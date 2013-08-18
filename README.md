@@ -1,9 +1,9 @@
 acl -- one advanced C/C++ lib for UNIX and WINDOWS
 ===
-Description:
+Description:<br>
 Advanced C/C++ library(ACL) for UNIX-like OS and WIN32 OS, including sync/async/ssl iostream for net/file, thread pool, process pool, db pool, server framework, event, memory, string, array/hash/ring/list, xml and json parser, http/smtp/icmp protocol, SSL/TLS, C unit test, etc
 
-Features:
+Features:<br>
 data structure: array/htable/ring/stack/avl
 socket/file stream(sync stream and async stream)
 http/icmp/smtp protocol
