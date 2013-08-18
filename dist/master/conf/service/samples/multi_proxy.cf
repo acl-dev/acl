@@ -1,0 +1,39 @@
+# service type  private unpriv  chroot  wakeup  maxproc command + args
+
+service proxy
+{
+	master_disable = yes
+	master_service = 5002
+	master_type = inet
+	master_private = n
+	master_unpriv = n
+	master_chroot = n
+	master_wakeup = -
+	master_maxproc = 1
+#	需要预先启动的进程数，该值不应大于 master_maxproc
+	master_prefork = 2
+	master_command = multi_proxy
+	master_log = {install_path}/var/log/multi_proxy.log
+#	master_args = 
+
+	multi_use_limit = 0
+	multi_pid_dir =  {install_path}/var/pid
+	multi_queue_dir = {install_path}/var
+	multi_rw_timeout = 0
+	multi_buf_size = 8192
+
+#	multi_in_flow_delay = 1
+	multi_idle_limit = 600
+#	multi_owner = owner
+	multi_delay_sec = 1
+	multi_delay_usec = 5000
+#	multi_daemon_timeout = 1800
+
+	proxy_debug_request = 1
+	proxy_request_file = {install_path}/var/log/request.log
+	proxy_debug_respond = 1
+	proxy_respond_file = {install_path}/var/log/respond.log
+	proxy_backend_addr = 127.0.0.1:80
+#	proxy_timeout = 60
+	proxy_bufsize = 8192
+}

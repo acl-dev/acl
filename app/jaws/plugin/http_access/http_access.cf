@@ -1,0 +1,8 @@
+service http_plugin_access {
+#	以下域名列表是否允许访问
+	http_domain_allow = www.sina.com, sina.com.cn:0
+#	重定向的域名列表
+	http_domain_redirect = test.tw=test.com.tw
+#	是否允许访问其它所有域名
+	http_domain_allow_all = 0
+}

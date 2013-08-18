@@ -1,0 +1,12 @@
+GET http://wmail2.mail.hexun.com/cgi-bin/main/login/1262918837 HTTP/1.1
+Host: wmail2.mail.hexun.com
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.0; zh-CN; rv:1.9.1.7) Gecko/20091221 Firefox/3.5.7
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: zh-cn,zh;q=0.7,en-us;q=0.3
+Accept-Encoding: gzip,deflate
+Accept-Charset: GB2312,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+Referer: http://wmail2.mail.hexun.com/cgi-bin/console/login/1262918836
+Cookie: __utma=27823648.422177696.1262914215.1262916847.1262917901.5; __utmb=27823648;__utmz=27823648.1262914215.1.1.utmccn=(direct)|utmcsr=(direct)|utmcmd=(none); HexunTrack=SID=217163494; hxck_sq_common=LoginStateCookie=md88aDazrp2KwrggnhhMQg%3d%3d&SnapCookie=bonerpMfA2LT9XEbMpY%2fnGYce2%2ffrrRRQHBRqeVvsqs%3d; ys-readmsg-layout-state=o%3Anorth%3Do%253Asize%253Dn%25253A60%5Esouth%3Do%253A%5Eeast%3Do%253A%5Ewest%3Do%253A; __utma=194262068.481558226.1262917014.1262917014.1262917014.1; __utmb=194262068.2.10.1262917014; __utmz=194262068.1262917014.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmc=27823648; userToken=3497499%7c0000%7c0%2cVO50ruL1k6bDxL7WkEqYWUstiyZHXAssMFwHmZbnBsSIY8%2bicqVhh7jy%2bRphjFQrBMa9YBCyyiqim8jYiLoVrxgCiGv%2fsnKzbwZSwa6v3N2N93qSsoJIG7%2f%2bprVJNnVtqdD%2bow0Rqx3tnrD6cl1gQg%3d%3d; MailUserName=whousegodwithme; wmail_login=1; pop_alive=0
+

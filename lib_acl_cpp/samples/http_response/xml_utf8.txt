@@ -1,0 +1,12 @@
+POST / HTTP/1.1
+HOST: 127.0.0.1:8888
+Content-Type: text/xml; charset=utf-8
+Content-Length: 153
+
+<root>
+  <users>
+    <user name="中国" pass="xxx1" />
+    <user name="中国" pass="xxx1" />
+    <user name="中国" pass="xxx1" />
+  </users>
+</root>

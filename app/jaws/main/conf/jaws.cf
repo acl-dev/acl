@@ -1,0 +1,100 @@
+
+service server {
+#	进程是否禁止运行
+	master_disable = no
+#	服务地址及端口号
+	master_service = 8284
+#	服务监听为域套接口
+#	master_service = jaws.sock
+#	服务类型
+	master_type = inet
+#	master_type = unix
+#	是否允许延迟接受客户端连接，如果为0则表示关闭该功能，如果大于0则表示打开此功能
+#	并且此值代表延迟接受连接的超时值，超过此值时如果客户端依然没有发来数据，则操作
+#	系统会在系统层直接关闭该连接
+#	master_defer_accept = 0
+#	是否只允许私有访问, 如果为 y, 则域套接口创建在 /opt/jaws/var/log/private/ 目录下,
+#	如果为 n, 则域套接口创建在 /opt/jaws/var/log/public/ 目录下,
+	master_private = n
+	master_unpriv = n
+#	是否需要 chroot: n -- no, y -- yes
+	master_chroot = n
+#	每隔多长时间触发一次，单位为秒(仅对 trigger 模式有效)
+	master_wakeup = -
+#	最大进程数
+	master_maxproc = 4
+#	进程程序名
+	master_command = jaws
+#	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
+#	master_args = -u
+#	传递给服务子进程的环境变量, 可以通过 getenv("SERVICE_ENV") 获得此值
+#	master_env = mempool_limit:512000000, mempool_use_mutex:true
+#	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
+#			sync_action:E_LOG_SEM, sem_name:/tmp/jaws.sem
+#	master_env = use_slice:true, slice_base:8, nslice:1024, nalloc_gc:100000, \
+#			slice_gc:gc2, rtgc_off:true
+#	进程日志记录文件
+	master_log = ./var/jaws.log
+
+#	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出
+	aio_use_limit = 0
+#	每个进程实例的空闲超时时间，超过此值后进程实例主动退出
+	aio_idle_limit = 0
+#	记录进程PID的位置(对于多进程实例来说没有意义)
+	aio_pid_dir =  ./var
+#	进程运行时所在的路径
+	aio_queue_dir = ./var
+#	读写超时时间, 单位为秒
+	aio_rw_timeout = 20
+#	读缓冲区的缓冲区大小
+	aio_buf_size = 8192
+#	每次 accept 时的循环接收的最大次数
+	aio_max_accept = 10
+#	进程运行时的用户身份
+	aio_owner = nobody
+
+#	采用事件循环的方式: select(default), poll, kernel(epoll/devpoll/kqueue)
+#	aio_event_mode = select
+#	aio_event_mode = poll
+	aio_event_mode = kernel
+#	是否由单独的线程接受客户端连接
+	aio_accept_alone = no
+#	用 select 进行循环时的时间间隔
+#	单位为秒
+	aio_delay_sec = 100
+#	单位为微秒
+	aio_delay_usec = 5000
+#	线程池的最大线程数, 如果该值为0则表示采用单线程非阻塞模式.
+#	aio_max_threads = 0
+#	每个线程的空闲时间.
+#	aio_thread_idle_limit = 60
+
+#	允许访问的客户端IP地址范围
+	aio_access_allow = 202.99.16.0:202.99.16.255, 127.0.0.1:127.0.0.1
+#	aio_access_allow = 0.0.0.0:255.255.255.255, 127.0.0.1:127.0.0.1
+
+############################################################################
+#	应用自己的配置选项
+
+#	每个客户端连接的空闲时间.
+#	client_idle_limit = 60
+#	是否输出当前的内存状态信息
+	debug_mem = 0
+#	服务协议名称
+	proto_name = http
+#	需要动态加载的服务模块
+	service_dlnames = ./lib/mod_http.so
+#	动态加载的服务模块的配置文件所在路径
+	service_cfgdir = ./conf
+#	连接池的连接数限制
+#	http_server_conn_limit = 10240
+#	每个进程最多启动的线程个数
+	nthreads = 1
+#	本机可以绑定的IP地址列表
+#	bind_ip_list = 127.0.0.1, 10.0.251.93, 60.28.251.93
+#	DNS服务器地址列表
+#	dns_list = 60.28.250.46:53, 60.28.250.40
+	dns_list = 8.8.8.8:53
+#	hosts_list 配置文件集合列表, 如：/etc/hosts, /etc/myhosts
+	hosts_list = /etc/hosts
+}

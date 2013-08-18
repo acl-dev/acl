@@ -1,0 +1,19 @@
+
+
+#命令函数名称|预测结果[0:表示成功, 1:表示失败]|参数个数|参数列表[name=参数1, name=参数2..
+#LOG|print:fprint
+LOG|print
+
+test_ring|0|0|
+STOP
+
+test_loop|0|0|count=10
+LOOP_BEGIN|COUNT=3
+  LOOP_BEGIN|COUNT=2
+    LOOP_BEGIN|COUNT=2
+#       LOOP_BREAK
+       test_param|0|0|account=zhengshuxin@hexun.com.cn, sender=cyun@staff.hexun.com, number=200
+    LOOP_END
+  LOOP_END
+LOOP_END
+#STOP

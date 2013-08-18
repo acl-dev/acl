@@ -1,0 +1,17 @@
+
+-----------------------------5169208281820
+Content-Disposition: form-data; name="file_1"; filename=""
+Content-Type: application/octet-stream
+
+
+-----------------------------5169208281820
+Content-Disposition: form-data; name="file_0"; filename="test.txt"
+Content-Type: text/plain
+
+hello world!
+
+-----------------------------5169208281820
+Content-Disposition: form-data; name="oper"
+
+upload
+-----------------------------5169208281820--

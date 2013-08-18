@@ -1,0 +1,5 @@
+service test {
+	host = localhost
+	root_path = /opt/acl/var/www/htdocs/
+#	vpath_map = /  /opt/acl/var/www/htdocs/  0
+}

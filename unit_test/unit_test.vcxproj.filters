@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="源文件\stdlib">
+      <UniqueIdentifier>{718dfeac-2754-47a3-ad50-01d30a63eab4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\net">
+      <UniqueIdentifier>{51e02ae8-7750-4cbf-9ca0-9c600bce0313}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\unit_test">
+      <UniqueIdentifier>{c75c87ca-0205-41bb-a476-33a6a3216ec5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="头文件\stdlib">
+      <UniqueIdentifier>{dc86b5b1-602c-44c7-8482-1325a6ae080b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\net">
+      <UniqueIdentifier>{d564e40c-4ff7-4d74-bcce-bc944390ea1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\unit_test">
+      <UniqueIdentifier>{e3ad21b6-c416-4f28-9bc3-b4f83ee4d867}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\unit_test\test_main.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\stdlib\test_avl.c">
+      <Filter>源文件\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\stdlib\test_htable.c">
+      <Filter>源文件\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\stdlib\test_malloc.c">
+      <Filter>源文件\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\stdlib\test_myflock.c">
+      <Filter>源文件\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\stdlib\test_ring.c">
+      <Filter>源文件\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\stdlib\test_stack.c">
+      <Filter>源文件\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\stdlib\test_stdlib.c">
+      <Filter>源文件\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\stdlib\test_string.c">
+      <Filter>源文件\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\stdlib\test_vstream.c">
+      <Filter>源文件\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\net\test_connect.c">
+      <Filter>源文件\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\net\test_net.c">
+      <Filter>源文件\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\net\test_net_misc.c">
+      <Filter>源文件\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\unit_test\unit_test.c">
+      <Filter>源文件\unit_test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\unit_test\unit_test\unit_test_fn.c">
+      <Filter>源文件\unit_test</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\unit_test\test_main.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\unit_test\stdlib\test_stdlib.h">
+      <Filter>头文件\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\unit_test\stdlib\test_stdtab.h">
+      <Filter>头文件\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\unit_test\net\test_net.h">
+      <Filter>头文件\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\unit_test\net\test_nettab.h">
+      <Filter>头文件\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\unit_test\unit_test\unit_test.h">
+      <Filter>头文件\unit_test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\unit_test\unit_test\unit_test_tab.h">
+      <Filter>头文件\unit_test</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

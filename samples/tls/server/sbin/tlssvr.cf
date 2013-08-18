@@ -1,0 +1,8 @@
+
+service tlscli {
+	server_tls_loglevel = 0
+	server_tls_scert_vd = 9
+	server_starttls_tmout = 300
+	server_tls_session_cache_database = btree:./var/cache_server
+	client_tls_session_cache_database = btree:./var/cache_client
+}

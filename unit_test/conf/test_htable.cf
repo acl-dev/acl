@@ -1,0 +1,15 @@
+LOG|print
+#htable_create|0|0|hash_fn=hash_crc32, table=name1:value1; name2:value2; name3:value3; name4:value4; name5:value5; name6:value6
+#htable_create|0|0|hash_fn=hash_def, table=name1:value1; name2:value2; name3:value3; name4:value4; name5:value5; name6:value6
+#htable_find|0|0|name=name1
+#htable_stat|0|0|
+#htable_find|-1|0|name=name_no_exist
+#htable_rwlock|0|0|hash_fn=hash_bin
+#htable_rwlock|0|0|hash_fn=hash_crc32
+#htable_rwlock|0|0|hash_fn=hash_func2
+#htable_rwlock|0|0|hash_fn=hash_func3
+#htable_rwlock|0|0|hash_fn=hash_func4
+#htable_rwlock|0|0|hash_fn=hash_func5
+#htable_rwlock|0|0|hash_fn=hash_func6
+htable_rwlock|0|0|hash_fn=hash_test
+#htable_rwlock|0|0|hash_fn=hash_def

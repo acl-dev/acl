@@ -1,0 +1,8 @@
+# configure
+
+service gbfilter {
+	debug_mem = 0
+	logpath = ./var/gbfilter.log
+	data_clone = 0
+	rewrite_enable = 1
+}

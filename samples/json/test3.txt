@@ -1,0 +1,5 @@
+{
+    id: 'file';
+    value: 'File',
+    name: 'zsxxsz'
+}

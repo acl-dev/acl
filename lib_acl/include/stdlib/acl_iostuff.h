@@ -1,0 +1,148 @@
+
+#ifndef	__ACL_IOSTUFF_INCLUDE_H__
+#define	__ACL_IOSTUFF_INCLUDE_H__
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
+#include "acl_define.h"
+
+#define ACL_CLOSE_ON_EXEC   1  /**< 标志位, 调用 exec 后自动关闭打开的描述字 */
+#define ACL_PASS_ON_EXEC    0
+
+#define ACL_BLOCKING        0  /**< 阻塞读写标志位 */
+#define ACL_NON_BLOCKING    1  /**< 非阻塞读写标志位 */
+
+/**
+ * 设置套接口为阻塞或非阻塞
+ * @param fd {ACL_SOCKET} SOCKET 套接字
+ * @param on {int} 是否设置该套接字为非阻塞, ACL_BLOCKING 或 ACL_NON_BLOCKING
+ * @return {int} 0: 成功; -1: 失败
+ */
+ACL_API int acl_non_blocking(ACL_SOCKET fd, int on);
+
+/**
+ * 写等待操作，直到套接字可写、出错或超时
+ * @param fd {ACL_SOCKET} SOCKET 套接字
+ * @param timeout {int} 超时时间，单位为秒
+ * @return {int} 0: 可写; -1: 失败或超时
+ */
+ACL_API int acl_write_wait(ACL_SOCKET fd, int timeout);
+
+/**
+ * 读等待操作，直到套接字有数据可读、出错或超时
+ * @param fd {ACL_SOCKET} SOCKET 套接字
+ * @param timeout {int} 超时时间，单位为秒
+ * @return {int} 0: 有数据可读; -1: 失败或超时
+ */
+ACL_API int acl_read_wait(ACL_SOCKET fd, int timeout);
+
+/**
+ * 毫秒级别睡眠
+ * @param delay {unsigned} 毫秒值
+ */
+ACL_API void acl_doze(unsigned delay);
+
+/**
+* 某个描述符是否可读
+* @param fd {ACL_SOCKET} 描述符
+* @return {int} 0: 不可读; != 0: 可读
+*/
+ACL_API int acl_readable(ACL_SOCKET fd);
+
+/**
+* 超时读数据
+* @param fd {ACL_SOCKET} 描述符
+* @param buf {void*} 存储区，不能为空
+* @param len {unsigned} buf 存储区大小
+* @param timeout {int} 超时时间，单位为秒
+* @return {int} > 0 读的数据; -1: 出错
+*/
+ACL_API int acl_timed_read(ACL_SOCKET fd, void *buf, unsigned len,
+					int timeout, void *unused_context);
+
+/**
+* 超时写数据
+* @param fd {ACL_SOCKET} 描述符
+* @param buf {void*} 数据存储区，不能为空
+* @param len {unsigned} 数据长度大小
+* @param timeout {int} 超时时间，单位为秒
+* @return {int} > 0 成功写入的数据; -1: 出错
+*/
+ACL_API int acl_timed_write(ACL_SOCKET fd, void *buf, unsigned len,
+					int timeout, void *unused_context);
+
+/**
+* 向文件描述符中循环写入数据，直到写完、出错或超时为止
+* @param fd {ACL_SOCKET} 文件描述符
+* @param buf {void*} 数据存储区，不能为空
+* @param len {unsigned} 数据长度大小
+* @param timeout {int} 超时时间，单位为秒
+* @param {int} 成功写入的长度
+*/
+ACL_API int acl_write_buf(ACL_SOCKET fd, const char *buf, int len, int timeout);
+
+/**
+* 探测套接字中系统缓存区的数据长度
+* @param fd {ACL_SOCKET} 描述符
+* @return {int} 系统缓存区数据长度
+*/
+ACL_API int acl_peekfd(ACL_SOCKET fd);
+
+/**
+ * 创建管道
+ * @param fds {ACL_FILE_HANDLE [2]} 存储结果
+ * @return {int} 0: ok; -1: error
+ */
+ACL_API int acl_pipe(ACL_FILE_HANDLE fds[2]);
+
+/**
+ * 关闭管道对
+ * @param fds {ACL_FILE_HANDLE[2]} 管道对
+ * @return {int} 0: ok; -1: error
+ */
+ACL_API int acl_pipe_close(ACL_FILE_HANDLE fds[2]);
+
+/**
+* 产生一个管道对
+* @param fds {ACL_FILE_HANDLE[2]} 存储产生的管道对地址，不能为空
+* @return 0: ok; -1: error
+*/
+ACL_API int acl_duplex_pipe(ACL_FILE_HANDLE fds[2]);
+
+#ifdef	ACL_UNIX
+/**
+ * 设置文件描述符标志位，当调用 exec 后该描述符自动被关闭
+ * @param fd {int} 文件描述符
+ * @param on {int} ACL_CLOSE_ON_EXEC 或 0
+ * @return {int} 0: ok; -1: error
+ */
+ACL_API int acl_close_on_exec(int fd, int on);
+
+/**
+ * 从某个文件描述符开始关闭之后的所有打开的文件描述符
+ * @param lowfd {int} 被关闭描述符的最低值
+ * @return {int} 0: ok; -1: error
+ */
+ACL_API int acl_closefrom(int lowfd);
+
+/**
+ * 设定当前进程可以打开最大文件描述符值
+ * @param limit {int} 设定的最大值
+ * @return {int} >=0: ok; -1: error
+ */
+ACL_API int acl_open_limit(int limit);
+
+/**
+ * 判断给定某个文件描述字是否是套接字
+ * @param fd {int} 文件描述符
+ * @return {int} != 0: 是; 0: 否
+ */
+ACL_API int acl_issock(int fd);
+#endif
+
+#ifdef	__cplusplus
+}
+#endif
+
+#endif

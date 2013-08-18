@@ -1,0 +1,13 @@
+LOG|print
+test_mask_addr|0|0|ip=192.168.1.10,bits=8
+test_mask_addr|0|0|ip=192.168.1.10,bits=16
+test_mask_addr|0|0|ip=192.168.1.10,bits=10
+test_mask_addr|0|0|ip=192.168.1.10,bits=24
+test_mask_addr|0|0|ip=192.168.1.10,bits=32
+test_connect|0|0|addr=www.hexun.com:80
+test_connect|0|0|addr=192.168.23.142@www.hexun.com:80
+test_connect|0|0|addr=0.0.0.0@www.hexun.com:80
+#test_connect|0|0|addr=127.0.0.1@www.hexun.com:80
+#test_connect|0|0|addr=60.28.250.199@www.hexun.com:80
+#test_connect|0|0|addr=10.0.250.199@www.hexun.com:80
+#test_connect|-1|0|addr=10.0.251.199@www.hexun.com:80

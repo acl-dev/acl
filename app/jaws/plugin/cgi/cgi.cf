@@ -1,0 +1,7 @@
+# configure
+
+service http_cgi {
+	logpath = /opt/jaws/var/log/cgifilter.log
+	cgi-bin = /opt/jaws/www/cgi-bin
+	cgi-map = /hello /hello.cgi
+}

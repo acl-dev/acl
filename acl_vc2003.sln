@@ -1,0 +1,66 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_acl", "lib_acl\lib_acl_vc2003.vcproj", "{B40213C2-507C-4C7F-A6E1-B850C9BDC27B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_protocol", "lib_protocol\lib_protocol_vc2003.vcproj", "{FE724EF7-3763-4E78-BDF5-BCBC075719FD}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_dict", "lib_dict\lib_dict.vcproj", "{9E6E9FE9-EAAC-44BA-B463-70DE0233822E}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_tls", "lib_tls\lib_tls.vcproj", "{389FDE47-7F16-4DD4-B37A-27918BE745B6}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		DebugDll = DebugDll
+		Release = Release
+		ReleaseDll = ReleaseDll
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B}.Debug.ActiveCfg = Debug|Win32
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B}.Debug.Build.0 = Debug|Win32
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B}.DebugDll.ActiveCfg = DebugDll|Win32
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B}.DebugDll.Build.0 = DebugDll|Win32
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B}.Release.ActiveCfg = Release|Win32
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B}.Release.Build.0 = Release|Win32
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B}.ReleaseDll.ActiveCfg = ReleaseDll|Win32
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B}.ReleaseDll.Build.0 = ReleaseDll|Win32
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD}.Debug.ActiveCfg = Debug|Win32
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD}.Debug.Build.0 = Debug|Win32
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD}.DebugDll.ActiveCfg = DebugDll|Win32
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD}.DebugDll.Build.0 = DebugDll|Win32
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD}.Release.ActiveCfg = Release|Win32
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD}.Release.Build.0 = Release|Win32
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD}.ReleaseDll.ActiveCfg = ReleaseDll|Win32
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD}.ReleaseDll.Build.0 = ReleaseDll|Win32
+		{9E6E9FE9-EAAC-44BA-B463-70DE0233822E}.Debug.ActiveCfg = Debug|Win32
+		{9E6E9FE9-EAAC-44BA-B463-70DE0233822E}.Debug.Build.0 = Debug|Win32
+		{9E6E9FE9-EAAC-44BA-B463-70DE0233822E}.DebugDll.ActiveCfg = DebugDll|Win32
+		{9E6E9FE9-EAAC-44BA-B463-70DE0233822E}.DebugDll.Build.0 = DebugDll|Win32
+		{9E6E9FE9-EAAC-44BA-B463-70DE0233822E}.Release.ActiveCfg = Release|Win32
+		{9E6E9FE9-EAAC-44BA-B463-70DE0233822E}.Release.Build.0 = Release|Win32
+		{9E6E9FE9-EAAC-44BA-B463-70DE0233822E}.ReleaseDll.ActiveCfg = ReleaseDll|Win32
+		{9E6E9FE9-EAAC-44BA-B463-70DE0233822E}.ReleaseDll.Build.0 = ReleaseDll|Win32
+		{389FDE47-7F16-4DD4-B37A-27918BE745B6}.Debug.ActiveCfg = Debug|Win32
+		{389FDE47-7F16-4DD4-B37A-27918BE745B6}.Debug.Build.0 = Debug|Win32
+		{389FDE47-7F16-4DD4-B37A-27918BE745B6}.DebugDll.ActiveCfg = DebugDll|Win32
+		{389FDE47-7F16-4DD4-B37A-27918BE745B6}.DebugDll.Build.0 = DebugDll|Win32
+		{389FDE47-7F16-4DD4-B37A-27918BE745B6}.Release.ActiveCfg = Release|Win32
+		{389FDE47-7F16-4DD4-B37A-27918BE745B6}.Release.Build.0 = Release|Win32
+		{389FDE47-7F16-4DD4-B37A-27918BE745B6}.ReleaseDll.ActiveCfg = ReleaseDll|Win32
+		{389FDE47-7F16-4DD4-B37A-27918BE745B6}.ReleaseDll.Build.0 = ReleaseDll|Win32
+	EndGlobalSection
+	GlobalSection(SolutionItems) = postSolution
+		changes.txt = changes.txt
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

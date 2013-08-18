@@ -1,0 +1,11 @@
+2008/10/14 17:06:28 http_client(pid=22572, tid=22792)(1, error): acl_inet_connect_ex(99): connect ip(60.288.250.199) port(8383) error
+/10/13 14:16:07 http_client(pid=20180, tid=21700)(1, error): acl_inet_connect_ex(99): connect ip(69.46.228.53) port(80) error
+2008/10/13 14:16:51 http_client(pid=20180, tid=21672)(1, error): acl_inet_connect_ex(99): connect ip(69.46.228.53) port(80) error
+thostbyname error(unknown error), addr=www.sina..com
+2009/04/08 10:19:44 http_client(pid=2624, tid=2628)(1, error): d:\工作目录\项目管理\acl\acl_project\lib_acl\src\net\connect\acl_inet_connect.c, acl_inet_connect_ex(67): invalid port(0)
+2009/04/08 10:27:23 http_client(pid=2624, tid=1708)(1, error): acl_inet_connect_ex(109): connect ip(127.0.0.1) port(28083) error
+2009/04/08 10:31:01 http_client(pid=2624, tid=2108)(1, error): http_hdr_res_parse: entry_lnk's size 0 invalid
+2009/04/08 10:31:01 http_client(pid=2624, tid=2108)(1, error): d:\工作目录\项目管理\acl\acl_project\win32_build\vc\samples\http_client\httpclient.cpp(315): parse hdr_res error
+2009/04/08 10:47:37 http_client(pid=2624, tid=884)(1, error): http_hdr_res_parse: entry_lnk's size 0 invalid
+2009/04/08 10:47:37 http_client(pid=2624, tid=884)(1, error): d:\工作目录\项目管理\acl\acl_project\win32_build\vc\samples\http_client\httpclient.cpp(315): parse hdr_res error
+2009/04/09 10:52:11 http_client(pid=2412, tid=2428)(1, error): acl_inet_connect_ex(109): connect ip(10.0.251.164) port(80) error

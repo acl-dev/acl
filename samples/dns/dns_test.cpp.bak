@@ -1,0 +1,80 @@
+
+#include "lib_acl.h"
+
+int dns_lookup(const char *domain, const char *dns_ip,
+			   unsigned short dns_port, ACL_VSTRING *strbuf)
+{
+	const char *myname = "dns_lookup";
+	char buf[512];
+	char rbuf[512];
+	size_t sz = 512;
+	unsigned short sid;
+	ACL_SOCKET s;
+	int rl;
+	struct sockaddr_in S;
+	
+	s = socket(PF_INET, SOCK_DGRAM, 0);
+	if (s < 0)
+		acl_msg_fatal("socket create error");
+
+	memset(&S, '\0', sizeof(S));
+	S.sin_family = AF_INET;
+	S.sin_port = htons(dns_port);
+	S.sin_addr.s_addr = inet_addr(dns_ip);
+
+	memset(buf, '\0', 512);
+	sz = 512;
+	sid = rfc1035BuildAQuery(domain, buf, sz, 100, NULL);
+	sendto(s, buf, (int) sz, 0, (struct sockaddr *) &S, (int) sizeof(S));
+	do {
+		fd_set R;
+		struct timeval to;
+
+		FD_ZERO(&R);
+		FD_SET(s, &R);
+		to.tv_sec = 10;
+		to.tv_usec = 0;
+		rl = select((int) s + 1, &R, NULL, NULL, &to);
+	} while (0);
+
+	if (rl < 1) {
+		acl_msg_error("TIMEOUT");
+		return -1;
+	}
+	memset(rbuf, '\0', 512);
+	rl = recv(s, rbuf, 512, 0);
+
+	{
+		unsigned short rid = 0;
+		int i, n;
+		rfc1035_message *answers;
+
+		n = rfc1035MessageUnpack(rbuf, rl, &answers);
+		if (n < 0) {
+			acl_msg_error("ERROR %d(%s), rl=%d", rfc1035_errno, rbuf, rl);
+			return (-1);
+		}
+		/*else if (rid != sid) {
+			acl_msg_error("ERROR, ID mismatch (%#hx, %#hx)", sid, rid);
+			return (-1);
+		} */
+
+		acl_msg_info("%d answers", n);
+
+		for (i = 0; i < n; i++) {
+			if (answers->answer[i].type == RFC1035_TYPE_A) {
+				struct in_addr a;
+				memcpy(&a, answers->answer[i].rdata, 4);
+				acl_msg_info("A\t%d\t%s\n", answers->answer[i].ttl, inet_ntoa(a));
+				if (strbuf)
+					acl_vstring_sprintf_append(strbuf, "A\t%d\t%s\r\n",
+						answers->answer[i].ttl, inet_ntoa(a));
+			} else {
+				acl_msg_error("can't print answer type %d", (int) answers->answer[i].type);
+			}
+		}
+		rfc1035MessageDestroy(answers);
+	}
+	closesocket(s);
+	return 0;
+}

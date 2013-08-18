@@ -1,0 +1,7 @@
+<root>
+  <users>
+    <user name="Ö£Ê÷ÐÂ1" pass="xsz1" />
+    <user name="Ö£Ê÷ÐÂ2" pass="xsz2" />
+    <user name="Ö£Ê÷ÐÂ3" pass="xsz3" />
+</users>
+</root>

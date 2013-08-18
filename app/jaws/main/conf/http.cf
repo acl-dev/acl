@@ -1,0 +1,40 @@
+
+service http_mod {
+############################################################################
+#	应用自己的配置选项
+#	是否调试内存分配情况
+	debug_mem = 0
+#	每个客户端连接的空闲时间.
+#	client_idle_limit = 60
+##	与HTTP服务相关的配置项
+#	http_filter_proxy = HTTP_FILTER_HTTPD
+	http_filter_proxy = HTTP_FILTER_PROXY
+#	是否与客户端保持长连接
+	http_client_keepalive = 1
+#	代理模式下，是否与服务端保持长连接
+	http_server_keepalive = 1
+#	似乎是天津网通的内容过滤网关处理 Proxy-Connection 存在问题，会造成延迟
+	http_proxy_connection_off = 1
+
+#	HTML错误模板存放目录
+	http_tmpl_path = ./var/www/tmpl
+#	虚拟主机配置文件存放目录
+	http_vhost_path = ./conf/www/vhost
+#	缺省域的配置文件名
+	http_vhost_default = ./conf/www/default.cf
+
+#	外挂动态库集合
+#	http_plugin_dlnames = /opt/jaws/plugin/cgi.so; /opt/jaws/plugin/gbfilter.so
+#	http_plugin_dlnames = /opt/jaws/plugin/cgi.so
+#	http_plugin_dlnames = /opt/jaws/plugin/gbfilter.so
+#	http_plugin_dlnames = /opt/jaws/plugin/gb_jt2ft.so
+#	http_plugin_dlnames = /opt/jaws/plugin/gb_jt2ft32.so
+#	http_plugin_dlnames = ./lib/http_access.so
+#	http_plugin_dlnames = ./lib/gb_jt2ft.so
+#	外挂动态库的配置文件所在目录
+	http_plugin_cfgdir = ./conf
+#	与服务端的连接池的最大连接限制
+	http_server_conn_limit = 1000
+#	HTTP 通信过程中的缓冲区大小
+	http_buf_size = 10240
+}

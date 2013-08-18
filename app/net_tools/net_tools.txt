@@ -1,0 +1,7 @@
+2013/03/13 10:15:55 net_tools (pid=4052)(info): sqlite3.dll loaded
+2013/03/13 10:15:55 net_tools (pid=4052)(info): table(mail_tbl) exist
+2013/03/13 10:15:55 net_tools (pid=4052)(error): sqlites_get_table(select smtp_addr, smtp_port, pop3_addr, pop3_port, user, pass, recipients from mail_tbl) error(no such column: smtp_port)
+2013/03/13 10:15:55 net_tools (pid=4052)(error): sql(select smtp_addr, smtp_port, pop3_addr, pop3_port, user, pass, recipients from mail_tbl) error
+2013/03/13 10:16:06 net_tools (pid=4052)(info): table(mail_tbl) exist
+2013/03/13 10:16:06 net_tools (pid=4052)(error): sqlites_get_table(insert into mail_tbl(smtp_addr, smtp_port, pop3_addr, pop3_port, user, pass, recipients) values('smtpcom.263xmail.com', 25, 'popcom.263xmail.com', 110, 'shuxin.zheng@net263.com', 'PiDMbTuA15EkoAcOR4zB9u2eOrpXMg2g/Q==', 'wang.li@net263.com,shuxin.zheng@net263.com,jian.shao@net263.com')) error(table mail_tbl has no column named smtp_port)
+2013/03/13 10:16:06 net_tools (pid=4052)(error): sql(insert into mail_tbl(smtp_addr, smtp_port, pop3_addr, pop3_port, user, pass, recipients) values('smtpcom.263xmail.com', 25, 'popcom.263xmail.com', 110, 'shuxin.zheng@net263.com', 'PiDMbTuA15EkoAcOR4zB9u2eOrpXMg2g/Q==', 'wang.li@net263.com,shuxin.zheng@net263.com,jian.shao@net263.com')) error

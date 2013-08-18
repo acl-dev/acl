@@ -1,0 +1,192 @@
+#include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/stdlib/locker.hpp"
+#include "acl_cpp/connpool/connect_client.hpp"
+#include "acl_cpp/connpool/connect_pool.hpp"
+
+namespace acl
+{
+
+connect_pool::connect_pool(const char* addr, int max, int retry_inter /* = 1 */)
+: alive_(true)
+, last_dead_(0)
+, max_(max)
+, count_(0)
+, idle_ttl_(-1)
+, last_check_(0)
+, check_inter_(30)
+, total_used_(0)
+, current_used_(0)
+, last_(0)
+{
+	if (retry_inter < 1 || retry_inter >= 60)
+		retry_inter_ = 1;
+	else
+		retry_inter_ = retry_inter;
+
+	if (max_ < 1)
+		max_ = 10;
+
+	ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
+}
+
+connect_pool::~connect_pool()
+{
+	std::list<connect_client*>::iterator it = pool_.begin();
+	for (; it != pool_.end(); ++it)
+		delete *it;
+}
+
+connect_pool& connect_pool::set_idle_ttl(time_t ttl)
+{
+	idle_ttl_ = ttl;
+	return *this;
+}
+
+connect_client* connect_pool::peek()
+{
+	lock_.lock();
+	if (alive_ == false)
+	{
+		time_t now = time(NULL);
+		if (now - last_dead_ < retry_inter_)
+		{
+			lock_.unlock();
+			return NULL;
+		}
+		alive_ = true;
+	}
+
+	connect_client* conn;
+
+	std::list<connect_client*>::iterator it = pool_.begin();
+	if (it != pool_.end())
+	{
+		conn = *it;
+		pool_.erase(it);
+		total_used_++;
+		current_used_++;
+		lock_.unlock();
+		return conn;
+	}
+	else if (count_ >= max_)
+	{
+		logger_error("too many connect(%d > %d) to redis: %s",
+			count_, max_, addr_);
+		lock_.unlock();
+		return NULL;
+	}
+
+	conn = create_connect();
+	if (conn->open() == false)
+	{
+		delete conn;
+		alive_ = false;
+		time(&last_dead_);
+		(void) time(&last_dead_);
+		lock_.unlock();
+		return NULL;
+	}
+
+	count_++;
+
+	total_used_++;
+	current_used_++;
+
+	lock_.unlock();
+	return conn;
+}
+
+void connect_pool::put(connect_client* conn, bool keep /* = true */)
+{
+	time_t now = time(NULL);
+
+	lock_.lock();
+	if (keep && alive_)
+	{
+		conn->set_when(now);
+		pool_.push_back(conn);
+	}
+	else
+	{
+		delete conn;
+		count_--;
+		acl_assert(count_ >= 0);
+	}
+
+	if (idle_ttl_ >= 0 && now - last_check_ >= check_inter_)
+	{
+		(void) check_idle(idle_ttl_, false);
+		(void) time(&last_check_);
+	}
+	lock_.unlock();
+}
+
+void connect_pool::set_alive(bool ok /* true | false */)
+{
+	lock_.lock();
+	alive_ = ok;
+	if (ok == false)
+		time(&last_dead_);
+	lock_.unlock();
+}
+
+int connect_pool::check_idle(time_t ttl, bool exclusive /* = true */)
+{
+	if (ttl < 0)
+		return 0;
+	if (exclusive)
+		lock_.lock();
+	if (pool_.empty())
+	{
+		lock_.unlock();
+		return 0;
+	}
+
+	if (ttl == 0)
+	{
+		int   n = 0;
+		std::list<connect_client*>::iterator it = pool_.begin();
+		for (; it != pool_.end(); ++it)
+		{
+			delete *it;
+			n++;
+		};
+		pool_.clear();
+		count_ = 0;
+		lock_.unlock();
+		return n;
+	}
+
+	int n = 0;
+	time_t now = time(NULL), when;
+
+	std::list<connect_client*>::iterator it, next;
+	std::list<connect_client*>::reverse_iterator rit = pool_.rbegin();
+
+	for (; rit != pool_.rend();)
+	{
+		it = --rit.base();
+		when = (*it)->get_when();
+		if (when <= 0)
+		{
+			++rit;
+			continue;
+		}
+
+		if (now - when < ttl)
+			break;
+
+		delete *it;
+		next = pool_.erase(it);
+		rit = std::list<connect_client*>::reverse_iterator(next);
+
+		n++;
+		count_--;
+	}
+
+	lock_.unlock();
+	return n;
+}
+
+} // namespace acl
