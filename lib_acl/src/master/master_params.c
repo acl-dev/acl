@@ -26,26 +26,16 @@
 
 char *acl_var_master_conf_dir; /* must be set value in app */
 
-char *acl_var_master_inet_interfaces;
 int   acl_var_master_proc_limit;
-char *acl_var_master_owner_user;
 uid_t acl_var_master_owner_uid;
-char *acl_var_master_owner;
-char *acl_var_master_owner_group;
 gid_t acl_var_master_owner_gid;
 int   acl_var_master_throttle_time;
-char *acl_var_master_daemon_dir;
-char *acl_var_master_queue_dir;
-char *acl_var_master_service_dir;
-char *acl_var_master_log_file;
-char *acl_var_master_pid_file;
 int   acl_var_master_buf_size;
 int   acl_var_master_rw_timeout;
 pid_t acl_var_master_pid;
 int   acl_var_master_in_flow_delay;
 int   acl_var_master_delay_sec;
 int   acl_var_master_delay_usec;
-int   acl_var_master_scan_subdir;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_MASTER_PROC_LIMIT, ACL_DEF_MASTER_PROC_LIMIT, &acl_var_master_proc_limit, 0, 0 },
@@ -57,6 +47,16 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_MASTER_DELAY_USEC, ACL_DEF_MASTER_DELAY_USEC, &acl_var_master_delay_usec, 0, 0 },
 	{ 0, 0, 0, 0, 0 },
 };
+
+char *acl_var_master_inet_interfaces;
+char *acl_var_master_owner_user;
+char *acl_var_master_owner;
+char *acl_var_master_owner_group;
+char *acl_var_master_daemon_dir;
+char *acl_var_master_queue_dir;
+char *acl_var_master_service_dir;
+char *acl_var_master_log_file;
+char *acl_var_master_pid_file;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ ACL_VAR_MASTER_INET_INTERFACES, ACL_DEF_MASTER_INET_INTERFACES, &acl_var_master_inet_interfaces },
@@ -71,8 +71,12 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ 0, 0, 0 },
 };
 
+int   acl_var_master_scan_subdir;
+int  acl_var_master_set_ugid;
+
 static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
 	{ ACL_VAR_MASTER_SCAN_SUBDIR, ACL_DEF_MASTER_SCAN_SUBDIR, &acl_var_master_scan_subdir },
+	{ ACL_VAR_MASTER_SET_UGID, ACL_DEF_MASTER_SET_UGID, &acl_var_master_set_ugid },
 	{ 0, 0, 0 },
 };
 #endif  /* ACL_UNIX */
@@ -121,8 +125,7 @@ static void __init_conf_bool_vars(ACL_CONFIG_BOOL_TABLE cbt[])
 }
 
 static void __update_conf_int_vars(ACL_CONFIG_INT_TABLE cit[],
-					const char *name,
-					const char *value)
+	const char *name, const char *value)
 {
 	int   i;
 
@@ -133,8 +136,7 @@ static void __update_conf_int_vars(ACL_CONFIG_INT_TABLE cit[],
 }
 
 static void __update_conf_int64_vars(ACL_CONFIG_INT64_TABLE cit[],
-					const char *name,
-					const char *value)
+	const char *name, const char *value)
 {
 	int   i;
 
@@ -145,8 +147,7 @@ static void __update_conf_int64_vars(ACL_CONFIG_INT64_TABLE cit[],
 }
 
 static void __update_conf_str_vars(ACL_CONFIG_STR_TABLE cst[],
-					const char *name,
-					const char *value)
+	const char *name, const char *value)
 {
 	int   i;
 
@@ -159,8 +160,7 @@ static void __update_conf_str_vars(ACL_CONFIG_STR_TABLE cst[],
 }
 
 static void __update_conf_bool_vars(ACL_CONFIG_BOOL_TABLE cbt[],
-					const char *name,
-					const char *value)
+	const char *name, const char *value)
 {
 	int   i, n;
 
@@ -204,13 +204,11 @@ static void __update_master_conf_vars(ACL_CFG_PARSER *parser)
 			continue;
 
 		if (acl_msg_verbose)
-			acl_msg_info("%s = [%s]",
-					cfg_line->value[0],
-					cfg_line->value[1]);
+			acl_msg_info("%s = [%s]", cfg_line->value[0],
+				cfg_line->value[1]);
 
-		__update_conf_int_vars(__conf_int_tab,
-					cfg_line->value[0],
-					cfg_line->value[1]);
+		__update_conf_int_vars(__conf_int_tab, cfg_line->value[0],
+			cfg_line->value[1]);
 	}
 
 	for (i = 0; i < n; i++) {
@@ -221,13 +219,11 @@ static void __update_master_conf_vars(ACL_CFG_PARSER *parser)
 			continue;
 
 		if (acl_msg_verbose)
-			acl_msg_info("%s = [%s]",
-					cfg_line->value[0],
-					cfg_line->value[1]);
+			acl_msg_info("%s = [%s]", cfg_line->value[0],
+				cfg_line->value[1]);
 
 		__update_conf_str_vars(__conf_str_tab,
-					cfg_line->value[0],
-					cfg_line->value[1]);
+			cfg_line->value[0], cfg_line->value[1]);
 	}
 
 	for (i = 0; i < n; i++) {
@@ -238,23 +234,21 @@ static void __update_master_conf_vars(ACL_CFG_PARSER *parser)
 			continue;
 
 		if (acl_msg_verbose)
-			acl_msg_info("%s = [%s]",
-					cfg_line->value[0],
-					cfg_line->value[1]);
+			acl_msg_info("%s = [%s]", cfg_line->value[0],
+				cfg_line->value[1]);
 
 		__update_conf_bool_vars(__conf_bool_tab,
-					cfg_line->value[0],
-					cfg_line->value[1]);
+			cfg_line->value[0], cfg_line->value[1]);
 	}
 }
 
 void acl_master_params_load(const char *pathname)
 {
-	char  myname[] = "acl_master_params_load";
+	const char *myname = "acl_master_params_load";
 
 	if (pathname == NULL || *pathname == 0)
 		acl_msg_fatal("%s(%d)->%s: input error",
-				__FILE__, __LINE__, myname);
+			__FILE__, __LINE__, myname);
 	if (__cfg_parser != NULL)
 		acl_cfg_parser_free(__cfg_parser);
 
@@ -264,8 +258,7 @@ void acl_master_params_load(const char *pathname)
 
 	if (__cfg_parser == NULL)
 		acl_msg_fatal("%s(%d)->%s: can't load file = %s, serr = %s",
-				__FILE__, __LINE__, myname,
-				pathname, strerror(errno));
+			__FILE__, __LINE__, myname, pathname, strerror(errno));
 	__update_master_conf_vars(__cfg_parser);
 }
 
@@ -280,11 +273,11 @@ static char *__app_conf_file = NULL;
 
 void acl_app_conf_load(const char *pathname)
 {
-	char  myname[] = "acl_app_conf_load";
+	const char *myname = "acl_app_conf_load";
 
 	if (pathname == NULL || *pathname == 0)
 		acl_msg_fatal("%s(%d)->%s: input error",
-				__FILE__, __LINE__, myname);
+			__FILE__, __LINE__, myname);
 
 	if (__app_cfg != NULL)
 		acl_xinetd_cfg_free(__app_cfg);
@@ -293,21 +286,20 @@ void acl_app_conf_load(const char *pathname)
 
 	if (__app_cfg == NULL)
 		acl_msg_fatal("%s(%d)->%s: xinetd_cfg_load null, file=%s, serr=%s",
-				__FILE__, __LINE__, myname,
-				pathname, strerror(errno));
+			__FILE__, __LINE__, myname, pathname, strerror(errno));
 
 	__app_conf_file = acl_mystrdup(pathname);
 }
 
 void  acl_get_app_conf_int_table(ACL_CONFIG_INT_TABLE *table)
 {
-	char  myname[] = "acl_get_app_conf_int_table";
+	const char *myname = "acl_get_app_conf_int_table";
 	int   i, n, ret;
 	char *name, *value;
 
 	if (__app_cfg == NULL)
 		acl_msg_fatal("%s(%d)->%s: app_cfg null, call app_conf_load first",
-				__FILE__, __LINE__, myname);
+			__FILE__, __LINE__, myname);
 
 	if (table == NULL)
 		return;
@@ -325,13 +317,13 @@ void  acl_get_app_conf_int_table(ACL_CONFIG_INT_TABLE *table)
 
 void  acl_get_app_conf_int64_table(ACL_CONFIG_INT64_TABLE *table)
 {
-	char  myname[] = "acl_get_app_conf_int64_table";
+	const char *myname = "acl_get_app_conf_int64_table";
 	int   i, n, ret;
 	char *name, *value;
 
 	if (__app_cfg == NULL)
 		acl_msg_fatal("%s(%d)->%s: app_cfg null, call app_conf_load first",
-				__FILE__, __LINE__, myname);
+			__FILE__, __LINE__, myname);
 
 	if (table == NULL)
 		return;
@@ -349,13 +341,13 @@ void  acl_get_app_conf_int64_table(ACL_CONFIG_INT64_TABLE *table)
 
 void  acl_get_app_conf_str_table(ACL_CONFIG_STR_TABLE *table)
 {
-	char  myname[] = "acl_get_app_conf_str_table";
+	const char *myname = "acl_get_app_conf_str_table";
 	int   i, n, ret;
 	char *name, *value;
 
 	if (__app_cfg == NULL)
 		acl_msg_fatal("%s(%d)->%s: app_cfg null, call app_conf_load first",
-				__FILE__, __LINE__, myname);
+			__FILE__, __LINE__, myname);
 
 	if (table == NULL)
 		return;
@@ -374,13 +366,13 @@ void  acl_get_app_conf_str_table(ACL_CONFIG_STR_TABLE *table)
 
 void  acl_get_app_conf_bool_table(ACL_CONFIG_BOOL_TABLE *table)
 {
-	char  myname[] = "acl_get_app_conf_bool_table";
+	const char *myname = "acl_get_app_conf_bool_table";
 	int   i, n, ret;
 	char *name, *value;
 
 	if (__app_cfg == NULL)
 		acl_msg_fatal("%s(%d)->%s: app_cfg null, call app_conf_load first",
-				__FILE__, __LINE__, myname);
+			__FILE__, __LINE__, myname);
 
 	if (table == NULL)
 		return;

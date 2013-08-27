@@ -144,12 +144,26 @@ static void json_escape_append(ACL_VSTRING *buf, const char *src)
 
 	ACL_VSTRING_ADDCH(buf, '"');
 	while (*ptr) {
-		if (*ptr == '"' || *ptr == '\\' || *ptr == '{'
-			|| *ptr == '}' || *ptr == '[' || *ptr == ']')
-		{
+		if (*ptr == '"' || *ptr == '\\' || *ptr == '/') {
 			ACL_VSTRING_ADDCH(buf, '\\');
-		}
-		ACL_VSTRING_ADDCH(buf, *ptr);
+			ACL_VSTRING_ADDCH(buf, *ptr);
+		} else if (*ptr == '\b') {
+			ACL_VSTRING_ADDCH(buf, '\\');
+			ACL_VSTRING_ADDCH(buf, 'b');
+		} else if (*ptr == '\f') {
+			ACL_VSTRING_ADDCH(buf, '\\');
+			ACL_VSTRING_ADDCH(buf, 'f');
+		} else if (*ptr == '\n') {
+			ACL_VSTRING_ADDCH(buf, '\\');
+			ACL_VSTRING_ADDCH(buf, 'n');
+		} else if (*ptr == '\r') {
+			ACL_VSTRING_ADDCH(buf, '\\');
+			ACL_VSTRING_ADDCH(buf, 'r');
+		} else if (*ptr == '\t') {
+			ACL_VSTRING_ADDCH(buf, '\\');
+			ACL_VSTRING_ADDCH(buf, 't');
+		} else
+			ACL_VSTRING_ADDCH(buf, *ptr);
 		ptr++;
 	}
 	ACL_VSTRING_ADDCH(buf, '"');

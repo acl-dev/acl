@@ -666,6 +666,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <None Include=".\changes.txt" />
     <None Include="Readme.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

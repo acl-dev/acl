@@ -73,7 +73,8 @@ static void master_listen_sock(ACL_MASTER_SERV *serv)
 				acl_var_master_owner_gid);
 			serv->listen_fds[i] = acl_unix_listen(
 				addr->addr, qlen, ACL_NON_BLOCKING);
-			acl_set_ugid(getuid(), getgid());
+			if (acl_var_master_set_ugid)
+				acl_set_ugid(getuid(), getgid());
 
 			service_type = ACL_VSTREAM_TYPE_LISTEN_UNIX;
 			break;
@@ -92,8 +93,8 @@ static void master_listen_sock(ACL_MASTER_SERV *serv)
 		acl_close_on_exec(serv->listen_fds[i], ACL_CLOSE_ON_EXEC);
 
 		serv->listen_streams[i] = acl_vstream_fdopen(serv->listen_fds[i],
-				O_RDONLY, acl_var_master_buf_size,
-				acl_var_master_rw_timeout, service_type);
+			O_RDONLY, acl_var_master_buf_size,
+			acl_var_master_rw_timeout, service_type);
 
 		acl_msg_info("%s(%d), %s: listen on: %s, qlen: %d",
 			__FILE__, __LINE__, myname, addr->addr, qlen);
@@ -122,8 +123,8 @@ static void master_listen_inet(ACL_MASTER_SERV *serv)
 		acl_tcp_defer_accept(serv->listen_fds[0], serv->defer_accept);
 
 	serv->listen_streams[0] = acl_vstream_fdopen(serv->listen_fds[0],
-			O_RDONLY, acl_var_master_buf_size,
-			acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN_INET);
+		O_RDONLY, acl_var_master_buf_size,
+		acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN_INET);
 	acl_close_on_exec(serv->listen_fds[0], ACL_CLOSE_ON_EXEC);
 	acl_msg_info("%s(%d), %s: listen on inet: %s, qlen: %d",
 		__FILE__, __LINE__, myname, serv->name, qlen);
@@ -149,10 +150,11 @@ static void master_listen_unix(ACL_MASTER_SERV *serv)
 			__FILE__, __LINE__, myname, serv->name, strerror(errno));
 
 	serv->listen_streams[0] = acl_vstream_fdopen(serv->listen_fds[0],
-			O_RDONLY, acl_var_master_buf_size,
-			acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN_UNIX);
+		O_RDONLY, acl_var_master_buf_size,
+		acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN_UNIX);
 	acl_close_on_exec(serv->listen_fds[0], ACL_CLOSE_ON_EXEC);
-	acl_set_ugid(getuid(), getgid());
+	if (acl_var_master_set_ugid)
+		acl_set_ugid(getuid(), getgid());
 	acl_msg_info("%s(%d), %s: listen on domain socket: %s, qlen: %d",
 		__FILE__, __LINE__, myname, serv->name, qlen);
 }
@@ -169,10 +171,11 @@ static void master_listen_fifo(ACL_MASTER_SERV *serv)
 			__FILE__, __LINE__, myname, serv->name, strerror(errno));
 
 	serv->listen_streams[0] = acl_vstream_fdopen(serv->listen_fds[0],
-			O_RDONLY, acl_var_master_buf_size,
-			acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN);
+		O_RDONLY, acl_var_master_buf_size,
+		acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN);
 	acl_close_on_exec(serv->listen_fds[0], ACL_CLOSE_ON_EXEC);
-	acl_set_ugid(getuid(), getgid());
+	if (acl_var_master_set_ugid)
+		acl_set_ugid(getuid(), getgid());
 	acl_msg_info("%s(%d), %s: listen on fifo socket: %s",
 		__FILE__, __LINE__, myname, serv->name);
 }

@@ -1510,4 +1510,9 @@
     </None>
     <None Include="Readme.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt">
+      <Filter>doc</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

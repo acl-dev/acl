@@ -1,4 +1,16 @@
 
+383) 2013.8.21
+383.1) feature: master 框架允许以非 root 身份启动，需要用户修改 acl_master 的
+配置文件 main.cf，添加 set_ugid = 0，默认情况下该值为 1
+
+382) 2013.8.20
+382.1) bugfix: acl_json_util.c::json_escape_append, acl_json_parse::json_tag
+中需要对特殊控制字符做转义处理（目前在解析时暂不支持 \u 的情况)
+
+381) 2013.8.19
+381.1) bugfix: acl_json_util.c::json_escape_append 中不应将 "{}[]" 这些字符作为
+特殊字符而转义
+
 380) 2013.8.14
 380.1) event: events_select/events_poll/events_kernel/events_iocp 使事件引擎
 的时钟更为精确

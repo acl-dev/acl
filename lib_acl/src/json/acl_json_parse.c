@@ -7,6 +7,8 @@
 #define	LEN	ACL_VSTRING_LEN
 #define	STR	acl_vstring_str
 #define END	acl_vstring_end
+#define ADDCH	ACL_VSTRING_ADDCH
+
 #define IS_QUOTE(x) ((x) == '\"' || (x) == '\'')
 #define IS_SPACE(c) ((c) == ' ' || (c) == '\t' || (c) == '\r' || (c) == '\n')
 #define SKIP_WHILE(cond, ptr) { while(*(ptr) && (cond)) (ptr)++; }
@@ -168,7 +170,18 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 		/* 如果前面有引号，则需要找到结尾引号 */
 		if (json->curr_node->quote) {
 			if (json->curr_node->backslash) {
-				ACL_VSTRING_ADDCH(json->curr_node->ltag, ch);
+				if (ch == 'b')
+					ADDCH(json->curr_node->ltag, '\b');
+				else if (ch == 'f')
+					ADDCH(json->curr_node->ltag, '\f');
+				else if (ch == 'n')
+					ADDCH(json->curr_node->ltag, '\n');
+				else if (ch == 'r')
+					ADDCH(json->curr_node->ltag, '\r');
+				else if (ch == 't')
+					ADDCH(json->curr_node->ltag, '\t');
+				else
+					ADDCH(json->curr_node->ltag, ch);
 				json->curr_node->backslash = 0;
 			}
 
@@ -178,7 +191,7 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 			else if (ch == '\\') {
 				/* 处理半个汉字的情形 */
 				if (json->curr_node->part_word) {
-					ACL_VSTRING_ADDCH(json->curr_node->ltag, ch);
+					ADDCH(json->curr_node->ltag, ch);
 					json->curr_node->part_word = 0;
 				} else
 					json->curr_node->backslash = 1;
@@ -195,7 +208,7 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 				data++;
 				break;
 			} else {
-				ACL_VSTRING_ADDCH(json->curr_node->ltag, ch);
+				ADDCH(json->curr_node->ltag, ch);
 
 				/* 是否兼容后半个汉字为转义符 '\' 的情况 */
 				if ((json->flag & ACL_JSON_FLAG_PART_WORD)) {
@@ -211,7 +224,7 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 		/* 分析标签名前没有引号的情况 */
 
 		else if (json->curr_node->backslash) {
-			ACL_VSTRING_ADDCH(json->curr_node->ltag, ch);
+			ADDCH(json->curr_node->ltag, ch);
 			json->curr_node->backslash = 0;
 		}
 
@@ -221,7 +234,7 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 		else if (ch == '\\') {
 			/* 处理半个汉字的情形 */
 			if (json->curr_node->part_word) {
-				ACL_VSTRING_ADDCH(json->curr_node->ltag, ch);
+				ADDCH(json->curr_node->ltag, ch);
 				json->curr_node->part_word = 0;
 			} else
 				json->curr_node->backslash = 1;
@@ -231,7 +244,7 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 			json->curr_node->part_word = 0;
 			break;
 		} else {
-			ACL_VSTRING_ADDCH(json->curr_node->ltag, ch);
+			ADDCH(json->curr_node->ltag, ch);
 
 			/* 是否兼容后半个汉字为转义符 '\' 的情况 */
 			if ((json->flag & ACL_JSON_FLAG_PART_WORD)) {
@@ -313,7 +326,7 @@ static const char *json_val(ACL_JSON *json, const char *data)
 		/* 如果开始有引号，则需要以该引号作为结尾符 */
 		if (json->curr_node->quote) {
 			if (json->curr_node->backslash) {
-				ACL_VSTRING_ADDCH(json->curr_node->text, ch);
+				ADDCH(json->curr_node->text, ch);
 				json->curr_node->backslash = 0;
 			}
 
@@ -325,7 +338,7 @@ static const char *json_val(ACL_JSON *json, const char *data)
 				 * 则当前的转义符当作后半个汉字
 				 */
 				if (json->curr_node->part_word) {
-					ACL_VSTRING_ADDCH(json->curr_node->text, ch);
+					ADDCH(json->curr_node->text, ch);
 					json->curr_node->part_word = 0;
 				} else
 					json->curr_node->backslash = 1;
@@ -338,7 +351,7 @@ static const char *json_val(ACL_JSON *json, const char *data)
 				data++;
 				break;
 			} else {
-				ACL_VSTRING_ADDCH(json->curr_node->text, ch);
+				ADDCH(json->curr_node->text, ch);
 
 				/* 是否兼容后半个汉字为转义符 '\' 的情况 */
 				if ((json->flag & ACL_JSON_FLAG_PART_WORD)) {
@@ -356,11 +369,11 @@ static const char *json_val(ACL_JSON *json, const char *data)
 				}
 			}
 		} else if (json->curr_node->backslash) {
-			ACL_VSTRING_ADDCH(json->curr_node->text, ch);
+			ADDCH(json->curr_node->text, ch);
 			json->curr_node->backslash = 0;
 		} else if (ch == '\\') {
 			if (json->curr_node->part_word) {
-				ACL_VSTRING_ADDCH(json->curr_node->text, ch);
+				ADDCH(json->curr_node->text, ch);
 				json->curr_node->part_word = 0;
 			} else
 				json->curr_node->backslash = 1;
@@ -371,7 +384,7 @@ static const char *json_val(ACL_JSON *json, const char *data)
 			json->curr_node->status = ACL_JSON_S_NXT;
 			break;
 		} else {
-			ACL_VSTRING_ADDCH(json->curr_node->text, ch);
+			ADDCH(json->curr_node->text, ch);
 
 			/* 是否兼容后半个汉字为转义符 '\' 的情况 */
 			if ((json->flag & ACL_JSON_FLAG_PART_WORD)) {

@@ -100,7 +100,8 @@ static void master_wakeup_timer_event(int event acl_unused, void *context)
 				acl_var_master_owner_gid);
 			status = acl_fifo_trigger(acl_var_master_global_event,
 				serv->name, &wakeup, sizeof(wakeup), BRIEFLY);
-			acl_set_ugid(getuid(), getgid());
+			if (acl_var_master_set_ugid)
+				acl_set_ugid(getuid(), getgid());
 			break;
 		default:
 			acl_msg_panic("%s: unknown service type: %d",

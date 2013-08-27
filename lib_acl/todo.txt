@@ -20,3 +20,4 @@ acl_ioctl_server.c 的模板程序中采用内存池功能
 10) acl_master 的子进程的监听地址应允许在配置文件中写多个 -- 完成
 11) acl_master 在重读配置是需要支持预启动机制 -- 完成
 12) event 模块需要进一步优化
+13) json 解析器需要支持 \u 方式 UNICODE 格式
