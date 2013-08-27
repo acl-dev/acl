@@ -13,7 +13,7 @@ namespace acl
  * 类对象，便可以使用 memcache 类折所有功能，其中 memcache 类为
  * connect_client 的子类
  */
-class memcache_pool : public connect_pool
+class ACL_CPP_API memcache_pool : public connect_pool
 {
 public:
 	memcache_pool(const char* addr, int count, int retry_inter = 0);

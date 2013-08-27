@@ -1,4 +1,5 @@
 #pragma once
+#include "acl_cpp/acl_cpp_define.hpp"
 #include <list>
 #include "acl_cpp/stdlib/locker.hpp"
 
@@ -11,7 +12,7 @@ class connect_client;
  * 客户端连接池类，实现对连接池的动态管理，该类为纯虚类，需要子类实现
  * 纯虚函数 create_connect 用于创建与服务端的一个连接
  */
-class connect_pool
+class ACL_CPP_API connect_pool
 {
 public:
 	/**

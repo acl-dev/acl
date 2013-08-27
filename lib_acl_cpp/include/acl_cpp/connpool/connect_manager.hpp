@@ -1,4 +1,5 @@
 #pragma once
+#include "acl_cpp/acl_cpp_define.hpp"
 #include <vector>
 
 namespace acl
@@ -9,7 +10,7 @@ class connect_pool;
 /**
  * connect pool 服务管理器，有获取连接池等功能
  */
-class connect_manager
+class ACL_CPP_API connect_manager
 {
 public:
 	connect_manager();

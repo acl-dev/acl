@@ -6,7 +6,7 @@ namespace acl {
 
 class db_handle;
 
-class sqlite_pool : public acl::db_pool
+class ACL_CPP_API sqlite_pool : public acl::db_pool
 {
 public:
 	/**

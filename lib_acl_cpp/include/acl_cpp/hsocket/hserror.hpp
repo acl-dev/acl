@@ -1,4 +1,5 @@
 #pragma once
+#include "acl_cpp/acl_cpp_define.hpp"
 
 #define	HS_ERR_INVALID_REPLY	-7		// 服务器返回数据错误
 #define	HS_ERR_EMPTY		-6		// 服务器返回数据为空
@@ -11,7 +12,7 @@
 
 namespace acl {
 
-class hserror
+class ACL_CPP_API hserror
 {
 public:
 	hserror();

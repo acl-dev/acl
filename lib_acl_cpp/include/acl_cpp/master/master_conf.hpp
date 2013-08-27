@@ -50,7 +50,7 @@ typedef struct master_int64_tbl
 
 class master_base;
 
-class master_conf
+class ACL_CPP_API master_conf
 {
 public:
 	master_conf();

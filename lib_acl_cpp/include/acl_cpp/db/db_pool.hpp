@@ -7,7 +7,7 @@ namespace acl {
 class db_handle;
 class locker;
 
-class db_pool
+class ACL_CPP_API db_pool
 {
 public:
 	/**

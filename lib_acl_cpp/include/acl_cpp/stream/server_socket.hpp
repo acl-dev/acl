@@ -1,4 +1,5 @@
 #pragma once
+#include "acl_cpp/acl_cpp_define.hpp"
 
 namespace acl {
 
@@ -7,7 +8,7 @@ class socket_stream;
 /**
  * 服务端监听套接口类，接收客户端连接，并创建客户端流连接对象
  */
-class server_socket
+class ACL_CPP_API server_socket
 {
 public:
 	/**

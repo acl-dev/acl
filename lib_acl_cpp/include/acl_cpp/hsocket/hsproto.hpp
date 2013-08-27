@@ -1,4 +1,5 @@
 #pragma once
+#include "acl_cpp/acl_cpp_define.hpp"
 #include <vector>
 
 namespace acl {
@@ -6,7 +7,7 @@ namespace acl {
 class string;
 class hsrow;
 
-class hsproto
+class ACL_CPP_API hsproto
 {
 public:
 	hsproto(bool cache_enable);

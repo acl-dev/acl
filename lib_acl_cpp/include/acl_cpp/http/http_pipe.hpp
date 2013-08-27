@@ -7,7 +7,7 @@ namespace acl {
 class charset_conv;
 class pipe_stream;
 
-class http_pipe
+class ACL_CPP_API http_pipe
 {
 public:
 	http_pipe(void);

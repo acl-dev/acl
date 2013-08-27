@@ -1,9 +1,10 @@
 #pragma once
+#include "acl_cpp/acl_cpp_define.hpp"
 
 namespace acl
 {
 
-class connect_client
+class ACL_CPP_API connect_client
 {
 public:
 	connect_client() : when_(0) {}

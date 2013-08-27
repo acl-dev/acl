@@ -13,7 +13,7 @@ namespace acl
  * 类对象，便可以使用 http_request 类折所有功能，其中 http_reuqest 类为
  * connect_client 的子类
  */
-class http_reuqest_pool : public connect_pool
+class ACL_CPP_API http_reuqest_pool : public connect_pool
 {
 public:
 	/**

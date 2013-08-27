@@ -97,7 +97,7 @@ hsclient* hspool::peek(const char* dbn, const char* tbl,
 	if (client->open_tbl(dbn, tbl, idx, flds) == false)
 	{
 		delete client;
-		return (false);
+		return (NULL);
 	}
 
 	return (client);

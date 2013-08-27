@@ -140,14 +140,14 @@ bool memcache::set(const acl::string& key, const void* dat, size_t dlen,
 {
 	bool has_tried = false;
 	struct iovec v[4];
-	line_.format("set %s %u %d %d\r\n", key.c_str(),
+	req_line_.format("set %s %u %d %d\r\n", key.c_str(),
 		flags, (int) timeout, (int) dlen);
 AGAIN:
 	if (open() == false)
 		return (false);
 
-	v[0].iov_base = (void*) line_.c_str();
-	v[0].iov_len = line_.length();
+	v[0].iov_base = (void*) req_line_.c_str();
+	v[0].iov_len = req_line_.length();
 	v[1].iov_base = (void*) dat;
 	v[1].iov_len = dlen;
 	v[2].iov_base = (void*) "\r\n";
@@ -165,7 +165,7 @@ AGAIN:
 		return (false);
 	}
 
-	if (conn_->gets(line_) == false)
+	if (conn_->gets(res_line_) == false)
 	{
 		close();
 		if (retry_ && !has_tried)
@@ -177,7 +177,7 @@ AGAIN:
 		return (false);
 	}
 
-	if (line_ != "STORED")
+	if (res_line_ != "STORED")
 	{
 		close();
 		if (retry_ && !has_tried)
@@ -186,7 +186,7 @@ AGAIN:
 			goto AGAIN;
 		}
 		ebuf_.format("reply(%s) for set(%s) error",
-			line_.c_str(), key.c_str());
+			res_line_.c_str(), key.c_str());
 		return (false);
 	}
 	return (true);
@@ -227,12 +227,12 @@ bool memcache::get(const acl::string& key, acl::string& buf,
 	bool has_tried = false;
 	buf.clear();
 
-	line_.format("get %s\r\n", key.c_str());
+	req_line_.format("get %s\r\n", key.c_str());
 
 AGAIN:
 	if (open() == false)
 		return (false);
-	if (conn_->write(line_) < 0)
+	if (conn_->write(req_line_) < 0)
 	{
 		close();
 		if (retry_ && !has_tried)
@@ -245,7 +245,7 @@ AGAIN:
 	}
 
 	// 读取服务器响应行
-	if (conn_->gets(line_) == false)
+	if (conn_->gets(res_line_) == false)
 	{
 		close();
 		if (retry_ && !has_tried)
@@ -256,19 +256,19 @@ AGAIN:
 		ebuf_.format("reply for get(%s) error", key.c_str());
 		return (false);
 	}
-	else if (line_ == "END")
+	else if (res_line_ == "END")
 	{
 		ebuf_.format("not found");
 		return (false);
 	}
-	else if (error_happen(line_.c_str()))
+	else if (error_happen(res_line_.c_str()))
 	{
 		close();
 		return (false);
 	}
 
 	// VALUE {key} {flags} {bytes}\r\n
-	ACL_ARGV* tokens = acl_argv_split(line_.c_str(), " \t");
+	ACL_ARGV* tokens = acl_argv_split(res_line_.c_str(), " \t");
 	if (tokens->argc < 4 || strcasecmp(tokens->argv[0], "VALUE") != 0)
 	{
 		close();
@@ -317,7 +317,7 @@ AGAIN:
 	}
 
 	// 读取数据尾部的 "\r\n"
-	if (conn_->gets(line_) == false)
+	if (conn_->gets(res_line_) == false)
 	{
 		close();
 		ebuf_.format("read data's delimiter error");
@@ -325,7 +325,7 @@ AGAIN:
 	}
 
 	// 读取 "END\r\n"
-	if (conn_->gets(line_) == false || line_ != "END")
+	if (conn_->gets(res_line_) == false || res_line_ != "END")
 	{
 		close();
 		ebuf_.format("END flag not found");
@@ -356,31 +356,32 @@ AGAIN:
 	if (open() == false)
 		return (false);
 
-	line_.format("delete %s\r\n", keybuf.c_str());
-	if (conn_->write(line_) < 0)
+	req_line_.format("delete %s\r\n", keybuf.c_str());
+	if (conn_->write(req_line_) < 0)
 	{
 		if (retry_ && !has_tried)
 		{
 			has_tried = true;
 			goto AGAIN;
 		}
-		ebuf_.format("write (%s) error", line_.c_str());
+		ebuf_.format("write (%s) error", req_line_.c_str());
 		return (false);
 	}
 	// DELETED|NOT_FOUND\r\n
-	if (conn_->gets(line_) == false)
+	if (conn_->gets(res_line_) == false)
 	{
 		if (retry_ && !has_tried)
 		{
 			has_tried = true;
 			goto AGAIN;
 		}
-		ebuf_.format("reply for(%s) error", line_.c_str());
+		ebuf_.format("reply for(%s) error", req_line_.c_str());
 		return (false);
 	}
-	if (line_ != "DELETED" && line_ != "NOT_FOUND")
+	if (res_line_ != "DELETED" && res_line_ != "NOT_FOUND")
 	{
-		ebuf_.format("reply for (%s) error", line_.c_str());
+		ebuf_.format("reply(%s) for (%s) error",
+			res_line_.c_str(), req_line_.c_str());
 		return (false);
 	}
 	return (true);

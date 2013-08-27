@@ -190,7 +190,8 @@ private:
 	string kbuf_;
 
 	socket_stream* conn_;
-	string line_;
+	string req_line_;
+	string res_line_;
 	bool error_happen(const char* line);
 };
 
