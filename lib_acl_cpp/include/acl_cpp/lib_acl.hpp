@@ -26,6 +26,7 @@
 
 #include "acl_cpp/memcache/memcache.hpp"
 #include "acl_cpp/memcache/memcache_pool.hpp"
+#include "acl_cpp/memcache/memcache_manager.hpp"
 
 #include "acl_cpp/session/session.hpp"
 #include "acl_cpp/session/memcache_session.hpp"
@@ -68,6 +69,7 @@
 #include "acl_cpp/http/http_download.hpp"
 #include "acl_cpp/http/http_utils.hpp"
 #include "acl_cpp/http/http_request_pool.hpp"
+#include "acl_cpp/http/http_request_manager.hpp"
 
 #include "acl_cpp/db/db_handle.hpp"
 #include "acl_cpp/db/db_mysql.hpp"
@@ -105,6 +107,7 @@
 #include "acl_cpp/master/master_threads.hpp"
 #include "acl_cpp/master/master_aio.hpp"
 #include "acl_cpp/master/master_proc.hpp"
+#include "acl_cpp/master/master_udp.hpp"
 #include "acl_cpp/master/master_trigger.hpp"
 #include "acl_cpp/master/master_conf.hpp"
 

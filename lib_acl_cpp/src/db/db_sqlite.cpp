@@ -224,7 +224,7 @@ const char* db_sqlite::get_error() const
 	if (db_)
 		return __sqlite3_errmsg(db_);
 	else
-		return "mysql not opened yet!";
+		return "sqlite not opened yet!";
 }
 bool db_sqlite::open(const char* local_charset /* = "GBK" */)
 {
@@ -510,6 +510,8 @@ bool db_sqlite::tbl_exists(const char*) { return false; }
 bool db_sqlite::sql_select(const char*) { return false; }
 bool db_sqlite::sql_update(const char*) { return false; }
 int db_sqlite::affect_count() const { return 0; }
+int db_sqlite::get_errno() const { return -1; }
+const char* db_sqlite::get_error() const { return "unknown"; }
 
 }  // namespace acl
 

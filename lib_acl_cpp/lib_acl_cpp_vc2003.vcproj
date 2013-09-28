@@ -550,6 +550,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				<File
 					RelativePath=".\src\master\master_trigger.cpp">
 				</File>
+				<File
+					RelativePath=".\src\master\master_udp.cpp">
+				</File>
 			</Filter>
 			<Filter
 				Name="ipc"
@@ -590,6 +593,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\src\http\http_request.cpp">
+				</File>
+				<File
+					RelativePath=".\src\http\http_request_manager.cpp">
 				</File>
 				<File
 					RelativePath=".\src\http\http_request_pool.cpp">
@@ -677,6 +683,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Filter="">
 				<File
 					RelativePath=".\src\memcache\memcache.cpp">
+				</File>
+				<File
+					RelativePath=".\src\memcache\memcache_manager.cpp">
 				</File>
 				<File
 					RelativePath=".\src\memcache\memcache_pool.cpp">
@@ -932,6 +941,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				<File
 					RelativePath=".\include\acl_cpp\master\master_trigger.hpp">
 				</File>
+				<File
+					RelativePath=".\include\acl_cpp\master\master_udp.hpp">
+				</File>
 			</Filter>
 			<Filter
 				Name="ipc"
@@ -972,6 +984,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\http\http_request.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\http\http_request_manager.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\http\http_request_pool.h">
@@ -1062,6 +1077,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Filter="">
 				<File
 					RelativePath=".\include\acl_cpp\memcache\memcache.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\memcache\memcache_manager.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\memcache\memcache_pool.hpp">

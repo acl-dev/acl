@@ -30,7 +30,7 @@
 /* host_port - parse string into host and port, destroy string */
 
 const char *acl_host_port(char *buf, char **host, char *def_host,
-		char **port, char *def_service)
+	char **port, char *def_service)
 {
 	char   *cp = buf;
 
@@ -40,9 +40,9 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 	if (*cp == '[') {
 		*host = ++cp;
 		if ((cp = acl_split_at(cp, ']')) == 0)
-			return ("missing \"]\"");
+			return "missing \"]\"";
 		if (*cp && *cp++ != ':')
-			return ("garbage after \"]\"");
+			return "garbage after \"]\"";
 		*port = *cp ? cp : def_service;
 	}
 
@@ -59,9 +59,9 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 		}
 	}
 	if (*host == 0)
-		return ("missing host information");
+		return "missing host information";
 	if (*port == 0)
-		return ("missing service information");
+		return "missing service information";
 
 	/*
 	 * Final sanity checks. We're still sloppy, allowing bare numerical
@@ -70,8 +70,8 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 	if (*host != def_host
 	    && !acl_valid_hostname(*host, ACL_DONT_GRIPE)
 	    && !acl_valid_hostaddr(*host, ACL_DONT_GRIPE))
-		return ("valid hostname or network address required");
+		return "valid hostname or network address required";
 	if (*port != def_service && ACL_ISDIGIT(**port) && !acl_alldig(*port))
-		return ("garbage after numerical service");
-	return (0);
+		return "garbage after numerical service";
+	return NULL;
 }

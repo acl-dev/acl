@@ -68,7 +68,7 @@ AUT_LINE *aut_loop_make_begin(const ACL_CFG_LINE *cfg_line)
 
 AUT_LINE *aut_loop_make_break(const ACL_CFG_LINE *cfg_line)
 {
-	char  myname[] = "aut_loop_make_break";
+	const char *myname = "aut_loop_make_break";
 	AUT_LINE *break_line, *tmp_line, *begin_line;
 	AUT_CMD_TOKEN *break_token, *tmp_token, *begin_token;
 	int   i, n;
@@ -114,7 +114,7 @@ AUT_LINE *aut_loop_make_break(const ACL_CFG_LINE *cfg_line)
 
 AUT_LINE *aut_loop_make_end(const ACL_CFG_LINE *cfg_line)
 {
-	char  myname[] = "aut_loop_make_end";
+	const char *myname = "aut_loop_make_end";
 	AUT_LINE *test_line, *test_line_peer;
 	AUT_CMD_TOKEN *loop_token = NULL, *loop_token_peer;
 	int   n, i;

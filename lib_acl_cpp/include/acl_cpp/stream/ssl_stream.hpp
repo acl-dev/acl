@@ -2,6 +2,7 @@
 #include "acl_cpp/acl_cpp_define.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 
+struct ACL_VSTREAM;
 typedef struct _ssl_session ssl_session;
 typedef struct _ssl_context ssl_context;
 
@@ -65,19 +66,19 @@ private:
 
 	bool ssl_client_init(void);
 
-	static int __read(void *ctx, unsigned char *buf, size_t len);
-	static int __send(void *ctx, const unsigned char *buf, size_t len);
+	static int __sock_read(void *ctx, unsigned char *buf, size_t len);
+	static int __sock_send(void *ctx, const unsigned char *buf, size_t len);
 
 #ifdef WIN32
 	static int __ssl_read(SOCKET fd, void *buf, size_t len,
-		int timeout, void *ctx);
+		int timeout, ACL_VSTREAM* stream, void *ctx);
 	static int __ssl_send(SOCKET fd, const void *buf, size_t len,
-		int timeout, void *ctx);
+		int timeout, ACL_VSTREAM* stream, void *ctx);
 #else
 	static int __ssl_read(int fd, void *buf, size_t len,
-		int timeout, void *ctx);
+		int timeout, ACL_VSTREAM* stream, void *ctx);
 	static int __ssl_send(int fd, const void *buf, size_t len,
-		int timeout, void *ctx);
+		int timeout, ACL_VSTREAM* stream, void *ctx);
 #endif
 
 	void clear(void);

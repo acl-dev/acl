@@ -46,6 +46,7 @@ all:
 	@(cd fs_benchmark; make)
 	@(cd http_request_pool; make)
 	@(cd memcache_pool; make)
+	@(cd udp_client;make)
 
 clean:
 	@(cd string; make clean)
@@ -95,3 +96,4 @@ clean:
 	@(cd fs_benchmark; make clean)
 	@(cd http_request_pool; make clean)
 	@(cd memcache_pool; make clean)
+	@(cd udp_client;make clean)

@@ -48,8 +48,7 @@ bool fstream::open(const char* path, unsigned int oflags, int mode)
 	m_pStream->fd.h_file = fh;
 	m_pStream->type = ACL_VSTREAM_TYPE_FILE;
 	m_pStream->oflags = oflags;
-	ACL_SAFE_STRNCPY(m_pStream->remote_addr, path,
-		sizeof(m_pStream->remote_addr));
+	acl_vstream_set_path(m_pStream, path);
 	m_bOpened = true;
 	m_bEof = false;
 	return (true);

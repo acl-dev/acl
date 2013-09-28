@@ -17,6 +17,7 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <unistd.h>
+# include <arpa/inet.h>
 #else
 # error "unknown OS type"
 #endif
@@ -31,11 +32,14 @@
 #include "stdlib/acl_mystring.h"
 #include "stdlib/acl_array.h"
 #include "stdlib/acl_iostuff.h"
+#include "net/acl_sane_inet.h"
 #include "stdlib/acl_vstream.h"
 
 #endif
 
 #include "../event/events_fdtable.h"
+
+static char __empty_string[] = "";
 
  /*
   * Initialization of the three pre-defined streams. Pre-allocate a static
@@ -77,8 +81,14 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		"\0",                           /* errbuf */
 		0,                              /* errnum */
 		0,                              /* rw_timeout */
-		"\0",                           /* local_addr */
-		"\0",                           /* remote_addr */
+		"\0",                           /* addr_local */
+		"\0",                           /* addr_peer */
+		NULL,                           /* sa_local */
+		NULL,                           /* sa_peer */
+		0,                              /* sa_local_size */
+		0,                              /* sa_peer_size */
+		0,                              /* sa_local_len */
+		0,                              /* sa_peer_len */
 		NULL,                           /* path */
 		NULL,                           /* context */
 		NULL,                           /* close_handle_lnk */
@@ -127,8 +137,14 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		"\0",                           /* errbuf */
 		0,                              /* errnum */
 		0,                              /* rw_timeout */
-		"\0",                           /* local_addr */
-		"\0",                           /* remote_addr */
+		"\0",                           /* addr_local */
+		"\0",                           /* addr_peer */
+		NULL,                           /* sa_local */
+		NULL,                           /* sa_peer */
+		0,                              /* sa_local_size */
+		0,                              /* sa_peer_size */
+		0,                              /* sa_local_len */
+		0,                              /* sa_peer_len */
 		NULL,                           /* path */
 		NULL,                           /* context */
 		NULL,                           /* close_handle_lnk */
@@ -176,8 +192,14 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		"\0",                           /* errbuf */
 		0,                              /* errnum */
 		0,                              /* rw_timeout */
-		"\0",                           /* local_addr */
-		"\0",                           /* remote_addr */
+		"\0",                           /* addr_local */
+		"\0",                           /* addr_peer */
+		NULL,                           /* sa_local */
+		NULL,                           /* sa_peer */
+		0,                              /* sa_local_size */
+		0,                              /* sa_peer_size */
+		0,                              /* sa_local_len */
+		0,                              /* sa_peer_len */
 		NULL,                           /* path */
 		NULL,                           /* context */
 		NULL,                           /* close_handle_lnk */
@@ -228,9 +250,9 @@ static int __vstream_sys_read(ACL_VSTREAM *stream)
 
 	if (stream->type == ACL_VSTREAM_TYPE_FILE) {
 		if (ACL_VSTREAM_FILE(stream) == ACL_FILE_INVALID)
-			return (-1);
+			return -1;
 	} else if (ACL_VSTREAM_SOCK(stream) == ACL_SOCKET_INVALID)
-		return (-1);
+		return -1;
 
 AGAIN:
 	if (stream->rw_timeout > 0
@@ -239,57 +261,57 @@ AGAIN:
 		stream->errnum = acl_last_error();
 
 		if (stream->errnum != ACL_ETIMEDOUT) {
-			(void) acl_strerror(stream->errnum,
-					    stream->errbuf,
-					    sizeof(stream->errbuf));
+			(void) acl_strerror(stream->errnum, stream->errbuf,
+				    sizeof(stream->errbuf));
 			stream->flag |= ACL_VSTREAM_FLAG_ERR;
 		} else {
 			stream->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
-			ACL_SAFE_STRNCPY(stream->errbuf, "read timeout", sizeof(stream->errbuf));
+			ACL_SAFE_STRNCPY(stream->errbuf, "read timeout",
+				sizeof(stream->errbuf));
 		}
 
-		return (-1);
+		return -1;
 	}
 
 	acl_set_error(0);
 
 	if (stream->type == ACL_VSTREAM_TYPE_FILE) {
 		stream->read_cnt = stream->fread_fn(ACL_VSTREAM_FILE(stream),
-					stream->read_buf,
-					(size_t) stream->read_buf_len,
-					stream->rw_timeout,
-					stream->context);
+			stream->read_buf, (size_t) stream->read_buf_len,
+			stream->rw_timeout, stream, stream->context);
 		if (stream->read_cnt > 0)
 			stream->sys_offset += stream->read_cnt;
 	} else
 		stream->read_cnt = stream->read_fn(ACL_VSTREAM_SOCK(stream),
-					stream->read_buf,
-					(size_t) stream->read_buf_len,
-					stream->rw_timeout,
-					stream->context);
+			stream->read_buf, (size_t) stream->read_buf_len,
+			stream->rw_timeout, stream, stream->context);
+
 	if (stream->read_cnt < 0) {
 		stream->errnum = acl_last_error();
 		if (stream->errnum == ACL_EINTR) {
 			goto AGAIN;
 		} else if (stream->errnum == ACL_ETIMEDOUT) {
 			stream->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
-			ACL_SAFE_STRNCPY(stream->errbuf, "read timeout", sizeof(stream->errbuf));
-		} else if (stream->errnum != ACL_EWOULDBLOCK && stream->errnum != ACL_EAGAIN) {
+			ACL_SAFE_STRNCPY(stream->errbuf, "read timeout",
+				sizeof(stream->errbuf));
+		} else if (stream->errnum != ACL_EWOULDBLOCK
+			&& stream->errnum != ACL_EAGAIN)
+		{
 			stream->flag |= ACL_VSTREAM_FLAG_ERR;
-			acl_strerror(stream->errnum, stream->errbuf, sizeof(stream->errbuf));
+			acl_strerror(stream->errnum, stream->errbuf,
+				sizeof(stream->errbuf));
 		}
 		/* XXX: should do something where, 2009.12.25 -- zsx */
 
 		stream->read_cnt = 0;	/* xxx: why? */
-		return (-1);
+		return -1;
 	} else if (stream->read_cnt == 0) { /* closed by peer */
-		char ebuf[256];
 		stream->flag = ACL_VSTREAM_FLAG_EOF;
 		stream->errnum = 0;
 		snprintf(stream->errbuf, sizeof(stream->errbuf),
-			"closed by peer(%s)", acl_last_strerror(ebuf, sizeof(ebuf)));
+			"closed by peer(%s)", acl_last_serror());
 
-		return (0);
+		return 0;
 	}
 
 	stream->read_ptr = stream->read_buf;
@@ -298,31 +320,30 @@ AGAIN:
 	stream->errbuf[0] = 0;
 	stream->total_read_cnt += stream->read_cnt;
 
-	return ((int) stream->read_cnt);
+	return (int) stream->read_cnt;
 }
 
 static int __sys_getc(ACL_VSTREAM *stream)
 {
 	stream->read_cnt = __vstream_sys_read(stream);
-	if (stream->read_cnt <= 0) {
-		return (ACL_VSTREAM_EOF);
-	} else {
-		return (ACL_VSTREAM_GETC(stream));
-	}
+	if (stream->read_cnt <= 0)
+		return ACL_VSTREAM_EOF;
+	else
+		return ACL_VSTREAM_GETC(stream);
 }
 
 int acl_vstream_getc(ACL_VSTREAM *stream)
 {
 	if (stream == NULL)
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	if (stream->read_cnt <= 0) {
 		if (__vstream_sys_read(stream) <= 0)
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 	}
 
 	stream->read_cnt--;
 	stream->offset++;
-	return (*stream->read_ptr++);
+	return *stream->read_ptr++;
 }
 
 int acl_vstream_nonb_readn(ACL_VSTREAM *stream, char *buf, int size)
@@ -339,8 +360,9 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *stream, char *buf, int size)
 		return (ACL_VSTREAM_EOF);
 
 	if (stream->read_cnt < 0)
-		acl_msg_fatal("%s, %s(%d): read_cnt(%d) < 0, fd(%d)", myname, __FILE__,
-			__LINE__, (int) stream->read_cnt, ACL_VSTREAM_SOCK(stream));
+		acl_msg_fatal("%s, %s(%d): read_cnt(%d) < 0, fd(%d)",
+			myname, __FILE__, __LINE__,
+			(int) stream->read_cnt, ACL_VSTREAM_SOCK(stream));
 
 	ptr = (unsigned char *) buf;
 	nread = 0;
@@ -351,7 +373,7 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *stream, char *buf, int size)
 		if (read_cnt <= 0) {
 			acl_msg_error("%s, %s(%d): internal error, read_cnt = %d",
 				myname, __FILE__, __LINE__, read_cnt);
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 		}
 		size  -= read_cnt;
 		ptr   += read_cnt;
@@ -361,7 +383,7 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *stream, char *buf, int size)
 		else if (size < 0) {
 			acl_msg_error("%s, %s(%d): internal error, size = %d",
 				myname, __FILE__, __LINE__, size);
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 		}
 	}
 
@@ -371,7 +393,7 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *stream, char *buf, int size)
 		acl_msg_error("%s, %s(%d): fcntl error(%s), fd=%d",
 			myname, __FILE__, __LINE__, acl_last_serror(),
 			ACL_VSTREAM_SOCK(stream));
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 	acl_non_blocking(ACL_VSTREAM_SOCK(stream), 1);
 #elif defined(ACL_MS_WINDOWS)
@@ -397,7 +419,7 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *stream, char *buf, int size)
 		acl_msg_error("%s, %s(%d): fcntl error(%s), fd=%d",
 			myname, __FILE__, __LINE__,
 			acl_last_serror(), ACL_VSTREAM_SOCK(stream));
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 
 #elif	defined(ACL_MS_WINDOWS)
@@ -409,18 +431,21 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *stream, char *buf, int size)
 #ifdef	ACL_MS_WINDOWS
 		if (stream->errnum == ACL_EWOULDBLOCK)
 #elif	defined(ACL_UNIX)
-		if (stream->errnum == ACL_EWOULDBLOCK || stream->errnum == ACL_EAGAIN)
+		if (stream->errnum == ACL_EWOULDBLOCK
+			|| stream->errnum == ACL_EAGAIN)
 #endif
-			return (nread);
+		{
+			return nread;
+		}
 		else if (nread == 0)
 			return (ACL_VSTREAM_EOF);
 		else
-			return (nread);
+			return nread;
 	} else if (read_cnt == 0) {
 		if (nread == 0)
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 		else
-			return (nread);
+			return nread;
 	}
 
 	if (stream->read_cnt > 0) {
@@ -429,7 +454,7 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *stream, char *buf, int size)
 		if (read_cnt <= 0) {
 			acl_msg_error("%s, %s(%d): internal error, read_cnt = %d",
 				myname, __FILE__, __LINE__, read_cnt);
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 		}
 
 		nread += read_cnt;
@@ -437,7 +462,7 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *stream, char *buf, int size)
 
 	stream->rw_timeout = rw_timeout;
 
-	return (nread);
+	return nread;
 }
 
 int acl_vstream_probe_status(ACL_VSTREAM *stream)
@@ -450,7 +475,7 @@ int acl_vstream_probe_status(ACL_VSTREAM *stream)
 	int   rw_timeout;
 
 	if (stream == NULL)
-		return (-1);
+		return -1;
 
 #ifdef	ACL_UNIX
 	flags = fcntl(ACL_VSTREAM_SOCK(stream), F_GETFL, 0);
@@ -458,7 +483,7 @@ int acl_vstream_probe_status(ACL_VSTREAM *stream)
 		acl_msg_error("%s, %s(%d): fcntl error(%s), fd=%d",
 			myname, __FILE__, __LINE__,
 			acl_last_serror(), ACL_VSTREAM_SOCK(stream));
-		return (-1);
+		return -1;
 	}
 	acl_non_blocking(ACL_VSTREAM_SOCK(stream), 1);
 #elif defined(ACL_MS_WINDOWS)
@@ -485,7 +510,7 @@ int acl_vstream_probe_status(ACL_VSTREAM *stream)
 		acl_msg_error("%s, %s(%d): fcntl error(%s), fd=%d",
 			myname, __FILE__, __LINE__,
 			acl_last_serror(), ACL_VSTREAM_SOCK(stream));
-		return (-1);
+		return -1;
 	}
 
 #elif	defined(ACL_MS_WINDOWS)
@@ -497,19 +522,22 @@ int acl_vstream_probe_status(ACL_VSTREAM *stream)
 #ifdef	ACL_MS_WINDOWS
 		if (stream->errnum == ACL_EWOULDBLOCK)
 #elif	defined(ACL_UNIX)
-		if (stream->errnum == ACL_EWOULDBLOCK || stream->errnum == ACL_EAGAIN)
+		if (stream->errnum == ACL_EWOULDBLOCK
+			|| stream->errnum == ACL_EAGAIN)
 #endif
-			return (0);
+		{
+			return 0;
+		}
 		else
-			return (-1);
+			return -1;
 	} else {
 		/* 将读到的数据再放回原处:) */
 		stream->read_cnt++;
 		stream->read_ptr--;
 		stream->offset--;
 		if (stream->read_ptr < stream->read_buf)
-			return (-1);
-		return (0);
+			return -1;
+		return 0;
 	}
 }
 
@@ -519,7 +547,7 @@ int acl_vstream_ungetc(ACL_VSTREAM *stream, int ch)
 
 	c = (unsigned char) ch;
 	(void) acl_vstream_unread(stream, &c, 1);
-	return (ch);
+	return ch;
 }
 
 static void *vstream_memmove(ACL_VSTREAM *stream, size_t n)
@@ -528,7 +556,7 @@ static void *vstream_memmove(ACL_VSTREAM *stream, size_t n)
 	char *src, *dst, *dst_saved;
 
 	if (stream->read_cnt == 0)
-		return (stream->read_buf);
+		return stream->read_buf;
 
 	src = (char*) stream->read_ptr + stream->read_cnt - 1;
 	dst_saved = dst = (char*) stream->read_ptr + n + stream->read_cnt - 1;
@@ -536,10 +564,10 @@ static void *vstream_memmove(ACL_VSTREAM *stream, size_t n)
 	/* 为了防止内存数据覆盖问题, 采用数据从尾部拷贝方式 */
 	while (src >= (char*) stream->read_ptr)
 		*dst-- = *src--;
-	return (dst_saved);
+	return dst_saved;
 #else
-	return (memmove((char*) stream->read_ptr + n,
-			stream->read_ptr, stream->read_cnt));
+	return memmove((char*) stream->read_ptr + n,
+			stream->read_ptr, stream->read_cnt);
 #endif
 }
 
@@ -566,7 +594,7 @@ int acl_vstream_unread(ACL_VSTREAM *stream, const void *ptr, size_t length)
 			stream->read_ptr = stream->read_buf;
 			stream->read_cnt += length;
 			stream->offset = 0;
-			return ((int) length);
+			return (int) length;
 		}
 
 		/* 说明整个缓冲区的空间都不够用, 所以需要扩充缓冲区空间 */
@@ -578,8 +606,8 @@ int acl_vstream_unread(ACL_VSTREAM *stream, const void *ptr, size_t length)
 
 		memcpy(pbuf, ptr, length);
 		if (stream->read_cnt > 0)
-			memcpy((char*) pbuf + length,
-				stream->read_ptr, (size_t) stream->read_cnt);
+			memcpy((char*) pbuf + length, stream->read_ptr,
+				(size_t) stream->read_cnt);
 		acl_myfree(stream->read_buf);
 
 		stream->read_buf = pbuf;
@@ -593,7 +621,7 @@ int acl_vstream_unread(ACL_VSTREAM *stream, const void *ptr, size_t length)
 	memcpy(stream->read_ptr, ptr, length);
 	stream->read_cnt += length;
 	stream->offset -= length;
-	return ((int) length);
+	return (int) length;
 }
 
 int acl_vstream_bfcp_some(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
@@ -603,7 +631,8 @@ int acl_vstream_bfcp_some(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 
 	/* input params error */
 	if (stream == NULL || vptr == NULL || maxlen <= 0)
-		acl_msg_fatal("%s, %s(%d): input error", myname, __FILE__, __LINE__);
+		acl_msg_fatal("%s, %s(%d): input error",
+			myname, __FILE__, __LINE__);
 
 	/* internal fatal error */
 	if (stream->read_cnt < 0)
@@ -613,16 +642,17 @@ int acl_vstream_bfcp_some(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 	/* there is no any data in buf */
 	if (stream->read_cnt == 0) {
 		stream->read_ptr = stream->read_buf;
-		return (0);
+		return 0;
 	}
 
 	if (stream->read_ptr >= stream->read_buf + (int) stream->read_buf_len) {
 		stream->read_cnt = 0;
 		stream->read_ptr = stream->read_buf;
-		return (0);
+		return 0;
 	}
 
-	n = (int) stream->read_cnt > (int) maxlen ? (int) maxlen : (int) stream->read_cnt;
+	n = (int) stream->read_cnt > (int) maxlen
+		? (int) maxlen : (int) stream->read_cnt;
 
 	memcpy(vptr, stream->read_ptr, n);
 
@@ -630,7 +660,7 @@ int acl_vstream_bfcp_some(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 	stream->read_ptr += n;
 	stream->offset += n;
 
-	return (n);
+	return n;
 }
 
 int acl_vstream_gets(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
@@ -639,10 +669,12 @@ int acl_vstream_gets(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 	unsigned char *ptr;
 
 	if (stream == NULL || vptr == NULL || maxlen <= 0)
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 
 	ptr = (unsigned char *) vptr;
-	for (n = 1; n < (int) maxlen; n++) {  /* left one byte for '\0' */
+	for (n = 1; n < (int) maxlen; n++) {
+		/* left one byte for '\0' */
+
 #ifdef	_USE_FAST_MACRO
 		ch = ACL_VSTREAM_GETC(stream);
 #else
@@ -651,12 +683,17 @@ int acl_vstream_gets(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 		if (ch == ACL_VSTREAM_EOF) {
 			stream->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
 			stream->flag |= ACL_VSTREAM_FLAG_TAGNO;
+
+			/* EOF, nodata read */
 			if (n == 1)
-				return (ACL_VSTREAM_EOF);/* EOF, nodata read */
-			break;		/* EOF, some data was read */
+				return ACL_VSTREAM_EOF;
+			/* EOF, some data was read */
+			break;
 		} else {
 			*ptr++ = ch;
-			if (ch == '\n'){	/* newline is stored, like fgets() */
+			if (ch == '\n'){
+				/* newline is stored, like fgets() */
+
 				stream->flag |= ACL_VSTREAM_FLAG_TAGYES;
 				stream->flag &= ~ACL_VSTREAM_FLAG_TAGNO;
 				break;
@@ -664,15 +701,13 @@ int acl_vstream_gets(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 		}
 	}
 
-	*ptr = 0;				/* null terminate like fgets() */
-	return (n);
+	/* null terminate like fgets() */
+	*ptr = 0;
+	return n;
 }
 
-int acl_vstream_readtags(ACL_VSTREAM *stream,
-			void *vptr,
-			size_t maxlen,
-			const char *tag,
-			size_t taglen)
+int acl_vstream_readtags(ACL_VSTREAM *stream, void *vptr, size_t maxlen,
+	const char *tag, size_t taglen)
 {
 	int   n, ch, flag_match = 0;
 	unsigned char *ptr;
@@ -681,7 +716,7 @@ int acl_vstream_readtags(ACL_VSTREAM *stream,
 
 	if (stream == NULL || vptr == NULL || maxlen <= 0
 	    || tag == NULL || taglen <= 0)
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 
 	ptr_needle_end = (const unsigned char *) tag;
 
@@ -693,7 +728,9 @@ int acl_vstream_readtags(ACL_VSTREAM *stream,
 	}
 	ptr = (unsigned char *) vptr;
 
-	for (n = 1; n < (int) maxlen; n++) {  /* left one byte for '\0' */
+	for (n = 1; n < (int) maxlen; n++) {
+		/* left one byte for '\0' */
+
 #ifdef	_USE_FAST_MACRO
 		ch = ACL_VSTREAM_GETC(stream);
 #else
@@ -701,11 +738,11 @@ int acl_vstream_readtags(ACL_VSTREAM *stream,
 #endif
 		if (ch == ACL_VSTREAM_EOF) {
 			if (n == 1)
-				return (ACL_VSTREAM_EOF);/* EOF, nodata read */
+				return ACL_VSTREAM_EOF;  /* EOF, nodata read */
 			else {
 				stream->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
 				stream->flag |= ACL_VSTREAM_FLAG_TAGNO;
-				break;		/* EOF, some data was read */
+				break;  /* EOF, some data was read */
 			}
 		} else {
 			*ptr = ch;
@@ -739,7 +776,7 @@ int acl_vstream_readtags(ACL_VSTREAM *stream,
 		} 
 	}
 	*ptr = 0;	/* null terminate like fgets() */
-	return (n);
+	return n;
 }
 
 int acl_vstream_gets_nonl(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
@@ -747,9 +784,8 @@ int acl_vstream_gets_nonl(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 	int   n, ch;
 	unsigned char *ptr;
 
-	if (stream == NULL || vptr == NULL || maxlen <= 0) {
-		return (ACL_VSTREAM_EOF);
-	}
+	if (stream == NULL || vptr == NULL || maxlen <= 0)
+		return ACL_VSTREAM_EOF;
 
 	ptr = (unsigned char *) vptr;
 	for (n = 1; n < (int) maxlen; n++) {
@@ -762,30 +798,29 @@ int acl_vstream_gets_nonl(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 			stream->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
 			stream->flag |= ACL_VSTREAM_FLAG_TAGNO;
 			if (n == 1)
-				return (ACL_VSTREAM_EOF);  /* EOF, nodata read */
+				return ACL_VSTREAM_EOF;  /* EOF, nodata read */
 			else
-				break;		/* EOF, some data was read */
+				break;  /* EOF, some data was read */
 		} else {
 			*ptr++ = ch;
 			if (ch == '\n') {
 				stream->flag |= ACL_VSTREAM_FLAG_TAGYES;
 				stream->flag &= ~ACL_VSTREAM_FLAG_TAGNO;
-				break;		/* newline is stored, like fgets() */
+				break;  /* newline is stored, like fgets() */
 			}
 		}
 	}
 
-	*ptr = 0;				/* null terminate like fgets() */
+	*ptr = 0;  /* null terminate like fgets() */
 	ptr--;
 	while (ptr >= (unsigned char *) vptr) {
-		if (*ptr == '\r' || *ptr == '\n') {
-			*ptr-- = 0;
-			n--;
-			continue;
-		}
-		break;
+		if (*ptr != '\r' && *ptr != '\n')
+			break;
+
+		*ptr-- = 0;
+		n--;
 	}
-	return (n);
+	return n;
 }
 
 int acl_vstream_readn(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
@@ -794,7 +829,7 @@ int acl_vstream_readn(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 	unsigned char *ptr;
 
 	if (stream == NULL || vptr == NULL || (int) maxlen <= 0)
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 
 	ptr = (unsigned char *) vptr;
 	for (n = 0; n < (int) maxlen; n++) {
@@ -805,12 +840,11 @@ int acl_vstream_readn(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 #endif
 		if (ch == ACL_VSTREAM_EOF) {
 			if (n == 0)
-				return (ACL_VSTREAM_EOF); /* EOF, nodata read */
+				return ACL_VSTREAM_EOF;  /* EOF, nodata read */
 			else
-				break;		/* EOF, some data was read */
-		} else {
+				break;  /* EOF, some data was read */
+		} else
 			*ptr++ = ch;
-		}
 	}
 
 	if (n != (int) maxlen) {
@@ -819,10 +853,10 @@ int acl_vstream_readn(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 			n, (int) maxlen);
 		stream->flag |= ACL_VSTREAM_FLAG_RDSHORT;
 
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 
-	return (n);
+	return n;
 }
 
 int acl_vstream_read(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
@@ -832,16 +866,16 @@ int acl_vstream_read(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 	unsigned char *ptr;
 
 	if (stream == NULL || vptr == NULL || (int) maxlen <= 0)
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 
-	if (stream->read_cnt < 0) {
+	if (stream->read_cnt < 0)
 		acl_msg_fatal("%s, %s(%d): read_cnt(%d) < 0",
 			myname, __FILE__, __LINE__, (int) stream->read_cnt);
-	}
+
 	ptr = (unsigned char *) vptr;
 	if (stream->read_cnt > 0) {
 		read_cnt = acl_vstream_bfcp_some(stream, ptr, maxlen);
-		return (read_cnt);
+		return read_cnt;
 	}
 
 	/* stream->read_cnt == 0 */
@@ -849,12 +883,12 @@ int acl_vstream_read(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 	/* there is no data in buf, so need to read data from system */
 	read_cnt = __vstream_sys_read(stream);
 	if (read_cnt < 0)
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	else if (read_cnt == 0)
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 
 	read_cnt = acl_vstream_bfcp_some(stream, ptr, maxlen);
-	return (read_cnt);
+	return read_cnt;
 }
 
 static void __bfgets_crlf_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int *ready)
@@ -873,7 +907,7 @@ static void __bfgets_crlf_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int *re
 		stream->read_ptr++;
 	}
 
-	ACL_VSTRING_TERMINATE(strbuf);		/* set '\0' teminated */
+	ACL_VSTRING_TERMINATE(strbuf);  /* set '\0' teminated */
 }
 
 int acl_vstream_gets_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int *ready)
@@ -882,7 +916,8 @@ int acl_vstream_gets_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int *ready)
 	int   n;
 
 	if (stream == NULL || strbuf == NULL || ready == NULL)
-		acl_msg_fatal("%s, %s(%d): invalid input", myname, __FILE__, __LINE__);
+		acl_msg_fatal("%s, %s(%d): invalid input",
+			myname, __FILE__, __LINE__);
 
 	*ready = 0;
 	n = ACL_VSTRING_LEN(strbuf);
@@ -894,26 +929,28 @@ int acl_vstream_gets_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int *ready)
 	if (stream->read_cnt > 0) {
 		__bfgets_crlf_peek(stream, strbuf, ready);
 		if (*ready)
-			return (ACL_VSTRING_LEN(strbuf) - n);
+			return ACL_VSTRING_LEN(strbuf) - n;
 	}
 
-	/* XXX: 调用者通过检查 *ready 值来判断是否读够数据 */
-	/* 系统IO读操作出错或关闭时返回结束标记 */
-	/* 如果返回 ACL_VSTRING_EOF 则调用者应该通过检查缓冲区长度来处理未被处理的数据 */
+	/* XXX: 调用者通过检查 *ready 值来判断是否读够数据, 系统IO读操作出错
+	 * 或关闭时返回结束标记; 如果返回 ACL_VSTRING_EOF 则调用者应该通过
+	 * 检查缓冲区长度来处理未被处理的数据
+	 */
 
 	if (stream->sys_read_ready) {
 		if (__vstream_sys_read(stream) <= 0) {
 			n = ACL_VSTRING_LEN(strbuf) - n;
-			return (n > 0 ? n : ACL_VSTREAM_EOF);
+			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
 	if (stream->read_cnt > 0)
 		__bfgets_crlf_peek(stream, strbuf, ready);
-	return (ACL_VSTRING_LEN(strbuf) - n);
+	return ACL_VSTRING_LEN(strbuf) - n;
 }
 
-static void __bfgets_no_crlf_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int *ready)
+static void __bfgets_no_crlf_peek(ACL_VSTREAM *stream,
+	ACL_VSTRING *strbuf, int *ready)
 {
 	int   n, ch;
 
@@ -941,19 +978,23 @@ static void __bfgets_no_crlf_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int 
 			else
 				break;
 		}
-		acl_vstring_truncate(strbuf, n + 1);	/* reset the offset position */
+
+		/* reset the offset position */
+		acl_vstring_truncate(strbuf, n + 1);
 	}
 
 	ACL_VSTRING_TERMINATE(strbuf);		/* set '\0' teminated */
 }
 
-int acl_vstream_gets_nonl_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int *ready)
+int acl_vstream_gets_nonl_peek(ACL_VSTREAM *stream,
+	ACL_VSTRING *strbuf, int *ready)
 {
 	const char *myname = "acl_vstream_gets_nonl_peek";
 	int   n;
 
 	if (stream == NULL || strbuf == NULL || ready == NULL)
-		acl_msg_fatal("%s, %s(%d): invalid input", myname, __FILE__, __LINE__);
+		acl_msg_fatal("%s, %s(%d): invalid input",
+			myname, __FILE__, __LINE__);
 
 	*ready = 0;
 	n = ACL_VSTRING_LEN(strbuf);
@@ -965,31 +1006,34 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int *re
 	if (stream->read_cnt > 0) {
 		__bfgets_no_crlf_peek(stream, strbuf, ready);
 		if (*ready)
-			return (ACL_VSTRING_LEN(strbuf) - n);
+			return ACL_VSTRING_LEN(strbuf) - n;
 	}
 
-	/* XXX: 调用者通过检查 *ready 值来判断是否读够数据 */
-	/* 系统IO读操作出错或关闭时返回结束标记 */
-	/* 如果返回 ACL_VSTRING_EOF 则调用者应该通过检查缓冲区长度来处理未被处理的数据 */
+	/* XXX: 调用者通过检查 *ready 值来判断是否读够数据, 系统IO读操作出错
+	 * 或关闭时返回结束标记; 如果返回 ACL_VSTRING_EOF 则调用者应该通过
+	 * 检查缓冲区长度来处理未被处理的数据
+	 */
 
 	if (stream->sys_read_ready) {
 		if (__vstream_sys_read(stream) <= 0) {
 			n = ACL_VSTRING_LEN(strbuf) - n;
-			return (n > 0 ? n : ACL_VSTREAM_EOF);
+			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
 	if (stream->read_cnt > 0)
 		__bfgets_no_crlf_peek(stream, strbuf, ready);
-	return (ACL_VSTRING_LEN(strbuf) - n);
+	return ACL_VSTRING_LEN(strbuf) - n;
 }
 
-static int __bfread_cnt_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int cnt, int *ready)
+static int __bfread_cnt_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf,
+	int cnt, int *ready)
 {
 	int   n;
 
-	if (stream->read_cnt <= 0) /* XXX: sanity check */
-		return (0);
+	/* XXX: sanity check */
+	if (stream->read_cnt <= 0)
+		return 0;
 	n = (int) (stream->read_cnt > cnt ? cnt : stream->read_cnt);
 	acl_vstring_memcat(strbuf, (char*) stream->read_ptr, n);
 	stream->read_cnt -= n;
@@ -999,17 +1043,19 @@ static int __bfread_cnt_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int cnt, 
 	if (cnt == 0)
 		*ready = 1;
 
-	ACL_VSTRING_TERMINATE(strbuf);		/* set '\0' teminated */
-	return (n);
+	ACL_VSTRING_TERMINATE(strbuf);  /* set '\0' teminated */
+	return n;
 }
 
-int acl_vstream_readn_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int cnt, int *ready)
+int acl_vstream_readn_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf,
+	int cnt, int *ready)
 {
 	const char *myname = "acl_vstream_readn_peek";
 	int   cnt_saved = cnt;
 
 	if (stream == NULL || strbuf == NULL || cnt <= 0 || ready == NULL)
-		acl_msg_fatal("%s, %s(%d): invalid input", myname, __FILE__, __LINE__);
+		acl_msg_fatal("%s, %s(%d): invalid input",
+			myname, __FILE__, __LINE__);
 
 	*ready = 0;
 	if (stream->read_cnt < 0)
@@ -1019,28 +1065,30 @@ int acl_vstream_readn_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf, int cnt, in
 	if (stream->read_cnt > 0) {
 		cnt -= __bfread_cnt_peek(stream, strbuf, cnt, ready);
 		if (*ready)
-			return (cnt_saved - cnt);
+			return cnt_saved - cnt;
 	}
 
-	/* XXX: 调用者通过检查 *ready 值来判断是否读够数据 */
-	/* 系统IO读操作出错或关闭时返回结束标记 */
-	/* 如果返回 ACL_VSTRING_EOF 则调用者应该通过检查缓冲区长度来处理未被处理的数据 */
+	/* XXX: 调用者通过检查 *ready 值来判断是否读够数据, 系统IO读操作出错
+	 * 或关闭时返回结束标记, 如果返回 ACL_VSTRING_EOF 则调用者应该通过
+	 * 检查缓冲区长度来处理未被处理的数据
+	 */
 
 	if (stream->sys_read_ready) {
 		if (__vstream_sys_read(stream) <= 0) {
 			int   n = cnt_saved - cnt;
-			return (n > 0 ? n : ACL_VSTREAM_EOF);
+			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
 	if (stream->read_cnt > 0)
 		cnt -= __bfread_cnt_peek(stream, strbuf, cnt, ready);
-	return (cnt_saved - cnt);
+	return cnt_saved - cnt;
 }
 
 static void __bfread_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf)
 {
-	if (stream->read_cnt <= 0) /* XXX: sanity check */
+	/* XXX: sanity check */
+	if (stream->read_cnt <= 0)
 		return;
 	acl_vstring_memcat(strbuf, (char*) stream->read_ptr,
 		(size_t) stream->read_cnt);
@@ -1048,7 +1096,8 @@ static void __bfread_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf)
 	stream->read_ptr += stream->read_cnt;
 	stream->read_cnt = 0;
 
-	ACL_VSTRING_TERMINATE(strbuf);		/* set '\0' teminated */
+	/* set '\0' teminated */
+	ACL_VSTRING_TERMINATE(strbuf);
 }
 
 int acl_vstream_read_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf)
@@ -1057,7 +1106,8 @@ int acl_vstream_read_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf)
 	int   n;
 
 	if (stream == NULL || strbuf == NULL)
-		acl_msg_fatal("%s, %s(%d): invalid input", myname, __FILE__, __LINE__);
+		acl_msg_fatal("%s, %s(%d): invalid input",
+			myname, __FILE__, __LINE__);
 
 	n = ACL_VSTRING_LEN(strbuf);
 
@@ -1068,19 +1118,20 @@ int acl_vstream_read_peek(ACL_VSTREAM *stream, ACL_VSTRING *strbuf)
 	if (stream->read_cnt > 0)
 		__bfread_peek(stream, strbuf);
 
-	/* 系统IO读操作出错或关闭时返回结束标记 */
-	/* 如果返回 ACL_VSTRING_EOF 则调用者应该通过检查缓冲区长度来处理未被处理的数据 */
+	/* 系统IO读操作出错或关闭时返回结束标记, 如果返回 ACL_VSTRING_EOF
+	 * 则调用者应该通过检查缓冲区长度来处理未被处理的数据
+	 */
 
 	if (stream->sys_read_ready) {
 		if (__vstream_sys_read(stream) <= 0) {
 			n = ACL_VSTRING_LEN(strbuf) - n;
-			return (n > 0 ? n : ACL_VSTREAM_EOF);
+			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
 	if (stream->read_cnt > 0)
 		__bfread_peek(stream, strbuf);
-	return (ACL_VSTRING_LEN(strbuf) - n);
+	return ACL_VSTRING_LEN(strbuf) - n;
 }
 
 int acl_vstream_can_read(ACL_VSTREAM *stream)
@@ -1092,19 +1143,19 @@ int acl_vstream_can_read(ACL_VSTREAM *stream)
 			myname, __FILE__, __LINE__, (int) stream->read_cnt);
 
 	if (stream->flag & (ACL_VSTREAM_FLAG_ERR | ACL_VSTREAM_FLAG_EOF))
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	else if (stream->read_cnt > 0)
-		return (1);
+		return 1;
 	else if (stream->sys_read_ready == 0)
-		return (0);
+		return 0;
 	else if ((stream->flag & ACL_VSTREAM_FLAG_PREREAD) != 0) {
 		if (__vstream_sys_read(stream) <= 0)
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 		else
-			return (1);
+			return 1;
 	}
 	else
-		return (1);
+		return 1;
 }
 
 static int __vstream_sys_write(ACL_VSTREAM *stream, const void *vptr, int dlen)
@@ -1114,23 +1165,29 @@ static int __vstream_sys_write(ACL_VSTREAM *stream, const void *vptr, int dlen)
 
 	if (stream == NULL || vptr == NULL || dlen <= 0) {
 		if (stream == NULL)
-			acl_msg_error("%s, %s(%d): stream null", myname, __FILE__, __LINE__);
+			acl_msg_error("%s, %s(%d): stream null",
+				myname, __FILE__, __LINE__);
 		if (vptr == NULL)
-			acl_msg_error("%s, %s(%d): vptr null", myname, __FILE__, __LINE__);
+			acl_msg_error("%s, %s(%d): vptr null",
+				myname, __FILE__, __LINE__);
 		if (dlen <= 0)
-			acl_msg_error("%s, %s(%d): dlen(%d) <= 0", myname, __FILE__, __LINE__, dlen);
-		acl_msg_error("%s, %s(%d): input invalid", myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+			acl_msg_error("%s, %s(%d): dlen(%d) <= 0",
+				myname, __FILE__, __LINE__, dlen);
+		acl_msg_error("%s, %s(%d): input invalid",
+			myname, __FILE__, __LINE__);
+		return ACL_VSTREAM_EOF;
 	}
 
 	if (stream->type == ACL_VSTREAM_TYPE_FILE) {
 		if (ACL_VSTREAM_FILE(stream) == ACL_FILE_INVALID) {
-			acl_msg_error("%s, %s(%d): h_file invalid", myname, __FILE__, __LINE__);
-			return (ACL_VSTREAM_EOF);
+			acl_msg_error("%s, %s(%d): h_file invalid",
+				myname, __FILE__, __LINE__);
+			return ACL_VSTREAM_EOF;
 		}
 	} else if (ACL_VSTREAM_SOCK(stream) == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s, %s(%d): sockfd invalid", myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		acl_msg_error("%s, %s(%d): sockfd invalid",
+			myname, __FILE__, __LINE__);
+		return ACL_VSTREAM_EOF;
 	}
 
 TAG_AGAIN:
@@ -1138,71 +1195,83 @@ TAG_AGAIN:
 	if (stream->type == ACL_VSTREAM_TYPE_FILE) {
 		if ((stream->oflags & O_APPEND)) {
 #ifdef ACL_MS_WINDOWS
-			stream->sys_offset = acl_lseek(ACL_VSTREAM_FILE(stream), 0, SEEK_END);
+			stream->sys_offset = acl_lseek(
+				ACL_VSTREAM_FILE(stream), 0, SEEK_END);
 			if (stream->sys_offset < 0)
-				return (ACL_VSTREAM_EOF);
+				return ACL_VSTREAM_EOF;
 #endif
 		} else if ((stream->flag & ACL_VSTREAM_FLAG_CACHE_SEEK)
-					&& stream->offset != stream->sys_offset) {
+			&& stream->offset != stream->sys_offset)
+		{
 
 			stream->sys_offset = acl_lseek(ACL_VSTREAM_FILE(stream),
-					stream->offset, SEEK_SET);
+				stream->offset, SEEK_SET);
 			if (stream->sys_offset == -1) {
-				acl_msg_error("%s, %s(%d): lseek error(%s), offset(" ACL_FMT_I64D
-					"), sys_offset(" ACL_FMT_I64D ")", myname, __FILE__,
+				acl_msg_error("%s, %s(%d): lseek error(%s), "
+					"offset(" ACL_FMT_I64D "), sys_offset("
+					ACL_FMT_I64D ")", myname, __FILE__,
 					__LINE__, acl_last_serror(),
 					stream->offset, stream->sys_offset);
-				return (ACL_VSTREAM_EOF);
+				return ACL_VSTREAM_EOF;
 			}
 			stream->offset = stream->sys_offset;
 		}
 
 		n = stream->fwrite_fn(ACL_VSTREAM_FILE(stream), vptr, dlen,
-				stream->rw_timeout, stream->context);
+			stream->rw_timeout, stream, stream->context);
 		if (n > 0) {
 			stream->sys_offset += n;
 			stream->offset = stream->sys_offset;
-			stream->read_cnt = 0;  /* 防止缓冲区内的数据与实际不一致, 仅对文件IO有效 */
+
+			/* 防止缓冲区内的数据与实际不一致, 仅对文件IO有效 */
+			stream->read_cnt = 0;
 		}
 	} else
 		n = stream->write_fn(ACL_VSTREAM_SOCK(stream), vptr, dlen,
-				stream->rw_timeout, stream->context);
+			stream->rw_timeout, stream, stream->context);
 	if (n < 0) {
 		if (acl_last_error() == ACL_EINTR) {
 			if (++neintr >= 5)
-				return (ACL_VSTREAM_EOF);
+				return ACL_VSTREAM_EOF;
 
 			goto TAG_AGAIN;
 		}
 
-		if (acl_last_error() == ACL_EAGAIN || acl_last_error() == ACL_EWOULDBLOCK)
+		if (acl_last_error() == ACL_EAGAIN
+			|| acl_last_error() == ACL_EWOULDBLOCK)
+		{
 			acl_set_error(ACL_EAGAIN);
+		}
 
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 
 	stream->total_write_cnt += n;
-	return (n);
+	return n;
 }
 
-static int __vstream_sys_writev(ACL_VSTREAM *stream, const struct iovec *vector, int count)
+static int __vstream_sys_writev(ACL_VSTREAM *stream,
+	const struct iovec *vec, int count)
 {
 	const char *myname = "__vstream_sys_writev";
 	int   n, neintr = 0;
 
-	if (stream == NULL || vector == NULL || count <= 0) {
-		acl_msg_error("%s, %s(%d): input invalid", myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+	if (stream == NULL || vec == NULL || count <= 0) {
+		acl_msg_error("%s, %s(%d): input invalid",
+			myname, __FILE__, __LINE__);
+		return ACL_VSTREAM_EOF;
 	}
 
 	if (stream->type == ACL_VSTREAM_TYPE_FILE) {
 		if (ACL_VSTREAM_FILE(stream) == ACL_FILE_INVALID) {
-			acl_msg_error("%s, %s(%d): h_file invalid", myname, __FILE__, __LINE__);
-			return (ACL_VSTREAM_EOF);
+			acl_msg_error("%s, %s(%d): h_file invalid",
+				myname, __FILE__, __LINE__);
+			return ACL_VSTREAM_EOF;
 		}
 	} else if (ACL_VSTREAM_SOCK(stream) == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s, %s(%d): sockfd invalid", myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		acl_msg_error("%s, %s(%d): sockfd invalid",
+			myname, __FILE__, __LINE__);
+		return ACL_VSTREAM_EOF;
 	}
 
 TAG_AGAIN:
@@ -1210,86 +1279,95 @@ TAG_AGAIN:
 	if (stream->type == ACL_VSTREAM_TYPE_FILE) {
 		if ((stream->oflags & O_APPEND)) {
 #ifdef ACL_MS_WINDOWS
-			stream->sys_offset = acl_lseek(ACL_VSTREAM_FILE(stream), 0, SEEK_END);
+			stream->sys_offset = acl_lseek(
+				ACL_VSTREAM_FILE(stream), 0, SEEK_END);
 			if (stream->sys_offset < 0)
-				return (ACL_VSTREAM_EOF);
+				return ACL_VSTREAM_EOF;
 #endif
 		} else if ((stream->flag & ACL_VSTREAM_FLAG_CACHE_SEEK)
-					&& stream->offset != stream->sys_offset) {
+			&& stream->offset != stream->sys_offset)
+		{
 			stream->sys_offset = acl_lseek(ACL_VSTREAM_FILE(stream),
 					stream->offset, SEEK_SET);
 			if (stream->sys_offset == -1) {
-				acl_msg_error("%s, %s(%d): lseek error(%s), offset(" ACL_FMT_I64D
-					"), sys_offset(" ACL_FMT_I64D ")", myname, __FILE__,
+				acl_msg_error("%s, %s(%d): lseek error(%s), "
+					"offset(" ACL_FMT_I64D "), sys_offset("
+					ACL_FMT_I64D ")", myname, __FILE__,
 					__LINE__, acl_last_serror(),
 					stream->offset, stream->sys_offset);
-				return (ACL_VSTREAM_EOF);
+				return ACL_VSTREAM_EOF;
 			}
 		}
 
-		n = stream->fwritev_fn(ACL_VSTREAM_FILE(stream), vector, count,
-					stream->rw_timeout, stream->context);
+		n = stream->fwritev_fn(ACL_VSTREAM_FILE(stream), vec, count,
+			stream->rw_timeout, stream, stream->context);
 		if (n > 0) {
 			stream->sys_offset += n;
 			stream->offset = stream->sys_offset;
-			stream->read_cnt = 0;  /* 防止缓冲区内的数据与实际不一致, 仅对文件IO有效 */
+
+			/* 防止缓冲区内的数据与实际不一致, 仅对文件IO有效 */
+			stream->read_cnt = 0;
 		}
 	} else
-		n = stream->writev_fn(ACL_VSTREAM_SOCK(stream), vector, count,
-				stream->rw_timeout, stream->context);
+		n = stream->writev_fn(ACL_VSTREAM_SOCK(stream), vec, count,
+			stream->rw_timeout, stream, stream->context);
 	if (n < 0) {
 		if (acl_last_error() == ACL_EINTR) {
 			if (++neintr >= 5)
-				return (ACL_VSTREAM_EOF);
+				return ACL_VSTREAM_EOF;
 
 			goto TAG_AGAIN;
 		}
 
-		if (acl_last_error() == ACL_EAGAIN || acl_last_error() == ACL_EWOULDBLOCK)
+		if (acl_last_error() == ACL_EAGAIN
+			|| acl_last_error() == ACL_EWOULDBLOCK)
+		{
 			acl_set_error(ACL_EAGAIN);
+		}
 
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 
 	stream->total_write_cnt += n;
-	return (n);
+	return n;
 }
 
 int acl_vstream_write(ACL_VSTREAM *stream, const void *vptr, int dlen)
 {
 	if (stream->wbuf_dlen > 0) {
 		if (acl_vstream_fflush(stream) == ACL_VSTREAM_EOF)
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 	}
-	return (__vstream_sys_write(stream, vptr, dlen));
+	return __vstream_sys_write(stream, vptr, dlen);
 }
 
-int acl_vstream_writev(ACL_VSTREAM *stream, const struct iovec *vector, int count)
+int acl_vstream_writev(ACL_VSTREAM *stream, const struct iovec *vec, int count)
 {
 	if (stream->wbuf_dlen > 0) {
 		if (acl_vstream_fflush(stream) == ACL_VSTREAM_EOF)
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 	}
-	return (__vstream_sys_writev(stream, vector, count));
+	return __vstream_sys_writev(stream, vec, count);
 }
 
-int acl_vstream_writevn(ACL_VSTREAM *stream, const struct iovec *vector, int count)
+int acl_vstream_writevn(ACL_VSTREAM *stream, const struct iovec *vec, int count)
 {
 	const char *myname = "acl_vstream_writevn";
 	int   n, i, dlen, k;
 	struct iovec *vect;
 
-	if (count <= 0 || vector == NULL)
-		acl_msg_fatal("%s, %s(%d): invalid input", myname, __FILE__, __LINE__);
+	if (count <= 0 || vec == NULL)
+		acl_msg_fatal("%s, %s(%d): invalid input",
+			myname, __FILE__, __LINE__);
 
 	if (stream->wbuf_dlen > 0) {
 		if (acl_vstream_fflush(stream) == ACL_VSTREAM_EOF)
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 	}
 	vect = (struct iovec*) acl_mycalloc(count, sizeof(struct iovec));
 	for (i = 0; i < count; i++) {
-		vect[i].iov_base = vector[i].iov_base;
-		vect[i].iov_len = vector[i].iov_len;
+		vect[i].iov_base = vec[i].iov_base;
+		vect[i].iov_len = vec[i].iov_len;
 	}
 
 	dlen = 0;
@@ -1298,7 +1376,7 @@ int acl_vstream_writevn(ACL_VSTREAM *stream, const struct iovec *vector, int cou
 		n = __vstream_sys_writev(stream, vect, count);
 		if (n == ACL_VSTREAM_EOF) {
 			acl_myfree(vect);
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 		}
 		dlen += n;
 
@@ -1310,7 +1388,8 @@ int acl_vstream_writevn(ACL_VSTREAM *stream, const struct iovec *vector, int cou
 				k++;
 			} else {
 				/* partially written */
-				vect[i].iov_base = (void *) ((unsigned char*) vect[i].iov_base + n);
+				vect[i].iov_base = (void *) ((unsigned char*)
+					vect[i].iov_base + n);
 				vect[i].iov_len -= n;
 				break;
 			}
@@ -1318,10 +1397,10 @@ int acl_vstream_writevn(ACL_VSTREAM *stream, const struct iovec *vector, int cou
 
 		if (i >= count) {
 			acl_myfree(vect);
-			return (dlen);
+			return dlen;
 		}
 		count -= k;
-		vector += k;
+		vec += k;
 	}
 }
 
@@ -1332,8 +1411,9 @@ int acl_vstream_vfprintf(ACL_VSTREAM *stream, const char *fmt, va_list ap)
 	int   n;
 
 	if (stream == NULL || fmt == NULL || *fmt == 0) {
-		acl_msg_error("%s, %s(%d): fmt invalid", myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		acl_msg_error("%s, %s(%d): fmt invalid",
+			myname, __FILE__, __LINE__);
+		return ACL_VSTREAM_EOF;
 	}
 
 	strbuf = acl_vstring_alloc(ACL_VSTREAM_BUFSIZE);
@@ -1343,17 +1423,18 @@ int acl_vstream_vfprintf(ACL_VSTREAM *stream, const char *fmt, va_list ap)
 	}
 
 	if (acl_vstring_vsprintf(strbuf, fmt, ap) == NULL)
-		acl_msg_fatal("%s, %s(%d): vsprintf return null", myname, __FILE__, __LINE__);
+		acl_msg_fatal("%s, %s(%d): vsprintf return null",
+			myname, __FILE__, __LINE__);
 
 	n = ACL_VSTRING_LEN(strbuf);
 	if (n <= 0)
-		acl_msg_fatal("%s, %s(%d): len(%d) <= 0", myname, __FILE__, __LINE__, n);
+		acl_msg_fatal("%s, %s(%d): len(%d) <= 0",
+			myname, __FILE__, __LINE__, n);
 
 	n = acl_vstream_writen(stream, acl_vstring_str(strbuf), n);
 
 	acl_vstring_free(strbuf);
-
-	return (n);
+	return n;
 }
 
 int acl_vstream_fprintf(ACL_VSTREAM *stream, const char *fmt, ...)
@@ -1363,14 +1444,15 @@ int acl_vstream_fprintf(ACL_VSTREAM *stream, const char *fmt, ...)
 	int   n;
 
 	if (stream == NULL || fmt == NULL) {
-		acl_msg_error("%s, %s(%d): input invalid", myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		acl_msg_error("%s, %s(%d): input invalid",
+			myname, __FILE__, __LINE__);
+		return ACL_VSTREAM_EOF;
 	}
 
 	va_start(ap, fmt);
 	n = acl_vstream_vfprintf(stream, fmt, ap);
 	va_end(ap);
-	return (n);
+	return n;
 }
 
 int acl_vstream_printf(const char *fmt, ...)
@@ -1380,8 +1462,9 @@ int acl_vstream_printf(const char *fmt, ...)
 	int   n;
 
 	if (fmt == NULL) {
-		acl_msg_error("%s, %s(%d): input invalid", myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		acl_msg_error("%s, %s(%d): input invalid",
+			myname, __FILE__, __LINE__);
+		return ACL_VSTREAM_EOF;
 	}
 
 	if (ACL_VSTREAM_OUT->fd.h_file == (ACL_FILE_HANDLE) -1)
@@ -1389,13 +1472,13 @@ int acl_vstream_printf(const char *fmt, ...)
 	if (ACL_VSTREAM_OUT->fd.h_file == ACL_FILE_INVALID) {
 		acl_msg_error("%s, %s(%d): ACL_VSTREAM_OUT can't be inited",
 			myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 	va_start(ap, fmt);
 	n = acl_vstream_vfprintf(ACL_VSTREAM_OUT, fmt, ap);
 	va_end(ap);
 
-	return (n);
+	return n;
 }
 
 int acl_vstream_fputs(const char *s, ACL_VSTREAM *fp)
@@ -1404,14 +1487,18 @@ int acl_vstream_fputs(const char *s, ACL_VSTREAM *fp)
 
 	if (s == NULL || fp == NULL) {
 		acl_msg_error("%s(%d): input invalid", myname, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 
-	if ((*s) != 0 && acl_vstream_buffed_fwrite(fp, s, strlen(s)) == ACL_VSTREAM_EOF)
-		return (ACL_VSTREAM_EOF);
+	if ((*s) != 0 && acl_vstream_buffed_fwrite(fp, s, strlen(s))
+		== ACL_VSTREAM_EOF)
+	{
+		return ACL_VSTREAM_EOF;
+	}
 	if (acl_vstream_buffed_fwrite(fp, "\r\n", 2) == ACL_VSTREAM_EOF)
-		return (ACL_VSTREAM_EOF);
-	return (acl_vstream_fflush(fp) == ACL_VSTREAM_EOF ? ACL_VSTREAM_EOF : 0);
+		return ACL_VSTREAM_EOF;
+	return acl_vstream_fflush(fp) == ACL_VSTREAM_EOF
+		? ACL_VSTREAM_EOF : 0;
 }
 
 int acl_vstream_puts(const char *s)
@@ -1426,7 +1513,7 @@ int acl_vstream_puts(const char *s)
 		return (ACL_VSTREAM_EOF);
 	}
 
-	return (acl_vstream_fputs(s, ACL_VSTREAM_OUT));
+	return acl_vstream_fputs(s, ACL_VSTREAM_OUT);
 }
 
 static int __loop_writen(ACL_VSTREAM *stream, const void *vptr, size_t dlen)
@@ -1438,34 +1525,37 @@ static int __loop_writen(ACL_VSTREAM *stream, const void *vptr, size_t dlen)
 	while (dlen > 0) {
 		n = __vstream_sys_write(stream, ptr, dlen);
 		if (n <= 0) {
-			if (acl_last_error() == ACL_EINTR || acl_last_error() == ACL_EAGAIN)
+			if (acl_last_error() == ACL_EINTR
+				|| acl_last_error() == ACL_EAGAIN)
+			{
 				continue;
-			return (ACL_VSTREAM_EOF);
+			}
+			return ACL_VSTREAM_EOF;
 		}
 
 		dlen  -= n;
 		ptr   += n;
 	}
 
-	return (ptr - (const unsigned char *) vptr);
+	return ptr - (const unsigned char *) vptr;
 }
 
 int acl_vstream_writen(ACL_VSTREAM *stream, const void *vptr, size_t dlen)
 {
 	if (stream == NULL || vptr == NULL || dlen <= 0)
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 
 	if (stream->wbuf_dlen > 0) {
 		if (acl_vstream_fflush(stream) == ACL_VSTREAM_EOF)
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 	}
-	return (__loop_writen(stream, vptr, dlen));
+	return __loop_writen(stream, vptr, dlen);
 }
 
 int acl_vstream_buffed_writen(ACL_VSTREAM *stream, const void *vptr, size_t dlen)
 {
 	if (stream == NULL || vptr == NULL || dlen == 0)
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 
 	if (stream->wbuf == NULL) {
 		stream->wbuf_size = 8192;
@@ -1474,19 +1564,21 @@ int acl_vstream_buffed_writen(ACL_VSTREAM *stream, const void *vptr, size_t dlen
 
 	if (dlen >= (size_t) stream->wbuf_size) {
 		if (acl_vstream_fflush(stream) == ACL_VSTREAM_EOF)
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 		else if (__loop_writen(stream, vptr, dlen) == ACL_VSTREAM_EOF)
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 		else
-			return (dlen);
-	} else if (dlen + (size_t) stream->wbuf_dlen >= (size_t) stream->wbuf_size) {
+			return dlen;
+	} else if (dlen + (size_t) stream->wbuf_dlen >=
+		(size_t) stream->wbuf_size)
+	{
 		if (acl_vstream_fflush(stream) == ACL_VSTREAM_EOF)
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 	}
 
 	memcpy(stream->wbuf + (size_t) stream->wbuf_dlen, vptr, dlen);
 	stream->wbuf_dlen += (int) dlen;
-	return(dlen);
+	return dlen;
 }
 
 int acl_vstream_buffed_vfprintf(ACL_VSTREAM *stream, const char *fmt, va_list ap)
@@ -1496,8 +1588,9 @@ int acl_vstream_buffed_vfprintf(ACL_VSTREAM *stream, const char *fmt, va_list ap
 	int   n;
 
 	if (stream == NULL || fmt == NULL || *fmt == 0) {
-		acl_msg_error("%s, %s(%d): fmt invalid", myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		acl_msg_error("%s, %s(%d): fmt invalid",
+			myname, __FILE__, __LINE__);
+		return ACL_VSTREAM_EOF;
 	}
 
 	strbuf = acl_vstring_alloc(ACL_VSTREAM_BUFSIZE);
@@ -1507,17 +1600,18 @@ int acl_vstream_buffed_vfprintf(ACL_VSTREAM *stream, const char *fmt, va_list ap
 	}
 
 	if (acl_vstring_vsprintf(strbuf, fmt, ap) == NULL)
-		acl_msg_fatal("%s, %s(%d): vsprintf return null", myname, __FILE__, __LINE__);
+		acl_msg_fatal("%s, %s(%d): vsprintf return null",
+			myname, __FILE__, __LINE__);
 
 	n = ACL_VSTRING_LEN(strbuf);
 	if (n <= 0)
-		acl_msg_fatal("%s, %s(%d): len(%d) <= 0", myname, __FILE__, __LINE__, n);
+		acl_msg_fatal("%s, %s(%d): len(%d) <= 0",
+			myname, __FILE__, __LINE__, n);
 
 	n = acl_vstream_buffed_writen(stream, acl_vstring_str(strbuf), n);
 
 	acl_vstring_free(strbuf);
-
-	return (n);
+	return n;
 }
 
 int acl_vstream_buffed_fprintf(ACL_VSTREAM *stream, const char *fmt, ...)
@@ -1527,14 +1621,15 @@ int acl_vstream_buffed_fprintf(ACL_VSTREAM *stream, const char *fmt, ...)
 	int   n;
 
 	if (stream == NULL || fmt == NULL) {
-		acl_msg_error("%s, %s(%d): input invalid", myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		acl_msg_error("%s, %s(%d): input invalid",
+			myname, __FILE__, __LINE__);
+		return ACL_VSTREAM_EOF;
 	}
 
 	va_start(ap, fmt);
 	n = acl_vstream_buffed_vfprintf(stream, fmt, ap);
 	va_end(ap);
-	return (n);
+	return n;
 }
 
 int acl_vstream_buffed_printf(const char *fmt, ...)
@@ -1544,8 +1639,9 @@ int acl_vstream_buffed_printf(const char *fmt, ...)
 	int   n;
 
 	if (fmt == NULL) {
-		acl_msg_error("%s, %s(%d): input invalid", myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		acl_msg_error("%s, %s(%d): input invalid",
+			myname, __FILE__, __LINE__);
+		return ACL_VSTREAM_EOF;
 	}
 
 	if (ACL_VSTREAM_OUT->fd.h_file == (ACL_FILE_HANDLE) -1)
@@ -1553,13 +1649,13 @@ int acl_vstream_buffed_printf(const char *fmt, ...)
 	if (ACL_VSTREAM_OUT->fd.h_file == ACL_FILE_INVALID) {
 		acl_msg_error("%s, %s(%d): ACL_VSTREAM_OUT can't be inited",
 			myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 	va_start(ap, fmt);
 	n = acl_vstream_buffed_vfprintf(ACL_VSTREAM_OUT, fmt, ap);
 	va_end(ap);
 
-	return (n);
+	return n;
 }
 
 int acl_vstream_buffed_fputs(const char *s, ACL_VSTREAM *fp)
@@ -1568,14 +1664,17 @@ int acl_vstream_buffed_fputs(const char *s, ACL_VSTREAM *fp)
 
 	if (s == NULL || fp == NULL) {
 		acl_msg_error("%s(%d): input invalid", myname, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 
-	if ((*s) != 0 && acl_vstream_buffed_fwrite(fp, s, strlen(s)) == ACL_VSTREAM_EOF)
-		return (ACL_VSTREAM_EOF);
+	if ((*s) != 0 && acl_vstream_buffed_fwrite(fp, s, strlen(s))
+		== ACL_VSTREAM_EOF)
+	{
+		return ACL_VSTREAM_EOF;
+	}
 	if (acl_vstream_buffed_fwrite(fp, "\r\n", 2) == ACL_VSTREAM_EOF)
-		return (ACL_VSTREAM_EOF);
-	return (0);
+		return ACL_VSTREAM_EOF;
+	return 0;
 }
 
 int acl_vstream_buffed_puts(const char *s)
@@ -1587,10 +1686,10 @@ int acl_vstream_buffed_puts(const char *s)
 	if (ACL_VSTREAM_OUT->fd.h_file == ACL_FILE_INVALID) {
 		acl_msg_error("%s, %s(%d): ACL_VSTREAM_OUT can't be inited",
 			myname, __FILE__, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 
-	return (acl_vstream_buffed_fputs(s, ACL_VSTREAM_OUT));
+	return acl_vstream_buffed_fputs(s, ACL_VSTREAM_OUT);
 }
 
 int acl_vstream_fsync(ACL_VSTREAM *fp)
@@ -1599,26 +1698,26 @@ int acl_vstream_fsync(ACL_VSTREAM *fp)
 
 	if (fp == NULL) {
 		acl_msg_error("%s(%d): fp null", myname, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 	if (fp->type != ACL_VSTREAM_TYPE_FILE) {
 		acl_msg_error("%s(%d): not a file stream", myname, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 
 	if (acl_vstream_fflush(fp) == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d): fflush fp stream's buff error(%s)",
 			myname, __LINE__, acl_last_serror());
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
 	
-	if (acl_file_fflush(ACL_VSTREAM_FILE(fp)) < 0) {
+	if (acl_file_fflush(ACL_VSTREAM_FILE(fp), fp, fp->context) < 0) {
 		acl_msg_error("%s(%d): fflush to disk error(%s)",
 			myname, __LINE__, acl_last_serror());
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 	}
 
-	return (0);
+	return 0;
 }
 
 void acl_vstream_buffed_space(ACL_VSTREAM *stream)
@@ -1638,7 +1737,7 @@ int acl_vstream_fflush(ACL_VSTREAM *stream)
 
 	if (stream == NULL) {
 		acl_msg_error("%s(%d): stream null", myname, __LINE__);
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	} else if (stream->wbuf == NULL || stream->wbuf_dlen == 0)
 		return 0;
 
@@ -1646,9 +1745,12 @@ int acl_vstream_fflush(ACL_VSTREAM *stream)
 	while (stream->wbuf_dlen > 0) {
 		n = __vstream_sys_write(stream, ptr, (int) stream->wbuf_dlen);
 		if (n <= 0) {
-			if (acl_last_error() == ACL_EINTR || acl_last_error() == ACL_EAGAIN)
+			if (acl_last_error() == ACL_EINTR
+				|| acl_last_error() == ACL_EAGAIN)
+			{
 				continue;
-			return (ACL_VSTREAM_EOF);
+			}
+			return ACL_VSTREAM_EOF;
 		}
 
 		stream->wbuf_dlen -= n;
@@ -1659,7 +1761,7 @@ int acl_vstream_fflush(ACL_VSTREAM *stream)
 		acl_msg_fatal("%s(%d): wbuf_dlen(%d) < 0",
 			myname, __LINE__, (int) stream->wbuf_dlen);
 
-	return (ptr - stream->wbuf);
+	return ptr - stream->wbuf;
 }
 
 int acl_vstream_peekfd(ACL_VSTREAM *stream)
@@ -1673,17 +1775,17 @@ int acl_vstream_peekfd(ACL_VSTREAM *stream)
 			return (-1);
 		n += ACL_VSTREAM_BFRD_CNT(stream);
 
-		return (n);
+		return n;
 	}
 
-	return (-1);
+	return -1;
 #else
 	const char *myname = "acl_vstream_peekfd";
 
 	acl_msg_fatal("%s: not implement yet", myname);
 
 	/* not reached */
-	return (-1);
+	return -1;
 #endif /* ACL_UNIX */
 } 
 
@@ -1693,18 +1795,19 @@ ACL_VSTREAM *acl_vstream_fhopen(ACL_FILE_HANDLE fh, unsigned int oflags)
 	ACL_VSTREAM *fp;
 
 	if (fh == ACL_FILE_INVALID) {
-		acl_msg_error("%s, %s(%d): fh invalid", myname, __FILE__, __LINE__);
-		return (NULL);
+		acl_msg_error("%s, %s(%d): fh invalid",
+			myname, __FILE__, __LINE__);
+		return NULL;
 	}
 
-	fp = acl_vstream_fdopen(ACL_SOCKET_INVALID, oflags, 4096, 0, ACL_VSTREAM_TYPE_FILE);
+	fp = acl_vstream_fdopen(ACL_SOCKET_INVALID, oflags,
+		4096, 0, ACL_VSTREAM_TYPE_FILE);
 	if (fp == NULL)
-		return (NULL);
+		return NULL;
 
 	fp->fd.h_file = fh;
-	return (fp);
+	return fp;
 }
-
 
 /* 定义流的缓冲区的默认大小 */
 
@@ -1714,39 +1817,32 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	size_t buflen, int rw_timeo, int fdtype)
 {
 	const char *myname = "acl_vstream_fdopen";
-	ACL_VSTREAM *stream = NULL;
+	ACL_VSTREAM *stream;
 
 	stream = (ACL_VSTREAM *) acl_mycalloc(1, sizeof(ACL_VSTREAM));
-	if (stream == NULL) {
-		acl_msg_error("%s(%d): calloc error(%s)",
-			myname, __LINE__, acl_last_serror());
-		return (NULL);
-	}
 
 	if (buflen <= 0 && !(fdtype & (ACL_VSTREAM_TYPE_LISTEN_INET
-				| ACL_VSTREAM_TYPE_LISTEN_UNIX)))
+		| ACL_VSTREAM_TYPE_LISTEN_UNIX)))
+	{
 		acl_msg_warn("%s(%d): buflen(%d) invalid",
 			myname, __LINE__, (int) buflen);
+	}
 
 	if (buflen < ACL_VSTREAM_DEF_MAXLEN)
 		buflen = ACL_VSTREAM_DEF_MAXLEN;
 
 	/* XXX: 只有非监听流才需要有读缓冲区 */
+	/* XXX: 目前 UDP 服务端口号在 MASTER 框架中暂时当监听套接口用，所以
+	   需要给其分配读缓冲区
+	 */
 
 	if ((fdtype & ACL_VSTREAM_TYPE_LISTEN_INET)
 	    || (fdtype & ACL_VSTREAM_TYPE_LISTEN_UNIX))
 	{
 		fdtype |= ACL_VSTREAM_TYPE_LISTEN;
-		stream->read_buf = NULL;
-	} else {
-		stream->read_buf = (unsigned char *) acl_mymalloc(buflen + 1);
-		if (stream->read_buf == NULL) {
-			acl_myfree(stream);
-			acl_msg_error("%s(%d): calloc error(%s)",
-				myname, __LINE__, acl_last_serror());
-			return (NULL);
-		}
 	}
+
+	stream->read_buf = (unsigned char *) acl_mymalloc(buflen + 1);
 
 	if (fdtype == 0) {
 		fdtype = ACL_VSTREAM_TYPE_SOCK;
@@ -1760,7 +1856,6 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 #ifdef ACL_MS_WINDOWS
 	stream->iocp_sock        = ACL_SOCKET_INVALID;
 #endif
-
 	stream->read_ptr         = stream->read_buf;
 	stream->oflags           = oflags;
 	ACL_SAFE_STRNCPY(stream->errbuf, "OK", sizeof(stream->errbuf));
@@ -1783,64 +1878,69 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 		stream->close_fn = acl_socket_close;
 	}
 
-	stream->path = stream->remote_addr;   /* default */
+	stream->addr_local = __empty_string;
+	stream->addr_peer = __empty_string;
+	stream->path = __empty_string;
 
 	stream->close_handle_lnk = acl_array_create(5);
-	if (stream->close_handle_lnk == NULL) {
-		acl_myfree(stream->read_buf);
-		acl_myfree(stream);
-		acl_msg_error("%s, %s(%d): acl_array_create error=%s",
-				myname, __FILE__, __LINE__, acl_last_serror());
-		return (NULL);
-	}
-
-	return (stream);
+	return stream;
 }
 
-ACL_VSTREAM *acl_vstream_clone(const ACL_VSTREAM *stream_src)
+ACL_VSTREAM *acl_vstream_clone(const ACL_VSTREAM *from)
 {
 	const char *myname = "acl_vstream_clone";
-	ACL_VSTREAM *stream_obj;
+	ACL_VSTREAM *to;
 	ACL_VSTREAM_CLOSE_HANDLE *handle_from, *handle_to;
 	int   i, n;
 
-	stream_obj = (ACL_VSTREAM *) acl_mycalloc(1, sizeof(ACL_VSTREAM));
-	if (stream_obj == NULL)
-		return (NULL);
+	to = (ACL_VSTREAM *) acl_mycalloc(1, sizeof(ACL_VSTREAM));
+	memcpy(to, from, sizeof(ACL_VSTREAM));
+	to->read_buf = (unsigned char *)
+		acl_mymalloc((int) to->read_buf_len + 1);
+	memcpy(to->read_buf, from->read_buf, (size_t) to->read_buf_len);
+	to->read_ptr = to->read_buf + (from->read_ptr - from->read_buf);
 
-	memcpy(stream_obj, stream_src, sizeof(ACL_VSTREAM));
+	if (from->addr_peer && from->addr_peer != __empty_string)
+		to->addr_peer = acl_mystrdup(from->addr_peer);
+	else
+		to->addr_peer = __empty_string;
 
-	stream_obj->read_buf = (unsigned char *) acl_mymalloc((int) stream_obj->read_buf_len + 1);
-	if (stream_obj->read_buf == NULL) {
-		acl_myfree(stream_obj);
-		return (NULL);
+	if (from->addr_local && from->addr_local != __empty_string)
+		to->addr_local = acl_mystrdup(from->addr_local);
+	else
+		to->addr_local = __empty_string;
+
+	if (from->sa_peer) {
+		to->sa_peer = (struct sockaddr_in*)
+			acl_mymalloc(sizeof(struct sockaddr_in));
+		memcpy(to->sa_peer, from->sa_peer,
+			sizeof(struct sockaddr_in));
 	}
-	memcpy(stream_obj->read_buf, stream_src->read_buf, (size_t) stream_obj->read_buf_len);
-	stream_obj->read_ptr = stream_obj->read_buf
-		+ (stream_src->read_ptr - stream_src->read_buf);
-
-	stream_obj->path = stream_obj->remote_addr;  /* default */
-	ACL_SAFE_STRNCPY(stream_obj->remote_addr, stream_src->remote_addr, sizeof(stream_obj->remote_addr));
-
-	stream_obj->ioctl_read_ctx = NULL;
-	stream_obj->ioctl_write_ctx = NULL;
-	stream_obj->fdp = NULL;
-
-	stream_obj->context = stream_src->context;
-
-	stream_obj->close_handle_lnk = acl_array_create(5);
-	if (stream_obj->close_handle_lnk == NULL) {
-		acl_msg_fatal("%s, %s(%d): acl_array_create error=%s",
-			myname, __FILE__, __LINE__, acl_last_serror());
+	if (from->sa_local) {
+		to->sa_local = (struct sockaddr_in*)
+			acl_mymalloc(sizeof(struct sockaddr_in));
+		memcpy(to->sa_local, from->sa_local,
+			sizeof(struct sockaddr_in));
 	}
 
-	if (stream_src->close_handle_lnk == NULL)
-		return (stream_obj);
+	if (from->path && from->path != __empty_string)
+		to->path = acl_mystrdup(from->path);
+	else
+		to->path = __empty_string;
 
-	n = acl_array_size(stream_src->close_handle_lnk);
+	to->ioctl_read_ctx = NULL;
+	to->ioctl_write_ctx = NULL;
+	to->fdp = NULL;
+	to->context = from->context;
+	to->close_handle_lnk = acl_array_create(5);
+
+	if (from->close_handle_lnk == NULL)
+		return to;
+
+	n = acl_array_size(from->close_handle_lnk);
 	for (i = 0; i < n; i++) {
 		handle_from = (ACL_VSTREAM_CLOSE_HANDLE *)
-			acl_array_index(stream_src->close_handle_lnk, i);
+			acl_array_index(from->close_handle_lnk, i);
 		if (handle_from == NULL)
 			continue;
 		if (handle_from->close_fn == NULL)
@@ -1848,19 +1948,15 @@ ACL_VSTREAM *acl_vstream_clone(const ACL_VSTREAM *stream_src)
 
 		handle_to = (ACL_VSTREAM_CLOSE_HANDLE *)
 			acl_mycalloc(1, sizeof(ACL_VSTREAM_CLOSE_HANDLE));
-		if (handle_to == NULL)
-			acl_msg_fatal("%s, %s(%d): calloc error=%s",
-				myname, __FILE__, __LINE__, acl_last_serror());
 		handle_to->close_fn = handle_from->close_fn;
 		handle_to->context = handle_from->context;
 
-		if (acl_array_append(stream_obj->close_handle_lnk, handle_to) < 0)
+		if (acl_array_append(to->close_handle_lnk, handle_to) < 0)
 			acl_msg_fatal("%s, %s(%d): acl_array_append error=%s",
-				myname, __FILE__, __LINE__,
-				acl_last_serror());
+				myname, __FILE__, __LINE__, acl_last_serror());
 	}
 
-	return (stream_obj);
+	return to;
 }
 
 int acl_vstream_set_fdtype(ACL_VSTREAM *stream, int type)
@@ -1875,11 +1971,12 @@ int acl_vstream_set_fdtype(ACL_VSTREAM *stream, int type)
 		stream->close_fn = acl_socket_close;
 	}
 
-	return (-1);
+	return -1;
 }
 /* acl_vstream_fopen - open buffered file stream */
 
-ACL_VSTREAM *acl_vstream_fopen(const char *path, unsigned int oflags, int mode, size_t buflen)
+ACL_VSTREAM *acl_vstream_fopen(const char *path, unsigned int oflags,
+	int mode, size_t buflen)
 {
 	ACL_VSTREAM *fp;
 	ACL_FILE_HANDLE fh;
@@ -1896,20 +1993,21 @@ ACL_VSTREAM *acl_vstream_fopen(const char *path, unsigned int oflags, int mode, 
 	fh = acl_file_open(path, oflags, mode);
 
 	if (fh == ACL_FILE_INVALID)
-		return (NULL);
+		return NULL;
 
-	fp = acl_vstream_fdopen(ACL_SOCKET_INVALID, oflags, buflen, 0, ACL_VSTREAM_TYPE_FILE);
+	fp = acl_vstream_fdopen(ACL_SOCKET_INVALID, oflags, buflen,
+		0, ACL_VSTREAM_TYPE_FILE);
 	if (fp == NULL)
-		return (NULL);
+		return NULL;
 
 	fp->fd.h_file = fh;
-	ACL_SAFE_STRNCPY(fp->remote_addr, path, sizeof(fp->remote_addr));
-	return (fp);
+	acl_vstream_set_path(fp, path);
+	return fp;
 }
 
 char *acl_vstream_loadfile(const char *path)
 {
-	return (acl_vstream_loadfile2(path, NULL));
+	return acl_vstream_loadfile2(path, NULL);
 }
 
 char *acl_vstream_loadfile2(const char *path, ssize_t *size)
@@ -1930,8 +2028,9 @@ char *acl_vstream_loadfile2(const char *path, ssize_t *size)
 		*size = -1;
 
 	if (path == NULL || *path == 0) {
-		acl_msg_error("%s, %s(%d):path invalid", myname, __FILE__, __LINE__);
-		return (NULL);
+		acl_msg_error("%s, %s(%d):path invalid",
+			myname, __FILE__, __LINE__);
+		return NULL;
 	}
 
 	fp = acl_vstream_fopen(path, oflags, mode, 4096);
@@ -1939,16 +2038,15 @@ char *acl_vstream_loadfile2(const char *path, ssize_t *size)
 		acl_msg_error("%s, %s(%d): open file(%s) error(%s)",
 			myname, __FILE__, __LINE__,
 			path, acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 
 	vbuf = acl_vstring_alloc(1024);
 	if (buf == NULL) {
 		acl_msg_error("%s, %s(%d): alloc vstring error(%s)",
-			myname, __FILE__, __LINE__,
-			acl_last_serror());
+			myname, __FILE__, __LINE__, acl_last_serror());
 		acl_vstream_close(fp);
-		return (NULL);
+		return NULL;
 	}
 
 	while (1) {
@@ -1962,7 +2060,7 @@ char *acl_vstream_loadfile2(const char *path, ssize_t *size)
 		*size = (ssize_t) ACL_VSTRING_LEN(vbuf);
 	acl_vstream_close(fp);
 	ACL_VSTRING_TERMINATE(vbuf);
-	return (acl_vstring_export(vbuf));
+	return acl_vstring_export(vbuf);
 }
 
 /* acl_vstream_ctl - fine control */
@@ -1988,8 +2086,8 @@ void acl_vstream_ctl(ACL_VSTREAM *stream, int name,...)
 			break;
 		case ACL_VSTREAM_CTL_PATH:
 			ptr = va_arg(ap, char*);
-			ACL_SAFE_STRNCPY(stream->remote_addr,
-				ptr, sizeof(stream->remote_addr));
+			ACL_SAFE_STRNCPY(stream->addr_peer, ptr,
+				sizeof(stream->addr_peer));
 			break;
 		case ACL_VSTREAM_CTL_FD:
 			ACL_VSTREAM_SOCK(stream) = va_arg(ap, ACL_SOCKET);
@@ -1999,11 +2097,10 @@ void acl_vstream_ctl(ACL_VSTREAM *stream, int name,...)
 			break;
 		case ACL_VSTREAM_CTL_CACHE_SEEK:
 			n = va_arg(ap, int);
-			if (n) {
+			if (n)
 				stream->flag |= ACL_VSTREAM_FLAG_CACHE_SEEK;
-			} else {
+			else
 				stream->flag &= ~ACL_VSTREAM_FLAG_CACHE_SEEK;
-			}
 			break;
 		default:
 			acl_msg_panic("%s, %s(%d): bad name %d",
@@ -2019,19 +2116,20 @@ acl_off_t acl_vstream_fseek2(ACL_VSTREAM *stream, acl_off_t offset, int whence)
 	acl_off_t n;
 
 	if (stream == NULL || ACL_VSTREAM_FILE(stream) == ACL_FILE_INVALID)
-		acl_msg_fatal("%s, %s(%d): input error", myname, __FILE__, __LINE__);
+		acl_msg_fatal("%s, %s(%d): input error",
+			myname, __FILE__, __LINE__);
 
 	if (stream->type != ACL_VSTREAM_TYPE_FILE) {
-		acl_msg_error("%s, %s(%d): stream->type(%d) not ACL_VSTREAM_TYPE_FILE",
+		acl_msg_error("%s, %s(%d): type(%d) not ACL_VSTREAM_TYPE_FILE",
 			myname, __FILE__, __LINE__, stream->type);
-		return (-1);
+		return -1;
 	}
 
 	if (stream->wbuf_dlen > 0) {
 		if (acl_vstream_fflush(stream) == ACL_VSTREAM_EOF) {
 			acl_msg_error("%s, %s(%d): acl_vstream_fflush error",
 				myname, __FILE__, __LINE__);
-			return (-1);
+			return -1;
 		}
 	}
 
@@ -2043,20 +2141,21 @@ acl_off_t acl_vstream_fseek2(ACL_VSTREAM *stream, acl_off_t offset, int whence)
 	/* 获得真正的当前文件指针位置 */
 	n = acl_lseek(ACL_VSTREAM_FILE(stream), (acl_off_t) 0, SEEK_CUR);
 	if (n < 0)
-		return (-1);
+		return -1;
 
 	if (whence == SEEK_CUR) {
 		if (stream->read_cnt >= offset) {
 			stream->read_cnt -= (int) offset;
-			n = -stream->read_cnt;		/* 计算出真实的文件位置 */
+			n = -stream->read_cnt;  /* 计算出真实的文件位置 */
 			stream->read_cnt = 0;
 		} else if (stream->read_cnt >= 0) {
 			offset -= stream->read_cnt;
-			n = offset;			/* 计算出真实的文件位置 */
+			n = offset;  /* 计算出真实的文件位置 */
 			stream->read_cnt = 0;
 		} else { /* stream->read_cnt < 0 ? */
 			acl_msg_fatal("%s, %s(%d): invalud read_cnt = %d",
-				myname, __FILE__, __LINE__, (int) stream->read_cnt);
+				myname, __FILE__, __LINE__,
+				(int) stream->read_cnt);
 		}
 	} else {
 		n = offset;
@@ -2065,9 +2164,10 @@ acl_off_t acl_vstream_fseek2(ACL_VSTREAM *stream, acl_off_t offset, int whence)
 
 SYS_SEEK2:
 	/* 定位到合适的位置 */
-	stream->sys_offset = acl_lseek(ACL_VSTREAM_FILE(stream), offset, whence);
+	stream->sys_offset = acl_lseek(
+		ACL_VSTREAM_FILE(stream), offset, whence);
 	stream->offset = stream->sys_offset;
-	return (stream->offset);
+	return stream->offset;
 }
 
 acl_off_t acl_vstream_fseek(ACL_VSTREAM *stream, acl_off_t offset, int whence)
@@ -2076,19 +2176,20 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *stream, acl_off_t offset, int whence)
 	acl_off_t n;
 
 	if (stream == NULL || ACL_VSTREAM_FILE(stream) == ACL_FILE_INVALID)
-		acl_msg_fatal("%s, %s(%d): input error", myname, __FILE__, __LINE__);
+		acl_msg_fatal("%s, %s(%d): input error",
+			myname, __FILE__, __LINE__);
 
 	if (stream->type != ACL_VSTREAM_TYPE_FILE) {
-		acl_msg_error("%s, %s(%d): stream->type(%d) not ACL_VSTREAM_TYPE_FILE",
+		acl_msg_error("%s, %s(%d): type(%d) not ACL_VSTREAM_TYPE_FILE",
 			myname, __FILE__, __LINE__, stream->type);
-		return (-1);
+		return -1;
 	}
 
 	if (stream->wbuf_dlen > 0) {
 		if (acl_vstream_fflush(stream) == ACL_VSTREAM_EOF) {
 			acl_msg_error("%s, %s(%d): acl_vstream_fflush error",
 				myname, __FILE__, __LINE__);
-			return (-1);
+			return -1;
 		}
 	}
 
@@ -2105,7 +2206,8 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *stream, acl_off_t offset, int whence)
 			acl_msg_error("%s, %s(%d): offset(" ACL_FMT_I64D
 				") + read_cnt(%d) != sys_offset("
 				ACL_FMT_I64D ")", myname, __FILE__, __LINE__,
-				stream->offset, stream->read_cnt, stream->sys_offset);
+				stream->offset, stream->read_cnt,
+				stream->sys_offset);
 			stream->read_cnt = 0;
 			goto SYS_SEEK;
 		}
@@ -2119,31 +2221,35 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *stream, acl_off_t offset, int whence)
 			stream->read_cnt -= (int) offset;
 			stream->read_ptr += (int) offset;
 			stream->offset += offset;
-			return (stream->offset);
+			return stream->offset;
 		} else if (stream->read_cnt >= 0) {
-			/* 因为要计算从当前流位置 stream->offset 开始偏移 offset 的位置,
-			 * 而且流中还存在一定的缓存数据(stream->read_cnt), 所以需要先从
-			 * stream->offset 开始移动 stream->read_cnt 个字节(移动出读缓冲区),
-			 * 然后再移动剩余的字节(即 offset - stream->read_cnt) 即可; 因为
-			 * 已经称出读缓冲区，所以需要将 stream->read_cnt 置 0.
+			/* 因为要计算从当前流位置 stream->offset 开始偏移 offset
+			 * 的位置,而且流中还存在一定的缓存数据(stream->read_cnt),
+			 * 所以需要先从 stream->offset 开始移动 stream->read_cnt
+			 * 个字节(移动出读缓冲区),然后再移动剩余的字节
+			 * (即 offset - stream->read_cnt) 即可; 因为已经称出读缓
+			 * 冲区，所以需要将 stream->read_cnt 置 0.
 			 */
 			offset -= stream->read_cnt;
 			stream->read_cnt = 0;
 		} else { /* stream->read_cnt < 0 ? */
 			acl_msg_error("%s, %s(%d): invalud read_cnt = %d",
-				myname, __FILE__, __LINE__, (int) stream->read_cnt);
+				myname, __FILE__, __LINE__,
+				(int) stream->read_cnt);
 			stream->read_cnt = 0;
 		}
 	} else if (whence == SEEK_SET) {
 #if 0
 		/* 获得真正的当前文件指针位置 */
-		stream->sys_offset = acl_lseek(ACL_VSTREAM_FILE(stream), (off_t) 0, SEEK_CUR);
+		stream->sys_offset = acl_lseek(ACL_VSTREAM_FILE(stream),
+			(off_t) 0, SEEK_CUR);
 #endif
 		/* 利用缓存的偏移位置 */
 
 		if (stream->sys_offset < 0) {
-			acl_msg_error("%s, %s(%d): seek n(" ACL_FMT_I64D ") invalid",
-				myname, __FILE__, __LINE__, stream->sys_offset);
+			acl_msg_error("%s, %s(%d): seek n(" ACL_FMT_I64D
+				") invalid", myname, __FILE__, __LINE__,
+				stream->sys_offset);
 			stream->read_cnt = 0;
 			goto SYS_SEEK;
 		}
@@ -2153,12 +2259,15 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *stream, acl_off_t offset, int whence)
 			acl_msg_error("%s, %s(%d): offset(" ACL_FMT_I64D
 				") + read_cnt(%d) != sys_offset("
 				ACL_FMT_I64D ")", myname, __FILE__, __LINE__,
-				stream->offset, stream->read_cnt, stream->sys_offset);
+				stream->offset, stream->read_cnt,
+				stream->sys_offset);
 			stream->read_cnt = 0;
 			goto SYS_SEEK;
 		}
 
-		/* 如果读数据指针经过移动，可以将其回移，因为缓冲区内数据并未破坏，可以复用 */
+		/* 如果读数据指针经过移动，可以将其回移，因为缓冲区内数据
+		 * 并未破坏，可以复用
+		 */
 		if (stream->read_ptr > stream->read_buf) {
 			n = stream->read_ptr - stream->read_buf;
 			stream->offset -= n;
@@ -2172,7 +2281,7 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *stream, acl_off_t offset, int whence)
 			stream->read_cnt -= (int) n;
 			stream->read_ptr += n;
 			stream->offset += n;
-			return (stream->offset);
+			return stream->offset;
 		}
 		stream->read_cnt = 0;
 	} else
@@ -2183,7 +2292,7 @@ SYS_SEEK:
 	stream->sys_offset = acl_lseek(ACL_VSTREAM_FILE(stream), offset, whence);
 	stream->offset = stream->sys_offset;
 
-	return (stream->offset);
+	return stream->offset;
 }
 
 #ifdef ACL_MS_WINDOWS
@@ -2206,22 +2315,22 @@ int acl_file_ftruncate(ACL_VSTREAM *fp, acl_off_t length)
 	if (acl_vstream_fseek(fp, length, SEEK_SET) < 0) {
 		acl_msg_error("%s, %s(%d): fseek error(%s)",
 			myname, __FILE__, __LINE__, acl_last_serror());
-		return (-1);
+		return -1;
 	}
 
 	if (!SetEndOfFile(hf)) {
 		acl_msg_error("%s, %s(%d): SetEndOfFile error(%s)",
 			myname, __FILE__, __LINE__, acl_last_serror());
-		return (-1);
+		return -1;
 	}
 
 	if (acl_vstream_fseek(fp, 0, SEEK_SET) < 0) {
 		acl_msg_error("%s, %s(%d): fseek error(%s)",
 			myname, __FILE__, __LINE__, acl_last_serror());
-		return (-1);
+		return -1;
 	}
 
-	return (0);
+	return 0;
 }
 
 int acl_file_truncate(const char *path, acl_off_t length)
@@ -2233,27 +2342,27 @@ int acl_file_truncate(const char *path, acl_off_t length)
 	if (fp == NULL) {
 		acl_msg_error("%s, %s(%d): fopen file(%s) error(%s)",
 			myname, __FILE__, __LINE__, path, acl_last_serror());
-		return (-1);
+		return -1;
 	}
 
 	if (acl_file_ftruncate(fp, length) < 0) {
 		acl_vstream_close(fp);
-		return (-1);
+		return -1;
 	}
 	acl_vstream_close(fp);
-	return (0);
+	return 0;
 }
 #elif defined(ACL_UNIX)
 int acl_file_ftruncate(ACL_VSTREAM *fp, acl_off_t length)
 {
 	ACL_FILE_HANDLE hf = ACL_VSTREAM_FILE(fp);
 
-	return (ftruncate(hf, length));
+	return ftruncate(hf, length);
 }
 
 int acl_file_truncate(const char *path, acl_off_t length)
 {
-	return (truncate(path, length));
+	return truncate(path, length);
 }
 #endif /* !ACL_MS_WINDOWS, ACL_UNIX */
 
@@ -2263,13 +2372,13 @@ int acl_vstream_fstat(ACL_VSTREAM *fp, struct acl_stat *buf)
 
 	if (fp == NULL || buf == NULL) {
 		acl_msg_error("%s(%d): input invalid", myname, __LINE__);
-		return (-1);
+		return -1;
 	} else if (fp->type != ACL_VSTREAM_TYPE_FILE) {
 		acl_msg_error("%s(%d): not a file stream", myname, __LINE__);
-		return (-1);
+		return -1;
 	}
 
-	return (acl_fstat(ACL_VSTREAM_FILE(fp), buf));
+	return acl_fstat(ACL_VSTREAM_FILE(fp), buf);
 }
 
 acl_int64 acl_vstream_fsize(ACL_VSTREAM *fp)
@@ -2278,12 +2387,13 @@ acl_int64 acl_vstream_fsize(ACL_VSTREAM *fp)
 
 	if (fp == NULL) {
 		acl_msg_error("%s(%d): fp null", myname, __LINE__);
-		return (-1);
+		return -1;
 	} else if (fp->type != ACL_VSTREAM_TYPE_FILE) {
 		acl_msg_error("%s(%d): not a file stream", myname, __LINE__);
-		return (-1);
+		return -1;
 	}
-	return (acl_file_fsize(ACL_VSTREAM_FILE(fp)) + fp->wbuf_dlen);
+	return acl_file_fsize(ACL_VSTREAM_FILE(fp), fp, fp->context)
+		+ fp->wbuf_dlen;
 }
 
 void acl_vstream_reset(ACL_VSTREAM *stream)
@@ -2329,8 +2439,9 @@ void acl_vstream_free(ACL_VSTREAM *stream)
 				break;
 			if (close_handle->close_fn == NULL)
 				continue;
-			/* 只所将此调用放在 close_fn 前面，是为了防止有人误在 close_fn
-			 * 里调用了删除回调函数的操作而造成对同一内存的多次释放
+			/* 只所将此调用放在 close_fn 前面，是为了防止有人误在
+			 * close_fn 里调用了删除回调函数的操作而造成对同一内
+			 * 存的多次释放
 			 */
 			acl_array_delete_idx(stream->close_handle_lnk, i, NULL);
 			close_handle->close_fn(stream, close_handle->context);
@@ -2346,23 +2457,34 @@ void acl_vstream_free(ACL_VSTREAM *stream)
 	if (stream->wbuf != NULL)
 		acl_myfree(stream->wbuf);
 
+	if (stream->addr_peer && stream->addr_peer != __empty_string)
+		acl_myfree(stream->addr_peer);
+	if (stream->addr_local && stream->addr_local != __empty_string)
+		acl_myfree(stream->addr_local);
+	if (stream->sa_peer)
+		acl_myfree(stream->sa_peer);
+	if (stream->sa_local)
+		acl_myfree(stream->sa_local);
+	if (stream->path && stream->path != __empty_string)
+		acl_myfree(stream->path);
+
 	acl_myfree(stream);
 }
 
 int acl_vstream_close(ACL_VSTREAM *stream)
 {
+	const char *myname = "acl_vstream_close";
 	int  ret = 0;
 
 	if (stream->nrefer > 0) {
 		/* 设置延迟释放标志位 */
 		stream->flag |= ACL_VSTREAM_FLAG_DEFER_FREE;
-		return (0);
+		return 0;
 	}
 
 	if (stream->wbuf_dlen > 0) {
-		if (acl_vstream_fflush(stream) == ACL_VSTREAM_EOF) {
-			acl_msg_error("acl_vstream_close: fflush stream error");
-		}
+		if (acl_vstream_fflush(stream) == ACL_VSTREAM_EOF)
+			acl_msg_error("%s: fflush stream error", myname);
 	}
 
 	/* 必须在调用各个关闭回调函数之前将连接关闭，否则会影响 iocp 的事件引擎
@@ -2407,8 +2529,9 @@ int acl_vstream_close(ACL_VSTREAM *stream)
 				continue;
 			if (close_handle->close_fn == NULL)
 				continue;
-			/* 只所将此调用放在 close_fn 前面，是为了防止有人误在 close_fn
-			 * 里调用了删除回调函数的操作而造成对同一内存的多次释放
+			/* 只所将此调用放在 close_fn 前面，是为了防止有人误在
+			 * close_fn 里调用了删除回调函数的操作而造成对同一内存
+			 * 的多次释放
 			 */
 			acl_array_delete_idx(stream->close_handle_lnk, i, NULL);
 			close_handle->close_fn(stream, close_handle->context);
@@ -2419,8 +2542,11 @@ int acl_vstream_close(ACL_VSTREAM *stream)
 
 	if (ACL_VSTREAM_SOCK(stream) != ACL_SOCKET_INVALID && stream->close_fn)
 		ret = stream->close_fn(ACL_VSTREAM_SOCK(stream));
-	else if (ACL_VSTREAM_FILE(stream) != ACL_FILE_INVALID && stream->fclose_fn)
+	else if (ACL_VSTREAM_FILE(stream) != ACL_FILE_INVALID
+		&& stream->fclose_fn)
+	{
 		ret = stream->fclose_fn(ACL_VSTREAM_FILE(stream));
+	}
 
 	if (stream->fdp != NULL)
 		event_fdtable_free(stream->fdp);
@@ -2429,8 +2555,144 @@ int acl_vstream_close(ACL_VSTREAM *stream)
 	if (stream->wbuf != NULL)
 		acl_myfree(stream->wbuf);
 
+	if (stream->addr_local && stream->addr_local != __empty_string)
+		acl_myfree(stream->addr_local);
+	if (stream->addr_peer && stream->addr_peer != __empty_string)
+		acl_myfree(stream->addr_peer);
+	if (stream->sa_peer)
+		acl_myfree(stream->sa_peer);
+	if (stream->sa_local)
+		acl_myfree(stream->sa_local);
+	if (stream->path && stream->path != __empty_string)
+		acl_myfree(stream->path);
+
 	acl_myfree(stream);
-	return (ret);
+	return ret;
+}
+
+static void set_sock_addr(struct sockaddr_in *saddr, const char *addr)
+{
+	const char *myname = "set_sockaddr";
+	char  buf[128], *ptr;
+	int   port;
+
+	snprintf(buf, sizeof(buf), "%s", addr);
+	ptr = strchr(buf, ':');
+	if (ptr == NULL) {
+		acl_msg_error("%s, %s(%d): addr(%s) invalid",
+			myname, __FILE__, __LINE__, addr);
+		return;
+	}
+	*ptr++ = 0;
+	port = atoi(ptr);
+
+	saddr->sin_family = AF_INET;
+	saddr->sin_port = htons(port);
+	saddr->sin_addr.s_addr = inet_addr(buf);
+}
+
+void acl_vstream_set_local(ACL_VSTREAM *stream, const char *addr)
+{
+	if (stream->addr_local == __empty_string || stream->addr_local == NULL)
+		stream->addr_local = acl_mystrdup(addr);
+	else {
+		acl_myfree(stream->addr_local);
+		stream->addr_local = acl_mystrdup(addr);
+	}
+
+	if (stream->sa_local == NULL) {
+		stream->sa_local_size = sizeof(struct sockaddr_in);
+		stream->sa_local = (struct sockaddr_in*)
+			acl_mycalloc(1, stream->sa_local_size);
+	} else
+		memset(stream->sa_local, 0, stream->sa_local_size);
+
+	set_sock_addr(stream->sa_local, addr);
+	stream->sa_local_len = stream->sa_local_size;
+}
+
+void acl_vstream_set_local_addr(ACL_VSTREAM *stream, const struct sockaddr_in *sa)
+{
+	int   port;
+	char  ip[64], addr[64];
+
+	if (stream->sa_local == NULL) {
+		stream->sa_local_size = sizeof(struct sockaddr_in);
+		stream->sa_local = (struct sockaddr_in*)
+			acl_mymalloc(stream->sa_local_size);
+	}
+
+	memcpy(stream->sa_local, sa, stream->sa_local_size);
+	stream->sa_local_len = stream->sa_local_size;
+
+	ip[0] = 0;
+	acl_inet_ntoa(sa->sin_addr, ip, sizeof(ip));
+	port = ntohs(sa->sin_port);
+	snprintf(addr, sizeof(addr), "%s:%d", ip, port);
+
+	if (stream->addr_local == __empty_string || stream->addr_local == NULL)
+		stream->addr_local = acl_mystrdup(addr);
+	else {
+		acl_myfree(stream->addr_local);
+		stream->addr_local = acl_mystrdup(addr);
+	}
+}
+
+void acl_vstream_set_peer(ACL_VSTREAM *stream, const char *addr)
+{
+	if (stream->addr_peer == __empty_string || stream->addr_peer == NULL)
+		stream->addr_peer = acl_mystrdup(addr);
+	else {
+		acl_myfree(stream->addr_peer);
+		stream->addr_peer = acl_mystrdup(addr);
+	}
+
+	if (stream->sa_peer == NULL) {
+		stream->sa_peer_size = sizeof(struct sockaddr_in);
+		stream->sa_peer = (struct sockaddr_in*)
+			acl_mycalloc(1, stream->sa_peer_size);
+	} else
+		memset(stream->sa_peer, 0, stream->sa_peer_size);
+
+	set_sock_addr(stream->sa_peer, addr);
+	stream->sa_peer_len = stream->sa_peer_size;
+}
+
+void acl_vstream_set_peer_addr(ACL_VSTREAM *stream, const struct sockaddr_in *sa)
+{
+	int   port;
+	char  ip[64], addr[64];
+
+	if (stream->sa_peer == NULL) {
+		stream->sa_peer_size = sizeof(struct sockaddr_in);
+		stream->sa_peer = (struct sockaddr_in*)
+			acl_mymalloc(stream->sa_peer_size);
+	}
+
+	memcpy(stream->sa_peer, sa, stream->sa_peer_size);
+	stream->sa_peer_len = stream->sa_peer_size;
+
+	ip[0] = 0;
+	acl_inet_ntoa(sa->sin_addr, ip, sizeof(ip));
+	port = ntohs(sa->sin_port);
+	snprintf(addr, sizeof(addr), "%s:%d", ip, port);
+
+	if (stream->addr_peer == __empty_string || stream->addr_peer == NULL)
+		stream->addr_peer = acl_mystrdup(addr);
+	else {
+		acl_myfree(stream->addr_peer);
+		stream->addr_peer = acl_mystrdup(addr);
+	}
+}
+
+void acl_vstream_set_path(ACL_VSTREAM *stream, const char *path)
+{
+	if (stream->path == __empty_string || stream->path == NULL)
+		stream->path = acl_mystrdup(path);
+	else {
+		acl_myfree(stream->path);
+		stream->path = acl_mystrdup(path);
+	}
 }
 
 void acl_vstream_call_close_handles(ACL_VSTREAM *stream)
@@ -2450,8 +2712,9 @@ void acl_vstream_call_close_handles(ACL_VSTREAM *stream)
 				continue;
 			if (close_handle->close_fn == NULL)
 				continue;
-			/* 只所将此调用放在 close_fn 前面，是为了防止有人误在 close_fn
-			 * 里调用了删除回调函数的操作而造成对同一内存的多次释放
+			/* 只所将此调用放在 close_fn 前面，是为了防止有人误在
+			 * close_fn 里调用了删除回调函数的操作而造成对同一内存
+			 * 的多次释放
 			 */
 			acl_array_delete_idx(stream->close_handle_lnk, i, NULL);
 			close_handle->close_fn(stream, close_handle->context);
@@ -2513,7 +2776,8 @@ void acl_vstream_delete_close_handle(ACL_VSTREAM *stream,
 		return;
 	}
 	if (stream->close_handle_lnk == NULL) {
-		acl_msg_error("%s(%d): close_handle_lnk null", myname, __LINE__);
+		acl_msg_error("%s(%d): close_handle_lnk null",
+			myname, __LINE__);
 		return;
 	}
 	if (close_fn == NULL) {

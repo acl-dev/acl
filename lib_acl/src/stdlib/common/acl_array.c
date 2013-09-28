@@ -384,7 +384,7 @@ int acl_array_mv_idx(ACL_ARRAY *a, int ito, int ifrom, void (*free_fn)(void *))
 /* if you are going to append a known and large number of items, call this first */
 int acl_array_pre_append(ACL_ARRAY *a, int app_count)
 {
-	char  myname[] = "acl_array_pre_append";
+	const char *myname = "acl_array_pre_append";
 
 	if(a == NULL || app_count <= 0)
 		acl_msg_fatal("%s(%d)->%s: invalid input",

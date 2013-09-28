@@ -445,38 +445,35 @@ static void enable_read(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 }
 
 static void parse_addr(char *addr, unsigned short *port,
-	char **local_ip, char **remote_addr)
+	char **local_ip, char **remote)
 {
 	const char *myname = "parse_addr";
 	char *ptr;
 
 	ptr = strchr(addr, ':');
-	if (ptr == NULL) {
+	if (ptr == NULL)
 		acl_msg_fatal("%s, %s(%d): invalid addr(%s)",
-				__FILE__, myname, __LINE__, addr);
-	}
+			__FILE__, myname, __LINE__, addr);
 
 	*ptr++ = 0;
 	*port = atoi(ptr);
-	if (*port <= 0) {
+	if (*port <= 0)
 		acl_msg_fatal("%s, %s(%d): invalid port(%d)",
-				__FILE__, myname, __LINE__, *port);
-	}
+			__FILE__, myname, __LINE__, *port);
 
 	ptr = strchr(addr, '@');
 	if (ptr != NULL) {
 		*ptr++ = 0;
 		*local_ip = addr;
-		*remote_addr = ptr; 
+		*remote = ptr; 
 	} else {
 		*local_ip = NULL;
-		*remote_addr = addr;
+		*remote = addr;
 	}
 
-	if (strlen(*remote_addr) == 0) {
+	if (strlen(*remote) == 0)
 		acl_msg_fatal("%s, %s(%d): ip buf's length is 0",
-				__FILE__, myname, __LINE__);
-	}
+			__FILE__, myname, __LINE__);
 }
 
 static void enable_connect(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
@@ -485,7 +482,7 @@ static void enable_connect(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 	DWORD SentLen = 0;
 	struct sockaddr_in addr;
 	unsigned short port;
-	char *local_ip, *remote_addr, buf[256];
+	char *local_ip, *remote, buf[256];
 	ACL_SOCKET sock = ACL_VSTREAM_SOCK(fdp->stream);
 	LPFN_CONNECTEX lpfnConnectEx = NULL;
 	GUID  GuidConnectEx = WSAID_CONNECTEX;
@@ -495,12 +492,11 @@ static void enable_connect(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 	memset(&fdp->event_write->overlapped, 0,
 		sizeof(fdp->event_write->overlapped));
 
-	ACL_SAFE_STRNCPY(buf, fdp->stream->remote_addr, sizeof(buf));
-	parse_addr(buf, &port, &local_ip, &remote_addr);
+	ACL_SAFE_STRNCPY(buf, ACL_VSTREAM_PEER(fdp->stream), sizeof(buf));
+	parse_addr(buf, &port, &local_ip, &remote);
 
-	if (!local_ip || !*local_ip) {
+	if (!local_ip || !*local_ip)
 		local_ip = any_ip;
-	}
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
@@ -515,7 +511,7 @@ static void enable_connect(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons((short) port);
-	addr.sin_addr.s_addr = inet_addr(remote_addr);
+	addr.sin_addr.s_addr = inet_addr(remote);
 
 	dwErr = WSAIoctl(sock,
 			SIO_GET_EXTENSION_FUNCTION_POINTER,
@@ -669,8 +665,8 @@ static void event_loop(ACL_EVENT *eventp)
 {
 	const char *myname = "event_loop";
 	EVENT_KERNEL *ev = (EVENT_KERNEL *) eventp;
-	ACL_EVENT_NOTIFY_FN worker_fn;
-	void    *worker_arg;
+	ACL_EVENT_NOTIFY_TIME timer_fn;
+	void    *timer_arg;
 	ACL_EVENT_TIMER *timer;
 	int   delay;
 	ACL_EVENT_FDTABLE *fdp;
@@ -720,8 +716,8 @@ TAG_DONE:
 	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
 		if (timer->when > eventp->event_present)
 			break;
-		worker_fn  = timer->callback;
-		worker_arg = timer->context;
+		timer_fn  = timer->callback;
+		timer_arg = timer->context;
 
 		/* 如果定时器的时间间隔 > 0 且允许定时器被循环调用，则再重设定时器 */
 		if (timer->delay > 0 && timer->keep) {
@@ -736,7 +732,7 @@ TAG_DONE:
 					myname, __LINE__, timer->nrefer);
 			acl_myfree(timer);
 		}
-		worker_fn(ACL_EVENT_TIME, worker_arg);
+		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
 	}
 
 	for (;;) {

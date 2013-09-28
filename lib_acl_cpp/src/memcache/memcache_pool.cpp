@@ -6,8 +6,8 @@ namespace acl
 {
 
 memcache_pool::memcache_pool(const char* addr, int count,
-	int retry_inter /* = 0 */)
-: connect_pool(addr, count, retry_inter)
+	size_t idx /* = 0 */)
+: connect_pool(addr, count, idx)
 {
 	conn_timeout_ = 30;
 	rw_timeout_ = 60;

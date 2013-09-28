@@ -47,6 +47,14 @@ public:
 	bool open(const char* addr, int conn_timeout, int rw_timeout);
 
 	/**
+	 * 绑定本地 UDP 地址，创建 UDP 网络流对象
+	 * @param addr {const char*} 本机地址，格式：ip:port
+	 * @param rw_timeout {int} 读写超时时间(秒)
+	 * @return {bool} 绑定是否成功
+	 */
+	bool bind_udp(const char* addr, int rw_timeout = 0);
+
+	/**
 	 * 关闭网络连接流
 	 * @return {bool} 关闭是否成功
 	 */
@@ -95,6 +103,15 @@ public:
 	const char* get_peer_ip() const;
 
 	/**
+	 * 设置远程连接对象的地址，对于 TCP 传输方式，不需要显示调用此函数
+	 * 设置远程对象地址，UDP 传输方式时需要调用此函数设置远程地址，然后
+	 * 才可以向远程连接写数据
+	 * @param addr {const char*} 远程连接对象的地址，格式：ip:port
+	 * @return {bool} 当流对象未打开时返回 false
+	 */
+	bool set_peer(const char* addr);
+
+	/**
 	 * 获得连接的本地地址
 	 * @param full {bool} 是否获得完整地址，即：IP:PORT，如果该参数
 	 *  为 false，则仅返回 IP，否则返回 IP:PORT
@@ -109,7 +126,14 @@ public:
 	 *  无法获得本地地址
 	 */
 	const char* get_local_ip() const;
-protected:
+
+	/**
+	 * 设置本地地址
+	 * @param addr {const char*} 地址，格式：ip:port
+	 * @return {bool} 当流对象未打开时返回 false
+	 */
+	bool set_local(const char* addr);
+
 private:
 	char  dummy_[1];
 	char  peer_ip_[33];

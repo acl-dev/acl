@@ -36,7 +36,7 @@
 #ifdef SUNOS5
 int acl_stream_connect(const char *path, int block_mode, int unused_timeout)
 {
-	char   *myname = "acl_stream_connect";
+	const char *myname = "acl_stream_connect";
 
 #ifdef ACL_FREEBSD
 	path = path;
@@ -44,7 +44,7 @@ int acl_stream_connect(const char *path, int block_mode, int unused_timeout)
 	unused_timeout = unused_timeout;
 
 	acl_msg_fatal("%s(%d): not support!", myname, __LINE__);
-	return (-1);
+	return -1;
 #else
 	int     pair[2];
 	int     fifo;
@@ -56,21 +56,16 @@ int acl_stream_connect(const char *path, int block_mode, int unused_timeout)
 	 * the server.
 	 */
 	if ((fifo = open(path, O_WRONLY | O_NONBLOCK, 0)) < 0)
-		return (-1);
+		return -1;
 
 	/*
 	 * Create a pipe, and send one pipe end to the server.
 	 */
-	if (pipe(pair) < 0) {
-		char tbuf[256];
-		acl_msg_fatal("%s: pipe: %s",
-			myname, acl_last_strerror(tbuf, sizeof(tbuf)));
-	}
-	if (ioctl(fifo, I_SENDFD, pair[1]) < 0) {
-		char tbuf[256];
+	if (pipe(pair) < 0)
+		acl_msg_fatal("%s: pipe: %s", myname, acl_last_serror());
+	if (ioctl(fifo, I_SENDFD, pair[1]) < 0)
 		acl_msg_fatal("%s: send file descriptor: %s",
-			myname, acl_last_strerror(tbuf, sizeof(tbuf)));
-	}
+			myname, acl_last_serror());
 	close(pair[1]);
 
 	/*
@@ -87,10 +82,9 @@ int acl_stream_connect(const char *path, int block_mode, int unused_timeout)
 	/*
 	 * Keep the other end of the pipe.
 	 */
-	return (pair[0]);
+	return pair[0];
 #endif /* ACL_FREEBSD */
 }
 #endif
 
 #endif /* ACL_UNIX */
-

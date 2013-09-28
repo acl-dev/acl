@@ -61,16 +61,17 @@ static int master_prefork(ACL_MASTER_SERV *serv)
 
 /* master_avail_event - create child process to handle connection request */
 
-static void master_avail_event(int event, void *context)
+static void master_avail_event(int type, ACL_EVENT *event,
+	ACL_VSTREAM *stream acl_unused, void *context)
 {
 	ACL_MASTER_SERV *serv = (ACL_MASTER_SERV *) context;
 	int     n;
 
-	if (event == 0)  /* XXX Can this happen? */
+	if (type == 0)  /* XXX Can this happen? */
 		acl_msg_panic("master_avail_event: null event");
 	else if (ACL_MASTER_THROTTLED(serv)) {  /* XXX interface botch */
 		for (n = 0; n < serv->listen_fd_count; n++) {
-			acl_event_disable_readwrite(acl_var_master_global_event,
+			acl_event_disable_readwrite(event,
 				serv->listen_streams[n]);
 		}
 	} else if (serv->prefork_proc > 0)

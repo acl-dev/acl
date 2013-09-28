@@ -19,12 +19,19 @@ public:
 	 * 构造函数
 	 * @param addr {const char*} 服务器监听地址，格式：ip:port(domain:port)
 	 * @param count {int} 连接池最大连接个数限制
+	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
+	 */
+	connect_pool(const char* addr, int count, size_t idx = 0);
+	virtual ~connect_pool();
+
+	/**
+	 * 设置连接池异常的重试时间间隔
 	 * @param retry_inter {int} 当连接断开后，重新再次打开连接的时间间隔(秒)，
 	 *  当该值 <= 0 时表示允许连接断开后可以立即重连，否则必须超过该时间间隔后才
-	 *  允许断开重连
+	 *  允许断开重连；未调用本函数时，内部缺省值为 1 秒
+	 * @retrun {connect_pool&}
 	 */
-	connect_pool(const char* addr, int count, int retry_inter = 0);
-	virtual ~connect_pool();
+	connect_pool& set_retry_inter(int retry_inter);
 
 	/**
 	 * 设置连接池中空闲连接的空闲生存周期
@@ -83,6 +90,15 @@ public:
 	}
 
 	/**
+	 * 获得该连接池对象在连接池集合中的下标位置
+	 * @return {size_t}
+	 */
+	size_t get_idx() const
+	{
+		return idx_;
+	}
+
+	/**
 	 * 重置统计计数器
 	 * @param inter {int} 统计的时间间隔
 	 */
@@ -124,7 +140,9 @@ protected:
 	// 有问题的服务器的可以重试的时间间隔，不可用连接池对象再次被启用的时间间隔
 	int   retry_inter_;
 	time_t last_dead_;			// 该连接池对象上次不可用时的时间截
-	char  addr_[64];			// 连接池对应的服务器地址，IP:PORT
+
+	size_t idx_;				// 该连接池对象在集合中的下标位置
+	char  addr_[256];			// 连接池对应的服务器地址，IP:PORT
 	int   max_;				// 最大连接数
 	int   count_;				// 当前的连接数
 	time_t idle_ttl_;			// 空闲连接的生命周期

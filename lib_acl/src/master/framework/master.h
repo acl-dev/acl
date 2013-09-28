@@ -82,6 +82,7 @@ typedef struct ACL_MASTER_SERV {
 #define ACL_MASTER_SERV_TYPE_INET	2	/* AF_INET domain socket */
 #define ACL_MASTER_SERV_TYPE_FIFO	3	/* fifo (named pipe) */
 #define	ACL_MASTER_SERV_TYPE_SOCK	4	/* AF_UNIX/AF_INET socket */
+#define	ACL_MASTER_SERV_TYPE_UDP	5	/* AF_INET UDP socket */
 
  /*
   * Default process management policy values. This is only the bare minimum.

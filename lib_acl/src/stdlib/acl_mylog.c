@@ -100,7 +100,7 @@ void acl_log_fp_set(ACL_VSTREAM *fp, const char *logpre)
 
 	acl_foreach(iter, __loggers) {
 		log = (ACL_LOG*) iter.data;
-		if (strcmp(log->path, fp->remote_addr) == 0) {
+		if (strcmp(log->path, ACL_VSTREAM_PATH(fp)) == 0) {
 			acl_msg_warn("%s(%d): log %s has been opened.",
 				myname, __LINE__, log->path);
 			return;
@@ -112,7 +112,7 @@ void acl_log_fp_set(ACL_VSTREAM *fp, const char *logpre)
 #endif
 	log = (ACL_LOG*) calloc(1, sizeof(ACL_LOG));
 	log->fp = fp;
-	log->path = strdup(fp->remote_addr);
+	log->path = strdup(ACL_VSTREAM_PATH(fp));
 	log->type = ACL_LOG_T_UNKNOWN;
 	log->lock = (acl_pthread_mutex_t*) calloc(1, sizeof(acl_pthread_mutex_t));
 	thread_mutex_init(log->lock, NULL);
@@ -155,7 +155,7 @@ static int open_file_log(const char *filename, const char *logpre)
 	}
 
 	fp = private_vstream_fhopen(fh, O_RDWR);
-	snprintf(fp->remote_addr, sizeof(fp->remote_addr), "%s", filename);
+	acl_vstream_set_path(fp, filename);
 
 #ifdef	ACL_UNIX
 	acl_close_on_exec(fh, ACL_CLOSE_ON_EXEC);

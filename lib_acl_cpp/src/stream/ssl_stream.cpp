@@ -153,7 +153,7 @@ bool ssl_stream::ssl_client_init()
 
 	ssl_set_rng(ssl_, havege_random, hs_);
 	//ssl_set_dbg(ssl_, my_debug, stdout);
-	ssl_set_bio(ssl_, __read, this, __send, this);
+	ssl_set_bio(ssl_, __sock_read, this, __sock_send, this);
 
 	ssl_set_ciphersuites(ssl_, ssl_default_ciphersuites);
 	ssl_set_session(ssl_, 1, 600, ssn_);
@@ -168,16 +168,16 @@ bool ssl_stream::ssl_client_init()
 	return (true);
 }
 
-int ssl_stream::__read(void *ctx, unsigned char *buf, size_t len)
+int ssl_stream::__sock_read(void *ctx, unsigned char *buf, size_t len)
 {
 #ifdef HAS_POLARSSL
 	ssl_stream* cli = (ssl_stream*) ctx;
 	ACL_VSTREAM* stream = cli->get_vstream();
 	acl_assert(stream);
-	ACL_SOCKET fd = ACL_VSTREAM_SOCK(stream);
 	int   ret, timeout = 120;
 
-	if ((ret = acl_socket_read(fd, buf, len, timeout, NULL)) < 0)
+	if ((ret = acl_socket_read(ACL_VSTREAM_SOCK(stream), buf, len,
+		timeout, stream, NULL)) < 0)
 	{
 		int   errnum = acl_last_error();
 		if (ret == ACL_EINTR || ret == ACL_EWOULDBLOCK
@@ -201,16 +201,16 @@ int ssl_stream::__read(void *ctx, unsigned char *buf, size_t len)
 #endif
 }
 
-int ssl_stream::__send(void *ctx, const unsigned char *buf, size_t len)
+int ssl_stream::__sock_send(void *ctx, const unsigned char *buf, size_t len)
 {
 #ifdef HAS_POLARSSL
 	ssl_stream* cli = (ssl_stream*) ctx;
 	ACL_VSTREAM* stream = cli->get_vstream();
 	acl_assert(stream);
-	ACL_SOCKET fd = ACL_VSTREAM_SOCK(stream);
 	int   ret, timeout = 120;
 
-	if ((ret = acl_socket_write(fd, buf, len, timeout, NULL)) < 0)
+	if ((ret = acl_socket_write(ACL_VSTREAM_SOCK(stream), buf, len,
+		timeout, stream, NULL)) < 0)
 	{
 		int   errnum = acl_last_error();
 		if (ret == ACL_EINTR || ret == ACL_EWOULDBLOCK
@@ -234,8 +234,8 @@ int ssl_stream::__send(void *ctx, const unsigned char *buf, size_t len)
 #endif
 }
 
-int ssl_stream::__ssl_read(ACL_SOCKET fd acl_unused, void *buf, size_t len,
-	int timeout acl_unused, void *ctx)
+int ssl_stream::__ssl_read(ACL_SOCKET, void *buf, size_t len, int,
+	ACL_VSTREAM*, void *ctx)
 {
 #ifdef HAS_POLARSSL
 	ssl_stream* cli = (ssl_stream*) ctx;
@@ -259,8 +259,8 @@ int ssl_stream::__ssl_read(ACL_SOCKET fd acl_unused, void *buf, size_t len,
 #endif
 }
 
-int ssl_stream::__ssl_send(ACL_SOCKET fd acl_unused, const void *buf, size_t len,
-	int timeout acl_unused, void *ctx)
+int ssl_stream::__ssl_send(ACL_SOCKET, const void *buf, size_t len,
+	int, ACL_VSTREAM*, void *ctx)
 {
 #ifdef HAS_POLARSSL
 	ssl_stream* cli = (ssl_stream*) ctx;

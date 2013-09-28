@@ -7,6 +7,8 @@
 namespace acl
 {
 
+#define CP(x, y) ACL_SAFE_STRNCPY(x, y, sizeof(x))
+
 http_header::http_header(void)
 {
 	init();
@@ -35,6 +37,7 @@ void http_header::init()
 	is_request_ = true;
 	url_ = NULL;
 	method_ = HTTP_METHOD_GET;
+	CP(method_s_, "GET");
 	keep_alive_ = false;
 	nredirect_ = 0; // 默认条件下不主动进行重定向
 	accept_compress_ = true;
@@ -213,6 +216,45 @@ http_header& http_header::set_host(const char* value)
 http_header& http_header::set_method(http_method_t method)
 {
 	method_ = method;
+
+	switch(method_)
+	{
+	case HTTP_METHOD_GET:
+		CP(method_s_, "GET");
+		break;
+	case HTTP_METHOD_POST:
+		CP(method_s_, "POST");
+		break;
+	case HTTP_METHOD_PUT:
+		CP(method_s_, "PUT");
+		break;
+	case HTTP_METHOD_CONNECT:
+		CP(method_s_, "CONNECT");
+		break;
+	case HTTP_METHOD_PURGE:
+		CP(method_s_, "PURGE");
+		break;
+	default:
+		CP(method_s_, "UNKNOWN");
+		break;
+	}
+	return *this;
+}
+
+http_header& http_header::set_method(const char* method)
+{
+	if (strcasecmp(method, "GET") == 0)
+		method_ = HTTP_METHOD_GET;
+	else if (strcasecmp(method, "POST") == 0)
+		method_ = HTTP_METHOD_POST;
+	else if (strcasecmp(method, "PUT") == 0)
+		method_ = HTTP_METHOD_PUT;
+	else if (strcasecmp(method, "CONNECT") == 0)
+		method_ = HTTP_METHOD_CONNECT;
+	else if (strcasecmp(method, "PURGE") == 0)
+		method_ = HTTP_METHOD_PURGE;
+	else
+		method_ = HTTP_METHOD_UNKNOWN;
 	return *this;
 }
 
@@ -271,30 +313,8 @@ bool http_header::build_request(string& buf) const
 		return (false);
 	}
 
-	buf.clear();
-	switch(method_)
-	{
-	case HTTP_METHOD_GET:
-		buf = "GET ";
-		break;
-	case HTTP_METHOD_POST:
-		buf = "POST ";
-		break;
-	case HTTP_METHOD_PUT:
-		buf = "PUT ";
-		break;
-	case HTTP_METHOD_CONNECT:
-		buf = "CONNECT";
-		break;
-	case HTTP_METHOD_PURGE:
-		buf = "PURGE";
-		break;
-	default:
-		logger_error("unknown method(%d)", (int) method_);
-		return (false);
-	}
+	buf.format("%s %s", method_s_, url_);
 
-	buf << url_;
 	if (!params_.empty())
 	{
 		buf << '?';

@@ -44,7 +44,7 @@
 #include "net/acl_tcp_ctl.h"
 #include "net/acl_sane_socket.h"
 #include "event/acl_events.h"
-#include "ioctl/acl_myioctl.h"
+#include "ioctl/acl_ioctl.h"
 
 /* Global library. */
 
@@ -141,9 +141,6 @@ static void (*ioctl_server_pre_disconn) (ACL_VSTREAM *, char *, char **);
 static int (*ioctl_server_on_accept)(ACL_VSTREAM *);
 static void (*ioctl_server_rw_timer) (ACL_VSTREAM *);
 
-/* forward declare */
-static void ioctl_server_timeout(int event acl_unused, void *context);
-	
 static void ioctl_init(void)
 {
 	pthread_mutex_init(&__closing_time_mutex, NULL);
@@ -217,7 +214,7 @@ static int get_client_count(void)
 	return (n);
 }
 
-void acl_ioctl_server_request_timer(ACL_IOCTL_TIMER_FN timer_fn,
+void acl_ioctl_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
 	void *arg, int delay)
 {
 	acl_assert(__h_ioctl);
@@ -225,7 +222,7 @@ void acl_ioctl_server_request_timer(ACL_IOCTL_TIMER_FN timer_fn,
 		(acl_int64) delay * 1000000);
 }
 
-void acl_ioctl_server_cancel_timer(ACL_IOCTL_TIMER_FN timer_fn, void *arg)
+void acl_ioctl_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg)
 {
 	acl_assert(__h_ioctl);
 	acl_ioctl_cancel_timer(__h_ioctl, timer_fn, arg);
@@ -241,7 +238,8 @@ ACL_IOCTL *acl_ioctl_server_handle()
 	return (__h_ioctl);
 }
 
-static void close_listen_timer(int event acl_unused, void *context acl_unused)
+static void close_listen_timer(int type acl_unused, ACL_EVENT *event acl_unused,
+	void *context acl_unused)
 {
 	int   i;
 
@@ -290,6 +288,40 @@ static void ioctl_server_exit(void)
 	exit(0);
 }
 
+/* ioctl_server_timeout - idle time exceeded */
+
+static void ioctl_server_timeout(int type acl_unused,
+	ACL_EVENT *event acl_unused, void *context)
+{
+	const char* myname = "ioctl_server_timeout";
+	ACL_IOCTL *h_ioctl = (ACL_IOCTL *) context;
+	time_t last, inter;
+	int   n;
+
+	n = get_client_count();
+
+	/* if there are some fds not be closed, the timer should be reset again */
+	if (n > 0 && acl_var_ioctl_idle_limit > 0) {
+		acl_ioctl_request_timer(h_ioctl, ioctl_server_timeout, h_ioctl,
+			(acl_int64) acl_var_ioctl_idle_limit * 1000000);
+		return;
+	}
+
+	last  = last_closing_time();
+	inter = time(NULL) - last;
+
+	if (inter >= 0 && inter < acl_var_ioctl_idle_limit) {
+		acl_ioctl_request_timer(h_ioctl, ioctl_server_timeout, h_ioctl,
+			(acl_int64) (acl_var_ioctl_idle_limit - inter) * 1000000);
+		return;
+	}
+
+	if (acl_msg_verbose)
+		acl_msg_info("%s: idle timeout -- exiting", myname);
+
+	ioctl_server_exit();
+}
+
 /* ioctl_server_abort - terminate after abnormal master exit */
 
 static void ioctl_server_abort(int event acl_unused, ACL_IOCTL *h_ioctl,
@@ -329,40 +361,8 @@ static void ioctl_server_abort(int event acl_unused, ACL_IOCTL *h_ioctl,
 	ioctl_server_exit();
 }
 
-/* ioctl_server_timeout - idle time exceeded */
-
-static void ioctl_server_timeout(int event acl_unused, void *context)
-{
-	const char* myname = "ioctl_server_timeout";
-	ACL_IOCTL *h_ioctl = (ACL_IOCTL *) context;
-	time_t last, inter;
-	int   n;
-
-	n = get_client_count();
-
-	/* if there are some fds not be closed, the timer should be reset again */
-	if (n > 0 && acl_var_ioctl_idle_limit > 0) {
-		acl_ioctl_request_timer(h_ioctl, ioctl_server_timeout, h_ioctl,
-			(acl_int64) acl_var_ioctl_idle_limit * 1000000);
-		return;
-	}
-
-	last  = last_closing_time();
-	inter = time(NULL) - last;
-
-	if (inter >= 0 && inter < acl_var_ioctl_idle_limit) {
-		acl_ioctl_request_timer(h_ioctl, ioctl_server_timeout, h_ioctl,
-			(acl_int64) (acl_var_ioctl_idle_limit - inter) * 1000000);
-		return;
-	}
-
-	if (acl_msg_verbose)
-		acl_msg_info("%s: idle timeout -- exiting", myname);
-
-	ioctl_server_exit();
-}
-
-static void ioctl_server_use_timer(int event acl_unused, void *context)
+static void ioctl_server_use_timer(int type acl_unused,
+	ACL_EVENT *event acl_unused, void *context)
 {
 	ACL_IOCTL *h_ioctl = (ACL_IOCTL *) context;
 	int   n;
@@ -427,7 +427,7 @@ static void decrease_counter_callback(ACL_VSTREAM *stream acl_unused,
 /* ioctl_server_wakeup - wake up application */
 
 static void ioctl_server_wakeup(ACL_IOCTL *h_ioctl, int fd,
-	const char *remote_addr, const char *local_addr)
+	const char *remote, const char *local)
 {
 	ACL_VSTREAM *stream;
 
@@ -449,13 +449,13 @@ static void ioctl_server_wakeup(ACL_IOCTL *h_ioctl, int fd,
 		acl_msg_fatal("%s(%d): acl_vstream_fdopen error(%s)",
 			__FILE__, __LINE__, strerror(errno));
 
-	if (remote_addr)
-		ACL_SAFE_STRNCPY(stream->remote_addr, remote_addr,
-			sizeof(stream->remote_addr));
-	if (local_addr)
-		ACL_SAFE_STRNCPY(stream->local_addr, local_addr,
-			sizeof(stream->local_addr));
-	/* when the stream is closed, the callback will be called to decrease the counter */
+	if (remote)
+		acl_vstream_set_peer(stream, remote);
+	if (local)
+		acl_vstream_set_local(stream, local);
+	/* when the stream is closed, the callback will be called
+	 * to decrease the counter
+	 */
 	acl_vstream_add_close_handle(stream, decrease_counter_callback, NULL);
 
 	ioctl_server_execute(h_ioctl, stream);
@@ -463,7 +463,8 @@ static void ioctl_server_wakeup(ACL_IOCTL *h_ioctl, int fd,
 
 /* restart listening */
 
-static void ioctl_restart_listen(int event acl_unused, void *context)
+static void ioctl_restart_listen(int type acl_unused,
+	ACL_EVENT *event acl_unused, void *context)
 {
 	ACL_VSTREAM *stream = (ACL_VSTREAM*) context;
 	acl_assert(__h_ioctl);
@@ -562,7 +563,7 @@ static void ioctl_server_accept_sock(int event_type, ACL_IOCTL *h_ioctl,
 	const char  *myname = "ioctl_serer_accept_inet";
 	int     listen_fd = ACL_VSTREAM_SOCK(stream);
 	int     time_left = -1, i = 0, delay_listen = 0, fd, sock_type;
-	char    remote_addr[64], local_addr[64];
+	char    remote[64], local[64];
 
 	if (__listen_streams == NULL) {
 		acl_msg_info("Server stoping ...");
@@ -590,8 +591,7 @@ static void ioctl_server_accept_sock(int event_type, ACL_IOCTL *h_ioctl,
 		ioctl_server_pre_accept(ioctl_server_name, ioctl_server_argv);
 
 	while (i++ < acl_var_ioctl_max_accept) {
-		fd = acl_accept(listen_fd, remote_addr,
-			sizeof(remote_addr), &sock_type);
+		fd = acl_accept(listen_fd, remote, sizeof(remote), &sock_type);
 		if (fd < 0) {
 			if (errno == EMFILE) {
 				delay_listen = 1;
@@ -613,9 +613,9 @@ static void ioctl_server_accept_sock(int event_type, ACL_IOCTL *h_ioctl,
 	        /* 如果为 TCP 套接口，则设置 nodelay 选项以避免发送延迟现象 */
 		if (sock_type == AF_INET)
 			acl_tcp_set_nodelay(fd);
-		if (acl_getsockname(fd, local_addr, sizeof(local_addr)) < 0)
-			memset(local_addr, 0, sizeof(local_addr));
-		ioctl_server_wakeup(h_ioctl, fd, remote_addr, local_addr);
+		if (acl_getsockname(fd, local, sizeof(local)) < 0)
+			memset(local, 0, sizeof(local));
+		ioctl_server_wakeup(h_ioctl, fd, remote, local);
 	}
 
 	if (ioctl_server_lock != 0

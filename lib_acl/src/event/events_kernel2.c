@@ -476,8 +476,8 @@ static void event_loop(ACL_EVENT *eventp)
 {
 	const char *myname = "event_loop";
 	EVENT_KERNEL *ev = (EVENT_KERNEL *) eventp;
-	ACL_EVENT_NOTIFY_FN worker_fn;
-	void    *worker_arg;
+	ACL_EVENT_NOTIFY_TIME timer_fn;
+	void    *timer_arg;
 	ACL_EVENT_TIMER *timer;
 	int   delay, n, nready;
 	ACL_EVENT_FDTABLE *fdp;
@@ -594,8 +594,8 @@ TAG_DONE:
 	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
 		if (timer->when > eventp->event_present)
 			break;
-		worker_fn  = timer->callback;
-		worker_arg = timer->context;
+		timer_fn  = timer->callback;
+		timer_arg = timer->context;
 
 		/* 如果定时器的时间间隔 > 0 且允许定时器被循环调用，则再重设定时器 */
 		if (timer->delay > 0 && timer->keep) {
@@ -610,7 +610,7 @@ TAG_DONE:
 					myname, __LINE__, timer->nrefer);
 			acl_myfree(timer);
 		}
-		worker_fn(ACL_EVENT_TIME, worker_arg);
+		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
 	}
 
 	event_fire(eventp);

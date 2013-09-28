@@ -161,6 +161,23 @@ public:
 	http_header& set_method(http_method_t method);
 
 	/**
+	 * 设置 HTTP 协议的请求方法，本函数允许用户扩展 HTTP 请求方法，
+	 * 通过该函数设置的请求方法仅影响 HTTP 请求过程
+	 * @param method {const char*} 请求方法
+	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
+	 */
+	http_header& set_method(const char* method);
+
+	/**
+	 * 当作为请求头时，本函数取得当前邮件头的请求方法
+	 * @return {http_method_t}
+	 */
+	http_method_t get_method(void) const
+	{
+		return method_;
+	}
+
+	/**
 	 * 设置 HTTP 请求头中 Range 字段，用于分段请求数据，多用于
 	 * 支持断点续传的 WEB 服务器中
 	 * @param from {http_off_t} 起始偏移位置，下标从 0 开始，该
@@ -265,6 +282,7 @@ private:
 	std::list<HttpCookie*> cookies_;      // cookies 集合
 	std::list<HTTP_HDR_ENTRY*> entries_;  // HTTP 请求头中各字段集合
 	http_method_t method_;                // HTTP 请求的方法
+	char  method_s_[64];                  // HTTP 请求方法以字符串表示
 	bool keep_alive_;                     // 是否保持长连接
 	unsigned int nredirect_;              // 最大重定向的次数限制
 	bool accept_compress_;                // 是否接收压缩数据

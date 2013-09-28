@@ -436,7 +436,7 @@ void acl_msg_panic2(const char *fmt, va_list ap)
 
 const char *acl_strerror(unsigned int errnum, char *buffer, int size)
 {
-	char  myname[] = "acl_strerror";
+	const char *myname = "acl_strerror";
 #ifdef	ACL_MS_WINDOWS
         int   L;
 

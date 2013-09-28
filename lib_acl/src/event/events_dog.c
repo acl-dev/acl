@@ -48,17 +48,18 @@ static void event_dog_close(EVENT_DOG *evdog)
 	evdog->client = NULL;
 }
 
-static void read_fn(int event_type acl_unused, void *context)
+static void read_fn(int event_type acl_unused, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context)
 {
 	EVENT_DOG *evdog = (EVENT_DOG*) context;
 	char  buf[2];
 
 	evdog->client->rw_timeout = 1;
 	if (acl_vstream_readn(evdog->client, buf, 1) == ACL_VSTREAM_EOF) {
-	        acl_event_disable_read(evdog->eventp, evdog->client);
+	        acl_event_disable_read(event, stream);
 		event_dog_reopen(evdog);
 	} else
-		acl_event_enable_read(evdog->eventp, evdog->client, 0, read_fn, evdog);
+		acl_event_enable_read(event, stream, 0, read_fn, evdog);
 }
 
 static void event_dog_open(EVENT_DOG *evdog)
@@ -75,7 +76,7 @@ static void event_dog_open(EVENT_DOG *evdog)
 		acl_msg_fatal("%s(%d): listen on addr(%s) error(%s)",
 			myname, __LINE__, addr, acl_last_serror());
 
-	evdog->server = acl_vstream_connect(evdog->sstream->local_addr,
+	evdog->server = acl_vstream_connect(ACL_VSTREAM_LOCAL(evdog->sstream),
 			ACL_BLOCKING, 0, 0, 1024);
 	if (evdog->server == NULL)
 		acl_msg_fatal("%s(%d): connect to addr(%s) error(%s)",
@@ -108,25 +109,21 @@ static void event_dog_reopen(EVENT_DOG *evdog)
 
 EVENT_DOG *event_dog_create(ACL_EVENT *eventp, int thread_mode)
 {
-	const char *myname = "event_dog_create";
 	EVENT_DOG *evdog;
 
 	evdog = (EVENT_DOG*) acl_mycalloc(1, sizeof(EVENT_DOG));
-	if (evdog == NULL)
-		acl_msg_fatal("%s(%d): calloc error", myname, __LINE__);
-
 	evdog->eventp = eventp;
 	evdog->thread_mode = thread_mode;
 
 	event_dog_open(evdog);
-	return (evdog);
+	return evdog;
 }
 
 ACL_VSTREAM *event_dog_client(EVENT_DOG *evdog)
 {
 	if (evdog && evdog->client)
 		return (evdog->client);
-	return (NULL);
+	return NULL;
 }
 
 void event_dog_notify(EVENT_DOG *evdog)
@@ -148,4 +145,3 @@ void event_dog_free(EVENT_DOG *evdog)
 	event_dog_close(evdog);
 	acl_myfree(evdog);
 }
-

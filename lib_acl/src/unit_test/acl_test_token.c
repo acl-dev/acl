@@ -16,7 +16,7 @@
 
 AUT_CMD_TOKEN *aut_line_peer_token(const AUT_LINE *test_line)
 {
-	char  myname[] = "aut_line_peer_token";
+	const char *myname = "aut_line_peer_token";
 	AUT_LINE *test_peer;
 
 	if (test_line == NULL || test_line->arg_inner == NULL)
@@ -31,7 +31,7 @@ AUT_CMD_TOKEN *aut_line_peer_token(const AUT_LINE *test_line)
 
 AUT_LINE *aut_line_peer(const AUT_LINE *test_line)
 {
-	char  myname[] = "aut_line_peer";
+	const char *myname = "aut_line_peer";
 	AUT_LINE *test_peer;
 	AUT_CMD_TOKEN *token, *token_peer;
 

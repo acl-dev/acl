@@ -373,7 +373,7 @@ ACL_VSTREAM *acl_ioctl_accept(ACL_VSTREAM *sstream, char *ipbuf, int size)
 	return acl_vstream_accept(sstream, ipbuf, size);
 }
 
-acl_int64 acl_ioctl_request_timer(ACL_IOCTL *ioc, ACL_IOCTL_TIMER_FN timer_fn,
+acl_int64 acl_ioctl_request_timer(ACL_IOCTL *ioc, ACL_EVENT_NOTIFY_TIME timer_fn,
 	void *context, acl_int64 idle_limit)
 {
 	const char *myname = "acl_ioctl_request_timer";
@@ -388,7 +388,7 @@ acl_int64 acl_ioctl_request_timer(ACL_IOCTL *ioc, ACL_IOCTL_TIMER_FN timer_fn,
 }
 
 acl_int64 acl_ioctl_cancel_timer(ACL_IOCTL *ioc,
-	ACL_IOCTL_TIMER_FN timer_fn, void *context)
+	ACL_EVENT_NOTIFY_TIME timer_fn, void *context)
 {
 	const char *myname = "acl_ioctl_cancel_timer";
 

@@ -32,7 +32,8 @@
 
 /* master_status_event - status read event handler */
 
-static void master_status_event(int event, void *context)
+static void master_status_event(int type, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream acl_unused, void *context)
 {
 	const char *myname = "master_status_event";
 	ACL_MASTER_SERV *serv = (ACL_MASTER_SERV *) context;
@@ -41,7 +42,7 @@ static void master_status_event(int event, void *context)
 	ACL_MASTER_PID pid;
 	int     n;
 
-	if (event == 0)				/* XXX Can this happen?  */
+	if (type == 0)				/* XXX Can this happen?  */
 		return;
 
 	/*

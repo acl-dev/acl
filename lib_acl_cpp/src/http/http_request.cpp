@@ -157,15 +157,6 @@ bool http_request::send_request(const char* data, size_t len)
 	acl_assert(client_);  // 必须保证该连接已经打开
 	client_->reset();  // 重置状态
 
-	// 构建 HTTP 请求头
-	if (data && len > 0)
-	{
-		header_.set_method(HTTP_METHOD_POST);
-		header_.set_content_length(len);
-	}
-	else
-		header_.set_method(HTTP_METHOD_GET);
-
 	// 写 HTTP 请求头
 	if (client_->write(header_) == false)
 	{
@@ -190,6 +181,17 @@ bool http_request::request(const char* data, size_t len)
 {
 	bool  have_retried = false;
 	bool  reuse_conn;
+
+	// 构建 HTTP 请求头
+	if (data && len > 0)
+	{
+		http_method_t method = header_.get_method();
+		// 在有数据体的条件下，HTTP 请求方法必须为以下两者之一：
+		// HTTP_METHOD_POST 或 HTTP_METHOD_PUT
+		if (method != HTTP_METHOD_POST && method != HTTP_METHOD_PUT)
+			header_.set_method(HTTP_METHOD_POST);
+		header_.set_content_length(len);
+	}
 
 	while (true)
 	{

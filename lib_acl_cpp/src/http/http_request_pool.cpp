@@ -5,20 +5,20 @@
 namespace acl
 {
 
-http_reuqest_pool::http_reuqest_pool(const char* addr,
-	int count, int retry_inter /* = 0 */)
-: connect_pool(addr, count, retry_inter)
+http_request_pool::http_request_pool(const char* addr,
+	int count, size_t idx /* = 0 */)
+: connect_pool(addr, count, idx)
 {
 	conn_timeout_ = 30;
 	rw_timeout_ = 30;
 }
 
-http_reuqest_pool::~http_reuqest_pool()
+http_request_pool::~http_request_pool()
 {
 
 }
 
-http_reuqest_pool& http_reuqest_pool::set_timeout(int conn_timeout /* = 30 */,
+http_request_pool& http_request_pool::set_timeout(int conn_timeout /* = 30 */,
 	int rw_timeout /* = 60 */)
 {
 	conn_timeout_ = conn_timeout;
@@ -26,7 +26,7 @@ http_reuqest_pool& http_reuqest_pool::set_timeout(int conn_timeout /* = 30 */,
 	return *this;
 }
 
-connect_client* http_reuqest_pool::create_connect()
+connect_client* http_request_pool::create_connect()
 {
 	http_request* request = NEW http_request(addr_,
 		conn_timeout_, rw_timeout_);

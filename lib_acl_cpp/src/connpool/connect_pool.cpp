@@ -7,9 +7,10 @@
 namespace acl
 {
 
-connect_pool::connect_pool(const char* addr, int max, int retry_inter /* = 1 */)
+connect_pool::connect_pool(const char* addr, int max, size_t idx /* = 0 */)
 : alive_(true)
 , last_dead_(0)
+, idx_(idx)
 , max_(max)
 , count_(0)
 , idle_ttl_(-1)
@@ -19,10 +20,7 @@ connect_pool::connect_pool(const char* addr, int max, int retry_inter /* = 1 */)
 , current_used_(0)
 , last_(0)
 {
-	if (retry_inter < 1 || retry_inter >= 60)
-		retry_inter_ = 1;
-	else
-		retry_inter_ = retry_inter;
+	retry_inter_ = 1;
 
 	if (max_ < 1)
 		max_ = 10;

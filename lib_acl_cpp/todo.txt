@@ -23,3 +23,4 @@ http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=270070
 16) 能支持 mysql 协议到 mongodb 协议的转换协议实现
 17) HttpServlet 支持 FCGI
 18) mime 解析库针对 7BIT 格式兼容性支持
+19) http 协议库支持 websocket

@@ -28,7 +28,7 @@
 #endif
 
 #include "stdlib/acl_msg.h"
-#include "stdlib/acl_vstream.h"  /* for ACL_VSTREAM_EOF */
+#include "stdlib/acl_vstream.h"
 #include "stdlib/acl_sys_patch.h"
 
 #endif
@@ -53,7 +53,7 @@ ACL_FILE_HANDLE acl_file_open(const char *filepath, int flags, int mode)
 		break;
 	default:                /* error, bad flags */
 		acl_set_error(ERROR_INVALID_PARAMETER);
-		return (ACL_FILE_INVALID);
+		return ACL_FILE_INVALID;
 	}
 
         /* decode open/create method flags */
@@ -79,7 +79,7 @@ ACL_FILE_HANDLE acl_file_open(const char *filepath, int flags, int mode)
 	default:
 		/* this can't happen ... all cases are covered */
 		acl_set_error(ERROR_INVALID_PARAMETER);
-		return (ACL_FILE_INVALID);
+		return ACL_FILE_INVALID;
 	}
 
 	fileshare |= FILE_SHARE_READ | FILE_SHARE_WRITE;
@@ -87,12 +87,12 @@ ACL_FILE_HANDLE acl_file_open(const char *filepath, int flags, int mode)
 
 	fh = CreateFile(filepath, fileaccess, fileshare, NULL,
 			filecreate, fileattr, NULL);
-	return (fh);
+	return fh;
 }
 
 int acl_file_close(ACL_FILE_HANDLE fh)
 {
-	return (CloseHandle(fh) ? 0 : -1);
+	return CloseHandle(fh) ? 0 : -1;
 }
 
 acl_off_t acl_lseek(ACL_FILE_HANDLE fh, acl_off_t offset, int whence)
@@ -109,7 +109,7 @@ acl_off_t acl_lseek(ACL_FILE_HANDLE fh, acl_off_t offset, int whence)
 		method = FILE_END;
 	else {
 		acl_msg_error("%s(%d): invalid whence(%d)", myname, __LINE__, whence);
-		return (-1);
+		return -1;
 	}
 
 	li.QuadPart = offset;
@@ -123,51 +123,58 @@ acl_off_t acl_lseek(ACL_FILE_HANDLE fh, acl_off_t offset, int whence)
 }
 
 int acl_file_read(ACL_FILE_HANDLE fh, void *buf, size_t size,
-	int timeout acl_unused, void *arg acl_unused)
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
+	void *arg acl_unused)
 {
 	DWORD nRead = 0;
 
 	if (!ReadFile(fh, buf, size, &nRead, NULL))
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 
-	return (nRead);
+	return nRead;
 }
 
 int acl_file_write(ACL_FILE_HANDLE fh, const void *buf, size_t size,
-	int timeout acl_unused, void *arg acl_unused)
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
+	void *arg acl_unused)
 {
 	DWORD nWritten = 0;
 
 	if (!WriteFile(fh, buf, size, &nWritten, NULL))
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 
-	return (nWritten);
+	return nWritten;
 }
 
 int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vector, int count,
-	int timeout acl_unused, void *arg acl_unused)
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
+	void *arg acl_unused)
 {
 	int   i, n;
 	DWORD nWritten = 0;
 
 	n = 0;
 	for (i = 0; i < count; i++)	{
-		if (!WriteFile(fh, vector[i].iov_base, vector[i].iov_len, &nWritten, NULL))
-			return (ACL_VSTREAM_EOF);
+		if (!WriteFile(fh, vector[i].iov_base,
+			vector[i].iov_len, &nWritten, NULL))
+		{
+			return ACL_VSTREAM_EOF;
+		}
 		else if (nWritten != vector[i].iov_len) {
 			n += nWritten;
 			break;
 		}
 		n += vector[i].iov_len;
 	}
-	return (n);
+	return n;
 }
 
-int acl_file_fflush(ACL_FILE_HANDLE fh)
+int acl_file_fflush(ACL_FILE_HANDLE fh, ACL_VSTREAM *stream acl_unused,
+	void *arg acl_unused)
 {
 	if (FlushFileBuffers(fh))
-		return (0);
-	return (-1);
+		return 0;
+	return -1;
 }
 
 acl_int64 acl_file_size(const char *filename)
@@ -175,20 +182,21 @@ acl_int64 acl_file_size(const char *filename)
 	struct acl_stat sbuf;
 
 	if (acl_stat(filename, &sbuf) == -1)
-		return (-1);
-	return (sbuf.st_size);
+		return -1;
+	return sbuf.st_size;
 }
 
-acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh)
+acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *stream acl_unused,
+	void *arg acl_unused)
 {
 	DWORD  nLow, nHigh;
 	acl_int64 n;
 
 	nLow = GetFileSize(fh, &nHigh);
 	if (nLow == 0xFFFFFFFF)
-		return (-1);
+		return -1;
 	n = nHigh;
-	return (nLow + (n << 32));
+	return nLow + (n << 32);
 }
 
 /* this function comes from MS'S C Library */
@@ -335,44 +343,48 @@ done:
 
 ACL_FILE_HANDLE acl_file_open(const char *filepath, int flags, int mode)
 {
-	return (open(filepath, flags, mode));
+	return open(filepath, flags, mode);
 }
 
 int acl_file_close(ACL_FILE_HANDLE fh)
 {
-	return (close(fh));
+	return close(fh);
 }
 
 acl_off_t acl_lseek(ACL_FILE_HANDLE fh, acl_off_t offset, int whence)
 {
 #if	defined(ACL_LINUX) || defined(ACL_SUNOS5)
-	return (lseek64(fh, offset, whence));
+	return lseek64(fh, offset, whence);
 #else
-	return (lseek(fh, offset, whence));
+	return lseek(fh, offset, whence);
 #endif
 }
 
 int acl_file_read(ACL_FILE_HANDLE fh, void *buf, size_t size,
-	int timeout acl_unused, void *arg acl_unused)
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
+	void *arg acl_unused)
 {
-	return (read(fh, buf, size));
+	return read(fh, buf, size);
 }
 
 int acl_file_write(ACL_FILE_HANDLE fh, const void *buf, size_t size,
-	int timeout acl_unused, void *arg acl_unused)
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
+	void *arg acl_unused)
 {
-	return (write(fh, buf, size));
+	return write(fh, buf, size);
 }
 
 int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vector, int count,
-	int timeout acl_unused, void *arg acl_unused)
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
+	void *arg acl_unused)
 {
-	return (writev(fh, vector, count));
+	return writev(fh, vector, count);
 }
 
-int acl_file_fflush(ACL_FILE_HANDLE fh)
+int acl_file_fflush(ACL_FILE_HANDLE fh, ACL_VSTREAM *stream acl_unused,
+	void *arg acl_unused)
 {
-	return (fsync(fh));
+	return fsync(fh);
 }
 
 acl_int64 acl_file_size(const char *filename)
@@ -380,17 +392,18 @@ acl_int64 acl_file_size(const char *filename)
 	struct acl_stat sbuf;
 
 	if (acl_stat(filename, &sbuf) == -1)
-		return (-1);
-	return (sbuf.st_size);
+		return -1;
+	return sbuf.st_size;
 }
 
-acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh)
+acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *stream acl_unused,
+	void *arg acl_unused)
 {
 	struct acl_stat sbuf;
 
 	if (acl_fstat(fh, &sbuf) == -1)
-		return (-1);
-	return (sbuf.st_size);
+		return -1;
+	return sbuf.st_size;
 }
 
 #else

@@ -101,6 +101,27 @@ public:
 	bool set(const char* key, time_t timeout = 0);
 
 	/**
+	 * 以流式方式上传大数据时，该函数发送数据头
+	 * @param key {const char*} 键值字符串
+	 * @param dlen {size_t} 数据体的数据总长度
+	 * @timeout {time_t} 数据的过期时间(秒)
+	 * @param flags {unsigned short} 附属的标志位
+	 * @return {bool} 是否成功
+	 */
+	bool set_begin(const char* key, size_t dlen,
+		time_t timeout = 0, unsigned short flags = 0);
+
+	/**
+	 * 循环调用本函数上传数据值，内部会自动计算已经上传的数据总和是否达到了 set_begin
+	 * 中设置的数据总长度，当达到后会自动补一个 "\r\n"，调用者不应再调用此函数上传数据，
+	 * 除非是一个新的上传过程开始了
+	 * @param data {const void*} 数据地址指针
+	 * @param len {data} data 数据长度
+	 * @return {bool} 是否成功
+	 */
+	bool set_data(const void* data, size_t len);
+
+	/**
 	* 从 memcached 中获得对应键值的缓存数据
 	* @param key {const char*} 字符串键值
 	* @param klen {size_t} 键值长度
@@ -121,6 +142,40 @@ public:
 	*  数据不存在或出错
 	*/
 	bool get(const char* key, string& buf, unsigned short* flags = NULL);
+
+	/**
+	 * 流式方式从服务端获取数据，本函数发送请求协议
+	 * @param key {const void*} 键值
+	 * @param klen {size_t} key 键值长度
+	 * @param flags {unsigned short*} 存储附属的标志位
+	 * @return {int} 返回数据体的长度，分以下三种情形：
+	 *   0：表示不存在
+	 *  -1：表示出错
+	 *  >0：表示数据体的长度
+	 */
+	int get_begin(const void* key, size_t klen, unsigned short* flags = NULL);
+
+	/**
+	 * 流式方式从服务端获取数据，本函数发送请求协议
+	 * @param key {const char*} 键值字符串
+	 * @param flags {unsigned short*} 存储附属的标志位
+	 * @return {int} 返回数据体的长度，分以下三种情形：
+	 *   0：表示不存在
+	 *  -1：表示出错
+	 *  >0：表示数据体的长度
+	 */
+	int get_begin(const char* key, unsigned short* flags = NULL);
+
+	/**
+	 * 流式方式从服务端获取数据，循环调用本函数接收数据
+	 * @param buf {void*} 缓冲区地址
+	 * @param size {size_t} 缓冲区大小
+	 * @return {int} 已读到的数据大小，分为以下三种情形：
+	 *  0：表示数据读完
+	 *  > 0: 表示本次读到的数据长度
+	 *  -1：表示出错
+	 */
+	int  get_data(void* buf, size_t size);
 
 	/**
 	* 从 memcached 中删除数据
@@ -172,26 +227,27 @@ private:
 	bool set(const string& key, const void* dat, size_t dlen,
 		time_t timeout, unsigned short flags);
 	bool get(const string& key, string& buf, unsigned short* flags);
-	const string& get_key(const char* key, size_t klen);
+	const string& build_key(const char* key, size_t klen);
 
-	string* keypre_;
-	rfc2047 coder_;
-	int   conn_timeout_;
-	int   rw_timeout_;
-	bool  encode_key_;
+	string* keypre_;         // 非空时，该字符串被添加在 KEY 值前组成新的 KEY
+	rfc2047 coder_;          // 当需要对 KEY 编码时的编码器
+	int   conn_timeout_;     // 网络连接超时时间
+	int   rw_timeout_;       // 网络 IO 超时时间
+	bool  encode_key_;       // 是否需要对 KEY 进行编码
 
-	bool  opened_;
-	bool  retry_;
-	char* addr_;
-	char* ip_;
-	int   port_;
-	int   enum_;
-	string ebuf_;
-	string kbuf_;
+	bool  opened_;           // 连接是否打开
+	bool  retry_;            // 是否支持连接中断重试
+	char* addr_;             // 服务地址(ip:port)
+	int   enum_;             // 出错号，留作将来扩充用
+	string ebuf_;            // 存储出错信息
+	string kbuf_;            // 存储经转码后的 KEY 值缓冲区
 
-	socket_stream* conn_;
-	string req_line_;
-	string res_line_;
+	size_t content_length_;  // 当采用流式上传/下载大数据时此值记录数据体的总长度
+	size_t length_;          // 已经上传/下载的数据总和
+
+	socket_stream* conn_;    // 与后端服务的连接对象
+	string req_line_;        // 存储请求数据
+	string res_line_;        // 存储响应数据
 	bool error_happen(const char* line);
 };
 

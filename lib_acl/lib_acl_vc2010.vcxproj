@@ -426,6 +426,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include=".\src\master\template\acl_multi_server.c" />
     <ClCompile Include=".\src\master\template\acl_single_server.c" />
     <ClCompile Include=".\src\master\template\acl_trigger_server.c" />
+    <ClCompile Include=".\src\master\template\acl_udp_server.c" />
     <ClCompile Include=".\src\master\framework\master_avail.c" />
     <ClCompile Include=".\src\master\framework\master_conf.c" />
     <ClCompile Include=".\src\master\framework\master_ent.c" />
@@ -624,7 +625,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\include\event\acl_timer.h" />
     <ClInclude Include=".\include\aio\acl_aio.h" />
     <ClInclude Include=".\include\ioctl\acl_ioctl.h" />
-    <ClInclude Include=".\include\ioctl\acl_myioctl.h" />
     <ClInclude Include=".\include\ioctl\acl_spool.h" />
     <ClInclude Include=".\include\db\acl_db.h" />
     <ClInclude Include=".\include\db\acl_dberr.h" />
@@ -653,6 +653,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\include\master\acl_server_api.h" />
     <ClInclude Include=".\include\master\acl_single_params.h" />
     <ClInclude Include=".\include\master\acl_trigger_params.h" />
+    <ClInclude Include=".\include\master\acl_udp_params.h" />
     <ClInclude Include=".\include\proctl\acl_proctl.h" />
     <ClInclude Include=".\include\experiment\experiment.h" />
     <ClInclude Include=".\include\init\acl_init.h" />

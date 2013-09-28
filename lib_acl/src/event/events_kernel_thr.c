@@ -369,8 +369,8 @@ static void event_loop(ACL_EVENT *eventp)
 {
 	const char *myname = "event_loop";
 	EVENT_KERNEL_THR *event_thr = (EVENT_KERNEL_THR *) eventp;
-	ACL_EVENT_NOTIFY_FN worker_fn;
-	void    *worker_arg;
+	ACL_EVENT_NOTIFY_TIME timer_fn;
+	void    *timer_arg;
 	ACL_EVENT_TIMER *timer;
 	int   n, delay, nready;
 	ACL_EVENT_FDTABLE *fdp;
@@ -504,11 +504,11 @@ TAG_DONE:
 		if (entry_ptr == NULL)
 			break;
 
-		timer         = ACL_RING_TO_TIMER(entry_ptr);
-		worker_fn     = timer->callback;
-		worker_arg    = timer->context;
+		timer     = ACL_RING_TO_TIMER(entry_ptr);
+		timer_fn  = timer->callback;
+		timer_arg = timer->context;
 
-		worker_fn(ACL_EVENT_TIME, worker_arg);
+		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
 
 		acl_myfree(timer);
 	}

@@ -25,12 +25,12 @@ public:
 
 	/**
 	 * 在单独运行时的处理函数，用户可以调用此函数进行一些必要的调试工作
-	 * @param addr {const char*} 服务监听地址
+	 * @param addrs {const char*} 服务监听地址列表，格式：IP:PORT, IP:PORT...
 	 * @param path {const char*} 配置文件全路径
 	 * @param ht {aio_handle_type} 事件引擎的类型
 	 * @return {bool} 监听是否成功
 	 */
-	bool run_alone(const char* addr, const char* path = NULL,
+	bool run_alone(const char* addrs, const char* path = NULL,
 		aio_handle_type ht = ENGINE_SELECT);
 
 	/**

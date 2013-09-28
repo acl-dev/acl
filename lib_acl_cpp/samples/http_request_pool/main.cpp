@@ -11,7 +11,7 @@ static bool __unzip = false;
 static void init(const char* addr, int count)
 {
 	// 创建 HTTP 请求连接池对象
-	__conn_pool = new http_reuqest_pool(addr, count);
+	__conn_pool = new http_request_pool(addr, count);
 
 	// 创建线程池
 	__thr_pool = acl_thread_pool_create(count, 60);

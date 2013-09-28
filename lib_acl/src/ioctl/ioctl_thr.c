@@ -31,7 +31,8 @@ static void worker_callback_r(void *context)
 	notify_fn(ctx->event_type, ioc, stream, arg);
 }
 
-void read_notify_callback_r(int event_type, void *context)
+void read_notify_callback_r(int event_type, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream acl_unused, void *context)
 {
 	ACL_IOCTL_CTX *ctx = (ACL_IOCTL_CTX *) context;
 	ACL_IOCTL *ioc = ctx->ioc;
@@ -52,7 +53,8 @@ void read_notify_callback_r(int event_type, void *context)
 	}
 }
 
-void write_notify_callback_r(int event_type, void *context)
+void write_notify_callback_r(int event_type, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream acl_unused, void *context)
 {
 	ACL_IOCTL_CTX *ctx = (ACL_IOCTL_CTX *) context;
 	ACL_IOCTL *ioc = ctx->ioc;
@@ -73,11 +75,11 @@ void write_notify_callback_r(int event_type, void *context)
 	}
 }
 
-void listen_notify_callback_r(int event_type, void *context)
+void listen_notify_callback_r(int event_type, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream acl_unused, void *context)
 {
 	ACL_IOCTL_CTX *ctx= (ACL_IOCTL_CTX *) context;
 	ACL_IOCTL *ioc = ctx->ioc;
-	ACL_VSTREAM *stream = ctx->stream;
 	ACL_IOCTL_NOTIFY_FN notify_fn = ctx->notify_fn;
 	void *arg = ctx->context;
 

@@ -410,7 +410,7 @@ int acl_event_isxset(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 acl_int64 acl_event_request_timer(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	void *context, acl_int64 delay, int keep)
 {
-	char  myname[] = "acl_event_request_timer";
+	const char *myname = "acl_event_request_timer";
 
 	if (delay < 0)
 		acl_msg_panic("%s: invalid delay: %lld", myname, delay);

@@ -43,7 +43,7 @@ static void __nv_pair_free(void *arg)
 
 static ACL_XINETD_NV_PAIR *__nv_pair_new(const char *name, const char *value)
 {
-	char  myname[] = "__nv_pair_new";
+	const char *myname = "__nv_pair_new";
 	ACL_XINETD_NV_PAIR *pair;
 	char *data;
 
@@ -84,7 +84,7 @@ static ACL_XINETD_NV_PAIR *__nv_pair_new(const char *name, const char *value)
 
 static int __nv_pair_append(ACL_XINETD_NV_PAIR *pair, const char *value)
 {
-	char  myname[] = "__nv_pair_append";
+	const char *myname = "__nv_pair_append";
 	char *data = acl_mystrdup(value);
 
 	if (data == NULL)
@@ -103,7 +103,7 @@ static int __nv_pair_append(ACL_XINETD_NV_PAIR *pair, const char *value)
 
 static int __xinetd_cfg_parse(ACL_XINETD_CFG_PARSER *xcp, char *line_nonl)
 {
-	char  myname[] = "__xinetd_cfg_parse";
+	const char *myname = "__xinetd_cfg_parse";
 	char *ptr, *ptr_eq;
 	char *name = NULL, *value = NULL;
 	ACL_XINETD_NV_PAIR *pair, *pair_search;
@@ -201,7 +201,7 @@ static int __xinetd_cfg_parse(ACL_XINETD_CFG_PARSER *xcp, char *line_nonl)
 
 void acl_xinetd_cfg_free(ACL_XINETD_CFG_PARSER *xcp)
 {
-	char  myname[] = "acl_xinetd_cfg_free";
+	const char *myname = "acl_xinetd_cfg_free";
 
 	if (xcp == NULL)
 		acl_msg_fatal("%s(%d)->%s: input error",
@@ -214,7 +214,7 @@ void acl_xinetd_cfg_free(ACL_XINETD_CFG_PARSER *xcp)
 
 ACL_XINETD_CFG_PARSER *acl_xinetd_cfg_load(const char *pathname)
 {
-	char  myname[] = "acl_xinetd_cfg_load";
+	const char *myname = "acl_xinetd_cfg_load";
 	char *content_buf = NULL;
 	char *pline, *phead;
 	ACL_XINETD_CFG_PARSER *xcp = NULL;
@@ -285,7 +285,7 @@ ACL_XINETD_CFG_PARSER *acl_xinetd_cfg_load(const char *pathname)
 
 const char *acl_xinetd_cfg_get(const ACL_XINETD_CFG_PARSER *xcp, const char *name)
 {
-	char  myname[] = "acl_xinetd_cfg_get";
+	const char *myname = "acl_xinetd_cfg_get";
 	ACL_XINETD_NV_PAIR *pair;
 	int   i, n;
 
@@ -310,7 +310,7 @@ const char *acl_xinetd_cfg_get(const ACL_XINETD_CFG_PARSER *xcp, const char *nam
 
 const ACL_ARRAY *acl_xinetd_cfg_get_ex(const ACL_XINETD_CFG_PARSER *xcp, const char *name)
 {
-	char  myname[] = "acl_xinetd_cfg_get";
+	const char *myname = "acl_xinetd_cfg_get";
 	ACL_XINETD_NV_PAIR *pair;
 	int   i, n;
 

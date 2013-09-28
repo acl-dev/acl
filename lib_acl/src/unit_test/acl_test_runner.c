@@ -33,7 +33,7 @@ static int __fn_callback(int from, int to, int *stop);
 /*--------------------------------------------------------------------------*/
 static int __test_stop(AUT_LINE *test_line, void *arg_unused)
 {
-	char  myname[] = "__test_stop";
+	const char *myname = "__test_stop";
 
 	arg_unused = arg_unused;
 
@@ -48,7 +48,7 @@ static int __test_stop(AUT_LINE *test_line, void *arg_unused)
 /* 内部睡眠命令函数 */
 static int __test_sleep(AUT_LINE *test_line, void *arg_unused)
 {
-	char  myname[] = "__test_sleep";
+	const char *myname = "__test_sleep";
 	const char *ptr;
 	int   sleep_second;
 
@@ -71,7 +71,7 @@ static int __test_sleep(AUT_LINE *test_line, void *arg_unused)
 /* 内部暂停函数 */
 static int __test_pause(AUT_LINE *test_line_unused, void *arg_unused)
 {
-	char  myname[] = "__test_pause";
+	const char *myname = "__test_pause";
 	int   i = 0;
 
 	test_line_unused = test_line_unused;
@@ -89,7 +89,7 @@ static int __test_pause(AUT_LINE *test_line_unused, void *arg_unused)
 
 static int __test_loop_begin(AUT_LINE *test_line, void *arg_unused)
 {
-	char  myname[] = "__test_loop_begin";
+	const char *myname = "__test_loop_begin";
 	int   count, i, from, to, ret, stop;
 
 	arg_unused = arg_unused;
@@ -125,7 +125,7 @@ static int __test_loop_begin(AUT_LINE *test_line, void *arg_unused)
 
 static int __test_loop_break(AUT_LINE *test_line, void *arg_unused)
 {
-	char  myname[] = "__test_loop_break";
+	const char *myname = "__test_loop_break";
 	const AUT_LINE *loop_end_line;
 	int   num_break, num_end; 
 
@@ -219,7 +219,7 @@ static AUT_FN_ITEM __inner_fn_tab[] = {
 
 static AUT_FN_ITEM *__lookup_fn_item(const AUT_LINE *test_line)
 {
-	char  myname[] = "__lookup_fn_item";
+	const char *myname = "__lookup_fn_item";
 	int   i, n;
 	AUT_FN_ITEM *item = NULL, *tmp;
 
@@ -240,7 +240,7 @@ static AUT_FN_ITEM *__lookup_fn_item(const AUT_LINE *test_line)
 
 static int __fn_callback(int from, int to, int *stop)
 {
-	char  myname[] = "__fn_callback";
+	const char *myname = "__fn_callback";
 	AUT_FN_ITEM *item;
 	AUT_LINE *test_line;
 	int   ret;
@@ -307,7 +307,7 @@ static int __fn_callback(int from, int to, int *stop)
 
 int aut_start(void)
 {
-	char  myname[] = "aut_start";
+	const char *myname = "aut_start";
 	int   max;
 
 	if (__all_callback_fn == NULL) {
@@ -347,7 +347,7 @@ void aut_stop(void)
 
 static void __add_fn_item(ACL_ARRAY *fn_tab, const AUT_FN_ITEM *fn_item, int inner)
 {
-	char  myname[] = "__add_fn_item";
+	const char *myname = "__add_fn_item";
 	AUT_FN_ITEM *item;
 
 	item = (AUT_FN_ITEM *) acl_mycalloc(1, sizeof(AUT_FN_ITEM));

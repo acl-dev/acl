@@ -103,7 +103,7 @@ static ACL_VSTREAM **__stream_array;
 static ACL_TRIGGER_SERVER_FN trigger_server_service;
 static char *trigger_server_name;
 static char **trigger_server_argv;
-static void (*trigger_server_accept) (int, void *);
+static void (*trigger_server_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
 static void (*trigger_server_onexit) (char *, char **);
 static void (*trigger_server_pre_accept) (char *, char **);
 static ACL_VSTREAM *trigger_server_lock;
@@ -126,7 +126,8 @@ static void trigger_server_exit(void)
 
 /* trigger_server_abort - terminate after abnormal master exit */
 
-static void trigger_server_abort(int event acl_unused, void *context acl_unused)
+static void trigger_server_abort(int type acl_unused, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream acl_unused, void *context acl_unused)
 {
 	if (acl_msg_verbose)
 		acl_msg_info("master disconnect -- exiting");
@@ -135,7 +136,8 @@ static void trigger_server_abort(int event acl_unused, void *context acl_unused)
 
 /* trigger_server_timeout - idle time exceeded */
 
-static void trigger_server_timeout(int event acl_unused, void *context acl_unused)
+static void trigger_server_timeout(int type acl_unused,
+	ACL_EVENT *event acl_unused, void *context acl_unused)
 {
 	if (acl_msg_verbose)
 		acl_msg_info("idle timeout -- exiting");
@@ -144,7 +146,7 @@ static void trigger_server_timeout(int event acl_unused, void *context acl_unuse
 
 /* trigger_server_wakeup - wake up application */
 
-static void trigger_server_wakeup(int fd)
+static void trigger_server_wakeup(ACL_EVENT *event, int fd)
 {
 	char    buf[ACL_TRIGGER_BUF_SIZE];
 	int     len;
@@ -155,7 +157,8 @@ static void trigger_server_wakeup(int fd)
 	if (acl_master_notify(acl_var_trigger_pid, trigger_server_generation,
 		ACL_MASTER_STAT_TAKEN) < 0)
 	{
-		trigger_server_abort(ACL_EVENT_NULL_TYPE, ACL_EVENT_NULL_CONTEXT);
+		trigger_server_abort(ACL_EVENT_NULL_TYPE, event,
+			NULL, ACL_EVENT_NULL_CONTEXT);
 	}
 	if (trigger_server_in_flow_delay && acl_master_flow_get(1) < 0)
 		acl_doze(acl_var_trigger_in_flow_delay * 1000);
@@ -166,20 +169,21 @@ static void trigger_server_wakeup(int fd)
 	if (acl_master_notify(acl_var_trigger_pid, trigger_server_generation,
 		ACL_MASTER_STAT_AVAIL) < 0)
 	{
-		trigger_server_abort(ACL_EVENT_NULL_TYPE, ACL_EVENT_NULL_CONTEXT);
+		trigger_server_abort(ACL_EVENT_NULL_TYPE, event,
+			NULL, ACL_EVENT_NULL_CONTEXT);
 	}
 	if (acl_var_trigger_idle_limit > 0)
-		acl_event_request_timer(__eventp, trigger_server_timeout, NULL,
+		acl_event_request_timer(event, trigger_server_timeout, NULL,
 			(acl_int64) acl_var_trigger_idle_limit * 1000000, 0);
 	use_count++;
 }
 
 /* trigger_server_accept_fifo - accept fifo client request */
 
-static void trigger_server_accept_fifo(int event acl_unused, void *context)
+static void trigger_server_accept_fifo(int type acl_unused, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context acl_unused)
 {
 	const char *myname = "trigger_server_accept_fifo";
-	ACL_VSTREAM *stream = (ACL_VSTREAM *) context;
 	int     listen_fd = ACL_VSTREAM_SOCK(stream);
 
 	if (trigger_server_lock != 0
@@ -198,15 +202,15 @@ static void trigger_server_accept_fifo(int event acl_unused, void *context)
 	 */
 	if (trigger_server_pre_accept)
 		trigger_server_pre_accept(trigger_server_name, trigger_server_argv);
-	trigger_server_wakeup(listen_fd);
+	trigger_server_wakeup(event, listen_fd);
 }
 
 /* trigger_server_accept_local - accept socket client request */
 
-static void trigger_server_accept_local(int event acl_unused, void *context)
+static void trigger_server_accept_local(int type acl_unused, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context acl_unused)
 {
 	const char *myname = "trigger_server_accept_local";
-	ACL_VSTREAM *stream = (ACL_VSTREAM *) context;
 	int listen_fd = ACL_VSTREAM_SOCK(stream), time_left = 0, fd;
 
 	if (acl_msg_verbose)
@@ -220,7 +224,7 @@ static void trigger_server_accept_local(int event acl_unused, void *context)
 	 * the idle timer if this was a false alarm.
 	 */
 	if (acl_var_trigger_idle_limit > 0)
-		time_left = (int) ((acl_event_cancel_timer(__eventp,
+		time_left = (int) ((acl_event_cancel_timer(event,
 			trigger_server_timeout, NULL) + 999999) / 1000000);
 
 	if (trigger_server_pre_accept)
@@ -236,15 +240,15 @@ static void trigger_server_accept_local(int event acl_unused, void *context)
 		if (errno != EAGAIN)
 			acl_msg_fatal("accept connection: %s", strerror(errno));
 		if (time_left >= 0)
-			acl_event_request_timer(__eventp, trigger_server_timeout,
+			acl_event_request_timer(event, trigger_server_timeout,
 				NULL, (acl_int64) time_left * 1000000, 0);
 		return;
 	}
 	acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 	if (acl_read_wait(fd, 10) == 0)
-		trigger_server_wakeup(fd);
+		trigger_server_wakeup(event, fd);
 	else if (time_left >= 0)
-		acl_event_request_timer(__eventp, trigger_server_timeout,
+		acl_event_request_timer(event, trigger_server_timeout,
 			NULL, (acl_int64) time_left * 1000000, 0);
 	close(fd);
 }
@@ -253,10 +257,10 @@ static void trigger_server_accept_local(int event acl_unused, void *context)
 
 /* trigger_server_accept_pass - accept descriptor */
 
-static void trigger_server_accept_pass(int event acl_unused, void *context)
+static void trigger_server_accept_pass(int type acl_unused, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context acl_unused)
 {
 	const char *myname = "trigger_server_accept_pass";
-	ACL_VSTREAM *stream = (ACL_VSTREAM *) context;
 	int listen_fd = ACL_VSTREAM_SOCK(stream), time_left = 0, fd;
 
 	if (acl_msg_verbose)
@@ -270,7 +274,7 @@ static void trigger_server_accept_pass(int event acl_unused, void *context)
 	 * the idle timer if this was a false alarm.
 	 */
 	if (acl_var_trigger_idle_limit > 0)
-		time_left = (int) ((acl_event_cancel_timer(__eventp,
+		time_left = (int) ((acl_event_cancel_timer(event,
 			trigger_server_timeout, NULL) + 999999) / 1000000);
 
 	if (trigger_server_pre_accept)
@@ -285,15 +289,15 @@ static void trigger_server_accept_pass(int event acl_unused, void *context)
 		if (errno != EAGAIN)
 			acl_msg_fatal("accept connection: %s", strerror(errno));
 		if (time_left >= 0)
-			acl_event_request_timer(__eventp, trigger_server_timeout,
+			acl_event_request_timer(event, trigger_server_timeout,
 				NULL, (acl_int64) time_left * 1000000, 0);
 		return;
 	}
 	acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 	if (acl_read_wait(fd, 10) == 0)
-		trigger_server_wakeup(fd);
+		trigger_server_wakeup(event, fd);
 	else if (time_left >= 0)
-		acl_event_request_timer(__eventp, trigger_server_timeout,
+		acl_event_request_timer(event, trigger_server_timeout,
 			NULL, (acl_int64) time_left * 1000000, 0);
 	close(fd);
 }
@@ -686,7 +690,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 				__FILE__, __LINE__, myname, fd);
 
 		acl_event_enable_read(__eventp, stream, 0,
-				trigger_server_accept, stream);
+			trigger_server_accept, stream);
 		acl_close_on_exec(ACL_VSTREAM_SOCK(stream), ACL_CLOSE_ON_EXEC);
 	}
 

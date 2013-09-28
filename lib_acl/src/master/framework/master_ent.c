@@ -306,7 +306,7 @@ static void service_sock(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 	serv->name = acl_mystrdup(name);
 
 	acl_foreach(iter, tokens) {
-		const char* path = (const char*) iter.data;
+		const char *path = (const char*) iter.data;
 		ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR*)
 			acl_mycalloc(1, sizeof(ACL_MASTER_ADDR));
 
@@ -327,6 +327,36 @@ static void service_sock(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 	}
 
 	acl_argv_free(tokens);
+}
+
+/* UDP socket service */
+
+static void service_udp(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
+{
+	const char *name = get_str_ent(xcp, ACL_VAR_MASTER_SERV_SERVICE, NULL);
+	ACL_ARGV *tokens = acl_argv_split(name, ",; \t");
+	ACL_ITER iter;
+
+	serv->type = ACL_MASTER_SERV_TYPE_UDP;
+	serv->addrs = acl_array_create(1);
+	serv->name = acl_mystrdup(name);
+
+	acl_foreach(iter, tokens) {
+		const char *ptr = (const char*) iter.data;
+
+		if (acl_ipv4_addr_valid(ptr) || acl_alldig(ptr)
+			|| (*ptr == ':' && acl_alldig(ptr + 1)))
+		{
+			ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR*)
+				acl_mycalloc(1, sizeof(ACL_MASTER_ADDR));
+
+			addr->type = ACL_MASTER_SERV_TYPE_UDP;
+			addr->addr = acl_mystrdup(ptr);
+
+			acl_array_append(serv->addrs, addr);
+			serv->listen_fd_count++;
+		}
+	}
 }
 
 /* Transport type: inet (wild-card listen or virtual) or unix. */
@@ -353,6 +383,8 @@ static void service_transport(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 		service_inet(xcp, serv);
 	else if (STR_SAME(transport, ACL_MASTER_XPORT_NAME_SOCK))
 		service_sock(xcp, serv);
+	else if (STR_SAME(transport, ACL_MASTER_XPORT_NAME_UDP))
+		service_udp(xcp, serv);
 	else
 		acl_msg_fatal("unknown master_service: %s", transport);
 
@@ -397,7 +429,6 @@ static void service_wakeup_time(ACL_XINETD_CFG_PARSER *xcp,
 
 static void service_proc(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 {
-
 	/*
 	 * Concurrency limit. Zero means no limit.
 	 */

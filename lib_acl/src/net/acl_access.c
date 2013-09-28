@@ -22,7 +22,7 @@ static int __host_allow_all = 0;
 
 static void __access_init(void)
 {
-	char  myname[] = "__access_init";
+	const char *myname = "__access_init";
 
 	if (__host_allow_link)
 		return;
@@ -44,7 +44,7 @@ int acl_access_add(const char *data, const char *sep1, const char *sep2)
 	 * 127.0.0.1:127.0.0.1, 10.0.250.1:10.0.250:10, 192.168.0.1:192.168.0.255
 	 * 127.0.0.1,127.0.0.1; 10.0.250.1,10.0.250:10; 192.168.0.1,192.168.0.255
 	 */
-	char  myname[] = "acl_access_add";
+	const char *myname = "acl_access_add";
 	ACL_ARGV *items;
 	char *psrc, *ptr, *from, *to, buf[256];
 	int   i;
@@ -134,7 +134,7 @@ int acl_access_add(const char *data, const char *sep1, const char *sep2)
 
 int acl_access_cfg(ACL_XINETD_CFG_PARSER *xcp, const char *name)
 {
-	char  myname[] = "acl_access_cfg";
+	const char *myname = "acl_access_cfg";
 	const ACL_ARRAY *p_array;
 	const char *pctr;
 	int   i, n;

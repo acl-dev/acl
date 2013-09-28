@@ -46,6 +46,16 @@ bool socket_stream::open(ACL_VSTREAM* vstream)
 	return true;
 }
 
+bool socket_stream::bind_udp(const char* addr, int rw_timeout /* = 0 */)
+{
+	if (m_pStream)
+		acl_vstream_close(m_pStream);
+	m_pStream = acl_vstream_bind(addr, rw_timeout);
+	m_bEof = false;
+	m_bOpened = true;
+	return true;
+}
+
 bool socket_stream::close()
 {
 	if (m_bOpened == false)
@@ -89,14 +99,16 @@ const char* socket_stream::get_peer(bool full /* = false */) const
 	}
 
 	// xxx: acl_vstream 中没有对此地址赋值
-	if (m_pStream->remote_addr[0] == 0)
+	char* ptr = ACL_VSTREAM_PEER(m_pStream);
+	if (ptr == NULL || *ptr == 0)
 	{
+		char  buf[64];
 		if (acl_getpeername(ACL_VSTREAM_SOCK(m_pStream),
-			m_pStream->remote_addr,
-			sizeof(m_pStream->remote_addr)) == -1)
+			buf, sizeof(buf)) == -1)
 		{
 			return dummy_;
 		}
+		acl_vstream_set_peer(m_pStream, buf);
 	}
 
 	if (full)
@@ -107,23 +119,43 @@ const char* socket_stream::get_peer(bool full /* = false */) const
 
 const char* socket_stream::get_peer_ip() const
 {
+	if (m_pStream == NULL)
+	{
+		const_cast<socket_stream*> (this)->dummy_[0] = 0;
+		return dummy_;
+	}
+
 	if (peer_ip_[0] != 0)
 		return peer_ip_;
 
-	if (m_pStream->remote_addr[0] == 0)
+	char* ptr = ACL_VSTREAM_PEER(m_pStream);
+	if (ptr == NULL || *ptr == 0)
 	{
+		char  buf[64];
 		if (acl_getpeername(ACL_VSTREAM_SOCK(m_pStream),
-			m_pStream->remote_addr,
-			sizeof(m_pStream->remote_addr)) == -1)
+			buf, sizeof(buf)) == -1)
 		{
 			return dummy_;
 		}
+		acl_vstream_set_peer(m_pStream, buf);
 	}
 
 	return const_cast<socket_stream*> (this)->get_ip(
-		m_pStream->remote_addr,
+		ACL_VSTREAM_PEER(m_pStream),
 		const_cast<socket_stream*> (this)->peer_ip_,
 		sizeof(peer_ip_));
+}
+
+bool socket_stream::set_peer(const char* addr)
+{
+	if (m_pStream == NULL)
+	{
+		logger_error("stream not opened yet!");
+		return false;
+	}
+
+	acl_vstream_set_peer(m_pStream, addr);
+	return true;
 }
 
 const char* socket_stream::get_local(bool full /* = false */) const
@@ -135,14 +167,16 @@ const char* socket_stream::get_local(bool full /* = false */) const
 	}
 
 	// xxx: acl_vstream 中没有对此地址赋值
-	if (m_pStream->local_addr[0] == 0)
+	char* ptr = ACL_VSTREAM_LOCAL(m_pStream);
+	if (ptr == NULL || *ptr == 0)
 	{
+		char  buf[256];
 		if (acl_getsockname(ACL_VSTREAM_SOCK(m_pStream),
-			m_pStream->local_addr,
-			sizeof(m_pStream->local_addr)) == -1)
+			buf, sizeof(buf)) == -1)
 		{
 			return dummy_;
 		}
+		acl_vstream_set_local(m_pStream, buf);
 	}
 
 	if (full)
@@ -153,23 +187,44 @@ const char* socket_stream::get_local(bool full /* = false */) const
 
 const char* socket_stream::get_local_ip() const
 {
+	if (m_pStream == NULL)
+	{
+		const_cast<socket_stream*> (this)->dummy_[0] = 0;
+		return dummy_;
+	}
+
+	// xxx: acl_vstream 中没有对此地址赋值
 	if (local_ip_[0] != 0)
 		return local_ip_;
 
-	if (m_pStream->local_addr[0] == 0)
+	char* ptr = ACL_VSTREAM_LOCAL(m_pStream);
+	if (ptr == NULL || *ptr == 0)
 	{
+		char  buf[256];
 		if (acl_getsockname(ACL_VSTREAM_SOCK(m_pStream),
-			m_pStream->local_addr,
-			sizeof(m_pStream->local_addr)) == -1)
+			buf, sizeof(buf)) == -1)
 		{
 			return dummy_;
 		}
+		acl_vstream_set_local(m_pStream, buf);
 	}
 
 	return const_cast<socket_stream*>(this)->get_ip(
 		ACL_VSTREAM_LOCAL(m_pStream),
 		const_cast<socket_stream*>(this)->local_ip_,
 		sizeof(local_ip_));
+}
+
+bool socket_stream::set_local(const char* addr)
+{
+	if (m_pStream == NULL)
+	{
+		logger_error("stream not opened yet!");
+		return false;
+	}
+
+	acl_vstream_set_local(m_pStream, addr);
+	return true;
 }
 
 const char* socket_stream::get_ip(const char* addr, char* buf, size_t size)

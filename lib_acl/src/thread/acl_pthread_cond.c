@@ -19,7 +19,7 @@
 
 int acl_pthread_cond_init(acl_pthread_cond_t *cond, acl_pthread_condattr_t *cond_attr)
 {
-	char  myname[] = "acl_pthread_cond_init";
+	const char *myname = "acl_pthread_cond_init";
 
 	if (cond == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
@@ -43,7 +43,7 @@ int acl_pthread_cond_init(acl_pthread_cond_t *cond, acl_pthread_condattr_t *cond
 /* Create a condition variable */
 acl_pthread_cond_t * acl_pthread_cond_create(void)
 {
-	char  myname[] = "acl_pthread_cond_create";
+	const char *myname = "acl_pthread_cond_create";
 	acl_pthread_cond_t *cond;
 	char  buf[256];
 
@@ -88,7 +88,7 @@ int acl_pthread_cond_destroy(acl_pthread_cond_t *cond)
 /* Restart one of the threads that are waiting on the condition variable */
 int acl_pthread_cond_signal(acl_pthread_cond_t *cond)
 {
-	char  myname[] = "acl_pthread_cond_signal";
+	const char *myname = "acl_pthread_cond_signal";
 
 	if (cond == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
@@ -115,7 +115,7 @@ int acl_pthread_cond_signal(acl_pthread_cond_t *cond)
 /* Restart all threads that are waiting on the condition variable */
 int acl_pthread_cond_broadcast(acl_pthread_cond_t *cond)
 {
-	char  myname[] = "acl_pthread_cond_broadcast";
+	const char *myname = "acl_pthread_cond_broadcast";
 
 	if (cond == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
@@ -172,7 +172,7 @@ Thread B:
 int acl_pthread_cond_timedwait(acl_pthread_cond_t *cond, acl_pthread_mutex_t *mutex,
 		const struct timespec *timeout)
 {
-	char  myname[] = "acl_pthread_cond_timedwait";
+	const char *myname = "acl_pthread_cond_timedwait";
 	int   retval;
 	
 	if (cond == NULL) {

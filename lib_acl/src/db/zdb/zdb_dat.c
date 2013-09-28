@@ -1,9 +1,15 @@
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
-#include "lib_acl.h"
-#include "db/zdb.h"
+#include <string.h>
+#include <stdio.h>
+#include "stdlib/acl_msg.h"
+#include "stdlib/acl_debug.h"
+#include "stdlib/acl_mymalloc.h"
+#include "stdlib/acl_meter_time.h"
+#include "stdlib/acl_sane_basename.h"
 #include "thread/acl_pthread.h"
+#include "db/zdb.h"
 
 #endif
 

@@ -26,7 +26,7 @@
 /* acl_timed_write - write with deadline */
 
 int acl_timed_write(ACL_SOCKET fd, void *buf, unsigned len,
-		int timeout, void *unused_context acl_unused)
+	int timeout, void *unused_context acl_unused)
 {
 	int     ret;
 
@@ -45,17 +45,15 @@ int acl_timed_write(ACL_SOCKET fd, void *buf, unsigned len,
 	 */
 	for (;;) {
 		if (timeout > 0 && acl_write_wait(fd, timeout) < 0)
-			return (-1);
-		ret = acl_socket_write(fd, buf, len, 0, NULL);
+			return -1;
+		ret = acl_socket_write(fd, buf, len, 0, NULL, NULL);
 		if (ret < 0 && timeout > 0 && acl_last_error() == ACL_EAGAIN) {
 			acl_msg_warn("write() returns EAGAIN on"
-					" a writable file descriptor!");
+				" a writable file descriptor!");
 			acl_msg_warn("pausing to avoid going into"
-					" a tight select/write loop!");
+				" a tight select/write loop!");
 			sleep(1);
-		} else {
-			return (ret);
-		}
+		} else
+			return ret;
 	}
 }
-

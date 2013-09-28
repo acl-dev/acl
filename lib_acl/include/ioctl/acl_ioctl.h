@@ -25,12 +25,6 @@ typedef struct ACL_IOCTL ACL_IOCTL;
 typedef void (*ACL_IOCTL_NOTIFY_FN)(int event_type, ACL_IOCTL *ioc,
 	ACL_VSTREAM *stream, void *context);
 
-/**
- * 超时回调函数类型定义: void (*)(int event_type, void *context)
- * @see ACL_EVENT_NOTIFY_TIME
- */
-typedef ACL_EVENT_NOTIFY_TIME ACL_IOCTL_TIMER_FN;
-
 typedef void (*ACL_IOCTL_WORKER_FN)(ACL_IOCTL *ioc, void *arg);
 typedef void (*ACL_IOCTL_THREAD_INIT_FN)(void *);
 typedef void (*ACL_IOCTL_THREAD_EXIT_FN)(void *);
@@ -271,23 +265,23 @@ ACL_API ACL_VSTREAM *acl_ioctl_accept(ACL_VSTREAM *sstream,
 /**
  * 给任务工作池添加一个定时器任务, 该函数仅是 acl_event_request_timer 的简单封装.
  * @param ioc {ACL_IOCTL*} 服务器任务池句柄
- * @param timer_fn {ACL_IOCTL_TIMER_FN} 定时器任务回调函数.
+ * @param timer_fn {ACL_EVENT_NOTIFY_TIME} 定时器任务回调函数.
  * @param context {void*} timer_fn 的参数之一.
  * @param idle_limit {acl_int64} 启动定时器函数的时间(微秒级)
  * @return {acl_int64} 剩余的时间, 单位为微秒.
  */
 ACL_API acl_int64 acl_ioctl_request_timer(ACL_IOCTL *ioc,
-	ACL_IOCTL_TIMER_FN timer_fn, void *context, acl_int64 idle_limit);
+	ACL_EVENT_NOTIFY_TIME timer_fn, void *context, acl_int64 idle_limit);
 
 /**
  * 取消某个定时器任务, 该函数仅是 acl_event_cancel_timer 的简单封装.
  * @param ioc {ACL_IOCTL*} 服务器任务池句柄
- * @param timer_fn {ACL_IOCTL_TIMER_FN} 定时器任务回调函数.
+ * @param timer_fn {ACL_EVENT_NOTIFY_TIME} 定时器任务回调函数.
  * @param context {void*} timer_fn 的参数之一.
  * @return {acl_int64} 剩余的时间, 单位为微秒.
  */
 ACL_API acl_int64 acl_ioctl_cancel_timer(ACL_IOCTL *ioc,                                                            
-	ACL_IOCTL_TIMER_FN timer_fn, void *context);
+	ACL_EVENT_NOTIFY_TIME timer_fn, void *context);
 
 /**
  * 向当前线程池中增加一个新的任务

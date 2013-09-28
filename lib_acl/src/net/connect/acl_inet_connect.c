@@ -33,7 +33,8 @@
 
 #endif
 
-static ACL_SOCKET inet_connect_one(const char *ip, int port, const char *local_ip, int b_mode, int timeout);
+static ACL_SOCKET inet_connect_one(const char *ip, int port,
+	const char *local_ip, int b_mode, int timeout);
 
 /* acl_inet_connect - connect to TCP listener */
 
@@ -44,12 +45,13 @@ ACL_SOCKET acl_inet_connect(const char *addr, int block_mode, int timeout)
 	return (acl_inet_connect_ex(addr, block_mode, timeout, &h_error));
 }
 
-ACL_SOCKET acl_inet_connect_ex(const char *addr, int b_mode, int timeout, int *h_error)
+ACL_SOCKET acl_inet_connect_ex(const char *addr, int b_mode,
+	int timeout, int *h_error)
 {
-	char  myname[] = "acl_inet_connect_ex";
+	const char *myname = "acl_inet_connect_ex";
 	ACL_SOCKET  sock = ACL_SOCKET_INVALID;
 	char  buf[256], *ptr;
-	const char *pip, *remote_addr, *local_ip;
+	const char *pip, *remote, *local_ip;
 	int   port, i, n;
 	ACL_DNS_DB *h_dns_db;
 
@@ -76,25 +78,25 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int b_mode, int timeout, int *h
 	if (ptr != NULL) {
 		*ptr++ = 0;
 		local_ip = buf;
-		remote_addr = ptr; 
+		remote = ptr; 
 	} else {
 		local_ip = NULL;
-		remote_addr = buf;
+		remote = buf;
 	}
 
-	if (strlen(remote_addr) == 0) {
+	if (strlen(remote) == 0) {
 		acl_msg_error("%s, %s(%d): ip buf's length is 0",
 					__FILE__, myname, __LINE__);
 		return (ACL_SOCKET_INVALID);
 	}
 
-	h_dns_db = acl_gethostbyname(remote_addr, h_error);
+	h_dns_db = acl_gethostbyname(remote, h_error);
 	if (h_dns_db == NULL) {
 		n = h_error ? *h_error : -1;
 
 		acl_msg_error("%s, %s(%d): gethostbyname error(%s), addr=%s",
-				__FILE__, myname, __LINE__,
-				acl_netdb_strerror(n), remote_addr);
+			__FILE__, myname, __LINE__,
+			acl_netdb_strerror(n), remote);
 		return (ACL_SOCKET_INVALID);
 	}
 
@@ -120,7 +122,8 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int b_mode, int timeout, int *h
 
 /* inet_connect_one - try to connect to one address */
 
-static ACL_SOCKET inet_connect_one(const char *ip, int port, const char *local_ip, int b_mode, int timeout)
+static ACL_SOCKET inet_connect_one(const char *ip, int port,
+	const char *local_ip, int b_mode, int timeout)
 {
 	const char *myname = "inet_connect_one";
 	ACL_SOCKET  sock;
@@ -132,8 +135,9 @@ static ACL_SOCKET inet_connect_one(const char *ip, int port, const char *local_i
 	/* sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); */
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s(%d): create socket error(%s)", myname, __LINE__, acl_last_serror());
-		return (ACL_SOCKET_INVALID);
+		acl_msg_error("%s(%d): create socket error(%s)",
+			myname, __LINE__, acl_last_serror());
+		return ACL_SOCKET_INVALID;
 	}
 
 	acl_tcp_set_rcvbuf(sock, ACL_SOCKET_RBUF_SIZE);
@@ -143,11 +147,13 @@ static ACL_SOCKET inet_connect_one(const char *ip, int port, const char *local_i
 		memset(&saddr, 0, sizeof(saddr));
 		saddr.sin_family = AF_INET;
 		saddr.sin_addr.s_addr = inet_addr(local_ip);
-		if (bind(sock, (struct sockaddr *) &saddr, sizeof(struct sockaddr)) < 0) {
+		if (bind(sock, (struct sockaddr *) &saddr,
+			sizeof(struct sockaddr)) < 0)
+		{
 			acl_socket_close(sock);
 			acl_msg_error("%s(%d): bind local ip(%s) error(%s)",
 				myname, __LINE__, local_ip, acl_last_serror());
-			return (ACL_SOCKET_INVALID);
+			return ACL_SOCKET_INVALID;
 		}
 	}
 
@@ -162,20 +168,23 @@ static ACL_SOCKET inet_connect_one(const char *ip, int port, const char *local_i
 	if (timeout > 0) {
 		acl_non_blocking(sock, ACL_NON_BLOCKING);
 		if (acl_timed_connect(sock, (const struct sockaddr *) &saddr,
-				sizeof(struct sockaddr), timeout) < 0) {
+			sizeof(struct sockaddr), timeout) < 0)
+		{
 			acl_socket_close(sock);
 			return (ACL_SOCKET_INVALID);
 		}
 		if (b_mode != ACL_NON_BLOCKING)
 			acl_non_blocking(sock, b_mode);
-		return (sock);
+		return sock;
 	}
 
 	/*
 	 * Maybe block until connected.
 	 */
 	acl_non_blocking(sock, b_mode);
-	if (acl_sane_connect(sock, (const struct sockaddr *) &saddr, sizeof(saddr)) < 0) {
+	if (acl_sane_connect(sock, (const struct sockaddr *) &saddr,
+		sizeof(saddr)) < 0)
+	{
 		int  ret, err, errno_saved;
 		socklen_t len;
 
@@ -194,7 +203,7 @@ static ACL_SOCKET inet_connect_one(const char *ip, int port, const char *local_i
 				acl_set_error(ACL_ENOTCONN);
 #endif
 			acl_socket_close(sock);
-			return (ACL_SOCKET_INVALID);
+			return ACL_SOCKET_INVALID;
 		} else if (err != 0) {
 			errno_saved = err;
 			acl_set_error(err);
@@ -202,13 +211,13 @@ static ACL_SOCKET inet_connect_one(const char *ip, int port, const char *local_i
 
 #ifdef	ACL_MS_WINDOWS
 		if (errno_saved == ACL_EINPROGRESS || errno_saved == ACL_EWOULDBLOCK)
-			return (sock);
+			return sock;
 #elif defined(ACL_UNIX)
 		if (errno_saved == ACL_EINPROGRESS || errno_saved == EISCONN)
-			return (sock);
+			return sock;
 #endif
 		acl_socket_close(sock);
-		return (ACL_SOCKET_INVALID);
+		return ACL_SOCKET_INVALID;
 	}
-	return (sock);
+	return sock;
 }

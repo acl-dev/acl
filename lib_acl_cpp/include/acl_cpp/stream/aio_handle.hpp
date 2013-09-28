@@ -6,6 +6,7 @@
 //#include "string.hpp"
 
 struct ACL_AIO;
+struct ACL_EVENT;
 
 namespace acl
 {
@@ -336,7 +337,7 @@ private:
 	aio_timer_delay_free* delay_free_timer_;
 
 	void destroy_timer(aio_timer_callback* callback);
-	static void on_timer_callback(int event_type,
+	static void on_timer_callback(int event_type, ACL_EVENT*,
 		aio_timer_callback *callback);
 };
 

@@ -36,12 +36,15 @@
 
 /* master_wakeup_timer_event - wakeup event handler */
 
-static void master_wakeup_timer_event(int event acl_unused, void *context)
+static void master_wakeup_timer_event(int type acl_unused,
+	ACL_EVENT *event, void *context)
 {
 	const char *myname = "master_wakeup_timer_event";
 	ACL_MASTER_SERV *serv = (ACL_MASTER_SERV *) context;
 	static char wakeup = ACL_TRIGGER_REQ_WAKEUP;
 	int     status = 0;
+
+	acl_assert(event == acl_var_master_global_event);
 
 	/*
 	 * Don't wakeup services whose automatic wakeup feature was
@@ -131,7 +134,7 @@ void    acl_master_wakeup_init(ACL_MASTER_SERV *serv)
 	if (acl_msg_verbose)
 		acl_msg_info("%s: service %s time %d",
 			myname, serv->name, serv->wakeup_time);
-	master_wakeup_timer_event(0, (void *) serv);
+	master_wakeup_timer_event(0, acl_var_master_global_event, (void *) serv);
 }
 
 /* acl_master_wakeup_cleanup - cancel wakeup timer */

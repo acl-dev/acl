@@ -12,6 +12,7 @@ extern "C" {
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif
+#include "event/acl_events.h"
 #include "aio/acl_aio.h"
 #include "acl_netdb.h"
 
@@ -62,7 +63,7 @@ typedef struct ACL_DNS {
 #define	ACL_DNS_FLAG_CHECK_DNS_NET	(1 << 2)	/* 检查DNS网络是否匹配 */
 
 	/* 该函数指针用来避免动态加载库的访问地址不一致问题 */
-	void (*lookup_timeout) (int event_type, void *context);
+	ACL_EVENT_NOTIFY_TIME lookup_timeout;
 } ACL_DNS;
 
 typedef struct ACL_DNS_REQ ACL_DNS_REQ;

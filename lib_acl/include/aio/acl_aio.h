@@ -35,12 +35,6 @@ typedef struct ACL_AIO ACL_AIO;
 typedef struct ACL_ASTREAM ACL_ASTREAM;
 
 /**
- * 异步流超时回调函数类型定义: void (*)(int event_type, void *context)
- * @see ACL_EVENT_NOTIFY_TIME
- */
-typedef ACL_EVENT_NOTIFY_TIME ACL_AIO_TIMER_FN;
-
-/**
  * 事件通知函数句柄类型, 当某个受监控的流有数据可读或出错时的回调用户的注册函数,
  * 目前用与该类型相关的异步函数有:
  *   acl_aio_gets, acl_aio_gets_nonl, acl_aio_read, acl_aio_readn.
@@ -51,9 +45,7 @@ typedef ACL_EVENT_NOTIFY_TIME ACL_AIO_TIMER_FN;
  * @return {int} 该函数指针调用如果返回-1则表明应用要求关闭异步流
  */
 typedef int (*ACL_AIO_READ_FN)(ACL_ASTREAM *astream,
-				void *context,
-				char *data,
-				int dlen);
+	void *context, char *data, int dlen);
 
 /**
  * 事件通知函数句柄类型，当某个异步流可读/可写时调用此类型的用户回调函数
@@ -759,42 +751,42 @@ ACL_API void acl_aio_unrefer(ACL_ASTREAM *astream);
 /**
  * 给任务工作池添加一个定时器任务, 该函数仅是 acl_event_request_timer 的简单封装.
  * @param aio {ACL_AIO*} 异步通信引擎句柄
- * @param timer_fn {ACL_AIO_TIMER_FN} 定时器任务回调函数.
+ * @param timer_fn {ACL_EVENT_NOTIFY_TIME} 定时器任务回调函数.
  * @param context {void*} timer_fn 的参数之一.
  * @param idle_limit {acl_int64} 启动定时器函数的时间，单位为微秒.
  * @param keep {int} 是否重复定时器任务
  * @return {acl_int64} 剩余的时间, 单位为微秒.
  */
- ACL_API acl_int64 acl_aio_request_timer(ACL_AIO *aio, ACL_AIO_TIMER_FN timer_fn,
+ ACL_API acl_int64 acl_aio_request_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME timer_fn,
 	 void *context, acl_int64 idle_limit, int keep);
 
 /**
  * 取消某个定时器任务, 该函数仅是 acl_event_cancel_timer 的简单封装.
  * @param aio {ACL_AIO*} 异步通信引擎句柄
- * @param timer_fn {ACL_AIO_TIMER_FN} 定时器任务回调函数.
+ * @param timer_fn {ACL_EVENT_NOTIFY_TIME} 定时器任务回调函数.
  * @param context {void*} timer_fn 的参数之一.
  * @return {acl_int64} 剩余的时间, 单位为微秒.
  */
-ACL_API acl_int64 acl_aio_cancel_timer(ACL_AIO *aio, ACL_AIO_TIMER_FN timer_fn, void *context);
+ACL_API acl_int64 acl_aio_cancel_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME timer_fn, void *context);
 
 /**
  * 设置是否需要循环启用通过 acl_aio_request_timer 设置的定时器任务
  * @param aio {ACL_AIO*} 异步通信引擎句柄
- * @param timer_fn {ACL_AIO_TIMER_FN} 定时器任务回调函数.
+ * @param timer_fn {ACL_EVENT_NOTIFY_TIME} 定时器任务回调函数.
  * @param context {void*} timer_fn 的参数之一.
  * @param onoff {int} 是否重复定时器任务
  */
-ACL_API void acl_aio_keep_timer(ACL_AIO *aio, ACL_AIO_TIMER_FN callback,
+ACL_API void acl_aio_keep_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback,
 	void *context, int onoff);
 
 /**
  * 判断所设置的定时器都处于重复使用状态
  * @param aio {ACL_AIO*} 异步通信引擎句柄
- * @param timer_fn {ACL_AIO_TIMER_FN} 定时器任务回调函数.
+ * @param timer_fn {ACL_EVENT_NOTIFY_TIME} 定时器任务回调函数.
  * @param context {void*} timer_fn 的参数之一.
  * @return {int} !0 表示所设置的定时器都处于重复使用状态
  */
-ACL_API int acl_aio_timer_ifkeep(ACL_AIO *aio, ACL_AIO_TIMER_FN callback, void *context);
+ACL_API int acl_aio_timer_ifkeep(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback, void *context);
 
 #ifdef	__cplusplus
 }

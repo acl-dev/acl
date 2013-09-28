@@ -62,7 +62,7 @@ void connect_manager::init(const char* default_addr,
 	if (addr_list != NULL && *addr_list != 0)
 		set_service_list(addr_list, count);
 
-	// 创建缺省 redis 服务连接池对象，该对象一同放入总的连接池集群中
+	// 创建缺省服务连接池对象，该对象一同放入总的连接池集群中
 	if (default_addr != NULL && *default_addr != 0)
 	{
 		logger("default_pool: %s", default_addr);
@@ -72,7 +72,7 @@ void connect_manager::init(const char* default_addr,
 	else
 		logger("no default redis set");
 
-	// 必须保证至少有一个 redis 服务可用
+	// 必须保证至少有一个服务可用
 	if (pools_.empty())
 		logger_fatal("no redis service available!");
 }
@@ -85,7 +85,7 @@ void connect_manager::set_service_list(const char* addr_list, int count)
 		return;
 	}
 
-	// 创建 redis 连接池服务集群
+	// 创建连接池服务集群
 
 	ACL_ARGV* tokens = acl_argv_split(addr_list, ";, \t");
 	ACL_ITER iter;
@@ -108,7 +108,7 @@ void connect_manager::set_service_list(const char* addr_list, int count)
 
 connect_pool& connect_manager::set(const char* addr, int count)
 {
-	char key[64];
+	char key[256];
 	ACL_SAFE_STRNCPY(key, addr, sizeof(key));
 	acl_lowercase(key);
 
@@ -119,7 +119,7 @@ connect_pool& connect_manager::set(const char* addr, int count)
 			return **it;
 	}
 
-	connect_pool* pool = create_pool(key, count);
+	connect_pool* pool = create_pool(key, count, pools_.size() - 1);
 	pools_.push_back(pool);
 	service_size_ = pools_.size();
 
@@ -130,7 +130,7 @@ connect_pool& connect_manager::set(const char* addr, int count)
 
 connect_pool* connect_manager::get(const char* addr)
 {
-	char key[64];
+	char key[256];
 	ACL_SAFE_STRNCPY(key, addr, sizeof(key));
 	acl_lowercase(key);
 
@@ -158,11 +158,19 @@ connect_pool* connect_manager::peek()
 	return pool;
 }
 
-void connect_manager::statistics_record(int, void* ctx)
+connect_pool* connect_manager::peek(const char* key)
+{
+	if (key == NULL || *key == 0)
+		return peek();
+	unsigned n = acl_hash_crc32(key, strlen(key));
+	return pools_[n % service_size_];
+}
+
+void connect_manager::statistics_record(int, ACL_EVENT*, void* ctx)
 {
 	connect_manager* manager = (connect_manager*) ctx;
 
-	// 记录当前 redis 访问情况
+	// 记录当前服务访问情况
 	manager->statistics();
 
 	// 重新设置定时器

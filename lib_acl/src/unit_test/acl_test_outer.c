@@ -22,7 +22,7 @@
 
 AUT_LINE *aut_add_outer_cmd(const ACL_CFG_LINE *cfg_line)
 {
-	char  myname[] = "aut_add_outer_cmd";
+	const char *myname = "aut_add_outer_cmd";
 	AUT_LINE *test_line;
 
 	if (cfg_line->ncount < 3)

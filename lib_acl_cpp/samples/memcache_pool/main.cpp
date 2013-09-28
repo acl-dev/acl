@@ -29,8 +29,10 @@ static void end(void)
 // MEMCACHE 请求过程，向服务器发送请求后从服务器读取响应数据
 static bool memcache_get(memcache* conn, const char* key)
 {
+	const char* keypre = "test";
 	string buf;
 
+	conn->set_prefix(keypre);
 	if (conn->get(key, buf) == false)
 	{
 		printf("get key: %s error\r\n", key);
@@ -79,7 +81,7 @@ static void run(int cocurrent, char* key)
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
-		"	-s memcache_server_addr [127.0.0.1:11211\r\n"
+		"	-s memcache_server_addr [127.0.0.1:11211]\r\n"
 		"	-k key\r\n"
 		"	-c cocurrent [default: 10]\r\n"
 		"	-n loop_count[default: 10]\r\n", procname);

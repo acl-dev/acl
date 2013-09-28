@@ -162,7 +162,8 @@ static int __try_fflush(ACL_ASTREAM *astream)
 
 /* 流出错或流可写时触发了流的写事件处理函数 */
 
-static void __writen_notify_callback(int event_type, void *context)
+static void __writen_notify_callback(int event_type, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream acl_unused, void *context)
 {
 	const char *myname = "__write_notify_callback";
 	ACL_ASTREAM *astream = (ACL_ASTREAM *) context;
@@ -523,7 +524,8 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 	WRITE_SAFE_ENABLE(astream, __writen_notify_callback);
 }
 
-static void can_write_callback(int event_type, void *context)
+static void can_write_callback(int event_type, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream acl_unused, void *context)
 {
 	const char *myname = "can_write_callback";
 	ACL_ASTREAM *astream = (ACL_ASTREAM*) context;

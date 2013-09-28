@@ -20,16 +20,16 @@
 
 #include "ioctl_internal.h"
 
-void read_notify_callback(int event_type, void *context)
+void read_notify_callback(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context)
 {
 	ACL_IOCTL_CTX *ctx = (ACL_IOCTL_CTX *) context;
 	ACL_IOCTL *ioc = (ACL_IOCTL*) ctx->ioc;
-	ACL_VSTREAM *stream = ctx->stream;
 	ACL_IOCTL_NOTIFY_FN notify_fn = ctx->notify_fn;
 	void *arg = ctx->context;
 
 	ctx->event_type = event_type;
-	acl_event_disable_read(ioc->event, stream);
+	acl_event_disable_read(event, stream);
 
 	switch (event_type) {
 	case ACL_EVENT_READ:
@@ -45,17 +45,17 @@ void read_notify_callback(int event_type, void *context)
 	}
 }
 
-void write_notify_callback(int event_type, void *context)
+void write_notify_callback(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context)
 {
 	ACL_IOCTL_CTX *ctx = (ACL_IOCTL_CTX *) context;
 	ACL_IOCTL *ioc = (ACL_IOCTL*) ctx->ioc;
-	ACL_VSTREAM *stream = ctx->stream;
 	ACL_IOCTL_NOTIFY_FN notify_fn = ctx->notify_fn;
 	void *arg = ctx->context;
 
 	ctx->event_type = event_type;
 
-	acl_event_disable_write(ioc->event, stream);
+	acl_event_disable_write(event, stream);
 
 	switch (event_type) {
 	case ACL_EVENT_WRITE:
@@ -71,11 +71,11 @@ void write_notify_callback(int event_type, void *context)
 	}
 }
 
-void listen_notify_callback(int event_type, void *context)
+void listen_notify_callback(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context)
 {
 	ACL_IOCTL_CTX *ctx= (ACL_IOCTL_CTX *) context;
 	ACL_IOCTL *ioc = (ACL_IOCTL*) ctx->ioc;
-	ACL_VSTREAM *stream = ctx->stream;
 	ACL_IOCTL_NOTIFY_FN notify_fn = ctx->notify_fn;
 	void *arg = ctx->context;
 
@@ -84,7 +84,7 @@ void listen_notify_callback(int event_type, void *context)
 	switch (event_type) {
 	case ACL_EVENT_RW_TIMEOUT:
 	case ACL_EVENT_XCPT:
-		acl_event_disable_read(ioc->event, stream);
+		acl_event_disable_read(event, stream);
 	case ACL_EVENT_READ:
 		notify_fn(event_type, ioc, stream, arg);
 		break;

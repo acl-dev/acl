@@ -43,7 +43,8 @@ struct ACL_INET_TRIGGER {
 
 /* ACL_INET_TRIGGER_event - disconnect from peer */
 
-static void acl_inet_trigger_event(int event, void *context)
+static void acl_inet_trigger_event(int type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context)
 {
 	const char *myname = "acl_inet_trigger_event";
 	struct ACL_INET_TRIGGER *ip = (struct ACL_INET_TRIGGER *) context;
@@ -51,10 +52,10 @@ static void acl_inet_trigger_event(int event, void *context)
 	/*
 	 * Disconnect.
 	 */
-	if (event == ACL_EVENT_TIME)
+	if (type == ACL_EVENT_TIME)
 		acl_msg_warn("%s: read timeout for service %s",
 			myname, ip->service);
-	acl_event_disable_readwrite(ip->eventp, ip->stream);
+	acl_event_disable_readwrite(event, stream);
 	/*
 	 * acl_event_cancel_timer(ip->eventp, acl_inet_trigger_event, context);
 	 */

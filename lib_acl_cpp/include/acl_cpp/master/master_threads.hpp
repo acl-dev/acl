@@ -2,6 +2,7 @@
 #include "acl_cpp/master/master_base.hpp"
 
 struct ACL_VSTREAM;
+struct ACL_EVENT;
 
 namespace acl {
 
@@ -24,7 +25,7 @@ public:
 
 	/**
 	 * 在单独运行时的处理函数，用户可以调用此函数进行一些必要的调试工作
-	 * @param addr {const char*} 服务监听地址
+	 * @param addrs {const char*} 服务监听地址列表，格式：IP:PORT, IP:PORT...
 	 * @param path {const char*} 配置文件全路径
 	 * @param count {unsigned int} 循环服务的次数，达到此值后函数自动返回；
 	 *  若该值为 0 则表示程序一直循环处理外来请求而不返回
@@ -33,8 +34,9 @@ public:
 	 *  且不会启动线程处理客户端请求
 	 * @return {bool} 监听是否成功
 	 */
-	bool run_alone(const char* addr, const char* path = NULL,
+	bool run_alone(const char* addrs, const char* path = NULL,
 		unsigned int count = 1, int threads_count = 1);
+
 protected:
 	// 该类不能直接被实例化
 	master_threads();
@@ -83,6 +85,7 @@ protected:
 	 * 当线程池中一个线程退出时的回调函数
 	 */
 	virtual void thread_on_exit() {}
+
 public:
 	/**
 	 * 设置进程级别的定时器，该定时器只有当 proc_on_init 回调过程中
@@ -92,21 +95,18 @@ public:
 	 * @param ctx {void*} callback 被调用时的第二个参数
 	 * @param delay {int} 定时器被循环触发的时间间隔(秒)
 	 */
-	static void proc_set_timer(void (*callback)(int, void*), void* ctx, int delay);
+	static void proc_set_timer(void (*callback)(int, ACL_EVENT*, void*),
+		void* ctx, int delay);
 
 	/**
 	 * 删除进程级别的定时器
 	 * @param callback {void (*)(int, void*)} 定时器回调函数
 	 * @param ctx {void*} callback 被调用时的第二个参数
 	 */
-	static void proc_del_timer(void (*callback)(int, void*), void* ctx);
+	static void proc_del_timer(void (*callback)(int, ACL_EVENT*, void*),
+		void* ctx);
+
 private:
-	// 处理客户端请求
-	void do_serivce(ACL_VSTREAM* client);
-
-	// 仅运行一次
-	void run_once(ACL_VSTREAM* sstream);
-
 	// 线程开始创建后的回调函数
 	static int thread_begin(void* arg);
 
@@ -116,12 +116,14 @@ private:
 	// 多线程情况下的处理函数
 	static void thread_run(void* arg);
 
-	// 多线程方式并行处理
-	void run_parallel(ACL_VSTREAM* sstream, unsigned int count,
-		int threads_count);
+	// 仅运行一次
+	static void run_once(ACL_VSTREAM* client);
 
-	// 单线程方式串行处理
-	void run_serial(ACL_VSTREAM* sstream, unsigned int count);
+	// 监听套被回调的函数
+	static void listen_callback(int event_type, ACL_EVENT*,
+		ACL_VSTREAM*, void *context);
+
+	//////////////////////////////////////////////////////////////////
 
 	// 当接收到一个客户端连接时回调此函数
 	static int service_main(ACL_VSTREAM*, void*);

@@ -432,13 +432,12 @@ acl_int64 aio_handle::set_timer(aio_timer_callback* callback,
 	callback->handle_ = this;
 	delay = callback->set_task(id, delay);
 	return (acl_aio_request_timer(aio_,
-		(void (*)(int, void*)) on_timer_callback,
+		(void (*)(int, ACL_EVENT*, void*)) on_timer_callback,
 		callback, delay < 0 ? 0 : delay,
 		callback->keep_ ? 1 : 0));
 }
 
-void aio_handle::on_timer_callback(int event_type acl_unused,
-	aio_timer_callback *callback)
+void aio_handle::on_timer_callback(int, ACL_EVENT*, aio_timer_callback *callback)
 {
 	acl_assert(callback);
 	acl_assert(callback->handle_);
@@ -458,7 +457,7 @@ void aio_handle::on_timer_callback(int event_type acl_unused,
 
 	//  需要重置定时器的到达时间截
 	acl_aio_request_timer(handle->aio_,
-		(void (*)(int, void*)) on_timer_callback,
+		(void (*)(int, ACL_EVENT*, void*)) on_timer_callback,
 		callback, next_delay < 0 ? 0 : next_delay,
 		callback->keep_timer() ? 1 : 0);
 }
@@ -473,7 +472,7 @@ acl_int64 aio_handle::del_timer(aio_timer_callback* callback, unsigned int id)
 		return del_timer(callback);
 
 	return (acl_aio_request_timer(callback->handle_->aio_,
-		(void (*)(int, void*)) on_timer_callback,
+		(void (*)(int, ACL_EVENT*, void*)) on_timer_callback,
 		callback, next_delay < 0 ? 0 : next_delay,
 		callback->keep_timer() ? 1 : 0));
 }
@@ -482,7 +481,7 @@ acl_int64 aio_handle::del_timer(aio_timer_callback* callback)
 {
 	acl_assert(aio_);
 	acl_int64 next_delay = acl_aio_cancel_timer(aio_,
-		(void (*)(int, void*)) on_timer_callback, callback);
+		(void (*)(int, ACL_EVENT*, void*)) on_timer_callback, callback);
 	callback->clear();
 	destroy_timer(callback);
 

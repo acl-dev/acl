@@ -19,7 +19,7 @@
 
 static int __put_log_level(const ACL_CFG_LINE *cfg_line)
 {
-	char  myname[] = "__put_log_level";
+	const char *myname = "__put_log_level";
 
 	if (cfg_line->ncount < 2) {
 		aut_log_error("%s: ncount=%d", myname, cfg_line->ncount);
@@ -45,7 +45,7 @@ static ACL_CFG_FN __general_cfg_tab[] = {
 
 int aut_cfg_add_general_line(const ACL_CFG_LINE *line)
 {
-	char  myname[] = "aut_cfg_add_general_line";
+	const char *myname = "aut_cfg_add_general_line";
 	int   i;
 
 	if (line->ncount < 1)

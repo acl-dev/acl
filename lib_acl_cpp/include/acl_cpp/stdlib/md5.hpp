@@ -52,7 +52,7 @@ public:
 	 * @param klen {size_t} key 非空时表示 key 的长度
 	 * @param out {void*} 存储 md5 结果
 	 * @param size {size_t} out 大小，至少应该为 16 字节
-	 * @return {const char*} 返回存储结果的地址(即 buf 地址)
+	 * @return {const char*} 返回存储结果的地址(即 out 地址)
 	 */
 	static const char* md5_digest(const void *dat, size_t dlen,
 		const void *key, size_t klen, void* out, size_t size);
@@ -65,7 +65,7 @@ public:
 	 * @param klen {size_t} key 非空时表示 key 的长度
 	 * @param out {void*} 存储 md5 结果
 	 * @param size {size_t} out 大小，至少应该为 33 字节
-	 * @return {const char*} 返回存储结果的地址(即 buf 地址)，
+	 * @return {const char*} 返回存储结果的地址(即 out 地址)，
 	 *  且返回值为以 \0 结尾的 32 字节长度(不含 \0)字符串
 	 */
 	static const char* md5_string(const void *dat, size_t dlen,

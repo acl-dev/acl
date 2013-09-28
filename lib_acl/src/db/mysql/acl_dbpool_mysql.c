@@ -60,7 +60,7 @@ static ACL_DB_HANDLE_MYSQL *__new_mysql_handle(void)
 static ACL_DB_HANDLE_MYSQL *__open_mysql_handle(ACL_DB_POOL_MYSQL *mysql_pool,
 	ACL_DB_HANDLE_MYSQL *mysql_handle, ACL_DB_INFO *db_info)
 {
-	char  myname[] = "__open_mysql_handle";
+	const char *myname = "__open_mysql_handle";
 	int   reuse_flag = 0;
 	const char *ptr;
 	char *db_host, *db_unix;
@@ -284,7 +284,7 @@ static void __dbpool_mysql_check(ACL_DB_POOL *db_pool)
 /*----------------------------------------------------------------------------*/
 static ACL_DB_HANDLE *__dbpool_mysql_peek(ACL_DB_POOL *db_pool)
 {
-	char  myname[] = "__dbpool_mysql_peek";
+	const char *myname = "__dbpool_mysql_peek";
 	ACL_DB_POOL_MYSQL *mysql_pool = (ACL_DB_POOL_MYSQL *) db_pool;
 	ACL_DB_HANDLE_MYSQL *mysql_handle, *mysql_handle_slot = NULL;
 	int   i, n;
@@ -358,7 +358,7 @@ static ACL_DB_HANDLE *__dbpool_mysql_peek(ACL_DB_POOL *db_pool)
 /*----------------------------------------------------------------------------*/
 static void __dbpool_mysql_release(ACL_DB_HANDLE *db_handle)
 {
-	char  myname[] = "__dbpool_mysql_release";
+	const char *myname = "__dbpool_mysql_release";
 	ACL_DB_POOL *db_pool;
 	ACL_DB_POOL_MYSQL *mysql_pool;
 	ACL_DB_HANDLE_MYSQL *mysql_handle;
@@ -403,7 +403,7 @@ static void *__dbpool_mysql_export(ACL_DB_HANDLE *db_handle)
 /*----------------------------------------------------------------------------*/
 static void __dbpool_mysql_close(ACL_DB_HANDLE *db_handle)
 {
-	char  myname[] = "__dbpool_mysql_close";
+	const char *myname = "__dbpool_mysql_close";
 	ACL_DB_POOL *db_pool;
 	ACL_DB_POOL_MYSQL *mysql_pool;
 	ACL_DB_HANDLE_MYSQL *mysql_handle = (ACL_DB_HANDLE_MYSQL *) db_handle;
@@ -455,7 +455,7 @@ static void __dbpool_mysql_destroy(ACL_DB_POOL *db_pool)
 /*----------------------------------------------------------------------------*/
 ACL_DB_POOL *acl_dbpool_mysql_create(const ACL_DB_INFO *db_info)
 {
-	char  myname[] = "acl_dbpool_mysql_create";
+	const char *myname = "acl_dbpool_mysql_create";
 	ACL_DB_POOL_MYSQL *mysql_pool;
 
 	mysql_pool = (ACL_DB_POOL_MYSQL *) acl_mycalloc(1, sizeof(ACL_DB_POOL_MYSQL));

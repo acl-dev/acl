@@ -35,20 +35,23 @@
 } while (0)
 
 #ifdef ACL_MS_WINDOWS
-static void __connect_notify_callback(int event_type, void *context);
+static void __connect_notify_callback(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context);
 
-static void ConnectTimer(int event_type acl_unused, void *ctx)
+static void ConnectTimer(int event_type acl_unused,
+	ACL_EVENT *event acl_unused, void *ctx)
 {
 	ACL_ASTREAM *astream = (ACL_ASTREAM*) ctx;
 
 	if (astream->aio->event_mode != ACL_EVENT_WMSG)
 		acl_msg_fatal("event_mode(%d) != ACL_EVENT_WMSG(%d)",
 			astream->aio->event_mode, ACL_EVENT_WMSG);
-	__connect_notify_callback(ACL_EVENT_RW_TIMEOUT, ctx);
+	__connect_notify_callback(ACL_EVENT_RW_TIMEOUT, NULL, NULL, ctx);
 }
 #endif
 
-static void __connect_notify_callback(int event_type, void *context)
+static void __connect_notify_callback(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream acl_unused, void *context)
 {
 	const char *myname = "__connect_notify_callback";
 	ACL_ASTREAM *astream = (ACL_ASTREAM *) context;
@@ -74,9 +77,9 @@ static void __connect_notify_callback(int event_type, void *context)
 			 */
 			acl_aio_iocp_close(astream);
 		} else {
-			acl_event_enable_write(astream->aio->event,
-				astream->stream, astream->timeout,
-				__connect_notify_callback, astream);
+			acl_event_enable_write(event, astream->stream,
+				astream->timeout, __connect_notify_callback,
+				astream);
 		}
 		return;
 	}
@@ -188,7 +191,7 @@ ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout)
 		cstream = acl_vstream_fdopen(connfd, ACL_VSTREAM_FLAG_RW,
 				aio->rbuf_size, timeout, ACL_VSTREAM_TYPE_SOCK);
 		acl_assert(cstream);
-		ACL_SAFE_STRNCPY(cstream->remote_addr, addr, sizeof(cstream->remote_addr));
+		acl_vstream_set_peer(cstream, addr);
 	} else
 #endif
 		cstream = acl_vstream_connect(addr, ACL_NON_BLOCKING,

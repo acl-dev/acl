@@ -19,7 +19,8 @@
 
 #include "aio.h"
 
-static void __accept_notify_callback(int event_type, void *context)
+static void __accept_notify_callback(int event_type,
+	ACL_EVENT *event acl_unused, ACL_VSTREAM *stream, void *context)
 {
 	const char *myname = "__accept_notify_callback";
 	ACL_ASTREAM *astream = (ACL_ASTREAM *) context;
@@ -44,7 +45,7 @@ static void __accept_notify_callback(int event_type, void *context)
 
 	for (i = 0; i < astream->accept_nloop; i++) {
 		/* cstream read_buf 的长度 read_buf_len 继承自监听流的 read_buf_len */
-		cstream = acl_vstream_accept(astream->stream, NULL, 0);
+		cstream = acl_vstream_accept(stream, NULL, 0);
 		if (cstream == NULL) {
 			int   ret;
 			char  ebuf[256];
@@ -82,7 +83,9 @@ void acl_aio_accept(ACL_ASTREAM *astream)
 		astream->timeout, __accept_notify_callback, astream);
 }
 
-static void __listen_notify_callback(int event_type, void *context)
+static void __listen_notify_callback(int event_type,
+	ACL_EVENT *event acl_unused, ACL_VSTREAM *stream acl_unused,
+	void *context)
 {
 	const char *myname = "__listen_notify_callback";
 	ACL_ASTREAM *astream = (ACL_ASTREAM *) context;
@@ -108,7 +111,7 @@ static void __listen_notify_callback(int event_type, void *context)
 
 void acl_aio_listen(ACL_ASTREAM *astream)
 {
-	char  myname[] = "acl_aio_listen";
+	const char *myname = "acl_aio_listen";
 
 	if (astream == NULL)
 		acl_msg_fatal("%s: input invalid", myname);

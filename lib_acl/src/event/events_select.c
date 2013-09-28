@@ -353,8 +353,8 @@ static void event_loop(ACL_EVENT *eventp)
 {
 	const char *myname = "event_loop";
 	EVENT_SELECT *ev = (EVENT_SELECT *) eventp;
-	ACL_EVENT_NOTIFY_FN worker_fn;
-	void    *worker_arg;
+	ACL_EVENT_NOTIFY_TIME timer_fn;
+	void    *timer_arg;
 	ACL_SOCKET sockfd;
 	ACL_EVENT_TIMER *timer;
 	int   nready, i;
@@ -442,7 +442,10 @@ static void event_loop(ACL_EVENT *eventp)
 		/* 如果该描述字对象已经在被设置为异常或超时状态则继续 */
 
 		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT)))
+		{
+			acl_msg_info("error set ACL_EVENT_XCPT");
 			continue;
+		}
 
 		sockfd = ACL_VSTREAM_SOCK(fdp->stream);
 
@@ -501,8 +504,8 @@ TAG_DONE:
 	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
 		if (timer->when > eventp->event_present)
 			break;
-		worker_fn  = timer->callback;
-		worker_arg = timer->context;
+		timer_fn  = timer->callback;
+		timer_arg = timer->context;
 
 		/* 如果定时器的时间间隔 > 0 且允许定时器被循环调用，则再重设定时器 */
 		if (timer->delay > 0 && timer->keep) {
@@ -517,7 +520,7 @@ TAG_DONE:
 					myname, __LINE__, timer->nrefer);
 			acl_myfree(timer);
 		}
-		worker_fn(ACL_EVENT_TIME, worker_arg);
+		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
 	}
 
 	/* 处理准备好的描述字事件 */

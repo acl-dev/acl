@@ -526,7 +526,7 @@ void acl_vstring_glue(ACL_VSTRING *vp, void *buf, size_t len)
 
 char acl_vstring_charat(ACL_VSTRING *vp, size_t offset)
 {
-	char  myname[] = "acl_vstring_charat";
+	const char *myname = "acl_vstring_charat";
 
 	if (vp == NULL)
 		acl_msg_fatal("%s(%d): invalid input", myname, __LINE__);

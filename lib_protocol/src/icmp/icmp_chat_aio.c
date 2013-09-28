@@ -7,7 +7,8 @@ static void delay_send_pkt(ICMP_PKT*, int);
 static int read_close_fn(ACL_ASTREAM*, void*);
 static int read_ready_fn(ACL_ASTREAM*, void *, const char*, int);
 
-static void check_timer(int event_type acl_unused, void *context)
+static void check_timer(int event_type acl_unused,
+	ACL_EVENT *event acl_unused, void *context)
 {
 	const char *myname = "check_timer";
 	ICMP_CHAT *chat = (ICMP_CHAT*) context;
@@ -95,7 +96,8 @@ void icmp_chat_aio(ICMP_HOST* host)
 }
 
 /* 某个包的发送定时器到达的回调函数 */
-static void delay_send_timer(int event_type acl_unused, void *context)
+static void delay_send_timer(int event_type acl_unused,
+	ACL_EVENT *event acl_unused, void *context)
 {
 	ICMP_PKT *pkt = (ICMP_PKT*) context;
 

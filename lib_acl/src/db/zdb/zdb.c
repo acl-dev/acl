@@ -1,7 +1,17 @@
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
-#include "lib_acl.h"
+#include <stdio.h>
+#include <string.h>
+#include "stdlib/acl_make_dirs.h"
+#include "stdlib/acl_mystring.h"
+#include "stdlib/acl_msg.h"
+#include "stdlib/acl_vstring.h"
+#include "stdlib/acl_iterator.h"
+#include "stdlib/acl_array.h"
+#include "stdlib/acl_argv.h"
+#include "stdlib/acl_mymalloc.h"
+#include "stdlib/acl_file.h"
 #include "db/zdb.h"
 
 #endif

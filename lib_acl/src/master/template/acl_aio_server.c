@@ -154,9 +154,6 @@ static void (*aio_server_rw_timer) (ACL_VSTREAM *);
 
 static ACL_ASTREAM *ACL_MASTER_STAT_ASTREAM = NULL;
 
-/* forward declare */
-static void aio_server_timeout(int eventd, void *context);
-
 static void aio_init(void)
 {
 	pthread_mutex_init(&__closing_time_mutex, NULL);
@@ -254,7 +251,7 @@ ACL_AIO* acl_aio_server_handle()
 	return (__h_aio);
 }
 
-void acl_aio_server_request_timer(ACL_AIO_TIMER_FN timer_fn, void *arg, int delay)
+void acl_aio_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg, int delay)
 {
 	const char *myname = "acl_aio_server_request_timer";
 
@@ -264,7 +261,7 @@ void acl_aio_server_request_timer(ACL_AIO_TIMER_FN timer_fn, void *arg, int dela
 			__FILE__, __LINE__, myname);
 }
 
-void acl_aio_server_cancel_timer(ACL_AIO_TIMER_FN timer_fn, void *arg)
+void acl_aio_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg)
 {
 	const char *myname = "acl_aio_server_cancel_timer";
 
@@ -297,6 +294,39 @@ static void aio_server_exit(void)
 	if (aio_server_onexit)
 		aio_server_onexit(aio_server_name, aio_server_argv);
 	exit(0);
+}
+
+/* aio_server_timeout - idle time exceeded */
+
+static void aio_server_timeout(int type acl_unused,
+	ACL_EVENT *event acl_unused, void *context)
+{
+	ACL_AIO *aio = (ACL_AIO *) context;
+	time_t last, inter;
+	int   n;
+
+	n = get_client_count();
+
+	/* if there are some fds not be closed, the timer should be reset again */
+	if (n > 0 && acl_var_aio_idle_limit > 0) {                                         
+		acl_aio_request_timer(aio, aio_server_timeout, (void *) aio,
+			(acl_int64) acl_var_aio_idle_limit * 1000000, 0);
+		return;
+	}
+
+	last  = last_closing_time();
+	inter = time(NULL) - last;
+
+	if (inter >= 0 && inter < acl_var_aio_idle_limit) {
+		acl_aio_request_timer(aio, aio_server_timeout, (void *) aio,
+			(acl_int64) (acl_var_aio_idle_limit - inter) * 1000000, 0);
+		return;
+	}
+
+	if (acl_msg_verbose)
+		acl_msg_info("idle timeout -- exiting");
+
+	aio_server_exit();
 }
 
 /* aio_server_abort - terminate after abnormal master exit */
@@ -335,39 +365,8 @@ static void aio_server_read_abort(ACL_ASTREAM *astream, void *context,
 	aio_server_abort(astream, context);
 }
 
-/* aio_server_timeout - idle time exceeded */
-
-static void aio_server_timeout(int event acl_unused, void *context)
-{
-	ACL_AIO *aio = (ACL_AIO *) context;
-	time_t last, inter;
-	int   n;
-
-	n = get_client_count();
-
-	/* if there are some fds not be closed, the timer should be reset again */
-	if (n > 0 && acl_var_aio_idle_limit > 0) {                                         
-		acl_aio_request_timer(aio, aio_server_timeout, (void *) aio,
-			(acl_int64) acl_var_aio_idle_limit * 1000000, 0);
-		return;
-	}
-
-	last  = last_closing_time();
-	inter = time(NULL) - last;
-
-	if (inter >= 0 && inter < acl_var_aio_idle_limit) {
-		acl_aio_request_timer(aio, aio_server_timeout, (void *) aio,
-			(acl_int64) (acl_var_aio_idle_limit - inter) * 1000000, 0);
-		return;
-	}
-
-	if (acl_msg_verbose)
-		acl_msg_info("idle timeout -- exiting");
-
-	aio_server_exit();
-}
-
-static void aio_server_use_timer(int event acl_unused, void *context)
+static void aio_server_use_timer(int type acl_unused,
+	ACL_EVENT *event acl_unused, void *context)
 {
 	ACL_AIO *aio = (ACL_AIO *) context;
 	int   n;
@@ -575,7 +574,8 @@ static void *tls_alloc(size_t len)
 
 /* restart listening */
 
-static void restart_listen(int event acl_unused, void *context)
+static void restart_listen(int type acl_unused,
+	ACL_EVENT *event acl_unused, void *context)
 {
 	ACL_ASTREAM *stream = (ACL_ASTREAM*) context;
 	acl_msg_info("restart listen now!");
@@ -740,7 +740,8 @@ static int aio_server_accept_sock2(ACL_ASTREAM *astream, ACL_AIO *aio)
 	return i;
 }
 
-static void aio_server_accept_timer(int event acl_unused, void *context)
+static void aio_server_accept_timer(int type acl_unused,
+	ACL_EVENT *event acl_unused, void *context)
 {
 	ACL_ASTREAM *astream = (ACL_ASTREAM*) context;
 	ACL_AIO *aio = acl_aio_handle(astream);

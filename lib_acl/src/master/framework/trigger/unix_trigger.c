@@ -33,13 +33,13 @@
 
 struct ACL_UNIX_TRIGGER {
 	ACL_VSTREAM *stream;
-	ACL_EVENT   *eventp;
-	char    *service;
+	char        *service;
 };
 
 /* acl_unix_trigger_event - disconnect from peer */
 
-static void acl_unix_trigger_event(int event, void *context)
+static void acl_unix_trigger_event(int type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context)
 {
 	const char *myname = "acl_unix_trigger_event";
 	struct ACL_UNIX_TRIGGER *up = (struct ACL_UNIX_TRIGGER *) context;
@@ -47,23 +47,32 @@ static void acl_unix_trigger_event(int event, void *context)
 	/*
 	 * Disconnect.
 	 */
-	if (event == ACL_EVENT_TIME)
+	if (type == ACL_EVENT_TIME)
 		acl_msg_warn("%s: read timeout for service %s",
 			myname, up->service);
-	acl_event_disable_readwrite(up->eventp, up->stream);
+	acl_event_disable_readwrite(event, stream);
 #ifdef	__USE_TIMER
-	acl_event_cancel_timer(up->eventp, acl_unix_trigger_event, up);
+	acl_event_cancel_timer(event, acl_unix_trigger_event, up);
 #endif
-	if (acl_vstream_close(up->stream) < 0)
+	if (acl_vstream_close(stream) < 0)
 		acl_msg_warn("%s: close %s: %s",
 			myname, up->service, strerror(errno));
 	acl_myfree(up->service);
 	acl_myfree(up);
 }
 
+#ifdef	__USE_TIMER
+static void acl_unix_trigger_timer(int type, ACL_EVENT *event, void *context)
+{
+	struct ACL_UNIX_TRIGGER *up = (struct ACL_UNIX_TRIGGER *) context;
+
+	acl_unix_trigger_event(type, event, up->stream, context);
+}
+#endif
+
 /* acl_unix_trigger - wakeup UNIX-domain server */
 
-int acl_unix_trigger(ACL_EVENT *eventp, const char *service,
+int acl_unix_trigger(ACL_EVENT *event, const char *service,
 	const char *buf, int len, int timeout)
 {
 	const char *myname = "acl_unix_trigger";
@@ -91,7 +100,6 @@ int acl_unix_trigger(ACL_EVENT *eventp, const char *service,
 	up->service = acl_mystrdup(service);
 	up->stream = acl_vstream_fdopen(fd, O_RDWR, 4096,
 			timeout, ACL_VSTREAM_TYPE_LISTEN_UNIX);
-	up->eventp = eventp; 
 
 	/*
 	 * Write the request...
@@ -109,16 +117,16 @@ int acl_unix_trigger(ACL_EVENT *eventp, const char *service,
 	 */
 #ifdef	__USE_TIMER
 	if (timeout > 0)
-		acl_event_request_timer(up->eventp, acl_unix_trigger_event,
+		acl_event_request_timer(event, acl_unix_trigger_timer,
 			(void *) up, (timeout + 100) * 1000000);
-	acl_event_enable_read(up->eventp, up->stream, 0,
+	acl_event_enable_read(event, up->stream, 0,
 		acl_unix_trigger_event, (void *) up);
 #else
 	if (timeout > 0)
-		acl_event_enable_read(up->eventp, up->stream, timeout + 100,
+		acl_event_enable_read(event, up->stream, timeout + 100,
 			acl_unix_trigger_event, (void *) up);
 	else
-		acl_event_enable_read(up->eventp, up->stream, 0,
+		acl_event_enable_read(event, up->stream, 0,
 			acl_unix_trigger_event, (void *) up);
 #endif
 

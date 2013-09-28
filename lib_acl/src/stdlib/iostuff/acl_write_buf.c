@@ -28,17 +28,17 @@ int acl_write_buf(ACL_SOCKET fd, const char *buf, int len, int timeout)
 
 	while (len > 0) {
 		if (timeout > 0 && acl_write_wait(fd, timeout) < 0)
-			return (-1);
-		count = acl_socket_write(fd, buf, len, 0, NULL);
+			return -1;
+		count = acl_socket_write(fd, buf, len, 0, NULL, NULL);
 		if (count < 0) {
 			if (acl_last_error() == ACL_EAGAIN && timeout > 0)
 				continue;
-			return (-1);
+			return -1;
 		}
 		if (count == 0)
 			acl_msg_fatal("write returned 0");
 		buf += count;
 		len -= count;
 	}
-	return (len);
+	return len;
 }

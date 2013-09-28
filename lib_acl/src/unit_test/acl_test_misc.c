@@ -47,7 +47,7 @@ void aut_line_free(void *ctx)
 
 const ACL_ARRAY *aut_args_get(const char *cmd_name)
 {
-	char  myname[] = "aut_args_get";
+	const char *myname = "aut_args_get";
 	AUT_LINE *test_line;
 	int   i, n;
 
@@ -68,7 +68,7 @@ const ACL_ARRAY *aut_args_get(const char *cmd_name)
 
 int aut_size(void)
 {
-	char  myname[] = "aust_size";
+	const char *myname = "aust_size";
 	int   n;
 
 	if (var_aut_line_array == NULL)
@@ -80,7 +80,7 @@ int aut_size(void)
 
 AUT_LINE *aut_index(int idx)
 {
-	char  myname[] = "aut_cfg_index";
+	const char *myname = "aut_cfg_index";
 	AUT_LINE *test_line;
 	int   n;
 
@@ -102,7 +102,7 @@ AUT_LINE *aut_index(int idx)
 /* 比较所给的命令字与配置行中的命令字是否相等 */
 int aut_line_cmdcmp(const AUT_LINE *test_line, const char *cmd_name)
 {
-	char  myname[] = "aut_line_cmdcmp";
+	const char *myname = "aut_line_cmdcmp";
 
 	if (test_line == NULL || cmd_name == NULL) {
 		printf("%s: input error\n", myname);
@@ -115,7 +115,7 @@ int aut_line_cmdcmp(const AUT_LINE *test_line, const char *cmd_name)
 /* 比较程序执行结果与配置行中的期望结果值 */
 int aut_line_resultcmp(const AUT_LINE *test_line, int value)
 {
-	char  myname[] = "aut_line_resultcmp";
+	const char *myname = "aut_line_resultcmp";
 
 	if (test_line == NULL) {
 		printf("%s: input error\n", myname);
@@ -130,7 +130,7 @@ int aut_line_resultcmp(const AUT_LINE *test_line, int value)
 /* 取得该配置行在配置文件中的行号 */
 int aut_line_number(const AUT_LINE *test_line)
 {
-	char  myname[] = "aut_line_number";
+	const char *myname = "aut_line_number";
 
 	if (test_line == NULL) {
 		printf("%s: input error\n", myname);
@@ -149,7 +149,7 @@ int aut_line_valid_linenum(const AUT_LINE *test_line)
 /* 取得该配置行的命令字 */
 const char *aut_line_cmdname(const AUT_LINE *test_line)
 {
-	char  myname[] = "aut_line_cmdname";
+	const char *myname = "aut_line_cmdname";
 
 	if (test_line == NULL) {
 		printf("%s: input error\n", myname);
@@ -162,7 +162,7 @@ const char *aut_line_cmdname(const AUT_LINE *test_line)
 /* 取得该配置行中配置参数的个数 */
 int aut_line_argc(const AUT_LINE *test_line)
 {
-	char  myname[] = "aut_line_argc";
+	const char *myname = "aut_line_argc";
 
 	if (test_line == NULL) {
 		printf("%s: input error\n", myname);
@@ -174,7 +174,7 @@ int aut_line_argc(const AUT_LINE *test_line)
 
 const char *aut_line_getvalue(const AUT_LINE *test_line, const char *name)
 {
-	char  myname[] = "aut_line_getvalue";
+	const char *myname = "aut_line_getvalue";
 	AUT_ARG_ITEM *arg = NULL;
 	int   i, n;
 
@@ -199,7 +199,7 @@ const char *aut_line_getvalue(const AUT_LINE *test_line, const char *name)
 /* 取得该配置行中参数内容  */
 const char *aut_line_argstr(const AUT_LINE *test_line)
 {
-	char  myname[] = "aut_line_argstr";
+	const char *myname = "aut_line_argstr";
 
 	if (test_line == NULL) {
 		printf("%s: input error\n", myname);
@@ -212,7 +212,7 @@ const char *aut_line_argstr(const AUT_LINE *test_line)
 /* 取得该配置行中的期望结果值 */
 int aut_line_result(const AUT_LINE *test_line)
 {
-	char  myname[] = "aut_line_result";
+	const char *myname = "aut_line_result";
 
 	if (test_line == NULL) {
 		printf("%s: input error\n", myname);
@@ -225,7 +225,7 @@ int aut_line_result(const AUT_LINE *test_line)
 /* 判断是否停止继续执行的配置行 */
 int aut_line_stop(const AUT_LINE *test_line)
 {
-	char  myname[] = "aut_line_stop";
+	const char *myname = "aut_line_stop";
 
 	if (test_line == NULL)
 		aut_log_fatal("%s: input error", myname);
@@ -238,7 +238,7 @@ int aut_line_stop(const AUT_LINE *test_line)
 /* 判断是否是保留配置行 */
 int aut_line_reserved(AUT_LINE *test_line)
 {
-	char  myname[] = "aut_line_reserved";
+	const char *myname = "aut_line_reserved";
 
 	if (test_line == NULL)
 		aut_log_fatal("%s: input error", myname);
@@ -251,7 +251,7 @@ int aut_line_reserved(AUT_LINE *test_line)
 /* 将用户自己的参数项存储在 test_line 内的 arg_inner 中 */
 int aut_line_add_arg(AUT_LINE *test_line, void *arg)
 {
-	char  myname[] = "aut_line_add_arg";
+	const char *myname = "aut_line_add_arg";
 
 	if (test_line == NULL)
 		aut_log_fatal("%s: input error", myname);
@@ -278,7 +278,7 @@ void *aut_line_get_arg(const AUT_LINE *test_line)
 
 int aut_end_linenum(int start_linenum)
 {
-	char  myname[] = "aut_end_linenum";
+	const char *myname = "aut_end_linenum";
 	const AUT_LINE *test_line_start;
 	const AUT_LINE *test_line_end = NULL;
 

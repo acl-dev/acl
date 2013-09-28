@@ -2,41 +2,40 @@
 #include "icmp_struct.h"
 #include "icmp_private.h"
 
-static int icmp_read(ACL_SOCKET fd, void *buf, size_t size, int timeout acl_unused, void *arg)
+static int icmp_read(ACL_SOCKET fd, void *buf, size_t size,
+	int timeout acl_unused, ACL_VSTREAM *stream acl_unused, void *arg)
 {
 	ICMP_STREAM *is = (ICMP_STREAM*) arg;
 	int   ret;
 
 #ifdef ACL_UNIX
 	ret = recvfrom(fd, buf, size, 0, (struct sockaddr*) &is->from,
-		(socklen_t*) &is->from_len);
+			(socklen_t*) &is->from_len);
 #elif defined(WIN32)
-	ret = recvfrom(fd, (char*) buf, (int) size, 0, (struct sockaddr*) &is->from,
-		&is->from_len);
+	ret = recvfrom(fd, (char*) buf, (int) size, 0,
+			(struct sockaddr*) &is->from, &is->from_len);
 #else
 #error "unknown OS"
 #endif
-	if (ret < 0) {
-		char tbuf[256];
-		printf("%s(%d): recvfrom error(%s)\r\n",
-			__FILE__, __LINE__, acl_last_strerror(tbuf, sizeof(tbuf)));
-	}
+	if (ret < 0)
+		acl_msg_error("%s(%d): recvfrom error(%s)",
+			__FILE__, __LINE__, acl_last_serror());
 	return (ret);
 }
 
-static int icmp_write(ACL_SOCKET fd, const void *buf, size_t size, int timeout acl_unused, void *arg)
+static int icmp_write(ACL_SOCKET fd, const void *buf, size_t size,
+	int timeout acl_unused, ACL_VSTREAM *stream acl_unused, void *arg)
 {
 	ICMP_STREAM *is = (ICMP_STREAM*) arg;
 	int   ret;
 
 #ifdef ACL_UNIX
-	ret = sendto(fd, buf, size, 0,
-			(struct sockaddr*) &is->curr_host->dest,
-			sizeof(is->curr_host->dest));
+	ret = sendto(fd, buf, size, 0, (struct sockaddr*) &is->curr_host->dest,
+		sizeof(is->curr_host->dest));
 #elif defined(WIN32)
 	ret = sendto(fd, (const char*) buf, (int) size, 0,
-			(struct sockaddr*) &is->curr_host->dest,
-			sizeof(is->curr_host->dest));
+		(struct sockaddr*) &is->curr_host->dest,
+		sizeof(is->curr_host->dest));
 #else
 #error	"unknown OS"
 #endif

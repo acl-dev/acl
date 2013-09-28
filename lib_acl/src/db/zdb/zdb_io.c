@@ -15,6 +15,15 @@
 # undef		PREAD
 #endif
 
+#include <string.h>
+#include "stdlib/avl.h"
+#include "stdlib/acl_msg.h"
+#include "stdlib/acl_cache.h"
+#include "stdlib/acl_vstring.h"
+#include "stdlib/acl_slice.h"
+#include "stdlib/acl_fhandle.h"
+#include "stdlib/acl_mymalloc.h"
+#include "stdlib/acl_mystring.h"
 #include "db/zdb.h"
 
 #endif

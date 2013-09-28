@@ -1,11 +1,18 @@
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
-#include "lib_acl.h"
+#include "stdlib/acl_define.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+
+#include "net/acl_sane_socket.h"
+#include "net/acl_access.h"
+#include "master/acl_ioctl_params.h"
+#include "master/acl_master_type.h"
+#include "master/acl_master_conf.h"
 
 #endif
 
@@ -38,7 +45,7 @@ static void (*__app_on_close)(ACL_VSTREAM *stream, void*) = NULL;
 
 static ACL_APP_HANDLE *app_create(void)
 {
-	char  myname[] = "app_create";
+	const char *myname = "app_create";
 	ACL_APP_HANDLE *app;
 
 	app = (ACL_APP_HANDLE *) acl_mycalloc(1, sizeof(ACL_APP_HANDLE));
@@ -54,7 +61,7 @@ static ACL_APP_HANDLE *app_create(void)
 static void __read_notify_callback(int event_type, ACL_IOCTL *h_ioctl,
 	ACL_VSTREAM *cstream, void *context)
 {
-	const char  myname[] = "__read_notify_callback";
+	const char *myname = "__read_notify_callback";
 	ACL_APP_HANDLE *app;
 	int   ret;
 
@@ -153,7 +160,7 @@ static int (*__app_on_accept)(ACL_VSTREAM *stream) = NULL;
 static void __service(ACL_IOCTL *h_ioctl, ACL_VSTREAM *stream,
 	char *service acl_unused, char **argv acl_unused)
 {
-	char  myname[] = "__service";
+	const char *myname = "__service";
 	char  addr[64], *ptr;
 
 	/*
@@ -214,7 +221,7 @@ static void __pre_jail_init(char *name acl_unused, char **argv acl_unused)
 
 static void __post_jail_init(char *name acl_unused, char **argv acl_unused)
 {
-	char  myname[] = "__post_jail_init";
+	const char *myname = "__post_jail_init";
 
 	if (acl_var_ioctl_access_allow != NULL)
 		acl_access_add(acl_var_ioctl_access_allow, ", \t", ":");

@@ -48,7 +48,7 @@ int var_aut_log_level = 0;
 /* 分析配置文件中的第四个参数, 将其进行分解并存入动态数组之中 */
 ACL_ARRAY *aut_parse_args_list(const char *str_in)
 {
-	char  myname[] = "aut_parse_args_list";
+	const char *myname = "aut_parse_args_list";
 	ACL_ARRAY *argvs_array = NULL;
 	AUT_ARG_ITEM *arg_item = NULL;
 	char *ptr_item, *pstr, *pstr_saved, *pname, *pvalue;
@@ -153,7 +153,7 @@ static void __parse_cfg_line(const ACL_CFG_LINE *line)
 /* 初始化 */
 static void __init(void)
 {
-	char  myname[] = "__init";
+	const char *myname = "__init";
 
 	if (var_aut_line_array != NULL)
 		return;
@@ -170,7 +170,7 @@ static void __init(void)
 /* 将配置文件读入内存并进行分解 */
 int aut_cfg_parse(const char *pathname)
 {
-	char  myname[] = "aut_cfg_parse";
+	const char *myname = "aut_cfg_parse";
 	ACL_CFG_PARSER *cfg_parser;
 	ACL_CFG_LINE *cfg_line;
 	int   i, n;
@@ -209,7 +209,7 @@ int aut_cfg_parse(const char *pathname)
 /* 打印输出配置文件中的有效配置行 */
 int aut_cfg_print(void)
 {
-	char  myname[] = "aut_cfg_print";
+	const char *myname = "aut_cfg_print";
 	AUT_LINE *line = NULL;
 	AUT_ARG_ITEM *arg;
 	int   i, j, n, m, first_line_arg;

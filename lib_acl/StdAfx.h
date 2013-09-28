@@ -3,12 +3,12 @@
 
 #ifdef ACL_PREPARE_COMPILE
 
-#include "stdlib/acl_define.h"
+# include "stdlib/acl_define.h"
 
-#include <string.h>
-#include <float.h>			/* DBL_MAX_10_EXP */
-#include <ctype.h>
-#include <limits.h>			/* CHAR_BIT */
+# include <string.h>
+# include <float.h>			/* DBL_MAX_10_EXP */
+# include <ctype.h>
+# include <limits.h>			/* CHAR_BIT */
 
 # ifdef	ACL_MS_WINDOWS
 #  include <process.h>
@@ -22,10 +22,8 @@ int acl_secure_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
 #  else
 #   define snprintf _snprintf
 #   define vsnprintf _vsnprintf
-#  endif
+#  endif  /* __STDC_WANT_SECURE_LIB__ */
 # endif  /* ACL_MS_WINDOWS */
-
-#include "stdlib/acl_define.h"
 
 # ifdef	ACL_UNIX
 #  ifndef  __USE_XOPEN2K
@@ -52,6 +50,7 @@ int acl_secure_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
 #  include <signal.h>
 #  include <sys/stat.h>
 #  include <sys/socket.h>
+#  include <sys/un.h>
 #  ifdef ACL_FREEBSD
 #   include <netinet/in_systm.h>
 #   include <netinet/in.h>

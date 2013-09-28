@@ -797,6 +797,9 @@
     <ClCompile Include=".\src\master\template\acl_trigger_server.c">
       <Filter>Source Files\master\template</Filter>
     </ClCompile>
+    <ClCompile Include=".\src\master\template\acl_udp_server.c">
+      <Filter>Source Files\master\template</Filter>
+    </ClCompile>
     <ClCompile Include=".\src\master\framework\master_avail.c">
       <Filter>Source Files\master\framework</Filter>
     </ClCompile>
@@ -1392,9 +1395,6 @@
     <ClInclude Include=".\include\ioctl\acl_ioctl.h">
       <Filter>Header Files\ioctl</Filter>
     </ClInclude>
-    <ClInclude Include=".\include\ioctl\acl_myioctl.h">
-      <Filter>Header Files\ioctl</Filter>
-    </ClInclude>
     <ClInclude Include=".\include\ioctl\acl_spool.h">
       <Filter>Header Files\ioctl</Filter>
     </ClInclude>
@@ -1477,6 +1477,9 @@
       <Filter>Header Files\master</Filter>
     </ClInclude>
     <ClInclude Include=".\include\master\acl_trigger_params.h">
+      <Filter>Header Files\master</Filter>
+    </ClInclude>
+    <ClInclude Include=".\include\master\acl_udp_params.h">
       <Filter>Header Files\master</Filter>
     </ClInclude>
     <ClInclude Include=".\include\proctl\acl_proctl.h">

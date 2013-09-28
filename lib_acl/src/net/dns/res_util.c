@@ -1,7 +1,9 @@
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
-#include "lib_acl.h"
+#include <string.h>
+#include "stdlib/acl_argv.h"
+#include "net/acl_sane_inet.h"
 
 #endif
 

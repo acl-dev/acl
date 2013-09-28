@@ -54,7 +54,7 @@ void    acl_master_flow_init(void)
 
 int acl_master_flow_get(int len)
 {
-	char  myname[] = "acl_master_flow_get";
+	const char *myname = "acl_master_flow_get";
 	char  buf[BUFFER_SIZE];
 	struct stat st;
 	int   count;
@@ -93,7 +93,7 @@ int acl_master_flow_get(int len)
 
 int acl_master_flow_put(int len)
 {
-	char  myname[] = "acl_master_flow_put";
+	const char *myname = "acl_master_flow_put";
 	char  buf[BUFFER_SIZE];
 	int   count;
 	int   n = 0;
@@ -126,7 +126,7 @@ int acl_master_flow_put(int len)
 
 int acl_master_flow_count(void)
 {
-	char  myname[] = "acl_master_flow_count";
+	const char *myname = "acl_master_flow_count";
 	int   count;
 
 	if ((count = acl_peekfd(ACL_MASTER_FLOW_READ)) < 0)

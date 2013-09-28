@@ -16,7 +16,13 @@ namespace acl
 class ACL_CPP_API memcache_pool : public connect_pool
 {
 public:
-	memcache_pool(const char* addr, int count, int retry_inter = 0);
+	/**
+	 * 构造函数
+	 * @param addr {const char*} 服务端地址，格式：ip:port
+	 * @param count {int} 连接池的最大连接数限制
+	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
+	 */
+	memcache_pool(const char* addr, int count, size_t idx = 0);
 	~memcache_pool();
 
 	/**

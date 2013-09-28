@@ -1,5 +1,6 @@
 #include "acl_stdafx.hpp"
 #include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 #include "acl_cpp/master/master_aio.hpp"
@@ -9,7 +10,6 @@ namespace acl
 
 static master_aio* __ma = NULL;
 static aio_handle* __handle = NULL;
-static aio_listen_stream* __sstream = NULL;
 
 master_aio::master_aio()
 {
@@ -20,12 +20,6 @@ master_aio::master_aio()
 
 master_aio::~master_aio()
 {
-	if (__sstream)
-	{
-		__sstream->close();
-		__sstream = NULL;
-	}
-
 	if (__handle)
 	{
 		__handle->check();
@@ -64,9 +58,18 @@ void master_aio::run_daemon(int argc, char** argv)
 #else
 	logger_fatal("no support win32 yet!");
 #endif
-	}
+}
 
-bool master_aio::run_alone(const char* addr, const char* path /* = NULL */,
+//////////////////////////////////////////////////////////////////////////
+
+static void close_all_listener(std::vector<aio_listen_stream*>& sstreams)
+{
+	std::vector<aio_listen_stream*>::iterator it = sstreams.begin();
+	for (; it != sstreams.end(); ++it)
+		(*it)->close();
+}
+
+bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	aio_handle_type ht /* = ENGINE_SELECT */)
 {
 	acl_assert(__handle == NULL);
@@ -74,23 +77,31 @@ bool master_aio::run_alone(const char* addr, const char* path /* = NULL */,
 #ifdef WIN32
 	acl_init();
 #endif
+	std::vector<aio_listen_stream*> sstreams;
+	ACL_ARGV* tokens = acl_argv_split(addrs, ";,| \t");
+	ACL_ITER iter;
 
 	// 初始化配置参数
 	conf_.load(path);
 
 	__handle = NEW aio_handle(ht);
-	__sstream = NEW aio_listen_stream(__handle);
-	// 监听指定的地址
-	if (__sstream->open(addr) == false)
+	acl_foreach(iter, tokens)
 	{
-		logger_error("listen %s error: %s", addr, acl_last_serror());
-		__sstream->close();
-		// XXX: 为了保证能关闭监听流，应在此处再 check 一下
-		__handle->check();
-		__sstream = NULL;
-		return (false);
+		const char* addr = (const char*) iter.data;
+		aio_listen_stream* sstream = NEW aio_listen_stream(__handle);
+		// 监听指定的地址
+		if (sstream->open(addr) == false)
+		{
+			logger_error("listen %s error: %s", addr, last_serror());
+			close_all_listener(sstreams);
+			// XXX: 为了保证能关闭监听流，应在此处再 check 一下
+			__handle->check();
+			acl_argv_free(tokens);
+			return (false);
+		}
+		sstream->add_accept_callback(this);
 	}
-	__sstream->add_accept_callback(this);
+	acl_argv_free(tokens);
 
 	service_pre_jail(NULL);
 	service_init(NULL);
@@ -103,8 +114,7 @@ bool master_aio::run_alone(const char* addr, const char* path /* = NULL */,
 			break;
 		}
 	}
-	__sstream->close();
-	__sstream = NULL;
+	close_all_listener(sstreams);
 	__handle->check();
 	service_exit(NULL);
 	return true;

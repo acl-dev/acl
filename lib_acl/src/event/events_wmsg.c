@@ -480,9 +480,11 @@ static void handleClose(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 	if (fdp == NULL)
 		return;
 	else if (fdp->r_callback)
-		fdp->r_callback(ACL_EVENT_XCPT, fdp->r_context);
+		fdp->r_callback(ACL_EVENT_XCPT, &ev->event,
+			NULL, fdp->r_context);
 	else if (fdp->w_callback)
-		fdp->w_callback(ACL_EVENT_XCPT, fdp->w_context);
+		fdp->w_callback(ACL_EVENT_XCPT, &ev->event,
+			NULL, fdp->w_context);
 	/*
 	else
 		acl_msg_error("%s(%d): w_callback and r_callback null"
@@ -503,7 +505,8 @@ static void handleConnect(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 			myname, __LINE__, (int) sockfd);
 	else {
 		fdp->stream->flag &= ~ACL_VSTREAM_FLAG_CONNECTING;
-		fdp->w_callback(ACL_EVENT_WRITE, fdp->w_context);
+		fdp->w_callback(ACL_EVENT_WRITE, &ev->event,
+			NULL, fdp->w_context);
 	}
 }
 
@@ -517,7 +520,7 @@ static void handleAccept(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 	else if (fdp->r_callback == NULL)
 		acl_msg_fatal("%s(%d): fdp callback null", myname, __LINE__);
 
-	fdp->r_callback(ACL_EVENT_READ, fdp->r_context);
+	fdp->r_callback(ACL_EVENT_READ, &ev->event, NULL, fdp->r_context);
 }
 
 static void handleRead(EVENT_WMSG *ev, ACL_SOCKET sockfd)
@@ -529,13 +532,15 @@ static void handleRead(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 		acl_msg_error("%s(%d): fdp null for sockfd(%d)",
 			myname, __LINE__, (int) sockfd);
 	else if ((fdp->stream->type & ACL_VSTREAM_TYPE_LISTEN))
-		fdp->r_callback(ACL_EVENT_READ, fdp->r_context);
+		fdp->r_callback(ACL_EVENT_READ, &ev->event, NULL,
+			fdp->r_context);
 	else if (fdp->r_callback != NULL) {
 		/* 该描述字可读则设置 ACL_VSTREAM 的系统可读标志从而触发
 		 * ACL_VSTREAM 流在读时调用系统的 read 函数
 		 */
 		fdp->stream->sys_read_ready = 1;
-		fdp->r_callback(ACL_EVENT_READ, fdp->r_context);
+		fdp->r_callback(ACL_EVENT_READ, &ev->event,
+			NULL, fdp->r_context);
 	}
 	/* else
 		acl_msg_error("%s(%d): fdp->r_callback null for sockfd(%d)",
@@ -554,7 +559,8 @@ static void handleWrite(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 	else if ((fdp->stream->flag & ACL_VSTREAM_FLAG_CONNECTING))
 		handleConnect(ev, sockfd);
 	else if (fdp->w_callback != NULL)
-		fdp->w_callback(ACL_EVENT_WRITE, fdp->w_context);
+		fdp->w_callback(ACL_EVENT_WRITE, &ev->event,
+			NULL, fdp->w_context);
 	/*
 	else
 		acl_msg_error("%s(%d): fdp->w_callback null for sockfd(%d)",
@@ -690,8 +696,8 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 	EVENT_WMSG *ev = get_hwnd_event(hwnd);
 	ACL_EVENT *eventp;
 	ACL_EVENT_TIMER *timer;
-	ACL_EVENT_NOTIFY_FN worker_fn;
-	void    *worker_arg;
+	ACL_EVENT_NOTIFY_TIME timer_fn;
+	void    *timer_arg;
 
 	if (ev == NULL)
 		acl_msg_fatal("%s(%d): ev null", myname, __LINE__);
@@ -706,8 +712,8 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
 		if (timer->when > eventp->event_present)
 			break;
-		worker_fn  = timer->callback;
-		worker_arg = timer->context;
+		timer_fn  = timer->callback;
+		timer_arg = timer->context;
 
 		/* 如果定时器的时间间隔 > 0 且允许定时器被循环调用，则再重设定时器 */
 		if (timer->delay > 0 && timer->keep) {
@@ -722,7 +728,7 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 					myname, __LINE__, timer->nrefer);
 			acl_myfree(timer);
 		}
-		worker_fn(ACL_EVENT_TIME, worker_arg);
+		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
 	}
 
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) == 0) {

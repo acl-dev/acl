@@ -42,11 +42,11 @@ static void master_unthrottle(ACL_MASTER_SERV *serv);
 
 /* master_unthrottle_wrapper - in case (char *) != (struct *) */
 
-static void master_unthrottle_wrapper(int unused_event, void *ptr)
+static void master_unthrottle_wrapper(int type acl_unused,
+	ACL_EVENT *event acl_unused, void *ptr)
 {
 	ACL_MASTER_SERV *serv = (ACL_MASTER_SERV *) ptr;
 
-	unused_event = unused_event;
 	/*
 	 * This routine runs after expiry of the timer set
 	 * in master_throttle(), which gets called when it
@@ -206,6 +206,7 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 				acl_msg_fatal("%s: dup2 listen_fd %d: %s",
 					myname, serv->listen_fds[n], strerror(errno));
 			(void) close(serv->listen_fds[n]);
+			acl_msg_info(">>>fd is: %d<<", ACL_MASTER_LISTEN_FD + n);
 			acl_vstream_free(serv->listen_streams[n]);
 		}
 

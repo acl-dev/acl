@@ -67,7 +67,8 @@
 } while (0)
 
 /* 统一的读事件处理回调接口 */
-static void main_read_callback(int event_type, void *context)
+static void main_read_callback(int event_type, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream acl_unused, void *context)
 {
 	ACL_ASTREAM *astream = (ACL_ASTREAM*) context;
 
@@ -742,7 +743,8 @@ int acl_aio_can_read(ACL_ASTREAM *astream)
 	return (acl_vstream_can_read(astream->stream));
 }
 
-static void can_read_callback(int event_type, void *context)
+static void can_read_callback(int event_type, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream acl_unused, void *context)
 {
 	ACL_ASTREAM *astream = (ACL_ASTREAM*) context;
 
@@ -796,7 +798,8 @@ void acl_aio_enable_read(ACL_ASTREAM *astream,
 		READ_IOCP_CLOSE(astream);
 		astream->flag |= ACL_AIO_FLAG_DEAD;
 	} else if (ret > 0 && astream->read_nested < astream->read_nested_limit) {
-		can_read_callback(ACL_EVENT_READ, astream);
+		can_read_callback(ACL_EVENT_READ, astream->aio->event,
+			astream->stream , astream);
 	} else {
 		READ_SAFE_ENABLE(astream, can_read_callback);
 	}

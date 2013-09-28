@@ -22,7 +22,7 @@
 /* Create a semaphore */
 ACL_SEM *acl_sem_create2(const char *pathname, unsigned int initial_value)
 {
-	char  myname[] = "acl_sem_create2";
+	const char *myname = "acl_sem_create2";
 	ACL_SEM *sem;
 	char  buf[256];
 
@@ -65,7 +65,7 @@ void acl_sem_destroy(ACL_SEM *sem)
 
 int acl_sem_wait_timeout(ACL_SEM *sem, unsigned int timeout)
 {
-	char  myname[] = "acl_sem_wait_timeout";
+	const char *myname = "acl_sem_wait_timeout";
 	int   retval;
 	DWORD dwMilliseconds;
 	char  buf[256];
@@ -112,7 +112,7 @@ int acl_sem_wait(ACL_SEM *sem)
 /* Returns the current count of the semaphore */
 unsigned int acl_sem_value(ACL_SEM *sem)
 {
-	char  myname[] = "acl_sem_value";
+	const char *myname = "acl_sem_value";
 
 	if (sem == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
@@ -124,7 +124,7 @@ unsigned int acl_sem_value(ACL_SEM *sem)
 
 int acl_sem_post(ACL_SEM *sem)
 {
-	char  myname[] = "acl_sem_post";
+	const char *myname = "acl_sem_post";
 
 	if (sem == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",

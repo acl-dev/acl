@@ -245,6 +245,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\master\master_proc.cpp" />
     <ClCompile Include="src\master\master_threads.cpp" />
     <ClCompile Include="src\master\master_trigger.cpp" />
+    <ClCompile Include="src\master\master_udp.cpp" />
     <ClCompile Include="src\memcache\memcache.cpp" />
     <ClCompile Include="src\memcache\memcache_pool.cpp" />
     <ClCompile Include="src\mime\internal\header_opts.cpp" />
@@ -345,6 +346,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\http\http_mime.hpp" />
     <ClInclude Include="include\acl_cpp\http\http_pipe.hpp" />
     <ClInclude Include="include\acl_cpp\http\http_request.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_request_manager.hpp" />
     <ClInclude Include="include\acl_cpp\http\http_request_pool.hpp" />
     <ClInclude Include="include\acl_cpp\http\http_response.hpp" />
     <ClInclude Include="include\acl_cpp\http\http_service.hpp" />
@@ -361,7 +363,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\master\master_proc.hpp" />
     <ClInclude Include="include\acl_cpp\master\master_threads.hpp" />
     <ClInclude Include="include\acl_cpp\master\master_trigger.hpp" />
+    <ClInclude Include="include\acl_cpp\master\master_udp.hpp" />
     <ClInclude Include="include\acl_cpp\memcache\memcache.hpp" />
+    <ClInclude Include="include\acl_cpp\memcache\memcache_manager.hpp" />
     <ClInclude Include="include\acl_cpp\memcache\memcache_pool.hpp" />
     <ClInclude Include="include\acl_cpp\mime\mime.hpp" />
     <ClInclude Include="include\acl_cpp\mime\mime_attach.hpp" />

@@ -1,3 +1,12 @@
+
+242) 2013.9.27
+242.1) lib_acl 库中 ACL_EVENT_NOTIFY_RDWR/ACL_EVENT_NOTIFY_TIME 函数接口定义 
+的修改，与之相关的模块(icmp)进行了修改
+
+241) 2013.9.22
+241.1) 因为 lib_acl 基础库中的 ACL_VSTREAM 读写回调函数接口变更，调整了与之相关的
+部分内部接口，主要影响到了 icmp 模块中 icmp_stream.c 中的内部接口
+
 240) 2013.7.30
 240.1) warning: http_hdr_req.c::http_hdr_req_new() 内部使用了线程局部变量，
 当用 valgrind 检查时会报内存泄露警告，通过在主线程中将其释放去掉了此警告

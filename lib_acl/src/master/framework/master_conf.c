@@ -58,9 +58,8 @@ void    acl_master_refresh(void)
 			*servp = serv->next;
 			acl_master_stop_service(serv);
 			acl_free_master_ent(serv);
-		} else {
+		} else
 			servp = &serv->next;
-		}
 	}
 }
 
@@ -78,7 +77,8 @@ void    acl_master_config(void)
 #define STR_SAME	!strcmp
 #define SWAP(type,a,b)	{ type temp = a; a = b; b = temp; }
 
-	pathname = acl_concatenate(acl_var_master_conf_dir, "/", "main.cf", (char *) 0);
+	pathname = acl_concatenate(acl_var_master_conf_dir,
+			"/", "main.cf", (char *) 0);
 	acl_master_params_load(pathname);
 	acl_myfree(pathname);
 
@@ -94,9 +94,13 @@ void    acl_master_config(void)
 	while ((entry = acl_get_master_ent()) != 0) {
 		if (acl_msg_verbose)
 			acl_print_master_ent(entry);
-		for (serv = acl_var_master_head; serv != 0; serv = serv->next)
-			if (STR_SAME(serv->name, entry->name) && serv->type == entry->type)
+		for (serv = acl_var_master_head; serv != 0; serv = serv->next) {
+			if (STR_SAME(serv->name, entry->name)
+				&& serv->type == entry->type)
+			{
 				break;
+			}
+		}
 
 		service_null = 0;
 		/*

@@ -1106,6 +1106,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 						RelativePath=".\src\master\template\acl_trigger_server.c">
 					</File>
 					<File
+						RelativePath=".\src\master\template\acl_udp_server.c">
+					</File>
+					<File
 						RelativePath=".\src\master\template\template.h">
 					</File>
 				</Filter>
@@ -1675,9 +1678,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\ioctl\acl_ioctl.h">
 				</File>
 				<File
-					RelativePath=".\include\ioctl\acl_myioctl.h">
-				</File>
-				<File
 					RelativePath=".\include\ioctl\acl_spool.h">
 				</File>
 			</Filter>
@@ -1779,6 +1779,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\master\acl_trigger_params.h">
+				</File>
+				<File
+					RelativePath=".\include\master\acl_udp_params.h">
 				</File>
 			</Filter>
 			<Filter

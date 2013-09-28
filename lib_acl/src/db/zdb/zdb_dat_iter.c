@@ -1,7 +1,9 @@
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
-#include "lib_acl.h"
+#include "init/acl_init.h"
+#include "stdlib/acl_msg.h"
+#include "stdlib/acl_mymalloc.h"
 #include "db/zdb.h"
 
 #endif

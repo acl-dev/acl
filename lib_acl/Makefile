@@ -80,7 +80,7 @@ endif
 #	LIB_NAME = lib_acl.a
 #endif
 
-CFLAGS += -DHAS_MYSQL
+#CFLAGS += -DHAS_MYSQL
 
 #Find system type.
 ifneq ($(SYSPATH),)
@@ -232,7 +232,8 @@ static: depends $(OBJS_DST)
 	@$(RANLIB) $(LIB_PATH_DST)/lib_acl.a
 	@echo 'build $(LIB_PATH_DST)/lib_acl.a ok!'
 
-shared_ldflags = -lmysqlclient -lrt -lpthread -ldl
+#shared_ldflags = -lmysqlclient -lrt -lpthread -ldl
+shared_ldflags = -lrt -lpthread -ldl
 shared: depends $(OBJS_DST)
 	@echo ''
 	@echo 'creating $(LIB_PATH_DST)/lib_acl.so ...'

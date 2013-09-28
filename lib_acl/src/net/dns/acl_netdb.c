@@ -321,7 +321,7 @@ ACL_DNS_DB *acl_netdb_clone(const ACL_DNS_DB *h_dns_db)
 
 ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error)
 {
-	char  myname[] = "acl_gethostbyname";
+	const char *myname = "acl_gethostbyname";
 	ACL_DNS_DB *h_dns_db = NULL;
 	ACL_HOSTNAME *h_host;
 /* #ifndef	SUNOS5 */

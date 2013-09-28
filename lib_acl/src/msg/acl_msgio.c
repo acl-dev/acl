@@ -621,7 +621,7 @@ static ACL_MSGIO *accept_connection(ACL_VSTREAM *sstream, ACL_MSGIO *listener)
 	msg_list_clone(listener, mio_client);
 	mio_client->aio = listener->aio;
 
-	ctx_client = msgio_ctx_new(mio_client, stream->remote_addr);
+	ctx_client = msgio_ctx_new(mio_client, ACL_VSTREAM_PEER(stream));
 	acl_vstream_add_close_handle(stream, free_msg_ctx_onclose, ctx_client);
 	acl_vstream_add_close_handle(stream, free_mio_onclose, mio_client);
 
@@ -662,7 +662,7 @@ static int listen_callback(ACL_ASTREAM *sstream acl_unused, void *arg)
 ACL_MSGIO *acl_msgio_listen(ACL_AIO *aio, const char *addr)
 {
 	const char *myname = "acl_msgio_listen";
-	char  local_addr[] = "127.0.0.1:0";
+	const char *local = "127.0.0.1:0";
 	const char *addr_ptr;
 	MSGIO_CTX *ctx;
 	ACL_MSGIO *listener;
@@ -673,7 +673,7 @@ ACL_MSGIO *acl_msgio_listen(ACL_AIO *aio, const char *addr)
 	if (addr != NULL)
 		addr_ptr = addr;
 	else
-		addr_ptr = local_addr;
+		addr_ptr = local;
 
 	listener = msgio_new();
 	listener->type = ACL_MSGIO_TYPE_ACCEPT;
@@ -682,7 +682,11 @@ ACL_MSGIO *acl_msgio_listen(ACL_AIO *aio, const char *addr)
 		acl_msg_fatal("%s: listen(%s) error(%s)",
 			myname, addr_ptr, acl_last_serror());
 
-	ACL_SAFE_STRNCPY(listener->addr, stream->local_addr, sizeof(listener->addr));
+	if (ACL_VSTREAM_LOCAL(stream) && *ACL_VSTREAM_LOCAL(stream))
+		ACL_SAFE_STRNCPY(listener->addr, ACL_VSTREAM_LOCAL(stream),
+			sizeof(listener->addr));
+	else
+		listener->addr[0] = 0;
 
 	ctx = msgio_ctx_new(listener, listener->addr);
 

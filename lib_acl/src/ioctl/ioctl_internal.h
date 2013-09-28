@@ -2,6 +2,7 @@
 #define	__IOCTL_INTERNAL_INCLUDE_H__
 
 #include "thread/acl_pthread_pool.h"
+#include "stdlib/acl_vstream.h"
 
 /* ·þÎñÆ÷¿ò¼ÜÓÃ¾ä±ú */
 struct ACL_IOCTL {
@@ -33,13 +34,19 @@ typedef struct ACL_IOCTL_CTX {
 } ACL_IOCTL_CTX;
 
 /* in ioctl_thr.c */
-void read_notify_callback_r(int event_type, void *context);
-void write_notify_callback_r(int event_type, void *context);
-void listen_notify_callback_r(int event_type, void *context);
+void read_notify_callback_r(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context);
+void write_notify_callback_r(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context);
+void listen_notify_callback_r(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context);
 
 /* in ioctl_proc.c */
-void read_notify_callback(int event_type, void *context);
-void write_notify_callback(int event_type, void *context);
-void listen_notify_callback(int event_type, void *context);
+void read_notify_callback(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context);
+void write_notify_callback(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context);
+void listen_notify_callback(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context);
 
 #endif

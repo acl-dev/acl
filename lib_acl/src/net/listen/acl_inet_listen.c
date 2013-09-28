@@ -42,7 +42,6 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int block_mode)
 	char *buf, *host = NULL, *sport = NULL;
 	const char *ptr;
 	struct sockaddr_in sa;
-	char  tbuf[256];
 
 	/*
 	 * Translate address information to internal form.
@@ -52,7 +51,7 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int block_mode)
 	if (ptr) {
 		acl_msg_error("%s(%d): %s, %s invalid", myname, __LINE__, addr, ptr);
 		acl_myfree(buf);
-		return (ACL_SOCKET_INVALID);
+		return ACL_SOCKET_INVALID;
 	}
 
 	if (host && *host == 0)
@@ -63,14 +62,14 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int block_mode)
 	if (sport == NULL) {
 		acl_msg_error("%s(%d): no port given from addr(%s)", myname, __LINE__, addr);
 		acl_myfree(buf);
-		return (ACL_SOCKET_INVALID);
+		return ACL_SOCKET_INVALID;
 	}
 	nport = atoi(sport);
 	if (nport < 0) {
 		acl_msg_error("%s: port(%d) < 0 invalid from addr(%s)",
 			myname, nport, addr);
 		acl_myfree(buf);
-		return (ACL_SOCKET_INVALID);
+		return ACL_SOCKET_INVALID;
 	}
 
 	memset(&sa, 0, sizeof(sa));
@@ -83,37 +82,40 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int block_mode)
 	/* Create a listener socket. */
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s: socket %s", myname, acl_last_strerror(tbuf, sizeof(tbuf)));
-		return (ACL_SOCKET_INVALID);
+		acl_msg_error("%s: socket %s", myname, acl_last_serror());
+		return ACL_SOCKET_INVALID;
 	}
 
 	on = 1;
-	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char *) &on, sizeof(on)) < 0)
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
+		(char *) &on, sizeof(on)) < 0)
+	{
 		acl_msg_error("%s: setsockopt(SO_REUSEADDR): %s",
-			myname, acl_last_strerror(tbuf, sizeof(tbuf)));
+			myname, acl_last_serror());
+	}
 
 	if (bind(sock, (struct sockaddr *) &sa, sizeof(struct sockaddr)) < 0) {
-		acl_msg_error("%s: bind %s port %d: %s",
-			myname, host, nport, acl_last_strerror(tbuf, sizeof(tbuf)));
+		acl_msg_error("%s: bind %s error %s",
+			myname, addr, acl_last_serror());
 		acl_socket_close(sock);
-		return (ACL_SOCKET_INVALID);
+		return ACL_SOCKET_INVALID;
 	}
 
 	acl_non_blocking(sock, block_mode);
 
 	if (listen(sock, backlog) < 0) {
 		acl_msg_error("%s: listen error: %s, addr(%s)",
-			myname, acl_last_strerror(tbuf, sizeof(tbuf)), addr);
+			myname, acl_last_serror(), addr);
 		acl_socket_close(sock);
-		return (ACL_SOCKET_INVALID);
+		return ACL_SOCKET_INVALID;
 	}
 
-	return (sock);
+	return sock;
 }
 
 ACL_SOCKET acl_inet_accept(ACL_SOCKET listen_fd)
 {
-	return (acl_inet_accept_ex(listen_fd, NULL, 0));
+	return acl_inet_accept_ex(listen_fd, NULL, 0);
 }
 
 ACL_SOCKET acl_inet_accept_ex(ACL_SOCKET listen_fd, char *ipbuf, size_t size)

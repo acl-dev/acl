@@ -1,5 +1,6 @@
 #include "acl_stdafx.hpp"
 #include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/master/master_proc.hpp"
 
@@ -42,26 +43,73 @@ void master_proc::run_daemon(int argc, char** argv)
 #endif
 }
 
-bool master_proc::run_alone(const char* addr, const char* path /* = NULL */,
+//////////////////////////////////////////////////////////////////////////
+
+static int  __count_limit = 1;
+static int  __count = 0;
+static bool __stop = false;
+
+static void close_all_listener(std::vector<ACL_VSTREAM*>& sstreams)
+{
+	std::vector<ACL_VSTREAM*>::iterator it = sstreams.begin();
+	for (; it != sstreams.end(); ++it)
+		acl_vstream_close(*it);
+}
+
+void master_proc::listen_callback(int, ACL_EVENT*, ACL_VSTREAM *sstream, void*)
+{
+	ACL_VSTREAM* client = acl_vstream_accept(sstream, NULL, 0);
+	if (client == NULL)
+	{
+		logger_error("accept error %s", last_serror());
+		__stop = true;
+	}
+	else
+	{
+		service_main(client, NULL, NULL);
+		acl_vstream_close(client); // 因为在 service_main 里不会关闭连接
+
+		__count++;
+		if (__count_limit > 0 && __count >= __count_limit)
+			__stop = true;
+	}
+}
+
+bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 	int   count /* = 1 */)
 {
 	// 每个进程只能有一个实例在运行
 	acl_assert(has_called == false);
 	has_called = true;
 	daemon_mode_ = false;
-	acl_assert(addr && *addr);
+	__count_limit = count;
+	acl_assert(addrs && *addrs);
 
 #ifdef WIN32
 	acl_init();
 #endif
+	ACL_EVENT* eventp = acl_event_new_select(1, 0);
+	std::vector<ACL_VSTREAM*> sstreams;
+	ACL_ARGV* tokens = acl_argv_split(addrs, ";,| \t");
+	ACL_ITER iter;
 
-	ACL_VSTREAM* sstream = acl_vstream_listen(addr, 128);
-	if (sstream == NULL)
+	acl_foreach(iter, tokens)
 	{
-		logger_error("listen %s error(%s)",
-			addr, acl_last_serror());
-		return false;
+		const char* addr = (const char*) iter.data;
+		ACL_VSTREAM* sstream = acl_vstream_listen(addr, 128);
+		if (sstream == NULL)
+		{
+			logger_error("listen %s error %s",
+				addr, last_serror());
+			close_all_listener(sstreams);
+			acl_argv_free(tokens);
+			return false;
+		}
+		acl_event_enable_listen(eventp, sstream, 0,
+			listen_callback, sstream);
+		sstreams.push_back(sstream);
 	}
+	acl_argv_free(tokens);
 
 	// 初始化配置参数
 	conf_.load(path);
@@ -69,21 +117,11 @@ bool master_proc::run_alone(const char* addr, const char* path /* = NULL */,
 	service_pre_jail(NULL, NULL);
 	service_init(NULL, NULL);
 
-	int   i = 0;
-	while (true)
-	{
-		ACL_VSTREAM* client = acl_vstream_accept(sstream, NULL, 0);
-		if (client == NULL)
-			break;
+	while (!__stop)
+		acl_event_loop(eventp);
 
-		service_main(client, NULL, NULL);
-		acl_vstream_close(client); // 因为在 service_main 里不会关闭连接
-
-		if (count > 0 && ++i >= count)
-			break;
-	}
-
-	acl_vstream_close(sstream);
+	close_all_listener(sstreams);
+	acl_event_free(eventp);
 	service_exit(NULL, NULL);
 	return true;
 }

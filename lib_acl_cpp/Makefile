@@ -11,8 +11,6 @@ CFLAGS = -c -g -W -Wall -Wcast-align \
 -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS \
 -Wno-long-long \
 -fPIC \
--DHAS_MYSQL \
--DHAS_SQLITE \
 -Wformat
 #-DHAS_POLARSSL
 #-DUSE_DYNAMIC
@@ -118,7 +116,7 @@ OBJS_DEF = $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/*.cp
 VERSION = 1.1.1.2
 DATE_NOW = 20`date +%y`.`date +%m`.`date +%d`
 
-all: static shared
+all: static shared sample
 
 $(shell mkdir -p $(DEF_PATH_DST))
 ifneq ($(MAKECMDGOALS),clean)
@@ -134,15 +132,17 @@ CREATE_DEF = @(echo 'creating $@'; rm -f $@; \
 
 ###########################################################
 
+sample: static
+	@(cd samples; make)
+
 static: depends $(OBJS_DST)
 	@echo 'creating $(LIB_PATH_DST)/lib_acl_cpp.a'
 	@$(AR) $(ARFL) $(LIB_PATH_DST)/lib_acl_cpp.a $(OBJS_DST)
 	@$(RANLIB) $(LIB_PATH_DST)/lib_acl_cpp.a
 	@echo 'create $(LIB_PATH_DST)/lib_acl_cpp.a ok!'
-	@(cd samples; make)
 
 shared_ldflags = -l_protocol -l_acl \
-	-lmysqlclient -lsqlite3 -lrt -lpthread -lz -ldl
+	-lrt -lpthread -lz -ldl
 shared: depends $(OBJS_DST)
 	@echo 'creating $(LIB_PATH_DST)/lib_acl_cpp.so'
 	@if test -n "$(rpath)"; then \
@@ -221,10 +221,9 @@ $(OBJ_PATH_DST)/%.o: ./src/mime/internal/%.cpp
 $(DEF_PATH_DST)/%.inc: ./src/mime/internal/%.cpp
 	$(CREATE_DEF)
 
-samples: $(lib_acl_cpp.a)
-	@(cd samples; make)
 clean:
 	rm -f $(LIB_PATH_DST)/lib_acl_cpp.a
+	rm -f $(LIB_PATH_DST)/lib_acl_cpp.so
 	rm -f $(OBJS_DST)
 	rm -f $(OBJS_DEF)
 	@(cd samples; make clean)

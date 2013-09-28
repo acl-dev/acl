@@ -47,7 +47,7 @@ static AUT_LINE *__mkcmd_if(const ACL_CFG_LINE *line)
 
 static AUT_LINE *__mkcmd_endif(const ACL_CFG_LINE *line)
 {
-	char  myname[] = "__mkcmd_endif";
+	const char *myname = "__mkcmd_endif";
 	AUT_LINE *test_line, *test_line_peer;
 	AUT_CMD_TOKEN *if_token = NULL, *if_token_peer;
 	int   n, i;
@@ -133,7 +133,7 @@ static __MATCH_CMD __inner_cmd_tab[] = {
 
 AUT_LINE *aut_add_inner_cmd(const ACL_CFG_LINE *line)
 {
-	char  myname[] = "aut_add_inner_cmd";
+	const char *myname = "aut_add_inner_cmd";
 	AUT_LINE *test_line = NULL;
 	__MATCH_CMD *pmatch_cmd;
 	AUT_CMD_TOKEN *inner_token;

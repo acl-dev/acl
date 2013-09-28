@@ -1,7 +1,6 @@
 #ifndef	__ZDB_PRIVATE_INCLUDE_H__
 #define	__ZDB_PRIVATE_INCLUDE_H__
 
-#include "lib_acl.h"
 #include "db/zdb.h"
 
 #define	ZDB_DBG_BASE		500

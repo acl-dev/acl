@@ -1,7 +1,9 @@
 #ifndef	__ACL_APP_MAIN_INCLUDE_H__
 #define	__ACL_APP_MAIN_INCLUDE_H__
 
-#include "lib_acl.h"
+#include "stdlib/acl_define.h"
+#include "stdlib/acl_vstream.h"
+#include "acl_server_api.h"
 
 #ifdef	__cplusplus
 extern "C" {

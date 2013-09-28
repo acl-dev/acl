@@ -64,6 +64,9 @@
     <ClCompile Include="src\master\master_threads.cpp">
       <Filter>src\master</Filter>
     </ClCompile>
+    <ClCompile Include="src\master\master_udp.cpp">
+      <Filter>src\master</Filter>
+    </ClCompile>
     <ClCompile Include="src\ipc\ipc_service.cpp">
       <Filter>src\ipc</Filter>
     </ClCompile>
@@ -489,6 +492,9 @@
     <ClInclude Include="include\acl_cpp\master\master_threads.hpp">
       <Filter>include\master</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\master\master_udp.hpp">
+      <Filter>include\master</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\mime\rfc2047.hpp">
       <Filter>include\mime</Filter>
     </ClInclude>
@@ -692,6 +698,12 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\connpool\connect_client.hpp">
       <Filter>include\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\memcache\memcache_manager.hpp">
+      <Filter>include\memcache</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_request_manager.hpp">
+      <Filter>include\http</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

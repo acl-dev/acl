@@ -1,7 +1,9 @@
 #ifndef	__ZDB_INCLUDE_H__
 #define	__ZDB_INCLUDE_H__
 
-#include "lib_acl.h"
+#include "stdlib/acl_define.h"
+#include "stdlib/acl_vstring.h"
+#include "stdlib/acl_fhandle.h"
 
 typedef struct ZDB ZDB;
 typedef struct ZDB_KEY_HDR ZDB_KEY_HDR;

@@ -45,7 +45,7 @@ static void dns_stream_open(ACL_DNS *dns);
 /* ACL_VSTREAM: 从数据流读取数据的回调函数 */
 
 static int dns_read(ACL_SOCKET fd, void *buf, size_t size,
-	int timeout acl_unused, void *arg)
+	int timeout acl_unused, ACL_VSTREAM *stream acl_unused, void *arg)
 {       
 	const char *myname = "dns_read";
 	ACL_DNS *dns = (ACL_DNS*) arg;
@@ -53,7 +53,8 @@ static int dns_read(ACL_SOCKET fd, void *buf, size_t size,
 
 	dns->addr_from.addr_len = sizeof(dns->addr_from.addr);
 #ifdef ACL_UNIX
-	ret = recvfrom(fd, buf, size, 0, (struct sockaddr*) &dns->addr_from.addr,
+	ret = recvfrom(fd, buf, size, 0,
+			(struct sockaddr*) &dns->addr_from.addr,
 			(socklen_t*) &dns->addr_from.addr_len);
 #elif defined(ACL_MS_WINDOWS)
 	ret = recvfrom(fd, (char*) buf, (int) size, 0,
@@ -71,7 +72,7 @@ static int dns_read(ACL_SOCKET fd, void *buf, size_t size,
 /* ACL_VSTREAM: 向数据流写取数据的回调函数 */
 
 static int dns_write(ACL_SOCKET fd, const void *buf, size_t size,
-	int timeout acl_unused, void *arg)
+	int timeout acl_unused, ACL_VSTREAM *stream acl_unused, void *arg)
 {       
 	const char *myname = "dns_write";
 	ACL_DNS *dns = (ACL_DNS*) arg;
@@ -91,11 +92,11 @@ static int dns_write(ACL_SOCKET fd, const void *buf, size_t size,
 			myname, __LINE__, i);
 
 #ifdef ACL_UNIX 
-	ret = sendto(fd, buf, size, 0, (struct sockaddr*) &addr->addr,
-			addr->addr_len);
-#elif defined(ACL_MS_WINDOWS)
-	ret = sendto(fd, (const char*) buf, (int) size, 0,
+	ret = sendto(fd, buf, size, 0,
 			(struct sockaddr*) &addr->addr, addr->addr_len);
+#elif defined(ACL_MS_WINDOWS)
+	ret = sendto(fd, (const char*) buf, (int) size,
+			0, (struct sockaddr*) &addr->addr, addr->addr_len);
 #else
 #error  "unknown OS"
 #endif
@@ -378,7 +379,8 @@ static int dns_lookup_send(ACL_DNS *dns, ACL_DNS_REQ *handle, const char *domain
 
 /* 查询超时的回调函数 */
 
-static void dns_lookup_timeout(int event_type, void *context)
+static void dns_lookup_timeout(int event_type, ACL_EVENT *event acl_unused,
+	void *context)
 {
 	const char *myname = "dns_lookup_timeout";
 	ACL_DNS_REQ *handle = (ACL_DNS_REQ*) context;

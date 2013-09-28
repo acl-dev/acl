@@ -1,11 +1,18 @@
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
-#include "lib_acl.h"
+#include "stdlib/acl_define.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+
+#include "net/acl_sane_socket.h"
+#include "net/acl_access.h"
+#include "master/acl_aio_params.h"
+#include "master/acl_master_type.h"
+#include "master/acl_master_conf.h"
 
 #endif
 
@@ -31,26 +38,29 @@ static void *__app_pre_jail_ctx = NULL;
 static char *__default_deny_info = "You are not welcome!\r\n";
 static char *__deny_info;
 
-static void __service(ACL_SOCKET fd, char *service acl_unused, char **argv acl_unused)
+static void __service(ACL_SOCKET fd, char *service acl_unused,
+	char **argv acl_unused)
 {
-	char  myname[] = "__service";
+	const char *myname = "__service";
 	char  addr[64], *ptr, ip[64];
 
 	/* Sanity check. This service takes no command-line arguments. */
 	if (argv[0])
-		acl_msg_fatal("%s, %s(%d): unexpected command-line argument: %s, service=%s",
-			__FILE__, myname, __LINE__, argv[0], service ? service : "null");
+		acl_msg_fatal("%s, %s(%d): unexpected command-line "
+			"argument: %s, service=%s", __FILE__, myname,
+			__LINE__, argv[0], service ? service : "null");
 
 	acl_watchdog_pat();
 
 	if (isatty(fd)) {
-		acl_msg_error("%s, %s(%d): fd isatty", __FILE__, myname, __LINE__);
+		acl_msg_error("%s, %s(%d): fd isatty",
+			__FILE__, myname, __LINE__);
 		return;
 	}
 
 	if (acl_getpeername(fd, addr, sizeof(addr)) < 0) {
 		acl_msg_warn("%s, %s(%d): can't get socket's addr",
-				__FILE__, myname, __LINE__);
+			__FILE__, myname, __LINE__);
 		acl_socket_close(fd);
 		return;
 	}
@@ -62,15 +72,16 @@ static void __service(ACL_SOCKET fd, char *service acl_unused, char **argv acl_u
 	if (!acl_access_permit(ip)) {
 		acl_msg_warn("%s, %s(%d): addr(%s) be denied",
 			__FILE__, myname, __LINE__, ip);
-		acl_socket_write(fd, __deny_info, strlen(__deny_info), 0, 0);
 		acl_socket_close(fd);
 	} else if (__run_fn != NULL) {
 		ACL_VSTREAM *vstream;
 		ACL_ASTREAM *astream;
 
-		vstream = acl_vstream_fdopen(fd, O_RDWR, acl_var_aio_buf_size, 0, ACL_VSTREAM_TYPE_SOCK);
-		ACL_SAFE_STRNCPY(vstream->remote_addr, addr, sizeof(vstream->remote_addr));
-		acl_getsockname(fd, vstream->local_addr, sizeof(vstream->local_addr));
+		vstream = acl_vstream_fdopen(fd, O_RDWR, acl_var_aio_buf_size,
+			0, ACL_VSTREAM_TYPE_SOCK);
+		acl_vstream_set_peer(vstream, addr);
+		acl_getsockname(fd, addr, sizeof(addr));
+		acl_vstream_set_local(vstream, addr);
 		astream = acl_aio_open(acl_aio_server_handle(), vstream);
 		if (__run_fn(astream, __run_ctx) != 0)
 			acl_aio_iocp_close(astream);
@@ -183,7 +194,8 @@ static ACL_CONFIG_STR_TABLE null_conf_str_tab[] = {
 	{ 0, 0, 0 },
 };
 
-void acl_aio_app_main(int argc, char *argv[], ACL_AIO_RUN_FN run_fn, void *run_ctx, int name, ...)
+void acl_aio_app_main(int argc, char *argv[], ACL_AIO_RUN_FN run_fn,
+	void *run_ctx, int name, ...)
 {
 	const char *myname = "acl_aio_app_main";
 	va_list ap;
@@ -248,18 +260,19 @@ void acl_aio_app_main(int argc, char *argv[], ACL_AIO_RUN_FN run_fn, void *run_c
 	va_end(ap);
 
 	acl_aio_server_main(argc, argv, __service,
-				ACL_MASTER_SERVER_BOOL_TABLE, bool_tab,
-				ACL_MASTER_SERVER_INT_TABLE, int_tab,
-				ACL_MASTER_SERVER_INT64_TABLE, int64_tab,
-				ACL_MASTER_SERVER_STR_TABLE, str_tab,
-				ACL_MASTER_SERVER_PRE_INIT, __pre_jail_init,
-				ACL_MASTER_SERVER_PRE_ACCEPT, __pre_accept,
-				ACL_MASTER_SERVER_POST_INIT, __post_jail_init,
-				ACL_MASTER_SERVER_EXIT, __app_on_exit,
-				0);
+			ACL_MASTER_SERVER_BOOL_TABLE, bool_tab,
+			ACL_MASTER_SERVER_INT_TABLE, int_tab,
+			ACL_MASTER_SERVER_INT64_TABLE, int64_tab,
+			ACL_MASTER_SERVER_STR_TABLE, str_tab,
+			ACL_MASTER_SERVER_PRE_INIT, __pre_jail_init,
+			ACL_MASTER_SERVER_PRE_ACCEPT, __pre_accept,
+			ACL_MASTER_SERVER_POST_INIT, __post_jail_init,
+			ACL_MASTER_SERVER_EXIT, __app_on_exit,
+			0);
 }
 
-void acl_aio_app2_main(int argc, char *argv[], ACL_AIO_RUN2_FN run2_fn, void *run_ctx, int name, ...)
+void acl_aio_app2_main(int argc, char *argv[], ACL_AIO_RUN2_FN run2_fn,
+	void *run_ctx, int name, ...)
 {
 	const char *myname = "acl_aio_app2_main";
 	va_list ap;
@@ -330,14 +343,14 @@ void acl_aio_app2_main(int argc, char *argv[], ACL_AIO_RUN2_FN run2_fn, void *ru
 	va_end(ap);
 
 	acl_aio_server_main(argc, argv, __service,
-				ACL_MASTER_SERVER_BOOL_TABLE, bool_tab,
-				ACL_MASTER_SERVER_INT_TABLE, int_tab,
-				ACL_MASTER_SERVER_INT64_TABLE, int64_tab,
-				ACL_MASTER_SERVER_STR_TABLE, str_tab,
-				ACL_MASTER_SERVER_PRE_INIT, __pre_jail_init,
-				ACL_MASTER_SERVER_PRE_ACCEPT, __pre_accept,
-				ACL_MASTER_SERVER_POST_INIT, __post_jail_init,
-				ACL_MASTER_SERVER_EXIT, __app_on_exit,
-				0);
+			ACL_MASTER_SERVER_BOOL_TABLE, bool_tab,
+			ACL_MASTER_SERVER_INT_TABLE, int_tab,
+			ACL_MASTER_SERVER_INT64_TABLE, int64_tab,
+			ACL_MASTER_SERVER_STR_TABLE, str_tab,
+			ACL_MASTER_SERVER_PRE_INIT, __pre_jail_init,
+			ACL_MASTER_SERVER_PRE_ACCEPT, __pre_accept,
+			ACL_MASTER_SERVER_POST_INIT, __post_jail_init,
+			ACL_MASTER_SERVER_EXIT, __app_on_exit,
+			0);
 }
 #endif

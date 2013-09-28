@@ -55,14 +55,13 @@ int get_addr_from_file(const char *filepath, char *buf, size_t size)
 {
 	const char *myname = "get_addr_from_file";
 	ACL_VSTREAM *fp;
-	char  ebuf[256];
 	int   n;
 
 	fp = acl_vstream_fopen(filepath, O_RDONLY, 0600, 1024);
 	if (fp == NULL) {
 		acl_msg_error("%s(%d): fopen file(%s) error(%s)",
-			myname, __LINE__, filepath, acl_last_strerror(ebuf, sizeof(ebuf)));
-		return (-1);
+			myname, __LINE__, filepath, acl_last_serror());
+		return -1;
 	}
 
 	n = acl_vstream_gets_nonl(fp, buf, size);
@@ -70,15 +69,15 @@ int get_addr_from_file(const char *filepath, char *buf, size_t size)
 
 	if (n == ACL_VSTREAM_EOF)
 		acl_msg_error("%s(%d): gets from file(%s) error(%s)",
-			myname, __LINE__, filepath, acl_last_strerror(ebuf, sizeof(ebuf)));
+			myname, __LINE__, filepath, acl_last_serror());
 
-	return (0);
+	return 0;
 }
 
 ACL_VSTREAM *local_listen()
 {
 	const char *myname = "local_listen";
-	char  lock_file[MAX_PATH], ebuf[256];
+	char  lock_file[MAX_PATH];
 	ACL_VSTREAM *sstream, *fp;
 	ACL_FILE_HANDLE handle;
 
@@ -87,40 +86,49 @@ ACL_VSTREAM *local_listen()
 	fp = acl_vstream_fopen(lock_file, O_RDWR | O_CREAT, 0600, 1024);
 	if (fp == NULL)
 		acl_msg_fatal("%s(%d): open file(%s) error(%s)",
-			myname, __LINE__, lock_file, acl_last_strerror(ebuf, sizeof(ebuf)));
+			myname, __LINE__, lock_file, acl_last_serror());
 
 	handle = ACL_VSTREAM_FILE(fp);
-	if (acl_myflock(handle, 0, ACL_MYFLOCK_OP_EXCLUSIVE | ACL_MYFLOCK_OP_NOWAIT) == -1) {
+	if (acl_myflock(handle, 0, ACL_MYFLOCK_OP_EXCLUSIVE
+		| ACL_MYFLOCK_OP_NOWAIT) == -1)
+	{
 		acl_msg_error("%s(%d): lock file(%s) error(%s)",
-			myname, __LINE__, lock_file, acl_last_strerror(ebuf, sizeof(ebuf)));
-		return (NULL);
+			myname, __LINE__, lock_file, acl_last_serror());
+		return NULL;
 	}
 
-	sstream = acl_vstream_listen_ex("127.0.0.1:0", 128, ACL_BLOCKING, 1024, 0);
+	sstream = acl_vstream_listen_ex("127.0.0.1:0", 128,
+			ACL_BLOCKING, 1024, 0);
 	if (sstream == NULL)
 		acl_msg_fatal("%s(%d): listen error(%s)",
-			myname, __LINE__, acl_last_strerror(ebuf, sizeof(ebuf)));
+			myname, __LINE__, acl_last_serror());
 
 	if (acl_file_ftruncate(fp, 0) < 0)
 		acl_msg_fatal("%s(%d): truncate file(%s) error(%s)",
-			myname, __LINE__, lock_file, acl_last_strerror(ebuf, sizeof(ebuf)));
+			myname, __LINE__, lock_file, acl_last_serror());
 	if (acl_vstream_fseek(fp, 0, SEEK_SET) < 0)
 		acl_msg_fatal("%s(%d): fseek file(%s) error(%s)",
-			myname, __LINE__, lock_file, acl_last_strerror(ebuf, sizeof(ebuf)));
+			myname, __LINE__, lock_file, acl_last_serror());
 
-	if (acl_vstream_fprintf(fp, "%s\r\n", sstream->local_addr) == ACL_VSTREAM_EOF)
+	if (acl_vstream_fprintf(fp, "%s\r\n", ACL_VSTREAM_LOCAL(sstream))
+		== ACL_VSTREAM_EOF)
+	{
 		acl_msg_fatal("%s(%d): fprintf to file(%s) error(%s)",
-			myname, __LINE__, lock_file, acl_last_strerror(ebuf, sizeof(ebuf)));
+			myname, __LINE__, lock_file, acl_last_serror());
+	}
 
 	/* XXX: 只能采用先解排它锁，再加共享锁，微软比较弱!!! */
 
 	if (acl_myflock(handle, 0, ACL_MYFLOCK_OP_NONE) == -1)
 		acl_msg_fatal("%s(%d): unlock file(%s) error(%s)",
-			myname, __LINE__, lock_file, acl_last_strerror(ebuf, sizeof(ebuf)));
-	if (acl_myflock(handle, 0, ACL_MYFLOCK_OP_SHARED | ACL_MYFLOCK_OP_NOWAIT) == -1)
+			myname, __LINE__, lock_file, acl_last_serror());
+	if (acl_myflock(handle, 0, ACL_MYFLOCK_OP_SHARED
+		| ACL_MYFLOCK_OP_NOWAIT) == -1)
+	{
 		acl_msg_fatal("%s(%d): lock file(%s) error(%s)",
-			myname, __LINE__, lock_file, acl_last_strerror(ebuf, sizeof(ebuf)));
-	return (sstream);
+			myname, __LINE__, lock_file, acl_last_serror());
+	}
+	return sstream;
 }
 
 #endif /* ACL_MS_WINDOWS */

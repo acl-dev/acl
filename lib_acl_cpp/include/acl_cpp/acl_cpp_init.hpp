@@ -11,7 +11,15 @@ namespace acl
 	ACL_CPP_API void acl_cpp_init(void);
 
 #ifdef WIN32
+	/**
+	 * win32 下打开 DOS 窗口
+	 */
 	ACL_CPP_API void open_dos(void);
+
+	/**
+	 * win32 下关闭 DOS 窗口
+	 */
+	ACL_CPP_API void close_dos(void);
 #endif
 
 }

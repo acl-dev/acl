@@ -105,7 +105,7 @@ static ACL_VSTREAM **__listen_streams = NULL;
 static void (*multi_server_service) (ACL_VSTREAM *, char *, char **);
 static char *multi_server_name;
 static char **multi_server_argv;
-static void (*multi_server_accept) (int, void *);
+static void (*multi_server_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
 static void (*multi_server_onexit) (char *, char **);
 static void (*multi_server_pre_accept) (char *, char **);
 static ACL_VSTREAM *multi_server_lock;
@@ -116,9 +116,6 @@ static int (*multi_server_on_accept)(ACL_VSTREAM *);
 
 /* add by zsx for rw timeout, 2005.9.25*/
 static void (*multi_server_rw_timer) (ACL_VSTREAM *);
-
-/* forward declare */
-static void multi_server_timeout(int event, void *context);
 
 ACL_EVENT *acl_multi_server_event()
 {
@@ -151,7 +148,7 @@ void acl_multi_server_cancel_rw_timer(ACL_VSTREAM *stream)
 			__FILE__, __LINE__, myname);
 }
 
-static void disable_listen(void)
+static void disable_listen(ACL_EVENT *event)
 {
 	int   i;
 
@@ -159,7 +156,7 @@ static void disable_listen(void)
 		return;
 
 	for (i = 0; __listen_streams[i] != NULL; i++) {
-		acl_event_disable_readwrite(__eventp, __listen_streams[i]);
+		acl_event_disable_readwrite(event, __listen_streams[i]);
 		acl_vstream_close(__listen_streams[i]);
 		__listen_streams[i] = NULL;
 	}
@@ -176,9 +173,28 @@ static void multi_server_exit(void)
 	exit(0);
 }
 
+/* multi_server_timeout - idle time exceeded */
+
+static void multi_server_timeout(int type acl_unused, ACL_EVENT *event,
+	void *context acl_unused)
+{
+	if (client_count > 0) {
+		/* set idle timeout to 1 second */
+		acl_var_multi_idle_limit = 1;
+		acl_event_request_timer(event, multi_server_timeout, NULL,
+			(acl_int64) acl_var_multi_idle_limit * 1000000, 0);
+		return;
+	}
+
+	if (acl_msg_verbose)
+		acl_msg_info("idle timeout -- exiting");
+	multi_server_exit();
+}
+
 /* multi_server_abort - terminate after abnormal master exit */
 
-static void multi_server_abort(int event acl_unused, void *context acl_unused)
+static void multi_server_abort(int type acl_unused, ACL_EVENT *event,
+	ACL_VSTREAM *stream acl_unused, void *context acl_unused)
 {
 	if (!listen_disabled)
 		listen_disabled = 1;
@@ -186,30 +202,13 @@ static void multi_server_abort(int event acl_unused, void *context acl_unused)
 	if (client_count > 0) {
 		/* set idle timeout to 1 second */
 		acl_var_multi_idle_limit = 1;
-		acl_event_request_timer(__eventp, multi_server_timeout, NULL,
+		acl_event_request_timer(event, multi_server_timeout, NULL,
 			(acl_int64) acl_var_multi_idle_limit * 1000000, 0);
 		return;
 	}
 
 	if (acl_msg_verbose)
 		acl_msg_info("master disconnect -- exiting");
-	multi_server_exit();
-}
-
-/* multi_server_timeout - idle time exceeded */
-
-static void multi_server_timeout(int event acl_unused, void *context acl_unused)
-{
-	if (client_count > 0) {
-		/* set idle timeout to 1 second */
-		acl_var_multi_idle_limit = 1;
-		acl_event_request_timer(__eventp, multi_server_timeout, NULL,
-			(acl_int64) acl_var_multi_idle_limit * 1000000, 0);
-		return;
-	}
-
-	if (acl_msg_verbose)
-		acl_msg_info("idle timeout -- exiting");
 	multi_server_exit();
 }
 
@@ -259,10 +258,10 @@ void    acl_multi_server_disconnect(ACL_VSTREAM *stream)
 
 /* multi_server_execute - in case (char *) != (struct *) */
 
-static void multi_server_execute(int event, void *context)
+static void multi_server_execute(int type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context acl_unused)
 {
 	const char *myname = "multi_server_execute";
-	ACL_VSTREAM *stream = (ACL_VSTREAM *) context;
 
 	if (multi_server_lock != 0
 	    && acl_myflock(ACL_VSTREAM_FILE(multi_server_lock),
@@ -279,32 +278,33 @@ static void multi_server_execute(int event, void *context)
 		if (acl_master_notify(acl_var_multi_pid,
 			multi_server_generation, ACL_MASTER_STAT_TAKEN) < 0)
 		{
-			multi_server_abort(ACL_EVENT_NULL_TYPE,
-				ACL_EVENT_NULL_CONTEXT);
+			multi_server_abort(ACL_EVENT_NULL_TYPE, event,
+				stream, ACL_EVENT_NULL_CONTEXT);
 		}
 		multi_server_service(stream, multi_server_name,
 			multi_server_argv);
 		if (acl_master_notify(acl_var_multi_pid,
 			multi_server_generation, ACL_MASTER_STAT_AVAIL) < 0)
 		{
-			multi_server_abort(ACL_EVENT_NULL_TYPE,
-				ACL_EVENT_NULL_CONTEXT);
+			multi_server_abort(ACL_EVENT_NULL_TYPE, event,
+				stream, ACL_EVENT_NULL_CONTEXT);
 		}
 	} else {
 		/* add by zsx for rw timeout, 2005.9.25*/
-		if (event == ACL_EVENT_RW_TIMEOUT && multi_server_rw_timer)
+		if (type == ACL_EVENT_RW_TIMEOUT && multi_server_rw_timer)
 			multi_server_rw_timer(stream);
 		else
 			acl_multi_server_disconnect(stream);
 	}
 	if (client_count == 0 && acl_var_multi_idle_limit > 0)
-		acl_event_request_timer(__eventp, multi_server_timeout, NULL,
+		acl_event_request_timer(event, multi_server_timeout, NULL,
 			(acl_int64) acl_var_multi_idle_limit * 1000000, 0);
 }
 
 /* multi_server_enable_read - enable read events */
 
-static void __multi_server_enable_read(int event acl_unused, void *context)
+static void __multi_server_enable_read(int type acl_unused, ACL_EVENT *event,
+	void *context)
 {
 	ACL_VSTREAM *stream = (ACL_VSTREAM *) context;
 	int   ret;
@@ -319,7 +319,7 @@ static void __multi_server_enable_read(int event acl_unused, void *context)
 
 	use_count++;
 
-	acl_event_enable_read(__eventp, stream, acl_var_multi_rw_timeout,
+	acl_event_enable_read(event, stream, acl_var_multi_rw_timeout,
 		multi_server_execute, (void *) stream);
 }
 
@@ -332,15 +332,15 @@ void acl_multi_server_enable_read(ACL_VSTREAM *stream)
 			__FILE__, __LINE__, myname);
 	} else {
 		client_count++;
-		acl_event_enable_read(__eventp,
-			stream, acl_var_multi_rw_timeout,
-			multi_server_execute, (void *) stream);
+		acl_event_enable_read(__eventp, stream,
+			acl_var_multi_rw_timeout, multi_server_execute,
+			(void *) stream);
 	}
 }
 
 /* multi_server_wakeup - wake up application */
 
-static void multi_server_wakeup(int fd)
+static void multi_server_wakeup(ACL_EVENT *event, int fd)
 {
 	ACL_VSTREAM *stream;
 
@@ -354,20 +354,20 @@ static void multi_server_wakeup(int fd)
 		acl_var_multi_rw_timeout, ACL_VSTREAM_TYPE_SOCK);
 
 	if (multi_server_in_flow_delay && acl_master_flow_get(1) < 0)
-		acl_event_request_timer(__eventp,
-			__multi_server_enable_read, (void *) stream,
-			(acl_int64) acl_var_multi_in_flow_delay* 1000000, 0);
+		acl_event_request_timer(event, __multi_server_enable_read,
+			(void *) stream, (acl_int64)
+			acl_var_multi_in_flow_delay * 1000000, 0);
 	else
-		__multi_server_enable_read(0, (void *) stream);
+		__multi_server_enable_read(0, event, (void *) stream);
 }
 
 #ifdef MASTER_XPORT_NAME_PASS
 
 /* multi_server_accept_pass - accept descriptor */
 
-static void multi_server_accept_pass(int event acl_unused, void *context)
+static void multi_server_accept_pass(int type acl_unused, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context)
 {
-	ACL_VSTREAM *stream = (ACL_VSTREAM *) context;
 	int     listen_fd = acl_vstream_fileno(stream), time_left = -1, fd;
 
 	/*
@@ -394,19 +394,19 @@ static void multi_server_accept_pass(int event acl_unused, void *context)
 		if (errno != EAGAIN)
 			acl_msg_fatal("accept connection: %s", strerror(errno));
 		if (time_left >= 0)
-			acl_event_request_timer(__eventp, multi_server_timeout,
+			acl_event_request_timer(event, multi_server_timeout,
 				NULL, (acl_int64) time_left * 1000000, 0);
 	} else
-		multi_server_wakeup(fd);
+		multi_server_wakeup(event, fd);
 }
 
 #endif
 
 /* multi_server_accept_sock - accept client connection request */
 
-static void multi_server_accept_sock(int event acl_unused, void *context)
+static void multi_server_accept_sock(int type acl_unused, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context acl_unused)
 {
-	ACL_VSTREAM *stream = (ACL_VSTREAM *) context;
 	int listen_fd = ACL_VSTREAM_SOCK(stream), time_left = -1, fd, sock_type;
 
 	/*
@@ -417,7 +417,7 @@ static void multi_server_accept_sock(int event acl_unused, void *context)
 	 * minimize confusion.
 	 */
 	if (client_count == 0 && acl_var_multi_idle_limit > 0)
-		time_left = (int) ((acl_event_cancel_timer(__eventp,
+		time_left = (int) ((acl_event_cancel_timer(event,
 			multi_server_timeout, NULL) + 9999999) / 1000000);
 
 	if (multi_server_pre_accept)
@@ -433,13 +433,13 @@ static void multi_server_accept_sock(int event acl_unused, void *context)
 		if (errno != EAGAIN)
 			acl_msg_fatal("accept connection: %s", strerror(errno));
 		if (time_left >= 0)
-			acl_event_request_timer(__eventp, multi_server_timeout,
+			acl_event_request_timer(event, multi_server_timeout,
 				NULL, (acl_int64) time_left * 1000000, 0);
 	} else {
 		/* ±‹√‚∑¢ÀÕ—”≥Ÿœ÷œÛ */
 		if (sock_type == AF_INET)
 			acl_tcp_set_nodelay(fd);
-		multi_server_wakeup(fd);
+		multi_server_wakeup(event, fd);
 	}
 }
 
@@ -842,7 +842,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 		acl_event_loop(__eventp);
 		if (listen_disabled == 1) {
 			listen_disabled = 2;
-			disable_listen();
+			disable_listen(__eventp);
 		}
 	}
 	multi_server_exit();

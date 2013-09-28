@@ -47,7 +47,7 @@ static int _cfg_file_load(ACL_FILE_HANDLE filefd, char *buf, int bsize)
 	len = 0;
 	bsize--;  /* make one byte room for '\0' */
 	while (1) {
-		n = acl_file_read(filefd, ptr, bsize, 0, NULL);
+		n = acl_file_read(filefd, ptr, bsize, 0, NULL, NULL);
 		if (n < 0)  /* read error */
 			return (-1);
 		else if (n == 0)  /* read over */
@@ -520,7 +520,7 @@ static int _cfg_line_dump(ACL_FILE_HANDLE filefd, const ACL_CFG_LINE *cfg_line, 
 		}
 		ptr = ptr + strlen(ptr);
 		strcat(ptr, "\n\0");
-		i = acl_file_write(filefd, pbuf, strlen(pbuf), 0, NULL);
+		i = acl_file_write(filefd, pbuf, strlen(pbuf), 0, NULL, NULL);
 		if (i <= 0) {
 			printf("%s: can't write pbuf, error=%s\n",
 				myname, acl_last_strerror(tbuf, sizeof(tbuf)));
@@ -533,7 +533,7 @@ static int _cfg_line_dump(ACL_FILE_HANDLE filefd, const ACL_CFG_LINE *cfg_line, 
 		if (pbuf == NULL)
 			return (-1);
 		sprintf(pbuf, "%s\n", cfg_line->pdata);
-		i = acl_file_write(filefd, pbuf, strlen(pbuf), 0, NULL);
+		i = acl_file_write(filefd, pbuf, strlen(pbuf), 0, NULL, NULL);
 		if (i <= 0)
 			return (-1);
 	}

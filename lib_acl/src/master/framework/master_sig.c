@@ -128,12 +128,10 @@ static void master_sigchld(int unused_sig)
 
 /* master_sig_event - called upon return from select() */
 
-static void master_sig_event(int unused_event, void *unused_context)
+static void master_sig_event(int type acl_unused, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream acl_unused, void *context acl_unused)
 {
     char    c[1];
-
-    unused_event = unused_event;
-    unused_context = unused_context;
 
     while (read(ACL_SIG_PIPE_READ_FD, c, 1) > 0)
 	 /* void */ ;

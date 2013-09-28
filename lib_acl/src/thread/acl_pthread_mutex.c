@@ -20,7 +20,7 @@
 
 int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex, const acl_pthread_mutexattr_t *mattr)
 {
-	char  myname[] = "acl_pthread_mutex_init";
+	const char *myname = "acl_pthread_mutex_init";
 	char  buf[256];
 
 	if (mutex == NULL) {
@@ -45,7 +45,7 @@ int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex, const acl_pthread_mutexat
 
 acl_pthread_mutex_t *acl_pthread_mutex_create(void)
 {
-	char  myname[] = "acl_pthread_mutex_create";
+	const char *myname = "acl_pthread_mutex_create";
 	acl_pthread_mutex_t *mutex;
 	char  buf[256];
 
@@ -88,7 +88,7 @@ int acl_pthread_mutex_destroy(acl_pthread_mutex_t *mutex)
 
 int acl_pthread_mutex_lock(acl_pthread_mutex_t *mutex)
 {
-	char  myname[] = "acl_pthread_mutex_lock";
+	const char *myname = "acl_pthread_mutex_lock";
 	char  buf[256];
 
 	if (mutex == NULL) {
@@ -109,7 +109,7 @@ int acl_pthread_mutex_lock(acl_pthread_mutex_t *mutex)
 
 int acl_pthread_mutex_unlock(acl_pthread_mutex_t *mutex)
 {
-	char  myname[] = "acl_pthread_mutex_unlock";
+	const char *myname = "acl_pthread_mutex_unlock";
 	char  buf[256];
 
 	if (mutex == NULL) {

@@ -270,7 +270,7 @@ static VOID CALLBACK CloseTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dw
 
 # elif defined(ACL_USE_EVENT_TIMER)
 
-static void CloseTimer(int event_type acl_unused, void *ctx)
+static void CloseTimer(int event_type acl_unused, ACL_EVENT *event, void *ctx)
 {
 	ACL_AIO *aio = (ACL_AIO*) ctx;
 

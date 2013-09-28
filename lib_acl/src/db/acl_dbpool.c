@@ -34,7 +34,7 @@ static void __dbpool_debug_cfg(const ACL_DB_INFO *db_info)
 /*----------------------------------------------------------------------------*/
 ACL_DB_POOL *acl_dbpool_create(const char *db_type, const ACL_DB_INFO *db_info)
 {
-	char myname[] = "acl_dbpool_create";
+	const char *myname = "acl_dbpool_create";
 	ACL_DB_POOL *db_pool = NULL;
 	ACL_DB_INFO *info;
 

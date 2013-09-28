@@ -31,6 +31,7 @@
 
 #include "net/acl_listen.h"
 #include "net/acl_tcp_ctl.h"
+#include "net/acl_vstream_net.h"
 
 /* Application-specific. */
 
@@ -130,6 +131,40 @@ static void master_listen_inet(ACL_MASTER_SERV *serv)
 		__FILE__, __LINE__, myname, serv->name, qlen);
 }
 
+static void master_bind_udp(ACL_MASTER_SERV *serv)
+{
+	const char *myname = "master_bind_udp";
+	int   i;
+
+	if (serv->listen_fd_count != acl_array_size(serv->addrs))
+		acl_msg_panic("listen_fd_count(%d) != addrs's size(%d)",
+			serv->listen_fd_count, acl_array_size(serv->addrs));
+
+	for (i = 0; i < serv->listen_fd_count; i++) {
+		ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR*)
+			acl_array_index(serv->addrs, i);
+		switch (addr->type) {
+		case ACL_MASTER_SERV_TYPE_UDP:
+			serv->listen_streams[i] = acl_vstream_bind(addr->addr,
+					acl_var_master_rw_timeout);
+			if (serv->listen_streams[i] == NULL)
+				acl_msg_fatal("%s(%d), %s: bind %s error %s",
+					__FILE__, __LINE__, myname,
+					addr->addr, strerror(errno));
+			break;
+		default:
+			acl_msg_panic("invalid type: %d, addr: %s",
+				addr->type, addr->addr);
+			break;
+		}
+
+		serv->listen_fds[i] = ACL_VSTREAM_SOCK(serv->listen_streams[i]);
+		acl_close_on_exec(serv->listen_fds[i], ACL_CLOSE_ON_EXEC);
+		acl_msg_info("%s(%d), %s: bind on %s ok",
+			__FILE__, __LINE__, myname, addr->addr);
+	}
+}
+
 static void master_listen_unix(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "master_listen_unix";
@@ -209,6 +244,13 @@ void    acl_master_listen_init(ACL_MASTER_SERV *serv)
 	 */
 	case ACL_MASTER_SERV_TYPE_INET:
 		master_listen_inet(serv);
+		break;
+
+	/*
+	 * UDP socket endponts
+	 */
+	case ACL_MASTER_SERV_TYPE_UDP:
+		master_bind_udp(serv);
 		break;
 
 	/*

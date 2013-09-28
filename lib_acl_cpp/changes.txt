@@ -1,5 +1,45 @@
 修改历史列表：
 ------------------------------------------------------------------------
+178) 2013.9.27
+178.1) lib_acl 库中 ACL_EVENT_NOTIFY_RDWR/ACL_EVENT_NOTIFY_TIME 函数接口定义
+的修改，与之相关的模块进行了修改
+178.2) feature: master 服务器框架增加了 master_udp 服务模板类
+178.3) samples: 增加了针对 UDP 的测试用例 udp_client 
+
+177) 2013.9.22
+177.1) 因为 lib_acl 基础库中的 ACL_VSTREAM 读写回调函数接口变更，调整了与之相关的
+部分内部接口，主要影响到了 ssl_stream/ssl_aio_stream
+
+176) 2013.9.13
+176.1) compile: 增加了 Makefile.db 工程文件，使用该文件编译则需要 mysql/sqlite 库;
+如果不需要数据库相关的功能，则使用 Makefile 工程文件进行编译
+
+175) 2013.9.12
+175.1) feature: connect_manager 类增加了根据键值字符串的哈希值获取连接池对象的
+虚函数，从而有利于在分布式环境里使用连接池
+175.2) feature: connect_manager/connect_pool 类增加了针对每个连接池有一个其
+位于连接池集合中的下标索引
+
+174) 2013.9.10
+174.1) feature: http_request::request 中原来只能指定 GET/POST 两种请求方法，现在
+可以指定多种请求方法
+174.2) feature: http_header 允许设置自定义（即除 GET/POST/PUT/CONNECT/PURGE之个）
+的请求头命令字
+
+173) 2013.9.9
+173.1) feature: memcache 类支持流式读写数据，从而可以支持大 value 的存取方式
+
+172) 2013.9.7
+172.1) master_threads 类在单独运行方式的使用场景接近于在 acl_master 框架下的运行场景
+
+171) 2013.9.5
+171.1) feature: master_threads/master_aio/master_proc 类支持在单独运行模式下监听多个地址
+171.2) feature: acl_cpp_init.cpp 中添加了 WIN32 下关闭 DOS 窗口的函数
+171.3) compile: acl_cpp_init.cpp 中 freopen 返回的文件句柄因为未被使用而使编译器报警
+
+170) 2013.8.30
+170.1) feature: http/memcache 模块增加了连接池管理类
+170.2) connpool/http_request_pool/memcache_pool: 调整了构造函数，去掉了最后一个参数
 
 169) 2013.8.22
 169.1) bugfix: memcache 类中当连接异常中断重试时会因请求数据被清掉而出错，原因
