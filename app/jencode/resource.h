@@ -8,9 +8,12 @@
 #define IDD_JENCODE_DIALOG              102
 #define IDR_MAINFRAME                   128
 #define IDC_BUTTON_TRAN                 1000
+#define IDC_BUTTON_GB2UTF               1000
 #define IDC_EDIT_SPATH                  1001
 #define IDC_BUTTON2                     1002
 #define IDC_BUTTON3                     1003
+#define IDC_BUTTON_TRAN2                1003
+#define IDC_BUTTON_UTF2GB               1003
 #define IDC_EDIT2                       1004
 #define IDC_EDIT_DPATH                  1004
 #define IDC_IDX_SELECT                  1005

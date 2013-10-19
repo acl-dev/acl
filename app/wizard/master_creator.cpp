@@ -25,7 +25,7 @@ static tpl_t* open_tpl(const char* filename)
 
 //////////////////////////////////////////////////////////////////////////
 
-static bool copy_and_replace(const char* from, const char* to)
+static bool copy_and_replace(const char* from, const char* to, bool exec = false)
 {
 	tpl_t* tpl = open_tpl(from);
 	if (tpl == NULL)
@@ -44,6 +44,14 @@ static bool copy_and_replace(const char* from, const char* to)
 	}
 	printf("create %s ok.\r\n", filepath.c_str());
 	tpl_free(tpl);
+
+	if (exec)
+	{
+#ifndef	WIN32
+		chmod(filepath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR |
+			S_IRGRP | S_IWGRP | S_IXGRP);
+#endif
+	}
 	return true;
 }
 
@@ -51,6 +59,9 @@ static bool create_common()
 {
 	if (copy_and_replace("Makefile", "Makefile") == false)
 		return false;
+	if (copy_and_replace("valgrind.sh", "valgrind.sh", true) == false)
+		return false;
+
 	string file;
 
 	// for vc2003

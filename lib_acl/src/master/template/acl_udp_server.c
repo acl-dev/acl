@@ -112,6 +112,13 @@ void acl_udp_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
 	acl_event_request_timer(__event, timer_fn, arg, delay, keep);
 }
 
+ACL_VSTREAM **acl_udp_server_streams()
+{
+	if (__servers == NULL)
+		acl_msg_warn("server streams NULL!");
+	return __servers;
+}
+
 void acl_udp_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg)
 {
 	acl_event_cancel_timer(__event, timer_fn, arg);
@@ -413,9 +420,8 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		acl_msg_info("%s(%d)->%s: configure file = %s", 
 			__FILE__, __LINE__, myname, conf_file);
 
-	/*
-	 * Application-specific initialization.
-	 */
+	/* Application-specific initialization. */
+
 	va_start(ap, service);
 	while ((key = va_arg(ap, int)) != 0) {
 		switch (key) {
@@ -467,16 +473,12 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	if (user_name)
 		user_name = acl_var_udp_owner;
 
-	/*
-	 * If not connected to stdin, stdin must not be a terminal.
-	 */
+	/* If not connected to stdin, stdin must not be a terminal. */
 	if (stream == 0 && isatty(STDIN_FILENO))
 		acl_msg_fatal("%s(%d)->%s: do not run this command by hand",
 			__FILE__, __LINE__, myname);
 
-	/*
-	 * Can options be required?
-	 */
+	/* Can options be required? */
 	if (stream == 0) {
 		if (transport == 0)
 			acl_msg_fatal("no transport type specified");
@@ -486,9 +488,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 			acl_msg_fatal("unsupported transport type: %s", transport);
 	}
 
-	/*
-	 * Retrieve process generation from environment.
-	 */
+	/* Retrieve process generation from environment. */
 	if ((generation = getenv(ACL_MASTER_GEN_NAME)) != 0) {
 		if (!acl_alldig(generation))
 			acl_msg_fatal("bad generation: %s", generation);
@@ -505,16 +505,28 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	 * external lock file.
 	 */
 
-	/*
-	 * Set up call-back info.
-	 */
+	/* 设置回回调过程相关参数 */
 	udp_server_service_fn = service;
 	udp_server_name = service_name;
 	udp_server_argv = argv + optind;
 
-	/*
-	 * create event and call user's thread callback
-	 */
+	/* 在切换用户运行身份前切换程序运行目录 */
+	if (chdir(acl_var_udp_queue_dir) < 0)
+		acl_msg_fatal("chdir(\"%s\"): %s",
+			acl_var_udp_queue_dir, acl_last_serror());
+
+	/* 切换用户运行身份前回调应用设置的回调函数 */
+	if (pre_init)
+		pre_init(udp_server_name, udp_server_argv);
+
+	acl_chroot_uid(root_dir, user_name);
+
+	/* 设置子进程运行环境，允许产生 core 文件 */
+	if (acl_var_udp_enable_core)
+		set_core_limit();
+	udp_server_open_log();
+
+	/* 根据配置内容创建对应的事件句柄 */
 	if (strcasecmp(acl_var_udp_event_mode, "poll") == 0) {
 		__event = acl_event_new_poll(acl_var_udp_delay_sec,
 				acl_var_udp_delay_usec);
@@ -530,34 +542,15 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	}
 
 	/*
-	 * Run pre-jail initialization.
-	 */
-	if (chdir(acl_var_udp_queue_dir) < 0)
-		acl_msg_fatal("chdir(\"%s\"): %s",
-			acl_var_udp_queue_dir, strerror(errno));
-
-	if (pre_init)
-		pre_init(udp_server_name, udp_server_argv);
-
-	acl_chroot_uid(root_dir, user_name);
-
-	/* 设置子进程运行环境，允许产生 core 文件 */
-	if (acl_var_udp_enable_core)
-		set_core_limit();
-	udp_server_open_log();
-
-	/*
-	 * Run post-jail initialization.
-	 */
-	if (post_init)
-		post_init(udp_server_name, udp_server_argv);
-
-	/*
 	 * Are we running as a one-shot server with the client connection on
-	 * standard input? If so, make sure the output is written to stdout so as
-	 * to satisfy common expectation.
+	 * standard input? If so, make sure the output is written to stdout
+	 * so as to satisfy common expectation.
 	 */
 	if (stream != 0) {
+		/* Run post-jail initialization. */
+		if (post_init)
+			post_init(udp_server_name, udp_server_argv);
+
 		service(stream, udp_server_name, udp_server_argv);
 		udp_server_exit();
 	}
@@ -594,25 +587,25 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		acl_vstream_set_local(stream, addr);
 		acl_vstream_set_udp_io(stream);
 		acl_non_blocking(fd, ACL_NON_BLOCKING);
-		acl_event_enable_read(__event, stream, 0,
-			udp_server_read, stream);
+		acl_event_enable_read(__event, stream, 0, udp_server_read, stream);
 		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 		__servers[i++] = stream;
 	}
 
-	acl_event_enable_read(__event, ACL_MASTER_STAT_STREAM,
-		0, udp_server_abort, __event);
+	acl_event_enable_read(__event, ACL_MASTER_STAT_STREAM, 0,
+		udp_server_abort, __event);
 	acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
+
 	watchdog = acl_watchdog_create(acl_var_udp_daemon_timeout,
 		(ACL_WATCHDOG_FN) 0, (char *) 0);
 
-	acl_msg_info("%s: starting...", argv[0]);
+	/* 进程初始化完毕后回调此函数，以使用户可以初始化自己的环境 */
+	if (post_init)
+		post_init(udp_server_name, udp_server_argv);
 
-	if (acl_msg_verbose)
-		acl_msg_info("%s(%d): daemon started, log = %s",
-			acl_var_udp_procname, __LINE__, acl_var_udp_log_file);
+	acl_msg_info("%s: daemon started, log: %s", argv[0], acl_var_udp_log_file);
 
 	while (1) {
 		if (udp_server_lock != 0) {
@@ -620,7 +613,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 			if (acl_myflock(ACL_VSTREAM_FILE(udp_server_lock),
 				ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_EXCLUSIVE) < 0)
 			{
-				acl_msg_fatal("select lock: %s", strerror(errno));
+				acl_msg_fatal("lock error %s", acl_last_serror());
 			}
 		}
 		acl_watchdog_start(watchdog);

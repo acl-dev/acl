@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 #include "stdlib/acl_define.h"
+#include "stdlib/acl_mymalloc.h"
 
 /* #include <time.h> */
 #include <stdio.h>
@@ -206,6 +207,19 @@ static int reopen_log(ACL_LOG *log)
 	} else if (now - log->last_open < log->reopen_inter)
 		RETURN (-1);
 
+	if (log->fp->path) {
+		acl_myfree(log->fp->path);
+		log->fp->path = NULL;
+	}
+	if (log->fp->addr_local) {
+		acl_myfree(log->fp->addr_local);
+		log->fp->addr_local = NULL;
+	}
+	if (log->fp->addr_peer) {
+		acl_myfree(log->fp->addr_peer);
+		log->fp->addr_peer = NULL;
+	}
+
 	private_vstream_close(log->fp);
 	acl_assert(log->path);
 	log->fp = private_vstream_connect(log->path, 60, 60);
@@ -268,7 +282,7 @@ static int open_unix_log(const char *addr, const char *logpre)
 }
 
 static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
-	int timeout acl_unused, void *arg)
+	int timeout acl_unused, ACL_VSTREAM *stream acl_unused, void *arg)
 {
 	ACL_LOG *log = (ACL_LOG*) arg;
 	int   ret;
@@ -286,7 +300,7 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 }
 
 static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
-	int timeout acl_unused, void *arg)
+	int timeout acl_unused, ACL_VSTREAM *stream acl_unused, void *arg)
 {
 	ACL_LOG *log = (ACL_LOG*) arg;
 	int   ret;
@@ -731,8 +745,21 @@ void acl_close_log()
 		if ((log->flag & ACL_LOG_F_FIXED))
 			continue;
 
-		if (log->fp)
+		if (log->fp) {
+			if (log->fp->path) {
+				acl_myfree(log->fp->path);
+				log->fp->path = NULL;
+			}
+			if (log->fp->addr_local) {
+				acl_myfree(log->fp->addr_local);
+				log->fp->addr_local = NULL;
+			}
+			if (log->fp->addr_peer) {
+				acl_myfree(log->fp->addr_peer);
+				log->fp->addr_peer = NULL;
+			}
 			private_vstream_close(log->fp);
+		}
 		if (log->path)
 			free(log->path);
 		if (log->lock)

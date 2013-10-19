@@ -1,10 +1,12 @@
 #include "StdAfx.h"
 #include "Gb2Utf8.h"
 
-CGb2Utf8::CGb2Utf8(void)
+CGb2Utf8::CGb2Utf8(const char* fromCharset, const char* toCharset)
 : m_hWnd(0)
 , m_sPath(_T(""))
 , m_dPath(_T(""))
+, m_fromCharset(fromCharset)
+, m_toCharset(toCharset)
 {
 }
 
@@ -34,15 +36,15 @@ void CGb2Utf8::OnTransEnd(int nMsg)
 	m_nMsgTransEnd = nMsg;
 }
 
-int CGb2Utf8::TransformPath(CString *pFrom, CString *pTo)
+int CGb2Utf8::TransformPath(CString *path_from, CString *path_to)
 {
 	ACL_SCAN_DIR *scan_src; //, *scan_dst;
 
-	scan_src = acl_scan_dir_open(pFrom->GetString(), 1);
+	scan_src = acl_scan_dir_open(path_from->GetString(), 1);
 	if (scan_src == NULL) {
 		CString msg;
 
-		msg.Format("Open src path %s error", pFrom->GetString());
+		msg.Format("Open src path %s error", path_from->GetString());
 		MessageBox(NULL, msg, "Open path", 0);
 		return (-1);
 	}
@@ -73,7 +75,6 @@ int CGb2Utf8::TransformFile(const char *pFrom, const char *pTo)
 {
 	char *sBuf = NULL;
 	size_t iLen;
-	const char *toCode = "utf-8", *fromCode = "gb2312";
 
 #undef RETURN
 #define RETURN(_x_) do \
@@ -93,10 +94,12 @@ int CGb2Utf8::TransformFile(const char *pFrom, const char *pTo)
 
 	acl::charset_conv conv;
 	acl::string buf;
-	if (conv.convert(fromCode, toCode, sBuf, iLen, &buf) == false)
+	if (conv.convert(m_fromCharset.GetString(), m_toCharset.GetString(),
+		sBuf, iLen, &buf) == false)
 	{
 		logger_error("conver from %s to %s error: %s",
-			fromCode, toCode, conv.serror());
+			m_fromCharset.GetString(), m_toCharset.GetString(),
+			conv.serror());
 		RETURN (-1);
 	}
 

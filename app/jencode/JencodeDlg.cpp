@@ -9,6 +9,7 @@
 #include "JencodeDlg.h"
 #include "DelBOM.h"
 #include "JencodeDlg.h"
+#include ".\jencodedlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -70,7 +71,8 @@ BEGIN_MESSAGE_MAP(CJencodeDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	//}}AFX_MSG_MAP
-	ON_BN_CLICKED(IDC_BUTTON_TRAN, OnBnClickedButtonTran)
+	ON_BN_CLICKED(IDC_BUTTON_GB2UTF, OnBnClickedButtonGb2utf)
+	ON_BN_CLICKED(IDC_BUTTON_UTF2GB, OnBnClickedButtonUtf2gb)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButton2)
 	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedButton3)
 	ON_MESSAGE(WM_USER_TRANS_OVER, OnTransOver)
@@ -177,7 +179,8 @@ HCURSOR CJencodeDlg::OnQueryDragIcon()
 
 void CJencodeDlg::ButtonsEnable(void)
 {
-	GetDlgItem(IDC_BUTTON_TRAN)->EnableWindow(TRUE);
+	GetDlgItem(IDC_BUTTON_GB2UTF)->EnableWindow(TRUE);
+	GetDlgItem(IDC_BUTTON_UTF2GB)->EnableWindow(TRUE);
 	GetDlgItem(IDC_ACL_TRANS)->EnableWindow(TRUE);
 	GetDlgItem(IDC_ACL_RESTORE)->EnableWindow(TRUE);
 	GetDlgItem(IDC_DEL_BOM)->EnableWindow(TRUE);
@@ -187,6 +190,7 @@ BOOL CJencodeDlg::CheckPath(void)
 {
 	UpdateData(TRUE);
 	GetDlgItem(IDC_EDIT_SPATH)->GetWindowText(m_sPath);
+	//MessageBox(m_sPath);
 	if (m_sPath.GetLength() == 0)
 	{
 		MessageBox("请选择源目录...");
@@ -207,23 +211,43 @@ BOOL CJencodeDlg::CheckPath(void)
 
 void CJencodeDlg::ButtonsDisable(void)
 {
-	GetDlgItem(IDC_BUTTON_TRAN)->EnableWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_GB2UTF)->EnableWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_UTF2GB)->EnableWindow(FALSE);
 	GetDlgItem(IDC_ACL_TRANS)->EnableWindow(FALSE);
 	GetDlgItem(IDC_ACL_RESTORE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_DEL_BOM)->EnableWindow(FALSE);
 }
 
-void CJencodeDlg::OnBnClickedButtonTran()
+void CJencodeDlg::OnBnClickedButtonGb2utf()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	if (!CheckPath())
 		return;
 
-	static CGb2Utf8 gb2Utf8;
+	static CGb2Utf8 gb2Utf8("gbk", "utf-8");
 
 	gb2Utf8.Init(this->GetSafeHwnd(), m_sPath, m_dPath);
 	gb2Utf8.OnTransEnd(WM_USER_TRANS_OVER);
 	gb2Utf8.Run();
+	m_wndStatus.SetText("运行", 0, 0);
+	m_nBegin = time(NULL);
+	ButtonsDisable();
+}
+
+void CJencodeDlg::OnBnClickedButtonUtf2gb()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (!CheckPath())
+	{
+		MessageBox(m_sPath);
+		return;
+	}
+
+	static CGb2Utf8 utf2gb("utf-8", "gbk");
+
+	utf2gb.Init(this->GetSafeHwnd(), m_sPath, m_dPath);
+	utf2gb.OnTransEnd(WM_USER_TRANS_OVER);
+	utf2gb.Run();
 	m_wndStatus.SetText("运行", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
@@ -394,3 +418,4 @@ void CJencodeDlg::OnBnClickedTransIdx()
 	m_wndStatus.SetText("运行", 0, 0);
 	m_nBegin = time(NULL);
 }
+

@@ -34,7 +34,8 @@ public:
 		int default_count);
 
 	/**
-	 * 添加服务器的客户端连接池
+	* 添加服务器的客户端连接池，，该函数可以在程序运行过程中
+	* 被调用，因为内部会自动加锁
 	 * @param addr {const char*} 服务器地址(ip:port)
 	 * @param count {int} 连接池数量限制
 	 * @return {connect_pool&} 返回新添加的连接池对象
@@ -42,15 +43,25 @@ public:
 	connect_pool& set(const char* addr, int count);
 
 	/**
+	 * 从连接池集群中删除某个地址的连接池，该函数可以在程序运行过程中
+	 * 被调用，因为内部会自动加锁
+	 * @param addr {const char*} 服务器地址(ip:port)
+	 */
+	void remove(const char* addr);
+
+	/**
 	 * 根据服务端地址获得该服务器的连接池
 	 * @param addr {const char*} redis 服务器地址(ip:port)
+	 * @param exclusive {bool} 是否需要互斥访问连接池数组，当需要动态
+	 *  管理连接池集群时，该值应为 true
 	 * @return {connect_pool*} 返回空表示没有此服务
 	 */
-	connect_pool* get(const char* addr);
+	connect_pool* get(const char* addr, bool exclusive = true);
 
 	/**
 	 * 从连接池集群中获得一个连接池，该函数采用轮循方式从连接池集合中获取一个
-	 * 后端服务器的连接池，从而保证了完全的均匀性；
+	 * 后端服务器的连接池，从而保证了完全的均匀性；该函数内部会自动对连接池管理
+	 * 队列加锁
 	 * 此外，该函数为虚接口，允许子类实现自己的轮循方式
 	 * @return {connect_pool*} 返回一个连接池，返回指针永远非空
 	 */
@@ -59,12 +70,24 @@ public:
 	/**
 	 * 从连接池集群中获得一个连接池，该函数采用哈希定位方式从集合中获取一个
 	 * 后端服务器的连接池；子类可以重载此虚函数，采用自己的集群获取方式
-	 * 该虚函数内部缺省采用 CRC32 的哈希算法
+	 * 该虚函数内部缺省采用 CRC32 的哈希算法；
 	 * @param key {const char*} 键值字符串，如果该值为 NULL，则内部
 	 *  自动切换到轮循方式
+	 * @param exclusive {bool} 是否需要互斥访问连接池数组，当需要动态
+	 *  管理连接池集群时，该值应为 true
 	 * @return {connect_pool*} 返回一个可用的连接池，返回指针永远非空
 	 */
-	virtual connect_pool* peek(const char* key);
+	virtual connect_pool* peek(const char* key, bool exclusive = true);
+
+	/**
+	 * 当用户重载了 peek 函数时，可以调用此函数对连接池管理过程加锁
+	 */
+	void lock();
+
+	/**
+	 * 当用户重载了 peek 函数时，可以调用此函数对连接池管理过程加锁
+	 */
+	void unlock();
 
 	/**
 	 * 获得所有的服务器的连接池，该连接池中包含缺省的服务连接池
@@ -121,7 +144,6 @@ private:
 	string default_addr_;			// 缺省的服务地址
 	connect_pool* default_pool_;		// 缺省的服务连接池
 	std::vector<connect_pool*> pools_;	// 所有的服务连接池
-	size_t service_size_;			// 缓存住当前总的服务器集群数量
 	size_t service_idx_;			// 下一个要访问的的下标值
 	locker lock_;				// 访问 pools_ 时的互斥锁
 	int  stat_inter_;			// 统计访问量的定时器间隔

@@ -138,7 +138,7 @@ int aio_ostream::del_write_callback(aio_callback* callback)
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 int aio_ostream::disable_write_callback(aio_callback* callback)
@@ -168,7 +168,7 @@ int aio_ostream::disable_write_callback(aio_callback* callback)
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 int aio_ostream::enable_write_callback(aio_callback* callback /* = NULL */)
@@ -199,7 +199,7 @@ int aio_ostream::enable_write_callback(aio_callback* callback /* = NULL */)
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 void aio_ostream::hook_write()
@@ -284,9 +284,9 @@ int aio_ostream::write_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 			continue;
 
 		if ((*it)->callback->write_callback() == false)
-			return (-1);
+			return -1;
 	}
-	return (0);
+	return 0;
 }
 
 int aio_ostream::write_wakup(ACL_ASTREAM* stream acl_unused, void* ctx)
@@ -299,9 +299,9 @@ int aio_ostream::write_wakup(ACL_ASTREAM* stream acl_unused, void* ctx)
 			continue;
 
 		if ((*it)->callback->write_wakeup() == false)
-			return (-1);
+			return -1;
 	}
-	return (0);
+	return 0;
 }
 
 }  // namespace acl

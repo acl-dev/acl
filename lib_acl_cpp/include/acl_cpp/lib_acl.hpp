@@ -23,6 +23,8 @@
 #include "acl_cpp/stdlib/escape.hpp"
 #include "acl_cpp/stdlib/pipe_stream.hpp"
 #include "acl_cpp/stdlib/url_coder.hpp"
+#include "acl_cpp/stdlib/thread.hpp"
+#include "acl_cpp/stdlib/thread_pool.hpp"
 
 #include "acl_cpp/memcache/memcache.hpp"
 #include "acl_cpp/memcache/memcache_pool.hpp"

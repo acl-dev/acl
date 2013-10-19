@@ -88,9 +88,11 @@ ACL_ASTREAM *acl_aio_open(ACL_AIO *aio, ACL_VSTREAM *stream)
 	if ((stream->type & ACL_VSTREAM_TYPE_LISTEN)) {
 		if (stream->read_buf == NULL)
 			stream->read_buf_len = aio->rbuf_size;
+/*
 		else
 			acl_msg_warn("%s(%d): stream->read_buf not null, fixed",
 				myname, __LINE__);
+*/
 		astream->accept_nloop = 1;
 	}
 

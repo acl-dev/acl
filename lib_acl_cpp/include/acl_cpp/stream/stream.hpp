@@ -79,9 +79,9 @@ public:
 	 */
 	int get_rw_timeout(void) const;
 protected:
-	ACL_VSTREAM *m_pStream;
-	bool m_bEof;
-	bool m_bOpened;
+	ACL_VSTREAM *stream_;
+	bool eof_;
+	bool opened_;
 
 	void* ctx_;
 };

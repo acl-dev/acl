@@ -56,13 +56,14 @@ protected:
 	 */  
 	virtual bool read_callback(char* data, int len)  
 	{
-		if (strncmp(data, "quit", len) == 0)
+		if (strncmp(data, "quit", 4) == 0)
 		{
 			// 可以显式地调用异步流的关闭过程，也可以直接返回 false，
 			// 通知异步框架自动关闭该异步流
 			// client_->close();
 			return false;
 		}
+		client_->write(data, len);
 		return true;
 	}
 
@@ -110,6 +111,9 @@ master_service::~master_service()
 
 bool master_service::on_accept(acl::aio_socket_stream* client)
 {
+	logger("connect from %s, fd %d", client->get_peer(true),
+		client->sock_handle());
+
 	// 创建异步客户端流的回调对象并与该异步流进行绑定
 	io_callback* callback = new io_callback(client);
 

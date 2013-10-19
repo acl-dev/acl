@@ -28,13 +28,27 @@ public:
 protected:
 	// 该类不能直接被实例化
 	master_udp();
-	virtual ~master_udp() {}
+	virtual ~master_udp();
 
 	/**
 	 * 纯虚函数：当 UDP 流有数据可读时回调子类此函数
 	 * @param stream {socket_stream*}
 	 */
 	virtual void on_read(socket_stream* stream) = 0;
+
+	/**
+	 * 获得本地监听的套接口流对象集合
+	 * @return {const std::vector<socket_stream*>&}
+	 */
+	const std::vector<socket_stream*>& get_sstreams() const
+	{
+		return sstreams_;
+	}
+
+private:
+	std::vector<socket_stream*> sstreams_;
+
+	void close_sstreams(void);
 
 private:
 	// 当接收到一个客户端连接时回调此函数

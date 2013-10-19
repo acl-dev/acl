@@ -8,7 +8,8 @@ extern "C" {
 #include "stdlib/acl_define.h"
 #ifdef ACL_UNIX
 
-char   *acl_master_pathname(const char *queue_path, const char *service_class, const char *service_name);
+extern char   *acl_master_pathname(const char *queue_path,
+	const char *service_class, const char *service_name);
 
 #endif /* ACL_UNIX */
 

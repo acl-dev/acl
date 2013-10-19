@@ -41,7 +41,7 @@ void    acl_master_flow_init(void)
 
     if (pipe(acl_var_master_flow_pipe) < 0)
 	acl_msg_fatal("%s(%d)->%s: pipe: %s",
-			__FILE__, __LINE__, myname, strerror(errno));
+		__FILE__, __LINE__, myname, strerror(errno));
 
     acl_non_blocking(acl_var_master_flow_pipe[0], ACL_NON_BLOCKING);
     acl_non_blocking(acl_var_master_flow_pipe[1], ACL_NON_BLOCKING);
@@ -70,23 +70,23 @@ int acl_master_flow_get(int len)
 	 * Silence some wild claims.
 	 */
 	if (fstat(ACL_MASTER_FLOW_WRITE, &st) < 0)
-		acl_msg_fatal("fstat flow pipe write descriptor: %s", strerror(errno));
+		acl_msg_fatal("fstat flow pipe write descriptor: %s",
+			strerror(errno));
 
 	/*
 	 * Read and discard N bytes. XXX AIX read() can return 0 when an open
 	 * pipe is empty.
 	 */
 	for (count = len; count > 0; count -= n) {
-		n = read(ACL_MASTER_FLOW_READ,
-			buf,
+		n = read(ACL_MASTER_FLOW_READ, buf,
 			count > BUFFER_SIZE ? BUFFER_SIZE : count);
 		if (n <= 0)
-			return (-1);
+			return -1;
 	}
 
 	if (acl_msg_verbose)
 		acl_msg_info("%s: %d %d", myname, len, len - count);
-	return (len - count);
+	return len - count;
 }
 
 /* acl_master_flow_put - put N tokens */
@@ -98,28 +98,23 @@ int acl_master_flow_put(int len)
 	int   count;
 	int   n = 0;
 
-	/*
-	 * Sanity check.
-	 */
+	/* Sanity check. */
 	if (len <= 0)
 		acl_msg_panic("%s: bad length %d", myname, len);
 
-	/*
-	 * Write or discard N bytes.
-	 */
+	/* Write or discard N bytes. */
 	memset(buf, 0, len > BUFFER_SIZE ? BUFFER_SIZE : len);
 
 	for (count = len; count > 0; count -= n) {
-		n = write(ACL_MASTER_FLOW_WRITE,
-				buf,
-				count > BUFFER_SIZE ?  BUFFER_SIZE : count);
+		n = write(ACL_MASTER_FLOW_WRITE, buf,
+			count > BUFFER_SIZE ?  BUFFER_SIZE : count);
 		if (n < 0)
-			return (-1);
+			return -1;
 	}
 
 	if (acl_msg_verbose)
 		acl_msg_info("%s: %d %d", myname, len, len - count);
-	return (len - count);
+	return len - count;
 }
 
 /* acl_master_flow_count - return number of available tokens */
@@ -131,6 +126,6 @@ int acl_master_flow_count(void)
 
 	if ((count = acl_peekfd(ACL_MASTER_FLOW_READ)) < 0)
 		acl_msg_warn("%s: %s", myname, strerror(errno));
-	return (count);
+	return count;
 }
 #endif /* ACL_UNIX */

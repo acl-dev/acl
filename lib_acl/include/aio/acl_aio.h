@@ -141,9 +141,9 @@ struct ACL_ASTREAM {
 	int   accept_nloop;	/**<  acl_aio_accept 内部循环 accept 的最大次数 */
 	int   error;		/**< 当前套接口的错误号 */
 
-	ACL_AIO_ACCEPT_FN  accept_fn;  /**< accept 完成时的回调函数 */
-	ACL_AIO_LISTEN_FN  listen_fn;  /**< 有新连接到达时的回调函数 */
-	void *context;		/**< 用户设置的参数 */
+	ACL_AIO_ACCEPT_FN  accept_fn;	/**< accept 完成时的回调函数 */
+	ACL_AIO_LISTEN_FN  listen_fn;	/**< 有新连接到达时的回调函数 */
+	void *context;			/**< 用户设置的参数 */
 
 	ACL_AIO_NOTIFY_FN  can_read_fn; /**< 可以读时的回调函数 */
 	void *can_read_ctx;		/**< can_read_fn 参数之一 */
@@ -155,8 +155,8 @@ struct ACL_ASTREAM {
 	ACL_ARRAY *close_handles;	/**< 关闭时的辅助回调函数 */
 	ACL_ARRAY *timeo_handles;	/**< 超时时的辅助回调函数 */
 	ACL_ARRAY *connect_handles;	/**< 连接成功时辅助回调函数 */
-	ACL_FIFO   reader_fifo;
-	ACL_FIFO   writer_fifo;
+	ACL_FIFO   reader_fifo;		/**< 临时存放回调函数 */
+	ACL_FIFO   writer_fifo;		/**< 临时存放回调函数 */
 
 	/* 可读时的回调函数 */
 	void (*event_read_callback)(int event_type, ACL_ASTREAM *astream);
@@ -189,7 +189,7 @@ struct ACL_ASTREAM {
 ACL_API ACL_AIO *acl_aio_create(int event_mode);
 
 /**
- * 创建一个异步通信的异步框架实例句柄, 可以指定是否采用 epoll/devpoll/windows message
+ * 创建异步框架实例句柄, 可以指定是否采用 epoll/devpoll/windows message
  * @param event_mode {int} 事件监听方式: ACL_EVENT_SELECT, ACL_EVENT_POLL
  *  , ACL_EVENT_KERNEL, ACL_EVENT_WMSG
  * @param nMsg {unsigned int} 当与 WIN32 界面的消息整合时，即 event_mode 设为
@@ -262,14 +262,16 @@ ACL_API int acl_aio_get_delay_usec(ACL_AIO *aio);
 /**
  * 设置异步引擎循环的等待时间中的秒级部分
  * @param aio {ACL_AIO*} 异步框架引擎句柄
- * @param delay_sec {int} 用 select/poll/epoll/kqueue/devpoll 时的秒级等待时间
+ * @param delay_sec {int} 设置用 select/poll/epoll/kqueue/devpoll
+ *  时的秒级等待时间
  */
 ACL_API void acl_aio_set_delay_sec(ACL_AIO *aio, int delay_sec);
 
 /**
  * 设置异步引擎循环的等待时间中的微秒级部分
  * @param aio {ACL_AIO*} 异步框架引擎句柄
- * @param delay_usec {int} 用 select/poll/epoll/kqueue/devpoll 时的微秒级等待时间
+ * @param delay_usec {int} 设置用 select/poll/epoll/kqueue/devpoll
+ *  时的微秒级等待时间
  */
 ACL_API void acl_aio_set_delay_usec(ACL_AIO *aio, int delay_usec);
 
@@ -521,8 +523,8 @@ ACL_API void acl_aio_gets(ACL_ASTREAM *astream);
 
 /**
  * 异步从流中读取一行数据, 当成功读取一行数据、出错、读超时时将回调用户的
- * 注册函数: notify_fn, 与 acl_aio_gets 功能类似, 但唯一的区别是返回的数据 data
- * 中不包含 "\r\n" 或 "\n", 当读到一个空行时, 则 dlen == 0.
+ * 注册函数: notify_fn, 与 acl_aio_gets 功能类似, 但唯一的区别是返回的数据
+ * data 中不包含 "\r\n" 或 "\n", 当读到一个空行时, 则 dlen == 0.
  * @param astream {ACL_ASTREAM*} 受监控的流, 当该流有完整的一行数据、出错
  *  或读超时时将回调用户的注册函数.
  * 注: 读操作发生在异步框架内.
@@ -643,7 +645,8 @@ ACL_API void acl_aio_writen(ACL_ASTREAM *astream, const char *data, int dlen);
  * @param vector {const struct iovec*} 数据集合数组
  * @param count {int} vector 数组的长度
  */
-ACL_API void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count);
+ACL_API void acl_aio_writev(ACL_ASTREAM *astream,
+		const struct iovec *vector, int count);
 
 /**
  * 以格式方式异步向流中写数据, 当流出错、写超时或写成功时将触发事件通知过程
@@ -697,8 +700,8 @@ ACL_API int acl_aio_iswset(ACL_ASTREAM *astream);
 ACL_API void acl_aio_accept(ACL_ASTREAM *astream);
 
 /**
- * 异步监听, 当监听流上出错、超时或有新连接到达时将触发监听事件通知过程, 当有新连接时
- * 用户需在自己的注册函数里 accept() 该新连接.
+ * 异步监听, 当监听流上出错、超时或有新连接到达时将触发监听事件通知过程, 当有
+ * 新连接时用户需在自己的注册函数里 accept() 该新连接.
  * @param astream {ACL_ASTREAM*} 处于监听状态的流
  */
 ACL_API void acl_aio_listen(ACL_ASTREAM *astream);
@@ -708,11 +711,11 @@ ACL_API void acl_aio_listen(ACL_ASTREAM *astream);
 /**
  * 异步连接一个远程服务器, 当连接流出错、超时或连接成功时将触发事件通知过程.
  * @param aio {ACL_AIO*} 异步框架引擎句柄
- * @param saddr {const char*} 远程服务器监听地址, 格式: ip:port, 如: 192.168.0.1:80
+ * @param saddr {const char*} 远程服务器地址, 格式: ip:port, 如: 192.168.0.1:80
  * @param timeout {int} 连接超时的时间值，单位为秒
  * @return {ACL_ASTREAM*} 创建异步连接过程是否成功
  */
-ACL_API ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *saddr, int timeout);
+ACL_API ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout);
 
 /*---------------------------- 其它通用异步操作接口 --------------------------*/
 
@@ -749,7 +752,7 @@ ACL_API void acl_aio_refer(ACL_ASTREAM *astream);
 ACL_API void acl_aio_unrefer(ACL_ASTREAM *astream);
 
 /**
- * 给任务工作池添加一个定时器任务, 该函数仅是 acl_event_request_timer 的简单封装.
+ * 添加一个定时器任务, 该函数仅是 acl_event_request_timer 的简单封装
  * @param aio {ACL_AIO*} 异步通信引擎句柄
  * @param timer_fn {ACL_EVENT_NOTIFY_TIME} 定时器任务回调函数.
  * @param context {void*} timer_fn 的参数之一.
@@ -757,8 +760,9 @@ ACL_API void acl_aio_unrefer(ACL_ASTREAM *astream);
  * @param keep {int} 是否重复定时器任务
  * @return {acl_int64} 剩余的时间, 单位为微秒.
  */
- ACL_API acl_int64 acl_aio_request_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME timer_fn,
-	 void *context, acl_int64 idle_limit, int keep);
+ACL_API acl_int64 acl_aio_request_timer(ACL_AIO *aio,
+		ACL_EVENT_NOTIFY_TIME timer_fn, void *context,
+		acl_int64 idle_limit, int keep);
 
 /**
  * 取消某个定时器任务, 该函数仅是 acl_event_cancel_timer 的简单封装.
@@ -767,7 +771,8 @@ ACL_API void acl_aio_unrefer(ACL_ASTREAM *astream);
  * @param context {void*} timer_fn 的参数之一.
  * @return {acl_int64} 剩余的时间, 单位为微秒.
  */
-ACL_API acl_int64 acl_aio_cancel_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME timer_fn, void *context);
+ACL_API acl_int64 acl_aio_cancel_timer(ACL_AIO *aio,
+		ACL_EVENT_NOTIFY_TIME timer_fn, void *context);
 
 /**
  * 设置是否需要循环启用通过 acl_aio_request_timer 设置的定时器任务
@@ -777,7 +782,7 @@ ACL_API acl_int64 acl_aio_cancel_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME timer
  * @param onoff {int} 是否重复定时器任务
  */
 ACL_API void acl_aio_keep_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback,
-	void *context, int onoff);
+		void *context, int onoff);
 
 /**
  * 判断所设置的定时器都处于重复使用状态
@@ -786,7 +791,8 @@ ACL_API void acl_aio_keep_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback,
  * @param context {void*} timer_fn 的参数之一.
  * @return {int} !0 表示所设置的定时器都处于重复使用状态
  */
-ACL_API int acl_aio_timer_ifkeep(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback, void *context);
+ACL_API int acl_aio_timer_ifkeep(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback,
+		void *context);
 
 #ifdef	__cplusplus
 }

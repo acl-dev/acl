@@ -27,13 +27,21 @@ typedef struct ACL_APP_HANDLE {
 static ACL_IOCTL_RUN_FN __run_fn = NULL;
 static void *__run_ctx = NULL;
 
-static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
+static char *var_cfg_deny_banner;
+static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	/* TODO: you can add configure variables of int type here */
-	{ 0, 0, 0, 0, 0 },
+
+	{ "master_deny_banner", "You are not welcome!", &var_cfg_deny_banner },
+	{ 0, 0, 0 }
 };
 
-static char *__default_deny_info = "You are not welcome!\r\n";
-static char *__deny_info;
+static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
+	/* TODO: you can add configure variables of int type here */
+
+	{ 0, 0, 0, 0, 0 }
+};
+
+static char *__deny_info = NULL;
 static int (*__app_on_timeout)(ACL_VSTREAM *stream, void*) = NULL;
 static void (*__app_on_close)(ACL_VSTREAM *stream, void*) = NULL;
 /*----------------------------------------------------------------------------*/
@@ -190,7 +198,8 @@ static void __service(ACL_IOCTL *h_ioctl, ACL_VSTREAM *stream,
 	if (!acl_access_permit(addr)) {
 		acl_msg_warn("%s, %s(%d): addr(%s) be denied",
 			__FILE__, myname, __LINE__, addr);
-		(void) acl_vstream_writen(stream, __deny_info, strlen(__deny_info));
+		if (__deny_info && *__deny_info)
+			(void) acl_vstream_fprintf(stream, "%s\r\n", __deny_info);
 		acl_vstream_close(stream);
 	} else {
 		int ret = 0;
@@ -210,6 +219,11 @@ static void __pre_accept(char *name acl_unused, char **argv acl_unused)
 static void __pre_jail_init(char *name acl_unused, char **argv acl_unused)
 {
 	acl_get_app_conf_int_table(__conf_int_tab);
+	acl_get_app_conf_str_table(__conf_str_tab);
+
+	/* 当没有通过函数参数设置拒绝访问信息时，则使用配置文件中的内容 */
+	if (__deny_info == NULL)
+		__deny_info = var_cfg_deny_banner;
 
 	/* 是否采用用户自定义的日志函数库 */
 	if (__app_open_log)
@@ -269,7 +283,6 @@ static void app_main_init(void)
 	ACL_ARGV *env_argv;
 	int   i;
 
-	__deny_info = __default_deny_info;
 	ptr = getenv("SERVICE_ENV");
 	if (ptr == NULL || *ptr == 0)
 		return;

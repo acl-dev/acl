@@ -89,7 +89,7 @@ int acl_unix_trigger(ACL_EVENT *event, const char *service,
 		if (acl_msg_verbose)
 			acl_msg_warn("%s: connect to %s: %s",
 				myname, service, strerror(errno));
-		return (-1);
+		return -1;
 	}
 	acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 
@@ -130,6 +130,6 @@ int acl_unix_trigger(ACL_EVENT *event, const char *service,
 			acl_unix_trigger_event, (void *) up);
 #endif
 
-	return (0);
+	return 0;
 }
 #endif /* ACL_UNIX */

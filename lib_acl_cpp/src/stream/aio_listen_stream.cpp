@@ -39,7 +39,7 @@ bool aio_listen_stream::open(const char* addr)
 {
 	ACL_VSTREAM *sstream = acl_vstream_listen(addr, 128);
 	if (sstream == NULL)
-		return (false);
+		return false;
 
 	snprintf(addr_, sizeof(addr_), "%s", ACL_VSTREAM_LOCAL(sstream));
 
@@ -51,12 +51,12 @@ bool aio_listen_stream::open(const char* addr)
 
 	// hook 监听的回调过程
 	hook_accept();
-	return (true);
+	return true;
 }
 
 const char* aio_listen_stream::get_addr() const
 {
-	return (addr_);
+	return addr_;
 }
 
 void aio_listen_stream::hook_accept()
@@ -83,9 +83,9 @@ int aio_listen_stream::accept_callback(ACL_ASTREAM* stream, void* ctx)
 	for (; it != as->accept_callbacks_.end(); ++it)
 	{
 		if ((*it)->accept_callback(ss) == false)
-			return (-1);
+			return -1;
 	}
-	return (0);
+	return 0;
 }
 
 }  // namespace acl

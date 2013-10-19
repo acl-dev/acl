@@ -12,6 +12,8 @@
 
 #ifdef ACL_UNIX
 
+#include <errno.h>
+#include <string.h>
 #include <unistd.h>
 
 /* Utility library. */
@@ -47,23 +49,15 @@ void    acl_master_vars_init(int buf_size, int rw_timeout)
 		acl_vstream_free(ACL_MASTER_FLOW_WRITE_STREAM);
 
 	ACL_MASTER_STAT_STREAM = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
-						O_RDWR,
-						buf_size,
-						rw_timeout,
-						ACL_VSTREAM_TYPE_SOCK);
+			O_RDWR, buf_size, rw_timeout, ACL_VSTREAM_TYPE_SOCK);
 	ACL_MASTER_FLOW_READ_STREAM = acl_vstream_fdopen(ACL_MASTER_FLOW_READ,
-						O_RDONLY,
-						buf_size,
-						rw_timeout,
-						ACL_VSTREAM_TYPE_SOCK);
+			O_RDONLY, buf_size, rw_timeout, ACL_VSTREAM_TYPE_SOCK);
 	ACL_MASTER_FLOW_WRITE_STREAM = acl_vstream_fdopen(ACL_MASTER_FLOW_WRITE,
-						O_WRONLY,
-						buf_size,
-						rw_timeout,
-						ACL_VSTREAM_TYPE_SOCK);
+			O_WRONLY, buf_size, rw_timeout, ACL_VSTREAM_TYPE_SOCK);
 	if (acl_var_master_thread_pool == NULL)
 		acl_var_master_thread_pool = acl_thread_pool_create(100, 60);
 	if (acl_var_master_thread_pool == NULL)
-		acl_msg_fatal("%s(%d): create thread pool error", myname, __LINE__);
+		acl_msg_fatal("%s(%d): create thread pool error(%s)",
+			myname, __LINE__, strerror(errno));
 }
 #endif /* ACL_UNIX */

@@ -42,23 +42,43 @@ master_service::~master_service()
 {
 }
 
-bool master_service::thread_on_read(acl::socket_stream*)
+bool master_service::thread_on_read(acl::socket_stream* conn)
 {
+	acl::string buf;
+
+	if (conn->gets(buf) == false)
+	{
+		logger_warn("gets error from %s, fd %d",
+			conn->get_peer(), conn->sock_handle());
+		return false;
+	}
+	else if(conn->format("%s\r\n", buf.c_str()) == -1)
+		return false;
+	else if (buf == "quit")
+		return false;
+	else
+		return true;
+}
+
+bool master_service::thread_on_accept(acl::socket_stream* conn)
+{
+	logger("connect from %s, fd: %d", conn->get_peer(true),
+		conn->sock_handle());
+	conn->set_rw_timeout(5);
 	return true;
 }
 
-bool master_service::thread_on_accept(acl::socket_stream*)
+bool master_service::thread_on_timeout(acl::socket_stream* conn)
 {
-	return true;
-}
-
-bool master_service::thread_on_timeout(acl::socket_stream*)
-{
+	logger("read timeout from %s, fd: %d", conn->get_peer(),
+		conn->sock_handle());
 	return false;
 }
 
-void master_service::thread_on_close(acl::socket_stream*)
+void master_service::thread_on_close(acl::socket_stream* conn)
 {
+	logger("disconnect from %s, fd: %d", conn->get_peer(),
+		conn->sock_handle());
 }
 
 void master_service::thread_on_init()

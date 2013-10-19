@@ -190,7 +190,7 @@ extern int acl_var_master_flow_pipe[2];
  /*
   * master_warning.c
   */
-extern void master_warning(const char *notify_addr, const char *notify_recipients,
+extern void master_warning(const char *notify_addr, const char *recipients,
 	const char *path, int pid, const char *info);
 
 #endif /* ACL_UNIX */

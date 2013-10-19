@@ -109,7 +109,6 @@ bool memcache::open()
 		return true;
 
 	conn_ = NEW socket_stream();
-	char  addr[64];
 
 	if (conn_->open(addr_, conn_timeout_, rw_timeout_) == false)
 	{
@@ -118,7 +117,7 @@ bool memcache::open()
 		conn_ = NULL;
 		opened_ = false;
 		ebuf_.format("connect server(%s) error(%s)",
-			addr, acl_last_serror());
+			addr_, acl_last_serror());
 		return false;
 	}
 	opened_ = true;

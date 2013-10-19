@@ -44,7 +44,14 @@ master_service::~master_service()
 
 void master_service::on_read(acl::socket_stream* stream)
 {
-	(void) stream;
+	int   n;
+	char  buf[4096];
+
+	if ((n = stream->read(buf, sizeof(buf), false)) == -1)
+		return;
+
+	logger("read from %s, %d bytes", stream->get_peer(), n);
+	stream->write(buf, n);
 }
 
 void master_service::proc_on_init()

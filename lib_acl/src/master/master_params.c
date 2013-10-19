@@ -247,7 +247,7 @@ void acl_master_params_load(const char *pathname)
 	const char *myname = "acl_master_params_load";
 
 	if (pathname == NULL || *pathname == 0)
-		acl_msg_fatal("%s(%d)->%s: input error",
+		acl_msg_fatal("%s(%d), %s: input error",
 			__FILE__, __LINE__, myname);
 	if (__cfg_parser != NULL)
 		acl_cfg_parser_free(__cfg_parser);
@@ -257,7 +257,7 @@ void acl_master_params_load(const char *pathname)
 	__cfg_parser = acl_cfg_parser_load(pathname, " =");
 
 	if (__cfg_parser == NULL)
-		acl_msg_fatal("%s(%d)->%s: can't load file = %s, serr = %s",
+		acl_msg_fatal("%s(%d), %s: load file(%s) error(%s)",
 			__FILE__, __LINE__, myname, pathname, strerror(errno));
 	__update_master_conf_vars(__cfg_parser);
 }
@@ -276,7 +276,7 @@ void acl_app_conf_load(const char *pathname)
 	const char *myname = "acl_app_conf_load";
 
 	if (pathname == NULL || *pathname == 0)
-		acl_msg_fatal("%s(%d)->%s: input error",
+		acl_msg_fatal("%s(%d), %s: input error",
 			__FILE__, __LINE__, myname);
 
 	if (__app_cfg != NULL)
@@ -285,7 +285,7 @@ void acl_app_conf_load(const char *pathname)
 	__app_cfg = acl_xinetd_cfg_load(pathname);
 
 	if (__app_cfg == NULL)
-		acl_msg_fatal("%s(%d)->%s: xinetd_cfg_load null, file=%s, serr=%s",
+		acl_msg_fatal("%s(%d), %s: load file(%s) error(%s)",
 			__FILE__, __LINE__, myname, pathname, strerror(errno));
 
 	__app_conf_file = acl_mystrdup(pathname);
@@ -298,7 +298,7 @@ void  acl_get_app_conf_int_table(ACL_CONFIG_INT_TABLE *table)
 	char *name, *value;
 
 	if (__app_cfg == NULL)
-		acl_msg_fatal("%s(%d)->%s: app_cfg null, call app_conf_load first",
+		acl_msg_fatal("%s(%d), %s: app_cfg null, app_conf_load first",
 			__FILE__, __LINE__, myname);
 
 	if (table == NULL)
@@ -322,7 +322,7 @@ void  acl_get_app_conf_int64_table(ACL_CONFIG_INT64_TABLE *table)
 	char *name, *value;
 
 	if (__app_cfg == NULL)
-		acl_msg_fatal("%s(%d)->%s: app_cfg null, call app_conf_load first",
+		acl_msg_fatal("%s(%d), %s: app_cfg null, app_conf_load first",
 			__FILE__, __LINE__, myname);
 
 	if (table == NULL)
@@ -346,7 +346,7 @@ void  acl_get_app_conf_str_table(ACL_CONFIG_STR_TABLE *table)
 	char *name, *value;
 
 	if (__app_cfg == NULL)
-		acl_msg_fatal("%s(%d)->%s: app_cfg null, call app_conf_load first",
+		acl_msg_fatal("%s(%d), %s: app_cfg null, app_conf_load first",
 			__FILE__, __LINE__, myname);
 
 	if (table == NULL)
@@ -358,9 +358,8 @@ void  acl_get_app_conf_str_table(ACL_CONFIG_STR_TABLE *table)
 
 	for (i = 0; i < n; i++) {
 		ret = acl_xinetd_cfg_index(__app_cfg, i, &name, &value);
-		if (ret == 0) {
+		if (ret == 0)
 			__update_conf_str_vars(table, name, value);
-		}
 	}
 }
 
@@ -371,7 +370,7 @@ void  acl_get_app_conf_bool_table(ACL_CONFIG_BOOL_TABLE *table)
 	char *name, *value;
 
 	if (__app_cfg == NULL)
-		acl_msg_fatal("%s(%d)->%s: app_cfg null, call app_conf_load first",
+		acl_msg_fatal("%s(%d), %s: app_cfg null, app_conf_load first",
 			__FILE__, __LINE__, myname);
 
 	if (table == NULL)
@@ -387,4 +386,3 @@ void  acl_get_app_conf_bool_table(ACL_CONFIG_BOOL_TABLE *table)
 			__update_conf_bool_vars(table, name, value);
 	}
 }
-

@@ -84,20 +84,16 @@ void    acl_master_restart_service(ACL_MASTER_SERV *serv)
 
 	if (acl_var_master_global_event == NULL)
 		acl_var_master_global_event = acl_event_new_select(
-				acl_var_master_delay_sec,
-				acl_var_master_delay_usec);
+			acl_var_master_delay_sec, acl_var_master_delay_usec);
 	if (acl_var_master_global_event == NULL)
 		acl_msg_fatal("%s(%d)->%s: acl_event_new null, serr=%s",
-				__FILE__, __LINE__, myname, strerror(errno));
-	/*
-	 * Undo some of the things that master_start_service() did.
-	 */
+			__FILE__, __LINE__, myname, strerror(errno));
+
+	/* Undo some of the things that master_start_service() did. */
 	acl_master_wakeup_cleanup(serv);
 	acl_master_status_cleanup(serv);
 
-	/*
-	 * Now undo the undone.
-	 */
+	/* Now undo the undone. */
 	acl_master_status_init(serv);
 
 	/* set ACL_MASTER_FLAG_RELOADING flag */

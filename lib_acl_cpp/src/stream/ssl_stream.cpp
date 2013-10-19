@@ -53,7 +53,7 @@ bool ssl_stream::open_ssl(ACL_SOCKET fd, bool use_ssl /* = true */)
 	ACL_VSTREAM* conn = acl_vstream_fdopen(fd, O_RDWR,
 		8192, 0, ACL_VSTREAM_TYPE_SOCK);
 	acl_assert(conn);
-	return (open_ssl(conn, use_ssl));
+	return open_ssl(conn, use_ssl);
 }
 
 bool ssl_stream::open_ssl(const char* addr, int conn_timeout,
@@ -62,8 +62,8 @@ bool ssl_stream::open_ssl(const char* addr, int conn_timeout,
 	ACL_VSTREAM* conn = acl_vstream_connect(addr, ACL_BLOCKING,
 		conn_timeout, rw_timeout, 8192);
 	if (conn == NULL)
-		return (false);
-	return (open_ssl(conn, use_ssl));
+		return false;
+	return open_ssl(conn, use_ssl);
 }
 
 bool ssl_stream::open_ssl(ACL_VSTREAM* vstream, bool use_ssl /* = true */)
@@ -74,18 +74,18 @@ bool ssl_stream::open_ssl(ACL_VSTREAM* vstream, bool use_ssl /* = true */)
 	if (use_ssl && ssl_client_init() == false)
 	{
 		(void) this->close();
-		return (false);
+		return false;
 	}
 
-	return (true);
+	return true;
 }
 
 bool ssl_stream::open_ssl(bool on)
 {
-	if (m_pStream == NULL)
+	if (stream_ == NULL)
 	{
-		logger_error("m_pStream null");
-		return (false);
+		logger_error("stream_ null");
+		return false;
 	}
 
 	if (on)
@@ -96,12 +96,12 @@ bool ssl_stream::open_ssl(bool on)
 		{
 			acl_assert(ssn_);
 			acl_assert(hs_);
-			return (true);
+			return true;
 		}
 #endif
 			
 		// 打开 SSL 流模式
-		return (ssl_client_init());
+		return ssl_client_init();
 	}
 	else
 	{
@@ -112,7 +112,7 @@ bool ssl_stream::open_ssl(bool on)
 			ssl_ = NULL;
 			acl_assert(ssn_ == NULL);
 			acl_assert(hs_ == NULL);
-			return (true);
+			return true;
 		}
 #endif
 
@@ -120,18 +120,18 @@ bool ssl_stream::open_ssl(bool on)
 		clear();
 
 		// 切换成非 SSL 流模式
-		acl_vstream_ctl(m_pStream,
+		acl_vstream_ctl(stream_,
 			ACL_VSTREAM_CTL_READ_FN, acl_socket_read,
 			ACL_VSTREAM_CTL_WRITE_FN, acl_socket_write,
 			ACL_VSTREAM_CTL_CTX, this,
 			ACL_VSTREAM_CTL_END);
-		return (true);
+		return true;
 	}
 }
 
 bool ssl_stream::ssl_client_init()
 {
-	acl_assert(m_pStream);
+	acl_assert(stream_);
 
 #ifdef HAS_POLARSSL
 	ssl_ = (ssl_context*) acl_mycalloc(1, sizeof(ssl_context));
@@ -145,7 +145,7 @@ bool ssl_stream::ssl_client_init()
 	if ((ret = ssl_init(ssl_)) != 0)
 	{
 		logger_error("failed, ssl_init returned %d", ret);
-		return (false);
+		return false;
 	}
 
 	ssl_set_endpoint(ssl_, SSL_IS_CLIENT);
@@ -158,14 +158,14 @@ bool ssl_stream::ssl_client_init()
 	ssl_set_ciphersuites(ssl_, ssl_default_ciphersuites);
 	ssl_set_session(ssl_, 1, 600, ssn_);
 
-	acl_vstream_ctl(m_pStream,
+	acl_vstream_ctl(stream_,
 		ACL_VSTREAM_CTL_READ_FN, __ssl_read,
 		ACL_VSTREAM_CTL_WRITE_FN, __ssl_send,
 		ACL_VSTREAM_CTL_CTX, this,
 		ACL_VSTREAM_CTL_END);
-	acl_tcp_set_nodelay(ACL_VSTREAM_SOCK(m_pStream));
+	acl_tcp_set_nodelay(ACL_VSTREAM_SOCK(stream_));
 #endif
-	return (true);
+	return true;
 }
 
 int ssl_stream::__sock_read(void *ctx, unsigned char *buf, size_t len)
@@ -185,19 +185,19 @@ int ssl_stream::__sock_read(void *ctx, unsigned char *buf, size_t len)
 			|| ret == ACL_EAGAIN
 #endif
 		)
-			return (POLARSSL_ERR_NET_WANT_READ);
+			return POLARSSL_ERR_NET_WANT_READ;
 		else if (errnum == ACL_ECONNRESET || errno == EPIPE)
-			return (POLARSSL_ERR_NET_CONN_RESET);
+			return POLARSSL_ERR_NET_CONN_RESET;
 		else
-			return (POLARSSL_ERR_NET_RECV_FAILED);
+			return POLARSSL_ERR_NET_RECV_FAILED;
 	}
 
-	return (ret);
+	return ret;
 #else
 	(void) ctx;
 	(void) buf;
 	(void) len;
-	return (-1);
+	return -1;
 #endif
 }
 
@@ -218,19 +218,19 @@ int ssl_stream::__sock_send(void *ctx, const unsigned char *buf, size_t len)
 			|| ret == ACL_EAGAIN
 #endif
 		)
-			return (POLARSSL_ERR_NET_WANT_WRITE);
+			return POLARSSL_ERR_NET_WANT_WRITE;
 		else if (errnum == ACL_ECONNRESET || errno == EPIPE)
-			return (POLARSSL_ERR_NET_CONN_RESET);
+			return POLARSSL_ERR_NET_CONN_RESET;
 		else
-			return (POLARSSL_ERR_NET_SEND_FAILED);
+			return POLARSSL_ERR_NET_SEND_FAILED;
 	}
 
-	return (ret);
+	return ret;
 #else
 	(void) ctx;
 	(void) buf;
 	(void) len;
-	return (-1);
+	return -1;
 #endif
 }
 
@@ -246,16 +246,16 @@ int ssl_stream::__ssl_read(ACL_SOCKET, void *buf, size_t len, int,
 		if (ret != POLARSSL_ERR_NET_WANT_READ
 			&& ret != POLARSSL_ERR_NET_WANT_WRITE)
 		{
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 		}
 	}
 
-	return (ret);
+	return ret;
 #else
 	(void) buf;
 	(void) len;
 	(void) ctx;
-	return (-1);
+	return -1;
 #endif
 }
 
@@ -271,16 +271,16 @@ int ssl_stream::__ssl_send(ACL_SOCKET, const void *buf, size_t len,
 		if (ret != POLARSSL_ERR_NET_WANT_READ
 			&& ret != POLARSSL_ERR_NET_WANT_WRITE)
 		{
-			return (ACL_VSTREAM_EOF);
+			return ACL_VSTREAM_EOF;
 		}
 	}
 
-	return (ret);
+	return ret;
 #else
 	(void) buf;
 	(void) len;
 	(void) ctx;
-	return (-1);
+	return -1;
 #endif
 }
 

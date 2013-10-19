@@ -113,18 +113,18 @@ static const char *get_str_ent(ACL_XINETD_CFG_PARSER *xcp,
 	value = acl_xinetd_cfg_get(xcp, name);
 	if (value == 0) {
 		if (def_val)
-			return (def_val);
+			return def_val;
 		fatal_with_context("missing \"%s\" field", name);
 	}
 
 	if (strcmp(value, "-") == 0) {
 		if (def_val != 0)
-			return (def_val);
+			return def_val;
 		fatal_with_context("field \"%s\" has no default value", name);
 		/* no reach here */
-		return (NULL);
+		return NULL;
 	} else 
-		return (value);
+		return value;
 }
 
 /* get_bool_ent - extract boolean field */
@@ -139,22 +139,22 @@ static int get_bool_ent(ACL_XINETD_CFG_PARSER *xcp,
 		if (def_val == NULL)
 			fatal_with_context("missing \"%s\" field", name);
 		if (strcasecmp("y", def_val) == 0)
-			return (1);
+			return 1;
 		else if (strcasecmp("n", def_val) == 0)
-			return (0);
+			return 0;
 		else
 			fatal_invalid_field(name, value);
 	}
 
 	if (strcasecmp("y", value) == 0) {
-		return (1);
+		return 1;
 	} else if (strcasecmp("n", value) == 0) {
-		return (0);
+		return 0;
 	} else {
 		fatal_invalid_field(name, value);
 	}
 	/* NOTREACHED */
-	return (0);
+	return 0;
 }
 
 /* get_int_ent - extract integer field */
@@ -171,12 +171,12 @@ static int get_int_ent(ACL_XINETD_CFG_PARSER *xcp, const char *name,
 			fatal_with_context("missing \"%s\" field", name);
 		if (!ACL_ISDIGIT(*def_val) || (n = atoi(def_val)) < min_val)
 			fatal_invalid_field(name, def_val);
-		return (n);
+		return n;
 	}
 
 	if (!ACL_ISDIGIT(*value) || (n = atoi(value)) < min_val)
 		fatal_invalid_field(name, value);
-	return (n);
+	return n;
 }
 
 static ACL_XINETD_CFG_PARSER *lookup_service_conf(ACL_VSTRING *path_buf)
@@ -189,7 +189,7 @@ static ACL_XINETD_CFG_PARSER *lookup_service_conf(ACL_VSTRING *path_buf)
 	while (1) {
 		config_file = acl_scan_dir_next_file(__scan);
 		if (config_file == NULL) /* over now */
-			return (NULL);
+			return NULL;
 
 #if 0
 		acl_vstring_sprintf(path_buf, "%s/%s", __master_path, config_file);
@@ -221,7 +221,7 @@ static ACL_XINETD_CFG_PARSER *lookup_service_conf(ACL_VSTRING *path_buf)
 
 	__config_file_ptr = config_file;
 
-	return (xcp);
+	return xcp;
 }
 
 static void init_listeners(ACL_MASTER_SERV *serv)

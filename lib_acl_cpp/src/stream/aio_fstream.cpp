@@ -83,12 +83,12 @@ bool aio_fstream::open_read(const char* path)
 
 bool aio_fstream::open_write(const char* path)
 {
-	return (open(path, O_WRONLY | O_TRUNC | O_CREAT, 0600));
+	return open(path, O_WRONLY | O_TRUNC | O_CREAT, 0600);
 }
 
 bool aio_fstream::open_append(const char* path)
 {
-	return (open(path, O_WRONLY | O_APPEND | O_CREAT, 0600));
+	return open(path, O_WRONLY | O_APPEND | O_CREAT, 0600);
 }
 
 }  // namespace

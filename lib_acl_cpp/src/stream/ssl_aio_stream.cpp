@@ -89,11 +89,11 @@ bool ssl_aio_stream::open_callback()
 	{
 		acl_assert(ssn_);
 		acl_assert(hs_);
-		return (ssl_client_init());
+		return ssl_client_init();
 	}
-	return (true);
+	return true;
 #else
-	return (false);
+	return false;
 #endif
 }
 
@@ -105,7 +105,7 @@ ssl_aio_stream* ssl_aio_stream::open(aio_handle* handle,
 	ACL_ASTREAM* astream =
 		acl_aio_connect(handle->get_handle(), addr, timeout);
 	if (astream == NULL)
-		return (NULL);
+		return NULL;
 
 	ssl_aio_stream* stream = NEW ssl_aio_stream(handle, astream, false);
 
@@ -119,7 +119,7 @@ ssl_aio_stream* ssl_aio_stream::open(aio_handle* handle,
 	if (use_ssl)
 		stream->add_open_callback(stream);
 
-	return (stream);
+	return stream;
 }
 
 bool ssl_aio_stream::open_ssl(bool on)
@@ -130,7 +130,7 @@ bool ssl_aio_stream::open_ssl(bool on)
 	if (stream == NULL)
 	{
 		logger_error("stream null");
-		return (false);
+		return false;
 	}
 
 	if (on)
@@ -141,12 +141,12 @@ bool ssl_aio_stream::open_ssl(bool on)
 		{
 			acl_assert(ssn_);
 			acl_assert(hs_);
-			return (true);
+			return true;
 		}
 #endif
 
 		// 打开 SSL 流模式
-		return (ssl_client_init());
+		return ssl_client_init();
 	}
 	else
 	{
@@ -157,7 +157,7 @@ bool ssl_aio_stream::open_ssl(bool on)
 			ssl_ = NULL;
 			acl_assert(ssn_ == NULL);
 			acl_assert(hs_ == NULL);
-			return (true);
+			return true;
 		}
 #endif
 
@@ -170,7 +170,7 @@ bool ssl_aio_stream::open_ssl(bool on)
 			ACL_VSTREAM_CTL_WRITE_FN, acl_socket_write,
 			ACL_VSTREAM_CTL_CTX, this,
 			ACL_VSTREAM_CTL_END);
-		return (true);
+		return true;
 	}
 }
 
@@ -187,7 +187,7 @@ bool ssl_aio_stream::ssl_client_init()
 	if ((ret = ssl_init(ssl_)) != 0)
 	{
 		logger_error("failed, ssl_init returned %d", ret);
-		return (false);
+		return false;
 	}
 
 	ssl_set_endpoint(ssl_, SSL_IS_CLIENT);
@@ -207,7 +207,7 @@ bool ssl_aio_stream::ssl_client_init()
 		ACL_VSTREAM_CTL_END);
 	acl_tcp_set_nodelay(ACL_VSTREAM_SOCK(stream));
 #endif
-	return (true);
+	return true;
 }
 
 int ssl_aio_stream::__sock_read(void *ctx, unsigned char *buf, size_t len)
@@ -223,25 +223,25 @@ int ssl_aio_stream::__sock_read(void *ctx, unsigned char *buf, size_t len)
 	{
 		errnum = acl_last_error();
 		if (errnum == ACL_EINTR)
-			return (POLARSSL_ERR_NET_WANT_READ);
+			return POLARSSL_ERR_NET_WANT_READ;
 		else if (errnum == ACL_EWOULDBLOCK)
-			return (POLARSSL_ERR_NET_WANT_READ);
+			return POLARSSL_ERR_NET_WANT_READ;
 #if ACL_EWOULDBLOCK != ACL_EAGAIN
 		else if (errnum == ACL_EAGAIN)
-			return (POLARSSL_ERR_NET_WANT_READ);
+			return POLARSSL_ERR_NET_WANT_READ;
 #endif
 		else if (errnum == ACL_ECONNRESET || errno == EPIPE)
-			return (POLARSSL_ERR_NET_CONN_RESET);
+			return POLARSSL_ERR_NET_CONN_RESET;
 		else
-			return (POLARSSL_ERR_NET_RECV_FAILED);
+			return POLARSSL_ERR_NET_RECV_FAILED;
 	}
 
-	return (ret);
+	return ret;
 #else
 	(void) ctx;
 	(void) buf;
 	(void) len;
-	return (-1);
+	return -1;
 #endif
 }
 
@@ -258,26 +258,26 @@ int ssl_aio_stream::__sock_send(void *ctx, const unsigned char *buf, size_t len)
 	{
 		errnum = acl_last_error();
 		if (errnum == ACL_EINTR)
-			return (POLARSSL_ERR_NET_WANT_WRITE);
+			return POLARSSL_ERR_NET_WANT_WRITE;
 
 		else if (errnum == ACL_EWOULDBLOCK)
-			return (POLARSSL_ERR_NET_WANT_WRITE);
+			return POLARSSL_ERR_NET_WANT_WRITE;
 #if ACL_EWOULDBLOCK != ACL_EAGAIN
 		else if (errnum == ACL_EAGAIN)
-			return (POLARSSL_ERR_NET_WANT_WRITE);
+			return POLARSSL_ERR_NET_WANT_WRITE;
 #endif
 		else if (errnum == ACL_ECONNRESET || errno == EPIPE)
-			return (POLARSSL_ERR_NET_CONN_RESET);
+			return POLARSSL_ERR_NET_CONN_RESET;
 		else
-			return (POLARSSL_ERR_NET_SEND_FAILED);
+			return POLARSSL_ERR_NET_SEND_FAILED;
 	}
 
-	return (ret);
+	return ret;
 #else
 	(void) ctx;
 	(void) buf;
 	(void) len;
-	return (-1);
+	return -1;
 #endif
 }
 
@@ -296,14 +296,14 @@ int ssl_aio_stream::__ssl_read(ACL_SOCKET, void *buf, size_t len,
 			if (acl_last_error() != ACL_EWOULDBLOCK)
 				acl_set_error(ACL_EWOULDBLOCK);
 		}
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
-	return (ret);
+	return ret;
 #else
 	(void) buf;
 	(void) len;
 	(void) ctx;
-	return (-1);
+	return -1;
 #endif
 }
 
@@ -322,14 +322,14 @@ int ssl_aio_stream::__ssl_send(ACL_SOCKET, const void *buf, size_t len,
 			if (acl_last_error() != ACL_EWOULDBLOCK)
 				acl_set_error(ACL_EWOULDBLOCK);
 		}
-		return (ACL_VSTREAM_EOF);
+		return ACL_VSTREAM_EOF;
 	}
-	return (ret);
+	return ret;
 #else
 	(void) buf;
 	(void) len;
 	(void) ctx;
-	return (-1);
+	return -1;
 #endif
 }
 

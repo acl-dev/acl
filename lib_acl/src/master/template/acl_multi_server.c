@@ -268,7 +268,7 @@ static void multi_server_execute(int type, ACL_EVENT *event,
 		ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("%s(%d)->%s: select unlock: %s",
-			__FILE__, __LINE__, myname, strerror(errno));
+			__FILE__, __LINE__, myname, acl_last_serror());
 	}
 
 	/*
@@ -388,11 +388,11 @@ static void multi_server_accept_pass(int type acl_unused, ACL_EVENT *event,
 	    && acl_myflock(ACL_VSTREAM_FILE(multi_server_lock),
 	    	ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
 	{
-		acl_msg_fatal("select unlock: %s", strerror(errno));
+		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
 	if (fd < 0) {
 		if (errno != EAGAIN)
-			acl_msg_fatal("accept connection: %s", strerror(errno));
+			acl_msg_fatal("accept connection: %s", acl_last_serror());
 		if (time_left >= 0)
 			acl_event_request_timer(event, multi_server_timeout,
 				NULL, (acl_int64) time_left * 1000000, 0);
@@ -427,11 +427,11 @@ static void multi_server_accept_sock(int type acl_unused, ACL_EVENT *event,
 	    && acl_myflock(ACL_VSTREAM_FILE(multi_server_lock),
 	  	  	ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
 	{
-		acl_msg_fatal("select unlock: %s", strerror(errno));
+		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
 	if (fd < 0) {
 		if (errno != EAGAIN)
-			acl_msg_fatal("accept connection: %s", strerror(errno));
+			acl_msg_fatal("accept connection: %s", acl_last_serror());
 		if (time_left >= 0)
 			acl_event_request_timer(event, multi_server_timeout,
 				NULL, (acl_int64) time_left * 1000000, 0);
@@ -751,7 +751,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 	 */
 	if (chdir(acl_var_multi_queue_dir) < 0)
 		acl_msg_fatal("chdir(\"%s\"): %s", acl_var_multi_queue_dir,
-			strerror(errno));
+			acl_last_serror());
 	if (pre_init)
 		pre_init(multi_server_name, multi_server_argv);
 
@@ -833,7 +833,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 			if (acl_myflock(ACL_VSTREAM_FILE(multi_server_lock),
 				ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_EXCLUSIVE) < 0)
 			{
-				acl_msg_fatal("select lock: %s", strerror(errno));
+				acl_msg_fatal("lock error %s", acl_last_serror());
 			}
 		}
 		acl_watchdog_start(watchdog);

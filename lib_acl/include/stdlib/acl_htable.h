@@ -136,7 +136,7 @@ ACL_API ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table, const char *key, vo
  * @param value 用户自己的特定数据项(可以由类型硬转化而来, 但是此数据项必须不能堆栈变量)
  * @param callback 如果该函数指针不为空，则当添加成功后便调用该函数
  * @param arg callback 的参数之一
- * @return 所分配的哈希表项的指针, == NULL: 表示内部分分配内存出错, 为严重的错误
+ * @return {int} 0 表示 添加成功，-1 表示添加失败
  *  注：如果在添加时该哈希争键存在，则返回已经存在的哈希项，使用者应该通过调用
  *  acl_htable_last_errno() 来查看是否重复添加同一个键值(ACL_HTABLE_STAT_DUPLEX_KEY)
  */

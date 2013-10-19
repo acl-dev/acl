@@ -30,7 +30,6 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedButtonTran();
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedButton3();
 	afx_msg LRESULT OnTransOver(WPARAM uID, LPARAM lEvent);
@@ -50,4 +49,6 @@ private:
 	CString m_sIdxPath, m_fsPath;
 public:
 	afx_msg void OnBnClickedDelBom();
+	afx_msg void OnBnClickedButtonGb2utf();
+	afx_msg void OnBnClickedButtonUtf2gb();
 };

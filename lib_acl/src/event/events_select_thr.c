@@ -366,9 +366,10 @@ static void event_loop(ACL_EVENT *eventp)
 
 	if (event_thr_prepare(eventp) == 0) {
 		if (eventp->fdcnt_ready == 0) {
+			select_delay /= 1000000;
 			if (select_delay <= 0)
 				select_delay = 1;
-			sleep(select_delay);
+			sleep((int) select_delay);
 		}
 
 		THREAD_UNLOCK(&event_thr->event.tb_mutex);

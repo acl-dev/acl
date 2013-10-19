@@ -34,9 +34,15 @@ static ACL_APP_OPEN_LOG __app_open_log = NULL;
 static ACL_APP_CLOSE_LOG __app_close_log = NULL;
 static ACL_APP_PRE_JAIL __app_pre_jail = NULL;
 static void *__app_pre_jail_ctx = NULL;
+static char *__deny_info = NULL;
 
-static char *__default_deny_info = "You are not welcome!\r\n";
-static char *__deny_info;
+static char *var_cfg_deny_banner;
+static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
+	/* TODO: you can add configure variables of int type here */
+
+	{ "master_deny_banner", "You are not welcome!", &var_cfg_deny_banner },
+	{ 0, 0, 0 }
+};
 
 static void __service(ACL_SOCKET fd, char *service acl_unused,
 	char **argv acl_unused)
@@ -64,6 +70,7 @@ static void __service(ACL_SOCKET fd, char *service acl_unused,
 		acl_socket_close(fd);
 		return;
 	}
+
 	ACL_SAFE_STRNCPY(ip, addr, sizeof(ip));
 	ptr = strchr(ip, ':');
 	if (ptr)
@@ -72,6 +79,12 @@ static void __service(ACL_SOCKET fd, char *service acl_unused,
 	if (!acl_access_permit(ip)) {
 		acl_msg_warn("%s, %s(%d): addr(%s) be denied",
 			__FILE__, myname, __LINE__, ip);
+
+		if (__deny_info && *__deny_info) {
+			(void) write(fd, __deny_info, strlen(__deny_info));
+			(void) write(fd, "\r\n", 2);
+		}
+
 		acl_socket_close(fd);
 	} else if (__run_fn != NULL) {
 		ACL_VSTREAM *vstream;
@@ -88,10 +101,9 @@ static void __service(ACL_SOCKET fd, char *service acl_unused,
 	} else if (__run2_fn != NULL) {
 		if (__run2_fn(fd, __run_ctx) != 0)
 			acl_socket_close(fd);
-	} else {
+	} else
 		acl_msg_fatal("%s(%d), %s: __run_fn and __run2_fn are null",
 			__FILE__, __LINE__, myname);
-	}
 }
 
 static void __pre_accept(char *name acl_unused, char **argv acl_unused)
@@ -100,6 +112,12 @@ static void __pre_accept(char *name acl_unused, char **argv acl_unused)
 
 static void __pre_jail_init(char *name acl_unused, char **argv acl_unused)
 {
+	acl_get_app_conf_str_table(__conf_str_tab);
+
+	/* 当没有通过函数参数设置拒绝访问信息时，则使用配置文件中的内容 */
+	if (__deny_info == NULL)
+		__deny_info = var_cfg_deny_banner;
+
 	/* 是否采用用户自定义的日志函数库 */
 	if (__app_open_log)
 		__app_open_log();
@@ -139,7 +157,6 @@ static void app_main_init(void)
 	ACL_ARGV *env_argv;
 	int   i;
 
-	__deny_info = __default_deny_info;
 	ptr = getenv("SERVICE_ENV");
 	if (ptr == NULL || *ptr == 0)
 		return;
@@ -160,9 +177,9 @@ static void app_main_init(void)
 		*ptr++ = 0;
 		if (ptr == 0)
 			continue;
-		if (strcasecmp(pname, "mempool_limit") == 0) {
+		if (strcasecmp(pname, "mempool_limit") == 0)
 			__mempool_limit = atoi(ptr);
-		} else if (strcasecmp(pname, "mempool_use_mutex") == 0) {
+		else if (strcasecmp(pname, "mempool_use_mutex") == 0) {
 			if (strcasecmp(ptr, "true") == 0)
 				__mempool_use_mutex = 1;
 		}

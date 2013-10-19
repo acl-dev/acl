@@ -45,13 +45,12 @@ static void acl_stream_trigger_event(int event, void *context)
 	const char *myname = "acl_stream_trigger_event";
 	struct ACL_STREAM_TRIGGER *sp = (struct ACL_STREAM_TRIGGER *) context;
 
-	/*
-	 * Disconnect.
-	 */
+	/* Disconnect. */
 	if (event == ACL_EVENT_TIME)
 		acl_msg_warn("%s: read timeout for service %s",
 			myname, sp->service);
 	acl_event_disable_readwrite(sp->eventp, sp->stream);
+
 	/*
 	 * acl_event_cancel_timer(sp->eventp, acl_stream_trigger_event, context);
 	 */
@@ -74,20 +73,16 @@ int acl_stream_trigger(ACL_EVENT *eventp, const char *service,
 	if (acl_msg_verbose > 1)
 		acl_msg_info("%s: service %s", myname, service);
 
-	/*
-	 * Connect...
-	 */
+	/* Connect... */
 	if ((fd = acl_stream_connect(service, ACL_BLOCKING, timeout)) < 0) {
 		if (acl_msg_verbose)
 			acl_msg_warn("%s: connect to %s: %s",
 				myname, service, strerror(errno));
-		return (-1);
+		return -1;
 	}
 	acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 
-	/*
-	 * Stash away context.
-	 */
+	/* Stash away context. */
 	sp = (struct ACL_STREAM_TRIGGER *) acl_mymalloc(sizeof(*sp));
 	sp->fd = fd;
 	sp->service = acl_mystrdup(service);
@@ -95,9 +90,7 @@ int acl_stream_trigger(ACL_EVENT *eventp, const char *service,
 			timeout, ACL_VSTREAM_TYPE_SOCK);
 	sp->eventp = eventp;
 
-	/*
-	 * Write the request...
-	 */
+	/* Write the request... */
 	if (acl_write_buf(sp->stream, buf, len, timeout) < 0
 		|| acl_write_buf(sp->stream, "", 1, timeout) < 0)
 	{
@@ -106,9 +99,7 @@ int acl_stream_trigger(ACL_EVENT *eventp, const char *service,
 				myname, service, strerror(errno));
 	}
 
-	/*
-	 * Wakeup when the peer disconnects, or when we lose patience.
-	 */
+	/* Wakeup when the peer disconnects, or when we lose patience. */
 
 	if (timeout > 0)
 		acl_event_enable_read(sp->eventp, sp->stream, timeout + 100,
@@ -117,7 +108,7 @@ int acl_stream_trigger(ACL_EVENT *eventp, const char *service,
 		acl_event_enable_read(sp->eventp, sp->stream, 0,
 			acl_stream_trigger_event, (void *) sp);
 
-	return (0);
+	return 0;
 }
 #endif /* SUNOS5 */
 #endif /* ACL_UNIX */

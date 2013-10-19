@@ -67,6 +67,7 @@ typedef void (*ACL_MASTER_SERVER_RW_TIMER_FN) (ACL_VSTREAM *);
 typedef void (*ACL_SINGLE_SERVER_FN) (ACL_VSTREAM *, char *, char **);
 extern void acl_single_server_main(int, char **, ACL_SINGLE_SERVER_FN, ...);
 extern ACL_EVENT *acl_single_server_event(void);
+extern ACL_VSTREAM **acl_single_server_sstreams(void);
 
  /*
   * acl_multi_server.c
@@ -91,6 +92,7 @@ extern void acl_ioctl_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *
 extern void acl_ioctl_server_main(int, char **, ACL_IOCTL_SERVER_FN,...);
 extern ACL_IOCTL *acl_ioctl_server_handle(void);
 extern ACL_EVENT *acl_ioctl_server_event(void);
+extern ACL_VSTREAM **acl_ioctl_server_streams(void);
 extern void acl_ioctl_server_enable_read(ACL_IOCTL *h_ioctl, ACL_VSTREAM *stream,
 	int timeout, ACL_IOCTL_NOTIFY_FN notify_fn, void *context);
 
@@ -124,6 +126,7 @@ extern int acl_aio_server_fprintf(ACL_ASTREAM *astream,
 		const char *fmt, ...);
 extern int acl_aio_server_connect(const char *saddr, int timeout,
 		ACL_AIO_CONNECT_FN connect_fn, void *context);
+extern ACL_ASTREAM **acl_aio_server_streams(void);
 
  /*
   * acl_udp_server.c
@@ -134,6 +137,7 @@ extern void acl_udp_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
 extern void acl_udp_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg);
 extern void acl_udp_server_main(int, char **, ACL_UDP_SERVER_FN, ...);
 extern ACL_EVENT *acl_udp_server_event(void);
+extern ACL_VSTREAM **acl_udp_server_streams(void);
 
  /*
   * acl_listener_server.c

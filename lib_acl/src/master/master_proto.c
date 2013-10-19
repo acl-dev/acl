@@ -42,16 +42,13 @@ int     acl_master_notify(int pid, unsigned generation, int status)
 
 	if (write(ACL_MASTER_STATUS_FD, (char *) &stat_buf, sizeof(stat_buf))
 	    != sizeof(stat_buf)) {
-		if (acl_msg_verbose)
-			acl_msg_warn("%s(%d)->%s: status %d: %s",
-					__FILE__, __LINE__, myname, status, strerror(errno));
-		return (-1);
-	} else {
-		if (acl_msg_verbose)
-			acl_msg_info("%s(%d)->%s: OK, status %d, pid = %d",
-					__FILE__, __LINE__, myname,
-					status, pid);
-		return (0);
-	}
+		acl_msg_warn("%s(%d), %s: status %d, error %s",
+			__FILE__, __LINE__, myname, status, strerror(errno));
+		return -1;
+	} else if (acl_msg_verbose)
+		acl_msg_info("%s(%d)->%s: OK, status %d, pid = %d",
+			__FILE__, __LINE__, myname, status, pid);
+
+	return 0;
 }
 #endif /* ACL_UNIX */

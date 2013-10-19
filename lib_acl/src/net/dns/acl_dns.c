@@ -304,9 +304,10 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 
 /* 数据流出错时的回调函数 */
 
-static int dns_lookup_error(ACL_ASTREAM *server acl_unused, void *ctx)
+static int dns_lookup_error(ACL_ASTREAM *server acl_unused, void *ctx acl_unused)
 {
 	const char *myname = "dns_lookup_error";
+#if 0
 	ACL_DNS *dns = (ACL_DNS*) ctx;
 
 	acl_msg_warn("%s(%d): error(%s), re-open a new socket",
@@ -317,6 +318,10 @@ static int dns_lookup_error(ACL_ASTREAM *server acl_unused, void *ctx)
 
 	/* 异步读DNS服务器响应数据 */
 	acl_aio_read(dns->astream);
+#else
+	acl_msg_warn("%s(%d): dns_lookup error %s",
+		myname, __LINE__, acl_last_serror());
+#endif
 	return (-1);
 }
 

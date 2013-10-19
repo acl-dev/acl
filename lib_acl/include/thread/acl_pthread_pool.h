@@ -163,6 +163,13 @@ ACL_API int acl_pthread_pool_dispatch(void *dispatch_arg,
 ACL_API int acl_pthread_pool_size(acl_pthread_pool_t *thr_pool);
 
 /**
+ * 取得当前队列中未处理的任务个数
+ * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
+ * @return {int} 当前未处理的任务数
+ */
+ACL_API int acl_pthread_pool_qlen(acl_pthread_pool_t *thr_pool);
+
+/**
  * 设置线程池中线程的堆栈大小
  * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
  * @param size {size_t} 线程创建时的堆栈大小，单位为字节

@@ -11,6 +11,9 @@ aio_stream::aio_stream(aio_handle* handle)
 	, error_hooked_(false)
 {
 	acl_assert(handle);
+	dummy_[0] = 0;
+	peer_ip_[0] = 0;
+	local_ip_[0] = 0;
 }
 
 aio_stream::~aio_stream()
@@ -42,29 +45,90 @@ void aio_stream::close()
 	acl_aio_iocp_close(stream_);
 }
 
+const char* aio_stream::get_peer(bool full /* = false */) const
+{
+	if (stream_ == NULL)
+		return dummy_;
+
+	ACL_VSTREAM* vs = acl_aio_vstream(stream_);
+	const char* ptr = ACL_VSTREAM_PEER(vs);
+	ACL_SOCKET fd = ACL_VSTREAM_SOCK(vs);
+	if (ptr == NULL || *ptr == 0)
+	{
+		char  buf[64];
+		if (acl_getpeername(fd, buf, sizeof(buf)) == -1)
+			return dummy_;
+		acl_vstream_set_peer(vs, buf);
+	}
+
+	ptr = ACL_VSTREAM_PEER(vs);
+	if (full)
+		return ptr;
+	else if (peer_ip_[0] != 0)
+		return peer_ip_;
+
+	return const_cast<aio_stream*> (this)->get_ip(ptr,
+		const_cast<aio_stream*>(this)->peer_ip_, sizeof(peer_ip_));
+}
+
+const char* aio_stream::get_local(bool full /* = false */) const
+{
+	if (stream_ == NULL)
+		return dummy_;
+
+	ACL_VSTREAM* vs = acl_aio_vstream(stream_);
+	const char* ptr = ACL_VSTREAM_LOCAL(vs);
+	ACL_SOCKET fd = ACL_VSTREAM_SOCK(vs);
+	if (ptr == NULL || *ptr == 0)
+	{
+		char  buf[64];
+		if (acl_getsockname(fd, buf, sizeof(buf)) == -1)
+			return dummy_;
+		acl_vstream_set_local(vs, buf);
+	}
+
+	ptr = ACL_VSTREAM_LOCAL(vs);
+	if (full)
+		return ptr;
+	else if (local_ip_[0] != 0)
+		return local_ip_;
+
+	return const_cast<aio_stream*> (this)->get_ip(ptr,
+		const_cast<aio_stream*>(this)->local_ip_, sizeof(local_ip_));
+}
+
+const char* aio_stream::get_ip(const char* addr, char* buf, size_t size)
+{
+	snprintf(buf, size, "%s", addr);
+	char* ptr = strchr(buf, ':');
+	if (ptr)
+		*ptr = 0;
+	return buf;
+}
+
 aio_handle& aio_stream::get_handle() const
 {
-	return (*handle_);
+	return *handle_;
 }
 
 ACL_ASTREAM* aio_stream::get_astream() const
 {
-	return (stream_);
+	return stream_;
 }
 
 ACL_VSTREAM* aio_stream::get_vstream() const
 {
 	if (stream_ == NULL)
-		return (NULL);
-	return (acl_aio_vstream(stream_));
+		return NULL;
+	return acl_aio_vstream(stream_);
 }
 
 ACL_SOCKET aio_stream::get_socket() const
 {
 	ACL_VSTREAM* stream = get_vstream();
 	if (stream == NULL)
-		return (ACL_SOCKET_INVALID);
-	return (ACL_VSTREAM_SOCK(stream));
+		return ACL_SOCKET_INVALID;
+	return ACL_VSTREAM_SOCK(stream);
 }
 
 void aio_stream::add_close_callback(aio_callback* callback)
@@ -174,7 +238,7 @@ int aio_stream::del_close_callback(aio_callback* callback)
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 int aio_stream::del_timeout_callback(aio_callback* callback)
@@ -206,7 +270,7 @@ int aio_stream::del_timeout_callback(aio_callback* callback)
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 int aio_stream::disable_close_callback(aio_callback* callback)
@@ -236,7 +300,7 @@ int aio_stream::disable_close_callback(aio_callback* callback)
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 int aio_stream::disable_timeout_callback(aio_callback* callback)
@@ -266,7 +330,7 @@ int aio_stream::disable_timeout_callback(aio_callback* callback)
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 int aio_stream::enable_close_callback(aio_callback* callback /* = NULL */)
@@ -297,7 +361,7 @@ int aio_stream::enable_close_callback(aio_callback* callback /* = NULL */)
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 int aio_stream::enable_timeout_callback(aio_callback* callback /* = NULL */)
@@ -328,7 +392,7 @@ int aio_stream::enable_timeout_callback(aio_callback* callback /* = NULL */)
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 void aio_stream::hook_error()
@@ -370,7 +434,7 @@ int aio_stream::close_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 	}
 
 	as->destroy();
-	return (0);
+	return 0;
 }
 
 int aio_stream::timeout_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
@@ -383,10 +447,10 @@ int aio_stream::timeout_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 			continue;
 
 		if ((*it)->callback->timeout_callback() == false)
-			return (-1);
+			return -1;
 	}
 
-	return (0);
+	return 0;
 }
 
 }  // namespace acl

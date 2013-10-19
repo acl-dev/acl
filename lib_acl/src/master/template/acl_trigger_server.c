@@ -190,7 +190,7 @@ static void trigger_server_accept_fifo(int type acl_unused, ACL_EVENT *event,
 	    && acl_myflock(ACL_VSTREAM_FILE(trigger_server_lock),
 		    	ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
 	{
-		acl_msg_fatal("select unlock: %s", strerror(errno));
+		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
 
 	if (acl_msg_verbose)
@@ -234,11 +234,11 @@ static void trigger_server_accept_local(int type acl_unused, ACL_EVENT *event,
 	    && acl_myflock(ACL_VSTREAM_FILE(trigger_server_lock),
 	    	ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
 	{
-		acl_msg_fatal("select unlock: %s", strerror(errno));
+		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
 	if (fd < 0) {
 		if (errno != EAGAIN)
-			acl_msg_fatal("accept connection: %s", strerror(errno));
+			acl_msg_fatal("accept connection: %s", acl_last_serror());
 		if (time_left >= 0)
 			acl_event_request_timer(event, trigger_server_timeout,
 				NULL, (acl_int64) time_left * 1000000, 0);
@@ -284,10 +284,10 @@ static void trigger_server_accept_pass(int type acl_unused, ACL_EVENT *event,
 	    && acl_myflock(ACL_VSTREAM_FILE(trigger_server_lock),
 		    	ACL_INTERNAL_LOCK,
 			ACL_MYFLOCK_OP_NONE) < 0)
-		acl_msg_fatal("select unlock: %s", strerror(errno));
+		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	if (fd < 0) {
 		if (errno != EAGAIN)
-			acl_msg_fatal("accept connection: %s", strerror(errno));
+			acl_msg_fatal("accept connection: %s", acl_last_serror());
 		if (time_left >= 0)
 			acl_event_request_timer(event, trigger_server_timeout,
 				NULL, (acl_int64) time_left * 1000000, 0);
@@ -339,8 +339,9 @@ static void trigger_server_init(const char *procname)
 	acl_var_trigger_log_file = getenv("SERVICE_LOG");
 	if (acl_var_trigger_log_file == NULL) {
 		acl_var_trigger_log_file = acl_mystrdup("acl_master.log");
-		acl_msg_fatal("%s(%d)->%s: can't get MASTER_LOG's env value, use %s log",
-			__FILE__, __LINE__, myname, acl_var_trigger_log_file);
+		acl_msg_fatal("%s(%d)->%s: can't get MASTER_LOG's env value,"
+			" use %s log", __FILE__, __LINE__, myname,
+			acl_var_trigger_log_file);
 	}
 
 	acl_get_app_conf_int_table(__conf_int_tab);
@@ -518,23 +519,24 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 			break;
 		case ACL_MASTER_SERVER_SOLITARY:
 			if (!alone)
-				acl_msg_fatal("service %s requires a process limit of 1",
-					service_name);
+				acl_msg_fatal("service %s requires a process"
+					" limit of 1", service_name);
 			break;
 		case ACL_MASTER_SERVER_UNLIMITED:
 			if (!zerolimit)
-				acl_msg_fatal("service %s requires a process limit of 0",
-					service_name);
+				acl_msg_fatal("service %s requires a process"
+					" limit of 0", service_name);
 			break;
 		case ACL_MASTER_SERVER_PRIVILEGED:
 			if (user_name)
-				acl_msg_fatal("service %s requires privileged operation",
-					service_name);
+				acl_msg_fatal("service %s requires privileged"
+					" operation", service_name);
 			break;
 		default:
 			acl_msg_panic("%s: unknown argument type: %d", myname, key);
 		}
 	}
+
 	va_end(ap);
 
 	if (root_dir)
@@ -633,7 +635,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	 */
 	if (chdir(acl_var_trigger_queue_dir) < 0)
 		acl_msg_fatal("chdir(\"%s\"): %s",
-			acl_var_trigger_queue_dir, strerror(errno));
+			acl_var_trigger_queue_dir, acl_last_serror());
 	if (pre_init)
 		pre_init(trigger_server_name, trigger_server_argv);
 
@@ -661,7 +663,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	if (stream != 0) {
 		len = read(ACL_VSTREAM_SOCK(stream), buf, sizeof(buf));
 		if (len <= 0)
-			acl_msg_fatal("read: %s", strerror(errno));
+			acl_msg_fatal("read: %s", acl_last_serror());
 		service(buf, len, trigger_server_name, trigger_server_argv);
 		trigger_server_exit();
 	}
@@ -713,7 +715,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 			if (acl_myflock(ACL_VSTREAM_FILE(trigger_server_lock),
 				ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_EXCLUSIVE) < 0)
 			{
-				acl_msg_fatal("select lock: %s", strerror(errno));
+				acl_msg_fatal("lock error %s", acl_last_serror());
 			}
 		}
 		acl_watchdog_start(watchdog);
@@ -721,6 +723,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 		acl_event_set_delay_sec(__eventp, delay);
 		acl_event_loop(__eventp);
 	}
+
 	trigger_server_exit();
 }
 #endif /* ACL_UNIX */

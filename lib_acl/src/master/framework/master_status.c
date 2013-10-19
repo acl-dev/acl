@@ -42,7 +42,7 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 	ACL_MASTER_PID pid;
 	int     n;
 
-	if (type == 0)				/* XXX Can this happen?  */
+	if (type == 0)  /* XXX Can this happen?  */
 		return;
 
 	/*

@@ -7,9 +7,9 @@ namespace acl
 
 aio_socket_stream::aio_socket_stream(aio_handle* handle,
 	ACL_ASTREAM* stream, bool opened /* = false */)
-	: aio_stream(handle), aio_istream(handle), aio_ostream(handle)
-	, opened_(opened)
-	, open_hooked_(false)
+: aio_stream(handle), aio_istream(handle), aio_ostream(handle)
+, opened_(opened)
+, open_hooked_(false)
 {
 	acl_assert(handle);
 	acl_assert(stream);
@@ -32,9 +32,9 @@ aio_socket_stream::aio_socket_stream(aio_handle* handle,
 }
 
 aio_socket_stream::aio_socket_stream(aio_handle* handle, ACL_SOCKET fd)
-	: aio_stream(handle), aio_istream(handle), aio_ostream(handle)
-	, opened_(true)
-	, open_hooked_(false)
+: aio_stream(handle), aio_istream(handle), aio_ostream(handle)
+, opened_(true)
+, open_hooked_(false)
 {
 	acl_assert(handle);
 
@@ -132,7 +132,7 @@ int aio_socket_stream::del_open_callback(aio_open_callback* callback /* = NULL *
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 int aio_socket_stream::disable_open_callback(aio_open_callback* callback /* = NULL */)
@@ -162,7 +162,7 @@ int aio_socket_stream::disable_open_callback(aio_open_callback* callback /* = NU
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 int aio_socket_stream::enable_open_callback(aio_open_callback* callback /* = NULL */)
@@ -193,7 +193,7 @@ int aio_socket_stream::enable_open_callback(aio_open_callback* callback /* = NUL
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 aio_socket_stream* aio_socket_stream::open(aio_handle* handle,
@@ -204,7 +204,7 @@ aio_socket_stream* aio_socket_stream::open(aio_handle* handle,
 	ACL_ASTREAM* astream =
 		acl_aio_connect(handle->get_handle(), addr, timeout);
 	if (astream == NULL)
-		return (NULL);
+		return NULL;
 
 	aio_socket_stream* stream =
 		NEW aio_socket_stream(handle, astream, false);
@@ -215,12 +215,12 @@ aio_socket_stream* aio_socket_stream::open(aio_handle* handle,
 	// hook 连接成功的回调过程
 	stream->hook_open();
 
-	return (stream);
+	return stream;
 }
 
 bool aio_socket_stream::is_opened() const
 {
-	return (opened_);
+	return opened_;
 }
 
 void aio_socket_stream::hook_open()
@@ -256,9 +256,9 @@ int aio_socket_stream::open_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 			continue;
 
 		if ((*it)->callback->open_callback() == false)
-			return (-1);
+			return -1;
 	}
-	return (0);
+	return 0;
 }
 
 }  // namespace acl

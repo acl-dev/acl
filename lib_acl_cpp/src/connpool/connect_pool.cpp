@@ -9,6 +9,7 @@ namespace acl
 
 connect_pool::connect_pool(const char* addr, int max, size_t idx /* = 0 */)
 : alive_(true)
+, delay_destroy_(false)
 , last_dead_(0)
 , idx_(idx)
 , max_(max)
@@ -100,6 +101,22 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 	time_t now = time(NULL);
 
 	lock_.lock();
+
+	// 检查是否设置了自销毁标志位
+	if (delay_destroy_)
+	{
+		delete conn;
+		count_--;
+		acl_assert(count_ >= 0);
+		if (count_ == 0)
+		{
+			// 如果引用计数为 0 则自销毁
+			lock_.unlock();
+			delete this;
+		}
+		return;
+	}
+
 	if (keep && alive_)
 	{
 		conn->set_when(now);
@@ -117,6 +134,13 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 		(void) check_idle(idle_ttl_, false);
 		(void) time(&last_check_);
 	}
+	lock_.unlock();
+}
+
+void connect_pool::set_delay_destroy()
+{
+	lock_.lock();
+	delay_destroy_ = true;
 	lock_.unlock();
 }
 

@@ -53,13 +53,12 @@ int acl_fifo_trigger(ACL_EVENT *eventp_unused, const char *service,
 	 * the caller with safe_open() specific quirks such as the why argument.
 	 */
 	if ((fp = acl_safe_open(service, O_WRONLY | O_NONBLOCK, 0,
-			(struct stat *) 0, (uid_t) -1,
-			(uid_t) -1, why)) == 0)
+		(struct stat *) 0, (uid_t) -1, (uid_t) -1, why)) == 0)
 	{
 		if (acl_msg_verbose)
 			acl_msg_info("%s: open %s: %s",
 				myname, service, acl_vstring_str(why));
-		return (-1);
+		return -1;
 	}
 	fd = ACL_VSTREAM_FILE(fp);
 
@@ -79,7 +78,7 @@ int acl_fifo_trigger(ACL_EVENT *eventp_unused, const char *service,
 		if (acl_msg_verbose)
 			acl_msg_warn("%s: close %s: %s",
 				myname, service, strerror(errno));
-	return (0);
+	return 0;
 }
 #endif /* ACL_UNIX */
 
@@ -109,7 +108,7 @@ static void cleanup(void)
 static void handler(int sig)
 {
 	acl_msg_fatal("got signal %d after %d triggers %d wakeups",
-			sig, trig_count, wakeup_count);
+		sig, trig_count, wakeup_count);
 }
 
 static void read_event(int unused_event, char *context)
@@ -147,6 +146,8 @@ int     main(int unused_argc, char **unused_argv)
 		acl_event_loop(-1);
 		acl_event_loop(-1);
 	}
+
+	return 0;
 }
 
 #endif

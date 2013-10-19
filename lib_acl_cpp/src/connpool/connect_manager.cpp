@@ -112,34 +112,76 @@ connect_pool& connect_manager::set(const char* addr, int count)
 	ACL_SAFE_STRNCPY(key, addr, sizeof(key));
 	acl_lowercase(key);
 
+	lock_.lock();
+
 	std::vector<connect_pool*>::iterator it = pools_.begin();
 	for (; it != pools_.end(); ++it)
 	{
 		if (strcasecmp(key, (*it)->get_addr()) == 0)
+		{
+			lock_.unlock();
 			return **it;
+		}
 	}
 
 	connect_pool* pool = create_pool(key, count, pools_.size() - 1);
 	pools_.push_back(pool);
-	service_size_ = pools_.size();
+
+	lock_.unlock();
 
 	logger("Add one service, addr: %s, count: %d", addr, count);
 
 	return *pool;
 }
 
-connect_pool* connect_manager::get(const char* addr)
+void connect_manager::remove(const char* addr)
 {
 	char key[256];
 	ACL_SAFE_STRNCPY(key, addr, sizeof(key));
 	acl_lowercase(key);
 
+	lock_.lock();
+
 	std::vector<connect_pool*>::iterator it = pools_.begin();
 	for (; it != pools_.end(); ++it)
 	{
 		if (strcasecmp(key, (*it)->get_addr()) == 0)
-			return *it;
+		{
+			(*it)->set_delay_destroy();
+			pools_.erase(it);
+			break;
+		}
 	}
+	if (it == pools_.end())
+		logger_warn("addr(%s) not found!", addr);
+
+	lock_.unlock();
+}
+
+
+connect_pool* connect_manager::get(const char* addr,
+	bool exclusive /* = true */)
+{
+	char key[256];
+	ACL_SAFE_STRNCPY(key, addr, sizeof(key));
+	acl_lowercase(key);
+
+	if (exclusive)
+		lock_.lock();
+
+	std::vector<connect_pool*>::iterator it = pools_.begin();
+	for (; it != pools_.end(); ++it)
+	{
+		if (strcasecmp(key, (*it)->get_addr()) == 0)
+		{
+			if (exclusive)
+				lock_.unlock();
+			return *it;
+		}
+	}
+
+	if (exclusive)
+		lock_.unlock();
 
 	logger_error("no connect pool for addr %s", addr);
 	return NULL;
@@ -151,19 +193,39 @@ connect_pool* connect_manager::peek()
 {
 	connect_pool* pool;
 	lock_.lock();
-	size_t n = service_idx_ % service_size_;
+	size_t service_size = pools_.size();
+	size_t n = service_idx_ % service_size;
 	service_idx_++;
 	lock_.unlock();
 	pool = pools_[n];
 	return pool;
 }
 
-connect_pool* connect_manager::peek(const char* key)
+connect_pool* connect_manager::peek(const char* key,
+	bool exclusive /* = true */)
 {
 	if (key == NULL || *key == 0)
 		return peek();
+
 	unsigned n = acl_hash_crc32(key, strlen(key));
-	return pools_[n % service_size_];
+	if (exclusive)
+		lock_.lock();
+	size_t service_size = pools_.size();
+	connect_pool* pool = pools_[n % service_size];
+	if (exclusive)
+		lock_.unlock();
+
+	return pool;
+}
+
+void connect_manager::lock()
+{
+	lock_.lock();
+}
+
+void connect_manager::unlock()
+{
+	lock_.unlock();
 }
 
 void connect_manager::statistics_record(int, ACL_EVENT*, void* ctx)

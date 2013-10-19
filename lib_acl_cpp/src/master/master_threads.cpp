@@ -15,6 +15,10 @@ master_threads::master_threads(void)
 	__mt = this;
 }
 
+master_threads::~master_threads(void)
+{
+}
+
 static bool has_called = false;
 
 void master_threads::run_daemon(int argc, char** argv)
@@ -52,11 +56,16 @@ static int  __count_limit = 1;
 static int  __count = 0;
 static acl_pthread_pool_t* __thread_pool = NULL;
 
-static void close_all_listener(std::vector<ACL_VSTREAM*>& sstreams)
+static void close_sstreams(ACL_EVENT* event, std::vector<ACL_VSTREAM*>& streams)
 {
-	std::vector<ACL_VSTREAM*>::iterator it;
-	for (it = sstreams.begin(); it != sstreams.end(); ++it)
+	std::vector<ACL_VSTREAM*>::iterator it = streams.begin();
+	for (; it != streams.end(); ++it)
+	{
+		acl_event_disable_readwrite(event, *it);
 		acl_vstream_close(*it);
+	}
+
+	streams.clear();
 }
 
 bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
@@ -73,10 +82,11 @@ bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 #ifdef WIN32
 	acl_init();
 #endif
-	ACL_EVENT* eventp = acl_event_new_select_thr(1, 0);
+
 	std::vector<ACL_VSTREAM*> sstreams;
-	ACL_ARGV* tokens = acl_argv_split(addrs, ";,| \t");
-	ACL_ITER iter;
+	ACL_EVENT* eventp = acl_event_new_select_thr(1, 0);
+	ACL_ARGV*  tokens = acl_argv_split(addrs, ";,| \t");
+	ACL_ITER   iter;
 
 	acl_foreach(iter, tokens)
 	{
@@ -87,7 +97,7 @@ bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 			logger_error("listen %s error(%s)",
 				addr, acl_last_serror());
 			acl_argv_free(tokens);
-			close_all_listener(sstreams);
+			close_sstreams(eventp, sstreams);
 			acl_event_free(eventp);
 			return false;
 		}
@@ -95,6 +105,7 @@ bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 			listen_callback, sstream);
 		sstreams.push_back(sstream);
 	}
+
 	acl_argv_free(tokens);
 
 	// 初始化配置参数
@@ -120,9 +131,13 @@ bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 	else
 		thread_exit(NULL);
 
-	close_all_listener(sstreams);
-	acl_event_free(eventp);
 	service_exit(NULL);
+
+	// 必须在调用 acl_event_free 前调用 close_sstreams，因为在关闭
+	// 网络流对象时依然有对 ACL_EVENT 引擎的使用
+	close_sstreams(eventp, sstreams);
+	acl_event_free(eventp);
+
 	return true;
 }
 

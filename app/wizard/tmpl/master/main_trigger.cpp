@@ -19,7 +19,10 @@ int main(int argc, char* argv[])
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
 		acl::log::stdout_open(true);  // 日志输出至标准输出
-		ms.run_alone(NULL, 5, 1);  // 单独运行方式
+		if (argc >= 3)
+			ms.run_alone(argv[2], 5, 1);  // 单独运行方式
+		else
+			ms.run_alone(NULL, 5, 1);  // 单独运行方式
 	}
 	else
 		ms.run_daemon(argc, argv);  // acl_master 控制模式运行

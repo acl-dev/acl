@@ -386,6 +386,7 @@ static void event_loop(ACL_EVENT *eventp)
 
 	if (event_prepare(eventp) == 0) {
 		if (eventp->fdcnt_ready == 0) {
+			delay /= 1000000;
 			if (delay <= 0)
 				delay = 1;
 			/* 为避免循环过快，休眠一下 */

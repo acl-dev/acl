@@ -16,6 +16,28 @@ master_udp::master_udp(void)
 	__mu = this;
 }
 
+master_udp::~master_udp(void)
+{
+	close_sstreams();
+}
+
+void master_udp::close_sstreams(void)
+{
+	std::vector<socket_stream*>::iterator it = sstreams_.begin();
+	for (; it != sstreams_.end(); ++it)
+	{
+		// 当在 daemon 运行模式，socket_stream 中的 ACL_VSTREAM
+		// 对象将由 lib_acl 库中的 acl_udp_server 内部关闭，所以
+		// 此处需要将 ACL_VSTREAM 对象与 socket_stream 解耦
+		if (daemon_mode_)
+			(*it)->unbind();
+		delete *it;
+	}
+
+	// 必须清空流集合，因为该函数在析构时还将被调用一次
+	sstreams_.clear();
+}
+
 static bool has_called = false;
 
 void master_udp::run_daemon(int argc, char** argv)
@@ -45,13 +67,6 @@ static int  __count_limit = 1;
 static int  __count = 0;
 static bool __stop = false;
 
-static void close_all_streams(std::vector<ACL_VSTREAM*>& sstreams)
-{
-	std::vector<ACL_VSTREAM*>::iterator it = sstreams.begin();
-	for (; it != sstreams.end(); ++it)
-		acl_vstream_close(*it);
-}
-
 void master_udp::read_callback(int, ACL_EVENT*, ACL_VSTREAM *sstream, void*)
 {
 	service_main(sstream, NULL, NULL);
@@ -74,7 +89,6 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 	acl_init();
 #endif
 	ACL_EVENT* eventp = acl_event_new_select(1, 0);
-	std::vector<ACL_VSTREAM*> sstreams;
 	ACL_ARGV* tokens = acl_argv_split(addrs, ";,| \t");
 	ACL_ITER iter;
 
@@ -86,14 +100,19 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 		{
 			logger_error("bind %s error %s",
 				addr, last_serror());
-			close_all_streams(sstreams);
+			close_sstreams();
+			acl_event_free(eventp);
 			acl_argv_free(tokens);
 			return false;
 		}
 		acl_event_enable_read(eventp, sstream, 0,
 			read_callback, sstream);
-		sstreams.push_back(sstream);
+		socket_stream* ss = NEW socket_stream();
+		if (ss->open(sstream) == false)
+			logger_fatal("open stream error!");
+		sstreams_.push_back(ss);
 	}
+
 	acl_argv_free(tokens);
 
 	// 初始化配置参数
@@ -105,28 +124,46 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 	while (!__stop)
 		acl_event_loop(eventp);
 
-	close_all_streams(sstreams);
-	acl_event_free(eventp);
 	service_exit(NULL, NULL);
+
+	// 必须在调用 acl_event_free 前调用 close_sstreams，因为在关闭
+	// 网络流对象时依然有对 ACL_EVENT 引擎的使用
+	close_sstreams();
+	acl_event_free(eventp);
 	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
 
+static void on_close(ACL_VSTREAM* stream, void* ctx)
+{
+	if (ctx && stream->context == ctx)
+	{
+		socket_stream* ss = (socket_stream*) ctx;
+		delete ss;
+	}
+}
+
 void master_udp::service_main(ACL_VSTREAM *stream, char*, char**)
 {
-	socket_stream* ss = NEW socket_stream();
-	if (ss->open(stream) == false)
-		logger_fatal("open stream error!");
-
 	acl_assert(__mu != NULL);
+
+	socket_stream* ss = (socket_stream*) stream->context;
+	if (ss == NULL)
+	{
+		// 当本函数第一次被调用时，需要打开 socket_stream 流
+		ss = NEW socket_stream();
+		if (ss->open(stream) == false)
+			logger_fatal("open stream error!");
+		stream->context = ss;
+		acl_vstream_add_close_handle(stream, on_close, ss);
+	}
+
 #ifndef	WIN32
 	if (__mu->daemon_mode_)
 		acl_watchdog_pat();  // 必须通知 acl_master 框架一下
 #endif
 	__mu->on_read(ss);
-	ss->unbind();
-	delete ss;
 }
 
 void master_udp::service_pre_jail(char*, char**)
@@ -138,6 +175,21 @@ void master_udp::service_pre_jail(char*, char**)
 void master_udp::service_init(char*, char**)
 {
 	acl_assert(__mu != NULL);
+
+#ifndef	WIN32
+	if (__mu->daemon_mode_)
+	{
+		ACL_VSTREAM** streams = acl_udp_server_streams();
+		for (int i = 0; streams[i] != NULL; i++)
+		{
+			socket_stream* ss = NEW socket_stream();
+			if (ss->open(streams[i]) == false)
+				logger_fatal("open stream error!");
+			__mu->sstreams_.push_back(ss);
+		}
+	}
+#endif
+
 	__mu->proc_inited_ = true;
 	__mu->proc_on_init();
 }

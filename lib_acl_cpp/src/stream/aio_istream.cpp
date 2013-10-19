@@ -119,7 +119,7 @@ int aio_istream::del_read_callback(aio_callback* callback /* = NULL */)
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 int aio_istream::disable_read_callback(aio_callback* callback)
@@ -149,7 +149,7 @@ int aio_istream::disable_read_callback(aio_callback* callback)
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 int aio_istream::enable_read_callback(aio_callback* callback /* = NULL */)
@@ -180,7 +180,7 @@ int aio_istream::enable_read_callback(aio_callback* callback /* = NULL */)
 		}
 	}
 
-	return (n);
+	return n;
 }
 
 void aio_istream::hook_read()
@@ -212,7 +212,7 @@ void aio_istream::keep_read(bool onoff)
 
 bool aio_istream::keep_read() const
 {
-	return (acl_aio_stream_get_keep_read(stream_) == 0 ? false : true);
+	return acl_aio_stream_get_keep_read(stream_) == 0 ? false : true;
 }
 
 void aio_istream::gets(int timeout /* = 0 */, bool nonl /* = true */,
@@ -331,9 +331,9 @@ int aio_istream::read_callback(ACL_ASTREAM* stream acl_unused, void* ctx,
 			continue;
 
 		if ((*it)->callback->read_callback(data, len) == false)
-			return (-1);
+			return -1;
 	}
-	return (0);
+	return 0;
 }
 
 int aio_istream::read_wakeup(ACL_ASTREAM* stream acl_unused, void* ctx)
@@ -346,9 +346,9 @@ int aio_istream::read_wakeup(ACL_ASTREAM* stream acl_unused, void* ctx)
 			continue;
 
 		if ((*it)->callback->read_wakeup() == false)
-			return (-1);
+			return -1;
 	}
-	return (0);
+	return 0;
 }
 
 }  // namespace acl

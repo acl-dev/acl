@@ -124,10 +124,10 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 	 */
 
 	if (!(serv->flags & ACL_MASTER_FLAG_RELOADING)) {
-		if (!ACL_MASTER_LIMIT_OK(serv->max_proc, serv->total_proc)) {
+		if (!ACL_MASTER_LIMIT_OK(serv->max_proc, serv->total_proc))
 			acl_msg_panic("%s(%d)->%s: at process limit %d",
 				__FILE__, __LINE__, myname, serv->total_proc);
-		}
+
 		if (serv->avail_proc > 0 && (serv->prefork_proc <= 0
 			|| serv->avail_proc > serv->prefork_proc))
 		{
@@ -168,7 +168,7 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 		/* MASTER_FLOW_READ_STREAM has been inited in master_vars.c */
 		if (acl_var_master_flow_pipe[0] <= ACL_MASTER_FLOW_READ)
 			acl_msg_fatal("%s: flow pipe read descriptor <= %d",
-					myname, ACL_MASTER_FLOW_READ);
+				myname, ACL_MASTER_FLOW_READ);
 		if (dup2(acl_var_master_flow_pipe[0], ACL_MASTER_FLOW_READ) < 0)
 			acl_msg_fatal("%s: dup2: %s", myname, strerror(errno));
 		if (close(acl_var_master_flow_pipe[0]) < 0)
@@ -178,7 +178,7 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 		/* MASTER_FLOW_WRITE_STREAM has been inited in master_vars.c */
 		if (acl_var_master_flow_pipe[1] <= ACL_MASTER_FLOW_WRITE)
 			acl_msg_fatal("%s: flow pipe read descriptor <= %d",
-					myname, ACL_MASTER_FLOW_WRITE);
+				myname, ACL_MASTER_FLOW_WRITE);
 		if (dup2(acl_var_master_flow_pipe[1], ACL_MASTER_FLOW_WRITE) < 0)
 			acl_msg_fatal("%s: dup2: %s", myname, strerror(errno));
 		if (close(acl_var_master_flow_pipe[1]) < 0)
@@ -191,7 +191,7 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 		/* MASTER_STAT_STREAM has been inited in master_vars.c*/
 		if (serv->status_fd[1] <= ACL_MASTER_STATUS_FD)
 			acl_msg_fatal("%s: status file descriptor collision",
-					myname);
+				myname);
 		if (dup2(serv->status_fd[1], ACL_MASTER_STATUS_FD) < 0)
 			acl_msg_fatal("%s: dup2 status_fd: %s",
 				myname, strerror(errno));
@@ -206,7 +206,8 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 				acl_msg_fatal("%s: dup2 listen_fd %d: %s",
 					myname, serv->listen_fds[n], strerror(errno));
 			(void) close(serv->listen_fds[n]);
-			acl_msg_info(">>>fd is: %d<<", ACL_MASTER_LISTEN_FD + n);
+			if (acl_msg_verbose)
+				acl_msg_info(">>>fd is: %d<<", ACL_MASTER_LISTEN_FD + n);
 			acl_vstream_free(serv->listen_streams[n]);
 		}
 

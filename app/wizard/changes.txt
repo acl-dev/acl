@@ -1,4 +1,8 @@
 
+5) 2013.10.3
+5.1) feature: master_creator.cpp, 各个服务器模板示例增加了一些 IO 使用功能举例
+5.2) feature: master_creator.cpp, 生成服务器示例时添加了 valgrind.sh 脚本用来检查内存问题
+
 4) 2013.9.27
 4.1) feature: 增加了 master_udp 服务器模板例子
 

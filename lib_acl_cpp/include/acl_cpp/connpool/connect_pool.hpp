@@ -6,11 +6,14 @@
 namespace acl
 {
 
+class connect_manager;
 class connect_client;
 
 /**
  * 客户端连接池类，实现对连接池的动态管理，该类为纯虚类，需要子类实现
- * 纯虚函数 create_connect 用于创建与服务端的一个连接
+ * 纯虚函数 create_connect 用于创建与服务端的一个连接，当允许该类
+ * 对象允许通过 set_delay_destroy() 设置延迟销毁时，该类的子类实例
+ * 必须是动态对象
  */
 class ACL_CPP_API connect_pool
 {
@@ -22,6 +25,10 @@ public:
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 */
 	connect_pool(const char* addr, int count, size_t idx = 0);
+
+	/**
+	 * 该类当允许自行销毁时，类实例应为动态对象
+	 */
 	virtual ~connect_pool();
 
 	/**
@@ -70,6 +77,15 @@ public:
 	 * @param ok {bool} 设置该连接是否正常
 	 */
 	void set_alive(bool ok /* true | false */);
+
+	/**
+	 * 判断本连接池是否可用
+	 * @return {bool}
+	 */
+	bool aliving(void) const
+	{
+		return alive_;
+	}
 
 	/**
 	 * 获取连接池的服务器地址
@@ -134,9 +150,16 @@ public:
 protected:
 	virtual connect_client* create_connect() = 0;
 
+	friend class connect_manager;
+
+	/**
+	 * 设置该连接池对象为延迟自销毁，当内部发现引用计数为 0 时会自行销毁
+	 */
+	void set_delay_destroy();
+
 protected:
-	// 是否属正常
-	bool  alive_;
+	bool  alive_;				// 是否属正常
+	bool  delay_destroy_;			// 是否设置了延迟自销毁
 	// 有问题的服务器的可以重试的时间间隔，不可用连接池对象再次被启用的时间间隔
 	int   retry_inter_;
 	time_t last_dead_;			// 该连接池对象上次不可用时的时间截

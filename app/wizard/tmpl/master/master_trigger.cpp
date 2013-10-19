@@ -44,6 +44,7 @@ master_service::~master_service()
 
 void master_service::on_trigger()
 {
+	logger("trigger now!");
 }
 
 void master_service::proc_on_init()

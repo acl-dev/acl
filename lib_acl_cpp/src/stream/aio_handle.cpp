@@ -18,7 +18,7 @@ aio_delay_free::~aio_delay_free()
 
 bool aio_delay_free::locked() const
 {
-	return (locked_ || locked_fixed_);
+	return locked_ || locked_fixed_;
 }
 
 void aio_delay_free::set_locked()
@@ -86,9 +86,9 @@ public:
 		std::set<aio_delay_free*>::iterator it =
 			gc_set_.find(callback);
 		if (it != gc_set_.end())
-			return (false);
+			return false;
 		gc_set_.insert(callback);
-		return (true);
+		return true;
 	}
 
 	bool del(aio_delay_free* callback)
@@ -98,10 +98,10 @@ public:
 		if (it != gc_set_.end())
 		{
 			gc_set_.erase(it);
-			return (true);
+			return true;
 		}
 		else
-			return (false);
+			return false;
 	}
 
 	aio_handle* handle_;
@@ -157,17 +157,17 @@ int aio_timer_callback::clear()
 	}
 	tasks_.clear();
 	length_ = 0;
-	return (n);
+	return n;
 }
 
 bool aio_timer_callback::empty() const
 {
-	return (tasks_.empty());
+	return tasks_.empty();
 }
 
 size_t aio_timer_callback::length() const
 {
-	return (length_);
+	return length_;
 }
 
 void aio_timer_callback::keep_timer(bool on)
@@ -210,12 +210,12 @@ acl_int64 aio_timer_callback::del_task(unsigned int id)
 		logger_warn("timer id: %u not found", id);
 
 	if (tasks_.empty())
-		return (TIMER_EMPTY);
+		return TIMER_EMPTY;
 
 	set_time();
 
 	acl_int64 delay = tasks_.front()->when - present_;
-	return (delay < 0 ? 0 : delay);
+	return delay < 0 ? 0 : delay;
 }
 
 acl_int64 aio_timer_callback::set_task(unsigned int id, acl_int64 delay)
@@ -242,7 +242,7 @@ acl_int64 aio_timer_callback::set_task(unsigned int id, acl_int64 delay)
 	else
 		task->delay = delay;
 
-	return (set_task(task));
+	return set_task(task);
 }
 
 acl_int64 aio_timer_callback::set_task(aio_timer_task* task)
@@ -267,14 +267,14 @@ acl_int64 aio_timer_callback::set_task(aio_timer_task* task)
 
 	aio_timer_task* first = tasks_.front();
 	acl_int64 delay = first->when - present_;
-	return (delay < 0 ? 0 : delay);
+	return delay < 0 ? 0 : delay;
 }
 
 acl_int64 aio_timer_callback::trigger(void)
 {
 	// sanity check
 	if (tasks_.empty())
-		return (TIMER_EMPTY);
+		return TIMER_EMPTY;
 
 	acl_assert(length_ > 0);
 
@@ -304,7 +304,7 @@ acl_int64 aio_timer_callback::trigger(void)
 
 		aio_timer_task* first = tasks_.front();
 		acl_int64 delay = first->when - present_;
-		return (delay < 0 ? 0 : delay);
+		return delay < 0 ? 0 : delay;
 	}
 
 	// 将到达的定时任务重新放回至定时器的任务列表中，
@@ -333,7 +333,7 @@ acl_int64 aio_timer_callback::trigger(void)
 
 	// 子类有可能会在 timer_callback 中删除了所有的定时任务
 	if (tasks_.empty())
-		return (TIMER_EMPTY);
+		return TIMER_EMPTY;
 
 	aio_timer_task* first = tasks_.front();
 	acl_int64 delay = first->when - present_;
@@ -341,7 +341,7 @@ acl_int64 aio_timer_callback::trigger(void)
 	// 如果在加锁期间外部程序要求释放该对象，则在此处释放
 	if (destroy_on_unlock_)
 		destroy();
-	return (delay < 0 ? 0 : delay);
+	return delay < 0 ? 0 : delay;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -422,7 +422,7 @@ void aio_handle::keep_read(bool onoff)
 
 bool aio_handle::keep_read() const
 {
-	return (acl_aio_get_keep_read(aio_) == 0 ? false : true);
+	return acl_aio_get_keep_read(aio_) == 0 ? false : true;
 }
 
 acl_int64 aio_handle::set_timer(aio_timer_callback* callback,
@@ -431,10 +431,10 @@ acl_int64 aio_handle::set_timer(aio_timer_callback* callback,
 	acl_assert(aio_);
 	callback->handle_ = this;
 	delay = callback->set_task(id, delay);
-	return (acl_aio_request_timer(aio_,
+	return acl_aio_request_timer(aio_,
 		(void (*)(int, ACL_EVENT*, void*)) on_timer_callback,
 		callback, delay < 0 ? 0 : delay,
-		callback->keep_ ? 1 : 0));
+		callback->keep_ ? 1 : 0);
 }
 
 void aio_handle::on_timer_callback(int, ACL_EVENT*, aio_timer_callback *callback)
@@ -471,10 +471,10 @@ acl_int64 aio_handle::del_timer(aio_timer_callback* callback, unsigned int id)
 	if (callback->empty())
 		return del_timer(callback);
 
-	return (acl_aio_request_timer(callback->handle_->aio_,
+	return acl_aio_request_timer(callback->handle_->aio_,
 		(void (*)(int, ACL_EVENT*, void*)) on_timer_callback,
 		callback, next_delay < 0 ? 0 : next_delay,
-		callback->keep_timer() ? 1 : 0));
+		callback->keep_timer() ? 1 : 0);
 }
 
 acl_int64 aio_handle::del_timer(aio_timer_callback* callback)
@@ -485,7 +485,7 @@ acl_int64 aio_handle::del_timer(aio_timer_callback* callback)
 	callback->clear();
 	destroy_timer(callback);
 
-	return (next_delay);
+	return next_delay;
 }
 
 void aio_handle::delay_free(aio_delay_free* callback)
@@ -515,20 +515,20 @@ void aio_handle::destroy_timer(aio_timer_callback* callback)
 
 ACL_AIO* aio_handle::get_handle() const
 {
-	return (aio_);
+	return aio_;
 }
 
 aio_handle_type aio_handle::get_engine_type() const
 {
-	return (engine_type_);
+	return engine_type_;
 }
 
 bool aio_handle::check()
 {
 	acl_aio_loop(aio_);
 	if (stop_)
-		return (false);
-	return (true);
+		return false;
+	return true;
 }
 
 void aio_handle::stop()
@@ -556,7 +556,7 @@ void aio_handle::decrease()
 
 int aio_handle::length() const
 {
-	return (nstream_);
+	return nstream_;
 }
 
 }  // namespace acl

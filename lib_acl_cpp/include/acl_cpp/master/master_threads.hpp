@@ -40,7 +40,7 @@ public:
 protected:
 	// 该类不能直接被实例化
 	master_threads();
-	virtual ~master_threads() {}
+	virtual ~master_threads();
 
 	/**
 	 * 纯虚函数：当某个客户端连接有数据可读或关闭或出错时调用此函数

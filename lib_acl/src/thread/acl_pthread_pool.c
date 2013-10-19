@@ -117,7 +117,7 @@ static void *__poller_thread(void *arg)
 		__SET_ERRNO(status);
 		acl_msg_error("%s, %s(%d): pthread_mutex_lock error(%s)",
 			__FILE__, myname, __LINE__, acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 
 	thr_pool->poller_running = 1;
@@ -168,12 +168,12 @@ static void *__poller_thread(void *arg)
 		__SET_ERRNO(status);
 		acl_msg_error("%s, %s(%d): pthread_mutex_unlock error(%s)",
 			__FILE__, myname, __LINE__, acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 
 	acl_debug(ACL_DEBUG_THR_POOL, 3) ("poller unlock ok");
 
-	return (NULL);
+	return NULL;
 }
 
 static void *__worker_thread(void* arg)
@@ -198,7 +198,7 @@ static void *__worker_thread(void* arg)
 			acl_msg_error("%s(%d), %s: tid = %lu, worker init call error",
 				__FILE__, __LINE__, myname,
 				(unsigned long) acl_pthread_self());
-			return (NULL);
+			return NULL;
 		}
 	}
 
@@ -208,7 +208,7 @@ static void *__worker_thread(void* arg)
 		acl_msg_error("%s(%d)->%s: tid = %lu, lock error(%s)",
 			__FILE__, __LINE__, myname,
 			(unsigned long) acl_pthread_self(), acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 	
 	for (;;) {
@@ -332,7 +332,7 @@ acl_pthread_pool_t *acl_thread_pool_create(int threads_limit, int idle_timeout)
 
 	/* 创建半驻留线程句柄 */
 	thr_pool = acl_pthread_pool_create(&attr);
-	return (thr_pool);
+	return thr_pool;
 }
 
 acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
@@ -347,7 +347,7 @@ acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
 		__SET_ERRNO(status);
 		acl_msg_error("%s(%d)->%s: pthread_attr_init, serr = %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 
 	if (attr && attr->stack_size > 0)
@@ -361,7 +361,7 @@ acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
 		acl_myfree(thr_pool);
 		acl_msg_error("%s(%d)->%s: pthread_attr_setdetachstate, serr = %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 # if     !defined(__FreeBSD__)
 	status = pthread_attr_setscope(&thr_pool->attr, PTHREAD_SCOPE_SYSTEM);
@@ -371,7 +371,7 @@ acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
 		acl_set_error(status);
 		acl_msg_error("%s(%d)->%s: pthread_attr_setscope, serr = %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 # endif
 #elif defined(ACL_MS_WINDOWS)
@@ -384,7 +384,7 @@ acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
 		acl_myfree(thr_pool);
 		acl_msg_error("%s(%d)->%s: pthread_mutex_init, serr = %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 	status = acl_pthread_cond_init(&thr_pool->worker_cond, NULL);
 	if (status != 0) {
@@ -394,7 +394,7 @@ acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
 		__SET_ERRNO(status);
 		acl_msg_error("%s(%d)->%s: pthread_cond_init, serr = %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 
 	status = acl_pthread_mutex_init(&thr_pool->poller_mutex, NULL);
@@ -406,7 +406,7 @@ acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
 		acl_myfree(thr_pool);
 		acl_msg_error("%s(%d)->%s: pthread_mutex_init, serr = %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 	status = acl_pthread_cond_init(&thr_pool->poller_cond, NULL);
 	if (status != 0) {
@@ -418,7 +418,7 @@ acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
 		__SET_ERRNO(status);
 		acl_msg_error("%s(%d)->%s: pthread_cond_init, serr = %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 
 	__init_workq(thr_pool);
@@ -441,7 +441,7 @@ acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
 
 	thr_pool->valid = ACL_PTHREAD_POOL_VALID;
 
-	return (thr_pool);
+	return thr_pool;
 }
 
 int acl_pthread_pool_set_timewait(acl_pthread_pool_t *thr_pool, int timewait)
@@ -453,11 +453,11 @@ int acl_pthread_pool_set_timewait(acl_pthread_pool_t *thr_pool, int timewait)
 	{
 		acl_msg_error("%s(%d)->%s: invalid input",
 			__FILE__, __LINE__, myname);
-		return (-1);
+		return -1;
 	}
 
 	thr_pool->overload_timewait = timewait;
-	return (0);
+	return 0;
 }
 
 int acl_pthread_pool_atinit(acl_pthread_pool_t *thr_pool,
@@ -468,13 +468,13 @@ int acl_pthread_pool_atinit(acl_pthread_pool_t *thr_pool,
 	if (thr_pool == NULL || thr_pool->valid != ACL_PTHREAD_POOL_VALID) {
 		acl_msg_error("%s(%d)->%s: input invalid",
 			__FILE__, __LINE__, myname);
-		return (ACL_EINVAL);
+		return ACL_EINVAL;
 	}
 
 	thr_pool->worker_init_fn = init_fn;
 	thr_pool->worker_init_arg = init_arg;
 
-	return (0);
+	return 0;
 }
 
 int acl_pthread_pool_atfree(acl_pthread_pool_t *thr_pool,
@@ -485,13 +485,13 @@ int acl_pthread_pool_atfree(acl_pthread_pool_t *thr_pool,
 	if (thr_pool == NULL || thr_pool->valid != ACL_PTHREAD_POOL_VALID) {
 		acl_msg_error("%s(%d)->%s: input invalid",
 			__FILE__, __LINE__, myname);
-		return (ACL_EINVAL);
+		return ACL_EINVAL;
 	}
 
 	thr_pool->worker_free_fn = free_fn;
 	thr_pool->worker_free_arg = free_arg;
 
-	return (0);
+	return 0;
 }
 
 static int __wait_poller_exit(acl_pthread_pool_t *thr_pool)
@@ -510,7 +510,7 @@ static int __wait_poller_exit(acl_pthread_pool_t *thr_pool)
 		__SET_ERRNO(status);
 		acl_msg_error("%s, %s(%d): pthread_mutex_lock, serr = %s",
 			__FILE__, myname, __LINE__, acl_last_serror());
-		return (status);
+		return status;
 	}
 
 	acl_debug(ACL_DEBUG_THR_POOL, 3) ("%s: begin to wait cond", myname);
@@ -532,7 +532,7 @@ static int __wait_poller_exit(acl_pthread_pool_t *thr_pool)
 			acl_msg_error("%s, %s(%d): pthread_cond_wait,"
 				" serr = %s", __FILE__, myname, __LINE__,
 				acl_last_serror());
-			return (status);
+			return status;
 		}
 	}
 
@@ -545,7 +545,7 @@ static int __wait_poller_exit(acl_pthread_pool_t *thr_pool)
 			__FILE__, myname, __LINE__, acl_last_serror());
 	}
 
-	return (status);
+	return status;
 }
 
 static int __wait_worker_exit(acl_pthread_pool_t *thr_pool)
@@ -558,7 +558,7 @@ static int __wait_worker_exit(acl_pthread_pool_t *thr_pool)
 		__SET_ERRNO(status);
 		acl_msg_error("%s(%d)->%s: pthread_mutex_lock, serr = %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
-		return (status);
+		return status;
 	}
 
 	thr_pool->worker_quit = 1;
@@ -569,7 +569,7 @@ static int __wait_worker_exit(acl_pthread_pool_t *thr_pool)
 	} else if (thr_pool->counter == 0) {
 		acl_debug(ACL_DEBUG_THR_POOL, 2) ("%s: debug: counter = 0", myname);
 		status = acl_pthread_mutex_unlock(&thr_pool->worker_mutex);
-		return (0);
+		return 0;
 	}
 
 	/* 1. set quit flag
@@ -588,7 +588,7 @@ static int __wait_worker_exit(acl_pthread_pool_t *thr_pool)
 			acl_msg_error("%s(%d)->%s: pthread_cond_broadcast,"
 				" serr = %s", __FILE__, __LINE__, myname,
 				acl_last_serror());
-			return (status);
+			return status;
 		}
 	}
 
@@ -609,7 +609,7 @@ static int __wait_worker_exit(acl_pthread_pool_t *thr_pool)
 			acl_msg_error("%s(%d)->%s: pthread_cond_timedwait,"
 				" serr = %s", __FILE__, __LINE__, myname,
 				acl_last_serror());
-			return (status);
+			return status;
 		}
 	}
 
@@ -620,7 +620,7 @@ static int __wait_worker_exit(acl_pthread_pool_t *thr_pool)
 			__FILE__, __LINE__, myname, acl_last_serror());
 	}
 
-	return (status);
+	return status;
 }
 
 int acl_pthread_pool_destroy(acl_pthread_pool_t *thr_pool)
@@ -631,7 +631,7 @@ int acl_pthread_pool_destroy(acl_pthread_pool_t *thr_pool)
 	if (thr_pool == NULL || thr_pool->valid != ACL_PTHREAD_POOL_VALID) {
 		acl_msg_error("%s(%d)->%s: input invalid",
 			__FILE__, __LINE__, myname);
-		return (ACL_EINVAL);
+		return ACL_EINVAL;
 	}
 
 	thr_pool->valid = 0;			/* prevent any other operations	*/
@@ -641,7 +641,7 @@ int acl_pthread_pool_destroy(acl_pthread_pool_t *thr_pool)
 		__SET_ERRNO(status);
 		acl_msg_error("%s, %s(%d): wait_poller_exit error(%s), ret=%d",
 			__FILE__, myname, __LINE__, acl_last_serror(), status);
-		return (status);
+		return status;
 	}
 
 	acl_debug(ACL_DEBUG_THR_POOL, 2)
@@ -653,7 +653,7 @@ int acl_pthread_pool_destroy(acl_pthread_pool_t *thr_pool)
 		__SET_ERRNO(status);
 		acl_msg_error("%s, %s(%d): wait_worker_exit error(%s), ret=%d",
 			__FILE__, myname, __LINE__, acl_last_serror(), status);
-		return (status);
+		return status;
 	}
 
 	acl_debug(ACL_DEBUG_THR_POOL, 2)
@@ -672,7 +672,7 @@ int acl_pthread_pool_destroy(acl_pthread_pool_t *thr_pool)
 
 	status = s1 ? s1 : (s2 ? s2 : (s3 ? s3 : (s4 ? s4 : s5)));
 
-	return (status);
+	return status;
 }
 
 int acl_pthread_pool_stop(acl_pthread_pool_t *thr_pool)
@@ -683,7 +683,7 @@ int acl_pthread_pool_stop(acl_pthread_pool_t *thr_pool)
 	if (thr_pool == NULL || thr_pool->valid != ACL_PTHREAD_POOL_VALID) {
 		acl_msg_error("%s(%d)->%s: input invalid",
 			__FILE__, __LINE__, myname);
-		return (ACL_EINVAL);
+		return ACL_EINVAL;
 	}
 
 	thr_pool->valid = 0;			/* prevent any other operations	*/
@@ -693,7 +693,7 @@ int acl_pthread_pool_stop(acl_pthread_pool_t *thr_pool)
 		__SET_ERRNO(status);
 		acl_msg_error("%s, %s(%d): wait_poller_exit error(%s), ret=%d",
 			__FILE__, myname, __LINE__, acl_last_serror(), status);
-		return (status);
+		return status;
 	}
 
 	acl_debug(ACL_DEBUG_THR_POOL, 2)
@@ -705,7 +705,7 @@ int acl_pthread_pool_stop(acl_pthread_pool_t *thr_pool)
 		__SET_ERRNO(status);
 		acl_msg_error("%s, %s(%d): wait_worker_exit error(%s), ret=%d",
 			__FILE__, myname, __LINE__, acl_last_serror(), status);
-		return (status);
+		return status;
 	}
 
 	thr_pool->valid = ACL_PTHREAD_POOL_VALID;  /* restore the valid status */
@@ -714,7 +714,7 @@ int acl_pthread_pool_stop(acl_pthread_pool_t *thr_pool)
 		("%s(%d): worker threads exit ok, conter=%d",
 		 myname, __LINE__, thr_pool->counter);
 
-	return (0);
+	return 0;
 }
 
 static void __workq_addone(acl_pthread_pool_t *thr_pool, ACL_TASK *item)
@@ -781,12 +781,12 @@ int acl_pthread_pool_add(acl_pthread_pool_t *thr_pool,
 	int   status;
 
 	if (thr_pool->valid != ACL_PTHREAD_POOL_VALID || run_fn == NULL)
-		return (ACL_EINVAL);
+		return ACL_EINVAL;
 
 #ifndef	USE_SLICE
 	item = (ACL_TASK*) acl_mymalloc(sizeof(ACL_TASK));
 	if (item == NULL)
-		return (ACL_ENOMEM);
+		return ACL_ENOMEM;
 
 	item->worker_fn  = run_fn;
 	item->worker_arg = run_arg;
@@ -807,7 +807,7 @@ int acl_pthread_pool_add(acl_pthread_pool_t *thr_pool,
 	item = (ACL_TASK*) acl_slice_alloc(thr_pool->slice);
 	if (item == NULL) {
 		acl_pthread_mutex_unlock(&thr_pool->worker_mutex);
-		return (ACL_ENOMEM);
+		return ACL_ENOMEM;
 	}
 #endif
 
@@ -824,7 +824,7 @@ int acl_pthread_pool_add(acl_pthread_pool_t *thr_pool,
 			__FILE__, __LINE__, myname, acl_last_serror());
 	}
 
-	return (0);
+	return 0;
 }
 
 void acl_pthread_pool_add_begin(acl_pthread_pool_t *thr_pool)
@@ -919,13 +919,13 @@ int acl_pthread_pool_start_poller(acl_pthread_pool_t *thr_pool)
 	if (thr_pool == NULL || thr_pool->valid != ACL_PTHREAD_POOL_VALID) {
 		acl_msg_error("%s(%d)->%s: input invalid",
 			__FILE__, __LINE__, myname);
-		return (-1);
+		return -1;
 	}
 
 	if (thr_pool->poller_fn == NULL) {
 		acl_msg_warn("%s, %s(%d): poller_fn is null, don't need call %s",
 			__FILE__, myname, __LINE__, myname);
-		return (-1);
+		return -1;
 	}
 
 	status = acl_pthread_mutex_lock(&thr_pool->poller_mutex);
@@ -933,13 +933,13 @@ int acl_pthread_pool_start_poller(acl_pthread_pool_t *thr_pool)
 		__SET_ERRNO(status);
 		acl_msg_error("%s, %s(%d): lock poller_mutex error(%s)",
 			__FILE__, myname, __LINE__, acl_last_serror());
-		return (-1);
+		return -1;
 	}
 
 	if (thr_pool->poller_running) {
 		acl_msg_error("%s, %s(%d): server is running",
 			__FILE__, myname, __LINE__);
-		return (-1);
+		return -1;
 	}
 
 	status = acl_pthread_mutex_unlock(&thr_pool->poller_mutex);
@@ -947,7 +947,7 @@ int acl_pthread_pool_start_poller(acl_pthread_pool_t *thr_pool)
 		__SET_ERRNO(status);
 		acl_msg_error("%s, %s(%d): unlock poller_mutex error(%s)",
 			__FILE__, myname, __LINE__, acl_last_serror());
-		return (-1);
+		return -1;
 	}
 
 	__init_workq(thr_pool);
@@ -958,10 +958,10 @@ int acl_pthread_pool_start_poller(acl_pthread_pool_t *thr_pool)
 		__SET_ERRNO(status);
 		acl_msg_error("%s(%d)->%s: pthread_create poller, serr = %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
-		return (status);
+		return status;
 	}
 
-	return (0);
+	return 0;
 }
 
 int acl_pthread_pool_add_dispatch(void *dispatch_arg, void (*run_fn)(void *), void *run_arg)
@@ -976,7 +976,7 @@ int acl_pthread_pool_add_dispatch(void *dispatch_arg, void (*run_fn)(void *), vo
 	thr_pool = (acl_pthread_pool_t *) dispatch_arg;
 	acl_pthread_pool_add_one(thr_pool, run_fn, run_arg);
 
-	return (0);
+	return 0;
 }
 
 int acl_pthread_pool_dispatch(void *dispatch_arg, void (*run_fn)(void *), void *run_arg)
@@ -990,7 +990,7 @@ int acl_pthread_pool_dispatch(void *dispatch_arg, void (*run_fn)(void *), void *
 
 	thr_pool = (acl_pthread_pool_t *) dispatch_arg;
 
-	return (acl_pthread_pool_add(thr_pool, run_fn, run_arg));
+	return acl_pthread_pool_add(thr_pool, run_fn, run_arg);
 }
 
 int acl_pthread_pool_size(acl_pthread_pool_t *thr_pool)
@@ -1002,7 +1002,7 @@ int acl_pthread_pool_size(acl_pthread_pool_t *thr_pool)
 	if (status) {
 		acl_msg_error("%s(%d)->%s: pthread_mutex_lock error(%s)",
 			__FILE__, __LINE__, myname, strerror(status));
-		return (-1);
+		return -1;
 	}
 
 	n = thr_pool->counter;
@@ -1010,10 +1010,15 @@ int acl_pthread_pool_size(acl_pthread_pool_t *thr_pool)
 	if (status) {
 		acl_msg_error("%s(%d)->%s: pthread_mutex_unlock error(%s)",
 			__FILE__, __LINE__, myname, strerror(status));
-		return (-1);
+		return -1;
 	}
 
-	return (n);
+	return n;
+}
+
+int acl_pthread_pool_qlen(acl_pthread_pool_t *thr_pool)
+{
+	return thr_pool->qlen;
 }
 
 void acl_pthread_pool_set_stacksize(acl_pthread_pool_t *thr_pool, size_t size)

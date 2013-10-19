@@ -17,13 +17,12 @@ typedef struct WARN_INFO {
 } WARN_INFO;
 
 static WARN_INFO *warn_info_new(const char *notify_addr,
-	const char *notify_recipients, const char *path,
-	int pid, const char *desc)
+	const char *recipients, const char *path, int pid, const char *desc)
 {
 	WARN_INFO *info = (WARN_INFO*) acl_mycalloc(1, sizeof(WARN_INFO));
 
 	info->notify_addr = acl_mystrdup(notify_addr);
-	info->notify_recipients = acl_mystrdup(notify_recipients);
+	info->notify_recipients = acl_mystrdup(recipients);
 	info->path = acl_mystrdup(path);
 	info->pid = pid;
 	info->desc = acl_mystrdup(desc);
@@ -77,7 +76,7 @@ static void notify_thread(void *arg)
 	warn_info_free(info);
 }
 
-void master_warning(const char *notify_addr, const char *notify_recipients,
+void master_warning(const char *notify_addr, const char *recipients,
 	const char *path, int pid, const char *desc)
 {
 	const char *myname = "master_warning";
@@ -96,7 +95,7 @@ void master_warning(const char *notify_addr, const char *notify_recipients,
 		return;
 	}
 
-	info = warn_info_new(notify_addr, notify_recipients, path, pid, desc);
+	info = warn_info_new(notify_addr, recipients, path, pid, desc);
 	if (acl_pthread_pool_add(acl_var_master_thread_pool,
 		notify_thread, info) != 0)
 	{
