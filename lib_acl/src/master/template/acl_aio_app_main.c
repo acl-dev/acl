@@ -81,8 +81,11 @@ static void __service(ACL_SOCKET fd, char *service acl_unused,
 			__FILE__, myname, __LINE__, ip);
 
 		if (__deny_info && *__deny_info) {
-			(void) write(fd, __deny_info, strlen(__deny_info));
-			(void) write(fd, "\r\n", 2);
+			if (write(fd, __deny_info, strlen(__deny_info)) > 0
+				&& write(fd, "\r\n", 2) > 0)
+			{
+				/* do nothing, just avoid compile warning */
+			}
 		}
 
 		acl_socket_close(fd);

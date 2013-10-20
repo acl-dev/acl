@@ -1,3 +1,37 @@
+修改历史列表：
+------------------------------------------------------------------------
+
+395) 2013.10.20
+395.1) compile: acl_aio_app_main.c, 其中在调用 write 时，需要判断返回值，否则
+会在高版本 gcc 上报警告
+
+394) 2013.10.17
+394.1) bugfix: acl_mylog.c, 当通过 UDP 方式记录日志时，因为之前 acl_vstream.c
+允许注册外部接口的改变而发生了不兼容性问题
+
+393) 2013.10.15
+393.1) feature: acl_aio_app_main.c/acl_ioctl_app_main.c, 增加了配置项
+master_deny_banner 允许用户自定义拒绝连接的内容信息
+
+392) 2013.10.12
+392.1) feature: acl_pthread_pool.c 增加了 acl_pthread_pool_qlen 函数，提供
+当前线程池队列中未被处理的任务数量
+
+391) 2013.10.7
+391.1) performance: acl_vstream.c，将 __vstream_sys_read 的读过程进行了
+优化，改名为 __sys_read，以允许将用户输入的缓冲区做为系统 read 的内存地址，
+从而在调用 acl_vstream_readn/acl_vstream_read 时避免了数据的二次拷贝
+
+------------------------------------------------------------------------
+
+390) 2013.10.1
+390.1) 将 master 模块下的源文件代码排版整理了一下
+390.2) bugfix: events_select.c/events_select_thr.c 当套接字监听集合为空时
+休眠的时间单位为秒，需要将微秒级的 delay 转为秒级
+
+389) 2013.9.30
+389.1) feature: acl_single_server.c, acl_ioctl_server.c, acl_aio_server.c
+acl_udp_server.c 增加了可以获得本地监听套接口流对象集合的函数
 
 388) 2013.9.27
 388.1) events: ACL_EVENT_NOTIFY_RDWR/ACL_EVENT_NOTIFY_TIME 函数接口类型
