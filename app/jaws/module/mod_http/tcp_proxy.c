@@ -91,7 +91,7 @@ void tcp_start(CLIENT_ENTRY *entry)
 	if (entry->client == NULL || entry->server == NULL)
 		return;
 	acl_aio_ctl(entry->client,
-		ACL_AIO_CTL_READ_FN, read_callback,
+		ACL_AIO_CTL_READ_HOOK_ADD, read_callback, entry,
 		ACL_AIO_CTL_CLOSE_HOOK_ADD, io_close_fn, entry,
 		ACL_AIO_CTL_TIMEO_HOOK_ADD, io_timeout_fn, entry,
 		ACL_AIO_CTL_TIMEOUT, entry->service->rw_timeout,
@@ -99,7 +99,7 @@ void tcp_start(CLIENT_ENTRY *entry)
 		ACL_AIO_CTL_END);
 
 	acl_aio_ctl(entry->server,
-		ACL_AIO_CTL_READ_FN, read_callback,
+		ACL_AIO_CTL_READ_HOOK_ADD, read_callback, entry,
 		ACL_AIO_CTL_CLOSE_HOOK_ADD, io_close_fn, entry,
 		ACL_AIO_CTL_TIMEO_HOOK_ADD, io_timeout_fn, entry,
 		ACL_AIO_CTL_TIMEOUT, entry->service->rw_timeout,

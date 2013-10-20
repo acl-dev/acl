@@ -107,6 +107,7 @@ build:
 	@(cd multi_proxy; make)
 	@(cd aio_echo; make)
 	@(cd aio_proxy; make)
+	@(cd udp_echo; make)
 #	@(cd master_notify; make)
 
 $(OBJ_OUTPATH)%.o: %.c *.h
@@ -124,6 +125,7 @@ clean:
 	@(cd aio_proxy; make clean)
 	@(cd aio_echo; make clean)
 	@(cd master_notify; make clean)
+	@(cd udp_echo; make clean)
 
 install:
 	cp single_echo/single_echo ${DIST_PATH}/
@@ -133,6 +135,7 @@ install:
 	cp single_proxy/single_proxy ${DIST_PATH}/
 	cp multi_proxy/multi_proxy ${DIST_PATH}/
 	cp aio_proxy/aio_proxy ${DIST_PATH}/
+	cp udp_echo/udp_echo ${DIST_PATH}/
 #	cp master_notify/acl_notify ${DIST_PATH}/
 #	cp aio_echo/aio_echo ${DIST_PATH}/
 

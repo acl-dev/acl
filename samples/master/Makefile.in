@@ -31,7 +31,7 @@ endif
 #Path for Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -DLINUX2
-	SYSLIB = -lcrypt -lpthread
+	SYSLIB = -lpthread
 endif
 
 #Path for SunOS

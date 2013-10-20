@@ -203,7 +203,8 @@ static void connect_pool(void)
 	printf("prepare connect %d ok, __timeout=%d\r\n", __nconn, __timeout);
 }
 
-static void gc_timer(int event_type acl_unused, void *context)
+static void gc_timer(int event_type acl_unused, ACL_EVENT *event acl_unused,
+	void *context)
 {
 	ACL_AIO *aio = (ACL_AIO *) context;
 
@@ -242,6 +243,9 @@ void echo_client_start(int use_slice)
 		acl_myfree(__data);
 	__data = NULL;
 	printf("enter any key to quit now\n");
+
+	acl_aio_free(__aio);
+	__aio = NULL;
 	getchar();
 }
 

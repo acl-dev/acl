@@ -45,6 +45,8 @@ void http_header::init()
 	cgi_mode_ = false;
 	range_from_ = -1;
 	range_to_ = -1;
+	content_length_ = -1;
+	chunked_transfer_ = false;
 }
 
 void http_header::clear()
@@ -117,13 +119,13 @@ http_header& http_header::add_entry(const char* name, const char* value)
 
 http_header& http_header::set_content_length(acl_int64 n)
 {
-	char buf[64];
-#ifdef WIN32
-	_snprintf(buf, sizeof(buf), "%I64d", n);
-#else
-	snprintf(buf, sizeof(buf), "%lld", n);
-#endif
-	add_entry("Content-Length", buf);
+	content_length_ = n;
+	return *this;
+}
+
+http_header& http_header::set_chunked(bool on)
+{
+	chunked_transfer_ = on;
 	return *this;
 }
 
@@ -184,6 +186,19 @@ void http_header::build_common(string& buf) const
 		std::list<HTTP_HDR_ENTRY*>::const_iterator it = entries_.begin();
 		for (; it != entries_.end(); ++it)
 			buf << (*it)->name << ": " << (*it)->value << "\r\n";
+	}
+
+	if (chunked_transfer_)
+		buf << "Transfer-Encoding: " << "chunked\r\n";
+	else if (content_length_ >= 0)
+	{
+		char length[64];
+#ifdef WIN32
+		_snprintf(length, sizeof(length), "%I64d", content_length_);
+#else
+		snprintf(length, sizeof(length), "%lld", content_length_);
+#endif
+		buf << "Content-Length" << length << "\r\n";
 	}
 
 	if (is_request_ == false && cgi_mode_)

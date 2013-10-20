@@ -70,8 +70,21 @@ public:
 	 */
 #ifdef WIN32
 	http_header& set_content_length(__int64 n);
+
+	/**
+	 * 获得通过 set_content_length 设置的 HTTP 头中的 Content-Length 值
+	 * @return {int64}
+	 */
+	__int64 get_content_length() const
+	{
+		return content_length_;
+	}
 #else
 	http_header& set_content_length(long long int n);
+	long long int get_content_length() const
+	{
+		return content_length_;
+	}
 #endif
 
 	/**
@@ -267,6 +280,22 @@ public:
 	http_header& set_status(int status);
 
 	/**
+	 * 设置 HTTP 响应头中的 chunked 传输标志
+	 * @param on {bool}
+	 * @return {http_header&}
+	 */
+	http_header& set_chunked(bool on);
+
+	/**
+	 * 判断当前 HTTP 传输是否采用 chunked 传输方式
+	 * @return {bool}
+	 */
+	bool chunked_transfer() const
+	{
+		return chunked_transfer_;
+	}
+
+	/**
 	 * 设置是否用来生成 CGI 格式的响应头
 	 * @param on {bool} 是否 CGI 格式响应头
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
@@ -292,11 +321,13 @@ private:
 #ifdef WIN32
 	__int64 range_from_;                  // 请求头中，range 起始位置
 	__int64 range_to_;                    // 请求头中，range 结束位置
+	__int64 content_length_;              // HTTP 数据体长度
 #else
 	long long int range_from_;            // 请求头中，range 起始位置
 	long long int range_to_;              // 请求头中，range 结束位置
+	long long int content_length_;        // HTTP 数据体长度
 #endif
-
+	bool chunked_transfer_;               // 是否为 chunked 传输模式
 	void init(void);                      // 初始化
 	void clear(void);
 	void build_common(string& buf) const; // 构建通用头

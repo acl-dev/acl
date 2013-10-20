@@ -6,9 +6,13 @@ typedef struct {
 	ACL_EVENT *event;
 } STREAM_IN;
 
-static void trigger_event(int event acl_unused, void *context acl_unused)
+static void trigger_event(int event_type acl_unused,
+	ACL_EVENT *event acl_unused, void *context acl_unused)
 {
 	printf("timer trigger now\r\n");
+
+	printf("please input: ");
+	fflush(stdout);
 }
 
 static int __stop_event = 0;
@@ -30,15 +34,19 @@ static void free_stream(STREAM_IN *in)
 	acl_myfree(in);
 }
 
-static void read_callback(int event_type acl_unused, void *context)
+static void read_callback(int event_type acl_unused, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context)
 {
 	STREAM_IN *in = (STREAM_IN *) context;
 	int   ready;
 
+	acl_assert(in->in == stream);
+	acl_assert(in->event == event);
+
 	/* 尝试从输入流中读取一行数据，并且要求去掉尾部的回车换行符 */
-	if (acl_vstream_gets_nonl_peek(in->in, in->buf, &ready) == ACL_VSTREAM_EOF)
+	if (acl_vstream_gets_nonl_peek(stream, in->buf, &ready) == ACL_VSTREAM_EOF)
 	{
-		acl_event_disable_read(in->event, in->in);
+		acl_event_disable_read(event, stream);
 		printf(">>>>gets error\r\n");
 		free_stream(in);
 		__stop_event = 1;
@@ -51,8 +59,11 @@ static void read_callback(int event_type acl_unused, void *context)
 		if (strcasecmp(STR(in->buf), "QUIT") == 0) {
 			__stop_event = 1;
 			free_stream(in);
-		} else
+		} else {
+			printf("please input: ");
+			fflush(stdout);
 			ACL_VSTRING_RESET(in->buf); /* 清空缓冲区 */
+		}
 	}
 }
 

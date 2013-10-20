@@ -112,7 +112,7 @@ INSTALL_PATH=
 
 if [ $# -lt 1 ]
 then
-	echo "parameter not enougth($#)"
+#	echo "parameter not enougth($#)"
 	echo "usage:$0 install_path"
 	exit 1
 fi

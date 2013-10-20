@@ -54,7 +54,8 @@ static void init(void)
 	echo_server_init(__data, (int) strlen(__data), __echo_src);
 }
 
-static void gc_timer(int event_type acl_unused, void *context)
+static void gc_timer(int event_type acl_unused, ACL_EVENT *event acl_unused,
+	void *context)
 {
 	ACL_AIO *aio = (ACL_AIO *) context;
 

@@ -42,7 +42,7 @@ struct DNS_CTX {
 
 struct DNS_SERVER {
 	ACL_AIO *aio;			/* 异步通信框架 */
-	ACL_WORK_QUEUE *wq;		/* 线程池句柄 */
+	acl_pthread_pool_t *wq;		/* 线程池句柄 */
 	ACL_MSGIO *listener;		/* 消息监听者句柄 */
 	ACL_MSGIO *mio;			/* 消息句柄 */
 	char  addr[256];

@@ -349,6 +349,12 @@
     <ClCompile Include="src\master\master_udp.cpp">
       <Filter>src\master</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\thread.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\thread_pool.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -722,6 +728,12 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\master\master_udp.hpp">
       <Filter>include\master</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread.hpp">
+      <Filter>include\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread_pool.hpp">
+      <Filter>include\stdlib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

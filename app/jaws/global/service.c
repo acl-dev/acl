@@ -41,7 +41,7 @@ void service_set_dns(SERVICE *service, ACL_AIO *aio,
 		service->dns_server = dns_server_create(aio, 300);
 		service->dns_table = acl_htable_create(100, 0);
 		/* 创建半驻留线程池对象 */
-		service->wq = acl_workq_create(nthreads, idle, NULL, NULL);
+		service->wq = acl_thread_pool_create(nthreads, idle);
 		return;
 	}
 
@@ -94,11 +94,10 @@ static void service_gc_timer(int event_type acl_unused, void *context)
 	int   n;
 	ACL_AIO *aio = (ACL_AIO*) context;
 	n = acl_mem_slice_gc();
-	acl_aio_request_timer(aio, service_gc_timer, aio, __timer);
 }
 
 void service_set_gctimer(ACL_AIO *aio, int timer)
 {
 	__timer = timer;
-	acl_aio_request_timer(aio, service_gc_timer, aio, timer);
+	acl_aio_request_timer(aio, service_gc_timer, aio, timer, 1);
 }

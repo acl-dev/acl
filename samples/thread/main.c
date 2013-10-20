@@ -21,27 +21,6 @@ extern int pthread_spin_lock (pthread_spinlock_t *__lock);
 extern int pthread_spin_unlock (pthread_spinlock_t *__lock);
 #endif
 
-static void workq_thread_fn(int event acl_unused, void *argv acl_unused)
-{
-	static __thread unsigned int i = 0;
-	printf(">>main thread id: %u\n", (unsigned int) acl_main_thread_self());
-
-	printf("thread start!\r\n");
-	printf("thread(%lu): before i++, i=%d\r\n", (unsigned long int) acl_pthread_self(), i);
-	i++;
-	printf("thread(%lu): after i++, i=%d\r\n", (unsigned long int) acl_pthread_self(), i);
-	sleep(2);
-}
-
-static void test_workq(void)
-{
-	ACL_WORK_QUEUE *wq = acl_workq_create(2, 60, NULL, NULL);
-
-	acl_workq_add(wq, workq_thread_fn, 0, NULL);
-	sleep(1);
-	acl_workq_add(wq, workq_thread_fn, 0, NULL);
-}
-
 static void *test_thread_fn(void *arg)
 {
 	THREAD_CTX *ctx = (THREAD_CTX*) arg;
@@ -190,7 +169,7 @@ static void *test_tls_thread(void *arg acl_unused)
 		printf(">>>%s(%d)(tid=%d): time cose %d seconds, tid: %ld\n",
 			myname, __LINE__, (int) acl_pthread_self(),
 			(int) (time(NULL) - begin), tid);
-		acl_vstring_sprintf(buf, "%s, tid=%d", myname, acl_pthread_self());
+		acl_vstring_sprintf(buf, "%s, tid=%lu", myname, acl_pthread_self());
 		printf(">>>%s: buf=%s\n", myname, acl_vstring_str(buf));
 	} else {
 		time(&begin);
@@ -313,12 +292,9 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	printf(">>>>main tid: %u\n", (unsigned) acl_pthread_self());
 	if (0)
 		test_nested_mutex();
-	if (1)
-		test_workq();
 
-	while (1) {
+	while (1)
 		sleep(10);
-	}
 	return (0);
 }
 

@@ -337,6 +337,12 @@
     <ClCompile Include="src\http\http_request_pool.cpp">
       <Filter>src\http</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\thread.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\thread_pool.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -704,6 +710,12 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\http\http_request_manager.hpp">
       <Filter>include\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread.hpp">
+      <Filter>include\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread_pool.hpp">
+      <Filter>include\stdlib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -39,8 +39,6 @@ static void gc_timer(int event_type acl_unused, void *context)
 	ACL_AIO *aio = (ACL_AIO *) context;
 
 	acl_mem_slice_delay_destroy();
-	/* 设定定时器定时清理垃圾回收器 */
-	acl_aio_request_timer(aio, gc_timer, aio, 2);
 }
 
 static void run_loop(ACL_AIO *aio, const char *listen_addr)
@@ -61,7 +59,7 @@ static void run_loop(ACL_AIO *aio, const char *listen_addr)
 		ACL_AIO_CTL_END);
 	acl_aio_listen(astream);
 	/* 设定定时器定时清理垃圾回收器 */
-	acl_aio_request_timer(aio, gc_timer, aio, 2);
+	acl_aio_request_timer(aio, gc_timer, aio, 2, 1);
 
 	while (1) {
 		acl_aio_loop(aio);
@@ -90,7 +88,7 @@ static void exec_path(char *exe_path, int size)
 
 	GetModuleFileName(NULL, exeFullPath, MAX_PATH);
 	_splitpath(exeFullPath, szDriver, szDir, szFile, szExt);   
-	snprintf(exe_path, size, "%s%s", szDriver, szDir);
+	_snprintf(exe_path, size, "%s%s", szDriver, szDir);
 }
 
 #endif

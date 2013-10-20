@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
+				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;..\"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VC2003"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -69,7 +69,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
+				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;..\"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;VC2003"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="3"
@@ -118,7 +118,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
+				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;..\"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;VC2003;ACL_CPP_DLL"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="3"
@@ -172,7 +172,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
+				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;..\"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VC2003;ACL_CPP_DLL"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -256,6 +256,9 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y
 						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="..\util.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
@@ -263,6 +266,9 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath=".\stdafx.h">
+			</File>
+			<File
+				RelativePath="..\util.h">
 			</File>
 		</Filter>
 		<Filter

@@ -226,6 +226,7 @@ static int logger_open(const char *filename, void *ctx)
 	h_log->h_log = acl_vstream_fopen(h_log->filename, flag, mode, 1024);
 	if (h_log->h_log == NULL)
 		return (-1);
+
 	__pid = getpid();
 	return (0);
 }
@@ -354,8 +355,6 @@ static void buffed_logger_fflush(int event_type acl_unused, void *context)
 	if (h_log->h_log != NULL) {
 		acl_vstream_fflush(h_log->h_log);
 	}
-	assert(h_log->aio);
-	(void) acl_aio_request_timer(h_log->aio, buffed_logger_fflush, h_log, 1);
 }
 
 static void buffed_logger_set(ACL_AIO *aio)
@@ -371,7 +370,7 @@ static void buffed_logger_set(ACL_AIO *aio)
 
 	acl_msg_register(buffer_logger_open, buffer_logger_close,
 		buffer_logger_write, (void*)h_log);
-	(void) acl_aio_request_timer(aio, buffed_logger_fflush, h_log, 1);
+	(void) acl_aio_request_timer(aio, buffed_logger_fflush, h_log, 1, 1);
 	__log_wrap = h_log;
 }
 

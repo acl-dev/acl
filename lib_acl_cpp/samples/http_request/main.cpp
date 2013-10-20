@@ -2,7 +2,7 @@
 //
 #include <assert.h>
 #include <getopt.h>
-#include "lib_acl.hpp"
+#include "acl_cpp/lib_acl.hpp"
 
 using namespace acl;
 

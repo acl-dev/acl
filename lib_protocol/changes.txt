@@ -1,4 +1,8 @@
 
+243) 2013.10.3
+243.1) bugfix: http_chat_async.c 中 http_res_body_get_async/http_req_body_get_async
+两个函数没有对 ctx->read_cnt 置 0
+
 242) 2013.9.27
 242.1) lib_acl 库中 ACL_EVENT_NOTIFY_RDWR/ACL_EVENT_NOTIFY_TIME 函数接口定义 
 的修改，与之相关的模块(icmp)进行了修改

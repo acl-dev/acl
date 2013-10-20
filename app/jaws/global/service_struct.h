@@ -32,7 +32,7 @@ typedef struct {
 struct SERVICE {
 	char  name[256];			/* 服务名称 */
 	ACL_AIO *aio;				/* 异步IO句柄 */
-	ACL_WORK_QUEUE *wq;			/* 为了兼容老的外挂模块所需要的线程池句柄 */
+	acl_pthread_pool_t *wq;			/* 为了兼容老的外挂模块所需要的线程池句柄 */
 	ACL_ASTREAM *sstream;			/* 监听套接口 */
 	int   conn_timeout;			/* 默认的连接超时时间 */
 	int   rw_timeout;			/* 默认的IO超时时间 */

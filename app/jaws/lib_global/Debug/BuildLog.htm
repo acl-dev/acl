@@ -11,66 +11,101 @@
 </h3>
 </pre></table><table width=100%% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
 命令行
-</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>正在创建临时文件“d:\工作目录\项目管理\jaws\jaws\lib_global\Debug\RSP00009F.rsp”，其内容为
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>正在创建临时文件“c:\work\acl\code\trunk\app\jaws\lib_global\Debug\RSP000006.rsp”，其内容为
 [
-/Od /I "..\include\acl" /I "..\include\protocol" /D "WIN32" /D "_DEBUG" /D "_LIB" /D "_MBCS" /Gm /EHsc /RTC1 /MTd /Fo"Debug/" /Fd"Debug/vc70.pdb" /W3 /c /Wp64 /ZI /TC
-\工作目录\项目管理\jaws\jaws\global\utf2gb.c
-\工作目录\项目管理\jaws\jaws\global\sys_patch.c
-\工作目录\项目管理\jaws\jaws\global\string.c
-\工作目录\项目管理\jaws\jaws\global\service_load.c
-\工作目录\项目管理\jaws\jaws\global\service_ipc.c
-\工作目录\项目管理\jaws\jaws\global\service.c
-\工作目录\项目管理\jaws\jaws\global\logger.c
-\工作目录\项目管理\jaws\jaws\global\forward.c
-\工作目录\项目管理\jaws\jaws\global\file_cache.c
-\工作目录\项目管理\jaws\jaws\global\dns_server.c
-\工作目录\项目管理\jaws\jaws\global\dns_lookup.c
-\工作目录\项目管理\jaws\jaws\global\dns_cache.c
-\工作目录\项目管理\jaws\jaws\global\conn_cache.c
-\工作目录\项目管理\jaws\jaws\global\client_entry.c
+/Od /I "..\..\..\lib_acl\include" /I "..\..\..\include\protocol" /D "WIN32" /D "_DEBUG" /D "_LIB" /D "_MBCS" /Gm /EHsc /RTC1 /MTd /Fo"Debug/" /Fd"Debug/vc70.pdb" /W3 /c /Wp64 /ZI /TC
+\work\acl\code\trunk\app\jaws\global\service_main.c
+\work\acl\code\trunk\app\jaws\global\service_load.c
+\work\acl\code\trunk\app\jaws\global\service_ipc.c
+\work\acl\code\trunk\app\jaws\global\service.c
+\work\acl\code\trunk\app\jaws\global\logger.c
+\work\acl\code\trunk\app\jaws\global\forward.c
+\work\acl\code\trunk\app\jaws\global\file_cache.c
+\work\acl\code\trunk\app\jaws\global\dns_server.c
+\work\acl\code\trunk\app\jaws\global\dns_lookup.c
+\work\acl\code\trunk\app\jaws\global\conn_cache.c
+\work\acl\code\trunk\app\jaws\global\client_entry.c
 ]
-正在创建命令行“cl.exe @d:\工作目录\项目管理\jaws\jaws\lib_global\Debug\RSP00009F.rsp /nologo”
-正在创建临时文件“d:\工作目录\项目管理\jaws\jaws\lib_global\Debug\RSP0000A0.rsp”，其内容为
-[
-/OUT:"../lib/win32/lib_global.lib" /NOLOGO
-.\Debug\client_entry.obj
-.\Debug\conn_cache.obj
-.\Debug\dns_cache.obj
-.\Debug\dns_lookup.obj
-.\Debug\dns_server.obj
-.\Debug\file_cache.obj
-.\Debug\forward.obj
-.\Debug\logger.obj
-.\Debug\service.obj
-.\Debug\service_ipc.obj
-.\Debug\service_load.obj
-.\Debug\string.obj
-.\Debug\sys_patch.obj
-.\Debug\utf2gb.obj
-]
-正在创建命令行“lib.exe @d:\工作目录\项目管理\jaws\jaws\lib_global\Debug\RSP0000A0.rsp”
+正在创建命令行“cl.exe @c:\work\acl\code\trunk\app\jaws\lib_global\Debug\RSP000006.rsp /nologo”
 </pre></table><table width=100%% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
 输出窗口
 </font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>正在编译...
-utf2gb.c
-sys_patch.c
-string.c
+service_main.c
+c:\work\acl\code\trunk\app\jaws\global\service_main.c(98) : error C2198: “acl_aio_request_timer” : 通过指向函数的指针调用的参数太少
+c:\work\acl\code\trunk\app\jaws\global\service_main.c(121) : error C2198: “acl_aio_request_timer” : 通过指向函数的指针调用的参数太少
 service_load.c
 service_ipc.c
 service.c
+c:\work\acl\code\trunk\app\jaws\global\service.c(44) : warning C4013: “acl_workq_create”未定义；假设外部返回 int
+c:\work\acl\code\trunk\app\jaws\global\service.c(44) : warning C4047: “=” : “acl_pthread_pool_t *”与“int”的间接级别不同
+c:\work\acl\code\trunk\app\jaws\global\service.c(97) : error C2198: “acl_aio_request_timer” : 通过指向函数的指针调用的参数太少
+c:\work\acl\code\trunk\app\jaws\global\service.c(103) : error C2198: “acl_aio_request_timer” : 通过指向函数的指针调用的参数太少
 logger.c
+c:\work\acl\code\trunk\app\jaws\global\logger.c(251) : warning C4013: “vsnprintf”未定义；假设外部返回 int
+c:\work\acl\code\trunk\app\jaws\global\logger.c(276) : warning C4013: “snprintf”未定义；假设外部返回 int
+c:\work\acl\code\trunk\app\jaws\global\logger.c(358) : error C2198: “acl_aio_request_timer” : 通过指向函数的指针调用的参数太少
+c:\work\acl\code\trunk\app\jaws\global\logger.c(374) : error C2198: “acl_aio_request_timer” : 通过指向函数的指针调用的参数太少
 forward.c
+c:\work\acl\code\trunk\app\jaws\global\forward.c(34) : warning C4013: “snprintf”未定义；假设外部返回 int
+c:\work\acl\code\trunk\app\jaws\global\forward.c(115) : error C2065: “ACL_AIO_CTL_CONNECT_FN” : 未声明的标识符
 file_cache.c
+c:\work\acl\code\trunk\app\jaws\global\file_cache.c(2) : fatal error C1083: 无法打开包含文件:“lib_protocol.h”: No such file or directory
 dns_server.c
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(38) : error C2065: “ACL_WORKER_ATTR” : 未声明的标识符
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(38) : error C2065: “w_attr” : 未声明的标识符
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(38) : error C2059: 语法错误 : “)”
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(39) : error C2275: “DNS_CTX” : 将此类型用作表达式非法
+        c:\work\acl\code\trunk\app\jaws\global\dns.h(19) : 参见“DNS_CTX”的声明
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(39) : error C2065: “dns_ctx” : 未声明的标识符
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(39) : error C2223: “->run_data”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(40) : error C2275: “DNS_SERVER” : 将此类型用作表达式非法
+        c:\work\acl\code\trunk\app\jaws\global\dns.h(20) : 参见“DNS_SERVER”的声明
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(40) : error C2065: “dns” : 未声明的标识符
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(40) : error C2223: “->dns”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(45) : error C2143: 语法错误 : 缺少“;”(在“类型”的前面)
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(47) : error C2223: “->dns_db”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(47) : error C2223: “->domain_key”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(47) : error C2065: “error” : 未声明的标识符
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(47) : warning C4133: “函数” : 从“int *__w64 ”到“const char *”的类型不兼容
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(47) : error C2198: “acl_gethostbyname” : 通过指向函数的指针调用的参数太少
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(48) : error C2223: “->dns_db”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(50) : error C2223: “->domain_key”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(51) : error C2223: “->ip_cnt”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(52) : warning C4047: “函数” : “DNS_CTX *”与“int”的间接级别不同
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(52) : warning C4047: “函数” : “DNS_SERVER *”与“int”的间接级别不同
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(56) : error C2065: “n” : 未声明的标识符
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(56) : error C2223: “->dns_db”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(56) : error C2198: “acl_netdb_size” : 通过指向函数的指针调用的参数太少
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(57) : error C2223: “->ip_cnt”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(59) : error C2065: “i” : 未声明的标识符
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(59) : error C2223: “->ip_cnt”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(60) : warning C4013: “snprintf”未定义；假设外部返回 int
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(60) : error C2223: “->ip”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(60) : error C2223: “->ip”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(61) : error C2223: “->dns_db”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(61) : warning C4047: “函数” : “const ACL_DNS_DB *”与“int”的间接级别不同
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(61) : error C2198: “acl_netdb_index_ip” : 通过指向函数的指针调用的参数太少
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(62) : error C2223: “->port”的左侧必须指向结构/联合
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(64) : warning C4047: “函数” : “DNS_CTX *”与“int”的间接级别不同
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(64) : warning C4047: “函数” : “DNS_SERVER *”与“int”的间接级别不同
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(87) : warning C4013: “acl_workq_add”未定义；假设外部返回 int
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(166) : warning C4013: “acl_workq_create”未定义；假设外部返回 int
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(166) : warning C4047: “=” : “acl_pthread_pool_t *”与“int”的间接级别不同
+c:\work\acl\code\trunk\app\jaws\global\dns_server.c(177) : warning C4013: “acl_workq_destroy”未定义；假设外部返回 int
 dns_lookup.c
-dns_cache.c
+c:\work\acl\code\trunk\app\jaws\global\dns_lookup.c(20) : error C2065: “ACL_AIO_CTL_WRITE_FN” : 未声明的标识符
+c:\work\acl\code\trunk\app\jaws\global\dns_lookup.c(21) : error C2065: “ACL_AIO_CTL_TIMEO_FN” : 未声明的标识符
 conn_cache.c
+c:\work\acl\code\trunk\app\jaws\global\conn_cache.c(85) : error C2198: “acl_aio_request_timer” : 通过指向函数的指针调用的参数太少
+c:\work\acl\code\trunk\app\jaws\global\conn_cache.c(100) : error C2198: “acl_aio_request_timer” : 通过指向函数的指针调用的参数太少
+c:\work\acl\code\trunk\app\jaws\global\conn_cache.c(106) : error C2198: “acl_aio_request_timer” : 通过指向函数的指针调用的参数太少
 client_entry.c
+c:\work\acl\code\trunk\app\jaws\global\client_entry.c(23) : warning C4311: “类型转换” : 从“CLIENT_ENTRY *”到“long”的指针截断
+c:\work\acl\code\trunk\app\jaws\global\client_entry.c(23) : warning C4311: “类型转换” : 从“ACL_ASTREAM *”到“long”的指针截断
 正在生成代码...
-正在创建库...
 </pre></table><table width=100%% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
 结果
 </font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>
-生成日志保存在“file://d:\工作目录\项目管理\jaws\jaws\lib_global\Debug\BuildLog.htm”中
-lib_global - 0 错误，0 警告</pre></table><table   width=100% height=20 bgcolor=#CFCFE5><tr><td><font face=宋体 size=+2>
+生成日志保存在“file://c:\work\acl\code\trunk\app\jaws\lib_global\Debug\BuildLog.htm”中
+lib_global - 41 错误，18 警告</pre></table><table   width=100% height=20 bgcolor=#CFCFE5><tr><td><font face=宋体 size=+2>
 </font></table></body></html>

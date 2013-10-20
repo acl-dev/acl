@@ -49,10 +49,10 @@ static ACL_IPLINK *__host_allow_link = NULL;
 /* forward define */
 static int __if_host_allow(const char *client_ip);
 
-static void __proxy_handle_fn(int unused_event, void *context)
+static void __proxy_handle_fn(int type acl_unused, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream, void *context)
 {
-	char  myname[] = "__proxy_handle_fn";
-	ACL_VSTREAM *stream;
+	const char *myname = "__proxy_handle_fn";
 	char  buf[8192];
 	int   n, ret;
 
@@ -69,9 +69,6 @@ static void __proxy_handle_fn(int unused_event, void *context)
 				__FILE__, __LINE__, myname);
 		return;
 	}
-
-	unused_event = unused_event;
-	stream = (ACL_VSTREAM *) context;
 
 	if (stream == __front_stream) {
 		n = acl_vstream_read(stream, buf, sizeof(buf) - 1);
@@ -112,7 +109,8 @@ static void __proxy_handle_fn(int unused_event, void *context)
 
 static void __service(ACL_VSTREAM *stream, char *service, char **argv)
 {
-	char  myname[] = "__service";
+	const char *myname = "__service";
+	char  buf[64];
 	int   connect_retries = var_proxy_retries;
 
 	/*
@@ -128,18 +126,17 @@ static void __service(ACL_VSTREAM *stream, char *service, char **argv)
 		acl_msg_info("%s(%d)->%s: service name = %s, rw_timeout = %d",
 			__FILE__, __LINE__, myname, service, stream->rw_timeout);
 
-	__front_stream->remote_addr[0] = 0;
 	(void) acl_getpeername(ACL_VSTREAM_SOCK(__front_stream),
-			__front_stream->remote_addr,
-			sizeof(__front_stream->remote_addr));
+			buf, sizeof(buf));
+	acl_vstream_set_peer(__front_stream, buf);
 
-	if (__if_host_allow(__front_stream->remote_addr) < 0)
+	if (__if_host_allow(buf) < 0)
 		return;
 
 	if (var_proxy_log_level > 2)
 		acl_msg_info("%s(%d)->%s: connected from addr=%s",
 				__FILE__, __LINE__, myname,
-				__front_stream->remote_addr);
+				ACL_VSTREAM_PEER(__front_stream));
 
 	while (connect_retries) {
 		__backend_stream =
@@ -168,7 +165,7 @@ static void __service(ACL_VSTREAM *stream, char *service, char **argv)
 	if (var_proxy_log_level > 2)
 		acl_msg_info("%s(%d)->%s: ok, connect ip=%s, retries=%d",
 				__FILE__, __LINE__, myname,
-				__backend_stream->remote_addr,
+				ACL_VSTREAM_PEER(__backend_stream),
 				var_proxy_retries - connect_retries);
 
 	acl_event_enable_read(__eventp,

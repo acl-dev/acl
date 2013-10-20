@@ -10,6 +10,7 @@ static void test_stdio(void)
 	acl::ifstream in;
 	in.open(0, O_RDONLY);
 
+	printf("waiting input from stdin:\r\n");
 	if (in.gets(buf))
 		printf(">>>>ok, gets: %s\n", buf.c_str());
 	else
@@ -52,9 +53,10 @@ int main(void)
 			break;
 		printf("%s", buf.c_str());
 	}
-
-	getchar();
 	fp.close();
+
+	printf("enter any key to exit\r\n");
+	getchar();
 
 	return (0);
 }

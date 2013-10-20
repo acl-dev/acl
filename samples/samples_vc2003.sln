@@ -233,6 +233,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unit_test", "..\unit_test\u
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "udp_server", "udp_server\udp_server.vcproj", "{F9FCF18C-A628-4139-AC73-F6AE6DD096AC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "udp_client", "udp_client\udp_client.vcproj", "{561DAAF5-D322-453A-AE91-177A00C39AC3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -609,6 +619,22 @@ Global
 		{11BB762F-1998-4F62-81F0-7E0600029F70}.Release.Build.0 = Release|Win32
 		{11BB762F-1998-4F62-81F0-7E0600029F70}.ReleaseDll.ActiveCfg = ReleaseDll|Win32
 		{11BB762F-1998-4F62-81F0-7E0600029F70}.ReleaseDll.Build.0 = ReleaseDll|Win32
+		{F9FCF18C-A628-4139-AC73-F6AE6DD096AC}.Debug.ActiveCfg = Debug|Win32
+		{F9FCF18C-A628-4139-AC73-F6AE6DD096AC}.Debug.Build.0 = Debug|Win32
+		{F9FCF18C-A628-4139-AC73-F6AE6DD096AC}.DebugDll.ActiveCfg = DebugDll|Win32
+		{F9FCF18C-A628-4139-AC73-F6AE6DD096AC}.DebugDll.Build.0 = DebugDll|Win32
+		{F9FCF18C-A628-4139-AC73-F6AE6DD096AC}.Release.ActiveCfg = Release|Win32
+		{F9FCF18C-A628-4139-AC73-F6AE6DD096AC}.Release.Build.0 = Release|Win32
+		{F9FCF18C-A628-4139-AC73-F6AE6DD096AC}.ReleaseDll.ActiveCfg = ReleaseDll|Win32
+		{F9FCF18C-A628-4139-AC73-F6AE6DD096AC}.ReleaseDll.Build.0 = ReleaseDll|Win32
+		{561DAAF5-D322-453A-AE91-177A00C39AC3}.Debug.ActiveCfg = Debug|Win32
+		{561DAAF5-D322-453A-AE91-177A00C39AC3}.Debug.Build.0 = Debug|Win32
+		{561DAAF5-D322-453A-AE91-177A00C39AC3}.DebugDll.ActiveCfg = DebugDll|Win32
+		{561DAAF5-D322-453A-AE91-177A00C39AC3}.DebugDll.Build.0 = DebugDll|Win32
+		{561DAAF5-D322-453A-AE91-177A00C39AC3}.Release.ActiveCfg = Release|Win32
+		{561DAAF5-D322-453A-AE91-177A00C39AC3}.Release.Build.0 = Release|Win32
+		{561DAAF5-D322-453A-AE91-177A00C39AC3}.ReleaseDll.ActiveCfg = ReleaseDll|Win32
+		{561DAAF5-D322-453A-AE91-177A00C39AC3}.ReleaseDll.Build.0 = ReleaseDll|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

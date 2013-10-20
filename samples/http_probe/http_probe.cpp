@@ -53,8 +53,7 @@ int main(int argc, char *argv[])
 	if (var_cfg_file == NULL)
 		var_cfg_file = acl_mystrdup("test.cf");
 	init();
-	probe_run(0, 0);
-
+	probe_run();
+	acl_myfree(var_cfg_file);
 	exit (0);
 }
-

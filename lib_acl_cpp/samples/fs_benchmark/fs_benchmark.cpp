@@ -239,6 +239,8 @@ int main(int argc, char* argv[])
 	// Ïú»ÙÏß³Ì³Ø
 	acl_pthread_pool_destroy(tp);
 
+	logger_close();
+
 #ifdef WIN32
 	printf("enter any key to exit\r\n");
 	getchar();

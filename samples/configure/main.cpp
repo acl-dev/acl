@@ -76,6 +76,14 @@ static void check_cf(const char *filename)
 
 	list_all(cfg);
 
+	for (int i = 0; __conf_str_tab[i].name != NULL; i++)
+	{
+		if (*__conf_str_tab[i].target)
+			acl_myfree(*__conf_str_tab[i].target);
+	}	
+
+	acl_xinetd_cfg_free(cfg);
+
 }
 
 static void list_cf(const char *filename)
@@ -131,4 +139,3 @@ int main(int argc, char *argv[])
 
 	return (0);
 }
-

@@ -1,4 +1,5 @@
 #include "lib_acl.h"
+#include "sys_patch.h"
 
 #ifdef ACL_BCB_COMPILER
 #pragma hdrstop
@@ -31,12 +32,11 @@ static void reply_lookup_msg(DNS_CTX *dns_ctx, DNS_SERVER *dns)
 
 /* DNS查询线程，查到DNS结果会通过IO消息将数据传递给非阻塞式主线程的消息队列 */
 
-static void lookup_thread(int event_type acl_unused, void *arg)
+static void lookup_thread(void *arg)
 {
 	const char *myname = "lookup_thread";
 #ifdef USE_THREAD_POOL
-	ACL_WORKER_ATTR *w_attr = (ACL_WORKER_ATTR *) arg;
-	DNS_CTX *dns_ctx = (DNS_CTX *) w_attr->run_data;
+	DNS_CTX *dns_ctx = (DNS_CTX *) arg;
 	DNS_SERVER *dns = dns_ctx->dns;
 #else
 	DNS_CTX *dns_ctx = (DNS_CTX *) arg;
@@ -84,9 +84,9 @@ static int msg_lookup(int msg_type acl_unused, ACL_MSGIO *mio,
 
 	/* 创建单独的线程进行阻塞式DNS查询过程 */
 #ifdef USE_THREAD_POOL
-	acl_workq_add(dns_ctx->dns->wq, lookup_thread, 0, dns_ctx);
+	acl_pthread_pool_add(dns_ctx->dns->wq, lookup_thread, dns_ctx);
 #else
-	lookup_thread(0, dns_ctx);
+	lookup_thread(dns_ctx);
 #endif
 
 	return (1);
@@ -163,7 +163,7 @@ DNS_SERVER *dns_server_create(ACL_AIO *aio, int timeout)
 
 	/* 需要创建独立的线程程查询DNS(因为查询DNS是阻塞式查询) */
 #ifdef USE_THREAD_POOL
-	dns->wq = acl_workq_create(max_threads, idle_timeout, NULL, dns);
+	dns->wq = acl_thread_pool_create(max_threads, idle_timeout);
 #endif
 	
 	return (dns);
@@ -174,7 +174,7 @@ DNS_SERVER *dns_server_create(ACL_AIO *aio, int timeout)
 void dns_server_close(DNS_SERVER *dns)
 {
 	acl_msgio_close(dns->listener);
-	acl_workq_destroy(dns->wq);
+	acl_pthread_pool_destroy(dns->wq);
 	acl_myfree(dns);
 }
 

@@ -1,5 +1,45 @@
 修改历史列表：
 ------------------------------------------------------------------------
+
+188) 2013.10.20
+188.1) feature: HttpServletResponse 类支持 Transfer-Encoding: chunked 传输方式
+
+187) 2013.10.19
+187.1) samples: 增加了测试用例 thread_client，一个多线程网络客户端程序
+
+186) 2013.10.18
+186.1) bugfix: db/db_mysql.cpp, 在打开 mysql 连接时设置字符集，判断是否设置
+成功的方法有误
+
+185) 2013.10.15
+185.1) thread 类分离出一个基类: thread_job，从而使逻辑更为清晰
+
+184) 2013.10.13
+184.1) bugfix: master_udp.cpp, master_udp::service_main() 中的 socket_stream
+是临时堆栈变量，如果被用户外部引用则可能造成内存非法访问
+
+183) 2013.10.12
+183.1) samples: 增加了 master_udp_threads，该例子将线程池与 master_udp 模板结合
+
+182) 2013.10.11
+182.1) feature: connect_manager/connect_pool 允许动态添加、删除连接池对象
+182.2) feature: 增加了线程类(stdlib/thread)及线程池类(stdlib/thread_pool)
+182.3) samples: 增加了测试用例 thread 用以测试线程类
+182.4) samples: 增加了测试用例 thread_pool 用以测试线程池类
+
+181) 2013.10.10
+181.1) samples: 添加了 master_aio_proxy 用作纯 TCP 非阻塞代理
+
+180) 2013.10.3
+180.1) feature: aio_stream 增加了 get_peer/get_local 用来获得网络连接流的本地
+及远程地址
+
+179) 2013.9.30
+179.1) feature: master_udp 服务器模板增加了可在 proc_on_init() 虚函数中获得
+本地绑定套接字流对象集合的函数功能: get_sstreams()
+179.2) bugfix: memcache.cpp 当调用 open 函数连接 memcached 服务器失败时，用
+valgrind 检查出记录错误日志时引用了一个未经初始化的变量
+
 178) 2013.9.27
 178.1) lib_acl 库中 ACL_EVENT_NOTIFY_RDWR/ACL_EVENT_NOTIFY_TIME 函数接口定义
 的修改，与之相关的模块进行了修改

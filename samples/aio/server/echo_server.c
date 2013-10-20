@@ -109,6 +109,7 @@ static int __accept_callback(ACL_ASTREAM *client, void *context acl_unused)
 		ACL_AIO_CTL_WRITE_HOOK_ADD, __write_callback, NULL,
 		ACL_AIO_CTL_CLOSE_HOOK_ADD, __io_close, NULL,
 		ACL_AIO_CTL_TIMEO_HOOK_ADD, __io_timeout, NULL,
+		ACL_AIO_CTL_TIMEOUT, 5,
 		ACL_AIO_CTL_END);
 #ifdef	USE_GETS
 	acl_aio_gets(client);
@@ -144,6 +145,7 @@ static void __listen_callback(ACL_ASTREAM *sstream, void *context)
 			ACL_AIO_CTL_WRITE_HOOK_ADD, __write_callback, NULL,
 			ACL_AIO_CTL_CLOSE_HOOK_ADD, __io_close, NULL,
 			ACL_AIO_CTL_TIMEO_HOOK_ADD, __io_timeout, NULL,
+			ACL_AIO_CTL_TIMEOUT, 5,
 			ACL_AIO_CTL_END);
 #ifdef	USE_GETS
 		acl_aio_gets(client);

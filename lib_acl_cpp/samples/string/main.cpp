@@ -391,11 +391,21 @@ int main(void)
 
 	test_main();
 
-	test4();
-	test5();
-	test6();
-	test7();
+	if (1)
+	{
+		test4();
+		test5();
+		test6();
+		test7();
+	}
 
+	acl::string sss2("hello|world,;hello1|waaaa;sdsdsdsdds|");
+	const std::vector<acl::string>& tokens = sss2.split2(";,|");
+	std::vector<acl::string>::const_iterator cit = tokens.begin();
+	for (; cit != tokens.end(); ++cit)
+	{
+		printf("%s\r\n", (*cit).c_str());
+	}
 #ifdef WIN32
 	printf("enter any key to exit\r\n");
 	getchar();

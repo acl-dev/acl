@@ -94,8 +94,6 @@ static void gc_timer(int event_type acl_unused, void *context)
 	ACL_AIO *aio = (ACL_AIO *) context;
 
 	acl_mem_slice_delay_destroy();
-	/* 设定定时器定时清理垃圾回收器 */
-	acl_aio_request_timer(aio, gc_timer, aio, 2);
 }
 
 void service_init(ACL_AIO *aio, ACL_FIFO *modules)
@@ -118,7 +116,7 @@ void service_init(ACL_AIO *aio, ACL_FIFO *modules)
 	__dll_env.mem_slice = var_mem_slice;
 	if (var_mem_slice) {
 		/* 设定定时器定时清理垃圾回收器 */
-		acl_aio_request_timer(aio, gc_timer, aio, 2);
+		acl_aio_request_timer(aio, gc_timer, aio, 2, 1);
 	}
 
 	if (__dll_env.mem_slice)

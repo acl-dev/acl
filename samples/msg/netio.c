@@ -24,7 +24,7 @@ static void server_listen(void)
 
 	__sstream = acl_vstream_listen(addr, 64);
 	assert(__sstream);
-	snprintf(__server_addr, sizeof(__server_addr), "%s", __sstream->local_addr);
+	snprintf(__server_addr, sizeof(__server_addr), "%s", ACL_VSTREAM_LOCAL(__sstream));
 }
 
 static void server_listen_stop(void)

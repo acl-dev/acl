@@ -156,7 +156,7 @@ static void __htable_rwlock_fn(void *arg)
 */
 
 	ACL_SAFE_STRNCPY(thr_ctx->key, key, sizeof(thr_ctx->key));
-	if (acl_htable_enter(ctx->table, key, (char *) thr_ctx) == NULL)
+	if (acl_htable_enter_r(ctx->table, key, (char *) thr_ctx, NULL, NULL) == -1)
 		acl_msg_fatal("insert into htable error(%s), key(%s)",
 				strerror(errno), key);
 

@@ -9,6 +9,16 @@ int main(void)
 	unsigned int   n1 = (unsigned int) -1;
 	unsigned long  n2 = (unsigned long) -1;
 	unsigned long long n3 = (unsigned long long) -1;
+	const char *str2 = "hello world, you're welcome!";
+	ACL_ARGV *tokens = acl_argv_split(str2, " \t,'!");
+	ACL_ITER  iter;
+
+	printf("----------------------------------------------\r\n");
+	acl_foreach(iter, tokens)
+		printf("tokens[%d]: %s\r\n", iter.i, (const char*) iter.data);
+	printf("total: %d\r\n", iter.size);
+	acl_argv_free(tokens);
+	printf("----------------------------------------------\r\n");
 
 	src_saved = src;
 	printf("src: %s\r\n", src);

@@ -274,23 +274,31 @@ static int chunked_data(ACL_ASTREAM *astream, HTTP_CHAT_CTX *ctx)
 {
 	HTTP_BODY_NOTIFY notify = ctx->notify.body_notify;
 	void *arg = ctx->arg;
-	ACL_VSTRING *sbuf;
+	ACL_VSTRING *sbuf = NULL;
 	char *data;
 	int   dlen, ret;
 
 	if (ctx->chunked) {
 		ret = (int) HTTP_LEN_ROUND(ctx);
 		sbuf = acl_aio_readn_peek(astream, ret);
-	} else if (ctx->hdr->content_length <= 0) {
+	} else if (ctx->hdr->content_length <= 0)
 		sbuf = acl_aio_read_peek(astream);
-	} else {
+	else {
 		ret = (int) HTTP_LEN_ROUND(ctx);
-		sbuf = acl_aio_readn_peek(astream, ret);
+		if (ret <= 0) {
+			/* 说明本次 HTTP 数据已经读完且遇到对方关闭
+			 * 或对方发来了多余的数据，所以需要返回 -1
+			 */
+			DISABLE_READ(astream);
+			if (notify(HTTP_CHAT_OK, NULL, 0, arg) < 0)
+				return (-1);
+			return (-1);
+		} else
+			sbuf = acl_aio_readn_peek(astream, ret);
 	}
 
-	if (sbuf == NULL) {
+	if (sbuf == NULL)
 		return (0);
-	}
 
 	data = acl_vstring_str(sbuf);
 	dlen = (int) ACL_VSTRING_LEN(sbuf);
@@ -301,6 +309,9 @@ static int chunked_data(ACL_ASTREAM *astream, HTTP_CHAT_CTX *ctx)
 
 	if (ctx->chunk_len > 0 && ctx->read_cnt >= ctx->chunk_len) {
 		if (!ctx->chunked) {
+			/* 如果读到完了整块数据且非 CHUNK 传输，
+			 * 则认为读完 HTTP 响应
+			 */
 			/* xxx: 禁止连续读 */
 			DISABLE_READ(astream);
 			if (notify(HTTP_CHAT_OK, data, dlen, arg) < 0)
@@ -308,6 +319,7 @@ static int chunked_data(ACL_ASTREAM *astream, HTTP_CHAT_CTX *ctx)
 			return (1);
 		}
 
+		/* 对于 chunk 传输，读完本数据块 */
 		if (notify(HTTP_CHAT_DATA, data, dlen, arg) < 0)
 			return (-1);
 
@@ -400,9 +412,8 @@ static int body_can_read(ACL_ASTREAM *astream, void *context)
 		if ((ret = acl_aio_can_read(astream)) == ACL_VSTREAM_EOF) {
 			(void) notify(HTTP_CHAT_ERR_IO, NULL, 0, arg);
 			return (-1);
-		} else if (ret == 0) {
+		} else if (ret == 0)
 			break;
-		}
 
 		switch (ctx->status) {
 		case CHAT_S_CHUNK_HDR:
@@ -422,11 +433,10 @@ static int body_can_read(ACL_ASTREAM *astream, void *context)
 				myname, __LINE__, ctx->status);
 			return (-1);
 		}
-		if (ret < 0) {
+		if (ret < 0)
 			return (-1);
-		} else if (ret == 1) {
+		else if (ret == 1)
 			return (0);
-		}
 	}
 
 	acl_aio_enable_read(astream, body_can_read, ctx);
@@ -464,11 +474,12 @@ void http_req_body_get_async(HTTP_REQ *request, ACL_ASTREAM *astream,
 	ctx->hdr                = hdr;
 	ctx->stream             = astream;
 	ctx->timeout            = timeout;
-	ctx->chunk_len          = hdr->content_length;
 	ctx->chunked            = 0;
+	ctx->chunk_len          = hdr->content_length;
+	ctx->read_cnt           = 0;
+	ctx->body_len           = 0;
 	ctx->notify.body_notify = notify;
 	ctx->arg                = arg;
-	ctx->body_len           = 0;
 
 	body_get(astream, ctx);
 }
@@ -496,11 +507,12 @@ void http_res_body_get_async(HTTP_RES *respond, ACL_ASTREAM *astream,
 	ctx->hdr                = hdr;
 	ctx->stream             = astream;
 	ctx->timeout            = timeout;
-	ctx->chunk_len          = hdr->content_length;
 	ctx->chunked            = hdr->chunked;
+	ctx->chunk_len          = hdr->content_length;
+	ctx->read_cnt           = 0;
+	ctx->body_len           = 0;
 	ctx->notify.body_notify = notify;
 	ctx->arg                = arg;
-	ctx->body_len           = 0;
 
 	body_get(astream, ctx);
 }

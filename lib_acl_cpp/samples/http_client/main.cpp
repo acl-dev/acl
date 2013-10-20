@@ -22,6 +22,7 @@ public:
 
 	~http_request(void)
 	{
+		printf("notify aio handle to stop!\r\n");
 		// 通知异步事件引擎完全退出
 		handle_->stop();
 	}
@@ -71,9 +72,9 @@ protected:
 		read_length_ += dlen;
 		http_off_t n =  (read_length_ * 100) / content_length_;
 #ifdef WIN32
-		printf("%I64d%%\r", n);
+		printf("%s(%d): n=%I64d%%\r", __FUNCTION__, __LINE__, n);
 #else
-		printf("%lld%%\r", n);
+		printf("%s(%d): n=%lld%%\r", __FUNCTION__, __LINE__, n);
 #endif
 
 		if (out_.opened())
@@ -122,7 +123,7 @@ int main()
 
 	// 创建 HTTP 请求过程
 	acl::string domain;
-	domain = "www.banmau.com";
+	domain = "www.hexun.com";
 	//domain = "192.168.1.229";
 	//domain = "www.renwou.net";
 	http_request* req = new http_request(domain.c_str(), 80, &handle);
@@ -155,7 +156,10 @@ int main()
 		}
 	}
 
+	printf("delete http service now\r\n");
 	delete service;
+
+	printf("delete delay aio stream\r\n");
 	handle.check();
 
 	printf(">>enter any key to exist\n");

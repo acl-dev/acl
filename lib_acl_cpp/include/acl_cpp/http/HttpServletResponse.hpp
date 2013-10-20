@@ -35,6 +35,15 @@ public:
 #endif
 
 	/**
+	 * 设置 HTTP chunked 传输模式
+	 * @param on {bool} 如果为 true，即使设置了 setContentLength，
+	 *  则内部也会采用 chunked 传输方式，根据 HTTP RFC 规范要求，
+	 *  chunked 传输的优先级高级 conteng-length 方式
+	 * @return {HttpServletResponse&}
+	 */
+	HttpServletResponse& setChunkedTransferEncoding(bool on);
+
+	/**
 	 * 设置与 HTTP 客户端保持联系长连接
 	 * @param on {bool}
 	 */
@@ -129,8 +138,49 @@ public:
 	http_header& getHttpHeader(void) const;
 
 	/**
+	 * 向客户端发送 HTTP 数据体响应数据，可以循环调用此函数，
+	 * 当通过 setChunkedTransferEncoding 设置了 chunked 传输方式后，
+	 * 内部自动采用 chunked 传输方式；调用此函数不必显式调用
+	 * sendHeader 函数来发送 HTTP 响应头，因为内部会自动在第一次
+	 * 写时发送 HTTP 响应头
+	 * @param data {const void*} 数据地址
+	 * @param len {size_t} data 数据长度
+	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
+	 */
+	bool write(const void* data, size_t len);
+
+	/**
+	 * 向客户端发送 HTTP 数据体响应数据，可以循环调用此函数，该函数
+	 * 内部调用 HttpServletResponse::write(const void*, size_t) 过程
+	 * @param buf {const string&} 数据缓冲区
+	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
+	 */
+	bool write(const string& buf);
+
+	/**
+	 * 带格式方式向 HTTP 客户端发送响应数据，内部自动调用
+	 * HttpServletResponse::write(const void*, size_t) 过程
+	 * @param fmt {const char*} 变参格式字符串
+	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
+	 */
+	bool format(const char* fmt, ...);
+
+	/**
+	 * 带格式方式向 HTTP 客户端发送响应数据，内部自动调用
+	 * HttpServletResponse::write(const string&) 过程
+	 * @param fmt {const char*} 变参格式字符串
+	 * @param ap {va_list} 变参列表
+	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
+	 */
+	bool vformat(const char* fmt, va_list ap);
+
+	/**
 	 * 发送 HTTP 响应头，用户应该发送数据体前调用此函数将 HTTP
 	 * 响应头发送给客户端
+	 * @return {bool} 发送是否成功，若返回 false 则表示连接中断，
+	 *  当调用以上几个写的函数时，本函数不必显式被调用，如果是
+	 *  通过从 getOutputStream 获得的 socket 流写数据时，则本函数
+	 *  必须显式被调用
 	 */
 	bool sendHeader(void);
 
@@ -140,11 +190,13 @@ public:
 	 * @return {ostream&}
 	 */
 	ostream& getOutputStream(void) const;
+
 private:
 	socket_stream& stream_;
 	http_header* header_;
 	char  charset_[32];
 	char  content_type_[32];
+	bool  head_sent_;
 };
 
 }  // namespace acl

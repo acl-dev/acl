@@ -5,9 +5,9 @@ service probe {
 	fork_sleep=0
 
 ####################################################################################################
-	probed_server = <server_name="ÍøÍ¨ÍøÕ¾:192.168.0.2", \
-				addr=192.168.0.2:80, \
-				url=http://www.test.com/, \
+	probed_server = <server_name="ÍøÍ¨ÍøÕ¾:202.108.33.60", \
+				addr=202.108.33.60:80, \
+				url=http://www.sina.com.cn, \
 				connect_timeout=60, \
 				rw_timeout=60, \
 				retry_inter=5, \
@@ -16,9 +16,9 @@ service probe {
 				log=www.log, \
 				warn_time=2>
 
-	probed_server = <server_name="ÍøÍ¨²©¿Í:192.168.0.3", \
-				addr=192.168.0.3:80, \
-				url=http://blog.test.com/, \
+	probed_server = <server_name="ÍøÍ¨²©¿Í:60.28.250.219", \
+				addr=60.28.250.219:80, \
+				url=http://blog.hexun.com/, \
 				connect_timeout=60, \
 				rw_timeout=60, \
 				retry_inter=5, \

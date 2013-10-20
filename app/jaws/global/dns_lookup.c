@@ -16,9 +16,6 @@ static void inner_nslookup_error(CLIENT_ENTRY *entry)
 	if (entry->client == NULL)
 		acl_msg_fatal("%s(%d): client null",
 			__FILE__, __LINE__);
-	/* 采用AIO库中默认的写关闭动作及写超时动作 */
-	acl_aio_ctl(entry->client, ACL_AIO_CTL_WRITE_FN, NULL,
-		ACL_AIO_CTL_TIMEO_FN, NULL, ACL_AIO_CTL_END);
 
 	if (entry->dns_errmsg) {
 		acl_aio_refer(entry->client);
@@ -132,9 +129,6 @@ static void thrpool_nslookup_complete(const DNS_CTX *dns_ctx)
 			if (entry->client == NULL)
 				acl_msg_fatal("%s(%d): client null",
 					__FILE__, __LINE__);
-			/* 采用AIO库中默认的写关闭动作及写超时动作 */
-			acl_aio_ctl(entry->client, ACL_AIO_CTL_WRITE_FN, NULL,
-				ACL_AIO_CTL_TIMEO_FN, NULL, ACL_AIO_CTL_END);
 
 			if (entry->dns_errmsg) {
 				/* XXX: 因为此处可能会有两处关闭 client 流的地方:

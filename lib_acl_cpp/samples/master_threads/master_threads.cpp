@@ -186,7 +186,10 @@ int main(int argc, char* argv[])
 	{
 		format = (void (*)(const char*, ...)) printf;
 		format("listen: 127.0.0.1:8888\r\n");
-		mt.run_alone("127.0.0.1:8888", NULL, 2, 10);  // 单独运行方式
+		if (argc >= 3)
+			mt.run_alone("127.0.0.1:8888", argv[2], 2, 1);  // 单独运行方式
+		else
+			mt.run_alone("127.0.0.1:8888", NULL, 2, 10);  // 单独运行方式
 	}
 	else
 		mt.run_daemon(argc, argv);  // acl_master 控制模式运行

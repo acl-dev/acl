@@ -79,7 +79,7 @@ static int send_file_hdr_ready(ACL_ASTREAM *stream, void *ctx)
 	HTTP_CLIENT *client = (HTTP_CLIENT*) ctx;
 
 	acl_aio_ctl(stream,
-		ACL_AIO_CTL_WRITE_FN, send_file_ready,
+		ACL_AIO_CTL_WRITE_HOOK_ADD, send_file_ready, ctx,
 		ACL_AIO_CTL_END);
 	return (http_reply_file(client));
 }
@@ -128,9 +128,7 @@ static int http_doc_file(HTTP_CLIENT *client, const char *filepath)
 
 	/* xxx: only for test: ACL_AIO_CTL_CLOSE_FN */
 	acl_aio_ctl(client->entry.client,
-		ACL_AIO_CTL_WRITE_FN, send_file_hdr_ready,
-		ACL_AIO_CTL_CLOSE_FN, NULL,
-		ACL_AIO_CTL_TIMEO_FN, NULL,
+		ACL_AIO_CTL_WRITE_HOOK_ADD, send_file_hdr_ready, client,
 		ACL_AIO_CTL_CTX, client,
 		ACL_AIO_CTL_END);
 
@@ -210,9 +208,7 @@ static int http_doc_cache(HTTP_CLIENT *client, FILE_CACHE *cache)
 #endif
 
 	acl_aio_ctl(client->entry.client,
-		ACL_AIO_CTL_WRITE_FN, send_cache_ready,
-		ACL_AIO_CTL_CLOSE_FN, NULL,
-		ACL_AIO_CTL_TIMEO_FN, NULL,
+		ACL_AIO_CTL_WRITE_HOOK_ADD, send_cache_ready, client,
 		ACL_AIO_CTL_CTX, client,
 		ACL_AIO_CTL_END);
 

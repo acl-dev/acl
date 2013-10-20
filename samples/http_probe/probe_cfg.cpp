@@ -24,12 +24,8 @@ User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.1.4322
 Accept-Encoding: gzip, deflate\r\n\
 Host: %s:%d\r\n\r\n";
 
-static int  __parse_url(const char *url,
-		char *host_buf,
-		int hlen,
-		int *http_port,
-		char *url_buf,
-		int ulen)
+static int  __parse_url(const char *url, char *host_buf, int hlen,
+	int *http_port, char *url_buf, int ulen)
 {
 	/* url format: http://www.hexun.com[:80]/index.html */
 	char *ptr, *url_begin;
@@ -43,14 +39,12 @@ static int  __parse_url(const char *url,
 
 	n = strlen("http://");
 
-	if (strncasecmp(ptr, "http://", n) == 0) { /* 标准的 http 协议请求格式 */
+	/* 是否标准的 http 协议请求格式 */
+	if (strncasecmp(ptr, "http://", n) == 0)
 		ptr += n;
-	} else { /* 非标准的格式 */
-		; /* do nothing */
-	}
 
 	if (*ptr == 0)
-		return (-1);
+		return -1;
 
 	url_begin = ptr;
 	ptr = strchr(url_begin, '/');
@@ -60,9 +54,8 @@ static int  __parse_url(const char *url,
 			strcpy(url_buf, "/");
 		else
 			snprintf(url_buf, ulen, "/%s", ptr);
-	} else {
+	} else
 		strcpy(url_buf, "/");
-	}
 
 	/* 获得 http 协议端口号 */
 	if (http_port) {
@@ -79,13 +72,12 @@ static int  __parse_url(const char *url,
 	}
 
 	snprintf(host_buf, hlen, "%s", url_begin);
-
-	return (0);
+	return 0;
 }
 
 static void __build_http_request(PROBE_SERVER *server)
 {
-	char  myname[] = "__build_http_request";
+	const char *myname = "__build_http_request";
 	char  host_refer[256], url_request[256];
 	int   port_refer = 80;
 	int   ret;
@@ -93,31 +85,23 @@ static void __build_http_request(PROBE_SERVER *server)
 	memset(host_refer, 0, sizeof(host_refer));
 	memset(url_request, 0, sizeof(url_request));
 
-	ret = __parse_url(server->url,
-			host_refer,
-			sizeof(host_refer),
-			&port_refer,
-			url_request,
-			sizeof(url_request));
+	ret = __parse_url(server->url, host_refer, sizeof(host_refer),
+			&port_refer, url_request, sizeof(url_request));
 	if (ret < 0)
-		acl_msg_fatal("%s(%d)->%s: call __parse_url err, invalid url=[%s]",
-				__FILE__, __LINE__, myname,
-				server->url);
+		acl_msg_fatal("%s(%d), %s: invalid url=[%s]",
+			__FILE__, __LINE__, myname, server->url);
 
 	snprintf(server->http_request_header,
-			sizeof(server->http_request_header) - 1,
-			request_format,
-			url_request,
-			host_refer,
-			port_refer);
+		sizeof(server->http_request_header) - 1, request_format,
+			url_request, host_refer, port_refer);
 
 	server->http_request_len = (int) strlen(server->http_request_header);
 }
 
 static void __set_name_value(char *data, PROBE_SERVER *server)
 {
-/* data: name=value */
-	char  myname[] = "__set_name_value";
+	/* data: name=value */
+	const char *myname = "__set_name_value";
 	char *pname, *pvalue, *ptr;
 
 	pname = data;
@@ -125,8 +109,8 @@ static void __set_name_value(char *data, PROBE_SERVER *server)
 	while (*pname == ' ' || *pname == '\t')
 		pname++;
 	if (pname == 0) {
-		acl_msg_error("%s(%d)->%s: invalid data=[%s]",
-				__FILE__, __LINE__, myname, data);
+		acl_msg_error("%s(%d), %s: invalid data=[%s]",
+			__FILE__, __LINE__, myname, data);
 		return;
 	}
 
@@ -145,7 +129,7 @@ static void __set_name_value(char *data, PROBE_SERVER *server)
 		pvalue++;
 	if (pvalue == 0) {
 		acl_msg_error("%s(%d)->%s: invalid data=[%s]",
-				__FILE__, __LINE__, myname, data);
+			__FILE__, __LINE__, myname, data);
 		return;
 	}
 
@@ -180,7 +164,8 @@ static void __set_name_value(char *data, PROBE_SERVER *server)
 		server->warn_time = atoi(pvalue);
 
 	/* only for test */
-	printf("name(%s)=value(%s), probe_inter=%d\n", pname, pvalue, server->probe_inter);
+	printf("name(%s)=value(%s), probe_inter=%d\n",
+		pname, pvalue, server->probe_inter);
 }
 
 static PROBE_SERVER *__cfg_server_new(char *data)
@@ -188,18 +173,19 @@ static PROBE_SERVER *__cfg_server_new(char *data)
 /*
  * data: server_name="博客2", addr=10.0.90.246:80, url=http://blog.hexun.com/index.aspx, connect_timeout=60, rw_timeout=60, retry_inter=5, probe_inter=5
  */
-	char  myname[] = "__cfg_server_new";
+	const char *myname = "__cfg_server_new";
 	PROBE_SERVER *server = NULL;
 	char *ptr;
 
 	if (data == NULL || *data == 0) {
 		acl_msg_error("%s: invalid data input", myname);
-		return (NULL);
+		return NULL;
 	}
 
 	server = (PROBE_SERVER *) acl_mycalloc(1, sizeof(PROBE_SERVER));
 	if (server == NULL)
-		acl_msg_fatal("%s: can't calloc, serr=%s", myname, strerror(errno));
+		acl_msg_fatal("%s: can't calloc, serr=%s",
+			myname, strerror(errno));
 
 	while (1) {
 		ptr = acl_mystrtok(&data, ",");
@@ -212,20 +198,19 @@ static PROBE_SERVER *__cfg_server_new(char *data)
 	__build_http_request(server);
 	if (server->logfile != NULL) {
 		server->logfp = acl_vstream_fopen(server->logfile,
-						O_WRONLY | O_CREAT | O_APPEND,
-						0600, 4096);
+			O_WRONLY | O_CREAT | O_APPEND, 0600, 4096);
 		if (server->logfp == NULL)
-			acl_msg_fatal("%s: can't open logfile(%s)",
-					myname, server->logfile, strerror(errno));
+			acl_msg_fatal("%s: open logfile(%s) error %s ",
+				myname, server->logfile, strerror(errno));
 	} else
 		server->logfp = NULL;
 
-	return (server);
+	return server;
 }
 
 static void __cfg_parse_one_server(const char *server_data)
 {
-	char  myname[] = "__cfg_parse_one_server";
+	const char *myname = "__cfg_parse_one_server";
 	char *buf = NULL;
 	char *begin, *end;
 	PROBE_SERVER *server;
@@ -239,7 +224,7 @@ static void __cfg_parse_one_server(const char *server_data)
 
 	if (server_data == NULL || *server_data == 0)
 		acl_msg_fatal("%s(%d)->%s: input invalid",
-				__FILE__, __LINE__, myname);
+			__FILE__, __LINE__, myname);
 
 	buf = acl_mystrdup(server_data);
 
@@ -264,25 +249,17 @@ static void __cfg_parse_one_server(const char *server_data)
 	}
 
 	server = __cfg_server_new(begin);
-	if (server != NULL) {
-		if (acl_array_append(var_probe_server_link, (void *) server) < 0)
-			acl_msg_fatal("%s(%d)->%s: acl_array_append err=%s",
-					__FILE__, __LINE__, myname, strerror(errno));
-	} else
+	if (server == NULL)
 		acl_msg_fatal("%s(%d)->%s: invalid data=[%s]",
-				__FILE__, __LINE__, myname,
-				server_data);
+			__FILE__, __LINE__, myname, server_data);
+	else
+		acl_array_append(var_probe_server_link, (void *) server);
 
 	acl_msg_info("%s(%d)->%s: name=%s, addr=%s, url=%s, connect_timeout=%d,"
-			" rw_timeout=%d, retry_inter=%d, probe_inter=%d\n",
-			__FILE__, __LINE__, myname,
-			server->name,
-			server->addr,
-			server->url,
-			server->connect_timeout,
-			server->rw_timeout,
-			server->retry_inter,
-			server->probe_inter);
+		" rw_timeout=%d, retry_inter=%d, probe_inter=%d\n",
+		__FILE__, __LINE__, myname, server->name, server->addr,
+		server->url, server->connect_timeout, server->rw_timeout,
+		server->retry_inter, server->probe_inter);
 
 	RETURN;
 }
@@ -307,19 +284,19 @@ static void __cfg_server_parse(const ACL_ARRAY *a)
 
 void probe_cfg_load(void)
 {
-	char  myname[] = "probe_cfg_load";
+	const char *myname = "probe_cfg_load";
 	ACL_XINETD_CFG_PARSER *xcp;
 	const ACL_ARRAY *servers_array;
 	const char *ptr;
 
 	if (var_cfg_file == NULL || *var_cfg_file == 0)
 		acl_msg_fatal("%s(%d)->%s: __cfg_file null",
-				__FILE__, __LINE__, myname);
+			__FILE__, __LINE__, myname);
 
 	xcp = acl_xinetd_cfg_load(var_cfg_file);
 	if (xcp == NULL) {
 		acl_msg_error("%s(%d)->%s: xinetd_cfg_load return null, file=%s",
-				__FILE__, __LINE__, myname, var_cfg_file);
+			__FILE__, __LINE__, myname, var_cfg_file);
 		exit (1);
 	}
 	__cfg_parser = xcp;
@@ -327,13 +304,12 @@ void probe_cfg_load(void)
 	var_probe_server_link = acl_array_create(50);
 	if (var_probe_server_link == NULL)
 		acl_msg_fatal("%s(%d)->%s: acl_array_create error, serr=%s",
-				__FILE__, __LINE__, myname,
-				strerror(errno));
+			__FILE__, __LINE__, myname, strerror(errno));
 
 	servers_array = acl_xinetd_cfg_get_ex(xcp, VAR_CFG_SERVER);
 	if (servers_array == NULL)
 		acl_msg_fatal("%s(%d)->%s: not fine %s line",
-				__FILE__, __LINE__, myname, VAR_CFG_SERVER);
+			__FILE__, __LINE__, myname, VAR_CFG_SERVER);
 
 	__cfg_server_parse(servers_array);
 
@@ -361,9 +337,7 @@ void probe_cfg_load(void)
 	ptr = acl_xinetd_cfg_get(xcp, VAR_CFG_DEBUG_FILE);
 	if (ptr && *ptr)
 		var_probe_debug_fp = acl_vstream_fopen(ptr,
-						O_WRONLY | O_CREAT | O_APPEND,
-						0600, 4096);
+			O_WRONLY | O_CREAT | O_APPEND, 0600, 4096);
 	else
 		var_probe_debug_fp = NULL;
 }
-

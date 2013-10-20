@@ -5,6 +5,7 @@ static int   __max_count = 10;
 static int   __dat_length = 100;
 static char  __local_addr[64];
 static char  __server_addr[64];
+static bool  __server_fixed = true;
 
 static void run(void)
 {
@@ -23,6 +24,8 @@ static void run(void)
 	else
 		stream.set_peer(__server_addr);
 
+	stream.set_rw_timeout(0);
+
 	// 分配内存
 	buf = (char*) malloc(__dat_length + 1);
 	memset(buf, 'X', __dat_length);
@@ -36,6 +39,10 @@ static void run(void)
 	int   i = 0, ret;
 	for (; i < __max_count; i++)
 	{
+		// 服务端可能会用别的地址回复数据，所以需要重新设置远程服务地址
+		if (!__server_fixed)
+			stream.set_peer(__server_addr);
+
 		// 发送数据
 		if (stream.write(buf, __dat_length) == -1)
 		{
@@ -80,6 +87,7 @@ static void usage(const char* procname)
 	printf("usage: %s -h [help]\r\n"
 		"	-s server_addr [default: 127.0.0.1:8888]\r\n"
 		"	-l local_addr [default: 127.0.0.1:18888]\r\n"
+		"	-o [server reply in other addr, default: no]\r\n"
 		"	-n max_count [default: 10]\r\n"
 		"	-N data_length [default: 100]\r\n",
 		procname);
@@ -96,7 +104,7 @@ int main(int argc, char* argv[])
 	snprintf(__server_addr, sizeof(__server_addr), "127.0.0.1:8888");
 	snprintf(__local_addr, sizeof(__local_addr), "127.0.0.1:18888");
 
-	while ((ch = getopt(argc, argv, "hs:l:n:N:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:l:on:N:")) > 0)
 	{
 		switch (ch)
 		{
@@ -108,6 +116,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'l':
 			snprintf(__local_addr, sizeof(__local_addr), "%s", optarg);
+			break;
+		case 'o':
+			__server_fixed = false;
 			break;
 		case 'n':
 			__max_count = atoi(optarg);

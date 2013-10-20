@@ -388,6 +388,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\stdlib\string.cpp">
 				</File>
 				<File
+					RelativePath=".\src\stdlib\thread.cpp">
+				</File>
+				<File
+					RelativePath=".\src\stdlib\thread_pool.cpp">
+				</File>
+				<File
 					RelativePath=".\src\stdlib\url_coder.cpp">
 				</File>
 				<File
@@ -857,6 +863,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\string.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\thread.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\thread_pool.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\url_coder.hpp">

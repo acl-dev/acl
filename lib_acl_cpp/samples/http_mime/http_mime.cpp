@@ -68,9 +68,9 @@ static void test(const char* path, const char* boundary)
 int main(int argc, char* argv[])
 {
 	const char* path = "./tmp.txt";
-//	const char* boundary = "-----------------------------5169208281820";
+	const char* boundary = "-----------------------------5169208281820";
 //	const char* boundary = "------WebKitFormBoundaryztuvecMyltzibUyI";
-	const char* boundary = "--gvdrLIiwm31yiNkOc7Hr3HdHouL22D-P_49Q";
+//	const char* boundary = "--gvdrLIiwm31yiNkOc7Hr3HdHouL22D-P_49Q";
 	if (argc >= 2)
 		path = argv[1];
 	test(path, boundary);

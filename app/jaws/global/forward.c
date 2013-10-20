@@ -1,5 +1,6 @@
 #include "lib_acl.h"
 #include "conn_cache.h"
+#include "sys_patch.h"
 #include "service.h"
 
 #ifdef ACL_BCB_COMPILER
@@ -112,8 +113,6 @@ static int connect_close_callback(ACL_ASTREAM *astream, void *context)
 
 	/* 卸载回调函数，防止被重复调用 */
 	acl_aio_ctl(astream,
-		ACL_AIO_CTL_CONNECT_FN, NULL,
-		ACL_AIO_CTL_CLOSE_HOOK_DEL, connect_close_callback, entry,
 		ACL_AIO_CTL_TIMEO_HOOK_DEL, connect_timeout_callback, entry,
 		ACL_AIO_CTL_END);
 
@@ -142,7 +141,7 @@ static int connect_close_callback(ACL_ASTREAM *astream, void *context)
 
 		client_entry_set_server(entry, server);
 		acl_aio_ctl(server,
-			ACL_AIO_CTL_CONNECT_FN, connect_callback,
+			ACL_AIO_CTL_CONNECT_HOOK_ADD, connect_callback,
 			ACL_AIO_CTL_CLOSE_HOOK_ADD, connect_close_callback, entry,
 			ACL_AIO_CTL_TIMEO_HOOK_ADD, connect_timeout_callback, entry,
 			ACL_AIO_CTL_CTX, entry,
@@ -181,8 +180,6 @@ static int connect_timeout_callback(ACL_ASTREAM *astream, void *context)
 
 	/* 卸载回调函数，防止被重复调用 */
 	acl_aio_ctl(astream,
-		ACL_AIO_CTL_CONNECT_FN, NULL,
-		ACL_AIO_CTL_CLOSE_HOOK_DEL, connect_close_callback, entry,
 		ACL_AIO_CTL_TIMEO_HOOK_DEL, connect_timeout_callback, entry,
 		ACL_AIO_CTL_END);
 
@@ -211,7 +208,7 @@ static int connect_timeout_callback(ACL_ASTREAM *astream, void *context)
 
 		client_entry_set_server(entry, server);
 		acl_aio_ctl(server,
-			ACL_AIO_CTL_CONNECT_FN, connect_callback,
+			ACL_AIO_CTL_CONNECT_HOOK_ADD, connect_callback,
 			ACL_AIO_CTL_CLOSE_HOOK_ADD, connect_close_callback, entry,
 			ACL_AIO_CTL_TIMEO_HOOK_ADD, connect_timeout_callback, entry,
 			ACL_AIO_CTL_CTX, entry,
@@ -245,12 +242,6 @@ static int connect_callback(ACL_ASTREAM *server, void *context)
 {
 	CLIENT_ENTRY *entry = (CLIENT_ENTRY*) context;
 
-	/* 卸载回调函数，防止被重复调用 */
-	acl_aio_ctl(server,
-		ACL_AIO_CTL_CONNECT_FN, NULL,
-		ACL_AIO_CTL_CLOSE_HOOK_DEL, connect_close_callback, entry,
-		ACL_AIO_CTL_TIMEO_HOOK_DEL, connect_timeout_callback, entry,
-		ACL_AIO_CTL_END);
 	entry->tm.connect = time(NULL) - entry->tm.stamp;
 	return (entry->connect_notify_fn(entry));
 }
@@ -281,7 +272,7 @@ void forward_start(CLIENT_ENTRY *entry)
 
 		client_entry_set_server(entry, server);
 		acl_aio_ctl(server,
-			ACL_AIO_CTL_CONNECT_FN, connect_callback,
+			ACL_AIO_CTL_CONNECT_HOOK_ADD, connect_callback,
 			ACL_AIO_CTL_CTX, entry,
 			ACL_AIO_CTL_CLOSE_HOOK_ADD, connect_close_callback, entry,
 			ACL_AIO_CTL_TIMEO_HOOK_ADD, connect_timeout_callback, entry,

@@ -9,6 +9,8 @@ extern "C" {
 
 #ifdef ACL_MS_WINDOWS
 struct tm *localtime_r(const time_t *timep, struct tm *result);
+#define snprintf _snprintf
+#define getpid _getpid
 #endif
 
 #ifdef __cplusplus

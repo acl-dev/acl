@@ -82,7 +82,7 @@ static void conn_pool_free_timer(int event_type acl_unused, void *context)
 
 static void set_conn_pool_free_timer(CONN_POOL *conns)
 {
-	acl_aio_request_timer(conns->aio, conn_pool_free_timer, conns, 1);
+	acl_aio_request_timer(conns->aio, conn_pool_free_timer, conns, 1, 1);
 }
 
 static void conn_pool_stat_timer(int event_type acl_unused, void *context)
@@ -95,15 +95,12 @@ static void conn_pool_stat_timer(int event_type acl_unused, void *context)
 	acl_msg_info("%s(%d): nset: %d, nget: %d, nclose: %d, inter: %d",
 		myname, __LINE__, cache->nset, cache->nget,
 		cache->nclose, cache->nset - cache->nget - cache->nclose);
-
-	/* 再次设置定时器 */
-	acl_aio_request_timer(cache->aio, conn_pool_stat_timer, cache, 2);
 }
 
 static void set_conn_pool_stat_timer(CONN_CACHE *cache)
 {
 	/* 设置定时器 */
-	acl_aio_request_timer(cache->aio, conn_pool_stat_timer, cache, 2);
+	acl_aio_request_timer(cache->aio, conn_pool_stat_timer, cache, 2, 1);
 }
 
 CONN_CACHE *conn_cache_create(ACL_AIO *aio, int conn_limit)

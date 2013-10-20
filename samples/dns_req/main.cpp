@@ -81,6 +81,7 @@ static void dns_lookup(char *domains, const char *dns_ips, int dns_port)
 
 	acl_argv_free(argv);
 	acl_dns_close(dns);
+	acl_aio_check(aio);
 	acl_aio_free(aio);
 }
 

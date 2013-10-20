@@ -1175,6 +1175,10 @@ static int request_header_ready(int status, void *arg)
 		return (0);
 	}
 
+#ifdef WIN32
+#define snprintf _snprintf
+#endif
+
 	if (via_static == NULL) {
 		via_static = (char*) acl_mycalloc(1, via_max);
 		snprintf(via_static, via_max, "jaws-%d", getpid());

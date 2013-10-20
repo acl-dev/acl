@@ -77,10 +77,10 @@ typedef struct PROBE_SERVER {
 	time_t time_end;
 	time_t time_total_cost;
 
-	ACL_AIO *aio;
-	ACL_VSTREAM *stream;
+	ACL_AIO      *aio;
+	ACL_ASTREAM  *stream;
 	HTTP_HDR_RES *hdr_res;
-	HTTP_RES     *respond;
+	HTTP_RES     *res;
 } PROBE_SERVER;
 
 
@@ -113,7 +113,7 @@ extern ACL_VSTREAM *var_probe_debug_fp;
 extern void probe_cfg_load(void);
 
 /* in probe_run.c */
-extern void probe_run(int max_threads, int idle_limit);
+extern void probe_run(void);
 
 /* in main.c */
 extern char *var_cfg_file;
