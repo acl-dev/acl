@@ -2,9 +2,6 @@
 //
 
 #include "stdafx.h"
-#include "lib_acl.h"
-#include "string.hpp"
-#include "db_mysql.hpp"
 
 // 查询表数据
 static int tbl_select(acl::db_handle& db)
