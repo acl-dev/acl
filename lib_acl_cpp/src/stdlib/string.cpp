@@ -141,7 +141,7 @@ string& string::operator =(long n)
 		return (*this);
 	}
 	else
-		return (format("ld", n));
+		return (format("%ld", n));
 }
 
 string& string::operator =(unsigned long n)

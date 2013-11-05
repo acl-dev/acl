@@ -49,6 +49,8 @@
 #define IDC_FILE                        1025
 #define IDC_RECV_LIMIT                  1026
 #define IDC_RECV_ALL                    1027
+#define IDC_RECV_ALL2                   1028
+#define IDC_RECV_SAVE                   1028
 #define IDC_STATIC_SMTP_ADDR            1030
 #define IDC_STATIC_PASS                 1031
 #define IDC_CHECK_SAVE                  1031

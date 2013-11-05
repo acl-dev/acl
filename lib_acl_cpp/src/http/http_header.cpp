@@ -198,7 +198,7 @@ void http_header::build_common(string& buf) const
 #else
 		snprintf(length, sizeof(length), "%lld", content_length_);
 #endif
-		buf << "Content-Length" << length << "\r\n";
+		buf << "Content-Length: " << length << "\r\n";
 	}
 
 	if (is_request_ == false && cgi_mode_)

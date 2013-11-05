@@ -328,7 +328,6 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 		acl_msg_fatal("%s: %s: %s", myname, EVENT_REG_DEL_TEXT,
 			acl_last_serror());
 	}
-
 	event_fdtable_reset(fdp);
 }
 

@@ -131,6 +131,7 @@ private:
 	size_t pop3_recv_limit_;
 	bool pop3_ok_;
 	pop3_result pop3_result_;
+	bool pop3_save_;
 public:
 	test_all& set_ip_file(const char* filename)
 	{
@@ -227,6 +228,11 @@ public:
 			pop3_recv_all_ = false;
 			pop3_recv_limit_ = recv_limit;
 		}
+		return *this;
+	}
+	test_all& set_pop3_save(bool on)
+	{
+		pop3_save_ = on;
 		return *this;
 	}
 public:

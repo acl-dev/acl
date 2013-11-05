@@ -39,6 +39,13 @@ thread& thread::set_stacksize(size_t size)
 void* thread::thread_run(void* arg)
 {
 	thread* thr = (thread*) arg;
+
+	// 如果线程创建时为分离模式，则当 run 运行时用户有可能
+	// 将线程对象销毁了，所以不能再将 thr->return_arg_ 进行
+	// 赋值，否则就有可能出现内存非法访问
+	if (thr->detachable_)
+		return thr->run();
+
 	thr->return_arg_ = thr->run();
 	return thr->return_arg_;
 }
@@ -62,7 +69,7 @@ bool thread::start()
 	if (ret != 0)
 	{
 		acl_set_error(ret);
-		logger_error("create thread error", last_serror());
+		logger_error("create thread error %s", last_serror());
 		return false;
 	}
 

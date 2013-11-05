@@ -137,6 +137,8 @@ BEGIN
     LTEXT           "封",IDC_STATIC,137,180,19,14
     CONTROL         "接收所有邮件",IDC_RECV_ALL,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,162,179,57,10
+    CONTROL         "存储所有邮件",IDC_RECV_SAVE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,224,179,57,10
 END
 
 IDD_OPTION DIALOGEX 0, 0, 309, 337

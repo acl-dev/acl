@@ -61,6 +61,14 @@ extern int   acl_var_multi_use_limit;
 #define	ACL_DEF_MULTI_ENABLE_CORE	1
 extern int   acl_var_multi_enable_core;
 
+#define	ACL_VAR_MULTI_LOG_DEBUG		"master_debug"
+#define	ACL_DEF_MULTI_LOG_DEBUG		""
+extern char *acl_var_multi_log_debug;
+
+#define	ACL_VAR_MULTI_MAX_DEBUG		"master_debug_max"
+#define	ACL_DEF_MULTI_MAX_DEBUG		1000
+extern int   acl_var_multi_max_debug;
+
 #endif /* ACL_UNIX */
 
 #ifdef	__cplusplus

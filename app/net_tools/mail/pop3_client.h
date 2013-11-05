@@ -52,6 +52,7 @@ public:
 	pop3_client& set_rw_timeout(int);
 	pop3_client& set_pop3(const char*, int);
 	pop3_client& set_recv_count(int);
+	pop3_client& set_recv_save(bool on);
 protected:
 	// 基类虚函数：子线程处理函数
 	virtual void rpc_run();
@@ -75,6 +76,7 @@ private:
 	int pop3_port_;
 	int recv_limit_;
 	time_t recv_begin_;
+	bool resv_save_;
 
 	bool get_ip();
 

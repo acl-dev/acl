@@ -1,4 +1,5 @@
 
+------------------------------------------------------------------------
 243) 2013.10.3
 243.1) bugfix: http_chat_async.c 中 http_res_body_get_async/http_req_body_get_async
 两个函数没有对 ctx->read_cnt 置 0

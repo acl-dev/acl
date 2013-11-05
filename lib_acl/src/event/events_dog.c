@@ -51,8 +51,13 @@ static void event_dog_close(EVENT_DOG *evdog)
 static void read_fn(int event_type acl_unused, ACL_EVENT *event,
 	ACL_VSTREAM *stream, void *context)
 {
+	const char *myname = "read_fn";
 	EVENT_DOG *evdog = (EVENT_DOG*) context;
 	char  buf[2];
+
+	if (evdog->client != stream)
+		acl_msg_fatal("%s(%d), %s: stream != evdog->client",
+			__FILE__, __LINE__, myname);
 
 	evdog->client->rw_timeout = 1;
 	if (acl_vstream_readn(evdog->client, buf, 1) == ACL_VSTREAM_EOF) {

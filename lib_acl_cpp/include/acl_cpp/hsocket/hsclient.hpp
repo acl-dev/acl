@@ -48,7 +48,12 @@ public:
 	 * @param ... {const char*} 参数列表，最后一个参数为 NULL 表示结束
 	 * @return {const std::verctor<hsrow*>&} 返回结果集
 	 */
+#ifdef	WIN32
 	const std::vector<hsrow*>& get(const char* first_value, ...);
+#else
+	const std::vector<hsrow*>& get(const char* first_value, ...)
+		__attribute__((format(printf, 2, 3)));
+#endif
 
 	/**
 	 * 更新数据库表中匹配字段的数值
@@ -91,7 +96,12 @@ public:
 	 * @param ... {const char*} 参数列表，最后一个参数为 NULL 表示结束
 	 * @return {bool} 添加记录是否成功
 	 */
+#ifdef	WIN32
 	bool fmt_del(const char* first_value, ...);
+#else
+	bool fmt_del(const char* first_value, ...)
+		__attribute__((format(printf, 2, 3)));
+#endif
 
 	/**
 	 * 向数据库添加新记录
@@ -110,7 +120,12 @@ public:
 	 * @param ... {const char*} 参数列表，最后一个参数为 NULL 表示结束
 	 * @return {bool} 添加记录是否成功
 	 */
+#ifdef	WIN32
 	bool fmt_add(const char* first_value, ...);
+#else
+	bool fmt_add(const char* first_value, ...)
+		__attribute__((format(printf, 2, 3)));
+#endif
 
 	/**
 	 * 设置是否进行调试

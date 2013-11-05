@@ -10,7 +10,12 @@ public:
 	redis_key() {}
 	~redis_key() {}
 
+#ifdef	WIN32
 	bool del_keys(const char* first_key, ...);
+#else
+	bool del_keys(const char* first_key, ...)
+		__attribute__((format(printf, 2, 3)));
+#endif
 	int  get_keys(const char* pattern, std::vector<acl::string>& out);
 	bool if_exists(const char* key);
 	redis_key_t get_key_type(const char* key);

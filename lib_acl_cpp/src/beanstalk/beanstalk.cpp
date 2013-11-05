@@ -562,7 +562,7 @@ bool beanstalk::release(unsigned long long id, unsigned pri /* = 1024 */,
 bool beanstalk::bury(unsigned long long id, unsigned int pri /* = 1024 */)
 {
 	string cmdline(128);
-	cmdline.format("bury %llu %u %u\r\n", id, pri);
+	cmdline.format("bury %llu %u\r\n", id, pri);
 	ACL_ARGV* tokens = beanstalk_request(cmdline);
 	if (tokens == NULL)
 	{

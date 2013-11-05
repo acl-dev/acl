@@ -78,6 +78,7 @@ int   acl_var_aio_min_notify;
 int   acl_var_aio_quick_abort;
 int   acl_var_aio_enable_core;
 int   acl_var_aio_accept_timer;
+int   acl_var_aio_max_debug;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
         { ACL_VAR_AIO_BUF_SIZE, ACL_DEF_AIO_BUF_SIZE, &acl_var_aio_buf_size, 0, 0 },
@@ -96,6 +97,8 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_AIO_QUICK_ABORT, ACL_DEF_AIO_QUICK_ABORT, &acl_var_aio_quick_abort, 0, 0 },
 	{ ACL_VAR_AIO_ENABLE_CORE, ACL_DEF_AIO_ENABLE_CORE, &acl_var_aio_enable_core, 0, 0 },
 	{ ACL_VAR_AIO_ACCEPT_TIMER, ACL_DEF_AIO_ACCEPT_TIMER, &acl_var_aio_accept_timer, 0, 0 },
+	{ ACL_VAR_AIO_MAX_DEBUG, ACL_DEF_AIO_MAX_DEBUG, &acl_var_aio_max_debug, 0, 0 },
+
         { 0, 0, 0, 0, 0 },
 };
 
@@ -108,6 +111,7 @@ char *acl_var_aio_event_mode;
 char *acl_var_aio_pid_dir;
 char *acl_var_aio_access_allow;
 char *acl_var_aio_accept_alone;
+char *acl_var_aio_log_debug;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
         { ACL_VAR_AIO_QUEUE_DIR, ACL_DEF_AIO_QUEUE_DIR, &acl_var_aio_queue_dir },
@@ -116,6 +120,8 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ ACL_VAR_AIO_ACCESS_ALLOW, ACL_DEF_AIO_ACCESS_ALLOW, &acl_var_aio_access_allow },
         { ACL_VAR_AIO_EVENT_MODE, ACL_DEF_AIO_EVENT_MODE, &acl_var_aio_event_mode },
 	{ ACL_VAR_AIO_ACCEPT_ALONE, ACL_DEF_AIO_ACCEPT_ALONE, &acl_var_aio_accept_alone },
+	{ ACL_VAR_AIO_LOG_DEBUG, ACL_DEF_AIO_LOG_DEBUG, &acl_var_aio_log_debug },
+
         { 0, 0, 0 },
 };
 
@@ -831,6 +837,12 @@ static void aio_server_open_log(void)
 
 	/* second, open the service's log */
 	acl_msg_open(acl_var_aio_log_file, acl_var_aio_procname);
+
+	if (acl_var_aio_log_debug && *acl_var_aio_log_debug
+		&& acl_var_aio_max_debug >= 100)
+	{
+		acl_debug_init2(acl_var_aio_log_debug, acl_var_aio_max_debug);
+	}
 }
 
 static void usage(int argc, char *argv[])

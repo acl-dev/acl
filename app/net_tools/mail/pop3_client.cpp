@@ -17,6 +17,7 @@ pop3_client::pop3_client()
 	meter_.pop3_recv_elapsed = 0.00;
 	meter_.pop3_quit_elapsed = 0.00;
 	recv_limit_ = 0;
+	resv_save_ = false;
 }
 
 pop3_client::~pop3_client()
@@ -65,6 +66,12 @@ pop3_client& pop3_client::set_pop3(const char* addr, int port)
 pop3_client& pop3_client::set_recv_count(int n)
 {
 	recv_limit_ = n;
+	return *this;
+}
+
+pop3_client& pop3_client::set_recv_save(bool on)
+{
+	resv_save_ = on;
 	return *this;
 }
 
@@ -566,17 +573,33 @@ bool pop3_client::pop3_retr_one(acl::socket_stream& conn, size_t idx)
 	time_t last, now;
 	time(&last);
 
+	static int __count = 0;
+	__count++;
+	acl::string filepath;
+	filepath.format("%d.eml", __count);
+	acl::ofstream out;
+	if (resv_save_ && out.open_write(filepath) == false)
+	{
+		logger_error("open file %s error %s", 
+			filepath.c_str(), acl::last_serror());
+		return false;
+	}
 	while (true)
 	{
-		if (conn.gets(line) == false)
+		line.clear();
+		if (conn.gets(line, false) == false)
 		{
 			logger_error("gets mail data error(%s) from server %s, "
 				"user: %s, idx: %d", acl::last_serror(),
 				pop3_ip_.c_str(), auth_account_.c_str(), idx);
 			return false;
 		}
-		if (line == ".")
+		if (line == ".\n" || line == ".\r\n")
 			break;
+
+		if (out.write(line) == -1)
+			logger_error("write to %s error %s, %d",
+				filepath.c_str(), acl::last_serror());
 
 		meter_.recved_size += line.length();
 

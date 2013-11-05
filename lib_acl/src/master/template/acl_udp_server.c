@@ -65,6 +65,7 @@ int   acl_var_udp_delay_usec;
 int   acl_var_udp_daemon_timeout;
 int   acl_var_udp_master_maxproc;
 int   acl_var_udp_enable_core;
+int   acl_var_udp_max_debug;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_UDP_BUF_SIZE, ACL_DEF_UDP_BUF_SIZE, &acl_var_udp_buf_size, 0, 0 },
@@ -75,6 +76,8 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_UDP_DAEMON_TIMEOUT, ACL_DEF_UDP_DAEMON_TIMEOUT, &acl_var_udp_daemon_timeout, 0, 0 },
 	{ ACL_VAR_UDP_MASTER_MAXPROC, ACL_DEF_UDP_MASTER_MAXPROC, &acl_var_udp_master_maxproc, 0, 0},
 	{ ACL_VAR_UDP_ENABLE_CORE, ACL_DEF_UDP_ENABLE_CORE, &acl_var_udp_enable_core, 0, 0 },
+	{ ACL_VAR_UDP_MAX_DEBUG, ACL_DEF_UDP_MAX_DEBUG, &acl_var_udp_max_debug, 0, 0 },
+
         { 0, 0, 0, 0, 0 },
 };
 
@@ -82,12 +85,15 @@ char *acl_var_udp_queue_dir;
 char *acl_var_udp_owner;
 char *acl_var_udp_pid_dir;
 char *acl_var_udp_event_mode;
+char *acl_var_udp_log_debug;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ ACL_VAR_UDP_QUEUE_DIR, ACL_DEF_UDP_QUEUE_DIR, &acl_var_udp_queue_dir },
 	{ ACL_VAR_UDP_OWNER, ACL_DEF_UDP_OWNER, &acl_var_udp_owner },
 	{ ACL_VAR_UDP_PID_DIR, ACL_DEF_UDP_PID_DIR, &acl_var_udp_pid_dir },
 	{ ACL_VAR_UDP_EVENT_MODE, ACL_DEF_UDP_EVENT_MODE, &acl_var_udp_event_mode },
+	{ ACL_VAR_UDP_LOG_DEBUG, ACL_DEF_UDP_LOG_DEBUG, &acl_var_udp_log_debug },
+
         { 0, 0, 0 },
 };
 
@@ -306,6 +312,12 @@ static void udp_server_open_log(void)
 
 	/* second, open the service's log */
 	acl_msg_open(acl_var_udp_log_file, acl_var_udp_procname);
+
+	if (acl_var_udp_log_debug && *acl_var_udp_log_debug
+		&& acl_var_udp_max_debug >= 100)
+	{
+		acl_debug_init2(acl_var_udp_log_debug, acl_var_udp_max_debug);
+	}
 }
 
 static void usage(int argc, char *argv[])

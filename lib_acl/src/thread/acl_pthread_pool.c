@@ -720,7 +720,6 @@ int acl_pthread_pool_stop(acl_pthread_pool_t *thr_pool)
 static void __workq_addone(acl_pthread_pool_t *thr_pool, ACL_TASK *item)
 {
 	const char *myname = "__workq_addone";
-	acl_pthread_t id;
 	int   status;
 
 	if (thr_pool->first == NULL)
@@ -737,13 +736,14 @@ static void __workq_addone(acl_pthread_pool_t *thr_pool, ACL_TASK *item)
 #else
 		status = pthread_cond_broadcast(&thr_pool->worker_cond);
 #endif
-		if ( status != 0 ) {
+		if (status != 0) {
 			__SET_ERRNO(status);
 			acl_msg_error("%s(%d)->%s: pthread_cond_signal, serr = %s",
 				__FILE__, __LINE__, myname, acl_last_serror());
-			return;
 		}
 	} else if (thr_pool->counter < thr_pool->parallelism) {
+		acl_pthread_t id;
+
 		status = acl_pthread_create(&id, &thr_pool->attr,
 				__worker_thread, (void*) thr_pool);
 		if (status != 0) {
@@ -769,8 +769,6 @@ static void __workq_addone(acl_pthread_pool_t *thr_pool, ACL_TASK *item)
 			sleep(thr_pool->overload_timewait);
 		}
 	}
-
-	return;
 }
 
 int acl_pthread_pool_add(acl_pthread_pool_t *thr_pool,
@@ -809,11 +807,11 @@ int acl_pthread_pool_add(acl_pthread_pool_t *thr_pool,
 		acl_pthread_mutex_unlock(&thr_pool->worker_mutex);
 		return ACL_ENOMEM;
 	}
-#endif
 
 	item->worker_fn  = run_fn;
 	item->worker_arg = run_arg;
 	item->next       = NULL;
+#endif
 
 	__workq_addone(thr_pool, item);
 

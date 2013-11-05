@@ -1,6 +1,23 @@
 修改历史列表：
 ------------------------------------------------------------------------
 
+------------------------------------------------------------------------
+399) 2013.11.5
+399.1) bugfix: events.c，event_thr_fire() 函数在调用 disable_readwrite_fn
+后 fdp->stream = NULL，而此值在 events_dog.c 中被使用造成错误
+
+398) 2013.11.3
+398.1) acl_debug.c: 调整了参数的表示方法，调整后的调试标签及级别字符串的
+格式: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8...
+
+397) 2013.11.2
+397.1) feature: acl_master 服务器模板添加了 master_debug 配置项，方便用户
+在使用 acl 的服务器框架时调试日志
+
+396) 2013.10.29
+396.1) bugfix: acl_xml_util.c, acl_xml_tag_add() 在调用 acl_token_tree_add
+时，第三个参数应该调用 ACL_TOKEN_F_STOP，原来是 ACL_TOKEN_F_PASS
+
 395) 2013.10.20
 395.1) compile: acl_aio_app_main.c, 其中在调用 write 时，需要判断返回值，否则
 会在高版本 gcc 上报警告

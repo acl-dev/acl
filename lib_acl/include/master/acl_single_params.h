@@ -73,6 +73,14 @@ extern int   acl_var_single_use_limit;
 #define	ACL_DEF_SINGLE_ENABLE_CORE	1
 extern int   acl_var_single_enable_core;
 
+#define	ACL_VAR_SINGLE_LOG_DEBUG	"master_debug"
+#define	ACL_DEF_SINGLE_LOG_DEBUG	""
+extern char *acl_var_single_log_debug;
+
+#define	ACL_VAR_SINGLE_MAX_DEBUG	"master_debug_max"
+#define	ACL_DEF_SINGLE_MAX_DEBUG	1000
+extern int   acl_var_single_max_debug;
+
 #endif /* ACL_UNIX*/
 
 #ifdef	__cplusplus

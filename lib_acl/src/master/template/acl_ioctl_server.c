@@ -68,20 +68,16 @@ int   acl_var_ioctl_max_threads;
 int   acl_var_ioctl_stacksize;
 int   acl_var_ioctl_thread_idle_limit;
 int   acl_var_ioctl_idle_limit;
-char *acl_var_ioctl_queue_dir;
-char *acl_var_ioctl_owner;
 int   acl_var_ioctl_delay_sec;
 int   acl_var_ioctl_delay_usec;
-char *acl_var_ioctl_event_mode;
 int   acl_var_ioctl_daemon_timeout;
 int   acl_var_ioctl_use_limit;
-char *acl_var_ioctl_pid_dir;
-char *acl_var_ioctl_access_allow;
 int   acl_var_ioctl_master_maxproc;
 int   acl_var_ioctl_max_accept;
 int   acl_var_ioctl_enable_dog;
 int   acl_var_ioctl_quick_abort;
 int   acl_var_ioctl_enable_core;
+int   acl_var_ioctl_max_debug;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_IOCTL_BUF_SIZE, ACL_DEF_IOCTL_BUF_SIZE, &acl_var_ioctl_buf_size, 0, 0 },
@@ -100,8 +96,17 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_IOCTL_ENABLE_DOG, ACL_DEF_IOCTL_ENABLE_DOG, &acl_var_ioctl_enable_dog, 0, 0 },
 	{ ACL_VAR_IOCTL_QUICK_ABORT, ACL_DEF_IOCTL_QUICK_ABORT, &acl_var_ioctl_quick_abort, 0, 0 },
 	{ ACL_VAR_IOCTL_ENABLE_CORE, ACL_DEF_IOCTL_ENABLE_CORE, &acl_var_ioctl_enable_core, 0, 0 },
+	{ ACL_VAR_IOCTL_MAX_DEBUG, ACL_DEF_IOCTL_MAX_DEBUG, &acl_var_ioctl_max_debug, 0, 0 },
+
         { 0, 0, 0, 0, 0 },
 };
+
+char *acl_var_ioctl_queue_dir;
+char *acl_var_ioctl_owner;
+char *acl_var_ioctl_pid_dir;
+char *acl_var_ioctl_access_allow;
+char *acl_var_ioctl_event_mode;
+char *acl_var_ioctl_log_debug;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ ACL_VAR_IOCTL_QUEUE_DIR, ACL_DEF_IOCTL_QUEUE_DIR, &acl_var_ioctl_queue_dir },
@@ -109,6 +114,8 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ ACL_VAR_IOCTL_PID_DIR, ACL_DEF_IOCTL_PID_DIR, &acl_var_ioctl_pid_dir },
 	{ ACL_VAR_IOCTL_ACCESS_ALLOW, ACL_DEF_IOCTL_ACCESS_ALLOW, &acl_var_ioctl_access_allow },
 	{ ACL_VAR_IOCTL_EVENT_MODE, ACL_DEF_IOCTL_EVENT_MODE, &acl_var_ioctl_event_mode },
+	{ ACL_VAR_IOCTL_LOG_DEBUG, ACL_DEF_IOCTL_LOG_DEBUG, &acl_var_ioctl_log_debug },
+
         { 0, 0, 0 },
 };
 
@@ -697,6 +704,13 @@ static void ioctl_server_open_log(void)
 
 	/* second, open the service's log */
 	acl_msg_open(acl_var_ioctl_log_file, acl_var_ioctl_procname);
+
+	if (acl_var_ioctl_log_debug && *acl_var_ioctl_log_debug
+		&& acl_var_ioctl_max_debug >= 100)
+	{
+		acl_debug_init2(acl_var_ioctl_log_debug,
+			acl_var_ioctl_max_debug);
+	}
 }
 
 static void usage(int argc, char *argv[])

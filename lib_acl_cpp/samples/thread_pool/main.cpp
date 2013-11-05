@@ -2,7 +2,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 
-class mythread : public acl::thread
+class mythread : public acl::thread_job
 {
 public:
 	mythread(bool auto_destroy = false)
@@ -15,8 +15,8 @@ protected:
 	virtual void* run()
 	{
 		const char* myname = "run";
-		printf("%s: thread id: %lu, %lu\r\n",
-			myname, thread_id(), acl::thread::thread_self());
+		printf("%s: thread id: %lu\r\n",
+			myname, acl::thread::thread_self());
 		sleep(1);
 		if (auto_destroy_)
 			delete this;

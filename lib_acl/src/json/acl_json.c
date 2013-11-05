@@ -121,7 +121,7 @@ ACL_JSON_NODE *acl_json_node_alloc(ACL_JSON *json)
 
 	if (json->slice)
 		node = (ACL_JSON_NODE*) acl_slice_pool_calloc(__FILE__, __LINE__,
-						json->slice, 1, sizeof(ACL_JSON_NODE));
+				json->slice, 1, sizeof(ACL_JSON_NODE));
 	else
 		node = (ACL_JSON_NODE*) acl_mycalloc(1, sizeof(ACL_JSON_NODE));
 	acl_ring_init(&node->children);

@@ -255,7 +255,8 @@ static bool save_as(ifstream& in, fstream& out, MIME_NODE* node)
 	{
 		logger_warn("node invalid, header_begin(%d), "
 			"header_end(%d), body_begin(%d), body_end(%d)",
-			(int) node->header_begin);
+			(int) node->header_begin, (int) node->header_end,
+			(int) node->body_begin, (int) node->body_end);
 		return (true);
 	}
 

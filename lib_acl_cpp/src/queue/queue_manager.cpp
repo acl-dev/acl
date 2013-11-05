@@ -306,8 +306,8 @@ bool queue_manager::cache_check(queue_file* fp)
 	else if (it->second != fp)
 	{
 		m_queueLocker.unlock();
-		logger_error("%s not match, %lx, %lx", fp->key(),
-			(size_t) fp, (size_t)it->second);
+		logger_error("%s not match, %lu, %lu", fp->key(),
+			(unsigned long) fp, (unsigned long)it->second);
 		return (false);
 	}
 	m_queueLocker.unlock();

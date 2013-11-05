@@ -95,11 +95,19 @@ extern int   acl_var_aio_enable_core;
 
 #define	ACL_VAR_AIO_QUICK_ABORT		"aio_quick_abort"
 #define	ACL_DEF_AIO_QUICK_ABORT		1
-extern int acl_var_aio_quick_abort;
+extern int   acl_var_aio_quick_abort;
 
 #define	ACL_VAR_AIO_ACCEPT_TIMER	"aio_accept_timer"
 #define	ACL_DEF_AIO_ACCEPT_TIMER	0
-extern int acl_var_aio_accept_timer;
+extern int   acl_var_aio_accept_timer;
+
+#define	ACL_VAR_AIO_LOG_DEBUG		"master_debug"
+#define	ACL_DEF_AIO_LOG_DEBUG		""
+extern char *acl_var_aio_log_debug;
+
+#define	ACL_VAR_AIO_MAX_DEBUG		"master_debug_max"
+#define	ACL_DEF_AIO_MAX_DEBUG		1000
+extern int  acl_var_aio_max_debug;
 
 #endif /* ACL_UNIX */
 

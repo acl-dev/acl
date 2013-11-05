@@ -62,14 +62,12 @@ int   acl_var_multi_buf_size;
 int   acl_var_multi_rw_timeout;
 int   acl_var_multi_in_flow_delay;
 int   acl_var_multi_idle_limit;
-char *acl_var_multi_queue_dir;
-char *acl_var_multi_owner;
 int   acl_var_multi_delay_sec;
 int   acl_var_multi_delay_usec;
 int   acl_var_multi_daemon_timeout;
 int   acl_var_multi_use_limit;
-char *acl_var_multi_pid_dir;
 int   acl_var_multi_enable_core;
+int   acl_var_multi_max_debug;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
         { ACL_VAR_MULTI_BUF_SIZE, ACL_DEF_MULTI_BUF_SIZE, &acl_var_multi_buf_size, 0, 0 },
@@ -81,13 +79,22 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
         { ACL_VAR_MULTI_DAEMON_TIMEOUT, ACL_DEF_MULTI_DAEMON_TIMEOUT, &acl_var_multi_daemon_timeout, 0, 0 },
         { ACL_VAR_MULTI_USE_LIMIT, ACL_DEF_MULTI_USE_LIMIT, &acl_var_multi_use_limit, 0, 0 },
 	{ ACL_VAR_MULTI_ENABLE_CORE, ACL_DEF_MULTI_ENABLE_CORE, &acl_var_multi_enable_core, 0, 0 },
+	{ ACL_VAR_MULTI_MAX_DEBUG, ACL_DEF_MULTI_MAX_DEBUG, &acl_var_multi_max_debug, 0, 0 },
+
         { 0, 0, 0, 0, 0 },
 };
+
+char *acl_var_multi_queue_dir;
+char *acl_var_multi_owner;
+char *acl_var_multi_pid_dir;
+char *acl_var_multi_log_debug;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
         { ACL_VAR_MULTI_QUEUE_DIR, ACL_DEF_MULTI_QUEUE_DIR, &acl_var_multi_queue_dir },
         { ACL_VAR_MULTI_OWNER, ACL_DEF_MULTI_OWNER, &acl_var_multi_owner },
 	{ ACL_VAR_MULTI_PID_DIR, ACL_DEF_MULTI_PID_DIR, &acl_var_multi_pid_dir },
+	{ ACL_VAR_MULTI_LOG_DEBUG, ACL_DEF_MULTI_LOG_DEBUG, &acl_var_multi_log_debug },
+
         { 0, 0, 0 },
 };
 
@@ -494,6 +501,13 @@ static void multi_server_open_log(void)
 
 	/* second, open the service's log */
 	acl_msg_open(acl_var_multi_log_file, acl_var_multi_procname);
+
+	if (acl_var_multi_log_debug && *acl_var_multi_log_debug
+		&& acl_var_multi_max_debug >= 100)
+	{
+		acl_debug_init2(acl_var_multi_log_debug,
+			acl_var_multi_max_debug);
+	}
 }
 
 static void usage(int argc, char *argv[])

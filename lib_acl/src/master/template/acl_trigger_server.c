@@ -59,19 +59,17 @@
 int   acl_var_trigger_pid;
 char *acl_var_trigger_procname;
 char *acl_var_trigger_log_file;
-char *acl_var_trigger_pid_dir;
 
 int   acl_var_trigger_buf_size;
 int   acl_var_trigger_rw_timeout;
 int   acl_var_trigger_in_flow_delay;
 int   acl_var_trigger_idle_limit;
-char *acl_var_trigger_queue_dir;
-char *acl_var_trigger_owner;
 int   acl_var_trigger_delay_sec;
 int   acl_var_trigger_delay_usec;
 int   acl_var_trigger_daemon_timeout;
 int   acl_var_trigger_use_limit;
 int   acl_var_trigger_enable_core;
+int   acl_var_trigger_max_debug;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_TRIGGER_BUF_SIZE, ACL_DEF_TRIGGER_BUF_SIZE, &acl_var_trigger_buf_size, 0, 0 },
@@ -83,13 +81,22 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_TRIGGER_DAEMON_TIMEOUT, ACL_DEF_TRIGGER_DAEMON_TIMEOUT, &acl_var_trigger_daemon_timeout, 0, 0 },
 	{ ACL_VAR_TRIGGER_USE_LIMIT, ACL_DEF_TRIGGER_USE_LIMIT, &acl_var_trigger_use_limit, 0, 0 },
 	{ ACL_VAR_TRIGGER_ENABLE_CORE, ACL_DEF_TRIGGER_ENABLE_CORE, &acl_var_trigger_enable_core, 0, 0 },
+	{ ACL_VAR_TRIGGER_MAX_DEBUG, ACL_DEF_TRIGGER_MAX_DEBUG, &acl_var_trigger_max_debug, 0, 0 },
+
 	{ 0, 0, 0, 0, 0 },
 };
+
+char *acl_var_trigger_queue_dir;
+char *acl_var_trigger_owner;
+char *acl_var_trigger_pid_dir;
+char *acl_var_trigger_log_debug;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ ACL_VAR_TRIGGER_QUEUE_DIR, ACL_DEF_TRIGGER_QUEUE_DIR, &acl_var_trigger_queue_dir },
 	{ ACL_VAR_TRIGGER_OWNER, ACL_DEF_TRIGGER_OWNER, &acl_var_trigger_owner },
 	{ ACL_VAR_TRIGGER_PID_DIR, ACL_DEF_TRIGGER_PID_DIR, &acl_var_trigger_pid_dir },
+	{ ACL_VAR_TRIGGER_LOG_DEBUG, ACL_DEF_TRIGGER_LOG_DEBUG, &acl_var_trigger_log_debug },
+
 	{ 0, 0, 0 },
 };
 
@@ -357,6 +364,13 @@ static void trigger_server_open_log(void)
 
 	/* second, open the service's log */
 	acl_msg_open(acl_var_trigger_log_file, acl_var_trigger_procname);
+
+	if (acl_var_trigger_log_debug && *acl_var_trigger_log_debug
+		&& acl_var_trigger_max_debug >= 100)
+	{
+		acl_debug_init2(acl_var_trigger_log_debug,
+			acl_var_trigger_max_debug);
+	}
 }
 
 static void usage(int argc, char *argv[])

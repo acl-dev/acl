@@ -37,9 +37,8 @@ public:
 	bool start();
 
 	/**
-	 * 当创建线程时为非 detachable 状态，则可以调用此函数
-	 * 等待线程结束；否则，若创建线程时为 detachable 状态
-	 * 在调用本函数时将会报错
+	 * 当创建线程时为非 detachable 状态，则必须调用此函数等待线程结束；
+	 * 若创建线程时为 detachable 状态时，禁止调用本函数
 	 * @param out {void**} 当该参数非空指针时，该参数用来存放
 	 *  线程退出前返回的参数
 	 * @return {bool} 是否成功

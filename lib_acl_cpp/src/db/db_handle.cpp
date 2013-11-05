@@ -64,7 +64,7 @@ const char* db_row::field_value(size_t ifield) const
 	if (ifield >= values_.size())
 	{
 		logger_error("ifield(%d) invalid, values_.size: %d",
-			ifield, (int) values_.size());
+			(int) ifield, (int) values_.size());
 		return (NULL);
 	}
 
@@ -198,7 +198,8 @@ const db_row* db_rows::operator [](size_t idx) const
 {
 	if (idx >= rows_.size())
 	{
-		logger_error("idx(%d) >= rows_.size %d", (int) idx, rows_.size());
+		logger_error("idx(%d) >= rows_.size %d",
+			(int) idx, (int) rows_.size());
 		return (NULL);
 	}
 

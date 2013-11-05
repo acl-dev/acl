@@ -75,6 +75,7 @@ Cnet_toolsDlg::Cnet_toolsDlg(CWnd* pParent /*=NULL*/)
 	, m_pop3Port(110)
 	, m_recvLimit(1)
 	, m_recvAll(FALSE)
+	, m_recvSave(FALSE)
 	, m_smtpUser("")
 	, m_smtpPass("")
 	, m_recipients("wang.li@net263.com;shuxin.zheng@net263.com;jian.shao@net263.com")
@@ -109,6 +110,7 @@ void Cnet_toolsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_PKT_SIZE, m_pktSize);
 	DDX_Text(pDX, IDC_RECV_LIMIT, m_recvLimit);
 	DDX_Check(pDX, IDC_RECV_ALL, m_recvAll);
+	DDX_Check(pDX, IDC_RECV_SAVE, m_recvSave);
 	DDX_Text(pDX, IDC_IP_FILE_PATH, m_ipFilePath);
 	DDX_Text(pDX, IDC_DOMAIN_FILE, m_domainFilePath);
 	DDX_Text(pDX, IDC_FILE, m_attachFilePath);
@@ -151,6 +153,7 @@ BEGIN_MESSAGE_MAP(Cnet_toolsDlg, CDialog)
 	ON_EN_KILLFOCUS(IDC_FILE, OnEnKillfocusFile)
 	ON_EN_KILLFOCUS(IDC_RECV_LIMIT, OnEnKillfocusRecvLimit)
 	ON_BN_KILLFOCUS(IDC_RECV_ALL, OnBnKillfocusRecvAll)
+	ON_BN_CLICKED(IDC_RECV_SAVE, OnBnClickedRecvSave)
 END_MESSAGE_MAP()
 
 
@@ -810,7 +813,8 @@ void Cnet_toolsDlg::OnBnClickedRecvMail()
 		.set_rw_timeout(m_rwTimeout)
 		.set_account(m_smtpUser.GetString())
 		.set_passwd(m_smtpPass.GetString())
-		.set_recv_count(m_recvAll ? -1 : m_recvLimit);
+		.set_recv_count(m_recvAll ? -1 : m_recvLimit)
+		.set_recv_save(m_recvSave ? true : false);
 	rpc_manager::get_instance().fork(pop3);
 }
 
@@ -894,7 +898,8 @@ void Cnet_toolsDlg::OnBnClickedTestall()
 		.set_recipients(m_recipients.GetString())
 		.set_pop3_addr(m_pop3Addr)
 		.set_pop3_port(m_pop3Port)
-		.set_pop3_recv(m_recvAll ? -1 : m_recvLimit);
+		.set_pop3_recv(m_recvAll ? -1 : m_recvLimit)
+		.set_pop3_save(m_recvSave ? true : false);
 	test->start();
 }
 
@@ -1100,4 +1105,9 @@ void Cnet_toolsDlg::OnBnKillfocusRecvAll()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	check();
+}
+
+void Cnet_toolsDlg::OnBnClickedRecvSave()
+{
+	// TODO: 在此添加控件通知处理程序代码
 }

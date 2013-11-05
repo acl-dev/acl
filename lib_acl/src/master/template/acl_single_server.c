@@ -60,19 +60,17 @@
 int   acl_var_single_pid;
 char *acl_var_single_procname;
 char *acl_var_single_log_file;
-char *acl_var_single_pid_dir;
 
 int   acl_var_single_buf_size;
 int   acl_var_single_rw_timeout;
 int   acl_var_single_in_flow_delay;
 int   acl_var_single_idle_limit;
-char *acl_var_single_queue_dir;
-char *acl_var_single_owner;
 int   acl_var_single_delay_sec;
 int   acl_var_single_delay_usec;
 int   acl_var_single_daemon_timeout;
 int   acl_var_single_use_limit;
 int   acl_var_single_enable_core;
+int   acl_var_single_max_debug;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_SINGLE_BUF_SIZE, ACL_DEF_SINGLE_BUF_SIZE, &acl_var_single_buf_size, 0, 0 },
@@ -84,13 +82,22 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_SINGLE_DAEMON_TIMEOUT, ACL_DEF_SINGLE_DAEMON_TIMEOUT, &acl_var_single_daemon_timeout, 0, 0 },
 	{ ACL_VAR_SINGLE_USE_LIMIT, ACL_DEF_SINGLE_USE_LIMIT, &acl_var_single_use_limit, 0, 0 },
 	{ ACL_VAR_SINGLE_ENABLE_CORE, ACL_DEF_SINGLE_ENABLE_CORE, &acl_var_single_enable_core, 0, 0 },
+	{ ACL_VAR_SINGLE_MAX_DEBUG, ACL_DEF_SINGLE_MAX_DEBUG, &acl_var_single_max_debug, 0, 0 },
+
 	{ 0, 0, 0, 0, 0 },
 };
+
+char *acl_var_single_queue_dir;
+char *acl_var_single_owner;
+char *acl_var_single_pid_dir;
+char *acl_var_single_log_debug;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ ACL_VAR_SINGLE_QUEUE_DIR, ACL_DEF_SINGLE_QUEUE_DIR, &acl_var_single_queue_dir },
 	{ ACL_VAR_SINGLE_OWNER, ACL_DEF_SINGLE_OWNER, &acl_var_single_owner },
 	{ ACL_VAR_SINGLE_PID_DIR, ACL_DEF_SINGLE_PID_DIR, &acl_var_single_pid_dir },
+	{ ACL_VAR_SINGLE_LOG_DEBUG, ACL_DEF_SINGLE_LOG_DEBUG, &acl_var_single_log_debug },
+
 	{ 0, 0, 0 },
 };
 
@@ -354,6 +361,13 @@ static void single_server_open_log(const char *proc)
 
 	/* second, open the service's log */
 	acl_msg_open(acl_var_single_log_file, acl_var_single_procname);
+
+	if (acl_var_single_log_debug && *acl_var_single_log_debug
+		&& acl_var_single_max_debug >= 100)
+	{
+		acl_debug_init2(acl_var_single_log_debug,
+			acl_var_single_max_debug);
+	}
 }
 
 static void usage(int argc, char *argv[])

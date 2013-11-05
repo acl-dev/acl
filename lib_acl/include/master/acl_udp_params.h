@@ -65,6 +65,14 @@ extern int   acl_var_udp_master_maxproc;
 #define	ACL_DEF_UDP_ENABLE_CORE		1
 extern int   acl_var_udp_enable_core;
 
+#define	ACL_VAR_UDP_LOG_DEBUG		"master_debug"
+#define	ACL_DEF_UDP_LOG_DEBUG		""
+extern char *acl_var_udp_log_debug;
+
+#define	ACL_VAR_UDP_MAX_DEBUG		"master_debug_max"
+#define	ACL_DEF_UDP_MAX_DEBUG		1000
+extern int   acl_var_udp_max_debug;
+
 #endif /* ACL_UNIX */
 
 #ifdef	__cplusplus

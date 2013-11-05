@@ -37,6 +37,8 @@ service $<PROGRAM> {
 	master_wakeup = -
 #	最大进程数
 	master_maxproc = 5
+#	预启动进程数，该值不得大于 master_maxproc
+#	master_prefork = 0
 #	进程程序名
 	master_command = $<PROGRAM>
 #	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
@@ -47,6 +49,8 @@ service $<PROGRAM> {
 #			sync_action:E_LOG_SEM, sem_name:/tmp/aio_echo.sem
 #	进程日志记录文件
 	master_log = {install_path}/var/log/$<PROGRAM>
+#	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2
+#	master_debug =
 
 #	是否允许产生 core 文件
 #	aio_enable_core = 1

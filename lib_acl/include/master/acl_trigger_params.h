@@ -61,6 +61,14 @@ extern int   acl_var_trigger_use_limit;
 #define	ACL_DEF_TRIGGER_ENABLE_CORE	1
 extern int   acl_var_trigger_enable_core;
 
+#define	ACL_VAR_TRIGGER_LOG_DEBUG	"master_debug"
+#define	ACL_DEF_TRIGGER_LOG_DEBUG	""
+extern char *acl_var_trigger_log_debug;
+
+#define	ACL_VAR_TRIGGER_MAX_DEBUG	"master_debug_max"
+#define	ACL_DEF_TRIGGER_MAX_DEBUG	1000
+extern int   acl_var_trigger_max_debug;
+
 #endif /* ACL_UNIX */
 
 #ifdef	__cplusplus

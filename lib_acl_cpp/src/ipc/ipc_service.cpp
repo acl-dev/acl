@@ -111,7 +111,7 @@ static void* thread_once_main(REQ_CTX* ctx)
 		if (ipc == NULL)
 		{
 			logger_error("peek connect to %s error: %s",
-				ctx->addr, last_error());
+				ctx->addr, last_serror());
 		}
 		else
 		{

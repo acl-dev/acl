@@ -11,6 +11,8 @@
 
 static int __total_c_line = 0;
 static int __total_h_line = 0;
+static int __total_cpp_line = 0;
+static int __total_hpp_line = 0;
 
 static void fmt_change(const char *filepath, const char *fmt)
 {
@@ -45,13 +47,25 @@ static void fmt_change(const char *filepath, const char *fmt)
 				{
 					if (strrncasecmp(filepath, ".c", 2) == 0)
 						__total_c_line++;
-					else if (strrncasecmp(filepath, ".h", 2) == 0
-						&& strstr(filepath, "mysql_include") == NULL
+					else if (strrncasecmp(filepath, ".cpp", 4) == 0)
+						__total_cpp_line++;
+					else if (strstr(filepath, "mysql") == NULL
 						&& strstr(filepath, "openssl") == NULL
+						&& strstr(filepath, "dist") == NULL
 						&& strstr(filepath, "bdb") == NULL
 						&& strstr(filepath, "tc") == NULL
+						&& strstr(filepath, "google") == NULL
+						&& strstr(filepath, "iconv") == NULL
+						&& strstr(filepath, "polarssl") == NULL
+						&& strstr(filepath, "sqlite") == NULL
+						&& strstr(filepath, "zlib") == NULL
 						&& strstr(filepath, "cdb") == NULL)
-						__total_h_line++;
+					{
+						if (strrncasecmp(filepath, ".h", 2) == 0)
+							__total_h_line++;
+						else if (strrncasecmp(filepath, ".hpp", 4) == 0)
+							__total_hpp_line++;
+					}
 				}
 			}
 		} else if (*ptr == '\n') {
@@ -62,13 +76,25 @@ static void fmt_change(const char *filepath, const char *fmt)
 			{
 				if (strrncasecmp(filepath, ".c", 2) == 0)
 					__total_c_line++;
-				else if (strrncasecmp(filepath, ".h", 2) == 0
-					&& strstr(filepath, "mysql_include") == NULL
+				else if (strrncasecmp(filepath, ".cpp", 4) == 0)
+					__total_cpp_line++;
+				else if (strstr(filepath, "mysql") == NULL
 					&& strstr(filepath, "openssl") == NULL
+					&& strstr(filepath, "dist") == NULL
 					&& strstr(filepath, "bdb") == NULL
 					&& strstr(filepath, "tc") == NULL
+					&& strstr(filepath, "google") == NULL
+					&& strstr(filepath, "iconv") == NULL
+					&& strstr(filepath, "polarssl") == NULL
+					&& strstr(filepath, "sqlite") == NULL
+					&& strstr(filepath, "zlib") == NULL
 					&& strstr(filepath, "cdb") == NULL)
-					__total_h_line++;
+				{
+					if (strrncasecmp(filepath, ".h", 2) == 0)
+						__total_h_line++;
+					else if (strrncasecmp(filepath, ".hpp", 4) == 0)
+						__total_hpp_line++;
+				}
 			}
 		}
 		if (n) {
@@ -148,8 +174,11 @@ static void scan_dir(const char *src_path, int to_fmt)
 	
 	acl_scan_dir_close(scan);
 
-	printf(">>> At last, %d files were changed to %s format, total_c_line: %d lines, total_h_line: %d\r\n",
-		n, info, __total_c_line, __total_h_line);
+	printf(">>> At last, %d files were changed to %s format\r\n"
+		">>> total_c_line: %d lines, total_h_line: %d, "
+		"total_cpp_line: %d, total_hpp_line: %d\r\n",
+		n, info, __total_c_line, __total_h_line,
+		__total_cpp_line, __total_hpp_line);
 }
 
 static void usage(const char *progname)

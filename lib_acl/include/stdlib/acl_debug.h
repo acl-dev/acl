@@ -29,18 +29,18 @@ ACL_API void acl_debug_end(void);
 
 /**
  * 初始化日志调试调用接口
- * @param pStr {const char*} 调试标签及级别字符串，
- *  格式: 1,1; 2,10; 3,8...  or 1:1; 2:10; 3:8...
+ * @param ptr {const char*} 调试标签及级别字符串，
+ *  格式: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8...
  */
-ACL_API void acl_debug_init(const char *pStr);
+ACL_API void acl_debug_init(const char *ptr);
 
 /**
  * 初始化日志调试调用接口
- * @param pStr {const char*} 调试标签及级别字符串，
- *  格式: 1,1; 2,10; 3,8...  or 1:1; 2:10; 3:8...
+ * @param ptr {const char*} 调试标签及级别字符串，
+ *  格式: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8...
  * @param max_debug_level {int} 最大调试标签值
  */
-ACL_API void acl_debug_init2(const char *pStr, int max_debug_level);
+ACL_API void acl_debug_init2(const char *ptr, int max_debug_level);
 
 /**
  * 判断给定标签的级别是否在日志输出条件范围内

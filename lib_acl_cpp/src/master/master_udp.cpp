@@ -110,6 +110,7 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 		socket_stream* ss = NEW socket_stream();
 		if (ss->open(sstream) == false)
 			logger_fatal("open stream error!");
+		sstream->context = ss;
 		sstreams_.push_back(ss);
 	}
 

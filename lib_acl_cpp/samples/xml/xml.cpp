@@ -227,8 +227,28 @@ static void test2(void)
 	}
 }
 
+static void get_html(const char* file)
+{
+	acl::string buf;
+	if (acl::ifstream::load(file, &buf) == false)
+	{
+		printf("load %s error %s\r\n", file, acl::last_serror());
+		return;
+	}
+
+	acl::xml xml(buf.c_str());
+	const acl::string& text = xml.getText();
+	printf("text:{%s}\r\n", text.c_str());
+}
+
 int main(int argc, char* argv[])
 {
+	if (argc >= 2)
+	{
+		get_html(argv[1]);
+		return 0;
+	}
+
 	(void) argc;
 	(void) argv;
 	test2(); getchar(); return 0;

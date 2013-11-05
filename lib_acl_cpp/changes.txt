@@ -1,6 +1,23 @@
 修改历史列表：
 ------------------------------------------------------------------------
 
+------------------------------------------------------------------------
+
+191) 2013.11.5
+191.1) bugfix: http_header.cpp, http_header::build_common 添加 Content-Length
+HTTP 头部字段时没有添加分隔符 ": "
+
+190) 2013.11.1
+190.1) feature: 当使用 GCC 进行编译时，针对所有具有变参的函数接口定义添加了
+属性限定---__attribute__((format(printf, n, m)))，这样便于在编译期就能发现
+因参数使用不当而导致的错误
+190.2) bugfix: master_udp.cpp，当以 alone 方式运行时，没有将 socket_stream
+赋给 ACL_VSTREAM::context，导致在 service_main 时又重新打开一次
+
+189) 2013.10.31
+189.1) bugfix: thread.cpp，当线程为分离方式创建时 thread::thread_run 在调用完
+虚函数 run 后不得再引用线程对象的 return_arg_，否则会造成内存非法访问
+
 188) 2013.10.20
 188.1) feature: HttpServletResponse 类支持 Transfer-Encoding: chunked 传输方式
 
@@ -29,6 +46,8 @@
 
 181) 2013.10.10
 181.1) samples: 添加了 master_aio_proxy 用作纯 TCP 非阻塞代理
+
+------------------------------------------------------------------------
 
 180) 2013.10.3
 180.1) feature: aio_stream 增加了 get_peer/get_local 用来获得网络连接流的本地

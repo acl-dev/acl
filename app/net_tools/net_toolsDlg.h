@@ -86,6 +86,7 @@ private:
 	int m_pop3Port;
 	UINT m_recvLimit;
 	BOOL m_recvAll;
+	BOOL m_recvSave;
 
 protected:
 
@@ -148,4 +149,5 @@ public:
 	afx_msg void OnEnKillfocusFile();
 	afx_msg void OnEnKillfocusRecvLimit();
 	afx_msg void OnBnKillfocusRecvAll();
+	afx_msg void OnBnClickedRecvSave();
 };

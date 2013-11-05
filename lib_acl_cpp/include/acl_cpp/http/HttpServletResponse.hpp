@@ -142,7 +142,8 @@ public:
 	 * 当通过 setChunkedTransferEncoding 设置了 chunked 传输方式后，
 	 * 内部自动采用 chunked 传输方式；调用此函数不必显式调用
 	 * sendHeader 函数来发送 HTTP 响应头，因为内部会自动在第一次
-	 * 写时发送 HTTP 响应头
+	 * 写时发送 HTTP 响应头；另外，在使用 chunked 方式传输数据时，
+	 * 应该应该最后再调用一次本函数，且参数均设为 0 表示数据结束
 	 * @param data {const void*} 数据地址
 	 * @param len {size_t} data 数据长度
 	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
@@ -151,7 +152,9 @@ public:
 
 	/**
 	 * 向客户端发送 HTTP 数据体响应数据，可以循环调用此函数，该函数
-	 * 内部调用 HttpServletResponse::write(const void*, size_t) 过程
+	 * 内部调用 HttpServletResponse::write(const void*, size_t) 过程，
+	 * 另外，在使用 chunked 方式传输数据时，应该应该最后再调用一次本函数，
+	 * 且参数均设为 0 表示数据结束
 	 * @param buf {const string&} 数据缓冲区
 	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
 	 */
@@ -159,20 +162,30 @@ public:
 
 	/**
 	 * 带格式方式向 HTTP 客户端发送响应数据，内部自动调用
-	 * HttpServletResponse::write(const void*, size_t) 过程
+	 * HttpServletResponse::write(const void*, size_t) 过程，
+	 * 另外，在使用 chunked 方式传输数据时，应该应该最后再调用一次本函数，
+	 * 且参数均设为 0 表示数据结束
 	 * @param fmt {const char*} 变参格式字符串
 	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
 	 */
+#ifdef	WIN32
 	bool format(const char* fmt, ...);
+#else
+	bool format(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
+#endif
 
 	/**
 	 * 带格式方式向 HTTP 客户端发送响应数据，内部自动调用
-	 * HttpServletResponse::write(const string&) 过程
+	 * HttpServletResponse::write(const string&) 过程，
+	 * 另外，在使用 chunked 方式传输数据时，应该应该最后再调用一次本函数，
+	 * 且参数均设为 0 表示数据结束
 	 * @param fmt {const char*} 变参格式字符串
 	 * @param ap {va_list} 变参列表
 	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
 	 */
 	bool vformat(const char* fmt, va_list ap);
+
+	///////////////////////////////////////////////////////////////////
 
 	/**
 	 * 发送 HTTP 响应头，用户应该发送数据体前调用此函数将 HTTP
@@ -192,11 +205,11 @@ public:
 	ostream& getOutputStream(void) const;
 
 private:
-	socket_stream& stream_;
-	http_header* header_;
-	char  charset_[32];
-	char  content_type_[32];
-	bool  head_sent_;
+	socket_stream& stream_;		// 客户端连接流
+	http_header* header_;		// http 响应头
+	char  charset_[32];		// 字符集
+	char  content_type_[32];	// content-type 类型
+	bool  head_sent_;		// 是否已经发送了 HTTP 响应头
 };
 
 }  // namespace acl

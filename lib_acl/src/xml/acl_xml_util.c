@@ -33,7 +33,7 @@ void acl_xml_tag_add(const char *tag)
 
 		ACL_SAFE_STRNCPY(buf, tag, sizeof(buf));
 		acl_lowercase(buf);
-		acl_token_tree_add(tag_tree, buf, ACL_TOKEN_F_PASS, NULL);
+		acl_token_tree_add(tag_tree, buf, ACL_TOKEN_F_STOP, NULL);
 	}
 }
 
@@ -48,6 +48,7 @@ int acl_xml_tag_selfclosed(const char *tag)
 	ACL_SAFE_STRNCPY(buf, tag, sizeof(buf));
 	acl_lowercase(buf);
 	token = acl_token_tree_word_match(tag_tree, buf);
+
 	if (token)
 		return (1);
 	else

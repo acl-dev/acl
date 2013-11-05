@@ -319,7 +319,7 @@ static void test_main(void)
 	s >> n1 >> n2 >> n3 >> n4;
 
 	s.format("\tunsigned int64 -1: %llu\r\n"
-		"\tunsigned int -1: %lu\r\n"
+		"\tunsigned int -1: %u\r\n"
 		"\tunsigned short -1: %u\r\n"
 		"\tunsigned char -1: %u, %c\r\n",
 		n1, n2, n3, n4, n4);

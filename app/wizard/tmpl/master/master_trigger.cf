@@ -30,6 +30,8 @@ service $<PROGRAM>
 #	master_args = 
 #	进程日志记录文件
 	master_log = {install_path}/var/log/$<PROGRAM>
+#	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2
+#	master_debug =
 #	传递给服务子进程的环境变量, 可以通过 getenv("SERVICE_ENV") 获得此值
 #	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
 #			sync_action:E_LOG_SEM, sem_name:/tmp/trigger.sem

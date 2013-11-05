@@ -58,7 +58,12 @@ public:
 	url_coder& set(const char* name, const char* value,
 		bool override = true);
 	url_coder& set(const char* name, int value, bool override = true);
+#ifdef	WIN32
 	url_coder& set(const char* name, bool override, const char* fmt, ...);
+#else
+	url_coder& set(const char* name, bool override, const char* fmt, ...)
+		__attribute__((format(printf, 4, 5)));
+#endif
 	url_coder& set(const char* name, const char* fmt, va_list ap,
 		bool override = true);
 

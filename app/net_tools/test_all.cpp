@@ -70,6 +70,7 @@ test_all::test_all(test_callback* callback)
 , pop3_ok_(false)
 , pop3_recv_all_(false)
 , pop3_recv_limit_(1)
+, pop3_save_(false)
 {
 
 }
@@ -115,7 +116,8 @@ void test_all::start()
 		.set_rw_timeout(rw_timeout_)
 		.set_account(mail_user_.c_str())
 		.set_passwd(mail_pass_.c_str())
-		.set_recv_count(pop3_recv_all_ ? -1 : (int) pop3_recv_limit_);
+		.set_recv_count(pop3_recv_all_ ? -1 : (int) pop3_recv_limit_)
+		.set_recv_save(pop3_save_);
 	rpc_manager::get_instance().fork(pop3);
 }
 
