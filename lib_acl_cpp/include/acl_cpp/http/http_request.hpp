@@ -62,20 +62,46 @@ public:
 	http_header& request_header(void);
 
 	/**
+	 * 设置本地字符集，当本地字符集非空时，则边接收数据边进行字符集转换
+	 * @param local_charset {const char*} 本地字符集
+	 * @return {http_header&}
+	 */
+	http_request& set_local_charset(const char* local_charset);
+
+	/**
 	 * 向 HTTP 服务器发送 HTTP 请求头及 HTTP 请求体，同时从
 	 * HTTP 服务器读取 HTTP 响应头，对于长连接，当连接中断时
 	 * 会再重试一次，在调用下面的几个 get_body 函数前必须先
-	 * 调用本函数；
+	 * 调用本函数(或调用 write_head/write_body)；
 	 * 正常情况下，该函数在发送完请求数据后会读 HTTP 响应头，
 	 * 所以用户在本函数返回 true 后可以调用：get_body() 或
 	 * http_request::get_clinet()->read_body(char*, size_t)
 	 * 继续读 HTTP 响应的数据体
-	 * @param data {const char*} 发送的数据体地址，非空时自动按
+	 * @param data {const void*} 发送的数据体地址，非空时自动按
 	 *  POST 方法发送，否则按 GET 方法发送
 	 * @param len {size_} data 非空时指定 data 数据长度
 	 * @return {bool} 发送请求数据及读 HTTP 响应头数据是否成功
 	 */
-	bool request(const char* data, size_t len);
+	bool request(const void* data, size_t len);
+
+	/**
+	 * 当采用流式写数据时，需要首先调用本函数发送 HTTP 请求头
+	 * @return {bool} 是否成功，如果成功才可以继续调用 write_body
+	 */
+	bool write_head();
+
+	/**
+	 * 当采用流式写数据时，在调用 write_head 后，可以循环调用本函数
+	 * 发送 HTTP 请求体数据；当输入的两个参数为空值时则表示数据写完；
+	 * 当发送完数据后，该函数内部会自动读取 HTTP 响应头数据，用户可
+	 * 继续调用 get_body/read_body 获取 HTTP 响应体数据
+	 * @param data {const void*} 数据地址指针，当该值为空指针时表示
+	 *  数据发送完毕
+	 * @param len {size_t} data 非空指针时表示数据长度
+	 * @return {bool} 发送数据体是否成功
+	 *  注：当应用发送完数据后，必须再调用一次本函数，同时将两个参数都赋空
+	 */
+	bool write_body(const void* data, size_t len);
 
 	/**
 	 * 当调用 request 成功后调用本函数，读取服务器响应体数据
@@ -120,20 +146,12 @@ public:
 	 *  注：该函数读到的是原始 HTTP 数据体数据，不做解压和字符集
 	 *  解码，用户自己根据需要进行处理
 	 */
-	int get_body(char* buf, size_t size);
-
-	/**
-	 * 在调用 read_body 之前，通过此函数设置本地字符集，从而使数据
-	 * 边接收边转换
-	 * @param to_charset {const char*} 本地字符集
-	 */
-	void set_charset(const char* to_charset);
+	int read_body(char* buf, size_t size);
 
 	/**
 	 * 当调用 request 成功后调用本函数读 HTTP 响应数据体，可以循环调用
-	 * 本函数，本函数内部自动对压缩数据进行解压，如果在调用本函数之前
-	 * 调用 set_charset 设置了本地字符集，则还同时对数据进行字符集转码
-	 * 操作
+	 * 本函数，本函数内部自动对压缩数据进行解压，如果在调用本函数之前调用
+	 * set_charset 设置了本地字符集，则还同时对数据进行字符集转码操作
 	 * @param out {string&} 存储结果数据
 	 * @param clean {bool} 每次调用本函数时，是否要求先自动将缓冲区 out
 	 *  的数据清空
@@ -217,7 +235,7 @@ public:
 protected:
 	/**
 	 * 基类 connect_client 的纯虚函数，显式地调用本函数用来打开与服务端的连接
-	 * @reutrn {bool} 连接是否成功
+	 * @return {bool} 连接是否成功
 	 */
 	virtual bool open();
 
@@ -227,6 +245,7 @@ private:
 	int  conn_timeout_;
 	int  rw_timeout_;
 	bool unzip_;
+	char local_charset_[64];
 	charset_conv* conv_;
         http_client* client_;
 	http_header  header_;
@@ -241,12 +260,15 @@ private:
 	long long int range_to_;
 	long long int range_max_;
 #endif
+	// 在写 HTTP 请求数据体时，该标志位标识是否允许重试过
+	bool need_retry_;
 
-	bool send_request(const char* data, size_t len);
+	bool send_request(const void* data, size_t len);
 	bool try_open(bool* reuse_conn);
 	void close(void);
 	void create_cookies(void);
 	http_pipe* get_pipe(const char* to_charset);
+	void set_charset_conv();
 	void check_range(void);
 };
 

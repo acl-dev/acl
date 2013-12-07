@@ -21,14 +21,17 @@ public:
 
 	/**
 	 * HTTP 请求头构造函数
-	 * @param url {const char*} 请求的 url，
-	 * 该 url 不能包含 ? 以及 ? 后面的参数部分，如果想添加该 url 的参数，
-	 * 应该通过调用 add_param 完成，url 格式
-	 * 如: http://www.test.com/, /cgi-bin/test.cgi,
-	 *     http://www.test.com/cgi-bin/test.cgi
-	 * 不能为: http://www.test.com/cgi-bin/test.cgi?name=value 或
-	 * /cgi-bin/test.cgi?name=value，因为其中的 name=value 参数
-	 * 必须由 add_param 来添加
+	 * @param url {const char*} 请求的 URL，url 格式示例如下：
+	 *   http://www.test.com/
+	 *   /cgi-bin/test.cgi
+	 *   http://www.test.com/cgi-bin/test.cgi
+	 *   http://www.test.com/cgi-bin/test.cgi?name=value
+	 *   /cgi-bin/test.cgi?name=value
+	 * 如果该 url 中有主机字段，则内部自动添加主机；
+	 * 如果该 url 中有参数字段，则内部自动进行处理并调用 add_param 方法；
+	 * 调用该函数后用户仍可以调用 add_param 等函数添加其它参数；
+	 * 当参数字段只有参数名没有参数值时，该参数将会被忽略，所以如果想
+	 * 单独添加参数名，应该调用 add_param 方法来添加
 	 */
 	http_header(const char* url);
 
@@ -57,8 +60,8 @@ public:
 
 	/**
 	 * 向 HTTP 头中添加字段
-	 * @param name {const char*} 字段名
-	 * @param value {const char*} 字段值
+	 * @param name {const char*} 字段名，非空指针
+	 * @param value {const char*} 字段值，非空指针
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
 	 */
 	http_header& add_entry(const char* name, const char* value);
@@ -147,14 +150,19 @@ public:
 	bool build_request(string& buf) const;
 
 	/**
-	 * 设置请求的 URL，该 URL 不能包含 ? 以及 ? 后面的参数部分，
-	 * 如果想添加该 URL 的参数，应该通过调用 add_param 完成，url 格式
-	 * 如: http://www.test.com/, /cgi-bin/test.cgi,
-	 *     http://www.test.com/cgi-bin/test.cgi
-	 * 不能为: http://www.test.com/cgi-bin/test.cgi?name=value 或
-	 * /cgi-bin/test.cgi?name=value，因为其中的 name=value 参数必须由 add_param
-	 * 来添加
-	 * @param url {const char*} 请求的 url
+	 * 设置请求的 URL，url 格式示例如下：
+	 * 1、http://www.test.com/
+	 * 2、/cgi-bin/test.cgi
+	 * 3、http://www.test.com/cgi-bin/test.cgi
+	 * 3、http://www.test.com/cgi-bin/test.cgi?name=value
+	 * 4、/cgi-bin/test.cgi?name=value
+	 * 5、http://www.test.com
+	 * 如果该 url 中有主机字段，则内部自动添加主机；
+	 * 如果该 url 中有参数字段，则内部自动进行处理并调用 add_param 方法；
+	 * 调用该函数后用户仍可以调用 add_param 等函数添加其它参数；
+	 * 当参数字段只有参数名没有参数值时，该参数将会被忽略，所以如果想
+	 * 单独添加参数名，应该调用 add_param 方法来添加
+	 * @param url {const char*} 请求的 url，非空指针
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
 	 */
 	http_header& set_url(const char* url);
@@ -165,6 +173,15 @@ public:
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
 	 */
 	http_header& set_host(const char* value);
+
+	/**
+	 * 获得设置的 HTTP 请求头中的 HOST 字段
+	 * @return {const char*} 返回空指针表示没有设置 HOST 字段
+	 */
+	const char* get_host() const
+	{
+		return host_[0] == 0 ? NULL : host_;
+	}
 
 	/**
 	 * 设置 HTTP 协议的请求方法，如果不调用此函数，则默认用 GET 方法
@@ -226,12 +243,30 @@ public:
 	http_header& accept_gzip(bool on);
 
 	/**
-	 * 向请求的 URL 中添加参数对
-	 * @param name {const char*} 参数名
-	 * @param value {const char*} 参数值
+	 * 向请求的 URL 中添加参数对，当只有参数名没有参数值时则：
+	 * 1、参数名非空串，但参数值为空指针，则 URL 参数中只有：{name}
+	 * 2、参数名非空串，但参数值为空串，则 URL参数中为：{name}=
+	 * @param name {const char*} 参数名，不能为空指针
+	 * @param value {const char*} 参数值，当为空指针时，仅添加参数名，
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
 	 */
 	http_header& add_param(const char* name, const char* value);
+	http_header& add_int(const char* name, short value);
+	http_header& add_int(const char* name, int value);
+	http_header& add_int(const char* name, long value);
+	http_header& add_int(const char* name, unsigned short value);
+	http_header& add_int(const char* name, unsigned int value);
+	http_header& add_int(const char* name, unsigned long value);
+#ifdef WIN32
+	http_header& add_int(const char* name, __int64 vlaue);
+	http_header& add_int(const char* name, unsigned __int64 vlaue);
+	http_header& add_format(const char* name, const char* fmt, ...);
+#else
+	http_header& add_int(const char* name, long long int value);
+	http_header& add_int(const char* name, unsigned long long int value);
+	http_header& add_format(const char* name, const char* fmt, ...)
+		 __attribute__((format(printf, 3, 4)));
+#endif
 
 	/**
 	 * url 重定向
@@ -312,6 +347,7 @@ private:
 	std::list<HTTP_HDR_ENTRY*> entries_;  // HTTP 请求头中各字段集合
 	http_method_t method_;                // HTTP 请求的方法
 	char  method_s_[64];                  // HTTP 请求方法以字符串表示
+	char  host_[256];                     // HTTP 请求头中的 HOST 字段
 	bool keep_alive_;                     // 是否保持长连接
 	unsigned int nredirect_;              // 最大重定向的次数限制
 	bool accept_compress_;                // 是否接收压缩数据

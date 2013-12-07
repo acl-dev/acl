@@ -17,6 +17,7 @@ http_response::http_response(socket_stream* client)
 {
 	debug_ = false;
 	header_ok_ = false;
+	head_sent_ = false;
 	client_ = NEW http_client(client);
 }
 
@@ -32,6 +33,7 @@ void http_response::close()
 		delete client_;
 		client_ = NULL;
 	}
+	head_sent_ = false;
 }
 
 http_header& http_response::response_header()
@@ -276,7 +278,7 @@ bool http_response::get_body(string& out, const char* to_charset /* = NULL */)
 	return true;
 }
 
-int http_response::get_body(char* buf, size_t size)
+int http_response::read_body(char* buf, size_t size)
 {
 	if (header_ok_ == false)
 	{
@@ -286,8 +288,7 @@ int http_response::get_body(char* buf, size_t size)
 	return client_->read_body(buf, size);
 }
 
-bool http_response::response(const char* body, size_t len,
-	int status /* = 200 */, bool keep_alive /* = true */)
+bool http_response::response(const void* data, size_t len)
 {
 	if (client_ == NULL)
 	{
@@ -295,29 +296,24 @@ bool http_response::response(const char* body, size_t len,
 		return false;
 	}
 
-	// 构建 HTTP 响应头
-	header_.set_status(status);
-	header_.set_keep_alive(keep_alive);
-	if (body && len > 0)
-		header_.set_content_length(len);
+	// 第一次调用本函数时应先发送 HTTP 响应头
+	if (!head_sent_)
+	{
+		if (client_->write_head(header_) == false)
+		{
+			close();
+			return false;
+		}
+		head_sent_ = true;
+	}
 
-	// 写 HTTP 响应头
-	if (client_->write(header_) == false)
+	// 发送 HTTP 响应体数据
+	if (client_->write_body(data, len) == false)
 	{
 		close();
 		return false;
 	}
 
-	if (body == NULL || len == 0)
-		return true;
-
-	// 一次性将 HTTP 响应头及响应体写入流中
-	// 写 HTTP 请求体
-	if (client_->get_ostream().write(body, len) == -1)
-	{
-		close();
-		return false;
-	}
 	return true;
 }
 

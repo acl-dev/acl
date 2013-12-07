@@ -11,17 +11,27 @@ static void __hdr_init(HTTP_HDR_RES *hh)
 	hh->reply_status = 0;
 }
 
-static void cache_free(ACL_ARRAY *pool)
+static void thread_cache_free(ACL_ARRAY *pool)
 {
-	acl_array_free(pool, (void (*)(void*)) http_hdr_res_free);
+	if ((unsigned long) acl_pthread_self() != acl_main_thread_self())
+		acl_array_free(pool, (void (*)(void*)) http_hdr_res_free);
 }
 
 static acl_pthread_key_t cache_key = -1;
+
 #ifndef	USE_TLS_EX
 static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
-static void cache_init(void)
+
+static ACL_ARRAY *main_cache = NULL;
+static void main_cache_free(void)
 {
-	acl_pthread_key_create(&cache_key, (void (*)(void*)) cache_free);
+	if (main_cache)
+		acl_array_free(main_cache, (void (*)(void*)) http_hdr_res_free);
+}
+
+static void thread_cache_init(void)
+{
+	acl_pthread_key_create(&cache_key, (void (*)(void*)) thread_cache_free);
 }
 #endif
 
@@ -42,7 +52,8 @@ HTTP_HDR_RES *http_hdr_res_new(void)
 	pool = (ACL_ARRAY*) acl_pthread_tls_get(&cache_key);
 	if (pool == NULL) {
 		pool = acl_array_create(100);
-		acl_pthread_tls_set(cache_key, pool, (void (*)(void*)) cache_free);
+		acl_pthread_tls_set(cache_key, pool,
+			(void (*)(void*)) thread_cache_free);
 	}
 
 	pool = (ACL_ARRAY*) acl_pthread_tls_get(&cache_key);
@@ -53,11 +64,15 @@ HTTP_HDR_RES *http_hdr_res_new(void)
 		return (hh);
 	}
 #else
-	acl_pthread_once(&once_control, cache_init);
+	acl_pthread_once(&once_control, thread_cache_init);
 	pool = (ACL_ARRAY*) acl_pthread_getspecific(cache_key);
 	if (pool == NULL) {
 		pool = acl_array_create(100);
 		acl_pthread_setspecific(cache_key, pool);
+		if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
+			main_cache = pool;
+			atexit(main_cache_free);
+		}
 	}
 	hh = (HTTP_HDR_RES*) pool->pop_back(pool);
 	if (hh) {
@@ -215,7 +230,7 @@ int http_hdr_res_parse(HTTP_HDR_RES *hdr_res)
 
 	hdr_res->reply_status = atoi(buf);
 	if (hdr_res->reply_status < 100 || hdr_res->reply_status >= 600) {
-		acl_msg_error("%s: status(%d) invalid", myname, hdr_res->reply_status);
+		acl_msg_error("%s: status(%s) invalid", myname, buf);
 		return (-1);
 	}
 

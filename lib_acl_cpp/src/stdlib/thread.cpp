@@ -64,7 +64,8 @@ bool thread::start()
 	int   ret = acl_pthread_create((acl_pthread_t*) thread_,
 		&attr, thread_run, this);
 #else
-	int   ret = acl_pthread_create(&thread_id_, &attr, thread_run, this);
+	int   ret = acl_pthread_create((pthread_t*) &thread_id_, &attr,
+			thread_run, this);
 #endif
 	if (ret != 0)
 	{

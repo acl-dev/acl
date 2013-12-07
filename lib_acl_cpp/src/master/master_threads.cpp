@@ -85,6 +85,8 @@ bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 
 	std::vector<ACL_VSTREAM*> sstreams;
 	ACL_EVENT* eventp = acl_event_new_select_thr(1, 0);
+	set_event(eventp);  // 设置基类的事件句柄
+
 	ACL_ARGV*  tokens = acl_argv_split(addrs, ";,| \t");
 	ACL_ITER   iter;
 
@@ -137,6 +139,7 @@ bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 	// 网络流对象时依然有对 ACL_EVENT 引擎的使用
 	close_sstreams(eventp, sstreams);
 	acl_event_free(eventp);
+	eventp = NULL;
 
 	return true;
 }
@@ -154,17 +157,12 @@ void master_threads::listen_callback(int, ACL_EVENT*, ACL_VSTREAM* sstream, void
 	{
 		acl_pthread_pool_add(__thread_pool, thread_run, client);
 		__count++;
-		if (__count_limit > 0 && __count >= __count_limit)
-			__stop = true;
 	}
 	else
 	{
 		// 单线程方式串行处理
 		run_once(client);
-
 		__count++;
-		if (__count_limit > 0 && __count >= __count_limit)
-			__stop = true;
 	}
 }
 
@@ -224,32 +222,9 @@ void master_threads::run_once(ACL_VSTREAM* client)
 		if (service_main(client, NULL) == 1)
 			break;
 	}
-}
 
-//////////////////////////////////////////////////////////////////////////
-
-void master_threads::proc_set_timer(void (*callback)(int, ACL_EVENT*, void*),
-	void* ctx, int delay)
-{
-#ifdef WIN32
-	logger_error("can't support on win32");
-#else
-	if (__mt->proc_inited_)
-		acl_ioctl_server_request_timer(callback, ctx, delay);
-	else
-		logger_error("please call me in proc_on_init");
-#endif
-}
-
-void master_threads::proc_del_timer(void (*callback)(int, ACL_EVENT*, void*),
-	void* ctx)
-{
-#ifdef WIN32
-	logger_error("can't support on win32");
-#else
-	if (__mt->proc_inited_)
-		acl_ioctl_server_cancel_timer(callback, ctx);
-#endif
+	if (__count_limit > 0 && __count >= __count_limit)
+		__stop = true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -257,12 +232,22 @@ void master_threads::proc_del_timer(void (*callback)(int, ACL_EVENT*, void*),
 void master_threads::service_pre_jail(void*)
 {
 	acl_assert(__mt != NULL);
+
+#ifndef WIN32
+	if (__mt->daemon_mode())
+	{
+		ACL_EVENT* eventp = acl_ioctl_server_event();
+		__mt->set_event(eventp);
+	}
+#endif
+
 	__mt->proc_pre_jail();
 }
 
 void master_threads::service_init(void*)
 {
 	acl_assert(__mt != NULL);
+
 	__mt->proc_inited_ = true;
 	__mt->proc_on_init();
 }

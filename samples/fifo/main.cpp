@@ -37,6 +37,8 @@ static void fifo_test(bool use_slice)
 		if (ptr == NULL)
 			break;
 		printf("fifo pop: %s\n", ptr);
+		if (!slice)
+			acl_myfree(ptr);
 	}
 
 	if (slice == NULL)

@@ -5,6 +5,7 @@
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/master/master_threads.hpp"
+#include "acl_cpp/event/event_timer.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 
 static char *var_cfg_debug_msg;
@@ -36,6 +37,54 @@ static acl::master_int_tbl var_conf_int_tab[] = {
 };
 
 static void (*format)(const char*, ...) = acl::log::msg1;
+
+//////////////////////////////////////////////////////////////////////////
+
+class master_timer_test : public acl::event_timer
+{
+public:
+	master_timer_test(acl::socket_stream* stream)
+	: max_(0)
+	, count_(0)
+	, stream_(stream)
+	{
+	}
+
+	void set_max(int max)
+	{
+		max_ = max;
+	}
+
+protected:
+	// 基类虚函数
+	virtual void timer_callback(unsigned int id)
+	{
+		format("timer callback, id: %u\r\n", id);
+		if (count_++ >= max_)
+		{
+			printf("clear all timer task now\r\n");
+			clear();
+		}
+		//else
+		//	set_task(1000, 1000000);
+	}
+
+	virtual void destroy()
+	{
+		format("destroy called\r\n");
+		delete this;
+	}
+
+private:
+	int  max_;
+	int  count_;
+	acl::socket_stream* stream_;
+
+	~master_timer_test()
+	{
+		format("timer destroy now!\r\n");
+	}
+};
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -81,6 +130,28 @@ protected:
 		{
 			stream->puts("bye!");
 			return false;
+		}
+
+		if (buf == "timer")
+		{
+			int  max = 0;
+			master_timer_test* timer = new master_timer_test(stream);
+			timer->keep_timer(true);
+
+			timer->set_task(1000, 1000000);
+			max += 2;
+			timer->set_task(1001, 1000000);
+			max += 2;
+			timer->set_task(1002, 1000000);
+			max += 2;
+			timer->set_task(1003, 1000000);
+			max += 2;
+			timer->set_max(max);
+
+			// 调用基类方法设置定时器任务
+			proc_set_timer(timer);
+			stream->format("set timer ok\r\n");
+			return true;
 		}
 
 		if (buf.empty())
@@ -184,15 +255,20 @@ int main(int argc, char* argv[])
 
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
+		int   task_count = 2, threads_count = 2;
 		format = (void (*)(const char*, ...)) printf;
 		format("listen: 127.0.0.1:8888\r\n");
+
+		// 单独运行方式
 		if (argc >= 3)
-			mt.run_alone("127.0.0.1:8888", argv[2], 2, 1);  // 单独运行方式
+			mt.run_alone("127.0.0.1:8888", argv[2], task_count, threads_count);
 		else
-			mt.run_alone("127.0.0.1:8888", NULL, 2, 10);  // 单独运行方式
+			mt.run_alone("127.0.0.1:8888", NULL, task_count, threads_count);
 	}
+
+	// acl_master 控制模式运行
 	else
-		mt.run_daemon(argc, argv);  // acl_master 控制模式运行
+		mt.run_daemon(argc, argv);
 	return 0;
 }
 

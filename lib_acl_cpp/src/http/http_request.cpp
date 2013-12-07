@@ -31,6 +31,7 @@ http_request::http_request(socket_stream* client,
 	client_ = NEW http_client(client, client->get_vstream()->rw_timeout,
 		true, unzip);
 	unzip_ = unzip;
+	local_charset_[0] = 0;
 	conv_ = NULL;
 
 	const char* ptr = client->get_peer();
@@ -43,6 +44,7 @@ http_request::http_request(socket_stream* client,
 	header_.set_host(addr_);
 	cookie_inited_ = false;
 	cookies_ = NULL;
+	need_retry_ = true;
 	RESET_RANGE();
 }
 
@@ -55,6 +57,7 @@ http_request::http_request(const char* addr,
 	conn_timeout_ = conn_timeout;
 	rw_timeout_ = rw_timeout;
 	unzip_ = unzip;
+	local_charset_[0] = 0;
 	conv_ = NULL;
 
 	header_.set_url("/");
@@ -63,6 +66,7 @@ http_request::http_request(const char* addr,
 	cookie_inited_ = false;
 	cookies_ = NULL;
 	client_ = NULL;
+	need_retry_ = true;
 	RESET_RANGE();
 }
 
@@ -102,6 +106,7 @@ void http_request::reset(void)
 		delete conv_;
 		conv_ = NULL;
 	}
+	need_retry_ = true;
 	RESET_RANGE();
 }
 
@@ -152,23 +157,104 @@ http_client* http_request::get_client(void) const
 	return client_;
 }
 
-bool http_request::send_request(const char* data, size_t len)
+bool http_request::write_head()
+{
+	acl_assert(client_);  // 必须保证该连接已经打开
+	bool  reuse_conn;
+
+	while (true)
+	{
+		// 尝试打开远程连接
+		if (try_open(&reuse_conn) == false)
+		{
+			logger_error("connect server error");
+			need_retry_ = false;
+			return false;
+
+		}
+
+		// 如果是新创建的连接，则不需重试
+		if (!reuse_conn)
+			need_retry_ = false;
+
+		client_->reset();  // 重置状态
+
+		// 发送 HTTP 请求头
+		if (client_->write_head(header_) > 0)
+			return true;
+
+		close();
+
+		if (!need_retry_)
+			return false;
+
+		// 先取消重试标志位，然后再重试一次
+		need_retry_ = false;
+	}
+}
+
+bool http_request::write_body(const void* data, size_t len)
+{
+	while (true)
+	{
+		if (client_->write_body(data, len) == false)
+		{
+			if (!need_retry_)
+				return false;
+
+			// 取消重试标志位
+			need_retry_ = false;
+
+			// 再重试一次
+			if (write_head() == false)
+				return false;
+
+			// 再次写数据体
+			continue;
+		}
+
+		// 说明至少已经两次写操作了，所以应该取消重试标志位
+		need_retry_ = false;
+
+		// 如果数据非空，则说明还有数据可写
+		if (data != NULL && len > 0)
+			return true;
+
+		// data == NULL || len == 0 时，表示请求数据
+		// 已经发送完毕，开始从服务端读取 HTTP 响应数据
+		// 读 HTTP 响应头
+		if (client_->read_head() == true)
+			break;
+
+		return false;
+	}
+
+	// 说明所有数据已经发送完毕，并且成功读取了 HTTP 响应头，
+	// 下面可以读取 HTTP 响应数据体了
+
+	// 设置字符集转换器
+	set_charset_conv();
+
+	// 检查返回头中是否有 Content-Range 字段
+	check_range();
+
+	return true;
+}
+
+bool http_request::send_request(const void* data, size_t len)
 {
 	acl_assert(client_);  // 必须保证该连接已经打开
 	client_->reset();  // 重置状态
 
 	// 写 HTTP 请求头
-	if (client_->write(header_) == false)
+	if (client_->write_head(header_) < 0)
 	{
 		close();
 		return false;
 	}
 
-	if (data == NULL || len == 0)
-		return true;
-
 	// 写 HTTP 请求体
-	if (client_->get_ostream().write(data, len) == -1)
+	if (client_->write_body(data, len) == false)
 	{
 		close();
 		return false;
@@ -177,7 +263,7 @@ bool http_request::send_request(const char* data, size_t len)
 	return true;
 }
 
-bool http_request::request(const char* data, size_t len)
+bool http_request::request(const void* data, size_t len)
 {
 	bool  have_retried = false;
 	bool  reuse_conn;
@@ -200,7 +286,6 @@ bool http_request::request(const char* data, size_t len)
 		{
 			logger_error("connect server error");
 			return false;
-
 		}
 
 		// 发送 HTTP 请求至服务器
@@ -237,8 +322,12 @@ bool http_request::request(const char* data, size_t len)
 		have_retried = true;
 	}
 
+	// 设置字符集转换器
+	set_charset_conv();
+
 	// 检查返回头中是否有 Content-Range 字段
 	check_range();
+
 	return true;
 }
 
@@ -306,29 +395,70 @@ acl_int64 http_request::get_range_max() const
 	return range_max_;
 }
 
-http_pipe* http_request::get_pipe(const char* to_charset)
+http_request& http_request::set_local_charset(const char* local_charset)
 {
-	if (to_charset == NULL || *to_charset == 0)
-		return NULL;
+	ACL_SAFE_STRNCPY(local_charset_, local_charset,
+		sizeof(local_charset_));
+	return *this;
+}
+
+void http_request::set_charset_conv()
+{
+	if (client_ == NULL || local_charset_[0] == 0)
+		return;
 
 	// 需要获得响应头字符集信息
 	const char* ptr = client_->header_value("Content-Type");
 	if (ptr == NULL || *ptr == 0)
-		return NULL;
+		return;
 
 	http_ctype ctype;
 	ctype.parse(ptr);
 
 	const char* from_charset = ctype.get_charset();
 
-	if (from_charset && strcasecmp(from_charset, to_charset) != 0)
+	if (from_charset == NULL || *from_charset == 0
+		|| strcasecmp(from_charset, local_charset_) == 0)
 	{
-		http_pipe* hp = NEW http_pipe();
-		hp->set_charset(from_charset, to_charset);
-		return hp;
+		return;
 	}
-	else
+
+	// 初始化字符集转换器
+
+	if (conv_ == NULL)
+		conv_ = charset_conv::create(from_charset, local_charset_);
+
+	// 复用之前创建的字符集转换器
+	else if (conv_->update_begin(from_charset, local_charset_) == false)
+	{
+		logger_error("invalid charset conv, from %s, to %s",
+			from_charset, local_charset_);
+		delete conv_;
+		conv_ = NULL;
+	}
+}
+
+http_pipe* http_request::get_pipe(const char* to_charset)
+{
+	if (to_charset != NULL)
+	{
+		// 重新设置字符集转换器
+		set_local_charset(to_charset);
+
+		// 获取字符集转换器
+		set_charset_conv();
+	}
+
+	if (conv_ == NULL)
 		return NULL;
+
+	http_pipe* hp = NEW http_pipe();
+
+	// 将字符集转换器交由 http_pipe 管理
+	hp->set_charset(conv_);
+	conv_ = NULL;
+
+	return hp;
 }
 
 bool http_request::get_body(xml& out, const char* to_charset /* = NULL */)
@@ -342,6 +472,7 @@ bool http_request::get_body(xml& out, const char* to_charset /* = NULL */)
 
 	string  buf(4096);
 	int   ret;
+
 	// 读 HTTP 响应体，并按 xml 格式进行分析
 	while (true)
 	{
@@ -443,53 +574,6 @@ bool http_request::get_body(string& out, const char* to_charset /* = NULL */)
 	return true;
 }
 
-void http_request::set_charset(const char* to_charset)
-{
-	if (client_ == NULL || to_charset == NULL || *to_charset == 0)
-	{
-		if (conv_)
-		{
-			delete conv_;
-			conv_ = NULL;
-		}
-		return;
-	}
-
-	// 需要获得响应头字符集信息
-	const char* ptr = client_->header_value("Content-Type");
-	if (ptr == NULL || *ptr == 0)
-	{
-		if (conv_)
-		{
-			delete conv_;
-			conv_ = NULL;
-		}
-		return;
-	}
-
-	http_ctype ctype;
-	ctype.parse(ptr);
-
-	const char* from_charset = ctype.get_charset();
-	if (from_charset && strcasecmp(from_charset, to_charset) != 0)
-	{
-		if (conv_ == NULL)
-			conv_ = charset_conv::create(from_charset, to_charset);
-		else if (conv_->update_begin(from_charset, to_charset) == false)
-		{
-			logger_error("invalid charset conv, from %s, to %s",
-				from_charset, to_charset);
-			delete conv_;
-			conv_ = NULL;
-		}
-	}
-	else if (conv_)
-	{
-		delete conv_;
-		conv_ = NULL;
-	}
-}
-
 int http_request::read_body(string& out, bool clean /* = NULL */,
 	int* real_size /* = NULL */)
 {
@@ -499,6 +583,7 @@ int http_request::read_body(string& out, bool clean /* = NULL */,
 		return -1;
 
 	int   ret;
+
 	if (conv_ == NULL)
 	{
 		ret = client_->read_body(out, clean, real_size);
@@ -507,22 +592,29 @@ int http_request::read_body(string& out, bool clean /* = NULL */,
 		return ret;
 	}
 
+	size_t saved_size = out.length();
 	string  buf(4096);
 	ret = client_->read_body(buf, true, real_size);
 	if (ret < 0)
 	{
 		conv_->update_finish(&out);
 		close();
+		return ret;
 	}
-	else if (ret == 0)
+
+	if (ret == 0)
 		conv_->update_finish(&out);
 	else if (ret > 0)
 		conv_->update(buf.c_str(), ret, &out);
 
-	return ret;
+	size_t curr_size = out.length();
+
+	// 在进行字符集转换时，内容尺寸可能变化，所以根据前后实际
+	// 内容尺寸之差来计算本次读到的数据长度
+	return (int) (curr_size - saved_size);
 }
 
-int http_request::get_body(char* buf, size_t size)
+int http_request::read_body(char* buf, size_t size)
 {
 	if (client_ == NULL)
 		return -1;

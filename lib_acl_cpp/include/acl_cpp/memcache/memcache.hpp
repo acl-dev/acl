@@ -48,7 +48,7 @@ public:
 	/**
 	 * 设置是否针对 KEY 键值进行编码，缺少时不对 key 编码，当应用的 key 中可能
 	 * 会有特殊字符或二进制值时，建议调用此函数对 key 进行编码
-	 * @parma onoff {bool} 为 true 表示内部需要对 key 进行编码
+	 * @param onoff {bool} 为 true 表示内部需要对 key 进行编码
 	 * @return {memcache&}
 	 */
 	memcache& encode_key(bool onoff);
@@ -104,7 +104,7 @@ public:
 	 * 以流式方式上传大数据时，该函数发送数据头
 	 * @param key {const char*} 键值字符串
 	 * @param dlen {size_t} 数据体的数据总长度
-	 * @timeout {time_t} 数据的过期时间(秒)
+	 * @param timeout {time_t} 数据的过期时间(秒)
 	 * @param flags {unsigned short} 附属的标志位
 	 * @return {bool} 是否成功
 	 */

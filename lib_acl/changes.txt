@@ -1,5 +1,41 @@
 修改历史列表：
 ------------------------------------------------------------------------
+406) 2013.12.5
+406.1) feature: Makefile 支持 solaris 编译
+
+405) 2013.12.4
+405.1) remove: 去掉了 event 目录下的 events_kernel2.c 及 events_kernel3.c
+
+404) 2013.11.26
+404.1) feature: acl_json.c 增加了 acl_json_node_duplicate 用于复制一个 JSON
+结点对象到一个新的 JSON 结点中；增加了 acl_json_create 用于根据一个 JSON 结点
+创建一个完全的 JSON 对象
+404.2) feature: acl_json_util.c 增加了 acl_json_node_build 用于根据一个 JSON
+结点生成 JSON 字符串
+
+403) 2013.11.25
+403.1) bugfix: acl_json_parse.c，json_val() 函数中没有针对转义内容做特殊处理
+
+402) 2013.11.17
+402.1) performance: acl_vstream.c，__sys_read 函数中当流的 sys_read_ready
+为 1 时，则不会调用系统 API select 判断超时过程，从而减少一次系统调用，
+因为 sys_read_ready 标志位会在事件模块(event_xxx) 中被设置
+402.2) performance: acl_aio_server.c, acl_ioctl_server.c 服务器模块参加了
+控制参数：master_status_notify，当启动多个子进程时，该参数决定是否向
+acl_master 主进程汇报子进程的状态，当 master_prefork 预启动参数打开且该
+值 > 1 时，将 master_status_notify 设置为 0，则子进程不再向 acl_master 主
+进程汇报状态，有助于减少 acl_master 主进程的负载
+402.3) performance: acl_vstream.c, 在 acl_vstream_readn 中，为减少 read
+次数，当输入缓冲区较小时，则自动启用双缓冲读方式
+
+401) 2013.11.7
+401.1) bugfix: acl_vstream.c，在 acl_vstream_ctl 函数中，当控制参数为
+ACL_VSTREAM_CTL_PATH 时，对 stream->addr_peer 的赋值有问题（此 bug 由高
+版本的 gcc4.8.2 检测出）
+
+400) 2013.11.6
+400.1) compile: acl_msg.c，在函数 acl_last_serror() 中分配的线程局部变量
+在主线程中无法被正常释放，会导致 valgrind 报错
 
 ------------------------------------------------------------------------
 399) 2013.11.5

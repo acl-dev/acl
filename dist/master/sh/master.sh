@@ -9,19 +9,52 @@ LOG_PATH=$HOME_PATH/var/log/acl_master
 
 RUNNING="no"
 PID=0
+OSTYPE=
+
+guess_os()
+{
+	os_name=`uname -s`
+	os_type=`uname -p`
+	case $os_name in
+	Linux)
+		OSTYPE="linux"
+		;;
+	SunOS)
+		OSTYPE="sunos"
+		;;
+	FreeBSD)
+		OSTYPE="freebsd"
+		;;
+	*)
+		echo "unknown OS - $os_name $os_type"
+		exit 1
+		;;
+	esac
+}
 
 check_proc()
 {
-	RUNNING="no"
+	guess_os
 
-	if [ -f $PID_FILE ]; then
-		PID=`sed 1q $PID_FILE | awk '{print $NF}'`
-		if [ -d "/proc/$PID" ]; then
-			link_path=`ls -l /proc/$PID/exe | awk '{print $NF}'`
-			if [ "$link_path" = "$EXE_PATH" ]; then
-				RUNNING="yes"
-			fi
-		fi
+	if [ ! -f $PID_FILE ]; then
+		RUNNING="no"
+		return
+	fi
+
+	PID=`sed 1q $PID_FILE | awk '{print $NF}'`
+	if [ ! -d "/proc/$PID" ]; then
+		RUNNING="no"
+		return
+	fi
+
+	if [ "$OSTYPE" != "linux" ]; then
+		RUNNING="yes"
+		return
+	fi
+
+	link_path=`ls -l /proc/$PID/exe | awk '{print $NF}'`
+	if [ "$link_path" = "$EXE_PATH" ]; then
+		RUNNING="yes"
 	fi
 }
 

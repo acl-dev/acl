@@ -40,7 +40,8 @@ struct ACL_STREAM_TRIGGER {
 
 /* acl_stream_trigger_event - disconnect from peer */
 
-static void acl_stream_trigger_event(int event, void *context)
+static void acl_stream_trigger_event(int event, ACL_EVENT *eventp acl_unused,
+	ACL_VSTREAM *stream acl_unused, void *context)
 {
 	const char *myname = "acl_stream_trigger_event";
 	struct ACL_STREAM_TRIGGER *sp = (struct ACL_STREAM_TRIGGER *) context;
@@ -91,8 +92,8 @@ int acl_stream_trigger(ACL_EVENT *eventp, const char *service,
 	sp->eventp = eventp;
 
 	/* Write the request... */
-	if (acl_write_buf(sp->stream, buf, len, timeout) < 0
-		|| acl_write_buf(sp->stream, "", 1, timeout) < 0)
+	if (acl_write_buf(ACL_VSTREAM_SOCK(sp->stream), buf, len, timeout) < 0
+		|| acl_write_buf(ACL_VSTREAM_SOCK(sp->stream), "", 1, timeout) < 0)
 	{
 		if (acl_msg_verbose)
 			acl_msg_warn("%s: write to %s: %s",

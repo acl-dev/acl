@@ -169,7 +169,7 @@ int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vector, int count,
 	return n;
 }
 
-int acl_file_fflush(ACL_FILE_HANDLE fh, ACL_VSTREAM *stream acl_unused,
+int acl_file_fflush(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
 	if (FlushFileBuffers(fh))
@@ -186,7 +186,7 @@ acl_int64 acl_file_size(const char *filename)
 	return sbuf.st_size;
 }
 
-acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *stream acl_unused,
+acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
 	DWORD  nLow, nHigh;
@@ -381,7 +381,7 @@ int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vector, int count,
 	return writev(fh, vector, count);
 }
 
-int acl_file_fflush(ACL_FILE_HANDLE fh, ACL_VSTREAM *stream acl_unused,
+int acl_file_fflush(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
 	return fsync(fh);
@@ -396,7 +396,7 @@ acl_int64 acl_file_size(const char *filename)
 	return sbuf.st_size;
 }
 
-acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *stream acl_unused,
+acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
 	struct acl_stat sbuf;

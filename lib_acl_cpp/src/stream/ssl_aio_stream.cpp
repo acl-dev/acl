@@ -1,12 +1,10 @@
 #include "acl_stdafx.hpp"
-#include "polarssl/ssl.h"
-#include "polarssl/havege.h"
+#ifdef HAS_POLARSSL
+# include "polarssl/ssl.h"
+# include "polarssl/havege.h"
+#endif
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/ssl_aio_stream.hpp"
-
-//#ifndef HAS_POLARSSL
-//#define HAS_POLARSSL
-//#endif
 
 namespace acl
 {

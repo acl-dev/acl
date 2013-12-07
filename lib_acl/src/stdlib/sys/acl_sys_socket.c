@@ -99,7 +99,7 @@ int acl_socket_close(ACL_SOCKET fd)
 }
 
 int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *stream acl_unused,
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
 #if 0
@@ -125,7 +125,7 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 }
 
 int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *stream acl_unused,
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
 #if 0
@@ -150,7 +150,7 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 }
 
 int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
-	int timeout acl_unused, ACL_VSTREAM *stream acl_unused,
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
 	int   i, n, ret;
@@ -190,21 +190,21 @@ int acl_socket_close(ACL_SOCKET fd)
 }
 
 int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *stream acl_unused,
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
 	return read(fd, buf, size);
 }
 
 int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *stream acl_unused,
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
 	return write(fd, buf, size);
 }
 
 int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
-	int timeout acl_unused, ACL_VSTREAM *stream acl_unused,
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
 	return writev(fd, vec, count);

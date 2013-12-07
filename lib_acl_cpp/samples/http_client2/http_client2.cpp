@@ -8,15 +8,28 @@ static void get_url(const char* url, const char* host,
 {
 	acl::http_header header;
 
+	//header.add_param("test", NULL);
 	header.set_method(acl::HTTP_METHOD_GET);
 	header.set_url(url);
 	header.set_content_type("text/xml; charset=utf-8");
-	header.set_host(host);
+	if (header.get_host() == NULL)
+	{
+		header.set_host(host);
+		printf(">>>set host: %s\r\n", host);
+	}
+	else
+		printf(">>>host: %s\r\n", header.get_host());
 	header.set_keep_alive(true);
 	header.add_entry("User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
 	header.add_entry("Accept", "*/*");
 	header.add_entry("Cache-Control", "no-cache");
 	header.accept_gzip(true);
+
+	acl::string buf;
+
+	header.build_request(buf);
+	printf("--------------------request------------------\r\n");
+	printf("%s\r\n", buf.c_str());
 
 	acl::http_client client;
 	printf("begin connect %s\r\n", addr);
@@ -26,13 +39,7 @@ static void get_url(const char* url, const char* host,
 		return;
 	}
 
-	acl::string buf;
-
-	header.build_request(buf);
-	printf("--------------------request------------------\r\n");
-	printf("%s\r\n", buf.c_str());
-
-	if (client.write(header) == -1)
+	if (client.write_head(header) == -1)
 	{
 		printf("write request header error\r\n");
 		return;
@@ -73,10 +80,13 @@ int main(int argc, char* argv[])
 	//const char* host = "www.sina.com.cn";
 	//const char* addr = "www.sina.com.cn:80";
 
-	get_url("http://www.sina.com.cn/", "www.sina.com.cn",
+	get_url("http://www.sina.com.cn/?name=value&nam2=value2", "www.sina.com.cn",
 		"www.sina.com.cn:80", "sina.txt");
 	get_url("http://www.hexun.com/", "www.hexun.com",
 		"www.hexun.com:80", "hexun.txt");
+	get_url("/", "www.hexun.com", "www.hexun.com:80", "hexun.txt");
+	get_url("http://www.baidu.com", "www.baidu.com",
+		"www.baidu.com:80", "baidu.txt");
 
 	acl::http_header header(400);
 	acl::string buf;

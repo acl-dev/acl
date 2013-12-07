@@ -88,12 +88,22 @@ void master_trigger::service_main(char*, int, char*, char**)
 void master_trigger::service_pre_jail(char*, char**)
 {
 	acl_assert(__mt != NULL);
+
+#ifndef WIN32
+	if (__mt->daemon_mode())
+	{
+		ACL_EVENT* eventp = acl_trigger_server_event();
+		__mt->set_event(eventp);  // 设置基类的事件引擎句柄
+	}
+#endif
+
 	__mt->proc_pre_jail();
 }
 
 void master_trigger::service_init(char*, char**)
 {
 	acl_assert(__mt != NULL);
+
 	__mt->proc_inited_ = true;
 	__mt->proc_on_init();
 }

@@ -34,6 +34,8 @@ CFLAGS = -c -g -W -Wall -Wcast-align \
 SYSLIB = -lpthread
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
+UNIXTYPE = LINUX
+
 ifeq ($(CC),)
         CC = gcc
 endif
@@ -45,16 +47,19 @@ endif
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD
+	UNIXTYPE = FREEBSD
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX
+	UNIXTYPE = MACOSX
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -DLINUX2
+	UNIXTYPE = LINUX
 endif
 
 # For SunOS
@@ -66,12 +71,13 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 		SYSLIB += -lsocket -lnsl -lrt
 	endif
 	CFLAGS += -DSUNOS5
+	UNIXTYPE = SUNOS5
 endif
 
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
 	CFLAGS += -DHP_UX -DHPUX11
-	PLAT_NAME=hp-ux
+	UNIXTYPE = HPUX
 endif
 
 #CCARGS =
@@ -205,6 +211,9 @@ OBJS_DEF     = $(INIT_DEF) $(PRIV_DEF) $(STDLIB_DEF) \
 ###########################################################
 .PHONY = all static shared acl_master clean clean_lib clean_master rebuild
 
+STATIC_LIBNAME = lib_acl.a
+SHARED_LIBNAME = lib_acl.so
+
 all: static shared acl_master
 
 $(shell mkdir -p $(DEF_PATH_DST))
@@ -227,22 +236,28 @@ CREATE_DEF = @(echo 'creating $@'; rm -f $@; \
 	rm -f $@.$$$$)
 
 static: depends $(OBJS_DST)
-	@echo 'creating $(LIB_PATH_DST)/lib_acl.a'
-	@$(AR) $(ARFL) $(LIB_PATH_DST)/lib_acl.a $(OBJS_DST)
-	@$(RANLIB) $(LIB_PATH_DST)/lib_acl.a
-	@echo 'build $(LIB_PATH_DST)/lib_acl.a ok!'
+	@echo 'creating $(LIB_PATH_DST)/$(STATIC_LIBNAME)'
+	@$(AR) $(ARFL) $(LIB_PATH_DST)/$(STATIC_LIBNAME) $(OBJS_DST)
+	@$(RANLIB) $(LIB_PATH_DST)/$(STATIC_LIBNAME)
+	@echo 'build $(LIB_PATH_DST)/$(STATIC_LIBNAME) ok!'
 
 #shared_ldflags = -lmysqlclient -lrt -lpthread -ldl
 shared_ldflags = -lrt -lpthread -ldl
 shared: depends $(OBJS_DST)
 	@echo ''
-	@echo 'creating $(LIB_PATH_DST)/lib_acl.so ...'
-	@if test -n "$(rpath)"; then \
-		$(CC) -shared -o $(LIB_PATH_DST)/lib_acl.so $(OBJS_DST) -L$(rpath) \
-			$(shared_ldflags) -Wl,-rpath,$(rpath); \
-		echo 'build $(LIB_PATH_DST)/lib_acl.so ok!'; \
+	@echo 'creating $(SHARED_LIBNAME)'
+	@if test -n "$(rpath)" && test "$(UNIXTYPE)" = "LINUX"; then \
+		echo "building for linux"; \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+			-L$(rpath) $(shared_ldflags) -Wl,-rpath,$(rpath); \
+		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
+	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "SUNOS5"; then \
+		echo "building for sunos5"; \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+			-L$(rpath) $(shared_ldflags); \
+		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	else \
-		echo 'skip build $(LIB_PATH_DST)/lib_acl.so; usage: make shared rpath=xxx'; \
+		echo 'skip build $(SHARED_LIBNAME); usage: make rpath=xxx'; \
 	fi
 
 depends: $(OBJS_DEF)

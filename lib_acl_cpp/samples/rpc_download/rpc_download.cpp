@@ -77,7 +77,7 @@ protected:
 		while (true)
 		{
 			// 读 HTTP 响应数据体
-			int ret = req.get_body(buf, sizeof(buf));
+			int ret = req.read_body(buf, sizeof(buf));
 			if (ret <= 0)
 			{
 				ctx = new DOWN_CTX;

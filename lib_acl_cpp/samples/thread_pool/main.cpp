@@ -35,7 +35,8 @@ public:
 	mythread_pool() {}
 	~mythread_pool()
 	{
-		printf("thread pool destroy now, tid: %lu\r\n", acl_pthread_self());
+		printf("thread pool destroy now, tid: %lu\r\n",
+			(unsigned long) acl_pthread_self());
 	}
 
 protected:

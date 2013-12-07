@@ -7,6 +7,7 @@
 
 #endif
 
+#define	ADDCH	ACL_VSTRING_ADDCH
 #define	LEN	ACL_VSTRING_LEN
 #define	STR	acl_vstring_str
 #define END	acl_vstring_end
@@ -107,7 +108,7 @@ static const char *xml_parse_left_em(ACL_XML *xml, const char *data)
 		data++;
 	} else {
 		if (xml->curr_node->meta[1] == '-') {
-			ACL_VSTRING_ADDCH(xml->curr_node->ltag, '-');
+			ADDCH(xml->curr_node->ltag, '-');
 			xml->curr_node->meta[1] = 0;
 		}
 		xml->curr_node->flag |= ACL_XML_F_META_EM;
@@ -128,7 +129,7 @@ static const char *xml_parse_meta_tag(ACL_XML *xml, const char *data)
 			xml->curr_node->status = ACL_XML_S_MTXT;
 			break;
 		}
-		ACL_VSTRING_ADDCH(xml->curr_node->ltag, ch);
+		ADDCH(xml->curr_node->ltag, ch);
 	}
 	ACL_VSTRING_TERMINATE(xml->curr_node->ltag);
 	return (data);
@@ -145,7 +146,7 @@ static const char *xml_meta_attr_name(ACL_XML_ATTR *attr, const char *data)
 			break;
 		}
 		if (!IS_SPACE(ch))
-			ACL_VSTRING_ADDCH(attr->name, ch);
+			ADDCH(attr->name, ch);
 		data++;
 	}
 	return data;
@@ -163,11 +164,22 @@ static const char *xml_meta_attr_value(ACL_XML_ATTR *attr, const char *data)
 
 	while ((ch = *data) != 0) {
 		if (attr->backslash) {
-			ACL_VSTRING_ADDCH(attr->value, ch);
+			if (ch == 'b')
+				ADDCH(attr->value, '\b');
+			else if (ch == 'f')
+				ADDCH(attr->value, '\f');
+			else if (ch == 'n')
+				ADDCH(attr->value, '\n');
+			else if (ch == 'r')
+				ADDCH(attr->value, '\r');
+			else if (ch == 't')
+				ADDCH(attr->value, '\t');
+			else
+				ADDCH(attr->value, ch);
 			attr->backslash = 0;
 		} else if (ch == '\\') {
 			if (attr->part_word) {
-				ACL_VSTRING_ADDCH(attr->value, ch);
+				ADDCH(attr->value, ch);
 				attr->part_word = 0;
 			} else
 				attr->backslash = 1;
@@ -176,12 +188,12 @@ static const char *xml_meta_attr_value(ACL_XML_ATTR *attr, const char *data)
 				data++;
 				break;
 			}
-			ACL_VSTRING_ADDCH(attr->value, ch);
+			ADDCH(attr->value, ch);
 		} else if (IS_SPACE(ch)) {
 			data++;
 			break;
 		} else {
-			ACL_VSTRING_ADDCH(attr->value, ch);
+			ADDCH(attr->value, ch);
 			if ((attr->node->xml->flag & ACL_XML_FLAG_PART_WORD)) {
 				if (attr->part_word)
 					attr->part_word = 0;
@@ -233,15 +245,15 @@ static const char *xml_parse_meta_text(ACL_XML *xml, const char *data)
 			if (ch == xml->curr_node->quote) {
 				xml->curr_node->quote = 0;
 			}
-			ACL_VSTRING_ADDCH(xml->curr_node->text, ch);
+			ADDCH(xml->curr_node->text, ch);
 		} else if (IS_QUOTE(ch)) {
 			if (xml->curr_node->quote == 0) {
 				xml->curr_node->quote = ch;
 			}
-			ACL_VSTRING_ADDCH(xml->curr_node->text, ch);
+			ADDCH(xml->curr_node->text, ch);
 		} else if (ch == '<') {
 			xml->curr_node->nlt++;
-			ACL_VSTRING_ADDCH(xml->curr_node->text, ch);
+			ADDCH(xml->curr_node->text, ch);
 		} else if (ch == '>') {
 			if (xml->curr_node->nlt == 0) {
 				char *last;
@@ -264,9 +276,9 @@ static const char *xml_parse_meta_text(ACL_XML *xml, const char *data)
 				break;
 			}
 			xml->curr_node->nlt--;
-			ACL_VSTRING_ADDCH(xml->curr_node->text, ch);
+			ADDCH(xml->curr_node->text, ch);
 		} else {
-			ACL_VSTRING_ADDCH(xml->curr_node->text, ch);
+			ADDCH(xml->curr_node->text, ch);
 		}
 		data++;
 	}
@@ -288,17 +300,17 @@ static const char *xml_parse_meta_comment(ACL_XML *xml, const char *data)
 			if (ch == xml->curr_node->quote) {
 				xml->curr_node->quote = 0;
 			} else {
-				ACL_VSTRING_ADDCH(xml->curr_node->text, ch);
+				ADDCH(xml->curr_node->text, ch);
 			}
 		} else if (IS_QUOTE(ch)) {
 			if (xml->curr_node->quote == 0) {
 				xml->curr_node->quote = ch;
 			} else {
-				ACL_VSTRING_ADDCH(xml->curr_node->text, ch);
+				ADDCH(xml->curr_node->text, ch);
 			}
 		} else if (ch == '<') {
 			xml->curr_node->nlt++;
-			ACL_VSTRING_ADDCH(xml->curr_node->text, ch);
+			ADDCH(xml->curr_node->text, ch);
 		} else if (ch == '>') {
 			if (xml->curr_node->nlt == 0) {
 				if (xml->curr_node->meta[0] == '-'
@@ -310,9 +322,9 @@ static const char *xml_parse_meta_comment(ACL_XML *xml, const char *data)
 				}
 			}
 			xml->curr_node->nlt--;
-			ACL_VSTRING_ADDCH(xml->curr_node->text, ch);
+			ADDCH(xml->curr_node->text, ch);
 		} else if (xml->curr_node->nlt > 0) {
-			ACL_VSTRING_ADDCH(xml->curr_node->text, ch);
+			ADDCH(xml->curr_node->text, ch);
 		} else if (ch == '-') {
 			if (xml->curr_node->meta[0] != '-') {
 				xml->curr_node->meta[0] = '-';
@@ -321,14 +333,14 @@ static const char *xml_parse_meta_comment(ACL_XML *xml, const char *data)
 			}
 		} else {
 			if (xml->curr_node->meta[0] == '-') {
-				ACL_VSTRING_ADDCH(xml->curr_node->text, '-');
+				ADDCH(xml->curr_node->text, '-');
 				xml->curr_node->meta[0] = 0;
 			}
 			if (xml->curr_node->meta[1] == '-') {
-				ACL_VSTRING_ADDCH(xml->curr_node->text, '-');
+				ADDCH(xml->curr_node->text, '-');
 				xml->curr_node->meta[1] = 0;
 			}
-			ACL_VSTRING_ADDCH(xml->curr_node->text, ch);
+			ADDCH(xml->curr_node->text, ch);
 		}
 		data++;
 	}
@@ -369,7 +381,7 @@ static const char *xml_parse_left_tag(ACL_XML *xml, const char *data)
 			xml->curr_node->last_ch = ch;
 			break;
 		} else {
-			ACL_VSTRING_ADDCH(xml->curr_node->ltag, ch);
+			ADDCH(xml->curr_node->ltag, ch);
 			xml->curr_node->last_ch = ch;
 		}
 	}
@@ -419,7 +431,7 @@ static const char *xml_parse_attr(ACL_XML *xml, const char *data)
 			break;
 		}
 		if (!IS_SPACE(ch))
-			ACL_VSTRING_ADDCH(attr->name, ch);
+			ADDCH(attr->name, ch);
 		data++;
 	}
 
@@ -444,12 +456,23 @@ static const char *xml_parse_attr_val(ACL_XML *xml, const char *data)
 
 	while ((ch = *data) != 0) {
 		if (attr->backslash) {
-			ACL_VSTRING_ADDCH(attr->value, ch);
+			if (ch == 'b')
+				ADDCH(attr->value, '\b');
+			else if (ch == 'f')
+				ADDCH(attr->value, '\f');
+			else if (ch == 'n')
+				ADDCH(attr->value, '\n');
+			else if (ch == 'r')
+				ADDCH(attr->value, '\r');
+			else if (ch == 't')
+				ADDCH(attr->value, '\t');
+			else
+				ADDCH(attr->value, ch);
 			xml->curr_node->last_ch = ch;
 			attr->backslash = 0;
 		} else if (ch == '\\') {
 			if (attr->part_word) {
-				ACL_VSTRING_ADDCH(attr->value, ch);
+				ADDCH(attr->value, ch);
 				attr->part_word = 0;
 			}
 			else
@@ -461,7 +484,7 @@ static const char *xml_parse_attr_val(ACL_XML *xml, const char *data)
 				data++;
 				break;
 			}
-			ACL_VSTRING_ADDCH(attr->value, ch);
+			ADDCH(attr->value, ch);
 			xml->curr_node->last_ch = ch;
 		} else if (ch == '>') {
 			xml->curr_node->status = ACL_XML_S_LGT;
@@ -474,7 +497,7 @@ static const char *xml_parse_attr_val(ACL_XML *xml, const char *data)
 			data++;
 			break;
 		} else {
-			ACL_VSTRING_ADDCH(attr->value, ch);
+			ADDCH(attr->value, ch);
 			xml->curr_node->last_ch = ch;
 
 			if ((xml->flag & ACL_XML_FLAG_PART_WORD)) {
@@ -528,7 +551,7 @@ static const char *xml_parse_text(ACL_XML *xml, const char *data)
 			data++;
 			break;
 		}
-		ACL_VSTRING_ADDCH(xml->curr_node->text, ch);
+		ADDCH(xml->curr_node->text, ch);
 		data++;
 	}
 
@@ -565,8 +588,8 @@ static const char *xml_parse_right_lt(ACL_XML *xml, const char *data)
 		data++;
 		return (data);
 	} else if ((xml->curr_node->flag & ACL_XML_F_LEAF)) {
-		ACL_VSTRING_ADDCH(xml->curr_node->text, '<');
-		ACL_VSTRING_ADDCH(xml->curr_node->text, *data);
+		ADDCH(xml->curr_node->text, '<');
+		ADDCH(xml->curr_node->text, *data);
 		ACL_VSTRING_TERMINATE(xml->curr_node->text);
 		xml->curr_node->status = ACL_XML_S_TXT;
 		data++;
@@ -679,7 +702,7 @@ static const char *xml_parse_right_tag(ACL_XML *xml, const char *data)
 		}
 
 		if (!IS_SPACE(ch))
-			ACL_VSTRING_ADDCH(curr_node->rtag, ch);
+			ADDCH(curr_node->rtag, ch);
 		data++;
 	}
 

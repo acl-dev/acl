@@ -179,46 +179,6 @@ ACL_EVENT *acl_event_new_kernel(int delay_sec, int delay_usec)
 #endif
 }
 
-ACL_EVENT *acl_event_new_kernel2(int delay_sec, int delay_usec)
-{
-#ifdef	ACL_EVENTS_KERNEL_STYLE
-	ACL_EVENT *eventp;
-	int   fdsize;
-
-	fdsize = event_limit(0);
-	eventp = event_new_kernel2(fdsize);
-	event_init(eventp, fdsize, delay_sec, delay_usec);
-	return (eventp);
-#else
-	const char *myname = "acl_event_new_kernel2";
-
-	delay_sec = delay_sec;
-	delay_usec = delay_usec;
-	acl_msg_fatal("%s(%d): not support!", myname, __LINE__);
-	return (NULL);
-#endif
-}
-
-ACL_EVENT *acl_event_new_kernel3(int delay_sec, int delay_usec)
-{
-#ifdef	ACL_EVENTS_KERNEL_STYLE
-	ACL_EVENT *eventp;
-	int   fdsize;
-
-	fdsize = event_limit(0);
-	eventp = event_new_kernel2(fdsize);
-	event_init(eventp, fdsize, delay_sec, delay_usec);
-	return (eventp);
-#else
-	const char *myname = "acl_event_new_kernel3";
-
-	delay_sec = delay_sec;
-	delay_usec = delay_usec;
-	acl_msg_fatal("%s(%d): not support!", myname, __LINE__);
-	return (NULL);
-#endif
-}
-
 ACL_EVENT *acl_event_new_kernel_thr(int delay_sec, int delay_usec)
 {
 #ifdef	ACL_EVENTS_KERNEL_STYLE
@@ -286,12 +246,6 @@ ACL_EVENT *acl_event_new(int event_mode, int use_thr, int delay_sec, int delay_u
 			break;
 		case ACL_EVENT_KERNEL:
 			eventp = acl_event_new_kernel(delay_sec, delay_usec);
-			break;
-		case ACL_EVENT_KERNEL2:
-			eventp = acl_event_new_kernel2(delay_sec, delay_usec);
-			break;
-		case ACL_EVENT_KERNEL3:
-			eventp = acl_event_new_kernel3(delay_sec, delay_usec);
 			break;
 		case ACL_EVENT_POLL:
 			eventp = acl_event_new_poll(delay_sec, delay_usec);

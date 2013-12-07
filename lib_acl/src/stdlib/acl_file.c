@@ -139,7 +139,7 @@ ACL_FILE *acl_fopen(const char *filename, const char *mode)
 		return NULL;
 
 	fp = (ACL_FILE*) acl_mymalloc(sizeof(ACL_FILE));
-	fp->stream = stream;
+	fp->fp = stream;
 	fp->status = 0;
 	fp->errnum = 0;
 	return fp;
@@ -153,7 +153,7 @@ void acl_clearerr(ACL_FILE *fp)
 
 int acl_fclose(ACL_FILE *fp)
 {
-	int   ret = acl_vstream_fclose(fp->stream);
+	int   ret = acl_vstream_fclose(fp->fp);
 
 	acl_myfree(fp);
 	if (ret == ACL_VSTREAM_EOF || ret < 0)
@@ -176,7 +176,7 @@ size_t acl_fread(void *buf, size_t size, size_t nitems, ACL_FILE *fp)
 	fp->status &= ~ACL_FILE_EOF;
 	fp->errnum = 0;
 
-	ret = acl_vstream_readn(fp->stream, buf, size * nitems);
+	ret = acl_vstream_readn(fp->fp, buf, size * nitems);
 	if (ret == ACL_VSTREAM_EOF) {
 		fp->status |= ACL_FILE_EOF;
 		return EOF;
@@ -199,7 +199,7 @@ char *acl_fgets(char *buf, int size, ACL_FILE *fp)
 	fp->status &= ~ACL_FILE_EOF;
 	fp->errnum = 0;
 
-	ret = acl_vstream_gets(fp->stream, buf, size);
+	ret = acl_vstream_gets(fp->fp, buf, size);
 	if (ret == ACL_VSTREAM_EOF) {
 		fp->status |= ACL_FILE_EOF;
 		return NULL;
@@ -214,7 +214,7 @@ char *acl_fgets_nonl(char *buf, int size, ACL_FILE *fp)
 	fp->status &= ~ACL_FILE_EOF;
 	fp->errnum = 0;
 
-	ret = acl_vstream_gets_nonl(fp->stream, buf, size);
+	ret = acl_vstream_gets_nonl(fp->fp, buf, size);
 	if (ret == ACL_VSTREAM_EOF) {
 		fp->status |= ACL_FILE_EOF;
 		return NULL;
@@ -224,7 +224,7 @@ char *acl_fgets_nonl(char *buf, int size, ACL_FILE *fp)
 
 int acl_fgetc(ACL_FILE *fp)
 {
-	int   ret = ACL_VSTREAM_GETC(fp->stream);
+	int   ret = ACL_VSTREAM_GETC(fp->fp);
 
 	fp->status &= ~ACL_FILE_EOF;
 	fp->errnum = 0;
@@ -272,7 +272,7 @@ int acl_vfprintf(ACL_FILE *fp, const char *fmt, va_list ap)
 	fp->status &= ~ACL_FILE_EOF;
 	fp->errnum = 0;
 
-	ret = acl_vstream_vfprintf(fp->stream, fmt, ap);
+	ret = acl_vstream_vfprintf(fp->fp, fmt, ap);
 	if (ret == ACL_VSTREAM_EOF) {
 		fp->status |= ACL_FILE_EOF;
 		return EOF;
@@ -291,7 +291,7 @@ size_t acl_fwrite(const void *ptr, size_t size, size_t nitems, ACL_FILE *fp)
 	fp->status &= ~ACL_FILE_EOF;
 	fp->errnum = 0;
 
-	ret = acl_vstream_writen(fp->stream, ptr, size * nitems);
+	ret = acl_vstream_writen(fp->fp, ptr, size * nitems);
 	if (ret == ACL_VSTREAM_EOF) {
 		fp->status |= ACL_FILE_EOF;
 		return EOF;
@@ -329,7 +329,7 @@ int acl_fputs(const char *s, ACL_FILE *fp)
 	fp->status &= ~ACL_FILE_EOF;
 	fp->errnum = 0;
 
-	ret = acl_vstream_fputs(s, fp->stream);
+	ret = acl_vstream_fputs(s, fp->fp);
 	if (ret == ACL_VSTREAM_EOF) {
 		fp->status |= ACL_FILE_EOF;
 		return EOF;
@@ -346,7 +346,7 @@ int acl_putc(int c, ACL_FILE *fp)
 	fp->status &= ~ACL_FILE_EOF;
 	fp->errnum = 0;
 
-	ret = ACL_VSTREAM_PUTC(ch, fp->stream);
+	ret = ACL_VSTREAM_PUTC(ch, fp->fp);
 	if (ret == ACL_VSTREAM_EOF) {
 		fp->status |= ACL_FILE_EOF;
 		return EOF;
@@ -383,5 +383,5 @@ int acl_putchar(int c)
 
 acl_off_t acl_fseek(ACL_FILE *fp, acl_off_t offset, int whence)
 {
-	return acl_vstream_fseek(fp->stream, offset, whence);
+	return acl_vstream_fseek(fp->fp, offset, whence);
 }

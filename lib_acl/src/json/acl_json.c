@@ -415,6 +415,48 @@ ACL_JSON *acl_json_alloc1(ACL_SLICE_POOL *slice)
 	return (json);
 }
 
+ACL_JSON_NODE *acl_json_node_duplicate(ACL_JSON *json, ACL_JSON_NODE *from)
+{
+	ACL_JSON_NODE *child_from, *child_to, *to;
+	ACL_RING_ITER iter;
+
+	to = acl_json_node_alloc(json);
+	to->left_ch = from->left_ch;
+	to->right_ch = from->right_ch;
+	to->type = from->type;
+	to->depth = from->depth;  /* XXX? */
+	acl_vstring_strcpy(to->ltag, STR(from->ltag));
+	acl_vstring_strcpy(to->text, STR(from->text));
+
+	acl_ring_foreach(iter, &from->children) {
+		child_from = acl_ring_to_appl(iter.ptr, ACL_JSON_NODE, node);
+		child_to = acl_json_node_duplicate(json, child_from);
+		acl_json_node_add_child(to, child_to);
+		if (from->tag_node == child_from)
+			to->tag_node = child_to;
+	}
+
+	return to;
+}
+
+ACL_JSON *acl_json_create(ACL_JSON_NODE *node)
+{
+	ACL_JSON *json = acl_json_alloc();
+	ACL_JSON_NODE *first = acl_json_node_duplicate(json, node);
+
+	acl_json_node_add_child(json->root, first);
+
+	/* 当 node 结点为根结点时，说明拷贝整个对象，此时根结点有 {}，
+	 * 当 node 结点为非根结点时，此结点没有 {}，所以需要给新创建的
+	 * json 对象的根结点加 {}
+	 */
+	if (node != node->json->root) {
+		json->root->left_ch = '{';
+		json->root->right_ch = '}';
+	}
+	return json;
+}
+
 void acl_json_foreach_init(ACL_JSON *json, ACL_JSON_NODE *node)
 {
 	json->root = node;

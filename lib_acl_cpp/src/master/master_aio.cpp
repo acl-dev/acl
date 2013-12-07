@@ -85,6 +85,12 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	conf_.load(path);
 
 	__handle = NEW aio_handle(ht);
+
+	ACL_AIO* aio = __handle->get_handle();
+	acl_assert(aio);
+	ACL_EVENT* eventp = acl_aio_event(aio);
+	set_event(eventp);  // 设置基类的事件句柄
+
 	acl_foreach(iter, tokens)
 	{
 		const char* addr = (const char*) iter.data;
@@ -136,22 +142,28 @@ bool master_aio::accept_callback(aio_socket_stream* client)
 void master_aio::service_pre_jail(void*)
 {
 	acl_assert(__ma != NULL);
+
 #ifndef WIN32
 	if (__ma->daemon_mode_)
 	{
 		acl_assert(__handle == NULL);
+
+		ACL_EVENT* eventp = acl_aio_server_event();
+		__ma->set_event(eventp);
 
 		ACL_AIO *aio = acl_aio_server_handle();
 		acl_assert(aio);
 		__handle = NEW aio_handle(aio);
 	}
 #endif
+
 	__ma->proc_pre_jail();
 }
 
 void master_aio::service_init(void* ctx acl_unused)
 {
 	acl_assert(__ma != NULL);
+
 	__ma->proc_inited_ = true;
 	__ma->proc_on_init();
 }

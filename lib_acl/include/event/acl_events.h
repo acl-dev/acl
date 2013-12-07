@@ -31,9 +31,7 @@ extern "C" {
 #define	ACL_EVENT_SELECT	0
 #define	ACL_EVENT_POLL		1
 #define	ACL_EVENT_KERNEL	2
-#define	ACL_EVENT_KERNEL2	3
-#define	ACL_EVENT_KERNEL3	4
-#define ACL_EVENT_WMSG		5
+#define ACL_EVENT_WMSG		3
 
  /*
   * Dummies.
@@ -121,22 +119,6 @@ ACL_API ACL_EVENT *acl_event_new_poll_thr(int delay_sec, int delay_usec);
  * @return {ACL_EVENT*} 事件对象指针，如果为空表示出错
  */
 ACL_API ACL_EVENT *acl_event_new_kernel(int delay_sec, int delay_usec);
-
-/**
- * 创建一个新的事件对象, 该事件采用效率高的 epoll/devpoll/kqueue 方式，且不支持多线程
- * @param delay_sec {int} 在调用事件循环函数时休息的秒数
- * @param delay_usec {int} 在调用事件循环函数时休息的微秒数(忽略不计)
- * @return {ACL_EVENT*} 事件对象指针，如果为空表示出错
- */
-ACL_API ACL_EVENT *acl_event_new_kernel2(int delay_sec, int delay_usec);
-
-/**
- * 创建一个新的事件对象, 该事件采用效率高的 epoll/devpoll/kqueue 方式，且不支持多线程
- * @param delay_sec {int} 在调用事件循环函数时休息的秒数
- * @param delay_usec {int} 在调用事件循环函数时休息的微秒数(忽略不计)
- * @return {ACL_EVENT*} 事件对象指针，如果为空表示出错
- */
-ACL_API ACL_EVENT *acl_event_new_kernel3(int delay_sec, int delay_usec);
 
 /**
  * 创建一个新的事件对象, 该事件采用效率高的 epoll/devpoll/kqueue 方式，且采用线程方式

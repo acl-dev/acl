@@ -58,15 +58,24 @@ protected:
 	 *  必将该连接再传递至 thread_main 过程
 	 *  注：当本函数返回 false 流关闭时并不调用 thread_on_close 过程
 	 */
-	virtual bool thread_on_accept(socket_stream* stream) { (void) stream; return true; }
+	virtual bool thread_on_accept(socket_stream* stream)
+	{
+		(void) stream;
+		return true;
+	}
 
 	/**
-	 * 当某个网络连接的 IO 读写超时时的回调函数，如果该函数返回 true 则表示继续等待下一次
-	 * 读写，否则则希望关闭该连接
+	 * 当某个网络连接的 IO 读写超时时的回调函数，如果该函数返回 true 则
+	 * 表示继续等待下一次读写，否则则希望关闭该连接
 	 * @param stream {socket_stream*}
-	 * @return {bool} 如果返回 false 则表示子类要求关闭连接，否则则要求继续监听该连接
+	 * @return {bool} 如果返回 false 则表示子类要求关闭连接，否则则要求
+	 *  继续监听该连接
 	 */
-	virtual bool thread_on_timeout(socket_stream* stream) { (void) stream; return false; }
+	virtual bool thread_on_timeout(socket_stream* stream)
+	{
+		(void) stream;
+		return false;
+	}
 
 	/**
 	 * 当与某个线程绑定的连接关闭时的回调函数
@@ -85,26 +94,6 @@ protected:
 	 * 当线程池中一个线程退出时的回调函数
 	 */
 	virtual void thread_on_exit() {}
-
-public:
-	/**
-	 * 设置进程级别的定时器，该定时器只有当 proc_on_init 回调过程中
-	 * 被设置才会生效且该定时器仅被调用一次，如果需要循环定时器，则
-	 * 需要在定时器内再次设置
-	 * @param callback {void (*)(int, void*)} 定时器回调函数
-	 * @param ctx {void*} callback 被调用时的第二个参数
-	 * @param delay {int} 定时器被循环触发的时间间隔(秒)
-	 */
-	static void proc_set_timer(void (*callback)(int, ACL_EVENT*, void*),
-		void* ctx, int delay);
-
-	/**
-	 * 删除进程级别的定时器
-	 * @param callback {void (*)(int, void*)} 定时器回调函数
-	 * @param ctx {void*} callback 被调用时的第二个参数
-	 */
-	static void proc_del_timer(void (*callback)(int, ACL_EVENT*, void*),
-		void* ctx);
 
 private:
 	// 线程开始创建后的回调函数

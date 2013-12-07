@@ -13,7 +13,7 @@ class thread_job;
  * 自动退出)，该类有两个非纯虚函数：thread_on_init(线程池中的某个线程第一次
  * 创建时会首先调用此函数)，thread_on_exit(线程池中的某个线程退出时调用此函数)
  */
-class thread_pool
+class ACL_CPP_API thread_pool
 {
 public:
 	thread_pool();

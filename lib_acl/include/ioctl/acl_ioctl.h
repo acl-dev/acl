@@ -116,7 +116,7 @@ ACL_API void acl_ioctl_disable_readwrite(ACL_IOCTL *ioc, ACL_VSTREAM *stream);
  * @param ioc {ACL_IOCTL*} 服务器任务池句柄
  * @param stream {ACL_VSTREAM*} 客户端数据流指针
  */
-ACL_API void acl_ioctl_disable_read(ACL_IOCTL *ioctl, ACL_VSTREAM *stream);
+ACL_API void acl_ioctl_disable_read(ACL_IOCTL *h_ioctl, ACL_VSTREAM *stream);
 
 /**
  * 将数据流从事件的写监听中去除

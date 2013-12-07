@@ -24,8 +24,9 @@ public:
 	 * @param default_addr {const char*} 缺省的服务器地址，如果非空，
 	 *  则在查询时优先使用此服务器
 	 * @param addr_list {const char*} 所有服务器列表，可以为空
-	 *  格式：IP:PORT:COUNT|IP:PORT:COUNT ...
-	 *  如：127.0.0.1:7777:50|192.168.1.1:7777:10|127.0.0.1:7778
+	 *  格式: IP:PORT:COUNT;IP:PORT:COUNT ...
+	 *    或  IP:PORT:COUNT,IP:PORT:COUNT ...
+	 *  如：127.0.0.1:7777:50;192.168.1.1:7777:10;127.0.0.1:7778
 	 * @param default_count {int} 当 addr_list 中分隔的某个服务没有
 	 *  COUNT 信息时便用此值
 	 *  注：default_addr 和 addr_list 不能同时为空
@@ -134,6 +135,7 @@ protected:
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 * @param addr {const char*} 服务器监听地址，格式：ip:port
 	 * @param count {int} 连接池的大小限制
+	 * @return {connect_pool*} 返回创建的连接池对象
 	 */
 	virtual connect_pool* create_pool(const char* addr,
 		int count, size_t idx) = 0;

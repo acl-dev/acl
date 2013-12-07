@@ -12,16 +12,18 @@
 
 #ifdef	ACL_UNIX
 
+# ifdef	ACL_SUNOS5
+#include <stropts.h>
+# endif
+
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <sys/ioctl.h>
-/*
 # ifndef ACL_FREEBSD
 #  include <stropts.h>
 # endif
-*/
 #include <sys/types.h>
 #include <fcntl.h>
 

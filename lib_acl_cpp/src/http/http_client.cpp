@@ -20,6 +20,8 @@ http_client::http_client(void)
 	, unzip_(true)
 	, zstream_(NULL)
 	, is_request_(true)
+	, body_finish_(false)
+	, chunked_transfer_(false)
 {
 
 }
@@ -36,6 +38,8 @@ http_client::http_client(socket_stream* client, int rw_timeout /* = 120 */,
 	, unzip_(unzip)
 	, zstream_(NULL)
 	, is_request_(is_request)
+	, body_finish_(false)
+	, chunked_transfer_(false)
 {
 
 }
@@ -89,6 +93,7 @@ void http_client::reset(void)
 
 	last_ret_ = -1;
 	body_finish_ = false;
+	chunked_transfer_ = false;
 }
 
 bool http_client::open(const char* addr, int conn_timeout /* = 60 */,
@@ -117,14 +122,40 @@ bool http_client::open(const char* addr, int conn_timeout /* = 60 */,
 	return (true);
 }
 
-int http_client::write(const http_header& header)
+int http_client::write_head(const http_header& header)
 {
+	chunked_transfer_ = header.chunked_transfer();
 	string buf;
 	if (header.is_request())
 		header.build_request(buf);
 	else
 		header.build_response(buf);
 	return get_ostream().write(buf.c_str(), buf.length());
+}
+
+bool http_client::write_body(const void* data, size_t len)
+{
+	ostream& fp = get_ostream();
+
+	if (chunked_transfer_ == false)
+	{
+		if (data == NULL || len == 0)
+			return true;
+		return fp.write(data, len) == -1 ? false : true;
+	}
+
+	// 如果设置了 chunked 传输方式，则按块传输方式写数据
+
+	if (data == NULL || len == 0)
+		return fp.format("0\r\n\r\n") == -1 ? false : true;
+
+	if (fp.format("%x\r\n", (int) len) == -1)
+		return false;
+	if (fp.write(data, len) == -1)
+		return false;
+	if (fp.write("\r\n", 2) == -1)
+		return false;
+	return true;
 }
 
 ostream& http_client::get_ostream(void) const
@@ -600,7 +631,7 @@ int http_client::read_request_body(string& out, bool clean,
 	return (ret);
 }
 
-const HTTP_HDR_RES* http_client::get_respond_head(string* buf)
+HTTP_HDR_RES* http_client::get_respond_head(string* buf)
 {
 	if (hdr_res_ == NULL)
 		return (NULL);
@@ -612,7 +643,7 @@ const HTTP_HDR_RES* http_client::get_respond_head(string* buf)
 	return (hdr_res_);
 }
 
-const HTTP_HDR_REQ* http_client::get_request_head(string* buf)
+HTTP_HDR_REQ* http_client::get_request_head(string* buf)
 {
 	if (hdr_req_ == NULL)
 		return (NULL);

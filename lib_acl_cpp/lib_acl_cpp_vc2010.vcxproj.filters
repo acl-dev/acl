@@ -319,6 +319,9 @@
     <ClCompile Include="src\stream\server_socket.cpp">
       <Filter>src\stream</Filter>
     </ClCompile>
+    <ClCompile Include="src\stream\aio_delay_free.cpp">
+      <Filter>src\stream</Filter>
+    </ClCompile>
     <ClCompile Include="src\stream\aio_fstream.cpp">
       <Filter>src\stream</Filter>
     </ClCompile>
@@ -342,6 +345,15 @@
     </ClCompile>
     <ClCompile Include="src\stdlib\thread_pool.cpp">
       <Filter>src\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_timer_callback.cpp">
+      <Filter>src\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_timer_delay_free.cpp">
+      <Filter>src\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\event_timer.cpp">
+      <Filter>src\event</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -624,6 +636,9 @@
     <ClInclude Include="include\acl_cpp\stream\aio_stream.hpp">
       <Filter>include\stream</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_timer_callback.hpp">
+      <Filter>include\stream</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\stream\fstream.hpp">
       <Filter>include\stream</Filter>
     </ClInclude>
@@ -684,6 +699,9 @@
     <ClInclude Include="include\acl_cpp\stream\server_socket.hpp">
       <Filter>include\stream</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_delay_free.hpp">
+      <Filter>include\stream</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\stream\aio_fstream.hpp">
       <Filter>include\stream</Filter>
     </ClInclude>
@@ -716,6 +734,12 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\thread_pool.hpp">
       <Filter>include\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stream\aio_timer_delay_free.hpp">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\event\event_timer.hpp">
+      <Filter>include\event</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -821,6 +845,12 @@
     </Filter>
     <Filter Include="include\connpool">
       <UniqueIdentifier>{91040771-66ce-4530-816d-10b9166321a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\event">
+      <UniqueIdentifier>{a4a8f04d-9107-435a-b1c1-5b8249e6cb4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\event">
+      <UniqueIdentifier>{484e9df8-18fb-4d8f-bc99-940873adca7e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

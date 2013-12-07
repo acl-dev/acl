@@ -84,14 +84,14 @@ public:
 	 * @param s {const string&} 源字符串对象
 	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
 	 */
-	string& operator=(const string&);
+	string& operator=(const string& s);
 
 	/**
 	 * 对目标字符串类对象赋值
 	 * @param s {const string*} 源字符串对象
 	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
 	 */
-	string& operator=(const string*);
+	string& operator=(const string* s);
 
 #ifdef WIN32
 	/**
@@ -207,7 +207,7 @@ public:
 	 * @param s {const string*} 源字符串对象指针
 	 * @return {string&} 目标字符串对象的引用
 	 */
-	string& operator+=(const string*);
+	string& operator+=(const string* s);
 #ifdef WIN32
 	/**
 	 * 向目标字符串对象尾部添加有符号长整型数字，当为目标字符串对象为
@@ -275,7 +275,7 @@ public:
 	 * @param n {long} 源无符号短整数
 	 * @return {string&} 目标字符串对象的引用
 	 */
-	string& operator+=(unsigned short);
+	string& operator+=(unsigned short n);
 
 	/**
 	 * 向目标字符串对象尾部添加有符号字符，当为目标字符串对象为
@@ -505,7 +505,7 @@ public:
 	 * @param s {const string&} 输入的字符串对象指针
 	 * @return {bool} 返回 true 表示字符串内容不同
 	 */
-	bool operator!=(const char*) const;
+	bool operator!=(const char* s) const;
 
 	/**
 	 * 判断当前字符串对象的内容是否小于所给的字符串对象内容（内部区分大小写）
@@ -513,7 +513,7 @@ public:
 	 * @return {bool} 返回 true 表示当前字符串对象的内容小于输入的字符串
 	 *  对象内容
 	 */
-	bool operator<(const string&) const;
+	bool operator<(const string& s) const;
 
 	/**
 	 * 判断当前字符串对象的内容是否大于所给的字符串对象内容（内部区分大小写）
@@ -521,7 +521,7 @@ public:
 	 * @return {bool} 返回 true 表示当前字符串对象的内容大于输入的字符串
 	 *  对象内容
 	 */
-	bool operator>(const string&) const;
+	bool operator>(const string& s) const;
 
 	/**
 	 * 将当前字符串对象直接转为字符串指针（即将内部缓冲区直接导出）
@@ -621,7 +621,7 @@ public:
 
 	/**
 	 * 返回从当前字符串对象中缓冲区指定位置以左的内容
-	 * @param size_t {npos} 下标位置，当该值大于等于当前字符串的数据长度时，
+	 * @param npos {size_t} 下标位置，当该值大于等于当前字符串的数据长度时，
 	 *  则返回整个字符串对象；返回值不包含该值指定位置的字符内容
 	 * @return {const string} 返回值为一完整的对象，不需要单独释放，该函数的效率
 	 *  可能并不太高
@@ -630,7 +630,7 @@ public:
 
 	/**
 	 * 返回从当前字符串对象中缓冲区指定位置以右的内容
-	 * @param size_t {npos} 下标位置，当该值大于等于当前字符串的数据长度时，
+	 * @param npos {size_t} 下标位置，当该值大于等于当前字符串的数据长度时，
 	 *  则返回的字符串对象内容为空；返回值不包含该值指定位置的字符内容
 	 * @return {const string} 返回值为一完整的对象，不需要单独释放，该函数的效率
 	 *  可能并不太高
@@ -720,7 +720,7 @@ public:
 	 * @param sep {const char*} 进行分割时的分割标记
 	 * @return {const std::vector<string>&} 返回 vector 格式的分割结果
 	 */
-	const std::vector<string>& split2(const char*);
+	const std::vector<string>& split2(const char* sep);
 
 	/**
 	 * 以 '=' 为分隔符将当前对象存储的字符串分割成 name/value 对，分割时会自动
@@ -982,14 +982,14 @@ public:
 	 * @param n {long long int} 64 位有符号整数
 	 * @return {const string&} 转换结果对象的引用
 	 */
-	static const string& parse_int64(long long int);
+	static const string& parse_int64(long long int n);
 
 	/**
 	 * 将 64 位无符号整数转为字符串存
 	 * @param n {unsigned long long int} 64 位无符号整数
 	 * @return {const string&} 转换结果对象的引用
 	 */
-	static const string& parse_int64(unsigned long long int);
+	static const string& parse_int64(unsigned long long int n);
 #endif
 
 private:

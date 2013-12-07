@@ -228,7 +228,7 @@ public:
 
 	/**
 	 * 纯虚接口，子类必须实现此接口用于打开数据库
-	 * @param local_charset {const char*} 本地字符集
+	 * @param local_charset {const char*} 本地字符集(GBK, UTF8, ...)
 	 * @return {bool} 打开是否成功
 	 */
 	virtual bool open(const char* local_charset = "GBK") = 0;

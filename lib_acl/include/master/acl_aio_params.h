@@ -109,6 +109,10 @@ extern char *acl_var_aio_log_debug;
 #define	ACL_DEF_AIO_MAX_DEBUG		1000
 extern int  acl_var_aio_max_debug;
 
+#define	ACL_VAR_AIO_STATUS_NOTIFY	"master_status_notify"
+#define	ACL_DEF_AIO_STATUS_NOTIFY	1
+extern int  acl_var_aio_status_notify;
+
 #endif /* ACL_UNIX */
 
 #ifdef	__cplusplus

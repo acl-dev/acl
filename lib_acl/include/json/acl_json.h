@@ -114,6 +114,15 @@ ACL_API void acl_json_node_append(ACL_JSON_NODE *node1, ACL_JSON_NODE *node2);
 ACL_API void acl_json_node_add_child(ACL_JSON_NODE *parent, ACL_JSON_NODE *child);
 
 /**
+ * 将一个 JSON 对象的 JSON 结点复制至 JSON 对象中的一个 JSON 结点中，并返回
+ * 目标新创建的 JSON 结点
+ * @param json {ACL_JSON*} 目标 JSON 对象
+ * @param from {ACL_JSON_NODE*} 源 JSON 对象的一个 JSON 结点
+ * @return {ACL_JSON_NODE*} 返回非空对象指针
+ */
+ACL_API ACL_JSON_NODE *acl_json_node_duplicate(ACL_JSON *json, ACL_JSON_NODE *from);
+
+/**
  * 获得某个 json 结点的父结点
  * @param node {ACL_JSON_NODE*} json 结点
  * @return {ACL_JSON_NODE*} 父结点, 如果为 NULL 则表示其父结点不存在
@@ -153,6 +162,13 @@ ACL_API ACL_JSON *acl_json_alloc(void);
  * @return {ACL_JSON*} 新创建的 json 对象
  */
 ACL_API ACL_JSON *acl_json_alloc1(ACL_SLICE_POOL *slice);
+
+/**
+ * 根据一个 JSON 对象的一个 JSON 结点创建一个新的 JSON 对象
+ * @param node {ACL_JSON_NODE*} 源 JSON 对象的一个 JSON 结点
+ * @return {ACL_JSON*} 新创建的 JSON 对象
+ */
+ACL_API ACL_JSON *acl_json_create(ACL_JSON_NODE *node);
 
 /**
  * 将某一个 ACL_JSON_NODE 结点作为一个 json 对象的根结点，
@@ -283,6 +299,18 @@ ACL_API ACL_JSON_NODE *acl_json_create_node(ACL_JSON *json,
  */
 ACL_API void acl_json_node_append_child(ACL_JSON_NODE *parent,
 	ACL_JSON_NODE *child);
+
+/**
+ * 将 json 对象的一个 JSON 结点转成字符串内容
+ * @param node {ACL_JSON_NODE*} json 结点对象
+ * @param buf {ACL_VSTRING*} 存储结果集的缓冲区，当该参数为空时则函数内部会
+ *  自动分配一段缓冲区，应用用完后需要释放掉；非空函数内部会直接将结果存储其中
+ * @return {ACL_VSTRING*} json 结点对象转换成字符串后的存储缓冲区，
+ *  该返回值永远非空，使用者可以通过 ACL_VSTRING_LEN(x) 宏来判断内容是否为空，
+ *  返回的 ACL_VSTRING 指针如果为该函数内部创建的，则用户名必须用
+ *  acl_vstring_free 进行释放
+ */
+ACL_API ACL_VSTRING *acl_json_node_build(ACL_JSON_NODE *json, ACL_VSTRING *buf);
 
 /**
  * 将 json 对象转成字符串内容

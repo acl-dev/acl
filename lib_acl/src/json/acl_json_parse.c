@@ -326,7 +326,18 @@ static const char *json_val(ACL_JSON *json, const char *data)
 		/* 如果开始有引号，则需要以该引号作为结尾符 */
 		if (json->curr_node->quote) {
 			if (json->curr_node->backslash) {
-				ADDCH(json->curr_node->text, ch);
+				if (ch == 'b')
+					ADDCH(json->curr_node->text, '\b');
+				else if (ch == 'f')
+					ADDCH(json->curr_node->text, '\f');
+				else if (ch == 'n')
+					ADDCH(json->curr_node->text, '\n');
+				else if (ch == 'r')
+					ADDCH(json->curr_node->text, '\r');
+				else if (ch == 't')
+					ADDCH(json->curr_node->text, '\t');
+				else
+					ADDCH(json->curr_node->text, ch);
 				json->curr_node->backslash = 0;
 			}
 

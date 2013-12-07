@@ -71,12 +71,12 @@ ACL_API int acl_socket_close(ACL_SOCKET fd);
  * @param buf {void*} 内存缓冲区地址
  * @param size {size_t} buf 缓冲区大小
  * @param timeout {size_t} 读超时时间(秒)
- * @param stream {ACL_VSTREAM*} 网络流, 可以为空
+ * @param fp {ACL_VSTREAM*} 网络流, 可以为空
  * @param arg {void*} 用户自已的参数，在回调方式时有用
  * @return {int} 0: OK; -1: error
  */
 ACL_API int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
-	int timeout, ACL_VSTREAM *stream, void *arg);
+	int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
  * 向套接字写数据
@@ -84,12 +84,12 @@ ACL_API int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
  * @param buf {void*} 数据地址
  * @param size {size_t} buf 数据大小
  * @param timeout {int} 写超时时间(秒)
- * @param stream {ACL_VSTREAM*} 网络流, 可以为空
+ * @param fp {ACL_VSTREAM*} 网络流, 可以为空
  * @param arg {void*} 用户自已的参数，在回调方式时有用
  * @return {int} 0: OK; -1: error
  */
 ACL_API int acl_socket_write(ACL_SOCKET fd, const void *buf,
-	size_t size, int timeout, ACL_VSTREAM *stream, void *arg);
+	size_t size, int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
  * 向套接字写数据
@@ -97,12 +97,12 @@ ACL_API int acl_socket_write(ACL_SOCKET fd, const void *buf,
  * @param vec {const struct iovec*} 数据数组地址
  * @param count {int} vec 数组长度
  * @param timeout {int} 写超时时间(秒)
- * @param stream {ACL_VSTREAM*} 网络流, 可以为空
+ * @param fp {ACL_VSTREAM*} 网络流, 可以为空
  * @param arg {void*} 用户自已的参数，在回调方式时有用
  * @return {int} 0: OK; -1: error
  */
 ACL_API int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec,
-	int count, int timeout, ACL_VSTREAM *stream, void *arg);
+	int count, int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
  * 打开文件句柄
@@ -136,12 +136,12 @@ ACL_API acl_off_t acl_lseek(ACL_FILE_HANDLE fh, acl_off_t offset, int whence);
  * @param buf {void*} 存储缓冲区
  * @param size {size_t} buf 缓冲区大小
  * @param timeout {int} 读超时时间(秒)
- * @param stream {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
+ * @param fp {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
  * @param arg {void*} 用户传递的参数, 以回调方式使用时此参数有效
  * @return {int} 读到的实际数据, 如果返回 ACL_VSTREAM_EOF 表示读结束或出错
  */
 ACL_API int acl_file_read(ACL_FILE_HANDLE fh, void *buf, size_t size,
-	int timeout, ACL_VSTREAM *stream, void *arg);
+	int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
  * 向文件中写数据
@@ -149,12 +149,12 @@ ACL_API int acl_file_read(ACL_FILE_HANDLE fh, void *buf, size_t size,
  * @param buf {void*} 数据存储缓冲区
  * @param size {size_t} buf 缓冲区中数据长度大小
  * @param timeout {int} 写超时时间(秒)
- * @param stream {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
+ * @param fp {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
  * @param arg {void*} 用户传递的参数, 以回调方式使用时此参数有效
  * @return {int} 成功写的数据量, 如果返回 ACL_VSTREAM_EOF 表示写出错
  */
 ACL_API int acl_file_write(ACL_FILE_HANDLE fh, const void *buf, size_t size,
-	int timeout, ACL_VSTREAM *stream, void *arg);
+	int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
  * 向文件中写一组数据
@@ -162,21 +162,21 @@ ACL_API int acl_file_write(ACL_FILE_HANDLE fh, const void *buf, size_t size,
  * @param vec {const struct iovec*} 数据存储数组
  * @param count {int} vec 数组中元素个数
  * @param timeout {int} 写超时时间(秒)
- * @param stream {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
+ * @param fp {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
  * @param arg {void*} 用户传递的参数, 以回调方式使用时此参数有效
  * @return {int} 成功写的数据量, 如果返回 ACL_VSTREAM_EOF 表示写出错
  */
 ACL_API int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vec,
-	int count, int timeout, ACL_VSTREAM *stream, void *arg);
+	int count, int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
  * 将文件缓冲区中的数据全部写入硬盘
  * @param fh {ACL_FILE_HANDLE} 文件句柄
- * @param stream {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
+ * @param fp {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
  * @param arg {void*} 用户传递的参数, 以回调方式使用时此参数有效
  * @return {int} 0: ok; -1: error
  */
-ACL_API int acl_file_fflush(ACL_FILE_HANDLE fh, ACL_VSTREAM *stream, void *arg);
+ACL_API int acl_file_fflush(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp, void *arg);
 
 /**
  * 根据文件名取得该文件的大小
@@ -188,11 +188,11 @@ ACL_API acl_int64 acl_file_size(const char *filename);
 /**
  * 根据文件句柄取得该文件的大小
  * @param fh {ACL_FILE_HANDLE} 文件句柄
- * @param stream {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
+ * @param fp {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
  * @param arg {void*} 用户传递的参数, 以回调方式使用时此参数有效
  * @return {acl_int64} >= 0: ok;  -1: error
  */
-ACL_API acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *stream, void *arg);
+ACL_API acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp, void *arg);
 
 # ifdef	__cplusplus
 }

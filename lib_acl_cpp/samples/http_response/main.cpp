@@ -34,7 +34,8 @@ protected:
 		if (res.read_header() == false)
 		{
 			const char* ptr = "read request header error";
-			res.response(ptr, strlen(ptr), 400, false);
+			res.response_header().set_status(400).set_keep_alive(false);
+			res.response(ptr, strlen(ptr));
 			return;
 		}
 
@@ -46,7 +47,8 @@ protected:
 		if (p == NULL || *p == 0)
 		{
 			const char* ptr = "no Content-Type";
-			res.response(ptr, strlen(ptr), 400, false);
+			res.response_header().set_status(400).set_keep_alive(false);
+			res.response(ptr, strlen(ptr));
 			return;
 		}
 

@@ -5,15 +5,42 @@
 namespace acl
 {
 
-bool http_utils::get_addr(const char* url, char* out, size_t size)
+bool http_utils::get_addr(const char* url, char* addr, size_t size)
 {
-	if (strncasecmp(url, "http://", sizeof("http://") - 1) != 0)
+	char  buf[256];
+	unsigned short port;
+
+	if (get_addr(url, buf, sizeof(buf), &port) == false)
+		return false;
+	snprintf(addr, size, "%s:%d", buf, port);
+	return true;
+}
+
+bool http_utils::get_addr(const char* url, char* domain, size_t size,
+	unsigned short* pport)
+{
+#define	HTTP_PREFIX	"http://"
+#define	HTTPS_PREFIX	"https://"
+
+	const char* ptr;
+	unsigned short default_port;
+
+	if (strncasecmp(url, HTTP_PREFIX, sizeof(HTTP_PREFIX) - 1) == 0)
+	{
+		ptr = url + sizeof(HTTP_PREFIX) - 1;
+		default_port = 80;
+	}
+	else if (strncasecmp(url, HTTPS_PREFIX, sizeof(HTTPS_PREFIX) - 1) == 0)
+	{
+		ptr = url + sizeof(HTTPS_PREFIX) - 1;
+		default_port = 443;
+	}
+	else
 	{
 		logger_error("invalid url: %s", url);
 		return false;
 	}
 
-	const char* ptr = url + sizeof("http://") - 1;
 	if (*ptr == 0)
 	{
 		logger_error("invalid url: %s", url);
@@ -26,19 +53,23 @@ bool http_utils::get_addr(const char* url, char* out, size_t size)
 	char* slash = strchr(buf, '/');
 	if (slash)
 		*slash = 0;
+
 	unsigned short port;
+
 	char* col = strchr(buf, ':');
 	if (col == NULL)
-		port = 80;
+		port = default_port;
 	else
 	{
 		*col++ = 0;
 		port = (unsigned short) atoi(col);
-		if (port < 80)
-			port = 80;
+		if (port == 0 || port == 65535)
+			port = default_port;
 	}
 
-	snprintf(out, size, "%s:%d", buf, port);
+	if (pport)
+		*pport = port;
+	ACL_SAFE_STRNCPY(domain, buf, size);
 	return true;
 }
 

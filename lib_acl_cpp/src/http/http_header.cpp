@@ -1,6 +1,8 @@
 #include "acl_stdafx.hpp"
 #include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/stdlib/url_coder.hpp"
 #include "acl_cpp/http/HttpCookie.hpp"
 #include "acl_cpp/http/http_header.hpp"
 
@@ -38,6 +40,7 @@ void http_header::init()
 	url_ = NULL;
 	method_ = HTTP_METHOD_GET;
 	CP(method_s_, "GET");
+	host_[0]  = 0;
 	keep_alive_ = false;
 	nredirect_ = 0; // 默认条件下不主动进行重定向
 	accept_compress_ = true;
@@ -52,7 +55,10 @@ void http_header::init()
 void http_header::clear()
 {
 	if (url_)
+	{
 		acl_myfree(url_);
+		url_ = NULL;
+	}
 
 	std::list<HttpCookie*>::iterator cookies_it = cookies_.begin();
 	for (; cookies_it != cookies_.end(); ++cookies_it)
@@ -72,7 +78,9 @@ void http_header::clear()
 	for (; params_it != params_.end(); ++params_it)
 	{
 		acl_myfree((*params_it)->name);
-		acl_myfree((*params_it)->value);
+		// 在调用 add_param 时允许 value 为空指针
+		if ((*params_it)->value)
+			acl_myfree((*params_it)->value);
 		acl_myfree(*params_it);
 	}
 	params_.clear();
@@ -170,8 +178,18 @@ http_header& http_header::add_cookie(HttpCookie* cookie)
 
 void http_header::date_format(char* out, size_t size, time_t t)
 {
+#ifdef WIN32
 	struct tm *gmt = gmtime(&t);
-	strftime(out, size - 1, RFC1123_STRFTIME, gmt);
+#else
+	struct tm gmt_buf, *gmt = gmtime_r(&t, &gmt_buf);
+#endif
+	if (gmt != NULL)
+		strftime(out, size - 1, RFC1123_STRFTIME, gmt);
+	else
+	{
+		logger_error("gmtime error %s", last_serror());
+		out[0] = 0;
+	}
 }
 
 bool http_header::is_request() const
@@ -215,16 +233,79 @@ void http_header::build_common(string& buf) const
 http_header& http_header::set_url(const char* url)
 {
 	acl_assert(url && *url);
+	is_request_ = true;
+
 	if (url_)
 		acl_myfree(url_);
-	url_ = acl_mystrdup(url);
-	is_request_ = true;
+
+	size_t len = strlen(url);
+
+	// 多分配两个字节：'\0' 及可能添加的 '/'
+	url_ = (char*) acl_mymalloc(len + 2);
+	memcpy(url_, url, len);
+	url_[len] = 0;
+
+	char* ptr;
+	if (strncasecmp(url_, "http://", sizeof("http://") - 1) == 0)
+		ptr = url_ + sizeof("http://") - 1;
+	else if (strncasecmp(url_, "https://", sizeof("https://") - 1) == 0)
+		ptr = url_+ sizeof("https://") -1;
+	else
+		ptr = url_;
+
+	char* params, *slash;
+
+	// 开始提取 host 字段
+
+	// 当 url 中只有相对路径时
+	if (ptr == url_)
+		params = strchr(ptr, '?');
+
+	// 当 url 为绝对路径时
+	else if ((slash = strchr(ptr, '/')) != NULL && slash > ptr)
+	{
+		size_t n = slash - ptr + 1;
+		if (n > sizeof(host_))
+			n = sizeof(host_);
+
+		// 添加主机地址
+		ACL_SAFE_STRNCPY(host_, ptr, n);
+		params = strchr(slash, '?');
+	}
+
+	// 当 url 为绝对路径且主机地址后没有 '/'
+	else
+	{
+		// 这是安全的，因为在前面给 url_ 分配内存时多了一个字节
+		if (slash == NULL)
+		{
+			url_[len] = '/';
+			url_[len + 1] = 0;
+		}
+		params = strchr(ptr, '?');
+	}
+
+	if (params == NULL)
+		return *this;
+
+	*params++ = 0;
+	if (*params == 0)
+		return *this;
+
+	url_coder coder;
+	coder.decode(params);
+	const std::vector<URL_NV*>& tokens = coder.get_params();
+	std::vector<URL_NV*>::const_iterator cit = tokens.begin();
+	for (; cit != tokens.end(); ++cit)
+		add_param((*cit)->name, (*cit)->value);
+
 	return *this;
 }
 
 http_header& http_header::set_host(const char* value)
 {
-	add_entry("Host", value);
+	if (value && *value)
+		CP(host_, value);
 	return *this;
 }
 
@@ -299,7 +380,7 @@ http_header& http_header::accept_gzip(bool on)
 
 http_header& http_header::add_param(const char* name, const char* value)
 {
-	if (name == NULL || *name == 0 || value == NULL || *value == 0)
+	if (name == NULL || *name == 0)
 		return *this;
 
 	std::list<HTTP_PARAM*>::iterator it = params_.begin();
@@ -307,17 +388,98 @@ http_header& http_header::add_param(const char* name, const char* value)
 	{
 		if (strcasecmp((*it)->name, name) == 0)
 		{
-			acl_myfree((*it)->value);
-			(*it)->value = acl_mystrdup(value);
+			if ((*it)->value)
+				acl_myfree((*it)->value);
+			if (value)
+				(*it)->value = acl_mystrdup(value);
+			else
+				(*it)->value = NULL;
 			return *this;
 		}
 	}
 
 	HTTP_PARAM* param = (HTTP_PARAM*) acl_mycalloc(1, sizeof(HTTP_PARAM));
 	param->name = acl_mystrdup(name);
-	param->value = acl_mystrdup(value);
+	if (value)
+		param->value = acl_mystrdup(value);
+	else
+		param->value = NULL;
 	params_.push_back(param);
 	return *this;
+}
+
+http_header& http_header::add_int(const char* name, short value)
+{
+	char buf[32];
+	snprintf(buf, sizeof(buf), "%d", value);
+	return add_param(name, buf);
+}
+
+http_header& http_header::add_int(const char* name, unsigned short value)
+{
+	char buf[32];
+	snprintf(buf, sizeof(buf), "%u", value);
+	return add_param(name, buf);
+}
+
+http_header& http_header::add_int(const char* name, int value)
+{
+	char buf[32];
+	snprintf(buf, sizeof(buf), "%d", value);
+	return add_param(name, buf);
+}
+
+http_header& http_header::add_int(const char* name, unsigned int value)
+{
+	char buf[32];
+	snprintf(buf, sizeof(buf), "%u", value);
+	return add_param(name, buf);
+}
+
+http_header& http_header::add_int(const char* name, long value)
+{
+	char buf[32];
+	snprintf(buf, sizeof(buf), "%ld", value);
+	return add_param(name, buf);
+}
+
+http_header& http_header::add_int(const char* name, unsigned long value)
+{
+	char buf[32];
+	snprintf(buf, sizeof(buf), "%lu", value);
+	return add_param(name, buf);
+}
+
+http_header& http_header::add_int(const char* name, acl_int64 value)
+{
+	char buf[32];
+#ifdef WIN32
+	snprintf(buf, sizeof(buf), "%I64d", value);
+#else
+	snprintf(buf, sizeof(buf), "%lld", value);
+#endif
+	return add_param(name, buf);
+}
+
+http_header& http_header::add_int(const char* name, acl_uint64 value)
+{
+	char buf[32];
+#ifdef WIN32
+	snprintf(buf, sizeof(buf), "%I64u", value);
+#else
+	snprintf(buf, sizeof(buf), "%llu", value);
+#endif
+	return add_param(name, buf);
+}
+
+http_header& http_header::add_format(const char* name, const char* fmt, ...)
+{
+	string buf(128);
+	va_list ap;
+	va_start(ap, fmt);
+	buf.vformat(fmt, ap);
+	va_end(ap);
+	return add_param(name, buf.c_str());
 }
 
 bool http_header::build_request(string& buf) const
@@ -334,42 +496,53 @@ bool http_header::build_request(string& buf) const
 	{
 		buf << '?';
 		acl::string tmp;
-		int  i = 0;
+		int i = 0;
 		std::list<HTTP_PARAM*>::const_iterator it = params_.begin();
 		for (; it != params_.end(); ++it)
 		{
-			if (!(*it)->name || !(*it)->value)
-				continue;
-
 			if (i > 0)
-				buf << '&';
+				buf += '&';
+			else
+				i++;
 
 			// 需要对参数进行 URL 编码
 
 			tmp.url_encode((*it)->name);
-			buf << tmp.c_str() << '=';
+			buf += tmp.c_str();
+
+			// 允许参数值为空指针
+			if ((*it)->value == NULL)
+				continue;
+
+			buf += '=';
+
+			// 允许参数值为空串
+			if (*((*it)->value) == 0)
+				continue;
+
 			tmp.url_encode((*it)->value);
-			buf << tmp.c_str();
-			i++;
+			buf += tmp.c_str();
 		}
 	}
-	buf << " HTTP/1.1\r\n";
+	buf += " HTTP/1.1\r\n";
 	if (accept_compress_)
 		// 因为目前的 zlib_stream 仅支持于此
-		buf << "Accept-Encoding: gzip\r\n";
+		buf += "Accept-Encoding: gzip\r\n";
 
+	if (host_[0] != 0)
+		buf.format_append("Host: %s\r\n", host_);
 
 	if (!cookies_.empty())
 	{
-		buf << "Cookie: ";
+		buf += "Cookie: ";
 		std::list<HttpCookie*>::const_iterator it = cookies_.begin();
 		for (; it != cookies_.end(); ++it)
 		{
 			if (it != cookies_.begin())
-				buf << "; ";
+				buf += "; ";
 			buf << (*it)->getName() << "=" << (*it)->getValue();
 		}
-		buf << "\r\n";
+		buf += "\r\n";
 	}
 
 	// 添加分段请求字段
@@ -378,11 +551,11 @@ bool http_header::build_request(string& buf) const
 		buf << "Range: bytes=" << range_from_ << '-';
 		if (range_to_ >= range_from_)
 			buf << range_to_;
-		buf << "\r\n";
+		buf += "\r\n";
 	}
 
 	build_common(buf);
-	buf << "\r\n";
+	buf += "\r\n";
 
 	return (true);
 }

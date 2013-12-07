@@ -23,11 +23,12 @@ public:
 	http_response(socket_stream* client);
 	virtual ~http_response(void);
 
-	//////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
 	// 与读取请求数据相关的方法
 
 	/**
-	 * 读取 HTTP 请求客户端的 HTTP 请求头，在调用本方法后才可以调用 get_body
+	 * 读取 HTTP 请求客户端的 HTTP 请求头，在调用本方法后才可以调用
+	 * get_body/read_body 读取 HTTP 请求体数据
 	 * @return {bool} 是否成功
 	 */
 	bool read_header();
@@ -77,12 +78,12 @@ public:
 	 *  关闭连接，> 0 表示已经读到的数据，用户应该一直读数据直到
 	 *  返回值 <= 0 为止
 	 *  注：该函数读到的是原始 HTTP 数据体数据，不做解压和字符集
-	 *      解码，用户自己根据需要进行处理
-	 *      必须首先调用 read_header 后才能调用本函数
+	 *     解码，用户自己根据需要进行处理；必须首先调用 read_header
+	 *     后才能调用本函数
 	 */
-	int get_body(char* buf, size_t size);
+	int read_body(char* buf, size_t size);
 
-	//////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
 	// 与数据响应相关的方法函数
 
 	/**
@@ -94,16 +95,22 @@ public:
 	http_header& response_header(void);
 
 	/**
-	 * 向 HTTP 客户端发送响应数据，在调用本函数前，必须先调用
-	 * get_body 获得 HTTP 客户端的请求数据
-	 * @param body {const char*} 数据体地址
-	 * @param len {size_t} body 非空时表明 body 数据长度
-	 * @param status {int} HTTP 响应码：1xx, 2xx, 3xx, 4xx, 5xx
-	 * @param keep_alive {bool} 是否与客户端保持长连接
-	 * @return {bool} 发送是否成功
+	 * 向客户端发送 HTTP 响应数据，可以循环调用此函数；
+	 * <b>在调用本函数前，必须提前保证以下操作：</b>
+	 * 1）必须先调用 read_header && get_body 获得 HTTP 客户端的请求数据；
+	 * 2）必须通过 response_header 取得 http_header 对象，同时设置响应头部
+	 *    字段（如：set_status, set_keep_alive 等）
+	 * <b>在调用本函数时，以下操作将会发生：</b>
+	 * 1）内部会自动在第一次写时发送 HTTP 响应头；
+	 * 2）当通过 http_header::set_chunked 设置了 chunked 传输方式后，
+	 * 内部自动采用 chunked 传输方式；
+	 * 3）在使用 chunked 方式传输数据时，应该最后再调用一次本函数，
+	 * 且参数均设为 0 表示数据结束
+	 * @param data {const void*} 数据地址
+	 * @param len {size_t} data 数据长度
+	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
 	 */
-	bool response(const char* body, size_t len,
-		int status = 200, bool keep_alive = true);
+	bool response(const void* data, size_t len);
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -124,6 +131,7 @@ private:
 	bool header_ok_;
 	http_client* client_;
 	http_header  header_;
+	bool head_sent_;
 	http_pipe* get_pipe(const char* to_charset);
 };
 

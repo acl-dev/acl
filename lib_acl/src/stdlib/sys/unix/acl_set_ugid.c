@@ -59,10 +59,10 @@ int acl_change_uid(char *user_name)
 	gid = pwd->pw_gid;
 	if (setgid(gid) < 0)
 		acl_msg_fatal("%s: setgid error(%s, %d): %s",
-			where, user_name, uid, acl_last_strerror(tbuf, sizeof(tbuf)));
+			where, user_name, (int) uid, acl_last_strerror(tbuf, sizeof(tbuf)));
 	if (setuid(uid) < 0)
 		acl_msg_fatal("%s: setuid error(%s, %d): %s",
-			where, user_name, uid, acl_last_strerror(tbuf, sizeof(tbuf)));
+			where, user_name, (int) uid, acl_last_strerror(tbuf, sizeof(tbuf)));
 
 	return (0);
 }

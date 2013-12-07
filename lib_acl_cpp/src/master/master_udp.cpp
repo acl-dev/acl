@@ -89,6 +89,8 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 	acl_init();
 #endif
 	ACL_EVENT* eventp = acl_event_new_select(1, 0);
+	set_event(eventp);  // 设置基类的事件句柄
+
 	ACL_ARGV* tokens = acl_argv_split(addrs, ";,| \t");
 	ACL_ITER iter;
 
@@ -170,6 +172,12 @@ void master_udp::service_main(ACL_VSTREAM *stream, char*, char**)
 void master_udp::service_pre_jail(char*, char**)
 {
 	acl_assert(__mu != NULL);
+
+#ifndef WIN32
+	ACL_EVENT* eventp = acl_udp_server_event();
+	__mu->set_event(eventp);
+#endif
+
 	__mu->proc_pre_jail();
 }
 

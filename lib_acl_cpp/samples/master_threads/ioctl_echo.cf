@@ -109,6 +109,6 @@ service server {
 #	是否输出当前内存的状态信息
 	debug_mem = 1
 #	是否在一个线程中连接读
-	loop_read = 1
+	loop_read = 0
 }
 

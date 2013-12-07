@@ -69,7 +69,7 @@ service $<PROGRAM> {
 	ioctl_max_accept = 25
 #	在并发访问量非常低的情况下，如访问量在 10 次/秒 以下时，可以找开此值(即赋为1)，以加速事件循环过程,
 #	从而防止服务进程阻塞在 select 上的时间过长而影响访问速度
-#	ioctl_enable_dog = 0
+#	ioctl_enable_dog = 1
 #	进程运行时的用户身份
 	ioctl_owner = root
 

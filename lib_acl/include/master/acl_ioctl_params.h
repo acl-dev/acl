@@ -105,6 +105,10 @@ extern char *acl_var_ioctl_log_debug;
 #define	ACL_DEF_IOCTL_MAX_DEBUG		1000
 extern int   acl_var_ioctl_max_debug;
 
+#define	ACL_VAR_IOCTL_STATUS_NOTIFY	"master_status_notify"
+#define	ACL_DEF_IOCTL_STATUS_NOTIFY	1
+extern int   acl_var_ioctl_status_notify;
+
 #endif /* ACL_UNIX */
 
 #ifdef	__cplusplus

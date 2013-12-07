@@ -120,14 +120,14 @@ static void vstream_parse_args(ACL_VSTREAM_POPEN_ARGS *args, va_list ap)
 
 #ifdef	ACL_UNIX
 
-/* acl_vstream_popen - open stream to child process */
+/* acl_vstream_popen - open fp to child process */
 
 ACL_VSTREAM *acl_vstream_popen(int flags,...)
 {
 	const char *myname = "acl_vstream_popen";
 	ACL_VSTREAM_POPEN_ARGS args;
 	va_list ap;
-	ACL_VSTREAM *stream;
+	ACL_VSTREAM *fp;
 	int     sockfd[2];
 	int     pid;
 	int     fd;
@@ -142,13 +142,13 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 		args.command = args.argv[0];
 
 	if (acl_duplex_pipe(sockfd) < 0)
-		return (0);
+		return 0;
 
 	switch (pid = fork()) {
 	case -1:				/* error */
 		(void) close(sockfd[0]);
 		(void) close(sockfd[1]);
-		return (0);
+		return 0;
 	case 0:					/* child */
 		if (close(sockfd[1]))
 			acl_msg_warn("close: %s", acl_last_serror());
@@ -199,23 +199,23 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 	default:					/* parent */
 		if (close(sockfd[0]))
 			acl_msg_warn("close: %s", acl_last_serror());
-		stream = acl_vstream_fdopen(sockfd[1], flags,
+		fp = acl_vstream_fdopen(sockfd[1], flags,
 				4096, 0, ACL_VSTREAM_TYPE_FILE);
 		/*
-		 * stream->waitpid_fn = args.waitpid_fn;
+		 * fp->waitpid_fn = args.waitpid_fn;
 		 */
-		stream->pid = pid;
-		return (stream);
+		fp->pid = pid;
+		return fp;
 	}
 }
 
-/* acl_vstream_pclose - close stream to child process */
+/* acl_vstream_pclose - close fp to child process */
 
-int acl_vstream_pclose(ACL_VSTREAM *stream)
+int acl_vstream_pclose(ACL_VSTREAM *fp)
 {
-	pid_t   saved_pid = stream->pid;
+	pid_t   saved_pid = fp->pid;
 	/*
-	 * ACL_VSTREAM_WAITPID_FN saved_waitpid_fn = stream->waitpid_fn;
+	 * ACL_VSTREAM_WAITPID_FN saved_waitpid_fn = fp->waitpid_fn;
 	 */
 	ACL_VSTREAM_WAITPID_FN saved_waitpid_fn = 0;
 	pid_t   pid;
@@ -225,9 +225,9 @@ int acl_vstream_pclose(ACL_VSTREAM *stream)
 	 * Close the pipe. Don't trigger an alarm in vstream_fclose().
 	 */
 	if (saved_pid == 0)
-		acl_msg_panic("vstream_pclose: stream has no process");
-	stream->pid = 0;
-	acl_vstream_fclose(stream);
+		acl_msg_panic("vstream_pclose: fp has no process");
+	fp->pid = 0;
+	acl_vstream_fclose(fp);
 
 	/*
 	 * Reap the child exit status.
@@ -238,9 +238,9 @@ int acl_vstream_pclose(ACL_VSTREAM *stream)
 		else
 			pid = waitpid(saved_pid, &wait_status, 0);
 	} while (pid == -1 && errno == EINTR);
-	return (pid == -1 ? -1 :
+	return pid == -1 ? -1 :
 		WIFSIGNALED(wait_status) ? WTERMSIG(wait_status) :
-		WEXITSTATUS(wait_status));
+		WEXITSTATUS(wait_status);
 }
 
 #elif defined(ACL_MS_WINDOWS)
@@ -249,14 +249,14 @@ int acl_vstream_pclose(ACL_VSTREAM *stream)
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_sys_patch.h"
 
-/* acl_vstream_popen - open stream to child process */
+/* acl_vstream_popen - open fp to child process */
 
 ACL_VSTREAM *acl_vstream_popen(int flags,...)
 {
 	const char *myname = "acl_vstream_popen";
 	ACL_VSTREAM_POPEN_ARGS args;
 	va_list ap;
-	ACL_VSTREAM *stream;
+	ACL_VSTREAM *fp;
 	ACL_FILE_HANDLE  fds[2];
 	HANDLE prochnd, hInOut;
 	STARTUPINFOA sinfo;
@@ -291,7 +291,7 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 
 	if (acl_duplex_pipe(fds) < 0) {
 		acl_vstring_free(cmdline);
-		return (NULL);
+		return NULL;
 	}
 
 	prochnd = GetCurrentProcess();
@@ -302,7 +302,7 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 			myname, __LINE__, acl_last_serror());
 		acl_file_close(fds);
 		acl_vstring_free(cmdline);
-		return (NULL);
+		return NULL;
 	}
 
 	if (args.env) {
@@ -330,12 +330,12 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 	sinfo.hStdError = GetStdHandle(STD_ERROR_HANDLE);
 
 	if (!CreateProcessA(args.command, acl_vstring_str(cmdline), /* Command line */
-			NULL, NULL,  /* Proc & thread security attributes */
-			TRUE,  /* Inherit handles */
-			dwCreationFlags,  /* Creation flags */
-			envbuf ? acl_vstring_str(envbuf) : NULL,  /* Environment block */
-			NULL,  /* Current directory name */
-			&sinfo, &pinfo))
+		NULL, NULL,  /* Proc & thread security attributes */
+		TRUE,  /* Inherit handles */
+		dwCreationFlags,  /* Creation flags */
+		envbuf ? acl_vstring_str(envbuf) : NULL,  /* Environment block */
+		NULL,  /* Current directory name */
+		&sinfo, &pinfo))
 	{
 		acl_msg_error("%s: CreateProcess(%s) error(%s)",
 			myname, args.command, acl_last_serror());
@@ -344,35 +344,35 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 		if (envbuf)
 			acl_vstring_free(envbuf);
 		acl_vstring_free(cmdline);
-		return (NULL);
+		return NULL;
 	}
 
 	acl_file_close(fds[1]);
 	acl_file_close(hInOut);
 	CloseHandle(pinfo.hThread);
-	stream = acl_vstream_fhopen(fds[0], flags);
-	stream->pid = pinfo.dwProcessId;
-	stream->hproc = pinfo.hProcess;
+	fp = acl_vstream_fhopen(fds[0], flags);
+	fp->pid = pinfo.dwProcessId;
+	fp->hproc = pinfo.hProcess;
 
 	if (envbuf)
 		acl_vstring_free(envbuf);
 	acl_vstring_free(cmdline);
-	return (stream);
+	return fp;
 }
 
 /* wail_child -- wait the child exit status */
 
-static void wait_child(ACL_VSTREAM *stream)
+static void wait_child(ACL_VSTREAM *fp)
 {
 	const char *myname = "wait_child";
 	DWORD   wait_status, ntime = INFINITE;
 
-	if (stream->hproc == INVALID_HANDLE_VALUE)
+	if (fp->hproc == INVALID_HANDLE_VALUE)
 		return;
 
-	wait_status = WaitForSingleObject(stream->hproc, ntime);
+	wait_status = WaitForSingleObject(fp->hproc, ntime);
 	if (wait_status == WAIT_OBJECT_0) {
-		if (GetExitCodeProcess(stream->hproc, &wait_status)) {
+		if (GetExitCodeProcess(fp->hproc, &wait_status)) {
 			if (wait_status != 0)
 				acl_msg_warn("%s(%d): child exit code(%d)",
 					myname, __LINE__, wait_status);
@@ -384,22 +384,22 @@ static void wait_child(ACL_VSTREAM *stream)
 			myname, __LINE__, acl_last_serror());
 	}
 
-	CloseHandle(stream->hproc);
-	stream->hproc = INVALID_HANDLE_VALUE;
+	CloseHandle(fp->hproc);
+	fp->hproc = INVALID_HANDLE_VALUE;
 }
 
-/* acl_vstream_pclose - close stream to child process */
+/* acl_vstream_pclose - close fp to child process */
 
-int acl_vstream_pclose(ACL_VSTREAM *stream)
+int acl_vstream_pclose(ACL_VSTREAM *fp)
 {
 	const char *myname = "acl_vstream_pclose";
 
 	/*
 	 * Reap the monitor_child_thread exit status.
 	 */
-	wait_child(stream);
-	acl_vstream_fclose(stream);
-	return (-1);
+	wait_child(fp);
+	acl_vstream_fclose(fp);
+	return -1;
 }
 
 #endif /* ACL_MS_WINDOWS */

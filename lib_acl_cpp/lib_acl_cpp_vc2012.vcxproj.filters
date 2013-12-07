@@ -325,6 +325,9 @@
     <ClCompile Include="src\db\sqlite_pool.cpp">
       <Filter>src\db</Filter>
     </ClCompile>
+    <ClCompile Include="src\event\event_timer.cpp">
+      <Filter>src\event</Filter>
+    </ClCompile>
     <ClCompile Include="src\connpool\connect_manager.cpp">
       <Filter>src\connpool</Filter>
     </ClCompile>
@@ -354,6 +357,15 @@
     </ClCompile>
     <ClCompile Include="src\stdlib\thread_pool.cpp">
       <Filter>src\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_delay_free.cpp">
+      <Filter>src\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_timer_delay_free.cpp">
+      <Filter>src\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_timer_callback.cpp">
+      <Filter>src\stream</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -702,6 +714,9 @@
     <ClInclude Include="include\acl_cpp\db\sqlite_pool.hpp">
       <Filter>include\db</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\event\event_timer.hpp">
+      <Filter>include\event</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\connpool\connect_client.hpp">
       <Filter>include\connpool</Filter>
     </ClInclude>
@@ -734,6 +749,15 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\thread_pool.hpp">
       <Filter>include\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_delay_free.hpp">
+      <Filter>include\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stream\aio_timer_delay_free.hpp">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_timer_callback.hpp">
+      <Filter>include\stream</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

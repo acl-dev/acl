@@ -34,7 +34,8 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static __thread acl::socket_stream* __stream = NULL;
+static acl_pthread_key_t  stream_key;
+static acl_pthread_once_t stream_once = ACL_PTHREAD_ONCE_INIT;
 
 class echo_thread : public acl::thread
 {
@@ -55,8 +56,11 @@ protected:
 	virtual void* run()
 	{
 		// 回写需要先设置远程连接地址
-		__stream->set_peer(peer_addr_);
-		__stream->write(buf_, len_);
+		acl::socket_stream* conn = (acl::socket_stream*)
+			acl_pthread_getspecific(stream_key);
+		acl_assert(conn);
+		conn->set_peer(peer_addr_);
+		conn->write(buf_, len_);
 
 		// 因为该对象是动态分配的，所以需要释放掉
 		delete this;
@@ -69,6 +73,17 @@ private:
 	int   len_;
 };
 
+static void close_stream(void* arg)
+{
+	acl::socket_stream* conn = (acl::socket_stream*) arg;
+	delete conn;
+}
+
+static void thread_init_once()
+{
+	acl_pthread_key_create(&stream_key, close_stream);
+}
+
 class mythread_pool : public acl::thread_pool
 {
 public:
@@ -78,26 +93,27 @@ public:
 protected:
 	virtual bool thread_on_init()
 	{
-		__stream = new acl::socket_stream;
-		if (__stream->bind_udp(var_cfg_local_addr) == false)
+		acl_pthread_once(&stream_once, thread_init_once);
+		acl::socket_stream* conn = (acl::socket_stream*)
+			acl_pthread_getspecific(stream_key);
+		if (conn != NULL)
+			return true;
+
+		conn = new acl::socket_stream;
+		if (conn->bind_udp(var_cfg_local_addr) == false)
 		{
-			logger_error("bind %s error %s",
-				var_cfg_local_addr, acl::last_serror());
-			delete __stream;
-			__stream = NULL;
+			logger_error("bind %s error %s", var_cfg_local_addr,
+				acl::last_serror());
+			delete conn;
 			return false;
 		}
 
+		acl_pthread_setspecific(stream_key, conn);
 		return true;
 	}
 
 	virtual void thread_on_exit()
 	{
-		if (__stream)
-		{
-			delete __stream;
-			__stream = NULL;
-		}
 	}
 };
 

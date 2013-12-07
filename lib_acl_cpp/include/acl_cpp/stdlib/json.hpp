@@ -17,6 +17,7 @@ struct ACL_ITER;
 
 namespace acl {
 
+class string;
 class json;
 
 /**
@@ -37,6 +38,26 @@ public:
 	 * @return {const char*} 返回空说明没有文本标签值
 	 */
 	const char* get_text(void) const;
+
+	/**
+	 * 当该 json 结点有标签时，本函数用来新的标签值覆盖旧的标签名
+	 * @param name {const char*} 新的标签值，为非空字符串
+	 * @return {bool} 返回 false 表示该结点没有标签或输入空串，没有进行替换
+	 */
+	bool set_tag(const char* name);
+
+	/**
+	 * 当该 json 结点为叶结点时，本函数用来替换结点的文本值
+	 * @param text {const char*} 新的叶结点文本值，为非空字符串
+	 * @return {bool} 返回 false 表示该结点非叶结点或输入非法
+	 */
+	bool set_text(const char* text);
+
+	/**
+	 * 将当前 json 结点转换成 json 字符串(包含本 json 结点及其子结点)
+	 * @return {const char*}
+	 */
+	const string& to_string(void);
 
 	/**
 	 * 给本 json 结点添加 json_node 子结点对象
@@ -138,6 +159,7 @@ public:
 	 * @return {ACL_JSON_NODE*} 返回结点对象，注：该结点用户不能单独释放
 	 */
 	ACL_JSON_NODE* get_json_node() const;
+
 private:
 	friend class json;
 	/**
@@ -164,13 +186,14 @@ private:
 	json_node* parent_saved_;
 	json_node* child_;
 	ACL_ITER* iter_;
+	string* buf_;
 };
 
 class ACL_CPP_API json : public pipe_stream
 {
 public:
 	/**
-	 * 构造函数
+	 * 构造函数，可用于解析 json 字符串或生成 json 对象
 	 * @param data {const char*} json 格式的字符串，可以是完整的
 	 *  json 字符串，也可以是部分的 json 字符串，也可以是空指针，
 	 *  无论如何，用户依然可以用部分或完整的 json 字符串调用 update
@@ -178,8 +201,20 @@ public:
 	 *  的 data 参数非空时，它也会调用 update
 	 */
 	json(const char* data = NULL);
+
+	/**
+	 * 根据一个 json 对象中的一个 json 结点构造一个新的 json 对象
+	 * @param node {const json_node&} 源 json 对象中的一个 json 结点
+	 */
+	json(const json_node& node);
+
 	~json(void);
 
+	/**
+	 * 设置是否在解析时自动处理半个汉字的情形
+	 * @param on {bool}
+	 * @return {json&}
+	 */
 	json& part_word(bool on);
 
 	/**
@@ -275,6 +310,22 @@ public:
 	json_node& create_node(const char* tag, json_node& node);
 
 	/**
+	 * 将一个 json 对象中的一个 json 结点复制至任一 json 对象中的一个
+	 * 新 json 结点中并返回该新的 json 结点
+	 * @param node {json_node*} 源 json 对象的一个 json 结点
+	 * @return {json_node&} 当前目标 json 对象中新创建的 json 结点
+	 */
+	json_node& duplicate_node(const json_node* node);
+
+	/**
+	 * 将一个 json 对象中的一个 json 结点复制至任一 json 对象中的一个
+	 * 新 json 结点中并返回该新的 json 结点
+	 * @param node {json_node&} 源 json 对象的一个 json 结点
+	 * @return {json_node&} 当前目标 json 对象中新创建的 json 结点
+	 */
+	json_node& duplicate_node(const json_node& node);
+
+	/**
 	 * 获得根结点对象
 	 * @return {json_node&}
 	 */
@@ -301,6 +352,12 @@ public:
 	 * @param out {string&} 存储转换结果的缓冲区
 	 */
 	void build_json(string& out);
+
+	/**
+	 * 将 json 对象树转换成 json 字符串
+	 * @return {const string&}
+	 */
+	const string& to_string();
 
 	// pipe_stream 虚函数重载
 

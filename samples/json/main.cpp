@@ -176,6 +176,7 @@ static void test_json_data(const char* data)
 	ACL_JSON* json = acl_json_alloc();
 	const char* ptr = data;
 	char  buf[2];
+	ACL_VSTRING *tmp;
 
 	json->flag |= ACL_JSON_FLAG_PART_WORD;
 
@@ -198,6 +199,12 @@ static void test_json_data(const char* data)
 	test_json_foreach2(json);
 	test_json_find1(json);
 	test_json_find2(json);
+
+	tmp = acl_vstring_alloc(128);
+	acl_json_build(json, tmp);
+	printf(">>>source: |%s|\r\n", data);
+	printf(">>>result: |%s|\r\n", acl_vstring_str(tmp));
+	acl_vstring_free(tmp);
 	acl_json_free(json);
 }
 

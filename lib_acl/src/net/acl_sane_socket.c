@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #ifdef	ACL_UNIX
 #include <sys/socket.h>
 #include <netinet/in.h>

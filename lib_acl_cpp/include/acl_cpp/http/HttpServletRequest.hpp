@@ -179,6 +179,18 @@ public:
 	unsigned short getRemotePort(void) const;
 
 	/**
+	 * 获得 HTTP 请求头中设置的 Host 字段
+	 * @return {const char*} 如果为空，则表示不存在
+	 */
+	const char* getRemoteHost(void) const;
+
+	/**
+	 * 获得 HTTP 请求头中设置的 User-Agent 字段
+	 * @return {const char*} 如果为空，则表示不存在
+	 */
+	const char* getUserAgent(void) const;
+
+	/**
 	 * 获得 HTTP 请求中的参数值，该值已经被 URL 解码且
 	 * 转换成本地要求的字符集；针对 GET 方法，则是获得
 	 * URL 中 ? 后面的参数值；针对 POST 方法，则可以获得
@@ -217,6 +229,18 @@ public:
 	 */
 	const http_ctype& getHttpCtype(void) const;
 
+	/**
+	 * 判断 HTTP 客户端是否要求保持长连接
+	 * @return {bool}
+	 */
+	bool isKeepAlive(void) const;
+
+	/**
+	 * 当客户端要求保持长连接时，从 HTTP 请求头中获得保持的时间
+	 * @return {int} 返回值 < 0 表示不存在 Keep-Alive 字段
+	 */
+	int getKeepAlive(void) const;
+
 	/*
 	 * 当 HTTP 请求为 POST 方法，通过本函数设置读 HTTP 数据体的
 	 * IO 超时时间值(秒)
@@ -229,6 +253,14 @@ public:
 	 * @return {http_request_error_t}
 	 */
 	http_request_error_t getLastError(void) const;
+
+	/**
+	 * 当 HttpServlet 类以服务模式(即非 CGI 方式)运行时，可以调用此
+	 * 方法获得客户端连接的 HTTP 类对象，从而获得更多的参数
+	 * @return {http_client*} 当以服务模式运行时，此函数返回 HTTP 客户端
+	 *  连接非空对象；当以 CGI 方式运行时，则返回空指针
+	 */
+	http_client* getClient(void) const;
 
 	/**
 	 * 将 HTTP 请求头输出至流中（文件流或网络流）

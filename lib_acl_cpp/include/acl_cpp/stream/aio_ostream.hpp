@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
+#include "acl_cpp/stream/aio_timer_callback.hpp"
 #include "acl_cpp/stream/aio_stream.hpp"
 
 namespace acl

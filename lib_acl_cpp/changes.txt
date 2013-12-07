@@ -1,6 +1,85 @@
 修改历史列表：
 ------------------------------------------------------------------------
 
+206) 2013.12.7
+206.1) samples/master_udp_threads: 该例子中的线程局部变量的静态用法 __thread
+无法支持 solaris，改为动态方式使用线程局部变量方式
+
+205) 2013.12.6
+205.1) comment: 修正 connect_manager::init 原来错误的参数格式描述
+205.2) bugfix: connect_pool::put 在归还连接给连接池时，为了让过期连接尽快回收，
+需要调用 push_front，原来调用了 push_back
+
+204) 2013.12.5
+204.1) feature: Makefile 支持 solaris(x86) 编译
+
+203) 2013.12.2
+203.1) document: 消除了几个头文件中由 doxygen 检测出的错误注释
+
+202) 2013.12.1
+202.1) feature: 新增加 event 模块，将 master_timer 定时器类改名为 event_timer
+类放于 event 模块中
+202.2) feature: 在基类 master_base 中添加了方法 proc_set_timer 用于添加进程
+级别的定时器，(同时移除了 master_threads 子类中的 proc_set_timer 方法)，这样
+master_base 的所有子类 (master_threads, master_aio, master_proc, master_udp,
+master_trigger) 都可以添加进程级别的定时器
+
+201) 2013.11.29
+201.1) feature: master 模块增加了定时器类 master_timer
+201.2) feature: master_threads 模板支持新的定时器
+201.3) workaround: stream 模块的异步流部分，将 aio_timer_callback 等类声明从
+aio_handle 类中移除成为独立的类
+
+200) 2013.11.26
+200.1) feature: json.cpp,
+200.1.1) json 类增加了以下功能函数：
+a) 构造函数 json(const json_node&)，可以根据一个 json 对象的某一个 json
+结点创建一个新的 json 对象
+b) duplicate_node 根据一个 json 对象的某个 json 结点复制一个新的 json 结点
+c) to_string 新的将 json 对象转换为字符串的函数
+200.1.2) json_node 类增加了以下功能函数：
+a) to_string 根据 json 结点生成 json 字符串的函数
+b) set_tag 用来替换标签名
+c) set_text 当 json 结点为叶结点时用来替换标签值
+200.2) samples: 新增加了 json 测试用例 json3/json4
+
+199) 2013.11.23
+199.1) feature: http_header 类丰富了 set_url 及请求构造函数的参数类型，
+允许 URL 参数中含有请求参数，且内部会自动解析 url 中的主机名及参数
+199.2) feature: http_header 类添加了请求参数添加方法：add_int 及 add_format
+199.3) feature: http_header add_param 允许参数值为空指针或空串
+199.3) feature: http_header::set_host 仅是将主机字符串添加至成员变量 host_ 中
+199.4) feature: http_header::set_url 中允许添加类似于 http://www.test.com 的
+url(即末尾可以没有 '/')
+
+198) 2013.11.21
+198.1) feature: http_client 类增加了 chunked 传输方式；
+198.2) feature: http_request 类增加流式写函数：write_head/write_body；
+198.3) feature: http_response 类增加了流式写数据方式
+
+197) 2013.11.19
+197.1) workaround: 调整类 http_client 中的两个函数 get_respond_head  和
+get_request_head 的返回值限制，去掉 const 限定词
+197.2) bugfix: http_header.cpp，http_header::date_format 在 WIN32 编译出错
+
+196) 2013.11.17
+196.1) bugfix: json.cpp, json::getElementsByTags() 内部未对空指针做判断
+196.2) samples: samples/json2, 用于测试级联提取数据的例子
+
+195) 2013.11.13
+195.1) bugfix: http_header.cpp, http_header::date_format 在 UNIX 平台下
+gmtime 是线程不安全的，所以需要使用 gmtime_r
+
+194) 2013.11.9
+194.1) feature: HttpServletRequest 类增加了几个获取 HTTP 请求头参数的方法
+
+193) 2013.11.8
+193.1) feature: http_utils::get_addr 的 url 参数既可以是 HTTP 也可以是 HTTPS
+
+192) 2013.11.7
+192.1) bugfix: http_download.cpp 的构造函数中调用 ACL_SAFE_STRNCPY 时第三个
+参数给出错误的尺寸大小（此 bug 由高版本的 gcc4.8.2 检测出）
+
 ------------------------------------------------------------------------
 
 191) 2013.11.5

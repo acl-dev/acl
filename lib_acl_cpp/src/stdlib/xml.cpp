@@ -361,6 +361,7 @@ const xml_node* xml::getFirstElementByTag(const char* tag) const
 const std::vector<xml_node*>& xml::getElementsByTags(const char* tags) const
 {
 	const_cast<xml*>(this)->clear();
+
 	ACL_ARRAY* a = acl_xml_getElementsByTags(xml_, tags);
 	if (a != NULL) {
 		ACL_ITER iter;

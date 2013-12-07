@@ -89,9 +89,9 @@ PROG =
 
 COMPILE = $(CC) $(CFLAGS)
 
+# -Wl,-rpath,$(ACL_LIB) -Wl,-rpath,$(PROTO_LIB) -o $(OBJ_PATH)/$(PROG)
 all: RM $(OBJ)
-	$(CC) $(OBJ) $(LDFLAGS) \
-	  -Wl,-rpath,$(ACL_LIB) -Wl,-rpath,$(PROTO_LIB) -o $(OBJ_PATH)/$(PROG)
+	$(CC) $(OBJ) $(LDFLAGS) -o $(OBJ_PATH)/$(PROG)
 	@echo ""
 	@echo "All ok! Output:$(PROG)"
 	@echo ""

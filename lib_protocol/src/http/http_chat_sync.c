@@ -166,8 +166,8 @@ static int chunked_hdr_get(HTTP_CHAT_CTX *ctx)
 
 	ret = sscanf(buf, "%X %s", (unsigned int *) &chunk_len, pext);
 	if (ret < 0 || chunk_len < 0) {
-		acl_msg_error("%s(%d): chunked hdr(%s) invalid, dlen(%d), '\\n': %d, %d",
-			myname, __LINE__, buf, n, buf[0], '\n');
+		acl_msg_error("%s(%d): chunked hdr(%s) invalid, dlen(%d), "
+			"'\\n': %d, %d", myname, __LINE__, buf, n, buf[0], '\n');
 		return (-1);
 	}
 
@@ -275,6 +275,8 @@ http_off_t http_req_body_get_sync(HTTP_REQ *request, ACL_VSTREAM *stream,
 		ctx->chunk_len = request->hdr_req->hdr.content_length;
 		ctx->body_len  = 0;
 		ctx->read_cnt  = 0;
+		if (ctx->chunked)
+			ctx->chunk.chunk_oper = CHUNK_OPER_HEAD;
 		request->ctx = (void*) ctx;
 		request->free_ctx = free_ctx;
 	} else

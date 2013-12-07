@@ -219,12 +219,6 @@ ACL_EVENT *event_new_poll_thr(int fdsize);
 /* in events_kernel.c */
 ACL_EVENT *event_new_kernel(int fdsize);
 
-/* in events_kernel2.c */
-ACL_EVENT *event_new_kernel2(int fdsize);
-
-/* in events_kernel2.3 */
-ACL_EVENT *event_new_kernel3(int fdsize);
-
 /* in events_kernel_thr.c */
 ACL_EVENT *event_new_kernel_thr(int fdsize);
 

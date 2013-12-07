@@ -425,7 +425,7 @@ bool mime::save_mail(const char* path, const char* filename,
 
 	while (true)
 	{
-		ptr = strcasestr(s, "cid:");
+		ptr = acl_strcasestr(s, "cid:");
 		if (ptr == NULL)
 			break;
 		fpOut.write(s, ptr - s);

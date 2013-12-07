@@ -89,6 +89,8 @@ bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 	acl_init();
 #endif
 	ACL_EVENT* eventp = acl_event_new_select(1, 0);
+	set_event(eventp);  // 调用基类方法设置事件引擎句柄
+
 	std::vector<ACL_VSTREAM*> sstreams;
 	ACL_ARGV* tokens = acl_argv_split(addrs, ";,| \t");
 	ACL_ITER iter;
@@ -147,12 +149,22 @@ void master_proc::service_main(ACL_VSTREAM *stream, char*, char**)
 void master_proc::service_pre_jail(char*, char**)
 {
 	acl_assert(__mp != NULL);
+
+#ifndef WIN32
+	if (__mp->daemon_mode())
+	{
+		ACL_EVENT* eventp = acl_single_server_event();
+		__mp->set_event(eventp);
+	}
+#endif
+
 	__mp->proc_pre_jail();
 }
 
 void master_proc::service_init(char*, char**)
 {
 	acl_assert(__mp != NULL);
+
 	__mp->proc_inited_ = true;
 	__mp->proc_on_init();
 }

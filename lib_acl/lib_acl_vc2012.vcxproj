@@ -370,8 +370,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include=".\src\event\events_fdtable.c" />
     <ClCompile Include=".\src\event\events_iocp.c" />
     <ClCompile Include=".\src\event\events_kernel.c" />
-    <ClCompile Include=".\src\event\events_kernel2.c" />
-    <ClCompile Include=".\src\event\events_kernel3.c" />
     <ClCompile Include=".\src\event\events_kernel_thr.c" />
     <ClCompile Include=".\src\event\events_poll.c" />
     <ClCompile Include=".\src\event\events_poll_thr.c" />

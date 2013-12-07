@@ -1,6 +1,12 @@
 #include "lib_acl.h"
 #include "lib_protocol.h"
 
+static void *test_thread(void *dummy acl_unused)
+{
+	printf("last error: %s\r\n", acl_last_serror());
+	return 0;
+}
+
 static double stamp_sub(const struct timeval *from, const struct timeval *sub_by)
 {
 	struct timeval res;
@@ -252,6 +258,16 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
+	if (1)
+	{
+		acl_pthread_t tid;
+		acl_pthread_attr_t attr;
+
+		acl_pthread_attr_init(&attr);
+		acl_pthread_create(&tid, &attr, test_thread, NULL);
+		acl_pthread_join(tid, NULL);
+	}
+	printf("last error: %s\r\n", acl_last_serror());
 	if (strcasecmp(action, "parse") == 0)
 		return header_parse(filepath, max);
 	else if (strcasecmp(action, "read") == 0)

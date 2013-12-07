@@ -25,6 +25,9 @@ int main(int argc, char* argv[])
 			ms.run_alone(addr, argv[2], 5);  // 单独运行方式
 		else
 			ms.run_alone(addr, NULL, 5);  // 单独运行方式
+
+		printf("Enter any key to exit now\r\n");
+		getchar();
 	}
 	else
 		ms.run_daemon(argc, argv);  // acl_master 控制模式运行

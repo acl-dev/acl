@@ -1,6 +1,8 @@
 SHELL = /bin/sh
-OSNAME = $(shell uname -sm)
-OSTYPE = $(shell uname -p)
+#OSNAME = $(shell uname -sm)
+#OSTYPE = $(shell uname -p)
+OSNAME = $(shell uname -a)
+OSTYPE = $(shell uname -a)
 
 LIB_PATH = ./dist/lib
 ACL_LIB = $(LIB_PATH)

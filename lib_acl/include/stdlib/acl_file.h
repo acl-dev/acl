@@ -12,14 +12,14 @@ extern "C" {
  * 文件流类型定义
  */
 typedef struct ACL_FILE {
-	ACL_VSTREAM *stream;	/**< 流指针 */
+	ACL_VSTREAM *fp;	/**< 流指针 */
 	unsigned int status;	/**< 文件流状态 */
 #define	ACL_FILE_EOF		(1 << 0)
 	int   errnum;		/**< 文件流的出错错误号 */
 } ACL_FILE;
 
-#define	ACL_FPATH(fp)	(ACL_VSTREAM_PATH((fp)->stream)
-#define	ACL_FSTREAM(fp)	((fp)->stream)
+#define	ACL_FPATH(fp)	(ACL_VSTREAM_PATH((fp)->fp)
+#define	ACL_FSTREAM(fp)	((fp)->fp)
 
 /**
  * 打开或创建一个文件进行读写操作

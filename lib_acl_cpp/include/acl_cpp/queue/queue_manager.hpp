@@ -72,7 +72,7 @@ public:
 	/**
 	 * 修改文件的扩展名
 	 * @param fp {queue_file*} 队列文件对象
-	 * @param extname {const char*} 新的扩展名
+	 * @param extName {const char*} 新的扩展名
 	 * @return {bool} 修改文件扩展名是否成功
 	 */
 	bool rename_extname(queue_file* fp, const char* extName);

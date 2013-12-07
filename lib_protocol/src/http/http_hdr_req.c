@@ -88,9 +88,10 @@ static void __hdr_reset(HTTP_HDR_REQ *hh, int clear_cookies)
 		acl_htable_reset(hh->cookies_table, __cookies_args_free_fn);
 }
 
-static void cache_free(ACL_ARRAY *pool)
+static void thread_cache_free(ACL_ARRAY *pool)
 {
-	acl_array_free(pool, (void (*)(void*)) http_hdr_req_free);
+	if ((unsigned long) acl_pthread_self() != acl_main_thread_self())
+		acl_array_free(pool, (void (*)(void*)) http_hdr_req_free);
 }
 
 static acl_pthread_key_t cache_key = -1;
@@ -100,23 +101,15 @@ static ACL_ARRAY *cache_pool = NULL;
 static void main_cache_free(void)
 {
 	if (cache_pool) {
-		cache_free(cache_pool);
+		acl_array_free(cache_pool, (void (*)(void*)) http_hdr_req_free);
 		cache_pool = NULL;
 	}
-}
-
-static void dummy_free(void *arg acl_unused)
-{
 }
 
 static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
 static void cache_init(void)
 {
-	if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
-		acl_pthread_key_create(&cache_key, dummy_free);
-		atexit(main_cache_free);
-	} else
-		acl_pthread_key_create(&cache_key, (void (*)(void*)) cache_free);
+	acl_pthread_key_create(&cache_key, (void (*)(void*)) thread_cache_free);
 }
 #endif
 
@@ -137,7 +130,8 @@ HTTP_HDR_REQ *http_hdr_req_new(void)
 	pool = (ACL_ARRAY*) acl_pthread_tls_get(&cache_key);
 	if (pool == NULL) {
 		pool = acl_array_create(100);
-		acl_pthread_tls_set(cache_key, pool, (void (*)(void*)) cache_free);
+		acl_pthread_tls_set(cache_key, pool,
+			(void (*)(void*)) thread_cache_free);
 	}
 
 	pool = (ACL_ARRAY*) acl_pthread_tls_get(&cache_key);
@@ -153,8 +147,10 @@ HTTP_HDR_REQ *http_hdr_req_new(void)
 	if (pool == NULL) {
 		pool = acl_array_create(100);
 		acl_pthread_setspecific(cache_key, pool);
-		if ((unsigned long) acl_pthread_self() == acl_main_thread_self())
+		if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
 			cache_pool = pool;
+			atexit(main_cache_free);
+		}
 	}
 	hh = (HTTP_HDR_REQ*) pool->pop_back(pool);
 	if (hh) {

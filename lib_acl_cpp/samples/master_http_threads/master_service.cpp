@@ -67,7 +67,12 @@ bool master_service::thread_on_read(acl::socket_stream* stream)
 
 	// 返回数据给客户端
 
-	if (res.response(res_buf_, var_cfg_buf_size, 200, keep_alive) == false)
+	res.response_header()
+		.set_status(200)
+		.set_keep_alive(keep_alive)
+		.set_content_length(var_cfg_buf_size);
+
+	if (res.response(res_buf_, var_cfg_buf_size) == false)
 		return false;
 
 	return keep_alive ? true : false;

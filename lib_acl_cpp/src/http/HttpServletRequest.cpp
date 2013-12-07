@@ -597,6 +597,52 @@ const http_ctype& HttpServletRequest::getHttpCtype(void) const
 	return content_type_;
 }
 
+const char* HttpServletRequest::getRemoteHost(void) const
+{
+	if (cgi_mode_)
+		return acl_getenv("HTTP_HOST");
+	if (client_ == NULL)
+		return NULL;
+	return client_->request_host();
+}
+
+const char* HttpServletRequest::getUserAgent(void) const
+{
+	if (cgi_mode_)
+		return acl_getenv("HTTP_USER_AGENT");
+	if (client_ == NULL)
+		return NULL;
+	return client_->header_value("User-Agent");
+}
+
+bool HttpServletRequest::isKeepAlive(void) const
+{
+	if (cgi_mode_)
+	{
+		const char* ptr = acl_getenv("HTTP_CONNECTION");
+		if (ptr == NULL || strcasecmp(ptr, "keep-alive") != 0)
+			return false;
+		else
+			return true;
+	}
+	if (client_ == NULL)
+		return false;
+	return client_->keep_alive();
+}
+
+int HttpServletRequest::getKeepAlive(void) const
+{
+	if (cgi_mode_)
+		return -1;
+
+	if (client_ == NULL)
+		return -1;
+	const char* ptr = client_->header_value("Keep-Alive");
+	if (ptr == NULL || *ptr == 0)
+		return -1;
+	return atoi(ptr);
+}
+
 void HttpServletRequest::setRwTimeout(int rw_timeout)
 {
 	rw_timeout_ = rw_timeout;
@@ -605,6 +651,13 @@ void HttpServletRequest::setRwTimeout(int rw_timeout)
 http_request_error_t HttpServletRequest::getLastError(void) const
 {
 	return req_error_;
+}
+
+http_client* HttpServletRequest::getClient(void) const
+{
+	if (client_ == NULL)
+		logger_error("client_ NULL in CGI mode");
+	return client_;
 }
 
 void HttpServletRequest::fprint_header(ostream& out, const char* prompt)

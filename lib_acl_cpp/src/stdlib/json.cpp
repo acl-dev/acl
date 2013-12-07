@@ -1,16 +1,18 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/json.hpp"
 
 namespace acl
 {
 
 json_node::json_node(ACL_JSON_NODE* node, json* json_ptr)
-	: node_me_(node)
-	, json_(json_ptr)
-	, parent_(NULL)
-	, parent_saved_(NULL)
-	, child_(NULL)
-	, iter_(NULL)
+: node_me_(node)
+, json_(json_ptr)
+, parent_(NULL)
+, parent_saved_(NULL)
+, child_(NULL)
+, iter_(NULL)
+, buf_(NULL)
 {
 	acl_assert(json_ptr);
 }
@@ -23,6 +25,8 @@ json_node::~json_node(void)
 		delete child_;
 	if (iter_)
 		acl_myfree(iter_);
+	if (buf_)
+		delete buf_;
 }
 
 const char* json_node::tag_name(void) const
@@ -39,6 +43,37 @@ const char* json_node::get_text(void) const
 		return acl_vstring_str(node_me_->text);
 	else
 		return NULL;
+}
+
+bool json_node::set_tag(const char* name)
+{
+	if (name == NULL || *name == 0)
+		return false;
+	if (node_me_->ltag == NULL || ACL_VSTRING_LEN(node_me_->ltag) == 0)
+		return false;
+	acl_vstring_strcpy(node_me_->ltag, name);
+	return true;
+}
+
+bool json_node::set_text(const char* text)
+{
+	if (text == NULL || *text == 0)
+		return false;
+	if (node_me_->type != ACL_JSON_T_LEAF || node_me_->text == NULL)
+		return false;
+	acl_vstring_strcpy(node_me_->ltag, text);
+	return true;
+}
+
+const string& json_node::to_string(void)
+{
+	if (buf_ == NULL)
+		buf_ = NEW string(256);
+	else
+		buf_->clear();
+	ACL_VSTRING* vbuf = buf_->vstring();
+	(void) acl_json_node_build(node_me_, vbuf);
+	return *buf_;
 }
 
 json_node& json_node::add_child(json_node* child,
@@ -164,6 +199,15 @@ json::json(const char* data /* = NULL */)
 		update(data);
 }
 
+json::json(const json_node& node)
+{
+	json_ = acl_json_create(node.get_json_node());
+	root_ = NEW json_node(json_->root, this);
+	node_tmp_ = NULL;
+	buf_ = NULL;
+	iter_ = NULL;
+}
+
 json::~json(void)
 {
 	clear();
@@ -213,6 +257,7 @@ const std::vector<json_node*>& json::getElementsByTagName(const char* tag) const
 const std::vector<json_node*>& json::getElementsByTags(const char* tags) const
 {
 	const_cast<json*>(this)->clear();
+
 	ACL_ARRAY* a = acl_json_getElementsByTags(json_, tags);
 	if (a != NULL) {
 		ACL_ITER iter;
@@ -222,8 +267,8 @@ const std::vector<json_node*>& json::getElementsByTags(const char* tags) const
 			json_node* node = NEW json_node(tmp, const_cast<json*>(this));
 			const_cast<json*>(this)->nodes_tmp_.push_back(node);
 		}
+		acl_json_free_array(a);
 	}
-	acl_json_free_array(a);
 	return nodes_tmp_;
 }
 
@@ -271,6 +316,26 @@ json_node& json::create_node(const char* tag, json_node& node)
 	return *n;
 }
 
+json_node& json::duplicate_node(const json_node* node)
+{
+	ACL_JSON_NODE* tmp = acl_json_node_duplicate(json_,
+		node->get_json_node());
+	acl_assert(tmp);
+	json_node* n = NEW json_node(tmp, this);
+	nodes_.push_back(n);
+	return *n;
+}
+
+json_node& json::duplicate_node(const json_node& node)
+{
+	ACL_JSON_NODE* tmp = acl_json_node_duplicate(json_,
+		node.get_json_node());
+	acl_assert(tmp);
+	json_node* n = NEW json_node(tmp, this);
+	nodes_.push_back(n);
+	return *n;
+}
+
 json_node& json::get_root(void)
 {
 	if (root_)
@@ -302,6 +367,17 @@ json_node* json::next_node(void)
 		return NULL;
 	node_tmp_->set_json_node(node);
 	return node_tmp_;
+}
+
+const string& json::to_string(void)
+{
+	if (buf_ == NULL)
+		buf_ = new string(256);
+	else
+		buf_->clear();
+	ACL_VSTRING* vbuf = buf_->vstring();
+	(void) acl_json_build(json_, vbuf);
+	return *buf_;
 }
 
 void json::build_json(string& out)

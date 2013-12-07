@@ -836,12 +836,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\event\events_kernel.c">
 				</File>
 				<File
-					RelativePath=".\src\event\events_kernel2.c">
-				</File>
-				<File
-					RelativePath=".\src\event\events_kernel3.c">
-				</File>
-				<File
 					RelativePath=".\src\event\events_kernel_thr.c">
 				</File>
 				<File

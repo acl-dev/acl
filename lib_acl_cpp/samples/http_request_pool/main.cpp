@@ -37,12 +37,13 @@ static bool http_get(http_request* conn, int n)
 		.set_method(HTTP_METHOD_GET)
 		.accept_gzip(__unzip);
 
-	printf("%lu--%d: begin send request\r\n", acl_pthread_self(), n);
+	printf("%lu--%d: begin send request\r\n",
+		(unsigned long) acl_pthread_self(), n);
 	// 发送 HTTP 请求数据同时接收 HTTP 响应头
 	if (conn->request(NULL, 0) == false)
 	{
 		printf("%lu--%d: send GET request error\r\n",
-			acl_pthread_self(), n);
+			(unsigned long) acl_pthread_self(), n);
 		return false;
 	}
 
@@ -52,22 +53,22 @@ static bool http_get(http_request* conn, int n)
 	// 接收 HTTP 响应体数据
 	while (true)
 	{
-		ret = conn->get_body(buf, sizeof(buf));
+		ret = conn->read_body(buf, sizeof(buf));
 		if (ret == 0)
 			break;
 		else if (ret < 0)
 		{
 			printf("%lu--%d: error, length: %d\r\n",
-				acl_pthread_self(), n, length);
+				(unsigned long) acl_pthread_self(), n, length);
 			return false;
 		}
 		length += ret;
 		if (0)
 			printf("%lu--%d: read length: %d, %d\r\n",
-				acl_pthread_self(), n, length, ret);
+				(unsigned long) acl_pthread_self(), n, length, ret);
 	}
 	printf("%lu--%d: read body over, length: %d\r\n",
-		acl_pthread_self(), n, length);
+		(unsigned long) acl_pthread_self(), n, length);
 	return true;
 }
 

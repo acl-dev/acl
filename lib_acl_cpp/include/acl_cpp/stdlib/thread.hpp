@@ -6,7 +6,7 @@ namespace acl
 /**
  * 纯虚函数：线程任务类，该类实例的 run 方法是在子线程中被执行的
  */
-class thread_job
+class ACL_CPP_API thread_job
 {
 public:
 	thread_job() {}
@@ -23,7 +23,7 @@ public:
  * 线程纯虚类，该类的接口定义类似于 Java 的接口定义，子类需要实现
  * 基类的纯虚函数，使用者通过调用 thread::start() 启动线程过程
  */
-class thread : public thread_job
+class ACL_CPP_API thread : public thread_job
 {
 public:
 	thread();

@@ -170,6 +170,19 @@ static void json_escape_append(ACL_VSTRING *buf, const char *src)
 	ACL_VSTRING_TERMINATE(buf);
 }
 
+ACL_VSTRING *acl_json_node_build(ACL_JSON_NODE *node, ACL_VSTRING *buf)
+{
+	ACL_JSON *json = acl_json_create(node);
+
+	if (buf == NULL)
+		buf = acl_vstring_alloc(256);
+
+	acl_json_build(json, buf);
+	acl_json_free(json);
+
+	return buf;
+}
+
 ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 {
 	ACL_JSON_NODE *node, *prev;

@@ -4,9 +4,9 @@
 
 static void test(const char *name, int use_acl)
 {
-	ACL_DNS_DB *res;
+	ACL_DNS_DB *res = NULL;
 	ACL_HOSTNAME *h_host;
-#ifndef MACOSX
+#if	!defined(MACOSX) && !defined(ACL_SUNOS5)
 	struct hostent  h_buf; 
 	int   errnum = 0;
 	char  buf[4096];
@@ -24,7 +24,7 @@ static void test(const char *name, int use_acl)
 			return;
 		}
 	}
-#ifndef MACOSX
+#if	!defined(MACOSX) && !defined(ACL_SUNOS5)
 	else {
 		res = acl_netdb_new(name);
 		n = gethostbyname_r(name, &h_buf, buf, sizeof(buf), &h_addrp, &errnum);
@@ -51,13 +51,15 @@ static void test(const char *name, int use_acl)
 #endif
 
 	printf("gethostbyname name: %s\n", name);
-	acl_foreach(iter, res) {
-		const ACL_HOST_INFO *info;
+	if (res != NULL) {
+		acl_foreach(iter, res) {
+			const ACL_HOST_INFO *info;
 
-		info = (const ACL_HOST_INFO*) iter.data;
-		printf("\tip=%s; port=%d\n", info->ip, info->hport);
+			info = (const ACL_HOST_INFO*) iter.data;
+			printf("\tip=%s; port=%d\n", info->ip, info->hport);
+		}
+		acl_netdb_free(res);
 	}
-	acl_netdb_free(res);
 
 	res = acl_netdb_new(name);
 	memset(&addr, 0, sizeof(addr));

@@ -72,7 +72,18 @@ public:
 	 * @param header {http_header&}
 	 * @return {int} 真实写入的数据量, 返回 -1 表示出错
 	 */
-	int write(const http_header& header);
+	int write_head(const http_header& header);
+
+	/**
+	 * 发送 HTTP 数据体，可以循环调用此函数，当在第一次调用 write 函数写入
+	 * HTTP 头时设置了 chunked 传输方式，则内部自动采用 chunked 传输方式; 
+	 * 另外，在使用 chunked 方式传输数据时，应该最后再调用一次本函数，且参数
+	 * 均设为 0 表示数据结束
+	 * @param data {const void*} 数据地址
+	 * @param len {size_t} data 数据长度
+	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
+	 */
+	bool write_body(const void* data, size_t len);
 
 	/**
 	 * 当调用 http_client(socket_stream*, bool) 构造函数创建
@@ -240,7 +251,7 @@ public:
 	 * @return {const HTTP_HDR_RES*} HTTP 响应头对象，如果为空，则说明
 	 *  未读到响应头数据
 	 */
-	const HTTP_HDR_RES* get_respond_head(string* buf);
+	HTTP_HDR_RES* get_respond_head(string* buf);
 
 	/**
 	 * 取得通过 read_head 读到的 HTTP 请求头对象，且当传入缓冲区
@@ -249,7 +260,7 @@ public:
 	 * @return {const HTTP_HDR_REQ*} HTTP 请求头对象，如果为空，则说明
 	 *  未读到请求头数据
 	 */
-	const HTTP_HDR_REQ* get_request_head(string* buf);
+	HTTP_HDR_REQ* get_request_head(string* buf);
 
 	/**
 	 * 输出服务器返回的 HTTP 响应头信息至标准输出
@@ -264,7 +275,6 @@ public:
 	 */
 	void fprint_header(ostream& out, const char* prompt);
 
-protected:
 private:
 	socket_stream* stream_;     // HTTP 数据流
 	bool stream_fixed_;         // 是否允许释放 stream_ 流对象
@@ -280,6 +290,7 @@ private:
 	int  gzip_header_left_;     // gzip 头剩余的长度
 	int  last_ret_;             // 数据读完后记录最后的返回值
 	bool body_finish_;          // 是否已经读完 HTTP 响应体数据
+	bool chunked_transfer_;     // 是否为 chunked 传输模式
 
 	bool read_request_head(void);
 	bool read_response_head(void);

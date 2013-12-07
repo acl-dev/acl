@@ -79,6 +79,7 @@ int   acl_var_aio_quick_abort;
 int   acl_var_aio_enable_core;
 int   acl_var_aio_accept_timer;
 int   acl_var_aio_max_debug;
+int   acl_var_aio_status_notify;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
         { ACL_VAR_AIO_BUF_SIZE, ACL_DEF_AIO_BUF_SIZE, &acl_var_aio_buf_size, 0, 0 },
@@ -98,6 +99,7 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_AIO_ENABLE_CORE, ACL_DEF_AIO_ENABLE_CORE, &acl_var_aio_enable_core, 0, 0 },
 	{ ACL_VAR_AIO_ACCEPT_TIMER, ACL_DEF_AIO_ACCEPT_TIMER, &acl_var_aio_accept_timer, 0, 0 },
 	{ ACL_VAR_AIO_MAX_DEBUG, ACL_DEF_AIO_MAX_DEBUG, &acl_var_aio_max_debug, 0, 0 },
+	{ ACL_VAR_AIO_STATUS_NOTIFY, ACL_DEF_AIO_STATUS_NOTIFY, &acl_var_aio_status_notify, 0, 0 },
 
         { 0, 0, 0, 0, 0 },
 };
@@ -643,8 +645,9 @@ static void aio_server_accept_pass(ACL_ASTREAM *astream, void *context)
 				myname, acl_last_serror());
 	}
 
-	if (acl_var_aio_master_maxproc > 1 && i >= acl_var_aio_min_notify
-		&& acl_master_notify(acl_var_aio_pid, aio_server_generation,
+	if (acl_var_aio_status_notify && acl_var_aio_master_maxproc > 1
+		&& i >= acl_var_aio_min_notify && acl_master_notify(
+			acl_var_aio_pid, aio_server_generation,
 			ACL_MASTER_STAT_TAKEN) < 0)
 	{
 		aio_server_abort(astream, NULL);
@@ -653,8 +656,9 @@ static void aio_server_accept_pass(ACL_ASTREAM *astream, void *context)
 	for (j = 0; j < i; j++)
 		aio_server_wakeup(aio, fds[j]);
 
-	if (acl_var_aio_master_maxproc > 1 && i >= acl_var_aio_min_notify
-		&& acl_master_notify(acl_var_aio_pid, aio_server_generation,
+	if (acl_var_aio_status_notify && acl_var_aio_master_maxproc > 1
+		&& i >= acl_var_aio_min_notify && acl_master_notify(
+			acl_var_aio_pid, aio_server_generation,
 			ACL_MASTER_STAT_AVAIL) < 0)
 	{
 		aio_server_abort(astream, NULL);
@@ -720,9 +724,10 @@ static int aio_server_accept_sock2(ACL_ASTREAM *astream, ACL_AIO *aio)
 				__FILE__, __LINE__, myname, acl_last_serror());
 	}
 
-	if (acl_var_aio_master_maxproc > 1 && i >= acl_var_aio_min_notify
-		&& acl_master_notify(acl_var_aio_pid,
-			aio_server_generation, ACL_MASTER_STAT_TAKEN) < 0)
+	if (acl_var_aio_status_notify && acl_var_aio_master_maxproc > 1
+		&& i >= acl_var_aio_min_notify && acl_master_notify(
+			acl_var_aio_pid, aio_server_generation,
+			ACL_MASTER_STAT_TAKEN) < 0)
 	{
 		aio_server_abort(astream, NULL);
 	}
@@ -730,8 +735,9 @@ static int aio_server_accept_sock2(ACL_ASTREAM *astream, ACL_AIO *aio)
 	for (j = 0; j < i; j++)
 		aio_server_wakeup(aio, fds[j]);
 
-	if (acl_var_aio_master_maxproc > 1 && i >= acl_var_aio_min_notify
-		&& acl_master_notify(acl_var_aio_pid, aio_server_generation,
+	if (acl_var_aio_status_notify && acl_var_aio_master_maxproc > 1
+		&& i >= acl_var_aio_min_notify && acl_master_notify(
+			acl_var_aio_pid, aio_server_generation,
 			ACL_MASTER_STAT_AVAIL) < 0)
 	{
 		aio_server_abort(astream, NULL);

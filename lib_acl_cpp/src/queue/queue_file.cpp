@@ -17,7 +17,8 @@
 #define PATH_SEP	'/'
 #endif
 
-static __thread unsigned int __counter = 0;
+//static __thread unsigned int __counter = 0;
+static unsigned int __counter = 0;
 
 namespace acl
 {

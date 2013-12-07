@@ -154,7 +154,7 @@ bool HttpServletResponse::write(const void* data, size_t len)
 	if (data == NULL || len == 0)
 		return stream_.format("0\r\n\r\n") == -1 ? false : true;
 
-	if (stream_.format("%d\r\n", (int) len) == -1)
+	if (stream_.format("%x\r\n", (int) len) == -1)
 		return false;
 	if (stream_.write(data, len) == -1)
 		return false;

@@ -320,6 +320,26 @@ static void udp_server_open_log(void)
 	}
 }
 
+static void log_event_mode(int event_mode)
+{
+	const char *myname = "log_event_mode";
+
+	switch (event_mode) {
+	case ACL_EVENT_SELECT:
+		acl_msg_info("%s(%d): use select event", myname, __LINE__);
+		break;
+	case ACL_EVENT_POLL:
+		acl_msg_info("%s(%d): use poll event", myname, __LINE__);
+		break;
+	case ACL_EVENT_KERNEL:
+		acl_msg_info("%s(%d): use kernel_event", myname, __LINE__);
+		break;
+	default:
+		acl_msg_info("%s(%d): use select event", myname, __LINE__);
+		break;
+	}
+}
+
 static void usage(int argc, char *argv[])
 {
 	int   i;
@@ -370,6 +390,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	ACL_WATCHDOG *watchdog;
 	char   *generation;
 	int     fd, i, fdtype = 0;
+	int     event_mode;
 
 	int     f_flag = 0;
 	char    conf_file[1024];
@@ -522,6 +543,23 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	udp_server_name = service_name;
 	udp_server_argv = argv + optind;
 
+	/*******************************************************************/
+
+	/* 根据配置内容创建对应的事件句柄 */
+	if (strcasecmp(acl_var_udp_event_mode, "poll") == 0) {
+		__event = acl_event_new_poll(acl_var_udp_delay_sec,
+				acl_var_udp_delay_usec);
+		event_mode = ACL_EVENT_POLL;
+	} else if (strcasecmp(acl_var_udp_event_mode, "kernel") == 0) {
+		__event = acl_event_new_kernel(acl_var_udp_delay_sec,
+				acl_var_udp_delay_usec);
+		event_mode = ACL_EVENT_KERNEL;
+	} else {
+		__event = acl_event_new_select(acl_var_udp_delay_sec,
+				acl_var_udp_delay_usec);
+		event_mode = ACL_EVENT_SELECT;
+	}
+
 	/* 在切换用户运行身份前切换程序运行目录 */
 	if (chdir(acl_var_udp_queue_dir) < 0)
 		acl_msg_fatal("chdir(\"%s\"): %s",
@@ -537,21 +575,9 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	if (acl_var_udp_enable_core)
 		set_core_limit();
 	udp_server_open_log();
+	log_event_mode(event_mode);
 
-	/* 根据配置内容创建对应的事件句柄 */
-	if (strcasecmp(acl_var_udp_event_mode, "poll") == 0) {
-		__event = acl_event_new_poll(acl_var_udp_delay_sec,
-				acl_var_udp_delay_usec);
-		acl_msg_info("%s(%d): use poll event", myname, __LINE__);
-	} else if (strcasecmp(acl_var_udp_event_mode, "kernel") == 0) {
-		__event = acl_event_new_kernel(acl_var_udp_delay_sec,
-				acl_var_udp_delay_usec);
-		acl_msg_info("%s(%d): use kernel_event", myname, __LINE__);
-	} else {
-		__event = acl_event_new_select(acl_var_udp_delay_sec,
-				acl_var_udp_delay_usec);
-		acl_msg_info("%s(%d): use select event", myname, __LINE__);
-	}
+	/*******************************************************************/
 
 	/*
 	 * Are we running as a one-shot server with the client connection on
@@ -566,6 +592,8 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		service(stream, udp_server_name, udp_server_argv);
 		udp_server_exit();
 	}
+
+	/*******************************************************************/
 
 	/*
 	 * Running as a semi-resident server. Service connection requests.

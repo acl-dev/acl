@@ -443,7 +443,7 @@ const char *acl_strerror(unsigned int errnum, char *buffer, int size)
 	if (buffer == NULL || size <= 0) {
 		acl_msg_error("%s, %s(%d): input error",
 				__FILE__, myname, __LINE__);
-		return (NULL);
+		return NULL;
 	}
 
 	L = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ARGUMENT_ARRAY,
@@ -464,7 +464,7 @@ const char *acl_strerror(unsigned int errnum, char *buffer, int size)
 	if (buffer == NULL || size <= 0) {
 		acl_msg_error("%s, %s(%d): input error",
 				__FILE__, myname, __LINE__);
-		return (NULL);
+		return NULL;
 	}
 
 	snprintf(buffer, size, "%s", strerror(errnum));
@@ -472,41 +472,32 @@ const char *acl_strerror(unsigned int errnum, char *buffer, int size)
 # error "unknown OS type"
 #endif
 
-	return (buffer);
+	return buffer;
 }
 
 const char *acl_last_strerror(char *buffer, int size)
 {
-	return (acl_strerror(acl_last_error(), buffer, size));
+	return acl_strerror(acl_last_error(), buffer, size);
 }
 
 static acl_pthread_key_t __errbuf_key;
-
-static void free_buf(void *arg)
-{
-	char *buf = (char*) arg;
-	acl_myfree(buf);
-}
-
-static void dummy_free(void *arg acl_unused)
-{
-}
-
 static char *__main_buf = NULL;
 
-static void free_main_buf(void)
+static void thread_free_buf(void *buf)
+{
+	if ((unsigned long) acl_pthread_self() != acl_main_thread_self())
+		acl_myfree(buf);
+}
+
+static void main_free_buf(void)
 {
 	if (__main_buf)
 		acl_myfree(__main_buf);
 }
 
-static void error_buf_init(void)
+static void thread_buf_init(void)
 {
-	if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
-		acl_pthread_key_create(&__errbuf_key, dummy_free);
-		atexit(free_main_buf);
-	} else
-		acl_pthread_key_create(&__errbuf_key, free_buf);
+	acl_pthread_key_create(&__errbuf_key, thread_free_buf);
 }
 
 static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
@@ -517,15 +508,17 @@ const char *acl_last_serror(void)
 	int   error = acl_last_error();
 	static int __buf_size = 4096;
 
-	(void) acl_pthread_once(&once_control, error_buf_init);
+	(void) acl_pthread_once(&once_control, thread_buf_init);
 	buf = acl_pthread_getspecific(__errbuf_key);
 	if (buf == NULL) {
 		buf = acl_mymalloc(__buf_size);
 		acl_pthread_setspecific(__errbuf_key, buf);
-		if ((unsigned long) acl_pthread_self() == acl_main_thread_self())
+		if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
 			__main_buf = buf;
+			atexit(main_free_buf);
+		}
 	}
-	return (acl_strerror(error, buf, __buf_size));
+	return acl_strerror(error, buf, __buf_size);
 }
 
 int acl_last_error(void)
@@ -540,7 +533,7 @@ int acl_last_error(void)
 #else
 # error "unknow OS type"
 #endif
-	return (error);
+	return error;
 }
 
 void acl_set_error(int errnum)

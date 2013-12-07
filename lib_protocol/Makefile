@@ -24,6 +24,7 @@ CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 SYSLIB =
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
+UNIXTYPE = LINUX
 
 ifeq ($(CC),)
         CC = gcc
@@ -36,16 +37,19 @@ endif
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD -D_REENTRANT -pedantic
+	UNIXTYPE = FREEBSD
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -D_REENTRANT -pedantic
+	UNIXTYPE = FREEBSD
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -DLINUX2 -D_REENTRANT -pedantic
+	UNIXTYPE = LINUX
 endif
 
 # For SunOS
@@ -57,12 +61,13 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 		SYSLIB = -lsocket -lnsl -lrt
 	endif
 	CFLAGS += -DSUNOS5 -D_REENTRANT -pedantic
+	UNIXTYPE = SUNOS5
 endif
 
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
 	CFLAGS += -DHP_UX -DHPUX11
-	PLAT_NAME=hp-ux
+	UNIXTYPE = HPUX
 endif
 
 #Find system type.
@@ -99,6 +104,9 @@ OBJS_DST = $(BASE_OBJ) $(HTTP_OBJ) $(ICMP_OBJ) $(SMTP_OBJ)
 LIB_ACL_PATH = ../lib_acl
 CFLAGS += -I $(LIB_ACL_PATH)/include
 
+STATIC_LIBNAME = lib_protocol.a
+SHARED_LIBNAME = lib_protocol.so
+
 ###########################################################
 
 .PHONY = static shared clean
@@ -109,18 +117,27 @@ all: static shared
 $(shell mkdir -p $(OBJ_PATH_DST))
 
 static: $(OBJS_DST)
-	$(AR) $(ARFL) $(LIB_PATH_DST)/lib_protocol.a $(OBJS_DST)
-	$(RANLIB) $(LIB_PATH_DST)/lib_protocol.a
+	@echo 'creating $(LIB_PATH_DST)/$(STATIC_LIBNAME)'
+	$(AR) $(ARFL) $(LIB_PATH_DST)/$(STATIC_LIBNAME) $(OBJS_DST)
+	$(RANLIB) $(LIB_PATH_DST)/$(STATIC_LIBNAME)
+	@echo 'build $(LIB_PATH_DST)/$(STATIC_LIBNAME) ok!'
 
-SHARED_FDFLAGS = -l_acl -lrt -lpthread
+shared_ldflags = -l_acl -lrt -lpthread
 shared: $(OBJS_DST)
-	@echo 'creating $(LIB_PATH_DST)/lib_protocol.so'
-	@if test -n "$(rpath)"; then \
-		$(CC) -shared -o $(LIB_PATH_DST)/lib_protocol.so $(OBJS_DST) $(SHARED_FDFLAGS) \
-			-L$(rpath) -Wl,-rpath,$(rpath); \
-		echo 'build $(LIB_PATH_DST)/lib_protocol.so ok!'; \
+	@echo ''
+	@echo 'creating $(SHARED_LIBNAME)'
+	@if test -n "$(rpath)" && test "$(UNIXTYPE)" = "LINUX"; then \
+		echo "building for linux"; \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+			-L$(rpath) $(shared_ldflags) -Wl,-rpath,$(rpath); \
+		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
+	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "SUNOS5"; then \
+		echo "building for sunos5"; \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+			-R$(rpath) -L$(rpath) $(shared_ldflags); \
+		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	else \
-		echo 'skip build $(LIB_PATH_DST)/lib_protocol.so; usage: make shared rpath=xxx'; \
+		echo 'skip build $(SHARED_LIBNAME); usage: make rpath=xxx'; \
 	fi
 
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/%.c

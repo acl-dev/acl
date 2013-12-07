@@ -282,7 +282,7 @@ static int open_unix_log(const char *addr, const char *logpre)
 }
 
 static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *stream acl_unused, void *arg)
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused, void *arg)
 {
 	ACL_LOG *log = (ACL_LOG*) arg;
 	int   ret;
@@ -300,7 +300,7 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 }
 
 static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *stream acl_unused, void *arg)
+	int timeout acl_unused, ACL_VSTREAM *fp acl_unused, void *arg)
 {
 	ACL_LOG *log = (ACL_LOG*) arg;
 	int   ret;

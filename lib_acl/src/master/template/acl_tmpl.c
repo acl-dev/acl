@@ -8,7 +8,7 @@
 
 #include <sys/time.h>
 #include <sys/resource.h>
-#ifndef ACL_MACOSX
+#if !defined(ACL_MACOSX) && !defined(ACL_SUNOS5)
 # include <sys/prctl.h>
 #endif
 #include "stdlib/acl_msg.h"
@@ -19,7 +19,7 @@ void set_core_limit(void)
 	const char *myname = "set_limit";
 	struct rlimit rlim, rlim_new;
 
-#ifndef ACL_MACOSX
+#if !defined(ACL_MACOSX) && !defined(ACL_SUNOS5)
 	if (prctl(PR_SET_DUMPABLE, 1) < 0) {
 		acl_msg_warn("%s(%d): prctl error(%s)",
 			myname, __LINE__, acl_last_serror());

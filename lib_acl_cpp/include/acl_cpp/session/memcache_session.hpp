@@ -31,7 +31,7 @@ public:
 	/**
 	 * 以输入的 memcached 的连接对象为参数的构造函数
 	 * @param cache {memcache*} 输入的 memcached 连接对象
-	 * @param auth_free {bool} 当该参数为 true 时，则要求该
+	 * @param auto_free {bool} 当该参数为 true 时，则要求该
 	 *  memcached_session 对象析构函数中释放传入的 cache 对象；
 	 *  否则则禁止在 memcached_session 的析构函数中释放 cache 对象
 	 * @param ttl {time_t} 生存周期(秒)

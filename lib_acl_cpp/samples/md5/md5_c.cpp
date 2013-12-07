@@ -110,7 +110,7 @@ void md5_final(unsigned char digest[16], md5_ctx *ctx)
 
 	byteSwap(ctx->buf, 4);
 	memcpy(digest, ctx->buf, 16);
-	memset(ctx, 0, sizeof(ctx));	/* In case it's sensitive */
+	memset(ctx, 0, sizeof(md5_ctx));	/* In case it's sensitive */
 }
 
 /* The four core functions - F1 is optimized somewhat */

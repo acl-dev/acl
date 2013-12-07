@@ -120,7 +120,10 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 	if (keep && alive_)
 	{
 		conn->set_when(now);
-		pool_.push_back(conn);
+
+		// 将归还的连接放在链表首部，这样在调用释放过期连接
+		// 时比较方便，有利于尽快将不忙的数据库连接关闭
+		pool_.push_front(conn);
 	}
 	else
 	{
