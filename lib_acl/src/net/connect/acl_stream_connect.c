@@ -21,9 +21,11 @@
 #include <fcntl.h>
 #include <string.h>
 #include <sys/ioctl.h>
+/*
 # ifndef ACL_FREEBSD
 #  include <stropts.h>
 # endif
+*/
 #include <sys/types.h>
 #include <fcntl.h>
 
