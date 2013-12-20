@@ -3,7 +3,7 @@
  *
  * \brief DES block cipher
  *
- *  Copyright (C) 2006-2010, Brainspark B.V.
+ *  Copyright (C) 2006-2013, Brainspark B.V.
  *
  *  This file is part of PolarSSL (http://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
@@ -27,7 +27,16 @@
 #ifndef POLARSSL_DES_H
 #define POLARSSL_DES_H
 
+#include "config.h"
+
 #include <string.h>
+
+#if defined(_MSC_VER) && !defined(EFIX64) && !defined(EFI32)
+#include <basetsd.h>
+typedef UINT32 uint32_t;
+#else
+#include <inttypes.h>
+#endif
 
 #define DES_ENCRYPT     1
 #define DES_DECRYPT     0
@@ -36,13 +45,21 @@
 
 #define DES_KEY_SIZE    8
 
+#if !defined(POLARSSL_DES_ALT)
+// Regular implementation
+//
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \brief          DES context structure
  */
 typedef struct
 {
     int mode;                   /*!<  encrypt/decrypt   */
-    unsigned long sk[32];       /*!<  DES subkeys       */
+    uint32_t sk[32];            /*!<  DES subkeys       */
 }
 des_context;
 
@@ -52,13 +69,9 @@ des_context;
 typedef struct
 {
     int mode;                   /*!<  encrypt/decrypt   */
-    unsigned long sk[96];       /*!<  3DES subkeys      */
+    uint32_t sk[96];            /*!<  3DES subkeys      */
 }
 des3_context;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * \brief          Set key parity on the given key to odd.
@@ -164,6 +177,7 @@ int des_crypt_ecb( des_context *ctx,
                     const unsigned char input[8],
                     unsigned char output[8] );
 
+#if defined(POLARSSL_CIPHER_MODE_CBC)
 /**
  * \brief          DES-CBC buffer encryption/decryption
  *
@@ -180,6 +194,7 @@ int des_crypt_cbc( des_context *ctx,
                     unsigned char iv[8],
                     const unsigned char *input,
                     unsigned char *output );
+#endif /* POLARSSL_CIPHER_MODE_CBC */
 
 /**
  * \brief          3DES-ECB block encryption/decryption
@@ -194,6 +209,7 @@ int des3_crypt_ecb( des3_context *ctx,
                      const unsigned char input[8],
                      unsigned char output[8] );
 
+#if defined(POLARSSL_CIPHER_MODE_CBC)
 /**
  * \brief          3DES-CBC buffer encryption/decryption
  *
@@ -212,8 +228,21 @@ int des3_crypt_cbc( des3_context *ctx,
                      unsigned char iv[8],
                      const unsigned char *input,
                      unsigned char *output );
+#endif /* POLARSSL_CIPHER_MODE_CBC */
 
-/*
+#ifdef __cplusplus
+}
+#endif
+
+#else  /* POLARSSL_DES_ALT */
+#include "des_alt.h"
+#endif /* POLARSSL_DES_ALT */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
  * \brief          Checkup routine
  *
  * \return         0 if successful, or 1 if the test failed

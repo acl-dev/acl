@@ -651,7 +651,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		if (udp_server_lock != 0) {
 			acl_watchdog_stop(watchdog);
 			if (acl_myflock(ACL_VSTREAM_FILE(udp_server_lock),
-				ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_EXCLUSIVE) < 0)
+				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
 			{
 				acl_msg_fatal("lock error %s", acl_last_serror());
 			}

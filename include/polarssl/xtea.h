@@ -3,7 +3,7 @@
  *
  * \brief XTEA block cipher (32-bit)
  *
- *  Copyright (C) 2006-2010, Brainspark B.V.
+ *  Copyright (C) 2006-2013, Brainspark B.V.
  *
  *  This file is part of PolarSSL (http://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
@@ -27,9 +27,11 @@
 #ifndef POLARSSL_XTEA_H
 #define POLARSSL_XTEA_H
 
+#include "config.h"
+
 #include <string.h>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(EFIX64) && !defined(EFI32)
 #include <basetsd.h>
 typedef UINT32 uint32_t;
 #else
@@ -41,6 +43,14 @@ typedef UINT32 uint32_t;
 
 #define POLARSSL_ERR_XTEA_INVALID_INPUT_LENGTH             -0x0028  /**< The data input has an invalid length. */
 
+#if !defined(POLARSSL_XTEA_ALT)
+// Regular implementation
+//
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \brief          XTEA context structure
  */
@@ -50,17 +60,13 @@ typedef struct
 }
 xtea_context;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
  * \brief          XTEA key schedule
  *
  * \param ctx      XTEA context to be initialized
  * \param key      the secret key
  */
-void xtea_setup( xtea_context *ctx, unsigned char key[16] );
+void xtea_setup( xtea_context *ctx, const unsigned char key[16] );
 
 /**
  * \brief          XTEA cipher function
@@ -74,9 +80,10 @@ void xtea_setup( xtea_context *ctx, unsigned char key[16] );
  */
 int xtea_crypt_ecb( xtea_context *ctx,
                     int mode,
-                    unsigned char input[8],
+                    const unsigned char input[8],
                     unsigned char output[8] );
 
+#if defined(POLARSSL_CIPHER_MODE_CBC)
 /**
  * \brief          XTEA CBC cipher function
  *
@@ -94,10 +101,23 @@ int xtea_crypt_cbc( xtea_context *ctx,
                     int mode,
                     size_t length,
                     unsigned char iv[8],
-                    unsigned char *input,
+                    const unsigned char *input,
                     unsigned char *output);
+#endif /* POLARSSL_CIPHER_MODE_CBC */
 
-/*
+#ifdef __cplusplus
+}
+#endif
+
+#else  /* POLARSSL_XTEA_ALT */
+#include "xtea_alt.h"
+#endif /* POLARSSL_XTEA_ALT */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
  * \brief          Checkup routine
  *
  * \return         0 if successful, or 1 if the test failed

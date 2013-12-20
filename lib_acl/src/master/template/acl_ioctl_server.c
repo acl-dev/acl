@@ -551,7 +551,7 @@ static void ioctl_server_accept_pass(int event_type, ACL_IOCTL *h_ioctl,
 
 	if (ioctl_server_lock != 0
 	    && acl_myflock(ACL_VSTREAM_FILE(ioctl_server_lock),
-	    	ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
+	    	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
@@ -636,7 +636,7 @@ static void ioctl_server_accept_sock(int event_type, ACL_IOCTL *h_ioctl,
 
 	if (ioctl_server_lock != 0
 	    && acl_myflock(ACL_VSTREAM_FILE(ioctl_server_lock),
-  	  	ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
+  	  	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
@@ -1116,7 +1116,7 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 		if (ioctl_server_lock != 0) {
 			acl_watchdog_stop(watchdog);
 			if (acl_myflock(ACL_VSTREAM_FILE(ioctl_server_lock),
-				ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_EXCLUSIVE) < 0)
+				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
 			{
 				acl_msg_fatal("lock: %s", acl_last_serror());
 			}

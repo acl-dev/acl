@@ -16,7 +16,7 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 
 	printf("open %s ok, begin to lock it\r\n", filename);
 
-	if (acl_myflock(handle, ACL_MYFLOCK_STYLE_FCNTL, ACL_MYFLOCK_OP_EXCLUSIVE) == -1) {
+	if (acl_myflock(handle, ACL_FLOCK_STYLE_FCNTL, ACL_FLOCK_OP_EXCLUSIVE) == -1) {
 		acl_msg_error("lock error(%s)", acl_last_strerror(ebuf, sizeof(ebuf)));
 		getchar();
 		return (-1);
@@ -25,7 +25,7 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	printf("lock %s ok, enter any key to unlock\r\n", filename);
 	getchar();
 
-	if (acl_myflock(handle, ACL_MYFLOCK_STYLE_FCNTL, ACL_MYFLOCK_OP_NONE) == -1) {
+	if (acl_myflock(handle, ACL_FLOCK_STYLE_FCNTL, ACL_FLOCK_OP_NONE) == -1) {
 		acl_msg_error("unlock error(%s)", acl_last_strerror(ebuf, sizeof(ebuf)));
 		getchar();
 		return (-1);

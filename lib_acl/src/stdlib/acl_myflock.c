@@ -41,7 +41,7 @@ int acl_myflock(ACL_FILE_HANDLE fd, int lock_style, int operation)
 	/*
 	 * Sanity check.
 	 */
-	if ((operation & (ACL_MYFLOCK_OP_BITS)) != operation)
+	if ((operation & (ACL_FLOCK_OP_BITS)) != operation)
 		acl_msg_panic("myflock: improper operation type: 0x%x", operation);
 
 	switch (lock_style) {
@@ -50,7 +50,7 @@ int acl_myflock(ACL_FILE_HANDLE fd, int lock_style, int operation)
 	 * flock() does exactly what we need. Too bad it is not standard.
 	 */
 #ifdef ACL_HAS_FLOCK_LOCK
-	case ACL_MYFLOCK_STYLE_FLOCK:
+	case ACL_FLOCK_STYLE_FLOCK:
 	{
 		static int lock_ops[] = {
 			LOCK_UN, LOCK_SH, LOCK_EX, -1,
@@ -67,7 +67,7 @@ int acl_myflock(ACL_FILE_HANDLE fd, int lock_style, int operation)
 	 * it.
 	 */
 #ifdef ACL_HAS_FCNTL_LOCK
-	case ACL_MYFLOCK_STYLE_FCNTL:
+	case ACL_FLOCK_STYLE_FCNTL:
 	{
 		struct flock lock;
 		int     request;
@@ -76,8 +76,8 @@ int acl_myflock(ACL_FILE_HANDLE fd, int lock_style, int operation)
 		};
 
 		memset((char *) &lock, 0, sizeof(lock));
-		lock.l_type = lock_ops[operation & ~ACL_MYFLOCK_OP_NOWAIT];
-		request = (operation & ACL_MYFLOCK_OP_NOWAIT) ? F_SETLK : F_SETLKW;
+		lock.l_type = lock_ops[operation & ~ACL_FLOCK_OP_NOWAIT];
+		request = (operation & ACL_FLOCK_OP_NOWAIT) ? F_SETLK : F_SETLKW;
 		while ((status = fcntl(fd, request, &lock)) < 0
 			&& request == F_SETLKW
 			&& (acl_last_error() == ACL_EINTR
@@ -95,7 +95,7 @@ int acl_myflock(ACL_FILE_HANDLE fd, int lock_style, int operation)
 	 * Return a consistent result. Some systems return EACCES when a lock is
 	 * taken by someone else, and that would complicate error processing.
 	 */
-	if (status < 0 && (operation & ACL_MYFLOCK_OP_NOWAIT) != 0) {
+	if (status < 0 && (operation & ACL_FLOCK_OP_NOWAIT) != 0) {
 		char  error = acl_last_error();
 		if (error == ACL_EAGAIN || error == ACL_EWOULDBLOCK || error == EACCES)
 			acl_set_error(ACL_EAGAIN);
@@ -115,33 +115,33 @@ int acl_myflock(ACL_FILE_HANDLE fd, int lock_style acl_unused, int operation)
 	char  ebuf[256];
 	unsigned char lock_op;
 
-	if ((operation & (ACL_MYFLOCK_OP_BITS)) != operation)
+	if ((operation & (ACL_FLOCK_OP_BITS)) != operation)
 		acl_msg_panic("myflock: improper operation type: 0x%x", operation);
 
-	lock_op = operation & ~ACL_MYFLOCK_OP_NOWAIT;
+	lock_op = operation & ~ACL_FLOCK_OP_NOWAIT;
 
-	if (lock_op == ACL_MYFLOCK_OP_NONE) {
+	if (lock_op == ACL_FLOCK_OP_NONE) {
 		if(UnlockFile(fd, 0, 0, size, 0))
 			return (0);
 
 		acl_msg_error("%s(%d): unlock error(%s)",
 			myname, __LINE__, acl_last_strerror(ebuf,sizeof(ebuf)));
 		return (-1);
-	} else if (lock_op == ACL_MYFLOCK_OP_SHARED) {
+	} else if (lock_op == ACL_FLOCK_OP_SHARED) {
 		while (1) {
 			if(LockFile(fd, 0, 0, size, 0))
 				return (0);
 
-			if ((operation & ACL_MYFLOCK_OP_NOWAIT))
+			if ((operation & ACL_FLOCK_OP_NOWAIT))
 				return (-1);
 			sleep(1);
 		}
-	} else if (lock_op == ACL_MYFLOCK_OP_EXCLUSIVE) {
+	} else if (lock_op == ACL_FLOCK_OP_EXCLUSIVE) {
 		while (1) {
 			if(LockFile(fd, 0, 0, size, 0))
 				return (0);
 
-			if ((operation & ACL_MYFLOCK_OP_NOWAIT))
+			if ((operation & ACL_FLOCK_OP_NOWAIT))
 				return (-1);
 			sleep(1);
 		}
@@ -161,44 +161,44 @@ int acl_myflock(ACL_FILE_HANDLE fd, int lock_style acl_unused, int operation)
 	OVERLAPPED ovlp;
 	DWORD flags;
 
-	if ((operation & (ACL_MYFLOCK_OP_BITS)) != operation)
+	if ((operation & (ACL_FLOCK_OP_BITS)) != operation)
 		acl_msg_panic("myflock: improper operation type: 0x%x", operation);
 
 	memset(&ovlp, 0, sizeof(ovlp));
 
 	ovlp.Offset = 0;
-	lock_op = operation & ~ACL_MYFLOCK_OP_NOWAIT;
-	if (lock_op == ACL_MYFLOCK_OP_NONE) {
+	lock_op = operation & ~ACL_FLOCK_OP_NOWAIT;
+	if (lock_op == ACL_FLOCK_OP_NONE) {
 		if(UnlockFileEx(fd, 0, 1, 0, &ovlp))
 			return (0);
 		acl_msg_error("%s(%d): unlock error(%s)",
 			myname, __LINE__, acl_last_strerror(ebuf,sizeof(ebuf)));
 		return (-1);
-	} else if (lock_op == ACL_MYFLOCK_OP_SHARED) {
+	} else if (lock_op == ACL_FLOCK_OP_SHARED) {
 		while (1) {
 			flags = 0;
-			if ((operation & ACL_MYFLOCK_OP_NOWAIT))
+			if ((operation & ACL_FLOCK_OP_NOWAIT))
 				flags |= LOCKFILE_FAIL_IMMEDIATELY;
 
 			if(LockFileEx(fd, flags, 0, 1, 0, &ovlp))
 				return (0);
-			if ((operation & ACL_MYFLOCK_OP_NOWAIT)) {
+			if ((operation & ACL_FLOCK_OP_NOWAIT)) {
 				acl_msg_error("%s(%d): lock error(%s)", myname, __LINE__,
 					acl_last_strerror(ebuf,sizeof(ebuf)));
 				return (-1);
 			}
 			sleep(1);
 		}
-	} else if (lock_op == ACL_MYFLOCK_OP_EXCLUSIVE) {
+	} else if (lock_op == ACL_FLOCK_OP_EXCLUSIVE) {
 		while (1) {
 			flags = LOCKFILE_EXCLUSIVE_LOCK;
-			if ((operation & ACL_MYFLOCK_OP_NOWAIT))
+			if ((operation & ACL_FLOCK_OP_NOWAIT))
 				flags |= LOCKFILE_FAIL_IMMEDIATELY;
 
 			if(LockFileEx(fd, flags, 0, 1, 0, &ovlp))
 				return (0);
 
-			if ((operation & ACL_MYFLOCK_OP_NOWAIT)) {
+			if ((operation & ACL_FLOCK_OP_NOWAIT)) {
 				acl_msg_error("%s(%d): lock error(%s)", myname, __LINE__,
 					acl_last_strerror(ebuf,sizeof(ebuf)));
 				return (-1);

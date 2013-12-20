@@ -195,8 +195,15 @@ bool ssl_aio_stream::ssl_client_init()
 	//ssl_set_dbg(ssl_, my_debug, stdout);
 	ssl_set_bio(ssl_, __sock_read, this, __sock_send, this);
 
-	ssl_set_ciphersuites(ssl_, ssl_default_ciphersuites);
-	ssl_set_session(ssl_, 1, 600, ssn_);
+	const int* cipher_suites = ssl_list_ciphersuites();
+	if (cipher_suites == NULL)
+	{
+		logger_error("ssl_list_ciphersuites null");
+		return false;
+	}
+
+	ssl_set_ciphersuites(ssl_, cipher_suites);
+	ssl_set_session(ssl_, ssn_);
 
 	acl_vstream_ctl(stream,
 		ACL_VSTREAM_CTL_READ_FN, __ssl_read,

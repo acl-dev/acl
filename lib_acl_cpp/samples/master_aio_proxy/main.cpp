@@ -20,7 +20,10 @@ int main(int argc, char* argv[])
 		acl::log::stdout_open(true);  // 日志输出至标准输出
 		const char* addr = ":8888";
 		printf("listen on: %s\r\n", addr);
-		ms.run_alone(addr, NULL, acl::ENGINE_SELECT);  // 单独运行方式
+		if (argc >= 3)
+			ms.run_alone(addr, argv[2], acl::ENGINE_SELECT);
+		else
+			ms.run_alone(addr, NULL, acl::ENGINE_SELECT);  // 单独运行方式
 	}
 	else
 		ms.run_daemon(argc, argv);  // acl_master 控制模式运行

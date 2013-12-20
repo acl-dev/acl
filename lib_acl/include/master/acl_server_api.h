@@ -87,8 +87,10 @@ extern void acl_multi_server_enable_read(ACL_VSTREAM *stream);
   * acl_ioctl_server.c
   */
 typedef void (*ACL_IOCTL_SERVER_FN) (ACL_IOCTL *, ACL_VSTREAM *, char *, char **);
-extern void acl_ioctl_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg, int delay);
-extern void acl_ioctl_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg);
+extern void acl_ioctl_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
+	void *arg, int delay);
+extern void acl_ioctl_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
+	void *arg);
 extern void acl_ioctl_server_main(int, char **, ACL_IOCTL_SERVER_FN,...);
 extern ACL_IOCTL *acl_ioctl_server_handle(void);
 extern ACL_EVENT *acl_ioctl_server_event(void);
@@ -97,35 +99,45 @@ extern void acl_ioctl_server_enable_read(ACL_IOCTL *h_ioctl, ACL_VSTREAM *stream
 	int timeout, ACL_IOCTL_NOTIFY_FN notify_fn, void *context);
 
  /*
+  * acl_threads_server.c
+  */
+ACL_EVENT *acl_threads_server_event(void);
+acl_pthread_pool_t *acl_threads_server_threads(void);
+ACL_VSTREAM **acl_threads_server_streams(void);
+void acl_threads_server_main(int argc, char **argv,
+	int (*service)(ACL_VSTREAM*, void*), void *service_ctx, int name, ...);
+
+ /*
   * acl_aio_server.c
   */
 typedef void (*ACL_AIO_SERVER_FN) (ACL_SOCKET, char *, char **);
-extern void acl_aio_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg, int delay);
-extern void acl_aio_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg);
+extern void acl_aio_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
+	void *arg, int delay);
+extern void acl_aio_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
+	void *arg);
 extern void acl_aio_server_request_rw_timer(ACL_ASTREAM *);
 extern void acl_aio_server_cancel_rw_timer(ACL_ASTREAM *);
 extern void acl_aio_server_main(int, char **, ACL_AIO_SERVER_FN, ...);
 extern ACL_AIO *acl_aio_server_handle(void);
 extern ACL_EVENT *acl_aio_server_event(void);
 extern int acl_aio_server_read(ACL_ASTREAM *astream, int timeout,
-		ACL_AIO_READ_FN notify_fn, void *context);
+	ACL_AIO_READ_FN notify_fn, void *context);
 extern int acl_aio_server_readn(ACL_ASTREAM *astream, int count, int timeout,
-		ACL_AIO_READ_FN notify_fn, void *context);
+	ACL_AIO_READ_FN notify_fn, void *context);
 extern int acl_aio_server_gets(ACL_ASTREAM *astream, int timeout,
-		ACL_AIO_READ_FN notify_fn, void *context);
+	ACL_AIO_READ_FN notify_fn, void *context);
 extern int acl_aio_server_gets_nonl(ACL_ASTREAM *astream, int timeout,
-		ACL_AIO_READ_FN notify_fn, void *context);
+	ACL_AIO_READ_FN notify_fn, void *context);
 extern int acl_aio_server_writen(ACL_ASTREAM *astream,
-		ACL_AIO_WRITE_FN notify_fn, void *context,
-		const char *data, int dlen);
+	ACL_AIO_WRITE_FN notify_fn, void *context,
+	const char *data, int dlen);
 extern int acl_aio_server_vfprintf(ACL_ASTREAM *astream,
-		ACL_AIO_WRITE_FN notify_fn, void *context,
-		const char *fmt, va_list ap);
+	ACL_AIO_WRITE_FN notify_fn, void *context,
+	const char *fmt, va_list ap);
 extern int acl_aio_server_fprintf(ACL_ASTREAM *astream,
-		ACL_AIO_WRITE_FN notify_fn, void *context,
-		const char *fmt, ...);
+	ACL_AIO_WRITE_FN notify_fn, void *context, const char *fmt, ...);
 extern int acl_aio_server_connect(const char *saddr, int timeout,
-		ACL_AIO_CONNECT_FN connect_fn, void *context);
+	ACL_AIO_CONNECT_FN connect_fn, void *context);
 extern ACL_ASTREAM **acl_aio_server_streams(void);
 
  /*
@@ -134,7 +146,8 @@ extern ACL_ASTREAM **acl_aio_server_streams(void);
 typedef void (*ACL_UDP_SERVER_FN) (ACL_VSTREAM *, char *, char **);
 extern void acl_udp_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
 	void *arg, acl_int64 delay, int keep);
-extern void acl_udp_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg);
+extern void acl_udp_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
+	void *arg);
 extern void acl_udp_server_main(int, char **, ACL_UDP_SERVER_FN, ...);
 extern ACL_EVENT *acl_udp_server_event(void);
 extern ACL_VSTREAM **acl_udp_server_streams(void);

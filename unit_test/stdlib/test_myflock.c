@@ -51,7 +51,7 @@ static ACL_FILE_HANDLE __mylock_try_open(const char *filename)
 
 static int __mylock_op(ACL_FILE_HANDLE fd, int op, char *errbuf, int size)
 {
-	int   lock_style = ACL_MYFLOCK_STYLE_FCNTL;
+	int   lock_style = ACL_FLOCK_STYLE_FCNTL;
 	int   ret;
 
 	ret = acl_myflock(fd, lock_style, op);
@@ -66,7 +66,7 @@ static int __mylock_op(ACL_FILE_HANDLE fd, int op, char *errbuf, int size)
 
 int test_mylock_unlock(AUT_LINE *test_line, void *arg acl_unused)
 {
-	int   operation = ACL_MYFLOCK_OP_NONE;
+	int   operation = ACL_FLOCK_OP_NONE;
 	const char *filename;
 	ACL_FILE_HANDLE   fd;
 
@@ -77,7 +77,7 @@ int test_mylock_unlock(AUT_LINE *test_line, void *arg acl_unused)
 
 int test_mylock_excl(AUT_LINE *test_line, void *arg acl_unused)
 {
-	int   operation = ACL_MYFLOCK_OP_EXCLUSIVE;
+	int   operation = ACL_FLOCK_OP_EXCLUSIVE;
 	const char *filename;
 	ACL_FILE_HANDLE   fd;
 
@@ -88,7 +88,7 @@ int test_mylock_excl(AUT_LINE *test_line, void *arg acl_unused)
 
 int test_mylock_nowait(AUT_LINE *test_line, void *arg acl_unused)
 {
-	int   operation = ACL_MYFLOCK_OP_NOWAIT;
+	int   operation = ACL_FLOCK_OP_NOWAIT;
 	const char *filename;
 	ACL_FILE_HANDLE   fd;
 
@@ -99,7 +99,7 @@ int test_mylock_nowait(AUT_LINE *test_line, void *arg acl_unused)
 
 int test_mylock_shared(AUT_LINE *test_line, void *arg acl_unused)
 {
-	int   operation = ACL_MYFLOCK_OP_SHARED;
+	int   operation = ACL_FLOCK_OP_SHARED;
 	const char *filename;
 	ACL_FILE_HANDLE   fd;
 

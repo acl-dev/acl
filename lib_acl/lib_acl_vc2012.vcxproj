@@ -427,6 +427,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include=".\src\master\template\acl_master_log.c" />
     <ClCompile Include=".\src\master\template\acl_multi_server.c" />
     <ClCompile Include=".\src\master\template\acl_single_server.c" />
+    <ClCompile Include=".\src\master\template\acl_threads_server.c" />
     <ClCompile Include=".\src\master\template\acl_trigger_server.c" />
     <ClCompile Include=".\src\master\framework\master_avail.c" />
     <ClCompile Include=".\src\master\framework\master_conf.c" />
@@ -654,6 +655,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\include\master\acl_multi_params.h" />
     <ClInclude Include=".\include\master\acl_server_api.h" />
     <ClInclude Include=".\include\master\acl_single_params.h" />
+    <ClInclude Include=".\include\master\acl_threads_params.h" />
     <ClInclude Include=".\include\master\acl_trigger_params.h" />
     <ClInclude Include=".\include\proctl\acl_proctl.h" />
     <ClInclude Include=".\include\experiment\experiment.h" />

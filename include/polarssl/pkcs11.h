@@ -5,7 +5,7 @@
  *
  * \author Adriaan de Jong <dejong@fox-it.com>
  *
- *  Copyright (C) 2006-2011, Brainspark B.V.
+ *  Copyright (C) 2006-2013, Brainspark B.V.
  *
  *  This file is part of PolarSSL (http://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
@@ -33,9 +33,21 @@
 
 #if defined(POLARSSL_PKCS11_C)
 
-#include "x509.h"
+#include "x509_crt.h"
 
 #include <pkcs11-helper-1.0/pkcs11h-certificate.h>
+
+#if defined(_MSC_VER) && !defined(inline)
+#define inline _inline
+#else
+#if defined(__ARMCC_VERSION) && !defined(inline)
+#define inline __inline
+#endif /* __ARMCC_VERSION */
+#endif /*_MSC_VER */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Context for PKCS #11 private keys.
@@ -53,7 +65,7 @@ typedef struct {
  *
  * \return              0 on success.
  */
-int pkcs11_x509_cert_init( x509_cert *cert, pkcs11h_certificate_t pkcs11h_cert );
+int pkcs11_x509_cert_init( x509_crt *cert, pkcs11h_certificate_t pkcs11h_cert );
 
 /**
  * Initialise a pkcs11_context, storing the given certificate. Note that the
@@ -96,7 +108,7 @@ int pkcs11_decrypt( pkcs11_context *ctx,
                        int mode, size_t *olen,
                        const unsigned char *input,
                        unsigned char *output,
-                       unsigned int output_max_len );
+                       size_t output_max_len );
 
 /**
  * \brief          Do a private RSA to sign a message digest
@@ -120,6 +132,37 @@ int pkcs11_sign( pkcs11_context *ctx,
                     unsigned int hashlen,
                     const unsigned char *hash,
                     unsigned char *sig );
+
+/**
+ * SSL/TLS wrappers for PKCS#11 functions
+ */
+static inline int ssl_pkcs11_decrypt( void *ctx, int mode, size_t *olen,
+                        const unsigned char *input, unsigned char *output,
+                        size_t output_max_len )
+{
+    return pkcs11_decrypt( (pkcs11_context *) ctx, mode, olen, input, output,
+                           output_max_len );
+}
+
+static inline int ssl_pkcs11_sign( void *ctx, 
+                     int (*f_rng)(void *, unsigned char *, size_t), void *p_rng,
+                     int mode, int hash_id, unsigned int hashlen,
+                     const unsigned char *hash, unsigned char *sig )
+{
+    ((void) f_rng);
+    ((void) p_rng);
+    return pkcs11_sign( (pkcs11_context *) ctx, mode, hash_id,
+                        hashlen, hash, sig );
+}
+
+static inline size_t ssl_pkcs11_key_len( void *ctx )
+{
+    return ( (pkcs11_context *) ctx )->len;
+}
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* POLARSSL_PKCS11_C */
 

@@ -247,7 +247,7 @@ static void single_server_accept_pass(int type acl_unused, ACL_EVENT *event,
 	fd = PASS_ACCEPT(listen_fd);
 	if (single_server_lock != 0
 	    && acl_myflock(ACL_VSTREAM_FILE(single_server_lock),
-	    	ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
+	    	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
@@ -287,7 +287,7 @@ static void single_server_accept_sock(int type acl_unused, ACL_EVENT *event,
 	fd = acl_accept(listen_fd, remote, sizeof(remote), &sock_type);
 	if (single_server_lock != 0
 	    && acl_myflock(ACL_VSTREAM_FILE(single_server_lock),
-	    	ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
+	    	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
@@ -705,7 +705,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 		if (single_server_lock != 0) {
 			acl_watchdog_stop(watchdog);
 			if (acl_myflock(ACL_VSTREAM_FILE(single_server_lock),
-				ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_EXCLUSIVE) < 0)
+				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
 			{
 				acl_msg_fatal("error lock %s", acl_last_serror());
 			}

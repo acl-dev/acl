@@ -5,7 +5,7 @@
  *
  * \author Adriaan de Jong <dejong@fox-it.com>
  *
- *  Copyright (C) 2006-2011, Brainspark B.V.
+ *  Copyright (C) 2006-2013, Brainspark B.V.
  *
  *  This file is part of PolarSSL (http://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
@@ -44,6 +44,10 @@
 #define POLARSSL_ERR_MD_ALLOC_FAILED                       -0x5180  /**< Failed to allocate memory. */
 #define POLARSSL_ERR_MD_FILE_IO_ERROR                      -0x5200  /**< Opening or reading of file failed. */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     POLARSSL_MD_NONE=0,
     POLARSSL_MD_MD2,
@@ -56,7 +60,11 @@ typedef enum {
     POLARSSL_MD_SHA512,
 } md_type_t;
 
+#if defined(POLARSSL_SHA512_C)
 #define POLARSSL_MD_MAX_SIZE         64  /* longest known is SHA512 */
+#else
+#define POLARSSL_MD_MAX_SIZE         32  /* longest known is SHA256 or less */
+#endif
 
 /**
  * Message digest information. Allows message digest functions to be called
@@ -111,6 +119,8 @@ typedef struct {
     /** Free the given context */
     void (*ctx_free_func)( void *ctx );
 
+    /** Internal use only */
+    void (*process_func)( void *ctx, const unsigned char *input );
 } md_info_t;
 
 /**
@@ -128,10 +138,6 @@ typedef struct {
     NULL, /* md_info */ \
     NULL, /* md_ctx */ \
 }
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * \brief Returns the list of digests supported by the generic digest module.
@@ -198,6 +204,9 @@ int md_free_ctx( md_context_t *ctx );
  */
 static inline unsigned char md_get_size( const md_info_t *md_info )
 {
+    if( md_info == NULL )
+        return( 0 );
+
     return md_info->size;
 }
 
@@ -210,6 +219,9 @@ static inline unsigned char md_get_size( const md_info_t *md_info )
  */
 static inline md_type_t md_get_type( const md_info_t *md_info )
 {
+    if( md_info == NULL )
+        return( POLARSSL_MD_NONE );
+
     return md_info->type;
 }
 
@@ -222,6 +234,9 @@ static inline md_type_t md_get_type( const md_info_t *md_info )
  */
 static inline const char *md_get_name( const md_info_t *md_info )
 {
+    if( md_info == NULL )
+        return( NULL );
+
     return md_info->name;
 }
 
@@ -346,6 +361,9 @@ int md_hmac_reset( md_context_t *ctx );
 int md_hmac( const md_info_t *md_info, const unsigned char *key, size_t keylen,
                 const unsigned char *input, size_t ilen,
                 unsigned char *output );
+
+/* Internal use */
+int md_process( md_context_t *ctx, const unsigned char *data );
 
 #ifdef __cplusplus
 }

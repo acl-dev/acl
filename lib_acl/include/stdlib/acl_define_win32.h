@@ -101,7 +101,7 @@
 #  define	ssize_t	long
 # endif
 
-# define ACL_INTERNAL_LOCK	ACL_MYFLOCK_STYLE_FLOCK
+# define ACL_INTERNAL_LOCK	ACL_FLOCK_STYLE_FLOCK
 
 # define	acl_int64	__int64
 # define	acl_uint64	unsigned __int64

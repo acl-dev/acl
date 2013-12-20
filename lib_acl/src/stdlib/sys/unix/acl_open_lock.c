@@ -26,7 +26,8 @@
 
 /* open_lock - open file and lock it for exclusive access */
 
-ACL_VSTREAM *acl_open_lock(const char *path, int flags, int mode, ACL_VSTRING *why)
+ACL_VSTREAM *acl_open_lock(const char *path, int flags,
+	int mode, ACL_VSTRING *why)
 {
 	ACL_VSTREAM *fp;
 
@@ -35,14 +36,18 @@ ACL_VSTREAM *acl_open_lock(const char *path, int flags, int mode, ACL_VSTRING *w
 	 * don't have the O_LOCK open() flag, or the flag does not do what we
 	 * want, so we roll our own lock.
 	 */
-	if ((fp = acl_safe_open(path, flags, mode, (struct stat *) 0, -1, -1, why)) == 0)
-		return (0);
+	fp = acl_safe_open(path, flags, mode, (struct stat *) 0, -1, -1, why);
+	if (fp == 0)
+		return 0;
+
 	if (acl_myflock(ACL_VSTREAM_FILE(fp), ACL_INTERNAL_LOCK,
-			ACL_MYFLOCK_OP_EXCLUSIVE | ACL_MYFLOCK_OP_NOWAIT) < 0) {
-		acl_vstring_sprintf(why, "unable to set exclusive lock: %s", acl_last_serror());
+		ACL_FLOCK_OP_EXCLUSIVE | ACL_FLOCK_OP_NOWAIT) < 0)
+	{
+		acl_vstring_sprintf(why, "unable to set exclusive lock: %s",
+			acl_last_serror());
 		acl_vstream_close(fp);
-		return (0);
+		return 0;
 	}
-	return (fp);
+	return fp;
 }
 #endif /* ACL_UNIX */

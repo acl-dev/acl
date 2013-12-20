@@ -512,7 +512,8 @@ TAG_DONE:
 		acl_myfree(timer);
 	}
 
-	event_thr_fire(eventp);
+	if (eventp->fdcnt_ready > 0)
+		event_thr_fire(eventp);
 }
 
 static void event_add_dog(ACL_EVENT *eventp)

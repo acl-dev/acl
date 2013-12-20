@@ -89,8 +89,8 @@ ACL_VSTREAM *local_listen()
 			myname, __LINE__, lock_file, acl_last_serror());
 
 	handle = ACL_VSTREAM_FILE(fp);
-	if (acl_myflock(handle, 0, ACL_MYFLOCK_OP_EXCLUSIVE
-		| ACL_MYFLOCK_OP_NOWAIT) == -1)
+	if (acl_myflock(handle, 0, ACL_FLOCK_OP_EXCLUSIVE
+		| ACL_FLOCK_OP_NOWAIT) == -1)
 	{
 		acl_msg_error("%s(%d): lock file(%s) error(%s)",
 			myname, __LINE__, lock_file, acl_last_serror());
@@ -119,11 +119,11 @@ ACL_VSTREAM *local_listen()
 
 	/* XXX: 只能采用先解排它锁，再加共享锁，微软比较弱!!! */
 
-	if (acl_myflock(handle, 0, ACL_MYFLOCK_OP_NONE) == -1)
+	if (acl_myflock(handle, 0, ACL_FLOCK_OP_NONE) == -1)
 		acl_msg_fatal("%s(%d): unlock file(%s) error(%s)",
 			myname, __LINE__, lock_file, acl_last_serror());
-	if (acl_myflock(handle, 0, ACL_MYFLOCK_OP_SHARED
-		| ACL_MYFLOCK_OP_NOWAIT) == -1)
+	if (acl_myflock(handle, 0, ACL_FLOCK_OP_SHARED
+		| ACL_FLOCK_OP_NOWAIT) == -1)
 	{
 		acl_msg_fatal("%s(%d): lock file(%s) error(%s)",
 			myname, __LINE__, lock_file, acl_last_serror());

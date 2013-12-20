@@ -80,10 +80,10 @@ bool locker::lock()
 
 	if (fHandle_ != ACL_FILE_INVALID)
 	{
-		int operation = ACL_MYFLOCK_OP_EXCLUSIVE;
+		int operation = ACL_FLOCK_OP_EXCLUSIVE;
 		if (nowait_)
-			operation |= ACL_MYFLOCK_OP_NOWAIT;
-		if (acl_myflock(fHandle_, ACL_MYFLOCK_STYLE_FCNTL,
+			operation |= ACL_FLOCK_OP_NOWAIT;
+		if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL,
 			operation) == -1)
 		{
 			return false;
@@ -107,8 +107,8 @@ bool locker::unlock()
 
 	if (fHandle_ != ACL_FILE_INVALID)
 	{
-		if (acl_myflock(fHandle_, ACL_MYFLOCK_STYLE_FCNTL,
-			ACL_MYFLOCK_OP_NONE) == -1)
+		if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL,
+			ACL_FLOCK_OP_NONE) == -1)
 		{
 			ret = false;
 		}

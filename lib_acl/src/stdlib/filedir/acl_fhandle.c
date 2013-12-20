@@ -345,7 +345,7 @@ void acl_fhandle_lock(ACL_FHANDLE *fs)
 		&& (fs->status & ACL_FHANDLE_S_FLOCK_ON) == 0)
 	{
 		if (acl_myflock(ACL_VSTREAM_FILE(fs->fp),
-			ACL_MYFLOCK_STYLE_FCNTL, ACL_MYFLOCK_OP_EXCLUSIVE) == -1)
+			ACL_FLOCK_STYLE_FCNTL, ACL_FLOCK_OP_EXCLUSIVE) == -1)
 		{
 			acl_msg_fatal("%s: lock file(%s) error(%s)",
 				myname, PATH(fs->fp), acl_last_serror());
@@ -385,7 +385,7 @@ void acl_fhandle_unlock(ACL_FHANDLE *fs)
 		fs->status &= ~ACL_FHANDLE_S_FLOCK_ON;
 
 		if (acl_myflock(ACL_VSTREAM_FILE(fs->fp),
-			ACL_MYFLOCK_STYLE_FCNTL, ACL_MYFLOCK_OP_NONE) == -1)
+			ACL_FLOCK_STYLE_FCNTL, ACL_FLOCK_OP_NONE) == -1)
 		{
 			acl_msg_fatal("%s: unlock file(%s) error(%s)",
 				myname, PATH(fs->fp), acl_last_serror());

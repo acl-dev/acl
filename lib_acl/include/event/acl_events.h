@@ -147,6 +147,11 @@ ACL_API HWND acl_event_wmsg_hwnd(ACL_EVENT *eventp);
  */
 ACL_API void acl_event_add_dog(ACL_EVENT *eventp);
 
+ACL_API void acl_event_fire_hook(ACL_EVENT *eventp,
+		void (*fire_begin)(ACL_EVENT*, void*),
+		void (*fire_end)(ACL_EVENT*, void*),
+		void* ctx);
+
 /**
  * 释放事件结构
  * @param eventp {ACL_EVENT*} 事件对象指针, 不为能为空

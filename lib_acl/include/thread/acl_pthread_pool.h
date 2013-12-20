@@ -13,6 +13,23 @@
 extern "C" {
 #endif
 
+typedef struct acl_pthread_job_t acl_pthread_job_t;
+
+/**
+ * 创建一个线程池的工作任务
+ * @param run_fn {void (*)(void*)} 在子线程中被调用的回调函数 
+ * @param run_arg {void*} run_fn 的回调参数之一
+ * @return {acl_pthread_job_t*} 返回创建的工作任务
+ */
+ACL_API acl_pthread_job_t *acl_pthread_pool_alloc_job(void (*run_fn)(void*),
+		void *run_arg, int fixed);
+
+/**
+ * 释放由 acl_pthread_pool_alloc_job 创建的工作任务
+ * @param job {acl_pthread_job_t*}
+ */
+ACL_API void acl_pthread_pool_free_job(acl_pthread_job_t *job);
+
 /**
  * 线程池对象结构类型定义
  */
@@ -113,6 +130,14 @@ ACL_API void acl_pthread_pool_add_begin(acl_pthread_pool_t *thr_pool);
  */
 ACL_API void acl_pthread_pool_add_one(acl_pthread_pool_t *thr_pool,
 		void (*run_fn)(void *), void *run_arg);
+/**
+ * 添加一个新任务, 前提是已经成功加锁, 即调用acl_pthread_pool_add_begin 成功
+ * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
+ * @param job {acl_pthread_job_t*} 由 acl_pthread_pool_alloc_job 创建的线程任务
+ */
+ACL_API void acl_pthread_pool_add_job(acl_pthread_pool_t *thr_pool,
+		acl_pthread_job_t *job);
+
 /**
  * 批处理添加结束, 实际是解锁
  * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空

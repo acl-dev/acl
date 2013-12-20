@@ -141,16 +141,22 @@ struct	ACL_EVENT {
 	int  (*isxset_fn)(ACL_EVENT *, ACL_VSTREAM *);
 
 	/* 添加定时器任务 */
-	acl_int64 (*timer_request)(ACL_EVENT *ev, ACL_EVENT_NOTIFY_TIME,
+	acl_int64 (*timer_request)(ACL_EVENT *, ACL_EVENT_NOTIFY_TIME,
 		void *, acl_int64, int);
 	/* 取消定时器任务 */
 	acl_int64 (*timer_cancel)(ACL_EVENT *ev,
 		ACL_EVENT_NOTIFY_TIME, void *);
 	/* 设置定时器是否为循环执行 */
-	void (*timer_keep)(ACL_EVENT *ev, ACL_EVENT_NOTIFY_TIME,
-		void *, int);
+	void (*timer_keep)(ACL_EVENT *, ACL_EVENT_NOTIFY_TIME, void *, int);
 	/* 定时器是否循环执行的 */
-	int  (*timer_ifkeep)(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME, void *);
+	int  (*timer_ifkeep)(ACL_EVENT *, ACL_EVENT_NOTIFY_TIME, void *);
+
+	/* 每次调用事件回调函数前若该函数指针非空则先调用此函数 */
+	void (*fire_begin)(ACL_EVENT *, void *);
+	/* 每次调用事件回调函数后若该函数指针非空则调用此函数 */
+	void (*fire_end)(ACL_EVENT *, void *);
+	/* fire_begin/fire_finish 的第二个参数 */
+	void *fire_ctx;
 };
 
 /*

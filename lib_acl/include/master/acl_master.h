@@ -13,6 +13,7 @@ extern "C" {
 #include "acl_aio_params.h"
 #include "acl_udp_params.h"
 #include "acl_master_conf.h"
+#include "acl_threads_params.h"
 #include "acl_app_main.h"
 
 #ifdef	__cplusplus

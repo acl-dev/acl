@@ -70,11 +70,11 @@ void connect_manager::init(const char* default_addr,
 		default_pool_ = &set(default_addr_.c_str(), max);
 	}
 	else
-		logger("no default redis set");
+		logger("no default connection set");
 
 	// 必须保证至少有一个服务可用
 	if (pools_.empty())
-		logger_fatal("no redis service available!");
+		logger_fatal("no connection available!");
 }
 
 void connect_manager::set_service_list(const char* addr_list, int count)
@@ -97,7 +97,7 @@ void connect_manager::set_service_list(const char* addr_list, int count)
 		int max = check_addr(ptr, addr, count);
 		if (max <= 0)
 		{
-			logger_error("invalid redis addr: %s", addr.c_str());
+			logger_error("invalid server addr: %s", addr.c_str());
 			continue;
 		}
 		set(addr.c_str(), max);
@@ -284,7 +284,7 @@ void connect_manager::statistics()
 	std::vector<connect_pool*>::const_iterator cit = pools_.begin();
 	for (; cit != pools_.end(); ++cit)
 	{
-		logger("redis: %s, total: %llu, curr: %llu",
+		logger("server: %s, total: %llu, curr: %llu",
 			(*cit)->get_addr(), (*cit)->get_total_used(),
 			(*cit)->get_current_used());
 		(*cit)->reset_statistics(stat_inter_);

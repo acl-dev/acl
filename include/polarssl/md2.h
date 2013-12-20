@@ -3,7 +3,7 @@
  *
  * \brief MD2 message digest algorithm (hash function)
  *
- *  Copyright (C) 2006-2010, Brainspark B.V.
+ *  Copyright (C) 2006-2013, Brainspark B.V.
  *
  *  This file is part of PolarSSL (http://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
@@ -27,9 +27,19 @@
 #ifndef POLARSSL_MD2_H
 #define POLARSSL_MD2_H
 
+#include "config.h"
+
 #include <string.h>
 
 #define POLARSSL_ERR_MD2_FILE_IO_ERROR                 -0x0070  /**< Read/write error in file. */
+
+#if !defined(POLARSSL_MD2_ALT)
+// Regular implementation
+//
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * \brief          MD2 context structure
@@ -45,10 +55,6 @@ typedef struct
     size_t left;                /*!< amount of data in buffer   */
 }
 md2_context;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * \brief          MD2 context setup
@@ -73,6 +79,18 @@ void md2_update( md2_context *ctx, const unsigned char *input, size_t ilen );
  * \param output   MD2 checksum result
  */
 void md2_finish( md2_context *ctx, unsigned char output[16] );
+
+#ifdef __cplusplus
+}
+#endif
+
+#else  /* POLARSSL_MD2_ALT */
+#include "md2_alt.h"
+#endif /* POLARSSL_MD2_ALT */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * \brief          Output = MD2( input buffer )
@@ -145,6 +163,9 @@ void md2_hmac( const unsigned char *key, size_t keylen,
  * \return         0 if successful, or 1 if the test failed
  */
 int md2_self_test( int verbose );
+
+/* Internal use */
+void md2_process( md2_context *ctx );
 
 #ifdef __cplusplus
 }

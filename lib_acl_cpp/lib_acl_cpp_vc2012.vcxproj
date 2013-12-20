@@ -93,7 +93,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_MT;_CRT_SECURE_NO_WARNINGS;USE_WIN_ICONV;HAS_SQLITE;HAS_MYSQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_MT;_CRT_SECURE_NO_WARNINGS;USE_WIN_ICONV;HAS_SQLITE;HAS_MYSQL;HAS_POLARSSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -252,6 +252,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\master\master_conf.cpp" />
     <ClCompile Include="src\master\master_proc.cpp" />
     <ClCompile Include="src\master\master_threads.cpp" />
+    <ClCompile Include="src\master\master_threads2.cpp" />
     <ClCompile Include="src\master\master_trigger.cpp" />
     <ClCompile Include="src\master\master_udp.cpp" />
     <ClCompile Include="src\memcache\memcache.cpp" />
@@ -379,6 +380,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\master\master_conf.hpp" />
     <ClInclude Include="include\acl_cpp\master\master_proc.hpp" />
     <ClInclude Include="include\acl_cpp\master\master_threads.hpp" />
+    <ClInclude Include="include\acl_cpp\master\master_threads2.hpp" />
     <ClInclude Include="include\acl_cpp\master\master_trigger.hpp" />
     <ClInclude Include="include\acl_cpp\master\master_udp.hpp" />
     <ClInclude Include="include\acl_cpp\memcache\memcache.hpp" />

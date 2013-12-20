@@ -3,7 +3,7 @@
  *
  * \brief CTR_DRBG based on AES-256 (NIST SP 800-90)
  *
- *  Copyright (C) 2006-2010, Brainspark B.V.
+ *  Copyright (C) 2006-2013, Brainspark B.V.
  *
  *  This file is part of PolarSSL (http://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
@@ -41,11 +41,18 @@
 #define CTR_DRBG_KEYBITS            ( CTR_DRBG_KEYSIZE * 8 )
 #define CTR_DRBG_SEEDLEN            ( CTR_DRBG_KEYSIZE + CTR_DRBG_BLOCKSIZE )
                                             /**< The seed length (counter + AES key)            */
-#define CTR_DRBG_ENTROPY_LEN        48      /**< Amount of entropy used per seed by default     */
+
+#if !defined(POLARSSL_CONFIG_OPTIONS)
+#if defined(POLARSSL_SHA512_C)
+#define CTR_DRBG_ENTROPY_LEN        48      /**< Amount of entropy used per seed by default (48 with SHA-512, 32 with SHA-256) */
+#else
+#define CTR_DRBG_ENTROPY_LEN        32      /**< Amount of entropy used per seed by default (48 with SHA-512, 32 with SHA-256) */
+#endif
 #define CTR_DRBG_RESEED_INTERVAL    10000   /**< Interval before reseed is performed by default */
-#define CTR_DRBG_MAX_INPUT          256     /**< Maximum number of additional input bytes       */
-#define CTR_DRBG_MAX_REQUEST        1024    /**< Maximum number of requested bytes per call     */
-#define CTR_DRBG_MAX_SEED_INPUT     384     /**< Maximum size of (re)seed buffer                */
+#define CTR_DRBG_MAX_INPUT          256     /**< Maximum number of additional input bytes */
+#define CTR_DRBG_MAX_REQUEST        1024    /**< Maximum number of requested bytes per call */
+#define CTR_DRBG_MAX_SEED_INPUT     384     /**< Maximum size of (re)seed buffer */
+#endif /* !POLARSSL_CONFIG_OPTIONS */
 
 #define CTR_DRBG_PR_OFF             0       /**< No prediction resistance       */
 #define CTR_DRBG_PR_ON              1       /**< Prediction resistance enabled  */
@@ -194,6 +201,7 @@ int ctr_drbg_random( void *p_rng,
 /**
  * \brief               Write a seed file
  *
+ * \param ctx           CTR_DRBG context
  * \param path          Name of the file
  *
  * \return              0 if successful, 1 on file error, or
@@ -205,6 +213,7 @@ int ctr_drbg_write_seed_file( ctr_drbg_context *ctx, const char *path );
  * \brief               Read and update a seed file. Seed is added to this
  *                      instance
  *
+ * \param ctx           CTR_DRBG context
  * \param path          Name of the file
  *
  * \return              0 if successful, 1 on file error,
@@ -220,6 +229,9 @@ int ctr_drbg_update_seed_file( ctr_drbg_context *ctx, const char *path );
  * \return              0 if successful, or 1 if the test failed
  */
 int ctr_drbg_self_test( int verbose );
+
+/* Internal functions (do not call directly) */
+int ctr_drbg_init_entropy_len( ctr_drbg_context *, int (*)(void *, unsigned char *, size_t), void *, const unsigned char *, size_t, size_t );
 
 #ifdef __cplusplus
 }

@@ -37,6 +37,9 @@ int main(int argc, char* argv[])
 		case 'k':
 			keep_alive = true;
 			break;
+		case 's':
+			server_addr = optarg;
+			break;
 		default:
 			break;
 		}

@@ -191,7 +191,7 @@ int     main(int argc, char **argv)
 	for (;;) {
 #ifdef HAS_VOLATILE_LOCKS
 		if (acl_myflock(ACL_VSTREAM_FILE(lock_fp), ACL_INTERNAL_LOCK,
-			ACL_MYFLOCK_OP_EXCLUSIVE) < 0)
+			ACL_FLOCK_OP_EXCLUSIVE) < 0)
 		{
 			acl_msg_fatal("refresh exclusive lock: %m");
 		}

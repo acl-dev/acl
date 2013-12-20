@@ -666,7 +666,7 @@ static void aio_server_accept_pass(ACL_ASTREAM *astream, void *context)
 
 	if (aio_server_lock != 0
 		&& acl_myflock(ACL_VSTREAM_FILE(aio_server_lock),
-			ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
+			ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("%s: select unlock: %s",
 			myname, acl_last_serror());
@@ -745,7 +745,7 @@ static int aio_server_accept_sock2(ACL_ASTREAM *astream, ACL_AIO *aio)
 
 	if (aio_server_lock != 0
 		&& acl_myflock(ACL_VSTREAM_FILE(aio_server_lock),
-			ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
+			ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("%s(%d), %s: select unlock: %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
@@ -1068,7 +1068,7 @@ static void run_loop(const char *procname)
 		if (aio_server_lock != 0) {
 			acl_watchdog_stop(watchdog);
 			if (acl_myflock(ACL_VSTREAM_FILE(aio_server_lock),
-				ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_EXCLUSIVE) < 0)
+				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
 			{
 				acl_msg_fatal("lock error %s", acl_last_serror());
 			}

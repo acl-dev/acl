@@ -272,7 +272,7 @@ static void multi_server_execute(int type, ACL_EVENT *event,
 
 	if (multi_server_lock != 0
 	    && acl_myflock(ACL_VSTREAM_FILE(multi_server_lock),
-		ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
+		ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("%s(%d)->%s: select unlock: %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
@@ -393,7 +393,7 @@ static void multi_server_accept_pass(int type acl_unused, ACL_EVENT *event,
 	fd = PASS_ACCEPT(listen_fd);
 	if (multi_server_lock != 0
 	    && acl_myflock(ACL_VSTREAM_FILE(multi_server_lock),
-	    	ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
+	    	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
@@ -432,7 +432,7 @@ static void multi_server_accept_sock(int type acl_unused, ACL_EVENT *event,
 	fd = acl_accept(listen_fd, NULL, 0, &sock_type);
 	if (multi_server_lock != 0
 	    && acl_myflock(ACL_VSTREAM_FILE(multi_server_lock),
-	  	  	ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
+	  	  	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
@@ -845,7 +845,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 		if (multi_server_lock != 0) {
 			acl_watchdog_stop(watchdog);
 			if (acl_myflock(ACL_VSTREAM_FILE(multi_server_lock),
-				ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_EXCLUSIVE) < 0)
+				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
 			{
 				acl_msg_fatal("lock error %s", acl_last_serror());
 			}

@@ -1097,6 +1097,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 						RelativePath=".\src\master\template\acl_single_server.c">
 					</File>
 					<File
+						RelativePath=".\src\master\template\acl_threads_server.c">
+					</File>
+					<File
 						RelativePath=".\src\master\template\acl_trigger_server.c">
 					</File>
 					<File
@@ -1770,6 +1773,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\master\acl_single_params.h">
+				</File>
+				<File
+					RelativePath=".\include\master\acl_threads_params.h">
 				</File>
 				<File
 					RelativePath=".\include\master\acl_trigger_params.h">

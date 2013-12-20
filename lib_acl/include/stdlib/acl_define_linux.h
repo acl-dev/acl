@@ -30,7 +30,7 @@
 # define ACL_USE_PATHS_H
 # define ACL_HAS_FLOCK_LOCK
 # define ACL_HAS_FCNTL_LOCK
-# define ACL_INTERNAL_LOCK	ACL_MYFLOCK_STYLE_FLOCK
+# define ACL_INTERNAL_LOCK	ACL_FLOCK_STYLE_FLOCK
 # define ACL_ROOT_PATH		"/bin:/usr/bin:/sbin:/usr/sbin"
 # define ACL_PATH_MAILDIR	"/var/mail"
 # define ACL_PATH_BSHELL	"/bin/sh"

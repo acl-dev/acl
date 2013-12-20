@@ -3,6 +3,8 @@
 #include "acl_cpp/stream/stream.hpp"
 #include "acl_cpp/stdlib/pipe_stream.hpp"
 
+struct iovec;
+
 namespace acl {
 
 class string;

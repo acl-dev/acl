@@ -788,6 +788,9 @@
     <ClCompile Include=".\src\master\template\acl_single_server.c">
       <Filter>Source Files\master\template</Filter>
     </ClCompile>
+    <ClCompile Include=".\src\master\template\acl_threads_server.c">
+      <Filter>Source Files\master\template</Filter>
+    </ClCompile>
     <ClCompile Include=".\src\master\template\acl_trigger_server.c">
       <Filter>Source Files\master\template</Filter>
     </ClCompile>
@@ -1468,6 +1471,9 @@
       <Filter>Header Files\master</Filter>
     </ClInclude>
     <ClInclude Include=".\include\master\acl_single_params.h">
+      <Filter>Header Files\master</Filter>
+    </ClInclude>
+    <ClInclude Include=".\include\master\acl_threads_params.h">
       <Filter>Header Files\master</Filter>
     </ClInclude>
     <ClInclude Include=".\include\master\acl_trigger_params.h">

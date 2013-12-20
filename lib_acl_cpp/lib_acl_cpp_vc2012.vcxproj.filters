@@ -64,6 +64,9 @@
     <ClCompile Include="src\master\master_threads.cpp">
       <Filter>src\master</Filter>
     </ClCompile>
+    <ClCompile Include="src\master\master_threads2.cpp">
+      <Filter>src\master</Filter>
+    </ClCompile>
     <ClCompile Include="src\ipc\ipc_service.cpp">
       <Filter>src\ipc</Filter>
     </ClCompile>
@@ -325,9 +328,6 @@
     <ClCompile Include="src\db\sqlite_pool.cpp">
       <Filter>src\db</Filter>
     </ClCompile>
-    <ClCompile Include="src\event\event_timer.cpp">
-      <Filter>src\event</Filter>
-    </ClCompile>
     <ClCompile Include="src\connpool\connect_manager.cpp">
       <Filter>src\connpool</Filter>
     </ClCompile>
@@ -367,6 +367,7 @@
     <ClCompile Include="src\stream\aio_timer_callback.cpp">
       <Filter>src\stream</Filter>
     </ClCompile>
+    <ClCompile Include="src\event\event_timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -520,6 +521,9 @@
       <Filter>include\master</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\master\master_threads.hpp">
+      <Filter>include\master</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\master\master_threads2.hpp">
       <Filter>include\master</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\mime\rfc2047.hpp">
@@ -714,9 +718,6 @@
     <ClInclude Include="include\acl_cpp\db\sqlite_pool.hpp">
       <Filter>include\db</Filter>
     </ClInclude>
-    <ClInclude Include="include\acl_cpp\event\event_timer.hpp">
-      <Filter>include\event</Filter>
-    </ClInclude>
     <ClInclude Include="include\acl_cpp\connpool\connect_client.hpp">
       <Filter>include\connpool</Filter>
     </ClInclude>
@@ -759,6 +760,7 @@
     <ClInclude Include="include\acl_cpp\stream\aio_timer_callback.hpp">
       <Filter>include\stream</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\event\event_timer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl_cpp_vc2010.rc" />

@@ -395,32 +395,82 @@
 #endif /* PPC32 */
 #endif /* PPC64 */
 
-#if defined(__sparc__)
+#if defined(__sparc__) && defined(__sparc64__)
 
 #define MULADDC_INIT                            \
-    asm( "ld     %0, %%o0       " :: "m" (s));  \
-    asm( "ld     %0, %%o1       " :: "m" (d));  \
-    asm( "ld     %0, %%o2       " :: "m" (c));  \
-    asm( "ld     %0, %%o3       " :: "m" (b));
+    asm(                                        \
+         "                                      \
+                ldx     %3, %%o0;               \
+                ldx     %4, %%o1;               \
+                ld      %5, %%o2;               \
+                ld      %6, %%o3;               \
+         "
 
 #define MULADDC_CORE                            \
-    asm( "ld    [%o0], %o4      " );            \
-    asm( "inc      4,  %o0      " );            \
-    asm( "ld    [%o1], %o5      " );            \
-    asm( "umul   %o3,  %o4, %o4 " );            \
-    asm( "addcc  %o4,  %o2, %o4 " );            \
-    asm( "rd      %y,  %g1      " );            \
-    asm( "addx   %g1,    0, %g1 " );            \
-    asm( "addcc  %o4,  %o5, %o4 " );            \
-    asm( "st     %o4, [%o1]     " );            \
-    asm( "addx   %g1,    0, %o2 " );            \
-    asm( "inc      4,  %o1      " );
+         "                                      \
+                ld      [%%o0], %%o4;           \
+                inc     4, %%o0;                \
+                ld      [%%o1], %%o5;           \
+                umul    %%o3, %%o4, %%o4;       \
+                addcc   %%o4, %%o2, %%o4;       \
+                rd      %%y, %%g1;              \
+                addx    %%g1, 0, %%g1;          \
+                addcc   %%o4, %%o5, %%o4;       \
+                st      %%o4, [%%o1];           \
+                addx    %%g1, 0, %%o2;          \
+                inc     4, %%o1;                \
+        "
 
 #define MULADDC_STOP                            \
-    asm( "st     %%o2, %0       " : "=m" (c));  \
-    asm( "st     %%o1, %0       " : "=m" (d));  \
-    asm( "st     %%o0, %0       " : "=m" (s) :: \
-    "g1", "o0", "o1", "o2", "o3", "o4", "o5" );
+        "                                       \
+                st      %%o2, %0;               \
+                stx     %%o1, %1;               \
+                stx     %%o0, %2;               \
+        "                                       \
+        : "=m" (c), "=m" (d), "=m" (s)          \
+        : "m" (s), "m" (d), "m" (c), "m" (b)    \
+        : "g1", "o0", "o1", "o2", "o3", "o4",   \
+          "o5"                                  \
+        );
+#endif /* SPARCv9 */
+
+#if defined(__sparc__) && !defined(__sparc64__)
+
+#define MULADDC_INIT                            \
+    asm(                                        \
+         "                                      \
+                ld      %3, %%o0;               \
+                ld      %4, %%o1;               \
+                ld      %5, %%o2;               \
+                ld      %6, %%o3;               \
+         "
+
+#define MULADDC_CORE                            \
+         "                                      \
+                ld      [%%o0], %%o4;           \
+                inc     4, %%o0;                \
+                ld      [%%o1], %%o5;           \
+                umul    %%o3, %%o4, %%o4;       \
+                addcc   %%o4, %%o2, %%o4;       \
+                rd      %%y, %%g1;              \
+                addx    %%g1, 0, %%g1;          \
+                addcc   %%o4, %%o5, %%o4;       \
+                st      %%o4, [%%o1];           \
+                addx    %%g1, 0, %%o2;          \
+                inc     4, %%o1;                \
+        "
+
+#define MULADDC_STOP                            \
+        "                                       \
+                st      %%o2, %0;               \
+                st      %%o1, %1;               \
+                st      %%o0, %2;               \
+        "                                       \
+        : "=m" (c), "=m" (d), "=m" (s)          \
+        : "m" (s), "m" (d), "m" (c), "m" (b)    \
+        : "g1", "o0", "o1", "o2", "o3", "o4",   \
+          "o5"                                  \
+        );
 
 #endif /* SPARCv8 */
 
@@ -498,28 +548,100 @@
 
 #if defined(__arm__)
 
-#if !defined(__thumb__)
+#if defined(__thumb__) && !defined(__thumb2__)
 
 #define MULADDC_INIT                            \
-    asm( "ldr    r0, %0         " :: "m" (s));  \
-    asm( "ldr    r1, %0         " :: "m" (d));  \
-    asm( "ldr    r2, %0         " :: "m" (c));  \
-    asm( "ldr    r3, %0         " :: "m" (b));
+    asm(                                        \
+         "                                      \
+            ldr    r0, %3;                      \
+            ldr    r1, %4;                      \
+            ldr    r2, %5;                      \
+            ldr    r3, %6;                      \
+            lsr    r7, r3, #16;                 \
+            mov    r9, r7;                      \
+            lsl    r7, r3, #16;                 \
+            lsr    r7, r7, #16;                 \
+            mov    r8, r7;                      \
+         "
 
 #define MULADDC_CORE                            \
-    asm( "ldr    r4, [r0], #4   " );            \
-    asm( "mov    r5, #0         " );            \
-    asm( "ldr    r6, [r1]       " );            \
-    asm( "umlal  r2, r5, r3, r4 " );            \
-    asm( "adds   r7, r6, r2     " );            \
-    asm( "adc    r2, r5, #0     " );            \
-    asm( "str    r7, [r1], #4   " );
+         "                                      \
+            ldmia  r0!, {r6};                   \
+            lsr    r7, r6, #16;                 \
+            lsl    r6, r6, #16;                 \
+            lsr    r6, r6, #16;                 \
+            mov    r4, r8;                      \
+            mul    r4, r6;                      \
+            mov    r3, r9;                      \
+            mul    r6, r3;                      \
+            mov    r5, r9;                      \
+            mul    r5, r7;                      \
+            mov    r3, r8;                      \
+            mul    r7, r3;                      \
+            lsr    r3, r6, #16;                 \
+            add    r5, r5, r3;                  \
+            lsr    r3, r7, #16;                 \
+            add    r5, r5, r3;                  \
+            add    r4, r4, r2;                  \
+            mov    r2, #0;                      \
+            adc    r5, r2;                      \
+            lsl    r3, r6, #16;                 \
+            add    r4, r4, r3;                  \
+            adc    r5, r2;                      \
+            lsl    r3, r7, #16;                 \
+            add    r4, r4, r3;                  \
+            adc    r5, r2;                      \
+            ldr    r3, [r1];                    \
+            add    r4, r4, r3;                  \
+            adc    r2, r5;                      \
+            stmia  r1!, {r4};                   \
+         "
 
 #define MULADDC_STOP                            \
-    asm( "str    r2, %0         " : "=m" (c));  \
-    asm( "str    r1, %0         " : "=m" (d));  \
-    asm( "str    r0, %0         " : "=m" (s) :: \
-    "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7" );
+         "                                      \
+            str    r2, %0;                      \
+            str    r1, %1;                      \
+            str    r0, %2;                      \
+         "                                      \
+         : "=m" (c),  "=m" (d), "=m" (s)        \
+         : "m" (s), "m" (d), "m" (c), "m" (b)   \
+         : "r0", "r1", "r2", "r3", "r4", "r5",  \
+           "r6", "r7", "r8", "r9", "cc"         \
+         );
+
+#else
+
+#define MULADDC_INIT                            \
+    asm(                                        \
+         "                                     \
+            ldr    r0, %3;                      \
+            ldr    r1, %4;                      \
+            ldr    r2, %5;                      \
+            ldr    r3, %6;                      \
+         "
+
+#define MULADDC_CORE                            \
+         "                                      \
+            ldr    r4, [r0], #4;                \
+            mov    r5, #0;                      \
+            ldr    r6, [r1];                    \
+            umlal  r2, r5, r3, r4;              \
+            adds   r7, r6, r2;                  \
+            adc    r2, r5, #0;                  \
+            str    r7, [r1], #4;                \
+         "
+
+#define MULADDC_STOP                            \
+         "                                      \
+            str    r2, %0;                      \
+            str    r1, %1;                      \
+            str    r0, %2;                      \
+         "                                      \
+         : "=m" (c),  "=m" (d), "=m" (s)        \
+         : "m" (s), "m" (d), "m" (c), "m" (b)   \
+         : "r0", "r1", "r2", "r3", "r4", "r5",  \
+           "r6", "r7", "cc"                     \
+         );
 
 #endif /* Thumb */
 
@@ -693,7 +815,7 @@
 #endif /* POLARSSL_HAVE_ASM */
 
 #if !defined(MULADDC_CORE)
-#if defined(POLARSSL_HAVE_LONGLONG)
+#if defined(POLARSSL_HAVE_UDBL)
 
 #define MULADDC_INIT                    \
 {                                       \
@@ -701,7 +823,7 @@
     t_uint r0, r1;
 
 #define MULADDC_CORE                    \
-    r   = *(s++) * (t_udbl) b;           \
+    r   = *(s++) * (t_udbl) b;          \
     r0  = r;                            \
     r1  = r >> biL;                     \
     r0 += c;  r1 += (r0 <  c);          \

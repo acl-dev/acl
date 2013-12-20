@@ -195,7 +195,7 @@ static void trigger_server_accept_fifo(int type acl_unused, ACL_EVENT *event,
 
 	if (trigger_server_lock != 0
 	    && acl_myflock(ACL_VSTREAM_FILE(trigger_server_lock),
-		    	ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
+		    	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
@@ -239,7 +239,7 @@ static void trigger_server_accept_local(int type acl_unused, ACL_EVENT *event,
 	fd = acl_unix_accept(listen_fd);
 	if (trigger_server_lock != 0
 	    && acl_myflock(ACL_VSTREAM_FILE(trigger_server_lock),
-	    	ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) < 0)
+	    	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
@@ -290,7 +290,7 @@ static void trigger_server_accept_pass(int type acl_unused, ACL_EVENT *event,
 	if (trigger_server_lock != 0
 	    && acl_myflock(ACL_VSTREAM_FILE(trigger_server_lock),
 		    	ACL_INTERNAL_LOCK,
-			ACL_MYFLOCK_OP_NONE) < 0)
+			ACL_FLOCK_OP_NONE) < 0)
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	if (fd < 0) {
 		if (errno != EAGAIN)
@@ -727,7 +727,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 		if (trigger_server_lock != 0) {
 			acl_watchdog_stop(watchdog);
 			if (acl_myflock(ACL_VSTREAM_FILE(trigger_server_lock),
-				ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_EXCLUSIVE) < 0)
+				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
 			{
 				acl_msg_fatal("lock error %s", acl_last_serror());
 			}

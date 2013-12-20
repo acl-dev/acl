@@ -30,8 +30,14 @@ typedef void (*ACL_APP_PRE_JAIL)(void*);
 typedef void (*ACL_APP_OPEN_LOG)(void);
 typedef void (*ACL_APP_CLOSE_LOG)(void);
 
+typedef int  (*ACL_APP_ON_TIMEOUT)(ACL_VSTREAM*, void*);
+typedef void (*ACL_APP_ON_CLOSE)(ACL_VSTREAM*, void*);
+typedef int  (*ACL_APP_ON_ACCEPT)(ACL_VSTREAM*);
+
 typedef ACL_MASTER_SERVER_THREAD_INIT_FN ACL_APP_THREAD_INIT_FN  /* void (*)(void*) */;
 typedef ACL_MASTER_SERVER_THREAD_EXIT_FN ACL_APP_THREAD_EXIT_FN;  /* void (*)(void*) */
+typedef int  (*ACL_APP_THREAD_ON_INIT)(void*);
+typedef void (*ACL_APP_THREAD_ON_EXIT)(void*);
 
 #define	ACL_APP_CTL_END			0	/* 参数控制结束标志 */
 #define	ACL_APP_CTL_INIT_FN		1	/* 初始化函数 */
