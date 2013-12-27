@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include <stdio.h>
 #ifndef ACL_PREPARE_COMPILE
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_msg.h"
@@ -98,7 +99,6 @@ static void acl_json_node_reset(ACL_JSON_NODE *node)
 
 	acl_ring_init(&node->node);
 	node->quote = 0;
-	node->status = -1;
 	node->backslash = 0;
 	node->left_ch = node->right_ch = 0;
 	node->part_word = 0;
@@ -128,7 +128,6 @@ ACL_JSON_NODE *acl_json_node_alloc(ACL_JSON *json)
 	acl_ring_init(&node->node);
 
 	node->json = json;
-	node->status = ACL_JSON_S_NXT;
 	node->ltag = acl_vstring_alloc2(json->slice, 16);
 	node->text = acl_vstring_alloc2(json->slice, 16);
 	node->part_word = 0;
@@ -403,8 +402,8 @@ ACL_JSON *acl_json_alloc1(ACL_SLICE_POOL *slice)
 	json->root = acl_json_node_alloc(json);
 	/* 将根结点作为当前结点 */
 	json->curr_node = json->root;
-	/* 设置根结点的属性状态 */
-	json->curr_node->status = ACL_JSON_S_ROOT;
+	/* 设置状态机的状态 */
+	json->status = ACL_JSON_S_OBJ;
 
 	/* 设置迭代函数 */
 
@@ -444,16 +443,13 @@ ACL_JSON *acl_json_create(ACL_JSON_NODE *node)
 	ACL_JSON *json = acl_json_alloc();
 	ACL_JSON_NODE *first = acl_json_node_duplicate(json, node);
 
-	acl_json_node_add_child(json->root, first);
-
-	/* 当 node 结点为根结点时，说明拷贝整个对象，此时根结点有 {}，
-	 * 当 node 结点为非根结点时，此结点没有 {}，所以需要给新创建的
-	 * json 对象的根结点加 {}
-	 */
-	if (node != node->json->root) {
-		json->root->left_ch = '{';
-		json->root->right_ch = '}';
-	}
+	/* 如果 json 结点没有 {，则需要再创建一个空 {} 对象 */
+	if (first->left_ch != '{') {
+		ACL_JSON_NODE *obj = acl_json_create_obj(json);
+		acl_json_node_add_child(json->root, obj);
+		acl_json_node_add_child(obj, first);
+	} else
+		acl_json_node_add_child(json->root, first);
 	return json;
 }
 
@@ -534,7 +530,7 @@ void acl_json_reset(ACL_JSON *json)
 		acl_msg_fatal("%s(%d): node_cnt(%d) invalid",
 			myname, __LINE__, json->node_cnt);
 
-	json->root->status = ACL_JSON_S_ROOT;
+	json->status = ACL_JSON_S_OBJ;
 	json->curr_node = json->root;
 	json->finish = 0;
 	json->depth = 0;

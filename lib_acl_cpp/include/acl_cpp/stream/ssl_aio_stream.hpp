@@ -3,8 +3,6 @@
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 
 struct ACL_VSTREAM;
-typedef struct _ssl_session ssl_session;
-typedef struct _ssl_context ssl_context;
 
 namespace acl
 {
@@ -71,8 +69,8 @@ protected:
 	*/
 	virtual bool open_callback();
 private:
-	ssl_context* ssl_;
-	ssl_session* ssn_;
+	void* ssl_;
+	void* ssn_;
 	void* hs_;
 
 	bool ssl_client_init();

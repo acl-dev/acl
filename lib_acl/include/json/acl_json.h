@@ -18,10 +18,17 @@ struct ACL_JSON_NODE {
 	ACL_VSTRING *text;          /**< 当结点为叶结点时该文本内容非空 */
 	ACL_JSON_NODE *tag_node;    /**< 当标签值为 json 结点时此项非空 */
 	int   type;
-#define ACL_JSON_T_LEAF         0   /**< 该结点的标签值为叶结点 */
-#define ACL_JSON_T_NODE         1   /**< 该结点的标签值为 json 结点 */
-#define ACL_JSON_T_ARRAY        2   /**< 该结点的标签值为 json 数组 */
-#define ACL_JSON_T_OBJ          3   /**< 该结点为一个 json 对象 */
+#define	ACL_JSON_T_STRING       (1 << 0)
+#define	ACL_JSON_T_NUMBER       (1 << 1)
+#define ACL_JSON_T_OBJ          (1 << 2)
+#define ACL_JSON_T_ARRAY        (1 << 3)
+#define	ACL_JSON_T_BOOL         (1 << 4)
+#define	ACL_JSON_T_NULL         (1 << 5)
+
+#define ACL_JSON_T_LEAF         (1 << 6)
+#define ACL_JSON_T_MEMBER       (1 << 7)
+#define ACL_JSON_T_PAIR         (1 << 8)
+#define	ACL_JSON_T_ELEMENT      (1 << 9)
 
 	ACL_JSON_NODE *parent;      /**< 父结点 */
 	ACL_RING children;          /**< 子结点集合 */
@@ -35,14 +42,6 @@ struct ACL_JSON_NODE {
 	int   right_ch;             /**< 本结点的最后一个字符: } or ] */
 	int   backslash;            /**< 转义字符 \ */
 	int   part_word;            /**< 半个汉字的情况处理标志位 */
-
-	int   status;               /**< 状态机当前解析状态 */
-#define ACL_JSON_S_ROOT     0       /**< 表示是根结点 */
-#define ACL_JSON_S_OBJ      1       /**< 标签对象值 */
-#define ACL_JSON_S_NXT      2       /**< 下一个结点 */
-#define ACL_JSON_S_TAG      3       /**< 标签名 */
-#define ACL_JSON_S_VAL      4       /**< 子结点处理过程 */
-#define ACL_JSON_S_COL      5       /**< 冒号 : */
 
 	/* public: for acl_iterator, 通过 acl_foreach 列出该结点的一级子结点 */
 
@@ -76,6 +75,16 @@ struct ACL_JSON {
 	ACL_JSON_NODE *(*iter_prev)(ACL_ITER*, ACL_JSON*);
 
 	/* private */
+
+	int   status;               /**< 状态机当前解析状态 */
+#define ACL_JSON_S_OBJ      0       /**< 标签对象值 */
+#define	ACL_JSON_S_MEM      1       /**< member */
+#define	ACL_JSON_S_PAR      2       /**< pair */
+#define ACL_JSON_S_NXT      3       /**< 下一个结点 */
+#define ACL_JSON_S_TAG      4       /**< 标签名 */
+#define ACL_JSON_S_VAL      5       /**< 子结点处理过程 */
+#define ACL_JSON_S_COL      6       /**< 冒号 : */
+
 	ACL_ARRAY *node_cache;      /**< json 结点缓存池 */
 	int   max_cache;            /**< json 结点缓存池的最大容量 */
 	ACL_JSON_NODE *curr_node;   /**< 当前正在处理的 json 结点 */

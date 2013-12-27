@@ -66,7 +66,7 @@ public:
 	{
 		string buf(data, len);
 		ctx_->nread_total++;
-		//std::cout << buf.c_str();
+		std::cout << buf.c_str();
 		return (true);
 	}
 
@@ -148,8 +148,8 @@ public:
 		}
 
 		http_header header;
-		header.set_url("/cgi-bin/mail/index_login");
-		header.set_host("mail.banmau.com");
+		header.set_url("https://www.google.com.hk/");
+		header.set_host("www.google.com.hk");
 		header.set_keep_alive(false);
 		string buf;
 		(void) header.build_request(buf);
@@ -215,12 +215,12 @@ int main(int argc, char* argv[])
 
 	memset(&ctx, 0, sizeof(ctx));
 	ctx.connect_timeout = 500;
-	ctx.nopen_limit = 30;
+	ctx.nopen_limit = 10;
 	ctx.id_begin = 1;
 	ctx.nwrite_limit = 10;
 	ctx.debug = false;
 	//snprintf(ctx.addr, sizeof(ctx.addr), "74.125.71.19:443");
-	snprintf(ctx.addr, sizeof(ctx.addr), "122.49.0.202:443");
+	snprintf(ctx.addr, sizeof(ctx.addr), "www.google.com.hk:443");
 
 	while ((ch = getopt(argc, argv, "hc:n:kl:dt:")) > 0)
 	{

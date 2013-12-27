@@ -134,11 +134,35 @@ public:
 	 */
 	bool set_local(const char* addr);
 
+	/////////////////////////////////////////////////////////////////////
+
+	void close_ssl(void);
+	bool open_ssl_client(void);
+
 private:
 	char  dummy_[1];
 	char  peer_ip_[33];
 	char  local_ip_[33];
 	const char* get_ip(const char* addr, char* buf, size_t size);
+
+	void* ssl_;
+	void* ssn_;
+	void* hs_;
+
+	static int sock_read(void *ctx, unsigned char *buf, size_t len);
+	static int sock_send(void *ctx, const unsigned char *buf, size_t len);
+
+#ifdef WIN32
+	static int ssl_read(SOCKET fd, void *buf, size_t len,
+		int timeout, ACL_VSTREAM* stream, void *ctx);
+	static int ssl_send(SOCKET fd, const void *buf, size_t len,
+		int timeout, ACL_VSTREAM* stream, void *ctx);
+#else
+	static int ssl_read(int fd, void *buf, size_t len,
+		int timeout, ACL_VSTREAM* stream, void *ctx);
+	static int ssl_send(int fd, const void *buf, size_t len,
+		int timeout, ACL_VSTREAM* stream, void *ctx);
+#endif
 };
 
 } // namespace acl

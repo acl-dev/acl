@@ -23,7 +23,6 @@ class http_header;
 class ACL_CPP_API http_client
 {
 public:
-
 	/**
 	 * 缺省的构造函数，使用此构造函数创建的 HTTP 客户端对象，需要显示地
 	 * 调用 http_client::open 来打开数据流

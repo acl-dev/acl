@@ -40,6 +40,13 @@ public:
 	const char* get_text(void) const;
 
 	/**
+	 * 当该 json 结点存在子结点时，返回本 json 结点标签对应的 json 子结点
+	 * @param {const json_node*} 返回 NULL 说明不存在子结点
+	 *  注：get_text 与 get_obj 不会同时返回非 NULL
+	 */
+	json_node* get_obj(void) const;
+
+	/**
 	 * 当该 json 结点有标签时，本函数用来新的标签值覆盖旧的标签名
 	 * @param name {const char*} 新的标签值，为非空字符串
 	 * @return {bool} 返回 false 表示该结点没有标签或输入空串，没有进行替换
@@ -187,6 +194,7 @@ private:
 	json_node* child_;
 	ACL_ITER* iter_;
 	string* buf_;
+	json_node* obj_;
 };
 
 class ACL_CPP_API json : public pipe_stream

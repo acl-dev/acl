@@ -22,3 +22,4 @@ acl_ioctl_server.c 的模板程序中采用内存池功能
 12) event 模块需要进一步优化
 13) json 解析器需要支持 \u 方式 UNICODE 格式
 14) acl_master 子进程需要支持 UDP 方式 -- 完成
+15) json 解析器可以支持 BOOL, NUMBER, NULL 等类型

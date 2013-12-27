@@ -1,8 +1,8 @@
 #include "acl_stdafx.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/zlib_stream.hpp"
-#include "acl_cpp/stream/ssl_stream.hpp"
 #include "acl_cpp/stream/ostream.hpp"
+#include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/http/http_client.hpp"
 
@@ -108,18 +108,23 @@ bool http_client::open(const char* addr, int conn_timeout /* = 60 */,
 		stream_ = NULL;
 	}
 
-	ssl_stream* stream = NEW ssl_stream();
+	socket_stream* stream = NEW socket_stream();
 	rw_timeout_ = rw_timeout;
 	unzip_ = unzip;
 
-	if (stream->open_ssl(addr, conn_timeout,
-		rw_timeout, use_ssl) == false)
+	if (stream->open(addr, conn_timeout, rw_timeout) == false)
 	{
 		delete stream;
-		return (false);
+		return false;
 	}
+	if (use_ssl && stream->open_ssl_client() == false)
+	{
+		delete stream;
+		return false;
+	}
+
 	stream_ = stream;
-	return (true);
+	return true;
 }
 
 int http_client::write_head(const http_header& header)

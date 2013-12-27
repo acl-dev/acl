@@ -11,14 +11,15 @@ CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
 SYSLIB = -lpthread
 CHECKSYSRES = @echo "Unknow system type!";exit 1
-UNIXNAME = $(shell uname -sm)
+OSNAME = $(shell uname -sm)
+RPATH =
 
 ifeq ($(CC),)
         CC = gcc
 endif
 
 # For FreeBSD
-ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
+ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
 	ifeq ($(findstring gcc, $(CC)), gcc)
 		CFLAGS += -Wstrict-prototypes
 	endif
@@ -27,19 +28,25 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 endif
 
 #Path for Linux
-ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
+ifeq ($(findstring Linux, $(OSNAME)), Linux)
 	ifeq ($CC, "gcc")
 		CFLAGS += -Wstrict-prototypes
+	endif
+	ifeq ($(findstring i686, $(OSNAME)), i686)
+		RPATH = linux32
+	endif
+	ifeq ($(findstring x86_64, $(OSNAME)), x86_64)
+		RPATH = linux64
 	endif
 	CFLAGS += -DLINUX2 -D_REENTRANT -Wshadow
 endif
 
 #Path for SunOS
-ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
-	ifeq ($(findstring 86, $(UNIXNAME)), 86)
+ifeq ($(findstring SunOS, $(OSNAME)), SunOS)
+	ifeq ($(findstring 86, $(OSNAME)), 86)
 		SYSLIB += -lsocket -lnsl -lrt
 	endif
-	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
+	ifeq ($(findstring sun4u, $(OSNAME)), sun4u)
 		SYSLIB += -lsocket -lnsl -lrt
 	endif
 	ifeq ($CC, "gcc")
@@ -49,7 +56,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 endif
 
 #Path for HP-UX
-ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
+ifeq ($(findstring HP-UX, $(OSNAME)), HP-UX)
 	ifeq ($CC, "gcc")
 		CFLAGS += -Wstrict-prototypes
 	endif
@@ -66,7 +73,7 @@ endif
 CFLAGS += -I. -I../../include -I../../../lib_acl/include -I../../../lib_protocol/include
 EXTLIBS =
 LDFLAGS = -L../../lib -l_acl_cpp -L../../../lib_protocol/lib -l_protocol -L../../../lib_acl/lib -l_acl \
-	$(EXTLIBS) $(SYSLIB)
+	  -L../../../lib/$(RPATH) $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)

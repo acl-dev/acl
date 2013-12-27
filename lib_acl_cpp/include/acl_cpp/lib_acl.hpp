@@ -41,7 +41,6 @@
 #include "acl_cpp/stream/ofstream.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stream/server_socket.hpp"
-#include "acl_cpp/stream/ssl_stream.hpp"
 
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/aio_delay_free.hpp"

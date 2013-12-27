@@ -16,9 +16,9 @@ ssl_aio_stream::ssl_aio_stream(aio_handle* handle, ACL_ASTREAM* stream,
 #ifdef HAS_POLARSSL
 	if (use_ssl)
 	{
-		ssl_ = (ssl_context*) acl_mycalloc(1, sizeof(ssl_context));
-		ssn_ = (ssl_session*) acl_mycalloc(1, sizeof(ssl_session));
-		hs_ = acl_mymalloc(sizeof(havege_state));
+		ssl_ = acl_mycalloc(1, sizeof(ssl_context));
+		ssn_ = acl_mycalloc(1, sizeof(ssl_session));
+		hs_  = acl_mymalloc(sizeof(havege_state));
 	}
 	else
 	{
@@ -38,9 +38,9 @@ ssl_aio_stream::ssl_aio_stream(aio_handle* handle, ACL_SOCKET fd,
 #ifdef HAS_POLARSSL
 	if (use_ssl)
 	{
-		ssl_ = (ssl_context*) acl_mycalloc(1, sizeof(ssl_context));
-		ssn_ = (ssl_session*) acl_mycalloc(1, sizeof(ssl_session));
-		hs_ = acl_mymalloc(sizeof(havege_state));
+		ssl_ = acl_mycalloc(1, sizeof(ssl_context));
+		ssn_ = acl_mycalloc(1, sizeof(ssl_session));
+		hs_  = acl_mymalloc(sizeof(havege_state));
 	}
 	else
 	{
@@ -63,7 +63,7 @@ void ssl_aio_stream::clear()
 #ifdef HAS_POLARSSL
 	if (ssl_)
 	{
-		ssl_free(ssl_);
+		ssl_free((ssl_context*) ssl_);
 		acl_myfree(ssl_);
 		ssl_ = NULL;
 	}
@@ -182,18 +182,18 @@ bool ssl_aio_stream::ssl_client_init()
 	havege_init((havege_state*) hs_);
 
 	int   ret;
-	if ((ret = ssl_init(ssl_)) != 0)
+	if ((ret = ssl_init((ssl_context*) ssl_)) != 0)
 	{
 		logger_error("failed, ssl_init returned %d", ret);
 		return false;
 	}
 
-	ssl_set_endpoint(ssl_, SSL_IS_CLIENT);
-	ssl_set_authmode(ssl_, SSL_VERIFY_NONE);
+	ssl_set_endpoint((ssl_context*) ssl_, SSL_IS_CLIENT);
+	ssl_set_authmode((ssl_context*) ssl_, SSL_VERIFY_NONE);
 
-	ssl_set_rng(ssl_, ::havege_random, hs_);
-	//ssl_set_dbg(ssl_, my_debug, stdout);
-	ssl_set_bio(ssl_, __sock_read, this, __sock_send, this);
+	ssl_set_rng((ssl_context*) ssl_, ::havege_random, hs_);
+	//ssl_set_dbg((ssl_context*) ssl_, my_debug, stdout);
+	ssl_set_bio((ssl_context*) ssl_, __sock_read, this, __sock_send, this);
 
 	const int* cipher_suites = ssl_list_ciphersuites();
 	if (cipher_suites == NULL)
@@ -202,8 +202,8 @@ bool ssl_aio_stream::ssl_client_init()
 		return false;
 	}
 
-	ssl_set_ciphersuites(ssl_, cipher_suites);
-	ssl_set_session(ssl_, ssn_);
+	ssl_set_ciphersuites((ssl_context*) ssl_, cipher_suites);
+	ssl_set_session((ssl_context*) ssl_, (ssl_session*) ssn_);
 
 	acl_vstream_ctl(stream,
 		ACL_VSTREAM_CTL_READ_FN, __ssl_read,
@@ -293,7 +293,8 @@ int ssl_aio_stream::__ssl_read(ACL_SOCKET, void *buf, size_t len,
 	ssl_aio_stream* cli = (ssl_aio_stream*) ctx;
 	int   ret;
 
-	while ((ret = ::ssl_read(cli->ssl_, (unsigned char*) buf, len)) <= 0)
+	while ((ret = ::ssl_read((ssl_context*) cli->ssl_,
+		(unsigned char*) buf, len)) <= 0)
 	{
 		if (ret == POLARSSL_ERR_NET_WANT_READ
 			|| ret == POLARSSL_ERR_NET_WANT_WRITE)
@@ -319,7 +320,8 @@ int ssl_aio_stream::__ssl_send(ACL_SOCKET, const void *buf, size_t len,
 	ssl_aio_stream* cli = (ssl_aio_stream*) ctx;
 	int   ret;
 
-	while ((ret = ::ssl_write(cli->ssl_, (unsigned char*) buf, len)) <= 0)
+	while ((ret = ::ssl_write((ssl_context*) cli->ssl_,
+		(unsigned char*) buf, len)) <= 0)
 	{
 		if (ret == POLARSSL_ERR_NET_WANT_READ
 			|| ret == POLARSSL_ERR_NET_WANT_WRITE)

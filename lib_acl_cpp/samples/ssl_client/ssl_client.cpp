@@ -7,16 +7,21 @@
 #include "acl_cpp/acl_cpp_init.hpp"
 #include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/stream/ssl_stream.hpp"
+#include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/http/http_client.hpp"
 
 static void test0(int i)
 {
-	acl::ssl_stream client;
+	acl::socket_stream client;
 	acl::string addr("127.0.0.1:441");
-	if (client.open_ssl(addr.c_str(), 60, 60) == false)
+	if (client.open(addr.c_str(), 60, 60) == false)
 	{
 		std::cout << "connect " << addr.c_str() << " error!" << std::endl;
+		return;
+	}
+	if (client.open_ssl_client() == false)
+	{
+		std::cout << "open ssl " << addr.c_str() << " error!" << std::endl;
 		return;
 	}
 
@@ -42,31 +47,40 @@ static void test0(int i)
 
 static void test1(void)
 {
-	acl::string url("https://mail.51iker.com/");
+	acl::string url("https://www.google.com.hk/");
 	acl::http_header header;
 	header.set_url(url.c_str());
-	header.set_host("mail.51iker.com");
+	header.set_host("www.google.com.hk");
 	acl::string request;
 
 	header.build_request(request);
 
-	acl::string addr("mail.51iker.com:443");
-	acl::ssl_stream client;
+	acl::string addr("www.google.com.hk:443");
+	acl::socket_stream client;
 
-	if (client.open_ssl(addr.c_str(), 60, 60) == false)
+	if (client.open(addr.c_str(), 60, 60) == false)
 	{
-		std::cout << "connect " << addr.c_str() << " error!" << std::endl;
+		std::cout << "connect " << addr.c_str()
+			<< " error!" << std::endl;
+		return;
+	}
+
+	if (client.open_ssl_client() == false)
+	{
+		std::cout << "open ssl client " << addr.c_str()
+			<< " error!" << std::endl;
 		return;
 	}
 
 	std::cout << "request:" << std::endl;
-	std::cout << "----------------------------------------------" << std::endl;
+	std::cout << "----------------------------------------" << std::endl;
 	std::cout << request.c_str();
-	std::cout << "----------------------------------------------" << std::endl;
+	std::cout << "----------------------------------------" << std::endl;
 
 	if (client.write(request) == false)
 	{
-		std::cout << "write to " << addr.c_str() << " error!" << std::endl;
+		std::cout << "write to " << addr.c_str() <<
+			" error!" << std::endl;
 		return;
 	}
 
@@ -90,32 +104,33 @@ static void test1(void)
 static void test2(void)
 {
 	acl::http_client client;
-	acl::string url("https://mail.51iker.com/");
+	acl::string url("https://www.google.com.hk/");
 	acl::http_header header;
 
 	header.set_url(url.c_str());
-	header.set_host("mail.51iker.com");
+	header.set_host("www.google.com.hk");
 	acl::string request;
 
 	header.build_request(request);
 
-	// acl::string addr("mail.51iker.com:443");
-	acl::string addr("122.49.0.202:443");
+	acl::string addr("www.google.com.hk:443");
 
-	if (client.open(addr.c_str(), true) == false)
+	if (client.open(addr.c_str(), 60, 60, true, true) == false)
 	{
-		std::cout << "connect " << addr.c_str() << " error!" << std::endl;
+		std::cout << "connect " << addr.c_str()
+			<< " error!" << std::endl;
 		return;
 	}
 
 	std::cout << "request:" << std::endl;
-	std::cout << "----------------------------------------------" << std::endl;
+	std::cout << "----------------------------------------" << std::endl;
 	std::cout << request.c_str();
-	std::cout << "----------------------------------------------" << std::endl;
+	std::cout << "----------------------------------------" << std::endl;
 
 	if (client.get_ostream().write(request) == false)
 	{
-		std::cout << "write to " << addr.c_str() << " error!" << std::endl;
+		std::cout << "write to " << addr.c_str()
+			<< " error!" << std::endl;
 		return;
 	}
 
@@ -151,7 +166,7 @@ int main(int argc, char* argv[])
 	(void) argc; (void) argv;
 	acl::acl_cpp_init();
 
-	int   n = 100;
+	int   n = 1;
 	if (argc >= 2)
 		n = atoi(argv[1]);
 	if (n <= 0)

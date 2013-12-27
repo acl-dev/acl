@@ -369,9 +369,9 @@ static void server_use_timer(int type acl_unused,
 }
 
 typedef struct {
-	ACL_VSTREAM *stream;
 	acl_pthread_pool_t *threads;
 	acl_pthread_job_t *job;
+	ACL_VSTREAM *stream;
 	ACL_EVENT *event;
 	int   event_type;
 	void  (*read_callback)(int, ACL_EVENT*, ACL_VSTREAM*, void*);
