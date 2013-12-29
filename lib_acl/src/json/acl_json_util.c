@@ -100,6 +100,15 @@ ACL_JSON_NODE *acl_json_create_leaf(ACL_JSON *json,
 	return (node);
 }
 
+ACL_JSON_NODE *acl_json_create_string(ACL_JSON *json, const char *text)
+{
+	ACL_JSON_NODE *node = acl_json_node_alloc(json);
+
+	acl_vstring_strcpy(node->text, text);
+	node->type = ACL_JSON_T_STRING;
+	return (node);
+}
+
 ACL_JSON_NODE *acl_json_create_obj(ACL_JSON *json)
 {
 	ACL_JSON_NODE *node = acl_json_node_alloc(json);
@@ -209,15 +218,20 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 				/* '{' or '[' */	
 				ACL_VSTRING_ADDCH(buf, node->left_ch);
 			}
-
-			continue;
-		} else
+		}
 
 		/* 当结点有标签名时 */
-		if (LEN(node->ltag) > 0) {
+		else if (LEN(node->ltag) > 0) {
 			json_escape_append(buf, STR(node->ltag));
 			ACL_VSTRING_ADDCH(buf, ':');
 			ACL_VSTRING_ADDCH(buf, ' ');
+			json_escape_append(buf, STR(node->text));
+		}
+
+		/* 当结点为数组的字符串成员时 */
+		else if (LEN(node->text) > 0 && node->parent
+			&& node->parent->left_ch != 0)
+		{
 			json_escape_append(buf, STR(node->text));
 		}
 

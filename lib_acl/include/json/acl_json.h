@@ -78,11 +78,11 @@ struct ACL_JSON {
 
 	int   status;               /**< 状态机当前解析状态 */
 #define ACL_JSON_S_OBJ      0       /**< 标签对象值 */
-#define	ACL_JSON_S_MEM      1       /**< member */
-#define	ACL_JSON_S_PAR      2       /**< pair */
+#define	ACL_JSON_S_ARR      1       /**< json 结点 array */
+#define	ACL_JSON_S_PAR      2       /**< name:value pair */
 #define ACL_JSON_S_NXT      3       /**< 下一个结点 */
-#define ACL_JSON_S_TAG      4       /**< 标签名 */
-#define ACL_JSON_S_VAL      5       /**< 子结点处理过程 */
+#define ACL_JSON_S_TAG      4       /**< 对象标签名 */
+#define ACL_JSON_S_VAL      5       /**< 结点值处理过程 */
 #define ACL_JSON_S_COL      6       /**< 冒号 : */
 
 	ACL_ARRAY *node_cache;      /**< json 结点缓存池 */
@@ -273,6 +273,15 @@ ACL_API ACL_ARRAY *acl_json_getElementsByTags(ACL_JSON *json, const char *tags);
  */
 ACL_API ACL_JSON_NODE *acl_json_create_leaf(ACL_JSON *json,
 	const char *name, const char *text);
+
+/**
+ * 构建 json 对象的字符串结点，按 json 规范，该结点只能加入至数据对象中
+ * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
+ * @param text {const char*}
+ * @return {ACL_JSON_NODE*} 新创建的结点对象，在释放 ACL_JSON 对象时
+ *  一起被释放，所以不需要单独释放
+ */
+ACL_API ACL_JSON_NODE *acl_json_create_string(ACL_JSON *json, const char *text);
 
 /**
  * 构建 json 对象时创建 json 对象(即仅包含 {} 的对象)

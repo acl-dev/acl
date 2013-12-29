@@ -105,6 +105,15 @@ public:
 		bool return_child = false);
 
 	/**
+	 * 创建一个 json 字符串对象，并将之添加为本 json 结点的子结点
+	 * @param text {const char*} 文本字符串
+	 * @param return_child {bool} 是否需要本函数返回新创建的子结点的引用
+	 * @return {json_node&} return_child 为 true 时创建的新结点的引用，
+	 *  否则返回本 json 结点对象的引用
+	 */
+	json_node& add_child(const char* text, bool return_child = false);
+
+	/**
 	 * 创建一个 json 结点对象，并将之添加为本 json 结点的子结点
 	 * @param tag {const char*} 标签名
 	 * @param node {json_node*} 标签值指针
@@ -284,6 +293,16 @@ public:
 	 *  reset 来释放这些 json_node 结点对象
 	 */
 	json_node& create_node(const char* tag, const char* value);
+
+	/**
+	 * 创建一个 json_node 叶结点字符串对象，该结点对象的格式为："string"
+	 * 按 json 规范，该结点只能加入至数据对象中
+	 * @param text {const char*} 文本字符串
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，因为在
+	 *  json 对象被释放时这些结点会自动被释放，当然用户也可以在不用时调用
+	 *  reset 来释放这些 json_node 结点对象
+	 */
+	json_node& create_node(const char* text);
 
 	/**
 	 * 创建一个 json_node 结点容器对象，该对象没有标签,

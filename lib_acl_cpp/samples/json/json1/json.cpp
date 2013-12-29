@@ -39,11 +39,14 @@ static void test(void)
 	node2 = &json.create_node("name5", node1);
 	node0->add_child(node2);
 
-	node3 = &json.create_node("name6", "value6");
+	node3 = &json.create_node().add_child(json.create_node("name6", "value6"));
 	node1->add_child(node3);
 
 	node3 = &json.create_node("name7", "value7");
 	node1->add_child(node3);
+
+	node1->add_child(json.create_node("name7_string1"))
+		.add_child(json.create_node("name7_string2"));
 
 	node3 = &json.create_node();
 	node1->add_child(node3);

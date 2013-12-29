@@ -121,6 +121,12 @@ json_node& json_node::add_child(const char* tag, const char* value,
 	return add_child(json_->create_node(tag, value), return_child);
 }
 
+json_node& json_node::add_child(const char* text,
+	bool return_child /* = false */)
+{
+	return add_child(json_->create_node(text), return_child);
+}
+
 json_node& json_node::add_child(const char* tag, json_node* node,
 	bool return_child /* = false */)
 {
@@ -295,6 +301,14 @@ ACL_JSON* json::get_json(void) const
 json_node& json::create_node(const char* tag, const char* value)
 {
 	ACL_JSON_NODE* node = acl_json_create_leaf(json_, tag, value);
+	json_node* n = NEW json_node(node, this);
+	nodes_.push_back(n);
+	return *n;
+}
+
+json_node& json::create_node(const char* text)
+{
+	ACL_JSON_NODE* node = acl_json_create_string(json_, text);
 	json_node* n = NEW json_node(node, this);
 	nodes_.push_back(n);
 	return *n;

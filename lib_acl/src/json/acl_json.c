@@ -441,7 +441,12 @@ ACL_JSON_NODE *acl_json_node_duplicate(ACL_JSON *json, ACL_JSON_NODE *from)
 ACL_JSON *acl_json_create(ACL_JSON_NODE *node)
 {
 	ACL_JSON *json = acl_json_alloc();
-	ACL_JSON_NODE *first = acl_json_node_duplicate(json, node);
+	ACL_JSON_NODE *first;
+
+	/* 如果当前结点为根结点，则需要提取该根结点的第一个结点 */
+	if (node == node->json->root && node->tag_node != NULL)
+		node = node->tag_node;
+	first = acl_json_node_duplicate(json, node);
 
 	/* 如果 json 结点没有 {，则需要再创建一个空 {} 对象 */
 	if (first->left_ch != '{') {

@@ -15,30 +15,52 @@ static const char* default_data = "{\"DataValue\": {\"RemoteLoginRemind\": [{\"v
 static const char* default_data = "{\"DataValue\": {\"RemoteLoginRemind\": \"true1\", \"ModifyPasswdRemind\": \"true2\", \"MailForwardRemind\": \"true3\", \"SecureLoginVerification\": \"remote\"}}";
 #endif
 
-static void test(void)
+static void test(bool once)
 {
-	acl::json json(default_data);
+	acl::json json;
+
+	if (once)
+		json.update(default_data);
+	else
+	{
+		const char* s = default_data;
+		char  buf[2];
+
+		while (*s)
+		{
+			buf[0] = *s;
+			buf[1] = 0;
+			json.update(buf);
+			s++;
+		}
+	}
 
 	printf("-------------------------------------------------\r\n");
-	printf(">>>source data: %s\r\n", default_data);
+	printf(">>>%s(%d)->source data: %s\r\n",
+		__FUNCTION__, __LINE__, default_data);
 	printf("-------------------------------------------------\r\n");
-	printf(">>>build  json: %s\r\n", json.to_string().c_str());
+	printf(">>>%s(%d)->build  json: %s\r\n",
+		__FUNCTION__, __LINE__, json.to_string().c_str());
 	printf("-------------------------------------------------\r\n");
 	if (json.to_string() == default_data)
-		printf("OK!\r\n");
+		printf("%s(%d): build json OK!\r\n", __FUNCTION__, __LINE__);
 	else
-		printf("ERROR!\r\n");
+	{
+		printf("%s(%d): build json ERROR!\r\n", __FUNCTION__, __LINE__);
+		return;
+	}
 	printf("-------------------------------------------------\r\n");
 
 	const char* tags;
 	tags = "DataValue/RemoteLoginRemind";
 	//tags = "DataValue";
-	printf(">>>tags: %s\r\n", tags);
+	printf(">>>%s(%d)->tags: %s\r\n", __FUNCTION__, __LINE__, tags);
 
 	const std::vector<acl::json_node*>& nodes = json.getElementsByTags(tags);
 	if (nodes.empty())
 	{
-		printf("NOT FOUND\r\n");
+		printf(">>>%s(%d)->NOT FOUND(tags: %s)\r\n",
+			__FUNCTION__, __LINE__, tags);
 		return;
 	}
 
@@ -52,7 +74,8 @@ static void test(void)
 	printf("-------------------------------------------------\r\n");
 
 	acl::json json1(*first);
-	printf(">>>convert first json node to json: %s\r\n", json1.to_string().c_str());
+	printf(">>>%s(%d)->convert first json node to json:\r\n%s\r\n",
+		__FUNCTION__, __LINE__, json1.to_string().c_str());
 
 	printf("-------------------------------------------------\r\n");
 
@@ -61,25 +84,32 @@ static void test(void)
 	if (node)
 	{
 		acl_json_node_build(node, bf);
-		printf(">>>tag: %s, tag_node's string:\r\n%s\r\n",
-			first->tag_name(), acl_vstring_str(bf));
+		printf(">>>%s(%d)->tag: %s, tag_node's string:\r\n%s\r\n",
+			__FUNCTION__, __LINE__, first->tag_name(), acl_vstring_str(bf));
 		printf("-------------------------------------------------\r\n");
 
 		if (node->parent == first->get_json_node())
-			printf(">>>OK parent ok\r\n");
+			printf(">>>%s(%d)->OK parent ok\r\n",
+				__FUNCTION__, __LINE__);
 		else
-			printf(">>>ERROR not parent\r\n");
+		{
+			printf(">>>%s(%d)->ERROR not parent\r\n", __FUNCTION__, __LINE__);
+			return;
+		}
 
 		printf("-------------------------------------------------\r\n");
 		acl::json_node* obj = first->get_obj();
 		if (obj)
-			printf(">>>tag: %s, obj: %s\r\n", first->tag_name(),
+			printf(">>>%s(%d)->tag: %s, obj: %s\r\n",
+				__FUNCTION__, __LINE__, first->tag_name(),
 				obj->to_string().c_str());
 		else
-			printf(">>>tag: %s, obj null\r\n", first->tag_name());
+			printf(">>>%s(%d)->tag: %s, obj null\r\n",
+				__FUNCTION__, __LINE__, first->tag_name());
 	}
 	else
-		printf(">>>tag_node(%s) for tags(%s), tag: %s, txt: %s\r\n",
+		printf(">>>%s(%d)->tag_node(%s) for tags(%s), tag: %s, txt: %s\r\n",
+			__FUNCTION__, __LINE__,
 			first->get_json_node()->tag_node ? "not null" : "null",
 			tags, first->tag_name() ? first->tag_name() : "null",
 			first->get_text() ? first->get_text() : "null");
@@ -117,9 +147,35 @@ static void test(void)
 	printf("-------------------------------------------------\r\n");
 }
 
-int main(void)
+static void usage(const char* procname)
 {
-	test();
+	printf("usage: %s -h [help]\r\n"
+		"-o [if parse the whole json once, default: false]\r\n",
+		procname);
+}
+
+int main(int argc, char* argv[])
+{
+	int   ch;
+	bool  once = false;
+
+	while ((ch = getopt(argc, argv, "ho")) > 0)
+	{
+		switch (ch)
+		{
+		case 'h':
+			usage(argv[0]);
+			return 0;
+		case 'o':
+			once = true;
+			break;
+		default:
+			break;
+		}
+	}
+
+	test(once);
+
 	printf("enter any key to exit\r\n");
 	getchar();
 	return 0;
