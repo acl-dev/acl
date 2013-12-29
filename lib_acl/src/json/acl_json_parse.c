@@ -440,7 +440,6 @@ static const char *json_val(ACL_JSON *json, const char *data)
 					node->part_word = 1;
 			} else {
 				ADDCH(node->text, ch);
-				ACL_VSTRING_TERMINATE(node->text);
 			}
 		} else if (node->backslash) {
 			ADDCH(node->text, ch);
