@@ -271,11 +271,17 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 ACL_VSTRING *acl_json_node_build(ACL_JSON_NODE *node, ACL_VSTRING *buf)
 {
 	ACL_JSON *json = acl_json_alloc();
-	ACL_JSON_NODE *first = acl_json_node_duplicate(json, node);
+	ACL_JSON_NODE *first;
 
 	if (buf == NULL)
 		buf = acl_vstring_alloc(256);
 
+	if (node == node->json->root && node->tag_node != NULL)
+		node = node->tag_node;
+	else
+		json->root->left_ch = json->root->right_ch = 0;
+
+	first = acl_json_node_duplicate(json, node);
 	acl_json_node_add_child(json->root, first);
 	acl_json_build(json, buf);
 	acl_json_free(json);

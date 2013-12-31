@@ -35,12 +35,12 @@ static const char* default_data = \
     "   { 'value1': 'Open1',  'onclick': 'Open1()'},\r\n"
     "   { 'value2': 'Open2',  'onclick': 'Open2()'},\r\n"
     "   [{'value3': 'Open3',  'onclick': 'Open3()'}],\r\n"
-    "   [ 'value4', 'Open4',  'onclick', 'Open4()'],\r\n"
+    "   [{'value4': 'Open4'}, 'onclick', 'Open4()'],\r\n"
     "   [ 'value5', 'Open5',  'onclick', 'Open5()'],\r\n"
     "   { 'value6': 'Open6',  'onclick': 'Open6()'}\r\n"
     " ]\r\n"
     "}\r\n";
-static const char* default_result = "{\"menu name\": {\"id:file\": \"file\", \"value{\": \"File\", \"popup{}\": {\"menuitem1}\": [{\"value\": \"New\", \"onclick\": \"CreateNewDoc()\"}, {\"value\": \"Open\", \"onclick\": \"OpenDoc()\"}, {\"value\": \"Close\", \"onclick\": \"CloseDoc()\"}], \"menuname[]\": \"hello world\", \"inner\": {\"value\": \"new \", \"value\": \"open\"}, \"menuitem2\": [{\"value\": \"New\", \"onclick\": \"CreateNewDoc()\"}, {\"value\": \"Open\", \"onclick\": \"OpenDoc()\"}, {\"value\": \"Close\", \"onclick\": \"CloseDoc()\"}, {{\"value\": \"Help\", \"onclick\": \"Help()\"}}]}}, \"help\": \"hello world!\", \"menuitem2\": [{\"value1\": \"Open1\", \"onclick\": \"Open1()\"}, {\"value2\": \"Open2\", \"onclick\": \"Open2()\"}, [{\"value3\": \"Open3\", \"onclick\": \"Open3()\"}], [\"value4\", \"Open4\", \"onclick\", \"Open4()\"], [\"value5\", \"Open5\", \"onclick\", \"Open5()\"], {\"value6\": \"Open6\", \"onclick\": \"Open6()\"}]}";
+static const char* default_result = "{\"menu name\": {\"id:file\": \"file\", \"value{\": \"File\", \"popup{}\": {\"menuitem1}\": [{\"value\": \"New\", \"onclick\": \"CreateNewDoc()\"}, {\"value\": \"Open\", \"onclick\": \"OpenDoc()\"}, {\"value\": \"Close\", \"onclick\": \"CloseDoc()\"}], \"menuname[]\": \"hello world\", \"inner\": {\"value\": \"new \", \"value\": \"open\"}, \"menuitem2\": [{\"value\": \"New\", \"onclick\": \"CreateNewDoc()\"}, {\"value\": \"Open\", \"onclick\": \"OpenDoc()\"}, {\"value\": \"Close\", \"onclick\": \"CloseDoc()\"}, {{\"value\": \"Help\", \"onclick\": \"Help()\"}}]}}, \"help\": \"hello world!\", \"menuitem2\": [{\"value1\": \"Open1\", \"onclick\": \"Open1()\"}, {\"value2\": \"Open2\", \"onclick\": \"Open2()\"}, [{\"value3\": \"Open3\", \"onclick\": \"Open3()\"}], [{\"value4\": \"Open4\"}, \"onclick\", \"Open4()\"], [\"value5\", \"Open5\", \"onclick\", \"Open5()\"], {\"value6\": \"Open6\", \"onclick\": \"Open6()\"}]}";
 
 #elif 1
 static const char* default_data = "{\"menuitem2\": [{\"value1\": \"Open1\", \"onclick\": \"Open1()\"}, {\"value2\": \"Open2\", \"onclick\": \"Open2()\"}, [{\"value3\": \"Open3\", \"onclick\": \"Open3()\"}], [\"value4\", \"Open4\", \"onclick\", \"Open4()\"], [{\"value5\": \"Open5\"}, \"onclick\", \"Open5()\"], {\"value6\": \"Open6\", \"onclick\": \"Open6()\"}]}";
@@ -127,30 +127,32 @@ static void test(void)
 	}
 
 	acl::json json2(*nodes[0]);
-	printf(">>>%s(%d)->json(tags: %s) result: %s\r\n",
+	printf(">>>%s(%d)->json2(tags: %s) result:\r\n%s\r\n",
 		__FUNCTION__, __LINE__, tags, json2.to_string().c_str());
 	printf("-------------------------------------------------\r\n");
-	printf(">>>%s(%d)->before set node's string: %s\r\n",
+	printf(">>>%s(%d)->before set node's string:\r\n%s\r\n",
 		__FUNCTION__, __LINE__, (*nodes[0]).to_string().c_str());
 	printf("-------------------------------------------------\r\n");
 	nodes[0]->set_tag("popup");
 	nodes[0]->set_text("popup text");
-	printf(">>>%s(%d)->after set node's string: %s\r\n",
+	printf(">>>%s(%d)->after set node's string:\r\n%s\r\n",
 		__FUNCTION__, __LINE__, (*nodes[0]).to_string().c_str());
 
 	printf("-------------------------------------------------\r\n");
+	printf(">>>>root to string:\r\n%s\r\n", json1.get_root().to_string().c_str());
+	printf("-------------------------------------------------\r\n");
 
 	acl::json json3(json1.get_root());
-	printf(">>>%s(%d)->json3(from json's root) result: %s\r\n",
+	printf(">>>%s(%d)->json3(from json's root) result:\r\n%s\r\n",
 		__FUNCTION__, __LINE__, json3.to_string().c_str());
 
 	printf("-------------------------------------------------\r\n");
 
 	if (json1.to_string() == json3.to_string())
-		printf(">>%s(%d): OK!\r\n", __FUNCTION__, __LINE__);
+		printf(">>%s(%d): json1=json3, OK!\r\n", __FUNCTION__, __LINE__);
 	else
 	{
-		printf("%s(%d): ERROR!\r\n", __FUNCTION__, __LINE__);
+		printf("%s(%d): ERROR! json1 != json3\r\n", __FUNCTION__, __LINE__);
 		printf(">>%s(%d)->json1:\r\n%s\r\n",
 			__FUNCTION__, __LINE__, json1.to_string().c_str());
 		printf(">>%s(%d)->json3:\r\n%s\r\n",

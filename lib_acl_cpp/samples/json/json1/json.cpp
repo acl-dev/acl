@@ -18,8 +18,9 @@ static void test(void)
 	acl::json_node& root = json.get_root();
 	acl::json_node *node0, *node1, *node2, *node3;
 
-	node0 = &json.create_node();
-	root.add_child(node0);
+	//node0 = &json.create_node();
+	//root.add_child(node0);
+	node0 = &root;
 
 	node1 = &json.create_node("name1", "value1");
 	node0->add_child(node1);

@@ -403,7 +403,13 @@ ACL_JSON *acl_json_alloc1(ACL_SLICE_POOL *slice)
 	/* 将根结点作为当前结点 */
 	json->curr_node = json->root;
 	/* 设置状态机的状态 */
+#if 0
 	json->status = ACL_JSON_S_OBJ;
+#else
+	json->status = ACL_JSON_S_ROOT;
+	json->root->left_ch = '{';
+	json->root->right_ch = '}';
+#endif
 
 	/* 设置迭代函数 */
 
@@ -440,21 +446,39 @@ ACL_JSON_NODE *acl_json_node_duplicate(ACL_JSON *json, ACL_JSON_NODE *from)
 
 ACL_JSON *acl_json_create(ACL_JSON_NODE *node)
 {
-	ACL_JSON *json = acl_json_alloc();
-	ACL_JSON_NODE *first;
+	ACL_JSON *json;
+	ACL_JSON_NODE *root = node->json->root, *first;
 
-	/* 如果当前结点为根结点，则需要提取该根结点的第一个结点 */
-	if (node == node->json->root && node->tag_node != NULL)
-		node = node->tag_node;
-	first = acl_json_node_duplicate(json, node);
+	json = (ACL_JSON*) acl_mycalloc(1, sizeof(ACL_JSON));
+	json->slice = NULL;
 
-	/* 如果 json 结点没有 {，则需要再创建一个空 {} 对象 */
-	if (first->left_ch != '{') {
-		ACL_JSON_NODE *obj = acl_json_create_obj(json);
-		acl_json_node_add_child(json->root, obj);
-		acl_json_node_add_child(obj, first);
-	} else
+	/* 如果传入的结点为 root 结点，则直接赋值创建 root 即可 */
+	if (node == root) {
+		json->root = acl_json_node_duplicate(json, node);
+	} else {
+		json->root = acl_json_node_alloc(json);
+		first = acl_json_node_duplicate(json, node);
 		acl_json_node_add_child(json->root, first);
+	}
+
+	/* 将根结点作为当前结点 */
+	json->curr_node = json->root;
+	/* 设置状态机的状态 */
+#if 0
+	json->status = ACL_JSON_S_OBJ;
+#else
+	json->status = ACL_JSON_S_ROOT;
+	json->root->left_ch = '{';
+	json->root->right_ch = '}';
+#endif
+
+	/* 设置迭代函数 */
+
+	json->iter_head = json_iter_head;
+	json->iter_next = json_iter_next;
+	json->iter_tail = json_iter_tail;
+	json->iter_prev = json_iter_prev;
+
 	return json;
 }
 

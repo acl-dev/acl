@@ -11,20 +11,24 @@ int main()
 	
 	printf(">>>>{%s}\r\n", tablename);
 	acl::json json;
-	acl::json_node& root = json.get_root().add_child(false, true);
-	root.add_child("type", type);
-	root.add_child("tablename", tablename);
-	root.add_child("name", name);
+	//printf(">>>root: %s\r\n", json.to_string().c_str());
+	acl::json_node& first = json.get_root().add_child(false, true);
+	first.add_child("type", type);
+	first.add_child("tablename", tablename);
+	first.add_child("name", name);
 
 	// 生成json字符串
 	printf("json to string:%s\r\n", json.to_string().c_str());
+	printf("first to string: %s\r\n", first.to_string().c_str());
 
 	acl::string buf;
 	json.build_json(buf);
 	// 根据生成的字符串获取键值
-	acl::json json2(buf.c_str());
-	acl::json_node* root2 = json2.get_root().first_child();
+	acl::json json2(first);
+	acl::json_node* root2 = &json2.get_root();
 	acl::json_node* child = root2->first_child();
+
+	printf(">>>json2: %s|%s\r\n", json2.to_string().c_str(), buf.c_str());
 
 	const char* tag, *txt;
 	while (child != NULL)

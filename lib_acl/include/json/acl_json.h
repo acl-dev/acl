@@ -55,6 +55,21 @@ struct ACL_JSON_NODE {
 	ACL_JSON_NODE *(*iter_prev)(ACL_ITER*, ACL_JSON_NODE*);
 };
 
+enum {
+	ACL_JSON_S_ROOT,	/**< 根结点 */
+	ACL_JSON_S_OBJ,		/**< 标签对象值 */
+	ACL_JSON_S_MEMBER,
+	ACL_JSON_S_ARRAY,	/**< json 结点 array */
+	ACL_JSON_S_ELEMENT,
+	ACL_JSON_S_PAIR,	/**< name:value pair */
+	ACL_JSON_S_NEXT,	/**< 下一个结点 */
+	ACL_JSON_S_TAG,		/**< 对象标签名 */
+	ACL_JSON_S_VALUE,	/**< 结点值处理过程 */
+	ACL_JSON_S_COLON,	/**< 冒号 : */
+	ACL_JSON_S_STRING,
+	ACL_JSON_S_STREND
+};
+
 struct ACL_JSON {
 	int   depth;                /**< 最大深度 */
 	int   node_cnt;             /**< 结点总数, 包括 root 结点 */
@@ -76,14 +91,7 @@ struct ACL_JSON {
 
 	/* private */
 
-	int   status;               /**< 状态机当前解析状态 */
-#define ACL_JSON_S_OBJ      0       /**< 标签对象值 */
-#define	ACL_JSON_S_ARR      1       /**< json 结点 array */
-#define	ACL_JSON_S_PAR      2       /**< name:value pair */
-#define ACL_JSON_S_NXT      3       /**< 下一个结点 */
-#define ACL_JSON_S_TAG      4       /**< 对象标签名 */
-#define ACL_JSON_S_VAL      5       /**< 结点值处理过程 */
-#define ACL_JSON_S_COL      6       /**< 冒号 : */
+	int   status;                   /**< 状态机当前解析状态 */
 
 	ACL_ARRAY *node_cache;      /**< json 结点缓存池 */
 	int   max_cache;            /**< json 结点缓存池的最大容量 */

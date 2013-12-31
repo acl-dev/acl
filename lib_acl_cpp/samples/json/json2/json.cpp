@@ -96,13 +96,16 @@ static void test(void)
 	printf("-------------------------------------------------------\r\n");
 
 	const char* tags_list[] = {
-		"DataList/*/DataKey",
-		"DataList/*/DataValue",
-		"DataList/*/DataValue/BindList",
-		"DataValue/BindList/*/BindName",
-		"DataList/*/DataValue/*/name1",
-		"DataList/*/*/*/name1",
-		"DataList/*/DataValue/MailForward",
+		"DataList",
+		"DataList/DataKey",
+		"DataList/DataValue",
+		"DataList/DataValue/BindList",
+		"DataValue/BindList/BindName",
+		"DataList/DataValue/name1",
+		"DataList/*/name1",
+		"DataList/DataValue/MailForward",
+		"DataList/*/MailForward",
+		"DataList/MailForward",
 		NULL
 	};
 
