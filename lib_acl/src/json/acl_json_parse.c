@@ -367,6 +367,7 @@ static const char *json_value(ACL_JSON *json, const char *data)
 	} else
 		json->status = ACL_JSON_S_STRING;
 
+	json->curr_node->type = ACL_JSON_T_LEAF;
 	return data;
 }
 

@@ -71,6 +71,19 @@ static void test(void)
 	else
 		printf("%s(%d): Build json OK!\r\n", __FUNCTION__, __LINE__);
 
+	acl::string buf1 = json1.to_string();
+	json1.reset();
+	json1.update(default_data);
+	if (json1.to_string() != buf1)
+	{
+		printf("-------------------------------------------------\r\n");
+		printf("parse error after reset\r\n");
+		printf("first parse:\r\n%s\r\n", buf1.c_str());
+		printf("second parse:\r\n%s\r\n", json1.to_string().c_str());
+		printf("-------------------------------------------------\r\n");
+		return;
+	}
+
 #if 0
 	acl::json_node* iter = json1.first_node();
 	while (iter)

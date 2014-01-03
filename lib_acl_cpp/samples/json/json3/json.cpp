@@ -44,5 +44,32 @@ int main()
 		child = root2->next_child();
 	}
 	printf("\r\n");
+
+	/////////////////////////////////////
+
+	const char* sss = "{\"DataKey\": \"BindRule\", \"DataValue\": {\"waittime\": \"7\"}}";
+
+	acl::json json3(sss);
+	const char* tags = "DataValue";
+
+	printf("----------------------------------------------------\r\n");
+	printf(">>%s\r\n", sss);
+	acl::json_node* iter = json3.first_node();
+	while (iter)
+	{
+		tag = iter->tag_name();
+		txt = iter->get_text();
+		if (txt)
+			iter->set_text("hello");
+		printf("tag: %s, txt: %s\r\n", tag ? tag : "null", txt ? txt : "null");
+		iter = json3.next_node();
+	}
+	printf("----------------------------------------------------\r\n");
+
+	const std::vector<acl::json_node*>& nodes = json3.getElementsByTags(tags);
+	if (nodes.empty() == false)
+	{
+		printf(">>>%s\r\n", nodes[0]->to_string().c_str());
+	}
 	return 0;
 }

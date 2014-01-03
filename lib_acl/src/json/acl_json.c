@@ -406,9 +406,9 @@ ACL_JSON *acl_json_alloc1(ACL_SLICE_POOL *slice)
 #if 0
 	json->status = ACL_JSON_S_OBJ;
 #else
-	json->status = ACL_JSON_S_ROOT;
 	json->root->left_ch = '{';
 	json->root->right_ch = '}';
+	json->status = ACL_JSON_S_ROOT;
 #endif
 
 	/* ÉèÖÃµü´úº¯Êý */
@@ -559,8 +559,11 @@ void acl_json_reset(ACL_JSON *json)
 		acl_msg_fatal("%s(%d): node_cnt(%d) invalid",
 			myname, __LINE__, json->node_cnt);
 
-	json->status = ACL_JSON_S_OBJ;
+	json->root->left_ch = '{';
+	json->root->right_ch = '}';
+	json->root->type = ACL_JSON_T_OBJ;
 	json->curr_node = json->root;
+	json->status = ACL_JSON_S_ROOT;
 	json->finish = 0;
 	json->depth = 0;
 }
