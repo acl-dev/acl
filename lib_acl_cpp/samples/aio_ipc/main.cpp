@@ -141,7 +141,6 @@ class test_server : public ipc_server
 public:
 	test_server()
 	{
-
 	}
 
 	~test_server()

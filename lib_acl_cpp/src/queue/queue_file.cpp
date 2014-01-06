@@ -47,6 +47,7 @@ bool queue_file::create(const char* home, const char* queueName,
 	acl::string buf;
 	acl::fstream* fp = NULL;
 	int   i = 0;
+	bool  dir_exist;
 
 	ACL_SAFE_STRNCPY(m_home, home, sizeof(m_home));
 	ACL_SAFE_STRNCPY(m_queueName, queueName, sizeof(m_queueName));
@@ -79,6 +80,8 @@ bool queue_file::create(const char* home, const char* queueName,
 
 		fp = NEW fstream;
 
+		dir_exist = false;
+
 		while (true)
 		{
 			// 排它性创建唯一文件
@@ -87,7 +90,7 @@ bool queue_file::create(const char* home, const char* queueName,
 
 			logger_warn("open file %s error(%s)", buf.c_str(), acl_last_serror());
 
-			if (acl_last_error() != ENOENT)
+			if (acl_last_error() != ENOENT || dir_exist)
 				break;
 
 			// 尝试性创建目录
@@ -103,6 +106,7 @@ bool queue_file::create(const char* home, const char* queueName,
 			else
 				logger("create path: %s ok", buf.c_str());
 
+			dir_exist = true;
 			buf.clear();
 			buf << m_home << PATH_SEP << m_queueName << PATH_SEP << m_queueSub
 				<< PATH_SEP << m_partName << "." << extName;

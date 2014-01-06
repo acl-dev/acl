@@ -895,6 +895,9 @@ void acl_threads_server_main(int argc, char **argv,
 
 	/*******************************************************************/
 
+	/* use master's log before init, so can log something */
+	acl_master_log_open(argv[0]);
+
 	/*
 	 * Pick up policy settings from master process. Shut up error
 	 * messages to stderr, because no-one is going to see them.
@@ -1072,10 +1075,6 @@ void acl_threads_server_main(int argc, char **argv,
 	if (chdir(acl_var_threads_queue_dir) < 0)
 		acl_msg_fatal("chdir(\"%s\"): %s", acl_var_threads_queue_dir,
 			acl_last_serror());
-	if (pre_jail)
-		pre_jail(pre_jail_ctx);
-	acl_chroot_uid(root_dir, user_name);
-
 	/* if enable dump core when program crashed ? */
 	if (acl_var_threads_enable_core)
 		set_core_limit();
@@ -1092,6 +1091,11 @@ void acl_threads_server_main(int argc, char **argv,
 
 	/* open all listen streams */
 	__sstreams = server_open(__event, __threads, __socket_count, fdtype);
+
+	if (pre_jail)
+		pre_jail(pre_jail_ctx);
+
+	acl_chroot_uid(root_dir, user_name);
 
 	/* Run post-jail initialization. */
 	if (post_init)

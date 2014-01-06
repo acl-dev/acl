@@ -236,7 +236,7 @@ void master_threads2::service_pre_jail(void*)
 #ifndef WIN32
 	if (__mt->daemon_mode())
 	{
-		ACL_EVENT* eventp = acl_ioctl_server_event();
+		ACL_EVENT* eventp = acl_threads_server_event();
 		__mt->set_event(eventp);
 	}
 #endif

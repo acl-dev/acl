@@ -124,7 +124,9 @@ private:
 class db_ipc : public ipc_client
 {
 public:
-	db_ipc(db_service* dbs) : dbservice_(dbs)
+	db_ipc(db_service* dbs, acl_int64 magic)
+	: ipc_client(magic)
+	, dbservice_(dbs)
 	{
 
 	}
@@ -168,6 +170,9 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////
+#ifdef WIN32
+#include <process.h>
+#endif
 
 db_service::db_service(size_t dblimit /* = 100 */, int nthread /* = 2 */,
 	bool win32_gui /* = false */)
@@ -179,6 +184,11 @@ db_service::db_service(size_t dblimit /* = 100 */, int nthread /* = 2 */,
 		dblimit_ = (int) dblimit > nthread ? nthread : dblimit;
 	else
 		dblimit_ = dblimit;
+#ifdef WIN32
+	magic_ = _getpid() + time(NULL);
+#else
+	magic_ = getpid() + time(NULL);
+#endif
 }
 
 db_service::~db_service(void)
@@ -203,7 +213,7 @@ void db_service::on_accept(acl::aio_socket_stream* client)
 	// 系统快速回收套接口资源
 	acl_tcp_so_linger(fd, 1, 0);
 
-	ipc_client* ipc = NEW db_ipc(this);
+	ipc_client* ipc = NEW db_ipc(this, magic_);
 	ipc->open(client);
 
 	// 添加服务线程的消息处理

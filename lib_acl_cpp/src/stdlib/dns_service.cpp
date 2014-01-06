@@ -102,8 +102,9 @@ private:
 class dns_ipc : public ipc_client
 {
 public:
-	dns_ipc(dns_service* server)
-		: server_(server)
+	dns_ipc(dns_service* server, acl_int64 magic)
+	: ipc_client(magic)
+	, server_(server)
 	{
 
 	}
@@ -139,11 +140,18 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////
+#ifdef WIN32
+#include <process.h>
+#endif
 
 dns_service::dns_service(int nthread /* = 1 */, bool win32_gui /* = false */)
 	: ipc_service(nthread, win32_gui)
 {
-
+#ifdef WIN32
+	magic_ = _getpid() + time(NULL);
+#else
+	magic_ = getpid() + time(NULL);
+#endif
 }
 
 dns_service::~dns_service()
@@ -153,7 +161,7 @@ dns_service::~dns_service()
 
 void dns_service::on_accept(aio_socket_stream* client)
 {
-	ipc_client* ipc = NEW dns_ipc(this);
+	ipc_client* ipc = NEW dns_ipc(this, magic_);
 	ipc->open(client);
 
 	// 添加消息回调对象

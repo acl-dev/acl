@@ -9,6 +9,11 @@ typedef struct MSG_HDR
 {
 	int nMsg;
 	int dlen;
+#ifdef WIN32
+	__int64   magic;
+#else
+	long long int magic;
+#endif
 } MSG_HDR;
 
 typedef enum
@@ -28,8 +33,11 @@ class socket_stream;
 class ACL_CPP_API ipc_client : private aio_open_callback
 {
 public:
-
-	ipc_client();
+#ifdef WIN32
+	ipc_client(__int64 magic = -1);
+#else
+	ipc_client(long long int magic = -1);
+#endif
 	virtual ~ipc_client();
 
 	/**
@@ -148,6 +156,11 @@ protected:
 	 */
 	void trigger(int nMsg, void* data, int dlen);
 private:
+#ifdef WIN32
+	__int64   magic_;
+#else
+	long long int magic_;
+#endif
 	char* addr_;
 	std::list<int> messages_;
 	aio_handle* handle_;

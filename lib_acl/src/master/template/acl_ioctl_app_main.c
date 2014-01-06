@@ -295,7 +295,7 @@ static void app_main_init(void)
 		return;
 	}
 
-	for (i = 0; i <env_argv->argc; i++) {
+	for (i = 0; i < env_argv->argc; i++) {
 		pname = acl_argv_index(env_argv, i);
 		ptr = strchr(pname, ':');
 		if (ptr == NULL)

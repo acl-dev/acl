@@ -9,13 +9,14 @@
 namespace acl
 {
 
-ipc_client::ipc_client()
-	: addr_(NULL)
-	, async_stream_(NULL)
-	, sync_stream_(NULL)
-	, sync_stream_inner_(NULL)
-	, closing_(false)
-	, status_(IO_WAIT_HDR)
+ipc_client::ipc_client(acl_int64 magic /* = -1 */)
+: magic_(magic)
+, addr_(NULL)
+, async_stream_(NULL)
+, sync_stream_(NULL)
+, sync_stream_inner_(NULL)
+, closing_(false)
+, status_(IO_WAIT_HDR)
 {
 
 }
@@ -225,6 +226,7 @@ void ipc_client::send_message(int nMsg, const void* data, int dlen)
 
 	hdr.nMsg = nMsg;
 	hdr.dlen = dlen > 0 ? dlen : 0;
+	hdr.magic = magic_;
 
 	// 发送消息头
 	if (sync_stream_ != NULL)
@@ -267,6 +269,14 @@ bool ipc_client::read_callback(char* data, int len)
 	{
 		acl_assert(len == sizeof(MSG_HDR));
 		MSG_HDR* hdr = (MSG_HDR*) data;
+
+		// 先检查 IPC 消息数据的有效性
+		if (hdr->magic != magic_)
+		{
+			logger_error("unknown ipc magic: %lld", hdr->magic);
+			return false;
+		}
+		//logger(">>>ok, magic: %d", magic_);
 		if (hdr->dlen > 0)
 		{
 			hdr_.nMsg = hdr->nMsg;

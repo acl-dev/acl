@@ -39,6 +39,7 @@ void ipc_request::run(HWND hWnd acl_unused)
 
 struct REQ_CTX
 {
+	acl_int64 magic;
 	char  addr[256];
 	ipc_request* req;
 	ipc_service* service;
@@ -78,7 +79,7 @@ static void thread_pool_main(REQ_CTX* ctx)
 	{
 		// IO 消息模式
 
-		ipc_client* ipc = NEW ipc_client();
+		ipc_client* ipc = NEW ipc_client(ctx->magic);
 
 		// 连接消息服务器, 采用同步IPC通道方式
 		if (ipc->open(ctx->addr, 0) == false)
@@ -130,7 +131,7 @@ static void* thread_once_main(REQ_CTX* ctx)
 	{
 		// IO 消息模式
 
-		ipc_client* ipc = NEW ipc_client();
+		ipc_client* ipc = NEW ipc_client(ctx->magic);
 
 		// 连接消息服务器
 		if (ipc->open(ctx->addr, 0) == false)
@@ -274,6 +275,7 @@ void ipc_service::close_window(void)
 #endif
 
 ipc_service::ipc_service(int nthread, bool ipc_keep /* true */)
+: magic_(-1)
 {
 #ifdef WIN32
 	hWnd_ = NULL;
@@ -320,6 +322,7 @@ void ipc_service::request(ipc_request* req)
 #else
 	ACL_SAFE_STRNCPY(req_ctx->addr, get_addr(), sizeof(req_ctx->addr));
 #endif
+	req_ctx->magic = magic_;
 	req_ctx->req = req;
 	if (ipc_keep_)
 		req_ctx->service = this;
@@ -365,7 +368,7 @@ ipc_client* ipc_service::peek_conn()
 
 	// 创建新的 IO 消息流
 
-	ipc = NEW ipc_client();
+	ipc = NEW ipc_client(magic_);
 
 	const char* addr = get_addr();
 	// 连接消息服务器, 采用同步IPC通道方式

@@ -504,7 +504,7 @@ private:
 class http_ipc : public ipc_client
 {
 public:
-	http_ipc(void)
+	http_ipc(acl_int64 magic) : ipc_client(magic)
 	{
 
 	}
@@ -561,6 +561,9 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////
+#ifdef WIN32
+#include <process.h>
+#endif
 
 http_service::http_service(int nthread /* = 1 */, int nwait,
 	bool win32_gui /* = false */)
@@ -569,7 +572,11 @@ http_service::http_service(int nthread /* = 1 */, int nwait,
 , nwait_(nwait)
 , handle_type_(ENGINE_SELECT)
 {
-
+#ifdef WIN32
+	magic_ = _getpid() + time(NULL);
+#else
+	magic_ = getpid() + time(NULL);
+#endif
 }
 
 http_service::~http_service()
@@ -625,7 +632,7 @@ void http_service::win32_proc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam
 
 void http_service::on_accept(aio_socket_stream* client)
 {
-	ipc_client* ipc = NEW http_ipc();
+	ipc_client* ipc = NEW http_ipc(magic_);
 	ipc->open(client);
 
 	// 添加消息处理

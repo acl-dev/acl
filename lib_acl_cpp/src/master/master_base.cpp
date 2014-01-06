@@ -79,13 +79,19 @@ void master_base::set_event(ACL_EVENT* event)
 	event_ = event;
 }
 
-void master_base::proc_set_timer(event_timer* timer)
+bool master_base::proc_set_timer(event_timer* timer)
 {
 	if (event_ == NULL)
+	{
 		logger_warn("event NULL!");
+		return false;
+	}
 	else
+	{
 		acl_event_request_timer(event_, timer_callback, timer,
 			timer->min_delay(), timer->keep_timer() ? 1 : 0);
+		return true;
+	}
 }
 
 void master_base::proc_del_timer(event_timer* timer)

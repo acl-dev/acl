@@ -133,8 +133,8 @@ public:
 	 * @param ipc_keep {bool} 内部 IPC 消息流是否保持长连接，保持长
 	 *  连接有助于提高消息传递的效率
 	 */
-	rpc_service(int nthread, bool ipc_keep = true)
-		: ipc_service(nthread, ipc_keep) {}
+	rpc_service(int nthread, bool ipc_keep = true);
+
 	~rpc_service(void) {}
 
 	/**

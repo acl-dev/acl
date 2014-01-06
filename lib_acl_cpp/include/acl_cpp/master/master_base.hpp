@@ -49,8 +49,9 @@ public:
 	 * proc_on_init) 中被设置，当该定时器任务都执行完毕后会自动被
 	 * 销毁(即内部会自动调用 master_timer::destroy 方法)
 	 * @param timer {event_timer*} 定时任务
+	 * @return {bool} 设置定时器是否成功
 	 */
-	void proc_set_timer(event_timer* timer);
+	bool proc_set_timer(event_timer* timer);
 
 	/**
 	 * 删除进程级别定时器

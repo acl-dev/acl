@@ -217,7 +217,7 @@ bool rpc_request::cond_signal()
 class rpc_client : public ipc_client
 {
 public:
-	rpc_client(void) {}
+	rpc_client(acl_int64 magic) : ipc_client(magic) {}
 	~rpc_client(void) {}
 
 protected:
@@ -247,10 +247,24 @@ protected:
 private:
 };
 
+#ifdef WIN32
+#include <process.h>
+#endif
+
+rpc_service::rpc_service(int nthread, bool ipc_keep /* = true */)
+: ipc_service(nthread, ipc_keep)
+{
+#ifdef WIN32
+	magic_ = _getpid() + time(NULL);
+#else
+	magic_ = getpid() + time(NULL);
+#endif
+}
+
 void rpc_service::on_accept(aio_socket_stream* client)
 {
 	// 创建接收来自于子线程消息的 IPC 连接对象
-	ipc_client* ipc = new rpc_client();
+	ipc_client* ipc = new rpc_client(magic_);
 	ipc->open(client);
 
 	// 添加消息回调对象

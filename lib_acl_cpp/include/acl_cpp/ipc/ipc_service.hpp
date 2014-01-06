@@ -91,13 +91,19 @@ public:
 	 */
 	void push_conn(ipc_client* conn);
 protected:
+#ifdef WIN32
+	__int64   magic_;
+#else
+	long long int magic_;
+#endif
+
 	/**
 	 * 子类调用此函数发送请求服务
 	 * @param req {ipc_request*}
 	 */
 	void request(ipc_request* req);
 private:
-	bool ipc_keep_;
+	bool  ipc_keep_;
 	acl_pthread_pool_t* thread_pool_;
 #ifdef WIN32
 	HWND hWnd_;
