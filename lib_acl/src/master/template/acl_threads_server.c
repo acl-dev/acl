@@ -1075,9 +1075,6 @@ void acl_threads_server_main(int argc, char **argv,
 	if (chdir(acl_var_threads_queue_dir) < 0)
 		acl_msg_fatal("chdir(\"%s\"): %s", acl_var_threads_queue_dir,
 			acl_last_serror());
-	/* if enable dump core when program crashed ? */
-	if (acl_var_threads_enable_core)
-		set_core_limit();
 
 	/* open the server's log */
 	open_log(event_mode);
@@ -1096,6 +1093,10 @@ void acl_threads_server_main(int argc, char **argv,
 		pre_jail(pre_jail_ctx);
 
 	acl_chroot_uid(root_dir, user_name);
+
+	/* if enable dump core when program crashed ? */
+	if (acl_var_threads_enable_core)
+		set_core_limit();
 
 	/* Run post-jail initialization. */
 	if (post_init)

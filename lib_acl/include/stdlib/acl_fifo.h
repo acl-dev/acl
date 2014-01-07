@@ -127,7 +127,7 @@ ACL_API ACL_FIFO_INFO *acl_fifo_pop_info(ACL_FIFO *fifo);
 ACL_API void *acl_fifo_pop_back(ACL_FIFO *fifo);
 
 /**
- * 返回队列中头部(即最新添加的)的动态对象
+ * 返回队列中头部的动态对象
  * @param fifo {ACL_FIFO*}
  * @return {void*}, 如果为空，则表示队列为空
  */
@@ -135,7 +135,7 @@ ACL_API void *acl_fifo_head(ACL_FIFO *fifo);
 ACL_API ACL_FIFO_INFO *acl_fifo_head_info(ACL_FIFO *fifo);
 
 /**
- * 返回队列中尾部(即最早添加的)的动态对象
+ * 返回队列中尾部的动态对象
  * @param fifo {ACL_FIFO*}
  * @return {void*}, 如果为空，则表示队列为空
  */
