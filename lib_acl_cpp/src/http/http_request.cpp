@@ -110,6 +110,12 @@ void http_request::reset(void)
 	RESET_RANGE();
 }
 
+void http_request::set_timeout(int conn_timeout, int rw_timeout)
+{
+	conn_timeout_ = conn_timeout;
+	rw_timeout_ = rw_timeout;
+}
+
 http_request& http_request::set_unzip(bool on)
 {
 	unzip_ = on;

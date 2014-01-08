@@ -11,7 +11,7 @@ json/xml/mime/base64/qp/uucode, etc parse lib<br>
 thread/process pool<br>
 mysql/sqlite connection pool<br>
 event(select, poll, iocp, epoll, kqueue, devpoll, win32 message)<br>
-server framework<br>
+server framework(multi-process, multi-threads, aio, trigger, udp)<br>
 HttpServlet for C++; http client/server lib<br>
 log/configure lib<br>
 file queue<br>
@@ -20,3 +20,5 @@ zlib/iconv wrapper<br>
 session manager<br>
 unit test framework<br>
 
+website: http://www.iteye.com/
+tar download: https://sourceforge.net/projects/acl/

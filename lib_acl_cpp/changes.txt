@@ -1,5 +1,9 @@
 修改历史列表：
 ------------------------------------------------------------------------
+
+215) 2014.1.8
+215.1) feature: http_request 类添加了方法 set_timeout 可以设置网络超时及读写超时
+
 214) 2014.1.6
 214.1) bugfix: 新线程池服务器模板 master_threads2 类在调用 service_pre_jail
 时应该通过 acl_threads_server_event 获得事件引擎 (原来写的是 acl_ioctl_server_event,

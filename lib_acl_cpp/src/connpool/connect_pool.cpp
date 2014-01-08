@@ -70,8 +70,8 @@ connect_client* connect_pool::peek()
 	}
 	else if (count_ >= max_)
 	{
-		logger_error("too many connect(%d > %d) to redis: %s",
-			count_, max_, addr_);
+		logger_error("too many connections, max: %d, curr: %d,"
+			" server: %s", count_, max_, addr_);
 		lock_.unlock();
 		return NULL;
 	}

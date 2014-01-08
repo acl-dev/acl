@@ -232,6 +232,13 @@ public:
 	 */
 	void reset(void);
 
+	/**
+	 * 设置网络连接超时及网络读写超时时间(秒)
+	 * @param conn_timeout {int} 网络连接超时
+	 * @param rw_timeout {int} 网络读写超时
+	 */
+	void set_timeout(int conn_timeout, int rw_timeout);
+
 protected:
 	/**
 	 * 基类 connect_client 的纯虚函数，显式地调用本函数用来打开与服务端的连接
