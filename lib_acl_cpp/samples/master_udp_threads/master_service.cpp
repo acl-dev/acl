@@ -42,7 +42,11 @@ class echo_thread : public acl::thread
 public:
 	echo_thread(const char* peer, const char* data, size_t dlen)
 	{
+#if defined(WIN32) && _MSC_VER >= 1500
+		_snprintf_s(peer_addr_, sizeof(peer_addr_), sizeof(peer_addr_), "%s", peer);
+#else
 		snprintf(peer_addr_, sizeof(peer_addr_), "%s", peer);
+#endif
 		buf_ = (char*) acl_mymemdup(data, dlen);
 		len_ = (int) dlen;
 	}

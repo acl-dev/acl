@@ -60,11 +60,19 @@
         return -1;          \
     } while (0)
 
+#if defined(WIN32) && _MSC_VER >= 1500
+#define xstrlcpy(dst, src, size)                   \
+    do {                                           \
+        strncpy_s(dst, size, src, strlen(src));    \
+        dst[size - 1] = 0;                         \
+    } while (0)
+#else
 #define xstrlcpy(dst, src, size)    \
     do {                            \
         strncpy(dst, src, size);    \
         dst[size - 1] = 0;          \
     } while (0)
+#endif
 
 #define xstrlcpyn(dst, src, srclen, size) \
     xstrlcpy(dst, src, xmin((srclen) + 1, size))

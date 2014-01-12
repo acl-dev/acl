@@ -13,7 +13,7 @@
 #include <sys/types.h>
 #endif
 
-#ifdef  ACL_MS_WINDOWS
+#ifdef  WIN32
 #include <io.h>
 #endif
 
@@ -235,7 +235,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 	
 #ifdef ACL_UNIX
 	filefd = acl_file_open(pathname, O_RDWR, S_IREAD | S_IWRITE | S_IRGRP);
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	filefd = acl_file_open(pathname, O_RDWR, S_IREAD | S_IWRITE);
 #else
 # error "unknown OS"
@@ -564,7 +564,7 @@ int acl_cfg_parser_dump(const ACL_CFG_PARSER *parser,
 	filefd = acl_file_open(pathname,
 			O_CREAT | O_TRUNC | O_APPEND | O_WRONLY,
 			S_IREAD | S_IWRITE | S_IRGRP);
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	filefd = acl_file_open(pathname,
 		O_CREAT | O_TRUNC | O_APPEND | O_WRONLY,
 		S_IREAD | S_IWRITE);

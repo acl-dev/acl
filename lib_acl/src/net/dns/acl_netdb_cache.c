@@ -3,7 +3,7 @@
 
 #include "stdlib/acl_define.h"
 #include <stdio.h>
-#ifdef  ACL_MS_WINDOWS
+#ifdef  WIN32
 #include <io.h>
 #endif
 #ifdef  ACL_UNIX

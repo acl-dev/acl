@@ -49,7 +49,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stdlib/acl_define.h"
 #include "thread/acl_pthread.h"
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 # define ACL_HAVE_NO_RWLOCK
 #endif
 

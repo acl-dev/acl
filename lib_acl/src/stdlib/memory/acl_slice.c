@@ -7,7 +7,7 @@
 #endif
 #include <string.h>
 #include <stdlib.h>
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 #include <search.h>   /* just for qsort */
 #endif
 #include <stdio.h>
@@ -1007,7 +1007,7 @@ ACL_SLICE *acl_slice_create(const char *name, int page_size,
 
 #ifdef ACL_UNIX
 	sys_page_size = getpagesize();
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	SYSTEM_INFO info;
 
 	memset(&info, 0, sizeof(SYSTEM_INFO));

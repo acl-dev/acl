@@ -97,7 +97,7 @@ static char empty_string[] = "";
 
 /* acl_malloc - allocate memory or bust */
 
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 
 # define SET_FILE(_ptr_, _filename_) do {  \
 	_ptr_ = strrchr(_filename_, '/');  \
@@ -119,7 +119,7 @@ static char empty_string[] = "";
 	else  \
 		_ptr_++;  \
 } while (0)
-#endif  /* ACL_MS_WINDOWS */
+#endif  /* WIN32 */
 
 void acl_default_memstat(const char *filename, int line,
 	void *ptr, size_t *len, size_t *real_len)

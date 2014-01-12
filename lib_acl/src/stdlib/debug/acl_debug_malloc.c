@@ -18,7 +18,7 @@
 #define ASSERT acl_assert
 #endif
 
-#ifdef ACL_MS_VC
+#ifdef WIN32
 # define SANE_STRDUP _strdup
 #else
 # define SANE_STRDUP strdup

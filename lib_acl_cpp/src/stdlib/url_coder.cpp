@@ -140,10 +140,14 @@ url_coder& url_coder::set(const char* name, int value, bool override /* = true *
 	char buf[24];
 
 #ifdef WIN32
-#define snprintf _snprintf
-#endif
-
+# if _MSC_VER >= 1500
+	_snprintf_s(buf, sizeof(buf), sizeof(buf), "%d", value);
+# else
+	_snprintf(buf, sizeof(buf), "%d", value);
+# endif
+#else
 	snprintf(buf, sizeof(buf), "%d", value);
+#endif
 	return set(name, buf, override);
 }
 

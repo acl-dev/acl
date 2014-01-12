@@ -136,7 +136,7 @@ ACL_API ACL_EVENT *acl_event_new_kernel_thr(int delay_sec, int delay_usec);
  */
 ACL_API ACL_EVENT *acl_event_new_wmsg(unsigned int nMsg);
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 ACL_API HWND acl_event_wmsg_hwnd(ACL_EVENT *eventp);
 #endif
 

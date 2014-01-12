@@ -31,7 +31,7 @@ static int select_write_wait(ACL_SOCKET fd, int timeout)
 	struct timeval tv;
 	struct timeval *tp;
 	char   buf[256];
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 	int  errnum;
 #endif
 
@@ -65,7 +65,7 @@ static int select_write_wait(ACL_SOCKET fd, int timeout)
 	for (;;) {
 		switch (select(fd + 1, (fd_set *) 0, &write_fds, &except_fds, tp)) {
 		case -1:
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 			errnum = WSAGetLastError();
 			if (errnum != WSAEINPROGRESS && errnum != WSAEWOULDBLOCK) {
 				acl_msg_error("%s, %s(%d): select error(%s), fd(%d)",

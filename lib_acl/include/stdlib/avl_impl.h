@@ -38,7 +38,7 @@
 #ifdef ACL_UNIX
 # include <stdint.h>	/* uintptr_t */
 # define HAS_UINTPTR
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 # include <stddef.h>
 # define HAS_UINTPTR
 #endif

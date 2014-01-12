@@ -5,13 +5,9 @@
 #define logger_open	acl::log::open
 #define logger_close	acl::log::close
 
-#if defined(VC2003) || defined(VC2002) || defined(VC6)
-#define logger		acl::log::msg1
-#define logger_warn    acl::log::warn1
-#define logger_error    acl::log::error1
-#define logger_fatal    acl::log::fatal1
-#define logger_debug    acl::log::msg3
-#elif defined(WIN32)
+#if defined(WIN32)
+
+# if _MSC_VER >= 1500
 #define logger(fmt, ...)  \
 	acl::log::msg4(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
 #define logger_warn(fmt, ...)  \
@@ -22,7 +18,16 @@
 	acl::log::fatal4(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
 #define logger_debug(section, level, fmt, ...)  \
 	acl::log::msg6(section, level, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
+# else
+#define logger		acl::log::msg1
+#define logger_warn    acl::log::warn1
+#define logger_error    acl::log::error1
+#define logger_fatal    acl::log::fatal1
+#define logger_debug    acl::log::msg3
+# endif
+
 #else
+
 #define logger(fmt, args...)  \
 	acl::log::msg4(__FILE__, __LINE__, __FUNCTION__, fmt, ##args)
 #define logger_warn(fmt, args...)  \
@@ -33,6 +38,7 @@
 	acl::log::fatal4(__FILE__, __LINE__, __FUNCTION__, fmt, ##args)
 #define logger_debug(section, level, fmt, args...)  \
 	acl::log::msg6(section, level, __FILE__, __LINE__, __FUNCTION__, fmt, ##args)
+
 #endif
 
 namespace acl {

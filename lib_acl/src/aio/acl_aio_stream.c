@@ -247,7 +247,7 @@ void aio_delay_check(ACL_AIO *aio)
 
 #define ACL_USE_EVENT_TIMER
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 
 # ifdef ACL_USE_TLS_POOL
 
@@ -315,7 +315,7 @@ static void init_thread_aio(void)
 
 # endif  /* ACL_USE_TLS_POOL */
 
-#endif  /* ACL_MS_WINDOWS */
+#endif  /* WIN32 */
 
 /* 该函数非常关键，采用的IO完成时才关闭的策略，防止重复关闭 */
 void acl_aio_iocp_close(ACL_ASTREAM *astream)
@@ -345,7 +345,7 @@ void acl_aio_iocp_close(ACL_ASTREAM *astream)
 	aio->dead_streams->push_back(aio->dead_streams, astream);
 	astream->flag |= ACL_AIO_FLAG_DELAY_CLOSE;
 	aio_disable_readwrite(aio, astream);
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 
 # ifdef ACL_USE_TLS_POOL
 
@@ -395,7 +395,7 @@ void acl_aio_iocp_close(ACL_ASTREAM *astream)
 
 # endif  /* ACL_USE_TLS_POOL */
 
-#endif  /* ACL_MS_WINDOWS */
+#endif  /* WIN32 */
 }
 
 void acl_aio_add_read_hook(ACL_ASTREAM *astream, ACL_AIO_READ_FN callback, void *ctx)

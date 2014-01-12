@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 #include <direct.h>
 #define __S_ISTYPE(mode, mask)  (((mode) & _S_IFMT) == (mask))
 #ifndef	S_ISDIR

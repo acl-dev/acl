@@ -5,7 +5,7 @@
 
 #endif  /* ACL_PREPARE_COMPILE */
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 #include "stdlib/acl_stdlib.h"
 #include "net/acl_net.h"
 #include <windows.h>
@@ -131,4 +131,4 @@ ACL_VSTREAM *local_listen()
 	return sstream;
 }
 
-#endif /* ACL_MS_WINDOWS */
+#endif /* WIN32 */

@@ -3,7 +3,7 @@
 
 #include "stdlib/acl_define.h"
 
-#ifdef  ACL_MS_WINDOWS
+#ifdef  WIN32
 #include <io.h>
 #include <stdarg.h>
 #include <errno.h>
@@ -33,7 +33,7 @@
 
 #endif
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 
 ACL_FILE_HANDLE acl_file_open(const char *filepath, int flags, int mode)
 {

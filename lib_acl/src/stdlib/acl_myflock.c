@@ -105,7 +105,7 @@ int acl_myflock(ACL_FILE_HANDLE fd, int lock_style, int operation)
 }
 #endif /* ACL_UNIX */
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 # ifdef USE_LOCK_FILE
 /* use LockFile/UnlockFile */
 int acl_myflock(ACL_FILE_HANDLE fd, int lock_style acl_unused, int operation)

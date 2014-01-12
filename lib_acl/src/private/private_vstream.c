@@ -11,7 +11,7 @@
 #include <fcntl.h>
 #include <sys/stat.h> /* for S_IREAD */
 
-#ifdef  ACL_MS_WINDOWS
+#ifdef  WIN32
 # include <io.h>
 #elif defined(ACL_UNIX)
 # include <sys/types.h>
@@ -383,7 +383,7 @@ TAG_AGAIN:
 
 	if (stream->type == ACL_VSTREAM_TYPE_FILE) {
 		if ((stream->oflags & O_APPEND)) {
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 			stream->sys_offset = acl_lseek(
 				ACL_VSTREAM_FILE(stream), 0, SEEK_END);
 			if (stream->sys_offset < 0)
@@ -578,7 +578,7 @@ ACL_VSTREAM *private_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	stream->read_buf_len     = buflen;
 	stream->type             = fdtype;
 	ACL_VSTREAM_SOCK(stream) = fd;
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	stream->iocp_sock        = ACL_SOCKET_INVALID;
 #endif
 
@@ -629,7 +629,7 @@ ACL_VSTREAM *private_vstream_fopen(const char *path, unsigned int oflags,
 	oflags |= O_LARGEFILE;
 #endif
 
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 	oflags |= O_BINARY;
 #endif
 
@@ -711,7 +711,7 @@ ACL_VSTREAM *private_vstream_connect_ex(const char *addr, int block_mode,
 	if (ptr)
 		fd = acl_inet_connect_ex(addr, ACL_BLOCKING,
 			conn_timeout, he_errorp);
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 	else
 		return (NULL);
 #elif defined(ACL_UNIX)

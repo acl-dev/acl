@@ -174,22 +174,11 @@ http_header& http_header::add_cookie(HttpCookie* cookie)
 	return *this;
 }
 
-#define RFC1123_STRFTIME "%a, %d %b %Y %H:%M:%S GMT"
-
 void http_header::date_format(char* out, size_t size, time_t t)
 {
-#ifdef WIN32
-	struct tm *gmt = gmtime(&t);
-#else
-	struct tm gmt_buf, *gmt = gmtime_r(&t, &gmt_buf);
-#endif
-	if (gmt != NULL)
-		strftime(out, size - 1, RFC1123_STRFTIME, gmt);
-	else
-	{
+	const char* ptr = http_mkrfc1123(out, size, t);
+	if (*ptr == 0)
 		logger_error("gmtime error %s", last_serror());
-		out[0] = 0;
-	}
 }
 
 bool http_header::is_request() const
@@ -212,7 +201,12 @@ void http_header::build_common(string& buf) const
 	{
 		char length[64];
 #ifdef WIN32
+# if _MSC_VER >= 1500
+		_snprintf_s(length, sizeof(length), sizeof(length),
+			"%I64d", content_length_);
+# else
 		_snprintf(length, sizeof(length), "%I64d", content_length_);
+#endif
 #else
 		snprintf(length, sizeof(length), "%lld", content_length_);
 #endif

@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#ifdef  ACL_MS_WINDOWS
+#ifdef  WIN32
 #include <io.h>
 #include <fcntl.h>
 #endif
@@ -119,7 +119,7 @@ ACL_VSTREAM *acl_vstream_accept_ex(ACL_VSTREAM *listen_stream,
 	char buf[256];
 
 	if ((listen_stream->type | ACL_VSTREAM_TYPE_LISTEN_INET)) {
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 		if (!(listen_stream->type & ACL_VSTREAM_TYPE_LISTEN_IOCP))
 			connfd = acl_inet_accept_ex(servfd, buf, sizeof(buf));
 		else if (listen_stream->iocp_sock == ACL_SOCKET_INVALID)
@@ -202,7 +202,7 @@ ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
 		connfd = acl_inet_connect_ex(addr, block_mode,
 			connect_timeout, he_errorp);
 	}
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	else {
 		acl_msg_error("%s(%d): addr(%s) invalid",
 			myname, __LINE__, addr);
@@ -313,7 +313,7 @@ ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout)
 	sa.sin_port = htons(port);
 	sa.sin_addr.s_addr = inet_addr(host);
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 #else
 	sock = socket(AF_INET, SOCK_DGRAM, 0);

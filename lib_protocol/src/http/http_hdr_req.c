@@ -255,8 +255,8 @@ HTTP_HDR_REQ *http_hdr_req_clone(const HTTP_HDR_REQ* hdr_req)
 	http_hdr_clone(&hdr_req->hdr, &hh->hdr);
 
 	hh->port = hdr_req->port;
-	strcpy(hh->method, hdr_req->method);
-	strcpy(hh->host, hdr_req->host);
+	ACL_SAFE_STRNCPY(hh->method, hdr_req->method, sizeof(hh->method));
+	ACL_SAFE_STRNCPY(hh->host, hdr_req->host, sizeof(hh->host));
 	acl_vstring_strcpy(hh->url_part, acl_vstring_str(hdr_req->url_part));
 	acl_vstring_strcpy(hh->url_path, acl_vstring_str(hdr_req->url_path));
 	acl_vstring_strcpy(hh->url_params, acl_vstring_str(hdr_req->url_params));

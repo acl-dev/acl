@@ -19,7 +19,7 @@ struct ACL_AIO {
 	int   rbuf_size;
 	int   event_mode;
 	ACL_ARRAY *dead_streams;
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	int   timer_active;
 	unsigned int tid;
 #endif

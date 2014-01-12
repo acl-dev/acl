@@ -5,7 +5,7 @@
 
 #endif  /* ACL_PREPARE_COMPILE */
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 
 #include "stdlib/acl_stdlib.h"
 #include "net/acl_net.h"
@@ -164,5 +164,5 @@ void *proctl_child_thread(void *arg)
 	return (NULL);
 }
 
-#endif /* ACL_MS_WINDOWS */
+#endif /* WIN32 */
 

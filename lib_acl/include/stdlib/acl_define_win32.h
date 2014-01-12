@@ -1,21 +1,28 @@
 #ifndef __ACL_DEFINE_WIN32_INCLUDE_H__
 #define __ACL_DEFINE_WIN32_INCLUDE_H__
 
-#if defined (MS_VC) || defined(MS_VC6)
-# define ACL_MS_WINDOWS
-# define ACL_MS_VC
-# ifndef _CRT_SECURE_NO_WARNINGS
-#  define _CRT_SECURE_NO_WARNINGS
+/**
+ * _MSC_VER:
+ * vc++5.0	VS 5.0	1100
+ * vc++6.0	VS 6.0	1200
+ * vc++7.0	VS 2003	1310
+ * vc++8.0	VS 2005	1400
+ * vc++9.0	VS 2008	1500
+ * vc++10.0	VS 2010	1600
+ * vc++11.0	VS 2012	1700
+ */
+
+#if defined (WIN32)
+# if _MSC_VER >= 1500
+#  ifndef _CRT_SECURE_NO_WARNINGS
+#   define _CRT_SECURE_NO_WARNINGS
+#  endif
 # endif
 #elif	defined(BORLAND_CB)
-# define ACL_MS_WINDOWS
 # define ACL_BCB_COMPILER
-#elif	defined(WIN32)
-# define ACL_MS_WINDOWS
-# define ACL_MS_VC
 #endif
 
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 
 # ifdef acl_assert
 #  undef acl_assert
@@ -66,10 +73,10 @@
 # endif
 
 # undef	ACL_HAS_PTHREAD
-#endif /* ACL_MS_WINDOWS */
+#endif /* WIN32 */
 
 /* errno define */
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 # define	ACL_ETIMEDOUT		WSAETIMEDOUT
 # define	ACL_ENOMEM		WSAENOBUFS
 # define	ACL_EINVAL		WSAEINVAL
@@ -134,6 +141,6 @@ ACL_API int acl_fstat(ACL_FILE_HANDLE fh, struct acl_stat *buf);
 #  define	offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 # endif
 */
-#endif /* ACL_MS_WINDOWS */
+#endif /* WIN32 */
 
 #endif /* __ACL_DEFINE_WIN32_INCLUDE_H__ */

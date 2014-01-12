@@ -355,6 +355,18 @@
     <ClCompile Include="src\event\event_timer.cpp">
       <Filter>src\event</Filter>
     </ClCompile>
+    <ClCompile Include="src\memcache\memcache_manager.cpp">
+      <Filter>src\memcache</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_request_manager.cpp">
+      <Filter>src\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\mysql_pool.cpp">
+      <Filter>src\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\sqlite_pool.cpp">
+      <Filter>src\db</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">

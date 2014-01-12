@@ -10,7 +10,7 @@
 # include <ctype.h>
 # include <limits.h>			/* CHAR_BIT */
 
-# ifdef	ACL_MS_WINDOWS
+# ifdef	WIN32
 #  include <process.h>
 #  include <stdio.h>
 #  include <stdarg.h>
@@ -23,7 +23,7 @@ int acl_secure_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
 #   define snprintf _snprintf
 #   define vsnprintf _vsnprintf
 #  endif  /* __STDC_WANT_SECURE_LIB__ */
-# endif  /* ACL_MS_WINDOWS */
+# endif  /* WIN32 */
 
 # ifdef	ACL_UNIX
 #  ifndef  __USE_XOPEN2K

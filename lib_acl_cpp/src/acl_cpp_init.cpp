@@ -17,9 +17,16 @@ void open_dos(void)
 {
 	if (dos_fp_)
 		return;
+
 	// ´ò¿ª DOS ´°¿Ú
 	AllocConsole();
-	dos_fp_ = freopen("CONOUT$","w+t",stdout);
+
+#if _MSC_VER >= 1500
+	if (freopen_s(&dos_fp_,"CONOUT$", "w+t", stdout) != 0)
+		dos_fp_ = NULL;
+#else
+	dos_fp_ = freopen("CONOUT$", "w+t", stdout);
+#endif
 	if (dos_fp_ == NULL)
 	{
 		printf("open DOS error %s\r\n", last_serror());

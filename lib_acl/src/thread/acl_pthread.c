@@ -19,7 +19,7 @@
 
 #include "../private/private_fifo.h"
 
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 
 /*----------------------  WIN32 下模拟实现 Posix 标准接口函数 ----------------*/
 
@@ -490,7 +490,7 @@ int acl_pthread_join(acl_pthread_t thread, void **thread_return)
 	return (0);
 }
 
-#endif /* ACL_MS_WINDOWS */
+#endif /* WIN32 */
 
 /*------------------ 跨平台的通用函数集，是 Posix 标准的扩展 -----------------*/
 

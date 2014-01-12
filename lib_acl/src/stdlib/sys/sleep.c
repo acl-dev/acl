@@ -6,7 +6,7 @@
 
 #endif
 
-#ifdef	ACL_MS_VC
+#ifdef	WIN32
 void sleep(int sec)
 {
 	Sleep((sec * 1000));

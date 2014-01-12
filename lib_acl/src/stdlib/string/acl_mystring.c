@@ -370,7 +370,7 @@ size_t acl_strnlen(const char * s, size_t count)
         return (sc - s);
 }
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 
 acl_uint64 acl_atoui64(const char *str)
 {

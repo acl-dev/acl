@@ -9,7 +9,7 @@
 
 #endif  /* ACL_PREPARE_COMPILE */
 
-#ifdef ACL_MS_VC
+#ifdef WIN32
 
 #include <direct.h>
 #include <stdlib.h>
@@ -260,4 +260,4 @@ int _tclosedir(_tDIR *dir)
 	return 0;
 }
 
-#endif /* ACL_MS_VC */
+#endif /* WIN32 */

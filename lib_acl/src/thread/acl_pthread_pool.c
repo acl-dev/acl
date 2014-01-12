@@ -13,8 +13,8 @@
 #include <time.h>
 #include <unistd.h>
 
-#elif	defined(ACL_MS_WINDOWS)
-# ifdef ACL_MS_VC
+#elif	defined(WIN32)
+# ifdef WIN32
 #  pragma once
 # endif
 # ifdef ACL_BCB_COMPILER
@@ -73,7 +73,7 @@ struct acl_pthread_pool_t {
 };
 
 #undef	__SET_ERRNO
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 # define	__SET_ERRNO(_x_) (void) 0
 #elif	defined(ACL_UNIX)
 # define	__SET_ERRNO(_x_) (acl_set_error(_x_))
@@ -81,7 +81,7 @@ struct acl_pthread_pool_t {
 # error "unknown OS type"
 #endif
 
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 #define	sleep(_x_) do {  \
 	Sleep(_x_ * 1000);  \
 } while (0)
@@ -97,7 +97,7 @@ static void *__poller_thread(void *arg)
 	time_t now_t, pre_loop_t;
 #ifdef	ACL_UNIX
 	pthread_t id = pthread_self();
-#elif	defined(ACL_MS_WINDOWS)
+#elif	defined(WIN32)
 	unsigned long id = acl_pthread_self();
 #else
         # error "unknown OS"
@@ -150,7 +150,7 @@ static void *__poller_thread(void *arg)
 
 	thr_pool->poller_running = 0;
 		
-#ifdef	ACL_MS_WINDOWS 
+#ifdef	WIN32 
 	status = acl_pthread_cond_signal(&thr_pool->poller_cond);
 #else
 	status = pthread_cond_broadcast(&thr_pool->poller_cond);
@@ -382,7 +382,7 @@ acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
 		return NULL;
 	}
 # endif
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	(void) acl_pthread_attr_setdetachstate(&thr_pool->attr, 1);
 #endif
 	status = acl_pthread_mutex_init(&thr_pool->worker_mutex, NULL);
@@ -750,7 +750,7 @@ static void __job_add(acl_pthread_pool_t *thr_pool,
 		if (!notify_idle)
 			return;
 
-#ifdef	ACL_MS_WINDOWS 
+#ifdef	WIN32 
 		status = acl_pthread_cond_signal(&thr_pool->worker_cond);
 #else
 		status = pthread_cond_broadcast(&thr_pool->worker_cond);
@@ -881,7 +881,7 @@ void acl_pthread_pool_add_one(acl_pthread_pool_t *thr_pool,
 	job->worker_arg = run_arg;
 	job->next       = NULL;
 
-#ifdef	ACL_MS_WINDOWS 
+#ifdef	WIN32 
 	__job_add(thr_pool, job, 1);
 #else
 	__job_add(thr_pool, job, 0);
@@ -903,7 +903,7 @@ void acl_pthread_pool_add_job(acl_pthread_pool_t *thr_pool,
 
 	job->next = NULL;
 
-#ifdef	ACL_MS_WINDOWS 
+#ifdef	WIN32 
 	__job_add(thr_pool, job, 1);
 #else
 	__job_add(thr_pool, job, 0);
@@ -932,7 +932,7 @@ void acl_pthread_pool_add_end(acl_pthread_pool_t *thr_pool)
 			__FILE__, __LINE__, myname, acl_last_serror());
 	}
 
-#ifdef	ACL_MS_WINDOWS 
+#ifdef	WIN32 
 	(void) idle;
 	(void) qlen;
 #else

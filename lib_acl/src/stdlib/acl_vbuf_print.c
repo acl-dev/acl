@@ -153,7 +153,7 @@ ACL_VBUF *acl_vbuf_print(ACL_VBUF *bp, const char *format, va_list ap)
 				CHECK_OVERFLOW(i, MAX_LEN);
 			}
 		}
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 		if (*cp == 'l') {
 			if (*(cp + 1) == 'l') {
 				fmt[i++] = 'I';

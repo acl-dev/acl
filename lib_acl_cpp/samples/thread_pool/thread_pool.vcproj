@@ -119,7 +119,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;VC2003;ACL_CPP_DLL"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;ACL_DLL;ACL_CPP_DLL"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="3"
 				WarningLevel="3"
@@ -129,7 +129,6 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lib_acl_cpp_dll.lib lib_acl.lib lib_protocol.lib"
 				OutputFile="$(OutDir)/thread_pool.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\dist\lib\win32"
@@ -145,7 +144,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				CommandLine="copy ..\..\..\dist\lib\win32\lib_acl.dll $(OutDir)\ /Y
-copy ..\..\..\dist\lib\win32\lib_acl_cpp_dll.dll $(OutDir)\ /Y
+copy ..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir)\ /Y
 copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y
 "/>
 			<Tool
@@ -173,7 +172,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VC2003;ACL_CPP_DLL"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;ACL_DLL;ACL_CPP_DLL"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -185,7 +184,6 @@ copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lib_acl_cppd_dll.lib lib_acl_d.lib lib_protocol_d.lib"
 				OutputFile="$(OutDir)/thread_pool.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\dist\lib\win32"
@@ -200,7 +198,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y
 			<Tool
 				Name="VCPreBuildEventTool"
 				CommandLine="copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir)\ /Y
-copy ..\..\..\dist\lib\win32\lib_acl_cppd_dll.dll $(OutDir)\ /Y
+copy ..\..\..\dist\lib\win32\lib_acl_cpp_d.dll $(OutDir)\ /Y
 copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y
 "/>
 			<Tool

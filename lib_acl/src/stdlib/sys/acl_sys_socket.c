@@ -4,7 +4,7 @@
 #include "stdlib/acl_define.h"
 
 #include <errno.h>
-#ifdef  ACL_MS_WINDOWS
+#ifdef  WIN32
 #include <io.h>
 #include <stdarg.h>
 
@@ -33,7 +33,7 @@
 
 #endif
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 
 static int __socket_inited = 0;
 static int __socket_ended = 0;

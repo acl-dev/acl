@@ -7,7 +7,7 @@ extern "C" {
 #endif
 #include "stdlib/acl_define.h"
 
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 
 typedef struct ACL_SEM ACL_SEM;
 struct ACL_SEM {

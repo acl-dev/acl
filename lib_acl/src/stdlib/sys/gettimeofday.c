@@ -3,7 +3,7 @@
 
 #include "stdlib/acl_define.h"
 
-#ifdef  ACL_MS_WINDOWS
+#ifdef  WIN32
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 # include <time.h>
@@ -18,7 +18,7 @@
 
 #endif
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 
 #if 1
 
@@ -229,4 +229,4 @@ int gettimeofday(struct timeval * tp, struct timezone * tzp)
 }
 
 #endif  /* end if 0 */
-#endif  /* ACL_MS_WINDOWS */
+#endif  /* WIN32 */

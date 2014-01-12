@@ -16,7 +16,7 @@
 
 #endif
 
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 
 int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex, const acl_pthread_mutexattr_t *mattr)
 {
@@ -156,7 +156,7 @@ acl_pthread_mutex_t *acl_pthread_mutex_create(void)
 	return (mutex);
 }
 
-#endif /* ACL_MS_WINDOWS/ACL_UNIX */
+#endif /* WIN32/ACL_UNIX */
 
 typedef struct acl_pthread_nested_mutex_t acl_pthread_nested_mutex_t;
 

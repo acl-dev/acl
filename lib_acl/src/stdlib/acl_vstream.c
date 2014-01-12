@@ -11,7 +11,7 @@
 #include <fcntl.h>
 #include <sys/stat.h> /* for S_IREAD */
 
-#ifdef  ACL_MS_WINDOWS
+#ifdef  WIN32
 # include <io.h>
 #elif defined(ACL_UNIX)
 # include <sys/types.h>
@@ -57,7 +57,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 	{       
 #ifdef ACL_UNIX
 		{ STDIN_FILENO },               /* h_file */
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 		-1,                             /* h_file */
 #endif
 		0,                              /* is_nonblock */
@@ -104,7 +104,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		0,                              /* oflags */
 		0,                              /* nrefer */
 		0,                              /* pid */
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 		NULL,                           /* hproc */
 		ACL_SOCKET_INVALID,             /* iocp_sock */
 #endif
@@ -113,7 +113,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 	{
 #ifdef ACL_UNIX
 		{ STDOUT_FILENO },              /* h_file */
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 		-1,                             /* h_file */
 #endif
 		0,                              /* is_nonblock */
@@ -160,7 +160,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		0,                              /* oflags */
 		0,                              /* nrefer */
 		0,                              /* pid */
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 		NULL,                           /* hproc */
 		ACL_SOCKET_INVALID,             /* iocp_sock */
 #endif
@@ -168,7 +168,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 	{
 #ifdef ACL_UNIX
 		{ STDERR_FILENO },              /* h_file */
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 		-1,                             /* h_file */
 #endif
 		0,                              /* is_nonblock */
@@ -215,7 +215,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		0,                              /* oflags */
 		0,                              /* nrefer */
 		0,                              /* pid */
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 		NULL,                           /* hproc */
 		ACL_SOCKET_INVALID,             /* iocp_sock */
 #endif
@@ -230,7 +230,7 @@ void acl_vstream_init()
 		return;
 	__called = 1;
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 # if 0
 	ACL_VSTREAM_IN->fd.h_file = (HANDLE) _get_osfhandle(_fileno(stdin));
 	ACL_VSTREAM_OUT->fd.h_file = (HANDLE) _get_osfhandle(_fileno(stdout));
@@ -407,7 +407,7 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *fp, char *buf, int size)
 		return ACL_VSTREAM_EOF;
 	}
 	acl_non_blocking(ACL_VSTREAM_SOCK(fp), 1);
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	if (fp->type != ACL_VSTREAM_TYPE_FILE)
 		acl_non_blocking(ACL_VSTREAM_SOCK(fp), 1);
 #endif
@@ -433,13 +433,13 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *fp, char *buf, int size)
 		return ACL_VSTREAM_EOF;
 	}
 
-#elif	defined(ACL_MS_WINDOWS)
+#elif	defined(WIN32)
 	if (fp->is_nonblock == 0 && fp->type != ACL_VSTREAM_TYPE_FILE)
 		acl_non_blocking(ACL_VSTREAM_SOCK(fp), ACL_BLOCKING);
 #endif
 
 	if (read_cnt < 0) {
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 		if (fp->errnum == ACL_EWOULDBLOCK)
 #elif	defined(ACL_UNIX)
 		if (fp->errnum == ACL_EWOULDBLOCK
@@ -497,7 +497,7 @@ int acl_vstream_probe_status(ACL_VSTREAM *fp)
 		return -1;
 	}
 	acl_non_blocking(ACL_VSTREAM_SOCK(fp), 1);
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	if (fp->type != ACL_VSTREAM_TYPE_FILE)
 		acl_non_blocking(ACL_VSTREAM_SOCK(fp), 1);
 #endif
@@ -524,13 +524,13 @@ int acl_vstream_probe_status(ACL_VSTREAM *fp)
 		return -1;
 	}
 
-#elif	defined(ACL_MS_WINDOWS)
+#elif	defined(WIN32)
 	if (fp->is_nonblock == 0 && fp->type != ACL_VSTREAM_TYPE_FILE)
 		acl_non_blocking(ACL_VSTREAM_SOCK(fp), ACL_BLOCKING);
 #endif
 
 	if (ch == ACL_VSTREAM_EOF) {
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 		if (fp->errnum == ACL_EWOULDBLOCK)
 #elif	defined(ACL_UNIX)
 		if (fp->errnum == ACL_EWOULDBLOCK
@@ -1212,7 +1212,7 @@ TAG_AGAIN:
 
 	if (fp->type == ACL_VSTREAM_TYPE_FILE) {
 		if ((fp->oflags & O_APPEND)) {
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 			fp->sys_offset = acl_lseek(
 				ACL_VSTREAM_FILE(fp), 0, SEEK_END);
 			if (fp->sys_offset < 0)
@@ -1296,7 +1296,7 @@ TAG_AGAIN:
 
 	if (fp->type == ACL_VSTREAM_TYPE_FILE) {
 		if ((fp->oflags & O_APPEND)) {
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 			fp->sys_offset = acl_lseek(
 				ACL_VSTREAM_FILE(fp), 0, SEEK_END);
 			if (fp->sys_offset < 0)
@@ -1871,7 +1871,7 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	fp->read_buf_len     = buflen;
 	fp->type             = fdtype;
 	ACL_VSTREAM_SOCK(fp) = fd;
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	fp->iocp_sock        = ACL_SOCKET_INVALID;
 #endif
 	fp->read_ptr         = fp->read_buf;
@@ -2004,7 +2004,7 @@ ACL_VSTREAM *acl_vstream_fopen(const char *path, unsigned int oflags,
 	oflags |= O_LARGEFILE;
 #endif
 
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 	oflags |= O_BINARY;
 #endif
 
@@ -2032,7 +2032,7 @@ char *acl_vstream_loadfile2(const char *path, ssize_t *size)
 {
 	const char *myname = "acl_vstream_loadfile";
 	ACL_VSTREAM *fp;
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 	int   oflags = O_RDONLY | O_BINARY;
 #else
 	int   oflags = O_RDONLY;
@@ -2318,7 +2318,7 @@ SYS_SEEK:
 	return fp->offset;
 }
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 int acl_file_ftruncate(ACL_VSTREAM *fp, acl_off_t length)
 {
 	const char *myname = "acl_file_ftruncate";
@@ -2387,7 +2387,7 @@ int acl_file_truncate(const char *path, acl_off_t length)
 {
 	return truncate(path, length);
 }
-#endif /* !ACL_MS_WINDOWS, ACL_UNIX */
+#endif /* !WIN32, ACL_UNIX */
 
 int acl_vstream_fstat(ACL_VSTREAM *fp, struct acl_stat *buf)
 {

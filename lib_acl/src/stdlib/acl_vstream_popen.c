@@ -243,7 +243,7 @@ int acl_vstream_pclose(ACL_VSTREAM *fp)
 		WEXITSTATUS(wait_status);
 }
 
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 
 #include <process.h>
 #include "stdlib/acl_mymalloc.h"
@@ -402,4 +402,4 @@ int acl_vstream_pclose(ACL_VSTREAM *fp)
 	return -1;
 }
 
-#endif /* ACL_MS_WINDOWS */
+#endif /* WIN32 */

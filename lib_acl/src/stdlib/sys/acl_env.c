@@ -28,7 +28,7 @@ void acl_clean_env(char **preserve_list)
 #ifdef ACL_UNIX
 	extern char **environ;
 	char  **env = environ;
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	extern char **_environ;
 	char  **env = _environ;
 #endif
@@ -63,7 +63,7 @@ void acl_clean_env(char **preserve_list)
 	for (cpp = save_list->argv; *cpp; cpp += 2)
 #ifdef ACL_UNIX
 		if (setenv(cpp[0], cpp[1], 1))
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 		if (!SetEnvironmentVariable(cpp[0], cpp[1]))
 #endif
 			acl_msg_error("setenv(%s, %s): %s", cpp[0], cpp[1], acl_last_serror());
@@ -76,7 +76,7 @@ void acl_clean_env(char **preserve_list)
 
 char *acl_getenv(const char *name)
 {
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	const char *myname = "acl_getenv";
 	static acl_pthread_key_t buf_key = ACL_TLS_OUT_OF_INDEXES;
 	char *buf;
@@ -103,7 +103,7 @@ char *acl_getenv(const char *name)
 
 char *acl_getenv3(const char *name, char *buf, size_t len)
 {
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	if (GetEnvironmentVariable(name, buf, len) == 0)
 		return (NULL);
 	return (buf);
@@ -118,7 +118,7 @@ char *acl_getenv3(const char *name, char *buf, size_t len)
 
 int acl_setenv(const char *name, const char *val, int overwrite)
 {
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	if (overwrite == 0) {
 		if (acl_getenv(name) != NULL)
 			return (0);
@@ -133,7 +133,7 @@ int acl_setenv(const char *name, const char *val, int overwrite)
 
 int acl_putenv(char *str)
 {
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	const char *myname = "acl_putenv";
 	ACL_ARGV *argv = acl_argv_split(str, "=");
 
@@ -160,7 +160,7 @@ static void free_vstring(ACL_VSTRING *s)
 const char *acl_getenv_list(void)
 {
 	const char *myname = "acl_getenv_list";
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	static acl_pthread_key_t buf_key = ACL_TLS_OUT_OF_INDEXES;
 	ACL_VSTRING *buf;
 	LPTSTR lpszVariable;

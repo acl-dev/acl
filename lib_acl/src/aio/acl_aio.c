@@ -48,7 +48,7 @@ ACL_AIO *acl_aio_create2(int event_mode, unsigned int nMsg)
 		acl_msg_fatal("%s: calloc error(%s)",
 			myname, acl_last_strerror(ebuf, sizeof(ebuf)));
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	aio->tid = acl_pthread_self();
 #endif
 

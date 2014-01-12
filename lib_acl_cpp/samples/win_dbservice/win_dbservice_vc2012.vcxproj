@@ -125,12 +125,10 @@
       <MkTypLibCompatible>false</MkTypLibCompatible>
     </Midl>
     <PostBuildEvent>
-      <Command>copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir) /Y
-copy ..\..\bin\sqlite3.dll $(OutDir) /Y
-copy ..\..\bin\iconv.dll $(OutDir) /Y
-copy ..\..\lib\lib_acl_cpp_vc2012d_dll.dll $(OutDir) /Y
+      <Command>copy ..\..\..\lib\win32\sqlite3.dll $(OutDir) /Y
+copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir) /Y
 copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y
-</Command>
+copy ..\..\..\dist\lib\win32\lib_acl_cpp_d.dll $(OutDir) /Y</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -163,11 +161,10 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y
       <MkTypLibCompatible>false</MkTypLibCompatible>
     </Midl>
     <PostBuildEvent>
-      <Command>copy ..\..\..\dist\lib\win32\lib_acl.dll $(OutDir) /Y
-copy ..\..\bin\sqlite3.dll $(OutDir) /Y
-copy ..\..\bin\iconv.dll $(OutDir) /Y
-copy ..\..\lib\lib_acl_cpp_vc2012_dll.dll $(OutDir) /Y
+      <Command>copy ..\..\..\lib\win32\sqlite3.dll $(OutDir) /Y
+copy ..\..\..\dist\lib\win32\lib_acl.dll $(OutDir) /Y
 copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir) /Y
+copy ..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir) /Y
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -204,8 +201,8 @@ copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir) /Y
     <PostBuildEvent>
       <Command>copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir) /Y
 copy ..\..\..\lib\win32\sqlite3.dll $(OutDir) /Y
-copy ..\..\..\dist\lib\win32\lib_acl_cpp_vc2012d_dll.dll $(OutDir) /Y
-copy ..\..\..\dist\lib\win32\lib_acl_cpp_vc2012d_dll.pdb $(OutDir) /Y
+copy ..\..\..\dist\lib\win32\lib_acl_cpp_d.dll $(OutDir) /Y
+copy ..\..\..\dist\lib\win32\lib_acl_cpp_d.pdb $(OutDir) /Y
 copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y
 </Command>
     </PostBuildEvent>
@@ -243,7 +240,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y
       <Command>copy ..\..\..\dist\lib\win32\lib_acl.dll $(OutDir) /Y
 copy ..\..\..\lib\win32\sqlite3.dll $(OutDir) /Y
 copy ..\..\..\lib\win32\iconv.dll $(OutDir) /Y
-copy ..\..\..\dist\lib\win32\lib_acl_cpp_vc2012_dll.dll $(OutDir) /Y
+copy ..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir) /Y
 copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir) /Y
 </Command>
     </PostBuildEvent>

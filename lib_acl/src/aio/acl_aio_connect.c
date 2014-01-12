@@ -34,7 +34,7 @@
 	}  \
 } while (0)
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 	ACL_VSTREAM *stream, void *context);
 
@@ -84,7 +84,7 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 		return;
 	}
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	/* 如果是基于 win32 窗口消息的事件引擎则需要取消之前设置的超时定时器 */
 	if (astream->aio->event_mode == ACL_EVENT_WMSG)
 		acl_aio_cancel_timer(astream->aio, ConnectTimer, astream);
@@ -210,7 +210,7 @@ ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout)
 		acl_msg_fatal("%s: open astream error", myname);
 	}
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	if (timeout > 0 && aio->event_mode == ACL_EVENT_WMSG)
 		acl_aio_request_timer(aio, ConnectTimer, astream, timeout * 1000000, 0);
 #endif

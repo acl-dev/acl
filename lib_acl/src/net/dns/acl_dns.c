@@ -56,7 +56,7 @@ static int dns_read(ACL_SOCKET fd, void *buf, size_t size,
 	ret = recvfrom(fd, buf, size, 0,
 			(struct sockaddr*) &dns->addr_from.addr,
 			(socklen_t*) &dns->addr_from.addr_len);
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	ret = recvfrom(fd, (char*) buf, (int) size, 0,
 			(struct sockaddr*) &dns->addr_from.addr,
 			&dns->addr_from.addr_len);
@@ -94,7 +94,7 @@ static int dns_write(ACL_SOCKET fd, const void *buf, size_t size,
 #ifdef ACL_UNIX 
 	ret = sendto(fd, buf, size, 0,
 			(struct sockaddr*) &addr->addr, addr->addr_len);
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	ret = sendto(fd, (const char*) buf, (int) size,
 			0, (struct sockaddr*) &addr->addr, addr->addr_len);
 #else
@@ -130,7 +130,7 @@ static ACL_DNS_DB *build_dns_db(const rfc1035_message *res, int count,
 			/* 这样直接赋值要比用 memcpy 快些 */
 			phost->saddr.sin_addr.s_addr =
 				*((in_addr_t*) res->answer[i].rdata);
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 			phost->saddr.sin_addr.s_addr =
 				*((unsigned int*) res->answer[i].rdata);
 #endif

@@ -18,7 +18,7 @@ ACL_FILE *acl_fopen(const char *filename, const char *mode)
 	ACL_FILE *fp;
 	ACL_VSTREAM *stream;
 	int   oflags = 0, whileflag;
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 	int   commodeset = 0, scanset = 0;
 #endif
 
@@ -67,14 +67,14 @@ ACL_FILE *acl_fopen(const char *filename, const char *mode)
 			}
 			break;
 		case 'b':
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 			if (oflags & (O_TEXT | O_BINARY))
 				whileflag = 0;
 			else
 				oflags |= O_BINARY;
 #endif
 			break;
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 		case 't':
 			if (oflags & (O_TEXT | O_BINARY))
 				whileflag = 0;
@@ -126,7 +126,7 @@ ACL_FILE *acl_fopen(const char *filename, const char *mode)
 		case 'N':
 			oflags |= O_NOINHERIT;
 			break;
-#endif  /* ACL_MS_WINDOWS */
+#endif  /* WIN32 */
 		default:
 			errno = EINVAL;
 			acl_msg_error("Invalid file open mode");

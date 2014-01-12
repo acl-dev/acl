@@ -9,7 +9,7 @@ extern "C" {
 #include "acl_define.h"
 #include "acl_vstream.h"
 
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 struct iovec {
 	void *iov_base;   /**< Starting address */
 	size_t iov_len;   /**< Number of bytes */
@@ -40,7 +40,7 @@ ACL_API void sleep(int sec);
  */
 ACL_API int gettimeofday(struct timeval *tv, struct timezone *tz);
 
-#endif  /* ACL_MS_WINDOWS */
+#endif  /* WIN32 */
 #ifdef	ACL_UNIX
 # include <sys/uio.h>
 #endif

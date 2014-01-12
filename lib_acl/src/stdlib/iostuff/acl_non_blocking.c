@@ -67,7 +67,7 @@ int acl_non_blocking(ACL_SOCKET fd, int on)
 		acl_msg_error("fcntl(fd, F_SETL, nonb) failed");
 		return (-1);
 	}
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	if (ioctlsocket(fd, FIONBIO, (unsigned long *) &on) < 0) {
 		acl_msg_error("ioctlsocket(fd,FIONBIO) failed");
 		return (-1);

@@ -31,7 +31,7 @@
 
 #include "stdlib/acl_dir.h"
 
-#ifdef ACL_MS_VC
+#ifdef WIN32
 # define SANE_RMDIR _rmdir
 # define SANE_UNLINK _unlink
 #else

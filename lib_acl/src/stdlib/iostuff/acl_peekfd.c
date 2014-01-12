@@ -37,7 +37,7 @@ int acl_peekfd(ACL_SOCKET fd)
 	 */
 #ifdef ACL_UNIX
 	return (ioctl(fd, FIONREAD, (char *) &count) < 0 ? -1 : count);
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	return (ioctlsocket(fd, FIONREAD, (unsigned long *) &count) < 0 ? -1 : count);
 #endif
 }

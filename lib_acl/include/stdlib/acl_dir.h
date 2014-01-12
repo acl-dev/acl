@@ -6,7 +6,7 @@ extern "C" {
 
 #include "acl_define.h"
 
-#ifdef ACL_MS_VC
+#ifdef WIN32
 
 #if !defined(_UNICODE)
 
@@ -78,7 +78,7 @@ ACL_API void wrewinddir(wDIR *dir);
 
 #endif	/* _UNICODE */
 
-#endif /* ACL_MS_VC */
+#endif /* WIN32 */
 
 #ifdef __cplusplus
 }

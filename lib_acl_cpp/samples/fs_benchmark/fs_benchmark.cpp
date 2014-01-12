@@ -193,7 +193,11 @@ int main(int argc, char* argv[])
 	int   ch;
 	int   nthreads = 2;
 
+#ifdef WIN32
+	snprintf(__path, sizeof(__path), "var/%d", (int) _getpid());
+#else
 	snprintf(__path, sizeof(__path), "var/%d", (int) getpid());
+#endif
 	while ((ch = getopt(argc, argv, "hn:c:l:kp:P:")) > 0)
 	{
 		switch (ch)
@@ -214,7 +218,11 @@ int main(int argc, char* argv[])
 			__kernel_event = true;
 			break;
 		case 'p':
+#ifdef WIN32
+			snprintf(__path, sizeof(__path), "%s/%d", optarg, (int) _getpid());
+#else
 			snprintf(__path, sizeof(__path), "%s/%d", optarg, (int) getpid());
+#endif
 			break;
 		case 'P':
 			__parallel = atoi(optarg);

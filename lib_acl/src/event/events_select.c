@@ -413,7 +413,7 @@ static void event_loop(ACL_EVENT *eventp)
 
 	/* 调用 select 系统调用检测可用描述字 */
 
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 	nready = select(0, &rmask, &wmask, &xmask, tvp);
 #else
 	nready = select(eventp->maxfd + 1, &rmask, &wmask, &xmask, tvp);

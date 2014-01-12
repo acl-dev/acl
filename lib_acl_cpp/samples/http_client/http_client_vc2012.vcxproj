@@ -140,7 +140,7 @@
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <AdditionalLibraryDirectories>..\..\lib;..\..\..\dist\lib\win32</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_acl_vc2012.lib;lib_protocol_vc2003.lib;lib_acl_cpp_vc2012.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_acl_vc2012.lib;lib_protocol_vc2012.lib;lib_acl_cpp_vc2012.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">

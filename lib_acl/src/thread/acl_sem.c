@@ -8,7 +8,7 @@
 
 #endif
 
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 
 #include <windows.h>
 
@@ -149,4 +149,4 @@ int acl_sem_post(ACL_SEM *sem)
 	return 0;
 }
 
-#endif /* ACL_MS_WINDOWS */
+#endif /* WIN32 */

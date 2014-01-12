@@ -28,7 +28,7 @@ static int select_read_wait(ACL_SOCKET fd, int timeout)
 	fd_set  except_fds;
 	struct timeval tv;
 	struct timeval *tp;
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 	int  errnum;
 #endif
 
@@ -62,7 +62,7 @@ static int select_read_wait(ACL_SOCKET fd, int timeout)
 	for (;;) {
 		switch (select(fd + 1, (fd_set *) &read_fds, (fd_set *) 0, &except_fds, tp)) {
 		case -1:
-#ifdef	ACL_MS_WINDOWS
+#ifdef	WIN32
 			errnum = WSAGetLastError();
 			if (errnum != WSAEINPROGRESS && errnum != WSAEWOULDBLOCK) {
 				acl_msg_error("select error");

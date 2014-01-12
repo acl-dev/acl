@@ -153,7 +153,11 @@ static http_off_t chunked_data_get(HTTP_CHAT_CTX *ctx, void *buf, int size)
 static int chunked_hdr_get(HTTP_CHAT_CTX *ctx)
 {
 	const char *myname = "chunked_hdr_get";
-	char *pext = NULL;
+#if defined(WIN32) && _MSC_VER >= 1500
+	char  ext[64];
+#else
+	char *ext = NULL;
+#endif
 	char  buf[HTTP_BSIZE];
 	int   ret, n, chunk_len;
 
@@ -164,7 +168,16 @@ static int chunked_hdr_get(HTTP_CHAT_CTX *ctx)
 	ctx->read_cnt = 0;  /* reset the len to be read */
 	ctx->body_len += n;
 
-	ret = sscanf(buf, "%X %s", (unsigned int *) &chunk_len, pext);
+#ifdef WIN32
+# if _MSC_VER >= 1500
+	ret = sscanf_s(buf, "%X %s", (unsigned int *) &chunk_len, ext, sizeof(ext));
+# else
+	ret = sscanf(buf, "%X %s", (unsigned int *) &chunk_len, ext);
+# endif
+#else 
+	ret = sscanf(buf, "%X %s", (unsigned int *) &chunk_len, ext);
+#endif
+
 	if (ret < 0 || chunk_len < 0) {
 		acl_msg_error("%s(%d): chunked hdr(%s) invalid, dlen(%d), "
 			"'\\n': %d, %d", myname, __LINE__, buf, n, buf[0], '\n');
