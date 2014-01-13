@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\stdafx.cpp" />
+    <ClCompile Include="src\acl_fstream.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http_stream.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="include\google\protobuf\io\acl_fstream.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\google\protobuf\io\http_stream.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{c68e00df-63d0-4b23-adae-24a50d636a74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{7365b035-320d-4242-8b3c-e6e99b5ffa56}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
