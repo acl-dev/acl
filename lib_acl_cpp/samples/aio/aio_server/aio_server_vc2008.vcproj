@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="aio_ipc"
-	ProjectGUID="{956FA905-A77F-41FE-A4BE-C3BD3B5B3E83}"
+	Name="aio_server"
+	ProjectGUID="{225D0BFA-64D7-4F8F-951E-36A494CF6178}"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include;..\..\..\lib_acl\include"
+				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\lib_acl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,11 +63,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib wsock32.lib"
-				OutputFile="$(OutDir)/aio_ipc.exe"
+				OutputFile="$(OutDir)/aio_server.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib\win32;..\..\..\dist\lib\win32"
+				AdditionalLibraryDirectories="..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/aio_ipc.pdb"
+				ProgramDatabaseFile="$(OutDir)/aio_server.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -120,7 +120,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\..\lib_acl\include"
+				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\lib_acl\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -140,9 +140,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib wsock32.lib"
-				OutputFile="$(OutDir)/aio_ipc.exe"
+				OutputFile="$(OutDir)/aio_server.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib\win32;..\..\..\dist\lib\win32"
+				AdditionalLibraryDirectories="..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -199,7 +199,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include;..\..\..\lib_acl\include"
+				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\lib_acl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;ACL_CPP_DLL;ACL_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -221,11 +221,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib wsock32.lib"
-				OutputFile="$(OutDir)/aio_ipc.exe"
+				OutputFile="$(OutDir)/aio_server.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib\win32"
+				AdditionalLibraryDirectories="..\..\..\..\lib\win32"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/aio_ipc.pdb"
+				ProgramDatabaseFile="$(OutDir)/aio_server.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -279,7 +279,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include;..\..\..\lib_acl\include"
+				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\lib_acl\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;ACL_CPP_DLL;ACL_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -301,11 +301,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib wsock32.lib"
-				OutputFile="$(OutDir)/aio_ipc.exe"
+				OutputFile="$(OutDir)/aio_server.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib\win32"
+				AdditionalLibraryDirectories="..\..\..\..\lib\win32"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/aio_ipc.pdb"
+				ProgramDatabaseFile="$(OutDir)/aio_server.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
