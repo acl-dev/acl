@@ -427,11 +427,7 @@ static void read_callback1(int event_type, ACL_EVENT *event acl_unused,
 {
 	READ_CTX *ctx = (READ_CTX*) context;
 	ctx->event_type = event_type;
-#if 1
-	acl_pthread_pool_add_job(ctx->threads, ctx->job);
-#else
-	acl_pthread_pool_add_one(ctx->threads, thread_callback, ctx);
-#endif
+	acl_pthread_pool_bat_add_job(ctx->threads, ctx->job);
 }
 
 static void read_callback2(int event_type, ACL_EVENT *event acl_unused,
@@ -439,20 +435,19 @@ static void read_callback2(int event_type, ACL_EVENT *event acl_unused,
 {
 	READ_CTX *ctx = (READ_CTX*) context;
 	ctx->event_type = event_type;
-
-	acl_pthread_pool_add(ctx->threads, thread_callback, ctx);
+	acl_pthread_pool_add_job(ctx->threads, ctx->job);
 }
 
 static void event_fire_begin(ACL_EVENT *event acl_unused, void *ctx)
 {
 	acl_pthread_pool_t *threads = (acl_pthread_pool_t*) ctx;
-	acl_pthread_pool_add_begin(threads);
+	acl_pthread_pool_bat_add_begin(threads);
 }
 
 static void event_fire_end(ACL_EVENT *event acl_unused, void *ctx)
 {
 	acl_pthread_pool_t *threads = (acl_pthread_pool_t*) ctx;
-	acl_pthread_pool_add_end(threads);
+	acl_pthread_pool_bat_add_end(threads);
 }
 
 static void free_ctx(ACL_VSTREAM *stream acl_unused, void *context)
@@ -484,15 +479,12 @@ static void server_execute(ACL_EVENT *event, acl_pthread_pool_t *threads,
 		ctx->event_type    = -1;
 		ctx->serv_callback = __service_main;
 		ctx->serv_arg      = __service_ctx;
+		ctx->job = acl_pthread_pool_alloc_job(thread_callback, ctx, 1);
 
-		if (acl_var_threads_batadd) {
-			ctx->job = acl_pthread_pool_alloc_job(thread_callback,
-					ctx, 1);
+		if (acl_var_threads_batadd)
 			ctx->read_callback = read_callback1;
-		} else {
-			ctx->job = NULL;
+		else
 			ctx->read_callback = read_callback2;
-		}
 
 		stream->ioctl_read_ctx = ctx;
 		acl_vstream_add_close_handle(stream, free_ctx, ctx);

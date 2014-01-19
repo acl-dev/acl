@@ -152,12 +152,16 @@ typedef struct {
 	int  i;
 } RUN_CTX;
 static acl_pthread_mutex_t __mutex;
+static int  __i = 0;
 static void run_thread(void *arg)
 {
 	RUN_CTX *ctx = (RUN_CTX*) arg;
 
 	acl_pthread_mutex_lock(&__mutex);
-	acl_vstream_fprintf(ctx->fp, "hello world, hello world, hello world, hello world, i: %d\n", ctx->i);
+	if (0)
+		acl_vstream_fprintf(ctx->fp, "hello world, id: %d, i: %d\n", ctx->i, __i++);
+	else
+		__i++;
 	acl_pthread_mutex_unlock(&__mutex);
 	acl_myfree(ctx);
 }
@@ -169,7 +173,7 @@ static void test_thread_pool(void)
 	int   i;
 
 	acl_pthread_mutex_init(&__mutex, NULL);
-	thr_pool = acl_thread_pool_create(10, 10);
+	thr_pool = acl_thread_pool_create(100, 10);
 
 	for (i = 0; i < 1000000; i++) {
 		RUN_CTX *ctx = (RUN_CTX*) acl_mymalloc(sizeof(RUN_CTX));
@@ -181,6 +185,7 @@ static void test_thread_pool(void)
 	acl_pthread_pool_destroy(thr_pool);
 	acl_pthread_mutex_destroy(&__mutex);
 	acl_vstream_close(fp);
+	printf("last i: %d\r\n", __i);
 }
 
 int main(int argc acl_unused, char *argv[] acl_unused)

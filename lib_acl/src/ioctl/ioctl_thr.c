@@ -114,7 +114,6 @@ int acl_ioctl_add(ACL_IOCTL *ioc, ACL_IOCTL_WORKER_FN callback, void *arg)
 {
 	const char *myname = "acl_ioctl_add";
 	ACL_IOCTL_CTX *ctx;
-	int   ret;
 
 	if (ioc == NULL || ioc->tp == NULL)
 		acl_msg_fatal("%s(%d): input invalid", myname, __LINE__);
@@ -124,13 +123,8 @@ int acl_ioctl_add(ACL_IOCTL *ioc, ACL_IOCTL_WORKER_FN callback, void *arg)
 	ctx->worker_fn = callback;
 	ctx->context   = arg;
 
-	ret = acl_pthread_pool_add(ioc->tp, worker_ready_callback, ctx);
-	if (ret != 0) {
-		acl_msg_error("thread pool add failed!");
-		acl_myfree(ctx);
-	}
-
-	return (ret);
+	acl_pthread_pool_add(ioc->tp, worker_ready_callback, ctx);
+	return 0;
 }
 
 int acl_ioctl_nworker(ACL_IOCTL *ioc)

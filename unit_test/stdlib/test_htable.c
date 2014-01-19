@@ -190,8 +190,7 @@ int test_htable_rwlock(AUT_LINE *test_line, void *arg acl_unused)
 	tp = acl_thread_pool_create(threads, thread_idle);
 
 	for (i = 0; i < n; i++) {
-		if (acl_pthread_pool_add(tp, __htable_rwlock_fn, &__rwlock_ctx))
-			acl_msg_fatal("acl_workq_add error(%s)", strerror(errno));
+		acl_pthread_pool_add(tp, __htable_rwlock_fn, &__rwlock_ctx);
 	}
 
 	sleep(2);

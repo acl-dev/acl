@@ -87,8 +87,8 @@ bool thread_pool::run(thread_job* job)
 		return false;
 	}
 
-	return acl_pthread_pool_add(thr_pool_, thread_run, job)
-			== 0 ? true : false;
+	acl_pthread_pool_add(thr_pool_, thread_run, job);
+	return true;
 }
 
 bool thread_pool::execute(thread_job* job)

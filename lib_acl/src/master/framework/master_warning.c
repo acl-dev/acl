@@ -96,11 +96,7 @@ void master_warning(const char *notify_addr, const char *recipients,
 	}
 
 	info = warn_info_new(notify_addr, recipients, path, pid, desc);
-	if (acl_pthread_pool_add(acl_var_master_thread_pool,
-		notify_thread, info) != 0)
-	{
-		warn_info_free(info);
-	}
+	acl_pthread_pool_add(acl_var_master_thread_pool, notify_thread, info);
 }
 
 #endif /* ACL_UNIX */

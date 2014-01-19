@@ -1,6 +1,6 @@
 #include <iostream>
 #include <assert.h>
-#include "lib_acl.h"
+#include "acl_cpp/acl_cpp_init.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/aio_istream.hpp"
 #include "acl_cpp/stream/aio_listen_stream.hpp"
@@ -276,7 +276,7 @@ int main(int argc, char* argv[])
 	const char* addr = "127.0.0.1:9001";
 
 	// 初始化ACL库(尤其是在WIN32下一定要调用此函数，在UNIX平台下可不调用)
-	acl_init();
+	acl::acl_cpp_init();
 
 	// 监听指定的地址
 	if (sstream->open(addr) == false)
@@ -295,7 +295,6 @@ int main(int argc, char* argv[])
 	sstream->add_accept_callback(&callback);
 	std::cout << "Listen: " << addr << " ok!" << std::endl;
 
-#if 1
 	while (true)
 	{
 		// 如果返回 false 则表示不再继续，需要退出
@@ -305,7 +304,7 @@ int main(int argc, char* argv[])
 			break;
 		}
 	}
-#endif
+
 	// 关闭监听流并释放流对象
 	sstream->close();
 

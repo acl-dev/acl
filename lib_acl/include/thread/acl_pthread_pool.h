@@ -19,6 +19,7 @@ typedef struct acl_pthread_job_t acl_pthread_job_t;
  * 创建一个线程池的工作任务
  * @param run_fn {void (*)(void*)} 在子线程中被调用的回调函数 
  * @param run_arg {void*} run_fn 的回调参数之一
+ * @param fixed {int}
  * @return {acl_pthread_job_t*} 返回创建的工作任务
  */
 ACL_API acl_pthread_job_t *acl_pthread_pool_alloc_job(void (*run_fn)(void*),
@@ -41,9 +42,9 @@ typedef struct acl_pthread_pool_t acl_pthread_pool_t;
 typedef struct acl_pthread_pool_attr_t {
 	int   threads_limit;	/**< 线程池最大线程数限制 */
 #define ACL_PTHREAD_POOL_DEF_THREADS   100  /**< 缺省最大值为 100 个线程 */
-	int   idle_timeout;     /**< 工作线程空闲超时时间(秒) */
-#define ACL_PTHREAD_POOL_DEF_IDLE      60   /**< 缺省空间超时时间为 60 秒 */
-	size_t stack_size;      /**< 工作线程的堆栈大小(字节) */
+	int   idle_timeout;                 /**< 工作线程空闲超时时间(秒) */
+#define ACL_PTHREAD_POOL_DEF_IDLE      0    /**< 缺省空间超时时间为 0 秒 */
+	size_t stack_size;                  /**< 工作线程的堆栈大小(字节) */
 } acl_pthread_pool_attr_t;
 
 /**
@@ -111,27 +112,13 @@ ACL_API int acl_pthread_pool_stop(acl_pthread_pool_t *thr_pool);
  * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
  * @param run_fn {void (*)(*)} 当有可用工作线程时所调用的回调处理函数
  * @param run_arg {void*} 回调函数 run_fn 所需要的回调参数
- * @return {int} 0: 成功; != 0: 失败
- */
-ACL_API int acl_pthread_pool_add(acl_pthread_pool_t *thr_pool,
-		void (*run_fn)(void *), void *run_arg);
-
-/**
- * 开始进行批处理方式的添加任务, 实际上是开始进行加锁
- * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
- */
-ACL_API void acl_pthread_pool_add_begin(acl_pthread_pool_t *thr_pool);
-
-/**
- * 添加一个新任务, 前提是已经成功加锁, 即调用acl_pthread_pool_add_begin 成功
- * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
- * @param run_fn {void (*)(void*)} 当有可用工作线程时所调用的回调处理函数
- * @param run_arg 回调函数 run_fn 所需要的回调参数
  */
 ACL_API void acl_pthread_pool_add_one(acl_pthread_pool_t *thr_pool,
 		void (*run_fn)(void *), void *run_arg);
+#define	acl_pthread_pool_add	acl_pthread_pool_add_one
+
 /**
- * 添加一个新任务, 前提是已经成功加锁, 即调用acl_pthread_pool_add_begin 成功
+ * 向线程池添加一个任务
  * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
  * @param job {acl_pthread_job_t*} 由 acl_pthread_pool_alloc_job 创建的线程任务
  */
@@ -139,10 +126,32 @@ ACL_API void acl_pthread_pool_add_job(acl_pthread_pool_t *thr_pool,
 		acl_pthread_job_t *job);
 
 /**
+ * 开始进行批处理方式的添加任务, 实际上是开始进行加锁
+ * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
+ */
+ACL_API void acl_pthread_pool_bat_add_begin(acl_pthread_pool_t *thr_pool);
+
+/**
+ * 添加一个新任务, 前提是已经成功加锁, 即调用 acl_pthread_pool_bat_add_begin 成功
+ * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
+ * @param run_fn {void (*)(void*)} 当有可用工作线程时所调用的回调处理函数
+ * @param run_arg 回调函数 run_fn 所需要的回调参数
+ */
+ACL_API void acl_pthread_pool_bat_add_one(acl_pthread_pool_t *thr_pool,
+		void (*run_fn)(void *), void *run_arg);
+/**
+ * 添加一个新任务, 前提是已经成功加锁, 即调用 acl_pthread_pool_bat_add_begin 成功
+ * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
+ * @param job {acl_pthread_job_t*} 由 acl_pthread_pool_alloc_job 创建的线程任务
+ */
+ACL_API void acl_pthread_pool_bat_add_job(acl_pthread_pool_t *thr_pool,
+		acl_pthread_job_t *job);
+
+/**
  * 批处理添加结束, 实际是解锁
  * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
  */
-ACL_API void acl_pthread_pool_add_end(acl_pthread_pool_t *thr_pool);
+ACL_API void acl_pthread_pool_bat_add_end(acl_pthread_pool_t *thr_pool);
 
 /**
  * 设置线程池 POLLER 调度函数，若要使用此功能，需要在用函数
