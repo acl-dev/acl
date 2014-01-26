@@ -138,7 +138,6 @@ static time_t __last_closing_time = 0;
 static pthread_mutex_t __closing_time_mutex;
 static pthread_mutex_t __counter_mutex;
 
-static ACL_VSTREAM *__server_lock;
 static int (*__service_main) (ACL_VSTREAM *, void *);
 static void *__service_ctx;
 static char *__service_name;
@@ -629,12 +628,6 @@ static void server_accept_sock(int event_type, ACL_EVENT *event,
 		return;
 	}
 
-	if (__server_lock != 0 && acl_myflock(ACL_VSTREAM_FILE(__server_lock),
-  	  	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
-	{
-		acl_msg_fatal("select unlock: %s", acl_last_serror());
-	}
-
 	if (delay_listen) {
 		acl_event_disable_readwrite(event, stream);
 		acl_event_request_timer(event, restart_listen_timer,
@@ -868,7 +861,6 @@ void acl_threads_server_main(int argc, char **argv,
 	int   c, fdtype = 0, event_mode;
 	char *generation, conf_file[1024];
 	void *thread_init_ctx = NULL, *thread_exit_ctx = NULL;
-	ACL_WATCHDOG *watchdog;
 	ACL_APP_PRE_JAIL pre_jail = 0;
 	ACL_APP_INIT_FN  post_init = 0;
 	void *pre_jail_ctx = NULL, *post_init_ctx = NULL;
@@ -1097,28 +1089,14 @@ void acl_threads_server_main(int argc, char **argv,
 	acl_msg_info("%s(%d), %s daemon started, log: %s",
 		myname, __LINE__, argv[0], acl_var_threads_log_file);
 
-	watchdog = acl_watchdog_create(acl_var_threads_daemon_timeout,
-		(ACL_WATCHDOG_FN) 0, (char *) 0);
-
 	/*
 	 * Traditionally, BSD select() can't handle threadsple processes
 	 * selecting on the same socket, and wakes up every process in
 	 * select(). See TCP/IP Illustrated volume 2 page 532. We avoid
 	 * select() collisions with an external lock file.
 	 */
-	while (1) {
-		if (__server_lock != 0) {
-			acl_watchdog_stop(watchdog);
-			if (acl_myflock(ACL_VSTREAM_FILE(__server_lock),
-				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
-			{
-				acl_msg_fatal("lock: %s", acl_last_serror());
-			}
-		}
-
-		acl_watchdog_start(watchdog);
+	while (1)
 		acl_event_loop(__event);
-	}
 
 	/* not reached here */
 	server_exit();

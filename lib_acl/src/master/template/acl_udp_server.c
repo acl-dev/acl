@@ -109,7 +109,6 @@ static void (*udp_server_service_fn) (ACL_VSTREAM *, char *, char **);
 static char *udp_server_name;
 static char **udp_server_argv;
 static void (*udp_server_onexit_fn) (char *, char **);
-static ACL_VSTREAM *udp_server_lock;
 static unsigned udp_server_generation;
 
 void acl_udp_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
@@ -387,7 +386,6 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	char   *transport = 0;
 	int     alone = 0;
 	int     zerolimit = 0;
-	ACL_WATCHDOG *watchdog;
 	char   *generation;
 	int     fd, i, fdtype = 0;
 	int     event_mode;
@@ -638,27 +636,14 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
 
-	watchdog = acl_watchdog_create(acl_var_udp_daemon_timeout,
-		(ACL_WATCHDOG_FN) 0, (char *) 0);
-
 	/* 进程初始化完毕后回调此函数，以使用户可以初始化自己的环境 */
 	if (post_init)
 		post_init(udp_server_name, udp_server_argv);
 
 	acl_msg_info("%s: daemon started, log: %s", argv[0], acl_var_udp_log_file);
 
-	while (1) {
-		if (udp_server_lock != 0) {
-			acl_watchdog_stop(watchdog);
-			if (acl_myflock(ACL_VSTREAM_FILE(udp_server_lock),
-				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
-			{
-				acl_msg_fatal("lock error %s", acl_last_serror());
-			}
-		}
-		acl_watchdog_start(watchdog);
+	while (1)
 		acl_event_loop(__event);
-	}
 
 	/* not reached here */
 	udp_server_exit();

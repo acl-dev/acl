@@ -143,7 +143,6 @@ static char **ioctl_server_argv;
 static void (*ioctl_server_accept) (int, ACL_IOCTL *, ACL_VSTREAM *, void *);
 static void (*ioctl_server_onexit) (char *, char **);
 static void (*ioctl_server_pre_accept) (char *, char **);
-static ACL_VSTREAM *ioctl_server_lock;
 static int ioctl_server_in_flow_delay;
 static unsigned ioctl_server_generation;
 static void (*ioctl_server_pre_disconn) (ACL_VSTREAM *, char *, char **);
@@ -549,13 +548,6 @@ static void ioctl_server_accept_pass(int event_type, ACL_IOCTL *h_ioctl,
 		break;
 	}
 
-	if (ioctl_server_lock != 0
-	    && acl_myflock(ACL_VSTREAM_FILE(ioctl_server_lock),
-	    	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
-	{
-		acl_msg_fatal("select unlock: %s", acl_last_serror());
-	}
-
 	if (delay_listen) {
 		acl_ioctl_disable_readwrite(h_ioctl, stream);
 		acl_ioctl_request_timer(h_ioctl, ioctl_restart_listen,
@@ -632,13 +624,6 @@ static void ioctl_server_accept_sock(int event_type, ACL_IOCTL *h_ioctl,
 		if (acl_getsockname(fd, local, sizeof(local)) < 0)
 			memset(local, 0, sizeof(local));
 		ioctl_server_wakeup(h_ioctl, fd, remote, local);
-	}
-
-	if (ioctl_server_lock != 0
-	    && acl_myflock(ACL_VSTREAM_FILE(ioctl_server_lock),
-  	  	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
-	{
-		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
 
 	if (delay_listen) {
@@ -781,7 +766,6 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 	char   *transport = 0;
 	int     alone = 0;
 	int     zerolimit = 0;
-	ACL_WATCHDOG *watchdog;
 	char   *generation;
 	int     fd, i, fdtype = 0;
 	int     event_mode;
@@ -1098,8 +1082,6 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 	acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
-	watchdog = acl_watchdog_create(acl_var_ioctl_daemon_timeout,
-		(ACL_WATCHDOG_FN) 0, (char *) 0);
 
 	/*******************************************************************/
 
@@ -1112,18 +1094,8 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 
 	/*******************************************************************/
 
-	while (1) {
-		if (ioctl_server_lock != 0) {
-			acl_watchdog_stop(watchdog);
-			if (acl_myflock(ACL_VSTREAM_FILE(ioctl_server_lock),
-				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
-			{
-				acl_msg_fatal("lock: %s", acl_last_serror());
-			}
-		}
-		acl_watchdog_start(watchdog);
+	while (1)
 		sleep(1);
-	}
 
 	/* not reached here */
 	ioctl_server_exit();

@@ -151,7 +151,6 @@ static char **aio_server_argv;
 static void (*aio_server_accept) (ACL_ASTREAM *, void *);
 static void (*aio_server_onexit) (char *, char **);
 static void (*aio_server_pre_accept) (char *, char **);
-static ACL_VSTREAM *aio_server_lock;
 static int aio_server_in_flow_delay;
 static unsigned aio_server_generation;
 static void (*aio_server_pre_disconn) (ACL_VSTREAM *, char *, char **);
@@ -664,14 +663,6 @@ static void aio_server_accept_pass(ACL_ASTREAM *astream, void *context)
 		aio_server_abort(astream, NULL);
 	}
 
-	if (aio_server_lock != 0
-		&& acl_myflock(ACL_VSTREAM_FILE(aio_server_lock),
-			ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
-	{
-		acl_msg_fatal("%s: select unlock: %s",
-			myname, acl_last_serror());
-	}
-
 	if (delay_listen) {
 		acl_aio_disable_read(astream);
 		acl_aio_request_timer(aio, restart_listen, astream, 2000000, 0);
@@ -741,14 +732,6 @@ static int aio_server_accept_sock2(ACL_ASTREAM *astream, ACL_AIO *aio)
 			ACL_MASTER_STAT_AVAIL) < 0)
 	{
 		aio_server_abort(astream, NULL);
-	}
-
-	if (aio_server_lock != 0
-		&& acl_myflock(ACL_VSTREAM_FILE(aio_server_lock),
-			ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
-	{
-		acl_msg_fatal("%s(%d), %s: select unlock: %s",
-			__FILE__, __LINE__, myname, acl_last_serror());
 	}
 
 	if (delay_listen) {
@@ -1045,11 +1028,6 @@ static void setup_ipc(ACL_AIO *aio)
 
 static void run_loop(const char *procname)
 {
-	ACL_WATCHDOG *watchdog;
-
-	watchdog = acl_watchdog_create(acl_var_aio_daemon_timeout,
-		(ACL_WATCHDOG_FN) 0, (char *) 0);
-
 	acl_msg_info("%s: starting...(accept_alone: %s)",
 		procname, acl_var_aio_accept_alone);
 
@@ -1065,17 +1043,6 @@ static void run_loop(const char *procname)
 	 */
 
 	while (1) {
-		if (aio_server_lock != 0) {
-			acl_watchdog_stop(watchdog);
-			if (acl_myflock(ACL_VSTREAM_FILE(aio_server_lock),
-				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
-			{
-				acl_msg_fatal("lock error %s", acl_last_serror());
-			}
-		}
-
-		acl_watchdog_start(watchdog);
-
 		if (acl_var_aio_max_threads == 0)  /* single thread mode */
 			acl_aio_loop(__h_aio);
 		else  /* multi-threads mode */

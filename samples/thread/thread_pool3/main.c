@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	acl_msg_stdout_enable(1);
 	test_thread_pool(nthreads, timeout, nloop);
 	return 0;
 }
