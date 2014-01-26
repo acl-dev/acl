@@ -169,7 +169,7 @@ static void *test_tls_thread(void *arg acl_unused)
 		printf(">>>%s(%d)(tid=%d): time cose %d seconds, tid: %ld\n",
 			myname, __LINE__, (int) acl_pthread_self(),
 			(int) (time(NULL) - begin), tid);
-		acl_vstring_sprintf(buf, "%s, tid=%lu", myname, acl_pthread_self());
+		acl_vstring_sprintf(buf, "%s, tid=%lu", myname, (unsigned long) acl_pthread_self());
 		printf(">>>%s: buf=%s\n", myname, acl_vstring_str(buf));
 	} else {
 		time(&begin);

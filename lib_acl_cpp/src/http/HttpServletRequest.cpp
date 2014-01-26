@@ -531,8 +531,14 @@ bool HttpServletRequest::readHeader(void)
 	else if (method_ == HTTP_METHOD_POST)
 	{
 		acl_int64 len = getContentLength();
-		if (len == -1)
+		if (len < -1)
 			return false;
+		if (len == 0)
+		{
+			request_type_ = HTTP_REQUEST_NORMAL;
+			return true;
+		}
+
 		const char* ctype = getContentType();
 		const char* stype = content_type_.get_stype();
 
@@ -566,6 +572,7 @@ bool HttpServletRequest::readHeader(void)
 				return false;
 
 			request_type_ = HTTP_REQUEST_NORMAL;
+
 			char* query = (char*) acl_mymalloc((size_t) len + 1);
 			int ret = getInputStream().read(query, (size_t) len);
 			if (ret > 0)

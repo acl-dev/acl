@@ -1,5 +1,14 @@
 修改历史列表：
 ------------------------------------------------------------------------
+218) 2014.1.21
+218.1) bugfix: HttpServletRequest.cpp, HttpServletRequest::readHeader 在解析
+POST中的数据体时，需要判断请求头中 Content-Length 为 0 的情况
+
+217) 2014.1.20
+217.1) bugfix: http_request.cpp，当采用第一个构造函数(即 socket_stream* 流
+作为构造函数的参数之一)时，socket_stream::get_peer(bool full) 的参数应为 true
+以便于获得完整的地址(ip:port)，否则在重试时则只有IP而无PORT，导致无法连接成功
+
 216) 2014.1.11
 216.1) compile: 支持 vc2008 编译器
 216.2) feature: 在使用高版本 vc（_MSC_VER >= 1500,即 VC9 以上版本） 编译器时，

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <assert.h>
+#include "lib_acl.h"
 #include "acl_cpp/acl_cpp_init.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/aio_istream.hpp"

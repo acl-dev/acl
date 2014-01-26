@@ -34,7 +34,7 @@ http_request::http_request(socket_stream* client,
 	local_charset_[0] = 0;
 	conv_ = NULL;
 
-	const char* ptr = client->get_peer();
+	const char* ptr = client->get_peer(true);
 	acl_assert(ptr);
 	ACL_SAFE_STRNCPY(addr_, ptr, sizeof(addr_));
 	rw_timeout_ = client->get_vstream()->rw_timeout;
