@@ -5,8 +5,10 @@
 
 # Compiled Dynamic libraries
 *.so
+*.sdf
+*.ncb
+*.suo
 
 # Compiled Static libraries
 *.lai
 *.la
-*.a
