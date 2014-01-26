@@ -8,6 +8,11 @@
 *.sdf
 *.ncb
 *.suo
+*.pch
+*.pdb
+*.idb
+*.exp
+*.map
 
 # Compiled Static libraries
 *.lai
