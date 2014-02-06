@@ -190,7 +190,8 @@ void http_header::build_common(string& buf) const
 {
 	if (!entries_.empty())
 	{
-		std::list<HTTP_HDR_ENTRY*>::const_iterator it = entries_.begin();
+		std::list<HTTP_HDR_ENTRY*>::const_iterator it =
+			entries_.begin();
 		for (; it != entries_.end(); ++it)
 			buf << (*it)->name << ": " << (*it)->value << "\r\n";
 	}

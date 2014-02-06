@@ -145,7 +145,7 @@ private:
 #endif
 
 dns_service::dns_service(int nthread /* = 1 */, bool win32_gui /* = false */)
-	: ipc_service(nthread, win32_gui)
+: ipc_service(nthread, win32_gui)
 {
 #ifdef WIN32
 	magic_ = _getpid() + time(NULL);

@@ -48,6 +48,20 @@ db_pool& db_pool::set_idle(int idle)
 	return *this;
 }
 
+db_handle* db_pool::peek_open(const char* charset /* = "utf8" */)
+{
+	db_handle* conn = peek();
+
+	if (conn == NULL)
+		return NULL;
+	if (conn->open(charset) == true)
+		return conn;
+	logger_error("open db failed, charset: %s",
+		charset ? charset : "null");
+	put(conn, false);
+	return NULL;
+}
+
 db_handle* db_pool::peek()
 {
 	db_handle* conn;

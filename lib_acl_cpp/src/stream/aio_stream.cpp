@@ -6,9 +6,9 @@ namespace acl
 {
 
 aio_stream::aio_stream(aio_handle* handle)
-	: handle_(handle)
-	, stream_(NULL)
-	, error_hooked_(false)
+: handle_(handle)
+, stream_(NULL)
+, error_hooked_(false)
 {
 	acl_assert(handle);
 	dummy_[0] = 0;
@@ -282,7 +282,7 @@ int aio_stream::disable_close_callback(aio_callback* callback)
 	{
 		for (; it != close_callbacks_.end(); ++it)
 		{
-			if ((*it)->callback == NULL || (*it)->enable == false)
+			if ((*it)->callback == NULL || !(*it)->enable)
 				continue;
 			(*it)->enable = false;
 			n++;
@@ -292,7 +292,7 @@ int aio_stream::disable_close_callback(aio_callback* callback)
 	{
 		for (; it != close_callbacks_.end(); ++it)
 		{
-			if ((*it)->callback != callback || (*it)->enable == false)
+			if ((*it)->callback != callback || !(*it)->enable)
 				continue;
 			(*it)->enable = false;
 			n++;
@@ -312,7 +312,7 @@ int aio_stream::disable_timeout_callback(aio_callback* callback)
 	{
 		for (; it != timeout_callbacks_.end(); ++it)
 		{
-			if ((*it)->callback == NULL || (*it)->enable == false)
+			if ((*it)->callback == NULL || !(*it)->enable)
 				continue;
 			(*it)->enable = false;
 			n++;
@@ -322,7 +322,7 @@ int aio_stream::disable_timeout_callback(aio_callback* callback)
 	{
 		for (; it != timeout_callbacks_.end(); ++it)
 		{
-			if ((*it)->callback != callback || (*it)->enable == false)
+			if ((*it)->callback != callback || !(*it)->enable)
 				continue;
 			(*it)->enable = false;
 			n++;
@@ -342,7 +342,7 @@ int aio_stream::enable_close_callback(aio_callback* callback /* = NULL */)
 	{
 		for (; it != close_callbacks_.end(); ++it)
 		{
-			if ((*it)->enable == false && (*it)->callback != NULL)
+			if (!(*it)->enable && (*it)->callback != NULL)
 			{
 				(*it)->enable = true;
 				n++;
@@ -353,7 +353,7 @@ int aio_stream::enable_close_callback(aio_callback* callback /* = NULL */)
 	{
 		for (; it != close_callbacks_.end(); ++it)
 		{
-			if ((*it)->enable == false && (*it)->callback == callback)
+			if (!(*it)->enable && (*it)->callback == callback)
 			{
 				(*it)->enable = true;
 				n++;
@@ -373,7 +373,7 @@ int aio_stream::enable_timeout_callback(aio_callback* callback /* = NULL */)
 	{
 		for (; it != timeout_callbacks_.end(); ++it)
 		{
-			if ((*it)->enable == false && (*it)->callback != NULL)
+			if (!(*it)->enable && (*it)->callback != NULL)
 			{
 				(*it)->enable = true;
 				n++;
@@ -384,7 +384,7 @@ int aio_stream::enable_timeout_callback(aio_callback* callback /* = NULL */)
 	{
 		for (; it != timeout_callbacks_.end(); ++it)
 		{
-			if ((*it)->enable == false && (*it)->callback == callback)
+			if (!(*it)->enable && (*it)->callback == callback)
 			{
 				(*it)->enable = true;
 				n++;

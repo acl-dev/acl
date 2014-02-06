@@ -257,15 +257,14 @@ public:
 	http_header& add_int(const char* name, unsigned short value);
 	http_header& add_int(const char* name, unsigned int value);
 	http_header& add_int(const char* name, unsigned long value);
+	http_header& add_format(const char* name, const char* fmt, ...)
+		ACL_CPP_PRINTF(3, 4);
 #ifdef WIN32
 	http_header& add_int(const char* name, __int64 vlaue);
 	http_header& add_int(const char* name, unsigned __int64 vlaue);
-	http_header& add_format(const char* name, const char* fmt, ...);
 #else
 	http_header& add_int(const char* name, long long int value);
 	http_header& add_int(const char* name, unsigned long long int value);
-	http_header& add_format(const char* name, const char* fmt, ...)
-		 __attribute__((format(printf, 3, 4)));
 #endif
 
 	/**

@@ -173,8 +173,6 @@ int event_thr_prepare(ACL_EVENT *ev)
 	ACL_EVENT_FDTABLE *fdp;
 	int   i, nwait = 0;
 
-	ev->fdcnt_ready = 0;
-
 	for (i = 0; i < ev->fdcnt; i++) {
 		fdp = ev->fdtabs[i];
 		sockfd = ACL_VSTREAM_SOCK(fdp->stream);
@@ -213,9 +211,8 @@ int event_thr_prepare(ACL_EVENT *ev)
 				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
 			} else
 				nwait++;
-		} else {
+		} else
 			nwait++;
-		}
 	}
 
 	return nwait;

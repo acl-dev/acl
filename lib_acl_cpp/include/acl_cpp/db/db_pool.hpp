@@ -18,13 +18,23 @@ public:
 	virtual ~db_pool();
 
 	/**
-	 * 从数据库中连接池获得一个数据库连接，该函数返回的数据库
-	 * 连接对象用完后必须调用 db_pool->put(db_handle*) 将连接
-	 * 归还至数据库连接池，由该函数获得的连接句柄不能 delete，
-	 * 否则会造成连接池的内部计数器出错
+	 * 从数据库连接池获得一个数据库对象，该函数返回数据库对象，用户需调用
+	 * db_handle::open 打开数据库连接，然后再使用该数据库连接对象；
+	 * 用完后必须调用 db_pool->put(db_handle*) 将连接归还至数据库连接池，
+	 * 由该函数获得的连接句柄不能 delete，否则会造成连接池的内部计数器出错
 	 * @return {db_handle*} 返回空，则表示出错
 	 */
 	db_handle* peek();
+
+	/**
+	 * 从数据库连接池获得一个数据库对象，并且要求打开数据库连接，即用户不必
+	 * 显式地再调用 db_handle::open 过程；
+	 * 用完后必须调用 db_pool->put(db_handle*) 将连接归还至数据库连接池，
+	 * 由该函数获得的连接句柄不能 delete，否则会造成连接池的内部计数器出错
+	 * @param charset {const char*} 打开数据库时使用的字符集
+	 * @return {db_handle*} 数据库连接对象，返回空表示出错
+	 */
+	db_handle* peek_open(const char* charset = "utf8");
 
 	/**
 	 * 将数据库连接放回至连接池中，当从数据库连接池中获得连接

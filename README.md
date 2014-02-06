@@ -20,6 +20,6 @@ zlib/iconv wrapper<br>
 session manager<br>
 unit test framework<br>
 
-website: http://www.iteye.com/<br>
-tar download: https://sourceforge.net/projects/acl/<br>
+website: <a href=http://www.iteye.com/ target=_blank>http://www.iteye.com/</a><br>
+download: <a href=https://sourceforge.net/projects/acl/ target=_blank>https://sourceforge.net/projects/acl/</a><br>
 qq Ⱥ: 242722074<br>

@@ -19,7 +19,6 @@
 
 #include "stdlib/acl_sys_patch.h"
 #include "stdlib/acl_mymalloc.h"
-#include "stdlib/acl_mystring.h"
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_ring.h"
 #include "stdlib/acl_vstream.h"
@@ -30,22 +29,17 @@
 #include "events_define.h"
 
 #ifdef	ACL_EVENTS_KERNEL_STYLE
+#if (ACL_EVENTS_KERNEL_STYLE == ACL_EVENTS_STYLE_EPOLL)
 
-#include "events_epoll.h"
-#include "events_devpoll.h"
-#include "events_kqueue.h"
+#include <sys/epoll.h>
 #include "events_fdtable.h"
-#include "events_dog.h"
 #include "events.h"
 
 typedef struct EVENT_KERNEL_THR {
 	EVENT_THR event;
-	EVENT_BUFFER *event_buf;
+	struct epoll_event *event_buf;
 	int   event_fdslots;
 	int   event_fd;
-#ifdef	USE_FDMAP
-	ACL_FD_MAP *fdmap;
-#endif
 } EVENT_KERNEL_THR;
 
 static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
@@ -55,7 +49,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	EVENT_KERNEL_THR *event_thr = (EVENT_KERNEL_THR *) eventp;
 	ACL_EVENT_FDTABLE *fdp;
 	ACL_SOCKET sockfd;
-	int   err = 0;
+	struct epoll_event ev;
 
 	sockfd = ACL_VSTREAM_SOCK(stream);
 	fdp = (ACL_EVENT_FDTABLE*) stream->fdp;
@@ -88,35 +82,27 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		fdp->r_timeout = 0;
 	}
 
-	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ) == 0) {
-		stream->nrefer++;
-		fdp->flag = EVENT_FDTABLE_FLAG_READ | EVENT_FDTABLE_FLAG_EXPT;
+	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ) != 0)
+		return;
 
-		THREAD_LOCK(&event_thr->event.tb_mutex);
-		
-		fdp->fdidx = eventp->fdcnt;
-		eventp->fdtabs[eventp->fdcnt] = fdp;
-		eventp->fdcnt++;
+	stream->nrefer++;
+	fdp->flag = EVENT_FDTABLE_FLAG_READ | EVENT_FDTABLE_FLAG_EXPT;
 
-#ifdef	USE_FDMAP
-		acl_fdmap_add(event_thr->fdmap, sockfd, fdp);
-#endif
+	memset(&ev, 0, sizeof(ev));
+	ev.events = EPOLLIN | EPOLLHUP | EPOLLERR | EPOLLET;
+	ev.data.ptr = fdp;
 
-		EVENT_REG_ADD_READ(err, event_thr->event_fd, sockfd, fdp);
+	THREAD_LOCK(&event_thr->event.tb_mutex);
 
-		THREAD_UNLOCK(&event_thr->event.tb_mutex);
+	fdp->fdidx = eventp->fdcnt;
+	eventp->fdtabs[eventp->fdcnt] = fdp;
+	eventp->fdcnt++;
 
-		if (err < 0) {
-			acl_msg_fatal("%s: %s: %s, err(%d), fd(%d)",
-				myname, EVENT_REG_ADD_TEXT, acl_last_serror(),
-				err, sockfd);
-		}
-	}
+	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
-	/* 主要是为了减少通知次数 */
-	if (event_thr->event.blocked && event_thr->event.evdog
-	    && event_dog_client(event_thr->event.evdog) != stream)
-		event_dog_notify(event_thr->event.evdog);
+	if (epoll_ctl(event_thr->event_fd, EPOLL_CTL_ADD, sockfd, &ev) < 0)
+		acl_msg_fatal("%s: epoll_ctl: %s, fd: %d",
+			myname, acl_last_serror(), sockfd);
 }
 
 static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
@@ -126,7 +112,7 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	EVENT_KERNEL_THR *event_thr = (EVENT_KERNEL_THR *) eventp;
 	ACL_EVENT_FDTABLE *fdp;
 	ACL_SOCKET sockfd;
-	int   err = 0;
+	struct epoll_event ev;
 
 	sockfd = ACL_VSTREAM_SOCK(stream);
 	fdp = (ACL_EVENT_FDTABLE*) stream->fdp;
@@ -159,28 +145,27 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		fdp->r_timeout = 0;
 	}
 
-	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ) == 0) {
-		fdp->flag = EVENT_FDTABLE_FLAG_READ | EVENT_FDTABLE_FLAG_EXPT;
-		stream->nrefer++;
+	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ) != 0)
+		return;
 
-		THREAD_LOCK(&event_thr->event.tb_mutex);
+	fdp->flag = EVENT_FDTABLE_FLAG_READ | EVENT_FDTABLE_FLAG_EXPT;
+	stream->nrefer++;
 
-		fdp->fdidx = eventp->fdcnt;
-		eventp->fdtabs[eventp->fdcnt] = fdp;
-		eventp->fdcnt++;
+	memset(&ev, 0, sizeof(ev));
+	ev.events = EPOLLIN | EPOLLHUP | EPOLLERR;
+	ev.data.ptr = fdp;
 
-#ifdef	USE_FDMAP
-		acl_fdmap_add(event_thr->fdmap, sockfd, fdp);
-#endif
-		EVENT_REG_ADD_READ(err, event_thr->event_fd, sockfd, fdp);
+	THREAD_LOCK(&event_thr->event.tb_mutex);
 
-		THREAD_UNLOCK(&event_thr->event.tb_mutex);
+	fdp->fdidx = eventp->fdcnt;
+	eventp->fdtabs[eventp->fdcnt] = fdp;
+	eventp->fdcnt++;
 
-		if (err < 0)
-			acl_msg_fatal("%s: %s: %s, err(%d), fd(%d)",
-				myname, EVENT_REG_ADD_TEXT, acl_last_serror(),
-				err, sockfd);
-	}
+	THREAD_UNLOCK(&event_thr->event.tb_mutex);
+
+	if (epoll_ctl(event_thr->event_fd, EPOLL_CTL_ADD, sockfd, &ev) < 0)
+		acl_msg_fatal("%s: epool_ctl: %s, fd: %d",
+			myname, acl_last_serror(), sockfd);
 }
 
 static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
@@ -190,7 +175,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	EVENT_KERNEL_THR *event_thr = (EVENT_KERNEL_THR *) eventp;
 	ACL_EVENT_FDTABLE *fdp;
 	ACL_SOCKET sockfd;
-	int   err = 0;
+	struct epoll_event ev;
 
 	sockfd = ACL_VSTREAM_SOCK(stream);
 	fdp = (ACL_EVENT_FDTABLE*) stream->fdp;
@@ -222,33 +207,27 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		fdp->w_timeout = 0;
 	}
 
-	if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE) == 0) {
-		fdp->flag = EVENT_FDTABLE_FLAG_WRITE | EVENT_FDTABLE_FLAG_EXPT;
-		stream->nrefer++;
+	if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE) != 0)
+		return;
 
-		THREAD_LOCK(&event_thr->event.tb_mutex);
+	fdp->flag = EVENT_FDTABLE_FLAG_WRITE | EVENT_FDTABLE_FLAG_EXPT;
+	stream->nrefer++;
 
-		fdp->fdidx = eventp->fdcnt;
-		eventp->fdtabs[eventp->fdcnt] = fdp;
-		eventp->fdcnt++;
+	memset(&ev, 0, sizeof(ev));
+	ev.events = EPOLLIN | EPOLLHUP | EPOLLERR;
+	ev.data.ptr = fdp;
 
-#ifdef	USE_FDMAP
-		acl_fdmap_add(event_thr->fdmap, sockfd, fdp);
-#endif
-		EVENT_REG_ADD_WRITE(err, event_thr->event_fd, sockfd, fdp);
+	THREAD_LOCK(&event_thr->event.tb_mutex);
 
-		THREAD_UNLOCK(&event_thr->event.tb_mutex);
+	fdp->fdidx = eventp->fdcnt;
+	eventp->fdtabs[eventp->fdcnt] = fdp;
+	eventp->fdcnt++;
 
-		if (err < 0) {
-			acl_msg_fatal("%s: %s: %s, err(%d), fd(%d)",
-				myname, EVENT_REG_ADD_TEXT, acl_last_serror(),
-				err, sockfd);
-		}
-	}
+	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
-	if (event_thr->event.blocked && event_thr->event.evdog
-	    && event_dog_client(event_thr->event.evdog) != stream)
-		event_dog_notify(event_thr->event.evdog);
+	if (epoll_ctl(event_thr->event_fd, EPOLL_CTL_ADD, sockfd, &ev) < 0)
+		acl_msg_fatal("%s: epoll_ctl: %s, fd: %d",
+			myname, acl_last_serror(), sockfd);
 }
 
 /* event_disable_readwrite - disable request for read or write events */
@@ -259,7 +238,6 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	EVENT_KERNEL_THR *event_thr = (EVENT_KERNEL_THR *) eventp;
 	ACL_EVENT_FDTABLE *fdp;
 	ACL_SOCKET sockfd;
-	int   err = 0;
 
 	sockfd = ACL_VSTREAM_SOCK(stream);
 
@@ -289,34 +267,17 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 		eventp->fdtabs[fdp->fdidx]->fdidx = fdp->fdidx;
 	}
 
-#ifdef	USE_FDMAP
-	acl_fdmap_del(event_thr->fdmap, sockfd);
-#endif
+	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
-#ifdef	EVENT_REG_DEL_BOTH
-	EVENT_REG_DEL_BOTH(err, event_thr->event_fd, sockfd);
 	if (fdp->flag & EVENT_FDTABLE_FLAG_READ)
 		stream->nrefer--;
 	if (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
 		stream->nrefer--;
-#else
-	if (fdp->flag & EVENT_FDTABLE_FLAG_READ) {
-		EVENT_REG_DEL_READ(err, event_thr->event_fd, sockfd);
-		stream->nrefer--;
-	}
-	if (fdp->flag & EVENT_FDTABLE_FLAG_WRITE) {
-		EVENT_REG_DEL_WRITE(err, event_thr->event_fd, sockfd);
-		stream->nrefer--;
-	}
-#endif
 
-	THREAD_UNLOCK(&event_thr->event.tb_mutex);
-
-	if (err < 0) {
-		acl_msg_fatal("%s: %s: %s", myname, EVENT_REG_DEL_TEXT,
-			acl_last_serror());
-	}
 	event_fdtable_reset(fdp);
+
+	if (epoll_ctl(event_thr->event_fd, EPOLL_CTL_DEL, sockfd, NULL) < 0)
+		acl_msg_fatal("%s: epoll_ctl: %s", myname, acl_last_serror());
 }
 
 static int event_isrset(ACL_EVENT *eventp acl_unused, ACL_VSTREAM *stream)
@@ -381,11 +342,10 @@ static void event_loop(ACL_EVENT *eventp)
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
 		n = (int) (timer->when
 			- eventp->event_present + 1000000 - 1) / 1000000;
-		if (n <= 0) {
+		if (n <= 0)
 			delay = 0;
-		} else if (n < eventp->delay_sec) {
+		else if (n < eventp->delay_sec)
 			delay = n * 1000 + eventp->delay_usec / 1000;
-		}
 	}
 
 	THREAD_UNLOCK(&event_thr->event.tm_mutex);
@@ -414,49 +374,36 @@ static void event_loop(ACL_EVENT *eventp)
 	}
 
 	event_thr->event.blocked = 1;
-	EVENT_BUFFER_READ(nready, event_thr->event_fd, event_thr->event_buf,
-		event_thr->event_fdslots, delay);
+	nready = epoll_wait(event_thr->event_fd, event_thr->event_buf,
+			event_thr->event_fdslots, delay);
 	event_thr->event.blocked = 0;
 
 	if (nready < 0) {
-		if (acl_last_error() != ACL_EINTR) {
+		if (acl_last_error() != ACL_EINTR)
 			acl_msg_fatal("%s(%d), %s: event_loop: select: %s",
 				__FILE__, __LINE__, myname, acl_last_serror());
-		}
 		goto TAG_DONE;
 	} else if (nready == 0)
 		goto TAG_DONE;
 
 	bp = event_thr->event_buf;
 	for (; bp < event_thr->event_buf + nready; bp++) {
-#ifdef	USE_FDMAP
-		ACL_SOCKET sockfd;
-
-		sockfd = EVENT_GET_FD(bp);
-		fdp = acl_fdmap_ctx(event_thr->fdmap, sockfd);
-		if (fdp == NULL || fdp->stream == NULL)
-			continue;
-
-		if (sockfd != ACL_VSTREAM_SOCK(fdp->stream))
-			acl_msg_fatal("%s(%d): sockfd(%d) != %d", myname,
-				__LINE__, sockfd, ACL_VSTREAM_SOCK(fdp->stream));
-#else
-		fdp = (ACL_EVENT_FDTABLE *) EVENT_GET_CTX(bp);
-#endif
+		fdp = (ACL_EVENT_FDTABLE *) bp->data.ptr;
 		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT)))
 			continue;
 
-		if ((fdp->flag & EVENT_FDTABLE_FLAG_READ) && EVENT_TEST_READ(bp))
-		{
+		if ((bp->events & (EPOLLERR | EPOLLHUP)) != 0) {
+			fdp->event_type |= ACL_EVENT_XCPT;
+			fdp->fdidx_ready = eventp->fdcnt_ready;
+			eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
+		} else if ((bp->events & EPOLLIN) != 0) {
 			fdp->stream->sys_read_ready = 1;
 			if ((fdp->event_type & ACL_EVENT_READ) == 0) {
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = eventp->fdcnt_ready;
 				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
 			}
-		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
-			&& EVENT_TEST_WRITE(bp))
-		{
+		} else if ((bp->events & EPOLLOUT) != 0) {
 			fdp->event_type |= ACL_EVENT_WRITE;
 			fdp->fdidx_ready = eventp->fdcnt_ready;
 			eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
@@ -505,13 +452,6 @@ TAG_DONE:
 		event_thr_fire(eventp);
 }
 
-static void event_add_dog(ACL_EVENT *eventp)
-{
-	EVENT_KERNEL_THR *event_thr = (EVENT_KERNEL_THR*) eventp;
-
-	event_thr->event.evdog = event_dog_create((ACL_EVENT*) event_thr, 1);
-}
-
 static void event_free(ACL_EVENT *eventp)
 {
 	const char *myname = "event_free";
@@ -524,15 +464,12 @@ static void event_free(ACL_EVENT *eventp)
 	LOCK_DESTROY(&event_thr->event.tm_mutex);
 	LOCK_DESTROY(&event_thr->event.tb_mutex);
 
-#ifdef	USE_FDMAP
-	acl_fdmap_free(event_thr->fdmap);
-#endif
 	acl_myfree(event_thr->event_buf);
 	close(event_thr->event_fd);
 	acl_myfree(eventp);
 }
 
-ACL_EVENT *event_new_kernel_thr(int fdsize acl_unused)
+ACL_EVENT *event_epoll_alloc_r(int fdsize acl_unused)
 {
 	EVENT_KERNEL_THR *event_thr;
 	static int __default_max_events = 1024;
@@ -540,12 +477,11 @@ ACL_EVENT *event_new_kernel_thr(int fdsize acl_unused)
 	event_thr = (EVENT_KERNEL_THR*) event_alloc(sizeof(EVENT_KERNEL_THR));
 
 	snprintf(event_thr->event.event.name, sizeof(event_thr->event.event.name),
-		"thread events - %s", EVENT_NAME);
+		"thread events - epoll");
 	event_thr->event.event.event_mode           = ACL_EVENT_KERNEL;
 	event_thr->event.event.use_thread           = 1;
 	event_thr->event.event.loop_fn              = event_loop;
 	event_thr->event.event.free_fn              = event_free;
-	event_thr->event.event.add_dog_fn           = event_add_dog;
 	event_thr->event.event.enable_read_fn       = event_enable_read;
 	event_thr->event.event.enable_write_fn      = event_enable_write;
 	event_thr->event.event.enable_listen_fn     = event_enable_listen;
@@ -563,12 +499,10 @@ ACL_EVENT *event_new_kernel_thr(int fdsize acl_unused)
 
 	EVENT_REG_INIT_HANDLE(event_thr->event_fd, fdsize);
 	event_thr->event_fdslots = __default_max_events;
-	event_thr->event_buf = (EVENT_BUFFER *)
-		acl_mycalloc(event_thr->event_fdslots + 1, sizeof(EVENT_BUFFER));
-#ifdef	USE_FDMAP
-	event_thr->fdmap = acl_fdmap_create(fdsize);
-#endif
+	event_thr->event_buf = (EVENT_BUFFER *) acl_mycalloc(
+			event_thr->event_fdslots + 1, sizeof(EVENT_BUFFER));
 	return ((ACL_EVENT *) event_thr);
 }
 
-#endif	/* ACL_EVENTS_KERNEL_STYLE */
+#endif	/* ACL_EVENTS_KERNEL_STYLE == ACL_EVENTS_STYLE_EPOLL */
+#endif  /* ACL_EVENTS_KERNEL_STYLE */

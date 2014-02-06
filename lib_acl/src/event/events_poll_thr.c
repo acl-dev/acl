@@ -347,30 +347,37 @@ static void event_loop(ACL_EVENT *eventp)
 
 	THREAD_UNLOCK(&event_thr->event.tm_mutex);
 
-	THREAD_LOCK(&event_thr->event.tb_mutex);
+	eventp->fdcnt_ready = 0;
 
-	if (event_thr_prepare(eventp) == 0) {
-		if (eventp->fdcnt_ready == 0)
-			sleep(1);
+	if (eventp->event_present - eventp->last_check >= 100000) {
+		eventp->last_check = eventp->event_present;
+
+		THREAD_LOCK(&event_thr->event.tb_mutex);
+
+		if (event_thr_prepare(eventp) == 0) {
+			THREAD_UNLOCK(&event_thr->event.tb_mutex);
+
+			if (eventp->fdcnt_ready == 0)
+				sleep(1);
+
+			nready = 0;
+			goto TAG_DONE;
+		}
+
+		if (eventp->fdcnt_ready > 0)
+			delay = 0;
 
 		THREAD_UNLOCK(&event_thr->event.tb_mutex);
-		goto TAG_DONE;
 	}
-
-	if (eventp->fdcnt_ready > 0)
-		delay = 0;
-
-	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
 	event_thr->event.blocked = 1;
 	nready = poll(event_thr->fds, eventp->fdcnt, delay);
 	event_thr->event.blocked = 0;
 
 	if (nready < 0) {
-		if (acl_last_error() != ACL_EINTR) {
+		if (acl_last_error() != ACL_EINTR)
 			acl_msg_fatal("%s(%d), %s: event_loop: select: %s",
 				__FILE__, __LINE__, myname, acl_last_serror());
-		}
 		goto TAG_DONE;
 	} else if (nready == 0)
 		goto TAG_DONE;

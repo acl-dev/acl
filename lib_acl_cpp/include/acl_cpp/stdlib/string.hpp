@@ -821,11 +821,7 @@ public:
 	 * @param ... 变参数据
 	 * @return {string&} 当前对象的引用
 	 */
-#ifdef	WIN32
-	string& format(const char* fmt, ...);
-#else
-	string& format(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
-#endif
+	string& format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
 	 * 带格式方式的添加数据（类似于 vsprintf 接口方式）
@@ -870,8 +866,12 @@ public:
 	/**
 	 * 在当前对象的缓冲区数据中去掉指定的字符串内容，在处理过程中会发生数据移动情况
 	 * @param needle {const char*} 指定需要去掉的字符串数据
-	 * @param each {bool} 是否去掉所有的指定字符串数据
+	 * @param each {bool} 当为 true 时，则每一个出现在 needle 中的字符都会在
+	 *  当前对象的缓存区中去掉；否则，仅在当前对象缓冲区中去掉完整的 needle 字符串
 	 * @return {string&} 当前对象的引用
+	 *  如 acl::string s("hello world!");
+	 *  若 s.strip("hel", true), 则结果为： s == "o word!"
+	 *  若 s.strip("hel", false), 则结果为: s = "lo world!"
 	 */
 	string& strip(const char* needle, bool each = false);
 

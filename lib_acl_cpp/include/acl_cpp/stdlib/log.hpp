@@ -79,55 +79,25 @@ public:
 	 * 日志记录函数
 	 */
 
-#ifdef	WIN32
-	static void msg1(const char* fmt, ...);
-	static void msg4(const char* fname, int line, const char* func,
-		const char* fmt, ...);
-	static void msg3(size_t section, size_t level, const char* fmt, ...);
-	static void msg6(size_t section, size_t level, const char* fname,
+	static void ACL_CPP_PRINTF(1, 2) msg1(const char* fmt, ...);
+	static void ACL_CPP_PRINTF(4, 5) msg4(const char* fname,
 		int line, const char* func, const char* fmt, ...);
+	static void ACL_CPP_PRINTF(3, 4) msg3(size_t section,
+		size_t level, const char* fmt, ...);
+	static void ACL_CPP_PRINTF(6, 7) msg6(size_t section, size_t level,
+		const char* fname, int line, const char* func, const char* fmt, ...);
 
-	static void warn1(const char* fmt, ...);
-	static void warn4(const char* fname, int line, const char* func,
-		const char* fmt, ...);
+	static void ACL_CPP_PRINTF(1, 2) warn1(const char* fmt, ...);
+	static void ACL_CPP_PRINTF(4, 5) warn4(const char* fname, int line,
+		const char* func, const char* fmt, ...);
 
-	static void error1(const char* fmt, ...);
-	static void error4(const char* fname, int line, const char* func,
-		const char* fmt, ...);
+	static void ACL_CPP_PRINTF(1, 2) error1(const char* fmt, ...);
+	static void ACL_CPP_PRINTF(4, 5) error4(const char* fname, int line,
+		const char* func, const char* fmt, ...);
 
-	static void fatal1(const char* fmt, ...);
-	static void fatal4(const char* fname, int line, const char* func,
-		const char* fmt, ...);
-#else
-	static void __attribute__((format(printf, 1, 2)))
-		msg1(const char* fmt, ...);
-	static void __attribute__((format(printf, 4, 5)))
-		msg4(const char* fname, int line, const char* func,
-		const char* fmt, ...);
-	static void __attribute__((format(printf, 3, 4)))
-		msg3(size_t section, size_t level, const char* fmt, ...);
-	static void __attribute__((format(printf, 6, 7)))
-		msg6(size_t section, size_t level, const char* fname,
-		int line, const char* func, const char* fmt, ...);
-
-	static void __attribute__((format(printf, 1, 2)))
-		warn1(const char* fmt, ...);
-	static void __attribute__((format(printf, 4, 5)))
-		warn4(const char* fname, int line, const char* func,
-		const char* fmt, ...);
-
-	static void __attribute__((format(printf, 1, 2)))
-		error1(const char* fmt, ...);
-	static void __attribute__((format(printf, 4, 5)))
-		error4(const char* fname, int line, const char* func,
-		const char* fmt, ...);
-
-	static void __attribute__((format(printf, 1, 2)))
-		fatal1(const char* fmt, ...);
-	static void __attribute__((format(printf, 4, 5)))
-		fatal4(const char* fname, int line, const char* func,
-		const char* fmt, ...);
-#endif
+	static void ACL_CPP_PRINTF(1, 2) fatal1(const char* fmt, ...);
+	static void ACL_CPP_PRINTF(4, 5) fatal4(const char* fname, int line,
+		const char* func, const char* fmt, ...);
 
 	static void vmsg2(const char* fmt, va_list ap);
 	static void vmsg5(const char* fname, int line, const char* func,

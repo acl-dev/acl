@@ -72,13 +72,9 @@ public:
 	 *  如果返回值 > 0 则表示添加成功，若 == 0 则表示添加失败
 	 *  (查看 beanstalkd 源码，可以看出消息号从 1 开始增加)
 	 */
-#ifdef	WIN32
 	unsigned long long format_put(unsigned pri, unsigned delay, unsigned ttr,
-		const char* fmt, ...);
-#else
-	unsigned long long format_put(unsigned pri, unsigned delay, unsigned ttr,
-		const char* fmt, ...) __attribute__((format(printf, 5, 6)));
-#endif
+		const char* fmt, ...) ACL_CPP_PRINTF(5, 6);
+
 	unsigned long long vformat_put(const char* fmt, va_list ap,
 		unsigned pri = 1024, unsigned delay = 0, unsigned ttr = 60);
 
@@ -90,12 +86,7 @@ public:
 	 *  如果返回值 > 0 则表示添加成功，若 == 0 则表示添加失败
 	 *  (查看 beanstalkd 源码，可以看出消息号从 1 开始增加)
 	 */
-#ifdef	WIN32
-	unsigned long long format_put(const char* fmt, ...);
-#else
-	unsigned long long format_put(const char* fmt, ...)
-		__attribute__((format(printf, 2, 3)));
-#endif
+	unsigned long long format_put(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/////////////////////////////////////////////////////////////////////
 	// 消费者调用的接口
@@ -297,15 +288,10 @@ private:
 	char* tube_used_;
 	std::vector<char*> tubes_watched_;
 	acl::socket_stream conn_;
-#ifdef	WIN32
-	unsigned long long peek_fmt(string& buf, const char* fmt, ...);
-	bool list_tubes_fmt(string& buf, const char* fmt, ...);
-#else
 	unsigned long long peek_fmt(string& buf, const char* fmt, ...)
-		__attribute__((format(printf, 3, 4)));
+		ACL_CPP_PRINTF(3, 4);
 	bool list_tubes_fmt(string& buf, const char* fmt, ...)
-		__attribute__((format(printf, 3, 4)));
-#endif
+		ACL_CPP_PRINTF(3, 4);
 
 	unsigned ignore_one(const char* tube);
 	bool beanstalk_open();

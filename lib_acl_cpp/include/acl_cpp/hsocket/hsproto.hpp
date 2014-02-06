@@ -54,14 +54,8 @@ public:
 	 * @param ... {const char*} 参数列表，最后一个参数为 NULL 表示结束
 	 * @return {bool} 是否成功
 	 */
-#ifdef	WIN32
-	static bool build_get(string& out, int id,
+	static bool ACL_CPP_PRINTF(4, 5) build_get(string& out, int id,
 		int nfld, const char* first_value, ...);
-#else
-	static bool __attribute__((format(printf, 4, 5)))
-		build_get(string& out, int id, int nfld,
-			const char* first_value, ...);
-#endif
 
 	/**
 	 * 创建修改数据库记录的请求协议数据
@@ -108,14 +102,8 @@ public:
 	 * @param ... {const char*} 参数列表，最后一个参数为 NULL 表示结束
 	 * @return {bool} 是否成功
 	 */
-#ifdef	WIN32
-	static bool build_del(string& out, int id,
+	static bool ACL_CPP_PRINTF(4, 5) build_del(string& out, int id,
 		int nfld, const char* first_value, ...);
-#else
-	static bool __attribute__((format(printf, 4, 5)))
-		build_del(string& out, int id, int nfld,
-			const char* first_value, ...);
-#endif
 
 	/**
 	 * 创建添加数据库记录的请求协议数据
@@ -138,14 +126,8 @@ public:
 	 * @param ... {const char*} 参数列表，最后一个参数为 NULL 表示结束
 	 * @return {bool} 是否成功
 	 */
-#ifdef	WIN32
-	static bool build_add(string& out, int id,
+	static bool ACL_CPP_PRINTF(4, 5) build_add(string& out, int id,
 		int nfld, const char* first_value, ...);
-#else
-	static bool __attribute__((format(printf, 4, 5)))
-		build_add(string& out, int id, int nfld,
-			const char* first_value, ...);
-#endif
 
 	/**
 	 * 通用的创建数据库处理的请求协议数据

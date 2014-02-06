@@ -78,7 +78,8 @@ int aio_listen_stream::accept_callback(ACL_ASTREAM* stream, void* ctx)
 	aio_listen_stream* as = (aio_listen_stream*) ctx;
 	std::list<aio_accept_callback*>::iterator it =
 		as->accept_callbacks_.begin();
-	aio_socket_stream* ss = NEW aio_socket_stream(as->handle_, stream, true);
+	aio_socket_stream* ss = NEW aio_socket_stream(as->handle_,
+			stream, true);
 
 	for (; it != as->accept_callbacks_.end(); ++it)
 	{

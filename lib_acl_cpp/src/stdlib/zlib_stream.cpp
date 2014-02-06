@@ -323,7 +323,8 @@ bool zlib_stream::flush_out(int (*func)(z_stream*, int),
 			if (zstream_->avail_out > 0)
 			{
 				logger_error("flush_out(%s) error",
-					func == __deflate ? "deflate" : "inflate");
+					func == __deflate ?
+					"deflate" : "inflate");
 				return (false);
 			}
 

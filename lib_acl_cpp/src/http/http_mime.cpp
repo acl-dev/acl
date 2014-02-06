@@ -16,7 +16,7 @@ namespace acl
 http_mime_node::http_mime_node(const char* path, const MIME_NODE* node,
 	bool decodeIt /* = true */, const char* toCharset /* =  */,
 	off_t off /* = 0 */)
-	: mime_attach(path, node, decodeIt, toCharset, off)
+: mime_attach(path, node, decodeIt, toCharset, off)
 {
 	param_value_ = NULL;
 
@@ -195,7 +195,7 @@ void http_mime::set_saved_path(const char* path)
 
 bool http_mime::update(const char* data, size_t len)
 {
-	return (mime_state_update(mime_state_, data, len) == 1 ? true : false);
+	return mime_state_update(mime_state_, data, len) == 1 ? true : false;
 }
 
 const std::list<http_mime_node*>& http_mime::get_nodes(void) const

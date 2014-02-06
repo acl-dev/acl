@@ -364,7 +364,11 @@ static void event_loop(ACL_EVENT *eventp)
 
 	THREAD_LOCK(&event_thr->event.tb_mutex);
 
+	eventp->fdcnt_ready = 0;
+
 	if (event_thr_prepare(eventp) == 0) {
+		THREAD_UNLOCK(&event_thr->event.tb_mutex);
+
 		if (eventp->fdcnt_ready == 0) {
 			select_delay /= 1000000;
 			if (select_delay <= 0)
@@ -372,7 +376,7 @@ static void event_loop(ACL_EVENT *eventp)
 			sleep((int) select_delay);
 		}
 
-		THREAD_UNLOCK(&event_thr->event.tb_mutex);
+		nready = 0;
 		goto TAG_DONE;
 	}
 
@@ -399,10 +403,9 @@ static void event_loop(ACL_EVENT *eventp)
 	event_thr->event.blocked = 0;
 
 	if (nready < 0) {
-		if (acl_last_error() != ACL_EINTR) {
+		if (acl_last_error() != ACL_EINTR)
 			acl_msg_fatal("%s(%d), %s: event_loop: select: %s",
 				__FILE__, __LINE__, myname, acl_last_serror());
-		}
 		goto TAG_DONE;
 	} else if (nready == 0)
 		goto TAG_DONE;

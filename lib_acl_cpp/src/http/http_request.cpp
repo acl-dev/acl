@@ -48,9 +48,8 @@ http_request::http_request(socket_stream* client,
 	RESET_RANGE();
 }
 
-http_request::http_request(const char* addr,
-	int conn_timeout /* = 60 */, int rw_timeout /* = 60 */,
-	bool unzip /* = true */)
+http_request::http_request(const char* addr, int conn_timeout /* = 60 */,
+	int rw_timeout /* = 60 */, bool unzip /* = true */)
 {
 	acl_assert(addr && *addr);
 	ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
@@ -360,7 +359,8 @@ void http_request::check_range()
 	// 如果服务器返回的 range 内容与请求的不一致，则说明有错
 	else if (range_from_ != range_from)
 	{
-		logger_error("range_from(%lld) != %lld", range_from_, range_from);
+		logger_error("range_from(%lld) != %lld",
+			range_from_, range_from);
 		RESET_RANGE();
 	}
 	else if (range_to >= range_from && range_to_ != range_to)

@@ -26,7 +26,8 @@ const char* HttpSession::getAttribute(const char* name) const
 
 const void* HttpSession::getAttribute(const char* name, size_t* size) const
 {
-	const VBUF* bf = const_cast<HttpSession*> (this)->session_.get_vbuf(name);
+	const VBUF* bf = const_cast<HttpSession*>
+		(this)->session_.get_vbuf(name);
 	if (bf == NULL)
 		return NULL;
 	if (size)

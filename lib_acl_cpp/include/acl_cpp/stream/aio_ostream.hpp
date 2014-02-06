@@ -122,11 +122,7 @@ public:
 	 * 调用用户注册的回调函数
 	 * @param fmt {const char*} 格式字符串
 	 */
-#ifdef	WIN32
-	void format(const char* fmt, ...);
-#else
-	void format(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
-#endif
+	void format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
 	 * 格式化方式异步写数据，当完全写成功或出错或超时时会

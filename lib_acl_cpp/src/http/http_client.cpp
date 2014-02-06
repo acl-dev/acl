@@ -10,38 +10,36 @@ namespace acl
 {
 
 http_client::http_client(void)
-	: stream_(NULL)
-	, stream_fixed_(false)
-	, hdr_res_(NULL)
-	, res_(NULL)
-	, hdr_req_(NULL)
-	, req_(NULL)
-	, rw_timeout_(120)
-	, unzip_(true)
-	, zstream_(NULL)
-	, is_request_(true)
-	, body_finish_(false)
-	, chunked_transfer_(false)
+: stream_(NULL)
+, stream_fixed_(false)
+, hdr_res_(NULL)
+, res_(NULL)
+, hdr_req_(NULL)
+, req_(NULL)
+, rw_timeout_(120)
+, unzip_(true)
+, zstream_(NULL)
+, is_request_(true)
+, body_finish_(false)
+, chunked_transfer_(false)
 {
-
 }
 
 http_client::http_client(socket_stream* client, int rw_timeout /* = 120 */,
 	bool is_request /* = false */, bool unzip /* = true */)
-	: stream_(client)
-	, stream_fixed_(true)
-	, hdr_res_(NULL)
-	, res_(NULL)
-	, hdr_req_(NULL)
-	, req_(NULL)
-	, rw_timeout_(rw_timeout)
-	, unzip_(unzip)
-	, zstream_(NULL)
-	, is_request_(is_request)
-	, body_finish_(false)
-	, chunked_transfer_(false)
+: stream_(client)
+, stream_fixed_(true)
+, hdr_res_(NULL)
+, res_(NULL)
+, hdr_req_(NULL)
+, req_(NULL)
+, rw_timeout_(rw_timeout)
+, unzip_(unzip)
+, zstream_(NULL)
+, is_request_(is_request)
+, body_finish_(false)
+, chunked_transfer_(false)
 {
-
 }
 
 http_client::~http_client(void)
@@ -234,7 +232,8 @@ bool http_client::read_response_head(void)
 		}
 	}
 
-	const char* ptr = http_hdr_entry_value(&hdr_res_->hdr, "Content-Encoding");
+	const char* ptr = http_hdr_entry_value(&hdr_res_->hdr,
+			"Content-Encoding");
 	if (ptr && unzip_)
 	{
 		// 目前仅支持 gzip 数据的解压
@@ -529,6 +528,7 @@ int http_client::read_response_body(string& out, bool clean,
 	char  buf[8192];
 
 SKIP_GZIP_HEAD_AGAIN:  // 对于有 GZIP 头数据，可能需要重复读
+
 	int ret = (int) http_res_body_get_sync(res_, vstream, buf, sizeof(buf));
 
 	if (zstream_ == NULL)

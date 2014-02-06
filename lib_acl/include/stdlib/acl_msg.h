@@ -122,48 +122,28 @@ ACL_API void acl_msg_close(void);
  * @param fmt {const char*} 参数格式
  * @param ... 变参序列
  */
-#ifdef	WIN32
-ACL_API void acl_msg_info(const char *fmt,...);
-#else
-ACL_API void __attribute__((format(printf,1,2)))
-	acl_msg_info(const char *fmt,...);
-#endif
+ACL_API void ACL_PRINTF(1, 2) acl_msg_info(const char *fmt,...);
 
 /**
  * 警告级别日志信息记录函数
  * @param fmt {const char*} 参数格式
  * @param ... 变参序列
  */
-#ifdef	WIN32
-ACL_API void acl_msg_warn(const char *fmt,...);
-#else
-ACL_API void __attribute__((format(printf,1,2)))
-	acl_msg_warn(const char *fmt,...);
-#endif
+ACL_API void ACL_PRINTF(1, 2) acl_msg_warn(const char *fmt,...);
 
 /**
  * 错误级别日志信息记录函数
  * @param fmt {const char*} 参数格式
  * @param ... 变参序列
  */
-#ifdef	WIN32
-ACL_API void acl_msg_error(const char *fmt,...);
-#else
-ACL_API void __attribute__((format(printf,1,2)))
-	acl_msg_error(const char *fmt,...);
-#endif
+ACL_API void ACL_PRINTF(1, 2) acl_msg_error(const char *fmt,...);
 
 /**
  * 致命级别日志信息记录函数
  * @param fmt {const char*} 参数格式
  * @param ... 变参序列
  */
-#ifdef	WIN32
-ACL_API void acl_msg_fatal(const char *fmt,...);
-#else
-ACL_API void __attribute__((format(printf,1,2)))
-	acl_msg_fatal(const char *fmt,...);
-#endif
+ACL_API void ACL_PRINTF(1, 2) acl_msg_fatal(const char *fmt,...);
 
 /**
  * 致命级别日志信息记录函数
@@ -171,24 +151,15 @@ ACL_API void __attribute__((format(printf,1,2)))
  * @param fmt {const char*} 参数格式
  * @param ... 变参序列
  */
-#ifdef	WIN32
-ACL_API void acl_msg_fatal_status(int status, const char *fmt,...);
-#else
-ACL_API void __attribute__((format(printf,2,3)))
+ACL_API void ACL_PRINTF(2, 3)
 	acl_msg_fatal_status(int status, const char *fmt,...);
-#endif
 
 /**
  * 恐慌级别日志信息记录函数
  * @param fmt {const char*} 参数格式
  * @param ... 变参序列
  */
-#ifdef	WIN32
-ACL_API void acl_msg_panic(const char *fmt,...);
-#else
-ACL_API void __attribute__((format(printf,1,2)))
-	acl_msg_panic(const char *fmt,...);
-#endif
+ACL_API void ACL_PRINTF(1, 2) acl_msg_panic(const char *fmt,...);
 
 /**
  * 一般级别日志信息记录函数
@@ -298,12 +269,7 @@ ACL_API void acl_set_error(int errnum);
  * @param fmt {const char*} 格式参数
  * @param ... 变参序列
  */
-#ifdef	WIN32
-ACL_API void acl_msg_printf(const char *fmt,...);
-#else
-ACL_API void __attribute__((format(printf,1,2)))
-	acl_msg_printf(const char *fmt,...);
-#endif
+ACL_API void ACL_PRINTF(1, 2) acl_msg_printf(const char *fmt,...);
 
 #ifdef  __cplusplus
 }

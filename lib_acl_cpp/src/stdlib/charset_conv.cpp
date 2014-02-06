@@ -22,37 +22,38 @@ static const char UTF8_HEADER[] = { (char) 0xEF, (char) 0xBB, (char) 0xBF, (char
 #ifdef HAVE_H_ICONV
 # ifdef USE_WIN_ICONV
 #  include "internal/win_iconv.hpp"
-#   define __iconv_open    iconv_open
-#   define __iconv_close   iconv_close
-#   define __iconv         iconv
+#  define __iconv_open    iconv_open
+#  define __iconv_close   iconv_close
+#  define __iconv         iconv
 # elif defined(WIN32)
-   typedef iconv_t (*iconv_open_fn)(const char*, const char*);
-   typedef int     (*iconv_close_fn)(iconv_t);
-   typedef size_t  (*iconv_fn)(iconv_t, const char**, size_t*, char**, size_t*, int*);
-   typedef int     (*iconvctl_fn)(iconv_t, int, void*);
 
-   static iconv_open_fn __iconv_open = NULL;
-   static iconv_close_fn __iconv_close = NULL;
-   static iconv_fn __iconv = NULL;
-   static iconvctl_fn __iconvctl = NULL;
+typedef iconv_t (*iconv_open_fn)(const char*, const char*);
+typedef int     (*iconv_close_fn)(iconv_t);
+typedef size_t  (*iconv_fn)(iconv_t, const char**, size_t*, char**, size_t*, int*);
+typedef int     (*iconvctl_fn)(iconv_t, int, void*);
 
-   static acl_pthread_once_t __iconv_once = ACL_PTHREAD_ONCE_INIT;
-   static ACL_DLL_HANDLE __iconv_dll = NULL;
+static iconv_open_fn __iconv_open = NULL;
+static iconv_close_fn __iconv_close = NULL;
+static iconv_fn __iconv = NULL;
+static iconvctl_fn __iconvctl = NULL;
 
-   // 程序退出时释放动态加载的 iconv.dll 库
-   static void __iconv_dll_unload(void)
-   {
-	   if (__iconv_dll != NULL)
-	   {
-		   acl_dlclose(__iconv_dll);
-		   __iconv_dll = NULL;
-		   logger("iconv.dll unload ok");
-	   }
-   }
+static acl_pthread_once_t __iconv_once = ACL_PTHREAD_ONCE_INIT;
+static ACL_DLL_HANDLE __iconv_dll = NULL;
 
-   // 动态加载 iconv.dll 库
-   static void __iconv_dll_load(void)
-   {
+// 程序退出时释放动态加载的 iconv.dll 库
+static void __iconv_dll_unload(void)
+{
+	if (__iconv_dll != NULL)
+	{
+		acl_dlclose(__iconv_dll);
+		__iconv_dll = NULL;
+		logger("iconv.dll unload ok");
+	}
+}
+
+// 动态加载 iconv.dll 库
+static void __iconv_dll_load(void)
+{
 	if (__iconv_dll != NULL)
 		logger_fatal("__iconv_dll not null");
 
@@ -63,26 +64,27 @@ static const char UTF8_HEADER[] = { (char) 0xEF, (char) 0xBB, (char) 0xBF, (char
 	__iconv_open = (iconv_open_fn) acl_dlsym(__iconv_dll, "libiconv_open");
 	if (__iconv_open == NULL)
 		logger_fatal("load iconv_open from iconv.dll error: %s",
-			acl_last_serror());
+				acl_last_serror());
 
 	__iconv_close = (iconv_close_fn) acl_dlsym(__iconv_dll, "libiconv_close");
 	if (__iconv_close == NULL)
 		logger_fatal("load iconv_close from iconv.dll error: %s",
-			acl_last_serror());
+				acl_last_serror());
 
 	__iconv = (iconv_fn) acl_dlsym(__iconv_dll, "libiconv");
 	if (__iconv == NULL)
 		logger_fatal("load iconv from iconv.dll error: %s",
-			acl_last_serror());
+				acl_last_serror());
 
 	__iconvctl = (iconvctl_fn) acl_dlsym(__iconv_dll, "libiconvctl");
 	if (__iconvctl == NULL)
 		logger_fatal("load iconvctl from iconv.dll error: %s",
-			acl_last_serror());
+				acl_last_serror());
 
 	logger("iconv.dll loaded");
 	atexit(__iconv_dll_unload);
-   }
+}
+
 # else
 #  define __iconv_open    iconv_open
 #  define __iconv_close   iconv_close
@@ -96,9 +98,9 @@ namespace acl {
 #define EQ(x, y) !strcasecmp((x), (y))
 
 charset_conv::charset_conv()
-	: m_addInvalid(true)
-	, m_errmsg("ok")
-	, m_pBuf(NULL)
+: m_addInvalid(true)
+, m_errmsg("ok")
+, m_pBuf(NULL)
 {
 	m_fromCharset[0] = 0;
 	m_toCharset[0] = 0;
@@ -341,10 +343,12 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 
 #ifdef	WIN32
 # ifdef USE_WIN_ICONV
-		ret = __iconv(m_iconv, (const char**) &pIn, &nIn, &pOut, &nOut);
+		ret = __iconv(m_iconv, (const char**) &pIn, &nIn,
+				&pOut, &nOut);
 # else
 		int   err;
-		ret = __iconv(m_iconv, (const char**) &pIn, &nIn, &pOut, &nOut, &err);
+		ret = __iconv(m_iconv, (const char**) &pIn, &nIn,
+				&pOut, &nOut, &err);
 		errno = err;
 # endif // USE_WIN_ICONV
 #elif defined(ACL_SUNOS5)
@@ -381,12 +385,15 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 			// 重置状态, 似乎也没啥用处
 #ifdef	WIN32
 # ifdef USE_WIN_ICONV
-			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
+			__iconv(m_iconv, (const char**) &pNil,
+				&zero, &pNil, &zero);
 # else
-			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero, NULL);
+			__iconv(m_iconv, (const char**) &pNil,
+				&zero, &pNil, &zero, NULL);
 # endif
 #elif defined(ACL_SUNOS5)
-			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
+			__iconv(m_iconv, (const char**) &pNil,
+				&zero, &pNil, &zero);
 #else
 			__iconv(m_iconv, &pNil, &zero, &pNil, &zero);
 #endif
@@ -422,9 +429,11 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 			// 重置状态, 似乎也没啥用处
 #ifdef	WIN32
 # ifdef USE_WIN_ICONV
-			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
+			__iconv(m_iconv, (const char**) &pNil,
+				&zero, &pNil, &zero);
 # else
-			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero, NULL);
+			__iconv(m_iconv, (const char**) &pNil,
+				&zero, &pNil, &zero, NULL);
 # endif // USE_WIN_ICONV
 #elif defined(ACL_SUNOS5)
 			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);

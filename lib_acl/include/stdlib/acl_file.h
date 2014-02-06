@@ -1,6 +1,7 @@
 #ifndef	__ACL_FILE_INCLUDE_H__
 #define	__ACL_FILE_INCLUDE_H__
 
+#include "acl_define.h"
 #include "acl_vstream.h"
 #include <stdarg.h>
 
@@ -118,12 +119,7 @@ ACL_API int acl_getchar(void);
  * @param ... 变参
  * @return {size_t} 数据长度, 若出错则返回 EOF
  */
-#ifdef	WIN32
-ACL_API int acl_fprintf(ACL_FILE *fp, const char *fmt, ...);
-#else
-ACL_API int __attribute__((format(printf,2,3)))
-	acl_fprintf(ACL_FILE *fp, const char *fmt, ...);
-#endif
+ACL_API int ACL_PRINTF(2, 3) acl_fprintf(ACL_FILE *fp, const char *fmt, ...);
 
 /**
  * 向文件流中写入变参格式数据
@@ -158,12 +154,7 @@ ACL_API int acl_fputs(const char *s, ACL_FILE *fp);
  * @param ... 变参
  * @return {size_t} 数据长度, 若出错则返回 EOF
  */
-#ifdef	WIN32
-ACL_API int acl_printf(const char *fmt, ...);
-#else
-ACL_API int __attribute__((format(printf,1,2)))
-	acl_printf(const char *fmt, ...);
-#endif
+ACL_API int ACL_PRINTF(1, 2) acl_printf(const char *fmt, ...);
 
 /**
  * 向标准输出流中写入变参格式数据

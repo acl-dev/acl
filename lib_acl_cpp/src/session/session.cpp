@@ -153,7 +153,8 @@ bool session::flush()
 		}
 		else
 		{
-			logger_warn("unknown todo(%d)", (int) it_cache->second->todo);
+			logger_warn("unknown todo(%d)",
+				(int) it_cache->second->todo);
 			vbuf_free(it_cache->second);
 		}
 	}
@@ -192,7 +193,8 @@ bool session::set(const char* name, const void* value, size_t len,
 		if (it == attrs_cache_.end())
 			attrs_cache_[name] = vbuf_new(value, len, TODO_SET);
 		else
-			attrs_cache_[name] = vbuf_set(it->second, value, len, TODO_SET);
+			attrs_cache_[name] = vbuf_set(it->second, value,
+							len, TODO_SET);
 		dirty_ = true;
 		return true;
 	}
@@ -223,7 +225,8 @@ bool session::set(const char* name, const void* value, size_t len,
 		if (it == attrs_.end())
 			attrs_[name] = vbuf_new(value, len, TODO_SET);
 		else
-			attrs_[name] = vbuf_set(it->second, value, len, TODO_SET);
+			attrs_[name] = vbuf_set(it->second, value,
+						len, TODO_SET);
 		serialize(attrs_, buf);  // 序列化数据
 		attrs_clear(attrs_);
 	}
@@ -430,7 +433,8 @@ void session::deserialize(string& buf, std::map<string, VBUF*>& attrs)
 		if (it != attrs.end())
 			vbuf_free(it->second);
 		// 将从后端取得数据属性都设为 TODO_SET
-		attrs[ptr] = vbuf_new(p1, buf.length() - (p1 - buf.c_str()), TODO_SET);
+		attrs[ptr] = vbuf_new(p1, buf.length() - (p1 - buf.c_str()),
+				TODO_SET);
 	}
 
 	acl_argv_free(tokens);

@@ -37,11 +37,7 @@ public:
 	 * @return {bool} 写数据是否成功
 	 */
 	bool write(const void* data, size_t len);
-#ifdef	WIN32
-	int format(const char* fmt, ...);
-#else
-	int format(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
-#endif
+	int format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 	int vformat(const char* fmt, va_list ap);
 
 	/**

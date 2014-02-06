@@ -106,7 +106,7 @@ bool http_download::on_length(long long int)
 	return true;
 }
 
-bool http_download::get(acl_int64 range_from /* = -1 */, acl_int64 range_to /* = -1 */,
+bool http_download::get(acl_int64 from /* = -1 */, acl_int64 to /* = -1 */,
 	const char* body /* = NULL */, size_t len /* = 0 */)
 {
 	if (req_ == NULL)
@@ -114,8 +114,8 @@ bool http_download::get(acl_int64 range_from /* = -1 */, acl_int64 range_to /* =
 		logger_error("no valid url");
 		return false;
 	}
-	else if (range_from >= 0)
-		return save_range(body, len, range_from, range_to);
+	else if (from >= 0)
+		return save_range(body, len, from, to);
 	else
 		return save_total(body, len);
 }

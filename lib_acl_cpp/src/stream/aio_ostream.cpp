@@ -150,7 +150,7 @@ int aio_ostream::disable_write_callback(aio_callback* callback)
 	{
 		for (; it != write_callbacks_.end(); ++it)
 		{
-			if ((*it)->callback == NULL || (*it)->enable == false)
+			if ((*it)->callback == NULL || !(*it)->enable)
 				continue;
 			(*it)->enable = false;
 			n++;
@@ -160,7 +160,7 @@ int aio_ostream::disable_write_callback(aio_callback* callback)
 	{
 		for (; it != write_callbacks_.end(); ++it)
 		{
-			if ((*it)->callback != callback || (*it)->enable == false)
+			if ((*it)->callback != callback || !(*it)->enable)
 				continue;
 			(*it)->enable = false;
 			n++;
@@ -180,7 +180,7 @@ int aio_ostream::enable_write_callback(aio_callback* callback /* = NULL */)
 	{
 		for (; it != write_callbacks_.end(); ++it)
 		{
-			if ((*it)->enable == false && (*it)->callback != NULL)
+			if (!(*it)->enable && (*it)->callback != NULL)
 			{
 				(*it)->enable = true;
 				n++;
@@ -191,7 +191,7 @@ int aio_ostream::enable_write_callback(aio_callback* callback /* = NULL */)
 	{
 		for (; it != write_callbacks_.end(); ++it)
 		{
-			if ((*it)->enable == false && (*it)->callback == callback)
+			if (!(*it)->enable && (*it)->callback == callback)
 			{
 				(*it)->enable = true;
 				n++;

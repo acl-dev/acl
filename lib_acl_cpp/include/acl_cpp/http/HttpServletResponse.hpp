@@ -168,11 +168,7 @@ public:
 	 * @param fmt {const char*} 变参格式字符串
 	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
 	 */
-#ifdef	WIN32
-	bool format(const char* fmt, ...);
-#else
-	bool format(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
-#endif
+	bool format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
 	 * 带格式方式向 HTTP 客户端发送响应数据，内部自动调用

@@ -1,6 +1,16 @@
 修改历史列表：
 ------------------------------------------------------------------------
 
+423) 2014.2.6
+423.1) feature: 针对 gcc 或 vc 编译器，增加了一些编译属性开关
+
+422) 2014.2.3
+422.1) performance: events_kernel_thr.c 在调用 event_loop 循环过程中调用
+event_thr_prepare 时，增加了检测时间间隔，这样在高并发条件下可以有效地减少
+CPU 轮循的损耗
+422.2) feature: 增加了 events_epoll_r.c，从而将 epoll 的调用方式从
+events_kernel_thr.c 中剥离，以便于专门针对 epoll 方式进行优化
+
 421) 2014.1.25
 421.1) workaround: 去掉了 acl_threads_server.c, acl_ioctl_server.c, 
 acl_aio_server.c, acl_udp_server.c 中无用的监视狗(watchdog) 及文件互斥锁

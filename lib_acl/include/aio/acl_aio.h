@@ -662,12 +662,7 @@ ACL_API void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
  * @param fmt {const char*} 格式字符串
  * @param ... 变参参数表
  */
-#ifdef	WIN32
-ACL_API void acl_aio_fprintf(ACL_ASTREAM *astream, const char *fmt, ...);
-#else
-ACL_API void __attribute__((format(printf,2,3)))
-	acl_aio_fprintf(ACL_ASTREAM *astream, const char *fmt, ...);
-#endif
+ACL_API void ACL_PRINTF(2, 3) acl_aio_fprintf(ACL_ASTREAM *astream, const char *fmt, ...);
 
 /**
  * 设置异步流为写监听状态，当该流可写时则调用用户的回调函数

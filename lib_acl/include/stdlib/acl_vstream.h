@@ -565,12 +565,8 @@ ACL_API int acl_vstream_buffed_vfprintf(ACL_VSTREAM *fp, const char *fmt, va_lis
  * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示写出错, 应该关闭本地数据流,
  *  ret > 0:  表示成功写了 dlen 个字节的数据
  */
-#ifdef	WIN32
-ACL_API int acl_vstream_buffed_fprintf(ACL_VSTREAM *fp, const char *fmt, ...);
-#else
-ACL_API int __attribute__((format(printf,2,3)))
-	acl_vstream_buffed_fprintf(ACL_VSTREAM *fp, const char *fmt, ...);
-#endif
+ACL_API int ACL_PRINTF(2, 3) acl_vstream_buffed_fprintf(ACL_VSTREAM *fp,
+	const char *fmt, ...);
 
 /**
  * 向标准输出打印信息
@@ -641,12 +637,8 @@ ACL_API int acl_vstream_vfprintf(ACL_VSTREAM *fp, const char *fmt, va_list ap);
  * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示写出错, 应该关闭本地数据流,
  *  ret > 0:  表示成功写了 dlen 个字节的数据
  */
-#ifdef	WIN32
-ACL_API int acl_vstream_fprintf(ACL_VSTREAM *fp, const char *fmt, ...);
-#else
-ACL_API int __attribute__((format(printf,2,3)))
-	acl_vstream_fprintf(ACL_VSTREAM *fp, const char *fmt, ...);
-#endif
+ACL_API int ACL_PRINTF(2, 3) acl_vstream_fprintf(ACL_VSTREAM *fp,
+	const char *fmt, ...);
 
 /**
  * 向标准输出打印信息

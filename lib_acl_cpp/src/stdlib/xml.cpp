@@ -328,16 +328,18 @@ const std::vector<xml_node*>& xml::getElementsByTagName(const char* tag) const
 	const_cast<xml*>(this)->clear();
 
 	ACL_ARRAY* a = acl_xml_getElementsByTagName(xml_, tag);
-	if (a != NULL) {
-		ACL_ITER iter;
-		acl_foreach(iter, a)
-		{
-			ACL_XML_NODE *tmp = (ACL_XML_NODE*) iter.data;
-			xml_node* node = NEW xml_node(tmp, const_cast<xml*>(this));
-			const_cast<xml*>(this)->elements_.push_back(node);
-		}
-		acl_xml_free_array(a);
+	if (a == NULL)
+		return elements_;
+
+	ACL_ITER iter;
+	acl_foreach(iter, a)
+	{
+		ACL_XML_NODE *tmp = (ACL_XML_NODE*) iter.data;
+		xml_node* node = NEW xml_node(tmp, const_cast<xml*>(this));
+		const_cast<xml*>(this)->elements_.push_back(node);
 	}
+	acl_xml_free_array(a);
+
 	return elements_;
 }
 
@@ -355,6 +357,7 @@ const xml_node* xml::getFirstElementByTag(const char* tag) const
 	else
 		const_cast<xml*>(this)->node_->set_xml_node(node);
 	acl_xml_free_array(a);
+
 	return node_;
 }
 
@@ -363,16 +366,18 @@ const std::vector<xml_node*>& xml::getElementsByTags(const char* tags) const
 	const_cast<xml*>(this)->clear();
 
 	ACL_ARRAY* a = acl_xml_getElementsByTags(xml_, tags);
-	if (a != NULL) {
-		ACL_ITER iter;
-		acl_foreach(iter, a)
-		{
-			ACL_XML_NODE *tmp = (ACL_XML_NODE*) iter.data;
-			xml_node* node = NEW xml_node(tmp, const_cast<xml*>(this));
-			const_cast<xml*>(this)->elements_.push_back(node);
-		}
-		acl_xml_free_array(a);
+	if (a == NULL)
+		return elements_;
+
+	ACL_ITER iter;
+	acl_foreach(iter, a)
+	{
+		ACL_XML_NODE *tmp = (ACL_XML_NODE*) iter.data;
+		xml_node* node = NEW xml_node(tmp, const_cast<xml*>(this));
+		const_cast<xml*>(this)->elements_.push_back(node);
 	}
+	acl_xml_free_array(a);
+
 	return elements_;
 }
 
@@ -390,6 +395,7 @@ const xml_node* xml::getFirstElementByTags(const char* tags) const
 	else
 		const_cast<xml*>(this)->node_->set_xml_node(node);
 	acl_xml_free_array(a);
+
 	return node_;
 }
 
@@ -397,16 +403,18 @@ const std::vector<xml_node*>& xml::getElementsByName(const char* value) const
 {
 	const_cast<xml*>(this)->clear();
 	ACL_ARRAY* a = acl_xml_getElementsByName(xml_, value);
-	if (a != NULL) {
-		ACL_ITER iter;
-		acl_foreach(iter, a)
-		{
-			ACL_XML_NODE *tmp = (ACL_XML_NODE*) iter.data;
-			xml_node* node = NEW xml_node(tmp, const_cast<xml*>(this));
-			const_cast<xml*>(this)->elements_.push_back(node);
-		}
-		acl_xml_free_array(a);
+	if (a == NULL)
+		return elements_;
+
+	ACL_ITER iter;
+	acl_foreach(iter, a)
+	{
+		ACL_XML_NODE *tmp = (ACL_XML_NODE*) iter.data;
+		xml_node* node = NEW xml_node(tmp, const_cast<xml*>(this));
+		const_cast<xml*>(this)->elements_.push_back(node);
 	}
+	acl_xml_free_array(a);
+
 	return elements_;
 }
 
@@ -415,16 +423,18 @@ const std::vector<xml_node*>& xml::getElementsByAttr(
 {
 	const_cast<xml*>(this)->clear();
 	ACL_ARRAY *a = acl_xml_getElementsByAttr(xml_, name, value);
-	if (a != NULL) {
-		ACL_ITER iter;
-		acl_foreach(iter, a)
-		{
-			ACL_XML_NODE *tmp = (ACL_XML_NODE*) iter.data;
-			xml_node* node = NEW xml_node(tmp, const_cast<xml*>(this));
-			const_cast<xml*>(this)->elements_.push_back(node);
-		}
-		acl_xml_free_array(a);
+	if (a == NULL)
+		return elements_;
+
+	ACL_ITER iter;
+	acl_foreach(iter, a)
+	{
+		ACL_XML_NODE *tmp = (ACL_XML_NODE*) iter.data;
+		xml_node* node = NEW xml_node(tmp, const_cast<xml*>(this));
+		const_cast<xml*>(this)->elements_.push_back(node);
 	}
+	acl_xml_free_array(a);
+
 	return elements_;
 }
 

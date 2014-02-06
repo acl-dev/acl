@@ -144,7 +144,7 @@ int aio_socket_stream::disable_open_callback(aio_open_callback* callback /* = NU
 	{
 		for (; it != open_callbacks_.end(); ++it)
 		{
-			if ((*it)->callback == NULL || (*it)->enable == false)
+			if ((*it)->callback == NULL || !(*it)->enable)
 				continue;
 			(*it)->enable = false;
 			n++;
@@ -154,7 +154,7 @@ int aio_socket_stream::disable_open_callback(aio_open_callback* callback /* = NU
 	{
 		for (; it != open_callbacks_.end(); ++it)
 		{
-			if ((*it)->callback != callback || (*it)->enable == false)
+			if ((*it)->callback != callback || !(*it)->enable)
 				continue;
 			(*it)->enable = false;
 			n++;
@@ -174,7 +174,7 @@ int aio_socket_stream::enable_open_callback(aio_open_callback* callback /* = NUL
 	{
 		for (; it != open_callbacks_.end(); ++it)
 		{
-			if ((*it)->enable == false && (*it)->callback != NULL)
+			if (!(*it)->enable && (*it)->callback != NULL)
 			{
 				(*it)->enable = true;
 				n++;
@@ -185,7 +185,7 @@ int aio_socket_stream::enable_open_callback(aio_open_callback* callback /* = NUL
 	{
 		for (; it != open_callbacks_.end(); ++it)
 		{
-			if ((*it)->enable == false && (*it)->callback == callback)
+			if (!(*it)->enable && (*it)->callback == callback)
 			{
 				(*it)->enable = true;
 				n++;
@@ -249,10 +249,11 @@ int aio_socket_stream::open_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 	ss->hook_write();
 
 	// 遍历所有的打开回调对象，并调用之
-	std::list<AIO_OPEN_CALLBACK*>::iterator it = ss->open_callbacks_.begin();
+	std::list<AIO_OPEN_CALLBACK*>::iterator it =
+		ss->open_callbacks_.begin();
 	for (; it != ss->open_callbacks_.end(); ++it)
 	{
-		if ((*it)->enable == false || (*it)->callback == NULL)
+		if (!(*it)->enable || (*it)->callback == NULL)
 			continue;
 
 		if ((*it)->callback->open_callback() == false)

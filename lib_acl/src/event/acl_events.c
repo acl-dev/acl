@@ -186,7 +186,11 @@ ACL_EVENT *acl_event_new_kernel_thr(int delay_sec, int delay_usec)
 	int   fdsize;
 
 	fdsize = event_limit(0);
+#if (ACL_EVENTS_KERNEL_STYLE == ACL_EVENTS_STYLE_EPOLL)
+	eventp = event_epoll_alloc_r(fdsize);
+#else
 	eventp = event_new_kernel_thr(fdsize);
+#endif
 	event_init(eventp, fdsize, delay_sec, delay_usec);
 	return (eventp);
 #else

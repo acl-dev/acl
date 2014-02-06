@@ -19,18 +19,27 @@ static void test(void)
 	printf("strip: '\t !', before strip: %s, ", s1.c_str());
 	s1.strip("\t !", true);
 	printf("after strip: %s\r\n", s1.c_str());
+	acl_assert(s1 == "helloworld,You'rewelcome");
 
-	s1 = ("hello world, You're welcome!");
+	s1 = "hello world, You're welcome!";
 	s1.strip(":", true);
 	printf(">>s1: %s\n", s1.c_str());
+	acl_assert(s1 == "hello world, You're welcome!");
 
-	s1 = ("hello world, You're welcome!");
+	s1 = "hello world, You're welcome!";
+	s1.strip("he", true);
+	printf(">>s1: %s\n", s1.c_str());
+	acl_assert(s1 == "llo world, You'r wlcom!");
+
+	s1 = "hello world, You're welcome!";
 	s1.strip("he");
 	printf(">>s1: %s\n", s1.c_str());
+	acl_assert(s1 == "llo world, You're welcome!");
 
-	s1 = ("hello world, You're welcome!");
-	s1.strip("he ");
+	s1 = "hello world, You're welcome!";
+	s1.strip("he ", true);
 	printf(">>s1: %s\n", s1.c_str());
+	acl_assert(s1 == "lloworld,You'rwlcom!");
 }
 
 static void test2(void)

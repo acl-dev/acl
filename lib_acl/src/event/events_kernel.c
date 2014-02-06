@@ -46,7 +46,6 @@ typedef struct EVENT_KERNEL {
 	ACL_RING fdp_delay_list;
 	int   event_fdslots;
 	int   event_fd;
-	time_t last_check;
 #ifdef	USE_FDMAP
 	ACL_FD_MAP *fdmap;
 #endif
@@ -593,8 +592,8 @@ static void event_set_all(ACL_EVENT *eventp)
 
 	eventp->fdcnt_ready = 0;
 
-	if (eventp->event_present - ev->last_check >= 1000000) {
-		ev->last_check = eventp->event_present;
+	if (eventp->event_present - eventp->last_check >= 100000) {
+		eventp->last_check = eventp->event_present;
 		event_check_fds(eventp);
 	}
 

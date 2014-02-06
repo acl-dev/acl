@@ -199,7 +199,8 @@ ACL_API ACL_VSTRING *acl_vstring_insert(ACL_VSTRING *vp, size_t start,
  * @param len {size_t} 数据长度
  * @return {ACL_VSTRING*} 与 vp 相同
  */
-ACL_API ACL_VSTRING *acl_vstring_prepend(ACL_VSTRING *vp, const char *buf, size_t len);
+ACL_API ACL_VSTRING *acl_vstring_prepend(ACL_VSTRING *vp,
+	const char *buf, size_t len);
 
 /**
  * 向缓冲区按格式方式添加数据
@@ -208,12 +209,8 @@ ACL_API ACL_VSTRING *acl_vstring_prepend(ACL_VSTRING *vp, const char *buf, size_
  * @param ... 变参序列
  * @return {ACL_VSTRING*} 与 vp 相同
  */
-#ifdef	WIN32
-ACL_API ACL_VSTRING *acl_vstring_sprintf(ACL_VSTRING *vp, const char *format,...);
-#else
-ACL_API ACL_VSTRING *__attribute__((format(printf,2,3)))
-	acl_vstring_sprintf(ACL_VSTRING *vp, const char *format,...);
-#endif
+ACL_API ACL_VSTRING *ACL_PRINTF(2, 3) acl_vstring_sprintf(ACL_VSTRING *vp,
+	const char *format,...);
 
 /**
  * 以附加方式向缓冲区按格式方式添加数据
@@ -222,12 +219,8 @@ ACL_API ACL_VSTRING *__attribute__((format(printf,2,3)))
  * @param ... 变参序列
  * @return {ACL_VSTRING*} 与 vp 相同
  */
-#ifdef	WIN32
-ACL_API ACL_VSTRING *acl_vstring_sprintf_append(ACL_VSTRING *vp, const char *format,...);
-#else
-ACL_API ACL_VSTRING *__attribute__((format(printf,2,3)))
-	acl_vstring_sprintf_append(ACL_VSTRING *vp, const char *format,...);
-#endif
+ACL_API ACL_VSTRING *ACL_PRINTF(2, 3) acl_vstring_sprintf_append(
+	ACL_VSTRING *vp, const char *format,...);
 
 /**
  * 导出缓冲区内的数据区同时将 ACL_VSTRING 对象释放，用户需要单独调用 acl_myfree 来
@@ -290,12 +283,8 @@ ACL_API ACL_VSTRING *acl_vstring_vsprintf_append(ACL_VSTRING *vp, const char *fo
  * @param ... 变参序列
  * @return {ACL_VSTRING*} 与 vp 相同
  */
-#ifdef	WIN32
-ACL_API ACL_VSTRING *acl_vstring_sprintf_prepend(ACL_VSTRING *vp, const char *format, ...);
-#else
-ACL_API ACL_VSTRING *__attribute__((format(printf,2,3)))
-	acl_vstring_sprintf_prepend(ACL_VSTRING *vp, const char *format, ...);
-#endif
+ACL_API ACL_VSTRING *ACL_PRINTF(2, 3) acl_vstring_sprintf_prepend(
+	ACL_VSTRING *vp, const char *format, ...);
 
 /**
  * 从源串中获得一行数据(不含 "\r\n" 和 "\n")，同时将剩余数据缓存起来, 如果未获得完整行，则只缓存源串

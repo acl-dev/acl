@@ -65,12 +65,7 @@ ACL_API int acl_open_log(const char *recipients, const char *plog_pre);
  * @param ... 参数序列
  * @return {int} 写入日志文件的数据量
  */
-#ifdef	WIN32
-ACL_API int acl_write_to_log(const char *fmt, ...);
-#else
-ACL_API int __attribute__((format(printf,1,2)))
-	acl_write_to_log(const char *fmt, ...);
-#endif
+ACL_API int ACL_PRINTF(1, 2) acl_write_to_log(const char *fmt, ...);
 
 /**
  * 写日志

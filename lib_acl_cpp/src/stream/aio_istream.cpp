@@ -26,9 +26,9 @@ void aio_timer_reader::timer_callback(unsigned int id acl_unused)
 //////////////////////////////////////////////////////////////////////
 
 aio_istream::aio_istream(aio_handle* handle)
-	: aio_stream(handle)
-	, timer_reader_(NULL)
-	, read_hooked_(false)
+: aio_stream(handle)
+, timer_reader_(NULL)
+, read_hooked_(false)
 {
 
 }
@@ -131,7 +131,7 @@ int aio_istream::disable_read_callback(aio_callback* callback)
 	{
 		for (; it != read_callbacks_.end(); ++it)
 		{
-			if ((*it)->callback == NULL || (*it)->enable == false)
+			if ((*it)->callback == NULL || !(*it)->enable)
 				continue;
 			(*it)->enable = false;
 			n++;
@@ -141,7 +141,7 @@ int aio_istream::disable_read_callback(aio_callback* callback)
 	{
 		for (; it != read_callbacks_.end(); ++it)
 		{
-			if ((*it)->callback != callback || (*it)->enable == false)
+			if ((*it)->callback != callback || !(*it)->enable)
 				continue;
 			(*it)->enable = false;
 			n++;
@@ -161,7 +161,7 @@ int aio_istream::enable_read_callback(aio_callback* callback /* = NULL */)
 	{
 		for (; it != read_callbacks_.end(); ++it)
 		{
-			if ((*it)->enable == false && (*it)->callback != NULL)
+			if (!(*it)->enable && (*it)->callback != NULL)
 			{
 				(*it)->enable = true;
 				n++;
@@ -172,7 +172,7 @@ int aio_istream::enable_read_callback(aio_callback* callback /* = NULL */)
 	{
 		for (; it != read_callbacks_.end(); ++it)
 		{
-			if ((*it)->enable == false && (*it)->callback == callback)
+			if (!(*it)->enable && (*it)->callback == callback)
 			{
 				(*it)->enable = true;
 				n++;

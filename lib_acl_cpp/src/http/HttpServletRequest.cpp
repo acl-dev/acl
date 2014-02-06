@@ -226,31 +226,32 @@ const char* HttpServletRequest::getRequestUri(void) const
 HttpSession& HttpServletRequest::getSession(bool create /* = true */,
 	const char* sid_in /* = NULL */)
 {
-	if (http_session_ == NULL)
+	if (http_session_ != NULL)
+		return *http_session_;
+
+	http_session_ = NEW HttpSession(store_);
+	const char* sid;
+
+	if ((sid = getCookieValue(cookie_name_)) != NULL)
+		store_.set_sid(sid);
+	else if (create)
 	{
-		http_session_ = NEW HttpSession(store_);
-		const char* sid;
-		
-		if ((sid = getCookieValue(cookie_name_)) != NULL)
-			store_.set_sid(sid);
-		else if (create)
-		{
-			// 获得唯一 ID 标识符
-			sid = store_.get_sid();
-			// 生成 cookie 对象，并分别向请求对象和响应对象添加 cookie
-			HttpCookie* cookie = NEW HttpCookie(cookie_name_, sid);
-			res_.addCookie(cookie);
-			setCookie(cookie_name_, sid);
-		}
-		else if (sid_in != NULL && *sid_in != 0)
-		{
-			store_.set_sid(sid_in);
-			// 生成 cookie 对象，并分别向请求对象和响应对象添加 cookie
-			HttpCookie* cookie = NEW HttpCookie(cookie_name_, sid_in);
-			res_.addCookie(cookie);
-			setCookie(cookie_name_, sid_in);
-		}
+		// 获得唯一 ID 标识符
+		sid = store_.get_sid();
+		// 生成 cookie 对象，并分别向请求对象和响应对象添加 cookie
+		HttpCookie* cookie = NEW HttpCookie(cookie_name_, sid);
+		res_.addCookie(cookie);
+		setCookie(cookie_name_, sid);
 	}
+	else if (sid_in != NULL && *sid_in != 0)
+	{
+		store_.set_sid(sid_in);
+		// 生成 cookie 对象，并分别向请求对象和响应对象添加 cookie
+		HttpCookie* cookie = NEW HttpCookie(cookie_name_, sid_in);
+		res_.addCookie(cookie);
+		setCookie(cookie_name_, sid_in);
+	}
+
 	return *http_session_;
 }
 

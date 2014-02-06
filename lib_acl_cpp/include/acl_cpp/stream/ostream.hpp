@@ -57,11 +57,7 @@ public:
 	 * @param fmt {const char*} 变参格式字符串
 	 * @return {int} 真实写入的数据长度，返回 -1 表示出错
 	 */
-#ifdef	WIN32
-	int format(const char* fmt, ...);
-#else
-	int format(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
-#endif
+	int format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
 	 * 写入一个 64 位整数

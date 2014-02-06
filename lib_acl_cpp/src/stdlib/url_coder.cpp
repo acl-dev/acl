@@ -135,7 +135,8 @@ url_coder& url_coder::set(const char* name, const char* value,
 	return *this;
 }
 
-url_coder& url_coder::set(const char* name, int value, bool override /* = true */)
+url_coder& url_coder::set(const char* name, int value,
+	bool override /* = true */)
 {
 	char buf[24];
 

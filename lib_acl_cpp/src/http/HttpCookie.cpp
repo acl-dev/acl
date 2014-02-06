@@ -209,7 +209,7 @@ int HttpCookie::getMaxAge(void) const
 }
 
 const char* HttpCookie::getParam(const char* name,
-				 bool case_insensitive /* = true */) const
+	bool case_insensitive /* = true */) const
 {
 	std::list<HTTP_PARAM*>::const_iterator cit = params_.begin();
 	for (; cit != params_.end(); ++cit)

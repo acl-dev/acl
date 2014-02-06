@@ -78,6 +78,7 @@ struct	ACL_EVENT {
 	int	nested;
 	/* 当前时间截(微秒级) */
 	acl_int64 event_present;
+	acl_int64 last_check;
 	acl_int64 event_last_debug;
 	/* 事件引擎的最大等待时间(秒) */
 	int	delay_sec;
@@ -226,7 +227,13 @@ ACL_EVENT *event_new_poll_thr(int fdsize);
 ACL_EVENT *event_new_kernel(int fdsize);
 
 /* in events_kernel_thr.c */
+#ifdef	ACL_EVENTS_KERNEL_STYLE
 ACL_EVENT *event_new_kernel_thr(int fdsize);
+#endif
+
+#if (ACL_EVENTS_KERNEL_STYLE == ACL_EVENTS_STYLE_EPOLL)
+ACL_EVENT *event_epoll_alloc_r(int fdsize);
+#endif
 
 struct ACL_EVENT_TIMER {
 	acl_int64  when;                /* when event is wanted */

@@ -5,9 +5,11 @@ static acl_pthread_mutex_t __mutex;
 static int  __n = 0;
 static void run_thread(void *arg acl_unused)
 {
+	/*
 	acl_pthread_mutex_lock(&__mutex);
 	__n++;
 	acl_pthread_mutex_unlock(&__mutex);
+	*/
 }
 
 static void test_thread_pool(int nthreads, int timeout, int nloop)
