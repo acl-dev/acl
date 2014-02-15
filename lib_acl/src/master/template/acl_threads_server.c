@@ -79,6 +79,8 @@ int   acl_var_threads_enable_core;
 int   acl_var_threads_max_debug;
 int   acl_var_threads_status_notify;
 int   acl_var_threads_batadd;
+int   acl_var_threads_schedule_warn;
+int   acl_var_threads_schedule_wait;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_THREADS_BUF_SIZE, ACL_DEF_THREADS_BUF_SIZE, &acl_var_threads_buf_size, 0, 0 },
@@ -99,6 +101,8 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_THREADS_MAX_DEBUG, ACL_DEF_THREADS_MAX_DEBUG, &acl_var_threads_max_debug, 0, 0 },
 	{ ACL_VAR_THREADS_STATUS_NOTIFY, ACL_DEF_THREADS_STATUS_NOTIFY, &acl_var_threads_status_notify, 0, 0 },
 	{ ACL_VAR_THREADS_BATADD, ACL_DEF_THREADS_BATADD, &acl_var_threads_batadd, 0, 0 },
+	{ ACL_VAR_THREADS_SCHEDULE_WARN, ACL_DEF_THREADS_SCHEDULE_WARN, &acl_var_threads_schedule_warn, 0, 0 },
+	{ ACL_VAR_THREADS_SCHEDULE_WAIT, ACL_DEF_THREADS_SCHEDULE_WAIT, &acl_var_threads_schedule_wait, 0, 0 },
 
         { 0, 0, 0, 0, 0 },
 };
@@ -768,6 +772,13 @@ static acl_pthread_pool_t *threads_create(ACL_APP_THREAD_ON_INIT init_fn,
 
 	threads = acl_thread_pool_create(acl_var_threads_pool_limit,
 			acl_var_threads_thread_idle);
+
+	if (acl_var_threads_schedule_warn > 0)
+		acl_pthread_pool_set_schedule_warn(threads,
+			acl_var_threads_schedule_warn);
+	if (acl_var_threads_schedule_wait > 0)
+		acl_pthread_pool_set_schedule_wait(threads,
+			acl_var_threads_schedule_wait);
 
 	if (acl_var_threads_thread_stacksize > 0)
 		acl_pthread_pool_set_stacksize(threads,

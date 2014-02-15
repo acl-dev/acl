@@ -30,14 +30,16 @@ static void vstring_extend(ACL_VBUF *bp, int incr)
 	 * Note: vp->vbuf.len is the current buffer size (both on entry and on
 	 * exit of this routine). We round up the increment size to the buffer
 	 * size to avoid silly little buffer increments. With really large
-	 * strings we might want to abandon the length doubling strategy, and go
-	 * to fixed increments.
+	 * strings we might want to abandon the length doubling strategy,
+	 * and go to fixed increments.
 	 */
 	new_len = bp->len + (bp->len > incr ? bp->len : incr);
 	/*
-	 * bp->data = (unsigned char *) acl_myrealloc((char *) bp->data, new_len);
+	 * bp->data = (unsigned char *) acl_myrealloc((char *) bp->data,
+	 * 	new_len);
 	 */
-	bp->data = acl_allocator_membuf_alloc(__FILE__, __LINE__, __var_allocator, new_len);
+	bp->data = acl_allocator_membuf_alloc(__FILE__, __LINE__,
+		__var_allocator, new_len);
 	bp->len = new_len;
 	bp->ptr = bp->data + used;
 	bp->cnt = bp->len - used;
@@ -71,7 +73,8 @@ static void after_alloc_fn(void *obj, void *pool_ctx acl_unused)
 	ACL_VSTRING *vp = (ACL_VSTRING *) obj;
 	char *buf;
 
-	buf = acl_allocator_membuf_alloc(__FILE__, __LINE__, __var_allocator, __len);
+	buf = acl_allocator_membuf_alloc(__FILE__, __LINE__,
+		__var_allocator, __len);
 	acl_vstring_glue(vp, buf, __len);
 	vp->vbuf.get_ready = vstring_buf_get_ready;
 	vp->vbuf.put_ready = vstring_buf_put_ready;
@@ -82,7 +85,8 @@ static void before_free_fn(void *obj, void *pool_ctx acl_unused)
 {
 	ACL_VSTRING *vp = (ACL_VSTRING *) obj;
 
-	acl_allocator_membuf_free(__FILE__, __LINE__, __var_allocator, vp->vbuf.data);
+	acl_allocator_membuf_free(__FILE__, __LINE__,
+		__var_allocator, vp->vbuf.data);
 	vp->vbuf.data = NULL;
 }
 

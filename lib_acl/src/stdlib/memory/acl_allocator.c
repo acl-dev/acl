@@ -17,12 +17,13 @@
 #include "squid_allocator.h"
 #include "allocator.h"
 
-static size_t __min_gross_size = 8;			/* 8 byte */
+static size_t __min_gross_size = 8;		/* 8 byte */
 static size_t __max_gross_size = 1048576;	/* 1MB */
 
 #define CHECK_TYPE(_type) do { \
 	if (_type >= ACL_MEM_TYPE_MAX) \
-		acl_msg_fatal("%s: type(%d) > ACL_MEM_TYPE_MAX(%d)", myname, _type, ACL_MEM_TYPE_MAX); \
+		acl_msg_fatal("%s: type(%d) > ACL_MEM_TYPE_MAX(%d)", \
+			myname, _type, ACL_MEM_TYPE_MAX); \
 } while (0)
 
 static ACL_MEM_POOL *pool_create(void)
@@ -31,7 +32,7 @@ static ACL_MEM_POOL *pool_create(void)
 
 	acl_msg_fatal("%s: not supported!", myname);
 
-	return (NULL);
+	return NULL;
 }
 
 static void pool_destroy(ACL_MEM_POOL * pool acl_unused)
@@ -54,7 +55,7 @@ static void *mem_alloc(ACL_ALLOCATOR *allocator acl_unused,
 	const char *myname = "mem_alloc";
 
 	acl_msg_fatal("%s: not supported!", myname);
-	return (NULL);
+	return NULL;
 }
 
 static void mem_free(ACL_ALLOCATOR *allocator acl_unused,
@@ -70,7 +71,7 @@ static int pool_ifused(const ACL_MEM_POOL *pool acl_unused)
 	const char *myname = "pool_ifused";
 
 	acl_msg_fatal("%s: not supported!", myname);
-	return (0);
+	return 0;
 }
 
 static int pool_inuse_count(const ACL_MEM_POOL *pool acl_unused)
@@ -78,7 +79,7 @@ static int pool_inuse_count(const ACL_MEM_POOL *pool acl_unused)
 	const char *myname = "pool_inuse_count";
 
 	acl_msg_fatal("%s: not supported!", myname);
-	return (0);
+	return 0;
 }
 
 static size_t pool_inuse_size(const ACL_MEM_POOL *pool acl_unused)
@@ -86,7 +87,7 @@ static size_t pool_inuse_size(const ACL_MEM_POOL *pool acl_unused)
 	const char *myname = "pool_inuse_size";
 
 	acl_msg_fatal("%s: not supported!", myname);
-	return (0);
+	return 0;
 }
 
 static size_t pool_total_allocated(ACL_ALLOCATOR *pool acl_unused)
@@ -94,14 +95,15 @@ static size_t pool_total_allocated(ACL_ALLOCATOR *pool acl_unused)
 	const char *myname = "pool_total_allocated";
 
 	acl_msg_fatal("%s: not supported!", myname);
-	return (0);
+	return 0;
 }
 
 ACL_ALLOCATOR *allocator_alloc(size_t size)
 {
 	ACL_ALLOCATOR *allocator;
 
-	allocator = (ACL_ALLOCATOR *) acl_default_calloc(__FILE__, __LINE__, 1, size);
+	allocator = (ACL_ALLOCATOR *) acl_default_calloc(__FILE__, __LINE__,
+			1, size);
 	allocator->pools = acl_stack_create(100);
 
 	allocator->pool_create_fn = pool_create;
@@ -116,7 +118,7 @@ ACL_ALLOCATOR *allocator_alloc(size_t size)
 	allocator->mem_alloc_fn = mem_alloc;
 	allocator->mem_free_fn = mem_free;
 
-	return (allocator);
+	return allocator;
 }
 
 ACL_ALLOCATOR *acl_allocator_create(size_t mem_limit)
@@ -131,7 +133,7 @@ ACL_ALLOCATOR *acl_allocator_create(size_t mem_limit)
 	mem_pool_create(allocator);
 	vstring_pool_create(allocator);
 
-	return (allocator);
+	return allocator;
 }
 
 void acl_allocator_ctl(int name, ...)
@@ -178,12 +180,9 @@ void acl_allocator_free(ACL_ALLOCATOR *allocator)
 }
 
 ACL_MEM_POOL *acl_allocator_pool_add(ACL_ALLOCATOR *allocator,
-					  const char *label,
-					  size_t obj_size,
-					  acl_mem_type type,
-					  void (*after_alloc_fn)(void *obj, void *pool_ctx),
-					  void (*before_free_fn)(void *obj, void *pool_ctx),
-					  void *pool_ctx)
+	const char *label, size_t obj_size, acl_mem_type type,
+	void (*after_alloc_fn)(void *obj, void *pool_ctx),
+	void (*before_free_fn)(void *obj, void *pool_ctx), void *pool_ctx)
 {
 	const char *myname = "acl_allocator_pool_add";
 	ACL_MEM_POOL *pool;
@@ -205,7 +204,7 @@ ACL_MEM_POOL *acl_allocator_pool_add(ACL_ALLOCATOR *allocator,
 	allocator->MemPools[type] = pool;
 	acl_stack_append(allocator->pools, pool);
 
-	return (pool);
+	return pool;
 }
 
 void acl_allocator_pool_remove(ACL_ALLOCATOR *allocator, ACL_MEM_POOL *pool)
@@ -236,10 +235,11 @@ void *acl_allocator_mem_alloc(ACL_ALLOCATOR *allocator, acl_mem_type type)
 	CHECK_TYPE(type);
 	
 	pool = allocator->MemPools[type];
-	return (allocator->mem_alloc_fn(allocator, pool));
+	return allocator->mem_alloc_fn(allocator, pool);
 }
 
-void acl_allocator_mem_free(ACL_ALLOCATOR *allocator, acl_mem_type type, void *obj)
+void acl_allocator_mem_free(ACL_ALLOCATOR *allocator,
+	acl_mem_type type, void *obj)
 {
 	const char *myname = "acl_allocator_mem_free";
 	ACL_MEM_POOL *pool;
@@ -332,18 +332,18 @@ void *acl_allocator_membuf_alloc(const char *filename, int line,
 	size_t gross_size;
 	acl_mem_type type = memBufFindSizeType(size, &gross_size);
 
-	if (type != ACL_MEM_TYPE_NONE) {
-		return (acl_allocator_mem_alloc(allocator, type));
-	} else {
-		return (acl_default_malloc(filename, line, size));
-	}
+	if (type != ACL_MEM_TYPE_NONE)
+		return acl_allocator_mem_alloc(allocator, type);
+	else
+		return acl_default_malloc(filename, line, size);
 }
 
 void *acl_allocator_membuf_realloc(const char *filename, int line,
 	ACL_ALLOCATOR *allocator, void *oldbuf, size_t size)
 {
 	/* XXX This can be optimized on very large buffers to use realloc() */
-	void *newbuf = acl_allocator_membuf_alloc(filename, line, allocator, size);
+	void *newbuf = acl_allocator_membuf_alloc(filename, line,
+			allocator, size);
 
 	if (oldbuf) {
 		size_t data_size;
@@ -375,7 +375,7 @@ int acl_allocator_pool_ifused(ACL_ALLOCATOR *allocator, acl_mem_type type)
 	const char *myname = "acl_allocator_pool_ifused";
 
 	CHECK_TYPE(type);
-	return (allocator->pool_if_used(allocator->MemPools[type]));
+	return allocator->pool_if_used(allocator->MemPools[type]);
 }
 
 int acl_allocator_pool_inuse_count(ACL_ALLOCATOR *allocator, acl_mem_type type)
@@ -383,7 +383,7 @@ int acl_allocator_pool_inuse_count(ACL_ALLOCATOR *allocator, acl_mem_type type)
 	const char *myname = "acl_allocator_pool_inuse_count";
 
 	CHECK_TYPE(type);
-	return (allocator->pool_inuse_count(allocator->MemPools[type]));
+	return allocator->pool_inuse_count(allocator->MemPools[type]);
 }
 
 int acl_allocator_pool_inuse_size(ACL_ALLOCATOR *allocator, acl_mem_type type)
@@ -391,10 +391,10 @@ int acl_allocator_pool_inuse_size(ACL_ALLOCATOR *allocator, acl_mem_type type)
 	const char *myname = "acl_allocator_pool_inuse_size";
 
 	CHECK_TYPE(type);
-	return (allocator->pool_inuse_size(allocator->MemPools[type]));
+	return allocator->pool_inuse_size(allocator->MemPools[type]);
 }
 
 int acl_allocator_pool_total_allocated(ACL_ALLOCATOR *allocator)
 {
-	return (allocator->pool_total_allocated(allocator));
+	return allocator->pool_total_allocated(allocator);
 }

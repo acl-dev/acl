@@ -31,7 +31,8 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(int block_size)
 	ACL_DBUF_POOL *pool = (ACL_DBUF_POOL*) valloc(sizeof(ACL_DBUF_POOL));
 	memset(pool, 0, sizeof(ACL_DBUF_POOL));
 #else
-	ACL_DBUF_POOL *pool = (ACL_DBUF_POOL*) acl_mycalloc(1, sizeof(ACL_DBUF_POOL));
+	ACL_DBUF_POOL *pool = (ACL_DBUF_POOL*) acl_mycalloc(1,
+			sizeof(ACL_DBUF_POOL));
 #endif
 	int   size, page_size;
 
@@ -55,7 +56,7 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(int block_size)
 
 	pool->block_size = size;
 	pool->head = NULL;
-	return (pool);
+	return pool;
 }
 
 void acl_dbuf_pool_destroy(ACL_DBUF_POOL *pool)
@@ -103,13 +104,13 @@ static ACL_DBUF *acl_dbuf_alloc(ACL_DBUF_POOL *pool, int length)
 		dbuf->next = pool->head;
 		pool->head = dbuf;
 	}
-	return (dbuf);
+	return dbuf;
 }
 
 static int acl_dbuf_free(ACL_DBUF *dbuf)
 {
 	if (dbuf->ptr != dbuf->buf)
-		return (0);
+		return 0;
 
 #ifdef	USE_VALLOC
 	free(dbuf->ptr);
@@ -118,7 +119,7 @@ static int acl_dbuf_free(ACL_DBUF *dbuf)
 	acl_myfree(dbuf->ptr);
 	acl_myfree(dbuf);
 #endif
-	return (1);
+	return 1;
 }
 
 void acl_dbuf_pool_free(ACL_DBUF_POOL *pool, void *ptr, int length)
@@ -151,14 +152,17 @@ void *acl_dbuf_pool_alloc(ACL_DBUF_POOL *pool, int length)
 		dbuf = acl_dbuf_alloc(pool, length);
 	else if (pool->head == NULL)
 		dbuf = acl_dbuf_alloc(pool, pool->block_size);
-	else if (pool->block_size - ((char*) pool->head->ptr - (char*) pool->head->buf) < length)
+	else if (pool->block_size - ((char*) pool->head->ptr
+		- (char*) pool->head->buf) < length)
+	{
 		dbuf = acl_dbuf_alloc(pool, pool->block_size);
+	}
 	else
 		dbuf = pool->head;
 
 	ptr = dbuf->ptr;
 	dbuf->ptr = (char*) dbuf->ptr + length;
-	return (ptr);
+	return ptr;
 }
 
 void *acl_dbuf_pool_calloc(ACL_DBUF_POOL *pool, int length)
@@ -168,7 +172,7 @@ void *acl_dbuf_pool_calloc(ACL_DBUF_POOL *pool, int length)
 	ptr = acl_dbuf_pool_alloc(pool, length);
 	if (ptr)
 		memset(ptr, 0, length);
-	return (ptr);
+	return ptr;
 }
 
 char *acl_dbuf_pool_strdup(ACL_DBUF_POOL *pool, const char *s)
@@ -178,7 +182,7 @@ char *acl_dbuf_pool_strdup(ACL_DBUF_POOL *pool, const char *s)
 
 	memcpy(ptr, s, len);
 	ptr[len] = 0;
-	return (ptr);
+	return ptr;
 }
 
 void *acl_dbuf_pool_memdup(ACL_DBUF_POOL *pool, const void *s, size_t len)
@@ -186,7 +190,7 @@ void *acl_dbuf_pool_memdup(ACL_DBUF_POOL *pool, const void *s, size_t len)
 	void *ptr = acl_dbuf_pool_alloc(pool, len);
 
 	memcpy(ptr, s, len);
-	return (ptr);
+	return ptr;
 }
 
 void acl_dbuf_pool_test(size_t max)

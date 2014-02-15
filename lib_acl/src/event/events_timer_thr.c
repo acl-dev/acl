@@ -37,48 +37,41 @@ acl_int64 event_timer_request_thr(ACL_EVENT *eventp,
 	THREAD_LOCK(&event_thr->tm_mutex);
 
 	/*
-	* Make sure we schedule this event at the right time.
-	*/
-	SET_TIME(eventp->event_present);
+	 * Make sure we schedule this event at the right time.
+	 */
+	SET_TIME(eventp->present);
 
 	/*
-	* See if they are resetting an existing timer request. If so, take the
-	* request away from the timer queue so that it can be inserted at the
-	* right place.
-	*/
+	 * See if they are resetting an existing timer request. If so, take the
+	 * request away from the timer queue so that it can be inserted at the
+	 * right place.
+	 */
 	acl_ring_foreach(iter, &eventp->timer_head) {
 		timer = ACL_RING_TO_TIMER(iter.ptr);
 		if (timer->callback == callback && timer->context == context) {
-			timer->when = eventp->event_present + delay;
+			timer->when = eventp->present + delay;
 			acl_ring_detach(iter.ptr);
-			if (acl_msg_verbose > 2)
-				acl_msg_info("%s: reset 0x%lx 0x%lx %lld", myname,
-					(long) callback, (long) context, delay);
 			break;
 		}
 	}
 
 	/*
-	* If not found, schedule a new timer request.
-	*/
+	 * If not found, schedule a new timer request.
+	 */
 	if (iter.ptr == &eventp->timer_head) {
 		timer = (ACL_EVENT_TIMER *) acl_mymalloc(sizeof(ACL_EVENT_TIMER));
 		if (timer == NULL)
 			acl_msg_panic("%s: can't mymalloc for timer", myname);
-		timer->when = eventp->event_present + delay;
+		timer->when = eventp->present + delay;
 		timer->callback = callback;
 		timer->context = context;
 		timer->event_type = ACL_EVENT_TIME;
-
-		if (acl_msg_verbose > 2)
-			acl_msg_info("%s: set 0x%lx 0x%lx %lld", myname,
-				(long) callback, (long) context, delay);
 	}
 
 	/*
-	* Insert the request at the right place. Timer requests are kept sorted
-	* to reduce lookup overhead in the event loop.
-	*/
+	 * Insert the request at the right place. Timer requests are kept sorted
+	 * to reduce lookup overhead in the event loop.
+	 */
 	acl_ring_foreach(iter, &eventp->timer_head)
 		if (timer->when < ACL_RING_TO_TIMER(iter.ptr)->when)
 			break;
@@ -93,7 +86,6 @@ acl_int64 event_timer_request_thr(ACL_EVENT *eventp,
 acl_int64 event_timer_cancel_thr(ACL_EVENT *eventp,
 	ACL_EVENT_NOTIFY_TIME callback, void *context)
 {
-	const char *myname = "event_timer_cancel_thr";
 	EVENT_THR *event_thr = (EVENT_THR *) eventp;
 	ACL_RING_ITER iter;
 	ACL_EVENT_TIMER *timer;
@@ -102,17 +94,17 @@ acl_int64 event_timer_cancel_thr(ACL_EVENT *eventp,
 	THREAD_LOCK(&event_thr->tm_mutex);
 
 	/*
-	* See if they are canceling an existing timer request. Do not complain
-	* when the request is not found. It might have been canceled from some
-	* other thread.
-	*/
+	 * See if they are canceling an existing timer request. Do not complain
+	 * when the request is not found. It might have been canceled from some
+	 * other thread.
+	 */
 
-	SET_TIME(eventp->event_present);
+	SET_TIME(eventp->present);
 
 	acl_ring_foreach(iter, &eventp->timer_head) {
 		timer = ACL_RING_TO_TIMER(iter.ptr);
 		if (timer->callback == callback && timer->context == context) {
-			if ((time_left = timer->when - eventp->event_present) < 0)
+			if ((time_left = timer->when - eventp->present) < 0)
 				time_left = 0;
 			acl_ring_detach(&timer->ring);
 			acl_myfree(timer);
@@ -121,10 +113,6 @@ acl_int64 event_timer_cancel_thr(ACL_EVENT *eventp,
 	}
 
 	THREAD_UNLOCK(&event_thr->tm_mutex);
-
-	if (acl_msg_verbose > 2)
-		acl_msg_info("%s: 0x%lx 0x%lx %lld", myname,
-			(long) callback, (long) context, time_left);
 
 	return (time_left);
 }

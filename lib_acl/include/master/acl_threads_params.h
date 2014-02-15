@@ -108,6 +108,14 @@ extern char *acl_var_threads_access_allow;
 #define	ACL_DEF_THREADS_BATADD			0
 extern int   acl_var_threads_batadd;
 
+#define	ACL_VAR_THREADS_SCHEDULE_WARN		"ioctl_schedule_warn"
+#define	ACL_DEF_THREADS_SCHEDULE_WARN		100
+extern int   acl_var_threads_schedule_warn;
+
+#define	ACL_VAR_THREADS_SCHEDULE_WAIT		"ioctl_schedule_wait"
+#define	ACL_DEF_THREADS_SCHEDULE_WAIT		50
+extern int   acl_var_threads_schedule_wait;
+
 #endif /* ACL_UNIX */
 
 #ifdef	__cplusplus

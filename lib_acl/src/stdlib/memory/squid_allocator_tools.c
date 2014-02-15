@@ -19,14 +19,13 @@ void kb_incr(kb_t * k, unsigned int v)
 	k->bytes &= 0x3FF;
 	if (k->kb == 0) {
 		/*
-		* If kb overflows and becomes negative then add powers of
-		* 2 until it becomes positive again.
-		*/
+		 * If kb overflows and becomes negative then add powers of
+		 * 2 until it becomes positive again.
+		 */
 		kb_t x;
 		x.kb = 1 << 31;
-		while (x.kb && ((k->kb + x.kb) == 0)) {
+		while (x.kb && ((k->kb + x.kb) == 0))
 			x.kb <<= 1;
-		}
 		k->kb += x.kb;
 	}
 }
@@ -44,9 +43,9 @@ double gb_to_double(const gb_t * g)
 
 const char *gb_to_str(const gb_t * g)
 {
-	/*
-	* it is often convenient to call gb_to_str several times for _one_ printf
-	*/
+	/* it is often convenient to call gb_to_str
+	 * several times for _one_ printf
+	 */
 #define max_cc_calls 5
 	typedef char GbBuf[32];
 	static GbBuf bufs[max_cc_calls];

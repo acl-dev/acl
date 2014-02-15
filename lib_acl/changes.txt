@@ -1,6 +1,16 @@
 修改历史列表：
 ------------------------------------------------------------------------
 
+425) 2014.2.14
+425.1) performance: acl_pthread_pool.c，将 pthread_cond_signal 放在
+pthread_mutex_unlock 之后，从而减少了子线程等待任务被触发的时间(为了防止
+在子线程退出后与其绑定的线程条件变量未释放，将该条件变量放在线程池对象中，
+子线程只是引用该条件变量)
+
+424) 2014.2.8
+424.1) feature: acl_pthread_pool.c，将线程池中的线程超时等待时间切割成以
+1 秒为单位的时间片
+
 423) 2014.2.6
 423.1) feature: 针对 gcc 或 vc 编译器，增加了一些编译属性开关
 
@@ -8,7 +18,7 @@
 422.1) performance: events_kernel_thr.c 在调用 event_loop 循环过程中调用
 event_thr_prepare 时，增加了检测时间间隔，这样在高并发条件下可以有效地减少
 CPU 轮循的损耗
-422.2) feature: 增加了 events_epoll_r.c，从而将 epoll 的调用方式从
+422.2) feature: 增加了 events_epoll_thr.c，从而将 epoll 的调用方式从
 events_kernel_thr.c 中剥离，以便于专门针对 epoll 方式进行优化
 
 421) 2014.1.25

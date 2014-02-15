@@ -153,7 +153,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	if (timeout > 0) {
 		fdp->r_timeout = timeout * 1000000;
-		fdp->r_ttl = eventp->event_present + fdp->r_timeout;
+		fdp->r_ttl = eventp->present + fdp->r_timeout;
 	} else {
 		fdp->r_ttl = 0;
 		fdp->r_timeout = 0;
@@ -202,7 +202,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	if (timeout > 0) {
 		fdp->w_timeout = timeout * 1000000;
-		fdp->w_ttl = eventp->event_present + fdp->w_timeout;
+		fdp->w_ttl = eventp->present + fdp->w_timeout;
 	} else {
 		fdp->w_ttl = 0;
 		fdp->w_timeout = 0;
@@ -707,10 +707,10 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 			(unsigned int) idEvent);
 
 	eventp = &ev->event;
-	SET_TIME(eventp->event_present);
+	SET_TIME(eventp->present);
 
 	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		if (timer->when > eventp->event_present)
+		if (timer->when > eventp->present)
 			break;
 		timer_fn  = timer->callback;
 		timer_arg = timer->context;
@@ -737,8 +737,8 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 	} else {
 		int  delay;
 
-		SET_TIME(eventp->event_present);
-		delay = (int) (timer->when - eventp->event_present + 999) / 1000;
+		SET_TIME(eventp->present);
+		delay = (int) (timer->when - eventp->present + 999) / 1000;
 
 		/* 要求时间定时器的间隔最少是 1 毫秒 */
 		if (delay < 1000)
@@ -763,8 +763,8 @@ static acl_int64 event_set_timer(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callba
 	if (timer == NULL)
 		first_delay = -1;
 	else {
-		SET_TIME(eventp->event_present);
-		first_delay = timer->when - eventp->event_present;
+		SET_TIME(eventp->present);
+		first_delay = timer->when - eventp->present;
 		if (first_delay < 0)
 			first_delay = 0;
 	}

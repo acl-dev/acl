@@ -178,7 +178,8 @@ static void slice3_mbuf_alloc(ACL_SLICE *slice)
 	int   i, incr_real = 0;
 	char *ptr;
 
-	mbuf = (MBUF3*) acl_default_malloc(__FILE__, __LINE__, slice->page_size);
+	mbuf = (MBUF3*) acl_default_malloc(__FILE__, __LINE__,
+			slice->page_size);
 	mbuf->mbuf.slice = slice;
 	mbuf->mbuf.nused = 0;
 	mbuf->mbuf.signature = SIGNATURE;
@@ -193,9 +194,12 @@ static void slice3_mbuf_alloc(ACL_SLICE *slice)
 	for (i = 0; i < slice->page_nslots; i++) {
 		ptr += SLICE3_HEAD_SIZE;
 #ifdef	_LP64
-		if ((slice->flag & ACL_SLICE_FLAG_LP64_ALIGN) && ((uintptr_t)ptr & 0x7) != 0)  /* just for AVL */
+		if ((slice->flag & ACL_SLICE_FLAG_LP64_ALIGN)
+			&& ((uintptr_t)ptr & 0x7) != 0)  /* just for AVL */
+		{
 			acl_msg_fatal("%s(%d): %s, ptr(%lx) invalid",
 				myname, __LINE__, slice->name, (long) ptr);
+		}
 #endif
 		*((int*) (ptr - SLICE_OFF_SIZE)) = (int) (ptr - (char*) mbuf);
 		mbuf->mslots.slots[mbuf->mslots.islots++] = ptr;
@@ -224,7 +228,8 @@ static void *slice3_alloc(ACL_SLICE *slice)
 	if (slice->nbuf == 0 || slice3->mbufs[slice->nbuf - 1]->mslots.islots == 0)
 		slice3_mbuf_alloc(slice);
 
-	acl_assert(slice->nbuf > 0 && slice3->mbufs[slice->nbuf - 1]->mslots.islots > 0);
+	acl_assert(slice->nbuf > 0 &&
+		slice3->mbufs[slice->nbuf - 1]->mslots.islots > 0);
 	acl_assert(slice3->imbuf_avail >= 0 && slice3->imbuf_avail < slice->nbuf);
 
 	if (slice3->mbufs[slice3->imbuf_avail]->mslots.islots == 0) {
@@ -252,7 +257,7 @@ static void *slice3_alloc(ACL_SLICE *slice)
 	ptr = (char*) mbuf->mslots.slots[--mbuf->mslots.islots];
 	slice->used_length += slice->slice_size;
 	mbuf->mbuf.nused++;
-	return (ptr);
+	return ptr;
 }
 
 static void slice3_mbuf_free(ACL_SLICE *slice, MBUF3 *mbuf)
@@ -286,8 +291,9 @@ static void slice3_free(ACL_SLICE *slice_dummy acl_unused, void *buf)
 	off = *((int*)(ptr - SLICE_OFF_SIZE));
 	mbuf = (MBUF3*) ((char*) buf - off);
 	if (mbuf->mbuf.signature != SIGNATURE)
-		acl_msg_fatal("%s(%d): off (%u), corrupt or unallocated memory block(0x%x, 0x%x)",
-			myname, __LINE__, off, mbuf->mbuf.signature, SIGNATURE);
+		acl_msg_fatal("%s(%d): off (%u), corrupt or unallocated "
+			"memory block(0x%x, 0x%x)", myname, __LINE__, off,
+			mbuf->mbuf.signature, SIGNATURE);
 
 	slice = mbuf->mbuf.slice;
 	slice3 = (SLICE3*) slice;
@@ -324,10 +330,10 @@ static int slice3_gc(ACL_SLICE *slice)
 		if (mbuf->mbuf.nused == 0)
 			slice3_mbuf_free(slice, mbuf);
 		else
-			return (0);
+			return 0;
 	}
 
-	return (1);
+	return 1;
 }
 
 static int slice3_used(ACL_SLICE *slice)
@@ -340,7 +346,7 @@ static int slice3_used(ACL_SLICE *slice)
 		mbuf = slice3->mbufs[i];
 		n += mbuf->mbuf.nused;
 	}
-	return (n);
+	return n;
 }
 
 static void slice3_destroy(ACL_SLICE *slice)
@@ -382,12 +388,14 @@ static void slice3_stat(ACL_SLICE *slice,  ACL_SLICE_STAT *sbuf)
 	sbuf->flag = slice->flag;
 }
 
-static ACL_SLICE *slice3_create(int page_size, int slice_length, unsigned int flag)
+static ACL_SLICE *slice3_create(int page_size,
+	int slice_length, unsigned int flag)
 {
 	SLICE3 *slice;
 	int   incr_real;
 
-	slice = (SLICE3 *) acl_default_calloc(__FILE__, __LINE__, 1, sizeof(SLICE3));
+	slice = (SLICE3 *) acl_default_calloc(__FILE__, __LINE__,
+			1, sizeof(SLICE3));
 
 	/* call the base ACL_SLICE's init function */
 
@@ -399,9 +407,11 @@ static ACL_SLICE *slice3_create(int page_size, int slice_length, unsigned int fl
 
 #ifdef	_LP64
 	if ((flag & ACL_SLICE_FLAG_LP64_ALIGN) != 0) {
-		if ((slice_length + SLICE3_HEAD_SIZE) % sizeof(uintptr_t) != 0) {
+		if ((slice_length + SLICE3_HEAD_SIZE)
+			% sizeof(uintptr_t) != 0)
+		{
 			slice_length = ((slice_length + SLICE3_HEAD_SIZE)
-					/ sizeof(uintptr_t) + 1) * sizeof(uintptr_t)
+				/ sizeof(uintptr_t) + 1) * sizeof(uintptr_t)
 				- SLICE3_HEAD_SIZE;
 		}
 	}
@@ -412,8 +422,10 @@ static ACL_SLICE *slice3_create(int page_size, int slice_length, unsigned int fl
 	slice->slice.slice_length = slice_length;
 	slice->slice.slice_size = slice_length + SLICE3_HEAD_SIZE;
 	slice->slice.page_size = page_size;
-	slice->slice.page_nslots = (page_size - sizeof(MBUF3)) /slice->slice.slice_size;
-	slice->slice.gap_size = page_size - slice->slice.page_nslots * slice->slice.slice_size;
+	slice->slice.page_nslots = (page_size - sizeof(MBUF3))
+		/slice->slice.slice_size;
+	slice->slice.gap_size = page_size - slice->slice.page_nslots
+		* slice->slice.slice_size;
 
 	/* reset the base ACL_SLICE's callback */
 	
@@ -424,7 +436,7 @@ static ACL_SLICE *slice3_create(int page_size, int slice_length, unsigned int fl
 	slice->slice.slice_used = slice3_used;
 	slice->slice.slice_stat = slice3_stat;
 
-	return ((ACL_SLICE*) slice);
+	return (ACL_SLICE*) slice;
 }
 
 /*---------------------------- just for slice2 -------------------------------*/
@@ -452,9 +464,13 @@ static void slice2_mbuf_alloc(ACL_SLICE *slice)
 	for (i = 0; i < slice->page_nslots; i++) {
 		ptr += SLICE2_HEAD_SIZE;
 #ifdef	_LP64
-		if ((slice->flag & ACL_SLICE_FLAG_LP64_ALIGN) && ((uintptr_t)ptr & 0x7) != 0)  /* just for AVL */
-			acl_msg_fatal("%s(%d): %s, ptr(%lx) invalid, slice_length: %d",
-				myname, __LINE__, slice->name, (long) ptr, slice->slice_length);
+		if ((slice->flag & ACL_SLICE_FLAG_LP64_ALIGN)
+			&& ((uintptr_t)ptr & 0x7) != 0)  /* just for AVL */
+		{
+			acl_msg_fatal("%s(%d): %s, ptr(%lx) invalid, "
+				"slice_length: %d", myname, __LINE__,
+				slice->name, (long) ptr, slice->slice_length);
+		}
 #endif
 		*((int*) (ptr - SLICE2_HEAD_SIZE)) = (int) slice2->mslots.islots;
 		*((int*) (ptr - SLICE_OFF_SIZE)) = (int) (ptr - (char*) mbuf);
@@ -502,15 +518,16 @@ static void *slice2_alloc(ACL_SLICE *slice)
 			(int) slice->slice_size, (int) slice->slice_length,
 			slice->page_nslots, slice->page_size);
 
-		acl_msg_fatal("%s(%d): %s, corrupt or unallocated memory block(0x%x, 0x%x)",
-			myname, __LINE__, slice->name, mbuf->mbuf.signature, SIGNATURE);
+		acl_msg_fatal("%s(%d): %s, corrupt or unallocated "
+			"memory block(0x%x, 0x%x)", myname, __LINE__,
+			slice->name, mbuf->mbuf.signature, SIGNATURE);
 	}
 
 	/* reset the slice chunk's pos to -1 */
 	*((int*) (ptr - SLICE2_HEAD_SIZE)) = -1;
 
 	mbuf->mbuf.nused++;
-	return (ptr);
+	return ptr;
 }
 
 static void slice2_mbuf_free(SLICE2 *slice2, MBUF2 *mbuf)
@@ -550,9 +567,10 @@ static void slice2_mbuf_free(SLICE2 *slice2, MBUF2 *mbuf)
 		ptr += SLICE2_HEAD_SIZE;
 		pos = *((int*) (ptr - SLICE2_HEAD_SIZE));
 		if (pos < 0) {
-			acl_msg_fatal("%s(%d): %s, pos(%d) invalid, islots(%d), page_nslots(%d)",
-				myname, __LINE__, ((ACL_SLICE*) slice2)->name,
-				pos, slice2->mslots.islots, slice2->slice.page_nslots);
+			acl_msg_fatal("%s(%d): %s, pos(%d) invalid, "
+				"islots(%d), page_nslots(%d)", myname, __LINE__,
+				((ACL_SLICE*) slice2)->name, pos,
+				slice2->mslots.islots, slice2->slice.page_nslots);
 		} else if (pos + 1 > slice2->mslots.islots) {
 			ptr += slice2->slice.slice_length;
 			continue;
@@ -564,21 +582,26 @@ static void slice2_mbuf_free(SLICE2 *slice2, MBUF2 *mbuf)
 
 		if (slice2->mslots.slots[pos] != ptr)
 			acl_msg_fatal("%s(%d): pos(%d)'s(%lld, %lld) invalid",
-				myname, __LINE__, pos, slice2->mslots.slots[pos], ptr);
+				myname, __LINE__, pos,
+				slice2->mslots.slots[pos], ptr);
 
-		slice2->mslots.slots[pos] = slice2->mslots.slots[--slice2->mslots.islots];
+		slice2->mslots.slots[pos] =
+			slice2->mslots.slots[--slice2->mslots.islots];
 		/* reset the slice chunk's pos */
-		*((int*) ((char*) slice2->mslots.slots[pos] - SLICE2_HEAD_SIZE)) = pos;
+		*((int*) ((char*) slice2->mslots.slots[pos]
+			- SLICE2_HEAD_SIZE)) = pos;
 		ptr += slice2->slice.slice_length;
 	}
 #else
-	ptr = mbuf->payload + slice2->slice.slice_size * (slice2->slice.page_nslots - 1);
+	ptr = mbuf->payload + slice2->slice.slice_size
+		* (slice2->slice.page_nslots - 1);
 	for (i = slice2->slice.page_nslots - 1; i >= 0; i--) {
 		pos = *((int*) (ptr));
 		if (pos < 0) {
-			acl_msg_fatal("%s(%d): %s, pos(%d) invalid, islots(%d), page_nslots(%d)",
-				myname, __LINE__, ((ACL_SLICE*) slice2)->name,
-				pos, slice2->mslots.islots, slice2->slice.page_nslots);
+			acl_msg_fatal("%s(%d): %s, pos(%d) invalid, islots(%d),"
+				" page_nslots(%d)", myname, __LINE__,
+				((ACL_SLICE*) slice2)->name, pos,
+				slice2->mslots.islots, slice2->slice.page_nslots);
 		} else if (pos + 1 > slice2->mslots.islots) {
 			ptr -= slice2->slice.slice_size;
 			continue;
@@ -594,9 +617,11 @@ static void slice2_mbuf_free(SLICE2 *slice2, MBUF2 *mbuf)
 				slice2->mslots.slots[pos],
 				(ptr + SLICE2_HEAD_SIZE));
 
-		slice2->mslots.slots[pos] = slice2->mslots.slots[--slice2->mslots.islots];
+		slice2->mslots.slots[pos] =
+			slice2->mslots.slots[--slice2->mslots.islots];
 		/* reset the slice chunk's pos */
-		*((int*) ((char*) slice2->mslots.slots[pos] - SLICE2_HEAD_SIZE)) = pos;
+		*((int*) ((char*) slice2->mslots.slots[pos]
+			- SLICE2_HEAD_SIZE)) = pos;
 		ptr -= slice2->slice.slice_size;
 	}
 #endif
@@ -622,14 +647,16 @@ static void slice2_free(ACL_SLICE *slice_dummy acl_unused, void *buf)
 
 	mbuf = (MBUF2 *) (ptr - off);
 	if (mbuf->mbuf.signature != SIGNATURE)
-		acl_msg_fatal("%s(%d), (off %d): corrupt or unallocated memory block(0x%x, 0x%x)",
-			myname, __LINE__, off, mbuf->mbuf.signature, SIGNATURE);
+		acl_msg_fatal("%s(%d), (off %d): corrupt or unallocated "
+			"memory block(0x%x, 0x%x)", myname, __LINE__, off,
+			mbuf->mbuf.signature, SIGNATURE);
 
 	slice = mbuf->mbuf.slice;
 	slice2 = (SLICE2*) slice;
 
 	if (slice != slice_dummy)
-		acl_msg_fatal("%s(%d): %s invalid", myname, __LINE__, slice->name);
+		acl_msg_fatal("%s(%d): %s invalid",
+			myname, __LINE__, slice->name);
 
 	if (mbuf->mbuf.nused <= 0)
 		acl_msg_fatal("%s(%d): %s, nused(%d) <= 0",
@@ -664,11 +691,11 @@ static int slice2_gc(ACL_SLICE *slice)
 		if (mbuf->mbuf.nused == 0) {
 			slice2_mbuf_free(slice2, mbuf);
 		} else
-			return (0);
+			return 0;
 		iter = tmp;
 	}
 
-	return (1);
+	return 1;
 }
 
 static int slice2_used(ACL_SLICE *slice)
@@ -683,7 +710,7 @@ static int slice2_used(ACL_SLICE *slice)
 		n += mbuf->mbuf.nused;
 		iter = ring_succ(iter);
 	}
-	return (n);
+	return n;
 }
 
 static void slice2_destroy(ACL_SLICE *slice)
@@ -721,11 +748,13 @@ static void slice2_stat(ACL_SLICE *slice,  ACL_SLICE_STAT *sbuf)
 	sbuf->flag = slice->flag;
 }
 
-static ACL_SLICE *slice2_create(int page_size, int slice_length, unsigned int flag)
+static ACL_SLICE *slice2_create(int page_size,
+	int slice_length, unsigned int flag)
 {
 	SLICE2 *slice;
 
-	slice = (SLICE2 *) acl_default_calloc(__FILE__, __LINE__, 1, sizeof(SLICE2));
+	slice = (SLICE2 *) acl_default_calloc(__FILE__, __LINE__,
+		1, sizeof(SLICE2));
 
 	/* call the base ACL_SLICE's init function */
 	
@@ -743,7 +772,7 @@ static ACL_SLICE *slice2_create(int page_size, int slice_length, unsigned int fl
 	if ((flag & ACL_SLICE_FLAG_LP64_ALIGN) != 0) {
 		if ((slice_length + SLICE2_HEAD_SIZE) % sizeof(uintptr_t) != 0) {
 			slice_length = ((slice_length + SLICE2_HEAD_SIZE)
-					/ sizeof(uintptr_t) + 1) * sizeof(uintptr_t)
+				/ sizeof(uintptr_t) + 1) * sizeof(uintptr_t)
 				- SLICE2_HEAD_SIZE;
 		}
 	}
@@ -754,8 +783,10 @@ static ACL_SLICE *slice2_create(int page_size, int slice_length, unsigned int fl
 	slice->slice.slice_length = slice_length;
 	slice->slice.slice_size = slice_length + SLICE2_HEAD_SIZE;
 	slice->slice.page_size = page_size;
-	slice->slice.page_nslots = (page_size - sizeof(MBUF2)) /slice->slice.slice_size;
-	slice->slice.gap_size = page_size - slice->slice.page_nslots * slice->slice.slice_size;
+	slice->slice.page_nslots = (page_size - sizeof(MBUF2))
+		/slice->slice.slice_size;
+	slice->slice.gap_size = page_size - slice->slice.page_nslots
+		* slice->slice.slice_size;
 
 	/* reset the base ACL_SLICE's callback */
 	
@@ -766,7 +797,7 @@ static ACL_SLICE *slice2_create(int page_size, int slice_length, unsigned int fl
 	slice->slice.slice_used = slice2_used;
 	slice->slice.slice_stat = slice2_stat;
 
-	return ((ACL_SLICE*) slice);
+	return (ACL_SLICE*) slice;
 }
 
 /*---------------------------- just for slice1 -------------------------------*/
@@ -774,11 +805,13 @@ static ACL_SLICE *slice2_create(int page_size, int slice_length, unsigned int fl
 static void slice1_mbuf_alloc(ACL_SLICE *slice)
 {
 	SLICE1 *slice1 = (SLICE1*) slice;
-	MBUF1 *mbuf = (MBUF1*) acl_default_malloc(__FILE__, __LINE__, sizeof(MBUF1));
+	MBUF1 *mbuf = (MBUF1*) acl_default_malloc(__FILE__, __LINE__,
+			sizeof(MBUF1));
 	int   i, incr_real = 0;
 	char *ptr;
 
-	mbuf->buf = (void*) acl_default_malloc(__FILE__, __LINE__, slice->page_size);
+	mbuf->buf = (void*) acl_default_malloc(__FILE__, __LINE__,
+			slice->page_size);
 	ring_append(&slice1->mbuf_head, &mbuf->entry);
 	ptr = (char*) mbuf->buf;
 
@@ -807,7 +840,7 @@ static void *slice1_alloc(ACL_SLICE *slice)
 	ptr = slice1->mslots.slots[slice1->mslots.islots - 1];
 	slice1->mslots.islots--;
 	slice->used_length += slice->slice_size;
-	return (ptr);
+	return ptr;
 }
 
 static void slice1_free(ACL_SLICE *slice, void *ptr)
@@ -843,14 +876,15 @@ static void slice1_mbuf_free(ACL_SLICE *slice, void *buf)
 		}
 	}
 
-	acl_msg_fatal("%s: unknown buf addr: 0x%lx", myname, buf ? (long) buf : 0);
+	acl_msg_fatal("%s: unknown buf addr: 0x%lx",
+		myname, buf ? (long) buf : 0);
 }
 
 static int cmp_fn(const void *p1, const void *p2)
 {
 	acl_assert(p1);
 	acl_assert(p2);
-	return ((const char*) p1 - (const char*) p2);
+	return (const char*) p1 - (const char*) p2;
 }
 
 static int slice1_gc(ACL_SLICE *slice)
@@ -861,9 +895,10 @@ static int slice1_gc(ACL_SLICE *slice)
 	int   i, length, j, n, k = -1;
 
 	if (slice1->mslots.islots == 0)
-		return (1);
+		return 1;
 
-	qsort(slice1->mslots.slots, slice1->mslots.islots, sizeof(void*), cmp_fn);
+	qsort(slice1->mslots.slots, slice1->mslots.islots,
+		sizeof(void*), cmp_fn);
 
 	j = 0;
 	n = 0;
@@ -890,13 +925,15 @@ static int slice1_gc(ACL_SLICE *slice)
 
 	if (slice1->mslots.islots > 0) {
 		for (i = 0; i < k; i++) {
-			slice1->mslots.slots[j + i] = slice1->mslots.slots[slice1->mslots.islots + i];
+			slice1->mslots.slots[j + i] =
+				slice1->mslots.slots[slice1->mslots.islots + i];
 			if (slice1->mslots.slots[j + i] == NULL)
-				acl_msg_fatal("%s: slots[%d] null", myname, j + i);
+				acl_msg_fatal("%s: slots[%d] null",
+					myname, j + i);
 		}
 	}
 
-	return (1);
+	return 1;
 }
 
 static void slice1_destroy(ACL_SLICE *slice)
@@ -922,7 +959,7 @@ static int slice1_used(ACL_SLICE *slice acl_unused)
 	const char *myname = "slice1_used";
 
 	acl_msg_warn("%s(%d): not implement yet!", myname, __LINE__);
-	return (0);
+	return 0;
 }
 
 static void slice1_stat(ACL_SLICE *slice,  ACL_SLICE_STAT *sbuf)
@@ -946,7 +983,8 @@ static ACL_SLICE *slice1_create(int page_size, int slice_length, unsigned int fl
 {
 	SLICE1 *slice;
 
-	slice = (SLICE1 *) acl_default_calloc(__FILE__, __LINE__, 1, sizeof(SLICE1));
+	slice = (SLICE1 *) acl_default_calloc(__FILE__, __LINE__,
+			1, sizeof(SLICE1));
 
 	/* call the base ACL_SLICE's init function */
 	
@@ -963,7 +1001,8 @@ static ACL_SLICE *slice1_create(int page_size, int slice_length, unsigned int fl
 	slice->slice.slice_size = slice_length;
 	slice->slice.page_size = page_size;
 	slice->slice.page_nslots = page_size / slice->slice.slice_size;
-	slice->slice.gap_size = page_size - slice->slice.page_nslots * slice->slice.slice_size;
+	slice->slice.gap_size = page_size - slice->slice.page_nslots
+		* slice->slice.slice_size;
 
 	/* set the base ACL_SLICE's callback */
 
@@ -978,7 +1017,7 @@ static ACL_SLICE *slice1_create(int page_size, int slice_length, unsigned int fl
 	
 	ring_init(&slice->mbuf_head);
 
-	return ((ACL_SLICE*) slice);
+	return (ACL_SLICE*) slice;
 }
 
 /*------------------------   public functions   -----------------------------*/
@@ -1027,7 +1066,7 @@ ACL_SLICE *acl_slice_create(const char *name, int page_size,
 		acl_msg_warn("%s: slice_length(%d). page_size(%d)"
 			" maybe too small, please increase it.",
 			myname, slice_length, page_size);
-		return (NULL);
+		return NULL;
 	}
 
 	if ((flag & ACL_SLICE_FLAG_GC1))
@@ -1038,11 +1077,11 @@ ACL_SLICE *acl_slice_create(const char *name, int page_size,
 		slice = slice3_create(size, slice_length, flag);
 	else {
 		acl_msg_error("%s: flag invalid", myname);
-		return (NULL);
+		return NULL;
 	}
 
 	snprintf(slice->name, sizeof(slice->name), "%s", name);
-	return (slice);
+	return slice;
 }
 
 void acl_slice_destroy(ACL_SLICE *slice)
@@ -1052,12 +1091,12 @@ void acl_slice_destroy(ACL_SLICE *slice)
 
 int acl_slice_used(ACL_SLICE *slice)
 {
-	return (slice->slice_used(slice));
+	return slice->slice_used(slice);
 }
 
 void *acl_slice_alloc(ACL_SLICE *slice)
 {
-	return (slice->slice_alloc(slice));
+	return slice->slice_alloc(slice);
 }
 
 void *acl_slice_calloc(ACL_SLICE *slice)
@@ -1066,7 +1105,7 @@ void *acl_slice_calloc(ACL_SLICE *slice)
 
 	if (ptr)
 		memset(ptr, 0, slice->slice_length);
-	return (ptr);
+	return ptr;
 }
 
 void acl_slice_free2(ACL_SLICE *slice, void *ptr)
@@ -1091,7 +1130,7 @@ void acl_slice_free(void *ptr)
 
 int acl_slice_gc(ACL_SLICE *slice)
 {
-	return (slice->slice_gc(slice));
+	return slice->slice_gc(slice);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -1143,7 +1182,8 @@ void acl_slice_pool_init(ACL_SLICE_POOL *asp)
 	}
 }
 
-ACL_SLICE_POOL *acl_slice_pool_create(int base, int nslice, unsigned int slice_flag)
+ACL_SLICE_POOL *acl_slice_pool_create(int base, int nslice,
+	unsigned int slice_flag)
 {
 	ACL_SLICE_POOL *asp = (ACL_SLICE_POOL*)
 		acl_default_calloc(__FILE__, __LINE__, 1, sizeof(*asp));
@@ -1152,9 +1192,9 @@ ACL_SLICE_POOL *acl_slice_pool_create(int base, int nslice, unsigned int slice_f
 	asp->nslice = nslice;
 	asp->slice_flag = slice_flag;
 	asp->slices = (ACL_SLICE**) acl_default_calloc(__FILE__, __LINE__,
-			nslice, sizeof(ACL_SLICE));
+			nslice, sizeof(ACL_SLICE*));
 	acl_slice_pool_init(asp);
-	return (asp);
+	return asp;
 }
 
 void acl_slice_pool_destroy(ACL_SLICE_POOL *asp)
@@ -1177,7 +1217,7 @@ int acl_slice_pool_used(ACL_SLICE_POOL *asp)
 		n += acl_slice_used(asp->slices[i]);
 	}
 
-	return (n);
+	return n;
 }
 
 void acl_slice_pool_gc(ACL_SLICE_POOL *asp)
@@ -1230,7 +1270,7 @@ void *acl_slice_pool_alloc(const char *filename, int line,
 			*((size_t*) ptr) = 0;
 			ptr += sizeof(size_t);
 		}
-		return (ptr);
+		return ptr;
 	}
 	n = (int) size / asp->base;
 	if (size % asp->base != 0)
@@ -1241,7 +1281,7 @@ void *acl_slice_pool_alloc(const char *filename, int line,
 		*((size_t*) ptr) = 1;
 		ptr += sizeof(size_t);
 	}
-	return (ptr);
+	return ptr;
 }
 
 void *acl_slice_pool_calloc(const char *filename, int line,
@@ -1251,7 +1291,7 @@ void *acl_slice_pool_calloc(const char *filename, int line,
 
 	if (ptr)
 		memset(ptr, 0, nmemb * size);
-	return (ptr);
+	return ptr;
 }
 
 void *acl_slice_pool_realloc(const char *filename, int line,
@@ -1262,7 +1302,7 @@ void *acl_slice_pool_realloc(const char *filename, int line,
 	buf = acl_slice_pool_alloc(filename, line, asp, size);
 	memcpy(buf, ptr, size);
 	acl_slice_pool_free(filename, line, ptr);
-	return (buf);
+	return buf;
 }
 
 void *acl_slice_pool_memdup(const char *filename, int line,
@@ -1271,7 +1311,7 @@ void *acl_slice_pool_memdup(const char *filename, int line,
 	void *buf = acl_slice_pool_alloc(filename, line, asp, len);
 
 	memcpy(buf, ptr, len);
-	return (buf);
+	return buf;
 }
 
 char *acl_slice_pool_strdup(const char *filename, int line,
@@ -1281,7 +1321,7 @@ char *acl_slice_pool_strdup(const char *filename, int line,
 	char *ptr = (char*) acl_slice_pool_alloc(filename, line, asp, n);
 
 	memcpy(ptr, str, n);
-	return (ptr);
+	return ptr;
 }
 
 char *acl_slice_pool_strndup(const char *filename, int line,
@@ -1291,5 +1331,5 @@ char *acl_slice_pool_strndup(const char *filename, int line,
 
 	memcpy(ptr, str, len);
 	ptr[len] = 0;
-	return (ptr);
+	return ptr;
 }

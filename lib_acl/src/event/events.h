@@ -64,35 +64,29 @@ struct ACL_EVENT_FDTABLE {
 
 struct	ACL_EVENT {
 	/* 事件引擎名称标识 */
-	char    name[128];
+	char  name[128];
 
-	/* 事件引擎:
+	/**
+	 * 事件引擎:
 	 * ACL_EVENT_SELECT, ACL_EVENT_KERNEL,
 	 * ACL_EVENT_POLL, ACL_EVENT_WMSG
 	 */
-	int     event_mode;
+	int   event_mode;
 	/* 该事件引擎是否在多线程环境下使用 */
-	int     use_thread;
+	int   use_thread;
 
 	/* 避免事件引擎被嵌套调用 */
-	int	nested;
+	int   nested;
 	/* 当前时间截(微秒级) */
-	acl_int64 event_present;
+	acl_int64 present;
 	acl_int64 last_check;
-	acl_int64 event_last_debug;
+	acl_int64 last_debug;
 	/* 事件引擎的最大等待时间(秒) */
-	int	delay_sec;
+	int   delay_sec;
 	/* 事件引擎的最大等待时间(微秒) */
-	int	delay_usec;
+	int   delay_usec;
 	/* 定时器任务列表头 */
 	ACL_RING timer_head;
-
-	/*
-	ACL_RING used_ring;
-	ACL_RING slot_ring;
-	ACL_RING ready_ring;
-	ACL_RING wait_ring;
-	*/
 
 	/* 套接字最大个数 */
 	int   fdsize;
@@ -100,7 +94,6 @@ struct	ACL_EVENT {
 	int   fdcnt;
 	/* 事件循环时准备好的套接字个数 */
 	int   fdcnt_ready;
-	/* int   fdtab_free_cnt; */
 	/* 套接字事件对象表集合 */
 	ACL_EVENT_FDTABLE **fdtabs;
 	/* 准备好的套接字事件对象表集合 */
@@ -160,12 +153,10 @@ struct	ACL_EVENT {
 	void *fire_ctx;
 };
 
-/*
-如果采用自旋锁，性能反而下降非常厉害，可能与加锁时间片长有关系
+/* 如果采用自旋锁，必须保持加锁时间非常短 */
 #ifdef	ACL_HAS_SPINLOCK
 #define	EVENT_USE_SPINLOCK
 #endif
-*/
 
 typedef struct EVENT_THR {
 	ACL_EVENT event;
@@ -221,7 +212,7 @@ ACL_EVENT *event_new_select_thr(void);
 ACL_EVENT *event_new_poll(int fdsize);
 
 /* in events_poll_thr.c */
-ACL_EVENT *event_new_poll_thr(int fdsize);
+ACL_EVENT *event_poll_alloc_thr(int fdsize);
 
 /* in events_kernel.c */
 ACL_EVENT *event_new_kernel(int fdsize);
@@ -232,20 +223,19 @@ ACL_EVENT *event_new_kernel_thr(int fdsize);
 #endif
 
 #if (ACL_EVENTS_KERNEL_STYLE == ACL_EVENTS_STYLE_EPOLL)
-ACL_EVENT *event_epoll_alloc_r(int fdsize);
+ACL_EVENT *event_epoll_alloc_thr(int fdsize);
 #endif
 
 struct ACL_EVENT_TIMER {
-	acl_int64  when;                /* when event is wanted */
-	acl_int64  delay;               /* timer deley */
-	ACL_EVENT_NOTIFY_TIME callback; /* callback function */
-	int     event_type;
-	void   *context;                /* callback context */
-	ACL_RING    ring;               /* linkage */
-	int   nrefer;                   /* refered's count */
-	int   ncount;                   /* timer callback count */
-	/* 定时器被触发后是否会被自动加入下一个定时器过程 */
-	int   keep;
+	acl_int64  when;                /* when event is wanted  */
+	acl_int64  delay;               /* timer deley           */
+	ACL_EVENT_NOTIFY_TIME callback; /* callback function     */
+	int   event_type;
+	void *context;                  /* callback context      */
+	ACL_RING ring;                  /* linkage               */
+	int   nrefer;                   /* refered's count       */
+	int   ncount;                   /* timer callback count  */
+	int   keep;                     /* if timer call restart */
 };
 
 #define ACL_RING_TO_TIMER(r) \

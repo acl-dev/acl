@@ -168,7 +168,7 @@ END:
 
 	if (timeout > 0) {
 		fdp->r_timeout = timeout * 1000000;
-		fdp->r_ttl = eventp->event_present + fdp->r_timeout;
+		fdp->r_ttl = eventp->present + fdp->r_timeout;
 	} else {
 		fdp->r_ttl = 0;
 		fdp->r_timeout = 0;
@@ -223,7 +223,7 @@ END:
 
 	if (timeout > 0) {
 		fdp->w_timeout = timeout * 1000000;
-		fdp->w_ttl = eventp->event_present + fdp->w_timeout;
+		fdp->w_ttl = eventp->present + fdp->w_timeout;
 	} else {
 		fdp->w_ttl = 0;
 		fdp->w_timeout = 0;
@@ -614,8 +614,8 @@ static void event_set_all(ACL_EVENT *eventp)
 
 	eventp->fdcnt_ready = 0;
 
-	if (eventp->event_present - eventp->last_check >= 1000000) {
-		eventp->last_check = eventp->event_present;
+	if (eventp->present - eventp->last_check >= 1000000) {
+		eventp->last_check = eventp->present;
 		event_check_fds(eventp);
 	}
 
@@ -674,14 +674,14 @@ static void event_loop(ACL_EVENT *eventp)
 	if (delay < 0)
 		delay = 0; /* 0 milliseconds at least */
 
-	SET_TIME(eventp->event_present);
+	SET_TIME(eventp->present);
 
 	/*
 	 * Find out when the next timer would go off. Timer requests are sorted.
 	 * If any timer is scheduled, adjust the delay appropriately.
 	 */
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		acl_int64 n = (timer->when - eventp->event_present) / 1000;
+		acl_int64 n = (timer->when - eventp->present) / 1000;
 
 		if (n <= 0)
 			delay = 0;
@@ -711,9 +711,9 @@ TAG_DONE:
 	* the first request off the timer queue before delivering the event to
 	* the application.
 	*/
-	SET_TIME(eventp->event_present);
+	SET_TIME(eventp->present);
 	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		if (timer->when > eventp->event_present)
+		if (timer->when > eventp->present)
 			break;
 		timer_fn  = timer->callback;
 		timer_arg = timer->context;

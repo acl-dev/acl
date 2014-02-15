@@ -79,7 +79,8 @@ static void memMeterSyncHWater(MemMeter * m)
 	}
 }
 
-static void memPoolShrink(SQUID_MEM_ALLOCATOR *allocator, MemPool *pool, size_t new_limit)
+static void memPoolShrink(SQUID_MEM_ALLOCATOR *allocator,
+	MemPool *pool, size_t new_limit)
 {
 	char  *ptr;
 
@@ -88,8 +89,10 @@ static void memPoolShrink(SQUID_MEM_ALLOCATOR *allocator, MemPool *pool, size_t 
 		&& acl_stack_size(((ACL_MEM_POOL *) pool)->pstack) > 0) {
 		memMeterDec(pool->meter.alloc);
 		memMeterDec(pool->meter.idle);
-		memMeterDel(allocator->TheMeter.idle, ((ACL_MEM_POOL *)pool)->obj_size);
-		memMeterDel(allocator->TheMeter.alloc, ((ACL_MEM_POOL *) pool)->obj_size);
+		memMeterDel(allocator->TheMeter.idle,
+			((ACL_MEM_POOL *)pool)->obj_size);
+		memMeterDel(allocator->TheMeter.alloc,
+			((ACL_MEM_POOL *) pool)->obj_size);
 		ptr = acl_stack_pop(((ACL_MEM_POOL *) pool)->pstack);
 		acl_default_free(__FILE__, __LINE__, ptr);
 	}
@@ -105,8 +108,8 @@ static void memShrink(SQUID_MEM_ALLOCATOR *allocator, size_t new_limit)
 
 	acl_foreach_reverse(iter, ((ACL_ALLOCATOR *) allocator)->pools) {
 		MemPool *pool = (MemPool*) iter.data;
-		const size_t target_pool_size = (size_t)
-			((double) pool->meter.idle.level * new_limit) / start_limit;
+		const size_t target_pool_size = (size_t) ((double)
+			pool->meter.idle.level * new_limit) / start_limit;
 		memPoolShrink(allocator, pool, target_pool_size);
 	}
 
@@ -122,7 +125,7 @@ static void memShrink(SQUID_MEM_ALLOCATOR *allocator, size_t new_limit)
 
 	acl_msg_info("memShrink: 2nd phase done with %ld KB left",
 		(long int) toKB(allocator->TheMeter.idle.level));
-	acl_assert(allocator->TheMeter.idle.level <= new_limit);	/* paranoid */
+	acl_assert(allocator->TheMeter.idle.level <= new_limit); /* paranoid */
 }
 
 static void memCleanModule(ACL_ALLOCATOR *allocator)
@@ -143,7 +146,8 @@ static void memCleanModule(ACL_ALLOCATOR *allocator)
 	}
 
 	if (dirty_count)
-		acl_msg_warn("memCleanModule: %d pools are left dirty", dirty_count);
+		acl_msg_warn("memCleanModule: %d pools are left dirty",
+			dirty_count);
 
 	/* we clean the stack anyway */
 
@@ -164,11 +168,15 @@ static void memConfigure(ACL_ALLOCATOR *allocator, size_t mem_limit)
 	else
 		new_pool_limit = mem_unlimited_size;
 	/* shrink memory pools if needed */
-	if (((SQUID_MEM_ALLOCATOR *) allocator)->TheMeter.idle.level > new_pool_limit) {
-		acl_msg_info("Shrinking idle mem pools to %.2f MB", toMB(new_pool_limit));
+	if (((SQUID_MEM_ALLOCATOR *) allocator)->TheMeter.idle.level
+		> new_pool_limit)
+	{
+		acl_msg_info("Shrinking idle mem pools to %.2f MB",
+			toMB(new_pool_limit));
 		memShrink((SQUID_MEM_ALLOCATOR *) allocator, new_pool_limit);
 	}
-	acl_assert(((SQUID_MEM_ALLOCATOR *) allocator)->TheMeter.idle.level <= new_pool_limit);
+	acl_assert(((SQUID_MEM_ALLOCATOR *) allocator)->TheMeter.idle.level
+		<= new_pool_limit);
 	allocator->mem_idle_limit = new_pool_limit;
 }
 
@@ -176,11 +184,12 @@ static void memConfigure(ACL_ALLOCATOR *allocator, size_t mem_limit)
 
 static ACL_MEM_POOL *memPoolCreate(void)
 {
-	ACL_MEM_POOL *pool = acl_default_calloc(__FILE__, __LINE__, 1, sizeof(MemPool));
+	ACL_MEM_POOL *pool = acl_default_calloc(__FILE__, __LINE__,
+		1, sizeof(MemPool));
 	MemPool *squid_pool = (MemPool *) pool;
 
 	memset(&squid_pool->meter, 0, sizeof(squid_pool->meter));
-	return (pool);
+	return pool;
 }
 
 static void memPoolDestroy(ACL_MEM_POOL * pool)
@@ -208,7 +217,8 @@ struct mempool_cookie {
 
 static void *memPoolAlloc(ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool)
 {
-	SQUID_MEM_ALLOCATOR *squid_allocator = (SQUID_MEM_ALLOCATOR *) allocator;
+	SQUID_MEM_ALLOCATOR *squid_allocator =
+		(SQUID_MEM_ALLOCATOR *) allocator;
 	MemPool *squid_pool = (MemPool *) pool;
 	void *obj;
 
@@ -228,13 +238,15 @@ static void *memPoolAlloc(ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool)
 		obj = acl_stack_pop(pool->pstack);
 
 #if DEBUG_MEMPOOL
-		(void) VALGRIND_MAKE_READABLE(obj, pool->real_obj_size + sizeof(struct mempool_cookie));
+		(void) VALGRIND_MAKE_READABLE(obj, pool->real_obj_size
+			+ sizeof(struct mempool_cookie));
 #else
 		(void) VALGRIND_MAKE_READABLE(obj, pool->obj_size);
 #endif
 #if DEBUG_MEMPOOL
 		{
-			struct mempool_cookie *cookie = (void *) (((unsigned char *) obj) + pool->real_obj_size);
+			struct mempool_cookie *cookie = (void *)
+				(((unsigned char *) obj) + pool->real_obj_size);
 			acl_assert(cookie->cookie == MEMPOOL_COOKIE(obj));
 			acl_assert(cookie->pool == pool);
 			(void) VALGRIND_MAKE_NOACCESS(cookie, sizeof(cookie));
@@ -248,8 +260,10 @@ static void *memPoolAlloc(ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool)
 		{
 			struct mempool_cookie *cookie;
 			obj = acl_default_malloc(__FILE__, __LINE__,
-				pool->real_obj_size + sizeof(struct mempool_cookie));
-			cookie = (struct mempool_cookie *) (((unsigned char *) obj) + pool->real_obj_size);
+				pool->real_obj_size
+				+ sizeof(struct mempool_cookie));
+			cookie = (struct mempool_cookie *)
+				(((unsigned char *) obj) + pool->real_obj_size);
 			cookie->cookie = MEMPOOL_COOKIE(obj);
 			cookie->pool = pool;
 			(void) VALGRIND_MAKE_NOACCESS(cookie, sizeof(cookie));
@@ -265,9 +279,11 @@ static void *memPoolAlloc(ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool)
 	return obj;
 }
 
-static void memPoolFree(ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool, void *obj)
+static void memPoolFree(ACL_ALLOCATOR *allocator,
+	ACL_MEM_POOL * pool, void *obj)
 {
-	SQUID_MEM_ALLOCATOR *squid_allocator = (SQUID_MEM_ALLOCATOR *) allocator;
+	SQUID_MEM_ALLOCATOR *squid_allocator =
+		(SQUID_MEM_ALLOCATOR *) allocator;
 	MemPool *squid_pool = (MemPool *) pool;
 
 	acl_assert(pool && obj);
@@ -284,11 +300,14 @@ static void memPoolFree(ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool, void *obj
 		acl_assert(cookie->pool == pool);
 	}
 #endif
-	if (squid_allocator->TheMeter.idle.level + pool->obj_size <= allocator->mem_idle_limit) {
+	if (squid_allocator->TheMeter.idle.level + pool->obj_size
+		<= allocator->mem_idle_limit)
+	{
 		memMeterInc(squid_pool->meter.idle);
 		memMeterAdd(squid_allocator->TheMeter.idle, pool->obj_size);
 #if DEBUG_MEMPOOL
-		(void) VALGRIND_MAKE_NOACCESS(obj, pool->real_obj_size + sizeof(struct mempool_cookie));
+		(void) VALGRIND_MAKE_NOACCESS(obj, pool->real_obj_size
+				+ sizeof(struct mempool_cookie));
 #else
 		(void) VALGRIND_MAKE_NOACCESS(obj, pool->obj_size);
 #endif
@@ -305,7 +324,8 @@ static void memPoolFree(ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool, void *obj
 			pool->before_free_fn(obj, pool->pool_ctx);
 		acl_default_free(__FILE__, __LINE__, obj);
 	}
-	acl_assert(squid_pool->meter.idle.level <= squid_pool->meter.alloc.level);
+	acl_assert(squid_pool->meter.idle.level
+		<= squid_pool->meter.alloc.level);
 }
 
 static int memPoolWasUsed(const ACL_MEM_POOL * pool)
@@ -350,7 +370,8 @@ ACL_ALLOCATOR *squid_allocator_create(void)
 	allocator->mem_alloc_fn = memPoolAlloc;
 	allocator->mem_free_fn = memPoolFree;
 
-	memset(&((SQUID_MEM_ALLOCATOR *) allocator)->TheMeter, 0, sizeof(MemPoolMeter));
+	memset(&((SQUID_MEM_ALLOCATOR *) allocator)->TheMeter,
+		0, sizeof(MemPoolMeter));
 
-	return ((ACL_ALLOCATOR *) allocator);
+	return (ACL_ALLOCATOR *) allocator;
 }

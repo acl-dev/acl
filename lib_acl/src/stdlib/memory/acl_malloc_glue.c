@@ -71,7 +71,7 @@ static void __mem_alloc_stat(void)
 	if (__alloc_max == 0 || __alloc_stat == NULL)
 		return;
 
-	acl_msg_info("----------------alloc status--------------------------------");
+	acl_msg_info("----------------alloc status---------------------------");
 	for (i = 0; i < __alloc_max; i++) {
 		if (__alloc_stat[i] > 0)
 			acl_msg_info("%d byte: %d", (int) i, __alloc_stat[i]);
@@ -88,7 +88,7 @@ void acl_memory_stat(void)
 	}
 
 	MSTAT_LOCK;
-	acl_msg_info("-----------------mem status---------------------------------");
+	acl_msg_info("-----------------mem status----------------------------");
 	acl_msg_info("__malloc_call_counter = %d\r\n", __malloc_call_counter);
 	acl_msg_info("__calloc_call_counter = %d\r\n", __calloc_call_counter);
 	acl_msg_info("__realloc_call_counter = %d\r\n", __realloc_call_counter);
@@ -104,7 +104,7 @@ void acl_memory_stat(void)
 		+ __memdup_call_counter;
 	acl_msg_info("total malloc = %d, total free = %d, inter = %d\r\n",
 		n, __free_call_counter, n - __free_call_counter);
-	acl_msg_info("-----------------------------------------------------------\r\n");
+	acl_msg_info("---------------------------------------------------\r\n");
 	MSTAT_UNLOCK;
 }
 
@@ -139,7 +139,8 @@ void *acl_malloc_glue(const char *filename, int line, size_t size)
 		__malloc_length += size;
 		MSTAT_UNLOCK;
 		if (__mem_stack)
-			acl_msg_info("malloc: file=%s, line=%d", filename, line);
+			acl_msg_info("malloc: file=%s, line=%d",
+				filename, line);
 	}
 
 	return (__malloc_fn(filename, line, size));
@@ -161,7 +162,8 @@ void *acl_calloc_glue(const char *filename, int line, size_t nmemb, size_t size)
 		__malloc_length += size;
 		MSTAT_UNLOCK;
 		if (__mem_stack)
-			acl_msg_info("calloc: file=%s, line=%d", filename, line);
+			acl_msg_info("calloc: file=%s, line=%d",
+				filename, line);
 	}
 
 	return (__calloc_fn(filename, line, nmemb, size));
@@ -188,7 +190,8 @@ void *acl_realloc_glue(const char *filename, int line, void *ptr, size_t size)
 		}
 		MSTAT_UNLOCK;
 		if (__mem_stack)
-			acl_msg_info("realloc: file=%s, line=%d", filename, line);
+			acl_msg_info("realloc: file=%s, line=%d",
+				filename, line);
 	}
 
 	return (__realloc_fn(filename, line, ptr, size));
@@ -212,13 +215,15 @@ char *acl_strdup_glue(const char *filename, int line, const char *str)
 		__malloc_length += strlen(str);
 		MSTAT_UNLOCK;
 		if (__mem_stack)
-			acl_msg_info("strdup: file=%s, line=%d", filename, line);
+			acl_msg_info("strdup: file=%s, line=%d",
+				filename, line);
 	}
 
 	return (__strdup_fn(filename, line, str));
 }
 
-char *acl_strndup_glue(const char *filename, int line, const char *str, size_t len)
+char *acl_strndup_glue(const char *filename, int line,
+	const char *str, size_t len)
 {
 	if (__alloc_stat) {
 		size_t  n = strlen(str);
@@ -239,13 +244,15 @@ char *acl_strndup_glue(const char *filename, int line, const char *str, size_t l
 		__malloc_length += len > n ? n: len;
 		MSTAT_UNLOCK;
 		if (__mem_stack)
-			acl_msg_info("strndup: file=%s, line=%d", filename, line);
+			acl_msg_info("strndup: file=%s, line=%d",
+				filename, line);
 	}
 
 	return (__strndup_fn(filename, line, str, len));
 }
 
-void *acl_memdup_glue(const char *filename, int line, const void *ptr, size_t len)
+void *acl_memdup_glue(const char *filename, int line,
+	const void *ptr, size_t len)
 {
 	if (__alloc_stat) {
 		if (len >= __alloc_max)
@@ -261,7 +268,8 @@ void *acl_memdup_glue(const char *filename, int line, const void *ptr, size_t le
 		__malloc_length += len;
 		MSTAT_UNLOCK;
 		if (__mem_stack)
-			acl_msg_info("memdup: file=%s, line=%d", filename, line);
+			acl_msg_info("memdup: file=%s, line=%d",
+				filename, line);
 	}
 
 	return (__memdup_fn(filename, line, ptr, len));

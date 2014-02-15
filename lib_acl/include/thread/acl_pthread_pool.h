@@ -197,6 +197,29 @@ ACL_API int acl_pthread_pool_dispatch(void *dispatch_arg,
 ACL_API int acl_pthread_pool_size(acl_pthread_pool_t *thr_pool);
 
 /**
+ * 设置线程任务调度超时警告的时间(毫秒)
+ * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
+ * @param n {acl_int64} 当该值 > 0 时，如果线程任务的调度时间超过此值则会记录警告日志(毫秒)
+ */
+ACL_API void acl_pthread_pool_set_schedule_warn(
+		acl_pthread_pool_t *thr_pool, acl_int64 n);
+
+/**
+ * 设置线程池中子线程等待任务的超时基准时间(毫秒)
+ * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
+ * @param n {acl_int64} 当该值 > 0 时，子线程等待任务的超时等待基准时间(毫秒)
+ */
+ACL_API void acl_pthread_pool_set_schedule_wait(
+		acl_pthread_pool_t *thr_pool, acl_int64 n);
+
+/**
+ * 当线程池中的任务发生堆积时，通过该函数设置任务队列堆积报警值
+ * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
+ * @param max {int} 任务队列堆积报警值
+ */
+ACL_API void acl_pthread_pool_set_qlen_warn(
+		acl_pthread_pool_t *thr_pool, int max);
+/**
  * 取得当前队列中未处理的任务个数
  * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
  * @return {int} 当前未处理的任务数
@@ -208,7 +231,8 @@ ACL_API int acl_pthread_pool_qlen(acl_pthread_pool_t *thr_pool);
  * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
  * @param size {size_t} 线程创建时的堆栈大小，单位为字节
  */
-ACL_API void acl_pthread_pool_set_stacksize(acl_pthread_pool_t *thr_pool, size_t size);
+ACL_API void acl_pthread_pool_set_stacksize(
+		acl_pthread_pool_t *thr_pool, size_t size);
 
 /**
  * 初始化线程池属性值

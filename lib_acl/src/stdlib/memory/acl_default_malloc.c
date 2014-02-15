@@ -154,26 +154,28 @@ void *acl_default_malloc(const char *filename, int line, size_t len)
 		pname = __FILENAME_UNKNOWN;
 
 	if (len < 1)
-		acl_msg_fatal("%s(%d)->%s: malloc: requested length %ld invalid",
+		acl_msg_fatal("%s(%d), %s: malloc: length %ld invalid",
 			pname, line, myname, (long) len);
 
 	new_len = SPACE_FOR(len);
 	if (new_len <= 0)
-		acl_msg_fatal("%s(%d): new_len(%d) <= 0", myname, __LINE__, (int) new_len);
+		acl_msg_fatal("%s(%d): new_len(%d) <= 0",
+			myname, __LINE__, (int) new_len);
 	else if (new_len >= 100000000)
-		acl_msg_warn("%s(%d): new_len(%d) too large", myname, __LINE__, (int) new_len);
+		acl_msg_warn("%s(%d): new_len(%d) too large",
+			myname, __LINE__, (int) new_len);
 
 #ifdef	_USE_GLIB
 	if ((real_ptr = (MBLOCK *) g_malloc(new_len)) == 0) {
 		acl_msg_error("%s(%d)->%s: g_malloc error(%s)",
 			pname, line, myname, strerror(errno));
-		return (0);
+		return 0;
 	}
 #else
 	if ((real_ptr = (MBLOCK *) malloc(new_len)) == 0) {
 		acl_msg_error("%s(%d)->%s: malloc: insufficient memory: %s",
 			pname, line, myname, strerror(errno));
-		return (0);
+		return 0;
 	}
 #endif
 	CHECK_OUT_PTR(ptr, real_ptr, len);
@@ -181,10 +183,11 @@ void *acl_default_malloc(const char *filename, int line, size_t len)
 	memset(ptr, FILLER, len);
 #endif
 
-	return (ptr);
+	return ptr;
 }
 
-void *acl_default_calloc(const char *filename, int line, size_t nmemb, size_t size)
+void *acl_default_calloc(const char *filename, int line,
+	size_t nmemb, size_t size)
 {
 	void *ptr;
 	int   n;
@@ -192,12 +195,13 @@ void *acl_default_calloc(const char *filename, int line, size_t nmemb, size_t si
 	n = nmemb * size;
 	ptr = acl_default_malloc(filename, line, n);
 	memset(ptr, FILLER, n);
-	return (ptr);
+	return ptr;
 }
 
 /* acl_default_realloc - reallocate memory or bust */
 
-void *acl_default_realloc(const char *filename, int line, void *ptr, size_t len)
+void *acl_default_realloc(const char *filename, int line,
+	void *ptr, size_t len)
 {
 	const char *myname = "acl_default_realloc";
 	MBLOCK *real_ptr;
@@ -211,7 +215,7 @@ void *acl_default_realloc(const char *filename, int line, void *ptr, size_t len)
 
 #ifndef NO_SHARED_EMPTY_STRINGS
 	if (ptr == empty_string)
-		return (acl_default_malloc(pname, line, len));
+		return acl_default_malloc(pname, line, len);
 #endif
 
 	if (len < 1)
@@ -221,9 +225,11 @@ void *acl_default_realloc(const char *filename, int line, void *ptr, size_t len)
 
 	new_len = SPACE_FOR(len);
 	if (new_len <= 0)
-		acl_msg_fatal("%s(%d): new_len(%d) <= 0", myname, __LINE__, (int) new_len);
+		acl_msg_fatal("%s(%d): new_len(%d) <= 0",
+			myname, __LINE__, (int) new_len);
 	else if (new_len >= 100000000)
-		acl_msg_warn("%s(%d): new_len(%d) too large", myname, __LINE__, (int) new_len);
+		acl_msg_warn("%s(%d): new_len(%d) too large",
+			myname, __LINE__, (int) new_len);
 
 #ifdef	_USE_GLIB
 	if ((real_ptr = (MBLOCK *) g_realloc((char *) real_ptr, new_len)) == 0)
@@ -240,7 +246,7 @@ void *acl_default_realloc(const char *filename, int line, void *ptr, size_t len)
 		memset((char *) ptr + old_len, FILLER, len - old_len);
 #endif
 
-	return (ptr);
+	return ptr;
 }
 
 /* acl_default_free - release memory */
@@ -297,14 +303,15 @@ char *acl_default_strdup(const char *filename, int line, const char *str)
 
 #ifndef NO_SHARED_EMPTY_STRINGS
 	if (*str == 0)
-		return ((char *) empty_string);
+		return (char *) empty_string;
 #endif
-	return (strcpy(acl_default_malloc(pname, line, strlen(str) + 1), str));
+	return strcpy(acl_default_malloc(pname, line, strlen(str) + 1), str);
 }
 
 /* acl_default_strndup - save substring to heap */
 
-char *acl_default_strndup(const char *filename, int line, const char *str, size_t len)
+char *acl_default_strndup(const char *filename, int line,
+	const char *str, size_t len)
 {
 	const char *myname = "acl_default_strndup";
 	char *result;
@@ -322,18 +329,19 @@ char *acl_default_strndup(const char *filename, int line, const char *str, size_
 
 #ifndef NO_SHARED_EMPTY_STRINGS
 	if (*str == 0)
-		return ((char *) empty_string);
+		return (char *) empty_string;
 #endif
 	if ((cp = memchr(str, 0, len)) != 0)
 		len = cp - str;
 	result = memcpy(acl_default_malloc(pname, line, len + 1), str, len);
 	result[len] = 0;
-	return (result);
+	return result;
 }
 
 /* acl_default_memdup - copy memory */
 
-void *acl_default_memdup(const char *filename, int line, const void *ptr, size_t len)
+void *acl_default_memdup(const char *filename, int line,
+	const void *ptr, size_t len)
 {
 	const char *myname = "acl_default_memdup";
 	const char *pname = NULL;
@@ -346,5 +354,5 @@ void *acl_default_memdup(const char *filename, int line, const void *ptr, size_t
 	if (ptr == 0)
 		acl_msg_fatal("%s(%d)->%s: null pointer argument",
 			pname, line, myname);
-	return (memcpy(acl_default_malloc(pname, line, len), ptr, len));
+	return memcpy(acl_default_malloc(pname, line, len), ptr, len);
 }

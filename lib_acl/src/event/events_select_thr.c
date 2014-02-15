@@ -95,7 +95,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	if (timeout > 0) {
 		fdp->r_timeout = timeout * 1000000;
-		fdp->r_ttl = eventp->event_present + fdp->r_timeout;
+		fdp->r_ttl = eventp->present + fdp->r_timeout;
 	} else {
 		fdp->r_ttl = 0;
 		fdp->r_timeout = 0;
@@ -166,7 +166,7 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	if (timeout > 0) {
 		fdp->r_timeout = timeout * 1000000;
-		fdp->r_ttl = eventp->event_present + fdp->r_timeout;
+		fdp->r_ttl = eventp->present + fdp->r_timeout;
 	} else {
 		fdp->r_ttl = 0;
 		fdp->r_timeout = 0;
@@ -233,7 +233,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	if (timeout > 0) {
 		fdp->w_timeout = timeout * 1000000;
-		fdp->w_ttl = eventp->event_present + fdp->w_timeout;
+		fdp->w_ttl = eventp->present + fdp->w_timeout;
 	} else {
 		fdp->w_ttl = 0;
 		fdp->w_timeout = 0;
@@ -343,7 +343,7 @@ static void event_loop(ACL_EVENT *eventp)
 
 	acl_ring_init(&timer_ring);
 
-	SET_TIME(eventp->event_present);
+	SET_TIME(eventp->present);
 	THREAD_LOCK(&event_thr->event.tm_mutex);
 
 	/*
@@ -351,7 +351,7 @@ static void event_loop(ACL_EVENT *eventp)
 	 * If any timer is scheduled, adjust the delay appropriately.
 	 */
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		select_delay = (int) (timer->when - eventp->event_present + 1000000 - 1)
+		select_delay = (int) (timer->when - eventp->present + 1000000 - 1)
 			/ 1000000;
 		if (select_delay < 0)
 			select_delay = 0;
@@ -455,12 +455,12 @@ TAG_DONE:
 	 * the application.
 	 */
 
-	SET_TIME(eventp->event_present);
+	SET_TIME(eventp->present);
 
 	THREAD_LOCK(&event_thr->event.tm_mutex);
 
 	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		if (timer->when > eventp->event_present)
+		if (timer->when > eventp->present)
 			break;
 
 		acl_ring_detach(&timer->ring);          /* first this */

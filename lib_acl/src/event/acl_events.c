@@ -1,11 +1,3 @@
-/*
- * Name: events.c
- * Author: zsx
- * Date: 2005-4-7, Version: 1.0
- * Date: 2005-7-9, Version: 1.1
- * Date: 2006-6-23, Version: 1.2
- */
-
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
@@ -60,8 +52,8 @@ static void event_init(ACL_EVENT *eventp, int fdsize,
 
 	acl_ring_init(&eventp->timer_head);
 	eventp->timer_keep = 0;
-	SET_TIME(eventp->event_present);
-	SET_TIME(eventp->event_last_debug);
+	SET_TIME(eventp->present);
+	SET_TIME(eventp->last_debug);
 
 	if (eventp->init_fn)
 		eventp->init_fn(eventp);
@@ -86,7 +78,7 @@ static int event_limit(int fdsize)
 
 	acl_msg_info("%s: max fdsize: %d", myname, fdsize);
 
-	return (fdsize);
+	return fdsize;
 }
 
 ACL_EVENT *acl_event_new_select(int delay_sec, int delay_usec)
@@ -97,7 +89,7 @@ ACL_EVENT *acl_event_new_select(int delay_sec, int delay_usec)
 	fdsize = event_limit(FD_SETSIZE);
 	eventp = event_new_select();
 	event_init(eventp, fdsize, delay_sec, delay_usec);
-	return (eventp);
+	return eventp;
 }
 
 ACL_EVENT *acl_event_new_select_thr(int delay_sec, int delay_usec)
@@ -108,7 +100,7 @@ ACL_EVENT *acl_event_new_select_thr(int delay_sec, int delay_usec)
 	fdsize = event_limit(FD_SETSIZE);
 	eventp = event_new_select_thr();
 	event_init(eventp, fdsize, delay_sec, delay_usec);
-	return (eventp);
+	return eventp;
 }
 
 ACL_EVENT *acl_event_new_poll(int delay_sec, int delay_usec)
@@ -120,14 +112,14 @@ ACL_EVENT *acl_event_new_poll(int delay_sec, int delay_usec)
 	fdsize = event_limit(0);
 	eventp = event_new_poll(fdsize);
 	event_init(eventp, fdsize, delay_sec, delay_usec);
-	return (eventp);
+	return eventp;
 #else
 	const char *myname = "acl_event_new_poll";
 
 	delay_sec = delay_sec;
 	delay_usec = delay_usec;
 	acl_msg_fatal("%s(%d): not support!", myname, __LINE__);
-	return (NULL);
+	return NULL;
 #endif
 }
 
@@ -138,16 +130,16 @@ ACL_EVENT *acl_event_new_poll_thr(int delay_sec, int delay_usec)
 	int   fdsize;
 
 	fdsize = event_limit(0);
-	eventp = event_new_poll_thr(fdsize);
+	eventp = event_poll_alloc_thr(fdsize);
 	event_init(eventp, fdsize, delay_sec, delay_usec);
-	return (eventp);
+	return eventp;
 #else
 	const char *myname = "acl_event_new_poll_thr";
 
 	delay_sec = delay_sec;
 	delay_usec = delay_usec;
 	acl_msg_fatal("%s(%d): not support!", myname, __LINE__);
-	return (NULL);
+	return NULL;
 #endif
 }
 
@@ -160,7 +152,7 @@ ACL_EVENT *acl_event_new_kernel(int delay_sec, int delay_usec)
 	fdsize = event_limit(0);
 	eventp = event_new_kernel(fdsize);
 	event_init(eventp, fdsize, delay_sec, delay_usec);
-	return (eventp);
+	return eventp;
 #elif defined(ACL_EVENTS_STYLE_IOCP)
 	ACL_EVENT *eventp;
 	int   fdsize;
@@ -168,14 +160,14 @@ ACL_EVENT *acl_event_new_kernel(int delay_sec, int delay_usec)
 	fdsize = event_limit(0);
 	eventp = event_new_iocp(fdsize);
 	event_init(eventp, fdsize, delay_sec, delay_usec);
-	return (eventp);
+	return eventp;
 #else
 	const char *myname = "acl_event_new_kernel";
 
 	delay_sec = delay_sec;
 	delay_usec = delay_usec;
 	acl_msg_fatal("%s(%d): not support!", myname, __LINE__);
-	return (NULL);
+	return NULL;
 #endif
 }
 
@@ -187,19 +179,19 @@ ACL_EVENT *acl_event_new_kernel_thr(int delay_sec, int delay_usec)
 
 	fdsize = event_limit(0);
 #if (ACL_EVENTS_KERNEL_STYLE == ACL_EVENTS_STYLE_EPOLL)
-	eventp = event_epoll_alloc_r(fdsize);
+	eventp = event_epoll_alloc_thr(fdsize);
 #else
 	eventp = event_new_kernel_thr(fdsize);
 #endif
 	event_init(eventp, fdsize, delay_sec, delay_usec);
-	return (eventp);
+	return eventp;
 #else
 	const char *myname = "acl_event_new_kernel_thr";
 
 	delay_sec = delay_sec;
 	delay_usec = delay_usec;
 	acl_msg_fatal("%s(%d): not support!", myname, __LINE__);
-	return (NULL);
+	return NULL;
 #endif
 }
 
@@ -212,13 +204,13 @@ ACL_EVENT *acl_event_new_wmsg(unsigned int nMsg)
 	fdsize = event_limit(0);
 	eventp = event_new_wmsg(nMsg);
 	event_init(eventp, fdsize, 0, 0);
-	return (eventp);
+	return eventp;
 #else
 	const char *myname = "acl_event_new_kernel";
 
 	(void) nMsg;
 	acl_msg_fatal("%s(%d): not support!", myname, __LINE__);
-	return (NULL);
+	return NULL;
 #endif
 }
 
@@ -265,7 +257,7 @@ ACL_EVENT *acl_event_new(int event_mode, int use_thr, int delay_sec, int delay_u
 		}
 	}
 
-	return (eventp);
+	return eventp;
 }
 
 void acl_event_fire_hook(ACL_EVENT *eventp, void (*fire_begin)(ACL_EVENT*, void*),
@@ -297,7 +289,7 @@ void acl_event_free(ACL_EVENT *eventp)
 
 acl_int64 acl_event_time(ACL_EVENT *eventp)
 {
-	return (eventp->event_present);
+	return eventp->present;
 }
 
 void acl_event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
@@ -355,51 +347,53 @@ void acl_event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 
 int acl_event_isset(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 {
-	return (acl_event_isrset(eventp, stream) || acl_event_iswset(eventp, stream));
+	return acl_event_isrset(eventp, stream)
+		|| acl_event_iswset(eventp, stream);
 }
 
 int acl_event_isrset(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 {
-	return (eventp->isrset_fn(eventp, stream));
+	return eventp->isrset_fn(eventp, stream);
 }
 
 int acl_event_iswset(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 {
-	return (eventp->iswset_fn(eventp, stream));
+	return eventp->iswset_fn(eventp, stream);
 }
 
 int acl_event_isxset(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 {
-	return (eventp->isxset_fn(eventp, stream));
+	return eventp->isxset_fn(eventp, stream);
 }
 
-acl_int64 acl_event_request_timer(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
-	void *context, acl_int64 delay, int keep)
+acl_int64 acl_event_request_timer(ACL_EVENT *eventp,
+	ACL_EVENT_NOTIFY_TIME callback, void *context,
+	acl_int64 delay, int keep)
 {
 	const char *myname = "acl_event_request_timer";
 
 	if (delay < 0)
 		acl_msg_panic("%s: invalid delay: %lld", myname, delay);
 
-	return (eventp->timer_request(eventp, callback, context, delay, keep));
+	return eventp->timer_request(eventp, callback, context, delay, keep);
 }
 
-acl_int64 acl_event_cancel_timer(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
-	void *context)
+acl_int64 acl_event_cancel_timer(ACL_EVENT *eventp,
+	ACL_EVENT_NOTIFY_TIME callback, void *context)
 {
-	return (eventp->timer_cancel(eventp, callback, context));
+	return eventp->timer_cancel(eventp, callback, context);
 }
 
-void acl_event_keep_timer(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
-	void *context, int onoff)
+void acl_event_keep_timer(ACL_EVENT *eventp,
+	ACL_EVENT_NOTIFY_TIME callback, void *context, int onoff)
 {
 	eventp->timer_keep(eventp, callback, context, onoff);
 }
 
-int acl_event_timer_ifkeep(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
-	void *context)
+int acl_event_timer_ifkeep(ACL_EVENT *eventp,
+	ACL_EVENT_NOTIFY_TIME callback, void *context)
 {
-	return (eventp->timer_ifkeep(eventp, callback, context));
+	return eventp->timer_ifkeep(eventp, callback, context);
 }
 
 void acl_event_loop(ACL_EVENT *eventp)
@@ -419,10 +413,10 @@ void acl_event_set_delay_usec(ACL_EVENT *eventp, int usec)
 
 int acl_event_use_thread(ACL_EVENT *eventp)
 {
-	return (eventp->use_thread);
+	return eventp->use_thread;
 }
 
 int acl_event_mode(ACL_EVENT *eventp)
 {
-	return (eventp->event_mode);
+	return eventp->event_mode;
 }

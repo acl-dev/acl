@@ -116,7 +116,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	if (timeout > 0) {
 		fdp->r_timeout = timeout * 1000000;
-		fdp->r_ttl = eventp->event_present + fdp->r_timeout;
+		fdp->r_ttl = eventp->present + fdp->r_timeout;
 	} else {
 		fdp->r_ttl = 0;
 		fdp->r_timeout = 0;
@@ -161,7 +161,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	if (timeout > 0) {
 		fdp->w_timeout = timeout * 1000000;
-		fdp->w_ttl = eventp->event_present + fdp->w_timeout;
+		fdp->w_ttl = eventp->present + fdp->w_timeout;
 	} else {
 		fdp->w_ttl = 0;
 		fdp->w_timeout = 0;
@@ -369,12 +369,12 @@ static void event_loop(ACL_EVENT *eventp)
 
 	/* 调整事件引擎的时间截 */
 
-	SET_TIME(eventp->event_present);
+	SET_TIME(eventp->present);
 
 	/* 根据定时器任务的最近任务计算 select 的检测超时上限 */
 
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		acl_int64 n = timer->when - eventp->event_present;
+		acl_int64 n = timer->when - eventp->present;
 
 		if (n <= 0)
 			delay = 0;
@@ -498,12 +498,12 @@ TAG_DONE:
 
 	/* 调整事件引擎的时间截 */
 
-	SET_TIME(eventp->event_present);
+	SET_TIME(eventp->present);
 
 	/* 优先处理定时器中的任务 */
 
 	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		if (timer->when > eventp->event_present)
+		if (timer->when > eventp->present)
 			break;
 		timer_fn  = timer->callback;
 		timer_arg = timer->context;
