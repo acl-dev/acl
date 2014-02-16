@@ -24,31 +24,30 @@ ACL_SEM *acl_sem_create2(const char *pathname, unsigned int initial_value)
 {
 	const char *myname = "acl_sem_create2";
 	ACL_SEM *sem;
-	char  buf[256];
 
 	/* Allocate sem memory */
 	sem = (ACL_SEM *) acl_mymalloc(sizeof(*sem));
 	if (sem == NULL) {
 		acl_msg_error("%s, %s(%d): malloc error(%s)",
-			__FILE__, myname, __LINE__, acl_last_strerror(buf, sizeof(buf)));
-		return (NULL);
+			__FILE__, myname, __LINE__, acl_last_serror());
+		return NULL;
 	}
 	/* Create the semaphore, with max value 32K */
 	sem->id = CreateSemaphore(NULL, initial_value, 32 * 1024, pathname);
 	sem->count = initial_value;
 	if (!sem->id) {
 		acl_msg_error("%s, %s(%d): Couldn't create semaphore(%s)",
-			__FILE__, myname, __LINE__, acl_last_strerror(buf, sizeof(buf)));
+			__FILE__, myname, __LINE__, acl_last_serror());
 		acl_myfree(sem);
-		return (NULL);
+		return NULL;
 	}
 
-	return(sem);
+	return sem;
 }
 
 ACL_SEM *acl_sem_create(unsigned int initial_value)
 {
-	return (acl_sem_create2(NULL, initial_value));
+	return acl_sem_create2(NULL, initial_value);
 }
 
 /* Free the semaphore */
@@ -68,19 +67,17 @@ int acl_sem_wait_timeout(ACL_SEM *sem, unsigned int timeout)
 	const char *myname = "acl_sem_wait_timeout";
 	int   retval;
 	DWORD dwMilliseconds;
-	char  buf[256];
 
 	if (sem == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
-				__FILE__, myname, __LINE__);
-		return (-1);
+			__FILE__, myname, __LINE__);
+		return -1;
 	}
 
-	if (timeout == ACL_MUTEX_MAXWAIT) {
+	if (timeout == ACL_MUTEX_MAXWAIT)
 		dwMilliseconds = INFINITE;
-	} else {
+	else
 		dwMilliseconds = (DWORD) timeout;
-	}
 
 	switch (WaitForSingleObject(sem->id, dwMilliseconds)) {
 	case WAIT_OBJECT_0:
@@ -92,7 +89,7 @@ int acl_sem_wait_timeout(ACL_SEM *sem, unsigned int timeout)
 		break;
 	default:
 		acl_msg_error("%s, %s(%d): WaitForSingleObject() failed",
-			__FILE__, myname, __LINE__, acl_last_strerror(buf, sizeof(buf)));
+			__FILE__, myname, __LINE__, acl_last_serror());
 		retval = -1;
 		break;
 	}
@@ -117,7 +114,7 @@ unsigned int acl_sem_value(ACL_SEM *sem)
 	if (sem == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
 			__FILE__, myname, __LINE__);
-		return (0);
+		return 0;
 	}
 	return sem->count;
 }
@@ -128,9 +125,10 @@ int acl_sem_post(ACL_SEM *sem)
 
 	if (sem == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
-				__FILE__, myname, __LINE__);
-		return (-1);
+			__FILE__, myname, __LINE__);
+		return -1;
 	}
+
 	/* Increase the counter in the first place, because
 	 * after a successful release the semaphore may
 	 * immediately get destroyed by another thread which
@@ -139,13 +137,12 @@ int acl_sem_post(ACL_SEM *sem)
 	++sem->count;
 
 	if (ReleaseSemaphore(sem->id, 1, NULL) == FALSE) {
-		char  buf[256];
-
 		--sem->count;	/* restore */
 		acl_msg_error("%s, %s(%d): ReleaseSemaphore() failed",
-			__FILE__, myname, __LINE__, acl_last_strerror(buf, sizeof(buf)));
+			__FILE__, myname, __LINE__, acl_last_serror());
 		return -1;
 	}
+
 	return 0;
 }
 

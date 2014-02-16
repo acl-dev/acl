@@ -117,46 +117,49 @@ struct acl_pthread_condattr_t {
 struct timespec {
 	time_t tv_sec;		/* Seconds. */
 	long int tv_nsec;	/* Nanoseconds. */
-#if 0
-	long int tv_msec;	/* millisecond, add by zsx */
-#endif
 };
 
 /* in acl_pthread.c */
 ACL_API void acl_pthread_end(void);
-ACL_API int acl_pthread_once(acl_pthread_once_t *once_control, void (*init_routine)(void));
-ACL_API int acl_pthread_key_create(acl_pthread_key_t *key_ptr, void (*destructor)(void*));
+ACL_API int acl_pthread_once(acl_pthread_once_t *once_control,
+		void (*init_routine)(void));
+ACL_API int acl_pthread_key_create(acl_pthread_key_t *key_ptr,
+		void (*destructor)(void*));
 ACL_API void *acl_pthread_getspecific(acl_pthread_key_t key);
 ACL_API int acl_pthread_setspecific(acl_pthread_key_t key, void *value);
 ACL_API int acl_pthread_attr_init(acl_pthread_attr_t *attr);
-ACL_API int acl_pthread_attr_setstacksize(acl_pthread_attr_t *attr, size_t stacksize);
-ACL_API int acl_pthread_attr_setdetachstate(acl_pthread_attr_t *attr, int detached);
+ACL_API int acl_pthread_attr_setstacksize(acl_pthread_attr_t *attr,
+		size_t stacksize);
+ACL_API int acl_pthread_attr_setdetachstate(acl_pthread_attr_t *attr,
+		int detached);
 ACL_API int acl_pthread_attr_destroy(acl_pthread_attr_t *thr_attr);
 ACL_API unsigned long acl_pthread_self(void);
-ACL_API int  acl_pthread_create(acl_pthread_t  *thread,
-		    acl_pthread_attr_t *attr,
-		    void * (*start_routine)(void *),
-		    void *arg);
+ACL_API int  acl_pthread_create(acl_pthread_t *thread,
+		acl_pthread_attr_t *attr, void * (*start_routine)(void *),
+		void *arg);
 ACL_API int acl_pthread_detach(acl_pthread_t thread);
 ACL_API int acl_pthread_join(acl_pthread_t thread, void **thread_return);
 
 /* in acl_pthread_mutex.c */
 ACL_API int acl_pthread_mutex_destroy(acl_pthread_mutex_t *mutex);
-ACL_API int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex, const acl_pthread_mutexattr_t *mattr);
+ACL_API int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex,
+		const acl_pthread_mutexattr_t *mattr);
 ACL_API int acl_pthread_mutex_lock(acl_pthread_mutex_t *mutex);
 ACL_API int acl_pthread_mutex_unlock(acl_pthread_mutex_t *mutex);
 
 #define	acl_pthread_mutex_trylock        acl_pthread_mutex_lock
 
 /* in acl_pthread_cond.c */
-ACL_API int acl_pthread_cond_init(acl_pthread_cond_t *cond, acl_pthread_condattr_t *cond_attr);
+ACL_API int acl_pthread_cond_init(acl_pthread_cond_t *cond,
+		acl_pthread_condattr_t *cond_attr);
 ACL_API acl_pthread_cond_t * acl_pthread_cond_create(void);
 ACL_API int acl_pthread_cond_destroy(acl_pthread_cond_t *cond);
 ACL_API int acl_pthread_cond_signal(acl_pthread_cond_t *cond);
 ACL_API int acl_pthread_cond_broadcast(acl_pthread_cond_t *cond);
-ACL_API int acl_pthread_cond_timedwait(acl_pthread_cond_t *cond, acl_pthread_mutex_t *mutex,
-		const struct timespec *timeout);
-ACL_API int acl_pthread_cond_wait(acl_pthread_cond_t *cond, acl_pthread_mutex_t *mutex);
+ACL_API int acl_pthread_cond_timedwait(acl_pthread_cond_t *cond,
+		acl_pthread_mutex_t *mutex, const struct timespec *timeout);
+ACL_API int acl_pthread_cond_wait(acl_pthread_cond_t *cond,
+		acl_pthread_mutex_t *mutex);
 
 #endif  /* !ACL_HAS_PTHREAD */
 
@@ -176,7 +179,8 @@ ACL_API int acl_pthread_atexit_remove(void *arg, void (*free_callback)(void*));
 ACL_API int acl_pthread_tls_set_max(int max);
 ACL_API int acl_pthread_tls_get_max(void);
 ACL_API void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr);
-ACL_API int acl_pthread_tls_set(acl_pthread_key_t key, void *ptr, void (*free_fn)(void *));
+ACL_API int acl_pthread_tls_set(acl_pthread_key_t key, void *ptr,
+		void (*free_fn)(void *));
 ACL_API int acl_pthread_tls_del(acl_pthread_key_t key);
 ACL_API void acl_pthread_tls_once_get(acl_pthread_once_t *control_once);
 ACL_API void acl_pthread_tls_once_set(acl_pthread_once_t control_once);

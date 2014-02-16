@@ -17,13 +17,14 @@
 #include "thread/acl_sem.h"
 #include "thread/acl_pthread.h"
 
-int acl_pthread_cond_init(acl_pthread_cond_t *cond, acl_pthread_condattr_t *cond_attr)
+int acl_pthread_cond_init(acl_pthread_cond_t *cond,
+	acl_pthread_condattr_t *cond_attr)
 {
 	const char *myname = "acl_pthread_cond_init";
 
 	if (cond == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
-				__FILE__, myname, __LINE__);
+			__FILE__, myname, __LINE__);
 		return -1;
 	}
 
@@ -36,8 +37,8 @@ int acl_pthread_cond_init(acl_pthread_cond_t *cond, acl_pthread_condattr_t *cond
 	cond->waiting   = cond->signals = 0;
 
 	if (!cond->lock || !cond->wait_sem || !cond->wait_done)
-		return (-1);
-	return (0);
+		return -1;
+	return 0;
 }
 
 /* Create a condition variable */
@@ -45,36 +46,34 @@ acl_pthread_cond_t * acl_pthread_cond_create(void)
 {
 	const char *myname = "acl_pthread_cond_create";
 	acl_pthread_cond_t *cond;
-	char  buf[256];
 
 	cond = (acl_pthread_cond_t *)
 		acl_mycalloc(1, sizeof(acl_pthread_cond_t));
 	if (cond == NULL) {
 		acl_msg_error("%s, %s(%d): calloc error(%s)",
-				__FILE__, myname, __LINE__,
-				acl_last_strerror(buf, sizeof(buf)));
-		return (NULL);
+			__FILE__, myname, __LINE__, acl_last_serror());
+		return NULL;
 	}
 	
 	if (acl_pthread_cond_init(cond, NULL) < 0) {
 		acl_pthread_cond_destroy(cond);
-		return (NULL);
+		return NULL;
 	}
 
 	cond->dynamic = 1;
-
-	return(cond);
+	return cond;
 }
 
 /* Destroy a condition variable */
+
 int acl_pthread_cond_destroy(acl_pthread_cond_t *cond)
 {
 	if (cond == NULL)
-		return (-1);
+		return -1;
 
 	if (cond->wait_sem)
 		acl_sem_destroy(cond->wait_sem);
-	if ( cond->wait_done )
+	if (cond->wait_done)
 		acl_sem_destroy(cond->wait_done);
 	if ( cond->lock )
 		acl_pthread_mutex_destroy(cond->lock);
@@ -82,7 +81,7 @@ int acl_pthread_cond_destroy(acl_pthread_cond_t *cond)
 	if (cond->dynamic)
 		acl_myfree(cond);
 
-	return (0);
+	return 0;
 }
 
 /* Restart one of the threads that are waiting on the condition variable */
@@ -92,7 +91,7 @@ int acl_pthread_cond_signal(acl_pthread_cond_t *cond)
 
 	if (cond == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
-				__FILE__, myname, __LINE__);
+			__FILE__, myname, __LINE__);
 		return -1;
 	}
 
@@ -105,9 +104,8 @@ int acl_pthread_cond_signal(acl_pthread_cond_t *cond)
 		acl_sem_post(cond->wait_sem);
 		acl_pthread_mutex_unlock(cond->lock);
 		acl_sem_wait(cond->wait_done);
-	} else {
+	} else
 		acl_pthread_mutex_unlock(cond->lock);
-	}
 
 	return 0;
 }
@@ -119,7 +117,7 @@ int acl_pthread_cond_broadcast(acl_pthread_cond_t *cond)
 
 	if (cond == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
-				__FILE__, myname, __LINE__);
+			__FILE__, myname, __LINE__);
 		return -1;
 	}
 
@@ -132,26 +130,24 @@ int acl_pthread_cond_broadcast(acl_pthread_cond_t *cond)
 
 		num_waiting = (cond->waiting - cond->signals);
 		cond->signals = cond->waiting;
-		for (i = 0; i < num_waiting; ++i) {
+		for (i = 0; i < num_waiting; ++i)
 			acl_sem_post(cond->wait_sem);
-		}
+
 		/* Now all released threads are blocked here, waiting for us.
-		   Collect them all (and win fabulous prizes!) :-)
+		 * Collect them all (and win fabulous prizes!) :-)
 		 */
 		acl_pthread_mutex_unlock(cond->lock);
-		for (i = 0; i < num_waiting; ++i) {
+		for (i = 0; i < num_waiting; ++i)
 			acl_sem_wait(cond->wait_done);
-		}
-	} else {
+	} else
 		acl_pthread_mutex_unlock(cond->lock);
-	}
 
 	return 0;
 }
 
 /* Wait on the condition variable for at most 'ms' milliseconds.
-   The mutex must be locked before entering this function!
-   The mutex is unlocked during the wait, and locked again after the wait.
+ * The mutex must be locked before entering this function!
+ * The mutex is unlocked during the wait, and locked again after the wait.
 
 Typical use:
 
@@ -169,15 +165,15 @@ Thread B:
 	...
 	pthread_mutex_unlock(lock);
  */
-int acl_pthread_cond_timedwait(acl_pthread_cond_t *cond, acl_pthread_mutex_t *mutex,
-		const struct timespec *timeout)
+int acl_pthread_cond_timedwait(acl_pthread_cond_t *cond,
+	acl_pthread_mutex_t *mutex, const struct timespec *timeout)
 {
 	const char *myname = "acl_pthread_cond_timedwait";
 	int   retval;
 	
 	if (cond == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
-				__FILE__, myname, __LINE__);
+			__FILE__, myname, __LINE__);
 		return -1;
 	}
 
@@ -193,9 +189,9 @@ int acl_pthread_cond_timedwait(acl_pthread_cond_t *cond, acl_pthread_mutex_t *mu
 	acl_pthread_mutex_unlock(mutex);
 
 	/* Wait for a signal */
-	if (timeout == NULL) {
+	if (timeout == NULL)
 		retval = acl_sem_wait(cond->wait_sem);
-	} else {
+	else {
 		int ms;
 		struct timeval tv;
 
@@ -216,9 +212,9 @@ int acl_pthread_cond_timedwait(acl_pthread_cond_t *cond, acl_pthread_mutex_t *mu
 	acl_pthread_mutex_lock(cond->lock);
 	if (cond->signals > 0) {
 		/* If we timed out, we need to eat a condition signal */
-		if (retval > 0) {
+		if (retval > 0)
 			acl_sem_wait(cond->wait_sem);
-		}
+
 		/* We always notify the signal thread that we are done */
 		acl_sem_post(cond->wait_done);
 
@@ -231,13 +227,14 @@ int acl_pthread_cond_timedwait(acl_pthread_cond_t *cond, acl_pthread_mutex_t *mu
 	/* Lock the mutex, as is required by condition variable semantics */
 	acl_pthread_mutex_lock(mutex);
 
-	return (retval);
+	return retval;
 }
 
 /* Wait on the condition variable forever */
+
 int acl_pthread_cond_wait(acl_pthread_cond_t *cond, acl_pthread_mutex_t *mutex)
 {
-	return (acl_pthread_cond_timedwait(cond, mutex, NULL));
+	return acl_pthread_cond_timedwait(cond, mutex, NULL);
 }
 
 #endif /* ACL_HAS_PTHREAD */

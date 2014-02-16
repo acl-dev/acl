@@ -175,11 +175,7 @@ static void *poller_thread(void *arg)
 
 	thr_pool->poller_running = 0;
 		
-#ifdef	WIN32 
-	acl_assert(acl_pthread_cond_signal(&thr_pool->poller_cond) == 0);
-#else
-	acl_assert(pthread_cond_broadcast(&thr_pool->poller_cond) == 0);
-#endif
+	acl_assert(acl_pthread_cond_broadcast(&thr_pool->poller_cond) == 0);
 
 	acl_debug(ACL_DEBUG_THR_POOL, 3) ("poller broadcast ok");
 	acl_assert(acl_pthread_mutex_unlock(&thr_pool->poller_mutex) == 0);
@@ -485,15 +481,15 @@ static void *worker_thread(void* arg)
 
 	thr_pool->count--;
 
+	if (thr_pool->quit) /* && thr_pool->count == 0) */
+		acl_pthread_cond_signal(&thr_pool->cond);
+
 	status = acl_pthread_mutex_unlock(mutex);
 	if (status != 0) {
 		SET_ERRNO(status);
 		acl_msg_error("%s, %s(%d): unlock error(%s)",
 			__FILE__, myname, __LINE__, acl_last_serror());
 	}
-
-	if (thr_pool->quit) /* && thr_pool->count == 0) */
-		acl_pthread_cond_signal(&thr_pool->cond);
 
 	return NULL;
 }
@@ -917,7 +913,7 @@ void acl_pthread_pool_bat_add_end(acl_pthread_pool_t *thr_pool)
 	thr_pool->thr_iter = NULL;
 }
 
-static void init_thread_pool(acl_pthread_pool_t *thr_pool)
+static void thread_pool_init(acl_pthread_pool_t *thr_pool)
 {
 	thr_pool->quit              = 0;
 	thr_pool->poller_quit       = 0;
@@ -934,7 +930,7 @@ static void init_thread_pool(acl_pthread_pool_t *thr_pool)
 	thr_pool->count             = 0;
 	thr_pool->idle              = 0;
 	thr_pool->schedule_warn     = 100;
-	thr_pool->schedule_wait     = 50;
+	thr_pool->schedule_wait     = 100;
 	thr_pool->cond_first        = NULL;
 	thr_pool->cond_last         = NULL;
 }
@@ -986,31 +982,30 @@ acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
 		acl_pthread_attr_setstacksize(&thr_pool->attr,
 			attr->stack_size);
 
-#ifdef	ACL_UNIX
-	status = pthread_attr_setdetachstate(&thr_pool->attr,
-			PTHREAD_CREATE_DETACHED);
+	status = acl_pthread_attr_setdetachstate(&thr_pool->attr,
+			ACL_PTHREAD_CREATE_DETACHED);
 	if (status != 0) {
 		SET_ERRNO(status);
 		acl_msg_fatal("%s(%d), %s: pthread_attr_setdetachstate: %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
 	}
-# if     !defined(__FreeBSD__)
+
+#if	defined(ACL_UNIX) && !defined(__FreeBSD__)
 	status = pthread_attr_setscope(&thr_pool->attr, PTHREAD_SCOPE_SYSTEM);
 	if (status != 0) {
 		SET_ERRNO(status);
 		acl_msg_fatal("%s(%d), %s: pthread_attr_setscope: %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
 	}
-# endif
-#elif defined(WIN32)
-	(void) acl_pthread_attr_setdetachstate(&thr_pool->attr, 1);
 #endif
+
 	status = acl_pthread_mutex_init(&thr_pool->worker_mutex, NULL);
 	if (status != 0) {
 		SET_ERRNO(status);
 		acl_msg_fatal("%s(%d), %s: pthread_mutex_init: %s",
 			__FILE__, __LINE__, myname, acl_last_serror());
 	}
+
 	status = acl_pthread_cond_init(&thr_pool->cond, NULL);
 	if (status != 0) {
 		SET_ERRNO(status);
@@ -1040,7 +1035,7 @@ acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
 			__FILE__, __LINE__, myname, acl_last_serror());
 	}
 
-	init_thread_pool(thr_pool);
+	thread_pool_init(thr_pool);
 
 	thr_pool->parallelism = (attr && attr->threads_limit > 0) ?
 		attr->threads_limit : ACL_PTHREAD_POOL_DEF_THREADS;
@@ -1421,7 +1416,7 @@ int acl_pthread_pool_start_poller(acl_pthread_pool_t *thr_pool)
 		return -1;
 	}
 
-	init_thread_pool(thr_pool);
+	thread_pool_init(thr_pool);
 
 	status = acl_pthread_create(&id, &thr_pool->attr,
 				poller_thread, (void*) thr_pool);

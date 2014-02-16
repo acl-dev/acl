@@ -18,15 +18,15 @@
 
 #ifdef	WIN32
 
-int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex, const acl_pthread_mutexattr_t *mattr)
+int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex,
+	const acl_pthread_mutexattr_t *mattr)
 {
 	const char *myname = "acl_pthread_mutex_init";
-	char  buf[256];
 
 	if (mutex == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
-				__FILE__, myname, __LINE__);
-		return (-1);
+			__FILE__, myname, __LINE__);
+		return -1;
 	}
 
 	mutex->dynamic = 0;
@@ -35,26 +35,24 @@ int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex, const acl_pthread_mutexat
 	mutex->id = CreateMutex((SECURITY_ATTRIBUTES *) mattr, FALSE, NULL);
 	if (!mutex->id) {
 		acl_msg_error("%s, %s(%d): CreateMutex error(%s)",
-				__FILE__, myname, __LINE__,
-				acl_last_strerror(buf, sizeof(buf)));
+			__FILE__, myname, __LINE__, acl_last_serror());
 		acl_myfree(mutex);
-		return (-1);
+		return -1;
 	}
-	return (0);
+
+	return 0;
 }
 
 acl_pthread_mutex_t *acl_pthread_mutex_create(void)
 {
 	const char *myname = "acl_pthread_mutex_create";
 	acl_pthread_mutex_t *mutex;
-	char  buf[256];
 
 	mutex = acl_mycalloc(1, sizeof(acl_pthread_mutex_t));
 	if (mutex == NULL) {
 		acl_msg_error("%s, %s(%d): calloc error(%s)",
-				__FILE__, myname, __LINE__,
-				acl_last_strerror(buf, sizeof(buf)));
-		return (NULL);
+			__FILE__, myname, __LINE__, acl_last_serror());
+		return NULL;
 	}
 
 	mutex->dynamic = 1;
@@ -63,12 +61,12 @@ acl_pthread_mutex_t *acl_pthread_mutex_create(void)
 	mutex->id = CreateMutex(NULL, FALSE, NULL);
 	if (!mutex->id) {
 		acl_msg_error("%s, %s(%d): CreateMutex error(%s)",
-				__FILE__, myname, __LINE__,
-				acl_last_strerror(buf, sizeof(buf)));
+			__FILE__, myname, __LINE__, acl_last_serror());
 		acl_myfree(mutex);
-		return (NULL);
+		return NULL;
 	}
-	return (mutex);
+
+	return mutex;
 }
 
 /* Free the mutex */
@@ -81,51 +79,47 @@ int acl_pthread_mutex_destroy(acl_pthread_mutex_t *mutex)
 		}
 		if (mutex->dynamic)
 			acl_myfree(mutex);
-		return (0);
+		return 0;
 	} else
-		return (-1);
+		return -1;
 }
 
 int acl_pthread_mutex_lock(acl_pthread_mutex_t *mutex)
 {
 	const char *myname = "acl_pthread_mutex_lock";
-	char  buf[256];
 
 	if (mutex == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
-				__FILE__, myname, __LINE__);
-		return (-1);
+			__FILE__, myname, __LINE__);
+		return -1;
 	}
 
 	if (WaitForSingleObject(mutex->id, INFINITE) == WAIT_FAILED) {
 		acl_msg_error("%s, %s(%d): WaitForSingleObject error(%s)",
-				__FILE__, myname, __LINE__,
-				acl_last_strerror(buf, sizeof(buf)));
-		return (-1);
+			__FILE__, myname, __LINE__, acl_last_serror());
+		return -1;
 	}
 
-	return (0);
+	return 0;
 }
 
 int acl_pthread_mutex_unlock(acl_pthread_mutex_t *mutex)
 {
 	const char *myname = "acl_pthread_mutex_unlock";
-	char  buf[256];
 
 	if (mutex == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
-				__FILE__, myname, __LINE__);
-		return (-1);
+			__FILE__, myname, __LINE__);
+		return -1;
 	}
 
 	if (ReleaseMutex(mutex->id) == FALSE) {
 		acl_msg_error("%s, %s(%d): ReleaseMutex error(%s)",
-				__FILE__, myname, __LINE__,
-				acl_last_strerror(buf, sizeof(buf)));
-		return (-1);
+			__FILE__, myname, __LINE__, acl_last_serror());
+		return -1;
 	}
 
-	return (0);
+	return 0;
 }
 
 #elif	defined(ACL_UNIX)
@@ -137,23 +131,21 @@ acl_pthread_mutex_t *acl_pthread_mutex_create(void)
 	const char *myname = "acl_pthread_mutex_create";
 	acl_pthread_mutex_t *mutex;
 	int   status;
-	char  buf[256];
 
 	mutex = (acl_pthread_mutex_t *)
 		acl_mymalloc(sizeof(acl_pthread_mutex_t));
 	if (mutex == NULL)
-		return (NULL);
+		return NULL;
 
 	if ((status = acl_pthread_mutex_init(mutex, NULL)) < 0) {
-		acl_msg_error("%s: init mutex error(%s)(%s)",
-				myname, acl_last_strerror(buf, sizeof(buf)),
-				strerror(status));
+		acl_msg_error("%s: init mutex error(%s)",
+			myname, acl_last_serror());
 
 		acl_myfree(mutex);
-		return (NULL);
+		return NULL;
 	}
 
-	return (mutex);
+	return mutex;
 }
 
 #endif /* WIN32/ACL_UNIX */
@@ -179,10 +171,10 @@ static void free_header(void *arg)
 		return;
 
 	acl_ring_foreach(iter, header_ptr) {
-		tmp = ACL_RING_TO_APPL(iter.ptr, acl_pthread_nested_mutex_t, ring);
-		if (tmp->mutex != NULL && tmp->nrefer > 0) {
+		tmp = ACL_RING_TO_APPL(iter.ptr,
+			acl_pthread_nested_mutex_t, ring);
+		if (tmp->mutex != NULL && tmp->nrefer > 0)
 			acl_pthread_mutex_unlock(tmp->mutex);
-		}
 	}
 }
 
@@ -192,6 +184,7 @@ static void acl_thread_mutex_init_once(void)
 }
 
 static acl_pthread_once_t thread_mutex_once_control = ACL_PTHREAD_ONCE_INIT;
+
 int acl_thread_mutex_lock(acl_pthread_mutex_t *mutex)
 {
 	ACL_RING_ITER iter;
@@ -199,9 +192,10 @@ int acl_thread_mutex_lock(acl_pthread_mutex_t *mutex)
 	ACL_RING *header_ptr;
 
 	if (mutex == NULL)
-		return (-1);
+		return -1;
 
-	acl_pthread_once(&thread_mutex_once_control, acl_thread_mutex_init_once);
+	acl_pthread_once(&thread_mutex_once_control,
+		acl_thread_mutex_init_once);
 
 	header_ptr = acl_pthread_getspecific(__header_key);
 
@@ -212,7 +206,8 @@ int acl_thread_mutex_lock(acl_pthread_mutex_t *mutex)
 	}
 
 	acl_ring_foreach(iter, header_ptr) {
-		tmp = ACL_RING_TO_APPL(iter.ptr, acl_pthread_nested_mutex_t, ring);
+		tmp = ACL_RING_TO_APPL(iter.ptr,
+			acl_pthread_nested_mutex_t, ring);
 		if (tmp->mutex == mutex) {
 			nested_mutex = tmp;
 			break;
@@ -226,10 +221,9 @@ int acl_thread_mutex_lock(acl_pthread_mutex_t *mutex)
 		nested_mutex->mutex = mutex;
 		nested_mutex->nrefer = 1;
 		ACL_RING_APPEND(header_ptr, &nested_mutex->ring);
-	} else {
+	} else
 		nested_mutex->nrefer++;
-	}
-	return (0);
+	return 0;
 }
 
 int acl_thread_mutex_unlock(acl_pthread_mutex_t *mutex)
@@ -239,10 +233,11 @@ int acl_thread_mutex_unlock(acl_pthread_mutex_t *mutex)
 	ACL_RING *header_ptr = acl_pthread_getspecific(__header_key);
 
 	if (mutex == NULL || header_ptr == NULL)
-		return (-1);
+		return -1;
 
 	acl_ring_foreach(iter, header_ptr) {
-		tmp = ACL_RING_TO_APPL(iter.ptr, acl_pthread_nested_mutex_t, ring);
+		tmp = ACL_RING_TO_APPL(iter.ptr,
+			acl_pthread_nested_mutex_t, ring);
 		if (tmp->mutex == mutex) {
 			nested_mutex = tmp;
 			break;
@@ -250,14 +245,14 @@ int acl_thread_mutex_unlock(acl_pthread_mutex_t *mutex)
 	}
 	
 	if (nested_mutex == NULL)
-		return (-1);
+		return -1;
 	if (--nested_mutex->nrefer == 0) {
 		ACL_RING_DETACH(&nested_mutex->ring);
 		acl_myfree(nested_mutex);
 		acl_pthread_mutex_unlock(mutex);
 	}
 
-	return (0);
+	return 0;
 }
 
 int acl_thread_mutex_nested(acl_pthread_mutex_t *mutex)
@@ -267,10 +262,11 @@ int acl_thread_mutex_nested(acl_pthread_mutex_t *mutex)
 	ACL_RING *header_ptr = acl_pthread_getspecific(__header_key);
 
 	if (mutex == NULL || header_ptr == NULL)
-		return (-1);
+		return -1;
 
 	acl_ring_foreach(iter, header_ptr) {
-		tmp = ACL_RING_TO_APPL(iter.ptr, acl_pthread_nested_mutex_t, ring);
+		tmp = ACL_RING_TO_APPL(iter.ptr,
+			acl_pthread_nested_mutex_t, ring);
 		if (tmp->mutex == mutex) {
 			nested_mutex = tmp;
 			break;
@@ -278,6 +274,6 @@ int acl_thread_mutex_nested(acl_pthread_mutex_t *mutex)
 	}
 
 	if (nested_mutex == NULL)
-		return (0);
-	return (nested_mutex->nrefer);
+		return 0;
+	return nested_mutex->nrefer;
 }

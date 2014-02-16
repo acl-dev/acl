@@ -53,7 +53,8 @@ typedef struct acl_pthread_pool_attr_t {
  * @param idle_timeout {int} 工作线程空闲超时退出时间(秒)
  * @return {acl_pthread_pool_t*}, 如果不为空则表示成功，否则失败
  */
-ACL_API acl_pthread_pool_t *acl_thread_pool_create(int threads_limit, int idle_timeout);
+ACL_API acl_pthread_pool_t *acl_thread_pool_create(
+		int threads_limit, int idle_timeout);
 
 /**
  * 创建一个线程池对象
@@ -61,7 +62,8 @@ ACL_API acl_pthread_pool_t *acl_thread_pool_create(int threads_limit, int idle_t
  *  则采用默认参数: ACL_PTHREAD_POOL_DEF_XXX
  * @return {acl_pthread_pool_t*}, 如果不为空则表示成功，否则失败
  */
-ACL_API acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr);
+ACL_API acl_pthread_pool_t *acl_pthread_pool_create(
+		const acl_pthread_pool_attr_t *attr);
 
 /**
  * 当队列堆积的任务数大于空闲线程数的2倍时. 通过此函数设置添加任务的
@@ -70,7 +72,8 @@ ACL_API acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_
  * @param timewait_sec {int} 休眠　的时间值, 建议将此值设置为 1--5 秒内
  * @return {int} 成功返回 0, 失败返回 -1
  */
-ACL_API int acl_pthread_pool_set_timewait(acl_pthread_pool_t *thr_pool, int timewait_sec);
+ACL_API int acl_pthread_pool_set_timewait(
+		acl_pthread_pool_t *thr_pool, int timewait_sec);
 
 /**
  * 添加注册函数，在线程创建后立即执行此初始化函数
@@ -245,21 +248,24 @@ ACL_API void acl_pthread_pool_attr_init(acl_pthread_pool_attr_t *attr);
  * @param attr {acl_pthread_pool_attr_t*}
  * @param size {size_t}
  */
-ACL_API void acl_pthread_pool_attr_set_stacksize(acl_pthread_pool_attr_t *attr, size_t size);
+ACL_API void acl_pthread_pool_attr_set_stacksize(
+		acl_pthread_pool_attr_t *attr, size_t size);
 
 /**
  * 设置线程池属性中的最大线程数限制值
  * @param attr {acl_pthread_pool_attr_t*}
  * @param threads_limit {int} 线程池中的最大线程数
  */
-ACL_API void acl_pthread_pool_attr_set_threads_limit(acl_pthread_pool_attr_t *attr, int threads_limit);
+ACL_API void acl_pthread_pool_attr_set_threads_limit(
+		acl_pthread_pool_attr_t *attr, int threads_limit);
 
 /**
  * 设置线程池属性中线程空闲超时值
  * @param attr {acl_pthread_pool_attr_t*}
  * @param idle_timeout {int} 线程空闲超时时间(秒)
  */
-ACL_API void acl_pthread_pool_attr_set_idle_timeout(acl_pthread_pool_attr_t *attr, int idle_timeout);
+ACL_API void acl_pthread_pool_attr_set_idle_timeout(
+		acl_pthread_pool_attr_t *attr, int idle_timeout);
 
 #ifdef	__cplusplus
 }

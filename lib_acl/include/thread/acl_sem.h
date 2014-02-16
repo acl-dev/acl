@@ -15,7 +15,8 @@ struct ACL_SEM {
 	unsigned int volatile count;
 };
 
-ACL_API ACL_SEM *acl_sem_create2(const char *pathname, unsigned int initial_value);
+ACL_API ACL_SEM *acl_sem_create2(const char *pathname,
+		unsigned int initial_value);
 ACL_API ACL_SEM *acl_sem_create(unsigned int initial_value);
 ACL_API void acl_sem_destroy(ACL_SEM *sem);
 ACL_API int acl_sem_wait_timeout(ACL_SEM *sem, unsigned int timeout);
