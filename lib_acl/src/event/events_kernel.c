@@ -592,7 +592,7 @@ static void event_set_all(ACL_EVENT *eventp)
 
 	eventp->fdcnt_ready = 0;
 
-	if (eventp->present - eventp->last_check >= 100000) {
+	if (eventp->present - eventp->last_check >= eventp->check_inter) {
 		eventp->last_check = eventp->present;
 		event_check_fds(eventp);
 	}

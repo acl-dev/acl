@@ -25,7 +25,9 @@
 #endif
 
 #define	ACL_PTHREAD_POOL_VALID		0x0decca62
-#define	SEC_TO_NSEC			1000000000
+#define	SEC_TO_NS			1000000000
+#define	SEC_TO_MS			1000
+#define	MS_TO_NS			1000000
 
 #define SET_TIME(x) do { \
 	struct timeval t; \
@@ -53,6 +55,8 @@ typedef struct thread_worker {
 	int   quit;                           /* if thread need quit ?      */
 	int   idle;                           /* thread wait timeout        */
 	acl_int64 wait_base;                  /* once wait: nanosecond      */
+	acl_int64 wait_sec;                   /* once wait: second          */
+	acl_int64 wait_nsec;                  /* once wait: nanosecond      */
 	acl_int64 wait_count;                 /* timeout of total wait      */
 	acl_pthread_job_t    *job_first;      /* thread's work queue first  */
 	acl_pthread_job_t    *job_last;       /* thread's work queue last   */
@@ -208,8 +212,13 @@ static thread_worker *worker_create(acl_pthread_pool_t *thr_pool)
 	thr->id = (unsigned long) acl_pthread_self();
 	thr->idle = thr_pool->idle_timeout;
 	if (thr->idle > 0 && thr_pool->schedule_wait > 0) {
-		thr->wait_base = thr_pool->schedule_wait * 1000000;
-		thr->wait_count = SEC_TO_NSEC/thr->wait_base * thr->idle;
+		thr->wait_sec = thr_pool->schedule_wait / SEC_TO_MS;
+		thr->wait_nsec = (thr_pool->schedule_wait * MS_TO_NS)
+			% SEC_TO_NS;
+		thr->wait_count = (SEC_TO_MS * thr->idle)
+			/ thr_pool->schedule_wait;
+		if (thr->wait_count == 0)
+			thr->idle = 0;
 	} else
 		thr->idle = 0;
 
@@ -319,6 +328,9 @@ static int worker_wait(acl_pthread_pool_t *thr_pool, thread_worker *thr)
 {
 	const char *myname = "worker_wait";
 	int   status, idle_count = 0;
+	struct timespec  timeout;
+	struct timeval   tv;
+	acl_int64 n;
 
 	while (1) {
 
@@ -338,18 +350,13 @@ static int worker_wait(acl_pthread_pool_t *thr_pool, thread_worker *thr)
 		thr_pool->idle++;
 
 		if (thr->idle > 0) {
-			struct timespec  timeout;
-			struct timeval   tv;
-			acl_int64 n;
-
 			gettimeofday(&tv, NULL);
-			timeout.tv_sec = tv.tv_sec;
-			n = tv.tv_usec * 1000 + thr->wait_base;
-			if (n >= SEC_TO_NSEC) {
+			timeout.tv_sec = tv.tv_sec + (time_t) thr->wait_sec;
+			n = tv.tv_usec * 1000 + thr->wait_nsec;
+			if (n >= SEC_TO_NS) {
 				timeout.tv_sec += 1;
-				timeout.tv_nsec = (long) n - SEC_TO_NSEC;
-			}
-			else
+				timeout.tv_nsec = (long) n - SEC_TO_NS;
+			} else
 				timeout.tv_nsec = (long) n;
 
 			status = acl_pthread_cond_timedwait(&thr->cond->cond,
@@ -438,6 +445,7 @@ static void *worker_thread(void* arg)
 	}
 
 	for (;;) {
+
 		/* handle thread self's job first */
 		if (thr->job_first != NULL) {
 			job = thr->job_first;
@@ -450,7 +458,7 @@ static void *worker_thread(void* arg)
 		}
 
 		/* then handle thread pool's job */
-		if (thr_pool->job_first != NULL) {
+		else if (thr_pool->job_first != NULL) {
 			job = thr_pool->job_first;
 			thr_pool->job_first = job->next;
 			if (thr_pool->job_last == job)
@@ -462,6 +470,9 @@ static void *worker_thread(void* arg)
 
 		if (thr->job_first != NULL || thr_pool->job_first != NULL)
 			continue;
+
+		else if (thr_pool->quit)
+			break;
 
 		else if (worker_wait(thr_pool, thr) > 0)
 			continue;

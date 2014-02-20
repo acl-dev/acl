@@ -92,7 +92,7 @@ void acl_msg_open2(ACL_VSTREAM *fp, const char *info_pre)
 
 void acl_msg_open(const char *log_file, const char *info_pre)
 {
-	char where[] = "acl_msg_open";
+	const char *myname = "acl_msg_open";
 	int  ret;
 
 	if (log_file == NULL || *log_file == 0
@@ -111,13 +111,12 @@ void acl_msg_open(const char *log_file, const char *info_pre)
 			__msg_ctx = NULL;
 			ret = acl_open_log(log_file, info_pre);
 		}
-	} else {
+	} else
 		ret = acl_open_log(log_file, info_pre);
-	}
+
 	if (ret < 0) {
-		char ebuf[256];
 		printf("%s: can't open log file=%s, info_pre=%s,%s\n",
-			where, log_file, info_pre, acl_last_strerror(ebuf, sizeof(ebuf)));
+			myname, log_file, info_pre, acl_last_serror());
 		__log_open_flag = 0;
 		__open_fn = NULL;
 		__write_fn = NULL;
@@ -446,7 +445,8 @@ const char *acl_strerror(unsigned int errnum, char *buffer, int size)
 		return NULL;
 	}
 
-	L = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ARGUMENT_ARRAY,
+	L = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM
+			| FORMAT_MESSAGE_ARGUMENT_ARRAY,
 			NULL,
 			errnum,
 			0,
@@ -513,7 +513,9 @@ const char *acl_last_serror(void)
 	if (buf == NULL) {
 		buf = acl_mymalloc(__buf_size);
 		acl_pthread_setspecific(__errbuf_key, buf);
-		if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
+		if ((unsigned long) acl_pthread_self()
+			== acl_main_thread_self())
+		{
 			__main_buf = buf;
 			atexit(main_free_buf);
 		}

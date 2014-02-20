@@ -79,6 +79,8 @@ int   acl_var_threads_enable_core;
 int   acl_var_threads_max_debug;
 int   acl_var_threads_status_notify;
 int   acl_var_threads_batadd;
+int   acl_var_threads_check_inter;
+int   acl_var_threads_qlen_warn;
 int   acl_var_threads_schedule_warn;
 int   acl_var_threads_schedule_wait;
 
@@ -101,8 +103,10 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_THREADS_MAX_DEBUG, ACL_DEF_THREADS_MAX_DEBUG, &acl_var_threads_max_debug, 0, 0 },
 	{ ACL_VAR_THREADS_STATUS_NOTIFY, ACL_DEF_THREADS_STATUS_NOTIFY, &acl_var_threads_status_notify, 0, 0 },
 	{ ACL_VAR_THREADS_BATADD, ACL_DEF_THREADS_BATADD, &acl_var_threads_batadd, 0, 0 },
+	{ ACL_VAR_THREADS_QLEN_WARN, ACL_DEF_THREADS_QLEN_WARN, &acl_var_threads_qlen_warn, 0, 0 },
 	{ ACL_VAR_THREADS_SCHEDULE_WARN, ACL_DEF_THREADS_SCHEDULE_WARN, &acl_var_threads_schedule_warn, 0, 0 },
 	{ ACL_VAR_THREADS_SCHEDULE_WAIT, ACL_DEF_THREADS_SCHEDULE_WAIT, &acl_var_threads_schedule_wait, 0, 0 },
+	{ ACL_VAR_THREADS_CHECK_INTER, ACL_DEF_THREADS_CHECK_INTER, &acl_var_threads_check_inter, 0, 0 },
 
         { 0, 0, 0, 0, 0 },
 };
@@ -741,8 +745,15 @@ static ACL_EVENT *event_open(int event_mode, acl_pthread_pool_t *threads)
 
 	/* set the event fire begin and fire end callback */
 	if (acl_var_threads_batadd)
-		acl_event_fire_hook(event, event_fire_begin,
+		acl_event_set_fire_hook(event, event_fire_begin,
 			event_fire_end, threads);
+
+	if (acl_var_threads_check_inter > 0)
+		acl_event_set_check_inter(event, acl_var_threads_check_inter);
+
+	if (acl_var_threads_qlen_warn > 0)
+		acl_pthread_pool_set_qlen_warn(threads,
+			acl_var_threads_qlen_warn);
 
 	/*
 	 * Running as a semi-resident server. Service connection requests.

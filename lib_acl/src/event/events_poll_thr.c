@@ -153,9 +153,9 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	if (eventp->maxfd == ACL_SOCKET_INVALID || eventp->maxfd < sockfd)
 		eventp->maxfd = sockfd;
 
-	acl_fdmap_add(event_thr->fdmap, sockfd, fdp);
-
 	THREAD_UNLOCK(&event_thr->event.tb_mutex);
+
+	acl_fdmap_add(event_thr->fdmap, sockfd, fdp);
 }
 
 static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
@@ -261,9 +261,9 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 		event_thr->fds[fdp->fdidx] = event_thr->fds[eventp->fdcnt];
 	}
 
-	THREAD_UNLOCK(&event_thr->event.tb_mutex);
-
 	acl_fdmap_del(event_thr->fdmap, sockfd);
+
+	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
 	if (fdp->flag & EVENT_FDTABLE_FLAG_READ)
 		stream->nrefer--;
@@ -314,24 +314,25 @@ static void event_loop(ACL_EVENT *eventp)
 	ACL_EVENT_NOTIFY_TIME timer_fn;
 	ACL_EVENT_TIMER *timer;
 	void *timer_arg;
-	int   delay, nready, i, revents;
+	int   delay, nready, i, revents, fdcnt;
 	ACL_EVENT_FDTABLE *fdp;
 
 	acl_ring_init(&timer_ring);
 
 	delay = eventp->delay_sec * 1000 + eventp->delay_usec / 1000;
-	if (delay <= 0)
+	if (delay < 0)
 		delay = 100; /* 100 milliseconds at least */
 
 	SET_TIME(eventp->present);
 	THREAD_LOCK(&event_thr->event.tm_mutex);
 
 	/*
-	 * Find out when the next timer would go off. Timer requests are sorted.
-	 * If any timer is scheduled, adjust the delay appropriately.
+	 * Find out when the next timer would go off. Timer requests
+	 * are sorted. If any timer is scheduled, adjust the delay
+	 * appropriately.
 	 */
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		int   n = (int) (timer->when - eventp->present + 1000000 - 1)
+		int n = (int) (timer->when - eventp->present + 1000000 - 1)
 			/ 1000000;
 		if (n <= 0)
 			delay = 0;
@@ -343,12 +344,13 @@ static void event_loop(ACL_EVENT *eventp)
 
 	eventp->fdcnt_ready = 0;
 
-	if (eventp->present - eventp->last_check >= 100000) {
+	if (eventp->present - eventp->last_check >= eventp->check_inter) {
 		eventp->last_check = eventp->present;
 
 		THREAD_LOCK(&event_thr->event.tb_mutex);
 
 		if (event_thr_prepare(eventp) == 0) {
+
 			THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
 			if (eventp->fdcnt_ready == 0)
@@ -358,7 +360,9 @@ static void event_loop(ACL_EVENT *eventp)
 			goto TAG_DONE;
 		}
 
-		memcpy(event_thr->fdset, event_thr->fds, eventp->fdcnt);
+		memcpy(event_thr->fdset, event_thr->fds,
+			eventp->fdcnt * sizeof(struct pollfd));
+		fdcnt = eventp->fdcnt;
 
 		THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
@@ -367,24 +371,26 @@ static void event_loop(ACL_EVENT *eventp)
 	} else {
 		THREAD_LOCK(&event_thr->event.tb_mutex);
 
-		memcpy(event_thr->fdset, event_thr->fds, eventp->fdcnt);
+		memcpy(event_thr->fdset, event_thr->fds,
+			eventp->fdcnt * sizeof(struct pollfd));
+		fdcnt = eventp->fdcnt;
 
 		THREAD_UNLOCK(&event_thr->event.tb_mutex);
 	}
 
 	event_thr->event.blocked = 1;
-	nready = poll(event_thr->fdset, eventp->fdcnt, delay);
+	nready = poll(event_thr->fdset, fdcnt, delay);
 	event_thr->event.blocked = 0;
 
 	if (nready < 0) {
 		if (acl_last_error() != ACL_EINTR)
-			acl_msg_fatal("%s(%d), %s: event_loop: select: %s",
+			acl_msg_fatal("%s(%d), %s: event_loop: poll: %s",
 				__FILE__, __LINE__, myname, acl_last_serror());
 		goto TAG_DONE;
 	} else if (nready == 0)
 		goto TAG_DONE;
 
-	for (i = 0; i < eventp->fdcnt; i++) {
+	for (i = 0; i < fdcnt; i++) {
 		fdp = acl_fdmap_ctx(event_thr->fdmap, event_thr->fdset[i].fd);
 		if (fdp == NULL || fdp->stream == NULL)
 			continue;

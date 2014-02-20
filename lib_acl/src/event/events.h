@@ -80,6 +80,7 @@ struct	ACL_EVENT {
 	/* 当前时间截(微秒级) */
 	acl_int64 present;
 	acl_int64 last_check;
+	acl_int64 check_inter;
 	acl_int64 last_debug;
 	/* 事件引擎的最大等待时间(秒) */
 	int   delay_sec;

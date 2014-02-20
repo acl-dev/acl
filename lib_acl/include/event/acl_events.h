@@ -147,10 +147,24 @@ ACL_API HWND acl_event_wmsg_hwnd(ACL_EVENT *eventp);
  */
 ACL_API void acl_event_add_dog(ACL_EVENT *eventp);
 
-ACL_API void acl_event_fire_hook(ACL_EVENT *eventp,
+/**
+ * 设置事件触发的前置和后置处理过程
+ * @param eventp {ACL_EVENT*} 事件对象指针, 不为能为空
+ * @param fire_begin {void (*)(ACL_EVENT*, void*)} 当事件被统一触发前的回调过程
+ * @param fire_end {void (*)(ACL_EVENT*, void*)} 当事件被统一触发后的回调过程
+ * @param ctx {void*} fire_begin / fire_end 的第二个参数
+ */
+ACL_API void acl_event_set_fire_hook(ACL_EVENT *eventp,
 		void (*fire_begin)(ACL_EVENT*, void*),
 		void (*fire_end)(ACL_EVENT*, void*),
 		void* ctx);
+
+/**
+ * 设置事件循环过程中定时检查所有描述字状态的时间间隔，内部缺少值为 100 ms
+ * @param eventp {ACL_EVENT*} 事件对象指针, 不为能为空
+ * @param n {int} 定时查检时间间隔 (毫秒级)
+ */
+ACL_API void acl_event_set_check_inter(ACL_EVENT *eventp, int n);
 
 /**
  * 释放事件结构

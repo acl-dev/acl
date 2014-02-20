@@ -116,6 +116,14 @@ extern int   acl_var_threads_schedule_warn;
 #define	ACL_DEF_THREADS_SCHEDULE_WAIT		50
 extern int   acl_var_threads_schedule_wait;
 
+#define	ACL_VAR_THREADS_CHECK_INTER		"ioctl_check_inter"
+#define	ACL_DEF_THREADS_CHECK_INTER		100
+extern int   acl_var_threads_check_inter;
+
+#define	ACL_VAR_THREADS_QLEN_WARN		"ioctl_qlen_warn"
+#define	ACL_DEF_THREADS_QLEN_WARN		0
+extern int   acl_var_threads_qlen_warn;
+
 #endif /* ACL_UNIX */
 
 #ifdef	__cplusplus

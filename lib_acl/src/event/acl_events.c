@@ -45,15 +45,13 @@ static void event_init(ACL_EVENT *eventp, int fdsize,
 
 	eventp->delay_sec  = delay_sec + delay_usec / 1000000;
 	eventp->delay_usec = delay_usec % 1000000;
-	/*
-	acl_ring_init(&eventp->used_ring);
-	acl_ring_init(&eventp->slot_ring);
-	*/
 
 	acl_ring_init(&eventp->timer_head);
 	eventp->timer_keep = 0;
 	SET_TIME(eventp->present);
 	SET_TIME(eventp->last_debug);
+
+	eventp->check_inter = 100000;  /* default: 100 ms */
 
 	if (eventp->init_fn)
 		eventp->init_fn(eventp);
@@ -214,7 +212,8 @@ ACL_EVENT *acl_event_new_wmsg(unsigned int nMsg)
 #endif
 }
 
-ACL_EVENT *acl_event_new(int event_mode, int use_thr, int delay_sec, int delay_usec)
+ACL_EVENT *acl_event_new(int event_mode, int use_thr,
+	int delay_sec, int delay_usec)
 {
 	const char *myname = "acl_event_new";
 	ACL_EVENT *eventp = NULL;
@@ -222,10 +221,12 @@ ACL_EVENT *acl_event_new(int event_mode, int use_thr, int delay_sec, int delay_u
 	if (use_thr) {
 		switch (event_mode) {
 		case ACL_EVENT_SELECT:
-			eventp = acl_event_new_select_thr(delay_sec, delay_usec);
+			eventp = acl_event_new_select_thr(delay_sec,
+					delay_usec);
 			break;
 		case ACL_EVENT_KERNEL:
-			eventp = acl_event_new_kernel_thr(delay_sec, delay_usec);
+			eventp = acl_event_new_kernel_thr(delay_sec,
+					delay_usec);
 			break;
 		case ACL_EVENT_POLL:
 			eventp = acl_event_new_poll_thr(delay_sec, delay_usec);
@@ -260,7 +261,13 @@ ACL_EVENT *acl_event_new(int event_mode, int use_thr, int delay_sec, int delay_u
 	return eventp;
 }
 
-void acl_event_fire_hook(ACL_EVENT *eventp, void (*fire_begin)(ACL_EVENT*, void*),
+void acl_event_set_check_inter(ACL_EVENT *eventp, int n)
+{
+	eventp->check_inter = n * 1000;
+}
+
+void acl_event_set_fire_hook(ACL_EVENT *eventp,
+	void (*fire_begin)(ACL_EVENT*, void*),
 	void (*fire_end)(ACL_EVENT*, void*), void* ctx)
 {
 	eventp->fire_begin = fire_begin;
@@ -282,6 +289,7 @@ void acl_event_free(ACL_EVENT *eventp)
 		acl_ring_detach(&timer->ring);
 		acl_myfree(timer);
 	}
+
 	acl_myfree(eventp->fdtabs);
 	acl_myfree(eventp->fdtabs_ready);
 	free_fn(eventp);
@@ -300,7 +308,8 @@ void acl_event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	if (sockfd == ACL_SOCKET_INVALID)
 		acl_msg_fatal("%s(%d): sockfd(%d) invalid",
 			myname, __LINE__, sockfd);
-	eventp->enable_read_fn(eventp, stream, read_timeout, callback, context);
+	eventp->enable_read_fn(eventp, stream, read_timeout,
+			callback, context);
 }
 
 void acl_event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
@@ -311,13 +320,15 @@ void acl_event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	if (sockfd == ACL_SOCKET_INVALID)
 		acl_msg_fatal("%s(%d): sockfd(%d) invalid",
 			myname, __LINE__, sockfd);
-	eventp->enable_write_fn(eventp, stream, write_timeout, callback, context);
+	eventp->enable_write_fn(eventp, stream, write_timeout,
+			callback, context);
 }
 
 void acl_event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	int read_timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
 {
-	eventp->enable_listen_fn(eventp, stream, read_timeout, callback, context);
+	eventp->enable_listen_fn(eventp, stream, read_timeout,
+			callback, context);
 }
 
 void acl_event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream)
