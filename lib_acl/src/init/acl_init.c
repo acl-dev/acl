@@ -24,7 +24,7 @@
 
 #include "init.h"
 
-static char *version = "lib_acl_3.0.16";
+static char *version = "lib_acl_3.0.17";
 
 const char *acl_version(void)
 {

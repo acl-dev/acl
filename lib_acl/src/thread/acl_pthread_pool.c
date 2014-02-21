@@ -83,7 +83,6 @@ struct acl_pthread_pool_t {
 	thread_worker        *thr_first;      /* first idle thread          */
 	thread_worker        *thr_iter;       /* for bat operation          */
 	thread_cond          *cond_first;
-	thread_cond          *cond_last;
 	int   poller_running;                 /* is poller thread running ? */
 	int   qlen;                           /* the work queue's length    */
 	int   job_nslot;
@@ -193,7 +192,7 @@ static thread_cond *thread_cond_create(void)
 	thread_cond *cond = (thread_cond*)
 		acl_mycalloc(1, sizeof(thread_cond));
 
-	acl_pthread_cond_init(&cond->cond, NULL);
+	acl_assert(acl_pthread_cond_init(&cond->cond, NULL) == 0);
 	return cond;
 }
 
@@ -207,7 +206,6 @@ static thread_worker *worker_create(acl_pthread_pool_t *thr_pool)
 {
 	thread_worker *thr = (thread_worker*) acl_mycalloc(1,
 			sizeof(thread_worker));
-	thread_cond *cond = thr_pool->cond_first;
 
 	thr->id = (unsigned long) acl_pthread_self();
 	thr->idle = thr_pool->idle_timeout;
@@ -222,27 +220,20 @@ static thread_worker *worker_create(acl_pthread_pool_t *thr_pool)
 	} else
 		thr->idle = 0;
 
-	if (cond == NULL) {
-		cond = thread_cond_create();
-		acl_assert(acl_pthread_cond_init(&cond->cond, NULL) == 0);
-	} else {
-		thr_pool->cond_first = cond->next;
-		if (thr_pool->cond_last == cond)
-			thr_pool->cond_last = NULL;
-	}
+	if (thr_pool->cond_first != NULL) {
+		thr->cond = thr_pool->cond_first;
+		thr_pool->cond_first = thr_pool->cond_first->next;
+	} else
+		thr->cond = thread_cond_create();
 
-	thr->cond = cond;
 	thr->mutex = &thr_pool->worker_mutex;
 	return thr;
 }
 
 static void worker_free(acl_pthread_pool_t *thr_pool, thread_worker *thr)
 {
-	if (thr_pool->cond_first == NULL)
-		thr_pool->cond_first = thr->cond;
-	else
-		thr_pool->cond_last->next = thr->cond;
-	thr_pool->cond_last = thr->cond;
+	thr->cond->next = thr_pool->cond_first;
+	thr_pool->cond_first = thr->cond;
 	acl_myfree(thr);
 }
 
@@ -431,18 +422,17 @@ static void *worker_thread(void* arg)
 		}
 	}
 
-	thr = worker_create(thr_pool);
-	acl_assert(thr->mutex == &thr_pool->worker_mutex);
-	mutex = thr->mutex;
-
 	/* lock the thread pool's global mutex at first */
 
-	status = acl_pthread_mutex_lock(mutex);
+	status = acl_pthread_mutex_lock(&thr_pool->worker_mutex);
 	if (status != 0) {
 		SET_ERRNO(status);
 		acl_msg_fatal("%s(%d), %s: lock failed: %s", __FILE__,
 			__LINE__, myname, acl_last_serror());
 	}
+
+	thr = worker_create(thr_pool);
+	mutex = thr->mutex;
 
 	for (;;) {
 
@@ -498,7 +488,7 @@ static void *worker_thread(void* arg)
 	status = acl_pthread_mutex_unlock(mutex);
 	if (status != 0) {
 		SET_ERRNO(status);
-		acl_msg_error("%s, %s(%d): unlock error(%s)",
+		acl_msg_fatal("%s, %s(%d): unlock error(%s)",
 			__FILE__, myname, __LINE__, acl_last_serror());
 	}
 
@@ -943,7 +933,6 @@ static void thread_pool_init(acl_pthread_pool_t *thr_pool)
 	thr_pool->schedule_warn     = 100;
 	thr_pool->schedule_wait     = 100;
 	thr_pool->cond_first        = NULL;
-	thr_pool->cond_last         = NULL;
 }
 
 /* create work queue */

@@ -42,7 +42,7 @@ endif
 ##############################################################################
 
 .PHONY = check help all clean install uninstall uninstall_all build_bin build_src
-VERSION = 3.0.11
+VERSION = 3.0.17
 
 help:
 	@(echo "usage: make help|all|clean|install|uninstall|uninstall_all|build_bin|build_src")

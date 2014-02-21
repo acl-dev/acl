@@ -50,6 +50,8 @@ struct IOCP_EVENT {
 	int   type;
 #define	IOCP_EVENT_READ		(1 << 0)
 #define IOCP_EVENT_WRITE	(1 << 2)
+#define IOCP_EVENT_DEAD		(1 << 3)
+
 	ACL_EVENT_FDTABLE *fdp;
 
 #define ACCEPT_ADDRESS_LENGTH ((sizeof(struct sockaddr_in) + 16))
@@ -73,20 +75,44 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	}
 
 	/* 必须在释放 fdp->event_read/fdp->event_write 前关闭套接口句柄 */
-
-	if (ACL_VSTREAM_SOCK(stream) != ACL_SOCKET_INVALID && stream->close_fn)
+	shutdown(ACL_VSTREAM_SOCK(stream), 0);
+	shutdown(ACL_VSTREAM_SOCK(stream), 1);
+	if (ACL_VSTREAM_SOCK(stream) != ACL_SOCKET_INVALID
+		&& stream->close_fn)
+	{
 		(void) stream->close_fn(ACL_VSTREAM_SOCK(stream));
-	else if (ACL_VSTREAM_FILE(stream) != ACL_FILE_INVALID && stream->fclose_fn)
+	} else if (ACL_VSTREAM_FILE(stream) != ACL_FILE_INVALID
+		&& stream->fclose_fn)
+	{
 		(void) stream->fclose_fn(ACL_VSTREAM_FILE(stream));
+	}
+
 	ACL_VSTREAM_SOCK(stream) = ACL_SOCKET_INVALID;
 	ACL_VSTREAM_FILE(stream) = ACL_FILE_INVALID;
 
 	if (fdp->event_read) {
-		acl_myfree(fdp->event_read);
+		/* 如果完成端口处于未决状态，则不能释放重叠结构，需在主循环的
+		 * GetQueuedCompletionStatus 调用后来释放
+		 */
+		if (HasOverlappedIoCompleted(&fdp->event_read->overlapped))
+			acl_myfree(fdp->event_read);
+		else {
+			fdp->event_read->type = IOCP_EVENT_DEAD;
+			fdp->event_read->fdp = NULL;
+		}
 		fdp->event_read = NULL;
 	}
 	if (fdp->event_write) {
-		acl_myfree(fdp->event_write);
+		/* 如果完成端口处于未决状态，则不能释放重叠结构，需在主循环的
+		 * GetQueuedCompletionStatus 调用后来释放
+		 */
+		if (HasOverlappedIoCompleted(&fdp->event_write->overlapped))
+			acl_myfree(fdp->event_write);
+		else {
+			fdp->event_write->type = IOCP_EVENT_DEAD;
+			fdp->event_write->fdp = NULL;
+		}
+
 		fdp->event_write = NULL;
 	}
 
@@ -741,42 +767,64 @@ TAG_DONE:
 		DWORD lastError = 0;
 		IOCP_EVENT *iocp_event = NULL;
 
-		isSuccess = GetQueuedCompletionStatus(ev->h_iocp, &bytesTransferred,
-			(DWORD*) &fdp, (OVERLAPPED**) &iocp_event, delay);
+		isSuccess = GetQueuedCompletionStatus(ev->h_iocp,
+			&bytesTransferred, (DWORD*) &fdp,
+			(OVERLAPPED**) &iocp_event, delay);
+
 		if (!isSuccess) {
 			if (iocp_event == NULL)
 				break;
-			if (!(fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT))) {
+			if (iocp_event->type == IOCP_EVENT_DEAD)
+				acl_myfree(iocp_event);
+			else if (iocp_event->fdp == NULL) {
+				acl_msg_warn("%s(%d): fdp null",
+					myname, __LINE__);
+				acl_myfree(iocp_event);
+			} else if (iocp_event->fdp != fdp)
+				acl_msg_fatal("%s(%d): invalid fdp",
+					myname, __LINE__);
+			else if (!(fdp->event_type & (ACL_EVENT_XCPT
+				| ACL_EVENT_RW_TIMEOUT)))
+			{
 				fdp->event_type |= ACL_EVENT_XCPT;
 				fdp->fdidx_ready = eventp->fdcnt_ready;
-				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
+				eventp->fdtabs_ready[eventp->fdcnt_ready] = fdp;
+				eventp->fdcnt_ready++;
 			}
 			continue;
 		}
 
 		acl_assert(fdp == iocp_event->fdp);
 
-		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT)))
+		if ((fdp->event_type & (ACL_EVENT_XCPT
+			| ACL_EVENT_RW_TIMEOUT)))
+		{
 			continue;
+		}
+
 		if (iocp_event->type == IOCP_EVENT_READ) {
 			acl_assert(fdp->event_read == iocp_event);
 			iocp_event->type &= ~IOCP_EVENT_READ;
 			fdp->stream->sys_read_ready = 1;
-			if ((fdp->event_type & (ACL_EVENT_READ | ACL_EVENT_WRITE)) == 0)
+			if ((fdp->event_type & (ACL_EVENT_READ
+				| ACL_EVENT_WRITE)) == 0)
 			{
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = eventp->fdcnt_ready;
-				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
+				eventp->fdtabs_ready[eventp->fdcnt_ready] = fdp;
+				eventp->fdcnt_ready++;
 			}
 		}
 		if (iocp_event->type == IOCP_EVENT_WRITE) {
 			acl_assert(fdp->event_write == iocp_event);
 			iocp_event->type &= ~IOCP_EVENT_WRITE;
-			if ((fdp->event_type & (ACL_EVENT_READ | ACL_EVENT_WRITE)) == 0)
+			if ((fdp->event_type & (ACL_EVENT_READ
+				| ACL_EVENT_WRITE)) == 0)
 			{
 				fdp->event_type |= ACL_EVENT_WRITE;
 				fdp->fdidx_ready = eventp->fdcnt_ready;
-				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
+				eventp->fdtabs_ready[eventp->fdcnt_ready] = fdp;
+				eventp->fdcnt_ready++;
 			}
 		}
 		delay = 0;

@@ -195,8 +195,8 @@ public:
 	 */
 	bool timeout_callback()
 	{
-		std::cout << "Timeout ..." << std::endl;
-		return (true);
+		std::cout << "Timeout, delete it ..." << std::endl;
+		return (false);
 	}
 
 private:
@@ -239,7 +239,7 @@ public:
 		client->add_timeout_callback(callback);
 
 		// 从异步流读一行数据
-		client->gets(10, false);
+		client->gets(3, false);
 		return (true);
 	}
 };
@@ -251,7 +251,7 @@ static void usage(const char* procname)
 
 int main(int argc, char* argv[])
 {
-	bool use_kernel = true;
+	bool use_kernel = false;
 	int  ch;
 
 	while ((ch = getopt(argc, argv, "hk")) > 0)
