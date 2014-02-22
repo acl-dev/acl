@@ -63,6 +63,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aio_client", "lib_acl_cpp\s
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winaio", "lib_acl_cpp\samples\winaio\winaio.vcproj", "{ADE6F714-BD52-432D-AB86-62FA59AB6746}"
 	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aio_ipc", "lib_acl_cpp\samples\aio\aio_ipc\aio_ipc.vcproj", "{956FA905-A77F-41FE-A4BE-C3BD3B5B3E83}"
