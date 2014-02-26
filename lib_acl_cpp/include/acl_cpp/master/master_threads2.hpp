@@ -136,7 +136,7 @@ private:
 	static void service_exit(void*);
 
 	// 当线程创建后调用的回调函数
-	static void thread_init(void*);
+	static int thread_init(void*);
 
 	// 当线程退出前调用的回调函数
 	static void thread_exit(void*);

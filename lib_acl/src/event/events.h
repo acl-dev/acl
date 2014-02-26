@@ -155,9 +155,11 @@ struct	ACL_EVENT {
 };
 
 /* 如果采用自旋锁，必须保持加锁时间非常短 */
+/*
 #ifdef	ACL_HAS_SPINLOCK
 #define	EVENT_USE_SPINLOCK
 #endif
+*/
 
 typedef struct EVENT_THR {
 	ACL_EVENT event;

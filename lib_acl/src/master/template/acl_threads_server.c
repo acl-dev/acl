@@ -748,7 +748,7 @@ static ACL_EVENT *event_open(int event_mode, acl_pthread_pool_t *threads)
 		acl_event_set_fire_hook(event, event_fire_begin,
 			event_fire_end, threads);
 
-	if (acl_var_threads_check_inter > 0)
+	if (acl_var_threads_check_inter >= 0)
 		acl_event_set_check_inter(event, acl_var_threads_check_inter);
 
 	if (acl_var_threads_qlen_warn > 0)

@@ -258,10 +258,11 @@ void master_threads2::service_exit(void*)
 	__mt->proc_on_exit();
 }
 
-void master_threads2::thread_init(void*)
+int master_threads2::thread_init(void*)
 {
 	acl_assert(__mt != NULL);
 	__mt->thread_on_init();
+	return 0;
 }
 
 void master_threads2::thread_exit(void*)
