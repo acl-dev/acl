@@ -458,6 +458,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include=".\src\json\acl_json.c" />
     <ClCompile Include=".\src\json\acl_json_parse.c" />
     <ClCompile Include=".\src\json\acl_json_util.c" />
+    <ClCompile Include="src\event\events_epoll_thr.c" />
     <ClCompile Include="src\master\template\acl_udp_server.c" />
   </ItemGroup>
   <ItemGroup>

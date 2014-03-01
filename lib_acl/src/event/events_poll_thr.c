@@ -332,12 +332,15 @@ static void event_loop(ACL_EVENT *eventp)
 	 * appropriately.
 	 */
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		int n = (int) (timer->when - eventp->present + 1000000 - 1)
+		acl_int64 n = (timer->when - eventp->present + 1000000 - 1)
 			/ 1000000;
 		if (n <= 0)
 			delay = 0;
-		else if (n < eventp->delay_sec)
-			delay = n * 1000 + eventp->delay_usec / 1000;
+		else if (n < eventp->delay_sec) {
+			delay = (int) n * 1000 + eventp->delay_usec / 1000;
+			if (delay <= 0)  /* xxx */
+				delay = 100;
+		}
 	}
 
 	THREAD_UNLOCK(&event_thr->event.tm_mutex);

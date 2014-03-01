@@ -31,7 +31,7 @@ acl_int64 event_timer_request_thr(ACL_EVENT *eventp,
 	ACL_RING_ITER iter;
 	ACL_EVENT_TIMER *timer = NULL;
 
-	if (delay < 0)
+	if (delay < 0 || delay >= 4294963950LL)
 		acl_msg_panic("%s: invalid delay: %lld", myname, delay);
 
 	THREAD_LOCK(&event_thr->tm_mutex);

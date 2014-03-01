@@ -364,7 +364,9 @@
     <ClCompile Include="src\stream\aio_timer_callback.cpp">
       <Filter>src\stream</Filter>
     </ClCompile>
-    <ClCompile Include="src\event\event_timer.cpp" />
+    <ClCompile Include="src\event\event_timer.cpp">
+      <Filter>src\event</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -754,7 +756,9 @@
     <ClInclude Include="include\acl_cpp\stream\aio_timer_callback.hpp">
       <Filter>include\stream</Filter>
     </ClInclude>
-    <ClInclude Include="include\acl_cpp\event\event_timer.hpp" />
+    <ClInclude Include="include\acl_cpp\event\event_timer.hpp">
+      <Filter>include\event</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl_cpp_vc2010.rc" />
@@ -860,6 +864,12 @@
     </Filter>
     <Filter Include="src\connpool">
       <UniqueIdentifier>{477f1b57-f0e0-4eb7-9343-8f13a8618463}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\event">
+      <UniqueIdentifier>{c24e07a0-4035-459f-bd05-3feef68f2bd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\event">
+      <UniqueIdentifier>{c81440c9-71a3-4a12-b078-f9845c634089}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

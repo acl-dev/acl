@@ -905,6 +905,9 @@
     <ClCompile Include=".\src\code\uni2utf8.c">
       <Filter>Source Files\code</Filter>
     </ClCompile>
+    <ClCompile Include="src\event\events_epoll_thr.c">
+      <Filter>Source Files\event</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl.rc">

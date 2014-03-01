@@ -363,8 +363,11 @@ static void event_loop(ACL_EVENT *eventp)
 		acl_int64 n = timer->when - eventp->present;
 		if (n <= 0)
 			delay = 0;
-		else if ((int) n < delay)
+		else if ((int) n < delay) {
 			delay = (int) n;
+			if (delay <= 0)  /* xxx */
+				delay = 100;
+		}
 	}
 
 	/* 调用 event_prepare 检查有多少个描述字需要通过 poll 进行检测 */

@@ -648,8 +648,11 @@ static void event_loop(ACL_EVENT *eventp)
 
 		if (n <= 0)
 			delay = 0;
-		else if ((int) n < delay)
+		else if ((int) n < delay) {
 			delay = (int) n;
+			if (delay <= 0)  /* xxx */
+				delay = 100;
+		}
 	}
 
 	/* 设置描述字对象的状态，添加/删除之前设置的描述字对象 */

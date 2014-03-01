@@ -359,7 +359,7 @@ static void event_loop(ACL_EVENT *eventp)
 	ACL_EVENT_NOTIFY_TIME timer_fn;
 	void    *timer_arg;
 	ACL_EVENT_TIMER *timer;
-	int   n, delay, nready;
+	int   delay, nready;
 	ACL_EVENT_FDTABLE *fdp;
 	ACL_RING timer_ring, *entry_ptr;
 	EVENT_BUFFER *bp;
@@ -379,12 +379,14 @@ static void event_loop(ACL_EVENT *eventp)
 	 * If any timer is scheduled, adjust the delay appropriately.
 	 */
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		n = (int) (timer->when
+		acl_int64 n = (timer->when
 			- eventp->present + 1000000 - 1) / 1000000;
 		if (n <= 0) {
 			delay = 0;
 		} else if (n < eventp->delay_sec) {
-			delay = n * 1000 + eventp->delay_usec / 1000;
+			delay = (int) n * 1000 + eventp->delay_usec / 1000;
+			if (delay <= 0)  /* xxx */
+				delay = 100;
 		}
 	}
 

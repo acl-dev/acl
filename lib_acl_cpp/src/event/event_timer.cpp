@@ -58,8 +58,8 @@ void event_timer::set_time(void)
 {
 	struct timeval now;
 	gettimeofday(&now, NULL);
-	present_ = ((unsigned long) now.tv_sec) * 1000000
-		+ ((unsigned long) now.tv_usec);
+	present_ = ((acl_uint64) now.tv_sec) * 1000000
+		+ ((acl_uint64) now.tv_usec);
 }
 
 #define TIMER_EMPTY		-1
@@ -88,8 +88,15 @@ acl_int64 event_timer::del_task(unsigned int id)
 
 	set_time();
 
-	acl_int64 delay = tasks_.front()->when - present_;
-	return delay < 0 ? 0 : delay;
+	event_task* first = tasks_.front();
+	acl_int64 delay = first->when - present_;
+
+	if (delay < 0)
+		return 0;
+	else if (delay > first->delay)  /* xxx */
+		return first->delay;
+	else
+		return delay;
 }
 
 acl_int64 event_timer::set_task(unsigned int id, acl_int64 delay)
@@ -150,7 +157,13 @@ acl_int64 event_timer::set_task(event_task* task)
 
 	event_task* first = tasks_.front();
 	acl_int64 delay = first->when - present_;
-	return delay < 0 ? 0 : delay;
+
+	if (delay < 0)
+		return 0;
+	else if (delay > first->delay)  /* xxx */
+		return first->delay;
+	else
+		return delay;
 }
 
 acl_int64 event_timer::trigger(void)
@@ -180,7 +193,6 @@ acl_int64 event_timer::trigger(void)
 		tasks.push_back(task);
 	}
 
-	// 有可能这些到达的定时任务已经被用户提前删除了
 	if (tasks.empty())
 	{
 		acl_assert(!tasks_.empty());
@@ -206,7 +218,12 @@ acl_int64 event_timer::trigger(void)
 	event_task* first = tasks_.front();
 	acl_int64 delay = first->when - present_;
 
-	return delay < 0 ? 0 : delay;
+	if (delay < 0)
+		return 0;
+	else if (delay > first->delay)  /* xxx */
+		return first->delay;
+	else
+		return delay;
 }
 
 }  // namespace acl

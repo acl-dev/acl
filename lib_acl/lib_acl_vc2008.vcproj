@@ -1089,6 +1089,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\event\events_epoll_thr.c"
+					>
+				</File>
+				<File
 					RelativePath=".\src\event\events_fdtable.c"
 					>
 				</File>

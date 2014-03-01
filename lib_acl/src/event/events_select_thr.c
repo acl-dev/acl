@@ -351,8 +351,8 @@ static void event_loop(ACL_EVENT *eventp)
 	 * If any timer is scheduled, adjust the delay appropriately.
 	 */
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		select_delay = (int) (timer->when - eventp->present + 1000000 - 1)
-			/ 1000000;
+		select_delay = (int) ((timer->when - eventp->present + 1000000 - 1)
+			/ 1000000);
 		if (select_delay < 0)
 			select_delay = 0;
 		else if (eventp->delay_sec >= 0 && select_delay > eventp->delay_sec)

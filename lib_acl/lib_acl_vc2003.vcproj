@@ -821,6 +821,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\event\events_epoll.h">
 				</File>
 				<File
+					RelativePath=".\src\event\events_epoll_thr.c">
+				</File>
+				<File
 					RelativePath=".\src\event\events_fdtable.c">
 				</File>
 				<File

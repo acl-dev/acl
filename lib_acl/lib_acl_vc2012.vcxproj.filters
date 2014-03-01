@@ -905,6 +905,9 @@
     <ClCompile Include="src\master\template\acl_udp_server.c">
       <Filter>Source Files\master\template</Filter>
     </ClCompile>
+    <ClCompile Include="src\event\events_epoll_thr.c">
+      <Filter>Source Files\event</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl.rc">
