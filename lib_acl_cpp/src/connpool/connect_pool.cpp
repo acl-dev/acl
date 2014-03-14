@@ -21,7 +21,7 @@ connect_pool::connect_pool(const char* addr, int max, size_t idx /* = 0 */)
 , current_used_(0)
 , last_(0)
 {
-	retry_inter_ = 1;
+	retry_inter_ = 10;
 
 	if (max_ < 1)
 		max_ = 10;

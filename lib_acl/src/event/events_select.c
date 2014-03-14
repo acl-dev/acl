@@ -443,10 +443,7 @@ static void event_loop(ACL_EVENT *eventp)
 		/* 如果该描述字对象已经在被设置为异常或超时状态则继续 */
 
 		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT)))
-		{
-			acl_msg_info("error set ACL_EVENT_XCPT");
 			continue;
-		}
 
 		sockfd = ACL_VSTREAM_SOCK(fdp->stream);
 

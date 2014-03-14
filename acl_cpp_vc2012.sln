@@ -162,6 +162,20 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thread_pool", "lib_acl_cpp\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_rpc", "lib_rpc\lib_rpc_vc2012.vcxproj", "{2B0C9A86-6C14-4CEF-BD7A-4A6752386A44}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "http_request_manager", "lib_acl_cpp\samples\http_request_manager\http_request_manager_vc2012.vcxproj", "{312366B1-8882-4491-94F6-E105A19C63EF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_aio", "lib_acl_cpp\samples\master_aio\master_aio_vc2012.vcxproj", "{946DAF94-90C7-44F9-B24B-6B8F105A84EF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -471,6 +485,26 @@ Global
 		{2B0C9A86-6C14-4CEF-BD7A-4A6752386A44}.Releasedll|Win32.Build.0 = Release|Win32
 		{2B0C9A86-6C14-4CEF-BD7A-4A6752386A44}.Template|Win32.ActiveCfg = Release|Win32
 		{2B0C9A86-6C14-4CEF-BD7A-4A6752386A44}.Template|Win32.Build.0 = Release|Win32
+		{312366B1-8882-4491-94F6-E105A19C63EF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{312366B1-8882-4491-94F6-E105A19C63EF}.Debug|Win32.Build.0 = Debug|Win32
+		{312366B1-8882-4491-94F6-E105A19C63EF}.DebugDll|Win32.ActiveCfg = DebugDll|Win32
+		{312366B1-8882-4491-94F6-E105A19C63EF}.DebugDll|Win32.Build.0 = DebugDll|Win32
+		{312366B1-8882-4491-94F6-E105A19C63EF}.Release|Win32.ActiveCfg = Release|Win32
+		{312366B1-8882-4491-94F6-E105A19C63EF}.Release|Win32.Build.0 = Release|Win32
+		{312366B1-8882-4491-94F6-E105A19C63EF}.Releasedll|Win32.ActiveCfg = ReleaseDll|Win32
+		{312366B1-8882-4491-94F6-E105A19C63EF}.Releasedll|Win32.Build.0 = ReleaseDll|Win32
+		{312366B1-8882-4491-94F6-E105A19C63EF}.Template|Win32.ActiveCfg = DebugDll|Win32
+		{312366B1-8882-4491-94F6-E105A19C63EF}.Template|Win32.Build.0 = DebugDll|Win32
+		{946DAF94-90C7-44F9-B24B-6B8F105A84EF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{946DAF94-90C7-44F9-B24B-6B8F105A84EF}.Debug|Win32.Build.0 = Debug|Win32
+		{946DAF94-90C7-44F9-B24B-6B8F105A84EF}.DebugDll|Win32.ActiveCfg = DebugDll|Win32
+		{946DAF94-90C7-44F9-B24B-6B8F105A84EF}.DebugDll|Win32.Build.0 = DebugDll|Win32
+		{946DAF94-90C7-44F9-B24B-6B8F105A84EF}.Release|Win32.ActiveCfg = Release|Win32
+		{946DAF94-90C7-44F9-B24B-6B8F105A84EF}.Release|Win32.Build.0 = Release|Win32
+		{946DAF94-90C7-44F9-B24B-6B8F105A84EF}.Releasedll|Win32.ActiveCfg = ReleaseDll|Win32
+		{946DAF94-90C7-44F9-B24B-6B8F105A84EF}.Releasedll|Win32.Build.0 = ReleaseDll|Win32
+		{946DAF94-90C7-44F9-B24B-6B8F105A84EF}.Template|Win32.ActiveCfg = DebugDll|Win32
+		{946DAF94-90C7-44F9-B24B-6B8F105A84EF}.Template|Win32.Build.0 = DebugDll|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

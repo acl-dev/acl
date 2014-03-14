@@ -228,6 +228,7 @@ public:
 	virtual void close_callback()
 	{
 		// 必须在此处删除该动态分配的回调类对象以防止内存泄露
+		format("Close\r\n");
 		delete this;
 	}
 

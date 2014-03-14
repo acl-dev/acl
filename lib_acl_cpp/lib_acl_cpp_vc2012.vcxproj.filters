@@ -367,6 +367,9 @@
     <ClCompile Include="src\event\event_timer.cpp">
       <Filter>src\event</Filter>
     </ClCompile>
+    <ClCompile Include="src\connpool\connect_monitor.cpp">
+      <Filter>src\connpool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -758,6 +761,9 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\event\event_timer.hpp">
       <Filter>include\event</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\connect_monitor.hpp">
+      <Filter>include\connpool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

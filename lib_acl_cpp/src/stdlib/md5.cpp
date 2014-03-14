@@ -344,15 +344,11 @@ const char* md5::hex_encode(const void *in, char* out, size_t size)
 
 	memcpy(digest, in, 16);
 
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 	for (i = 0; i < 16; i++)
 	{
 #if _MSC_VER >= 1500
-		sprintf_s(&(buf[2 * i]), 2, "%02x", (unsigned char) digest[i]);
-		sprintf_s(&(buf[2 * i + 1]), 2, "%02x",
+		sprintf_s(&(buf[2 * i]), 3, "%02x", (unsigned char) digest[i]);
+		sprintf_s(&(buf[2 * i + 1]), 3, "%02x",
 			(unsigned char) (digest[i] << 4));
 #else
 		sprintf(&(buf[2 * i]), "%02x", (unsigned char) digest[i]);

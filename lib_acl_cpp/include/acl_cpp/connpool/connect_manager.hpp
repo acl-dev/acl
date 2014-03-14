@@ -1,6 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/stdlib/locker.hpp"
 #include <vector>
 
 struct ACL_EVENT;
@@ -9,6 +10,7 @@ namespace acl
 {
 
 class connect_pool;
+class connect_monitor;
 
 /**
  * connect pool 服务管理器，有获取连接池等功能
@@ -119,15 +121,31 @@ public:
 	}
 
 	/**
-	 * 初始化定时器，该定时器会定期打印当前所有服务器集群的访问统计
-	 * @param inter {int} 定时器的输出间隔
-	 */
-	void statistics_settimer(int inter = 1);
-
-	/**
 	 * 打印当前所有 redis 连接池的访问量
 	 */
 	void statistics();
+
+	/**
+	 * 启动后台非阻塞检测线程检测所有连接池连接状态
+	 * @param check_inter {int} 检测的时间间隔(秒)
+	 * @param conn_timeout {int} 连接服务器的超时时间(秒)
+	 */
+	void start_monitor(int check_inter = 1, int conn_timeout = 10);
+
+	/**
+	 * 停止后台检测线程
+	 * @param graceful {bool} 是否在关闭检测线程时需要等待所有的检测连接关闭后
+	 *  才返回，当连接池集群对象为进程空间内不会多次分配与释放时，则该值可以设为 false
+	 *  从而使检测线程快速退出，否则应该等待所有检测连接关闭后再使检测线程退出
+	 */
+	void stop_monitor(bool graceful = true);
+
+	/**
+	 * 设置某个连接池服务的存活状态，内部会自动加锁
+	 * @param addr {const char*} 服务器地址，格式：ip:port
+	 * @param alive {bool} 该服务器是否正常
+	 */
+	void set_pools_status(const char* addr, bool alive);
 
 protected:
 	/**
@@ -139,9 +157,7 @@ protected:
 	 */
 	virtual connect_pool* create_pool(const char* addr,
 		int count, size_t idx) = 0;
-private:
-	static void statistics_record(int, ACL_EVENT*, void* ctx);
-	void statistics_timer();
+
 private:
 	string default_addr_;			// 缺省的服务地址
 	connect_pool* default_pool_;		// 缺省的服务连接池
@@ -149,6 +165,7 @@ private:
 	size_t service_idx_;			// 下一个要访问的的下标值
 	locker lock_;				// 访问 pools_ 时的互斥锁
 	int  stat_inter_;			// 统计访问量的定时器间隔
+	connect_monitor* monitor_;		// 后台检测线程句柄
 
 	// 设置除缺省服务之外的服务器集群
 	void set_service_list(const char* addr_list, int count);

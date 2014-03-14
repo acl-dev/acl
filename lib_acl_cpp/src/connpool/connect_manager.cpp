@@ -2,6 +2,7 @@
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/locker.hpp"
+#include "acl_cpp/connpool/connect_monitor.hpp"
 #include "acl_cpp/connpool/connect_pool.hpp"
 #include "acl_cpp/connpool/connect_manager.hpp"
 
@@ -12,6 +13,7 @@ connect_manager::connect_manager()
 : default_pool_(NULL)
 , service_idx_(0)
 , stat_inter_(1)
+, monitor_(NULL)
 {
 }
 
@@ -204,11 +206,24 @@ connect_pool* connect_manager::peek()
 		logger_warn("pools's size is 0!");
 		return NULL;
 	}
-	n = service_idx_ % service_size;
-	service_idx_++;
+
+	// 遍历所有的连接池，找出一个可用的连接池
+	for(size_t i = 0; i < service_size; i++)
+	{
+		n = service_idx_ % service_size;
+		service_idx_++;
+		pool = pools_[n];
+		if (pool->aliving())
+		{
+			lock_.unlock();
+			return pool;
+		}
+	}
+
 	lock_.unlock();
-	pool = pools_[n];
-	return pool;
+
+	logger_error("all pool(size=%d) is dead!", (int) service_size);
+	return NULL;
 }
 
 connect_pool* connect_manager::peek(const char* key,
@@ -248,37 +263,6 @@ void connect_manager::unlock()
 	lock_.unlock();
 }
 
-void connect_manager::statistics_record(int, ACL_EVENT*, void* ctx)
-{
-	connect_manager* manager = (connect_manager*) ctx;
-
-	// 记录当前服务访问情况
-	manager->statistics();
-
-	// 重新设置定时器
-	manager->statistics_timer();
-}
-
-void connect_manager::statistics_settimer(int inter /* = 1 */)
-{
-	if (inter <= 0 || inter >= 3600 * 24 * 32)
-	{
-		logger_error("invalid inter: %d", inter);
-		return;
-	}
-
-	stat_inter_ = inter;
-#ifndef WIN32
-	acl_ioctl_server_request_timer(statistics_record, this, inter);
-#endif
-	logger("set statistics_timer ok! inter: %d", inter);
-}
-
-void connect_manager::statistics_timer()
-{
-	statistics_settimer(stat_inter_);
-}
-
 void connect_manager::statistics()
 {
 	std::vector<connect_pool*>::const_iterator cit = pools_.begin();
@@ -289,6 +273,61 @@ void connect_manager::statistics()
 			(*cit)->get_current_used());
 		(*cit)->reset_statistics(stat_inter_);
 	}
+}
+
+void connect_manager::start_monitor(int check_inter /* = 1 */,
+	int conn_timeout /* = 10 */)
+{
+	if (monitor_ != NULL)
+		return;
+
+	monitor_ = NEW connect_monitor(*this, check_inter, conn_timeout);
+
+	// 设置检测线程为非分离模式，以便于主线程可以等待检测线程退出
+	monitor_->set_detachable(false);
+	// 启动检测线程
+	monitor_->start();
+}
+
+void connect_manager::stop_monitor(bool graceful /* = true */)
+{
+	if (monitor_)
+	{
+		// 先通知检测线程停止检测过程
+		monitor_->stop(graceful);
+		// 再等待检测线程退出
+		monitor_->wait();
+		// 删除检测线程对象
+		delete monitor_;
+		monitor_ = NULL;
+	}
+}
+
+void connect_manager::set_pools_status(const char* addr, bool alive)
+{
+	std::vector<connect_pool*>::iterator it;
+	connect_pool* pool;
+	const char* ptr;
+
+	if (addr == NULL || *addr == 0)
+	{
+		logger_warn("addr null");
+		return;
+	}
+
+	lock();
+	it = pools_.begin();
+	for (; it != pools_.end(); ++it)
+	{
+		pool = *it;
+		ptr = pool->get_addr();
+		if (ptr && strcasecmp(ptr, addr) == 0)
+		{
+			pool->set_alive(alive);
+			break;
+		}
+	}
+	unlock();
 }
 
 } // namespace acl

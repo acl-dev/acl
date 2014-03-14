@@ -79,7 +79,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetDir)\$(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y&#x0D;&#x0A;copy $(TargetDir)\$(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y"
+				CommandLine="copy $(TargetDir)\$(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y&#x0D;&#x0A;copy $(TargetDir)\$(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -147,7 +147,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetDir)\$(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y&#x0D;&#x0A;copy $(TargetDir)\$(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y"
+				CommandLine="copy $(TargetDir)\$(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y&#x0D;&#x0A;copy $(TargetDir)\$(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -371,6 +371,10 @@
 				>
 				<File
 					RelativePath=".\src\connpool\connect_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\connpool\connect_monitor.cpp"
 					>
 				</File>
 				<File
@@ -981,6 +985,10 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\connpool\connect_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\connpool\connect_monitor.hpp"
 					>
 				</File>
 				<File

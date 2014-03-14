@@ -753,6 +753,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\connpool\connect_manager.cpp">
 				</File>
 				<File
+					RelativePath=".\src\connpool\connect_monitor.cpp">
+				</File>
+				<File
 					RelativePath=".\src\connpool\connect_pool.cpp">
 				</File>
 			</Filter>
@@ -1170,6 +1173,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\connpool\connect_manager.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\connpool\connect_monitor.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\connpool\connect_pool.hpp">

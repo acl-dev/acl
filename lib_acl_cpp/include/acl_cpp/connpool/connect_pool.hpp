@@ -35,7 +35,7 @@ public:
 	 * 设置连接池异常的重试时间间隔
 	 * @param retry_inter {int} 当连接断开后，重新再次打开连接的时间间隔(秒)，
 	 *  当该值 <= 0 时表示允许连接断开后可以立即重连，否则必须超过该时间间隔后才
-	 *  允许断开重连；未调用本函数时，内部缺省值为 1 秒
+	 *  允许断开重连；未调用本函数时，内部缺省值为 10 秒
 	 * @return {connect_pool&}
 	 */
 	connect_pool& set_retry_inter(int retry_inter);

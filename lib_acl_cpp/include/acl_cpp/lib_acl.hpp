@@ -124,3 +124,4 @@
 #include "acl_cpp/connpool/connect_client.hpp"
 #include "acl_cpp/connpool/connect_pool.hpp"
 #include "acl_cpp/connpool/connect_manager.hpp"
+#include "acl_cpp/connpool/connect_monitor.hpp"
