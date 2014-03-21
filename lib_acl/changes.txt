@@ -1,6 +1,18 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+434) 2014.3.21
+434.1) feature: acl_threads_server.c 中有几处在关闭流时都增加了流关闭的回调过程
+
+433) 2014.3.20
+433.1) bugfix: events_epoll_thr.c 在函数 event_disable_readwrite 中调用
+epoll_ctl 删除描述字时，也必须保证第四个参数（struct epoll_event*) 非空，否则在低版
+本 LINUX 下会有问题
+
+432) 2014.3.18
+432.1) bugfix: events_pool_thr.c 应该把 acl_fdmap_add/acl_fdmap_del/acl_fdmap_ctx
+的操作放在线程锁内部
+
 431) 2014.2.27
 431.1) workaround: event 事件引擎中，为了防止因64位整型转32位整型而出现负值做了
 安全判断

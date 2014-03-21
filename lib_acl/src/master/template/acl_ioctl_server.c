@@ -79,6 +79,7 @@ int   acl_var_ioctl_quick_abort;
 int   acl_var_ioctl_enable_core;
 int   acl_var_ioctl_max_debug;
 int   acl_var_ioctl_status_notify;
+int   acl_var_ioctl_check_inter;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_IOCTL_BUF_SIZE, ACL_DEF_IOCTL_BUF_SIZE, &acl_var_ioctl_buf_size, 0, 0 },
@@ -99,6 +100,7 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_IOCTL_ENABLE_CORE, ACL_DEF_IOCTL_ENABLE_CORE, &acl_var_ioctl_enable_core, 0, 0 },
 	{ ACL_VAR_IOCTL_MAX_DEBUG, ACL_DEF_IOCTL_MAX_DEBUG, &acl_var_ioctl_max_debug, 0, 0 },
 	{ ACL_VAR_IOCTL_STATUS_NOTIFY, ACL_DEF_IOCTL_STATUS_NOTIFY, &acl_var_ioctl_status_notify, 0, 0 },
+	{ ACL_VAR_IOCTL_CHECK_INTER, ACL_DEF_IOCTL_CHECK_INTER, &acl_var_ioctl_check_inter, 0, 0 },
 
         { 0, 0, 0, 0, 0 },
 };
@@ -769,7 +771,6 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 	char   *generation;
 	int     fd, i, fdtype = 0;
 	int     event_mode;
-
 	int     f_flag = 0;
 	char    conf_file[1024];
 
@@ -987,6 +988,11 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 		acl_var_ioctl_delay_usec);
 	acl_ioctl_ctl(__h_ioctl, ACL_IOCTL_CTL_THREAD_STACKSIZE,
 		acl_var_ioctl_stacksize, ACL_IOCTL_CTL_END);
+	if (acl_var_ioctl_check_inter > 0) {
+		ACL_EVENT *event = acl_ioctl_event(__h_ioctl);
+		acl_event_set_check_inter(event, acl_var_ioctl_check_inter);
+	}
+
 	if (thread_init_fn)
 		acl_ioctl_ctl(__h_ioctl, ACL_IOCTL_CTL_INIT_FN, thread_init_fn,
 			ACL_IOCTL_CTL_INIT_CTX, thread_init_ctx,

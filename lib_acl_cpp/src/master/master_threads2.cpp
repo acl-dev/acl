@@ -84,7 +84,7 @@ bool master_threads2::run_alone(const char* addrs, const char* path /* = NULL */
 #endif
 
 	std::vector<ACL_VSTREAM*> sstreams;
-	ACL_EVENT* eventp = acl_event_new_select_thr(1, 0);
+	ACL_EVENT* eventp = acl_event_new_kernel_thr(1, 0);
 	set_event(eventp);  // 设置基类的事件句柄
 
 	ACL_ARGV*  tokens = acl_argv_split(addrs, ";,| \t");
@@ -192,6 +192,7 @@ void master_threads2::run_once(ACL_VSTREAM* client)
 	acl_assert(stream);
 	ACL_SOCKET fd = stream->sock_handle();
 	int   timeout = stream->get_rw_timeout();
+	int   ret;
 
 	while (true)
 	{
@@ -213,14 +214,28 @@ void master_threads2::run_once(ACL_VSTREAM* client)
 		else
 		{
 			service_on_close(client, NULL);
-			// 删除流对象时会同时关闭套接字
-			delete stream;
+
+			// stream 对象会在 service_on_close 中被删除，
+			// 但在删除时并不会真正关闭套接流，所以需要在
+			// 此处关闭套接字流
+			acl_vstream_close(client);
 			break;
 		}
 
-		// 当函数返回 1 时表示 client 已经被关闭了
-		if (service_main(client, NULL) == 1)
+		// 返回 -1 表示需要关闭该客户端连接
+		if ((ret = service_main(client, NULL)) == -1)
+		{
+			service_on_close(client, NULL);
+
+			// stream 对象会在 service_on_close 中被删除，
+			// 但在删除时并不会真正关闭套接流，所以需要在
+			// 此处关闭套接字流
+			acl_vstream_close(client);
 			break;
+		}
+
+		// service_main 只能返回 0 或 -1
+		acl_assert(ret == 0);
 	}
 
 	if (__count_limit > 0 && __count >= __count_limit)
@@ -271,6 +286,39 @@ void master_threads2::thread_exit(void*)
 	__mt->thread_on_exit();
 }
 
+int master_threads2::service_on_accept(ACL_VSTREAM* client)
+{
+	// client->context 不应被占用
+	if (client->context != NULL)
+		logger_fatal("client->context not null!");
+
+	socket_stream* stream = NEW socket_stream();
+
+	// 设置 client->context 为流对象，该流对象将统一在
+	// service_on_close 中被释放
+	client->context = stream;
+
+	if (stream->open(client) == false)
+	{
+		logger_error("open stream error(%s)", acl_last_serror());
+		// 返回 -1 由上层框架调用 service_on_close 过程，在里面
+		// 释放 stream 对象
+		return -1;
+	}
+
+	acl_assert(__mt != NULL);
+
+	// 如果子类的 thread_on_accept 方法返回 false，则直接返回给上层
+	// 框架 -1，由上层框架再调用 service_on_close 过程，从而在该过程
+	// 中将 stream 对象释放
+	if (__mt->thread_on_accept(stream) == false)
+		return -1;
+
+	// 返回 0 表示可以继续处理该客户端连接，从而由上层框架将其置入
+	// 读监控集合中
+	return 0;
+}
+
 int master_threads2::service_main(ACL_VSTREAM *client, void*)
 {
 	acl_assert(__mt != NULL);
@@ -280,49 +328,16 @@ int master_threads2::service_main(ACL_VSTREAM *client, void*)
 	if (stream == NULL)
 		logger_fatal("client->context is null!");
 
-	// 调用子类的虚函数实现，如果返回 true 表示让框架继续监控该连接流
+	// 调用子类的虚函数实现，如果返回 true 表示让框架继续监控该连接流，
 	// 否则需要关闭该流
+	// 给上层框架返回 0 表示将与该连接保持长连接
 	if (__mt->thread_on_read(stream) == true)
-		return 0;  // 与该连接保持长连接
-	else
-	{
-		__mt->thread_on_close(stream);
-		delete stream;
-		return 1;  // 此连接已经关闭
-	}
-}
+		return 0;
 
-int master_threads2::service_on_accept(ACL_VSTREAM* client)
-{
-	// client->context 不应被占用
-	if (client->context != NULL)
-		logger_fatal("client->context not null!");
-
-	socket_stream* stream = NEW socket_stream();
-	if (stream->open(client) == false)
-	{
-		logger_error("open stream error(%s)", acl_last_serror());
-		delete stream;
-		return -1;
-	}
-	// 设置 client->context 为流对象
-	client->context = stream;
-
-	acl_assert(__mt != NULL);
-
-	if (__mt->thread_on_accept(stream) == false)
-	{
-		client->context = NULL;
-		// 解释与连接流的绑定关系，这样可以防止在删除流对象时
-		// 真正关闭了连接流，因为该流连接需要在本函数返回后由
-		// 框架自动关闭
-		(void) stream->unbind();
-		// 删除流对象
-		delete stream;
-		// 让框架关闭连接流
-		return -1;
-	}
-	return 0;
+	// 返回 -1 表示由上层框架真正关闭流，上层框架在真正关闭流前
+	// 将会回调 service_on_close 过程进行流关闭前的善后处理工作，
+	// stream 对象将在 service_on_close 中被释放
+	return -1;
 }
 
 int master_threads2::service_on_timeout(ACL_VSTREAM* client, void*)
@@ -332,6 +347,7 @@ int master_threads2::service_on_timeout(ACL_VSTREAM* client, void*)
 		logger_fatal("client->context is null!");
 
 	acl_assert(__mt != NULL);
+
 	return __mt->thread_on_timeout(stream) == true ? 0 : -1;
 }
 
@@ -342,7 +358,15 @@ void master_threads2::service_on_close(ACL_VSTREAM* client, void*)
 		logger_fatal("client->context is null!");
 
 	acl_assert(__mt != NULL);
+
+	// 调用子类函数对将要关闭的流进行善后处理
 	__mt->thread_on_close(stream);
+
+	// 解释与连接流的绑定关系，这样可以防止在删除流对象时
+	// 真正关闭了连接流，因为该流连接需要在本函数返回后由
+	// 框架自动关闭
+	(void) stream->unbind();
+	delete stream;
 }
 
 }  // namespace acl

@@ -232,22 +232,19 @@ void event_thr_fire(ACL_EVENT *ev)
 
 		stream = fdp->stream;
 
-		if (fdp->event_type & ACL_EVENT_XCPT) {
-			fdp->event_type &= ~ACL_EVENT_XCPT;
-			if (fdp->r_callback) {
-				worker_fn = fdp->r_callback;
-				worker_arg = fdp->r_context;
-			} else if (fdp->w_callback) {
-				worker_fn = fdp->w_callback;
-				worker_arg = fdp->w_context;
-			} else {
-				worker_fn = NULL;
-				worker_arg = NULL;
-			}
+		if (fdp->event_type & ACL_EVENT_READ) {
+			fdp->event_type &= ~ACL_EVENT_READ;
+			worker_fn = fdp->r_callback;
+			worker_arg = fdp->r_context;
+			if (!fdp->listener)
+				ev->disable_readwrite_fn(ev, stream);
+			worker_fn(ACL_EVENT_READ, ev, stream, worker_arg);
+		} else if (fdp->event_type & ACL_EVENT_WRITE) {
+			fdp->event_type &= ~ACL_EVENT_WRITE;
+			worker_fn = fdp->w_callback;
+			worker_arg = fdp->w_context;
 			ev->disable_readwrite_fn(ev, stream);
-			if (worker_fn)
-				worker_fn(ACL_EVENT_XCPT, ev,
-					stream, worker_arg);
+			worker_fn(ACL_EVENT_WRITE, ev, stream, worker_arg);
 		} else if (fdp->event_type & ACL_EVENT_RW_TIMEOUT) {
 			fdp->event_type &= ~ACL_EVENT_RW_TIMEOUT;
 			if (fdp->r_callback) {
@@ -265,19 +262,23 @@ void event_thr_fire(ACL_EVENT *ev)
 			if (worker_fn)
 				worker_fn(ACL_EVENT_RW_TIMEOUT, ev,
 					stream, worker_arg);
-		} else if (fdp->event_type & ACL_EVENT_READ) {
-			fdp->event_type &= ~ACL_EVENT_READ;
-			worker_fn = fdp->r_callback;
-			worker_arg = fdp->r_context;
+		} else if (fdp->event_type & ACL_EVENT_XCPT) {
+			fdp->event_type &= ~ACL_EVENT_XCPT;
+			if (fdp->r_callback) {
+				worker_fn = fdp->r_callback;
+				worker_arg = fdp->r_context;
+			} else if (fdp->w_callback) {
+				worker_fn = fdp->w_callback;
+				worker_arg = fdp->w_context;
+			} else {
+				worker_fn = NULL;
+				worker_arg = NULL;
+			}
 			if (!fdp->listener)
 				ev->disable_readwrite_fn(ev, stream);
-			worker_fn(ACL_EVENT_READ, ev, stream, worker_arg);
-		} else if (fdp->event_type & ACL_EVENT_WRITE) {
-			fdp->event_type &= ~ACL_EVENT_WRITE;
-			worker_fn = fdp->w_callback;
-			worker_arg = fdp->w_context;
-			ev->disable_readwrite_fn(ev, stream);
-			worker_fn(ACL_EVENT_WRITE, ev, stream, worker_arg);
+			if (worker_fn)
+				worker_fn(ACL_EVENT_XCPT, ev,
+					stream, worker_arg);
 		}
 	}
 

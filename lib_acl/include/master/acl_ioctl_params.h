@@ -109,6 +109,10 @@ extern int   acl_var_ioctl_max_debug;
 #define	ACL_DEF_IOCTL_STATUS_NOTIFY	1
 extern int   acl_var_ioctl_status_notify;
 
+#define	ACL_VAR_IOCTL_CHECK_INTER	"ioctl_check_inter"
+#define	ACL_DEF_IOCTL_CHECK_INTER	100
+extern int   acl_var_ioctl_check_inter;
+
 #endif /* ACL_UNIX */
 
 #ifdef	__cplusplus

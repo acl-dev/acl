@@ -11,7 +11,6 @@ int main()
 	
 	printf(">>>>{%s}\r\n", tablename);
 	acl::json json;
-	//printf(">>>root: %s\r\n", json.to_string().c_str());
 	acl::json_node& first = json.get_root().add_child(false, true);
 	first.add_child("type", type);
 	first.add_child("tablename", tablename);
@@ -19,7 +18,7 @@ int main()
 
 	// Éú³Éjson×Ö·û´®
 	printf("json to string:%s\r\n", json.to_string().c_str());
-	printf("first to string: %s\r\n", first.to_string().c_str());
+	printf("first json node to string: %s\r\n", first.to_string().c_str());
 
 	acl::string buf;
 	json.build_json(buf);

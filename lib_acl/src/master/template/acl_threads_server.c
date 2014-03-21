@@ -551,6 +551,8 @@ static void server_wakeup(ACL_EVENT *event, acl_pthread_pool_t *threads,
 
 	if (__server_on_accept) {
 		if (__server_on_accept(stream) < 0) {
+			if (__server_on_close != NULL)
+				__server_on_close(stream, __service_ctx);
 			acl_vstream_close(stream);
 			return;
 		}
@@ -558,7 +560,9 @@ static void server_wakeup(ACL_EVENT *event, acl_pthread_pool_t *threads,
 
 	if (addr[0] != 0 && !acl_access_permit(addr)) {
 		if (__deny_info && *__deny_info)
-			(void) acl_vstream_fprintf(stream, "%s\r\n", __deny_info);
+			acl_vstream_fprintf(stream, "%s\r\n", __deny_info);
+		if (__server_on_close != NULL)
+			__server_on_close(stream, __service_ctx);
 		acl_vstream_close(stream);
 		return;
 	}

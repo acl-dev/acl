@@ -91,9 +91,9 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	if (eventp->maxfd == ACL_SOCKET_INVALID || eventp->maxfd < sockfd)
 		eventp->maxfd = sockfd;
 
-	THREAD_UNLOCK(&event_thr->event.tb_mutex);
-
 	acl_fdmap_add(event_thr->fdmap, sockfd, fdp);
+
+	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
 	/* 主要是为了减少通知次数 */
 	if (event_thr->event.blocked && event_thr->event.evdog
@@ -153,9 +153,9 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	if (eventp->maxfd == ACL_SOCKET_INVALID || eventp->maxfd < sockfd)
 		eventp->maxfd = sockfd;
 
-	THREAD_UNLOCK(&event_thr->event.tb_mutex);
-
 	acl_fdmap_add(event_thr->fdmap, sockfd, fdp);
+
+	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 }
 
 static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
@@ -210,9 +210,9 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	if (eventp->maxfd == ACL_SOCKET_INVALID || eventp->maxfd < sockfd)
 		eventp->maxfd = sockfd;
 
-	THREAD_UNLOCK(&event_thr->event.tb_mutex);
-
 	acl_fdmap_add(event_thr->fdmap, sockfd, fdp);
+
+	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
 	if (event_thr->event.blocked && event_thr->event.evdog
 	    && event_dog_client(event_thr->event.evdog) != stream)
@@ -393,6 +393,8 @@ static void event_loop(ACL_EVENT *eventp)
 	} else if (nready == 0)
 		goto TAG_DONE;
 
+	THREAD_LOCK(&event_thr->event.tb_mutex);
+
 	for (i = 0; i < fdcnt; i++) {
 		fdp = acl_fdmap_ctx(event_thr->fdmap, event_thr->fdset[i].fd);
 		if (fdp == NULL || fdp->stream == NULL)
@@ -401,13 +403,6 @@ static void event_loop(ACL_EVENT *eventp)
 			continue;
 
 		revents = event_thr->fdset[i].revents;
-		if ((revents & (POLLHUP | POLLERR)) != 0) {
-			fdp->event_type |= ACL_EVENT_XCPT;
-			fdp->fdidx_ready = eventp->fdcnt_ready;
-			eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
-			continue;
-		}
-
 		if ((revents & POLLIN) != 0) {
 			fdp->stream->sys_read_ready = 1;
 			if ((fdp->event_type & ACL_EVENT_READ) == 0) {
@@ -420,8 +415,14 @@ static void event_loop(ACL_EVENT *eventp)
 			fdp->event_type |= ACL_EVENT_WRITE;
 			fdp->fdidx_ready = eventp->fdcnt_ready;
 			eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
+		} else if ((revents & (POLLHUP | POLLERR)) != 0) {
+			fdp->event_type |= ACL_EVENT_XCPT;
+			fdp->fdidx_ready = eventp->fdcnt_ready;
+			eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
 		}
 	}
+
+	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
 TAG_DONE:
 

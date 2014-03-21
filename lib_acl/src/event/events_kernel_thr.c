@@ -394,7 +394,7 @@ static void event_loop(ACL_EVENT *eventp)
 
 	eventp->fdcnt_ready = 0;
 
-	if (eventp->present - eventp->last_check >= 100000) {
+	if (eventp->present - eventp->last_check >= eventp->check_inter) {
 		eventp->last_check = eventp->present;
 
 		THREAD_LOCK(&event_thr->event.tb_mutex);
@@ -430,6 +430,11 @@ static void event_loop(ACL_EVENT *eventp)
 		goto TAG_DONE;
 
 	bp = event_thr->event_buf;
+
+#ifdef	USE_FDMAP
+	THREAD_LOCK(&event_thr->event.tb_mutex);
+#endif
+
 	for (; bp < event_thr->event_buf + nready; bp++) {
 #ifdef	USE_FDMAP
 		ACL_SOCKET sockfd;
@@ -464,6 +469,10 @@ static void event_loop(ACL_EVENT *eventp)
 			eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
 		}
 	}
+
+#ifdef	USE_FDMAP
+	THREAD_UNLOCK(&event_thr->event.tb_mutex);
+#endif
 
 TAG_DONE:
 
