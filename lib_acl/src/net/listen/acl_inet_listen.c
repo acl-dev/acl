@@ -28,6 +28,7 @@
 #include "stdlib/acl_iostuff.h"
 #include "net/acl_sane_inet.h"
 #include "net/acl_host_port.h"
+#include "net/acl_sane_socket.h"
 #include "net/acl_listen.h"
 
 #endif
@@ -133,19 +134,8 @@ ACL_SOCKET acl_inet_accept_ex(ACL_SOCKET listen_fd, char *ipbuf, size_t size)
 	fd = acl_sane_accept(listen_fd, (struct sockaddr *)&client_addr, &addr_len);
 	if (fd == ACL_SOCKET_INVALID)
 		return fd;
-	if (ipbuf != NULL && size > 0) {
-		size_t n;
-
-		if (acl_inet_ntoa(client_addr.sin_addr, ipbuf, size) == NULL)
-			return fd;
-		n = strlen(ipbuf);
-		if (n >= size)
-			return fd;
-
-		snprintf(ipbuf + n, size - n, ":%u",
-			(unsigned short) ntohs(client_addr.sin_port));
-		ipbuf[size - 1] = 0;
-	}
+	if (ipbuf != NULL && size > 0 && acl_getpeername(fd, ipbuf, size) < 0)
+		ipbuf[0] = 0;
 
 	return fd;
 }

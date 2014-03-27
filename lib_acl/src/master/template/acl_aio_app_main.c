@@ -44,6 +44,13 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ 0, 0, 0 }
 };
 
+static void __vstream_on_close(ACL_VSTREAM *vstream acl_unused, void *context)
+{
+	ACL_ASTREAM *astream = (ACL_ASTREAM*) context;
+
+	acl_aio_server_on_close(astream);
+}
+
 static void __service(ACL_SOCKET fd, char *service acl_unused,
 	char **argv acl_unused)
 {
@@ -95,10 +102,14 @@ static void __service(ACL_SOCKET fd, char *service acl_unused,
 
 		vstream = acl_vstream_fdopen(fd, O_RDWR, acl_var_aio_buf_size,
 			0, ACL_VSTREAM_TYPE_SOCK);
+
 		acl_vstream_set_peer(vstream, addr);
 		acl_getsockname(fd, addr, sizeof(addr));
 		acl_vstream_set_local(vstream, addr);
 		astream = acl_aio_open(acl_aio_server_handle(), vstream);
+
+		acl_vstream_add_close_handle(vstream, __vstream_on_close, astream);
+
 		if (__run_fn(astream, __run_ctx) != 0)
 			acl_aio_iocp_close(astream);
 	} else if (__run2_fn != NULL) {

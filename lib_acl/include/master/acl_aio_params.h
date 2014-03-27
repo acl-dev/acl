@@ -107,11 +107,19 @@ extern char *acl_var_aio_log_debug;
 
 #define	ACL_VAR_AIO_MAX_DEBUG		"master_debug_max"
 #define	ACL_DEF_AIO_MAX_DEBUG		1000
-extern int  acl_var_aio_max_debug;
+extern int   acl_var_aio_max_debug;
 
 #define	ACL_VAR_AIO_STATUS_NOTIFY	"master_status_notify"
 #define	ACL_DEF_AIO_STATUS_NOTIFY	1
-extern int  acl_var_aio_status_notify;
+extern int   acl_var_aio_status_notify;
+
+#define	ACL_VAR_AIO_DISPATCH_ADDR	"aio_dispatch_addr"
+#define	ACL_DEF_AIO_DISPATCH_ADDR	""
+extern char *acl_var_aio_dispatch_addr;
+
+#define	ACL_VAR_AIO_DISPATCH_TYPE	"aio_dispatch_type"
+#define	ACL_DEF_AIO_DISPATCH_TYPE	"default"
+extern char *acl_var_aio_dispatch_type;
 
 #endif /* ACL_UNIX */
 

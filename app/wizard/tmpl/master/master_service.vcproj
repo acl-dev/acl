@@ -129,7 +129,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lib_acl_cpp_dll.lib lib_acl.lib lib_protocol.lib"
+				AdditionalDependencies="lib_acl_cpp.lib lib_acl.lib lib_protocol.lib"
 				OutputFile="$(OutDir)/$<PROGRAM>.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\dist\lib\win32"
@@ -145,7 +145,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				CommandLine="copy ..\..\..\dist\lib\win32\lib_acl.dll $(OutDir)\ /Y
-copy ..\..\..\dist\lib\win32\lib_acl_cpp_dll.dll $(OutDir)\ /Y
+copy ..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir)\ /Y
 copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
@@ -184,7 +184,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y"/>
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lib_acl_cppd_dll.lib lib_acl_d.lib lib_protocol_d.lib"
+				AdditionalDependencies="lib_acl_cpp_d.lib lib_acl_d.lib lib_protocol_d.lib"
 				OutputFile="$(OutDir)/$<PROGRAM>.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\dist\lib\win32"
@@ -199,7 +199,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y"/>
 			<Tool
 				Name="VCPreBuildEventTool"
 				CommandLine="copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir)\ /Y
-copy ..\..\..\dist\lib\win32\lib_acl_cppd_dll.dll $(OutDir)\ /Y
+copy ..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir)\ /Y
 copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>

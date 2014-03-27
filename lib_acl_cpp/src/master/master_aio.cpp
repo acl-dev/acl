@@ -139,6 +139,31 @@ bool master_aio::accept_callback(aio_socket_stream* client)
 
 //////////////////////////////////////////////////////////////////////////
 
+class aio_close_callback : public aio_callback
+{
+public:
+	aio_close_callback(aio_socket_stream* ss)
+	{
+		stream_ = ss->get_astream();
+	}
+
+	~aio_close_callback() {}
+
+protected:
+	void close_callback()
+	{
+#ifndef WIN32
+		acl_aio_server_on_close(stream_);
+#endif // !WIN32
+		delete this;
+	}
+
+private:
+	ACL_ASTREAM *stream_;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
 void master_aio::service_pre_jail(void*)
 {
 	acl_assert(__ma != NULL);
@@ -180,6 +205,10 @@ int master_aio::service_main(ACL_SOCKET fd, void*)
 	acl_assert(__ma);
 
 	aio_socket_stream* stream = NEW aio_socket_stream(__handle, fd);
+
+	aio_close_callback* callback = NEW aio_close_callback(stream);
+	stream->add_close_callback(callback);
+
 	__ma->on_accept(stream);
 	return 0;
 }

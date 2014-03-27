@@ -114,9 +114,6 @@ void    acl_master_config(void)
 			continue;
 		}
 
-		/* reset all proc of the serv before restart the service. --zsx */
-		acl_master_avail_reset(serv);
-
 		/*
 		 * Update an existing service entry. Make the current
 		 * generation of child processes commit suicide whenever

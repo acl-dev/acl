@@ -125,17 +125,21 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 
 	if (!(serv->flags & ACL_MASTER_FLAG_RELOADING)) {
 		if (!ACL_MASTER_LIMIT_OK(serv->max_proc, serv->total_proc))
-			acl_msg_panic("%s(%d)->%s: at process limit %d",
+			acl_msg_warn("%s(%d)->%s: at process limit %d",
 				__FILE__, __LINE__, myname, serv->total_proc);
 
 		if (serv->avail_proc > 0 && (serv->prefork_proc <= 0
 			|| serv->avail_proc > serv->prefork_proc))
 		{
-			acl_msg_panic("%s(%d)->%s: processes available: %d"
+			acl_msg_warn("%s(%d)->%s: processes available: %d"
 				", processes prefork: %d", __FILE__, __LINE__,
 				myname, serv->avail_proc, serv->prefork_proc);
 		}
 	}
+
+	/* delete ACL_MASTER_FLAG_RELOADING set in acl_master_restart_service */
+	else
+	        serv->flags &= ~ACL_MASTER_FLAG_RELOADING;
 
 	if (serv->flags & ACL_MASTER_FLAG_THROTTLE)
 		acl_msg_panic("%s(%d)-%s: throttled service: %s",

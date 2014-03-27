@@ -988,10 +988,6 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 		acl_var_ioctl_delay_usec);
 	acl_ioctl_ctl(__h_ioctl, ACL_IOCTL_CTL_THREAD_STACKSIZE,
 		acl_var_ioctl_stacksize, ACL_IOCTL_CTL_END);
-	if (acl_var_ioctl_check_inter > 0) {
-		ACL_EVENT *event = acl_ioctl_event(__h_ioctl);
-		acl_event_set_check_inter(event, acl_var_ioctl_check_inter);
-	}
 
 	if (thread_init_fn)
 		acl_ioctl_ctl(__h_ioctl, ACL_IOCTL_CTL_INIT_FN, thread_init_fn,
@@ -1057,6 +1053,11 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 	if (acl_var_ioctl_use_limit > 0)
 		acl_ioctl_request_timer(__h_ioctl, ioctl_server_use_timer,
 			__h_ioctl, (acl_int64) __use_limit_delay * 1000000);
+
+	if (acl_var_ioctl_check_inter > 0) {
+		ACL_EVENT *event = acl_ioctl_event(__h_ioctl);
+		acl_event_set_check_inter(event, acl_var_ioctl_check_inter);
+	}
 
 	/*******************************************************************/
 

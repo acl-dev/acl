@@ -171,7 +171,6 @@ extern void acl_master_avail_listen(ACL_MASTER_SERV *);
 extern void acl_master_avail_cleanup(ACL_MASTER_SERV *);
 extern void acl_master_avail_more(ACL_MASTER_SERV *, ACL_MASTER_PROC *);
 extern void acl_master_avail_less(ACL_MASTER_SERV *, ACL_MASTER_PROC *);
-extern void acl_master_avail_reset(ACL_MASTER_SERV *serv);
 
  /*
   * acl_master_spawn.c

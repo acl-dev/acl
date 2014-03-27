@@ -59,6 +59,12 @@ int acl_getpeername(ACL_SOCKET sockfd, char *buf, size_t size)
 
 #ifndef	WIN32
 	if (sa->sa_family == AF_UNIX) {
+		memset(&addr, 0, sizeof(addr));
+		len = sizeof(addr);
+
+		if (getsockname(sockfd, sa, &len) == -1)
+			return -1;
+
 		snprintf(buf, size, "%s", addr.sa.un.sun_path);
 		return 0;
 	} else

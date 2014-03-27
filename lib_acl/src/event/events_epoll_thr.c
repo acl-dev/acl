@@ -591,7 +591,7 @@ ACL_EVENT *event_epoll_alloc_thr(int fdsize acl_unused)
 	LOCK_INIT(&event_thr->event.tm_mutex);
 	LOCK_INIT(&event_thr->event.tb_mutex);
 
-	EVENT_REG_INIT_HANDLE(event_thr->handle, fdsize);
+	event_thr->handle = epoll_create(fdsize);
 	event_thr->fdslots = __default_max_events;
 	event_thr->ebuf = (EVENT_BUFFER *) acl_mycalloc(event_thr->fdslots + 1,
 			sizeof(EVENT_BUFFER));

@@ -101,8 +101,7 @@ void    acl_master_restart_service(ACL_MASTER_SERV *serv)
 
 	acl_master_avail_listen(serv);
 
-	/* delete ACL_MASTER_FLAG_RELOADING flag */
-	serv->flags &= ~ACL_MASTER_FLAG_RELOADING;
+	/* ACL_MASTER_FLAG_RELOADING will be remove in acl_master_spawn */
 
 	acl_master_wakeup_init(serv);
 }

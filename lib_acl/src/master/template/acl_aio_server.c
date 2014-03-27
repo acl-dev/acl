@@ -44,6 +44,7 @@
 #include "net/acl_listen.h"
 #include "net/acl_tcp_ctl.h"
 #include "net/acl_sane_socket.h"
+#include "net/acl_vstream_net.h"
 #include "event/acl_events.h"
 #include "aio/acl_aio.h"
 
@@ -114,6 +115,8 @@ char *acl_var_aio_pid_dir;
 char *acl_var_aio_access_allow;
 char *acl_var_aio_accept_alone;
 char *acl_var_aio_log_debug;
+char *acl_var_aio_dispatch_addr;
+char *acl_var_aio_dispatch_type;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
         { ACL_VAR_AIO_QUEUE_DIR, ACL_DEF_AIO_QUEUE_DIR, &acl_var_aio_queue_dir },
@@ -123,6 +126,8 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
         { ACL_VAR_AIO_EVENT_MODE, ACL_DEF_AIO_EVENT_MODE, &acl_var_aio_event_mode },
 	{ ACL_VAR_AIO_ACCEPT_ALONE, ACL_DEF_AIO_ACCEPT_ALONE, &acl_var_aio_accept_alone },
 	{ ACL_VAR_AIO_LOG_DEBUG, ACL_DEF_AIO_LOG_DEBUG, &acl_var_aio_log_debug },
+	{ ACL_VAR_AIO_DISPATCH_ADDR, ACL_DEF_AIO_DISPATCH_ADDR, &acl_var_aio_dispatch_addr },
+	{ ACL_VAR_AIO_DISPATCH_TYPE, ACL_DEF_AIO_DISPATCH_TYPE, &acl_var_aio_dispatch_type },
 
         { 0, 0, 0 },
 };
@@ -191,7 +196,6 @@ static void unlock_counter(void)
 	pthread_mutex_unlock(&__counter_mutex);
 }
 
-/*
 static void update_closing_time(void)
 {
 	if (acl_var_aio_max_threads > 0)
@@ -200,7 +204,6 @@ static void update_closing_time(void)
 	if (acl_var_aio_max_threads > 0)
 		unlock_closing_time();
 }
-*/
 
 static time_t last_closing_time(void)
 {
@@ -224,7 +227,6 @@ static void increase_client_counter(void)
 		unlock_counter();
 }
 
-/*
 static void decrease_client_counter(void)
 {
 	if (acl_var_aio_max_threads > 0)
@@ -233,7 +235,6 @@ static void decrease_client_counter(void)
 	if (acl_var_aio_max_threads > 0)
 		unlock_counter();
 }
-*/
 
 static int get_client_count(void)
 {
@@ -515,13 +516,11 @@ int acl_aio_server_connect(const char *saddr, int timeout,
 	return 0;
 }
 
-/*
-static void decrease_counter_callback(ACL_VSTREAM *stream acl_unused, void *arg acl_unused)
+void acl_aio_server_on_close(ACL_ASTREAM *stream acl_unused)
 {
 	update_closing_time();
 	decrease_client_counter();
 }
-*/
 
 /* server_wakeup - wake up application in main thread */
 
@@ -770,6 +769,121 @@ static void aio_server_accept_sock(ACL_ASTREAM *astream, void *context)
 		acl_aio_request_timer(aio, aio_server_timeout,
 			(void *) aio, (acl_int64) time_left * 1000000, 0);
 }
+
+/*==========================================================================*/
+
+static void dispatch_open(ACL_EVENT *event, ACL_AIO *aio);
+
+static void dispatch_connect_timer(int type acl_unused,
+	ACL_EVENT *event, void *ctx)
+{
+	ACL_AIO *aio = (ACL_AIO*) ctx;
+
+	dispatch_open(event, aio);
+}
+
+static ACL_VSTREAM *__dispatch_conn = NULL;
+
+static int dispatch_report(void)
+{
+	const char *myname = "dispatch_report";
+	char  buf[256];
+	int   n;
+
+	if (__dispatch_conn == NULL) {
+		acl_msg_warn("%s(%d), %s: dispatch connection not available",
+			__FUNCTION__, __LINE__, myname);
+		return -1;
+	}
+
+	n = get_client_count();
+	snprintf(buf, sizeof(buf), "count=%d&used=%d&pid=%u&type=%s\r\n",
+		n, __use_count, (unsigned) getpid(),
+		acl_var_aio_dispatch_type);
+
+	if (acl_vstream_writen(__dispatch_conn, buf, strlen(buf))
+		== ACL_VSTREAM_EOF)
+	{
+		acl_msg_warn("%s(%d), %s: write to master_dispatch(%s) failed",
+			__FUNCTION__, __LINE__, myname,
+			acl_var_aio_dispatch_addr);
+
+		return -1;
+	}
+
+	return 0;
+}
+
+static void dispatch_timer(int type acl_unused, ACL_EVENT *event, void *ctx)
+{
+	if (dispatch_report() == 0)
+		acl_event_request_timer(event, dispatch_timer, ctx, 1000000, 0);
+}
+
+static void dispatch_receive(int event_type acl_unused, ACL_EVENT *event,
+	ACL_VSTREAM *conn, void *context)
+{
+	const char *myname = "dispatch_receive";
+	ACL_AIO *aio = (ACL_AIO*) context;
+	char  buf[256];
+	int   fd = -1, ret;
+
+	if (conn != __dispatch_conn)
+		acl_msg_fatal("%s(%d), %s: conn invalid",
+			__FUNCTION__, __LINE__, myname);
+
+	ret = acl_read_fd(ACL_VSTREAM_SOCK(conn), buf, sizeof(buf) - 1, &fd);
+	if (ret <= 0 || fd < 0) {
+		acl_msg_warn("%s(%d), %s: read from master_dispatch(%s) error",
+			__FUNCTION__, __LINE__, myname,
+			acl_var_aio_dispatch_addr);
+
+		acl_event_disable_read(event, conn);
+		acl_vstream_close(conn);
+		__dispatch_conn = NULL;
+
+		acl_event_request_timer(event, dispatch_connect_timer,
+			aio, 1000000, 0);
+
+		return;
+	}
+
+	if (acl_getsocktype(fd) == AF_INET)
+		acl_tcp_set_nodelay(fd);
+	/* begin handle one client connection same as accept */
+	aio_server_wakeup(aio, fd);
+}
+
+static void dispatch_open(ACL_EVENT *event, ACL_AIO *aio)
+{
+	const char *myname = "dispatch_open";
+
+	if (!acl_var_aio_dispatch_addr || !*acl_var_aio_dispatch_addr)
+	{
+		acl_msg_warn("%s(%d), %s: acl_var_aio_dispatch_addr null",
+			__FUNCTION__, __LINE__, myname);
+		return;
+	}
+
+	__dispatch_conn = acl_vstream_connect(acl_var_aio_dispatch_addr,
+			ACL_BLOCKING, 0, 0, 4096);
+
+	if (__dispatch_conn == NULL) {
+		acl_msg_warn("connect master_dispatch(%s) failed",
+			acl_var_aio_dispatch_addr);
+		acl_event_request_timer(event, dispatch_connect_timer,
+			aio, 1000000, 0);
+	} else if (dispatch_report() == 0) {
+		acl_event_enable_read(event, __dispatch_conn, 0,
+			dispatch_receive, aio);
+		acl_event_request_timer(event, dispatch_timer,
+			aio, 1000000, 0);
+	} else
+		acl_event_request_timer(event, dispatch_connect_timer,
+			aio, 1000000, 0);
+}
+
+/*==========================================================================*/
 
 static void aio_server_init(const char *procname)
 {
@@ -1253,6 +1367,9 @@ void acl_aio_server_main(int argc, char **argv, ACL_AIO_SERVER_FN service,...)
 	/* Run post-jail initialization. */
 	if (post_init)
 		post_init(aio_server_name, aio_server_argv);
+
+	if (acl_var_aio_dispatch_addr && *acl_var_aio_dispatch_addr)
+		dispatch_open(acl_aio_server_event(), __h_aio);
 
 	run_loop(argv[0]);  /* 进入事件主循环过程 */
 }

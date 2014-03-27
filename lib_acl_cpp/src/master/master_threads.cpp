@@ -3,6 +3,8 @@
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/master/master_threads.hpp"
 
+#if 0
+
 namespace acl
 {
 
@@ -345,3 +347,6 @@ void master_threads::service_on_close(ACL_VSTREAM* client, void*)
 }
 
 }  // namespace acl
+
+#endif
+

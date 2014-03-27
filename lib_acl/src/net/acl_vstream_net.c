@@ -56,13 +56,16 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 		listen_stream = acl_vstream_fdopen(listenfd,
 			ACL_VSTREAM_FLAG_RW, io_bufsize,
 			io_timeout, ACL_VSTREAM_TYPE_LISTEN_UNIX);
+
 		if (listen_stream == NULL) {
 			acl_socket_close(listenfd);
 			acl_msg_error("%s: open vstream error, addr(%s)",
 				myname, addr);
 			return NULL;
 		}
+
 		acl_vstream_set_local(listen_stream, addr);
+
 		sprintf(listen_stream->errbuf, "+OK");
 		return (listen_stream);
 	}
@@ -111,14 +114,14 @@ ACL_VSTREAM *acl_vstream_listen(const char *addr, int qlen)
 }
 
 ACL_VSTREAM *acl_vstream_accept_ex(ACL_VSTREAM *listen_stream,
-	ACL_VSTREAM *client_stream, char *ipbuf, int bsize)
+	ACL_VSTREAM *client_stream, char *addr, int size)
 {
 	const char *myname = "acl_vstream_accept_ex";
 	ACL_SOCKET connfd = ACL_SOCKET_INVALID;
 	ACL_SOCKET servfd = ACL_VSTREAM_SOCK(listen_stream);
 	char buf[256];
 
-	if ((listen_stream->type | ACL_VSTREAM_TYPE_LISTEN_INET)) {
+	if ((listen_stream->type & ACL_VSTREAM_TYPE_LISTEN_INET)) {
 #ifdef WIN32
 		if (!(listen_stream->type & ACL_VSTREAM_TYPE_LISTEN_IOCP))
 			connfd = acl_inet_accept_ex(servfd, buf, sizeof(buf));
@@ -130,7 +133,9 @@ ACL_VSTREAM *acl_vstream_accept_ex(ACL_VSTREAM *listen_stream,
 			connfd = listen_stream->iocp_sock;
 			listen_stream->iocp_sock = ACL_SOCKET_INVALID;
 
-			/* iocp 方式下，需调用下面过程以允许调用 getpeername/getsockname */
+			/* iocp 方式下，需调用下面过程以允许调用
+			 * getpeername/getsockname
+			 */
 			ret = setsockopt(connfd, SOL_SOCKET,
 				SO_UPDATE_ACCEPT_CONTEXT,
 				(char *)&servfd, sizeof(servfd));
@@ -142,14 +147,15 @@ ACL_VSTREAM *acl_vstream_accept_ex(ACL_VSTREAM *listen_stream,
 		connfd = acl_inet_accept_ex(servfd, buf, sizeof(buf));
 #endif
 
-		if (connfd != ACL_SOCKET_INVALID && ipbuf != NULL && bsize > 0)
-			ACL_SAFE_STRNCPY(ipbuf, buf, bsize);
+		if (connfd != ACL_SOCKET_INVALID && addr != NULL && size > 0)
+			ACL_SAFE_STRNCPY(addr, buf, size);
 #ifdef	ACL_UNIX
-	} else if ((listen_stream->type | ACL_VSTREAM_TYPE_LISTEN_UNIX)) {
+	} else if ((listen_stream->type & ACL_VSTREAM_TYPE_LISTEN_UNIX)) {
 		connfd = acl_unix_accept(servfd);
-		if (ipbuf)
-			ipbuf[0] = 0;
-		buf[0] = 0;
+		if (acl_getpeername(connfd, buf, sizeof(buf)) < 0)
+			buf[0] = 0;
+		if (addr)
+			ACL_SAFE_STRNCPY(addr, buf, size);
 #endif
 	} else
 		acl_msg_fatal("%s(%d)->%s: invalid listen stream(%d)",

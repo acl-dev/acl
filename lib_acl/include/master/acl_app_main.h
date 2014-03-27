@@ -87,7 +87,6 @@ typedef void (*ACL_APP_THREAD_ON_EXIT)(void*);
 void acl_ioctl_app_main(int argc, char *argv[], ACL_IOCTL_RUN_FN run_fn, void *run_ctx, int name, ...);
 void acl_aio_app_main(int argc, char *argv[], ACL_AIO_RUN_FN run_fn, void *run_ctx, int name, ...);
 void acl_aio_app2_main(int argc, char *argv[], ACL_AIO_RUN2_FN run2_fn, void *run_ctx, int name, ...);
-
 /*----------------------------------------------------------------------------*/
 
 #endif

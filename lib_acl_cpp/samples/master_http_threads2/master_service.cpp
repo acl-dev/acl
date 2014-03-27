@@ -11,9 +11,9 @@ acl::master_str_tbl var_conf_str_tab[] = {
 	{ 0, 0, 0 }
 };
 
-int  var_cfg_bool;
+int  var_cfg_so_linger;
 acl::master_bool_tbl var_conf_bool_tab[] = {
-	{ "bool", 1, &var_cfg_bool },
+	{ "so_linger", 0, &var_cfg_so_linger },
 
 	{ 0, 0, 0 }
 };
@@ -80,7 +80,7 @@ bool master_service::thread_on_read(acl::socket_stream* stream)
 
 bool master_service::thread_on_accept(acl::socket_stream* conn)
 {
-	if (0)
+	if (var_cfg_so_linger)
 		acl_tcp_so_linger(conn->sock_handle(), 1, 0);
 	return true;
 }

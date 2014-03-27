@@ -10,8 +10,9 @@ RANLIB  = ranlib
 # default lib name
 LIB_NAME  = lib_acl.a
 
+#-fno-strict-aliasing \
 #CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align
-#-fno-strict-aliasing
+
 CFLAGS = -c -g -W -Wall -Wcast-align \
 -Wpointer-arith \
 -Werror \

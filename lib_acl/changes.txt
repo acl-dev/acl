@@ -1,6 +1,37 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+437) 2014.3.27
+437.1) bugfix: acl_ioctl_server.c 中调用 acl_event_set_check_inter 时应该在调用
+acl_ioctl_start 之后，否则因为 ACL_EVENT 对象还未创建而出现空指针引用
+437.2) feature: acl_aio_server.c 支持与 master_dispatch 服务模块配合，接收来自
+于 master_dispatch 模块的连接转发及向其汇报自身当前连接数
+437.3) bugfix: acl_transfer_fd.c 中，将 control_un 的定义放在函数内部，否则将是
+线程不安全的
+437.4) compile: acl_transfer_fd.c 中 *((int *) CMSG_DATA(cmptr)) = send_fd; 类的
+用法在高版本 gcc (打开 -O2 以上开关，同时未使用 -fno-strict-aliasing) 编译时会报
+警告，采用另外的方法避免此警告
+
+436) 2014.3.26
+436.1) bugfix: acl_vstream_net.c 中 acl_vstream_accept_ex 接收外来连接时，判断
+监听描述符的类型方式有误
+436.2) bugfix: acl_getpeername 函数当客户端连接的是域套接字时，给出的地址不对，
+解决方法是当判断为域套接字后再调用 acl_getsockname 取得域套接字监听路径
+436.3) bugfix: acl_transfer_fd.c 中 acl_read_fd() 函数在读取 fd 时应该如下表示：
+*recv_fd = *((int *) CMSG_DATA(cmptr)); 而不是 *recv_fd = *CMSG_DATA(cmptr);
+436.4) feature: acl_threads_server.c 服务器模板支持从描述字派发器处获取来自于
+客户端的连接，应用只需要增加配置项：ioctl_dispatch_addr = xxx 即可
+436.5) app: 增加了 app/master_dispatch 套接字接收与派发服务器
+
+435) 2014.3.24
+435.1) bugfix: acl_master 服务器模块在 reload 配置文件时有可能会导致产生 core
+文件，原因是 acl_master_spawn 当判断进程数计数有问题会直接产生 core，导致计数
+不对的主要原因是 master_conf.c 在 reload 配置时预启动机制存在问题，解决方法是：
+a) 在 acl_master_spawn 中仅记 warning 信息，不产生 core
+b) 去掉 master_conf.c 中 acl_master_avail_reset 调用
+c) 在 master_avail.c 中的 acl_master_avail_listen 函数最后再判断是否需要启动新
+的子进程
+
 434) 2014.3.21
 434.1) feature: acl_threads_server.c 中有几处在关闭流时都增加了流关闭的回调过程
 

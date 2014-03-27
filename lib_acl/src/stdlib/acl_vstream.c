@@ -2594,17 +2594,14 @@ int acl_vstream_close(ACL_VSTREAM *fp)
 
 static void set_sock_addr(struct sockaddr_in *saddr, const char *addr)
 {
-	const char *myname = "set_sockaddr";
 	char  buf[128], *ptr;
 	int   port;
 
 	snprintf(buf, sizeof(buf), "%s", addr);
 	ptr = strchr(buf, ':');
-	if (ptr == NULL) {
-		acl_msg_error("%s, %s(%d): addr(%s) invalid",
-			myname, __FILE__, __LINE__, addr);
+	if (ptr == NULL)
 		return;
-	}
+
 	*ptr++ = 0;
 	port = atoi(ptr);
 

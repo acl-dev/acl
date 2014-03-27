@@ -139,6 +139,7 @@ extern int acl_aio_server_fprintf(ACL_ASTREAM *astream,
 extern int acl_aio_server_connect(const char *saddr, int timeout,
 	ACL_AIO_CONNECT_FN connect_fn, void *context);
 extern ACL_ASTREAM **acl_aio_server_streams(void);
+extern void acl_aio_server_on_close(ACL_ASTREAM *stream);
 
  /*
   * acl_udp_server.c
