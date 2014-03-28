@@ -20,37 +20,37 @@
 
 #ifdef MISSING_SIGSET_T
 
-int     sigemptyset(sigset_t *m)
+int sigemptyset(sigset_t *m)
 {
-    return *m = 0;
+	return *m = 0;
 }
 
-int     sigaddset(sigset_t *set, int signum)
+int sigaddset(sigset_t *set, int signum)
 {
-    *set |= sigmask(signum);
-    return 0;
+	*set |= sigmask(signum);
+	return 0;
 }
 
-int     sigprocmask(int how, sigset_t *set, sigset_t *old)
+int sigprocmask(int how, sigset_t *set, sigset_t *old)
 {
-    int previous;
+	int previous;
 
-    if (how == SIG_BLOCK)
-	previous = sigblock(*set);
-    else if (how == SIG_SETMASK)
-	previous = sigsetmask(*set);
-    else if (how == SIG_UNBLOCK) {
-	int     m = sigblock(0);
+	if (how == SIG_BLOCK)
+		previous = sigblock(*set);
+	else if (how == SIG_SETMASK)
+		previous = sigsetmask(*set);
+	else if (how == SIG_UNBLOCK) {
+		int     m = sigblock(0);
 
-	previous = sigsetmask(m & ~*set);
-    } else {
-	acl_set_error(EINVAL);
-	return -1;
-    }
+		previous = sigsetmask(m & ~*set);
+	} else {
+		acl_set_error(EINVAL);
+		return -1;
+	}
 
-    if (old)
-	*old = previous;
-    return 0;
+	if (old)
+		*old = previous;
+	return 0;
 }
 
 #endif
@@ -61,21 +61,21 @@ static struct sigaction actions[NSIG] = {};
 
 static int sighandle(int signum)
 {
-    if (signum == SIGCHLD) {
-	/* XXX If the child is just stopped, don't invoke the handler.	 */
-    }
-    actions[signum].sa_handler(signum);
+	if (signum == SIGCHLD) {
+		/* XXX If the child is just stopped, don't invoke the handler */
+	}
+	actions[signum].sa_handler(signum);
 }
 
-int     sigaction(int sig, struct sigaction *act, struct sigaction *oact)
+int sigaction(int sig, struct sigaction *act, struct sigaction *oact)
 {
-    static int initialized = 0;
+	static int initialized = 0;
 
-    if (!initialized) {
+	if (!initialized) {
 		int     i;
 
 		for (i = 0; i < NSIG; i++)
-		    actions[i].sa_handler = SIG_DFL;
+			actions[i].sa_handler = SIG_DFL;
 		initialized = 1;
 	}
 	if (sig <= 0 || sig >= NSIG) {
@@ -92,7 +92,7 @@ int     sigaction(int sig, struct sigaction *act, struct sigaction *oact)
 		};
 
 		if (sigvec(sig, &mine, NULL))
-		return -1;
+			return -1;
 	}
 
 	actions[sig] = *act;
@@ -102,5 +102,3 @@ int     sigaction(int sig, struct sigaction *act, struct sigaction *oact)
 #endif
 
 #endif /* ACL_UNIX*/
-
-

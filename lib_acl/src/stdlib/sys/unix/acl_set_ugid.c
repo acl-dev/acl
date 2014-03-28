@@ -28,9 +28,9 @@ void acl_set_ugid(uid_t uid, gid_t gid)
 	int   saved_error = acl_last_error();
 	char  tbuf[256];
 
-	if (geteuid() != 0)
-		if (seteuid(0) < 0)
-			acl_msg_fatal("seteuid(0): %s", acl_last_strerror(tbuf, sizeof(tbuf)));
+	if (geteuid() != 0 && seteuid(0) < 0)
+		acl_msg_fatal("seteuid(0): %s",
+			acl_last_strerror(tbuf, sizeof(tbuf)));
 	if (setgid(gid) < 0)
 		acl_msg_fatal("setgid(%ld): %s", (long) gid,
 			acl_last_strerror(tbuf, sizeof(tbuf)));
@@ -47,22 +47,24 @@ void acl_set_ugid(uid_t uid, gid_t gid)
 
 int acl_change_uid(char *user_name)
 {
-	char where[] = "change_uid";
+	const char *myname = "change_uid";
 	struct passwd *pwd;
 	uid_t  uid;
 	gid_t  gid;
 	char  tbuf[256];
 
 	if ((pwd = getpwnam(user_name)) == NULL)
-		acl_msg_fatal("%s: no such user=%s", where, user_name);
+		acl_msg_fatal("%s: no such user=%s", myname, user_name);
 	uid = pwd->pw_uid;
 	gid = pwd->pw_gid;
 	if (setgid(gid) < 0)
 		acl_msg_fatal("%s: setgid error(%s, %d): %s",
-			where, user_name, (int) uid, acl_last_strerror(tbuf, sizeof(tbuf)));
+			myname, user_name, (int) uid,
+			acl_last_strerror(tbuf, sizeof(tbuf)));
 	if (setuid(uid) < 0)
 		acl_msg_fatal("%s: setuid error(%s, %d): %s",
-			where, user_name, (int) uid, acl_last_strerror(tbuf, sizeof(tbuf)));
+			myname, user_name, (int) uid,
+			acl_last_strerror(tbuf, sizeof(tbuf)));
 
 	return (0);
 }

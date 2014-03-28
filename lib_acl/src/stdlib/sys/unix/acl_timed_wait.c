@@ -30,11 +30,8 @@ static int timed_wait_expired;
 
 /* timed_wait_alarm - timeout handler */
 
-static void timed_wait_alarm(int unused_sig)
+static void timed_wait_alarm(int unused_sig acl_unused)
 {
-
-	unused_sig = unused_sig;
-
 	/*
 	 * WARNING WARNING WARNING.
 	 * 
@@ -48,9 +45,9 @@ static void timed_wait_alarm(int unused_sig)
 /* timed_waitpid - waitpid with time limit */
 
 int acl_timed_waitpid(pid_t pid, ACL_WAIT_STATUS_T *statusp, int options,
-		int time_limit)
+	int time_limit)
 {
-	char   *myname = "timed_waitpid";
+	const char *myname = "timed_waitpid";
 	struct sigaction action;
 	struct sigaction old_action;
 	int     time_left;
@@ -94,4 +91,3 @@ int acl_timed_waitpid(pid_t pid, ACL_WAIT_STATUS_T *statusp, int options,
 	return (wpid);
 }
 #endif /* ACL_UNIX */
-

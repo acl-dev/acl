@@ -30,7 +30,7 @@
 /* safe_open_exist - open existing file */
 
 static ACL_VSTREAM *acl_safe_open_exist(const char *path, int flags,
-				        struct stat * fstat_st, ACL_VSTRING *why)
+	struct stat * fstat_st, ACL_VSTRING *why)
 {
 	struct stat local_statbuf;
 	struct stat lstat_st;
@@ -129,7 +129,7 @@ static ACL_VSTREAM *acl_safe_open_exist(const char *path, int flags,
 /* acl_safe_open_create - create new file */
 
 static ACL_VSTREAM *acl_safe_open_create(const char *path, int flags, int mode,
-	            struct stat * st, uid_t user, uid_t group, ACL_VSTRING *why)
+	struct stat * st, uid_t user, uid_t group, ACL_VSTRING *why)
 {
 	ACL_VSTREAM *fp;
 	char tbuf[256];
@@ -182,7 +182,7 @@ static ACL_VSTREAM *acl_safe_open_create(const char *path, int flags, int mode,
 /* acl_safe_open - safely open or create file */
 
 ACL_VSTREAM *acl_safe_open(const char *path, int flags, int mode,
-	            struct stat * st, uid_t user, gid_t group, ACL_VSTRING *why)
+	struct stat * st, uid_t user, gid_t group, ACL_VSTRING *why)
 {
 	ACL_VSTREAM *fp;
 

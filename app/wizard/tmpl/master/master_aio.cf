@@ -52,6 +52,8 @@ service $<PROGRAM> {
 #	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2
 #	master_debug =
 
+#	当启动多个子进程实例时，该开关控制多个子进程在接收连接时是否向 acl_master 发送消息报告自己的状态
+#	master_status_notify = 1
 #	是否允许产生 core 文件
 #	aio_enable_core = 1
 #	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出
@@ -79,7 +81,7 @@ service $<PROGRAM> {
 #	单位为微秒
 	aio_delay_usec = 500
 #       采用事件循环的方式: select(default), poll, kernel(epoll/devpoll/kqueue)
-	aio_event_mode = select
+	aio_event_mode = kernel
 #	是否将 socket 接收与IO功能分开: yes/no, 如果为 yes 可以大大提高 accept() 速度
 	aio_accept_alone = yes
 #	线程池的最大线程数, 如果该值为0则表示采用单线程非阻塞模式.
@@ -87,11 +89,18 @@ service $<PROGRAM> {
 #	每个线程的空闲时间.
 	aio_thread_idle_limit = 60
 
+#	当启用 master_dispatch 连接分开服务后，该配置指定 master_dispatch 所监听的
+#	域套接口的全路径，这样本子进程就可以从 master_dispatch 获得客户端连接
+#	aio_dispatch_addr = {install_path}/var/private/dispatch.sock
+#	当 aio_dispatch_addr 开启后，下面参数控制本服务进程发给前端 master_dispatch 的服务标识信息
+#	aio_dispatch_type = default
+
 #	允许访问的客户端IP地址范围
 	aio_access_allow = 127.0.0.1:255.255.255.255, 127.0.0.1:127.0.0.1
 
 #	当 acl_master 退出时，如果该值置1则该程序不等所有连接处理完毕便立即退出
 	aio_quick_abort = 1
+
 ############################################################################
 #	应用自己的配置选项
 

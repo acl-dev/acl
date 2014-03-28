@@ -60,7 +60,8 @@ int acl_read_fd(int fd, void *ptr, int nbytes, int *recv_fd)
 
 #ifdef HAVE_MSGHDR_MSG_CONTROL
 	if ((cmptr = CMSG_FIRSTHDR(&msg)) != NULL
-	    && cmptr->cmsg_len == CMSG_LEN(sizeof(int))) {
+	    && cmptr->cmsg_len == CMSG_LEN(sizeof(int)))
+	{
 		if (cmptr->cmsg_level != SOL_SOCKET)
 			acl_msg_fatal("%s: control level != SOL_SOCKET",
 				myname);

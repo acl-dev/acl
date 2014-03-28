@@ -8,7 +8,7 @@ service master_dispatch {
 #	for master_type = unix
 #	master_service = aio_echo.sock
 #	for master_type = sock
-	master_service = 5200, 127.0.0.1:5100, :5300, aio_echo.sock, aio_echo2.sock
+	master_service = 10080, dispatch.sock
 
 #	服务监听为域套接口
 #	master_service = aio_echo.sock
@@ -36,9 +36,9 @@ service master_dispatch {
 #	每隔多长时间触发一次，单位为秒(仅对 trigger 模式有效)
 	master_wakeup = -
 #	最大进程数
-	master_maxproc = 5
+	master_maxproc = 1
 #	预启动进程数，该值不得大于 master_maxproc
-#	master_prefork = 0
+	master_prefork = 0
 #	进程程序名
 	master_command = master_dispatch
 #	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
@@ -50,7 +50,7 @@ service master_dispatch {
 #	进程日志记录文件
 	master_log = {install_path}/var/log/master_dispatch
 #	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2
-#	master_debug =
+	master_debug = all:1
 
 #	是否允许产生 core 文件
 #	aio_enable_core = 1
@@ -79,7 +79,7 @@ service master_dispatch {
 #	单位为微秒
 	aio_delay_usec = 500
 #       采用事件循环的方式: select(default), poll, kernel(epoll/devpoll/kqueue)
-	aio_event_mode = select
+	aio_event_mode = kernel
 #	是否将 socket 接收与IO功能分开: yes/no, 如果为 yes 可以大大提高 accept() 速度
 	aio_accept_alone = yes
 #	线程池的最大线程数, 如果该值为0则表示采用单线程非阻塞模式.
@@ -96,10 +96,10 @@ service master_dispatch {
 #	应用自己的配置选项
 
 #	每个客户端连接的空闲时间.
-	client_idle_limit = 60
+#	client_idle_limit = 60
 #	是否输出当前的内存状态信息
-	debug_mem = 1
+#	debug_mem = 1
 #	是否发送欢迎信息
-	send_banner = 0
+#	send_banner = 0
 }
 

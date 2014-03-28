@@ -20,7 +20,7 @@
 #include "stdlib/unix/acl_mychown.h"
 
 
-/* 注意, 此函数是线程不安全的, 便如果每次的 s_owner 与 s_group 都一样则无所谓 */
+/* 注意, 此函数是线程不安全的, 如果每次的 s_owner 与 s_group 都一样则无所谓 */
 int acl_mychown(const char *path, const char *s_owner, const char *s_group)
 {
 	struct	passwd	*pwd;
@@ -45,7 +45,8 @@ int acl_mychown(const char *path, const char *s_owner, const char *s_group)
 	/* no such user */
 	return(-1);
 }
-/* 注意, 此函数是线程不安全的, 便如果每次的 s_owner 与 s_group 都一样则无所谓 */
+
+/* 注意, 此函数是线程不安全的, 如果每次的 s_owner 与 s_group 都一样则无所谓 */
 int acl_myfchown(const int fd, const char *s_owner, const char *s_group)
 {
 	struct	passwd	*pwd;

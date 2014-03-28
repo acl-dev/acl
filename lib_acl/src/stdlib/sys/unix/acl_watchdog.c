@@ -56,7 +56,7 @@ static ACL_WATCHDOG *acl_watchdog_curr;
 
 static void acl_watchdog_event(int unused_sig acl_unused)
 {
-	const char* myname = "acl_watchdog_event";
+	const char *myname = "acl_watchdog_event";
 	ACL_WATCHDOG *wp;
 
 	/*
@@ -83,7 +83,7 @@ static void acl_watchdog_event(int unused_sig acl_unused)
 ACL_WATCHDOG *acl_watchdog_create(unsigned timeout,
 	ACL_WATCHDOG_FN action, char *context)
 {
-	const char* myname = "acl_watchdog_create";
+	const char *myname = "acl_watchdog_create";
 	struct sigaction sig_action;
 	ACL_WATCHDOG *wp;
 
@@ -113,7 +113,7 @@ ACL_WATCHDOG *acl_watchdog_create(unsigned timeout,
 
 void    acl_watchdog_destroy(ACL_WATCHDOG *wp)
 {
-	const char* myname = "acl_watchdog_destroy";
+	const char *myname = "acl_watchdog_destroy";
 
 	acl_watchdog_stop(wp);
 	acl_watchdog_curr = wp->saved_watchdog;
@@ -131,7 +131,7 @@ void    acl_watchdog_destroy(ACL_WATCHDOG *wp)
 
 void    acl_watchdog_start(ACL_WATCHDOG *wp)
 {
-	const char* myname = "acl_watchdog_start";
+	const char *myname = "acl_watchdog_start";
 
 	if (wp != acl_watchdog_curr)
 		acl_msg_panic("%s: wrong watchdog instance", myname);
@@ -145,7 +145,7 @@ void    acl_watchdog_start(ACL_WATCHDOG *wp)
 
 void    acl_watchdog_stop(ACL_WATCHDOG *wp)
 {
-	const char* myname = "acl_watchdog_stop";
+	const char *myname = "acl_watchdog_stop";
 
 	if (wp != acl_watchdog_curr)
 		acl_msg_panic("%s: wrong watchdog instance", myname);
@@ -158,7 +158,7 @@ void    acl_watchdog_stop(ACL_WATCHDOG *wp)
 
 void    acl_watchdog_pat(void)
 {
-	const char* myname = "acl_watchdog_pat";
+	const char *myname = "acl_watchdog_pat";
 
 	if (acl_watchdog_curr)
 		acl_watchdog_curr->trip_run = 0;

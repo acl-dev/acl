@@ -18,9 +18,9 @@ extern "C" {
 typedef int sigset_t;
 
 enum {
-    SIG_BLOCK,
-    SIG_UNBLOCK,
-    SIG_SETMASK
+	SIG_BLOCK,
+	SIG_UNBLOCK,
+	SIG_SETMASK
 };
 
 extern int sigemptyset(sigset_t *);
@@ -32,15 +32,15 @@ extern int sigprocmask(int, sigset_t *, sigset_t *);
 #ifdef MISSING_SIGACTION
 
 struct sigaction {
-    void    (*sa_handler) ();
-    sigset_t sa_mask;
-    int     sa_flags;
+	void    (*sa_handler) ();
+	sigset_t sa_mask;
+	int     sa_flags;
 };
 
- /* Possible values for sa_flags.  Or them to set multiple.  */
+/* Possible values for sa_flags.  Or them to set multiple.  */
 enum {
-    SA_RESTART,
-    SA_NOCLDSTOP = 4			/* drop the = 4.  */
+	SA_RESTART,
+	SA_NOCLDSTOP = 4			/* drop the = 4.  */
 };
 
 extern int sigaction(int, struct sigaction *, struct sigaction *);
@@ -54,4 +54,3 @@ extern int sigaction(int, struct sigaction *, struct sigaction *);
 #endif
 
 #endif
-

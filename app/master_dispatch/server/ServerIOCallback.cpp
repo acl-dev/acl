@@ -30,7 +30,8 @@ bool ServerIOCallback::read_callback(char* data, int len)
 	acl::url_coder coder;
 	coder.decode(data);
 
-	printf(">>>gets: %s\r\n", data);
+	logger_debug(DEBUG_SVR, 1, "client: %s", data);
+
 	const char* ptr = coder.get("count");
 	if (ptr == NULL)
 	{
