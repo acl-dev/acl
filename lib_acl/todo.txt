@@ -19,7 +19,8 @@ acl_ioctl_server.c 的模板程序中采用内存池功能
 9) 配置文件中应支持变量
 10) acl_master 的子进程的监听地址应允许在配置文件中写多个 -- 完成
 11) acl_master 在重读配置是需要支持预启动机制 -- 完成
-12) event 模块需要进一步优化
+12) event 模块需要进一步优化 -- 完成大部分
 13) json 解析器需要支持 \u 方式 UNICODE 格式
 14) acl_master 子进程需要支持 UDP 方式 -- 完成
 15) json 解析器可以支持 BOOL, NUMBER, NULL 等类型
+16) events_select_thr.c, events_poll.c, events_select.c 需要支持检测时间间隔

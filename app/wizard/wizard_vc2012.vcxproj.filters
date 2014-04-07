@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="file_copy.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="http_creator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -33,11 +30,11 @@
     <ClCompile Include="wizard.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="file_tmpl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="file_copy.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="http_creator.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -48,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="file_tmpl.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

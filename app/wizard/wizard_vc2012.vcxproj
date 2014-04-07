@@ -89,7 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="file_copy.cpp" />
+    <ClCompile Include="file_tmpl.cpp" />
     <ClCompile Include="http_creator.cpp" />
     <ClCompile Include="master_creator.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -100,7 +100,7 @@
     <ClCompile Include="wizard.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="file_copy.h" />
+    <ClInclude Include="file_tmpl.h" />
     <ClInclude Include="http_creator.h" />
     <ClInclude Include="lib_tpl.h" />
     <ClInclude Include="master_creator.h" />

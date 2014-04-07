@@ -1,0 +1,27 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "$<PROGRAM>", "$<PROGRAM>.vcproj", "{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		DebugDll = DebugDll
+		Release = Release
+		ReleaseDll = ReleaseDll
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Debug.ActiveCfg = Debug|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Debug.Build.0 = Debug|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.DebugDll.ActiveCfg = DebugDll|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.DebugDll.Build.0 = DebugDll|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Release.ActiveCfg = Release|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Release.Build.0 = Release|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.ReleaseDll.ActiveCfg = ReleaseDll|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.ReleaseDll.Build.0 = ReleaseDll|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

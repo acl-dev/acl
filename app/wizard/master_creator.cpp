@@ -1,107 +1,12 @@
 #include "stdafx.h"
-#include "file_copy.h"
+#include "file_tmpl.h"
 #include "master_creator.h"
 
-static const char* src_path_ = "tmpl/master";
-static char  dst_path_[256];
-static char master_name[128];
-
-//////////////////////////////////////////////////////////////////////////
-
-static tpl_t* open_tpl(const char* filename)
+static bool create_master_threads(file_tmpl& tmpl)
 {
-	tpl_t* tpl = tpl_alloc();
-	string filepath;
-	filepath.format("%s/%s", src_path_, filename);
-	if (tpl_load(tpl, filepath.c_str()) != TPL_OK)
-	{
-		printf("load file %s error: %s\r\n",
-			filepath.c_str(), last_serror());
-		tpl_free(tpl);
-		return NULL;
-	}
-	return tpl;
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-static bool copy_and_replace(const char* from, const char* to, bool exec = false)
-{
-	tpl_t* tpl = open_tpl(from);
-	if (tpl == NULL)
-		return false;
-
-	tpl_set_field_fmt_global(tpl, "PROGRAM", "%s", master_name);
-
-	string filepath;
-	filepath << dst_path_ << '/' << to;
-	if (tpl_save_as(tpl, filepath.c_str()) != TPL_OK)
-	{
-		printf("save to %s error: %s\r\n", filepath.c_str(),
-			last_serror());
-		tpl_free(tpl);
-		return false;
-	}
-	printf("create %s ok.\r\n", filepath.c_str());
-	tpl_free(tpl);
-
-	if (exec)
-	{
-#ifndef	WIN32
-		chmod(filepath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR |
-			S_IRGRP | S_IWGRP | S_IXGRP);
-#endif
-	}
-	return true;
-}
-
-static bool create_common()
-{
-	if (copy_and_replace("Makefile", "Makefile") == false)
-		return false;
-	if (copy_and_replace("valgrind.sh", "valgrind.sh", true) == false)
-		return false;
-
-	string file;
-
-	// for vc2003
-	file.format("%s.sln", master_name);
-	if (copy_and_replace("master_service.sln", file.c_str()) == false)
-		return false;
-	file.format("%s.vcproj", master_name);
-	if (copy_and_replace("master_service.vcproj", file.c_str()) == false)
-		return false;
-
-	// for vc2012
-	file.format("%s_vc2012.sln", master_name);
-	if (copy_and_replace("master_service_vc2012.sln", file.c_str()) == false)
-		return false;
-	file.format("%s_vc2012.vcxproj", master_name);
-	if (copy_and_replace("master_service_vc2012.vcxproj", file.c_str()) == false)
-		return false;
-	file.format("%s_vc2012.vcxproj.filters", master_name);
-	if (copy_and_replace("master_service_vc2012.vcxproj.filters", file.c_str()) == false)
-		return false;
-
-	const char* name = "common_files";
-	const FILE_FROM_TO tab[] = {
-		{ "stdafx.h", "stdafx.h" },
-		{ "stdafx.cpp", "stdafx.cpp" },
-		{ NULL, NULL }
-	};
-
-	return files_copy(name, tab, src_path_, dst_path_);
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-static bool create_master_threads()
-{
-	create_common();
-
-	string file(master_name);
+	string file(tmpl.get_project_name());
 	file << ".cf";
-	if (copy_and_replace("master_threads.cf", file.c_str()) == false)
+	if (tmpl.copy_and_replace("master_threads.cf", file.c_str()) == false)
 		return false;
 
 	const char* name = "master_threads";
@@ -112,16 +17,14 @@ static bool create_master_threads()
 		{ NULL, NULL }
 	};
 
-	return files_copy(name, tab, src_path_, dst_path_);
+	return tmpl.files_copy(name, tab);
 }
 
-static bool create_master_proc()
+static bool create_master_proc(file_tmpl& tmpl)
 {
-	create_common();
-
-	string file(master_name);
+	string file(tmpl.get_project_name());
 	file << ".cf";
-	if (copy_and_replace("master_proc.cf", file.c_str()) == false)
+	if (tmpl.copy_and_replace("master_proc.cf", file.c_str()) == false)
 		return false;
 
 	const char* name = "master_proc";
@@ -132,16 +35,13 @@ static bool create_master_proc()
 		{ NULL, NULL }
 	};
 
-	return files_copy(name, tab, src_path_, dst_path_);
+	return tmpl.files_copy(name, tab);
 }
 
-static bool create_master_aio()
+static bool create_master_aio(file_tmpl& tmpl)
 {
-	create_common();
-
-	string file(master_name);
-	file << ".cf";
-	if (copy_and_replace("master_aio.cf", file.c_str()) == false)
+	string file(tmpl.get_project_name());
+	if (tmpl.copy_and_replace("master_aio.cf", file.c_str()) == false)
 		return false;
 
 	const char* name = "master_aio";
@@ -152,16 +52,14 @@ static bool create_master_aio()
 		{ NULL, NULL }
 	};
 
-	return files_copy(name, tab, src_path_, dst_path_);
+	return tmpl.files_copy(name, tab);
 }
 
-static bool create_master_rpc()
+static bool create_master_rpc(file_tmpl& tmpl)
 {
-	create_common();
-
-	string file(master_name);
+	string file(tmpl.get_project_name());
 	file << ".cf";
-	if (copy_and_replace("master_aio.cf", file.c_str()) == false)
+	if (tmpl.copy_and_replace("master_aio.cf", file.c_str()) == false)
 		return false;
 
 	const char* name = "master_rpc";
@@ -174,16 +72,14 @@ static bool create_master_rpc()
 		{ NULL, NULL }
 	};
 
-	return files_copy(name, tab, src_path_, dst_path_);
+	return tmpl.files_copy(name, tab);
 }
 
-static bool create_master_trigger()
+static bool create_master_trigger(file_tmpl& tmpl)
 {
-	create_common();
-
-	string file(master_name);
+	string file(tmpl.get_project_name());
 	file << ".cf";
-	if (copy_and_replace("master_trigger.cf", file.c_str()) == false)
+	if (tmpl.copy_and_replace("master_trigger.cf", file.c_str()) == false)
 		return false;
 
 	const char* name = "master_trigger";
@@ -194,16 +90,14 @@ static bool create_master_trigger()
 		{ NULL, NULL }
 	};
 
-	return files_copy(name, tab, src_path_, dst_path_);
+	return tmpl.files_copy(name, tab);
 }
 
-static bool create_master_udp()
+static bool create_master_udp(file_tmpl& tmpl)
 {
-	create_common();
-
-	string file(master_name);
+	string file(tmpl.get_project_name());
 	file << ".cf";
-	if (copy_and_replace("master_udp.cf", file.c_str()) == false)
+	if (tmpl.copy_and_replace("master_udp.cf", file.c_str()) == false)
 		return false;
 
 	const char* name = "master_udp";
@@ -214,74 +108,87 @@ static bool create_master_udp()
 		{ NULL, NULL }
 	};
 
-	return files_copy(name, tab, src_path_, dst_path_);
+	return tmpl. files_copy(name, tab);
 }
 
 void master_creator()
 {
-	char buf[256];
-	int  n;
+	file_tmpl tmpl;
+
+	// 设置源程序所在目录
+	tmpl.set_path_from("tmpl/master");
 
 	while (true)
 	{
-		printf("please input your program name: "); fflush(stdout);
+		char buf[256];
+		int  n;
+
+		printf("please input your program name: ");
+		fflush(stdout);
+
 		n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
 		if (n == ACL_VSTREAM_EOF)
 			break;
 		if (n == 0)
-			snprintf(master_name, sizeof(master_name), "master_service");
-		else
-			snprintf(master_name, sizeof(master_name), "%s", buf);
+			snprintf(buf, sizeof(buf), "master_service");
 
+		tmpl.set_project_name(buf);
 		// 创建目录
-		snprintf(dst_path_, sizeof(dst_path_), "%s", master_name);
-		acl_make_dirs(dst_path_, 0755);
+		tmpl.create_dirs();
 
 		printf("choose master_service type:\r\n");
-		printf("t: for master_threads; p: for master_proc; "
-			"a: for master_aio; g: for master_trigger; "
-			"r: for master_rpc; u: for master_udp; "
-			"s: skip choose\r\n");
-		printf(">"); fflush(stdout);
+		printf("	t: for master_threads\r\n"
+			"	p: for master_proc\r\n"
+			"	a: for master_aio\t\n"
+			"	g: for master_trigger\r\n"
+			"	r: for master_rpc\r\n"
+			"	u: for master_udp\r\n"
+			"	s: skip choose, try again\r\n");
+		printf(">");
+		fflush(stdout);
 
 		n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
 		if (n == ACL_VSTREAM_EOF)
 			break;
 		else if (strcasecmp(buf, "t") == 0)
 		{
-			create_master_threads();
+			create_master_threads(tmpl);
 			break;
 		}
 		else if (strcasecmp(buf, "p") == 0)
 		{
-			create_master_proc();
+			create_master_proc(tmpl);
 			break;
 		}
 		else if (strcasecmp(buf, "a") == 0)
 		{
-			create_master_aio();
+			create_master_aio(tmpl);
 			break;
 		}
 		else if (strcasecmp(buf, "r") == 0)
 		{
-			create_master_rpc();
+			create_master_rpc(tmpl);
 			break;
 		}
 		else if (strcasecmp(buf, "g") == 0)
 		{
-			create_master_trigger();
+			create_master_trigger(tmpl);
 			break;
 		}
 		else if (strcasecmp(buf, "u") == 0)
 		{
-			create_master_udp();
+			create_master_udp(tmpl);
 			break;
 		}
 		else if (strcasecmp(buf, "s") == 0)
-			break;
+			goto END;
 		else
 			printf("unknown ch: %s\r\n", buf);
 	}
+
+	tmpl.create_common();
+
+END:
 	for (int i = 0; i < 78; i++)
 		putchar('-');
 	printf("\r\n");

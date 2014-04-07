@@ -1,20 +1,16 @@
 #pragma once
-#include "acl_cpp/http/HttpServlet.hpp"
 
-class acl::HttpServletRequest;
-class acl::HttpServletResponse;
-
-class http_servet : public acl::HttpServlet
+class http_servlet : public acl::HttpServlet
 {
 public:
 	http_servlet();
 	~http_servlet();
 
 protected:
-	virtual void doUnknown(acl::HttpServletRequest&,
+	virtual bool doUnknown(acl::HttpServletRequest&,
 		acl::HttpServletResponse& res);
 	virtual bool doGet(acl::HttpServletRequest& req,
-		HttpServletResponse& res);
+		acl::HttpServletResponse& res);
 	virtual bool doPost(acl::HttpServletRequest& req,
 		acl::HttpServletResponse& res);
 };

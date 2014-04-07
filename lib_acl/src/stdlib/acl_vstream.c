@@ -262,20 +262,6 @@ static int __sys_read(ACL_VSTREAM *in, void *buf, size_t size)
 #endif
 
 AGAIN:
-	if (in->sys_read_ready == 0 && in->rw_timeout > 0
-		&& acl_read_wait(ACL_VSTREAM_SOCK(in), in->rw_timeout) < 0)
-	{
-		in->errnum = acl_last_error();
-		if (in->errnum == ACL_ETIMEDOUT) {
-			in->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
-			SAFE_COPY(in->errbuf, "read timeout");
-			return -1;
-		}
-
-		in->flag |= ACL_VSTREAM_FLAG_ERR;
-		acl_strerror(in->errnum, in->errbuf, sizeof(in->errbuf));
-		return -1;
-	}
 
 	/* 清除系统错误号 */
 	acl_set_error(0);
@@ -288,9 +274,27 @@ AGAIN:
 			in->rw_timeout, in, in->context);
 		if (in->read_cnt > 0)
 			in->sys_offset += in->read_cnt;
-	} else
+	} else {
+		if (in->sys_read_ready == 0 && in->rw_timeout > 0
+			&& acl_read_wait(ACL_VSTREAM_SOCK(in),
+				in->rw_timeout) < 0)
+		{
+			in->errnum = acl_last_error();
+			if (in->errnum == ACL_ETIMEDOUT) {
+				in->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
+				SAFE_COPY(in->errbuf, "read timeout");
+				return -1;
+			}
+
+			in->flag |= ACL_VSTREAM_FLAG_ERR;
+			acl_strerror(in->errnum, in->errbuf,
+				sizeof(in->errbuf));
+			return -1;
+		}
+
 		read_cnt = in->read_fn(ACL_VSTREAM_SOCK(in), buf, size,
 			in->rw_timeout, in, in->context);
+	}
 
 	if (read_cnt > 0) {
 		in->read_ptr = in->read_buf;
@@ -1244,9 +1248,28 @@ TAG_AGAIN:
 			/* 防止缓冲区内的数据与实际不一致, 仅对文件IO有效 */
 			fp->read_cnt = 0;
 		}
-	} else
+	} else {
+#if 0
+		if (fp->rw_timeout > 0 && acl_write_wait(ACL_VSTREAM_SOCK(fp),
+			fp->rw_timeout) < 0)
+		{
+			fp->errnum = acl_last_error();
+			if (fp->errnum == ACL_ETIMEDOUT) {
+				fp->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
+				SAFE_COPY(fp->errbuf, "write timeout");
+				return -1;
+			}
+			fp->flag |= ACL_VSTREAM_FLAG_ERR;
+			acl_strerror(fp->errnum, fp->errbuf,
+				sizeof(fp->errbuf));
+			return -1;
+		}
+#endif
+
 		n = fp->write_fn(ACL_VSTREAM_SOCK(fp), vptr, dlen,
 			fp->rw_timeout, fp, fp->context);
+	}
+
 	if (n < 0) {
 		if (acl_last_error() == ACL_EINTR) {
 			if (++neintr >= 5)
@@ -1326,9 +1349,28 @@ TAG_AGAIN:
 			/* 防止缓冲区内的数据与实际不一致, 仅对文件IO有效 */
 			fp->read_cnt = 0;
 		}
-	} else
+	} else {
+#if 0
+		if (fp->rw_timeout > 0 && acl_write_wait(ACL_VSTREAM_SOCK(fp),
+			fp->rw_timeout) < 0)
+		{
+			fp->errnum = acl_last_error();
+			if (fp->errnum == ACL_ETIMEDOUT) {
+				fp->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
+				SAFE_COPY(fp->errbuf, "write timeout");
+				return -1;
+			}
+			fp->flag |= ACL_VSTREAM_FLAG_ERR;
+			acl_strerror(fp->errnum, fp->errbuf,
+				sizeof(fp->errbuf));
+			return -1;
+		}
+#endif
+
 		n = fp->writev_fn(ACL_VSTREAM_SOCK(fp), vec, count,
 			fp->rw_timeout, fp, fp->context);
+	}
+
 	if (n < 0) {
 		if (acl_last_error() == ACL_EINTR) {
 			if (++neintr >= 5)
