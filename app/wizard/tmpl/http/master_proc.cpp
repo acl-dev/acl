@@ -55,7 +55,7 @@ void master_service::on_accept(acl::socket_stream* conn)
 	servlet.setLocalCharset("utf-8");  // charset: big5, gb2312, gb18030, gbk, utf-8
 	while (true)
 	{
-		if (servlet.doRun(session, stream) == false)
+		if (servlet.doRun(session, conn) == false)
 			break;
 	}
 

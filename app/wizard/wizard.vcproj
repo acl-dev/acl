@@ -115,7 +115,7 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\file_copy.cpp">
+				RelativePath=".\file_tmpl.cpp">
 			</File>
 			<File
 				RelativePath=".\http_creator.cpp">
@@ -150,7 +150,7 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\file_copy.h">
+				RelativePath=".\file_tmpl.h">
 			</File>
 			<File
 				RelativePath=".\http_creator.h">

@@ -8,9 +8,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_dict", "lib_dict\lib_di
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_tls", "lib_tls\lib_tls.vcxproj", "{389FDE47-7F16-4DD4-B37A-27918BE745B6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2597AF7B-516E-478A-B72E-0BC8A59E8965}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F9F91DA0-E242-4D91-A3E1-EE9440A70B53}"
 	ProjectSection(SolutionItems) = preProject
-		..\changes.txt = ..\changes.txt
+		changes.txt = changes.txt
 	EndProjectSection
 EndProject
 Global

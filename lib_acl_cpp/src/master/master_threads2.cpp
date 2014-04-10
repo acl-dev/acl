@@ -79,12 +79,15 @@ bool master_threads2::run_alone(const char* addrs, const char* path /* = NULL */
 
 	__count_limit = count;
 
+	std::vector<ACL_VSTREAM*> sstreams;
+
 #ifdef WIN32
 	acl_init();
+	ACL_EVENT* eventp = acl_event_new_select_thr(1, 0);
+#else
+	ACL_EVENT* eventp = acl_event_new_kernel_thr(1, 0);
 #endif
 
-	std::vector<ACL_VSTREAM*> sstreams;
-	ACL_EVENT* eventp = acl_event_new_kernel_thr(1, 0);
 	set_event(eventp);  // 设置基类的事件句柄
 
 	ACL_ARGV*  tokens = acl_argv_split(addrs, ";,| \t");

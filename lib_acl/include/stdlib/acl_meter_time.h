@@ -1,5 +1,5 @@
 #ifndef	__ACL_METER_TIME_INCLUDE_H__
-#define	__ACL_METER_TIME_INCLUDE_H_
+#define	__ACL_METER_TIME_INCLUDE_H__
 
 #ifdef	__cplusplus
 extern "C" {

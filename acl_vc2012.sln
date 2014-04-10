@@ -5,6 +5,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_protocol", "lib_protocol\lib_protocol_vc2012.vcxproj", "{FE724EF7-3763-4E78-BDF5-BCBC075719FD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2597AF7B-516E-478A-B72E-0BC8A59E8965}"
+	ProjectSection(SolutionItems) = preProject
+		changes.txt = changes.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
