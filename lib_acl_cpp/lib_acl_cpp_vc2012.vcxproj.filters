@@ -370,6 +370,9 @@
     <ClCompile Include="src\connpool\connect_monitor.cpp">
       <Filter>src\connpool</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\scan_dir.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -764,6 +767,9 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\connpool\connect_monitor.hpp">
       <Filter>include\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\scan_dir.hpp">
+      <Filter>include\stdlib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

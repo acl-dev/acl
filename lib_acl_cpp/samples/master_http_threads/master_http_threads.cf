@@ -72,6 +72,14 @@ service master_http_threads {
 #       采用事件循环的方式: select(default), poll, kernel(epoll/devpoll/kqueue)
 	ioctl_event_mode = kernel
 
+#	事件引擎检查所有空闲描述符的时间间隔(毫秒)
+#	ioctl_check_inter = 100
+#	当启用 master_dispatch 连接分开服务后，该配置指定 master_dispatch 所监听的
+#	域套接口的全路径，这样本子进程就可以从 master_dispatch 获得客户端连接
+#	ioctl_dispatch_addr = {install_path}/var/private/dispatch.sock
+#	当 ioctl_dispatch_addr 开启后，下面参数控制本服务进程发给前端 master_dispatch 的服务标识信息
+#	ioctl_dispatch_type = default
+
 #	线程池的最大线程数
 	ioctl_max_threads = 250
 #	线程的堆栈空间大小，单位为字节，0表示使用系统缺省值

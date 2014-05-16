@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="connect_manager"
-	ProjectGUID="{F7B28783-B507-42D8-BB2B-4B61E2B49FB7}"
+	Name="$<PROGRAM>"
+	ProjectGUID="{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -62,11 +62,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/connect_manager.exe"
+				AdditionalDependencies="lib_acl_cpp_vc2008d.lib lib_acl_vc2008d.lib lib_protocol_vc2008d.lib"
+				OutputFile="$(OutDir)/$<PROGRAM>.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\dist\lib\win32"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/connect_manager.pdb"
+				ProgramDatabaseFile="$(OutDir)/$<PROGRAM>.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -138,7 +139,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/connect_manager.exe"
+				AdditionalDependencies="lib_acl_cpp_vc2008.lib lib_acl_vc2008.lib lib_protocol_vc2008.lib"
+				OutputFile="$(OutDir)/$<PROGRAM>.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\dist\lib\win32"
 				GenerateDebugInformation="true"
@@ -181,7 +183,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="copy ..\..\..\dist\lib\win32\lib_acl.dll $(OutDir)\ /Y&#x0D;&#x0A;copy ..\..\..\dist\lib\win32\lib_acl_cpp_dll.dll $(OutDir)\ /Y&#x0D;&#x0A;copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y&#x0D;&#x0A;"
+				CommandLine="copy ..\..\..\dist\lib\win32\lib_acl.dll $(OutDir)\ /Y&#x0D;&#x0A;copy ..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir)\ /Y&#x0D;&#x0A;copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -198,7 +200,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;ACL_DLL;ACL_CPP_DLL"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;ACL_CPP_DLL"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -216,7 +218,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/connect_manager.exe"
+				AdditionalDependencies="lib_acl_cpp.lib lib_acl.lib lib_protocol.lib"
+				OutputFile="$(OutDir)/$<PROGRAM>.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\dist\lib\win32"
 				GenerateDebugInformation="true"
@@ -259,7 +262,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir)\ /Y&#x0D;&#x0A;copy ..\..\..\dist\lib\win32\lib_acl_cppd_dll.dll $(OutDir)\ /Y&#x0D;&#x0A;copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y&#x0D;&#x0A;"
+				CommandLine="copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir)\ /Y&#x0D;&#x0A;copy ..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir)\ /Y&#x0D;&#x0A;copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -277,7 +280,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;ACL_DLL;ACL_CPP_DLL"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;ACL_CPP_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -297,11 +300,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/connect_manager.exe"
+				AdditionalDependencies="lib_acl_cpp_d.lib lib_acl_d.lib lib_protocol_d.lib"
+				OutputFile="$(OutDir)/$<PROGRAM>.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\dist\lib\win32"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/connect_manager.pdb"
+				ProgramDatabaseFile="$(OutDir)/$<PROGRAM>.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -339,19 +343,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\connect_client.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\connect_manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\connect_pool.cpp"
+				RelativePath=".\http_servlet.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\main.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\master_service.cpp"
 				>
 			</File>
 			<File
@@ -397,15 +397,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\connect_client.h"
+				RelativePath=".\http_servlet.h"
 				>
 			</File>
 			<File
-				RelativePath=".\connect_manager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\connect_pool.h"
+				RelativePath=".\master_service.h"
 				>
 			</File>
 			<File

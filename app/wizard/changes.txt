@@ -1,4 +1,10 @@
 
+7) 2014.4.18
+7.1) feature: 支持创建由 vc2008 工程管理的 master_server 项目
+
+6) 2014.4.10
+6.1) feature: 支持创建由 vc2010 工程管理的 master_server 项目
+
 5) 2013.10.3
 5.1) feature: master_creator.cpp, 各个服务器模板示例增加了一些 IO 使用功能举例
 5.2) feature: master_creator.cpp, 生成服务器示例时添加了 valgrind.sh 脚本用来检查内存问题

@@ -401,69 +401,69 @@ public:
 	/**
 	 * 将字符串对象中的内容赋予目标字符串对象
 	 * @param s {string*} 目标字符串对象
-	 * @return {string&} 源字符串对象的引用
+	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
 	 */
-	string& operator>>(string* s);
+	size_t operator>>(string* s);
 #ifdef WIN32
 	/**
 	 * 将字符串对象中的内容赋予目标 64 位有符号整数
 	 * @param n {string*} 目标 64 位有符号整数
-	 * @return {string&} 源字符串对象的引用
+	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
 	 */
-	string& operator>>(__int64& n);
+	size_t operator>>(__int64& n);
 
 	/**
 	 * 将字符串对象中的内容赋予目标 64 位无符号整数
 	 * @param n {string*} 目标 64 位无符号整数
-	 * @return {string&} 源字符串对象的引用
+	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
 	 */
-	string& operator>>(unsigned __int64& n);
+	size_t operator>>(unsigned __int64& n);
 #else
-	string& operator>>(long long int&);
-	string& operator>>(unsigned long long int&);
+	size_t operator>>(long long int&);
+	size_t operator>>(unsigned long long int&);
 #endif
 
 	/**
 	 * 将字符串对象中的内容赋予目标 32 位有符号整数
 	 * @param n {string*} 目标 32 位有符号整数
-	 * @return {string&} 源字符串对象的引用
+	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
 	 */
-	string& operator>>(int& n);
+	size_t operator>>(int& n);
 
 	/**
 	 * 将字符串对象中的内容赋予目标 32 位无符号整数
 	 * @param n {string*} 目标 32 位无符号整数
-	 * @return {string&} 源字符串对象的引用
+	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
 	 */
-	string& operator>>(unsigned int& n);
+	size_t operator>>(unsigned int& n);
 
 	/**
 	 * 将字符串对象中的内容赋予目标 16 位有符号整数
 	 * @param n {string*} 目标 16 位有符号整数
-	 * @return {string&} 源字符串对象的引用
+	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
 	 */
-	string& operator>>(short& n);
+	size_t operator>>(short& n);
 
 	/**
 	 * 将字符串对象中的内容赋予目标 16 位无符号整数
 	 * @param n {string*} 目标 16 位无符号整数
-	 * @return {string&} 源字符串对象的引用
+	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
 	 */
-	string& operator>>(unsigned short& n);
+	size_t operator>>(unsigned short& n);
 
 	/**
 	 * 将字符串对象中的内容赋予目标 8 位有符号字符
 	 * @param n {string*} 目标 16 位有符号字符
-	 * @return {string&} 源字符串对象的引用
+	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
 	 */
-	string& operator>>(char& n);
+	size_t operator>>(char& n);
 
 	/**
 	 * 将字符串对象中的内容赋予目标 8 位无符号字符
 	 * @param n {string*} 目标 16 位无符号字符
-	 * @return {string&} 源字符串对象的引用
+	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
 	 */
-	string& operator>>(unsigned char& n);
+	size_t operator>>(unsigned char& n);
 
 	/**
 	 * 判断当前字符串对象的内容与所给的字符串对象内容是否相等（内部区分大小写）
@@ -641,13 +641,28 @@ public:
 	 * 将当前对象的缓冲内容拷贝一部分数据至目标缓冲内
 	 * @param buf {void*} 目标缓冲区地址
 	 * @param size {size_t} buf 缓冲区长度
-	 * @return {string&} 当前对象的引用
+	 * @param move {bool} 在拷贝完数据后，是否需要将后面的数据向前移动并覆盖前面
+	 *  的已拷贝的数据
+	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
 	 */
-	string& scan_buf(void* buf, size_t size);
+	size_t scan_buf(void* buf, size_t size, bool move = false);
+
+	/**
+	 * 从当前对象的缓冲区中拷贝一行数据(包含"\r\n")至目标缓冲区内，当数据被拷贝至
+	 * 目标缓冲区后，在源缓冲区内未被拷贝的数据会发生移动并覆盖被拷贝的数据区域
+	 * @param out {string&} 目标缓冲区
+	 * @param nonl {bool} 返回的一行数据是否去掉尾部的 "\r\n" 或 "\n"
+	 * @param n {size_t*} 该参数为非空指针时，则存储拷贝到的数据长度；当读到一
+	 *  个空行且 nonl 为 true 时，则该地址存储 0
+	 * @param part_copy {bool} 若当前缓冲区没有一行数据时是否依然拷贝
+	 * @return {bool} 是否拷贝了一个完整行数据 
+	 */
+	bool scan_line(string& out, bool nonl = true,
+		size_t* n = NULL, bool part_copy = false);
 
 	/**
 	 * 返回当前对象缓冲区中第一个不含数据的尾部地址
-	 * @return {char*} 返回值为 NULL 则可能是内部出错了
+	 * @return {char*} 返回值为 NULL 则说明内部数据为空，即 empty() == true
 	 */
 	char* buf_end(void);
 
@@ -876,6 +891,42 @@ public:
 	string& strip(const char* needle, bool each = false);
 
 	/**
+	 * 将当前对象缓冲区左边的空白（包含空格及TAB）去掉
+	 * @return {string&} 当前对象的引用
+	 */
+	string& trim_left_space();
+
+	/**
+	 * 将当前对象缓冲区右边的空白（包含空格及TAB）去掉
+	 * @return {string&} 当前对象的引用
+	 */
+	string& trim_right_space();
+
+	/**
+	 * 将当前对象缓冲区中所有的空白（包含空格及TAB）去掉
+	 * @return {string&} 当前对象的引用
+	 */
+	string& trim_space();
+
+	/**
+	 * 将当前对象缓冲区左边的回车换行符去掉
+	 * @return {string&} 当前对象的引用
+	 */
+	string& trim_left_line();
+
+	/**
+	 * 将当前对象缓冲区右边的回车换行符去掉
+	 * @return {string&} 当前对象的引用
+	 */
+	string& trim_right_line();
+
+	/**
+	 * 将当前对象缓冲区中所有的回车换行符去掉
+	 * @return {string&} 当前对象的引用
+	 */
+	string& trim_line();
+
+	/**
 	 * 清空当前对象的数据缓冲区
 	 * @return {string&} 当前对象的引用
 	 */
@@ -959,33 +1010,31 @@ public:
 	string& hex_decode(const char* s, size_t len);
 
 	/**
-	 * 将 32 位有符号整数转为字符串存
+	 * 将 32 位有符号整数转为字符串存（内部使用了线程局部变量）
 	 * @param n {int} 32 位有符号整数
 	 * @return {const string&} 转换结果对象的引用
 	 */
 	static const string& parse_int(int n);
 
 	/**
-	 * 将 32 位无符号整数转为字符串存
+	 * 将 32 位无符号整数转为字符串存（内部使用了线程局部变量）
 	 * @param n {int} 32 位无符号整数
 	 * @return {const string&} 转换结果对象的引用
 	 */
 	static const string& parse_int(unsigned int n);
 #ifdef WIN32
 	static const string& parse_int64(__int64 n);
-
-
 	static const string& parse_int64(unsigned __int64 n);
 #else
 	/**
-	 * 将 64 位有符号整数转为字符串存
+	 * 将 64 位有符号整数转为字符串存（内部使用了线程局部变量）
 	 * @param n {long long int} 64 位有符号整数
 	 * @return {const string&} 转换结果对象的引用
 	 */
 	static const string& parse_int64(long long int n);
 
 	/**
-	 * 将 64 位无符号整数转为字符串存
+	 * 将 64 位无符号整数转为字符串存（内部使用了线程局部变量）
 	 * @param n {unsigned long long int} 64 位无符号整数
 	 * @return {const string&} 转换结果对象的引用
 	 */

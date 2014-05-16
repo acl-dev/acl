@@ -1,5 +1,10 @@
 修改历史列表：
 ------------------------------------------------------------------------
+248) 2014.5.13
+248.1) bugfix: http_hdr_req.c 中 http_hdr_req_cookies_parse 在创建 cookies_table
+哈希表时指定了 ACL_HTABLE_FLAG_KEY_REUSE，但在 __add_cookie_item 中却将 KEY 所
+属的内存空间给提前释放了，从而引起了内存非法访问
+
 247) 2014.1.11
 247.1) compile: 在高版本VC（>VC2008) 环境下，使用更为安全的函数
 

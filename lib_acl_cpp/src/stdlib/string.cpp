@@ -76,39 +76,39 @@ void string::set_bin(bool bin)
 
 bool string::get_bin() const
 {
-	return (m_bin);
+	return m_bin;
 }
 
 char string::operator [](size_t n)
 {
 	acl_assert(n < LEN(m_pVbf));
-	return (AT(m_pVbf, n));
+	return AT(m_pVbf, n);
 }
 
 char string::operator [](int n)
 {
 	acl_assert(n < (int) LEN(m_pVbf) && n >= 0);
-	return (AT(m_pVbf, n));
+	return AT(m_pVbf, n);
 }
 
 string& string::operator =(const char* s)
 {
 	SCP(m_pVbf, s);
-	return (*this);
+	return *this;
 }
 
 string& string::operator =(const string& s)
 {
 	MCP(m_pVbf, STR(s.m_pVbf), LEN(s.m_pVbf));
 	TERM(m_pVbf);
-	return (*this);
+	return *this;
 }
 
 string& string::operator =(const string* s)
 {
 	MCP(m_pVbf, STR(s->m_pVbf), LEN(s->m_pVbf));
 	TERM(m_pVbf);
-	return (*this);
+	return *this;
 }
 
 string& string::operator =(acl_int64 n)
@@ -116,10 +116,10 @@ string& string::operator =(acl_int64 n)
 	if (m_bin)
 	{
 		copy(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format("%lld", n));
+		return format("%lld", n);
 }
 
 string& string::operator =(acl_uint64 n)
@@ -127,10 +127,10 @@ string& string::operator =(acl_uint64 n)
 	if (m_bin)
 	{
 		copy(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format("%llu", n));
+		return format("%llu", n);
 }
 
 string& string::operator =(long n)
@@ -138,10 +138,10 @@ string& string::operator =(long n)
 	if (m_bin)
 	{
 		copy(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format("%ld", n));
+		return format("%ld", n);
 }
 
 string& string::operator =(unsigned long n)
@@ -149,10 +149,10 @@ string& string::operator =(unsigned long n)
 	if (m_bin)
 	{
 		copy(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format("%lu", n));
+		return format("%lu", n);
 }
 
 string& string::operator =(int n)
@@ -160,10 +160,10 @@ string& string::operator =(int n)
 	if (m_bin)
 	{
 		copy(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format("%d", n));
+		return format("%d", n);
 }
 
 string& string::operator =(unsigned int n)
@@ -171,10 +171,10 @@ string& string::operator =(unsigned int n)
 	if (m_bin)
 	{
 		copy(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format("%u", n));
+		return format("%u", n);
 }
 
 string& string::operator =(short n)
@@ -182,10 +182,10 @@ string& string::operator =(short n)
 	if (m_bin)
 	{
 		copy(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format("%d", n));
+		return format("%d", n);
 }
 
 string& string::operator =(unsigned short n)
@@ -193,10 +193,10 @@ string& string::operator =(unsigned short n)
 	if (m_bin)
 	{
 		copy(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format("%d", n));
+		return format("%d", n);
 }
 
 string& string::operator =(char n)
@@ -204,10 +204,10 @@ string& string::operator =(char n)
 	if (m_bin)
 	{
 		copy(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format("%c", n));
+		return format("%c", n);
 }
 
 string& string::operator =(unsigned char n)
@@ -218,27 +218,27 @@ string& string::operator =(unsigned char n)
 		return (*this);
 	}
 	else
-		return (format("%c", n));
+		return format("%c", n);
 }
 
 string& string::operator +=(const char* s)
 {
 	SCAT(m_pVbf, s);
-	return (*this);
+	return *this;
 }
 
 string& string::operator +=(const string& s)
 {
 	MCAT(m_pVbf, STR(s.m_pVbf), LEN(s.m_pVbf));
 	TERM(m_pVbf);
-	return (*this);
+	return *this;
 }
 
 string& string::operator +=(const string* s)
 {
 	MCAT(m_pVbf, STR(s->m_pVbf), LEN(s->m_pVbf));
 	TERM(m_pVbf);
-	return (*this);
+	return *this;
 }
 
 string& string::operator +=(acl_int64 n)
@@ -246,10 +246,10 @@ string& string::operator +=(acl_int64 n)
 	if (m_bin)
 	{
 		append(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format_append("%lld", n));
+		return format_append("%lld", n);
 }
 
 string& string::operator +=(acl_uint64 n)
@@ -257,10 +257,10 @@ string& string::operator +=(acl_uint64 n)
 	if (m_bin)
 	{
 		append(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format_append("%llu", n));
+		return format_append("%llu", n);
 }
 
 string& string::operator +=(long n)
@@ -268,10 +268,10 @@ string& string::operator +=(long n)
 	if (m_bin)
 	{
 		append(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format_append("%l", n));
+		return format_append("%l", n);
 }
 
 string& string::operator +=(unsigned long n)
@@ -279,10 +279,10 @@ string& string::operator +=(unsigned long n)
 	if (m_bin)
 	{
 		append(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format_append("%lu", n));
+		return format_append("%lu", n);
 }
 
 string& string::operator +=(int n)
@@ -290,10 +290,10 @@ string& string::operator +=(int n)
 	if (m_bin)
 	{
 		append(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format_append("%d", n));
+		return format_append("%d", n);
 }
 
 string& string::operator +=(unsigned int n)
@@ -301,10 +301,10 @@ string& string::operator +=(unsigned int n)
 	if (m_bin)
 	{
 		append(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format_append("%u", n));
+		return format_append("%u", n);
 }
 
 string& string::operator +=(short n)
@@ -312,10 +312,10 @@ string& string::operator +=(short n)
 	if (m_bin)
 	{
 		append(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format_append("%d", n));
+		return format_append("%d", n);
 }
 
 string& string::operator +=(unsigned short n)
@@ -323,10 +323,10 @@ string& string::operator +=(unsigned short n)
 	if (m_bin)
 	{
 		append(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format_append("%u", n));
+		return format_append("%u", n);
 }
 
 string& string::operator +=(unsigned char n)
@@ -334,106 +334,99 @@ string& string::operator +=(unsigned char n)
 	if (m_bin)
 	{
 		append(&n, sizeof(n));
-		return (*this);
+		return *this;
 	}
 	else
-		return (format_append("%c", n));
+		return format_append("%c", n);
 }
 
 string& string::operator +=(char ch)
 {
 	*this += (unsigned char) ch;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(const string& s)
 {
 	*this += s;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(const string* s)
 {
 	*this += s;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(const char* s)
 {
 	*this += s;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(acl_int64 n)
 {
 	*this += n;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(acl_uint64 n)
 {
 	*this += n;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(int n)
 {
 	*this += n;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(unsigned int n)
 {
 	*this += n;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(long n)
 {
 	*this += n;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(unsigned long n)
 {
 	*this += n;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(short n)
 {
 	*this += n;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(unsigned short n)
 {
 	*this += n;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(char n)
 {
 	*this += n;
-	return (*this);
+	return *this;
 }
 
 string& string::operator <<(unsigned char n)
 {
 	*this += n;
-	return (*this);
-}
-
-string& string::operator >>(string* s)
-{
-	*s = this;
-	clear();
-	return (*this);
+	return *this;
 }
 
 string& string::push_back(char ch)
 {
-	return (append(&ch, sizeof(ch)));
+	return append(&ch, sizeof(ch));
 }
 
 char* string::buf_end()
@@ -444,96 +437,161 @@ char* string::buf_end()
 	if (m_ptr >= pEnd) {
 		if (!empty())
 			clear();
-		return (NULL);
+		return NULL;
 	}
-	return (pEnd);
+	return pEnd;
 }
 
-string& string::scan_buf(void* pbuf, size_t n)
+bool string::scan_line(string& out, bool nonl /* = true */,
+	size_t* n /* = NULL */, bool part_copy /* = false */)
+{
+	if (n)
+		*n = 0;
+
+	char* pEnd = buf_end();
+	if (pEnd == NULL)
+		return false;
+	
+	size_t len = pEnd - m_ptr;
+	char *ln = (char*) memchr(m_ptr, '\n', len);
+	if (ln != NULL)
+	{
+		len = ln - m_ptr + 1;
+		size_t len_saved = len;
+		if (nonl)
+		{
+			ln--;
+			len--;
+			if (ln >= m_ptr && *ln == '\r')
+			{
+				ln--;
+				len--;
+			}
+			if (len > 0)
+				out.append(m_ptr, len);
+		}
+		else
+			out.append(m_ptr, len);
+
+		acl_vstring_memmove(m_pVbf, m_ptr, len_saved);
+		m_ptr = STR(m_pVbf);
+		if (n)
+			*n = len;
+		return true;
+	}
+
+	if (!part_copy)
+		return false;
+
+	// 注：此处使用内部指针 m_ptr 而不是 STR(m_pVbf) 的主要原因是：之前可能有调用
+	// scan_buf 的操作但没有要求移动数据指针，为防止拷贝重复数据，所以此处使用了内部
+	// 内存指针 m_ptr
+	out.append(m_ptr, len);
+	clear();
+	if (n)
+		*n = len;
+	return false;
+}
+
+size_t string::scan_buf(void* pbuf, size_t n, bool move /* false */)
 {
 	if (pbuf == NULL || n == 0)
-		return (*this);
+		return 0;
 
 	const char *pEnd = buf_end();
 	if (pEnd == NULL)
-		return (*this);
+		return 0;
 
 	size_t len = pEnd - m_ptr;
 	if (len > n)
 		len = n;
 	memcpy(pbuf, m_ptr, len);
-	m_ptr += len;
-	return (*this);
+	if (move)
+	{
+		acl_vstring_memmove(m_pVbf, m_ptr, len);
+		m_ptr = STR(m_pVbf);
+	}
+	else
+		m_ptr += len;
+	return len;
 }
 
-string& string::operator >>(acl_int64& n)
+size_t string::operator >>(string* s)
 {
-	return (scan_buf(&n, sizeof(n)));
+	size_t len = this->length();
+	*s = this;
+	clear();
+	return len;
 }
 
-string& string::operator >>(acl_uint64& n)
+size_t string::operator >>(acl_int64& n)
 {
-	return (scan_buf(&n, sizeof(n)));
+	return scan_buf(&n, sizeof(n));
 }
 
-string& string::operator >>(int& n)
+size_t string::operator >>(acl_uint64& n)
 {
-	return (scan_buf(&n, sizeof(n)));
+	return scan_buf(&n, sizeof(n));
 }
 
-string& string::operator >>(unsigned int& n)
+size_t string::operator >>(int& n)
 {
-	return (scan_buf(&n, sizeof(n)));
+	return scan_buf(&n, sizeof(n));
 }
 
-string& string::operator >>(short& n)
+size_t string::operator >>(unsigned int& n)
 {
-	return (scan_buf(&n, sizeof(n)));
+	return scan_buf(&n, sizeof(n));
 }
 
-string& string::operator >>(unsigned short& n)
+size_t string::operator >>(short& n)
 {
-	return (scan_buf(&n, sizeof(n)));
+	return scan_buf(&n, sizeof(n));
 }
 
-string& string::operator >>(char& n)
+size_t string::operator >>(unsigned short& n)
 {
-	return (scan_buf(&n, sizeof(n)));
+	return scan_buf(&n, sizeof(n));
 }
 
-string& string::operator >>(unsigned char& n)
+size_t string::operator >>(char& n)
 {
-	return (scan_buf(&n, sizeof(n)));
+	return scan_buf(&n, sizeof(n));
+}
+
+size_t string::operator >>(unsigned char& n)
+{
+	return scan_buf(&n, sizeof(n));
 }
 
 bool string::operator ==(const string& s) const
 {
-	return (compare(s) == 0 ? true : false);
+	return compare(s) == 0 ? true : false;
 }
 
 bool string::operator==(const string* s) const
 {
-	return (compare(s) == 0 ? true : false);
+	return compare(s) == 0 ? true : false;
 }
 
 bool string::operator ==(const char* s) const
 {
-	return (compare(s) == 0 ? true : false);
+	return compare(s) == 0 ? true : false;
 }
 
 bool string::operator !=(const string& s) const
 {
-	return (compare(s) != 0 ? true : false);
+	return compare(s) != 0 ? true : false;
 }
 
 bool string::operator !=(const string* s) const
 {
-	return (compare(s) != 0 ? true : false);
+	return compare(s) != 0 ? true : false;
 }
 
 bool string::operator !=(const char* s) const
 {
-	return (compare(s) != 0 ? true : false);
+	return compare(s) != 0 ? true : false;
 }
 
 bool string::operator <(const string& s) const
@@ -543,12 +601,12 @@ bool string::operator <(const string& s) const
 	size_t n = nLeft > nRight ? nLeft : nRight;
 	int   ret = memcmp(STR(m_pVbf), STR(s.m_pVbf), n);
 	if (ret < 0)
-		return (true);
+		return true;
 	else if (ret > 0)
-		return (false);
+		return false;
 	if (nLeft < nRight)
-		return (true);
-	return (false);
+		return true;
+	return false;
 }
 
 bool string::operator >(const string& s) const
@@ -558,22 +616,22 @@ bool string::operator >(const string& s) const
 	size_t n = nLeft > nRight ? nLeft : nRight;
 	int   ret = memcmp(STR(m_pVbf), STR(s.m_pVbf), n);
 	if (ret > 0)
-		return (true);
+		return true;
 	else if (ret < 0)
-		return (false);
+		return false;
 	if (nLeft > nRight)
-		return (true);
-	return (false);
+		return true;
+	return false;
 }
 
 string::operator const char *() const
 {
-	return (STR(m_pVbf));
+	return STR(m_pVbf);
 }
 
 string::operator const void *() const
 {
-	return ((void*) STR(m_pVbf));
+	return (void*) STR(m_pVbf);
 }
 
 int string::compare(const string& s) const
@@ -583,8 +641,8 @@ int string::compare(const string& s) const
 
 	ret = memcmp(STR(m_pVbf), STR(s.m_pVbf), n);
 	if (ret != 0)
-		return (ret);
-	return ((int) (LEN(m_pVbf) - LEN(s.m_pVbf)));
+		return ret;
+	return (int) (LEN(m_pVbf) - LEN(s.m_pVbf));
 }
 
 int string::compare(const string* s) const
@@ -594,16 +652,16 @@ int string::compare(const string* s) const
 
 	ret = memcmp(STR(m_pVbf), STR(s->m_pVbf), n);
 	if (ret != 0)
-		return (ret);
-	return ((int) (LEN(m_pVbf) - LEN(s->m_pVbf)));
+		return ret;
+	return (int) (LEN(m_pVbf) - LEN(s->m_pVbf));
 }
 
 int string::compare(const char* s, bool case_sensitive) const
 {
 	if (case_sensitive)
-		return (compare((const void*) s, (size_t) strlen(s)));		
+		return compare((const void*) s, (size_t) strlen(s));		
 	else
-		return (acl_strcasecmp(STR(m_pVbf), s));
+		return acl_strcasecmp(STR(m_pVbf), s);
 }
 
 int string::compare(const void* ptr, size_t len) const
@@ -613,49 +671,49 @@ int string::compare(const void* ptr, size_t len) const
 
 	ret = memcmp(STR(m_pVbf), ptr, n);
 	if (ret != 0)
-		return (ret);
-	return ((int) (LEN(m_pVbf) - len));
+		return ret;
+	return (int) (LEN(m_pVbf) - len);
 }
 
 int string::ncompare(const char* s, size_t len, bool case_sensitive/* =true */) const
 {
 	if (case_sensitive)
-		return (strncmp(STR(m_pVbf), s, len));		
+		return strncmp(STR(m_pVbf), s, len);		
 	else
-		return (acl_strncasecmp(STR(m_pVbf), s, len));
+		return acl_strncasecmp(STR(m_pVbf), s, len);
 }
 
 int string::rncompare(const char* s, size_t len, bool case_sensitive/* =true */) const
 {
 	if (case_sensitive)
-		return (acl_strrncmp(STR(m_pVbf), s, len));		
+		return acl_strrncmp(STR(m_pVbf), s, len);		
 	else
-		return (acl_strrncasecmp(STR(m_pVbf), s, len));
+		return acl_strrncasecmp(STR(m_pVbf), s, len);
 }
 
 char* string::c_str() const
 {
-	return (STR(m_pVbf));
+	return STR(m_pVbf);
 }
 
 void* string::buf() const
 {
-	return (STR(m_pVbf));
+	return STR(m_pVbf);
 }
 
 size_t string::length() const
 {
-	return (LEN(m_pVbf));
+	return LEN(m_pVbf);
 }
 
 size_t string::size() const
 {
-	return (LEN(m_pVbf));
+	return LEN(m_pVbf);
 }
 
 size_t string::capacity() const
 {
-	return (ACL_VSTRING_SIZE(m_pVbf));
+	return ACL_VSTRING_SIZE(m_pVbf);
 }
 
 string& string::set_offset(size_t n)
@@ -664,54 +722,54 @@ string& string::set_offset(size_t n)
 	ACL_VSTRING_SPACE(m_pVbf, (int) n);
 	ACL_VSTRING_AT_OFFSET(m_pVbf, (int) n);
 	TERM(m_pVbf);
-	return (*this);
+	return *this;
 }
 
 string& string::space(size_t n)
 {
 	ACL_VSTRING_SPACE(m_pVbf, (int) n);
-	return (*this);
+	return *this;
 }
 
 bool string::empty() const
 {
-	return (LEN(m_pVbf) > 0 ? false : true);
+	return LEN(m_pVbf) > 0 ? false : true;
 }
 
 ACL_VSTRING* string::vstring() const
 {
-	return (m_pVbf);
+	return m_pVbf;
 }
 
 int string::find(char ch) const
 {
 	char *ptr = acl_vstring_memchr(m_pVbf, ch);
 	if (ptr == NULL)
-		return (-1);
-	return ((int)(ptr - STR(m_pVbf)));
+		return -1;
+	return (int)(ptr - STR(m_pVbf));
 }
 
 const char* string::find(const char* needle, bool case_sensitive) const
 {
 	if (case_sensitive)
-		return (acl_vstring_strstr(m_pVbf, needle));
+		return acl_vstring_strstr(m_pVbf, needle);
 	else
-		return (acl_vstring_strcasestr(m_pVbf, needle));
+		return acl_vstring_strcasestr(m_pVbf, needle);
 }
 
 const char* string::rfind(const char* needle, bool case_sensitive) const
 {
 	if (case_sensitive)
-		return (acl_vstring_rstrstr(m_pVbf, needle));
+		return acl_vstring_rstrstr(m_pVbf, needle);
 	else
-		return (acl_vstring_rstrcasestr(m_pVbf, needle));
+		return acl_vstring_rstrcasestr(m_pVbf, needle);
 }
 
 const string string::left(size_t npos)
 {
 	if (npos >= LEN(m_pVbf))
-		return (*this);
-	return (string(STR(m_pVbf), npos));
+		return *this;
+	return string(STR(m_pVbf), npos);
 }
 
 const string string::right(size_t npos)
@@ -720,7 +778,7 @@ const string string::right(size_t npos)
 	if (npos >= LEN(m_pVbf))
 		return string(1);
 	size_t nLeft = LEN(m_pVbf) - npos;
-	return (string(STR(m_pVbf) + npos, nLeft));
+	return string(STR(m_pVbf) + npos, nLeft);
 }
 
 const std::list<acl::string>& string::split(const char* sep)
@@ -738,7 +796,7 @@ const std::list<acl::string>& string::split(const char* sep)
 		m_psList->push_back(ptr);
 	}
 	acl_argv_free(argv);
-	return (*m_psList);
+	return *m_psList;
 }
 
 const std::vector<acl::string>& string::split2(const char* sep)
@@ -756,7 +814,7 @@ const std::vector<acl::string>& string::split2(const char* sep)
 		m_psList2->push_back(ptr);
 	}
 	acl_argv_free(argv);
-	return (*m_psList2);
+	return *m_psList2;
 }
 
 const std::pair<acl::string, acl::string>& string::split_nameval()
@@ -769,77 +827,77 @@ const std::pair<acl::string, acl::string>& string::split_nameval()
 	if (acl_split_nameval(STR(m_pVbf), &name, &value) != NULL) {
 		m_psPair->first = "";
 		m_psPair->second = "";
-		return (*m_psPair);
+		return *m_psPair;
 	}
 	m_psPair->first = name;
 	m_psPair->second = value;
-	return (*m_psPair);
+	return *m_psPair;
 }
 
 string& string::copy(const char* ptr)
 {
 	SCP(m_pVbf, ptr);
-	return (*this);
+	return *this;
 }
 
 string& string::copy(const void* ptr, size_t len)
 {
 	MCP(m_pVbf, (const char*) ptr, len);
 	TERM(m_pVbf);
-	return (*this);
+	return *this;
 }
 
 string& string::memmove(const char* ptr)
 {
-	return (memmove(ptr, strlen(ptr)));
+	return memmove(ptr, strlen(ptr));
 }
 
 string& string::memmove(const char* ptr, size_t len)
 {
 	acl_vstring_memmove(m_pVbf, ptr, len);
-	return (*this);
+	return *this;
 }
 
 string& string::append(const string& s)
 {
-	return (append(s.c_str(), s.length()));
+	return append(s.c_str(), s.length());
 }
 
 string& string::append(const string* s)
 {
-	return (append(s->c_str(), s->length()));
+	return append(s->c_str(), s->length());
 }
 
 string& string::append(const char* ptr)
 {
 	SCAT(m_pVbf, ptr);
-	return (*this);
+	return *this;
 }
 
 string& string::append(const void* ptr, size_t len)
 {
 	MCAT(m_pVbf, (const char*) ptr, len);
 	TERM(m_pVbf);
-	return (*this);
+	return *this;
 }
 
 string& string::prepend(const char* s)
 {
 	acl_vstring_prepend(m_pVbf, s, strlen(s));
-	return (*this);
+	return *this;
 }
 
 string& string::prepend(const void* ptr, size_t len)
 {
 	acl_vstring_prepend(m_pVbf, (const char*) ptr, len);
-	return (*this);
+	return *this;
 }
 
 
 string& string::insert(size_t start, const void* ptr, size_t len)
 {
 	acl_vstring_insert(m_pVbf, start, (const char*) ptr, len);
-	return (*this);
+	return *this;
 }
 
 string& string::format(const char* fmt, ...)
@@ -849,13 +907,13 @@ string& string::format(const char* fmt, ...)
 	va_start(ap, fmt);
 	vformat(fmt, ap);
 	va_end(ap);
-	return (*this);
+	return *this;
 }
 
 string& string::vformat(const char* fmt, va_list ap)
 {
 	acl_vstring_vsprintf(m_pVbf, fmt, ap);
-	return (*this);
+	return *this;
 }
 
 string& string::format_append(const char* fmt, ...)
@@ -865,13 +923,13 @@ string& string::format_append(const char* fmt, ...)
 	va_start(ap, fmt);
 	vformat_append(fmt, ap);
 	va_end(ap);
-	return (*this);
+	return *this;
 }
 
 string& string::vformat_append(const char* fmt, va_list ap)
 {
 	acl_vstring_vsprintf_append(m_pVbf, fmt, ap);
-	return (*this);
+	return *this;
 }
 
 string& string::replace(char from, char to)
@@ -885,13 +943,14 @@ string& string::replace(char from, char to)
 		ptr++;
 	}
 
-	return (*this);
+	return *this;
 }
 
 string& string::truncate(size_t n)
 {
 	acl_vstring_truncate(m_pVbf, n);
-	return (*this);
+	TERM(m_pVbf);
+	return *this;
 }
 
 string& string::strip(const char* needle, bool each /* false */)
@@ -926,7 +985,7 @@ string& string::strip(const char* needle, bool each /* false */)
 			FREE(m_pVbf);
 			m_pVbf = pVbf;
 		}
-		return (*this);
+		return *this;
 	}
 
 	size_t len = strlen(needle), n;
@@ -955,7 +1014,119 @@ string& string::strip(const char* needle, bool each /* false */)
 		FREE(m_pVbf);
 		m_pVbf = pVbf;
 	}
-	return (*this);
+	return *this;
+}
+
+string& string::trim_left_space()
+{
+	char* pBegin = STR(m_pVbf);
+	char* pEnd = acl_vstring_end(m_pVbf);
+	if (pEnd == pBegin)
+		return *this;
+	
+	size_t n = 0;
+	while (pBegin < pEnd && (*pBegin == ' ' || *pBegin == '\t'))
+	{
+		pBegin++;
+		n++;
+	}
+	if (pBegin == pEnd)
+		clear();
+	else if (n > 0)
+		acl_vstring_memmove(m_pVbf, pBegin, LEN(m_pVbf) - n);
+	return *this;
+}
+
+string& string::trim_right_space()
+{
+	char* pBegin = STR(m_pVbf);
+	char* pEnd = acl_vstring_end(m_pVbf);
+	if (pEnd == pBegin)
+		return *this;
+	pEnd--;
+	size_t n = 0;
+	while (pEnd >= pBegin && (*pEnd == ' ' || *pEnd == '\t'))
+	{
+		pEnd--;
+		n++;
+	}
+
+	size_t len = LEN(m_pVbf);
+	if (n > 0)
+	{
+		len -= n;
+		truncate(len);
+	}
+	return *this;
+}
+
+string& string::trim_space()
+{
+	return strip(" \t", true);
+}
+
+string& string::trim_left_line()
+{
+	char* pBegin = STR(m_pVbf);
+	char* pEnd = acl_vstring_end(m_pVbf);
+	if (pEnd == pBegin)
+		return *this;
+
+	size_t n = 0;
+	while (pBegin < pEnd)
+	{
+		if (*pBegin == '\n')
+		{
+			pBegin++;
+			n++;
+		}
+		else if (*pBegin == '\r' && (pBegin + 1) < pEnd
+			&& *(pBegin + 1) == '\n')
+		{
+			pBegin += 2;
+			n += 2;
+		}
+		else
+			break;
+	}
+	if (pBegin == pEnd)
+		clear();
+	else if (n > 0)
+		acl_vstring_memmove(m_pVbf, pBegin, LEN(m_pVbf) - n);
+	return *this;
+}
+
+string& string::trim_right_line()
+{
+	char* pBegin = STR(m_pVbf);
+	char* pEnd = acl_vstring_end(m_pVbf);
+	if (pEnd == pBegin)
+		return *this;
+	pEnd--;
+	size_t n = 0;
+	while (pEnd >= pBegin && *pEnd == '\n')
+	{
+		pEnd--;
+		n++;
+		if (pEnd >= pBegin && *pEnd == '\r')
+		{
+			pEnd--;
+			n++;
+		}
+	}
+
+	size_t len = LEN(m_pVbf);
+	if (n > 0)
+	{
+		len -= n;
+		truncate(len);
+	}
+	return *this;
+}
+
+string& string::trim_line()
+{
+	return strip("\r\n", true);
 }
 
 string& string::clear(void)
@@ -963,39 +1134,38 @@ string& string::clear(void)
 	RSET(m_pVbf);
 	TERM(m_pVbf);
 	m_ptr = NULL;
-	return (*this);
+	return *this;
 }
 
 string& string::lower()
 {
 	acl_lowercase(STR(m_pVbf));
-	return (*this);
+	return *this;
 }
 
 string& string::upper()
 {
 	acl_uppercase(STR(m_pVbf));
-	return (*this);
+	return *this;
 }
 
 string& string::base64_encode(void)
 {
 	size_t dlen = length();
 	if (dlen == 0)
-		return (*this);
+		return *this;
 	size_t n = (dlen * 4) / 3;
 	ACL_VSTRING *s = ALLOC(n) ;
 	acl_vstring_base64_encode(s, c_str(), (int) dlen);
 	FREE(m_pVbf);
 	m_pVbf = s;
-	return (*this);
+	return *this;
 }
 
 string& string::base64_encode(const void* ptr, size_t len)
 {
-	acl_vstring_base64_encode(m_pVbf,
-		(const char*) ptr, (int) len);
-	return (*this);
+	acl_vstring_base64_encode(m_pVbf, (const char*) ptr, (int) len);
+	return *this;
 }
 
 string& string::base64_decode(void)
@@ -1009,7 +1179,7 @@ string& string::base64_decode(void)
 		RSET(s);
 	FREE(m_pVbf);
 	m_pVbf = s;
-	return (*this);
+	return *this;
 }
 
 string& string::base64_decode(const char* s)
@@ -1019,7 +1189,7 @@ string& string::base64_decode(const char* s)
 	{
 		RSET(m_pVbf);
 	}
-	return (*this);
+	return *this;
 }
 
 string& string::base64_decode(const void* ptr, size_t len)
@@ -1029,7 +1199,7 @@ string& string::base64_decode(const void* ptr, size_t len)
 	{
 		RSET(m_pVbf);
 	}
-	return (*this);
+	return *this;
 }
 
 string& string::url_encode(const char* s)
@@ -1037,7 +1207,7 @@ string& string::url_encode(const char* s)
 	char *ptr = acl_url_encode(s);
 	(*this) = ptr;
 	acl_myfree(ptr);
-	return (*this);
+	return *this;
 }
 
 string& string::url_decode(const char* s)
@@ -1046,19 +1216,19 @@ string& string::url_decode(const char* s)
 
 	(*this) = ptr;
 	acl_myfree(ptr);
-	return (*this);
+	return *this;
 }
 
 string& string::hex_encode(const void* s, size_t len)
 {
 	(void) acl_hex_encode(m_pVbf, (const char*) s, (int) len);
-	return (*this);
+	return *this;
 }
 
 string& string::hex_decode(const char* s, size_t len)
 {
 	(void) acl_hex_decode(m_pVbf, s, (int) len);
-	return (*this);
+	return *this;
 }
 
 static void dummy_free(void*)
@@ -1096,14 +1266,15 @@ static acl_pthread_once_t __buf_once = ACL_PTHREAD_ONCE_INIT;
 static string& get_buf(void)
 {
 	acl_pthread_once(&__buf_once, prepare_once);
+
 	string* s = (string*) acl_pthread_getspecific(__buf_key);
-	if (s == NULL)
-	{
-		s = NEW string(21);
-		acl_pthread_setspecific(__buf_key, s);
-		if ((unsigned long) acl_pthread_self() == acl_main_thread_self())
-			__main_buf = s;
-	}
+	if (s != NULL)
+		return *s;
+
+	s = NEW string(21);
+	acl_pthread_setspecific(__buf_key, s);
+	if ((unsigned long) acl_pthread_self() == acl_main_thread_self())
+		__main_buf = s;
 	return *s;
 }
 
@@ -1111,28 +1282,28 @@ const string& string::parse_int(int n)
 {
 	string& s = get_buf();
 	s.format("%d", n);
-	return (s);
+	return s;
 }
 
 const string& string::parse_int(unsigned int n)
 {
 	string& s = get_buf();
 	s.format("%u", n);
-	return (s);
+	return s;
 }
 
 const string& string::parse_int64(acl_int64 n)
 {
 	string& s = get_buf();
 	s.format("%lld", n);
-	return (s);
+	return s;
 }
 
 const string& string::parse_int64(acl_uint64 n)
 {
 	string& s = get_buf();
 	s.format("%llu", n);
-	return (s);
+	return s;
 }
 
 } // namespace acl

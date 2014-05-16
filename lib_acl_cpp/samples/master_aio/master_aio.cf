@@ -1,7 +1,7 @@
 
-service master_http_aio {
+service server {
 #	进程是否禁止运行
-	master_disable = no
+	master_disable = yes
 #	服务地址及端口号
 	master_service = 5200
 
@@ -31,15 +31,15 @@ service master_http_aio {
 #	最大进程数
 	master_maxproc = 5
 #	进程程序名
-	master_command = master_http_aio
+	master_command = master_aio
 #	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
 	master_args =
 #	传递给服务子进程的环境变量, 可以通过 getenv("SERVICE_ENV") 获得此值
-#	master_env = mempool_limit:512000000, mempool_use_mutex:true
+	master_env = mempool_limit:512000000, mempool_use_mutex:true
 #	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
 #			sync_action:E_LOG_SEM, sem_name:/tmp/aio_echo.sem
 #	进程日志记录文件
-	master_log = {install_path}/var/log/master_http_aio
+	master_log = {install_path}/var/log/aio_echo.log
 
 #	是否允许产生 core 文件
 #	aio_enable_core = 1
@@ -68,7 +68,7 @@ service master_http_aio {
 #	单位为微秒
 	aio_delay_usec = 500
 #       采用事件循环的方式: select(default), poll, kernel(epoll/devpoll/kqueue)
-	aio_event_mode = kernel
+	aio_event_mode = select
 #	是否将 socket 接收与IO功能分开: yes/no, 如果为 yes 可以大大提高 accept() 速度
 	aio_accept_alone = yes
 #	线程池的最大线程数, 如果该值为0则表示采用单线程非阻塞模式.
@@ -90,9 +90,11 @@ service master_http_aio {
 ############################################################################
 #	应用自己的配置选项
 
-#	响应体的数据长度
-	buf_size = 1024
-#	是否启用预读过程
-	preread = 1
+#	每个客户端连接的空闲时间.
+	client_idle_limit = 60
+#	是否输出当前的内存状态信息
+	debug_mem = 1
+#	是否发送欢迎信息
+	send_banner = 0
 }
 

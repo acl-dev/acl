@@ -325,7 +325,10 @@ static void test_main(void)
 	unsigned int n2;
 	unsigned short n3;
 	unsigned char n4;
-	s >> n1 >> n2 >> n3 >> n4;
+	s >> n1;
+	s >> n2;
+	s >> n3;
+	s >> n4;
 
 	s.format("\tunsigned int64 -1: %llu\r\n"
 		"\tunsigned int -1: %u\r\n"

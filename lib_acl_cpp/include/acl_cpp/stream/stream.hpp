@@ -24,6 +24,11 @@ public:
 	bool eof(void) const;
 
 	/**
+	 * 清除流结束标志位，即将 eof_ 标志位置为 false
+	 */
+	void clear_eof(void);
+
+	/**
 	* 当前流是否处理打开状态
 	* @return {bool} true: 流已经打开; false: 流未打开
 	*/
@@ -78,6 +83,7 @@ public:
 	 * @return {int} 获得流的读写超时时间(秒)
 	 */
 	int get_rw_timeout(void) const;
+
 protected:
 	ACL_VSTREAM *stream_;
 	bool eof_;

@@ -385,3 +385,8 @@ acl_off_t acl_fseek(ACL_FILE *fp, acl_off_t offset, int whence)
 {
 	return acl_vstream_fseek(fp->fp, offset, whence);
 }
+
+acl_off_t acl_ftell(ACL_FILE *fp)
+{
+	return acl_vstream_ftell(fp->fp);
+}

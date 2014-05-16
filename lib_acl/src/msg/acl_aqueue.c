@@ -157,7 +157,12 @@ static int aqueue_wait(ACL_AQUEUE *queue, const struct  timespec *ptimeout)
 	int   status;
 
 	while (queue->first == NULL && queue->quit == 0) {
-		status = acl_pthread_cond_timedwait(&queue->cond, &queue->lock, ptimeout);
+		if (ptimeout != NULL)
+			status = acl_pthread_cond_timedwait(&queue->cond,
+					&queue->lock, ptimeout);
+		else
+			status = acl_pthread_cond_wait(&queue->cond, &queue->lock);
+
 		if (ptimeout && status == ACL_ETIMEDOUT) {
 			status = acl_pthread_mutex_unlock(&queue->lock);
 			if (status != 0)
@@ -219,9 +224,9 @@ void *acl_aqueue_pop_timedwait(ACL_AQUEUE *queue, int tmo_sec, int tmo_usec)
 			gettimeofday(&tv, NULL);
 			timeout.tv_sec = tv.tv_sec + tmo_sec;
 			timeout.tv_nsec = tv.tv_usec * 1000 + tmo_usec * 1000;
+			ptimeout = &timeout;
 		}
 
-		ptimeout = &timeout;
 		if (aqueue_wait(queue, ptimeout) < 0)
 			return (NULL);
 

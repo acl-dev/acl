@@ -22,6 +22,11 @@ bool stream::eof(void) const
 	return eof_;
 }
 
+void stream::clear_eof(void)
+{
+	eof_ = false;
+}
+
 bool stream::opened(void) const
 {
 	return opened_;

@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{312366B1-8882-4491-94F6-E105A19C63EF}</ProjectGuid>
+    <ProjectGuid>{A76344E8-D8EF-4E0D-9A01-73DB25B5B76E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <ProjectName>connect_manager</ProjectName>
   </PropertyGroup>
@@ -179,6 +179,9 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="connect_client.cpp" />
+    <ClCompile Include="connect_manager.cpp" />
+    <ClCompile Include="connect_pool.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">Create</PrecompiledHeader>
@@ -188,6 +191,9 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="connect_client.h" />
+    <ClInclude Include="connect_manager.h" />
+    <ClInclude Include="connect_pool.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

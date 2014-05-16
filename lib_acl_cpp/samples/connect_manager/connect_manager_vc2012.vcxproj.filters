@@ -21,9 +21,27 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="connect_client.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="connect_manager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="connect_pool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="connect_client.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="connect_manager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="connect_pool.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

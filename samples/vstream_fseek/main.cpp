@@ -9,7 +9,7 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	ACL_VSTREAM *fp;
 	char  buf[4096];
 	int   i, n;
-	acl_off_t off;
+	acl_off_t off, off2;
 	struct acl_stat sbuf;
 
 	fp = acl_vstream_fopen("test.txt", O_RDWR | O_CREAT, 0600, 4096);
@@ -60,6 +60,12 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	} else
 		printf("ok(%d): after seek 100, offset=%d, sys_offset=%d\r\n",
 			__LINE__, (int) fp->offset, (int) fp->sys_offset);
+	off2 =  acl_vstream_ftell(fp);
+	if (off2 != off) {
+		printf("error, off: %lld != ftell(%lld)\r\n", off, off2);
+		goto END;
+	} else
+		printf(">>>ftell: %lld ok\r\n", off2);
 
 	off = acl_vstream_fseek(fp, 4096, SEEK_SET);
 	if (off != 4096) {
@@ -127,8 +133,7 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	if (off != 200) {
 		printf("error(%d): off(%d) != 200\r\n", __LINE__, (int) off);
 		goto END;
-	} else
-		printf("ok(%d): after seek 200, offset=%d, sys_offset=%d\r\n",
+	} else printf("ok(%d): after seek 200, offset=%d, sys_offset=%d\r\n",
 			__LINE__, (int) fp->offset, (int) fp->sys_offset);
 	acl_vstream_read(fp, buf, 100);
 	printf("ok(%d): after read 100, offset=%d, sys_offset=%d\r\n",
@@ -159,6 +164,14 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	} else
 		printf("ok(%d): after seek 8190, offset=%d, sys_offset=%d\r\n",
 			__LINE__, (int) fp->offset, (int) fp->sys_offset);
+
+	off2 = acl_vstream_ftell(fp);
+	if (off2 != off) {
+		printf("ftell(%lld) != off(%lld), error\r\n", off2, off);
+		goto END;
+	} else
+		printf("ftell(%lld) == off(%lld), ok\r\n", off2, off);
+
 	n = acl_vstream_read(fp, buf, 100);
 	printf("ok(%d): after read 100, n=%d offset=%d, sys_offset=%d\r\n",
 		__LINE__, n, (int) fp->offset, (int) fp->sys_offset);

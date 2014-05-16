@@ -524,7 +524,7 @@ bool HttpServletRequest::readHeader(void)
 	}
 
 	const char* ptr = getQueryString();
-	if (ptr && ptr)
+	if (ptr && *ptr)
 		parseParameters(ptr);
 
 	if (method_ == HTTP_METHOD_GET)

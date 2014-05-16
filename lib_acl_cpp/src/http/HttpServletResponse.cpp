@@ -168,18 +168,20 @@ bool HttpServletResponse::write(const string& buf)
 	return write(buf.c_str(), buf.length());
 }
 
-bool HttpServletResponse::vformat(const char* fmt, va_list ap)
+int HttpServletResponse::vformat(const char* fmt, va_list ap)
 {
 	string buf;
 	buf.vformat(fmt, ap);
-	return write(buf);
+	if (write(buf) == false)
+		return -1;
+	return (int) buf.length();
 }
 
-bool HttpServletResponse::format(const char* fmt, ...)
+int HttpServletResponse::format(const char* fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
-	bool ret = vformat(fmt, ap);
+	int ret = vformat(fmt, ap);
 	va_end(ap);
 	return ret;
 }

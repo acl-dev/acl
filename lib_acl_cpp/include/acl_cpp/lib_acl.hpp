@@ -25,6 +25,7 @@
 #include "acl_cpp/stdlib/url_coder.hpp"
 #include "acl_cpp/stdlib/thread.hpp"
 #include "acl_cpp/stdlib/thread_pool.hpp"
+#include "acl_cpp/stdlib/scan_dir.hpp"
 
 #include "acl_cpp/memcache/memcache.hpp"
 #include "acl_cpp/memcache/memcache_pool.hpp"

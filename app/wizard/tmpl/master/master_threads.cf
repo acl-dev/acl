@@ -83,6 +83,7 @@ service $<PROGRAM> {
 
 #       采用事件循环的方式: select(default), poll, kernel(epoll/devpoll/kqueue)
 	ioctl_event_mode = kernel
+
 #	事件引擎检查所有空闲描述符的时间间隔(毫秒)
 #	ioctl_check_inter = 100
 #	当启用 master_dispatch 连接分开服务后，该配置指定 master_dispatch 所监听的

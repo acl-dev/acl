@@ -50,6 +50,7 @@ all:
 	@(cd thread_pool; make)
 	@(cd thread_client; make)
 	@(cd http_request_manager; make)
+	@(cd scan_dir; make)
 
 clean:
 	@(cd string; make clean)
@@ -103,3 +104,4 @@ clean:
 	@(cd thread_pool; make clean)
 	@(cd thread_client; make clean)
 	@(cd http_request_manager; make clean)
+	@(cd scan_dir; make clean)

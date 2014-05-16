@@ -209,16 +209,16 @@ public:
 
 	/**
 	 * 从 HTTP 服务器读取响应体数据或从 HTTP 客户端读取请求体数据，
-	 * 只有调用此函数才能进行解压操作
+	 * 此函数将对收到的数据内容进行解压操作
 	 * @param out {string&} 存储数据体的缓冲区
 	 * @param clean {bool} 在接收数据前是否自动清空 buf 缓冲区
 	 * @param real_size {int*} 若该指针非空，则记录真正读到的数据长度，
 	 *  通过该指针返回的数据值永远 >= 0
 	 * @return {int} 返回值含义如下：
 	 *  > 0: 表示已经读到的数据，并且数据还未读完
-	 *  == 0: 如果返回值为此值，则必须调用 body_finish 函数来判断是否
-	 *  已经读完 HTTP 响应体数据，如果已经读完，则同时表明还可以继续
-	 *  保持长连接
+	 *  == 0: 如果返回值为此值，则可以调用 disconnected()函数来判断连接是否已经
+	 *  关闭；调用 body_finish 函数来判断是否已经读完 HTTP 响应体数据，如果已经
+	 *  读完且连接未关闭，则还可以继续保持长连接
 	 *  < 0: 表示连接关闭
 	 * 注：read_body 的两个函数不能混用；
 	 *     当为解压缩数据时，则返回的值为解压缩后的数据长度
@@ -238,10 +238,32 @@ public:
 	int read_body(char* buf, size_t size);
 
 	/**
+	 * 从 HTTP 服务器响应数据或客户端请求数据中读取一行数据，此函数内部将会对原始数据
+	 * 进行解压操作；可以循环调用此函数直到该函数返回 false 或 body_finish() 返回
+	 * true 为止；当该函数返回 false 时表示连接已经关闭，当返回 true 时表示读到了
+	 * 一行数据，此时可以通过判断 body_finish() 返回值来判断是否已经读完了数据体
+	 * @param out {string&} 存储数据体的缓冲区，在该函数内部不会自动清理该缓冲区，
+	 *  用户可在调用该函数前自行清理该缓冲区中的数据(可调用:out.clear())
+	 * @param nonl {bool} 读取一行数据时是否自动去掉尾部的 "\r\n" 或 "\n"
+	 * @param size {size_t*} 当读到完整的一行数据时存放该行数据的长度，当读到一个
+	 *  空行且 nonl 为 true 时，则该值为 0
+	 * @return {bool} 是否读到了一行数据，当该函数返回 false 时表示读完毕或读出错，
+	 *  且没有读到完整的一行数据；如果返回 true 表示读到了一行数据，当读到一个空行时
+	 *  该函数也会返回 true，只是 *size = 0
+	 */
+	bool body_gets(string& out, bool nonl = true, size_t* size = NULL);
+
+	/**
 	 * 判断是否已经读完 HTTP 响应数据体
 	 * @return {bool}
 	 */
 	bool body_finish(void) const;
+
+	/**
+	 * 判断网络连接是否已经关闭
+	 * @return {bool}
+	 */
+	bool disconnected(void) const;
 
 	/**
 	 * 取得通过 read_head 读到的 HTTP 响应头对象，且当传入缓冲区
@@ -289,7 +311,9 @@ private:
 	int  gzip_header_left_;     // gzip 头剩余的长度
 	int  last_ret_;             // 数据读完后记录最后的返回值
 	bool body_finish_;          // 是否已经读完 HTTP 响应体数据
+	bool disconnected_;         // 网络连接是否已经关闭
 	bool chunked_transfer_;     // 是否为 chunked 传输模式
+	string* buf_;               // 内部缓冲区，用在按行读等操作中
 
 	bool read_request_head(void);
 	bool read_response_head(void);

@@ -331,7 +331,7 @@ static void __add_cookie_item(ACL_HTABLE *table, const char *data)
 	const char *name;
 	char *value;
 	char *ptr;
-	int   i, j;
+	int   i;
 
 #undef	RETURN
 #define	RETURN do {  \
@@ -390,10 +390,6 @@ static void __add_cookie_item(ACL_HTABLE *table, const char *data)
 	}
 
 	str = acl_vstring_alloc(256);
-	if (str == NULL)
-		acl_msg_fatal("%s, %s(%d): vstring_alloc error=%s",
-			__FILE__, myname, __LINE__, acl_last_serror());
-	j = 0;
 
 	for (i = 1; i < argv->argc; i++) {
 		ptr = acl_argv_index(argv, i);
@@ -402,13 +398,10 @@ static void __add_cookie_item(ACL_HTABLE *table, const char *data)
 		TRUNC_BLANK_NORETURN(ptr);
 		if (*ptr == 0)
 			continue;
-		if (j == 0) {
+		if (i == 1)
 			acl_vstring_sprintf_append(str, "%s", ptr);
-			j++;
-		} else {
+		else
 			acl_vstring_sprintf_append(str, "=%s", ptr);
-			j++;
-		}
 	}
 
 	/* 将真实的存储数据的区域内存引出, 同时将外包结构内存释放,
@@ -442,9 +435,20 @@ int http_hdr_req_cookies_parse(HTTP_HDR_REQ *hh)
 	if (entry == NULL)
 		return 0;
 
+	/* bugfix: 在创建哈希表时此处不应设置 ACL_HTABLE_FLAG_KEY_REUSE 标志位，
+	 * 如果设置了此标志，则在 __add_cookie_item 中调用 acl_htable_enter 时，
+	 * 会将 name 值的内存交给 htable，但随后在宏 RETURN 时却调用了释放数组
+	 * 的函数 acl_argv_free(argv)，将 name 所属的数组内存一起给释放了
+	 * ---zsx, 2014.5.13
+	 */
 	if (hh->cookies_table == NULL)
+#if 0
 		hh->cookies_table = acl_htable_create(__http_hdr_max_cookies,
-					ACL_HTABLE_FLAG_KEY_REUSE);
+			ACL_HTABLE_FLAG_KEY_REUSE);
+#else
+		hh->cookies_table = acl_htable_create(__http_hdr_max_cookies, 0);
+#endif
+
 	if (hh->cookies_table == NULL)
 		acl_msg_fatal("%s, %s(%d): htable create error(%s)",
 			__FILE__, myname, __LINE__, acl_last_serror());
@@ -453,7 +457,8 @@ int http_hdr_req_cookies_parse(HTTP_HDR_REQ *hh)
 	argv = acl_argv_split(entry->value, ";");
 	acl_foreach(iter, argv) {
 		ptr = (const char*) iter.data;
-		__add_cookie_item(hh->cookies_table, ptr);
+		if (ptr && *ptr)
+			__add_cookie_item(hh->cookies_table, ptr);
 	}
 	acl_argv_free(argv);
 	return 0;

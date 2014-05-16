@@ -300,11 +300,19 @@ ACL_API acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whenc
  * 定位文件指针
  * @param fp {ACL_VSTREAM*} 数据流指针
  * @param offset {acl_off_t} 偏移量
- * @param whence {int} 偏移方向, SEEK_SET, SEEK_CUR, SEEK_END
+ * @param whence {int} 移动方向：SEEK_SET（从文件起始位置后移动）,
+ *  SEEK_CUR（从当前文件指针位置向后移动）, SEEK_END（从文件尾向前移动）
  * @return ret {acl_off_t}, ret >= 0: 正确, ret < 0: 出错
  * @deprecated 该函数的效率较低
  */
 ACL_API acl_off_t acl_vstream_fseek2(ACL_VSTREAM *fp, acl_off_t offset, int whence);
+
+/**
+ * 返回当前文件指针所在位置
+ * @param fp {ACL_VSTREAM*} 数据流指针
+ * @return {acl_off_t} 当前文件指针所在位置, -1 表示出错
+ */
+ACL_API acl_off_t acl_vstream_ftell(ACL_VSTREAM *fp);
 
 /**
  * 将源文件进程截断

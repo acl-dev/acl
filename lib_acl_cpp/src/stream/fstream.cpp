@@ -94,7 +94,16 @@ bool fstream::close()
 
 acl_off_t fstream::fseek(acl_off_t offset, int whence)
 {
-	return acl_vstream_fseek(stream_, offset, whence);
+	acl_off_t ret = acl_vstream_fseek(stream_, offset, whence);
+	eof_ = ret >= 0 ? false : true;
+	return ret;
+}
+
+acl_off_t fstream::ftell()
+{
+	acl_off_t ret = acl_vstream_ftell(stream_);
+	eof_ = ret >= 0 ? false : true;
+	return ret;
 }
 
 bool fstream::ftruncate(acl_off_t length)

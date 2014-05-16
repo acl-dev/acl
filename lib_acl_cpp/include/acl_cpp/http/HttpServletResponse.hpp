@@ -163,23 +163,21 @@ public:
 	/**
 	 * 带格式方式向 HTTP 客户端发送响应数据，内部自动调用
 	 * HttpServletResponse::write(const void*, size_t) 过程，
-	 * 另外，在使用 chunked 方式传输数据时，应该应该最后再调用一次本函数，
-	 * 且参数均设为 0 表示数据结束
+	 * 在使用 chunked 方式传输数据时，应该应该最后再调用 write(NULL, 0) 表示数据结束
 	 * @param fmt {const char*} 变参格式字符串
-	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
+	 * @return {int} 成功则返回值 > 0，否则返回 -1
 	 */
-	bool format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
+	int format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
 	 * 带格式方式向 HTTP 客户端发送响应数据，内部自动调用
 	 * HttpServletResponse::write(const string&) 过程，
-	 * 另外，在使用 chunked 方式传输数据时，应该应该最后再调用一次本函数，
-	 * 且参数均设为 0 表示数据结束
+	 * 在使用 chunked 方式传输数据时，应该应该最后再调用 write(NULL, 0) 表示数据结束
 	 * @param fmt {const char*} 变参格式字符串
 	 * @param ap {va_list} 变参列表
-	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
+	 * @return {int} 成功则返回值 > 0，否则返回 -1
 	 */
-	bool vformat(const char* fmt, va_list ap);
+	int vformat(const char* fmt, va_list ap);
 
 	///////////////////////////////////////////////////////////////////
 

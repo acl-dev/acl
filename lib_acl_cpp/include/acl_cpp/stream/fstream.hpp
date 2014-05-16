@@ -49,14 +49,50 @@ public:
 	bool close();
 
 #ifdef WIN32
+	/**
+	 * 根据系统的文件句柄打开 fstream 文件流对象
+	 * @param fh 系统文件句柄
+	 * @param oflags 打开标志位
+	 */
 	void open(void* fh, unsigned int oflags);
+
+	/**
+	 * 移动文件指针位置
+	 * @param offset {__int64} 偏移量
+	 * @param whence {int} 移动方向：SEEK_SET（从文件起始位置后移动）,
+	 *  SEEK_CUR（从当前文件指针位置向后移动）, SEEK_END（从文件尾向前移动）
+	 * @return {acl_off_t} 正常时返回值 >= 0，出错时返回 -1
+	 */
 	__int64 fseek(__int64 offset, int whence);
+
+	/**
+	 * 获得当前系统文件指针在文件中的偏移位置
+	 * @return {acl_off_t} 正常时返回值 >= 0，出错时返回 -1
+	 */
+	__int64 ftell();
+
+	/**
+	 * 将文件尺寸截断至指定大小
+	 * @param length {acl_off_t} 文件截断后的大小尺寸
+	 * @return {bool} 是否成功
+	 */
 	bool ftruncate(__int64 length);
+
+	/**
+	 * 获得当前文件的大小
+	 * @return {acl_off_t} 正常时返回值 >= 0，出错返回 -1
+	 */
 	__int64 fsize(void) const;
+
+	/**
+	 * 返回系统文件句柄
+	 * @return 系统文件句柄，出错时返回 ACL_FILE_INVALID
+	 */
 	void* file_handle() const;
 #else
 	void open(int fh, unsigned int oflags);
 	long long int fseek(long long int offset, int whence);
+	long long int ftell();
 	bool ftruncate(long long int length);
 	long long int fsize(void) const;
 	int file_handle() const;

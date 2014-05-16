@@ -21,6 +21,7 @@ http_client::http_client(void)
 , zstream_(NULL)
 , is_request_(true)
 , body_finish_(false)
+, disconnected_(true)
 , chunked_transfer_(false)
 {
 }
@@ -38,7 +39,9 @@ http_client::http_client(socket_stream* client, int rw_timeout /* = 120 */,
 , zstream_(NULL)
 , is_request_(is_request)
 , body_finish_(false)
+, disconnected_(false)
 , chunked_transfer_(false)
+, buf_(NULL)
 {
 }
 
@@ -47,10 +50,15 @@ http_client::~http_client(void)
 	reset();
 	if (stream_ && !stream_fixed_)
 		delete stream_;
+	if (buf_)
+		delete buf_;
 }
 
 void http_client::reset(void)
 {
+	if (buf_)
+		buf_->clear();
+
 	if (res_)
 	{
 		// 说明是长连接的第二次请求，所以需要把上次请求的
@@ -104,6 +112,7 @@ bool http_client::open(const char* addr, int conn_timeout /* = 60 */,
 	{
 		delete stream_;
 		stream_ = NULL;
+		disconnected_ = true;
 	}
 
 	socket_stream* stream = NEW socket_stream();
@@ -113,14 +122,17 @@ bool http_client::open(const char* addr, int conn_timeout /* = 60 */,
 	if (stream->open(addr, conn_timeout, rw_timeout) == false)
 	{
 		delete stream;
+		disconnected_ = true;
 		return false;
 	}
 	if (use_ssl && stream->open_ssl_client() == false)
 	{
 		delete stream;
+		disconnected_ = true;
 		return false;
 	}
 
+	disconnected_ = false;
 	stream_ = stream;
 	return true;
 }
@@ -133,7 +145,10 @@ int http_client::write_head(const http_header& header)
 		header.build_request(buf);
 	else
 		header.build_response(buf);
-	return get_ostream().write(buf.c_str(), buf.length());
+	int ret = get_ostream().write(buf.c_str(), buf.length());
+	if (ret < 0)
+		disconnected_ = true;
+	return ret;
 }
 
 bool http_client::write_body(const void* data, size_t len)
@@ -144,20 +159,35 @@ bool http_client::write_body(const void* data, size_t len)
 	{
 		if (data == NULL || len == 0)
 			return true;
-		return fp.write(data, len) == -1 ? false : true;
+		if (fp.write(data, len) == -1)
+		{
+			disconnected_ = true;
+			return false;
+		}
+		else
+			return true;
 	}
 
 	// 如果设置了 chunked 传输方式，则按块传输方式写数据
 
 	if (data == NULL || len == 0)
-		return fp.format("0\r\n\r\n") == -1 ? false : true;
+	{
+		if (fp.format("0\r\n\r\n") == -1)
+		{
+			disconnected_ = true;
+			return false;
+		}
+		else
+			return true;
+	}
 
-	if (fp.format("%x\r\n", (int) len) == -1)
+	if (fp.format("%x\r\n", (int) len) == -1
+		|| fp.write(data, len) == -1
+		|| fp.write("\r\n", 2) == -1)
+	{
+		disconnected_ = true;
 		return false;
-	if (fp.write(data, len) == -1)
-		return false;
-	if (fp.write("\r\n", 2) == -1)
-		return false;
+	}
 	return true;
 }
 
@@ -195,13 +225,15 @@ bool http_client::read_response_head(void)
 	if (stream_ == NULL)
 	{
 		logger_error("connect stream not open yet");
-		return (false);
+		disconnected_ = true;
+		return false;
 	}
 	ACL_VSTREAM* vstream = stream_->get_vstream();
 	if (vstream == NULL)
 	{
 		logger_error("connect stream null");
-		return (false);
+		disconnected_ = true;
+		return false;
 	}
 
 	hdr_res_ = http_hdr_res_new();
@@ -210,7 +242,8 @@ bool http_client::read_response_head(void)
 	{
 		http_hdr_res_free(hdr_res_);
 		hdr_res_ = NULL;
-		return (false);
+		disconnected_ = true;
+		return false;
 	}
 
 	if (http_hdr_res_parse(hdr_res_) < 0)
@@ -218,7 +251,8 @@ bool http_client::read_response_head(void)
 		logger_error("parse response header error");
 		http_hdr_res_free(hdr_res_);
 		hdr_res_ = NULL;
-		return (false);
+		disconnected_ = true;
+		return false;
 	}
 
 	// 块传输的优先级最高
@@ -228,7 +262,7 @@ bool http_client::read_response_head(void)
 		if (hdr_res_->hdr.content_length == 0)
 		{
 			body_finish_ = true;
-			return (true);
+			return true;
 		}
 	}
 
@@ -252,7 +286,7 @@ bool http_client::read_response_head(void)
 			logger_warn("unknown compress format: %s", ptr);
 	}
 
-	return (true);
+	return true;
 }
 
 bool http_client::read_request_head(void)
@@ -263,13 +297,15 @@ bool http_client::read_request_head(void)
 	if (stream_ == NULL)
 	{
 		logger_error("client stream not open yet");
-		return (false);
+		disconnected_ = true;
+		return false;
 	}
 	ACL_VSTREAM* vstream = stream_->get_vstream();
 	if (vstream == NULL)
 	{
 		logger_error("client stream null");
-		return (false);
+		disconnected_ = true;
+		return false;
 	}
 
 	hdr_req_ = http_hdr_req_new();
@@ -278,7 +314,8 @@ bool http_client::read_request_head(void)
 	{
 		http_hdr_req_free(hdr_req_);
 		hdr_req_ = NULL;
-		return (false);
+		disconnected_ = true;
+		return false;
 	}
 
 	if (http_hdr_req_parse(hdr_req_) < 0)
@@ -286,12 +323,13 @@ bool http_client::read_request_head(void)
 		logger_error("parse request header error");
 		http_hdr_req_free(hdr_req_);
 		hdr_req_ = NULL;
-		return (false);
+		disconnected_ = true;
+		return false;
 	}
 
 	if (hdr_req_->hdr.content_length <= 0)
 		body_finish_ = true;
-	return (true);
+	return true;
 }
 
 acl_int64 http_client::body_length() const
@@ -406,19 +444,22 @@ int http_client::read_response_body(char* buf, size_t size)
 	if (hdr_res_ == NULL)
 	{
 		logger_error("response header not get yet");
-		return (-1);
+		disconnected_ = true;
+		return -1;
 	}
 
 	if (stream_ == NULL)
 	{
 		logger_error("not connected yet");
-		return (-1);
+		disconnected_ = true;
+		return -1;
 	}
 	ACL_VSTREAM* vstream = stream_->get_vstream();
 	if (vstream == NULL)
 	{
 		logger_error("connect stream null");
-		return (-1);
+		disconnected_ = true;
+		return -1;
 	}
 
 	if (res_ == NULL)
@@ -440,9 +481,11 @@ int http_client::read_response_body(char* buf, size_t size)
 			zstream_->unzip_finish(&dummy);
 		}
 		body_finish_ = true;
+		if (ret < 0)
+			disconnected_ = true;
 	}
 
-	return ((int) ret);
+	return (int) ret;
 }
 
 int http_client::read_request_body(char* buf, size_t size)
@@ -450,19 +493,22 @@ int http_client::read_request_body(char* buf, size_t size)
 	if (hdr_req_ == NULL)
 	{
 		logger_error("request header not get yet");
-		return (-1);
+		disconnected_ = true;
+		return -1;
 	}
 
 	if (stream_ == NULL)
 	{
 		logger_error("not connected yet");
-		return (-1);
+		disconnected_ = true;
+		return -1;
 	}
 	ACL_VSTREAM* vstream = stream_->get_vstream();
 	if (vstream == NULL)
 	{
 		logger_error("client stream null");
-		return (-1);
+		disconnected_ = true;
+		return -1;
 	}
 
 	if (req_ == NULL)
@@ -474,14 +520,23 @@ int http_client::read_request_body(char* buf, size_t size)
 	http_off_t ret = http_req_body_get_sync(req_, vstream, buf, (int) size);
 
 	if (ret <= 0)
+	{
 		body_finish_ = true;
+		if (ret < 0)
+			disconnected_ = true;
+	}
 
 	return ((int) ret);
 }
 
 bool http_client::body_finish(void) const
 {
-	return (body_finish_);
+	return body_finish_;
+}
+
+bool http_client::disconnected() const
+{
+	return disconnected_;
 }
 
 int http_client::read_body(string& out, bool clean /* = true */,
@@ -504,19 +559,22 @@ int http_client::read_response_body(string& out, bool clean,
 	if (stream_ == NULL)
 	{
 		logger_error("connect null");
-		return (-1);
+		disconnected_ = true;
+		return -1;
 	}
 	ACL_VSTREAM* vstream = stream_->get_vstream();
 	if (vstream == NULL)
 	{
 		logger_error("connect stream null");
-		return (-1);
+		disconnected_ = true;
+		return -1;
 	}
 
 	if (hdr_res_ == NULL)
 	{
 		logger_error("response header not get yet");
-		return (-1);
+		disconnected_ = true;
+		return -1;
 	}
 	if (res_ == NULL)
 		res_ = http_res_new(hdr_res_);
@@ -542,9 +600,11 @@ SKIP_GZIP_HEAD_AGAIN:  // 对于有 GZIP 头数据，可能需要重复读
 		else
 		{
 			body_finish_ = true; // 表示数据已经读完
+			if (ret < 0)
+				disconnected_ = true;
 			last_ret_ = ret;
 		}
-		return (ret);
+		return ret;
 	}
 
 	if (ret <= 0)
@@ -552,12 +612,14 @@ SKIP_GZIP_HEAD_AGAIN:  // 对于有 GZIP 头数据，可能需要重复读
 		if (zstream_->unzip_finish(&out) == false)
 		{
 			logger_error("unzip_finish error");
-			return (-1);
+			return -1;
 		}
 
 		last_ret_ = ret; // 记录返回值
 		body_finish_ = true; // 表示数据已经读完且解压缩完毕
-		return ((int) out.length() - saved_count);
+		if (ret < 0)
+			disconnected_ = true;
+		return (int) out.length() - saved_count;
 	}
 
 	if (real_size)
@@ -582,9 +644,9 @@ SKIP_GZIP_HEAD_AGAIN:  // 对于有 GZIP 头数据，可能需要重复读
 	if (zstream_->unzip_update(buf + n, ret - n, &out) == false)
 	{
 		logger_error("unzip_update error");
-		return (-1);
+		return -1;
 	}
-	return ((int) out.length() - saved_count);
+	return (int) out.length() - saved_count;
 }
 
 int http_client::read_request_body(string& out, bool clean,
@@ -593,24 +655,27 @@ int http_client::read_request_body(string& out, bool clean,
 	if (real_size)
 		*real_size = 0;
 	if (body_finish_)
-		return (last_ret_);
+		return last_ret_;
 
 	if (stream_ == NULL)
 	{
 		logger_error("client null");
-		return (-1);
+		disconnected_ = true;
+		return -1;
 	}
 	ACL_VSTREAM* vstream = stream_->get_vstream();
 	if (vstream == NULL)
 	{
 		logger_error("client stream null");
-		return (-1);
+		disconnected_ = true;
+		return -1;
 	}
 
 	if (hdr_req_ == NULL)
 	{
 		logger_error("request header not get yet");
-		return (-1);
+		disconnected_ = true;
+		return -1;
 	}
 	if (req_ == NULL)
 		req_ = http_req_new(hdr_req_);
@@ -631,9 +696,44 @@ int http_client::read_request_body(string& out, bool clean,
 	else
 	{
 		body_finish_ = true; // 表示数据已经读完
+		if (ret < 0)
+			disconnected_ = true;
 		last_ret_ = ret;
 	}
-	return (ret);
+	return ret;
+}
+
+bool http_client::body_gets(string& out, bool nonl /* = true */,
+	size_t* size /* = NULL */)
+{
+	if (buf_ == NULL)
+		buf_ = new string(1024);
+
+	size_t len, size_saved = out.length();
+
+	while (true)
+	{
+		if (!buf_->empty() && buf_->scan_line(out, nonl, &len, true))
+		{
+			if (size)
+				*size = out.length() - size_saved;
+			return true;
+		}
+
+		if (body_finish_)
+		{
+			if (size)
+				*size = out.length() - size_saved;
+			return false;
+		}
+
+		if (read_body(*buf_, false) <= 0 && buf_->empty())
+		{
+			if (size)
+				*size = out.length() - size_saved;
+			return false;
+		}
+	}
 }
 
 HTTP_HDR_RES* http_client::get_respond_head(string* buf)
@@ -645,19 +745,19 @@ HTTP_HDR_RES* http_client::get_respond_head(string* buf)
 		ACL_VSTRING* vbf = buf->vstring();
 		http_hdr_build(&hdr_res_->hdr, vbf);
 	}
-	return (hdr_res_);
+	return hdr_res_;
 }
 
 HTTP_HDR_REQ* http_client::get_request_head(string* buf)
 {
 	if (hdr_req_ == NULL)
-		return (NULL);
+		return NULL;
 	if (buf)
 	{
 		ACL_VSTRING* vbf = buf->vstring();
 		http_hdr_build(&hdr_req_->hdr, vbf);
 	}
-	return (hdr_req_);
+	return hdr_req_;
 }
 
 void http_client::print_header(const char* prompt)

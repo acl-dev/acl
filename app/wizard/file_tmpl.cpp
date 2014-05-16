@@ -92,6 +92,14 @@ bool file_tmpl::create_common()
 	if (copy_and_replace("master_service.vcproj", file.c_str()) == false)
 		return false;
 
+	// for vc2008
+	file.format("%s_vc2008.sln", project_name_.c_str());
+	if (copy_and_replace("master_service_vc2008.sln", file.c_str()) == false)
+		return false;
+	file.format("%s_vc2008.vcproj", project_name_.c_str());
+	if (copy_and_replace("master_service_vc2008.vcproj", file.c_str()) == false)
+		return false;
+
 	// for vc2010
 	file.format("%s_vc2010.sln", project_name_.c_str());
 	if (copy_and_replace("master_service_vc2010.sln", file.c_str()) == false)

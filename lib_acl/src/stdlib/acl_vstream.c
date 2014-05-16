@@ -2349,7 +2349,7 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 			return fp->offset;
 		}
 		fp->read_cnt = 0;
-	} else
+	}
 		fp->read_cnt = 0;
 
 SYS_SEEK:
@@ -2358,6 +2358,14 @@ SYS_SEEK:
 	fp->offset = fp->sys_offset;
 
 	return fp->offset;
+}
+
+acl_off_t acl_vstream_ftell(ACL_VSTREAM *fp)
+{
+	/* 先定位当前位置，然后再减去读缓冲区里的数据长度 */
+	fp->sys_offset = acl_lseek(ACL_VSTREAM_FILE(fp), 0, SEEK_CUR);
+	fp->offset = fp->sys_offset;
+	return fp->offset - fp->read_cnt;
 }
 
 #ifdef WIN32

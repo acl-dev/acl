@@ -336,6 +336,36 @@ bool http_request::request(const void* data, size_t len)
 	return true;
 }
 
+int http_request::http_status() const
+{
+	acl_assert(client_);
+	return client_->response_status();
+}
+
+acl_int64 http_request::body_length() const
+{
+	acl_assert(client_);
+	return client_->body_length();
+}
+
+bool http_request::keep_alive() const
+{
+	acl_assert(client_);
+	return client_->keep_alive();
+}
+
+const char* http_request::header_value(const char* name) const
+{
+	acl_assert(client_);
+	return client_->header_value(name);
+}
+
+bool http_request::body_finish() const
+{
+	acl_assert(client_);
+	return client_->body_finish();
+}
+
 void http_request::check_range()
 {
 	http_off_t range_from, range_to;
@@ -619,6 +649,50 @@ int http_request::read_body(string& out, bool clean /* = NULL */,
 	// 内容尺寸之差来计算本次读到的数据长度
 	return (int) (curr_size - saved_size);
 }
+
+bool http_request::body_gets(string& out, bool nonl /* = true */,
+	size_t* size /* = NULL */)
+{
+	if (size)
+		*size = 0;
+	if (client_ == NULL)
+		return false;
+
+	if (conv_ == NULL)
+	{
+		if (client_->body_gets(out, nonl, size) == true)
+			return true;
+		else
+		{
+			if (client_->disconnected())
+				close();
+			return false;
+		}
+	}
+
+	size_t n, size_saved = out.length();
+	string line(1024);
+	if (client_->body_gets(line, nonl, &n) == false)
+	{
+		if (!line.empty())
+			conv_->update(line.c_str(), line.length(), &out);
+		conv_->update_finish(&out);
+		if (size)
+			*size = out.length() - size_saved;
+		if (client_->disconnected())
+			close();
+		return false;
+	}
+
+	if (!line.empty())
+		conv_->update(line.c_str(), line.length(), &out);
+	conv_->update_finish(&out);
+	if (size)
+		*size = out.length() - size_saved;
+
+	return true;
+}
+
 
 int http_request::read_body(char* buf, size_t size)
 {

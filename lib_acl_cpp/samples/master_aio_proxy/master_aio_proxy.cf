@@ -83,6 +83,12 @@ service master_aio_proxy {
 #	每个线程的空闲时间.
 	aio_thread_idle_limit = 60
 
+#	当启用 master_dispatch 连接分开服务后，该配置指定 master_dispatch 所监听的
+#	域套接口的全路径，这样本子进程就可以从 master_dispatch 获得客户端连接
+#	aio_dispatch_addr = {install_path}/var/private/dispatch.sock
+#	当 aio_dispatch_addr 开启后，下面参数控制本服务进程发给前端 master_dispatch 的服务标识信息
+#	aio_dispatch_type = default
+
 #	允许访问的客户端IP地址范围
 	aio_access_allow = 127.0.0.1:255.255.255.255, 127.0.0.1:127.0.0.1
 

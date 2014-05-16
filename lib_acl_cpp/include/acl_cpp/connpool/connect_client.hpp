@@ -4,10 +4,12 @@
 namespace acl
 {
 
+class connect_pool;
+
 class ACL_CPP_API connect_client
 {
 public:
-	connect_client() : when_(0) {}
+	connect_client() : when_(0), pool_(NULL) {}
 	virtual ~connect_client() {}
 
 	/**
@@ -32,8 +34,27 @@ public:
 	 * @return {bool} 是否连接成功
 	 */
 	virtual bool open() = 0;
+
+	/**
+	 * 获得连接池对象引用，在 connect_pool 内部创建
+	 * 连接对象会调用 set_pool 设置连接池对象句柄
+	 * @return {connect_pool*}
+	 */
+	connect_pool* get_pool() const
+	{
+		return pool_;
+	}
+
 private:
+	friend class connect_pool;
+
 	time_t when_;
+	connect_pool* pool_;
+
+	void set_pool(connect_pool* pool)
+	{
+		pool_ = pool;
+	}
 };
 
 } // namespace acl

@@ -196,6 +196,13 @@ ACL_API int acl_putchar(int c);
  */
 ACL_API acl_off_t acl_fseek(ACL_FILE *fp, acl_off_t offset, int whence);
 
+/**
+ * 获得当前文件指针在文件中的位置
+ * @param fp {ACL_FILE*} 文件句柄
+ * @return {acl_off_t} 返回值 -1 表示出错
+ */
+ACL_API acl_off_t acl_ftell(ACL_FILE *fp);
+
 #ifdef	__cplusplus
 }
 #endif

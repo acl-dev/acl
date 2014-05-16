@@ -103,6 +103,44 @@ public:
 	 */
 	bool write_body(const void* data, size_t len);
 
+	/////////////////////////////////////////////////////////////////////
+
+	/**
+	 * 当发送完请求数据后，内部会自动调用读 HTTP 响应头过程，可以通过此函数获得服务端
+	 * 响应的 HTTP 状态字(2xx, 3xx, 4xx, 5xx)；
+	 * 其实该函数内部只是调用了 http_client::response_status 方法
+	 * @return {int}
+	 */
+	int http_status() const;
+
+	/**
+	 * 获得 HTTP 响应的数据体长度
+	 * @return {int64) 返回值若为 -1 则表明 HTTP 头不存在或没有长度字段
+	 */
+#ifdef WIN32
+	__int64 body_length(void) const;
+#else
+	long long int body_length(void) const;
+#endif
+	/**
+	 * HTTP 数据流(响应流是否允许保持长连接)
+	 * @return {bool}
+	 */
+	bool keep_alive(void) const;
+
+	/**
+	 * 获得 HTTP 响应头中某个字段名的字段值
+	 * @param name {const char*} 字段名
+	 * @return {const char*} 字段值，为空时表示不存在
+	 */
+	const char* header_value(const char* name) const;
+
+	/**
+	 * 是否读完了数据体
+	 * @return {bool}
+	 */
+	bool body_finish() const;
+
 	/**
 	 * 当调用 request 成功后调用本函数，读取服务器响应体数据
 	 * 并将结果存储于规定的 xml 对象中
@@ -169,6 +207,21 @@ public:
 		int* real_size = NULL);
 
 	/**
+	 * 当调用 request 成功后调用本函数来从 HTTP 服务端读一行数据，可以循环调用
+	 * 本函数，直到返回 false 或 body_finish() 返回 true 为止；
+	 * 本函数内部自动对压缩数据进行解压，如果在调用本函数之前调用 set_charset 设置了
+	 * 本地字符集，则还同时对数据进行字符集转码操作
+	 * @param out {string&} 存储结果数据
+	 * @param nonl {bool} 读到的一行数据是否自动去掉尾部的 "\r\n" 或 "\n"
+	 * @param size {size_t*} 该指针非空时存放读到的数据长度
+	 * @return {bool} 是否读到了一行数据：当返回 true 时表示读到了一行数据，可以
+	 *  通过 body_finish() 是否为 true 来判断是否读数据体已经结束，当读到一个空行
+	 *  且 nonl = true 时，则 *size = 0；当返回 false 时表示未读完整行且读完毕，
+	 *  *size 中存放着读到的数据长度
+	 */
+	bool body_gets(string& out, bool nonl = true, size_t* size = NULL);
+
+	/**
 	 * 当通过 http_request::request_header().set_range() 设置了
 	 * range 的请求时，此函数检查服务器返回的数据是否支持 range
 	 * @return {bool}
@@ -219,6 +272,8 @@ public:
 	 */
 	const HttpCookie* get_cookie(const char* name,
 		bool case_insensitive = true) const;
+
+	/////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 获得 http_client HTTP 连接流，可以通过返回的对象获得
