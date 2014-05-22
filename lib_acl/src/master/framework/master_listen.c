@@ -70,11 +70,12 @@ static void master_listen_sock(ACL_MASTER_SERV *serv)
 			service_type =  ACL_VSTREAM_TYPE_LISTEN_INET;
 			break;
 		case ACL_MASTER_SERV_TYPE_UNIX:
-			acl_set_eugid(acl_var_master_owner_uid,
-				acl_var_master_owner_gid);
+			if (acl_var_master_limit_privilege)
+				acl_set_eugid(acl_var_master_owner_uid,
+					acl_var_master_owner_gid);
 			serv->listen_fds[i] = acl_unix_listen(
 				addr->addr, qlen, ACL_NON_BLOCKING);
-			if (acl_var_master_set_ugid)
+			if (acl_var_master_limit_privilege)
 				acl_set_ugid(getuid(), getgid());
 
 			service_type = ACL_VSTREAM_TYPE_LISTEN_UNIX;
@@ -178,7 +179,8 @@ static void master_listen_unix(ACL_MASTER_SERV *serv)
 		qlen = 128;
 	}
 
-	acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
+	if (acl_var_master_limit_privilege)
+		acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
 	serv->listen_fds[0] = acl_unix_listen(serv->name, qlen, ACL_NON_BLOCKING);
 	if (serv->listen_fds[0] == ACL_SOCKET_INVALID)
 		acl_msg_fatal("%s(%d)->%s: listen on addr(%s) error(%s)",
@@ -188,7 +190,7 @@ static void master_listen_unix(ACL_MASTER_SERV *serv)
 		O_RDONLY, acl_var_master_buf_size,
 		acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN_UNIX);
 	acl_close_on_exec(serv->listen_fds[0], ACL_CLOSE_ON_EXEC);
-	if (acl_var_master_set_ugid)
+	if (acl_var_master_limit_privilege)
 		acl_set_ugid(getuid(), getgid());
 	acl_msg_info("%s(%d), %s: listen on domain socket: %s, qlen: %d",
 		__FILE__, __LINE__, myname, serv->name, qlen);
@@ -198,7 +200,8 @@ static void master_listen_fifo(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "master_listen_fifo";
 
-	acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
+	if (acl_var_master_limit_privilege)
+		acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
 	serv->listen_fds[0] = acl_fifo_listen(serv->name,
 			0622, ACL_NON_BLOCKING);
 	if (serv->listen_fds[0] == ACL_SOCKET_INVALID)
@@ -209,7 +212,7 @@ static void master_listen_fifo(ACL_MASTER_SERV *serv)
 		O_RDONLY, acl_var_master_buf_size,
 		acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN);
 	acl_close_on_exec(serv->listen_fds[0], ACL_CLOSE_ON_EXEC);
-	if (acl_var_master_set_ugid)
+	if (acl_var_master_limit_privilege)
 		acl_set_ugid(getuid(), getgid());
 	acl_msg_info("%s(%d), %s: listen on fifo socket: %s",
 		__FILE__, __LINE__, myname, serv->name);

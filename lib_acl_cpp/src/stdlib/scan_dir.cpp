@@ -78,7 +78,7 @@ const char* scan_dir::next_file(bool full /* = false */)
 
 	if (file_buf_ == NULL)
 		file_buf_ = NEW string(256);
-	file_buf_->format("%s/%s", path, file);
+	file_buf_->format("%s%c%s", path, PATH_SEP_C, file);
 
 	return file_buf_->c_str();
 }
@@ -100,7 +100,7 @@ const char* scan_dir::next_dir(bool full /* = false */)
 
 	if (file_buf_ == NULL)
 		file_buf_ = NEW string(256);
-	file_buf_->format("%s/%s", path, dir);
+	file_buf_->format("%s%c%s", path, PATH_SEP_C, dir);
 
 	return file_buf_->c_str();
 }
@@ -125,7 +125,7 @@ const char* scan_dir::next(bool full /* = false */, bool* is_file /* = NULL */)
 
 	if (file_buf_ == NULL)
 		file_buf_ = NEW string(256);
-	file_buf_->format("%s/%s", path, name);
+	file_buf_->format("%s%c%s", path, PATH_SEP_C, name);
 
 	return file_buf_->c_str();
 }
@@ -179,7 +179,7 @@ const char* scan_dir::curr_path(bool full /* = false */)
 
 	if (path_buf_ == NULL)
 		path_buf_ = NEW string(256);
-	path_buf_->format("%s/%s", buf, rpath);
+	path_buf_->format("%s%c%s", buf, PATH_SEP_C, rpath);
 
 	return path_buf_->c_str();
 }
@@ -200,7 +200,7 @@ const char* scan_dir::curr_file(bool full /* = false */)
 
 	if (file_buf_ == NULL)
 		file_buf_ = NEW string(256);
-	file_buf_->format("%s/%s", path, ptr);
+	file_buf_->format("%s%c%s", path, PATH_SEP_C, ptr);
 
 	return file_buf_->c_str();
 }

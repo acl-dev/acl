@@ -201,7 +201,7 @@ int acl_scan_dir_push(ACL_SCAN_DIR *scan, const char *path)
 	info = (ACL_SCAN_INFO *) acl_mymalloc(sizeof(*info));
 	if (scan->current) {
 		info->path = acl_concatenate(ACL_SCAN_DIR_PATH(scan),
-				"/", path, (char *) 0);
+				PATH_SEP_S, path, (char *) 0);
 	} else {
 		info->path = acl_mystrdup(path);
 	}
@@ -290,8 +290,8 @@ const char *acl_scan_dir_next_file(ACL_SCAN_DIR *scan)
 				return (NULL);
 			continue;
 		}
-		snprintf(pathbuf, sizeof(pathbuf), "%s/%s",
-			ACL_SCAN_DIR_PATH(scan), name);
+		snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
+			ACL_SCAN_DIR_PATH(scan), PATH_SEP_C, name);
 		if (acl_stat(pathbuf, &sbuf) < 0) {
 			char  tbuf[256];
 			acl_msg_error("%s(%d), %s: stat file(%s) error(%s)",
@@ -333,8 +333,8 @@ const char *acl_scan_dir_next_dir(ACL_SCAN_DIR *scan)
 				return (NULL);
 			continue;
 		}
-		snprintf(pathbuf, sizeof(pathbuf), "%s/%s",
-			ACL_SCAN_DIR_PATH(scan), name);
+		snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
+			ACL_SCAN_DIR_PATH(scan), PATH_SEP_C, name);
 		if (acl_stat(pathbuf, &sbuf) < 0) {
 			char  tbuf[256];
 			acl_msg_error("%s(%d), %s: stat file(%s) error(%s)",
@@ -372,8 +372,8 @@ const char *acl_scan_dir_next_name(ACL_SCAN_DIR *scan, int *is_file)
 				return (NULL);
 			continue;
 		}
-		snprintf(pathbuf, sizeof(pathbuf), "%s/%s",
-			ACL_SCAN_DIR_PATH(scan), name);
+		snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
+			ACL_SCAN_DIR_PATH(scan), PATH_SEP_C, name);
 		if (acl_stat(pathbuf, &sbuf) < 0) {
 			char  tbuf[256];
 			acl_msg_error("%s(%d), %s: stat file(%s) error(%s)",
@@ -420,8 +420,8 @@ acl_int64 acl_scan_dir_size2(ACL_SCAN_DIR *scan, int *nfile, int *ndir)
 				break;
 			continue;
 		}
-		snprintf(pathbuf, sizeof(pathbuf), "%s/%s",
-			ACL_SCAN_DIR_PATH(scan), name);
+		snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
+			ACL_SCAN_DIR_PATH(scan), PATH_SEP_C, name);
 		if (acl_stat(pathbuf, &sbuf) < 0) {
 			char  tbuf[256];
 			acl_msg_error("%s(%d), %s: stat file(%s) error(%s)",
@@ -509,8 +509,8 @@ acl_int64 acl_scan_dir_rm2(ACL_SCAN_DIR *scan, int *ndir, int *nfile)
 			continue;
 		}
 
-		snprintf(path, sizeof(path), "%s/%s",
-			ACL_SCAN_DIR_PATH(scan), name);
+		snprintf(path, sizeof(path), "%s%c%s",
+			ACL_SCAN_DIR_PATH(scan), PATH_SEP_C, name);
 
 		if (acl_stat(path, &sbuf) < 0) {
 			char tbuf[256];

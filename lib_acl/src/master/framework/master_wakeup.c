@@ -99,11 +99,12 @@ static void master_wakeup_timer_event(int type acl_unused,
 		 * module that is paranoid about open() calls.
 		 */
 		case ACL_MASTER_SERV_TYPE_FIFO:
-			acl_set_eugid(acl_var_master_owner_uid,
-				acl_var_master_owner_gid);
+			if (acl_var_master_limit_privilege)
+				acl_set_eugid(acl_var_master_owner_uid,
+					acl_var_master_owner_gid);
 			status = acl_fifo_trigger(acl_var_master_global_event,
 				serv->name, &wakeup, sizeof(wakeup), BRIEFLY);
-			if (acl_var_master_set_ugid)
+			if (acl_var_master_limit_privilege)
 				acl_set_ugid(getuid(), getgid());
 			break;
 		default:

@@ -1,7 +1,18 @@
 修改历史列表：
 ------------------------------------------------------------------------
+236) 2014.5.22
+236.1) bufix: http_client 类的构造函数 http_client() 中没有对 buf_ 赋 NULL，结果
+导致在 http_client::reset 中对 buf_ 进行 reset 操作时造成了非法指针引用
+
+235) 2014.5.20
+235.1) bugfix: connect_manager 连接池集群管理类当某个连接池有问题时，不能自动将失败的
+连接池进行恢复，最后可能会导致所有连接池不可用
+235.2) feature: connect_manager 增加了设置了用于连接池自动恢复的时来设置恢复时间间隔
+的方法：set_retry_inter
+
 234) 2014.5.15
 234.1) feature: 增加了 stdlib/scan_dir 类，该类用于磁盘目录扫描
+234.2) sample: 新增示例 samples/dircopy 用来拷贝目录结构，内部使用了 scan_dir 类
 
 233) 2014.5.13
 233.1) feature: string/http_client/http_request 类增加了按行读数据的方法

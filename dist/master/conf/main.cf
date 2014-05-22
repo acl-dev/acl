@@ -33,3 +33,5 @@ queue_directory = {install_path}/var
 pid_file = {install_path}/var/pid/acl_master.pid
 # 是否扫描并行 {install_path}/conf/service/ 目录下的子目录服务配置文件，0 -- 否，1 -- 是
 scan_subdir = 0
+# 是否允许自动切换用户运行身份
+# limit_privilege = 0

@@ -114,9 +114,9 @@ extern int   acl_var_master_rw_timeout;
 #define	ACL_DEF_MASTER_SCAN_SUBDIR	0
 extern int   acl_var_master_scan_subdir;
 
-#define	ACL_VAR_MASTER_SET_UGID		"set_ugid"
-#define	ACL_DEF_MASTER_SET_UGID		1
-extern int   acl_var_master_set_ugid;
+#define	ACL_VAR_MASTER_LIMIT_PRIVILEGE	"limit_privilege"
+#define	ACL_DEF_MASTER_LIMIT_PRIVILEGE	0
+extern int   acl_var_master_limit_privilege;
 
 extern pid_t acl_var_master_pid;
 

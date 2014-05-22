@@ -37,13 +37,19 @@ public:
 		int default_count);
 
 	/**
-	* 添加服务器的客户端连接池，，该函数可以在程序运行过程中
-	* 被调用，因为内部会自动加锁
+	* 添加服务器的客户端连接池，该函数可以在程序运行时被调用，内部自动加锁
 	 * @param addr {const char*} 服务器地址(ip:port)
 	 * @param count {int} 连接池数量限制
 	 * @return {connect_pool&} 返回新添加的连接池对象
 	 */
 	connect_pool& set(const char* addr, int count);
+
+	/**
+	 * 设置连接池失败后重试的时间时间隔（秒），该函数可以在程序运行时被调用，内部自动加锁
+	 * @param n {int} 当该值 <= 0 时，若连接池出现问题则会立即被重试
+	 * @return {void}
+	 */
+	void set_retry_inter(int n);
 
 	/**
 	 * 从连接池集群中删除某个地址的连接池，该函数可以在程序运行过程中
@@ -165,6 +171,7 @@ private:
 	size_t service_idx_;			// 下一个要访问的的下标值
 	locker lock_;				// 访问 pools_ 时的互斥锁
 	int  stat_inter_;			// 统计访问量的定时器间隔
+	int  retry_inter_;			// 连接池失败后重试的时间间隔
 	connect_monitor* monitor_;		// 后台检测线程句柄
 
 	// 设置除缺省服务之外的服务器集群

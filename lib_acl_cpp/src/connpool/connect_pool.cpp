@@ -21,7 +21,7 @@ connect_pool::connect_pool(const char* addr, int max, size_t idx /* = 0 */)
 , current_used_(0)
 , last_(0)
 {
-	retry_inter_ = 10;
+	retry_inter_ = 1;
 
 	if (max_ < 1)
 		max_ = 10;
@@ -44,8 +44,32 @@ connect_pool& connect_pool::set_idle_ttl(time_t ttl)
 
 connect_pool& connect_pool::set_retry_inter(int retry_inter)
 {
+	lock_.lock();
 	retry_inter_ = retry_inter;
+	lock_.unlock();
+
 	return *this;
+}
+
+bool connect_pool::aliving()
+{
+	// XXX，虽然此处未加锁，但也应该不会有问题，因为下面的 peek() 过程会再次
+	// 对 alive_ 加锁，以防止多线程操作时的冲突
+	if (alive_)
+		return true;
+
+	time_t now = time(NULL);
+
+	lock_.lock();
+	if (now - last_dead_ >= retry_inter_)
+	{
+		alive_ = true;
+		lock_.unlock();
+		return true;
+	}
+
+	lock_.unlock();
+	return false;
 }
 
 connect_client* connect_pool::peek()

@@ -13,6 +13,7 @@ connect_manager::connect_manager()
 : default_pool_(NULL)
 , service_idx_(0)
 , stat_inter_(1)
+, retry_inter_(1)
 , monitor_(NULL)
 {
 }
@@ -56,6 +57,22 @@ static int check_addr(const char* addr, string& buf, int default_count)
 		conn_max = default_count;
 	acl_argv_free(tokens);
 	return conn_max;
+}
+
+void connect_manager::set_retry_inter(int n)
+{
+	if (n == retry_inter_)
+		return;
+
+	lock_.lock();
+
+	retry_inter_ = n;
+
+	std::vector<connect_pool*>::iterator it = pools_.begin();
+	for (; it != pools_.end(); ++it)
+		(*it)->set_retry_inter(retry_inter_);
+
+	lock_.unlock();
 }
 
 void connect_manager::init(const char* default_addr,
@@ -129,6 +146,8 @@ connect_pool& connect_manager::set(const char* addr, int count)
 	}
 
 	connect_pool* pool = create_pool(key, count, pools_.size() - 1);
+	if (retry_inter_ > 0)
+		pool->set_retry_inter(retry_inter_);
 	pools_.push_back(pool);
 
 	lock_.unlock();

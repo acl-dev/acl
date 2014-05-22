@@ -8,6 +8,21 @@
 #endif // WIN32
 #include "acl_cpp/lib_acl.hpp"
 
+#ifdef WIN32
+#define SEP	'\\'
+#else
+#define SEP	'/'
+#endif
+
+// 去年路径前的 "./" 或 ".\"，因为在 WIN32 下
+#define SKIP(ptr) do  \
+{  \
+	if (*ptr == '.' && *(ptr + 1) == '/')  \
+		ptr += 2;  \
+	else if (*ptr == '.' && *(ptr + 1) == '\\')  \
+		ptr += 2;  \
+} while (0)
+
 static bool copy_file(acl::ifstream& in, const acl::string& to_path,
 	const acl::string& to_filepath, int* ncopied)
 {
@@ -54,15 +69,16 @@ static bool copy_file(acl::ifstream& in, const acl::string& to_path,
 		ret = in.read(buf, sizeof(buf), false);
 		if (ret == -1)
 		{
-			if (nread != length)
-			{
-				logger_error("read from file: %s error: %s, nread: %lld, "
-					"length: %lld", in.file_path(),
-					acl::last_serror(), nread, length);
-				return false;
-			}
-			break;
+			if (nread == length)
+				break;
+
+			logger_error("read from file: %s error: %s, "
+				"nread: %lld, length: %lld",
+				in.file_path(), acl::last_serror(),
+				nread, length);
+			return false;
 		}
+
 		nread += ret;
 
 		if (out.write(buf, ret) == -1)
@@ -89,8 +105,17 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 		return false;
 	}
 
+	SKIP(rpath);
+	SKIP(name);
+
+//	printf(">>rpath: %s\r\n", rpath);
+//	printf(">>name: %s\r\n", name);
+
 	acl::string from_filepath;
-	from_filepath.format("%s/%s", rpath, name);
+	if (*rpath == 0)
+		from_filepath << name;
+	else
+		from_filepath << rpath << SEP << name;
 
 	acl::ifstream from_fp;
 	if (from_fp.open_read(from_filepath.c_str()) == false)
@@ -102,8 +127,8 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 
 	acl::string to_pathbuf;
 	acl::string to_filepath;
-	to_pathbuf.format("%s/%s", to_path.c_str(), rpath);
-	to_filepath.format("%s/%s/%s", to_path.c_str(), rpath, name);
+	to_pathbuf << to_path << SEP << rpath;
+	to_filepath << to_path << SEP << rpath << SEP << name;
 
 	//printf("from_filepath: %s, to_filepath: %s\r\n",
 	//	from_fp.file_path(), to_filepath.c_str());
@@ -174,8 +199,11 @@ static bool check_dir(acl::scan_dir& scan, const char* to, int* ncopied)
 		return false;
 	}
 
+	SKIP(rpath);
+
 	acl::string to_path;
-	to_path.format("%s/%s", to, rpath);
+	to_path << to << SEP << rpath;
+	// printf(">>to_path: %s, to: %s\r\n", to_path.c_str(), to);
 
 	if (access(to_path.c_str(), 0) == 0)
 		return true;
@@ -188,7 +216,11 @@ static bool check_dir(acl::scan_dir& scan, const char* to, int* ncopied)
 			return true;
 		}
 		else
+		{
+			logger_error("make dirs(%s) error: %s",
+				to_path.c_str(), acl::last_serror());
 			return false;
+		}
 	}
 }
 
@@ -207,14 +239,22 @@ static void do_copy(const acl::string& from, const acl::string& to)
 	int   nfiles = 0, ndirs = 0, nfiles_copied = 0, ndirs_copied = 0;
 	while ((name = scan.next(false, &is_file)) != NULL)
 	{
+		SKIP(name);
+
 		if (is_file)
 		{
 			if (cmp_copy(scan, name, to, &nfiles_copied) == false)
+			{
+				printf(">>cm_copy failed, name: %s\r\n", name);
 				break;
+			}
 			nfiles++;
 		}
 		else if (check_dir(scan, to, &ndirs_copied) == false)
+		{
+			printf(">>check_dir failed, name: %s\r\n", name);
 			break;
+		}
 		else
 			ndirs++;
 
@@ -283,7 +323,7 @@ int main(int argc, char* argv[])
 	}
 
 	char path[256];
-	if (getcwd(path, sizeof(path)) < 0)
+	if (getcwd(path, sizeof(path)) == NULL)
 	{
 		logger_error("getcwd error: %s", path);
 		return 1;

@@ -72,11 +72,11 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 };
 
 int   acl_var_master_scan_subdir;
-int  acl_var_master_set_ugid;
+int   acl_var_master_limit_privilege;
 
 static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
 	{ ACL_VAR_MASTER_SCAN_SUBDIR, ACL_DEF_MASTER_SCAN_SUBDIR, &acl_var_master_scan_subdir },
-	{ ACL_VAR_MASTER_SET_UGID, ACL_DEF_MASTER_SET_UGID, &acl_var_master_set_ugid },
+	{ ACL_VAR_MASTER_LIMIT_PRIVILEGE, ACL_DEF_MASTER_LIMIT_PRIVILEGE, &acl_var_master_limit_privilege },
 	{ 0, 0, 0 },
 };
 #endif  /* ACL_UNIX */

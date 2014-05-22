@@ -23,6 +23,7 @@ http_client::http_client(void)
 , body_finish_(false)
 , disconnected_(true)
 , chunked_transfer_(false)
+, buf_(NULL)
 {
 }
 

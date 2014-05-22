@@ -274,8 +274,8 @@ static char *path_str_strip(const char *psrc, char *pbuf, int sizeb)
 	n       = sizeb;
 
 	while (*ptr_src && n > 0) {
-		if (*ptr_src == c_pathdelim_chr
-		    && *(ptr_src + 1) == c_pathdelim_chr)
+		if (*ptr_src == PATH_SEP_C
+		    && *(ptr_src + 1) == PATH_SEP_C)
 			; /* skip any useless '/'(in unix) or '\\'(in windows) */
 		else {
 			*ptr_obj++ = *ptr_src;
@@ -325,10 +325,10 @@ int acl_dir_correct(const char *psrc_dir, char *pbuf, int sizeb)
 
 	/* 为了保证最后一个字符肯定为 '/'(unix) or '\\'(windows), 需做如下处理 */
 
-	if (*(ptr - 1) != c_pathdelim_chr) {
+	if (*(ptr - 1) != PATH_SEP_C) {
 		if (ptr >= pbuf + sizeb) /* 说明所给的内存空间不够 */
 			return(-1);
-		*ptr++ = c_pathdelim_chr;
+		*ptr++ = PATH_SEP_C;
 		*ptr = 0;
 	}
 	return(0);
@@ -345,7 +345,7 @@ int acl_dir_getpath(const char *pathname, char *pbuf, int bsize)
 	n = acl_file_path_correct(pathname, pbuf, bsize);
 	if (n < 0)
 		return (-1);
-	ptr = strrchr(pbuf, c_pathdelim_chr);
+	ptr = strrchr(pbuf, PATH_SEP_C);
 	if (ptr != NULL)
 		*ptr = 0;
 	if (ptr == pbuf) { /* such as "/tmp.txt", I'll left "/" */

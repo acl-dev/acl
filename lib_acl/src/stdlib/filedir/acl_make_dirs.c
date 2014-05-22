@@ -184,6 +184,7 @@ int acl_make_dirs(const char *path, int perms)
 
 				if (error != ERROR_ALREADY_EXISTS)
 					break;
+				ret = 0;
 				/* Race condition? */
 				if ((ret = stat(saved_path, &st)) < 0)
 					break;
@@ -192,7 +193,8 @@ int acl_make_dirs(const char *path, int perms)
 					ret = -1;
 					break;
 				}
-			}
+			} else
+				ret = 0;
 		}
 		if (saved_ch != 0)
 			*cp = saved_ch;

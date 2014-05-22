@@ -65,11 +65,14 @@
 # ifdef	ACL_BCB_COMPILER
 #  pragma hdrstop
 # endif
-# define	_USE_FAST_MACRO
-# define	_USE_HTABLE_SEARCH
+# define _USE_FAST_MACRO
+# define _USE_HTABLE_SEARCH
 
-# ifndef	c_pathdelim_chr
-#  define	c_pathdelim_chr '\\'
+# ifndef PATH_SEP_C
+#  define PATH_SEP_C '\\'
+# endif
+# ifndef PATH_SEP_S
+#  define PATH_SEP_S "\\"
 # endif
 
 # undef	ACL_HAS_PTHREAD
