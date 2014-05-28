@@ -30,39 +30,41 @@ public:
 	 * 扫描下一个文件(遇到目录会自动跳过)，当在 open 指定了允许递归扫描选项
 	 * (即 recursive = true)，则该函数会递归扫描所打开目录的所有子目录
 	 * @param full {bool} 是否需要返回文件全路径
-	 * @return {const char*} 非 NULL 表示所扫描到的文件名，否则表示扫描完毕或目录
-	 *  还未打开
+	 * @return {const char*} 非 NULL 表示所扫描到的文件名，否则表示扫描完毕
+	 *  或目录还未打开
 	 */
 	const char* next_file(bool full = false);
 
 	/**
-	 * 扫描下一个目录(遇到文件或 "." 或 ".." 会跳过)，当在 open 指定允许了允许递归
-	 * 扫描项(即 recursive = true)，则该函数会递归扫描所开目录的所有子目录
+	 * 扫描下一个目录(遇到文件或 "." 或 ".." 会跳过)，当在 open 指定允许了
+	 * 允许递归扫描项(即 recursive = true)，则该函数会递归扫描所开目录的所
+	 * 有子目录
 	 * @param full {bool} 是否需要返回目录全路径
-	 * @return {const char*} 非 NULL 表示所扫描到的目录名，否则表示扫描完毕或目录
-	 *  还未打开
+	 * @return {const char*} 非 NULL 表示所扫描到的目录名，否则表示扫描完
+	 *  毕或目录还未打开
 	 */
 	const char* next_dir(bool full = false);
 
 	/**
-	 * 扫描下一个目录或文件，当在 open 指定了允许递归扫描项(即 resursive = true)，
-	 * 则该函数会递归扫描所打开目录的所有子目录及文件
-	 * @param full {bool} 是否需要返回目录或文件的全路径，如果为 true 则返回全路径，
-	 *  否则只返回文件名或目录名且都不含路径
-	 * @param is_file {bool*} 当返回结果非空时，该地址存储的值表示所扫描到的是否是
-	 *  文件，如果为 true 则为文件，否则为目录
-	 * @return {const char*} 非 NULL 表示所扫描到的目录名或文件名，否则表示扫描
-	 *  完毕或目录还未打开 
+	 * 扫描下一个目录或文件，当在 open 指定了允许递归扫描项(即 resursive
+	 * = true)，则该函数会递归扫描所打开目录的所有子目录及文件
+	 * @param full {bool} 是否需要返回目录或文件的全路径，如果为 true 则返
+	 *  回全路径，否则只返回文件名或目录名且都不含路径
+	 * @param is_file {bool*} 当返回结果非空时，该地址存储的值表示所扫描到
+	 *  的是否是文件，如果为 true 则为文件，否则为目录
+	 * @return {const char*} 非 NULL 表示所扫描到的目录名或文件名，否则表
+	 *  示扫描完毕或目录还未打开 
 	 */
 	const char* next(bool full = false, bool* is_file = NULL);
 
 	/**
-	 * 获得当前扫描过程所在的目录路径
-	 * @param full {bool} 为 true 时表示获得扫描程序当前所在的系统绝对路径，否则为
-	 *  相对于程序调用 open 函数时的程序运行路径
+	 * 获得当前扫描过程所在的目录路径，返回的路径尾部不包含路径分隔符 '/'
+	 * 或 '\\' (win32)，如对于路径：/home/zsx/，则会返回 /home/zsx，如果
+	 * 路径为根路径：/ 则该 '/' 将会保留；在 WIN32 下，返回类似于
+	 * C:\Users\zsx 的路径
 	 * @return {const char*} 当目录打开时该函数返回非空指针，否则返回 NULL
 	 */
-	const char* curr_path(bool full = false);
+	const char* curr_path();
 
 	/**
 	 * 获得当前程序扫描过程所扫到的文件名
@@ -136,6 +138,13 @@ public:
 	static unsigned long long remove_all(const char* path, bool recursive = true,
 		int* nfiles = NULL, int* ndirs = NULL);
 #endif
+
+	/**
+	 * 获得当前程序运行的路径
+	 * @param out {string&} 存储结果
+	 * @return {bool} 是否成功获得当前程序运行路径
+	 */
+	static bool get_cwd(string& out);
 
 private:
 	char* path_;

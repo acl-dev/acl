@@ -378,9 +378,6 @@
     <ClInclude Include="src\acl_stdafx.hpp">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="resource_vc2010.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="src\mime\internal\trimblanks.hpp">
       <Filter>src\mime\internal</Filter>
     </ClInclude>
@@ -771,9 +768,9 @@
     <ClInclude Include="include\acl_cpp\stdlib\scan_dir.hpp">
       <Filter>include\stdlib</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="lib_acl_cpp_vc2010.rc" />
+    <ClInclude Include="resource_vc2012.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="changes.txt" />
@@ -883,5 +880,8 @@
     <Filter Include="include\event">
       <UniqueIdentifier>{c81440c9-71a3-4a12-b078-f9845c634089}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="lib_acl_cpp_vc2012.rc" />
   </ItemGroup>
 </Project>

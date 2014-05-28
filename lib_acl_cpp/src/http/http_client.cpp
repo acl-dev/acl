@@ -708,32 +708,73 @@ bool http_client::body_gets(string& out, bool nonl /* = true */,
 	size_t* size /* = NULL */)
 {
 	if (buf_ == NULL)
-		buf_ = new string(1024);
+		buf_ = new string(4096);
 
 	size_t len, size_saved = out.length();
 
-	while (true)
+	// 首先判断是否已经读完 HTTP 数据体
+	if (body_finish_)
 	{
-		if (!buf_->empty() && buf_->scan_line(out, nonl, &len, true))
+		if (buf_->empty())
+		{
+			if (size)
+				*size = 0;
+			return false;
+		}
+
+		// 当读缓冲区数据非空时，先尝试从中获取一行数据
+		if (buf_->scan_line(out, nonl, &len) == true)
 		{
 			if (size)
 				*size = out.length() - size_saved;
 			return true;
 		}
 
+		// 如果不能读到完整行数据且 HTTP 数据体读完的情况下则将读
+		// 缓冲区内的数据都拷贝至目标缓冲区
+		out.append(buf_);
+		buf_->clear();
+
+		if (size)
+			*size = out.length() - size_saved;
+
+		return true;
+	}
+
+	// 继续读 HTTP 数据体，并尝试从中读取一行数据
+
+	len = 0;
+
+	while (true)
+	{
+		if (!buf_->empty())
+		{
+			if (buf_->scan_line(out, nonl, &len) == true)
+			{
+				if (size)
+					*size = out.length() - size_saved;
+				return true;
+			}
+
+			// 为了减少下次循环时调用 scan_line 的字符串查找次数，
+			// 将读缓冲区中的数据先拷贝至目标缓冲区中
+
+			len += buf_->length();
+			out.append(buf_);
+			buf_->clear();
+		}
+
 		if (body_finish_)
 		{
 			if (size)
-				*size = out.length() - size_saved;
-			return false;
+				*size = len;
+			return len > 0 ? true : false;
 		}
 
-		if (read_body(*buf_, false) <= 0 && buf_->empty())
-		{
-			if (size)
-				*size = out.length() - size_saved;
-			return false;
-		}
+		if (read_body(*buf_, false) <= 0)
+			body_finish_ = true;
+		else
+			body_finish_ = false;
 	}
 }
 

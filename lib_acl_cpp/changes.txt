@@ -1,5 +1,18 @@
 修改历史列表：
 ------------------------------------------------------------------------
+239) 2014.5.27
+239.1) bugfix: scan_dir 类中的 curr_path() 方法当返回全路径时有问题
+239.2) feature: string 类增加了 scan_line/scan_move 等函数，方便从缓冲区中提取
+数据，同时修改了 string::c_str(), string::length(), string::size()，使之能够
+兼容 scan_xxx 函数的操作行为
+
+238) 2014.5.26
+238.1) sample: samples/scan_dir 例子用来测试新增加的类 acl::scan_dir
+
+237) 2014.5.23
+237.1) feature: string 类为了使用方便，去掉了多个方法返回值中的限定词 const
+237.2) bugfix: scan_dir 类中的 curr_path 存在死循环过程
+
 236) 2014.5.22
 236.1) bufix: http_client 类的构造函数 http_client() 中没有对 buf_ 赋 NULL，结果
 导致在 http_client::reset 中对 buf_ 进行 reset 操作时造成了非法指针引用

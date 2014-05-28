@@ -72,13 +72,22 @@ const char* scan_dir::next_file(bool full /* = false */)
 	if (!full)
 		return file;
 
-	const char* path = curr_path(true);
+	const char* path = curr_path();
 	if (path == NULL)
 		return NULL;
 
 	if (file_buf_ == NULL)
 		file_buf_ = NEW string(256);
+
+
+#ifdef	WIN32
 	file_buf_->format("%s%c%s", path, PATH_SEP_C, file);
+#else
+	if (*path == '/' && *(path + 1) == 0)
+		file_buf_->format("%s%s", path, file);
+	else
+		file_buf_->format("%s%c%s", path, PATH_SEP_C, file);
+#endif
 
 	return file_buf_->c_str();
 }
@@ -94,13 +103,21 @@ const char* scan_dir::next_dir(bool full /* = false */)
 	if (!full)
 		return dir;
 
-	const char* path = curr_path(true);
+	const char* path = curr_path();
 	if (path == NULL)
 		return NULL;
 
 	if (file_buf_ == NULL)
 		file_buf_ = NEW string(256);
+
+#ifdef	WIN32
 	file_buf_->format("%s%c%s", path, PATH_SEP_C, dir);
+#else
+	if (*path == '/' && *(path + 1) == 0)
+		file_buf_->format("%s%s", path, dir);
+	else
+		file_buf_->format("%s%c%s", path, PATH_SEP_C, dir);
+#endif
 
 	return file_buf_->c_str();
 }
@@ -114,33 +131,42 @@ const char* scan_dir::next(bool full /* = false */, bool* is_file /* = NULL */)
 	const char* name = acl_scan_dir_next_name(scan_, &res);
 	if (name == NULL || *name == 0)
 		return NULL;
+
 	if (is_file)
 		*is_file = res ? true : false;
 	if (!full)
 		return name;
 
-	const char* path = curr_path(true);
+	const char* path = curr_path();
 	if (path == NULL)
 		return NULL;
 
 	if (file_buf_ == NULL)
 		file_buf_ = NEW string(256);
+
+
+#ifdef	WIN32
 	file_buf_->format("%s%c%s", path, PATH_SEP_C, name);
+#else
+	if (*path == '/' && *(path + 1) == 0)
+		file_buf_->format("%s%s", path, name);
+	else
+		file_buf_->format("%s%c%s", path, PATH_SEP_C, name);
+#endif
 
 	return file_buf_->c_str();
 }
 
-const char* scan_dir::curr_path(bool full /* = false */)
+const char* scan_dir::curr_path()
 {
 	if (scan_ == NULL)
 		return NULL;
 
-	const char* rpath = acl_scan_dir_path(scan_);
+	return acl_scan_dir_path(scan_);
+}
 
-	if (rpath == NULL || *rpath == 0)
-		return rpath;
-	if (!full)
-		return rpath;
+bool scan_dir::get_cwd(string& out)
+{
 
 #ifndef MAX_PATH
 #define MAX_PATH	1024
@@ -148,23 +174,24 @@ const char* scan_dir::curr_path(bool full /* = false */)
 	char  buf[MAX_PATH];
 
 #ifdef WIN32
-	if (GetCurrentDirectory(MAX_PATH, buf) == 0)
+	if (::GetCurrentDirectory(MAX_PATH, buf) == 0)
 	{
 		logger_error("can't get process path: %s", last_serror());
-		return NULL;
+		return false;
 	}
 #else
-	if (getcwd(buf, sizeof(buf)) == NULL)
+	if (::getcwd(buf, sizeof(buf)) == NULL)
 	{
 		logger_error("can't get process path: %s", last_serror());
-		return NULL;
+		return false;
 	}
 #endif // WIN32
 
 	// xxx: can this happen ?
 	if (buf[0] == 0)
-		return NULL;
+		return false;
 
+	// È¥µôÎ²²¿µÄ '/'
 	char* end = buf + strlen(buf) - 1;
 	while (end > buf)
 	{
@@ -175,13 +202,12 @@ const char* scan_dir::curr_path(bool full /* = false */)
 		if (*end == '/')
 			end--;
 #endif
+		else
+			break;
 	}
 
-	if (path_buf_ == NULL)
-		path_buf_ = NEW string(256);
-	path_buf_->format("%s%c%s", buf, PATH_SEP_C, rpath);
-
-	return path_buf_->c_str();
+	out = buf;
+	return true;
 }
 
 const char* scan_dir::curr_file(bool full /* = false */)
@@ -194,7 +220,7 @@ const char* scan_dir::curr_file(bool full /* = false */)
 	if (!full)
 		return ptr;
 
-	const char* path = curr_path(true);
+	const char* path = curr_path();
 	if (path == NULL)
 		return NULL;
 

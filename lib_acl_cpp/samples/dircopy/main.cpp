@@ -332,7 +332,7 @@ int main(int argc, char* argv[])
 
 	do_copy(".", path_to);
 
-	logger_error("enter any key to exit");
+	logger("enter any key to exit");
 	getchar();
 
 	return (0);

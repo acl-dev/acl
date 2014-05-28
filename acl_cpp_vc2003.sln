@@ -231,12 +231,18 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_acl", "lib_acl\lib_acl_vc2003.vcproj", "{B40213C2-507C-4C7F-A6E1-B850C9BDC27B}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_protocol", "lib_protocol\lib_protocol_vc2003.vcproj", "{FE724EF7-3763-4E78-BDF5-BCBC075719FD}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_acl_cpp", "lib_acl_cpp\lib_acl_cpp_vc2003.vcproj", "{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -361,6 +367,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "json6", "lib_acl_cpp\sample
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "http_request_manager", "lib_acl_cpp\samples\http_request_manager\http_request_manager.vcproj", "{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}"
 	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "connect_manager", "lib_acl_cpp\samples\connect_manager\connect_manager.vcproj", "{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}"

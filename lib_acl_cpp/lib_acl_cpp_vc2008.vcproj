@@ -826,6 +826,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stdlib\scan_dir.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stdlib\snprintf.cpp"
 					>
 				</File>
@@ -962,6 +966,14 @@
 			>
 			<File
 				RelativePath=".\src\acl_stdafx.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\include\acl_cpp\lib_acl.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\resource_vc2008.h"
 				>
 			</File>
 			<Filter
@@ -1356,6 +1368,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\stdlib\scan_dir.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\stdlib\singleton.hpp"
 					>
 				</File>
@@ -1478,6 +1494,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\lib_acl_cpp_vc2008.rc"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="doc"

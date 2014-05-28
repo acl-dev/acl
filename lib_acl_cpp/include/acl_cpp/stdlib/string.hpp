@@ -26,13 +26,15 @@ public:
 
 	/**
 	 * 构造函数
-	 * @param s {const string&} 源字符串对象，初始化后的类对象内部自动复制该字符串
+	 * @param s {const string&} 源字符串对象，初始化后的类对象内部自动复制
+	 *  该字符串
 	 */
 	string(const string& s);
 
 	/**
 	 * 构造函数
-	 * @param s {const char*} 内部自动用该字符串初始化类对象，s 必须是以 \0 结尾
+	 * @param s {const char*} 内部自动用该字符串初始化类对象，s 必须是
+	 *  以 \0 结尾
 	 */
 	string(const char* s);
 
@@ -46,9 +48,10 @@ public:
 
 	/**
 	 * 设置字符串类对象为二进制处理模式
-	 * @param bin {bool} 当该值为 true 时，则设置字符串类对象为二进制处理方式；
-	 *  否则为文本方式；该值为 true 时，则当调用 += int|int64|short|char
-	 *  或调用 << int|int64|short|char 时，则按二进制方式处理，否则按文本方式处理
+	 * @param bin {bool} 当该值为 true 时，则设置字符串类对象为二进制处理
+	 *  方式；否则为文本方式；该值为 true 时，则当调用 += int|int64|short|char
+	 *  或调用 << int|int64|short|char 时，则按二进制方式处理，否则按文本
+	 *  方式处理
 	 */
 	void set_bin(bool bin);
 
@@ -59,15 +62,19 @@ public:
 	bool get_bin() const;
 
 	/**
-	 * 根据字符数组下标获得指定位置的字符，输入参数必须为合法值，否则则内部产生断言
-	 * @param n {size_t} 指定的位置（该值 >= 0 且 < 字符串长度)，如果越界，则产生断言
+	 * 根据字符数组下标获得指定位置的字符，输入参数必须为合法值，否则则
+	 * 内部产生断言
+	 * @param n {size_t} 指定的位置（该值 >= 0 且 < 字符串长度)，如果越界
+	 *  则产生断言
 	 * @return {char} 返回指定位置的字符
 	 */
 	char operator[](size_t n);
 
 	/**
-	 * 根据字符数组下标获得指定位置的字符，输入参数必须为合法值，否则则内部产生断言
-	 * @param n {int} 指定的位置（该值 >= 0 且 < 字符串长度)，如果越界，则产生断言
+	 * 根据字符数组下标获得指定位置的字符，输入参数必须为合法值，否则则
+	 * 内部产生断言
+	 * @param n {int} 指定的位置（该值 >= 0 且 < 字符串长度)，如果越界，
+	 *  则产生断言
 	 * @return {char} 返回指定位置的字符
 	 */
 	char operator[](int n);
@@ -75,40 +82,42 @@ public:
 	/**
 	 * 对目标字符串类对象赋值
 	 * @param s {const char*} 源字符串
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(const char* s);
 
 	/**
 	 * 对目标字符串类对象赋值
 	 * @param s {const string&} 源字符串对象
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(const string& s);
 
 	/**
 	 * 对目标字符串类对象赋值
 	 * @param s {const string*} 源字符串对象
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(const string* s);
 
 #ifdef WIN32
 	/**
 	 * 对目标字符串类对象赋值
-	 * @param n {long long int} 源 64 位符号长整数，若字符串对象的当前状态为
-	 *  二进制模式，则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给
-	 *  字符串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 * @param n {long long int} 源 64 位符号长整数，若当前对象的当前状态为
+	 *  二进制模式，则该函数便会以二进制方式赋值给字符串对象，否则以文本方
+	 *  式赋值给字符串对象；关于二进制模式还是文本方式，其含义参见
+	 *  set_bin(bool)
+	 * @return {string&} 返回当前字对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(__int64 n);
 
 	/**
 	 * 对目标字符串类对象赋值
 	 * @param n {unsinged long long int} 源 64 位无符号长整数，若字符串对象
-	 *  的当前状态为二进制模式，则该函数便会以二进制方式赋值给字符串对象，否则以文本方式
-	 *  赋值给字符串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 *  的当前状态为二进制模式，则该函数便会以二进制方式赋值给字符串对象，
+	 *  否则以文本方式赋值给字符串对象；关于二进制模式还是文本方式，其含义
+	 *  参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(unsigned __int64);
 #else
@@ -118,37 +127,37 @@ public:
 
 	/**
 	 * 对目标字符串类对象赋值
-	 * @param n {char} 源有符号字符；若字符串对象的当前状态为二进制模式，则该函数
-	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；关于二进制模
-	 *  式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 * @param n {char} 源有符号字符；若字符串对象的当前状态为二进制模式，
+	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字
+	 *  符串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(char n);
 
 	/**
 	 * 对目标字符串类对象赋值
-	 * @param n {char} 源无符号字符；若字符串对象的当前状态为二进制模式，则该函数
-	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；关于二进制模
-	 *  式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 * @param n {char} 源无符号字符；若对象的当前状态为二进制模式，则该函数
+	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；
+	 *  关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(unsigned char n);
 
 	/**
 	 * 对目标字符串类对象赋值
-	 * @param n {char} 源有符号长整型；若字符串对象的当前状态为二进制模式，则该函数
-	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；关于二进制模
-	 *  式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 * @param n {char} 源有符号长整型；若对象的当前状态为二进制模式，则该函数
+	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；
+	 *  关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(long n);
 
 	/**
 	 * 对目标字符串类对象赋值
-	 * @param n {char} 源无符号长整型；若字符串对象的当前状态为二进制模式，则该函数
-	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；关于二进制模
-	 *  式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 * @param n {char} 源无符号长整型；若字对象的当前状态为二进制模式，
+	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给
+	 *  字符串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前字对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(unsigned long n);
 
@@ -181,10 +190,10 @@ public:
 
 	/**
 	 * 对目标字符串类对象赋值
-	 * @param n {char} 源无符号短整型；若字符串对象的当前状态为二进制模式，则该函数
-	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；关于二进制模
-	 *  式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 * @param n {char} 源无符号短整型；若对象的当前状态为二进制模式，则该
+	 *  函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串
+	 *  对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(unsigned short n);
 
@@ -587,11 +596,13 @@ public:
 	int ncompare(const char* s, size_t len, bool case_sensitive = true) const;
 
 	/**
-	 * 从尾部向前比较当前对象的缓冲区内容是否与所给的缓冲区的内容相同，限定比较数据长度
+	 * 从尾部向前比较当前对象的缓冲区内容是否与所给的缓冲区的内容相同，
+	 * 限定比较数据长度
 	 * @param s {const void*} 输入的缓冲区地址
 	 * @param len {size_t} ptr 的缓冲区内数据长度
 	 * @param case_sensitive {bool} 为 true 表示区分大小写
-	 * @return {int} 0：表示二者相同； > 0：当前对象缓冲区内容大于输入的内容；
+	 * @return {int} 0：表示二者相同；
+	 *  > 0：当前对象缓冲区内容大于输入的内容；
 	 *  < 0 ：当前对象缓冲内容小于输入的内容
 	 */
 	int rncompare(const char* s, size_t len, bool case_sensitive = true) const;
@@ -607,58 +618,68 @@ public:
 	 * 查找指定字符吕在当前对象缓冲区的起始位置（下标从 0 开始）
 	 * @param needle {const char*} 要查找的有符号字符串
 	 * @param case_sensitive {bool} 为 true 表示区分大小写
-	 * @return {const char*} 字符串在缓冲区中的起始位置，若返回值为空指针则表示不存在
+	 * @return {char*} 字符串在缓冲区中的起始位置，若返回值为空指针则表示不存在
 	 */
-	const char* find(const char* needle, bool case_sensitive=true) const;
+	char* find(const char* needle, bool case_sensitive=true) const;
 
 	/**
 	 * 从尾部向前查找指定字符吕在当前对象缓冲区的起始位置（下标从 0 开始）
 	 * @param needle {const char*} 要查找的有符号字符串
 	 * @param case_sensitive {bool} 为 true 表示区分大小写
-	 * @return {const char*} 字符串在缓冲区中的起始位置，若返回值为空指针则表示不存在
+	 * @return {char*} 字符串在缓冲区中的起始位置，若返回值为空指针则表示不存在
 	 */
-	const char* rfind(const char* needle, bool case_sensitive=true) const;
+	char* rfind(const char* needle, bool case_sensitive=true) const;
 
 	/**
 	 * 返回从当前字符串对象中缓冲区指定位置以左的内容
 	 * @param npos {size_t} 下标位置，当该值大于等于当前字符串的数据长度时，
 	 *  则返回整个字符串对象；返回值不包含该值指定位置的字符内容
-	 * @return {const string} 返回值为一完整的对象，不需要单独释放，该函数的效率
+	 * @return {string} 返回值为一完整的对象，不需要单独释放，该函数的效率
 	 *  可能并不太高
 	 */
-	const string left(size_t npos);
+	string left(size_t npos);
 
 	/**
 	 * 返回从当前字符串对象中缓冲区指定位置以右的内容
 	 * @param npos {size_t} 下标位置，当该值大于等于当前字符串的数据长度时，
 	 *  则返回的字符串对象内容为空；返回值不包含该值指定位置的字符内容
-	 * @return {const string} 返回值为一完整的对象，不需要单独释放，该函数的效率
-	 *  可能并不太高
+	 * @return {const string} 返回值为一完整的对象，不需要单独释放，该
+	 *  函数的效率可能并不太高
 	 */
-	const string right(size_t npos);
+	string right(size_t npos);
 
 	/**
 	 * 将当前对象的缓冲内容拷贝一部分数据至目标缓冲内
 	 * @param buf {void*} 目标缓冲区地址
 	 * @param size {size_t} buf 缓冲区长度
-	 * @param move {bool} 在拷贝完数据后，是否需要将后面的数据向前移动并覆盖前面
-	 *  的已拷贝的数据
+	 * @param move {bool} 在拷贝完数据后，是否需要将后面的数据向前移动并
+	 *  覆盖前面的已拷贝的数据
 	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
 	 */
 	size_t scan_buf(void* buf, size_t size, bool move = false);
 
 	/**
-	 * 从当前对象的缓冲区中拷贝一行数据(包含"\r\n")至目标缓冲区内，当数据被拷贝至
-	 * 目标缓冲区后，在源缓冲区内未被拷贝的数据会发生移动并覆盖被拷贝的数据区域
-	 * @param out {string&} 目标缓冲区
+	 * 从当前对象的缓冲区中拷贝一行数据(包含"\r\n")至目标缓冲区内，当数据
+	 * 被拷贝至目标缓冲区后，在源缓冲区内未被拷贝的数据会发生移动并覆盖被
+	 * 拷贝的数据区域
+	 * @param out {string&} 目标缓冲区，函数内部不会先自动清空该缓冲区
 	 * @param nonl {bool} 返回的一行数据是否去掉尾部的 "\r\n" 或 "\n"
-	 * @param n {size_t*} 该参数为非空指针时，则存储拷贝到的数据长度；当读到一
-	 *  个空行且 nonl 为 true 时，则该地址存储 0
-	 * @param part_copy {bool} 若当前缓冲区没有一行数据时是否依然拷贝
-	 * @return {bool} 是否拷贝了一个完整行数据 
+	 * @param n {size_t*} 该参数为非空指针时，则存储拷贝到的数据长度；当读
+	 *  到一个空行且 nonl 为 true 时，则该地址存储 0
+	 * @param move {bool} 在拷贝完数据后，是否需要将后面的数据向前移动并
+	 *  覆盖前面的已拷贝的数据
+	 * @return {bool} 是否拷贝了一个完整行数据，如果返回 false 还需要根据
+	 *  empty() == true 来判断当前缓冲区中是否还有数据
 	 */
-	bool scan_line(string& out, bool nonl = true,
-		size_t* n = NULL, bool part_copy = false);
+	bool scan_line(string& out, bool nonl = true, size_t* n = NULL,
+		bool move = false);
+
+	/**
+	 * 当使用 scan_xxx 类方法对缓冲区进行操作时未指定 move 动作，则调用本
+	 * 函数可以使缓冲区内剩余的数据向前移动至缓冲区首部
+	 * @return {size_t} 移动的字节数
+	 */
+	size_t scan_move();
 
 	/**
 	 * 返回当前对象缓冲区中第一个不含数据的尾部地址
@@ -726,24 +747,27 @@ public:
 	/**
 	 * 将当前对象存储的字符串进行分割
 	 * @param sep {const char*} 进行分割时的分割标记
-	 * @return {const std::list<string>&} 返回 list 格式的分割结果
+	 * @return {std::list<string>&} 返回 list 格式的分割结果，返回的结果不需要
+	 *  释放，其引用了当前对象的一个内部指针
 	 */
-	const std::list<string>& split(const char* sep);
+	std::list<string>& split(const char* sep);
 
 	/**
 	 * 将当前对象存储的字符串进行分割
 	 * @param sep {const char*} 进行分割时的分割标记
-	 * @return {const std::vector<string>&} 返回 vector 格式的分割结果
+	 * @return {std::vector<string>&} 返回 vector 格式的分割结果，返回的结果不
+	 *  需要释放，其引用了当前对象的一个内部指针
 	 */
-	const std::vector<string>& split2(const char* sep);
+	std::vector<string>& split2(const char* sep);
 
 	/**
 	 * 以 '=' 为分隔符将当前对象存储的字符串分割成 name/value 对，分割时会自动
 	 * 去掉源字符串的起始处、结尾处以及分隔符 '=' 两边的空格及 TAB
-	 * @return {const std::pair<string, string>&} 如果当前对象存储的字符串
-	 *  不符合分割条件（即不是严格的 name=value格式），则返回的结果中字符串对象为空串
+	 * @return {std::pair<string, string>&} 如果当前对象存储的字符串
+	 *  不符合分割条件（即不是严格的 name=value格式），则返回的结果中字符串对象为空串,
+	 *  返回的结果不需要释放，其引用了当前对象的一个内部地址
 	 */
-	const std::pair<string, string>& split_nameval(void);
+	std::pair<string, string>& split_nameval(void);
 
 	/**
 	 * 将字符串拷贝到当前对象的缓冲区中
@@ -1012,43 +1036,44 @@ public:
 	/**
 	 * 将 32 位有符号整数转为字符串存（内部使用了线程局部变量）
 	 * @param n {int} 32 位有符号整数
-	 * @return {const string&} 转换结果对象的引用
+	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
 	 */
-	static const string& parse_int(int n);
+	static string& parse_int(int n);
 
 	/**
 	 * 将 32 位无符号整数转为字符串存（内部使用了线程局部变量）
 	 * @param n {int} 32 位无符号整数
-	 * @return {const string&} 转换结果对象的引用
+	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
 	 */
-	static const string& parse_int(unsigned int n);
+	static string& parse_int(unsigned int n);
 #ifdef WIN32
-	static const string& parse_int64(__int64 n);
-	static const string& parse_int64(unsigned __int64 n);
+	static string& parse_int64(__int64 n);
+	static string& parse_int64(unsigned __int64 n);
 #else
 	/**
 	 * 将 64 位有符号整数转为字符串存（内部使用了线程局部变量）
 	 * @param n {long long int} 64 位有符号整数
-	 * @return {const string&} 转换结果对象的引用
+	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
 	 */
-	static const string& parse_int64(long long int n);
+	static string& parse_int64(long long int n);
 
 	/**
 	 * 将 64 位无符号整数转为字符串存（内部使用了线程局部变量）
 	 * @param n {unsigned long long int} 64 位无符号整数
-	 * @return {const string&} 转换结果对象的引用
+	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
 	 */
-	static const string& parse_int64(unsigned long long int n);
+	static string& parse_int64(unsigned long long int n);
 #endif
 
 private:
-	bool m_bin;
+	bool use_bin_;
+	ACL_VSTRING* vbf_;
+	char* scan_ptr_;
+	std::list<string>* list_tmp_;
+	std::vector<string>* vector_tmp_;
+	std::pair<string, string>* pair_tmp_;
+
 	void init(size_t len);
-	ACL_VSTRING* m_pVbf;
-	const char* m_ptr;
-	std::list<string>* m_psList;
-	std::vector<string>* m_psList2;
-	std::pair<string, string>* m_psPair;
 };
 
 } // namespce acl

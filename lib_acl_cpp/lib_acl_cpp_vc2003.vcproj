@@ -1,206 +1,134 @@
 <?xml version="1.0" encoding="gb2312"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="7.10"
 	Name="lib_acl_cpp"
 	ProjectGUID="{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}"
 	RootNamespace="lib_acl_cpp"
-	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
-	>
+	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
-			Name="Win32"
-		/>
+			Name="Win32"/>
 	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="."
 			IntermediateDirectory="Debug"
 			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
+			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\lib_protocol\include;..\lib_acl\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;USE_WIN_ICONV;HAS_SQLITE"
-				MinimalRebuild="true"
+				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="acl_stdafx.hpp"
 				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
 				ProgramDataBaseFileName="$(OutDir)/$(ProjectName)_vc2003d.pdb"
 				WarningLevel="3"
-				WarnAsError="true"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
-			/>
+				WarnAsError="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/$(ProjectName)_vc2003d.lib"
-			/>
+				OutputFile="$(OutDir)/$(ProjectName)_vc2003d.lib"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y&#x0D;&#x0A;copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y&#x0D;&#x0A;"
-			/>
+				CommandLine="copy $(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y
+copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
+"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="."
 			IntermediateDirectory="Release"
 			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
+			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=".\include;..\lib_protocol\include;..\lib_acl\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV;HAS_SQLITE"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="acl_stdafx.hpp"
 				ProgramDataBaseFileName="$(OutDir)/$(ProjectName)_vc2003.pdb"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
-			/>
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/$(ProjectName)_vc2003.lib"
-			/>
+				OutputFile="$(OutDir)/$(ProjectName)_vc2003.lib"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y&#x0D;&#x0A;copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y&#x0D;&#x0A;"
-			/>
+				CommandLine="copy $(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y
+copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
+"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
 			Name="DebugDll|Win32"
 			OutputDirectory="."
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
+			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\lib_protocol\include;..\lib_acl\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_SQLITE"
-				MinimalRebuild="false"
+				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="acl_stdafx.hpp"
 				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
 				ProgramDataBaseFileName="$(OutDir)/$(ProjectName)_d.pdb"
 				WarningLevel="3"
-				WarnAsError="true"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
-			/>
+				WarnAsError="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="lib_acl_d.lib lib_protocol_d.lib polarssl.lib"
@@ -209,123 +137,96 @@
 				AdditionalLibraryDirectories="..\lib\win32;..\dist\lib\win32"
 				IgnoreDefaultLibraryNames="libc"
 				ModuleDefinitionFile=""
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="TRUE"
 				AssemblyDebug="1"
-				GenerateMapFile="true"
-				MapExports="false"
+				GenerateMapFile="TRUE"
+				MapExports="FALSE"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				SupportUnloadOfDelayLoadedDLL="false"
+				SupportUnloadOfDelayLoadedDLL="FALSE"
 				ImportLibrary="$(OutDir)/$(TargetName).lib"
-				TargetMachine="1"
-			/>
+				TargetMachine="1"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
+				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y&#x0D;&#x0A;copy $(TargetName).dll ..\dist\lib\win32\$(TargetName).dll /Y&#x0D;&#x0A;copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y&#x0D;&#x0A;"
-			/>
+				CommandLine="copy $(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y
+copy $(TargetName).dll ..\dist\lib\win32\$(TargetName).dll /Y
+copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
+"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
 			Name="Releasedll|Win32"
 			OutputDirectory="."
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
+			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\lib_protocol\include;..\lib_acl\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_SQLITE"
-				MinimalRebuild="true"
+				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="acl_stdafx.hpp"
 				PrecompiledHeaderFile="$(IntDir)/$(TargetName).pch"
 				ProgramDataBaseFileName="$(OutDir)/$(ProjectName).pdb"
 				WarningLevel="3"
-				WarnAsError="true"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
-			/>
+				WarnAsError="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="lib_acl.lib polarssl.lib lib_protocol.lib"
 				OutputFile="$(OutDir)/$(ProjectName).dll"
 				AdditionalLibraryDirectories="..\lib\win32;..\dist\lib\win32"
 				IgnoreDefaultLibraryNames="libcmt;libc"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)/$(TargetName).lib"
-				TargetMachine="1"
-			/>
+				TargetMachine="1"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
+				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y&#x0D;&#x0A;copy $(TargetName).dll ..\dist\lib\win32\$(TargetName).dll /Y&#x0D;&#x0A;copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y&#x0D;&#x0A;"
-			/>
+				CommandLine="copy $(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y
+copy $(TargetName).dll ..\dist\lib\win32\$(TargetName).dll /Y
+copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
+"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -334,1255 +235,985 @@
 		<Filter
 			Name="源文件"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
-			>
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\src\acl_cpp_init.cpp"
-				>
+				RelativePath=".\src\acl_cpp_init.cpp">
 			</File>
 			<File
-				RelativePath=".\src\acl_cpp_test.cpp"
-				>
+				RelativePath=".\src\acl_cpp_test.cpp">
 			</File>
 			<File
-				RelativePath=".\src\acl_stdafx.cpp"
-				>
+				RelativePath=".\src\acl_stdafx.cpp">
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
+					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
+						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
+					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
+						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="DebugDll|Win32"
-					>
+					Name="DebugDll|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
+						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Releasedll|Win32"
-					>
+					Name="Releasedll|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
+						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\acl_stdafx.hpp"
-				>
+				RelativePath=".\src\acl_stdafx.hpp">
 			</File>
 			<Filter
 				Name="stream"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\stream\aio_delay_free.cpp"
-					>
+					RelativePath=".\src\stream\aio_delay_free.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\aio_fstream.cpp"
-					>
+					RelativePath=".\src\stream\aio_fstream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\aio_handle.cpp"
-					>
+					RelativePath=".\src\stream\aio_handle.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\aio_istream.cpp"
-					>
+					RelativePath=".\src\stream\aio_istream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\aio_listen_stream.cpp"
-					>
+					RelativePath=".\src\stream\aio_listen_stream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\aio_ostream.cpp"
-					>
+					RelativePath=".\src\stream\aio_ostream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\aio_socket_stream.cpp"
-					>
+					RelativePath=".\src\stream\aio_socket_stream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\aio_stream.cpp"
-					>
+					RelativePath=".\src\stream\aio_stream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\aio_timer_callback.cpp"
-					>
+					RelativePath=".\src\stream\aio_timer_callback.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\aio_timer_delay_free.cpp"
-					>
+					RelativePath=".\src\stream\aio_timer_delay_free.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\aio_timer_delay_free.hpp"
-					>
+					RelativePath=".\src\stream\aio_timer_delay_free.hpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\fstream.cpp"
-					>
+					RelativePath=".\src\stream\fstream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\ifstream.cpp"
-					>
+					RelativePath=".\src\stream\ifstream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\istream.cpp"
-					>
+					RelativePath=".\src\stream\istream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\ofstream.cpp"
-					>
+					RelativePath=".\src\stream\ofstream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\ostream.cpp"
-					>
+					RelativePath=".\src\stream\ostream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\server_socket.cpp"
-					>
+					RelativePath=".\src\stream\server_socket.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\socket_stream.cpp"
-					>
+					RelativePath=".\src\stream\socket_stream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\ssl_aio_stream.cpp"
-					>
+					RelativePath=".\src\stream\ssl_aio_stream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\stream.cpp"
-					>
+					RelativePath=".\src\stream\stream.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="stdlib"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\stdlib\charset_conv.cpp"
-					>
+					RelativePath=".\src\stdlib\charset_conv.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\dns_service.cpp"
-					>
+					RelativePath=".\src\stdlib\dns_service.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\escape.cpp"
-					>
+					RelativePath=".\src\stdlib\escape.cpp">
 					<FileConfiguration
-						Name="Debug|Win32"
-						>
+						Name="Debug|Win32">
 						<Tool
 							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"
-						/>
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release|Win32"
-						>
+						Name="Release|Win32">
 						<Tool
 							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"
-						/>
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="DebugDll|Win32"
-						>
+						Name="DebugDll|Win32">
 						<Tool
 							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"
-						/>
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Releasedll|Win32"
-						>
+						Name="Releasedll|Win32">
 						<Tool
 							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"
-						/>
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\src\stdlib\json.cpp"
-					>
+					RelativePath=".\src\stdlib\json.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\locker.cpp"
-					>
+					RelativePath=".\src\stdlib\locker.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\log.cpp"
-					>
+					RelativePath=".\src\stdlib\log.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\malloc.cpp"
-					>
+					RelativePath=".\src\stdlib\malloc.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\md5.cpp"
-					>
+					RelativePath=".\src\stdlib\md5.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\pipe_stream.cpp"
-					>
+					RelativePath=".\src\stdlib\pipe_stream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\snprintf.cpp"
-					>
+					RelativePath=".\src\stdlib\scan_dir.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\string.cpp"
-					>
+					RelativePath=".\src\stdlib\snprintf.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\thread.cpp"
-					>
+					RelativePath=".\src\stdlib\string.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\thread_pool.cpp"
-					>
+					RelativePath=".\src\stdlib\thread.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\url_coder.cpp"
-					>
+					RelativePath=".\src\stdlib\thread_pool.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\util.cpp"
-					>
+					RelativePath=".\src\stdlib\url_coder.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\xml.cpp"
-					>
+					RelativePath=".\src\stdlib\util.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stdlib\zlib_stream.cpp"
-					>
+					RelativePath=".\src\stdlib\xml.cpp">
+				</File>
+				<File
+					RelativePath=".\src\stdlib\zlib_stream.cpp">
 				</File>
 				<Filter
 					Name="internal"
-					>
+					Filter="">
 					<File
-						RelativePath=".\src\stdlib\internal\win_iconv.cpp"
-						>
+						RelativePath=".\src\stdlib\internal\win_iconv.cpp">
 					</File>
 					<File
-						RelativePath=".\src\stdlib\internal\win_iconv.hpp"
-						>
+						RelativePath=".\src\stdlib\internal\win_iconv.hpp">
 					</File>
 				</Filter>
 			</Filter>
 			<Filter
 				Name="mime"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\mime\mime.cpp"
-					>
+					RelativePath=".\src\mime\mime.cpp">
 				</File>
 				<File
-					RelativePath=".\src\mime\mime_attach.cpp"
-					>
+					RelativePath=".\src\mime\mime_attach.cpp">
 				</File>
 				<File
-					RelativePath=".\src\mime\mime_base64.cpp"
-					>
+					RelativePath=".\src\mime\mime_base64.cpp">
 				</File>
 				<File
-					RelativePath=".\src\mime\mime_body.cpp"
-					>
+					RelativePath=".\src\mime\mime_body.cpp">
 				</File>
 				<File
-					RelativePath=".\src\mime\mime_code.cpp"
-					>
+					RelativePath=".\src\mime\mime_code.cpp">
 				</File>
 				<File
-					RelativePath=".\src\mime\mime_head.cpp"
-					>
+					RelativePath=".\src\mime\mime_head.cpp">
 				</File>
 				<File
-					RelativePath=".\src\mime\mime_image.cpp"
-					>
+					RelativePath=".\src\mime\mime_image.cpp">
 				</File>
 				<File
-					RelativePath=".\src\mime\mime_node.cpp"
-					>
+					RelativePath=".\src\mime\mime_node.cpp">
 				</File>
 				<File
-					RelativePath=".\src\mime\mime_quoted_printable.cpp"
-					>
+					RelativePath=".\src\mime\mime_quoted_printable.cpp">
 				</File>
 				<File
-					RelativePath=".\src\mime\mime_uucode.cpp"
-					>
+					RelativePath=".\src\mime\mime_uucode.cpp">
 				</File>
 				<File
-					RelativePath=".\src\mime\mime_xxcode.cpp"
-					>
+					RelativePath=".\src\mime\mime_xxcode.cpp">
 				</File>
 				<File
-					RelativePath=".\src\mime\rfc2047.cpp"
-					>
+					RelativePath=".\src\mime\rfc2047.cpp">
 				</File>
 				<File
-					RelativePath=".\src\mime\rfc822.cpp"
-					>
+					RelativePath=".\src\mime\rfc822.cpp">
 				</File>
 				<Filter
 					Name="internal"
-					>
+					Filter="">
 					<File
-						RelativePath=".\src\mime\internal\header_opts.cpp"
-						>
+						RelativePath=".\src\mime\internal\header_opts.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\header_opts.hpp"
-						>
+						RelativePath=".\src\mime\internal\header_opts.hpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\header_token.cpp"
-						>
+						RelativePath=".\src\mime\internal\header_token.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\header_token.hpp"
-						>
+						RelativePath=".\src\mime\internal\header_token.hpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\is_header.cpp"
-						>
+						RelativePath=".\src\mime\internal\is_header.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\is_header.hpp"
-						>
+						RelativePath=".\src\mime\internal\is_header.hpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\lex_822.hpp"
-						>
+						RelativePath=".\src\mime\internal\lex_822.hpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\mime_state.cpp"
-						>
+						RelativePath=".\src\mime\internal\mime_state.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\mime_state.hpp"
-						>
+						RelativePath=".\src\mime\internal\mime_state.hpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\mime_state_parse.cpp"
-						>
+						RelativePath=".\src\mime\internal\mime_state_parse.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\quote_821_local.cpp"
-						>
+						RelativePath=".\src\mime\internal\quote_821_local.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\quote_821_local.hpp"
-						>
+						RelativePath=".\src\mime\internal\quote_821_local.hpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\quote_822_local.cpp"
-						>
+						RelativePath=".\src\mime\internal\quote_822_local.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\quote_822_local.hpp"
-						>
+						RelativePath=".\src\mime\internal\quote_822_local.hpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\quote_flags.hpp"
-						>
+						RelativePath=".\src\mime\internal\quote_flags.hpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\rec_type.cpp"
-						>
+						RelativePath=".\src\mime\internal\rec_type.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\rec_type.hpp"
-						>
+						RelativePath=".\src\mime\internal\rec_type.hpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\tok822.hpp"
-						>
+						RelativePath=".\src\mime\internal\tok822.hpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\tok822_find.cpp"
-						>
+						RelativePath=".\src\mime\internal\tok822_find.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\tok822_node.cpp"
-						>
+						RelativePath=".\src\mime\internal\tok822_node.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\tok822_parse.cpp"
-						>
+						RelativePath=".\src\mime\internal\tok822_parse.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\tok822_tree.cpp"
-						>
+						RelativePath=".\src\mime\internal\tok822_tree.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\trimblanks.cpp"
-						>
+						RelativePath=".\src\mime\internal\trimblanks.cpp">
 					</File>
 					<File
-						RelativePath=".\src\mime\internal\trimblanks.hpp"
-						>
+						RelativePath=".\src\mime\internal\trimblanks.hpp">
 					</File>
 				</Filter>
 			</Filter>
 			<Filter
 				Name="master"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\master\master_aio.cpp"
-					>
+					RelativePath=".\src\master\master_aio.cpp">
 				</File>
 				<File
-					RelativePath=".\src\master\master_base.cpp"
-					>
+					RelativePath=".\src\master\master_base.cpp">
 				</File>
 				<File
-					RelativePath=".\src\master\master_conf.cpp"
-					>
+					RelativePath=".\src\master\master_conf.cpp">
 				</File>
 				<File
-					RelativePath=".\src\master\master_proc.cpp"
-					>
+					RelativePath=".\src\master\master_proc.cpp">
 				</File>
 				<File
-					RelativePath=".\src\master\master_threads.cpp"
-					>
+					RelativePath=".\src\master\master_threads.cpp">
 				</File>
 				<File
-					RelativePath=".\src\master\master_threads2.cpp"
-					>
+					RelativePath=".\src\master\master_threads2.cpp">
 				</File>
 				<File
-					RelativePath=".\src\master\master_trigger.cpp"
-					>
+					RelativePath=".\src\master\master_trigger.cpp">
 				</File>
 				<File
-					RelativePath=".\src\master\master_udp.cpp"
-					>
+					RelativePath=".\src\master\master_udp.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="ipc"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\ipc\ipc_client.cpp"
-					>
+					RelativePath=".\src\ipc\ipc_client.cpp">
 				</File>
 				<File
-					RelativePath=".\src\ipc\ipc_server.cpp"
-					>
+					RelativePath=".\src\ipc\ipc_server.cpp">
 				</File>
 				<File
-					RelativePath=".\src\ipc\ipc_service.cpp"
-					>
+					RelativePath=".\src\ipc\ipc_service.cpp">
 				</File>
 				<File
-					RelativePath=".\src\ipc\rpc.cpp"
-					>
+					RelativePath=".\src\ipc\rpc.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="http"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\http\http_client.cpp"
-					>
+					RelativePath=".\src\http\http_client.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\http_ctype.cpp"
-					>
+					RelativePath=".\src\http\http_ctype.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\http_download.cpp"
-					>
+					RelativePath=".\src\http\http_download.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\http_header.cpp"
-					>
+					RelativePath=".\src\http\http_header.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\http_mime.cpp"
-					>
+					RelativePath=".\src\http\http_mime.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\http_pipe.cpp"
-					>
+					RelativePath=".\src\http\http_pipe.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\http_request.cpp"
-					>
+					RelativePath=".\src\http\http_request.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\http_request_manager.cpp"
-					>
+					RelativePath=".\src\http\http_request_manager.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\http_request_pool.cpp"
-					>
+					RelativePath=".\src\http\http_request_pool.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\http_response.cpp"
-					>
+					RelativePath=".\src\http\http_response.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\http_service.cpp"
-					>
+					RelativePath=".\src\http\http_service.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\http_utils.cpp"
-					>
+					RelativePath=".\src\http\http_utils.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\HttpCookie.cpp"
-					>
+					RelativePath=".\src\http\HttpCookie.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\HttpServlet.cpp"
-					>
+					RelativePath=".\src\http\HttpServlet.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\HttpServletRequest.cpp"
-					>
+					RelativePath=".\src\http\HttpServletRequest.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\HttpServletResponse.cpp"
-					>
+					RelativePath=".\src\http\HttpServletResponse.cpp">
 				</File>
 				<File
-					RelativePath=".\src\http\HttpSession.cpp"
-					>
+					RelativePath=".\src\http\HttpSession.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="hsocket"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\hsocket\hsclient.cpp"
-					>
+					RelativePath=".\src\hsocket\hsclient.cpp">
 				</File>
 				<File
-					RelativePath=".\src\hsocket\hserror.cpp"
-					>
+					RelativePath=".\src\hsocket\hserror.cpp">
 				</File>
 				<File
-					RelativePath=".\src\hsocket\hspool.cpp"
-					>
+					RelativePath=".\src\hsocket\hspool.cpp">
 				</File>
 				<File
-					RelativePath=".\src\hsocket\hsproto.cpp"
-					>
+					RelativePath=".\src\hsocket\hsproto.cpp">
 				</File>
 				<File
-					RelativePath=".\src\hsocket\hsrow.cpp"
-					>
+					RelativePath=".\src\hsocket\hsrow.cpp">
 				</File>
 				<File
-					RelativePath=".\src\hsocket\hstable.cpp"
-					>
+					RelativePath=".\src\hsocket\hstable.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="db"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\db\db_handle.cpp"
-					>
+					RelativePath=".\src\db\db_handle.cpp">
 				</File>
 				<File
-					RelativePath=".\src\db\db_mysql.cpp"
-					>
+					RelativePath=".\src\db\db_mysql.cpp">
 				</File>
 				<File
-					RelativePath=".\src\db\db_pool.cpp"
-					>
+					RelativePath=".\src\db\db_pool.cpp">
 				</File>
 				<File
-					RelativePath=".\src\db\db_service.cpp"
-					>
+					RelativePath=".\src\db\db_service.cpp">
 				</File>
 				<File
-					RelativePath=".\src\db\db_service_mysql.cpp"
-					>
+					RelativePath=".\src\db\db_service_mysql.cpp">
 				</File>
 				<File
-					RelativePath=".\src\db\db_service_sqlite.cpp"
-					>
+					RelativePath=".\src\db\db_service_sqlite.cpp">
 				</File>
 				<File
-					RelativePath=".\src\db\db_sqlite.cpp"
-					>
+					RelativePath=".\src\db\db_sqlite.cpp">
 				</File>
 				<File
-					RelativePath=".\src\db\mysql_pool.cpp"
-					>
+					RelativePath=".\src\db\mysql_pool.cpp">
 				</File>
 				<File
-					RelativePath=".\src\db\sqlite_pool.cpp"
-					>
+					RelativePath=".\src\db\sqlite_pool.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="memcache"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\memcache\memcache.cpp"
-					>
+					RelativePath=".\src\memcache\memcache.cpp">
 				</File>
 				<File
-					RelativePath=".\src\memcache\memcache_manager.cpp"
-					>
+					RelativePath=".\src\memcache\memcache_manager.cpp">
 				</File>
 				<File
-					RelativePath=".\src\memcache\memcache_pool.cpp"
-					>
+					RelativePath=".\src\memcache\memcache_pool.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="redis"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\redis\redis_client.cpp"
-					>
+					RelativePath=".\src\redis\redis_client.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="session"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\session\memcache_session.cpp"
-					>
+					RelativePath=".\src\session\memcache_session.cpp">
 				</File>
 				<File
-					RelativePath=".\src\session\session.cpp"
-					>
+					RelativePath=".\src\session\session.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="beanstalk"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\beanstalk\beanstalk.cpp"
-					>
+					RelativePath=".\src\beanstalk\beanstalk.cpp">
 				</File>
 				<File
-					RelativePath=".\src\beanstalk\beanstalk_pool.cpp"
-					>
+					RelativePath=".\src\beanstalk\beanstalk_pool.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="queue"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\queue\queue_file.cpp"
-					>
+					RelativePath=".\src\queue\queue_file.cpp">
 				</File>
 				<File
-					RelativePath=".\src\queue\queue_manager.cpp"
-					>
+					RelativePath=".\src\queue\queue_manager.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="connpool"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\connpool\connect_manager.cpp"
-					>
+					RelativePath=".\src\connpool\connect_manager.cpp">
 				</File>
 				<File
-					RelativePath=".\src\connpool\connect_monitor.cpp"
-					>
+					RelativePath=".\src\connpool\connect_monitor.cpp">
 				</File>
 				<File
-					RelativePath=".\src\connpool\connect_pool.cpp"
-					>
+					RelativePath=".\src\connpool\connect_pool.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="event"
-				>
+				Filter="">
 				<File
-					RelativePath=".\src\event\event_timer.cpp"
-					>
+					RelativePath=".\src\event\event_timer.cpp">
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
 			Name="头文件"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\include\acl_cpp\acl_cpp_define.hpp"
-				>
+				RelativePath=".\include\acl_cpp\acl_cpp_define.hpp">
 			</File>
 			<File
-				RelativePath=".\include\acl_cpp\acl_cpp_init.hpp"
-				>
+				RelativePath=".\include\acl_cpp\acl_cpp_init.hpp">
 			</File>
 			<File
-				RelativePath=".\include\acl_cpp\acl_cpp_test.hpp"
-				>
+				RelativePath=".\include\acl_cpp\acl_cpp_test.hpp">
 			</File>
 			<File
-				RelativePath=".\include\acl_cpp\lib_acl.hpp"
-				>
+				RelativePath=".\include\acl_cpp\lib_acl.hpp">
 			</File>
 			<File
-				RelativePath=".\resource_vc2003.h"
-				>
+				RelativePath=".\resource_vc2003.h">
 			</File>
 			<Filter
 				Name="stream"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\stream\aio_delay_free.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\aio_delay_free.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\aio_fstream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\aio_fstream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\aio_handle.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\aio_handle.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\aio_istream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\aio_istream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\aio_listen_stream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\aio_listen_stream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\aio_ostream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\aio_ostream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\aio_socket_stream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\aio_socket_stream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\aio_stream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\aio_stream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\fstream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\aio_timer_callback.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\ifstream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\fstream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\istream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\ifstream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\ofstream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\istream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\ostream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\ofstream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\server_socket.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\ostream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\socket_stream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\server_socket.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\ssl_aio_stream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\socket_stream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stream\stream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stream\ssl_aio_stream.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\stream.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="stdlib"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\charset_conv.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\charset_conv.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\dns_service.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\dns_service.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\escape.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\escape.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\final_tpl.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\final_tpl.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\json.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\json.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\locker.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\locker.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\log.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\log.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\malloc.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\malloc.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\md5.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\md5.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\noncopyable.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\noncopyable.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\pipe_stream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\pipe_stream.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\singleton.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\scan_dir.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\snprintf.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\singleton.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\string.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\snprintf.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\thread.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\string.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\thread_pool.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\thread.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\url_coder.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\thread_pool.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\util.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\url_coder.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\vld.h"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\util.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\xml.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\vld.h">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\zlib_stream.hpp"
-					>
+					RelativePath=".\include\acl_cpp\stdlib\xml.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\zlib_stream.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="mime"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\mime\mime.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\mime.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\mime_attach.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\mime_attach.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\mime_base64.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\mime_base64.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\mime_body.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\mime_body.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\mime_code.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\mime_code.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\mime_define.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\mime_define.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\mime_head.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\mime_head.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\mime_image.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\mime_image.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\mime_node.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\mime_node.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\mime_quoted_printable.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\mime_quoted_printable.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\mime_uucode.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\mime_uucode.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\mime_xxcode.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\mime_xxcode.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\rfc2047.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\rfc2047.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\mime\rfc822.hpp"
-					>
+					RelativePath=".\include\acl_cpp\mime\rfc822.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="master"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\master\master_aio.hpp"
-					>
+					RelativePath=".\include\acl_cpp\master\master_aio.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\master\master_base.hpp"
-					>
+					RelativePath=".\include\acl_cpp\master\master_base.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\master\master_conf.hpp"
-					>
+					RelativePath=".\include\acl_cpp\master\master_conf.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\master\master_proc.hpp"
-					>
+					RelativePath=".\include\acl_cpp\master\master_proc.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\master\master_threads.hpp"
-					>
+					RelativePath=".\include\acl_cpp\master\master_threads.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\master\master_threads2.hpp"
-					>
+					RelativePath=".\include\acl_cpp\master\master_threads2.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\master\master_trigger.hpp"
-					>
+					RelativePath=".\include\acl_cpp\master\master_trigger.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\master\master_udp.hpp"
-					>
+					RelativePath=".\include\acl_cpp\master\master_udp.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="ipc"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\ipc\ipc_client.hpp"
-					>
+					RelativePath=".\include\acl_cpp\ipc\ipc_client.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\ipc\ipc_server.hpp"
-					>
+					RelativePath=".\include\acl_cpp\ipc\ipc_server.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\ipc\ipc_service.hpp"
-					>
+					RelativePath=".\include\acl_cpp\ipc\ipc_service.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\ipc\rpc.hpp"
-					>
+					RelativePath=".\include\acl_cpp\ipc\rpc.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="http"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\http\http_client.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\http_client.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_ctype.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\http_ctype.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_download.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\http_download.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_header.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\http_header.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_mime.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\http_mime.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_pipe.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\http_pipe.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_request.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\http_request.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_request_manager.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\http_request_manager.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_request_pool.h"
-					>
+					RelativePath=".\include\acl_cpp\http\http_request_pool.h">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_response.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\http_response.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_service.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\http_service.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_type.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\http_type.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_utils.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\http_utils.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\HttpCookie.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\HttpCookie.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\HttpServlet.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\HttpServlet.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\HttpServletRequest.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\HttpServletRequest.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\HttpServletResponse.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\HttpServletResponse.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\HttpSession.hpp"
-					>
+					RelativePath=".\include\acl_cpp\http\HttpSession.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="hsocket"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\hsocket\hsclient.hpp"
-					>
+					RelativePath=".\include\acl_cpp\hsocket\hsclient.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\hsocket\hserror.hpp"
-					>
+					RelativePath=".\include\acl_cpp\hsocket\hserror.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\hsocket\hspool.hpp"
-					>
+					RelativePath=".\include\acl_cpp\hsocket\hspool.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\hsocket\hsproto.hpp"
-					>
+					RelativePath=".\include\acl_cpp\hsocket\hsproto.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\hsocket\hsrow.hpp"
-					>
+					RelativePath=".\include\acl_cpp\hsocket\hsrow.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\hsocket\hstable.hpp"
-					>
+					RelativePath=".\include\acl_cpp\hsocket\hstable.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="db"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\db\db_handle.hpp"
-					>
+					RelativePath=".\include\acl_cpp\db\db_handle.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\db\db_mysql.hpp"
-					>
+					RelativePath=".\include\acl_cpp\db\db_mysql.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\db\db_pool.hpp"
-					>
+					RelativePath=".\include\acl_cpp\db\db_pool.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\db\db_service.hpp"
-					>
+					RelativePath=".\include\acl_cpp\db\db_service.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\db\db_service_mysql.hpp"
-					>
+					RelativePath=".\include\acl_cpp\db\db_service_mysql.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\db\db_service_sqlite.hpp"
-					>
+					RelativePath=".\include\acl_cpp\db\db_service_sqlite.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\db\db_sqlite.hpp"
-					>
+					RelativePath=".\include\acl_cpp\db\db_sqlite.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\db\mysql_pool.hpp"
-					>
+					RelativePath=".\include\acl_cpp\db\mysql_pool.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\db\sqlite_pool.hpp"
-					>
+					RelativePath=".\include\acl_cpp\db\sqlite_pool.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="memcache"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\memcache\memcache.hpp"
-					>
+					RelativePath=".\include\acl_cpp\memcache\memcache.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\memcache\memcache_manager.hpp"
-					>
+					RelativePath=".\include\acl_cpp\memcache\memcache_manager.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\memcache\memcache_pool.hpp"
-					>
+					RelativePath=".\include\acl_cpp\memcache\memcache_pool.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="redis"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\redis\redis_client.hpp"
-					>
+					RelativePath=".\include\acl_cpp\redis\redis_client.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\redis\redis_key.hpp"
-					>
+					RelativePath=".\include\acl_cpp\redis\redis_key.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\redis\redis_response.hpp"
-					>
+					RelativePath=".\include\acl_cpp\redis\redis_response.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="session"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\session\memcache_session.hpp"
-					>
+					RelativePath=".\include\acl_cpp\session\memcache_session.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\session\session.hpp"
-					>
+					RelativePath=".\include\acl_cpp\session\session.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="beanstalk"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\beanstalk\beanstalk.hpp"
-					>
+					RelativePath=".\include\acl_cpp\beanstalk\beanstalk.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\beanstalk\beanstalk_pool.hpp"
-					>
+					RelativePath=".\include\acl_cpp\beanstalk\beanstalk_pool.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="queue"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\queue\queue_file.hpp"
-					>
+					RelativePath=".\include\acl_cpp\queue\queue_file.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\queue\queue_manager.hpp"
-					>
+					RelativePath=".\include\acl_cpp\queue\queue_manager.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="connpool"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\connpool\connect_client.hpp"
-					>
+					RelativePath=".\include\acl_cpp\connpool\connect_client.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\connpool\connect_manager.hpp"
-					>
+					RelativePath=".\include\acl_cpp\connpool\connect_manager.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\connpool\connect_monitor.hpp"
-					>
+					RelativePath=".\include\acl_cpp\connpool\connect_monitor.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\connpool\connect_pool.hpp"
-					>
+					RelativePath=".\include\acl_cpp\connpool\connect_pool.hpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="event"
-				>
+				Filter="">
 				<File
-					RelativePath=".\include\acl_cpp\event\event_timer.hpp"
-					>
+					RelativePath=".\include\acl_cpp\event\event_timer.hpp">
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
 			Name="资源文件"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 			<File
-				RelativePath=".\lib_acl_cpp_vc2003.rc"
-				>
+				RelativePath=".\lib_acl_cpp_vc2003.rc">
 			</File>
 		</Filter>
 		<Filter
 			Name="doc"
-			>
+			Filter="">
 			<File
-				RelativePath=".\changes.txt"
-				>
+				RelativePath=".\changes.txt">
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
-				>
+				RelativePath=".\ReadMe.txt">
 			</File>
 		</Filter>
 	</Files>

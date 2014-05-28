@@ -446,7 +446,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stream\socket_stream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\ssl_aio_stream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\stream.hpp" />
-    <ClInclude Include="resource_vc2010.h" />
+    <ClInclude Include="resource_vc2012.h" />
     <ClInclude Include="src\acl_stdafx.hpp" />
     <ClInclude Include="src\mime\internal\header_opts.hpp" />
     <ClInclude Include="src\mime\internal\header_token.hpp" />
@@ -468,7 +468,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="lib_acl_cpp_vc2010.rc" />
+    <ResourceCompile Include="lib_acl_cpp_vc2012.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
