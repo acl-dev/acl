@@ -1079,13 +1079,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					Name="template"
 					Filter="">
 					<File
-						RelativePath=".\src\master\template\acl_aio_app_main.c">
-					</File>
-					<File
 						RelativePath=".\src\master\template\acl_aio_server.c">
-					</File>
-					<File
-						RelativePath=".\src\master\template\acl_ioctl_app_main.c">
 					</File>
 					<File
 						RelativePath=".\src\master\template\acl_ioctl_server.c">
@@ -1755,9 +1749,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Filter="">
 				<File
 					RelativePath=".\include\master\acl_aio_params.h">
-				</File>
-				<File
-					RelativePath=".\include\master\acl_app_main.h">
 				</File>
 				<File
 					RelativePath=".\include\master\acl_ioctl_params.h">

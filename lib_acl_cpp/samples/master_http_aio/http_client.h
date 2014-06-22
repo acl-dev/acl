@@ -17,5 +17,6 @@ private:
 	acl::aio_socket_stream* conn_;
 	ACL_ASTREAM* stream_;
 	acl::string res_hdr_;
+	acl::string res_hdr2_;
 	acl::string res_body_;
 };

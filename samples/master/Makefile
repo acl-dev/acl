@@ -99,9 +99,10 @@ all: build
 build:
 	@(cd single_echo; make)
 	@(cd multi_echo; make)
-	@(cd ioctl_echo; make)
+#	@(cd ioctl_echo; make)
 	@(cd ioctl_echo2; make)
 	@(cd ioctl_echo3; make)
+	@(cd master_threads; make)
 	@(cd trigger; make)
 	@(cd single_proxy; make)
 	@(cd multi_proxy; make)
@@ -116,9 +117,10 @@ $(OBJ_OUTPATH)%.o: %.c *.h
 clean:
 	@(cd single_echo; make clean)
 	@(cd multi_echo; make clean)
-	@(cd ioctl_echo; make clean)
+#	@(cd ioctl_echo; make clean)
 	@(cd ioctl_echo2; make clean)
 	@(cd ioctl_echo3; make clean)
+	@(cd master_threads; make clean)
 	@(cd trigger; make clean)
 	@(cd single_proxy; make clean)
 	@(cd multi_proxy; make clean)

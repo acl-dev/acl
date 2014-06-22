@@ -11,6 +11,9 @@ CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 -Wpointer-arith -Werror -Wshadow -O2 \
 -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO
 #-Waggregate-return 
+
+LINUX =
+
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
@@ -36,6 +39,13 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	ifeq ($CC, "gcc")
 		CFLAGS += -Wstrict-prototypes
 	endif
+
+	ifeq ($(findstring x86_64, $(UNIXNAME)), x86_64)
+		LINUX = linux64
+	else
+		LINUX = linux32
+	endif
+
 	CFLAGS += -DLINUX2 -D_REENTRANT
 endif
 
@@ -71,8 +81,8 @@ endif
 CFLAGS += $(INC_COMPILE)
 
 INC_COMPILE = -I../../include -I../../../lib_acl/include -I../../../include/mysql
-LIB_COMPILE = -L../../lib -l_acl_cpp -L/opt/import_lib/lib -l_acl \
-	      -lmysqlclient_r -ldl
+LIB_COMPILE = -L../../lib -l_acl_cpp -L../../../lib_acl/lib -l_acl \
+		-L../../../lib/$(LINUX) -lmysqlclient_r -ldl
 
 ###########################################################
 OUT_PATH = .

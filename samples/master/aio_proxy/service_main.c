@@ -175,7 +175,7 @@ static int connect_callback(ACL_ASTREAM *stream, void *ctx)
 	return (0);
 }
 
-int service_main(ACL_ASTREAM *astream, void *run_ctx acl_unused)
+void service_main(ACL_ASTREAM *astream, void *run_ctx acl_unused)
 {
 	const char *myname = "service_main";
 	STREAM_PIPE *sp = (STREAM_PIPE*) acl_mycalloc(1, sizeof(STREAM_PIPE));
@@ -189,7 +189,7 @@ int service_main(ACL_ASTREAM *astream, void *run_ctx acl_unused)
 			__LINE__, var_cfg_backend_addr, acl_last_serror());
 		acl_aio_iocp_close(astream);
 		acl_myfree(sp);
-		return (-1);
+		return;
 	}
 
 	acl_aio_ctl(sp->server, ACL_AIO_CTL_CONNECT_HOOK_ADD, connect_callback, sp,
@@ -201,5 +201,4 @@ int service_main(ACL_ASTREAM *astream, void *run_ctx acl_unused)
 			ACL_AIO_CTL_READ_HOOK_ADD, read_callback, sp,
 			ACL_AIO_CTL_TIMEOUT, 300,
 			ACL_AIO_CTL_END);
-	return (0);
 }

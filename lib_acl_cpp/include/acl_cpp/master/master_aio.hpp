@@ -64,9 +64,9 @@ private:
 private:
 #ifdef WIN32
 	// 当接收到一个客户端连接时回调此函数
-	static int service_main(SOCKET, void*);
+	static void service_main(SOCKET, void*);
 #else
-	static int service_main(int, void*);
+	static void service_main(int, void*);
 #endif
 
 	// 当进程切换用户身份后调用的回调函数

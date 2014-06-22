@@ -420,9 +420,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include=".\src\master\master_params.c" />
     <ClCompile Include=".\src\master\master_proto.c" />
     <ClCompile Include=".\src\master\master_vars.c" />
-    <ClCompile Include=".\src\master\template\acl_aio_app_main.c" />
     <ClCompile Include=".\src\master\template\acl_aio_server.c" />
-    <ClCompile Include=".\src\master\template\acl_ioctl_app_main.c" />
     <ClCompile Include=".\src\master\template\acl_ioctl_server.c" />
     <ClCompile Include=".\src\master\template\acl_master_log.c" />
     <ClCompile Include=".\src\master\template\acl_multi_server.c" />
@@ -648,7 +646,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\include\code\acl_urlcode.h" />
     <ClInclude Include=".\include\code\acl_vstring_base64.h" />
     <ClInclude Include=".\include\master\acl_aio_params.h" />
-    <ClInclude Include=".\include\master\acl_app_main.h" />
     <ClInclude Include=".\include\master\acl_ioctl_params.h" />
     <ClInclude Include=".\include\master\acl_master.h" />
     <ClInclude Include=".\include\master\acl_master_conf.h" />

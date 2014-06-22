@@ -32,7 +32,7 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DLINUX2
-	SYSLIB = -lcrypt -lpthread
+	SYSLIB = -lcrypto -lpthread
 endif
 
 #Path for SunOS

@@ -52,10 +52,6 @@ static void __service(ACL_VSTREAM *stream, char *service, char **argv acl_unused
 	}
 }
 
-static void __pre_accept(char *name acl_unused, char **argv acl_unused)
-{
-}
-
 static void __pre_jail_init(char *name acl_unused, char **argv acl_unused)
 {
 }
@@ -74,7 +70,6 @@ int main(int argc, char *argv[])
 		ACL_MASTER_SERVER_INT_TABLE, __conf_int_tab,
 		ACL_MASTER_SERVER_STR_TABLE, __conf_str_tab,
 		ACL_MASTER_SERVER_PRE_INIT, __pre_jail_init,
-		ACL_MASTER_SERVER_PRE_ACCEPT, __pre_accept,
 		ACL_MASTER_SERVER_POST_INIT, __post_jail_init,
 		ACL_MASTER_SERVER_EXIT, service_exit,
 		0);

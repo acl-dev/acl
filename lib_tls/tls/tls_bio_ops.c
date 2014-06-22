@@ -189,7 +189,7 @@ static int network_biopair_interop(ACL_SOCKET fd, int timeout, BIO *network_bio)
 	for (write_pos = 0; write_pos < from_bio; /* see below */ ) {
 	    if (timeout > 0 && acl_write_wait(fd, timeout) < 0)
 		return (-1);
-	    num_write = acl_socket_write(fd, buffer + write_pos, from_bio - write_pos, 0, 0);
+	    num_write = acl_socket_write(fd, buffer + write_pos, from_bio - write_pos, 0, 0, 0);
 	    if (num_write <= 0) {
 		if ((num_write < 0) && (timeout > 0) && (errno == ACL_EAGAIN || errno == ACL_EINTR)) {
 		    acl_msg_warn("%s: write() returns EAGAIN on a writable file descriptor!", myname);
@@ -214,7 +214,7 @@ static int network_biopair_interop(ACL_SOCKET fd, int timeout, BIO *network_bio)
 	    want_read = (int) sizeof(buffer);
 	if (timeout > 0 && acl_read_wait(fd, timeout) < 0)
 	    return (-1);
-	num_read = acl_socket_read(fd, buffer, want_read, 0, 0);
+	num_read = acl_socket_read(fd, buffer, want_read, 0, 0, 0);
 	if (num_read == 0)
 	    /* FIX 200412 Cannot return a zero read count. */
 	    return (-1);

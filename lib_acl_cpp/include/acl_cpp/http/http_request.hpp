@@ -203,8 +203,7 @@ public:
 	 *  获得); < 0 表示数据流关闭，此时若 real_size 非空，则 real_size 存
 	 *  储的值应该为 0
 	 */
-	int read_body(string& out, bool clean = false,
-		int* real_size = NULL);
+	int read_body(string& out, bool clean = false, int* real_size = NULL);
 
 	/**
 	 * 当调用 request 成功后调用本函数来从 HTTP 服务端读一行数据，可以循环调用

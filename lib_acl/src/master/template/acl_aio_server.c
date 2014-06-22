@@ -45,6 +45,7 @@
 #include "net/acl_tcp_ctl.h"
 #include "net/acl_sane_socket.h"
 #include "net/acl_vstream_net.h"
+#include "net/acl_access.h"
 #include "event/acl_events.h"
 #include "aio/acl_aio.h"
 
@@ -117,6 +118,7 @@ char *acl_var_aio_accept_alone;
 char *acl_var_aio_log_debug;
 char *acl_var_aio_dispatch_addr;
 char *acl_var_aio_dispatch_type;
+char *acl_var_aio_deny_info;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
         { ACL_VAR_AIO_QUEUE_DIR, ACL_DEF_AIO_QUEUE_DIR, &acl_var_aio_queue_dir },
@@ -128,6 +130,7 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ ACL_VAR_AIO_LOG_DEBUG, ACL_DEF_AIO_LOG_DEBUG, &acl_var_aio_log_debug },
 	{ ACL_VAR_AIO_DISPATCH_ADDR, ACL_DEF_AIO_DISPATCH_ADDR, &acl_var_aio_dispatch_addr },
 	{ ACL_VAR_AIO_DISPATCH_TYPE, ACL_DEF_AIO_DISPATCH_TYPE, &acl_var_aio_dispatch_type },
+	{ ACL_VAR_AIO_DENY_INFO, ACL_DEF_AIO_DENY_INFO, &acl_var_aio_deny_info },
 
         { 0, 0, 0 },
 };
@@ -149,20 +152,16 @@ static time_t __last_closing_time = 0;
 static pthread_mutex_t __closing_time_mutex;
 static pthread_mutex_t __counter_mutex;
 
-static void (*aio_server_wakeup) (ACL_AIO *, int);
-static void (*aio_server_service) (ACL_SOCKET, char *, char **);
-static char *aio_server_name;
-static char **aio_server_argv;
-static void (*aio_server_accept) (ACL_ASTREAM *, void *);
-static void (*aio_server_onexit) (char *, char **);
-static void (*aio_server_pre_accept) (char *, char **);
-static int aio_server_in_flow_delay;
-static unsigned aio_server_generation;
-static void (*aio_server_pre_disconn) (ACL_VSTREAM *, char *, char **);
-static int (*aio_server_on_accept)(ACL_VSTREAM *);
+static ACL_AIO_SERVER_FN __service_main;
+static ACL_AIO_SERVER2_FN __service2_main;
+static ACL_MASTER_SERVER_EXIT_FN __service_onexit;
+static char *__service_name;
+static char **__service_argv;
+static void *__service_ctx;
+static void (*__service_accept) (ACL_ASTREAM *, void *);
 
-/* add by zsx for rw timeout, 2005.9.25*/
-static void (*aio_server_rw_timer) (ACL_VSTREAM *);
+static unsigned __aio_server_generation;
+static char *__deny_info = NULL;
 
 static ACL_ASTREAM *ACL_MASTER_STAT_ASTREAM = NULL;
 
@@ -308,8 +307,8 @@ static void disable_listen(void)
 
 static void aio_server_exit(void)
 {
-	if (aio_server_onexit)
-		aio_server_onexit(aio_server_name, aio_server_argv);
+	if (__service_onexit)
+		__service_onexit(__service_ctx);
 	exit(0);
 }
 
@@ -524,18 +523,71 @@ void acl_aio_server_on_close(ACL_ASTREAM *stream acl_unused)
 
 /* server_wakeup - wake up application in main thread */
 
-static void server_wakeup(ACL_AIO *aio acl_unused, int fd)
+static void disconnect_callback(ACL_VSTREAM *vs acl_unused, void *ctx)
 {
-	if (acl_msg_verbose)
-		acl_msg_info("connection established fd %d", fd);
+	ACL_ASTREAM *as = (ACL_ASTREAM*) ctx;
+
+	acl_aio_server_on_close(as);
+}
+
+static void server_wakeup(ACL_AIO *aio, int fd)
+{
+	const char *myname = "server_wakeup";
+	char  addr[256], *ptr;
 
 	acl_non_blocking(fd, ACL_NON_BLOCKING);
 	acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 
 	increase_client_counter();
 
+	if (acl_getpeername(fd, addr, sizeof(addr)) < 0) {
+		acl_msg_warn("%s, %s(%d): get socket's addr error: %s",
+			__FILE__, myname, __LINE__, acl_last_serror());
+		acl_socket_close(fd);
+		return;
+	}
+
+	ptr = strchr(addr, ':');
+	if (ptr)
+		*ptr = 0;
+
+	if (!acl_access_permit(addr)) {
+		acl_msg_warn("%s, %s(%d): addr(%s) be denied",
+			__FILE__, myname, __LINE__, addr);
+
+		if (__deny_info && *__deny_info) {
+			if (write(fd, __deny_info, strlen(__deny_info)) > 0
+				&& write(fd, "\r\n", 2) > 0)
+			{
+				/* do nothing, just avoid compile warning */
+			}
+		}
+
+		acl_socket_close(fd);
+		return;
+	}
+
 	__use_count++;
-	aio_server_service(fd, aio_server_name, aio_server_argv);
+
+	if (__service_main != NULL) {
+		ACL_VSTREAM *vs;
+		ACL_ASTREAM *as;
+
+		vs = acl_vstream_fdopen(fd, O_RDWR, acl_var_aio_buf_size,
+			0, ACL_VSTREAM_TYPE_SOCK);
+		acl_vstream_set_peer(vs, addr);
+		acl_getsockname(fd, addr, sizeof(addr));
+		acl_vstream_set_local(vs, addr);
+
+		as = acl_aio_open(aio, vs);
+		acl_vstream_add_close_handle(vs, disconnect_callback, as);
+
+		__service_main(as, __service_ctx);
+	} else if (__service2_main != NULL)
+		__service2_main(fd, __service_ctx);
+	else
+		acl_msg_fatal("%s(%d), %s: service_callback null",
+			__FILE__, __LINE__, myname);
 }
 
 static void dummy(void *ptr acl_unused)
@@ -622,9 +674,6 @@ static void aio_server_accept_pass(ACL_ASTREAM *astream, void *context)
 	else
 		time_left = acl_var_aio_idle_limit;
 
-	if (aio_server_pre_accept)
-		aio_server_pre_accept(aio_server_name, aio_server_argv);
-
 	fds = (int*) tls_alloc(sizeof(int) * acl_var_aio_max_accept);
 
 	for (i = 0; i < acl_var_aio_max_accept; i++) {
@@ -645,18 +694,18 @@ static void aio_server_accept_pass(ACL_ASTREAM *astream, void *context)
 
 	if (acl_var_aio_status_notify && acl_var_aio_master_maxproc > 1
 		&& i >= acl_var_aio_min_notify && acl_master_notify(
-			acl_var_aio_pid, aio_server_generation,
+			acl_var_aio_pid, __aio_server_generation,
 			ACL_MASTER_STAT_TAKEN) < 0)
 	{
 		aio_server_abort(astream, NULL);
 	}
 
 	for (j = 0; j < i; j++)
-		aio_server_wakeup(aio, fds[j]);
+		server_wakeup(aio, fds[j]);
 
 	if (acl_var_aio_status_notify && acl_var_aio_master_maxproc > 1
 		&& i >= acl_var_aio_min_notify && acl_master_notify(
-			acl_var_aio_pid, aio_server_generation,
+			acl_var_aio_pid, __aio_server_generation,
 			ACL_MASTER_STAT_AVAIL) < 0)
 	{
 		aio_server_abort(astream, NULL);
@@ -682,9 +731,6 @@ static int aio_server_accept_sock2(ACL_ASTREAM *astream, ACL_AIO *aio)
 	ACL_VSTREAM *vstream = acl_aio_vstream(astream);
 	int    listen_fd = ACL_VSTREAM_SOCK(vstream);
 	int    fd, *fds, i, j, delay_listen = 0, sock_type;
-
-	if (aio_server_pre_accept)
-		aio_server_pre_accept(aio_server_name, aio_server_argv);
 
 	fds = (int*) tls_alloc(sizeof(int) * acl_var_aio_max_accept);
 
@@ -716,18 +762,18 @@ static int aio_server_accept_sock2(ACL_ASTREAM *astream, ACL_AIO *aio)
 
 	if (acl_var_aio_status_notify && acl_var_aio_master_maxproc > 1
 		&& i >= acl_var_aio_min_notify && acl_master_notify(
-			acl_var_aio_pid, aio_server_generation,
+			acl_var_aio_pid, __aio_server_generation,
 			ACL_MASTER_STAT_TAKEN) < 0)
 	{
 		aio_server_abort(astream, NULL);
 	}
 
 	for (j = 0; j < i; j++)
-		aio_server_wakeup(aio, fds[j]);
+		server_wakeup(aio, fds[j]);
 
 	if (acl_var_aio_status_notify && acl_var_aio_master_maxproc > 1
 		&& i >= acl_var_aio_min_notify && acl_master_notify(
-			acl_var_aio_pid, aio_server_generation,
+			acl_var_aio_pid, __aio_server_generation,
 			ACL_MASTER_STAT_AVAIL) < 0)
 	{
 		aio_server_abort(astream, NULL);
@@ -851,7 +897,7 @@ static void dispatch_receive(int event_type acl_unused, ACL_EVENT *event,
 	if (acl_getsocktype(fd) == AF_INET)
 		acl_tcp_set_nodelay(fd);
 	/* begin handle one client connection same as accept */
-	aio_server_wakeup(aio, fd);
+	server_wakeup(aio, fd);
 }
 
 static void dispatch_open(ACL_EVENT *event, ACL_AIO *aio)
@@ -933,7 +979,7 @@ static void aio_server_init(const char *procname)
 	acl_master_vars_init(acl_var_aio_buf_size, acl_var_aio_rw_timeout);
 }
 
-static void aio_server_open_log(void)
+static void open_service_log(void)
 {
 	/* first, close the master's log */
 	master_log_close();
@@ -1042,79 +1088,74 @@ static ACL_ASTREAM **create_listener(ACL_AIO *aio, int event_mode acl_unused,
 	const char *transport, int socket_count)
 {
 	const char *myname = "create_listener";
-	int   i, fd, fdtype = 0;
-	ACL_AIO *aio_ptr;
-	ACL_VSTREAM *stream;
-	ACL_ASTREAM *astream, **listen_astreams;
+	int   i, fd, type = 0;
+	ACL_VSTREAM *vs;
+	ACL_ASTREAM *as, **sstreams;
 
 	/* socket count is as same listen_fd_count in parent process */
 
-	listen_astreams = (ACL_ASTREAM **)
-		acl_mycalloc(socket_count + 1, sizeof(ACL_ASTREAM *));
+	sstreams = (ACL_ASTREAM **) acl_mycalloc(socket_count + 1,
+			sizeof(ACL_ASTREAM *));
 	for (i = 0; i < socket_count + 1; i++)
-		listen_astreams[i] = NULL;
-
-	aio_server_wakeup = server_wakeup;
-	aio_ptr = aio;
+		sstreams[i] = NULL;
 
 	/* 选择连接接收接口 */
 
 	if (transport == 0)
-		acl_msg_fatal("no transport type specified");
+		acl_msg_fatal("%s: no transport type specified", myname);
 	if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_INET) == 0) {
-		aio_server_accept = aio_server_accept_sock;
-		fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
+		__service_accept = aio_server_accept_sock;
+		type = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 	} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_UNIX) == 0) {
-		aio_server_accept = aio_server_accept_sock;
-		fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_UNIX;
+		__service_accept = aio_server_accept_sock;
+		type = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_UNIX;
 	} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_SOCK) == 0) {
-		aio_server_accept = aio_server_accept_sock;
-		fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
+		__service_accept = aio_server_accept_sock;
+		type = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 #ifdef MASTER_XPORT_NAME_PASS
 	} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_PASS) == 0) {
-		aio_server_accept = aio_server_accept_pass;
-		fdtype = ACL_VSTREAM_TYPE_LISTEN;
+		__service_accept = aio_server_accept_pass;
+		type = ACL_VSTREAM_TYPE_LISTEN;
 #endif
 	} else
-		acl_msg_fatal("unsupported transport type: %s", transport);
+		acl_msg_fatal("%s: unsupported transport type: %s",
+			myname, transport);
 
 	for (i = 0, fd = ACL_MASTER_LISTEN_FD;
 		fd < ACL_MASTER_LISTEN_FD + socket_count; fd++)
 	{
 		/* 打开监听数据流 */
-		stream = acl_vstream_fdopen(fd, O_RDWR, acl_var_aio_buf_size,
-			acl_var_aio_rw_timeout, fdtype);
-		if (stream == NULL)
-			acl_msg_fatal("%s(%d), %s: stream null, fd = %d",
-				__FILE__, __LINE__, myname, fd);
+		vs = acl_vstream_fdopen(fd, O_RDWR, acl_var_aio_buf_size,
+			acl_var_aio_rw_timeout, type);
+		acl_assert(vs);
 
-		acl_non_blocking(ACL_VSTREAM_SOCK(stream), ACL_NON_BLOCKING);
-		acl_close_on_exec(ACL_VSTREAM_SOCK(stream), ACL_CLOSE_ON_EXEC);
+		acl_non_blocking(ACL_VSTREAM_SOCK(vs), ACL_NON_BLOCKING);
+		acl_close_on_exec(ACL_VSTREAM_SOCK(vs), ACL_CLOSE_ON_EXEC);
 
 		/* 打开异步数据流 */
-		astream = acl_aio_open(aio_ptr, stream);
-		if (astream == NULL)
-			acl_msg_fatal("%s(%d), %s: astream null, fd=%d",
-				__FILE__, __LINE__, myname, fd);
+		as = acl_aio_open(aio, vs);
+		acl_assert(as);
 
-		/* 如果采用子线程单独 accept 连接，则 aio_server_accept 在子线程
+		/* 若采用子线程单独 accept 连接，则 __service_accept 在子线程
 		 * 的异步事件循环中运行，否则在主线程的异步事件循环中运行
 		 */
-		acl_aio_ctl(astream, ACL_AIO_CTL_LISTEN_FN, aio_server_accept, 
-			ACL_AIO_CTL_CTX, aio_ptr, ACL_AIO_CTL_END);
+		acl_aio_ctl(as, ACL_AIO_CTL_LISTEN_FN, __service_accept, 
+			ACL_AIO_CTL_CTX, aio, ACL_AIO_CTL_END);
 
 		/* 设置异步监听 */
-		acl_aio_listen(astream);
-		listen_astreams[i++] = astream;
+		acl_aio_listen(as);
+		sstreams[i++] = as;
+
+		if (acl_var_aio_accept_timer <= 0)
+			continue;
 
 		/* 为了保证 accept 的优先级，可以设置接收定时器 */
-		if (acl_var_aio_accept_timer > 0)
-			acl_aio_request_timer(aio, aio_server_accept_timer,
-				astream, (acl_int64)
-				acl_var_aio_accept_timer * 1000000, 0);
+
+		acl_aio_request_timer(aio, aio_server_accept_timer,
+			as, (acl_int64) acl_var_aio_accept_timer * 1000000, 0);
 	}
 
-	return listen_astreams;
+	return sstreams;
 }
 
 /* 进程间通信设置 */
@@ -1150,10 +1191,11 @@ static void run_loop(const char *procname)
 			acl_var_aio_procname, __LINE__, acl_var_aio_log_file);
 
 	/*
-	 * Traditionally, BSD select() can't handle aiople processes selecting
-	 * on the same socket, and wakes up every process in select(). See TCP/IP
-	 * Illustrated volume 2 page 532. We avoid select() collisions with an
-	 * external lock file.
+	 * Traditionally, BSD select() can't handle aiople processes
+	 * selecting on the same socket, and wakes up every process
+	 * in select().
+	 * See TCP/IP Illustrated volume 2 page 532. We avoid select()
+	 * collisions with an external lock file.
 	 */
 
 	while (1) {
@@ -1163,7 +1205,9 @@ static void run_loop(const char *procname)
 			sleep(1);
 		if (__listen_disabled == 1) {
 			__listen_disabled = 2;
-			/* 该进程不再负责监听，防止 acl_master 主进程无法正常重启 */
+			/* 该进程不再负责监听，防止 acl_master 主进程
+			 * 无法正常重启
+			 */
 			disable_listen();
 		}
 	}
@@ -1174,24 +1218,38 @@ static void run_loop(const char *procname)
 
 /* acl_aio_server_main - the real main program */
 
-void acl_aio_server_main(int argc, char **argv, ACL_AIO_SERVER_FN service,...)
+static void server_main(int argc, char **argv, va_list ap)
 {
 	const char *myname = "acl_aio_server_main";
 	ACL_VSTREAM *stream = 0;
-	int     key, f_flag = 0;
-	char   *root_dir = 0, *user_name = 0 /*, debug_me = 0 */;
+	int     key, f_flag = 0, alone = 0;
+	char   *root_dir = 0, *user_name = 0;
 	char   *service_name = acl_mystrdup(acl_safe_basename(argv[0]));
-	va_list ap;
 	ACL_MASTER_SERVER_INIT_FN pre_init = 0;
 	ACL_MASTER_SERVER_INIT_FN post_init = 0;
-	int     alone = 0, zerolimit = 0;
 	char   *transport = 0, *generation, *conf_file_ptr = 0;
 
-	aio_init();  /* 初始化ACL库 */
+	/*******************************************************************/
+
+	/* If not connected to stdin, stdin must not be a terminal. */
+	if (isatty(STDIN_FILENO)) {
+		printf("%s(%d), %s: do not run this command by hand\r\n",
+			__FILE__, __LINE__, myname);
+		exit (1);
+	}
+
+	/*******************************************************************/
+
+	aio_init();  /* 初始化 */
+
+	/* 在子进程切换用户身份之前，先用 acl_master 的日志句柄记日志 */
+	acl_master_log_open(argv[0]);
+
+	/*******************************************************************/
 
 	/*
-	 * Pick up policy settings from master process. Shut up error messages to
-	 * stderr, because no-one is going to see them.
+	 * Pick up policy settings from master process. Shut up error
+	 * messages to stderr, because no-one is going to see them.
 	 */
 
 	opterr = 0;
@@ -1217,7 +1275,8 @@ void acl_aio_server_main(int argc, char **argv, ACL_AIO_SERVER_FN service,...)
 			break;
 		case 's':
 			if ((__socket_count = atoi(optarg)) <= 0)
-				acl_msg_fatal("invalid socket_count: %s", optarg);
+				acl_msg_fatal("%s: invalid socket_count: %s",
+					myname, optarg);
 			break;
 		case 'i':
 			stream = ACL_VSTREAM_IN;
@@ -1231,43 +1290,49 @@ void acl_aio_server_main(int argc, char **argv, ACL_AIO_SERVER_FN service,...)
 		case 'v':
 			acl_msg_verbose++;
 			break;
-		case 'z':
-			zerolimit = 1;
-			break;
 		default:
 			break;
 		}
 	}
 
-	/* If not connected to stdin, stdin must not be a terminal. */
-	if (stream == 0 && isatty(STDIN_FILENO))
-		acl_msg_fatal("%s(%d), %s: do not run this command by hand",
-			__FILE__, __LINE__, myname);
 	if (stream == 0)
 		aio_server_init(argv[0]);
-
 	if (f_flag == 0)
 		acl_msg_fatal("%s(%d), %s: need \"-f pathname\"",
 			__FILE__, __LINE__, myname);
-	else if (acl_msg_verbose)
+	if (acl_msg_verbose)
 		acl_msg_info("%s(%d), %s: configure file = %s", 
 			__FILE__, __LINE__, myname, conf_file_ptr);
 
 	/* Application-specific initialization. */
-	va_start(ap, service);
+
 	while ((key = va_arg(ap, int)) != 0) {
 		switch (key) {
 		case ACL_MASTER_SERVER_INT_TABLE:
-			acl_get_app_conf_int_table(va_arg(ap, ACL_CONFIG_INT_TABLE *));
+			/* 读取 int 类型的配置文件表 */
+			acl_get_app_conf_int_table(
+				va_arg(ap, ACL_CONFIG_INT_TABLE *));
 			break;
 		case ACL_MASTER_SERVER_INT64_TABLE:
-			acl_get_app_conf_int64_table(va_arg(ap, ACL_CONFIG_INT64_TABLE *));
+			/* 读取 int64 类型的配置文件表 */
+			acl_get_app_conf_int64_table(
+				va_arg(ap, ACL_CONFIG_INT64_TABLE *));
 			break;
 		case ACL_MASTER_SERVER_STR_TABLE:
-			acl_get_app_conf_str_table(va_arg(ap, ACL_CONFIG_STR_TABLE *));
+			/* 读取 string 类型的配置文件表 */
+			acl_get_app_conf_str_table(
+				va_arg(ap, ACL_CONFIG_STR_TABLE *));
 			break;
 		case ACL_MASTER_SERVER_BOOL_TABLE:
-			acl_get_app_conf_bool_table(va_arg(ap, ACL_CONFIG_BOOL_TABLE *));
+			/* 读取 bool 类型的配置文件表 */
+			acl_get_app_conf_bool_table(
+				va_arg(ap, ACL_CONFIG_BOOL_TABLE *));
+			break;
+		case ACL_MASTER_SERVER_DENY_INFO:
+			__deny_info = acl_mystrdup(va_arg(ap, const char*));
+			break;
+		case ACL_MASTER_SERVER_CTX:
+			__service_ctx = va_arg(ap, void *);
 			break;
 		case ACL_MASTER_SERVER_PRE_INIT:
 			pre_init = va_arg(ap, ACL_MASTER_SERVER_INIT_FN);
@@ -1276,43 +1341,16 @@ void acl_aio_server_main(int argc, char **argv, ACL_AIO_SERVER_FN service,...)
 			post_init = va_arg(ap, ACL_MASTER_SERVER_INIT_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
-			aio_server_onexit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
-			break;
-		case ACL_MASTER_SERVER_PRE_ACCEPT:
-			aio_server_pre_accept = va_arg(ap, ACL_MASTER_SERVER_ACCEPT_FN);
-			break;
-		case ACL_MASTER_SERVER_PRE_DISCONN:
-			aio_server_pre_disconn = va_arg(ap, ACL_MASTER_SERVER_DISCONN_FN);
-			break;
-		case ACL_MASTER_SERVER_ON_ACCEPT:
-			aio_server_on_accept = va_arg(ap, ACL_MASTER_SERVER_ON_ACCEPT_FN);
-			break;
-		case ACL_MASTER_SERVER_RW_TIMER:
-			aio_server_rw_timer = va_arg(ap, ACL_MASTER_SERVER_RW_TIMER_FN);
-			break;
-		case ACL_MASTER_SERVER_IN_FLOW_DELAY:
-			aio_server_in_flow_delay = 1;
-			break;
-		case ACL_MASTER_SERVER_SOLITARY:
-			if (!alone)
-				acl_msg_fatal("service %s requires a process"
-					" limit of 1", service_name);
-			break;
-		case ACL_MASTER_SERVER_UNLIMITED:
-			if (!zerolimit)
-				acl_msg_fatal("service %s requires a process"
-					" limit of 0", service_name);
-			break;
-		case ACL_MASTER_SERVER_PRIVILEGED:
-			if (user_name)
-				acl_msg_fatal("service %s requires privileged"
-					" operation", service_name);
+			__service_onexit =
+				va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
 			break;
 		default:
-			acl_msg_panic("%s: unknown argument type: %d", myname, key);
+			acl_msg_warn("%s: unknown argument type: %d",
+				myname, key);
 		}
 	}
-	va_end(ap);
+
+	va_end(ap);  /* 将传入的 va_list 参数收尾 */
 
 	/* 读完配置文件后重新设置 */
 
@@ -1321,23 +1359,26 @@ void acl_aio_server_main(int argc, char **argv, ACL_AIO_SERVER_FN service,...)
 	if (user_name)
 		user_name = acl_var_aio_owner;
 
+	/* 当没有通过函数参数设置拒绝访问信息时，则使用配置文件中的内容 */
+	if (__deny_info == NULL)
+		__deny_info = acl_var_aio_deny_info;
+
 	/*
 	 * Retrieve process generation from environment.
 	 */
 	if ((generation = getenv(ACL_MASTER_GEN_NAME)) != 0) {
 		if (!acl_alldig(generation))
 			acl_msg_fatal("bad generation: %s", generation);
-		sscanf(generation, "%o", &aio_server_generation);
+		sscanf(generation, "%o", &__aio_server_generation);
 		if (acl_msg_verbose)
 			acl_msg_info("process generation: %s (%o)",
-				generation, aio_server_generation);
+				generation, __aio_server_generation);
 	}
 
 	/* Set up call-back info.  */
 
-	aio_server_service = service;
-	aio_server_name = service_name;
-	aio_server_argv = argv + optind;
+	__service_name = service_name;
+	__service_argv = argv + optind;
 
 	__h_aio = create_aio(&__event_mode);  /* 创建异步IO引擎 */
 
@@ -1348,15 +1389,15 @@ void acl_aio_server_main(int argc, char **argv, ACL_AIO_SERVER_FN service,...)
 
 	/* Run pre-jail initialization. */
 	if (pre_init)
-		pre_init(aio_server_name, aio_server_argv);
+		pre_init(__service_ctx);
 
 	acl_chroot_uid(root_dir, user_name);  /* 切换用户身份 */
+	open_service_log();  /* 打开本进程自己的日志 */
 
 	/* 设置子进程运行环境，允许产生 core 文件 */
 	if (acl_var_aio_enable_core)
 		set_core_limit();
 
-	aio_server_open_log();  /* 打开日志 */
 	log_event_mode(__event_mode);  /* 将事件模式记入日志中 */
 
 	create_timer(__h_aio, __use_limit_delay);  /* 创建定时器 */
@@ -1366,11 +1407,34 @@ void acl_aio_server_main(int argc, char **argv, ACL_AIO_SERVER_FN service,...)
 
 	/* Run post-jail initialization. */
 	if (post_init)
-		post_init(aio_server_name, aio_server_argv);
+		post_init(__service_ctx);
 
 	if (acl_var_aio_dispatch_addr && *acl_var_aio_dispatch_addr)
 		dispatch_open(acl_aio_server_event(), __h_aio);
 
 	run_loop(argv[0]);  /* 进入事件主循环过程 */
 }
+
+void acl_aio_server_main(int argc, char **argv, ACL_AIO_SERVER_FN service,...)
+{
+	va_list ap;
+
+	__service_main = service;
+
+	va_start(ap, service);
+	/* ap 将在 server_mainn 中收尾 */
+	server_main(argc, argv, ap);
+}
+
+void acl_aio_server2_main(int argc, char **argv, ACL_AIO_SERVER2_FN service,...)
+{
+	va_list ap;
+
+	__service2_main = service;
+
+	va_start(ap, service);
+	/* ap 将在 server_mainn 中收尾 */
+	server_main(argc, argv, ap);
+}
+
 #endif /* ACL_UNIX */

@@ -117,7 +117,8 @@ static void auto_clnt_close(AUTO_CLNT *);
 
 /* auto_clnt_event - server-initiated disconnect or client-side max_idle */
 
-static void auto_clnt_event(int unused_event acl_unused, void *context)
+static void auto_clnt_event(int event_type acl_unused,
+	ACL_EVENT *event acl_unused, void *context)
 {
     AUTO_CLNT *auto_clnt = (AUTO_CLNT *) context;
 
@@ -131,9 +132,15 @@ static void auto_clnt_event(int unused_event acl_unused, void *context)
     auto_clnt_close(auto_clnt);
 }
 
+static void auto_clnt_event_read(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream acl_unused, void *context)
+{
+	auto_clnt_event(event_type, event, context);
+}
+
 /* auto_clnt_ttl_event - client-side expiration */
 
-static void auto_clnt_ttl_event(int event, void *context)
+static void auto_clnt_ttl_event(int event_type, ACL_EVENT *event, void *context)
 {
 
     /*
@@ -148,7 +155,7 @@ static void auto_clnt_ttl_event(int event, void *context)
      * direct calls to auto_clnt_event()? It should not, because there exists
      * code that takes the address of both functions.
      */
-    auto_clnt_event(event, context);
+    auto_clnt_event(event_type, event, context);
 }
 
 /* auto_clnt_open - connect to service */
@@ -192,7 +199,7 @@ static void auto_clnt_open(AUTO_CLNT *auto_clnt)
 	acl_close_on_exec(ACL_VSTREAM_SOCK(auto_clnt->vstream), ACL_CLOSE_ON_EXEC);
 #endif
 	acl_event_enable_read(auto_clnt->event, auto_clnt->vstream, 0,
-		auto_clnt_event, (char *) auto_clnt);
+		auto_clnt_event_read, (char *) auto_clnt);
 	if (auto_clnt->max_idle > 0)
 	    acl_event_request_timer(auto_clnt->event, auto_clnt_event,
 		    (char *) auto_clnt, auto_clnt->max_idle, 0);

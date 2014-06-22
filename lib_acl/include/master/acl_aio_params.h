@@ -121,6 +121,10 @@ extern char *acl_var_aio_dispatch_addr;
 #define	ACL_DEF_AIO_DISPATCH_TYPE	"default"
 extern char *acl_var_aio_dispatch_type;
 
+#define	ACL_VAR_AIO_DENY_INFO		"master_deny_info"
+#define	ACL_DEF_AIO_DENY_INFO		"you're not welcome!"
+extern char *acl_var_aio_deny_info;
+
 #endif /* ACL_UNIX */
 
 #ifdef	__cplusplus

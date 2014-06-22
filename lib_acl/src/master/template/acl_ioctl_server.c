@@ -143,13 +143,8 @@ static void (*ioctl_server_service) (ACL_IOCTL *, ACL_VSTREAM *, char *, char **
 static char *ioctl_server_name;
 static char **ioctl_server_argv;
 static void (*ioctl_server_accept) (int, ACL_IOCTL *, ACL_VSTREAM *, void *);
-static void (*ioctl_server_onexit) (char *, char **);
-static void (*ioctl_server_pre_accept) (char *, char **);
-static int ioctl_server_in_flow_delay;
+static ACL_MASTER_SERVER_EXIT_FN ioctl_server_onexit;
 static unsigned ioctl_server_generation;
-static void (*ioctl_server_pre_disconn) (ACL_VSTREAM *, char *, char **);
-static int (*ioctl_server_on_accept)(ACL_VSTREAM *);
-static void (*ioctl_server_rw_timer) (ACL_VSTREAM *);
 
 static void ioctl_init(void)
 {
@@ -295,7 +290,10 @@ static void disable_listen(void)
 static void ioctl_server_exit(void)
 {
 	if (ioctl_server_onexit)
+		ioctl_server_onexit(ioctl_server_name);
+	/*
 		ioctl_server_onexit(ioctl_server_name, ioctl_server_argv);
+		*/
 
 	/* XXX: some bugs exist, need to be fixed --- zsx
 	if (__h_ioctl)
@@ -526,9 +524,6 @@ static void ioctl_server_accept_pass(int event_type, ACL_IOCTL *h_ioctl,
 	else
 		time_left = acl_var_ioctl_idle_limit;
 
-	if (ioctl_server_pre_accept)
-		ioctl_server_pre_accept(ioctl_server_name, ioctl_server_argv);
-
 	while (i++ < acl_var_ioctl_max_accept) {
 		fd = PASS_ACCEPT(listen_fd);
 		if (fd >= 0) {
@@ -596,9 +591,6 @@ static void ioctl_server_accept_sock(int event_type, ACL_IOCTL *h_ioctl,
 			ioctl_server_timeout, h_ioctl) + 999999) / 1000000);
 	else
 		time_left = acl_var_ioctl_idle_limit;
-
-	if (ioctl_server_pre_accept)
-		ioctl_server_pre_accept(ioctl_server_name, ioctl_server_argv);
 
 	while (i++ < acl_var_ioctl_max_accept) {
 		fd = acl_accept(listen_fd, remote, sizeof(remote), &sock_type);
@@ -877,21 +869,6 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 		case ACL_MASTER_SERVER_EXIT:
 			ioctl_server_onexit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
 			break;
-		case ACL_MASTER_SERVER_PRE_ACCEPT:
-			ioctl_server_pre_accept = va_arg(ap, ACL_MASTER_SERVER_ACCEPT_FN);
-			break;
-		case ACL_MASTER_SERVER_PRE_DISCONN:
-			ioctl_server_pre_disconn = va_arg(ap, ACL_MASTER_SERVER_DISCONN_FN);
-			break;
-		case ACL_MASTER_SERVER_ON_ACCEPT:
-			ioctl_server_on_accept = va_arg(ap, ACL_MASTER_SERVER_ON_ACCEPT_FN);
-			break;
-		case ACL_MASTER_SERVER_RW_TIMER:
-			ioctl_server_rw_timer = va_arg(ap, ACL_MASTER_SERVER_RW_TIMER_FN);
-			break;
-		case ACL_MASTER_SERVER_IN_FLOW_DELAY:
-			ioctl_server_in_flow_delay = 1;
-			break;
 		case ACL_MASTER_SERVER_SOLITARY:
 			if (!alone)
 				acl_msg_fatal("service %s requires a process"
@@ -901,11 +878,6 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 			if (!zerolimit)
 				acl_msg_fatal("service %s requires a process"
 					" limit of 0", service_name);
-			break;
-		case ACL_MASTER_SERVER_PRIVILEGED:
-			if (user_name)
-				acl_msg_fatal("service %s requires privileged"
-					" operation", service_name);
 			break;
 		default:
 			acl_msg_panic("%s: unknown argument type: %d", myname, key);
@@ -1014,7 +986,7 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 			acl_last_serror());
 
 	if (pre_init)
-		pre_init(ioctl_server_name, ioctl_server_argv);
+		pre_init(ioctl_server_name);
 
 	acl_chroot_uid(root_dir, user_name);
 	/* 设置子进程运行环境，允许产生 core 文件 */
@@ -1032,7 +1004,7 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 	 */
 	if (stream != 0) {
 		if (post_init)
-			post_init(ioctl_server_name, ioctl_server_argv);
+			post_init(ioctl_server_name);
 		service(__h_ioctl, stream, ioctl_server_name, ioctl_server_argv);
 		ioctl_server_exit();
 	}
@@ -1094,7 +1066,7 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 
 	/* Run post-jail initialization. */
 	if (post_init)
-		post_init(ioctl_server_name, ioctl_server_argv);
+		post_init(ioctl_server_name);
 
 	acl_msg_info("%s(%d), %s daemon started, log: %s",
 		myname, __LINE__, argv[0], acl_var_ioctl_log_file);

@@ -97,22 +97,6 @@ static void __pre_disconnect_fn(ACL_VSTREAM *stream, char *unused_name, char **u
 	stream->context = NULL;
 }
 
-static void __rw_timer_fn(ACL_VSTREAM *stream)
-{
-	char  myname[] = "__rw_timer_fn";
-
-	if (stream == NULL || ACL_VSTREAM_SOCK(stream) < 0)
-		acl_msg_fatal("%s(%d)->%s: input error, null stream",
-				__FILE__, __LINE__, myname);
-
-	if (acl_msg_verbose)
-		acl_msg_info("%s(%d)->%s: rw timeout, fd = %d",
-				__FILE__, __LINE__, myname,
-				ACL_VSTREAM_SOCK(stream));
-
-	acl_multi_server_disconnect(stream);
-}
-
 static void __service(ACL_VSTREAM *stream, char *service, char **argv)
 {
 	char  myname[] = "__service";
@@ -145,8 +129,6 @@ static void __service(ACL_VSTREAM *stream, char *service, char **argv)
 		acl_multi_server_disconnect(stream);
 		return;
 	}
-
-	acl_multi_server_cancel_rw_timer(peer->stream);
 
 	n = acl_vstream_read(stream, __data_buf, var_proxy_bufsize);
 	if (n == ACL_VSTREAM_EOF) {
@@ -186,9 +168,6 @@ static void __service(ACL_VSTREAM *stream, char *service, char **argv)
 				strerror(errno));
 		return;
 	}
-
-	acl_multi_server_request_rw_timer(stream);
-	acl_multi_server_request_rw_timer(peer->stream);
 }
 
 static int __on_accept_fn(ACL_VSTREAM *front_stream)
@@ -226,18 +205,6 @@ static int __on_accept_fn(ACL_VSTREAM *front_stream)
 	acl_multi_server_enable_read(backend_stream);
 
 	return (0);
-}
-
-static void __pre_accept_fn(char *unused_name, char **unused_argv)
-{
-	char  myname[] = "__pre_accept_fn";
-
-	unused_name = unused_name;
-	unused_argv = unused_argv;
-
-	if (acl_msg_verbose)
-		acl_msg_info("%s(%d)->%s: test only",
-				__FILE__, __LINE__, myname);
 }
 
 static void __pre_jail_init_fn(char *unused_name, char **unused_argv)
@@ -307,11 +274,9 @@ int main(int argc, char *argv[])
 				ACL_MASTER_SERVER_BOOL_TABLE, __conf_bool_tab,
 				ACL_MASTER_SERVER_STR_TABLE, __conf_str_tab,
 				ACL_MASTER_SERVER_PRE_INIT, __pre_jail_init_fn,
-				ACL_MASTER_SERVER_PRE_ACCEPT, __pre_accept_fn,
 				ACL_MASTER_SERVER_POST_INIT, __post_jail_init_fn,
 				ACL_MASTER_SERVER_ON_ACCEPT, __on_accept_fn,
-				ACL_MASTER_SERVER_RW_TIMER, __rw_timer_fn,
-				ACL_MASTER_SERVER_PRE_DISCONN, __pre_disconnect_fn,
+				ACL_MASTER_SERVER_ON_CLOSE, __pre_disconnect_fn,
 				0);
 	exit (0);
 }

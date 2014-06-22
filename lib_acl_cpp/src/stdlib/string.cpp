@@ -1066,7 +1066,10 @@ string& string::trim_left_space()
 	if (pBegin == pEnd)
 		clear();
 	else if (n > 0)
+	{
 		acl_vstring_memmove(vbf_, pBegin, LEN(vbf_) - n);
+		TERM(vbf_);
+	}
 	return *this;
 }
 
@@ -1125,7 +1128,10 @@ string& string::trim_left_line()
 	if (pBegin == pEnd)
 		clear();
 	else if (n > 0)
+	{
 		acl_vstring_memmove(vbf_, pBegin, LEN(vbf_) - n);
+		TERM(vbf_);
+	}
 	return *this;
 }
 

@@ -676,7 +676,8 @@ static void event_loop(ACL_EVENT *eventp)
 		ev->event_fdslots, delay);
 
 	if (eventp->nested++ > 0)
-		acl_msg_fatal("%s(%d): recursive call", myname, __LINE__);
+		acl_msg_fatal("%s(%d): recursive call, nested: %d",
+			myname, __LINE__, eventp->nested);
 	if (nready < 0) {
 		if (acl_last_error() != ACL_EINTR) {
 			acl_msg_fatal("%s(%d), %s: select: %s", __FILE__,
@@ -778,13 +779,13 @@ TAG_DONE:
 		timer_fn  = timer->callback;
 		timer_arg = timer->context;
 
-		/* 如果定时器的时间间隔 > 0 且允许定时器被循环调用，则再重设定时器 */
+		/* 定时器时间间隔 > 0 且允许定时器被循环调用，则重设定时器 */
 		if (timer->delay > 0 && timer->keep) {
 			timer->ncount++;
 			eventp->timer_request(eventp, timer->callback,
 				timer->context, timer->delay, timer->keep);
 		} else {
-			acl_ring_detach(&timer->ring);		/* first this */
+			acl_ring_detach(&timer->ring);	/* first this */
 			timer->nrefer--;
 			if (timer->nrefer != 0)
 				acl_msg_fatal("%s(%d): nrefer(%d) != 0",

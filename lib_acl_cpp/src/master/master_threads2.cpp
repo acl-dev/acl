@@ -31,19 +31,19 @@ void master_threads2::run_daemon(int argc, char** argv)
 
 	// 调用 acl 服务器框架的多线程模板
 	acl_threads_server_main(argc, argv, service_main, NULL,
-		ACL_APP_CTL_ON_ACCEPT, service_on_accept,
-		ACL_APP_CTL_ON_TIMEOUT, service_on_timeout,
-		ACL_APP_CTL_ON_CLOSE, service_on_close,
-		ACL_APP_CTL_PRE_JAIL, service_pre_jail,
-		ACL_APP_CTL_INIT_FN, service_init,
-		ACL_APP_CTL_EXIT_FN, service_exit,
-		ACL_APP_CTL_THREAD_INIT, thread_init,
-		ACL_APP_CTL_THREAD_EXIT, thread_exit,
-		ACL_APP_CTL_CFG_BOOL, conf_.get_bool_cfg(),
-		ACL_APP_CTL_CFG_INT64, conf_.get_int64_cfg(),
-		ACL_APP_CTL_CFG_INT, conf_.get_int_cfg(),
-		ACL_APP_CTL_CFG_STR, conf_.get_str_cfg(),
-		ACL_APP_CTL_END);
+		ACL_MASTER_SERVER_ON_ACCEPT, service_on_accept,
+		ACL_MASTER_SERVER_ON_TIMEOUT, service_on_timeout,
+		ACL_MASTER_SERVER_ON_CLOSE, service_on_close,
+		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
+		ACL_MASTER_SERVER_POST_INIT, service_init,
+		ACL_MASTER_SERVER_EXIT, service_exit,
+		ACL_MASTER_SERVER_THREAD_INIT, thread_init,
+		ACL_MASTER_SERVER_THREAD_EXIT, thread_exit,
+		ACL_MASTER_SERVER_BOOL_TABLE, conf_.get_bool_cfg(),
+		ACL_MASTER_SERVER_INT64_TABLE, conf_.get_int64_cfg(),
+		ACL_MASTER_SERVER_INT_TABLE, conf_.get_int_cfg(),
+		ACL_MASTER_SERVER_STR_TABLE, conf_.get_str_cfg(),
+		ACL_MASTER_SERVER_END);
 #else
 	logger_fatal("no support win32 yet!");
 #endif

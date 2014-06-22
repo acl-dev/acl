@@ -109,50 +109,23 @@ static int listen_disabled = 0;
 static ACL_EVENT *__eventp = NULL;
 static ACL_VSTREAM **__listen_streams = NULL;
 
-static void (*multi_server_service) (ACL_VSTREAM *, char *, char **);
-static char *multi_server_name;
-static char **multi_server_argv;
-static void (*multi_server_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
-static void (*multi_server_onexit) (char *, char **);
-static void (*multi_server_pre_accept) (char *, char **);
-static ACL_VSTREAM *multi_server_lock;
+static ACL_MULTI_SERVER_FN __service_main;
+static ACL_MASTER_SERVER_DISCONN_FN __service_onclose;
+static ACL_MASTER_SERVER_TIMEOUT_FN __service_timeout;
+static ACL_MASTER_SERVER_ACCEPT_FN __service_onaccept;
+static ACL_MASTER_SERVER_EXIT_FN __service_onexit;
+static char *__service_name;
+static char **__service_argv;
+static void *__service_ctx;
+
+static void (*__service_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
+static ACL_VSTREAM *__service_lock;
 static int multi_server_in_flow_delay;
 static unsigned multi_server_generation;
-static void (*multi_server_pre_disconn) (ACL_VSTREAM *, char *, char **);
-static int (*multi_server_on_accept)(ACL_VSTREAM *);
-
-/* add by zsx for rw timeout, 2005.9.25*/
-static void (*multi_server_rw_timer) (ACL_VSTREAM *);
 
 ACL_EVENT *acl_multi_server_event()
 {
 	return (__eventp);
-}
-
-/* add by zsx for rw timeout, 2005.9.25*/
-void acl_multi_server_request_rw_timer(ACL_VSTREAM *stream)
-{
-	const char *myname = "acl_multi_server_request_rw_timer";
-
-	if (stream == NULL)
-		acl_msg_fatal("%s(%d), %s: input error",
-			__FILE__, __LINE__, myname);
-	if (__eventp == NULL)
-		acl_msg_fatal("%s(%d), %s: event has not been inited",
-			__FILE__, __LINE__, myname);
-}
-
-/* add by zsx for rw timeout, 2005.9.25*/
-void acl_multi_server_cancel_rw_timer(ACL_VSTREAM *stream)
-{
-	const char *myname = "acl_multi_server_cancel_rw_timer";
-
-	if (stream == NULL)
-		acl_msg_fatal("%s(%d), %s: input error",
-			__FILE__, __LINE__, myname);
-	if (__eventp == NULL)
-		acl_msg_fatal("%s(%d), %s: event has not been inited",
-			__FILE__, __LINE__, myname);
 }
 
 static void disable_listen(ACL_EVENT *event)
@@ -175,8 +148,8 @@ static void disable_listen(ACL_EVENT *event)
 
 static void multi_server_exit(void)
 {
-	if (multi_server_onexit)
-		multi_server_onexit(multi_server_name, multi_server_argv);
+	if (__service_onexit)
+		__service_onexit(__service_ctx);
 	exit(0);
 }
 
@@ -255,9 +228,8 @@ void    acl_multi_server_disconnect(ACL_VSTREAM *stream)
 	if (acl_msg_verbose)
 		acl_msg_info("connection closed fd %d",
 			ACL_VSTREAM_SOCK(stream));
-	if (multi_server_pre_disconn)
-		multi_server_pre_disconn(stream,
-			multi_server_name, multi_server_argv);
+	if (__service_onclose)
+		__service_onclose(stream, __service_ctx);
 	acl_event_disable_readwrite(__eventp, stream);
 	(void) acl_vstream_fclose(stream);
 	client_count--;
@@ -270,8 +242,8 @@ static void multi_server_execute(int type, ACL_EVENT *event,
 {
 	const char *myname = "multi_server_execute";
 
-	if (multi_server_lock != 0
-	    && acl_myflock(ACL_VSTREAM_FILE(multi_server_lock),
+	if (__service_lock != 0
+	    && acl_myflock(ACL_VSTREAM_FILE(__service_lock),
 		ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("%s(%d)->%s: select unlock: %s",
@@ -288,8 +260,7 @@ static void multi_server_execute(int type, ACL_EVENT *event,
 			multi_server_abort(ACL_EVENT_NULL_TYPE, event,
 				stream, ACL_EVENT_NULL_CONTEXT);
 		}
-		multi_server_service(stream, multi_server_name,
-			multi_server_argv);
+		__service_main(stream, __service_name, __service_argv);
 		if (acl_master_notify(acl_var_multi_pid,
 			multi_server_generation, ACL_MASTER_STAT_AVAIL) < 0)
 		{
@@ -298,8 +269,8 @@ static void multi_server_execute(int type, ACL_EVENT *event,
 		}
 	} else {
 		/* add by zsx for rw timeout, 2005.9.25*/
-		if (type == ACL_EVENT_RW_TIMEOUT && multi_server_rw_timer)
-			multi_server_rw_timer(stream);
+		if (type == ACL_EVENT_RW_TIMEOUT && __service_timeout)
+			__service_timeout(stream, NULL);
 		else
 			acl_multi_server_disconnect(stream);
 	}
@@ -316,8 +287,8 @@ static void __multi_server_enable_read(int type acl_unused, ACL_EVENT *event,
 	ACL_VSTREAM *stream = (ACL_VSTREAM *) context;
 	int   ret;
 
-	if (multi_server_on_accept != NULL) {
-		ret = multi_server_on_accept(stream);
+	if (__service_onaccept != NULL) {
+		ret = __service_onaccept(stream);
 		if (ret < 0) {
 			acl_multi_server_disconnect(stream);
 			return;
@@ -370,9 +341,9 @@ static void multi_server_wakeup(ACL_EVENT *event, int fd)
 
 #ifdef MASTER_XPORT_NAME_PASS
 
-/* multi_server_accept_pass - accept descriptor */
+/* __service_accept_pass - accept descriptor */
 
-static void multi_server_accept_pass(int type acl_unused, ACL_EVENT *event,
+static void __service_accept_pass(int type acl_unused, ACL_EVENT *event,
 	ACL_VSTREAM *stream, void *context)
 {
 	int     listen_fd = acl_vstream_fileno(stream), time_left = -1, fd;
@@ -388,11 +359,9 @@ static void multi_server_accept_pass(int type acl_unused, ACL_EVENT *event,
 		time_left = (int) ((acl_event_cancel_timer(__evenpt,
 			multi_server_timeout, NULL) + 999999) / 1000000);
 
-	if (multi_server_pre_accept)
-		multi_server_pre_accept(multi_server_name, multi_server_argv);
 	fd = PASS_ACCEPT(listen_fd);
-	if (multi_server_lock != 0
-	    && acl_myflock(ACL_VSTREAM_FILE(multi_server_lock),
+	if (__service_lock != 0
+	    && acl_myflock(ACL_VSTREAM_FILE(__service_lock),
 	    	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
@@ -409,9 +378,9 @@ static void multi_server_accept_pass(int type acl_unused, ACL_EVENT *event,
 
 #endif
 
-/* multi_server_accept_sock - accept client connection request */
+/* __service_accept_sock - accept client connection request */
 
-static void multi_server_accept_sock(int type acl_unused, ACL_EVENT *event,
+static void __service_accept_sock(int type acl_unused, ACL_EVENT *event,
 	ACL_VSTREAM *stream, void *context acl_unused)
 {
 	int listen_fd = ACL_VSTREAM_SOCK(stream), time_left = -1, fd, sock_type;
@@ -427,11 +396,9 @@ static void multi_server_accept_sock(int type acl_unused, ACL_EVENT *event,
 		time_left = (int) ((acl_event_cancel_timer(event,
 			multi_server_timeout, NULL) + 9999999) / 1000000);
 
-	if (multi_server_pre_accept)
-		multi_server_pre_accept(multi_server_name, multi_server_argv);
 	fd = acl_accept(listen_fd, NULL, 0, &sock_type);
-	if (multi_server_lock != 0
-	    && acl_myflock(ACL_VSTREAM_FILE(multi_server_lock),
+	if (__service_lock != 0
+	    && acl_myflock(ACL_VSTREAM_FILE(__service_lock),
 	  	  	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
@@ -644,6 +611,9 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 			acl_get_app_conf_bool_table(va_arg(ap, ACL_CONFIG_BOOL_TABLE *));
 			break;
 
+		case ACL_MASTER_SERVER_CTX:
+			__service_ctx = va_arg(ap, void *);
+			break;
 		case ACL_MASTER_SERVER_PRE_INIT:
 			pre_init = va_arg(ap, ACL_MASTER_SERVER_INIT_FN);
 			break;
@@ -654,43 +624,24 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 			loop = va_arg(ap, ACL_MASTER_SERVER_LOOP_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
-			multi_server_onexit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
+			__service_onexit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
 			break;
-		case ACL_MASTER_SERVER_PRE_ACCEPT:
-			multi_server_pre_accept = va_arg(ap, ACL_MASTER_SERVER_ACCEPT_FN);
-			break;
-		case ACL_MASTER_SERVER_PRE_DISCONN:
-			multi_server_pre_disconn = va_arg(ap, ACL_MASTER_SERVER_DISCONN_FN);
+		case ACL_MASTER_SERVER_ON_CLOSE:
+			__service_onclose = va_arg(ap, ACL_MASTER_SERVER_DISCONN_FN);
 			break;
 		case ACL_MASTER_SERVER_ON_ACCEPT:
-			multi_server_on_accept = va_arg(ap, ACL_MASTER_SERVER_ON_ACCEPT_FN);
+			__service_onaccept = va_arg(ap, ACL_MASTER_SERVER_ACCEPT_FN);
 			break;
 
-		/* add by zsx for rw timeout, 2005.9.25*/
-		case ACL_MASTER_SERVER_RW_TIMER:
-			multi_server_rw_timer = va_arg(ap, ACL_MASTER_SERVER_RW_TIMER_FN);
-			break; /* bugfix, I forgot add 'break' here, sorry, 2005.9.26 */
+		case ACL_MASTER_SERVER_ON_TIMEOUT:
+			__service_timeout = va_arg(ap, ACL_MASTER_SERVER_TIMEOUT_FN);
+			break;
 
 		case ACL_MASTER_SERVER_IN_FLOW_DELAY:
 			multi_server_in_flow_delay = 1;
 			break;
-		case ACL_MASTER_SERVER_SOLITARY:
-			if (!alone)
-				acl_msg_fatal("service %s requires a process limit of 1",
-					service_name);
-			break;
-		case ACL_MASTER_SERVER_UNLIMITED:
-			if (!zerolimit)
-				acl_msg_fatal("service %s requires a process limit of 0",
-						service_name);
-			break;
-		case ACL_MASTER_SERVER_PRIVILEGED:
-			if (user_name)
-				acl_msg_fatal("service %s requires privileged operation",
-					service_name);
-			break;
 		default:
-			acl_msg_panic("%s: unknown argument type: %d", myname, key);
+			acl_msg_warn("%s: unknown argument type: %d", myname, key);
 		}
 	}
 	va_end(ap);
@@ -714,17 +665,17 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 		if (transport == 0)
 			acl_msg_fatal("no transport type specified");
 		if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_INET) == 0) {
-			multi_server_accept = multi_server_accept_sock;
+			__service_accept = __service_accept_sock;
 			fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 		} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_UNIX) == 0) {
-			multi_server_accept = multi_server_accept_sock;
+			__service_accept = __service_accept_sock;
 			fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_UNIX;
 		} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_SOCK) == 0) {
-			multi_server_accept = multi_server_accept_sock;
+			__service_accept = __service_accept_sock;
 			fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 #ifdef MASTER_XPORT_NAME_PASS
 		} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_PASS) == 0) {
-			multi_server_accept = multi_server_accept_pass;
+			__service_accept = __service_accept_pass;
 			fdtype = ACL_VSTREAM_TYPE_LISTEN;
 #endif
 		} else
@@ -753,9 +704,9 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 	/*
 	 * Set up call-back info.
 	 */
-	multi_server_service = service;
-	multi_server_name = service_name;
-	multi_server_argv = argv + optind;
+	__service_main = service;
+	__service_name = service_name;
+	__service_argv = argv + optind;
 
 	__eventp = acl_event_new_select(acl_var_multi_delay_sec,
 			acl_var_multi_delay_usec);
@@ -767,7 +718,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 		acl_msg_fatal("chdir(\"%s\"): %s", acl_var_multi_queue_dir,
 			acl_last_serror());
 	if (pre_init)
-		pre_init(multi_server_name, multi_server_argv);
+		pre_init(__service_ctx);
 
 	acl_chroot_uid(root_dir, user_name);
 	/* 设置子进程运行环境，允许产生 core 文件 */
@@ -779,7 +730,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 	 * Run post-jail initialization.
 	 */
 	if (post_init)
-		post_init(multi_server_name, multi_server_argv);
+		post_init(__service_ctx);
 
 	/*
 	 * Are we running as a one-shot server with the client connection on
@@ -788,7 +739,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 	 */
 	if (stream != 0) {
 		while (1)
-			service(stream, multi_server_name, multi_server_argv);
+			service(stream, __service_name, __service_argv);
 		/* not reached here */
 		multi_server_exit();
 	}
@@ -820,7 +771,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 				__FILE__, __LINE__, myname, fd);
 
 		acl_event_enable_read(__eventp, stream, 0,
-			multi_server_accept, stream);
+			__service_accept, stream);
 		acl_close_on_exec(ACL_VSTREAM_SOCK(stream), ACL_CLOSE_ON_EXEC);
 		__listen_streams[i] = stream;
 	}
@@ -842,16 +793,16 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 	{
 		int  delay_sec;
 
-		if (multi_server_lock != 0) {
+		if (__service_lock != 0) {
 			acl_watchdog_stop(watchdog);
-			if (acl_myflock(ACL_VSTREAM_FILE(multi_server_lock),
+			if (acl_myflock(ACL_VSTREAM_FILE(__service_lock),
 				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
 			{
 				acl_msg_fatal("lock error %s", acl_last_serror());
 			}
 		}
 		acl_watchdog_start(watchdog);
-		delay_sec = loop ? loop(multi_server_name, multi_server_argv) : -1;
+		delay_sec = loop ? loop(__service_ctx) : -1;
 		acl_event_set_delay_sec(__eventp, delay_sec);
 		acl_event_loop(__eventp);
 		if (listen_disabled == 1) {

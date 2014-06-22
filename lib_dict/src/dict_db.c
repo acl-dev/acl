@@ -180,7 +180,7 @@ static const char *dict_db_lookup(DICT *dict, char *name, size_t name_len, char 
 	 */
 
 	if ((dict->flags & DICT_FLAG_LOCK)
-		&& acl_myflock(dict->lock_fd, ACL_MYFLOCK_STYLE_FLOCK, ACL_MYFLOCK_OP_SHARED) < 0)
+		&& acl_myflock(dict->lock_fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_SHARED) < 0)
 		acl_msg_fatal("%s: lock dictionary: %s", dict_db->dict.name,
 			acl_last_strerror(ebuf, sizeof(ebuf)));
 
@@ -224,7 +224,7 @@ static const char *dict_db_lookup(DICT *dict, char *name, size_t name_len, char 
 	 * Release the shared lock.
 	 */
 	if ((dict->flags & DICT_FLAG_LOCK)
-	    && acl_myflock(dict->lock_fd, ACL_MYFLOCK_STYLE_FLOCK, ACL_MYFLOCK_OP_NONE) < 0)
+	    && acl_myflock(dict->lock_fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_NONE) < 0)
 		acl_msg_fatal("%s: unlock dictionary: %s", dict_db->dict.name,
 			acl_last_strerror(ebuf, sizeof(ebuf)));
 
@@ -300,7 +300,7 @@ static void dict_db_update(DICT *dict, char *name, size_t name_len, char *value,
 	 * Acquire an exclusive lock.
 	 */
 	if ((dict->flags & DICT_FLAG_LOCK)
-		&& acl_myflock(dict->lock_fd, ACL_MYFLOCK_STYLE_FLOCK, ACL_MYFLOCK_OP_EXCLUSIVE) < 0)
+		&& acl_myflock(dict->lock_fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
 		acl_msg_fatal("%s(%d): %s lock dictionary error %s",
 			myname, __LINE__, dict_db->dict.name, acl_last_strerror(ebuf, sizeof(ebuf)));
 
@@ -358,7 +358,7 @@ static void dict_db_update(DICT *dict, char *name, size_t name_len, char *value,
 	 * Release the exclusive lock.
 	 */
 	if ((dict->flags & DICT_FLAG_LOCK)
-		&& acl_myflock(dict->lock_fd, ACL_MYFLOCK_STYLE_FLOCK, ACL_MYFLOCK_OP_NONE) < 0)
+		&& acl_myflock(dict->lock_fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_NONE) < 0)
 		acl_msg_fatal("%s(%d): %s: unlock dictionary: %s", myname, __LINE__,
 			dict_db->dict.name, acl_last_strerror(ebuf, sizeof(ebuf)));
 }
@@ -402,7 +402,7 @@ static int dict_db_delete(DICT *dict, char *name, size_t name_len)
 	 * Acquire an exclusive lock.
 	 */
 	if ((dict->flags & DICT_FLAG_LOCK)
-		&& acl_myflock(dict->lock_fd, ACL_MYFLOCK_STYLE_FLOCK, ACL_MYFLOCK_OP_EXCLUSIVE) < 0)
+		&& acl_myflock(dict->lock_fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
 		acl_msg_fatal("%s: lock dictionary: %s", dict_db->dict.name,
 			acl_last_strerror(ebuf, sizeof(ebuf)));
 
@@ -455,7 +455,7 @@ static int dict_db_delete(DICT *dict, char *name, size_t name_len)
 	 * Release the exclusive lock.
 	 */
 	if ((dict->flags & DICT_FLAG_LOCK)
-		&& acl_myflock(dict->lock_fd, ACL_MYFLOCK_STYLE_FLOCK, ACL_MYFLOCK_OP_NONE) < 0)
+		&& acl_myflock(dict->lock_fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_NONE) < 0)
 		acl_msg_fatal("%s: unlock dictionary: %s", dict_db->dict.name,
 			acl_last_strerror(ebuf, sizeof(ebuf)));
 
@@ -543,7 +543,7 @@ static int dict_db_sequence(DICT *dict, int function,
 	 * Acquire a shared lock.
 	 */
 	if ((dict->flags & DICT_FLAG_LOCK)
-		&& acl_myflock(dict->lock_fd, ACL_MYFLOCK_STYLE_FLOCK, ACL_MYFLOCK_OP_SHARED) < 0)
+		&& acl_myflock(dict->lock_fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_SHARED) < 0)
 		acl_msg_fatal("%s: lock dictionary: %s", dict_db->dict.name,
 			acl_last_strerror(ebuf, sizeof(ebuf)));
 
@@ -559,7 +559,7 @@ static int dict_db_sequence(DICT *dict, int function,
 	 * Release the shared lock.
 	 */
 	if ((dict->flags & DICT_FLAG_LOCK)
-		&& acl_myflock(dict->lock_fd, ACL_MYFLOCK_STYLE_FLOCK, ACL_MYFLOCK_OP_NONE) < 0)
+		&& acl_myflock(dict->lock_fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_NONE) < 0)
 		acl_msg_fatal("%s: unlock dictionary: %s", dict_db->dict.name,
 			acl_last_strerror(ebuf, sizeof(ebuf)));
 
@@ -604,7 +604,7 @@ static int dict_db_sequence(DICT *dict, int function,
 	 * Acquire a shared lock.
 	 */
 	if ((dict->flags & DICT_FLAG_LOCK)
-		&& acl_myflock(dict->lock_fd, ACL_MYFLOCK_STYLE_FLOCK, ACL_MYFLOCK_OP_SHARED) < 0)
+		&& acl_myflock(dict->lock_fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_SHARED) < 0)
 		acl_msg_fatal("%s: lock dictionary: %s", dict_db->dict.name,
 			acl_last_strerror(ebuf, sizeof(ebuf)));
 
@@ -616,7 +616,7 @@ static int dict_db_sequence(DICT *dict, int function,
 	 * Release the shared lock.
 	 */
 	if ((dict->flags & DICT_FLAG_LOCK)
-		&& myflock(dict->lock_fd, ACL_MYFLOCK_STYLE_FLOCK, ACL_MYFLOCK_OP_NONE) < 0)
+		&& myflock(dict->lock_fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_NONE) < 0)
 		acl_msg_fatal("%s: unlock dictionary: %s", dict_db->dict.name,
 			acl_last_strerror(ebuf, sizeof(ebuf)));
 
@@ -814,7 +814,7 @@ static DICT *dict_db_open(const char *class, const char *path, int open_flags,
 					db_path, acl_last_strerror(ebuf, sizeof(ebuf)), acl_last_error());
 			}
 		} else {
-			if (acl_myflock(lock_fd, ACL_MYFLOCK_STYLE_FLOCK, ACL_MYFLOCK_OP_SHARED) < 0)
+			if (acl_myflock(lock_fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_SHARED) < 0)
 				acl_msg_fatal("%s(%d): shared-lock database %s for open: %s",
 					myname, __LINE__, path, acl_last_strerror(ebuf, sizeof(ebuf)));
 		}
@@ -948,7 +948,7 @@ static DICT *dict_db_open(const char *class, const char *path, int open_flags,
 		acl_msg_fatal("%s(%d): set DB hash element count %d: %s",
 			myname, __LINE__, DICT_DB_NELM,
 			acl_last_strerror(ebuf, sizeof(ebuf)));
-#if (DB_VERSION_MAJOR == 4 && DB_VERSION_MINOR > 0)
+#if ((DB_VERSION_MAJOR == 4 || DB_VERSION_MAJOR == 5) && DB_VERSION_MINOR > 0)
 	if ((errno = db->open(db, 0, db_name, 0, type, db_flags, 0644)) != 0) {
 		char  curpath[256];
 
@@ -972,7 +972,7 @@ static DICT *dict_db_open(const char *class, const char *path, int open_flags,
 			myname, __LINE__, acl_last_strerror(ebuf, sizeof(ebuf)));
 #endif
 	if ((dict_flags & DICT_FLAG_LOCK) && lock_fd != ACL_FILE_INVALID) {
-		if (acl_myflock(lock_fd, ACL_MYFLOCK_STYLE_FLOCK, ACL_MYFLOCK_OP_NONE) < 0)
+		if (acl_myflock(lock_fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_NONE) < 0)
 			acl_msg_fatal("%s(%d): unlock database %s for open: %s",
 				myname, __LINE__, db_path,
 				acl_last_strerror(ebuf, sizeof(ebuf)));

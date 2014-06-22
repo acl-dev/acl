@@ -101,13 +101,13 @@ void    tls_prng_exch_update(TLS_PRNG_SRC *eh)
      * Update the PRNG exchange file. Since other processes may have added
      * entropy, we use a read-stir-write cycle.
      */
-    if (acl_myflock(eh->fd.file, ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_EXCLUSIVE) != 0)
+    if (acl_myflock(eh->fd.file, ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) != 0)
 	acl_msg_fatal("%s: cannot lock PRNG exchange file %s: %s",
 		myname, eh->name, acl_last_serror());
     if (acl_lseek(eh->fd.file, 0, SEEK_SET) < 0)
 	acl_msg_fatal("%s: cannot seek PRNG exchange file %s: %s",
 		myname, eh->name, acl_last_serror());
-    if ((count = acl_file_read(eh->fd.file, buffer, sizeof(buffer), 0, NULL)) < 0)
+    if ((count = acl_file_read(eh->fd.file, buffer, sizeof(buffer), 0, NULL, NULL)) < 0)
 	acl_msg_fatal("%s: cannot read PRNG exchange file %s: %s",
 		myname, eh->name, acl_last_serror());
 
@@ -118,10 +118,10 @@ void    tls_prng_exch_update(TLS_PRNG_SRC *eh)
     if (acl_lseek(eh->fd.file, 0, SEEK_SET) < 0)
 	acl_msg_fatal("%s: cannot seek PRNG exchange file %s: %s",
 		myname, eh->name, acl_last_serror());
-    if (acl_file_write(eh->fd.file, buffer, sizeof(buffer), 0, NULL) != sizeof(buffer))
+    if (acl_file_write(eh->fd.file, buffer, sizeof(buffer), 0, NULL, NULL) != sizeof(buffer))
 	acl_msg_fatal("%s: cannot write PRNG exchange file %s: %s",
 		myname, eh->name, acl_last_serror());
-    if (acl_myflock(eh->fd.file, ACL_INTERNAL_LOCK, ACL_MYFLOCK_OP_NONE) != 0)
+    if (acl_myflock(eh->fd.file, ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) != 0)
 	acl_msg_fatal("%s: cannot unlock PRNG exchange file %s: %s",
 		myname, eh->name, acl_last_serror());
 }

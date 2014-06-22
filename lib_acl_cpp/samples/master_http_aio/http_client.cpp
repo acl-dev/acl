@@ -12,6 +12,10 @@ http_client::http_client(acl::aio_socket_stream* conn, int buf_size)
 		"Content-Length: %d\r\n"
 		"Connection: keep-alive\r\n\r\n",
 		buf_size);
+	res_hdr2_.format("HTTP/1.1 200 OK\r\n"
+		"Content-Length: %d\r\n"
+		"Connection: close\r\n\r\n",
+		buf_size);
 }
 
 http_client::~http_client()
@@ -36,22 +40,36 @@ void http_client::close_callback()
 
 bool http_client::read_wakeup()
 {
+	bool keep_alive = false;
+
+#define	STR	acl_vstring_str
+
 	while (true)
 	{
 		ACL_VSTRING* buf = acl_aio_gets_nonl_peek(stream_);
 		if (buf == NULL)
 			return true;
-		if (ACL_VSTRING_LEN(buf) > 0)
-		{
-			ACL_VSTRING_RESET(buf);
-		}
-		else
-		{
+
+		if (ACL_VSTRING_LEN(buf) == 0)
 			break;
-		}
+
+		//logger("buf: |%s|", STR(buf));
+		if (strcasecmp(STR(buf), "Connection: keep-alive") == 0)
+			keep_alive = true;
+
+		ACL_VSTRING_RESET(buf);
 	}
 
-	conn_->write(res_hdr_.c_str(), (int) res_hdr_.length());
-	conn_->write(res_body_.c_str(), (int) res_body_.length());
-	return true;
+	if (keep_alive)
+	{
+		conn_->write(res_hdr_.c_str(), (int) res_hdr_.length());
+		conn_->write(res_body_.c_str(), (int) res_body_.length());
+		return true;
+	}
+	else
+	{
+		conn_->write(res_hdr2_.c_str(), (int) res_hdr2_.length());
+		conn_->write(res_body_.c_str(), (int) res_body_.length());
+		return false;
+	}
 }

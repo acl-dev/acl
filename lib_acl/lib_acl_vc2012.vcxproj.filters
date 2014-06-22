@@ -767,13 +767,7 @@
     <ClCompile Include=".\src\master\master_vars.c">
       <Filter>Source Files\master</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\master\template\acl_aio_app_main.c">
-      <Filter>Source Files\master\template</Filter>
-    </ClCompile>
     <ClCompile Include=".\src\master\template\acl_aio_server.c">
-      <Filter>Source Files\master\template</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\template\acl_ioctl_app_main.c">
       <Filter>Source Files\master\template</Filter>
     </ClCompile>
     <ClCompile Include=".\src\master\template\acl_ioctl_server.c">
@@ -1450,9 +1444,6 @@
       <Filter>Header Files\code</Filter>
     </ClInclude>
     <ClInclude Include=".\include\master\acl_aio_params.h">
-      <Filter>Header Files\master</Filter>
-    </ClInclude>
-    <ClInclude Include=".\include\master\acl_app_main.h">
       <Filter>Header Files\master</Filter>
     </ClInclude>
     <ClInclude Include=".\include\master\acl_ioctl_params.h">

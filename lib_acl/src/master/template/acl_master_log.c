@@ -20,14 +20,14 @@ void acl_master_log_open(const char *procname)
 
 	/* use master's log before chroot */
 	master_log = getenv("MASTER_LOG");
-	if (master_log == NULL) {
-		acl_msg_info("%s(%d): no MASTER_LOG's env value", myname, __LINE__);
-	} else {
+	if (master_log == NULL)
+		acl_msg_info("%s(%d): no MASTER_LOG's env value",
+			myname, __LINE__);
+	else {
 		acl_msg_open(master_log, procname);
 		var_master_log_opened = 1;
-		if (acl_msg_verbose)
-			acl_msg_info("%s(%d): service: %s, log opened now.",
-				myname, __LINE__, procname);
+		acl_msg_info("%s(%d): service: %s, log opened now.",
+			myname, __LINE__, procname);
 	}
 }
 

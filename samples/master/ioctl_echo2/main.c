@@ -11,8 +11,6 @@ int main(int argc, char *argv[])
 		ACL_APP_CTL_CFG_BOOL, service_conf_bool_tab,
 		ACL_APP_CTL_CFG_INT, service_conf_int_tab,
 		ACL_APP_CTL_CFG_STR, service_conf_str_tab,
-		/* ACL_APP_CTL_OPEN_LOG, app_set_libcore_log, */
-		/* ACL_APP_CTL_CLOSE_LOG, app_libcore_log_end, */
 		ACL_APP_CTL_END);
 
 	exit (0);

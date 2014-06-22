@@ -105,10 +105,12 @@ static int __socket_count = 1;
 static ACL_EVENT *__event = NULL;
 static ACL_VSTREAM **__servers = NULL;
 
-static void (*udp_server_service_fn) (ACL_VSTREAM *, char *, char **);
-static char *udp_server_name;
-static char **udp_server_argv;
-static void (*udp_server_onexit_fn) (char *, char **);
+static ACL_UDP_SERVER_FN __service_main;
+static ACL_MASTER_SERVER_EXIT_FN __service_onexit;
+static char *__service_name;
+static char **__service_argv;
+static void *__service_ctx;
+
 static unsigned udp_server_generation;
 
 void acl_udp_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
@@ -173,8 +175,8 @@ static void disable_listen(ACL_EVENT *event)
 
 static void udp_server_exit(void)
 {
-	if (udp_server_onexit_fn)
-		udp_server_onexit_fn(udp_server_name, udp_server_argv);
+	if (__service_onexit)
+		__service_onexit(__service_ctx);
 
 	exit(0);
 }
@@ -217,7 +219,7 @@ static void udp_server_execute(ACL_EVENT *event, ACL_VSTREAM *stream)
 	}
 
 	/* 回调用户注册的处理过程 */
-	udp_server_service_fn(stream, udp_server_name, udp_server_argv);
+	__service_main(stream, __service_name, __service_argv);
 
 	/* 清除发生在 UDP 套接字上的临时性错误，以免事件引擎报错 */
 	stream->flag = 0;
@@ -469,6 +471,9 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 			acl_get_app_conf_bool_table(va_arg(ap, ACL_CONFIG_BOOL_TABLE *));
 			break;
 
+		case ACL_MASTER_SERVER_CTX:
+			__service_ctx = va_arg(ap, void *);
+			break;
 		case ACL_MASTER_SERVER_PRE_INIT:
 			pre_init = va_arg(ap, ACL_MASTER_SERVER_INIT_FN);
 			break;
@@ -476,7 +481,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 			post_init = va_arg(ap, ACL_MASTER_SERVER_INIT_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
-			udp_server_onexit_fn = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
+			__service_onexit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
 			break;
 		case ACL_MASTER_SERVER_SOLITARY:
 			if (!alone)
@@ -486,11 +491,6 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		case ACL_MASTER_SERVER_UNLIMITED:
 			if (!zerolimit)
 				acl_msg_fatal("service %s requires a process limit of 0",
-					service_name);
-			break;
-		case ACL_MASTER_SERVER_PRIVILEGED:
-			if (user_name)
-				acl_msg_fatal("service %s requires privileged operation",
 					service_name);
 			break;
 		default:
@@ -537,9 +537,9 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	 */
 
 	/* 设置回回调过程相关参数 */
-	udp_server_service_fn = service;
-	udp_server_name = service_name;
-	udp_server_argv = argv + optind;
+	__service_main = service;
+	__service_name = service_name;
+	__service_argv = argv + optind;
 
 	/*******************************************************************/
 
@@ -565,7 +565,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 
 	/* 切换用户运行身份前回调应用设置的回调函数 */
 	if (pre_init)
-		pre_init(udp_server_name, udp_server_argv);
+		pre_init(__service_ctx);
 
 	acl_chroot_uid(root_dir, user_name);
 
@@ -585,9 +585,9 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	if (stream != 0) {
 		/* Run post-jail initialization. */
 		if (post_init)
-			post_init(udp_server_name, udp_server_argv);
+			post_init(__service_ctx);
 
-		service(stream, udp_server_name, udp_server_argv);
+		service(stream, __service_name, __service_argv);
 		udp_server_exit();
 	}
 
@@ -638,7 +638,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 
 	/* 进程初始化完毕后回调此函数，以使用户可以初始化自己的环境 */
 	if (post_init)
-		post_init(udp_server_name, udp_server_argv);
+		post_init(__service_ctx);
 
 	acl_msg_info("%s: daemon started, log: %s", argv[0], acl_var_udp_log_file);
 

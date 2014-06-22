@@ -22,7 +22,6 @@ master_aio::~master_aio()
 {
 	if (__handle)
 	{
-		__handle->check();
 		if (daemon_mode_ == false)
 			delete __handle;
 		__handle = NULL;
@@ -46,15 +45,15 @@ void master_aio::run_daemon(int argc, char** argv)
 	daemon_mode_ = true;
 
 	// 调用 acl 服务器框架的单线程非阻塞模板
-	acl_aio_app2_main(argc, argv, service_main, NULL,
-		ACL_APP_CTL_PRE_JAIL, service_pre_jail,
-		ACL_APP_CTL_INIT_FN, service_init,
-		ACL_APP_CTL_EXIT_FN, service_exit,
-		ACL_APP_CTL_CFG_BOOL, conf_.get_bool_cfg(),
-		ACL_APP_CTL_CFG_INT64, conf_.get_int64_cfg(),
-		ACL_APP_CTL_CFG_INT, conf_.get_int_cfg(),
-		ACL_APP_CTL_CFG_STR, conf_.get_str_cfg(),
-		ACL_APP_CTL_END);
+	acl_aio_server2_main(argc, argv, service_main,
+		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
+		ACL_MASTER_SERVER_POST_INIT, service_init,
+		ACL_MASTER_SERVER_EXIT, service_exit,
+		ACL_MASTER_SERVER_BOOL_TABLE, conf_.get_bool_cfg(),
+		ACL_MASTER_SERVER_INT64_TABLE, conf_.get_int64_cfg(),
+		ACL_MASTER_SERVER_INT_TABLE, conf_.get_int_cfg(),
+		ACL_MASTER_SERVER_STR_TABLE, conf_.get_str_cfg(),
+		ACL_MASTER_SERVER_END);
 #else
 	logger_fatal("no support win32 yet!");
 #endif
@@ -153,6 +152,8 @@ protected:
 	void close_callback()
 	{
 #ifndef WIN32
+		// 通过下面调用通知服务器框架目前已经处理的连接个数，便于
+		// 服务器框架半驻留操作
 		acl_aio_server_on_close(stream_);
 #endif // !WIN32
 		delete this;
@@ -199,7 +200,7 @@ void master_aio::service_exit(void* ctx acl_unused)
 	__ma->proc_on_exit();
 }
 
-int master_aio::service_main(ACL_SOCKET fd, void*)
+void master_aio::service_main(ACL_SOCKET fd, void*)
 {
 	acl_assert(__handle);
 	acl_assert(__ma);
@@ -210,7 +211,6 @@ int master_aio::service_main(ACL_SOCKET fd, void*)
 	stream->add_close_callback(callback);
 
 	__ma->on_accept(stream);
-	return 0;
 }
 
 }  // namespace acl

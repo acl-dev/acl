@@ -190,18 +190,6 @@ static void __service(ACL_VSTREAM *stream, char *service, char **argv)
 	__front_stream = NULL;
 }
 
-static void __pre_accept(char *unused_name, char **unused_argv)
-{
-	char  myname[] = "__pre_accept";
-
-	unused_name = unused_name;
-	unused_argv = unused_argv;
-
-	if (var_proxy_log_level > 3)
-		acl_msg_info("%s(%d)->%s: test only",
-				__FILE__, __LINE__, myname);
-}
-
 static void __add_one_host_item(ACL_IPLINK *allow_link, const char *pitem)
 {
 	char  myname[] = "__add_one_host_item";
@@ -412,7 +400,6 @@ int main(int argc, char *argv[])
 				ACL_MASTER_SERVER_INT_TABLE, __conf_int_tab,
 				ACL_MASTER_SERVER_STR_TABLE, __conf_str_tab,
 				ACL_MASTER_SERVER_PRE_INIT, __pre_jail_init,
-				ACL_MASTER_SERVER_PRE_ACCEPT, __pre_accept,
 				ACL_MASTER_SERVER_POST_INIT, __post_jail_init,
 				0);
 	exit (0);

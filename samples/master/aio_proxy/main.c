@@ -4,7 +4,7 @@
 int main(int argc, char *argv[])
 {
 /*	acl_debug_malloc_init("log.txt"); */
-	acl_aio_app_main(argc, argv, service_main, NULL,
+	acl_aio_server_main(argc, argv, service_main, NULL,
 		ACL_APP_CTL_INIT_FN, service_init,
 		/* ACL_APP_CTL_INIT_CTX, NULL, */
 		ACL_APP_CTL_EXIT_FN, service_exit,

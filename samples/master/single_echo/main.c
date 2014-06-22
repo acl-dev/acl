@@ -17,21 +17,15 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ 0, 0, 0 },
 };
 
-static void __service(ACL_VSTREAM *stream, char *service, char **argv acl_unused)
+static void __service(ACL_VSTREAM *stream, char *service acl_unused,
+	char **argv acl_unused)
 {
 	const char *myname = "__service";
 	char  buf[4096];
 	int   n, ret;
 
-	/*
-	 * Sanity check. This service takes no command-line arguments.
-	 */
-	if (argv[0])
-		acl_msg_fatal("%s(%d)->%s: unexpected command-line argument: %s",
-			__FILE__, __LINE__, myname, argv[0]);
-
-	acl_msg_info("%s(%d)->%s: service name = %s, rw_timeout = %d",
-		__FILE__, __LINE__, myname, service, stream->rw_timeout);
+	acl_msg_info("%s(%d)->%s: rw_timeout = %d",
+		__FILE__, __LINE__, myname, stream->rw_timeout);
 
 	acl_msg_info("total alloc: %d", acl_mempool_total_allocated());
 	do {
@@ -60,10 +54,6 @@ static void __service(ACL_VSTREAM *stream, char *service, char **argv acl_unused
 	} while (1);
 }
 
-static void __pre_accept(char *name acl_unused, char **argv acl_unused)
-{
-}
-
 static void __pre_jail_init(char *name acl_unused, char **argv acl_unused)
 {
 	acl_mempool_open(512000000, 1);
@@ -83,7 +73,6 @@ int main(int argc, char *argv[])
 		ACL_MASTER_SERVER_INT_TABLE, __conf_int_tab,
 		ACL_MASTER_SERVER_STR_TABLE, __conf_str_tab,
 		ACL_MASTER_SERVER_PRE_INIT, __pre_jail_init,
-		ACL_MASTER_SERVER_PRE_ACCEPT, __pre_accept,
 		ACL_MASTER_SERVER_POST_INIT, __post_jail_init,
 		ACL_MASTER_SERVER_EXIT, service_exit,
 		0);

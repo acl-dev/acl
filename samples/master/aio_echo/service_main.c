@@ -50,12 +50,11 @@ static int read_callback(ACL_ASTREAM *client, void *ctx acl_unused, char *data, 
 	return (0);
 }
 
-int service_main(ACL_ASTREAM *client, void *run_ctx acl_unused)
+void service_main(ACL_ASTREAM *client, void *run_ctx acl_unused)
 {
 	acl_aio_ctl(client,
 		ACL_AIO_CTL_READ_HOOK_ADD, read_callback, run_ctx,
 		ACL_AIO_CTL_TIMEOUT, 300,
 		ACL_AIO_CTL_END);
 	acl_aio_gets(client);
-	return (0);
 }

@@ -25,7 +25,11 @@ bool ManagerTimer::transfer(ClientConnection* client)
 	{
 		server = ServerManager::get_instance().min();
 		if (server == NULL)
+		{
+			logger_error("no server available for client: %s",
+				client->get_peer());
 			return false;
+		}
 
 		peer = client->get_peer();
 		if (peer == NULL)
@@ -39,6 +43,8 @@ bool ManagerTimer::transfer(ClientConnection* client)
 			strlen(buf), client->sock_handle());
 		if (ret == -1)
 		{
+			logger_error("write fd to backend error: %s",
+				acl::last_serror());
 			ServerManager::get_instance().del(server);
 			server->close();
 		}
@@ -78,12 +84,16 @@ void ManagerTimer::timer_callback(unsigned int)
 		// 则直接删除该对象
 		if (client->expired())
 		{
-			logger_warn("no server side, client(%s) expired!",
+			logger_error("no server side, client(%s) expired!",
 				client->get_peer());
 			delete client;
 		}
 		else
+		{
+			logger_warn("set client(%s) into queue",
+				client->get_peer());
 			ClientManager::get_instance().set(client);
+		}
 		break;
 	}
 }

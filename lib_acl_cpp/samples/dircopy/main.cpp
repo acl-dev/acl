@@ -97,7 +97,7 @@ static bool copy_file(acl::ifstream& in, const acl::string& to_path,
 static bool cmp_copy(acl::scan_dir& scan, const char* name,
 	const acl::string& to_path, int* ncopied)
 {
-	const char* rpath = scan.curr_path(false);
+	const char* rpath = scan.curr_path();
 	if (rpath == NULL)
 	{
 		logger_error("get current path error: %s, file: %s",

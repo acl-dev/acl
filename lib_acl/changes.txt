@@ -1,6 +1,22 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+447) 2014.6.17
+447.1) master/template: 整理了一下该模块的代码
+447.2) removed: 去掉了 acl_aio_app_main.c，将其功能合并至 acl_aio_server.c 中，
+去掉了 acl_app_main.h 头文件，将其中的部分代码合并至 acl_server_api.h 中
+
+446) 2014.6.13
+446.1) upgrade: 去掉了 acl_ioctl_app_main.c，该模块将由 acl_threads_server.c
+完全代替
+446.2) deprecated: 将 acl_ioctl_server.c 中的函数声明为过期，将来也会被去掉，
+其中的功能完全可以由 acl_threads_server.c 模块代替
+
+445) 2014.6.3
+445.1) performance: acl_pthread_pool.c, worker_wait() 函数将空闲线程添加至线程池
+和从线程池中移除的操作放在 pthread_cond_timedwait 等待循环的外面，这样既可以减少
+添加/移除操作的次数，同时又可以使等待任务超时的线程迟早地退出
+
 444) 2014.5.26
 444.1) acl_scan_dir.c: 整理了代码，在返回的目录字符串中，最后的字母如果是
 '/' 或 '\\' (win32)，则自动去掉尾部的目录分隔符

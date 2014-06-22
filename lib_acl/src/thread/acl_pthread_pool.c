@@ -318,27 +318,27 @@ static void worker_run(acl_pthread_pool_t *thr_pool,
 static int worker_wait(acl_pthread_pool_t *thr_pool, thread_worker *thr)
 {
 	const char *myname = "worker_wait";
-	int   status, idle_count = 0;
+	int   status, idle_count = 0, got_job = 0;
 	struct timespec  timeout;
 	struct timeval   tv;
 	acl_int64 n;
 
+	/* add the thread to the idle threads pool */
+
+	if (thr_pool->thr_first == NULL) {
+		thr_pool->thr_first = thr;
+		thr->next = NULL;
+		thr->prev = NULL;
+	} else {
+		thr_pool->thr_first->prev = thr;
+		thr->next = thr_pool->thr_first;
+		thr->prev = NULL;
+		thr_pool->thr_first = thr;
+	}
+
+	thr_pool->idle++;
+
 	while (1) {
-
-		/* add the idle thread to thread pool */
-
-		if (thr_pool->thr_first == NULL) {
-			thr_pool->thr_first = thr;
-			thr->next = NULL;
-			thr->prev = NULL;
-		} else {
-			thr_pool->thr_first->prev = thr;
-			thr->next = thr_pool->thr_first;
-			thr->prev = NULL;
-			thr_pool->thr_first = thr;
-		}
-
-		thr_pool->idle++;
 
 		if (thr->idle > 0) {
 			gettimeofday(&tv, NULL);
@@ -356,25 +356,20 @@ static int worker_wait(acl_pthread_pool_t *thr_pool, thread_worker *thr)
 			status = acl_pthread_cond_wait(&thr->cond->cond,
 					thr->mutex);
 
-		/* remove the thread from thread pool */
-
+		/* if thr->job_first not null, the thread had been remove
+		 * from idle threads pool by the main thread in job_deliver(),
+		 * so just return 1 here.
+		 */
 		if (thr->job_first)
 			return 1;
 
-		if (thr_pool->thr_first == thr) {
-			if (thr->next)
-				thr->next->prev = NULL;
-			thr_pool->thr_first = thr->next;
-		} else {
-			if (thr->next)
-				thr->next->prev = thr->prev;
-			thr->prev->next = thr->next;
+		/* else if threads pool's job not empty, the thread should
+		 * handle it and remove itself from the idle threads pool
+		 */
+		if (thr_pool->job_first) {
+			got_job = 1;
+			break;
 		}
-
-		thr_pool->idle--;
-
-		if (thr_pool->job_first)
-			return 1;
 
 		if (thr_pool->quit)
 			break;
@@ -397,8 +392,25 @@ static int worker_wait(acl_pthread_pool_t *thr_pool, thread_worker *thr)
 		break;
 	}
 
-	thr->quit = 1;
-	return 0;
+	/* remove the thread from thread pool */
+
+	if (thr_pool->thr_first == thr) {
+		if (thr->next)
+			thr->next->prev = NULL;
+		thr_pool->thr_first = thr->next;
+	} else {
+		if (thr->next)
+			thr->next->prev = thr->prev;
+		thr->prev->next = thr->next;
+	}
+
+	thr_pool->idle--;
+
+	/* if none job got, this must because the thread need to quit */
+	if (!got_job)
+		thr->quit = 1;
+
+	return got_job;
 }
 
 static void *worker_thread(void* arg)

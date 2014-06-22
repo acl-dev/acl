@@ -115,7 +115,8 @@ static ACL_EVENT *__eventp;
 
 /* tlsmgr_prng_exch_event - update PRNG exchange file */
 
-static void tlsmgr_prng_exch_event(int unused_event acl_unused, void *dummy)
+static void tlsmgr_prng_exch_event(int event_type acl_unused,
+	ACL_EVENT *event acl_unused, void *dummy)
 {
     const char *myname = "tlsmgr_prng_exch_event";
     unsigned char randbyte;
@@ -149,7 +150,8 @@ static void tlsmgr_prng_exch_event(int unused_event acl_unused, void *dummy)
 
 /* tlsmgr_reseed_event - re-seed the internal PRNG pool */
 
-static void tlsmgr_reseed_event(int unused_event acl_unused, void *dummy)
+static void tlsmgr_reseed_event(int event_type acl_unused,
+	ACL_EVENT *event acl_unused, void *dummy)
 {
     const char *myname = "tlsmgr_reseed_event";
     int     next_period;
@@ -237,7 +239,8 @@ static void tlsmgr_reseed_event(int unused_event acl_unused, void *dummy)
 
 /* tlsmgr_cache_run_event - start TLS session cache scan */
 
-static void tlsmgr_cache_run_event(int unused_event acl_unused, void *ctx)
+static void tlsmgr_cache_run_event(int event_type acl_unused,
+	ACL_EVENT *event acl_unused, void *ctx)
 {
     const char *myname = "tlsmgr_cache_run_event";
     TLSMGR_SCACHE *cache = (TLSMGR_SCACHE *) ctx;
@@ -719,7 +722,7 @@ static void tlsmgr_post_init(char *unused_name acl_unused,
     if (*var_tls_rand_source) {
 	if (var_tls_reseed_period > INT_MAX / UCHAR_MAX)
 	    var_tls_reseed_period = INT_MAX / UCHAR_MAX;
-	tlsmgr_reseed_event(NULL_EVENT, NULL_CONTEXT);
+	tlsmgr_reseed_event(NULL_EVENT, NULL, NULL_CONTEXT);
     }
 
     /*
@@ -728,7 +731,7 @@ static void tlsmgr_post_init(char *unused_name acl_unused,
     if (*var_tls_rand_exch_name) {
 	if (var_tls_prng_exch_period > INT_MAX / UCHAR_MAX)
 	    var_tls_prng_exch_period = INT_MAX / UCHAR_MAX;
-	tlsmgr_prng_exch_event(NULL_EVENT, NULL_CONTEXT);
+	tlsmgr_prng_exch_event(NULL_EVENT, NULL, NULL_CONTEXT);
     }
 
     /*
@@ -739,7 +742,7 @@ static void tlsmgr_post_init(char *unused_name acl_unused,
      */
     for (ent = cache_table; ent->cache_label; ++ent)
 	if (ent->cache_info)
-	    tlsmgr_cache_run_event(NULL_EVENT, (char *) ent);
+	    tlsmgr_cache_run_event(NULL_EVENT, NULL, (char *) ent);
 }
 
 /* tlsmgr_before_exit - save PRNG state before exit */
@@ -795,28 +798,29 @@ void   tlsmgr_alone_start(int argc, char *argv[])
 
 #endif  /* ACL_UNIX */
 
-static void client_ready_callback(int event_type acl_unused, void *ctx)
+static void client_ready_callback(int event_type acl_unused,
+	ACL_EVENT *event, ACL_VSTREAM *stream acl_unused, void *ctx)
 {
     ACL_VSTREAM *client_stream = (ACL_VSTREAM*) ctx;
 
     tlsmgr_service(client_stream, NULL, NULL);
-    acl_event_enable_read(__eventp, client_stream,
+    acl_event_enable_read(event, client_stream,
 	0, client_ready_callback, client_stream);
 }
 
-static void listen_callback(int event_type acl_unused, void *ctx)
+static void listen_callback(int event_type acl_unused, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *ctx acl_unused)
 {
     const char *myname = "listen_callback";
-    ACL_VSTREAM *server_stream = (ACL_VSTREAM*) ctx;
     ACL_VSTREAM *client_stream;
 
-    client_stream = acl_vstream_accept(server_stream, NULL, 0);
+    client_stream = acl_vstream_accept(stream, NULL, 0);
     if (client_stream == NULL) {
 	acl_msg_warn("%s(%d): accept error(%s)",
 		myname, __LINE__, acl_last_serror());
 	return;
     }
-    acl_event_enable_read(__eventp, client_stream,
+    acl_event_enable_read(event, client_stream,
 	0, client_ready_callback, client_stream);
 }
 
@@ -875,7 +879,7 @@ void   tlsmgr_local_start(const char *addr)
 	return;
     }
     snprintf(var_tlsmgr_service, sizeof(var_tlsmgr_service),
-	"inet:%s", server_stream->local_addr);
+	"inet:%s", ACL_VSTREAM_LOCAL(server_stream));
 
     tlsmgr_pre_init(NULL, NULL);
     tlsmgr_post_init(NULL, NULL);

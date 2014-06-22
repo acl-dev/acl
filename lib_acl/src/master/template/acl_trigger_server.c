@@ -107,13 +107,13 @@ static int use_count;
 static ACL_EVENT *__eventp = NULL;
 static ACL_VSTREAM **__stream_array;
 
-static ACL_TRIGGER_SERVER_FN trigger_server_service;
-static char *trigger_server_name;
-static char **trigger_server_argv;
-static void (*trigger_server_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
-static void (*trigger_server_onexit) (char *, char **);
-static void (*trigger_server_pre_accept) (char *, char **);
-static ACL_VSTREAM *trigger_server_lock;
+static ACL_TRIGGER_SERVER_FN __service_main;
+static char *__service_name;
+static char **__service_argv;
+static void *__service_ctx;
+static void (*__service_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
+static ACL_MASTER_SERVER_EXIT_FN __service_onexit;
+static ACL_VSTREAM *__service_lock;
 static int trigger_server_in_flow_delay;
 static unsigned trigger_server_generation;
 
@@ -126,8 +126,8 @@ ACL_EVENT *acl_trigger_server_event()
 
 static void trigger_server_exit(void)
 {
-	if (trigger_server_onexit)
-		trigger_server_onexit(trigger_server_name, trigger_server_argv);
+	if (__service_onexit)
+		__service_onexit(__service_ctx);
 	exit(0);
 }
 
@@ -170,8 +170,7 @@ static void trigger_server_wakeup(ACL_EVENT *event, int fd)
 	if (trigger_server_in_flow_delay && acl_master_flow_get(1) < 0)
 		acl_doze(acl_var_trigger_in_flow_delay * 1000);
 	if ((len = read(fd, buf, sizeof(buf))) >= 0)
-		trigger_server_service(buf, len, trigger_server_name,
-			trigger_server_argv);
+		__service_main(buf, len, __service_ctx, __service_argv);
 
 	if (acl_master_notify(acl_var_trigger_pid, trigger_server_generation,
 		ACL_MASTER_STAT_AVAIL) < 0)
@@ -185,16 +184,16 @@ static void trigger_server_wakeup(ACL_EVENT *event, int fd)
 	use_count++;
 }
 
-/* trigger_server_accept_fifo - accept fifo client request */
+/* __service_accept_fifo - accept fifo client request */
 
-static void trigger_server_accept_fifo(int type acl_unused, ACL_EVENT *event,
+static void __service_accept_fifo(int type acl_unused, ACL_EVENT *event,
 	ACL_VSTREAM *stream, void *context acl_unused)
 {
-	const char *myname = "trigger_server_accept_fifo";
+	const char *myname = "__service_accept_fifo";
 	int     listen_fd = ACL_VSTREAM_SOCK(stream);
 
-	if (trigger_server_lock != 0
-	    && acl_myflock(ACL_VSTREAM_FILE(trigger_server_lock),
+	if (__service_lock != 0
+	    && acl_myflock(ACL_VSTREAM_FILE(__service_lock),
 		    	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
@@ -207,17 +206,15 @@ static void trigger_server_accept_fifo(int type acl_unused, ACL_EVENT *event,
 	 * Read whatever the other side wrote into the FIFO. The FIFO read end is
 	 * non-blocking so we won't get stuck when multiple processes wake up.
 	 */
-	if (trigger_server_pre_accept)
-		trigger_server_pre_accept(trigger_server_name, trigger_server_argv);
 	trigger_server_wakeup(event, listen_fd);
 }
 
-/* trigger_server_accept_local - accept socket client request */
+/* __service_accept_local - accept socket client request */
 
-static void trigger_server_accept_local(int type acl_unused, ACL_EVENT *event,
+static void __service_accept_local(int type acl_unused, ACL_EVENT *event,
 	ACL_VSTREAM *stream, void *context acl_unused)
 {
-	const char *myname = "trigger_server_accept_local";
+	const char *myname = "__service_accept_local";
 	int listen_fd = ACL_VSTREAM_SOCK(stream), time_left = 0, fd;
 
 	if (acl_msg_verbose)
@@ -234,11 +231,9 @@ static void trigger_server_accept_local(int type acl_unused, ACL_EVENT *event,
 		time_left = (int) ((acl_event_cancel_timer(event,
 			trigger_server_timeout, NULL) + 999999) / 1000000);
 
-	if (trigger_server_pre_accept)
-		trigger_server_pre_accept(trigger_server_name, trigger_server_argv);
 	fd = acl_unix_accept(listen_fd);
-	if (trigger_server_lock != 0
-	    && acl_myflock(ACL_VSTREAM_FILE(trigger_server_lock),
+	if (__service_lock != 0
+	    && acl_myflock(ACL_VSTREAM_FILE(__service_lock),
 	    	ACL_INTERNAL_LOCK, ACL_FLOCK_OP_NONE) < 0)
 	{
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
@@ -262,12 +257,12 @@ static void trigger_server_accept_local(int type acl_unused, ACL_EVENT *event,
 
 #ifdef ACL_MASTER_XPORT_NAME_PASS
 
-/* trigger_server_accept_pass - accept descriptor */
+/* __service_accept_pass - accept descriptor */
 
-static void trigger_server_accept_pass(int type acl_unused, ACL_EVENT *event,
+static void __service_accept_pass(int type acl_unused, ACL_EVENT *event,
 	ACL_VSTREAM *stream, void *context acl_unused)
 {
-	const char *myname = "trigger_server_accept_pass";
+	const char *myname = "__service_accept_pass";
 	int listen_fd = ACL_VSTREAM_SOCK(stream), time_left = 0, fd;
 
 	if (acl_msg_verbose)
@@ -284,11 +279,9 @@ static void trigger_server_accept_pass(int type acl_unused, ACL_EVENT *event,
 		time_left = (int) ((acl_event_cancel_timer(event,
 			trigger_server_timeout, NULL) + 999999) / 1000000);
 
-	if (trigger_server_pre_accept)
-		trigger_server_pre_accept(trigger_server_name, trigger_server_argv);
 	fd = PASS_ACCEPT(listen_fd);
-	if (trigger_server_lock != 0
-	    && acl_myflock(ACL_VSTREAM_FILE(trigger_server_lock),
+	if (__service_lock != 0
+	    && acl_myflock(ACL_VSTREAM_FILE(__service_lock),
 		    	ACL_INTERNAL_LOCK,
 			ACL_FLOCK_OP_NONE) < 0)
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
@@ -513,6 +506,9 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 			acl_get_app_conf_bool_table(va_arg(ap, ACL_CONFIG_BOOL_TABLE *));
 			break;
 
+		case ACL_MASTER_SERVER_CTX:
+			__service_ctx = va_arg(ap, void *);
+			break;
 		case ACL_MASTER_SERVER_PRE_INIT:
 			pre_init = va_arg(ap, ACL_MASTER_SERVER_INIT_FN);
 			break;
@@ -523,10 +519,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 			loop = va_arg(ap, ACL_MASTER_SERVER_LOOP_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
-			trigger_server_onexit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
-			break;
-		case ACL_MASTER_SERVER_PRE_ACCEPT:
-			trigger_server_pre_accept = va_arg(ap, ACL_MASTER_SERVER_ACCEPT_FN);
+			__service_onexit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
 			break;
 		case ACL_MASTER_SERVER_IN_FLOW_DELAY:
 			trigger_server_in_flow_delay = 1;
@@ -540,11 +533,6 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 			if (!zerolimit)
 				acl_msg_fatal("service %s requires a process"
 					" limit of 0", service_name);
-			break;
-		case ACL_MASTER_SERVER_PRIVILEGED:
-			if (user_name)
-				acl_msg_fatal("service %s requires privileged"
-					" operation", service_name);
 			break;
 		default:
 			acl_msg_panic("%s: unknown argument type: %d", myname, key);
@@ -585,14 +573,14 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 		if (transport == 0)
 			acl_msg_fatal("no transport type specified");
 		if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_UNIX) == 0) {
-			trigger_server_accept = trigger_server_accept_local;
+			__service_accept = __service_accept_local;
 			fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 		} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_FIFO) == 0) {
-			trigger_server_accept = trigger_server_accept_fifo;
+			__service_accept = __service_accept_fifo;
 			fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_UNIX;
 #ifdef ACL_MASTER_XPORT_NAME_PASS
 		} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_PASS) == 0) {
-			trigger_server_accept = trigger_server_accept_pass;
+			__service_accept = __service_accept_pass;
 			fdtype = ACL_VSTREAM_TYPE_LISTEN;
 #endif
 		} else
@@ -621,14 +609,14 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 		lock_path = acl_concatenate(acl_var_trigger_pid_dir, "/",
 			transport, ".", service_name, (char *) 0);
 		why = acl_vstring_alloc(1);
-		if ((trigger_server_lock = acl_safe_open(lock_path,
+		if ((__service_lock = acl_safe_open(lock_path,
 			O_CREAT | O_RDWR, 0600, (struct stat *) 0,
 			(uid_t) -1, (uid_t) -1, why)) == 0)
 		{
 			acl_msg_fatal("open lock file %s: %s",
 				lock_path, acl_vstring_str(why));
 		}
-		acl_close_on_exec(ACL_VSTREAM_FILE(trigger_server_lock),
+		acl_close_on_exec(ACL_VSTREAM_FILE(__service_lock),
 			ACL_CLOSE_ON_EXEC);
 		acl_myfree(lock_path);
 		acl_vstring_free(why);
@@ -637,9 +625,9 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	/*
 	 * Set up call-back info.
 	 */
-	trigger_server_service = service;
-	trigger_server_name = service_name;
-	trigger_server_argv = argv + optind;
+	__service_main = service;
+	__service_name = service_name;
+	__service_argv = argv + optind;
 
 	__eventp = acl_event_new_select(acl_var_trigger_delay_sec,
 		acl_var_trigger_delay_usec);
@@ -651,7 +639,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 		acl_msg_fatal("chdir(\"%s\"): %s",
 			acl_var_trigger_queue_dir, acl_last_serror());
 	if (pre_init)
-		pre_init(trigger_server_name, trigger_server_argv);
+		pre_init(__service_ctx);
 
 #ifdef SNAPSHOT
 	tzset();
@@ -668,7 +656,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	 * Run post-jail initialization.
 	 */
 	if (post_init)
-		post_init(trigger_server_name, trigger_server_argv);
+		post_init(__service_ctx);
 
 	/*
 	 * Are we running as a one-shot server with the client connection on
@@ -678,7 +666,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 		len = read(ACL_VSTREAM_SOCK(stream), buf, sizeof(buf));
 		if (len <= 0)
 			acl_msg_fatal("read: %s", acl_last_serror());
-		service(buf, len, trigger_server_name, trigger_server_argv);
+		service(buf, len, __service_name, __service_argv);
 		trigger_server_exit();
 	}
 
@@ -706,7 +694,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 				__FILE__, __LINE__, myname, fd);
 
 		acl_event_enable_read(__eventp, stream, 0,
-			trigger_server_accept, stream);
+			__service_accept, stream);
 		acl_close_on_exec(ACL_VSTREAM_SOCK(stream), ACL_CLOSE_ON_EXEC);
 	}
 
@@ -724,16 +712,16 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	while (acl_var_trigger_use_limit == 0
 		|| use_count < acl_var_trigger_use_limit)
 	{
-		if (trigger_server_lock != 0) {
+		if (__service_lock != 0) {
 			acl_watchdog_stop(watchdog);
-			if (acl_myflock(ACL_VSTREAM_FILE(trigger_server_lock),
+			if (acl_myflock(ACL_VSTREAM_FILE(__service_lock),
 				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
 			{
 				acl_msg_fatal("lock error %s", acl_last_serror());
 			}
 		}
 		acl_watchdog_start(watchdog);
-		delay = loop ? loop(trigger_server_name, trigger_server_argv) : -1;
+		delay = loop ? loop(__service_ctx) : -1;
 		acl_event_set_delay_sec(__eventp, delay);
 		acl_event_loop(__eventp);
 	}

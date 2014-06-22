@@ -33,7 +33,7 @@ extern void service_exit(void *exit_ctx);
  * @param stream {ACL_VSTREAM*} 客户端数据连接流
  * @param run_ctx {void*} 用户自定义类型指针
  */
-extern int service_main(ACL_ASTREAM *astream, void *run_ctx);
+extern void service_main(ACL_ASTREAM *astream, void *run_ctx);
 
 #ifdef	__cplusplus
 }
