@@ -246,6 +246,8 @@ clean:
 	rm -f $(OBJS_DEF)
 	@(cd samples; make clean)
 
+rebuild rb: clean static
+
 build_src: clean
 	@(echo "begin building src release...")
 	@(rm -rf acl_cpp)

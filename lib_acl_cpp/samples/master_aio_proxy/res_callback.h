@@ -5,7 +5,7 @@ class req_callback;
 class res_callback : public acl::aio_open_callback
 {
 public:
-	res_callback(req_callback* req, acl::ofstream& res_fp);
+	res_callback(req_callback* req, acl::ofstream* res_fp);
 	~res_callback();
 
 	bool start(acl::aio_handle& handle, const char* server_addr);
@@ -56,5 +56,5 @@ protected:
 private:
 	acl::aio_socket_stream* conn_;
 	req_callback* req_;
-	acl::ofstream& res_fp_;
+	acl::ofstream* res_fp_;
 };

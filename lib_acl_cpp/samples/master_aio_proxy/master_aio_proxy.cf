@@ -8,7 +8,8 @@ service master_aio_proxy {
 #	for master_type = unix
 #	master_service = aio_echo.sock
 #	for master_type = sock
-	master_service = 5200, 127.0.0.1:5100, :5300, aio_echo.sock, aio_echo2.sock
+#	master_service = 5200, 127.0.0.1:5100, :5300, aio_echo.sock, aio_echo2.sock
+	master_service = 5200
 
 #	服务监听为域套接口
 #	master_service = aio_echo.sock
@@ -75,13 +76,13 @@ service master_aio_proxy {
 #	单位为微秒
 	aio_delay_usec = 500
 #       采用事件循环的方式: select(default), poll, kernel(epoll/devpoll/kqueue)
-	aio_event_mode = select
+	aio_event_mode = kernel
 #	是否将 socket 接收与IO功能分开: yes/no, 如果为 yes 可以大大提高 accept() 速度
 	aio_accept_alone = yes
 #	线程池的最大线程数, 如果该值为0则表示采用单线程非阻塞模式.
 	aio_max_threads = 0
 #	每个线程的空闲时间.
-	aio_thread_idle_limit = 60
+#	aio_thread_idle_limit = 60
 
 #	当启用 master_dispatch 连接分开服务后，该配置指定 master_dispatch 所监听的
 #	域套接口的全路径，这样本子进程就可以从 master_dispatch 获得客户端连接
@@ -97,11 +98,11 @@ service master_aio_proxy {
 ############################################################################
 #	应用自己的配置选项
 
-#	每个客户端连接的空闲时间.
-	client_idle_limit = 60
-#	是否输出当前的内存状态信息
-	debug_mem = 1
-#	是否发送欢迎信息
-	send_banner = 0
+#	后端服务器地址，格式：ip:port
+	backend_addr = 127.0.0.1:8080
+#	请求数据转存文件
+#	request_file = {install_path}/var/log/request.dat
+#	响应数据转存文件
+#	respond_file = {install_path}/var/log/response.dat
 }
 

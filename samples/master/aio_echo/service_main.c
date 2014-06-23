@@ -44,7 +44,8 @@ void service_exit(void *exist_ctx acl_unused)
 {
 }
 
-static int read_callback(ACL_ASTREAM *client, void *ctx acl_unused, char *data, int dlen)
+static int read_callback(ACL_ASTREAM *client, void *ctx acl_unused,
+	char *data, int dlen)
 {
 	acl_aio_writen(client, data, dlen);
 	return (0);

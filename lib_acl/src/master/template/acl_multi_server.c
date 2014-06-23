@@ -493,7 +493,6 @@ static void usage(int argc, char *argv[])
 	acl_msg_info("usage: %s -h[help]"
 		" -c [use chroot]"
 		" -d [debug]"
-		" -l [run alone]"
 		" -n service_name"
 		" -s socket_count"
 		" -i [use stdin]"
@@ -521,8 +520,6 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 	ACL_MASTER_SERVER_LOOP_FN loop = 0;
 	int     key;
 	char   *transport = 0;
-	int     alone = 0;
-	int     zerolimit = 0;
 	ACL_WATCHDOG *watchdog;
 	char   *generation;
 	int     fd, i, fdtype = 0;
@@ -539,7 +536,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 	 * stderr, because no-one is going to see them.
 	 */
 	opterr = 0;
-	while ((c = getopt(argc, argv, "hcdlm:n:s:it:uvzf:")) > 0) {
+	while ((c = getopt(argc, argv, "hcdm:n:s:it:uvf:")) > 0) {
 		switch (c) {
 		case 'h':
 			usage(argc, argv);
@@ -551,9 +548,6 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 			break;
 		case 'c':
 			root_dir = "setme";
-			break;
-		case 'l':
-			alone = 1;
 			break;
 		case 'n':
 			service_name = optarg;
@@ -573,9 +567,6 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 			break;
 		case 'v':
 			acl_msg_verbose++;
-			break;
-		case 'z':
-			zerolimit = 1;
 			break;
 		default:
 			break;

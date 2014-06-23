@@ -6,7 +6,7 @@ class req_callback : public acl::aio_callback
 {
 public:
 	req_callback(acl::aio_socket_stream* conn,
-		acl::ofstream& req_fp, acl::ofstream& res_fp);
+		acl::ofstream* req_fp, acl::ofstream* res_fp);
 	~req_callback();
 
 	void start(const char* server_addr);
@@ -52,6 +52,6 @@ protected:
 private:
 	acl::aio_socket_stream* conn_;
 	res_callback* res_;
-	acl::ofstream& req_fp_;
-	acl::ofstream& res_fp_;
+	acl::ofstream* req_fp_;
+	acl::ofstream* res_fp_;
 };

@@ -68,7 +68,7 @@ public:
 	 *  则产生断言
 	 * @return {char} 返回指定位置的字符
 	 */
-	char operator[](size_t n);
+	char operator[](size_t n) const;
 
 	/**
 	 * 根据字符数组下标获得指定位置的字符，输入参数必须为合法值，否则则
@@ -77,7 +77,23 @@ public:
 	 *  则产生断言
 	 * @return {char} 返回指定位置的字符
 	 */
-	char operator[](int n);
+	char operator[](int n) const;
+
+	/**
+	 * 左值赋值重载，用户可以直接使用对象的数组下标进行赋值，如果下标组值
+	 * 越界，则内部直接产生断言
+	 * @param n {size_t} 数组下标位置
+	 * @return {char&}
+	 */
+	char& operator[](size_t n);
+
+	/**
+	 * 左值赋值重载，用户可以直接使用对象的数组下标进行赋值，如果下标组值
+	 * 越界，则内部直接产生断言
+	 * @param n {int} 数组下标位置
+	 * @return {char&}
+	 */
+	char& operator[](int n);
 
 	/**
 	 * 对目标字符串类对象赋值

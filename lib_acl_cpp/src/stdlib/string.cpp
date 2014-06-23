@@ -7,6 +7,7 @@
 #define FREE(x) acl_vstring_free((x))
 #define STR(x)	acl_vstring_str((x))
 #define LEN(x)	ACL_VSTRING_LEN((x))
+#define	CAP(x)	ACL_VSTRING_SIZE((x))
 #define ADDCH(x, ch) ACL_VSTRING_ADDCH((x), (ch))
 #define MCP(x, from, n) acl_vstring_memcpy((x), (from), (n))
 #define MCAT(x, from, n) acl_vstring_memcat((x), (from), (n))
@@ -79,16 +80,28 @@ bool string::get_bin() const
 	return use_bin_;
 }
 
-char string::operator [](size_t n)
+char string::operator [](size_t n) const
 {
 	acl_assert(n < LEN(vbf_));
 	return AT(vbf_, n);
 }
 
-char string::operator [](int n)
+char string::operator [](int n) const
 {
 	acl_assert(n < (int) LEN(vbf_) && n >= 0);
 	return AT(vbf_, n);
+}
+
+char& string::operator [](size_t n)
+{
+	acl_assert(n < (size_t) CAP(vbf_));
+	return (char&) (vbf_->vbuf.ptr[n]);
+}
+
+char& string::operator [](int n)
+{
+	acl_assert(n < (int) CAP(vbf_) && n >= 0);
+	return (char&) (vbf_->vbuf.ptr[n]);
 }
 
 string& string::operator =(const char* s)
@@ -746,7 +759,7 @@ size_t string::size() const
 
 size_t string::capacity() const
 {
-	return ACL_VSTRING_SIZE(vbf_);
+	return CAP(vbf_);
 }
 
 string& string::set_offset(size_t n)

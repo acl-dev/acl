@@ -3,7 +3,7 @@
 #include "req_callback.h"
 
 req_callback::req_callback(acl::aio_socket_stream* conn,
-	acl::ofstream& req_fp, acl::ofstream& res_fp)
+	acl::ofstream* req_fp, acl::ofstream* res_fp)
 : conn_(conn)
 , res_(NULL)
 , req_fp_(req_fp)
@@ -30,13 +30,16 @@ bool req_callback::read_callback(char* data, int len)
 	peer.write(data, len);
 
 	// 将数据写入本地请求文件
-	req_fp_.write(data, len);
+	if (req_fp_)
+		req_fp_->write(data, len);
 
 	return true;
 }
 
 void req_callback::close_callback()
 {
+	logger("disconnect from %s, fd: %d", conn_->get_peer(),
+		conn_->sock_handle());
 	if (res_)
 	{
 		res_callback* res = res_;

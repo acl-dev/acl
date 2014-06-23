@@ -46,8 +46,8 @@ ACL_CONFIG_STR_TABLE service_conf_str_tab[] = {
 	/* example: { "mysql_dbaddr", "127.0.0.1:3306", &var_cfg_mysql_dbaddr }, */
 
 	{ "backend_addr", "127.0.0.1:3306", &var_cfg_backend_addr },
-	{ "request_file", "./request.txt", &var_cfg_request_file },
-	{ "respond_file", "./respond.txt", &var_cfg_respond_file },
+	{ "request_file", "", &var_cfg_request_file },
+	{ "respond_file", "", &var_cfg_respond_file },
 
 	{ 0, 0, 0 },
 };
@@ -58,16 +58,21 @@ void service_init(void *init_ctx acl_unused)
 {
 	const char *myname = "service_init";
 
-	request_fp = acl_fopen(var_cfg_request_file, "a+");
-	if (request_fp == NULL)
-		acl_msg_error("%s(%d): open %s error(%s)",
-			myname, __LINE__, var_cfg_request_file,
-			acl_last_serror());
-	respond_fp = acl_fopen(var_cfg_respond_file, "a+");
-	if (respond_fp == NULL)
-		acl_msg_error("%s(%d): open %s error(%s)",
-			myname, __LINE__, var_cfg_respond_file,
-			acl_last_serror());
+	if (var_cfg_request_file && *var_cfg_request_file) {
+		request_fp = acl_fopen(var_cfg_request_file, "a+");
+		if (request_fp == NULL)
+			acl_msg_error("%s(%d): open %s error(%s)",
+				myname, __LINE__, var_cfg_request_file,
+				acl_last_serror());
+	}
+
+	if (var_cfg_respond_file && *var_cfg_respond_file) {
+		respond_fp = acl_fopen(var_cfg_respond_file, "a+");
+		if (respond_fp == NULL)
+			acl_msg_error("%s(%d): open %s error(%s)",
+				myname, __LINE__, var_cfg_respond_file,
+				acl_last_serror());
+	}
 }
 
 void service_exit(void *exist_ctx acl_unused)
@@ -147,9 +152,8 @@ static int read_callback(ACL_ASTREAM *stream, void *ctx, char *data, int dlen)
 		if (sp->client == NULL)
 			return (-1);
 		acl_aio_writen(sp->client, data, dlen);
-	} else {
+	} else
 		return (-1);
-	}
 
 	return (0);
 }
@@ -180,7 +184,9 @@ void service_main(ACL_ASTREAM *astream, void *run_ctx acl_unused)
 	const char *myname = "service_main";
 	STREAM_PIPE *sp = (STREAM_PIPE*) acl_mycalloc(1, sizeof(STREAM_PIPE));
 
-	acl_msg_info("%s: begin connect %s", myname, var_cfg_backend_addr);
+	acl_msg_info("%s: begin connect %s, client: %s", myname,
+		var_cfg_backend_addr, ACL_VSTREAM_PEER(acl_aio_vstream(astream)));
+
 	sp->client = astream;
 	sp->server = acl_aio_connect(acl_aio_handle(astream),
 			var_cfg_backend_addr, 10);

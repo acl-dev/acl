@@ -1012,7 +1012,6 @@ static void usage(int argc, char *argv[])
 	acl_msg_info("usage: %s -h[help]"
 		" -c [use chroot]"
 		" -d [debug]"
-		" -l [run alone]"
 		" -n service_name"
 		" -s socket_count"
 		" -i [use stdin]"
@@ -1222,7 +1221,7 @@ static void server_main(int argc, char **argv, va_list ap)
 {
 	const char *myname = "acl_aio_server_main";
 	ACL_VSTREAM *stream = 0;
-	int     key, f_flag = 0, alone = 0;
+	int     key, f_flag = 0;
 	char   *root_dir = 0, *user_name = 0;
 	char   *service_name = acl_mystrdup(acl_safe_basename(argv[0]));
 	ACL_MASTER_SERVER_INIT_FN pre_init = 0;
@@ -1254,7 +1253,7 @@ static void server_main(int argc, char **argv, va_list ap)
 
 	opterr = 0;
 
-	while ((key = getopt(argc, argv, "hcdlm:n:o:s:it:uvzf:")) > 0) {
+	while ((key = getopt(argc, argv, "hcdm:n:o:s:it:uvzf:")) > 0) {
 		switch (key) {
 		case 'h':
 			usage(argc, argv);
@@ -1266,9 +1265,6 @@ static void server_main(int argc, char **argv, va_list ap)
 			break;
 		case 'c':
 			root_dir = "setme";
-			break;
-		case 'l':
-			alone = 1;
 			break;
 		case 'n':
 			service_name = optarg;
@@ -1387,6 +1383,10 @@ static void server_main(int argc, char **argv, va_list ap)
 		acl_msg_fatal("chdir(\"%s\"): %s", acl_var_aio_queue_dir,
 			acl_last_serror());
 
+	/* 增加 ip 地址限制 */
+	if (acl_var_aio_access_allow && *acl_var_aio_access_allow)
+		acl_access_add(acl_var_aio_access_allow, ", \t", ":");
+
 	/* Run pre-jail initialization. */
 	if (pre_init)
 		pre_init(__service_ctx);
@@ -1434,6 +1434,60 @@ void acl_aio_server2_main(int argc, char **argv, ACL_AIO_SERVER2_FN service,...)
 
 	va_start(ap, service);
 	/* ap 将在 server_mainn 中收尾 */
+	server_main(argc, argv, ap);
+}
+
+/****************************************************************************/
+
+static ACL_AIO_RUN_FN __app_run;
+
+static void service_adapter(ACL_ASTREAM *astream, void *ctx)
+{
+	const char *myname = "service_adapter";
+
+	if (__app_run) {
+		if (__app_run(astream, ctx) != 0)
+			acl_aio_iocp_close(astream);
+	} else
+		acl_msg_error("%s(%d): __app_run null", myname, __LINE__);
+}
+
+void acl_aio_app_main(int argc, char *argv[], ACL_AIO_RUN_FN run_fn,
+	void *run_ctx, ...)                                         
+{
+	va_list ap;
+
+	va_start(ap, run_ctx);
+	__service_main = service_adapter;
+	__app_run = run_fn;
+	__service_ctx = run_ctx;
+
+	server_main(argc, argv, ap);
+}
+
+static ACL_AIO_RUN2_FN __app2_run;
+
+static void service_adapter2(ACL_SOCKET fd, void *ctx)
+{
+	const char *myname = "service_adapter";
+
+	if (__app2_run) {
+		if (__app2_run(fd, ctx) != 0)
+			acl_socket_close(fd);
+	} else
+		acl_msg_error("%s(%d): __app2_run null", myname, __LINE__);
+}
+
+void acl_aio_app2_main(int argc, char *argv[], ACL_AIO_RUN2_FN run2_fn,
+	void *run_ctx, ...)
+{
+	va_list ap;
+
+	va_start(ap, run_ctx);
+	__service2_main = service_adapter2;
+	__app2_run = run2_fn;
+	__service_ctx = run_ctx;
+
 	server_main(argc, argv, ap);
 }
 

@@ -2,7 +2,7 @@
 #include "req_callback.h"
 #include "res_callback.h"
 
-res_callback::res_callback(req_callback* req, acl::ofstream& res_fp)
+res_callback::res_callback(req_callback* req, acl::ofstream* res_fp)
 : conn_(NULL)
 , req_(req)
 , res_fp_(res_fp)
@@ -28,7 +28,8 @@ bool res_callback::read_callback(char* data, int len)
 	peer.write(data, len);
 
 	// 将数据同时写入本地响应数据文件
-	res_fp_.write(data, len);
+	if (res_fp_)
+		res_fp_->write(data, len);
 
 	return true;
 }

@@ -21,6 +21,5 @@ session manager<br>
 unit test framework<br>
 
 website: <a href=http://www.iteye.com/ target=_blank>http://www.iteye.com/</a><br>
-bbs: <a href=http://www.aclfans.com/ target=_blank>http://www.aclfans.com</a><br>
 download: <a href=https://sourceforge.net/projects/acl/ target=_blank>https://sourceforge.net/projects/acl/</a><br>
 qq group: 242722074<br>

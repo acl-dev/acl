@@ -131,6 +131,15 @@ typedef void (*ACL_AIO_SERVER2_FN) (ACL_SOCKET, void *);
 
 void acl_aio_server_main(int, char **, ACL_AIO_SERVER_FN, ...);
 void acl_aio_server2_main(int, char **, ACL_AIO_SERVER2_FN, ...);
+
+typedef int (*ACL_AIO_RUN_FN)(ACL_ASTREAM *stream, void *run_ctx);
+typedef int (*ACL_AIO_RUN2_FN)(ACL_SOCKET fd, void *run_ctx);
+
+ACL_DEPRECATED void acl_aio_app_main(int argc, char *argv[],
+	ACL_AIO_RUN_FN run_fn, void *run_ctx, ...);
+ACL_DEPRECATED void acl_aio_app2_main(int argc, char *argv[],
+	ACL_AIO_RUN2_FN run2_fn, void *run_ctx, ...);
+
 void acl_aio_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
 	void *arg, int delay);
 void acl_aio_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg);
