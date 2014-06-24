@@ -21,6 +21,6 @@ Advanced C/C++ library(ACL) for UNIX-like OS and WIN32 OS, including sync/async/
 * unit test framework
 
 ### Contact
-Website: http://www.iteye.com
-Download: https://sourceforge.net/projects/acl
-QQ group: 242722074
+- Website: http://www.iteye.com
+- Download: https://sourceforge.net/projects/acl
+- QQ group: 242722074
