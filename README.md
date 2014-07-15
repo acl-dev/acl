@@ -73,8 +73,8 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 -    14 ipc: ×èÈû/·Ç×èÈûÍ¨ÐÅÕûºÏ¿â
 -    15 session: HTTP »á»°¿â
 
-### Ê¾Àý
-- acl ÏîÄ¿ÓÐ´óÁ¿µÄ²âÊÔ¼°Ó¦ÓÃÊ¾Àý£¬Ö÷ÒªÓÐÈý¸öÊ¾Àý¼¯ºÏÈçÏÂ£º
+### Ê¾Àý£¬acl ÏîÄ¿ÓÐ´óÁ¿µÄ²âÊÔ¼°Ó¦ÓÃÊ¾Àý£¬Ö÷ÒªÓÐÈý¸öÊ¾Àý¼¯ºÏÈçÏÂ£º
+
 #### acl/samples£º¸ÃÄ¿Â¼ÏÂµÄÀý×ÓÖ÷ÒªÊÇ»ùÓÚ lib_acl ¼° lib_protocol Á½¸ö¿âµÄÀý×Ó
 -    1.1 acl: ´òÓ¡µ±Ç° acl ¿â°æ±¾ºÅ³ÌÐò
 -    1.2 aio/client: ·Ç×èÈû io ¿Í»§¶Ë
