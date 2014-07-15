@@ -4,11 +4,11 @@
 acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD）的网络通信库及服务器编程框架，同时提供更多的实用功能库。通过该库，用户可以非常容易地编写支持多种模式(多线程、多进程、非阻塞、触发器、UDP方式)的服务器程序，WEB 应用程序，数据库应用程序。此外，该库还提供了常见应用的客户端通信库（如：HTTP、SMTP、ICMP、memcache、beanstalk），常见流式编解码库：XML/JSON/MIME/BASE64/UUCODE/QPCODE/RFC2047 etc。
 
 本工程主要包含 5 个库及大量示例。5 个库的说明如下：
-    1) lib_acl: 该库是最基础的库，其它 4 个库均依赖于该库; 该库以 C 语言实现。
-    2) lib_protocol: 该库主要实现了 http 协议及 icmp/ping 协议; 该库以 C 语言实现。
-    3) lib_acl_cpp: 该库用 C++ 语言封装了 lib_acl/lib_protocol 两个库，同时增加了一些其它有价值的功能应用。
-    4) lib_dict: 该库主要实现了 KEY-VALUE 的字典式存储库，该库另外还依赖于 BDB, CDB 以及 tokyocabinet 库。
-    5) lib_tls: 该库封装了 openssl 库，使 lib_acl 的通信模式可以支持 ssl。
+-    1) lib_acl: 该库是最基础的库，其它 4 个库均依赖于该库; 该库以 C 语言实现。
+-    2) lib_protocol: 该库主要实现了 http 协议及 icmp/ping 协议; 该库以 C 语言实现。
+-    3) lib_acl_cpp: 该库用 C++ 语言封装了 lib_acl/lib_protocol 两个库，同时增加了一些其它有价值的功能应用。
+-    4) lib_dict: 该库主要实现了 KEY-VALUE 的字典式存储库，该库另外还依赖于 BDB, CDB 以及 tokyocabinet 库。
+-    5) lib_tls: 该库封装了 openssl 库，使 lib_acl 的通信模式可以支持 ssl。
 
 ## 平台支持及编译
 整个工程目前支持 Linux(AS4,5,6, CS4,5,6), Windows, MacOS, FreeBSD, Solaris。
