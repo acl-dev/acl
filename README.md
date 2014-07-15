@@ -11,9 +11,9 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
     5) lib_tls: ¸Ã¿â·â×°ÁË openssl ¿â£¬Ê¹ lib_acl µÄÍ¨ÐÅÄ£Ê½¿ÉÒÔÖ§³Ö ssl¡£
 
 ## Æ½Ì¨Ö§³Ö¼°±àÒë
-Õû¸ö¹¤³ÌÄ¿Ç°Ö§³Ö Linux(AS4,5,6, CS4,5,6), Windows, MacOS, (Ô­±¾Ò²Ö§³Ö FreeBSD, Solaris, ÏÖÔÚÈç¹ûË­ÓÐÕâÐ©»·¾³£¬¿ÉÒÔÇáËÉÒÆÖ²µ½ÕâÐ©Æ½Ì¨ÉÏ£©¡£
-* Linux/MacOS: Ö±½ÓÔÚÖÕ¶ËÃüÁîÐÐ·½Ê½ÏÂ·Ö±ð½øÈë lib_acl/lib_protocol/lib_acl_cpp/lib_dict/lib_tls Ä¿Â¼ÏÂ£¬ÔËÐÐ make ÃüÁî¼´¿É¡£
-* Windows: ¿ÉÒÔÓÃ VC2003/VC2010 ½øÐÐ±àÒë¡£(Èç¹ûÄúÐèÒªÓÃ VC6/VC2005/VC2008 ±àÒë£¬¿ÉÒÔ²Î¿¼ VC2003 µÄ±àÒëÌõ¼þ)¡£
+Õû¸ö¹¤³ÌÄ¿Ç°Ö§³Ö Linux(AS4,5,6, CS4,5,6), Windows, MacOS, FreeBSD, Solaris¡£
+* Linux/UNIX: ±àÒëÆ÷Îª gcc£¬Ö±½ÓÔÚÖÕ¶ËÃüÁîÐÐ·½Ê½ÏÂ·Ö±ð½øÈë lib_acl/lib_protocol/lib_acl_cpp/lib_dict/lib_tls Ä¿Â¼ÏÂ£¬ÔËÐÐ make ÃüÁî¼´¿É¡£
+* Windows: ¿ÉÒÔÓÃ VC2003/VC2008/VC2010/VC2012 ½øÐÐ±àÒë¡£(Èç¹ûÐèÒªÓÃ VC6/VC2005 ±àÒë£¬¿ÉÒÔ²Î¿¼ VC2003 µÄ±àÒëÌõ¼þ)¡£
 
 µ±ÔÚ WIN32 »·¾³ÏÂÊ¹ÓÃ¶¯Ì¬¿âÊ±ÓÐ¼¸µãÐèÒª×¢Òâ£º
 * Ê¹ÓÃ lib_acl µÄ¶¯Ì¬¿âÊ±£¬ÐèÒªÔÚÓÃ»§µÄ¹¤³ÌÔ¤¶¨Òå: ACL_DLL;
@@ -73,11 +73,11 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 -    14 ipc: ×èÈû/·Ç×èÈûÍ¨ÐÅÕûºÏ¿â
 -    15 session: HTTP »á»°¿â
 
-* Ê¾Àý
+### Ê¾Àý
 - acl ÏîÄ¿ÓÐ´óÁ¿µÄ²âÊÔ¼°Ó¦ÓÃÊ¾Àý£¬Ö÷ÒªÓÐÈý¸öÊ¾Àý¼¯ºÏÈçÏÂ£º
 -    1¡¢acl/samples£º¸ÃÄ¿Â¼ÏÂµÄÀý×ÓÖ÷ÒªÊÇ»ùÓÚ lib_acl ¼° lib_protocol Á½¸ö¿âµÄÀý×Ó
 -    2¡¢acl/lib_acl_cpp/samples£º¸ÃÄ¿Â¼ÏÂµÄÀý×Ó»ù±¾ÊÇ»ùÓÚ lib_acl_cpp ¿âÐ´µÄ C++ Àý×Ó
--    3¡¢app£º¸ÃÄ¿Â¼ÏÂµÄÀý×ÓÖ÷ÒªÊÇÒ»Ð©±È½ÏÊµÓÃµÄÀý×Ó
+-    3¡¢acl/app£º¸ÃÄ¿Â¼ÏÂµÄÀý×ÓÖ÷ÒªÊÇÒ»Ð©±È½ÏÊµÓÃµÄÀý×Ó
 -    **3.1 wizard: ÓÃÀ´Éú³É»ùÓÚ acl ·þÎñÆ÷¿ò¼ÜµÄ³ÌÐòÄ£°åµÄ³ÌÐò**
 -    3.2 gid: ÓÃÀ´²úÉúÈ«¾ÖÎ¨Ò» ID ºÅµÄ·þÎñ³ÌÐò£¨º¬¿Í»§¶Ë¿â£©
 -    3.3 net_tools: ÓÃÀ´²âÊÔÍøÂç×´Ì¬µÄ³ÌÐò
