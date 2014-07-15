@@ -24,7 +24,7 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 
 ## Ä¿Â¼½á¹¹ËµÃ÷
 
-* lib_acl
+### lib_acl
 -    1 init : Ö÷ÒªÓÃÓÚ³õÊ¼»¯ acl »ù´¡¿â
 -    2 stdlib : ÊÇÒ»Ð©±È½Ï»ù´¡µÄ¹¦ÄÜº¯Êý¿â£¬ÔÚ stdlib/ ¸ùÄ¿Â¼ÏÂÖ÷Òª°üÀ¨Ò»Ð©ÓÐ¹ØÈÕÖ¾¼ÇÂ¼¡¢ÍøÂç/ÎÄ¼þÁ÷´¦Àí¡¢VSTRING»º³å²Ù×÷µÈ¹¦ÄÜº¯Êý£»ÔÚ stdlib/ ÏÂ»¹ÓÐ¶þ¼¶Ä¿Â¼£¬ÈçÏÂ£º
 -    2.1 common : ¸ÃÄ¿Â¼Ö÷ÒªÎªÒ»Ð©³£ÓÃµÄÊý¾Ý½á¹¹¼°Ëã·¨µÄ¹¦ÄÜº¯Êý¿â£¬Ïó¹þÏ£±í¡¢Á´±í¡¢¶ÓÁÐ¡¢¶¯Ì¬Êý×é¡¢¶ÑÕ»¡¢»º´æ¡¢Æ½ºâ¶þ²æÊ÷¡¢Ä£Ê½Æ¥ÅäÊ÷µÈ£»
@@ -35,12 +35,12 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 -    2.6 string : ¸ÃÄ¿Â¼Ö÷Òª°üº¬Ò»Ð©³£ÓÃµÄ×Ö·û´®²Ù×÷µÄ¿â£¬Ìá¹©ÁË±È±ê×¼C¸üÁé»î¸ßÐ§µÄ×Ö·û´®²Ù×÷¹¦ÄÜ£»
 -    2.7 debug : Ö÷ÒªÓÃÓÚÐ­Öúµ÷ÊÔÄÚ´æµÄÐ¹Â¶µÈ¹¦ÄÜ£»
 -    2.8 sys : Ö÷ÒªÊÇÓë²»Í¬²Ù×÷ÏµÍ³Æ½Ì¨Ïà¹ØµÄAPIµÄ·â×°º¯Êý¿â£»
--    3 net: ÊÇÓëÍøÂç²Ù×÷Ïà¹ØµÄº¯Êý¿â£¬°üº¬ÍøÂç¼àÌý¡¢ÍøÂçÁ¬½Ó¡¢DNS²éÑ¯¡¢Ì×½Ó¿Ú²ÎÊýÉèÖÃµÈ¹¦ÄÜ£»
+-    **3 net: ÊÇÓëÍøÂç²Ù×÷Ïà¹ØµÄº¯Êý¿â£¬°üº¬ÍøÂç¼àÌý¡¢ÍøÂçÁ¬½Ó¡¢DNS²éÑ¯¡¢Ì×½Ó¿Ú²ÎÊýÉèÖÃµÈ¹¦ÄÜ£»**
 -    3.1 connect : Ö÷ÒªÊÇÓëÍøÂçÁ¬½ÓÏà¹ØµÄº¯Êý¿â£¬°üº¬ÍøÂçÁ¬½Ó¡¢ÓòÌ×½Ó¿ÚÁ¬½ÓµÈ£»
 -    3.2 listen : Ö÷ÒªÊÇÓëÍøÂç¼àÌýÏà¹ØµÄº¯Êý¿â£¬°üº¬ÍøÂç¼àÌý¡¢ÓòÌ×½Ó¿Ú¼àÌýµÈ£»
 -    3.3 dns : Ö÷ÒªÊÇÓëDNSÓòÃû²éÑ¯Ïà¹ØµÄº¯Êý¿â£¬°üº¬¶Ô gethostbyname µÈ½Ó¿ÚµÄ·â×°¡¢°´RFC1035±ê×¼Ö±½Ó·¢ËÍUDP°ü·½Ê½½øÐÐ²éÑ¯µÈ¹¦ÄÜ£»
--    4 event : Ö÷Òª·â×°ÁË select/poll/epoll/iocp/win message/kqueue/devpoll µÈÏµÍ³API½Ó¿Ú£¬Ê¹´¦ÀíÍøÂçÊÂ¼þ¸ü¼ÓÁé»î¡¢¸ßÐ§¡¢¼òµ¥£¬ÁíÍâ»¹°üº¬¶¨Ê±Æ÷½Ó¿Ú£¬acl ÖÐµÄºÜ¶àÍøÂçÓ¦ÓÃ¶¼»áÓÃµ½ÕâÐ©½Ó¿Ú£¬Ïó aio¡¢master µÈÄ£¿é£»
--    5 aio : Ö÷Òª°üº¬ÍøÂçÒì²½²Ù×÷µÄ¹¦ÄÜº¯Êý£¬¸ÃÌ×º¯Êý¿âÔÚ´¦Àí¸ß²¢·¢Ê±ÓÐ·Ç³£¸ßµÄÐ§ÂÊ£¬¶øÇÒÌá¹©ÁË±È»ù´¡API¸üÎª¸ß¼¶µÄµ÷ÓÃ·½Ê½£¬±ÈÊ¹ÓÃÏó libevent Ö®ÀàµÄº¯Êý¿â¸üÎª¼òµ¥£¬¶øÇÒÊÇÏß³Ì°²È«µÄ£»
+-    **4 event : Ö÷Òª·â×°ÁË select/poll/epoll/iocp/win message/kqueue/devpoll µÈÏµÍ³API½Ó¿Ú£¬Ê¹´¦ÀíÍøÂçÊÂ¼þ¸ü¼ÓÁé»î¡¢¸ßÐ§¡¢¼òµ¥£¬ÁíÍâ»¹°üº¬¶¨Ê±Æ÷½Ó¿Ú£¬acl ÖÐµÄºÜ¶àÍøÂçÓ¦ÓÃ¶¼»áÓÃµ½ÕâÐ©½Ó¿Ú£¬Ïó aio¡¢master µÈÄ£¿é£»**
+-    **5 aio : Ö÷Òª°üº¬ÍøÂçÒì²½²Ù×÷µÄ¹¦ÄÜº¯Êý£¬¸ÃÌ×º¯Êý¿âÔÚ´¦Àí¸ß²¢·¢Ê±ÓÐ·Ç³£¸ßµÄÐ§ÂÊ£¬¶øÇÒÌá¹©ÁË±È»ù´¡API¸üÎª¸ß¼¶µÄµ÷ÓÃ·½Ê½£¬±ÈÊ¹ÓÃÏó libevent Ö®ÀàµÄº¯Êý¿â¸üÎª¼òµ¥£¬¶øÇÒÊÇÏß³Ì°²È«µÄ£»**
 -    6 msg : Ö÷Òª°üº¬ÁË»ùÓÚÏß³ÌµÄÏûÏ¢ÊÂ¼þ¼°»ùÓÚÍøÂçµÄÏûÏ¢ÊÂ¼þ¹¦ÄÜ£»
 -    7 thread : Ö÷ÒªÊÇ·â×°ÁË¸÷¸öOSÆ½Ì¨ÏÂµÄ»ù´¡Ïß³ÌAPI£¬Ê¹¶ÔÍâ½Ó¿Ú±£³ÖÒ»ÖÂÐÔ£¬Ïû³ýÁËÆ½Ì¨µÄ²îÒìÐÔ£¬Í¬Ê±»¹Ìá¹©ÁË°ë×¤ÁôÏß³Ì³ØµÄº¯Êý¿â£¬ÒÔ¼°¶ÔÓÚÏß³Ì¾Ö²¿±äÁ¿µÄÀ©Õ¹£»
 -    8 db : Ö÷ÒªÊÇÒ»Ð©ÓëÊý¾Ý¿âÓÐ¹ØµÄ¹¦ÄÜ¿â£¬¶¨ÒåÁËÒ»¸öÍ¨ÓÃµÄÊý¾Ý¿âÁ¬½Ó³ØµÄ¿ò¼Ü£¨²¢ÇÒÊµÏÖÁËmysqlµÄÁ¬½Ó³ØÊµÀý£©£»Ò»¸ö¼òµ¥µÄÄÚ´æÊý¾Ý¿â£¨ÓÉ¹þÏ£±í¡¢Á´±í¡¢Æ½ºâ¶þ²æÊ÷×éºÏ¶ø³É£©£»ZDBÊý¾Ý´æ´¢ÒýÇæ£¬ÕâÊÇÒ»¸ö¸ßÐ§µÄ»ùÓÚÊý×Ö¼üµÄ´æ´¢ÒýÇæ£»
@@ -49,37 +49,36 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 -    11 unit_test : °üº¬ÓÐ¹Ø½øÐÐ C ÓïÑÔµ¥Ôª²âÊÔµÄ¹¦ÄÜ¿â£»
 -    12 xml: ÊÇÒ»¸öÁ÷Ê½µÄ xml ½âÎöÆ÷¼°¹¹ÔìÆ÷£¬¿ÉÒÔÖ§³Ö×èÈû¼°×èÈûÊ½ÍøÂçÍ¨ÐÅ£»
 -    13 json: ÊÇÒ»¸öÁ÷Ê½µÄ json ½âÎöÆ÷¼°¹¹ÔìÆ÷£¬¿ÉÒÔÖ§³Ö×èÈû¼°×èÈûÊ½ÍøÂçÍ¨ÐÅ£»
--    14 master: ÊÇÔÚ UNIX »·¾³ÏÂÖ§³Ö¶àÖÖ·þÎñÆ÷Ä£Ê½µÄ·þÎñÆ÷¿ò¼Ü£¬Ä¿Ç°Ö÷ÒªÖ§³Ö¶à½ø³ÌÄ£Ê½¡¢¶à½ø³Ì¶àÏß³ÌÄ£Ê½¡¢¶à½ø³Ì·Ç×èÈûÄ£Ê½¡¢¶à½ø³Ì´¥·¢Æ÷Ä£Ê½¼° UDP Í¨ÐÅÄ£Ê½£»
+-    **14 master: ÊÇÔÚ UNIX »·¾³ÏÂÖ§³Ö¶àÖÖ·þÎñÆ÷Ä£Ê½µÄ·þÎñÆ÷¿ò¼Ü£¬Ä¿Ç°Ö÷ÒªÖ§³Ö¶à½ø³ÌÄ£Ê½¡¢¶à½ø³Ì¶àÏß³ÌÄ£Ê½¡¢¶à½ø³Ì·Ç×èÈûÄ£Ê½¡¢¶à½ø³Ì´¥·¢Æ÷Ä£Ê½¼° UDP Í¨ÐÅÄ£Ê½£»**
 
-* lib_protocol
+### lib_protocol
 -    1 http: HTTP Ð­ÒéÏà¹ØµÄ¿â£¬Ö§³Ö HTTP/1.1£¬Í¨Ñ¶·½Ê½Ö§³ÖÍ¬²½/Òì²½·½Ê½
 -    2 icmp: icmp/ping Ð­Òé¿â£¬Ö§³ÖÍ¬²½/Òì²½Í¨ÐÅ·½Ê½
 -    3 smtp: ÓÊ¼þ¿Í»§¶Ë·¢ÐÅÐ­Òé¿â
 
-* lib_acl_cpp
+### lib_acl_cpp
 -    1 stdlib: Ö÷Òª°üº¬×Ö·û´®´¦ÀíÀà(string)£¬xml/json ½âÎö¿â£¬zlib Ñ¹Ëõ¿â(ÒÀÀµÓÚ zlib ¿â), ÈÕÖ¾¼ÇÂ¼Àà, ×Ö·û¼¯×ªÂë(ÔÚUNIX»·¾³ÏÂÐèÒª iconv ¿â), memcached ¿Í»§¿â, »¥³âÀà(Ö§³ÖÏß³ÌËø¡¢ÎÄ¼þËø);
--    2 stream: Ö§³ÖÍøÂçÁ÷/ÎÄ¼þÁ÷£¬Ö§³Ö×èÈû/·Ç×èÈûÁ½ÖÖÍ¨ÐÅ·½Ê½£¬ÔÚ·Ç×èÈûÄ£Ê½ÏÂÖ§³Ö select/poll/epoll/iocp/win32 message/kqueue/devpoll£»Ö§³Ö ssl ¼ÓÃÜ´«Êä(×èÈû¼°·Ç×èÈû·½Ê½£¬ÐèÒª polarssl¿â);
+-    **2 stream: Ö§³ÖÍøÂçÁ÷/ÎÄ¼þÁ÷£¬Ö§³Ö×èÈû/·Ç×èÈûÁ½ÖÖÍ¨ÐÅ·½Ê½£¬ÔÚ·Ç×èÈûÄ£Ê½ÏÂÖ§³Ö select/poll/epoll/iocp/win32 message/kqueue/devpoll£»Ö§³Ö ssl ¼ÓÃÜ´«Êä(×èÈû¼°·Ç×èÈû·½Ê½£¬ÐèÒª polarssl¿â);**
 -    3 ipc: ÔÚ·Ç×èÈûÍ¨ÐÅ·½Ê½£¬Ìá¹©ÁË×èÈûÄ£¿éÓë·Ç×èÈûÄ£¿éÕûºÏµÄ·½Ê½;
--    4 http: ±È½ÏÍêÕûµÄ HTTP Í¨ÐÅ¿â¼°Ð­Òé½âÎö¿â£¬Ö§³Ö¿Í»§¶Ë¼°·þÎñ¶ËÄ£Ê½£¬Ö§³Ö ssl/gzip ´«Êä·½Ê½; Ö§³ÖÀàËÆÓÚ Java HttpServlet ·½Ê½µÄ´ó²¿·Ö½Ó¿Ú£¬·½±ã±àÐ´ CGI ¼° WEB ·þÎñÆ÷³ÌÐò£»
+-    **4 http: ±È½ÏÍêÕûµÄ HTTP Í¨ÐÅ¿â¼°Ð­Òé½âÎö¿â£¬Ö§³Ö¿Í»§¶Ë¼°·þÎñ¶ËÄ£Ê½£¬Ö§³Ö ssl/gzip ´«Êä·½Ê½; Ö§³ÖÀàËÆÓÚ Java HttpServlet ·½Ê½µÄ´ó²¿·Ö½Ó¿Ú£¬·½±ã±àÐ´ CGI ¼° WEB ·þÎñÆ÷³ÌÐò£»**
 -    5 db: ·â×°ÁË MYSQL/SQLITE ¿â£¬Ö§³ÖÊý¾Ý¿âÁ¬½Ó³Ø£»
 -    6 hsocket: ÊµÏÖÁËÍêÕûµÄ handler-socket ¿Í»§¶ËÍ¨ÐÅ¿â£»
--    7 mime: Ö§³ÖÍêÕûµÄÓëÓÊ¼þ±àÂëÏà¹ØµÄ¿â(ÓÊ¼þµÄ rfc2045-rfc2047/rfc822/base64/uucode ±àÂë¼°½âÂë¿â).
--    8 master: ·â×°ÁË C ¿âµÄ·þÎñÆ÷¿ò¼Ü¿â
+-    **7 mime: Ö§³ÖÍêÕûµÄÓëÓÊ¼þ±àÂëÏà¹ØµÄ¿â(ÓÊ¼þµÄ rfc2045-rfc2047/rfc822/base64/uucode ±àÂë¼°½âÂë¿â).**
+-    **8 master: ·â×°ÁË C ¿âµÄ·þÎñÆ÷¿ò¼Ü¿â**
 -    9 beanstalk: ÏûÏ¢¶ÓÁÐÓ¦ÓÃ beanstalkd µÄ¿Í»§¶ËÍ¨ÐÅ¿â
 -    10 connpool: Í¨ÓÃµÄÁ¬½Ó³Ø¿â
 -    11 hscoket: mysql ²å¼þ handle-socket µÄ¿Í»§¶ËÍ¨ÐÅ¿â
 -    12 memcache: memcached Ó¦ÓÃµÄ¿Í»§¶Ë¿â
--    13 mime: ÓëÓÊ¼þÓ¦ÓÃÏà¹ØµÄ¸÷ÖÖ±àÂë¡¢½âÂë¿â
--    14 queue: ´ÅÅÌÎÄ¼þ¶ÓÁÐ²Ù×÷¿â
--    15 ipc: ×èÈû/·Ç×èÈûÍ¨ÐÅÕûºÏ¿â
--    16 session: HTTP »á»°¿â
+-    13 queue: ´ÅÅÌÎÄ¼þ¶ÓÁÐ²Ù×÷¿â
+-    14 ipc: ×èÈû/·Ç×èÈûÍ¨ÐÅÕûºÏ¿â
+-    15 session: HTTP »á»°¿â
 -
 * Ê¾Àý
 - acl ÏîÄ¿ÓÐ´óÁ¿µÄ²âÊÔ¼°Ó¦ÓÃÊ¾Àý£¬Ö÷ÒªÓÐÈý¸öÊ¾Àý¼¯ºÏÈçÏÂ£º
 -    1¡¢acl/samples£º¸ÃÄ¿Â¼ÏÂµÄÀý×ÓÖ÷ÒªÊÇ»ùÓÚ lib_acl ¼° lib_protocol Á½¸ö¿âµÄÀý×Ó
 -    2¡¢acl/lib_acl_cpp/samples£º¸ÃÄ¿Â¼ÏÂµÄÀý×Ó»ù±¾ÊÇ»ùÓÚ lib_acl_cpp ¿âÐ´µÄ C++ Àý×Ó
 -    3¡¢app£º¸ÃÄ¿Â¼ÏÂµÄÀý×ÓÖ÷ÒªÊÇÒ»Ð©±È½ÏÊµÓÃµÄÀý×Ó
--    3.1 wizard: ÓÃÀ´Éú³É»ùÓÚ acl ·þÎñÆ÷¿ò¼ÜµÄ³ÌÐòÄ£°åµÄ³ÌÐò
+-    **3.1 wizard: ÓÃÀ´Éú³É»ùÓÚ acl ·þÎñÆ÷¿ò¼ÜµÄ³ÌÐòÄ£°åµÄ³ÌÐò**
 -    3.2 gid: ÓÃÀ´²úÉúÈ«¾ÖÎ¨Ò» ID ºÅµÄ·þÎñ³ÌÐò£¨º¬¿Í»§¶Ë¿â£©
 -    3.3 net_tools: ÓÃÀ´²âÊÔÍøÂç×´Ì¬µÄ³ÌÐò
 -    3.4 master_dispatch: ¶Ôºó¶Ë·þÎñÆ÷·ÖÅä TCP Á¬½ÓµÄÁ¬½Ó¾ùºâ³ÌÐò
