@@ -23,29 +23,39 @@
 #include "stdlib/acl_msg.h"
 #include "stdlib/unix/acl_set_ugid.h"
 
-void acl_set_ugid(uid_t uid, gid_t gid)
+int acl_set_ugid(uid_t uid, gid_t gid)
 {
 	int   saved_error = acl_last_error();
 	char  tbuf[256];
 
-	if (geteuid() != 0 && seteuid(0) < 0)
-		acl_msg_fatal("seteuid(0): %s",
+	if (geteuid() != 0 && seteuid(0) < 0) {
+		acl_msg_error("seteuid(0): %s",
 			acl_last_strerror(tbuf, sizeof(tbuf)));
-	if (setgid(gid) < 0)
-		acl_msg_fatal("setgid(%ld): %s", (long) gid,
+		return -1;
+	}
+	if (setgid(gid) < 0) {
+		acl_msg_error("setgid(%ld): %s", (long) gid,
 			acl_last_strerror(tbuf, sizeof(tbuf)));
-	if (setgroups(1, &gid) < 0)
-		acl_msg_fatal("setgroups(1, &%ld): %s", (long) gid,
+		return -1;
+	}
+	if (setgroups(1, &gid) < 0) {
+		acl_msg_error("setgroups(1, &%ld): %s", (long) gid,
 			acl_last_strerror(tbuf, sizeof(tbuf)));
-	if (setuid(uid) < 0)
-		acl_msg_fatal("setuid(%ld): %s", (long) uid,
+		return -1;
+	}
+	if (setuid(uid) < 0) {
+		acl_msg_error("setuid(%ld): %s", (long) uid,
 			acl_last_strerror(tbuf, sizeof(tbuf)));
+		return -1;
+	}
 	if (acl_msg_verbose > 1)
-		acl_msg_info("setugid: uid %ld gid %ld", (long) uid, (long) gid);
+		acl_msg_info("setugid: uid %ld gid %ld",
+			(long) uid, (long) gid);
 	acl_set_error(saved_error);
+	return 0;
 }
 
-int acl_change_uid(char *user_name)
+int acl_change_uid(const char *user)
 {
 	const char *myname = "change_uid";
 	struct passwd *pwd;
@@ -53,19 +63,23 @@ int acl_change_uid(char *user_name)
 	gid_t  gid;
 	char  tbuf[256];
 
-	if ((pwd = getpwnam(user_name)) == NULL)
-		acl_msg_fatal("%s: no such user=%s", myname, user_name);
+	if ((pwd = getpwnam(user)) == NULL) {
+		acl_msg_error("%s: no such user: %s", myname, user);
+		return -1;
+	}
 	uid = pwd->pw_uid;
 	gid = pwd->pw_gid;
-	if (setgid(gid) < 0)
-		acl_msg_fatal("%s: setgid error(%s, %d): %s",
-			myname, user_name, (int) uid,
-			acl_last_strerror(tbuf, sizeof(tbuf)));
-	if (setuid(uid) < 0)
-		acl_msg_fatal("%s: setuid error(%s, %d): %s",
-			myname, user_name, (int) uid,
-			acl_last_strerror(tbuf, sizeof(tbuf)));
+	if (setgid(gid) < 0) {
+		acl_msg_error("%s: setgid error(%s, %d): %s", myname, user,
+			(int) uid, acl_last_strerror(tbuf, sizeof(tbuf)));
+		return -1;
+	}
+	if (setuid(uid) < 0) {
+		acl_msg_error("%s: setuid error(%s, %d): %s", myname, user,
+			(int) uid, acl_last_strerror(tbuf, sizeof(tbuf)));
+		return -1;
+	}
 
-	return (0);
+	return 0;
 }
 #endif /* ACL_UNIX*/

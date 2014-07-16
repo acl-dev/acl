@@ -207,12 +207,27 @@ void aio_istream::disable_read()
 
 void aio_istream::keep_read(bool onoff)
 {
+	acl_assert(stream_);
 	acl_aio_stream_set_keep_read(stream_, onoff ? 1 : 0);
 }
 
 bool aio_istream::keep_read() const
 {
+	acl_assert(stream_);
 	return acl_aio_stream_get_keep_read(stream_) == 0 ? false : true;
+}
+
+aio_istream& aio_istream::set_buf_max(int max)
+{
+	acl_assert(stream_);
+	acl_aio_stream_set_line_length(stream_, max);
+	return *this;
+}
+
+int aio_istream::get_buf_max(void) const
+{
+	acl_assert(stream_);
+	return acl_aio_stream_get_line_length(stream_);
 }
 
 void aio_istream::gets(int timeout /* = 0 */, bool nonl /* = true */,

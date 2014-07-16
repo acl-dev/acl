@@ -172,6 +172,19 @@ public:
 	 */
 	bool keep_read() const;
 
+	/**
+	 * 设置接收缓冲区的最大长度，以避免缓冲区溢出，默认值为 0 表示不限制
+	 * @param int {max}
+	 * @return {aio_istream&}
+	 */
+	aio_istream& set_buf_max(int max);
+
+	/**
+	 * 获得当前接收缓冲区的最大长度限制
+	 * @return {int} 返回值  <= 0 表示没有限制
+	 */
+	int get_buf_max(void) const;
+
 protected:
 	virtual ~aio_istream();
 

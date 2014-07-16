@@ -28,9 +28,14 @@
 
 static void vstring_extend(ACL_VBUF *bp, int incr)
 {
+	const char *myname = "vstring_extend";
 	unsigned used = bp->ptr - bp->data;
 	int     new_len;
 	ACL_VSTRING *vp = (ACL_VSTRING *) bp->ctx;
+
+	if (vp->maxlen > 0 && (int) ACL_VSTRING_LEN(vp) > vp->maxlen)
+		acl_msg_warn("%s(%d), %s: reached the maxlen: %d",
+			__FILE__, __LINE__, myname, vp->maxlen);
 
 	/*
 	 * Note: vp->vbuf.len is the current buffer size (both on entry and on
@@ -42,7 +47,7 @@ static void vstring_extend(ACL_VBUF *bp, int incr)
 	new_len = bp->len + (bp->len > incr ? bp->len : incr);
 	if (vp->slice)
 		bp->data = (unsigned char *) acl_slice_pool_realloc(
-				__FILE__, __LINE__, vp->slice, bp->data, new_len);
+			__FILE__, __LINE__, vp->slice, bp->data, new_len);
 	else
 		bp->data = (unsigned char *) acl_myrealloc(bp->data, new_len);
 	bp->len = new_len;

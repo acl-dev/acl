@@ -471,52 +471,58 @@ ACL_API int acl_vstream_bfcp_some(ACL_VSTREAM *fp, void *vptr, size_t maxlen);
 ACL_API int acl_vstream_read(ACL_VSTREAM *fp, void *vptr, size_t maxlen);
 
 /**
-* 一次性从 ACL_VSTREAM 流或系统缓存区中读取一行数据, 包括回车换行符
-* (调用者自行解决WINDOWS与UNIX对于回车换行的兼容性问题), 如果未读到
-* 回车换行符, 也将数据拷贝至用户的内存缓冲区.
-* @param fp {ACL_VSTREAM*} 数据流 
-* @param strbuf {ACL_VSTRING*} 数据缓冲区
-* @param ready {int*} 是否按要求读到所需数据的标志位指针, 不能为空
-* @return ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
-*  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据
-*/
-ACL_API int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *strbuf, int *ready);
+ * 一次性从 ACL_VSTREAM 流或系统缓存区中读取一行数据, 包括回车换行符
+ * (调用者自行解决WINDOWS与UNIX对于回车换行的兼容性问题), 如果未读到
+ * 回车换行符, 也将数据拷贝至用户的内存缓冲区.
+ * @param fp {ACL_VSTREAM*} 数据流 
+ * @param buf {ACL_VSTRING*} 数据缓冲区，当 buf->maxlen > 0 时，则限制每行数据
+ *  的长度，即当 buf 中的数据长度达到 maxlen 时，即使没有读到完整一行数据，该
+ *  函数也会返回，且会将 ready 置 1，调用者需调用 fp->flag 标志位中是否包含
+ *  ACL_VSTREAM_FLAG_TAGYES 来判断是否读到一行数据
+ * @param ready {int*} 是否按要求读到所需数据的标志位指针, 不能为空
+ * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
+ *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据
+ */
+ACL_API int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready);
 
 /**
  * 一次性从 ACL_VSTREAM 流或系统缓存区中读取一行数据, 如果未读到回车换行符,
  * 也将数据拷贝至用户的内存缓冲区, 如果读到回车换行符便将回车换行符自动去掉,
  * 并将回车换行符前的数据拷贝至用户内存区.
  * @param fp {ACL_VSTREAM*} 数据流 
- * @param strbuf {ACL_VSTRING*} 数据缓冲区
+ * @param buf {ACL_VSTRING*} 数据缓冲区，当 buf->maxlen > 0 时，则限制每行数据
+ *  的长度，即当 buf 中的数据长度达到 maxlen 时，即使没有读到完整一行数据，该
+ *  函数也会返回，且会将 ready 置 1，调用者需调用 fp->flag 标志位中是否包含
+ *  ACL_VSTREAM_FLAG_TAGYES 来判断是否读到一行数据
  * @param ready {int*} 是否按要求读到所需数据的标志位指针, 不能为空
  * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
  *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据, 如果仅
  *  读到了一个空行, 则 ret == 0.
  */
-ACL_API int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *strbuf, int *ready);
+ACL_API int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready);
+
 /**
-* 功能: 一次性从 ACL_VSTREAM 流或系统缓存区中读取固定长度的数据,
-*       如果未读到所要求的数据, 也将数据拷贝至用户内存缓冲区, 如
-*       果读到所要求的数据, 则将 ready 标志位置位.
-* @param fp {ACL_VSTREAM*} 数据流 
-* @param strbuf {ACL_VSTRING*} 数据缓冲区
-* @param cnt {int} 所需要读的数据的长度
-* @param ready {int*} 是否按要求读到所需数据的标志位指针, 不能为空
-* @return ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
-*  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据, 
-*  (*ready) != 0: 表示读到了所要求长度的数据.
-*/
-ACL_API int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *strbuf, int cnt, int *ready);
+ * 一次性从 ACL_VSTREAM 流或系统缓存区中读取固定长度的数据, 如果未读到所要求的
+ * 数据, 也将数据拷贝至用户内存缓冲区, 如果读到所要求的数据, 则将 ready 标志位置位.
+ * @param fp {ACL_VSTREAM*} 数据流 
+ * @param buf {ACL_VSTRING*} 数据缓冲区
+ * @param cnt {int} 所需要读的数据的长度
+ * @param ready {int*} 是否按要求读到所需数据的标志位指针, 不能为空
+ * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
+ *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据, 
+ *  (*ready) != 0: 表示读到了所要求长度的数据.
+ */
+ACL_API int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int cnt, int *ready);
 
 /**
  * 一次性从 ACL_VSTREAM 流或系统缓存区中读取不固定长度的数据,
  * 只要能读到大于 0 个字节的数据则将 ready 标志位置位
  * @param fp {ACL_VSTREAM*} 数据流 
- * @param strbuf {ACL_VSTRING*} 数据缓冲区
+ * @param buf {ACL_VSTRING*} 数据缓冲区
  * @return  ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
  *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据.
  */
-ACL_API int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *strbuf);
+ACL_API int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf);
 
 /**
  * 检查 ACL_VSTREAM 流是否可读或出错

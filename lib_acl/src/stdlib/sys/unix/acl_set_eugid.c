@@ -23,27 +23,36 @@
 
 /* set_eugid - set effective user and group attributes */
 
-void acl_set_eugid(uid_t euid, gid_t egid)
+int acl_set_eugid(uid_t euid, gid_t egid)
 {
 	int   saved_error = acl_last_error();
 	char  tbuf[256];
 
-	if (geteuid() != 0)
-		if (seteuid(0))
-			acl_msg_fatal("set_eugid: seteuid(0): %s",
-				acl_last_strerror(tbuf, sizeof(tbuf)));
-	if (setegid(egid) < 0)
-		acl_msg_fatal("set_eugid: setegid(%ld): %s", (long) egid,
+	if (geteuid() != 0 && seteuid(0)) {
+		acl_msg_error("set_eugid: seteuid(0): %s",
 			acl_last_strerror(tbuf, sizeof(tbuf)));
-	if (setgroups(1, &egid) < 0)
-		acl_msg_fatal("set_eugid: setgroups(%ld): %s", (long) egid,
+		return -1;
+	}
+	if (setegid(egid) < 0) {
+		acl_msg_error("set_eugid: setegid(%ld): %s", (long) egid,
 			acl_last_strerror(tbuf, sizeof(tbuf)));
-	if (euid != 0 && seteuid(euid) < 0)
-		acl_msg_fatal("set_eugid: seteuid(%ld): %s", (long) euid,
+		return -1;
+	}
+	if (setgroups(1, &egid) < 0) {
+		acl_msg_error("set_eugid: setgroups(%ld): %s", (long) egid,
 			acl_last_strerror(tbuf, sizeof(tbuf)));
+		return -1;
+	}
+	if (euid != 0 && seteuid(euid) < 0) {
+		acl_msg_error("set_eugid: seteuid(%ld): %s", (long) euid,
+			acl_last_strerror(tbuf, sizeof(tbuf)));
+		return -1;
+	}
 	if (acl_msg_verbose)
 		acl_msg_info("set_eugid: euid %ld egid %ld",
-				(long) euid, (long) egid);
+			(long) euid, (long) egid);
+
 	acl_set_error(saved_error);
+	return 0;
 }
 #endif /* ACL_UNIX */

@@ -140,6 +140,7 @@ struct ACL_ASTREAM {
 	int   keep_read;	/**< 是否启用持续性读 */
 	int   accept_nloop;	/**<  acl_aio_accept 内部循环 accept 的最大次数 */
 	int   error;		/**< 当前套接口的错误号 */
+	int   line_length;	/**< 当以行为单位读数据时该值限制每行最大长度 */
 
 	ACL_AIO_ACCEPT_FN  accept_fn;	/**< accept 完成时的回调函数 */
 	ACL_AIO_LISTEN_FN  listen_fn;	/**< 有新连接到达时的回调函数 */
@@ -488,6 +489,7 @@ ACL_API void acl_aio_ctl(ACL_ASTREAM *astream, int name, ...);
 #define ACL_AIO_CTL_LISTEN_FN           2   /**< 设置有连接到达时回调函数 */
 #define ACL_AIO_CTL_CTX                 3   /**< 设置应用的参数 */
 #define ACL_AIO_CTL_TIMEOUT             4   /**< 设置超时时间 */
+#define	ACL_AIO_CTL_LINE_LENGTH         5   /**< 设置所读行数据的最大长长度 */
 #define ACL_AIO_CTL_STREAM              10  /**< 设置ACL_VSTREAM流指针 */
 #define ACL_AIO_CTL_READ_NESTED         11  /**< 设置最大读嵌套层数 */
 #define ACL_AIO_CTL_WRITE_NESTED        12  /**< 设置最大写嵌套层数 */
@@ -518,6 +520,9 @@ ACL_API ACL_VSTREAM *acl_aio_vstream(ACL_ASTREAM *astream);
  * @param astream {ACL_ASTREAM*} 受监控的流, 当该流有完整的一行数据、出错
  *  或读超时时将回调用户的注册函数.
  * 注: 读操作发生在异步框架内.
+ *     当通过 acl_aio_stream_set_line_length 设置了行最大长度限制，则当接收的
+ *     数据行过大时，为避免缓冲区溢出，该函数的处理过程将会在缓冲区达到该长度
+ *     限制时被触发，直接将数据交由使用者注册的回调过程
  */
 ACL_API void acl_aio_gets(ACL_ASTREAM *astream);
 
@@ -528,6 +533,8 @@ ACL_API void acl_aio_gets(ACL_ASTREAM *astream);
  * @param astream {ACL_ASTREAM*} 受监控的流, 当该流有完整的一行数据、出错
  *  或读超时时将回调用户的注册函数.
  * 注: 读操作发生在异步框架内.
+ *     数据行过大时，为避免缓冲区溢出，该函数的处理过程将会在缓冲区达到该长度
+ *     限制时被触发，直接将数据交由使用者注册的回调过程
  */
 ACL_API void acl_aio_gets_nonl(ACL_ASTREAM *astream);
 
@@ -613,6 +620,21 @@ ACL_API void acl_aio_disable_read(ACL_ASTREAM *astream);
  * @return {int} 0: 否，!= 0: 是
  */
 ACL_API int acl_aio_isrset(ACL_ASTREAM *astream);
+
+/**
+ * 设置读一行数据时每行数据的最大长度限制，这样的目的主要是为了防止对方发送的
+ * 一行数据过长，造成本地接收缓冲区内存溢出
+ * @param astream {ACL_ASTREAM*} 异步数据流
+ * @param len {int} 当该值 > 0 时将会限制按行读的数据长度
+ */
+ACL_API void acl_aio_stream_set_line_length(ACL_ASTREAM *astream, int len);
+
+/**
+ * 获得所设置的流按行读数据时的最大长度限制
+ * @param astream {ACL_ASTREAM*} 异步数据流
+ * @return {int}
+ */
+ACL_API int acl_aio_stream_get_line_length(ACL_ASTREAM *astream);
 
 /**
  * 单独设置异步流的连续读标记，缺省情况下自动继承 ACL_AIO 中的 keep_read

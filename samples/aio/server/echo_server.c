@@ -12,8 +12,9 @@
 static char *__data;
 static int   __dlen;
 static int   __echo_src;
+static int   __line_length;
 
-static int __gets_callback(ACL_ASTREAM *stream, void *context,
+static int __read_callback(ACL_ASTREAM *stream, void *context,
 			const char *data, int dlen);
 
 static void default_write_fn(void *arg acl_unused, const char *fmt, ...)
@@ -84,9 +85,18 @@ static int __write_callback(ACL_ASTREAM *client, void *context acl_unused,
 	return (0);
 }
 
-static int __gets_callback(ACL_ASTREAM *stream, void *context acl_unused,
+static int __read_callback(ACL_ASTREAM *stream, void *context acl_unused,
 			const char *data, int dlen)
 {
+#ifdef	USE_GETS
+	static int  __n = 0;
+
+	if (__n <= 10) {
+		printf(">>gets: [%s]\r\n", data);
+		__n++;
+	}
+#endif
+
 	if (__echo_src)
 		(void) acl_aio_writen(stream, data, dlen);
 	else
@@ -105,11 +115,12 @@ static int __accept_callback(ACL_ASTREAM *client, void *context acl_unused)
 		printf("can't get client addr %s\r\n", acl_last_serror());
 
 	acl_aio_ctl(client,
-		ACL_AIO_CTL_READ_HOOK_ADD, __gets_callback, NULL,
+		ACL_AIO_CTL_READ_HOOK_ADD, __read_callback, NULL,
 		ACL_AIO_CTL_WRITE_HOOK_ADD, __write_callback, NULL,
 		ACL_AIO_CTL_CLOSE_HOOK_ADD, __io_close, NULL,
 		ACL_AIO_CTL_TIMEO_HOOK_ADD, __io_timeout, NULL,
-		ACL_AIO_CTL_TIMEOUT, 5,
+		ACL_AIO_CTL_TIMEOUT, 60,
+		ACL_AIO_CTL_LINE_LENGTH, __line_length,
 		ACL_AIO_CTL_END);
 #ifdef	USE_GETS
 	acl_aio_gets(client);
@@ -141,11 +152,12 @@ static void __listen_callback(ACL_ASTREAM *sstream, void *context)
 		acl_non_blocking(ACL_VSTREAM_SOCK(cstream), ACL_NON_BLOCKING);
 		client = acl_aio_open(aio, cstream);
 		acl_aio_ctl(client,
-			ACL_AIO_CTL_READ_HOOK_ADD, __gets_callback, NULL,
+			ACL_AIO_CTL_READ_HOOK_ADD, __read_callback, NULL,
 			ACL_AIO_CTL_WRITE_HOOK_ADD, __write_callback, NULL,
 			ACL_AIO_CTL_CLOSE_HOOK_ADD, __io_close, NULL,
 			ACL_AIO_CTL_TIMEO_HOOK_ADD, __io_timeout, NULL,
-			ACL_AIO_CTL_TIMEOUT, 5,
+			ACL_AIO_CTL_TIMEOUT, 60,
+			ACL_AIO_CTL_LINE_LENGTH, __line_length,
 			ACL_AIO_CTL_END);
 #ifdef	USE_GETS
 		acl_aio_gets(client);
@@ -200,9 +212,10 @@ ACL_AIO *echo_server_start(ACL_VSTREAM *sstream, int accept_auto, int event_mode
 	return (h_aio);
 }
 
-void echo_server_init(char *data, int dlen, int echo_src)
+void echo_server_init(char *data, int dlen, int echo_src, int line_length)
 {
 	__data = data;
 	__dlen = dlen;
 	__echo_src = echo_src;
+	__line_length = line_length;
 }

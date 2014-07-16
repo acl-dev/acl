@@ -258,6 +258,9 @@ static void __aio_gets(ACL_ASTREAM *astream, int nonl)
 	else
 		astream->read_ready_fn = acl_vstream_gets_peek;
 
+	if (astream->line_length > 0)
+		astream->strbuf.maxlen = astream->line_length;
+
 	astream->event_read_callback = __gets_notify_callback;
 
 	ACL_VSTRING_RESET(&astream->strbuf);
@@ -828,4 +831,14 @@ int acl_aio_isrset(ACL_ASTREAM *astream)
 		return (0);
 
 	return (acl_event_isrset(astream->aio->event, astream->stream));
+}
+
+void acl_aio_stream_set_line_length(ACL_ASTREAM *astream, int len)
+{
+	astream->line_length = len;
+}
+
+int acl_aio_stream_get_line_length(ACL_ASTREAM *astream)
+{
+	return astream->line_length;
 }

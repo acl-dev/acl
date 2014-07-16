@@ -82,6 +82,7 @@ ACL_ASTREAM *acl_aio_open(ACL_AIO *aio, ACL_VSTREAM *stream)
 	astream->read_nested_limit = __AIO_NESTED_MAX;
 	astream->read_ready_fn = NULL;
 	astream->count = 0;
+	astream->line_length = 0;
 	astream->keep_read = aio->keep_read;  /* 继承异步句柄的持续读标志 */
 
 	/* just for listen fd */
@@ -727,6 +728,9 @@ void acl_aio_ctl(ACL_ASTREAM *astream, int name, ...)
 			break;
 		case ACL_AIO_CTL_TIMEOUT:
 			astream->timeout = va_arg(ap, int);
+			break;
+		case ACL_AIO_CTL_LINE_LENGTH:
+			astream->line_length = va_arg(ap, int);
 			break;
 		case ACL_AIO_CTL_STREAM:
 			stream = va_arg(ap, ACL_VSTREAM*);

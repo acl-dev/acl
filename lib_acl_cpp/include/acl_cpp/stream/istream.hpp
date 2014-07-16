@@ -32,14 +32,14 @@ public:
 	/**
 	 * 从输入流读数据直至读到所要求的字符串或出错才返回
 	 * @param buf {void*} 用户缓冲区
-	 * @param size_inout {size_t*} 作为参数时 *size_inout 表示缓冲 buf
+	 * @param inout {size_t*} 作为参数时 *inout 表示缓冲 buf
 	 *  的空间大小，函数返回后记录存储于 buf 中的数据长度
 	 * @param tag {const char*} 要求读到的字符串
-	 * @param taglen {size_t} tag 字符串的长度
+	 * @param len {size_t} tag 字符串的长度
 	 * @return {bool} 是否读到所要求的字符串数据
 	 */
 
-	bool readtags(void *buf, size_t* size_inout, const char *tag, size_t taglen);
+	bool readtags(void *buf, size_t* inout, const char *tag, size_t len);
 
 	/**
 	 * 从输入流中读到一行数据
@@ -100,6 +100,7 @@ public:
 	 * @return {bool} 读数据是否成功
 	 */
 	bool read(string& s, bool loop = true);
+	bool read(string* s, bool loop = true);
 
 	/**
 	 * 从输入流中读数据至缓冲区中
@@ -109,18 +110,23 @@ public:
 	 * @return {bool} 读数据是否成功
 	 */
 	bool read(string& s, size_t max, bool loop = true);
+	bool read(string* s, size_t max, bool loop = true);
 
 	/**
 	 * 从输入流中读一行数据至缓冲区中
 	 * @param s {string&} 缓冲区，内部会首先自动清空该缓冲区
 	 * @param nonl {bool} 是否保留所读行数据中的 "\r\n" 或 "\n"
+	 * @param max {size_t} 当该值 > 0 时，该值限定了所读到行的最大值，当
+	 *  接收到数据行长度大于该值时，则仅返回部分数据，同时内部会记录警告；
+	 *  当该值 = 0 时，则不限制行数据长度
 	 * @return {bool} 是否读到了一行数据
 	 *  1）如果返回 true 则说明读到了完整一行数据；如果该行数据中只有
 	 *     "\r\n" 或 "\n"，则 s 的内容为空，即：s.empty() == true
 	 *  2）如果返回 false 则说明读关闭且未读到一行数据，此时 s 中有可能
 	 *     存储着部分数据，需要用 if (s.empty() == true) 判断一下
 	 */
-	bool gets(string& s, bool nonl = true);
+	bool gets(string& s, bool nonl = true, size_t max = 0);
+	bool gets(string* s, bool nonl = true, size_t max = 0);
 
 	/**
 	 * 从输入流中读数据直到读到要求的字符串数据作为分隔符的数据，
@@ -130,6 +136,7 @@ public:
 	 * @return {bool} 是否读到要求的字符串数据
 	 */
 	bool readtags(string& s, const string& tag);
+	bool readtags(string* s, const string& tag);
 
 	/**
 	 * 从输入流中读一个字节数据
@@ -149,12 +156,20 @@ public:
 	 * @param buf {string&} 缓冲区
 	 * @param nonl {bool} 是否保留所读行数据中的 "\r\n" 或 "\n"
 	 * @param clear {bool} 是否内部自动清空 buf 缓冲区
+	 * @param max {int} 当该值 > 0 时则设置所读行数据的最大长度以避免本地
+	 *  缓冲区溢出
 	 * @return {bool} 是否读了一行数据; 如果返回 false 并不表示输入
 	 *  流结束，只是表示未读到一个完整行数据，应该通过调用 stream->eof()
 	 *  来检查输入流是否关闭，另外，如果仅读到了部分数据，则 buf 会存储
 	 *  这些部分数据
+	 *  注意：为了防止 buf 缓冲区溢出，调用者调用该方法获得的数据即使不够
+	 *  一行数据，应尽量取出 buf 中的数据然后将 buf->clear()，以防止 buf
+	 *  内存过大导致缓冲区溢出
 	 */
-	bool gets_peek(string& buf, bool nonl = true, bool clear = false);
+	bool gets_peek(string& buf, bool nonl = true,
+		bool clear = false, int max = 0);
+	bool gets_peek(string* buf, bool nonl = true,
+		bool clear = false, int max = 0);
 
 	/**
 	 * 尝试性从输入流中读取数据
@@ -162,8 +177,12 @@ public:
 	 * @param clear {bool} 函数开始时是否内部自动清空 buf 缓冲区
 	 * @return {bool} 是否读到数据, 如果返回 false 仅 表示未读完所要求
 	 *  的数据长度，应该通过调用 stream->eof() 来检查输入流是否关闭
+	 *  注意：为了防止 buf 缓冲区溢出，调用者调用该方法获得的数据即使不够
+	 *  一行数据，应尽量取出 buf 中的数据然后将 buf->clear()，以防止 buf
+	 *  内存过大导致缓冲区溢出
 	 */
 	bool read_peek(string& buf, bool clear = false);
+	bool read_peek(string* buf, bool clear = false);
 
 	/**
 	 * 尝试性从输入流中读取指定长度的数据
@@ -173,8 +192,12 @@ public:
 	 * @return {bool} 是否读到所要求数据长度的数据, 如果返回 false 仅
 	 *  表示未读完所要求的数据长度，应该通过调用 stream->eof() 来检查
 	 *  输入流是否关闭
+	 *  注意：为了防止 buf 缓冲区溢出，调用者调用该方法获得的数据即使不够
+	 *  一行数据，应尽量取出 buf 中的数据然后将 buf->clear()，以防止 buf
+	 *  内存过大导致缓冲区溢出
 	 */
 	bool readn_peek(string& buf, size_t cnt, bool clear = false);
+	bool readn_peek(string* buf, size_t cnt, bool clear = false);
 
 	/* 以下几个函数重载了输入操作符，它们都是阻塞式操作过程，且需要
 	 * 调用 stream->eof() 来判断输入流是否关闭或是否读到了文件尾
@@ -189,9 +212,6 @@ public:
 	istream& operator>>(int& n);
 	istream& operator>>(short& n);
 	istream& operator>>(char& ch);
-
-protected:
-private:
 };
 
 } // namespace acl

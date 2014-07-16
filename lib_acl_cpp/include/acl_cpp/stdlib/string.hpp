@@ -49,17 +49,31 @@ public:
 	/**
 	 * 设置字符串类对象为二进制处理模式
 	 * @param bin {bool} 当该值为 true 时，则设置字符串类对象为二进制处理
-	 *  方式；否则为文本方式；该值为 true 时，则当调用 += int|int64|short|char
+	 *  方式；否则为文本方式；为 true 时，则当调用 += int|int64|short|char
 	 *  或调用 << int|int64|short|char 时，则按二进制方式处理，否则按文本
 	 *  方式处理
+	 * @return {string&}
 	 */
-	void set_bin(bool bin);
+	string& set_bin(bool bin);
+
+	/**
+	 * 设置缓冲区的最大长度，以避免缓冲区溢出
+	 * @param max {int}
+	 * @return {string&}
+	 */
+	string& set_max(int  max);
 
 	/**
 	 * 判断当前字符串类对象是否为二进制处理方式 
 	 * @return {bool} 返回值为 true 时则表示为二进制方式
 	 */
 	bool get_bin() const;
+
+	/**
+	 * 返回当前缓冲区的最大长度限制，若返回值 <= 0 则表示没有限制
+	 * @return {int}
+	 */
+	int get_max(void) const;
 
 	/**
 	 * 根据字符数组下标获得指定位置的字符，输入参数必须为合法值，否则则
@@ -161,7 +175,7 @@ public:
 
 	/**
 	 * 对目标字符串类对象赋值
-	 * @param n {char} 源有符号长整型；若对象的当前状态为二进制模式，则该函数
+	 * @param n {char} 源有符号长整型；若对象当前状态为二进制模式，则该函数
 	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；
 	 *  关于二进制模式还是文本方式，其含义参见 set_bin(bool)
 	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
@@ -173,34 +187,34 @@ public:
 	 * @param n {char} 源无符号长整型；若字对象的当前状态为二进制模式，
 	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给
 	 *  字符串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前字对象的引用，便于对该类对象连续进行操作
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(unsigned long n);
 
 	/**
 	 * 对目标字符串类对象赋值
-	 * @param n {char} 源有符号整型；若字符串对象的当前状态为二进制模式，则该函数
-	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；关于二进制模
-	 *  式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 * @param n {char} 源有符号整型；若字符串对象的当前状态为二进制模式，
+	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符
+	 *  串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(int n);
 
 	/**
 	 * 对目标字符串类对象赋值
-	 * @param n {char} 源无符号整型；若字符串对象的当前状态为二进制模式，则该函数
-	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；关于二进制模
-	 *  式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 * @param n {char} 源无符号整型；若字符串对象的当前状态为二进制模式，
+	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符
+	 *  串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(unsigned int n);
 
 	/**
 	 * 对目标字符串类对象赋值
-	 * @param n {char} 源有符号短整型；若字符串对象的当前状态为二进制模式，则该函数
-	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；关于二进制模
-	 *  式还是文本方式，其含义参见 set_bin(bool)
-	 * @return {string&} 返回当前字符串类对象的引用，便于对该类对象连续进行操作
+	 * @param n {char} 源有符号短整型；若字符串对象的当前状态为二进制模式,
+	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符
+	 *  串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(short n);
 
@@ -426,21 +440,21 @@ public:
 	/**
 	 * 将字符串对象中的内容赋予目标字符串对象
 	 * @param s {string*} 目标字符串对象
-	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(string* s);
 #ifdef WIN32
 	/**
 	 * 将字符串对象中的内容赋予目标 64 位有符号整数
 	 * @param n {string*} 目标 64 位有符号整数
-	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(__int64& n);
 
 	/**
 	 * 将字符串对象中的内容赋予目标 64 位无符号整数
 	 * @param n {string*} 目标 64 位无符号整数
-	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(unsigned __int64& n);
 #else
@@ -451,89 +465,89 @@ public:
 	/**
 	 * 将字符串对象中的内容赋予目标 32 位有符号整数
 	 * @param n {string*} 目标 32 位有符号整数
-	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(int& n);
 
 	/**
 	 * 将字符串对象中的内容赋予目标 32 位无符号整数
 	 * @param n {string*} 目标 32 位无符号整数
-	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(unsigned int& n);
 
 	/**
 	 * 将字符串对象中的内容赋予目标 16 位有符号整数
 	 * @param n {string*} 目标 16 位有符号整数
-	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(short& n);
 
 	/**
 	 * 将字符串对象中的内容赋予目标 16 位无符号整数
 	 * @param n {string*} 目标 16 位无符号整数
-	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(unsigned short& n);
 
 	/**
 	 * 将字符串对象中的内容赋予目标 8 位有符号字符
 	 * @param n {string*} 目标 16 位有符号字符
-	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(char& n);
 
 	/**
 	 * 将字符串对象中的内容赋予目标 8 位无符号字符
 	 * @param n {string*} 目标 16 位无符号字符
-	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(unsigned char& n);
 
 	/**
-	 * 判断当前字符串对象的内容与所给的字符串对象内容是否相等（内部区分大小写）
+	 * 判断当前对象的内容与所给的字符串对象内容是否相等（内部区分大小写）
 	 * @param s {const string&} 输入的字符串对象引用
 	 * @return {bool} 返回 true 表示字符串内容相同
 	 */
 	bool operator==(const string& s) const;
 
 	/**
-	 * 判断当前字符串对象的内容与所给的字符串对象内容是否相等（内部区分大小写）
+	 * 判断当前对象的内容与所给的字符串对象内容是否相等（内部区分大小写）
 	 * @param s {const string&} 输入的字符串对象指针
 	 * @return {bool} 返回 true 表示字符串内容相同
 	 */
 	bool operator==(const string* s) const;
 
 	/**
-	 * 判断当前字符串对象的内容与所给的字符串内容是否相等（内部区分大小写）
+	 * 判断当前对象的内容与所给的字符串内容是否相等（内部区分大小写）
 	 * @param s {const string&} 输入的字符串对象指针
 	 * @return {bool} 返回 true 表示字符串内容相同
 	 */
 	bool operator==(const char* s) const;
 
 	/**
-	 * 判断当前字符串对象的内容与所给的字符串对象内容是否不等（内部区分大小写）
+	 * 判断当前对象的内容与所给的字符串对象内容是否不等（内部区分大小写）
 	 * @param s {const string&} 输入的字符串对象引用
 	 * @return {bool} 返回 true 表示字符串内容不同
 	 */
 	bool operator!=(const string& s) const;
 
 	/**
-	 * 判断当前字符串对象的内容与所给的字符串对象内容是否不等（内部区分大小写）
+	 * 判断当前对象的内容与所给的字符串对象内容是否不等（内部区分大小写）
 	 * @param s {const string&} 输入的字符串对象指针
 	 * @return {bool} 返回 true 表示字符串内容不同
 	 */
 	bool operator!=(const string* s) const;
 
 	/**
-	 * 判断当前字符串对象的内容与所给的字符串内容是否不等（内部区分大小写）
+	 * 判断当前对象的内容与所给的字符串内容是否不等（内部区分大小写）
 	 * @param s {const string&} 输入的字符串对象指针
 	 * @return {bool} 返回 true 表示字符串内容不同
 	 */
 	bool operator!=(const char* s) const;
 
 	/**
-	 * 判断当前字符串对象的内容是否小于所给的字符串对象内容（内部区分大小写）
+	 * 判断当前对象的内容是否小于所给的字符串对象内容（内部区分大小写）
 	 * @param s {const string&} 输入的字符串对象引用
 	 * @return {bool} 返回 true 表示当前字符串对象的内容小于输入的字符串
 	 *  对象内容
@@ -541,7 +555,7 @@ public:
 	bool operator<(const string& s) const;
 
 	/**
-	 * 判断当前字符串对象的内容是否大于所给的字符串对象内容（内部区分大小写）
+	 * 判断当前对象的内容是否大于所给的字符串对象内容（内部区分大小写）
 	 * @param s {const string&} 输入的字符串对象引用
 	 * @return {bool} 返回 true 表示当前字符串对象的内容大于输入的字符串
 	 *  对象内容
@@ -549,7 +563,7 @@ public:
 	bool operator>(const string& s) const;
 
 	/**
-	 * 将当前字符串对象直接转为字符串指针（即将内部缓冲区直接导出）
+	 * 将当前对象直接转为字符串指针（即将内部缓冲区直接导出）
 	 * @return {const char*} 返回值永远为非空指针，有可能为空串
 	 */
 	operator const char*() const;
@@ -596,13 +610,15 @@ public:
 	 * 比较当前对象的缓冲区内容是否与所给的缓冲区的内容相同
 	 * @param ptr {const void*} 输入的缓冲区地址
 	 * @param len {size_t} ptr 的缓冲区内数据长度
-	 * @return {int} 0：表示二者相同； > 0：当前对象缓冲区内容大于输入的内容；
+	 * @return {int} 返回结果含义如下:
+	 *  0：表示二者相同；
+	 *  > 0：当前对象缓冲区内容大于输入的内容；
 	 *  < 0 ：当前对象缓冲内容小于输入的内容
 	 */
 	int compare(const void* ptr, size_t len) const;
 
 	/**
-	 * 比较当前对象的缓冲区内容是否与所给的缓冲区的内容相同，限定比较数据长度
+	 * 比较当前对象缓冲区内容是否与所给的缓冲区的内容相同，限定比较数据长度
 	 * @param s {const void*} 输入的缓冲区地址
 	 * @param len {size_t} ptr 的缓冲区内数据长度
 	 * @param case_sensitive {bool} 为 true 表示区分大小写
@@ -634,7 +650,7 @@ public:
 	 * 查找指定字符吕在当前对象缓冲区的起始位置（下标从 0 开始）
 	 * @param needle {const char*} 要查找的有符号字符串
 	 * @param case_sensitive {bool} 为 true 表示区分大小写
-	 * @return {char*} 字符串在缓冲区中的起始位置，若返回值为空指针则表示不存在
+	 * @return {char*} 字符串在缓冲区中的起始位置，返回空指针则表示不存在
 	 */
 	char* find(const char* needle, bool case_sensitive=true) const;
 
@@ -763,25 +779,25 @@ public:
 	/**
 	 * 将当前对象存储的字符串进行分割
 	 * @param sep {const char*} 进行分割时的分割标记
-	 * @return {std::list<string>&} 返回 list 格式的分割结果，返回的结果不需要
-	 *  释放，其引用了当前对象的一个内部指针
+	 * @return {std::list<string>&} 返回 list 格式的分割结果，返回的结果
+	 *  不需要释放，其引用了当前对象的一个内部指针
 	 */
 	std::list<string>& split(const char* sep);
 
 	/**
 	 * 将当前对象存储的字符串进行分割
 	 * @param sep {const char*} 进行分割时的分割标记
-	 * @return {std::vector<string>&} 返回 vector 格式的分割结果，返回的结果不
-	 *  需要释放，其引用了当前对象的一个内部指针
+	 * @return {std::vector<string>&} 返回 vector 格式的分割结果，返回的
+	 *  结果不需要释放，其引用了当前对象的一个内部指针
 	 */
 	std::vector<string>& split2(const char* sep);
 
 	/**
-	 * 以 '=' 为分隔符将当前对象存储的字符串分割成 name/value 对，分割时会自动
-	 * 去掉源字符串的起始处、结尾处以及分隔符 '=' 两边的空格及 TAB
+	 * 以 '=' 为分隔符将当前对象存储的字符串分割成 name/value 对，分割时会
+	 * 自动去掉源字符串的起始处、结尾处以及分隔符 '=' 两边的空格及 TAB
 	 * @return {std::pair<string, string>&} 如果当前对象存储的字符串
-	 *  不符合分割条件（即不是严格的 name=value格式），则返回的结果中字符串对象为空串,
-	 *  返回的结果不需要释放，其引用了当前对象的一个内部地址
+	 *  不符合分割条件（即不是严格的 name=value格式），则返回的结果中字符
+	 *  串对象为空串,返回的结果不需要释放，其引用了当前对象的一个内部地址
 	 */
 	std::pair<string, string>& split_nameval(void);
 
@@ -919,10 +935,12 @@ public:
 	string& truncate(size_t n);
 
 	/**
-	 * 在当前对象的缓冲区数据中去掉指定的字符串内容，在处理过程中会发生数据移动情况
+	 * 在当前对象的缓冲区数据中去掉指定的字符串内容，在处理过程中会发生
+	 * 数据移动情况
 	 * @param needle {const char*} 指定需要去掉的字符串数据
-	 * @param each {bool} 当为 true 时，则每一个出现在 needle 中的字符都会在
-	 *  当前对象的缓存区中去掉；否则，仅在当前对象缓冲区中去掉完整的 needle 字符串
+	 * @param each {bool} 当为 true 时，则每一个出现在 needle 中的字符都
+	 *  会在当前对象的缓存区中去掉；否则，仅在当前对象缓冲区中去掉完整的
+	 *  needle 字符串
 	 * @return {string&} 当前对象的引用
 	 *  如 acl::string s("hello world!");
 	 *  若 s.strip("hel", true), 则结果为： s == "o word!"
@@ -999,7 +1017,8 @@ public:
 	string& base64_encode(const void* ptr, size_t len);
 
 	/**
-	 * 如果当前对象的缓冲区中的数据是经 base64 编码的，则此函数将这些数据进行解码
+	 * 如果当前对象的缓冲区中的数据是经 base64 编码的，则此函数将这些
+	 * 数据进行解码
 	 * @return {string&} 当前对象的引用
 	 */
 	string& base64_decode(void);

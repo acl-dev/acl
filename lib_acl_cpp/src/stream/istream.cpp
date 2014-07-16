@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/istream.hpp"
 
@@ -81,6 +82,12 @@ bool istream::read(string& s, bool loop /* = true */)
 	return true;
 }
 
+bool istream::read(string* s, bool loop /* = true */)
+{
+	acl_assert(s);
+	return read(*s, loop);
+}
+
 bool istream::read(string& s, size_t max, bool loop /* = true */)
 {
 	s.clear();
@@ -92,14 +99,83 @@ bool istream::read(string& s, size_t max, bool loop /* = true */)
 	return true;
 }
 
-bool istream::gets(string& s, bool nonl /* = true */)
+bool istream::read(string* s, size_t max, bool loop /* = true */)
+{
+	acl_assert(s);
+	return read(*s, max, loop);
+}
+
+bool istream::gets(string& s, bool nonl /* = true */, size_t max /* = 0 */)
+{
+	char buf[8192];
+	size_t size;
+
+	s.clear();
+
+	if (max == 0)
+	{
+		while (!eof())
+		{
+			size = sizeof(buf);
+			if (gets(buf, &size, nonl) == true)
+			{
+				if (size > 0)
+					s.append(buf, size);
+
+				return true;
+			}
+			if (size > 0)
+				s.append(buf, size);
+		}
+
+		return false;
+	}
+
+	size_t saved_max = max;
+
+	while (!eof())
+	{
+		size = sizeof(buf) > max ? max : sizeof(buf);
+		if (gets(buf, &size, nonl) == true)
+		{
+			if (size > 0)
+				s.append(buf, size);
+			return true;
+		}
+
+		if (size > 0)
+			s.append(buf, size);
+		max -= size;
+
+		// 如果读到的行长度达到最大限制，则直接返回 true
+		if (max == 0)
+		{
+			logger_warn("reached the max limit: %d",
+				(int) saved_max);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool istream::gets(string* s, bool nonl /* = true */, size_t max /* = 0 */)
+{
+	acl_assert(s);
+	return gets(*s, nonl, max);
+}
+
+bool istream::readtags(string& s, const string& tag)
 {
 	char buf[8192];
 
 	s.clear();
-	while (!eof()) {
+
+	while (!eof())
+	{
 		size_t size = sizeof(buf);
-		if (gets(buf, &size, nonl) == true) {
+		if (readtags(buf, &size, tag.c_str(), tag.length()) == true)
+		{
 			if (size > 0)
 				s.append(buf, size);
 			return true;
@@ -110,23 +186,10 @@ bool istream::gets(string& s, bool nonl /* = true */)
 	return false;
 }
 
-bool istream::readtags(string& s, const string& tag)
+bool istream::readtags(string* s, const string& tag)
 {
-	char buf[8192];
-
-	s.clear();
-
-	while (!eof()) {
-		size_t size = sizeof(buf);
-		if (readtags(buf, &size, tag.c_str(), tag.length()) == true) {
-			if (size > 0)
-				s.append(buf, size);
-			return true;
-		}
-		if (size > 0)
-			s.append(buf, size);
-	}
-	return false;
+	acl_assert(s);
+	return readtags(*s, tag);
 }
 
 int istream::getch()
@@ -146,10 +209,13 @@ int istream::ugetch(int ch)
 }
 
 bool istream::gets_peek(string& buf, bool nonl /* = true */,
-	bool clear /* = false */)
+	bool clear /* = false */, int max /* = 0 */)
 {
 	if (clear)
 		buf.clear();
+
+	if (max > 0)
+		buf.set_max(max);
 
 	int ready, ret;
 	ACL_VSTRING *vbf = (ACL_VSTRING*) buf.vstring();
@@ -160,6 +226,13 @@ bool istream::gets_peek(string& buf, bool nonl /* = true */,
 	if (ret == ACL_VSTREAM_EOF)
 		eof_ = true;
 	return ready ? true : false;
+}
+
+bool istream::gets_peek(string* buf, bool nonl /* = true */,
+	bool clear /* = false */, int max /* = 0 */)
+{
+	acl_assert(buf);
+	return gets_peek(*buf, nonl, clear, max);
 }
 
 bool istream::read_peek(string& buf, bool clear /* = false */)
@@ -176,6 +249,12 @@ bool istream::read_peek(string& buf, bool clear /* = false */)
 		return true;
 }
 
+bool istream::read_peek(string* buf, bool clear /* = false */)
+{
+	acl_assert(buf);
+	return read_peek(*buf, clear);
+}
+
 bool istream::readn_peek(string& buf, size_t cnt, bool clear /* = false */)
 {
 	if (clear)
@@ -188,6 +267,12 @@ bool istream::readn_peek(string& buf, size_t cnt, bool clear /* = false */)
 		eof_ = true;
 	}
 	return ready ? true : false;
+}
+
+bool istream::readn_peek(string* buf, size_t cnt, bool clear /* = false */)
+{
+	acl_assert(buf);
+	return readn_peek(*buf, cnt, clear);
 }
 
 istream& istream::operator>>(acl::string& s)

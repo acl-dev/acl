@@ -9,6 +9,9 @@
 
 using namespace acl;
 
+static int   __max = 0;
+static int   __timeout = 0;
+
 /**
  * 延迟读回调处理类
  */
@@ -110,7 +113,8 @@ public:
 	{
 		i_++;
 		if (i_ < 10)
-			std::cout << ">>gets(i:" << i_ << "): " << data;
+			std::cout << ">>gets(i:" << i_ << "): "
+				<< data << std::endl;
 
 		// 如果远程客户端希望退出，则关闭之
 		if (strncasecmp(data, "quit", 4) == 0)
@@ -238,15 +242,23 @@ public:
 		// 注册异步流的超时回调过程
 		client->add_timeout_callback(callback);
 
+		// 当限定了行数据最大长度时
+		if (__max > 0)
+			client->set_buf_max(__max);
+
 		// 从异步流读一行数据
-		client->gets(3, false);
+		client->gets(__timeout, false);
 		return (true);
 	}
 };
 
 static void usage(const char* procname)
 {
-	printf("usage: %s -h[help] -k[use kernel event: epoll/iocp/kqueue/devpool]\n", procname);
+	printf("usage: %s -h[help]\r\n"
+		"	-L line_max_length\r\n"
+		"	-t timeout\r\n"
+		"	-k[use kernel event: epoll/iocp/kqueue/devpool]\r\n",
+		procname);
 }
 
 int main(int argc, char* argv[])
@@ -254,7 +266,7 @@ int main(int argc, char* argv[])
 	bool use_kernel = false;
 	int  ch;
 
-	while ((ch = getopt(argc, argv, "hk")) > 0)
+	while ((ch = getopt(argc, argv, "hkL:t:")) > 0)
 	{
 		switch (ch)
 		{
@@ -263,6 +275,12 @@ int main(int argc, char* argv[])
 			return (0);
 		case 'k':
 			use_kernel = true;
+			break;
+		case 'L':
+			__max = atoi(optarg);
+			break;
+		case 't':
+			__timeout = atoi(optarg);
 			break;
 		default:
 			break;

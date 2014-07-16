@@ -14,6 +14,7 @@ static int  __use_slice = 0;
 static int  __nrunner = 1;
 static int  __accept_auto = 0;
 static int  __send_size = 100;
+static int  __line_length = 0;
 static char *__data;
 static int  __echo_src;
 static int  __event_mode = ACL_EVENT_KERNEL;
@@ -51,7 +52,8 @@ static void init(void)
 	__data[i++] = '\n';
 	__data[i] = 0;
 
-	echo_server_init(__data, (int) strlen(__data), __echo_src);
+	echo_server_init(__data, (int) strlen(__data),
+		__echo_src, __line_length);
 }
 
 static void gc_timer(int event_type acl_unused, ACL_EVENT *event acl_unused,
@@ -93,17 +95,22 @@ static void __proccess_running(ACL_VSTREAM *sstream, int nrunner)
 #ifdef ACL_UNIX
 	int   i;
 
-	for (i = 0; i < nrunner; i++) {
-		switch (fork()) {
-		case 0:  /* child */
-			__runner_loop(sstream);
-			exit (0);
-		case -1:
-			exit (1);
-		default:  /* parent */
-			break;
+	if (nrunner <= 1)
+		__runner_loop(sstream);
+	else {
+		for (i = 0; i < nrunner; i++) {
+			switch (fork()) {
+			case 0:  /* child */
+				__runner_loop(sstream);
+				exit (0);
+			case -1:
+				exit (1);
+			default:  /* parent */
+				break;
+			}
 		}
 	}
+
 #elif defined(ACL_MS_WINDOWS)
 	__runner_loop(sstream);
 #endif
@@ -122,9 +129,15 @@ static void run(void)
 
 static void usage(const char *progname)
 {
-	printf("usage: %s -h(help) -a(accept auto) -n instances "
-		"-s listen_addr(ip:port) -m event_type (select|kernel|poll) "
-		"-P [use mempool] -l echo_size -e(echo src data)\n", progname);
+	printf("usage: %s -h(help)\r\n"
+		"	-a(accept auto)\r\n"
+		"	-n instances\r\n"
+		"	-s listen_addr(ip:port)\r\n"
+		"	-m event_type (select|kernel|poll)\r\n"
+		"	-P [use mempool]\r\n"
+		"	-l echo_size\r\n"
+		"	-L max_line_size\r\n"
+		"	-e(echo src data)\n", progname);
 }
 
 int main(int argc, char *argv[])
@@ -138,7 +151,7 @@ int main(int argc, char *argv[])
 	acl_mem_slice_init(base, nslice, nalloc_gc, slice_flag);
 #endif
 
-	while ((ch = getopt(argc, argv, "hPeam:s:n:l:")) > 0) {
+	while ((ch = getopt(argc, argv, "hPeam:s:n:l:L:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -164,6 +177,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'l':
 			__send_size = atoi(optarg);
+			break;
+		case 'L':
+			__line_length = atoi(optarg);
 			break;
 		case 'e':
 			__echo_src = 1;
