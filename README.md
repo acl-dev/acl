@@ -75,17 +75,17 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ĞÅ¿â¼°·
 
 ### Í¼Àı
 *    ÀàË÷ÒıÍ¼£º
--    ![ÀàË÷ÒıÍ¼](res/img/index.jpg)
+     ![ÀàË÷ÒıÍ¼](res/img/index.jpg)
 *    Òì²½ IO Àà¼Ì³ĞÍ¼
--    ![Òì²½ IO Àà¼Ì³ĞÍ¼](res/img/aio_inherit.jpg)
+     ![Òì²½ IO Àà¼Ì³ĞÍ¼](res/img/aio_inherit.jpg)
 *    IO Á÷¼Ì³ĞÍ¼
--    ![IO Á÷¼Ì³ĞÍ¼](res/img/stream_inherit.jpg)
+     ![IO Á÷¼Ì³ĞÍ¼](res/img/stream_inherit.jpg)
 *    ½ÓÊÕÉÏ´«ÎÄ¼şµÄ CGI ³ÌĞò£º
--    ![½ÓÊÕÉÏ´«ÎÄ¼şµÄ CGI ³ÌĞò](res/img/cgi_upload.jpg)
+     ![½ÓÊÕÉÏ´«ÎÄ¼şµÄ CGI ³ÌĞò](res/img/cgi_upload.jpg)
 *    ÎÄ¼şÏÂÔØ¿Í»§¶Ë³ÌĞò£º
--    ![ÎÄ¼şÏÂÔØ¿Í»§¶Ë³ÌĞò](res/img/http_download.jpg)
+     ![ÎÄ¼şÏÂÔØ¿Í»§¶Ë³ÌĞò](res/img/http_download.jpg)
 *    ÍøÒ³ÏÂÔØ³ÌĞò£º
--    ![ÍøÒ³ÏÂÔØ³ÌĞò](res/img/http_client.jpg)
+     ![ÍøÒ³ÏÂÔØ³ÌĞò](res/img/http_client.jpg)
 
 ### acl ¿âÖĞÓĞ´óÁ¿Ê¾Àı¿É¹©²Î¿¼£¬Çë²Î¿¼£º[SAMPLES.md](SAMPLES.md)
 
