@@ -74,14 +74,20 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ĞÅ¿â¼°·
 -    15 session: HTTP »á»°¿â
 
 ### Í¼Àı
+*    ÀàË÷ÒıÍ¼£º
 -    ![ÀàË÷ÒıÍ¼](res/img/index.jpg)
--    ![Òì²½IOÀà¼Ì³ĞÍ¼](res/img/aio_inherit.jpg)
--    ![IOÁ÷¼Ì³ĞÍ¼](res/img/stream_inherit.jpg)
--    ![CGI´¦ÀíÎÄ¼şÉÏ´«](res/img/cgi_upload.jpg)
--    ![ÎÄ¼şÏÂÔØ¿Í»§¶Ë](res/img/http_download.jpg)
--    ![HTTP ÍøÒ³ÏÂÔØ](res/img/http_client.jpg)
+*    Òì²½ IO Àà¼Ì³ĞÍ¼
+-    ![Òì²½ IO Àà¼Ì³ĞÍ¼](res/img/aio_inherit.jpg)
+*    IO Á÷¼Ì³ĞÍ¼
+-    ![IO Á÷¼Ì³ĞÍ¼](res/img/stream_inherit.jpg)
+*    ½ÓÊÕÉÏ´«ÎÄ¼şµÄ CGI ³ÌĞò£º
+-    ![½ÓÊÕÉÏ´«ÎÄ¼şµÄ CGI ³ÌĞò](res/img/cgi_upload.jpg)
+*    ÎÄ¼şÏÂÔØ¿Í»§¶Ë³ÌĞò£º
+-    ![ÎÄ¼şÏÂÔØ¿Í»§¶Ë³ÌĞò](res/img/http_download.jpg)
+*    ÍøÒ³ÏÂÔØ³ÌĞò£º
+-    ![ÍøÒ³ÏÂÔØ³ÌĞò](res/img/http_client.jpg)
 
-### acl ¿âÖĞÓĞ´óÁ¿Ê¾Àı¿É¹©²Î¿¼£¬Çë²Î¿¼£º[SAMPLES.md](samples.md)
+### acl ¿âÖĞÓĞ´óÁ¿Ê¾Àı¿É¹©²Î¿¼£¬Çë²Î¿¼£º[SAMPLES.md](SAMPLES.md)
 
 ## ÆäËü
 - WEB Õ¾µã: http://www.iteye.com
