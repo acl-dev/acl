@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="cgi_upload"
 	ProjectGUID="{A28B19ED-291C-47C8-BDD5-10BB038C371E}"
+	RootNamespace="cgi_upload"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -41,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include"
+				AdditionalIncludeDirectories="..\..\include; ..\..\..\lib_acl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

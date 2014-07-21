@@ -505,6 +505,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 							RelativePath=".\src\stdlib\sys\unix\acl_chroot_uid.c">
 						</File>
 						<File
+							RelativePath=".\src\stdlib\sys\unix\acl_core_limit.c">
+						</File>
+						<File
 							RelativePath=".\src\stdlib\sys\unix\acl_mychown.c">
 						</File>
 						<File
@@ -1085,7 +1088,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 						RelativePath=".\src\master\template\acl_ioctl_server.c">
 					</File>
 					<File
-						RelativePath=".\src\master\template\acl_master_log.c">
+						RelativePath=".\src\master\template\master_log.c">
 					</File>
 					<File
 						RelativePath=".\src\master\template\acl_multi_server.c">
@@ -1097,16 +1100,13 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 						RelativePath=".\src\master\template\acl_threads_server.c">
 					</File>
 					<File
-						RelativePath=".\src\master\template\acl_tmpl.c">
-					</File>
-					<File
 						RelativePath=".\src\master\template\acl_trigger_server.c">
 					</File>
 					<File
 						RelativePath=".\src\master\template\acl_udp_server.c">
 					</File>
 					<File
-						RelativePath=".\src\master\template\template.h">
+						RelativePath=".\src\master\template\master_log.h">
 					</File>
 				</Filter>
 				<Filter
@@ -1530,6 +1530,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					Filter="">
 					<File
 						RelativePath=".\include\stdlib\unix\acl_chroot_uid.h">
+					</File>
+					<File
+						RelativePath=".\include\stdlib\unix\acl_core_limit.h">
 					</File>
 					<File
 						RelativePath=".\include\stdlib\unix\acl_mychown.h">

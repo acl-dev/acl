@@ -116,21 +116,21 @@ ssize_t header_token(HEADER_TOKEN *token, ssize_t token_len,
 	ssize_t n;
 
 	/*
-	* Initialize.
-	*/
+	 * Initialize.
+	 */
 	ACL_VSTRING_RESET(token_buffer);
 	cp = CU_CHAR_PTR(*ptr);
 	tok_count = 0;
 	if (user_specials == 0)
 		user_specials = LEX_822_SPECIALS;
 
-    /*
-     * Main parsing loop.
-     * 
-     * XXX What was the reason to continue parsing when user_terminator is
-     * specified? Perhaps this was needed at some intermediate stage of
-     * development?
-     */
+	/*
+	 * Main parsing loop.
+	 * 
+	 * XXX What was the reason to continue parsing when user_terminator is
+	 * specified? Perhaps this was needed at some intermediate stage of
+	 * development?
+	 */
 	while ((ch = *cp) != 0 && (user_terminator != 0 || tok_count < token_len)) {
 		cp++;
 
@@ -153,7 +153,7 @@ ssize_t header_token(HEADER_TOKEN *token, ssize_t token_len,
 			comment_level = 1;
 			while ((ch = *cp) != 0) {
 				cp++;
-				if (ch == '(') {		/* comments can nest! */
+				if (ch == '(') {  /* comments can nest! */
 					comment_level++;
 				} else if (ch == ')') {
 					if (--comment_level == 0)
@@ -182,8 +182,7 @@ ssize_t header_token(HEADER_TOKEN *token, ssize_t token_len,
 				if (ch == '\n') {		/* unfold */
 					if (tok_count < token_len) {
 						len = LEN(token_buffer);
-						while (len > 0
-							&& IS_SPACE_TAB_CR_LF(STR(token_buffer)[len - 1]))
+						while (len > 0 && IS_SPACE_TAB_CR_LF(STR(token_buffer)[len - 1]))
 							len--;
 						if (len < (ssize_t) LEN(token_buffer))
 							acl_vstring_truncate(token_buffer, len);
@@ -191,8 +190,12 @@ ssize_t header_token(HEADER_TOKEN *token, ssize_t token_len,
 					continue;
 				}
 				if (ch == '\\') {
-					if ((ch = *cp) == 0)
+					if (tok_count < token_len)
+						ACL_VSTRING_ADDCH(token_buffer, ch);
+
+					if (*cp == 0)
 						break;
+					ch = *cp;
 					cp++;
 				}
 				if (tok_count < token_len)

@@ -25,7 +25,7 @@ extern "C" {
   * External interface.
   */
 extern ACL_VSTREAM *acl_safe_open(const char *path, int flags, int mode,
-	           	 struct stat * st, uid_t user, gid_t group, ACL_VSTRING *why);
+	struct stat * st, uid_t user, gid_t group, ACL_VSTRING *why);
 
 #endif /* ACL_UNIX */
 

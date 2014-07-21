@@ -39,6 +39,7 @@
 #include "stdlib/acl_stringops.h"
 #include "stdlib/acl_myflock.h"
 #include "stdlib/unix/acl_watchdog.h"
+#include "stdlib/unix/acl_core_limit.h"
 #include "stdlib/acl_split_at.h"
 #include "net/acl_listen.h"
 #include "net/acl_tcp_ctl.h"
@@ -55,7 +56,7 @@
 /* Application-specific */
 #include "master/acl_ioctl_params.h"
 #include "master/acl_server_api.h"
-#include "template.h"
+#include "master_log.h"
 
 int   acl_var_ioctl_pid;
 char *acl_var_ioctl_procname;
@@ -991,7 +992,7 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 	acl_chroot_uid(root_dir, user_name);
 	/* 设置子进程运行环境，允许产生 core 文件 */
 	if (acl_var_ioctl_enable_core)
-		set_core_limit();
+		acl_set_core_limit(0);
 	ioctl_server_open_log();
 	log_event_mode(event_mode);
 

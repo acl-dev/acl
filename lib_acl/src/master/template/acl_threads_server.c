@@ -32,6 +32,7 @@
 
 #include "stdlib/acl_msg.h"
 #include "stdlib/unix/acl_chroot_uid.h"
+#include "stdlib/unix/acl_core_limit.h"
 #include "stdlib/acl_vstring.h"
 #include "stdlib/acl_vstream.h"
 #include "stdlib/acl_mymalloc.h"
@@ -55,7 +56,7 @@
 /* Application-specific */
 #include "master/acl_threads_params.h"
 #include "master/acl_server_api.h"
-#include "template.h"
+#include "master_log.h"
 
 int   acl_var_threads_pid;
 char *acl_var_threads_procname;
@@ -1038,7 +1039,7 @@ void acl_threads_server_main(int argc, char **argv,
 	/*******************************************************************/
 
 	/* 在子进程切换用户身份之前，先用 acl_master 的日志句柄记日志 */
-	acl_master_log_open(argv[0]);
+	master_log_open(argv[0]);
 
 	/*
 	 * Pick up policy settings from master process. Shut up error
@@ -1239,7 +1240,7 @@ void acl_threads_server_main(int argc, char **argv,
 
 	/* if enable dump core when program crashed ? */
 	if (acl_var_threads_enable_core)
-		set_core_limit();
+		acl_set_core_limit(0);
 
 	/* Run post-jail initialization. */
 	if (post_init)

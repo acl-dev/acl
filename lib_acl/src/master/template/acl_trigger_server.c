@@ -32,6 +32,7 @@
 
 #include "stdlib/acl_msg.h"
 #include "stdlib/unix/acl_chroot_uid.h"
+#include "stdlib/unix/acl_core_limit.h"
 #include "stdlib/acl_vstring.h"
 #include "stdlib/acl_vstream.h"
 #include "stdlib/acl_mymalloc.h"
@@ -54,7 +55,7 @@
 
 #include "master/acl_trigger_params.h"
 #include "master/acl_server_api.h"
-#include "template.h"
+#include "master_log.h"
 
 int   acl_var_trigger_pid;
 char *acl_var_trigger_procname;
@@ -427,7 +428,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	char   *conf_file_ptr = 0;
 
 	/* 提前进行模板初始化，以使日志尽早地打开, 开始先使用 acl_master 的日志文件 */
-	acl_master_log_open(argv[0]);
+	master_log_open(argv[0]);
 
 	if (acl_msg_verbose)
 		acl_msg_info("daemon started");
@@ -650,7 +651,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 
 	/* 设置子进程运行环境，允许产生 core 文件 */
 	if (acl_var_trigger_enable_core)
-		set_core_limit();
+		acl_set_core_limit(0);
 
 	/*
 	 * Run post-jail initialization.

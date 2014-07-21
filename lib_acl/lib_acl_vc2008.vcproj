@@ -683,6 +683,10 @@
 							>
 						</File>
 						<File
+							RelativePath=".\src\stdlib\sys\unix\acl_core_limit.c"
+							>
+						</File>
+						<File
 							RelativePath=".\src\stdlib\sys\unix\acl_mychown.c"
 							>
 						</File>
@@ -1428,7 +1432,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\src\master\template\acl_master_log.c"
+						RelativePath=".\src\master\template\master_log.c"
 						>
 					</File>
 					<File
@@ -1452,7 +1456,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\src\master\template\template.h"
+						RelativePath=".\src\master\template\master_log.h"
 						>
 					</File>
 				</Filter>
@@ -2002,6 +2006,10 @@
 					>
 					<File
 						RelativePath=".\include\stdlib\unix\acl_chroot_uid.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\stdlib\unix\acl_core_limit.h"
 						>
 					</File>
 					<File

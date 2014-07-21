@@ -31,6 +31,7 @@
 
 #include "stdlib/acl_msg.h"
 #include "stdlib/unix/acl_chroot_uid.h"
+#include "stdlib/unix/acl_core_limit.h"
 #include "stdlib/acl_vstring.h"
 #include "stdlib/acl_vstream.h"
 #include "stdlib/acl_mymalloc.h"
@@ -52,7 +53,7 @@
 /* Application-specific */
 #include "master/acl_multi_params.h"
 #include "master/acl_server_api.h"
-#include "template.h"
+#include "master_log.h"
 
 int   acl_var_multi_pid;
 char *acl_var_multi_procname;
@@ -714,7 +715,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 	acl_chroot_uid(root_dir, user_name);
 	/* 设置子进程运行环境，允许产生 core 文件 */
 	if (acl_var_multi_enable_core)
-		set_core_limit();
+		acl_set_core_limit(0);
 	multi_server_open_log();
 
 	/*

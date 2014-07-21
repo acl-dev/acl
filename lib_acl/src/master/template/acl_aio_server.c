@@ -40,6 +40,7 @@
 #include "stdlib/acl_stringops.h"
 #include "stdlib/acl_myflock.h"
 #include "stdlib/unix/acl_watchdog.h"
+#include "stdlib/unix/acl_core_limit.h"
 #include "stdlib/acl_split_at.h"
 #include "net/acl_listen.h"
 #include "net/acl_tcp_ctl.h"
@@ -60,7 +61,7 @@
 /* Application-specific */
 #include "master/acl_aio_params.h"
 #include "master/acl_server_api.h"
-#include "template.h"
+#include "master_log.h"
 
 int   acl_var_aio_pid;
 
@@ -1242,7 +1243,7 @@ static void server_main(int argc, char **argv, va_list ap)
 	aio_init();  /* 初始化 */
 
 	/* 在子进程切换用户身份之前，先用 acl_master 的日志句柄记日志 */
-	acl_master_log_open(argv[0]);
+	master_log_open(argv[0]);
 
 	/*******************************************************************/
 
@@ -1396,7 +1397,7 @@ static void server_main(int argc, char **argv, va_list ap)
 
 	/* 设置子进程运行环境，允许产生 core 文件 */
 	if (acl_var_aio_enable_core)
-		set_core_limit();
+		acl_set_core_limit(0);
 
 	log_event_mode(__event_mode);  /* 将事件模式记入日志中 */
 

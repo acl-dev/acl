@@ -22,7 +22,7 @@ const char *acl_safe_basename(const char *path)
 	const char   *result;
 
 	if ((result = strrchr(path, '/')) == NULL
-		&& (result = strchr(path, '\\')) == NULL)
+		&& (result = strrchr(path, '\\')) == NULL)
 	{
 		result = (const char *) path;
 	} else

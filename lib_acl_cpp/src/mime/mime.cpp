@@ -370,15 +370,15 @@ bool mime::save_mail(const char* path, const char* filename,
 	acl_make_dirs(path, 0700);
 
 	if (!pBody->html_stype()
-		|| pBody->parent_ctype() != MIME_CTYPE_MULTIPART)
-		//|| pBody->parent_stype() != MIME_STYPE_RELATED)
+		&& pBody->parent_ctype() != MIME_CTYPE_MULTIPART)
+		//&& pBody->parent_stype() != MIME_STYPE_RELATED)
 	{
 		filepath << path << "/" << filename;
 		return (pBody->save_body(filepath.c_str()));
 	}
 
-
-	const std::list<mime_image*>& images = get_images(enableDecode, toCharset, off);
+	const std::list<mime_image*>& images =
+		get_images(enableDecode, toCharset, off);
 	if (images.empty())
 	{
 		filepath.clear();
@@ -591,8 +591,8 @@ mime_body* mime::get_body_node(bool htmlFirst,
 	return (m_pBody);
 }
 
-const std::list<mime_node*>& mime::get_mime_nodes(
-	bool enableDecode /* = true */, off_t off /* = 0 */)
+const std::list<mime_node*>& mime::get_mime_nodes(bool enableDecode /* = true */,
+	const char* toCharset /* = "gb2312" */, off_t off /* = 0 */)
 {
 	if (m_pNodes == NULL)
 		m_pNodes = NEW std::list<mime_node*>;
@@ -608,13 +608,13 @@ const std::list<mime_node*>& mime::get_mime_nodes(
 	{
 		node = (MIME_NODE*) iter.data;
 		m_pNodes->push_back(NEW mime_node(m_pFilePath, node,
-				enableDecode, "gb2312", off));
+				enableDecode, toCharset, off));
 	}
 	return (*m_pNodes);
 }
 
-const std::list<mime_attach*>& mime::get_attachments(
-	bool enableDecode /* = true */, off_t off /* = 0 */)
+const std::list<mime_attach*>& mime::get_attachments(bool enableDecode /* = true */,
+	const char* toCharset /* = "gb2312" */, off_t off /* = 0 */)
 {
 	if (m_pAttaches == NULL)
 		m_pAttaches = NEW std::list<mime_attach*>;
@@ -633,7 +633,7 @@ const std::list<mime_attach*>& mime::get_attachments(
 		if (node->header_filename == NULL)
 			continue;
 		attach = NEW mime_attach(m_pFilePath, node,
-				enableDecode, NULL, off);
+				enableDecode, toCharset, off);
 		m_pAttaches->push_back(attach);
 	}
 	return (*m_pAttaches);
@@ -708,7 +708,8 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 	off_t pos = (off_t) in.fseek(node->header_begin, SEEK_SET);
 	pbuf = (char*) acl_mymalloc(dlen);
 	printf(">>>%s: header begin: %ld, end: %ld, len: %ld\n",
-		__FUNCTION__, node->header_begin, node->header_end, (long int) dlen);
+		__FUNCTION__, node->header_begin,
+		node->header_end, (long int) dlen);
 
 	int   ret;
 	if ((ret = in.read(pbuf, dlen, true)) < 0) {
@@ -739,7 +740,8 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 	pos = (off_t) in.fseek(node->body_begin, SEEK_SET);
 	if (pos == -1)
 	{
-		printf(">>>%s: fseek error(%s)\r\n", __FUNCTION__, acl_last_serror());
+		printf(">>>%s: fseek error(%s)\r\n", __FUNCTION__,
+			acl_last_serror());
 		return;
 	}
 
@@ -820,24 +822,34 @@ void mime::mime_debug(const char* save_path, bool decode /* = true */)
 			mime_ctype_name(node->ctype),
 			mime_stype_name(node->stype));
 		if (node->boundary)
-			printf(">>boundary: %s\r\n", acl_vstring_str(node->boundary));
+			printf(">>boundary: %s\r\n",
+				acl_vstring_str(node->boundary));
 		if (node->header_filename)
 		{
 			header_filename.clear();
-			if (rfc2047::decode(node->header_filename, strlen(node->header_filename),
-				&header_filename, "gbk", true, false) == false)
-				printf(">>filename: %s\r\n", node->header_filename);
+			if (rfc2047::decode(node->header_filename,
+				strlen(node->header_filename),
+				&header_filename,
+				"gbk", true, false) == false)
+			{
+				printf(">>filename: %s\r\n",
+					node->header_filename);
+			}
 			else
-				printf(">>filename: %s\r\n", header_filename.c_str());
+				printf(">>filename: %s\r\n",
+					header_filename.c_str());
 		}
 		if (node->charset)
 			printf(">>charset: %s\r\n", node->charset);
 		if (node->header_name)
 		{
 			header_name.clear();
-			if (rfc2047::decode(node->header_name, strlen(node->header_name),
+			if (rfc2047::decode(node->header_name,
+				strlen(node->header_name),
 				&header_name, "gbk", true, false) == false)
+			{
 				printf(">>name: %s\r\n", node->header_name);
+			}
 			else
 				printf(">>name: %s\r\n", header_name.c_str());
 		}

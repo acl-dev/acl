@@ -43,6 +43,7 @@ static const MIME_ENCODING mime_encoding_map[] = {  /* RFC 2045 */
 /*-------------------------------------------------------------------------*/
 
 #define RFC2045_TSPECIALS	"()<>@,;:\\\"/[]?="
+//#define RFC2045_TSPECIALS	"()<>@,;:\"/[]?="
 #define TOKEN_MATCH(tok, text) \
 	((tok).type == HEADER_TOK_TOKEN && EQUAL((tok).u.value, (text)))
 
@@ -255,9 +256,14 @@ static void mime_content_disposition(MIME_NODE *node,
 	header_token(state->token, MIME_MAX_TOKEN, \
 		state->token_buffer, ptr, RFC2045_TSPECIALS, ';')
 
-	while ((tok_count = PARSE_CONTENT_DISPOSITION(node->state, &cp)) > 0) {
+	while (1) {
+		tok_count = PARSE_CONTENT_DISPOSITION(node->state, &cp);
+		if (tok_count <= 0)
+			break;
+
 		if (tok_count < 3 || node->state->token[1].type != '=')
 			continue;
+
 		if (TOKEN_MATCH(node->state->token[0], "filename")
 			&& node->header_filename == NULL)
 		{

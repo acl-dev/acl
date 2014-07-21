@@ -17,6 +17,7 @@ extern "C" {
 #include "acl_transfer_fd.h"
 #include "acl_watchdog.h"
 #include "acl_trace.h"
+#include "acl_core_limit.h"
 
 #ifdef __cplusplus
 }

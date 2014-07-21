@@ -139,10 +139,16 @@ char& string::operator [](size_t n)
 
 char& string::operator [](int n)
 {
+	acl_assert(n >= 0);
+#if 1
+	return (*this)[(size_t) n];
+#else
 	if (n >= CAP(vbf_))
 	{
 		int  len = CAP(vbf_);
+		printf("%d: cap1: %d\n", __LINE__, CAP(vbf_));
 		space(n + 1);
+		printf("%d: cap2: %d\n", __LINE__, CAP(vbf_));
 		int  new_len = CAP(vbf_);
 
 		// 初始化新分配的内存
@@ -160,6 +166,7 @@ char& string::operator [](int n)
 	}
 
 	return (char&) (vbf_->vbuf.data[n]);
+#endif
 }
 
 string& string::operator =(const char* s)

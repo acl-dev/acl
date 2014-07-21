@@ -2,6 +2,7 @@
 //
 #include "stdafx.h"
 #include <assert.h>
+#include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 
 using namespace acl;
@@ -35,9 +36,13 @@ public:
 	virtual bool doPost(HttpServletRequest& req, HttpServletResponse& res)
 	{
 		// 如果 session 项不存在，则设置
+#if 0
 		const char* sid = req.getSession().getAttribute("sid");
 		if (*sid == 0)
 			req.getSession().setAttribute("sid", "xxxxxx");
+#else
+		const char* sid = "test_sid1";
+#endif
 
 		// 创建 HTTP 响应头
                 res.addCookie("name1", "value1");
@@ -71,7 +76,11 @@ public:
 		const char* cookie2 = req.getCookieValue("name2");
 
 		// 获得 sid session 值
+#if 0
 		const char* sid = req.getSession().getAttribute("sid");
+#else
+		const char* sid = "test_sid";
+#endif
 
 		// 创建 xml 格式的数据体
 		xml body;
@@ -220,7 +229,12 @@ public:
 					file2_ = filename;
 				else if (strcmp(name, "file3") == 0)
 					file3_ = filename;
+				filename = acl_safe_basename(filename);
+#ifdef WIN32
+				path.format("var\\%s", filename);
+#else
 				path.format("./var/%s", filename);
+#endif
 				(void) (*cit)->save(path.c_str());
 			}
 		}
@@ -283,8 +297,10 @@ protected:
 static void do_alone(void)
 {
 	master_service service;
-	printf("listen: 0.0.0.0:8888 ...\r\n");
-	service.run_alone("0.0.0.0:8888", NULL, 1);  // 单独运行方式
+	acl::log::stdout_open(true);
+	const char* addr = "0.0.0.0:8081";
+	printf("listen: %s ...\r\n", addr);
+	service.run_alone(addr, NULL, 1);  // 单独运行方式
 }
 
 // WEB CGI 模式

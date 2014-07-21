@@ -340,10 +340,16 @@ int main(int argc, char* argv[])
 
 		if (argc >= 3)
 			addr = argv[2];
+		
+		const char* conf;
+		if (argc >= 4)
+			conf = argv[3];
+		else
+			conf = NULL;
 
 		format = (void (*)(const char*, ...)) printf;
 		format("listen: %s now\r\n", addr);
-		ma.run_alone(addr);  // 单独运行方式
+		ma.run_alone(addr, conf);  // 单独运行方式
 	}
 	else
 		ma.run_daemon(argc, argv);  // acl_master 控制模式运行

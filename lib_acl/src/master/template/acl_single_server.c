@@ -32,6 +32,7 @@
 
 #include "stdlib/acl_msg.h"
 #include "stdlib/unix/acl_chroot_uid.h"
+#include "stdlib/unix/acl_core_limit.h"
 #include "stdlib/acl_vstring.h"
 #include "stdlib/acl_vstream.h"
 #include "stdlib/acl_mymalloc.h"
@@ -55,7 +56,7 @@
 /* Application-specific */
 #include "master/acl_single_params.h"
 #include "master/acl_server_api.h"
-#include "template.h"
+#include "master_log.h"
 
 int   acl_var_single_pid;
 char *acl_var_single_procname;
@@ -475,7 +476,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 		single_server_init(argv[0]);
 
 	/* 提前进行模板初始化，以使日志尽早地打开, 开始先使用 acl_master 的日志文件 */
-	acl_master_log_open(argv[0]);
+	master_log_open(argv[0]);
 
 	acl_msg_info("%s(%d): daemon started, log=%s",
 		acl_var_single_procname, __LINE__, acl_var_single_log_file);
@@ -632,7 +633,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 
 	/* 设置子进程运行环境，允许产生 core 文件 */
 	if (acl_var_single_enable_core)
-		set_core_limit();
+		acl_set_core_limit(0);
 
 	single_server_open_log(argv[0]);
 

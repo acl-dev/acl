@@ -32,6 +32,7 @@
 
 #include "stdlib/acl_msg.h"
 #include "stdlib/unix/acl_chroot_uid.h"
+#include "stdlib/unix/acl_core_limit.h"
 #include "stdlib/acl_vstream.h"
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_iostuff.h"
@@ -51,7 +52,7 @@
 /* Application-specific */
 #include "master/acl_udp_params.h"
 #include "master/acl_server_api.h"
-#include "template.h"
+#include "master_log.h"
 
 int   acl_var_udp_pid;
 char *acl_var_udp_procname;
@@ -571,7 +572,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 
 	/* 设置子进程运行环境，允许产生 core 文件 */
 	if (acl_var_udp_enable_core)
-		set_core_limit();
+		acl_set_core_limit(0);
 	udp_server_open_log();
 	log_event_mode(event_mode);
 

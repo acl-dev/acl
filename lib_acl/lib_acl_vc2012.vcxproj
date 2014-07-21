@@ -292,6 +292,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include=".\src\stdlib\sys\sleep.c" />
     <ClCompile Include=".\src\stdlib\sys\snprintf.c" />
     <ClCompile Include=".\src\stdlib\sys\unix\acl_chroot_uid.c" />
+    <ClCompile Include=".\src\stdlib\sys\unix\acl_core_limit.c" />
     <ClCompile Include=".\src\stdlib\sys\unix\acl_mychown.c" />
     <ClCompile Include=".\src\stdlib\sys\unix\acl_open_lock.c" />
     <ClCompile Include=".\src\stdlib\sys\unix\acl_safe_open.c" />
@@ -422,7 +423,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include=".\src\master\master_vars.c" />
     <ClCompile Include=".\src\master\template\acl_aio_server.c" />
     <ClCompile Include=".\src\master\template\acl_ioctl_server.c" />
-    <ClCompile Include=".\src\master\template\acl_master_log.c" />
+    <ClCompile Include=".\src\master\template\master_log.c" />
     <ClCompile Include=".\src\master\template\acl_multi_server.c" />
     <ClCompile Include=".\src\master\template\acl_single_server.c" />
     <ClCompile Include=".\src\master\template\acl_threads_server.c" />
@@ -504,7 +505,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\src\master\master_flow.h" />
     <ClInclude Include=".\src\master\master_params.h" />
     <ClInclude Include=".\src\master\master_proto.h" />
-    <ClInclude Include=".\src\master\template\template.h" />
+    <ClInclude Include=".\src\master\template\master_log.h" />
     <ClInclude Include=".\src\master\framework\master.h" />
     <ClInclude Include=".\src\master\framework\master_pathname.h" />
     <ClInclude Include=".\src\master\framework\trigger\trigger.h" />
@@ -589,6 +590,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\include\stdlib\avl.h" />
     <ClInclude Include=".\include\stdlib\avl_impl.h" />
     <ClInclude Include=".\include\stdlib\unix\acl_chroot_uid.h" />
+    <ClInclude Include=".\include\stdlib\unix\acl_core_limit.h" />
     <ClInclude Include=".\include\stdlib\unix\acl_mychown.h" />
     <ClInclude Include=".\include\stdlib\unix\acl_open_lock.h" />
     <ClInclude Include=".\include\stdlib\unix\acl_safe_open.h" />

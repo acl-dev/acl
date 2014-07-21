@@ -122,20 +122,22 @@ public:
 	/**
 	 * 获得所有的 mime 结点列表
 	 * @param enableDecode {bool} 转储时是否自动进行解码
+	 * @param toCharset {const char*} 目标字符集
 	 * @param off {off_t} 调用者希望给邮件结点附加的相对偏移量
 	 * @return {const std::list<mime_node*>&}
 	 */
-	const std::list<mime_node*>& get_mime_nodes(
-			bool enableDecode = true, off_t off = 0);
+	const std::list<mime_node*>& get_mime_nodes(bool enableDecode = true,
+		const char* toCharset = "gb2312", off_t off = 0);
 
 	/**
 	 * 获得附件列表
 	 * @param enableDecode {bool} 转储时是否自动进行解码
+	 * @param toCharset {const char*} 目标字符集
 	 * @param off {off_t} 调用者希望给邮件结点附加的相对偏移量
 	 * @return {const std::list<mime_attach*>&}
 	 */
-	const std::list<mime_attach*>& get_attachments(
-			bool enableDecode = true, off_t off = 0);
+	const std::list<mime_attach*>& get_attachments(bool enableDecode = true,
+		const char* toCharset = "gb2312", off_t off = 0);
 
 	/**
 	 * 获得图片列表

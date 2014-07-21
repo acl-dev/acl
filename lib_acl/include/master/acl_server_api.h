@@ -186,11 +186,6 @@ typedef void (*ACL_TRIGGER_SERVER_FN) (char *, int, char *, char **);
 void acl_trigger_server_main(int, char **, ACL_TRIGGER_SERVER_FN, ...);
 ACL_EVENT *acl_trigger_server_event(void);
 
-/*
- * acl_master_log.c
- */
-void acl_master_log_open(const char *procname);
-
 #define ACL_TRIGGER_BUF_SIZE	1024
 
 #endif /* ACL_UNIX */

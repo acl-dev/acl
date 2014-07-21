@@ -383,6 +383,9 @@
     <ClCompile Include=".\src\stdlib\sys\unix\acl_chroot_uid.c">
       <Filter>Source Files\stdlib\sys\unix</Filter>
     </ClCompile>
+    <ClCompile Include=".\src\stdlib\sys\unix\acl_core_limit.c">
+      <Filter>Source Files\stdlib\sys\unix</Filter>
+    </ClCompile>
     <ClCompile Include=".\src\stdlib\sys\unix\acl_mychown.c">
       <Filter>Source Files\stdlib\sys\unix</Filter>
     </ClCompile>
@@ -773,7 +776,7 @@
     <ClCompile Include=".\src\master\template\acl_ioctl_server.c">
       <Filter>Source Files\master\template</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\master\template\acl_master_log.c">
+    <ClCompile Include=".\src\master\template\master_log.c">
       <Filter>Source Files\master\template</Filter>
     </ClCompile>
     <ClCompile Include=".\src\master\template\acl_multi_server.c">
@@ -1020,7 +1023,7 @@
     <ClInclude Include=".\src\master\master_proto.h">
       <Filter>Source Files\master</Filter>
     </ClInclude>
-    <ClInclude Include=".\src\master\template\template.h">
+    <ClInclude Include=".\src\master\template\master_log.h">
       <Filter>Source Files\master\template</Filter>
     </ClInclude>
     <ClInclude Include=".\src\master\framework\master.h">
@@ -1273,6 +1276,9 @@
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_chroot_uid.h">
+      <Filter>Header Files\stdlib\unix</Filter>
+    </ClInclude>
+    <ClInclude Include=".\include\stdlib\unix\acl_core_limit.h">
       <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_mychown.h">
