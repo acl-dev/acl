@@ -1,4 +1,4 @@
-// main.cpp : ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¨Ó¦ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµã¡£
+// main.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌÐòµÄÈë¿Úµã¡£
 //
 #include "stdafx.h"
 #include <assert.h>
@@ -26,28 +26,28 @@ public:
 	{
 	}
 
-	// GET ï¿½ï¿½ï¿½ï¿½
+	// GET ·½·¨
 	virtual bool doGet(HttpServletRequest& req, HttpServletResponse& res)
 	{
 		return doPost(req, res);
 	}
 
-	// POST ï¿½ï¿½ï¿½ï¿½
+	// POST ·½·¨
 	virtual bool doPost(HttpServletRequest& req, HttpServletResponse& res)
 	{
-		// ï¿½ï¿½ï¿½ session ï¿½î²»ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		// Èç¹û session Ïî²»´æÔÚ£¬ÔòÉèÖÃ
 #if 0
 		const char* sid = req.getSession().getAttribute("sid");
 		if (*sid == 0)
 			req.getSession().setAttribute("sid", "xxxxxx");
 #endif
 
-		// ï¿½ï¿½ï¿½ï¿½ HTTP ï¿½ï¿½Ó¦Í·
+		// ´´½¨ HTTP ÏìÓ¦Í·
                 res.addCookie("name1", "value1");
 		res.addCookie("name2", "value2", ".test.com", "/", 3600 * 24);
-//		res.setStatus(400);  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã·ï¿½ï¿½Øµï¿½×´Ì¬ï¿½ï¿½
+//		res.setStatus(400);  // ¿ÉÒÔÉèÖÃ·µ»ØµÄ×´Ì¬Âë
 
-		// ï¿½ï¿½ï¿½Ö·ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
+		// Á½ÖÖ·½Ê½¶¼¿ÉÒÔÉèÖÃ×Ö·û¼¯
 		if (0)
 			res.setContentType("text/xml; charset=gb2312");
 		else
@@ -56,8 +56,8 @@ public:
 			res.setCharacterEncoding("gb2312");
 		}
 
-		// ï¿½ï¿½ï¿½ HTTP ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ name&value ï¿½ï¿½Ê½
-		// ï¿½ï¿½ï¿½ï¿½ MIME ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		// »ñµÃ HTTP ÇëÇóµÄÊý¾ÝÀàÐÍ£¬Õý³£µÄ²ÎÊýÀàÐÍ£¬¼´ name&value ·½Ê½
+		// »¹ÊÇ MIME Êý¾ÝÀàÐÍ£¬»¹ÊÇÊý¾ÝÁ÷ÀàÐÍ
 		http_request_t request_type = req.getRequestType();
 		if (request_type == HTTP_REQUEST_NORMAL)
 			return doParams(req, res);
@@ -69,18 +69,18 @@ public:
 
 	bool doResponse(HttpServletRequest& req, HttpServletResponse& res)
 	{
-		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ cookie Öµ
+		// »ñµÃä¯ÀÀÆ÷´«À´µÄ cookie Öµ
 		const char* cookie1 = req.getCookieValue("name1");
 		const char* cookie2 = req.getCookieValue("name2");
 
-		// ï¿½ï¿½ï¿½ sid session Öµ
+		// »ñµÃ sid session Öµ
 #if 0
 		const char* sid = req.getSession().getAttribute("sid");
 #else
 		const char* sid = "test_sid";
 #endif
 
-		// ï¿½ï¿½ï¿½ï¿½ xml ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		// ´´½¨ xml ¸ñÊ½µÄÊý¾ÝÌå
 		xml body;
 		body.get_root().add_child("root", true)
 			.add_child("content_type", true)
@@ -122,16 +122,16 @@ public:
 		string buf;
 		body.build_xml(buf);
 
-		// ï¿½ï¿½ï¿½ï¿½ http ï¿½ï¿½Ó¦Í·
+		// ·¢ËÍ http ÏìÓ¦Í·
 		if (res.sendHeader() == false)
 			return false;
-		// ï¿½ï¿½ï¿½ï¿½ http ï¿½ï¿½Ó¦ï¿½ï¿½
+		// ·¢ËÍ http ÏìÓ¦Ìå
 		if (res.getOutputStream().write(buf) == -1)
 			return false;
 		return true;
 	}
 
-	// GET ï¿½ï¿½Ê½ï¿½ï¿½ POST ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ã£º
+	// GET ·½Ê½»ò POST ·½Ê½ÇÒÂú×ã£º
 	// Content-Type: application/x-www-form-urlencoded
 	bool doParams(HttpServletRequest& req, HttpServletResponse& res)
 	{
@@ -141,11 +141,11 @@ public:
 		return doResponse(req, res);
 	}
 
-	// POST ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ã£º
+	// POST ·½Ê½ÇÒÂú×ã£º
 	// Content-Type: multipart/form-data; boundary=xxx
 	bool doUpload(HttpServletRequest& req, HttpServletResponse& res)
 	{
-		// ï¿½È»ï¿½ï¿½ Content-Type ï¿½ï¿½Ó¦ï¿½ï¿½ http_ctype ï¿½ï¿½ï¿½ï¿½
+		// ÏÈ»ñµÃ Content-Type ¶ÔÓ¦µÄ http_ctype ¶ÔÏó
 		http_mime* mime = req.getHttpMime();
 		if (mime == NULL)
 		{
@@ -153,7 +153,7 @@ public:
 			return false;
 		}
 
-		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½ï¿½
+		// »ñµÃÊý¾ÝÌåµÄ³¤¶È
 		long long int len = req.getContentLength();
 		if (len <= 0)
 		{
@@ -161,7 +161,7 @@ public:
 			return false;
 		}
 
-		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		// »ñµÃÊäÈëÁ÷
 		istream& in = req.getInputStream();
 		char  buf[8192];
 		int   ret;
@@ -171,10 +171,10 @@ public:
 		ofstream out;
 		out.open_write(filepath);
 
-		// ï¿½ï¿½ï¿½ï¿½Ô­Ê¼ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½
+		// ÉèÖÃÔ­Ê¼ÎÄ¼þ´æÈëÂ·¾¶
 		mime->set_saved_path(filepath);
 
-		// ï¿½ï¿½È¡ HTTP ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		// ¶ÁÈ¡ HTTP ¿Í»§¶ËÇëÇóÊý¾Ý
 		while (len > 0)
 		{
 			ret = in.read(buf, sizeof(buf), false);
@@ -187,7 +187,7 @@ public:
 
 			len -= ret;
 
-			// ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð½ï¿½ï¿½ï¿½
+			// ½«¶ÁµÃµ½µÄÊý¾ÝÊäÈëÖÁ½âÎöÆ÷½øÐÐ½âÎö
 			if (mime->update(buf, ret) == true)
 			{
 				n = true;
@@ -205,7 +205,7 @@ public:
 
 		string path;
 
-		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ MIME ï¿½ï¿½ã£¬ï¿½Ò³ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½Ö½ï¿½ï¿½ï¿½×ªï¿½ï¿½
+		// ±éÀúËùÓÐµÄ MIME ½áµã£¬ÕÒ³öÆäÖÐÎªÎÄ¼þ½áµãµÄ²¿·Ö½øÐÐ×ª´¢
 		const std::list<http_mime_node*>& nodes = mime->get_nodes();
 		std::list<http_mime_node*>::const_iterator cit = nodes.begin();
 		for (; cit != nodes.end(); ++cit)
@@ -237,7 +237,7 @@ public:
 			}
 		}
 
-		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½Ä³ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½×ªï¿½ï¿½
+		// ²éÕÒÉÏÔØµÄÄ³¸öÎÄ¼þ²¢×ª´¢
 		const http_mime_node* node = mime->get_node("file1");
 		if (node && node->get_mime_type() == HTTP_MIME_FILE)
 		{
@@ -251,7 +251,7 @@ public:
 		return doResponse(req, res);
 	}
 
-	// POST ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ã£º
+	// POST ·½Ê½ÇÒÂú×ã£º
 	// Content-Type: application/octet-stream
 	bool doOctetStream(HttpServletRequest&, HttpServletResponse&)
 	{
@@ -278,7 +278,7 @@ static void do_run(socket_stream* stream)
 	servlet.doRun(session, stream);
 }
 
-// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Ä·ï¿½ï¿½ï¿½ï¿½ï¿½
+// ·þÎñÆ÷·½Ê½ÔËÐÐÊ±µÄ·þÎñÀà
 class master_service : public master_proc
 {
 public:
@@ -291,14 +291,14 @@ protected:
 	}
 };
 
-// WEB ï¿½ï¿½ï¿½ï¿½Ä£Ê½
+// WEB ·þÎñÄ£Ê½
 static void do_alone(void)
 {
 	master_service service;
 	acl::log::stdout_open(true);
 	const char* addr = "0.0.0.0:8081";
 	printf("listen: %s ...\r\n", addr);
-	service.run_alone(addr, NULL, 1);  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð·ï¿½Ê½
+	service.run_alone(addr, NULL, 1);  // µ¥¶ÀÔËÐÐ·½Ê½
 }
 
 // WEB CGI Ä£Ê½
@@ -315,7 +315,7 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 #endif
 
-	// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
+	// ¿ªÊ¼ÔËÐÐ
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 		do_alone();
 	else
