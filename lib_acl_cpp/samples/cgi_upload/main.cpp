@@ -165,7 +165,7 @@ public:
 		istream& in = req.getInputStream();
 		char  buf[8192];
 		int   ret;
-		bool  n = false;
+		bool  finish = false;
 
 		const char* filepath = "./var/mime_file";
 		ofstream out;
@@ -174,10 +174,13 @@ public:
 		// 设置原始文件存入路径
 		mime->set_saved_path(filepath);
 
+		size_t k;
+
 		// 读取 HTTP 客户端请求数据
 		while (len > 0)
 		{
-			ret = in.read(buf, sizeof(buf), false);
+			k = len > sizeof(buf) ? sizeof(buf) : len;
+			ret = in.read(buf, k, false);
 			if (ret == -1)
 			{
 				logger_error("read POST data error");
@@ -188,15 +191,12 @@ public:
 			len -= ret;
 
 			// 将读得到的数据输入至解析器进行解析
-			if (mime->update(buf, ret) == true)
-			{
-				n = true;
-				break;
-			}
+			if (!finish && mime->update(buf, ret) == true)
+				finish = true;
 		}
 		out.close();
 
-		if (len != 0 || n == false)
+		if (len != 0 || finish == false)
 			logger_warn("not read all data from client");
 
 		param1_ = req.getParameter("name1");
@@ -211,6 +211,9 @@ public:
 		for (; cit != nodes.end(); ++cit)
 		{
 			const char* name = (*cit)->get_name();
+			if (name == NULL)
+				continue;
+
 			http_mime_t mime_type = (*cit)->get_mime_type();
 			if (mime_type == HTTP_MIME_FILE)
 			{
@@ -227,6 +230,9 @@ public:
 					file2_ = filename;
 				else if (strcmp(name, "file3") == 0)
 					file3_ = filename;
+
+				// 有的浏览器（如IE）上传文件时会带着文件路径，所以
+				// 需要先将路径去掉
 				filename = acl_safe_basename(filename);
 #ifdef WIN32
 				path.format("var\\%s", filename);
@@ -244,7 +250,14 @@ public:
 			const char* ptr = node->get_filename();
 			if (ptr)
 			{
+				// 有的浏览器（如IE）上传文件时会带着文件路径，所以
+				// 需要先将路径去掉
+				ptr = acl_safe_basename(ptr);
+#ifdef WIN32
+				path.format(".\\var\\1_%s", ptr);
+#else
 				path.format("./var/1_%s", ptr);
+#endif
 				(void) node->save(path.c_str());
 			}
 		}

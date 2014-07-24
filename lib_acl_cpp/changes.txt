@@ -1,5 +1,11 @@
 修改历史列表：
 ------------------------------------------------------------------------
+246) 2014.7.24
+246.1) bugfix: http_request.cpp 中调用方法 write_head 时，若请求方法为 POST 方法，
+则增加了有效的重试机制
+246.2) feature: http_mime.cpp 还未分析 HTTP MIME 数据时若用户调用 get_nodes，则内部
+不会设置 parsed_ 为 true 且会返回空结合集合
+
 245) 2014.7.21
 245.1) bugfix: header_token.cpp 的函数 header_token 当分析 WIN32 的路径时存在
 问题，会过滤掉路径中的反斜杠 '\'

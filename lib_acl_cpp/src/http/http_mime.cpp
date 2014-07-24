@@ -202,6 +202,11 @@ const std::list<http_mime_node*>& http_mime::get_nodes(void) const
 {
 	if (parsed_)
 		return mime_nodes_;
+
+	// 如果还没有分析完整就调用本函数，则直接返回空的集合
+	if (mime_state_->curr_status != MIME_S_TERM)
+		return mime_nodes_;
+
 	const_cast<http_mime*>(this)->parsed_ = true;
 
 	ACL_ITER iter;

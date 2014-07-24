@@ -166,6 +166,7 @@ bool http_request::write_head()
 {
 	acl_assert(client_);  // 必须保证该连接已经打开
 	bool  reuse_conn;
+	http_method_t method = header_.get_method();
 
 	while (true)
 	{
@@ -181,6 +182,31 @@ bool http_request::write_head()
 		// 如果是新创建的连接，则不需重试
 		if (!reuse_conn)
 			need_retry_ = false;
+
+		// 如果请求方法非 GET，则需要首先探测一下连接是否正常
+		if (method != HTTP_METHOD_GET)
+		{
+			socket_stream& ss = client_->get_stream();
+			ACL_VSTREAM* vs = ss.get_vstream();
+
+			// 因为系统 write API 成功并不能保证连接正常，所以只能是调用
+			// 系统 read API 来探测连接是否正常，该函数内部会将套接口先转
+			// 非阻塞套接口进行读操作，所以不会阻塞，同时即使有数据读到也会
+			// 先放到 ACL_VSTREAM 的读缓冲中，所以也不会丢失数据
+			if (acl_vstream_probe_status(vs) == -1)
+			{
+				close();
+
+				// 对于新创建的连接，则直接报错
+				if (!reuse_conn)
+				{
+					logger_error("new connection error");
+					return false;
+				}
+				need_retry_ = false;
+				continue;
+			}
+		}
 
 		client_->reset();  // 重置状态
 
