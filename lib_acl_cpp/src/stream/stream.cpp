@@ -99,7 +99,7 @@ void* stream::del_ctx(const char* key /* = NULL */)
 	if (key == NULL || *key == 0)
 	{
 		if (default_ctx_ == NULL)
-			return false;
+			return NULL;
 		void* ctx = default_ctx_;
 		default_ctx_ = NULL;
 		return ctx;
