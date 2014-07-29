@@ -179,7 +179,8 @@ public:
 		// 读取 HTTP 客户端请求数据
 		while (len > 0)
 		{
-			k = len > sizeof(buf) ? sizeof(buf) : len;
+			k = len > (long long int) sizeof(buf)
+				? (long long int) sizeof(buf) : len;
 			ret = in.read(buf, k, false);
 			if (ret == -1)
 			{

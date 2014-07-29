@@ -1,2 +1,3 @@
-include ../Makefile.in
+base_path = ../../..
+include ../../Makefile.in
 PROG = aio_ipc

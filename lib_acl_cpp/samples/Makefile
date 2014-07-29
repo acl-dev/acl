@@ -52,6 +52,7 @@ all:
 	@(cd http_request_manager; make)
 	@(cd dircopy; make)
 	@(cd scan_dir; make)
+	@(cd socket; make)
 
 clean:
 	@(cd string; make clean)
@@ -107,3 +108,4 @@ clean:
 	@(cd http_request_manager; make clean)
 	@(cd dircopy; make clean)
 	@(cd scan_dir; make clean)
+	@(cd socket; make clean)

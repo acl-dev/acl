@@ -1,3 +1,3 @@
 base_path = ../../..
 include ../../Makefile.in
-PROG = aio_client
+PROG = socket_server

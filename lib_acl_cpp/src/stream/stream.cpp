@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/stream.hpp"
 
 namespace acl {
@@ -7,7 +8,7 @@ stream::stream(void)
 : stream_(NULL)
 , eof_(true)
 , opened_(false)
-, ctx_(NULL)
+, default_ctx_(NULL)
 {
 }
 
@@ -74,14 +75,42 @@ void stream::reopen_stream(void)
 	open_stream();
 }
 
-void stream::set_ctx(void* ctx)
+void stream::set_ctx(void* ctx, const char* key /* = NULL */)
 {
-	ctx_ = ctx;
+	if (key == NULL || *key == 0)
+		default_ctx_ = ctx;
+	else
+		ctx_table_[key] = ctx;
 }
 
-void* stream::get_ctx() const
+void* stream::get_ctx(const char* key /* = NULL */) const
 {
-	return ctx_;
+	if (key == NULL || *key == 0)
+		return default_ctx_;
+	std::map<string, void*>::const_iterator it = ctx_table_.find(key);
+	if (it != ctx_table_.end())
+		return it->second;
+	else
+		return NULL;
+}
+
+void* stream::del_ctx(const char* key /* = NULL */)
+{
+	if (key == NULL || *key == 0)
+	{
+		if (default_ctx_ == NULL)
+			return false;
+		void* ctx = default_ctx_;
+		default_ctx_ = NULL;
+		return ctx;
+	}
+
+	std::map<string, void*>::iterator it = ctx_table_.find(key);
+	if (it == ctx_table_.end())
+		return NULL;
+	void *ctx = it->second;
+	ctx_table_.erase(it);
+	return ctx;
 }
 
 } // namespace acl

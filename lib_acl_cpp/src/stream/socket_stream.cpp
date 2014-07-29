@@ -254,6 +254,16 @@ const char* socket_stream::get_ip(const char* addr, char* buf, size_t size)
 	return buf;
 }
 
+bool socket_stream::alive(void) const
+{
+	if (stream_ == NULL)
+		return false;
+	if (acl_vstream_probe_status(stream_) == -1)
+		return false;
+	else
+		return true;
+}
+
 bool socket_stream::open_ssl_client(void)
 {
 	if (stream_ == NULL)

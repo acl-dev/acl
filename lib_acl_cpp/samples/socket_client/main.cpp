@@ -27,7 +27,7 @@ int main(void)
 		"read_delay5\r\n"
 		"quit\r\n";
 
-	if (client.write(req.c_str(), req.length()) == false)
+	if (client.write(req.c_str(), req.length()) == -1)
 	{
 		printf("write error\n");
 		getchar();

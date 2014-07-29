@@ -1,5 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
+#include "acl_cpp/stdlib/string.hpp"
+#include <map>
 
 struct ACL_VSTREAM;
 
@@ -63,14 +65,25 @@ public:
 	/**
 	 * 设置流的绑定对象
 	 * @param ctx {void*}
+	 * @param key {const char* } 标识该 ctx 的键
 	 */
-	void set_ctx(void* ctx);
+	void set_ctx(void* ctx, const char* key = NULL);
 
 	/**
 	 * 获得与流绑定的对象
+	 * @param key {const char* key} 非空时使用该 key 查询对应的 ctx 对象，
+	 *  否则返回缺省的 ctx 对象
 	 * @return {void*}
 	 */
-	void* get_ctx() const;
+	void* get_ctx(const char* key = NULL) const;
+
+	/**
+	 * 删除流中绑定的对象
+	 * @param key {const char*} 非空时删除对应该 key 的 ctx 对象，否则删除
+	 *  缺省的 ctx 对象
+	 * @return {void*} 当对象不存在时返回 NULL，成功删除后返回该对象
+	 */
+	void* del_ctx(const char* key = NULL);
 
 	/**
 	 * 设置流的读写超时时间
@@ -89,7 +102,8 @@ protected:
 	bool eof_;
 	bool opened_;
 
-	void* ctx_;
+	void* default_ctx_;
+	std::map<string, void*> ctx_table_;
 };
 
 } // namespace acl

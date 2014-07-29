@@ -134,6 +134,13 @@ public:
 	 */
 	bool set_local(const char* addr);
 
+	/**
+	 * 检查套接口连接的存活状态(内部使用了非阻塞读的方式进行探测)
+	 * @return {bool} 当网络连接未打开或已经关闭时该函数返回 false，如果
+	 *  连接正常则返回 true
+	 */
+	bool alive() const;
+
 	/////////////////////////////////////////////////////////////////////
 
 	void close_ssl(void);

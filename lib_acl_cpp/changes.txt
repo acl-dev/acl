@@ -1,5 +1,12 @@
 修改历史列表：
 ------------------------------------------------------------------------
+247) 2014.7.29
+247.1) feature: socket_stream 类增加了 alive() 方法用来检测网络连接的存活态
+247.2) feature: stream 类扩展了 set_ctx/get_ctx 方法，可以通过 key 设置/查找
+其对应的 ctx 对象，同时增加了 del_ctx 方法用来删除 key 对应的 ctx 对象
+247.3) samples: 增加了 socket/client, socket/server 两个网络测试用例，用来测试
+网络关闭时第一次写依然会成功的情况
+
 246) 2014.7.24
 246.1) bugfix: http_request.cpp 中调用方法 write_head 时，若请求方法为 POST 方法，
 则增加了有效的重试机制

@@ -184,16 +184,17 @@ bool http_request::write_head()
 			need_retry_ = false;
 
 		// 如果请求方法非 GET，则需要首先探测一下连接是否正常
-		if (method != HTTP_METHOD_GET)
+		if (method != HTTP_METHOD_GET && method != HTTP_METHOD_PURGE)
 		{
 			socket_stream& ss = client_->get_stream();
-			ACL_VSTREAM* vs = ss.get_vstream();
 
-			// 因为系统 write API 成功并不能保证连接正常，所以只能是调用
-			// 系统 read API 来探测连接是否正常，该函数内部会将套接口先转
-			// 非阻塞套接口进行读操作，所以不会阻塞，同时即使有数据读到也会
-			// 先放到 ACL_VSTREAM 的读缓冲中，所以也不会丢失数据
-			if (acl_vstream_probe_status(vs) == -1)
+			/* 因为系统 write API 成功并不能保证连接正常，所以只能
+			 * 是调用系统 read API 来探测连接是否正常，该函数内部
+			 * 会将套接口先转非阻塞套接口进行读操作，所以不会阻塞，
+			 * 同时即使有数据读到也会先放到 ACL_VSTREAM 的读缓冲中，
+			 * 所以也不会丢失数据
+			 */
+			if (ss.alive() == false)
 			{
 				close();
 

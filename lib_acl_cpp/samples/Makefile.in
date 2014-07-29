@@ -71,10 +71,18 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-CFLAGS += -I. -I../../include -I../../../lib_acl/include -I../../../lib_protocol/include
+BASE_PATH =
+
+ifneq ($(base_path),)
+	BASE_PATH = $(base_path)
+else
+	BASE_PATH = ../..
+endif
+
+CFLAGS += -I. -I$(BASE_PATH)/include -I$(BASE_PATH)/../lib_acl/include -I$(BASE_PATH)/../lib_protocol/include
 EXTLIBS =
-LDFLAGS = -L../../lib -l_acl_cpp -L../../../lib_protocol/lib -l_protocol -L../../../lib_acl/lib -l_acl \
-	  -L../../../lib/$(RPATH) $(EXTLIBS) $(SYSLIB)
+LDFLAGS = -L$(BASE_PATH)/lib -l_acl_cpp -L$(BASE_PATH)/../lib_protocol/lib -l_protocol -L$(BASE_PATH)/../lib_acl/lib -l_acl \
+	  -L$(BASE_PATH)/../lib/$(RPATH) $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)
