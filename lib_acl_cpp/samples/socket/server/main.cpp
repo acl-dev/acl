@@ -2,10 +2,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int main(void)
+int main(int argc, char* argv[])
 {
 	acl::server_socket server;
 	acl::string addr = "127.0.0.1:9001";
+
+	if (argc >= 2)
+		addr = argv[1];
 
 	if (server.open(addr) == false)
 	{

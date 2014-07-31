@@ -1,9 +1,6 @@
 #include <assert.h>
 #include "lib_acl.h"
-#include "acl_cpp/stdlib/charset_conv.hpp"
-#include "acl_cpp/mime/mime_base64.hpp"
-#include "acl_cpp/stream/fstream.hpp"
-#include "acl_cpp/stream/ifstream.hpp"
+#include "acl_cpp/lib_acl.hpp"
 #include <stdio.h>
 
 static int test1(void)
@@ -210,7 +207,7 @@ static int test2(const char* filepath)
 	}
 	else
 	{
-		printf("convert ok(tid: %u)\n", (unsigned int) acl_pthread_self());
+		printf("convert ok(tid: %u)\n", (unsigned int) acl::thread::thread_self());
 		return (0);
 	}
 }

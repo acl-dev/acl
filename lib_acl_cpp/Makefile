@@ -15,6 +15,9 @@ CFLAGS = -c -g -W -Wall -Wcast-align \
 #-DHAS_POLARSSL
 #-DUSE_DYNAMIC
 
+#just for freebsd's iconv.h
+CFLAGS += -I/usr/local/include
+
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX

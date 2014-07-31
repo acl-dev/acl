@@ -7,5 +7,8 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 else
 	LDFLAGS += -lz
 endif
+ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
+	EXTLIBS += -L/usr/local/lib -liconv
+endif
 CFLAGS += -I../
 PROG = memcache_pool

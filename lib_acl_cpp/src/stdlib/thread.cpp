@@ -2,6 +2,9 @@
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/thread.hpp"
+#ifdef	ACL_FREEBSD
+#include <pthread_np.h>
+#endif
 
 namespace acl
 {
@@ -39,6 +42,13 @@ thread& thread::set_stacksize(size_t size)
 void* thread::thread_run(void* arg)
 {
 	thread* thr = (thread*) arg;
+#ifdef	WIN32
+	thr->thread_id_ = GetCurrentThreadId();
+#elif	defined(ACL_FREEBSD)
+	thr->thread_id_ = pthread_getthreadid_np();
+#else
+	thr->thread_id_ = (unsigned long) pthread_self();
+#endif
 
 	// 如果线程创建时为分离模式，则当 run 运行时用户有可能
 	// 将线程对象销毁了，所以不能再将 thr->return_arg_ 进行
@@ -60,11 +70,11 @@ bool thread::start()
 	if (stack_size_ > 0)
 		acl_pthread_attr_setstacksize(&attr, stack_size_);
 
-#ifdef WIN32
+#ifdef	WIN32
 	int   ret = acl_pthread_create((acl_pthread_t*) thread_,
 		&attr, thread_run, this);
 #else
-	int   ret = acl_pthread_create((pthread_t*) &thread_id_, &attr,
+	int   ret = acl_pthread_create((pthread_t*) &thread_, &attr,
 			thread_run, this);
 #endif
 	if (ret != 0)
@@ -100,7 +110,7 @@ bool thread::wait(void** out /* = NULL */)
 #ifdef WIN32
 	int   ret = acl_pthread_join(*((acl_pthread_t*) thread_), &ptr);
 #else
-	int   ret = acl_pthread_join(thread_id_, &ptr);
+	int   ret = acl_pthread_join(thread_, &ptr);
 #endif
 
 	if (ret != 0)
@@ -126,7 +136,11 @@ unsigned long thread::thread_id() const
 
 unsigned long thread::thread_self()
 {
+#ifdef	ACL_FREEBSD
+	return (unsigned long) pthread_getthreadid_np();
+#else
 	return (unsigned long) acl_pthread_self();
+#endif
 }
 
 } // namespace acl

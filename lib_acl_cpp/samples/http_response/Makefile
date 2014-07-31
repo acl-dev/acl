@@ -6,4 +6,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 else
 	EXTLIBS = -lz
 endif
+ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
+	EXTLIBS += -L/usr/local/lib -liconv
+endif
 PROG = http_response

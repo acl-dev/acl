@@ -6,7 +6,7 @@
 
 #ifdef	ACL_UNIX
 #include <unistd.h>
-# ifndef ACL_SUNOS5
+# if !defined(ACL_SUNOS5) && !defined(ACL_FREEBSD)
 #include <execinfo.h>
 # endif
 #include <sys/types.h>
@@ -18,12 +18,12 @@ void acl_dump_trace(const char *filepath)
 {
 	const char *myname = "acl_dump_trace";
 	int   fd;
-#ifndef	ACL_SUNOS5
+#if	!defined(ACL_SUNOS5) && !defined(ACL_FREEBSD)
 	void *buffer[1000];
 #endif
 	size_t n;
 
-#ifndef	ACL_SUNOS5
+#if	!defined(ACL_SUNOS5) && !defined(ACL_FREEBSD)
 	n = backtrace(buffer, 1000);
 #else
 	n = 0;
@@ -38,7 +38,7 @@ void acl_dump_trace(const char *filepath)
 		return;
 	}
 
-#ifndef	ACL_SUNOS5
+#if	!defined(ACL_SUNOS5) && !defined(ACL_FREEBSD)
 	backtrace_symbols_fd(buffer, n, fd);
 #endif
 	close(fd);

@@ -1,6 +1,9 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+453) 2014.7.31
+453.1) compile: 在FreeBSD9.2(64)上编译通过
+
 452) 2014.7.21
 452.1) 将 master/template/acl_tmpl.c 移到 stdlib/sys/unix/acl_core_limit.c
 452.2) bugfix: acl_basename.c 中的 acl_safe_basename() 函数有 BUG

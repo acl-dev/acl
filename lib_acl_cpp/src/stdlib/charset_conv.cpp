@@ -257,7 +257,7 @@ bool charset_conv::update_begin(const char* fromCharset,
 # else
 		__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero, NULL);
 # endif // USE_WIN_ICONV
-#elif defined(ACL_SUNOS5)
+#elif defined(ACL_SUNOS5) || defined(ACL_FREEBSD)
 		__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
 #else
 		__iconv(m_iconv, &pNil, &zero, &pNil, &zero);
@@ -351,7 +351,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 				&pOut, &nOut, &err);
 		errno = err;
 # endif // USE_WIN_ICONV
-#elif defined(ACL_SUNOS5)
+#elif defined(ACL_SUNOS5) || defined(ACL_FREEBSD)
 		ret = __iconv(m_iconv, (const char**) &pIn, &nIn, &pOut, &nOut);
 #else
 		ret = __iconv(m_iconv, &pIn, &nIn, &pOut, &nOut);
@@ -391,7 +391,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 			__iconv(m_iconv, (const char**) &pNil,
 				&zero, &pNil, &zero, NULL);
 # endif
-#elif defined(ACL_SUNOS5)
+#elif defined(ACL_SUNOS5) || defined(ACL_FREEBSD)
 			__iconv(m_iconv, (const char**) &pNil,
 				&zero, &pNil, &zero);
 #else
@@ -435,7 +435,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 			__iconv(m_iconv, (const char**) &pNil,
 				&zero, &pNil, &zero, NULL);
 # endif // USE_WIN_ICONV
-#elif defined(ACL_SUNOS5)
+#elif defined(ACL_SUNOS5) || defined(ACL_FREEBSD)
 			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
 #else
 			__iconv(m_iconv, &pNil, &zero, &pNil, &zero);

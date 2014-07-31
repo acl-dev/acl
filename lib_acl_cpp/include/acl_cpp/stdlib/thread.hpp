@@ -77,9 +77,12 @@ public:
 private:
 	bool detachable_;
 	size_t stack_size_;
-	unsigned long thread_id_;
 #ifdef WIN32
 	void* thread_;
+	unsigned long thread_id_;
+#else
+	pthread_t thread_;
+	unsigned long thread_id_;
 #endif
 	void* return_arg_;
 	static void* thread_run(void* arg);

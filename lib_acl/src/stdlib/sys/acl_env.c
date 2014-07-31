@@ -192,10 +192,10 @@ const char *acl_getenv_list(void)
 	ACL_VSTRING_TERMINATE(buf);
 	return (acl_vstring_str(buf));
 #else
-	extern char **_environ;
 	static acl_pthread_key_t buf_key = ACL_TLS_OUT_OF_INDEXES;
 	ACL_VSTRING *buf;
-	char **pptr = _environ;
+	extern char **environ;
+	char **pptr = environ;
 	int   i = 0;
 
 	buf = (ACL_VSTRING*) acl_pthread_tls_get(&buf_key);

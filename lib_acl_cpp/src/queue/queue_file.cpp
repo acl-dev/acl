@@ -2,6 +2,7 @@
 #include <assert.h>
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
+#include "acl_cpp/stdlib/thread.hpp"
 #include "acl_cpp/stream/fstream.hpp"
 #include "acl_cpp/queue/queue_manager.hpp"
 #include "acl_cpp/queue/queue_file.hpp"
@@ -63,7 +64,7 @@ bool queue_file::create(const char* home, const char* queueName,
 		snprintf(m_partName, sizeof(m_partName),
 			"%08x%08x%08x%08x%08x",
 			(unsigned int) getpid(),
-			(unsigned int) acl_pthread_self(),
+			(unsigned int) acl::thread::thread_self(),
 			(unsigned int) tv.tv_sec,
 			(unsigned int) tv.tv_usec,
 			(unsigned int) __counter);
