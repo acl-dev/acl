@@ -72,18 +72,29 @@ static void __hdr_reset(HTTP_HDR_REQ *hh, int clear_cookies)
 	hh->host[0] = 0;
 	hh->flag = 0;
 
-	if (hh->url_part)
+	if (hh->url_part) {
 		ACL_VSTRING_RESET(hh->url_part);
+		ACL_VSTRING_TERMINATE(hh->url_part);
+	}
 
-	if (hh->url_path)
+	if (hh->url_path) {
 		ACL_VSTRING_RESET(hh->url_path);
-	if (hh->url_params)
-		ACL_VSTRING_RESET(hh->url_params);
+		ACL_VSTRING_TERMINATE(hh->url_path);
+	}
 
-	if (hh->file_path)
+	if (hh->url_params) {
+		ACL_VSTRING_RESET(hh->url_params);
+		ACL_VSTRING_TERMINATE(hh->url_params);
+	}
+
+	if (hh->file_path) {
 		ACL_VSTRING_RESET(hh->file_path);
+		ACL_VSTRING_TERMINATE(hh->file_path);
+	}
+
 	if (hh->params_table)
 		acl_htable_reset(hh->params_table, __request_args_free_fn);
+
 	if (clear_cookies && hh->cookies_table)
 		acl_htable_reset(hh->cookies_table, __cookies_args_free_fn);
 }
@@ -564,6 +575,8 @@ static void __strip_url_path(ACL_VSTRING *buf, const char *url)
 	ACL_ITER iter;
 
 	ACL_VSTRING_RESET(buf);
+	ACL_VSTRING_TERMINATE(buf);
+
 	argv = acl_argv_split(url, "/");
 	acl_foreach(iter, argv) {
 		ptr = (const char*) iter.data;

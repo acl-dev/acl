@@ -24,7 +24,8 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DFREEBSD -D_REENTRANT
-	SYSLIB = -lcrypt -lpthread
+	SYSLIB = -lcrypt -lpthread -lz
+	RPATH = freebsd
 endif
 
 #Path for Linux
@@ -53,6 +54,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DSUNOS5 -D_REENTRANT
+	RPATH = sunos_x86
 endif
 
 #Path for HP-UX

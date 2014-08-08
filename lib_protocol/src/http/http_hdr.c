@@ -343,6 +343,8 @@ int http_hdr_entry_replace2(HTTP_HDR *hh, const char *name,
 			continue;
 
 		ACL_VSTRING_RESET(value);
+		ACL_VSTRING_TERMINATE(value);
+
 		ptr_prev = entry->value;
 
 		while (*ptr_prev) {

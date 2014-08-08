@@ -41,6 +41,7 @@ static bool create_master_proc(file_tmpl& tmpl)
 static bool create_master_aio(file_tmpl& tmpl)
 {
 	string file(tmpl.get_project_name());
+	file << ".cf";
 	if (tmpl.copy_and_replace("master_aio.cf", file.c_str()) == false)
 		return false;
 
