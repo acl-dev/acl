@@ -1,9 +1,9 @@
 # acl -- one advanced C/C++ lib for UNIX and WINDOWS
 
-## ÃèÊö
+## Ò»¡¢ÃèÊö
 acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·þÎñÆ÷±à³Ì¿ò¼Ü£¬Í¬Ê±Ìá¹©¸ü¶àµÄÊµÓÃ¹¦ÄÜ¿â¡£Í¨¹ý¸Ã¿â£¬ÓÃ»§¿ÉÒÔ·Ç³£ÈÝÒ×µØ±àÐ´Ö§³Ö¶àÖÖÄ£Ê½(¶àÏß³Ì¡¢¶à½ø³Ì¡¢·Ç×èÈû¡¢´¥·¢Æ÷¡¢UDP·½Ê½)µÄ·þÎñÆ÷³ÌÐò£¬WEB Ó¦ÓÃ³ÌÐò£¬Êý¾Ý¿âÓ¦ÓÃ³ÌÐò¡£´ËÍâ£¬¸Ã¿â»¹Ìá¹©ÁË³£¼ûÓ¦ÓÃµÄ¿Í»§¶ËÍ¨ÐÅ¿â£¨Èç£ºHTTP¡¢SMTP¡¢ICMP¡¢memcache¡¢beanstalk£©£¬³£¼ûÁ÷Ê½±à½âÂë¿â£ºXML/JSON/MIME/BASE64/UUCODE/QPCODE/RFC2047 etc¡£
 
-### ¿â×é³É
+### 1.1¡¢¿â×é³É
 ±¾¹¤³ÌÖ÷Òª°üº¬ 5 ¸ö¿â¼°´óÁ¿Ê¾Àý¡£5 ¸ö¿âµÄËµÃ÷ÈçÏÂ£º
 -    1) lib_acl: ¸Ã¿âÊÇ×î»ù´¡µÄ¿â£¬ÆäËü 4 ¸ö¿â¾ùÒÀÀµÓÚ¸Ã¿â; ¸Ã¿âÒÔ C ÓïÑÔÊµÏÖ¡£
 -    2) lib_protocol: ¸Ã¿âÖ÷ÒªÊµÏÖÁË http Ð­Òé¼° icmp/ping Ð­Òé; ¸Ã¿âÒÔ C ÓïÑÔÊµÏÖ¡£
@@ -11,9 +11,9 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 -    4) lib_dict: ¸Ã¿âÖ÷ÒªÊµÏÖÁË KEY-VALUE µÄ×ÖµäÊ½´æ´¢¿â£¬¸Ã¿âÁíÍâ»¹ÒÀÀµÓÚ BDB, CDB ÒÔ¼° tokyocabinet ¿â¡£
 -    5) lib_tls: ¸Ã¿â·â×°ÁË openssl ¿â£¬Ê¹ lib_acl µÄÍ¨ÐÅÄ£Ê½¿ÉÒÔÖ§³Ö ssl¡£
 
-### ¹¦ÄÜÄ£¿é×é³É
-#### ÍøÂçÍ¨ÐÅ¿â
-* Á÷´¦ÀíÄ£¿é£¨ACL_VSTREAM£© : ¸ÃÄ£¿éÊÇÕû¸ö acl ÍøÂçÍ¨ÐÅ×î»ù´¡µÄÁ÷Ê½Í¨ÐÅÄ£¿é£¬²»½öÖ§³ÖÍøÂçÁ÷£¬Í¬Ê±»¹Ö§³ÖÎÄ¼þÁ÷£¬Ö÷ÒªÖ§³Ö£º
+### 1.2¡¢¹¦ÄÜÄ£¿é×é³É
+#### 1.2.1¡¢ÍøÂçÍ¨ÐÅ¿â
+* **Á÷´¦ÀíÄ£¿é£¨ACL_VSTREAM£©**: ¸ÃÄ£¿éÊÇÕû¸ö acl ÍøÂçÍ¨ÐÅ×î»ù´¡µÄÁ÷Ê½Í¨ÐÅÄ£¿é£¬²»½öÖ§³ÖÍøÂçÁ÷£¬Í¬Ê±»¹Ö§³ÖÎÄ¼þÁ÷£¬Ö÷ÒªÖ§³Ö£º
 - 1 °´ÐÐ¶ÁÊý¾Ý£¬¼æÈÝ win32 ÏÂµÄ \r\n£¬Í¬Ê±¼æÈÝ UNIX ÏÂµÄ \n µÄ½áÊø·û
 - 2 °´ÐÐ¶ÁÊý¾Ýµ«ÒªÇó×Ô¶¯È¥µôÎ²²¿µÄ \n »ò \r\n
 - 3 ÒÔ×Ö·û´®Îª·Ö¸ô·û¶ÁÈ¡Êý¾Ý
@@ -30,48 +30,64 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 - 14 »ñµÃÎÄ¼þ³ß´ç
 - 15 »ñµÃÍøÂçÁ÷µÄ±¾µØµØÖ·¼°Ô¶³ÌµØÖ·
 
-* ÍøÂç²Ù×÷Ä£¿é£º¸ÃÄ£¿éÖ÷ÒªÖ§³ÖÍøÂç·þÎñ¶Ë¼àÌý£¨Ö§³Ö TCP/UDP/UNIX ÓòÌ×½Ó¿Ú£©¡¢ÍøÂç¿Í»§¶ËÁ¬½Ó£¨Ö§³Ö TCP/UNIX ÓòÌ×½Ó¿Ú£©¡¢DNS ÓòÃû²éÑ¯¼°½á¹û»º´æ£¨Ö§³Öµ÷ÓÃÏµÍ³ gethostbyname º¯ÊýºÍÖ±½Ó·¢ËÍ DNS Ð­ÒéÁ½ÖÖ·½Ê½£©¡¢Ì×½Ó¿Ú£¨socket£©²Ù×÷¼°È¡±¾»úÍø¿¨µÈ¹¦ÄÜ¡£
+* **ÍøÂç²Ù×÷Ä£¿é**£º¸ÃÄ£¿éÖ÷ÒªÖ§³ÖÍøÂç·þÎñ¶Ë¼àÌý£¨Ö§³Ö TCP/UDP/UNIX ÓòÌ×½Ó¿Ú£©¡¢ÍøÂç¿Í»§¶ËÁ¬½Ó£¨Ö§³Ö TCP/UNIX ÓòÌ×½Ó¿Ú£©¡¢DNS ÓòÃû²éÑ¯¼°½á¹û»º´æ£¨Ö§³Öµ÷ÓÃÏµÍ³ gethostbyname º¯ÊýºÍÖ±½Ó·¢ËÍ DNS Ð­ÒéÁ½ÖÖ·½Ê½£©¡¢Ì×½Ó¿Ú£¨socket£©²Ù×÷¼°È¡±¾»úÍø¿¨µÈ¹¦ÄÜ¡£
 
-* ·Ç×èÈûÍøÂçÁ÷£ºÖ§³Ö·Ç×èÈû·½Ê½Á¬½Ó¡¢¶Á£¨°´ÐÐ¶Á£¬¹æ¶¨³¤¶È¶Á£©¡¢Ð´£¨Ð´ÐÐ£¬Ð´¹æ¶¨³¤¶È£¬Ð´Ò»×éÊý¾Ý£©µÈ²Ù×÷¡£
+* **·Ç×èÈûÍøÂçÁ÷**£ºÖ§³Ö·Ç×èÈû·½Ê½Á¬½Ó¡¢¶Á£¨°´ÐÐ¶Á£¬¹æ¶¨³¤¶È¶Á£©¡¢Ð´£¨Ð´ÐÐ£¬Ð´¹æ¶¨³¤¶È£¬Ð´Ò»×éÊý¾Ý£©µÈ²Ù×÷¡£
 
-* ÍøÂç IO ÊÂ¼þÒýÇæ£ºÖ§³Ö select(UNIX/LINUX/WIN32)¡¢poll(UNIX/LINUX)¡¢epoll(LINUX)¡¢kqueue(BSD)¡¢devpoll(solaris)¡¢iocp(WIN32)¡¢´°¿ÚÏûÏ¢(WIN32) µÈÏµÍ³ÊÂ¼þÒýÇæ£¬Í¬Ê±Ö§³Ö reactor ¼° proactor Á½ÖÖ±à³ÌÄ£ÐÍ¡£
+* **³£¼ûÍøÂçÓ¦ÓÃÐ­Òé¿â£¨lib_protocol/lib_acl_cpp£©**:
+Ö÷ÒªÖ§³Ö³£¼ûÍøÂçÓ¦ÓÃÐ­Òé£¬ÖîÈç£ºHTTP¡¢SMTP¡¢ICMP£¬ÆäÖÐ HTTP¡¢ICMP Á½¸öÄ£¿éÊµÏÖÁË×èÈû¡¢·Ç×èÈûÁ½ÖÖÍ¨ÐÅ·½Ê½£»´ËÍâ£¬HTTP Ð­ÒéÔÚC++°æµÄ lib_acl_cpp ÖÐ»¹Ö§³Ö·þÎñ¶Ë¡¢¿Í»§¶ËÁ½ÖÖÍ¨ÐÅ·½Ê½£¬µ±×÷Îª·þÎñ¶ËÊ¹ÓÃÊ±£¬Ö§³ÖÀàËÆÓÚ JAVA HttpServlet µÄ½Ó¿ÚÊ¹ÓÃ·½Ê½£¬µ±×÷Îª¿Í»§¶Ë·½Ê½Ê¹ÓÃÊ±£¬Ö§³ÖÁ¬½Ó³ØÓë¼¯Èº¹ÜÀí·½Ê½£¬¸ÃÄ£¿éÍ¬Ê±Ö§³Ö cookie¡¢session¡¢HTTP MIME ÎÄ¼þÉÏ´«¡¢·Ö¿é´«Êä¡¢×Ö·û¼¯×Ô¶¯×ª»»¡¢×Ô¶¯½âÑ¹Ëõ¡¢¶ÏµãÐø´«µÈ·á¸»µÄ¹¦ÄÜ¡£
 
-* ÍøÂç·þÎñÆ÷¿ò¼Ü£º¸ÃÄ£¿éÊÇ acl ÖÐ×îÎªÖØÒªµÄÄ£¿é£¬Ìá¹©ÁË·þÎñÆ÷±à³ÌÖÐ³£ÓÃµÄ»ù´¡ÉèÊ©£¬Õû¸ö·þÎñÆ÷¿ò¼ÜÖÐµÄ×Ó½ø³ÌÊµÀý²ÉÓÃ°ë×¤ÁôÊ½·þÎñÄ£ÐÍ£»¸Ã·þÎñÆ÷¿ò¼ÜÀ´Ô´ÓÚÖøÃûµÄ Postfix£¬ÔÚÆä»ù´¡ÉÏ½øÐÐÁËÖî¶àÀ©Õ¹£¬Ä¿Ç°ÒÑ¾­Ö§³ÖµÄÖ÷Òª¹¦ÄÜÓÐ£º
-- 1 ¶à½ø³ÌÄ£ÐÍ£ºÒ»¸öÁ¬½ÓÒ»¸ö½ø³Ì£¬ÕâÖÖÄ£ÐÍµÄÓÅµãÊÇ±à³Ì¼òµ¥¡¢°²È«ÎÈ¶¨£¬È±µãÊÇ²¢·¢¶È²»¸ß£»
-- 2 ¶à½ø³Ì¶àÏß³ÌÄ£ÐÍ£ºÃ¿¸ö×Ó½ø³ÌÊÇÓÉÏß³Ì³ØÖÐµÄÒ»×éÏß³Ì´¦ÀíËùÓÐµÄ¿Í»§¶ËÁ¬½Ó£¬²ÉÓÃ IO ÊÂ¼þ´¥·¢·½Ê½£¬Ö»ÓÐµ±Á¬½ÓÓÐÊý¾Ý¿É¶ÁÊ±²Å»á½«Á¬½ÓÓëÒ»¸öÏß³Ì½øÐÐ°ó¶¨£¬Ïß³Ì´¦ÀíÍêºóÁ¢¼´¹é»¹¸øÏß³Ì³Ø£¬ÕâÖÖÄ£ÐÍµÄ×î´óÓÅµãÊÇ¿ÉÒÔÓÃÉÙÁ¿µÄÏß³Ì±ã¿ÉÒÔ´¦Àí´óÁ¿µÄ¿Í»§¶ËÁ¬½Ó£¬¶øÇÒ±à³Ì±È½Ï¼òµ¥£¨Ïà¶ÔÓÚ·Ç×èÈûÄ£ÐÍ£©£»
-- 3 ¶à½ø³Ì·Ç×èÈûÄ£ÐÍ£ºÃ¿¸ö×Ó½ø³ÌÊÇÓÉÒ»¸öµ¥¶ÀµÄ·Ç×èÈûÏß³Ì×é³É£¬¸ÃÏß³Ì²ÉÓÃÍêÈ«·Ç×èÈû IO ·½Ê½´¦ÀíÍâÀ´µÄ´óÁ¿¿Í»§¶ËÁ¬½Ó£¨ÀàËÆÓÚ nginx/squid/ircd£©£¬¸ÃÄ£ÐÍµÄÓÅµãÊÇ´¦ÀíÐ§ÂÊ¸ßÕ¼ÓÃ×ÊÔ´ÉÙ£¬¿ÉÒÔ´¦Àí´óÁ¿¿Í»§¶ËÁ¬½Ó£¬È±µãÊÇ±à³Ì±È½Ï¸´ÔÓ£»
-- 4 UDP Í¨ÐÅÄ£ÐÍ£º¸ÃÄ£ÐÍÖ÷ÒªÎªÁËÖ§³Ö UDP ÍøÂç¹ý³Ì¶øÔö¼ÓµÄ·þÎñÄ£ÐÍ£»
-- 5 ½â·¢Æ÷Ä£ÐÍ£º¸ÃÄ£ÐÍµÄÊµÀýÖ÷ÒªÓÃÀ´´¦ÀíÒ»Ð©¶¨Ê±ÈÎÎñµÄºóÌ¨·þÎñ¹ý³Ì£¨ÀàËÆÓÚÏµÍ³µÄ crontab£©¡£
+* **³£¼ûÍøÂçÍ¨ÐÅ¿â**:
+Ö§³Ö memcached¡¢beanstalk¡¢handler socket ¿Í»§¶ËÍ¨ÐÅ¿â£¬¸ÃÍ¨ÐÅ¿âÖ§³ÖÁ¬½Ó³Ø·½Ê½¡£
 
-* ³£ÓÃÊý¾Ý½á¹¹Ä£¿é£º¸ÃÄ£¿éÌá¹©ÁË³£¼ûµÄ¹þÏ£±í¡¢¶¯Ì¬Êý×é¡¢Æ½ºâ¶þ²æÊ÷¡¢¶ÓÁÐ¡¢¶þ·Ö¿é²éÕÒÊ÷¡¢256 ²æÆ¥ÅäÊ÷µÈÊý×é½á¹¹¡£
+#### 1.2.2¡¢ÍøÂç IO ÊÂ¼þÒýÇæ
+Ö§³Ö select(UNIX/LINUX/WIN32)¡¢poll(UNIX/LINUX)¡¢epoll(LINUX)¡¢kqueue(BSD)¡¢devpoll(solaris)¡¢iocp(WIN32)¡¢´°¿ÚÏûÏ¢(WIN32) µÈÏµÍ³ÊÂ¼þÒýÇæ£¬Í¬Ê±Ö§³Ö Reactor ¼° Proactor Á½ÖÖ±à³ÌÄ£ÐÍ¡£
 
-* ÄÚ´æ²Ù×÷Ä£¿é£º¸ÃÄ£¿éÌá¹©ÈýÖÖÄÚ´æ³ØÄ£ÐÍ£º
-- 1 »ù±¾µÄÄÚ´æ·½Ê½£ºÄÚ²¿·â×°ÁËÏµÍ³µÄ malloc/free API£¬Ìá¹©ÁËÄÚ´æÐ£ÑéµÈ°²È«´ëÊ©£»¸Ã·½Ê½Í¬Ê±Ìá¹©Íâ²¿×¢²á½Ó¿Ú£¬ÔÊÐíÊ¹ÓÃÕß×¢²á×Ô¼ºµÄÄÚ´æ·ÖÅäÄ£ÐÍ£»
-- 2 ÄÚ´æÆ¬(slab) ·½Ê½£º¸ù¾Ý²»Í¬µÄ³ß´ç´óÐ¡·ÖÅä¶à¸ö¶¨³¤ÄÚ´æÁ´£¬¿ÉÒÔÓÐÐ§µØ¼õÉÙÄÚ´æËéÆ¬£¬´ó´óÌáÉýÄÚ´æ·ÖÅäÐ§ÂÊ£»
-- 3 ÄÚ´æÁ´·½Ê½£º½«³¤¶È²»Ò»µÄÐ¡ÄÚ´æ·ÖÅäÔÚÒ»ÌõÄÚ´æÒ³ÉÏ£¬¿ÉÒÔ·Ç³£ÓÐÐ§µØÊ¹ÓÃÄÚ´æ£¬¼õÉÙÄÚ´æÀË·Ñ¡£
+#### 1.2.3¡¢ÍøÂç·þÎñÆ÷¿ò¼Ü
+¸ÃÄ£¿éÊÇ acl ÖÐ×îÎªÖØÒªµÄÄ£¿é£¬Ìá¹©ÁË·þÎñÆ÷±à³ÌÖÐ³£ÓÃµÄ»ù´¡ÉèÊ©£¬¸Ã·þÎñÆ÷¿ò¼ÜÀ´Ô´ÓÚÖøÃûµÄ Postfix£¬ÔÚÆä»ù´¡ÉÏ½øÐÐÁËÖî¶àÀ©Õ¹£¬Ä¿Ç°ÒÑ¾­Ö§³ÖµÄÖ÷Òª·þÎñÄ£ÐÍÓÐ£º
+- **1 ¶à½ø³ÌÄ£ÐÍ£º**Ò»¸öÁ¬½ÓÒ»¸ö½ø³Ì£¬ÕâÖÖÄ£ÐÍµÄÓÅµãÊÇ±à³Ì¼òµ¥¡¢°²È«ÎÈ¶¨£¬È±µãÊÇ²¢·¢¶È²»¸ß£»
+- **2 ¶à½ø³Ì¶àÏß³ÌÄ£ÐÍ£º**Ã¿¸ö×Ó½ø³ÌÊÇÓÉÏß³Ì³ØÖÐµÄÒ»×éÏß³Ì´¦ÀíËùÓÐµÄ¿Í»§¶ËÁ¬½Ó£¬²ÉÓÃ IO ÊÂ¼þ´¥·¢·½Ê½£¬Ö»ÓÐµ±Á¬½ÓÓÐÊý¾Ý¿É¶ÁÊ±²Å»á½«Á¬½ÓÓëÒ»¸öÏß³Ì½øÐÐ°ó¶¨£¬Ïß³Ì´¦ÀíÍêºóÁ¢¼´¹é»¹¸øÏß³Ì³Ø£¬ÕâÖÖÄ£ÐÍµÄ×î´óÓÅµãÊÇ¿ÉÒÔÓÃÉÙÁ¿µÄÏß³Ì±ã¿ÉÒÔ´¦Àí´óÁ¿µÄ¿Í»§¶ËÁ¬½Ó£¬¶øÇÒ±à³Ì±È½Ï¼òµ¥£¨Ïà¶ÔÓÚ·Ç×èÈûÄ£ÐÍ£©£»
+- **3 ¶à½ø³Ì·Ç×èÈûÄ£ÐÍ£º**Ã¿¸ö×Ó½ø³ÌÊÇÓÉÒ»¸öµ¥¶ÀµÄ·Ç×èÈûÏß³Ì×é³É£¬¸ÃÏß³Ì²ÉÓÃÍêÈ«·Ç×èÈû IO ·½Ê½´¦ÀíÍâÀ´µÄ´óÁ¿¿Í»§¶ËÁ¬½Ó£¨ÀàËÆÓÚ nginx/squid/ircd£©£¬¸ÃÄ£ÐÍµÄÓÅµãÊÇ´¦ÀíÐ§ÂÊ¸ßÕ¼ÓÃ×ÊÔ´ÉÙ£¬¿ÉÒÔ´¦Àí´óÁ¿¿Í»§¶ËÁ¬½Ó£¬È±µãÊÇ±à³Ì±È½Ï¸´ÔÓ£»
+- **4 UDP Í¨ÐÅÄ£ÐÍ£º**¸ÃÄ£ÐÍÖ÷ÒªÎªÁËÖ§³Ö UDP ÍøÂç¹ý³Ì¶øÔö¼ÓµÄ·þÎñÄ£ÐÍ£»
+- **5 ½â·¢Æ÷Ä£ÐÍ£º**¸ÃÄ£ÐÍµÄÊµÀýÖ÷ÒªÓÃÀ´´¦ÀíÒ»Ð©¶¨Ê±ÈÎÎñµÄºóÌ¨·þÎñ¹ý³Ì£¨ÀàËÆÓÚÏµÍ³µÄ crontab£©¡£
 
-* ³£ÓÃ×Ö·û´®²Ù×÷Ä£¿é£ºÖ§³Ö×Ö·û´®Æ¥Åä²éÕÒ¡¢·Ö¸î¡¢´óÐ¡Ð´×ª»»¡¢H2B/B2H ×ª»»µÈ¹¦ÄÜ¡£
+·þÎñÆ÷¿ò¼ÜÖÐµÄ×Ó½ø³ÌÊµÓÃ²ÉÓÃ°ë×¤Áô·þÎñÄ£ÐÍ£¬Ö§³Ö×Ó½ø³ÌÔ¤Æô¶¯»úÖÆ¡¢×î´ó×îÐ¡½ø³ÌÊý¿ØÖÆ¡¢×Ó½ø³ÌÒì³£±¨¾¯¡¢µ¥Ò»½ø³Ì¼àÌý¶à¸öµØÖ·£¨¿ÉÍ¬Ê±¼àÌýTCP/UDPÌ×½Ó×ÖÒÔ¼° UNIX ÓòÌ×½Ó×Ö£©¡¢×Ó½ø³Ì°²È«¿ØÖÆ¡¢ÈÕÖ¾Êä³öÖÁ syslog-ng¡¢¶à½ø³ÌTCPÁ¬½Ó¾ùÔÈ»¯£»²ÉÓÃÅäÖÃÎÄ¼þÇý¶¯·½Ê½£¬Ã¿¸ö·þÎñÒ»¸öÅäÖÃÎÄ¼þ£¬·½±ã½ø³Ì¹ÜÀí¼°·þÎñ½ø³ÌÔÚÏßÉý¼¶¡£
 
-* ÎÄ¼þÄ¿Â¼Ä£¿é£ºÖ§³Ö¶à¼¶Ä¿Â¼´´½¨¡¢¶à¼¶Ä¿Â¼É¨Ãè¡¢ÎÄ¼þ¾ä±ú»º´æµÈ¹¦ÄÜ£¬Í¬Ê±ÔÚ´¦Àí¶à¼¶Ä¿Â¼²ÉÓÃÑ­»··½Ê½£¬±ÜÃâÁËµÝ¹é·½Ê½Ê±¿ÉÄÜµÄÕ»Òç³öµÄÒþ»¼¡£
+#### 1.2.4¡¢³£ÓÃÊý¾Ý½á¹¹Ä£¿é
+¸ÃÄ£¿éÌá¹©ÁË³£¼ûµÄ¹þÏ£±í£¨¼°¶àÖÖ¹þÏ£Ëã·¨£©¡¢¶¯Ì¬Êý×é¡¢Ë«ÏòÁ´±í¡¢Æ½ºâ¶þ²æÊ÷¡¢¶ÓÁÐ¡¢¶þ·Ö¿é²éÕÒÊ÷¡¢256 ²æÆ¥ÅäÊ÷µÈÊý×é½á¹¹£»Ìá¹©ÁËÍ³Ò»µÄÊý¾Ý½á¹¹±éÀú·½·¨(²ÉÓÃ acl_foreach)¡£
 
-* ¶ÁÅäÖÃÎÄ¼þÄ£¿é£ºÖ§³Ö¶Á name=value ÐÎÊ½µÄÅäÖÃÎÄ¼þ£¬value ½Ï³¤Ê±¿ÉÒÔÊ¹ÓÃ·´Ð±¸Ü(\)ÕÛÐÐ£¬²ÉÓÃÅäÖÃ±í·½Ê½ÌáÈ¡ÅäÖÃÎÄ¼þÖÐµÄÅäÖÃÏî¡£
+#### 1.2.5¡¢ ÄÚ´æ²Ù×÷Ä£¿é
+¸ÃÄ£¿éÌá¹©ÈýÖÖÄÚ´æ³ØÄ£ÐÍ£º
+- **1 »ù±¾µÄÄÚ´æ·½Ê½£º**ÄÚ²¿·â×°ÁËÏµÍ³µÄ malloc/free API£¬Ìá¹©ÁËÄÚ´æÐ£ÑéµÈ°²È«´ëÊ©£»¸Ã·½Ê½Í¬Ê±Ìá¹©Íâ²¿×¢²á½Ó¿Ú£¬ÔÊÐíÊ¹ÓÃÕß×¢²á×Ô¼ºµÄÄÚ´æ·ÖÅäÄ£ÐÍ£»
+- **2 ÄÚ´æÆ¬(slab) ·½Ê½£º**¸ù¾Ý²»Í¬µÄ³ß´ç´óÐ¡·ÖÅä¶à¸ö¶¨³¤ÄÚ´æÁ´£¬¿ÉÒÔÓÐÐ§µØ¼õÉÙÄÚ´æËéÆ¬£¬´ó´óÌáÉýÄÚ´æ·ÖÅäÐ§ÂÊ£»
+- **3 ÄÚ´æÁ´·½Ê½£º**½«³¤¶È²»Ò»µÄÐ¡ÄÚ´æ·ÖÅäÔÚÒ»ÌõÄÚ´æÒ³ÉÏ£¬¿ÉÒÔ·Ç³£ÓÐÐ§µØÊ¹ÓÃÄÚ´æ£¬¼õÉÙÄÚ´æÀË·Ñ¡£
 
-* Ïß³Ì¼°Ïß³Ì³ØÄ£¿é£ºÌá¹©ÁË¿çÆ½Ì¨µÄÖ§³Ö Posix ¹æ·¶µÄÏß³Ì½Ó¿Ú£¨Ö§³ÖWIN32£©£»Ïß³Ì³ØÄ£¿éÍ¨¹ý¶àÖÖ´ëÊ©×î´ó³Ì¶ÈµØ¼õÉÙÏß³ÌÈÎÎñ·ÖÅäÊ±µÄËø³åÍ»¡£
+#### 1.2.6¡¢³£ÓÃ×Ö·û´®²Ù×÷Ä£¿é
+Ö§³Ö×Ö·û´®Æ¥Åä²éÕÒ¡¢Ç°(ºó)Ïò±È½Ï¡¢×Ö·û´®·Ö¸î¡¢×Ö·û´®´óÐ¡Ð´×ª»»¡¢H2B/B2H ×ª»»¡¢URL ±àÂë/½âÂëµÈ¹¦ÄÜ¡£
 
-* Êý×Ö¼üµÄ K-V ´ÅÅÌ´æ´¢Ä£¿é£¨zdb£©£º²ÉÈ¡ KEY/VALUE ·Ö¿é´æ´¢·½Ê½£¬ÒòÎª KEY ÏÞ¶¨ÎªÊý×ÖÀàÐÍ£¬Ö»ÐèÄÚ´æ¼ÆËã±ã¿ÉËã³ö KEY µÄÎ»ÖÃ£¬KEY ÖÐ´æ·ÅÁË VALUE µÄÎ»ÖÃ£¬ËùÒÔ¶ÔÓÚÈÎºÎµÄÊý¾Ý²éÑ¯Ö»ÐèÁ½´Î´ÅÅÌ¶¨Î»¡££¨±¾ÈËÔÚºÍÑ¶×öÁ÷Á¿Í³¼Æ´æ´¢Ê±£¬Ê¹ÓÃ¸ÃÖÖ·½Ê½Ìæ´úÁËBSD¡¢TC µÈ²ÉÓÃBÊ÷µÄ K-V ´æ´¢£©
+#### 1.2.7¡¢ÎÄ¼þÄ¿Â¼Ä£¿é
+Ö§³Ö¶à¼¶Ä¿Â¼´´½¨¡¢¶à¼¶Ä¿Â¼É¨Ãè¡¢ÎÄ¼þ¾ä±ú»º´æµÈ¹¦ÄÜ£¬Í¬Ê±ÔÚ´¦Àí¶à¼¶Ä¿Â¼²ÉÓÃÑ­»··½Ê½£¬±ÜÃâÁËµÝ¹é·½Ê½Ê±¿ÉÄÜµÄÕ»Òç³öµÄÒþ»¼¡£
 
-* Á÷Ê½½âÎö¿â£º¸ÃÄ£¿é°üÀ¨ xml¡¢json¡¢rfc2047¡¢mime¡¢base64¡¢uucode¡¢qpcode¡¢charset µÈ±à½âÂë¿â£¬ÕâÐ©½âÂë¿â¾ù²ÉÓÃÁ÷Ê½½âÎö·½Ê½£¬ÊÊºÏÓÚ¶àÖÖÍøÂç IO ·½Ê½£¨×èÈû/·Ç×èÈûTCP¡¢UDP£©¡£
+#### 1.2.8¡¢¶ÁÅäÖÃÎÄ¼þÄ£¿é
+Ö§³Ö¶Á name=value ÐÎÊ½µÄÅäÖÃÎÄ¼þ£¬value ½Ï³¤Ê±¿ÉÒÔÊ¹ÓÃ·´Ð±¸Ü(\)ÕÛÐÐ£¬²ÉÓÃÅäÖÃ±í·½Ê½ÌáÈ¡ÅäÖÃÎÄ¼þÖÐµÄÅäÖÃÏî¡£
 
-* ³£¼ûÍøÂçÓ¦ÓÃÐ­Òé¿â£¨lib_protocol/lib_acl_cpp£©£ºÖ÷ÒªÖ§³Ö³£¼ûÍøÂçÓ¦ÓÃÐ­Òé£¬ÖîÈç£ºHTTP¡¢SMTP¡¢ICMP£¬ÆäÖÐ HTTP¡¢ICMP Á½¸öÄ£¿éÊµÏÖÁË×èÈû¡¢·Ç×èÈûÁ½ÖÖÍ¨ÐÅ·½Ê½£»´ËÍâ£¬HTTP Ð­ÒéÔÚC++°æµÄ lib_acl_cpp ÖÐ»¹Ö§³Ö·þÎñ¶Ë¡¢¿Í»§¶ËÁ½ÖÖÍ¨ÐÅ·½Ê½£¬µ±×÷Îª·þÎñ¶ËÊ¹ÓÃÊ±£¬Ö§³ÖÀàËÆÓÚ JAVA HttpServlet µÄ½Ó¿ÚÊ¹ÓÃ·½Ê½£¬µ±×÷Îª¿Í»§¶Ë·½Ê½Ê¹ÓÃÊ±£¬Ö§³ÖÁ¬½Ó³ØÓë¼¯Èº¹ÜÀí·½Ê½£¬¸ÃÄ£¿éÍ¬Ê±Ö§³Ö cookie¡¢session¡¢HTTP MIME ÎÄ¼þÉÏ´«¡¢·Ö¿é´«Êä¡¢×Ö·û¼¯×Ô¶¯×ª»»¡¢×Ô¶¯½âÑ¹Ëõ¡¢¶ÏµãÐø´«µÈ·á¸»µÄ¹¦ÄÜ¡£
+#### 1.2.9¡¢Ïß³Ì¼°Ïß³Ì³ØÄ£¿é
+Ìá¹©ÁË¿çÆ½Ì¨µÄÖ§³Ö Posix ¹æ·¶µÄÏß³Ì½Ó¿Ú£¨Ö§³ÖWIN32£©£»Ïß³Ì³ØÄ£¿éÍ¨¹ý¶àÖÖ´ëÊ©×î´ó³Ì¶ÈµØ¼õÉÙÏß³ÌÈÎÎñ·ÖÅäÊ±µÄËø³åÍ»£¨ÓÃÔÚ acl ·þÎñÆ÷¿ò¼ÜÖÐ¶à½ø³Ì¶àÏß³Ì·þÎñÄ£ÐÍÖÐ£©¡£
 
-* ³£¼ûÍøÂçÍ¨ÐÅ¿â£ºÖ§³Ö memcached¡¢beanstalk¡¢handler socket ¿Í»§¶ËÍ¨ÐÅ¿â£¬¸ÃÍ¨ÐÅ¿âÖ§³ÖÁ¬½Ó³Ø·½Ê½¡£
+#### 1.2.10¡¢Êý×Ö¼üµÄ K-V ´ÅÅÌ´æ´¢Ä£¿é£¨zdb£©
+²ÉÈ¡ KEY/VALUE ·Ö¿é´æ´¢·½Ê½£¬ÒòÎª KEY ÏÞ¶¨ÎªÊý×ÖÀàÐÍ£¬Ö»ÐèÄÚ´æ¼ÆËã±ã¿ÉËã³ö KEY µÄÎ»ÖÃ£¬KEY ÖÐ´æ·ÅÁË VALUE µÄÎ»ÖÃ£¬ËùÒÔ¶ÔÓÚÈÎºÎµÄÊý¾Ý²éÑ¯Ö»ÐèÁ½´Î´ÅÅÌ¶¨Î»¡££¨±¾ÈËÔÚºÍÑ¶×öÁ÷Á¿Í³¼Æ´æ´¢Ê±£¬Ê¹ÓÃ¸ÃÖÖ·½Ê½Ìæ´úÁËBSD¡¢TC µÈ²ÉÓÃBÊ÷µÄ K-V ´æ´¢£©
 
-* Êý¾Ý¿â·â×°¿â£ºÉè¼ÆÁËÍ³Ò»µÄÊý¾Ý¿â²Ù×÷½Ó¿Ú¼°Á¬½Ó³Ø´¦Àí·½Ê½£¬Ä¿Ç°Ö§³Ö sqlite/mysql¡£
+#### 1.2.11¡¢Á÷Ê½½âÎö¿â
+¸ÃÄ£¿é°üÀ¨ xml¡¢json¡¢rfc2047¡¢mime¡¢base64¡¢uucode¡¢qpcode¡¢charset µÈ±à½âÂë¿â£¬ÕâÐ©½âÂë¿â¾ù²ÉÓÃÁ÷Ê½½âÎö·½Ê½£¬ÊÊºÏÓÚ¶àÖÖÍøÂç IO Ä£ÐÍ£¨×èÈû/·Ç×èÈûTCP¡¢UDP£©¡£
 
-* ÎÄ¼þ¶ÓÁÐ´¦Àí¿â£ºÖ§³Ö¶à×éÄ¿Â¼¶ÓÁÐÎÄ¼þµÄ´´½¨¡¢É¨Ãè¡¢É¾³ýµÈ²Ù×÷¡£
+#### 1.2.12¡¢Êý¾Ý¿â·â×°¿â
+Éè¼ÆÁËÍ³Ò»µÄÊý¾Ý¿â²Ù×÷½Ó¿Ú¼°Á¬½Ó³Ø´¦Àí·½Ê½£¬Ä¿Ç°Ö§³Ö sqlite/mysql¡£
 
-## Æ½Ì¨Ö§³Ö¼°±àÒë
-Õû¸ö¹¤³ÌÄ¿Ç°Ö§³Ö Linux(AS4,5,6, CS4,5,6), Windows, MacOS, FreeBSD, Solaris¡£
+#### 1.2.13¡¢ÎÄ¼þ¶ÓÁÐ´¦Àí¿â
+Ö§³Ö¶à×éÄ¿Â¼¶ÓÁÐÎÄ¼þµÄ´´½¨¡¢É¨Ãè¡¢É¾³ýµÈ²Ù×÷£»³£ÓÃÓÚÁÙÊ±ÎÄ¼þ¶ÓÁÐµ÷¶ÈµÄ·þÎñ³ÌÐòÖÐ¡£
+
+## ¶þ¡¢Æ½Ì¨Ö§³Ö¼°±àÒë
+Õû¸ö¹¤³ÌÄ¿Ç°Ö§³Ö Linux(AS4,5,6, CS4,5,6, ubuntu), Windows, MacOS, FreeBSD, Solaris¡£
 * Linux/UNIX: ±àÒëÆ÷Îª gcc£¬Ö±½ÓÔÚÖÕ¶ËÃüÁîÐÐ·½Ê½ÏÂ·Ö±ð½øÈë lib_acl/lib_protocol/lib_acl_cpp/lib_dict/lib_tls Ä¿Â¼ÏÂ£¬ÔËÐÐ make ÃüÁî¼´¿É¡£
 * Windows: ¿ÉÒÔÓÃ VC2003/VC2008/VC2010/VC2012 ½øÐÐ±àÒë¡£(Èç¹ûÐèÒªÓÃ VC6/VC2005 ±àÒë£¬¿ÉÒÔ²Î¿¼ VC2003 µÄ±àÒëÌõ¼þ)¡£
 
@@ -82,9 +98,9 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 * Ê¹ÓÃ lib_dict µÄ¶¯Ì¬¿âÊ±£¬ÐèÒªÔÚ¹¤³ÌÖÐÔ¤¶¨Òå DICT_DLL;
 * Ê¹ÓÃ lib_tls µÄ¶¯Ì¬¿âÊ±£¬ÐèÒªÔÚ¹¤³ÌÖÐÔ¤¶¨Òå TLS_DLL¡£
 
-## Ä¿Â¼½á¹¹ËµÃ÷
+## Èý¡¢Ä¿Â¼½á¹¹ËµÃ÷
 
-### lib_acl
+### 3.1¡¢lib_acl
 -    1 init : Ö÷ÒªÓÃÓÚ³õÊ¼»¯ acl »ù´¡¿â
 -    2 stdlib : ÊÇÒ»Ð©±È½Ï»ù´¡µÄ¹¦ÄÜº¯Êý¿â£¬ÔÚ stdlib/ ¸ùÄ¿Â¼ÏÂÖ÷Òª°üÀ¨Ò»Ð©ÓÐ¹ØÈÕÖ¾¼ÇÂ¼¡¢ÍøÂç/ÎÄ¼þÁ÷´¦Àí¡¢VSTRING»º³å²Ù×÷µÈ¹¦ÄÜº¯Êý£»ÔÚ stdlib/ ÏÂ»¹ÓÐ¶þ¼¶Ä¿Â¼£¬ÈçÏÂ£º
 -    2.1 common : ¸ÃÄ¿Â¼Ö÷ÒªÎªÒ»Ð©³£ÓÃµÄÊý¾Ý½á¹¹¼°Ëã·¨µÄ¹¦ÄÜº¯Êý¿â£¬Ïó¹þÏ£±í¡¢Á´±í¡¢¶ÓÁÐ¡¢¶¯Ì¬Êý×é¡¢¶ÑÕ»¡¢»º´æ¡¢Æ½ºâ¶þ²æÊ÷¡¢Ä£Ê½Æ¥ÅäÊ÷µÈ£»
@@ -111,12 +127,12 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 -    13 json: ÊÇÒ»¸öÁ÷Ê½µÄ json ½âÎöÆ÷¼°¹¹ÔìÆ÷£¬¿ÉÒÔÖ§³Ö×èÈû¼°×èÈûÊ½ÍøÂçÍ¨ÐÅ£»
 -    **14 master: ÊÇÔÚ UNIX »·¾³ÏÂÖ§³Ö¶àÖÖ·þÎñÆ÷Ä£Ê½µÄ·þÎñÆ÷¿ò¼Ü£¬Ä¿Ç°Ö÷ÒªÖ§³Ö¶à½ø³ÌÄ£Ê½¡¢¶à½ø³Ì¶àÏß³ÌÄ£Ê½¡¢¶à½ø³Ì·Ç×èÈûÄ£Ê½¡¢¶à½ø³Ì´¥·¢Æ÷Ä£Ê½¼° UDP Í¨ÐÅÄ£Ê½£»**
 
-### lib_protocol
+### 3.2¡¢lib_protocol
 -    1 http: HTTP Ð­ÒéÏà¹ØµÄ¿â£¬Ö§³Ö HTTP/1.1£¬Í¨Ñ¶·½Ê½Ö§³ÖÍ¬²½/Òì²½·½Ê½
 -    2 icmp: icmp/ping Ð­Òé¿â£¬Ö§³ÖÍ¬²½/Òì²½Í¨ÐÅ·½Ê½
 -    3 smtp: ÓÊ¼þ¿Í»§¶Ë·¢ÐÅÐ­Òé¿â
 
-### lib_acl_cpp
+### 3.3¡¢lib_acl_cpp
 -    1 stdlib: Ö÷Òª°üº¬×Ö·û´®´¦ÀíÀà(string)£¬xml/json ½âÎö¿â£¬zlib Ñ¹Ëõ¿â(ÒÀÀµÓÚ zlib ¿â), ÈÕÖ¾¼ÇÂ¼Àà, ×Ö·û¼¯×ªÂë(ÔÚUNIX»·¾³ÏÂÐèÒª iconv ¿â), memcached ¿Í»§¿â, »¥³âÀà(Ö§³ÖÏß³ÌËø¡¢ÎÄ¼þËø);
 -    **2 stream: Ö§³ÖÍøÂçÁ÷/ÎÄ¼þÁ÷£¬Ö§³Ö×èÈû/·Ç×èÈûÁ½ÖÖÍ¨ÐÅ·½Ê½£¬ÔÚ·Ç×èÈûÄ£Ê½ÏÂÖ§³Ö select/poll/epoll/iocp/win32 message/kqueue/devpoll£»Ö§³Ö ssl ¼ÓÃÜ´«Êä(×èÈû¼°·Ç×èÈû·½Ê½£¬ÐèÒª polarssl¿â);**
 -    3 ipc: ÔÚ·Ç×èÈûÍ¨ÐÅ·½Ê½£¬Ìá¹©ÁË×èÈûÄ£¿éÓë·Ç×èÈûÄ£¿éÕûºÏµÄ·½Ê½;
@@ -133,7 +149,7 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 -    14 ipc: ×èÈû/·Ç×èÈûÍ¨ÐÅÕûºÏ¿â
 -    15 session: HTTP »á»°¿â
 
-### Í¼Àý
+### 3.4¡¢Í¼Àý
 *    ÀàË÷ÒýÍ¼£º
      ![ÀàË÷ÒýÍ¼](res/img/index.jpg)
 *    Òì²½ IO Àà¼Ì³ÐÍ¼
@@ -147,9 +163,9 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 *    ÍøÒ³ÏÂÔØ³ÌÐò£º
      ![ÍøÒ³ÏÂÔØ³ÌÐò](res/img/http_client.jpg)
 
-### acl ¿âÖÐÓÐ´óÁ¿Ê¾Àý¿É¹©²Î¿¼£¬Çë²Î¿¼£º[SAMPLES.md](SAMPLES.md)
+### 3.5¡¢acl ¿âÖÐÓÐ´óÁ¿Ê¾Àý¿É¹©²Î¿¼£¬Çë²Î¿¼£º[SAMPLES.md](SAMPLES.md)
 
-## ÆäËü
+## ËÄ¡¢ÆäËü
 - WEB Õ¾µã: http://www.iteye.com
 - Download: https://sourceforge.net/projects/acl
 - QQ Èº: 242722074
