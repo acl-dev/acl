@@ -60,11 +60,10 @@ public:
 	 * @param conn_timeout {int} 连接超时时间(秒)
 	 * @param rw_timeout {int} 读写超时时间(秒)
 	 * @param unzip {bool} 当服务器返回的数据体为压缩数据时是否自动解压缩
-	 * @param use_ssl {bool} 是否采用 SSL 加密传输方式
 	 * @return {bool} 连接是否成功
 	 */
 	bool open(const char* addr, int conn_timeout = 60, int rw_timeout = 60,
-		bool unzip = true, bool use_ssl = false);
+		bool unzip = true);
 
 	/**
 	 * 写 HTTP 请求头数据至输出流中

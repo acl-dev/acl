@@ -122,7 +122,7 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 	{
 		logger_error("open source file: %s error: %s",
 			from_filepath.c_str(), acl::last_serror());
-		return false;
+		return true;
 	}
 
 	acl::string to_pathbuf;

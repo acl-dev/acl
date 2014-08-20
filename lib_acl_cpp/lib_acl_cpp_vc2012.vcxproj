@@ -93,7 +93,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_MT;USE_WIN_ICONV;HAS_SQLITE;HAS_MYSQL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_MT;USE_WIN_ICONV;HAS_SQLITE;HAS_MYSQL;HAS_POLARSSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -323,6 +323,8 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\stream\istream.cpp" />
     <ClCompile Include="src\stream\ofstream.cpp" />
     <ClCompile Include="src\stream\ostream.cpp" />
+    <ClCompile Include="src\stream\polarssl_conf.cpp" />
+    <ClCompile Include="src\stream\polarssl_io.cpp" />
     <ClCompile Include="src\stream\server_socket.cpp" />
     <ClCompile Include="src\stream\socket_stream.cpp" />
     <ClCompile Include="src\stream\ssl_aio_stream.cpp" />
@@ -442,6 +444,8 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stream\istream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\ofstream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\ostream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\polarssl_conf.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\polarssl_io.hpp" />
     <ClInclude Include="include\acl_cpp\stream\server_socket.hpp" />
     <ClInclude Include="include\acl_cpp\stream\socket_stream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\ssl_aio_stream.hpp" />

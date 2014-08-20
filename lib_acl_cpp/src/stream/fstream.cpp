@@ -73,25 +73,6 @@ bool fstream::create(const char* path)
 	return open(path, O_RDWR | O_CREAT, 0600);
 }
 
-bool fstream::close()
-{
-	if (opened_ == false)
-		return false;
-
-	if (stream_ == NULL)
-		return true;
-
-	if (stream_->type != ACL_VSTREAM_TYPE_FILE)
-		return false;
-
-	ACL_FILE_HANDLE fh = ACL_VSTREAM_FILE(stream_);
-	if (fh == ACL_FILE_INVALID)
-		return false;
-	eof_ = true;
-	opened_ = false;
-	return acl_file_close(fh) == 0 ? true : false;
-}
-
 acl_off_t fstream::fseek(acl_off_t offset, int whence)
 {
 	acl_off_t ret = acl_vstream_fseek(stream_, offset, whence);

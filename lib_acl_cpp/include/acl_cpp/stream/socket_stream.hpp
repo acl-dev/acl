@@ -55,12 +55,6 @@ public:
 	bool bind_udp(const char* addr, int rw_timeout = 0);
 
 	/**
-	 * 关闭网络连接流
-	 * @return {bool} 关闭是否成功
-	 */
-	bool close();
-
-	/**
 	 * 获得网络连接流的套接字连接句柄
 	 * @return {ACL_SOCKET} 若出错，则返回 - 1(UNIX 平台)
 	 *  或 INVALID_SOCKET(win32平台)
@@ -141,35 +135,11 @@ public:
 	 */
 	bool alive() const;
 
-	/////////////////////////////////////////////////////////////////////
-
-	void close_ssl(void);
-	bool open_ssl_client(void);
-
 private:
 	char  dummy_[1];
 	char  peer_ip_[33];
 	char  local_ip_[33];
 	const char* get_ip(const char* addr, char* buf, size_t size);
-
-	void* ssl_;
-	void* ssn_;
-	void* hs_;
-
-	static int sock_read(void *ctx, unsigned char *buf, size_t len);
-	static int sock_send(void *ctx, const unsigned char *buf, size_t len);
-
-#ifdef WIN32
-	static int ssl_read(SOCKET fd, void *buf, size_t len,
-		int timeout, ACL_VSTREAM* stream, void *ctx);
-	static int ssl_send(SOCKET fd, const void *buf, size_t len,
-		int timeout, ACL_VSTREAM* stream, void *ctx);
-#else
-	static int ssl_read(int fd, void *buf, size_t len,
-		int timeout, ACL_VSTREAM* stream, void *ctx);
-	static int ssl_send(int fd, const void *buf, size_t len,
-		int timeout, ACL_VSTREAM* stream, void *ctx);
-#endif
 };
 
 } // namespace acl

@@ -2,7 +2,7 @@
 #include "IConnection.h"
 
 /**
- * æœåŠ¡ç«¯è¿æ¥å¯¹è±¡
+ * ·şÎñ¶ËÁ¬½Ó¶ÔÏó
  */
 class ServerConnection : public IConnection
 {
@@ -11,13 +11,13 @@ public:
 	~ServerConnection() {}
 
 	/**
-	 * è®¾ç½®å½“å‰æœåŠ¡ç«¯è¿æ¥çš„ä¸ªæ•°
+	 * ÉèÖÃµ±Ç°·şÎñ¶ËÁ¬½ÓµÄ¸öÊı
 	 * @param nconns {unsigned int}
 	 */
 	void set_nconns(unsigned int nconns);
 
 	/**
-	 * è·å¾—å½“å‰æœåŠ¡ç«¯è¿æ¥çš„ä¸ªæ•°
+	 * »ñµÃµ±Ç°·şÎñ¶ËÁ¬½ÓµÄ¸öÊı
 	 * @return {unsigned int}
 	 */
 	unsigned int get_nconns() const
@@ -26,14 +26,14 @@ public:
 	}
 
 	/**
-	 * å½“å‰æœåŠ¡ç«¯è¿æ¥ä¸ªæ•°åŠ  1
+	 * µ±Ç°·şÎñ¶ËÁ¬½Ó¸öÊı¼Ó 1
 	 */
 	void inc_nconns();
 
 	/**
-	 * å…³é—­æœåŠ¡ç«¯è¿æ¥ï¼Œå½“è¿æ¥å…³é—­æ—¶ä¼šè§¦å‘ ServiceIOCallback ä¸­çš„
-	 * close_callback è¿‡ç¨‹ï¼ŒåŒæ—¶åœ¨ ServiceIOCallback å¯¹è±¡çš„ææ„è¿‡ç¨‹
-	 * ä¸­ä¼šåˆ é™¤æœåŠ¡ç«¯æœ¬æœåŠ¡ç«¯è¿æ¥å¯¹è±¡
+	 * ¹Ø±Õ·şÎñ¶ËÁ¬½Ó£¬µ±Á¬½Ó¹Ø±ÕÊ±»á´¥·¢ ServiceIOCallback ÖĞµÄ
+	 * close_callback ¹ı³Ì£¬Í¬Ê±ÔÚ ServiceIOCallback ¶ÔÏóµÄÎö¹¹¹ı³Ì
+	 * ÖĞ»áÉ¾³ı·şÎñ¶Ë±¾·şÎñ¶ËÁ¬½Ó¶ÔÏó
 	 */
 	void close();
 

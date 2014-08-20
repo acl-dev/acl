@@ -53,7 +53,8 @@ ACL_API ACL_VSTRING *acl_vstring_alloc2(ACL_SLICE_POOL *slice, size_t len);
 /**
  * 设置 ACL_VSTRING 对象的属性, 目前该函数的功能还不够完善
  * @param vp {ACL_VSTRING*}
- * @param ... 由 ACL_VSTRING_CTL_XXX 表示的控制参数，结束标志为 ACL_VSTRING_CTL_END
+ * @param ... 由 ACL_VSTRING_CTL_XXX 表示的控制参数，结束标志为
+ *  ACL_VSTRING_CTL_END
  */
 ACL_API void acl_vstring_ctl(ACL_VSTRING *vp,...);
 
@@ -61,7 +62,7 @@ ACL_API void acl_vstring_ctl(ACL_VSTRING *vp,...);
 #define ACL_VSTRING_CTL_END         0
 
 /**
- * 将缓冲区内的数据截短至指定长度
+ * 将缓冲区内的数据截短至指定长度，同时保证缓冲区数据以 '\0' 结尾
  * @param vp {ACL_VSTRING*}
  * @param len {size_t} 截短后的长度
  * @return {ACL_VSTRING*} 与 vp 相同
@@ -90,7 +91,8 @@ ACL_API ACL_VSTRING *acl_vstring_strcpy(ACL_VSTRING *vp, const char *src);
  * @param len {size_t} 规定长度限制
  * @return {ACL_VSTRING*} 与 vp 相同
  */
-ACL_API ACL_VSTRING *acl_vstring_strncpy(ACL_VSTRING *vp, const char *src, size_t len);
+ACL_API ACL_VSTRING *acl_vstring_strncpy(ACL_VSTRING *vp,
+		const char *src, size_t len);
 
 /**
  * 附加拷贝字符串
@@ -107,41 +109,46 @@ ACL_API ACL_VSTRING *acl_vstring_strcat(ACL_VSTRING *vp, const char *src);
  * @param len {size_t} 规定长度限制
  * @return {ACL_VSTRING*} 与 vp 相同
  */
-ACL_API ACL_VSTRING *acl_vstring_strncat(ACL_VSTRING *vp, const char *src, size_t len);
+ACL_API ACL_VSTRING *acl_vstring_strncat(ACL_VSTRING *vp,
+		const char *src, size_t len);
 
 /**
- * 拷贝内存区数据
+ * 拷贝内存区数据，同时保证目标缓冲区尾部置 '\0'
  * @param vp {ACL_VSTRING*}
  * @param src {const char*} 源数据地址
  * @param len {size_t} 源数据长度
  * @return {ACL_VSTRING*} 与 vp 相同
  */
-ACL_API ACL_VSTRING *acl_vstring_memcpy(ACL_VSTRING *vp, const char *src, size_t len);
+ACL_API ACL_VSTRING *acl_vstring_memcpy(ACL_VSTRING *vp,
+		const char *src, size_t len);
 
 /**
- * 移动内存区数据, 源数据与目标地址的内存区可以是同一块内存区也可以不是同一块内存区
+ * 移动内存区数据, 源数据与目标地址的内存区可以是同一块内存区也可以不是
+ * 同一块内存区，该函数保证目标地址尾部以 '\0' 结尾
  * @param vp {ACL_VSTRING*}
  * @param src {const char*} 源数据地址
  * @param len {size_t} 源数据长度
  * @return {ACL_VSTRING*} 与 vp 相同
  */
-ACL_API ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len);
+ACL_API ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp,
+		const char *src, size_t len);
 
 /**
- * 拷贝内存区
+ * 拷贝内存区，该函数保证目标缓冲区以 '\0' 结尾
  * @param vp {ACL_VSTRING*}
  * @param src {const char*} 源数据地址
  * @param len {size_t} 源数据长度
  * @return {ACL_VSTRING*} 与 vp 相同
  */
-ACL_API ACL_VSTRING *acl_vstring_memcat(ACL_VSTRING *vp, const char *src, size_t len);
+ACL_API ACL_VSTRING *acl_vstring_memcat(ACL_VSTRING *vp,
+		const char *src, size_t len);
 
 /**
  * 查找某个字符
  * @param vp {ACL_VSTRING*}
  * @param ch {int} 要查找的字符
- * @return {char*} 目标字符所在位置的地址, 如果未查到则返回 NULL, 注：该返回地址是不能
- *  被单独释放的，因为其由 ACL_VSTRING 对象统一进行管理
+ * @return {char*} 目标字符所在位置的地址, 如果未查到则返回 NULL, 
+ *  注：该返回地址是不能被单独释放的，因为其由 ACL_VSTRING 对象统一进行管理
  */
 ACL_API char *acl_vstring_memchr(ACL_VSTRING *vp, int ch);
 
@@ -149,8 +156,8 @@ ACL_API char *acl_vstring_memchr(ACL_VSTRING *vp, int ch);
  * 查找某个字符串，字符串大小写敏感
  * @param vp {ACL_VSTRING*}
  * @param needle {const char*} 要查找的字符
- * @return {char*} 目标字符所在位置的地址, 如果未查到则返回 NULL, 注：该返回地址是不能
- *  被单独释放的，因为其由 ACL_VSTRING 对象统一进行管理
+ * @return {char*} 目标字符所在位置的地址, 如果未查到则返回 NULL, 
+ *  注：该返回地址是不能被单独释放的，因为其由 ACL_VSTRING 对象统一进行管理
  */
 ACL_API char *acl_vstring_strstr(ACL_VSTRING *vp, const char *needle);
 
@@ -158,8 +165,8 @@ ACL_API char *acl_vstring_strstr(ACL_VSTRING *vp, const char *needle);
  * 查找某个字符串，忽略字符串大小写
  * @param vp {ACL_VSTRING*}
  * @param needle {const char*} 要查找的字符
- * @return {char*} 目标字符所在位置的地址, 如果未查到则返回 NULL, 注：该返回地址是不能
- *  被单独释放的，因为其由 ACL_VSTRING 对象统一进行管理
+ * @return {char*} 目标字符所在位置的地址, 如果未查到则返回 NULL, 
+ *  注：该返回地址是不能被单独释放的，因为其由 ACL_VSTRING 对象统一进行管理
  */
 ACL_API char *acl_vstring_strcasestr(ACL_VSTRING *vp, const char *needle);
 
@@ -167,8 +174,8 @@ ACL_API char *acl_vstring_strcasestr(ACL_VSTRING *vp, const char *needle);
  * 从后向前查找字符串，字符串大小写敏感
  * @param vp {ACL_VSTRING*}
  * @param needle {const char*} 要查找的字符
- * @return {char*} 目标字符所在位置的地址, 如果未查到则返回 NULL, 注：该返回地址是不能
- *  被单独释放的，因为其由 ACL_VSTRING 对象统一进行管理
+ * @return {char*} 目标字符所在位置的地址, 如果未查到则返回 NULL, 
+ *  注：该返回地址是不能被单独释放的，因为其由 ACL_VSTRING 对象统一进行管理
  */
 ACL_API char *acl_vstring_rstrstr(ACL_VSTRING *vp, const char *needle);
 
@@ -176,13 +183,13 @@ ACL_API char *acl_vstring_rstrstr(ACL_VSTRING *vp, const char *needle);
  * 从后向前查找字符串，字符串大小写不敏感
  * @param vp {ACL_VSTRING*}
  * @param needle {const char*} 要查找的字符
- * @return {char*} 目标字符所在位置的地址, 如果未查到则返回 NULL, 注：该返回地址是不能
- *  被单独释放的，因为其由 ACL_VSTRING 对象统一进行管理
+ * @return {char*} 目标字符所在位置的地址, 如果未查到则返回 NULL,
+ *  注：该返回地址是不能被单独释放的，因为其由 ACL_VSTRING 对象统一进行管理
  */
 ACL_API char *acl_vstring_rstrcasestr(ACL_VSTRING *vp, const char *needle);
 
 /**
- * 向缓冲区的某个指定位置后添加数据
+ * 向缓冲区的某个指定位置后添加数据，同时保证目标缓冲区数据以 '\0' 结尾
  * @param vp {ACL_VSTRING*}
  * @param start {size_t} 指定的位置
  * @param buf {const char*} 数据地址
@@ -193,14 +200,14 @@ ACL_API ACL_VSTRING *acl_vstring_insert(ACL_VSTRING *vp, size_t start,
 		const char *buf, size_t len);
 
 /**
- * 向缓冲区的头部添加数据
+ * 向缓冲区的头部添加数据，同时保证目标缓冲区数据以 '\0' 结尾
  * @param vp {ACL_VSTRING*}
  * @param buf {const char*} 数据地址
  * @param len {size_t} 数据长度
  * @return {ACL_VSTRING*} 与 vp 相同
  */
 ACL_API ACL_VSTRING *acl_vstring_prepend(ACL_VSTRING *vp,
-	const char *buf, size_t len);
+		const char *buf, size_t len);
 
 /**
  * 向缓冲区按格式方式添加数据
@@ -210,7 +217,7 @@ ACL_API ACL_VSTRING *acl_vstring_prepend(ACL_VSTRING *vp,
  * @return {ACL_VSTRING*} 与 vp 相同
  */
 ACL_API ACL_VSTRING *ACL_PRINTF(2, 3) acl_vstring_sprintf(ACL_VSTRING *vp,
-	const char *format,...);
+		const char *format,...);
 
 /**
  * 以附加方式向缓冲区按格式方式添加数据
@@ -220,14 +227,14 @@ ACL_API ACL_VSTRING *ACL_PRINTF(2, 3) acl_vstring_sprintf(ACL_VSTRING *vp,
  * @return {ACL_VSTRING*} 与 vp 相同
  */
 ACL_API ACL_VSTRING *ACL_PRINTF(2, 3) acl_vstring_sprintf_append(
-	ACL_VSTRING *vp, const char *format,...);
+		ACL_VSTRING *vp, const char *format,...);
 
 /**
- * 导出缓冲区内的数据区同时将 ACL_VSTRING 对象释放，用户需要单独调用 acl_myfree 来
- * 释放返回的数据区内存
+ * 导出缓冲区内的数据区同时将 ACL_VSTRING 对象释放，用户需要单独调用
+ * acl_myfree 来释放返回的数据区内存
  * @param vp {ACL_VSTRING*}
- * @return {char*} 数据区地址，当返回值不为 NULL 时用户需要单独调用 acl_myfree 来
- *  释放该地址，否则会造成内存泄漏
+ * @return {char*} 数据区地址，当返回值不为 NULL 时用户需要单独调用
+ *  acl_myfree 来释放该地址，否则会造成内存泄漏
  */
 ACL_API char *acl_vstring_export(ACL_VSTRING *vp);
 
@@ -239,11 +246,12 @@ ACL_API char *acl_vstring_export(ACL_VSTRING *vp);
 ACL_API ACL_VSTRING *acl_vstring_import(char *str);
 
 /**
- * 将动态内存区与 ACL_VSTRING 粘合，注：vp 不能是调用 acl_vstring_alloc 产生的，
- * 并且不能调用 acl_vstring_init 进行过初始化, vp 可以是由 acl_mymalloc 产生或
- * 位于栈上的一个变量（如: ACL_VSTRING v）
- * @param vp {ACL_VSTRING*} 需由 acl_mymalloc 生成或是一个栈变量, 当以 acl_mymalloc
- *  方式生成的时应该通过 acl_myfree 释放它
+ * 将动态内存区与 ACL_VSTRING 粘合
+ * 注：vp 不能是调用 acl_vstring_alloc 产生的，并且不能调用 acl_vstring_init
+ *     进行过初始化, vp 可以是由 acl_mymalloc 产生或位于栈上的一个变量
+ *    （如: ACL_VSTRING v）
+ * @param vp {ACL_VSTRING*} 需由 acl_mymalloc 生成或是一个栈变量, 当以
+ *  acl_mymalloc 方式生成的时应该通过 acl_myfree 释放它
  * @param buf {void*} 用户传递的内存区, 可以是栈变量
  * @param len {size_t} buf 内存区的长度
  */
@@ -265,7 +273,8 @@ ACL_API char acl_vstring_charat(ACL_VSTRING *vp, size_t len);
  * @return {ACL_VSTRING*} 与 vp 相同
  * @see acl_vstring_sprintf
  */
-ACL_API ACL_VSTRING *acl_vstring_vsprintf(ACL_VSTRING *vp, const char *format, va_list ap);
+ACL_API ACL_VSTRING *acl_vstring_vsprintf(ACL_VSTRING *vp,
+		const char *format, va_list ap);
 
 /**
  * 按规定格式向尾部添加数据
@@ -274,7 +283,8 @@ ACL_API ACL_VSTRING *acl_vstring_vsprintf(ACL_VSTRING *vp, const char *format, v
  * @param ap {va_list}
  * @return {ACL_VSTRING*} 与 vp 相同
  */
-ACL_API ACL_VSTRING *acl_vstring_vsprintf_append(ACL_VSTRING *vp, const char *format, va_list ap);
+ACL_API ACL_VSTRING *acl_vstring_vsprintf_append(ACL_VSTRING *vp,
+		const char *format, va_list ap);
 
 /**
  * 按规定格式向头部添加数据
@@ -284,97 +294,110 @@ ACL_API ACL_VSTRING *acl_vstring_vsprintf_append(ACL_VSTRING *vp, const char *fo
  * @return {ACL_VSTRING*} 与 vp 相同
  */
 ACL_API ACL_VSTRING *ACL_PRINTF(2, 3) acl_vstring_sprintf_prepend(
-	ACL_VSTRING *vp, const char *format, ...);
+		ACL_VSTRING *vp, const char *format, ...);
 
 /**
- * 从源串中获得一行数据(不含 "\r\n" 和 "\n")，同时将剩余数据缓存起来, 如果未获得完整行，则只缓存源串
+ * 从源串中获得一行数据(不含 "\r\n" 和 "\n")，同时将剩余数据缓存起来, 如果
+ * 未获得完整行，则只缓存源串
  * @param vp {ACL_VSTRING*} 字符串数据缓存区
  * @param src {const char**} 源字符串指针地址, 返回后指针地址移动至下一位置
  * @param dlen {size_t} 源字符串数据长度
- * @return {const ACL_VSTRING*} NULL, 表示未找到 "\r\n" 或 "\n"，但会将剩余的数据
- *  拷贝至缓冲区内，应用需要通过 ACL_VSTRING_LEN 判断缓冲区中是否还有数据；!NULL，表示读到完整行
+ * @return {const ACL_VSTRING*} NULL, 表示未找到 "\r\n" 或 "\n"，但会将剩余
+ *  的数据拷贝至缓冲区内，应用需要通过 ACL_VSTRING_LEN 判断缓冲区中是否还有
+ *  数据；!NULL，表示读到完整行
  *  注：读到完整行后应该调用 ACL_VSTRING_RESET(vp) 将缓冲区清空
  */
-ACL_API const ACL_VSTRING *acl_buffer_gets_nonl(ACL_VSTRING *vp, const char **src, size_t dlen);
+ACL_API const ACL_VSTRING *acl_buffer_gets_nonl(ACL_VSTRING *vp,
+		const char **src, size_t dlen);
 
 /**
- * 从源串中获得一行数据(包含 "\r\n" 或 "\n")，同时将剩余数据缓存起来, 如果未获得完整行，则只缓存源串
+ * 从源串中获得一行数据(包含 "\r\n" 或 "\n")，同时将剩余数据缓存起来, 
+ * 如果未获得完整行，则只缓存源串
  * @param vp {ACL_VSTRING*} 字符串数据缓存区
  * @param src {const char**} 源字符串指针地址, 返回后指针地址移动至下一位置
  * @param dlen {size_t} 源字符串数据长度
- * @return {const ACL_VSTRING*} NULL, 表示未找到 "\r\n" 或 "\n"，但会将剩余的数据
- *  拷贝至缓冲区内，应用需要通过 ACL_VSTRING_LEN 判断缓冲区中是否还有数据；!NULL，表示读到完整行
+ * @return {const ACL_VSTRING*} NULL, 表示未找到 "\r\n" 或 "\n"，但会将剩余
+ *  的数据拷贝至缓冲区内，应用需要通过 ACL_VSTRING_LEN 判断缓冲区中是否还有
+ *  数据；!NULL，表示读到完整行
  *  注：读到完整行后应该调用 ACL_VSTRING_RESET(vp) 将缓冲区清空
  */
-ACL_API const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp, const char **src, size_t dlen);
+ACL_API const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp,
+		const char **src, size_t dlen);
 
  /*
   * Macros. Unsafe macros have UPPERCASE names.
   */
-#define ACL_VSTRING_SPACE(vp, len)	((vp)->vbuf.space(&(vp)->vbuf, len))
+#define ACL_VSTRING_SPACE(vp, len) ((vp)->vbuf.space(&(vp)->vbuf, len))
 
 /**
  * 取得当前 ACL_VSTRING 数据存储地址
  * @param vp {ACL_VSTRING*}
  * @return {char*}
  */
-#define acl_vstring_str(vp)		((char *) (vp)->vbuf.data)
+#define acl_vstring_str(vp) ((char *) (vp)->vbuf.data)
 
 /**
  * 取得当前 ACL_VSTRING 所存储的数据的长度
  * @param vp {ACL_VSTRING*}
  * @return {int}
  */
-#define ACL_VSTRING_LEN(vp)		(size_t) ((vp)->vbuf.ptr - (vp)->vbuf.data)
+#define ACL_VSTRING_LEN(vp) (size_t) ((vp)->vbuf.ptr - (vp)->vbuf.data)
 
 /**
  * 取得当前 ACL_VSTRING 内部缓冲区的总大小
  * @param vp {ACL_VSTRING*}
  * @return {int}
  */
-#define	ACL_VSTRING_SIZE(vp)		((vp)->vbuf.len)
+#define	ACL_VSTRING_SIZE(vp) ((vp)->vbuf.len)
 
 /**
  * 取得当前 ACL_VSTRING 的数据偏移指针位置
  * @param vp {ACL_VSTRING*}
  * @return {char*}
  */
-#define acl_vstring_end(vp)		((char *) (vp)->vbuf.ptr)
+#define acl_vstring_end(vp) ((char *) (vp)->vbuf.ptr)
 
 /**
  * 将 ACL_VSTRING 的数据偏移指针位置置 0
  * @param vp {ACL_VSTRING*}
  */
-#define ACL_VSTRING_TERMINATE(vp)	{ if ((vp)->vbuf.cnt <= 0) \
-						ACL_VSTRING_SPACE((vp),1); \
-				 	 *(vp)->vbuf.ptr = 0; }
+#define ACL_VSTRING_TERMINATE(vp) { \
+	if ((vp)->vbuf.cnt <= 0) \
+		ACL_VSTRING_SPACE((vp),1); \
+	*(vp)->vbuf.ptr = 0; \
+}
 
 /**
- * 重置 ACL_VSTRING 内部缓冲区同时将偏移指针位置置 0
+ * 重置 ACL_VSTRING 内部缓冲区指针地址起始位置，但不会将尾部数据置 0，应用可以
+ * 通过调用 ACL_VSTRING_TERMINATE 将缓冲数据尾部置 0
  * @param vp {ACL_VSTRING*}
  */
-#define ACL_VSTRING_RESET(vp)		{ (vp)->vbuf.ptr = (vp)->vbuf.data; \
-					  (vp)->vbuf.cnt = (vp)->vbuf.len; }
+#define ACL_VSTRING_RESET(vp) {	\
+	(vp)->vbuf.ptr = (vp)->vbuf.data; \
+	(vp)->vbuf.cnt = (vp)->vbuf.len; \
+}
 
 /**
  * 添加一个字符至 ACL_VSTRING 缓冲区
  * @param vp {ACL_VSTRING*}
  * @param ch {int} 字符
  */
-#define	ACL_VSTRING_ADDCH(vp, ch)	ACL_VBUF_PUT(&(vp)->vbuf, ch)
+#define	ACL_VSTRING_ADDCH(vp, ch) ACL_VBUF_PUT(&(vp)->vbuf, ch)
 
 /**
  * 移动数据偏移指针至内部缓冲区尾部
  * @param vp {ACL_VSTRING*}
  */
-#define ACL_VSTRING_SKIP(vp)		{ while ((vp)->vbuf.cnt > 0 && *(vp)->vbuf.ptr) \
-					  (vp)->vbuf.ptr++, (vp)->vbuf.cnt--; }
+#define ACL_VSTRING_SKIP(vp) { \
+	while ((vp)->vbuf.cnt > 0 && *(vp)->vbuf.ptr) \
+		(vp)->vbuf.ptr++, (vp)->vbuf.cnt--; \
+}
 
 /**
  * 当前 ACL_VSTRING 中还有多少数据可用
  * @param vp {ACL_VSTRING*}
  */
-#define acl_vstring_avail(vp)		((vp)->vbuf.cnt)
+#define acl_vstring_avail(vp) ((vp)->vbuf.cnt)
 
  /**
   * The following macro is not part of the public interface, because it can
@@ -383,11 +406,10 @@ ACL_API const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp, const char **src, si
 #define ACL_VSTRING_AT_OFFSET(vp, offset) { \
 	(vp)->vbuf.ptr = (vp)->vbuf.data + (offset); \
 	(vp)->vbuf.cnt = (vp)->vbuf.len - (offset); \
-    }
+}
 
 #ifdef  __cplusplus
 }
 #endif
 
 #endif
-

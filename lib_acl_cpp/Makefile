@@ -11,8 +11,8 @@ CFLAGS = -c -g -W -Wall -Wcast-align \
 -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS \
 -Wno-long-long \
 -fPIC \
--Wformat
-#-DHAS_POLARSSL
+-Wformat \
+-DHAS_POLARSSL
 #-DUSE_DYNAMIC
 
 #just for freebsd's iconv.h

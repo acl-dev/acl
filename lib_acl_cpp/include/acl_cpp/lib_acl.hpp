@@ -53,6 +53,9 @@
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 #include "acl_cpp/stream/aio_fstream.hpp"
 
+#include "acl_cpp/stream/polarssl_conf.hpp"
+#include "acl_cpp/stream/polarssl_io.hpp"
+
 #include "acl_cpp/ipc/ipc_client.hpp"
 #include "acl_cpp/ipc/ipc_server.hpp"
 #include "acl_cpp/ipc/ipc_service.hpp"

@@ -42,12 +42,6 @@ public:
 	 */
 	bool create(const char* path);
 
-	/**
-	 * 关闭文件流，同时关闭文件句柄
-	 * @return {bool} 关闭是否成功
-	 */
-	bool close();
-
 #ifdef WIN32
 	/**
 	 * 根据系统的文件句柄打开 fstream 文件流对象

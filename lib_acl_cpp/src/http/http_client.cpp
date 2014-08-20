@@ -104,8 +104,7 @@ void http_client::reset(void)
 }
 
 bool http_client::open(const char* addr, int conn_timeout /* = 60 */,
-	int rw_timeout /* = 60 */, bool unzip /* = true */,
-	bool use_ssl /* = false */)
+	int rw_timeout /* = 60 */, bool unzip /* = true */)
 {
 	is_request_ = true;
 
@@ -121,12 +120,6 @@ bool http_client::open(const char* addr, int conn_timeout /* = 60 */,
 	unzip_ = unzip;
 
 	if (stream->open(addr, conn_timeout, rw_timeout) == false)
-	{
-		delete stream;
-		disconnected_ = true;
-		return false;
-	}
-	if (use_ssl && stream->open_ssl_client() == false)
 	{
 		delete stream;
 		disconnected_ = true;

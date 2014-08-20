@@ -3,7 +3,7 @@
 class ServerConnection;
 
 /**
- * æœåŠ¡ç«¯è¿æ¥ IO å¤„ç†çš„å›è°ƒå¤„ç†ç±»
+ * ·şÎñ¶ËÁ¬½Ó IO ´¦ÀíµÄ»Øµ÷´¦ÀíÀà
  */
 class ServerIOCallback : public acl::aio_callback
 {

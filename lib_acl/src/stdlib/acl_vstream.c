@@ -109,6 +109,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		NULL,                           /* hproc */
 		ACL_SOCKET_INVALID,             /* iocp_sock */
 #endif
+		NULL,				/* objs_table */
 	},
 
 	{
@@ -165,6 +166,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		NULL,                           /* hproc */
 		ACL_SOCKET_INVALID,             /* iocp_sock */
 #endif
+		NULL,				/* objs_table */
 	},
 	{
 #ifdef ACL_UNIX
@@ -220,6 +222,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		NULL,                           /* hproc */
 		ACL_SOCKET_INVALID,             /* iocp_sock */
 #endif
+		NULL,				/* objs_table */
 	},
 };
 
@@ -2630,6 +2633,9 @@ int acl_vstream_close(ACL_VSTREAM *fp)
 		acl_array_destroy(fp->close_handle_lnk, NULL);
 	}
 
+	if (fp->objs_table)
+		acl_htable_free(fp->objs_table, NULL);
+
 	if (ACL_VSTREAM_SOCK(fp) != ACL_SOCKET_INVALID && fp->close_fn)
 		ret = fp->close_fn(ACL_VSTREAM_SOCK(fp));
 	else if (ACL_VSTREAM_FILE(fp) != ACL_FILE_INVALID && fp->fclose_fn)
@@ -2923,4 +2929,31 @@ const char *acl_vstream_strerror(ACL_VSTREAM *fp)
 		return err;
 
 	return fp->errbuf;
+}
+
+int acl_vstream_add_object(ACL_VSTREAM *fp, const char *key, void *obj)
+{
+	if (fp == NULL || key == NULL || *key == 0 || obj == NULL)
+		return -1;
+
+	if (fp->objs_table == NULL)
+		fp->objs_table = acl_htable_create(5, ACL_HTABLE_FLAG_KEY_LOWER);
+
+	acl_htable_enter(fp->objs_table, key, obj);
+	return 0;
+}
+
+int acl_vstream_del_object(ACL_VSTREAM *fp, const char *key)
+{
+	if (fp == NULL || fp->objs_table == NULL || key == NULL || *key == 0)
+		return -1;
+
+	return acl_htable_delete(fp->objs_table, key, NULL);
+}
+
+void *acl_vstream_get_object(ACL_VSTREAM *fp, const char *key)
+{
+	if (fp == NULL || fp->objs_table == NULL || key == NULL || *key == 0)
+		return NULL;
+	return acl_htable_find(fp->objs_table, key);
 }

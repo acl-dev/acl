@@ -10,14 +10,14 @@ ServerConnection::ServerConnection(acl::aio_socket_stream* conn)
 
 void ServerConnection::run()
 {
-	// åˆ›å»ºæœåŠ¡ç«¯è¿æ¥ IO å¤„ç†çš„å›è°ƒå¤„ç†å¯¹è±¡
+	// ´´½¨·şÎñ¶ËÁ¬½Ó IO ´¦ÀíµÄ»Øµ÷´¦Àí¶ÔÏó
 	ServerIOCallback* callback = new ServerIOCallback(this);
 
 	conn_->add_read_callback(callback);
 	conn_->add_close_callback(callback);
 	conn_->add_timeout_callback(callback);
 
-	// å¼‚æ­¥ä»æœåŠ¡ç«¯è·å–ä¸€è¡Œæ•°æ®
+	// Òì²½´Ó·şÎñ¶Ë»ñÈ¡Ò»ĞĞÊı¾İ
 	conn_->gets();
 }
 

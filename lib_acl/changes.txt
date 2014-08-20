@@ -1,6 +1,11 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+454) 2014.8.20
+454.1) feature: ACL_VSTREAM 增加了 objs_table 成员用来存放 KEY-OBJECT 对象，
+可以通过 acl_vstream_add_object/acl_vstream_get_object/acl_vstream_del_object
+来操作
+
 453) 2014.7.31
 453.1) compile: 在FreeBSD9.2(64)上编译通过
 

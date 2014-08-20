@@ -25,7 +25,7 @@ bool ServerIOCallback::read_callback(char* data, int len)
 		return false;
 	}
 
-	// å¤„ç†æœåŠ¡ç«¯å‘æ¥çš„å‘½ä»¤
+	// ´¦Àí·şÎñ¶Ë·¢À´µÄÃüÁî
 
 	acl::url_coder coder;
 	coder.decode(data);
@@ -42,7 +42,7 @@ bool ServerIOCallback::read_callback(char* data, int len)
 	unsigned int nconns = (unsigned int) atoi(ptr);
 	conn_->set_nconns(nconns);
 
-	// å°è¯•å°†æœåŠ¡ç«¯è¿æ¥å¯¹è±¡æ·»åŠ è¿›æœåŠ¡ç«¯ç®¡ç†å¯¹è±¡ä¸­
+	// ³¢ÊÔ½«·şÎñ¶ËÁ¬½Ó¶ÔÏóÌí¼Ó½ø·şÎñ¶Ë¹ÜÀí¶ÔÏóÖĞ
 	ServerManager::get_instance().set(conn_);
 
 	return true;

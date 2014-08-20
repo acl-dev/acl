@@ -195,8 +195,10 @@ void  acl_vstring_ctl(ACL_VSTRING *vp,...)
 
 ACL_VSTRING *acl_vstring_truncate(ACL_VSTRING *vp, size_t len)
 {
-	if (len < ACL_VSTRING_LEN(vp))
+	if (len < ACL_VSTRING_LEN(vp)) {
 		ACL_VSTRING_AT_OFFSET(vp, len);
+		ACL_VSTRING_TERMINATE(vp);
+	}
 	return (vp);
 }
 
@@ -261,6 +263,7 @@ ACL_VSTRING *acl_vstring_memcpy(ACL_VSTRING *vp, const char *src, size_t len)
 	ACL_VSTRING_SPACE(vp, len);
 	memcpy(acl_vstring_str(vp), src, len);
 	ACL_VSTRING_AT_OFFSET(vp, len);
+	ACL_VSTRING_TERMINATE(vp);
 	return (vp);
 }
 
@@ -274,6 +277,7 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 		/* 说明是同一内存区间的数据移动 */
 		memmove(acl_vstring_str(vp), src, len);
 		ACL_VSTRING_AT_OFFSET(vp, len);
+		ACL_VSTRING_TERMINATE(vp);
 		return (vp);
 	} else {
 		/* 说明不是同一内存区间的数据移动 */
@@ -284,6 +288,7 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 		vp->vbuf.data = (unsigned char *) ptr;
 		vp->vbuf.len = len;
 		ACL_VSTRING_AT_OFFSET(vp, len);
+		ACL_VSTRING_TERMINATE(vp);
 		vp->maxlen = 0;
 		return (vp);
 	}
@@ -297,6 +302,7 @@ ACL_VSTRING *acl_vstring_memcat(ACL_VSTRING *vp, const char *src, size_t len)
 	memcpy(acl_vstring_end(vp), src, len);
 	len += ACL_VSTRING_LEN(vp);
 	ACL_VSTRING_AT_OFFSET(vp, len);
+	ACL_VSTRING_TERMINATE(vp);
 	return (vp);
 }
 

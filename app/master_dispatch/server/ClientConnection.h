@@ -10,7 +10,7 @@ public:
 	bool expired() const;
 
 protected:
-	// 鍩虹被绾櫄鍑芥暟
+	// 基类纯虚函数
 	void run();
 
 private:

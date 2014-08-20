@@ -373,6 +373,12 @@
     <ClCompile Include="src\stdlib\scan_dir.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\stream\polarssl_io.cpp">
+      <Filter>src\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\polarssl_conf.cpp">
+      <Filter>src\stream</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -770,6 +776,12 @@
     </ClInclude>
     <ClInclude Include="resource_vc2012.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\polarssl_io.hpp">
+      <Filter>include\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\polarssl_conf.hpp">
+      <Filter>include\stream</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

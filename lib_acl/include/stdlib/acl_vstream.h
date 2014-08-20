@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 #include "acl_array.h"
-#include "acl_binhash.h"
+#include "acl_htable.h"
 #include "acl_vstring.h"
 
 #define	ACL_VSTREAM_EOF		(-1)		/* no more space or data */
@@ -169,6 +169,7 @@ struct ACL_VSTREAM {
 #elif defined(ACL_UNIX)
 	pid_t pid;
 #endif
+	ACL_HTABLE *objs_table;
 };
 
 extern ACL_API ACL_VSTREAM acl_vstream_fstd[];  /**< pre-defined streams */
@@ -836,6 +837,10 @@ ACL_API void acl_vstream_set_local(ACL_VSTREAM *fp, const char *addr);
  */
 ACL_API void acl_vstream_set_local_addr(ACL_VSTREAM *fp,
 	const struct sockaddr_in *sa);
+
+ACL_API int acl_vstream_add_object(ACL_VSTREAM *fp, const char *key, void *obj);
+ACL_API int acl_vstream_del_object(ACL_VSTREAM *fp, const char *key);
+ACL_API void *acl_vstream_get_object(ACL_VSTREAM *fp, const char *key);
 
 /**
  * 设定流的读/写套接字

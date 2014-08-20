@@ -267,6 +267,18 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	test_buffer_space();
 
 	test_vstring_vsprintf("test: %s", s1);
+
+	ACL_VSTRING* vv = acl_vstring_alloc(1);
+	acl_vstring_memcpy(vv, "hello", strlen("hello"));
+	printf(">>>after acl_vstring_memcpy: [%s], len: %d\r\n",
+		acl_vstring_str(vv), (int) ACL_VSTRING_LEN(vv));
+	ACL_VSTRING_RESET(vv);
+	printf(">>>after ACL_VSTRING_RESET: [%s], len: %d\r\n",
+		acl_vstring_str(vv), (int) ACL_VSTRING_LEN(vv));
+	ACL_VSTRING_TERMINATE(vv);
+	printf(">>>after ACL_VSTRING_TERMINATE: [%s], len: %d\r\n",
+		acl_vstring_str(vv), (int) ACL_VSTRING_LEN(vv));
+	acl_vstring_free(vv);
 	end();
 	return (0);
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-// çº¯è™šç±»ï¼Œç”¨æ¥å¤„ç†æ¥è‡ªäºå®¢æˆ·ç«¯åŠæœåŠ¡ç«¯çš„è¿æ¥
+// ´¿ĞéÀà£¬ÓÃÀ´´¦ÀíÀ´×ÔÓÚ¿Í»§¶Ë¼°·şÎñ¶ËµÄÁ¬½Ó
 class IConnection
 {
 public:
@@ -8,18 +8,18 @@ public:
 	virtual ~IConnection() {}
 
 	/**
-	 * çº¯è™šå‡½æ•°ï¼Œå­ç±»å¿…é¡»å®ç°
+	 * ´¿Ğéº¯Êı£¬×ÓÀà±ØĞëÊµÏÖ
 	 */
 	virtual void run() = 0;
 
 	/**
-	 * è·å¾—è¿æ¥å¯¹è±¡çš„ socket æè¿°ç¬¦
+	 * »ñµÃÁ¬½Ó¶ÔÏóµÄ socket ÃèÊö·û
 	 * @return {int}
 	 */
 	int   sock_handle() const;
 
 	/**
-	 * è·å¾—è¿æ¥å¯¹è±¡çš„åœ°å€
+	 * »ñµÃÁ¬½Ó¶ÔÏóµÄµØÖ·
 	 * @return {const char*}
 	 */
 	const char* get_peer(bool full = true) const;
