@@ -1,9 +1,9 @@
 /**
- * \file timing.h
+ * \file x509write.h
  *
- * \brief Portable interface to the CPU cycle counter
+ * \brief X509 buffer writing functionality
  *
- *  Copyright (C) 2006-2010, Brainspark B.V.
+ *  Copyright (C) 2006-2012, Brainspark B.V.
  *
  *  This file is part of PolarSSL (http://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
@@ -24,52 +24,31 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-#ifndef POLARSSL_TIMING_H
-#define POLARSSL_TIMING_H
+#ifndef POLARSSL_X509_WRITE_H
+#define POLARSSL_X509_WRITE_H
 
-/**
- * \brief          timer structure
- */
-struct hr_time
-{
-    unsigned char opaque[32];
-};
+#include "rsa.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern volatile int alarmed;
+typedef struct _x509_req_name
+{
+    char oid[128];
+    char name[128];
 
-/**
- * \brief          Return the CPU cycle counter value
- */
-unsigned long hardclock( void );
+    struct _x509_req_name *next;
+}
+x509_req_name;
 
-/**
- * \brief          Return the elapsed time in milliseconds
- *
- * \param val      points to a timer structure
- * \param reset    if set to 1, the timer is restarted
- */
-unsigned long get_timer( struct hr_time *val, int reset );
-
-/**
- * \brief          Setup an alarm clock
- *
- * \param seconds  delay before the "alarmed" flag is set
- */
-void set_alarm( int seconds );
-
-/**
- * \brief          Sleep for a certain amount of time
- *
- * \param milliseconds  delay in milliseconds
- */
-void m_sleep( int milliseconds );
+int x509_write_pubkey_der( unsigned char *buf, size_t size, rsa_context *rsa );
+int x509_write_key_der( unsigned char *buf, size_t size, rsa_context *rsa );
+int x509_write_cert_req( unsigned char *buf, size_t size, rsa_context *rsa,
+                         x509_req_name *req_name, int hash_id );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* timing.h */
+#endif /* POLARSSL_X509_WRITE_H */

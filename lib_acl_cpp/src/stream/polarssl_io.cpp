@@ -39,7 +39,7 @@ polarssl_io::~polarssl_io()
 
 	// 默认使用 havege_random 随机生成器，因为 ctr_drbg_random
 	// 内部有线程加锁过程
-# define HAS_HAVEGE
+# undef HAS_HAVEGE
 
 # ifdef HAS_HAVEGE
 	if (rnd_)
@@ -50,7 +50,9 @@ polarssl_io::~polarssl_io()
 # else
 	if (rnd_)
 	{
+#  ifdef POLARSSL_1_3_X
 		ctr_drbg_free((ctr_drbg_context*) rnd_);
+#  endif
 		acl_myfree(rnd_);
 	}
 # endif
@@ -106,13 +108,13 @@ bool polarssl_io::open(stream* s)
 
 	// 初始化随机数生成过程
 
-#ifdef HAS_HAVEGE
+# ifdef HAS_HAVEGE
 	rnd_  = acl_mymalloc(sizeof(havege_state));
 	::havege_init((havege_state*) rnd_);
 
 	// 设置随机数生成器
 	::ssl_set_rng((ssl_context*) ssl_, havege_random, rnd_);
-#else
+# else
 	rnd_ = acl_mymalloc(sizeof(ctr_drbg_context));
 
 	char pers[50];
@@ -130,7 +132,7 @@ bool polarssl_io::open(stream* s)
 
 	// 设置随机数生成器
 	::ssl_set_rng((ssl_context*) ssl_, ctr_drbg_random, rnd_);
-#endif
+# endif
 
 	//ssl_set_dbg(ssl_, my_debug, stdout);
 	
@@ -139,6 +141,7 @@ bool polarssl_io::open(stream* s)
 		// 只有客户端模式下才会调用此过程
 
 		ssn_ = acl_mycalloc(1, sizeof(ssl_session));
+# ifdef POLARSSL_1_3_X
 		ret = ::ssl_set_session((ssl_context*) ssl_,
 			(ssl_session*) ssn_);
 		if (ret != 0)
@@ -147,6 +150,9 @@ bool polarssl_io::open(stream* s)
 			acl_myfree(ssn_);
 			ssn_ = NULL;
 		}
+# else
+		::ssl_set_session((ssl_context*) ssl_, (ssl_session*) ssn_);
+# endif
 	}
 
 	// 配置全局参数（包含证书、私钥）

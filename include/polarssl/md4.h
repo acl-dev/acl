@@ -3,7 +3,7 @@
  *
  * \brief MD4 message digest algorithm (hash function)
  *
- *  Copyright (C) 2006-2014, Brainspark B.V.
+ *  Copyright (C) 2006-2013, Brainspark B.V.
  *
  *  This file is part of PolarSSL (http://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
@@ -27,15 +27,11 @@
 #ifndef POLARSSL_MD4_H
 #define POLARSSL_MD4_H
 
-#if !defined(POLARSSL_CONFIG_FILE)
 #include "config.h"
-#else
-#include POLARSSL_CONFIG_FILE
-#endif
 
 #include <string.h>
 
-#if defined(_MSC_VER) && !defined(EFIX64) && !defined(EFI32)
+#ifdef _MSC_VER
 #include <basetsd.h>
 typedef UINT32 uint32_t;
 #else
@@ -47,10 +43,6 @@ typedef UINT32 uint32_t;
 #if !defined(POLARSSL_MD4_ALT)
 // Regular implementation
 //
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * \brief          MD4 context structure
@@ -66,19 +58,9 @@ typedef struct
 }
 md4_context;
 
-/**
- * \brief          Initialize MD4 context
- *
- * \param ctx      MD4 context to be initialized
- */
-void md4_init( md4_context *ctx );
-
-/**
- * \brief          Clear MD4 context
- *
- * \param ctx      MD4 context to be cleared
- */
-void md4_free( md4_context *ctx );
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * \brief          MD4 context setup
@@ -142,8 +124,7 @@ int md4_file( const char *path, unsigned char output[16] );
  * \param key      HMAC secret key
  * \param keylen   length of the HMAC key
  */
-void md4_hmac_starts( md4_context *ctx, const unsigned char *key,
-                      size_t keylen );
+void md4_hmac_starts( md4_context *ctx, const unsigned char *key, size_t keylen );
 
 /**
  * \brief          MD4 HMAC process buffer
@@ -152,8 +133,7 @@ void md4_hmac_starts( md4_context *ctx, const unsigned char *key,
  * \param input    buffer holding the  data
  * \param ilen     length of the input data
  */
-void md4_hmac_update( md4_context *ctx, const unsigned char *input,
-                      size_t ilen );
+void md4_hmac_update( md4_context *ctx, const unsigned char *input, size_t ilen );
 
 /**
  * \brief          MD4 HMAC final digest
@@ -189,9 +169,6 @@ void md4_hmac( const unsigned char *key, size_t keylen,
  * \return         0 if successful, or 1 if the test failed
  */
 int md4_self_test( int verbose );
-
-/* Internal use */
-void md4_process( md4_context *ctx, const unsigned char data[64] );
 
 #ifdef __cplusplus
 }

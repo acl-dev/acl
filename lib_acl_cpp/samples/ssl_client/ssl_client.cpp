@@ -232,11 +232,16 @@ int main(int argc, char* argv[])
 	// 126 的 SSL 传输时当 HTTP 请求头中的 Host 值为 mail.126.com:443 时其 nginx
 	// 会报错，只能是：Host: mail.126.com，土鳖
 
-	test1("mail.126.com", 443, false, true);
-	test2("mail.126.com", 443, false, true);
-	test2("mail.qq.com", 443, false, true);
-	test2("mail.sohu.com", 443, false, true);
-	test2("mail.sina.com.cn", 443, false, true);
+	if (0)
+	{
+		test1("mail.126.com", 443, false, true);
+		test2("mail.126.com", 443, false, true);
+		test2("mail.qq.com", 443, false, true);
+		test2("mail.sohu.com", 443, false, true);
+		test2("mail.sina.com.cn", 443, false, true);
+	}
+	else
+		test2("mm.263.com", 1443, false, true);
 
 	printf("Over, enter any key to exit!\n");
 	getchar();

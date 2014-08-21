@@ -3,7 +3,7 @@
  *
  * \brief SHA-384 and SHA-512 cryptographic hash function
  *
- *  Copyright (C) 2006-2010, Brainspark B.V.
+ *  Copyright (C) 2006-2013, Brainspark B.V.
  *
  *  This file is part of PolarSSL (http://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
@@ -27,25 +27,31 @@
 #ifndef POLARSSL_SHA4_H
 #define POLARSSL_SHA4_H
 
-#include <string.h>
+#include "config.h"
 
-#define POLARSSL_ERR_SHA4_FILE_IO_ERROR                -0x007A  /**< Read/write error in file. */
+#include <string.h>
 
 #if defined(_MSC_VER) || defined(__WATCOMC__)
   #define UL64(x) x##ui64
-  #define long64 __int64
+  typedef unsigned __int64 uint64_t;
 #else
+  #include <inttypes.h>
   #define UL64(x) x##ULL
-  #define long64 long long
 #endif
+
+#define POLARSSL_ERR_SHA4_FILE_IO_ERROR                -0x007A  /**< Read/write error in file. */
+
+#if !defined(POLARSSL_SHA1_ALT)
+// Regular implementation
+//
 
 /**
  * \brief          SHA-512 context structure
  */
 typedef struct
 {
-    unsigned long64 total[2];    /*!< number of bytes processed  */
-    unsigned long64 state[8];    /*!< intermediate digest state  */
+    uint64_t total[2];          /*!< number of bytes processed  */
+    uint64_t state[8];          /*!< intermediate digest state  */
     unsigned char buffer[128];  /*!< data block being processed */
 
     unsigned char ipad[128];    /*!< HMAC: inner padding        */
@@ -82,6 +88,18 @@ void sha4_update( sha4_context *ctx, const unsigned char *input, size_t ilen );
  * \param output   SHA-384/512 checksum result
  */
 void sha4_finish( sha4_context *ctx, unsigned char output[64] );
+
+#ifdef __cplusplus
+}
+#endif
+
+#else  /* POLARSSL_SHA4_ALT */
+#include "sha4_alt.h"
+#endif /* POLARSSL_SHA4_ALT */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * \brief          Output = SHA-512( input buffer )

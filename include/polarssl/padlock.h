@@ -1,10 +1,9 @@
 /**
  * \file padlock.h
  *
- * \brief VIA PadLock ACE for HW encryption/decryption supported by some
- *        processors
+ * \brief VIA PadLock ACE for HW encryption/decryption supported by some processors
  *
- *  Copyright (C) 2006-2014, Brainspark B.V.
+ *  Copyright (C) 2006-2010, Brainspark B.V.
  *
  *  This file is part of PolarSSL (http://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
@@ -38,7 +37,7 @@
 #define POLARSSL_HAVE_X86
 #endif
 
-#if defined(_MSC_VER) && !defined(EFIX64) && !defined(EFI32)
+#ifdef _MSC_VER
 #include <basetsd.h>
 typedef INT32 int32_t;
 #else
@@ -60,7 +59,7 @@ extern "C" {
 /**
  * \brief          PadLock detection routine
  *
- * \param feature  The feature to detect
+ * \param          The feature to detect
  *
  * \return         1 if CPU has support for the feature, 0 otherwise
  */

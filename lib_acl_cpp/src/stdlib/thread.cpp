@@ -72,7 +72,7 @@ bool thread::start()
 
 #ifdef	WIN32
 	int   ret = acl_pthread_create((acl_pthread_t*) thread_,
-		&attr, thread_run, this);
+			&attr, thread_run, this);
 #else
 	int   ret = acl_pthread_create((pthread_t*) &thread_, &attr,
 			thread_run, this);
@@ -84,8 +84,10 @@ bool thread::start()
 		return false;
 	}
 
-#ifdef WIN32
+#ifdef	WIN32
 	thread_id_ = ((acl_pthread_t*) thread_)->id;
+#elif	defined(LINUX2)
+	thread_id_ = thread_;
 #endif
 
 	return true;
@@ -93,15 +95,22 @@ bool thread::start()
 
 bool thread::wait(void** out /* = NULL */)
 {
-	if (thread_id_ == 0)
-	{
-		logger_error("thread not running!");
-		return false;
-	}
-
 	if (detachable_)
 	{
 		logger_error("detachable thread can't be wait!");
+		return false;
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		if (thread_id_ != 0)
+			break;
+		sleep(1);
+	}
+
+	if (thread_id_ == 0)
+	{
+		logger_error("thread not running!");
 		return false;
 	}
 

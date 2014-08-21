@@ -5,7 +5,7 @@
  *
  * \author Adriaan de Jong <dejong@fox-it.com>
  *
- *  Copyright (C) 2006-2014, Brainspark B.V.
+ *  Copyright (C) 2006-2011, Brainspark B.V.
  *
  *  This file is part of PolarSSL (http://www.polarssl.org)
  *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
@@ -29,15 +29,11 @@
 #ifndef POLARSSL_PKCS11_H
 #define POLARSSL_PKCS11_H
 
-#if !defined(POLARSSL_CONFIG_FILE)
 #include "config.h"
-#else
-#include POLARSSL_CONFIG_FILE
-#endif
 
 #if defined(POLARSSL_PKCS11_C)
 
-#include "x509_crt.h"
+#include "x509.h"
 
 #include <pkcs11-helper-1.0/pkcs11h-certificate.h>
 
@@ -48,10 +44,6 @@
 #define inline __inline
 #endif /* __ARMCC_VERSION */
 #endif /*_MSC_VER */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * Context for PKCS #11 private keys.
@@ -69,7 +61,7 @@ typedef struct {
  *
  * \return              0 on success.
  */
-int pkcs11_x509_cert_init( x509_crt *cert, pkcs11h_certificate_t pkcs11h_cert );
+int pkcs11_x509_cert_init( x509_cert *cert, pkcs11h_certificate_t pkcs11h_cert );
 
 /**
  * Initialise a pkcs11_context, storing the given certificate. Note that the
@@ -93,8 +85,7 @@ int pkcs11_priv_key_init( pkcs11_context *priv_key,
 void pkcs11_priv_key_free( pkcs11_context *priv_key );
 
 /**
- * \brief          Do an RSA private key decrypt, then remove the message
- *                 padding
+ * \brief          Do an RSA private key decrypt, then remove the message padding
  *
  * \param ctx      PKCS #11 context
  * \param mode     must be RSA_PRIVATE, for compatibility with rsa.c's signature
@@ -120,8 +111,8 @@ int pkcs11_decrypt( pkcs11_context *ctx,
  *
  * \param ctx      PKCS #11 context
  * \param mode     must be RSA_PRIVATE, for compatibility with rsa.c's signature
- * \param md_alg   a POLARSSL_MD_* (use POLARSSL_MD_NONE for signing raw data)
- * \param hashlen  message digest length (for POLARSSL_MD_NONE only)
+ * \param hash_id  SIG_RSA_RAW, SIG_RSA_MD{2,4,5} or SIG_RSA_SHA{1,224,256,384,512}
+ * \param hashlen  message digest length (for SIG_RSA_RAW only)
  * \param hash     buffer holding the message digest
  * \param sig      buffer that will hold the ciphertext
  *
@@ -133,7 +124,7 @@ int pkcs11_decrypt( pkcs11_context *ctx,
  */
 int pkcs11_sign( pkcs11_context *ctx,
                     int mode,
-                    md_type_t md_alg,
+                    int hash_id,
                     unsigned int hashlen,
                     const unsigned char *hash,
                     unsigned char *sig );
@@ -141,22 +132,25 @@ int pkcs11_sign( pkcs11_context *ctx,
 /**
  * SSL/TLS wrappers for PKCS#11 functions
  */
-static inline int ssl_pkcs11_decrypt( void *ctx, int mode, size_t *olen,
-                        const unsigned char *input, unsigned char *output,
-                        size_t output_max_len )
+static inline int ssl_pkcs11_decrypt( void *ctx,
+                     int (*f_rng)(void *, unsigned char *, size_t), void *p_rng,
+                     int mode, size_t *olen, const unsigned char *input,
+                     unsigned char *output, size_t output_max_len )
 {
+    ((void) f_rng);
+    ((void) p_rng);
     return pkcs11_decrypt( (pkcs11_context *) ctx, mode, olen, input, output,
                            output_max_len );
 }
 
 static inline int ssl_pkcs11_sign( void *ctx,
                      int (*f_rng)(void *, unsigned char *, size_t), void *p_rng,
-                     int mode, md_type_t md_alg, unsigned int hashlen,
+                     int mode, int hash_id, unsigned int hashlen,
                      const unsigned char *hash, unsigned char *sig )
 {
     ((void) f_rng);
     ((void) p_rng);
-    return pkcs11_sign( (pkcs11_context *) ctx, mode, md_alg,
+    return pkcs11_sign( (pkcs11_context *) ctx, mode, hash_id,
                         hashlen, hash, sig );
 }
 
@@ -164,10 +158,6 @@ static inline size_t ssl_pkcs11_key_len( void *ctx )
 {
     return ( (pkcs11_context *) ctx )->len;
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* POLARSSL_PKCS11_C */
 
