@@ -20,14 +20,16 @@ static void test0(int i)
 	acl::string addr("127.0.0.1:441");
 	if (client.open(addr.c_str(), 60, 60) == false)
 	{
-		std::cout << "connect " << addr.c_str() << " error!" << std::endl;
+		std::cout << "connect " << addr.c_str()
+			<< " error!" << std::endl;
 		return;
 	}
 
 	acl::polarssl_io* ssl = new acl::polarssl_io(__ssl_conf, false);
 	if (client.setup_hook(ssl) == ssl)
 	{
-		std::cout << "open ssl " << addr.c_str() << " error!" << std::endl;
+		std::cout << "open ssl " << addr.c_str()
+			<< " error!" << std::endl;
 		ssl->destroy();
 		return;
 	}
@@ -38,14 +40,16 @@ static void test0(int i)
 	line[1022] = '\n';
 	if (client.write(line, strlen(line)) == -1)
 	{
-		std::cout << "write to " << addr.c_str() << " error!" << std::endl;
+		std::cout << "write to " << addr.c_str()
+			<< " error!" << std::endl;
 		return;
 	}
 
 	size_t n = sizeof(line);
 	if (client.gets(line, &n) == false)
 	{
-		std::cout << "gets from " << addr.c_str() << " error!" << std::endl;
+		std::cout << "gets from " << addr.c_str()
+			<< " error!" << std::endl;
 		return;
 	}
 	if (i < 10)
@@ -232,16 +236,11 @@ int main(int argc, char* argv[])
 	// 126 的 SSL 传输时当 HTTP 请求头中的 Host 值为 mail.126.com:443 时其 nginx
 	// 会报错，只能是：Host: mail.126.com，土鳖
 
-	if (0)
-	{
-		test1("mail.126.com", 443, false, true);
-		test2("mail.126.com", 443, false, true);
-		test2("mail.qq.com", 443, false, true);
-		test2("mail.sohu.com", 443, false, true);
-		test2("mail.sina.com.cn", 443, false, true);
-	}
-	else
-		test2("mm.263.com", 1443, false, true);
+	test1("mail.126.com", 443, false, true);
+	test2("mail.126.com", 443, false, true);
+	test2("mail.qq.com", 443, false, true);
+	test2("mail.sohu.com", 443, false, true);
+	test2("mail.sina.com.cn", 443, false, true);
 
 	printf("Over, enter any key to exit!\n");
 	getchar();
