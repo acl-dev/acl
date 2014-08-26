@@ -942,6 +942,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stream\polarssl_conf.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\stream\polarssl_io.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stream\server_socket.cpp"
 					>
 				</File>
@@ -1469,6 +1477,14 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\ostream.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\polarssl_conf.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\polarssl_io.hpp"
 					>
 				</File>
 				<File

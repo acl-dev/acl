@@ -382,7 +382,7 @@ static void do_alone(const char* crt_file, const char* key_file)
 {
 	master_service service(crt_file, key_file);
 	acl::log::stdout_open(true);
-	const char* addr = "0.0.0.0:443";
+	const char* addr = "0.0.0.0:2443";
 	printf("listen: %s ...\r\n", addr);
 	service.run_alone(addr, NULL, 0);  // 单独运行方式
 }
@@ -400,6 +400,7 @@ int main(int argc, char* argv[])
 #ifdef WIN32
 	acl::acl_cpp_init();
 #endif
+	acl::log::stdout_open(true);
 
 	// 开始运行
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
@@ -416,6 +417,8 @@ int main(int argc, char* argv[])
 
 		do_alone(crt_file, key_file);
 	}
+	else if (argc >= 2)
+		printf("usage: %s alone cert_file key_file\r\n", argv[0]);
 	else
 		do_cgi();
 
