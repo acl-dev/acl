@@ -1,7 +1,7 @@
 # acl -- one advanced C/C++ lib for UNIX and WINDOWS
 
 ## Ò»¡¢ÃèÊö
-acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·þÎñÆ÷±à³Ì¿ò¼Ü£¬Í¬Ê±Ìá¹©¸ü¶àµÄÊµÓÃ¹¦ÄÜ¿â¡£Í¨¹ý¸Ã¿â£¬ÓÃ»§¿ÉÒÔ·Ç³£ÈÝÒ×µØ±àÐ´Ö§³Ö¶àÖÖÄ£Ê½(¶àÏß³Ì¡¢¶à½ø³Ì¡¢·Ç×èÈû¡¢´¥·¢Æ÷¡¢UDP·½Ê½)µÄ·þÎñÆ÷³ÌÐò£¬WEB Ó¦ÓÃ³ÌÐò£¬Êý¾Ý¿âÓ¦ÓÃ³ÌÐò¡£´ËÍâ£¬¸Ã¿â»¹Ìá¹©ÁË³£¼ûÓ¦ÓÃµÄ¿Í»§¶ËÍ¨ÐÅ¿â£¨Èç£ºHTTP¡¢SMTP¡¢ICMP¡¢memcache¡¢beanstalk£©£¬³£¼ûÁ÷Ê½±à½âÂë¿â£ºXML/JSON/MIME/BASE64/UUCODE/QPCODE/RFC2047 etc¡£
+acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·þÎñÆ÷±à³Ì¿ò¼Ü£¬Í¬Ê±Ìá¹©¸ü¶àµÄÊµÓÃ¹¦ÄÜ¿â¡£Í¨¹ý¸Ã¿â£¬ÓÃ»§¿ÉÒÔ·Ç³£ÈÝÒ×µØ±àÐ´Ö§³Ö¶àÖÖÄ£Ê½(¶àÏß³Ì¡¢¶à½ø³Ì¡¢·Ç×èÈû¡¢´¥·¢Æ÷¡¢UDP·½Ê½)µÄ·þÎñÆ÷³ÌÐò£¬WEB Ó¦ÓÃ³ÌÐò£¬Êý¾Ý¿âÓ¦ÓÃ³ÌÐò¡£´ËÍâ£¬¸Ã¿â»¹Ìá¹©ÁË³£¼ûÓ¦ÓÃµÄ¿Í»§¶ËÍ¨ÐÅ¿â£¨Èç£ºHTTP¡¢SMTP¡¢ICMP¡¢memcache¡¢beanstalk¡¢handler socket£©£¬³£¼ûÁ÷Ê½±à½âÂë¿â£ºXML/JSON/MIME/BASE64/UUCODE/QPCODE/RFC2047 etc¡£
 
 ### 1.1¡¢¿â×é³É
 ±¾¹¤³ÌÖ÷Òª°üº¬ 5 ¸ö¿â¼°´óÁ¿Ê¾Àý¡£5 ¸ö¿âµÄËµÃ÷ÈçÏÂ£º
@@ -156,6 +156,10 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
      ![Òì²½ IO Àà¼Ì³ÐÍ¼](res/img/aio_inherit.jpg)
 *    IO Á÷¼Ì³ÐÍ¼
      ![IO Á÷¼Ì³ÐÍ¼](res/img/stream_inherit.jpg)
+*    acl ·þÎñ¿ò¼ÜÊØ»¤½ø³ÌÊÂ¼þ´¦ÀíÁ÷³Ì
+     ![acl ·þÎñÊØ»¤½ø³ÌÊÂ¼þ´¦ÀíÁ÷³Ì](res/img/acl_master.jpg)
+*    acl ·þÎñÆ÷¿ò¼Ü×Ó½ø³ÌÊÂ¼þ´¦ÀíÁ÷³Ì
+     ![·þÎñ×Ó½ø³ÌÊÂ¼þÁ÷³Ì](res/img/master_proc.jpg)
 *    ½ÓÊÕÉÏ´«ÎÄ¼þµÄ CGI ³ÌÐò£º
      ![½ÓÊÕÉÏ´«ÎÄ¼þµÄ CGI ³ÌÐò](res/img/cgi_upload.jpg)
 *    ÎÄ¼þÏÂÔØ¿Í»§¶Ë³ÌÐò£º
