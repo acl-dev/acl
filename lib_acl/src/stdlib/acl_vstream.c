@@ -321,6 +321,7 @@ AGAIN:
 	}
 
 	in->errnum = acl_last_error();
+
 	if (in->errnum == ACL_EINTR)
 		goto AGAIN;
 	else if (in->errnum == ACL_ETIMEDOUT) {
@@ -336,8 +337,8 @@ AGAIN:
 
 static int __vstream_read(ACL_VSTREAM *fp)
 {
-	fp->read_cnt = __sys_read(fp, fp->read_buf,
-			(size_t) fp->read_buf_len);
+	fp->read_cnt = __sys_read(fp, fp->read_buf, (size_t) fp->read_buf_len);
+
 	if (fp->read_cnt < 0) {
 		fp->read_cnt = 0;
 		return -1;
@@ -1223,11 +1224,13 @@ static int __vstream_write(ACL_VSTREAM *fp, const void *vptr, int dlen)
 		if (ACL_VSTREAM_FILE(fp) == ACL_FILE_INVALID) {
 			acl_msg_error("%s, %s(%d): h_file invalid",
 				myname, __FILE__, __LINE__);
+			fp->errnum = ACL_EINVAL;
 			return ACL_VSTREAM_EOF;
 		}
 	} else if (ACL_VSTREAM_SOCK(fp) == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s, %s(%d): sockfd invalid",
 			myname, __FILE__, __LINE__);
+		fp->errnum = ACL_EINVAL;
 		return ACL_VSTREAM_EOF;
 	}
 
@@ -1238,8 +1241,11 @@ TAG_AGAIN:
 #ifdef WIN32
 			fp->sys_offset = acl_lseek(
 				ACL_VSTREAM_FILE(fp), 0, SEEK_END);
-			if (fp->sys_offset < 0)
+			if (fp->sys_offset < 0) {
+				fp->errnum = acl_last_error();
+				fp->flag |= ACL_VSTREAM_FLAG_ERR;
 				return ACL_VSTREAM_EOF;
+			}
 #endif
 		} else if ((fp->flag & ACL_VSTREAM_FLAG_CACHE_SEEK)
 			&& fp->offset != fp->sys_offset)
@@ -1253,6 +1259,9 @@ TAG_AGAIN:
 					ACL_FMT_I64D ")", myname, __FILE__,
 					__LINE__, acl_last_serror(),
 					fp->offset, fp->sys_offset);
+
+				fp->errnum = acl_last_error();
+				fp->flag |= ACL_VSTREAM_FLAG_ERR;
 				return ACL_VSTREAM_EOF;
 			}
 			fp->offset = fp->sys_offset;
@@ -1289,25 +1298,28 @@ TAG_AGAIN:
 			fp->rw_timeout, fp, fp->context);
 	}
 
-	if (n < 0) {
-		if (acl_last_error() == ACL_EINTR) {
-			if (++neintr >= 5)
-				return ACL_VSTREAM_EOF;
-
-			goto TAG_AGAIN;
-		}
-
-		if (acl_last_error() == ACL_EAGAIN
-			|| acl_last_error() == ACL_EWOULDBLOCK)
-		{
-			acl_set_error(ACL_EAGAIN);
-		}
-
-		return ACL_VSTREAM_EOF;
+	if (n >= 0) {
+		fp->total_write_cnt += n;
+		return n;
 	}
 
-	fp->total_write_cnt += n;
-	return n;
+	fp->errnum = acl_last_error();
+
+	if (fp->errnum == ACL_EINTR) {
+		if (++neintr >= 5) {
+			fp->flag |= ACL_VSTREAM_FLAG_ERR;
+			return ACL_VSTREAM_EOF;
+		}
+
+		goto TAG_AGAIN;
+	}
+
+	if (fp->errnum == ACL_EAGAIN || fp->errnum == ACL_EWOULDBLOCK)
+		acl_set_error(ACL_EAGAIN);
+	else
+		fp->flag |= ACL_VSTREAM_FLAG_ERR;
+
+	return ACL_VSTREAM_EOF;
 }
 
 static int __vstream_writev(ACL_VSTREAM *fp, const struct iovec *vec, int count)
@@ -1325,11 +1337,13 @@ static int __vstream_writev(ACL_VSTREAM *fp, const struct iovec *vec, int count)
 		if (ACL_VSTREAM_FILE(fp) == ACL_FILE_INVALID) {
 			acl_msg_error("%s, %s(%d): h_file invalid",
 				myname, __FILE__, __LINE__);
+			fp->errnum = ACL_EINVAL;
 			return ACL_VSTREAM_EOF;
 		}
 	} else if (ACL_VSTREAM_SOCK(fp) == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s, %s(%d): sockfd invalid",
 			myname, __FILE__, __LINE__);
+		fp->errnum = ACL_EINVAL;
 		return ACL_VSTREAM_EOF;
 	}
 
@@ -1340,8 +1354,11 @@ TAG_AGAIN:
 #ifdef WIN32
 			fp->sys_offset = acl_lseek(
 				ACL_VSTREAM_FILE(fp), 0, SEEK_END);
-			if (fp->sys_offset < 0)
+			if (fp->sys_offset < 0) {
+				fp->errnum = acl_last_error();
+				fp->flag |= ACL_VSTREAM_FLAG_ERR;
 				return ACL_VSTREAM_EOF;
+			}
 #endif
 		} else if ((fp->flag & ACL_VSTREAM_FLAG_CACHE_SEEK)
 			&& fp->offset != fp->sys_offset)
@@ -1354,6 +1371,9 @@ TAG_AGAIN:
 					ACL_FMT_I64D ")", myname, __FILE__,
 					__LINE__, acl_last_serror(),
 					fp->offset, fp->sys_offset);
+
+				fp->errnum = acl_last_error();
+				fp->flag |= ACL_VSTREAM_FLAG_ERR;
 				return ACL_VSTREAM_EOF;
 			}
 		}
@@ -1389,25 +1409,26 @@ TAG_AGAIN:
 			fp->rw_timeout, fp, fp->context);
 	}
 
-	if (n < 0) {
-		if (acl_last_error() == ACL_EINTR) {
-			if (++neintr >= 5)
-				return ACL_VSTREAM_EOF;
-
-			goto TAG_AGAIN;
-		}
-
-		if (acl_last_error() == ACL_EAGAIN
-			|| acl_last_error() == ACL_EWOULDBLOCK)
-		{
-			acl_set_error(ACL_EAGAIN);
-		}
-
-		return ACL_VSTREAM_EOF;
+	if (n >= 0) {
+		fp->total_write_cnt += n;
+		return n;
 	}
 
-	fp->total_write_cnt += n;
-	return n;
+	fp->errnum = acl_last_error();
+
+	if (fp->errnum == ACL_EINTR) {
+		if (++neintr >= 5)
+			return ACL_VSTREAM_EOF;
+
+		goto TAG_AGAIN;
+	}
+
+	if (fp->errnum == ACL_EAGAIN || fp->errnum == ACL_EWOULDBLOCK)
+		acl_set_error(ACL_EAGAIN);
+	else
+		fp->flag |= ACL_VSTREAM_FLAG_ERR;
+
+	return ACL_VSTREAM_EOF;
 }
 
 int acl_vstream_write(ACL_VSTREAM *fp, const void *vptr, int dlen)

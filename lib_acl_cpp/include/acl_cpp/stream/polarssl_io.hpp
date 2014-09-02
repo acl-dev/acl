@@ -30,7 +30,7 @@ private:
 	~polarssl_io();
 
 	virtual bool open(stream* s);
-	virtual bool on_close();
+	virtual bool on_close(bool alive);
 	virtual int read(void* buf, size_t len);
 	virtual int send(const void* buf, size_t len);
 

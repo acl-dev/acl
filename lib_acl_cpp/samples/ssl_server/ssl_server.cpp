@@ -300,7 +300,8 @@ static void do_run(socket_stream* stream)
 class master_service : public master_proc
 {
 public:
-	master_service(const char* crt_file, const char* key_file)
+	master_service(const char* crt_file, const char* key_file,
+		acl::polarssl_verify_t verify_mode)
 	{
 		if (crt_file && *crt_file && key_file && *key_file)
 		{
@@ -310,6 +311,7 @@ public:
 		}
 		else
 			conf_ = NULL;
+		verify_mode_ = verify_mode;
 	}
 
 	~master_service()
@@ -336,8 +338,8 @@ protected:
 				logger_error("setup_hook error!");
 				ssl->destroy();
 			}
-
-			logger("setup ssl hook ok");
+			else
+				logger("setup ssl hook ok");
 		}
 		do_run(stream);
 	}
@@ -369,18 +371,22 @@ protected:
 			delete conf_;
 			conf_ = NULL;
 		}
+
+		conf_->set_authmode(verify_mode_);
 	}
 
 private:
 	polarssl_conf* conf_;
 	string crt_file_;
 	string key_file_;
+	acl::polarssl_verify_t verify_mode_;
 };
 
 // WEB 服务模式
-static void do_alone(const char* crt_file, const char* key_file)
+static void do_alone(const char* crt_file, const char* key_file,
+	acl::polarssl_verify_t verify_mode)
 {
-	master_service service(crt_file, key_file);
+	master_service service(crt_file, key_file, verify_mode);
 	acl::log::stdout_open(true);
 	const char* addr = "0.0.0.0:2443";
 	printf("listen: %s ...\r\n", addr);
@@ -405,7 +411,9 @@ int main(int argc, char* argv[])
 	// 开始运行
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
+		acl::polarssl_verify_t verify_mode;
 		const char* crt_file, *key_file;
+
 		if (argc >= 3)
 			crt_file = argv[2];
 		else
@@ -414,11 +422,22 @@ int main(int argc, char* argv[])
 			key_file = argv[3];
 		else
 			key_file = NULL;
+		if (argc >= 5)
+		{
+			if (strcasecmp(argv[4], "req") == 0)
+				verify_mode = acl::POLARSSL_VERIFY_REQ;
+			else if (strcasecmp(argv[4], "opt") == 0)
+				verify_mode = acl::POLARSSL_VERIFY_OPT;
+			else
+				verify_mode = acl::POLARSSL_VERIFY_NONE;
+		}
+		else
+			verify_mode = acl::POLARSSL_VERIFY_NONE;
 
-		do_alone(crt_file, key_file);
+		do_alone(crt_file, key_file, verify_mode);
 	}
 	else if (argc >= 2)
-		printf("usage: %s alone cert_file key_file\r\n", argv[0]);
+		printf("usage: %s alone cert_file key_file verify[none|req|opt]\r\n", argv[0]);
 	else
 		do_cgi();
 

@@ -6,6 +6,16 @@ namespace acl
 {
 
 /**
+ * SSL 证书校验级别类型定义
+ */
+typedef enum
+{
+	POLARSSL_VERIFY_NONE,	// 不校验证书
+	POLARSSL_VERIFY_OPT,	// 选择性校验，可以在握手时或握手后校验
+	POLARSSL_VERIFY_REQ	// 要求在握手时校验
+} polarssl_verify_t;
+
+/**
  * SSL 连接对象的配置类，该类对象一般可以声明为全局对象，用来对每一个 SSL
  * 连接对象进行证书配置；该类加载了全局性的证书、密钥等信息；每一个 SSL 对象
  * (polarssl_io) 调用本对象的setup_certs 方法来初始化自身的证书、密钥等信息
@@ -40,6 +50,11 @@ public:
 	 */
 	bool set_key(const char* key_file, const char* key_pass = NULL);
 
+	/**
+	 * 设置 SSL 证书校验方式，内部缺省为不校验证书
+	 * @param verify_mode {polarssl_verify_t}
+	 */
+	void set_authmode(polarssl_verify_t verify_mode);
 
 	/**
 	 * 当为服务端模式时是否启用会话缓存功能，有助于提高 SSL 握手效率
@@ -71,6 +86,7 @@ private:
 	void* pkey_;
 	void* cert_chain_;
 	void* cache_;
+	polarssl_verify_t verify_mode_;
 
 	void free_ca();
 };

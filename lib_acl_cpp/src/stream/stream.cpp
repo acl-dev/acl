@@ -75,7 +75,11 @@ bool stream::close()
 	opened_ = false;
 
 	if (hook_)
-		(void) hook_->on_close();
+	{
+#define	DEAD	(ACL_VSTREAM_FLAG_ERR | ACL_VSTREAM_FLAG_EOF)
+		bool alive = stream_->flag & DEAD ? false : true;
+		(void) hook_->on_close(alive);
+	}
 
 	int ret = acl_vstream_close(stream_);
 	stream_ = NULL;

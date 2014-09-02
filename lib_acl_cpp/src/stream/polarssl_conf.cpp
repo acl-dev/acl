@@ -51,6 +51,7 @@ polarssl_conf::polarssl_conf()
 	
 	cache_ = NULL;
 	pkey_ = NULL;
+	verify_mode_ = POLARSSL_VERIFY_NONE;
 #endif
 }
 
@@ -218,6 +219,11 @@ bool polarssl_conf::set_key(const char* key_file,
 #endif
 }
 
+void polarssl_conf::set_authmode(polarssl_verify_t verify_mode)
+{
+	verify_mode_ = verify_mode;
+}
+
 void polarssl_conf::enable_cache(bool on)
 {
 #ifdef HAS_POLARSSL
@@ -245,7 +251,21 @@ bool polarssl_conf::setup_certs(void* ssl_in, bool server_side)
 #ifdef HAS_POLARSSL
 	ssl_context* ssl = (ssl_context*) ssl_in;
 
-	::ssl_set_authmode((ssl_context*) ssl, SSL_VERIFY_NONE);
+	switch (verify_mode_)
+	{
+	case POLARSSL_VERIFY_NONE:
+		::ssl_set_authmode((ssl_context*) ssl, SSL_VERIFY_NONE);
+		break;
+	case POLARSSL_VERIFY_OPT:
+		::ssl_set_authmode((ssl_context*) ssl, SSL_VERIFY_OPTIONAL);
+		break;
+	case POLARSSL_VERIFY_REQ:
+		::ssl_set_authmode((ssl_context*) ssl, SSL_VERIFY_REQUIRED);
+		break;
+	default:
+		::ssl_set_authmode((ssl_context*) ssl, SSL_VERIFY_NONE);
+		break;
+	}
 
 	// Setup cipher_suites
 	const int* cipher_suites = ::ssl_list_ciphersuites();
@@ -255,6 +275,12 @@ bool polarssl_conf::setup_certs(void* ssl_in, bool server_side)
 		return false;
 	}
 	::ssl_set_ciphersuites((ssl_context*) ssl, cipher_suites);
+
+//	::ssl_set_min_version((ssl_context*) ssl, SSL_MAJOR_VERSION_3,
+//		SSL_MINOR_VERSION_0);
+//	::ssl_set_renegotiation((ssl_context*) ssl, SSL_RENEGOTIATION_DISABLED);
+//	::ssl_set_dh_param((ssl_context*) &ssl, POLARSSL_DHM_RFC5114_MODP_2048_P,
+//		POLARSSL_DHM_RFC5114_MODP_2048_G );
 
 	// Setup cache only for server-side
 	if (server_side && cache_ != NULL)

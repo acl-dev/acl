@@ -46,9 +46,10 @@ public:
 
 	/**
 	 * 当 stream 流对象关闭前将会回调该函数以便于子类实例做一些善后工作
+	 * @param alive {bool} 该连接是否依然正常
 	 * @return {bool}
 	 */
-	virtual bool on_close() { return true; }
+	virtual bool on_close(bool alive) { (void) alive; return true; }
 
 	/**
 	 * 当 stream 对象需要释放 stream_hook 子类对象时调用此方法

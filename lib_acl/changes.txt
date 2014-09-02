@@ -1,6 +1,10 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+455) 2014.8.27
+455.1) feature: acl_vstream.c 增加了几处 IO 出错时的错误号记录位置
+
+------------------------------------------------------------------------
 454) 2014.8.20
 454.1) feature: ACL_VSTREAM 增加了 objs_table 成员用来存放 KEY-OBJECT 对象，
 可以通过 acl_vstream_add_object/acl_vstream_get_object/acl_vstream_del_object
