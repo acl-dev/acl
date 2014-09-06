@@ -34,26 +34,16 @@ mime_head::~mime_head()
 
 mime_head& mime_head::reset()
 {
-	if (m_sender) {
-		delete m_sender;
-		m_sender = NULL;
-	}
-	if (m_from) {
-		delete m_from;
-		m_from = NULL;
-	}
-	if (m_replyto) {
-		delete m_replyto;
-		m_replyto = NULL;
-	}
-	if (m_returnpath) {
-		delete m_returnpath;
-		m_returnpath = NULL;
-	}
-	if (m_subject) {
-		delete m_subject;
-		m_subject = NULL;
-	}
+	delete m_sender;
+	m_sender = NULL;
+	delete m_from;
+	m_from = NULL;
+	delete m_replyto;
+	m_replyto = NULL;
+	delete m_returnpath;
+	m_returnpath = NULL;
+	delete m_subject;
+	m_subject = NULL;
 
 	std::list<char*>::iterator it;
 

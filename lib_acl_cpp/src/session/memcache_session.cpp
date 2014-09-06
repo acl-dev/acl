@@ -11,7 +11,7 @@ memcache_session::memcache_session(const char* cache_addr,
 	const char* prefix /* = NULL */, time_t ttl /* = 0 */, 
 	const char* sid /* = NULL */, bool encode_key /* = true */)
 : session(ttl, sid)
-, auth_free_(true)
+, auto_free_(true)
 {
 	acl_assert(cache_addr && *cache_addr);
 	cache_ = NEW memcache(cache_addr, conn_timeout, rw_timeout);
@@ -24,15 +24,14 @@ memcache_session::memcache_session(memcache* cache, bool auto_free /* = false */
 	time_t ttl /* = 0 */, const char* sid /* = NULL */)
 : session(ttl, sid)
 , cache_(cache)
-, auth_free_(auto_free)
+, auto_free_(auto_free)
 {
 
 }
 
 memcache_session::~memcache_session()
 {
-	if (auth_free_)
-		delete cache_;
+	delete cache_;
 }
 
 bool memcache_session::get_data(const char* sid, string& buf)

@@ -474,6 +474,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
   <ItemGroup>
     <ResourceCompile Include="lib_acl_cpp_vc2012.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

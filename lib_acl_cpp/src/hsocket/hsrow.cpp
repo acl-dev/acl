@@ -17,7 +17,6 @@ hsrow::hsrow(int ncolum)
 
 hsrow::~hsrow()
 {
-	row_.clear();
 	delete[] colums_;
 }
 

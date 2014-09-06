@@ -58,7 +58,7 @@ private:
 	virtual bool set_timeout(const char* sid, time_t ttl);
 private:
 	memcache* cache_;
-	bool auth_free_;
+	bool auto_free_;
 };
 
 } // namespace acl

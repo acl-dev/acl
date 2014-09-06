@@ -34,7 +34,6 @@ beanstalk::~beanstalk()
 	std::vector<char*>::iterator it = tubes_watched_.begin();
 	for (; it != tubes_watched_.end(); ++it)
 		acl_myfree(*it);
-	tubes_watched_.clear();
 }
 
 bool beanstalk::beanstalk_open()

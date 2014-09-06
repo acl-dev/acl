@@ -7,7 +7,7 @@ namespace acl
 
 class string;
 
-class scan_dir
+class ACL_CPP_API scan_dir
 {
 public:
 	scan_dir();

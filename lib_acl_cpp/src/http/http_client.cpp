@@ -49,10 +49,9 @@ http_client::http_client(socket_stream* client, int rw_timeout /* = 120 */,
 http_client::~http_client(void)
 {
 	reset();
-	if (stream_ && !stream_fixed_)
+	if (!stream_fixed_)
 		delete stream_;
-	if (buf_)
-		delete buf_;
+	delete buf_;
 }
 
 void http_client::reset(void)

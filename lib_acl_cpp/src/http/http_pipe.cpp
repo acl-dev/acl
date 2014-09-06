@@ -14,8 +14,7 @@ http_pipe::http_pipe()
 
 http_pipe::~http_pipe()
 {
-	if (conv_)
-		delete conv_;
+	delete conv_;
 }
 
 void http_pipe::set_charset(charset_conv* conv)

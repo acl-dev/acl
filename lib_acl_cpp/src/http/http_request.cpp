@@ -77,17 +77,14 @@ http_request::~http_request(void)
 		reset();
 		delete cookies_;
 	}
-	else if (conv_)
+	else
 		delete conv_;
 }
 
 void http_request::close(void)
 {
-	if (client_)
-	{
-		delete client_;
-		client_ = NULL;
-	}
+	delete client_;
+	client_ = NULL;
 }
 
 void http_request::reset(void)
@@ -100,11 +97,9 @@ void http_request::reset(void)
 		cookies_->clear();
 		cookie_inited_ = false;
 	}
-	if (conv_)
-	{
-		delete conv_;
-		conv_ = NULL;
-	}
+
+	delete conv_;
+	conv_ = NULL;
 	need_retry_ = true;
 	RESET_RANGE();
 }

@@ -336,7 +336,7 @@ void    acl_master_reap_child(void)
 		if ((proc = (ACL_MASTER_PROC *)
 			acl_binhash_find(acl_var_master_child_table,
 				(char *) &pid, sizeof(pid))) == 0) {
-			acl_msg_panic("master_reap: unknown pid: %d", pid);
+			acl_msg_warn("master_reap: unknown pid: %d", pid);
 			continue;
 		}
 		serv = proc->serv;

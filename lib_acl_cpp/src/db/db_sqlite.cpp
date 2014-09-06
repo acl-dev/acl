@@ -190,8 +190,7 @@ db_sqlite::db_sqlite(const char* dbfile)
 db_sqlite::~db_sqlite(void)
 {
 	close();
-	if (conv_)
-		delete conv_;
+	delete conv_;
 }
 
 const char* db_sqlite::version() const

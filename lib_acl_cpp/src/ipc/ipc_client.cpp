@@ -29,8 +29,7 @@ ipc_client::~ipc_client()
 		acl_myfree(addr_);
 	if (async_stream_ && !closing_)
 		async_stream_->close();
-	if (sync_stream_inner_)
-		delete sync_stream_inner_;
+	delete sync_stream_inner_;
 }
 
 void ipc_client::on_message(int nMsg, void* data, int dlen)

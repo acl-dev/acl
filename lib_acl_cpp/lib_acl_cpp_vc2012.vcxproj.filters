@@ -853,9 +853,6 @@
     <Filter Include="src\memcache">
       <UniqueIdentifier>{9610edea-3618-48cb-b775-679afa95c809}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\redis">
-      <UniqueIdentifier>{38eae937-c68c-41ec-8f96-045799bf54f3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\session">
       <UniqueIdentifier>{3514e29b-4004-4e16-a72f-fd84cb24d059}</UniqueIdentifier>
     </Filter>
@@ -895,5 +892,8 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl_cpp_vc2012.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt" />
   </ItemGroup>
 </Project>

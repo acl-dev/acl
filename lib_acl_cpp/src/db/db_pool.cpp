@@ -29,7 +29,6 @@ db_pool::~db_pool()
 	std::list<db_handle*>::iterator it = pool_.begin();
 	for (; it != pool_.end(); ++it)
 		delete (*it);
-	pool_.clear();
 	delete locker_;
 }
 

@@ -18,10 +18,8 @@ scan_dir::scan_dir()
 scan_dir::~scan_dir()
 {
 	close();
-	if (path_buf_)
-		delete path_buf_;
-	if (file_buf_)
-		delete file_buf_;
+	delete path_buf_;
+	delete file_buf_;
 }
 
 void scan_dir::close()

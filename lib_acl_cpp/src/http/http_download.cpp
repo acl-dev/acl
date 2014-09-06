@@ -32,8 +32,7 @@ http_download::~http_download()
 {
 	if (url_)
 		acl_myfree(url_);
-	if (req_)
-		delete req_;
+	delete req_;
 }
 
 const char* http_download::get_url() const

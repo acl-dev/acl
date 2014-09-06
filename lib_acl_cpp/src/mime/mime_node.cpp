@@ -57,8 +57,7 @@ mime_node::mime_node(const char* emailFile, const MIME_NODE* node,
 
 mime_node::~mime_node()
 {
-	if (m_pParent)
-		delete m_pParent;
+	delete m_pParent;
 }
 
 const char* mime_node::header_value(const char* name) const
@@ -129,15 +128,13 @@ bool mime_node::save(pipe_manager& out) const
 		{
 			logger_error("read error(%s), ret: %d",
 				acl_last_serror(), ret);
-			if (mime_decoder)
-				delete mime_decoder;
+			delete mime_decoder;
 			return (false);
 		}
 
 		if (out.update(buf, ret) == false)
 		{
-			if (mime_decoder)
-				delete mime_decoder;
+			delete mime_decoder;
 			return (false);
 		}
 		len -= ret;
@@ -145,8 +142,7 @@ bool mime_node::save(pipe_manager& out) const
 
 	bool result = out.update_end();
 
-	if (mime_decoder)
-		delete mime_decoder;
+	delete mime_decoder;
 	return (result);
 }
 
@@ -178,15 +174,13 @@ bool mime_node::save(pipe_manager& out, const char* src, int len) const
 	size_t n = m_bodyEnd - m_bodyBegin;
 	if (out.update(src + m_bodyBegin, n) == false)
 	{
-		if (mime_decoder)
-			delete mime_decoder;
+		delete mime_decoder;
 		return (false);
 	}
 
 	bool result = out.update_end();
 
-	if (mime_decoder)
-		delete mime_decoder;
+	delete mime_decoder;
 	return (result);
 }
 

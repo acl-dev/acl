@@ -20,8 +20,7 @@ pipe_string::pipe_string(string& s)
 
 pipe_string::~pipe_string()
 {
-	if (m_pSavedBufPtr)
-		delete m_pSavedBufPtr;
+	delete m_pSavedBufPtr;
 }
 
 int pipe_string::push_pop(const char* in, size_t len,

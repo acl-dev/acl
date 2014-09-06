@@ -48,14 +48,11 @@ xml_node::xml_node(ACL_XML_NODE* node, xml* xml_ptr)
 
 xml_node::~xml_node(void)
 {
-	if (parent_saved_)
-		delete parent_saved_;
-	if (child_)
-		delete child_;
+	delete parent_saved_;
+	delete child_;
 	if (child_iter_)
 		acl_myfree(child_iter_);
-	if (attr_)
-		delete attr_;
+	delete attr_;
 	if (attr_iter_)
 		acl_myfree(attr_iter_);
 }

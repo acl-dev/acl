@@ -35,12 +35,9 @@ mime::~mime()
 {
 	reset();
 	mime_state_free(m_pMimeState);
-	if (m_pNodes)
-		delete m_pNodes;
-	if (m_pAttaches)
-		delete m_pAttaches;
-	if (m_pImages)
-		delete m_pImages;
+	delete m_pNodes;
+	delete m_pAttaches;
+	delete m_pImages;
 }
 
 mime& mime::reset(void)
@@ -55,11 +52,8 @@ mime& mime::reset(void)
 		m_pFilePath = NULL;
 	}
 
-	if (m_pBody)
-	{
-		delete m_pBody;
-		m_pBody = NULL;
-	}
+	delete m_pBody;
+	m_pBody = NULL;
 
 	if (m_pNodes)
 	{

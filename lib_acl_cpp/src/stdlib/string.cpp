@@ -63,12 +63,9 @@ string::string(const void* s, size_t n) : use_bin_(false)
 string::~string()
 {
 	FREE(vbf_);
-	if (list_tmp_)
-		delete list_tmp_;
-	if (vector_tmp_)
-		delete vector_tmp_;
-	if (pair_tmp_)
-		delete pair_tmp_;
+	delete list_tmp_;
+	delete vector_tmp_;
+	delete pair_tmp_;
 }
 
 string& string::set_bin(bool bin)

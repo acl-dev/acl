@@ -195,9 +195,7 @@ db_service::~db_service(void)
 {
 	std::list<db_handle*>::iterator it = dbpool_.begin();
 	for (; it != dbpool_.end(); ++it)
-	{
 		delete (*it);
-	}
 }
 
 void db_service::on_accept(acl::aio_socket_stream* client)

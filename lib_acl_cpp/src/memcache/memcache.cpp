@@ -30,8 +30,7 @@ memcache::memcache(const char* addr /* = "127.0.0.1:11211" */,
 memcache::~memcache()
 {
 	close();
-	if (keypre_)
-		delete keypre_;
+	delete keypre_;
 	acl_myfree(addr_);
 }
 
@@ -39,11 +38,8 @@ memcache& memcache::set_prefix(const char* keypre)
 {
 	if (keypre == NULL || *keypre == 0)
 	{
-		if (keypre_)
-		{
-			delete keypre_;
-			keypre_ = NULL;
-		}
+		delete keypre_;
+		keypre_ = NULL;
 		return *this;
 	}
 

@@ -1,6 +1,11 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+456) 2014.9.2
+456.1) acl_master 进程的 master_spawn.c 中，在函数 master_delete_child 中，
+当调用 acl_binhash_find 返回 NULL 时会自动 panic，从而导致 acl_master 守护进程
+异常退出，现改成 warning
+
 455) 2014.8.27
 455.1) feature: acl_vstream.c 增加了几处 IO 出错时的错误号记录位置
 

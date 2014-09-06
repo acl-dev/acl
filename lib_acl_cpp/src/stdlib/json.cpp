@@ -20,16 +20,12 @@ json_node::json_node(ACL_JSON_NODE* node, json* json_ptr)
 
 json_node::~json_node(void)
 {
-	if (parent_saved_)
-		delete parent_saved_;
-	if (child_)
-		delete child_;
+	delete parent_saved_;
+	delete child_;
 	if (iter_)
 		acl_myfree(iter_);
-	if (buf_)
-		delete buf_;
-	if (obj_)
-		delete obj_;
+	delete buf_;
+	delete obj_;
 }
 
 const char* json_node::tag_name(void) const

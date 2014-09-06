@@ -20,12 +20,9 @@ master_aio::master_aio()
 
 master_aio::~master_aio()
 {
-	if (__handle)
-	{
-		if (daemon_mode_ == false)
-			delete __handle;
-		__handle = NULL;
-	}
+	if (daemon_mode_ == false)
+		delete __handle;
+	__handle = NULL;
 }
 
 aio_handle* master_aio::get_handle() const

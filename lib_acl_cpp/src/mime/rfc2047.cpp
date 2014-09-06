@@ -34,8 +34,7 @@ rfc2047::rfc2047(bool strip_sp /* false */, bool addCrlf /* true */)
 rfc2047::~rfc2047()
 {
 	reset();
-	if (m_coder)
-		delete m_coder;
+	delete m_coder;
 }
 
 void rfc2047::reset(bool strip_sp /* false */)
@@ -55,11 +54,8 @@ void rfc2047::reset(bool strip_sp /* false */)
 	m_status = rfc2047_status_next;
 	m_lastCh = 0;
 	m_stripSp = strip_sp;
-	if (m_coder)
-	{
-		delete m_coder;
-		m_coder = NULL;
-	}
+	delete m_coder;
+	m_coder = NULL;
 }
 
 const std::list<rfc2047_entry*>& rfc2047::get_list() const

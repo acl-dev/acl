@@ -126,8 +126,7 @@ charset_conv::~charset_conv()
 	if (m_pOutBuf)
 		acl_vstring_free(m_pOutBuf);
 #endif
-	if (m_pBuf)
-		delete m_pBuf;
+	delete m_pBuf;
 }
 
 void charset_conv::set_add_invalid(bool onoff)

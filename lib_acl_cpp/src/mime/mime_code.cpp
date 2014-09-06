@@ -40,8 +40,7 @@ mime_code::mime_code(bool addCrlf, bool addInvalid)
 
 mime_code::~mime_code()
 {
-	if (m_pBuf)
-		delete m_pBuf;
+	delete m_pBuf;
 }
 
 void mime_code::init(const unsigned char* toTab,

@@ -25,6 +25,12 @@
 # ifndef ssize_t
 #  define ssize_t long
 # endif
+# if(_MSC_VER >= 1300)
+#  include <winsock2.h>
+#  include <mswsock.h>
+# else
+#  include <winsock.h>
+# endif
 #else
 # ifdef HAVE_MEMCACHED
 #  undef	HAVE_MEMCACHED

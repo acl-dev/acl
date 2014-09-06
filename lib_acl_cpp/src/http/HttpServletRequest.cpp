@@ -51,8 +51,7 @@ HttpServletRequest::HttpServletRequest(HttpServletResponse& res, session& store,
 
 HttpServletRequest::~HttpServletRequest(void)
 {
-	if (client_)
-		delete client_;
+	delete client_;
 	std::vector<HttpCookie*>::iterator it = cookies_.begin();
 	for (; it != cookies_.end(); ++it)
 		(*it)->destroy();
@@ -63,10 +62,8 @@ HttpServletRequest::~HttpServletRequest(void)
 		acl_myfree((*it1)->value);
 		acl_myfree(*it1);
 	}
-	if (mime_)
-		delete mime_;
-	if (http_session_)
-		delete http_session_;
+	delete mime_;
+	delete http_session_;
 }
 
 http_method_t HttpServletRequest::getMethod(void) const

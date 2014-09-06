@@ -29,7 +29,6 @@ hspool::~hspool()
 	std::list<hsclient*>::iterator it = pool_.begin();
 	for (; it != pool_.end(); ++it)
 		delete (*it);
-	pool_.clear();
 	delete locker_;
 }
 

@@ -25,3 +25,4 @@ acl_ioctl_server.c 的模板程序中采用内存池功能
 15) json 解析器可以支持 BOOL, NUMBER, NULL 等类型
 16) events_select_thr.c, events_poll.c, events_select.c 需要支持检测时间间隔
 17) acl_master 服务器框架的各个服务模板应该支持进程退出前的回调接口，便于应用的善后工作
+18) acl_master 当子进程的 master_prefork 和空闲退出通知打开时，可能存在冲突
