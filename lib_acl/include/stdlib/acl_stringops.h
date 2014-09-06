@@ -1,5 +1,5 @@
-#ifndef __ACL_STRINGOPS_H_INCLUDED__
-#define __ACL_STRINGOPS_H_INCLUDED__
+#ifndef ACL_STRINGOPS_INCLUDE_H
+#define ACL_STRINGOPS_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

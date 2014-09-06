@@ -1,5 +1,5 @@
-#ifndef __ACL_MASK_ADDR_H_INCLUDED__
-#define __ACL_MASK_ADDR_H_INCLUDED__
+#ifndef ACL_MASK_ADDR_H_INCLUDED
+#define ACL_MASK_ADDR_H_INCLUDED
 
 #ifdef  __cplusplus
 extern "C" {

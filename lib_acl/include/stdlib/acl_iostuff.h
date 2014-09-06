@@ -1,6 +1,6 @@
+#ifndef	ACL_IOSTUFF_INCLUDE_H
+#define	ACL_IOSTUFF_INCLUDE_H
 
-#ifndef	__ACL_IOSTUFF_INCLUDE_H__
-#define	__ACL_IOSTUFF_INCLUDE_H__
 #ifdef	__cplusplus
 extern "C" {
 #endif

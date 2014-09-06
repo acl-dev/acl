@@ -1,5 +1,5 @@
-#ifndef __ACL_CHROOT_UID_H_INCLUDED__
-#define __ACL_CHROOT_UID_H_INCLUDED__
+#ifndef ACL_CHROOT_UID_INCLUDE_H
+#define ACL_CHROOT_UID_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

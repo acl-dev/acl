@@ -73,9 +73,9 @@ static bool copy_file(acl::ifstream& in, const acl::string& to_path,
 				break;
 
 			logger_error("read from file: %s error: %s, "
-				"nread: %lld, length: %lld",
+				"to file: %s, nread: %lld, length: %lld",
 				in.file_path(), acl::last_serror(),
-				nread, length);
+				to_filepath.c_str(), nread, length);
 			return false;
 		}
 
@@ -135,12 +135,19 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 
 	acl::ifstream to_fp;
 	if (to_fp.open_read(to_filepath.c_str()) == false)
+	{
+		printf("open to file: %s error: %s\r\n", to_filepath.c_str(),
+			acl::last_serror());
 		return copy_file(from_fp, to_pathbuf, to_filepath, ncopied);
+	}
 
 
 	acl_int64 length;
 	if ((length = to_fp.fsize()) != from_fp.fsize())
 	{
+		printf("to fsize: %ld, from fsize: %ld, to file: %s, from file: %s\r\n",
+			(long) to_fp.fsize(), (long) from_fp.fsize(),
+			to_filepath.c_str(), from_filepath.c_str());
 		to_fp.close();
 		return copy_file(from_fp, to_pathbuf, to_filepath, ncopied);
 	}
@@ -176,6 +183,8 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 		if (to_len == -1)
 		{
 			to_fp.close();
+			printf("fread from to file error: %s\r\n",
+				acl::last_serror());
 			return copy_file(from_fp, to_pathbuf,
 					to_filepath, ncopied);
 		}
@@ -183,6 +192,7 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 		if (memcmp(from_buf, to_buf, to_len) != 0)
 		{
 			to_fp.close();
+			printf("string not equal\r\n");
 			return copy_file(from_fp, to_pathbuf,
 					from_filepath, ncopied);
 		}
@@ -328,7 +338,7 @@ int main(int argc, char* argv[])
 		logger_error("getcwd error: %s", path);
 		return 1;
 	}
-	logger_error("current path: %s", path);
+	logger("current path: %s", path);
 
 	do_copy(".", path_to);
 

@@ -1,5 +1,5 @@
-#ifndef __ACL_SPLIT_AT_H_INCLUDED__
-#define __ACL_SPLIT_AT_H_INCLUDED__
+#ifndef ACL_SPLIT_AT_INCLUDE_H
+#define ACL_SPLIT_AT_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

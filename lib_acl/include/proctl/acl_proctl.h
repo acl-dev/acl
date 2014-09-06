@@ -1,5 +1,5 @@
-#ifndef __ACL_PROCTL_INCLUDE_H__
-#define __ACL_PROCTL_INCLUDE_H__
+#ifndef ACL_PROCTL_INCLUDE_H
+#define ACL_PROCTL_INCLUDE_H
 
 #include "stdlib/acl_define.h"
 #include <stdlib.h>

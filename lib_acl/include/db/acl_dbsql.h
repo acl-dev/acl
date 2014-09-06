@@ -1,5 +1,5 @@
-#ifndef __ACL_DBSQL_INCLUDE_H__
-#define __ACL_DBSQL_INCLUDE_H__
+#ifndef ACL_DBSQL_INCLUDE_H
+#define ACL_DBSQL_INCLUDE_H
 
 #ifdef __cplusplus
 extern "C" {

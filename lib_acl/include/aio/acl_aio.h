@@ -6,8 +6,8 @@
  * @version	1.1
  */
 
-#ifndef	__ACL_AIO_INCLUDE_H__
-#define	__ACL_AIO_INCLUDE_H__
+#ifndef	ACL_AIO_INCLUDE_H
+#define	ACL_AIO_INCLUDE_H
 
 #ifdef	__cplusplus
 extern "C" {

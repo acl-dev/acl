@@ -1,5 +1,5 @@
-#ifndef __ACL_DEFINE_UNIX_INCLUDE_H__
-#define __ACL_DEFINE_UNIX_INCLUDE_H__
+#ifndef ACL_DEFINE_UNIX_INCLUDE_H
+#define ACL_DEFINE_UNIX_INCLUDE_H
 
 #include "acl_define_linux.h"
 #include "acl_define_sunx86.h"

@@ -4,9 +4,9 @@
 namespace acl {
 
 locker::locker(bool use_mutex /* = true */, bool nowait /* = false */)
-	: pFile_(NULL)
-	, myFHandle_(false)
-	, nowait_(nowait)
+: pFile_(NULL)
+, myFHandle_(false)
+, nowait_(nowait)
 {
 	fHandle_ = ACL_FILE_INVALID;
 	if (use_mutex)
@@ -24,9 +24,9 @@ locker::~locker()
 	if (pMutex_)
 	{
 #ifndef WIN32
-		pthread_mutexattr_destroy(&mutexAttr_);
+		acl_assert(pthread_mutexattr_destroy(&mutexAttr_) == 0);
 #endif
-		acl_pthread_mutex_destroy(pMutex_);
+		acl_assert(acl_pthread_mutex_destroy(pMutex_) == 0);
 		acl_myfree(pMutex_);
 	}
 }
@@ -36,11 +36,12 @@ void locker::init_mutex()
 	pMutex_ = (acl_pthread_mutex_t*)
 		acl_mycalloc(1, sizeof(acl_pthread_mutex_t));
 #ifndef WIN32
-	pthread_mutexattr_init(&mutexAttr_);
-	pthread_mutexattr_settype(&mutexAttr_, PTHREAD_MUTEX_RECURSIVE);
-	acl_pthread_mutex_init(pMutex_, &mutexAttr_);
+	acl_assert(pthread_mutexattr_init(&mutexAttr_) == 0);
+	acl_assert(pthread_mutexattr_settype(&mutexAttr_,
+		PTHREAD_MUTEX_RECURSIVE) == 0);
+	acl_assert(acl_pthread_mutex_init(pMutex_, &mutexAttr_) == 0);
 #else
-	acl_pthread_mutex_init(pMutex_, NULL);
+	acl_assert(acl_pthread_mutex_init(pMutex_, NULL) == 0);
 #endif
 }
 

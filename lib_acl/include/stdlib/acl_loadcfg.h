@@ -1,6 +1,5 @@
-
-#ifndef	_LIB_UTIL_LOADCFG_INCLUDE_H_
-#define	_LIB_UTIL_LOADCFG_INCLUDE_H_
+#ifndef	ACL_LOADCFG_INCLUDE_H
+#define	ACL_LOADCFG_INCLUDE_H
 
 # ifdef	__cplusplus
 extern "C" {

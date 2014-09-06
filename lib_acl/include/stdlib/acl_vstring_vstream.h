@@ -1,5 +1,5 @@
-#ifndef	__ACL_VSTRING_VSTREAM_INCLUDE_H__
-#define	__ACL_VSTRING_VSTREAM_INCLUDE_H__
+#ifndef	ACL_VSTRING_VSTREAM_INCLUDE_H
+#define	ACL_VSTRING_VSTREAM_INCLUDE_H
 
 #ifdef	__cplusplus
 extern "C" {

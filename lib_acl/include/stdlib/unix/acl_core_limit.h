@@ -1,5 +1,5 @@
-#ifndef	__ACL_CORE_LIMIT_INCLUDE__
-#define	__ACL_CORE_LIMIT_INCLUDE__
+#ifndef	ACL_CORE_LIMIT_INCLUDE_H
+#define	ACL_CORE_LIMIT_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

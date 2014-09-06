@@ -1,5 +1,5 @@
-#ifndef	__ZDB_INCLUDE_H__
-#define	__ZDB_INCLUDE_H__
+#ifndef	ACL_ZDB_INCLUDE_H
+#define	ACL_ZDB_INCLUDE_H
 
 #include "stdlib/acl_define.h"
 #include "stdlib/acl_vstring.h"

@@ -1,6 +1,5 @@
-
-#ifndef	__ACL_SINGLE_PARAMS_INCLUDE_H_
-#define	__ACL_SINGLE_PARAMS_INCLUDE_H_
+#ifndef	ACL_SINGLE_PARAMS_INCLUDE_H
+#define	ACL_SINGLE_PARAMS_INCLUDE_H
 
 #ifdef	__cplusplus
 extern "C" {

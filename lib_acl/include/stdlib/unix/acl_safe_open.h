@@ -1,5 +1,5 @@
-#ifndef _SAFE_OPEN_H_INCLUDED_
-#define _SAFE_OPEN_H_INCLUDED_
+#ifndef ACL_SAFE_OPEN_H_INCLUDE_H
+#define ACL_SAFE_OPEN_H_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

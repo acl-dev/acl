@@ -1,5 +1,5 @@
-#ifndef	__ACL_DEFINE_INCLUDE_H__
-#define	__ACL_DEFINE_INCLUDE_H__
+#ifndef	ACL_DEFINE_INCLUDE_H
+#define	ACL_DEFINE_INCLUDE_H
 
 #include "acl_define_win32.h"
 #include "acl_define_unix.h"

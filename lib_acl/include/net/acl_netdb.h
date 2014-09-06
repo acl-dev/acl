@@ -1,6 +1,5 @@
-
-#ifndef	__ACL_NETDB_INCLUDE_H__
-#define	__ACL_NETDB_INCLUDE_H__
+#ifndef	ACL_NETDB_INCLUDE_H
+#define	ACL_NETDB_INCLUDE_H
 
 #include "stdlib/acl_define.h"
 

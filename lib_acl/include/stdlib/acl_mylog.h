@@ -1,16 +1,5 @@
-/*
-**============================================================================
-**
-**
-**
-**			mylog.h, writen by zsx
-**
-**
-**
-**============================================================================
-*/
-#ifndef	__ACL_MYLOG_INCLUDE_H_
-#define	__ACL_MYLOG_INCLUDE_H_
+#ifndef	ACL_MYLOG_INCLUDE_H
+#define	ACL_MYLOG_INCLUDE_H
 
 #include <stdarg.h>
 

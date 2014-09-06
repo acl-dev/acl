@@ -1,12 +1,5 @@
-/*
- * Name: acl_sane_socket.h
- * Author: zsx
- * Date: 2003-12-18
- * Version: 1.0
- */
-
-#ifndef	__ACL_SANE_SOCKET_INCLUDE_H__
-#define	__ACL_SANE_SOCKET_INCLUDE_H__
+#ifndef	ACL_SANE_SOCKET_INCLUDE_H
+#define	ACL_SANE_SOCKET_INCLUDE_H
 
 #ifdef	__cplusplus
 extern "C" {

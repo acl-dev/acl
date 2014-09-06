@@ -44,8 +44,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * SUCH DAMAGE.
  */
 
-#ifndef	__ACL_PTHREAD_RWLOCK__
-#define	__ACL_PTHREAD_RWLOCK__
+#ifndef	ACL_PTHREAD_RWLOCK_H
+#define	ACL_PTHREAD_RWLOCK_H
 
 #include "stdlib/acl_define.h"
 #include "thread/acl_pthread.h"

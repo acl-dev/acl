@@ -1,6 +1,5 @@
-
-#ifndef	__ACL_PTHREAD_WIN32_INCLUDE_H__
-#define	__ACL_PTHREAD_WIN32_INCLUDE_H__
+#ifndef	ACL_PTHREAD_WIN32_INCLUDE_H
+#define	ACL_PTHREAD_WIN32_INCLUDE_H
 
 #ifdef	__cplusplus
 extern "C" {

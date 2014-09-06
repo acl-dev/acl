@@ -1,6 +1,5 @@
-
-#ifndef	_ACL_RING_H_INCLUDE_
-#define	_ACL_RING_H_INCLUDE_
+#ifndef	ACL_RING_INCLUDE_H
+#define	ACL_RING_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

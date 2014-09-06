@@ -1,6 +1,5 @@
-
-#ifndef	__ACL_TRIGGER_PARAMS_INCLUDE_H__
-#define	__ACL_TRIGGER_PARAMS_INCLUDE_H__
+#ifndef	ACL_TRIGGER_PARAMS_INCLUDE_H
+#define	ACL_TRIGGER_PARAMS_INCLUDE_H
 
 #ifdef	__cplusplus
 extern "C" {

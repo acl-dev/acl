@@ -1,5 +1,5 @@
-#ifndef _WATCHDOG_H_INCLUDED_
-#define _WATCHDOG_H_INCLUDED_
+#ifndef ACL_WATCHDOG_INCLUDE_H
+#define ACL_WATCHDOG_INCLUDE_H
 
 #ifdef	__cplusplus
 extern "C" {

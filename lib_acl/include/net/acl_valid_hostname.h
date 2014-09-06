@@ -1,5 +1,5 @@
-#ifndef __ACL_VALID_HOSTNAME_H_INCLUDED__
-#define __ACL_VALID_HOSTNAME_H_INCLUDED__
+#ifndef ACL_VALID_HOSTNAME_INCLUDE_H
+#define ACL_VALID_HOSTNAME_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

@@ -1,5 +1,5 @@
-#ifndef __ACL_ARGV_H_INCLUDED_
-#define __ACL_ARGV_H_INCLUDED_
+#ifndef ACL_ARGV_INCLUDE_H
+#define ACL_ARGV_INCLUDE_H
 
 # ifdef	__cplusplus
 extern "C" {

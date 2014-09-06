@@ -1,6 +1,5 @@
-
-#ifndef	__MEMDB_INCLUDE_H_
-#define	__MEMDB_INCLUDE_H_
+#ifndef	ACL_MEMDB_INCLUDE_H
+#define	ACL_MEMDB_INCLUDE_H
 
 #ifdef	__cplusplus
 extern "C" {

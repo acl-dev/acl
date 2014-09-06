@@ -1,5 +1,5 @@
-#ifndef __ACL_TIMED_WAIT_H_INCLUDED__
-#define __ACL_TIMED_WAIT_H_INCLUDED__
+#ifndef ACL_TIMED_WAIT_INCLUDE_H
+#define ACL_TIMED_WAIT_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

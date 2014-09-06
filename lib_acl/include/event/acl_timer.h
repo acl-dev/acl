@@ -1,5 +1,5 @@
-#ifndef	__ACL_TIMER_INCLUDE_H__
-#define	__ACL_TIMER_INCLUDE_H__
+#ifndef	ACL_TIMER_INCLUDE_H
+#define	ACL_TIMER_INCLUDE_H
 
 #include "stdlib/acl_define.h"
 #include <time.h>

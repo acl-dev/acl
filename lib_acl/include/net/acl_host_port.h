@@ -1,5 +1,5 @@
-#ifndef __ACL_HOST_PORT_H_INCLUDED__
-#define __ACL_HOST_PORT_H_INCLUDED__
+#ifndef ACL_HOST_PORT_INCLUDE_H
+#define ACL_HOST_PORT_INCLUDE_H
 
 #ifdef	__cplusplus
 extern "C" {

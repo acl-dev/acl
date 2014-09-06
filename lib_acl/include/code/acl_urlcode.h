@@ -1,5 +1,5 @@
-#ifndef __ACL_URLCODE_INCLUDE_H__
-#define __ACL_URLCODE_INCLUDE_H__
+#ifndef ACL_URLCODE_INCLUDE_H
+#define ACL_URLCODE_INCLUDE_H
 
 #ifdef __cplusplus
 extern "C" {

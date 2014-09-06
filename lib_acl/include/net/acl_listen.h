@@ -1,5 +1,5 @@
-#ifndef __ACL_LISTEN_INCLUDE_H__
-#define __ACL_LISTEN_INCLUDE_H__
+#ifndef ACL_LISTEN_INCLUDE_H
+#define ACL_LISTEN_INCLUDE_H
 #ifdef __cplusplus
 extern "C" {
 #endif

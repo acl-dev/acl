@@ -1,5 +1,5 @@
-#ifndef __ACL_HEX_CODE_H_INCLUDED__
-#define __ACL_HEX_CODE_H_INCLUDED__
+#ifndef ACL_HEX_CODE_INCLUDE_H
+#define ACL_HEX_CODE_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

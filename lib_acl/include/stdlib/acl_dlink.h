@@ -1,5 +1,5 @@
-#ifndef __ACL_DLINK_INCLUDE__
-#define __ACL_DLINK_INCLUDE__
+#ifndef ACL_DLINK_INCLUDE
+#define ACL_DLINK_INCLUDE
 
 #ifdef __cplusplus
 extern "C" {

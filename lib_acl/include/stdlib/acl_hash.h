@@ -1,5 +1,5 @@
-#ifndef	__ACL_HASH_INCLUD_H__
-#define	__ACL_HASH_INCLUD_H__
+#ifndef	ACL_HASH_INCLUD_H
+#define	ACL_HASH_INCLUD_H
 
 #ifdef	__cplusplus
 extern "C" {

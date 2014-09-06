@@ -1,5 +1,5 @@
-#ifndef __ACL_DEBUG_INCLUDE_H__
-#define	__ACL_DEBUG_INCLUDE_H__
+#ifndef ACL_DEBUG_INCLUDE_H
+#define	ACL_DEBUG_INCLUDE_H
 
 #include "acl_define.h"
 #include "acl_msg.h"

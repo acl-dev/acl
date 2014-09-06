@@ -1,6 +1,5 @@
-
-#ifndef _ACL_SCAN_DIR_H_INCLUDED_
-#define _ACL_SCAN_DIR_H_INCLUDED_
+#ifndef ACL_SCAN_DIR_INCLUDE_H
+#define ACL_SCAN_DIR_INCLUDE_H
 
 #include <sys/stat.h>
 

@@ -23,8 +23,8 @@
  * Use is subject to license terms.
  */
 
-#ifndef	_AVL_H
-#define	_AVL_H
+#ifndef	ACL_AVL_H
+#define	ACL_AVL_H
 
 /*
  * This is a private header file.  Applications should not directly include

@@ -1,5 +1,5 @@
-#ifndef	_ACL_BASE64_CODE_INCLUDE_H_
-#define	_ACL_BASE64_CODE_INCLUDE_H_
+#ifndef	ACL_BASE64_CODE_INCLUDE_H
+#define	ACL_BASE64_CODE_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

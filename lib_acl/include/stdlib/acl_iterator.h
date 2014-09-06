@@ -1,5 +1,5 @@
-#ifndef	__ACL_ITERATOR_INCLUDE_H__
-#define	__ACL_ITERATOR_INCLUDE_H__
+#ifndef	ACL_ITERATOR_INCLUDE_H
+#define	ACL_ITERATOR_INCLUDE_H
 
 typedef struct ACL_ITER ACL_ITER;
 

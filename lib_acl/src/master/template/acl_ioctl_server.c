@@ -149,8 +149,8 @@ static unsigned ioctl_server_generation;
 
 static void ioctl_init(void)
 {
-	pthread_mutex_init(&__closing_time_mutex, NULL);
-	pthread_mutex_init(&__counter_mutex, NULL);
+	acl_assert(pthread_mutex_init(&__closing_time_mutex, NULL) == 0);
+	acl_assert(pthread_mutex_init(&__counter_mutex, NULL) == 0);
 	__last_closing_time = time(NULL);
 
 	__use_limit_delay = acl_var_ioctl_delay_sec > 1 ?
@@ -159,22 +159,22 @@ static void ioctl_init(void)
 
 static void lock_closing_time(void)
 {
-	pthread_mutex_lock(&__closing_time_mutex);
+	acl_assert(pthread_mutex_lock(&__closing_time_mutex) == 0);
 }
 
 static void unlock_closing_time(void)
 {
-	pthread_mutex_unlock(&__closing_time_mutex);
+	acl_assert(pthread_mutex_unlock(&__closing_time_mutex) == 0);
 }
 
 static void lock_counter(void)
 {
-	pthread_mutex_lock(&__counter_mutex);
+	acl_assert(pthread_mutex_lock(&__counter_mutex) == 0);
 }
 
 static void unlock_counter(void)
 {
-	pthread_mutex_unlock(&__counter_mutex);
+	acl_assert(pthread_mutex_unlock(&__counter_mutex) == 0);
 }
 
 static void update_closing_time(void)

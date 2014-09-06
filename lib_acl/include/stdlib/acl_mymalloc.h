@@ -9,8 +9,8 @@
  *		的宏时便自动切换到用户自己的内存管理接口调用上
  */
 
-#ifndef	_ACL_MYMALLOC_INCLUDE_H_
-#define	_ACL_MYMALLOC_INCLUDE_H_
+#ifndef	ACL_MYMALLOC_INCLUDE_H
+#define	ACL_MYMALLOC_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

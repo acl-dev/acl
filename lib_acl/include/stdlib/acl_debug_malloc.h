@@ -1,5 +1,5 @@
-#ifndef __ACL_DEBUG_MALLOC_INCLUDE_H__
-#define __ACL_DEBUG_MALLOC_INCLUDE_H__
+#ifndef ACL_DEBUG_MALLOC_INCLUDE_H
+#define ACL_DEBUG_MALLOC_INCLUDE_H
 
 #ifdef __cplusplus
 extern "C" {

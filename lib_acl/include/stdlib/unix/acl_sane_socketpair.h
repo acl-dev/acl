@@ -1,5 +1,5 @@
-#ifndef __ACL_SANE_SOCKETPAIR_H__
-#define __ACL_SANE_SOCKETPAIR_H__
+#ifndef ACL_SANE_SOCKETPAIR_H
+#define ACL_SANE_SOCKETPAIR_H
 
 #ifdef  __cplusplus
 extern "C" {

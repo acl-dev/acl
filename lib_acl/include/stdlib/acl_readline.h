@@ -1,5 +1,5 @@
-#ifndef	__ACL_READLINE_INCLUDE_H__
-#define	__ACL_READLINE_INCLUDE_H__
+#ifndef	ACL_READLINE_INCLUDE_H
+#define	ACL_READLINE_INCLUDE_H
 
 #include "acl_vstream.h"
 #include "acl_vstring.h"

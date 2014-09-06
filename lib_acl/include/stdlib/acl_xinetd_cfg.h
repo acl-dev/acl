@@ -1,5 +1,5 @@
-#ifndef	__ACL_XINETD_CFG_INCLUDE_H_
-#define	__ACL_XINETD_CFG_INCLUDE_H_
+#ifndef	ACL_XINETD_CFG_INCLUDE_H
+#define	ACL_XINETD_CFG_INCLUDE_H
 
 #ifdef	__cplusplus
 extern "C" {

@@ -1,5 +1,5 @@
-#ifndef	__ACL_ARRAY_INCLUDE_H_
-#define	__ACL_ARRAY_INCLUDE_H_
+#ifndef	ACL_ARRAY_INCLUDE_H
+#define	ACL_ARRAY_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

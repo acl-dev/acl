@@ -1,6 +1,5 @@
-
-#ifndef _ACL_TRANSFER_FD_INCLUDE_
-#define _ACL_TRANSFER_FD_INCLUDE_
+#ifndef ACL_TRANSFER_FD_INCLUDE_H
+#define ACL_TRANSFER_FD_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

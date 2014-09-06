@@ -5,8 +5,8 @@
  * Version: 1.0
  *
 */
-#ifndef	_IPLINK_INCLUDE_H_
-#define	_IPLINK_INCLUDE_H_
+#ifndef	ACL_IPLINK_INCLUDE_H
+#define	ACL_IPLINK_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

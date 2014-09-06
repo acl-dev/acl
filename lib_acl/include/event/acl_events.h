@@ -1,5 +1,5 @@
-#ifndef __ACL_EVENTS_H_INCLUDED__
-#define __ACL_EVENTS_H_INCLUDED__
+#ifndef ACL_EVENTS_H_INCLUDED
+#define ACL_EVENTS_H_INCLUDED
 
 #ifdef	__cplusplus
 extern "C" {

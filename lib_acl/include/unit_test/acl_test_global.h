@@ -1,5 +1,5 @@
-#ifndef	__ACL_TEST_GLOBAL_INCLUDE_H_
-#define	__ACL_TEST_GLOBAL_INCLUDE_H_
+#ifndef	ACL_TEST_GLOBAL_INCLUDE_H
+#define	ACL_TEST_GLOBAL_INCLUDE_H
 
 # ifdef	__plusplus
 extern "C" {

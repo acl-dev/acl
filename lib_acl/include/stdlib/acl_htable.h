@@ -1,6 +1,5 @@
-
-#ifndef _ACL_HTABLE_H_INCLUDED_
-#define _ACL_HTABLE_H_INCLUDED_
+#ifndef ACL_HTABLE_INCLUDE_H
+#define ACL_HTABLE_INCLUDE_H
 
 #ifdef  __cplusplus
 extern "C" {

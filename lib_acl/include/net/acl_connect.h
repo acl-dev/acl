@@ -1,6 +1,5 @@
-
-#ifndef	_ACL_CONNECT_INCLUDE_H__
-#define	_ACL_CONNECT_INCLUDE_H__
+#ifndef	ACL_CONNECT_INCLUDE_H
+#define	ACL_CONNECT_INCLUDE_H
 
 #ifdef	__cplusplus
 extern "C" {
