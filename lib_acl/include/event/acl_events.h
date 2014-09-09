@@ -12,16 +12,14 @@ extern "C" {
 
 /*+++++++++++++++++++++++++++ 全局宏定义 +++++++++++++++++++++++++++++++++++*/
  /* Event codes. */
-#define ACL_EVENT_READ          (1<<0)      /**< read event */
-#define ACL_EVENT_WRITE         (1<<1)      /**< write event */
-#define	ACL_EVENT_CONNECT       ACL_EVENT_WRITE  /**< client has connected the server*/
-#define ACL_EVENT_XCPT          (1<<2)      /**< exception */
-#define ACL_EVENT_TIME          (1<<3)      /**< timer event */
-#define	ACL_EVENT_RW_TIMEOUT    (1<<4)      /**< read/write timeout event */
-
-#define	ACL_EVENT_TIMEOUT	ACL_EVENT_RW_TIMEOUT
-#define	ACL_EVENT_ACCEPT	ACL_EVENT_READ
-#define	ACL_EVENT_CLIENT	(ACL_EVENT_ACCEPT)
+#define ACL_EVENT_READ          (1 << 0)      /**< read event */
+#define	ACL_EVENT_ACCEPT        (1 << 1)      /**< accept one connection */
+#define ACL_EVENT_WRITE         (1 << 2)      /**< write event */
+#define	ACL_EVENT_CONNECT       (1 << 3)      /**< client has connected the server*/
+#define ACL_EVENT_XCPT          (1 << 4)      /**< exception */
+#define ACL_EVENT_TIME          (1 << 5)      /**< timer event */
+#define	ACL_EVENT_RW_TIMEOUT    (1 << 6)      /**< read/write timeout event */
+#define	ACL_EVENT_TIMEOUT       ACL_EVENT_RW_TIMEOUT
 
 #define	ACL_EVENT_FD_IDLE	0
 #define	ACL_EVENT_FD_BUSY	1

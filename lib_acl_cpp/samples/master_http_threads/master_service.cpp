@@ -47,6 +47,8 @@ master_service::~master_service()
 
 bool master_service::thread_on_read(acl::socket_stream* stream)
 {
+	logger("thread id: %lu", acl_pthread_self());
+
 	acl::http_response res(stream);
 	// 响应数据体为 xml 格式
 	res.response_header().set_content_type("text/html");
@@ -82,6 +84,7 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 {
 	if (0)
 		acl_tcp_so_linger(conn->sock_handle(), 1, 0);
+	logger("thread id: %lu", acl_pthread_self());
 	return true;
 }
 
@@ -92,6 +95,7 @@ bool master_service::thread_on_timeout(acl::socket_stream*)
 
 void master_service::thread_on_close(acl::socket_stream*)
 {
+	logger("thread id: %lu", acl_pthread_self());
 }
 
 void master_service::thread_on_init()
@@ -104,6 +108,8 @@ void master_service::thread_on_exit()
 
 void master_service::proc_on_init()
 {
+	logger("thread id: %lu", acl_pthread_self());
+
 	if (var_cfg_buf_size <= 0)
 		var_cfg_buf_size = 1024;
 	res_buf_ = (char*) acl_mymalloc(var_cfg_buf_size + 1);

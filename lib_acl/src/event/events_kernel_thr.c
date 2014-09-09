@@ -455,12 +455,14 @@ static void event_loop(ACL_EVENT *eventp)
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_READ) && EVENT_TEST_READ(bp))
 		{
-			fdp->stream->sys_read_ready = 1;
 			if ((fdp->event_type & ACL_EVENT_READ) == 0) {
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = eventp->fdcnt_ready;
 				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
 			}
+			if (fdp->listener)
+				fdp->event_type |= ACL_EVENT_ACCEPT;
+			fdp->stream->sys_read_ready = 1;
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
 			&& EVENT_TEST_WRITE(bp))
 		{

@@ -207,7 +207,7 @@ static void event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	fdp->r_ttl = 0;
 	fdp->r_timeout = 0;
 	fdp->r_callback = NULL;
-	fdp->event_type &= ~ACL_EVENT_READ;
+	fdp->event_type &= ~(ACL_EVENT_READ | ACL_EVENT_ACCEPT);
 	fdp->flag &= ~EVENT_FDTABLE_FLAG_READ;
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
@@ -265,7 +265,7 @@ static void event_disable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	fdp->w_ttl = 0;
 	fdp->w_timeout = 0;
 	fdp->w_callback = NULL;
-	fdp->event_type &= ~ACL_EVENT_WRITE;
+	fdp->event_type &= ~(ACL_EVENT_WRITE | ACL_EVENT_CONNECT);
 	fdp->flag &= ~EVENT_FDTABLE_FLAG_WRITE;
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
@@ -442,6 +442,8 @@ static void event_loop(ACL_EVENT *eventp)
 			if ((fdp->event_type & (ACL_EVENT_READ | ACL_EVENT_WRITE)) == 0)
 			{
 				fdp->event_type |= ACL_EVENT_READ;
+				if (fdp->listener)
+					fdp->event_type |= ACL_EVENT_ACCEPT;
 				fdp->fdidx_ready = eventp->fdcnt_ready;
 				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
 			}

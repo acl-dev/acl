@@ -171,17 +171,13 @@ static void __writen_notify_callback(int event_type, ACL_EVENT *event acl_unused
 
 	WRITE_SAFE_DIABLE(astream);
 
-	if (event_type == ACL_EVENT_XCPT) {
+	if ((event_type & ACL_EVENT_XCPT) != 0) {
 		/* 流发生了错误，启动IO完成延迟关闭关闭 */
 		WRITE_IOCP_CLOSE(astream);
 		return;
-	} else if (event_type == ACL_EVENT_RW_TIMEOUT) {
+	} else if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
 		/* 写操作超时，如果用户的回调函数返回 -1则启动IO完成延迟关闭过程 */
-		int   ret;
-
-		ret = aio_timeout_callback(astream);
-
-		if (ret < 0) {
+		if (aio_timeout_callback(astream) < 0) {
 			WRITE_IOCP_CLOSE(astream);
 		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 			/* 该流正处于IO延迟关闭状态，因为本次写IO已经成功完成，
@@ -195,8 +191,8 @@ static void __writen_notify_callback(int event_type, ACL_EVENT *event acl_unused
 		return;
 	}
 
-	if (event_type != ACL_EVENT_WRITE)
-		acl_msg_fatal("%s: unknown event type(%d)", myname, event_type);
+	if ((event_type & ACL_EVENT_WRITE) == 0)
+		acl_msg_fatal("%s: unknown event: %d", myname, event_type);
 
 	/* 尝试发送流的写队列里的数据 */
 	nleft = __try_fflush(astream);
@@ -532,14 +528,11 @@ static void can_write_callback(int event_type, ACL_EVENT *event acl_unused,
 
 	WRITE_SAFE_DIABLE(astream);
 
-	if (event_type == ACL_EVENT_XCPT) {
+	if ((event_type & ACL_EVENT_XCPT) != 0) {
 		WRITE_IOCP_CLOSE(astream);
 		return;
-	} else if (event_type == ACL_EVENT_RW_TIMEOUT) {
-		int  ret;
-
-		ret = aio_timeout_callback(astream);
-		if (ret < 0) {
+	} else if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
+		if (aio_timeout_callback(astream) < 0) {
 			WRITE_IOCP_CLOSE(astream);
 		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 			/* 该流正处于IO延迟关闭状态，因为本次读IO已经成功完成，

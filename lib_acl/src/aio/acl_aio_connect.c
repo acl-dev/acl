@@ -61,26 +61,18 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 	WRITE_SAFE_DIABLE(astream);
 
 	/* 先判断是否是超时导致返回 */
-	if (event_type == ACL_EVENT_RW_TIMEOUT) {
-		ret = aio_timeout_callback(astream);
-		if (ret < 0) {
+	if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
+		if (aio_timeout_callback(astream) < 0)
 			acl_aio_iocp_close(astream);
-			return;
-		}
-		/* 增加引用计数，以防异常关闭 */
-		ret = aio_timeout_callback(astream);
-		if (ret < 0) {
-			acl_aio_iocp_close(astream);
-		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
+		else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE)
 			/* 该流正处于IO延迟关闭状态，因为本次写IO已经成功完成，
 			 * 所以需要完成流的IO延迟关闭过程
 			 */
 			acl_aio_iocp_close(astream);
-		} else {
+		else
 			acl_event_enable_write(event, astream->stream,
 				astream->timeout, __connect_notify_callback,
 				astream);
-		}
 		return;
 	}
 
@@ -90,7 +82,7 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 		acl_aio_cancel_timer(astream->aio, ConnectTimer, astream);
 #endif
 
-	if (event_type == ACL_EVENT_XCPT) {
+	if ((event_type & ACL_EVENT_XCPT) != 0) {
 		acl_aio_iocp_close(astream);
 		return;
 	}
@@ -112,20 +104,19 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 		acl_set_error(ACL_ENOTCONN);
 #endif
 
-	if (errno == 0 || errno == ACL_EISCONN) {
+	if (errno == 0 || errno == ACL_EISCONN)
 		event_type = ACL_EVENT_CONNECT;
-	} else if (event_type == ACL_EVENT_CONNECT) {
-		event_type = ACL_EVENT_XCPT;
-	}
+	else if ((event_type & ACL_EVENT_CONNECT) == 0)
+		event_type |= ACL_EVENT_XCPT;
 
-	if (event_type == ACL_EVENT_XCPT) {
+	if ((event_type & ACL_EVENT_XCPT) != 0) {
 		astream->flag |= ACL_AIO_FLAG_DEAD;
 		acl_aio_iocp_close(astream);
 		return;
 	}
 
-	if (event_type != ACL_EVENT_CONNECT)
-		acl_msg_fatal("%s: unknown event type(%d)", myname, event_type);
+	if ((event_type & ACL_EVENT_CONNECT) == 0)
+		acl_msg_fatal("%s: unknown event: %d", myname, event_type);
 
 	/* 将引用计数加1以防止在 connect_fn 内部调用了关闭过程，connect_fn
 	 * 可通过返回-1，在回调返回后真正关闭
@@ -136,7 +127,7 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 		ACL_ITER iter;
 		ACL_FIFO connect_handles;
 
-		/* XXX: 必须将各个回调句柄从回调队列中一一提出置入一个单独队列中,
+		/* 必须将各个回调句柄从回调队列中一一提出置入一个单独队列中,
 		 * 因为 ACL_AIO 在回调过程中有可能发生嵌套，防止被重复调用
 		 */
 
@@ -153,25 +144,25 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 			if (handle == NULL)
 				break;
 			ret = handle->callback(astream, handle->ctx);
-			if (ret != 0) {
-				astream->nrefer--;
-				if (ret < 0 || astream->flag  & ACL_AIO_FLAG_IOCP_CLOSE)
-					acl_aio_iocp_close(astream);
-				return;
-			}
+			if (ret == 0)
+				continue;
+
+			astream->nrefer--;
+			if (ret < 0 || astream->flag  & ACL_AIO_FLAG_IOCP_CLOSE)
+				acl_aio_iocp_close(astream);
+			return;
 		}
 	}
 
 	astream->nrefer--;
 
-	if (ret < 0) {
+	if (ret < 0)
 		acl_aio_iocp_close(astream);
-	} else if ((astream->flag  & ACL_AIO_FLAG_IOCP_CLOSE)) {
+	else if ((astream->flag  & ACL_AIO_FLAG_IOCP_CLOSE))
 		/* 之前该流已经被设置了IO完成延迟关闭标志位，
 		 * 则再次启动IO完成延迟关闭过程
 		 */
 		acl_aio_iocp_close(astream);
-	}
 }
 
 ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout)
@@ -202,21 +193,20 @@ ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout)
 		return (NULL);
 	}
 
-
 	cstream->flag |= ACL_VSTREAM_FLAG_CONNECTING;
 
 	astream = acl_aio_open(aio, cstream);
-	if (astream == NULL) {
+	if (astream == NULL)
 		acl_msg_fatal("%s: open astream error", myname);
-	}
 
 #ifdef WIN32
 	if (timeout > 0 && aio->event_mode == ACL_EVENT_WMSG)
-		acl_aio_request_timer(aio, ConnectTimer, astream, timeout * 1000000, 0);
+		acl_aio_request_timer(aio, ConnectTimer, astream,
+			timeout * 1000000, 0);
 #endif
 	astream->error = acl_last_error();
 	acl_aio_ctl(astream, ACL_AIO_CTL_TIMEOUT, timeout, ACL_AIO_CTL_END);
 
 	WRITE_SAFE_ENABLE(astream, __connect_notify_callback);
-	return (astream);
+	return astream;
 }

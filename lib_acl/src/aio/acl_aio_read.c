@@ -114,13 +114,13 @@ static int read_complete_callback(ACL_ASTREAM *astream, char *data, int len)
 			ret = handle->callback(astream, handle->ctx, data, len);
 			if (ret != 0) {
 				astream->nrefer--;
-				return (ret);
+				return ret;
 			}
 		}
 	}
 
 	astream->nrefer--;
-	return (ret);
+	return ret;
 }
 
 /* 尝试性读一行数据
@@ -142,7 +142,7 @@ static int __gets_peek(ACL_ASTREAM *astream)
 			|| astream->stream->errnum == ACL_EAGAIN))
 		{
 			READ_SAFE_ENABLE(astream, main_read_callback);
-			return (0);
+			return 0;
 		}
 
 		/* XXX: 必须查看缓冲区中是否还有数据,
@@ -157,7 +157,7 @@ static int __gets_peek(ACL_ASTREAM *astream)
 		/* 读出错，需要关闭流 */
 		astream->flag |= ACL_AIO_FLAG_DEAD;
 		READ_IOCP_CLOSE(astream);
-		return (-1);
+		return -1;
 	} else if (ready) {
 		char *ptr = acl_vstring_str(&astream->strbuf);
 		int   len = ACL_VSTRING_LEN(&astream->strbuf);
@@ -170,18 +170,18 @@ static int __gets_peek(ACL_ASTREAM *astream)
 		 */
 		if (n < 0 || (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE)) {
 			READ_IOCP_CLOSE(astream);
-			return (-1);
+			return -1;
 		} else if (astream->keep_read == 0
 			|| (astream->flag & ACL_AIO_FLAG_ISRD) == 0)
 		{
-			return (0);
+			return 0;
 		}
-		return (len);
+		return len;
 	}
 
 	/* 未读到所要求的一行数据，继续监控该流的读行事件 */
 	READ_SAFE_ENABLE(astream, main_read_callback);
-	return (0);
+	return 0;
 }
 
 /* 由事件监控过程回调触发的读行事件处理过程 */
@@ -193,7 +193,7 @@ static void __gets_notify_callback(int event_type, ACL_ASTREAM *astream)
 	if (astream->keep_read == 0)
 		READ_SAFE_DISABLE(astream);
 
-	if (event_type == ACL_EVENT_XCPT) {
+	if ((event_type & ACL_EVENT_XCPT) != 0) {
 		/* 该流出错，但是有可能关闭的事件通知到达时流依然可读，
 		 * 则应该保证读优先，直到把操作系统缓冲区中的数据读完
 		 * 为止，最后再处理关闭事件，即关闭流
@@ -209,12 +209,11 @@ static void __gets_notify_callback(int event_type, ACL_ASTREAM *astream)
 		} while (ret > 0);
 		READ_IOCP_CLOSE(astream);
 		return;
-	} else if (event_type == ACL_EVENT_RW_TIMEOUT) {
+	} else if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
 		/* 读流超时，如果应用返回值大于等于0，则希望继续读,
 		 * 如果返回值小于0则希望关闭流。有人会有这种需求吗？
 		 */
-		int  ret = aio_timeout_callback(astream);
-		if (ret < 0) {
+		if (aio_timeout_callback(astream) < 0) {
 			READ_IOCP_CLOSE(astream);
 		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 			/* 该流正处于IO延迟关闭状态，因为本次读IO已经
@@ -228,8 +227,8 @@ static void __gets_notify_callback(int event_type, ACL_ASTREAM *astream)
 		return;
 	}
 
-	if (event_type !=  ACL_EVENT_READ)
-		acl_msg_fatal("%s: unknown event(%d)", myname, event_type);
+	if ((event_type & ACL_EVENT_READ) == 0)
+		acl_msg_fatal("%s: unknown event: %d", myname, event_type);
 
 	/* 尝试性地读数据 */
 	while (1) {
@@ -331,10 +330,10 @@ static int __read_peek(ACL_ASTREAM *astream)
 			|| astream->stream->errnum == ACL_EWOULDBLOCK)
 		{
 			READ_SAFE_ENABLE(astream, main_read_callback);
-			return (0);
+			return 0;
 		}
 
-		/* XXX: 必须查看缓冲区中是否还有数据, 必须兼容数据读不够的情况! */
+		/* 必须查看缓冲区中是否还有数据, 必须兼容数据读不够的情况! */
 		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
 			char *ptr = acl_vstring_str(&astream->strbuf);
 			int   len = ACL_VSTRING_LEN(&astream->strbuf);
@@ -344,7 +343,7 @@ static int __read_peek(ACL_ASTREAM *astream)
 		/* 读出错，需要关闭流 */
 		astream->flag |= ACL_AIO_FLAG_DEAD;
 		READ_IOCP_CLOSE(astream);
-		return (-1);
+		return -1;
 	} else if (n > 0) {
 		char *ptr = acl_vstring_str(&astream->strbuf);
 		int   len = ACL_VSTRING_LEN(&astream->strbuf);
@@ -357,17 +356,17 @@ static int __read_peek(ACL_ASTREAM *astream)
 		 */
 		if (n < 0 || astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 			READ_IOCP_CLOSE(astream);
-			return (-1);
+			return -1;
 		} else if (astream->keep_read == 0
 			|| (astream->flag & ACL_AIO_FLAG_ISRD) == 0)
 		{
-			return (0);
+			return 0;
 		}
-		return (len);
+		return len;
 	} else {
 		/* 读数据不符合要求，继续监控该读事件 */
 		READ_SAFE_ENABLE(astream, main_read_callback);
-		return (0);
+		return 0;
 	}
 }
 
@@ -380,7 +379,7 @@ static void __read_notify_callback(int event_type, ACL_ASTREAM *astream)
 	if (astream->keep_read == 0)
 		READ_SAFE_DISABLE(astream);
 
-	if (event_type == ACL_EVENT_XCPT) {
+	if ((event_type & ACL_EVENT_XCPT) != 0) {
 		/* 该流出错，但是有可能关闭的事件通知到达时流依然可读，
 		 * 则应该保证读优先，直到把操作系统缓冲区中的数据读完
 		 * 为止，最后再处理关闭事件，即关闭流
@@ -392,14 +391,14 @@ static void __read_notify_callback(int event_type, ACL_ASTREAM *astream)
 			astream->stream->sys_read_ready = 1;
 			ret = __read_peek(astream);
 		} while (ret > 0);
+
 		READ_IOCP_CLOSE(astream);
 		return;
-	} else if (event_type == ACL_EVENT_RW_TIMEOUT) {
+	} else if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
 		/* 读流超时，如果应用返回值大于等于0，则希望继续读,
 		 * 如果返回值小于0则希望关闭流。有人会有这种需求吗？
 		 */
-		int  ret = aio_timeout_callback(astream);
-		if (ret < 0) {
+		if (aio_timeout_callback(astream) < 0) {
 			/* 用户希望关闭流 */
 			READ_IOCP_CLOSE(astream);
 		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
@@ -410,11 +409,12 @@ static void __read_notify_callback(int event_type, ACL_ASTREAM *astream)
 		} else {
 			READ_SAFE_ENABLE(astream, main_read_callback);
 		}
+
 		return;
 	}
 
-	if (event_type !=  ACL_EVENT_READ)
-		acl_msg_fatal("%s: unknown event(%d)", myname, event_type);
+	if ((event_type & ACL_EVENT_READ) == 0)
+		acl_msg_fatal("%s: unknown event: %d", myname, event_type);
 
 	/* 尝试性地读数据 */
 	while (1) {
@@ -499,7 +499,7 @@ static int __readn_peek(ACL_ASTREAM *astream)
 			|| astream->stream->errnum == ACL_EWOULDBLOCK)
 		{
 			READ_SAFE_ENABLE(astream, main_read_callback);
-			return (0);
+			return 0;
 		}
 		/* XXX: 查看缓冲区中是否还有数据, 必须兼容数据读不够的情况! */
 		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
@@ -516,7 +516,7 @@ static int __readn_peek(ACL_ASTREAM *astream)
 		/* 读出错或读关闭，需要关闭流 */
 		astream->flag |= ACL_AIO_FLAG_DEAD;
 		READ_IOCP_CLOSE(astream);
-		return (-1);
+		return -1;
 	} else if (ready) {
 		/* ok, 已经满足读条件，即已经获得了所要求数据长度的数据 */
 		char *ptr = acl_vstring_str(&astream->strbuf);
@@ -530,17 +530,17 @@ static int __readn_peek(ACL_ASTREAM *astream)
 		n = read_complete_callback(astream, ptr, len);
 		if (n < 0 || astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 			READ_IOCP_CLOSE(astream);
-			return (-1);
+			return -1;
 		} else if (astream->keep_read == 0
 			|| (astream->flag & ACL_AIO_FLAG_ISRD) == 0)
 		{
-			return (0);
+			return 0;
 		}
-		return (len);
+		return len;
 	} else {
 		/* 读数据不符合要求，继续监控该读事件 */
 		READ_SAFE_ENABLE(astream, main_read_callback);
-		return (0);
+		return 0;
 	}
 }
 
@@ -549,12 +549,11 @@ static int __readn_peek(ACL_ASTREAM *astream)
 static void __readn_notify_callback(int event_type, ACL_ASTREAM *astream)
 {
 	const char *myname = "__readn_notify_callback";
-	int   n;
 
 	if (astream->keep_read == 0)
 		READ_SAFE_DISABLE(astream);
 
-	if (event_type == ACL_EVENT_XCPT) {
+	if ((event_type & ACL_EVENT_XCPT) != 0) {
 		/* 该流出错，但是有可能关闭的事件通知到达时流依然可读，
 		 * 则应该保证读优先，直到把操作系统缓冲区中的数据读完
 		 * 为止，最后再处理关闭事件，即关闭流
@@ -566,15 +565,14 @@ static void __readn_notify_callback(int event_type, ACL_ASTREAM *astream)
 			astream->stream->sys_read_ready = 1;
 			ret = __readn_peek(astream);
 		} while (astream->keep_read && ret > 0);
+
 		READ_IOCP_CLOSE(astream);
 		return;
-	} else if (event_type == ACL_EVENT_RW_TIMEOUT) {
+	} else if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
 		/* 读流超时，如果应用返回值大于等于0，则希望继续读,
 		 * 如果返回值小于0则希望关闭流。有人会有这种需求吗？
 		 */
-		n = aio_timeout_callback(astream);
-
-		if (n < 0) {
+		if (aio_timeout_callback(astream) < 0) {
 			READ_IOCP_CLOSE(astream);
 		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 			/* 该流正处于IO延迟关闭状态，因为本次读IO已经成功完成，
@@ -587,8 +585,9 @@ static void __readn_notify_callback(int event_type, ACL_ASTREAM *astream)
 		return;
 	}
 
-	if (event_type != ACL_EVENT_READ)
-		acl_msg_fatal("%s: unknown event type(%d)", myname, event_type);
+	if ((event_type & ACL_EVENT_READ) == 0)
+		acl_msg_fatal("%s: unknown event: %d", myname, event_type);
+
 	if (astream->stream == NULL)
 		acl_msg_fatal("%s: stream null", myname);
 
@@ -654,22 +653,21 @@ ACL_VSTRING *acl_aio_gets_peek(ACL_ASTREAM *astream)
 	int   ready = 0;
 
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
-		return (NULL);
+		return NULL;
 	if (acl_vstream_gets_peek(astream->stream,
 			&astream->strbuf, &ready) == ACL_VSTREAM_EOF
 		&& astream->stream->errnum != ACL_EAGAIN
 		&& astream->stream->errnum != ACL_EWOULDBLOCK)
 	{
 		astream->flag |= ACL_AIO_FLAG_DEAD;
-		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
+		if (ACL_VSTRING_LEN(&astream->strbuf) > 0)
 			return (&astream->strbuf);
-		} else {
-			return (NULL);
-		}
-	} else if (ready) {
-		return (&astream->strbuf);
-	} else
-		return (NULL);
+		else
+			return NULL;
+	} else if (ready)
+		return &astream->strbuf;
+	else
+		return NULL;
 }
 
 ACL_VSTRING *acl_aio_gets_nonl_peek(ACL_ASTREAM *astream)
@@ -677,22 +675,21 @@ ACL_VSTRING *acl_aio_gets_nonl_peek(ACL_ASTREAM *astream)
 	int   ready = 0;
 
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
-		return (NULL);
+		return NULL;
 	if (acl_vstream_gets_nonl_peek(astream->stream,
 			&astream->strbuf, &ready) == ACL_VSTREAM_EOF
 		&& astream->stream->errnum != ACL_EAGAIN
 		&& astream->stream->errnum != ACL_EWOULDBLOCK)
 	{
 		astream->flag |= ACL_AIO_FLAG_DEAD;
-		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
-			return (&astream->strbuf);
-		} else {
-			return (NULL);
-		}
-	} else if (ready) {
-		return (&astream->strbuf);
-	} else
-		return (NULL);
+		if (ACL_VSTRING_LEN(&astream->strbuf) > 0)
+			return &astream->strbuf;
+		else
+			return NULL;
+	} else if (ready)
+		return &astream->strbuf;
+	else
+		return NULL;
 }
 
 ACL_VSTRING *acl_aio_read_peek(ACL_ASTREAM *astream)
@@ -700,22 +697,21 @@ ACL_VSTRING *acl_aio_read_peek(ACL_ASTREAM *astream)
 	int   n;
 
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
-		return (NULL);
+		return NULL;
 	if ((n = acl_vstream_read_peek(astream->stream,
 			&astream->strbuf)) == ACL_VSTREAM_EOF
 		&& astream->stream->errnum != ACL_EAGAIN
 		&& astream->stream->errnum != ACL_EWOULDBLOCK)
 	{
 		astream->flag |= ACL_AIO_FLAG_DEAD;
-		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
-			return (&astream->strbuf);
-		} else {
-			return (NULL);
-		}
-	} else if (n > 0) {
-		return (&astream->strbuf);
-	} else
-		return (NULL);
+		if (ACL_VSTRING_LEN(&astream->strbuf) > 0)
+			return &astream->strbuf;
+		else
+			return NULL;
+	} else if (n > 0)
+		return &astream->strbuf;
+	else
+		return NULL;
 }
 
 ACL_VSTRING *acl_aio_readn_peek(ACL_ASTREAM *astream, int count)
@@ -723,27 +719,26 @@ ACL_VSTRING *acl_aio_readn_peek(ACL_ASTREAM *astream, int count)
 	int   ready = 0;
 
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
-		return (NULL);
+		return NULL;
 	if (acl_vstream_readn_peek(astream->stream,
 			&astream->strbuf, count, &ready) == ACL_VSTREAM_EOF
 		&& astream->stream->errnum != ACL_EAGAIN
 		&& astream->stream->errnum != ACL_EWOULDBLOCK)
 	{
 		astream->flag |= ACL_AIO_FLAG_DEAD;
-		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
-			return (&astream->strbuf);
-		} else {
-			return (NULL);
-		}
-	} else if (ready) {
-		return (&astream->strbuf);
-	} else
-		return (NULL);
+		if (ACL_VSTRING_LEN(&astream->strbuf) > 0)
+			return &astream->strbuf;
+		else
+			return NULL;
+	} else if (ready)
+		return &astream->strbuf;
+	else
+		return NULL;
 }
 
 int acl_aio_can_read(ACL_ASTREAM *astream)
 {
-	return (acl_vstream_can_read(astream->stream));
+	return acl_vstream_can_read(astream->stream);
 }
 
 static void can_read_callback(int event_type, ACL_EVENT *event acl_unused,
@@ -754,12 +749,11 @@ static void can_read_callback(int event_type, ACL_EVENT *event acl_unused,
 	if (astream->keep_read == 0)
 		READ_SAFE_DISABLE(astream);
 
-	if (event_type == ACL_EVENT_XCPT) {
+	if ((event_type & ACL_EVENT_XCPT) != 0) {
 		READ_IOCP_CLOSE(astream);
 		return;
-	} else if (event_type == ACL_EVENT_RW_TIMEOUT) {
-		int  ret = aio_timeout_callback(astream);
-		if (ret < 0) {
+	} else if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
+		if (aio_timeout_callback(astream) < 0) {
 			READ_IOCP_CLOSE(astream);
 		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 			/* 该流正处于IO延迟关闭状态，因为本次读IO已经成功完成，
@@ -779,9 +773,8 @@ static void can_read_callback(int event_type, ACL_EVENT *event acl_unused,
 	} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 		astream->nrefer--;
 		READ_IOCP_CLOSE(astream);
-	} else {
+	} else
 		astream->nrefer--;
-	}
 }
 
 void acl_aio_enable_read(ACL_ASTREAM *astream,
@@ -823,14 +816,10 @@ void acl_aio_disable_read(ACL_ASTREAM *astream)
 
 int acl_aio_isrset(ACL_ASTREAM *astream)
 {
-	const char *myname = "acl_aio_isrset";
-
-	if (astream == NULL)
-		acl_msg_fatal("%s: input invalid", myname);
 	if (astream->stream == NULL)
-		return (0);
+		return 0;
 
-	return (acl_event_isrset(astream->aio->event, astream->stream));
+	return acl_event_isrset(astream->aio->event, astream->stream);
 }
 
 void acl_aio_stream_set_line_length(ACL_ASTREAM *astream, int len)
