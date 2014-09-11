@@ -36,6 +36,7 @@ public:
 
 private:
 	acl::db_service* server_;
+	acl::aio_handle* handle_;
 public:
 	afx_msg void OnBnClickedGetData();
 	afx_msg void OnBnClickedDeleteData();

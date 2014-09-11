@@ -146,12 +146,14 @@ Cwin_dbserviceDlg::Cwin_dbserviceDlg(CWnd* pParent /*=NULL*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	server_ = NULL;
+	handle_ = new acl::aio_handle(acl::ENGINE_WINMSG);
 }
 
 Cwin_dbserviceDlg::~Cwin_dbserviceDlg()
 {
 	if (server_)
 		delete server_;
+	delete handle_;
 }
 
 void Cwin_dbserviceDlg::DoDataExchange(CDataExchange* pDX)
@@ -215,6 +217,12 @@ BOOL Cwin_dbserviceDlg::OnInitDialog()
 
 	// 采用基于 WIN32 消息模式的IPC方式
 	server_ = new acl::db_service_sqlite("DB_TEST", __dbfile, 2, 2, true);
+	if (server_->open(handle_) == false)
+	{
+		printf("open db service failed\r\n");
+		delete server_;
+		server_ = NULL;
+	}
 
 	return TRUE;  // 除非设置了控件的焦点，否则返回 TRUE
 }
@@ -272,6 +280,12 @@ void Cwin_dbserviceDlg::OnBnClickedAddData()
 {
 	// TODO: 在此添加控件通知处理程序代码
 
+	if (server_ == NULL)
+	{
+		MessageBox("db not opened yet!");
+		return;
+	}
+
 	acl::string sql;
 	myquery* query;
 
@@ -288,6 +302,12 @@ void Cwin_dbserviceDlg::OnBnClickedAddData()
 void Cwin_dbserviceDlg::OnBnClickedGetData()
 {
 	// TODO: 在此添加控件通知处理程序代码
+
+	if (server_ == NULL)
+	{
+		MessageBox("db not opened yet!");
+		return;
+	}
 
 	acl::string sql;
 	myquery* query;
@@ -306,6 +326,12 @@ void Cwin_dbserviceDlg::OnBnClickedGetData()
 void Cwin_dbserviceDlg::OnBnClickedDeleteData()
 {
 	// TODO: 在此添加控件通知处理程序代码
+
+	if (server_ == NULL)
+	{
+		MessageBox("db not opened yet!");
+		return;
+	}
 
 	acl::string sql;
 	myquery* query;
