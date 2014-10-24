@@ -2,40 +2,26 @@
 
 int main(void)
 {
-        ACL_IFCONF *ifconf;
-        ACL_IFADDR *ifaddr;
-        ACL_ITER iter;
-	char  host_ip[64];
+        ACL_IFCONF *ifconf;	/* 网卡查询结果对象 */
+        ACL_IFADDR *ifaddr;	/* 每个网卡信息对象 */
+        ACL_ITER iter;		/* 遍历对象 */
 
-	acl_msg_stdout_enable(1);
+	/* 查询本机所有网卡信息 */
 	ifconf = acl_get_ifaddrs();
 
 	if (ifconf == NULL) {
 		printf("acl_get_ifaddrs error: %s\r\n", acl_last_serror());
-		return (1);
+		return 1;
 	}
 
-	host_ip[0] = 0;
+	/* 遍历所有网卡的信息 */
 	acl_foreach(iter, ifconf) {
 		ifaddr = (ACL_IFADDR*) iter.data;
-
-		if (strcmp(ifaddr->ip, "127.0.0.1") == 0)
-			continue;
-
-		acl_msg_info(">>>ip: %s", ifaddr->ip);
-		/* 外网IP优先 */
-		if (strncmp(ifaddr->ip, "10.", 3) != 0
-			&& strncmp(ifaddr->ip, "192.", 4) != 0)
-		{
-			snprintf(host_ip, sizeof(host_ip), "%s", ifaddr->ip);
-		} else if (host_ip == NULL) {
-			snprintf(host_ip, sizeof(host_ip), "%s", ifaddr->ip);
-		}
+		printf(">>>ip: %s, name: %s\r\n", ifaddr->ip, ifaddr->name);
 	}
 
-	if (host_ip[0])
-		printf(">>host_ip: %s\n", host_ip);
-
+	/* 释放查询结果 */
 	acl_free_ifaddrs(ifconf);
-	return (0);
+
+	return 0;
 }

@@ -4,7 +4,7 @@
 #ifdef	ACL_UNIX
 # include <unistd.h>
 # include <sys/time.h>			/* gettimeofday, not POSIX */
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 # include <process.h>
 #endif
 

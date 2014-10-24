@@ -130,6 +130,7 @@ void acl_aqueue_free(ACL_AQUEUE *queue, ACL_AQUEUE_FREE_FN free_fn)
 		qi = queue->first;
 		if (qi == NULL)
 			break;
+		queue->first = qi->next;
 		if (free_fn != NULL)
 			free_fn(qi->data);
 		acl_myfree(qi);

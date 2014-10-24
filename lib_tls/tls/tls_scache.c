@@ -450,7 +450,7 @@ TLS_SCACHE *tls_scache_open(const char *dbname, const char *cache_label,
 #elif defined(ACL_UNIX)
 #define DICT_FLAGS \
 	(DICT_FLAG_DUP_REPLACE | DICT_FLAG_LOCK | DICT_FLAG_SYNC_UPDATE)
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 #define DICT_FLAGS \
 	(DICT_FLAG_DUP_REPLACE | DICT_FLAG_SYNC_UPDATE)
 #endif

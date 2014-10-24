@@ -87,7 +87,7 @@ TLS_PRNG_SRC *tls_prng_egd_open(const char *name, int timeout)
 
 #ifdef ACL_UNIX
     fd = acl_unix_connect(name, ACL_BLOCKING, timeout);
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	fd = acl_inet_connect(name, ACL_BLOCKING, timeout);
 #endif
 	

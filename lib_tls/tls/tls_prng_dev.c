@@ -118,9 +118,11 @@ ssize_t tls_prng_dev_read(TLS_PRNG_SRC *dev, size_t len)
 	rand_bytes = len;
     errno = 0;
 #ifdef ACL_UNIX
-    count = acl_timed_read(dev->fd.file, buffer, (int) rand_bytes, dev->timeout, (void *) 0);
-#elif defined(ACL_MS_WINDOWS)
-	count = acl_file_read(dev->fd.file, buffer, (int) rand_bytes, dev->timeout, (void *) 0);
+    count = acl_timed_read(dev->fd.file, buffer, (int) rand_bytes, dev->timeout,
+		NULL, NULL);
+#elif defined(WIN32)
+	count = acl_file_read(dev->fd.file, buffer, (int) rand_bytes,
+		dev->timeout, NULL, NULL);
 #endif
     if (count > 0) {
 	if (acl_msg_verbose)

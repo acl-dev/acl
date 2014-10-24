@@ -35,7 +35,7 @@
 #ifdef	ACL_UNIX
 #include <sys/time.h>			/* gettimeofday() */
 #include <unistd.h>			/* getpid() */
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 #include <process.h>
 #endif
 
@@ -62,8 +62,8 @@
 void    tls_int_seed(void)
 {
     static __thread struct {
-#ifdef ACL_MS_WINDOWS
-		int pid;
+#ifdef WIN32
+	int pid;
 #else
 	pid_t   pid;
 #endif

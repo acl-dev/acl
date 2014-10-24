@@ -229,6 +229,8 @@ bool polarssl_io::on_close(bool alive)
 			return false;
 		}
 	}
+#else
+	(void) alive;
 #endif
 
 	return true;

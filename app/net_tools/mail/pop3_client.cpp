@@ -327,7 +327,7 @@ bool pop3_client::pop3_get_banner(acl::socket_stream& conn)
 	if (line.ncompare("+OK", 3, false) != 0)
 	{
 		logger_error("pop3 server(%s) banner error: %s for user: %s",
-			pop3_ip_.c_str(), line.c_str, auth_account_.c_str());
+			pop3_ip_.c_str(), line.c_str(), auth_account_.c_str());
 		return false;
 	}
 	logger("banner: %s", line.c_str());
@@ -357,7 +357,7 @@ bool pop3_client::pop3_auth(acl::socket_stream& conn,
 	if (line.ncompare("+OK", 3, false) != 0)
 	{
 		logger_error("pop3 server(%s) reply error: %s for cmd USER %s",
-			pop3_ip_.c_str(), line.c_str, auth_account_.c_str());
+			pop3_ip_.c_str(), line.c_str(), auth_account_.c_str());
 		return false;
 	}
 
@@ -380,7 +380,7 @@ bool pop3_client::pop3_auth(acl::socket_stream& conn,
 	if (line.ncompare("+OK", 3, false) != 0)
 	{
 		logger_error("pop3 server(%s) reply error: %s for cmd PASS %s",
-			pop3_ip_.c_str(), line.c_str, auth_passwd_.c_str());
+			pop3_ip_.c_str(), line.c_str(), auth_passwd_.c_str());
 		return false;
 	}
 	logger("PASS's reply: %s", line.c_str());
@@ -529,7 +529,7 @@ bool pop3_client::pop3_retr(acl::socket_stream& conn,
 		time(&now);
 		inter = now - recv_begin_;
 		if (inter > 0)
-			meter_.recved_speed = meter_.recved_size / inter;
+			meter_.recved_speed = meter_.recved_size / (size_t) inter;
 		UP_CTX* up = new UP_CTX;
 		up->curr = i;
 		up->total = meter_.recved_limit;

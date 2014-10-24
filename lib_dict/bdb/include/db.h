@@ -75,7 +75,7 @@ typedef unsigned int u_int;
 typedef unsigned long u_long;
 #endif
 
-#ifndef	ACL_MS_WINDOWS
+#ifndef	WIN32
 #ifdef _WIN64
 typedef int64_t ssize_t;
 #else

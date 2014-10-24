@@ -21,7 +21,7 @@ ICMP_CHAT *icmp_chat_create(ACL_AIO* aio, int check_tid)
 	chat->count = 0;
 #ifdef ACL_UNIX
 	chat->pid = getpid();
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 	chat->pid = _getpid();
 #endif
 	chat->tid = (unsigned long) acl_pthread_self();

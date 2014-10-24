@@ -2,6 +2,11 @@
 #include <IPTypes.h>
 #include <Iphlpapi.h>
 #include "util.h"
+#pragma comment(lib, "Iphlpapi.lib")
+
+#ifndef VC6
+typedef  FIXED_INFO_W2KSP1 FIXED_INFO;
+#endif
 
 static size_t collect(const FIXED_INFO *fi, std::vector<acl::string>& dns_list)
 {
@@ -23,7 +28,9 @@ size_t util::get_dns(std::vector<acl::string>& dns_list)
 	n = sizeof(FIXED_INFO);
 	fi= (FIXED_INFO*) acl_mycalloc(1, n) ;
 
+#if (NTDDI_VERSION >= NTDDI_WIN2KSP1)
 	DWORD ret = ::GetNetworkParams(fi, &n);
+#endif
 	if (ret == ERROR_SUCCESS)
 	{
 		size_t n1 = collect(fi, dns_list);

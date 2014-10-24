@@ -13,7 +13,7 @@
 
 #ifdef ACL_UNIX
 # define FILE_HANDLE(x) (x)
-#elif defined(ACL_MS_WINDOWS)
+#elif defined(WIN32)
 # include <io.h>
 # define FILE_HANDLE(x) _get_osfhandle(x)
 #endif

@@ -807,7 +807,7 @@ static DICT *dict_db_open(const char *class, const char *path, int open_flags,
 	if (dict_flags & DICT_FLAG_LOCK) {
 		if ((lock_fd = acl_file_open(db_path, LOCK_OPEN_FLAGS(open_flags), 0644)) == ACL_FILE_INVALID) {
 			if (errno != ENOENT) {
-#ifdef ACL_MS_WINDOWS
+#ifdef WIN32
 				if (acl_last_error() != ERROR_FILE_NOT_FOUND)
 #endif
 				acl_msg_fatal("%s(%d): open file %s: %s(%d)", myname, __LINE__,

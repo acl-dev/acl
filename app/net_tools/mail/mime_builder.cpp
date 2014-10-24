@@ -2,6 +2,11 @@
 #include "global/global.h"
 #include "mime_builder.hpp"
 
+#ifdef WIN32
+#include <process.h>
+#define getpid _getpid
+#endif
+
 mime_builder::mime_builder()
 : body_text_(NULL)
 , body_html_(NULL)

@@ -19,7 +19,7 @@ typedef struct ACL_FILE {
 	int   errnum;		/**< 文件流的出错错误号 */
 } ACL_FILE;
 
-#define	ACL_FPATH(fp)	(ACL_VSTREAM_PATH((fp)->fp)
+#define	ACL_FPATH(fp)	ACL_VSTREAM_PATH((fp)->fp)
 #define	ACL_FSTREAM(fp)	((fp)->fp)
 
 /**

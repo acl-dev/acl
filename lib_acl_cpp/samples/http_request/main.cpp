@@ -4,8 +4,6 @@
 #include <getopt.h>
 #include "acl_cpp/lib_acl.hpp"
 
-using namespace acl;
-
 //////////////////////////////////////////////////////////////////////////
 
 class http_request_test
@@ -25,21 +23,24 @@ public:
 
 	bool run(void)
 	{
-		string body;
-		if (ifstream::load(file_, &body) == false)
+		acl::string body;
+
+		// 从本地文件中加载请求数据
+		if (acl::ifstream::load(file_, &body) == false)
 		{
 			logger_error("load %s error", file_.c_str());
 			return false;
 		}
 
-		http_request req(server_addr_);
+		// 创建  HTTP 请求客户端
+		acl::http_request req(server_addr_);
 
 		// 添加 HTTP 请求头字段
 
-		string ctype("text/");
+		acl::string ctype("text/");
 		ctype << stype_ << "; charset=" << charset_;
 
-		http_header& hdr = req.request_header();  // 请求头对象的引用
+		acl::http_header& hdr = req.request_header();  // 请求头对象的引用
 		hdr.set_url("/");
 		hdr.set_content_type(ctype);
 
@@ -52,9 +53,7 @@ public:
 		}
 
 		// 取出 HTTP 响应头的数据字段
-		http_client* client = req.get_client();
-		assert(client);
-		const char* p = client->header_value("Content-Type");
+		const char* p = req.header_value("Content-Type");
 		if (p == NULL || *p == 0)
 		{
 			logger_error("no Content-Type");
@@ -62,7 +61,7 @@ public:
 		}
 
 		// 分析 HTTP 响应头的数据类型
-		http_ctype content_type;
+		acl::http_ctype content_type;
 		content_type.parse(p);
 
 		// 响应头数据类型的子类型
@@ -84,9 +83,9 @@ public:
 
 private:
 	// 处理 text/plain 类型数据
-	bool do_plain(http_request& req)
+	bool do_plain(acl::http_request& req)
 	{
-		string body;
+		acl::string body;
 		if (req.get_body(body, to_charset_) == false)
 		{
 			logger_error("get http body error");
@@ -97,15 +96,15 @@ private:
 	}
 
 	// 处理 text/xml 类型数据
-	bool do_xml(http_request& req)
+	bool do_xml(acl::http_request& req)
 	{
-		xml body;
+		acl::xml body;
 		if (req.get_body(body, to_charset_) == false)
 		{
 			logger_error("get http body error");
 			return false;
 		}
-		xml_node* node = body.first_node();
+		acl::xml_node* node = body.first_node();
 		while (node)
 		{
 			const char* tag = node->tag_name();
@@ -121,16 +120,16 @@ private:
 	}
 
 	// 处理 text/json 类型数据
-	bool do_json(http_request& req)
+	bool do_json(acl::http_request& req)
 	{
-		json body;
+		acl::json body;
 		if (req.get_body(body, to_charset_) == false)
 		{
 			logger_error("get http body error");
 			return false;
 		}
 
-		json_node* node = body.first_node();
+		acl::json_node* node = body.first_node();
 		while (node)
 		{
 			if (node->tag_name())
@@ -147,11 +146,11 @@ private:
 	}
 
 private:
-	string server_addr_;	// web 服务器地址
-	string file_;		// 本地请求的数据文件
-	string stype_;		// 请求数据的子数据类型
-	string charset_;	// 本地请求数据文件的字符集
-	string to_charset_;	// 将服务器响应数据转为本地字符集
+	acl::string server_addr_;	// web 服务器地址
+	acl::string file_;		// 本地请求的数据文件
+	acl::string stype_;		// 请求数据的子数据类型
+	acl::string charset_;		// 本地请求数据文件的字符集
+	acl::string to_charset_;	// 将服务器响应数据转为本地字符集
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -168,8 +167,8 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int   ch;
-	string server_addr("127.0.0.1:8888"), file("./xml.txt");
-	string stype("xml"), charset("gb2312");
+	acl::string server_addr("127.0.0.1:8888"), file("./xml.txt");
+	acl::string stype("xml"), charset("gb2312");
 
 	while ((ch = getopt(argc, argv, "hs:f:t:c:")) > 0)
 	{
@@ -193,10 +192,12 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	// 将日志输出至屏幕
+	acl::log::stdout_open(true);
+
 	// 开始运行
-	log::stdout_open(true);
-	http_request_test test(server_addr, file, stype, charset);
-	test.run();
+	http_request_test request(server_addr, file, stype, charset);
+	request.run();
 
 	return 0;
 }

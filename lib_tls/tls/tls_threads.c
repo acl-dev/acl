@@ -26,10 +26,13 @@ static unsigned long threads_thread_id_fn(void)
 {
 #ifdef	ACL_UNIX
 	acl_pthread_t ret;
-#elif defined(ACL_MS_WINDOWS)
-	unsigned long ret;
-#endif
 	ret = acl_pthread_self();
+#elif defined(WIN32)
+	unsigned long ret;
+	ret = acl_pthread_self();
+#else
+#error "unknown OS"
+#endif
 	return((unsigned long) ret);
 }
 
