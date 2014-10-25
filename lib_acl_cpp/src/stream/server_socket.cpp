@@ -96,4 +96,12 @@ socket_stream* server_socket::accept(int timeout /* = 0 */)
 	return client;
 }
 
+void server_socket::set_tcp_defer_accept(int timeout)
+{
+	if (fd_ == ACL_SOCKET_INVALID)
+		logger_error("server socket not opened!");
+	else
+		acl_tcp_defer_accept(fd_, timeout);
+}
+
 } // namespace acl

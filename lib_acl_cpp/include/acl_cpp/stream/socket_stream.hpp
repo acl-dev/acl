@@ -38,8 +38,11 @@ public:
 
 	/**
 	 * 连接远程服务器并打开网络连接流
-	 * @param addr {const char*} 远程服务器监听地址, 格式: IP:PORT,
-	 *  对UNIX平台, 该地址还可以为域套接口地址, 如: /tmp/mysock
+	 * @param addr {const char*} 服务器地址, 若连接域套接口服务器(仅UNIX平台),
+	 *  域套接地址：/tmp/test.sock; 如果连接一个TCP服务器，则地址格式为:
+	 *  [${local_ip}@]${remote_addr}, 如: 60.28.250.199@www.sina.com:80,
+	 *  意思是绑定本的网卡地址为: 60.28.250.199, 远程连接 www.sina.com 的 80,
+	 *  如果由OS自动绑定本地 IP 地址，则可以写为：www.sina.com:80
 	 * @param conn_timeout {int} 连接超时时间(秒)
 	 * @param rw_timeout {int} 读写超时时间(秒)
 	 * @return {bool} 连接是否成功
@@ -134,6 +137,64 @@ public:
 	 *  连接正常则返回 true
 	 */
 	bool alive() const;
+
+	/**
+	 * 设置 TCP 套接字的 nodelay 功能
+	 * @param on {bool} true 表示打开，false 表示关闭
+	 * @return {socket_stream&}
+	 */
+	socket_stream& set_tcp_nodelay(bool on);
+
+	/**
+	 * 设置 TCP 套接字的 SO_LINGER 选项
+	 * @param on {bool} 是否启用 SO_LINGER 选项
+	 * @param linger {int} 当SO_LINGER打开时，取消 timed_wait 的时间，单位为秒
+	 * @return {socket_stream&}
+	 */
+	socket_stream& set_tcp_solinger(bool on, int linger);
+
+	/**
+	 * 设置 TCP 套接字的写缓冲区大小
+	 * @param size {int} 缓冲区设置大小
+	 * @return {socket_stream&}
+	 */
+	socket_stream& set_tcp_sendbuf(int size);
+
+	/**
+	 * 设置 TCP 套接字的读缓冲区大小
+	 * @param size {int} 缓冲区设置大小
+	 * @return {socket_stream&}
+	 */
+	socket_stream& set_tcp_recvbuf(int size);
+
+	/**
+	 * 获得 TCP 套接字是否设置了 nodelay 选项
+	 * @return {bool} true 表示打开，false 表示关闭
+	 */
+	bool get_tcp_nodelay();
+
+	/**
+	 * 获得 TCP 套接字的 linger 值
+	 * @param fd {ACL_SOCKET} 套接字
+	 * @return {int} 返回 -1 表示未设置 linger 选项或内部出错，>= 0
+	 *  表示设置了 linger 选项且该值表示套接字关闭后该 TCP 连接在内核中
+	 *  维持 TIME_WAIT 状态的逗留时间(秒)
+	 */
+	int get_tcp_solinger();
+
+	/**
+	 * 获取 TCP 套接字的写缓冲区大小
+	 * @param fd {ACL_SOCKET} 套接字
+	 * @return {int} 缓冲区大小
+	 */
+	int get_tcp_sendbuf();
+
+	/**
+	 * 获取 TCP 套接字的读缓冲区大小
+	 * @param fd {ACL_SOCKET} 套接字
+	 * @return {int} 缓冲区大小
+	 */
+	int get_tcp_recvbuf();
 
 private:
 	char  dummy_[1];

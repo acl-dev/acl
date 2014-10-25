@@ -64,6 +64,14 @@ public:
 		return fd_;
 	}
 
+	/**
+	 * 设置监听套接字的延迟接收功能，即当客户端连接上有数据时才将该连接返回
+	 * 给应用，目前该功能仅支持 Linux
+	 * @param timeout {int} 如果客户端连接在规定的时间内未发来数据，
+	 *  也将该连接返回给应用
+	 */
+	void set_tcp_defer_accept(int timeout);
+
 private:
 	int   backlog_;
 	bool  block_;

@@ -218,4 +218,104 @@ bool socket_stream::alive(void) const
 		return true;
 }
 
+socket_stream& socket_stream::set_tcp_nodelay(bool on)
+{
+	ACL_SOCKET sock = sock_handle();
+	if (sock == ACL_SOCKET_INVALID)
+	{
+		logger_error("invalid socket handle");
+		return *this;
+	}
+	acl_tcp_nodelay(sock, on ? 1 : 0);
+
+	return *this;
+}
+
+socket_stream& socket_stream::set_tcp_solinger(bool on, int linger)
+{
+	ACL_SOCKET sock = sock_handle();
+	if (sock == ACL_SOCKET_INVALID)
+	{
+		logger_error("invalid socket handle");
+		return *this;
+	}
+	acl_tcp_so_linger(sock, on ? 1 : 0, linger);
+
+	return *this;
+}
+
+socket_stream& socket_stream::set_tcp_sendbuf(int size)
+{
+	ACL_SOCKET sock = sock_handle();
+	if (sock == ACL_SOCKET_INVALID)
+	{
+		logger_error("invalid socket handle");
+		return *this;
+	}
+	acl_tcp_set_sndbuf(sock, size);
+
+	return *this;
+}
+
+socket_stream& socket_stream::set_tcp_recvbuf(int size)
+{
+	ACL_SOCKET sock = sock_handle();
+	if (sock == ACL_SOCKET_INVALID)
+	{
+		logger_error("invalid socket handle");
+		return *this;
+	}
+	acl_tcp_set_rcvbuf(sock, size);
+
+	return *this;
+}
+
+bool socket_stream::get_tcp_nodelay()
+{
+	ACL_SOCKET sock = sock_handle();
+	if (sock == ACL_SOCKET_INVALID)
+	{
+		logger_error("invalid socket handle");
+		return false;
+	}
+
+	return acl_get_tcp_nodelay(sock) == 0 ? false : true;
+}
+
+int socket_stream::get_tcp_solinger()
+{
+	ACL_SOCKET sock = sock_handle();
+	if (sock == ACL_SOCKET_INVALID)
+	{
+		logger_error("invalid socket handle");
+		return -1;
+	}
+
+	return acl_get_tcp_solinger(sock);
+}
+
+int socket_stream::get_tcp_sendbuf()
+{
+	ACL_SOCKET sock = sock_handle();
+	if (sock == ACL_SOCKET_INVALID)
+	{
+		logger_error("invalid socket handle");
+		return -1;
+	}
+
+	return acl_tcp_get_sndbuf(sock);
+}
+
+int socket_stream::get_tcp_recvbuf()
+{
+	ACL_SOCKET sock = sock_handle();
+	if (sock == ACL_SOCKET_INVALID)
+	{
+		logger_error("invalid socket handle");
+		return -1;
+	}
+
+	return acl_tcp_get_rcvbuf(sock);
+}
+
 } // namespace acl
