@@ -379,6 +379,9 @@
     <ClCompile Include="src\stream\polarssl_conf.cpp">
       <Filter>src\stream</Filter>
     </ClCompile>
+    <ClCompile Include="src\db\query.cpp">
+      <Filter>src\db</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -783,11 +786,13 @@
     <ClInclude Include="include\acl_cpp\stream\polarssl_conf.hpp">
       <Filter>include\stream</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\query.hpp">
+      <Filter>include\db</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="changes.txt" />
     <None Include="ReadMe.txt" />
-    <None Include="ClassDiagram11.cd" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

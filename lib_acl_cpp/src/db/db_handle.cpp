@@ -2,6 +2,7 @@
 #include <assert.h>
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/db/db_pool.hpp"
+#include "acl_cpp/db/query.hpp"
 #include "acl_cpp/db/db_handle.hpp"
 
 namespace acl
@@ -232,6 +233,16 @@ db_handle::~db_handle()
 		acl_myfree(id_);
 }
 
+bool db_handle::exec_select(query& query)
+{
+	return sql_select(query.to_string().c_str());
+}
+
+bool db_handle::exec_update(query& query)
+{
+	return sql_update(query.to_string().c_str());
+}
+
 string& db_handle::escape_string(const char* in, size_t len, string& out)
 {
 	for (size_t i = 0; i < len; i++, in++)
@@ -372,4 +383,5 @@ db_handle& db_handle::set_when(time_t now)
 	when_ = now;
 	return *this;
 }
+
 } // namespace acl

@@ -83,7 +83,7 @@ static void* consumer(void* ctx)
 			printf("delete id %llu ok\r\n", id);
 		if (i % 1000 == 0)
 		{
-			buf.format_append("; total: %d, curr: %d, id: %ld",
+			buf.format_append("; total: %d, curr: %d, id: %lld",
 				__max, i, id);
 			ACL_METER_TIME(buf.c_str());
 		}

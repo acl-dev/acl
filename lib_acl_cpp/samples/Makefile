@@ -53,6 +53,7 @@ all:
 	@(cd dircopy; make)
 	@(cd scan_dir; make)
 	@(cd socket; make)
+	@(cd db; make)
 
 clean:
 	@(cd string; make clean)
@@ -109,3 +110,4 @@ clean:
 	@(cd dircopy; make clean)
 	@(cd scan_dir; make clean)
 	@(cd socket; make clean)
+	@(cd db; make clean)

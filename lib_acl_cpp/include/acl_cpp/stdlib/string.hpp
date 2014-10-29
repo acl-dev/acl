@@ -908,7 +908,7 @@ public:
 	 * @param ... 变参数据
 	 * @return {string&} 当前对象的引用
 	 */
-	string& format_append(const char* fmt, ...);
+	string& format_append(const char* fmt, ...)  ACL_CPP_PRINTF(2, 3);
 
 	/**
 	 * 带格式方式在当前对象的尾部添加数据

@@ -346,7 +346,7 @@ string& string::operator +=(long n)
 		return *this;
 	}
 	else
-		return format_append("%l", n);
+		return format_append("%ld", n);
 }
 
 string& string::operator +=(unsigned long n)

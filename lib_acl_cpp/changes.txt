@@ -1,9 +1,17 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+258) 2014.10.26
+258.1) feature: 丰富和完善了 SQL 查询器 query 的接口
+258.2) sample: 新增数据库查询示例 samples/db/mysql_query
+258.3) feature: string 类的 format_append 函数增加了变参类型校验功能
+258.4) bugfix: string 类中的 operator +=(long n) 的变参类型有误
+
 257) 2014.10.25
 257.1) feature: socket_stream 类增加了 TCP 套接字的设置/获取方法；server_socket
 增加了设置服务器套接字延迟接收选项方法
+257.2) feature: 增加了 query 数据库查询对象类，通过该类构建安全的 SQL 查询语句，并通过
+db_handle 类对象查询该 query 对象，此设计借鉴了 java hiberate 的一些思想
 
 256) 2014.9.12
 256.1) compile: 消除了使用 Makefile.db 编译时的一些警告

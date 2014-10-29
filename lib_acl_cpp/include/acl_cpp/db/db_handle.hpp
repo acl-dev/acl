@@ -192,6 +192,7 @@ private:
 };
 
 class db_pool;
+class query;
 
 /**
  * 数据库操作句柄对象类型
@@ -268,6 +269,22 @@ public:
 	virtual bool sql_update(const char* sql) = 0;
 
 	/**
+	 * 更安全易用的查询过程，调用此函数功能等同于 sql_select，只是查询对象 query
+	 * 构建的 sql 语句是安全的，可以防止 sql 注入
+	 * @param query {query&}
+	 * @return {bool} 执行是否成功
+	 */
+	bool exec_select(query& query);
+
+	/**
+	 * 更安全易用的更新过程，调用此函数功能等同于 sql_update，只是查询对象 query
+	 * 构建的 sql 语句是安全的，可以防止 sql 注入
+	 * @param query {query&}
+	 * @return {bool} 执行是否成功
+	 */
+	bool exec_update(query& query);
+
+	/**
 	 * 虚接口，为防止 sql 注入，用户应针对字符串字段调用此函数将一些特殊
 	 * 字符进行转义，该接口对常见的特殊字符进行了转义，子类也可以实现自己
 	 * 的转义方法
@@ -285,7 +302,7 @@ public:
 	 */
 	virtual int affect_count() const = 0;
 
-	//////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 获得执行 SQL 语句后的结果

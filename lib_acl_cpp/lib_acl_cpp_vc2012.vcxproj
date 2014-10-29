@@ -214,6 +214,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\db\db_handle.cpp" />
     <ClCompile Include="src\db\db_mysql.cpp" />
     <ClCompile Include="src\db\db_pool.cpp" />
+    <ClCompile Include="src\db\query.cpp" />
     <ClCompile Include="src\db\db_service.cpp" />
     <ClCompile Include="src\db\db_service_mysql.cpp" />
     <ClCompile Include="src\db\db_service_sqlite.cpp" />
@@ -343,6 +344,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\db\db_handle.hpp" />
     <ClInclude Include="include\acl_cpp\db\db_mysql.hpp" />
     <ClInclude Include="include\acl_cpp\db\db_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\db\query.hpp" />
     <ClInclude Include="include\acl_cpp\db\db_service.hpp" />
     <ClInclude Include="include\acl_cpp\db\db_service_mysql.hpp" />
     <ClInclude Include="include\acl_cpp\db\db_service_sqlite.hpp" />
@@ -468,7 +470,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
   </ItemGroup>
   <ItemGroup>
     <None Include="changes.txt" />
-    <None Include="ClassDiagram11.cd" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
