@@ -10,7 +10,7 @@ namespace acl
  * SQL 查询语句查询器，该类会自动对 sql 中的一些特殊字符进行转义，使用方式类似于
  * java hibernate 的 SQL 语句构建方式
  */
-class query
+class ACL_CPP_API query
 {
 public:
 	query();

@@ -95,10 +95,10 @@ service master_dispatch {
 ############################################################################
 #	应用自己的配置选项
 
-#	每个客户端连接的空闲时间.
-#	client_idle_limit = 60
-#	是否输出当前的内存状态信息
-#	debug_mem = 1
-#	是否发送欢迎信息
-#	send_banner = 0
+#	后端子进程连接此服务地址获得客户端连接句柄, 该地址为 master_service 中的一个域套接口
+	backend_service = dispatch.sock
+#	该定时器用来管理未被处理的客户端连接(秒)
+	manager_timer = 1
+#	客户端连接未被后端子进程接收的超时时间(秒)
+	conn_expired = 10
 }
