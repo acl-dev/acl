@@ -51,14 +51,25 @@ protected:
 	virtual bool thread_on_read(socket_stream* stream) = 0;
 
 	/**
-	 * 当线程池中的某个线程获得一个连接时的回调函数，
-	 * 子类可以做一些初始化工作
+	 * 当线程池中的某个线程获得一个连接时的回调函数，子类可以做一些
+	 * 初始化工作，该函数是在主线程的线程空间中运行
 	 * @param stream {socket_stream*}
 	 * @return {bool} 如果返回 false 则表示子类要求关闭连接，而不
 	 *  必将该连接再传递至 thread_main 过程
-	 *  注：当本函数返回 false 流关闭时并不调用 thread_on_close 过程
 	 */
 	virtual bool thread_on_accept(socket_stream* stream)
+	{
+		(void) stream;
+		return true;
+	}
+
+	/**
+	 * 当接收到一个客户端连接后，服务端回调此函数与客户端进行握手的操作，
+	 * 该函数将在 thread_on_accept 之后被调用
+	 * @return {bool} 如果返回 false 则表示子类要求关闭连接，而不
+	 *  必将该连接再传递至 thread_main 过程
+	 */
+	virtual bool thread_on_handshake(socket_stream *stream)
 	{
 		(void) stream;
 		return true;
@@ -119,6 +130,10 @@ private:
 
 	// 当接收到一个客户连接时的回调函数，可以进行一些初始化
 	static int service_on_accept(ACL_VSTREAM*);
+
+	// 当接收到客户端连接后服务端需要与客户端做一些事先的握手动作时
+	// 回调此函数，该函数会在 service_on_accept 之后被调用
+	static int service_on_handshake(ACL_VSTREAM*);
 
 	// 当客户端连接读写超时时的回调函数
 	static int service_on_timeout(ACL_VSTREAM*, void*);

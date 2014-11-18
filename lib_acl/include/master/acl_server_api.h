@@ -34,6 +34,7 @@ extern "C" {
 #define	ACL_MASTER_SERVER_ON_CLOSE		16
 #define	ACL_MASTER_SERVER_ON_ACCEPT		17
 #define	ACL_MASTER_SERVER_ON_TIMEOUT		18
+#define	ACL_MASTER_SERVER_ON_HANDSHAKE		19
 
 #define	ACL_MASTER_SERVER_THREAD_INIT		20
 #define	ACL_MASTER_SERVER_THREAD_INIT_CTX	21
@@ -41,8 +42,6 @@ extern "C" {
 #define	ACL_MASTER_SERVER_THREAD_EXIT_CTX	23
 #define	ACL_MASTER_SERVER_CTX			24
 #define	ACL_MASTER_SERVER_DENY_INFO		25
-
-/* 为了保持兼容性，进行如下宏定�?*/
 
 #define	ACL_APP_CTL_END			ACL_MASTER_SERVER_END
 #define	ACL_APP_CTL_CFG_INT		ACL_MASTER_SERVER_INT_TABLE
@@ -65,6 +64,7 @@ typedef void (*ACL_MASTER_SERVER_INIT_FN) (void *);
 typedef int  (*ACL_MASTER_SERVER_LOOP_FN) (void *);
 typedef void (*ACL_MASTER_SERVER_EXIT_FN) (void *);
 typedef int  (*ACL_MASTER_SERVER_ACCEPT_FN) (ACL_VSTREAM *);
+typedef int  (*ACL_MASTER_SERVER_HANDSHAKE_FN) (ACL_VSTREAM *);
 typedef void (*ACL_MASTER_SERVER_DISCONN_FN) (ACL_VSTREAM *, void *);
 typedef int  (*ACL_MASTER_SERVER_TIMEOUT_FN) (ACL_VSTREAM *, void *);
 

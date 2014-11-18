@@ -17,18 +17,21 @@ struct ACL_JSON_NODE {
 	ACL_VSTRING *ltag;          /**< 标签名 */
 	ACL_VSTRING *text;          /**< 当结点为叶结点时该文本内容非空 */
 	ACL_JSON_NODE *tag_node;    /**< 当标签值为 json 结点时此项非空 */
-	int   type;
-#define	ACL_JSON_T_STRING       (1 << 0)
-#define	ACL_JSON_T_NUMBER       (1 << 1)
-#define ACL_JSON_T_OBJ          (1 << 2)
-#define ACL_JSON_T_ARRAY        (1 << 3)
-#define	ACL_JSON_T_BOOL         (1 << 4)
-#define	ACL_JSON_T_NULL         (1 << 5)
+	int   type;                 /**< 结点类型 */
+#define	ACL_JSON_T_A_STRING      (1 << 0)
+#define	ACL_JSON_T_A_NUMBER      (1 << 1)
+#define	ACL_JSON_T_A_BOOL        (1 << 2)
+#define	ACL_JSON_T_NUMBER        (1 << 3)
+#define ACL_JSON_T_OBJ           (1 << 4)
+#define ACL_JSON_T_ARRAY         (1 << 5)
+#define	ACL_JSON_T_BOOL          (1 << 6)
+#define	ACL_JSON_T_NULL          (1 << 7)
 
-#define ACL_JSON_T_LEAF         (1 << 6)
-#define ACL_JSON_T_MEMBER       (1 << 7)
-#define ACL_JSON_T_PAIR         (1 << 8)
-#define	ACL_JSON_T_ELEMENT      (1 << 9)
+#define ACL_JSON_T_TEXT          (1 << 8)
+#define ACL_JSON_T_LEAF          ACL_JSON_T_TEXT
+#define ACL_JSON_T_MEMBER        (1 << 9)
+#define ACL_JSON_T_PAIR          (1 << 10)
+#define	ACL_JSON_T_ELEMENT       (1 << 11)
 
 	ACL_JSON_NODE *parent;      /**< 父结点 */
 	ACL_RING children;          /**< 子结点集合 */
@@ -275,21 +278,66 @@ ACL_API ACL_ARRAY *acl_json_getElementsByTags(ACL_JSON *json, const char *tags);
  * 构建 json 对象时创建 json 叶结点
  * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
  * @param name {const char*} 标签名，非空
- * @param text {const char*} 标签值，非空
+ * @param value {const char*} 标签值，非空
  * @return {ACL_JSON_NODE*} 新创建的结点对象，在释放 ACL_JSON 对象时
  *  一起被释放，所以不需要单独释放
  */
-ACL_API ACL_JSON_NODE *acl_json_create_leaf(ACL_JSON *json,
-	const char *name, const char *text);
+ACL_API ACL_JSON_NODE *acl_json_create_text(ACL_JSON *json,
+	const char *name, const char *value);
+#define acl_json_create_leaf acl_json_create_text
 
 /**
- * 构建 json 对象的字符串结点，按 json 规范，该结点只能加入至数据对象中
+ * 构建 json 对象时创建 json 布尔类型的叶结点
+ * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
+ * @param name {const char*} 标签名，非空
+ * @param value {int} 布尔类型值
+ * @return {ACL_JSON_NODE*} 新创建的结点对象，在释放 ACL_JSON 对象时
+ *  一起被释放，所以不需要单独释放
+ */
+ACL_API ACL_JSON_NODE *acl_json_create_bool(ACL_JSON *json,
+	const char *name, int value);
+
+/**
+ * 构建 json 对象时创建 json int 类型的叶结点
+ * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
+ * @param name {const char*} 标签名，非空
+ * @param value {acl_int64} 有符号整形值
+ * @return {ACL_JSON_NODE*} 新创建的结点对象，在释放 ACL_JSON 对象时
+ *  一起被释放，所以不需要单独释放
+ */
+ACL_API ACL_JSON_NODE *acl_json_create_int64(ACL_JSON *json,
+	const char *name, acl_int64 value);
+
+/**
+ * 构建 json 对象的字符串结点，按 json 规范，该结点只能加入至数组对象中
  * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
  * @param text {const char*}
  * @return {ACL_JSON_NODE*} 新创建的结点对象，在释放 ACL_JSON 对象时
  *  一起被释放，所以不需要单独释放
  */
-ACL_API ACL_JSON_NODE *acl_json_create_string(ACL_JSON *json, const char *text);
+ACL_API ACL_JSON_NODE *acl_json_create_array_text(ACL_JSON *json,
+	const char *text);
+ACL_API ACL_JSON_NODE *acl_json_create_string(ACL_JSON *json,
+	const char *text);
+
+/**
+ * 构建 json 对象的数值结点，按 json 规范，该结点只能加入至数组对象中
+ * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
+ * @param text {const char*}
+ * @return {ACL_JSON_NODE*} 新创建的结点对象，在释放 ACL_JSON 对象时
+ *  一起被释放，所以不需要单独释放
+ */
+ACL_API ACL_JSON_NODE *acl_json_create_array_int64(ACL_JSON *json,
+	acl_int64 value);
+
+/**
+ * 构建 json 对象的布尔结点，按 json 规范，该结点只能加入至数组对象中
+ * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
+ * @param value {int}
+ * @return {ACL_JSON_NODE*} 新创建的结点对象，在释放 ACL_JSON 对象时
+ *  一起被释放，所以不需要单独释放
+ */
+ACL_API ACL_JSON_NODE *acl_json_create_array_bool(ACL_JSON *json, int value);
 
 /**
  * 构建 json 对象时创建 json 对象(即仅包含 {} 的对象)

@@ -34,7 +34,8 @@ public:
 	const char* tag_name(void) const;
 
 	/**
-	 * 返回该 json 结点的文本标签值
+	 * 返回该 json 结点的文本标签值，当该值为布尔型或数值型时调用者可
+	 * 自行进行转换
 	 * @return {const char*} 返回空说明没有文本标签值
 	 */
 	const char* get_text(void) const;
@@ -91,17 +92,49 @@ public:
 	 * @return {json_node&} return_child 为 true 时创建的新结点的引用，
 	 *  否则返回本 json 结点对象的引用
 	 */
+	json_node& add_array(bool return_child = false);
 	json_node& add_child(bool as_array = false, bool return_child = false);
 
 	/**
-	 * 创建一个 json 结点对象，并将之添加为本 json 结点的子结点
+	 * 创建一个字符串类型的 json 结点对象，并将之添加为本 json 结点的子结点
 	 * @param tag {const char*} 标签名
 	 * @param value {const char*} 标签值
 	 * @param return_child {bool} 是否需要本函数返回新创建的子结点的引用
 	 * @return {json_node&} return_child 为 true 时创建的新结点的引用，
 	 *  否则返回本 json 结点对象的引用
+	 * 注：此处的 add_text 和 add_child 是同样的功能
 	 */
+	json_node& add_text(const char* tag, const char* value,
+		bool return_child = false);
+
 	json_node& add_child(const char* tag, const char* value,
+		bool return_child = false);
+
+	/**
+	 * 创建一个int64 类型的 json 结点对象，并将之添加为本 json 结点的子结点
+	 * @param tag {const char*} 标签名
+	 * @param value {int64} 标签值
+	 * @param return_child {bool} 是否需要本函数返回新创建的子结点的引用
+	 * @return {json_node&} return_child 为 true 时创建的新结点的引用，
+	 *  否则返回本 json 结点对象的引用
+	 */
+#ifdef WIN32
+	json_node& add_number(const char* tag, __int64 value,
+		bool return_child = false);
+#else
+	json_node& add_number(const char* tag, long long int value,
+		bool return_child = false);
+#endif
+
+	/**
+	 * 创建一个布尔类型的 json 结点对象，并将之添加为本 json 结点的子结点
+	 * @param tag {const char*} 标签名
+	 * @param value {bool} 标签值
+	 * @param return_child {bool} 是否需要本函数返回新创建的子结点的引用
+	 * @return {json_node&} return_child 为 true 时创建的新结点的引用，
+	 *  否则返回本 json 结点对象的引用
+	 */
+	json_node& add_bool(const char* tag, bool value,
 		bool return_child = false);
 
 	/**
@@ -111,7 +144,32 @@ public:
 	 * @return {json_node&} return_child 为 true 时创建的新结点的引用，
 	 *  否则返回本 json 结点对象的引用
 	 */
+	json_node& add_array_text(const char* text, bool return_child = false);
+
+	ACL_CPP_DEPRECATED_FOR("add_text")
 	json_node& add_child(const char* text, bool return_child = false);
+
+	/**
+	 * 创建一个 json 数字对象，并将之添加为本 json 结点的子结点
+	 * @param value {acl_int64} 数字值
+	 * @param return_child {bool} 是否需要本函数返回新创建的子结点的引用
+	 * @return {json_node&} return_child 为 true 时创建的新结点的引用，
+	 *  否则返回本 json 结点对象的引用
+	 */
+#ifdef WIN32
+	json_node& add_array_number(__int64 value, bool return_child = false);
+#else
+	json_node& add_array_number(long long int value, bool return_child = false);
+#endif
+
+	/**
+	 * 创建一个 json 布尔对象，并将之添加为本 json 结点的子结点
+	 * @param value {bool} 布尔值
+	 * @param return_child {bool} 是否需要本函数返回新创建的子结点的引用
+	 * @return {json_node&} return_child 为 true 时创建的新结点的引用，
+	 *  否则返回本 json 结点对象的引用
+	 */
+	json_node& add_array_bool(bool value, bool return_child = false);
 
 	/**
 	 * 创建一个 json 结点对象，并将之添加为本 json 结点的子结点
@@ -262,14 +320,16 @@ public:
 
 	/**
 	 * 从 json 对象中获得所有的与给定多级标签名相同的 json 结点的集合
-	 * @param tags {const char*} 多级标签名，由 '/' 分隔各级标签名，如针对 json 数据：
+	 * @param tags {const char*} 多级标签名，由 '/' 分隔各级标签名，
+	 *  如针对 json 数据：
 	 *  { 'root': [
 	 *      'first': { 'second': { 'third': 'test1' } },
 	 *      'first': { 'second': { 'third': 'test2' } },
 	 *      'first': { 'second': { 'third': 'test3' } }
 	 *    ]
 	 *  }
-	 *  可以通过多级标签名：root/first/second/third 一次性查出所有符合条件的结点
+	 *  可以通过多级标签名：root/first/second/third 一次性查出所有符合
+	 *  条件的结点
 	 * @return {const std::vector<json_node*>&} 符合条件的 json 结点集合, 
 	 *  如果查询结果为空，则该集合为空，即：empty() == true
 	 *  注：返回的数组中的 json_node 结点数据可以修改，但不能删除该结点，
@@ -285,43 +345,98 @@ public:
 	ACL_JSON* get_json(void) const;
 
 	/**
-	 * 创建一个 json_node 叶结点对象，该结点对象的格式为：tag_name: "tag_value"
+	 * 创建一个 json_node 叶结点对象，该结点对象的格式为：
+	 * "tag_name": "tag_value"
 	 * @param tag {const char*} 标签名
 	 * @param value {const char*} 标签值
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，因为在
-	 *  json 对象被释放时这些结点会自动被释放，当然用户也可以在不用时调用
-	 *  reset 来释放这些 json_node 结点对象
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些结点会自动被释放，当然用户也可以在
+	 *  不用时调用 reset 来释放这些 json_node 结点对象
 	 */
 	json_node& create_node(const char* tag, const char* value);
 
 	/**
-	 * 创建一个 json_node 叶结点字符串对象，该结点对象的格式为："string"
-	 * 按 json 规范，该结点只能加入至数据对象中
-	 * @param text {const char*} 文本字符串
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，因为在
-	 *  json 对象被释放时这些结点会自动被释放，当然用户也可以在不用时调用
-	 *  reset 来释放这些 json_node 结点对象
+	 * 创建一个 json_node 叶结点对象，该结点对象的格式为：
+	 * "tag_name": tag_value
+	 * @param tag {const char*} 标签名
+	 * @param value {int64} 标签值
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些结点会自动被释放，当然用户也可以在
+	 *  不用时调用 reset 来释放这些 json_node 结点对象
 	 */
+#ifdef WIN32
+	json_node& create_node(const char* tag, __int64 value);
+#else
+	json_node& create_node(const char* tag, long long int value);
+#endif
+
+	/**
+	 * 创建一个 json_node 叶结点对象，该结点对象的格式为：
+	 * "tag_name": true|false
+	 * @param tag {const char*} 标签名
+	 * @param value {bool} 标签值
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些结点会自动被释放，当然用户也可以在
+	 *  不用时调用 reset 来释放这些 json_node 结点对象
+	 */
+	json_node& create_node(const char* tag, bool value);
+
+	/**
+	 * 创建一个 json_node 叶结点字符串对象，该结点对象的格式为："string"
+	 * 按 json 规范，该结点只能加入至数组对象中
+	 * @param text {const char*} 文本字符串
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些结点会自动被释放，当然用户也可以在
+	 *  不用时调用 reset 来释放这些 json_node 结点对象
+	 */
+	json_node& create_array_text(const char* text);
+
+	ACL_CPP_DEPRECATED_FOR("create_array_text")
 	json_node& create_node(const char* text);
+
+	/**
+	 * 创建一个 json_node 叶结点数值对象
+	 * 按 json 规范，该结点只能加入至数组对象中
+	 * @param value {acl_int64} 数值
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些结点会自动被释放，当然用户也可以在
+	 * 不用时调用 reset 来释放这些 json_node 结点对象
+	 */
+#ifdef WIN32
+	json_node& create_array_number(__int64 value);
+#else
+	json_node& create_array_number(long long int value);
+#endif
+
+	/**
+	 * 创建一个 json_node 叶结点布尔对象
+	 * 按 json 规范，该结点只能加入至数组对象中
+	 * @param value {bool} 布尔值
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些结点会自动被释放，当然用户也可以在
+	 * 不用时调用 reset 来释放这些 json_node 结点对象
+	 */
+	json_node& create_array_bool(bool value);
 
 	/**
 	 * 创建一个 json_node 结点容器对象，该对象没有标签,
 	 * 该结点对象的格式为："{}" 或数组对象 "[]"
 	 * @param as_array {bool} 是否数组对象
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，因为在
-	 *  json 对象被释放时这些结点会自动被释放，当然用户也可以在不用时调用
-	 *  reset 来释放这些 json_node 结点对象
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些结点会自动被释放，当然用户也可以在
+	 *  不用时调用 reset 来释放这些 json_node 结点对象
 	 */
 	json_node& create_node(bool as_array = false);
+	json_node& create_array();
 
 	/**
 	 * 创建一个 json_node 结点对象，该结点对象的格式为：tag_name: {}
 	 * 或 tag_name: []
 	 * @param tag {const char*} 标签名
 	 * @param node {json_node*} json 结点对象作为标签值
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，因为在
-	 *  json 对象被释放时这些结点会自动被释放，当然用户也可以在不用时调用
-	 *  reset 来释放这些 json_node 结点对象
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些结点会自动被释放，当然用户也可以在
+	 *  不用时调用 reset 来释放这些 json_node 结点对象
 	 */
 	json_node& create_node(const char* tag, json_node* node);
 
@@ -330,9 +445,9 @@ public:
 	 * 或 tag_name: []
 	 * @param tag {const char*} 标签名
 	 * @param node {json_node&} json 结点对象作为标签值
-	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，因为在
-	 *  json 对象被释放时这些结点会自动被释放，当然用户也可以在不用时调用
-	 *  reset 来释放这些 json_node 结点对象
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些结点会自动被释放，当然用户也可以在
+	 *  不用时调用 reset 来释放这些 json_node 结点对象
 	 */
 	json_node& create_node(const char* tag, json_node& node);
 

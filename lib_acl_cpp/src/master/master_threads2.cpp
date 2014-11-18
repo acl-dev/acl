@@ -32,6 +32,7 @@ void master_threads2::run_daemon(int argc, char** argv)
 	// 调用 acl 服务器框架的多线程模板
 	acl_threads_server_main(argc, argv, service_main, NULL,
 		ACL_MASTER_SERVER_ON_ACCEPT, service_on_accept,
+		ACL_MASTER_SERVER_ON_HANDSHAKE, service_on_handshake,
 		ACL_MASTER_SERVER_ON_TIMEOUT, service_on_timeout,
 		ACL_MASTER_SERVER_ON_CLOSE, service_on_close,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
@@ -320,6 +321,20 @@ int master_threads2::service_on_accept(ACL_VSTREAM* client)
 	// 返回 0 表示可以继续处理该客户端连接，从而由上层框架将其置入
 	// 读监控集合中
 	return 0;
+}
+
+int master_threads2::service_on_handshake(ACL_VSTREAM *client)
+{
+	acl_assert(__mt != NULL);
+
+	// client->context 在 service_on_accept 中被设置
+	socket_stream* stream = (socket_stream*) client->context;
+	if (stream == NULL)
+		logger_fatal("client->context is null!");
+
+	if (__mt->thread_on_handshake(stream) == true)
+		return 0;
+	return -1;
 }
 
 int master_threads2::service_main(ACL_VSTREAM *client, void*)

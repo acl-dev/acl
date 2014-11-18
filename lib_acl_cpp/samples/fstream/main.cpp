@@ -42,10 +42,13 @@ int main(void)
 		printf("first lock %s ok\n", path.c_str());
 	else
 		printf("first lock %s error(%s)\n", path.c_str(), acl_last_serror());
+
+#ifndef WIN32
 	if (locker.lock() == true)
 		printf("second lock %s ok\n", path.c_str());
 	else
 		printf("second lock %s error(%s)\n", path.c_str(), acl_last_serror());
+#endif
 
 	acl::string buf;
 	while (1) {

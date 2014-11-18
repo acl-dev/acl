@@ -106,16 +106,6 @@ public:
 	ACL_VSTREAM* unbind();
 
 	/**
-	 * 打开流对象，如果流已经打开，则不会重复打开
-	 */
-	void open_stream(void);
-
-	/**
-	 * 重新打开流对象，如果流已经打开则先释放流对象再打开
-	 */
-	void reopen_stream(void);
-
-	/**
 	 * 设置流的绑定对象
 	 * @param ctx {void*}
 	 * @param key {const char* } 标识该 ctx 的键
@@ -173,6 +163,17 @@ public:
 	 * @return {stream_hook*}
 	 */
 	stream_hook* remove_hook();
+
+protected:
+	/**
+	 * 打开流对象，如果流已经打开，则不会重复打开
+	 */
+	void open_stream(bool is_file = false);
+
+	/**
+	 * 重新打开流对象，如果流已经打开则先释放流对象再打开
+	 */
+	void reopen_stream(bool is_file = false);
 
 protected:
 	stream_hook* hook_;
