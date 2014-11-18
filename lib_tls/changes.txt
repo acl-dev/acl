@@ -1,3 +1,7 @@
+
+5) 2014.11.3
+5.1) compile: 修改了 tls_prng_file.c, tls_prng_dev.c 编译出错的问题
+
 4) 2014.6.13
 4.1) compile: compile ok in gcc4.9
 

@@ -105,7 +105,7 @@ static void test(void)
 
 	////////////////////////////////////////////////////////////////////////////
 
-	node1 = &json.create_node(true);
+	node1 = &json.create_node(true);  // node1 为数组结点
 	node2 = &json.create_node("name5", node1);
 	node0->add_child(node2);
 
@@ -126,11 +126,11 @@ static void test(void)
 
 	acl::json_node& node_a =
 		json.create_node("name12",
-				json.create_node()
-				.add_child(json.create_node("name12_1_1", "value12_1_1"))
-				.add_child(json.create_node("name12_1_2", "value12_1_2"))
-				.add_child(json.create_node("name12_1_3", "value12_1_3"))
-				.add_child(json.create_node("name12_1_4", "value12_1_4")));
+			json.create_node()
+			.add_child(json.create_node("name12_1_1", "value12_1_1"))
+			.add_child(json.create_node("name12_1_2", "value12_1_2"))
+			.add_child(json.create_node("name12_1_3", "value12_1_3"))
+			.add_child(json.create_node("name12_1_4", "value12_1_4")));
 	acl::json_node& node_b =
 			json.create_node()
 			.add_child(json.create_node("name13_1", "value13_1"))
@@ -163,7 +163,10 @@ static void test(void)
 			json.create_node()
 			.add_child("name24", "value24")
 			.add_child("name24_1", "value24_1"))
-		.add_child(true, true).add_child("name25", "value25")
+			.add_number("name24_int", 1000)
+			.add_bool("name24_bool", true)
+		.add_child(true, true)
+			.add_child("name25", "value25")
 			.add_child("name26", "value26")
 			.add_child("name27", "value27")
 			.get_parent()

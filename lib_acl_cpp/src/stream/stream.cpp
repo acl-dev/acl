@@ -87,19 +87,19 @@ bool stream::close()
 	return ret == 0 ? true : false;
 }
 
-void stream::open_stream(void)
+void stream::open_stream(bool is_file /* = false */)
 {
 	if (stream_ != NULL)
 		return;
-	stream_ = acl_vstream_fdopen(ACL_SOCKET_INVALID, O_RDWR,
-		8192, 0, ACL_VSTREAM_TYPE_SOCK);
+	stream_ = acl_vstream_fdopen(ACL_SOCKET_INVALID, O_RDWR, 8192, 0,
+		is_file ? ACL_VSTREAM_TYPE_FILE : ACL_VSTREAM_TYPE_SOCK);
 }
 
-void stream::reopen_stream(void)
+void stream::reopen_stream(bool is_file /* = false */)
 {
 	if (stream_)
 		acl_vstream_free(stream_);
-	open_stream();
+	open_stream(is_file);
 }
 
 bool stream::set_ctx(void* ctx, const char* key /* = NULL */,

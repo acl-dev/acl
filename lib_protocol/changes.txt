@@ -1,5 +1,10 @@
 修改历史列表：
 ------------------------------------------------------------------------
+250) 2014.11.18
+250.1) bugfix: proto_snprintf.c 中函数 proto_secure_snprintf/proto_securevsnprintf
+在调用 _vsnprintf_s 时第三个参数应该为 _TRUNCATE，否则当缓冲区给的比较小时VC提供的
+API 内部会产生断言
+
 249) 2014.8.8
 249.1) bugfix: http_hdr_req.c 中当重复使用线程局部变量时调用 __hdr_reset
 来重置其中的一些参数，虽然调用了 ACL_VSTRING_RESET，但该宏并不会将缓冲数据

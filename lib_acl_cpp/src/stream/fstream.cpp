@@ -15,7 +15,7 @@ fstream::~fstream()
 
 void fstream::open(ACL_FILE_HANDLE fh, unsigned int oflags)
 {
-	open_stream();  // 调用基类方法先创建空流对象
+	open_stream(true);  // 调用基类方法先创建空流对象
 
 	acl_assert(ACL_VSTREAM_FILE(stream_) == ACL_FILE_INVALID);
 
@@ -42,7 +42,7 @@ bool fstream::open(const char* path, unsigned int oflags, int mode)
 	if (fh == ACL_FILE_INVALID)
 		return false;
 
-	open_stream();  // 调用基类方法先创建空流对象
+	open_stream(true);  // 调用基类方法先创建空流对象
 
 	stream_->fread_fn  = acl_file_read;
 	stream_->fwrite_fn = acl_file_write;

@@ -1,6 +1,23 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+261) 2014.11.18
+261.1) bugfix: fstream::open 方法在打开文件时先调用基类 stream::open_stream，
+然后基类函数再调用 C 库 acl_vstream_fdopen 时没有说明打开流的类型，导致内部流对象
+ACL_VSTREAM 的关闭回调函数设置有误
+261.2) bugfix: snprintf.cpp 中函数 snprintf/vsnprintf 在调用 _vsnprintf_s 时
+第三个参数应该为 _TRUNCATE，否则当缓冲区给的比较小时VC提供的 API 内部会产生断言
+
+260) 2014.11.10
+260.1) feature: master_threads2 类增加了 thread_on_handshake 方法，当服务端
+调用完 thread_on_accept 后可以在子线程中调用 thread_on_handshake 方法，以
+处理较长的任务
+
+259) 2014.11.7
+259.1) feature: json 类增加了构造布尔型和数值型的接口
+259.2) samples: 增加了 json 测试用例 json/json7
+------------------------------------------------------------------------
+
 258) 2014.10.26
 258.1) feature: 丰富和完善了 SQL 查询器 query 的接口
 258.2) sample: 新增数据库查询示例 samples/db/mysql_query

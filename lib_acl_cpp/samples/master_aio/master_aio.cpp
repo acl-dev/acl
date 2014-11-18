@@ -336,7 +336,7 @@ int main(int argc, char* argv[])
 
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
-		const char* addr = "127.0.0.1:8888";
+		const char* addr = "127.0.0.1:8888, 127.0.0.1:8889";
 
 		if (argc >= 3)
 			addr = argv[2];
