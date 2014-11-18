@@ -161,7 +161,6 @@ static void (*__server_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
 static ACL_MASTER_SERVER_EXIT_FN	__server_onexit;
 static unsigned __server_generation;
 static ACL_MASTER_SERVER_ACCEPT_FN __server_on_accept;
-static ACL_MASTER_SERVER_HANDSHAKE_FN __server_on_handshake;
 static ACL_MASTER_SERVER_DISCONN_FN __server_on_close;
 static ACL_MASTER_SERVER_TIMEOUT_FN __server_on_timeout;
 static char *__deny_info = NULL;
@@ -397,42 +396,14 @@ typedef struct {
 	int   event_type;
 	void  (*read_callback)(int, ACL_EVENT*, ACL_VSTREAM*, void*);
 	int   (*serv_callback)(ACL_VSTREAM*, void*);
-	ACL_MASTER_SERVER_ACCEPT_FN serv_accept;
-	ACL_MASTER_SERVER_HANDSHAKE_FN serv_handshake;
-	ACL_MASTER_SERVER_DISCONN_FN serv_close;
-	ACL_MASTER_SERVER_TIMEOUT_FN serv_timeout;
 	void *serv_arg;
 } READ_CTX;
 
-static void client_wakeup(ACL_EVENT *event,
-	acl_pthread_pool_t *threads acl_unused, ACL_VSTREAM *stream)
+static void client_wakeup(ACL_EVENT *event, acl_pthread_pool_t *threads,
+	ACL_VSTREAM *stream)
 {
 	READ_CTX *ctx = (READ_CTX*) stream->ioctl_read_ctx;
-	const char* peer = ACL_VSTREAM_PEER(stream);
-	char  addr[256];
-
-	if (peer) {
-		char *ptr;
-		ACL_SAFE_STRNCPY(addr, peer, sizeof(addr));
-		ptr = strchr(addr, ':');
-		if (ptr)
-			*ptr = 0;
-	} else
-		addr[0] = 0;
-
-	if (addr[0] != 0 && !acl_access_permit(addr)) {
-		if (__deny_info && *__deny_info)
-			acl_vstream_fprintf(stream, "%s\r\n", __deny_info);
-		if (ctx->serv_close != NULL)
-			ctx->serv_close(stream, ctx->serv_arg);
-		acl_vstream_close(stream);
-		return;
-	}
-
-	if (ctx->serv_handshake != NULL && ctx->serv_handshake(stream) < 0) {
-		acl_vstream_close(stream);
-		return;
-	}
+	(void) threads;
 
 	if (acl_var_threads_status_notify && acl_var_threads_master_maxproc > 1
 	    && acl_master_notify(acl_var_threads_pid, __server_generation,
@@ -458,39 +429,45 @@ static void thread_callback(void *arg)
 {
 	READ_CTX *ctx = (READ_CTX*) arg;
 
-	if ((ctx->event_type & ACL_EVENT_READ) != 0) {
-		int ret = ctx->serv_callback(ctx->stream, ctx->serv_arg);
-		if (ret == 0)
+	if ((ctx->event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
+		if (__server_on_timeout == NULL) {
+			if (__server_on_close != NULL)
+				__server_on_close(ctx->stream, ctx->serv_arg);
+			acl_vstream_close(ctx->stream);
+		} else if (__server_on_timeout(ctx->stream, ctx->serv_arg) < 0) {
+			if (__server_on_close != NULL)
+				__server_on_close(ctx->stream, ctx->serv_arg);
+			acl_vstream_close(ctx->stream);
+		} else
 			acl_event_enable_read(ctx->event, ctx->stream,
 				ctx->stream->rw_timeout,
 				ctx->read_callback, ctx);
-		else if (ret < 0) {
-			if (ctx->serv_close != NULL)
-				ctx->serv_close(ctx->stream, ctx->serv_arg);
+	} else if ((ctx->event_type & ACL_EVENT_XCPT) != 0) {
+		if (__server_on_close != NULL)
+			__server_on_close(ctx->stream, ctx->serv_arg);
+		acl_vstream_close(ctx->stream);
+	} else if ((ctx->event_type & ACL_EVENT_ACCEPT) != 0) {
+		acl_assert(__server_on_accept != NULL);
+
+		if (__server_on_accept(ctx->stream) >= 0)
+			client_wakeup(ctx->event, ctx->threads, ctx->stream);
+		else if (__server_on_close != NULL) {
+			__server_on_close(ctx->stream, __service_ctx);
 			acl_vstream_close(ctx->stream);
 		}
-	} else if ((ctx->event_type & ACL_EVENT_ACCEPT) != 0) {
-		client_wakeup(ctx->event, ctx->threads, ctx->stream);
-	} else if ((ctx->event_type & ACL_EVENT_XCPT) != 0) {
-		if (ctx->serv_close != NULL)
-			ctx->serv_close(ctx->stream, ctx->serv_arg);
-		acl_vstream_close(ctx->stream);
-	} else if ((ctx->event_type & ACL_EVENT_RW_TIMEOUT) == 0) {
+	} else if ((ctx->event_type & ACL_EVENT_READ) != 0) {
+		int ret = ctx->serv_callback(ctx->stream, ctx->serv_arg);
+		if (ret < 0) {
+			if (__server_on_close != NULL)
+				__server_on_close(ctx->stream, ctx->serv_arg);
+			acl_vstream_close(ctx->stream);
+		} else if (ret == 0)
+			acl_event_enable_read(ctx->event, ctx->stream,
+				ctx->stream->rw_timeout,
+				ctx->read_callback, ctx);
+	} else
 		acl_msg_fatal("%s, %s(%d): unknown event type(%d)",
 			__FILE__, __FUNCTION__, __LINE__, ctx->event_type);
-	} else if (ctx->serv_timeout == NULL) {
-		if (ctx->serv_close != NULL)
-			ctx->serv_close(ctx->stream, ctx->serv_arg);
-		acl_vstream_close(ctx->stream);
-	} else if (ctx->serv_timeout(ctx->stream, ctx->serv_arg) < 0) {
-		if (ctx->serv_close != NULL)
-			ctx->serv_close(ctx->stream, ctx->serv_arg);
-		acl_vstream_close(ctx->stream);
-	} else {
-		acl_event_enable_read(ctx->event, ctx->stream,
-			ctx->stream->rw_timeout,
-			ctx->read_callback, ctx);
-	}
 }
 
 static void read_callback1(int event_type, ACL_EVENT *event acl_unused,
@@ -541,16 +518,12 @@ static void create_job(ACL_EVENT *event, acl_pthread_pool_t *threads,
 {
 	READ_CTX *ctx = (READ_CTX*) acl_mymalloc(sizeof(READ_CTX));
 
-	ctx->stream         = stream;
-	ctx->threads        = threads;
-	ctx->event          = event;
-	ctx->event_type     = -1;
-	ctx->serv_accept    = __server_on_accept;
-	ctx->serv_handshake = __server_on_handshake;
-	ctx->serv_close     = __server_on_close;
-	ctx->serv_timeout   = __server_on_timeout;
-	ctx->serv_callback  = __service_main;
-	ctx->serv_arg       = __service_ctx;
+	ctx->stream        = stream;
+	ctx->threads       = threads;
+	ctx->event         = event;
+	ctx->event_type    = -1;
+	ctx->serv_callback = __service_main;
+	ctx->serv_arg      = __service_ctx;
 	ctx->job = acl_pthread_pool_alloc_job(thread_callback, ctx, 1);
 
 	if (acl_var_threads_batadd)
@@ -561,15 +534,22 @@ static void create_job(ACL_EVENT *event, acl_pthread_pool_t *threads,
 	stream->ioctl_read_ctx = ctx;
 	acl_vstream_add_close_handle(stream, free_ctx, ctx);
 
-	if (ctx->serv_accept != NULL && ctx->serv_accept(stream) < 0) {
-		if (ctx->serv_close != NULL)
-			ctx->serv_close(stream, ctx->serv_arg);
-		acl_vstream_close(stream);
-	} else if (acl_var_threads_thread_accept) {
+	/* 如果没有 on_accept 回调函数，则直接在主线程中处理 */
+	if (__server_on_accept == NULL)
+		client_wakeup(event, threads, stream);
+
+	/* 为了防止 on_accept 的回调处理过程过长阻塞了主线程，可以通过配置
+	 * 项选择该过程是否交由线程池中的子线程处理
+	 */
+	else if (acl_var_threads_thread_accept) {
 		ctx->event_type = ACL_EVENT_ACCEPT;
 		acl_pthread_pool_add_job(ctx->threads, ctx->job);
-	} else {
+	} else if (__server_on_accept(stream) >= 0)
 		client_wakeup(event, threads, stream);
+	else {
+		if (__server_on_close != NULL)
+			__server_on_close(stream, __service_ctx);
+		acl_vstream_close(stream);
 	}
 }
 
@@ -577,6 +557,7 @@ static void client_open(ACL_EVENT *event, acl_pthread_pool_t *threads,
 	int fd, const char *remote, const char *local)
 {
 	ACL_VSTREAM *stream;
+	char  addr[64];
 
 	acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 	increase_client_counter();
@@ -585,8 +566,17 @@ static void client_open(ACL_EVENT *event, acl_pthread_pool_t *threads,
 
 	stream = acl_vstream_fdopen(fd, O_RDWR, acl_var_threads_buf_size,
 			acl_var_threads_rw_timeout, ACL_VSTREAM_TYPE_SOCK);
-	if (remote)
+
+	if (remote) {
+		char *ptr;
 		acl_vstream_set_peer(stream, remote);
+		ACL_SAFE_STRNCPY(addr, remote, sizeof(addr));
+		ptr = strchr(addr, ':');
+		if (ptr)
+			*ptr = 0;
+	} else
+		addr[0] = 0;
+
 	if (local)
 		acl_vstream_set_local(stream, local);
 
@@ -596,7 +586,14 @@ static void client_open(ACL_EVENT *event, acl_pthread_pool_t *threads,
 	 */
 	acl_vstream_add_close_handle(stream, decrease_counter_callback, NULL);
 
-	create_job(event, threads, stream);
+	if (addr[0] != 0 && !acl_access_permit(addr)) {
+		if (__deny_info && *__deny_info)
+			acl_vstream_fprintf(stream, "%s\r\n", __deny_info);
+		if (__server_on_close != NULL)
+			__server_on_close(stream, __service_ctx);
+		acl_vstream_close(stream);
+	} else
+		create_job(event, threads, stream);
 }
 
 /* restart listening */
@@ -1145,10 +1142,6 @@ void acl_threads_server_main(int argc, char **argv,
 		case ACL_MASTER_SERVER_ON_ACCEPT:
 			__server_on_accept =
 				va_arg(ap, ACL_MASTER_SERVER_ACCEPT_FN);
-			break;
-		case ACL_MASTER_SERVER_ON_HANDSHAKE:
-			__server_on_handshake =
-				va_arg(ap, ACL_MASTER_SERVER_HANDSHAKE_FN);
 			break;
 		case ACL_MASTER_SERVER_ON_TIMEOUT:
 			__server_on_timeout =
