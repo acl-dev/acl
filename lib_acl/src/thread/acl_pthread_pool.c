@@ -1497,9 +1497,84 @@ int acl_pthread_pool_size(acl_pthread_pool_t *thr_pool)
 	return n;
 }
 
+int acl_pthread_pool_idle(acl_pthread_pool_t *thr_pool)
+{
+	const char *myname = "acl_pthread_pool_idle";
+	int   status, n;
+
+	status = acl_pthread_mutex_lock(&thr_pool->worker_mutex);
+	if (status) {
+		acl_msg_error("%s(%d), %s: pthread_mutex_lock error(%s)",
+			__FILE__, __LINE__, myname, strerror(status));
+		return -1;
+	}
+
+	n = thr_pool->idle;
+
+	status = acl_pthread_mutex_unlock(&thr_pool->worker_mutex);
+	if (status) {
+		acl_msg_error("%s(%d), %s: pthread_mutex_unlock error(%s)",
+			__FILE__, __LINE__, myname, strerror(status));
+		return -1;
+	}
+
+	return n;
+}
+
+int acl_pthread_pool_busy(acl_pthread_pool_t *thr_pool)
+{
+	const char *myname = "acl_pthread_pool_busy";
+	int   status, n;
+
+	status = acl_pthread_mutex_lock(&thr_pool->worker_mutex);
+	if (status) {
+		acl_msg_error("%s(%d), %s: pthread_mutex_lock error(%s)",
+			__FILE__, __LINE__, myname, strerror(status));
+		return -1;
+	}
+
+	n = thr_pool->count - thr_pool->idle;
+
+	status = acl_pthread_mutex_unlock(&thr_pool->worker_mutex);
+	if (status) {
+		acl_msg_error("%s(%d), %s: pthread_mutex_unlock error(%s)",
+			__FILE__, __LINE__, myname, strerror(status));
+		return -1;
+	}
+
+	if (n < 0)
+		acl_msg_error("%s(%d), %s: threads's count(%d) < idle(%d)",
+			__FILE__, __LINE__, myname, thr_pool->count,
+			thr_pool->idle);
+	return n;
+}
+
 int acl_pthread_pool_qlen(acl_pthread_pool_t *thr_pool)
 {
-	return thr_pool->qlen;
+	const char *myname = "acl_pthread_pool_qlen";
+	int   status, n;
+
+	status = acl_pthread_mutex_lock(&thr_pool->worker_mutex);
+	if (status) {
+		acl_msg_error("%s(%d), %s: pthread_mutex_lock error(%s)",
+			__FILE__, __LINE__, myname, strerror(status));
+		return -1;
+	}
+
+	n = thr_pool->qlen;
+
+	status = acl_pthread_mutex_unlock(&thr_pool->worker_mutex);
+	if (status) {
+		acl_msg_error("%s(%d), %s: pthread_mutex_unlock error(%s)",
+			__FILE__, __LINE__, myname, strerror(status));
+		return -1;
+	}
+
+	if (n < 0)
+		acl_msg_error("%s(%d), %s: threads's count(%d) < idle(%d)",
+		__FILE__, __LINE__, myname, thr_pool->count,
+		thr_pool->idle);
+	return n;
 }
 
 void acl_pthread_pool_set_stacksize(acl_pthread_pool_t *thr_pool, size_t size)

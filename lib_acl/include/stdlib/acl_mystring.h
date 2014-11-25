@@ -306,6 +306,49 @@ ACL_API const char *acl_i64toa_radix(acl_int64 value, char *buf, size_t size, in
  */
 ACL_API const char *acl_ui64toa_radix(acl_uint64 value, char *buf, size_t size, int radix);
 
+/*--------------------------------------------------------------------------*/
+
+typedef struct ACL_LINE_STATE {
+	int   offset;		/* 解析器的当前偏移量 */
+	char  finish;		/* 是否成功找到了一个空行 */
+	char  last_ch;		/* 解析器存放的最后一个字符 */
+	char  last_lf;		/* 解析器上一个字符是否为换行符 LF */
+} ACL_LINE_STATE;
+
+/**
+ * 分配一个 ACL_LINE_STATE 对象用作 acl_find_blank_line 函数的参数
+ * @return {ACL_LINE_STATE*} 永远返回非空指针
+ */
+ACL_API ACL_LINE_STATE *acl_line_state_alloc(void);
+
+/**
+ * 释放由 acl_line_state_alloc 分配的 ACL_LINE_STATE 对象
+ * @param state {ACL_LINE_STATE*} 非空 ACL_LINE_STATE 对象
+ */
+ACL_API void acl_line_state_free(ACL_LINE_STATE *state);
+
+/**
+ * 重置 ACL_LINE_STATE 对象的状态
+ * @param state {ACL_LINE_STATE*} 由 acl_line_state_alloc 动态分配的对象或者
+ *  栈变量或直接调用 malloc 或其它内存池分配的对象，但只有 acl_line_state_alloc
+ *  分配的对象才可以使用 acl_line_state_free 释放
+ * @param offset {int} 设置 ACL_LINE_STATE 对象中 offset 的初始值
+ * @return {ACL_LINE_STATE*} 传入的 state 对象指针
+ */
+ACL_API ACL_LINE_STATE *acl_line_state_reset(ACL_LINE_STATE *state, int offset);
+
+/**
+ * 从所给数据缓冲区中查找一个空行(空行可以为: \r\n 或 \n)，该函数支持流式
+ * 解析，可以循环调用本函数
+ * @param s {const char*} 传入数据缓冲区地址
+ * @param n {int} s 数据缓冲区的长度
+ * @param state {ACL_LINE_STATE*} 由 acl_line_state_alloc 分配的对象
+ * @return {int} 剩余的的字节数
+ */
+ACL_API int acl_find_blank_line(const char *s, int n, ACL_LINE_STATE *state);
+
+/*--------------------------------------------------------------------------*/
+
 #ifdef  __cplusplus
 }
 #endif

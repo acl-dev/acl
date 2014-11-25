@@ -145,6 +145,7 @@ static int __use_count = 0;
 static int __use_limit_delay = 1;
 static int __socket_count = 1;
 static int __listen_disabled = 0;
+static int __aborting = 0;
 
 static ACL_AIO *__h_aio = NULL;
 static ACL_ASTREAM **__sstreams = NULL;
@@ -353,6 +354,10 @@ static void aio_server_abort(ACL_ASTREAM *astream, void *context acl_unused)
 	const char *myname = "aio_server_abort";
 	int   n;
 	ACL_AIO *aio = acl_aio_handle(astream);
+
+	if (__aborting)
+		return;
+	__aborting = 1;
 
 	if (aio != __h_aio)
 		acl_msg_fatal("%s(%d): aio invalid", myname, __LINE__);
@@ -904,6 +909,12 @@ static void dispatch_receive(int event_type acl_unused, ACL_EVENT *event,
 static void dispatch_open(ACL_EVENT *event, ACL_AIO *aio)
 {
 	const char *myname = "dispatch_open";
+
+	if (__aborting) {
+		acl_msg_info("%s(%d), %s: master disconnect -- aborting",
+			__FILE__, __LINE__, myname);
+		return;
+	}
 
 	if (!acl_var_aio_dispatch_addr || !*acl_var_aio_dispatch_addr)
 	{

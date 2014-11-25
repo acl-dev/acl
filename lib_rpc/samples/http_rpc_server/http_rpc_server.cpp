@@ -2,12 +2,9 @@
 //
 
 #include "stdafx.h"
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/http/http_request.hpp"
-#include "acl_cpp/acl_cpp_init.hpp"
-#include "acl_cpp/stream/socket_stream.hpp"
-#include "google/protobuf/io/http_stream.h"
 #include "lib_acl.h"
+#include "acl_cpp/lib_acl.hpp"
+#include "google/protobuf/io/http_stream.h"
 #include "test.pb.h"
 
 using namespace google::protobuf::io;
@@ -56,12 +53,9 @@ static bool handle_one(http_response& response, bool output)
 	return response.send_response(addr_res);
 }
 
-static void handle_client(ACL_VSTREAM* conn)
+static void handle_client(acl::socket_stream* client)
 {
-	acl::socket_stream client;
-	(void) client.open(conn);
-
-	acl::http_response res(&client);
+	acl::http_response res(client);
 	http_response response(&res);
 
 	int   i = 0;
@@ -100,26 +94,20 @@ static void handle_client(ACL_VSTREAM* conn)
 
 static void usage(const char* procname)
 {
-	printf("usage: %s -h [help] -s listen_addr [127.0.0.1:8088]\r\n", procname);
+	printf("usage: %s -h [help]\r\n"
+		"-s listen_addr [127.0.0.1:8888]\r\n"
+		"-m [use_mempool, default: false]\r\n", procname);
 }
 
 int main(int argc, char* argv[])
 {
-	if (1)
-		acl_mem_slice_init(8, 1024, 100000,
-			ACL_SLICE_FLAG_GC2 |
-			ACL_SLICE_FLAG_RTGC_OFF |
-			ACL_SLICE_FLAG_LP64_ALIGN);
-
-#ifdef WIN32
-	acl::acl_cpp_init();
-#endif
+	bool  use_mempool = false;
 	char  addr[64];
 	int   ch;
 
-	snprintf(addr, sizeof(addr), "127.0.0.1:8088");
+	snprintf(addr, sizeof(addr), "127.0.0.1:8888");
 
-	while ((ch = getopt(argc, argv, "hs:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:m")) > 0)
 	{
 		switch (ch)
 		{
@@ -129,13 +117,27 @@ int main(int argc, char* argv[])
 		case 's':
 			snprintf(addr, sizeof(addr), "%s", optarg);
 			break;
+		case 'm':
+			use_mempool = true;
+			break;
 		default:
 			break;
 		}
 	}
 
-	ACL_VSTREAM* listener = acl_vstream_listen(addr, 128);
-	if (listener == NULL)
+	// 该函数的调用必须在所有使用 acl 的函数之前
+	if (use_mempool)
+		acl_mem_slice_init(8, 1024, 100000,
+			ACL_SLICE_FLAG_GC2 |
+			ACL_SLICE_FLAG_RTGC_OFF |
+			ACL_SLICE_FLAG_LP64_ALIGN);
+
+#ifdef WIN32
+	acl::acl_cpp_init();
+#endif
+
+	acl::server_socket server;
+	if (server.open(addr) == false)
 	{
 		printf("can't listen on %s\r\n", addr);
 		return 1;
@@ -145,9 +147,12 @@ int main(int argc, char* argv[])
 
 	while(true)
 	{
-		ACL_VSTREAM* conn = acl_vstream_accept(listener, NULL, 0);
+		acl::socket_stream* conn = server.accept();
 		if (conn == NULL)
+		{
+			printf("accept error\r\n");
 			break;
+		}
 		handle_client(conn);
 	}
 	return 0;

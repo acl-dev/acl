@@ -3,6 +3,7 @@
 #include "google/protobuf/io/http_stream.h"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/http/http_client.hpp"
+#include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "lib_acl.h"
 
@@ -86,6 +87,10 @@ bool http_request::rpc_request(const MessageLite& in, MessageLite* out)
 
 	gettimeofday(&begin, NULL);
 #endif
+	acl::http_header& header = request_->request_header();
+	header.set_content_length(buf.length());
+	header.set_keep_alive(true);
+
 	if (request_->request(buf.c_str(), buf.length()) == false)
 		return false;
 
@@ -214,6 +219,11 @@ bool http_response::send_response(const MessageLite& in)
 
 	gettimeofday(&begin, NULL);
 #endif
+
+	acl::http_header& header = response_->response_header();
+	header.set_status(200);
+	header.set_content_length(buf.length());
+	header.set_keep_alive(true);
 
 	bool ret = response_->response(buf.c_str(), buf.length());
 

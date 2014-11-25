@@ -63,9 +63,9 @@ int main(int argc, char* argv[])
 	for (size_t i = 0; i < person_count; i++)
 	{
 		tutorial::Person* person = address.add_person();
-		buf.format("zsxxsz-%d", i);
+		buf.format("zsxxsz-%d", (int) i);
 		person->set_name(buf.c_str());
-		buf.format("zsxxsz-%d@test.com", i);
+		buf.format("zsxxsz-%d@test.com", (int) i);
 		person->set_email(buf.c_str());
 		person->set_id(i);
 
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 		for (size_t j = 0; j < tutorial::Person::WORK; j++)
 		{
 			tutorial::Person::PhoneNumber* phone = person->add_phone();
-			buf.format("11111111-%d-%d", i, j);
+			buf.format("11111111-%d-%d", (int) i, (int) j);
 			phone->set_number(buf.c_str());
 		}
 	}

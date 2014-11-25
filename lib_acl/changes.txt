@@ -1,6 +1,19 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+466) 2014.11.25
+466.1) feature: acl_mystring.c 中增加了 acl_find_blank_line 函数，用来从给定
+数据中查找空行的位置
+466.2) feature: acl_pthread_pool.c 中增加了 acl_pthread_pool_idle，
+acl_pthread_pool_busy 两个函数，分别用来获得当前线程池中的空闲线程数及繁忙线程数
+466.3) feature: acl_threads_server.c 服务器模板当子进程退出时会优先调用应用
+回调函数，由应用回调函数优先决定是否退出
+
+465) 2014.11.23
+465.1) bugfix: acl_threads_server.c/acl_aio_server.c 服务器模板，当采用 TCP
+分发方式时，如果 acl_master reload 后若子进程配置的不是立即退出，则该子进程
+会重试连接 TCP 派发器从而导致该子进程永不会退出
+
 464) 2014.11.18
 464.1) bugfix: snprintf.c 中 acl_secure_snprintf/acl_secure_vsnprintf 在调用
 _vsnprintf_s 时有误，第三个参数需传入 _TRUNCATE，否则当缓冲区较小时会产生断言

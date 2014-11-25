@@ -11,6 +11,7 @@
 #pragma hdrstop
 #endif
 
+#include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_vsprintf.h"
 #include "stdlib/acl_mystring.h"
 
@@ -487,3 +488,89 @@ const char *acl_ui64toa_radix(acl_uint64 val, char *buf, size_t size, int radix)
 	return buf;
 }
 
+/*--------------------------------------------------------------------------*/
+
+static int get_blank_line(const char* s, int n, ACL_LINE_STATE* state)
+{
+	/* 如果还未找到换行符，则继续 */
+
+	if (state->last_lf == 0) {
+		while (n > 0) {
+			state->last_ch = *s;
+			state->offset++;
+			n--;
+			if (state->last_ch == '\n') {
+				state->last_lf = '\n';
+				break;
+			}
+			s++;
+		}
+
+		return n;
+	}
+
+	/* 如果数据以换行开始， 说明当前的空行找到 */
+	if (*s == '\n') {
+		/* 上次数据为: \n\r 或 \n */
+
+		state->offset++;
+		state->finish = 1;
+		state->last_ch = '\n';
+		return n - 1;
+	}
+
+	if (*s == '\r') {
+		state->offset++;
+		if (state->last_ch == '\r') {
+			/* XXX: 出现了 \n\r\r 现象 */
+			state->last_lf = 0;
+			return n - 1;
+		}
+
+		/* 返回, 以期待下一个字符为 '\n' */
+		state->last_ch = '\r';
+		return n - 1;
+	}
+
+	/* 清除 '\n' */
+	state->last_lf = 0;
+
+	return n;
+}
+
+int acl_find_blank_line(const char *s, int n, ACL_LINE_STATE *state)
+{
+	int   ret;
+
+	while (n > 0) {
+		ret = get_blank_line(s, n, state);
+		if (state->finish)
+			return ret;
+		if (ret == 0)
+			return 0;
+		s += n - ret;
+		n = ret;
+	}
+
+	return  0;
+}
+
+ACL_LINE_STATE *acl_line_state_alloc(void)
+{
+	ACL_LINE_STATE *state = (ACL_LINE_STATE*)
+		acl_mycalloc(1, sizeof(ACL_LINE_STATE));
+
+	return state;
+}
+
+void acl_line_state_free(ACL_LINE_STATE *state)
+{
+	acl_myfree(state);
+}
+
+ACL_LINE_STATE *acl_line_state_reset(ACL_LINE_STATE *state, int offset)
+{
+	memset(state, 0, sizeof(ACL_LINE_STATE));
+	state->offset = offset;
+	return state;
+}

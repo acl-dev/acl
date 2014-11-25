@@ -192,11 +192,25 @@ ACL_API int acl_pthread_pool_dispatch(void *dispatch_arg,
 		void (*run_fn)(void *), void *run_arg);
 
 /**
- * 当前线程池中的线程数
+ * 获得当前线程池中的线程数
  * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
- * @return {int} 返回线程池中的总线程数
+ * @return {int} 返回线程池中的总线程数，返回值 < 0 表示出错
  */
 ACL_API int acl_pthread_pool_size(acl_pthread_pool_t *thr_pool);
+
+/**
+ * 获得当前线程池中的空闲线程数
+ * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
+ * @return {int} 返回线程池中的空闲线程数，返回值 < 0 表示出错
+ */
+ACL_API int acl_pthread_pool_idle(acl_pthread_pool_t *thr_pool);
+
+/**
+ * 获得当前线程池中的繁忙线程数
+ * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
+ * @return {int} 返回线程池中的繁忙线程数，返回值 < 0 表示出错
+ */
+ACL_API int acl_pthread_pool_busy(acl_pthread_pool_t *thr_pool);
 
 /**
  * 设置线程任务调度超时警告的时间(毫秒)
@@ -222,9 +236,9 @@ ACL_API void acl_pthread_pool_set_schedule_wait(
 ACL_API void acl_pthread_pool_set_qlen_warn(
 		acl_pthread_pool_t *thr_pool, int max);
 /**
- * 取得当前队列中未处理的任务个数
+ * 取得当前线程池全局队列中未处理的任务个数
  * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
- * @return {int} 当前未处理的任务数
+ * @return {int} 当前未处理的任务数，返回值 < 0 表示出错
  */
 ACL_API int acl_pthread_pool_qlen(acl_pthread_pool_t *thr_pool);
 

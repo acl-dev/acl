@@ -29,6 +29,8 @@ void string::init(size_t len)
 	vector_tmp_ = NULL;
 	pair_tmp_ = NULL;
 	scan_ptr_ = NULL;
+	line_state_ = NULL;
+	line_state_offset_ = 0;
 }
 
 string::string(size_t len /* = 64 */, bool bin /* = false */)
@@ -66,6 +68,8 @@ string::~string()
 	delete list_tmp_;
 	delete vector_tmp_;
 	delete pair_tmp_;
+	if (line_state_)
+		acl_line_state_free(line_state_);
 }
 
 string& string::set_bin(bool bin)
@@ -849,6 +853,47 @@ ACL_VSTRING* string::vstring() const
 	return vbf_;
 }
 
+int string::find_blank_line(int* left_count /* = NULL */,
+	string* out /* = NULL */)
+{
+	if (line_state_ == NULL)
+		line_state_ = (ACL_LINE_STATE*) acl_line_state_alloc();
+
+	int   len = (int) LEN(vbf_);
+	if (line_state_->offset >= len)
+		return -1;
+
+	int   nleft = len - line_state_->offset;
+	char* s = STR(vbf_) + line_state_->offset;
+	int   ret = acl_find_blank_line(s, nleft, line_state_);
+
+	if (left_count != NULL)
+		*left_count = ret;
+
+	if (line_state_->finish)
+	{
+		acl_line_state_reset(line_state_, line_state_->offset);
+		if (out != NULL)
+		{
+			out->append(STR(vbf_) + line_state_offset_,
+				line_state_->offset - line_state_offset_);
+		}
+		line_state_offset_ = line_state_->offset;
+
+		return line_state_->offset;
+	}
+
+	return 0;
+}
+
+string& string::find_reset(void)
+{
+	if (line_state_)
+		acl_line_state_reset(line_state_, 0);
+	line_state_offset_ = 0;
+	return *this;
+}
+
 int string::find(char ch) const
 {
 	char *ptr = acl_vstring_memchr(vbf_, ch);
@@ -1248,6 +1293,7 @@ string& string::clear(void)
 	RSET(vbf_);
 	TERM(vbf_);
 	scan_ptr_ = NULL;
+	find_reset();
 	return *this;
 }
 
@@ -1261,6 +1307,18 @@ string& string::upper()
 {
 	acl_uppercase(STR(vbf_));
 	return *this;
+}
+
+size_t string::substr(string& out, size_t pos /* = 0 */, size_t len /* = 0 */)
+{
+	size_t n = LEN(vbf_);
+	if (pos >= n)
+		return 0;
+	n -= pos;
+	if (len == 0 || len > n)
+		len = n;
+	out.append(STR(vbf_) + pos, len);
+	return n;
 }
 
 string& string::base64_encode(void)

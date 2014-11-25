@@ -98,7 +98,6 @@ acl_ofstream::CopyingAclOutputStream::~CopyingAclOutputStream()
 bool acl_ofstream::CopyingAclOutputStream::Write(
 	const void* buffer, int size)
 {
-	printf("write called, size: %d\r\n", size);
 	return output_->write(buffer, (size_t) size) == size ? true : false;
 }
 

@@ -66,7 +66,7 @@ typedef int32 Atomic32;
 #ifdef GOOGLE_PROTOBUF_ARCH_64_BIT
 // We need to be able to go between Atomic64 and AtomicWord implicitly.  This
 // means Atomic64 and AtomicWord should be the same type on 64-bit.
-#if defined(GOOGLE_PROTOBUF_OS_NACL)
+#if defined(__ILP32__) || defined(GOOGLE_PROTOBUF_OS_NACL)
 // NaCl's intptr_t is not actually 64-bits on 64-bit!
 // http://code.google.com/p/nativeclient/issues/detail?id=1162
 typedef int64 Atomic64;
@@ -120,6 +120,9 @@ Atomic32 Release_CompareAndSwap(volatile Atomic32* ptr,
                                 Atomic32 old_value,
                                 Atomic32 new_value);
 
+#if defined(__MINGW32__) && defined(MemoryBarrier)
+#undef MemoryBarrier
+#endif
 void MemoryBarrier();
 void NoBarrier_Store(volatile Atomic32* ptr, Atomic32 value);
 void Acquire_Store(volatile Atomic32* ptr, Atomic32 value);
@@ -160,8 +163,11 @@ Atomic64 Release_Load(volatile const Atomic64* ptr);
 #define GOOGLE_PROTOBUF_ATOMICOPS_ERROR \
 #error "Atomic operations are not supported on your platform"
 
+// ThreadSanitizer, http://clang.llvm.org/docs/ThreadSanitizer.html.
+#if defined(THREAD_SANITIZER)
+#include <google/protobuf/stubs/atomicops_internals_tsan.h>
 // MSVC.
-#if defined(_MSC_VER)
+#elif defined(_MSC_VER)
 #if defined(GOOGLE_PROTOBUF_ARCH_IA32) || defined(GOOGLE_PROTOBUF_ARCH_X64)
 #include <google/protobuf/stubs/atomicops_internals_x86_msvc.h>
 #else
@@ -176,14 +182,18 @@ GOOGLE_PROTOBUF_ATOMICOPS_ERROR
 #elif defined(__GNUC__)
 #if defined(GOOGLE_PROTOBUF_ARCH_IA32) || defined(GOOGLE_PROTOBUF_ARCH_X64)
 #include <google/protobuf/stubs/atomicops_internals_x86_gcc.h>
-#elif defined(GOOGLE_PROTOBUF_ARCH_ARM)
+#elif defined(GOOGLE_PROTOBUF_ARCH_ARM) && defined(__linux__)
 #include <google/protobuf/stubs/atomicops_internals_arm_gcc.h>
+#elif defined(GOOGLE_PROTOBUF_ARCH_AARCH64)
+#include <google/protobuf/stubs/atomicops_internals_arm64_gcc.h>
 #elif defined(GOOGLE_PROTOBUF_ARCH_ARM_QNX)
 #include <google/protobuf/stubs/atomicops_internals_arm_qnx.h>
-#elif defined(GOOGLE_PROTOBUF_ARCH_MIPS)
+#elif defined(GOOGLE_PROTOBUF_ARCH_MIPS) || defined(GOOGLE_PROTOBUF_ARCH_MIPS64)
 #include <google/protobuf/stubs/atomicops_internals_mips_gcc.h>
-#elif defined(__pnacl__)
+#elif defined(__native_client__)
 #include <google/protobuf/stubs/atomicops_internals_pnacl.h>
+#elif (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4))
+#include <google/protobuf/stubs/atomicops_internals_generic_gcc.h>
 #else
 GOOGLE_PROTOBUF_ATOMICOPS_ERROR
 #endif

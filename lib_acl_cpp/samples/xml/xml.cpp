@@ -249,10 +249,7 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	(void) argc;
-	(void) argv;
-	test2(); getchar(); return 0;
-
+	test2();
 	test();
 	printf("enter any key to exit\r\n");
 	getchar();

@@ -77,7 +77,7 @@ CFLAGS += -I../../include -I../../../include -I. -I.. \
 EXTLIBS =
 LDFLAGS = -L../.. -l_rpc  \
 	-L../../../lib_acl_cpp/lib -l_acl_cpp -L../../../lib_protocol/lib -l_protocol -L../../../lib_acl/lib -l_acl \
-	-L../../../lib/protobuf/$(RPATH) -lprotobuf-lite \
+	-L../../../lib/$(RPATH) -lprotobuf-lite \
 	$(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)

@@ -37,6 +37,7 @@ void master_threads2::run_daemon(int argc, char** argv)
 		ACL_MASTER_SERVER_ON_CLOSE, service_on_close,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
+		ACL_MASTER_SERVER_EXIT_TIMER, service_exit_timer,
 		ACL_MASTER_SERVER_EXIT, service_exit,
 		ACL_MASTER_SERVER_THREAD_INIT, thread_init,
 		ACL_MASTER_SERVER_THREAD_EXIT, thread_exit,
@@ -269,6 +270,12 @@ void master_threads2::service_init(void*)
 
 	__mt->proc_inited_ = true;
 	__mt->proc_on_init();
+}
+
+int master_threads2::service_exit_timer(size_t nclients, size_t nthreads)
+{
+	acl_assert(__mt != NULL);
+	return __mt->proc_exit_timer(nclients, nthreads) == true ? 1 : 0;
 }
 
 void master_threads2::service_exit(void*)

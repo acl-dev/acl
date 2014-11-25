@@ -20,14 +20,14 @@ static bool handle_one(http_request& rpc, bool output)
 	// 请求过程
 
 	static tutorial::AddressBook address;
-	size_t  person_count = 5;
+	int  person_count = 5;
 
 	address.Clear();
 
 	acl::string buf;
 
 	// 给地址簿中添加用户列表
-	for (size_t i = 0; i < person_count; i++)
+	for (int i = 0; i < person_count; i++)
 	{
 		tutorial::Person* person = address.add_person();
 		buf.format("zsxxsz-%d", i);
@@ -37,7 +37,7 @@ static bool handle_one(http_request& rpc, bool output)
 		person->set_id(i);
 
 		// 给一个用户添加多个电话号码
-		for (size_t j = 0; j < tutorial::Person::WORK; j++)
+		for (int j = 0; j < tutorial::Person::WORK; j++)
 		{
 			tutorial::Person::PhoneNumber* phone = person->add_phone();
 			buf.format("11111111-%d-%d", i, j);
@@ -124,27 +124,22 @@ static void handle_rpc(const char* addr, int max)
 
 static void usage(const char* procname)
 {
-	printf("usage: %s -h [help] -s server_addr [127.0.0.1:8088] -n max_request\r\n", procname);
+	printf("usage: %s -h [help]\r\n"
+		"-s server_addr [default: 127.0.0.1:8888]\r\n"
+		"-n max_request\r\n"
+		"-m [use_mempool, default: false]\r\n", procname);
 }
 
 int main(int argc, char* argv[])
 {
-	if (1)
-		acl_mem_slice_init(8, 1024, 100000,
-			ACL_SLICE_FLAG_GC2 |
-			ACL_SLICE_FLAG_RTGC_OFF |
-			ACL_SLICE_FLAG_LP64_ALIGN);
-
-#ifdef WIN32
-	acl::acl_cpp_init();
-#endif
 
 	char  addr[64];
 	int   ch, max = 1;
+	bool  use_mempool = false;
 
-	snprintf(addr, sizeof(addr), "127.0.0.1:8088");
+	snprintf(addr, sizeof(addr), "127.0.0.1:8888");
 
-	while ((ch = getopt(argc, argv, "hs:n:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:m")) > 0)
 	{
 		switch (ch)
 		{
@@ -159,10 +154,23 @@ int main(int argc, char* argv[])
 			if (max <= 0)
 				max = 1;
 			break;
+		case 'm':
+			use_mempool = true;
+			break;
 		default:
 			break;
 		}
 	}
+
+#ifdef WIN32
+	acl::acl_cpp_init();
+#endif
+
+	if (use_mempool)
+		acl_mem_slice_init(8, 1024, 100000,
+			ACL_SLICE_FLAG_GC2 |
+			ACL_SLICE_FLAG_RTGC_OFF |
+			ACL_SLICE_FLAG_LP64_ALIGN);
 
 	handle_rpc(addr, max);
 

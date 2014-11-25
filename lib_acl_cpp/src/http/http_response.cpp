@@ -18,7 +18,9 @@ http_response::http_response(socket_stream* client)
 	debug_ = false;
 	header_ok_ = false;
 	head_sent_ = false;
+	printf("%s:%d\n", __FUNCTION__, __LINE__);
 	client_ = NEW http_client(client);
+	printf("%s:%d\n", __FUNCTION__, __LINE__);
 }
 
 http_response::~http_response(void)
@@ -50,6 +52,9 @@ bool http_response::read_header()
 {
 	if (client_)
 	{
+		// 在读 HTTP 请求头时将此标志重置，以便于在长连接的响应
+		// 过程中可以重复响应 HTTP 头
+		head_sent_ = false;
 		client_->reset();
 		header_.reset();
 	}
@@ -306,6 +311,9 @@ bool http_response::response(const void* data, size_t len)
 		}
 		head_sent_ = true;
 	}
+
+	if (data == NULL || len == 0)
+		head_sent_ = false;
 
 	// 发送 HTTP 响应体数据
 	if (client_->write_body(data, len) == false)

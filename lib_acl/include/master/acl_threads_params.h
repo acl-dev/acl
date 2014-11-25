@@ -131,10 +131,6 @@ extern char *acl_var_threads_dispatch_addr;
 #define	ACL_DEF_THREADS_DISPATCH_TYPE		"default"
 extern char *acl_var_threads_dispatch_type;
 
-#define	ACL_VAR_THREADS_THREAD_ACCEPT		"ioctl_thread_accept"
-#define	ACL_DEF_THREADS_THREAD_ACCEPT		0
-extern int   acl_var_threads_thread_accept;
-
 #endif /* ACL_UNIX */
 
 #ifdef	__cplusplus

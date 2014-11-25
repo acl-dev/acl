@@ -5,6 +5,7 @@
 #include <utility>
 
 struct ACL_VSTRING;
+struct ACL_LINE_STATE;
 
 namespace acl {
 
@@ -640,6 +641,26 @@ public:
 	int rncompare(const char* s, size_t len, bool case_sensitive = true) const;
 
 	/**
+	 * 在当前字符串缓冲区中查找空行的位置，可以循环调用本方法以获得所有的
+	 * 符合条件的内容
+	 * @param left_count {int*} 当该指针非空时存储当前字符串剩余的数据长度
+	 * @param buf {string*} 当找到空行时，则将上一次空行(不含该空行)和
+	 *  本次空行(包含该空行)之间的数据存放于该缓冲区内，注：内部并不负责
+	 *  清空该缓冲区，因为采用数据追加方式
+	 * @return {int} 返回 0 表示未找到空行；返回值 > 0 表示空行的下一个
+	 *  位置(因为需要找到一个空行返回的是该空行的下一个位置，所以若找到
+	 *  空行则返回值一定大于 0)；返回值 < 0 表示内部出错
+	 */
+	int find_blank_line(int* left_count = NULL, string* buf = NULL);
+
+	/**
+	 * 重置内部查询状态，当需要重新开始调用 find_blank_line 时需要调用本
+	 * 方法以重置内部查询状态
+	 * @return {string&}
+	 */
+	string& find_reset(void);
+
+	/**
 	 * 查找指定字符在当前对象缓冲区的位置（下标从 0 开始）
 	 * @param n {char} 要查找的有符号字符
 	 * @return {int} 字符在缓冲区中的位置，若返回值 < 0 则表示不存在
@@ -1003,6 +1024,17 @@ public:
 	string& upper(void);
 
 	/**
+	 * 从当前缓冲区中将指定偏移量指定长度的数据拷贝至目标缓冲区中
+	 * @param out {string&} 目标缓冲区，内部采用追加方式，并不清空该对象
+	 * @param pos {size_t} 当前缓冲区的起始位置
+	 * @param len {size_t} 从 pos 起始位置开始拷贝的数据量，当该值为 0 时
+	 *  则拷贝指定 pos 位置后所有的数据，否则拷贝指定长度的数据，若指定的
+	 *  数据长度大于实际要拷贝的长度，则仅拷贝实际存在的数据
+	 * @return {size_t} 返回拷贝的实际数据长度，pos 越界时则该返回值为 0
+	 */
+	size_t substr(string& out, size_t pos = 0, size_t len = 0);
+
+	/**
 	 * 将当前对象的数据缓冲区中的数据进行 base64 转码
 	 * @return {string&} 当前对象的引用
 	 */
@@ -1107,6 +1139,8 @@ private:
 	std::list<string>* list_tmp_;
 	std::vector<string>* vector_tmp_;
 	std::pair<string, string>* pair_tmp_;
+	ACL_LINE_STATE* line_state_;
+	int   line_state_offset_;
 
 	void init(size_t len);
 };
