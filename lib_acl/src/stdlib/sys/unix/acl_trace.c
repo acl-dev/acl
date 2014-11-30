@@ -2,32 +2,24 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "stdlib/acl_define.h"
 #include "stdlib/acl_msg.h"
+#include "stdlib/unix/acl_trace.h"
 #endif
 
-#ifdef	ACL_UNIX
+#ifdef	ACL_LINUX
 #include <unistd.h>
-# if !defined(ACL_SUNOS5) && !defined(ACL_FREEBSD)
 #include <execinfo.h>
-# endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "stdlib/unix/acl_trace.h"
 
 void acl_dump_trace(const char *filepath)
 {
 	const char *myname = "acl_dump_trace";
 	int   fd;
-#if	!defined(ACL_SUNOS5) && !defined(ACL_FREEBSD)
 	void *buffer[1000];
-#endif
 	size_t n;
 
-#if	!defined(ACL_SUNOS5) && !defined(ACL_FREEBSD)
 	n = backtrace(buffer, 1000);
-#else
-	n = 0;
-#endif
 	if (n == 0)
 		return;
 
@@ -38,10 +30,32 @@ void acl_dump_trace(const char *filepath)
 		return;
 	}
 
-#if	!defined(ACL_SUNOS5) && !defined(ACL_FREEBSD)
 	backtrace_symbols_fd(buffer, n, fd);
-#endif
 	close(fd);
+}
+
+void acl_log_strace(void)
+{
+	void *buffer[1000];
+	size_t n, i;
+	char **results;
+
+	n = backtrace(buffer, 1000);
+	if (n == 0)
+		return;
+	results = backtrace_symbols(buffer, n);
+	for (i = 0; i < n; i++)
+		acl_msg_info("backtrace: %s", results[i]);
+}
+
+#else
+
+void acl_dump_trace(const char *filepath acl_unused)
+{
+}
+
+void acl_log_strace(void)
+{
 }
 
 #endif

@@ -574,10 +574,17 @@ static void __strip_url_path(ACL_VSTRING *buf, const char *url)
 	const char  last_ch = *(url + strlen(url) - 1);
 	ACL_ITER iter;
 
+	argv = acl_argv_split(url, "/");
+
+	/* xxx: 必须将下面两行的初始化放在 acl_argv_split 的后面，因为 url
+	 * 所指内容有可能与 buf 中的缓冲区地址相同，参见 __strip_url_path
+	 * 的两处调用；另外，在调用 ACL_VSTRING_RESET 后还必须调用
+	 * ACL_VSTRING_TERMINATE，否则 ACL_VSTRING_RESET 仅移动指针位置，
+	 * 并不会将初始位置赋 '\0'
+	 */
 	ACL_VSTRING_RESET(buf);
 	ACL_VSTRING_TERMINATE(buf);
 
-	argv = acl_argv_split(url, "/");
 	acl_foreach(iter, argv) {
 		ptr = (const char*) iter.data;
 		if (strcmp(ptr, ".") == 0 || strcmp(ptr, "..") == 0)

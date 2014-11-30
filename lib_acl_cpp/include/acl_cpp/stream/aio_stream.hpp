@@ -80,6 +80,7 @@ struct AIO_CALLBACK
 };
 
 class aio_handle;
+class stream_hook;
 
 /**
  * 异步流基类，该类为纯虚类，不能被直接实例化，只能被子类继承使用
@@ -215,14 +216,31 @@ public:
 	aio_handle& get_handle() const;
 
 	/**
-	 * 判断流是否处于 hooked 状态
-	 * @return {bool}
+	 * 注册读写流对象，内部会自动调用 hook->open 过程，如果成功，则返回之前注册的对象
+	 * (可能为NULL)，若失败则返回与输入参数相同的指针，应用可以通过判断返回值与输入值
+	 * 是否相同来判断注册流对象是否成功
+	 * xxx: 在调用此方法前必须保证流连接已经创建
+	 * @param hook {stream_hook*} 非空对象指针
+	 * @return {stream_hook*} 返回值与输入值不同则表示成功
 	 */
-	bool is_hooked() const;
+	stream_hook* setup_hook(stream_hook* hook);
+
+	/**
+	 * 获得当前注册的流读写对象
+	 * @return {stream_hook*}
+	 */
+	stream_hook* get_hook() const;
+
+	/**
+	 * 删除当前注册的流读写对象并返回该对象，恢复缺省的读写过程
+	 * @return {stream_hook*}
+	 */
+	stream_hook* remove_hook();
 
 protected:
 	aio_handle* handle_;
 	ACL_ASTREAM* stream_;
+	stream_hook* hook_;
 
 	virtual ~aio_stream();
 
@@ -250,6 +268,29 @@ private:
 	char  peer_ip_[33];
 	char  local_ip_[33];
 	const char* get_ip(const char* addr, char* buf, size_t size);
+
+private:
+#ifdef WIN32
+	static int read_hook(SOCKET fd, void *buf, size_t len,
+		int timeout, ACL_VSTREAM* stream, void *ctx);
+	static int send_hook(SOCKET fd, const void *buf, size_t len,
+		int timeout, ACL_VSTREAM* stream, void *ctx);
+
+	static int fread_hook(HANDLE fd, void *buf, size_t len,
+		int timeout, ACL_VSTREAM* stream, void *ctx);
+	static int fsend_hook(HANDLE fd, const void *buf, size_t len,
+		int timeout, ACL_VSTREAM* stream, void *ctx);
+#else
+	static int read_hook(int fd, void *buf, size_t len,
+		int timeout, ACL_VSTREAM* stream, void *ctx);
+	static int send_hook(int fd, const void *buf, size_t len,
+		int timeout, ACL_VSTREAM* stream, void *ctx);
+
+	static int fread_hook(int fd, void *buf, size_t len,
+		int timeout, ACL_VSTREAM* stream, void *ctx);
+	static int fsend_hook(int fd, const void *buf, size_t len,
+		int timeout, ACL_VSTREAM* stream, void *ctx);
+#endif
 };
 
 }  // namespace acl

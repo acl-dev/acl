@@ -138,8 +138,12 @@ static int __gets_peek(ACL_ASTREAM *astream)
 	n = astream->read_ready_fn(astream->stream, &astream->strbuf, &ready);
 
 	if (n == ACL_VSTREAM_EOF) {
-		if ((astream->stream->errnum == ACL_EWOULDBLOCK
-			|| astream->stream->errnum == ACL_EAGAIN))
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+		if (astream->stream->errnum == ACL_EWOULDBLOCK)
+#else
+		if (astream->stream->errnum == ACL_EWOULDBLOCK
+			|| astream->stream->errnum == ACL_EAGAIN)
+#endif
 		{
 			READ_SAFE_ENABLE(astream, main_read_callback);
 			return 0;
@@ -326,8 +330,12 @@ static int __read_peek(ACL_ASTREAM *astream)
 	n = acl_vstream_read_peek(astream->stream, &astream->strbuf);
 
 	if (n == ACL_VSTREAM_EOF) {
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+		if (astream->stream->errnum == ACL_EWOULDBLOCK)
+#else
 		if (astream->stream->errnum == ACL_EAGAIN
 			|| astream->stream->errnum == ACL_EWOULDBLOCK)
+#endif
 		{
 			READ_SAFE_ENABLE(astream, main_read_callback);
 			return 0;
@@ -495,8 +503,12 @@ static int __readn_peek(ACL_ASTREAM *astream)
 	n = acl_vstream_readn_peek(astream->stream, &astream->strbuf,
 		astream->count - n, &ready);
 	if (n == ACL_VSTREAM_EOF) {
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+		if (astream->stream->errnum == ACL_EWOULDBLOCK)
+#else
 		if (astream->stream->errnum == ACL_EAGAIN
 			|| astream->stream->errnum == ACL_EWOULDBLOCK)
+#endif
 		{
 			READ_SAFE_ENABLE(astream, main_read_callback);
 			return 0;
@@ -656,7 +668,9 @@ ACL_VSTRING *acl_aio_gets_peek(ACL_ASTREAM *astream)
 		return NULL;
 	if (acl_vstream_gets_peek(astream->stream,
 			&astream->strbuf, &ready) == ACL_VSTREAM_EOF
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
 		&& astream->stream->errnum != ACL_EAGAIN
+#endif
 		&& astream->stream->errnum != ACL_EWOULDBLOCK)
 	{
 		astream->flag |= ACL_AIO_FLAG_DEAD;
@@ -677,8 +691,10 @@ ACL_VSTRING *acl_aio_gets_nonl_peek(ACL_ASTREAM *astream)
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
 		return NULL;
 	if (acl_vstream_gets_nonl_peek(astream->stream,
-			&astream->strbuf, &ready) == ACL_VSTREAM_EOF
+		&astream->strbuf, &ready) == ACL_VSTREAM_EOF
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
 		&& astream->stream->errnum != ACL_EAGAIN
+#endif
 		&& astream->stream->errnum != ACL_EWOULDBLOCK)
 	{
 		astream->flag |= ACL_AIO_FLAG_DEAD;
@@ -699,8 +715,10 @@ ACL_VSTRING *acl_aio_read_peek(ACL_ASTREAM *astream)
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
 		return NULL;
 	if ((n = acl_vstream_read_peek(astream->stream,
-			&astream->strbuf)) == ACL_VSTREAM_EOF
+		&astream->strbuf)) == ACL_VSTREAM_EOF
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
 		&& astream->stream->errnum != ACL_EAGAIN
+#endif
 		&& astream->stream->errnum != ACL_EWOULDBLOCK)
 	{
 		astream->flag |= ACL_AIO_FLAG_DEAD;
@@ -721,8 +739,10 @@ ACL_VSTRING *acl_aio_readn_peek(ACL_ASTREAM *astream, int count)
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
 		return NULL;
 	if (acl_vstream_readn_peek(astream->stream,
-			&astream->strbuf, count, &ready) == ACL_VSTREAM_EOF
+		&astream->strbuf, count, &ready) == ACL_VSTREAM_EOF
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
 		&& astream->stream->errnum != ACL_EAGAIN
+#endif
 		&& astream->stream->errnum != ACL_EWOULDBLOCK)
 	{
 		astream->flag |= ACL_AIO_FLAG_DEAD;
@@ -773,8 +793,12 @@ static void can_read_callback(int event_type, ACL_EVENT *event acl_unused,
 	} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 		astream->nrefer--;
 		READ_IOCP_CLOSE(astream);
-	} else
+	} else {
 		astream->nrefer--;
+		if (astream->keep_read) {
+			READ_SAFE_ENABLE(astream, can_read_callback);
+		}
+	}
 }
 
 void acl_aio_enable_read(ACL_ASTREAM *astream,

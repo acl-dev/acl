@@ -1,5 +1,7 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
+#include "acl_cpp/stream/stream_hook.hpp"
 #include "acl_cpp/stream/aio_stream.hpp"
 
 namespace acl
@@ -8,6 +10,7 @@ namespace acl
 aio_stream::aio_stream(aio_handle* handle)
 : handle_(handle)
 , stream_(NULL)
+, hook_(NULL)
 , error_hooked_(false)
 {
 	acl_assert(handle);
@@ -18,6 +21,9 @@ aio_stream::aio_stream(aio_handle* handle)
 
 aio_stream::~aio_stream()
 {
+	if (hook_)
+		hook_->destroy();
+
 	if (stream_)
 	{
 		handle_->decrease();
@@ -453,6 +459,157 @@ int aio_stream::timeout_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 	}
 
 	return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
+stream_hook* aio_stream::get_hook() const
+{
+	return hook_;
+}
+
+stream_hook* aio_stream::remove_hook()
+{
+	ACL_VSTREAM* vstream = get_vstream();
+	if (vstream == NULL)
+	{
+		logger_error("vstream null");
+		return NULL;
+	}
+
+	stream_hook* hook = hook_;
+	hook_ = NULL;
+
+	if (vstream->type == ACL_VSTREAM_TYPE_FILE)
+	{
+		vstream->fread_fn  = acl_file_read;
+		vstream->fwrite_fn = acl_file_write;
+		vstream->fwritev_fn = acl_file_writev;
+		vstream->fclose_fn = acl_file_close;
+	}
+	else
+	{
+		vstream->read_fn  = acl_socket_read;
+		vstream->write_fn = acl_socket_write;
+		vstream->writev_fn = acl_socket_writev;
+		vstream->close_fn = acl_socket_close;
+	}
+
+	return hook;
+}
+
+#define	HOOK_KEY	"aio_stream::setup_hook"
+
+stream_hook* aio_stream::setup_hook(stream_hook* hook)
+{
+	ACL_VSTREAM* vstream = get_vstream();
+	if (vstream == NULL)
+	{
+		logger_error("vstream null");
+		return NULL;
+	}
+
+	stream_hook* old_hook = hook_;
+
+	if (vstream->type == ACL_VSTREAM_TYPE_FILE)
+	{
+		ACL_FSTREAM_RD_FN read_fn = vstream->fread_fn;
+		ACL_FSTREAM_WR_FN write_fn = vstream->fwrite_fn;
+
+		vstream->fread_fn = fread_hook;
+		vstream->fwrite_fn = fsend_hook;
+		acl_vstream_add_object(vstream, HOOK_KEY, this);
+
+		if (hook->open(vstream) == false)
+		{
+			// 如果打开失败，则恢复
+
+			vstream->fread_fn = read_fn;
+			vstream->fwrite_fn = write_fn;
+			acl_vstream_del_object(vstream, HOOK_KEY);
+			return hook;
+		}
+	}
+	else
+	{
+		ACL_VSTREAM_RD_FN read_fn = vstream->read_fn;
+		ACL_VSTREAM_WR_FN write_fn = vstream->write_fn;
+
+		vstream->read_fn = read_hook;
+		vstream->write_fn = send_hook;
+		acl_vstream_add_object(vstream, HOOK_KEY, this);
+
+		acl_tcp_set_nodelay(ACL_VSTREAM_SOCK(vstream));
+
+		if (hook->open(vstream) == false)
+		{
+			// 如果打开失败，则恢复
+
+			vstream->read_fn = read_fn;
+			vstream->write_fn = write_fn;
+			acl_vstream_del_object(vstream, HOOK_KEY);
+			return hook;
+		}
+	}
+
+	hook_ = hook;
+	return old_hook;
+}
+
+int aio_stream::read_hook(ACL_SOCKET, void *buf, size_t len,
+	int, ACL_VSTREAM* vs, void *)
+{
+	aio_stream* s = (aio_stream*) acl_vstream_get_object(vs, HOOK_KEY);
+	acl_assert(s);
+
+	if (s->hook_ == NULL)
+	{
+		logger_error("hook_ null");
+		return -1;
+	}
+	return s->hook_->read(buf, len);
+}
+
+int aio_stream::send_hook(ACL_SOCKET, const void *buf, size_t len,
+	int, ACL_VSTREAM* vs, void *)
+{
+	aio_stream* s = (aio_stream*) acl_vstream_get_object(vs, HOOK_KEY);
+	acl_assert(s);
+
+	if (s->hook_ == NULL)
+	{
+		logger_error("hook_ null");
+		return -1;
+	}
+	return s->hook_->send(buf, len);
+}
+
+int aio_stream::fread_hook(ACL_FILE_HANDLE, void *buf, size_t len,
+	int, ACL_VSTREAM* vs, void *)
+{
+	aio_stream* s = (aio_stream*) acl_vstream_get_object(vs, HOOK_KEY);
+	acl_assert(s);
+
+	if (s->hook_ == NULL)
+	{
+		logger_error("hook_ null");
+		return -1;
+	}
+	return s->hook_->read(buf, len);
+}
+
+int aio_stream::fsend_hook(ACL_FILE_HANDLE, const void *buf, size_t len,
+	int, ACL_VSTREAM* vs, void *)
+{
+	aio_stream* s = (aio_stream*) acl_vstream_get_object(vs, HOOK_KEY);
+	acl_assert(s);
+
+	if (s->hook_ == NULL)
+	{
+		logger_error("hook_ null");
+		return -1;
+	}
+	return s->hook_->send(buf, len);
 }
 
 }  // namespace acl

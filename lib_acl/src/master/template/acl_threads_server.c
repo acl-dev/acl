@@ -294,7 +294,7 @@ static void listen_cleanup(ACL_EVENT *event)
 	 * select 所调用的事件集合中就不存在该监听流了。
 	 */
 
-	if (acl_pthread_self() != acl_main_thread_self())
+	if ((unsigned long) acl_pthread_self() != acl_main_thread_self())
 		acl_event_request_timer(event, listen_cleanup_timer,
 			__sstreams, 1000000, 0);
 	else {

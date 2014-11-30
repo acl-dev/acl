@@ -29,6 +29,7 @@
 
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_vstream.h"
+#include "stdlib/acl_iostuff.h"
 #include "stdlib/acl_sys_patch.h"
 
 #endif
@@ -43,7 +44,6 @@ int acl_socket_init(void)
 	const char *myname = "acl_socket_init";
 	WORD version = 0;
 	WSADATA data;
-	char  ebuf[256];
 
 	if (__socket_inited) {
 		acl_msg_warn("%s(%d): has been inited", myname, __LINE__);
@@ -58,7 +58,7 @@ int acl_socket_init(void)
 
 	if (WSAStartup(version, &data) != 0) {
 		acl_msg_error("%s(%d): WSAStartup error(%s)",
-			myname, __LINE__, acl_last_strerror(ebuf, sizeof(ebuf)));
+			myname, __LINE__, acl_last_serror());
 		return -1;
 	}
 	if (LOBYTE(data.wVersion) != 2 || HIBYTE(data.wVersion) != 0) {
@@ -99,8 +99,7 @@ int acl_socket_close(ACL_SOCKET fd)
 }
 
 int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
-	void *arg acl_unused)
+	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
 #if 0
 	WSABUF wsaData;
@@ -117,7 +116,14 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 		return -1;
 	return dwBytes;
 #else
-	int ret = recv(fd, buf, size, 0);
+	int ret;
+
+	if (timeout > 0 && acl_read_wait(fd, timeout) < 0) {
+		errno = acl_last_error();
+		return -1;
+	}
+
+	ret = recv(fd, buf, size, 0);
 	if (ret <= 0)
 		errno = acl_last_error();
 	return ret;
@@ -125,8 +131,7 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 }
 
 int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
-	void *arg acl_unused)
+	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
 #if 0
 	WSABUF wsaData;
@@ -141,8 +146,18 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 		return (-1);
 	return dwBytes;
 #else
-	int ret = send(fd, buf, size, 0);
+	int   ret;
 
+#ifdef ACL_WRITEABLE_CHECK
+	if (timeout > 0 && acl_write_wait(fd, timeout) < 0) {
+		errno = acl_last_error();
+		return -1;
+	}
+#else
+	(void) timeout;
+#endif
+
+	ret = send(fd, buf, size, 0);
 	if (ret <= 0)
 		errno = acl_last_error();
 	return ret;
@@ -150,10 +165,18 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 }
 
 int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
-	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
-	void *arg acl_unused)
+	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
 	int   i, n, ret;
+
+#ifdef ACL_WRITEABLE_CHECK
+	if (timeout > 0 && acl_write_wait(fd, timeout) < 0) {
+		errno = acl_last_error();
+		return -1;
+	}
+#else
+	(void) timeout;
+#endif
 
 	n = 0;
 	for (i = 0; i < count; i++)	{
@@ -190,23 +213,40 @@ int acl_socket_close(ACL_SOCKET fd)
 }
 
 int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
-	void *arg acl_unused)
+	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
+	if (timeout > 0 && acl_read_wait(fd, timeout) < 0) {
+		errno = acl_last_error();
+		return -1;
+	}
 	return read(fd, buf, size);
 }
 
 int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
-	void *arg acl_unused)
+	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
+#ifdef ACL_WRITEABLE_CHECK
+	if (timeout > 0 && acl_write_wait(fd, timeout) < 0) {
+		errno = acl_last_error();
+		return -1;
+	}
+#else
+	(void) timeout;
+#endif
 	return write(fd, buf, size);
 }
 
 int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
-	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
-	void *arg acl_unused)
+	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
+#ifdef ACL_WRITEABLE_CHECK
+	if (timeout > 0 && acl_write_wait(fd, timeout) < 0) {
+		errno = acl_last_error();
+		return -1;
+	}
+#else
+	(void) timeout;
+#endif
 	return writev(fd, vec, count);
 }
 

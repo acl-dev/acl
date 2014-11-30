@@ -82,7 +82,7 @@ endif
 CFLAGS += -I. -I$(BASE_PATH)/include -I$(BASE_PATH)/../lib_acl/include -I$(BASE_PATH)/../lib_protocol/include
 EXTLIBS =
 LDFLAGS = -L$(BASE_PATH)/lib -l_acl_cpp -L$(BASE_PATH)/../lib_protocol/lib -l_protocol -L$(BASE_PATH)/../lib_acl/lib -l_acl \
-	  -L$(BASE_PATH)/../lib/$(RPATH) $(EXTLIBS) $(SYSLIB)
+	  -L$(BASE_PATH)/../lib/$(RPATH) $(EXTLIBS) $(SYSLIB) -rdynamic
 
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)

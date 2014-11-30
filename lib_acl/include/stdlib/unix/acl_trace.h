@@ -1,16 +1,21 @@
-#ifndef	__ACL_TRACE_INCLUDE_H__
-#define	__ACL_TRACE_INCLUDE_H__
+#ifndef	ACL_TRACE_INCLUDE_H
+#define	ACL_TRACE_INCLUDE_H
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-#include "../acl_define.h"
-#ifdef ACL_UNIX
+/**
+ * 将当前函数的堆栈输出至指定文件中
+ * @param filepath {const char*} 目标文件名
+ */
+void acl_dump_strace(const char *filepath);
+#define acl_dump_trace acl_dump_strace
 
-void acl_dump_trace(const char *filepath);
-
-#endif /* ACL_UNIX */
+/**
+ * 将当前函数的堆栈输出至日志中
+ */
+void acl_log_strace(void);
 
 #ifdef	__cplusplus
 }

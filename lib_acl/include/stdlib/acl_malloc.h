@@ -69,6 +69,19 @@ ACL_API void acl_default_memstat(const char *filename, int line,
         void *ptr, size_t *len, size_t *real_len);
 
 /**
+ * 设置内存分配最大报警值，即当调用者分配的内存大小达到此报警值后，内部会自动
+ * 记录报警日志，同时将调用堆栈打印至日志中；内部缺少值是 100000000
+ * @param len {size_t} 最大报警值，该值必须 > 0
+ */
+ACL_API void acl_default_set_memlimit(size_t len);
+
+/**
+ * 获得当前所设置的内存分配最大报警值大小(内部缺省值是 100000000)
+ * @return {size_t}
+ */
+ACL_API size_t acl_default_get_memlimit(void);
+
+/**
  * ACL库中缺省的内存分配器接口, 分配内存但并不初始化所分配内存的内容
  * 类似于标准库中的 malloc
  * @param filename {const char*} 调用该函数的文件名，可以为空

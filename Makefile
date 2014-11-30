@@ -52,7 +52,8 @@ all:
 	@(cd lib_acl_cpp; make $(MAKE_ARGS))
 	@(cd lib_rpc; make $(MAKE_ARGS))
 	@(cd unit_test; make $(MAKE_ARGS))
-	@(cd samples; make)
+	@(cd lib_acl/samples; make)
+	@(cd lib_protocol/samples; make)
 #	@(cd lib_dict; make $(MAKE_ARGS))
 #	@(cd lib_tls; make $(MAKE_ARGS))
 clean:
@@ -61,7 +62,8 @@ clean:
 	@(cd lib_acl_cpp; make clean)
 	@(cd lib_rpc; make clean)
 	@(cd unit_test; make clean)
-	@(cd samples; make clean)
+	@(cd lib_acl/samples; make clean)
+	@(cd lib_protocol/samples; make clean)
 #	@(cd lib_dict; make clean)
 #	@(cd lib_tls; make clean)
 

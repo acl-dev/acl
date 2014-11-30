@@ -220,7 +220,8 @@ int main(int argc, char* argv[])
 	ctx.nwrite_limit = 10;
 	ctx.debug = false;
 	//snprintf(ctx.addr, sizeof(ctx.addr), "74.125.71.19:443");
-	snprintf(ctx.addr, sizeof(ctx.addr), "www.google.com.hk:443");
+	//snprintf(ctx.addr, sizeof(ctx.addr), "www.google.com.hk:443");
+	snprintf(ctx.addr, sizeof(ctx.addr), "mail.sina.com.cn:443");
 
 	while ((ch = getopt(argc, argv, "hc:n:kl:dt:")) > 0)
 	{

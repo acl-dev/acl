@@ -532,6 +532,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 							RelativePath=".\src\stdlib\sys\unix\acl_transfer_fd.c">
 						</File>
 						<File
+							RelativePath=".\src\stdlib\sys\unix\acl_trace.c">
+						</File>
+						<File
 							RelativePath=".\src\stdlib\sys\unix\acl_username.c">
 						</File>
 						<File
@@ -1557,6 +1560,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					</File>
 					<File
 						RelativePath=".\include\stdlib\unix\acl_transfer_fd.h">
+					</File>
+					<File
+						RelativePath=".\include\stdlib\unix\acl_trace.h">
 					</File>
 					<File
 						RelativePath=".\include\stdlib\unix\acl_unix.h">

@@ -46,27 +46,29 @@ master_service::~master_service()
 		delete conf_;
 }
 
-static bool ssl_handshake(acl::socket_stream& conn, acl::polarssl_conf& conf)
+static acl::polarssl_io* setup_ssl(acl::socket_stream& conn,
+	acl::polarssl_conf& conf)
 {
-	acl::stream_hook* hook = conn.get_hook();
+	acl::polarssl_io* hook = (acl::polarssl_io*) conn.get_hook();
 	if (hook != NULL)
-		return true;
+		return hook;
 
 	// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册至网络
 	// 连接流对象中，即用 ssl io 替换 stream 中默认的底层 IO 过程
 
 	logger("begin setup ssl hook...");
 
-	acl::polarssl_io* ssl = new acl::polarssl_io(conf, true);
+	// 采用非阻塞 SSL 握手方式
+	acl::polarssl_io* ssl = new acl::polarssl_io(conf, true, true);
 	if (conn.setup_hook(ssl) == ssl)
 	{
 		logger_error("setup_hook error!");
 		ssl->destroy();
-		return false;
+		return NULL;
 	}
 
 	logger("setup hook ok, tid: %lu", acl::thread::thread_self());
-	return true;
+	return ssl;
 }
 
 bool master_service::thread_on_read(acl::socket_stream* conn)
@@ -78,11 +80,20 @@ bool master_service::thread_on_read(acl::socket_stream* conn)
 	if (conf_ == NULL)
 		return servlet->doRun("127.0.0.1:11211", conn);
 
-	// 当 thread_on_accept 在主线程中时，则需要在子线程中进行 SSL 握手
-	if (acl_var_threads_thread_accept == 0
-		&& ssl_handshake(*conn, *conf_) == false)
-	{
+	acl::polarssl_io* ssl = setup_ssl(*conn, *conf_);
+	if (ssl == NULL)
 		return false;
+
+	if (ssl->handshake() == false)
+	{
+		logger_error("ssl handshake failed");
+		return false;
+	}
+
+	if (ssl->handshake_ok() == false)
+	{
+		logger("handshake trying ...");
+		return true;
 	}
 
 	return servlet->doRun("127.0.0.1:11211", conn);
@@ -97,13 +108,6 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 
 	http_servlet* servlet = new http_servlet();
 	conn->set_ctx(servlet);
-
-	// 当 thread_on_accept 在子线程中时，则可以在子线程中进行 SSL 握手
-	if (acl_var_threads_thread_accept
-		&& ssl_handshake(*conn, *conf_) == false)
-	{
-		return false;
-	}
 
 	return true;
 }
@@ -135,9 +139,6 @@ void master_service::thread_on_exit()
 
 void master_service::proc_on_init()
 {
-	logger("main tid: %lu, ioctl_thread_accept: %d",
-		acl::thread::thread_self(), acl_var_threads_thread_accept);
-
 	if (var_cfg_crt_file == NULL || *var_cfg_crt_file == 0
 		|| var_cfg_key_file == NULL || *var_cfg_key_file == 0)
 	{

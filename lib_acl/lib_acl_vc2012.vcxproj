@@ -459,6 +459,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include=".\src\json\acl_json_util.c" />
     <ClCompile Include="src\event\events_epoll_thr.c" />
     <ClCompile Include="src\master\template\acl_udp_server.c" />
+    <ClCompile Include="src\stdlib\sys\unix\acl_trace.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl.rc" />
@@ -519,6 +520,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\src\private\sem.h" />
     <ClInclude Include=".\src\private\thread.h" />
     <ClInclude Include=".\include\lib_acl.h" />
+    <ClInclude Include="include\stdlib\unix\acl_trace.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include=".\include\stdlib\acl_allocator.h" />
     <ClInclude Include=".\include\stdlib\acl_argv.h" />

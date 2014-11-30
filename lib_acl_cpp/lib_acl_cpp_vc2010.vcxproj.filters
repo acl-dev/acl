@@ -783,6 +783,9 @@
     <ClInclude Include="include\acl_cpp\db\query.hpp">
       <Filter>include\db</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\stream_hook.hpp">
+      <Filter>include\stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl_cpp_vc2010.rc" />

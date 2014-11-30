@@ -100,7 +100,7 @@ int main(void)
 	else if (second != third)
 		printf("error, second != third\r\n");
 	else
-		printf("All OK\r\n");
+		printf("All OK\r\n\r\n");
 
 #ifdef WIN32
 	printf("enter any key to exit\r\n");

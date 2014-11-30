@@ -1,6 +1,7 @@
 #include "acl_stdafx.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/stream/stream_hook.hpp"
 #include "acl_cpp/stream/stream.hpp"
 
 namespace acl {
@@ -204,7 +205,7 @@ stream_hook* stream::setup_hook(stream_hook* hook)
 		stream_->fwrite_fn = fsend_hook;
 		acl_vstream_add_object(stream_, HOOK_KEY, this);
 
-		if (hook->open(this) == false)
+		if (hook->open(stream_) == false)
 		{
 			// 如果打开失败，则恢复
 
@@ -225,7 +226,7 @@ stream_hook* stream::setup_hook(stream_hook* hook)
 
 		acl_tcp_set_nodelay(ACL_VSTREAM_SOCK(stream_));
 
-		if (hook->open(this) == false)
+		if (hook->open(stream_) == false)
 		{
 			// 如果打开失败，则恢复
 

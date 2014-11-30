@@ -789,6 +789,9 @@
     <ClInclude Include="include\acl_cpp\db\query.hpp">
       <Filter>include\db</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\stream_hook.hpp">
+      <Filter>include\stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="changes.txt" />

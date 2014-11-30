@@ -452,6 +452,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stream\socket_stream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\ssl_aio_stream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\stream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\stream_hook.hpp" />
     <ClInclude Include="resource_vc2012.h" />
     <ClInclude Include="src\acl_stdafx.hpp" />
     <ClInclude Include="src\mime\internal\header_opts.hpp" />

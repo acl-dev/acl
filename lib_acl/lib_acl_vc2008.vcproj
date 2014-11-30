@@ -715,6 +715,10 @@
 							>
 						</File>
 						<File
+							RelativePath=".\src\stdlib\sys\unix\acl_trace.c"
+							>
+						</File>
+						<File
 							RelativePath=".\src\stdlib\sys\unix\acl_transfer_fd.c"
 							>
 						</File>
@@ -1432,10 +1436,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\src\master\template\master_log.c"
-						>
-					</File>
-					<File
 						RelativePath=".\src\master\template\acl_multi_server.c"
 						>
 					</File>
@@ -1453,6 +1453,10 @@
 					</File>
 					<File
 						RelativePath=".\src\master\template\acl_udp_server.c"
+						>
+					</File>
+					<File
+						RelativePath=".\src\master\template\master_log.c"
 						>
 					</File>
 					<File
@@ -2038,6 +2042,10 @@
 					</File>
 					<File
 						RelativePath=".\include\stdlib\unix\acl_timed_wait.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\stdlib\unix\acl_trace.h"
 						>
 					</File>
 					<File

@@ -1,6 +1,20 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+469) 2014.11.30
+469.1) bugfix: acl_aio_read.c 中的 reactor IO 方式的函数 acl_aio_enable_read
+内部在某种情况下有可能不会触发读回调过程
+
+468) 2014.11.29
+468.1) bugfix: acl_sys_socket.c 中的读/写超时参数 timeout 不起作用，已修复
+468.2) workaround: acl_vstream.c 中的 __sys_read 将读超时判断交由 read_fn 处理
+
+467) 2014.11.28
+467.1) feature: acl_trace.c 中增加了 acl_log_strace() 函数用来将函数调用堆栈
+输出至日志文件中
+467.2) feature: acl_default_mallo.c 增加了 acl_default_set_memlimit,
+acl_default_get_memlimit 函数用来设置/获得分配内存最大报警值
+
 466) 2014.11.25
 466.1) feature: acl_mystring.c 中增加了 acl_find_blank_line 函数，用来从给定
 数据中查找空行的位置

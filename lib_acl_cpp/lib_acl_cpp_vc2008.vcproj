@@ -1511,6 +1511,10 @@
 					RelativePath=".\include\acl_cpp\stream\stream.hpp"
 					>
 				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\stream_hook.hpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

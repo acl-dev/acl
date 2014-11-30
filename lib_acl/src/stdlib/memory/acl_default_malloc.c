@@ -19,10 +19,12 @@
 
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_malloc.h"
+#include "stdlib/unix/acl_trace.h"
 
 #endif
 
 static char __FILENAME_UNKNOWN[] = "unknown file";
+static size_t  __malloc_limit = 100000000;
 
 /*
   * Structure of an annotated memory block. In order to detect spurious
@@ -92,7 +94,6 @@ typedef struct MBLOCK {
 
 #ifndef NO_SHARED_EMPTY_STRINGS
 static char empty_string[] = "";
-
 #endif
 
 /* acl_malloc - allocate memory or bust */
@@ -140,6 +141,17 @@ void acl_default_memstat(const char *filename, int line,
 		*real_len = SPACE_FOR(*len);
 }
  
+void acl_default_set_memlimit(size_t len)
+{
+	acl_assert(len > 0);
+	__malloc_limit = len;
+}
+
+size_t acl_default_get_memlimit(void)
+{
+	return __malloc_limit;
+}
+
 void *acl_default_malloc(const char *filename, int line, size_t len)
 {
 	const char *myname = "acl_default_malloc";
@@ -161,20 +173,25 @@ void *acl_default_malloc(const char *filename, int line, size_t len)
 	if (new_len <= 0)
 		acl_msg_fatal("%s(%d): new_len(%d) <= 0",
 			myname, __LINE__, (int) new_len);
-	else if (new_len >= 100000000)
+	else if (new_len >= __malloc_limit) {
+		acl_log_strace();
 		acl_msg_warn("%s(%d): new_len(%d) too large",
 			myname, __LINE__, (int) new_len);
+	}
 
 #ifdef	_USE_GLIB
 	if ((real_ptr = (MBLOCK *) g_malloc(new_len)) == 0) {
-		acl_msg_error("%s(%d)->%s: g_malloc error(%s)",
-			pname, line, myname, strerror(errno));
+		acl_log_strace();
+		acl_msg_error("%s(%d)->%s: new_len: %d, g_malloc error(%s)",
+			pname, line, myname, (int) new_len, strerror(errno));
 		return 0;
 	}
 #else
 	if ((real_ptr = (MBLOCK *) malloc(new_len)) == 0) {
-		acl_msg_error("%s(%d)->%s: malloc: insufficient memory: %s",
-			pname, line, myname, strerror(errno));
+		acl_log_strace();
+		acl_msg_error("%s(%d)->%s: malloc: insufficient memory: %s, "
+			"new_len: %d", pname, line, myname,
+			strerror(errno), (int) new_len);
 		return 0;
 	}
 #endif
@@ -227,9 +244,11 @@ void *acl_default_realloc(const char *filename, int line,
 	if (new_len <= 0)
 		acl_msg_fatal("%s(%d): new_len(%d) <= 0",
 			myname, __LINE__, (int) new_len);
-	else if (new_len >= 100000000)
+	else if (new_len >= __malloc_limit) {
+		acl_log_strace();
 		acl_msg_warn("%s(%d): new_len(%d) too large",
 			myname, __LINE__, (int) new_len);
+	}
 
 #ifdef	_USE_GLIB
 	if ((real_ptr = (MBLOCK *) g_realloc((char *) real_ptr, new_len)) == 0)
@@ -264,6 +283,7 @@ void acl_default_free(const char *filename, int line, void *ptr)
 		pname = __FILENAME_UNKNOWN;
 
 	if (ptr == NULL) {
+		acl_log_strace();
 		acl_msg_error("%s(%d)->%s: ptr null", pname, line, myname);
 		return;
 	}

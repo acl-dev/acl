@@ -905,6 +905,9 @@
     <ClCompile Include="src\event\events_epoll_thr.c">
       <Filter>Source Files\event</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\sys\unix\acl_trace.c">
+      <Filter>Source Files\stdlib\sys\unix</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl.rc">
@@ -1502,6 +1505,9 @@
     </ClInclude>
     <ClInclude Include=".\src\code\uni2utf8.h">
       <Filter>Source Files\code</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stdlib\unix\acl_trace.h">
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
