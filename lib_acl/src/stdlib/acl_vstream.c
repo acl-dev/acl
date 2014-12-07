@@ -52,7 +52,7 @@ static unsigned char __vstream_stdin_buf[ACL_VSTREAM_BUFSIZE];
 static unsigned char __vstream_stdout_buf[ACL_VSTREAM_BUFSIZE];
 static unsigned char __vstream_stderr_buf[ACL_VSTREAM_BUFSIZE];
 
-static int __sys_getc(ACL_VSTREAM *fp);
+static int read_char(ACL_VSTREAM *fp);
 
 ACL_VSTREAM acl_vstream_fstd[] = {              
 	{       
@@ -93,7 +93,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		NULL,                           /* path */
 		NULL,                           /* context */
 		NULL,                           /* close_handle_lnk */
-		__sys_getc,                     /* sys_getc */
+		read_char,                      /* sys_getc */
 		acl_socket_read,                /* read_fn */
 		NULL,                           /* write_fn */
 		NULL,                           /* writev_fn */
@@ -150,7 +150,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		NULL,                           /* path */
 		NULL,                           /* context */
 		NULL,                           /* close_handle_lnk */
-		__sys_getc,                     /* sys_getc */
+		read_char,                      /* sys_getc */
 		NULL,                           /* read_fn */
 		acl_socket_write,               /* write_fn */
 		acl_socket_writev,              /* writev_fn */
@@ -206,7 +206,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		NULL,                           /* path */
 		NULL,                           /* context */
 		NULL,                           /* close_handle_lnk */
-		__sys_getc,                     /* sys_getc */
+		read_char,                      /* sys_getc */
 		NULL,                           /* read_fn */
 		acl_socket_write,               /* write_fn */
 		acl_socket_writev,              /* writev_fn */
@@ -250,9 +250,10 @@ void acl_vstream_init()
 #endif
 }
 
-static int __sys_read(ACL_VSTREAM *in, void *buf, size_t size)
+static int sys_read(ACL_VSTREAM *in, void *buf, size_t size)
 {
-	int   read_cnt;
+	const char *myname = "sys_read";
+	int   read_cnt, nagain = 0;
 
 	if (in->type == ACL_VSTREAM_TYPE_FILE) {
 		if (ACL_VSTREAM_FILE(in) == ACL_FILE_INVALID) {
@@ -273,18 +274,23 @@ AGAIN:
 	/* 清除系统错误号 */
 	acl_set_error(0);
 
-	/* 清除可读标志位 */
-	in->sys_read_ready = 0;
-
 	if (in->type == ACL_VSTREAM_TYPE_FILE) {
 		read_cnt = in->fread_fn(ACL_VSTREAM_FILE(in), buf, size,
-			in->rw_timeout, in, in->context);
+			in->sys_read_ready ? 0 : in->rw_timeout,
+			in, in->context);
 		if (in->read_cnt > 0)
 			in->sys_offset += in->read_cnt;
 	} else {
+		/* 如果由事件引擎设置了套接字有数据可读，则将超时时间设 0，
+		 * 这样可以减少一次对读超时的调用
+		 */ 
 		read_cnt = in->read_fn(ACL_VSTREAM_SOCK(in), buf, size,
-			in->rw_timeout, in, in->context);
+			in->sys_read_ready ? 0 : in->rw_timeout,
+			in, in->context);
 	}
+
+	/* 清除可读标志位 */
+	in->sys_read_ready = 0;
 
 	if (read_cnt > 0) {
 		in->read_ptr = in->read_buf;
@@ -305,12 +311,24 @@ AGAIN:
 
 	in->errnum = acl_last_error();
 
-	if (in->errnum == ACL_EINTR)
-		goto AGAIN;
-	else if (in->errnum == ACL_ETIMEDOUT) {
+	if (in->errnum == ACL_EINTR) {
+		if (nagain++ < 5)
+			goto AGAIN;
+
+		acl_msg_error("%s(%d), %s: nagain: %d too much, fd: %d",
+			__FILE__, __LINE__, myname, nagain,
+			in->type == ACL_VSTREAM_TYPE_FILE ?
+			(int) ACL_VSTREAM_FILE(in) : ACL_VSTREAM_SOCK(in));
+	} else if (in->errnum == ACL_ETIMEDOUT) {
 		in->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
 		SAFE_COPY(in->errbuf, "read timeout");
-	} else if (in->errnum != ACL_EWOULDBLOCK && in->errnum != ACL_EAGAIN) {
+	}
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+	else if (in->errnum != ACL_EWOULDBLOCK)
+#else
+	else if (in->errnum != ACL_EWOULDBLOCK && in->errnum != ACL_EAGAIN)
+#endif
+	{
 		in->flag |= ACL_VSTREAM_FLAG_ERR;
 		acl_strerror(in->errnum, in->errbuf, sizeof(in->errbuf));
 	}
@@ -318,9 +336,9 @@ AGAIN:
 	return -1;
 }
 
-static int __vstream_read(ACL_VSTREAM *fp)
+static int read_once(ACL_VSTREAM *fp)
 {
-	fp->read_cnt = __sys_read(fp, fp->read_buf, (size_t) fp->read_buf_len);
+	fp->read_cnt = sys_read(fp, fp->read_buf, (size_t) fp->read_buf_len);
 
 	if (fp->read_cnt < 0) {
 		fp->read_cnt = 0;
@@ -329,9 +347,9 @@ static int __vstream_read(ACL_VSTREAM *fp)
 		return fp->read_cnt;
 }
 
-static int __sys_getc(ACL_VSTREAM *fp)
+static int read_char(ACL_VSTREAM *fp)
 {
-	fp->read_cnt = __vstream_read(fp);
+	fp->read_cnt = read_once(fp);
 	if (fp->read_cnt <= 0)
 		return ACL_VSTREAM_EOF;
 	else
@@ -342,7 +360,7 @@ int acl_vstream_getc(ACL_VSTREAM *fp)
 {
 	if (fp == NULL)
 		return ACL_VSTREAM_EOF;
-	if (fp->read_cnt <= 0 && __vstream_read(fp) <= 0)
+	if (fp->read_cnt <= 0 && read_once(fp) <= 0)
 		return ACL_VSTREAM_EOF;
 
 	fp->read_cnt--;
@@ -412,7 +430,7 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *fp, char *buf, int size)
 	fp->rw_timeout = 0;
 	fp->errnum = 0;
 
-	read_cnt = __vstream_read(fp);
+	read_cnt = read_once(fp);
 
 	fp->rw_timeout = rw_timeout;
 
@@ -710,22 +728,22 @@ int acl_vstream_gets(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
 int acl_vstream_readtags(ACL_VSTREAM *fp, void *vptr, size_t maxlen,
 	const char *tag, size_t taglen)
 {
-	int   n, ch, flag_match = 0;
+	int   n, ch, matched = 0;
 	unsigned char *ptr;
-	const unsigned char *ptr_haystack;
-	const unsigned char *ptr_needle, *ptr_needle_end;
+	const unsigned char *haystack;
+	const unsigned char *needle, *needle_end;
 
 	if (fp == NULL || vptr == NULL || maxlen <= 0
 	    || tag == NULL || taglen <= 0)
 		return ACL_VSTREAM_EOF;
 
-	ptr_needle_end = (const unsigned char *) tag;
+	needle_end = (const unsigned char *) tag;
 
 	while(1) {
 		taglen--;
 		if (taglen == 0)
 			break;
-		ptr_needle_end++;
+		needle_end++;
 	}
 	ptr = (unsigned char *) vptr;
 
@@ -748,29 +766,29 @@ int acl_vstream_readtags(ACL_VSTREAM *fp, void *vptr, size_t maxlen,
 		}
 
 		*ptr = ch;
-		if (ch == *ptr_needle_end) {
-			ptr_haystack = ptr - 1;
-			ptr_needle = ptr_needle_end - 1;
-			flag_match = 0;
+		if (ch == *needle_end) {
+			haystack = ptr - 1;
+			needle = needle_end - 1;
+			matched = 0;
 			while(1) {
 				/* 已经成功比较完毕(匹配) */
-				if (ptr_needle < (const unsigned char *) tag) {
-					flag_match = 1;
+				if (needle < (const unsigned char *) tag) {
+					matched = 1;
 					break;
 				}
 
 				/* 原字符串用完而匹配串还没有比较完(不匹配) */
-				if (ptr_haystack < (unsigned char *) vptr)
+				if (haystack < (unsigned char *) vptr)
 					break;
 				/* 不相等(不匹配) */
-				if (*ptr_haystack != *ptr_needle)
+				if (*haystack != *needle)
 					break;
-				ptr_haystack--;
-				ptr_needle--;
+				haystack--;
+				needle--;
 			}
 		}
 		ptr++;
-		if (flag_match) {
+		if (matched) {
 			fp->flag |= ACL_VSTREAM_FLAG_TAGYES;
 			fp->flag &= ~ACL_VSTREAM_FLAG_TAGNO;
 			break;
@@ -855,7 +873,7 @@ int acl_vstream_readn(ACL_VSTREAM *fp, void *buf, size_t size)
 
 	if (size_saved  < (size_t) fp->read_buf_len / 4) {
 		while (size > 0) {
-			if (__vstream_read(fp) <= 0)
+			if (read_once(fp) <= 0)
 				return ACL_VSTREAM_EOF;
 			n = acl_vstream_bfcp_some(fp, ptr, size);
 			ptr += n;
@@ -863,7 +881,7 @@ int acl_vstream_readn(ACL_VSTREAM *fp, void *buf, size_t size)
 		}
 	} else {
 		while (size > 0) {
-			n = __sys_read(fp, ptr, size);
+			n = sys_read(fp, ptr, size);
 			if (n <= 0)
 				return ACL_VSTREAM_EOF;
 			size -= n;
@@ -892,7 +910,7 @@ int acl_vstream_read(ACL_VSTREAM *fp, void *buf, size_t size)
 
 	/* fp->read_cnt == 0 */
 	else {
-		int   read_cnt = __sys_read(fp, buf, size);
+		int   read_cnt = sys_read(fp, buf, size);
 		return read_cnt <= 0 ? ACL_VSTREAM_EOF : read_cnt;
 	}
 }
@@ -969,7 +987,7 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	 */
 
 	if (fp->sys_read_ready) {
-		if (__vstream_read(fp) <= 0) {
+		if (read_once(fp) <= 0) {
 			n = LEN(buf) - n;
 			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
@@ -1036,7 +1054,7 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	 */
 
 	if (fp->sys_read_ready) {
-		if (__vstream_read(fp) <= 0) {
+		if (read_once(fp) <= 0) {
 			n = LEN(buf) - n;
 
 			return n > 0 ? n : ACL_VSTREAM_EOF;
@@ -1100,7 +1118,7 @@ int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
 	 */
 
 	if (fp->sys_read_ready) {
-		if (__vstream_read(fp) <= 0) {
+		if (read_once(fp) <= 0) {
 			int   n = cnt_saved - cnt;
 			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
@@ -1148,7 +1166,7 @@ int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 	 */
 
 	if (fp->sys_read_ready) {
-		if (__vstream_read(fp) <= 0) {
+		if (read_once(fp) <= 0) {
 			n = LEN(buf) - n;
 			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
@@ -1174,7 +1192,7 @@ int acl_vstream_can_read(ACL_VSTREAM *fp)
 	else if (fp->sys_read_ready == 0)
 		return 0;
 	else if ((fp->flag & ACL_VSTREAM_FLAG_PREREAD) != 0) {
-		if (__vstream_read(fp) <= 0)
+		if (read_once(fp) <= 0)
 			return ACL_VSTREAM_EOF;
 		else
 			return 1;
@@ -1183,9 +1201,9 @@ int acl_vstream_can_read(ACL_VSTREAM *fp)
 		return 1;
 }
 
-static int __vstream_write(ACL_VSTREAM *fp, const void *vptr, int dlen)
+static int write_once(ACL_VSTREAM *fp, const void *vptr, int dlen)
 {
-	const char *myname = "__vstream_write";
+	const char *myname = "write_once";
 	int   n, neintr = 0;
 
 	if (fp == NULL || vptr == NULL || dlen <= 0) {
@@ -1218,6 +1236,9 @@ static int __vstream_write(ACL_VSTREAM *fp, const void *vptr, int dlen)
 	}
 
 TAG_AGAIN:
+
+	/* 清除系统错误号 */
+	acl_set_error(0);
 
 	if (fp->type == ACL_VSTREAM_TYPE_FILE) {
 		if ((fp->oflags & O_APPEND)) {
@@ -1264,7 +1285,7 @@ TAG_AGAIN:
 			fp->rw_timeout, fp, fp->context);
 	}
 
-	if (n >= 0) {
+	if (n > 0) {
 		fp->total_write_cnt += n;
 		return n;
 	}
@@ -1295,9 +1316,9 @@ TAG_AGAIN:
 	return ACL_VSTREAM_EOF;
 }
 
-static int __vstream_writev(ACL_VSTREAM *fp, const struct iovec *vec, int count)
+static int writev_once(ACL_VSTREAM *fp, const struct iovec *vec, int count)
 {
-	const char *myname = "__vstream_writev";
+	const char *myname = "writev_once";
 	int   n, neintr = 0;
 
 	if (fp == NULL || vec == NULL || count <= 0) {
@@ -1382,7 +1403,7 @@ TAG_AGAIN:
 			fp->rw_timeout, fp, fp->context);
 	}
 
-	if (n >= 0) {
+	if (n > 0) {
 		fp->total_write_cnt += n;
 		return n;
 	}
@@ -1396,7 +1417,11 @@ TAG_AGAIN:
 		goto TAG_AGAIN;
 	}
 
+#if ACL_EAGAIN == ACL_EWOULDBLOCK
+	if (fp->errnum == ACL_EAGAIN)
+#else
 	if (fp->errnum == ACL_EAGAIN || fp->errnum == ACL_EWOULDBLOCK)
+#endif
 		acl_set_error(ACL_EAGAIN);
 	else
 		fp->flag |= ACL_VSTREAM_FLAG_ERR;
@@ -1410,7 +1435,7 @@ int acl_vstream_write(ACL_VSTREAM *fp, const void *vptr, int dlen)
 		if (acl_vstream_fflush(fp) == ACL_VSTREAM_EOF)
 			return ACL_VSTREAM_EOF;
 	}
-	return __vstream_write(fp, vptr, dlen);
+	return write_once(fp, vptr, dlen);
 }
 
 int acl_vstream_writev(ACL_VSTREAM *fp, const struct iovec *vec, int count)
@@ -1419,7 +1444,7 @@ int acl_vstream_writev(ACL_VSTREAM *fp, const struct iovec *vec, int count)
 		if (acl_vstream_fflush(fp) == ACL_VSTREAM_EOF)
 			return ACL_VSTREAM_EOF;
 	}
-	return __vstream_writev(fp, vec, count);
+	return writev_once(fp, vec, count);
 }
 
 int acl_vstream_writevn(ACL_VSTREAM *fp, const struct iovec *vec, int count)
@@ -1445,7 +1470,7 @@ int acl_vstream_writevn(ACL_VSTREAM *fp, const struct iovec *vec, int count)
 	dlen = 0;
 
 	while (1) {
-		n = __vstream_writev(fp, vect, count);
+		n = writev_once(fp, vect, count);
 		if (n == ACL_VSTREAM_EOF) {
 			acl_myfree(vect);
 			return ACL_VSTREAM_EOF;
@@ -1588,25 +1613,42 @@ int acl_vstream_puts(const char *s)
 	return acl_vstream_fputs(s, ACL_VSTREAM_OUT);
 }
 
-static int __loop_writen(ACL_VSTREAM *fp, const void *vptr, size_t dlen)
+static int loop_writen(ACL_VSTREAM *fp, const void *vptr, size_t size)
 {
-	const unsigned char *ptr;
-	int   n;
+	const char *myname = "loop_writen";
+	const unsigned char *ptr = (const unsigned char *) vptr;
+	int   once_dlen = 64 * 1024 * 1024;  /* xxx: 以 64KB 为单位写 */
+	int   nleft = (int) size, n, len;
+	time_t begin, end;
+	ACL_SOCKET fd = ACL_VSTREAM_SOCK(fp);
 
-	ptr   = (const unsigned char *) vptr;
-	while (dlen > 0) {
-		n = __vstream_write(fp, ptr, dlen);
-		if (n <= 0) {
-			if (acl_last_error() == ACL_EINTR
-				|| acl_last_error() == ACL_EAGAIN)
-			{
-				continue;
-			}
+	while (nleft > 0) {
+		len = nleft > once_dlen ? once_dlen : nleft;
+		n = write_once(fp, ptr, len);
+		if (n < 0)
 			return ACL_VSTREAM_EOF;
-		}
 
-		dlen  -= n;
+		nleft -= n;
 		ptr   += n;
+
+		if (n == len || fp->writev_fn == NULL || fp->rw_timeout <= 0)
+			continue;
+
+		/* 对于套接口写操作，如果一次性写没有写完，可能是系统写缓冲区满，
+		 * 需要检测超时写
+		 */
+		begin = time(NULL);
+
+		if (acl_write_wait(fd, fp->rw_timeout) == 0)
+			continue;
+
+		end = time(NULL);
+		acl_msg_error("%s(%d), %s: acl_write_wait error,"
+			"size: %d, nleft: %d, peer: %s, fd: %d,"
+			" timeout: %d, cost: %ld", __FILE__, __LINE__,
+			myname, (int) size, nleft, ACL_VSTREAM_PEER(fp), fd,
+			fp->rw_timeout, end - begin);
+		return ACL_VSTREAM_EOF;
 	}
 
 	return ptr - (const unsigned char *) vptr;
@@ -1621,7 +1663,7 @@ int acl_vstream_writen(ACL_VSTREAM *fp, const void *vptr, size_t dlen)
 		if (acl_vstream_fflush(fp) == ACL_VSTREAM_EOF)
 			return ACL_VSTREAM_EOF;
 	}
-	return __loop_writen(fp, vptr, dlen);
+	return loop_writen(fp, vptr, dlen);
 }
 
 int acl_vstream_buffed_writen(ACL_VSTREAM *fp, const void *vptr, size_t dlen)
@@ -1637,7 +1679,7 @@ int acl_vstream_buffed_writen(ACL_VSTREAM *fp, const void *vptr, size_t dlen)
 	if (dlen >= (size_t) fp->wbuf_size) {
 		if (acl_vstream_fflush(fp) == ACL_VSTREAM_EOF)
 			return ACL_VSTREAM_EOF;
-		else if (__loop_writen(fp, vptr, dlen) == ACL_VSTREAM_EOF)
+		else if (loop_writen(fp, vptr, dlen) == ACL_VSTREAM_EOF)
 			return ACL_VSTREAM_EOF;
 		else
 			return dlen;
@@ -1804,36 +1846,22 @@ void acl_vstream_buffed_space(ACL_VSTREAM *fp)
 int acl_vstream_fflush(ACL_VSTREAM *fp)
 {
 	const char *myname = "acl_vstream_fflush";
-	unsigned char *ptr;
 	int   n;
 
 	if (fp == NULL) {
 		acl_msg_error("%s(%d): fp null", myname, __LINE__);
 		return ACL_VSTREAM_EOF;
-	} else if (fp->wbuf == NULL || fp->wbuf_dlen == 0)
+	} else if (fp->wbuf == NULL || fp->wbuf_dlen <= 0)
 		return 0;
 
-	ptr = fp->wbuf;
-	while (fp->wbuf_dlen > 0) {
-		n = __vstream_write(fp, ptr, (int) fp->wbuf_dlen);
-		if (n <= 0) {
-			if (acl_last_error() == ACL_EINTR
-				|| acl_last_error() == ACL_EAGAIN)
-			{
-				continue;
-			}
-			return ACL_VSTREAM_EOF;
-		}
-
+	n = loop_writen(fp, fp->wbuf, fp->wbuf_dlen);
+	if (n > 0) {
 		fp->wbuf_dlen -= n;
-		ptr += n;
+		if (fp->wbuf_dlen < 0)
+			acl_msg_fatal("%s(%d): wbuf_dlen(%d) < 0",
+				myname, __LINE__, fp->wbuf_dlen);
 	}
-
-	if (fp->wbuf_dlen < 0)
-		acl_msg_fatal("%s(%d): wbuf_dlen(%d) < 0",
-			myname, __LINE__, (int) fp->wbuf_dlen);
-
-	return ptr - fp->wbuf;
+	return n;
 }
 
 int acl_vstream_peekfd(ACL_VSTREAM *fp)
@@ -1935,7 +1963,7 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	if (rw_timeo > 0)
 		fp->rw_timeout = rw_timeo;
 
-	fp->sys_getc = __sys_getc;
+	fp->sys_getc = read_char;
 	if (fdtype == ACL_VSTREAM_TYPE_FILE) {
 		fp->fread_fn  = acl_file_read;
 		fp->fwrite_fn = acl_file_write;

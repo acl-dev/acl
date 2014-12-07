@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "socket_stream", "lib_acl_cp
 		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mime", "lib_acl_cpp\samples\mime\mime.vcxproj", "{52AA7352-CE48-4F60-B92D-1EB16A79FE54}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mime", "lib_acl_cpp\samples\mime\mime\mime.vcxproj", "{52AA7352-CE48-4F60-B92D-1EB16A79FE54}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 	EndProjectSection
@@ -26,14 +26,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fstream", "lib_acl_cpp\samp
 		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mime_base64", "lib_acl_cpp\samples\mime_base64\mime_base64.vcxproj", "{19CB30E5-2672-4A8B-96FB-9C42970CCF69}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mime_base64", "lib_acl_cpp\samples\mime\mime_base64\mime_base64.vcxproj", "{19CB30E5-2672-4A8B-96FB-9C42970CCF69}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
 		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mime_qp", "lib_acl_cpp\samples\mime_qp\mime_qp.vcxproj", "{5DC79C83-9DE8-46B3-A172-8A4E3371878B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mime_qp", "lib_acl_cpp\samples\mime\mime_qp\mime_qp.vcxproj", "{5DC79C83-9DE8-46B3-A172-8A4E3371878B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}

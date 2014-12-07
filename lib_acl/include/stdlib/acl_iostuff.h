@@ -53,7 +53,7 @@ ACL_API void acl_doze(unsigned delay);
 /**
 * Ä³¸öÃèÊö·ûÊÇ·ñ¿É¶Á
 * @param fd {ACL_SOCKET} ÃèÊö·û
-* @return {int} 0: ²»¿É¶Á; != 0: ¿É¶Á
+* @return {int} 0: ²»¿É¶Á; -1: ³ö´í£¬ 1£º¿É¶Á
 */
 ACL_API int acl_readable(ACL_SOCKET fd);
 

@@ -5,7 +5,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "socket_stream", "lib_acl_cp
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mime", "lib_acl_cpp\samples\mime\mime.vcproj", "{52AA7352-CE48-4F60-B92D-1EB16A79FE54}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mime", "lib_acl_cpp\samples\mime\mime\mime.vcproj", "{52AA7352-CE48-4F60-B92D-1EB16A79FE54}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
@@ -22,12 +22,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fstream", "lib_acl_cpp\samp
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mime_base64", "lib_acl_cpp\samples\mime_base64\mime_base64.vcproj", "{19CB30E5-2672-4A8B-96FB-9C42970CCF69}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mime_base64", "lib_acl_cpp\samples\mime\mime_base64\mime_base64.vcproj", "{19CB30E5-2672-4A8B-96FB-9C42970CCF69}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mime_qp", "lib_acl_cpp\samples\mime_qp\mime_qp.vcproj", "{5DC79C83-9DE8-46B3-A172-8A4E3371878B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mime_qp", "lib_acl_cpp\samples\mime\mime_qp\mime_qp.vcproj", "{5DC79C83-9DE8-46B3-A172-8A4E3371878B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 	EndProjectSection
@@ -94,14 +94,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HttpClient", "lib_acl_cpp\s
 		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ssl_client", "lib_acl_cpp\samples\ssl_client\ssl_client.vcproj", "{B14C93A6-DABE-48F9-A78C-C94049B69984}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ssl_client", "lib_acl_cpp\samples\ssl\ssl_client\ssl_client.vcproj", "{B14C93A6-DABE-48F9-A78C-C94049B69984}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
 		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ssl_aio_client", "lib_acl_cpp\samples\ssl_aio_client\ssl_aio_client.vcproj", "{8CF882F1-3D3C-4233-BCA6-7F90E49B80BE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ssl_aio_client", "lib_acl_cpp\samples\aio\ssl_aio_client\ssl_aio_client.vcproj", "{8CF882F1-3D3C-4233-BCA6-7F90E49B80BE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
@@ -139,24 +139,24 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mysql", "lib_acl_cpp\sample
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_threads", "lib_acl_cpp\samples\master_threads\master_threads.vcproj", "{FA0EEABF-CC21-4A99-89AA-D0379175E55A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_threads", "lib_acl_cpp\samples\master\master_threads\master_threads.vcproj", "{FA0EEABF-CC21-4A99-89AA-D0379175E55A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_aio", "lib_acl_cpp\samples\master_aio\master_aio.vcproj", "{4B7C83E5-C34F-4C42-9A37-E5F33FBA2EA3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_aio", "lib_acl_cpp\samples\master\master_aio\master_aio.vcproj", "{4B7C83E5-C34F-4C42-9A37-E5F33FBA2EA3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_trigger", "lib_acl_cpp\samples\master_trigger\master_trigger.vcproj", "{80F0213B-A053-4420-BAF9-4657AD8473DA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_trigger", "lib_acl_cpp\samples\master\master_trigger\master_trigger.vcproj", "{80F0213B-A053-4420-BAF9-4657AD8473DA}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_proc", "lib_acl_cpp\samples\master_proc\master_proc.vcproj", "{B7EE43F4-7541-48A7-A066-DA60A55E67ED}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_proc", "lib_acl_cpp\samples\master\master_proc\master_proc.vcproj", "{B7EE43F4-7541-48A7-A066-DA60A55E67ED}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
@@ -276,7 +276,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "memcache_pool", "lib_acl_cp
 		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_udp", "lib_acl_cpp\samples\master_udp\master_udp.vcproj", "{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_udp", "lib_acl_cpp\samples\master\master_udp\master_udp.vcproj", "{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}

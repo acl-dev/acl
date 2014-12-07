@@ -192,6 +192,13 @@ ACL_API int acl_pthread_pool_dispatch(void *dispatch_arg,
 		void (*run_fn)(void *), void *run_arg);
 
 /**
+ * 获得当前线程池的最大线程数限制
+ * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
+ * @return {int} 最大线程数限制值
+ */
+ACL_API int acl_pthread_pool_limit(acl_pthread_pool_t *thr_pool);
+
+/**
  * 获得当前线程池中的线程数
  * @param thr_pool {acl_pthread_pool_t*} 线程池对象，不能为空
  * @return {int} 返回线程池中的总线程数，返回值 < 0 表示出错

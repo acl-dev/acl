@@ -72,11 +72,17 @@ endif
 ###########################################################
 
 BASE_PATH =
-
 ifneq ($(base_path),)
 	BASE_PATH = $(base_path)
 else
 	BASE_PATH = ../..
+endif
+
+UTIL_PATH =
+ifneq ($(util_path),)
+	UTIL_PATH = $(util_path)
+else
+	UTIL_PATH = ..
 endif
 
 CFLAGS += -I. -I$(BASE_PATH)/include -I$(BASE_PATH)/../lib_acl/include -I$(BASE_PATH)/../lib_protocol/include
@@ -90,12 +96,14 @@ LINK = $(CC) $(OBJ) $(LDFLAGS)
 OBJ_PATH = .
 
 #Project's objs
+#UTIL = $(wildcard $(UTIL_PATH)/*.cpp)
 SRC = $(wildcard *.cpp) $(UTIL)
+#SRC = $(wildcard *.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 
 $(OBJ_PATH)/%.o: %.cpp
 	$(COMPILE) $< -o $@
-$(OBJ_PATH)/%.o: ../%.cpp
+$(OBJ_PATH)/%.o: $(UTIL_PATH)/%.cpp
 	$(COMPILE) $< -o $@
 
 .PHONY = all clean

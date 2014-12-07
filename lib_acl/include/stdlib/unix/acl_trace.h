@@ -9,13 +9,12 @@ extern "C" {
  * 将当前函数的堆栈输出至指定文件中
  * @param filepath {const char*} 目标文件名
  */
-void acl_dump_strace(const char *filepath);
-#define acl_dump_trace acl_dump_strace
+void acl_trace_save(const char *filepath);
 
 /**
  * 将当前函数的堆栈输出至日志中
  */
-void acl_log_strace(void);
+void acl_trace_info(void);
 
 #ifdef	__cplusplus
 }

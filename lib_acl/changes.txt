@@ -1,6 +1,25 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+473) 2014.12.6
+473.1) feature: acl_msg.c 中的 acl_msg_error/warn/fatal/panic 支持记录函数调用堆栈
+
+472) 2014.12.5
+472.1) feature: acl_vstream.c 中循环写函数(loop_writen)支持超时写功能，即当设置了
+写超时后，会检查每次写后的数据长度是否小于要求的写长度，如果小于则进入写超时等待；同时该循环
+写函数支持以 64KB 为单位写数据
+472.2) feature: acl_threads_server.c 完善了连接使用数自动退出机制
+472.3) feature: acl_threads_server.c 当采用 TCP 连接分发方式时，增加了汇报给分发器
+的信息字段，以便于分发器根据这些字段决定分发的策略
+
+471) 2014.12.4
+471.1) performance: acl_vstream.c 优化了读 (__sys_read) 的性能
+471.2) bugfix: acl_vstream.c 在写时有可能会造成死循环
+
+470) 2014.12.2
+470.1) bugfix: acl_vstream.c 中函数 __sys_read 的标志位 sys_read_ready 置 0
+应该在 read_fn/fread_fn 函数返回后
+
 469) 2014.11.30
 469.1) bugfix: acl_aio_read.c 中的 reactor IO 方式的函数 acl_aio_enable_read
 内部在某种情况下有可能不会触发读回调过程

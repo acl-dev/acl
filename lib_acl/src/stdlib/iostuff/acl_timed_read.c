@@ -26,25 +26,23 @@
 /* acl_timed_read - read with deadline */
 
 int acl_timed_read(ACL_SOCKET fd, void *buf, unsigned len,
-	int timeout, void *unused_context acl_unused)
+	int timeout, void *context acl_unused)
 {
 	int     ret;
 
 	/*
-	 * Wait for a limited amount of time for something to happen. If nothing
-	 * happens, report an ETIMEDOUT error.
+	 * Wait for a limited amount of time for something to happen.
+	 * If nothing happens, report an ETIMEDOUT error.
 	 * 
-	 * XXX Solaris 8 read() fails with EAGAIN after read-select() returns
-	 * success.
+	 * XXX Solaris 8 read() fails with EAGAIN after read-select()
+	 * returns success.
 	 */
 	for (;;) {
-		if (timeout > 0 &&
-			acl_read_wait(fd, timeout) < 0)
-		{
+		if (timeout > 0 && acl_read_wait(fd, timeout) < 0)
 			return -1;
-		}
 		ret = acl_socket_read(fd, buf, len, 0, NULL, NULL);
-		if (ret < 0 && timeout > 0 && acl_last_error() == ACL_EAGAIN) {
+		if (ret < 0 && timeout > 0 && acl_last_error() == ACL_EAGAIN)
+		{
 			acl_msg_warn("read() returns EAGAIN on"
 				" a readable file descriptor!");
 			acl_msg_warn("pausing to avoid going into"

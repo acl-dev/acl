@@ -60,6 +60,9 @@ static bool copy_file(acl::ifstream& in, const acl::string& to_path,
 		return false;
 	}
 
+	logger("copying from file: %s, to file: %s", in.file_path(),
+		to_filepath.c_str());
+
 	char  buf[4096];
 	int   ret;
 	acl_int64 nread = 0;
@@ -192,9 +195,10 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 		if (memcmp(from_buf, to_buf, to_len) != 0)
 		{
 			to_fp.close();
-			printf("string not equal\r\n");
+			logger("string not equal, from: %s, to: %s",
+				from_fp.file_path(), to_filepath.c_str());
 			return copy_file(from_fp, to_pathbuf,
-					from_filepath, ncopied);
+					to_filepath, ncopied);
 		}
 	}
 }

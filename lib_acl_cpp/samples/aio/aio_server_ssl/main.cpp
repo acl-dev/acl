@@ -25,7 +25,7 @@ public:
 	timer_reader(int delay)
 	{
 		delay_ = delay;
-		std::cout << "timer_reader init, delay: " << delay << std::endl;
+		printf("timer_reader init, delay: %d\r\n", delay);
 	}
 
 	~timer_reader()
@@ -35,15 +35,14 @@ public:
 	// aio_timer_reader 的子类必须重载 destroy 方法
 	void destroy()
 	{
-		std::cout << "timer_reader delete, delay: "  << delay_ << std::endl;
+		printf("timer_reader delete, delay: %d\r\n", delay_);
 		delete this;
 	}
 
 	// 重载基类回调方法
 	virtual void timer_callback(unsigned int id)
 	{
-		std::cout << "timer_reader(" << id
-			<< "): timer_callback, delay: " << delay_ << std::endl;
+		printf("timer_reader(%d): delay: %d\r\n", id, delay_);
 
 		// 调用基类的处理过程
 		aio_timer_reader::timer_callback(id);
@@ -62,7 +61,7 @@ public:
 	timer_writer(int delay)
 	{
 		delay_ = delay;
-		std::cout << "timer_writer init, delay: " << delay << std::endl;
+		printf("timer_writer init, delay: %d\r\n", delay);
 	}
 
 	~timer_writer()
@@ -72,15 +71,15 @@ public:
 	// aio_timer_reader 的子类必须重载 destroy 方法
 	void destroy()
 	{
-		std::cout << "timer_writer delete, delay: " << delay_ << std::endl;
+		printf("timer_writer delete, delay: %d\r\n", delay_);
 		delete this;
 	}
 
 	// 重载基类回调方法
 	virtual void timer_callback(unsigned int id)
 	{
-		std::cout << "timer_writer(" << id << "): timer_callback, delay: "
-			<< delay_ << std::endl;
+		printf("timer_writer(%d): timer_callback, delay: %d\r\n",
+			id, delay_);
 
 		// 调用基类的处理过程
 		aio_timer_writer::timer_callback(id);
@@ -104,7 +103,7 @@ public:
 
 	~io_callback()
 	{
-		std::cout << "delete io_callback now ..." << std::endl;
+		printf("delete io_callback now ...\r\n");
 	}
 
 	/**
@@ -128,13 +127,9 @@ public:
 		// 尝试进行 SSL 握手
 		if (hook->handshake() == false)
 		{
-			std::cout << "ssl handshake failed" << std::endl;
+			printf("ssl handshake failed\r\n");
 			return false;
 		}
-
-		std::cout << ">>>handshake: "
-			<<  (hook->handshake_ok() ? "ok": "wait")
-			<< "<<<" << std::endl;
 
 		// 如果 SSL 握手已经成功，则开始按行读数据
 		if (hook->handshake_ok())
@@ -161,9 +156,9 @@ public:
 	bool read_callback(char* data, int len)
 	{
 		i_++;
-		if (i_ < 10)
-			std::cout << ">>gets(i:" << i_ << "): "
-				<< data << std::endl;
+		//if (i_ < 10)
+		//	std::cout << ">>gets(i:" << i_ << "): "
+		//		<< data << std::endl;
 
 		// 如果远程客户端希望退出，则关闭之
 		if (strncasecmp(data, "quit", 4) == 0)

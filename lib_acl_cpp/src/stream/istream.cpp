@@ -224,7 +224,17 @@ bool istream::gets_peek(string& buf, bool nonl /* = true */,
 	else
 		ret = acl_vstream_gets_peek(stream_, vbf, &ready);
 	if (ret == ACL_VSTREAM_EOF)
-		eof_ = true;
+	{
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+		if (stream_->errnum != ACL_EWOULDBLOCK)
+#else
+		if (stream_->errnum != ACL_EWOULDBLOCK
+			&& stream_->errnum != ACL_EAGAIN)
+#endif
+		{
+			eof_ = true;
+		}
+	}
 	return ready ? true : false;
 }
 
@@ -242,7 +252,15 @@ bool istream::read_peek(string& buf, bool clear /* = false */)
 
 	if (acl_vstream_read_peek(stream_, buf.vstring()) == ACL_VSTREAM_EOF)
 	{
-		eof_ = true;
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+		if (stream_->errnum != ACL_EWOULDBLOCK)
+#else
+		if (stream_->errnum != ACL_EWOULDBLOCK
+			&& stream_->errnum != ACL_EAGAIN)
+#endif
+		{
+			eof_ = true;
+		}
 		return false;
 	}
 	else
@@ -264,7 +282,15 @@ bool istream::readn_peek(string& buf, size_t cnt, bool clear /* = false */)
 	if (acl_vstream_readn_peek(stream_, buf.vstring(),
 		(int) cnt, &ready) == ACL_VSTREAM_EOF)
 	{
-		eof_ = true;
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+		if (stream_->errnum != ACL_EWOULDBLOCK)
+#else
+		if (stream_->errnum != ACL_EWOULDBLOCK
+			&& stream_->errnum != ACL_EAGAIN)
+#endif
+		{
+			eof_ = true;
+		}
 	}
 	return ready ? true : false;
 }

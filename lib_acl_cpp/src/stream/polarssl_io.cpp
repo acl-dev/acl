@@ -76,6 +76,15 @@ static void my_debug( void *ctx, int level acl_unused, const char *str )
 }
 #endif
 
+polarssl_io& polarssl_io::set_non_blocking(bool yes)
+{
+	// 此处仅设置非阻塞 IO 标志位，至于套接字是否被设置了非阻塞模式
+	// 由应用自己来决定
+
+	non_block_ = yes;
+	return *this;
+}
+
 bool polarssl_io::open(ACL_VSTREAM* s)
 {
 	if (s == NULL)
@@ -331,11 +340,47 @@ int polarssl_io::sock_read(void *ctx, unsigned char *buf, size_t len)
 {
 #ifdef HAS_POLARSSL
 	polarssl_io* io = (polarssl_io*) ctx;
-	int   ret, timeout = 120;
 	ACL_VSTREAM* vs = io->stream_;
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(vs);
 
-	ret = acl_socket_read(fd, buf, len, timeout, vs, NULL);
+	//logger(">>>non_block: %s, sys_ready: %s",
+	//	io->non_block_ ? "yes" : "no",
+	//	vs->sys_read_ready ? "yes":"no");
+
+	// 非阻塞模式下，如果 sys_read_ready 标志位为 0，则说明有可能
+	// 本次 IO 将读不到数据，为了防止该读过程被阻塞，所以此处直接
+	// 返回给 polarssl 并告之等待下次读，下次读操作将由事件引擎触发，
+	// 这样做的优点是在非阻塞模式下即使套接字没有设置为非阻塞状态
+	// 也不会阻塞线程，但缺点是增加了事件循环触发的次数
+	if (io->non_block_ && vs->sys_read_ready == 0)
+	{
+		 int   ret = acl_readable(fd);
+		 if (ret == -1)
+			 return POLARSSL_ERR_NET_RECV_FAILED;
+		 else if (ret == 0)
+		 {
+			// 必须在此处设置系统的 errno 号，此处是模拟了
+			// 非阻塞读过程
+			acl_set_error(ACL_EWOULDBLOCK);
+			return POLARSSL_ERR_NET_WANT_READ;
+		 }
+		 // else: ret == 1
+	}
+
+	// 当事件引擎设置了套接字可读的状态时，超时等待为 0 秒
+
+	int  timeout;
+	if (vs->sys_read_ready)
+		timeout = 0;
+	else
+		timeout = vs->rw_timeout;
+
+	int ret = acl_socket_read(fd, buf, len, timeout, vs, NULL);
+
+	// 须将该标志位置 0，这样在非阻塞模式下，如果 polarssl 在重复
+	// 调用 sock_read 函数时，可以在前面提前返回以免阻塞在 IO 读过程
+	vs->sys_read_ready = 0;
+
 	if (ret < 0)
 	{
 		int   errnum = acl_last_error();
@@ -368,11 +413,11 @@ int polarssl_io::sock_send(void *ctx, const unsigned char *buf, size_t len)
 {
 #ifdef HAS_POLARSSL
 	polarssl_io* io = (polarssl_io*) ctx;
-	int   ret, timeout = 120;
 	ACL_VSTREAM* vs = io->stream_;
-	ACL_SOCKET fd = ACL_VSTREAM_SOCK(vs);
 
-	ret = acl_socket_write(fd, buf, len, timeout, vs, NULL);
+	// 当为非阻塞模式时，超时等待为 0 秒
+	int ret = acl_socket_write(ACL_VSTREAM_SOCK(vs), buf, len,
+			io->non_block_ ? 0 : vs->rw_timeout, vs, NULL);
 	if (ret < 0)
 	{
 		int   errnum = acl_last_error();

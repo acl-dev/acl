@@ -12,9 +12,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-void acl_dump_trace(const char *filepath)
+void acl_trace_save(const char *filepath)
 {
-	const char *myname = "acl_dump_trace";
+	const char *myname = "acl_trace_save";
 	int   fd;
 	void *buffer[1000];
 	size_t n;
@@ -34,7 +34,7 @@ void acl_dump_trace(const char *filepath)
 	close(fd);
 }
 
-void acl_log_strace(void)
+void acl_trace_info(void)
 {
 	void *buffer[1000];
 	size_t n, i;
@@ -50,11 +50,11 @@ void acl_log_strace(void)
 
 #else
 
-void acl_dump_trace(const char *filepath acl_unused)
+void acl_trace_save(const char *filepath acl_unused)
 {
 }
 
-void acl_log_strace(void)
+void acl_trace_info(void)
 {
 }
 

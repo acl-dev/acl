@@ -1474,6 +1474,11 @@ int acl_pthread_pool_dispatch(void *dispatch_arg,
 	return 0;
 }
 
+int acl_pthread_pool_limit(acl_pthread_pool_t *thr_pool)
+{
+	return thr_pool->parallelism;
+}
+
 int acl_pthread_pool_size(acl_pthread_pool_t *thr_pool)
 {
 	const char *myname = "acl_pthread_pool_size";

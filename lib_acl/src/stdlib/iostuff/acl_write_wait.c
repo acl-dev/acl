@@ -23,117 +23,113 @@
 #include "stdlib/acl_iostuff.h"
 #include "../../init/init.h"
 
-static int select_write_wait(ACL_SOCKET fd, int timeout)
-{
-	const char *myname = "select_write_wait";
-	fd_set  write_fds;
-	fd_set  except_fds;
-	struct timeval tv;
-	struct timeval *tp;
-	char   buf[256];
-#ifdef	WIN32
-	int  errnum;
-#endif
-
-#ifdef	ACL_UNIX
-	/*
-	* Sanity checks.
-	*/
-	if (FD_SETSIZE <= (unsigned) fd)
-		acl_msg_panic("%s, %s(%d): descriptor %d does not fit FD_SETSIZE %d",
-		myname, __FILE__, __LINE__, fd, FD_SETSIZE);
-#endif
-
-	/*
-	* Guard the write() with select() so we do not depend on alarm() and on
-	* signal() handlers. Restart the select when interrupted by some signal.
-	* Some select() implementations may reduce the time to wait when
-	* interrupted, which is exactly what we want.
-	*/
-	FD_ZERO(&write_fds);
-	FD_SET(fd, &write_fds);
-	FD_ZERO(&except_fds);
-	FD_SET(fd, &except_fds);
-	if (timeout >= 0) {
-		tv.tv_usec = 0;
-		tv.tv_sec = timeout;
-		tp = &tv;
-	} else {
-		tp = 0;
-	}
-
-	for (;;) {
-		switch (select(fd + 1, (fd_set *) 0, &write_fds, &except_fds, tp)) {
-		case -1:
-#ifdef	WIN32
-			errnum = WSAGetLastError();
-			if (errnum != WSAEINPROGRESS && errnum != WSAEWOULDBLOCK) {
-				acl_msg_error("%s, %s(%d): select error(%s), fd(%d)",
-					myname, __FILE__, __LINE__,
-					acl_last_strerror(buf, sizeof(buf)), fd);
-				return (-1);
-			}
-#else
-			if (acl_last_error() != ACL_EINTR) {
-				acl_msg_error("%s, %s(%d): select error(%s), fd(%d)",
-					myname, __FILE__, __LINE__,
-					acl_last_strerror(buf, sizeof(buf)), fd);
-				return (-1);
-			}
-#endif
-			continue;
-		case 0:
-			acl_set_error(ACL_ETIMEDOUT);
-			return (-1);
-		default:
-			return (0);
-		}
-	}
-}
-
 #ifdef ACL_UNIX
 
-#include <stdio.h>
-static int poll_write_wait(ACL_SOCKET fd, int timeout)
+int acl_write_wait(ACL_SOCKET fd, int timeout)
 {
-	const char *myname = "poll_write_wait";
+	const char *myname = "acl_write_wait";
 	struct pollfd fds;
 	int   delay = timeout * 1000;
 
 	fds.events = POLLOUT | POLLHUP | POLLERR;
 	fds.fd = fd;
 
+	acl_set_error(0);
+
 	for (;;) {
 		switch (poll(&fds, 1, delay)) {
 		case -1:
-			if (acl_last_error() != ACL_EINTR) {
-				char tbuf[256];
-				acl_msg_error("%s: poll error(%s)", myname,
-					acl_last_strerror(tbuf, sizeof(tbuf)));
-				return (-1);
-			}
-			continue;
+			if (acl_last_error() == ACL_EINTR)
+				continue;
+			acl_msg_error("%s(%d), %s: poll error(%s), fd: %d",
+				__FILE__, __LINE__, myname,
+				acl_last_serror(), (int) fd);
+			return -1;
 		case 0:
 			acl_set_error(ACL_ETIMEDOUT);
-			return (-1);
+			return -1;
 		default:
-			if ((fds.revents & (POLLHUP | POLLERR))
-				|| !(fds.revents & POLLOUT))
-			{
-				return (-1);
+			if ((fds.revents & (POLLHUP | POLLERR))) {
+				acl_msg_error("%s(%d), %s: fd: %d,"
+					"POLLHUP: %s, POLLERR: %s",
+					__FILE__, __LINE__, myname, fd,
+					fds.revents & POLLHUP ? "yes" : "no",
+					fds.revents & POLLERR ? "yes" : "no");
+				return -1;
 			}
-			return (0);
+			if (fds.revents & POLLOUT)
+				return 0;
+			acl_msg_error("%s(%d), %s: unknown error, fd: %d",
+				__FILE__, __LINE__, myname, fd);
+			return -1;
 		}
 	}
 }
-#endif
+
+#else
 
 int acl_write_wait(ACL_SOCKET fd, int timeout)
 {
-#ifdef	ACL_UNIX
-	if (__acl_var_use_poll)
-		return (poll_write_wait(fd, timeout));
-#endif
+	const char *myname = "acl_write_wait";
+	fd_set  wfds, xfds;
+	struct timeval tv;
+	struct timeval *tp;
+	int  errnum;
 
-	return (select_write_wait(fd, timeout));
+	/*
+	 * Sanity checks.
+	 */
+	if (FD_SETSIZE <= (unsigned) fd)
+		acl_msg_fatal("%s, %s(%d): descriptor %d does not fit "
+			"FD_SETSIZE %d", myname, __FILE__, __LINE__,
+			(int) fd, FD_SETSIZE);
+
+	/*
+	* Guard the write() with select() so we do not depend on alarm()
+	* and on signal() handlers. Restart the select when interrupted
+	* by some signal. Some select() implementations may reduce the time
+	* to wait when interrupted, which is exactly what we want.
+	*/
+	FD_ZERO(&wfds);
+	FD_SET(fd, &wfds);
+	FD_ZERO(&xfds);
+	FD_SET(fd, &xfds);
+
+	if (timeout >= 0) {
+		tv.tv_usec = 0;
+		tv.tv_sec = timeout;
+		tp = &tv;
+	} else
+		tp = 0;
+
+	acl_set_error(0);
+
+	for (;;) {
+		switch (select(fd + 1, (fd_set *) 0, &wfds, &xfds, tp)) {
+		case -1:
+			errnum = acl_last_error();
+#ifdef	WIN32
+			if (errnum == WSAEINPROGRESS
+				|| errnum == WSAEWOULDBLOCK
+				|| errnum == ACL_EINTR)
+			{
+				continue;
+			}
+#else
+			if (errnum == ACL_EINTR)
+				continue;
+#endif
+			acl_msg_error("%s, %s(%d): select error(%s), fd(%d)",
+				myname, __FILE__, __LINE__,
+				acl_last_serror(), (int) fd);
+			return -1;
+		case 0:
+			acl_set_error(ACL_ETIMEDOUT);
+			return -1;
+		default:
+			return 0;
+		}
+	}
 }
+
+#endif

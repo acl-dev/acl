@@ -1,6 +1,14 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+266) 2014.12.2
+266.1) bugfix: polarssl_io 类在非阻塞模式下有可能会阻塞在 IO 上
+
+265) 2014.12.1
+265.1) bugfix: istream 类中的 xxx_peek 函数在读出错时没有判断 errno 为 ACL_EWOULDBLOCK
+的情况，在非阻塞方式下，当读返回 -1 且 errno 为 ACL_EWOULDBLOCK 时并不表示读出错
+265.2) feature: polarssl_io 类完善了非阻塞 IO 过程
+
 264) 2014.11.29
 264.1) feature: stream_setup 类现在可以支持 aio_stream 非阻塞流了
 264.2) feature: polarssl_io 类增加了支持非阻塞 IO 的方法

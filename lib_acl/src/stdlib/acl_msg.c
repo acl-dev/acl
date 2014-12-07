@@ -88,6 +88,7 @@ void acl_msg_open2(ACL_VSTREAM *fp, const char *info_pre)
 	} else {
 		acl_log_fp_set(fp, info_pre);
 	}
+
 	__log_open_flag = 1;
 }
 
@@ -185,6 +186,7 @@ void acl_msg_info2(const char *fmt, va_list ap)
 		printf("\r\n");
 	}
 }
+
 void acl_msg_warn(const char *fmt,...)
 {
 	va_list ap;
@@ -211,7 +213,9 @@ void acl_msg_warn(const char *fmt,...)
 	}
 
 	va_end (ap);
+	acl_trace_info();
 }
+
 void acl_msg_warn2(const char *fmt, va_list ap)
 {
 	if (__pre_write_fn)
@@ -231,7 +235,10 @@ void acl_msg_warn2(const char *fmt, va_list ap)
 		vprintf(fmt, ap);
 		printf("\r\n");
 	}
+
+	acl_trace_info();
 }
+
 void acl_msg_error(const char *fmt,...)
 {
 	va_list ap;
@@ -257,7 +264,9 @@ void acl_msg_error(const char *fmt,...)
 	}
 
 	va_end (ap);
+	acl_trace_info();
 }
+
 void acl_msg_error2(const char *fmt, va_list ap)
 {
 	if (__pre_write_fn)
@@ -277,7 +286,10 @@ void acl_msg_error2(const char *fmt, va_list ap)
 		vprintf(fmt, ap);
 		printf("\r\n");
 	}
+
+	acl_trace_info();
 }
+
 void acl_msg_fatal(const char *fmt,...)
 {
 	va_list ap;
@@ -304,7 +316,7 @@ void acl_msg_fatal(const char *fmt,...)
 	}
 
 	va_end (ap);
-	acl_log_strace();
+	acl_trace_info();
 	acl_close_log();
 	acl_assert(0);
 }
@@ -328,7 +340,8 @@ void acl_msg_fatal2(const char *fmt, va_list ap)
 		vprintf(fmt, ap);
 		printf("\r\n");
 	}
-	acl_log_strace();
+
+	acl_trace_info();
 	acl_close_log();
 	acl_assert(0);
 }
@@ -356,7 +369,7 @@ void acl_msg_fatal_status(int status, const char *fmt,...)
 	}
 
 	va_end (ap);
-	acl_log_strace();
+	acl_trace_info();
 	acl_close_log();
 	acl_assert(0);
 }
@@ -379,7 +392,7 @@ void acl_msg_fatal_status2(int status, const char *fmt, va_list ap)
 		printf("\r\n");
 	}
 
-	acl_log_strace();
+	acl_trace_info();
 	acl_close_log();
 	acl_assert(0);
 }
@@ -409,8 +422,7 @@ void acl_msg_panic(const char *fmt,...)
 	}
 
 	va_end (ap);
-
-	acl_log_strace();
+	acl_trace_info();
 	acl_close_log();
 	acl_assert(0);
 }
@@ -435,7 +447,7 @@ void acl_msg_panic2(const char *fmt, va_list ap)
 		printf("\r\n");
 	}
 
-	acl_log_strace();
+	acl_trace_info();
 	acl_close_log();
 	acl_assert(0);
 }
@@ -534,14 +546,15 @@ const char *acl_last_serror(void)
 
 int acl_last_error(void)
 {
+#ifdef	WIN32
 	int   error;
 
-#ifdef	WIN32
 	error = WSAGetLastError();
 	WSASetLastError(error);
-#endif
-	error = errno;
 	return error;
+#else
+	return errno;
+#endif
 }
 
 void acl_set_error(int errnum)
