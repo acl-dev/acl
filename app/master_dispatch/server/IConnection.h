@@ -19,6 +19,15 @@ public:
 	int   sock_handle() const;
 
 	/**
+	 * 获得非阻塞连接流对象
+	 * @return {acl::aio_socket_stream*}
+	 */
+	acl::aio_socket_stream* get_conn() const
+	{
+		return conn_;
+	}
+
+	/**
 	 * 获得连接对象的地址
 	 * @return {const char*}
 	 */

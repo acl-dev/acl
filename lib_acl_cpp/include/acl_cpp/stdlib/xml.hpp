@@ -151,6 +151,17 @@ public:
 	xml_node& set_text(const char* str);
 
 	/**
+	 * 设置 xml 结点的文本内容
+	 * @param number {long long int} 64 位整数
+	 * @return {xml_node&}
+	 */
+#ifdef	WIN32
+	xml_node& set_text(__int64 number);
+#else
+	xml_node& set_text(long long int number);
+#endif
+
+	/**
 	 * 给本 xml 结点添加 xml_node 子结点对象
 	 * @param child {xml_node*} 子结点对象
 	 * @param return_child {bool} 是否需要本函数返回新创建的子结点的引用
@@ -178,6 +189,22 @@ public:
 	 */
 	xml_node& add_child(const char* tag, bool return_child = false,
 		const char* str = NULL);
+
+	/**
+	 * 给本 xml 结点添加 xml_node 子结点对象
+	 * @param tag {const char* tag} 子结点对象的标签名
+	 * @param number {long long int} 64 位整数
+	 * @param return_child {bool} 是否需要本函数返回新创建的子结点的引用
+	 * @return {xml_node&} return_child 为 true 返回子结点的引用，
+	 *  否则返回本 xml 结点引用
+	 */
+#ifdef	WIN32
+	xml_node& add_child(const char* tag, __int64 number,
+		bool return_child = false);
+#else
+	xml_node& add_child(const char* tag, long long int number,
+		bool return_child = false);
+#endif
 
 	/**
 	 * 获得本结点的父级结点对象的引用
@@ -381,6 +408,20 @@ public:
 	 *  reset 来释放这些 xml_node 结点对象
 	 */
 	xml_node& create_node(const char* tag, const char* text = NULL);
+
+	/**
+	 * 创建一个 xml_node 结点对象
+	 * @param tag {const char*} 标签名
+	 * @param number {long long int} 64 位整数
+	 * @return {xml_node*} 新产生的 xml_node 对象不需要用户手工释放，因为在
+	 *  xml 对象被释放时这些结点会自动被释放，当然用户也可以在不用时调用
+	 *  reset 来释放这些 xml_node 结点对象
+	 */
+#ifdef	WIN32
+	xml_node& create_node(const char* tag, __int64 number);
+#else
+	xml_node& create_node(const char* tag, long long int number);
+#endif
 
 	/**
 	 * 获得根结点对象，但需要注意，该结点为虚结点，里面不存放任何数据，

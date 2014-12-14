@@ -18,9 +18,7 @@ http_response::http_response(socket_stream* client)
 	debug_ = false;
 	header_ok_ = false;
 	head_sent_ = false;
-	printf("%s:%d\n", __FUNCTION__, __LINE__);
 	client_ = NEW http_client(client);
-	printf("%s:%d\n", __FUNCTION__, __LINE__);
 }
 
 http_response::~http_response(void)

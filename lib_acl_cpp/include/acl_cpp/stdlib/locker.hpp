@@ -24,10 +24,8 @@ public:
 	/**
 	 * 构造函数
 	 * @param use_mutex {bool} 是否创建线程锁
-	 * @param nowait {bool} 是否一直等待至加锁成功
-	 *  (包括线程锁和文件锁)
 	 */
-	locker(bool use_mutex = true, bool nowait = false);
+	locker(bool use_mutex = true);
 	virtual ~locker();
 
 	/**
@@ -56,11 +54,17 @@ public:
 	bool lock();
 
 	/**
+	 * 尝试对已经打开的锁(包括线程锁和文件锁)进行加锁
+	 * @return {bool} 加锁是否成功
+	 */
+	bool try_lock();
+
+	/**
 	 * 针对已经打开的锁(包括线程锁和文件锁)进行解锁
 	 * @return {bool} 解锁是否成功
 	 */
 	bool unlock();
-protected:
+
 private:
 	void init_mutex(void);
 
@@ -76,7 +80,6 @@ private:
 	int   fHandle_;
 #endif
 	bool  myFHandle_;
-	bool  nowait_;
 };
 
 }  // namespace acl

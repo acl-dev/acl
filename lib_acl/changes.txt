@@ -1,6 +1,16 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+475) 2014.12.13
+475) bugfix: acl_json_util.c 中将 JSON 对象转为字符串的函数 acl_json_build
+不能支持某些情形
+476) featrue: acl_json_util.c 中增加了流式将 JSON 对象转为字符串的函数
+acl_json_building，这样当 JSON 对象比较大时使用该函数可以有效防止要求系统分配
+非常大的内存空间而导致分配内存失败
+
+474) 2014.12.8
+474.1) feature: acl_trace.c 中的函数 acl_trace_info 增加了防止递归嵌套的功能
+
 473) 2014.12.6
 473.1) feature: acl_msg.c 中的 acl_msg_error/warn/fatal/panic 支持记录函数调用堆栈
 

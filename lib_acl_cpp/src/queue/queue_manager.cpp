@@ -57,12 +57,12 @@ queue_manager::~queue_manager()
 
 const char* queue_manager::get_home() const
 {
-	return (m_home.c_str());
+	return m_home.c_str();
 }
 
 const char* queue_manager::get_queueName() const
 {
-	return (m_queueName.c_str());
+	return m_queueName.c_str();
 }
 
 queue_file* queue_manager::create_file(const char* extName)
@@ -73,12 +73,12 @@ queue_file* queue_manager::create_file(const char* extName)
 		extName, sub_width_) == false)
 	{
 		delete fp;
-		return (NULL);
+		return NULL;
 	}
 
 	if (cache_add(fp) == false)
 		logger_fatal("%s already exist in table", fp->key());
-	return (fp);
+	return fp;
 }
 
 queue_file* queue_manager::open_file(const char* filePath, bool no_cache /* = true */)
@@ -88,7 +88,7 @@ queue_file* queue_manager::open_file(const char* filePath, bool no_cache /* = tr
 		&partName, &extName) == false)
 	{
 		logger_error("filePath(%s) invalid", filePath);
-		return (NULL);
+		return NULL;
 	}
 
 	queue_file* fp;
@@ -102,7 +102,7 @@ queue_file* queue_manager::open_file(const char* filePath, bool no_cache /* = tr
 			logger_warn("file: %s locked", filePath);
 			return NULL;
 		}
-		return (fp);
+		return fp;
 	}
 
 	// 从磁盘打开已经存在的队列文件
@@ -111,10 +111,10 @@ queue_file* queue_manager::open_file(const char* filePath, bool no_cache /* = tr
 		partName.c_str(), extName.c_str()) == false)
 	{
 		delete fp;
-		return (NULL);
+		return NULL;
 	}
 	cache_add(fp);
-	return (fp);
+	return fp;
 }
 
 bool queue_manager::close_file(queue_file* fp)
@@ -122,7 +122,7 @@ bool queue_manager::close_file(queue_file* fp)
 	string key(fp->key());
 	delete fp;
 	cache_del(key.c_str());
-	return (true);
+	return true;
 }
 
 bool queue_manager::delete_file(queue_file* fp)
@@ -131,7 +131,7 @@ bool queue_manager::delete_file(queue_file* fp)
 	fp->remove();
 	delete fp;
 	cache_del(key.c_str());
-	return (true);
+	return true;
 }
 
 bool queue_manager::rename_extname(queue_file* fp, const char* extName)
@@ -140,7 +140,7 @@ bool queue_manager::rename_extname(queue_file* fp, const char* extName)
 	{
 		logger_warn("file(%s)'s key(%s) not exist",
 			fp->get_filePath(), fp->key());
-		return (false);
+		return false;
 	}
 	return fp->move_file(fp->get_queueName(), extName);
 }
@@ -157,8 +157,8 @@ bool queue_manager::move_file(queue_file* fp, queue_manager* toQueue, const char
 {
 	bool ret = move_file(fp, toQueue->get_queueName(), extName);
 	if (ret == false)
-		return (false);
-	return (toQueue->cache_add(fp));
+		return false;
+	return toQueue->cache_add(fp);
 }
 
 bool queue_manager::parse_filePath(const char* filePath, string* home,
@@ -168,7 +168,7 @@ bool queue_manager::parse_filePath(const char* filePath, string* home,
 	if (filePath == NULL || *filePath == 0)
 	{
 		logger_error("filePath invalid!");
-		return (false);
+		return false;
 	}
 
 	// 格式为: /home/queue_name/queue_sub_node/file_name.file_ext
@@ -178,7 +178,7 @@ bool queue_manager::parse_filePath(const char* filePath, string* home,
 	{
 		logger_error("filePath(%s) invalid", filePath);
 		acl_argv_free(argv);
-		return (false);
+		return false;
 	}
 
 	home->clear();
@@ -203,7 +203,7 @@ bool queue_manager::parse_filePath(const char* filePath, string* home,
 	bool ret  = parse_fileName(argv->argv[argv->argc - 1], partName, extName);
 
 	acl_argv_free(argv);
-	return (ret);
+	return ret;
 }
 
 bool queue_manager::parse_fileName(const char* fileName, string* partName, string* extName)
@@ -212,7 +212,7 @@ bool queue_manager::parse_fileName(const char* fileName, string* partName, strin
 	if (extSep == NULL || extSep == fileName)
 	{
 		logger_error("fileName(%s) invalid", fileName);
-		return (false);
+		return false;
 	}
 
 	// 拷贝文件名
@@ -221,12 +221,12 @@ bool queue_manager::parse_fileName(const char* fileName, string* partName, strin
 	if (*extSep == 0)
 	{
 		logger("fileName(%s) invalid", fileName);
-		return (false);
+		return false;
 	}
 
 	// 拷贝扩展名
 	*extName = extSep;
-	return (true);
+	return true;
 }
 
 bool queue_manager::parse_path(const char* path, string* home,
@@ -235,7 +235,7 @@ bool queue_manager::parse_path(const char* path, string* home,
 	if (path == NULL || *path == 0)
 	{
 		logger_error("path invalid!");
-		return (false);
+		return false;
 	}
 
 	/* WINDOWS 支持 '/' 和 '\\' 两种分隔符 */
@@ -245,7 +245,7 @@ bool queue_manager::parse_path(const char* path, string* home,
 	{
 		logger_error("path(%s) invalid", path);
 		acl_argv_free(argv);
-		return (false);
+		return false;
 	}
 
 	// 取得home
@@ -260,22 +260,22 @@ bool queue_manager::parse_path(const char* path, string* home,
 	// 取得队列子目录名
 	*queueSub = argv->argv[argv->argc - 1];
 	acl_argv_free(argv);
-	return (true);
+	return true;
 }
 
 unsigned int queue_manager::hash_queueSub(const char* partName, unsigned width)
 {
 	acl_assert(width > 0);
 	unsigned int n = acl_hash_crc32(partName, strlen(partName));
-	return (n % width);
+	return n % width;
 }
 
 bool queue_manager::busy(const char* partName)
 {
 	if (cache_find(partName))
-		return (true);
+		return true;
 	else
-		return (false);
+		return false;
 }
 
 queue_file* queue_manager::cache_find(const char* key)
@@ -289,7 +289,7 @@ queue_file* queue_manager::cache_find(const char* key)
 		fp = it->second;
 	}
 	m_queueLocker.unlock();
-	return (fp);
+	return fp;
 }
 
 bool queue_manager::cache_check(queue_file* fp)
@@ -301,17 +301,17 @@ bool queue_manager::cache_check(queue_file* fp)
 	{
 		m_queueLocker.unlock();
 		logger_error("%s not exist in table", fp->key());
-		return (false);
+		return false;
 	}
 	else if (it->second != fp)
 	{
 		m_queueLocker.unlock();
 		logger_error("%s not match, %lu, %lu", fp->key(),
 			(unsigned long) fp, (unsigned long)it->second);
-		return (false);
+		return false;
 	}
 	m_queueLocker.unlock();
-	return (true);
+	return true;
 }
 
 bool queue_manager::cache_add(queue_file* fp)
@@ -329,7 +329,7 @@ bool queue_manager::cache_add(queue_file* fp)
 		ret = false;
 	}
 	m_queueLocker.unlock();
-	return (ret);
+	return ret;
 }
 
 bool queue_manager::cache_del(const char* key)
@@ -350,7 +350,7 @@ bool queue_manager::cache_del(const char* key)
 	}
 
 	m_queueLocker.unlock();
-	return (ret);
+	return ret;
 }
 
 bool queue_manager::remove(queue_file* fp)
@@ -359,7 +359,7 @@ bool queue_manager::remove(queue_file* fp)
 	bool ret = fp->remove();
 	delete fp;
 	cache_del(key.c_str());
-	return (ret);
+	return ret;
 }
 
 bool queue_manager::scan_open(bool scanSub /* = true */)
@@ -370,9 +370,9 @@ bool queue_manager::scan_open(bool scanSub /* = true */)
 	if (m_scanDir == NULL)
 	{
 		logger_error("open %s error(%s)", path.c_str(), acl_last_serror());
-		return (false);
+		return false;
 	} else
-		return (true);
+		return true;
 }
 
 void queue_manager::scan_close()
@@ -397,7 +397,7 @@ queue_file* queue_manager::scan_next()
 		// 扫描下一个磁盘文件
 		const char* fileName = acl_scan_dir_next_file(m_scanDir);
 		if (fileName == NULL)
-			return (NULL);
+			return NULL;
 
 		string partName, extName;
 
@@ -437,7 +437,7 @@ queue_file* queue_manager::scan_next()
 			break;
 	}
 
-	return (fp);
+	return fp;
 }
 
 } // namespace acl

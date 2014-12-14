@@ -27,6 +27,15 @@ int main(int argc, char* argv[])
 			break;
 		}
 
+		printf("before set sendbuf's size: %d, readbuf's size: %d\r\n",
+			client->get_tcp_sendbuf(), client->get_tcp_recvbuf());
+
+		client->set_tcp_sendbuf(1024000);
+		client->set_tcp_recvbuf(2048000);
+
+		printf("after set sendbuf's size: %d, readbuf's size: %d\r\n",
+			client->get_tcp_sendbuf(), client->get_tcp_recvbuf());
+
 		if (client->write("hello world\r\n") == false)
 		{
 			printf("write error\r\n");

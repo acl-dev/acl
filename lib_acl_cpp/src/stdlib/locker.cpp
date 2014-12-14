@@ -3,10 +3,9 @@
 
 namespace acl {
 
-locker::locker(bool use_mutex /* = true */, bool nowait /* = false */)
+locker::locker(bool use_mutex /* = true */)
 : pFile_(NULL)
 , myFHandle_(false)
-, nowait_(nowait)
 {
 	fHandle_ = ACL_FILE_INVALID;
 	if (use_mutex)
@@ -24,9 +23,9 @@ locker::~locker()
 	if (pMutex_)
 	{
 #ifndef WIN32
-		acl_assert(pthread_mutexattr_destroy(&mutexAttr_) == 0);
+		(void) pthread_mutexattr_destroy(&mutexAttr_);
 #endif
-		acl_assert(acl_pthread_mutex_destroy(pMutex_) == 0);
+		(void) acl_pthread_mutex_destroy(pMutex_);
 		acl_myfree(pMutex_);
 	}
 }
@@ -68,30 +67,36 @@ bool locker::open(ACL_FILE_HANDLE fh)
 
 bool locker::lock()
 {
-	if (pMutex_)
-	{
-		if (nowait_)
-		{
-			if (acl_pthread_mutex_trylock(pMutex_) == -1)
-				return false;
-		}
-		else if (acl_pthread_mutex_lock(pMutex_) == -1)
-			return false;
-	}
-
-	if (fHandle_ != ACL_FILE_INVALID)
-	{
-		int operation = ACL_FLOCK_OP_EXCLUSIVE;
-		if (nowait_)
-			operation |= ACL_FLOCK_OP_NOWAIT;
-		if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL,
-			operation) == -1)
-		{
-			return false;
-		}
-	} else if (pFile_ != NULL)
+	if (pMutex_ && acl_pthread_mutex_lock(pMutex_) == -1)
 		return false;
-	return true;
+
+	if (fHandle_ == ACL_FILE_INVALID)
+		return true;
+
+	int operation = ACL_FLOCK_OP_EXCLUSIVE;
+	if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL, operation) == 0)
+		return true;
+
+	if (pMutex_)
+		acl_assert(acl_pthread_mutex_unlock(pMutex_) == 0);
+	return false;
+}
+
+bool locker::try_lock()
+{
+	if (pMutex_ && acl_pthread_mutex_trylock(pMutex_) == -1)
+		return false;
+
+	if (fHandle_ == ACL_FILE_INVALID)
+		return true;
+
+	int operation = ACL_FLOCK_OP_EXCLUSIVE | ACL_FLOCK_OP_NOWAIT;
+	if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL, operation) == 0)
+		return true;
+
+	if (pMutex_)
+		acl_assert(acl_pthread_mutex_unlock(pMutex_) == 0);
+	return false;
 }
 
 bool locker::unlock()
@@ -105,21 +110,16 @@ bool locker::unlock()
 		else
 			ret = true;
 	}
-
-	if (fHandle_ != ACL_FILE_INVALID)
-	{
-		if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL,
-			ACL_FLOCK_OP_NONE) == -1)
-		{
-			ret = false;
-		}
-		else
-			ret = true;
-	} else if (pFile_ != NULL)
-		ret = false;
 	else
 		ret = true;
-	return (ret);
+
+	if (fHandle_ == ACL_FILE_INVALID)
+		return ret;
+
+	int operation = ACL_FLOCK_STYLE_FCNTL;
+	if (acl_myflock(fHandle_, operation, ACL_FLOCK_OP_NONE) == -1)
+		return false;
+	return ret;
 }
 
 } // namespace acl

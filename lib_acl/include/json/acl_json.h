@@ -397,6 +397,22 @@ ACL_API ACL_VSTRING *acl_json_node_build(ACL_JSON_NODE *json, ACL_VSTRING *buf);
  */
 ACL_API ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf);
 
+/**
+ * 流式 JSON 对象转字符串处理过程，即该函数在将 JSON 对象转为字符串的过程中，
+ * 一边转换一边将数据通过回调函数输出给调用者，调用者可以限定长度限定调用回
+ * 调函数的时机；该处理过程适应于当JSON对象转成的字符串非常长时(如超过100 MB),
+ * 因为采用流式转换方式，所以并不需要分配一个大内存
+ * @param json {ACL_JSON*} json 对象
+ * @param length {size_t} 在转换为字符串的过程中如果缓冲区长度超过该长度则回调
+ *  用户设定的回调函数
+ * @param callback {int (*)(ACL_JSON*, ACL_VSTRING*, void*)} 用户设定的回调
+ *  函数，当回调函数给的第二个参数为 NULL 时表示处理完毕；如果用户在该回调
+ *  的某次被调用后返回值 < 0 则停止处理过程
+ * @param ctx {void*} callback 函数的最后一个参数
+ */
+ACL_API void acl_json_building(ACL_JSON *json, size_t length,
+	int (*callback)(ACL_JSON *, ACL_VSTRING *, void *), void *ctx);
+
 #ifdef __cplusplus
 }
 #endif

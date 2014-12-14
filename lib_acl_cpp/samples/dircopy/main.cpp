@@ -120,12 +120,19 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 	else
 		from_filepath << rpath << SEP << name;
 
+	if (strstr(from_filepath.c_str(), ".svn") != NULL
+		|| strstr(from_filepath.c_str(), ".git") != NULL
+		|| strstr(from_filepath.c_str(), ".cvs") != NULL)
+	{
+		return true;
+	}
+
 	acl::ifstream from_fp;
 	if (from_fp.open_read(from_filepath.c_str()) == false)
 	{
 		logger_error("open source file: %s error: %s",
 			from_filepath.c_str(), acl::last_serror());
-		return true;
+		return false;
 	}
 
 	acl::string to_pathbuf;
@@ -139,8 +146,8 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 	acl::ifstream to_fp;
 	if (to_fp.open_read(to_filepath.c_str()) == false)
 	{
-		printf("open to file: %s error: %s\r\n", to_filepath.c_str(),
-			acl::last_serror());
+		//printf("open to file: %s error: %s\r\n", to_filepath.c_str(),
+		//	acl::last_serror());
 		return copy_file(from_fp, to_pathbuf, to_filepath, ncopied);
 	}
 
@@ -148,9 +155,10 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 	acl_int64 length;
 	if ((length = to_fp.fsize()) != from_fp.fsize())
 	{
-		printf("to fsize: %ld, from fsize: %ld, to file: %s, from file: %s\r\n",
-			(long) to_fp.fsize(), (long) from_fp.fsize(),
-			to_filepath.c_str(), from_filepath.c_str());
+		printf("to fsize: %ld, from fsize: %ld, to file: %s, "
+			"from file: %s\r\n", (long) to_fp.fsize(),
+			(long) from_fp.fsize(), to_filepath.c_str(),
+			from_filepath.c_str());
 		to_fp.close();
 		return copy_file(from_fp, to_pathbuf, to_filepath, ncopied);
 	}
@@ -217,25 +225,29 @@ static bool check_dir(acl::scan_dir& scan, const char* to, int* ncopied)
 
 	acl::string to_path;
 	to_path << to << SEP << rpath;
+
+	if (strstr(to_path.c_str(), ".svn") != NULL
+		|| strstr(to_path.c_str(), ".git") != NULL
+		|| strstr(to_path.c_str(), ".cvs") != NULL)
+	{
+		return true;
+	}
+
 	// printf(">>to_path: %s, to: %s\r\n", to_path.c_str(), to);
 
 	if (access(to_path.c_str(), 0) == 0)
 		return true;
-	else
+
+	int ret = acl_make_dirs(to_path.c_str(), 0755);
+	if (ret == 0)
 	{
-		int ret = acl_make_dirs(to_path.c_str(), 0755);
-		if (ret == 0)
-		{
-			(*ncopied)++;
-			return true;
-		}
-		else
-		{
-			logger_error("make dirs(%s) error: %s",
-				to_path.c_str(), acl::last_serror());
-			return false;
-		}
+		(*ncopied)++;
+		return true;
 	}
+
+	logger_error("make dirs(%s) error: %s",
+		to_path.c_str(), acl::last_serror());
+	return false;
 }
 
 static void do_copy(const acl::string& from, const acl::string& to)

@@ -173,8 +173,15 @@ xml_node& xml_node::set_text(const char* str)
 	return *this;
 }
 
-xml_node& xml_node::add_child(xml_node* child,
-	bool return_child /* = false */)
+xml_node& xml_node::set_text(acl_int64 number)
+{
+	char buf[32];
+	acl_assert(acl_i64toa(number, buf, sizeof(buf)) != NULL);
+	acl_xml_node_set_text(node_, buf);
+	return *this;
+}
+
+xml_node& xml_node::add_child(xml_node* child, bool return_child /* = false */)
 {
 	ACL_XML_NODE* node = child->get_xml_node();
 	acl_xml_node_add_child(node_, node);
@@ -184,17 +191,21 @@ xml_node& xml_node::add_child(xml_node* child,
 	return *this;
 }
 
-xml_node& xml_node::add_child(xml_node& child,
-	bool return_child /* = false */)
+xml_node& xml_node::add_child(xml_node& child, bool return_child /* = false */)
 {
 	return add_child(&child, return_child);
 }
 
-xml_node& xml_node::add_child(const char* tag,
-	bool return_child /* = false */,
+xml_node& xml_node::add_child(const char* tag, bool return_child /* = false */,
 	const char* str /* = NULL */)
 {
 	return add_child(xml_->create_node(tag, str), return_child);
+}
+
+xml_node& xml_node::add_child(const char* tag, acl_int64 number,
+	bool return_child /* = false */)
+{
+	return add_child(xml_->create_node(tag, number), return_child);
 }
 
 xml_node& xml_node::get_parent() const
@@ -552,6 +563,17 @@ xml_node& xml::create_node(const char* tag, const char* text /* = NULL */)
 	return *n;
 }
 
+xml_node& xml::create_node(const char* tag, acl_int64 number)
+{
+	char buf[32];
+	acl_assert(acl_i64toa(number, buf, sizeof(buf)) != NULL);
+
+	ACL_XML_NODE* node = acl_xml_create_node(xml_, tag, buf);
+	xml_node* n = NEW xml_node(node, this);
+	nodes_.push_back(n);
+	return *n;
+}
+
 xml_node& xml::get_root(void)
 {
 	if (root_)
@@ -645,6 +667,7 @@ void xml::clear(void)
 	std::list<xml_node*>::iterator it1 = nodes_.begin();
 	for (; it1 != nodes_.end(); ++it1)
 		delete (*it1);
+	nodes_.clear();
 }
 
 } // namespace acl

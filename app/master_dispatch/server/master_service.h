@@ -27,5 +27,7 @@ protected:
 	virtual void proc_on_exit();
 
 private:
-	acl::event_timer* timer_;
+	acl::event_timer* manage_timer_;
+	acl::event_timer* status_timer_;
+	acl::event_timer* server_timer_;
 };

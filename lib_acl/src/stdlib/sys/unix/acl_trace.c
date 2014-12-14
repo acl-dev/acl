@@ -2,6 +2,9 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "stdlib/acl_define.h"
 #include "stdlib/acl_msg.h"
+#include "stdlib/acl_mymalloc.h"
+#include "thread/acl_pthread.h"
+#include "init/acl_init.h"
 #include "stdlib/unix/acl_trace.h"
 #endif
 
@@ -34,18 +37,69 @@ void acl_trace_save(const char *filepath)
 	close(fd);
 }
 
+static acl_pthread_key_t __trace_key;
+static acl_pthread_once_t __trace_once = ACL_PTHREAD_ONCE_INIT;
+static unsigned int *__main_buf = NULL;
+
+static void trace_buf_free(void *buf)
+{
+	if ((unsigned long) acl_pthread_self() != acl_main_thread_self())
+		acl_myfree(buf);
+}
+
+static void main_buf_free(void)
+{
+	if (__main_buf)
+		acl_myfree(__main_buf);
+}
+
+static void trace_buf_init(void)
+{
+	acl_assert(acl_pthread_key_create(&__trace_key, trace_buf_free) == 0);
+}
+
 void acl_trace_info(void)
 {
 	void *buffer[1000];
 	size_t n, i;
 	char **results;
+	unsigned int *intbuf;
+
+	/* 初始化线程局部变量 */
+	if (acl_pthread_once(&__trace_once, trace_buf_init) != 0)
+		return;
+	intbuf = acl_pthread_getspecific(__trace_key);
+	if (intbuf == NULL) {
+		intbuf = acl_mymalloc(sizeof(int));
+		*intbuf = 0;
+		acl_assert(acl_pthread_setspecific(__trace_key, intbuf) == 0);
+		if ((unsigned long) acl_pthread_self()
+			== acl_main_thread_self())
+		{
+			__main_buf = intbuf;
+			atexit(main_buf_free);
+		}
+	}
+
+	/* 如果产生递归嵌套，则直接返回 */
+	if ((*intbuf) > 0)
+		return;
 
 	n = backtrace(buffer, 1000);
 	if (n == 0)
 		return;
+
+	/* 防止递归嵌套标志自增 */
+	(*intbuf)++;
+
 	results = backtrace_symbols(buffer, n);
+
+	/* 记录下所有的堆栈信息 */
 	for (i = 0; i < n; i++)
 		acl_msg_info("backtrace: %s", results[i]);
+
+	/* 防止递归嵌套标志自减 */
+	(*intbuf)--;
 }
 
 #else

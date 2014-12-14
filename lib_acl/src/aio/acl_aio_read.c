@@ -793,12 +793,8 @@ static void can_read_callback(int event_type, ACL_EVENT *event acl_unused,
 	} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 		astream->nrefer--;
 		READ_IOCP_CLOSE(astream);
-	} else {
+	} else
 		astream->nrefer--;
-		if (astream->keep_read) {
-			READ_SAFE_ENABLE(astream, can_read_callback);
-		}
-	}
 }
 
 void acl_aio_enable_read(ACL_ASTREAM *astream,
@@ -808,6 +804,8 @@ void acl_aio_enable_read(ACL_ASTREAM *astream,
 
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
 		return;
+
+	READ_SAFE_ENABLE(astream, can_read_callback);
 
 	astream->can_read_fn = can_read_fn;
 	astream->can_read_ctx = context;
@@ -820,8 +818,6 @@ void acl_aio_enable_read(ACL_ASTREAM *astream,
 	} else if (ret > 0 && astream->read_nested < astream->read_nested_limit) {
 		can_read_callback(ACL_EVENT_READ, astream->aio->event,
 			astream->stream , astream);
-	} else {
-		READ_SAFE_ENABLE(astream, can_read_callback);
 	}
 
 	--astream->read_nested;

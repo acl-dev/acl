@@ -535,6 +535,7 @@ void json::clear(void)
 	std::list<json_node*>::iterator it1 = nodes_.begin();
 	for (; it1 != nodes_.end(); ++it1)
 		delete (*it1);
+	nodes_.clear();
 }
 
 } // namespace acl

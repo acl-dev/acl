@@ -517,7 +517,7 @@ static void main_free_buf(void)
 
 static void thread_buf_init(void)
 {
-	acl_pthread_key_create(&__errbuf_key, thread_free_buf);
+	acl_assert(acl_pthread_key_create(&__errbuf_key, thread_free_buf) == 0);
 }
 
 static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
@@ -533,7 +533,7 @@ const char *acl_last_serror(void)
 	buf = acl_pthread_getspecific(__errbuf_key);
 	if (buf == NULL) {
 		buf = acl_mymalloc(__buf_size);
-		acl_pthread_setspecific(__errbuf_key, buf);
+		acl_assert(acl_pthread_setspecific(__errbuf_key, buf) == 0);
 		if ((unsigned long) acl_pthread_self()
 			== acl_main_thread_self())
 		{

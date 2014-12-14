@@ -70,21 +70,31 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-CFLAGS += -I../../../lib_acl/include -I../../../lib_protocol/include -I../../../lib_acl_cpp/include
+CFLAGS += -I. -I../../../lib_acl/include -I../../../lib_protocol/include -I../../../lib_acl_cpp/include
 EXTLIBS =
 LDFLAGS = -L../../../lib_acl_cpp/lib -l_acl_cpp -L../../../lib_protocol/lib -l_protocol -L../../../lib_acl/lib -l_acl \
-	$(EXTLIBS) $(SYSLIB)
+	$(EXTLIBS) $(SYSLIB) -rdynamic
 
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)
 ###########################################################
-OBJ_PATH = .
+OBJ_PATH = ./debug
 
 #Project's objs
-SRC = $(wildcard *.cpp)
-OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
+SRC =	$(wildcard *.cpp) \
+	$(wildcard server/*.cpp) \
+	$(wildcard client/*.cpp) \
+	$(wildcard status/*.cpp)
+
+OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC))) 
 
 $(OBJ_PATH)/%.o: %.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: server/%.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: client/%.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: status/%.cpp
 	$(COMPILE) $< -o $@
 
 .PHONY = all clean

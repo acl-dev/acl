@@ -26,7 +26,7 @@ namespace acl
 
 queue_file::queue_file()
 : m_fp(NULL)
-, m_locker(true, true)
+, m_locker(true)
 , m_bLocked(false)
 , m_bLockerOpened(false)
 , nwriten_(0)
@@ -136,7 +136,7 @@ END:
 	else
 		m_bLockerOpened = true;
 
-	return (true);
+	return true;
 }
 
 bool queue_file::open(const char* filePath)
@@ -146,11 +146,11 @@ bool queue_file::open(const char* filePath)
 		&partName, &extName) == false)
 	{
 		logger_error("filePath(%s) invalid", filePath);
-		return (false);
+		return false;
 	}
 
-	return (open(home.c_str(), queueName.c_str(), queueSub.c_str(),
-		partName.c_str(), extName.c_str()));
+	return open(home.c_str(), queueName.c_str(), queueSub.c_str(),
+		partName.c_str(), extName.c_str());
 }
 
 bool queue_file::open(const char* home, const char* queueName,
@@ -171,7 +171,7 @@ bool queue_file::open(const char* home, const char* queueName,
 			acl_last_serror());
 		delete m_fp;
 		m_fp = NULL;
-		return (false);
+		return false;
 	}
 
 	if (m_home != home)
@@ -198,7 +198,7 @@ bool queue_file::open(const char* home, const char* queueName,
 	}
 
 	// XXX, 需要分析该全路径, 以提取需要的字段
-	return (true);
+	return true;
 }
 
 void queue_file::close()
@@ -213,7 +213,7 @@ void queue_file::close()
 
 acl::fstream* queue_file::get_fstream() const
 {
-	return (m_fp);
+	return m_fp;
 }
 
 time_t queue_file::get_ctime() const
@@ -221,12 +221,12 @@ time_t queue_file::get_ctime() const
 	if (m_fp == NULL)
 	{
 		logger_error("m_fp null");
-		return ((time_t) -1);
+		return (time_t) -1;
 	}
 	else if (m_filePath.empty())
 	{
 		logger_error("m_filePath empty");
-		return ((time_t) -1);
+		return (time_t) -1;
 	}
 
 	struct acl_stat buf;
@@ -234,9 +234,9 @@ time_t queue_file::get_ctime() const
 	{
 		logger_error("stat file(%s) error(%s)",
 			m_filePath.c_str(), acl_last_serror());
-		return ((time_t) -1);
+		return (time_t) -1;
 	}
-	return (buf.st_ctime);
+	return buf.st_ctime;
 }
 
 bool queue_file::write(const void* data, size_t len)
@@ -244,21 +244,21 @@ bool queue_file::write(const void* data, size_t len)
 	if (data == NULL || len == 0 || len >= (unsigned int) -1)
 	{
 		logger_error("input invalid");
-		return (false);
+		return false;
 	}
 	if (m_fp == NULL)
 	{
 		logger_error("m_fp null");
-		return (false);
+		return false;
 	}
 	if (m_fp->write(data, len) != (int) len)
 	{
 		logger_error("write error");
-		return (false);
+		return false;
 	}
 
 	nwriten_ += len;
-	return (true);
+	return true;
 }
 
 int queue_file::format(const char* fmt, ...)
@@ -287,17 +287,17 @@ int queue_file::read(void* buf, size_t len)
 	if (buf == NULL || len == 0 || len >= (unsigned int) -1)
 	{
 		logger_error("input invalid");
-		return (-1);
+		return -1;
 	}
 	if (m_fp == NULL)
 	{
 		logger_error("m_fp null");
-		return (-1);
+		return -1;
 	}
 	int   ret;
 	if ((ret = m_fp->read(buf, len, false)) < 0)
-		return (-1);
-	return (ret);
+		return -1;
+	return ret;
 }
 
 bool queue_file::remove()
@@ -311,9 +311,9 @@ bool queue_file::remove()
 	{
 		logger_error("unlink %s error(%s)",
 			m_filePath.c_str(), acl_last_serror());
-		return (false);
+		return false;
 	}
-	return (true);
+	return true;
 }
 
 bool queue_file::move_file(const char* queueName, const char* extName)
@@ -342,7 +342,7 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 			logger_error("move from %s to %s error(%s), errno: %d, %d",
 				m_filePath.c_str(), buf.c_str(), acl_last_serror(),
 				acl_last_error(), ENOENT);
-			return (false);
+			return false;
 		}
 
 		// 设置重试标志位
@@ -363,7 +363,7 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 
 #ifdef WIN32
 	// win32 下需要重新再打开
-	return (open(m_home, queueName, m_queueSub, m_partName, extName));
+	return open(m_home, queueName, m_queueSub, m_partName, extName);
 #else
 	if (m_queueName != queueName)
 		ACL_SAFE_STRNCPY(m_queueName, queueName, sizeof(m_queueName));
@@ -373,7 +373,7 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 	m_filePath << m_home << PATH_SEP << m_queueName << PATH_SEP
 		<< m_queueSub << PATH_SEP << m_partName << "." << m_extName;
 #endif
-	return (true);
+	return true;
 }
 
 void queue_file::set_queueName(const char* queueName)
@@ -395,19 +395,19 @@ void queue_file::set_extName(const char* extName)
 bool queue_file::lock()
 {
 	if (m_bLockerOpened == false)
-		return (false);
-	if (m_locker.lock() == false)
-		return (false);
-	return (true);
+		return false;
+	if (m_locker.try_lock() == false)
+		return false;
+	return true;
 }
 
 bool queue_file::unlock()
 {
 	if (m_bLockerOpened == false)
-		return (false);
+		return false;
 	if (m_locker.unlock() == false)
-		return (false);
-	return (true);
+		return false;
+	return true;
 }
 
 } // namespace acl

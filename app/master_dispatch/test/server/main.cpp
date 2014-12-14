@@ -18,7 +18,15 @@ int main(int argc, char* argv[])
 	}
 
 	acl::url_coder coder;
-	coder.set("client_count", 0);
+	coder.set("count", 10);
+	coder.set("used", 0);
+	coder.set("pid", (int) getpid());
+	coder.set("max_threads", 10);
+	coder.set("curr_threads", 1);
+	coder.set("busy_threads", 0);
+	coder.set("qlen", 0);
+	coder.set("type", "default");
+
 	if (stream.format("%s\r\n", coder.to_string().c_str()) == -1)
 	{
 		printf("write %s to %s error\r\n", coder.to_string().c_str(),

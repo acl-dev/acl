@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 	{
 		const char* addr = "127.0.0.1:8888";
 		printf("listen on: %s\r\n", addr);
-		ms.run_alone(addr, NULL, acl::ENGINE_SELECT);  // 单独运行方式
+		ms.run_alone(addr, NULL, acl::ENGINE_KERNEL);  // 单独运行方式
 	}
 	else
 		ms.run_daemon(argc, argv);  // acl_master 控制模式运行

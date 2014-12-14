@@ -281,7 +281,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;VC2003;ACL_DLL"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;VC2003;ACL_DLL;ACL_CPP_DLL"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -342,6 +342,10 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath=".\main.cpp"
+				>
+			</File>
 			<File
 				RelativePath=".\http_servlet.cpp"
 				>
