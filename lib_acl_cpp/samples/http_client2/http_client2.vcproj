@@ -32,7 +32,6 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="polarssl.lib"
 				OutputFile="$(OutDir)/http_client2.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\win32;..\..\..\dist\lib\win32"

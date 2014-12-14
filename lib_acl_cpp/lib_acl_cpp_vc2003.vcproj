@@ -336,9 +336,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\stream\socket_stream.cpp">
 				</File>
 				<File
-					RelativePath=".\src\stream\ssl_aio_stream.cpp">
-				</File>
-				<File
 					RelativePath=".\src\stream\stream.cpp">
 				</File>
 			</Filter>
@@ -854,9 +851,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\socket_stream.hpp">
-				</File>
-				<File
-					RelativePath=".\include\acl_cpp\stream\ssl_aio_stream.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\stream.hpp">

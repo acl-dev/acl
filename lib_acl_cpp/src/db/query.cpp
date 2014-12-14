@@ -329,12 +329,15 @@ const char* query::to_date(time_t t, string& out,
 
 	if (fmt == NULL || *fmt == 0)
 		fmt = "%Y-%m-%d %H:%M:%S";
-
+	
+	
 	struct tm* local_ptr;
 
 #ifdef WIN32
 # ifdef __STDC_WANT_SECURE_LIB__
+
 	struct tm local;
+
 	if (localtime_s(&local, &t) != 0)
 	{
 		logger_error("localtime_s failed, t: %ld", (long) t);
@@ -350,6 +353,7 @@ const char* query::to_date(time_t t, string& out,
 	}
 # endif
 #else
+
 	struct tm local;
 
 	if ((local_ptr = localtime_r(&t, &local)) == NULL)
@@ -358,7 +362,7 @@ const char* query::to_date(time_t t, string& out,
 		return NULL;
 	}
 #endif
-	if (strftime(buf, sizeof(buf), fmt, &local) == 0)
+	if (strftime(buf, sizeof(buf), fmt, local_ptr) == 0)
 	{
 		logger_error("strftime failed, t: %ld, fmt: %s",
 			(long) t, fmt);

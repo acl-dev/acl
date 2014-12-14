@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include"
+				AdditionalIncludeDirectories="..\..\include;..\..\..\lib_acl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VC2003"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -32,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lib_acl_vc2003d.lib lib_protocol_vc2003d.lib polarssl.lib"
+				AdditionalDependencies="lib_acl_vc2003d.lib lib_protocol_vc2003d.lib"
 				OutputFile="$(OutDir)/cgi_upload.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\win32;..\..\..\dist\lib\win32"

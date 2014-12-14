@@ -96,7 +96,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2010d.lib;lib_acl_cpp_vc2010d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2010d.lib;lib_acl_cpp_vc2010d.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)mysql_query.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>

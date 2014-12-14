@@ -328,7 +328,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\stream\polarssl_io.cpp" />
     <ClCompile Include="src\stream\server_socket.cpp" />
     <ClCompile Include="src\stream\socket_stream.cpp" />
-    <ClCompile Include="src\stream\ssl_aio_stream.cpp" />
     <ClCompile Include="src\stream\stream.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -450,7 +449,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stream\polarssl_io.hpp" />
     <ClInclude Include="include\acl_cpp\stream\server_socket.hpp" />
     <ClInclude Include="include\acl_cpp\stream\socket_stream.hpp" />
-    <ClInclude Include="include\acl_cpp\stream\ssl_aio_stream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\stream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\stream_hook.hpp" />
     <ClInclude Include="resource_vc2012.h" />

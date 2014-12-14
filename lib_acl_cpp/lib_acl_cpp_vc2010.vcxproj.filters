@@ -190,9 +190,6 @@
     <ClCompile Include="src\stream\socket_stream.cpp">
       <Filter>src\stream</Filter>
     </ClCompile>
-    <ClCompile Include="src\stream\ssl_aio_stream.cpp">
-      <Filter>src\stream</Filter>
-    </ClCompile>
     <ClCompile Include="src\mime\internal\header_opts.cpp">
       <Filter>src\mime\internal</Filter>
     </ClCompile>
@@ -685,9 +682,6 @@
       <Filter>include\stream</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stream\socket_stream.hpp">
-      <Filter>include\stream</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\stream\ssl_aio_stream.hpp">
       <Filter>include\stream</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\lib_acl.hpp">

@@ -222,6 +222,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="polarssl.lib"
 				OutputFile="$(OutDir)/ssl_aio_client.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32"
@@ -345,12 +346,20 @@
 				RelativePath=".\main.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\ssl_aio_stream.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="头文件"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\ssl_aio_stream.hpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="资源文件"

@@ -4,7 +4,7 @@
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
-#include "acl_cpp/stream/ssl_aio_stream.hpp"
+#include "ssl_aio_stream.hpp"
 
 #ifdef WIN32
 # ifndef snprintf

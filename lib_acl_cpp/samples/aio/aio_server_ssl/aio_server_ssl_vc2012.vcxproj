@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{225D0BFA-64D7-4F8F-951E-36A494CF6178}</ProjectGuid>
+    <ProjectGuid>{A07145B7-36AE-4D6F-8536-30A8BE48529D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <ProjectName>aio_server_ssl</ProjectName>
   </PropertyGroup>
@@ -101,7 +101,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2012d.lib;lib_acl_cpp_vc2012d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2012d.lib;lib_acl_cpp_vc2012d.lib;polarssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)aio_server_ssl.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -123,9 +123,9 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2012.lib;lib_acl_cpp_vc2012.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2012.lib;lib_acl_cpp_vc2012.lib;polarssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)aio_server_ssl.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -149,9 +149,9 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_d.lib;lib_acl_cpp_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_d.lib;lib_acl_cpp_d.lib;polarssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)aio_server_ssl.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)aio_server_ssl.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -172,9 +172,9 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl.lib;lib_acl_cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl.lib;lib_acl_cpp.lib;polarssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)aio_server_ssl.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)aio_server_ssl.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>

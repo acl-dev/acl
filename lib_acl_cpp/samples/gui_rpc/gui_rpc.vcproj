@@ -36,7 +36,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/verbose:lib"
-				AdditionalDependencies="uxtheme.lib polarssl.lib lib_acl_d.lib lib_protocol_d.lib lib_acl_cpp_d.lib"
+				AdditionalDependencies="uxtheme.lib lib_acl_d.lib lib_protocol_d.lib lib_acl_cpp_d.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib\win32;..\..\..\dist\lib\win32"
 				IgnoreDefaultLibraryNames="libc"
