@@ -176,7 +176,7 @@ public:
 private:
 	bool  debugOn_;
 	bool  cache_enable_;
-	int   nfld_;
+	//int   nfld_;
 	int   ntoken_;
 	char* buf_ptr_;
 

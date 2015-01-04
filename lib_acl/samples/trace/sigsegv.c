@@ -57,7 +57,7 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr)
 	fprintf(stderr, "info.si_addr  = %p\n", info->si_addr);
 	for(i = 0; i < NGREG; i++)
 		fprintf(stderr, "reg[%02d]       = 0x" REGFORMAT "\n",
-			(int) i, ucontext->uc_mcontext.gregs[i]);
+			(int) i, (unsigned long) ucontext->uc_mcontext.gregs[i]);
 
 #if defined(SIGSEGV_STACK_X86) || defined(SIGSEGV_STACK_IA64)
 # if defined(SIGSEGV_STACK_IA64)

@@ -1,6 +1,7 @@
 #include "acl_stdafx.hpp"
 #include "../mime/internal/mime_state.hpp"
 #include "../mime/internal/header_opts.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/charset_conv.hpp"
@@ -151,7 +152,7 @@ http_mime::http_mime(const char* boundary,
 	boundary_ = acl_mystrdup(boundary);
 
 	if (local_charset && *local_charset)
-		snprintf(local_charset_, sizeof(local_charset_),
+		safe_snprintf(local_charset_, sizeof(local_charset_),
 			"%s", local_charset);
 	else
 		local_charset_[0] = 0;

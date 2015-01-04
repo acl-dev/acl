@@ -78,7 +78,11 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	/* windows xp 环境下，必须在关闭套接字之前调用此宏判断重叠 IO
 	 * 是否处于 STATUS_PENDING 状态
 	 */
-	is_completed = HasOverlappedIoCompleted(&fdp->event_read->overlapped);
+	if (fdp->event_read != NULL)
+		is_completed = HasOverlappedIoCompleted(
+			&fdp->event_read->overlapped);
+	else
+		is_completed = FALSE;
 
 	/* 必须在释放 fdp->event_read/fdp->event_write 前关闭套接口句柄 */
 	if (ACL_VSTREAM_SOCK(stream) != ACL_SOCKET_INVALID

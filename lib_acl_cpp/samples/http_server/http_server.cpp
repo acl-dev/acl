@@ -161,8 +161,8 @@ int main(int argc, char* argv[])
 	bool enable_stdout = false;
 	int  nthreads = 20;
 
-	snprintf(addr, sizeof(addr), "127.0.0.1:9001");
-	snprintf(rpc_addr, sizeof(rpc_addr), "127.0.0.1:0");
+	acl::safe_snprintf(addr, sizeof(addr), "127.0.0.1:9001");
+	acl::safe_snprintf(rpc_addr, sizeof(rpc_addr), "127.0.0.1:0");
 
 	while ((ch = getopt(argc, argv, "vkhpms:n:N:r:")) > 0)
 	{
@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
 			usage(argv[0]);
 			return 0;
 		case 's':
-			snprintf(addr, sizeof(addr), "%s", optarg);
+			acl::safe_snprintf(addr, sizeof(addr), "%s", optarg);
 			break;
 		case 'p':
 			preread = true;
@@ -197,7 +197,7 @@ int main(int argc, char* argv[])
 			enable_stdout = true;
 			break;
 		case 'r':
-			snprintf(rpc_addr, sizeof(rpc_addr), "%s", optarg);
+			acl::safe_snprintf(rpc_addr, sizeof(rpc_addr), "%s", optarg);
 			break;
 		default:
 			break;

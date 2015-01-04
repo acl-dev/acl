@@ -339,7 +339,7 @@ public:
 protected:
 private:
 	//char* domain_;  // HTTP 服务器域名
-	unsigned short port_;                 // HTTP 服务器端口
+	//unsigned short port_;                 // HTTP 服务器端口
 	char* url_;                           // HTTP 请求的 URL
 	std::list<HTTP_PARAM*> params_;       // 请求参数集合
 	std::list<HttpCookie*> cookies_;      // cookies 集合

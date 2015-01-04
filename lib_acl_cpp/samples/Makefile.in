@@ -1,10 +1,13 @@
-CC      = g++
+CC	= ${MY_ENV_CC}
+#CC      = g++
 
-CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
+CFLAGS = -c -g -W -Wall -Wcast-qual \
 -Wno-long-long \
 -Wpointer-arith -Werror -O3 \
+-Wno-invalid-source-encoding \
 -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO
 
+# -Wcast-align
 #-Waggregate-return
 ###########################################################
 #Check system:
@@ -16,7 +19,7 @@ UNIXNAME = $(OSNAME)
 RPATH =
 
 ifeq ($(CC),)
-        CC = gcc
+        CC = g++
 endif
 
 # For FreeBSD
@@ -70,23 +73,26 @@ ifneq ($(SYSPATH),)
 	CHECKSYSRES = @echo "System is $(shell uname -sm)"
 endif
 ###########################################################
-
+SRC =
 BASE_PATH =
+UTIL_PATH =
 ifneq ($(base_path),)
 	BASE_PATH = $(base_path)
+	UTIL_PATH = $(base_path)/samples
+	CFLAGS += -I$(base_path)/samples
+	SRC = $(wildcard $(UTIL_PATH)/*.cpp)
 else
 	BASE_PATH = ../..
 endif
 
-UTIL_PATH =
-ifneq ($(util_path),)
-	UTIL_PATH = $(util_path)
-else
-	UTIL_PATH = ..
-endif
+#ifneq ($(util_path),)
+#	UTIL_PATH = $(util_path)
+#else
+#	UTIL_PATH = ..
+#endif
 
 CFLAGS += -I. -I$(BASE_PATH)/include -I$(BASE_PATH)/../lib_acl/include -I$(BASE_PATH)/../lib_protocol/include
-EXTLIBS =
+#EXTLIBS =
 LDFLAGS = -L$(BASE_PATH)/lib -l_acl_cpp -L$(BASE_PATH)/../lib_protocol/lib -l_protocol -L$(BASE_PATH)/../lib_acl/lib -l_acl \
 	  -L$(BASE_PATH)/../lib/$(RPATH) $(EXTLIBS) $(SYSLIB) -rdynamic
 
@@ -97,7 +103,7 @@ OBJ_PATH = .
 
 #Project's objs
 #UTIL = $(wildcard $(UTIL_PATH)/*.cpp)
-SRC = $(wildcard *.cpp) $(UTIL)
+SRC += $(wildcard *.cpp)
 #SRC = $(wildcard *.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 

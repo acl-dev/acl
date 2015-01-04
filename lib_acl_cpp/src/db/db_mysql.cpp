@@ -472,7 +472,7 @@ bool db_mysql::tbl_exists(const char* tbl_name)
 
 	char sql[256];
 
-	snprintf(sql, sizeof(sql), "show tables like '%s'", tbl_name);
+	safe_snprintf(sql, sizeof(sql), "show tables like '%s'", tbl_name);
 	if (sane_mysql_query(sql) == false)
 		return false;
 	MYSQL_RES *my_res = __mysql_store_result(conn_);

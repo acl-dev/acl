@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/mime/mime_define.hpp"
 #include "acl_cpp/mime/mime_base64.hpp"
@@ -294,7 +295,7 @@ void mime_code::create_decode_tab(const unsigned char *toTab,
 		if (i++ % 16 == 0) {
 			out->append("\r\n");
 		}
-		snprintf(buf, sizeof(buf), "%d, ", *cp);
+		safe_snprintf(buf, sizeof(buf), "%d, ", *cp);
 		out->append((char*) buf);
 	}
 }

@@ -1,4 +1,5 @@
-UTIL = $(wildcard ../*.cpp)
+#UTIL = $(wildcard ../*.cpp)
+base_path = ../..
 PROG = thread_client
-include ../Makefile.in
 CFLAGS += -I../
+include ../Makefile.in

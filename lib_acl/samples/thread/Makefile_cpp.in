@@ -1,4 +1,5 @@
-CC      = g++
+CC = $(MY_ENV_CC)
+#CC = g++
 
 CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 -Waggregate-return -Wno-long-long \

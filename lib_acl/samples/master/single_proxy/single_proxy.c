@@ -343,12 +343,9 @@ static int __if_host_allow(const char *client_ip)
 	return (-1);
 }
 
-static void __pre_jail_init(char *unused_name, char **unused_argv)
+static void __pre_jail_init(char *name acl_unused, char **argv acl_unused)
 {
 	char  myname[] = "__pre_jail_init";
-
-	unused_name = unused_name;
-	unused_argv = unused_argv;
 
 	acl_msg_info("%s(%d)->%s: var_proxy_log_level=%d",
 			__FILE__, __LINE__, myname, var_proxy_log_level);
@@ -379,12 +376,9 @@ static void __pre_jail_init(char *unused_name, char **unused_argv)
 				__FILE__, __LINE__, myname);
 }
 
-static void __post_jail_init(char *unused_name, char **unused_argv)
+static void __post_jail_init(char *name acl_unused, char **argv acl_unused)
 {
 	char  myname[] = "__post_jail_init";
-
-	unused_name = unused_name;
-	unused_argv = unused_argv;
 
 	if (var_proxy_log_level > 3)
 		acl_msg_info("%s(%d)->%s: test only",

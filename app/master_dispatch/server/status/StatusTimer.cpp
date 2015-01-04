@@ -23,6 +23,6 @@ void StatusTimer::timer_callback(unsigned int)
 	ServerManager::get_instance().statusToJson(*buf);
 
 	// 发起一个 HTTP 请求过程，将之将由子线程处理
-	HttpClientRpc* rpc = new HttpClientRpc(buf, var_cfg_status_server);
+	HttpClientRpc* rpc = new HttpClientRpc(buf, var_cfg_status_servers);
 	rpc_manager::get_instance().fork(rpc);
 }

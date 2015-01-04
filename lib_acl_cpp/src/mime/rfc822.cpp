@@ -1,5 +1,6 @@
 #include "acl_stdafx.hpp"
 #include <string.h>
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/mime/rfc2047.hpp"
@@ -283,7 +284,7 @@ void rfc822::mkdate_gmt(time_t t, char *buf, size_t size)
 	p = gmtime_r(&t, &tm_buf);
 #endif
 
-	snprintf(buf, size, "%s, %02d %s %04d %02d:%02d:%02d (GMT)",
+	safe_snprintf(buf, size, "%s, %02d %s %04d %02d:%02d:%02d (GMT)",
 		wdays[p->tm_wday],
 		p->tm_mday,
 		months[p->tm_mon],

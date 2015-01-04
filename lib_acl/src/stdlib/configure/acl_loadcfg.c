@@ -256,7 +256,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 
 #undef	SKIP
 #define SKIP(var, cond) \
-        for (; *var && (cond); var++);
+        for (; *var && (cond); var++) {}
 
 	ptr = content_buf;
 	while (*ptr) {

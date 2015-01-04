@@ -43,12 +43,10 @@ int acl_pthread_rwlock_destroy(acl_pthread_rwlock_t *rwlock)
 }
 
 int acl_pthread_rwlock_init (acl_pthread_rwlock_t *rwlock,
-	const acl_pthread_rwlockattr_t *attr_unsed)
+	const acl_pthread_rwlockattr_t *attr acl_unused)
 {
 	acl_pthread_rwlock_t prwlock;
 	int   ret;
-
-	attr_unsed = attr_unsed;
 
 	/* allocate rwlock object */
 	prwlock = (acl_pthread_rwlock_t)

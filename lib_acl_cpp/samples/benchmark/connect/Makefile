@@ -1,2 +1,3 @@
-include ../Makefile.in
+base_path = ../../..
 PROG = connect
+include ../../Makefile.in

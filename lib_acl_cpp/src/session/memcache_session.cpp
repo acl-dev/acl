@@ -31,7 +31,8 @@ memcache_session::memcache_session(memcache* cache, bool auto_free /* = false */
 
 memcache_session::~memcache_session()
 {
-	delete cache_;
+	if (auto_free_)
+		delete cache_;
 }
 
 bool memcache_session::get_data(const char* sid, string& buf)

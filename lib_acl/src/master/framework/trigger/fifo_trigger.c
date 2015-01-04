@@ -30,15 +30,13 @@
 
 /* acl_fifo_trigger - wakeup fifo server */
 
-int acl_fifo_trigger(ACL_EVENT *eventp_unused, const char *service,
+int acl_fifo_trigger(ACL_EVENT *eventp_unused acl_unused, const char *service,
 	const char *buf, int len, int timeout)
 {
 	const char *myname = "acl_fifo_trigger";
 	static ACL_VSTRING *why;
 	ACL_VSTREAM *fp;
 	int     fd;
-
-	eventp_unused = eventp_unused;
 
 	if (why == 0)
 		why = acl_vstring_alloc(1);

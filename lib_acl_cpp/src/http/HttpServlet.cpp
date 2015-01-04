@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/session/memcache_session.hpp"
@@ -15,27 +16,43 @@ HttpServlet::HttpServlet(void)
 {
 	local_charset_[0] = 0;
 	rw_timeout_ = 60;
+	parse_body_enable_ = true;
+	parse_body_limit_ = 102400;
 }
 
 HttpServlet::~HttpServlet(void)
 {
 }
 
-void HttpServlet::setLocalCharset(const char* charset)
+HttpServlet& HttpServlet::setLocalCharset(const char* charset)
 {
 	if (charset && *charset)
-		snprintf(local_charset_, sizeof(local_charset_), "%s", charset);
+		safe_snprintf(local_charset_, sizeof(local_charset_),
+			"%s", charset);
 	else
 		local_charset_[0] =0;
+	return *this;
 }
 
-void HttpServlet::setRwTimeout(int rw_timeout)
+HttpServlet& HttpServlet::setRwTimeout(int rw_timeout)
 {
 	rw_timeout_ = rw_timeout;
+	return *this;
 }
 
-bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */,
-	bool body_parse /* = true */, int body_limit /* = 102400 */)
+HttpServlet& HttpServlet::setParseBody(bool on)
+{
+	parse_body_enable_ = on;
+	return *this;
+}
+
+HttpServlet& HttpServlet::setParseBodyLimit(int length)
+{
+	parse_body_limit_ = length;
+	return *this;
+}
+
+bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */)
 {
 	socket_stream* in;
 	socket_stream* out;
@@ -64,7 +81,7 @@ bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */,
 
 	HttpServletResponse res(*out);
 	HttpServletRequest req(res, session, *in, local_charset_,
-		body_parse, body_limit);
+		parse_body_enable_, parse_body_limit_);
 
 	if (rw_timeout_ >= 0)
 		req.setRwTimeout(rw_timeout_);
@@ -109,11 +126,10 @@ bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */,
 }
 
 bool HttpServlet::doRun(const char* memcached_addr /* = "127.0.0.1:11211" */,
-	socket_stream* stream /* = NULL */,
-	bool body_parse /* = true */, int body_limit /* = 102400 */)
+	socket_stream* stream /* = NULL */)
 {
 	memcache_session session(memcached_addr);
-	return doRun(session, stream, body_parse, body_limit);
+	return doRun(session, stream);
 }
 
 } // namespace acl

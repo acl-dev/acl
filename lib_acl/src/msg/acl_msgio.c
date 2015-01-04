@@ -585,11 +585,10 @@ static int close_callback(ACL_ASTREAM *astream, void *arg)
 	return (-1);
 }
 
-static int io_timeout_callback(ACL_ASTREAM *astream, void *arg)
+static int io_timeout_callback(ACL_ASTREAM *astream acl_unused, void *arg)
 {
 	MSGIO_CTX *ctx = (MSGIO_CTX *) arg;
 
-	astream = astream;
 	ctx->info.hdr.type = ACL_MSGIO_TIMEOUT;
 	ctx->info.hdr.dlen = 0;
 	if (message_dispatch(ctx) < 0)
@@ -713,11 +712,10 @@ ACL_MSGIO *acl_msgio_accept(ACL_MSGIO *listener)
 
 /* 连接超时回调函数 */
 
-static int connect_timeout_callback(ACL_ASTREAM *astream, void *arg)
+static int connect_timeout_callback(ACL_ASTREAM *astream acl_unused, void *arg)
 {
 	MSGIO_CTX *ctx = (MSGIO_CTX *) arg;
 
-	astream = astream;
 	ctx->info.hdr.type = ACL_MSGIO_CONNECT_TIMEOUT;
 	ctx->info.hdr.dlen = 0;
 	(void) message_dispatch(ctx);

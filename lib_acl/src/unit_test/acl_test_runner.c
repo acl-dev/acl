@@ -31,11 +31,9 @@ static ACL_ARRAY *__all_callback_fn = NULL;
 static int __fn_callback(int from, int to, int *stop);
 
 /*--------------------------------------------------------------------------*/
-static int __test_stop(AUT_LINE *test_line, void *arg_unused)
+static int __test_stop(AUT_LINE *test_line, void *arg acl_unused)
 {
 	const char *myname = "__test_stop";
-
-	arg_unused = arg_unused;
 
 	aut_log_info("%s(%d): Stop here, line=%d, cmd=%s",
 			myname, __LINE__,
@@ -46,13 +44,12 @@ static int __test_stop(AUT_LINE *test_line, void *arg_unused)
 }
 
 /* 内部睡眠命令函数 */
-static int __test_sleep(AUT_LINE *test_line, void *arg_unused)
+static int __test_sleep(AUT_LINE *test_line, void *arg acl_unused)
 {
 	const char *myname = "__test_sleep";
 	const char *ptr;
 	int   sleep_second;
 
-	arg_unused = arg_unused;
 	ptr = aut_line_getvalue(test_line, VAR_AUT_ITEM_COUNT);
 	if (ptr == NULL) {
 		aut_log_error("%s: can't get name=%s' value",
@@ -69,13 +66,10 @@ static int __test_sleep(AUT_LINE *test_line, void *arg_unused)
 }
 
 /* 内部暂停函数 */
-static int __test_pause(AUT_LINE *test_line_unused, void *arg_unused)
+static int __test_pause(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 {
 	const char *myname = "__test_pause";
 	int   i = 0;
-
-	test_line_unused = test_line_unused;
-	arg_unused = arg_unused;
 
 	aut_log_info("%s: PAUSE, exit when type Ctrl + c", myname);
 	while (1) {
@@ -87,12 +81,10 @@ static int __test_pause(AUT_LINE *test_line_unused, void *arg_unused)
 	return (0);
 }
 
-static int __test_loop_begin(AUT_LINE *test_line, void *arg_unused)
+static int __test_loop_begin(AUT_LINE *test_line, void *arg acl_unused)
 {
 	const char *myname = "__test_loop_begin";
 	int   count, i, from, to, ret, stop;
-
-	arg_unused = arg_unused;
 
 	count = aut_loop_count(test_line);
 	if (count < 0) {
@@ -123,13 +115,11 @@ static int __test_loop_begin(AUT_LINE *test_line, void *arg_unused)
 	return (to - from + 1);
 }
 
-static int __test_loop_break(AUT_LINE *test_line, void *arg_unused)
+static int __test_loop_break(AUT_LINE *test_line, void *arg acl_unused)
 {
 	const char *myname = "__test_loop_break";
 	const AUT_LINE *loop_end_line;
 	int   num_break, num_end; 
-
-	arg_unused = arg_unused;
 
 	loop_end_line = aut_lookup_from_line(test_line, AUT_FLAG_LOOP_END);
 	if (loop_end_line == NULL) {
@@ -155,44 +145,32 @@ static int __test_loop_break(AUT_LINE *test_line, void *arg_unused)
 	return (num_end - num_break + 1);
 }
 
-static int __test_loop_end(AUT_LINE *test_line_unused, void *arg_unused)
+static int __test_loop_end(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 {
-	test_line_unused = test_line_unused;
-	arg_unused = arg_unused;
-
 	return (1);
 }
 
 /* not complete yet */
-static int __test_if(AUT_LINE *test_line, void *arg_unused)
+static int __test_if(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 {
-	test_line = test_line;
-	arg_unused = arg_unused;
 	return (1);
 }
 
 /* not complete yet */
-static int __test_else(AUT_LINE *test_line, void *arg_unused)
+static int __test_else(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 {
-	test_line = test_line;
-	arg_unused = arg_unused;
 	return (1);
 }
 
 /* not complete yet */
-static int __test_endif(AUT_LINE *test_line, void *arg_unused)
+static int __test_endif(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 {
-	test_line = test_line;
-	arg_unused = arg_unused;
 	return (1);
 }
 
 /* not complete yet */
-static int __test_goto(AUT_LINE *test_line, void *arg_unused)
+static int __test_goto(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 {
-	test_line  = test_line;
-	arg_unused = arg_unused;
-
 	return (1);
 }
 

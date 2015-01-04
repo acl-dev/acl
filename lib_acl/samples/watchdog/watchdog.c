@@ -7,26 +7,22 @@
 
 #include "lib_util.h"
 
-static void __watchdog_fn(ACL_WATCHDOG *wp, char *arg)
+static void __watchdog_fn(ACL_WATCHDOG *wp acl_unused, char *arg)
 {
 	char  myname[] = "__watchdog_fn";
 	char *buf;
 
-	wp = wp;
 	buf = (char *) arg;
 	printf("%s: buf [%s]\n", myname, buf);
 	acl_watchdog_start(wp);
 }
 
-int     main(int unused_argc, char **unused_argv)
+int     main(int argc acl_unused, char **argv acl_unused)
 {
 	char      myname[] = "main";
 	ACL_WATCHDOG *wp;
 	ACL_VSTREAM  *vp;
 	char      buf[256] = "test before";
-
-	unused_argc = unused_argc;
-	unused_argv = unused_argv;
 
 	acl_msg_verbose = 2;
 

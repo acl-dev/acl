@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
@@ -252,7 +253,7 @@ private:
 	HTTP_IPC_DAT data_;
 	socket_stream client_;
 	ACL_VSTREAM* vstream_;
-	char  addr_[64];
+	//char  addr_[64];
 	HTTP_HDR_RES* hdr_res_;
 	HTTP_RES* res_;
 	bool respond_over_;
@@ -338,7 +339,7 @@ private:
 	http_status_t read_respond_hdr(void)
 	{
 		acl_assert(vstream_);
-		snprintf(data_.i_addr, sizeof(data_.i_addr),
+		safe_snprintf(data_.i_addr, sizeof(data_.i_addr),
 			"%s", ACL_VSTREAM_PEER(vstream_));
 		hdr_res_ = http_hdr_res_new();
 		int ret = http_hdr_res_get_sync(hdr_res_, vstream_, 60);
@@ -557,7 +558,7 @@ protected:
 		delete this;
 	}
 private:
-	HTTP_HDR_RES* hdr_res_;
+	//HTTP_HDR_RES* hdr_res_;
 };
 
 //////////////////////////////////////////////////////////////////////////

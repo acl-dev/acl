@@ -551,7 +551,7 @@ static char *get_buf(const char *pre, const char *fmt, va_list ap, size_t *len)
 		ptr = buf + n1;
 		n2 = n - n1;
 		ret = vsnprintf(ptr, n2, fmt, ap);
-		if (ret > 0 && ret <= (int) n2) {
+		if (ret > 0 && ret < (int) n2) {
 			*len = n1 + ret;
 			break;
 		}

@@ -302,7 +302,7 @@ protected:
 
 private:
 	char addr_[64];
-	bool keep_alive_;
+	//bool keep_alive_;
 	int  conn_timeout_;
 	int  rw_timeout_;
 	bool unzip_;

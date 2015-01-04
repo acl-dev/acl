@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/http/http_utils.hpp"
 
@@ -12,7 +13,7 @@ bool http_utils::get_addr(const char* url, char* addr, size_t size)
 
 	if (get_addr(url, buf, sizeof(buf), &port) == false)
 		return false;
-	snprintf(addr, size, "%s:%d", buf, port);
+	safe_snprintf(addr, size, "%s:%d", buf, port);
 	return true;
 }
 

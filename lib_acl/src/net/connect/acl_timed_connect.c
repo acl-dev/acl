@@ -21,7 +21,8 @@
 
 #endif
 
-int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr * sa, socklen_t len, int timeout)
+int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr * sa,
+	socklen_t len, int timeout)
 {
 	int   err;
 

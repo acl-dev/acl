@@ -74,9 +74,9 @@ static void master_sighup(int sig)
 
 #ifdef USE_SIG_RETURN
 
-static void master_sigchld(int sig, int code, struct sigcontext * scp)
+static void master_sigchld(int sig, int code acl_unused,
+	struct sigcontext * scp)
 {
-	code = code;
 	if (acl_msg_verbose)
 		acl_msg_info("%s(%d), USE_SIG_RETURN", __FILE__, __LINE__);
 
@@ -102,11 +102,9 @@ static void master_sigchld(int sig, int code, struct sigcontext * scp)
 
 /* master_sigchld - force wakeup from select() */
 
-static void master_sigchld(int unused_sig)
+static void master_sigchld(int sig acl_unused)
 {
 	int     saved_errno = errno;
-
-	unused_sig = unused_sig;
 
 	if (acl_msg_verbose)
 		acl_msg_info("%s(%d), USE_SIG_PIPE", __FILE__, __LINE__);

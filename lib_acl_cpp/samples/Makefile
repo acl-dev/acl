@@ -15,7 +15,7 @@ all:
 	@(cd socket_client; make)
 	@(cd http_client; make)
 #	@(cd http_client2; make)
-	@(cd final_class; make)
+#	@(cd final_class; make)
 	@(cd zlib; make)
 	@(cd http_servlet; make)
 	@(cd cgi; make)

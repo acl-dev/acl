@@ -1,5 +1,6 @@
 #include "acl_stdafx.hpp"
 #include <assert.h>
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/thread.hpp"
@@ -61,7 +62,7 @@ bool queue_file::create(const char* home, const char* queueName,
 		// 产生部分文件名
 		memset(&tv, 0, sizeof(tv));
 		gettimeofday(&tv, NULL);
-		snprintf(m_partName, sizeof(m_partName),
+		safe_snprintf(m_partName, sizeof(m_partName),
 			"%08x%08x%08x%08x%08x",
 			(unsigned int) getpid(),
 			(unsigned int) acl::thread::thread_self(),
@@ -73,7 +74,7 @@ bool queue_file::create(const char* home, const char* queueName,
 
 		// 计算队列子目录
 		n = queue_manager::hash_queueSub(m_partName, width);
-		snprintf(m_queueSub, sizeof(m_queueSub), "%u", n);
+		safe_snprintf(m_queueSub, sizeof(m_queueSub), "%u", n);
 
 		buf.clear();
 		buf << m_home << PATH_SEP << m_queueName << PATH_SEP << m_queueSub

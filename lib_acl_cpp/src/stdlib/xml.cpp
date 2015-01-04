@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/xml.hpp"
@@ -137,14 +138,14 @@ xml_node& xml_node::add_attr(const char* name, const char* value)
 xml_node& xml_node::add_attr(const char* name, char n)
 {
 	char buf[2];
-	snprintf(buf, sizeof(buf), "%c", n);
+	safe_snprintf(buf, sizeof(buf), "%c", n);
 	return add_attr(name, buf);
 }
 
 xml_node& xml_node::add_attr(const char* name, int n)
 {
 	char buf[32];
-	snprintf(buf, sizeof(buf), "%d", n);
+	safe_snprintf(buf, sizeof(buf), "%d", n);
 	return add_attr(name, buf);
 }
 
@@ -152,7 +153,7 @@ xml_node& xml_node::add_attr(const char* name, size_t n)
 {
 	char buf[32];
 
-	snprintf(buf, sizeof(buf), "%lu", (unsigned long) n);
+	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) n);
 	return add_attr(name, buf);
 }
 
@@ -160,9 +161,9 @@ xml_node& xml_node::add_attr(const char* name, acl_int64 n)
 {
 	char buf[32];
 #ifdef WIN32
-	snprintf(buf, sizeof(buf), "%I64d", n);
+	safe_snprintf(buf, sizeof(buf), "%I64d", n);
 #else
-	snprintf(buf, sizeof(buf), "%lld", n);
+	safe_snprintf(buf, sizeof(buf), "%lld", n);
 #endif
 	return add_attr(name, buf);
 }

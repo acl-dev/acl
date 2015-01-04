@@ -255,6 +255,7 @@ public:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
+		"	-l ip:port\r\n"
 		"	-L line_max_length\r\n"
 		"	-t timeout\r\n"
 		"	-k[use kernel event: epoll/iocp/kqueue/devpool]\r\n",
@@ -265,14 +266,18 @@ int main(int argc, char* argv[])
 {
 	bool use_kernel = false;
 	int  ch;
+	acl::string addr(":9001");
 
-	while ((ch = getopt(argc, argv, "hkL:t:")) > 0)
+	while ((ch = getopt(argc, argv, "l:hkL:t:")) > 0)
 	{
 		switch (ch)
 		{
 		case 'h':
 			usage(argv[0]);
 			return (0);
+		case 'l':
+			addr = optarg;
+			break;
 		case 'k':
 			use_kernel = true;
 			break;
@@ -292,15 +297,14 @@ int main(int argc, char* argv[])
 
 	// 创建监听异步流
 	aio_listen_stream* sstream = new aio_listen_stream(&handle);
-	const char* addr = "127.0.0.1:9001";
 
 	// 初始化ACL库(尤其是在WIN32下一定要调用此函数，在UNIX平台下可不调用)
 	acl::acl_cpp_init();
 
 	// 监听指定的地址
-	if (sstream->open(addr) == false)
+	if (sstream->open(addr.c_str()) == false)
 	{
-		std::cout << "open " << addr << " error!" << std::endl;
+		std::cout << "open " << addr.c_str() << " error!" << std::endl;
 		sstream->close();
 		// XXX: 为了保证能关闭监听流，应在此处再 check 一下
 		handle.check();
@@ -312,7 +316,7 @@ int main(int argc, char* argv[])
 	// 创建回调类对象，当有新连接到达时自动调用此类对象的回调过程
 	io_accept_callback callback;
 	sstream->add_accept_callback(&callback);
-	std::cout << "Listen: " << addr << " ok!" << std::endl;
+	std::cout << "Listen: " << addr.c_str() << " ok!" << std::endl;
 
 	while (true)
 	{

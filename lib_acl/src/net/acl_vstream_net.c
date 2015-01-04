@@ -40,8 +40,7 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 	ACL_VSTREAM *listen_stream;
 	int   len;
 
-	if (addr == 0 || *addr == 0 || qlen <= 0)
-	{
+	if (addr == 0 || *addr == 0 || qlen <= 0) {
 		acl_msg_error("%s: input invalid", myname);
 		return NULL;
 	}

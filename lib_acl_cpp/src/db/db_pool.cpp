@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/locker.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/db/db_handle.hpp"
@@ -37,7 +38,7 @@ void db_pool::set_id()
 	struct timeval tv;
 
 	(void) gettimeofday(&tv, NULL);
-	snprintf(id_, sizeof(id_), "%d.%d.%d",
+	safe_snprintf(id_, sizeof(id_), "%d.%d.%d",
 		(int) tv.tv_sec, (int) tv.tv_usec, rand());
 }
 
@@ -92,7 +93,7 @@ db_handle* db_pool::peek()
 	conn = create();
 
 	static int __id = 0;
-	snprintf(id_, sizeof(id_), "id: %d", __id++);
+	safe_snprintf(id_, sizeof(id_), "id: %d", __id++);
 	conn->set_id(id_);
 	conn->set_when(time(NULL));
 	return conn;

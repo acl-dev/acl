@@ -20,18 +20,37 @@ public:
 	virtual ~HttpServlet(void) = 0;
 
 	/**
-	 * 设置本地字符集，如果设置了本地字符集，则在接收 HTTP 请求
-	 * 数据时，会自动将请求的字符集转为本地字符集
+	 * 设置本地字符集，如果设置了本地字符集，则在接收 HTTP 请求数据时，会自动将请求的
+	 * 字符集转为本地字符集；该函数必须在 doRun 之前调用才有效
 	 * @param charset {const char*} 本地字符集，如果该指针为空，
 	 *  则清除本地字符集
+	 * @return {HttpServlet&}
 	 */
-	void setLocalCharset(const char* charset);
+	HttpServlet& setLocalCharset(const char* charset);
 
 	/**
-	 * 设置 HTTP 会话过程的 IO 读写超时时间
+	 * 设置 HTTP 会话过程的 IO 读写超时时间；该函数必须在 doRun 之前调用才有效
 	 * @param rw_timeout {int} 读写超时时间(秒)
+	 * @return {HttpServlet&}
 	 */
-	void setRwTimeout(int rw_timeout);
+	HttpServlet& setRwTimeout(int rw_timeout);
+
+	/**
+	 * 针对 POST 方法，该方法设置是否需要解析数据体数据，默认为解析，该函数必须在 doRun
+	 * 之前调用才有效；当数据体为数据流或 MIME 格式，即使调用本方法设置了解析数据，也不
+	 * 会对数据体进行解析
+	 * @param on {bool} 是否需要解析
+	 * @return {HttpServlet&}
+	 */
+	HttpServlet& setParseBody(bool on);
+
+	/**
+	 * 针对 POST 方法，该方法设置解析数据体的最大长度，如果数据体，该函数必须在 doRun
+	 * 之前调用才有效
+	 * @param length {int} 最大长度限制，如果请求的数据体长度过大，则直接返回 false
+	 * @return {HttpServlet&}
+	 */
+	HttpServlet& setParseBodyLimit(int length);
 
 	/**
 	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数
@@ -40,31 +59,19 @@ public:
 	 *  运行时，该参数必须非空；当在 apache 下以 CGI 方式运行时，该参数
 	 *  设为 NULL；另外，该函数内部不会关闭流连接，应用应自行处理流对象
 	 *  的关闭情况，这样可以方便与 acl_master 架构结合
-	 * @param body_parse {bool} 针对 POST 方法，该参数指定是否需要
-	 *  读取 HTTP 请求数据体并按 n/v 方式进行分析；当为 true 则内
-	 *  部会读取 HTTP 请求体数据，并进行分析，当用户调用 getParameter
-	 *  时，不仅可以获得 URL 中的参数，同时可以获得 POST 数据体中
-	 *  的参数；当该参数为 false 时则不读取数据体
-	 * @param body_limit {int} 针对 POST 方法，当数据体为文本参数
-	 *  类型时，此参数限制数据体的长度；当数据体为数据流或 MIME
-	 *  格式或 body_read 为 false，此参数无效
 	 * @return {bool} 返回处理结果
 	 */
-	bool doRun(session& session, socket_stream* stream = NULL,
-		bool body_parse = true, int body_limit = 102400);
+	bool doRun(session& session, socket_stream* stream = NULL);
 
 	/**
 	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数，
 	 * 调用本函数意味着采用 memcached 来存储 session 数据
 	 * @param memcached_addr {const char*} memcached 服务器地址，格式：IP:PORT
 	 * @param stream {socket_stream*} 含义同上
-	 * @param body_parse {bool} 含义同上
-	 * @param body_limit {int} 含义同上
 	 * @return {bool} 返回处理结果
 	 */
 	bool doRun(const char* memcached_addr = "127.0.0.1:11211",
-		socket_stream* stream = NULL,
-		bool body_parse = true, int body_limit = 102400);
+		socket_stream* stream = NULL);
 
 	/**
 	 * 当 HTTP 请求为 GET 方式时的虚函数
@@ -134,6 +141,8 @@ protected:
 private:
 	char local_charset_[32];
 	int  rw_timeout_;
+	bool parse_body_enable_;
+	int  parse_body_limit_;
 };
 
 } // namespace acl

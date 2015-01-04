@@ -1,6 +1,7 @@
 SHELL = /bin/sh
 #CC      = gcc
-CC      = g++
+CC = $(MY_ENV_CC)
+CC = g++
 AR      = ar
 ARFL    = rv
 RANLIB  = ranlib

@@ -206,6 +206,17 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\aliyun\oss\internal\CORSOperation.cpp" />
+    <ClCompile Include="src\aliyun\oss\internal\OSSBucketOperation.cpp" />
+    <ClCompile Include="src\aliyun\oss\internal\OSSMultipartOperation.cpp" />
+    <ClCompile Include="src\aliyun\oss\internal\OSSObjectOperation.cpp" />
+    <ClCompile Include="src\aliyun\oss\model\Bucket.cpp" />
+    <ClCompile Include="src\aliyun\oss\model\CopyObjectResult.cpp" />
+    <ClCompile Include="src\aliyun\oss\model\GetObjectRequest.cpp" />
+    <ClCompile Include="src\aliyun\oss\model\OptionsRequest.cpp" />
+    <ClCompile Include="src\aliyun\oss\model\OSSObject.cpp" />
+    <ClCompile Include="src\aliyun\oss\model\ResponseHeaderOverrides.cpp" />
+    <ClCompile Include="src\aliyun\oss\OSSClient.cpp" />
     <ClCompile Include="src\beanstalk\beanstalk.cpp" />
     <ClCompile Include="src\beanstalk\beanstalk_pool.cpp" />
     <ClCompile Include="src\connpool\connect_manager.cpp" />
@@ -291,6 +302,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\session\memcache_session.cpp" />
     <ClCompile Include="src\session\session.cpp" />
     <ClCompile Include="src\stdlib\charset_conv.cpp" />
+    <ClCompile Include="src\stdlib\dbuf_pool.cpp" />
     <ClCompile Include="src\stdlib\dns_service.cpp" />
     <ClCompile Include="src\stdlib\escape.cpp" />
     <ClCompile Include="src\stdlib\internal\win_iconv.cpp" />
@@ -334,6 +346,33 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\acl_cpp_define.hpp" />
     <ClInclude Include="include\acl_cpp\acl_cpp_init.hpp" />
     <ClInclude Include="include\acl_cpp\acl_cpp_test.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\AbortMultipartUploadRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\Bucket.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\CompleteMultipartUploadRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\CompleteMultipartUploadResult.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\CopyObjectRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\CopyObjectResult.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\CORSRule.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\CreateBucketRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\GetObjectRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\InitiateMultipartUploadRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\InitiateMultipartUploadResult.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\ListMultipartUploadsRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\ListObjectsRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\ListPartsRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\MultipartUploadListing.h" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\ObjectMetadata.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\OptionsRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\OSSObject.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\PartListing.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\PutObjectResult.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\ResponseHeaderOverrides.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\SetBucketCORSRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\UploadPartCopyRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\UploadPartCopyResult.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\UploadPartRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\model\UploadPartResult.hpp" />
+    <ClInclude Include="include\acl_cpp\aliyun\oss\OSSClient.hpp" />
     <ClInclude Include="include\acl_cpp\beanstalk\beanstalk.hpp" />
     <ClInclude Include="include\acl_cpp\beanstalk\beanstalk_pool.hpp" />
     <ClInclude Include="include\acl_cpp\connpool\connect_client.hpp" />
@@ -410,6 +449,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\session\memcache_session.hpp" />
     <ClInclude Include="include\acl_cpp\session\session.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\charset_conv.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\dbuf_pool.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\dns_service.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\escape.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\final_tpl.hpp" />
@@ -453,6 +493,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stream\stream_hook.hpp" />
     <ClInclude Include="resource_vc2012.h" />
     <ClInclude Include="src\acl_stdafx.hpp" />
+    <ClInclude Include="src\aliyun\oss\internal\CORSOperation.hpp" />
+    <ClInclude Include="src\aliyun\oss\internal\OSSBucketOperation.hpp" />
+    <ClInclude Include="src\aliyun\oss\internal\OSSMultipartOperation.hpp" />
+    <ClInclude Include="src\aliyun\oss\internal\OSSObjectOperation.hpp" />
+    <ClInclude Include="src\aliyun\oss\model\oss_macro.hpp" />
+    <ClInclude Include="src\aliyun\oss\OSSConstants.hpp" />
     <ClInclude Include="src\mime\internal\header_opts.hpp" />
     <ClInclude Include="src\mime\internal\header_token.hpp" />
     <ClInclude Include="src\mime\internal\is_header.hpp" />

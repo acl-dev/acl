@@ -163,7 +163,7 @@ private:
 #endif
 	char* addr_;
 	std::list<int> messages_;
-	aio_handle* handle_;
+	//aio_handle* handle_;
 	aio_socket_stream* async_stream_;
 	socket_stream* sync_stream_;
 	socket_stream* sync_stream_inner_;

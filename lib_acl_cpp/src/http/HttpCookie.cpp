@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/http/HttpCookie.hpp"
 
@@ -154,7 +155,7 @@ HttpCookie& HttpCookie::setExpires(const char* expires)
 HttpCookie& HttpCookie::setMaxAge(int max_age)
 {
 	char tmp[20];
-	snprintf(tmp, sizeof(tmp), "%d", max_age);
+	safe_snprintf(tmp, sizeof(tmp), "%d", max_age);
 	add("Max-Age", tmp);
 	return *this;
 }

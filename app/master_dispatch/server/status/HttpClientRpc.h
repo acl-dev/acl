@@ -3,7 +3,7 @@
 class HttpClientRpc : public acl::rpc_request
 {
 public:
-	HttpClientRpc(acl::string* buf, const char* server_addr);
+	HttpClientRpc(acl::string* buf, const char* server_addrs);
 
 protected:
 	// 实现基类虚函数
@@ -16,7 +16,7 @@ protected:
 
 private:
 	acl::string* buf_;
-	acl::string  server_addr_;
+	acl::string  server_addrs_;
 
 	~HttpClientRpc();
 };

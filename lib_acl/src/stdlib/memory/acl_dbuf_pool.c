@@ -22,10 +22,10 @@ typedef struct ACL_DBUF {
 
 struct ACL_DBUF_POOL {
         ACL_DBUF *head;
-        int block_size;
+        size_t block_size;
 };
 
-ACL_DBUF_POOL *acl_dbuf_pool_create(int block_size)
+ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size)
 {
 #ifdef	USE_VALLOC
 	ACL_DBUF_POOL *pool = (ACL_DBUF_POOL*) valloc(sizeof(ACL_DBUF_POOL));
@@ -34,7 +34,8 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(int block_size)
 	ACL_DBUF_POOL *pool = (ACL_DBUF_POOL*) acl_mycalloc(1,
 			sizeof(ACL_DBUF_POOL));
 #endif
-	int   size, page_size;
+	size_t size;
+	int    page_size;
 
 #ifdef ACL_UNIX
 	page_size = getpagesize();
@@ -50,7 +51,7 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(int block_size)
 	page_size = 4096;
 #endif
 
-	size = (block_size / page_size) * page_size;
+	size = (block_size / (size_t) page_size) * (size_t) page_size;
 	if (size == 0)
 		size = page_size;
 
@@ -83,7 +84,7 @@ void acl_dbuf_pool_destroy(ACL_DBUF_POOL *pool)
 #endif
 }
 
-static ACL_DBUF *acl_dbuf_alloc(ACL_DBUF_POOL *pool, int length)
+static ACL_DBUF *acl_dbuf_alloc(ACL_DBUF_POOL *pool, size_t length)
 {
 #ifdef	USE_VALLOC
 	ACL_DBUF *dbuf = (ACL_DBUF*) valloc(sizeof(ACL_DBUF));
@@ -122,7 +123,7 @@ static int acl_dbuf_free(ACL_DBUF *dbuf)
 	return 1;
 }
 
-void acl_dbuf_pool_free(ACL_DBUF_POOL *pool, void *ptr, int length)
+void acl_dbuf_pool_free(ACL_DBUF_POOL *pool, void *ptr, size_t length)
 {
 	ACL_DBUF *dbuf, *next;
 
@@ -143,7 +144,7 @@ void acl_dbuf_pool_free(ACL_DBUF_POOL *pool, void *ptr, int length)
 	}
 }
 
-void *acl_dbuf_pool_alloc(ACL_DBUF_POOL *pool, int length)
+void *acl_dbuf_pool_alloc(ACL_DBUF_POOL *pool, size_t length)
 {
 	void *ptr;
 	ACL_DBUF *dbuf;
@@ -165,7 +166,7 @@ void *acl_dbuf_pool_alloc(ACL_DBUF_POOL *pool, int length)
 	return ptr;
 }
 
-void *acl_dbuf_pool_calloc(ACL_DBUF_POOL *pool, int length)
+void *acl_dbuf_pool_calloc(ACL_DBUF_POOL *pool, size_t length)
 {
 	void *ptr;
 

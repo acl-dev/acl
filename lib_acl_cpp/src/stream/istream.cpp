@@ -24,12 +24,21 @@ bool istream::readtags(void *buf, size_t* size, const char *tag, size_t taglen)
 {
 	int   ret = acl_vstream_readtags(stream_, buf, *size, tag, taglen);
 	if (ret == ACL_VSTREAM_EOF)
+	{
+		*size = 0;
 		eof_ = true;
+	}
 
 	if ((stream_->flag & ACL_VSTREAM_FLAG_TAGYES))
+	{
+		*size = ret;
 		return true;
+	}
 	else
+	{
+		*size = ret;
 		return false;
+	}
 }
 
 bool istream::gets(void* buf, size_t* size, bool nonl /* = true */)

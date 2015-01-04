@@ -61,13 +61,11 @@ static char *__data_buf;
 static ACL_VSTREAM *__request_stream;
 static ACL_VSTREAM *__respond_stream;
 
-static void __pre_disconnect_fn(ACL_VSTREAM *stream, char *unused_name, char **unused_argv)
+static void __pre_disconnect_fn(ACL_VSTREAM *stream,
+	char *name acl_unused, char **argv acl_unused)
 {
 	char  myname[] = "__pre_disconnect_fn";
 	VSTREAM_PROXY_OBJ *vpobj, *peer;
-
-	unused_name = unused_name;
-	unused_argv = unused_argv;
 
 	if (stream == NULL) {
 		acl_msg_error("%s(%d)->%s: stream null",
@@ -207,25 +205,19 @@ static int __on_accept_fn(ACL_VSTREAM *front_stream)
 	return (0);
 }
 
-static void __pre_jail_init_fn(char *unused_name, char **unused_argv)
+static void __pre_jail_init_fn(char *name acl_unused, char **argv acl_unused)
 {
 	char  myname[] = "__pre_jail_init_fn";
-
-	unused_name = unused_name;
-	unused_argv = unused_argv;
 
 	if (acl_msg_verbose)
 		acl_msg_info("%s(%d)->%s: test only",
 				__FILE__, __LINE__, myname);
 }
 
-static void __post_jail_init_fn(char *unused_name, char **unused_argv)
+static void __post_jail_init_fn(char *name acl_unused, char **argv acl_unused)
 {
 	char  myname[] = "__post_jail_init_fn";
 	ACL_VSTRING *why = acl_vstring_alloc(100);
-
-	unused_name = unused_name;
-	unused_argv = unused_argv;
 
 	if (acl_msg_verbose)
 		acl_msg_info("%s(%d)->%s: test only",

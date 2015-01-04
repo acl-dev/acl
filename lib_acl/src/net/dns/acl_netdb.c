@@ -185,7 +185,8 @@ static const ACL_HOST_INFO *netdb_iter_prev(ACL_ITER *iter, struct ACL_DNS_DB *d
 	return ((const ACL_HOST_INFO*) dns_db->h_db->iter_prev(iter, dns_db->h_db));
 }
 
-static const ACL_HOST_INFO *netdb_iter_info(ACL_ITER *iter, struct ACL_DNS_DB *dns_db acl_unused)
+static const ACL_HOST_INFO *netdb_iter_info(ACL_ITER *iter,
+	struct ACL_DNS_DB *dns_db acl_unused)
 {
 	return (iter->ptr ? (ACL_HOST_INFO*) iter->ptr : NULL);
 }

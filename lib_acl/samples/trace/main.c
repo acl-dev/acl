@@ -12,7 +12,7 @@ static void stack3(void)
 	char **s;
 	char *m = NULL;
 
-	acl_dump_trace(file);
+	acl_trace_save(file);
 
 	n = backtrace(buf, 10);
 	s = backtrace_symbols(buf, n);

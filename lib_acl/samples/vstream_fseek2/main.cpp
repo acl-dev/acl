@@ -223,11 +223,8 @@ static void test_fseek(int buflen)
 	acl_vstream_close(fp);
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
-	argc = argc;
-	argv = argv;
-
 	test_fseek(4);
 	printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 	test_fseek2(4);

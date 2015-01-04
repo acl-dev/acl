@@ -7,13 +7,14 @@ ARFL    = rv
 #ARFL    = cru
 RANLIB  = ranlib
 
-CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
+CFLAGS = -c -g -W -Wall -Wcast-qual \
 -Waggregate-return -Wmissing-prototypes \
 -Wpointer-arith -Werror -Wshadow -O3 \
 -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO \
 -Wno-long-long \
 -fPIC
 
+# -Wcast-align
 #CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 #-Waggregate-return -Wmissing-prototypes \
 #-Wpointer-arith -Werror -Wshadow -O2 \

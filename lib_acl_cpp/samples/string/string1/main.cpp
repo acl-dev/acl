@@ -1,6 +1,7 @@
 #include "lib_acl.h"
 #include "acl_cpp/stream/ofstream.hpp"
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include <stdio.h>
 #include <string>
 
@@ -363,9 +364,19 @@ static void test_main(void)
 	test3();
 }
 
+static void test31(void)
+{
+	char buf[1];
+	const char* s = "01234567890123456789";
+	int ret = acl::safe_snprintf(buf, sizeof(buf), "%s", s);
+	printf(">>ret: %d, buf: %s, len: %d\r\n", ret, buf, (int) strlen(buf));
+}
+
 int main(void)
 {
 	//acl_mem_slice_init(8, 1024, 1000000, ACL_SLICE_FLAG_GC2 | ACL_SLICE_FLAG_RTGC_OFF);
+	test31();
+	getchar();
 
 	acl::string buf;
 	const char* sss = "hello world!";

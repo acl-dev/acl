@@ -64,7 +64,7 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-LIB_BASE_PATH = ../../lib_acl
+LIB_BASE_PATH = ../..
 LIB_NAME_PATH = -L$(LIB_BASE_PATH)/lib
 LIB_INCL_PATH = $(LIB_BASE_PATH)/include
 

@@ -21,7 +21,7 @@ const char *acl_split_nameval(char *buf, char **name, char **value)
 	 * Ugly macros to make complex expressions less unreadable.
 	 */
 #define SKIP(start, var, cond) \
-	for (var = start; *var && (cond); var++);
+	for (var = start; *var && (cond); var++) {}
 
 #define TRIM(s) { \
 	char *p; \

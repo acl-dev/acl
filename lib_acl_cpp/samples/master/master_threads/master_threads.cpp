@@ -48,6 +48,7 @@ public:
 	, count_(0)
 	, stream_(stream)
 	{
+		(void) stream_;
 	}
 
 	void set_max(int max)

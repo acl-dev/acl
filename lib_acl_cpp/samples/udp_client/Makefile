@@ -1,4 +1,5 @@
-UTIL = $(wildcard ../*.cpp)
+#UTIL = $(wildcard ../*.cpp)
 PROG = udp_client
-include ../Makefile.in
+base_path = ../..
 CFLAGS += -I../
+include ../Makefile.in

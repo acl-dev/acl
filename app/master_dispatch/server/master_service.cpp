@@ -6,22 +6,28 @@
 #include "server/ServerConnection.h"
 #include "server/ServerTimer.h"
 #include "rpc_manager.h"
+#include "allow_list.h"
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // 配置内容项
 
 char *var_cfg_backend_service;
-char *var_cfg_status_server;
+char *var_cfg_status_servers;
 char *var_cfg_status_service;
 char *var_cfg_session_addr;  // memcache 服务器地址，以备将来使用
 char *var_cfg_rpc_addr;
+char *var_cfg_manager_allow;
+char *var_cfg_service_name;
 acl::master_str_tbl var_conf_str_tab[] = {
 	{ "backend_service", "dispatch.sock", &var_cfg_backend_service },
-	{ "status_server", "", &var_cfg_status_server },
+	{ "status_servers", "", &var_cfg_status_servers },
 	{ "status_service", "1080", &var_cfg_status_service },
 	{ "session_addr", "127.0.0.1:11211", &var_cfg_session_addr },
 	{ "rpc_addr", "127.0.0.1:0", &var_cfg_rpc_addr },
+	{ "manager_allow", "127.0.0.1:127.0.0.1, 192.168.0.0:192.168.255.255",
+		&var_cfg_manager_allow },
+	{ "service_name", "dispatch_service", &var_cfg_service_name },
 
 	{ 0, 0, 0 }
 };
@@ -52,7 +58,7 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 };
 
 // 本机 IP 地址，优先采用内网 IP
-acl::string var_cfg_local_ip;
+acl::string var_cfg_local_addr;
 ;
 //////////////////////////////////////////////////////////////////////////////
 
@@ -86,6 +92,18 @@ bool master_service::on_accept(acl::aio_socket_stream* client)
 	else if (acl_strrncasecmp(local, var_cfg_status_service,
 		strlen(var_cfg_status_service)) == 0)
 	{
+		const char* ip = client->get_peer();
+		if (ip == NULL || *ip == 0)
+		{
+			logger_error("can't get peer ip");
+			return false;
+		}
+		if (allow_list::get_instance().allow_manager(ip) == false)
+		{
+			logger_warn("deny manager ip: %s", ip);
+			return false;
+		}
+
 		// 创建服务对象处理状态汇报的请求
 		IConnection* conn = new StatusConnection(client);
 
@@ -116,7 +134,7 @@ static void get_local_ip()
 
 	if (ifconf == NULL)
 	{
-		var_cfg_local_ip = "127.0.0.1";
+		var_cfg_local_addr = "127.0.0.1";
 		return;
 	}
 
@@ -133,9 +151,11 @@ static void get_local_ip()
 	}
 
 	if (ip)
-		var_cfg_local_ip = ip;
+		var_cfg_local_addr = ip;
 	else
-		var_cfg_local_ip = "127.0.0.1";
+		var_cfg_local_addr = "127.0.0.1";
+
+	var_cfg_local_addr << ":" << var_cfg_service_name;
 
 	/* 释放查询结果 */
 	acl_free_ifaddrs(ifconf);
@@ -144,6 +164,10 @@ static void get_local_ip()
 void master_service::proc_on_init()
 {
 	get_local_ip();
+
+	if (var_cfg_manager_allow && *var_cfg_manager_allow)
+		allow_list::get_instance()
+			.set_allow_manager(var_cfg_manager_allow);
 
 	if (var_cfg_manage_timer <= 0)
 		var_cfg_manage_timer = 1;
@@ -158,7 +182,7 @@ void master_service::proc_on_init()
 
 	// 如果配置了状态服务器，则启动状态汇报定时器，定时向状态服务器
 	// 汇报进程状态
-	if (var_cfg_status_server && *var_cfg_status_server
+	if (var_cfg_status_servers && *var_cfg_status_servers
 		&& var_cfg_status_timer > 0)
 	{
 		// 启动服务器状态汇报定时器

@@ -384,14 +384,12 @@ unsigned acl_hash_bin(const void *key, size_t len)
 	return (h);
 }
 
-unsigned acl_hash_test(const void *key, size_t len)
+unsigned acl_hash_test(const void *key, size_t len acl_unused)
 {
 	unsigned long result = 0;
 	const unsigned char *ptr = (const unsigned char *)key;
 	int   c = 0;
 	int   i = 0;
-
-	len = len;
 
 	for (i = 1; (c = *ptr++) != 0; i++)
 		result += c * 3 * i;

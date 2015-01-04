@@ -8,7 +8,7 @@ service master_dispatch {
 #	for master_type = unix
 #	master_service = aio_echo.sock
 #	for master_type = sock
-	master_service = 10080, dispatch.sock, 1080
+	master_service = dispatch.sock, 1080
 
 #	服务监听为域套接口
 #	master_service = aio_echo.sock
@@ -97,19 +97,18 @@ service master_dispatch {
 
 #	后端子进程连接此服务地址获得客户端连接句柄, 该地址为 master_service 中的一个域套接口
 	backend_service = dispatch.sock
-#	监听的状态服务的端口
-	status_service = 1080
 #	该定时器用来管理未被处理的客户端连接(秒)
 	manager_timer = 1
 #	客户端连接未被后端子进程接收的超时时间(秒)
 	conn_expired = 10
-#	接收状态汇报的服务器地址
-#	status_server = 127.0.0.1:8088
-	status_server =
+#	接收状态汇报的多个管理服务器地址，格式：ip:port; ip:port ...
+	status_servers = 127.0.0.1:10081
 #	定时向接收服务器汇报状态的定时器时间间隔(秒)
 	status_timer = 2
 #	接收状态请求的本地服务
 	status_service = 1080
 #	定时统计服务器状态的定时器时间间隔(秒)
 	server_timer = 1
+#	本派发器所代理的服务名称
+	service_name = test_service
 }

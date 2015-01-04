@@ -404,7 +404,8 @@ TAG_AGAIN:
 		if (n > 0) {
 			stream->sys_offset += n;
 			stream->offset = stream->sys_offset;
-			stream->read_cnt = 0;  /* 防止缓冲区内的数据与实际不一致, 仅对文件IO有效 */
+			/* 防止缓冲区内的数据与实际不一致, 仅对文件IO有效 */
+			stream->read_cnt = 0;
 		}
 	} else
 		n = stream->write_fn(ACL_VSTREAM_SOCK(stream), vptr, dlen,

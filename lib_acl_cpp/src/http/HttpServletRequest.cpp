@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/istream.hpp"
@@ -42,7 +43,7 @@ HttpServletRequest::HttpServletRequest(HttpServletResponse& res, session& store,
 	else
 		cgi_mode_ = false;
 	if (local_charset && *local_charset)
-		snprintf(localCharset_, sizeof(localCharset_),
+		safe_snprintf(localCharset_, sizeof(localCharset_),
 			"%s", local_charset);
 	else
 		localCharset_[0] = 0;
@@ -295,7 +296,7 @@ const char* HttpServletRequest::getLocalAddr(void) const
 	const char* ptr = client_->get_stream().get_local();
 	if (*ptr == 0)
 		return NULL;
-	snprintf(const_cast<HttpServletRequest*>(this)->localAddr_,
+	safe_snprintf(const_cast<HttpServletRequest*>(this)->localAddr_,
 		sizeof(localAddr_), "%s", ptr);
 	char* p = (char*) strchr(localAddr_, ':');
 	if (p)
@@ -338,7 +339,7 @@ const char* HttpServletRequest::getRemoteAddr(void) const
 		logger_warn("get_peer return empty string");
 		return NULL;
 	}
-	snprintf(const_cast<HttpServletRequest*>(this)->remoteAddr_,
+	safe_snprintf(const_cast<HttpServletRequest*>(this)->remoteAddr_,
 		sizeof(remoteAddr_), "%s", ptr);
 	char* p = (char*) strchr(remoteAddr_, ':');
 	if (p)

@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/ostream.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
@@ -15,7 +16,7 @@ HttpServletResponse::HttpServletResponse(socket_stream& stream)
 	header_ = NEW http_header();
 	header_->set_request_mode(false);
 	charset_[0] = 0;
-	snprintf(content_type_, sizeof(content_type_), "text/html");
+	safe_snprintf(content_type_, sizeof(content_type_), "text/html");
 	head_sent_ = false;
 }
 
@@ -35,7 +36,7 @@ HttpServletResponse& HttpServletResponse::setRedirect(
 HttpServletResponse& HttpServletResponse::setCharacterEncoding(
 	const char* charset)
 {
-	snprintf(charset_, sizeof(charset_), "%s", charset);
+	safe_snprintf(charset_, sizeof(charset_), "%s", charset);
 	return *this;
 }
 
@@ -59,7 +60,7 @@ HttpServletResponse& HttpServletResponse::setChunkedTransferEncoding(bool on)
 
 HttpServletResponse& HttpServletResponse::setContentType(const char* value)
 {
-	snprintf(content_type_, sizeof(content_type_), "%s", value);
+	safe_snprintf(content_type_, sizeof(content_type_), "%s", value);
 	return *this;
 }
 
@@ -76,7 +77,7 @@ HttpServletResponse& HttpServletResponse::setHeader(
 	const char* name, int value)
 {
 	char buf[32];
-	snprintf(buf, sizeof(buf), "%d", value);
+	safe_snprintf(buf, sizeof(buf), "%d", value);
 	header_->add_entry(name, buf);
 	return *this;
 }

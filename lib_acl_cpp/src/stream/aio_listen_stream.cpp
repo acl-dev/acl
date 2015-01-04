@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 #include "acl_cpp/stream/aio_listen_stream.hpp"
@@ -41,7 +42,7 @@ bool aio_listen_stream::open(const char* addr)
 	if (sstream == NULL)
 		return false;
 
-	snprintf(addr_, sizeof(addr_), "%s", ACL_VSTREAM_LOCAL(sstream));
+	safe_snprintf(addr_, sizeof(addr_), "%s", ACL_VSTREAM_LOCAL(sstream));
 
 	stream_ = acl_aio_open(handle_->get_handle(), sstream);
 

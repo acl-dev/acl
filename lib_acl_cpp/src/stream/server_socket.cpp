@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
@@ -22,7 +23,7 @@ server_socket::~server_socket()
 
 bool server_socket::open(const char* addr)
 {
-	snprintf(addr_, sizeof(addr_), "%s", addr);
+	safe_snprintf(addr_, sizeof(addr_), "%s", addr);
 
 #ifndef WIN32
 	if (strchr(addr, '/') != NULL)

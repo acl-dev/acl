@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/string.hpp"
@@ -406,42 +407,42 @@ http_header& http_header::add_param(const char* name, const char* value)
 http_header& http_header::add_int(const char* name, short value)
 {
 	char buf[32];
-	snprintf(buf, sizeof(buf), "%d", value);
+	safe_snprintf(buf, sizeof(buf), "%d", value);
 	return add_param(name, buf);
 }
 
 http_header& http_header::add_int(const char* name, unsigned short value)
 {
 	char buf[32];
-	snprintf(buf, sizeof(buf), "%u", value);
+	safe_snprintf(buf, sizeof(buf), "%u", value);
 	return add_param(name, buf);
 }
 
 http_header& http_header::add_int(const char* name, int value)
 {
 	char buf[32];
-	snprintf(buf, sizeof(buf), "%d", value);
+	safe_snprintf(buf, sizeof(buf), "%d", value);
 	return add_param(name, buf);
 }
 
 http_header& http_header::add_int(const char* name, unsigned int value)
 {
 	char buf[32];
-	snprintf(buf, sizeof(buf), "%u", value);
+	safe_snprintf(buf, sizeof(buf), "%u", value);
 	return add_param(name, buf);
 }
 
 http_header& http_header::add_int(const char* name, long value)
 {
 	char buf[32];
-	snprintf(buf, sizeof(buf), "%ld", value);
+	safe_snprintf(buf, sizeof(buf), "%ld", value);
 	return add_param(name, buf);
 }
 
 http_header& http_header::add_int(const char* name, unsigned long value)
 {
 	char buf[32];
-	snprintf(buf, sizeof(buf), "%lu", value);
+	safe_snprintf(buf, sizeof(buf), "%lu", value);
 	return add_param(name, buf);
 }
 
@@ -449,9 +450,9 @@ http_header& http_header::add_int(const char* name, acl_int64 value)
 {
 	char buf[32];
 #ifdef WIN32
-	snprintf(buf, sizeof(buf), "%I64d", value);
+	safe_snprintf(buf, sizeof(buf), "%I64d", value);
 #else
-	snprintf(buf, sizeof(buf), "%lld", value);
+	safe_snprintf(buf, sizeof(buf), "%lld", value);
 #endif
 	return add_param(name, buf);
 }
@@ -460,9 +461,9 @@ http_header& http_header::add_int(const char* name, acl_uint64 value)
 {
 	char buf[32];
 #ifdef WIN32
-	snprintf(buf, sizeof(buf), "%I64u", value);
+	safe_snprintf(buf, sizeof(buf), "%I64u", value);
 #else
-	snprintf(buf, sizeof(buf), "%llu", value);
+	safe_snprintf(buf, sizeof(buf), "%llu", value);
 #endif
 	return add_param(name, buf);
 }

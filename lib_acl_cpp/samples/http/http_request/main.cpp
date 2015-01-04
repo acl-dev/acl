@@ -1,3 +1,4 @@
+#include <getopt.h>
 #include "acl_cpp/lib_acl.hpp"
 
 static void usage(const char* procname)

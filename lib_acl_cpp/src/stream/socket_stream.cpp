@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 
@@ -201,7 +202,7 @@ bool socket_stream::set_local(const char* addr)
 
 const char* socket_stream::get_ip(const char* addr, char* buf, size_t size)
 {
-	snprintf(buf, size, "%s", addr);
+	safe_snprintf(buf, size, "%s", addr);
 	char* ptr = strchr(buf, ':');
 	if (ptr)
 		*ptr = 0;

@@ -45,7 +45,7 @@ private:
 	friend class aio_istream;
 
 	aio_istream* in_;
-	int   read_delayed_;
+	//int   read_delayed_;
 	bool  delay_gets_;
 	int   delay_timeout_;
 	bool  delay_nonl_;

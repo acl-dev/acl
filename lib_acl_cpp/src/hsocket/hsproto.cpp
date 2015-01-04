@@ -1,6 +1,7 @@
 #include "acl_stdafx.hpp"
 #include <string.h>
 #include <stdio.h>
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/escape.hpp"
@@ -46,7 +47,7 @@ bool hsproto::build_get(string& out, int id, const char* values[], int num,
 	char buf[32], *limit_offset = NULL;
 	if (nlimit > 1)
 	{
-		snprintf(buf, sizeof(buf), "%d\t%d", nlimit, noffset);
+		safe_snprintf(buf, sizeof(buf), "%d\t%d", nlimit, noffset);
 		limit_offset = buf;
 	}
 
@@ -90,7 +91,7 @@ bool hsproto::build_mod(string& out, int id, const char* values[], int num,
 		noffset = 0;
 	char buf[32], *limit_offset = NULL;
 
-	snprintf(buf, sizeof(buf), "%d\t%d", nlimit, noffset);
+	safe_snprintf(buf, sizeof(buf), "%d\t%d", nlimit, noffset);
 	build_request(out, id, cond, values,
 		num, limit_offset, 'U', to_values, to_num);
 	return (true);
@@ -107,7 +108,7 @@ bool hsproto::build_del(string& out, int id, const char* values[],
 	char buf[32], *limit_offset = NULL;
 	if (nlimit > 1)
 	{
-		snprintf(buf, sizeof(buf), "%d\t%d", nlimit, noffset);
+		safe_snprintf(buf, sizeof(buf), "%d\t%d", nlimit, noffset);
 		limit_offset = buf;
 	}
 
@@ -181,8 +182,8 @@ void hsproto::build_request(string& buf, int id, const char* oper,
 
 	buf.clear();
 
-	snprintf(idbuf, sizeof(idbuf), "%d", id);
-	snprintf(numbuf, sizeof(numbuf), "%d", num);
+	safe_snprintf(idbuf, sizeof(idbuf), "%d", id);
+	safe_snprintf(numbuf, sizeof(numbuf), "%d", num);
 	buf << idbuf << "\t" << oper << "\t" << numbuf;
 
 	int  i;

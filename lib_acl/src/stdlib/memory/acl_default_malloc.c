@@ -47,7 +47,7 @@ typedef struct MBLOCK {
 #define CHECK_PTR(_ptr_, _real_ptr_, _len_, _fname_, _line_) { \
 	if (_ptr_ == 0) \
 		acl_msg_fatal("%s(%d): null pointer input", _fname_, _line_); \
-	_real_ptr_ = (MBLOCK *) ((char *) _ptr_ - offsetof(MBLOCK, u.payload[0])); \
+	_real_ptr_ = (MBLOCK *) (((char *) _ptr_) - offsetof(MBLOCK, u.payload[0])); \
 	if (_real_ptr_->signature != SIGNATURE) \
 		acl_msg_fatal("%s(%d): corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
 			_fname_, _line_, (int) _real_ptr_->length, _real_ptr_->signature, SIGNATURE); \
@@ -58,7 +58,7 @@ typedef struct MBLOCK {
 #define CHECK_IN_PTR(_ptr_, _real_ptr_, _len_, _fname_, _line_) { \
 	if (_ptr_ == 0) \
 		acl_msg_fatal("%s(%d): null pointer input", _fname_, _line_); \
-	_real_ptr_ = (MBLOCK *) ((char *) _ptr_ - offsetof(MBLOCK, u.payload[0])); \
+	_real_ptr_ = (MBLOCK *) (((char *) _ptr_) - offsetof(MBLOCK, u.payload[0])); \
 	if (_real_ptr_->signature != SIGNATURE) \
 		acl_msg_fatal("%s(%d): corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
 			_fname_, _line_, (int) _real_ptr_->length, _real_ptr_->signature, SIGNATURE); \

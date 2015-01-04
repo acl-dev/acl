@@ -1,12 +1,13 @@
 SHELL = /bin/sh
-CC      = g++
+CC	= ${MY_ENV_CC}
+#CC      = g++
 AR      = ar
 ARFL    = rv
 #ARFL    = cru
 RANLIB  = ranlib
 
 #-Wcast-qual
-CFLAGS = -c -g -W -Wall -Wcast-align \
+CFLAGS = -c -g -W -Wall \
 -Wpointer-arith -Werror -Wshadow -O3 \
 -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS \
 -Wno-long-long \
@@ -14,7 +15,7 @@ CFLAGS = -c -g -W -Wall -Wcast-align \
 -Wformat \
 -DHAS_POLARSSL
 #-DUSE_DYNAMIC
-
+# -Wcast-align
 #just for freebsd's iconv.h
 CFLAGS += -I/usr/local/include
 

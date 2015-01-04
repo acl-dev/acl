@@ -350,7 +350,8 @@ void acl_msg_fatal_status(int status, const char *fmt,...)
 {
 	va_list ap;
 
-	status = status;
+	(void) status;
+
 	va_start (ap, fmt);
 
 	if (__log_open_flag) {
@@ -376,7 +377,8 @@ void acl_msg_fatal_status(int status, const char *fmt,...)
 
 void acl_msg_fatal_status2(int status, const char *fmt, va_list ap)
 {
-	status = status;
+	(void) status;
+
 	if (__log_open_flag) {
 		if (__write_fn != NULL)
 			__write_fn(__msg_ctx, fmt, ap);

@@ -106,7 +106,7 @@ static void thread_main(void* ctx)
 			__conn_pool->put(conn, true);
 		if (i % 1000 == 0)
 		{
-			snprintf(buf, sizeof(buf), "key: %s, action(%s) ok",
+			acl::safe_snprintf(buf, sizeof(buf), "key: %s, action(%s) ok",
 				keybuf.c_str(), __action.c_str());
 			ACL_METER_TIME(buf);
 		}

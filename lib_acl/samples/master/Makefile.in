@@ -1,5 +1,6 @@
 SHELL = /bin/sh
-CC      = gcc
+CC = $(MY_ENV_CC)
+#CC = gcc
 
 CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 -Waggregate-return -Wmissing-prototypes \
@@ -12,6 +13,10 @@ CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 SYSLIB =
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
+
+ifeq ($(CC),)
+	CC = gcc
+endif
 
 ifeq ($(findstring gcc, $(CC)), gcc)
 	CFLAGS += -Wstrict-prototypes

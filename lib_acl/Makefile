@@ -13,7 +13,7 @@ LIB_NAME  = lib_acl.a
 #-fno-strict-aliasing \
 #CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align
 
-CFLAGS = -c -g -W -Wall -Wcast-align \
+CFLAGS = -c -g -W -Wall \
 -Wpointer-arith \
 -Werror \
 -Wshadow \
@@ -26,7 +26,10 @@ CFLAGS = -c -g -W -Wall -Wcast-align \
 -Wuninitialized \
 -D_POSIX_PTHREAD_SEMANTICS \
 -pedantic \
+-Wno-invalid-source-encoding \
+-Wno-extended-offsetof \
 -fPIC
+# -Wcast-align
 #-Winvalid-pch -DACL_PREPARE_COMPILE
 
 ###########################################################

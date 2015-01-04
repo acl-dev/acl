@@ -33,7 +33,11 @@ typedef enum
 	HTTP_METHOD_POST,       // POST 方法
 	HTTP_METHOD_PUT,        // PUT 方法
 	HTTP_METHOD_CONNECT,    // CONNECT 方法
-	HTTP_METHOD_PURGE       // PURGE 方法
+	HTTP_METHOD_PURGE,      // PURGE 方法
+	HTTP_METHOD_DELETE,     // DELETE 方法
+	HTTP_METHOD_HEAD,       // HEAD 方法
+	HTTP_METHOD_OPTION      // OPTION 方法
+
 } http_method_t;
 
 typedef enum

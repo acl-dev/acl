@@ -1,5 +1,4 @@
-UTIL = $(wildcard ../*.cpp)
-include ../Makefile.in
+#UTIL = $(wildcard ../*.cpp)
 #LDFLAGS += -lz -liconv
 #Path for SunOS
 ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
@@ -10,5 +9,7 @@ endif
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	EXTLIBS += -L/usr/local/lib -liconv
 endif
+base_path = ../..
 CFLAGS += -I../
 PROG = memcache_pool
+include ../Makefile.in

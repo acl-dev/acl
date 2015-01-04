@@ -48,7 +48,7 @@ private:
 	friend class aio_ostream;
 
 	aio_ostream* out_;
-	int   write_delayed_;
+	//int   write_delayed_;
 	acl::string buf_;
 };
 

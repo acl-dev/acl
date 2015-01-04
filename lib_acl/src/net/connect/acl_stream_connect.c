@@ -45,7 +45,7 @@ int acl_stream_connect(const char *path, int block_mode, int unused_timeout)
 #ifdef ACL_FREEBSD
 	path = path;
 	block_mode = block_mode;
-	unused_timeout = unused_timeout;
+	(void) unused_timeout;
 
 	acl_msg_fatal("%s(%d): not support!", myname, __LINE__);
 	return -1;
@@ -53,7 +53,7 @@ int acl_stream_connect(const char *path, int block_mode, int unused_timeout)
 	int     pair[2];
 	int     fifo;
 
-	unused_timeout = unused_timeout;
+	(void) unused_timeout;
 
 	/*
 	 * The requested file system object must exist, otherwise we can't reach

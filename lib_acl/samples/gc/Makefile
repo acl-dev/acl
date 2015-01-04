@@ -65,7 +65,7 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-ACL_PATH = ../../lib_acl
+ACL_PATH = ../..
 ACL_LIB = $(ACL_PATH)/lib
 ACL_INC = $(ACL_PATH)/include
 

@@ -26,9 +26,8 @@ static void default_write_fn(void *arg acl_unused, const char *fmt, ...)
 	va_end(ap);
 }
 
-static void default_fflush_fn(void *arg)
+static void default_fflush_fn(void *arg acl_unused)
 {
-	arg = arg;
 }
 
 static void (*__write_fn)(void *arg, const char *fmt, ...) = default_write_fn;
