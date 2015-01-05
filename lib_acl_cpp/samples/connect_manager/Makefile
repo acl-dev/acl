@@ -6,4 +6,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 else
 	LDFLAGS += -lz
 endif
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	EXTLIBS += -L/usr/lib -liconv
+endif
 PROG = connect_manager

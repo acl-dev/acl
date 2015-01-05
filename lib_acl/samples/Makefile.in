@@ -1,5 +1,4 @@
 CC = $(MY_ENV_CC)
-#CC = gcc
 
 CFLAGS = -c -g -W -Wall -Wcast-qual \
 -Waggregate-return -Wno-long-long -Wmissing-prototypes \
@@ -31,6 +30,12 @@ endif
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD -D_REENTRANT
 	SYSLIB += -lcrypt
+endif
+
+# For Darwin
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	CFLAGS += -DMACOSX -D_REENTRANT
+	UNIXTYPE = MACOSX
 endif
 
 #Path for Linux

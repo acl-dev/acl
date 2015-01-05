@@ -6,7 +6,6 @@ ARFL    = rv
 #ARFL    = cru
 RANLIB  = ranlib
 
-#-Wcast-qual
 CFLAGS = -c -g -W -Wall \
 -Wpointer-arith -Werror -Wshadow -O3 \
 -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS \
@@ -16,6 +15,7 @@ CFLAGS = -c -g -W -Wall \
 -DHAS_POLARSSL
 #-DUSE_DYNAMIC
 # -Wcast-align
+#-Wcast-qual
 #just for freebsd's iconv.h
 CFLAGS += -I/usr/local/include
 
@@ -33,18 +33,18 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	ifeq ($(findstring gcc, $(CC)), gcc)
-		CFLAGS += -Wstrict-prototypes
-	endif
 	CFLAGS += -DFREEBSD -D_REENTRANT
 	UNIXTYPE = FREEBSD
 endif
 
+# For Darwin
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	CFLAGS += -DMACOSX -D_REENTRANT
+	UNIXTYPE = MACOSX
+endif
+
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	ifeq ($CC, "gcc")
-		CFLAGS += -Wstrict-prototypes
-	endif
 	CFLAGS += -DLINUX2 -D_REENTRANT
 	UNIXTYPE = LINUX
 endif
@@ -57,19 +57,13 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
 		SYSLIB = -lsocket -lnsl -lrt
 	endif
-	ifeq ($CC, "gcc")
-		CFLAGS += -Wstrict-prototypes
-	endif
 	CFLAGS += -DSUNOS5 -D_REENTRANT
 	UNIXTYPE = SUNOS5
 endif
 
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
-	ifeq ($CC, "gcc")
-		CFLAGS += -Wstrict-prototypes
-	endif
-	CFLAGS += -DHP_UX -DHPUX11
+	CFLAGS += -DHP_UX -DHPUX11 -D_REENTRANT
 	UNIXTYPE = HPUX
 endif
 

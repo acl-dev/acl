@@ -38,6 +38,12 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD -D_REENTRANT -pedantic
 endif
 
+# For Darwin
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)                               
+	CFLAGS += -DMACOSX                                                     
+	UNIXTYPE = MACOSX                                                      
+endif 
+
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	ifeq ($CC, "gcc")

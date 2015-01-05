@@ -7,4 +7,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 else
 	EXTLIBS = -lz
 endif
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	EXTLIBS += -L/usr/lib -liconv
+endif
 PROG = master_http_threads2

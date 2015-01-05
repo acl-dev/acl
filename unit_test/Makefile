@@ -7,12 +7,20 @@ ARFL    = rv
 #ARFL    = cru
 RANLIB  = ranlib
 
-CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
--Waggregate-return -Wmissing-prototypes \
--Wpointer-arith -Werror -Wshadow -O2 \
--D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO \
--Wno-long-long
-
+CFLAGS = -c -g -W -Wall -Wcast-qual \
+-O2 \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
+-D_USE_FAST_MACRO \
+-Wpointer-arith \
+-Werror \
+-Wshadow \
+-Waggregate-return \
+-Wmissing-prototypes \
+-Wno-long-long \
+-Wno-invalid-source-encoding \
+-Wno-extended-offsetof
+# -Wcast-align
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
@@ -31,6 +39,12 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	endif
 	CFLAGS += -DFREEBSD -D_REENTRANT -pedantic
 	SYSLIB = -lcrypt -lpthread
+endif
+
+# For Darwin
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)                               
+	CFLAGS += -DMACOSX                                                     
+	UNIXTYPE = MACOSX                                                      
 endif
 
 #Path for Linux

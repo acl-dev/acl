@@ -4,13 +4,12 @@
 
 #include "unit_test.h"
 
-int test_unit_param(AUT_LINE *test_line, void *arg_unused)
+int test_unit_param(AUT_LINE *test_line, void *arg acl_unused)
 {
 	char  myname[] = "test_unit_param";
 	const char *account, *sender;
 	int   number;
 
-	arg_unused = arg_unused;
 	AUT_SET_STR(test_line, "account", account);
 	AUT_SET_STR(test_line, "sender", sender);
 	AUT_SET_INT(test_line, "number", number);
@@ -21,11 +20,9 @@ int test_unit_param(AUT_LINE *test_line, void *arg_unused)
 	return (0);
 }
 
-int test_unit_loop(AUT_LINE *test_line, void *arg_unused)
+int test_unit_loop(AUT_LINE *test_line, void *arg acl_unused)
 {
 	int   count, i;
-
-	arg_unused = arg_unused;
 
 	AUT_SET_INT(test_line, "count", count);
 	if (count <= 0)

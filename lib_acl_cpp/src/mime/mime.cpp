@@ -247,18 +247,21 @@ static bool save_as(ifstream& in, fstream& out, MIME_NODE* node)
 {
 	if (node->header_begin < 0 || node->header_end <= node->header_begin)
 	{
-		logger_warn("node invalid, header_begin(%d), "
-			"header_end(%d), body_begin(%d), body_end(%d)",
-			(int) node->header_begin, (int) node->header_end,
-			(int) node->body_begin, (int) node->body_end);
+		logger_warn("node invalid, header_begin(%ld), "
+			"header_end(%ld), body_begin(%ld), body_end(%ld)",
+			(long int) node->header_begin,
+			(long int) node->header_end,
+			(long int) node->body_begin,
+			(long int) node->body_end);
 		return (true);
 	}
 
 	ssize_t len = node->header_end - node->header_begin;
 	if (len <= 0)
 	{
-		logger_warn("header_begin(%d) >= header_end(%d)",
-			(int) node->header_begin, (int) node->header_end);
+		logger_warn("header_begin(%ld) >= header_end(%ld)",
+			(long int) node->header_begin,
+			(long int) node->header_end);
 		return (true);
 	}
 	if (save_as(in, out, node->header_begin, len) == false)
@@ -702,8 +705,8 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 	off_t pos = (off_t) in.fseek(node->header_begin, SEEK_SET);
 	pbuf = (char*) acl_mymalloc(dlen);
 	printf(">>>%s: header begin: %ld, end: %ld, len: %ld\n",
-		__FUNCTION__, node->header_begin,
-		node->header_end, (long int) dlen);
+		__FUNCTION__, (long int) node->header_begin,
+		(long int) node->header_end, (long int) dlen);
 
 	int   ret;
 	if ((ret = in.read(pbuf, dlen, true)) < 0) {
@@ -719,14 +722,15 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 
 	dlen = node->body_end - node->body_begin;
 	printf(">>>%s: body begin: %ld, end: %ld, len: %ld\r\n",
-		__FUNCTION__, node->body_begin, node->body_end, (long int) dlen);
+		__FUNCTION__, (long int) node->body_begin,
+		(long int) node->body_end, (long int) dlen);
 
 	out.format(">---------body begin(length: %d)----------<\r\n", (int) dlen);
 
 	if (dlen <= 0) {
-		printf(">>>%s: body_begin(%d) >= body_end(%d), len: %d\r\n",
-			__FUNCTION__, (int) node->body_begin,
-			(int) node->body_end, (int) dlen);
+		printf(">>>%s: body_begin(%ld) >= body_end(%ld), len: %d\r\n",
+			__FUNCTION__, (long int) node->body_begin,
+			(long int) node->body_end, (int) dlen);
 		out.close();
 		in.close();
 		return;

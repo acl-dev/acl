@@ -1,0 +1,1 @@
+./master_dispatch alone "/home/zsx/work/acl/trunk/app/master_dispatch/server/dispatch.sock, :10080"
