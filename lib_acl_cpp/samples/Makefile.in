@@ -1,10 +1,16 @@
 CC	= ${MY_ENV_CC}
 
-CFLAGS = -c -g -W -Wall -Wcast-qual \
+CFLAGS = -c -g -W \
+-O3 \
+-Wall \
+-Werror \
+-Wcast-qual \
+-Wshadow \
 -Wno-long-long \
--Wpointer-arith -Werror -O3 \
--Wno-invalid-source-encoding \
--D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO
+-Wpointer-arith \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
+-D_USE_FAST_MACRO
 
 # -Wcast-align
 #-Waggregate-return
@@ -23,28 +29,25 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD -D_REENTRANT -Wshadow
+	CFLAGS += -DFREEBSD
 	SYSLIB = -lcrypt -lpthread
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
-	CFLAGS += -DMACOSX -D_REENTRANT
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding -Wno-extended-offsetof
 	UNIXTYPE = MACOSX
 endif
 
 #Path for Linux
 ifeq ($(findstring Linux, $(OSNAME)), Linux)
-	ifeq ($CC, "gcc")
-		CFLAGS += -Wstrict-prototypes
-	endif
 	ifeq ($(findstring i686, $(OSNAME)), i686)
 		RPATH = linux32
 	endif
 	ifeq ($(findstring x86_64, $(OSNAME)), x86_64)
 		RPATH = linux64
 	endif
-	CFLAGS += -DLINUX2 -D_REENTRANT -Wshadow
+	CFLAGS += -DLINUX2
 endif
 
 #Path for SunOS
@@ -58,14 +61,11 @@ ifeq ($(findstring SunOS, $(OSNAME)), SunOS)
 	ifeq ($CC, "gcc")
 		CFLAGS += -Wstrict-prototypes
 	endif
-	CFLAGS += -DSUNOS5 -D_REENTRANT
+	CFLAGS += -DSUNOS5
 endif
 
 #Path for HP-UX
 ifeq ($(findstring HP-UX, $(OSNAME)), HP-UX)
-	ifeq ($CC, "gcc")
-		CFLAGS += -Wstrict-prototypes
-	endif
 	CFLAGS += -DHP_UX -DHPUX11 -Wshadow
 	PLAT_NAME=hp-ux
 endif

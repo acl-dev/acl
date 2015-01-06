@@ -1,9 +1,18 @@
 CC = $(MY_ENV_CC)
 
-CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
--Waggregate-return -Wno-long-long \
--Wpointer-arith -Werror -Wshadow -O2 \
--D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO
+CFLAGS = -c -g -W \
+-Wall \
+-Wcast-qual \
+-Wcast-align \
+-Waggregate-return \
+-Wno-long-long \
+-Wpointer-arith \
+-Werror \
+-Wshadow \
+-O2 \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
+-D_USE_FAST_MACRO
 
 ###########################################################
 #Check system:
@@ -22,19 +31,19 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD -D_REENTRANT -pedantic
+	CFLAGS += -DFREEBSD -pedantic
 	SYSLIB += -lcrypt
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
-	CFLAGS += -DMACOSX -D_REENTRANT
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding -Wno-extended-offsetof
 	UNIXTYPE = MACOSX
 endif
 
 #Path for Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	CFLAGS += -DLINUX2 -D_REENTRANT -pedantic
+	CFLAGS += -DLINUX2 -pedantic
 	SYSLIB += -lcrypt
 endif
 
@@ -46,7 +55,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
 		SYSLIB += -lsocket -lnsl -lrt
 	endif
-	CFLAGS += -DSUNOS5 -D_REENTRANT -pedantic
+	CFLAGS += -DSUNOS5 -pedantic
 	SYSLIB += -lcrypt
 endif
 

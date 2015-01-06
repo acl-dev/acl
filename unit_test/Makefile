@@ -7,19 +7,19 @@ ARFL    = rv
 #ARFL    = cru
 RANLIB  = ranlib
 
-CFLAGS = -c -g -W -Wall -Wcast-qual \
--O2 \
+CFLAGS = -c -g -W \
+-O3 \
+-Wall \
+-Werror \
+-Wshadow \
+-Wcast-qual \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \
 -D_USE_FAST_MACRO \
 -Wpointer-arith \
--Werror \
--Wshadow \
 -Waggregate-return \
 -Wmissing-prototypes \
--Wno-long-long \
--Wno-invalid-source-encoding \
--Wno-extended-offsetof
+-Wno-long-long
 # -Wcast-align
 ###########################################################
 #Check system:
@@ -32,27 +32,25 @@ ifeq ($(CC),)
         CC = gcc
 endif
 
+ifeq ($(findstring gcc, $(CC)), gcc)
+	CFLAGS += -Wstrict-prototypes
+endif
+
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	ifeq ($(findstring gcc, $(CC)), gcc)
-		CFLAGS += -Wstrict-prototypes
-	endif
-	CFLAGS += -DFREEBSD -D_REENTRANT -pedantic
+	CFLAGS += -DFREEBSD -pedantic
 	SYSLIB = -lcrypt -lpthread
 endif
 
 # For Darwin
-ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)                               
-	CFLAGS += -DMACOSX                                                     
-	UNIXTYPE = MACOSX                                                      
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding -Wno-extended-offsetof
+	UNIXTYPE = MACOSX
 endif
 
 #Path for Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	ifeq ($CC, "gcc")
-		CFLAGS += -Wstrict-prototypes
-	endif
-	CFLAGS += -DLINUX2 -D_REENTRANT -pedantic
+	CFLAGS += -DLINUX2 -pedantic
 endif
 
 #Path for SunOS
@@ -66,14 +64,11 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($CC, "gcc")
 		CFLAGS += -Wstrict-prototypes
 	endif
-	CFLAGS += -DSUNOS5 -D_REENTRANT -pedantic
+	CFLAGS += -DSUNOS5 -pedantic
 endif
 
 #Path for HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
-	ifeq ($CC, "gcc")
-		CFLAGS += -Wstrict-prototypes
-	endif
 	CFLAGS += -DHP_UX -DHPUX11
 	PLAT_NAME=hp-ux
 endif

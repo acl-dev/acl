@@ -2,6 +2,7 @@
 #include <assert.h>
 #include "lib_acl.h"
 #include "acl_cpp/acl_cpp_init.hpp"
+#include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/aio_istream.hpp"
 #include "acl_cpp/stream/aio_listen_stream.hpp"
@@ -291,6 +292,8 @@ int main(int argc, char* argv[])
 			break;
 		}
 	}
+
+	acl::log::stdout_open(true);
 
 	// 构建异步引擎类对象
 	aio_handle handle(use_kernel ? ENGINE_KERNEL : ENGINE_SELECT);

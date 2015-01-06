@@ -6,9 +6,15 @@ ARFL    = rv
 RANLIB  = ranlib
 
 #-Wcast-qual
-CFLAGS = -c -g -W -Wall -Wcast-align \
--Wpointer-arith -Werror -Wshadow -O3 \
--D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS \
+CFLAGS = -c -g -W \
+-Wall \
+-Wcast-align \
+-Wpointer-arith \
+-Werror \
+-Wshadow \
+-O3 \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
 -Wno-long-long \
 -fPIC \
 -Wformat \
@@ -27,17 +33,18 @@ ifeq ($(CC),)
         CC = g++
 endif
 
+ifeq ($(findstring gcc, $(CC)), gcc)
+	CFLAGS += -Wstrict-prototypes
+endif
+
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	ifeq ($(findstring gcc, $(CC)), gcc)
-		CFLAGS += -Wstrict-prototypes
-	endif
-	CFLAGS += -DFREEBSD -D_REENTRANT
+	CFLAGS += -DFREEBSD
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)                               
-	CFLAGS += -DMACOSX                                                     
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding -Wno-extended-offsetof
 	UNIXTYPE = MACOSX                                                      
 endif 
 
@@ -46,7 +53,7 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	ifeq ($CC, "gcc")
 		CFLAGS += -Wstrict-prototypes
 	endif
-	CFLAGS += -DLINUX2 -D_REENTRANT
+	CFLAGS += -DLINUX2
 endif
 
 # For SunOS
@@ -57,10 +64,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
 		SYSLIB = -lsocket -lnsl -lrt
 	endif
-	ifeq ($CC, "gcc")
-		CFLAGS += -Wstrict-prototypes
-	endif
-	CFLAGS += -DSUNOS5 -D_REENTRANT
+	CFLAGS += -DSUNOS5
 endif
 
 # For HP-UX

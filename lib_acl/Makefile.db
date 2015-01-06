@@ -12,11 +12,12 @@ LIB_NAME  = lib_acl.a
 
 #CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align
 #-fno-strict-aliasing
-CFLAGS = -c -g -W -Wall -Wcast-align \
--Wpointer-arith \
+CFLAGS = -c -g -W \
+-O3 \
+-Wall \
 -Werror \
 -Wshadow \
--O3 \
+-Wpointer-arith \
 -Waggregate-return \
 -Wmissing-prototypes \
 -D_REENTRANT \
@@ -26,6 +27,7 @@ CFLAGS = -c -g -W -Wall -Wcast-align \
 -D_POSIX_PTHREAD_SEMANTICS \
 -pedantic \
 -fPIC
+#-Wcast-align
 #-Winvalid-pch -DACL_PREPARE_COMPILE
 
 ###########################################################
@@ -52,7 +54,7 @@ endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
-	CFLAGS += -DMACOSX
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding -Wno-extended-offsetof
 	UNIXTYPE = MACOSX
 endif
 

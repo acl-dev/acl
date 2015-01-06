@@ -6,9 +6,14 @@ ARFL    = rv
 #ARFL    = cru
 RANLIB  = ranlib
 
-CFLAGS = -c -g -W -Wall \
--Wpointer-arith -Werror -Wshadow -O3 \
--D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS \
+CFLAGS = -c -g -W \
+-O3 \
+-Wall \
+-Wpointer-arith \
+-Werror \
+-Wshadow \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
 -Wno-long-long \
 -fPIC \
 -Wformat \
@@ -33,19 +38,19 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD -D_REENTRANT
+	CFLAGS += -DFREEBSD
 	UNIXTYPE = FREEBSD
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
-	CFLAGS += -DMACOSX -D_REENTRANT
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding -Wno-extended-offsetof
 	UNIXTYPE = MACOSX
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	CFLAGS += -DLINUX2 -D_REENTRANT
+	CFLAGS += -DLINUX2
 	UNIXTYPE = LINUX
 endif
 
@@ -57,13 +62,13 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
 		SYSLIB = -lsocket -lnsl -lrt
 	endif
-	CFLAGS += -DSUNOS5 -D_REENTRANT
+	CFLAGS += -DSUNOS5
 	UNIXTYPE = SUNOS5
 endif
 
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
-	CFLAGS += -DHP_UX -DHPUX11 -D_REENTRANT
+	CFLAGS += -DHP_UX -DHPUX11
 	UNIXTYPE = HPUX
 endif
 

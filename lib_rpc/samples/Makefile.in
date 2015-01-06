@@ -1,9 +1,16 @@
 CC      = g++
 
-CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
+CFLAGS = -c -g -W \
+-O3 \
+-Wall \
+-Werror \
+-Wcast-qual \
+-Wcast-align \
 -Wno-long-long \
--Wpointer-arith -Werror -O3 \
--D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO
+-Wpointer-arith \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
+-D_USE_FAST_MACRO
 #-Wshadow 
 #-Waggregate-return
 ###########################################################
@@ -25,13 +32,13 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	ifeq ($(findstring gcc, $(CC)), gcc)
 		CFLAGS += -Wstrict-prototypes
 	endif
-	CFLAGS += -DFREEBSD -D_REENTRANT
+	CFLAGS += -DFREEBSD
 	SYSLIB = -lcrypt -lpthread
 endif
 
 #For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)                               
-	CFLAGS += -DMACOSX                                                     
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding -Wno-extended-offsetof
 	UNIXTYPE = MACOSX                                                      
 endif
 
@@ -46,7 +53,7 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	ifeq ($(findstring x86_64, $(OSTYPE)), x86_64)
 		RPATH = linux64
 	endif
-	CFLAGS += -DLINUX2 -D_REENTRANT
+	CFLAGS += -DLINUX2
 endif
 
 #Path for SunOS
@@ -60,7 +67,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($CC, "gcc")
 		CFLAGS += -Wstrict-prototypes
 	endif
-	CFLAGS += -DSUNOS5 -D_REENTRANT
+	CFLAGS += -DSUNOS5
 endif
 
 #Path for HP-UX

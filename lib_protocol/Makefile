@@ -7,10 +7,18 @@ ARFL    = rv
 #ARFL    = cru
 RANLIB  = ranlib
 
-CFLAGS = -c -g -W -Wall -Wcast-qual \
--Waggregate-return -Wmissing-prototypes \
--Wpointer-arith -Werror -Wshadow -O3 \
--D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO \
+CFLAGS = -c -g -W \
+-O3 \
+-Wall \
+-Werror \
+-Wcast-qual \
+-Waggregate-return \
+-Wmissing-prototypes \
+-Wpointer-arith \
+-Wshadow \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
+-D_USE_FAST_MACRO \
 -Wno-long-long \
 -fPIC
 
@@ -37,19 +45,19 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD -D_REENTRANT -pedantic
+	CFLAGS += -DFREEBSD -pedantic
 	UNIXTYPE = FREEBSD
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
-	CFLAGS += -DMACOSX -D_REENTRANT -pedantic
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding -Wno-extended-offsetof
 	UNIXTYPE = FREEBSD
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	CFLAGS += -DLINUX2 -D_REENTRANT -pedantic
+	CFLAGS += -DLINUX2 -pedantic
 	UNIXTYPE = LINUX
 endif
 
@@ -61,7 +69,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
 		SYSLIB = -lsocket -lnsl -lrt
 	endif
-	CFLAGS += -DSUNOS5 -D_REENTRANT -pedantic
+	CFLAGS += -DSUNOS5 -pedantic
 	UNIXTYPE = SUNOS5
 endif
 
