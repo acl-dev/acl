@@ -122,7 +122,8 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 
 	if (strstr(from_filepath.c_str(), ".svn") != NULL
 		|| strstr(from_filepath.c_str(), ".git") != NULL
-		|| strstr(from_filepath.c_str(), ".cvs") != NULL)
+		|| strstr(from_filepath.c_str(), ".cvs") != NULL
+		|| strstr(from_filepath.c_str(), ".o") != NULL)
 	{
 		return true;
 	}

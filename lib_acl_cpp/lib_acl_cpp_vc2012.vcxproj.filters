@@ -415,6 +415,30 @@
     <ClCompile Include="src\aliyun\oss\internal\CORSOperation.cpp">
       <Filter>src\aliyun\oss\internal</Filter>
     </ClCompile>
+    <ClCompile Include="src\redis\redis_result.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_client.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_hash.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_key.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_list.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_string.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_pool.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_manager.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -924,6 +948,30 @@
     <ClInclude Include="include\acl_cpp\aliyun\oss\model\UploadPartCopyResult.hpp">
       <Filter>include\aliyun\oss\model</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_client.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_result.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_hash.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_key.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_list.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_string.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_pool.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_manager.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="changes.txt" />
@@ -1049,6 +1097,9 @@
     </Filter>
     <Filter Include="src\aliyun\oss\internal">
       <UniqueIdentifier>{8d5bc637-579f-4fe3-85a4-9412fba1adf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\redis">
+      <UniqueIdentifier>{5ea6d29e-ffbe-4bdb-b5c1-fa5966807ce7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

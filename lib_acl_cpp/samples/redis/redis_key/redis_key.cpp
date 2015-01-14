@@ -1,0 +1,144 @@
+#include "stdafx.h"
+
+static acl::string __keypre("test_key");
+
+static void test_del(acl::redis_key& option, int n)
+{
+	acl::string key;
+
+	for (int i = 0; i < n; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+		int ret = option.del(key.c_str(), NULL);
+		if (ret < 0)
+		{
+			printf("del key: %s error\r\n", key.c_str());
+			break;
+		}
+		option.get_client().reset();
+	}
+}
+
+static void test_expire(acl::redis_key& option, int n)
+{
+	acl::string key;
+
+	for (int i = 0; i < n; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+		if (option.expire(key.c_str(), 100) < 0)
+		{
+			printf("expire key: %s error\r\n", key.c_str());
+			break;
+		}
+		option.get_client().reset();
+	}
+}
+
+static void test_ttl(acl::redis_key& option, int n)
+{
+	acl::string key;
+
+	for (int i = 0; i < n; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+		if (option.ttl(key.c_str()) < 0)
+		{
+			printf("get ttl key: %s error\r\n", key.c_str());
+			break;
+		}
+		option.get_client().reset();
+	}
+}
+
+static void test_exists(acl::redis_key& option, int n)
+{
+	acl::string key;
+
+	for (int i = 0; i < n; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+		if (option.exists(key.c_str()) == false)
+			printf("no exists key: %s\r\n", key.c_str());
+		option.get_client().reset();
+	}
+}
+
+static void test_type(acl::redis_key& option, int n)
+{
+	acl::string key;
+
+	for (int i = 0; i < n; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+		acl::redis_key_t ret = option.type(key.c_str());
+		if (ret == acl::REDIS_KEY_UNKNOWN)
+		{
+			printf("unknown type key: %s\r\n", key.c_str());
+			break;
+		}
+		option.get_client().reset();
+	}
+}
+
+static void usage(const char* procname)
+{
+	printf("usage: %s -h[help]\r\n"
+		"-s redis_addr[127.0.0.1:6380]\r\n"
+		"-n count\r\n"
+		"-C connect_timeout[default: 10]\r\n"
+		"-T rw_timeout[default: 10]\r\n"
+		"-a cmd\r\n",
+		procname);
+}
+
+int main(int argc, char* argv[])
+{
+	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
+	acl::string addr("127.0.0.1:6380"), cmd;
+
+	while ((ch = getopt(argc, argv, "hs:n:C:T:a:")) > 0)
+	{
+		switch (ch)
+		{
+		case 'h':
+			usage(argv[0]);
+			return 0;
+		case 's':
+			addr = optarg;
+			break;
+		case 'n':
+			n = atoi(optarg);
+			break;
+		case 'C':
+			conn_timeout = atoi(optarg);
+			break;
+		case 'T':
+			rw_timeout = atoi(optarg);
+			break;
+		case 'a':
+			cmd = optarg;
+			break;
+		default:
+			break;
+		}
+	}
+
+	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
+	acl::redis_key option(client);
+
+	if (cmd == "del")
+		test_del(option, n);
+	else if (cmd == "expire")
+		test_expire(option, n);
+	else if (cmd == "ttl")
+		test_ttl(option, n);
+	else if (cmd == "exists")
+		test_exists(option, n);
+	else if (cmd == "type")
+		test_type(option, n);
+	else
+		printf("unknown cmd: %s\r\n", cmd.c_str());
+
+	return 0;
+}

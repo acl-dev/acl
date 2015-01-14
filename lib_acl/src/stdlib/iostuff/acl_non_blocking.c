@@ -30,6 +30,8 @@ int acl_non_blocking(ACL_SOCKET fd, int on)
 #ifdef	ACL_UNIX
 	int   flags;
 	int   nonb = PATTERN;
+#elif	defined(WIN32)
+	unsigned long n = on;
 #endif
 #ifdef	NBLOCK_SYSV
 	int	res;
@@ -54,26 +56,44 @@ int acl_non_blocking(ACL_SOCKET fd, int on)
 		res = 1;
 	else
 		res = 0;
-	if (ioctl (fd, FIONBIO, &res) < 0) {
+	if (ioctl(fd, FIONBIO, &res) < 0) {
 		acl_msg_error("ioctl(fd,FIONBIO) failed");
-		return (-1);
+		return -1;
 	}
 #elif defined(ACL_UNIX)
 	if ((flags = fcntl(fd, F_GETFL, 0)) == -1) {
 		acl_msg_error("fcntl(fd, F_GETFL) failed");
-		return (-1);
+		return -1;
 	}
 	if (fcntl(fd, F_SETFL, on ? flags | nonb : flags & ~nonb) < 0) {
 		acl_msg_error("fcntl(fd, F_SETL, nonb) failed");
-		return (-1);
+		return -1;
 	}
 #elif defined(WIN32)
-	if (ioctlsocket(fd, FIONBIO, (unsigned long *) &on) < 0) {
+	if (ioctlsocket(fd, FIONBIO, &n) < 0) {
 		acl_msg_error("ioctlsocket(fd,FIONBIO) failed");
-		return (-1);
+		return -1;
 	}
 #else
 # error "unknown OS type"
 #endif
 	return (0);
+}
+
+int acl_is_blocking(ACL_SOCKET fd)
+{
+#ifdef ACL_UNIX
+	int flags;
+	if ((flags = fcntl(fd, F_GETFL, 0)) == -1) {
+		acl_msg_error("fcntl(fd, F_GETFL) failed");
+		return -1;
+	}
+	return (flags & PATTERN) == 0 ? 1 : 0;
+#elif defined(WIN32)
+	const char *myname = "acl_is_blocking";
+
+	acl_msg_error("%s(%d), %s: unsport in win32",
+		__FUNCTION__, __LINE__, myname);
+	return -1;
+#endif /* ACL_UNIX */
 }

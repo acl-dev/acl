@@ -23,6 +23,14 @@ extern "C" {
 ACL_API int acl_non_blocking(ACL_SOCKET fd, int on);
 
 /**
+ * 判断所给套按口是否为阻塞模式
+ * @param fd {ACL_SOCKET}  SOCKET 套接字
+ * @return {int} -1 表示出错或所给参数有误或该平台不支持，1 表示所给套接字为阻塞模式
+ *  0 表示所给套接字为非阻塞模式
+ */
+ACL_API int acl_is_blocking(ACL_SOCKET fd);
+
+/**
  * 写等待操作，直到套接字可写、出错或超时
  * @param fd {ACL_SOCKET} 描述符
  * @param timeout {int} 超时时间，单位为秒，该值分下面三种情形：

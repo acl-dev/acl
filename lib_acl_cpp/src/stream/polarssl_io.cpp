@@ -94,11 +94,20 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 		return false;
 	}
 
-	stream_ = s;
-
 #ifdef HAS_POLARSSL
 	// 防止重复调用 open 过程
-	acl_assert(ssl_ == NULL);
+	if (ssl_ != NULL)
+	{
+		// 如果是同一个流，则返回 true
+		if (stream_ == s)
+			return true;
+
+		// 否则，禁止同一个 SSL IO 对象被绑在不同的流对象上
+		logger_error("open again, stream_ changed!");
+		return false;
+	}
+
+	stream_ = s;
 
 	ssl_ = acl_mycalloc(1, sizeof(ssl_context));
 

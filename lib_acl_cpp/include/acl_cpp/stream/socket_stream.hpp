@@ -168,6 +168,14 @@ public:
 	socket_stream& set_tcp_recvbuf(int size);
 
 	/**
+	 * 设置 TCP 套接字的非阻塞状态
+	 * @param on {bool} 是否设置为非阻塞状态，当为 true 时，
+	 *  则该套接字被设为非阻塞状态；否则为阻塞状态
+	 * @return {socket_stream&}
+	 */
+	socket_stream& set_tcp_non_blocking(bool on);
+
+	/**
 	 * 获得 TCP 套接字是否设置了 nodelay 选项
 	 * @return {bool} true 表示打开，false 表示关闭
 	 */
@@ -195,6 +203,13 @@ public:
 	 * @return {int} 缓冲区大小
 	 */
 	int get_tcp_recvbuf();
+
+	/**
+	 * 判断当前套接字是否被设置了非阻塞模式
+	 * @return {bool}
+	 * 注：该方法目前仅支持 UNIX 平台
+	 */
+	bool get_tcp_non_blocking();
 
 private:
 	char  dummy_[1];

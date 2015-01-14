@@ -25,4 +25,4 @@ http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=270070
 18) mime 解析库针对 7BIT 格式兼容性支持
 19) http 协议库支持 websocket
 20) 应该使 stream 流对象支持 openssl
-21) 应该重新设计 aio_stream 中对 polarssl 的支持方式
+21) 应该重新设计 aio_stream 中对 polarssl 的支持方式 -- 完成

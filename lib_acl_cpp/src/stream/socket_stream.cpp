@@ -271,6 +271,19 @@ socket_stream& socket_stream::set_tcp_recvbuf(int size)
 	return *this;
 }
 
+socket_stream& socket_stream::set_tcp_non_blocking(bool on)
+{
+	ACL_SOCKET sock = sock_handle();
+	if (sock == ACL_SOCKET_INVALID)
+	{
+		logger_error("invalid socket handle");
+		return *this;
+	}
+	(void) acl_non_blocking(sock, on ? ACL_NON_BLOCKING : ACL_BLOCKING);
+
+	return *this;
+}
+
 bool socket_stream::get_tcp_nodelay()
 {
 	ACL_SOCKET sock = sock_handle();
@@ -317,6 +330,18 @@ int socket_stream::get_tcp_recvbuf()
 	}
 
 	return acl_tcp_get_rcvbuf(sock);
+}
+
+bool socket_stream::get_tcp_non_blocking()
+{
+	ACL_SOCKET sock = sock_handle();
+	if (sock == ACL_SOCKET_INVALID)
+	{
+		logger_error("invalid socket handle");
+		return false;
+	}
+
+	return acl_is_blocking(sock) == 0 ? true : false;
 }
 
 } // namespace acl
