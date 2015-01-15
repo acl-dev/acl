@@ -477,6 +477,13 @@ unsigned long long beanstalk::reserve(string& buf, int timeout /* = -1 */)
 		logger_error("'%s' error", cmdline.c_str());
 		return 0;
 	}
+	if (strcasecmp(tokens->argv[0], "TIMED_OUT") == 0
+		|| strcasecmp(tokens->argv[0], "DEADLINE_SOON") == 0)
+	{
+		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		acl_argv_free(tokens);
+		return 0;
+	}
 	if (tokens->argc < 3 || strcasecmp(tokens->argv[0], "RESERVED"))
 	{
 		logger_error("reserve failed: %s", tokens->argv[0]);

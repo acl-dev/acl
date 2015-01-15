@@ -186,7 +186,7 @@ bool redis_string::getset(const char* key, size_t key_len,
 	if (result_ == NULL)
 		return false;
 	if (result_->get_type() != REDIS_RESULT_STRING)
-		return NULL;
+		return false;
 	(void) result_->argv_to_string(buf);
 	return true;
 }
@@ -264,7 +264,7 @@ bool redis_string::getrange(const char* key, size_t key_len,
 	char start_buf[INT_LEN], end_buf[INT_LEN];
 	(void) safe_snprintf(start_buf, sizeof(start_buf), "%d", start);
 	names[1] = start_buf;
-	lens[2] = strlen(start_buf);
+	lens[1] = strlen(start_buf);
 
 	(void) safe_snprintf(end_buf, sizeof(end_buf), "%d", end);
 	names[2] = end_buf;
@@ -330,7 +330,7 @@ bool redis_string::getbit(const char* key, size_t len, unsigned offset, int& bit
 	names[1] = buf4off;
 	lens[1] = strlen(buf4off);
 
-	const string& req = conn_.build("SETBIT", NULL, names, lens, 3);
+	const string& req = conn_.build("GETBIT", NULL, names, lens, 2);
 	result_ = conn_.run(req);
 	if (result_ == NULL)
 		return false;
@@ -722,8 +722,8 @@ bool redis_string::mget(const string& req,
 		return true;
 
 	size_t size = mget_size();
-	string buf;
-	const redis_result*  rr;
+	string buf(4096);
+	const redis_result* rr;
 	size_t nslice, len;
 	const char* ptr;
 
@@ -840,16 +840,20 @@ bool redis_string::decrby(const char* key, long long int dec,
 bool redis_string::incoper(const char* cmd, const char* key, long long int n,
 	long long int* result)
 {
-	const char* keys[1];
-	const char* values[1];
+	size_t argc = 1;
+	const char* names[2];
 
-	keys[0] = key;
+	names[0] = key;
 
 	char buf[INT64_LEN];
-	(void) acl_i64toa(n, buf, sizeof(buf));
-	values[0] = buf;
+	if (n != 1)
+	{
+		(void) acl_i64toa(n, buf, sizeof(buf));
+		names[1] = buf;
+		argc++;
+	}
 
-	const string& req = conn_.build(cmd, NULL, keys, values, 1);
+	const string& req = conn_.build(cmd, NULL, names, argc);
 	result_ = conn_.run(req);
 	if (result_ == NULL)
 		return false;

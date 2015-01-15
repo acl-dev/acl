@@ -33,8 +33,10 @@ redis_client::~redis_client()
 	if (result_)
 		result_->reset();
 	delete pool_;
-	acl_myfree(argv_);
-	acl_myfree(argv_lens_);
+	if (argv_ != NULL)
+		acl_myfree(argv_);
+	if (argv_lens_ != NULL)
+		acl_myfree(argv_lens_);
 }
 
 void redis_client::reset()
@@ -54,8 +56,17 @@ void redis_client::argv_space(size_t n)
 	if (argv_size_ >= n)
 		return;
 	argv_size_ = n;
-	argv_ = (const char**) acl_mymalloc(n * sizeof(char*));
-	argv_lens_ = (size_t*) acl_mymalloc(n * sizeof(size_t));
+	if (argv_ == NULL)
+	{
+		argv_ = (const char**) acl_mymalloc(n * sizeof(char*));
+		argv_lens_ = (size_t*) acl_mymalloc(n * sizeof(size_t));
+	}
+	else
+	{
+		argv_ = (const char**) acl_myrealloc(argv_, n * sizeof(char*));
+		argv_lens_ = (size_t*) acl_myrealloc(argv_lens_,
+				n * sizeof(size_t));
+	}
 }
 
 bool redis_client::open()
@@ -796,7 +807,7 @@ const string& redis_client::build(const char* cmd, const char* key,
 
 	argc_ = 1 + argc * 2;
 	if (key != NULL)
-		argc++;
+		argc_++;
 	argv_space(argc_);
 
 	size_t i = 0;
@@ -833,7 +844,7 @@ const string& redis_client::build(const char* cmd, const char* key,
 
 	argc_ = 1 + argc * 2;
 	if (key != NULL)
-		argc++;
+		argc_++;
 	argv_space(argc_);
 
 	size_t i = 0;
@@ -874,7 +885,7 @@ const string& redis_client::build(const char* cmd, const char* key,
 
 	argc_ = 1 + argc * 2;
 	if (key != NULL)
-		argc++;
+		argc_++;
 	argv_space(argc_);
 
 	size_t i = 0;

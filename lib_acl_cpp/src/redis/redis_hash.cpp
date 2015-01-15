@@ -73,60 +73,103 @@ bool redis_hash::hmset(const string& req)
 
 /////////////////////////////////////////////////////////////////////////////
 
-bool redis_hash::hmget(const char* key, const std::vector<string>& names)
+bool redis_hash::hmget(const char* key, const std::vector<string>& names,
+	std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_.build("HMGET", key, names);
-	return hmget(req);
+	return hmget(req, result);
 }
 
-bool redis_hash::hmget(const char* key, const std::vector<char*>& names)
+bool redis_hash::hmget(const char* key, const std::vector<char*>& names,
+	std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_.build("HMGET", key, names);
-	return hmget(req);
+	return hmget(req, result);
 }
 
-bool redis_hash::hmget(const char* key, const std::vector<const char*>& names)
+bool redis_hash::hmget(const char* key, const std::vector<const char*>& names,
+	std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_.build("HMGET", key, names);
-	return hmget(req);
+	return hmget(req, result);
 }
 
-bool redis_hash::hmget(const char* key, const std::vector<int>& names)
+bool redis_hash::hmget(const char* key, const std::vector<int>& names,
+	std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_.build("HMGET", key, names);
-	return hmget(req);
+	return hmget(req, result);
 }
 
-bool redis_hash::hmget(const char* key, const char* names[], size_t argc)
+bool redis_hash::hmget(const char* key, const char* names[], size_t argc,
+	std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_.build("HMGET", key, names, argc);
-	return hmget(req);
+	return hmget(req, result);
 }
 
-bool redis_hash::hmget(const char* key, const int names[], size_t argc)
+bool redis_hash::hmget(const char* key, const int names[], size_t argc,
+	std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_.build("HMGET", key, names, argc);
-	return hmget(req);
+	return hmget(req, result);
 }
 
 bool redis_hash::hmget(const char* key, const char* names[],
-	const size_t lens[], size_t argc)
+	const size_t lens[], size_t argc, std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_.build("HMGET", key, names, lens, argc);
-	return hmget(req);
+	return hmget(req, result);
 }
 
-bool redis_hash::hmget(const string& req)
+bool redis_hash::hmget(const string& req, std::vector<string>* result /* = NULL */)
 {
 	result_ = conn_.run(req);
 	if (result_ == NULL)
 		return false;
 	if (result_->get_type() != REDIS_RESULT_ARRAY)
 		return false;
+	if (result == NULL)
+		return true;
+
+	size_t size = hmget_size();
+	const redis_result* rr;
+	size_t nslice, len;
+	const char* ptr;
+	string buf(4096);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		rr = hmget_result(i);
+		if (rr == NULL || (nslice = rr->get_size()) == 0)
+			result->push_back("");
+		else if (nslice == 1)
+		{
+			ptr = rr->get(0, &len);
+			buf.copy(ptr, len);
+			result->push_back(buf);
+		}
+		else
+		{
+			buf.clear();
+			rr->argv_to_string(buf);
+			result->push_back(buf);
+		}
+	}
+
 	return true;
 }
 
-const char* redis_hash::hmget_result(size_t i, size_t* len /* = NULL */) const
+const redis_result* redis_hash::hmget_result(size_t i) const
+{
+	if (result_ == NULL)
+		return NULL;
+	if (result_->get_type() != REDIS_RESULT_ARRAY)
+		return NULL;
+	return result_->get_child(i);
+}
+
+const char* redis_hash::hmget_value(size_t i, size_t* len /* = NULL */) const
 {
 	if (result_ == NULL)
 		return NULL;
@@ -151,6 +194,15 @@ const char* redis_hash::hmget_result(size_t i, size_t* len /* = NULL */) const
 	return buf;
 }
 
+size_t redis_hash::hmget_size() const
+{
+	if (result_ == NULL)
+		return 0;
+	if (result_->get_type() != REDIS_RESULT_ARRAY)
+		return 0;
+	return result_->get_size();
+}
+
 /////////////////////////////////////////////////////////////////////////////
 
 int redis_hash::hset(const char* key, const char* name, const char* value)
@@ -168,13 +220,15 @@ int redis_hash::hset(const char* key, const char* name, size_t name_len,
 	const char* value, size_t value_len)
 {
 	const char* names[1];
-	names[0] = name;
 	size_t names_len[1];
+
+	names[0] = name;
 	names_len[0] = name_len;
 
 	const char* values[1];
-	values[0] = value;
 	size_t values_len[1];
+
+	values[0] = value;
 	values_len[0] = value_len;
 
 	const string& req = conn_.build("HSET", key, names, names_len,
@@ -404,6 +458,7 @@ int redis_hash::hdel(const char* key, const char* first_name, ...)
 {
 	const char* name;
 	std::vector<const char*> names;
+	names.push_back(first_name);
 	va_list ap;
 	va_start(ap, first_name);
 	while((name = va_arg(ap, const char*)) != NULL)
@@ -481,7 +536,7 @@ bool redis_hash::hincrbyfloat(const char* key, const char* name,
 	(void) safe_snprintf(buf, sizeof(buf), "%f", inc);
 	const char* values[1];
 	values[0] = buf;
-	const string& req = conn_.build("HINCRBY", key, names, values, 1);
+	const string& req = conn_.build("HINCRBYFLOAT", key, names, values, 1);
 	result_ = conn_.run(req);
 	if (result_ == NULL)
 		return false;

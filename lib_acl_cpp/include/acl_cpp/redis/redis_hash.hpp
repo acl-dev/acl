@@ -50,16 +50,22 @@ public:
 	 * @return {bool} 操作是否成功，如果返回成功，可以通过方法 hmget_result 根据
 	 *  下标值取得对应的值，或直接调用 get_result 方法取得 redis_result
 	 */
-	bool hmget(const char* key, const std::vector<string>& names);
-	bool hmget(const char* key, const std::vector<char*>& names);
-	bool hmget(const char* key, const std::vector<const char*>& names);
-	bool hmget(const char* key, const std::vector<int>& names);
+	bool hmget(const char* key, const std::vector<string>& names,
+		std::vector<string>* result = NULL);
+	bool hmget(const char* key, const std::vector<char*>& names,
+		std::vector<string>* result = NULL);
+	bool hmget(const char* key, const std::vector<const char*>& names,
+		std::vector<string>* result = NULL);
+	bool hmget(const char* key, const std::vector<int>& names,
+		std::vector<string>* result = NULL);
 
-	bool hmget(const char* key, const char* names[], size_t argc);
-	bool hmget(const char* key, const int names[], size_t argc);
-	bool hmget(const char* key, const char* names[],
-		const size_t lens[], size_t argc);
-	bool hmget(const string& req);
+	bool hmget(const char* key, const char* names[], size_t argc,
+		std::vector<string>* result = NULL);
+	bool hmget(const char* key, const int names[], size_t argc,
+		std::vector<string>* result = NULL);
+	bool hmget(const char* key, const char* names[], const size_t lens[],
+		size_t argc, std::vector<string>* result = NULL);
+	bool hmget(const string& req, std::vector<string>* result = NULL);
 
 	/**
 	 * 当 hmget 获得 true 时调用本方法来获得对应下标的值，下标顺序与 hmget 中的数组
@@ -71,7 +77,9 @@ public:
 	 *  为了保证使用上的安全性，返回的数据总能保证最后是以 \0 结尾，在计算数据长度时
 	 *  不包含该结尾符
 	 */
-	const char* hmget_result(size_t i, size_t* len = NULL) const;
+	const char* hmget_value(size_t i, size_t* len = NULL) const;
+	const redis_result* hmget_result(size_t i) const;
+	size_t hmget_size() const;
 
 	/////////////////////////////////////////////////////////////////////
 

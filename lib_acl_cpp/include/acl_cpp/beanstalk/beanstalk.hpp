@@ -124,7 +124,10 @@ public:
 	 *  时，则无限期等待，当 > 0 时，则在该时间内若没有消息，则返回，
 	 *  当 == 0 时，则立即返回一条消息或返回超时
 	 * @return {unsigned long long} 返回所取得的消息号，若返回值 > 0
-	 *  表示正确取到一个消息，否则说明出错或超时没有消息可用
+	 *  表示正确取到一个消息，否则说明出错或超时没有消息可用，其中当
+	 *  返回 0 时，如果调用 get_error() 获得的内容为 TIMED_OUT 则表示
+	 *  超时了，当为 DEADLINE_SOON 时则表示该消息已经被读取但在规定的 ttr
+	 *  (事务时间内) 没有被 delete_id
 	 */
 	unsigned long long reserve(string& buf, int timeout = -1);
 

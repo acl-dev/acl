@@ -15,7 +15,8 @@ static void test_del(acl::redis_key& option, int n)
 			printf("del key: %s error\r\n", key.c_str());
 			break;
 		}
-		option.get_client().reset();
+		else if (i < 10)
+			printf("del ok, key: %s\r\n", key.c_str());
 	}
 }
 
@@ -31,23 +32,27 @@ static void test_expire(acl::redis_key& option, int n)
 			printf("expire key: %s error\r\n", key.c_str());
 			break;
 		}
-		option.get_client().reset();
+		else if (i < 10)
+			printf("expire ok, key: %s\r\n", key.c_str());
 	}
 }
 
 static void test_ttl(acl::redis_key& option, int n)
 {
 	acl::string key;
+	int ttl;
 
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		if (option.ttl(key.c_str()) < 0)
+		if ((ttl = option.ttl(key.c_str())) < 0)
 		{
 			printf("get ttl key: %s error\r\n", key.c_str());
 			break;
 		}
-		option.get_client().reset();
+		else if (i < 10)
+			printf("ttl ok, key: %s, ttl: %d\r\n",
+				key.c_str(), ttl);
 	}
 }
 
@@ -60,7 +65,8 @@ static void test_exists(acl::redis_key& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 		if (option.exists(key.c_str()) == false)
 			printf("no exists key: %s\r\n", key.c_str());
-		option.get_client().reset();
+		else
+			printf("exists key: %s\r\n", key.c_str());
 	}
 }
 
@@ -77,7 +83,9 @@ static void test_type(acl::redis_key& option, int n)
 			printf("unknown type key: %s\r\n", key.c_str());
 			break;
 		}
-		option.get_client().reset();
+		else
+			printf("type ok, key: %s, ret: %d\r\n",
+				key.c_str(), ret);
 	}
 }
 
@@ -124,6 +132,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	acl::acl_cpp_init();
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	acl::redis_key option(client);
 
@@ -137,8 +146,20 @@ int main(int argc, char* argv[])
 		test_exists(option, n);
 	else if (cmd == "type")
 		test_type(option, n);
+	else if (cmd == "all")
+	{
+		test_expire(option, n);
+		test_ttl(option, n);
+		test_exists(option, n);
+		test_type(option, n);
+		test_del(option, n);
+	}
 	else
 		printf("unknown cmd: %s\r\n", cmd.c_str());
 
+#ifdef WIN32
+	printf("enter any key to exit\r\n");
+	getchar();
+#endif
 	return 0;
 }
