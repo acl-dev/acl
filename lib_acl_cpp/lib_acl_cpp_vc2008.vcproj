@@ -777,6 +777,38 @@
 			<Filter
 				Name="redis"
 				>
+				<File
+					RelativePath=".\src\redis\redis_client.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_hash.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_key.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_list.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_pool.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_result.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_string.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="session"
@@ -795,6 +827,10 @@
 				>
 				<File
 					RelativePath=".\src\stdlib\charset_conv.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\stdlib\dbuf_pool.cpp"
 					>
 				</File>
 				<File
@@ -1319,6 +1355,38 @@
 			<Filter
 				Name="redis"
 				>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_client.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_hash.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_key.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_list.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_pool.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_result.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_string.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="session"
@@ -1337,6 +1405,10 @@
 				>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\charset_conv.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\dbuf_pool.hpp"
 					>
 				</File>
 				<File

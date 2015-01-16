@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="redis_pool"
-	ProjectGUID="{2DABFAD1-114B-4F96-9185-DC0C56A3662D}"
+	ProjectGUID="{C090282C-A161-4C76-90AE-77735C4FC00A}"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -343,6 +343,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\redis_pool.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -378,10 +382,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\redis_pool.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
@@ -404,6 +404,4 @@
 			>
 		</File>
 	</Files>
-	<Globals>
-	</Globals>
 </VisualStudioProject>

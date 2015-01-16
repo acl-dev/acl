@@ -19,7 +19,7 @@ typedef enum
 	REDIS_KEY_ZSET		// sorted set
 } redis_key_t;
 
-class redis_key
+class ACL_CPP_API redis_key
 {
 public:
 	redis_key(redis_client* conn = NULL);
