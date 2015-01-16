@@ -37,6 +37,8 @@ redis_client::~redis_client()
 		acl_myfree(argv_);
 	if (argv_lens_ != NULL)
 		acl_myfree(argv_lens_);
+	if (conn_.opened())
+		conn_.close();
 }
 
 void redis_client::reset()
@@ -84,7 +86,8 @@ bool redis_client::open()
 
 void redis_client::close()
 {
-	conn_.close();
+	if (conn_.opened())
+		conn_.close();
 }
 
 redis_result* redis_client::get_error()

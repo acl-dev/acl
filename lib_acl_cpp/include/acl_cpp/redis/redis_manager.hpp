@@ -8,7 +8,12 @@ namespace acl
 class ACL_CPP_API redis_manager : public connect_manager
 {
 public:
-	redis_manager();
+	/**
+	 * 构造函数
+	 * @param conn_timeout {int} 服务器连接超时时间(秒)
+	 * @param rw_timeout {int}　网络 IO 读写超时时间(秒)
+	 */
+	redis_manager(int conn_timeout, int rw_timeout);
 	virtual ~redis_manager();
 
 protected:
@@ -21,6 +26,8 @@ protected:
 	virtual acl::connect_pool* create_pool(const char* addr,
 		int count, size_t idx);
 private:
+	int   conn_timeout_;
+	int   rw_timeout_;
 };
 
 } // namespace acl

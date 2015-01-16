@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 
 	acl::acl_cpp_init();
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
-	acl::redis_key option(client);
+	acl::redis_key option(&client);
 
 	if (cmd == "del")
 		test_del(option, n);

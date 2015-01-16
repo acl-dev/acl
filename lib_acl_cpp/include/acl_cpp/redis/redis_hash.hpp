@@ -13,7 +13,7 @@ class redis_result;
 class ACL_CPP_API redis_hash
 {
 public:
-	redis_hash(redis_client& conn);
+	redis_hash(redis_client* conn = NULL);
 	~redis_hash();
 
 	const redis_result* get_result() const
@@ -21,7 +21,9 @@ public:
 		return result_;
 	}
 
-	redis_client& get_client() const
+	void set_client(redis_client* conn);
+
+	redis_client* get_client() const
 	{
 		return conn_;
 	}
@@ -132,7 +134,7 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 private:
-	redis_client& conn_;
+	redis_client* conn_;
 	const redis_result* result_;
 };
 

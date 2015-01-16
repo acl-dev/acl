@@ -13,7 +13,7 @@ namespace acl
 #define INT_LEN		11
 #define FLOAT_LEN	32
 
-redis_string::redis_string(redis_client& conn)
+redis_string::redis_string(redis_client* conn /* = NULL */)
 : conn_(conn)
 , result_(NULL)
 {
@@ -42,8 +42,8 @@ bool redis_string::set(const char* key, size_t key_len,
 	names[1] = value;
 	lens[1] = value_len;
 
-	const string& req = conn_.build("SET", NULL, names, lens, 2);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("SET", NULL, names, lens, 2);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
 	if (result_->get_type() != REDIS_RESULT_STATUS)
@@ -77,8 +77,8 @@ bool redis_string::setex(const char* key, size_t key_len, const char* value,
 	names[2] = value;
 	lens[2] = value_len;
 
-	const string& req = conn_.build("SETEX", NULL, names, lens, 3);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("SETEX", NULL, names, lens, 3);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
 	if (result_->get_type() != REDIS_RESULT_STATUS)
@@ -107,8 +107,8 @@ int redis_string::setnx(const char* key, size_t key_len,
 	names[1] = value;
 	lens[1] = value_len;
 
-	const string& req = conn_.build("SETNX", NULL, names, lens, 2);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("SETNX", NULL, names, lens, 2);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
 	if (result_->get_type() != REDIS_RESULT_INTEGER)
@@ -132,8 +132,8 @@ int redis_string::append(const char* key, const char* value, size_t size)
 	names[1] = value;
 	lens[1] = size;
 
-	const string& req = conn_.build("APPEND", NULL, names, lens, 2);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("APPEND", NULL, names, lens, 2);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
 	if (result_->get_type() != REDIS_RESULT_INTEGER)
@@ -155,8 +155,8 @@ const redis_result* redis_string::get(const char* key)
 	const char* keys[1];
 	keys[0] = key;
 
-	const string& req = conn_.build("GET", NULL, keys, 1);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("GET", NULL, keys, 1);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return NULL;
 	if (result_->get_type() != REDIS_RESULT_STRING)
@@ -181,8 +181,8 @@ bool redis_string::getset(const char* key, size_t key_len,
 	names[1] = value;
 	lens[1] = value_len;
 
-	const string& req = conn_.build("GETSET", NULL, names, lens, 2);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("GETSET", NULL, names, lens, 2);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
 	if (result_->get_type() != REDIS_RESULT_STRING)
@@ -206,8 +206,8 @@ int redis_string::str_len(const char* key, size_t len)
 	names[0] = key;
 	lens[0] = len;
 
-	const string& req = conn_.build("STRLEN", NULL, names, lens, 1);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("STRLEN", NULL, names, lens, 1);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
 	if (result_->get_type() != REDIS_RESULT_INTEGER)
@@ -237,8 +237,8 @@ int redis_string::setrange(const char* key, size_t key_len, unsigned offset,
 	names[2] = value;
 	lens[2] = value_len;
 
-	const string& req = conn_.build("SETRANGE", NULL, names, lens, 3);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("SETRANGE", NULL, names, lens, 3);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
 
@@ -270,8 +270,8 @@ bool redis_string::getrange(const char* key, size_t key_len,
 	names[2] = end_buf;
 	lens[2] = strlen(end_buf);
 
-	const string& req = conn_.build("GETRANGE", NULL, names, lens, 3);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("GETRANGE", NULL, names, lens, 3);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
 	if (result_->get_type() != REDIS_RESULT_STRING)
@@ -303,8 +303,8 @@ bool redis_string::setbit(const char* key, size_t len, unsigned offset, int bit)
 	names[2] = bit ? "1" : "0";
 	lens[2] = 1;
 
-	const string& req = conn_.build("SETBIT", NULL, names, lens, 3);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("SETBIT", NULL, names, lens, 3);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
 	if (result_->get_type() != REDIS_RESULT_INTEGER)
@@ -330,8 +330,8 @@ bool redis_string::getbit(const char* key, size_t len, unsigned offset, int& bit
 	names[1] = buf4off;
 	lens[1] = strlen(buf4off);
 
-	const string& req = conn_.build("GETBIT", NULL, names, lens, 2);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("GETBIT", NULL, names, lens, 2);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
 	if (result_->get_type() != REDIS_RESULT_INTEGER)
@@ -354,8 +354,8 @@ int redis_string::bitcount(const char* key, size_t len)
 	names[0] = key;
 	lens[0] = len;
 
-	const string& req = conn_.build("BITCOUNT", NULL, names, lens, 1);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("BITCOUNT", NULL, names, lens, 1);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
 	if (result_->get_type() != REDIS_RESULT_INTEGER)
@@ -386,8 +386,8 @@ int redis_string::bitcount(const char* key, size_t len, int start, int end)
 	names[2] = buf4end;
 	lens[2] = strlen(buf4end);
 
-	const string& req = conn_.build("BITCOUNT", NULL, names, lens, 3);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("BITCOUNT", NULL, names, lens, 3);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
 	if (result_->get_type() != REDIS_RESULT_INTEGER)
@@ -487,7 +487,7 @@ int redis_string::bitop(const char* op, const char* destkey,
 	for (; cit != keys.end(); ++cit)
 		names.push_back(*cit);
 
-	const string& req = conn_.build("BITOP", NULL, names);
+	const string& req = conn_->build("BITOP", NULL, names);
 	return bitop(req);
 }
 
@@ -502,7 +502,7 @@ int redis_string::bitop(const char* op, const char* destkey,
 	for (; cit != keys.end(); ++cit)
 		names.push_back((*cit));
 
-	const string& req = conn_.build("BITOP", NULL, names);
+	const string& req = conn_->build("BITOP", NULL, names);
 	return bitop(req);
 }
 
@@ -516,13 +516,13 @@ int redis_string::bitop(const char* op, const char* destkey,
 	for (size_t i = 0; i < size; i++)
 		names.push_back(keys[i]);
 
-	const string& req = conn_.build("BITOP", NULL, names);
+	const string& req = conn_->build("BITOP", NULL, names);
 	return bitop(req);
 }
 
 int redis_string::bitop(const string& req)
 {
-	result_ = conn_.run(req);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
 	if (result_->get_type() != REDIS_RESULT_INTEGER)
@@ -534,47 +534,47 @@ int redis_string::bitop(const string& req)
 
 bool redis_string::mset(const std::map<string, string>& objs)
 {
-	const string& req = conn_.build("MSET", NULL, objs);
+	const string& req = conn_->build("MSET", NULL, objs);
 	return mset(req);
 }
 
 bool redis_string::mset(const std::map<int, string>& objs)
 {
-	const string& req = conn_.build("MSET", NULL, objs);
+	const string& req = conn_->build("MSET", NULL, objs);
 	return mset(req);
 }
 
 bool redis_string::mset(const std::vector<string>& keys,
 	const std::vector<string>& values)
 {
-	const string& req = conn_.build("MSET", NULL, keys, values);
+	const string& req = conn_->build("MSET", NULL, keys, values);
 	return mset(req);
 }
 
 bool redis_string::mset(const std::vector<int>& keys,
 	const std::vector<string>& values)
 {
-	const string& req = conn_.build("MSET", NULL, keys, values);
+	const string& req = conn_->build("MSET", NULL, keys, values);
 	return mset(req);
 }
 
 bool redis_string::mset(const char* keys[], const char* values[], size_t argc)
 {
-	const string& req = conn_.build("MSET", NULL, keys, values, argc);
+	const string& req = conn_->build("MSET", NULL, keys, values, argc);
 	return mset(req);
 }
 
 bool redis_string::mset(const char* keys[], const size_t keys_len[],
 	const char* values[], const size_t values_len[], size_t argc)
 {
-	const string& req = conn_.build("MSET", NULL, keys, keys_len,
+	const string& req = conn_->build("MSET", NULL, keys, keys_len,
 		values, values_len, argc);
 	return mset(req);
 }
 
 bool redis_string::mset(const string& req)
 {
-	result_ = conn_.run(req);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
 	if (result_->get_type() != REDIS_RESULT_STATUS)
@@ -589,48 +589,48 @@ bool redis_string::mset(const string& req)
 
 int redis_string::msetnx(const std::map<string, string>& objs)
 {
-	const string& req = conn_.build("MSETNX", NULL, objs);
+	const string& req = conn_->build("MSETNX", NULL, objs);
 	return msetnx(req);
 }
 
 int redis_string::msetnx(const std::map<int, string>& objs)
 {
-	const string& req = conn_.build("MSETNX", NULL, objs);
+	const string& req = conn_->build("MSETNX", NULL, objs);
 	return msetnx(req);
 }
 
 int redis_string::msetnx(const std::vector<string>& keys,
 	const std::vector<string>& values)
 {
-	const string& req = conn_.build("MSETNX", NULL, keys, values);
+	const string& req = conn_->build("MSETNX", NULL, keys, values);
 	return msetnx(req);
 }
 
 int redis_string::msetnx(const std::vector<int>& keys,
 	const std::vector<string>& values)
 {
-	const string& req = conn_.build("MSETNX", NULL, keys, values);
+	const string& req = conn_->build("MSETNX", NULL, keys, values);
 	return msetnx(req);
 }
 
 
 int redis_string::msetnx(const char* keys[], const char* values[], size_t argc)
 {
-	const string& req = conn_.build("MSETNX", NULL, keys, values, argc);
+	const string& req = conn_->build("MSETNX", NULL, keys, values, argc);
 	return msetnx(req);
 }
 
 int redis_string::msetnx(const char* keys[], const size_t keys_len[],
 	const char* values[], const size_t values_len[], size_t argc)
 {
-	const string& req = conn_.build("MSETNX", NULL, keys, keys_len,
+	const string& req = conn_->build("MSETNX", NULL, keys, keys_len,
 		values, values_len, argc);
 	return msetnx(req);
 }
 
 int redis_string::msetnx(const string& req)
 {
-	result_ = conn_.run(req);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
 	if (result_->get_type() != REDIS_RESULT_INTEGER)
@@ -649,28 +649,28 @@ int redis_string::msetnx(const string& req)
 bool redis_string::mget(const std::vector<string>& keys,
 	std::vector<string>* result /* = NULL */)
 {
-	const string& req = conn_.build("MGET", NULL, keys);
+	const string& req = conn_->build("MGET", NULL, keys);
 	return mget(req, result);
 }
 
 bool redis_string::mget(const std::vector<const char*>& keys,
 	std::vector<string>* result /* = NULL */)
 {
-	const string& req = conn_.build("MGET", NULL, keys);
+	const string& req = conn_->build("MGET", NULL, keys);
 	return mget(req, result);
 }
 
 bool redis_string::mget(const std::vector<char*>& keys,
 	std::vector<string>* result /* = NULL */)
 {
-	const string& req = conn_.build("MGET", NULL, keys);
+	const string& req = conn_->build("MGET", NULL, keys);
 	return mget(req, result);
 }
 
 bool redis_string::mget(const std::vector<int>& keys,
 	std::vector<string>* result /* = NULL */)
 {
-	const string& req = conn_.build("MGET", NULL, keys);
+	const string& req = conn_->build("MGET", NULL, keys);
 	return mget(req, result);
 }
 
@@ -692,28 +692,28 @@ bool redis_string::mget(std::vector<string>* result,
 bool redis_string::mget(const char* keys[], size_t argc,
 	std::vector<string>* result /* = NULL */)
 {
-	const string& req = conn_.build("MGET", NULL, keys, argc);
+	const string& req = conn_->build("MGET", NULL, keys, argc);
 	return mget(req, result);
 }
 
 bool redis_string::mget(const int keys[], size_t argc,
 	std::vector<string>* result /* = NULL */)
 {
-	const string& req = conn_.build("MGET", NULL, keys, argc);
+	const string& req = conn_->build("MGET", NULL, keys, argc);
 	return mget(req, result);
 }
 
 bool redis_string::mget(const char* keys[], const size_t keys_len[],
 	size_t argc, std::vector<string>* result /* = NULL */)
 {
-	const string& req = conn_.build("MGET", NULL, keys, keys_len, argc);
+	const string& req = conn_->build("MGET", NULL, keys, keys_len, argc);
 	return mget(req, result);
 }
 
 bool redis_string::mget(const string& req,
 	std::vector<string>* result /* = NULL */)
 {
-	result_ = conn_.run(req);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
 	if (result_->get_type() != REDIS_RESULT_ARRAY)
@@ -763,7 +763,7 @@ const char* redis_string::mget_value(size_t i, size_t* len /* = NULL */) const
 	// 大内存有可能被切片成多个不连续的小内存
 	size = rr->get_length();
 	size++;
-	char* buf = (char*) conn_.get_pool()->dbuf_alloc(size);
+	char* buf = (char*) conn_->get_pool()->dbuf_alloc(size);
 	size = rr->argv_to_string(buf, size);
 	if (len)
 		*len = size;
@@ -812,8 +812,8 @@ bool redis_string::incrbyfloat(const char* key, double inc,
 	const char* values[1];
 	values[0] = buf;
 
-	const string& req = conn_.build("INCRBYFLOAT", NULL, keys, values, 1);
-	result_ = conn_.run(req);
+	const string& req = conn_->build("INCRBYFLOAT", NULL, keys, values, 1);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
 	if (result_->get_type() != REDIS_RESULT_STRING)
@@ -853,8 +853,8 @@ bool redis_string::incoper(const char* cmd, const char* key, long long int n,
 		argc++;
 	}
 
-	const string& req = conn_.build(cmd, NULL, names, argc);
-	result_ = conn_.run(req);
+	const string& req = conn_->build(cmd, NULL, names, argc);
+	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
 	if (result_->get_type() != REDIS_RESULT_INTEGER)

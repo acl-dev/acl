@@ -5,7 +5,7 @@
 namespace acl
 {
 
-redis_list::redis_list(redis_client& conn)
+redis_list::redis_list(redis_client* conn /* = NULL */)
 : conn_(conn)
 {
 

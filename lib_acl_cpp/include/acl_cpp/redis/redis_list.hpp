@@ -9,16 +9,16 @@ class redis_client;
 class ACL_CPP_API redis_list
 {
 public:
-	redis_list(redis_client& conn);
+	redis_list(redis_client* conn = NULL);
 	~redis_list();
 
-	redis_client& get_client() const
+	redis_client* get_client() const
 	{
 		return conn_;
 	}
 
 private:
-	redis_client& conn_;
+	redis_client* conn_;
 };
 
 } // namespace acl

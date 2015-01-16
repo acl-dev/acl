@@ -314,10 +314,10 @@ static void test_hlen(acl::redis_hash& option, int n)
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		"-s redis_addr[127.0.0.1:6380]\r\n"
+		"-s redis_addr[127.0.0.1:6379]\r\n"
 		"-n count\r\n"
 		"-C connect_timeout[default: 10]\r\n"
-		"-T rw_timeout[default: 10]\r\n"
+		"-I rw_timeout[default: 10]\r\n"
 		"-a cmd\r\n",
 		procname);
 }
@@ -325,9 +325,9 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
-	acl::string addr("127.0.0.1:6380"), cmd;
+	acl::string addr("127.0.0.1:6379"), cmd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:T:a:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:I:a:")) > 0)
 	{
 		switch (ch)
 		{
@@ -343,7 +343,7 @@ int main(int argc, char* argv[])
 		case 'C':
 			conn_timeout = atoi(optarg);
 			break;
-		case 'T':
+		case 'I':
 			rw_timeout = atoi(optarg);
 			break;
 		case 'a':
@@ -356,7 +356,7 @@ int main(int argc, char* argv[])
 
 	acl::acl_cpp_init();
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
-	acl::redis_hash option(client);
+	acl::redis_hash option(&client);
 
 	if (cmd == "hmset")
 		test_hmset(option, n);

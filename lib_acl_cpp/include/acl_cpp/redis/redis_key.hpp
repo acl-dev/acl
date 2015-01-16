@@ -22,10 +22,12 @@ typedef enum
 class redis_key
 {
 public:
-	redis_key(redis_client& conn);
+	redis_key(redis_client* conn = NULL);
 	~redis_key();
 
-	redis_client& get_client() const
+	void set_client(redis_client* conn);
+
+	redis_client* get_client() const
 	{
 		return conn_;
 	}
@@ -83,7 +85,7 @@ public:
 	redis_key_t type(const char* key);
 
 private:
-	redis_client& conn_;
+	redis_client* conn_;
 	const redis_result* result_;
 };
 

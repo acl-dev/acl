@@ -23,10 +23,13 @@ public:
 	 * @param rw_timeout {int} 网络 IO 读写超时时间(秒)
 	 * @return {redis_pool&}
 	 */
-	redis_pool& set_timeout(int conn_timeout = 30, int rw_timeout = 60);
+	redis_pool& set_timeout(int conn_timeout, int rw_timeout);
 
 protected:
-	// 基类纯虚函数
+	/**
+	 * 基类纯虚函数: 调用此函数用来创建一个新的连接
+	 * @return {connect_client*}
+	 */
 	virtual connect_client* create_connect();
 
 private:

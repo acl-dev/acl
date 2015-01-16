@@ -44,6 +44,7 @@ all:
 	@(cd scan_dir; make)
 	@(cd socket; make)
 	@(cd db; make)
+	@(cd redis; make)
 
 clean:
 	@(cd string; make clean)
@@ -91,3 +92,4 @@ clean:
 	@(cd scan_dir; make clean)
 	@(cd socket; make clean)
 	@(cd db; make clean)
+	@(cd redis; make clean)
