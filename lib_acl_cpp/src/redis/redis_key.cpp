@@ -21,6 +21,12 @@ redis_key::~redis_key()
 
 }
 
+void redis_key::reset()
+{
+	if (conn_)
+		conn_->reset();
+}
+
 void redis_key::set_client(redis_client* conn)
 {
 	conn_ = conn;
@@ -169,6 +175,81 @@ redis_key_t redis_key::type(const char* key)
 		logger_error("unknown type: %s, key: %s", ptr, key);
 		return REDIS_KEY_UNKNOWN;
 	}
+}
+
+bool redis_key::migrate(const char* key, const char* addr, unsigned dest_db,
+	unsigned timeout, const char* option /* = NULL */)
+{
+	char addrbuf[64];
+	safe_snprintf(addrbuf, sizeof(addrbuf), "%s", addr);
+	char* at = strchr(addrbuf, ':');
+	if (at == NULL || *(at + 1) == 0)
+		return false;
+	*at++ = 0;
+	int port = atoi(at);
+	if (port >= 65535 || port <= 0)
+		return false;
+
+	const char* argv[7];
+	size_t lens[7];
+	size_t argc = 6;
+
+	argv[0] = "MIGRATE";
+	lens[0] = sizeof("MIGRATE") - 1;
+	argv[1] = addrbuf;
+	lens[1] = strlen(addrbuf);
+	argv[2] = at;
+	lens[2] = strlen(at);
+	argv[3] = key;
+	lens[3] = strlen(key);
+
+	char db_s[11];
+	safe_snprintf(db_s, sizeof(db_s), "%u", dest_db);
+	argv[4] = db_s;
+	lens[4] = strlen(db_s);
+
+	char timeout_s[11];
+	safe_snprintf(timeout_s, sizeof(timeout_s), "%u", timeout);
+	argv[5] = timeout_s;
+	lens[5] = strlen(timeout_s);
+
+	if (option && *option)
+	{
+		argv[6] = option;
+		lens[6] = strlen(option);
+		argc++;
+	}
+
+	const string& req = conn_->build_request(argc, argv, lens);
+	result_ = conn_->run(req);
+	if (result_ == NULL || result_->get_type() != REDIS_RESULT_STATUS)
+		return false;
+	const char* status = result_->get_status();
+	if (status == NULL || strcasecmp(status, "OK") != 0)
+		return false;
+	return true;
+}
+
+int redis_key::move(const char* key, unsigned dest_db)
+{
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "MOVE";
+	lens[0] = sizeof("MOVE") - 1;
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	char db_s[11];
+	safe_snprintf(db_s, sizeof(db_s), "%u", dest_db);
+	argv[2] = db_s;
+	lens[2] = strlen(db_s);
+
+	const string& req = conn_->build_request(3, argv, lens);
+	result_ = conn_->run(req);
+	if (result_ == NULL || result_->get_type() != REDIS_RESULT_INTEGER)
+		return -1;
+	return result_->get_integer();
 }
 
 /////////////////////////////////////////////////////////////////////////////

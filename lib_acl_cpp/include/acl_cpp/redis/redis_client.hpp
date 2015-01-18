@@ -27,12 +27,16 @@ public:
 
 	void close();
 	
-	const redis_result* run(const string& request);
+	const redis_result* run(const string& request, size_t nobjs = 1);
 
 	const string& build_request(size_t argc, const char* argv[],
 		size_t argv_lens[], string* buf = NULL);
 
-	/*******************************************************************/
+	const string& build_request(const std::vector<string>& args,
+		string* buf = NULL);
+	const string& build_request(const std::vector<const char*>& args,
+		const std::vector<size_t>& lens, string* buf = NULL);
+
 	/*******************************************************************/
 
 	const string& build(const char* cmd, const char* key,
@@ -81,7 +85,6 @@ public:
 		size_t argc, string* buf = NULL);
 
 	/*******************************************************************/
-	/*******************************************************************/
 
 	const string& build(const char* cmd, const char* key,
 		const std::vector<string>& names, string* buf = NULL);
@@ -100,7 +103,6 @@ public:
 		const char* names[], const size_t lens[],
 		size_t argc, string* buf = NULL);
 
-	/*******************************************************************/
 	/*******************************************************************/
 
 protected:
@@ -125,6 +127,7 @@ private:
 
 	void argv_space(size_t n);
 
+	redis_result* get_objects(size_t nobjs);
 	redis_result* get_object();
 	redis_result* get_error();
 	redis_result* get_status();

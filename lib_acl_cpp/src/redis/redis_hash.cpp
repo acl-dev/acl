@@ -22,6 +22,12 @@ redis_hash::~redis_hash()
 {
 }
 
+void redis_hash::reset()
+{
+	if (conn_ != NULL)
+		conn_->reset();
+}
+
 void redis_hash::set_client(redis_client* conn)
 {
 	conn_ = conn;
@@ -224,20 +230,19 @@ int redis_hash::hset(const char* key, const char* name,
 int redis_hash::hset(const char* key, const char* name, size_t name_len,
 	const char* value, size_t value_len)
 {
-	const char* names[1];
-	size_t names_len[1];
+	const char* argv[4];
+	size_t lens[4];
 
-	names[0] = name;
-	names_len[0] = name_len;
+	argv[0] = "HSET";
+	lens[0] = sizeof("HSET") - 1;
+	argv[1] = key;
+	lens[1] = strlen(key);
+	argv[2] = name;
+	lens[2] = name_len;
+	argv[3] = value;
+	lens[3] = value_len;
 
-	const char* values[1];
-	size_t values_len[1];
-
-	values[0] = value;
-	values_len[0] = value_len;
-
-	const string& req = conn_->build("HSET", key, names, names_len,
-		values, values_len, 1);
+	const string& req = conn_->build_request(4, argv, lens);
 	return hset(req);
 }
 
@@ -271,18 +276,19 @@ int redis_hash::hsetnx(const char* key, const char* name,
 int redis_hash::hsetnx(const char* key, const char* name, size_t name_len,
 	const char* value, size_t value_len)
 {
-	const char* names[1];
-	names[0] = name;
-	size_t names_len[1];
-	names_len[0] = name_len;
+	const char* argv[4];
+	size_t lens[4];
 
-	const char* values[1];
-	values[0] = value;
-	size_t values_len[1];
-	values_len[0] = value_len;
+	argv[0] = "HSETNX";
+	lens[0] = sizeof("HSETNX") - 1;
+	argv[1] = key;
+	lens[1] = strlen(key);
+	argv[2] = name;
+	lens[2] = name_len;
+	argv[3] = value;
+	lens[3] = value_len;
 
-	const string& req = conn_->build("HSETNX", key, names, names_len,
-		values, values_len, 1);
+	const string& req = conn_->build_request(4, argv, lens);
 	return hsetnx(req);
 }
 
@@ -308,12 +314,17 @@ bool redis_hash::hget(const char* key, const char* name, string& result)
 bool redis_hash::hget(const char* key, const char* name,
 	size_t name_len, string& result)
 {
-	const char* names[1];
-	names[0] = name;
-	size_t names_len[1];
-	names_len[0] = name_len;
+	const char* argv[3];
+	size_t lens[3];
 
-	const string& req = conn_->build("HGET", key, names, names_len, 1);
+	argv[0] = "HGET";
+	lens[0] = sizeof("HGET") - 1;
+	argv[1] = key;
+	lens[1] = strlen(key);
+	argv[2] = name;
+	lens[2] = name_len;
+
+	const string& req = conn_->build_request(3, argv, lens);
 	const redis_result* rr = conn_->run(req);
 	if (rr == NULL)
 		return false;

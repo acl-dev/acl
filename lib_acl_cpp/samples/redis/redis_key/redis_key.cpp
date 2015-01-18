@@ -9,6 +9,7 @@ static void test_del(acl::redis_key& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
+		option.reset();
 		int ret = option.del(key.c_str(), NULL);
 		if (ret < 0)
 		{
@@ -27,6 +28,7 @@ static void test_expire(acl::redis_key& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
+		option.reset();
 		if (option.expire(key.c_str(), 100) < 0)
 		{
 			printf("expire key: %s error\r\n", key.c_str());
@@ -45,6 +47,7 @@ static void test_ttl(acl::redis_key& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
+		option.reset();
 		if ((ttl = option.ttl(key.c_str())) < 0)
 		{
 			printf("get ttl key: %s error\r\n", key.c_str());
@@ -63,6 +66,7 @@ static void test_exists(acl::redis_key& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
+		option.reset();
 		if (option.exists(key.c_str()) == false)
 			printf("no exists key: %s\r\n", key.c_str());
 		else
@@ -77,6 +81,7 @@ static void test_type(acl::redis_key& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
+		option.reset();
 		acl::redis_key_t ret = option.type(key.c_str());
 		if (ret == acl::REDIS_KEY_UNKNOWN)
 		{
@@ -92,7 +97,7 @@ static void test_type(acl::redis_key& option, int n)
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		"-s redis_addr[127.0.0.1:6380]\r\n"
+		"-s redis_addr[127.0.0.1:6379]\r\n"
 		"-n count\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-T rw_timeout[default: 10]\r\n"
@@ -103,7 +108,7 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
-	acl::string addr("127.0.0.1:6380"), cmd;
+	acl::string addr("127.0.0.1:6379"), cmd;
 
 	while ((ch = getopt(argc, argv, "hs:n:C:T:a:")) > 0)
 	{

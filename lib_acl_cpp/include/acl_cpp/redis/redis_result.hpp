@@ -112,10 +112,10 @@ public:
 
 	/**
 	 * 当数据类型为 REDIS_RESULT_ARRAY 类型时，该函数返回所有的数组对象
-	 * @param idx {size_t*} 当返回数组非空时，则该地址存放数组长度
+	 * @param size {size_t*} 当返回数组非空时，则该地址存放数组长度
 	 * @return {const const redis_result*}
 	 */
-	const redis_result** get_children(size_t* idx) const;
+	const redis_result** get_children(size_t* size) const;
 
 	/**
 	 * 当数据类型为 REDIS_RESULT_ARRAY 类型时，该函数返回对应下标的结果对象
@@ -133,12 +133,12 @@ public:
 		return pool_;
 	}
 
-	void reset();
-
 private:
 	~redis_result();
 
 	friend class redis_client;
+	void reset();
+
 	redis_result& set_type(redis_result_t type);
 	redis_result& set_size(size_t size);
 	redis_result& put(const char* buf, size_t len);

@@ -234,10 +234,10 @@ const redis_result* redis_result::get_child(size_t i) const
 	return children_[i];
 }
 
-const redis_result** redis_result::get_children(size_t* idx) const
+const redis_result** redis_result::get_children(size_t* size) const
 {
-	if (idx)
-		*idx = children_idx_;
+	if (size)
+		*size = children_idx_;
 	return children_;
 }
 

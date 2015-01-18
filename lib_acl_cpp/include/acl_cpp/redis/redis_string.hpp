@@ -16,6 +16,8 @@ public:
 	redis_string(redis_client* conn = NULL);
 	~redis_string();
 
+	void reset();
+
 	const redis_result* get_result() const
 	{
 		return result_;
@@ -46,7 +48,9 @@ public:
 	int append(const char* key, const char* value, size_t size);
 
 	bool get(const char* key, string& buf);
+	bool get(const char* key, size_t len, string& buf);
 	const redis_result* get(const char* key);
+	const redis_result* get(const char* key, size_t len);
 
 	bool getset(const char* key, const char* value, string& buf);
 	bool getset(const char* key, size_t key_len,
@@ -94,14 +98,6 @@ public:
 	int bitop_or(const char* destkey, const char* keys[], size_t size);
 	int bitop_xor(const char* destkey, const char* keys[], size_t size);
 
-	int bitop(const char* op, const char* destkey,
-		const std::vector<string>& keys);
-	int bitop(const char* op, const char* destkey,
-		const std::vector<const char*>& keys);
-	int bitop(const char* op, const char* destkey,
-		const char* keys[], size_t size);
-	int bitop(const string& req);
-
 	/////////////////////////////////////////////////////////////////////
 
 	bool mset(const std::map<string, string>& objs);
@@ -115,7 +111,6 @@ public:
 	bool mset(const char* keys[], const char* values[], size_t argc);
 	bool mset(const char* keys[], const size_t keys_len[],
 		const char* values[], const size_t values_len[], size_t argc);
-	bool mset(const string& req);
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -130,7 +125,6 @@ public:
 	int msetnx(const char* keys[], const char* values[], size_t argc);
 	int msetnx(const char* keys[], const size_t keys_len[],
 		const char* values[], const size_t values_len[], size_t argc);
-	int msetnx(const string& req);
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -152,7 +146,6 @@ public:
 	bool mget(const char* keys[], const size_t keys_len[], size_t argc,
 		std::vector<string>* result = NULL);
 
-	bool mget(const string& req, std::vector<string>* result = NULL);
 	size_t mget_size() const;
 	const char* mget_value(size_t i, size_t* len = NULL) const;
 	const redis_result* mget_result(size_t i) const;
@@ -176,6 +169,17 @@ public:
 private:
 	redis_client* conn_;
 	const redis_result* result_;
+
+	int bitop(const char* op, const char* destkey,
+		const std::vector<string>& keys);
+	int bitop(const char* op, const char* destkey,
+		const std::vector<const char*>& keys);
+	int bitop(const char* op, const char* destkey,
+		const char* keys[], size_t size);
+	int bitop(const string& req);
+	bool mset(const string& req);
+	int msetnx(const string& req);
+	bool mget(const string& req, std::vector<string>* result = NULL);
 };
 
 } // namespace acl

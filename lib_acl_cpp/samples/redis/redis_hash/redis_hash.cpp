@@ -23,6 +23,7 @@ static void test_hmset(acl::redis_hash& option, int n)
 		attrs[attr2] = val2;
 		attrs[attr3] = val3;
 
+		option.reset();
 		if (option.hmset(key.c_str(), attrs) == false)
 		{
 			printf("hmset error, key: %s\r\n", key.c_str());
@@ -56,7 +57,7 @@ static void test_hmget(acl::redis_hash& option, int n)
 		attrs[2] = attr3.c_str();
 
 		result.clear();
-
+		option.reset();
 		if (option.hmget(key, attrs, 3, &result) == false)
 		{
 			printf("hmget error\r\n");
@@ -94,6 +95,7 @@ static void test_hset(acl::redis_hash& option, int n)
 		attr.format("attr1");
 		value.format("value_%s", key.c_str());
 
+		option.reset();
 		if (option.hset(key.c_str(), attr.c_str(),
 			value.c_str()) < 0)
 		{
@@ -117,6 +119,7 @@ static void test_hsetnx(acl::redis_hash& option, int n)
 		attr.format("attr4");
 		value.format("value_%s", key.c_str());
 
+		option.reset();
 		if ((ret = option.hsetnx(key.c_str(), attr.c_str(),
 			value.c_str())) <0)
 		{
@@ -140,6 +143,7 @@ static void test_hget(acl::redis_hash& option, int n)
 		attr.format("attr1");
 		value.clear();
 
+		option.reset();
 		if (option.hget(key.c_str(), attr.c_str(), value) == false)
 		{
 			printf("hget key: %s, attr: %s\r\n", key.c_str(),
@@ -165,6 +169,7 @@ static void test_hgetall(acl::redis_hash& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 		result.clear();
 
+		option.reset();
 		if (option.hgetall(key.c_str(), result) == false)
 		{
 			printf("hgetall key: %s\r\n", key.c_str());
@@ -191,6 +196,8 @@ static void test_hdel(acl::redis_hash& option, int n)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 		attr.format("attr1");
+
+		option.reset();
 		int ret = option.hdel(key.c_str(), attr.c_str(), NULL);
 		if (ret < 0)
 		{
@@ -211,6 +218,8 @@ static void test_hincrby(acl::redis_hash& option, int n)
 	{
 		key.format("hincr_%s_%d", __keypre.c_str(), i);
 		attr.format("attr1");
+
+		option.reset();
 		if (option.hincrby(key.c_str(), attr.c_str(), 10,
 			&result) == false)
 		{
@@ -233,6 +242,8 @@ static void test_hincrbyfloat(acl::redis_hash& option, int n)
 	{
 		key.format("hincrbyfloat_%s_%d", __keypre.c_str(), i);
 		attr.format("attr1");
+
+		option.reset();
 		if (option.hincrbyfloat(key.c_str(), attr.c_str(),
 			8.8, &result) == false)
 		{
@@ -256,6 +267,8 @@ static void test_hkeys(acl::redis_hash& option, int n)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 		attrs.clear();
+
+		option.reset();
 		if (option.hkeys(key.c_str(), attrs) == false)
 		{
 			printf("hkeys error, key: %s\r\n", key.c_str());
@@ -284,6 +297,8 @@ static void test_hexists(acl::redis_hash& option, int n)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 		attr.format("attr1");
+
+		option.reset();
 		if (option.hexists(key.c_str(), attr.c_str()) == false)
 			printf("no hexists key: %s\r\n", key.c_str());
 		else
@@ -299,6 +314,8 @@ static void test_hlen(acl::redis_hash& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
+
+		option.reset();
 		int ret = option.hlen(key.c_str());
 		if (ret < 0)
 		{

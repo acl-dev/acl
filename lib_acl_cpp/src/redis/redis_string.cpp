@@ -25,6 +25,12 @@ redis_string::~redis_string()
 
 }
 
+void redis_string::reset()
+{
+	if (conn_)
+		conn_->reset();
+}
+
 bool redis_string::set(const char* key, const char* value)
 {
 	return set(key, strlen(key), value, strlen(value));
@@ -33,16 +39,17 @@ bool redis_string::set(const char* key, const char* value)
 bool redis_string::set(const char* key, size_t key_len,
 	const char* value, size_t value_len)
 {
-	const char* names[2];
-	size_t lens[2];
+	const char* argv[3];
+	size_t lens[3];
 
-	names[0] = key;
-	lens[0] = key_len;
+	argv[0] = "SET";
+	lens[0] = sizeof("SET") - 1;
+	argv[1] = key;
+	lens[1] = key_len;
+	argv[2] = value;
+	lens[2] = value_len;
 
-	names[1] = value;
-	lens[1] = value_len;
-
-	const string& req = conn_->build("SET", NULL, names, lens, 2);
+	const string& req = conn_->build_request(3, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
@@ -63,21 +70,23 @@ bool redis_string::setex(const char* key, const char* value, int timeout)
 bool redis_string::setex(const char* key, size_t key_len, const char* value,
 	size_t value_len, int timeout)
 {
-	const char* names[3];
-	size_t lens[3];
+	const char* argv[4];
+	size_t lens[4];
 
-	names[0] = key;
-	lens[0] = key_len;
+	argv[0] = "SETEX";
+	lens[0] = sizeof("SETEX") - 1;
+	argv[1] = key;
+	lens[1] = key_len;
 
 	char buf[INT_LEN];
 	(void) safe_snprintf(buf, sizeof(buf), "%d", timeout);
-	names[1] = buf;
-	lens[1] = strlen(buf);
+	argv[2] = buf;
+	lens[2] = strlen(buf);
 
-	names[2] = value;
-	lens[2] = value_len;
+	argv[3] = value;
+	lens[3] = value_len;
 
-	const string& req = conn_->build("SETEX", NULL, names, lens, 3);
+	const string& req = conn_->build_request(4, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
@@ -98,16 +107,17 @@ int redis_string::setnx(const char* key, const char* value)
 int redis_string::setnx(const char* key, size_t key_len,
 	const char* value, size_t value_len)
 {
-	const char* names[2];
-	size_t lens[2];
+	const char* argv[3];
+	size_t lens[3];
 
-	names[0] = key;
-	lens[0] = key_len;
+	argv[0] = "SETNX";
+	lens[0] = sizeof("SETNX") - 1;
+	argv[1] = key;
+	lens[1] = key_len;
+	argv[2] = value;
+	lens[2] = value_len;
 
-	names[1] = value;
-	lens[1] = value_len;
-
-	const string& req = conn_->build("SETNX", NULL, names, lens, 2);
+	const string& req = conn_->build_request(3, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
@@ -123,16 +133,17 @@ int redis_string::append(const char* key, const char* value)
 
 int redis_string::append(const char* key, const char* value, size_t size)
 {
-	const char* names[2];
-	size_t lens[2];
+	const char* argv[3];
+	size_t lens[3];
 
-	names[0] = key;
-	lens[0] = strlen(key);
+	argv[0] = "APPEND";
+	lens[0] = sizeof("APPEND") - 1;
+	argv[1] = key;
+	lens[1] = strlen(key);
+	argv[2] = value;
+	lens[2] = size;
 
-	names[1] = value;
-	lens[1] = size;
-
-	const string& req = conn_->build("APPEND", NULL, names, lens, 2);
+	const string& req = conn_->build_request(3, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
@@ -143,7 +154,12 @@ int redis_string::append(const char* key, const char* value, size_t size)
 
 bool redis_string::get(const char* key, string& buf)
 {
-	result_ = get(key);
+	return get(key, strlen(key), buf);
+}
+
+bool redis_string::get(const char* key, size_t len, string& buf)
+{
+	result_ = get(key, len);
 	if (result_ == NULL)
 		return false;
 	(void) result_->argv_to_string(buf);
@@ -152,10 +168,20 @@ bool redis_string::get(const char* key, string& buf)
 
 const redis_result* redis_string::get(const char* key)
 {
-	const char* keys[1];
-	keys[0] = key;
+	return get(key, strlen(key));
+}
 
-	const string& req = conn_->build("GET", NULL, keys, 1);
+const redis_result* redis_string::get(const char* key, size_t len)
+{
+	const char* argv[2];
+	size_t lens[2];
+
+	argv[0] = "GET";
+	lens[0] = sizeof("GET") - 1;
+	argv[1] = key;
+	lens[1] = len;
+
+	const string& req = conn_->build_request(2, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return NULL;
@@ -172,16 +198,17 @@ bool redis_string::getset(const char* key, const char* value, string& buf)
 bool redis_string::getset(const char* key, size_t key_len,
 	const char* value, size_t value_len, string& buf)
 {
-	const char* names[2];
-	size_t lens[2];
+	const char* argv[3];
+	size_t lens[3];
 
-	names[0] = key;
-	lens[0] = key_len;
+	argv[0] = "GETSET";
+	lens[0] = sizeof("GETSET") - 1;
+	argv[1] = key;
+	lens[1] = key_len;
+	argv[2] = value;
+	lens[2] = value_len;
 
-	names[1] = value;
-	lens[1] = value_len;
-
-	const string& req = conn_->build("GETSET", NULL, names, lens, 2);
+	const string& req = conn_->build_request(3, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
@@ -200,13 +227,15 @@ int redis_string::str_len(const char* key)
 
 int redis_string::str_len(const char* key, size_t len)
 {
-	const char* names[1];
-	size_t lens[1];
+	const char* argv[2];
+	size_t lens[2];
 
-	names[0] = key;
-	lens[0] = len;
+	argv[0] = "STRLEN";
+	lens[0] = sizeof("STRLEN") - 1;
+	argv[1] = key;
+	lens[1] = len;
 
-	const string& req = conn_->build("STRLEN", NULL, names, lens, 1);
+	const string& req = conn_->build_request(2, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
@@ -223,21 +252,23 @@ int redis_string::setrange(const char* key, unsigned offset, const char* value)
 int redis_string::setrange(const char* key, size_t key_len, unsigned offset,
 	const char* value, size_t value_len)
 {
-	const char* names[3];
-	size_t lens[3];
+	const char* argv[4];
+	size_t lens[4];
 
-	names[0] = key;
-	lens[0] = key_len;
+	argv[0] = "SETRANGE";
+	lens[0] = sizeof("SETRANGE") - 1;
+	argv[1] = key;
+	lens[1] = key_len;
 
 	char buf[INT64_LEN];
 	(void) acl_i64toa(offset, buf, sizeof(buf));
-	names[1] = buf;
-	lens[1] = strlen(buf);
+	argv[2] = buf;
+	lens[2] = strlen(buf);
 
-	names[2] = value;
-	lens[2] = value_len;
+	argv[3] = value;
+	lens[3] = value_len;
 
-	const string& req = conn_->build("SETRANGE", NULL, names, lens, 3);
+	const string& req = conn_->build_request(4, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
@@ -255,22 +286,24 @@ bool redis_string::getrange(const char* key, int start, int end, string& buf)
 bool redis_string::getrange(const char* key, size_t key_len,
 	int start, int end, string& buf)
 {
-	const char* names[3];
-	size_t lens[3];
+	const char* argv[4];
+	size_t lens[4];
 
-	names[0] = key;
-	lens[0] = key_len;
+	argv[0] = "GETRANGE";
+	lens[0] = sizeof("GETRANGE") - 1;
+	argv[1] = key;
+	lens[1] = key_len;
 
 	char start_buf[INT_LEN], end_buf[INT_LEN];
 	(void) safe_snprintf(start_buf, sizeof(start_buf), "%d", start);
-	names[1] = start_buf;
-	lens[1] = strlen(start_buf);
+	argv[2] = start_buf;
+	lens[2] = strlen(start_buf);
 
 	(void) safe_snprintf(end_buf, sizeof(end_buf), "%d", end);
-	names[2] = end_buf;
-	lens[2] = strlen(end_buf);
+	argv[3] = end_buf;
+	lens[3] = strlen(end_buf);
 
-	const string& req = conn_->build("GETRANGE", NULL, names, lens, 3);
+	const string& req = conn_->build_request(4, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
@@ -289,21 +322,23 @@ bool redis_string::setbit(const char* key, unsigned offset, int bit)
 
 bool redis_string::setbit(const char* key, size_t len, unsigned offset, int bit)
 {
-	const char* names[3];
-	size_t lens[3];
+	const char* argv[4];
+	size_t lens[4];
 
-	names[0] = key;
-	lens[0] = len;
+	argv[0] = "SETBIT";
+	lens[0] = sizeof("SETBIT") - 1;
+	argv[1] = key;
+	lens[1] = len;
 
 	char buf4off[INT_LEN];
 	(void) safe_snprintf(buf4off, sizeof(buf4off), "%d", offset);
-	names[1] = buf4off;
-	lens[1] = strlen(buf4off);
+	argv[2] = buf4off;
+	lens[2] = strlen(buf4off);
 
-	names[2] = bit ? "1" : "0";
-	lens[2] = 1;
+	argv[3] = bit ? "1" : "0";
+	lens[3] = 1;
 
-	const string& req = conn_->build("SETBIT", NULL, names, lens, 3);
+	const string& req = conn_->build_request(4, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
@@ -319,18 +354,20 @@ bool redis_string::getbit(const char* key, unsigned offset, int& bit)
 
 bool redis_string::getbit(const char* key, size_t len, unsigned offset, int& bit)
 {
-	const char* names[2];
-	size_t lens[2];
+	const char* argv[3];
+	size_t lens[3];
 
-	names[0] = key;
-	lens[0] = len;
+	argv[0] = "GETBIT";
+	lens[0] = sizeof("GETBIT") - 1;
+	argv[1] = key;
+	lens[1] = len;
 
 	char buf4off[INT_LEN];
 	(void) safe_snprintf(buf4off, sizeof(buf4off), "%d", offset);
-	names[1] = buf4off;
-	lens[1] = strlen(buf4off);
+	argv[2] = buf4off;
+	lens[2] = strlen(buf4off);
 
-	const string& req = conn_->build("GETBIT", NULL, names, lens, 2);
+	const string& req = conn_->build_request(3, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
@@ -348,13 +385,15 @@ int redis_string::bitcount(const char* key)
 
 int redis_string::bitcount(const char* key, size_t len)
 {
-	const char* names[1];
-	size_t lens[1];
+	const char* argv[2];
+	size_t lens[2];
 
-	names[0] = key;
-	lens[0] = len;
+	argv[0] = "BITCOUNT";
+	lens[0] = sizeof("BITCOUNT") - 1;
+	argv[1] = key;
+	lens[1] = len;
 
-	const string& req = conn_->build("BITCOUNT", NULL, names, lens, 1);
+	const string& req = conn_->build_request(2, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
@@ -370,23 +409,25 @@ int redis_string::bitcount(const char* key, int start, int end)
 
 int redis_string::bitcount(const char* key, size_t len, int start, int end)
 {
-	const char* names[3];
-	size_t lens[3];
+	const char* argv[4];
+	size_t lens[4];
 
-	names[0] = key;
-	lens[0] = len;
+	argv[0] = "BITCOUNT";
+	lens[0] = sizeof("BITCOUNT") - 1;
+	argv[1] = key;
+	lens[1] = len;
 
 	char buf4start[INT_LEN];
 	(void) safe_snprintf(buf4start, sizeof(buf4start), "%d", start);
-	names[1] = buf4start;
-	lens[1] = strlen(buf4start);
+	argv[2] = buf4start;
+	lens[2] = strlen(buf4start);
 
 	char buf4end[INT_LEN];
 	(void) safe_snprintf(buf4end, sizeof(buf4end), "%d", end);
-	names[2] = buf4end;
-	lens[2] = strlen(buf4end);
+	argv[3] = buf4end;
+	lens[3] = strlen(buf4end);
 
-	const string& req = conn_->build("BITCOUNT", NULL, names, lens, 3);
+	const string& req = conn_->build_request(4, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return -1;
@@ -479,44 +520,83 @@ int redis_string::bitop_xor(const char* destkey, const char* key, ...)
 int redis_string::bitop(const char* op, const char* destkey,
 	const std::vector<string>& keys)
 {
-	std::vector<string> names;
-	names.push_back(op);
-	names.push_back(destkey);
+	size_t argc = 3 + keys.size();
+	dbuf_pool* pool = conn_->get_pool();
+	const char** argv = (const char**)
+		pool->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*)
+		pool->dbuf_alloc(argc * sizeof(size_t));
+
+	argv[0] = "BITOP";
+	lens[0] = strlen(argv[0]);
+	argv[1] = op;
+	lens[1] = strlen(argv[1]);
+	argv[2] = destkey;
+	lens[2] = strlen(argv[2]);
 
 	std::vector<string>::const_iterator cit = keys.begin();
-	for (; cit != keys.end(); ++cit)
-		names.push_back(*cit);
+	for (size_t i = 3; cit != keys.end(); ++cit, i++)
+	{
+		argv[i] = (*cit).c_str();
+		lens[i] = strlen(argv[i]);
+	}
 
-	const string& req = conn_->build("BITOP", NULL, names);
+	const string& req = conn_->build_request(argc, argv, lens);
 	return bitop(req);
 }
 
 int redis_string::bitop(const char* op, const char* destkey,
 	const std::vector<const char*>& keys)
 {
-	std::vector<const char*> names;
-	names.push_back(op);
-	names.push_back(destkey);
+	size_t argc = 3 + keys.size();
+	dbuf_pool* pool = conn_->get_pool();
+	const char** argv = (const char**)
+		pool->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*)
+		pool->dbuf_alloc(argc * sizeof(size_t));
+
+	argv[0] = "BITOP";
+	lens[0] = strlen(argv[0]);
+	argv[1] = op;
+	lens[1] = strlen(argv[1]);
+	argv[2] = destkey;
+	lens[2] = strlen(argv[2]);
 
 	std::vector<const char*>::const_iterator cit = keys.begin();
-	for (; cit != keys.end(); ++cit)
-		names.push_back((*cit));
+	for (size_t i = 3; cit != keys.end(); ++cit, i++)
+	{
+		argv[i] = *cit;
+		lens[i] = strlen(argv[i]);
+	}
 
-	const string& req = conn_->build("BITOP", NULL, names);
+	const string& req = conn_->build_request(argc, argv, lens);
 	return bitop(req);
 }
 
 int redis_string::bitop(const char* op, const char* destkey,
 	const char* keys[], size_t size)
 {
-	std::vector<const char*> names;
-	names.push_back(op);
-	names.push_back(destkey);
+	size_t argc = 3 + size;
+	dbuf_pool* pool = conn_->get_pool();
+	const char** argv = (const char**)
+		pool->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*)
+		pool->dbuf_alloc(argc * sizeof(size_t));
 
-	for (size_t i = 0; i < size; i++)
-		names.push_back(keys[i]);
+	argv[0] = "BITOP";
+	lens[0] = strlen(argv[0]);
+	argv[1] = op;
+	lens[1] = strlen(argv[1]);
+	argv[2] = destkey;
+	lens[2] = strlen(argv[2]);
 
-	const string& req = conn_->build("BITOP", NULL, names);
+	for (size_t i = 3, j = 0; j < size; i++, j++)
+	{
+		argv[i] = keys[j];
+		lens[i] = strlen(argv[i]);
+	}
+
+	const string& req = conn_->build_request(argc, argv, lens);
 	return bitop(req);
 }
 
@@ -804,15 +884,20 @@ bool redis_string::incrby(const char* key, long long int inc,
 bool redis_string::incrbyfloat(const char* key, double inc,
 	double* result /* = NULL */)
 {
-	const char* keys[1];
-	keys[0] = key;
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "INCRBYFLOAT";
+	lens[0] = sizeof("INCRBYFLOAT") - 1;
+	argv[1] = key;
+	lens[1] = strlen(key);
+
 	char buf[FLOAT_LEN];
 	(void) safe_snprintf(buf, sizeof(buf), "%f", inc);
+	argv[2] = buf;
+	lens[2] = strlen(buf);
 
-	const char* values[1];
-	values[0] = buf;
-
-	const string& req = conn_->build("INCRBYFLOAT", NULL, keys, values, 1);
+	const string& req = conn_->build_request(3, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;
@@ -840,20 +925,25 @@ bool redis_string::decrby(const char* key, long long int dec,
 bool redis_string::incoper(const char* cmd, const char* key, long long int n,
 	long long int* result)
 {
-	size_t argc = 1;
-	const char* names[2];
+	size_t argc = 2;
+	const char* argv[3];
+	size_t lens[3];
 
-	names[0] = key;
+	argv[0] = cmd;
+	lens[0] = strlen(cmd);
+	argv[1] = key;
+	lens[1] = strlen(key);
 
 	char buf[INT64_LEN];
 	if (n != 1)
 	{
 		(void) acl_i64toa(n, buf, sizeof(buf));
-		names[1] = buf;
+		argv[2] = buf;
+		lens[2] = strlen(buf);
 		argc++;
 	}
 
-	const string& req = conn_->build(cmd, NULL, names, argc);
+	const string& req = conn_->build_request(argc, argv, lens);
 	result_ = conn_->run(req);
 	if (result_ == NULL)
 		return false;

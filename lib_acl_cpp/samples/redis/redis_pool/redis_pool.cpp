@@ -7,6 +7,7 @@ static bool test_del(acl::redis_key& option, int i)
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
+	option.reset();
 	int ret = option.del(key.c_str(), NULL);
 	if (ret < 0)
 	{
@@ -23,6 +24,7 @@ static bool test_expire(acl::redis_key& option, int i)
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
+	option.reset();
 	if (option.expire(key.c_str(), 100) < 0)
 	{
 		printf("expire key: %s error\r\n", key.c_str());
@@ -39,6 +41,7 @@ static bool test_ttl(acl::redis_key& option, int i)
 	int ttl;
 
 	key.format("%s_%d", __keypre.c_str(), i);
+	option.reset();
 	if ((ttl = option.ttl(key.c_str())) < 0)
 	{
 		printf("get ttl key: %s error\r\n", key.c_str());
@@ -54,6 +57,7 @@ static bool test_exists(acl::redis_key& option, int i)
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
+	option.reset();
 	if (option.exists(key.c_str()) == false)
 	{
 		if (i < 10)
@@ -72,6 +76,7 @@ static bool test_type(acl::redis_key& option, int i)
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
+	option.reset();
 	acl::redis_key_t ret = option.type(key.c_str());
 	if (ret == acl::REDIS_KEY_UNKNOWN)
 	{

@@ -25,6 +25,8 @@ public:
 	redis_key(redis_client* conn = NULL);
 	~redis_key();
 
+	void reset();
+
 	void set_client(redis_client* conn);
 
 	redis_client* get_client() const
@@ -47,7 +49,6 @@ public:
 	int del(const char* keys[], size_t argc);
 	int del(const int keys[], size_t argc);
 	int del(const char* keys[], const size_t lens[], size_t argc);
-	int del(const string& req);
 
 	/**
 	 * 设置 KEY 的生存周期，单位（秒）
@@ -84,9 +85,16 @@ public:
 	 */
 	redis_key_t type(const char* key);
 
+	bool migrate(const char* key, const char* addr, unsigned dest_db,
+		unsigned timeout, const char* option = NULL);
+
+	int move(const char* key, unsigned dest_db);
+
 private:
 	redis_client* conn_;
 	const redis_result* result_;
+
+	int del(const string& req);
 };
 
 } // namespace acl

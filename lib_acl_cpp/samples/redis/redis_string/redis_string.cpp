@@ -12,6 +12,7 @@ static void test_set(acl::redis_string& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 		value.format("value_%s", key.c_str());
 
+		option.reset();
 		if (option.set(key.c_str(), value.c_str()) == false)
 		{
 			printf("set key: %s error\r\n", key.c_str());
@@ -30,6 +31,8 @@ static void test_setex(acl::redis_string& option, int n, int ttl)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 		value.format("value_%s", key.c_str());
+
+		option.reset();
 		if (option.setex(key.c_str(), value.c_str(), ttl) == false)
 		{
 			printf("setex key: %s error\r\n", key.c_str());
@@ -50,6 +53,7 @@ static void test_setnx(acl::redis_string& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 		value.format("_setnx_%s", key.c_str());
 
+		option.reset();
 		int ret = option.setnx(key.c_str(), value.c_str());
 		if (ret < 0)
 		{
@@ -71,6 +75,7 @@ static void test_append(acl::redis_string& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 		value.format("_append_%d", i);
 
+		option.reset();
 		if (option.append(key.c_str(), value.c_str()) < 0)
 		{
 			printf("append key: %s\r\n", key.c_str());
@@ -90,6 +95,7 @@ static void test_get(acl::redis_string& option, int n)
 		//key.format("key1_%s_%d", __keypre.c_str(), i);
 		value.clear();
 
+		option.reset();
 		if (option.get(key.c_str(), value) == false)
 		{
 			printf("get key: %s\r\n", key.c_str());
@@ -113,6 +119,8 @@ static void test_getset(acl::redis_string& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 		value.format("getset_%s", key.c_str());
 		result.clear();
+
+		option.reset();
 		if (option.getset(key.c_str(), value.c_str(), result) == false)
 		{
 			printf("getset error, key: %s\r\n", key.c_str());
@@ -131,6 +139,8 @@ static void test_strlen(acl::redis_string& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
+
+		option.reset();
 		int ret = option.str_len(key.c_str());
 		if (ret < 0)
 		{
@@ -163,6 +173,7 @@ static void test_mset(acl::redis_string& option, int n)
 		objs[key2] = val2;
 		objs[key3] = val3;
 
+		option.reset();
 		if (option.mset(objs) == false)
 		{
 			printf("mset error\r\n");
@@ -195,6 +206,7 @@ static void test_mget(acl::redis_string& option, int n)
 		keys[2] = key3.c_str();
 
 		result.clear();
+		option.reset();
 		if (option.mget(keys, 3, &result) == false)
 		{
 			printf("mset error\r\n");
@@ -241,6 +253,7 @@ static void test_msetnx(acl::redis_string& option, int n)
 		objs[key2] = val2;
 		objs[key3] = val3;
 
+		option.reset();
 		ret = option.msetnx(objs);
 		if (ret < 0)
 		{
@@ -268,6 +281,8 @@ static void test_setrange(acl::redis_string& option, int n)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 		value.format("range_value_%s", key.c_str());
+
+		option.reset();
 		ret = option.setrange(key.c_str(), off, value.c_str());
 		if (ret < 0)
 		{
@@ -290,6 +305,8 @@ static void test_getrange(acl::redis_string& option, int n)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 		value.clear();
+
+		option.reset();
 		if (option.getrange(key, start, end, value) == false)
 		{
 			printf("getrange error, key: %s, start: %d, end: %d\r\n",
@@ -312,6 +329,8 @@ static void test_setbit(acl::redis_string& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("bit_%s_%d", __keypre.c_str(), i);
+
+		option.reset();
 		if (option.setbit(key.c_str(), off, 1) == false)
 		{
 			printf("setbit error, key: %s, off: %u\r\n",
@@ -334,6 +353,8 @@ static void test_getbit(acl::redis_string& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("bit_%s_%d", __keypre.c_str(), i);
+
+		option.reset();
 		if (option.getbit(key.c_str(), off, bit) == false)
 		{
 			printf("getbit error, key: %s, off: %u\r\n",
@@ -356,6 +377,8 @@ static void test_bitcount(acl::redis_string& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("bit_%s_%d", __keypre.c_str(), i);
+
+		option.reset();
 		ret = option.bitcount(key.c_str());
 		if (ret < 0)
 		{
@@ -384,6 +407,7 @@ static void test_bitop_and(acl::redis_string& option, int n)
 		keys[1] = key2.c_str();
 		keys[2] = key3.c_str();
 
+		option.reset();
 		ret = option.bitop_and(key.c_str(), keys, 3);
 		if (ret < 0)
 		{
@@ -412,6 +436,7 @@ static void test_bitop_or(acl::redis_string& option, int n)
 		keys[1] = key2.c_str();
 		keys[2] = key3.c_str();
 
+		option.reset();
 		ret = option.bitop_or(key.c_str(), keys, 3);
 		if (ret < 0)
 		{
@@ -440,6 +465,7 @@ static void test_bitop_xor(acl::redis_string& option, int n)
 		keys[1] = key2.c_str();
 		keys[2] = key3.c_str();
 
+		option.reset();
 		ret = option.bitop_xor(key.c_str(), keys, 3);
 		if (ret < 0)
 		{
@@ -460,6 +486,8 @@ static void test_incr(acl::redis_string& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("incr_%s_%d", __keypre.c_str(), i);
+
+		option.reset();
 		if (option.incr(key.c_str(), &result) == false)
 		{
 			printf("incr error, key: %s\r\n", key.c_str());
@@ -479,6 +507,8 @@ static void test_incrby(acl::redis_string& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("incr_%s_%d", __keypre.c_str(), i);
+
+		option.reset();
 		if (option.incrby(key.c_str(), 10, &result) == false)
 		{
 			printf("incrby error, key: %s\r\n", key.c_str());
@@ -498,6 +528,8 @@ static void test_incrbyfloat(acl::redis_string& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("incrbyfloat_%s_%d", __keypre.c_str(), i);
+
+		option.reset();
 		if (option.incrbyfloat(key.c_str(), 8.8, &result) == false)
 		{
 			printf("incrbyfloat error, key: %s\r\n", key.c_str());
@@ -517,6 +549,8 @@ static void test_decr(acl::redis_string& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("incr_%s_%d", __keypre.c_str(), i);
+
+		option.reset();
 		if (option.decr(key.c_str(), &result) == false)
 		{
 			printf("decr error, key: %s\r\n", key.c_str());
@@ -536,6 +570,8 @@ static void test_decrby(acl::redis_string& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("incr_%s_%d", __keypre.c_str(), i);
+
+		option.reset();
 		if (option.decrby(key.c_str(), 10, &result) == false)
 		{
 			printf("decrby error, key: %s\r\n", key.c_str());

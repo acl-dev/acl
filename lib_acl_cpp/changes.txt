@@ -1,6 +1,10 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+273) 2015.1.17-1.18
+273.1) feature: 实现了 list/pubsub/connection/transaction redist 客户端命令
+273.2) feature: redis 客户端库中的 redis_key 类增加了 migrate/move 支持
+
 272) 2015.1.16
 272.1) feature: redis 客户端连接池及连接池集群测试通过
 

@@ -16,6 +16,8 @@ public:
 	redis_hash(redis_client* conn = NULL);
 	~redis_hash();
 
+	void reset();
+
 	const redis_result* get_result() const
 	{
 		return result_;
@@ -42,7 +44,6 @@ public:
 	bool hmset(const char* key, const std::map<int, string>& attrs);
 	bool hmset(const char* key, const std::map<int, char*>& attrs);
 	bool hmset(const char* key, const std::map<int, const char*>& attrs);
-	bool hmset(const string& req);
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -67,7 +68,6 @@ public:
 		std::vector<string>* result = NULL);
 	bool hmget(const char* key, const char* names[], const size_t lens[],
 		size_t argc, std::vector<string>* result = NULL);
-	bool hmget(const string& req, std::vector<string>* result = NULL);
 
 	/**
 	 * 当 hmget 获得 true 时调用本方法来获得对应下标的值，下标顺序与 hmget 中的数组
@@ -90,14 +90,12 @@ public:
 		const char* value, size_t value_len);
 	int hset(const char* key, const char* name, size_t name_len,
 		const char* value, size_t value_len);
-	int hset(const string& req);
 
 	int hsetnx(const char* key, const char* name, const char* value);
 	int hsetnx(const char* key, const char* name,
 		const char* value, size_t value_len);
 	int hsetnx(const char* key, const char* name, size_t name_len,
 		const char* value, size_t value_len);
-	int hsetnx(const string& req);
 
 	bool hget(const char* key, const char* name, string& result);
 	bool hget(const char* key, const char* name,
@@ -117,7 +115,6 @@ public:
 	int hdel(const char* key, const std::vector<string>& names);
 	int hdel(const char* key, const std::vector<char*>& names);
 	int hdel(const char* key, const std::vector<const char*>& names);
-	int hdel(const string& req);
 
 	bool hincrby(const char* key, const char* name,
 		long long int inc, long long int* result = NULL);
@@ -136,6 +133,12 @@ public:
 private:
 	redis_client* conn_;
 	const redis_result* result_;
+
+	bool hmset(const string& req);
+	bool hmget(const string& req, std::vector<string>* result = NULL);
+	int hset(const string& req);
+	int hsetnx(const string& req);
+	int hdel(const string& req);
 };
 
 } // namespace acl

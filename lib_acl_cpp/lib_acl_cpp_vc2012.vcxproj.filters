@@ -439,6 +439,15 @@
     <ClCompile Include="src\redis\redis_manager.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\redis\redic_connection.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_pubsub.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_transaction.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -970,6 +979,15 @@
       <Filter>include\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_manager.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_connection.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_pubsub.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_transaction.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
   </ItemGroup>
