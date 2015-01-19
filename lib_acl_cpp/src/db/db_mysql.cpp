@@ -3,35 +3,45 @@
 #include "mysql.h"
 #include "errmsg.h"
 #include "mysqld_error.h"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/db/db_mysql.hpp"
 
 //////////////////////////////////////////////////////////////////////////
-
 #ifdef HAS_MYSQL
 
 #if defined(ACL_CPP_DLL) || defined(USE_DYNAMIC)
-typedef unsigned long (*mysql_libversion_fn)(void);
-typedef const char* (*mysql_client_info_fn)(void);
-typedef MYSQL* (*mysql_init_fn)(MYSQL*);
-typedef MYSQL* (*mysql_open_fn)(MYSQL*, const char*, const char*,
+
+#ifndef STDCALL
+# ifdef WIN32
+#  define STDCALL __stdcall
+# else
+#  define STDCALL
+# endif // WIN32
+#endif // STDCALL
+
+typedef unsigned long (STDCALL *mysql_libversion_fn)(void);
+typedef const char* (STDCALL *mysql_client_info_fn)(void);
+typedef MYSQL* (STDCALL *mysql_init_fn)(MYSQL*);
+typedef MYSQL* (STDCALL *mysql_open_fn)(MYSQL*, const char*, const char*,
     const char*, const char*, unsigned int,
     const char*, unsigned long);
-typedef void (*mysql_close_fn)(MYSQL*);
-typedef int  (*mysql_options_fn)(MYSQL*,enum mysql_option option, const void*);
-typedef my_bool (*mysql_autocommit_fn)(MYSQL*, my_bool);
-typedef unsigned int (*mysql_errno_fn)(MYSQL*);
-typedef const char* (*mysql_error_fn)(MYSQL*);
-typedef int (*mysql_query_fn)(MYSQL*, const char*);
-typedef unsigned int (*mysql_num_fields_fn)(MYSQL_RES*);
-typedef MYSQL_FIELD* (*mysql_fetch_fields_fn)(MYSQL_RES*);
-typedef MYSQL_ROW (*mysql_fetch_row_fn)(MYSQL_RES*);
-typedef MYSQL_RES* (*mysql_store_result_fn)(MYSQL*);
-typedef my_ulonglong (*mysql_num_rows_fn)(MYSQL_RES*);
-typedef void (*mysql_free_result_fn)(MYSQL_RES*);
-typedef my_ulonglong (*mysql_affected_rows_fn)(MYSQL*);
-typedef int (*mysql_set_character_set_fn)(MYSQL*, const char*);
-typedef const char* (*mysql_character_set_name_fn)(MYSQL*);
+typedef void (STDCALL *mysql_close_fn)(MYSQL*);
+typedef int  (STDCALL *mysql_options_fn)(MYSQL*,enum mysql_option option,
+	const void*);
+typedef my_bool (STDCALL *mysql_autocommit_fn)(MYSQL*, my_bool);
+typedef unsigned int (STDCALL *mysql_errno_fn)(MYSQL*);
+typedef const char* (STDCALL *mysql_error_fn)(MYSQL*);
+typedef int (STDCALL *mysql_query_fn)(MYSQL*, const char*);
+typedef unsigned int (STDCALL *mysql_num_fields_fn)(MYSQL_RES*);
+typedef MYSQL_FIELD* (STDCALL *mysql_fetch_fields_fn)(MYSQL_RES*);
+typedef MYSQL_ROW (STDCALL *mysql_fetch_row_fn)(MYSQL_RES*);
+typedef MYSQL_RES* (STDCALL *mysql_store_result_fn)(MYSQL*);
+typedef my_ulonglong (STDCALL *mysql_num_rows_fn)(MYSQL_RES*);
+typedef void (STDCALL *mysql_free_result_fn)(MYSQL_RES*);
+typedef my_ulonglong (STDCALL *mysql_affected_rows_fn)(MYSQL*);
+typedef int (STDCALL *mysql_set_character_set_fn)(MYSQL*, const char*);
+typedef const char* (STDCALL *mysql_character_set_name_fn)(MYSQL*);
 
 static mysql_libversion_fn __mysql_libversion = NULL;
 static mysql_client_info_fn __mysql_client_info = NULL;

@@ -2,7 +2,6 @@
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
-#include "acl_cpp/redis/redis_result.hpp"
 #include "acl_cpp/redis/redis_key.hpp"
 
 namespace acl
@@ -11,7 +10,7 @@ namespace acl
 #define INT_LEN	11
 
 redis_key::redis_key(redis_client* conn /* = NULL */)
-: conn_(conn)
+: redis_command(conn)
 {
 
 }
@@ -19,17 +18,6 @@ redis_key::redis_key(redis_client* conn /* = NULL */)
 redis_key::~redis_key()
 {
 
-}
-
-void redis_key::reset()
-{
-	if (conn_)
-		conn_->reset();
-}
-
-void redis_key::set_client(redis_client* conn)
-{
-	conn_ = conn;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -51,49 +39,43 @@ int redis_key::del(const char* first_key, ...)
 int redis_key::del(const std::vector<string>& keys)
 {
 	const string& req = conn_->build("DEL", NULL, keys);
-	return del(req);
+	return conn_->get_number(req);
 }
 
 int redis_key::del(const std::vector<char*>& keys)
 {
 	const string& req = conn_->build("DEL", NULL, keys);
-	return del(req);
+	return conn_->get_number(req);
 }
 
 int redis_key::del(const std::vector<const char*>& keys)
 {
 	const string& req = conn_->build("DEL", NULL, keys);
-	return del(req);
+	return conn_->get_number(req);
 }
 
 int redis_key::del(const std::vector<int>& keys)
 {
 	const string& req = conn_->build("DEL", NULL, keys);
-	return del(req);
+	return conn_->get_number(req);
 }
 
 int redis_key::del(const char* keys[], size_t argc)
 {
 	const string& req = conn_->build("DEL", NULL, keys, argc);
-	return del(req);
+	return conn_->get_number(req);
 }
 
 int redis_key::del(const int keys[], size_t argc)
 {
 	const string& req = conn_->build("DEL", NULL, keys, argc);
-	return del(req);
+	return conn_->get_number(req);
 }
 
 int redis_key::del(const char* keys[], const size_t lens[], size_t argc)
 {
 	const string& req = conn_->build("DEL", NULL, keys, lens, argc);
-	return del(req);
-}
-
-int redis_key::del(const string& req)
-{
-	result_ = conn_->run(req);
-	return result_ == NULL ? -1 : result_->get_integer();
+	return conn_->get_number(req);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -107,10 +89,7 @@ int redis_key::expire(const char* key, int n)
 	argv[1] = buf;
 
 	const string& req = conn_->build("EXPIRE", NULL, argv, 2);
-	const redis_result* rr = conn_->run(req);
-	if (rr == NULL)
-		return -1;
-	return rr->get_integer();
+	return conn_->get_number(req);
 }
 
 int redis_key::ttl(const char* key)
@@ -119,16 +98,13 @@ int redis_key::ttl(const char* key)
 	argv[0] = key;
 
 	const string& req = conn_->build("TTL", NULL, argv, 1);
-	const redis_result* rr = conn_->run(req);
-	if (rr == NULL)
-		return -1;
+
 	bool success;
-	int ret = rr->get_integer(&success);
-	if (!success)
+	int ret = conn_->get_number(req, &success);
+	if (success == false)
 		return -1;
-	if (ret < 0)
-		return 0;
-	return ret;
+	else
+		return ret;
 }
 
 bool redis_key::exists(const char* key)
@@ -137,10 +113,7 @@ bool redis_key::exists(const char* key)
 	keys[0] = key;
 
 	const string& req = conn_->build("EXISTS", NULL, keys, 1);
-	const redis_result* rr = conn_->run(req);
-	if (rr == NULL)
-		return false;
-	return rr->get_integer() > 0 ? true : false;
+	return conn_->get_number(req) > 0 ? true : false;
 }
 
 redis_key_t redis_key::type(const char* key)
@@ -149,14 +122,7 @@ redis_key_t redis_key::type(const char* key)
 	keys[0] = key;
 
 	const string& req = conn_->build("TYPE", NULL, keys, 1);
-	const redis_result* rr = conn_->run(req);
-	if (rr == NULL)
-	{
-		logger_error("result null");
-		return REDIS_KEY_UNKNOWN;
-	}
-
-	const char* ptr = rr->get_status();
+	const char* ptr = conn_->get_status_string(req);
 	if (ptr == NULL)
 		return REDIS_KEY_UNKNOWN;
 
@@ -221,13 +187,7 @@ bool redis_key::migrate(const char* key, const char* addr, unsigned dest_db,
 	}
 
 	const string& req = conn_->build_request(argc, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL || result_->get_type() != REDIS_RESULT_STATUS)
-		return false;
-	const char* status = result_->get_status();
-	if (status == NULL || strcasecmp(status, "OK") != 0)
-		return false;
-	return true;
+	return conn_->get_status(req);
 }
 
 int redis_key::move(const char* key, unsigned dest_db)
@@ -246,10 +206,7 @@ int redis_key::move(const char* key, unsigned dest_db)
 	lens[2] = strlen(db_s);
 
 	const string& req = conn_->build_request(3, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL || result_->get_type() != REDIS_RESULT_INTEGER)
-		return -1;
-	return result_->get_integer();
+	return conn_->get_number(req);
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -8,7 +8,7 @@ namespace acl
 {
 
 redis_pubsub::redis_pubsub(redis_client* conn /* = NULL */)
-: conn_(conn)
+: redis_command(conn)
 {
 
 }
@@ -16,17 +16,6 @@ redis_pubsub::redis_pubsub(redis_client* conn /* = NULL */)
 redis_pubsub::~redis_pubsub()
 {
 
-}
-
-void redis_pubsub::reset()
-{
-	if (conn_)
-		conn_->reset();
-}
-
-void redis_pubsub::set_client(redis_client* conn)
-{
-	conn_ = conn;
 }
 
 int redis_pubsub::publish(const char* channel, const char* msg, size_t len)
@@ -42,11 +31,7 @@ int redis_pubsub::publish(const char* channel, const char* msg, size_t len)
 	lens[2] = len;
 
 	const string& req = conn_->build_request(3, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL || result_->get_type() != REDIS_RESULT_INTEGER)
-		return -1;
-
-	return result_->get_integer();
+	return conn_->get_number(req);
 }
 
 int redis_pubsub::subscribe(const char* first_channel, ...)
@@ -65,7 +50,7 @@ int redis_pubsub::subscribe(const char* first_channel, ...)
 
 int redis_pubsub::subscribe(const std::vector<string>& channels)
 {
-	return subscribe("SUBSCRIBE", channels);
+	return subop("SUBSCRIBE", channels);
 }
 
 int redis_pubsub::unsubscribe(const char* first_channel, ...)
@@ -84,11 +69,10 @@ int redis_pubsub::unsubscribe(const char* first_channel, ...)
 
 int redis_pubsub::unsubscribe(const std::vector<string>& channels)
 {
-	return subscribe("UNSUBSCRIBE", channels);
+	return subop("UNSUBSCRIBE", channels);
 }
 
-int redis_pubsub::subscribe(const char* cmd,
-	const std::vector<string>& channels)
+int redis_pubsub::subop(const char* cmd, const std::vector<string>& channels)
 {
 	size_t argc = 1 + channels.size();
 	dbuf_pool* pool = conn_->get_pool();
@@ -107,17 +91,17 @@ int redis_pubsub::subscribe(const char* cmd,
 	}
 
 	const string& req = conn_->build_request(argc, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL || result_->get_type() != REDIS_RESULT_ARRAY)
+	const redis_result* result = conn_->run(req);
+	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
-	size_t size = result_->get_size();
+	size_t size = result->get_size();
 	if (size != channels.size())
 		return -1;
 
 	int nchannels = 0, ret;
 	for (size_t i = 1; i < size; i++)
 	{
-		const redis_result* obj = result_->get_child(i);
+		const redis_result* obj = result->get_child(i);
 		if (obj == NULL)
 			return -1;
 		if (( ret = check_channel(obj, argv[0], channels[i])) < 0)
@@ -153,22 +137,22 @@ int redis_pubsub::check_channel(const redis_result* obj, const char* cmd,
 	rr = obj->get_child(2);
 	if (rr == NULL || rr->get_type() != REDIS_RESULT_INTEGER)
 		return -1;
-	return result_->get_integer();
+	return obj->get_integer();
 }
 
 bool redis_pubsub::get_message(string& channel, string& msg)
 {
-	result_ = conn_->run("");
-	if (result_ == NULL)
+	const redis_result* result = conn_->run("");
+	if (result == NULL)
 		return false;
-	if (result_->get_type() != REDIS_RESULT_ARRAY)
+	if (result->get_type() != REDIS_RESULT_ARRAY)
 		return false;
 
-	size_t size = result_->get_size();
+	size_t size = result->get_size();
 	if (size != 3)
 		return false;
 
-	const redis_result* obj = result_->get_child(0);
+	const redis_result* obj = result->get_child(0);
 	if (obj == NULL || obj->get_type() != REDIS_RESULT_STRING)
 		return false;
 
@@ -177,12 +161,12 @@ bool redis_pubsub::get_message(string& channel, string& msg)
 	if (strcasecmp(tmp.c_str(), "message") != 0)
 		return false;
 
-	obj = result_->get_child(1);
+	obj = result->get_child(1);
 	if (obj == NULL || obj->get_type() != REDIS_RESULT_STRING)
 		return false;
 	obj->argv_to_string(channel);
 
-	obj = result_->get_child(2);
+	obj = result->get_child(2);
 	if (obj == NULL || obj->get_type() != REDIS_RESULT_STRING)
 		return false;
 	obj->argv_to_string(msg);

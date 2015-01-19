@@ -2,14 +2,13 @@
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
-#include "acl_cpp/redis/redis_result.hpp"
 #include "acl_cpp/redis/redis_connection.hpp"
 
 namespace acl
 {
 
 redis_connection::redis_connection(redis_client* conn /* = NULL */)
-: conn_(conn)
+: redis_command(conn)
 {
 
 }
@@ -17,11 +16,6 @@ redis_connection::redis_connection(redis_client* conn /* = NULL */)
 redis_connection::~redis_connection()
 {
 
-}
-
-void redis_connection::set_client(redis_client* conn)
-{
-	conn_ = conn;
 }
 
 bool redis_connection::auth(const char* passwd)
@@ -36,16 +30,7 @@ bool redis_connection::auth(const char* passwd)
 	lens[1] = strlen(argv[1]);
 
 	const string& req = conn_->build_request(2, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return false;
-	if (result_->get_type() != REDIS_RESULT_STATUS)
-		return false;
-	const char* res = result_->get(0);
-	if (res == NULL || strcasecmp(res, "OK") != 0)
-		return false;
-	else
-		return true;
+	return conn_->get_status(req);
 }
 
 bool redis_connection::select(int dbnum)
@@ -62,15 +47,7 @@ bool redis_connection::select(int dbnum)
 	lens[1] = strlen(argv[1]);
 
 	const string& req = conn_->build_request(2, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return false;
-	if (result_->get_type() != REDIS_RESULT_STATUS)
-		return false;
-	const char* res = result_->get(0);
-	if (res == NULL || strcasecmp(res, "ok") != 0)
-		return false;
-	return true;
+	return conn_->get_status(req);
 }
 
 bool redis_connection::ping()
@@ -82,15 +59,7 @@ bool redis_connection::ping()
 	lens[0] = strlen(argv[0]);
 
 	const string& req = conn_->build_request(1, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return false;
-	if (result_->get_type() != REDIS_RESULT_STATUS)
-		return false;
-	const char* res = result_->get(0);
-	if (res == NULL || strcasecmp(res, "PONG") != 0)
-		return false;
-	return true;
+	return conn_->get_status(req, "PONG");
 }
 
 bool redis_connection::echo(const char* s)
@@ -104,18 +73,9 @@ bool redis_connection::echo(const char* s)
 	argv[1] = s;
 	lens[1] = strlen(argv[1]);
 
-	const string& req = conn_->build_request(2, argv, lens);
-	result_  = conn_->run(req);
-	if (result_ == NULL)
-		return false;
-	if (result_->get_type() != REDIS_RESULT_STRING)
-		return false;
 	string buf;
-	result_->argv_to_string(buf);
-	if (buf != s)
-		return false;
-	else
-		return true;
+	const string& req = conn_->build_request(2, argv, lens);
+	return conn_->get_string(req, buf) >= 0 ? true : false;
 }
 
 bool redis_connection::quit()
@@ -127,17 +87,9 @@ bool redis_connection::quit()
 	lens[0] = strlen(argv[0]);
 
 	const string& req = conn_->build_request(1, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return false;
-	if (result_->get_type() != REDIS_RESULT_STATUS)
-		return false;
-	const char* res = result_->get(0);
-	if (res == NULL || strcasecmp(res, "OK") != 0)
-		return false;
-
+	bool ret = conn_->get_status(req);
 	conn_->close();
-	return true;
+	return ret;
 }
 
 } // namespace acl

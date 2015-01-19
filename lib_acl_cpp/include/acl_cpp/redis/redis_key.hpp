@@ -2,6 +2,7 @@
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <vector>
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/redis/redis_command.hpp"
 
 namespace acl {
 
@@ -19,20 +20,11 @@ typedef enum
 	REDIS_KEY_ZSET		// sorted set
 } redis_key_t;
 
-class ACL_CPP_API redis_key
+class ACL_CPP_API redis_key : public redis_command
 {
 public:
 	redis_key(redis_client* conn = NULL);
 	~redis_key();
-
-	void reset();
-
-	void set_client(redis_client* conn);
-
-	redis_client* get_client() const
-	{
-		return conn_;
-	}
 
 	/**
 	 * É¾³ýÒ»×é KEY
@@ -89,12 +81,6 @@ public:
 		unsigned timeout, const char* option = NULL);
 
 	int move(const char* key, unsigned dest_db);
-
-private:
-	redis_client* conn_;
-	const redis_result* result_;
-
-	int del(const string& req);
 };
 
 } // namespace acl

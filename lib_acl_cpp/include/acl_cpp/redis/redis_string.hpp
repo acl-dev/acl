@@ -2,6 +2,7 @@
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <map>
 #include <vector>
+#include "acl_cpp/redis/redis_command.hpp"
 
 namespace acl
 {
@@ -10,25 +11,11 @@ class string;
 class redis_client;
 class redis_result;
 
-class ACL_CPP_API redis_string
+class ACL_CPP_API redis_string : public redis_command
 {
 public:
 	redis_string(redis_client* conn = NULL);
 	~redis_string();
-
-	void reset();
-
-	const redis_result* get_result() const
-	{
-		return result_;
-	}
-
-	void set_client(redis_client* conn);
-
-	redis_client* get_client() const
-	{
-		return conn_;
-	}
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -129,22 +116,22 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	bool mget(const std::vector<string>& keys,
-		std::vector<string>* result = NULL);
+		std::vector<string>* out = NULL);
 	bool mget(const std::vector<const char*>& keys,
-		std::vector<string>* result = NULL);
+		std::vector<string>* out = NULL);
 	bool mget(const std::vector<char*>& keys,
-		std::vector<string>* result = NULL);
+		std::vector<string>* out = NULL);
 	bool mget(const std::vector<int>& keys,
-		std::vector<string>* result = NULL);
+		std::vector<string>* out = NULL);
 
 	bool mget(std::vector<string>* result, const char* first_key, ...)
 		ACL_CPP_PRINTF(3, 4);;
 	bool mget(const char* keys[], size_t argc,
-		std::vector<string>* result = NULL);
+		std::vector<string>* out = NULL);
 	bool mget(const int keys[], size_t argc,
-		std::vector<string>* result = NULL);
+		std::vector<string>* out = NULL);
 	bool mget(const char* keys[], const size_t keys_len[], size_t argc,
-		std::vector<string>* result = NULL);
+		std::vector<string>* out = NULL);
 
 	size_t mget_size() const;
 	const char* mget_value(size_t i, size_t* len = NULL) const;
@@ -167,19 +154,13 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 private:
-	redis_client* conn_;
-	const redis_result* result_;
-
 	int bitop(const char* op, const char* destkey,
 		const std::vector<string>& keys);
 	int bitop(const char* op, const char* destkey,
 		const std::vector<const char*>& keys);
 	int bitop(const char* op, const char* destkey,
 		const char* keys[], size_t size);
-	int bitop(const string& req);
-	bool mset(const string& req);
-	int msetnx(const string& req);
-	bool mget(const string& req, std::vector<string>* result = NULL);
+	bool mget(const string& req, std::vector<string>* out = NULL);
 };
 
 } // namespace acl

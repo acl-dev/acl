@@ -1,6 +1,11 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+274) 2015.1.19
+274.1) bugfix: db_mysql.cpp 在 WIN32 下使用 mysql 库采用了动态加载的方式，在函数指针
+前应增加 STDCALL 宏定义
+274.2) redis: 重构 redis 客户端库
+
 273) 2015.1.17-1.18
 273.1) feature: 实现了 list/pubsub/connection/transaction redist 客户端命令
 273.2) feature: redis 客户端库中的 redis_key 类增加了 migrate/move 支持

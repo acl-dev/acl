@@ -3,6 +3,7 @@
 #include <map>
 #include <vector>
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/redis/redis_command.hpp"
 
 namespace acl
 {
@@ -10,25 +11,11 @@ namespace acl
 class redis_client;
 class redis_result;
 
-class ACL_CPP_API redis_hash
+class ACL_CPP_API redis_hash : public redis_command
 {
 public:
 	redis_hash(redis_client* conn = NULL);
 	~redis_hash();
-
-	void reset();
-
-	const redis_result* get_result() const
-	{
-		return result_;
-	}
-
-	void set_client(redis_client* conn);
-
-	redis_client* get_client() const
-	{
-		return conn_;
-	}
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -131,14 +118,7 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 private:
-	redis_client* conn_;
-	const redis_result* result_;
-
-	bool hmset(const string& req);
 	bool hmget(const string& req, std::vector<string>* result = NULL);
-	int hset(const string& req);
-	int hsetnx(const string& req);
-	int hdel(const string& req);
 };
 
 } // namespace acl

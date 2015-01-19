@@ -24,10 +24,34 @@ public:
 	}
 
 	void reset();
-
 	void close();
 	
+	const redis_result* get_result() const
+	{
+		return result_;
+	}
+
 	const redis_result* run(const string& request, size_t nobjs = 1);
+
+	int get_number(const string& req, bool* success = NULL);
+	long long int get_number64(const string& req, bool* success = NULL);
+	bool get_status(const string& req, const char* success = "OK");
+	const char* get_status_string(const char* req);
+	int get_string(const string& req, string& buf);
+	int get_string(const string& req, string* buf);
+	int get_string(const string& req, char* buf, size_t size);
+	int get_strings(const string& req, std::vector<string>& result);
+	int get_strings(const string& req, std::map<string, string>& result);
+	int get_strings(const string& req, std::vector<string>& names,
+		std::vector<string>& values);
+	int get_strings(const string& req, std::vector<const char*>& names,
+		std::vector<const char*>& values);
+
+	const char* get_value(size_t i, size_t* len = NULL);
+	const redis_result* get_child(size_t i) const;
+	size_t get_size() const;
+
+	/*******************************************************************/
 
 	const string& build_request(size_t argc, const char* argv[],
 		size_t argv_lens[], string* buf = NULL);

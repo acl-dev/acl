@@ -14,8 +14,7 @@ namespace acl
 #define FLOAT_LEN	32
 
 redis_string::redis_string(redis_client* conn /* = NULL */)
-: conn_(conn)
-, result_(NULL)
+: redis_command(conn)
 {
 
 }
@@ -23,12 +22,6 @@ redis_string::redis_string(redis_client* conn /* = NULL */)
 redis_string::~redis_string()
 {
 
-}
-
-void redis_string::reset()
-{
-	if (conn_)
-		conn_->reset();
 }
 
 bool redis_string::set(const char* key, const char* value)
@@ -50,16 +43,7 @@ bool redis_string::set(const char* key, size_t key_len,
 	lens[2] = value_len;
 
 	const string& req = conn_->build_request(3, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return false;
-	if (result_->get_type() != REDIS_RESULT_STATUS)
-		return false;
-	const char* status = result_->get_status();
-	if (status == NULL || strcasecmp(status, "OK") != 0)
-		return false;
-	else
-		return true;
+	return conn_->get_status(req);
 }
 
 bool redis_string::setex(const char* key, const char* value, int timeout)
@@ -87,16 +71,7 @@ bool redis_string::setex(const char* key, size_t key_len, const char* value,
 	lens[3] = value_len;
 
 	const string& req = conn_->build_request(4, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return false;
-	if (result_->get_type() != REDIS_RESULT_STATUS)
-		return false;
-	const char* status = result_->get_status();
-	if (status == NULL || strcasecmp(status, "OK") != 0)
-		return false;
-	else
-		return true;
+	return conn_->get_status(req);
 }
 
 int redis_string::setnx(const char* key, const char* value)
@@ -118,12 +93,7 @@ int redis_string::setnx(const char* key, size_t key_len,
 	lens[2] = value_len;
 
 	const string& req = conn_->build_request(3, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return -1;
-	if (result_->get_type() != REDIS_RESULT_INTEGER)
-		return -1;
-	return result_->get_integer();
+	return conn_->get_number(req);
 }
 
 int redis_string::append(const char* key, const char* value)
@@ -144,12 +114,7 @@ int redis_string::append(const char* key, const char* value, size_t size)
 	lens[2] = size;
 
 	const string& req = conn_->build_request(3, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return -1;
-	if (result_->get_type() != REDIS_RESULT_INTEGER)
-		return -1;
-	return result_->get_integer();
+	return conn_->get_number(req);
 }
 
 bool redis_string::get(const char* key, string& buf)
@@ -159,11 +124,16 @@ bool redis_string::get(const char* key, string& buf)
 
 bool redis_string::get(const char* key, size_t len, string& buf)
 {
-	result_ = get(key, len);
-	if (result_ == NULL)
-		return false;
-	(void) result_->argv_to_string(buf);
-	return true;
+	const char* argv[2];
+	size_t lens[2];
+
+	argv[0] = "GET";
+	lens[0] = sizeof("GET") - 1;
+	argv[1] = key;
+	lens[1] = len;
+
+	const string& req = conn_->build_request(2, argv, lens);
+	return conn_->get_string(req, buf) >= 0 ? true : false;
 }
 
 const redis_result* redis_string::get(const char* key)
@@ -182,12 +152,12 @@ const redis_result* redis_string::get(const char* key, size_t len)
 	lens[1] = len;
 
 	const string& req = conn_->build_request(2, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
+	const redis_result* result = conn_->run(req);
+	if (result == NULL)
 		return NULL;
-	if (result_->get_type() != REDIS_RESULT_STRING)
+	if (result->get_type() != REDIS_RESULT_STRING)
 		return NULL;
-	return result_;
+	return result;
 }
 
 bool redis_string::getset(const char* key, const char* value, string& buf)
@@ -209,13 +179,7 @@ bool redis_string::getset(const char* key, size_t key_len,
 	lens[2] = value_len;
 
 	const string& req = conn_->build_request(3, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return false;
-	if (result_->get_type() != REDIS_RESULT_STRING)
-		return false;
-	(void) result_->argv_to_string(buf);
-	return true;
+	return conn_->get_string(req, buf) >= 0 ? true : false;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -236,12 +200,7 @@ int redis_string::str_len(const char* key, size_t len)
 	lens[1] = len;
 
 	const string& req = conn_->build_request(2, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return -1;
-	if (result_->get_type() != REDIS_RESULT_INTEGER)
-		return -1;
-	return result_->get_integer();
+	return conn_->get_number(req);
 }
 
 int redis_string::setrange(const char* key, unsigned offset, const char* value)
@@ -269,13 +228,7 @@ int redis_string::setrange(const char* key, size_t key_len, unsigned offset,
 	lens[3] = value_len;
 
 	const string& req = conn_->build_request(4, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return -1;
-
-	if (result_->get_type() != REDIS_RESULT_INTEGER)
-		return -1;
-	return result_->get_integer();
+	return conn_->get_number(req);
 }
 
 bool redis_string::getrange(const char* key, int start, int end, string& buf)
@@ -304,13 +257,7 @@ bool redis_string::getrange(const char* key, size_t key_len,
 	lens[3] = strlen(end_buf);
 
 	const string& req = conn_->build_request(4, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return false;
-	if (result_->get_type() != REDIS_RESULT_STRING)
-		return false;
-	(void) result_->argv_to_string(buf);
-	return true;
+	return conn_->get_string(req, buf) >= 0 ? true : false;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -339,12 +286,7 @@ bool redis_string::setbit(const char* key, size_t len, unsigned offset, int bit)
 	lens[3] = 1;
 
 	const string& req = conn_->build_request(4, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return false;
-	if (result_->get_type() != REDIS_RESULT_INTEGER)
-		return false;
-	return true;
+	return conn_->get_number(req) >= 0 ? true : false;
 }
 
 bool redis_string::getbit(const char* key, unsigned offset, int& bit)
@@ -352,7 +294,8 @@ bool redis_string::getbit(const char* key, unsigned offset, int& bit)
 	return getbit(key, strlen(key), offset, bit);
 }
 
-bool redis_string::getbit(const char* key, size_t len, unsigned offset, int& bit)
+bool redis_string::getbit(const char* key, size_t len,
+	unsigned offset, int& bit)
 {
 	const char* argv[3];
 	size_t lens[3];
@@ -368,13 +311,10 @@ bool redis_string::getbit(const char* key, size_t len, unsigned offset, int& bit
 	lens[2] = strlen(buf4off);
 
 	const string& req = conn_->build_request(3, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
+	int ret = conn_->get_number(req);
+	if (ret < 0)
 		return false;
-	if (result_->get_type() != REDIS_RESULT_INTEGER)
-		return false;
-
-	bit = result_->get_integer() == 0 ? 0 : 1;
+	bit = ret == 0 ? 0 : 1;
 	return true;
 }
 
@@ -394,12 +334,7 @@ int redis_string::bitcount(const char* key, size_t len)
 	lens[1] = len;
 
 	const string& req = conn_->build_request(2, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return -1;
-	if (result_->get_type() != REDIS_RESULT_INTEGER)
-		return -1;
-	return result_->get_integer();
+	return conn_->get_number(req);
 }
 
 int redis_string::bitcount(const char* key, int start, int end)
@@ -428,12 +363,7 @@ int redis_string::bitcount(const char* key, size_t len, int start, int end)
 	lens[3] = strlen(buf4end);
 
 	const string& req = conn_->build_request(4, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return -1;
-	if (result_->get_type() != REDIS_RESULT_INTEGER)
-		return -1;
-	return result_->get_integer();
+	return conn_->get_number(req);
 }
 
 int redis_string::bitop_and(const char* destkey, const std::vector<string>& keys)
@@ -542,7 +472,7 @@ int redis_string::bitop(const char* op, const char* destkey,
 	}
 
 	const string& req = conn_->build_request(argc, argv, lens);
-	return bitop(req);
+	return conn_->get_number(req);
 }
 
 int redis_string::bitop(const char* op, const char* destkey,
@@ -570,7 +500,7 @@ int redis_string::bitop(const char* op, const char* destkey,
 	}
 
 	const string& req = conn_->build_request(argc, argv, lens);
-	return bitop(req);
+	return conn_->get_number(req);
 }
 
 int redis_string::bitop(const char* op, const char* destkey,
@@ -597,17 +527,7 @@ int redis_string::bitop(const char* op, const char* destkey,
 	}
 
 	const string& req = conn_->build_request(argc, argv, lens);
-	return bitop(req);
-}
-
-int redis_string::bitop(const string& req)
-{
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return -1;
-	if (result_->get_type() != REDIS_RESULT_INTEGER)
-		return -1;
-	return result_->get_integer();
+	return conn_->get_number(req);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -615,33 +535,33 @@ int redis_string::bitop(const string& req)
 bool redis_string::mset(const std::map<string, string>& objs)
 {
 	const string& req = conn_->build("MSET", NULL, objs);
-	return mset(req);
+	return conn_->get_status(req);
 }
 
 bool redis_string::mset(const std::map<int, string>& objs)
 {
 	const string& req = conn_->build("MSET", NULL, objs);
-	return mset(req);
+	return conn_->get_status(req);
 }
 
 bool redis_string::mset(const std::vector<string>& keys,
 	const std::vector<string>& values)
 {
 	const string& req = conn_->build("MSET", NULL, keys, values);
-	return mset(req);
+	return conn_->get_status(req);
 }
 
 bool redis_string::mset(const std::vector<int>& keys,
 	const std::vector<string>& values)
 {
 	const string& req = conn_->build("MSET", NULL, keys, values);
-	return mset(req);
+	return conn_->get_status(req);
 }
 
 bool redis_string::mset(const char* keys[], const char* values[], size_t argc)
 {
 	const string& req = conn_->build("MSET", NULL, keys, values, argc);
-	return mset(req);
+	return conn_->get_status(req);
 }
 
 bool redis_string::mset(const char* keys[], const size_t keys_len[],
@@ -649,20 +569,7 @@ bool redis_string::mset(const char* keys[], const size_t keys_len[],
 {
 	const string& req = conn_->build("MSET", NULL, keys, keys_len,
 		values, values_len, argc);
-	return mset(req);
-}
-
-bool redis_string::mset(const string& req)
-{
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return false;
-	if (result_->get_type() != REDIS_RESULT_STATUS)
-		return false;
-	const char* ptr = result_->get(0);
-	if (ptr == NULL || strcasecmp(ptr, "OK") != 0)
-		return false;
-	return true;
+	return conn_->get_status(req);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -670,34 +577,34 @@ bool redis_string::mset(const string& req)
 int redis_string::msetnx(const std::map<string, string>& objs)
 {
 	const string& req = conn_->build("MSETNX", NULL, objs);
-	return msetnx(req);
+	return conn_->get_number(req);
 }
 
 int redis_string::msetnx(const std::map<int, string>& objs)
 {
 	const string& req = conn_->build("MSETNX", NULL, objs);
-	return msetnx(req);
+	return conn_->get_number(req);
 }
 
 int redis_string::msetnx(const std::vector<string>& keys,
 	const std::vector<string>& values)
 {
 	const string& req = conn_->build("MSETNX", NULL, keys, values);
-	return msetnx(req);
+	return conn_->get_number(req);
 }
 
 int redis_string::msetnx(const std::vector<int>& keys,
 	const std::vector<string>& values)
 {
 	const string& req = conn_->build("MSETNX", NULL, keys, values);
-	return msetnx(req);
+	return conn_->get_number(req);
 }
 
 
 int redis_string::msetnx(const char* keys[], const char* values[], size_t argc)
 {
 	const string& req = conn_->build("MSETNX", NULL, keys, values, argc);
-	return msetnx(req);
+	return conn_->get_number(req);
 }
 
 int redis_string::msetnx(const char* keys[], const size_t keys_len[],
@@ -705,56 +612,40 @@ int redis_string::msetnx(const char* keys[], const size_t keys_len[],
 {
 	const string& req = conn_->build("MSETNX", NULL, keys, keys_len,
 		values, values_len, argc);
-	return msetnx(req);
-}
-
-int redis_string::msetnx(const string& req)
-{
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return -1;
-	if (result_->get_type() != REDIS_RESULT_INTEGER)
-		return -1;
-	int ret = result_->get_integer();
-	if (ret == 0)
-		return 0;
-	else if (ret == 1)
-		return 1;
-	else
-		return -1;
+	return conn_->get_number(req);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 
 bool redis_string::mget(const std::vector<string>& keys,
-	std::vector<string>* result /* = NULL */)
+	std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys);
-	return mget(req, result);
+	return mget(req, out);
 }
 
 bool redis_string::mget(const std::vector<const char*>& keys,
-	std::vector<string>* result /* = NULL */)
+	std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys);
-	return mget(req, result);
+	return mget(req, out);
 }
 
 bool redis_string::mget(const std::vector<char*>& keys,
-	std::vector<string>* result /* = NULL */)
+	std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys);
-	return mget(req, result);
+	return mget(req, out);
 }
 
 bool redis_string::mget(const std::vector<int>& keys,
-	std::vector<string>* result /* = NULL */)
+	std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys);
-	return mget(req, result);
+	return mget(req, out);
 }
 
-bool redis_string::mget(std::vector<string>* result,
+bool redis_string::mget(std::vector<string>* out,
 	const char* first_key, ...)
 {
 	std::vector<const char*> keys;
@@ -766,63 +657,63 @@ bool redis_string::mget(std::vector<string>* result,
 		keys.push_back(key);
 	va_end(ap);
 
-	return mget(keys, result);
+	return mget(keys, out);
 }
 
 bool redis_string::mget(const char* keys[], size_t argc,
-	std::vector<string>* result /* = NULL */)
+	std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys, argc);
-	return mget(req, result);
+	return mget(req, out);
 }
 
 bool redis_string::mget(const int keys[], size_t argc,
-	std::vector<string>* result /* = NULL */)
+	std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys, argc);
-	return mget(req, result);
+	return mget(req, out);
 }
 
 bool redis_string::mget(const char* keys[], const size_t keys_len[],
-	size_t argc, std::vector<string>* result /* = NULL */)
+	size_t argc, std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys, keys_len, argc);
-	return mget(req, result);
+	return mget(req, out);
 }
 
-bool redis_string::mget(const string& req,
-	std::vector<string>* result /* = NULL */)
+bool redis_string::mget(const string& req, std::vector<string>* out /* = NULL */)
 {
-	result_ = conn_->run(req);
-	if (result_ == NULL)
+	const redis_result* result = conn_->run(req);
+	if (result == NULL)
 		return false;
-	if (result_->get_type() != REDIS_RESULT_ARRAY)
+	if (result->get_type() != REDIS_RESULT_ARRAY)
 		return false;
 	if (result == NULL)
 		return true;
 
-	size_t size = mget_size();
 	string buf(4096);
 	const redis_result* rr;
 	size_t nslice, len;
 	const char* ptr;
 
+	size_t size = mget_size();
+
 	for (size_t i = 0; i < size; i++)
 	{
 		rr = mget_result(i);
 		if (rr == NULL || (nslice = rr->get_size()) == 0)
-			result->push_back("");
+			out->push_back("");
 		else if (nslice == 1)
 		{
 			ptr = rr->get(0, &len);
 			buf.copy(ptr, len);
-			result->push_back(buf);
+			out->push_back(buf);
 		}
 		else
 		{
 			buf.clear();
 			rr->argv_to_string(buf);
-			result->push_back(buf);
+			out->push_back(buf);
 		}
 	}
 
@@ -831,41 +722,17 @@ bool redis_string::mget(const string& req,
 
 const char* redis_string::mget_value(size_t i, size_t* len /* = NULL */) const
 {
-	const redis_result* rr = mget_result(i);
-	if (rr == NULL)
-		return NULL;
-	size_t size = rr->get_size();
-	if (size == 0)
-		return NULL;
-	if (size == 1)
-		return rr->get(0, len);
-
-	// 大内存有可能被切片成多个不连续的小内存
-	size = rr->get_length();
-	size++;
-	char* buf = (char*) conn_->get_pool()->dbuf_alloc(size);
-	size = rr->argv_to_string(buf, size);
-	if (len)
-		*len = size;
-	return buf;
+	return conn_->get_value(i, len);
 }
 
 const redis_result* redis_string::mget_result(size_t i) const
 {
-	if (result_ == NULL)
-		return NULL;
-	if (result_->get_type() != REDIS_RESULT_ARRAY)
-		return NULL;
-	return result_->get_child(i);
+	return conn_->get_child(i);
 }
 
 size_t redis_string::mget_size() const
 {
-	if (result_ == NULL)
-		return 0;
-	if (result_->get_type() != REDIS_RESULT_ARRAY)
-		return 0;
-	return result_->get_size();
+	return conn_->get_size();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -898,16 +765,11 @@ bool redis_string::incrbyfloat(const char* key, double inc,
 	lens[2] = strlen(buf);
 
 	const string& req = conn_->build_request(3, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
+	if (conn_->get_string(req, buf, sizeof(buf)) == false)
 		return false;
-	if (result_->get_type() != REDIS_RESULT_STRING)
-		return false;
+
 	if (result != NULL)
-	{
-		(void) result_->argv_to_string(buf, sizeof(buf));
 		*result = atof(buf);
-	}
 	return true;
 }
 
@@ -944,14 +806,13 @@ bool redis_string::incoper(const char* cmd, const char* key, long long int n,
 	}
 
 	const string& req = conn_->build_request(argc, argv, lens);
-	result_ = conn_->run(req);
-	if (result_ == NULL)
-		return false;
-	if (result_->get_type() != REDIS_RESULT_INTEGER)
-		return false;
+
+	bool success;
 	if (result != NULL)
-		*result = result_->get_integer64();
-	return true;
+		*result = conn_->get_number64(req, &success);
+	else
+		(void) conn_->get_number64(req, &success);
+	return success;
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -142,3 +142,5 @@
 #include "acl_cpp/redis/redis_list.hpp"
 #include "acl_cpp/redis/redis_pubsub.hpp"
 #include "acl_cpp/redis/redis_transaction.hpp"
+#include "acl_cpp/redis/redis_set.hpp"
+#include "acl_cpp/redis/redis_zset.hpp"

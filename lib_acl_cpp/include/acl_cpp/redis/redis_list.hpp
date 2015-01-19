@@ -1,5 +1,6 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
+#include "acl_cpp/redis/redis_command.hpp"
 
 namespace acl
 {
@@ -7,25 +8,11 @@ namespace acl
 class redis_client;
 class redis_result;
 
-class ACL_CPP_API redis_list
+class ACL_CPP_API redis_list : public redis_command
 {
 public:
 	redis_list(redis_client* conn = NULL);
 	~redis_list();
-
-	void reset();
-
-	const redis_result* get_result() const
-	{
-		return result_;
-	}
-
-	void set_client(redis_client* conn);
-
-	redis_client* get_client() const
-	{
-		return conn_;
-	}
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -99,12 +86,8 @@ public:
 	bool ltrim(const char* key, size_t start, size_t end);
 
 private:
-	redis_client* conn_;
-	const redis_result* result_;
-
 	int linsert(const char* key, const char* pos, const char* pivot,
 		size_t pivot_len, const char* value, size_t value_len);
-	int push(const string& req);
 	int pushx(const char* cmd, const char* key,
 		const char* value, size_t len);
 	int pop(const char* cmd, const char* key, string& buf);
@@ -113,7 +96,6 @@ private:
 	bool bpop(const char* cmd, const std::vector<string>& keys,
 		size_t timeout, std::pair<string, string>& result);
 	bool bpop(const string& req, std::pair<string, string>& result);
-
 };
 
 } // namespace acl
