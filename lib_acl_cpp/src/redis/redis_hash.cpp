@@ -64,87 +64,52 @@ bool redis_hash::hmget(const char* key, const std::vector<string>& names,
 	std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_->build("HMGET", key, names);
-	return hmget(req, result);
+	return conn_->get_strings(req, result) >= 0 ? true : false;
 }
 
 bool redis_hash::hmget(const char* key, const std::vector<char*>& names,
 	std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_->build("HMGET", key, names);
-	return hmget(req, result);
+	return conn_->get_strings(req, result) >= 0 ? true : false;
 }
 
 bool redis_hash::hmget(const char* key, const std::vector<const char*>& names,
 	std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_->build("HMGET", key, names);
-	return hmget(req, result);
+	return conn_->get_strings(req, result) >= 0 ? true : false;
 }
 
 bool redis_hash::hmget(const char* key, const std::vector<int>& names,
 	std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_->build("HMGET", key, names);
-	return hmget(req, result);
+	return conn_->get_strings(req, result) >= 0 ? true : false;
 }
 
 bool redis_hash::hmget(const char* key, const char* names[], size_t argc,
 	std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_->build("HMGET", key, names, argc);
-	return hmget(req, result);
+	return conn_->get_strings(req, result) >= 0 ? true : false;
 }
 
 bool redis_hash::hmget(const char* key, const int names[], size_t argc,
 	std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_->build("HMGET", key, names, argc);
-	return hmget(req, result);
+	return conn_->get_strings(req, result) >= 0 ? true : false;
 }
 
 bool redis_hash::hmget(const char* key, const char* names[],
 	const size_t lens[], size_t argc, std::vector<string>* result /* = NULL */)
 {
 	const string& req = conn_->build("HMGET", key, names, lens, argc);
-	return hmget(req, result);
+	return conn_->get_strings(req, result) >= 0 ? true : false;
 }
 
-bool redis_hash::hmget(const string& req, std::vector<string>* out /* = NULL */)
-{
-	const redis_result* rr = conn_->run(req);
-	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY)
-		return false;
-	if (out == NULL)
-		return true;
-
-	size_t size = hmget_size();
-	size_t nslice, len;
-	const char* ptr;
-	string buf(4096);
-
-	for (size_t i = 0; i < size; i++)
-	{
-		rr = hmget_result(i);
-		if (rr == NULL || (nslice = rr->get_size()) == 0)
-			out->push_back("");
-		else if (nslice == 1)
-		{
-			ptr = rr->get(0, &len);
-			buf.copy(ptr, len);
-			out->push_back(buf);
-		}
-		else
-		{
-			buf.clear();
-			rr->argv_to_string(buf);
-			out->push_back(buf);
-		}
-	}
-
-	return true;
-}
-
-const redis_result* redis_hash::hmget_result(size_t i) const
+const redis_result* redis_hash::hmget_child(size_t i) const
 {
 	return conn_->get_child(i);
 }

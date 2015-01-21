@@ -135,7 +135,7 @@ public:
 
 	size_t mget_size() const;
 	const char* mget_value(size_t i, size_t* len = NULL) const;
-	const redis_result* mget_result(size_t i) const;
+	const redis_result* mget_child(size_t i) const;
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -160,7 +160,6 @@ private:
 		const std::vector<const char*>& keys);
 	int bitop(const char* op, const char* destkey,
 		const char* keys[], size_t size);
-	bool mget(const string& req, std::vector<string>* out = NULL);
 };
 
 } // namespace acl

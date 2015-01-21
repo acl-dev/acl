@@ -91,15 +91,14 @@ int redis_pubsub::subop(const char* cmd, const std::vector<string>& channels)
 	}
 
 	const string& req = conn_->build_request(argc, argv, lens);
-	const redis_result* result = conn_->run(req);
+	const redis_result* result = conn_->run(req, channels.size());
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
-	size_t size = result->get_size();
-	if (size != channels.size())
-		return -1;
 
+	size_t size = channels.size();
 	int nchannels = 0, ret;
-	for (size_t i = 1; i < size; i++)
+
+	for (size_t i = 0; i < size; i++)
 	{
 		const redis_result* obj = result->get_child(i);
 		if (obj == NULL)
@@ -121,6 +120,7 @@ int redis_pubsub::check_channel(const redis_result* obj, const char* cmd,
 	const redis_result* rr = obj->get_child(0);
 	if (rr == NULL || rr->get_type() != REDIS_RESULT_STRING)
 		return -1;
+
 	string buf;
 	rr->argv_to_string(buf);
 	if (strcasecmp(buf.c_str(), cmd) != 0)
@@ -129,15 +129,17 @@ int redis_pubsub::check_channel(const redis_result* obj, const char* cmd,
 	rr = obj->get_child(1);
 	if (rr == NULL || rr->get_type() != REDIS_RESULT_STRING)
 		return -1;
+
 	buf.clear();
 	rr->argv_to_string(buf);
-	if (strcasecmp(cmd, channel.c_str()) != 0)
+	if (strcasecmp(buf.c_str(), channel.c_str()) != 0)
 		return -1;
 
 	rr = obj->get_child(2);
 	if (rr == NULL || rr->get_type() != REDIS_RESULT_INTEGER)
 		return -1;
-	return obj->get_integer();
+
+	return rr->get_integer();
 }
 
 bool redis_pubsub::get_message(string& channel, string& msg)

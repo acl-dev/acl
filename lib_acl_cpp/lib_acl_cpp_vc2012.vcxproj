@@ -309,6 +309,8 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\redis\redis_pool.cpp" />
     <ClCompile Include="src\redis\redis_pubsub.cpp" />
     <ClCompile Include="src\redis\redis_result.cpp" />
+    <ClCompile Include="src\redis\redis_script.cpp" />
+    <ClCompile Include="src\redis\redis_server.cpp" />
     <ClCompile Include="src\redis\redis_set.cpp" />
     <ClCompile Include="src\redis\redis_string.cpp" />
     <ClCompile Include="src\redis\redis_transaction.cpp" />
@@ -470,6 +472,8 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\redis\redis_pool.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_pubsub.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_result.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_script.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_server.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_set.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_string.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_transaction.hpp" />

@@ -67,7 +67,7 @@ public:
 	 *  不包含该结尾符
 	 */
 	const char* hmget_value(size_t i, size_t* len = NULL) const;
-	const redis_result* hmget_result(size_t i) const;
+	const redis_result* hmget_child(size_t i) const;
 	size_t hmget_size() const;
 
 	/////////////////////////////////////////////////////////////////////
@@ -114,11 +114,6 @@ public:
 	bool hexists(const char* key, const char* name, size_t name_len);
 
 	int hlen(const char* key);
-
-	/////////////////////////////////////////////////////////////////////
-
-private:
-	bool hmget(const string& req, std::vector<string>* result = NULL);
 };
 
 } // namespace acl

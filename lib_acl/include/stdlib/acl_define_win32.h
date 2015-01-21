@@ -43,6 +43,11 @@
 #  define ACL_API
 # endif
 
+/* see WINSOCK2.H, 用户需要预先定义此值，因其默认值为64 */
+# ifndef	FD_SETSIZE
+#  define	FD_SETSIZE	50000
+# endif
+
 # include <fcntl.h>
 # include <sys/stat.h>
 # include <sys/types.h>
@@ -50,9 +55,7 @@
 # ifndef	ACL_WIN32_STDC
 #  define	ACL_WIN32_STDC
 # endif
-# ifndef	FD_SETSIZE
-#  define	FD_SETSIZE	4096  /* see WINSOCK2.H, 用户需要预先定义此值，因其默认值为64 */
-# endif
+
 /* # include <windows.h> */
 /* # include <winsock2.h> */
 # if(_MSC_VER >= 1300)

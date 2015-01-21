@@ -457,6 +457,12 @@
     <ClCompile Include="src\redis\redis_command.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\redis\redis_server.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_script.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -1006,6 +1012,12 @@
       <Filter>include\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_command.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_server.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_script.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
   </ItemGroup>

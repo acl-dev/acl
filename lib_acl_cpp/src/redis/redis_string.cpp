@@ -452,17 +452,15 @@ int redis_string::bitop(const char* op, const char* destkey,
 {
 	size_t argc = 3 + keys.size();
 	dbuf_pool* pool = conn_->get_pool();
-	const char** argv = (const char**)
-		pool->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*)
-		pool->dbuf_alloc(argc * sizeof(size_t));
+	const char** argv = (const char**) pool->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) pool->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = "BITOP";
-	lens[0] = strlen(argv[0]);
+	lens[0] = sizeof("BITOP") - 1;
 	argv[1] = op;
-	lens[1] = strlen(argv[1]);
+	lens[1] = strlen(op);
 	argv[2] = destkey;
-	lens[2] = strlen(argv[2]);
+	lens[2] = strlen(destkey);
 
 	std::vector<string>::const_iterator cit = keys.begin();
 	for (size_t i = 3; cit != keys.end(); ++cit, i++)
@@ -480,17 +478,15 @@ int redis_string::bitop(const char* op, const char* destkey,
 {
 	size_t argc = 3 + keys.size();
 	dbuf_pool* pool = conn_->get_pool();
-	const char** argv = (const char**)
-		pool->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*)
-		pool->dbuf_alloc(argc * sizeof(size_t));
+	const char** argv = (const char**) pool->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) pool->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = "BITOP";
-	lens[0] = strlen(argv[0]);
+	lens[0] = sizeof("BITOP") - 1;
 	argv[1] = op;
-	lens[1] = strlen(argv[1]);
+	lens[1] = strlen(op);
 	argv[2] = destkey;
-	lens[2] = strlen(argv[2]);
+	lens[2] = strlen(destkey);
 
 	std::vector<const char*>::const_iterator cit = keys.begin();
 	for (size_t i = 3; cit != keys.end(); ++cit, i++)
@@ -508,17 +504,15 @@ int redis_string::bitop(const char* op, const char* destkey,
 {
 	size_t argc = 3 + size;
 	dbuf_pool* pool = conn_->get_pool();
-	const char** argv = (const char**)
-		pool->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*)
-		pool->dbuf_alloc(argc * sizeof(size_t));
+	const char** argv = (const char**) pool->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) pool->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = "BITOP";
-	lens[0] = strlen(argv[0]);
+	lens[0] = sizeof("BITOP") - 1;
 	argv[1] = op;
-	lens[1] = strlen(argv[1]);
+	lens[1] = strlen(op);
 	argv[2] = destkey;
-	lens[2] = strlen(argv[2]);
+	lens[2] = strlen(destkey);
 
 	for (size_t i = 3, j = 0; j < size; i++, j++)
 	{
@@ -600,7 +594,6 @@ int redis_string::msetnx(const std::vector<int>& keys,
 	return conn_->get_number(req);
 }
 
-
 int redis_string::msetnx(const char* keys[], const char* values[], size_t argc)
 {
 	const string& req = conn_->build("MSETNX", NULL, keys, values, argc);
@@ -621,32 +614,31 @@ bool redis_string::mget(const std::vector<string>& keys,
 	std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys);
-	return mget(req, out);
+	return conn_->get_strings(req, out) >= 0 ? true : false;
 }
 
 bool redis_string::mget(const std::vector<const char*>& keys,
 	std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys);
-	return mget(req, out);
+	return conn_->get_strings(req, out) >= 0 ? true : false;
 }
 
 bool redis_string::mget(const std::vector<char*>& keys,
 	std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys);
-	return mget(req, out);
+	return conn_->get_strings(req, out) >= 0 ? true : false;
 }
 
 bool redis_string::mget(const std::vector<int>& keys,
 	std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys);
-	return mget(req, out);
+	return conn_->get_strings(req, out) >= 0 ? true : false;
 }
 
-bool redis_string::mget(std::vector<string>* out,
-	const char* first_key, ...)
+bool redis_string::mget(std::vector<string>* out, const char* first_key, ...)
 {
 	std::vector<const char*> keys;
 	keys.push_back(first_key);
@@ -657,67 +649,29 @@ bool redis_string::mget(std::vector<string>* out,
 		keys.push_back(key);
 	va_end(ap);
 
-	return mget(keys, out);
+	const string& req = conn_->build("MGET", NULL, keys);
+	return conn_->get_strings(req, out) >= 0 ? true : false;
 }
 
 bool redis_string::mget(const char* keys[], size_t argc,
 	std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys, argc);
-	return mget(req, out);
+	return conn_->get_strings(req, out) >= 0 ? true : false;
 }
 
 bool redis_string::mget(const int keys[], size_t argc,
 	std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys, argc);
-	return mget(req, out);
+	return conn_->get_strings(req, out) >= 0 ? true : false;
 }
 
 bool redis_string::mget(const char* keys[], const size_t keys_len[],
 	size_t argc, std::vector<string>* out /* = NULL */)
 {
 	const string& req = conn_->build("MGET", NULL, keys, keys_len, argc);
-	return mget(req, out);
-}
-
-bool redis_string::mget(const string& req, std::vector<string>* out /* = NULL */)
-{
-	const redis_result* result = conn_->run(req);
-	if (result == NULL)
-		return false;
-	if (result->get_type() != REDIS_RESULT_ARRAY)
-		return false;
-	if (result == NULL)
-		return true;
-
-	string buf(4096);
-	const redis_result* rr;
-	size_t nslice, len;
-	const char* ptr;
-
-	size_t size = mget_size();
-
-	for (size_t i = 0; i < size; i++)
-	{
-		rr = mget_result(i);
-		if (rr == NULL || (nslice = rr->get_size()) == 0)
-			out->push_back("");
-		else if (nslice == 1)
-		{
-			ptr = rr->get(0, &len);
-			buf.copy(ptr, len);
-			out->push_back(buf);
-		}
-		else
-		{
-			buf.clear();
-			rr->argv_to_string(buf);
-			out->push_back(buf);
-		}
-	}
-
-	return true;
+	return conn_->get_strings(req, out) >= 0 ? true : false;
 }
 
 const char* redis_string::mget_value(size_t i, size_t* len /* = NULL */) const
@@ -725,7 +679,7 @@ const char* redis_string::mget_value(size_t i, size_t* len /* = NULL */) const
 	return conn_->get_value(i, len);
 }
 
-const redis_result* redis_string::mget_result(size_t i) const
+const redis_result* redis_string::mget_child(size_t i) const
 {
 	return conn_->get_child(i);
 }

@@ -144,3 +144,5 @@
 #include "acl_cpp/redis/redis_transaction.hpp"
 #include "acl_cpp/redis/redis_set.hpp"
 #include "acl_cpp/redis/redis_zset.hpp"
+#include "acl_cpp/redis/redis_script.hpp"
+#include "acl_cpp/redis/redis_server.hpp"

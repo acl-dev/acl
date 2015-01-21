@@ -9,8 +9,7 @@ valgrind --tool=memcheck --leak-check=yes -v ./redis_string -s 127.0.0.1:6379 -a
 valgrind --tool=memcheck --leak-check=yes -v ./redis_string -s 127.0.0.1:6379 -a strlen -n 10
 valgrind --tool=memcheck --leak-check=yes -v ./redis_string -s 127.0.0.1:6379 -a mset -n 10
 valgrind --tool=memcheck --leak-check=yes -v ./redis_string -s 127.0.0.1:6379 -a mget -n 10
-valgrind --tool=memcheck --leak-check=yes -v ./redis_string -s 127.0.0.1:6379 -a mget -n 10
-valgrind --tool=memcheck --leak-check=yes -v ./redis_string -s 127.0.0.1:6379 -a mgetnx -n 10
+valgrind --tool=memcheck --leak-check=yes -v ./redis_string -s 127.0.0.1:6379 -a msetnx -n 10
 valgrind --tool=memcheck --leak-check=yes -v ./redis_string -s 127.0.0.1:6379 -a setrange -n 10
 valgrind --tool=memcheck --leak-check=yes -v ./redis_string -s 127.0.0.1:6379 -a getrange -n 10
 valgrind --tool=memcheck --leak-check=yes -v ./redis_string -s 127.0.0.1:6379 -a setbit -n 10

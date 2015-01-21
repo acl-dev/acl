@@ -39,8 +39,8 @@ int redis_list::llen(const char* key)
 	return conn_->get_number(req);
 }
 
-bool redis_list::lindex(const char* key, size_t idx, string& buf,
-	bool* exist/*  = NULL */)
+bool redis_list::lindex(const char* key, size_t idx,
+	string& buf, bool* exist /*  = NULL */)
 {
 	if (exist)
 		*exist = false;
@@ -70,8 +70,7 @@ bool redis_list::lset(const char* key, size_t idx, const char* value)
 	return lset(key, idx, value, strlen(value));
 }
 
-bool redis_list::lset(const char* key, size_t idx,
-	const char* value, size_t len)
+bool redis_list::lset(const char* key, size_t idx, const char* value, size_t len)
 {
 	const char* argv[4];
 	size_t lens[4];

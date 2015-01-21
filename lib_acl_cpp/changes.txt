@@ -1,6 +1,13 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+276) 2015.1.21
+276.1) feature: 实现 了redis_zset 全部接口
+276.2) samples: 新增例子 samples/redis/redis_pubsub 测试 redis_pubsub 类
+
+275) 2015.1.20
+275.1) feature: redis_zset 类实现了 10 个命令方法
+
 274) 2015.1.19
 274.1) bugfix: db_mysql.cpp 在 WIN32 下使用 mysql 库采用了动态加载的方式，在函数指针
 前应增加 STDCALL 宏定义

@@ -78,9 +78,31 @@ int redis_key::del(const char* keys[], const size_t lens[], size_t argc)
 	return conn_->get_number(req);
 }
 
-/////////////////////////////////////////////////////////////////////////////
+int redis_key::dump(const char* key, string& out)
+{
+	const char* argv[2];
+	size_t lens[2];
 
-int redis_key::expire(const char* key, int n)
+	argv[0] = "DUMP";
+	lens[0] = sizeof("DUMP") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	const string& req = conn_->build_request(2, argv, lens);
+	return conn_->get_string(req, out);
+}
+
+bool redis_key::exists(const char* key)
+{
+	const char* keys[1];
+	keys[0] = key;
+
+	const string& req = conn_->build("EXISTS", NULL, keys, 1);
+	return conn_->get_number(req) > 0 ? true : false;
+}
+
+int redis_key::set_expire(const char* key, int n)
 {
 	const char* argv[2];
 	argv[0]  = key;
@@ -92,7 +114,90 @@ int redis_key::expire(const char* key, int n)
 	return conn_->get_number(req);
 }
 
-int redis_key::ttl(const char* key)
+int redis_key::keys_pattern(const char* pattern, std::vector<string>& out)
+{
+	const char* argv[2];
+	size_t lens[2];
+
+	argv[0] = "KEYS";
+	lens[0] = sizeof("KEYS") - 1;
+
+	argv[1] = pattern;
+	lens[1] = strlen(pattern);
+
+	const string& req = conn_->build_request(2, argv, lens);
+	return conn_->get_strings(req, out);
+}
+
+bool redis_key::rename_key(const char* key, const char* newkey)
+{
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "RENAME";
+	lens[0] = sizeof("RENAME") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	argv[2] = newkey;
+	lens[2] = strlen(newkey);
+
+	const string& req = conn_->build_request(3, argv, lens);
+	return conn_->get_status(req);
+}
+
+bool redis_key::renamenx(const char* key, const char* newkey)
+{
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "RENAMENX";
+	lens[0] = sizeof("RENAMENX") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	argv[2] = newkey;
+	lens[2] = strlen(newkey);
+
+	const string& req = conn_->build_request(3, argv, lens);
+	return conn_->get_status(req);
+}
+
+bool redis_key::restore(const char* key, const char* value, size_t len,
+	int ttl, bool replace /* = false */)
+{
+	const char* argv[5];
+	size_t lens[5];
+
+	argv[0] = "RESTORE";
+	lens[0] = sizeof("RESTORE") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	char ttl_s[INT_LEN];
+	safe_snprintf(ttl_s, sizeof(ttl_s), "%d", ttl);
+	argv[2] = ttl_s;
+	lens[2] = strlen(ttl_s);
+
+	argv[3] = value;
+	lens[3] = len;
+
+	size_t argc = 4;
+	if (replace)
+	{
+		argv[4] = "REPLACE";
+		lens[4] = sizeof("REPLACE") - 1;
+		argc++;
+	}
+
+	const string& req = conn_->build_request(argc, argv, lens);
+	return conn_->get_status(req);
+}
+
+int redis_key::get_ttl(const char* key)
 {
 	const char* argv[1];
 	argv[0] = key;
@@ -102,19 +207,11 @@ int redis_key::ttl(const char* key)
 	bool success;
 	int ret = conn_->get_number(req, &success);
 	if (success == false)
-		return -1;
+		return -3;
 	else
 		return ret;
 }
 
-bool redis_key::exists(const char* key)
-{
-	const char* keys[1];
-	keys[0] = key;
-
-	const string& req = conn_->build("EXISTS", NULL, keys, 1);
-	return conn_->get_number(req) > 0 ? true : false;
-}
 
 redis_key_t redis_key::type(const char* key)
 {
