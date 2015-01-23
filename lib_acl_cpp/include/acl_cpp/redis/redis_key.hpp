@@ -67,7 +67,16 @@ public:
 	 *  0：该 key 不存在
 	 *  < 0: 出错
 	 */
-	int set_expire(const char* key, int n);
+	int expire(const char* key, int n);
+
+	/**
+	 * 用 UNIX 时间截设置 KEY 的生存周期
+	 * @param key {const char*} 对象键值
+	 * @param stamp {time_t} UNIX 时间截，即自 1970 年以来的秒数
+	 * @return {int} 返回值的含义：
+	 *  1 -- 设置成功，0 -- 该 key 不存在，-1 -- 出错
+	 */
+	int expireat(const char* key, time_t stamp);
 
 	/**
 	 * 查找所有符合给定模式 pattern 的 key
@@ -81,6 +90,56 @@ public:
 	 *   KEYS h[ae]llo 匹配 hello 和 hallo ，但不匹配 hillo 。
 	 */
 	int keys_pattern(const char* pattern, std::vector<string>& out);
+
+	/**
+	 * 移除给定 key 的生存时间，将这个 key 从"易失的"(带生存时间 key )转换成
+	 * "持久的"(一个不带生存时间、永不过期的 key )
+	 * @param key {const char*} 对象键值
+	 * @return {int} 返回值的含义如下：
+	 *  1 -- 设置成功，0 -- 该 key 不存在或未设置过期时间，-1 -- 出错
+	 */
+	int persist(const char* key);
+
+	/**
+	 * 设置 KEY 的生存周期，单位（毫秒）
+	 * @param key {const char*} 键值
+	 * @param n {int} 生存周期（毫秒）
+	 * @return {int} 返回值含义如下：
+	 *  > 0: 成功设置了生存周期
+	 *  0：该 key 不存在
+	 *  < 0: 出错
+	 */
+	int pexpire(const char* key, int n);
+
+	/**
+	 * 以毫秒为单位设置 key 的过期 unix 时间戳
+	 * @param key {const char*} 键值
+	 * @param n {long long int} UNIX 时间截，即自 1970 年以来的毫秒数
+	 * @return {int} 返回值含义如下：
+	 *  > 0: 成功设置了生存周期
+	 *  0：该 key 不存在
+	 *  < 0: 出错
+	 */
+	int pexpireat(const char* key, long long int n);
+
+	/**
+	 * 获得 KEY 的剩余生存周期，单位（毫秒）
+	 * @param key {const char*} 键值
+	 * @return {int} 返回对应键值的生存周期
+	 *  > 0: 该 key 剩余的生存周期（毫秒）
+	 * -3：出错
+	 * -2：key 不存在
+	 * -1：当 key 存在但没有设置剩余时间
+	 * 注：对于 redis-server 2.8 以前版本，key 不存在或存在但未设置生存期则返回 -1
+	 */
+	long long int pttl(const char* key);
+
+	/**
+	 * 从当前数据库中随机返回(不会删除)一个 key
+	 ＊@param buf {string&} 成功获得随机 KEY 时存储结果
+	 * @return {bool} 操作是否成功，当出错或 key 不存在时返回 falsse
+	 */
+	bool randmkey(string& buf);
 
 	/**
 	 * 将 key 改名为 newkey

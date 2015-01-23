@@ -7,7 +7,8 @@
 namespace acl
 {
 
-#define INT_LEN	11
+#define INT_LEN		11
+#define LONG_LEN	21
 
 redis_key::redis_key(redis_client* conn /* = NULL */)
 : redis_command(conn)
@@ -95,22 +96,57 @@ int redis_key::dump(const char* key, string& out)
 
 bool redis_key::exists(const char* key)
 {
-	const char* keys[1];
-	keys[0] = key;
+	const char* argv[2];
+	size_t lens[2];
 
-	const string& req = conn_->build("EXISTS", NULL, keys, 1);
+	argv[0] = "EXISTS";
+	lens[0] = sizeof("EXISTS") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	const string& req = conn_->build_request(2, argv, lens);
 	return conn_->get_number(req) > 0 ? true : false;
 }
 
-int redis_key::set_expire(const char* key, int n)
+int redis_key::expire(const char* key, int n)
 {
-	const char* argv[2];
-	argv[0]  = key;
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "EXPIRE";
+	lens[0] = sizeof("EXPIRE") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
 	char buf[INT_LEN];
 	(void) safe_snprintf(buf, INT_LEN, "%d", n);
-	argv[1] = buf;
+	argv[2] = buf;
+	lens[2] = strlen(buf);
 
-	const string& req = conn_->build("EXPIRE", NULL, argv, 2);
+	const string& req = conn_->build_request(3, argv, lens);
+	return conn_->get_number(req);
+}
+
+int redis_key::expireat(const char* key, time_t stamp)
+{
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "EXPIREAT";
+	lens[0] = sizeof("EXPIREAT") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	char stamp_s[LONG_LEN];
+	safe_snprintf(stamp_s, sizeof(stamp_s), "%lu", (unsigned long) stamp);
+
+	argv[2] = stamp_s;
+	lens[2] = strlen(stamp_s);
+
+	const string& req = conn_->build_request(3, argv, lens);
 	return conn_->get_number(req);
 }
 
@@ -127,6 +163,95 @@ int redis_key::keys_pattern(const char* pattern, std::vector<string>& out)
 
 	const string& req = conn_->build_request(2, argv, lens);
 	return conn_->get_strings(req, out);
+}
+
+int redis_key::persist(const char* key)
+{
+	const char* argv[2];
+	size_t lens[2];
+
+	argv[0] = "PERSIST";
+	lens[0] = sizeof("PERSIST") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	const string& req = conn_->build_request(2, argv, lens);
+	return conn_->get_number(req);
+}
+
+int redis_key::pexpire(const char* key, int n)
+{
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "PEXPIRE";
+	lens[0] = sizeof("PEXPIRE") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	char buf[INT_LEN];
+	(void) safe_snprintf(buf, INT_LEN, "%d", n);
+	argv[2] = buf;
+	lens[2] = strlen(buf);
+
+	const string& req = conn_->build_request(3, argv, lens);
+	return conn_->get_number(req);
+}
+
+int redis_key::pexpireat(const char* key, long long int stamp)
+{
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "PEXPIREAT";
+	lens[0] = sizeof("PEXPIREAT") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	char stamp_s[LONG_LEN];
+	acl_i64toa(stamp, stamp_s, sizeof(stamp_s));
+
+	argv[2] = stamp_s;
+	lens[2] = strlen(stamp_s);
+
+	const string& req = conn_->build_request(3, argv, lens);
+	return conn_->get_number(req);
+}
+
+long long int redis_key::pttl(const char* key)
+{
+	const char* argv[2];
+	size_t lens[2];
+
+	argv[0] = "PTTL";
+	lens[0] = sizeof("PTTL") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	const string& req = conn_->build_request(2, argv, lens);
+
+	bool success;
+	long long int ret = conn_->get_number64(req, &success);
+	if (success == false)
+		return -3;
+	else
+		return ret;
+}
+
+bool redis_key::randmkey(string& buf)
+{
+	const char* argv[1];
+	size_t lens[1];
+
+	argv[0] = "RANDOMKEY";
+	lens[0] = sizeof("RANDOMKEY");
+
+	const string& req = conn_->build_request(1, argv, lens);
+	return conn_->get_string(req, buf) > 0 ? true : false;
 }
 
 bool redis_key::rename_key(const char* key, const char* newkey)
@@ -199,10 +324,16 @@ bool redis_key::restore(const char* key, const char* value, size_t len,
 
 int redis_key::get_ttl(const char* key)
 {
-	const char* argv[1];
-	argv[0] = key;
+	const char* argv[2];
+	size_t lens[2];
 
-	const string& req = conn_->build("TTL", NULL, argv, 1);
+	argv[0] = "TTL";
+	lens[0] = sizeof("TTL") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	const string& req = conn_->build_request(2, argv, lens);
 
 	bool success;
 	int ret = conn_->get_number(req, &success);
@@ -215,10 +346,16 @@ int redis_key::get_ttl(const char* key)
 
 redis_key_t redis_key::type(const char* key)
 {
-	const char* keys[1];
-	keys[0] = key;
+	const char* argv[2];
+	size_t lens[2];
 
-	const string& req = conn_->build("TYPE", NULL, keys, 1);
+	argv[0] = "TYPE";
+	lens[0] = sizeof("TYPE") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	const string& req = conn_->build_request(2, argv, lens);
 	const char* ptr = conn_->get_status_string(req);
 	if (ptr == NULL)
 		return REDIS_KEY_UNKNOWN;

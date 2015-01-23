@@ -191,7 +191,11 @@ void master_threads2::thread_run(void* arg)
 void master_threads2::run_once(ACL_VSTREAM* client)
 {
 	if (service_on_accept(client) != 0)
+	{
+		service_on_close(client, NULL);
+		acl_vstream_close(client);
 		return;
+	}
 
 	socket_stream* stream = (socket_stream*) client->context;
 	acl_assert(stream);

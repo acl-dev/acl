@@ -5,14 +5,15 @@ static acl::string __channel_prefix("test_channel");
 static bool test_subscribe(acl::redis_pubsub& option, int n)
 {
 	acl::string channel1, channel2;
-	int   ret;
+	int   ret, i;
 
-	for (int i = 0; i < n; i++)
+	for (i = 0; i < n; i++)
 	{
 		channel1.format("%s_1_%d", __channel_prefix.c_str(), i);
 		channel2.format("%s_2_%d", __channel_prefix.c_str(), i);
 
 		option.reset();
+
 		ret = option.subscribe(channel1.c_str(), channel2.c_str(), NULL);
 		if (ret <= 0)
 		{
@@ -25,12 +26,16 @@ static bool test_subscribe(acl::redis_pubsub& option, int n)
 				channel2.c_str());
 	}
 
+	printf(">>>subscribe total: %d\r\n", i * 2);
+
 	acl::string msg;
 
-	for (int i = 0; i < n; i++)
+	for (i = 0; i < n; i++)
 	{
 		channel1.clear();
 		msg.clear();
+		option.reset();
+
 		if ((ret = option.get_message(channel1, msg)) < 0)
 		{
 			printf("get_message error, ret: %d\r\n", ret);
@@ -42,6 +47,8 @@ static bool test_subscribe(acl::redis_pubsub& option, int n)
 
 		channel2.clear();
 		msg.clear();
+		option.reset();
+
 		if ((ret = option.get_message(channel2, msg)) < 0)
 		{
 			printf("get_message error, ret: %d\r\n", ret);
@@ -53,15 +60,17 @@ static bool test_subscribe(acl::redis_pubsub& option, int n)
 
 	}
 
+	printf(">>>message total: %d\r\n", i * 2);
+
 	return true;
 }
 
 static bool test_publish(acl::redis_pubsub& option, int n)
 {
 	acl::string channel, msg;
-	int   ret;
+	int   ret, i;
 
-	for (int i = 0; i < n; i++)
+	for (i = 0; i < n; i++)
 	{
 		channel.format("%s_1_%d", __channel_prefix.c_str(), i);
 		msg.format("msg_1_%s", channel.c_str());
@@ -80,6 +89,7 @@ static bool test_publish(acl::redis_pubsub& option, int n)
 
 		channel.format("%s_2_%d", __channel_prefix.c_str(), i);
 		msg.format("msg_2_%s", channel.c_str());
+		option.reset();
 
 		ret = option.publish(channel.c_str(), msg.c_str(), msg.length());
 		if (ret <= 0)
@@ -93,6 +103,7 @@ static bool test_publish(acl::redis_pubsub& option, int n)
 				msg.c_str());
 	}
 
+	printf(">>>publish total: %d\r\n", i * 2);
 	return true;
 }
 
