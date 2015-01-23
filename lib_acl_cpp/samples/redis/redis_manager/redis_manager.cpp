@@ -25,7 +25,7 @@ static bool test_expire(acl::redis_key& option, int i)
 
 	key.format("%s_%d", __keypre.c_str(), i);
 	option.reset();
-	if (option.set_expire(key.c_str(), 100) < 0)
+	if (option.expire(key.c_str(), 100) < 0)
 	{
 		printf("expire key: %s error\r\n", key.c_str());
 		return false;
