@@ -114,6 +114,21 @@ public:
 	bool hexists(const char* key, const char* name, size_t name_len);
 
 	int hlen(const char* key);
+
+	/**
+	 * 命令用于迭代哈希键中的键值对
+	 * @param key {const char*} 哈希键值
+	 * @param cursor {int} 游标值，开始遍历时该值写 0
+	 * @param out {std::map<string>&} 结果集
+	 * @param pattern {const char*} 匹配模式，glob 风格，非空时有效
+	 * @param count {const size_t*} 限定的结果集数量，非空指针时有效
+	 * @return {int} 下一个游标位置，含义如下：
+	 *   0：遍历结束
+	 *  -1: 出错
+	 *  >0: 游标的下一个位置
+	 */
+	int hscan(const char* key, int cursor, std::map<string, string>& out,
+		const char* pattern = NULL, const size_t* count = NULL);
 };
 
 } // namespace acl

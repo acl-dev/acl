@@ -1,5 +1,7 @@
 #include "acl_stdafx.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
+#include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/redis/redis_result.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
 #include "acl_cpp/redis/redis_set.hpp"
 
@@ -403,6 +405,33 @@ int redis_set::srem(const char* key, const char* members[],
 {
 	const string& req = conn_->build("SREM", key, members, lens, argc);
 	return conn_->get_number(req);
+}
+
+int redis_set::sscan(const char* key, int cursor, std::vector<string>& out,
+	const char* pattern /* = NULL */, const size_t* count /* = NULL */)
+{
+	if (key == NULL || *key == 0 || cursor < 0)
+		return -1;
+
+	size_t size;
+	const redis_result** children = scan_keys("SSCAN", key, cursor,
+		size, pattern, count);
+	if (children == NULL)
+		return cursor;
+
+	const redis_result* rr;
+	string key_buf(128);
+	out.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		rr = children[i];
+		rr->argv_to_string(key_buf);
+		out.push_back(key_buf);
+		key_buf.clear();
+	}
+
+	return cursor;
 }
 
 } // namespace acl

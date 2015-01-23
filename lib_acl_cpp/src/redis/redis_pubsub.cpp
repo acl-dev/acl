@@ -36,7 +36,7 @@ int redis_pubsub::publish(const char* channel, const char* msg, size_t len)
 
 int redis_pubsub::subscribe(const char* first_channel, ...)
 {
-	std::vector<string> channels;
+	std::vector<const char*> channels;
 	channels.push_back(first_channel);
 	va_list ap;
 	va_start(ap, first_channel);
@@ -48,6 +48,11 @@ int redis_pubsub::subscribe(const char* first_channel, ...)
 	return subscribe(channels);
 }
 
+int redis_pubsub::subscribe(const std::vector<const char*>& channels)
+{
+	return subop("SUBSCRIBE", channels);
+}
+
 int redis_pubsub::subscribe(const std::vector<string>& channels)
 {
 	return subop("SUBSCRIBE", channels);
@@ -55,7 +60,7 @@ int redis_pubsub::subscribe(const std::vector<string>& channels)
 
 int redis_pubsub::unsubscribe(const char* first_channel, ...)
 {
-	std::vector<string> channels;
+	std::vector<const char*> channels;
 	channels.push_back(first_channel);
 	va_list ap;
 	va_start(ap, first_channel);
@@ -67,9 +72,101 @@ int redis_pubsub::unsubscribe(const char* first_channel, ...)
 	return unsubscribe(channels);
 }
 
+int redis_pubsub::unsubscribe(const std::vector<const char*>& channels)
+{
+	return subop("UNSUBSCRIBE", channels);
+}
+
 int redis_pubsub::unsubscribe(const std::vector<string>& channels)
 {
 	return subop("UNSUBSCRIBE", channels);
+}
+
+int redis_pubsub::psubscribe(const char* first_pattern, ...)
+{
+	std::vector<const char*> patterns;
+	patterns.push_back(first_pattern);
+	va_list ap;
+	va_start(ap, first_pattern);
+	const char* pattern;
+	while ((pattern = va_arg(ap, const char*)) != NULL)
+		patterns.push_back(pattern);
+	va_end(ap);
+
+	return psubscribe(patterns);
+}
+
+int redis_pubsub::psubscribe(const std::vector<const char*>& patterns)
+{
+	return subop("PSUBSCRIBE", patterns);
+}
+
+int redis_pubsub::psubscribe(const std::vector<string>& patterns)
+{
+	return subop("PSUBSCRIBE", patterns);
+}
+
+int redis_pubsub::punsubscribe(const char* first_pattern, ...)
+{
+	std::vector<const char*> patterns;
+	patterns.push_back(first_pattern);
+	va_list ap;
+	va_start(ap, first_pattern);
+	const char* pattern;
+	while ((pattern = va_arg(ap, const char*)) != NULL)
+		patterns.push_back(pattern);
+	va_end(ap);
+
+	return punsubscribe(patterns);
+}
+
+int redis_pubsub::punsubscribe(const std::vector<const char*>& patterns)
+{
+	return subop("PUNSUBSCRIBE", patterns);
+}
+
+int redis_pubsub::punsubscribe(const std::vector<string>& patterns)
+{
+	return subop("PUNSUBSCRIBE", patterns);
+}
+
+int redis_pubsub::subop(const char* cmd, const std::vector<const char*>& channels)
+{
+	size_t argc = 1 + channels.size();
+	dbuf_pool* pool = conn_->get_pool();
+	const char** argv = (const char**)
+		pool->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t *) pool->dbuf_alloc(argc * sizeof(size_t));
+
+	argv[0] = cmd;
+	lens[0] = strlen(cmd);
+
+	std::vector<const char*>::const_iterator cit = channels.begin();
+	for (size_t i = 1; cit != channels.end(); ++cit, ++i)
+	{
+		argv[i] = *cit;
+		lens[i] = strlen(argv[i]);
+	}
+
+	const string& req = conn_->build_request(argc, argv, lens);
+	const redis_result* result = conn_->run(req, channels.size());
+	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+		return -1;
+
+	size_t size = channels.size();
+	int nchannels = 0, ret;
+
+	for (size_t i = 0; i < size; i++)
+	{
+		const redis_result* obj = result->get_child(i);
+		if (obj == NULL)
+			return -1;
+		if (( ret = check_channel(obj, argv[0], channels[i])) < 0)
+			return -1;
+		if (ret > nchannels)
+			nchannels = ret;
+	}
+	return nchannels;
 }
 
 int redis_pubsub::subop(const char* cmd, const std::vector<string>& channels)
@@ -173,6 +270,115 @@ bool redis_pubsub::get_message(string& channel, string& msg)
 		return false;
 	obj->argv_to_string(msg);
 	return true;
+}
+
+int redis_pubsub::pubsub_channels(std::vector<string>& channels,
+	const char* first_pattern, ...)
+{
+	std::vector<const char*> patterns;
+	if (first_pattern)
+	{
+		patterns.push_back(NULL);
+		va_list ap;
+		va_start(ap, first_pattern);
+		const char* pattern;
+		while ((pattern = va_arg(ap, const char*)) != NULL)
+			patterns.push_back(pattern);
+		va_end(ap);
+	}
+
+	return pubsub_channels(patterns, channels);
+}
+
+int redis_pubsub::pubsub_channels(const std::vector<const char*>& patterns,
+	std::vector<string>& channels)
+{
+	const string& req = conn_->build("PUBSUB", "CHANNELS", patterns);
+	return conn_->get_strings(req, channels);
+}
+
+int redis_pubsub::pubsub_channels(const std::vector<string>& patterns,
+	std::vector<string>& channels)
+{
+	const string& req = conn_->build("PUBSUB", "CHANNELS", patterns);
+	return conn_->get_strings(req, channels);
+}
+
+int redis_pubsub::pubsub_numsub(std::map<string, int>& out,
+	const char* first_channel, ...)
+{
+	std::vector<const char*> channels;
+	if (first_channel != NULL)
+	{
+		channels.push_back(first_channel);
+		const char* channel;
+		va_list ap;
+		va_start(ap, first_channel);
+		while ((channel = va_arg(ap, const char*)) != NULL)
+			channels.push_back(channel);
+	}
+
+	return pubsub_numsub(channels, out);
+}
+
+int redis_pubsub::pubsub_numsub(const std::vector<const char*>& channels,
+	std::map<string, int>& out)
+{
+	const string& req = conn_->build("PUBSUB", "NUMSUB", channels);
+	return pubsub_numsub(req, out);
+}
+
+int redis_pubsub::pubsub_numsub(const std::vector<string>& channels,
+	std::map<string, int>& out)
+{
+	const string& req = conn_->build("PUBSUB", "NUMSUB", channels);
+	return pubsub_numsub(req, out);
+}
+
+int redis_pubsub::pubsub_numsub(const string& req, std::map<string, int>& out)
+{
+	const redis_result* result = conn_->run(req);
+	if (result == NULL)
+		return -1;
+
+	size_t size;
+	const redis_result** children = result->get_children(&size);
+	if (children == NULL || size == 0)
+		return 0;
+
+	if (size % 2 != 0)
+		return -1;
+
+	string buf(128);
+	const redis_result* rr;
+
+	for (size_t i = 0; i < size;)
+	{
+		rr = children[i];
+		rr->argv_to_string(buf);
+		i++;
+
+		rr = children[i];
+		out[buf] = rr->get_integer();
+		buf.clear();
+	}
+
+	return size / 2;
+}
+
+int redis_pubsub::pubsub_numpat()
+{
+	const char* argv[2];
+	size_t lens[2];
+
+	argv[0] = "PUBSUB";
+	lens[0] = sizeof("PUBSUB") - 1;
+
+	argv[1] = "NUMPAT";
+	lens[1] = sizeof("NUMPAT") - 1;
+
+	const string& req = conn_->build_request(2, argv, lens);
+	return conn_->get_number(req);
 }
 
 } // namespace acl

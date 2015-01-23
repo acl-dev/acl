@@ -382,6 +382,20 @@ public:
 	 */
 	int zremrangebylex(const char* key, const char* min, const char* max);
 
+	/**
+	 * 命令用于迭代有序集合中的元素（包括元素成员和元素分值）
+	 * @param cursor {int} 游标值，开始遍历时该值写 0
+	 * @param out {std::map<string, double>&} 结果集
+	 * @param pattern {const char*} 匹配模式，glob 风格，非空时有效
+	 * @param count {const size_t*} 限定的结果集数量，非空指针时有效
+	 * @return {int} 下一个游标位置，含义如下：
+	 *   0：遍历结束
+	 *  -1: 出错
+	 *  >0: 游标的下一个位置
+	 */
+	int zscan(const char* key, int cursor, std::map<string, double>& out,
+		const char* pattern = NULL, const size_t* count = NULL);
+
 private:
 	int zrange_get(const char* cmd, const char* key, int start,
 		int stop, std::vector<string>& result);

@@ -24,6 +24,10 @@ public:
 
 protected:
 	redis_client* conn_;
+
+	const redis_result** scan_keys(const char* cmd, const char* key,
+		int& cursor, size_t& size, const char* pattern,
+		const size_t* count);
 };
 
 } // namespace acl

@@ -1,6 +1,7 @@
 #include "acl_stdafx.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/redis/redis_result.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
 #include "acl_cpp/redis/redis_key.hpp"
 
@@ -291,7 +292,7 @@ bool redis_key::renamenx(const char* key, const char* newkey)
 }
 
 bool redis_key::restore(const char* key, const char* value, size_t len,
-	int ttl, bool replace /* = false */)
+	int nttl, bool replace /* = false */)
 {
 	const char* argv[5];
 	size_t lens[5];
@@ -303,7 +304,7 @@ bool redis_key::restore(const char* key, const char* value, size_t len,
 	lens[1] = strlen(key);
 
 	char ttl_s[INT_LEN];
-	safe_snprintf(ttl_s, sizeof(ttl_s), "%d", ttl);
+	safe_snprintf(ttl_s, sizeof(ttl_s), "%d", nttl);
 	argv[2] = ttl_s;
 	lens[2] = strlen(ttl_s);
 
@@ -322,7 +323,7 @@ bool redis_key::restore(const char* key, const char* value, size_t len,
 	return conn_->get_status(req);
 }
 
-int redis_key::get_ttl(const char* key)
+int redis_key::ttl(const char* key)
 {
 	const char* argv[2];
 	size_t lens[2];
@@ -441,6 +442,33 @@ int redis_key::move(const char* key, unsigned dest_db)
 
 	const string& req = conn_->build_request(3, argv, lens);
 	return conn_->get_number(req);
+}
+
+int redis_key::scan(int cursor, std::vector<string>& out,
+	const char* pattern /* = NULL */, const size_t* count /* = NULL */)
+{
+	if (cursor < 0)
+		return -1;
+
+	size_t size;
+	const redis_result** children = scan_keys("SCAN", NULL, cursor,
+		size, pattern, count);
+	if (children == NULL)
+		return cursor;
+
+	const redis_result* rr;
+	string key_buf(128);
+	out.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		rr = children[i];
+		rr->argv_to_string(key_buf);
+		out.push_back(key_buf);
+		key_buf.clear();
+	}
+
+	return cursor;
 }
 
 /////////////////////////////////////////////////////////////////////////////

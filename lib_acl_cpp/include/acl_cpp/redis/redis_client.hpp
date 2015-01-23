@@ -140,7 +140,6 @@ private:
 	unsigned long long used_;
 	dbuf_pool* pool_;
 	socket_stream conn_;
-	socket_stream* p;
 	char* addr_;
 	int   conn_timeout_;
 	int   rw_timeout_;

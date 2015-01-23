@@ -42,7 +42,7 @@ static bool test_ttl(acl::redis_key& option, int i)
 
 	key.format("%s_%d", __keypre.c_str(), i);
 	option.reset();
-	if ((ttl = option.get_ttl(key.c_str())) < 0)
+	if ((ttl = option.ttl(key.c_str())) < 0)
 	{
 		printf("get ttl key: %s error\r\n", key.c_str());
 		return false;

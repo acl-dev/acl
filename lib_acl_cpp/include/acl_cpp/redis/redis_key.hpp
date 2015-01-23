@@ -90,6 +90,27 @@ public:
 	 *   KEYS h[ae]llo 匹配 hello 和 hallo ，但不匹配 hillo 。
 	 */
 	int keys_pattern(const char* pattern, std::vector<string>& out);
+	
+	/**
+	 * 将数据从一个 redis-server 迁移至另一个 redis-server
+	 * @param key {const char*} 数据对应的键值
+	 * @param addr {const char*} 目标 redis-server 服务器地址，格式：ip:port
+	 * @param dest_db {unsigned} 目标 redis-server 服务器的数据库 ID 号
+	 * @param timeout {unsigned} 迁移过程的超时时间(毫秒级)
+	 * @param option {const char*} COPY 或 REPLACE
+	 * @return {bool} 迁移是否成功
+	 */
+	bool migrate(const char* key, const char* addr, unsigned dest_db,
+		unsigned timeout, const char* option = NULL);
+
+	/**
+	 * 将数据移至本 redis-server 中的另一个数据库中
+	 * @param key {const char*} 数据键值
+	 * @param dest_db {unsigned} 目标数据库 ID 号
+	 * @return {int} 迁移是否成功。-1: 表示出错，0：迁移失败，因为目标数据库中存在
+	 *  相同键值，1：迁移成功
+	 */
+	int move(const char* key, unsigned dest_db);
 
 	/**
 	 * 移除给定 key 的生存时间，将这个 key 从"易失的"(带生存时间 key )转换成
@@ -174,7 +195,7 @@ public:
 	 * -1：当 key 存在但没有设置剩余时间
 	 * 注：对于 redis-server 2.8 以前版本，key 不存在或存在但未设置生存期则返回 -1
 	 */
-	int get_ttl(const char* key);
+	int ttl(const char* key);
 
 	/**
 	 * 获得 KEY 的存储类型
@@ -184,25 +205,18 @@ public:
 	redis_key_t type(const char* key);
 
 	/**
-	 * 将数据从一个 redis-server 迁移至另一个 redis-server
-	 * @param key {const char*} 数据对应的键值
-	 * @param addr {const char*} 目标 redis-server 服务器地址，格式：ip:port
-	 * @param dest_db {unsigned} 目标 redis-server 服务器的数据库 ID 号
-	 * @param timeout {unsigned} 迁移过程的超时时间(毫秒级)
-	 * @param option {const char*} COPY 或 REPLACE
-	 * @return {bool} 迁移是否成功
+	 * 命令用于迭代当前数据库中的数据库键
+	 * @param cursor {int} 游标值，开始遍历时该值写 0
+	 * @param out {std::vector<string>&} 结果集
+	 * @param pattern {const char*} 匹配模式，glob 风格，非空时有效
+	 * @param count {const size_t*} 限定的结果集数量，非空指针时有效
+	 * @return {int} 下一个游标位置，含义如下：
+	 *   0：遍历结束
+	 *  -1: 出错
+	 *  >0: 游标的下一个位置
 	 */
-	bool migrate(const char* key, const char* addr, unsigned dest_db,
-		unsigned timeout, const char* option = NULL);
-
-	/**
-	 * 将数据移至本 redis-server 中的另一个数据库中
-	 * @param key {const char*} 数据键值
-	 * @param dest_db {unsigned} 目标数据库 ID 号
-	 * @return {int} 迁移是否成功。-1: 表示出错，0：迁移失败，因为目标数据库中存在
-	 *  相同键值，1：迁移成功
-	 */
-	int move(const char* key, unsigned dest_db);
+	int scan(int cursor, std::vector<string>& out,
+		const char* pattern = NULL, const size_t* count = NULL);
 };
 
 } // namespace acl

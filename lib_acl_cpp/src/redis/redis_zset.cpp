@@ -431,16 +431,18 @@ int redis_zset::zrange_get_with_scores(const char* cmd, const char* key,
 		child = children[i * 2];
 		if (child == NULL)
 			continue;
+
 		child->argv_to_string(buf);
 		score = atof(buf.c_str());
+		buf.clear();
 
 		child = children[(i + 1) * 2];
 		if (child == NULL)
 			continue;
-		buf.clear();
-		child->argv_to_string(buf);
 
+		child->argv_to_string(buf);
 		out.push_back(std::make_pair(buf, score));
+		buf.clear();
 	}
 
 	return size;
@@ -578,16 +580,18 @@ int redis_zset::zrangebyscore_get_with_scores(const char* cmd,
 		child = children[i * 2];
 		if (child == NULL)
 			continue;
+
 		child->argv_to_string(buf);
 		score = atof(buf.c_str());
+		buf.clear();
 
 		child = children[(i + 1) * 2];
 		if (child == NULL)
 			continue;
-		buf.clear();
 		child->argv_to_string(buf);
 
 		out.push_back(std::make_pair(buf, score));
+		buf.clear();
 	}
 
 	return size;
@@ -1048,6 +1052,40 @@ int redis_zset::zremrangebylex(const char* key, const char* min, const char* max
 
 	const string& req = conn_->build_request(4, argv, lens);
 	return conn_->get_number(req);
+}
+
+int redis_zset::zscan(const char* key, int cursor, std::map<string, double>& out,
+	const char* pattern /* = NULL */, const size_t* count /* = NULL */)
+{
+	if (key == NULL || *key == 0 || cursor < 0)
+		return -1;
+
+	size_t size;
+	const redis_result** children = scan_keys("ZSCAN", key, cursor,
+		size, pattern, count);
+	if (children == NULL)
+		return cursor;
+
+	if (size % 2 != 0)
+		return -1;
+
+	const redis_result* rr;
+	string name(128), value(128);
+
+	for (size_t i = 0; i < size;)
+	{
+		rr = children[i];
+		rr->argv_to_string(name);
+		i++;
+
+		rr = children[i];
+		rr->argv_to_string(value);
+		i++;
+
+		out[name] = atof(value.c_str());
+	}
+
+	return cursor;
 }
 
 } // namespace acl

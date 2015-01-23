@@ -76,6 +76,9 @@ public:
 	int srem(const char* key, const std::vector<const char*>& members);
 	int srem(const char* key, const char* members[],
 		size_t lens[], size_t argc);
+
+	int sscan(const char* key, int cursor, std::vector<string>& out,
+		const char* pattern = NULL, const size_t* count = NULL);
 };
 
 } // namespace acl

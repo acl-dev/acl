@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{81D44C60-6BC1-47AA-92DA-52FE7F84C822}</ProjectGuid>
+    <ProjectGuid>{9942942B-9DBA-4E56-897A-2746DB8C9E78}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <ProjectName>redis_pubsub</ProjectName>
   </PropertyGroup>
