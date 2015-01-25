@@ -37,7 +37,10 @@ public:
 
 	int get_number(const string& req, bool* success = NULL);
 	long long int get_number64(const string& req, bool* success = NULL);
+	int get_number(const string& req, std::vector<int>& out);
+	int get_number64(const string& req, std::vector<long long int>& out);
 	bool get_status(const string& req, const char* success = "OK");
+	int get_status(const string& req, std::vector<bool>& out);
 	const char* get_status_string(const char* req);
 	int get_string(const string& req, string& buf);
 	int get_string(const string& req, string* buf);

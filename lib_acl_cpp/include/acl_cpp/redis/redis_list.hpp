@@ -6,7 +6,6 @@ namespace acl
 {
 
 class redis_client;
-class redis_result;
 
 class ACL_CPP_API redis_list : public redis_command
 {

@@ -303,6 +303,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\redis\redis_client.cpp" />
     <ClCompile Include="src\redis\redis_command.cpp" />
     <ClCompile Include="src\redis\redis_hash.cpp" />
+    <ClCompile Include="src\redis\redis_hyperloglog.cpp" />
     <ClCompile Include="src\redis\redis_key.cpp" />
     <ClCompile Include="src\redis\redis_list.cpp" />
     <ClCompile Include="src\redis\redis_manager.cpp" />
@@ -466,6 +467,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\redis\redis_command.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_connection.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_hash.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_hyperloglog.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_key.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_list.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_manager.hpp" />

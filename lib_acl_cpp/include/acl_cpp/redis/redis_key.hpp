@@ -6,7 +6,7 @@
 
 namespace acl {
 
-class redis_result;
+class redis_client;
 
 // redis 服务支持的数据类型分类
 typedef enum
@@ -111,6 +111,28 @@ public:
 	 *  相同键值，1：迁移成功
 	 */
 	int move(const char* key, unsigned dest_db);
+
+	/**
+	 * 返回给定 key 引用所储存的值的次数。此命令主要用于除错。
+	 * @param key {const char*} 数据键值
+	 * @return {int} 返回 0 表示该 key 不存在；< 0 表示出错
+	 */
+	int object_refcount(const char* key);
+
+	/**
+	 * 返回给定 key 锁储存的值所使用的内部表示
+	 * @param key {const char*} 数据键值
+	 * @param out {string&} 存在结果
+	 * @return {bool} 是否成功
+	 */
+	bool object_encoding(const char* key, string& out);
+
+	/**
+	 * 返回给定 key 自储存以来的空闲时间(idle， 没有被读取也没有被写入)，以秒为单位
+	 * @param key {const char*} 数据键值
+	 * @return {int} 返回值 < 0 表示出错
+	 */
+	int object_idletime(const char* key);
 
 	/**
 	 * 移除给定 key 的生存时间，将这个 key 从"易失的"(带生存时间 key )转换成

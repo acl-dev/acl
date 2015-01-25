@@ -444,6 +444,60 @@ int redis_key::move(const char* key, unsigned dest_db)
 	return conn_->get_number(req);
 }
 
+int redis_key::object_refcount(const char* key)
+{
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "OBJECT";
+	lens[0] = sizeof("OBJECT") - 1;
+
+	argv[1] = "REFCOUNT";
+	lens[1] = sizeof("REFCOUNT") - 1;
+
+	argv[2] = key;
+	lens[2] = strlen(key);
+
+	const string& req = conn_->build_request(3, argv, lens);
+	return conn_->get_number(req);
+}
+
+bool redis_key::object_encoding(const char* key, string& out)
+{
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "OBJECT";
+	lens[0] = sizeof("OBJECT") - 1;
+
+	argv[1] = "ENCODING";
+	lens[1] = sizeof("ENCODING") - 1;
+
+	argv[2] = key;
+	lens[2] = strlen(key);
+
+	const string& req = conn_->build_request(3, argv, lens);
+	return conn_->get_string(req, out) > 0 ? true : false;
+}
+
+int redis_key::object_idletime(const char* key)
+{
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "OBJECT";
+	lens[0] = sizeof("OBJECT") - 1;
+
+	argv[1] = "IDLETIME";
+	lens[1] = sizeof("IDLETIME") - 1;
+
+	argv[2] = key;
+	lens[2] = strlen(key);
+
+	const string& req = conn_->build_request(3, argv, lens);
+	return conn_->get_number(req);
+}
+
 int redis_key::scan(int cursor, std::vector<string>& out,
 	const char* pattern /* = NULL */, const size_t* count /* = NULL */)
 {
