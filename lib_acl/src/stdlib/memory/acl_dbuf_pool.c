@@ -149,12 +149,14 @@ void *acl_dbuf_pool_alloc(ACL_DBUF_POOL *pool, size_t length)
 	void *ptr;
 	ACL_DBUF *dbuf;
 
+	length += length % 4;
+
 	if (length > pool->block_size)
 		dbuf = acl_dbuf_alloc(pool, length);
 	else if (pool->head == NULL)
 		dbuf = acl_dbuf_alloc(pool, pool->block_size);
-	else if (pool->block_size - ((char*) pool->head->ptr
-		- (char*) pool->head->buf) < length)
+	else if (pool->block_size < ((char*) pool->head->ptr
+		- (char*) pool->head->buf) + length)
 	{
 		dbuf = acl_dbuf_alloc(pool, pool->block_size);
 	}

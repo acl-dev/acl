@@ -1,6 +1,16 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+479) 2015.1.27
+479.1) bugfix: acl_dbuf_pool.c 的函数 acl_dbuf_pool_alloc() 在比较剩余长度
+与 pool->block_size 的长度时，采用的是 pool->block_size 长度减去一个较大的
+长度，结果导致无符号整形(block_size 为 size_t 类型) 溢出
+注：原来的错误表达方式为：
+pool->block_size - ((char*) pool->head->ptr - (char*) pool->head->buf) < length
+正确的方式为：
+pool->block_size < ((char*) pool->head->ptr - (char*) pool->head->buf) + length
+因为其中的整形都为无符号类型，所以第一种表达方式会造成比较符左边的值产生溢出
+
 478) 2015.1.7
 478.1) feature: 增加了 acl_is_blocking() 函数用于判断套接字是阻塞模式还是非阻塞模式
 

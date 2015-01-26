@@ -8,7 +8,7 @@
 namespace acl
 {
 
-#define BUFLEN	64
+#define BUFLEN	32
 #define INTLEN	11
 
 redis_zset::redis_zset(redis_client* conn /* = NULL */)
@@ -577,7 +577,7 @@ int redis_zset::zrangebyscore_get_with_scores(const char* cmd,
 
 	for (size_t i = 0; i < size; i++)
 	{
-		child = children[i * 2];
+		child = children[2 * i + 1];
 		if (child == NULL)
 			continue;
 
@@ -585,7 +585,7 @@ int redis_zset::zrangebyscore_get_with_scores(const char* cmd,
 		score = atof(buf.c_str());
 		buf.clear();
 
-		child = children[(i + 1) * 2];
+		child = children[2 * i];
 		if (child == NULL)
 			continue;
 		child->argv_to_string(buf);

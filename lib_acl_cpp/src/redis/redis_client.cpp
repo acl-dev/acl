@@ -26,6 +26,7 @@ redis_client::redis_client(const char* addr, int conn_timeout /* = 60 */,
 , result_(NULL)
 {
 	addr_ = acl_mystrdup(addr);
+//	pool_ = NEW dbuf_pool(40960);
 	pool_ = NEW dbuf_pool();
 	req_ = NEW redis_request();
 }
@@ -779,7 +780,7 @@ void redis_client::build_request1(size_t argc, const char* argv[], size_t lens[]
 		request_.append(argv[i], lens[i]);
 		request_.append("\r\n");
 	}
-
+	// printf("%s", request_.c_str());
 }
 
 void redis_client::build_request2(size_t argc, const char* argv[], size_t lens[])
