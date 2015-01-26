@@ -67,7 +67,7 @@ private:
 	int subop(const char* cmd, const std::vector<string>& channels);
 	int check_channel(const redis_result* obj, const char* cmd,
 		const string& channel);
-	int pubsub_numsub(const string& req, std::map<string, int>& out);
+	int pubsub_numsub(std::map<string, int>& out);
 };
 
 } // namespace acl

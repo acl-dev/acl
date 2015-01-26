@@ -40,44 +40,44 @@ int redis_key::del(const char* first_key, ...)
 
 int redis_key::del(const std::vector<string>& keys)
 {
-	const string& req = conn_->build("DEL", NULL, keys);
-	return conn_->get_number(req);
+	conn_->build("DEL", NULL, keys);
+	return conn_->get_number();
 }
 
 int redis_key::del(const std::vector<char*>& keys)
 {
-	const string& req = conn_->build("DEL", NULL, keys);
-	return conn_->get_number(req);
+	conn_->build("DEL", NULL, keys);
+	return conn_->get_number();
 }
 
 int redis_key::del(const std::vector<const char*>& keys)
 {
-	const string& req = conn_->build("DEL", NULL, keys);
-	return conn_->get_number(req);
+	conn_->build("DEL", NULL, keys);
+	return conn_->get_number();
 }
 
 int redis_key::del(const std::vector<int>& keys)
 {
-	const string& req = conn_->build("DEL", NULL, keys);
-	return conn_->get_number(req);
+	conn_->build("DEL", NULL, keys);
+	return conn_->get_number();
 }
 
 int redis_key::del(const char* keys[], size_t argc)
 {
-	const string& req = conn_->build("DEL", NULL, keys, argc);
-	return conn_->get_number(req);
+	conn_->build("DEL", NULL, keys, argc);
+	return conn_->get_number();
 }
 
 int redis_key::del(const int keys[], size_t argc)
 {
-	const string& req = conn_->build("DEL", NULL, keys, argc);
-	return conn_->get_number(req);
+	conn_->build("DEL", NULL, keys, argc);
+	return conn_->get_number();
 }
 
 int redis_key::del(const char* keys[], const size_t lens[], size_t argc)
 {
-	const string& req = conn_->build("DEL", NULL, keys, lens, argc);
-	return conn_->get_number(req);
+	conn_->build("DEL", NULL, keys, lens, argc);
+	return conn_->get_number();
 }
 
 int redis_key::dump(const char* key, string& out)
@@ -91,8 +91,8 @@ int redis_key::dump(const char* key, string& out)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	const string& req = conn_->build_request(2, argv, lens);
-	return conn_->get_string(req, out);
+	conn_->build_request(2, argv, lens);
+	return conn_->get_string(out);
 }
 
 bool redis_key::exists(const char* key)
@@ -106,8 +106,8 @@ bool redis_key::exists(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	const string& req = conn_->build_request(2, argv, lens);
-	return conn_->get_number(req) > 0 ? true : false;
+	conn_->build_request(2, argv, lens);
+	return conn_->get_number() > 0 ? true : false;
 }
 
 int redis_key::expire(const char* key, int n)
@@ -126,8 +126,8 @@ int redis_key::expire(const char* key, int n)
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 
-	const string& req = conn_->build_request(3, argv, lens);
-	return conn_->get_number(req);
+	conn_->build_request(3, argv, lens);
+	return conn_->get_number();
 }
 
 int redis_key::expireat(const char* key, time_t stamp)
@@ -147,8 +147,8 @@ int redis_key::expireat(const char* key, time_t stamp)
 	argv[2] = stamp_s;
 	lens[2] = strlen(stamp_s);
 
-	const string& req = conn_->build_request(3, argv, lens);
-	return conn_->get_number(req);
+	conn_->build_request(3, argv, lens);
+	return conn_->get_number();
 }
 
 int redis_key::keys_pattern(const char* pattern, std::vector<string>& out)
@@ -162,8 +162,8 @@ int redis_key::keys_pattern(const char* pattern, std::vector<string>& out)
 	argv[1] = pattern;
 	lens[1] = strlen(pattern);
 
-	const string& req = conn_->build_request(2, argv, lens);
-	return conn_->get_strings(req, out);
+	conn_->build_request(2, argv, lens);
+	return conn_->get_strings(out);
 }
 
 int redis_key::persist(const char* key)
@@ -177,8 +177,8 @@ int redis_key::persist(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	const string& req = conn_->build_request(2, argv, lens);
-	return conn_->get_number(req);
+	conn_->build_request(2, argv, lens);
+	return conn_->get_number();
 }
 
 int redis_key::pexpire(const char* key, int n)
@@ -197,8 +197,8 @@ int redis_key::pexpire(const char* key, int n)
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 
-	const string& req = conn_->build_request(3, argv, lens);
-	return conn_->get_number(req);
+	conn_->build_request(3, argv, lens);
+	return conn_->get_number();
 }
 
 int redis_key::pexpireat(const char* key, long long int stamp)
@@ -218,8 +218,8 @@ int redis_key::pexpireat(const char* key, long long int stamp)
 	argv[2] = stamp_s;
 	lens[2] = strlen(stamp_s);
 
-	const string& req = conn_->build_request(3, argv, lens);
-	return conn_->get_number(req);
+	conn_->build_request(3, argv, lens);
+	return conn_->get_number();
 }
 
 long long int redis_key::pttl(const char* key)
@@ -233,10 +233,10 @@ long long int redis_key::pttl(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	const string& req = conn_->build_request(2, argv, lens);
+	conn_->build_request(2, argv, lens);
 
 	bool success;
-	long long int ret = conn_->get_number64(req, &success);
+	long long int ret = conn_->get_number64(&success);
 	if (success == false)
 		return -3;
 	else
@@ -251,8 +251,8 @@ bool redis_key::randmkey(string& buf)
 	argv[0] = "RANDOMKEY";
 	lens[0] = sizeof("RANDOMKEY");
 
-	const string& req = conn_->build_request(1, argv, lens);
-	return conn_->get_string(req, buf) > 0 ? true : false;
+	conn_->build_request(1, argv, lens);
+	return conn_->get_string(buf) > 0 ? true : false;
 }
 
 bool redis_key::rename_key(const char* key, const char* newkey)
@@ -269,8 +269,8 @@ bool redis_key::rename_key(const char* key, const char* newkey)
 	argv[2] = newkey;
 	lens[2] = strlen(newkey);
 
-	const string& req = conn_->build_request(3, argv, lens);
-	return conn_->get_status(req);
+	conn_->build_request(3, argv, lens);
+	return conn_->get_status();
 }
 
 bool redis_key::renamenx(const char* key, const char* newkey)
@@ -287,8 +287,8 @@ bool redis_key::renamenx(const char* key, const char* newkey)
 	argv[2] = newkey;
 	lens[2] = strlen(newkey);
 
-	const string& req = conn_->build_request(3, argv, lens);
-	return conn_->get_status(req);
+	conn_->build_request(3, argv, lens);
+	return conn_->get_status();
 }
 
 bool redis_key::restore(const char* key, const char* value, size_t len,
@@ -319,8 +319,8 @@ bool redis_key::restore(const char* key, const char* value, size_t len,
 		argc++;
 	}
 
-	const string& req = conn_->build_request(argc, argv, lens);
-	return conn_->get_status(req);
+	conn_->build_request(argc, argv, lens);
+	return conn_->get_status();
 }
 
 int redis_key::ttl(const char* key)
@@ -334,10 +334,10 @@ int redis_key::ttl(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	const string& req = conn_->build_request(2, argv, lens);
+	conn_->build_request(2, argv, lens);
 
 	bool success;
-	int ret = conn_->get_number(req, &success);
+	int ret = conn_->get_number(&success);
 	if (success == false)
 		return -3;
 	else
@@ -356,8 +356,8 @@ redis_key_t redis_key::type(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	const string& req = conn_->build_request(2, argv, lens);
-	const char* ptr = conn_->get_status_string(req);
+	conn_->build_request(2, argv, lens);
+	const char* ptr = conn_->get_status_string();
 	if (ptr == NULL)
 		return REDIS_KEY_UNKNOWN;
 
@@ -421,8 +421,8 @@ bool redis_key::migrate(const char* key, const char* addr, unsigned dest_db,
 		argc++;
 	}
 
-	const string& req = conn_->build_request(argc, argv, lens);
-	return conn_->get_status(req);
+	conn_->build_request(argc, argv, lens);
+	return conn_->get_status();
 }
 
 int redis_key::move(const char* key, unsigned dest_db)
@@ -440,8 +440,8 @@ int redis_key::move(const char* key, unsigned dest_db)
 	argv[2] = db_s;
 	lens[2] = strlen(db_s);
 
-	const string& req = conn_->build_request(3, argv, lens);
-	return conn_->get_number(req);
+	conn_->build_request(3, argv, lens);
+	return conn_->get_number();
 }
 
 int redis_key::object_refcount(const char* key)
@@ -458,8 +458,8 @@ int redis_key::object_refcount(const char* key)
 	argv[2] = key;
 	lens[2] = strlen(key);
 
-	const string& req = conn_->build_request(3, argv, lens);
-	return conn_->get_number(req);
+	conn_->build_request(3, argv, lens);
+	return conn_->get_number();
 }
 
 bool redis_key::object_encoding(const char* key, string& out)
@@ -476,8 +476,8 @@ bool redis_key::object_encoding(const char* key, string& out)
 	argv[2] = key;
 	lens[2] = strlen(key);
 
-	const string& req = conn_->build_request(3, argv, lens);
-	return conn_->get_string(req, out) > 0 ? true : false;
+	conn_->build_request(3, argv, lens);
+	return conn_->get_string(out) > 0 ? true : false;
 }
 
 int redis_key::object_idletime(const char* key)
@@ -494,8 +494,8 @@ int redis_key::object_idletime(const char* key)
 	argv[2] = key;
 	lens[2] = strlen(key);
 
-	const string& req = conn_->build_request(3, argv, lens);
-	return conn_->get_number(req);
+	conn_->build_request(3, argv, lens);
+	return conn_->get_number();
 }
 
 int redis_key::scan(int cursor, std::vector<string>& out,

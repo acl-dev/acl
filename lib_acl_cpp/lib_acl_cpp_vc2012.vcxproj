@@ -309,6 +309,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\redis\redis_manager.cpp" />
     <ClCompile Include="src\redis\redis_pool.cpp" />
     <ClCompile Include="src\redis\redis_pubsub.cpp" />
+    <ClCompile Include="src\redis\redis_request.cpp" />
     <ClCompile Include="src\redis\redis_result.cpp" />
     <ClCompile Include="src\redis\redis_script.cpp" />
     <ClCompile Include="src\redis\redis_server.cpp" />
@@ -544,6 +545,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="src\mime\internal\rec_type.hpp" />
     <ClInclude Include="src\mime\internal\tok822.hpp" />
     <ClInclude Include="src\mime\internal\trimblanks.hpp" />
+    <ClInclude Include="src\redis\redis_request.hpp" />
     <ClInclude Include="src\stdlib\internal\win_iconv.hpp" />
     <ClInclude Include="src\stream\aio_timer_delay_free.hpp" />
   </ItemGroup>

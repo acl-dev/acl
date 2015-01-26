@@ -20,14 +20,14 @@ redis_transaction::~redis_transaction()
 
 bool redis_transaction::watch(const std::vector<string>& keys)
 {
-	const string& req = conn_->build("WATCH", NULL, keys);
-	return conn_->get_status(req);
+	conn_->build("WATCH", NULL, keys);
+	return conn_->get_status();
 }
 
 bool redis_transaction::unwatch(const std::vector<string>& keys)
 {
-	const string& req = conn_->build("UNWATCH", NULL, keys);
-	return conn_->get_status(req);
+	conn_->build("UNWATCH", NULL, keys);
+	return conn_->get_status();
 }
 
 bool redis_transaction::multi()
@@ -38,8 +38,8 @@ bool redis_transaction::multi()
 	argv[0] = "MULTI";
 	lens[0] = sizeof("MULTI") - 1;
 
-	const string& req = conn_->build_request(1, argv, lens);
-	return conn_->get_status(req);
+	conn_->build_request(1, argv, lens);
+	return conn_->get_status();
 }
 
 bool redis_transaction::exec()
@@ -50,8 +50,8 @@ bool redis_transaction::exec()
 	argv[0] = "EXEC";
 	lens[0] = sizeof("EXEC") - 1;
 
-	const string& req = conn_->build_request(1, argv, lens);
-	const redis_result* result = conn_->run(req);
+	conn_->build_request(1, argv, lens);
+	const redis_result* result = conn_->run();
 	if(result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return false;
 
@@ -69,15 +69,15 @@ bool redis_transaction::discard()
 	argv[0] = "DISCARD";
 	lens[0] = sizeof("DISCARD") - 1;
 
-	const string& req = conn_->build_request(1, argv, lens);
-	return conn_->get_status(req);
+	conn_->build_request(1, argv, lens);
+	return conn_->get_status();
 }
 
 bool redis_transaction::queue_cmd(const char* cmd, const char* argv[],
 	const size_t lens[], size_t argc)
 {
-	const string& req = conn_->build(cmd, NULL, argv, lens, argc);
-	if (conn_->get_status(req, "QUEUED") == false)
+	conn_->build(cmd, NULL, argv, lens, argc);
+	if (conn_->get_status("QUEUED") == false)
 		return false;
 	cmds_.push_back(cmd);
 	return true;

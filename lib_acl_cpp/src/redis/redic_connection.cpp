@@ -29,8 +29,8 @@ bool redis_connection::auth(const char* passwd)
 	argv[1] = passwd;
 	lens[1] = strlen(argv[1]);
 
-	const string& req = conn_->build_request(2, argv, lens);
-	return conn_->get_status(req);
+	conn_->build_request(2, argv, lens);
+	return conn_->get_status();
 }
 
 bool redis_connection::select(int dbnum)
@@ -46,8 +46,8 @@ bool redis_connection::select(int dbnum)
 	argv[1] = buf;
 	lens[1] = strlen(argv[1]);
 
-	const string& req = conn_->build_request(2, argv, lens);
-	return conn_->get_status(req);
+	conn_->build_request(2, argv, lens);
+	return conn_->get_status();
 }
 
 bool redis_connection::ping()
@@ -58,8 +58,8 @@ bool redis_connection::ping()
 	argv[0] = "PING";
 	lens[0] = strlen(argv[0]);
 
-	const string& req = conn_->build_request(1, argv, lens);
-	return conn_->get_status(req, "PONG");
+	conn_->build_request(1, argv, lens);
+	return conn_->get_status("PONG");
 }
 
 bool redis_connection::echo(const char* s)
@@ -74,8 +74,8 @@ bool redis_connection::echo(const char* s)
 	lens[1] = strlen(argv[1]);
 
 	string buf;
-	const string& req = conn_->build_request(2, argv, lens);
-	return conn_->get_string(req, buf) >= 0 ? true : false;
+	conn_->build_request(2, argv, lens);
+	return conn_->get_string(buf) >= 0 ? true : false;
 }
 
 bool redis_connection::quit()
@@ -86,8 +86,8 @@ bool redis_connection::quit()
 	argv[0] = "QUIT";
 	lens[0] = strlen(argv[0]);
 
-	const string& req = conn_->build_request(1, argv, lens);
-	bool ret = conn_->get_status(req);
+	conn_->build_request(1, argv, lens);
+	bool ret = conn_->get_status();
 	conn_->close();
 	return ret;
 }

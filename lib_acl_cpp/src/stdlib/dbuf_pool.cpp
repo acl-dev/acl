@@ -4,9 +4,9 @@
 namespace acl
 {
 
-dbuf_pool::dbuf_pool()
+dbuf_pool::dbuf_pool(size_t block_size /* = 8192 */)
 {
-	pool_ = acl_dbuf_pool_create(0);
+	pool_ = acl_dbuf_pool_create(block_size);
 }
 
 dbuf_pool::~dbuf_pool()

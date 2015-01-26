@@ -90,8 +90,8 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 		argc++;
 	}
 
-	const string& req = conn_->build_request(argc, argv, lens);
-	const redis_result* result = conn_->run(req, 2);
+	conn_->build_request(argc, argv, lens);
+	const redis_result* result = conn_->run(2);
 	if (result == NULL)
 	{
 		cursor = -1;
