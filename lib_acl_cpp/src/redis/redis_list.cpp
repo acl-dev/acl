@@ -70,7 +70,8 @@ bool redis_list::lset(const char* key, size_t idx, const char* value)
 	return lset(key, idx, value, strlen(value));
 }
 
-bool redis_list::lset(const char* key, size_t idx, const char* value, size_t len)
+bool redis_list::lset(const char* key, size_t idx,
+	const char* value, size_t len)
 {
 	const char* argv[4];
 	size_t lens[4];
@@ -448,7 +449,6 @@ bool redis_list::bpop(std::pair<string, string>& out)
 	first->argv_to_string(buf);
 	out.first = buf;
 
-	buf.clear();
 	second->argv_to_string(buf);
 	out.second = buf;
 	return true;

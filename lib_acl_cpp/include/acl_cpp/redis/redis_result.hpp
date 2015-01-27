@@ -104,7 +104,7 @@ public:
 	/**
 	 * 当数据类型为 REDIS_RESULT_STRING 类型时，该函数将按内存块存放的数据存储至
 	 * 连接内存中，但需要注意防止内存溢出
-	 * @param buf {string&} 存储结果数据
+	 * @param buf {string&} 存储结果数据，内部会先调用 buf.clear()
 	 * @return {size_t} 数据的总长度
 	 */
 	size_t argv_to_string(string& buf) const;

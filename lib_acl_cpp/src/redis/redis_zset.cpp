@@ -22,7 +22,7 @@ redis_zset::~redis_zset()
 
 }
 
-int redis_zset::zadd(const char* key, std::map<string, double>& members)
+int redis_zset::zadd(const char* key, const std::map<string, double>& members)
 {
 	dbuf_pool* pool = conn_->get_pool();
 	size_t argc = 2 + members.size() * 2;
@@ -58,7 +58,7 @@ int redis_zset::zadd(const char* key, std::map<string, double>& members)
 }
 
 int redis_zset::zadd(const char* key,
-	std::vector<std::pair<string, double> >&members)
+	const std::vector<std::pair<string, double> >&members)
 {
 	dbuf_pool* pool = conn_->get_pool();
 	size_t argc = 2 + members.size() * 2;
@@ -93,7 +93,7 @@ int redis_zset::zadd(const char* key,
 }
 
 int redis_zset::zadd(const char* key,
-	std::vector<std::pair<const char*, double> >&members)
+	const std::vector<std::pair<const char*, double> >&members)
 {
 	dbuf_pool* pool = conn_->get_pool();
 	size_t argc = 2 + members.size() * 2;
@@ -128,8 +128,8 @@ int redis_zset::zadd(const char* key,
 	return conn_->get_number();
 }
 
-int redis_zset::zadd(const char* key, std::vector<string>& members,
-	std::vector<double>& scores)
+int redis_zset::zadd(const char* key, const std::vector<string>& members,
+	const std::vector<double>& scores)
 {
 	size_t size = scores.size();
 	if (size != members.size())
@@ -167,8 +167,8 @@ int redis_zset::zadd(const char* key, std::vector<string>& members,
 	return conn_->get_number();
 }
 
-int redis_zset::zadd(const char* key, std::vector<const char*>& members,
-	std::vector<double>& scores)
+int redis_zset::zadd(const char* key, const std::vector<const char*>& members,
+	const std::vector<double>& scores)
 {
 	size_t size = scores.size();
 	if (size != members.size())
@@ -386,6 +386,8 @@ int redis_zset::zrange(const char* key, int start,
 int redis_zset::zrange_get_with_scores(const char* cmd, const char* key,
 	int start, int stop, std::vector<std::pair<string, double> >& out)
 {
+	out.clear();
+
 	const char* argv[5];
 	size_t lens[5];
 
@@ -574,6 +576,7 @@ int redis_zset::zrangebyscore_get_with_scores(const char* cmd,
 	double score;
 	const redis_result* child;
 	string buf(128);
+	out.clear();
 
 	for (size_t i = 0; i < size; i++)
 	{
@@ -1054,7 +1057,8 @@ int redis_zset::zremrangebylex(const char* key, const char* min, const char* max
 	return conn_->get_number();
 }
 
-int redis_zset::zscan(const char* key, int cursor, std::map<string, double>& out,
+int redis_zset::zscan(const char* key, int cursor,
+	std::vector<std::pair<string, double> >& out,
 	const char* pattern /* = NULL */, const size_t* count /* = NULL */)
 {
 	if (key == NULL || *key == 0 || cursor < 0)
@@ -1069,6 +1073,9 @@ int redis_zset::zscan(const char* key, int cursor, std::map<string, double>& out
 	if (size % 2 != 0)
 		return -1;
 
+	out.clear();
+	out.reserve(size);
+
 	const redis_result* rr;
 	string name(128), value(128);
 
@@ -1082,7 +1089,7 @@ int redis_zset::zscan(const char* key, int cursor, std::map<string, double>& out
 		rr->argv_to_string(value);
 		i++;
 
-		out[name] = atof(value.c_str());
+		out.push_back(std::make_pair(name, atof(value.c_str())));
 	}
 
 	return cursor;

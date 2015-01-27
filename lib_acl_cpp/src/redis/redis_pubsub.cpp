@@ -352,6 +352,7 @@ int redis_pubsub::pubsub_numsub(std::map<string, int>& out)
 
 	string buf(128);
 	const redis_result* rr;
+	out.clear();
 
 	for (size_t i = 0; i < size;)
 	{

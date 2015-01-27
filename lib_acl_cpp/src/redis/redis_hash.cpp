@@ -377,6 +377,7 @@ int redis_hash::hscan(const char* key, int cursor,
 
 	const redis_result* rr;
 	string name(128), value(128);
+	out.clear();
 
 	for (size_t i = 0; i < size;)
 	{

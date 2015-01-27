@@ -216,6 +216,7 @@ int redis_script::eval_status(const char* cmd, const char* script,
 
 	const redis_result* rr;
 	const char* status;
+	out.clear();
 
 	for (size_t i = 0; i < size; i++)
 	{
@@ -250,6 +251,8 @@ int redis_script::eval_number(const char* cmd, const char* script,
 	const redis_result* rr;
 	int number;
 	bool success;
+	out.clear();
+	status.clear();
 
 	for (size_t i = 0; i < size; i++)
 	{
@@ -277,7 +280,9 @@ long long int redis_script::eval_number64(const char* cmd, const char* script,
 	if (children == NULL || size == 0)
 		return 0;
 
+	out.clear();
 	out.reserve(size);
+	status.clear();
 
 	const redis_result* rr;
 	long long int number;
@@ -308,6 +313,7 @@ int redis_script::eval_strings(const char* cmd, const char* script,
 	if (children == NULL || size == 0)
 		return 0;
 
+	out.clear();
 	out.reserve(size);
 
 	const redis_result* rr;
@@ -481,6 +487,8 @@ bool redis_script::script_flush()
 
 bool redis_script::script_load(const string& script, string& out)
 {
+	out.clear();
+
 	const char* argv[3];
 	size_t lens[3];
 

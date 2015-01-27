@@ -27,15 +27,15 @@ public:
 	 * -1：表示出错或 key 对象非有序集对象
 	 * >0：新添加的成员数量
 	 */
-	int zadd(const char* key, std::map<string, double>& members);
+	int zadd(const char* key, const std::map<string, double>& members);
 	int zadd(const char* key,
-		std::vector<std::pair<string, double> >&members);
+		const std::vector<std::pair<string, double> >&members);
 	int zadd(const char* key,
-		std::vector<std::pair<const char*, double> >&members);
-	int zadd(const char* key, std::vector<string>& members,
-		std::vector<double>& scores);
-	int zadd(const char* key, std::vector<const char*>& members,
-		std::vector<double>& scores);
+		const std::vector<std::pair<const char*, double> >&members);
+	int zadd(const char* key, const std::vector<string>& members,
+		const std::vector<double>& scores);
+	int zadd(const char* key, const std::vector<const char*>& members,
+		const std::vector<double>& scores);
 	int zadd(const char* key, const char* members[], double scores[],
 		size_t size);
 	int zadd(const char* key, const char* members[], size_t members_len[],
@@ -80,7 +80,8 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param start {int} 起始下标位置
 	 * @param stop {int} 结束下标位置（结果集同时含该位置）
-	 * @param result {std::vector<string>&} 存储结果集
+	 * @param result {std::vector<string>&} 存储结果集，内部先调用
+	 *  result.clear() 清除其中的元素
 	 * @return {int} 结果集中成员的数量
 	 *  0: 表示结果集为空或 key 不存在
 	 * -1: 表示出错或 key 对象非有序集对象
@@ -96,7 +97,7 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param start {int} 起始下标位置
 	 * @param stop {int} 结束下标位置（结果集同时含该位置）
-	 * @param result 存储 "成员名-分值对"结果集
+	 * @param result 存储 "成员名-分值对"结果集，内部先调用 out.clear()
 	 * @return {int} 结果集中成员的数量
 	 *  0: 表示结果集为空或 key 不存在
 	 * -1: 表示出错或 key 对象非有序集对象
@@ -113,7 +114,7 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param min {double} 最小分值
 	 * @param max {double} 最大分值
-	 * @param out 存储“分值-成员名”对的结果集
+	 * @param out 存储“分值-成员名”对的结果集，内部先调用 out.clear()
 	 * @param offset {const int*} 非空时表示结果集的起始下标
 	 * @param count {const int*} 非空时表示截取的结果集中成员个数
 	 * @return {int} 结果集中成员的数量
@@ -132,7 +133,7 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param min {const char*} 以字符串表示最小分值
 	 * @param max {const char*} 以字符串表示最大分值
-	 * @param out 存储“分值-成员名”对的结果集
+	 * @param out 存储“分值-成员名”对的结果集，内部先调用 out.clear()
 	 * @param offset {const int*} 非空时表示结果集的起始下标
 	 * @param count {const int*} 非空时表示截取的结果集中成员个数
 	 * @return {int} 结果集中成员的数量
@@ -155,6 +156,8 @@ public:
 	 * 返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )
 	 * 的成员及分值。有序集成员按 score 值递增(从小到大)次序排列；分值(min/max)使用
 	 * 浮点数表示
+	 * @param out 存储结果集，内部先调用 out.clear()
+	 * @return {int} 结果集中成员的数量
 	 */
 	int zrangebyscore_with_scores(const char* key, double min, double max,
 		std::vector<std::pair<string, double> >& out,
@@ -164,6 +167,8 @@ public:
 	 * 返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )
 	 * 的成员及分值。有序集成员按 score 值递增(从小到大)次序排列；分值(min/max)使用
 	 * 字符串表示
+	 * @param out 存储结果集，内部先调用 out.clear()
+	 * @return {int} 结果集中成员的数量
 	 */
 	int zrangebyscore_with_scores(const char* key, const char* min,
 		const char* max, std::vector<std::pair<string, double> >& out,
@@ -240,6 +245,7 @@ public:
 	 * @param result {std::vector<string>&} 存储结果集
 	 *  注：对于下标位置，0 表示第一个成员，1 表示第二个成员；-1 表示最后一个成员，
 	 *     -2 表示倒数第二个成员，以此类推
+	 * @return {int} 结果集数量，-1 表示出错
 	 */
 	int zrevrange(const char* key, int start, int stop,
 		std::vector<string>& result);
@@ -249,9 +255,10 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param start {int} 起始下标位置
 	 * @param stop {int} 结束下标位置（结果集同时含该位置）
-	 * @param result 存储 "成员名-分值对"结果集
+	 * @param result 存储 "成员名-分值对"结果集，内部先调用 out.clear()
 	 *  注：对于下标位置，0 表示第一个成员，1 表示第二个成员；-1 表示最后一个成员，
 	 *     -2 表示倒数第二个成员，以此类推
+	 * @return {int} 结果集数量，-1 表示出错
 	 */
 	int zrevrange_with_scores(const char* key, int start, int stop,
 		std::vector<std::pair<string, double> >& out);
@@ -262,7 +269,7 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param min {const char*} 以字符串表示最小分值
 	 * @param max {const char*} 以字符串表示最大分值
-	 * @param out 存储“分值-成员名”对的结果集
+	 * @param out 存储“分值-成员名”对的结果集，内部先调用 out.clear()
 	 * @param offset {const int*} 非空时表示结果集的起始下标
 	 * @param count {const int*} 非空时表示截取的结果集中成员个数
 	 * @return {int} 结果集中成员的数量
@@ -285,6 +292,8 @@ public:
 	 * 返回有序集 key 中，所有 score 值介于 min 和 max 之间(包括等于 min 或 max )
 	 * 的成员及分值。有序集成员按 score 值递减(从小到大)次序排列；分值(min/max)使用
 	 * 浮点数表示
+	 * @param out 存储“分值-成员名”对的结果集，内部先调用 out.clear()
+	 * @param count {const int*} 非空时表示截取的结果集中成员个数
 	 */
 	int zrevrangebyscore_with_scores(const char* key, double min,
 		double max, std::vector<std::pair<string, double> >& out,
@@ -330,7 +339,7 @@ public:
 	 *  MIN: 将所有集合中某个成员的 最小 score 值作为结果集中该成员的 score 值
 	 *  MAX: 将所有集合中某个成员的 最大 score 值作为结果集中该成员的 score 值
 	 * @return {int} 新保存到目标有序集的结果集中的元素(成员)数量，如果源有序集
-	 *  集合中存在相同的成员，则只新增一个成员
+	 *  集合中存在相同的成员，则只新增一个成员；返回 -1 表示出错
 	 */
 	int zunionstore(const char* dst, const std::map<string, double>& keys,
 		const char* aggregate = "SUM");
@@ -351,6 +360,21 @@ public:
 	int zinterstore(const char* dst, const std::vector<string>& keys,
 		const std::vector<double>* weights = NULL,
 		const char* aggregate = "SUM");
+	
+	/**
+	 * 命令用于迭代有序集合中的元素（包括元素成员和元素分值）
+	 * @param cursor {int} 游标值，开始遍历时该值写 0
+	 * @param out 存储结果集，内部先 out.clear()
+	 * @param pattern {const char*} 匹配模式，glob 风格，非空时有效
+	 * @param count {const size_t*} 限定的结果集数量，非空指针时有效
+	 * @return {int} 下一个游标位置，含义如下：
+	 *   0：遍历结束
+	 *  -1: 出错
+	 *  >0: 游标的下一个位置
+	 */
+	int zscan(const char* key, int cursor,
+		std::vector<std::pair<string, double> >& out,
+		const char* pattern = NULL, const size_t* count = NULL);
 
 	/**
 	 * 当有序集合的所有成员都具有相同的分值时， 有序集合的元素会根据成员的字典序
@@ -358,6 +382,7 @@ public:
 	 * 有序集合键 key 中， 值介于 min 和 max 之间的成员
 	 * @param min {const char*} 区间最小值
 	 * @param max {const char*} 区间最大值
+	 * @param out {std::map<string, double>&} 存储结果集，内部先 out.clear()
 	 * @param offset {const int*} 非空时有效，从结果集中选取的下标起始值
 	 * @param count {const int*} 非空时有效，从结果集中的指定下标位置起选取的数量
 	 * @return {int} 结果集中成员的数量
@@ -378,30 +403,16 @@ public:
 	/**
 	 * 于一个所有成员的分值都相同的有序集合键 key 来说， 这个命令会返回该集合中， 
 	 * 成员介于 min 和 max 范围内的元素数量
-	 * @return {int}
+	 * @return {int} 符合条件的元素数量
 	 */
 	int zlexcount(const char* key, const char* min, const char* max);
 
 	/**
 	 * 对于一个所有成员的分值都相同的有序集合键 key 来说， 这个命令会移除该集合中，
 	 * 成员介于 min 和 max 范围内的所有元素
-	 * @return {int}
+	 * @return {int} 被移除的元素数量
 	 */
 	int zremrangebylex(const char* key, const char* min, const char* max);
-
-	/**
-	 * 命令用于迭代有序集合中的元素（包括元素成员和元素分值）
-	 * @param cursor {int} 游标值，开始遍历时该值写 0
-	 * @param out {std::map<string, double>&} 结果集
-	 * @param pattern {const char*} 匹配模式，glob 风格，非空时有效
-	 * @param count {const size_t*} 限定的结果集数量，非空指针时有效
-	 * @return {int} 下一个游标位置，含义如下：
-	 *   0：遍历结束
-	 *  -1: 出错
-	 *  >0: 游标的下一个位置
-	 */
-	int zscan(const char* key, int cursor, std::map<string, double>& out,
-		const char* pattern = NULL, const size_t* count = NULL);
 
 private:
 	int zrange_get(const char* cmd, const char* key, int start,

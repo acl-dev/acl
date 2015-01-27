@@ -407,6 +407,8 @@ long long int redis_client::get_number64(bool* success /* = NULL */)
 
 int redis_client::get_number(std::vector<int>& out)
 {
+	out.clear();
+
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
@@ -429,6 +431,8 @@ int redis_client::get_number(std::vector<int>& out)
 
 int redis_client::get_number64(std::vector<long long int>& out)
 {
+	out.clear();
+
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
@@ -465,6 +469,8 @@ bool redis_client::get_status(const char* success /* = "OK" */)
 
 int redis_client::get_status(std::vector<bool>& out)
 {
+	out.clear();
+
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
@@ -520,6 +526,8 @@ int redis_client::get_string(char* buf, size_t size)
 
 int redis_client::get_strings(std::vector<string>& out)
 {
+	out.clear();
+
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
@@ -561,6 +569,8 @@ int redis_client::get_strings(std::vector<string>* out)
 	if (out == NULL)
 		return result->get_size();
 
+	out->clear();
+
 	size_t size;
 	const redis_result** children = result->get_children(&size);
 	if (children == NULL)
@@ -592,6 +602,8 @@ int redis_client::get_strings(std::vector<string>* out)
 
 int redis_client::get_strings(std::map<string, string>& out)
 {
+	out.clear();
+
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
@@ -631,6 +643,9 @@ int redis_client::get_strings(std::map<string, string>& out)
 int redis_client::get_strings(std::vector<string>& names,
 	std::vector<string>& values)
 {
+	names.clear();
+	values.clear();
+
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
@@ -673,6 +688,9 @@ int redis_client::get_strings(std::vector<string>& names,
 int redis_client::get_strings(std::vector<const char*>& names,
 	std::vector<const char*>& values)
 {
+	names.clear();
+	values.clear();
+
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
@@ -780,7 +798,7 @@ void redis_client::build_request1(size_t argc, const char* argv[], size_t lens[]
 		request_.append(argv[i], lens[i]);
 		request_.append("\r\n");
 	}
-	// printf("%s", request_.c_str());
+	//printf("%s", request_.c_str());
 }
 
 void redis_client::build_request2(size_t argc, const char* argv[], size_t lens[])
