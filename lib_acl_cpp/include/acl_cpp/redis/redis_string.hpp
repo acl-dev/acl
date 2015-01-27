@@ -119,8 +119,6 @@ public:
 		std::vector<string>* out = NULL);
 	bool mget(const std::vector<const char*>& keys,
 		std::vector<string>* out = NULL);
-	bool mget(const std::vector<char*>& keys,
-		std::vector<string>* out = NULL);
 	bool mget(const std::vector<int>& keys,
 		std::vector<string>* out = NULL);
 

@@ -166,12 +166,6 @@ int redis_list::lpush(const char* key, const std::vector<string>& values)
 	return conn_->get_number();
 }
 
-int redis_list::lpush(const char* key, const std::vector<char*>& values)
-{
-	conn_->build("LPUSH", key, values);
-	return conn_->get_number();
-}
-
 int redis_list::lpush(const char* key, const std::vector<const char*>& values)
 {
 	conn_->build("LPUSH", key, values);
@@ -208,12 +202,6 @@ int redis_list::rpush(const char* key, const char* values[], size_t argc)
 }
 
 int redis_list::rpush(const char* key, const std::vector<string>& values)
-{
-	conn_->build("RPUSH", key, values);
-	return conn_->get_number();
-}
-
-int redis_list::rpush(const char* key, const std::vector<char*>& values)
 {
 	conn_->build("RPUSH", key, values);
 	return conn_->get_number();
@@ -310,12 +298,6 @@ bool redis_list::blpop(std::pair<string, string>& result, size_t timeout,
 	return blpop(keys, timeout, result);
 }
 
-bool redis_list::blpop(const std::vector<char*>& keys, size_t timeout,
-	std::pair<string, string>& result)
-{
-	return blpop((const std::vector<const char*>&) keys, timeout, result);
-}
-
 bool redis_list::blpop(const std::vector<const char*>& keys, size_t timeout,
 	std::pair<string, string>& result)
 {
@@ -342,12 +324,6 @@ bool redis_list::brpop(std::pair<string, string>& result, size_t timeout,
 		keys.push_back(key);
 	va_end(ap);
 	return brpop(keys, timeout, result);
-}
-
-bool redis_list::brpop(const std::vector<char*>& keys, size_t timeout,
-	std::pair<string, string>& result)
-{
-	return brpop((const std::vector<const char*>&) keys, timeout, result);
 }
 
 bool redis_list::brpop(const std::vector<const char*>& keys, size_t timeout,

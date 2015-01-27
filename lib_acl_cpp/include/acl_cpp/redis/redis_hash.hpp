@@ -30,11 +30,9 @@ public:
 	 * @return {bool} 添加是否成功
 	 */
 	bool hmset(const char* key, const std::map<string, string>& attrs);
-	bool hmset(const char* key, const std::map<string, char*>& attrs);
 	bool hmset(const char* key, const std::map<string, const char*>& attrs);
 
 	bool hmset(const char* key, const std::map<int, string>& attrs);
-	bool hmset(const char* key, const std::map<int, char*>& attrs);
 	bool hmset(const char* key, const std::map<int, const char*>& attrs);
 
 	/////////////////////////////////////////////////////////////////////
@@ -49,8 +47,6 @@ public:
 	 *  调用方法中传入非空的存储结果对象的地址
 	 */
 	bool hmget(const char* key, const std::vector<string>& names,
-		std::vector<string>* result = NULL);
-	bool hmget(const char* key, const std::vector<char*>& names,
 		std::vector<string>* result = NULL);
 	bool hmget(const char* key, const std::vector<const char*>& names,
 		std::vector<string>* result = NULL);
@@ -165,7 +161,6 @@ public:
 	int hdel(const char* key, const char* names[],
 		const size_t names_len[], size_t argc);
 	int hdel(const char* key, const std::vector<string>& names);
-	int hdel(const char* key, const std::vector<char*>& names);
 	int hdel(const char* key, const std::vector<const char*>& names);
 
 	/**

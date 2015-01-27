@@ -72,14 +72,10 @@ public:
 	void build(const char* cmd, const char* key,
 		const std::map<string, string>& attrs);
 	void build(const char* cmd, const char* key,
-		const std::map<string, char*>& attrs);
-	void build(const char* cmd, const char* key,
 		const std::map<string, const char*>& attrs);
 
 	void build(const char* cmd, const char* key,
 		const std::map<int, string>& attrs);
-	void build(const char* cmd, const char* key,
-		const std::map<int, char*>& attrs);
 	void build(const char* cmd, const char* key,
 		const std::map<int, const char*>& attrs);
 
@@ -87,18 +83,12 @@ public:
 		const std::vector<string>& names,
 		const std::vector<string>& values);
 	void build(const char* cmd, const char* key,
-		const std::vector<char*>& names,
-		const std::vector<char*>& values);
-	void build(const char* cmd, const char* key,
 		const std::vector<const char*>& names,
 		const std::vector<const char*>& values);
 
 	void build(const char* cmd, const char* key,
 		const std::vector<int>& names,
 		const std::vector<string>& values);
-	void build(const char* cmd, const char* key,
-		const std::vector<int>& names,
-		const std::vector<char*>& values);
 	void build(const char* cmd, const char* key,
 		const std::vector<int>& names,
 		const std::vector<const char*>& values);
@@ -115,8 +105,6 @@ public:
 
 	void build(const char* cmd, const char* key,
 		const std::vector<string>& names);
-	void build(const char* cmd, const char* key,
-		const std::vector<char*>& names);
 	void build(const char* cmd, const char* key,
 		const std::vector<const char*>& names);
 	void build(const char* cmd, const char* key,

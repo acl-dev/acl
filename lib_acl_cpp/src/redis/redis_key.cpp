@@ -44,12 +44,6 @@ int redis_key::del(const std::vector<string>& keys)
 	return conn_->get_number();
 }
 
-int redis_key::del(const std::vector<char*>& keys)
-{
-	conn_->build("DEL", NULL, keys);
-	return conn_->get_number();
-}
-
 int redis_key::del(const std::vector<const char*>& keys)
 {
 	conn_->build("DEL", NULL, keys);

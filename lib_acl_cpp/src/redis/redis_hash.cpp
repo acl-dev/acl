@@ -28,12 +28,6 @@ bool redis_hash::hmset(const char* key, const std::map<string, string>& attrs)
 	return conn_->get_status();
 }
 
-bool redis_hash::hmset(const char* key, const std::map<string, char*>& attrs)
-{
-	conn_->build("HMSET", key, attrs);
-	return conn_->get_status();
-}
-
 bool redis_hash::hmset(const char* key, const std::map<string, const char*>& attrs)
 {
 	conn_->build("HMSET", key, attrs);
@@ -41,12 +35,6 @@ bool redis_hash::hmset(const char* key, const std::map<string, const char*>& att
 }
 
 bool redis_hash::hmset(const char* key, const std::map<int, string>& attrs)
-{
-	conn_->build("HMSET", key, attrs);
-	return conn_->get_status();
-}
-
-bool redis_hash::hmset(const char* key, const std::map<int, char*>& attrs)
 {
 	conn_->build("HMSET", key, attrs);
 	return conn_->get_status();
@@ -61,13 +49,6 @@ bool redis_hash::hmset(const char* key, const std::map<int, const char*>& attrs)
 /////////////////////////////////////////////////////////////////////////////
 
 bool redis_hash::hmget(const char* key, const std::vector<string>& names,
-	std::vector<string>* result /* = NULL */)
-{
-	conn_->build("HMGET", key, names);
-	return conn_->get_strings(result) >= 0 ? true : false;
-}
-
-bool redis_hash::hmget(const char* key, const std::vector<char*>& names,
 	std::vector<string>* result /* = NULL */)
 {
 	conn_->build("HMGET", key, names);
@@ -268,12 +249,6 @@ int redis_hash::hdel(const char* key, const std::vector<string>& names)
 	return conn_->get_number();
 }
 
-int redis_hash::hdel(const char* key, const std::vector<char*>& names)
-{
-	conn_->build("HDEL", key, names);
-	return conn_->get_number();
-}
-
 int redis_hash::hdel(const char* key, const std::vector<const char*>& names)
 {
 	conn_->build("HDEL", key, names);
@@ -359,8 +334,7 @@ int redis_hash::hlen(const char* key)
 	return conn_->get_number();
 }
 
-int redis_hash::hscan(const char* key, int cursor,
-	  std::map<string, string>& out,
+int redis_hash::hscan(const char* key, int cursor, std::map<string, string>& out,
 	  const char* pattern /* = NULL */, const size_t* count /* = NULL */)
 {
 	if (key == NULL || *key == 0 || cursor < 0)

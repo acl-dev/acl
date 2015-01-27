@@ -35,7 +35,6 @@ public:
 	 */
 	int del(const char* first_key, ...) ACL_CPP_PRINTF(2, 3);
 	int del(const std::vector<string>& keys);
-	int del(const std::vector<char*>& keys);
 	int del(const std::vector<const char*>& keys);
 	int del(const std::vector<int>& keys);
 	int del(const char* keys[], size_t argc);

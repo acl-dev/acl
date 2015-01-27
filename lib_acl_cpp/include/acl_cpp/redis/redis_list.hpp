@@ -33,7 +33,6 @@ public:
 	int lpush(const char* key, const char* first_value, ...);
 	int lpush(const char* key, const char* values[], size_t argc);
 	int lpush(const char* key, const std::vector<string>& values);
-	int lpush(const char* key, const std::vector<char*>& values);
 	int lpush(const char* key, const std::vector<const char*>& values);
 	int lpush(const char* key, const char* values[], size_t lens[],
 		size_t argc);
@@ -41,7 +40,6 @@ public:
 	int rpush(const char* key, const char* first_value, ...);
 	int rpush(const char* key, const char* values[], size_t argc);
 	int rpush(const char* key, const std::vector<string>& values);
-	int rpush(const char* key, const std::vector<char*>& values);
 	int rpush(const char* key, const std::vector<const char*>& values);
 	int rpush(const char* key, const char* values[], size_t lens[],
 		size_t argc);
@@ -58,16 +56,12 @@ public:
 		const char* first_key, ...);
 	bool blpop(const std::vector<const char*>& keys, size_t timeout,
 		std::pair<string, string>& result);
-	bool blpop(const std::vector<char*>& keys, size_t timeout,
-		std::pair<string, string>& result);
 	bool blpop(const std::vector<string>& keys, size_t timeout,
 		std::pair<string, string>& result);
 
 	bool brpop(std::pair<string, string>& result, size_t timeout,
 		const char* first_key, ...);
 	bool brpop(const std::vector<const char*>& keys, size_t timeout,
-		std::pair<string, string>& result);
-	bool brpop(const std::vector<char*>& keys, size_t timeout,
 		std::pair<string, string>& result);
 	bool brpop(const std::vector<string>& keys, size_t timeout,
 		std::pair<string, string>& result);

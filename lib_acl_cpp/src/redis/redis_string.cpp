@@ -622,13 +622,6 @@ bool redis_string::mget(const std::vector<const char*>& keys,
 	return conn_->get_strings(out) >= 0 ? true : false;
 }
 
-bool redis_string::mget(const std::vector<char*>& keys,
-	std::vector<string>* out /* = NULL */)
-{
-	conn_->build("MGET", NULL, keys);
-	return conn_->get_strings(out) >= 0 ? true : false;
-}
-
 bool redis_string::mget(const std::vector<int>& keys,
 	std::vector<string>* out /* = NULL */)
 {
