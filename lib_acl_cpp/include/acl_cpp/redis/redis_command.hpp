@@ -38,6 +38,13 @@ public:
 	}
 
 	/**
+	 * 判断当前所绑定的 redis 连接流对象(redis_client) 连接是否已经关闭；只有
+	 * 内部的 conn_ 流对象非空时调用此函数才有意义
+	 * @return {bool}
+	 */
+	bool eof() const;
+
+	/**
 	 * 获得本次 redis 操作过程的结果
 	 * @return {redis_result*}
 	 */

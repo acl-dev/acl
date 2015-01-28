@@ -158,41 +158,42 @@ size_t redis_result::get_length() const
 	return len;
 }
 
-size_t redis_result::argv_to_string(string& buf) const
+int redis_result::argv_to_string(string& buf) const
 {
 	buf.clear();
 
 	if (idx_ == 0)
-		return 0;
+		return -1;
 
-	size_t length = 0;
+	int length = 0;
 	for (size_t i = 0; i < idx_; i++)
 	{
 		buf.append(argv_[i], lens_[i]);
-		length += lens_[i];
+		length += (int) lens_[i];
 	}
 
 	return length;
 }
 
-size_t redis_result::argv_to_string(char* buf, size_t size) const
+int redis_result::argv_to_string(char* buf, size_t size) const
 {
 	if (idx_ == 0 || size == 0)
-		return 0;
+		return -1;
 
 	size--;
 	if (size == 0)
 		return 0;
 
 	char* ptr = buf;
-	size_t length = 0, n;
+	int length = 0;
+	size_t n;
 	for (size_t i = 0; i < idx_; i++)
 	{
 		n = size > lens_[i] ? lens_[i] : size;
 		memcpy(ptr, argv_[i], n);
 		ptr += n;
 		size -= n;
-		length += n;
+		length += (int) n;
 		if (size == 0)
 			break;
 	}

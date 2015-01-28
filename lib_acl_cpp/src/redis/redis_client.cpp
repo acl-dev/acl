@@ -110,6 +110,11 @@ void redis_client::close()
 		conn_.close();
 }
 
+bool redis_client::eof() const
+{
+	return conn_.eof();
+}
+
 /////////////////////////////////////////////////////////////////////////////
 
 void redis_client::put_data(redis_result* rr, const char* data, size_t len)
@@ -503,7 +508,7 @@ int redis_client::get_string(string& buf)
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_STRING)
 		return -1;
-	return (int) result->argv_to_string(buf);
+	return result->argv_to_string(buf);
 }
 
 int redis_client::get_string(string* buf)
@@ -513,7 +518,7 @@ int redis_client::get_string(string* buf)
 		return -1;
 	if (buf == NULL)
 		return (int) result->get_length();
-	return (int) result->argv_to_string(*buf);
+	return result->argv_to_string(*buf);
 }
 
 int redis_client::get_string(char* buf, size_t size)
@@ -521,7 +526,7 @@ int redis_client::get_string(char* buf, size_t size)
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_STRING)
 		return -1;
-	return (int) result->argv_to_string(buf, size);
+	return result->argv_to_string(buf, size);
 }
 
 int redis_client::get_strings(std::vector<string>& out)

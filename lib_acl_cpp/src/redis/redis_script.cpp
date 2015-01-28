@@ -71,7 +71,7 @@ int redis_script::eval_string(const char* script,
 	if (result == NULL)
 		return -1;
 
-	return (int) result->argv_to_string(out);
+	return result->argv_to_string(out);
 }
 
 bool redis_script::evalsha_status(const char* script,
@@ -124,7 +124,7 @@ int redis_script::evalsha_string(const char* script,
 	if (result == NULL)
 		return -1;
 
-	return (int) result->argv_to_string(out);
+	return result->argv_to_string(out);
 }
 
 int redis_script::eval_status(const char* script,

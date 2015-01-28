@@ -32,6 +32,11 @@ void redis_command::set_client(redis_client* conn)
 	conn_ = conn;
 }
 
+bool redis_command::eof() const
+{
+	return conn_ == NULL ? false : conn_->eof();
+}
+
 const redis_result* redis_command::get_result() const
 {
 	return conn_ ? conn_->get_result() : NULL;
@@ -111,7 +116,7 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 		return NULL;
 	}
 	string tmp(128);
-	if (rr->argv_to_string(tmp) == 0)
+	if (rr->argv_to_string(tmp) < 0)
 	{
 		cursor = -1;
 		return NULL;

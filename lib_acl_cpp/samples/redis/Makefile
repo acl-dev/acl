@@ -6,6 +6,7 @@ all:
 	@(cd redis_manager; make)
 	@(cd redis_pubsub; make)
 	@(cd redis_zset; make)
+	@(cd redis_list; make)
 
 clean:
 	@(cd redis_key; make clean)
@@ -15,3 +16,4 @@ clean:
 	@(cd redis_manager; make clean)
 	@(cd redis_pubsub; make clean)
 	@(cd redis_zset; make clean)
+	@(cd redis_list; make clean)

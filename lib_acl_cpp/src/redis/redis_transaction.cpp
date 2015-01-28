@@ -24,14 +24,19 @@ bool redis_transaction::watch(const std::vector<string>& keys)
 	return conn_->get_status();
 }
 
-bool redis_transaction::unwatch(const std::vector<string>& keys)
+bool redis_transaction::unwatch()
 {
-	conn_->build("UNWATCH", NULL, keys);
+	const char* argv[1];
+	size_t lens[1];
+
+	conn_->build_request(1, argv, lens);
 	return conn_->get_status();
 }
 
 bool redis_transaction::multi()
 {
+	cmds_.clear();
+
 	const char* argv[1];
 	size_t lens[1];
 

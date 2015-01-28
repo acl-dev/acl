@@ -351,29 +351,6 @@ int redis_set::srandmember(const char* key, size_t n, std::vector<string>& out)
 	return conn_->get_strings(out);
 }
 
-int redis_set::srem(const char* key, const char* member)
-{
-	return srem(key, member, strlen(member));
-}
-
-int redis_set::srem(const char* key, const char* member, size_t len)
-{
-	const char* argv[3];
-	size_t lens[3];
-
-	argv[0] = "SREM";
-	lens[0] = sizeof("SREM") - 1;
-
-	argv[1] = key;
-	lens[1] = strlen(key);
-
-	argv[2] = member;
-	lens[2] = len;
-
-	conn_->build_request(3, argv, lens);
-	return conn_->get_number();
-}
-
 int redis_set::srem(const char* key, const char* first_member, ...)
 {
 	std::vector<const char*> members;

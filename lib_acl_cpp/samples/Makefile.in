@@ -4,7 +4,6 @@ CFLAGS = -c -g -W \
 -O3 \
 -Wall \
 -Werror \
--Wcast-qual \
 -Wshadow \
 -Wno-long-long \
 -Wpointer-arith \
@@ -12,6 +11,7 @@ CFLAGS = -c -g -W \
 -D_POSIX_PTHREAD_SEMANTICS \
 -D_USE_FAST_MACRO
 
+#-Wcast-qual
 # -Wcast-align
 #-Waggregate-return
 ###########################################################
