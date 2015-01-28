@@ -28,7 +28,6 @@ public:
 	 *  1、出错
 	 *  2、有一个 key 非列表对象
 	 *  3、key 不存在或超时未获得元素对象
-<<<<<<< HEAD
 
 	 */
 	bool blpop(std::pair<string, string>& result, size_t timeout,
@@ -74,53 +73,6 @@ public:
 	 */
 	bool lindex(const char* key, size_t idx, string& buf);
 
-=======
-
-	 */
-	bool blpop(std::pair<string, string>& result, size_t timeout,
-		const char* first_key, ...);
-	bool blpop(const std::vector<const char*>& keys, size_t timeout,
-		std::pair<string, string>& result);
-	bool blpop(const std::vector<string>& keys, size_t timeout,
-		std::pair<string, string>& result);
-
-	/**
-	 * 含义参见 blpop，唯一区别为该方法弹出尾部元素对象
-	 * @sess blpop
-	 */
-	bool brpop(std::pair<string, string>& result, size_t timeout,
-		const char* first_key, ...);
-	bool brpop(const std::vector<const char*>& keys, size_t timeout,
-		std::pair<string, string>& result);
-	bool brpop(const std::vector<string>& keys, size_t timeout,
-		std::pair<string, string>& result);
-
-	/**
-	 * 阻塞式执行以下两个动作：
-	 * 1) 将列表 src 中的最后一个元素(尾元素)弹出，并返回给客户端。
-	 * 2) 将 src 弹出的元素插入到列表 dst ，作为 dst 列表的的头元素
-	 * @param src {const char*} 源列表对象 key
-	 * @param dst {const char*} 目标列表对象 key
-	 * @param buf {string*} 非空时存储 src 的尾部元素 key 值
-	 * @param timeout {size_t} 等待超时时间，如果为 0 则一直等待直到有数据或出错
-	 * @return {bool} 当从 src 列表中成功弹出尾部元素并放入 dst 列表头部后
-	 *  该方法返回 true；返回 false 表示超时、出错或 src/dst 有一个非列表对象
-	 * @see rpoplpush
-	 */
-	bool brpoplpush(const char* src, const char* dst, size_t timeout,
-		string* buf = NULL);
-
-	/**
-	 * 返回 key 对应的列表对象中，指定下标的元素
-	 * @param key {const char*} 列表对象的 key
-	 * @param idx {size_t} 下标值
-	 * @param buf {string&} 存储结果
-	 * @return {bool} 返回 true 表明操作成功，此时若 buf 数据非空则表明正确获得了
-	 *  指定下标的元素，如果 buf.empty()表示没有获得元素；返回 false 时表明操作失败
-	 */
-	bool lindex(const char* key, size_t idx, string& buf);
-
->>>>>>> 13bcb6aefb2b0971c698670ea8622b3d8208ca46
 	/**
 	 * 在列表对象中将一个新元素添加至指定元素的前面
 	 * @param key {const char*} 列表对象的 key
@@ -177,11 +129,7 @@ public:
 	int lpush(const char* key, const char* values[], size_t argc);
 	int lpush(const char* key, const std::vector<string>& values);
 	int lpush(const char* key, const std::vector<const char*>& values);
-<<<<<<< HEAD
 	int lpush(const char* key, const char* values[], const size_t lens[],
-=======
-	int lpush(const char* key, const char* values[], size_t lens[],
->>>>>>> 13bcb6aefb2b0971c698670ea8622b3d8208ca46
 		size_t argc);
 
 	/**
@@ -271,7 +219,6 @@ public:
 	 *  该方法返回 true；返回 false 出错或 src/dst 有一个非列表对象
 	 */
 	bool rpoplpush(const char* src, const char* dst, string* buf = NULL);
-<<<<<<< HEAD
 
 	/**
 	 * 将一个或多个值元素插入到列表对象 key 的表尾
@@ -289,25 +236,6 @@ public:
 		size_t argc);
 
 	/**
-=======
-
-	/**
-	 * 将一个或多个值元素插入到列表对象 key 的表尾
-	 * @param key {const char*} 列表对象的 key
-	 * @param first_value {const char*} 第一个非空字符串，该变参的列表的最后一个
-	 *  必须设为 NULL
-	 * @return {int} 返回添加完后当前列表对象中的元素个数，返回 -1 表示出错或该 key
-	 *  对象非列表对象，当该 key 不存在时会添加新的列表对象及对象中的元素
-	 */
-	int rpush(const char* key, const char* first_value, ...);
-	int rpush(const char* key, const char* values[], size_t argc);
-	int rpush(const char* key, const std::vector<string>& values);
-	int rpush(const char* key, const std::vector<const char*>& values);
-	int rpush(const char* key, const char* values[], size_t lens[],
-		size_t argc);
-
-	/**
->>>>>>> 13bcb6aefb2b0971c698670ea8622b3d8208ca46
 	 * 将一个新的列表对象的元素添加至已经存在的指定列表对象的尾部，当该列表对象
 	 * 不存在时则不添加
 	 * @param key {const char*} 列表对象的 key
