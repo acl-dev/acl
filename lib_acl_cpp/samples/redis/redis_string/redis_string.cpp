@@ -141,7 +141,7 @@ static void test_strlen(acl::redis_string& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 
 		option.reset();
-		int ret = option.str_len(key.c_str());
+		int ret = option.get_strlen(key.c_str());
 		if (ret < 0)
 		{
 			printf("str_len error, key: %s\r\n", key.c_str());

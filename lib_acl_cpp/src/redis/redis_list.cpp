@@ -39,12 +39,8 @@ int redis_list::llen(const char* key)
 	return conn_->get_number();
 }
 
-bool redis_list::lindex(const char* key, size_t idx,
-	string& buf, bool* exist /*  = NULL */)
+bool redis_list::lindex(const char* key, size_t idx, string& buf)
 {
-	if (exist)
-		*exist = false;
-
 	const char* argv[3];
 	size_t lens[3];
 
@@ -59,19 +55,15 @@ bool redis_list::lindex(const char* key, size_t idx,
 	lens[2] = strlen(tmp);
 
 	conn_->build_request(3, argv, lens);
-	long ret = conn_->get_string(buf);
-	if (exist && ret > 0)
-		*exist = true;
-	return ret >= 0 ? true : false;
+	return conn_->get_string(buf) >= 0 ? true : false;
 }
 
-bool redis_list::lset(const char* key, size_t idx, const char* value)
+bool redis_list::lset(const char* key, int idx, const char* value)
 {
 	return lset(key, idx, value, strlen(value));
 }
 
-bool redis_list::lset(const char* key, size_t idx,
-	const char* value, size_t len)
+bool redis_list::lset(const char* key, int idx, const char* value, size_t len)
 {
 	const char* argv[4];
 	size_t lens[4];
@@ -469,7 +461,7 @@ bool redis_list::brpoplpush(const char* src, const char* dst,
 	return conn_->get_string(buf) >= 0 ? true : false;
 }
 
-bool redis_list::lrange(const char* key, size_t start, size_t end,
+bool redis_list::lrange(const char* key, int start, int end,
 	std::vector<string>& result)
 {
 	const char* argv[4];
@@ -481,8 +473,8 @@ bool redis_list::lrange(const char* key, size_t start, size_t end,
 	lens[1] = strlen(key);
 
 	char start_s[LONG_LEN], end_s[LONG_LEN];
-	safe_snprintf(start_s, sizeof(start_s), "%lu", (unsigned long) start);
-	safe_snprintf(end_s, sizeof(end_s), "%lu", (unsigned long) end);
+	safe_snprintf(start_s, sizeof(start_s), "%d", start);
+	safe_snprintf(end_s, sizeof(end_s), "%d", end);
 
 	argv[2] = start_s;
 	lens[2] = strlen(start_s);
@@ -520,7 +512,7 @@ int redis_list::lrem(const char* key, int count, const char* value, size_t len)
 	return conn_->get_number();
 }
 
-bool redis_list::ltrim(const char* key, size_t start, size_t end)
+bool redis_list::ltrim(const char* key, int start, int end)
 {
 	const char* argv[4];
 	size_t lens[4];
@@ -531,8 +523,8 @@ bool redis_list::ltrim(const char* key, size_t start, size_t end)
 	lens[1] = strlen(key);
 
 	char start_s[LONG_LEN], end_s[LONG_LEN];
-	safe_snprintf(start_s, sizeof(start_s), "%lu", (unsigned long) start);
-	safe_snprintf(end_s, sizeof(end_s), "%lu", (unsigned long) end);
+	safe_snprintf(start_s, sizeof(start_s), "%d", start);
+	safe_snprintf(end_s, sizeof(end_s), "%d", end);
 
 	argv[2] = start_s;
 	lens[2] = strlen(start_s);

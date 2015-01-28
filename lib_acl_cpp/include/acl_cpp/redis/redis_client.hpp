@@ -55,7 +55,8 @@ public:
 	int get_strings(std::vector<string>& result);
 	int get_strings(std::vector<string>* result);
 	int get_strings(std::map<string, string>& result);
-	int get_strings(std::vector<string>& names, std::vector<string>& values);
+	int get_strings(std::vector<string>& names,
+		std::vector<string>& values);
 	int get_strings(std::vector<const char*>& names,
 		std::vector<const char*>& values);
 

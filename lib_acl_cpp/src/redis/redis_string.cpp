@@ -184,12 +184,12 @@ bool redis_string::getset(const char* key, size_t key_len,
 
 /////////////////////////////////////////////////////////////////////////////
 
-int redis_string::str_len(const char* key)
+int redis_string::get_strlen(const char* key)
 {
-	return str_len(key, strlen(key));
+	return get_strlen(key, strlen(key));
 }
 
-int redis_string::str_len(const char* key, size_t len)
+int redis_string::get_strlen(const char* key, size_t len)
 {
 	const char* argv[2];
 	size_t lens[2];
@@ -262,12 +262,13 @@ bool redis_string::getrange(const char* key, size_t key_len,
 
 /////////////////////////////////////////////////////////////////////////////
 
-bool redis_string::setbit(const char* key, unsigned offset, int bit)
+bool redis_string::setbit(const char* key, unsigned offset, bool bit)
 {
 	return setbit(key, strlen(key), offset, bit);
 }
 
-bool redis_string::setbit(const char* key, size_t len, unsigned offset, int bit)
+bool redis_string::setbit(const char* key, size_t len,
+	unsigned offset, bool bit)
 {
 	const char* argv[4];
 	size_t lens[4];
