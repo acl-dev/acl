@@ -88,7 +88,7 @@ int redis_set::scard(const char* key)
 	return conn_->get_number();
 }
 
-int redis_set::smembers(const char* key, std::vector<string>& members)
+int redis_set::smembers(const char* key, std::vector<string>* members)
 {
 	const char* argv[2];
 	size_t lens[2];
@@ -131,7 +131,7 @@ int redis_set::smove(const char* src, const char* dst, const char* member,
 	return conn_->get_number();
 }
 
-int redis_set::sdiff(std::vector<string>& members, const char* first_key, ...)
+int redis_set::sdiff(std::vector<string>* members, const char* first_key, ...)
 {
 	std::vector<const char*> keys;
 	keys.push_back(first_key);
@@ -147,20 +147,20 @@ int redis_set::sdiff(std::vector<string>& members, const char* first_key, ...)
 }
 
 int redis_set::sdiff(const std::vector<const char*>& keys,
-	std::vector<string>& members)
+	std::vector<string>* members)
 {
 	conn_->build("SDIFF", NULL, keys);
 	return conn_->get_strings(members);
 }
 
 int redis_set::sdiff(const std::vector<string>& keys,
-	std::vector<string>& members)
+	std::vector<string>* members)
 {
 	conn_->build("SDIFF", NULL, keys);
 	return conn_->get_strings(members);
 }
 
-int redis_set::sinter(std::vector<string>& members, const char* first_key, ...)
+int redis_set::sinter(std::vector<string>* members, const char* first_key, ...)
 {
 	std::vector<const char*> keys;
 	keys.push_back(first_key);
@@ -176,20 +176,20 @@ int redis_set::sinter(std::vector<string>& members, const char* first_key, ...)
 }
 
 int redis_set::sinter(const std::vector<const char*>& keys,
-	std::vector<string>& members)
+	std::vector<string>* members)
 {
 	conn_->build("SINTER", NULL, keys);
 	return conn_->get_strings(members);
 }
 
 int redis_set::sinter(const std::vector<string>& keys,
-	std::vector<string>& members)
+	std::vector<string>* members)
 {
 	conn_->build("SINTER", NULL, keys);
 	return conn_->get_strings(members);
 }
 
-int redis_set::sunion(std::vector<string>& members, const char* first_key, ...)
+int redis_set::sunion(std::vector<string>* members, const char* first_key, ...)
 {
 	std::vector<const char*> keys;
 	keys.push_back(first_key);
@@ -205,14 +205,14 @@ int redis_set::sunion(std::vector<string>& members, const char* first_key, ...)
 }
 
 int redis_set::sunion(const std::vector<const char*>& keys,
-	std::vector<string>& members)
+	std::vector<string>* members)
 {
 	conn_->build("SUNION", NULL, keys);
 	return conn_->get_strings(members);
 }
 
 int redis_set::sunion(const std::vector<string>& keys,
-	std::vector<string>& members)
+	std::vector<string>* members)
 {
 	conn_->build("SUNION", NULL, keys);
 	return conn_->get_strings(members);

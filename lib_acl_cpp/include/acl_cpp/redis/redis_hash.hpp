@@ -41,10 +41,18 @@ public:
 	 * 根据 KEY 值将多个"域-值"对从哈希表中取出
 	 * @param key {const char*} 哈希表 key 值
 	 * @param names 对应 key 的域值对
-	 * @param result {std::vector<string>*} 当该对象指针非空时存储查询结果
-	 * @return {bool} 操作是否成功，如果返回成功，可以通过方法 hmget_result 根据
-	 *  下标值取得对应的值，或直接调用 get_result 方法取得 redis_result，或者在
-	 *  调用方法中传入非空的存储结果对象的地址
+	 * @param result {std::vector<string>*} 当该对象指针非空时存储查询结果；
+	 *  如果该参数为 NULL 时，则可以通过基类 get_
+	 * @return {bool} 操作是否成功，操作成功后可以通过以下任一种方式获得数据：
+	 *  1、基类方法 get_value 获得指定下标的元素数据
+	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *     redis_result::argv_to_string 方法获得元素数据
+	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
+	 *     的方法获得该元素的数据
+	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  5、在调用方法中传入非空的存储结果对象的地址
 	 */
 	bool hmget(const char* key, const std::vector<string>& names,
 		std::vector<string>* result = NULL);
@@ -59,32 +67,6 @@ public:
 		std::vector<string>* result = NULL);
 	bool hmget(const char* key, const char* names[], const size_t lens[],
 		size_t argc, std::vector<string>* result = NULL);
-
-	/**
-	 * 当 hmget 获得 true 时调用本方法来获得对应下标的值，下标顺序与 hmget
-	 * 中的数组的下标顺序相同
-	 * @param i {size_t} 下标（从 0 开始）
-	 * @param len {size_t*} 若该指针非空，则存储所返回结果的长度（仅当该方法
-	 *  返回非空指针时有效）
-	 * @return {const char*} 返回对应下标的值，当返回 NULL 时表示该下标没有值，
-	 *  为了保证使用上的安全性，返回的数据总能保证最后是以 \0 结尾，在计算数据长度
-	 *  时不包含该结尾符
-	 */
-	const char* hmget_value(size_t i, size_t* len = NULL) const;
-
-	/**
-	 * 当查询结果为数组对象时调用本方法获得一个数组元素
-	 * @param i {size_t} 数组对象的下标值
-	 * @return {const redis_result*} 当结果非数组对象或结果为空或出错时该方法
-	 *  返回 NULL
-	 */
-	const redis_result* hmget_child(size_t i) const;
-
-	/**
-	 * 返回查询结果集的个数
-	 * @return {size_t}
-	 */
-	size_t hmget_size() const;
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -155,8 +137,7 @@ public:
 	 * @param first_name {const char*} 第一个域字段名，最后一个字段必须是 NULL
 	 * @return {int} 成功删除的域字段个数，返回 -1 表示出错或该 key 对象非哈希对象
 	 */
-	int hdel(const char* key, const char* first_name, ...)
-		ACL_CPP_PRINTF(3, 4);;
+	int hdel(const char* key, const char* first_name, ...);
 	int hdel(const char* key, const char* names[], size_t argc);
 	int hdel(const char* key, const char* names[],
 		const size_t names_len[], size_t argc);

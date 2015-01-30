@@ -85,18 +85,29 @@ public:
 	/**
 	 * 列出当前的活跃频道：活跃频道指的是那些至少有一个订阅者的频道， 订阅模式的
 	 * 客户端不计算在内
-	 * @param channels {std::vector<string>&} 存放频道结果集
+	 * @param channels {std::vector<string>*} 非空时存放频道结果集
 	 * @param first_pattern {const char*} 作为附加的匹配模式第一个匹配字符串，
 	 *  该指针可以为 NULL，此时获取指所有的活跃频道；对于变参而言最后一个参数需为 NULL
 	 * @return {int} 返回活跃频道数； -1 表示出错
 	 *
+	 *  操作成功后可以通过以下任一方式获得数据
+	 *  1、基类方法 get_value 获得指定下标的元素数据
+	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *     redis_result::argv_to_string 方法获得元素数据
+	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
+	 *     的方法获得该元素的数据
+	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  5、在调用方法中传入非空的存储结果对象的地址
+	 *
 	 */
-	int pubsub_channels(std::vector<string>& channels,
+	int pubsub_channels(std::vector<string>* channels,
 		const char* first_pattern, ...);
 	int pubsub_channels(const std::vector<const char*>& patterns,
-		std::vector<string>& channels);
+		std::vector<string>* channels);
 	int pubsub_channels(const std::vector<string>& patterns,
-		std::vector<string>& channels);
+		std::vector<string>* channels);
 
 	/**
 	 * 返回给定频道的订阅者数量， 订阅模式的客户端不计算在内

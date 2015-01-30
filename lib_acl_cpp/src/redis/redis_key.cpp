@@ -145,7 +145,7 @@ int redis_key::expireat(const char* key, time_t stamp)
 	return conn_->get_number();
 }
 
-int redis_key::keys_pattern(const char* pattern, std::vector<string>& out)
+int redis_key::keys_pattern(const char* pattern, std::vector<string>* out)
 {
 	const char* argv[2];
 	size_t lens[2];

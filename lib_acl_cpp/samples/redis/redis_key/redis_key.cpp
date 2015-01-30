@@ -101,7 +101,7 @@ static void usage(const char* procname)
 		"-n count\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-T rw_timeout[default: 10]\r\n"
-		"-a cmd\r\n",
+		"-a cmd[del|expire|ttl|exists|type|all]\r\n",
 		procname);
 }
 

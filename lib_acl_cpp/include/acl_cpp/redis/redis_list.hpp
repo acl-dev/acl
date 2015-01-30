@@ -151,14 +151,25 @@ public:
 	 * @param key {const char*} 列表对象的 key
 	 * @param start {int} 起始下标值
 	 * @param end {int} 结束下标值
-	 * @param result {std::vector<string>&} 存储列表对象中指定区间的元素集合
+	 * @param result {std::vector<string>*} 非空时存储列表对象中指定区间的元素集合
 	 * @return {bool} 操作是否成功，当返回 false 表示出错或 key 非列表对象
 	 *  举例：
 	 *  1) 当 start = 0, end = 10 时则指定从下标 0 开始至 10 的 11 个元素
 	 *  2) 当 start = -1, end = -2 时则指定从最后一个元素第倒数第二个共 2 个元素 
+	 *
+	 *  操作成功后可以通过以下任一方式获得数据
+	 *  1、基类方法 get_value 获得指定下标的元素数据
+	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *     redis_result::argv_to_string 方法获得元素数据
+	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
+	 *     的方法获得该元素的数据
+	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  5、在调用方法中传入非空的存储结果对象的地址
 	 */
 	bool lrange(const char* key, int start, int end,
-		std::vector<string>& result);
+		std::vector<string>* result);
 
 	/**
 	 * 根据元素值从列表对象中移除指定数量的元素

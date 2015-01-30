@@ -90,21 +90,6 @@ bool redis_hash::hmget(const char* key, const char* names[],
 	return conn_->get_strings(result) >= 0 ? true : false;
 }
 
-const redis_result* redis_hash::hmget_child(size_t i) const
-{
-	return conn_->get_child(i);
-}
-
-const char* redis_hash::hmget_value(size_t i, size_t* len /* = NULL */) const
-{
-	return conn_->get_value(i, len);
-}
-
-size_t redis_hash::hmget_size() const
-{
-	return conn_->get_size();
-}
-
 /////////////////////////////////////////////////////////////////////////////
 
 int redis_hash::hset(const char* key, const char* name, const char* value)

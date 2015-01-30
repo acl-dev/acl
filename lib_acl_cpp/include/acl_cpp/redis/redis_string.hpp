@@ -261,7 +261,16 @@ public:
 	 * @param keys {const std::vector<string>&} 字符串 key 集合
 	 * @param out {std::vector<string>*} 非空时存储字符串值集合数组，对于不存在
 	 *  的 key 也会存储一个空串对象
-	 * @return {bool} 操作是否成功
+	 * @return {bool} 操作是否成功，操作成功后可以通过以下任一种方式获得数据：
+	 *  1、基类方法 get_value 获得指定下标的元素数据
+	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *     redis_result::argv_to_string 方法获得元素数据
+	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
+	 *     的方法获得该元素的数据
+	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  5、在调用方法中传入非空的存储结果对象的地址
 	 */
 	bool mget(const std::vector<string>& keys,
 		std::vector<string>* out = NULL);
@@ -270,36 +279,13 @@ public:
 	bool mget(const std::vector<int>& keys,
 		std::vector<string>* out = NULL);
 
-	bool mget(std::vector<string>* result, const char* first_key, ...)
-		ACL_CPP_PRINTF(3, 4);;
+	bool mget(std::vector<string>* result, const char* first_key, ...);
 	bool mget(const char* keys[], size_t argc,
 		std::vector<string>* out = NULL);
 	bool mget(const int keys[], size_t argc,
 		std::vector<string>* out = NULL);
 	bool mget(const char* keys[], const size_t keys_len[], size_t argc,
 		std::vector<string>* out = NULL);
-
-	/** 
-	 * 在调用 mget 后调用此函数返回结果集数组的个数
-	 * @return {size_t}
-	 */
-	size_t mget_size() const;
-
-	/**
-	 * 返回指定下标位置的字符串数据，当下标越界或数据为空或为空串时返回 NULL
-	 * 可以先调用 mget_size() 获得数组长度
-	 * @param i {size_t} 下标位置
-	 * @param len {size*} 返回的数据非空时存储数据长度
-	 * @return {const char*} 返回的数据地址
-	 */
-	const char* mget_value(size_t i, size_t* len = NULL) const;
-
-	/**
-	 * 返回指定下标位置的结果对象，可以先调用 mget_size() 获得数组长度
-	 * @param i {size_t} 下标位置
-	 * @return {const redis_result*} 如果下标越界或数据错误则返回 NULL
-	 */
-	const redis_result* mget_child(size_t i) const;
 
 	/////////////////////////////////////////////////////////////////////
 

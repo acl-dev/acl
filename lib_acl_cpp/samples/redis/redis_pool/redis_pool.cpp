@@ -165,7 +165,7 @@ static void usage(const char* procname)
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-c max_threads[default: 10]\r\n"
-		"-a cmd\r\n",
+		"-a cmd[expire|ttl|exists|type|del]\r\n",
 		procname);
 }
 

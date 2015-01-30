@@ -20,6 +20,7 @@ public:
 	~redis_client();
 
 	void set_slice_request(bool on);
+	void set_slice_respond(bool on);
 
 	dbuf_pool* get_pool() const
 	{
@@ -128,6 +129,7 @@ protected:
 
 private:
 	bool slice_req_;
+	bool slice_res_;
 	unsigned long long used_;
 	dbuf_pool* pool_;
 	socket_stream conn_;

@@ -80,7 +80,7 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param start {int} 起始下标位置
 	 * @param stop {int} 结束下标位置（结果集同时含该位置）
-	 * @param result {std::vector<string>&} 存储结果集，内部先调用
+	 * @param result {std::vector<string>*} 非空时存储结果集，内部先调用
 	 *  result.clear() 清除其中的元素
 	 * @return {int} 结果集中成员的数量
 	 *  0: 表示结果集为空或 key 不存在
@@ -88,9 +88,20 @@ public:
 	 * >0: 结果集的数量
 	 *  注：对于下标位置，0 表示第一个成员，1 表示第二个成员；-1 表示最后一个成员，
 	 *     -2 表示倒数第二个成员，以此类推
+	 *
+	 *  操作成功后可以通过以下任一方式获得数据
+	 *  1、基类方法 get_value 获得指定下标的元素数据
+	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *     redis_result::argv_to_string 方法获得元素数据
+	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
+	 *     的方法获得该元素的数据
+	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  5、在调用方法中传入非空的存储结果对象的地址
 	 */
 	int zrange(const char* key, int start, int stop,
-		std::vector<string>& result);
+		std::vector<string>* result);
 
 	/**
 	 * 从 key 的有序集中获得指定位置区间的成员名及分值列表，成员按分值递增方式排序
@@ -114,7 +125,7 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param min {double} 最小分值
 	 * @param max {double} 最大分值
-	 * @param out 存储“分值-成员名”对的结果集，内部先调用 out.clear()
+	 * @param out {std::vector<string>*} 非空时存储“成员名”结果集
 	 * @param offset {const int*} 非空时表示结果集的起始下标
 	 * @param count {const int*} 非空时表示截取的结果集中成员个数
 	 * @return {int} 结果集中成员的数量
@@ -122,9 +133,20 @@ public:
 	 * -1: 表示出错或 key 对象非有序集对象
 	 * >0: 结果集的数量
 	 *  注：offset 和 count 必须同时为非空指针时才有效
+	 *
+	 *  操作成功后可以通过以下任一方式获得数据
+	 *  1、基类方法 get_value 获得指定下标的元素数据
+	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *     redis_result::argv_to_string 方法获得元素数据
+	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
+	 *     的方法获得该元素的数据
+	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  5、在调用方法中传入非空的存储结果对象的地址
 	 */
 	int zrangebyscore(const char* key, double min, double max,
-		std::vector<string>& out, const int* offset = NULL,
+		std::vector<string>* out, const int* offset = NULL,
 		const int* count = NULL);
 
 	/**
@@ -133,7 +155,7 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param min {const char*} 以字符串表示最小分值
 	 * @param max {const char*} 以字符串表示最大分值
-	 * @param out 存储“分值-成员名”对的结果集，内部先调用 out.clear()
+	 * @param out {std::vector<string>*} 非空时存储“成员名”结果集
 	 * @param offset {const int*} 非空时表示结果集的起始下标
 	 * @param count {const int*} 非空时表示截取的结果集中成员个数
 	 * @return {int} 结果集中成员的数量
@@ -147,9 +169,20 @@ public:
 	 *   增加 ( 符号来使用可选的开区间 (小于或大于)，如：
 	 * 3.1）"ZRANGEBYSCORE zset (1 5" 返回所有符合条件 1 < score <= 5 的成员
 	 * 3.2）"ZRANGEBYSCORE zset (5 (10" 返回所有符合条件 5 < score < 10 的成员
+	 *
+	 *  操作成功后可以通过以下任一方式获得数据
+	 *  1、基类方法 get_value 获得指定下标的元素数据
+	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *     redis_result::argv_to_string 方法获得元素数据
+	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
+	 *     的方法获得该元素的数据
+	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  5、在调用方法中传入非空的存储结果对象的地址
 	 */
 	int zrangebyscore(const char* key, const char* min, const char* max,
-		std::vector<string>& out, const int* offset = NULL,
+		std::vector<string>* out, const int* offset = NULL,
 		const int* count = NULL);
 
 	/**
@@ -242,13 +275,13 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param start {int} 起始下标位置
 	 * @param stop {int} 结束下标位置（结果集同时含该位置）
-	 * @param result {std::vector<string>&} 存储结果集
+	 * @param result {std::vector<string>*} 非空时存储结果集
 	 *  注：对于下标位置，0 表示第一个成员，1 表示第二个成员；-1 表示最后一个成员，
 	 *     -2 表示倒数第二个成员，以此类推
 	 * @return {int} 结果集数量，-1 表示出错
 	 */
 	int zrevrange(const char* key, int start, int stop,
-		std::vector<string>& result);
+		std::vector<string>* result);
 
 	/**
 	 * 从 key 的有序集中获得指定位置区间的成员名及分值列表，成员按分值递减方式排序
@@ -269,7 +302,7 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param min {const char*} 以字符串表示最小分值
 	 * @param max {const char*} 以字符串表示最大分值
-	 * @param out 存储“分值-成员名”对的结果集，内部先调用 out.clear()
+	 * @param out {std::vector<string>*} 非空时存储“成员名”结果集
 	 * @param offset {const int*} 非空时表示结果集的起始下标
 	 * @param count {const int*} 非空时表示截取的结果集中成员个数
 	 * @return {int} 结果集中成员的数量
@@ -285,7 +318,7 @@ public:
 	 * 3.2）"ZRANGEBYSCORE zset (5 (10" 返回所有符合条件 5 < score < 10 的成员
 	 */
 	int zrevrangebyscore(const char* key, const char* min, const char* max,
-		std::vector<string>& out, const int* offset = NULL,
+		std::vector<string>* out, const int* offset = NULL,
 		const int* count = NULL);
 
 	/**
@@ -382,7 +415,7 @@ public:
 	 * 有序集合键 key 中， 值介于 min 和 max 之间的成员
 	 * @param min {const char*} 区间最小值
 	 * @param max {const char*} 区间最大值
-	 * @param out {std::map<string, double>&} 存储结果集，内部先 out.clear()
+	 * @param out {std::vector<string>*} 非空时存储结果集
 	 * @param offset {const int*} 非空时有效，从结果集中选取的下标起始值
 	 * @param count {const int*} 非空时有效，从结果集中的指定下标位置起选取的数量
 	 * @return {int} 结果集中成员的数量
@@ -397,7 +430,7 @@ public:
 	 *   ZRANGEBYLEX <zset> - + ， 命令将返回有序集合中的所有元素
 	 */
 	int zrangebylex(const char* key, const char* min, const char* max,
-		std::vector<string>& out, const int* offset = NULL,
+		std::vector<string>* out, const int* offset = NULL,
 		const int* count = NULL);
 
 	/**
@@ -416,11 +449,11 @@ public:
 
 private:
 	int zrange_get(const char* cmd, const char* key, int start,
-		int stop, std::vector<string>& result);
+		int stop, std::vector<string>* result);
 	int zrange_get_with_scores(const char* cmd, const char* key, int start,
 		int stop, std::vector<std::pair<string, double> >& out);
 	int zrangebyscore_get(const char* cmd, const char* key,
-		const char* min, const char* max, std::vector<string>& out,
+		const char* min, const char* max, std::vector<string>* out,
 		const int* offset = NULL, const int* count = NULL);
 	int zrangebyscore_get_with_scores(const char* cmd,
 		const char* key, const char* min, const char* max,

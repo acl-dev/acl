@@ -33,7 +33,7 @@ public:
 	 *  -1: 出错
 	 *  >0: 真正删除的 KEY 的个数，该值有可能少于输入的 KEY 的个数
 	 */
-	int del(const char* first_key, ...) ACL_CPP_PRINTF(2, 3);
+	int del(const char* first_key, ...);
 	int del(const std::vector<string>& keys);
 	int del(const std::vector<const char*>& keys);
 	int del(const std::vector<int>& keys);
@@ -80,15 +80,26 @@ public:
 	/**
 	 * 查找所有符合给定模式 pattern 的 key
 	 * @param pattern {const char*} 匹配模式
-	 * @param out {std::vector<string>&} 存储结果集
+	 * @param out {std::vector<string>*} 非 NULL 时用来存储结果集
 	 * @return {int} 结果集的数量，0--为空，<0 -- 表示出错
 	 *  匹配模式举例：
 	 *   KEYS * 匹配数据库中所有 key 。
 	 *   KEYS h?llo 匹配 hello ， hallo 和 hxllo 等。
 	 *   KEYS h*llo 匹配 hllo 和 heeeeello 等。
 	 *   KEYS h[ae]llo 匹配 hello 和 hallo ，但不匹配 hillo 。
+	 *
+	 *  操作成功后可以通过以下任一方式获得数据
+	 *  1、基类方法 get_value 获得指定下标的元素数据
+	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *     redis_result::argv_to_string 方法获得元素数据
+	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
+	 *     的方法获得该元素的数据
+	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  5、在调用方法中传入非空的存储结果对象的地址
 	 */
-	int keys_pattern(const char* pattern, std::vector<string>& out);
+	int keys_pattern(const char* pattern, std::vector<string>* out);
 	
 	/**
 	 * 将数据从一个 redis-server 迁移至另一个 redis-server

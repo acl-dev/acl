@@ -66,14 +66,14 @@ static void test_hmget(acl::redis_hash& option, int n)
 		else if (i >= 10)
 			continue;
 
-		size_t size = option.hmget_size();
+		size_t size = option.get_size();
 		printf("size: %lu, key: %s\r\n", (unsigned long) size,
 			key.c_str());
 
 		size_t j;
 		for (j = 0; j < size; j++)
 		{
-			const char* val = option.hmget_value(j);
+			const char* val = option.get_value(j);
 			printf("hmget ok, %s=%s\r\n",
 				attrs[j], val ? val : "null");
 		}
@@ -336,7 +336,7 @@ static void usage(const char* procname)
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-S [if slice request, default: no]\r\n"
-		"-a cmd\r\n",
+		"-a cmd[hmset|hmget|hset|hsetnx|hget|hgetall|hincrby|hincrybyFloat|hkeys|hexists|hlen|hdel]\r\n",
 		procname);
 }
 

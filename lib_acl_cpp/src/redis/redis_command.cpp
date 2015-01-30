@@ -37,9 +37,24 @@ bool redis_command::eof() const
 	return conn_ == NULL ? false : conn_->eof();
 }
 
+size_t redis_command::get_size() const
+{
+	return conn_ ? conn_->get_size() : 0;
+}
+
 const redis_result* redis_command::get_result() const
 {
 	return conn_ ? conn_->get_result() : NULL;
+}
+
+const redis_result* redis_command::get_child(size_t i) const
+{
+	return conn_ ? conn_->get_child(i) : NULL;
+}
+
+const char* redis_command::get_value(size_t i, size_t* len /* = NULL */) const
+{
+	return conn_ ? conn_->get_value(i, len) : NULL;
 }
 
 const redis_result** redis_command::scan_keys(const char* cmd, const char* key,

@@ -3,7 +3,6 @@
 
 #include "stdafx.h"
 #include <assert.h>
-#include "acl_cpp/stdlib/md5.hpp"
 #include "md5_c.h"
 
 int main()
@@ -21,6 +20,56 @@ int main()
 
 	assert(strcmp(buf1, buf2) == 0);
 
+	/////////////////////////////////////////////////////////////////////
+
+	acl::md5 md5;
+
+	s = "ABCDEFGHIGKLMNOPQRSTUVWXYZ";
+	md5.update(s, strlen(s));
+	md5.finish();
+	acl::safe_snprintf(buf1, sizeof(buf1), "%s", md5.get_string());
+
+	md5.reset();
+
+	char ch;
+	size_t len = strlen(s);
+	for (size_t i = 0; i < len; i++)
+	{
+		ch = s[i];
+		md5.update(&ch, 1);
+	}
+	md5.finish();
+	acl::safe_snprintf(buf2, sizeof(buf2), "%s", md5.get_string());
+
+	if (strcmp(buf1, buf2) == 0)
+		printf("OK: %s\r\n", buf1);
+	else
+		printf("error, buf1: %s, buf2: %s\r\n", buf1, buf2);
+
+	/////////////////////////////////////////////////////////////////////
+
+	md5.reset();
+	len = 1024000;
+	char* buf = (char*) malloc(len);
+
+	for (size_t i = 0; i < len; i++)
+	{
+		ch = i % 255;
+		buf[i] = ch;
+		md5.update(&ch, 1);
+	}
+	md5.finish();
+	acl::safe_snprintf(buf1, sizeof(buf1), "%s", md5.get_string());
+
+	md5.reset();
+	md5.update(buf, len);
+	md5.finish();
+	acl::safe_snprintf(buf2, sizeof(buf2), "%s", md5.get_string());
+
+	if (strcmp(buf1, buf2) == 0)
+		printf("OK2: %s\r\n", buf1);
+	else
+		printf("error, buf1: %s, buf2: %s\r\n", buf1, buf2);
 #ifdef WIN32
 	getchar();
 #endif

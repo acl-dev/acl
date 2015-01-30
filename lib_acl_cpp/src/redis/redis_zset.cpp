@@ -258,13 +258,14 @@ int redis_zset::zadd(const char* key, const char* members[],
 
 	size_t j = 2;
 	char* buf;
+	int len;
 
 	for (size_t i = 0; i < size; i++)
 	{
 		buf = (char*) pool->dbuf_alloc(BUFLEN);
-		safe_snprintf(buf, BUFLEN, "%.8f", scores[i]);
+		len = safe_snprintf(buf, BUFLEN, "%.8f", scores[i]);
 		argv[j] = buf;
-		lens[j] = strlen(buf);
+		lens[j] = len;
 		j++;
 
 		argv[j] = members[i];
@@ -352,7 +353,7 @@ bool redis_zset::zincrby(const char* key, double inc,
 }
 
 int redis_zset::zrange_get(const char* cmd, const char* key, int start,
-	int stop, std::vector<string>& result)
+	int stop, std::vector<string>* result)
 {
 	const char* argv[4];
 	size_t lens[4];
@@ -378,7 +379,7 @@ int redis_zset::zrange_get(const char* cmd, const char* key, int start,
 }
 
 int redis_zset::zrange(const char* key, int start,
-	int stop, std::vector<string>& result)
+	int stop, std::vector<string>* result)
 {
 	return zrange_get("ZRANGE", key, start, stop, result);
 }
@@ -457,7 +458,7 @@ int redis_zset::zrange_with_scores(const char* key, int start, int stop,
 }
 
 int redis_zset::zrangebyscore_get(const char* cmd, const char* key,
-	const char* min, const char* max, std::vector<string>& out,
+	const char* min, const char* max, std::vector<string>* out,
 	const int* offset /* = NULL */, const int* count /* = NULL */)
 {
 	const char* argv[8];
@@ -499,7 +500,7 @@ int redis_zset::zrangebyscore_get(const char* cmd, const char* key,
 }
 
 int redis_zset::zrangebyscore(const char* key, const char* min,
-	const char* max, std::vector<string>& out,
+	const char* max, std::vector<string>* out,
 	const int* offset /* = NULL */, const int* count /* = NULL */)
 {
 	return zrangebyscore_get("ZRANGEBYSCORE", key, min, max,
@@ -507,7 +508,7 @@ int redis_zset::zrangebyscore(const char* key, const char* min,
 }
 
 int redis_zset::zrangebyscore(const char* key, double min,
-	double max, std::vector<string>& out,
+	double max, std::vector<string>* out,
 	const int* offset /* = NULL */, const int* count /* = NULL */)
 {
 	char min_s[BUFLEN], max_s[BUFLEN];
@@ -731,7 +732,7 @@ int redis_zset::zremrangebyscore(const char* key, const char* min,
 }
 
 int redis_zset::zrevrange(const char* key, int start, int stop,
-	std::vector<string>& result)
+	std::vector<string>* result)
 {
 	return zrange_get("ZREVRANGE", key, start, stop, result);
 }
@@ -981,7 +982,7 @@ int redis_zset::zinterstore(const char* dst, const std::vector<string>& keys,
 }
 
 int redis_zset::zrangebylex(const char* key, const char* min, const char* max,
-	std::vector<string>& out, const int* offset /* = NULL */,
+	std::vector<string>* out, const int* offset /* = NULL */,
 	const int* count /* = NULL */)
 {
 	const char* argv[7];

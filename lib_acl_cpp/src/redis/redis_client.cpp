@@ -16,6 +16,7 @@ namespace acl
 redis_client::redis_client(const char* addr, int conn_timeout /* = 60 */,
 	int rw_timeout /* = 30 */, bool retry /* = true */)
 : slice_req_(false)
+, slice_res_(false)
 , used_(0)
 , conn_timeout_(conn_timeout)
 , rw_timeout_(rw_timeout)
@@ -49,6 +50,11 @@ redis_client::~redis_client()
 void redis_client::set_slice_request(bool on)
 {
 	slice_req_ = on;
+}
+
+void redis_client::set_slice_respond(bool on)
+{
+	slice_res_ = on;
 }
 
 void redis_client::reset()
@@ -179,6 +185,24 @@ redis_result* redis_client::get_redis_string()
 	if (len < 0)
 		return rr;
 
+	char*  buf;
+
+	if (!slice_res_)
+	{
+		rr->set_size(1);
+		buf = (char*) pool_->dbuf_alloc(len + 1);
+		if (conn_.read(buf, (size_t) len) == -1)
+			return NULL;
+		buf[len] = 0;
+		rr->put(buf, (size_t) len);
+
+		// 读 \r\n
+		buf_.clear();
+		if (conn_.gets(buf_) == false)
+			return NULL;
+		return rr;
+	}
+
 	// 将可能返回的大内存分成不连接的内存链存储
 
 #define CHUNK_LENGTH	8192
@@ -187,7 +211,6 @@ redis_result* redis_client::get_redis_string()
 	if ((size_t) len % CHUNK_LENGTH != 0)
 		size++;
 	rr->set_size(size);
-	char*  buf;
 	int    n;
 
 	while (len > 0)
@@ -327,6 +350,8 @@ const redis_result* redis_client::run1(size_t nchildren /* = 0 */)
 
 		if (!retry_ || retried)
 			break;
+
+		retried = true;
 	}
 
 	return NULL;
@@ -375,6 +400,8 @@ const redis_result* redis_client::run2(size_t nchildren /* = 0 */)
 
 		if (!retry_ || retried)
 			break;
+
+		retried = true;
 	}
 
 	return NULL;

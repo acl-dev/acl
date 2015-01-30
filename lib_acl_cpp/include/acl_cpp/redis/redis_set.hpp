@@ -54,10 +54,20 @@ public:
 	/**
 	 * 返回集合 key 中的所有成员
 	 * @param key {const char*} 集合对象的键值
-	 * @param members {std::vector<string>&} 存储结果集
+	 * @param members {std::vector<string>*} 非空时存储结果集
 	 * @return {int} 结果集数量，返回 -1 表示出错或有一个 key 非集合对象
+	 *  操作成功后可以通过以下任一方式获得数据
+	 *  1、基类方法 get_value 获得指定下标的元素数据
+	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *     redis_result::argv_to_string 方法获得元素数据
+	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
+	 *     的方法获得该元素的数据
+	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  5、在调用方法中传入非空的存储结果对象的地址
 	 */
-	int smembers(const char* key, std::vector<string>& members);
+	int smembers(const char* key, std::vector<string>* members);
 
 	/**
 	 * 将 member 元素从 src 集合移动到 dst 集合
@@ -76,39 +86,49 @@ public:
 
 	/**
 	 * 返回一个集合的全部成员，该集合是所有给定集合之间的差集
-	 * @param members {std::vector<string>&} 存储结果集
+	 * @param members {std::vector<string>*} 非空时存储结果集
 	 * @param first_key {const char*} 第一个非空的集合对象 key
 	 * @return {int} 结果集数量，返回 -1 表示出错或有一个 key 非集合对象
+	 *  操作成功后可以通过以下任一方式获得数据
+	 *  1、基类方法 get_value 获得指定下标的元素数据
+	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *     redis_result::argv_to_string 方法获得元素数据
+	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
+	 *     的方法获得该元素的数据
+	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  5、在调用方法中传入非空的存储结果对象的地址
 	 */
-	int sdiff(std::vector<string>& members, const char* first_key, ...);
+	int sdiff(std::vector<string>* members, const char* first_key, ...);
 	int sdiff(const std::vector<const char*>& keys,
-		std::vector<string>& members);
+		std::vector<string>* members);
 	int sdiff(const std::vector<string>& keys,
-		std::vector<string>& members);
+		std::vector<string>* members);
 
 	/**
 	 * 返回一个集合的全部成员，该集合是所有给定集合的交集
-	 * @param members {std::vector<string>&} 存储结果集
+	 * @param members {std::vector<string>*} 非空时存储结果集
 	 * @param first_key {const char*} 第一个集合对象 key（非NULL）
 	 * @return {int} 结果集数量，返回 -1 表示出错或有一个 key 非集合对象
 	 */
-	int sinter(std::vector<string>& members, const char* first_key, ...);
+	int sinter(std::vector<string>* members, const char* first_key, ...);
 	int sinter(const std::vector<const char*>& keys,
-		std::vector<string>& members);
+		std::vector<string>* members);
 	int sinter(const std::vector<string>& keys,
-		std::vector<string>& members);
+		std::vector<string>* members);
 
 	/**
 	 * 返回一个集合的全部成员，该集合是所有给定集合的并集
-	 * @param members {std::vector<string>&} 存储结果集
+	 * @param members {std::vector<string>*} 非空时存储结果集
 	 * @param first_key {const char*} 第一个集合对象 key（非NULL）
 	 * @return {int} 结果集数量，返回 -1 表示出错或有一个 key 非集合对象
 	 */
-	int sunion(std::vector<string>& members, const char* first_key, ...);
+	int sunion(std::vector<string>* members, const char* first_key, ...);
 	int sunion(const std::vector<const char*>& keys,
-		std::vector<string>& members);
+		std::vector<string>* members);
 	int sunion(const std::vector<string>& keys,
-		std::vector<string>& members);
+		std::vector<string>* members);
 
 	/**
 	 * 这个命令的作用和 SDIFF 类似，但它将结果保存到 dst 集合，而不是简单地返回结果集

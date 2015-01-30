@@ -666,21 +666,6 @@ bool redis_string::mget(const char* keys[], const size_t keys_len[],
 	return conn_->get_strings(out) >= 0 ? true : false;
 }
 
-const char* redis_string::mget_value(size_t i, size_t* len /* = NULL */) const
-{
-	return conn_->get_value(i, len);
-}
-
-const redis_result* redis_string::mget_child(size_t i) const
-{
-	return conn_->get_child(i);
-}
-
-size_t redis_string::mget_size() const
-{
-	return conn_->get_size();
-}
-
 /////////////////////////////////////////////////////////////////////////////
 
 bool redis_string::incr(const char* key, long long int* result /* = NULL */)

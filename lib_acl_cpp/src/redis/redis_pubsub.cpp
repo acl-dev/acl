@@ -273,7 +273,7 @@ bool redis_pubsub::get_message(string& channel, string& msg)
 	return true;
 }
 
-int redis_pubsub::pubsub_channels(std::vector<string>& channels,
+int redis_pubsub::pubsub_channels(std::vector<string>* channels,
 	const char* first_pattern, ...)
 {
 	std::vector<const char*> patterns;
@@ -292,14 +292,14 @@ int redis_pubsub::pubsub_channels(std::vector<string>& channels,
 }
 
 int redis_pubsub::pubsub_channels(const std::vector<const char*>& patterns,
-	std::vector<string>& channels)
+	std::vector<string>* channels)
 {
 	conn_->build("PUBSUB", "CHANNELS", patterns);
 	return conn_->get_strings(channels);
 }
 
 int redis_pubsub::pubsub_channels(const std::vector<string>& patterns,
-	std::vector<string>& channels)
+	std::vector<string>* channels)
 {
 	conn_->build("PUBSUB", "CHANNELS", patterns);
 	return conn_->get_strings(channels);

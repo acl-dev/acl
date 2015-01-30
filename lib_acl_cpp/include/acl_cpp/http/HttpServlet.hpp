@@ -120,6 +120,33 @@ public:
 	}
 
 	/**
+	 * 当 HTTP 请求为 DELETE 方式时的虚函数
+	 */
+	virtual bool doDelete(HttpServletRequest&, HttpServletResponse&)
+	{
+		logger_error("child not implement doPurge yet!");
+		return false;
+	}
+
+	/**
+	 * 当 HTTP 请求为 HEAD 方式时的虚函数
+	 */
+	virtual bool doHead(HttpServletRequest&, HttpServletResponse&)
+	{
+		logger_error("child not implement doPurge yet!");
+		return false;
+	}
+
+	/**
+	 * 当 HTTP 请求为 OPTION 方式时的虚函数
+	 */
+	virtual bool doOption(HttpServletRequest&, HttpServletResponse&)
+	{
+		logger_error("child not implement doPurge yet!");
+		return false;
+	}
+
+	/**
 	 * 当 HTTP 请求方法未知时的虚函数
 	 */
 	virtual bool doUnknown(HttpServletRequest&, HttpServletResponse&)

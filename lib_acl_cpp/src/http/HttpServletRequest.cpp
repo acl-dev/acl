@@ -503,16 +503,22 @@ bool HttpServletRequest::readHeader(void)
 		logger_error("method null");
 		return false;
 	}
-	if (strcmp(method, "GET") == 0)
+	if (strcasecmp(method, "GET") == 0)
 		method_ = HTTP_METHOD_GET;
-	else if (strcmp(method, "POST") == 0)
+	else if (strcasecmp(method, "POST") == 0)
 		method_ = HTTP_METHOD_POST;
-	else if (strcmp(method, "PUT") == 0)
+	else if (strcasecmp(method, "PUT") == 0)
 		method_ = HTTP_METHOD_PUT;
-	else if (strcmp(method, "CONNECT") == 0)
+	else if (strcasecmp(method, "CONNECT") == 0)
 		method_ = HTTP_METHOD_CONNECT;
-	else if (strcmp(method, "PURGE") == 0)
+	else if (strcasecmp(method, "PURGE") == 0)
 		method_ = HTTP_METHOD_PURGE;
+	else if (strcasecmp(method, "DELETE") == 0)
+		method_ = HTTP_METHOD_DELETE;
+	else if (strcasecmp(method, "HEAD") == 0)
+		method_ = HTTP_METHOD_HEAD;
+	else if (strcasecmp(method, "OPTION") == 0)
+		method_ = HTTP_METHOD_OPTION;
 	else
 	{
 		logger_error("unkown method: %s", method);

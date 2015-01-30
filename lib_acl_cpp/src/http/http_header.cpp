@@ -326,6 +326,15 @@ http_header& http_header::set_method(http_method_t method)
 	case HTTP_METHOD_PURGE:
 		CP(method_s_, "PURGE");
 		break;
+	case  HTTP_METHOD_DELETE:
+		CP(method_s_, "DELETE");
+		break;
+	case  HTTP_METHOD_HEAD:
+		CP(method_s_, "HEAD");
+		break;
+	case  HTTP_METHOD_OPTION:
+		CP(method_s_, "OPTION");
+		break;
 	default:
 		CP(method_s_, "UNKNOWN");
 		break;
@@ -345,6 +354,12 @@ http_header& http_header::set_method(const char* method)
 		method_ = HTTP_METHOD_CONNECT;
 	else if (strcasecmp(method, "PURGE") == 0)
 		method_ = HTTP_METHOD_PURGE;
+	else if (strcasecmp(method, "DELETE") == 0)
+		method_ = HTTP_METHOD_DELETE;
+	else if (strcasecmp(method, "HEAD") == 0)
+		method_ = HTTP_METHOD_HEAD;
+	else if (strcasecmp(method, "OPTION") == 0)
+		method_ = HTTP_METHOD_OPTION;
 	else
 		method_ = HTTP_METHOD_UNKNOWN;
 	return *this;

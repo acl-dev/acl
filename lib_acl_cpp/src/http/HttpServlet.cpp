@@ -91,24 +91,40 @@ bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */)
 	bool  ret;
 
 	http_method_t method = req.getMethod();
-	if (method == HTTP_METHOD_GET)
-		ret = doGet(req, res);
-	else if (method == HTTP_METHOD_POST)
-		ret = doPost(req, res);
-	else if (method == HTTP_METHOD_PUT)
-		ret = doPut(req, res);
-	else if (method == HTTP_METHOD_CONNECT)
-		ret = doConnect(req, res);
-	else if (method == HTTP_METHOD_PURGE)
-		ret = doPurge(req, res);
-	else
+
+	switch (method)
 	{
+	case HTTP_METHOD_GET:
+		ret = doGet(req, res);
+		break;
+	case HTTP_METHOD_POST:
+		ret = doPost(req, res);
+		break;
+	case HTTP_METHOD_PUT:
+		ret = doPut(req, res);
+		break;
+	case HTTP_METHOD_CONNECT:
+		ret = doConnect(req, res);
+		break;
+	case HTTP_METHOD_PURGE:
+		ret = doPurge(req, res);
+		break;
+	case HTTP_METHOD_DELETE:
+		ret = doDelete(req, res);
+		break;
+	case  HTTP_METHOD_HEAD:
+		ret = doHead(req, res);
+		break;
+	case HTTP_METHOD_OPTION:
+		ret = doOption(req, res);
+		break;
+	default:
 		ret = false; // 有可能是IO失败或未知方法
-		http_request_error_t n = req.getLastError();
-		if (n == HTTP_REQ_ERR_METHOD)
+		if (req.getLastError() == HTTP_REQ_ERR_METHOD)
 			doUnknown(req, res);
 		else
 			doError(req, res);
+		break;
 	}
 
 	if (in != out)

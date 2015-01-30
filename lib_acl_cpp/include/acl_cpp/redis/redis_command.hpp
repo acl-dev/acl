@@ -50,6 +50,34 @@ public:
 	 */
 	const redis_result* get_result() const;
 
+	/**
+	 * 当查询结果为数组对象时调用本方法获得查询结果集的个数；该方法可以获得结果为下面
+	 * 两个方法 (get_child/get_value) 所需要的数组元素的个数
+	 * @return {size_t}
+	 */
+	size_t get_size() const;
+
+	/**
+	 * 当查询结果为数组对象时调用本方法获得一个数组元素对象
+	 * @param i {size_t} 数组对象的下标值
+	 * @return {const redis_result*} 当结果非数组对象或结果为空或出错时该方法
+	 *  返回 NULL
+	 */
+	const redis_result* get_child(size_t i) const;
+
+	/**
+	 * 当从 redis-server 获得的数据是一组字符串类型的结果集时，可以调用本函数获得
+	 * 某个指定下标位置的数据
+	 * @param i {size_t} 下标（从 0 开始）
+	 * @param len {size_t*} 若该指针非空，则存储所返回结果的长度（仅当该方法
+	 *  返回非空指针时有效）
+	 * @return {const char*} 返回对应下标的值，当返回 NULL 时表示该下标没有值，
+	 *  为了保证使用上的安全性，返回的数据总能保证最后是以 \0 结尾，在计算数据长度
+	 *  时不包含该结尾符，但为了兼容二进制情形，调用者还是应该通过返回的 len 存放
+	 *  的长度值来获得数据的真实长度
+	 */
+	const char* get_value(size_t i, size_t* len = NULL) const;
+
 protected:
 	redis_client* conn_;
 

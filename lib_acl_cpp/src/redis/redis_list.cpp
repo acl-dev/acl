@@ -462,7 +462,7 @@ bool redis_list::brpoplpush(const char* src, const char* dst,
 }
 
 bool redis_list::lrange(const char* key, int start, int end,
-	std::vector<string>& result)
+	std::vector<string>* result)
 {
 	const char* argv[4];
 	size_t lens[4];

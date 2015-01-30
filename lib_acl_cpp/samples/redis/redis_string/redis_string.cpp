@@ -215,13 +215,13 @@ static void test_mget(acl::redis_string& option, int n)
 		else if (i >= 10)
 			continue;
 
-		size_t size = option.mget_size();
+		size_t size = option.get_size();
 		printf("size: %lu\r\n", (unsigned long) size);
 
 		size_t j;
 		for (j = 0; j < size; j++)
 		{
-			const char* val = option.mget_value(j);
+			const char* val = option.get_value(j);
 			printf("mget ok, %s=%s\r\n",
 				keys[j], val ? val : "null");
 		}
@@ -591,7 +591,7 @@ static void usage(const char* procname)
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-t object timeout[default: 10]\r\n"
-		"-a cmd\r\n",
+		"-a cmd[set|setex|setnx|append|get|getset|strlen|mset|mget|msetnx|setrange|getrange|setbit|getbit|bitcount|bitop_and|bitop_or|bitop_xor|incr|incrby|incrybfloat|decr|decrby]\r\n",
 		procname);
 }
 
