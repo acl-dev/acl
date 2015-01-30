@@ -714,6 +714,8 @@ int http_hdr_req_line_parse(HTTP_HDR_REQ *hh)
 		return -1;
 	}
 
+#if 0
+	/* 去掉该判断，以允许上层应用可以扩展 HTTP 请求方法 */
 	if (strcasecmp(entry->name, "POST") != 0
 	    && strcasecmp(entry->name, "GET") != 0
 	    && strcasecmp(entry->name, "CONNECT") != 0
@@ -725,6 +727,7 @@ int http_hdr_req_line_parse(HTTP_HDR_REQ *hh)
 		return -1;
 
 	}
+#endif
 
 	ACL_SAFE_STRNCPY(hh->method, entry->name, sizeof(hh->method));
 
