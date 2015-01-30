@@ -114,7 +114,7 @@ static void test_zrange(acl::redis_zset& option, int n)
 		option.reset();
 		result.clear();
 
-		int ret = option.zrange(key.c_str(), start, stop, result);
+		int ret = option.zrange(key.c_str(), start, stop, &result);
 		if (ret < 0)
 		{
 			printf("zrange error, key: %s\r\n", key.c_str());
@@ -188,7 +188,7 @@ static void test_zrangebyscore(acl::redis_zset& option, int n)
 		option.reset();
 		result.clear();
 
-		int ret = option.zrangebyscore(key.c_str(), min, max, result);
+		int ret = option.zrangebyscore(key.c_str(), min, max, &result);
 		if (ret < 0)
 		{
 			printf("zrangebyscore error, key: %s\r\n", key.c_str());
@@ -435,7 +435,7 @@ static void test_zrangebylex(acl::redis_zset& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		int ret = option.zrangebylex(key.c_str(), min, max, result);
+		int ret = option.zrangebylex(key.c_str(), min, max, &result);
 		if (ret < 0)
 		{
 			printf("zrangebylex error, key: %s\r\n", key.c_str());
