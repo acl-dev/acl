@@ -778,11 +778,23 @@
 				Name="redis"
 				>
 				<File
+					RelativePath=".\src\redis\redic_connection.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_client.cpp"
 					>
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_command.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_hash.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_hyperloglog.cpp"
 					>
 				</File>
 				<File
@@ -802,11 +814,43 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_pubsub.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_request.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_request.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_result.cpp"
 					>
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_script.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_server.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_set.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_string.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_transaction.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_zset.cpp"
 					>
 				</File>
 			</Filter>
@@ -1360,7 +1404,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\redis\redis_command.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_connection.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\redis\redis_hash.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_hyperloglog.hpp"
 					>
 				</File>
 				<File
@@ -1380,11 +1436,35 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\redis\redis_pubsub.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\redis\redis_result.hpp"
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\redis\redis_script.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_server.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_set.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\redis\redis_string.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_transaction.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_zset.hpp"
 					>
 				</File>
 			</Filter>

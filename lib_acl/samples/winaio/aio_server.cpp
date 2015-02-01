@@ -151,6 +151,8 @@ void aiho_server_start(ACL_AIO *aio, const char *addr, int accept_auto, int echo
 
 	memset(__data, 'X', sizeof(__data));
 	__data[sizeof(__data) - 1] = 0;
+	__data[sizeof(__data) - 2] = '\n';
+	__data[sizeof(__data) - 3] = '\r';
 	__dlen = (int) strlen(__data);
 	__echo_src = echo_src;
 	sstream = acl_vstream_listen(addr, 128);

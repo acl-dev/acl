@@ -327,7 +327,7 @@ int redis_set::srandmember(const char* key, string& out)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	conn_->build_request(3, argv, lens);
+	conn_->build_request(2, argv, lens);
 	return conn_->get_string(out);
 }
 

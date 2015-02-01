@@ -78,10 +78,20 @@ bool redis_transaction::discard()
 	return conn_->get_status();
 }
 
-bool redis_transaction::queue_cmd(const char* cmd, const char* argv[],
+bool redis_transaction::run_cmd(const char* cmd, const char* argv[],
 	const size_t lens[], size_t argc)
 {
 	conn_->build(cmd, NULL, argv, lens, argc);
+	if (conn_->get_status("QUEUED") == false)
+		return false;
+	cmds_.push_back(cmd);
+	return true;
+}
+
+bool redis_transaction::run_cmd(const char* cmd,
+	const std::vector<string>& args)
+{
+	conn_->build(cmd, NULL, args);
 	if (conn_->get_status("QUEUED") == false)
 		return false;
 	cmds_.push_back(cmd);

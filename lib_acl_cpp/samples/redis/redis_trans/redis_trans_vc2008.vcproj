@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="redis_list"
-	ProjectGUID="{846A8FEB-F011-4C88-A7EA-D60309E99EA7}"
+	Name="redis_trans"
+	ProjectGUID="{950A5755-029A-44B5-B0D8-910A12D0080C}"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -63,11 +63,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/redis_list.exe"
+				OutputFile="$(OutDir)/redis_trans.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/redis_list.pdb"
+				ProgramDatabaseFile="$(OutDir)/redis_trans.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -140,7 +140,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib wsock32.lib"
-				OutputFile="$(OutDir)/redis_list.exe"
+				OutputFile="$(OutDir)/redis_trans.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32"
 				GenerateDebugInformation="true"
@@ -221,11 +221,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/redis_list.exe"
+				OutputFile="$(OutDir)/redis_trans.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/redis_list.pdb"
+				ProgramDatabaseFile="$(OutDir)/redis_trans.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -301,11 +301,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/redis_list.exe"
+				OutputFile="$(OutDir)/redis_trans.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/redis_list.pdb"
+				ProgramDatabaseFile="$(OutDir)/redis_trans.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -343,7 +343,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\redis_list.cpp"
+				RelativePath=".\redis_trans.cpp"
 				>
 			</File>
 			<File

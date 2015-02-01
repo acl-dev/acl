@@ -1,6 +1,10 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+280) 2015.2.1
+280.1) samples: redis_connection, redis_hyperloglog, redis_transaction 三个
+redis 客户端命令的测试例子测试通过
+
 279) 2015.1.30
 279.1) feature: http_header.cpp 中的 set_method 增加了 HEAD/OPTION 请求方法
 279.2) samples: redis_zset_pool 例子可以通过 redis 有序集存储大块数据，方式

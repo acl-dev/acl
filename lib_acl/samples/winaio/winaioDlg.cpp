@@ -196,7 +196,7 @@ void CwinaioDlg::OnBnClickedListen()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	const char *addr = "127.0.0.1:30082";
-	aiho_server_start(__aio, addr,  1, 1);
+	aiho_server_start(__aio, addr,  1, 0);
 }
 
 typedef struct
@@ -205,7 +205,7 @@ typedef struct
 	ACL_AIO *aio;
 } CTX;
 
-static void OnTimerCallback(int event_type, void *context)
+static void OnTimerCallback(int event_type, ACL_EVENT *event, void *context)
 {
 	CTX *ctx = (CTX*) context;
 

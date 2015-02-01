@@ -1,12 +1,119 @@
 #include "stdafx.h"
 
-static acl::string __keypre("zset_key");
+static acl::string __keypre("set_key");
 
-static void test_zadd(acl::redis_zset& option, int n)
+static void test_sadd(acl::redis_set& option, int n)
 {
 	acl::string key;
-	std::map<acl::string, double> members;
+	std::vector<acl::string> members;
 	acl::string member;
+
+	members.reserve(1000);
+
+	for (int j = 0; j < 1000; j++)
+	{
+		member.format("member_%d", j);
+		members.push_back(member);
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+
+		option.reset();
+		int ret = option.sadd(key, members);
+		if (ret < 0)
+		{
+			printf("sadd key: %s error\r\n", key.c_str());
+			break;
+		}
+		else if (i >= 10)
+			continue;
+
+		printf("sadd ok, key: %s, ret: %d\r\n", key.c_str(), ret);
+	}
+}
+
+static void test_scard(acl::redis_set& option, int n)
+{
+	acl::string key;
+
+	for (int i = 0; i < n; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+		option.reset();
+		int ret = option.scard(key.c_str());
+		if (ret < 0)
+		{
+			printf("scard key: %s error\r\n", key.c_str());
+			break;
+		}
+		else if (i >= 10)
+			continue;
+
+		printf("scard ok, key: %s, count: %d\r\n", key.c_str(), ret);
+	}
+}
+
+static void test_sdiff(acl::redis_set& option, int n)
+{
+	acl::string key;
+	std::vector<acl::string> keys;
+	std::vector<acl::string> result;
+
+	for (int i = 0; i < 10; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+		keys.push_back(key);
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		option.reset();
+		int ret = option.sdiff(keys, &result);
+		if (ret < 0)
+		{
+			printf("sdiff error\r\n");
+			break;
+		}
+		else if (i < 10)
+			printf("sdiff ok, count: %d\r\n", ret);
+	}
+}
+
+static void test_sdiffstore(acl::redis_set& option, int n)
+{
+	acl::string key, dest_key("set_dest_key");
+	std::vector<acl::string> keys;
+
+	for (int i = 0; i < 10; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+		keys.push_back(key);
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		option.reset();
+		int ret = option.sdiffstore(dest_key.c_str(), keys);
+		if (ret < 0)
+		{
+			printf("sdiffstore error, dest: %s\r\n",
+				dest_key.c_str());
+			break;
+		}
+		else if (i >= 10)
+			continue;
+
+		printf("sdiffstore ok, dest: %s, count: %d\r\n",
+			dest_key.c_str(), ret);
+	}
+}
+
+static void test_sismember(acl::redis_set& option, int n)
+{
+	bool ret;
+	acl::string key, member;
 
 	for (int i = 0; i < n; i++)
 	{
@@ -15,487 +122,246 @@ static void test_zadd(acl::redis_zset& option, int n)
 		for (int j = 0; j < 1000; j++)
 		{
 			member.format("member_%d", j);
-			members[member] = j;
-		}
-
-		option.reset();
-		int ret = option.zadd(key, members);
-		if (ret < 0)
-		{
-			printf("add key: %s error\r\n", key.c_str());
-			break;
-		}
-		else if (i < 10)
-			printf("add ok, key: %s, ret: %d\r\n",
-				key.c_str(), ret);
-		members.clear();
-	}
-}
-
-static void test_zcard(acl::redis_zset& option, int n)
-{
-	acl::string key;
-
-	for (int i = 0; i < n; i++)
-	{
-		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		int ret = option.zcard(key.c_str());
-		if (ret < 0)
-		{
-			printf("zcard key: %s error\r\n", key.c_str());
-			break;
-		}
-		else if (i < 10)
-			printf("zcard ok, key: %s, count: %d\r\n",
-				key.c_str(), ret);
-	}
-}
-
-static void test_zcount(acl::redis_zset& option, int n)
-{
-	acl::string key;
-	double min = 2, max = 100;
-
-	for (int i = 0; i < n; i++)
-	{
-		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		int ret = option.zcount(key.c_str(), min, max);
-		if (ret < 0)
-		{
-			printf("zcount key: %s error\r\n", key.c_str());
-			break;
-		}
-		else if (i < 10)
-			printf("zcount ok, key: %s, count: %d\r\n",
-				key.c_str(), ret);
-	}
-}
-
-static void test_zincrby(acl::redis_zset& option, int n)
-{
-	acl::string key;
-	double inc = 2.5, result;
-	acl::string member;
-
-	for (int i = 0; i < n; i++)
-	{
-		key.format("%s_%d", __keypre.c_str(), i);
-
-		for (int j = 0; j < 1000; j++)
-		{
-			member.format("member_%d", j);
-
 			option.reset();
-			if (option.zincrby(key.c_str(), inc, member.c_str(),
-				&result) == false)
+			ret = option.sismember(key.c_str(), member.c_str());
+			if (option.eof())
 			{
-				printf("zincrby error, key: %s\r\n", key.c_str());
-				break;
+				printf("sismmeber eof, key: %s, member: %s\r\n",
+					key.c_str(), member.c_str());
+				return;
 			}
-			else if (j < 10 && i * j < 100)
-				printf("zincrby ok key: %s, result: %.2f\r\n",
-					key.c_str(), result);
+			if (i >= 10)
+				continue;
+
+			printf("sismember: %s, key: %s, member: %s\r\n",
+				ret ? "true" : "false", key.c_str(),
+				member.c_str());
 		}
 	}
 }
 
-static void test_zrange(acl::redis_zset& option, int n)
+static void test_smembers(acl::redis_set& option, int n)
 {
 	acl::string key;
-	std::vector<acl::string> result;
-	int start = 0, stop = 10;
-
-	printf("===============test zrange=============================\r\n");
-	for (int i = 0; i < n; i++)
-	{
-		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		result.clear();
-
-		int ret = option.zrange(key.c_str(), start, stop, &result);
-		if (ret < 0)
-		{
-			printf("zrange error, key: %s\r\n", key.c_str());
-			break;
-		}
-		else if (i >= 10)
-		{
-			result.clear();
-			continue;
-		}
-
-		printf("zrange ok, key: %s, ret: %d\r\n", key.c_str(), ret);
-		std::vector<acl::string>::const_iterator cit;
-		for (cit = result.begin(); cit != result.end(); ++cit)
-		{
-			if (cit != result.begin())
-				printf(", ");
-			printf("%s", (*cit).c_str());
-		}
-		printf("\r\n");
-		result.clear();
-	}
-
-	printf("===============test zrange_with_scores=================\r\n");
-	std::vector<std::pair<acl::string, double> > result2;
-
-	for (int i = 0; i < n; i++)
-	{
-		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		result.clear();
-
-		int ret = option.zrange_with_scores(key.c_str(), start, stop,
-				result2);
-		if (ret < 0)
-		{
-			printf("zrange error, key: %s\r\n", key.c_str());
-			break;
-		}
-		else if (i >= 10)
-		{
-			result2.clear();
-			continue;
-		}
-
-		printf("zrange ok, key: %s, ret: %d\r\n", key.c_str(), ret);
-
-		std::vector<std::pair<acl::string, double> >::const_iterator cit;
-		for (cit = result2.begin(); cit != result2.end(); ++cit)
-		{
-			if (cit != result2.begin())
-				printf(", ");
-			printf("%s: %.2f", cit->first.c_str(), cit->second);
-		}
-		printf("\r\n");
-		result2.clear();
-	}
-}
-
-static void test_zrangebyscore(acl::redis_zset& option, int n)
-{
-	acl::string key;
-	double min = 2, max = 10;
-
-	printf("================test zrangebyscore=====================\r\n");
-	std::vector<acl::string> result;
-
-	for (int i = 0; i < n; i++)
-	{
-		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		result.clear();
-
-		int ret = option.zrangebyscore(key.c_str(), min, max, &result);
-		if (ret < 0)
-		{
-			printf("zrangebyscore error, key: %s\r\n", key.c_str());
-			break;
-		}
-		else if (i >= 10)
-		{
-			result.clear();
-			continue;
-		}
-
-		printf("zrangebyscore ok, key: %s, ret: %d\r\n",
-			key.c_str(), ret);
-		std::vector<acl::string>::const_iterator cit;
-		for (cit = result.begin(); cit != result.end(); ++cit)
-		{
-			if (cit != result.begin())
-				printf(", ");
-			printf("%s", (*cit).c_str());
-		}
-		printf("\r\n");
-		result.clear();
-	}
-
-	printf("===========test zrangebyscore_with_scores==============\r\n");
-	std::vector<std::pair<acl::string, double> > result2;
-
-	for (int i = 0; i < n; i++)
-	{
-		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		result.clear();
-
-		int ret = option.zrangebyscore_with_scores(key.c_str(),
-			min, max, result2);
-		if (ret < 0)
-		{
-			printf("zrangebyscore_with_scores error, key: %s\r\n",
-				key.c_str());
-			break;
-		}
-		else if (i >= 10)
-		{
-			result2.clear();
-			continue;
-		}
-
-		printf("zrangebyscore_with_scores ok, key: %s, ret: %d\r\n",
-			key.c_str(), ret);
-		std::vector<std::pair<acl::string, double> >::const_iterator cit;
-		for (cit = result2.begin(); cit != result2.end(); ++cit)
-		{
-			if (cit != result2.begin())
-				printf(", ");
-			printf("%s: %.2f", cit->first.c_str(),
-				cit->second);
-		}
-		printf("\r\n");
-		result2.clear();
-	}
-}
-
-static void test_zrank(acl::redis_zset& option, int n)
-{
-	acl::string key;
-	acl::string member;
-
-	for (int i = 0; i < n; i++)
-	{
-		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-
-		for (int j = 0; j < 1000; j++)
-		{
-			member.format("member_%d", j);
-			int ret = option.zrank(key.c_str(), member.c_str());
-			if (ret < 0)
-			{
-				printf("zrank error, key: %s\r\n", key.c_str());
-				break;
-			}
-			else if (j > 0 && j * i < 100)
-				printf("zrank ok, key: %s, member:%s, "
-					"rank: %d\r\n", key.c_str(),
-					member.c_str(), ret);
-		}
-	}
-}
-
-static void test_zrem(acl::redis_zset& option, int n)
-{
-	acl::string key;
-	acl::string member;
 	std::vector<acl::string> members;
 
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 		option.reset();
-
-		for (int j = 900; j < 1000; j++)
-		{
-			member.format("member_%d", j);
-			members.push_back(member);
-		}
-
-		int ret = option.zrem(key.c_str(), members);
+		int ret = option.smembers(key.c_str(), &members);
 		if (ret < 0)
 		{
-			printf("zrem error, key: %s\r\n", key.c_str());
+			printf("smembers error, key: %s\r\n", key.c_str());
 			break;
 		}
-		else if (i < 10)
-			printf("zrem ok, key: %s, ret: %d\r\n",
-				key.c_str(), ret);
+		else if (i >= 10)
+			continue;
+
+		printf("smembers ok, key: %s, count: %d\r\n", key.c_str(), ret);
 	}
 }
 
-static void test_zscore(acl::redis_zset& option, int n)
+static void test_smove(acl::redis_set& option, int n)
+{
+	acl::string src_key, dst_key;
+	acl::string member;
+	int ret;
+
+	for (int i = 0; i < n; i++)
+	{
+		src_key.format("%s_%d", __keypre.c_str(), i);
+		dst_key.format("dest_%s_%d", __keypre.c_str(), i);
+
+		for (int j = 0; j < 1000; j++)
+		{
+			member.format("member_%d", j);
+			option.reset();
+			ret = option.smove(src_key.c_str(), dst_key.c_str(),
+					member.c_str());
+
+			if (ret < 0)
+			{
+				printf("smove error, src: %s, des: %s\r\n",
+					src_key.c_str(), dst_key.c_str());
+				break;
+			}
+			else if (j * i >= 100)
+				continue;
+
+			printf("smove ok, src: %s, dst: %s, member:%s, ret: %d\r\n",
+				src_key.c_str(), dst_key.c_str(),
+				member.c_str(), ret);
+		}
+	}
+}
+
+static void test_spop(acl::redis_set& option, int n)
 {
 	acl::string key;
 	acl::string member;
-	bool ret;
-	double result;
 
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 		option.reset();
-
-		for (int j = 0; j < 1000; j++)
+		bool ret = option.spop(key.c_str(), member);
+		if (option.eof())
 		{
-			member.format("member_%d", j);
-			ret = option.zscore(key.c_str(), member.c_str(),
-				result);
-			if (ret == false)
-			{
-				printf("zscore error, key: %s\r\n",
-					key.c_str());
-				break;
-			}
-			else if (j > 0 && j * i < 100)
-				printf("zscore ok, key: %s, member:%s, "
-					"score: %.2f\r\n", key.c_str(),
-					member.c_str(), result);
-		}
-	}
-}
-
-static void test_zunionstore(acl::redis_zset& option, int n)
-{
-	acl::string dest_key, src1_key, src2_key;
-	std::vector<acl::string> src_keys;
-
-	for (int i = 0; i < n; i++)
-	{
-		dest_key.format("zset_dest_key_%d", i);
-		src1_key.format("zset_src1_key_%d", i);
-		src_keys.push_back(src1_key);
-		src2_key.format("zset_src2_key_%d", i);
-		src_keys.push_back(src2_key);
-
-		int ret = option.zunionstore(dest_key.c_str(), src_keys);
-		if (ret < 0)
-		{
-			printf("zunionstore error, dest: %s\r\n",
-				dest_key.c_str());
+			printf("spop eof, key: %s\r\n", key.c_str());
 			break;
 		}
-		src_keys.clear();
+		if (i >= 10)
+			continue;
+
+		printf("spop %s, key: %s, member: %s\r\n",
+			ret ? "ok" : "empty", key.c_str(),
+			ret ? member.c_str() : "");
 	}
 }
 
-static void test_zinterstore(acl::redis_zset& option ,int n)
-{
-	acl::string dest_key, src1_key, src2_key;
-	std::vector<acl::string> src_keys;
-
-	for (int i = 0; i < n; i++)
-	{
-		dest_key.format("zset_dest_key_%d", i);
-		src1_key.format("zset_src1_key_%d", i);
-		src_keys.push_back(src1_key);
-		src2_key.format("zset_src2_key_%d", i);
-		src_keys.push_back(src2_key);
-
-		int ret = option.zinterstore(dest_key.c_str(), src_keys);
-		if (ret < 0)
-		{
-			printf("zinterstore error, dest: %s\r\n",
-				dest_key.c_str());
-			break;
-		}
-		src_keys.clear();
-	}
-}
-
-static void test_zscan(acl::redis_zset& option, int n)
+static void test_srandmember(acl::redis_set& option, int n)
 {
 	acl::string key;
-	int   ret = 0, j;
-	std::vector<std::pair<acl::string, double> > result;
-	std::vector<std::pair<acl::string, double> >::const_iterator cit;
+	acl::string member;
+	int ret;
+
+	for (int i = 0; i < n; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+		option.reset();
+		ret = option.srandmember(key.c_str(), member);
+		if (option.eof())
+			break;
+
+		if (i >= 10)
+			continue;
+
+		printf("srandmember %s, key: %s, member: %s\r\n",
+			ret ? "ok" : "empty", key.c_str(), member.c_str());
+	}
+}
+
+static void test_srem(acl::redis_set& option, int n)
+{
+	acl::string key;
+	acl::string member;
+	std::vector<acl::string> members;
+
+	members.reserve(1000);
+
+	for (int j = 0; j < 1000; j++)
+	{
+		member.format("member_%d", j);
+		members.push_back(member);
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+
+		option.reset();
+		int ret = option.srem(key.c_str(), members);
+
+		if (ret < 0)
+		{
+			printf("srem error, key: %s\r\n", key.c_str());
+			break;
+		}
+		if (i >= 10)
+			continue;
+
+		printf("srem ok, key: %s, ret: %d\r\n", key.c_str(), ret);
+	}
+}
+
+static void test_sunion(acl::redis_set& option ,int n)
+{
+	acl::string key;
+	std::vector<acl::string> keys;
+	std::vector<acl::string> result;
+
+	for (int i = 0; i < 10; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+		keys.push_back(key);
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		option.reset();
+		int ret = option.sunion(keys, &result);
+		if (ret < 0)
+		{
+			printf("sunion error\r\n");
+			break;
+		}
+		else if (i < 10)
+			printf("sunion ok, count: %d\r\n", ret);
+	}
+}
+
+static void test_sunionstore(acl::redis_set& option, int n)
+{
+	acl::string key, dest_key("set_dest_key");
+	std::vector<acl::string> keys;
+
+	for (int i = 0; i < 10; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+		keys.push_back(key);
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		option.reset();
+		int ret = option.sunionstore(dest_key.c_str(), keys);
+		if (ret < 0)
+		{
+			printf("sdiffstore error, dest: %s\r\n",
+				dest_key.c_str());
+			break;
+		}
+		else if (i < 10)
+			printf("sdiffstore ok, dest: %s, count: %d\r\n",
+			dest_key.c_str(), ret);
+	}
+}
+
+static void test_sscan(acl::redis_set& option, int n)
+{
+	acl::string key;
+	int   ret = 0;
+	std::vector<acl::string> result;
+	std::vector<acl::string>::const_iterator cit;
 
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 		while (true)
 		{
-			ret = option.zscan(key.c_str(), ret, result);
+			option.reset();
+			ret = option.sscan(key.c_str(), ret, result);
 			if (ret < 0)
 			{
-				printf("zscan failed, key: %s\r\n",
+				printf("sscan failed, key: %s\r\n",
 					key.c_str());
 				break;
+			}
+			if (i < 10)
+			{
+				cit = result.begin();
+				for (; cit != result.end(); ++cit)
+					printf("%s: %s\r\n", key.c_str(),
+						(*cit).c_str());
 			}
 			if (ret == 0)
 			{
-				printf("zscan over, key: %s\r\n",
+				printf("sscan over, key: %s\r\n",
 					key.c_str());
 				break;
 			}
-			if (i >= 10)
-				continue;
-
-			j = 0;
-			for (cit = result.begin(); cit != result.end(); ++cit)
-			{
-				printf("%s: %.2f\r\n", cit->first.c_str(),
-					cit->second);
-				j++;
-			}
-			printf("\r\n");
 		}
-	}
-}
-
-static void test_zrangebylex(acl::redis_zset& option, int n)
-{
-	acl::string key;
-	const char* min = "[aaa", *max = "(g";
-	std::vector<acl::string> result;
-
-	for (int i = 0; i < n; i++)
-	{
-		key.format("%s_%d", __keypre.c_str(), i);
-		int ret = option.zrangebylex(key.c_str(), min, max, &result);
-		if (ret < 0)
-		{
-			printf("zrangebylex error, key: %s\r\n", key.c_str());
-			break;
-		}
-		if (i >= 10)
-		{
-			result.clear();
-			continue;
-		}
-
-		std::vector<acl::string>::const_iterator cit;
-		for (cit = result.begin(); cit != result.end(); ++cit)
-		{
-			if (cit != result.begin())
-				printf(", ");
-			printf("%s", (*cit).c_str());
-		}
-		printf("\r\n");
-	}
-}
-
-static void test_zlexcount(acl::redis_zset& option, int n)
-{
-	acl::string key;
-	const char* min = "[aaa", *max = "(g";
-
-	for (int i = 0; i < n; i++)
-	{
-		key.format("%s_%d", __keypre.c_str(), i);
-		int ret = option.zlexcount(key.c_str(), min, max);
-		if (ret < 0)
-		{
-			printf("zlexcount error, key: %s\r\n", key.c_str());
-			break;
-		}
-		if (i >= 10)
-			continue;
-		printf("key: %s, count: %d\r\n", key.c_str(), ret);
-	}
-}
-
-static void test_zremrangebylex(acl::redis_zset& option, int n)
-{
-	acl::string key;
-	const char* min = "[aaa", *max = "(g";
-
-	for (int i = 0; i < n; i++)
-	{
-		key.format("%s_%d", __keypre.c_str(), i);
-		int ret = option.zremrangebylex(key.c_str(), min, max);
-		if (ret < 0)
-		{
-			printf("zremrangebylex error, key: %s\r\n",
-				key.c_str());
-			break;
-		}
-		if (i >= 10)
-			continue;
-		printf("key: %s, count: %d\r\n", key.c_str(), ret);
 	}
 }
 
@@ -506,7 +372,7 @@ static void usage(const char* procname)
 		"-n count\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-T rw_timeout[default: 10]\r\n"
-		"-a cmd\r\n",
+		"-a cmd[sadd|scard|sdiffstore|sismember|smembers|smove|spop|srandmember|sunion|sunionstore|sscan|srem\r\n",
 		procname);
 }
 
@@ -544,50 +410,49 @@ int main(int argc, char* argv[])
 
 	acl::acl_cpp_init();
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
-	acl::redis_zset option(&client);
+	acl::redis_set option(&client);
 
-	if (cmd == "zadd")
-		test_zadd(option, n);
-	else if (cmd == "zcard")
-		test_zcard(option, n);
-	else if (cmd == "zcount")
-		test_zcount(option, n);
-	else if (cmd == "zincrby")
-		test_zincrby(option, n);
-	else if (cmd == "zrange")
-		test_zrange(option, n);
-	else if (cmd == "zrangebyscore")
-		test_zrangebyscore(option, n);
-	else if (cmd == "zrank")
-		test_zrank(option, n);
-	else if (cmd == "zrem")
-		test_zrem(option, n);
-	else if (cmd == "zscore")
-		test_zscore(option, n);
-	else if (cmd == "zunionstore")
-		test_zunionstore(option, n);
-	else if (cmd == "zinterstore")
-		test_zinterstore(option, n);
-	else if (cmd == "zscan")
-		test_zscan(option, n);
-	else if (cmd == "zrangebylex")
-		test_zrangebylex(option, n);
-	else if (cmd == "zlexcount")
-		test_zlexcount(option, n);
-	else if (cmd == "zremrangebylex")
-		test_zremrangebylex(option, n);
+	if (cmd == "sadd")
+		test_sadd(option, n);
+	else if (cmd == "scard")
+		test_scard(option, n);
+	else if (cmd == "sdiff")
+		test_sdiff(option, n);
+	else if (cmd == "sdiffstore")
+		test_sdiffstore(option, n);
+	else if (cmd == "sismember")
+		test_sismember(option, n);
+	else if (cmd == "smembers")
+		test_smembers(option, n);
+	else if (cmd == "smove")
+		test_smove(option, n);
+	else if (cmd == "spop")
+		test_spop(option, n);
+	else if (cmd == "srandmember")
+		test_srandmember(option, n);
+	else if (cmd == "srem")
+		test_srem(option, n);
+	else if (cmd == "sunion")
+		test_sunion(option, n);
+	else if (cmd == "sunionstore")
+		test_sunionstore(option, n);
+	else if (cmd == "sscan")
+		test_sscan(option, n);
 	else if (cmd == "all")
 	{
-		test_zadd(option, n);
-		test_zcard(option, n);
-		test_zcount(option, n);
-		test_zincrby(option, n);
-		test_zrange(option, n);
-		test_zrangebyscore(option, n);
-		test_zrank(option, n);
-		test_zrem(option, n);
-
-		test_zscore(option, n);
+		test_sadd(option, n);
+		test_scard(option, n);
+		test_sdiff(option, n);
+		test_sdiffstore(option, n);
+		test_sismember(option, n);
+		test_smembers(option, n);
+		test_smove(option, n);
+		test_spop(option, n);
+		test_srandmember(option, n);
+		test_sunion(option, n);
+		test_sunionstore(option, n);
+		test_sscan(option, n);
+		test_srem(option, n);
 	}
 	else
 		printf("unknown cmd: %s\r\n", cmd.c_str());

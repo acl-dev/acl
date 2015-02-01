@@ -86,7 +86,6 @@ static void test_zincrby(acl::redis_zset& option, int n)
 		for (int j = 0; j < 1000; j++)
 		{
 			member.format("member_%d", j);
-
 			option.reset();
 			if (option.zincrby(key.c_str(), inc, member.c_str(),
 				&result) == false)
@@ -259,11 +258,11 @@ static void test_zrank(acl::redis_zset& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
 
 		for (int j = 0; j < 1000; j++)
 		{
 			member.format("member_%d", j);
+			option.reset();
 			int ret = option.zrank(key.c_str(), member.c_str());
 			if (ret < 0)
 			{
@@ -287,7 +286,6 @@ static void test_zrem(acl::redis_zset& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
 
 		for (int j = 900; j < 1000; j++)
 		{
@@ -295,6 +293,7 @@ static void test_zrem(acl::redis_zset& option, int n)
 			members.push_back(member);
 		}
 
+		option.reset();
 		int ret = option.zrem(key.c_str(), members);
 		if (ret < 0)
 		{
@@ -317,11 +316,11 @@ static void test_zscore(acl::redis_zset& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
 
 		for (int j = 0; j < 1000; j++)
 		{
 			member.format("member_%d", j);
+			option.reset();
 			ret = option.zscore(key.c_str(), member.c_str(),
 				result);
 			if (ret == false)
@@ -351,6 +350,7 @@ static void test_zunionstore(acl::redis_zset& option, int n)
 		src2_key.format("zset_src2_key_%d", i);
 		src_keys.push_back(src2_key);
 
+		option.reset();
 		int ret = option.zunionstore(dest_key.c_str(), src_keys);
 		if (ret < 0)
 		{
@@ -375,6 +375,7 @@ static void test_zinterstore(acl::redis_zset& option ,int n)
 		src2_key.format("zset_src2_key_%d", i);
 		src_keys.push_back(src2_key);
 
+		option.reset();
 		int ret = option.zinterstore(dest_key.c_str(), src_keys);
 		if (ret < 0)
 		{
@@ -398,6 +399,7 @@ static void test_zscan(acl::redis_zset& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 		while (true)
 		{
+			option.reset();
 			ret = option.zscan(key.c_str(), ret, result);
 			if (ret < 0)
 			{
@@ -435,6 +437,7 @@ static void test_zrangebylex(acl::redis_zset& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
+		option.reset();
 		int ret = option.zrangebylex(key.c_str(), min, max, &result);
 		if (ret < 0)
 		{
@@ -466,6 +469,7 @@ static void test_zlexcount(acl::redis_zset& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
+		option.reset();
 		int ret = option.zlexcount(key.c_str(), min, max);
 		if (ret < 0)
 		{
@@ -486,6 +490,7 @@ static void test_zremrangebylex(acl::redis_zset& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
+		option.reset();
 		int ret = option.zremrangebylex(key.c_str(), min, max);
 		if (ret < 0)
 		{

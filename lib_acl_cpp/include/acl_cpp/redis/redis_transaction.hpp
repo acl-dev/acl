@@ -63,8 +63,16 @@ public:
 	 * @param argc {size_t} 参数数组的长度
 	 * @return {bool} 操作是否成功
 	 */
-	bool queue_cmd(const char* cmd, const char* argv[],
+	bool run_cmd(const char* cmd, const char* argv[],
 		const size_t lens[], size_t argc);
+
+	/**
+	 * 在 multi 和 exec 之间执行多条 redis 客户端命令
+	 * @param cmd {const char*} redis 命令
+	 * @param args {const std::vector<string>&} 参数数组
+	 * @return {bool} 操作是否成功
+	 */
+	bool run_cmd(const char* cmd, const std::vector<string>& args);
 
 	/**
 	 * 在成功调用 exec 后调用本函数获得操作结果数组的长度
@@ -80,6 +88,15 @@ public:
 	 *  当 i 越界时返回 NULL
 	 */
 	const redis_result* get_child(size_t i, string* cmd) const;
+
+	/**
+	 * 获得当前事务所重的命令集合
+	 * @return {const std::vector<string>&}
+	 */
+	const std::vector<string>& get_commands() const
+	{
+		return cmds_;
+	}
 
 private:
 	std::vector<string> cmds_;

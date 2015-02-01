@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="redis_zset"
-	ProjectGUID="{CCA2C901-6D42-4EA1-96CD-5D89489F939B}"
+	ProjectGUID="{11FA58C0-5B8A-49A8-8536-FB2722D2FC8E}"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>

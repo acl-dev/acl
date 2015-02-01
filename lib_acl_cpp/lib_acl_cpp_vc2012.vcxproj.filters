@@ -382,39 +382,6 @@
     <ClCompile Include="src\stdlib\dbuf_pool.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
-    <ClCompile Include="src\aliyun\oss\model\Bucket.cpp">
-      <Filter>src\aliyun\oss\model</Filter>
-    </ClCompile>
-    <ClCompile Include="src\aliyun\oss\model\CopyObjectResult.cpp">
-      <Filter>src\aliyun\oss\model</Filter>
-    </ClCompile>
-    <ClCompile Include="src\aliyun\oss\model\GetObjectRequest.cpp">
-      <Filter>src\aliyun\oss\model</Filter>
-    </ClCompile>
-    <ClCompile Include="src\aliyun\oss\model\OSSObject.cpp">
-      <Filter>src\aliyun\oss\model</Filter>
-    </ClCompile>
-    <ClCompile Include="src\aliyun\oss\model\ResponseHeaderOverrides.cpp">
-      <Filter>src\aliyun\oss\model</Filter>
-    </ClCompile>
-    <ClCompile Include="src\aliyun\oss\OSSClient.cpp">
-      <Filter>src\aliyun\oss</Filter>
-    </ClCompile>
-    <ClCompile Include="src\aliyun\oss\internal\OSSBucketOperation.cpp">
-      <Filter>src\aliyun\oss\internal</Filter>
-    </ClCompile>
-    <ClCompile Include="src\aliyun\oss\internal\OSSObjectOperation.cpp">
-      <Filter>src\aliyun\oss\internal</Filter>
-    </ClCompile>
-    <ClCompile Include="src\aliyun\oss\model\OptionsRequest.cpp">
-      <Filter>src\aliyun\oss\model</Filter>
-    </ClCompile>
-    <ClCompile Include="src\aliyun\oss\internal\OSSMultipartOperation.cpp">
-      <Filter>src\aliyun\oss\internal</Filter>
-    </ClCompile>
-    <ClCompile Include="src\aliyun\oss\internal\CORSOperation.cpp">
-      <Filter>src\aliyun\oss\internal</Filter>
-    </ClCompile>
     <ClCompile Include="src\redis\redis_result.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
@@ -879,105 +846,6 @@
     <ClInclude Include="include\acl_cpp\stdlib\dbuf_pool.hpp">
       <Filter>include\stdlib</Filter>
     </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\Bucket.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\CopyObjectResult.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\GetObjectRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\ObjectMetadata.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\OSSObject.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\PutObjectResult.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\ResponseHeaderOverrides.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\OSSClient.hpp">
-      <Filter>include\aliyun\oss</Filter>
-    </ClInclude>
-    <ClInclude Include="src\aliyun\oss\model\oss_macro.hpp">
-      <Filter>src\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="src\aliyun\oss\OSSConstants.hpp">
-      <Filter>src\aliyun\oss</Filter>
-    </ClInclude>
-    <ClInclude Include="src\aliyun\oss\internal\OSSBucketOperation.hpp">
-      <Filter>src\aliyun\oss\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="src\aliyun\oss\internal\OSSObjectOperation.hpp">
-      <Filter>src\aliyun\oss\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\CopyObjectRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\CreateBucketRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\ListObjectsRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\OptionsRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="src\aliyun\oss\internal\OSSMultipartOperation.hpp">
-      <Filter>src\aliyun\oss\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="src\aliyun\oss\internal\CORSOperation.hpp">
-      <Filter>src\aliyun\oss\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\CORSRule.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\SetBucketCORSRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\AbortMultipartUploadRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\CompleteMultipartUploadRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\InitiateMultipartUploadRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\ListMultipartUploadsRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\ListPartsRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\UploadPartRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\UploadPartCopyRequest.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\CompleteMultipartUploadResult.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\InitiateMultipartUploadResult.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\MultipartUploadListing.h">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\PartListing.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\UploadPartResult.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\aliyun\oss\model\UploadPartCopyResult.hpp">
-      <Filter>include\aliyun\oss\model</Filter>
-    </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_client.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
@@ -1136,27 +1004,6 @@
     </Filter>
     <Filter Include="include\event">
       <UniqueIdentifier>{c81440c9-71a3-4a12-b078-f9845c634089}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\aliyun">
-      <UniqueIdentifier>{dab2f86a-7878-42d3-a5fe-b937c7186164}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\aliyun">
-      <UniqueIdentifier>{36591026-3aa3-471d-9ecb-b0fb9ef764ae}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\aliyun\oss">
-      <UniqueIdentifier>{5b02be4d-f122-4432-86ed-c331372d76f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\aliyun\oss">
-      <UniqueIdentifier>{3533f24f-3efc-41bc-a14e-b742628faa60}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\aliyun\oss\model">
-      <UniqueIdentifier>{a7e34327-263b-4575-a2b9-50caf589a73c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\aliyun\oss\model">
-      <UniqueIdentifier>{01dd68e9-ed92-466d-816a-3f4c2b7b7bc6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\aliyun\oss\internal">
-      <UniqueIdentifier>{8d5bc637-579f-4fe3-85a4-9412fba1adf5}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\redis">
       <UniqueIdentifier>{5ea6d29e-ffbe-4bdb-b5c1-fa5966807ce7}</UniqueIdentifier>

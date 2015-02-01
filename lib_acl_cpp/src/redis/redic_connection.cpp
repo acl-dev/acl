@@ -24,10 +24,10 @@ bool redis_connection::auth(const char* passwd)
 	size_t lens[2];
 
 	argv[0] = "AUTH";
-	lens[0] = strlen(argv[0]);
+	lens[0] = sizeof("AUTH") - 1;
 
 	argv[1] = passwd;
-	lens[1] = strlen(argv[1]);
+	lens[1] = strlen(passwd);
 
 	conn_->build_request(2, argv, lens);
 	return conn_->get_status();

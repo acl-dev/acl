@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="redis_string"
-	ProjectGUID="{2DABFAD1-114B-4F96-9185-DC0C56A3662D}"
+	ProjectGUID="{70296D43-9E0F-46D7-8C2B-40A960D31D50}"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -343,6 +343,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\redis_string.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -377,10 +381,6 @@
 						UsePrecompiledHeader="1"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\redis_string.cpp"
-				>
 			</File>
 		</Filter>
 		<Filter

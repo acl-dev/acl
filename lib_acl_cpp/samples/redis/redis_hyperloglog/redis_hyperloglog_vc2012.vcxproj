@@ -19,25 +19,30 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{58580DE9-8034-4B8E-B9F2-67A538E98FB8}</ProjectGuid>
+    <ProjectGuid>{9FA235B5-B8EE-4F05-899F-FC0D70D3F8BA}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
+    <ProjectName>redis_hyperloglog</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -95,11 +100,11 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>lib_acl_vc2010d.lib;lib_acl_cpp_vc2010d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)redis_string.exe</OutputFile>
+      <AdditionalDependencies>lib_acl_vc2012d.lib;lib_acl_cpp_vc2012d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)redis_hyperloglog.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)redis_string.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)redis_hyperloglog.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <IgnoreSpecificDefaultLibraries>
@@ -116,8 +121,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2010.lib;lib_acl_cpp_vc2010.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)redis_string.exe</OutputFile>
+      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2012.lib;lib_acl_cpp_vc2012.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)redis_hyperloglog.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -142,10 +147,10 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>lib_acl_d.lib;lib_acl_cpp_d.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)redis_string.exe</OutputFile>
+      <OutputFile>$(OutDir)redis_hyperloglog.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)redis_string.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)redis_hyperloglog.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -164,10 +169,10 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>lib_acl.lib;lib_acl_cpp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)redis_string.exe</OutputFile>
+      <OutputFile>$(OutDir)redis_hyperloglog.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)redis_string.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)redis_hyperloglog.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -183,7 +188,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="redis_string.cpp" />
+    <ClCompile Include="redis_hyperloglog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
