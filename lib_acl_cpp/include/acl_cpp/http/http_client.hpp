@@ -295,6 +295,13 @@ public:
 	 */
 	void fprint_header(ostream& out, const char* prompt);
 
+	/**
+	 * 输出服务器返回的 HTTP 响应头信息至缓冲区中
+	 * @param out {string&} 存储结果的数据缓冲区
+	 * @param prompt {const char*} 若非空则随同 HTTP 头信息一起输出
+	 */
+	void sprint_header(string& out, const char* prompt);
+
 private:
 	socket_stream* stream_;     // HTTP 数据流
 	bool stream_fixed_;         // 是否允许释放 stream_ 流对象

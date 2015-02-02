@@ -2,7 +2,7 @@
 
 static acl::string __keypre("hash_test_key");
 
-static void test_hmset(acl::redis_hash& option, int n)
+static bool test_hmset(acl::redis_hash& option, int n)
 {
 	acl::string key, attr1, attr2, attr3;
 	acl::string val1, val2, val3;
@@ -27,7 +27,7 @@ static void test_hmset(acl::redis_hash& option, int n)
 		if (option.hmset(key.c_str(), attrs) == false)
 		{
 			printf("hmset error, key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 		{
@@ -38,9 +38,11 @@ static void test_hmset(acl::redis_hash& option, int n)
 		}
 		attrs.clear();
 	}
+
+	return true;
 }
 
-static void test_hmget(acl::redis_hash& option, int n)
+static bool test_hmget(acl::redis_hash& option, int n)
 {
 	acl::string key, attr1, attr2, attr3;
 	const char* attrs[3];
@@ -61,7 +63,7 @@ static void test_hmget(acl::redis_hash& option, int n)
 		if (option.hmget(key, attrs, 3, &result) == false)
 		{
 			printf("hmget error\r\n");
-			break;
+			return false;
 		}
 		else if (i >= 10)
 			continue;
@@ -82,9 +84,11 @@ static void test_hmget(acl::redis_hash& option, int n)
 		for (j = 0; it != result.end(); ++it, j++)
 			printf("hmget %s=%s\r\n", attrs[j], (*it).c_str());
 	}
+
+	return true;
 }
 
-static void test_hset(acl::redis_hash& option, int n)
+static bool test_hset(acl::redis_hash& option, int n)
 {
 	acl::string key;
 	acl::string attr, value;
@@ -100,14 +104,16 @@ static void test_hset(acl::redis_hash& option, int n)
 			value.c_str()) < 0)
 		{
 			printf("hset key: %s error\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("hset key: %s ok\r\n", key.c_str());
 	}
+
+	return true;
 }
 
-static void test_hsetnx(acl::redis_hash& option, int n)
+static bool test_hsetnx(acl::redis_hash& option, int n)
 {
 	acl::string key;
 	acl::string attr, value;
@@ -124,15 +130,17 @@ static void test_hsetnx(acl::redis_hash& option, int n)
 			value.c_str())) <0)
 		{
 			printf("hsetnx key: %s error\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("hsetnx key: %s ok, ret: %d\r\n",
 				key.c_str(), ret);
 	}
+
+	return true;
 }
 
-static void test_hget(acl::redis_hash& option, int n)
+static bool test_hget(acl::redis_hash& option, int n)
 {
 	acl::string key;
 	acl::string attr, value;
@@ -148,7 +156,7 @@ static void test_hget(acl::redis_hash& option, int n)
 		{
 			printf("hget key: %s, attr: %s\r\n", key.c_str(),
 				attr.c_str());
-			break;
+			return false;
 		}
 		else if (i >= 10)
 			continue;
@@ -157,9 +165,11 @@ static void test_hget(acl::redis_hash& option, int n)
 			key.c_str(), attr.c_str(), value.c_str(),
 			(int) value.length());
 	}
+
+	return true;
 }
 
-static void test_hgetall(acl::redis_hash& option, int n)
+static bool test_hgetall(acl::redis_hash& option, int n)
 {
 	acl::string key;
 	std::map<acl::string, acl::string> result;
@@ -173,7 +183,7 @@ static void test_hgetall(acl::redis_hash& option, int n)
 		if (option.hgetall(key.c_str(), result) == false)
 		{
 			printf("hgetall key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i >= 10)
 			continue;
@@ -186,9 +196,11 @@ static void test_hgetall(acl::redis_hash& option, int n)
 				cit->second.c_str());
 		}
 	}
+
+	return true;
 }
 
-static void test_hdel(acl::redis_hash& option, int n)
+static bool test_hdel(acl::redis_hash& option, int n)
 {
 	acl::string key, attr;
 
@@ -202,14 +214,16 @@ static void test_hdel(acl::redis_hash& option, int n)
 		if (ret < 0)
 		{
 			printf("hdel key: %s error\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("hdel ok, key: %s\r\n", key.c_str());
 	}
+
+	return true;
 }
 
-static void test_hincrby(acl::redis_hash& option, int n)
+static bool test_hincrby(acl::redis_hash& option, int n)
 {
 	acl::string key, attr;
 	long long int result;
@@ -225,15 +239,17 @@ static void test_hincrby(acl::redis_hash& option, int n)
 		{
 			printf("hincrby error, key: %s, attr: %s\r\n",
 				key.c_str(), attr.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("hincrby, key: %s, attr: %s, result: %lld\r\n",
 				key.c_str(), attr.c_str(), result);
 	}
+
+	return true;
 }
 
-static void test_hincrbyfloat(acl::redis_hash& option, int n)
+static bool test_hincrbyfloat(acl::redis_hash& option, int n)
 {
 	acl::string key, attr;
 	double result;
@@ -248,7 +264,7 @@ static void test_hincrbyfloat(acl::redis_hash& option, int n)
 			8.8, &result) == false)
 		{
 			printf("hincrbyfloat error, key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i >= 10)
 			continue;
@@ -256,9 +272,11 @@ static void test_hincrbyfloat(acl::redis_hash& option, int n)
 		printf("hincrbyfloat ok, key: %s, attr: %s, result: %.2f\r\n",
 			key.c_str(), attr.c_str(), result);
 	}
+
+	return true;
 }
 
-static void test_hkeys(acl::redis_hash& option, int n)
+static bool test_hkeys(acl::redis_hash& option, int n)
 {
 	acl::string key;
 	std::vector<acl::string> attrs;
@@ -272,7 +290,7 @@ static void test_hkeys(acl::redis_hash& option, int n)
 		if (option.hkeys(key.c_str(), attrs) == false)
 		{
 			printf("hkeys error, key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i >= 10)
 			continue;
@@ -287,9 +305,11 @@ static void test_hkeys(acl::redis_hash& option, int n)
 		}
 		printf("\r\n");
 	}
+
+	return true;
 }
 
-static void test_hexists(acl::redis_hash& option, int n)
+static bool test_hexists(acl::redis_hash& option, int n)
 {
 	acl::string key, attr;
 
@@ -305,9 +325,11 @@ static void test_hexists(acl::redis_hash& option, int n)
 			printf("hexists key: %s, attr: %s\r\n",
 				key.c_str(), attr.c_str());
 	}
+
+	return true;
 }
 
-static void test_hlen(acl::redis_hash& option, int n)
+static bool test_hlen(acl::redis_hash& option, int n)
 {
 	acl::string key;
 
@@ -320,12 +342,14 @@ static void test_hlen(acl::redis_hash& option, int n)
 		if (ret < 0)
 		{
 			printf("hlen error, key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("hlen: %s's value's length: %d\r\n",
 				key.c_str(), ret);
 	}
+
+	return true;
 }
 
 static void usage(const char* procname)
@@ -381,47 +405,57 @@ int main(int argc, char* argv[])
 	client.set_slice_request(slice_req);
 	acl::redis_hash option(&client);
 
+	bool ret;
+
 	if (cmd == "hmset")
-		test_hmset(option, n);
+		ret = test_hmset(option, n);
 	else if (cmd == "hmget")
-		test_hmget(option, n);
+		ret = test_hmget(option, n);
 	else if (cmd == "hset")
-		test_hset(option, n);
+		ret = test_hset(option, n);
 	else if (cmd == "hsetnx")
-		test_hsetnx(option, n);
+		ret = test_hsetnx(option, n);
 	else if (cmd == "hget")
-		test_hget(option, n);
+		ret = test_hget(option, n);
 	else if (cmd == "hgetall")
-		test_hgetall(option, n);
+		ret = test_hgetall(option, n);
 	else if (cmd == "hdel")
-		test_hdel(option, n);
+		ret = test_hdel(option, n);
 	else if (cmd == "hincrby")
-		test_hincrby(option, n);
+		ret = test_hincrby(option, n);
 	else if (cmd == "hincrbyfloat")
-		test_hincrbyfloat(option, n);
+		ret = test_hincrbyfloat(option, n);
 	else if (cmd == "hkeys")
-		test_hkeys(option, n);
+		ret = test_hkeys(option, n);
 	else if (cmd == "hexists")
-		test_hexists(option, n);
+		ret = test_hexists(option, n);
 	else if (cmd == "hlen")
-		test_hlen(option, n);
+		ret = test_hlen(option, n);
 	else if (cmd == "all")
 	{
-		test_hmset(option, n);
-		test_hmget(option, n);
-		test_hset(option, n);
-		test_hsetnx(option, n);
-		test_hget(option, n);
-		test_hgetall(option, n);
-		test_hincrby(option, n);
-		test_hincrbyfloat(option, n);
-		test_hkeys(option, n);
-		test_hexists(option, n);
-		test_hlen(option, n);
-		test_hdel(option, n);
+		ret = test_hmset(option, n)
+			&& test_hmget(option, n)
+			&& test_hset(option, n)
+			&& test_hsetnx(option, n)
+			&& test_hget(option, n)
+			&& test_hgetall(option, n)
+			&& test_hincrby(option, n)
+			&& test_hincrbyfloat(option, n)
+			&& test_hkeys(option, n)
+			&& test_hexists(option, n)
+			&& test_hlen(option, n)
+			&& test_hdel(option, n);
 	}
 	else
+	{
+		ret = false;
 		printf("unknown cmd: %s\r\n", cmd.c_str());
+	}
+
+	if (ret == true)
+		printf("test OK!\r\n");
+	else
+		printf("test failed!\r\n");
 
 #ifdef WIN32
 	printf("enter any key to exit\r\n");

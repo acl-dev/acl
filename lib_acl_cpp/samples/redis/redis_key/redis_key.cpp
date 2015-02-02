@@ -2,7 +2,7 @@
 
 static acl::string __keypre("test_key");
 
-static void test_del(acl::redis_key& option, int n)
+static bool test_del(acl::redis_key& option, int n)
 {
 	acl::string key;
 
@@ -14,14 +14,16 @@ static void test_del(acl::redis_key& option, int n)
 		if (ret < 0)
 		{
 			printf("del key: %s error\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("del ok, key: %s\r\n", key.c_str());
 	}
+
+	return true;
 }
 
-static void test_expire(acl::redis_key& option, int n)
+static bool test_expire(acl::redis_key& option, int n)
 {
 	acl::string key;
 
@@ -32,14 +34,16 @@ static void test_expire(acl::redis_key& option, int n)
 		if (option.expire(key.c_str(), 100) < 0)
 		{
 			printf("expire key: %s error\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("expire ok, key: %s\r\n", key.c_str());
 	}
+
+	return true;
 }
 
-static void test_ttl(acl::redis_key& option, int n)
+static bool test_ttl(acl::redis_key& option, int n)
 {
 	acl::string key;
 	int ttl;
@@ -51,15 +55,17 @@ static void test_ttl(acl::redis_key& option, int n)
 		if ((ttl = option.ttl(key.c_str())) < 0)
 		{
 			printf("get ttl key: %s error\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("ttl ok, key: %s, ttl: %d\r\n",
 				key.c_str(), ttl);
 	}
+
+	return true;
 }
 
-static void test_exists(acl::redis_key& option, int n)
+static bool test_exists(acl::redis_key& option, int n)
 {
 	acl::string key;
 
@@ -72,9 +78,11 @@ static void test_exists(acl::redis_key& option, int n)
 		else
 			printf("exists key: %s\r\n", key.c_str());
 	}
+
+	return true;
 }
 
-static void test_type(acl::redis_key& option, int n)
+static bool test_type(acl::redis_key& option, int n)
 {
 	acl::string key;
 
@@ -86,12 +94,14 @@ static void test_type(acl::redis_key& option, int n)
 		if (ret == acl::REDIS_KEY_UNKNOWN)
 		{
 			printf("unknown type key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else
 			printf("type ok, key: %s, ret: %d\r\n",
 				key.c_str(), ret);
 	}
+
+	return true;
 }
 
 static void usage(const char* procname)
@@ -141,26 +151,36 @@ int main(int argc, char* argv[])
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	acl::redis_key option(&client);
 
+	bool ret;
+
 	if (cmd == "del")
-		test_del(option, n);
+		ret = test_del(option, n);
 	else if (cmd == "expire")
-		test_expire(option, n);
+		ret = test_expire(option, n);
 	else if (cmd == "ttl")
-		test_ttl(option, n);
+		ret = test_ttl(option, n);
 	else if (cmd == "exists")
-		test_exists(option, n);
+		ret = test_exists(option, n);
 	else if (cmd == "type")
-		test_type(option, n);
+		ret = test_type(option, n);
 	else if (cmd == "all")
 	{
-		test_expire(option, n);
-		test_ttl(option, n);
-		test_exists(option, n);
-		test_type(option, n);
-		test_del(option, n);
+		ret = test_expire(option, n)
+			&& test_ttl(option, n)
+			&& test_exists(option, n)
+			&& test_type(option, n)
+			&& test_del(option, n);
 	}
 	else
+	{
+		ret = false;
 		printf("unknown cmd: %s\r\n", cmd.c_str());
+	}
+
+	if (ret == true)
+		printf("test OK!\r\n");
+	else
+		printf("test failed!\r\n");
 
 #ifdef WIN32
 	printf("enter any key to exit\r\n");

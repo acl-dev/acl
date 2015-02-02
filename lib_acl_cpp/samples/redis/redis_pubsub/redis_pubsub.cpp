@@ -155,12 +155,22 @@ int main(int argc, char* argv[])
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	acl::redis_pubsub option(&client);
 
+	bool ret;
+
 	if (cmd == "subscribe")
-		test_subscribe(option, n);
+		ret = test_subscribe(option, n);
 	else if (cmd == "publish")
-		test_publish(option, n);
+		ret = test_publish(option, n);
 	else
+	{
+		ret = false;
 		printf("unknown cmd: %s\r\n", cmd.c_str());
+	}
+
+	if (ret == true)
+		printf("test OK!\r\n");
+	else
+		printf("test failed!\r\n");
 
 #ifdef WIN32
 	printf("enter any key to exit\r\n");

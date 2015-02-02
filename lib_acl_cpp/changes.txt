@@ -1,6 +1,10 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+281) 2015.2.2
+281.1) feature: http_client.cpp 增加了 sprint_header 方法，可以将 HTTP 响应头
+输出至缓冲区内，以便于应用进行调试
+
 280) 2015.2.1
 280.1) samples: redis_connection, redis_hyperloglog, redis_transaction 三个
 redis 客户端命令的测试例子测试通过

@@ -816,4 +816,18 @@ void http_client::fprint_header(ostream& out, const char* prompt)
 		http_hdr_fprint(fp, &hdr_req_->hdr, prompt ? prompt : "dummy");
 }
 
+void http_client::sprint_header(string& out, const char* prompt)
+{
+	ACL_VSTRING* bf = out.vstring();
+	if (bf == NULL)
+	{
+		logger_error("vstring null");
+		return;
+	}
+	if (hdr_res_)
+		http_hdr_sprint(bf, &hdr_res_->hdr, prompt ? prompt : "dummy");
+	else if (hdr_req_)
+		http_hdr_sprint(bf, &hdr_req_->hdr, prompt ? prompt : "dummy");
+}
+
 }  // namespace acl

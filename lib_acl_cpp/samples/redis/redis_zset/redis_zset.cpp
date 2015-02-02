@@ -2,7 +2,7 @@
 
 static acl::string __keypre("zset_key");
 
-static void test_zadd(acl::redis_zset& option, int n)
+static bool test_zadd(acl::redis_zset& option, int n)
 {
 	acl::string key;
 	std::map<acl::string, double> members;
@@ -23,16 +23,18 @@ static void test_zadd(acl::redis_zset& option, int n)
 		if (ret < 0)
 		{
 			printf("add key: %s error\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("add ok, key: %s, ret: %d\r\n",
 				key.c_str(), ret);
 		members.clear();
 	}
+
+	return true;
 }
 
-static void test_zcard(acl::redis_zset& option, int n)
+static bool test_zcard(acl::redis_zset& option, int n)
 {
 	acl::string key;
 
@@ -44,15 +46,17 @@ static void test_zcard(acl::redis_zset& option, int n)
 		if (ret < 0)
 		{
 			printf("zcard key: %s error\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("zcard ok, key: %s, count: %d\r\n",
 				key.c_str(), ret);
 	}
+
+	return true;
 }
 
-static void test_zcount(acl::redis_zset& option, int n)
+static bool test_zcount(acl::redis_zset& option, int n)
 {
 	acl::string key;
 	double min = 2, max = 100;
@@ -65,15 +69,17 @@ static void test_zcount(acl::redis_zset& option, int n)
 		if (ret < 0)
 		{
 			printf("zcount key: %s error\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("zcount ok, key: %s, count: %d\r\n",
 				key.c_str(), ret);
 	}
+
+	return true;
 }
 
-static void test_zincrby(acl::redis_zset& option, int n)
+static bool test_zincrby(acl::redis_zset& option, int n)
 {
 	acl::string key;
 	double inc = 2.5, result;
@@ -91,16 +97,18 @@ static void test_zincrby(acl::redis_zset& option, int n)
 				&result) == false)
 			{
 				printf("zincrby error, key: %s\r\n", key.c_str());
-				break;
+				return false;
 			}
 			else if (j < 10 && i * j < 100)
 				printf("zincrby ok key: %s, result: %.2f\r\n",
 					key.c_str(), result);
 		}
 	}
+
+	return true;
 }
 
-static void test_zrange(acl::redis_zset& option, int n)
+static bool test_zrange(acl::redis_zset& option, int n)
 {
 	acl::string key;
 	std::vector<acl::string> result;
@@ -117,7 +125,7 @@ static void test_zrange(acl::redis_zset& option, int n)
 		if (ret < 0)
 		{
 			printf("zrange error, key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i >= 10)
 		{
@@ -171,9 +179,11 @@ static void test_zrange(acl::redis_zset& option, int n)
 		printf("\r\n");
 		result2.clear();
 	}
+
+	return true;
 }
 
-static void test_zrangebyscore(acl::redis_zset& option, int n)
+static bool test_zrangebyscore(acl::redis_zset& option, int n)
 {
 	acl::string key;
 	double min = 2, max = 10;
@@ -191,7 +201,7 @@ static void test_zrangebyscore(acl::redis_zset& option, int n)
 		if (ret < 0)
 		{
 			printf("zrangebyscore error, key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i >= 10)
 		{
@@ -227,7 +237,7 @@ static void test_zrangebyscore(acl::redis_zset& option, int n)
 		{
 			printf("zrangebyscore_with_scores error, key: %s\r\n",
 				key.c_str());
-			break;
+			return false;
 		}
 		else if (i >= 10)
 		{
@@ -248,9 +258,11 @@ static void test_zrangebyscore(acl::redis_zset& option, int n)
 		printf("\r\n");
 		result2.clear();
 	}
+
+	return true;
 }
 
-static void test_zrank(acl::redis_zset& option, int n)
+static bool test_zrank(acl::redis_zset& option, int n)
 {
 	acl::string key;
 	acl::string member;
@@ -267,7 +279,7 @@ static void test_zrank(acl::redis_zset& option, int n)
 			if (ret < 0)
 			{
 				printf("zrank error, key: %s\r\n", key.c_str());
-				break;
+				return false;
 			}
 			else if (j > 0 && j * i < 100)
 				printf("zrank ok, key: %s, member:%s, "
@@ -275,9 +287,11 @@ static void test_zrank(acl::redis_zset& option, int n)
 					member.c_str(), ret);
 		}
 	}
+
+	return true;
 }
 
-static void test_zrem(acl::redis_zset& option, int n)
+static bool test_zrem(acl::redis_zset& option, int n)
 {
 	acl::string key;
 	acl::string member;
@@ -298,15 +312,17 @@ static void test_zrem(acl::redis_zset& option, int n)
 		if (ret < 0)
 		{
 			printf("zrem error, key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("zrem ok, key: %s, ret: %d\r\n",
 				key.c_str(), ret);
 	}
+
+	return true;
 }
 
-static void test_zscore(acl::redis_zset& option, int n)
+static bool test_zscore(acl::redis_zset& option, int n)
 {
 	acl::string key;
 	acl::string member;
@@ -327,7 +343,7 @@ static void test_zscore(acl::redis_zset& option, int n)
 			{
 				printf("zscore error, key: %s\r\n",
 					key.c_str());
-				break;
+				return false;
 			}
 			else if (j > 0 && j * i < 100)
 				printf("zscore ok, key: %s, member:%s, "
@@ -335,9 +351,11 @@ static void test_zscore(acl::redis_zset& option, int n)
 					member.c_str(), result);
 		}
 	}
+
+	return true;
 }
 
-static void test_zunionstore(acl::redis_zset& option, int n)
+static bool test_zunionstore(acl::redis_zset& option, int n)
 {
 	acl::string dest_key, src1_key, src2_key;
 	std::vector<acl::string> src_keys;
@@ -356,13 +374,15 @@ static void test_zunionstore(acl::redis_zset& option, int n)
 		{
 			printf("zunionstore error, dest: %s\r\n",
 				dest_key.c_str());
-			break;
+			return false;
 		}
 		src_keys.clear();
 	}
+
+	return true;
 }
 
-static void test_zinterstore(acl::redis_zset& option ,int n)
+static bool test_zinterstore(acl::redis_zset& option ,int n)
 {
 	acl::string dest_key, src1_key, src2_key;
 	std::vector<acl::string> src_keys;
@@ -381,16 +401,18 @@ static void test_zinterstore(acl::redis_zset& option ,int n)
 		{
 			printf("zinterstore error, dest: %s\r\n",
 				dest_key.c_str());
-			break;
+			return false;
 		}
 		src_keys.clear();
 	}
+
+	return true;
 }
 
-static void test_zscan(acl::redis_zset& option, int n)
+static bool test_zscan(acl::redis_zset& option, int n)
 {
 	acl::string key;
-	int   ret = 0, j;
+	int   ret = 0;
 	std::vector<std::pair<acl::string, double> > result;
 	std::vector<std::pair<acl::string, double> >::const_iterator cit;
 
@@ -405,30 +427,33 @@ static void test_zscan(acl::redis_zset& option, int n)
 			{
 				printf("zscan failed, key: %s\r\n",
 					key.c_str());
-				break;
+				return false;
 			}
-			if (ret == 0)
-			{
-				printf("zscan over, key: %s\r\n",
-					key.c_str());
-				break;
-			}
+			
 			if (i >= 10)
-				continue;
+			{
+				if (ret == 0)
+					break;
+			}
 
-			j = 0;
 			for (cit = result.begin(); cit != result.end(); ++cit)
 			{
 				printf("%s: %.2f\r\n", cit->first.c_str(),
 					cit->second);
-				j++;
 			}
-			printf("\r\n");
+
+			if (ret == 0)
+			{
+				printf("zscan over, key: %s\r\n", key.c_str());
+				break;
+			}
 		}
 	}
+
+	return true;
 }
 
-static void test_zrangebylex(acl::redis_zset& option, int n)
+static bool test_zrangebylex(acl::redis_zset& option, int n)
 {
 	acl::string key;
 	const char* min = "[aaa", *max = "(g";
@@ -442,7 +467,7 @@ static void test_zrangebylex(acl::redis_zset& option, int n)
 		if (ret < 0)
 		{
 			printf("zrangebylex error, key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		if (i >= 10)
 		{
@@ -459,9 +484,11 @@ static void test_zrangebylex(acl::redis_zset& option, int n)
 		}
 		printf("\r\n");
 	}
+
+	return true;
 }
 
-static void test_zlexcount(acl::redis_zset& option, int n)
+static bool test_zlexcount(acl::redis_zset& option, int n)
 {
 	acl::string key;
 	const char* min = "[aaa", *max = "(g";
@@ -474,15 +501,17 @@ static void test_zlexcount(acl::redis_zset& option, int n)
 		if (ret < 0)
 		{
 			printf("zlexcount error, key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		if (i >= 10)
 			continue;
 		printf("key: %s, count: %d\r\n", key.c_str(), ret);
 	}
+
+	return true;
 }
 
-static void test_zremrangebylex(acl::redis_zset& option, int n)
+static bool test_zremrangebylex(acl::redis_zset& option, int n)
 {
 	acl::string key;
 	const char* min = "[aaa", *max = "(g";
@@ -496,12 +525,14 @@ static void test_zremrangebylex(acl::redis_zset& option, int n)
 		{
 			printf("zremrangebylex error, key: %s\r\n",
 				key.c_str());
-			break;
+			return false;
 		}
 		if (i >= 10)
 			continue;
 		printf("key: %s, count: %d\r\n", key.c_str(), ret);
 	}
+
+	return true;
 }
 
 static void usage(const char* procname)
@@ -551,51 +582,60 @@ int main(int argc, char* argv[])
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	acl::redis_zset option(&client);
 
+	bool ret;
+
 	if (cmd == "zadd")
-		test_zadd(option, n);
+		ret = test_zadd(option, n);
 	else if (cmd == "zcard")
-		test_zcard(option, n);
+		ret = test_zcard(option, n);
 	else if (cmd == "zcount")
-		test_zcount(option, n);
+		ret = test_zcount(option, n);
 	else if (cmd == "zincrby")
-		test_zincrby(option, n);
+		ret = test_zincrby(option, n);
 	else if (cmd == "zrange")
-		test_zrange(option, n);
+		ret = test_zrange(option, n);
 	else if (cmd == "zrangebyscore")
-		test_zrangebyscore(option, n);
+		ret = test_zrangebyscore(option, n);
 	else if (cmd == "zrank")
-		test_zrank(option, n);
+		ret = test_zrank(option, n);
 	else if (cmd == "zrem")
-		test_zrem(option, n);
+		ret = test_zrem(option, n);
 	else if (cmd == "zscore")
-		test_zscore(option, n);
+		ret = test_zscore(option, n);
 	else if (cmd == "zunionstore")
-		test_zunionstore(option, n);
+		ret = test_zunionstore(option, n);
 	else if (cmd == "zinterstore")
-		test_zinterstore(option, n);
+		ret = test_zinterstore(option, n);
 	else if (cmd == "zscan")
-		test_zscan(option, n);
+		ret = test_zscan(option, n);
 	else if (cmd == "zrangebylex")
-		test_zrangebylex(option, n);
+		ret = test_zrangebylex(option, n);
 	else if (cmd == "zlexcount")
-		test_zlexcount(option, n);
+		ret = test_zlexcount(option, n);
 	else if (cmd == "zremrangebylex")
-		test_zremrangebylex(option, n);
+		ret = test_zremrangebylex(option, n);
 	else if (cmd == "all")
 	{
-		test_zadd(option, n);
-		test_zcard(option, n);
-		test_zcount(option, n);
-		test_zincrby(option, n);
-		test_zrange(option, n);
-		test_zrangebyscore(option, n);
-		test_zrank(option, n);
-		test_zrem(option, n);
-
-		test_zscore(option, n);
+		ret = test_zadd(option, n)
+			&& test_zcard(option, n)
+			&& test_zcount(option, n)
+			&& test_zincrby(option, n)
+			&& test_zrange(option, n)
+			&& test_zrangebyscore(option, n)
+			&& test_zrank(option, n)
+			&& test_zrem(option, n)
+			&& test_zscore(option, n);
 	}
 	else
+	{
+		ret = false;
 		printf("unknown cmd: %s\r\n", cmd.c_str());
+	}
+
+	if (ret == true)
+		printf("test OK!\r\n");
+	else
+		printf("test failed!\r\n");
 
 #ifdef WIN32
 	printf("enter any key to exit\r\n");

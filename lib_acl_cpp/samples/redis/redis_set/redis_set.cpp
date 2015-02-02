@@ -2,7 +2,7 @@
 
 static acl::string __keypre("set_key");
 
-static void test_sadd(acl::redis_set& option, int n)
+static bool test_sadd(acl::redis_set& option, int n)
 {
 	acl::string key;
 	std::vector<acl::string> members;
@@ -25,16 +25,18 @@ static void test_sadd(acl::redis_set& option, int n)
 		if (ret < 0)
 		{
 			printf("sadd key: %s error\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i >= 10)
 			continue;
 
 		printf("sadd ok, key: %s, ret: %d\r\n", key.c_str(), ret);
 	}
+
+	return true;
 }
 
-static void test_scard(acl::redis_set& option, int n)
+static bool test_scard(acl::redis_set& option, int n)
 {
 	acl::string key;
 
@@ -46,16 +48,18 @@ static void test_scard(acl::redis_set& option, int n)
 		if (ret < 0)
 		{
 			printf("scard key: %s error\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i >= 10)
 			continue;
 
 		printf("scard ok, key: %s, count: %d\r\n", key.c_str(), ret);
 	}
+
+	return true;
 }
 
-static void test_sdiff(acl::redis_set& option, int n)
+static bool test_sdiff(acl::redis_set& option, int n)
 {
 	acl::string key;
 	std::vector<acl::string> keys;
@@ -74,14 +78,16 @@ static void test_sdiff(acl::redis_set& option, int n)
 		if (ret < 0)
 		{
 			printf("sdiff error\r\n");
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("sdiff ok, count: %d\r\n", ret);
 	}
+
+	return true;
 }
 
-static void test_sdiffstore(acl::redis_set& option, int n)
+static bool test_sdiffstore(acl::redis_set& option, int n)
 {
 	acl::string key, dest_key("set_dest_key");
 	std::vector<acl::string> keys;
@@ -100,7 +106,7 @@ static void test_sdiffstore(acl::redis_set& option, int n)
 		{
 			printf("sdiffstore error, dest: %s\r\n",
 				dest_key.c_str());
-			break;
+			return false;
 		}
 		else if (i >= 10)
 			continue;
@@ -108,9 +114,11 @@ static void test_sdiffstore(acl::redis_set& option, int n)
 		printf("sdiffstore ok, dest: %s, count: %d\r\n",
 			dest_key.c_str(), ret);
 	}
+
+	return true;
 }
 
-static void test_sismember(acl::redis_set& option, int n)
+static bool test_sismember(acl::redis_set& option, int n)
 {
 	bool ret;
 	acl::string key, member;
@@ -128,7 +136,7 @@ static void test_sismember(acl::redis_set& option, int n)
 			{
 				printf("sismmeber eof, key: %s, member: %s\r\n",
 					key.c_str(), member.c_str());
-				return;
+				return false;
 			}
 			if (i >= 10)
 				continue;
@@ -138,9 +146,11 @@ static void test_sismember(acl::redis_set& option, int n)
 				member.c_str());
 		}
 	}
+
+	return true;
 }
 
-static void test_smembers(acl::redis_set& option, int n)
+static bool test_smembers(acl::redis_set& option, int n)
 {
 	acl::string key;
 	std::vector<acl::string> members;
@@ -153,16 +163,19 @@ static void test_smembers(acl::redis_set& option, int n)
 		if (ret < 0)
 		{
 			printf("smembers error, key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		else if (i >= 10)
 			continue;
-
-		printf("smembers ok, key: %s, count: %d\r\n", key.c_str(), ret);
+	
+		printf("smembers ok, key: %s, count: %d\r\n",
+			key.c_str(), ret);
 	}
+
+	return true;
 }
 
-static void test_smove(acl::redis_set& option, int n)
+static bool test_smove(acl::redis_set& option, int n)
 {
 	acl::string src_key, dst_key;
 	acl::string member;
@@ -184,7 +197,7 @@ static void test_smove(acl::redis_set& option, int n)
 			{
 				printf("smove error, src: %s, des: %s\r\n",
 					src_key.c_str(), dst_key.c_str());
-				break;
+				return false;
 			}
 			else if (j * i >= 100)
 				continue;
@@ -194,9 +207,11 @@ static void test_smove(acl::redis_set& option, int n)
 				member.c_str(), ret);
 		}
 	}
+
+	return true;
 }
 
-static void test_spop(acl::redis_set& option, int n)
+static bool test_spop(acl::redis_set& option, int n)
 {
 	acl::string key;
 	acl::string member;
@@ -209,7 +224,7 @@ static void test_spop(acl::redis_set& option, int n)
 		if (option.eof())
 		{
 			printf("spop eof, key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		if (i >= 10)
 			continue;
@@ -218,9 +233,11 @@ static void test_spop(acl::redis_set& option, int n)
 			ret ? "ok" : "empty", key.c_str(),
 			ret ? member.c_str() : "");
 	}
+
+	return true;
 }
 
-static void test_srandmember(acl::redis_set& option, int n)
+static bool test_srandmember(acl::redis_set& option, int n)
 {
 	acl::string key;
 	acl::string member;
@@ -232,7 +249,7 @@ static void test_srandmember(acl::redis_set& option, int n)
 		option.reset();
 		ret = option.srandmember(key.c_str(), member);
 		if (option.eof())
-			break;
+			return false;
 
 		if (i >= 10)
 			continue;
@@ -240,9 +257,11 @@ static void test_srandmember(acl::redis_set& option, int n)
 		printf("srandmember %s, key: %s, member: %s\r\n",
 			ret ? "ok" : "empty", key.c_str(), member.c_str());
 	}
+
+	return true;
 }
 
-static void test_srem(acl::redis_set& option, int n)
+static bool test_srem(acl::redis_set& option, int n)
 {
 	acl::string key;
 	acl::string member;
@@ -266,16 +285,18 @@ static void test_srem(acl::redis_set& option, int n)
 		if (ret < 0)
 		{
 			printf("srem error, key: %s\r\n", key.c_str());
-			break;
+			return false;
 		}
 		if (i >= 10)
 			continue;
 
 		printf("srem ok, key: %s, ret: %d\r\n", key.c_str(), ret);
 	}
+
+	return true;
 }
 
-static void test_sunion(acl::redis_set& option ,int n)
+static bool test_sunion(acl::redis_set& option ,int n)
 {
 	acl::string key;
 	std::vector<acl::string> keys;
@@ -294,14 +315,16 @@ static void test_sunion(acl::redis_set& option ,int n)
 		if (ret < 0)
 		{
 			printf("sunion error\r\n");
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("sunion ok, count: %d\r\n", ret);
 	}
+
+	return true;
 }
 
-static void test_sunionstore(acl::redis_set& option, int n)
+static bool test_sunionstore(acl::redis_set& option, int n)
 {
 	acl::string key, dest_key("set_dest_key");
 	std::vector<acl::string> keys;
@@ -320,15 +343,17 @@ static void test_sunionstore(acl::redis_set& option, int n)
 		{
 			printf("sdiffstore error, dest: %s\r\n",
 				dest_key.c_str());
-			break;
+			return false;
 		}
 		else if (i < 10)
 			printf("sdiffstore ok, dest: %s, count: %d\r\n",
 			dest_key.c_str(), ret);
 	}
+
+	return true;
 }
 
-static void test_sscan(acl::redis_set& option, int n)
+static bool test_sscan(acl::redis_set& option, int n)
 {
 	acl::string key;
 	int   ret = 0;
@@ -346,23 +371,27 @@ static void test_sscan(acl::redis_set& option, int n)
 			{
 				printf("sscan failed, key: %s\r\n",
 					key.c_str());
-				break;
+				return false;
 			}
-			if (i < 10)
+
+			if (i >= 10)
 			{
-				cit = result.begin();
-				for (; cit != result.end(); ++cit)
-					printf("%s: %s\r\n", key.c_str(),
-						(*cit).c_str());
+				if (ret == 0)
+					break;
 			}
+			
+			for (cit = result.begin(); cit != result.end(); ++cit)
+				printf("%s: %s\r\n", key.c_str(),
+					(*cit).c_str());
 			if (ret == 0)
 			{
-				printf("sscan over, key: %s\r\n",
-					key.c_str());
+				printf("sscan over, key: %s\r\n", key.c_str());
 				break;
 			}
 		}
 	}
+
+	return true;
 }
 
 static void usage(const char* procname)
@@ -412,50 +441,60 @@ int main(int argc, char* argv[])
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	acl::redis_set option(&client);
 
+	bool ret;
+
 	if (cmd == "sadd")
-		test_sadd(option, n);
+		ret = test_sadd(option, n);
 	else if (cmd == "scard")
-		test_scard(option, n);
+		ret = test_scard(option, n);
 	else if (cmd == "sdiff")
-		test_sdiff(option, n);
+		ret = test_sdiff(option, n);
 	else if (cmd == "sdiffstore")
-		test_sdiffstore(option, n);
+		ret = test_sdiffstore(option, n);
 	else if (cmd == "sismember")
-		test_sismember(option, n);
+		ret = test_sismember(option, n);
 	else if (cmd == "smembers")
-		test_smembers(option, n);
+		ret = test_smembers(option, n);
 	else if (cmd == "smove")
-		test_smove(option, n);
+		ret = test_smove(option, n);
 	else if (cmd == "spop")
-		test_spop(option, n);
+		ret = test_spop(option, n);
 	else if (cmd == "srandmember")
-		test_srandmember(option, n);
+		ret = test_srandmember(option, n);
 	else if (cmd == "srem")
-		test_srem(option, n);
+		ret = test_srem(option, n);
 	else if (cmd == "sunion")
-		test_sunion(option, n);
+		ret = test_sunion(option, n);
 	else if (cmd == "sunionstore")
-		test_sunionstore(option, n);
+		ret = test_sunionstore(option, n);
 	else if (cmd == "sscan")
-		test_sscan(option, n);
+		ret = test_sscan(option, n);
 	else if (cmd == "all")
 	{
-		test_sadd(option, n);
-		test_scard(option, n);
-		test_sdiff(option, n);
-		test_sdiffstore(option, n);
-		test_sismember(option, n);
-		test_smembers(option, n);
-		test_smove(option, n);
-		test_spop(option, n);
-		test_srandmember(option, n);
-		test_sunion(option, n);
-		test_sunionstore(option, n);
-		test_sscan(option, n);
-		test_srem(option, n);
+		ret = test_sadd(option, n)
+			&& test_scard(option, n)
+			&& test_sdiff(option, n)
+			&& test_sdiffstore(option, n)
+			&& test_sismember(option, n)
+			&& test_smembers(option, n)
+			&& test_smove(option, n)
+			&& test_spop(option, n)
+			&& test_srandmember(option, n)
+			&& test_sunion(option, n)
+			&& test_sunionstore(option, n)
+			&& test_sscan(option, n)
+			&& test_srem(option, n);
 	}
 	else
+	{
+		ret = false;
 		printf("unknown cmd: %s\r\n", cmd.c_str());
+	}
+
+	if (ret == true)
+		printf("test OK!\r\n");
+	else
+		printf("test failed!\r\n");
 
 #ifdef WIN32
 	printf("enter any key to exit\r\n");

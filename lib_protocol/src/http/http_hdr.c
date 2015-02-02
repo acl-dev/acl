@@ -601,3 +601,35 @@ void http_hdr_fprint(ACL_VSTREAM *fp, const HTTP_HDR *hh, const char *msg)
 	acl_vstream_fprintf(fp, "--------------- end -----------------\r\n");
 }
 
+void http_hdr_sprint(ACL_VSTRING *bf, const HTTP_HDR *hh, const char *msg)
+{
+	const char *myname = "http_hdr_fprint";
+	HTTP_HDR_ENTRY *entry;
+	int   n, i;
+
+	if (bf == NULL || hh == NULL) {
+		acl_msg_error("%s(%d): input invalid", myname, __LINE__);
+		return;
+	}
+
+	n = acl_array_size(hh->entry_lnk);
+	if (n <= 0) {
+		acl_msg_info("%s, %s(%d): array empty",	myname, __FILE__, __LINE__);
+		return;
+	}
+
+	acl_vstring_sprintf(bf, "------------- in %s - (%s)----------------\r\n",
+		myname, msg ? msg : "begin");
+	entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, 0);
+	if (entry)
+		acl_vstring_sprintf_append(bf, "%s %s\r\n",
+			entry->name, entry->value);
+	for (i = 1; i < n; i++) {
+		entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, i);
+		if (entry == NULL)
+			break;
+		acl_vstring_sprintf_append(bf, "%s: %s\r\n",
+			entry->name, entry->value);
+	}
+	acl_vstring_strcat(bf, "--------------- end -----------------\r\n");
+}

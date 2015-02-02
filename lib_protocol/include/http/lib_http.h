@@ -138,6 +138,14 @@ HTTP_API void http_hdr_print(const HTTP_HDR *hh, const char *msg);
 */
 HTTP_API void http_hdr_fprint(ACL_VSTREAM *fp, const HTTP_HDR *hh, const char *msg);
 
+/**
+ * 调试输出HTTP协议头部数据，调试类接口
+ * @param bf {ACL_VSTRING*} 输出结果将会定向至该缓冲区
+ * @param hh {HTTP_HDR*} 通用HTTP头类型的数据指针，不能为空
+ * @param msg {const char*} 用户希望与头部信息一起输出的自定义信息, 可以为空
+*/
+HTTP_API void http_hdr_sprint(ACL_VSTRING *bf, const HTTP_HDR *hh, const char *msg);
+
 /*-------------------------------- HTTP 请求头操作函数 -----------------------*/
 /* in http_hdr_req.c */
 

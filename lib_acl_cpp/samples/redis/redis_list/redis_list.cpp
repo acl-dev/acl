@@ -6,7 +6,6 @@
  * modify by zsx
  */
 
-//static acl::string __keypre("list");
 static const char *__key = "list";
 static const int max_print_line = 50;
 static const int __value_len = 32;
@@ -19,7 +18,7 @@ do\
 } while (0);
 
 
-static void test_lpush(acl::redis_list& option, int n)
+static bool test_lpush(acl::redis_list& option, int n)
 {
 	acl::string value;
 
@@ -27,102 +26,132 @@ static void test_lpush(acl::redis_list& option, int n)
 	{
 		value.format("%s_%d", __key, i);
 		option.reset();
-		int ret = option.lpush(__key, value.c_str(),NULL);
+		int ret = option.lpush(__key, value.c_str(), NULL);
 		if (ret <= 0)
 		{
 			printf("lpush key: %s error\r\n", __key);
-			break;
+			return false;
 		}
 		else if (i < max_print_line)
 			printf("lpush ok, key:%s ,value:%s \r\n",
-				__key,value.c_str());
+				__key, value.c_str());
 	}
-}
-//int lpush(const char* key, const char* values[], size_t argc);
 
-static void test_lpush2(acl::redis_list& option, int n)
+	return true;
+}
+
+static bool test_lpush2(acl::redis_list& option, int n)
 {
 	char** value = new char *[n+1];
 	for (int i = 0; i < n; i++)
 	{
 		value[i] = new char[__value_len];
-		acl::safe_snprintf(value[i], __value_len,"%s_%d",__key,i);
+		acl::safe_snprintf(value[i], __value_len, "%s_%d", __key, i);
 	}
 	value[n] = NULL;
 
 	option.reset();
 	int ret = option.lpush(__key, (const char**) value, n);
 	if (ret <= 0)
+	{
 		printf("lpush key: %s error\r\n", __key);
-	else
-		printf("lpush key:%s ret : %d ok\r\n",__key, ret);
-	for (int i = 0; i < n; ++i) {
-		delete value[i];
+		return false;
 	}
+	else
+		printf("lpush key:%s ret : %d ok\r\n", __key, ret);
+
+	for (int i = 0; i < n; ++i)
+		delete value[i];
+
 	delete [] value;
+
+	return true;
 }
-//int lpush(const char* key, const std::vector<string>& values);
-static void test_lpush3(acl::redis_list &option, int n)
+
+static bool test_lpush3(acl::redis_list &option, int n)
 {
 	std::vector<acl::string> values;
 	acl::string buf;
-	for (int i = 0; i < n; ++i) {
-		buf.format("%s_%d",__key, i);
+
+	for (int i = 0; i < n; ++i)
+	{
+		buf.format("%s_%d", __key, i);
 		values.push_back(buf);
 	}
+
+	option.reset();
 	int ret = option.lpush(__key, values);
 	if (ret <= 0)
-		printf("lpush key:%s error\r\n",__key);
+	{
+		printf("lpush key:%s error\r\n", __key);
+		return false;
+	}
 	else
-		printf("lpush key:%s ret : %d ok\r\n",__key, ret);
+		printf("lpush key:%s ret : %d ok\r\n", __key, ret);
+
+	return true;
 }
 
-//nt lpush(const char* key, const std::vector<char*>& values);
-static void test_lpush4(acl::redis_list &option, int n)
+static bool test_lpush4(acl::redis_list &option, int n)
 {
 	std::vector<const char *> values;
 	char **value  = new char *[n];
 
-	for (int i  = 0; i < n; ++i) {
+	for (int i  = 0; i < n; ++i)
+	{
 		value[i] = new char[__value_len];
 		acl::safe_snprintf(value[i], __value_len, "%s_%d", __key, i);
 		values.push_back(value[i]);
 	}
+
+	option.reset();
 	int ret = option.lpush(__key, (std::vector<const char*>&) values);
 	if(ret <= 0)
-		printf("lpush key:%s error\r\n",__key);
-	else
-		printf("lpush key:%s ret : %d ok\r\n",__key, ret);
-
-	for (int i = 0; i < n; ++i) {
-		delete value[i];
+	{
+		printf("lpush key:%s error\r\n", __key);
+		return false;
 	}
+	else
+		printf("lpush key:%s ret : %d ok\r\n", __key, ret);
+
+	for (int i = 0; i < n; ++i)
+		delete value[i];
+
 	delete [] value;
+
+	return true;
 }
-//int lpush(const char* key, const std::vector<const char*>& values);
-static void test_lpush5(acl::redis_list &option, int n)
+
+static bool test_lpush5(acl::redis_list &option, int n)
 {
 	std::vector<const char*> values;
 	char **value  = new char *[n];
-	for (int i  = 0; i < n; ++i) {
+	for (int i  = 0; i < n; ++i)
+	{
 		value[i] = new char[__value_len];
 		acl::safe_snprintf(value[i], __value_len, "%s_%d", __key, i);
 		values.push_back(value[i]);
 	}
+
+	option.reset();
 	int ret = option.lpush(__key, values);
 	if(ret <= 0)
-		printf("lpush key:%s error\r\n",__key);
-	else
-		printf("lpush key:%s ret : %d ok\r\n",__key, ret);
-
-	for (int i = 0; i < n; ++i) {
-		delete value[i];
+	{
+		printf("lpush key:%s error\r\n", __key);
+		return false;
 	}
+	else
+		printf("lpush key:%s ret : %d ok\r\n", __key, ret);
+
+	for (int i = 0; i < n; ++i)
+		delete value[i];
+
 	delete [] value;
+
+	return true;
 }
 
-//int lpush(const char* key, const char* values[], size_t lens[],size_t argc);
-static void test_lpush6(acl::redis_list &option, int n)
+static bool test_lpush6(acl::redis_list &option, int n)
 {
 	char **values = new char *[n];
 	size_t *lens = new size_t[n];
@@ -132,71 +161,94 @@ static void test_lpush6(acl::redis_list &option, int n)
 		acl::safe_snprintf(values[i],__value_len, "%s_%d", __key, i);
 		lens[i] = strlen(values[i]);
 	}
-	int ret = option.lpush(__key, (const char**)values, lens, n);
-	
-	if (ret <= 0)
-		printf("lpush key:%s error\r\n", __key);
-	else
-		printf("lpush key:%s ret : %d ok\r\n",__key, ret);
 
-	for (int i = 0; i < n; ++i) {
-		delete values[i];
+	option.reset();
+	int ret = option.lpush(__key, (const char**)values, lens, n);
+	if (ret <= 0)
+	{
+		printf("lpush key:%s error\r\n", __key);
+		return false;
 	}
+	else
+		printf("lpush key:%s ret : %d ok\r\n", __key, ret);
+
+	for (int i = 0; i < n; ++i)
+		delete values[i];
+
 	delete [] values;
+
+	return true;
 }
-//int rpush(const char* key, const char* first_value, ...);
-static void test_rpush(acl::redis_list& option, int n)
+
+static bool test_rpush(acl::redis_list& option, int n)
 {
 	acl::string value;
 	int ret;
-	for (int i = 0; i < n; ++i) {
+	for (int i = 0; i < n; ++i)
+	{
 		value.format("%s_%d",__key, i);
 		option.reset();
 		ret = option.rpush(__key, value.c_str(), NULL);
-		if (ret <= 0) {
-			printf("rpush key:%s error, \r\n",__key);
-			break;
-		}else if (i < max_print_line) {
+		if (ret <= 0)
+		{
+			printf("rpush key:%s error, \r\n", __key);
+			return false;
+		}
+		else if (i < max_print_line)
+		{
 			printf("rpush key:%s, value:%s ok \r\n",
 				__key, value.c_str());
 		}
 	}
+
+	return true;
 }
-//int rpush(const char* key, const char* values[], size_t argc);
-static void  test_rpush2(acl::redis_list& option, int n)
+
+static bool test_rpush2(acl::redis_list& option, int n)
 {
 	char **values = new char *[n];
 	for (int i = 0 ; i < n ; ++ i)
 	{
 		values[i] = new char[__value_len];
-		acl::safe_snprintf(values[i], __value_len, "%s_%d",__key, i);
+		acl::safe_snprintf(values[i], __value_len, "%s_%d", __key, i);
 	}
+
+	option.reset();
 	int ret = option.rpush(__key, (const char **)values, n);
-	if(ret <= 0)
+	if(ret < 0)
 		printf("rpush key:%s error\r\n",__key);
 	else
-		printf("rpush key:%s ret : %d ok\r\n",__key, ret);
+		printf("rpush key:%s ret : %d ok\r\n", __key, ret);
 
 	DELETE_VALUES(values, n);
+
+	return ret > 0 ? true : false;
 }
-//int rpush(const char* key, const std::vector<string>& values);
-static void test_rpush3(acl::redis_list &option, int n)
+
+static bool test_rpush3(acl::redis_list &option, int n)
 {
 	std::vector<acl::string> values;
 	acl::string value;
 	for (int i = 0; i < n; ++i)
 	{
-		value.format("%s_%d",__key, i);
+		value.format("%s_%d", __key, i);
 		values.push_back(value);
 	}
+
+	option.reset();
 	int ret = option.rpush(__key, values);
-	if(ret <= 0)
-		printf("rpush key:%s error",__key);
+	if (ret <= 0)
+	{
+		printf("rpush key:%s error", __key);
+		return false;
+	}
 	else
-		printf("rpush key:%s ret : %d ok\r\n",__key, ret);
+		printf("rpush key:%s ret : %d ok\r\n", __key, ret);
+
+	return true;
 }
-//int rpush(const char* key, const std::vector<char*>& values);
-static void test_rpush4(acl::redis_list &option, int n)
+
+static bool test_rpush4(acl::redis_list &option, int n)
 {
 	std::vector<const char*> values;
 	for (int i = 0; i < n; ++i) 
@@ -205,20 +257,28 @@ static void test_rpush4(acl::redis_list &option, int n)
 		acl::safe_snprintf(value, __value_len, "%s_%d", __key, i);
 		values.push_back(value);
 	}
+
+	option.reset();
 	int ret = option.rpush(__key, (const std::vector<const char*>&) values);
 	if(ret <= 0)
+	{
 		printf("rpush key:%s ok",__key);
+		return false;
+	}
 	else
 		printf("rpush key:%s ret : %d ok\r\n",__key, ret);
 
-	while (values.empty() == false){
+	while (values.empty() == false)
+	{
 		const char *value = values.back();
 		values.pop_back();
 		delete value;
 	}
+
+	return true;
 }
-//int rpush(const char* key, const std::vector<const char*>& values);
-static void test_rpush5(acl::redis_list &option, int n)
+
+static bool test_rpush5(acl::redis_list &option, int n)
 {
 	std::vector<const char*> values;
 	for (int i = 0; i < n; ++i) 
@@ -227,21 +287,25 @@ static void test_rpush5(acl::redis_list &option, int n)
 		acl::safe_snprintf(value, __value_len, "%s_%d", __key, i);
 		values.push_back(value);
 	}
-	int ret = option.rpush(__key, values);
 
+	option.reset();
+	int ret = option.rpush(__key, values);
 	if(ret <= 0)
 		printf("rpush key:%s ok",__key);
 	else
 		printf("rpush key:%s ret : %d ok\r\n",__key, ret);
 
-	while (values.empty() == false){
+	while (values.empty() == false)
+	{
 		const char *value = values.back();
 		values.pop_back();
 		delete value;
 	}
+
+	return ret > 0 ? true : false;
 }
-//int rpush(const char* key, const char* values[], size_t lens[],size_t argc);
-static void test_rpush6(acl::redis_list &option, int n)
+
+static bool test_rpush6(acl::redis_list &option, int n)
 {
 	char **values = new char *[n];
 	size_t *lens = new size_t[n];
@@ -251,53 +315,65 @@ static void test_rpush6(acl::redis_list &option, int n)
 		lens[i] = __value_len;
 		acl::safe_snprintf(values[i], __value_len, "%s_%d", __key, i);
 	}
+
+	option.reset();
 	int ret = option.rpush(__key, (const char**) values,lens, n);
-	if(ret <= 0)
-		printf("rpush key:%s error",__key);
+	if (ret <= 0)
+		printf("rpush key:%s error", __key);
 	else
-		printf("rpush key:%s ret : %d ok\r\n",__key, ret);
+		printf("rpush key:%s ret : %d ok\r\n", __key, ret);
 
 	DELETE_VALUES(values, n);
 	delete []lens;
+
+	return ret > 0 ? true : false;
 }
-static void test_lpushx(acl::redis_list& option, int n)
+
+static bool test_lpushx(acl::redis_list& option, int n)
 {
 	acl::string value;
 	int ret;
 
-	for (int i = 0; i < n; i++) {
+	for (int i = 0; i < n; i++)
+	{
 		value.format("%s_%d", __key, i);
 		option.reset();
 		ret = option.lpushx(__key, value.c_str());
-		if (ret <= 0) {
+		if (ret <= 0)
+		{
 			printf("lpushx key: %s error\r\n", __key);
-			break;
+			return false;
 		}
 		else if (i < max_print_line)
 			printf("lpushx ok, key:%s ,value:%s \r\n",
 				__key,value.c_str());
 	}
+
+	return true;
 }
-//int lpushx(const char* key, const char* value, size_t len);
-static void test_lpushx2(acl::redis_list &option, int n)
+
+static bool test_lpushx2(acl::redis_list &option, int n)
 {
 	acl::string value;
 	for (int i = 0; i < n; ++i)
 	{
-		value.format("%s_%d",__key, i);
+		value.format("%s_%d", __key, i);
 		option.reset();
-		int ret = option.lpushx(__key, value.c_str(),value.length());
-		if(ret <= 0){
+		int ret = option.lpushx(__key, value.c_str(), value.length());
+		if(ret <= 0)
+		{
 			printf("lpushx key:%s error \r\n", __key);
-			break;
+			return false;
 		}
 		else if(i < max_print_line)
-			printf("lpushx key:%s ok",__key);
+			printf("lpushx key:%s ok", __key);
 	}
+
+	return true;
 	
 }
-//int rpushx(const char* key, const char* value);
-static void test_rpushx (acl::redis_list &option, int n)
+
+static bool test_rpushx (acl::redis_list &option, int n)
 {
 	acl::string value;
 	for (int i = 0; i < n; ++i)
@@ -305,17 +381,19 @@ static void test_rpushx (acl::redis_list &option, int n)
 		value.format("%s_%d",__key, i);
 		option.reset();
 		int ret = option.rpushx(__key, value.c_str());
-		if(ret <= 0){
+		if(ret <= 0)
+		{
 			printf("lpushx key:%s error \r\n", __key);
-			break;
+			return false;
 		}
 		else if(i < max_print_line)
-			printf("lpushx key:%s ok",__key);
+			printf("lpushx key:%s ok", __key);
 	}
 
+	return true;
 }
-//int rpushx(const char* key, const char* value, size_t len);
-static void test_rpushx2 (acl::redis_list &option, int n)
+
+static bool test_rpushx2 (acl::redis_list &option, int n)
 {
 	acl::string value;
 	for (int i = 0; i < n; ++i)
@@ -323,70 +401,87 @@ static void test_rpushx2 (acl::redis_list &option, int n)
 		value.format("%s_%d",__key, i);
 		option.reset();
 		int ret = option.rpushx(__key, value.c_str(), value.length());
-		if(ret <= 0){
+		if(ret <= 0)
+		{
 			printf("lpushx key:%s error \r\n", __key);
-			break;
+			return false;
 		}
 		else if(i < max_print_line)
-			printf("lpushx key:%s ok\r\n",__key);
+			printf("lpushx key:%s ok\r\n", __key);
 	}
 
+	return true;
 }
-static void test_lrange(acl::redis_list& option)
+
+static bool test_lrange(acl::redis_list& option)
 {
 	std::vector<acl::string> result;
 
+	option.reset();
 	bool ret = option.lrange(__key, 0, 1000, &result);
-	if (ret == false) {
-		printf("lrang key: %s error\r\n",__key);
-		return;
+	if (ret == false)
+	{
+		printf("lrang key: %s error\r\n", __key);
+		return false;
 	}
 
 	std::vector<acl::string>::const_iterator citr = result.begin();
 	int i = 0;
 	printf("lrang key: %s result:\r\n",__key);
 	
-	for (;citr != result.end(); ++citr) {
+	for (;citr != result.end(); ++citr)
+	{
 		printf("%s\r\n",(*citr).c_str());
 		if (i >= max_print_line)
 			break;
 	}
+
+	return true;
 }
-//int rpop(const char* key, string& buf);
-static void test_rpop(acl::redis_list &option, int n)
+
+static bool test_rpop(acl::redis_list &option, int n)
 {
 	int ret;
 	acl::string buf;
-	for (int i = 0; i < n; ++i) {
+
+	for (int i = 0; i < n; ++i)
+	{
 		option.reset();
 		buf.clear();
 		ret = option.rpop(__key, buf);
-		if (ret <= 0) {
-			printf("rpop key: %s error\r\n",__key);
-			break;
+		if (ret <= 0)
+		{
+			printf("rpop key: %s error\r\n", __key);
+			return false;
 		}
-		printf("rpop key:%s ,buf:%s ok \r\n",__key, buf.c_str());
+		printf("rpop key:%s ,buf:%s ok \r\n", __key, buf.c_str());
 	}
+
+	return true;
 }
-//int lpop(const char* key, string& buf);
-static void test_lpop(acl::redis_list &option, int n)
+
+static bool test_lpop(acl::redis_list &option, int n)
 {
 	int ret;
 	acl::string buf;
-	for (int i = 0; i < n; ++i) {
+
+	for (int i = 0; i < n; ++i)
+	{
 		option.reset();
 		buf.clear();
 		ret = option.lpop(__key, buf);
-		if (ret <= 0) {
-			printf("lpop key: %s error\r\n",__key);
-			break;
+		if (ret <= 0)
+		{
+			printf("lpop key: %s error\r\n", __key);
+			return false;
 		}
-		printf("lpop key:%s ,buf:%s ok \r\n",__key, buf.c_str());
+		printf("lpop key:%s ,buf:%s ok \r\n", __key, buf.c_str());
 	}
+
+	return true;
 }
-/*bool blpop(const std::vector<string>& keys, size_t timeout,
-std::pair<string, string>& result);*/
-static void test_blpop(acl::redis_list &option, int n)
+
+static bool test_blpop(acl::redis_list &option, int n)
 {
 	std::vector<acl::string> keys;
 	acl::string key;
@@ -399,14 +494,18 @@ static void test_blpop(acl::redis_list &option, int n)
 	}
 	bool ret = option.blpop(keys, n, result);
 	if (ret == false)
+	{
 		printf("blpop timeout\r\n");
+		return false;
+	}
 	else
 		printf("blpop key:%s,value:%s ok \r\n",
 			result.first.c_str(),result.second.c_str());
+
+	return true;
 }
-/*bool brpop(const std::vector<string>& keys, size_t timeout,
-std::pair<string, string>& result);*/
-static void test_brpop(acl::redis_list &option, int n)
+
+static bool test_brpop(acl::redis_list &option, int n)
 {
 	std::vector<acl::string> keys;
 	acl::string key;
@@ -417,111 +516,168 @@ static void test_brpop(acl::redis_list &option, int n)
 		key.format("%s_%d",__key, i);
 		keys.push_back(key);
 	}
+
+	option.reset();
 	bool ret = option.brpop(keys, n, result);
 	if (ret == false)
+	{
 		printf("brpop timeout\r\n");
+		return false;
+	}
 	else
 		printf("brpop key:%s,value:%s ok \r\n",
-		result.first.c_str(),result.second.c_str());
+			result.first.c_str(),result.second.c_str());
+
+	return true;
 }
-//bool rpoplpush(const char* src, const char* dst, string* buf = NULL);
-static void test_rpoplpush(acl::redis_list &option, int)
+
+static bool test_rpoplpush(acl::redis_list &option, int)
 {
 	acl::string src("list_src");
 	acl::string dst("list_dst");
 	acl::string buf;
+
+	option.reset();
 	bool ret = option.rpoplpush(src.c_str(), dst.c_str(), &buf);
 	if(ret == false)
+	{
 		printf("rpoplpush src:%s, dst:%s error\r\n",
 			src.c_str(), dst.c_str());
+		return false;
+	}
 	else
 		printf("rpoplpush src:%s, dst:%s buf:%s ok \r\n",
 			src.c_str(), dst.c_str(), buf.c_str());
 
+	return true;
+
 }
-/*bool brpoplpush(const char* src, const char* dst, size_t timeout,
-				string* buf = NULL);*/
-static void test_brpoplpush(acl::redis_list &option, int)
+static bool test_brpoplpush(acl::redis_list &option, int)
 {
 	acl::string src("list1");
 	acl::string dst("list");
 	acl::string buf;
+
+	option.reset();
 	bool ret = option.brpoplpush(src.c_str(), dst.c_str(), 1, &buf);
 	if(ret == false)
-		printf("brpoplpush src:%s, dst:%s timeout\r\n",src.c_str(), 
-			dst.c_str());
+	{
+		printf("brpoplpush src:%s, dst:%s timeout\r\n",
+			src.c_str(), dst.c_str());
+		return false;
+	}
 	else
 		printf("rpoplpush src:%s, dst:%s buf:%s ok \r\n",
 			src.c_str(), dst.c_str(), buf.c_str());
+
+	return true;
 }
 
-//int lrem(const char* key, int count, const char* value);
-void static test_lrem(acl::redis_list &option, int n)
+static bool test_lrem(acl::redis_list &option, int n)
 {
+	option.reset();
 	int ret = option.lrem(__key, n, "list1_1");
-	if (ret <= 0)
-		printf("lrem key:%s,count:%d error\r\n",__key, n);
+	if (ret < 0)
+	{
+		printf("lrem key:%s,count:%d error\r\n", __key, n);
+		return false;
+	}
 	else
 		printf("lrem key:%s,count :%d ok\r\n", __key, n);
+
+	return true;
 }
-//bool ltrim(const char* key, size_t start, size_t end);
-void static test_ltrim(acl::redis_list &option, int n)
+
+static bool test_ltrim(acl::redis_list &option, int n)
 {
+	option.reset();
 	bool ret = option.ltrim(__key, 0, n);
 	if (ret == false)
-
-		printf("ltrim key:%s,start:%d end:%d error\r\n",__key, 0, n);
+	{
+		printf("ltrim key:%s,start:%d end:%d error\r\n", __key, 0, n);
+		return false;
+	}
 	else
-		printf("ltrim key:%s,start:%d end:%d ok\r\n",__key, 0, n);
+		printf("ltrim key:%s,start:%d end:%d ok\r\n", __key, 0, n);
+
+	return true;
 }
-//llen(const char *)
-void static test_llen(acl::redis_list &option, int)
+
+static bool test_llen(acl::redis_list &option, int)
 {
+	option.reset();
 	int len = option.llen(__key);
 	if (len < 0)
+	{
 		printf("llen key:%s error\r\n", __key);
+		return false;
+	}
 	else
-		printf("llen key:%s ret : %d \r\n",__key, len);
+		printf("llen key:%s ret : %d \r\n", __key, len);
+
+	return true;
 }
-/*bool lindex(const char* key, size_t idx, string& buf,
-bool* exist = NULL);*/
-void static test_lindex(acl::redis_list &option, int n)
+
+static bool test_lindex(acl::redis_list &option, int n)
 {
 	acl::string buf;
+
+	option.reset();
 	bool ret = option.lindex(__key, n, buf);
-	if(ret == false)
+	if (ret == false)
+	{
 		printf("lindex key:%s error\r\n",__key);
+		return false;
+	}
 	else
 		printf("lindex key:%s, value:%s, ok\r\n", __key, buf.c_str());
+
+	return true;
 }
-/*bool lset(const char* key, size_t idx, const char* value);*/
-void static test_lset(acl::redis_list &option, int n)
+
+static bool test_lset(acl::redis_list &option, int n)
 {
+	option.reset();
 	bool ret = option.lset(__key, n, "new_value");
-	if(ret == false)
+	if (ret == false)
+	{
 		printf("lset key:%s ,index:%d error\r\n",__key, n);
+		return false;
+	}
 	else
 		printf("lset key:%s ,index:%d ok \r\n",__key, n);
+
+	return true;
 }
-/*int linsert_before(const char* key, const char* pivot,
-const char* value);*/
-void static test_linsert_before(acl::redis_list &option, int)
+
+static bool test_linsert_before(acl::redis_list &option, int)
 {
+	option.reset();
 	int ret  = option.linsert_before(__key, "list1_1","list1_new");
-	if(ret < 0 )
-		printf("linsert_before key:%s,error\r\n",__key);
+	if (ret < 0)
+	{
+		printf("linsert_before key:%s,error\r\n", __key);
+		return false;
+	}
 	else
-		printf("linsert_before key:%s,ok\r\n",__key);
+		printf("linsert_before key:%s,ok\r\n", __key);
+
+	return true;
 }
-/*int linsert_after(const char* key, const char* pivot,
-const char* value);*/
-void static test_linsert_after(acl::redis_list &option, int)
+
+static bool test_linsert_after(acl::redis_list &option, int)
 {
+	option.reset();
 	int ret  = option.linsert_after(__key, "list1_1","list1_new");
-	if(ret < 0 )
-		printf("linsert_before key:%s,error\r\n",__key);
+	if (ret < 0)
+	{
+		printf("linsert_before key:%s,error\r\n", __key);
+		return false;
+	}
 	else
-		printf("linsert_before key:%s,ok\r\n",__key);
+		printf("linsert_before key:%s,ok\r\n", __key);
+
+	return true;
 }
 static void usage(const char* procname)
 {
@@ -571,62 +727,66 @@ int main(int argc, char* argv[])
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	acl::redis_list option(&client);
 	
+	bool ret;
+
 	if (cmd == "lpush")
 	{
-		test_lpush(option, n);
-		test_lpush2(option, n);
-		test_lpush3(option, n);
-		test_lpush4(option, n);
-		test_lpush5(option, n);
-		test_lpush6(option, n);
+		ret = test_lpush(option, n)
+			&& test_lpush2(option, n)
+			&& test_lpush3(option, n)
+			&& test_lpush4(option, n)
+			&& test_lpush5(option, n)
+			&& test_lpush6(option, n);
 	}
 	else if (cmd == "rpush")
-	{
-		test_rpush(option, n);
-		test_rpush2(option, n);
-		test_rpush3(option, n);
-		test_rpush4(option, n);
-		test_rpush5(option, n);
-		test_rpush6(option, n);
-	}
+		ret = test_rpush(option, n)
+			&& test_rpush2(option, n)
+			&& test_rpush3(option, n)
+			&& test_rpush4(option, n)
+			&& test_rpush5(option, n)
+			&& test_rpush6(option, n);
 	else if (cmd == "lpushx")
-	{
-		test_lpushx(option, n);
-		test_lpushx2(option, n);
-	}
+		ret = test_lpushx(option, n) && test_lpushx2(option, n);
 	else if (cmd == "rpushx")
-	{
-		test_rpushx(option, n);
-		test_rpushx2(option, n);
-	}
+		ret = test_rpushx(option, n) && test_rpushx2(option, n);
 	else if (cmd == "lrange")
-		test_lrange(option);
+		ret = test_lrange(option);
 	else if (cmd == "rpop")
-		test_rpop(option, n);
+		ret = test_rpop(option, n);
 	else if (cmd == "lpop")
-		test_lpop(option, n);
+		ret = test_lpop(option, n);
 	else if (cmd == "blpop")
-		test_blpop(option, n);
+		ret = test_blpop(option, n);
 	else if (cmd == "brpop")
-		test_brpop(option, n);
+		ret = test_brpop(option, n);
 	else if (cmd == "rpoplpush")
-		test_rpoplpush(option, n);
+		ret = test_rpoplpush(option, n);
 	else if (cmd == "brpoplpush")
-		test_brpoplpush(option, n);
+		ret = test_brpoplpush(option, n);
 	else if (cmd == "lrem")
-		test_lrem(option, n);
+		ret = test_lrem(option, n);
 	else if (cmd == "ltrim")
-		test_ltrim(option, n);
+		ret = test_ltrim(option, n);
 	else if (cmd == "llen")
-		test_llen(option, n);
+		ret = test_llen(option, n);
 	else if (cmd == "lindex")
-		test_lindex(option, n);
+		ret = test_lindex(option, n);
 	else if (cmd == "lset")
-		test_lset(option, n);
+		ret = test_lset(option, n);
 	else if (cmd == "linsert_before")
-		test_linsert_before(option,1);
+		ret = test_linsert_before(option,1);
 	else if (cmd == "linsert_after")
-		test_linsert_after(option,1);
+		ret = test_linsert_after(option,1);
+	else
+	{
+		ret = false;
+		printf("unknown cmd: %s\r\n", cmd.c_str());
+	}
+
+	if (ret == true)
+		printf("test OK!\r\n");
+	else
+		printf("test failed!\r\n");
 	
 #ifdef WIN32
 	printf("enter any key to exit\r\n");
