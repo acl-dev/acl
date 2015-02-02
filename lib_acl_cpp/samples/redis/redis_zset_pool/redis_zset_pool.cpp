@@ -301,7 +301,7 @@ static void init(const char* cmd, bool check)
 	__big_data = (char*) malloc(__big_data_length);
 	for (size_t i = 0; i < __big_data_length; i++)
 	{
-		ch = i % 255;
+		ch = (char) i % 255;
 		__big_data[i] = ch;
 		md5.update(&ch, 1);
 	}

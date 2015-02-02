@@ -346,6 +346,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\stdlib\charset_conv.cpp">
 				</File>
 				<File
+					RelativePath=".\src\stdlib\dbuf_pool.cpp">
+				</File>
+				<File
 					RelativePath=".\src\stdlib\dns_service.cpp">
 				</File>
 				<File
@@ -722,7 +725,61 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Name="redis"
 				Filter="">
 				<File
+					RelativePath=".\src\redis\redic_connection.cpp">
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_client.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_command.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_hash.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_hyperloglog.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_key.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_list.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_manager.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_pool.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_pubsub.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_request.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_request.hpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_result.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_script.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_server.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_set.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_string.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_transaction.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_zset.cpp">
 				</File>
 			</Filter>
 			<Filter
@@ -861,6 +918,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Filter="">
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\charset_conv.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\dbuf_pool.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\dns_service.hpp">
@@ -1150,10 +1210,52 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\acl_cpp\redis\redis_client.hpp">
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\redis\redis_command.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_connection.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_hash.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_hyperloglog.hpp">
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\redis\redis_key.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\redis\redis_response.hpp">
+					RelativePath=".\include\acl_cpp\redis\redis_list.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_manager.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_pool.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_pubsub.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_result.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_script.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_server.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_set.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_string.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_transaction.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_zset.hpp">
 				</File>
 			</Filter>
 			<Filter

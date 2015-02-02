@@ -12,7 +12,7 @@ class redis_client;
 class redis_result;
 
 /**
- * 除 PSETEX 外所有的字符串对象的命令都已实现
+ * 所有的字符串对象的命令都已实现
  */
 class ACL_CPP_API redis_string : public redis_command
 {
@@ -33,7 +33,7 @@ public:
 		const char* value, size_t value_len);
 
 	/**
-	 * 将值 value 关联到 key ，并将 key 的生存时间设为 seconds (以秒为单位)，
+	 * 将值 value 关联到 key ，并将 key 的生存时间设为 timeout (以秒为单位)，
 	 * 如果 key 已经存在， SETEX 命令将覆写旧值
 	 * @param key {const char*} 字符串对象的 key
 	 * @param value {const char*} 字符串对象的 value
@@ -42,6 +42,18 @@ public:
 	 */
 	bool setex(const char* key, const char* value, int timeout);
 	bool setex(const char* key, size_t key_len, const char* value,
+		size_t value_len, int timeout);
+
+	/**
+	 * 将值 value 关联到 key ，并将 key 的生存时间设为 timeout (以毫秒为单位)，
+	 * 如果 key 已经存在， SETEX 命令将覆写旧值
+	 * @param key {const char*} 字符串对象的 key
+	 * @param value {const char*} 字符串对象的 value
+	 * @param timeout {int} 过期值，单位为毫秒
+	 * @return {bool} 操作是否成功，返回 false 表示出错或该 key 对象非字符串对象
+	 */
+	bool psetex(const char* key, const char* value, int timeout);
+	bool psetex(const char* key, size_t key_len, const char* value,
 		size_t value_len, int timeout);
 
 	/**

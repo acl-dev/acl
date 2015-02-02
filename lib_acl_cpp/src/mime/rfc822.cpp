@@ -427,7 +427,7 @@ void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 		p->tm_sec,
 		offset);
 #else
-	snprintf(buf, size, "%s, %02d %s %04d %02d:%02d:%02d %+05d (CST)",
+	safe_snprintf(buf, size, "%s, %02d %s %04d %02d:%02d:%02d %+05d (CST)",
 		wdays[p->tm_wday],
 		p->tm_mday,
 		months[p->tm_mon],

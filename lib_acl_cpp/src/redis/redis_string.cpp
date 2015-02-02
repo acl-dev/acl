@@ -37,8 +37,10 @@ bool redis_string::set(const char* key, size_t key_len,
 
 	argv[0] = "SET";
 	lens[0] = sizeof("SET") - 1;
+
 	argv[1] = key;
 	lens[1] = key_len;
+
 	argv[2] = value;
 	lens[2] = value_len;
 
@@ -59,6 +61,36 @@ bool redis_string::setex(const char* key, size_t key_len, const char* value,
 
 	argv[0] = "SETEX";
 	lens[0] = sizeof("SETEX") - 1;
+
+	argv[1] = key;
+	lens[1] = key_len;
+
+	char buf[INT_LEN];
+	(void) safe_snprintf(buf, sizeof(buf), "%d", timeout);
+	argv[2] = buf;
+	lens[2] = strlen(buf);
+
+	argv[3] = value;
+	lens[3] = value_len;
+
+	conn_->build_request(4, argv, lens);
+	return conn_->get_status();
+}
+
+bool redis_string::psetex(const char* key, const char* value, int timeout)
+{
+	return psetex(key, strlen(key), value, strlen(value), timeout);
+}
+
+bool redis_string::psetex(const char* key, size_t key_len, const char* value,
+	size_t value_len, int timeout)
+{
+	const char* argv[4];
+	size_t lens[4];
+
+	argv[0] = "PSETEX";
+	lens[0] = sizeof("PSETEX") - 1;
+
 	argv[1] = key;
 	lens[1] = key_len;
 
@@ -87,8 +119,10 @@ int redis_string::setnx(const char* key, size_t key_len,
 
 	argv[0] = "SETNX";
 	lens[0] = sizeof("SETNX") - 1;
+
 	argv[1] = key;
 	lens[1] = key_len;
+
 	argv[2] = value;
 	lens[2] = value_len;
 
@@ -108,8 +142,10 @@ int redis_string::append(const char* key, const char* value, size_t size)
 
 	argv[0] = "APPEND";
 	lens[0] = sizeof("APPEND") - 1;
+
 	argv[1] = key;
 	lens[1] = strlen(key);
+
 	argv[2] = value;
 	lens[2] = size;
 
@@ -129,6 +165,7 @@ bool redis_string::get(const char* key, size_t len, string& buf)
 
 	argv[0] = "GET";
 	lens[0] = sizeof("GET") - 1;
+
 	argv[1] = key;
 	lens[1] = len;
 
@@ -148,6 +185,7 @@ const redis_result* redis_string::get(const char* key, size_t len)
 
 	argv[0] = "GET";
 	lens[0] = sizeof("GET") - 1;
+
 	argv[1] = key;
 	lens[1] = len;
 
@@ -173,8 +211,10 @@ bool redis_string::getset(const char* key, size_t key_len,
 
 	argv[0] = "GETSET";
 	lens[0] = sizeof("GETSET") - 1;
+
 	argv[1] = key;
 	lens[1] = key_len;
+
 	argv[2] = value;
 	lens[2] = value_len;
 
@@ -196,6 +236,7 @@ int redis_string::get_strlen(const char* key, size_t len)
 
 	argv[0] = "STRLEN";
 	lens[0] = sizeof("STRLEN") - 1;
+
 	argv[1] = key;
 	lens[1] = len;
 
@@ -216,6 +257,7 @@ int redis_string::setrange(const char* key, size_t key_len, unsigned offset,
 
 	argv[0] = "SETRANGE";
 	lens[0] = sizeof("SETRANGE") - 1;
+
 	argv[1] = key;
 	lens[1] = key_len;
 
@@ -244,6 +286,7 @@ bool redis_string::getrange(const char* key, size_t key_len,
 
 	argv[0] = "GETRANGE";
 	lens[0] = sizeof("GETRANGE") - 1;
+
 	argv[1] = key;
 	lens[1] = key_len;
 
@@ -275,6 +318,7 @@ bool redis_string::setbit(const char* key, size_t len,
 
 	argv[0] = "SETBIT";
 	lens[0] = sizeof("SETBIT") - 1;
+
 	argv[1] = key;
 	lens[1] = len;
 
@@ -303,6 +347,7 @@ bool redis_string::getbit(const char* key, size_t len,
 
 	argv[0] = "GETBIT";
 	lens[0] = sizeof("GETBIT") - 1;
+
 	argv[1] = key;
 	lens[1] = len;
 
@@ -331,6 +376,7 @@ int redis_string::bitcount(const char* key, size_t len)
 
 	argv[0] = "BITCOUNT";
 	lens[0] = sizeof("BITCOUNT") - 1;
+
 	argv[1] = key;
 	lens[1] = len;
 
@@ -350,6 +396,7 @@ int redis_string::bitcount(const char* key, size_t len, int start, int end)
 
 	argv[0] = "BITCOUNT";
 	lens[0] = sizeof("BITCOUNT") - 1;
+
 	argv[1] = key;
 	lens[1] = len;
 
@@ -458,8 +505,10 @@ int redis_string::bitop(const char* op, const char* destkey,
 
 	argv[0] = "BITOP";
 	lens[0] = sizeof("BITOP") - 1;
+
 	argv[1] = op;
 	lens[1] = strlen(op);
+
 	argv[2] = destkey;
 	lens[2] = strlen(destkey);
 
@@ -484,8 +533,10 @@ int redis_string::bitop(const char* op, const char* destkey,
 
 	argv[0] = "BITOP";
 	lens[0] = sizeof("BITOP") - 1;
+
 	argv[1] = op;
 	lens[1] = strlen(op);
+
 	argv[2] = destkey;
 	lens[2] = strlen(destkey);
 
@@ -510,8 +561,10 @@ int redis_string::bitop(const char* op, const char* destkey,
 
 	argv[0] = "BITOP";
 	lens[0] = sizeof("BITOP") - 1;
+
 	argv[1] = op;
 	lens[1] = strlen(op);
+
 	argv[2] = destkey;
 	lens[2] = strlen(destkey);
 
@@ -687,6 +740,7 @@ bool redis_string::incrbyfloat(const char* key, double inc,
 
 	argv[0] = "INCRBYFLOAT";
 	lens[0] = sizeof("INCRBYFLOAT") - 1;
+
 	argv[1] = key;
 	lens[1] = strlen(key);
 
@@ -724,6 +778,7 @@ bool redis_string::incoper(const char* cmd, const char* key, long long int n,
 
 	argv[0] = cmd;
 	lens[0] = strlen(cmd);
+
 	argv[1] = key;
 	lens[1] = strlen(key);
 

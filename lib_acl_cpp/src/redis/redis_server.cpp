@@ -20,6 +20,18 @@ redis_server::~redis_server()
 
 }
 
+bool redis_server::bgrewriteaof()
+{
+	const char* argv[1];
+	size_t lens[1];
+
+	argv[0] = "BGREWRITEAOF";
+	lens[0] = sizeof("BGREWRITEAOF") - 1;
+
+	conn_->build_request(1, argv, lens);
+	return conn_->get_status("Background");
+}
+
 bool redis_server::bgsave()
 {
 	const char* argv[1];
@@ -225,7 +237,7 @@ time_t redis_server::lastsave()
 	lens[0] = sizeof("LASTSAVE") - 1;
 
 	conn_->build_request(1, argv, lens);
-	return conn_->get_number64();
+	return (time_t) conn_->get_number64();
 }
 
 bool redis_server::monitor()
@@ -305,6 +317,62 @@ bool redis_server::slaveof(const char* ip, int port)
 	lens[2] = strlen(port_s);
 
 	conn_->build_request(3, argv, lens);
+	return conn_->get_status();
+}
+
+const redis_result* redis_server::slowlog_get(int number /* = 0 */)
+{
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "SLOWLOG";
+	lens[0] = sizeof("SLOWLOG") - 1;
+
+	argv[1] = "GET";
+	lens[1] = sizeof("GET") - 1;
+
+	size_t argc = 2;
+
+	char buf[INT_LEN];
+	if (number > 0)
+	{
+		safe_snprintf(buf, sizeof(buf), "%d", number);
+		argv[2] = buf;
+		lens[2] = strlen(buf);
+		argc++;
+	}
+
+	conn_->build_request(argc, argv, lens);
+	return conn_->run();
+}
+
+int redis_server::slowlog_len()
+{
+	const char* argv[2];
+	size_t lens[2];
+
+	argv[0] = "SLOWLOG";
+	lens[0] = sizeof("SLOWLOG") - 1;
+
+	argv[1] = "LEN";
+	lens[1] = sizeof("LEN") - 1;
+
+	conn_->build_request(2, argv, lens);
+	return conn_->get_number();
+}
+
+bool redis_server::slowlog_reset()
+{
+	const char* argv[2];
+	size_t lens[2];
+
+	argv[0] = "SLOWLOG";
+	lens[0] = sizeof("SLOWLOG") - 1;
+
+	argv[1] = "RESET";
+	lens[1] = sizeof("RESET") - 1;
+
+	conn_->build_request(2, argv, lens);
 	return conn_->get_status();
 }
 
