@@ -1,7 +1,7 @@
 # acl -- one advanced C/C++ lib for UNIX and WINDOWS
 
 ## Ò»¡¢ÃèÊö
-acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·þÎñÆ÷±à³Ì¿ò¼Ü£¬Í¬Ê±Ìá¹©¸ü¶àµÄÊµÓÃ¹¦ÄÜ¿â¡£Í¨¹ý¸Ã¿â£¬ÓÃ»§¿ÉÒÔ·Ç³£ÈÝÒ×µØ±àÐ´Ö§³Ö¶àÖÖÄ£Ê½(¶àÏß³Ì¡¢¶à½ø³Ì¡¢·Ç×èÈû¡¢´¥·¢Æ÷¡¢UDP·½Ê½)µÄ·þÎñÆ÷³ÌÐò£¬WEB Ó¦ÓÃ³ÌÐò£¬Êý¾Ý¿âÓ¦ÓÃ³ÌÐò¡£´ËÍâ£¬¸Ã¿â»¹Ìá¹©ÁË³£¼ûÓ¦ÓÃµÄ¿Í»§¶ËÍ¨ÐÅ¿â£¨Èç£ºHTTP¡¢SMTP¡¢ICMP¡¢memcache¡¢beanstalk¡¢handler socket£©£¬³£¼ûÁ÷Ê½±à½âÂë¿â£ºXML/JSON/MIME/BASE64/UUCODE/QPCODE/RFC2047 etc¡£
+acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·þÎñÆ÷±à³Ì¿ò¼Ü£¬Í¬Ê±Ìá¹©¸ü¶àµÄÊµÓÃ¹¦ÄÜ¿â¡£Í¨¹ý¸Ã¿â£¬ÓÃ»§¿ÉÒÔ·Ç³£ÈÝÒ×µØ±àÐ´Ö§³Ö¶àÖÖÄ£Ê½(¶àÏß³Ì¡¢¶à½ø³Ì¡¢·Ç×èÈû¡¢´¥·¢Æ÷¡¢UDP·½Ê½)µÄ·þÎñÆ÷³ÌÐò£¬WEB Ó¦ÓÃ³ÌÐò£¬Êý¾Ý¿âÓ¦ÓÃ³ÌÐò¡£´ËÍâ£¬¸Ã¿â»¹Ìá¹©ÁË³£¼ûÓ¦ÓÃµÄ¿Í»§¶ËÍ¨ÐÅ¿â£¨Èç£ºHTTP¡¢SMTP¡¢ICMP¡¢redis¡¢memcache¡¢beanstalk¡¢handler socket£©£¬³£¼ûÁ÷Ê½±à½âÂë¿â£ºXML/JSON/MIME/BASE64/UUCODE/QPCODE/RFC2047 etc¡£
 
 ### 1.1¡¢¿â×é³É
 ±¾¹¤³ÌÖ÷Òª°üº¬ 5 ¸ö¿â¼°´óÁ¿Ê¾Àý¡£5 ¸ö¿âµÄËµÃ÷ÈçÏÂ£º
@@ -141,13 +141,14 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 -    6 hsocket: ÊµÏÖÁËÍêÕûµÄ handler-socket ¿Í»§¶ËÍ¨ÐÅ¿â£»
 -    **7 mime: Ö§³ÖÍêÕûµÄÓëÓÊ¼þ±àÂëÏà¹ØµÄ¿â(ÓÊ¼þµÄ rfc2045-rfc2047/rfc822/base64/uucode ±àÂë¼°½âÂë¿â).**
 -    **8 master: ·â×°ÁË C ¿âµÄ·þÎñÆ÷¿ò¼Ü¿â**
--    9 beanstalk: ÏûÏ¢¶ÓÁÐÓ¦ÓÃ beanstalkd µÄ¿Í»§¶ËÍ¨ÐÅ¿â
+-    9 beanstalk: ÏûÏ¢¶ÓÁÐÓ¦ÓÃ beanstalkd µÄ¿Í»§¶ËÍ¨ÐÅ¿â£¬Ö§³ÖÁ¬½Ó³Ø
 -    10 connpool: Í¨ÓÃµÄÁ¬½Ó³Ø¿â
--    11 hscoket: mysql ²å¼þ handle-socket µÄ¿Í»§¶ËÍ¨ÐÅ¿â
--    12 memcache: memcached Ó¦ÓÃµÄ¿Í»§¶Ë¿â
+-    11 hscoket: mysql ²å¼þ handle-socket µÄ¿Í»§¶ËÍ¨ÐÅ¿â£¬Ö§³ÖÁ¬½Ó³Ø
+-    12 memcache: memcached Ó¦ÓÃµÄ¿Í»§¶Ë¿â£¬Ö§³ÖÁ¬½Ó³Ø¼°Á¬½Ó³Ø¼¯Èº¹ÜÀí
 -    13 queue: ´ÅÅÌÎÄ¼þ¶ÓÁÐ²Ù×÷¿â
 -    14 ipc: ×èÈû/·Ç×èÈûÍ¨ÐÅÕûºÏ¿â
 -    15 session: HTTP »á»°¿â
+-    16 redis: ÍêÕûÊµÏÖÁË redis Ð­ÒéµÄ¿Í»§¶ËÍ¨ÐÅ¿â(×Ü¹² 12 ¸ö´óÀà£¬150 ¶à¸öÃüÁî)£¬Ö§³ÖÁ¬½Ó³Ø¼°Á¬½Ó³Ø¼¯Èº¹ÜÀí
 
 ### 3.4¡¢Í¼Àý
 *    ÀàË÷ÒýÍ¼£º
