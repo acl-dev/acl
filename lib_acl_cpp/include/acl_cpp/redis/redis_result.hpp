@@ -65,15 +65,21 @@ public:
 
 	/**
 	 * 当返回值为 REDIS_RESULT_STATUS 类型时，本方法返回状态信息
-	 * @return {const char*} 返回 NULL 表示出错
+	 * @return {const char*} 返回 "" 表示出错
 	 */
 	const char* get_status() const;
+
+	/**
+	 * 当出错时返回值为 REDIS_RESULT_STATUS 类型，本方法返回出错信息
+	 * @return {const char*} 返回空串 "" 表示没有出错信息
+	 */
+	const char* get_error() const;
 
 	/**
 	 * 返回对应下标的数据(当数据类型非 REDIS_RESULT_ARRAY 时）
 	 * @param i {size_t} 数组下标
 	 * @param len {size_t*} 当为非 NULL 指针时存储所返回数据的长度
-	 * @return {const char*}
+	 * @return {const char*} 返回 NULL 表示下标越界
 	 */
 	const char* get(size_t i, size_t* len = NULL) const;
 

@@ -26,7 +26,7 @@ public:
 	~handle_io()
 	{
 		delete http_;
-		std::cout << "delete io_callback now ..." << std::endl;
+		printf("delete io_callback now ...\r\n");
 	}
 
 	bool write_callback()
@@ -39,7 +39,7 @@ public:
 	 */
 	void close_callback()
 	{
-		std::cout << "Closed now." << std::endl;
+		printf("Closed now.\r\n");
 
 		// 必须在此处删除该动态分配的回调类对象以防止内存泄露
 		delete this;
@@ -51,7 +51,7 @@ public:
 	 */
 	bool timeout_callback()
 	{
-		std::cout << "Timeout ..." << std::endl;
+		printf("Timeout ...\r\n");
 		return (false);
 	}
 
@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
 	// 监听指定的地址
 	if (sstream->open(addr) == false)
 	{
-		std::cout << "open " << addr << " error!" << std::endl;
+		printf("open %s error!\r\n", addr);
 		sstream->close();
 		// XXX: 为了保证能关闭监听流，应在此处再 check 一下
 		handle->check();
@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
 	// 将回调处理类对象与异步监听流绑定
 	sstream->add_accept_callback(&callback);
 
-	std::cout << "Listen: " << addr << " ok!" << std::endl;
+	printf("Listen: %s ok!\r\n", addr);
 
 	time_t last = time(NULL), now;
 	while (true)
@@ -252,7 +252,7 @@ int main(int argc, char* argv[])
 		// 如果返回 false 则表示不再继续，需要退出
 		if (handle->check() == false)
 		{
-			std::cout << "aio_server stop now ..." << std::endl;
+			printf("aio_server stop now ...\r\n");
 			break;
 		}
 

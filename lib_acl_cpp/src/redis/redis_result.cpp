@@ -106,7 +106,7 @@ int redis_result::get_integer(bool* success /* = NULL */) const
 	if (result_type_ != REDIS_RESULT_INTEGER)
 		return -1;
 	const char* ptr = get(0);
-	if (ptr == NULL)
+	if (ptr == NULL || *ptr == 0)
 		return -1;
 	if (success)
 		*success = true;
@@ -120,7 +120,7 @@ long long int redis_result::get_integer64(bool* success /* = NULL */) const
 	if (result_type_ != REDIS_RESULT_INTEGER)
 		return -1;
 	const char* ptr = get(0);
-	if (ptr == NULL)
+	if (ptr == NULL || *ptr == 0)
 		return -1;
 	if (success)
 		*success = true;
@@ -130,8 +130,17 @@ long long int redis_result::get_integer64(bool* success /* = NULL */) const
 const char* redis_result::get_status() const
 {
 	if (result_type_ != REDIS_RESULT_STATUS)
-		return NULL;
-	return get(0);
+		return "";
+	const char* ptr = get(0);
+	return ptr == NULL ? "" : ptr;
+}
+
+const char* redis_result::get_error() const
+{
+	if (result_type_ != REDIS_RESULT_ERROR)
+		return "";
+	const char* ptr = get(0);
+	return ptr == NULL ? "" : ptr;
 }
 
 const char* redis_result::get(size_t i, size_t* len /* = NULL */) const

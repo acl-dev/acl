@@ -259,7 +259,7 @@ bool redis_server::get_command(string& buf)
 	if (result == NULL || result->get_type() != REDIS_RESULT_STATUS)
 		return false;
 	const char* status = result->get_status();
-	if (status == NULL)
+	if (status == NULL || *status == '\0')
 		return false;
 	buf = status;
 	return true;

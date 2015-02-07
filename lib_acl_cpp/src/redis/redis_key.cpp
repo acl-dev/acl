@@ -352,7 +352,7 @@ redis_key_t redis_key::type(const char* key)
 
 	conn_->build_request(2, argv, lens);
 	const char* ptr = conn_->get_status_string();
-	if (ptr == NULL)
+	if (ptr == NULL || *ptr == 0)
 		return REDIS_KEY_UNKNOWN;
 
 	if (strcasecmp(ptr, "none") == 0)

@@ -130,7 +130,7 @@ template <class T>
 class singleton : public singleton_module
 {
 public:
-	ACL_CPP_API static T& get_instance()
+	static T& get_instance()
 	{
 		static singleton_wrapper< T > t;
 		// refer to instance, causing it to be instantiated (and
@@ -140,13 +140,13 @@ public:
 		return static_cast<T &>(t);
 	}
 
-	ACL_CPP_API static bool is_destroyed()
+	static bool is_destroyed()
 	{
 		return singleton_wrapper< T >::destroyed_;
 	}
 
 private:
-	ACL_CPP_API static T& instance_;
+	static T& instance_;
 	// include this to provoke instantiation at pre-execution time
 	static void use(T const &) {}
 };

@@ -491,7 +491,7 @@ bool redis_client::get_status(const char* success /* = "OK" */)
 	if (result == NULL || result->get_type() != REDIS_RESULT_STATUS)
 		return false;
 	const char* status = result->get_status();
-	if (status == NULL)
+	if (status == NULL || *status == '\0')
 		return false;
 	else if (success == NULL || strcasecmp(status, success) == 0)
 		return true;
