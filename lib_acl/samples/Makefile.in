@@ -9,7 +9,8 @@ CFLAGS = -c -g -W -Wall -Wcast-qual \
 -Wshadow \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \
--D_USE_FAST_MACRO
+-D_USE_FAST_MACRO \
+-Wno-invalid-source-encoding
 
 # -Wcast-align
 #CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \

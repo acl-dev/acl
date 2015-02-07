@@ -54,6 +54,7 @@ all:
 	@(cd unit_test; make $(MAKE_ARGS))
 	@(cd lib_acl/samples; make)
 	@(cd lib_protocol/samples; make)
+	@(cd lib_acl_cpp/samples; make)
 #	@(cd lib_dict; make $(MAKE_ARGS))
 #	@(cd lib_tls; make $(MAKE_ARGS))
 clean:

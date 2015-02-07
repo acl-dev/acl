@@ -1,7 +1,7 @@
 SHELL = /bin/sh
-CC      = gcc
+#CC      = gcc
 #CC      = g++
-#CC	= ${MY_ENV_CC}
+CC	= ${MY_ENV_CC}
 AR      = ar
 ARFL    = rv
 #ARFL    = cru
@@ -19,7 +19,8 @@ CFLAGS = -c -g -W \
 -Wpointer-arith \
 -Waggregate-return \
 -Wmissing-prototypes \
--Wno-long-long
+-Wno-long-long \
+-Wno-invalid-source-encoding
 # -Wcast-align
 ###########################################################
 #Check system:

@@ -130,6 +130,7 @@ DATE_NOW = 20`date +%y`.`date +%m`.`date +%d`
 STATIC_LIBNAME = lib_acl_cpp.a
 SHARED_LIBNAME = lib_acl_cpp.so
 
+lib: static
 all: static shared sample
 
 $(shell mkdir -p $(DEF_PATH_DST))
