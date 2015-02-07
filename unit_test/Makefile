@@ -19,8 +19,8 @@ CFLAGS = -c -g -W \
 -Wpointer-arith \
 -Waggregate-return \
 -Wmissing-prototypes \
--Wno-long-long \
--Wno-invalid-source-encoding
+-Wno-long-long
+#-Wno-invalid-source-encoding
 # -Wcast-align
 ###########################################################
 #Check system:

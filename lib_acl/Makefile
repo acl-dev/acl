@@ -27,9 +27,9 @@ CFLAGS = -c -g -W \
 -Wuninitialized \
 -D_POSIX_PTHREAD_SEMANTICS \
 -pedantic \
--fPIC \
--Wno-invalid-source-encoding \
--Wno-extended-offsetof
+-fPIC
+#-Wno-invalid-source-encoding \
+#-Wno-extended-offsetof
 #-Wcast-align
 #-Winvalid-pch -DACL_PREPARE_COMPILE
 

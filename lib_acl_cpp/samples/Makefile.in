@@ -9,8 +9,8 @@ CFLAGS = -c -g -W \
 -Wpointer-arith \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \
--D_USE_FAST_MACRO \
--Wno-invalid-source-encoding
+-D_USE_FAST_MACRO
+#-Wno-invalid-source-encoding
 
 #-Wcast-qual
 # -Wcast-align
