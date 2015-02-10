@@ -39,12 +39,58 @@ bool redis_command::eof() const
 
 size_t redis_command::get_size() const
 {
-	return conn_ ? conn_->get_size() : 0;
+	if (conn_ == NULL)
+		return 0;
+	const redis_result* result = conn_->get_result();
+	return result ? result->get_size() : 0;
 }
 
-const redis_result* redis_command::get_result() const
+redis_result_t redis_command::get_type() const
 {
-	return conn_ ? conn_->get_result() : NULL;
+	if (conn_ == NULL)
+		return REDIS_RESULT_UNKOWN;
+	const redis_result* result = conn_->get_result();
+	return result ? result->get_type() : REDIS_RESULT_UNKOWN;
+}
+
+int redis_command::get_integer(bool* success /* = NULL */) const
+{
+	if (conn_ == NULL)
+		return 0;
+	const redis_result* result = conn_->get_result();
+	return result ? result->get_integer(success) : 0;
+}
+
+long long int redis_command::get_integer64(bool* success /* = NULL */) const
+{
+	if (conn_ == NULL)
+		return 0;
+	const redis_result* result = conn_->get_result();
+	return result ? result->get_integer64(success) : 0;
+}
+
+const char* redis_command::get(size_t i, size_t* len /* = NULL */) const
+{
+	if (conn_ == NULL)
+		return NULL;
+	const redis_result* result = conn_->get_result();
+	return result ? result->get(i, len) : NULL;
+}
+
+const char* redis_command::get_status() const
+{
+	if (conn_ == NULL)
+		return "";
+	const redis_result* result = conn_->get_result();
+	return result ? result->get_status() : "";
+}
+
+const char* redis_command::get_error() const
+{
+	if (conn_ == NULL)
+		return "";
+	const redis_result* result = conn_->get_result();
+	return result ? result->get_error() : "";
 }
 
 const redis_result* redis_command::get_child(size_t i) const
@@ -55,6 +101,11 @@ const redis_result* redis_command::get_child(size_t i) const
 const char* redis_command::get_value(size_t i, size_t* len /* = NULL */) const
 {
 	return conn_ ? conn_->get_value(i, len) : NULL;
+}
+
+const redis_result* redis_command::get_result() const
+{
+	return conn_ ? conn_->get_result() : NULL;
 }
 
 const redis_result** redis_command::scan_keys(const char* cmd, const char* key,

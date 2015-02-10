@@ -51,12 +51,13 @@ static void __service(ACL_VSTREAM *stream, char *service acl_unused,
 				__FILE__, __LINE__, myname, strerror(errno));
 			break;
 		}
+		if (strncasecmp(buf, "quit", 4) == 0)
+			break;
 	} while (1);
 }
 
 static void __pre_jail_init(char *name acl_unused, char **argv acl_unused)
 {
-	acl_mempool_open(512000000, 1);
 }
 
 static void __post_jail_init(char *name acl_unused, char **argv acl_unused)

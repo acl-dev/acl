@@ -704,8 +704,11 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 			}
 		}
 		acl_watchdog_start(watchdog);
-		delay_sec = loop ? loop(__service_ctx) : -1;
-		acl_event_set_delay_sec(__eventp, delay_sec);
+
+		if (loop != NULL) {
+			delay_sec = loop(__service_ctx);
+			acl_event_set_delay_sec(__eventp, delay_sec);
+		}
 		acl_event_loop(__eventp);
 	}
 

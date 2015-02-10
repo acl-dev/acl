@@ -43,6 +43,17 @@ ifeq ($(findstring gcc, $(CC)), gcc)
 	CFLAGS += -Wstrict-prototypes
 endif
 
+ifeq ($(findstring clang, $(CC)), clang)
+	CFLAGS += -Wstrict-prototypes \
+		  -Wno-invalid-source-encoding \
+		  -Wno-extended-offsetof
+endif
+
+ifeq ($(findstring clang++, $(CC)), clang++)
+	CFLAGS += -Wno-invalid-source-encoding \
+		  -Wno-extended-offsetof
+endif
+
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD -pedantic
@@ -51,7 +62,8 @@ endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
-	CFLAGS += -DMACOSX -Wno-invalid-source-encoding -Wno-extended-offsetof
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
+		  -Wno-extended-offsetof
 	UNIXTYPE = FREEBSD
 endif
 

@@ -131,8 +131,8 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 		if (serv->avail_proc > 0 && (serv->prefork_proc <= 0
 			|| serv->avail_proc > serv->prefork_proc))
 		{
-			acl_msg_warn("%s(%d)->%s: processes available: %d"
-				", processes prefork: %d", __FILE__, __LINE__,
+			acl_msg_warn("%s(%d)->%s: processes available: %d, "
+				"processes prefork: %d", __FILE__, __LINE__,
 				myname, serv->avail_proc, serv->prefork_proc);
 		}
 	}

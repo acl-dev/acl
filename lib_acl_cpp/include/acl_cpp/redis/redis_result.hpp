@@ -7,6 +7,7 @@ namespace acl
 
 typedef enum
 {
+	REDIS_RESULT_UNKOWN,
 	REDIS_RESULT_NIL,
 	REDIS_RESULT_ERROR,
 	REDIS_RESULT_STATUS,
@@ -24,7 +25,8 @@ public:
 	redis_result(dbuf_pool* pool);
 
 	/**
-	 * 重载了 new/delete 操作符，在 new 新对象时，使内存的分配在内存池进行分配
+	 * 重载了 new/delete 操作符，在 new 新对象时，使内存的分配在
+	 * 内存池进行分配
 	 */
 	void *operator new(size_t size, dbuf_pool* pool);
 	void operator delete(void* ptr, dbuf_pool* pool);
@@ -70,7 +72,7 @@ public:
 	const char* get_status() const;
 
 	/**
-	 * 当出错时返回值为 REDIS_RESULT_STATUS 类型，本方法返回出错信息
+	 * 当出错时返回值为 REDIS_RESULT_ERROR 类型，本方法返回出错信息
 	 * @return {const char*} 返回空串 "" 表示没有出错信息
 	 */
 	const char* get_error() const;
@@ -108,8 +110,8 @@ public:
 	size_t get_length() const;
 
 	/**
-	 * 当数据类型为 REDIS_RESULT_STRING 类型时，该函数将按内存块存放的数据存储至
-	 * 连接内存中，但需要注意防止内存溢出
+	 * 当数据类型为 REDIS_RESULT_STRING 类型时，该函数将按内存块存放的数据
+	 * 存储至连接内存中，但需要注意防止内存溢出
 	 * @param buf {string&} 存储结果数据，内部会先调用 buf.clear()
 	 * @return {int} 数据的总长度，返回值 -1 表示内部数组为空
 	 */

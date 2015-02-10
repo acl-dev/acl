@@ -31,16 +31,19 @@ static int master_prefork(ACL_MASTER_SERV *serv)
 
 	if (serv->prefork_proc <= 0)
 		return 0;
-	else if ((serv->flags & ACL_MASTER_FLAG_RELOADING) != 0) {
+
+	if ((serv->flags & ACL_MASTER_FLAG_RELOADING) != 0) {
 		int  n;
 		for (n = 0; n < serv->prefork_proc; n++)
 			acl_master_spawn(serv);
 
 		if (acl_msg_verbose)
-			acl_msg_info("%s: service %s prefork %d processes ok ...",
+			acl_msg_info("%s: service %s prefork %d processes ok",
 				myname, serv->name, n);
 		return n;
-	} else if (serv->total_proc < serv->prefork_proc) {
+	}
+	
+	if (serv->total_proc < serv->prefork_proc) {
 		int  nproc = serv->prefork_proc - serv->total_proc;
 		int  n = serv->max_proc - serv->total_proc;
 
@@ -52,11 +55,12 @@ static int master_prefork(ACL_MASTER_SERV *serv)
 			acl_master_spawn(serv);
 
 		if (acl_msg_verbose)
-			acl_msg_info("%s: service %s prefork %d processes ok ...",
+			acl_msg_info("%s: service %s prefork %d processes ok",
 				myname, serv->name, n);
 		return nproc;
-	} else
-		return 0;
+	}
+
+	return 0;
 }
 
 /* master_avail_event - create child process to handle connection request */
@@ -74,9 +78,9 @@ static void master_avail_event(int type, ACL_EVENT *event,
 			acl_event_disable_readwrite(event,
 				serv->listen_streams[n]);
 		}
-	} else if (serv->prefork_proc > 0)
-		(void) master_prefork(serv);
-	else
+	} else if (serv->prefork_proc <= 0 || serv->max_proc <= 0)
+		acl_master_spawn(serv);
+	else if (master_prefork(serv) == 0 && serv->total_proc < serv->max_proc)
 		acl_master_spawn(serv);
 }
 
