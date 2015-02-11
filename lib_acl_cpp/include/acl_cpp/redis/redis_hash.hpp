@@ -200,7 +200,9 @@ public:
 	 * 命令用于迭代哈希键中的键值对
 	 * @param key {const char*} 哈希键值
 	 * @param cursor {int} 游标值，开始遍历时该值写 0
-	 * @param out {std::map<string>&} 结果集
+	 * @param out {std::map<string>&} 存储结果集，内部以追加方式将本次
+	 *  遍历结果添加进该对象中，为防止因总结果集过大导致该数组溢出，用户可在
+	 *  调用本函数前后清理该对象
 	 * @param pattern {const char*} 匹配模式，glob 风格，非空时有效
 	 * @param count {const size_t*} 限定的结果集数量，非空指针时有效
 	 * @return {int} 下一个游标位置，含义如下：

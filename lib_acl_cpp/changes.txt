@@ -4,6 +4,9 @@
 283) 2015.2.11
 283.1) samples: 因为 acl_master 模式运行的服务器框架不支持 WIN32，所以现在
 将所有 master_xxx 系列的示例在 WIN32 下强制采用 alone 运行模式
+283.2) performance: redis_key::scan, redis_zset::zscan, redis_set::sscan,
+redis_hahs:hscan 之前在遍历时总会先清理存储结果集的对象空间，外部在用时可能会造成二次
+拷贝现象，影响一定性能，现在清除了内部的自动清理过程，将清理操作交给用户灵活处理
 
 282) 2015.2.10
 282.1) feature: redis_command 增加了几个方便调用的方法，使用户可以通过

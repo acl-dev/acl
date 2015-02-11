@@ -399,8 +399,8 @@ int redis_set::sscan(const char* key, int cursor, std::vector<string>& out,
 	const redis_result* rr;
 	string key_buf(128);
 
-	out.clear();
-	out.reserve(size);
+	// out.clear();
+	out.reserve(out.size() + size);
 
 	for (size_t i = 0; i < size; i++)
 	{

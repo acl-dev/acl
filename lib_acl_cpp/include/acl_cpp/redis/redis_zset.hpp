@@ -397,7 +397,8 @@ public:
 	/**
 	 * 命令用于迭代有序集合中的元素（包括元素成员和元素分值）
 	 * @param cursor {int} 游标值，开始遍历时该值写 0
-	 * @param out 存储结果集，内部先 out.clear()
+	 * @param out 存储结果集，内部以追加方式将本次遍历结果集合添加进该数组中，
+	 *  为防止因总结果集过大导致该数组溢出，用户可在调用本函数前后清理该数组对象
 	 * @param pattern {const char*} 匹配模式，glob 风格，非空时有效
 	 * @param count {const size_t*} 限定的结果集数量，非空指针时有效
 	 * @return {int} 下一个游标位置，含义如下：
