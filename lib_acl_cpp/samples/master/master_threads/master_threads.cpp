@@ -262,14 +262,28 @@ int main(int argc, char* argv[])
 
 		// 单独运行方式
 		if (argc >= 3)
-			mt.run_alone("127.0.0.1:8888", argv[2], task_count, threads_count);
+			mt.run_alone("127.0.0.1:8888", argv[2],
+				task_count, threads_count);
 		else
-			mt.run_alone("127.0.0.1:8888", NULL, task_count, threads_count);
+			mt.run_alone("127.0.0.1:8888", NULL,
+				task_count, threads_count);
 	}
 
 	// acl_master 控制模式运行
 	else
+	{
+#ifdef	WIN32
+		int   task_count = 2, threads_count = 2;
+		format = (void (*)(const char*, ...)) printf;
+		format("listen: 127.0.0.1:8888\r\n");
+
+		// 单独运行方式
+		mt.run_alone("127.0.0.1:8888", NULL,
+			task_count, threads_count);
+#else
 		mt.run_daemon(argc, argv);
+#endif
+	}
+
 	return 0;
 }
-

@@ -130,7 +130,14 @@ int main(int argc, char* argv[])
 		mp.run_alone("127.0.0.1:8888", NULL, 5);  // 单独运行方式
 	}
 	else
+	{
+#ifdef	WIN32
+		format = (void (*)(const char*, ...)) printf;
+		mp.run_alone("127.0.0.1:8888", NULL, 5);  // 单独运行方式
+#else
 		mp.run_daemon(argc, argv);  // acl_master 控制模式运行
+#endif
+	}
 
 	return 0;
 }

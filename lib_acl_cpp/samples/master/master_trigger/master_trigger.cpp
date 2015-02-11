@@ -86,7 +86,14 @@ int main(int argc, char* argv[])
 		mt.run_alone(NULL, 5, 1);  // 单独运行方式
 	}
 	else
+	{
+#ifdef	WIN32
+		format = (void (*)(const char*, ...)) printf;
+		mt.run_alone(NULL, 5, 1);  // 单独运行方式
+#else
 		mt.run_daemon(argc, argv);  // acl_master 控制模式运行
+#endif
+	}
 
 	return 0;
 }

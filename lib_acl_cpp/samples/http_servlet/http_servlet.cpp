@@ -128,7 +128,15 @@ int main(int argc, char* argv[])
 		service.run_alone("0.0.0.0:8888", NULL, 1);  // 单独运行方式
 	}
 	else
+	{
+#ifdef	WIN32
+		format = (void (*)(const char*, ...)) printf;
+		printf("listen: 0.0.0.0:8888 ...\r\n");
+		service.run_alone("0.0.0.0:8888", NULL, 1);  // 单独运行方式
+#else
 		service.run_daemon(argc, argv);  // acl_master 控制模式运行
+#endif
+	}
 
 	return 0;
 }
