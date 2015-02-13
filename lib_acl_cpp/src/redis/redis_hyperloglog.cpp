@@ -34,15 +34,15 @@ int redis_hyperloglog::pfadd(const char* key, const char* first_element, ...)
 int redis_hyperloglog::pfadd(const char* key,
 	const std::vector<const char*>& elements)
 {
-	conn_->build("PFADD", key, elements);
-	return conn_->get_number();
+	build("PFADD", key, elements);
+	return get_number();
 }
 
 int redis_hyperloglog::pfadd(const char* key,
 	const std::vector<string>& elements)
 {
-	conn_->build("PFADD", key, elements);
-	return conn_->get_number();
+	build("PFADD", key, elements);
+	return get_number();
 }
 
 int redis_hyperloglog::pfcount(const char* first_key, ...)
@@ -62,14 +62,14 @@ int redis_hyperloglog::pfcount(const char* first_key, ...)
 
 int redis_hyperloglog::pfcount(const std::vector<const char*>& keys)
 {
-	conn_->build("PFCOUNT", NULL, keys);
-	return conn_->get_number();
+	build("PFCOUNT", NULL, keys);
+	return get_number();
 }
 
 int redis_hyperloglog::pfcount(const std::vector<string>& keys)
 {
-	conn_->build("PFCOUNT", NULL, keys);
-	return conn_->get_number();
+	build("PFCOUNT", NULL, keys);
+	return get_number();
 }
 
 bool redis_hyperloglog::pfmerge(const char* dst, const char* first_src, ...)
@@ -90,15 +90,15 @@ bool redis_hyperloglog::pfmerge(const char* dst, const char* first_src, ...)
 bool redis_hyperloglog::pfmerge(const char* dst,
 	const std::vector<const char*>& keys)
 {
-	conn_->build("PFMERGE", dst, keys);
-	return conn_->get_status();
+	build("PFMERGE", dst, keys);
+	return check_status();
 }
 
 bool redis_hyperloglog::pfmerge(const char* dst,
 	const std::vector<string>& keys)
 {
-	conn_->build("PFMERGE", dst, keys);
-	return conn_->get_status();
+	build("PFMERGE", dst, keys);
+	return check_status();
 }
 
 } //namespace acl

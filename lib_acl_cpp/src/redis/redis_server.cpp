@@ -28,8 +28,8 @@ bool redis_server::bgrewriteaof()
 	argv[0] = "BGREWRITEAOF";
 	lens[0] = sizeof("BGREWRITEAOF") - 1;
 
-	conn_->build_request(1, argv, lens);
-	return conn_->get_status("Background");
+	build_request(1, argv, lens);
+	return check_status("Background");
 }
 
 bool redis_server::bgsave()
@@ -40,8 +40,8 @@ bool redis_server::bgsave()
 	argv[0] = "BGSAVE";
 	lens[0] = sizeof("BGSAVE") - 1;
 
-	conn_->build_request(1, argv, lens);
-	return conn_->get_status();
+	build_request(1, argv, lens);
+	return check_status();
 }
 
 bool redis_server::client_getname(string& buf)
@@ -55,8 +55,8 @@ bool redis_server::client_getname(string& buf)
 	argv[1] = "GETNAME";
 	lens[1] = sizeof("GETNAME") - 1;
 
-	conn_->build_request(2, argv, lens);
-	return conn_->get_string(buf) >0 ? true : false;
+	build_request(2, argv, lens);
+	return get_string(buf) >0 ? true : false;
 }
 
 bool redis_server::client_kill(const char* addr)
@@ -73,8 +73,8 @@ bool redis_server::client_kill(const char* addr)
 	argv[2] = addr;
 	lens[2] = strlen(addr);
 
-	conn_->build_request(3, argv, lens);
-	return conn_->get_status();
+	build_request(3, argv, lens);
+	return check_status();
 }
 
 int redis_server::client_list(string& buf)
@@ -88,8 +88,8 @@ int redis_server::client_list(string& buf)
 	argv[1] = "LIST";
 	lens[1] = sizeof("LIST") - 1;
 
-	conn_->build_request(2, argv, lens);
-	return conn_->get_string(buf);
+	build_request(2, argv, lens);
+	return get_string(buf);
 }
 
 bool redis_server::client_setname(const char* name)
@@ -106,8 +106,8 @@ bool redis_server::client_setname(const char* name)
 	argv[2] = name;
 	lens[2] = strlen(name);
 
-	conn_->build_request(3, argv, lens);
-	return conn_->get_status();
+	build_request(3, argv, lens);
+	return check_status();
 }
 
 int redis_server::config_get(const char* parameter,
@@ -125,8 +125,8 @@ int redis_server::config_get(const char* parameter,
 	argv[2] = parameter;
 	lens[2] = strlen(parameter);
 
-	conn_->build_request(3, argv, lens);
-	return conn_->get_strings(out);
+	build_request(3, argv, lens);
+	return get_strings(out);
 }
 
 bool redis_server::config_resetstat()
@@ -140,8 +140,8 @@ bool redis_server::config_resetstat()
 	argv[1] = "RESETSTAT";
 	lens[1] = sizeof("RESETSTAT") - 1;
 
-	conn_->build_request(2, argv, lens);
-	return conn_->get_status();
+	build_request(2, argv, lens);
+	return check_status();
 }
 
 bool redis_server::config_rewrite()
@@ -155,8 +155,8 @@ bool redis_server::config_rewrite()
 	argv[1] = "REWRITE";
 	lens[1] = sizeof("REWRITE") -1;
 
-	conn_->build_request(2, argv, lens);
-	return conn_->get_status();
+	build_request(2, argv, lens);
+	return check_status();
 }
 
 bool redis_server::config_set(const char* name, const char* value)
@@ -176,8 +176,8 @@ bool redis_server::config_set(const char* name, const char* value)
 	argv[3] = value;
 	lens[3] = strlen(value);
 
-	conn_->build_request(4, argv, lens);
-	return conn_->get_status();
+	build_request(4, argv, lens);
+	return check_status();
 }
 
 int redis_server::dbsize()
@@ -188,8 +188,8 @@ int redis_server::dbsize()
 	argv[0] = "DBSIZE";
 	lens[0] = sizeof("DBSIZE") - 1;
 
-	conn_->build_request(1, argv, lens);
-	return conn_->get_number();
+	build_request(1, argv, lens);
+	return get_number();
 }
 
 bool redis_server::flushall()
@@ -200,8 +200,8 @@ bool redis_server::flushall()
 	argv[0] = "FLUSHALL";
 	lens[0] = sizeof("FLUSHALL") - 1;
 
-	conn_->build_request(1, argv, lens);
-	return conn_->get_status();
+	build_request(1, argv, lens);
+	return check_status();
 }
 
 bool redis_server::flushdb()
@@ -212,8 +212,8 @@ bool redis_server::flushdb()
 	argv[0] = "FLUSHDB";
 	lens[0] = sizeof("FLUSHDB") - 1;
 
-	conn_->build_request(1, argv, lens);
-	return conn_->get_status();
+	build_request(1, argv, lens);
+	return check_status();
 }
 
 int redis_server::info(string& buf)
@@ -224,8 +224,8 @@ int redis_server::info(string& buf)
 	argv[0] = "INFO";
 	lens[0] = sizeof("INFO") - 1;
 
-	conn_->build_request(1, argv, lens);
-	return conn_->get_string(buf);
+	build_request(1, argv, lens);
+	return get_string(buf);
 }
 
 time_t redis_server::lastsave()
@@ -236,8 +236,8 @@ time_t redis_server::lastsave()
 	argv[0] = "LASTSAVE";
 	lens[0] = sizeof("LASTSAVE") - 1;
 
-	conn_->build_request(1, argv, lens);
-	return (time_t) conn_->get_number64();
+	build_request(1, argv, lens);
+	return (time_t) get_number64();
 }
 
 bool redis_server::monitor()
@@ -248,14 +248,14 @@ bool redis_server::monitor()
 	argv[0] = "MONITOR";
 	lens[0] = sizeof("MONITOR") - 1;
 
-	conn_->build_request(1, argv, lens);
-	return conn_->get_status();
+	build_request(1, argv, lens);
+	return check_status();
 }
 
 bool redis_server::get_command(string& buf)
 {
-	conn_->reset_request();
-	const redis_result* result = conn_->run();
+	reset_request();
+	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_STATUS)
 		return false;
 	const char* status = result->get_status();
@@ -273,8 +273,8 @@ bool redis_server::save()
 	argv[0] = "SAVE";
 	lens[0] = sizeof("SAVE") - 1;
 
-	conn_->build_request(1, argv, lens);
-	return conn_->get_status();
+	build_request(1, argv, lens);
+	return check_status();
 }
 
 void redis_server::shutdown(bool save_data /* = true */)
@@ -296,8 +296,8 @@ void redis_server::shutdown(bool save_data /* = true */)
 		lens[1] = sizeof("nosave") - 1;
 	}
 
-	conn_->build_request(2, argv, lens);
-	(void) conn_->get_status();
+	build_request(2, argv, lens);
+	(void) check_status();
 }
 
 bool redis_server::slaveof(const char* ip, int port)
@@ -316,8 +316,8 @@ bool redis_server::slaveof(const char* ip, int port)
 	argv[2] = port_s;
 	lens[2] = strlen(port_s);
 
-	conn_->build_request(3, argv, lens);
-	return conn_->get_status();
+	build_request(3, argv, lens);
+	return check_status();
 }
 
 const redis_result* redis_server::slowlog_get(int number /* = 0 */)
@@ -342,8 +342,8 @@ const redis_result* redis_server::slowlog_get(int number /* = 0 */)
 		argc++;
 	}
 
-	conn_->build_request(argc, argv, lens);
-	return conn_->run();
+	build_request(argc, argv, lens);
+	return run();
 }
 
 int redis_server::slowlog_len()
@@ -357,8 +357,8 @@ int redis_server::slowlog_len()
 	argv[1] = "LEN";
 	lens[1] = sizeof("LEN") - 1;
 
-	conn_->build_request(2, argv, lens);
-	return conn_->get_number();
+	build_request(2, argv, lens);
+	return get_number();
 }
 
 bool redis_server::slowlog_reset()
@@ -372,8 +372,8 @@ bool redis_server::slowlog_reset()
 	argv[1] = "RESET";
 	lens[1] = sizeof("RESET") - 1;
 
-	conn_->build_request(2, argv, lens);
-	return conn_->get_status();
+	build_request(2, argv, lens);
+	return check_status();
 }
 
 bool redis_server::get_time(time_t& stamp, int& escape)
@@ -384,10 +384,10 @@ bool redis_server::get_time(time_t& stamp, int& escape)
 	argv[0] = "TIME";
 	lens[0] = sizeof("TIME") - 1;
 
-	conn_->build_request(1, argv, lens);
+	build_request(1, argv, lens);
 
 	std::vector<string> tokens;
-	if (conn_->get_strings(tokens) <= 0 || tokens.size() < 2)
+	if (get_strings(tokens) <= 0 || tokens.size() < 2)
 		return false;
 
 	stamp = atol(tokens[0].c_str());

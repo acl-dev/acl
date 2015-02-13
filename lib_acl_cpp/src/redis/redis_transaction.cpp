@@ -20,8 +20,8 @@ redis_transaction::~redis_transaction()
 
 bool redis_transaction::watch(const std::vector<string>& keys)
 {
-	conn_->build("WATCH", NULL, keys);
-	return conn_->get_status();
+	build("WATCH", NULL, keys);
+	return check_status();
 }
 
 bool redis_transaction::unwatch()
@@ -29,8 +29,8 @@ bool redis_transaction::unwatch()
 	const char* argv[1];
 	size_t lens[1];
 
-	conn_->build_request(1, argv, lens);
-	return conn_->get_status();
+	build_request(1, argv, lens);
+	return check_status();
 }
 
 bool redis_transaction::multi()
@@ -43,8 +43,8 @@ bool redis_transaction::multi()
 	argv[0] = "MULTI";
 	lens[0] = sizeof("MULTI") - 1;
 
-	conn_->build_request(1, argv, lens);
-	return conn_->get_status();
+	build_request(1, argv, lens);
+	return check_status();
 }
 
 bool redis_transaction::exec()
@@ -55,8 +55,8 @@ bool redis_transaction::exec()
 	argv[0] = "EXEC";
 	lens[0] = sizeof("EXEC") - 1;
 
-	conn_->build_request(1, argv, lens);
-	const redis_result* result = conn_->run();
+	build_request(1, argv, lens);
+	const redis_result* result = run();
 	if(result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return false;
 
@@ -74,15 +74,15 @@ bool redis_transaction::discard()
 	argv[0] = "DISCARD";
 	lens[0] = sizeof("DISCARD") - 1;
 
-	conn_->build_request(1, argv, lens);
-	return conn_->get_status();
+	build_request(1, argv, lens);
+	return check_status();
 }
 
 bool redis_transaction::run_cmd(const char* cmd, const char* argv[],
 	const size_t lens[], size_t argc)
 {
-	conn_->build(cmd, NULL, argv, lens, argc);
-	if (conn_->get_status("QUEUED") == false)
+	build(cmd, NULL, argv, lens, argc);
+	if (check_status("QUEUED") == false)
 		return false;
 	cmds_.push_back(cmd);
 	return true;
@@ -91,8 +91,8 @@ bool redis_transaction::run_cmd(const char* cmd, const char* argv[],
 bool redis_transaction::run_cmd(const char* cmd,
 	const std::vector<string>& args)
 {
-	conn_->build(cmd, NULL, args);
-	if (conn_->get_status("QUEUED") == false)
+	build(cmd, NULL, args);
+	if (check_status("QUEUED") == false)
 		return false;
 	cmds_.push_back(cmd);
 	return true;
@@ -100,7 +100,7 @@ bool redis_transaction::run_cmd(const char* cmd,
 
 size_t redis_transaction::get_size() const
 {
-	return conn_->get_size();
+	return result_size();
 }
 
 const redis_result* redis_transaction::get_child(size_t i, string* cmd) const
@@ -110,7 +110,7 @@ const redis_result* redis_transaction::get_child(size_t i, string* cmd) const
 		if (i < cmds_.size())
 			*cmd = cmds_[i];
 	}
-	return conn_->get_child(i);
+	return result_child(i);
 }
 
 } // namespace acl

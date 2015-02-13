@@ -35,8 +35,8 @@ int redis_list::llen(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	conn_->build_request(2, argv, lens);
-	return conn_->get_number();
+	build_request(2, argv, lens);
+	return get_number();
 }
 
 bool redis_list::lindex(const char* key, size_t idx, string& buf)
@@ -54,8 +54,8 @@ bool redis_list::lindex(const char* key, size_t idx, string& buf)
 	argv[2] = tmp;
 	lens[2] = strlen(tmp);
 
-	conn_->build_request(3, argv, lens);
-	return conn_->get_string(buf) >= 0 ? true : false;
+	build_request(3, argv, lens);
+	return get_string(buf) >= 0 ? true : false;
 }
 
 bool redis_list::lset(const char* key, int idx, const char* value)
@@ -81,8 +81,8 @@ bool redis_list::lset(const char* key, int idx, const char* value, size_t len)
 	argv[3] = value;
 	lens[3] = len;
 
-	conn_->build_request(4, argv, lens);
-	return conn_->get_status();
+	build_request(4, argv, lens);
+	return check_status();
 }
 
 int redis_list::linsert_before(const char* key, const char* pivot,
@@ -126,8 +126,8 @@ int redis_list::linsert(const char* key, const char* pos, const char* pivot,
 	argv[4] = value;
 	lens[4] = value_len;
 
-	conn_->build_request(5, argv, lens);
-	return conn_->get_number();
+	build_request(5, argv, lens);
+	return get_number();
 }
 
 int redis_list::lpush(const char* key, const char* first_value, ...)
@@ -148,27 +148,27 @@ int redis_list::lpush(const char* key, const char* first_value, ...)
 
 int redis_list::lpush(const char* key, const char* values[], size_t argc)
 {
-	conn_->build("LPUSH", key, values, argc);
-	return conn_->get_number();
+	build("LPUSH", key, values, argc);
+	return get_number();
 }
 
 int redis_list::lpush(const char* key, const std::vector<string>& values)
 {
-	conn_->build("LPUSH", key, values);
-	return conn_->get_number();
+	build("LPUSH", key, values);
+	return get_number();
 }
 
 int redis_list::lpush(const char* key, const std::vector<const char*>& values)
 {
-	conn_->build("LPUSH", key, values);
-	return conn_->get_number();
+	build("LPUSH", key, values);
+	return get_number();
 }
 
 int redis_list::lpush(const char* key, const char* values[],
 	const size_t lens[], size_t argc)
 {
-	conn_->build("LPUSH", key, values, lens, argc);
-	return conn_->get_number();
+	build("LPUSH", key, values, lens, argc);
+	return get_number();
 }
 
 int redis_list::rpush(const char* key, const char* first_value, ...)
@@ -189,27 +189,27 @@ int redis_list::rpush(const char* key, const char* first_value, ...)
 
 int redis_list::rpush(const char* key, const char* values[], size_t argc)
 {
-	conn_->build("RPUSH", key, values, argc);
-	return conn_->get_number();
+	build("RPUSH", key, values, argc);
+	return get_number();
 }
 
 int redis_list::rpush(const char* key, const std::vector<string>& values)
 {
-	conn_->build("RPUSH", key, values);
-	return conn_->get_number();
+	build("RPUSH", key, values);
+	return get_number();
 }
 
 int redis_list::rpush(const char* key, const std::vector<const char*>& values)
 {
-	conn_->build("RPUSH", key, values);
-	return conn_->get_number();
+	build("RPUSH", key, values);
+	return get_number();
 }
 
 int redis_list::rpush(const char* key, const char* values[],
 	const size_t lens[], size_t argc)
 {
-	conn_->build("RPUSH", key, values, lens, argc);
-	return conn_->get_number();
+	build("RPUSH", key, values, lens, argc);
+	return get_number();
 }
 
 int redis_list::lpushx(const char* key, const char* value)
@@ -245,8 +245,8 @@ int redis_list::pushx(const char* cmd, const char* key,
 	argv[2] = value;
 	lens[2] = len;
 
-	conn_->build_request(3, argv, lens);
-	return conn_->get_number();
+	build_request(3, argv, lens);
+	return get_number();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -271,8 +271,8 @@ int redis_list::pop(const char* cmd, const char* key, string& buf)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	conn_->build_request(2, argv, lens);
-	return (int) conn_->get_string(buf);
+	build_request(2, argv, lens);
+	return (int) get_string(buf);
 }
 
 bool redis_list::blpop(std::pair<string, string>& result, size_t timeout,
@@ -335,10 +335,8 @@ bool redis_list::bpop(const char* cmd, const std::vector<const char*>& keys,
 	size_t timeout, std::pair<string, string>& result)
 {
 	size_t argc = 2 + keys.size();
-	dbuf_pool* pool = conn_->get_pool();
-	const char** args = (const char**)
-		pool->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*) pool->dbuf_alloc(argc * sizeof(size_t));
+	const char** args = (const char**) pool_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
 
 	args[0] = cmd;
 	lens[0] = strlen(cmd);
@@ -357,7 +355,7 @@ bool redis_list::bpop(const char* cmd, const std::vector<const char*>& keys,
 	args[i] = buf;
 	lens[i] = strlen(args[i]);
 
-	conn_->build_request(argc, args, lens);
+	build_request(argc, args, lens);
 	return bpop(result);
 }
 
@@ -365,10 +363,8 @@ bool redis_list::bpop(const char* cmd, const std::vector<string>& keys,
 	size_t timeout, std::pair<string, string>& result)
 {
 	size_t argc = 2 + keys.size();
-	dbuf_pool* pool = conn_->get_pool();
-	const char** args = (const char**)
-		pool->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*) pool->dbuf_alloc(argc * sizeof(size_t));
+	const char** args = (const char**) pool_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
 
 	args[0] = cmd;
 	lens[0] = strlen(cmd);
@@ -387,13 +383,13 @@ bool redis_list::bpop(const char* cmd, const std::vector<string>& keys,
 	args[i] = buf;
 	lens[i] = strlen(args[i]);
 
-	conn_->build_request(argc, args, lens);
+	build_request(argc, args, lens);
 	return bpop(result);
 }
 
 bool redis_list::bpop(std::pair<string, string>& out)
 {
-	const redis_result* result = conn_->run();
+	const redis_result* result = run();
 	if (result == NULL)
 		return false;
 	if (result->get_type() != REDIS_RESULT_ARRAY)
@@ -435,8 +431,8 @@ bool redis_list::rpoplpush(const char* src, const char* dst,
 	argv[2] = dst;
 	lens[2] = strlen(dst);
 
-	conn_->build_request(3, argv, lens);
-	return conn_->get_string(buf) >= 0 ? true : false;
+	build_request(3, argv, lens);
+	return get_string(buf) >= 0 ? true : false;
 }
 
 bool redis_list::brpoplpush(const char* src, const char* dst,
@@ -457,8 +453,8 @@ bool redis_list::brpoplpush(const char* src, const char* dst,
 	argv[3] = tmp;
 	lens[3] = strlen(argv[3]);
 
-	conn_->build_request(4, argv, lens);
-	return conn_->get_string(buf) >= 0 ? true : false;
+	build_request(4, argv, lens);
+	return get_string(buf) >= 0 ? true : false;
 }
 
 bool redis_list::lrange(const char* key, int start, int end,
@@ -481,8 +477,8 @@ bool redis_list::lrange(const char* key, int start, int end,
 	argv[3] = end_s;
 	lens[3] = strlen(end_s);
 
-	conn_->build_request(4, argv, lens);
-	return conn_->get_strings(result) < 0 ? false : true;
+	build_request(4, argv, lens);
+	return get_strings(result) < 0 ? false : true;
 }
 
 int redis_list::lrem(const char* key, int count, const char* value)
@@ -508,8 +504,8 @@ int redis_list::lrem(const char* key, int count, const char* value, size_t len)
 	argv[3] = value;
 	lens[3] = len;
 
-	conn_->build_request(4, argv, lens);
-	return conn_->get_number();
+	build_request(4, argv, lens);
+	return get_number();
 }
 
 bool redis_list::ltrim(const char* key, int start, int end)
@@ -531,8 +527,8 @@ bool redis_list::ltrim(const char* key, int start, int end)
 	argv[3] = end_s;
 	lens[3] = strlen(end_s);
 
-	conn_->build_request(4, argv, lens);
-	return conn_->get_status();
+	build_request(4, argv, lens);
+	return check_status();
 }
 
 //////////////////////////////////////////////////////////////////////////

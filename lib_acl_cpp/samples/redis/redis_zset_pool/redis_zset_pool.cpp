@@ -9,7 +9,7 @@ static bool test_zadd(acl::redis_zset& option, int i, const char* key,
 		nmember++;
 
 	// 从连接对象中获得统一的内存池分配对象，分配小内存块
-	acl::dbuf_pool* pool = option.get_client()->get_pool();
+	acl::dbuf_pool* pool = option.get_pool();
 	// 动态分配数据块指针数组内存
 	const char** members = (const char**)
 		pool->dbuf_alloc(nmember * sizeof(char*));
@@ -238,8 +238,7 @@ protected:
 			// 每个线程一个 ID 号，做为键值组成部分
 			key.format("%s_%d_%d", __keypre.c_str(), id_, i);
 
-			conn->reset();
-
+			option.reset();
 			// 将 redis 连接对象与 redis 命令操作类对象进行绑定关联
 			option.set_client(conn);
 

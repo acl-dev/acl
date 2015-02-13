@@ -68,14 +68,14 @@ static bool test_hmget(acl::redis_hash& option, int n)
 		else if (i >= 10)
 			continue;
 
-		size_t size = option.get_size();
+		size_t size = option.result_size();
 		printf("size: %lu, key: %s\r\n", (unsigned long) size,
 			key.c_str());
 
 		size_t j;
 		for (j = 0; j < size; j++)
 		{
-			const char* val = option.get_value(j);
+			const char* val = option.result_value(j);
 			printf("hmget ok, %s=%s\r\n",
 				attrs[j], val ? val : "null");
 		}

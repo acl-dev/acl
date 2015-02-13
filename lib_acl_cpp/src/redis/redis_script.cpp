@@ -364,10 +364,9 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 	const std::vector<string>& args)
 {
 	size_t argc = 3 + keys.size() + args.size();
-	dbuf_pool* pool = conn_->get_pool();
 	const char** argv = (const char**)
-		pool->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*) pool->dbuf_alloc(argc * sizeof(size_t));
+		pool_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = cmd;
 	lens[0] = strlen(cmd);
@@ -400,8 +399,8 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 
 	acl_assert(i == argc);
 
-	conn_->build_request(argc, argv, lens);
-	return conn_->run();
+	build_request(argc, argv, lens);
+	return run();
 }
 
 const redis_result* redis_script::eval_cmd(const char* cmd,
@@ -410,10 +409,9 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 	const std::vector<const char*>& args)
 {
 	size_t argc = 3 + keys.size() + args.size();
-	dbuf_pool* pool = conn_->get_pool();
 	const char** argv = (const char**)
-		pool->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*) pool->dbuf_alloc(argc * sizeof(size_t));
+		pool_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = cmd;
 	lens[0] = strlen(cmd);
@@ -446,15 +444,15 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 
 	acl_assert(i == argc);
 
-	conn_->build_request(argc, argv, lens);
-	return conn_->run();
+	build_request(argc, argv, lens);
+	return run();
 }
 
 int redis_script::script_exists(const std::vector<string>& scripts,
 	std::vector<bool>& out)
 {
-	conn_->build("SCRIPT", "EXISTS", scripts);
-	int ret = conn_->get_status(out);
+	build("SCRIPT", "EXISTS", scripts);
+	int ret = get_status(out);
 	if (ret != (int) scripts.size())
 		return -1;
 	return ret;
@@ -463,8 +461,8 @@ int redis_script::script_exists(const std::vector<string>& scripts,
 int redis_script::script_exists(const std::vector<const char*>& scripts,
 	std::vector<bool>& out)
 {
-	conn_->build("SCRIPT", "EXISTS", scripts);
-	int ret = conn_->get_status(out);
+	build("SCRIPT", "EXISTS", scripts);
+	int ret = get_status(out);
 	if (ret != (int) scripts.size())
 		return -1;
 	return ret;
@@ -481,8 +479,8 @@ bool redis_script::script_flush()
 	argv[1] = "FLUSH";
 	lens[1] = sizeof("FLUSH") - 1;
 
-	conn_->build_request(2, argv, lens);
-	return conn_->get_status();
+	build_request(2, argv, lens);
+	return check_status();
 }
 
 bool redis_script::script_load(const string& script, string& out)
@@ -501,8 +499,8 @@ bool redis_script::script_load(const string& script, string& out)
 	argv[2] = script;
 	lens[2] = strlen(script);
 
-	conn_->build_request(3, argv, lens);
-	return conn_->get_string(out) > 0 ? true : false;
+	build_request(3, argv, lens);
+	return get_string(out) > 0 ? true : false;
 }
 
 bool redis_script::script_kill()
@@ -516,8 +514,8 @@ bool redis_script::script_kill()
 	argv[1] = "KILL";
 	lens[1] = sizeof("KILL") - 1;
 
-	conn_->build_request(2, argv, lens);
-	return conn_->get_status();
+	build_request(2, argv, lens);
+	return check_status();
 }
 
 } // namespace acl

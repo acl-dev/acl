@@ -30,8 +30,8 @@ int redis_pubsub::publish(const char* channel, const char* msg, size_t len)
 	argv[2] = msg;
 	lens[2] = len;
 
-	conn_->build_request(3, argv, lens);
-	return conn_->get_number();
+	build_request(3, argv, lens);
+	return get_number();
 }
 
 int redis_pubsub::subscribe(const char* first_channel, ...)
@@ -133,10 +133,8 @@ int redis_pubsub::punsubscribe(const std::vector<string>& patterns)
 int redis_pubsub::subop(const char* cmd, const std::vector<const char*>& channels)
 {
 	size_t argc = 1 + channels.size();
-	dbuf_pool* pool = conn_->get_pool();
-	const char** argv = (const char**)
-		pool->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t *) pool->dbuf_alloc(argc * sizeof(size_t));
+	const char** argv = (const char**) pool_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t *) pool_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = cmd;
 	lens[0] = strlen(cmd);
@@ -148,8 +146,8 @@ int redis_pubsub::subop(const char* cmd, const std::vector<const char*>& channel
 		lens[i] = strlen(argv[i]);
 	}
 
-	conn_->build_request(argc, argv, lens);
-	const redis_result* result = conn_->run(channels.size());
+	build_request(argc, argv, lens);
+	const redis_result* result = run(channels.size());
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
 
@@ -172,10 +170,8 @@ int redis_pubsub::subop(const char* cmd, const std::vector<const char*>& channel
 int redis_pubsub::subop(const char* cmd, const std::vector<string>& channels)
 {
 	size_t argc = 1 + channels.size();
-	dbuf_pool* pool = conn_->get_pool();
-	const char** argv = (const char**)
-		pool->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t *) pool->dbuf_alloc(argc * sizeof(size_t));
+	const char** argv = (const char**) pool_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t *) pool_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = cmd;
 	lens[0] = strlen(cmd);
@@ -187,8 +183,8 @@ int redis_pubsub::subop(const char* cmd, const std::vector<string>& channels)
 		lens[i] = (*cit).length();
 	}
 
-	conn_->build_request(argc, argv, lens);
-	const redis_result* result = conn_->run(channels.size());
+	build_request(argc, argv, lens);
+	const redis_result* result = run(channels.size());
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
 
@@ -241,8 +237,8 @@ int redis_pubsub::check_channel(const redis_result* obj, const char* cmd,
 
 bool redis_pubsub::get_message(string& channel, string& msg)
 {
-	conn_->reset_request();
-	const redis_result* result = conn_->run();
+	reset_request();
+	const redis_result* result = run();
 	if (result == NULL)
 		return false;
 	if (result->get_type() != REDIS_RESULT_ARRAY)
@@ -294,15 +290,15 @@ int redis_pubsub::pubsub_channels(std::vector<string>* channels,
 int redis_pubsub::pubsub_channels(const std::vector<const char*>& patterns,
 	std::vector<string>* channels)
 {
-	conn_->build("PUBSUB", "CHANNELS", patterns);
-	return conn_->get_strings(channels);
+	build("PUBSUB", "CHANNELS", patterns);
+	return get_strings(channels);
 }
 
 int redis_pubsub::pubsub_channels(const std::vector<string>& patterns,
 	std::vector<string>* channels)
 {
-	conn_->build("PUBSUB", "CHANNELS", patterns);
-	return conn_->get_strings(channels);
+	build("PUBSUB", "CHANNELS", patterns);
+	return get_strings(channels);
 }
 
 int redis_pubsub::pubsub_numsub(std::map<string, int>& out,
@@ -325,20 +321,20 @@ int redis_pubsub::pubsub_numsub(std::map<string, int>& out,
 int redis_pubsub::pubsub_numsub(const std::vector<const char*>& channels,
 	std::map<string, int>& out)
 {
-	conn_->build("PUBSUB", "NUMSUB", channels);
+	build("PUBSUB", "NUMSUB", channels);
 	return pubsub_numsub(out);
 }
 
 int redis_pubsub::pubsub_numsub(const std::vector<string>& channels,
 	std::map<string, int>& out)
 {
-	conn_->build("PUBSUB", "NUMSUB", channels);
+	build("PUBSUB", "NUMSUB", channels);
 	return pubsub_numsub(out);
 }
 
 int redis_pubsub::pubsub_numsub(std::map<string, int>& out)
 {
-	const redis_result* result = conn_->run();
+	const redis_result* result = run();
 	if (result == NULL)
 		return -1;
 
@@ -379,8 +375,8 @@ int redis_pubsub::pubsub_numpat()
 	argv[1] = "NUMPAT";
 	lens[1] = sizeof("NUMPAT") - 1;
 
-	conn_->build_request(2, argv, lens);
-	return conn_->get_number();
+	build_request(2, argv, lens);
+	return get_number();
 }
 
 } // namespace acl
