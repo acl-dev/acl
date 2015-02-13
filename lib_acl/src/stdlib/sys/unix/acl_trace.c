@@ -98,6 +98,9 @@ void acl_trace_info(void)
 	for (i = 0; i < n; i++)
 		acl_msg_info("backtrace: %s", results[i]);
 
+	if (results != NULL)
+		free(results);
+
 	/* ·ÀÖ¹µÝ¹éÇ¶Ì×±êÖ¾×Ô¼õ */
 	(*intbuf)--;
 }
