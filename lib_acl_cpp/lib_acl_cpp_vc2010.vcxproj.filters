@@ -391,7 +391,7 @@
     <ClCompile Include="src\redis\redis_list.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
-    <ClCompile Include="src\redis\redis_manager.cpp">
+    <ClCompile Include="src\redis\redis_cluster.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
     <ClCompile Include="src\redis\redis_pool.cpp">
@@ -406,7 +406,7 @@
     <ClCompile Include="src\stdlib\dbuf_pool.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
-    <ClCompile Include="src\redis\redic_connection.cpp">
+    <ClCompile Include="src\redis\redis_connection.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
     <ClCompile Include="src\redis\redis_command.cpp">
@@ -849,7 +849,7 @@
     <ClInclude Include="include\acl_cpp\redis\redis_list.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
-    <ClInclude Include="include\acl_cpp\redis\redis_manager.hpp">
+    <ClInclude Include="include\acl_cpp\redis\redis_cluster.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_pool.hpp">

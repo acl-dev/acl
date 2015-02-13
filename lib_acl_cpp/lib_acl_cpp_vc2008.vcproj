@@ -778,15 +778,19 @@
 				Name="redis"
 				>
 				<File
-					RelativePath=".\src\redis\redic_connection.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\redis\redis_client.cpp"
 					>
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_cluster.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_command.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_connection.cpp"
 					>
 				</File>
 				<File
@@ -803,10 +807,6 @@
 				</File>
 				<File
 					RelativePath=".\src\redis\redis_list.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\redis\redis_manager.cpp"
 					>
 				</File>
 				<File
@@ -1404,6 +1404,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\redis\redis_cluster.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\redis\redis_command.hpp"
 					>
 				</File>
@@ -1425,10 +1429,6 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_list.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\acl_cpp\redis\redis_manager.hpp"
 					>
 				</File>
 				<File

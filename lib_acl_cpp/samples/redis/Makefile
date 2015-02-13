@@ -12,6 +12,7 @@ all:
 	@(cd redis_connection; make)
 	@(cd redis_hyperloglog; make)
 	@(cd redis_trans; make)
+	@(cd redis_cluster; make)
 #	@(cd redis_server; make)
 
 clean:
@@ -28,4 +29,22 @@ clean:
 	@(cd redis_connection; make clean)
 	@(cd redis_hyperloglog; make clean)
 	@(cd redis_trans; make clean)
+	@(cd redis_cluster; make clean)
+#	@(cd redis_server; make)
+
+clean:
+	@(cd redis_key; make clean)
+	@(cd redis_string; make clean)
+	@(cd redis_hash; make clean)
+	@(cd redis_pool; make clean)
+	@(cd redis_manager; make clean)
+	@(cd redis_pubsub; make clean)
+	@(cd redis_zset; make clean)
+	@(cd redis_list; make clean)
+	@(cd redis_zset_pool; make clean)
+	@(cd redis_set; make clean)
+	@(cd redis_connection; make clean)
+	@(cd redis_hyperloglog; make clean)
+	@(cd redis_trans; make clean)
+#	@(cd redis_server; make clean)
 #	@(cd redis_server; make clean)

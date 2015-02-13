@@ -1,9 +1,11 @@
 #include "acl_stdafx.hpp"
 #include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
-#include "acl_cpp/stdlib/snprintf.hpp"
+#include "acl_cpp/redis/redis_cluster.hpp"
 #include "acl_cpp/redis/redis_result.hpp"
+#include "acl_cpp/redis/redis_pool.hpp"
 #include "acl_cpp/redis/redis_command.hpp"
 #include "redis_request.hpp"
 
@@ -13,8 +15,42 @@ namespace acl
 #define INT_LEN		11
 #define	LONG_LEN	21
 
-redis_command::redis_command(redis_client* conn /* = NULL */)
+redis_command::redis_command()
+: conn_(NULL)
+, cluster_(NULL)
+, used_(0)
+, slice_req_(false)
+, request_buf_(NULL)
+, request_obj_(NULL)
+, argv_size_(0)
+, argv_(NULL)
+, argv_lens_(NULL)
+, slice_res_(false)
+, result_(NULL)
+{
+	pool_ = NEW dbuf_pool(128000);
+}
+
+
+redis_command::redis_command(redis_client* conn)
 : conn_(conn)
+, cluster_(NULL)
+, used_(0)
+, slice_req_(false)
+, request_buf_(NULL)
+, request_obj_(NULL)
+, argv_size_(0)
+, argv_(NULL)
+, argv_lens_(NULL)
+, slice_res_(false)
+, result_(NULL)
+{
+	pool_ = NEW dbuf_pool(128000);
+}
+
+redis_command::redis_command(redis_cluster* cluster)
+: conn_(NULL)
+, cluster_(cluster)
 , used_(0)
 , slice_req_(false)
 , request_buf_(NULL)
@@ -30,13 +66,13 @@ redis_command::redis_command(redis_client* conn /* = NULL */)
 
 redis_command::~redis_command()
 {
-	delete pool_;
 	if (argv_ != NULL)
 		acl_myfree(argv_);
 	if (argv_lens_ != NULL)
 		acl_myfree(argv_lens_);
 	delete request_buf_;
 	delete request_obj_;
+	delete pool_;
 }
 
 void redis_command::reset()
@@ -62,6 +98,11 @@ void redis_command::set_slice_respond(bool on)
 void redis_command::set_client(redis_client* conn)
 {
 	conn_ = conn;
+}
+
+void redis_command::set_cluster(redis_cluster* cluster)
+{
+	cluster_ = cluster;
 }
 
 bool redis_command::eof() const
@@ -157,14 +198,104 @@ const redis_result* redis_command::get_result() const
 	return result_;
 }
 
+redis_pool* redis_command::get_conns(redis_cluster* cluster, const char* info)
+{
+	char* cmd = pool_->dbuf_strdup(info);
+	char* slot = strchr(cmd, ' ');
+	if (slot == NULL)
+		return NULL;
+	*slot++ = 0;
+	char* addr = strchr(slot, ' ');
+	if (addr == NULL)
+		return NULL;
+	*addr++ = 0;
+	if (*addr == 0)
+		return NULL;
+
+	// printf(">>>addr: %s, slot: %s\r\n", addr, slot);
+	return (redis_pool*) cluster->get(addr);
+}
+
+const redis_result* redis_command::run(redis_cluster* cluster, size_t nchildren)
+{
+	redis_pool* conns = (redis_pool*) cluster->peek();
+	if (conns == NULL)
+		return NULL;
+
+	redis_client* conn = (redis_client*) conns->peek();
+	if (conn == NULL)
+		return NULL;
+
+	redis_result_t type;
+	int   n = 0;
+
+	while (n++ <= 10)
+	{
+		if (slice_req_)
+			result_ = conn->run(pool_, *request_obj_, nchildren);
+		else
+			result_ = conn->run(pool_, *request_buf_, nchildren);
+
+		conns->put(conn, !conn->eof());
+
+		if (result_ == NULL)
+			return NULL;
+
+		type = result_->get_type();
+
+		if (type == REDIS_RESULT_UNKOWN)
+			return NULL;
+		if (type != REDIS_RESULT_ERROR)
+			return result_;
+
+		const char* ptr = result_->get_error();
+		if (ptr == NULL || *ptr == 0)
+			return result_;
+
+		if (strncasecmp(ptr, "MOVED", 5) == 0)
+		{
+			conns = get_conns(cluster_, ptr);
+			if (conns == NULL)
+				return result_;
+			conn = (redis_client*) conns->peek();
+			if (conn == NULL)
+				return result_;
+			reset();
+		}
+		else if (strncasecmp(ptr, "ASK", 3) == 0)
+		{
+			conns = get_conns(cluster_, ptr);
+			if (conns == NULL)
+				return result_;
+			conn = (redis_client*) conns->peek();
+			if (conn == NULL)
+				return result_;
+			reset();
+		}
+		else
+			return result_;
+	}
+
+	logger_warn("too many cluster redirect: %d", n);
+	return NULL;
+}
+
 const redis_result* redis_command::run(size_t nchildren /* = 0 */)
 {
 	used_++;
-	if (slice_req_)
-		result_ = conn_->run(pool_, *request_obj_, nchildren);
+
+	if (cluster_ != NULL)
+		return run(cluster_, nchildren);
+	else if (conn_ != NULL)
+	{
+		if (slice_req_)
+			result_ = conn_->run(pool_, *request_obj_, nchildren);
+		else
+			result_ = conn_->run(pool_, *request_buf_, nchildren);
+		return result_;
+	}
 	else
-		result_ = conn_->run(pool_, *request_buf_, nchildren);
-	return result_;
+		return NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////

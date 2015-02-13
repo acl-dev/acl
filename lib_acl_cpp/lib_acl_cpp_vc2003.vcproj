@@ -725,13 +725,16 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Name="redis"
 				Filter="">
 				<File
-					RelativePath=".\src\redis\redic_connection.cpp">
-				</File>
-				<File
 					RelativePath=".\src\redis\redis_client.cpp">
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_cluster.cpp">
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_command.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_connection.cpp">
 				</File>
 				<File
 					RelativePath=".\src\redis\redis_hash.cpp">
@@ -744,9 +747,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\src\redis\redis_list.cpp">
-				</File>
-				<File
-					RelativePath=".\src\redis\redis_manager.cpp">
 				</File>
 				<File
 					RelativePath=".\src\redis\redis_pool.cpp">
@@ -1210,6 +1210,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\acl_cpp\redis\redis_client.hpp">
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\redis\redis_cluster.hpp">
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\redis\redis_command.hpp">
 				</File>
 				<File
@@ -1226,9 +1229,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_list.hpp">
-				</File>
-				<File
-					RelativePath=".\include\acl_cpp\redis\redis_manager.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_pool.hpp">

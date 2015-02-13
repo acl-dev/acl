@@ -6,6 +6,8 @@ namespace acl
 {
 
 class redis_client;
+class redis_pool;
+class redis_cluster;
 
 /**
  * redis 客户端命令类的纯虚父类
@@ -13,7 +15,9 @@ class redis_client;
 class ACL_CPP_API redis_command
 {
 public:
-	redis_command(redis_client* conn = NULL);
+	redis_command();
+	redis_command(redis_client* conn);
+	redis_command(redis_cluster* cluster);
 	virtual ~redis_command() = 0;
 
 	/**
@@ -36,6 +40,21 @@ public:
 	redis_client* get_client() const
 	{
 		return conn_;
+	}
+
+	/**
+	 * 设置连接池集群管理器
+	 * @param cluster {redis_cluster*}
+	 */
+	void set_cluster(redis_cluster* cluster);
+
+	/**
+	 * 获得所设置的连接池集群管理器
+	 * @return {redis_cluster*}
+	 */
+	redis_cluster* get_cluster() const
+	{
+		return cluster_;
 	}
 
 	/**
@@ -150,6 +169,7 @@ public:
 
 protected:
 	const redis_result* run(size_t nchildren = 0);
+	const redis_result* run(redis_cluster* cluster, size_t nchildren);
 
 	void build_request(size_t argc, const char* argv[], size_t lens[]);
 	void reset_request();
@@ -233,7 +253,10 @@ protected:
 
 private:
 	redis_client* conn_;
+	redis_cluster* cluster_;
 	unsigned long long used_;
+
+	redis_pool* get_conns(redis_cluster* cluster, const char* info);
 
 private:
 	/************************** request ********************************/

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-static acl::string __keypre("test_key");
+static acl::string __keypre("test_key_cluster");
 
 static bool test_del(acl::redis_key& option, int i)
 {
@@ -88,11 +88,26 @@ static bool test_type(acl::redis_key& option, int i)
 	return true;
 }
 
+static bool test_set(acl::redis_string& option, int i)
+{
+	acl::string key;
+	key.format("%s_%d", __keypre.c_str(), i);
+
+	acl::string value;
+	value.format("value_%s", key.c_str());
+
+	option.reset();
+	bool ret = option.set(key.c_str(), value.c_str());
+	printf("set key: %s, value: %s %s\r\n", key.c_str(),
+		value.c_str(), ret ? "ok" : "error");
+	return ret;
+}
+
 class test_thread : public acl::thread
 {
 public:
-	test_thread(acl::redis_cluster& manager, const char* cmd, int n)
-		: manager_(manager), cmd_(cmd), n_(n) {}
+	test_thread(acl::redis_cluster& cluster, const char* cmd, int n)
+		: cluster_(cluster), cmd_(cmd), n_(n) {}
 
 	~test_thread() {}
 
@@ -100,30 +115,17 @@ protected:
 	virtual void* run()
 	{
 		bool ret;
-		acl::redis_pool* pool;
-		acl::redis_client* conn;
 		acl::redis_key option;
+		acl::redis_string string_option;
 
 		for (int i = 0; i < n_; i++)
 		{
-			pool = (acl::redis_pool*) manager_.peek();
-			if (pool == NULL)
-			{
-				printf("peek connection pool failed\r\n");
-				break;
-			}
+			option.set_cluster(&cluster_);
+			string_option.set_cluster(&cluster_);
 
-			conn = (acl::redis_client*) pool->peek();
-			
-			if (conn == NULL)
-			{
-				printf("peek redis_client failed\r\n");
-				break;
-			}
-
-			option.set_client(conn);
-
-			if (cmd_ == "del")
+			if (cmd_ == "set")
+				ret = test_set(string_option, i);
+			else if (cmd_ == "del")
 				ret = test_del(option, i);
 			else if (cmd_ == "expire")
 				ret = test_expire(option, i);
@@ -152,17 +154,18 @@ protected:
 				break;
 			}
 
-			pool->put(conn, ret);
-
 			if (ret == false)
+			{
+				printf("cmd: %s error\r\n", cmd_.c_str());
 				break;
+			}
 		}
 
 		return NULL;
 	}
 
 private:
-	acl::redis_cluster& manager_;
+	acl::redis_cluster& cluster_;
 	acl::string cmd_;
 	int n_;
 };
@@ -170,12 +173,12 @@ private:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		"-s redis_addr[127.0.0.1:6379]\r\n"
+		"-s redis_addr_list[127.0.0.1:6379, 127.0.0.1:6380]\r\n"
 		"-n count[default: 10]\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-c max_threads[default: 10]\r\n"
-		"-a cmd[expire|ttl|exists|type|del]\r\n",
+		"-a cmd[set|expire|ttl|exists|type|del]\r\n",
 		procname);
 }
 
@@ -183,7 +186,7 @@ int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
 	int  max_threads = 10;
-	acl::string addr("127.0.0.1:6379"), cmd;
+	acl::string addrs("127.0.0.1:6379, 127.0.0.1:6380"), cmd;
 
 	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:")) > 0)
 	{
@@ -193,7 +196,7 @@ int main(int argc, char* argv[])
 			usage(argv[0]);
 			return 0;
 		case 's':
-			addr = optarg;
+			addrs = optarg;
 			break;
 		case 'n':
 			n = atoi(optarg);
@@ -216,14 +219,15 @@ int main(int argc, char* argv[])
 	}
 
 	acl::acl_cpp_init();
+	//acl::log::stdout_open(true);
 
-	acl::redis_cluster manager(conn_timeout, rw_timeout);
-	manager.set(addr.c_str(), max_threads);
+	acl::redis_cluster cluster(conn_timeout, rw_timeout);
+	cluster.init(NULL, addrs.c_str(), max_threads);
 
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++)
 	{
-		test_thread* thread = new test_thread(manager, cmd.c_str(), n);
+		test_thread* thread = new test_thread(cluster, cmd.c_str(), n);
 		threads.push_back(thread);
 		thread->set_detachable(false);
 		thread->start();
