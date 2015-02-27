@@ -35,6 +35,7 @@ int redis_list::llen(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 	return get_number();
 }
@@ -54,6 +55,7 @@ bool redis_list::lindex(const char* key, size_t idx, string& buf)
 	argv[2] = tmp;
 	lens[2] = strlen(tmp);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_string(buf) >= 0 ? true : false;
 }
@@ -81,6 +83,7 @@ bool redis_list::lset(const char* key, int idx, const char* value, size_t len)
 	argv[3] = value;
 	lens[3] = len;
 
+	hash_slot(key);
 	build_request(4, argv, lens);
 	return check_status();
 }
@@ -126,6 +129,7 @@ int redis_list::linsert(const char* key, const char* pos, const char* pivot,
 	argv[4] = value;
 	lens[4] = value_len;
 
+	hash_slot(key);
 	build_request(5, argv, lens);
 	return get_number();
 }
@@ -148,18 +152,21 @@ int redis_list::lpush(const char* key, const char* first_value, ...)
 
 int redis_list::lpush(const char* key, const char* values[], size_t argc)
 {
+	hash_slot(key);
 	build("LPUSH", key, values, argc);
 	return get_number();
 }
 
 int redis_list::lpush(const char* key, const std::vector<string>& values)
 {
+	hash_slot(key);
 	build("LPUSH", key, values);
 	return get_number();
 }
 
 int redis_list::lpush(const char* key, const std::vector<const char*>& values)
 {
+	hash_slot(key);
 	build("LPUSH", key, values);
 	return get_number();
 }
@@ -167,6 +174,7 @@ int redis_list::lpush(const char* key, const std::vector<const char*>& values)
 int redis_list::lpush(const char* key, const char* values[],
 	const size_t lens[], size_t argc)
 {
+	hash_slot(key);
 	build("LPUSH", key, values, lens, argc);
 	return get_number();
 }
@@ -189,18 +197,21 @@ int redis_list::rpush(const char* key, const char* first_value, ...)
 
 int redis_list::rpush(const char* key, const char* values[], size_t argc)
 {
+	hash_slot(key);
 	build("RPUSH", key, values, argc);
 	return get_number();
 }
 
 int redis_list::rpush(const char* key, const std::vector<string>& values)
 {
+	hash_slot(key);
 	build("RPUSH", key, values);
 	return get_number();
 }
 
 int redis_list::rpush(const char* key, const std::vector<const char*>& values)
 {
+	hash_slot(key);
 	build("RPUSH", key, values);
 	return get_number();
 }
@@ -208,6 +219,7 @@ int redis_list::rpush(const char* key, const std::vector<const char*>& values)
 int redis_list::rpush(const char* key, const char* values[],
 	const size_t lens[], size_t argc)
 {
+	hash_slot(key);
 	build("RPUSH", key, values, lens, argc);
 	return get_number();
 }
@@ -245,6 +257,7 @@ int redis_list::pushx(const char* cmd, const char* key,
 	argv[2] = value;
 	lens[2] = len;
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_number();
 }

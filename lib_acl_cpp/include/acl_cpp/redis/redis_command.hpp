@@ -17,14 +17,17 @@ class ACL_CPP_API redis_command
 public:
 	redis_command();
 	redis_command(redis_client* conn);
-	redis_command(redis_cluster* cluster);
+	redis_command(redis_cluster* cluster, size_t max_conns);
 	virtual ~redis_command() = 0;
 
 	/**
 	 * 在重复使用一个继承于 redis_command 的子类操作 redis 时，需要在
 	 * 下一次调用前调用本方法以释放上次操作的临时对象
+	 * @param save_slot {bool} 当采用集群模式时，该参数决定是否需要重新
+	 *  计算哈希槽值，如果反复调用 redis 命令过程中的 key 值不变，则可以保留此
+	 *  哈希槽值以减少内部重新进行计算的次数
 	 */
-	void reset();
+	void reset(bool save_slot = false);
 
 	/**
 	 * 在使用连接池方式时，通过本函数将从连接池获得的连接对象
@@ -45,8 +48,10 @@ public:
 	/**
 	 * 设置连接池集群管理器
 	 * @param cluster {redis_cluster*}
+	 * @param max_conns {size_t} 当内部动态创建连接池对象时，该值指定每个动态创建
+	 *  的连接池的最大连接数量
 	 */
-	void set_cluster(redis_cluster* cluster);
+	void set_cluster(redis_cluster* cluster, size_t max_conns);
 
 	/**
 	 * 获得所设置的连接池集群管理器
@@ -251,10 +256,16 @@ protected:
 protected:
 	dbuf_pool* pool_;
 
+	// 根据键值计算哈希槽值
+	void hash_slot(const char* key);
+	void hash_slot(const char* key, size_t len);
+
 private:
 	redis_client* conn_;
 	redis_cluster* cluster_;
+	size_t max_conns_;
 	unsigned long long used_;
+	int slot_;
 
 	redis_pool* get_conns(redis_cluster* cluster, const char* info);
 

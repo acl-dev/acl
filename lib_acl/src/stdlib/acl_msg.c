@@ -31,6 +31,7 @@ int acl_msg_verbose = 0;
 
 static int __log_open_flag = 0;
 static int __stdout_enable = 0;
+static int __trace_enable = 0;
 
 static ACL_MSG_OPEN_FN __open_fn = NULL;
 static ACL_MSG_CLOSE_FN __close_fn = NULL;
@@ -68,6 +69,11 @@ void acl_msg_pre_write(ACL_MSG_PRE_WRITE_FN pre_write, void *ctx)
 void acl_msg_stdout_enable(int onoff)
 {
 	__stdout_enable = onoff;
+}
+
+void acl_msg_trace_enable(int onoff)
+{
+	__trace_enable = onoff;
 }
 
 void acl_msg_open2(ACL_VSTREAM *fp, const char *info_pre)
@@ -213,7 +219,9 @@ void acl_msg_warn(const char *fmt,...)
 	}
 
 	va_end (ap);
-	acl_trace_info();
+
+	if (__trace_enable)
+		acl_trace_info();
 }
 
 void acl_msg_warn2(const char *fmt, va_list ap)
@@ -236,7 +244,8 @@ void acl_msg_warn2(const char *fmt, va_list ap)
 		printf("\r\n");
 	}
 
-	acl_trace_info();
+	if (__trace_enable)
+		acl_trace_info();
 }
 
 void acl_msg_error(const char *fmt,...)
@@ -264,7 +273,9 @@ void acl_msg_error(const char *fmt,...)
 	}
 
 	va_end (ap);
-	acl_trace_info();
+
+	if (__trace_enable)
+		acl_trace_info();
 }
 
 void acl_msg_error2(const char *fmt, va_list ap)
@@ -287,7 +298,8 @@ void acl_msg_error2(const char *fmt, va_list ap)
 		printf("\r\n");
 	}
 
-	acl_trace_info();
+	if (__trace_enable)
+		acl_trace_info();
 }
 
 void acl_msg_fatal(const char *fmt,...)

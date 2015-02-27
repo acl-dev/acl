@@ -24,6 +24,11 @@ redis_key::~redis_key()
 
 /////////////////////////////////////////////////////////////////////////////
 
+int redis_key::del(const char* key)
+{
+	return del(key, NULL);
+}
+
 int redis_key::del(const char* first_key, ...)
 {
 	std::vector<const char*> keys;
@@ -40,36 +45,56 @@ int redis_key::del(const char* first_key, ...)
 
 int redis_key::del(const std::vector<string>& keys)
 {
+	if (keys.size() == 1)
+		hash_slot(keys[0].c_str());
 	build("DEL", NULL, keys);
 	return get_number();
 }
 
 int redis_key::del(const std::vector<const char*>& keys)
 {
+	if (keys.size() == 1)
+		hash_slot(keys[0]);
 	build("DEL", NULL, keys);
 	return get_number();
 }
 
 int redis_key::del(const std::vector<int>& keys)
 {
+	if (keys.size() == 1)
+	{
+		char buf[INT_LEN];
+		safe_snprintf(buf, sizeof(buf), "%d", keys[0]);
+		hash_slot(buf);
+	}
 	build("DEL", NULL, keys);
 	return get_number();
 }
 
 int redis_key::del(const char* keys[], size_t argc)
 {
+	if (argc == 1)
+		hash_slot(keys[0]);
 	build("DEL", NULL, keys, argc);
 	return get_number();
 }
 
 int redis_key::del(const int keys[], size_t argc)
 {
+	if (argc == 1)
+	{
+		char buf[INT_LEN];
+		safe_snprintf(buf, sizeof(buf), "%d", keys[0]);
+		hash_slot(buf);
+	}
 	build("DEL", NULL, keys, argc);
 	return get_number();
 }
 
 int redis_key::del(const char* keys[], const size_t lens[], size_t argc)
 {
+	if (argc == 1)
+		hash_slot(keys[0], lens[0]);
 	build("DEL", NULL, keys, lens, argc);
 	return get_number();
 }
@@ -85,6 +110,7 @@ int redis_key::dump(const char* key, string& out)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 	return get_string(out);
 }
@@ -100,6 +126,7 @@ bool redis_key::exists(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 	return get_number() > 0 ? true : false;
 }
@@ -120,6 +147,7 @@ int redis_key::expire(const char* key, int n)
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_number();
 }
@@ -141,6 +169,7 @@ int redis_key::expireat(const char* key, time_t stamp)
 	argv[2] = stamp_s;
 	lens[2] = strlen(stamp_s);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_number();
 }
@@ -171,6 +200,7 @@ int redis_key::persist(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 	return get_number();
 }
@@ -191,6 +221,7 @@ int redis_key::pexpire(const char* key, int n)
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_number();
 }
@@ -212,6 +243,7 @@ int redis_key::pexpireat(const char* key, long long int stamp)
 	argv[2] = stamp_s;
 	lens[2] = strlen(stamp_s);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_number();
 }
@@ -227,6 +259,7 @@ long long int redis_key::pttl(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 
 	bool success;
@@ -313,6 +346,7 @@ bool redis_key::restore(const char* key, const char* value, size_t len,
 		argc++;
 	}
 
+	hash_slot(key);
 	build_request(argc, argv, lens);
 	return check_status();
 }
@@ -328,6 +362,7 @@ int redis_key::ttl(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 
 	bool success;
@@ -350,6 +385,7 @@ redis_key_t redis_key::type(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 	const char* ptr = get_status();
 
@@ -453,6 +489,7 @@ int redis_key::object_refcount(const char* key)
 	argv[2] = key;
 	lens[2] = strlen(key);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_number();
 }
@@ -471,6 +508,7 @@ bool redis_key::object_encoding(const char* key, string& out)
 	argv[2] = key;
 	lens[2] = strlen(key);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_string(out) > 0 ? true : false;
 }
@@ -489,6 +527,7 @@ int redis_key::object_idletime(const char* key)
 	argv[2] = key;
 	lens[2] = strlen(key);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_number();
 }

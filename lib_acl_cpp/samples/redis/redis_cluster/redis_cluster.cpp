@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "util.h"
 
 static acl::string __keypre("test_key_cluster");
 
@@ -98,16 +99,34 @@ static bool test_set(acl::redis_string& option, int i)
 
 	option.reset();
 	bool ret = option.set(key.c_str(), value.c_str());
-	printf("set key: %s, value: %s %s\r\n", key.c_str(),
-		value.c_str(), ret ? "ok" : "error");
+	if (i < 10)
+		printf("set key: %s, value: %s %s\r\n", key.c_str(),
+			value.c_str(), ret ? "ok" : "error");
+	return ret;
+}
+
+static bool test_get(acl::redis_string& option, int i)
+{
+	acl::string key;
+	key.format("%s_%d", __keypre.c_str(), i);
+
+	acl::string value;
+
+	option.reset();
+	bool ret = option.get(key.c_str(), value);
+	if (i < 10)
+		printf("get key: %s, value: %s %s, len: %d\r\n",
+			key.c_str(), value.c_str(), ret ? "ok" : "error",
+			(int) value.length());
 	return ret;
 }
 
 class test_thread : public acl::thread
 {
 public:
-	test_thread(acl::redis_cluster& cluster, const char* cmd, int n)
-		: cluster_(cluster), cmd_(cmd), n_(n) {}
+	test_thread(acl::redis_cluster& cluster, int max_conns,
+		const char* cmd, int n)
+	: cluster_(cluster), max_conns_(max_conns), cmd_(cmd), n_(n) {}
 
 	~test_thread() {}
 
@@ -115,33 +134,37 @@ protected:
 	virtual void* run()
 	{
 		bool ret;
-		acl::redis_key option;
-		acl::redis_string string_option;
+		acl::redis_key cmd_key;
+		acl::redis_string cmd_string;
 
 		for (int i = 0; i < n_; i++)
 		{
-			option.set_cluster(&cluster_);
-			string_option.set_cluster(&cluster_);
+			cmd_key.set_cluster(&cluster_, max_conns_);
+			cmd_string.set_cluster(&cluster_, max_conns_);
 
 			if (cmd_ == "set")
-				ret = test_set(string_option, i);
+				ret = test_set(cmd_string, i);
+			else if (cmd_ == "get")
+				ret = test_get(cmd_string, i);
 			else if (cmd_ == "del")
-				ret = test_del(option, i);
+				ret = test_del(cmd_key, i);
 			else if (cmd_ == "expire")
-				ret = test_expire(option, i);
+				ret = test_expire(cmd_key, i);
 			else if (cmd_ == "ttl")
-				ret = test_ttl(option, i);
+				ret = test_ttl(cmd_key, i);
 			else if (cmd_ == "exists")
-				ret = test_exists(option, i);
+				ret = test_exists(cmd_key, i);
 			else if (cmd_ == "type")
-				ret = test_type(option, i);
+				ret = test_type(cmd_key, i);
 			else if (cmd_ == "all")
 			{
-				if (test_expire(option, i) == false
-					|| test_ttl(option, i) == false
-					|| test_exists(option, i) == false
-					|| test_type(option, i) == false
-					|| test_del(option, i) == false)
+				if (test_set(cmd_string, i) == false
+					|| test_get(cmd_string, i) == false
+					|| test_exists(cmd_key, i) == false
+					|| test_type(cmd_key, i) == false
+					|| test_expire(cmd_key, i) == false
+					|| test_ttl(cmd_key, i) == false
+					|| test_del(cmd_key, i) == false)
 				{
 					ret = false;
 				}
@@ -159,6 +182,13 @@ protected:
 				printf("cmd: %s error\r\n", cmd_.c_str());
 				break;
 			}
+
+			if (i > 0 && i % 1000 == 0)
+			{
+				char tmp[128];
+				acl::safe_snprintf(tmp, sizeof(tmp), "%d", i);
+				acl::meter_time(__FILE__, __LINE__, tmp);
+			}
 		}
 
 		return NULL;
@@ -166,6 +196,7 @@ protected:
 
 private:
 	acl::redis_cluster& cluster_;
+	int max_conns_;
 	acl::string cmd_;
 	int n_;
 };
@@ -173,12 +204,12 @@ private:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		"-s redis_addr_list[127.0.0.1:6379, 127.0.0.1:6380]\r\n"
+		"-s redis_addr_list[127.0.0.1:6379]\r\n"
 		"-n count[default: 10]\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-c max_threads[default: 10]\r\n"
-		"-a cmd[set|expire|ttl|exists|type|del]\r\n",
+		"-a cmd[set|get|expire|ttl|exists|type|del]\r\n",
 		procname);
 }
 
@@ -186,7 +217,7 @@ int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
 	int  max_threads = 10;
-	acl::string addrs("127.0.0.1:6379, 127.0.0.1:6380"), cmd;
+	acl::string addrs("127.0.0.1:6379"), cmd;
 
 	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:")) > 0)
 	{
@@ -224,10 +255,14 @@ int main(int argc, char* argv[])
 	acl::redis_cluster cluster(conn_timeout, rw_timeout);
 	cluster.init(NULL, addrs.c_str(), max_threads);
 
+	struct timeval begin;
+	gettimeofday(&begin, NULL);
+
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++)
 	{
-		test_thread* thread = new test_thread(cluster, cmd.c_str(), n);
+		test_thread* thread = new test_thread(cluster, max_threads,
+			cmd.c_str(), n);
 		threads.push_back(thread);
 		thread->set_detachable(false);
 		thread->start();
@@ -239,6 +274,14 @@ int main(int argc, char* argv[])
 		(*it)->wait();
 		delete (*it);
 	}
+
+	struct timeval end;
+	gettimeofday(&end, NULL);
+
+	long long int total = max_threads * n;
+	double inter = util::stamp_sub(&end, &begin);
+	printf("total %s: %lld, spent: %0.2f ms, speed: %0.2f\r\n", cmd.c_str(),
+		total, inter, (total * 1000) /(inter > 0 ? inter : 1));
 
 #ifdef WIN32
 	printf("enter any key to exit\r\n");

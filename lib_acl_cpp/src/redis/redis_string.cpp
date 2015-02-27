@@ -44,6 +44,7 @@ bool redis_string::set(const char* key, size_t key_len,
 	argv[2] = value;
 	lens[2] = value_len;
 
+	hash_slot(key, key_len);
 	build_request(3, argv, lens);
 	return check_status();
 }
@@ -73,6 +74,7 @@ bool redis_string::setex(const char* key, size_t key_len, const char* value,
 	argv[3] = value;
 	lens[3] = value_len;
 
+	hash_slot(key, key_len);
 	build_request(4, argv, lens);
 	return check_status();
 }
@@ -102,6 +104,7 @@ bool redis_string::psetex(const char* key, size_t key_len, const char* value,
 	argv[3] = value;
 	lens[3] = value_len;
 
+	hash_slot(key, key_len);
 	build_request(4, argv, lens);
 	return check_status();
 }
@@ -126,6 +129,7 @@ int redis_string::setnx(const char* key, size_t key_len,
 	argv[2] = value;
 	lens[2] = value_len;
 
+	hash_slot(key, key_len);
 	build_request(3, argv, lens);
 	return get_number();
 }
@@ -149,6 +153,7 @@ int redis_string::append(const char* key, const char* value, size_t size)
 	argv[2] = value;
 	lens[2] = size;
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_number();
 }
@@ -169,6 +174,7 @@ bool redis_string::get(const char* key, size_t len, string& buf)
 	argv[1] = key;
 	lens[1] = len;
 
+	hash_slot(key, len);
 	build_request(2, argv, lens);
 	return get_string(buf) >= 0 ? true : false;
 }
@@ -189,6 +195,7 @@ const redis_result* redis_string::get(const char* key, size_t len)
 	argv[1] = key;
 	lens[1] = len;
 
+	hash_slot(key, len);
 	build_request(2, argv, lens);
 	const redis_result* result = run();
 	if (result == NULL)
@@ -218,6 +225,7 @@ bool redis_string::getset(const char* key, size_t key_len,
 	argv[2] = value;
 	lens[2] = value_len;
 
+	hash_slot(key, key_len);
 	build_request(3, argv, lens);
 	return get_string(buf) >= 0 ? true : false;
 }
@@ -240,6 +248,7 @@ int redis_string::get_strlen(const char* key, size_t len)
 	argv[1] = key;
 	lens[1] = len;
 
+	hash_slot(key, len);
 	build_request(2, argv, lens);
 	return get_number();
 }
@@ -269,6 +278,7 @@ int redis_string::setrange(const char* key, size_t key_len, unsigned offset,
 	argv[3] = value;
 	lens[3] = value_len;
 
+	hash_slot(key, key_len);
 	build_request(4, argv, lens);
 	return get_number();
 }
@@ -299,6 +309,7 @@ bool redis_string::getrange(const char* key, size_t key_len,
 	argv[3] = end_buf;
 	lens[3] = strlen(end_buf);
 
+	hash_slot(key, key_len);
 	build_request(4, argv, lens);
 	return get_string(buf) >= 0 ? true : false;
 }
@@ -330,6 +341,7 @@ bool redis_string::setbit(const char* key, size_t len,
 	argv[3] = bit ? "1" : "0";
 	lens[3] = 1;
 
+	hash_slot(key, len);
 	build_request(4, argv, lens);
 	return get_number() >= 0 ? true : false;
 }
@@ -356,6 +368,7 @@ bool redis_string::getbit(const char* key, size_t len,
 	argv[2] = buf4off;
 	lens[2] = strlen(buf4off);
 
+	hash_slot(key, len);
 	build_request(3, argv, lens);
 	int ret = get_number();
 	if (ret < 0)
@@ -380,6 +393,7 @@ int redis_string::bitcount(const char* key, size_t len)
 	argv[1] = key;
 	lens[1] = len;
 
+	hash_slot(key, len);
 	build_request(2, argv, lens);
 	return get_number();
 }
@@ -410,6 +424,7 @@ int redis_string::bitcount(const char* key, size_t len, int start, int end)
 	argv[3] = buf4end;
 	lens[3] = strlen(buf4end);
 
+	hash_slot(key, len);
 	build_request(4, argv, lens);
 	return get_number();
 }
@@ -720,12 +735,14 @@ bool redis_string::mget(const char* keys[], const size_t keys_len[],
 
 bool redis_string::incr(const char* key, long long int* result /* = NULL */)
 {
+	hash_slot(key);
 	return incoper("INCR", key, 1, result);
 }
 
 bool redis_string::incrby(const char* key, long long int inc,
 	long long int* result /* = NULL */)
 {
+	hash_slot(key);
 	return incoper("INCRBY", key, inc, result);
 }
 
@@ -746,6 +763,7 @@ bool redis_string::incrbyfloat(const char* key, double inc,
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	if (get_string(buf, sizeof(buf)) == false)
 		return false;
@@ -788,6 +806,7 @@ bool redis_string::incoper(const char* cmd, const char* key, long long int n,
 		argc++;
 	}
 
+	hash_slot(key);
 	build_request(argc, argv, lens);
 
 	bool success;

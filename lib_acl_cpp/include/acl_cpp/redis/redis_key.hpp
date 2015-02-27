@@ -33,6 +33,7 @@ public:
 	 *  -1: 出错
 	 *  >0: 真正删除的 KEY 的个数，该值有可能少于输入的 KEY 的个数
 	 */
+	int del(const char* key);
 	int del(const char* first_key, ...);
 	int del(const std::vector<string>& keys);
 	int del(const std::vector<const char*>& keys);

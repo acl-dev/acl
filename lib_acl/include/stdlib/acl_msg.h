@@ -87,6 +87,13 @@ extern ACL_API int acl_msg_verbose;
 ACL_API void acl_msg_stdout_enable(int onoff);
 
 /**
+ * 当调用 acl_msg_error_xxx/acl_msg_warn_xxx 等函数记录出错或警告类型的日志时
+ * 是否需要记录调用堆栈，可由该函数进行设置
+ * @param onoff {int} 非 0 表示允许记录调用出错/警告日志的堆栈，缺省不记录
+ */
+ACL_API void acl_msg_trace_enable(int onoff);
+
+/**
  * 日志打开函数
  * @param log_file {const char*} 日志接收者集合，由 "|" 分隔，接收器
  *  可以是本地文件或远程套接口，如:

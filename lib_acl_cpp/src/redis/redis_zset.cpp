@@ -52,6 +52,7 @@ int redis_zset::zadd(const char* key, const std::map<string, double>& members)
 		i++;
 	}
 
+	hash_slot(key);
 	build_request(argc, argv, lens);
 	return get_number();
 }
@@ -86,6 +87,7 @@ int redis_zset::zadd(const char* key,
 		i++;
 	}
 
+	hash_slot(key);
 	build_request(argc, argv, lens);
 	return get_number();
 }
@@ -121,6 +123,7 @@ int redis_zset::zadd(const char* key,
 		i++;
 	}
 
+	hash_slot(key);
 	build_request(argc, argv, lens);
 	return get_number();
 }
@@ -159,6 +162,7 @@ int redis_zset::zadd(const char* key, const std::vector<string>& members,
 		j++;
 	}
 
+	hash_slot(key);
 	build_request(argc, argv, lens);
 	return get_number();
 }
@@ -197,6 +201,7 @@ int redis_zset::zadd(const char* key, const std::vector<const char*>& members,
 		j++;
 	}
 
+	hash_slot(key);
 	build_request(argc, argv, lens);
 	return get_number();
 }
@@ -231,6 +236,7 @@ int redis_zset::zadd(const char* key, const char* members[], double scores[],
 		j++;
 	}
 
+	hash_slot(key);
 	build_request(argc, argv, lens);
 	return get_number();
 }
@@ -266,6 +272,7 @@ int redis_zset::zadd(const char* key, const char* members[],
 		j++;
 	}
 
+	hash_slot(key);
 	build_request(argc, argv, lens);
 	return get_number();
 }
@@ -281,6 +288,7 @@ int redis_zset::zcard(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 	return get_number();
 }
@@ -306,6 +314,7 @@ int redis_zset::zcount(const char* key, double min, double max)
 	argv[3] = max_buf;
 	lens[3] = strlen(max_buf);
 
+	hash_slot(key);
 	build_request(4, argv, lens);
 	return get_number();
 }
@@ -336,6 +345,7 @@ bool redis_zset::zincrby(const char* key, double inc,
 	argv[3] = member;
 	lens[3] = len;
 
+	hash_slot(key);
 	build_request(4, argv, lens);
 	int ret = get_string(score, sizeof(score));
 	if (ret < 0)
@@ -367,6 +377,7 @@ int redis_zset::zrange_get(const char* cmd, const char* key, int start,
 	argv[3] = stop_s;
 	lens[3] = strlen(stop_s);
 
+	hash_slot(key);
 	build_request(4, argv, lens);
 	return get_strings(result);
 }
@@ -404,6 +415,7 @@ int redis_zset::zrange_get_with_scores(const char* cmd, const char* key,
 	argv[4] = "WITHSCORES";
 	lens[4] = sizeof("WITHSCORES") - 1;
 
+	hash_slot(key);
 	build_request(5, argv, lens);
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
@@ -488,6 +500,7 @@ int redis_zset::zrangebyscore_get(const char* cmd, const char* key,
 		argc += 2;
 	}
 
+	hash_slot(key);
 	build_request(argc, argv, lens);
 	return get_strings(out);
 }
@@ -553,6 +566,7 @@ int redis_zset::zrangebyscore_get_with_scores(const char* cmd,
 		argc += 2;
 	}
 
+	hash_slot(key);
 	build_request(argc, argv, lens);
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
@@ -627,6 +641,7 @@ int redis_zset::zrank(const char* key, const char* member, size_t len)
 	argv[2] = member;
 	lens[2] = len;
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_number();
 }
@@ -651,12 +666,14 @@ int redis_zset::zrem(const char* key, const char* first_member, ...)
 
 int redis_zset::zrem(const char* key, const std::vector<string>& members)
 {
+	hash_slot(key);
 	build("ZREM", key, members);
 	return get_number();
 }
 
 int redis_zset::zrem(const char* key, const std::vector<const char*>& members)
 {
+	hash_slot(key);
 	build("ZREM", key, members);
 	return get_number();
 }
@@ -664,6 +681,7 @@ int redis_zset::zrem(const char* key, const std::vector<const char*>& members)
 int redis_zset::zrem(const char* key, const char* members[],
 	const size_t lens[], size_t argc)
 {
+	hash_slot(key);
 	build("ZREM", key, members, lens, argc);
 	return get_number();
 }
@@ -689,6 +707,7 @@ int redis_zset::zremrangebyrank(const char* key, int start, int stop)
 	argv[3] = stop_s;
 	lens[3] = strlen(stop_s);
 
+	hash_slot(key);
 	build_request(4, argv, lens);
 	return get_number();
 }
@@ -720,6 +739,7 @@ int redis_zset::zremrangebyscore(const char* key, const char* min,
 	argv[3] = max;
 	lens[3] = strlen(max);
 
+	hash_slot(key);
 	build_request(4, argv, lens);
 	return get_number();
 }
@@ -769,6 +789,7 @@ int redis_zset::zrevrank(const char* key, const char* member, size_t len)
 	argv[2] = member;
 	lens[2] = len;
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_number();
 }
@@ -793,6 +814,7 @@ bool redis_zset::zscore(const char* key, const char* member, size_t len,
 	argv[2] = member;
 	lens[2] = len;
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 
 	char buf[BUFLEN];
@@ -1002,6 +1024,7 @@ int redis_zset::zrangebylex(const char* key, const char* min, const char* max,
 		argc++;
 	}
 
+	hash_slot(key);
 	build_request(argc, argv, lens);
 	return get_strings(out);
 }
@@ -1023,6 +1046,7 @@ int redis_zset::zlexcount(const char* key, const char* min, const char* max)
 	argv[3] = max;
 	lens[3] = strlen(max);
 
+	hash_slot(key);
 	build_request(4, argv, lens);
 	return get_number();
 }
@@ -1044,6 +1068,7 @@ int redis_zset::zremrangebylex(const char* key, const char* min, const char* max
 	argv[3] = max;
 	lens[3] = strlen(max);
 
+	hash_slot(key);
 	build_request(4, argv, lens);
 	return get_number();
 }

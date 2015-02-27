@@ -36,6 +36,7 @@ int redis_set::sadd(const char* key, const char* first_member, ...)
 
 int redis_set::sadd(const char* key, const std::vector<const char*>& memsbers)
 {
+	hash_slot(key);
 	build("SADD", key, memsbers);
 	return get_number();
 
@@ -43,12 +44,14 @@ int redis_set::sadd(const char* key, const std::vector<const char*>& memsbers)
 
 int redis_set::sadd(const char* key, const std::vector<string>& members)
 {
+	hash_slot(key);
 	build("SADD", key, members);
 	return get_number();
 }
 
 int redis_set::sadd(const char* key, const char* argv[], size_t argc)
 {
+	hash_slot(key);
 	build("SADD", key, argv, argc);
 	return get_number();
 }
@@ -56,6 +59,7 @@ int redis_set::sadd(const char* key, const char* argv[], size_t argc)
 int redis_set::sadd(const char* key, const char* argv[],
 	const size_t lens[], size_t argc)
 {
+	hash_slot(key);
 	build("SADD", key, argv, lens, argc);
 	return get_number();
 }
@@ -70,6 +74,7 @@ bool redis_set::spop(const char* key, string& buf)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 	return get_string(buf) < 0 ? false : true;
 }
@@ -84,6 +89,7 @@ int redis_set::scard(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 	return get_number();
 }
@@ -98,6 +104,7 @@ int redis_set::smembers(const char* key, std::vector<string>* members)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 	return get_strings(members);
 }
@@ -312,6 +319,7 @@ bool redis_set::sismember(const char* key, const char* member, size_t len)
 	argv[2] = member;
 	lens[2] = len;
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_number() > 0 ? true : false;
 }
@@ -327,6 +335,7 @@ int redis_set::srandmember(const char* key, string& out)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 	return get_string(out);
 }
@@ -347,6 +356,7 @@ int redis_set::srandmember(const char* key, size_t n, std::vector<string>& out)
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	return get_strings(out);
 }
@@ -367,12 +377,14 @@ int redis_set::srem(const char* key, const char* first_member, ...)
 
 int redis_set::srem(const char* key, const std::vector<string>& members)
 {
+	hash_slot(key);
 	build("SREM", key, members);
 	return get_number();
 }
 
 int redis_set::srem(const char* key, const std::vector<const char*>& members)
 {
+	hash_slot(key);
 	build("SREM", key, members);
 	return get_number();
 }
@@ -380,6 +392,7 @@ int redis_set::srem(const char* key, const std::vector<const char*>& members)
 int redis_set::srem(const char* key, const char* members[],
 	size_t lens[], size_t argc)
 {
+	hash_slot(key);
 	build("SREM", key, members, lens, argc);
 	return get_number();
 }
