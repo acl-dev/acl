@@ -20,11 +20,15 @@ connect_manager::connect_manager()
 
 connect_manager::~connect_manager()
 {
+	lock_.lock();
+
 	std::vector<connect_pool*>::iterator it = pools_.begin();
 
 	// default_pool_ 已经包含在 pools_ 里了
 	for (; it != pools_.end(); ++it)
 		delete *it;
+
+	lock_.unlock();
 }
 
 // 分析一个服务器地址，格式：IP:PORT[:MAX_CONN]
@@ -146,8 +150,7 @@ connect_pool& connect_manager::set(const char* addr, int count)
 	}
 
 	connect_pool* pool = create_pool(key, count, pools_.size() - 1);
-	if (retry_inter_ > 0)
-		pool->set_retry_inter(retry_inter_);
+	pool->set_retry_inter(retry_inter_);
 	pools_.push_back(pool);
 
 	lock_.unlock();
@@ -180,7 +183,6 @@ void connect_manager::remove(const char* addr)
 
 	lock_.unlock();
 }
-
 
 connect_pool* connect_manager::get(const char* addr,
 	bool exclusive /* = true */)

@@ -21,6 +21,8 @@ redis_command::redis_command()
 , max_conns_(0)
 , used_(0)
 , slot_(-1)
+, redirect_max_(15)
+, redirect_sleep_(1)
 , slice_req_(false)
 , request_buf_(NULL)
 , request_obj_(NULL)
@@ -40,6 +42,8 @@ redis_command::redis_command(redis_client* conn)
 , max_conns_(0)
 , used_(0)
 , slot_(-1)
+, redirect_max_(15)
+, redirect_sleep_(1)
 , slice_req_(false)
 , request_buf_(NULL)
 , request_obj_(NULL)
@@ -68,6 +72,18 @@ redis_command::redis_command(redis_cluster* cluster, size_t max_conns)
 , result_(NULL)
 {
 	pool_ = NEW dbuf_pool(128000);
+	if (cluster != NULL)
+	{
+		redirect_max_ = cluster->get_redirect_max();
+		if (redirect_max_ <= 0)
+			redirect_max_ = 15;
+		redirect_sleep_ = cluster->get_redirect_sleep();
+	}
+	else
+	{
+		redirect_max_ = 15;
+		redirect_sleep_ = 1;
+	}
 }
 
 redis_command::~redis_command()
@@ -114,6 +130,10 @@ void redis_command::set_cluster(redis_cluster* cluster, size_t max_conns)
 	max_conns_ = max_conns;
 	if (max_conns_ == 0)
 		max_conns_ = 100;
+	redirect_max_ = cluster->get_redirect_max();
+	if (redirect_max_ <= 0)
+		redirect_max_ = 15;
+	redirect_sleep_ = cluster->get_redirect_sleep();
 }
 
 bool redis_command::eof() const
@@ -232,7 +252,8 @@ const redis_result* redis_command::get_result() const
 	return result_;
 }
 
-redis_pool* redis_command::get_conns(redis_cluster* cluster, const char* info)
+// 分析重定向信息，获得重定向的服务器地址
+const char* redis_command::get_addr(const char* info)
 {
 	char* cmd = pool_->dbuf_strdup(info);
 	char* slot = strchr(cmd, ' ');
@@ -246,130 +267,261 @@ redis_pool* redis_command::get_conns(redis_cluster* cluster, const char* info)
 	if (*addr == 0)
 		return NULL;
 
-	// printf(">>>addr: %s, slot: %s\r\n", addr, slot);
-	redis_pool* conns = (redis_pool*) cluster->get(addr);
-
-	// 如果服务器地址不存在，则根据服务器地址动态创建连接池对象
-	if (conns == NULL)
-		conns = (redis_pool*) &cluster->set(addr, max_conns_);
-
-	return conns;
+	return addr;
 }
 
-const redis_result* redis_command::run(redis_cluster* cluster, size_t nchildren)
+// 根据输入的目标地址进行重定向：打开与该地址的连接，如果连接失败，则随机
+// 选取一个服务器地址进行连接
+redis_client* redis_command::redirect(redis_cluster* cluster, const char* addr)
 {
 	redis_pool* conns;
 
-	// 如果已经计算了哈希槽值，则优先从本地缓存中查找对应的连接池
-	// 如果未找到，则从所有集群结点中随便找一个可用的连接池对象
+	// 如果服务器地址不存在，则根据服务器地址动态创建连接池对象
+	if ((conns = (redis_pool*) cluster->get(addr)) == NULL)
+		conns = (redis_pool*) &cluster->set(addr, max_conns_);
 
-	if (slot_ >= 0)
-	{
-		conns = cluster->peek_slot(slot_);
-		if (conns == NULL)
-			conns = (redis_pool*) cluster->peek();
-	}
-	else
-		conns = (redis_pool*) cluster->peek();
-
-	// 如果没有找到可用的连接池对象，则直接返回 NULL 表示出错
 	if (conns == NULL)
 		return NULL;
 
-	// 从连接池对象中获取一个连接对象
-	redis_client* conn = (redis_client*) conns->peek();
+	redis_client* conn;
+
+	int i = 0;
+
+	while (i++ < 5)
+	{
+		conn = (redis_client*) conns->peek();
+		if (conn != NULL)
+			return conn;
+
+		conns = (redis_pool*) cluster->peek();
+	}
+
+	logger_warn("too many retry: %d, addr: %s", i, addr);
+	return NULL;
+}
+
+redis_client* redis_command::peek_conn(redis_cluster* cluster, int slot)
+{
+	// 如果已经计算了哈希槽值，则优先从本地缓存中查找对应的连接池
+	// 如果未找到，则从所有集群结点中随便找一个可用的连接池对象
+
+	redis_pool* conns;
+	redis_client* conn;
+	int i = 0;
+
+	while (i++ < 5)
+	{
+		if (slot < 0)
+			conns = (redis_pool*) cluster->peek();
+		else if ((conns = cluster->peek_slot(slot)) == NULL)
+			conns = (redis_pool*) cluster->peek();
+
+		if (conns == NULL)
+		{
+			slot = -1;
+			continue;
+		}
+
+		conn = (redis_client*) conns->peek();
+		if (conn != NULL)
+			return conn;
+
+		// 取消哈希槽的地址映射关系
+		cluster->clear_slot(slot);
+
+		// 将连接池对象置为不可用状态
+		conns->set_alive(false);
+	}
+
+	logger_warn("too many retry: %d, slot: %d", i, slot);
+	return NULL;
+}
+
+const redis_result* redis_command::run(redis_cluster* cluster, size_t nchild)
+{
+	redis_client* conn = peek_conn(cluster, slot_);
+
+	// 如果没有找到可用的连接对象，则直接返回 NULL 表示出错
 	if (conn == NULL)
+	{
+		logger_error("peek_conn NULL, slot_: %d", slot_);
 		return NULL;
+	}
 
 	redis_result_t type;
+	bool  last_moved;
 	int   n = 0;
-	bool  last_moved = false;
 
-	while (n++ <= 10)
+	while (n++ < redirect_max_)
 	{
 		// 根据请求过程是否采用内存分片方式调用不同的请求过程
 		if (slice_req_)
-			result_ = conn->run(pool_, *request_obj_, nchildren);
+			result_ = conn->run(pool_, *request_obj_, nchild);
 		else
-			result_ = conn->run(pool_, *request_buf_, nchildren);
+			result_ = conn->run(pool_, *request_buf_, nchild);
 
-		// 将连接对象归还给连接池对象
-		conns->put(conn, !conn->eof());
+		// 如果连接异常断开，则需要进行重试
+		if (conn->eof())
+		{
+			// 删除哈希槽中的地址映射关系以便下次操作时重新获取
+			cluster->clear_slot(slot_);
+
+			// 将连接池对象置为不可用状态
+			conn->get_pool()->set_alive(false);
+
+			// 将连接对象归还给连接池对象
+			conn->get_pool()->put(conn, false);
+
+			conn = peek_conn(cluster, slot_);
+			if (conn != NULL)
+			{
+				last_moved = true;
+				reset(true);
+				continue;
+			}
+
+			last_moved = false;
+		}
+		else
+		{
+			last_moved = false;
+			// 将连接对象归还给连接池对象
+			conn->get_pool()->put(conn, true);
+		}
 
 		if (result_ == NULL)
+		{
+			logger_error("result NULL");
 			return NULL;
+		}
 
 		// 取得服务器的响应结果的类型，并进行分别处理
 		type = result_->get_type();
 
 		if (type == REDIS_RESULT_UNKOWN)
+		{
+			logger_error("unknown result type: %d", type);
 			return NULL;
+		}
 
 		if (type != REDIS_RESULT_ERROR)
 		{
-			// 如果发生重定向过程，则设置哈希槽的对应 redis 服务地址
-
+			// 如果发生重定向过程，则设置哈希槽对应 redis 服务地址
 			if (slot_ < 0 || !last_moved)
 				return result_;
 
-			const char* addr = conns->get_addr();
+			const char* addr = conn->get_pool()->get_addr();
 			cluster->set_slot(slot_, addr);
 
 			return result_;
 		}
 
+#define	EQ(x, y) !strncasecmp((x), (y), sizeof(y) -1)
+
 		// 对于结果类型为错误类型，则需要进一步判断是否是重定向指令
 		const char* ptr = result_->get_error();
 		if (ptr == NULL || *ptr == 0)
+		{
+			logger_error("result error: null");
 			return result_;
+		}
 
 		// 如果出错信息为重定向指令，则执行重定向过程
-		if (strncasecmp(ptr, "MOVED", 5) == 0)
+		if (EQ(ptr, "MOVED"))
 		{
-			conns = get_conns(cluster_, ptr);
-			if (conns == NULL)
+			const char* addr = get_addr(ptr);
+			if (addr == NULL)
+			{
+				logger_warn("MOVED invalid, ptr: %s", ptr);
 				return result_;
-			conn = (redis_client*) conns->peek();
+			}
+
+			conn = redirect(cluster, addr);
 			if (conn == NULL)
+			{
+				logger_error("redirect NULL, addr: %s", addr);
 				return result_;
+			}
+
+			ptr = conn->get_pool()->get_addr();
+			if (n >= 2 && redirect_sleep_ > 0
+				&& strcmp(ptr, addr) != 0)
+			{
+				logger("redirect %d, curr %s, waiting %s ...",
+					n, ptr, addr);
+				sleep(redirect_sleep_);
+			}
+
 			last_moved = true;
 
 			// 需要保存哈希槽值
 			reset(true);
 		}
-		else if (strncasecmp(ptr, "ASK", 3) == 0)
+		else if (EQ(ptr, "ASK"))
 		{
-			conns = get_conns(cluster_, ptr);
-			if (conns == NULL)
+			const char* addr = get_addr(ptr);
+			if (addr == NULL)
+			{
+				logger_warn("ASK invalid, ptr: %s", ptr);
 				return result_;
-			conn = (redis_client*) conns->peek();
+			}
+
+			conn = redirect(cluster, addr);
 			if (conn == NULL)
+			{
+				logger_error("redirect NULL, addr: %s", addr);
 				return result_;
+			}
+
 			last_moved = false;
+			reset(true);
+		}
+
+		// 处理一个主结点失效的情形
+		else if (EQ(ptr, "CLUSTERDOWN"))
+		{
+			cluster->clear_slot(slot_);
+
+			if (redirect_sleep_ > 0)
+			{
+				logger("redirect %d, slot %d, waiting %s ...",
+					n, slot_, ptr);
+				sleep(redirect_sleep_);
+			}
+
+			conn = peek_conn(cluster, -1);
+			if (conn == NULL)
+			{
+				logger_error("peek_conn NULL");
+				return result_;
+			}
 			reset(true);
 		}
 
 		// 对于其它错误类型，则直接返回本次得到的响应结果对象
 		else
+		{
+			logger_error("server error: %s", ptr);
 			return result_;
+		}
 	}
 
-	logger_warn("too many cluster redirect: %d", n);
+	logger_warn("too many redirect: %d, max: %d", n, redirect_max_);
 	return NULL;
 }
 
-const redis_result* redis_command::run(size_t nchildren /* = 0 */)
+const redis_result* redis_command::run(size_t nchild /* = 0 */)
 {
 	used_++;
 
 	if (cluster_ != NULL)
-		return run(cluster_, nchildren);
+		return run(cluster_, nchild);
 	else if (conn_ != NULL)
 	{
 		if (slice_req_)
-			result_ = conn_->run(pool_, *request_obj_, nchildren);
+			result_ = conn_->run(pool_, *request_obj_, nchild);
 		else
-			result_ = conn_->run(pool_, *request_buf_, nchildren);
+			result_ = conn_->run(pool_, *request_buf_, nchild);
 		return result_;
 	}
 	else

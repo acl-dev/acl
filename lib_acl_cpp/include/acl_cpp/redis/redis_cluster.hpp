@@ -36,12 +36,52 @@ public:
 	void set_slot(int slot, const char* addr);
 
 	/**
+	 * 清除哈希槽对应的 redis 服务地址，以便于重新计算位置
+	 * @param slot {int} 哈希槽值
+	 */
+	void clear_slot(int slot);
+
+	/**
 	 * 获得哈希槽最大值
 	 * @return {int}
 	 */
 	int get_max_slot() const
 	{
 		return max_slot_;
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	/**
+	 * 设置协议重定向次数的阀值，默认值为 15
+	 * @param max {int} 重定向次数阀值，只有当该值 > 0 时才有效
+	 */
+	void set_redirect_max(int max);
+
+	/**
+	 * 设置协议重定向次数的阀值
+	 * @return {int}
+	 */
+	int get_redirect_max() const
+	{
+		return redirect_max_;
+	}
+
+	/**
+	 * 当重定向次数 >= 2 时允许休眠的时间(秒)，默认值为 1 秒，这样做的
+	 * 好处是当一个 redis 服务主结点掉线后，其它从结点升级为主结点是需要
+	 * 时间的(由 redis.conf 中的 cluster-node-timeout 配置项决定)，所以
+	 * 为了在重定向的次数范围内不报错需要等待从结点升级为主结点
+	 * @param n {int} 每次重定向时的休息时间(秒)，默认值为 1 秒
+	 */
+	void set_redirect_sleep(int n);
+
+	/**
+	 * 获得 set_redirect_sleep 设置的或默认的时间
+	 * @return {int} 单位为秒
+	 */
+	int get_redirect_sleep() const
+	{
+		return redirect_sleep_;
 	}
 
 protected:
@@ -59,6 +99,8 @@ private:
 	int   max_slot_;
 	const char**  slot_addrs_;
 	std::vector<char*> addrs_;
+	int   redirect_max_;
+	int   redirect_sleep_;
 };
 
 } // namespace acl

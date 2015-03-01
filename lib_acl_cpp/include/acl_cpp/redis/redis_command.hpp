@@ -173,8 +173,8 @@ public:
 	void set_slice_respond(bool on);
 
 protected:
-	const redis_result* run(size_t nchildren = 0);
-	const redis_result* run(redis_cluster* cluster, size_t nchildren);
+	const redis_result* run(size_t nchild = 0);
+	const redis_result* run(redis_cluster* cluster, size_t nchild);
 
 	void build_request(size_t argc, const char* argv[], size_t lens[]);
 	void reset_request();
@@ -266,8 +266,12 @@ private:
 	size_t max_conns_;
 	unsigned long long used_;
 	int slot_;
+	int redirect_max_;
+	int redirect_sleep_;
 
-	redis_pool* get_conns(redis_cluster* cluster, const char* info);
+	redis_client* peek_conn(redis_cluster* cluster, int slot);
+	redis_client* redirect(redis_cluster* cluster, const char* addr);
+	const char* get_addr(const char* info);
 
 private:
 	/************************** request ********************************/

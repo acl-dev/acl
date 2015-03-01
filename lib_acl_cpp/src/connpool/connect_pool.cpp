@@ -61,10 +61,13 @@ bool connect_pool::aliving()
 	time_t now = time(NULL);
 
 	lock_.lock();
-	if (now - last_dead_ >= retry_inter_)
+	if (retry_inter_ > 0 && now - last_dead_ >= retry_inter_)
 	{
 		alive_ = true;
 		lock_.unlock();
+
+		// 重置服务端连接状态，以便重试
+		logger("reset server: %s", get_addr());
 		return true;
 	}
 
@@ -78,12 +81,15 @@ connect_client* connect_pool::peek()
 	if (alive_ == false)
 	{
 		time_t now = time(NULL);
-		if (now - last_dead_ < retry_inter_)
+		if (retry_inter_ <= 0 || now - last_dead_ < retry_inter_)
 		{
 			lock_.unlock();
 			return NULL;
 		}
 		alive_ = true;
+
+		// 重置服务端连接状态，以便重试
+		logger("reset server: %s", get_addr());
 	}
 
 	connect_client* conn;
@@ -140,13 +146,15 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 	{
 		delete conn;
 		count_--;
-		acl_assert(count_ >= 0);
-		if (count_ == 0)
+
+		if (count_ <= 0)
 		{
 			// 如果引用计数为 0 则自销毁
 			lock_.unlock();
 			delete this;
 		}
+		else
+			lock_.unlock();
 		return;
 	}
 

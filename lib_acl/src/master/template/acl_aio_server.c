@@ -547,8 +547,9 @@ static void server_wakeup(ACL_AIO *aio, int fd)
 	increase_client_counter();
 
 	if (acl_getpeername(fd, addr, sizeof(addr)) < 0) {
-		acl_msg_warn("%s, %s(%d): get socket's addr error: %s",
-			__FILE__, myname, __LINE__, acl_last_serror());
+		if (acl_msg_verbose)
+			acl_msg_warn("%s, %s(%d): get socket's addr error: %s",
+				__FILE__, myname, __LINE__, acl_last_serror());
 		acl_socket_close(fd);
 		return;
 	}
@@ -558,8 +559,9 @@ static void server_wakeup(ACL_AIO *aio, int fd)
 		*ptr = 0;
 
 	if (!acl_access_permit(addr)) {
-		acl_msg_warn("%s, %s(%d): addr(%s) be denied",
-			__FILE__, myname, __LINE__, addr);
+		if (acl_msg_verbose)
+			acl_msg_warn("%s, %s(%d): addr(%s) be denied",
+				__FILE__, myname, __LINE__, addr);
 
 		if (__deny_info && *__deny_info) {
 			if (write(fd, __deny_info, strlen(__deny_info)) > 0

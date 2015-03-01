@@ -99,6 +99,7 @@ static bool test_set(acl::redis_string& option, int i)
 
 	option.reset();
 	bool ret = option.set(key.c_str(), value.c_str());
+	return ret;
 	if (i < 10)
 		printf("set key: %s, value: %s %s\r\n", key.c_str(),
 			value.c_str(), ret ? "ok" : "error");
@@ -121,12 +122,19 @@ static bool test_get(acl::redis_string& option, int i)
 	return ret;
 }
 
+static int __threads_exit = 0;
+
 class test_thread : public acl::thread
 {
 public:
-	test_thread(acl::redis_cluster& cluster, int max_conns,
-		const char* cmd, int n)
-	: cluster_(cluster), max_conns_(max_conns), cmd_(cmd), n_(n) {}
+	test_thread(acl::locker& locker, acl::redis_cluster& cluster,
+		int max_conns, const char* cmd, int n)
+	: locker_(locker)
+	, cluster_(cluster)
+	, max_conns_(max_conns)
+	, cmd_(cmd)
+	, n_(n)
+	{}
 
 	~test_thread() {}
 
@@ -179,9 +187,12 @@ protected:
 
 			if (ret == false)
 			{
-				printf("cmd: %s error\r\n", cmd_.c_str());
+				printf("cmd: %s error, tid: %lu\r\n",
+					cmd_.c_str(), thread_self());
 				break;
 			}
+
+			continue;
 
 			if (i > 0 && i % 1000 == 0)
 			{
@@ -191,10 +202,15 @@ protected:
 			}
 		}
 
+		locker_.lock();
+		__threads_exit++;
+		locker_.unlock();
+
 		return NULL;
 	}
 
 private:
+	acl::locker& locker_;
 	acl::redis_cluster& cluster_;
 	int max_conns_;
 	acl::string cmd_;
@@ -250,28 +266,57 @@ int main(int argc, char* argv[])
 	}
 
 	acl::acl_cpp_init();
-	//acl::log::stdout_open(true);
+	acl::log::stdout_open(true);
 
 	acl::redis_cluster cluster(conn_timeout, rw_timeout);
+
+	// 当连接池不可用时，设置重新恢复该连接池对象的等待时间(秒)，
+	// 当设置的值 <= 0 时表示不再恢复
+	cluster.set_retry_inter(0);
+
+	// 设置重定向的最大阀值，若重定向次数超过此阀值则报错
+	cluster.set_redirect_max(20);
+
+	// 当重定向次数 >= 2 时每次再重定向此函数设置休息的时间(秒)
+	cluster.set_redirect_sleep(1);
+
 	cluster.init(NULL, addrs.c_str(), max_threads);
 
 	struct timeval begin;
 	gettimeofday(&begin, NULL);
 
+	acl::locker locker;
+
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++)
 	{
-		test_thread* thread = new test_thread(cluster, max_threads,
-			cmd.c_str(), n);
+		test_thread* thread = new test_thread(locker, cluster,
+			max_threads, cmd.c_str(), n);
 		threads.push_back(thread);
-		thread->set_detachable(false);
+		thread->set_detachable(true);
 		thread->start();
+	}
+
+	while (true)
+	{
+		locker.lock();
+		if (__threads_exit == max_threads)
+		{
+			locker.unlock();
+			printf("All threads over now!\r\n");
+			break;
+		}
+		locker.unlock();
+
+		//printf("max_threads: %d, threads_exit: %d\r\n",
+		//	max_threads, __threads_exit);
+		sleep(1);
 	}
 
 	std::vector<test_thread*>::iterator it = threads.begin();
 	for (; it != threads.end(); ++it)
 	{
-		(*it)->wait();
+		//(*it)->wait();
 		delete (*it);
 	}
 

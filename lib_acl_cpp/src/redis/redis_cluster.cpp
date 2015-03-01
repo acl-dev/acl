@@ -10,6 +10,8 @@ redis_cluster::redis_cluster(int conn_timeout, int rw_timeout,
 : conn_timeout_(conn_timeout)
 , rw_timeout_(rw_timeout)
 , max_slot_(max_slot)
+, redirect_max_(15)
+, redirect_sleep_(1)
 {
 	slot_addrs_ = (const char**) acl_mycalloc(max_slot_, sizeof(char*));
 }
@@ -20,6 +22,17 @@ redis_cluster::~redis_cluster()
 	std::vector<char*>::iterator it = addrs_.begin();
 	for (; it != addrs_.end(); ++it)
 		acl_myfree(*it);
+}
+
+void redis_cluster::set_redirect_max(int max)
+{
+	if (max > 0)
+		redirect_max_ = max;
+}
+
+void redis_cluster::set_redirect_sleep(int n)
+{
+	redirect_sleep_ = n;
 }
 
 connect_pool* redis_cluster::create_pool(const char* addr,
@@ -46,11 +59,21 @@ redis_pool* redis_cluster::peek_slot(int slot)
 	}
 
 	// 因为已经进行了加锁保护，所以在调用 get 方法时的第二个锁保护参数设为 false
-	redis_pool* conn = (redis_pool*) get(slot_addrs_[slot], false);
+	redis_pool* conns = (redis_pool*) get(slot_addrs_[slot], false);
 
 	unlock();
 
-	return conn;
+	return conns;
+}
+
+void redis_cluster::clear_slot(int slot)
+{
+	if (slot >= 0 && slot < max_slot_)
+	{
+		lock();
+		slot_addrs_[slot] = NULL;
+		unlock();
+	}
 }
 
 void redis_cluster::set_slot(int slot, const char* addr)
