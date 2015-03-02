@@ -11,7 +11,7 @@ redis_cluster::redis_cluster(int conn_timeout, int rw_timeout,
 , rw_timeout_(rw_timeout)
 , max_slot_(max_slot)
 , redirect_max_(15)
-, redirect_sleep_(1)
+, redirect_sleep_(100)
 {
 	slot_addrs_ = (const char**) acl_mycalloc(max_slot_, sizeof(char*));
 }

@@ -225,6 +225,8 @@ static void usage(const char* procname)
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-c max_threads[default: 10]\r\n"
+		"-w wait_for_cluster_resume[default: 500 ms]\r\n"
+		"-r retry_for_cluster_resnum[default: 10]\r\n"
 		"-a cmd[set|get|expire|ttl|exists|type|del]\r\n",
 		procname);
 }
@@ -232,10 +234,10 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
-	int  max_threads = 10;
+	int  max_threads = 10, nsleep = 500, nretry = 10;
 	acl::string addrs("127.0.0.1:6379"), cmd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:w:r:")) > 0)
 	{
 		switch (ch)
 		{
@@ -260,6 +262,12 @@ int main(int argc, char* argv[])
 		case 'a':
 			cmd = optarg;
 			break;
+		case 'w':
+			nsleep = atoi(optarg);
+			break;
+		case 'r':
+			nretry = atoi(optarg);
+			break;
 		default:
 			break;
 		}
@@ -275,10 +283,10 @@ int main(int argc, char* argv[])
 	cluster.set_retry_inter(0);
 
 	// 设置重定向的最大阀值，若重定向次数超过此阀值则报错
-	cluster.set_redirect_max(20);
+	cluster.set_redirect_max(nretry);
 
-	// 当重定向次数 >= 2 时每次再重定向此函数设置休息的时间(秒)
-	cluster.set_redirect_sleep(1);
+	// 当重定向次数 >= 2 时每次再重定向此函数设置休息的时间(毫秒)
+	cluster.set_redirect_sleep(nsleep);
 
 	cluster.init(NULL, addrs.c_str(), max_threads);
 
