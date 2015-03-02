@@ -314,7 +314,9 @@ redis_client* redis_command::peek_conn(redis_cluster* cluster, int slot)
 		if (slot < 0)
 			conns = (redis_pool*) cluster->peek();
 		else if ((conns = cluster->peek_slot(slot)) == NULL)
+		{
 			conns = (redis_pool*) cluster->peek();
+		}
 
 		if (conns == NULL)
 		{
@@ -349,7 +351,7 @@ const redis_result* redis_command::run(redis_cluster* cluster, size_t nchild)
 	}
 
 	redis_result_t type;
-	bool  last_moved;
+	bool  last_moved = false;
 	int   n = 0;
 
 	while (n++ < redirect_max_)
@@ -384,7 +386,6 @@ const redis_result* redis_command::run(redis_cluster* cluster, size_t nchild)
 		}
 		else
 		{
-			last_moved = false;
 			// 将连接对象归还给连接池对象
 			conn->get_pool()->put(conn, true);
 		}
