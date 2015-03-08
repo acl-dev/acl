@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,1,2
- PRODUCTVERSION 1,1,1,2
+ FILEVERSION 3,1,1,0
+ PRODUCTVERSION 3,1,1,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,12 +70,12 @@ BEGIN
             VALUE "Comments", "通用的C++库"
             VALUE "CompanyName", "zsx"
             VALUE "FileDescription", "lib_acl_cpp 库"
-            VALUE "FileVersion", "1.1.1.2"
+            VALUE "FileVersion", "3.1.1.0"
             VALUE "InternalName", "lib_acl_cpp"
-            VALUE "LegalCopyright", "版权所有 (C) 2011"
+            VALUE "LegalCopyright", "版权所有 (C) 2015"
             VALUE "OriginalFilename", "lib_acl_cpp.lib"
             VALUE "ProductName", " lib_acl_cpp 库"
-            VALUE "ProductVersion", "1.1.1.2"
+            VALUE "ProductVersion", "3.1.1.0"
         END
     END
     BLOCK "VarFileInfo"

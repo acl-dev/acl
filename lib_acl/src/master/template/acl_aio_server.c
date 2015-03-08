@@ -167,6 +167,9 @@ static char *__deny_info = NULL;
 
 static ACL_ASTREAM *ACL_MASTER_STAT_ASTREAM = NULL;
 
+static void dispatch_open(ACL_EVENT *event, ACL_AIO *aio);
+static void dispatch_close(ACL_AIO *aio);
+
 static void aio_init(void)
 {
 	acl_assert(pthread_mutex_init(&__closing_time_mutex, NULL) == 0);
@@ -826,8 +829,6 @@ static void aio_server_accept_sock(ACL_ASTREAM *astream, void *context)
 
 /*==========================================================================*/
 
-static void dispatch_open(ACL_EVENT *event, ACL_AIO *aio);
-
 static void dispatch_connect_timer(int type acl_unused,
 	ACL_EVENT *event, void *ctx)
 {
@@ -904,8 +905,23 @@ static void dispatch_receive(int event_type acl_unused, ACL_EVENT *event,
 
 	if (acl_getsocktype(fd) == AF_INET)
 		acl_tcp_set_nodelay(fd);
+
 	/* begin handle one client connection same as accept */
+
 	server_wakeup(aio, fd);
+}
+
+static void dispatch_close(ACL_AIO *aio)
+{
+	if (__dispatch_conn) {
+		ACL_EVENT *event = acl_aio_event(aio);
+
+		acl_event_disable_readwrite(event, __dispatch_conn);
+		acl_event_cancel_timer(event, dispatch_connect_timer, aio);
+		acl_event_cancel_timer(event, dispatch_timer, aio);
+		acl_vstream_close(__dispatch_conn);
+		__dispatch_conn = NULL;
+	}
 }
 
 static void dispatch_open(ACL_EVENT *event, ACL_AIO *aio)
@@ -1218,10 +1234,12 @@ static void run_loop(const char *procname)
 			sleep(1);
 		if (__listen_disabled == 1) {
 			__listen_disabled = 2;
+
 			/* 该进程不再负责监听，防止 acl_master 主进程
 			 * 无法正常重启
 			 */
 			disable_listen();
+			dispatch_close(__h_aio);
 		}
 	}
 

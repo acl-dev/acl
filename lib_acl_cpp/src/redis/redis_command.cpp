@@ -22,7 +22,7 @@ redis_command::redis_command()
 , used_(0)
 , slot_(-1)
 , redirect_max_(15)
-, redirect_sleep_(1)
+, redirect_sleep_(100)
 , slice_req_(false)
 , request_buf_(NULL)
 , request_obj_(NULL)
@@ -293,6 +293,7 @@ redis_client* redis_command::redirect(redis_cluster* cluster, const char* addr)
 		if (conn != NULL)
 			return conn;
 
+		conns->set_alive(false);
 		conns = (redis_pool*) cluster->peek();
 	}
 
@@ -349,7 +350,7 @@ const redis_result* redis_command::run(redis_cluster* cluster, size_t nchild)
 	}
 
 	redis_result_t type;
-	bool  last_moved;
+	bool  last_moved = false;
 	int   n = 0;
 
 	while (n++ < redirect_max_)
@@ -382,12 +383,10 @@ const redis_result* redis_command::run(redis_cluster* cluster, size_t nchild)
 
 			last_moved = false;
 		}
+
+		// 将连接对象归还给连接池对象
 		else
-		{
-			last_moved = false;
-			// 将连接对象归还给连接池对象
 			conn->get_pool()->put(conn, true);
-		}
 
 		if (result_ == NULL)
 		{
@@ -449,7 +448,7 @@ const redis_result* redis_command::run(redis_cluster* cluster, size_t nchild)
 			{
 				logger("redirect %d, curr %s, waiting %s ...",
 					n, ptr, addr);
-				sleep(redirect_sleep_);
+				acl_doze(redirect_sleep_);
 			}
 
 			last_moved = true;
@@ -473,6 +472,15 @@ const redis_result* redis_command::run(redis_cluster* cluster, size_t nchild)
 				return result_;
 			}
 
+			ptr = conn->get_pool()->get_addr();
+			if (n >= 2 && redirect_sleep_ > 0
+				&& strcmp(ptr, addr) != 0)
+			{
+				logger("redirect %d, curr %s, waiting %s ...",
+					n, ptr, addr);
+				acl_doze(redirect_sleep_);
+			}
+
 			last_moved = false;
 			reset(true);
 		}
@@ -486,7 +494,7 @@ const redis_result* redis_command::run(redis_cluster* cluster, size_t nchild)
 			{
 				logger("redirect %d, slot %d, waiting %s ...",
 					n, slot_, ptr);
-				sleep(redirect_sleep_);
+				acl_doze(redirect_sleep_);
 			}
 
 			conn = peek_conn(cluster, -1);

@@ -7,8 +7,8 @@
 char *var_cfg_crt_file;
 char *var_cfg_key_file;
 acl::master_str_tbl var_conf_str_tab[] = {
-	{ "crt_file", "./mm263com1.crt", &var_cfg_crt_file },
-	{ "key_file", "./mm263com.key", &var_cfg_key_file },
+	{ "crt_file", "./ssl_crt.pem", &var_cfg_crt_file },
+	{ "key_file", "./ssl_key.pem", &var_cfg_key_file },
 
 	{ 0, 0, 0 }
 };

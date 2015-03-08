@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <vector>
 #include "acl_cpp/acl_cpp_define.hpp"
+#include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 
 struct ACL_ARGV;
@@ -267,7 +268,7 @@ public:
 	// 公共接口
 	const char* get_error() const
 	{
-		return errbuf_;
+		return errbuf_.c_str();
 	}
 
 	socket_stream& get_conn()
@@ -283,14 +284,15 @@ public:
 	{
 		return addr_;
 	}
+
 private:
 	char* addr_;
 	int   timeout_;
 	bool  retry_;
-	char  errbuf_[128];
+	string  errbuf_;
 	char* tube_used_;
 	std::vector<char*> tubes_watched_;
-	acl::socket_stream conn_;
+	socket_stream conn_;
 	unsigned long long peek_fmt(string& buf, const char* fmt, ...)
 		ACL_CPP_PRINTF(3, 4);
 	bool list_tubes_fmt(string& buf, const char* fmt, ...)

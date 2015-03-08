@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,0,19,0
- PRODUCTVERSION 3,0,19,0
+ FILEVERSION 3,1,1,0
+ PRODUCTVERSION 3,1,1,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -69,12 +69,12 @@ BEGIN
         BEGIN
             VALUE "Comments", "本库为跨平台的C库，包括了网络通讯，服务器框架等功能"
             VALUE "FileDescription", "acl 库"
-            VALUE "FileVersion", "3.0.19.0"
+            VALUE "FileVersion", "3.1.1.0"
             VALUE "InternalName", "lib_acl"
-            VALUE "LegalCopyright", "zsx (C) 2011"
+            VALUE "LegalCopyright", "zsx (C) 2015"
             VALUE "OriginalFilename", "lib_acl.lib"
             VALUE "ProductName", " acl 库"
-            VALUE "ProductVersion", "3, 0, l, 9"
+            VALUE "ProductVersion", "3, 1, l, 0"
         END
     END
     BLOCK "VarFileInfo"

@@ -67,17 +67,17 @@ public:
 	}
 
 	/**
-	 * 当重定向次数 >= 2 时允许休眠的时间(秒)，默认值为 1 秒，这样做的
+	 * 当重定向次数 >= 2 时允许休眠的时间(毫秒)，默认值为 100 毫秒，这样做的
 	 * 好处是当一个 redis 服务主结点掉线后，其它从结点升级为主结点是需要
 	 * 时间的(由 redis.conf 中的 cluster-node-timeout 配置项决定)，所以
 	 * 为了在重定向的次数范围内不报错需要等待从结点升级为主结点
-	 * @param n {int} 每次重定向时的休息时间(秒)，默认值为 1 秒
+	 * @param n {int} 每次重定向时的休息时间(毫秒)，默认值为 100 毫秒
 	 */
 	void set_redirect_sleep(int n);
 
 	/**
 	 * 获得 set_redirect_sleep 设置的或默认的时间
-	 * @return {int} 单位为秒
+	 * @return {int} 单位为毫秒
 	 */
 	int get_redirect_sleep() const
 	{

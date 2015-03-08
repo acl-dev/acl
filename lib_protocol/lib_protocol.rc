@@ -53,8 +53,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 3,1,1,0
+ PRODUCTVERSION 3,1,1,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -71,12 +71,12 @@ BEGIN
         BEGIN
             VALUE "Comments", "主要包括HTTP协议，ICMP协议的实现"
             VALUE "FileDescription", "protocol"
-            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "FileVersion", "3, 1, 1, 0"
             VALUE "InternalName", "lib_prot"
-            VALUE "LegalCopyright", "zsx (C) 2011"
-            VALUE "OriginalFilename", "lib_prot.lib"
+            VALUE "LegalCopyright", "zsx (C) 2015"
+            VALUE "OriginalFilename", "lib_protocol.lib"
             VALUE "ProductName", "protocol"
-            VALUE "ProductVersion", "1, 0, 0, 1"
+            VALUE "ProductVersion", "3, 1, 1, 0"
         END
     END
     BLOCK "VarFileInfo"

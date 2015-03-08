@@ -185,7 +185,7 @@ void connect_manager::remove(const char* addr)
 }
 
 connect_pool* connect_manager::get(const char* addr,
-	bool exclusive /* = true */)
+	bool exclusive /* = true */, bool restore /* = false */)
 {
 	char key[256];
 	ACL_SAFE_STRNCPY(key, addr, sizeof(key));
@@ -199,6 +199,8 @@ connect_pool* connect_manager::get(const char* addr,
 	{
 		if (strcasecmp(key, (*it)->get_addr()) == 0)
 		{
+			if (restore && (*it)->aliving() == false)
+				(*it)->set_alive(true);
 			if (exclusive)
 				lock_.unlock();
 			return *it;

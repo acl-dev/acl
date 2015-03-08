@@ -34,6 +34,8 @@ void http_rpc::rpc_run()
 	ACL_VSTREAM* vstream = client_->get_vstream();
 	ACL_VSTREAM_SET_RWTIMO(vstream, 10);
 	(void) stream.open(vstream);
+	// 设置为阻塞模式
+	stream.set_tcp_non_blocking(false);
 
 	rpc_req_add();
 
@@ -41,6 +43,9 @@ void http_rpc::rpc_run()
 	handle_conn(&stream);
 
 	rpc_req_del();
+
+	// 设置为非阻塞模式
+	stream.set_tcp_non_blocking(true);
 
 	// 将 ACL_VSTREAM 与阻塞流对象解绑定，这样才能保证当释放阻塞流对象时
 	// 不会关闭与请求者的连接，因为该连接本身是属于非阻塞流对象的，需要采

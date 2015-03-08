@@ -168,6 +168,7 @@ static ACL_MASTER_SERVER_EXIT_TIMER_FN __server_exit_timer;
 
 static char *__deny_info = NULL;
 
+static void dispatch_close(ACL_EVENT *event);
 static void dispatch_open(ACL_EVENT *event, acl_pthread_pool_t *threads);
 
 static void lock_closing_time(void)
@@ -332,7 +333,16 @@ static void server_exiting(int type acl_unused, ACL_EVENT *event, void *ctx)
 
 	if (!__listen_disabled) {
 		__listen_disabled = 1;
+
+		/* 关闭所有监听套接口 */
 		listen_cleanup(event);
+
+		/* 通知 acl_master 框架，本进程不再接收新连接 */
+		acl_master_notify(acl_var_threads_pid, __server_generation,
+				ACL_MASTER_STAT_TAKEN);
+
+		/* 关闭与 TCP 连接派发器 master_dispatch 的通道 */
+		dispatch_close(event);
 	}
 
 	if (__server_exit_timer != NULL
@@ -841,6 +851,9 @@ static int dispatch_report(void)
 	char  buf[256];
 
 	if (__dispatch_conn == NULL) {
+		if (__aborting)
+			return 0;
+
 		acl_msg_warn("%s(%d), %s: dispatch connection not available",
 			__FUNCTION__, __LINE__, myname);
 		return -1;
@@ -915,6 +928,18 @@ static void dispatch_receive(int event_type acl_unused, ACL_EVENT *event,
 	client_open(event, threads, fd, remote, local);
 
 	acl_event_enable_read(event, conn, 0, dispatch_receive, threads);
+}
+
+static void dispatch_close(ACL_EVENT *event)
+{
+	if (__dispatch_conn) {
+		acl_event_cancel_timer(event, dispatch_connect_timer,
+			__dispatch_conn);
+		acl_event_disable_readwrite(event, __dispatch_conn);
+		acl_vstream_close(__dispatch_conn);
+		__dispatch_conn = NULL;
+		__aborting = 1;
+	}
 }
 
 static void dispatch_open(ACL_EVENT *event, acl_pthread_pool_t *threads)

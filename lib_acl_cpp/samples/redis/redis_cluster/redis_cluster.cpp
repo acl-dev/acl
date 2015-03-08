@@ -3,13 +3,14 @@
 
 static acl::string __keypre("test_key_cluster");
 
-static bool test_del(acl::redis_key& option, int i)
+static bool test_del(acl::redis_key& cmd, int i)
 {
+	cmd.reset();
+
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
-	option.reset();
-	int ret = option.del(key.c_str(), NULL);
+	int ret = cmd.del(key.c_str(), NULL);
 	if (ret < 0)
 	{
 		printf("del key: %s error\r\n", key.c_str());
@@ -20,13 +21,14 @@ static bool test_del(acl::redis_key& option, int i)
 	return true;
 }
 
-static bool test_expire(acl::redis_key& option, int i)
+static bool test_expire(acl::redis_key& cmd, int i)
 {
+	cmd.reset();
+
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
-	option.reset();
-	if (option.expire(key.c_str(), 100) < 0)
+	if (cmd.expire(key.c_str(), 100) < 0)
 	{
 		printf("expire key: %s error\r\n", key.c_str());
 		return false;
@@ -36,14 +38,15 @@ static bool test_expire(acl::redis_key& option, int i)
 	return true;
 }
 
-static bool test_ttl(acl::redis_key& option, int i)
+static bool test_ttl(acl::redis_key& cmd, int i)
 {
+	cmd.reset();
+
 	acl::string key;
 	int ttl;
 
 	key.format("%s_%d", __keypre.c_str(), i);
-	option.reset();
-	if ((ttl = option.ttl(key.c_str())) < 0)
+	if ((ttl = cmd.ttl(key.c_str())) < 0)
 	{
 		printf("get ttl key: %s error\r\n", key.c_str());
 		return false;
@@ -53,13 +56,14 @@ static bool test_ttl(acl::redis_key& option, int i)
 	return true;
 }
 
-static bool test_exists(acl::redis_key& option, int i)
+static bool test_exists(acl::redis_key& cmd, int i)
 {
+	cmd.reset();
+
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
-	option.reset();
-	if (option.exists(key.c_str()) == false)
+	if (cmd.exists(key.c_str()) == false)
 	{
 		if (i < 10)
 			printf("no exists key: %s\r\n", key.c_str());
@@ -72,13 +76,14 @@ static bool test_exists(acl::redis_key& option, int i)
 	return true;
 }
 
-static bool test_type(acl::redis_key& option, int i)
+static bool test_type(acl::redis_key& cmd, int i)
 {
+	cmd.reset();
+
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
-	option.reset();
-	acl::redis_key_t ret = option.type(key.c_str());
+	acl::redis_key_t ret = cmd.type(key.c_str());
 	if (ret == acl::REDIS_KEY_UNKNOWN)
 	{
 		printf("unknown type key: %s\r\n", key.c_str());
@@ -89,16 +94,17 @@ static bool test_type(acl::redis_key& option, int i)
 	return true;
 }
 
-static bool test_set(acl::redis_string& option, int i)
+static bool test_set(acl::redis_string& cmd, int i)
 {
+	cmd.reset();
+
 	acl::string key;
 	key.format("%s_%d", __keypre.c_str(), i);
 
 	acl::string value;
 	value.format("value_%s", key.c_str());
 
-	option.reset();
-	bool ret = option.set(key.c_str(), value.c_str());
+	bool ret = cmd.set(key.c_str(), value.c_str());
 	return ret;
 	if (i < 10)
 		printf("set key: %s, value: %s %s\r\n", key.c_str(),
@@ -106,15 +112,16 @@ static bool test_set(acl::redis_string& option, int i)
 	return ret;
 }
 
-static bool test_get(acl::redis_string& option, int i)
+static bool test_get(acl::redis_string& cmd, int i)
 {
+	cmd.reset();
+
 	acl::string key;
 	key.format("%s_%d", __keypre.c_str(), i);
 
 	acl::string value;
 
-	option.reset();
-	bool ret = option.get(key.c_str(), value);
+	bool ret = cmd.get(key.c_str(), value);
 	if (i < 10)
 		printf("get key: %s, value: %s %s, len: %d\r\n",
 			key.c_str(), value.c_str(), ret ? "ok" : "error",
@@ -144,12 +151,11 @@ protected:
 		bool ret;
 		acl::redis_key cmd_key;
 		acl::redis_string cmd_string;
+		cmd_key.set_cluster(&cluster_, max_conns_);
+		cmd_string.set_cluster(&cluster_, max_conns_);
 
 		for (int i = 0; i < n_; i++)
 		{
-			cmd_key.set_cluster(&cluster_, max_conns_);
-			cmd_string.set_cluster(&cluster_, max_conns_);
-
 			if (cmd_ == "set")
 				ret = test_set(cmd_string, i);
 			else if (cmd_ == "get")
@@ -192,8 +198,6 @@ protected:
 				break;
 			}
 
-			continue;
-
 			if (i > 0 && i % 1000 == 0)
 			{
 				char tmp[128];
@@ -225,6 +229,8 @@ static void usage(const char* procname)
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-c max_threads[default: 10]\r\n"
+		"-w wait_for_cluster_resume[default: 500 ms]\r\n"
+		"-r retry_for_cluster_resnum[default: 10]\r\n"
 		"-a cmd[set|get|expire|ttl|exists|type|del]\r\n",
 		procname);
 }
@@ -232,10 +238,10 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
-	int  max_threads = 10;
+	int  max_threads = 10, nsleep = 500, nretry = 10;
 	acl::string addrs("127.0.0.1:6379"), cmd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:w:r:")) > 0)
 	{
 		switch (ch)
 		{
@@ -260,6 +266,12 @@ int main(int argc, char* argv[])
 		case 'a':
 			cmd = optarg;
 			break;
+		case 'w':
+			nsleep = atoi(optarg);
+			break;
+		case 'r':
+			nretry = atoi(optarg);
+			break;
 		default:
 			break;
 		}
@@ -270,15 +282,15 @@ int main(int argc, char* argv[])
 
 	acl::redis_cluster cluster(conn_timeout, rw_timeout);
 
-	// å½“è¿æ¥æ± ä¸å¯ç”¨æ—¶ï¼Œè®¾ç½®é‡æ–°æ¢å¤è¯¥è¿æ¥æ± å¯¹è±¡çš„ç­‰å¾…æ—¶é—´(ç§’)ï¼Œ
-	// å½“è®¾ç½®çš„å€¼ <= 0 æ—¶è¡¨ç¤ºä¸å†æ¢å¤
-	cluster.set_retry_inter(0);
+	// µ±Ä³¸öÁ¬½Ó³Ø½áµã³öÎÊÌâ£¬ÉèÖÃÌ½²â¸ÃÁ¬½Ó½áµãÊÇ·ñ»Ö¸´µÄÊ±¼ä¼ä¸ô(Ãë)£¬µ±¸ÃÖµ
+	// Îª 0 Ê±£¬Ôò²»¼ì²â
+	cluster.set_retry_inter(1);
 
-	// è®¾ç½®é‡å®šå‘çš„æœ€å¤§é˜€å€¼ï¼Œè‹¥é‡å®šå‘æ¬¡æ•°è¶…è¿‡æ­¤é˜€å€¼åˆ™æŠ¥é”™
-	cluster.set_redirect_max(20);
+	// ÉèÖÃÖØ¶¨ÏòµÄ×î´ó·§Öµ£¬ÈôÖØ¶¨Ïò´ÎÊı³¬¹ı´Ë·§ÖµÔò±¨´í
+	cluster.set_redirect_max(nretry);
 
-	// å½“é‡å®šå‘æ¬¡æ•° >= 2 æ—¶æ¯æ¬¡å†é‡å®šå‘æ­¤å‡½æ•°è®¾ç½®ä¼‘æ¯çš„æ—¶é—´(ç§’)
-	cluster.set_redirect_sleep(1);
+	// µ±ÖØ¶¨Ïò´ÎÊı >= 2 Ê±Ã¿´ÎÔÙÖØ¶¨Ïò´Ëº¯ÊıÉèÖÃĞİÏ¢µÄÊ±¼ä(ºÁÃë)
+	cluster.set_redirect_sleep(nsleep);
 
 	cluster.init(NULL, addrs.c_str(), max_threads);
 

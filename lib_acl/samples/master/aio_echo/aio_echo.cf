@@ -37,7 +37,7 @@ service server {
 #	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
 	master_args =
 #	传递给服务子进程的环境变量, 可以通过 getenv("SERVICE_ENV") 获得此值
-	master_env = mempool_limit:512000000, mempool_use_mutex:true
+#	master_env = mempool_limit:512000000, mempool_use_mutex:true
 #	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
 #			sync_action:E_LOG_SEM, sem_name:/tmp/aio_echo.sem
 #	进程日志记录文件

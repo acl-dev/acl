@@ -346,6 +346,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_pool", "lib_acl_cpp\s
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_manager", "lib_acl_cpp\samples\redis\redis_manager\redis_manager_vc2012.vcxproj", "{4DF99E14-36C7-4C31-B22C-4A43C5C1A8C6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_pubsub", "lib_acl_cpp\samples\redis\redis_pubsub\redis_pubsub_vc2012.vcxproj", "{9942942B-9DBA-4E56-897A-2746DB8C9E78}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -362,6 +367,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_zset", "lib_acl_cpp\s
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_set", "lib_acl_cpp\samples\redis\redis_set\redis_set_vc2012.vcxproj", "{4D42F462-A2FE-4B4A-A680-53668FA128A6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_zset_pool", "lib_acl_cpp\samples\redis\redis_zset_pool\redis_zset_pool_vc2012.vcxproj", "{25AE83C1-77FE-4B4E-9133-70BA32311750}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -397,6 +407,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_trans", "lib_acl_cpp\
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_list", "lib_acl_cpp\samples\redis\redis_list\redis_list_vc2012.vcxproj", "{1D669177-07FD-4DDD-A13E-52A7DF19CA62}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_cluster", "lib_acl_cpp\samples\redis\redis_cluster\redis_cluster_vc2012.vcxproj", "{814E8FCD-38B1-4CC2-A37D-A77A993D918D}"
 	ProjectSection(ProjectDependencies) = postProject

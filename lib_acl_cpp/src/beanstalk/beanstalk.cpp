@@ -44,6 +44,7 @@ bool beanstalk::beanstalk_open()
 	{
 		logger_error("connect server: %s error: %s",
 			addr_, last_serror());
+		errbuf_.format("connect");
 		return false;
 	}
 	if (tube_used_ && beanstalk_use() == false)
@@ -79,6 +80,7 @@ bool beanstalk::beanstalk_use()
 	{
 		logger_error("use %s error: %s", tube_used_, last_serror());
 		conn_.close();
+		errbuf_.format("use");
 		return false;
 	}
 	string line(128);
@@ -87,6 +89,7 @@ bool beanstalk::beanstalk_use()
 		conn_.close();
 		logger_error("gets from beanstalkd(%s) error: %s",
 			addr_, last_serror());
+		errbuf_.format("gets");
 		return false;
 	}
 
@@ -95,7 +98,7 @@ bool beanstalk::beanstalk_use()
 		|| strcasecmp(tokens->argv[1], tube_used_))
 	{
 		logger_error("'use %s' error %s", tube_used_, tokens->argv[0]);
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		close();
 		return false;
@@ -110,6 +113,7 @@ unsigned beanstalk::beanstalk_watch(const char* tube)
 	if (conn_.format("watch %s\r\n", tube) == -1)
 	{
 		logger_error("'watch %s' failed: %s", tube, last_serror());
+		errbuf_ = "watch";
 		return 0;
 	}
 	string line(128);
@@ -117,6 +121,7 @@ unsigned beanstalk::beanstalk_watch(const char* tube)
 	{
 		logger_error("'watch %s' error(%s): reply ailed",
 			last_serror(), tube);
+		errbuf_ = "watch";
 		return 0;
 	}
 
@@ -124,7 +129,7 @@ unsigned beanstalk::beanstalk_watch(const char* tube)
 	if (tokens->argc < 2 || strcasecmp(tokens->argv[0], "WATCHING"))
 	{
 		logger_error("'watch %s' error: %s", tube, line.c_str());
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		close();
 		return 0;
@@ -140,6 +145,7 @@ unsigned beanstalk::beanstalk_watch(const char* tube)
 	{
 		logger_error("'watch %s' error(%s), tube watched is 0",
 			line.c_str(), tube);
+		errbuf_ = line.c_str();
 		close();
 	}
 	return n;
@@ -167,6 +173,7 @@ ACL_ARGV* beanstalk::beanstalk_request(const string& cmdline,
 			}
 			logger_error("write to beanstalkd(%s) error: %s",
 				addr_, last_serror());
+			errbuf_ = "write";
 			return NULL;
 		}
 
@@ -182,6 +189,7 @@ ACL_ARGV* beanstalk::beanstalk_request(const string& cmdline,
 			}
 			logger_error("write to beanstalkd(%s) error: %s",
 				addr_, last_serror());
+			errbuf_ = "write";
 			return NULL;
 		}
 
@@ -196,6 +204,7 @@ ACL_ARGV* beanstalk::beanstalk_request(const string& cmdline,
 			}
 			logger_error("gets from beanstalkd(%s) error: %s",
 				addr_, last_serror());
+			errbuf_ = "gets";
 			return NULL;
 		}
 		break;
@@ -214,6 +223,7 @@ bool beanstalk::open()
 	{
 		logger_error("connect beanstalkd %s error: %s",
 			addr_, last_serror());
+		errbuf_= "connect";
 		return false;
 	}
 	return true;
@@ -257,7 +267,7 @@ bool beanstalk::use(const char* tube)
 		|| strcasecmp(tokens->argv[1], tube))
 	{
 		logger_error("'%s' error %s", cmdline.c_str(), tokens->argv[0]);
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		close();
 		return false;
@@ -275,6 +285,7 @@ unsigned long long beanstalk::put(const void* data, size_t n,
 	unsigned pri /* = 1024 */, unsigned delay /* = 0 */,
 	unsigned int ttr /* = 60 */)
 {
+	errbuf_.clear();
 	string cmdline(128);
 	cmdline.format("put %u %u %u %u\r\n", pri, delay, ttr, (unsigned int) n);
 	ACL_ARGV* tokens = beanstalk_request(cmdline, data, n);
@@ -287,7 +298,7 @@ unsigned long long beanstalk::put(const void* data, size_t n,
 	if (tokens->argc < 2 || strcasecmp(tokens->argv[0], "INSERTED"))
 	{
 		logger_error("'%s' error", cmdline.c_str());
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		close();
 		return 0;
@@ -347,7 +358,7 @@ unsigned beanstalk::watch(const char* tube)
 	if (tokens->argc < 2 || strcasecmp(tokens->argv[0], "WATCHING"))
 	{
 		logger_error("'%s' error %s", cmdline.c_str(), tokens->argv[0]);
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		close();
 		return 0;
@@ -362,6 +373,7 @@ unsigned beanstalk::watch(const char* tube)
 	if (n == 0)
 	{
 		logger_error("'%s' error, tube watched is 0", cmdline.c_str());
+		errbuf_ = "watching";
 		close();
 	}
 
@@ -377,6 +389,7 @@ unsigned beanstalk::ignore(const char* tube)
 	if (strcasecmp(tube, "default") == 0)
 	{
 		logger_error("tube(%s) is default, can't be ignore", tube);
+		errbuf_ = "default";
 		return 0;
 	}
 
@@ -396,6 +409,7 @@ unsigned beanstalk::ignore(const char* tube)
 	if (!found)
 	{
 		logger_error("tube(%s) not found", tube);
+		errbuf_ = "tube_not_found";
 		return 0;
 	}
 	return ignore_one(tube);
@@ -422,6 +436,7 @@ unsigned beanstalk::ignore_all()
 		if (ret == 0)
 		{
 			logger_error("ignore tube %s failed", *it);
+			errbuf_ = "ignore";
 			return 0;
 		}
 		tubes_watched_.erase(it);
@@ -443,7 +458,7 @@ unsigned beanstalk::ignore_one(const char* tube)
 	if (tokens->argc < 2 || strcasecmp(tokens->argv[0], "WATCHING"))
 	{
 		logger_error("'%s' error %s", cmdline.c_str(), tokens->argv[0]);
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		close();
 		return 0;
@@ -458,6 +473,7 @@ unsigned beanstalk::ignore_one(const char* tube)
 	if (n == 0)
 	{
 		logger_error("'%s' error, tube watched is 0", cmdline.c_str());
+		errbuf_ = "no_watching";
 		close();
 	}
 	return n;
@@ -480,14 +496,14 @@ unsigned long long beanstalk::reserve(string& buf, int timeout /* = -1 */)
 	if (strcasecmp(tokens->argv[0], "TIMED_OUT") == 0
 		|| strcasecmp(tokens->argv[0], "DEADLINE_SOON") == 0)
 	{
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		return 0;
 	}
 	if (tokens->argc < 3 || strcasecmp(tokens->argv[0], "RESERVED"))
 	{
 		logger_error("reserve failed: %s", tokens->argv[0]);
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		close();
 		return 0;
@@ -500,6 +516,7 @@ unsigned long long beanstalk::reserve(string& buf, int timeout /* = -1 */)
 	if (n == 0)
 	{
 		logger_error("reserve data's length 0");
+		errbuf_ = "reserve";
 		close();
 		return 0;
 	}
@@ -508,12 +525,14 @@ unsigned long long beanstalk::reserve(string& buf, int timeout /* = -1 */)
 	if (conn_.read(buf, n, true) == false)
 	{
 		logger_error("reserve read body failed");
+		errbuf_ = "read";
 		close();
 		return 0;
 	}
 	else if (conn_.gets(cmdline) == false)
 	{
 		logger_error("reserve: gets last line failed");
+		errbuf_ = "gets";
 		close();
 		return 0;
 	}
@@ -533,7 +552,7 @@ bool beanstalk::delete_id(unsigned long long id)
 	if (strcasecmp(tokens->argv[0], "DELETED"))
 	{
 		logger_error("'%s' error %s", cmdline.c_str(), tokens->argv[0]);
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		return false;
 	}
@@ -556,7 +575,7 @@ bool beanstalk::release(unsigned long long id, unsigned pri /* = 1024 */,
 	if (strcasecmp(tokens->argv[0], "RELEASED"))
 	{
 		logger_error("'%s' error %s", cmdline.c_str(), tokens->argv[0]);
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		return false;
 	}
@@ -578,7 +597,7 @@ bool beanstalk::bury(unsigned long long id, unsigned int pri /* = 1024 */)
 	if (strcasecmp(tokens->argv[0], "BURIED"))
 	{
 		logger_error("'%s' error %s", cmdline.c_str(), tokens->argv[0]);
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		return false;
 	}
@@ -600,7 +619,7 @@ bool beanstalk::touch(unsigned long long id)
 	if (strcasecmp(tokens->argv[0], "TOUCHED"))
 	{
 		logger_error("'%s' error %s", cmdline.c_str(), tokens->argv[0]);
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		return false;
 	}
@@ -627,7 +646,7 @@ unsigned long long beanstalk::peek_fmt(string& buf, const char* fmt, ...)
 	}
 	if (tokens->argc < 3 || strcasecmp(tokens->argv[0], "FOUND"))
 	{
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		return 0;
 	}
@@ -638,6 +657,7 @@ unsigned long long beanstalk::peek_fmt(string& buf, const char* fmt, ...)
 	if (n == 0)
 	{
 		logger_error("peek data's length 0");
+		errbuf_ = "peek";
 		close();
 		return 0;
 	}
@@ -646,12 +666,14 @@ unsigned long long beanstalk::peek_fmt(string& buf, const char* fmt, ...)
 	if (conn_.read(buf, n, true) == false)
 	{
 		logger_error("peek read body failed");
+		errbuf_ = "read";
 		close();
 		return 0;
 	}
 	else if (conn_.gets(cmdline) == false)
 	{
 		logger_error("peek: gets last line falied");
+		errbuf_ = "gets";
 		close();
 		return 0;
 	}
@@ -691,7 +713,7 @@ int beanstalk::kick(unsigned n)
 	if (strcasecmp(tokens->argv[0], "KICKED"))
 	{
 		logger_error("'%s' error %s", cmdline.c_str(), tokens->argv[0]);
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		return -1;
 	}
@@ -720,7 +742,7 @@ bool beanstalk::list_tube_used(string& buf)
 	if (tokens->argc < 2 || strcasecmp(tokens->argv[0], "USING"))
 	{
 		logger_error("'%s' error %s", cmdline.c_str(), tokens->argv[0]);
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		close();
 		return false;
@@ -749,7 +771,7 @@ bool beanstalk::list_tubes_fmt(string& buf, const char* fmt, ...)
 	}
 	if (tokens->argc < 2 || strcasecmp(tokens->argv[0], "OK"))
 	{
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		close();
 		return false;
@@ -760,6 +782,7 @@ bool beanstalk::list_tubes_fmt(string& buf, const char* fmt, ...)
 	if (n == 0)
 	{
 		logger_error("list data's length 0");
+		errbuf_ = "length";
 		close();
 		return false;
 	}
@@ -768,6 +791,7 @@ bool beanstalk::list_tubes_fmt(string& buf, const char* fmt, ...)
 	if (conn_.read(buf, n, true) == false)
 	{
 		logger_error("peek read body failed");
+		errbuf_ = "read";
 		close();
 		return false;
 	}
@@ -797,7 +821,7 @@ bool beanstalk::pause_tube(const char* tube, unsigned delay)
 	if (strcasecmp(tokens->argv[0], "PAUSED"))
 	{
 		logger_error("'%s' error %s", cmdline.c_str(), tokens->argv[0]);
-		ACL_SAFE_STRNCPY(errbuf_, tokens->argv[0], sizeof(errbuf_));
+		errbuf_ = tokens->argv[0];
 		acl_argv_free(tokens);
 		return false;
 	}

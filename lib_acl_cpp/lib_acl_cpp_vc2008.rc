@@ -53,8 +53,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,1,2
- PRODUCTVERSION 1,1,1,2
+ FILEVERSION 3,1,1,0
+ PRODUCTVERSION 3,1,1,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -71,12 +71,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "zsx"
             VALUE "FileDescription", "acl_cpp ¿â"
-            VALUE "FileVersion", "1, 1, 1, 2"
-            VALUE "InternalName", "lib_acl_"
-            VALUE "LegalCopyright", "acl_cpp (C) 2011"
+            VALUE "FileVersion", "3, 1, 1, 0"
+            VALUE "InternalName", "lib_acl_cpp"
+            VALUE "LegalCopyright", "acl_cpp (C) 2015"
             VALUE "OriginalFilename", "lib_acl_cpp.lib"
             VALUE "ProductName", "acl_cpp ¿â"
-            VALUE "ProductVersion", "1, 1, 1, 2"
+            VALUE "ProductVersion", "3, 1, 1, 0"
         END
     END
     BLOCK "VarFileInfo"

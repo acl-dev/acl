@@ -63,9 +63,12 @@ public:
 	 * @param addr {const char*} redis 服务器地址(ip:port)
 	 * @param exclusive {bool} 是否需要互斥访问连接池数组，当需要动态
 	 *  管理连接池集群时，该值应为 true
+	 * @param restore {bool} 当该服务结点被置为不可用时，该参数决定是否自动
+	 *  将之恢复为可用状态
 	 * @return {connect_pool*} 返回空表示没有此服务
 	 */
-	connect_pool* get(const char* addr, bool exclusive = true);
+	connect_pool* get(const char* addr, bool exclusive = true,
+		bool restore = false);
 
 	/**
 	 * 从连接池集群中获得一个连接池，该函数采用轮循方式从连接池集合中获取一个
