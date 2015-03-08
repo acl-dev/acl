@@ -109,7 +109,8 @@ The redis cluster support caching the redis hash-slot in client for performance,
 In your Makefile, you should add below compiling flags:
 -DLINUX2 for LINUX, -DFREEBSD for FreeBSD, -DMACOSX for MAXOS, -DSUNOS5 for Solaris X86;
 -I path specify the lib_acl.hpp's parent path, for exmaple: -I./lib_acl_cpp/include, in the lib_acl_cpp/include path the acl_cpp path should be included;
-Of couse you can look at the Makefile in lib_acl_cpp\samples to find the build conditions.
+At last, link with -L{path_to_acl_cpp} -l_acl_cpp -L{path_to_protocol} -l_protocol -L{path_to_acl) -l_acl
+Of couse you can look at the Makefile.in in lib_acl_cpp\samples and Makfile in lib_acl_cpp\samples\redis\ to find the build conditions.
 ### On WIN32
 Open acl_cpp_vc2003.sln/acl_cpp_vc2008.sln/acl_cpp_vc2010.sln/acl_cpp_vc2012.sln, and looat at the redis samples project option setting.
 
