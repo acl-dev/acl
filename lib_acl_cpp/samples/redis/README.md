@@ -111,6 +111,21 @@ In your Makefile, you should add below compiling flags:
 -I path specify the lib_acl.hpp's parent path, for exmaple: -I./lib_acl_cpp/include, in the lib_acl_cpp/include path the acl_cpp path should be included;
 At last, link with -L{path_to_acl_cpp} -l_acl_cpp -L{path_to_protocol} -l_protocol -L{path_to_acl) -l_acl
 Of couse you can look at the Makefile.in in lib_acl_cpp\samples and Makfile in lib_acl_cpp\samples\redis\ to find the build conditions.
+One Makefile as below:
+```Makefile
+CFLAGS = -c -g -W -O3 -Wall -Werror -Wshadow \
+-Wno-long-long -Wpointer-arith -D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS -DLINUX2
+BASE_PATH=./acl
+LDFLAGS = -L$(BASE_PATH)/lib_acl_cpp/lib -l_acl_cpp \
+	-L$(BASE_PATH)/lib_protocol/lib -l_protocol \
+	-L$(BASE_PATH)/lib_acl/lib -l_acl \
+	-lpthread
+test: main.o
+	gcc -o main.o $(LDFLAGS)
+main.o: main.cpp
+	gcc $(CFLAGS) main.cpp -o main.o
+```
 ### On WIN32
 Open acl_cpp_vc2003.sln/acl_cpp_vc2008.sln/acl_cpp_vc2010.sln/acl_cpp_vc2012.sln, and looat at the redis samples project option setting.
 
