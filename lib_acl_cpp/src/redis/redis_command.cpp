@@ -315,7 +315,9 @@ redis_client* redis_command::peek_conn(redis_cluster* cluster, int slot)
 		if (slot < 0)
 			conns = (redis_pool*) cluster->peek();
 		else if ((conns = cluster->peek_slot(slot)) == NULL)
+		{
 			conns = (redis_pool*) cluster->peek();
+		}
 
 		if (conns == NULL)
 		{
@@ -386,6 +388,11 @@ const redis_result* redis_command::run(redis_cluster* cluster, size_t nchild)
 
 		// 将连接对象归还给连接池对象
 		else
+<<<<<<< HEAD
+=======
+		{
+			// 将连接对象归还给连接池对象
+>>>>>>> 7678442e78145953ffacd25d526d3f1222f0e1c2
 			conn->get_pool()->put(conn, true);
 
 		if (result_ == NULL)
