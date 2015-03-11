@@ -170,7 +170,11 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ĞÅ¿â¼°·
 
 ### 3.5¡¢acl ¿âÖĞÓĞ´óÁ¿Ê¾Àı¿É¹©²Î¿¼£¬Çë²Î¿¼£º[SAMPLES.md](SAMPLES.md)
 
-## ËÄ¡¢ÆäËü
+## ËÄ¡¢Ê¹ÓÃĞí¿É
+- BSD license (license.bsd)
+- IBM public license (license.ibm)
+
+## Îå¡¢ÆäËü
 - WEB Õ¾µã: http://www.iteye.com
 - Download: https://sourceforge.net/projects/acl
 - QQ Èº: 242722074
