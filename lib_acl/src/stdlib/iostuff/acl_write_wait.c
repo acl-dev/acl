@@ -76,6 +76,7 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 	struct timeval *tp;
 	int  errnum;
 
+#ifndef WIN32
 	/*
 	 * Sanity checks.
 	 */
@@ -83,6 +84,7 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 		acl_msg_fatal("%s, %s(%d): descriptor %d does not fit "
 			"FD_SETSIZE %d", myname, __FILE__, __LINE__,
 			(int) fd, FD_SETSIZE);
+#endif
 
 	/*
 	* Guard the write() with select() so we do not depend on alarm()
@@ -105,7 +107,11 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 	acl_set_error(0);
 
 	for (;;) {
+#ifdef WIN32
+		switch (select(1, (fd_set *) 0, &wfds, &xfds, tp)) {
+#else
 		switch (select(fd + 1, (fd_set *) 0, &wfds, &xfds, tp)) {
+#endif
 		case -1:
 			errnum = acl_last_error();
 #ifdef	WIN32

@@ -19,7 +19,7 @@ http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=270070
 12) http 中的 WEB 编程模块应该支持 FCGI 模式
 13) session 应该增加一个 session_pool
 14) 整合 thrift/buffer 协议到 acl_master 服务器框架中
-15) 应支持 redis 客户端协议
+15) 应支持 redis 客户端协议 -- 完成
 16) 能支持 mysql 协议到 mongodb 协议的转换协议实现
 17) HttpServlet 支持 FCGI
 18) mime 解析库针对 7BIT 格式兼容性支持

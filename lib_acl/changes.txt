@@ -1,6 +1,12 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+486) 2015.3.11
+486.1) bugfix: 修改 acl_read_wait.c/acl_write_wait.c， 在 WIN32 平台下调用
+select 时不必检查 fd 与 FD_SETSIZE 的关系，因为 WIN32 下的 fd_set 结构定义及
+FD_XXX 宏的实现原理与 UNIX 不同，并且 WIN32 下的 fd 是不连续的，有可能会出现非常大
+的值，所以其中检查 fd < FD_SETSIZE 有可能会导致崩溃，其实也完全没有必要检查
+
 485) 2015.3.5
 485.1) bugfix: acl_threads_server.c/acl_aio_server.c 当进程退出时，需要通知
 acl_master 主进程自己当前不可用，同时需要关闭与前端 TCP 派发器(master_dispatch)的连接

@@ -182,6 +182,7 @@ protected:
 	// 要求关闭该客户端连接
 	virtual bool thread_on_accept(acl::socket_stream* stream)
 	{
+		stream->set_rw_timeout(2);
 		format("accept one client, peer: %s, local: %s, var_cfg_io_timeout: %d\r\n",
 			stream->get_peer(), stream->get_local(), var_cfg_io_timeout);
 		if (stream->format("hello, you're welcome!\r\n") == -1)
@@ -256,9 +257,10 @@ int main(int argc, char* argv[])
 
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
-		int   task_count = 2, threads_count = 2;
+		int   task_count = 20, threads_count = 2;
 		format = (void (*)(const char*, ...)) printf;
 		format("listen: 127.0.0.1:8888\r\n");
+		acl::log::stdout_open(true);
 
 		// 单独运行方式
 		if (argc >= 3)
