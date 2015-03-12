@@ -121,7 +121,6 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 
 		if (isSuccess)
 			return 0;
-		//delay = 0;
 	}
 
 	acl_msg_warn("timeout error: %s", acl_last_serror());
