@@ -362,6 +362,9 @@ http_header& http_header::set_method(const char* method)
 		method_ = HTTP_METHOD_OPTION;
 	else
 		method_ = HTTP_METHOD_UNKNOWN;
+
+	CP(method_s_, method);
+
 	return *this;
 }
 
