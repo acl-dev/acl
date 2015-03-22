@@ -286,6 +286,22 @@ int main(void)
 	////////////////////////////////////////////////////////////////////
 
 	printf("\r\n");
+	json.reset();
+	buf.clear();
+	json.get_root().add_text("name", "value");
+	json.build_json(buf);
+	printf("%s\r\n", buf.c_str());
+	s = "{\"name\": \"value\"}";
+	if (strcmp(s, buf.c_str()) != 0)
+	{
+		printf("%s\r\n", s);
+		printf("%s(%d): Error\r\n", __FUNCTION__, __LINE__);
+		return 1;
+	}
+
+	////////////////////////////////////////////////////////////////////
+
+	printf("\r\n");
 	printf("ALL OVER NOW!\r\n\r\n");
 
 #ifdef WIN32

@@ -19,10 +19,10 @@ mime_node::mime_node(const char* emailFile, const MIME_NODE* node,
 	const char* toCharset /* = "gb2312" */,
 	off_t off /* = 0 */)
 	: m_name(128)
+	, m_headers_(NULL)
+	, m_pMimeNode(node)
 	, m_pParent(NULL)
 {
-	m_pMimeNode = node;
-
 	if (emailFile)
 		m_emailFile = emailFile;
 	m_enableDecode = enableDecode;
@@ -57,6 +57,7 @@ mime_node::mime_node(const char* emailFile, const MIME_NODE* node,
 
 mime_node::~mime_node()
 {
+	delete m_headers_;
 	delete m_pParent;
 }
 
@@ -72,6 +73,28 @@ const char* mime_node::header_value(const char* name) const
 	}
 
 	return (NULL);
+}
+
+const std::map<string, string>& mime_node::get_headers() const
+{
+	if (m_headers_ != NULL)
+		return *m_headers_;
+
+	const_cast<mime_node*> (this)->m_headers_ =
+		NEW std::map<string, string>;
+
+	ACL_ITER iter;
+
+	acl_foreach(iter, m_pMimeNode->header_list)
+	{
+		HEADER_NV* hdr = (HEADER_NV*) iter.data;
+		if (*hdr->value == 0)
+			continue;
+		std::pair<string, string> entry(hdr->name, hdr->value);
+		const_cast<mime_node*> (this)->m_headers_->insert(entry);
+	}
+
+	return *m_headers_;
 }
 
 bool mime_node::save(pipe_manager& out) const

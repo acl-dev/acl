@@ -1,6 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <stdlib.h>
+#include <map>
 #include "acl_cpp/stdlib/string.hpp"
 
 struct MIME_NODE;
@@ -116,6 +117,12 @@ public:
 	 * @return {const char*} 为空则表示不存在
 	 */
 	const char* header_value(const char* name) const;
+
+	/**
+	 * 取得该结点的所有头部字段集合
+	 * @return {const std::map<string, string>&}
+	 */
+	const std::map<string, string>& get_headers() const;
 
 	/**
 	 * 转储本结点内容于指定的管道流中
@@ -241,6 +248,7 @@ protected:
 	char  m_toCharset[32];
 	off_t m_bodyBegin;
 	off_t m_bodyEnd;
+	std::map<string, string>* m_headers_;
 	const MIME_NODE* m_pMimeNode;
 	mime_node* m_pParent;
 };
