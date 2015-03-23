@@ -1,6 +1,10 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+290) 2015.3.23
+290.1) bugfix: redis_command::scan_keys 内部在使用指针参数 count 时有问题，
+感谢 wangsquirrel@gmail.com 发现此 BUG
+
 289) 2015.3.17
 389.1) bugfix: http_header 类中的方法 set_method(const char* method) 需要对
 method_s 进行赋值
