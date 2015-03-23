@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 #else
 		ms.run_daemon(argc, argv);  // acl_master 控制模式运行
 #endif
-	{
+	}
 
 	return 0;
 }
