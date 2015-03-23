@@ -945,7 +945,7 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 
 		char count_s[LONG_LEN];
 		safe_snprintf(count_s, sizeof(count_s), "%lu",
-			(unsigned long) count);
+			(unsigned long) (*count));
 		argv[argc] = count_s;
 		lens[argc] = strlen(count_s);
 		argc++;
