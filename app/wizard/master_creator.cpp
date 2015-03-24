@@ -131,7 +131,7 @@ void master_creator()
 		if (n == ACL_VSTREAM_EOF)
 			break;
 		if (n == 0)
-			::snprintf(buf, sizeof(buf), "master_service");
+			acl::safe_snprintf(buf, sizeof(buf), "master_service");
 
 		tmpl.set_project_name(buf);
 		// ´´½¨Ä¿Â¼
