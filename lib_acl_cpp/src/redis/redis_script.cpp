@@ -10,15 +10,23 @@ namespace acl
 
 #define LONG_LEN	21
 
-redis_script::redis_script(redis_client* conn /* = NULL */)
+redis_script::redis_script()
+: redis_command(NULL)
+{
+}
+
+redis_script::redis_script(redis_client* conn)
 : redis_command(conn)
 {
+}
 
+redis_script::redis_script(redis_cluster* cluster, size_t max_conns)
+: redis_command(cluster, max_conns)
+{
 }
 
 redis_script::~redis_script()
 {
-
 }
 
 bool redis_script::eval_status(const char* script,

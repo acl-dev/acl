@@ -7,15 +7,23 @@
 namespace acl
 {
 
-redis_pubsub::redis_pubsub(redis_client* conn /* = NULL */)
+redis_pubsub::redis_pubsub()
+: redis_command(NULL)
+{
+}
+
+redis_pubsub::redis_pubsub(redis_client* conn)
 : redis_command(conn)
 {
+}
 
+redis_pubsub::redis_pubsub(redis_cluster* cluster, size_t max_conns)
+: redis_command(cluster, max_conns)
+{
 }
 
 redis_pubsub::~redis_pubsub()
 {
-
 }
 
 int redis_pubsub::publish(const char* channel, const char* msg, size_t len)

@@ -1,6 +1,16 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+292) 2015.3.27
+292.1) feature: redis 客户端库提供了一个统一的类 redis，该类继承了所有的
+命令 redis 命令类，只需使用这一个类便可以执行所有的 redis 命令
+292.2) samples/redis: 增加了 redis, redis_cluster2 两个测试用例
+292.3) workaround: 去掉了 redis 命令中变量名为数字的情况
+
+291) 2015.3.25
+291.1) bugfix: server_socket::open() 当用户输入的地址为 ip:0 时，需要重新调用
+acl_getsocketname 来获得真正监听的地址
+
 290) 2015.3.23
 290.1) bugfix: redis_command::scan_keys 内部在使用指针参数 count 时有问题，
 感谢 wangsquirrel@gmail.com 发现此 BUG

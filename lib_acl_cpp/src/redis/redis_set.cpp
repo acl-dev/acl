@@ -10,15 +10,23 @@ namespace acl
 
 #define LONG_LEN	21
 
-redis_set::redis_set(redis_client* conn /* = NULL */)
+redis_set::redis_set()
+: redis_command(NULL)
+{
+}
+
+redis_set::redis_set(redis_client* conn)
 : redis_command(conn)
 {
+}
 
+redis_set::redis_set(redis_cluster* cluster, size_t max_conns)
+: redis_command(cluster, max_conns)
+{
 }
 
 redis_set::~redis_set()
 {
-
 }
 
 int redis_set::sadd(const char* key, const char* first_member, ...)

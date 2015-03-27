@@ -1,5 +1,6 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
+#include <map>
 #include "acl_cpp/redis/redis_result.hpp"
 
 namespace acl
@@ -8,6 +9,7 @@ namespace acl
 class redis_client;
 class redis_pool;
 class redis_cluster;
+class redis_request;
 
 /**
  * redis 客户端命令类的纯虚父类;
@@ -238,22 +240,10 @@ protected:
 		const std::map<string, const char*>& attrs);
 
 	void build(const char* cmd, const char* key,
-		const std::map<int, string>& attrs);
-	void build(const char* cmd, const char* key,
-		const std::map<int, const char*>& attrs);
-
-	void build(const char* cmd, const char* key,
 		const std::vector<string>& names,
 		const std::vector<string>& values);
 	void build(const char* cmd, const char* key,
 		const std::vector<const char*>& names,
-		const std::vector<const char*>& values);
-
-	void build(const char* cmd, const char* key,
-		const std::vector<int>& names,
-		const std::vector<string>& values);
-	void build(const char* cmd, const char* key,
-		const std::vector<int>& names,
 		const std::vector<const char*>& values);
 
 	void build(const char* cmd, const char* key,
@@ -270,13 +260,9 @@ protected:
 		const std::vector<string>& names);
 	void build(const char* cmd, const char* key,
 		const std::vector<const char*>& names);
-	void build(const char* cmd, const char* key,
-		const std::vector<int>& names);
 
 	void build(const char* cmd, const char* key,
 		const char* names[], size_t argc);
-	void build(const char* cmd, const char* key,
-		const int names[], size_t argc);
 	void build(const char* cmd, const char* key,
 		const char* names[], const size_t lens[], size_t argc);
 

@@ -5,15 +5,23 @@
 namespace acl
 {
 
-redis_hyperloglog::redis_hyperloglog(redis_client* conn /* = NULL */)
+redis_hyperloglog::redis_hyperloglog()
+: redis_command(NULL)
+{
+}
+
+redis_hyperloglog::redis_hyperloglog(redis_client* conn)
 : redis_command(conn)
 {
+}
 
+redis_hyperloglog::redis_hyperloglog(redis_cluster* cluster, size_t max_conns)
+: redis_command(cluster, max_conns)
+{
 }
 
 redis_hyperloglog::~redis_hyperloglog()
 {
-
 }
 
 int redis_hyperloglog::pfadd(const char* key, const char* first_element, ...)

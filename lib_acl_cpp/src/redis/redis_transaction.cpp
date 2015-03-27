@@ -7,15 +7,23 @@
 namespace acl
 {
 
-redis_transaction::redis_transaction(redis_client* conn /* = NULL */)
+redis_transaction::redis_transaction()
+: redis_command(NULL)
+{
+}
+
+redis_transaction::redis_transaction(redis_client* conn)
 : redis_command(conn)
 {
+}
 
+redis_transaction::redis_transaction(redis_cluster* cluster, size_t max_conns)
+: redis_command(cluster, max_conns)
+{
 }
 
 redis_transaction::~redis_transaction()
 {
-
 }
 
 bool redis_transaction::watch(const std::vector<string>& keys)

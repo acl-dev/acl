@@ -16,11 +16,13 @@ class redis_result;
  * HDEL/HEXISTS/HGET/HGETALL/HINCRBY/HINCRBYFLOAT/HKEYS/HLEN/HMGET/HMSET
  * HSET/HSETNX/HVALS/HSCAN
  */
-class ACL_CPP_API redis_hash : public redis_command
+class ACL_CPP_API redis_hash : virtual public redis_command
 {
 public:
-	redis_hash(redis_client* conn = NULL);
-	~redis_hash();
+	redis_hash();
+	redis_hash(redis_client* conn);
+	redis_hash(redis_cluster* cluster, size_t max_conns);
+	virtual ~redis_hash();
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -31,9 +33,6 @@ public:
 	 */
 	bool hmset(const char* key, const std::map<string, string>& attrs);
 	bool hmset(const char* key, const std::map<string, const char*>& attrs);
-
-	bool hmset(const char* key, const std::map<int, string>& attrs);
-	bool hmset(const char* key, const std::map<int, const char*>& attrs);
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -58,12 +57,8 @@ public:
 		std::vector<string>* result = NULL);
 	bool hmget(const char* key, const std::vector<const char*>& names,
 		std::vector<string>* result = NULL);
-	bool hmget(const char* key, const std::vector<int>& names,
-		std::vector<string>* result = NULL);
 
 	bool hmget(const char* key, const char* names[], size_t argc,
-		std::vector<string>* result = NULL);
-	bool hmget(const char* key, const int names[], size_t argc,
 		std::vector<string>* result = NULL);
 	bool hmget(const char* key, const char* names[], const size_t lens[],
 		size_t argc, std::vector<string>* result = NULL);

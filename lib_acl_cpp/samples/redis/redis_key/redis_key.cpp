@@ -10,7 +10,7 @@ static bool test_del(acl::redis_key& option, int n)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 		option.reset();
-		int ret = option.del(key.c_str(), NULL);
+		int ret = option.del_one(key.c_str());
 		if (ret < 0)
 		{
 			printf("del key: %s error\r\n", key.c_str());

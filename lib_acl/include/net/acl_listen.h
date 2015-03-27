@@ -33,7 +33,8 @@ ACL_API ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size, int* sock
 
 /**
  * 监听某个网络地址
- * @param addr {const char*} 网络地址, 格式如：127.0.0.1:8080
+ * @param addr {const char*} 网络地址, 格式如：127.0.0.1:8080，当输入地址为 ip:0 时
+ *  则由操作系统自动分配监听端口号，监听成功后可以调用 acl_getsockname 获得真正监听的地址
  * @param backlog {int} 监听套接字系统接收区的队列大小
  * @param block_mode {int} 阻塞模式还是非阻塞模式, ACL_BLOCKING 或 ACL_NON_BLOCKING
  * @return {ACL_SOCKET} 返回监听套接字，如果为 ACL_SOCKET_INVALID 表示无法监听该网络地址

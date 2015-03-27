@@ -9,15 +9,23 @@ namespace acl
 
 #define INT_LEN		11
 
-redis_server::redis_server(redis_client* conn /* = NULL */)
+redis_server::redis_server()
+: redis_command(NULL)
+{
+}
+
+redis_server::redis_server(redis_client* conn)
 : redis_command(conn)
 {
+}
 
+redis_server::redis_server(redis_cluster* cluster, size_t max_conns)
+: redis_command(cluster, max_conns)
+{
 }
 
 redis_server::~redis_server()
 {
-
 }
 
 bool redis_server::bgrewriteaof()

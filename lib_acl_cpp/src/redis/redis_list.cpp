@@ -12,15 +12,23 @@ namespace acl
 #define INT_LEN		11
 #define LONG_LEN	21
 
-redis_list::redis_list(redis_client* conn /* = NULL */)
+redis_list::redis_list()
+: redis_command(NULL)
+{
+}
+
+redis_list::redis_list(redis_client* conn)
 : redis_command(conn)
 {
+}
 
+redis_list::redis_list(redis_cluster* cluster, size_t max_conns)
+: redis_command(cluster, max_conns)
+{
 }
 
 redis_list::~redis_list()
 {
-
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -148,3 +148,4 @@
 #include "acl_cpp/redis/redis_server.hpp"
 #include "acl_cpp/redis/redis_hyperloglog.hpp"
 #include "acl_cpp/redis/redis_connection.hpp"
+#include "acl_cpp/redis/redis.hpp"

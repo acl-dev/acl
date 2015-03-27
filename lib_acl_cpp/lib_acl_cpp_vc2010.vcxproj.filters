@@ -436,6 +436,9 @@
     <ClCompile Include="src\redis\redis_zset.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\redis\redis.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -893,6 +896,9 @@
     </ClInclude>
     <ClInclude Include="src\redis\redis_request.hpp">
       <Filter>src\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis.hpp">
+      <Filter>include\redis</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

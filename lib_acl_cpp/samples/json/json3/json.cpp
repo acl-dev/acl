@@ -46,7 +46,7 @@ int main()
 
 	/////////////////////////////////////
 
-	const char* sss = "{\"DataKey\": \"BindRule\", \"DataValue\": {\"waittime\": \"7\"}}";
+	const char* sss = "{\"DataKey\": \"BindRule\", \"DataValue\": {\"waittime\": \"7\"}, \"null_key\": null}";
 
 	acl::json json3(sss);
 	const char* tags = "DataValue";
@@ -58,6 +58,7 @@ int main()
 	{
 		tag = iter->tag_name();
 		txt = iter->get_text();
+		printf("tag: %s, txt: %s\r\n", tag ? tag : "null", txt ? txt : "null");
 		if (txt)
 			iter->set_text("hello");
 		printf("tag: %s, txt: %s\r\n", tag ? tag : "null", txt ? txt : "null");

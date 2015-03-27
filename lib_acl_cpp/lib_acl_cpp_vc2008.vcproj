@@ -778,6 +778,10 @@
 				Name="redis"
 				>
 				<File
+					RelativePath=".\src\redis\redis.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_client.cpp"
 					>
 				</File>
@@ -1399,6 +1403,10 @@
 			<Filter
 				Name="redis"
 				>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis.hpp"
+					>
+				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_client.hpp"
 					>

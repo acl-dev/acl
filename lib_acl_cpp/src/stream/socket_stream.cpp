@@ -52,6 +52,8 @@ bool socket_stream::bind_udp(const char* addr, int rw_timeout /* = 0 */)
 	if (stream_)
 		acl_vstream_close(stream_);
 	stream_ = acl_vstream_bind(addr, rw_timeout);
+	if (stream_ == NULL)
+		return false;
 	eof_ = false;
 	opened_ = true;
 	return true;

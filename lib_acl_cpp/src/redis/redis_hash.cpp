@@ -10,10 +10,19 @@ namespace acl
 #define INT64_LEN	21
 #define FLOAT_LEN	32
 
-redis_hash::redis_hash(redis_client* conn /* = NULL */)
+redis_hash::redis_hash()
+: redis_command(NULL)
+{
+}
+
+redis_hash::redis_hash(redis_client* conn)
 : redis_command(conn)
 {
+}
 
+redis_hash::redis_hash(redis_cluster* cluster, size_t max_conns)
+: redis_command(cluster, max_conns)
+{
 }
 
 redis_hash::~redis_hash()
@@ -30,20 +39,6 @@ bool redis_hash::hmset(const char* key, const std::map<string, string>& attrs)
 }
 
 bool redis_hash::hmset(const char* key, const std::map<string, const char*>& attrs)
-{
-	hash_slot(key);
-	build("HMSET", key, attrs);
-	return check_status();
-}
-
-bool redis_hash::hmset(const char* key, const std::map<int, string>& attrs)
-{
-	hash_slot(key);
-	build("HMSET", key, attrs);
-	return check_status();
-}
-
-bool redis_hash::hmset(const char* key, const std::map<int, const char*>& attrs)
 {
 	hash_slot(key);
 	build("HMSET", key, attrs);
@@ -68,23 +63,7 @@ bool redis_hash::hmget(const char* key, const std::vector<const char*>& names,
 	return get_strings(result) >= 0 ? true : false;
 }
 
-bool redis_hash::hmget(const char* key, const std::vector<int>& names,
-	std::vector<string>* result /* = NULL */)
-{
-	hash_slot(key);
-	build("HMGET", key, names);
-	return get_strings(result) >= 0 ? true : false;
-}
-
 bool redis_hash::hmget(const char* key, const char* names[], size_t argc,
-	std::vector<string>* result /* = NULL */)
-{
-	hash_slot(key);
-	build("HMGET", key, names, argc);
-	return get_strings(result) >= 0 ? true : false;
-}
-
-bool redis_hash::hmget(const char* key, const int names[], size_t argc,
 	std::vector<string>* result /* = NULL */)
 {
 	hash_slot(key);

@@ -24,7 +24,8 @@ ACL_API ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 /**
  * 监听某个地址（对于UNIX，还可以监听域套接字）
  * @param addr {const char*} 监听地址
- *  如：127.0.0.1:80, 或域套接字, 如：/tmp/test.sock
+ *  如：127.0.0.1:80, 或域套接字, 如：/tmp/test.sock，当地址为 ip:0 时则监听端口号
+ *  由操作系统自动分配
  * @param qlen {int} 监听队列的长度
  * @return {ACL_VSTREAM*} 监听流指针
  */
@@ -85,7 +86,8 @@ ACL_API ACL_VSTREAM *acl_vstream_connect(const char *addr, int block_mode,
 /**
  * 针对 UDP 通信，该函数用来绑定本地 UDP 地址，如果绑定成功，则创建
  * ACL_VSTREAM 对象, 用户可以象调用 ACL_VSTREAM 对象的读写接口
- * @param addr {const char*} 本地 UDP 地址，格式：ip:port
+ * @param addr {const char*} 本地 UDP 地址，格式：ip:port，可以输入地址 ip:0 来让
+ *  操作系统自动分配本地端口号
  * @param rw_timeout {int} 读写超时时间(秒)
  * @return {ACL_VSTREAM*} 返回 NULL 表示绑定失败
  */

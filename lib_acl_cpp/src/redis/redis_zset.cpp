@@ -11,15 +11,23 @@ namespace acl
 #define BUFLEN	32
 #define INTLEN	11
 
-redis_zset::redis_zset(redis_client* conn /* = NULL */)
+redis_zset::redis_zset()
+: redis_command(NULL)
+{
+}
+
+redis_zset::redis_zset(redis_client* conn)
 : redis_command(conn)
 {
+}
 
+redis_zset::redis_zset(redis_cluster* cluster, size_t max_conns)
+: redis_command(cluster, max_conns)
+{
 }
 
 redis_zset::~redis_zset()
 {
-
 }
 
 int redis_zset::zadd(const char* key, const std::map<string, double>& members)

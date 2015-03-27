@@ -20,11 +20,13 @@ typedef enum
 	REDIS_KEY_ZSET		// sorted set
 } redis_key_t;
 
-class ACL_CPP_API redis_key : public redis_command
+class ACL_CPP_API redis_key : virtual public redis_command
 {
 public:
-	redis_key(redis_client* conn = NULL);
-	~redis_key();
+	redis_key();
+	redis_key(redis_client* conn);
+	redis_key(redis_cluster* cluster, size_t max_conns);
+	virtual ~redis_key();
 
 	/**
 	 * 删除一组 KEY，对于变参的接口，则要求最后一个参数必须以 NULL 结束
@@ -33,13 +35,12 @@ public:
 	 *  -1: 出错
 	 *  >0: 真正删除的 KEY 的个数，该值有可能少于输入的 KEY 的个数
 	 */
-	int del(const char* key);
+	int del_one(const char* key);
+	int del_one(const char* key, size_t len);
 	int del(const char* first_key, ...);
 	int del(const std::vector<string>& keys);
 	int del(const std::vector<const char*>& keys);
-	int del(const std::vector<int>& keys);
 	int del(const char* keys[], size_t argc);
-	int del(const int keys[], size_t argc);
 	int del(const char* keys[], const size_t lens[], size_t argc);
 
 	/**

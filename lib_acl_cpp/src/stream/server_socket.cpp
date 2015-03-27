@@ -23,14 +23,13 @@ server_socket::~server_socket()
 
 bool server_socket::open(const char* addr)
 {
-	safe_snprintf(addr_, sizeof(addr_), "%s", addr);
-
 #ifndef WIN32
 	if (strchr(addr, '/') != NULL)
 	{
 		fd_ = acl_unix_listen(addr, backlog_, block_
 			? ACL_BLOCKING : ACL_NON_BLOCKING);
 		unix_sock_ = true;
+		ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
 	}
 	else
 #endif
@@ -41,9 +40,20 @@ bool server_socket::open(const char* addr)
 	{
 		logger_error("listen %s error %s", addr, last_serror());
 		unix_sock_ = false;
+		ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
 		return false;
 	}
 
+	if (unix_sock_)
+		return true;
+
+	// 之所以再用 getsockname 重新获得一些监听地址，主要是为了应对当输入的 addr 
+	// 为 ip:0 的情形，即当给定的地址中的端口为 0 时要求操作系统自动分配一个端口号
+	if (acl_getsockname(fd_, addr_, sizeof(addr_)) < 0)
+	{
+		logger_error("getsockname error: %s", acl_last_serror());
+		ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
+	}
 	return true;
 }
 

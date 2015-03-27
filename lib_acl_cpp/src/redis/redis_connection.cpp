@@ -7,15 +7,23 @@
 namespace acl
 {
 
-redis_connection::redis_connection(redis_client* conn /* = NULL */)
+redis_connection::redis_connection()
+: redis_command(NULL)
+{
+}
+
+redis_connection::redis_connection(redis_client* conn)
 : redis_command(conn)
 {
+}
 
+redis_connection::redis_connection(redis_cluster* cluster, size_t max_conns)
+: redis_command(cluster, max_conns)
+{
 }
 
 redis_connection::~redis_connection()
 {
-
 }
 
 bool redis_connection::auth(const char* passwd)

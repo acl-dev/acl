@@ -11,11 +11,13 @@ class redis_client;
  * redis Connection 类，包含命令如下：
  * AUTH、ECHO、PING、QUIT、SELECT
  */
-class ACL_CPP_API redis_connection : public redis_command
+class ACL_CPP_API redis_connection : virtual public redis_command
 {
 public:
-	redis_connection(redis_client* conn = NULL);
-	~redis_connection();
+	redis_connection();
+	redis_connection(redis_client* conn);
+	redis_connection(redis_cluster* cluster, size_t max_conns);
+	virtual ~redis_connection();
 
 	/////////////////////////////////////////////////////////////////////
 

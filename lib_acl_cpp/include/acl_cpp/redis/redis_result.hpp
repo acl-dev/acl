@@ -16,6 +16,7 @@ typedef enum
 	REDIS_RESULT_ARRAY,
 } redis_result_t;
 
+class string;
 class dbuf_pool;
 class redis_client;
 

@@ -10,11 +10,13 @@ namespace acl
 
 class redis_client;
 
-class ACL_CPP_API redis_zset : public redis_command
+class ACL_CPP_API redis_zset : virtual public redis_command
 {
 public:
-	redis_zset(redis_client* conn = NULL);
-	~redis_zset();
+	redis_zset();
+	redis_zset(redis_client* conn);
+	redis_zset(redis_cluster* cluster, size_t max_conns);
+	virtual ~redis_zset();
 
 	/////////////////////////////////////////////////////////////////////
 
