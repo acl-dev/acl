@@ -44,12 +44,11 @@ static void test_redis_string(acl::redis_string& cmd, const char* key)
 	// call redis-server: GET key
 	if (cmd.get(key, val) == false)
 		printf("get key error\r\n");
-
 }
 
 static void test_redis_key(acl::redis_key& cmd, const char* key)
 {
-	if (cmd_key.exists(key) == false)
+	if (cmd.exists(key) == false)
 		printf("key not exists\r\n");
 	else
 		printf("key exists\r\n");
@@ -99,12 +98,72 @@ int main(void)
 	// call redis server
 	test_redis_string(cmd_string, key);
 	test_redis_key(cmd_key, key);
-
 }
 ```
 The redis cluster support caching the redis hash-slot in client for performance, and can dynamic add redis server nodes in running.
 
+### another way to use acl redis easily
+The acl::redis class inherits from all the other acl redis command class, which includes all the redis client commands. So you can use the acl::redis class just as you can do in all the redis-client-commands class.
+
+```c++
+#include <stdlib.h>
+#include <stdio.h>
+#include "acl_cpp/lib_acl.hpp"
+
+static void test_redis_string(acl::redis& cmd, const char* key)
+{
+	acl::string val("test_value");
+
+	// call redis-server: SET key value
+	if (cmd.set(key, val.c_str()) == false)
+	{
+		printf("redis set error\r\n");
+		return;
+	}
+
+	// clear the string buf space
+	val.clear();
+
+	// reset the redis command object for reusing it
+	cmd.reset();
+
+	// call redis-server: GET key
+	if (cmd.get(key, val) == false)
+		printf("get key error\r\n");
+}
+
+static void test_redis_key(acl::redis& cmd, const char* key)
+{
+	if (cmd.exists(key) == false)
+		printf("key not exists\r\n");
+	else
+		printf("key exists\r\n");
+}
+
+int main(void)
+{
+	const char* redis_addr = "127.0.0.1:6379";
+	int conn_timeout = 10, rw_timeout = 10, max_conns = 100;
+
+	// declare redis cluster ojbect
+	acl::redis_cluster cluster;
+	cluster.set(redis_addr, max_conns);
+
+	// redis operation command
+	acl::redis cmd;
+
+	// bind redis command with redis cluster
+	cmd.set_cluster(&cluster, max_conns);
+
+	const char* key = "test_key";
+
+	// call redis server
+	test_redis_string(cmd, key);
+	test_redis_key(cmd, key);
+}
+```
 ### add acl redis to your projects
+Before you use the acl redis, you should compile the three base libraries which redis depending on. Enter the lib_acl, lib_protocol, lib_acl_cpp, and build the lib_acl.a, lib_protocol.a and lib_acl_cpp.a.
 #### On UNIX/LINUX
 In your Makefile, you should add below compiling flags:
 -DLINUX2 for LINUX, -DFREEBSD for FreeBSD, -DMACOSX for MAXOS, -DSUNOS5 for Solaris X86;
