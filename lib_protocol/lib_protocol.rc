@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// ??(???????) resources
+// 中文(中华人民共和国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 #ifdef _WIN32
@@ -69,7 +69,7 @@ BEGIN
     BEGIN
         BLOCK "080404b0"
         BEGIN
-            VALUE "Comments", "主要包括HTTP协议，ICMP协议的实现"
+            VALUE "Comments", "主要包括HTTP协议，ICMP协议，SMTP协议的实现"
             VALUE "FileDescription", "protocol"
             VALUE "FileVersion", "3, 1, 1, 0"
             VALUE "InternalName", "lib_prot"
@@ -85,7 +85,7 @@ BEGIN
     END
 END
 
-#endif    // ??(???????) resources
+#endif    // 中文(中华人民共和国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -1,5 +1,6 @@
 #ifndef ACL_LISTEN_INCLUDE_H
 #define ACL_LISTEN_INCLUDE_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -85,5 +86,6 @@ ACL_API int acl_fifo_listen(const char *path, int permissions, int block_mode);
 #ifdef __cplusplus
 }
 #endif
+
 #endif
 

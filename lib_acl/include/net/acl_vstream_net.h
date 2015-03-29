@@ -1,5 +1,6 @@
 #ifndef ACL_VSTREAM_NET_INCLUDE_H
 #define ACL_VSTREAM_NET_INCLUDE_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -102,5 +103,6 @@ ACL_API void acl_vstream_set_udp_io(ACL_VSTREAM *stream);
 #ifdef __cplusplus
 }
 #endif
+
 #endif
 
