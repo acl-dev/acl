@@ -92,6 +92,7 @@ bool redis_transaction::run_cmd(const char* cmd, const char* argv[],
 	build(cmd, NULL, argv, lens, argc);
 	if (check_status("QUEUED") == false)
 		return false;
+
 	cmds_.push_back(cmd);
 	return true;
 }
@@ -102,6 +103,7 @@ bool redis_transaction::run_cmd(const char* cmd,
 	build(cmd, NULL, args);
 	if (check_status("QUEUED") == false)
 		return false;
+
 	cmds_.push_back(cmd);
 	return true;
 }

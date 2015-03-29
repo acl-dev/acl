@@ -263,6 +263,7 @@ bool redis_server::monitor()
 bool redis_server::get_command(string& buf)
 {
 	reset_request();
+
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_STATUS)
 		return false;

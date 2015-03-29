@@ -19,9 +19,34 @@ class redis_request;
 class ACL_CPP_API redis_command
 {
 public:
+	/**
+	 * 缺省的构造函数，如果使用此构造函数初始化类对象，则必须调用 set_client 或
+	 * set_cluster 设置 redis 客户端命令类对象的通讯方式。
+	 * default constructor. You must set the communication method by
+	 * set_client or set_cluster functions.
+	 */
 	redis_command();
+
+	/**
+	 * 当使用非集群模式时的构造函数，可以使用此构造函数设置 redis 通信类对象。
+	 * Using this constructor to set the redis communication mode,
+	 * usually in no-cluster mode.
+	 * @param conn {redis_client*} redis 通信类对象
+	 *  the redis communication in no-cluster mode
+	 */
 	redis_command(redis_client* conn);
+
+	/**
+	 * 使用集群模式的构造函数，在构造类对象时指定了集群模式的 redis_cluster 对象。
+	 * Using this constructor to set the redis_cluster, usually in
+	 * cluster mode.
+	 * @param cluster {redis_cluster*} redis 集群连接对象
+	 *  redis cluster object in cluster mode
+	 * @param max_conns {size_t} 与集群中所有结点之间的每个连接池的最大连接数
+	 *  the max of every connection pool with all the redis nodes
+	 */
 	redis_command(redis_cluster* cluster, size_t max_conns);
+
 	virtual ~redis_command() = 0;
 
 	/**
@@ -39,9 +64,9 @@ public:
 	void reset(bool save_slot = false);
 
 	/**
-	 * 在使用连接池方式时，通过本函数将从连接池获得的连接对象;
-	 * when using connection pool and not in cluster mode, the function
-	 * is used to set the connection for next redis command operation.
+	 * 在使用非集群方式时，通过本函数将从连接池获得的连接对象;
+	 * when not using cluster mode, the function is used
+	 * to set the connection for next redis command operation.
 	 * @param conn {redis_client*} 与 redis 客户端命令进行关联;
 	 *  the redis connection to be set in next redis operation
 	 */
@@ -232,6 +257,7 @@ protected:
 	const redis_result** scan_keys(const char* cmd, const char* key,
 		int& cursor, size_t& size, const char* pattern,
 		const size_t* count);
+
 	/*******************************************************************/
 
 	void build(const char* cmd, const char* key,

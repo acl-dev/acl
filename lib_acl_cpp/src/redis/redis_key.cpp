@@ -561,6 +561,4 @@ int redis_key::scan(int cursor, std::vector<string>& out,
 	return cursor;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-
 } // namespace acl

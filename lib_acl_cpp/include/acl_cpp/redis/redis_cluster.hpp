@@ -9,6 +9,13 @@ namespace acl
 
 class redis_pool;
 
+/**
+ * redis 客户端集群类，通过将此类对象注册入 redis 客户端命令类(redis_command)，
+ * 则使所有的客户端命令自动支持集群版 redis 命令。
+ * redis client cluster class. The class's object is set in the redis_command
+ * using redis_command::set_cluster(redis_cluster*), and all the redis client
+ * command will support the redis cluster mode.
+ */
 class ACL_CPP_API redis_cluster : public connect_manager
 {
 public:

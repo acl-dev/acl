@@ -14,9 +14,21 @@ class string;
 class ACL_CPP_API redis_pubsub : virtual public redis_command
 {
 public:
+	/**
+	 * see redis_command::redis_command()
+	 */
 	redis_pubsub();
+
+	/**
+	 * see redis_command::redis_command(redis_client*)
+	 */
 	redis_pubsub(redis_client* conn);
+
+	/**
+	 * see redis_command::redis_command(redis_cluster*£¬ size_t)
+	 */
 	redis_pubsub(redis_cluster* cluster, size_t max_conns);
+
 	virtual ~redis_pubsub();
 
 	/////////////////////////////////////////////////////////////////////

@@ -279,6 +279,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_cluster2_vc2010", "li
 		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples_acl", "samples_acl", "{6E9E519A-6E4F-491A-91C0-6CA079CA0C94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32

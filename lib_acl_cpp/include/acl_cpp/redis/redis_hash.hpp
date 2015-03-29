@@ -19,9 +19,21 @@ class redis_result;
 class ACL_CPP_API redis_hash : virtual public redis_command
 {
 public:
+	/**
+	 * see redis_command::redis_command()
+	 */
 	redis_hash();
+
+	/**
+	 * see redis_command::redis_command(redis_client*)
+	 */
 	redis_hash(redis_client* conn);
+
+	/**
+	 * see redis_command::redis_command(redis_cluster*£¬ size_t)
+	 */
 	redis_hash(redis_cluster* cluster, size_t max_conns);
+
 	virtual ~redis_hash();
 
 	/////////////////////////////////////////////////////////////////////

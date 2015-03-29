@@ -12,6 +12,14 @@ class dbuf_pool;
 class redis_result;
 class redis_request;
 
+/**
+ * redis 客户端对象网络通信类，通过此类将组织好的 redis 请求命令发给 redis 服务端，
+ * 同时接收 redis 服务端响应结果；该类继承于 connect_client 类，主要为了使用连接池
+ * 功能。
+ * redis client network IO class. The redis request is sent to server
+ * and the server's respond is handled in this class. The class inherits
+ * connect_client, which can use the connection pool function.
+ */
 class ACL_CPP_API redis_client : public connect_client
 {
 public:

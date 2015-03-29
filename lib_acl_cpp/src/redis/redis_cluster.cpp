@@ -19,6 +19,7 @@ redis_cluster::redis_cluster(int conn_timeout, int rw_timeout,
 redis_cluster::~redis_cluster()
 {
 	acl_myfree(slot_addrs_);
+
 	std::vector<char*>::iterator it = addrs_.begin();
 	for (; it != addrs_.end(); ++it)
 		acl_myfree(*it);

@@ -309,6 +309,7 @@ const redis_result* redis_client::run(dbuf_pool* pool, const redis_request& req,
 {
 	// 重置协议处理状态
 	bool retried = false;
+
 	redis_result* result;
 
 	struct iovec* iov = req.get_iovec();

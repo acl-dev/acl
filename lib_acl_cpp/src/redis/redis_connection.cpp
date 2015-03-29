@@ -50,7 +50,7 @@ bool redis_connection::select(int dbnum)
 	lens[0] = strlen(argv[0]);
 
 	char buf[21];
-	(void) safe_snprintf(buf, sizeof(buf), "%d", dbnum);
+	safe_snprintf(buf, sizeof(buf), "%d", dbnum);
 	argv[1] = buf;
 	lens[1] = strlen(argv[1]);
 

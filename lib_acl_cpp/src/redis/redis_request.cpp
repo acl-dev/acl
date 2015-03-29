@@ -9,7 +9,6 @@ redis_request::redis_request()
 , argc_(0)
 , size_(0)
 {
-
 }
 
 redis_request::~redis_request()

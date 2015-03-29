@@ -12,9 +12,21 @@ class redis_client;
 class ACL_CPP_API redis_set : virtual public redis_command
 {
 public:
+	/**
+	 * see redis_command::redis_command()
+	 */
 	redis_set();
+
+	/**
+	 * see redis_command::redis_command(redis_client*)
+	 */
 	redis_set(redis_client* conn);
+
+	/**
+	 * see redis_command::redis_command(redis_cluster*£¬ size_t)
+	 */
 	redis_set(redis_cluster* cluster, size_t max_conns);
+
 	virtual ~redis_set();
 
 	/////////////////////////////////////////////////////////////////////

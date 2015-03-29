@@ -20,6 +20,11 @@ class string;
 class dbuf_pool;
 class redis_client;
 
+/**
+ * 对 redis-server 返回结果对象类，对 redis-server 返回的数据进行分析后创建
+ * redis_result 类对象。
+ * the redis result for redis-server's respond
+ */
 class ACL_CPP_API redis_result
 {
 public:

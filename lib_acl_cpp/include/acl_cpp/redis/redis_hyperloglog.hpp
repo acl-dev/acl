@@ -12,9 +12,21 @@ class redis_client;
 class ACL_CPP_API redis_hyperloglog : virtual public redis_command
 {
 public:
+	/**
+	 * see redis_command::redis_command()
+	 */
 	redis_hyperloglog();
+
+	/**
+	 * see redis_command::redis_command(redis_client*)
+	 */
 	redis_hyperloglog(redis_client* conn);
+
+	/**
+	 * see redis_command::redis_command(redis_cluster*£¬ size_t)
+	 */
 	redis_hyperloglog(redis_cluster* cluster, size_t max_conns);
+
 	virtual ~redis_hyperloglog();
 
 	/**

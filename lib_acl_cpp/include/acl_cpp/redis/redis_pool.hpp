@@ -5,6 +5,12 @@
 namespace acl
 {
 
+/**
+ * redis 连接池类，该类继承于 connect_pool，在 connect_pool 定义了通用的有关
+ * TCP 连接池的通用方法。
+ * redis connection pool inherting from connect_pool, which includes
+ * TCP connection pool methods.
+ */
 class ACL_CPP_API redis_pool : public connect_pool
 {
 public:
@@ -15,6 +21,7 @@ public:
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 */
 	redis_pool(const char* addr, int count, size_t idx = 0);
+
 	virtual ~redis_pool();
 
 	/**

@@ -358,6 +358,4 @@ int redis_hash::hscan(const char* key, int cursor, std::map<string, string>& out
 	return cursor;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-
 } // namespace acl

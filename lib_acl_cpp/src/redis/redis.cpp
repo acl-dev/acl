@@ -18,12 +18,10 @@ redis::redis(redis_client* conn /* = NULL */)
 	, redis_transaction(conn)
 	, redis_zset(conn)
 {
-
 }
 
 redis::~redis()
 {
-
 }
 
 } // namespace acl

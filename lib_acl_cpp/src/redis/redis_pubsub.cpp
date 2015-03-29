@@ -46,6 +46,7 @@ int redis_pubsub::subscribe(const char* first_channel, ...)
 {
 	std::vector<const char*> channels;
 	channels.push_back(first_channel);
+
 	va_list ap;
 	va_start(ap, first_channel);
 	const char* channel;

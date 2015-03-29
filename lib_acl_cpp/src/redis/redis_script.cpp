@@ -30,7 +30,8 @@ redis_script::~redis_script()
 }
 
 bool redis_script::eval_status(const char* script,
-	const std::vector<string>& keys, const std::vector<string>& args,
+	const std::vector<string>& keys,
+	const std::vector<string>& args,
 	const char* success /* = "OK" */)
 {
 	const redis_result* result = eval_cmd(script, "EVAL", keys, args);

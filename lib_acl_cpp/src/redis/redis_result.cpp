@@ -49,6 +49,7 @@ redis_result& redis_result::set_size(size_t size)
 		logger_error("set size when putting, idx_: %d", (int) idx_);
 		return *this;
 	}
+
 	size_ = size;
 	return *this;
 }

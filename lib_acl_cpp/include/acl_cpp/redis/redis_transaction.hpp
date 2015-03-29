@@ -13,9 +13,21 @@ class redis_result;
 class ACL_CPP_API redis_transaction : virtual public redis_command
 {
 public:
+	/**
+	 * see redis_command::redis_command()
+	 */
 	redis_transaction();
+
+	/**
+	 * see redis_command::redis_command(redis_client*)
+	 */
 	redis_transaction(redis_client* conn);
+
+	/**
+	 * see redis_command::redis_command(redis_cluster*£¬ size_t)
+	 */
 	redis_transaction(redis_cluster* cluster, size_t max_conns);
+
 	virtual ~redis_transaction();
 
 	/////////////////////////////////////////////////////////////////////

@@ -261,8 +261,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zdb", "lib_acl\samples\zdb\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples_acl", "samples_acl", "{267F658E-44AF-4080-8577-EFCE99A5E030}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples_protocol", "samples_protocol", "{7C54A0C9-3817-4BBC-BF52-4FA941FD3C69}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgi", "lib_acl_cpp\samples\cgi\cgi_vc2012.vcxproj", "{2C2212C1-01D2-4C8E-AB15-F7E31C7C134B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aio_server_ssl", "lib_acl_cpp\samples\aio\aio_server_ssl\aio_server_ssl_vc2012.vcxproj", "{A07145B7-36AE-4D6F-8536-30A8BE48529D}"

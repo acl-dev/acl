@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{4FE55739-6D3E-4FA7-BC10-05AB84E3D721}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "acl_cpp_samples", "acl_cpp_samples", "{4FE55739-6D3E-4FA7-BC10-05AB84E3D721}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aio", "aio", "{B8331BFA-4F66-41B8-9A0F-8B7617DC07B8}"
 EndProject

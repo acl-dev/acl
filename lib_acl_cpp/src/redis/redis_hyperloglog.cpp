@@ -109,4 +109,4 @@ bool redis_hyperloglog::pfmerge(const char* dst,
 	return check_status();
 }
 
-} //namespace acl
+} // namespace acl

@@ -72,6 +72,7 @@ redis_command::redis_command(redis_cluster* cluster, size_t max_conns)
 , result_(NULL)
 {
 	pool_ = NEW dbuf_pool(128000);
+
 	if (cluster != NULL)
 	{
 		redirect_max_ = cluster->get_redirect_max();

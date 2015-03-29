@@ -13,8 +13,19 @@ class redis_client;
 class ACL_CPP_API redis_zset : virtual public redis_command
 {
 public:
+	/**
+	 * see redis_command::redis_command()
+	 */
 	redis_zset();
+
+	/**
+	 * see redis_command::redis_command(redis_client*)
+	 */
 	redis_zset(redis_client* conn);
+
+	/**
+	 * see redis_command::redis_command(redis_cluster*£¬ size_t)
+	 */
 	redis_zset(redis_cluster* cluster, size_t max_conns);
 	virtual ~redis_zset();
 

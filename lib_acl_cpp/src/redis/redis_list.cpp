@@ -552,6 +552,4 @@ bool redis_list::ltrim(const char* key, int start, int end)
 	return check_status();
 }
 
-//////////////////////////////////////////////////////////////////////////
-
 } // namespace acl

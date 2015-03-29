@@ -23,9 +23,21 @@ typedef enum
 class ACL_CPP_API redis_key : virtual public redis_command
 {
 public:
+	/**
+	 * see redis_command::redis_command()
+	 */
 	redis_key();
+
+	/**
+	 * see redis_command::redis_command(redis_client*)
+	 */
 	redis_key(redis_client* conn);
+
+	/**
+	 * see redis_command::redis_command(redis_cluster*£¬ size_t)
+	 */
 	redis_key(redis_cluster* cluster, size_t max_conns);
+
 	virtual ~redis_key();
 
 	/**

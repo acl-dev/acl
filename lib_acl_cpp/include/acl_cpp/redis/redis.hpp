@@ -16,6 +16,12 @@
 namespace acl
 {
 
+/**
+ * 该类继承了所有 redis 命令类，因此可以只通过此类对象使用所有的 redis 命令。
+ * inherit all the redis command class, which include all the commands
+ * of Key, String, Hash, List, Set, SortedSet, Hyperloglog, Pub/Sub,
+ * Transaction, Script, Connection, Server.
+ */
 class ACL_CPP_API redis
 	: public redis_connection
 	, public redis_hash
