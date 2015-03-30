@@ -688,39 +688,7 @@ int redis_command::get_string(char* buf, size_t size)
 
 int redis_command::get_strings(std::vector<string>& out)
 {
-	out.clear();
-
-	const redis_result* result = run();
-	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
-		return -1;
-
-	size_t size;
-	const redis_result** children = result->get_children(&size);
-	if (children == NULL)
-		return 0;
-
-	if (size > 0)
-		out.reserve(size);
-
-	const redis_result* rr;
-	string buf(4096);
-
-	for (size_t i = 0; i < size; i++)
-	{
-		rr = children[i];
-		if (rr == NULL || rr->get_type() != REDIS_RESULT_STRING)
-			out.push_back("");
-		else if (rr->get_size() == 0)
-			out.push_back("");
-		else 
-		{
-			rr->argv_to_string(buf);
-			out.push_back(buf);
-			buf.clear();
-		}
-	}
-
-	return (int) size;
+	return get_strings(&out);
 }
 
 int redis_command::get_strings(std::vector<string>* out)
@@ -779,7 +747,7 @@ int redis_command::get_strings(std::map<string, string>& out)
 	if (size % 2 != 0)
 		return -1;
 
-	string name_buf, value_buf;
+	string name, value;
 
 	const redis_result* rr;
 	for (size_t i = 0; i < size;)
@@ -790,13 +758,21 @@ int redis_command::get_strings(std::map<string, string>& out)
 			i += 2;
 			continue;
 		}
-		name_buf.clear();
-		value_buf.clear();
-		rr->argv_to_string(name_buf);
+		name.clear();
+		rr->argv_to_string(name);
 		i++;
-		rr->argv_to_string(value_buf);
+
+		rr = children[i];
+		if (rr->get_type() != REDIS_RESULT_STRING)
+		{
+			i++;
+			continue;
+		}
+		value.clear();
+		rr->argv_to_string(value);
 		i++;
-		out[name_buf] = value_buf;
+
+		out[name] = value;
 	}
 
 	return (int) out.size();
@@ -822,7 +798,7 @@ int redis_command::get_strings(std::vector<string>& names,
 	if (size % 2 != 0)
 		return -1;
 
-	string buf;
+	string name, value;
 	const redis_result* rr;
 
 	for (size_t i = 0; i < size;)
@@ -833,15 +809,22 @@ int redis_command::get_strings(std::vector<string>& names,
 			i += 2;
 			continue;
 		}
-		buf.clear();
-		rr->argv_to_string(buf);
+		name.clear();
+		rr->argv_to_string(name);
 		i++;
-		names.push_back(buf);
 
-		buf.clear();
-		rr->argv_to_string(buf);
+		rr = children[i];
+		if (rr->get_type() != REDIS_RESULT_STRING)
+		{
+			i++;
+			continue;
+		}
+		value.clear();
+		rr->argv_to_string(value);
 		i++;
-		values.push_back(buf);
+
+		names.push_back(name);
+		values.push_back(value);
 	}
 
 	return (int) names.size();
@@ -867,10 +850,9 @@ int redis_command::get_strings(std::vector<const char*>& names,
 	if (size % 2 != 0)
 		return -1;
 
-	char* buf;
+	char* nbuf, *vbuf;
 	size_t len;
 	const redis_result* rr;
-	std::vector<const redis_result*>::const_iterator cit;
 
 	for (size_t i = 0; i < size;)
 	{
@@ -880,18 +862,24 @@ int redis_command::get_strings(std::vector<const char*>& names,
 			i += 2;
 			continue;
 		}
-
 		len = rr->get_length() + 1;
-		buf = (char*) pool_->dbuf_alloc(len);
-		rr->argv_to_string(buf, len);
+		nbuf = (char*) pool_->dbuf_alloc(len);
+		rr->argv_to_string(nbuf, len);
 		i++;
-		names.push_back(buf);
 
+		rr = children[i];
+		if (rr->get_type() != REDIS_RESULT_STRING)
+		{
+			i++;
+			continue;
+		}
 		len = rr->get_length() + 1;
-		buf = (char*) pool_->dbuf_alloc(len);
-		rr->argv_to_string(buf, len);
+		vbuf = (char*) pool_->dbuf_alloc(len);
+		rr->argv_to_string(vbuf, len);
 		i++;
-		values.push_back(buf);
+
+		names.push_back(nbuf);
+		values.push_back(vbuf);
 	}
 
 	return (int) names.size();
