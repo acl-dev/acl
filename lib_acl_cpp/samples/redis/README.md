@@ -102,6 +102,7 @@ int main(void)
 ```
 The redis cluster support caching the redis hash-slot in client for performance, and can dynamic add redis server nodes in running.
 
+
 ### another way to use acl redis easily
 The acl::redis class inherits from all the other acl redis command class, which includes all the redis client commands. So you can use the acl::redis class just as you can do in all the redis-client-commands class.
 
@@ -162,8 +163,62 @@ int main(void)
 	test_redis_key(cmd, key);
 }
 ```
+
+### redis client cluster running in multi-threads
+```c++
+static int __max_conns = 100;
+
+static void* thread_main(void* arg)
+{
+	acl::redis_client_cluster* cluster = (acl::redis_client_cluster*) arg;
+
+	acl::redis cmd;
+	cmd.set_cluster(cluster, __max_conns);
+
+	const char* key = "test_key";
+
+	for (int i = 0; i < 100000; i++)
+	{
+		test_redis_string(cmd, key);
+		test_redis_key(cmd, key);
+	}
+
+	return NULL;
+}
+
+int main(void)
+{
+	const char* redis_addr = "127.0.0.1:6379";
+	int conn_timeout = 10, rw_timeout = 10;
+
+	// declare redis cluster ojbect
+	acl::redis_client_cluster cluster;
+	cluster.set(redis_addr, __max_conns);
+
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	
+	// create first thread
+	pthread_t id1;
+	pthread_create(&id1, &attr, thread_main, &cluster);
+
+	// create second thread
+	pthread_t id2;
+	pthread_create(&id2, &attr, thread_main, &cluster);
+
+	pthread_join(&id1);
+	pthread_join(&id2);
+
+	return 0;
+}
+```
+
 ### add acl redis to your projects
 Before you use the acl redis, you should compile the three base libraries which redis depending on. Enter the lib_acl, lib_protocol, lib_acl_cpp, and build the lib_acl.a, lib_protocol.a and lib_acl_cpp.a.
+$cd lib_acl; make
+$cd lib_protocol; make
+$cd lib_acl_cpp; make
+
 #### On UNIX/LINUX
 In your Makefile, you should add below compiling flags:
 -DLINUX2 for LINUX, -DFREEBSD for FreeBSD, -DMACOSX for MAXOS, -DSUNOS5 for Solaris X86;
@@ -174,7 +229,8 @@ One Makefile as below:
 ```Makefile
 CFLAGS = -c -g -W -O3 -Wall -Werror -Wshadow \
 -Wno-long-long -Wpointer-arith -D_REENTRANT \
--D_POSIX_PTHREAD_SEMANTICS -DLINUX2
+-D_POSIX_PTHREAD_SEMANTICS -DLINUX2 \
+-I ./lib_acl_cpp/include
 BASE_PATH=./acl
 LDFLAGS = -L$(BASE_PATH)/lib_acl_cpp/lib -l_acl_cpp \
 	-L$(BASE_PATH)/lib_protocol/lib -l_protocol \
