@@ -206,8 +206,8 @@ int main(void)
 	pthread_t id2;
 	pthread_create(&id2, &attr, thread_main, &cluster);
 
-	pthread_join(&id1);
-	pthread_join(&id2);
+	pthread_join(&id1, NULL);
+	pthread_join(&id2, NULL);
 
 	return 0;
 }
