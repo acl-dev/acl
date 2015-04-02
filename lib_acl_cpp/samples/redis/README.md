@@ -11,7 +11,7 @@ Because acl redis lib is a part of lib_acl_cpp lib, and lib_acl_cpp depend lib_a
 - 1 compile lib_acl.a: Enter into lib_acl path and type make, the lib_acl.a will be compiled
 - 2 compile lib_protocol.a: Enter into lib_protocol path and type make, the lib_protocol.a will be compiled
 - 3 compile lib_acl_cpp.a: Enter into lib_acl_cpp path and type make, the lib_acl_cpp.a will be compiled
-- 4 compile redis samples: Enter into lib_acl_cpp\samples\redis and type make, all the redis samples(including redis_cluster, redis_connection, redis_hash, redis_hyperloglog, redis_key, redis_lib, redis_manager, redis_pool, redis_pubsub, redis_server, redis_set, redis_string, redis_trans, redis_zset, redis_zset_pool) will be compiled.
+- 4 compile redis samples: Enter into lib_acl_cpp\samples\redis and type make, all the redis samples(including redis_cluster, redis_connection, redis_hash, redis_hyperloglog, redis_key, redis_lib, redis_manager, redis_pool, redis_pubsub, redis_server, redis_set, redis_string, redis_trans, redis_zset, redis_zset_pool, redis_client_cluster) will be compiled.
 
 ### compile on WINDOWS
 You can use VC2003, VC2008, VC2010, VC2012 to build all acl libs including acl redis lib in lib_acl_cpp module when you open the acl projects(acl_cpp_vc2003.sln, acl_cpp_vc2008.sln, acl_cpp_vc2010.sln, acl_cpp_vc2012.sln). You should build lib_acl first, and second build lib_protocol, and third build lib_acl_cpp, and at last build all the acl samples including redis samples.
@@ -82,7 +82,7 @@ int main(void)
 	int conn_timeout = 10, rw_timeout = 10, max_conns = 100;
 
 	// declare redis cluster ojbect
-	acl::redis_cluster cluster;
+	acl::redis_client_cluster cluster;
 	cluster.set(redis_addr, max_conns);
 
 	// redis operation command
@@ -146,7 +146,7 @@ int main(void)
 	int conn_timeout = 10, rw_timeout = 10, max_conns = 100;
 
 	// declare redis cluster ojbect
-	acl::redis_cluster cluster;
+	acl::redis_client_cluster cluster;
 	cluster.set(redis_addr, max_conns);
 
 	// redis operation command
