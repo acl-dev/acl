@@ -272,7 +272,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_vc2010", "lib_acl_cpp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_cluster_vc2010", "lib_acl_cpp\samples\redis\redis_cluster\redis_cluster_vc2010.vcxproj", "{560AD9F1-FDD5-4C89-9CCC-F4CF68FED05F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_cluster2_vc2010", "lib_acl_cpp\samples\redis\redis_cluster2\redis_cluster2_vc2010.vcxproj", "{AD4762CE-510B-4D2C-9075-CCE7689286C4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_client_cluster2_vc2010", "lib_acl_cpp\samples\redis\redis_client_cluster2\redis_client_cluster2_vc2010.vcxproj", "{AD4762CE-510B-4D2C-9075-CCE7689286C4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
@@ -280,6 +280,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_cluster2_vc2010", "li
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples_acl", "samples_acl", "{6E9E519A-6E4F-491A-91C0-6CA079CA0C94}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_client_cluster_vc2010", "lib_acl_cpp\samples\redis\redis_client_cluster\redis_client_cluster_vc2010.vcxproj", "{3DF1326C-0D04-45D8-AD8A-1285A62EE652}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -790,6 +797,16 @@ Global
 		{AD4762CE-510B-4D2C-9075-CCE7689286C4}.Releasedll|Win32.Build.0 = Releasedll|Win32
 		{AD4762CE-510B-4D2C-9075-CCE7689286C4}.Template|Win32.ActiveCfg = Release|Win32
 		{AD4762CE-510B-4D2C-9075-CCE7689286C4}.Template|Win32.Build.0 = Release|Win32
+		{3DF1326C-0D04-45D8-AD8A-1285A62EE652}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3DF1326C-0D04-45D8-AD8A-1285A62EE652}.Debug|Win32.Build.0 = Debug|Win32
+		{3DF1326C-0D04-45D8-AD8A-1285A62EE652}.DebugDll|Win32.ActiveCfg = DebugDll|Win32
+		{3DF1326C-0D04-45D8-AD8A-1285A62EE652}.DebugDll|Win32.Build.0 = DebugDll|Win32
+		{3DF1326C-0D04-45D8-AD8A-1285A62EE652}.Release|Win32.ActiveCfg = Release|Win32
+		{3DF1326C-0D04-45D8-AD8A-1285A62EE652}.Release|Win32.Build.0 = Release|Win32
+		{3DF1326C-0D04-45D8-AD8A-1285A62EE652}.Releasedll|Win32.ActiveCfg = Releasedll|Win32
+		{3DF1326C-0D04-45D8-AD8A-1285A62EE652}.Releasedll|Win32.Build.0 = Releasedll|Win32
+		{3DF1326C-0D04-45D8-AD8A-1285A62EE652}.Template|Win32.ActiveCfg = Release|Win32
+		{3DF1326C-0D04-45D8-AD8A-1285A62EE652}.Template|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -847,6 +864,7 @@ Global
 		{D9D035FB-8332-490F-BB0B-0E02D5F8B6A0} = {7B001BDA-0EFF-4EE0-89E7-C0EECE8955A9}
 		{560AD9F1-FDD5-4C89-9CCC-F4CF68FED05F} = {7B001BDA-0EFF-4EE0-89E7-C0EECE8955A9}
 		{AD4762CE-510B-4D2C-9075-CCE7689286C4} = {7B001BDA-0EFF-4EE0-89E7-C0EECE8955A9}
+		{3DF1326C-0D04-45D8-AD8A-1285A62EE652} = {7B001BDA-0EFF-4EE0-89E7-C0EECE8955A9}
 		{84376B60-FF20-4FD0-967E-C568FC2FBC53} = {DC80E4B1-1DC2-49D8-9FC3-BD3E60337968}
 	EndGlobalSection
 EndGlobal

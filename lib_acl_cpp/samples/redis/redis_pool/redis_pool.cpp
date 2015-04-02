@@ -91,7 +91,7 @@ static bool test_type(acl::redis_key& option, int i)
 class test_thread : public acl::thread
 {
 public:
-	test_thread(acl::redis_pool& pool, const char* cmd, int n)
+	test_thread(acl::redis_client_pool& pool, const char* cmd, int n)
 		: pool_(pool), cmd_(cmd), n_(n) {}
 
 	~test_thread() {}
@@ -152,7 +152,7 @@ protected:
 	}
 
 private:
-	acl::redis_pool& pool_;
+	acl::redis_client_pool& pool_;
 	acl::string cmd_;
 	int n_;
 };
@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
 
 	acl::acl_cpp_init();
 
-	acl::redis_pool pool(addr.c_str(), max_threads);
+	acl::redis_client_pool pool(addr.c_str(), max_threads);
 	pool.set_timeout(conn_timeout, rw_timeout);
 
 	std::vector<test_thread*> threads;

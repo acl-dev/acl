@@ -22,7 +22,7 @@ redis_list::redis_list(redis_client* conn)
 {
 }
 
-redis_list::redis_list(redis_cluster* cluster, size_t max_conns)
+redis_list::redis_list(redis_client_cluster* cluster, size_t max_conns)
 : redis_command(cluster, max_conns)
 {
 }

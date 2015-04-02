@@ -1,6 +1,13 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+294) 2015.4.2
+294.1) 类名调整：将类 redis_pool 重命名为 redis_client_pool, 将类 redis_cluster
+重命名为 redis_client_cluster
+294.2) feature: 新增加类 redis_cluster，支持官方新公布的 CLUSTER 指令集
+294.3) feature: redis_client_cluster 类支持静态初始化哈希槽与服务结点的对应关系
+294.4) samples: 新增加 redis CLUSTER 指令集的测试用例 redis_cluster
+
 293) 2015.3.30
 293.1) bugfix: redis_command.cpp 中最后三个 get_strings 函数在取得 rr 下标时有误
 

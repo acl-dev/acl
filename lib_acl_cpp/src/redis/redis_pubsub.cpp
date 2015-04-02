@@ -17,7 +17,7 @@ redis_pubsub::redis_pubsub(redis_client* conn)
 {
 }
 
-redis_pubsub::redis_pubsub(redis_cluster* cluster, size_t max_conns)
+redis_pubsub::redis_pubsub(redis_client_cluster* cluster, size_t max_conns)
 : redis_command(cluster, max_conns)
 {
 }

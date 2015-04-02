@@ -91,7 +91,7 @@ static bool test_type(acl::redis_key& option, int i)
 class test_thread : public acl::thread
 {
 public:
-	test_thread(acl::redis_cluster& manager, const char* cmd, int n)
+	test_thread(acl::redis_client_cluster& manager, const char* cmd, int n)
 		: manager_(manager), cmd_(cmd), n_(n) {}
 
 	~test_thread() {}
@@ -100,13 +100,13 @@ protected:
 	virtual void* run()
 	{
 		bool ret;
-		acl::redis_pool* pool;
+		acl::redis_client_pool* pool;
 		acl::redis_client* conn;
 		acl::redis_key option;
 
 		for (int i = 0; i < n_; i++)
 		{
-			pool = (acl::redis_pool*) manager_.peek();
+			pool = (acl::redis_client_pool*) manager_.peek();
 			if (pool == NULL)
 			{
 				printf("peek connection pool failed\r\n");
@@ -162,7 +162,7 @@ protected:
 	}
 
 private:
-	acl::redis_cluster& manager_;
+	acl::redis_client_cluster& manager_;
 	acl::string cmd_;
 	int n_;
 };
@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
 
 	acl::acl_cpp_init();
 
-	acl::redis_cluster manager(conn_timeout, rw_timeout);
+	acl::redis_client_cluster manager(conn_timeout, rw_timeout);
 	manager.set(addr.c_str(), max_threads);
 
 	std::vector<test_thread*> threads;

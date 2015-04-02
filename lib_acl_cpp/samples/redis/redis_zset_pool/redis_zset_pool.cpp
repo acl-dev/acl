@@ -210,7 +210,7 @@ static char* __hmac;
 class test_thread : public acl::thread
 {
 public:
-	test_thread(acl::redis_pool& pool, const char* cmd, int n, int id)
+	test_thread(acl::redis_client_pool& pool, const char* cmd, int n, int id)
 		: pool_(pool), cmd_(cmd), n_(n), id_(id) {}
 
 	~test_thread() {}
@@ -283,7 +283,7 @@ protected:
 	}
 
 private:
-	acl::redis_pool& pool_;
+	acl::redis_client_pool& pool_;
 	acl::string cmd_;
 	int n_;
 	int id_;
@@ -396,7 +396,7 @@ int main(int argc, char* argv[])
 
 	init(cmd, check);
 
-	acl::redis_pool pool(addr.c_str(), max_threads);
+	acl::redis_client_pool pool(addr.c_str(), max_threads);
 	pool.set_timeout(conn_timeout, rw_timeout);
 
 	std::vector<test_thread*> threads;

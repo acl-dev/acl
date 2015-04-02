@@ -17,7 +17,7 @@ redis_transaction::redis_transaction(redis_client* conn)
 {
 }
 
-redis_transaction::redis_transaction(redis_cluster* cluster, size_t max_conns)
+redis_transaction::redis_transaction(redis_client_cluster* cluster, size_t max_conns)
 : redis_command(cluster, max_conns)
 {
 }

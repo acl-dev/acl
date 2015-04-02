@@ -21,7 +21,7 @@ redis_key::redis_key(redis_client* conn)
 {
 }
 
-redis_key::redis_key(redis_cluster* cluster, size_t max_conns)
+redis_key::redis_key(redis_client_cluster* cluster, size_t max_conns)
 : redis_command(cluster, max_conns)
 {
 }

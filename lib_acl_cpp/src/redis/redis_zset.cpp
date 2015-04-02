@@ -21,7 +21,7 @@ redis_zset::redis_zset(redis_client* conn)
 {
 }
 
-redis_zset::redis_zset(redis_cluster* cluster, size_t max_conns)
+redis_zset::redis_zset(redis_client_cluster* cluster, size_t max_conns)
 : redis_command(cluster, max_conns)
 {
 }

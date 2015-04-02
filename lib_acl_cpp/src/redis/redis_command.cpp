@@ -3,9 +3,9 @@
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
-#include "acl_cpp/redis/redis_cluster.hpp"
+#include "acl_cpp/redis/redis_client_pool.hpp"
+#include "acl_cpp/redis/redis_client_cluster.hpp"
 #include "acl_cpp/redis/redis_result.hpp"
-#include "acl_cpp/redis/redis_pool.hpp"
 #include "acl_cpp/redis/redis_command.hpp"
 #include "redis_request.hpp"
 
@@ -56,7 +56,7 @@ redis_command::redis_command(redis_client* conn)
 	pool_ = NEW dbuf_pool(128000);
 }
 
-redis_command::redis_command(redis_cluster* cluster, size_t max_conns)
+redis_command::redis_command(redis_client_cluster* cluster, size_t max_conns)
 : conn_(NULL)
 , cluster_(cluster)
 , max_conns_(max_conns)
@@ -125,7 +125,7 @@ void redis_command::set_client(redis_client* conn)
 	conn_ = conn;
 }
 
-void redis_command::set_cluster(redis_cluster* cluster, size_t max_conns)
+void redis_command::set_cluster(redis_client_cluster* cluster, size_t max_conns)
 {
 	cluster_ = cluster;
 	max_conns_ = max_conns;
@@ -273,13 +273,14 @@ const char* redis_command::get_addr(const char* info)
 
 // 根据输入的目标地址进行重定向：打开与该地址的连接，如果连接失败，则随机
 // 选取一个服务器地址进行连接
-redis_client* redis_command::redirect(redis_cluster* cluster, const char* addr)
+redis_client* redis_command::redirect(redis_client_cluster* cluster,
+	const char* addr)
 {
-	redis_pool* conns;
+	redis_client_pool* conns;
 
 	// 如果服务器地址不存在，则根据服务器地址动态创建连接池对象
-	if ((conns = (redis_pool*) cluster->get(addr)) == NULL)
-		conns = (redis_pool*) &cluster->set(addr, max_conns_);
+	if ((conns = (redis_client_pool*) cluster->get(addr)) == NULL)
+		conns = (redis_client_pool*) &cluster->set(addr, max_conns_);
 
 	if (conns == NULL)
 		return NULL;
@@ -295,28 +296,28 @@ redis_client* redis_command::redirect(redis_cluster* cluster, const char* addr)
 			return conn;
 
 		conns->set_alive(false);
-		conns = (redis_pool*) cluster->peek();
+		conns = (redis_client_pool*) cluster->peek();
 	}
 
 	logger_warn("too many retry: %d, addr: %s", i, addr);
 	return NULL;
 }
 
-redis_client* redis_command::peek_conn(redis_cluster* cluster, int slot)
+redis_client* redis_command::peek_conn(redis_client_cluster* cluster, int slot)
 {
 	// 如果已经计算了哈希槽值，则优先从本地缓存中查找对应的连接池
 	// 如果未找到，则从所有集群结点中随便找一个可用的连接池对象
 
-	redis_pool* conns;
+	redis_client_pool* conns;
 	redis_client* conn;
 	int i = 0;
 
 	while (i++ < 5)
 	{
 		if (slot < 0)
-			conns = (redis_pool*) cluster->peek();
+			conns = (redis_client_pool*) cluster->peek();
 		else if ((conns = cluster->peek_slot(slot)) == NULL)
-			conns = (redis_pool*) cluster->peek();
+			conns = (redis_client_pool*) cluster->peek();
 
 		if (conns == NULL)
 		{
@@ -339,7 +340,8 @@ redis_client* redis_command::peek_conn(redis_cluster* cluster, int slot)
 	return NULL;
 }
 
-const redis_result* redis_command::run(redis_cluster* cluster, size_t nchild)
+const redis_result* redis_command::run(redis_client_cluster* cluster,
+	size_t nchild)
 {
 	redis_client* conn = peek_conn(cluster, slot_);
 
@@ -708,6 +710,48 @@ int redis_command::get_strings(std::vector<string>* out)
 
 	if (size > 0)
 		out->reserve(size);
+
+	const redis_result* rr;
+	string buf(4096);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		rr = children[i];
+		if (rr == NULL || rr->get_type() != REDIS_RESULT_STRING)
+			out->push_back("");
+		else if (rr->get_size() == 0)
+			out->push_back("");
+		else 
+		{
+			rr->argv_to_string(buf);
+			out->push_back(buf);
+			buf.clear();
+		}
+	}
+
+	return (int) size;
+}
+
+
+int redis_command::get_strings(std::list<string>& out)
+{
+	return get_strings(&out);
+}
+
+int redis_command::get_strings(std::list<string>* out)
+{
+	const redis_result* result = run();
+	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+		return -1;
+	if (out == NULL)
+		return result->get_size();
+
+	out->clear();
+
+	size_t size;
+	const redis_result** children = result->get_children(&size);
+	if (children == NULL)
+		return 0;
 
 	const redis_result* rr;
 	string buf(4096);
@@ -1385,6 +1429,40 @@ void redis_command::build(const char* cmd, const char* key,
 }
 
 void redis_command::build(const char* cmd, const char* key,
+	const std::vector<int>& names)
+{
+	size_t argc = names.size();
+	argc_ = 1 + argc;
+	if (key != NULL)
+		argc_++;
+	argv_space(argc_);
+
+	size_t i = 0;
+	argv_[i] = cmd;
+	argv_lens_[i] = strlen(cmd);
+	i++;
+
+	if (key != NULL)
+	{
+		argv_[i] = key;
+		argv_lens_[i] = strlen(key);
+		i++;
+	}
+
+	char* buf4int;
+	for (size_t j = 0; j < argc; j++)
+	{
+		buf4int = (char*) pool_->dbuf_alloc(INT_LEN);
+		safe_snprintf(buf4int, INT_LEN, "%d", names[j]);
+		argv_[i] = buf4int;
+		argv_lens_[i] = strlen(argv_[i]);
+		i++;
+	}
+
+	build_request(argc_, argv_, argv_lens_);
+}
+
+void redis_command::build(const char* cmd, const char* key,
 	const char* names[], size_t argc)
 {
 	argc_ = 1 + argc;
@@ -1438,6 +1516,39 @@ void redis_command::build(const char* cmd, const char* key,
 	{
 		argv_[i] = names[j];
 		argv_lens_[i] = lens[j];
+		i++;
+	}
+
+	build_request(argc_, argv_, argv_lens_);
+}
+
+void redis_command::build(const char* cmd, const char* key,
+	const int names[], size_t argc)
+{
+	argc_ = 1 + argc;
+	if (key != NULL)
+		argc_++;
+	argv_space(argc_);
+
+	size_t i = 0;
+	argv_[i] = cmd;
+	argv_lens_[i] = strlen(cmd);
+	i++;
+
+	if (key != NULL)
+	{
+		argv_[i] = key;
+		argv_lens_[i] = strlen(key);
+		i++;
+	}
+
+	char* buf4int;
+	for (size_t j = 0; j < argc; j++)
+	{
+		buf4int = (char*) pool_->dbuf_alloc(INT_LEN);
+		safe_snprintf(buf4int, INT_LEN, "%d", names[j]);
+		argv_[i] = buf4int;
+		argv_lens_[i] = strlen(argv_[i]);
 		i++;
 	}
 

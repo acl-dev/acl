@@ -15,7 +15,7 @@ redis_hyperloglog::redis_hyperloglog(redis_client* conn)
 {
 }
 
-redis_hyperloglog::redis_hyperloglog(redis_cluster* cluster, size_t max_conns)
+redis_hyperloglog::redis_hyperloglog(redis_client_cluster* cluster, size_t max_conns)
 : redis_command(cluster, max_conns)
 {
 }

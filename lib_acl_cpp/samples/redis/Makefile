@@ -13,7 +13,8 @@ all:
 	@(cd redis_hyperloglog; make)
 	@(cd redis_trans; make)
 	@(cd redis_cluster; make)
-	@(cd redis_cluster2; make)
+	@(cd redis_client_cluster; make)
+	@(cd redis_client_cluster2; make)
 	@(cd redis; make)
 #	@(cd redis_server; make)
 
@@ -32,6 +33,7 @@ clean:
 	@(cd redis_hyperloglog; make clean)
 	@(cd redis_trans; make clean)
 	@(cd redis_cluster; make clean)
-	@(cd redis_cluster2; make clean)
+	@(cd redis_client_cluster; make clean)
+	@(cd redis_client_cluster2; make clean)
 	@(cd redis; make clean)
 #	@(cd redis_server; make)

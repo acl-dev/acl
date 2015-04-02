@@ -17,7 +17,7 @@ redis_connection::redis_connection(redis_client* conn)
 {
 }
 
-redis_connection::redis_connection(redis_cluster* cluster, size_t max_conns)
+redis_connection::redis_connection(redis_client_cluster* cluster, size_t max_conns)
 : redis_command(cluster, max_conns)
 {
 }

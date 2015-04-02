@@ -1,14 +1,15 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <map>
+#include <list>
+#include <vector>
 #include "acl_cpp/redis/redis_result.hpp"
 
 namespace acl
 {
 
 class redis_client;
-class redis_pool;
-class redis_cluster;
+class redis_client_cluster;
 class redis_request;
 
 /**
@@ -37,15 +38,15 @@ public:
 	redis_command(redis_client* conn);
 
 	/**
-	 * 使用集群模式的构造函数，在构造类对象时指定了集群模式的 redis_cluster 对象。
-	 * Using this constructor to set the redis_cluster, usually in
+	 * 集群模式的构造函数，在构造类对象时指定了集群模式的 redis_client_cluster 对象。
+	 * Using this constructor to set the redis_client_cluster, usually in
 	 * cluster mode.
-	 * @param cluster {redis_cluster*} redis 集群连接对象
+	 * @param cluster {redis_client_cluster*} redis 集群连接对象
 	 *  redis cluster object in cluster mode
 	 * @param max_conns {size_t} 与集群中所有结点之间的每个连接池的最大连接数
 	 *  the max of every connection pool with all the redis nodes
 	 */
-	redis_command(redis_cluster* cluster, size_t max_conns);
+	redis_command(redis_client_cluster* cluster, size_t max_conns);
 
 	virtual ~redis_command() = 0;
 
@@ -88,7 +89,7 @@ public:
 	/**
 	 * 设置连接池集群管理器;
 	 * set the redis cluster object in redis cluster mode
-	 * @param cluster {redis_cluster*} redis 集群连接对象;
+	 * @param cluster {redis_client_cluster*} redis 集群连接对象;
 	 *  the redis_cluster connection object which can connect to any
 	 *  redis-server and support connection pool
 	 * @param max_conns {size_t} 当内部动态创建连接池对象时，该值指定每个动态创建
@@ -96,14 +97,14 @@ public:
 	 *  when dynamicly creating connection pool to any redis-server, use
 	 *  this param to limit the max number for each connection pool
 	 */
-	void set_cluster(redis_cluster* cluster, size_t max_conns);
+	void set_cluster(redis_client_cluster* cluster, size_t max_conns);
 
 	/**
 	 * 获得所设置的连接池集群管理器;
 	 * get redis_cluster object set by set_cluster function
-	 * @return {redis_cluster*}
+	 * @return {redis_client_cluster*}
 	 */
-	redis_cluster* get_cluster() const
+	redis_client_cluster* get_cluster() const
 	{
 		return cluster_;
 	}
@@ -250,7 +251,7 @@ public:
 
 protected:
 	const redis_result* run(size_t nchild = 0);
-	const redis_result* run(redis_cluster* cluster, size_t nchild);
+	const redis_result* run(redis_client_cluster* cluster, size_t nchild);
 
 	void build_request(size_t argc, const char* argv[], size_t lens[]);
 	void reset_request();
@@ -286,11 +287,15 @@ protected:
 		const std::vector<string>& names);
 	void build(const char* cmd, const char* key,
 		const std::vector<const char*>& names);
+	void build(const char* cmd, const char* key,
+		const std::vector<int>& names);
 
 	void build(const char* cmd, const char* key,
 		const char* names[], size_t argc);
 	void build(const char* cmd, const char* key,
 		const char* names[], const size_t lens[], size_t argc);
+	void build(const char* cmd, const char* key,
+		const int names[], size_t argc);
 
 protected:
 	int get_number(bool* success = NULL);
@@ -307,6 +312,8 @@ protected:
 	int get_string(char* buf, size_t size);
 	int get_strings(std::vector<string>& result);
 	int get_strings(std::vector<string>* result);
+	int get_strings(std::list<string>& result);
+	int get_strings(std::list<string>* result);
 	int get_strings(std::map<string, string>& result);
 	int get_strings(std::vector<string>& names,
 		std::vector<string>& values);
@@ -323,15 +330,15 @@ protected:
 
 private:
 	redis_client* conn_;
-	redis_cluster* cluster_;
+	redis_client_cluster* cluster_;
 	size_t max_conns_;
 	unsigned long long used_;
 	int slot_;
 	int redirect_max_;
 	int redirect_sleep_;
 
-	redis_client* peek_conn(redis_cluster* cluster, int slot);
-	redis_client* redirect(redis_cluster* cluster, const char* addr);
+	redis_client* peek_conn(redis_client_cluster* cluster, int slot);
+	redis_client* redirect(redis_client_cluster* cluster, const char* addr);
 	const char* get_addr(const char* info);
 
 private:

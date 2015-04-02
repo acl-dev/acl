@@ -20,7 +20,7 @@ redis_hash::redis_hash(redis_client* conn)
 {
 }
 
-redis_hash::redis_hash(redis_cluster* cluster, size_t max_conns)
+redis_hash::redis_hash(redis_client_cluster* cluster, size_t max_conns)
 : redis_command(cluster, max_conns)
 {
 }

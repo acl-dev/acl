@@ -20,7 +20,7 @@ redis_set::redis_set(redis_client* conn)
 {
 }
 
-redis_set::redis_set(redis_cluster* cluster, size_t max_conns)
+redis_set::redis_set(redis_client_cluster* cluster, size_t max_conns)
 : redis_command(cluster, max_conns)
 {
 }

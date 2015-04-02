@@ -23,9 +23,9 @@ public:
 	redis_hyperloglog(redis_client* conn);
 
 	/**
-	 * see redis_command::redis_command(redis_cluster*£¬ size_t)
+	 * see redis_command::redis_command(redis_client_cluster*£¬ size_t)
 	 */
-	redis_hyperloglog(redis_cluster* cluster, size_t max_conns);
+	redis_hyperloglog(redis_client_cluster* cluster, size_t max_conns);
 
 	virtual ~redis_hyperloglog();
 

@@ -786,6 +786,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_client_cluster.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_client_pool.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_cluster.cpp"
 					>
 				</File>
@@ -814,7 +822,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\redis\redis_pool.cpp"
+					RelativePath=".\src\redis\redis_node.cpp"
 					>
 				</File>
 				<File
@@ -1412,6 +1420,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\redis\redis_client_cluster.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_client_pool.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\redis\redis_cluster.hpp"
 					>
 				</File>
@@ -1440,7 +1456,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\redis\redis_pool.hpp"
+					RelativePath=".\include\acl_cpp\redis\redis_node.hpp"
 					>
 				</File>
 				<File

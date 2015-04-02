@@ -20,7 +20,7 @@ redis_script::redis_script(redis_client* conn)
 {
 }
 
-redis_script::redis_script(redis_cluster* cluster, size_t max_conns)
+redis_script::redis_script(redis_client_cluster* cluster, size_t max_conns)
 : redis_command(cluster, max_conns)
 {
 }

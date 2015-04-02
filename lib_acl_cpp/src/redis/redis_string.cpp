@@ -23,7 +23,7 @@ redis_string::redis_string(redis_client* conn)
 {
 }
 
-redis_string::redis_string(redis_cluster* cluster, size_t max_conns)
+redis_string::redis_string(redis_client_cluster* cluster, size_t max_conns)
 : redis_command(cluster, max_conns)
 {
 }

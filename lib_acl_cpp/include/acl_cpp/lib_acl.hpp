@@ -133,8 +133,8 @@
 #include "acl_cpp/connpool/connect_monitor.hpp"
 
 #include "acl_cpp/redis/redis_client.hpp"
-#include "acl_cpp/redis/redis_pool.hpp"
-#include "acl_cpp/redis/redis_cluster.hpp"
+#include "acl_cpp/redis/redis_client_pool.hpp"
+#include "acl_cpp/redis/redis_client_cluster.hpp"
 #include "acl_cpp/redis/redis_result.hpp"
 #include "acl_cpp/redis/redis_key.hpp"
 #include "acl_cpp/redis/redis_hash.hpp"
@@ -148,4 +148,6 @@
 #include "acl_cpp/redis/redis_server.hpp"
 #include "acl_cpp/redis/redis_hyperloglog.hpp"
 #include "acl_cpp/redis/redis_connection.hpp"
+#include "acl_cpp/redis/redis_cluster.hpp"
+#include "acl_cpp/redis/redis_node.hpp"
 #include "acl_cpp/redis/redis.hpp"

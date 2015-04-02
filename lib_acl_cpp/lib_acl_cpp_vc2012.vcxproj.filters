@@ -400,9 +400,6 @@
     <ClCompile Include="src\redis\redis_string.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
-    <ClCompile Include="src\redis\redis_pool.cpp">
-      <Filter>src\redis</Filter>
-    </ClCompile>
     <ClCompile Include="src\redis\redis_connection.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
@@ -433,10 +430,19 @@
     <ClCompile Include="src\redis\redis_request.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\redis\redis.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_client_cluster.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_client_pool.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
     <ClCompile Include="src\redis\redis_cluster.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
-    <ClCompile Include="src\redis\redis.cpp">
+    <ClCompile Include="src\redis\redis_node.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
   </ItemGroup>
@@ -867,9 +873,6 @@
     <ClInclude Include="include\acl_cpp\redis\redis_string.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
-    <ClInclude Include="include\acl_cpp\redis\redis_pool.hpp">
-      <Filter>include\redis</Filter>
-    </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_connection.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
@@ -900,10 +903,19 @@
     <ClInclude Include="src\redis\redis_request.hpp">
       <Filter>src\redis</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_client_cluster.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_client_pool.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_cluster.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
-    <ClInclude Include="include\acl_cpp\redis\redis.hpp">
+    <ClInclude Include="include\acl_cpp\redis\redis_node.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
   </ItemGroup>
