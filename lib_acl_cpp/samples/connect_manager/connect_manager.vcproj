@@ -237,6 +237,9 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y
 				RelativePath=".\main.cpp">
 			</File>
 			<File
+				RelativePath=".\mymonitor.cpp">
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -276,6 +279,9 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y
 			</File>
 			<File
 				RelativePath=".\connect_pool.h">
+			</File>
+			<File
+				RelativePath=".\mymonitor.h">
 			</File>
 			<File
 				RelativePath=".\stdafx.h">

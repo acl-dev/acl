@@ -204,6 +204,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     </ClCompile>
     <ClCompile Include="src\beanstalk\beanstalk.cpp" />
     <ClCompile Include="src\beanstalk\beanstalk_pool.cpp" />
+    <ClCompile Include="src\connpool\check_client.cpp" />
+    <ClCompile Include="src\connpool\check_rpc.cpp" />
+    <ClCompile Include="src\connpool\check_timer.cpp" />
     <ClCompile Include="src\connpool\connect_manager.cpp" />
     <ClCompile Include="src\connpool\connect_monitor.cpp" />
     <ClCompile Include="src\connpool\connect_pool.cpp" />
@@ -354,6 +357,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\acl_cpp_test.hpp" />
     <ClInclude Include="include\acl_cpp\beanstalk\beanstalk.hpp" />
     <ClInclude Include="include\acl_cpp\beanstalk\beanstalk_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\check_client.hpp" />
     <ClInclude Include="include\acl_cpp\connpool\connect_client.hpp" />
     <ClInclude Include="include\acl_cpp\connpool\connect_manager.hpp" />
     <ClInclude Include="include\acl_cpp\connpool\connect_monitor.hpp" />
@@ -490,6 +494,8 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stream\stream_hook.hpp" />
     <ClInclude Include="resource_vc2010.h" />
     <ClInclude Include="src\acl_stdafx.hpp" />
+    <ClInclude Include="src\connpool\check_rpc.hpp" />
+    <ClInclude Include="src\connpool\check_timer.hpp" />
     <ClInclude Include="src\mime\internal\header_opts.hpp" />
     <ClInclude Include="src\mime\internal\header_token.hpp" />
     <ClInclude Include="src\mime\internal\is_header.hpp" />

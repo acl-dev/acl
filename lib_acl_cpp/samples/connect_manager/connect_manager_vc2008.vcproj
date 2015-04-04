@@ -355,6 +355,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mymonitor.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -406,6 +410,10 @@
 			</File>
 			<File
 				RelativePath=".\connect_pool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mymonitor.h"
 				>
 			</File>
 			<File

@@ -445,6 +445,15 @@
     <ClCompile Include="src\redis\redis_node.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\connpool\check_client.cpp">
+      <Filter>src\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\check_timer.cpp">
+      <Filter>src\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\check_rpc.cpp">
+      <Filter>src\connpool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -911,6 +920,15 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_node.hpp">
       <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\check_client.hpp">
+      <Filter>include\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="src\connpool\check_timer.hpp">
+      <Filter>src\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="src\connpool\check_rpc.hpp">
+      <Filter>src\connpool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

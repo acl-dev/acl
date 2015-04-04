@@ -183,6 +183,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
     <ClCompile Include="connect_manager.cpp" />
     <ClCompile Include="connect_pool.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mymonitor.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -194,6 +195,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
     <ClInclude Include="connect_client.h" />
     <ClInclude Include="connect_manager.h" />
     <ClInclude Include="connect_pool.h" />
+    <ClInclude Include="mymonitor.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

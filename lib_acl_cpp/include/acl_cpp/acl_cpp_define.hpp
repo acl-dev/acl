@@ -35,8 +35,9 @@
 //extern "C" { FILE _iob[3] = {__iob_func()[0], __iob_func()[1], __iob_func()[2]}; }
 //extern "C" { FILE _iob[3]; }
 //# endif
-# ifndef ssize_t
-#  define ssize_t long
+# ifndef	HAS_SSIZE_T
+# define	HAS_SSIZE_T
+typedef long ssize_t;
 # endif
 # if(_MSC_VER >= 1300)
 #  include <winsock2.h>

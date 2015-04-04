@@ -30,6 +30,9 @@
     <ClCompile Include="connect_pool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="mymonitor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -42,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="connect_pool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mymonitor.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

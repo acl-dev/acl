@@ -179,6 +179,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "thread", "thread", "{BE48C8C9-2F6D-450B-9D42-4666E9257C8A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "connect_manager", "lib_acl_cpp\samples\connect_manager\connect_manager_vc2012.vcxproj", "{A76344E8-D8EF-4E0D-9A01-73DB25B5B76E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dircopy", "lib_acl_cpp\samples\dircopy\dircopy_vc2012.vcxproj", "{98BB9F33-AFC3-4943-8855-4D253B87F8F1}"
 	ProjectSection(ProjectDependencies) = postProject

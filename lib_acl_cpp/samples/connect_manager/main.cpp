@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "connect_manager.h"
+#include "mymonitor.h"
 #include "connect_pool.h"
 #include "connect_client.h"
 
@@ -28,7 +29,8 @@ static void check_all_connections(void)
 }
 
 // 初始化过程
-static void init(const char* addrs, int count)
+static void init(const char* addrs, int count,
+	bool sync_check, const acl::string& proto)
 {
 	// 创建 HTTP 请求连接池集群管理对象
 	__conn_manager = new connect_manager();
@@ -40,8 +42,13 @@ static void init(const char* addrs, int count)
 
 	// 启动后台检测线程
 	int  check_inter = 1, conn_timeout = 5;
-	__conn_manager->start_monitor(check_inter, conn_timeout);
 
+	acl::connect_monitor* monitor = new mymonitor(*__conn_manager, proto);
+	monitor->set_check_inter(check_inter);
+	monitor->set_conn_timeout(conn_timeout);
+	if (sync_check)
+		monitor->open_rpc_service(10, NULL);
+	(void) __conn_manager->start_monitor(monitor);
 
 	int   n = 10;
 	printf(">>>sleep %d seconds for monitor check\r\n", n);
@@ -65,8 +72,20 @@ static void end(void)
 
 	printf("\r\n>>> STOPPING check thread now\r\n");
 
+#if 0
+	int i = 0;
+	while (i++ < 10)
+	{
+		sleep(1);
+		printf("----------- sleep %d seconds -----------\r\n", i);
+	}
+#endif
+
 	// 停止后台检测线程
-	__conn_manager->stop_monitor(true);
+	acl::connect_monitor* monitor = __conn_manager->stop_monitor(true);
+
+	// 删除检测器对象
+	delete monitor;
 
 	// 销毁连接池
 	delete __conn_manager;
@@ -91,7 +110,7 @@ static void thread_main(void*)
 			printf("\r\n>>>%lu(%d): peek pool failed<<<\r\n",
 				(unsigned long) acl_pthread_self(), __LINE__);
 			check_all_connections();
-			exit (1);
+			break;
 		}
 
 		// 设置连接的超时时间及读超时时间
@@ -105,7 +124,7 @@ static void thread_main(void*)
 				(unsigned long) acl_pthread_self(),
 				pool->get_addr());
 			check_all_connections();
-			exit (1);
+			break;
 		}
 
 		// 需要对获得的连接重置状态，以清除上次请求过程的临时数据
@@ -138,13 +157,17 @@ static void usage(const char* procname)
 	printf("usage: %s -h [help]\r\n"
 		"	-s server_addrs [www.sina.com.cn:80;www.263.net:80;www.qq.com:80]\r\n"
 		"	-c cocurrent [default: 10]\r\n"
+		"	-S [sync check io]\r\n"
+		"	-P protocol [http|pop3]\r\n"
 		"	-n loop_count[default: 10]\r\n", procname);
 }
 
 int main(int argc, char* argv[])
 {
 	int   ch, cocurrent = 10;
+	bool  sync_check = false;
 	acl::string addrs("www.sina.com.cn:80;www.263.net:80;www.qq.com:81");
+	acl::string proto("pop3");
 
 	// 初始化 acl 库
 	acl::acl_cpp_init();
@@ -152,7 +175,7 @@ int main(int argc, char* argv[])
 	// 日志输出至标准输出
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:n:c:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:c:SP:")) > 0)
 	{
 		switch (ch)
 		{
@@ -168,13 +191,19 @@ int main(int argc, char* argv[])
 		case 'n':
 			__loop_count = atoi(optarg);
 			break;
+		case 'S':
+			sync_check = true;
+			break;
+		case 'P':
+			proto = optarg;
+			break;
 		default:
 			usage(argv[0]);
 			return 0;
 		}
 	}
 
-	init(addrs, cocurrent);
+	init(addrs, cocurrent, sync_check, proto);
 	run(cocurrent);
 	end();
 

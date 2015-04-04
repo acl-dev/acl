@@ -131,6 +131,7 @@
 #include "acl_cpp/connpool/connect_pool.hpp"
 #include "acl_cpp/connpool/connect_manager.hpp"
 #include "acl_cpp/connpool/connect_monitor.hpp"
+#include "acl_cpp/connpool/check_client.hpp"
 
 #include "acl_cpp/redis/redis_client.hpp"
 #include "acl_cpp/redis/redis_client_pool.hpp"

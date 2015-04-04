@@ -370,6 +370,26 @@
 				Name="connpool"
 				>
 				<File
+					RelativePath=".\src\connpool\check_client.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\connpool\check_rpc.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\connpool\check_rpc.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\connpool\check_timer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\connpool\check_timer.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\connpool\connect_manager.cpp"
 					>
 				</File>
@@ -1091,6 +1111,10 @@
 			<Filter
 				Name="connpool"
 				>
+				<File
+					RelativePath=".\include\acl_cpp\connpool\check_client.hpp"
+					>
+				</File>
 				<File
 					RelativePath=".\include\acl_cpp\connpool\connect_client.hpp"
 					>

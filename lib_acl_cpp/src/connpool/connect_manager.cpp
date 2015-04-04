@@ -298,32 +298,41 @@ void connect_manager::statistics()
 	}
 }
 
-void connect_manager::start_monitor(int check_inter /* = 1 */,
-	int conn_timeout /* = 10 */)
+bool connect_manager::start_monitor(connect_monitor* monitor)
 {
 	if (monitor_ != NULL)
-		return;
+	{
+		logger_warn("one connect_monitor running!");
+		return false;
+	}
 
-	monitor_ = NEW connect_monitor(*this, check_inter, conn_timeout);
+	monitor_ = monitor;
 
 	// 设置检测线程为非分离模式，以便于主线程可以等待检测线程退出
 	monitor_->set_detachable(false);
 	// 启动检测线程
 	monitor_->start();
+
+	return true;
 }
 
-void connect_manager::stop_monitor(bool graceful /* = true */)
+connect_monitor* connect_manager::stop_monitor(bool graceful /* = true */)
 {
-	if (monitor_)
+	connect_monitor* monitor = monitor_;
+
+	if (monitor)
 	{
-		// 先通知检测线程停止检测过程
-		monitor_->stop(graceful);
-		// 再等待检测线程退出
-		monitor_->wait();
-		// 删除检测线程对象
-		delete monitor_;
+		// 先将连接检测对象置 NULL
 		monitor_ = NULL;
+
+		// 先通知检测线程停止检测过程
+		monitor->stop(graceful);
+
+		// 再等待检测线程退出
+		monitor->wait();
 	}
+
+	return monitor;
 }
 
 void connect_manager::set_pools_status(const char* addr, bool alive)

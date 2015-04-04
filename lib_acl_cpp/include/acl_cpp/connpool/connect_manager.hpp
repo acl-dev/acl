@@ -136,18 +136,21 @@ public:
 
 	/**
 	 * 启动后台非阻塞检测线程检测所有连接池连接状态
-	 * @param check_inter {int} 检测的时间间隔(秒)
-	 * @param conn_timeout {int} 连接服务器的超时时间(秒)
+	 * @param monitor {connect_monitor*} 连接检测对象
+	 * @return {bool} 是否正常启动了连接检测器，当返回 false 说明当前还有正在
+	 *  运行的连接检测器，当想再次启动检测器时需要先调用 stop_monitor
 	 */
-	void start_monitor(int check_inter = 1, int conn_timeout = 10);
+	bool start_monitor(connect_monitor* monitor);
 
 	/**
 	 * 停止后台检测线程
 	 * @param graceful {bool} 是否在关闭检测线程时需要等待所有的检测连接关闭后
 	 *  才返回，当连接池集群对象为进程空间内不会多次分配与释放时，则该值可以设为 false
 	 *  从而使检测线程快速退出，否则应该等待所有检测连接关闭后再使检测线程退出
+	 * @return {connect_monitor*} 返回 start_monitor 设置的检测器，同时内部
+	 *  的 monitor_ 成员自动置 NULL
 	 */
-	void stop_monitor(bool graceful = true);
+	connect_monitor* stop_monitor(bool graceful = true);
 
 	/**
 	 * 设置某个连接池服务的存活状态，内部会自动加锁
