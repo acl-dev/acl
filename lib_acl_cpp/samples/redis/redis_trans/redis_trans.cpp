@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
-static bool test_multi(acl::redis_transaction& option)
+static bool test_multi(acl::redis_transaction& redis)
 {
-	option.reset();
-	if (option.multi() == false)
+	redis.clear();
+	if (redis.multi() == false)
 	{
 		printf("multi error\r\n");
 		return false;
@@ -12,7 +12,7 @@ static bool test_multi(acl::redis_transaction& option)
 	return true;
 }
 
-static bool test_run_cmds(acl::redis_transaction& option)
+static bool test_run_cmds(acl::redis_transaction& redis)
 {
 	std::vector<acl::string> args;
 	const char* cmd = "SET";
@@ -20,14 +20,14 @@ static bool test_run_cmds(acl::redis_transaction& option)
 	args.push_back("multi_string_key");
 	args.push_back("multi_string_value");
 
-	if (option.run_cmd(cmd, args) == false)
+	if (redis.run_cmd(cmd, args) == false)
 	{
 		printf("run cmd: %s error\r\n", cmd);
 		return false;
 	}
 
 	args.clear();
-	option.reset();
+	redis.clear();
 
 	cmd = "HMSET";
 	args.push_back("multi_hash_key");
@@ -36,32 +36,32 @@ static bool test_run_cmds(acl::redis_transaction& option)
 	args.push_back("name2");
 	args.push_back("values");
 
-	if (option.run_cmd(cmd, args) == false)
+	if (redis.run_cmd(cmd, args) == false)
 	{
 		printf("run cmd: %s error\r\n", cmd);
 		return false;
 	}
 
 	args.clear();
-	option.reset();
+	redis.clear();
 
 	cmd = "GET";
 	args.push_back("multi_string_key");
 
-	if (option.run_cmd(cmd, args) == false)
+	if (redis.run_cmd(cmd, args) == false)
 	{
 		printf("run cmd: %s error\r\n", cmd);
 		return false;
 	}
 
 	args.clear();
-	option.reset();
+	redis.clear();
 
 	cmd = "HGET";
 	args.push_back("multi_hash_key");
 	args.push_back("name1");
 
-	if (option.run_cmd(cmd, args) == false)
+	if (redis.run_cmd(cmd, args) == false)
 	{
 		printf("run cmd: %s error\r\n", cmd);
 		return false;
@@ -71,10 +71,10 @@ static bool test_run_cmds(acl::redis_transaction& option)
 	return true;
 }
 
-static bool test_exec(acl::redis_transaction& option)
+static bool test_exec(acl::redis_transaction& redis)
 {
-	option.reset();
-	if (option.exec() == false)
+	redis.clear();
+	if (redis.exec() == false)
 	{
 		printf("exec error\r\n");
 		return false;
@@ -83,10 +83,10 @@ static bool test_exec(acl::redis_transaction& option)
 	return true;
 }
 
-static bool get_results(acl::redis_transaction& option)
+static bool get_results(acl::redis_transaction& redis)
 {
-	const std::vector<acl::string>& cmds = option.get_commands();
-	size_t size = option.get_size();
+	const std::vector<acl::string>& cmds = redis.get_commands();
+	size_t size = redis.get_size();
 
 	if (size != cmds.size())
 	{
@@ -98,7 +98,7 @@ static bool get_results(acl::redis_transaction& option)
 	/////////////////////////////////////////////////////////////////////
 	// cmd: SET
 
-	const acl::redis_result* result = option.get_child(0, NULL);
+	const acl::redis_result* result = redis.get_child(0, NULL);
 	if (result == NULL)
 	{
 		printf("have no result for cmd %s\r\n", cmds[0].c_str());
@@ -115,7 +115,7 @@ static bool get_results(acl::redis_transaction& option)
 	/////////////////////////////////////////////////////////////////////
 	// cmd: HMSET
 
-	result = option.get_child(1, NULL);
+	result = redis.get_child(1, NULL);
 	if (result == NULL)
 	{
 		printf("have no result for cmd %s\r\n", cmds[0].c_str());
@@ -132,7 +132,7 @@ static bool get_results(acl::redis_transaction& option)
 	/////////////////////////////////////////////////////////////////////
 	// cmd: GET
 
-	result = option.get_child(2, NULL);
+	result = redis.get_child(2, NULL);
 	if (result == NULL)
 	{
 		printf("have no result for cmd %s\r\n", cmds[0].c_str());
@@ -150,7 +150,7 @@ static bool get_results(acl::redis_transaction& option)
 	/////////////////////////////////////////////////////////////////////
 	// cmd: HGET
 
-	result = option.get_child(3, NULL);
+	result = redis.get_child(3, NULL);
 	if (result == NULL)
 	{
 		printf("have no result for cmd %s\r\n", cmds[0].c_str());
@@ -212,12 +212,12 @@ int main(int argc, char* argv[])
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	client.set_slice_request(slice_req);
 	client.set_slice_respond(false);
-	acl::redis_transaction option(&client);
+	acl::redis_transaction redis(&client);
 
 	bool ret;
 
-	ret = test_multi(option) && test_run_cmds(option)
-		&& test_exec(option) && get_results(option);
+	ret = test_multi(redis) && test_run_cmds(redis)
+		&& test_exec(redis) && get_results(redis);
 
 	printf("all cmds %s\r\n", ret ? "ok" : "failed");
 

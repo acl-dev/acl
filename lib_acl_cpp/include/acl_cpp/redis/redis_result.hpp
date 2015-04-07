@@ -151,7 +151,7 @@ private:
 	~redis_result();
 
 	friend class redis_client;
-	void reset();
+	void clear();
 
 	redis_result& set_type(redis_result_t type);
 	redis_result& set_size(size_t size);

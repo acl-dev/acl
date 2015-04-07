@@ -1,28 +1,28 @@
 #include "stdafx.h"
 
-static bool test_auth(acl::redis_connection& option)
+static bool test_auth(acl::redis_connection& redis)
 {
 	acl::string passwd("hello");
 
-	option.reset();
-	if (option.auth(passwd.c_str()) == false)
+	redis.clear();
+	if (redis.auth(passwd.c_str()) == false)
 	{
 		printf("auth failed, passwd: %s, eof: %s\r\n",
-			passwd.c_str(), option.eof() ? "yes" : "no");
+			passwd.c_str(), redis.eof() ? "yes" : "no");
 		return false;
 	}
 	printf("auth ok, passwd: %s\r\n", passwd.c_str());
 	return true;
 }
 
-static bool test_echo(acl::redis_connection& option, int n)
+static bool test_echo(acl::redis_connection& redis, int n)
 {
 	acl::string buf("hello world!");
 
 	for (int i = 0; i < n; i++)
 	{
-		option.reset();
-		if (option.echo(buf.c_str()) == false)
+		redis.clear();
+		if (redis.echo(buf.c_str()) == false)
 		{
 			printf("echo error\r\n");
 			return false;
@@ -35,12 +35,12 @@ static bool test_echo(acl::redis_connection& option, int n)
 	return true;
 }
 
-static bool test_ping(acl::redis_connection& option, int n)
+static bool test_ping(acl::redis_connection& redis, int n)
 {
 	for (int i = 0; i < n; i++)
 	{
-		option.reset();
-		if (option.ping() == false)
+		redis.clear();
+		if (redis.ping() == false)
 		{
 			printf("ping failed\r\n");
 			return false;
@@ -51,10 +51,10 @@ static bool test_ping(acl::redis_connection& option, int n)
 	return true;
 }
 
-static bool test_quit(acl::redis_connection& option)
+static bool test_quit(acl::redis_connection& redis)
 {
-	option.reset();
-	if (option.quit() == false)
+	redis.clear();
+	if (redis.quit() == false)
 	{
 		printf("quit error\r\n");
 		return false;
@@ -66,12 +66,12 @@ static bool test_quit(acl::redis_connection& option)
 	}
 }
 
-static bool test_select(acl::redis_connection& option, int n)
+static bool test_select(acl::redis_connection& redis, int n)
 {
 	for (int i = 0; i < n; i++)
 	{
-		option.reset();
-		if (option.select(i % 2) == false)
+		redis.clear();
+		if (redis.select(i % 2) == false)
 		{
 			printf("select %d error\r\n", i % 2);
 			return false;
@@ -133,27 +133,27 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	client.set_slice_request(slice_req);
-	acl::redis_connection option(&client);
+	acl::redis_connection redis(&client);
 
 	bool ret;
 
 	if (cmd == "auth")
-		ret = test_auth(option);
+		ret = test_auth(redis);
 	else if (cmd == "echo")
-		ret = test_echo(option, n);
+		ret = test_echo(redis, n);
 	else if (cmd == "ping")
-		ret = test_ping(option, n);
+		ret = test_ping(redis, n);
 	else if (cmd == "quit")
-		ret = test_quit(option);
+		ret = test_quit(redis);
 	else if (cmd == "select")
-		ret = test_select(option, n);
+		ret = test_select(redis, n);
 	else if (cmd == "all")
 	{
-		ret = test_auth(option)
-			&& test_echo(option, n)
-			&& test_ping(option, n)
-			&& test_select(option, n)
-			&& test_quit(option);
+		ret = test_auth(redis)
+			&& test_echo(redis, n)
+			&& test_ping(redis, n)
+			&& test_select(redis, n)
+			&& test_quit(redis);
 	}
 	else
 	{

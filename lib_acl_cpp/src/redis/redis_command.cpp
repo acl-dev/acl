@@ -100,6 +100,11 @@ redis_command::~redis_command()
 
 void redis_command::reset(bool save_slot /* = false */)
 {
+	return clear(save_slot);
+}
+
+void redis_command::clear(bool save_slot /* = false */)
+{
 	if (used_ > 0)
 	{
 		delete pool_;
@@ -380,7 +385,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			if (conn != NULL)
 			{
 				last_moved = true;
-				reset(true);
+				clear(true);
 				continue;
 			}
 
@@ -457,7 +462,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			last_moved = true;
 
 			// 需要保存哈希槽值
-			reset(true);
+			clear(true);
 		}
 		else if (EQ(ptr, "ASK"))
 		{
@@ -485,7 +490,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			}
 
 			last_moved = false;
-			reset(true);
+			clear(true);
 		}
 
 		// 处理一个主结点失效的情形
@@ -495,7 +500,8 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 
 			if (redirect_sleep_ > 0)
 			{
-				logger("redirect %d, slot %d, waiting %s ...",
+				logger("%s: redirect %d, slot %d, waiting %s ...",
+					conn->get_pool()->get_addr(),
 					n, slot_, ptr);
 				acl_doze(redirect_sleep_);
 			}
@@ -506,7 +512,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 				logger_error("peek_conn NULL");
 				return result_;
 			}
-			reset(true);
+			clear(true);
 		}
 
 		// 对于其它错误类型，则直接返回本次得到的响应结果对象
@@ -622,6 +628,7 @@ bool redis_command::check_status(const char* success /* = "OK" */)
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_STATUS)
 		return false;
+
 	const char* status = result->get_status();
 	if (status == NULL || *status == '\0')
 		return false;
@@ -1036,12 +1043,12 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 	return children;
 }
 
-void redis_command::reset_request()
+void redis_command::clear_request()
 {
 	if (request_buf_)
 		request_buf_->clear();
 	if (request_obj_)
-		request_obj_->reset();
+		request_obj_->clear();
 }
 
 void redis_command::build_request(size_t argc, const char* argv[], size_t lens[])
@@ -1065,7 +1072,7 @@ void redis_command::build_request1(size_t argc, const char* argv[], size_t lens[
 		request_buf_->append(argv[i], lens[i]);
 		request_buf_->append("\r\n");
 	}
-	//printf("%s", request_buf_->c_str());
+	//printf("%s: %s", __FUNCTION__, request_buf_->c_str());
 }
 
 void redis_command::build_request2(size_t argc, const char* argv[], size_t lens[])
@@ -1074,7 +1081,7 @@ void redis_command::build_request2(size_t argc, const char* argv[], size_t lens[
 	if (request_obj_ == NULL)
 		request_obj_ = NEW redis_request();
 	else
-		request_obj_->reset();
+		request_obj_->clear();
 	request_obj_->reserve(size);
 
 #define BLEN	32

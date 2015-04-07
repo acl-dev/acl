@@ -29,9 +29,12 @@ static void init(const char* addrs, int count)
 
 	printf(">>>start monitor thread\r\n");
 
-	// 启动后台检测线程
 	int  check_inter = 1, conn_timeout = 5;
-	__conn_manager->start_monitor(check_inter, conn_timeout);
+	acl::connect_monitor* monitor = new acl::connect_monitor(*__conn_manager);
+	(*monitor).set_check_inter(check_inter).set_conn_timeout(conn_timeout);
+
+	// 启动后台检测线程
+	__conn_manager->start_monitor(monitor);
 
 
 	int   n = 10;
@@ -66,8 +69,11 @@ static void end(void)
 			? "alive" : "dead");
 	}
 	printf("\r\n>>> STOPPING check thread now\r\n");
+
 	// 停止后台检测线程
-	__conn_manager->stop_monitor(true);
+	acl::connect_monitor* monitor = __conn_manager->stop_monitor(true);
+	// 删除检测器对象
+	delete monitor;
 
 	// 销毁连接池
 	delete __conn_manager;

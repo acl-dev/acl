@@ -12,7 +12,7 @@ public:
 	redis_request();
 	~redis_request();
 
-	void reset();
+	void clear();
 	void reserve(size_t size);
 	void put(const char* data, size_t dlen);
 

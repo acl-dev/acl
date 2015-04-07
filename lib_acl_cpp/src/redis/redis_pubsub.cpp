@@ -246,7 +246,7 @@ int redis_pubsub::check_channel(const redis_result* obj, const char* cmd,
 
 bool redis_pubsub::get_message(string& channel, string& msg)
 {
-	reset_request();
+	clear_request();
 	const redis_result* result = run();
 	if (result == NULL)
 		return false;

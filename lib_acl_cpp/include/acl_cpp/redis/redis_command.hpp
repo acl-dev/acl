@@ -62,6 +62,9 @@ public:
 	 *  can set the param save_slot to false which can reduse the times
 	 *  of compute the same key's hash-slot.
 	 */
+	void clear(bool save_slot = false);
+
+	ACL_CPP_DEPRECATED_FOR("clear")
 	void reset(bool save_slot = false);
 
 	/**
@@ -254,7 +257,7 @@ protected:
 	const redis_result* run(redis_client_cluster* cluster, size_t nchild);
 
 	void build_request(size_t argc, const char* argv[], size_t lens[]);
-	void reset_request();
+	void clear_request();
 	const redis_result** scan_keys(const char* cmd, const char* key,
 		int& cursor, size_t& size, const char* pattern,
 		const size_t* count);

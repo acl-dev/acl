@@ -874,6 +874,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_slot.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_string.cpp"
 					>
 				</File>
@@ -1501,6 +1505,10 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_set.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_slot.hpp"
 					>
 				</File>
 				<File

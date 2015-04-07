@@ -5,7 +5,7 @@ static acl::string __keypre("test_key_cluster");
 
 static bool test_del(acl::redis& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 
@@ -23,7 +23,7 @@ static bool test_del(acl::redis& cmd, int i)
 
 static bool test_expire(acl::redis& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 
@@ -40,7 +40,7 @@ static bool test_expire(acl::redis& cmd, int i)
 
 static bool test_ttl(acl::redis& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 	int ttl;
@@ -58,7 +58,7 @@ static bool test_ttl(acl::redis& cmd, int i)
 
 static bool test_exists(acl::redis& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 
@@ -78,7 +78,7 @@ static bool test_exists(acl::redis& cmd, int i)
 
 static bool test_type(acl::redis& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 
@@ -96,7 +96,7 @@ static bool test_type(acl::redis& cmd, int i)
 
 static bool test_set(acl::redis& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 	key.format("%s_%d", __keypre.c_str(), i);
@@ -114,7 +114,7 @@ static bool test_set(acl::redis& cmd, int i)
 
 static bool test_get(acl::redis& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 	key.format("%s_%d", __keypre.c_str(), i);
@@ -127,6 +127,19 @@ static bool test_get(acl::redis& cmd, int i)
 			key.c_str(), value.c_str(), ret ? "ok" : "error",
 			(int) value.length());
 	return ret;
+}
+
+static bool test_lrem(acl::redis& cmd, int i)
+{
+	cmd.clear();
+
+	acl::string key;
+	key.format("list_%s_%d", __keypre.c_str(), i);
+
+	int ret = cmd.lrem(key.c_str(), 0, "list_value");
+	if (i < 10)
+		printf("lrem key: %s, ret: %d\r\n", key.c_str(), ret);
+	return i >= 0 ? true : false;
 }
 
 static int __threads_exit = 0;
@@ -168,6 +181,8 @@ protected:
 				ret = test_exists(cmd, i);
 			else if (cmd_ == "type")
 				ret = test_type(cmd, i);
+			else if (cmd_ == "lrem")
+				ret = test_lrem(cmd, i);
 			else if (cmd_ == "all")
 			{
 				if (test_set(cmd, i) == false
@@ -230,7 +245,7 @@ static void usage(const char* procname)
 		"-w wait_for_cluster_resume[default: 500 ms]\r\n"
 		"-r retry_for_cluster_resnum[default: 10]\r\n"
 		"-p [preset all hash-slots of the cluster]\r\n"
-		"-a cmd[set|get|expire|ttl|exists|type|del]\r\n",
+		"-a cmd[set|get|expire|ttl|exists|type|del|lrem]\r\n",
 		procname);
 }
 

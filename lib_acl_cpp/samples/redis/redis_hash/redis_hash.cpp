@@ -2,7 +2,7 @@
 
 static acl::string __keypre("hash_test_key");
 
-static bool test_hmset(acl::redis_hash& option, int n)
+static bool test_hmset(acl::redis_hash& redis, int n)
 {
 	acl::string key, attr1, attr2, attr3;
 	acl::string val1, val2, val3;
@@ -23,8 +23,8 @@ static bool test_hmset(acl::redis_hash& option, int n)
 		attrs[attr2] = val2;
 		attrs[attr3] = val3;
 
-		option.reset();
-		if (option.hmset(key.c_str(), attrs) == false)
+		redis.clear();
+		if (redis.hmset(key.c_str(), attrs) == false)
 		{
 			printf("hmset error, key: %s\r\n", key.c_str());
 			return false;
@@ -42,7 +42,7 @@ static bool test_hmset(acl::redis_hash& option, int n)
 	return true;
 }
 
-static bool test_hmget(acl::redis_hash& option, int n)
+static bool test_hmget(acl::redis_hash& redis, int n)
 {
 	acl::string key, attr1, attr2, attr3;
 	const char* attrs[3];
@@ -59,8 +59,8 @@ static bool test_hmget(acl::redis_hash& option, int n)
 		attrs[2] = attr3.c_str();
 
 		result.clear();
-		option.reset();
-		if (option.hmget(key, attrs, 3, &result) == false)
+		redis.clear();
+		if (redis.hmget(key, attrs, 3, &result) == false)
 		{
 			printf("hmget error\r\n");
 			return false;
@@ -68,14 +68,14 @@ static bool test_hmget(acl::redis_hash& option, int n)
 		else if (i >= 10)
 			continue;
 
-		size_t size = option.result_size();
+		size_t size = redis.result_size();
 		printf("size: %lu, key: %s\r\n", (unsigned long) size,
 			key.c_str());
 
 		size_t j;
 		for (j = 0; j < size; j++)
 		{
-			const char* val = option.result_value(j);
+			const char* val = redis.result_value(j);
 			printf("hmget ok, %s=%s\r\n",
 				attrs[j], val ? val : "null");
 		}
@@ -88,7 +88,7 @@ static bool test_hmget(acl::redis_hash& option, int n)
 	return true;
 }
 
-static bool test_hset(acl::redis_hash& option, int n)
+static bool test_hset(acl::redis_hash& redis, int n)
 {
 	acl::string key;
 	acl::string attr, value;
@@ -99,8 +99,8 @@ static bool test_hset(acl::redis_hash& option, int n)
 		attr.format("attr1");
 		value.format("value_%s", key.c_str());
 
-		option.reset();
-		if (option.hset(key.c_str(), attr.c_str(),
+		redis.clear();
+		if (redis.hset(key.c_str(), attr.c_str(),
 			value.c_str()) < 0)
 		{
 			printf("hset key: %s error\r\n", key.c_str());
@@ -113,7 +113,7 @@ static bool test_hset(acl::redis_hash& option, int n)
 	return true;
 }
 
-static bool test_hsetnx(acl::redis_hash& option, int n)
+static bool test_hsetnx(acl::redis_hash& redis, int n)
 {
 	acl::string key;
 	acl::string attr, value;
@@ -125,8 +125,8 @@ static bool test_hsetnx(acl::redis_hash& option, int n)
 		attr.format("attr4");
 		value.format("value_%s", key.c_str());
 
-		option.reset();
-		if ((ret = option.hsetnx(key.c_str(), attr.c_str(),
+		redis.clear();
+		if ((ret = redis.hsetnx(key.c_str(), attr.c_str(),
 			value.c_str())) <0)
 		{
 			printf("hsetnx key: %s error\r\n", key.c_str());
@@ -140,7 +140,7 @@ static bool test_hsetnx(acl::redis_hash& option, int n)
 	return true;
 }
 
-static bool test_hget(acl::redis_hash& option, int n)
+static bool test_hget(acl::redis_hash& redis, int n)
 {
 	acl::string key;
 	acl::string attr, value;
@@ -151,8 +151,8 @@ static bool test_hget(acl::redis_hash& option, int n)
 		attr.format("attr1");
 		value.clear();
 
-		option.reset();
-		if (option.hget(key.c_str(), attr.c_str(), value) == false)
+		redis.clear();
+		if (redis.hget(key.c_str(), attr.c_str(), value) == false)
 		{
 			printf("hget key: %s, attr: %s\r\n", key.c_str(),
 				attr.c_str());
@@ -169,7 +169,7 @@ static bool test_hget(acl::redis_hash& option, int n)
 	return true;
 }
 
-static bool test_hgetall(acl::redis_hash& option, int n)
+static bool test_hgetall(acl::redis_hash& redis, int n)
 {
 	acl::string key;
 	std::map<acl::string, acl::string> result;
@@ -179,8 +179,8 @@ static bool test_hgetall(acl::redis_hash& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 		result.clear();
 
-		option.reset();
-		if (option.hgetall(key.c_str(), result) == false)
+		redis.clear();
+		if (redis.hgetall(key.c_str(), result) == false)
 		{
 			printf("hgetall key: %s\r\n", key.c_str());
 			return false;
@@ -200,7 +200,7 @@ static bool test_hgetall(acl::redis_hash& option, int n)
 	return true;
 }
 
-static bool test_hdel(acl::redis_hash& option, int n)
+static bool test_hdel(acl::redis_hash& redis, int n)
 {
 	acl::string key, attr;
 
@@ -209,8 +209,8 @@ static bool test_hdel(acl::redis_hash& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 		attr.format("attr1");
 
-		option.reset();
-		int ret = option.hdel(key.c_str(), attr.c_str(), NULL);
+		redis.clear();
+		int ret = redis.hdel(key.c_str(), attr.c_str(), NULL);
 		if (ret < 0)
 		{
 			printf("hdel key: %s error\r\n", key.c_str());
@@ -223,7 +223,7 @@ static bool test_hdel(acl::redis_hash& option, int n)
 	return true;
 }
 
-static bool test_hincrby(acl::redis_hash& option, int n)
+static bool test_hincrby(acl::redis_hash& redis, int n)
 {
 	acl::string key, attr;
 	long long int result;
@@ -233,8 +233,8 @@ static bool test_hincrby(acl::redis_hash& option, int n)
 		key.format("hincr_%s_%d", __keypre.c_str(), i);
 		attr.format("attr1");
 
-		option.reset();
-		if (option.hincrby(key.c_str(), attr.c_str(), 10,
+		redis.clear();
+		if (redis.hincrby(key.c_str(), attr.c_str(), 10,
 			&result) == false)
 		{
 			printf("hincrby error, key: %s, attr: %s\r\n",
@@ -249,7 +249,7 @@ static bool test_hincrby(acl::redis_hash& option, int n)
 	return true;
 }
 
-static bool test_hincrbyfloat(acl::redis_hash& option, int n)
+static bool test_hincrbyfloat(acl::redis_hash& redis, int n)
 {
 	acl::string key, attr;
 	double result;
@@ -259,8 +259,8 @@ static bool test_hincrbyfloat(acl::redis_hash& option, int n)
 		key.format("hincrbyfloat_%s_%d", __keypre.c_str(), i);
 		attr.format("attr1");
 
-		option.reset();
-		if (option.hincrbyfloat(key.c_str(), attr.c_str(),
+		redis.clear();
+		if (redis.hincrbyfloat(key.c_str(), attr.c_str(),
 			8.8, &result) == false)
 		{
 			printf("hincrbyfloat error, key: %s\r\n", key.c_str());
@@ -276,7 +276,7 @@ static bool test_hincrbyfloat(acl::redis_hash& option, int n)
 	return true;
 }
 
-static bool test_hkeys(acl::redis_hash& option, int n)
+static bool test_hkeys(acl::redis_hash& redis, int n)
 {
 	acl::string key;
 	std::vector<acl::string> attrs;
@@ -286,8 +286,8 @@ static bool test_hkeys(acl::redis_hash& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 		attrs.clear();
 
-		option.reset();
-		if (option.hkeys(key.c_str(), attrs) == false)
+		redis.clear();
+		if (redis.hkeys(key.c_str(), attrs) == false)
 		{
 			printf("hkeys error, key: %s\r\n", key.c_str());
 			return false;
@@ -309,7 +309,7 @@ static bool test_hkeys(acl::redis_hash& option, int n)
 	return true;
 }
 
-static bool test_hexists(acl::redis_hash& option, int n)
+static bool test_hexists(acl::redis_hash& redis, int n)
 {
 	acl::string key, attr;
 
@@ -318,8 +318,8 @@ static bool test_hexists(acl::redis_hash& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 		attr.format("attr1");
 
-		option.reset();
-		if (option.hexists(key.c_str(), attr.c_str()) == false)
+		redis.clear();
+		if (redis.hexists(key.c_str(), attr.c_str()) == false)
 			printf("no hexists key: %s\r\n", key.c_str());
 		else
 			printf("hexists key: %s, attr: %s\r\n",
@@ -329,7 +329,7 @@ static bool test_hexists(acl::redis_hash& option, int n)
 	return true;
 }
 
-static bool test_hlen(acl::redis_hash& option, int n)
+static bool test_hlen(acl::redis_hash& redis, int n)
 {
 	acl::string key;
 
@@ -337,8 +337,8 @@ static bool test_hlen(acl::redis_hash& option, int n)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 
-		option.reset();
-		int ret = option.hlen(key.c_str());
+		redis.clear();
+		int ret = redis.hlen(key.c_str());
 		if (ret < 0)
 		{
 			printf("hlen error, key: %s\r\n", key.c_str());
@@ -360,7 +360,7 @@ static void usage(const char* procname)
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-S [if slice request, default: no]\r\n"
-		"-a cmd[hmset|hmget|hset|hsetnx|hget|hgetall|hincrby|hincrybyFloat|hkeys|hexists|hlen|hdel]\r\n",
+		"-a cmd[hmset|hmget|hset|hsetnx|hget|hgetall|hincrby|hincrbyfloat|hkeys|hexists|hlen|hdel]\r\n",
 		procname);
 }
 
@@ -403,48 +403,48 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	client.set_slice_request(slice_req);
-	acl::redis_hash option(&client);
+	acl::redis_hash redis(&client);
 
 	bool ret;
 
 	if (cmd == "hmset")
-		ret = test_hmset(option, n);
+		ret = test_hmset(redis, n);
 	else if (cmd == "hmget")
-		ret = test_hmget(option, n);
+		ret = test_hmget(redis, n);
 	else if (cmd == "hset")
-		ret = test_hset(option, n);
+		ret = test_hset(redis, n);
 	else if (cmd == "hsetnx")
-		ret = test_hsetnx(option, n);
+		ret = test_hsetnx(redis, n);
 	else if (cmd == "hget")
-		ret = test_hget(option, n);
+		ret = test_hget(redis, n);
 	else if (cmd == "hgetall")
-		ret = test_hgetall(option, n);
+		ret = test_hgetall(redis, n);
 	else if (cmd == "hdel")
-		ret = test_hdel(option, n);
+		ret = test_hdel(redis, n);
 	else if (cmd == "hincrby")
-		ret = test_hincrby(option, n);
+		ret = test_hincrby(redis, n);
 	else if (cmd == "hincrbyfloat")
-		ret = test_hincrbyfloat(option, n);
+		ret = test_hincrbyfloat(redis, n);
 	else if (cmd == "hkeys")
-		ret = test_hkeys(option, n);
+		ret = test_hkeys(redis, n);
 	else if (cmd == "hexists")
-		ret = test_hexists(option, n);
+		ret = test_hexists(redis, n);
 	else if (cmd == "hlen")
-		ret = test_hlen(option, n);
+		ret = test_hlen(redis, n);
 	else if (cmd == "all")
 	{
-		ret = test_hmset(option, n)
-			&& test_hmget(option, n)
-			&& test_hset(option, n)
-			&& test_hsetnx(option, n)
-			&& test_hget(option, n)
-			&& test_hgetall(option, n)
-			&& test_hincrby(option, n)
-			&& test_hincrbyfloat(option, n)
-			&& test_hkeys(option, n)
-			&& test_hexists(option, n)
-			&& test_hlen(option, n)
-			&& test_hdel(option, n);
+		ret = test_hmset(redis, n)
+			&& test_hmget(redis, n)
+			&& test_hset(redis, n)
+			&& test_hsetnx(redis, n)
+			&& test_hget(redis, n)
+			&& test_hgetall(redis, n)
+			&& test_hincrby(redis, n)
+			&& test_hincrbyfloat(redis, n)
+			&& test_hkeys(redis, n)
+			&& test_hexists(redis, n)
+			&& test_hlen(redis, n)
+			&& test_hdel(redis, n);
 	}
 	else
 	{

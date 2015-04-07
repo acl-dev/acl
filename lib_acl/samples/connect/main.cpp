@@ -1,17 +1,29 @@
 #include "lib_acl.h"
+#include <list>
 
 static void test(const char* addr)
 {
+	std::list<ACL_VSTREAM*> conns;
+
 	for (int i = 0; i < 10000; i++)
 	{
 		ACL_VSTREAM* client = acl_vstream_connect(addr, ACL_BLOCKING, 10, 10, 4096);
 		if (client == NULL)
 			printf("connect addr: %s error\r\n", addr);
 		else
-			printf("connect addr: %s ok\r\n", addr);
+		{
+			printf("connect addr: %s ok, i: %d\r\n", addr, i);
+			conns.push_back(client);
+		}
 	}
 
+	printf("enter any key to exit\r\n");
 	getchar();
+
+	std::list<ACL_VSTREAM*>::iterator it = conns.begin();
+	for (; it != conns.end(); ++it)
+		acl_vstream_close(*it);
+	printf("Exit now ok\r\n");
 }
 
 int main(int argc, char *argv[])

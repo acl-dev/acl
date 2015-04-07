@@ -36,7 +36,7 @@ void redis_result::operator delete(void* ptr acl_unused,
 	logger_error("DELETE NOW!");
 }
 
-void redis_result::reset()
+void redis_result::clear()
 {
 	children_ = NULL;
 	children_idx_ = 0;

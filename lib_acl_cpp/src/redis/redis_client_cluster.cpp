@@ -2,7 +2,7 @@
 #include <vector>
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/redis/redis_cluster.hpp"
-#include "acl_cpp/redis/redis_node.hpp"
+#include "acl_cpp/redis/redis_slot.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
 #include "acl_cpp/redis/redis_client_pool.hpp"
 #include "acl_cpp/redis/redis_client_cluster.hpp"
@@ -121,23 +121,23 @@ void redis_client_cluster::set_all_slot(const char* addr, int max_conns)
 	redis_client client(addr, 30, 60, false);
 	redis_cluster cluster(&client);
 
-	const std::vector<redis_node*>* nodes = cluster.slots();
-	if (nodes == NULL)
+	const std::vector<redis_slot*>* slots = cluster.cluster_slots();
+	if (slots == NULL)
 		return;
 
-	std::vector<redis_node*>::const_iterator cit;
-	for (cit = nodes->begin(); cit != nodes->end(); ++cit)
+	std::vector<redis_slot*>::const_iterator cit;
+	for (cit = slots->begin(); cit != slots->end(); ++cit)
 	{
-		redis_node* node = *cit;
-		const char* ip = node->get_ip();
+		const redis_slot* slot = *cit;
+		const char* ip = slot->get_ip();
 		if (*ip == 0)
 			continue;
-		int port = node->get_port();
+		int port = slot->get_port();
 		if (port <= 0)
 			continue;
 
-		size_t slot_min = node->get_slot_range_from();
-		size_t slot_max = node->get_slot_range_to();
+		size_t slot_min = slot->get_slot_min();
+		size_t slot_max = slot->get_slot_max();
 		if ((int) slot_max >= max_slot_ || slot_max < slot_min)
 			continue;
 		

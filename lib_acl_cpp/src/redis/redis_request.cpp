@@ -17,7 +17,7 @@ redis_request::~redis_request()
 		acl_myfree(iov_);
 }
 
-void redis_request::reset()
+void redis_request::clear()
 {
 	argc_ = 0;
 }

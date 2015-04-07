@@ -2,7 +2,7 @@
 
 static const char* __keypre = "hyperloglog_";
 
-static bool test_pfadd(acl::redis_hyperloglog& option, int n)
+static bool test_pfadd(acl::redis_hyperloglog& redis, int n)
 {
 	acl::string key, element;
 	std::vector<acl::string> elements;
@@ -18,8 +18,8 @@ static bool test_pfadd(acl::redis_hyperloglog& option, int n)
 	{
 		key.format("%s_key_%d", __keypre, i);
 
-		option.reset();
-		int ret = option.pfadd(key.c_str(), elements);
+		redis.clear();
+		int ret = redis.pfadd(key.c_str(), elements);
 		if (ret < 0)
 		{
 			printf("pfadd error, key: %s\r\n", key.c_str());
@@ -35,7 +35,7 @@ static bool test_pfadd(acl::redis_hyperloglog& option, int n)
 	return true;
 }
 
-static bool test_pfcount(acl::redis_hyperloglog& option, int n)
+static bool test_pfcount(acl::redis_hyperloglog& redis, int n)
 {
 	acl::string key;
 	std::vector<acl::string> keys;
@@ -46,8 +46,8 @@ static bool test_pfcount(acl::redis_hyperloglog& option, int n)
 		keys.push_back(key);
 	}
 
-	option.reset();
-	int ret = option.pfcount(keys);
+	redis.clear();
+	int ret = redis.pfcount(keys);
 	if (ret < 0)
 	{
 		printf("pfcount error\r\n");
@@ -58,7 +58,7 @@ static bool test_pfcount(acl::redis_hyperloglog& option, int n)
 	return true;
 }
 
-static bool test_pfmerge(acl::redis_hyperloglog& option, int n)
+static bool test_pfmerge(acl::redis_hyperloglog& redis, int n)
 {
 	acl::string key;
 	std::vector<acl::string> keys;
@@ -71,8 +71,8 @@ static bool test_pfmerge(acl::redis_hyperloglog& option, int n)
 
 	acl::string dest_key;
 	dest_key.format("%s_dest_key", __keypre);
-	option.reset();
-	if (option.pfmerge(dest_key, keys) == false)
+	redis.clear();
+	if (redis.pfmerge(dest_key, keys) == false)
 	{
 		printf("pfmerge failed, dest: %s\r\n", dest_key.c_str());
 		return false;
@@ -80,8 +80,8 @@ static bool test_pfmerge(acl::redis_hyperloglog& option, int n)
 
 	printf("pfmerge ok, dest: %s\r\n", dest_key.c_str());
 
-	option.reset();
-	int ret = option.pfcount(dest_key.c_str(), NULL);
+	redis.clear();
+	int ret = redis.pfcount(dest_key.c_str(), NULL);
 	printf("pfcont ok, count: %d, key: %s\r\n", ret, dest_key.c_str());
 
 	return true;
@@ -138,21 +138,21 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	client.set_slice_request(slice_req);
-	acl::redis_hyperloglog option(&client);
+	acl::redis_hyperloglog redis(&client);
 
 	bool ret;
 
 	if (cmd == "pfadd")
-		ret = test_pfadd(option, n);
+		ret = test_pfadd(redis, n);
 	else if (cmd == "pfcount")
-		ret = test_pfcount(option, n);
+		ret = test_pfcount(redis, n);
 	else if (cmd == "pfmerge")
-		ret = test_pfmerge(option, n);
+		ret = test_pfmerge(redis, n);
 	else if (cmd == "all")
 	{
-		ret = test_pfadd(option, n)
-			&& test_pfcount(option, n)
-			&& test_pfmerge(option, n);
+		ret = test_pfadd(redis, n)
+			&& test_pfcount(redis, n)
+			&& test_pfmerge(redis, n);
 	}
 	else
 	{

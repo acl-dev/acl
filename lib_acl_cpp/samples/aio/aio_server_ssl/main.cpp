@@ -12,6 +12,8 @@
 
 static int   __max = 0;
 static int   __timeout = 0;
+static int   __max_used = 0;
+static int   __cur_used = 0;
 
 // SSL 模式下的 SSL 配置对象
 static acl::polarssl_conf* __ssl_conf;
@@ -104,6 +106,7 @@ public:
 	~io_callback()
 	{
 		printf("delete io_callback now ...\r\n");
+		__cur_used++;
 	}
 
 	/**
@@ -320,8 +323,10 @@ public:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
+		"	-l server_addr[ip:port, default: 127.0.0.1:9001]\r\n"
 		"	-L line_max_length\r\n"
 		"	-t timeout\r\n"
+		"	-n conn_used_limit\r\n"
 		"	-k[use kernel event: epoll/iocp/kqueue/devpool]\r\n"
 		"	-K ssl_key_file -C ssl_cert_file [in SSL mode]\r\n",
 		procname);
@@ -332,15 +337,19 @@ int main(int argc, char* argv[])
 	// 事件引擎是否采用内核中的高效模式
 	bool use_kernel = false;
 	acl::string key_file, cert_file;
+	acl::string addr("127.0.0.1:9001");
 	int  ch;
 
-	while ((ch = getopt(argc, argv, "hkL:t:K:C:")) > 0)
+	while ((ch = getopt(argc, argv, "l:hkL:t:K:C:n:")) > 0)
 	{
 		switch (ch)
 		{
 		case 'h':
 			usage(argv[0]);
 			return (0);
+		case 'l':
+			addr = optarg;
+			break;
 		case 'k':
 			use_kernel = true;
 			break;
@@ -355,6 +364,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'C':
 			cert_file = optarg;
+			break;
+		case 'n':
+			__max_used = atoi(optarg);
 			break;
 		default:
 			break;
@@ -397,15 +409,14 @@ int main(int argc, char* argv[])
 
 	// 创建监听异步流
 	acl::aio_listen_stream* sstream = new acl::aio_listen_stream(&handle);
-	const char* addr = "127.0.0.1:9001";
 
 	// 初始化ACL库(尤其是在WIN32下一定要调用此函数，在UNIX平台下可不调用)
 	acl::acl_cpp_init();
 
 	// 监听指定的地址
-	if (sstream->open(addr) == false)
+	if (sstream->open(addr.c_str()) == false)
 	{
-		std::cout << "open " << addr << " error!" << std::endl;
+		std::cout << "open " << addr.c_str() << " error!" << std::endl;
 		sstream->close();
 		// XXX: 为了保证能关闭监听流，应在此处再 check 一下
 		handle.check();
@@ -417,7 +428,7 @@ int main(int argc, char* argv[])
 	// 创建回调类对象，当有新连接到达时自动调用此类对象的回调过程
 	io_accept_callback callback;
 	sstream->add_accept_callback(&callback);
-	std::cout << "Listen: " << addr << " ok!" << std::endl;
+	std::cout << "Listen: " << addr.c_str() << " ok!" << std::endl;
 
 	while (true)
 	{
@@ -427,6 +438,9 @@ int main(int argc, char* argv[])
 			std::cout << "aio_server stop now ..." << std::endl;
 			break;
 		}
+
+		if (__max_used > 0 && __cur_used >= __max_used)
+			break;
 	}
 
 	// 关闭监听流并释放流对象

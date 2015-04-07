@@ -40,7 +40,8 @@ class ACL_CPP_API redis
 {
 public:
 	redis(redis_client* conn = NULL);
-	~redis();
+	redis(redis_client_cluster* cluster, size_t max_conns);
+	~redis() {}
 };
 
 } // namespace acl

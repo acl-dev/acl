@@ -5,7 +5,7 @@ static acl::string __keypre("test_key_cluster");
 
 static bool test_del(acl::redis_key& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 
@@ -23,7 +23,7 @@ static bool test_del(acl::redis_key& cmd, int i)
 
 static bool test_expire(acl::redis_key& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 
@@ -40,7 +40,7 @@ static bool test_expire(acl::redis_key& cmd, int i)
 
 static bool test_ttl(acl::redis_key& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 	int ttl;
@@ -58,7 +58,7 @@ static bool test_ttl(acl::redis_key& cmd, int i)
 
 static bool test_exists(acl::redis_key& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 
@@ -78,7 +78,7 @@ static bool test_exists(acl::redis_key& cmd, int i)
 
 static bool test_type(acl::redis_key& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 
@@ -96,7 +96,7 @@ static bool test_type(acl::redis_key& cmd, int i)
 
 static bool test_set(acl::redis_string& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 	key.format("%s_%d", __keypre.c_str(), i);
@@ -114,7 +114,7 @@ static bool test_set(acl::redis_string& cmd, int i)
 
 static bool test_get(acl::redis_string& cmd, int i)
 {
-	cmd.reset();
+	cmd.clear();
 
 	acl::string key;
 	key.format("%s_%d", __keypre.c_str(), i);

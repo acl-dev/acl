@@ -2,13 +2,13 @@
 
 static acl::string __keypre("test_key");
 
-static bool test_del(acl::redis_key& option, int i)
+static bool test_del(acl::redis_key& redis, int i)
 {
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
-	option.reset();
-	int ret = option.del(key.c_str(), NULL);
+	redis.clear();
+	int ret = redis.del(key.c_str(), NULL);
 	if (ret < 0)
 	{
 		printf("del key: %s error\r\n", key.c_str());
@@ -19,13 +19,13 @@ static bool test_del(acl::redis_key& option, int i)
 	return true;
 }
 
-static bool test_expire(acl::redis_key& option, int i)
+static bool test_expire(acl::redis_key& redis, int i)
 {
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
-	option.reset();
-	if (option.expire(key.c_str(), 100) < 0)
+	redis.clear();
+	if (redis.expire(key.c_str(), 100) < 0)
 	{
 		printf("expire key: %s error\r\n", key.c_str());
 		return false;
@@ -35,14 +35,14 @@ static bool test_expire(acl::redis_key& option, int i)
 	return true;
 }
 
-static bool test_ttl(acl::redis_key& option, int i)
+static bool test_ttl(acl::redis_key& redis, int i)
 {
 	acl::string key;
 	int ttl;
 
 	key.format("%s_%d", __keypre.c_str(), i);
-	option.reset();
-	if ((ttl = option.ttl(key.c_str())) < 0)
+	redis.clear();
+	if ((ttl = redis.ttl(key.c_str())) < 0)
 	{
 		printf("get ttl key: %s error\r\n", key.c_str());
 		return false;
@@ -52,13 +52,13 @@ static bool test_ttl(acl::redis_key& option, int i)
 	return true;
 }
 
-static bool test_exists(acl::redis_key& option, int i)
+static bool test_exists(acl::redis_key& redis, int i)
 {
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
-	option.reset();
-	if (option.exists(key.c_str()) == false)
+	redis.clear();
+	if (redis.exists(key.c_str()) == false)
 	{
 		if (i < 10)
 			printf("no exists key: %s\r\n", key.c_str());
@@ -71,13 +71,13 @@ static bool test_exists(acl::redis_key& option, int i)
 	return true;
 }
 
-static bool test_type(acl::redis_key& option, int i)
+static bool test_type(acl::redis_key& redis, int i)
 {
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
-	option.reset();
-	acl::redis_key_t ret = option.type(key.c_str());
+	redis.clear();
+	acl::redis_key_t ret = redis.type(key.c_str());
 	if (ret == acl::REDIS_KEY_UNKNOWN)
 	{
 		printf("unknown type key: %s\r\n", key.c_str());
@@ -101,7 +101,7 @@ protected:
 	{
 		bool ret;
 		acl::redis_client* conn;
-		acl::redis_key option;
+		acl::redis_key redis;
 
 		for (int i = 0; i < n_; i++)
 		{
@@ -113,25 +113,25 @@ protected:
 				break;
 			}
 
-			option.set_client(conn);
+			redis.set_client(conn);
 
 			if (cmd_ == "del")
-				ret = test_del(option, i);
+				ret = test_del(redis, i);
 			else if (cmd_ == "expire")
-				ret = test_expire(option, i);
+				ret = test_expire(redis, i);
 			else if (cmd_ == "ttl")
-				ret = test_ttl(option, i);
+				ret = test_ttl(redis, i);
 			else if (cmd_ == "exists")
-				ret = test_exists(option, i);
+				ret = test_exists(redis, i);
 			else if (cmd_ == "type")
-				ret = test_type(option, i);
+				ret = test_type(redis, i);
 			else if (cmd_ == "all")
 			{
-				if (test_expire(option, i) == false
-					|| test_ttl(option, i) == false
-					|| test_exists(option, i) == false
-					|| test_type(option, i) == false
-					|| test_del(option, i) == false)
+				if (test_expire(redis, i) == false
+					|| test_ttl(redis, i) == false
+					|| test_exists(redis, i) == false
+					|| test_type(redis, i) == false
+					|| test_del(redis, i) == false)
 				{
 					ret = false;
 				}

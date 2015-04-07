@@ -18,15 +18,15 @@ do\
 } while (0);
 
 
-static bool test_lpush(acl::redis_list& option, int n)
+static bool test_lpush(acl::redis_list& redis, int n)
 {
 	acl::string value;
 
 	for (int i = 0; i < n; i++)
 	{
 		value.format("%s_%d", __key, i);
-		option.reset();
-		int ret = option.lpush(__key, value.c_str(), NULL);
+		redis.clear();
+		int ret = redis.lpush(__key, value.c_str(), NULL);
 		if (ret <= 0)
 		{
 			printf("lpush key: %s error\r\n", __key);
@@ -40,7 +40,7 @@ static bool test_lpush(acl::redis_list& option, int n)
 	return true;
 }
 
-static bool test_lpush2(acl::redis_list& option, int n)
+static bool test_lpush2(acl::redis_list& redis, int n)
 {
 	char** value = new char *[n+1];
 	for (int i = 0; i < n; i++)
@@ -50,8 +50,8 @@ static bool test_lpush2(acl::redis_list& option, int n)
 	}
 	value[n] = NULL;
 
-	option.reset();
-	int ret = option.lpush(__key, (const char**) value, n);
+	redis.clear();
+	int ret = redis.lpush(__key, (const char**) value, n);
 	if (ret <= 0)
 	{
 		printf("lpush key: %s error\r\n", __key);
@@ -68,7 +68,7 @@ static bool test_lpush2(acl::redis_list& option, int n)
 	return true;
 }
 
-static bool test_lpush3(acl::redis_list &option, int n)
+static bool test_lpush3(acl::redis_list &redis, int n)
 {
 	std::vector<acl::string> values;
 	acl::string buf;
@@ -79,8 +79,8 @@ static bool test_lpush3(acl::redis_list &option, int n)
 		values.push_back(buf);
 	}
 
-	option.reset();
-	int ret = option.lpush(__key, values);
+	redis.clear();
+	int ret = redis.lpush(__key, values);
 	if (ret <= 0)
 	{
 		printf("lpush key:%s error\r\n", __key);
@@ -92,7 +92,7 @@ static bool test_lpush3(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_lpush4(acl::redis_list &option, int n)
+static bool test_lpush4(acl::redis_list &redis, int n)
 {
 	std::vector<const char *> values;
 	char **value  = new char *[n];
@@ -104,8 +104,8 @@ static bool test_lpush4(acl::redis_list &option, int n)
 		values.push_back(value[i]);
 	}
 
-	option.reset();
-	int ret = option.lpush(__key, (std::vector<const char*>&) values);
+	redis.clear();
+	int ret = redis.lpush(__key, (std::vector<const char*>&) values);
 	if(ret <= 0)
 	{
 		printf("lpush key:%s error\r\n", __key);
@@ -122,7 +122,7 @@ static bool test_lpush4(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_lpush5(acl::redis_list &option, int n)
+static bool test_lpush5(acl::redis_list &redis, int n)
 {
 	std::vector<const char*> values;
 	char **value  = new char *[n];
@@ -133,8 +133,8 @@ static bool test_lpush5(acl::redis_list &option, int n)
 		values.push_back(value[i]);
 	}
 
-	option.reset();
-	int ret = option.lpush(__key, values);
+	redis.clear();
+	int ret = redis.lpush(__key, values);
 	if(ret <= 0)
 	{
 		printf("lpush key:%s error\r\n", __key);
@@ -151,7 +151,7 @@ static bool test_lpush5(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_lpush6(acl::redis_list &option, int n)
+static bool test_lpush6(acl::redis_list &redis, int n)
 {
 	char **values = new char *[n];
 	size_t *lens = new size_t[n];
@@ -162,8 +162,8 @@ static bool test_lpush6(acl::redis_list &option, int n)
 		lens[i] = strlen(values[i]);
 	}
 
-	option.reset();
-	int ret = option.lpush(__key, (const char**)values, lens, n);
+	redis.clear();
+	int ret = redis.lpush(__key, (const char**)values, lens, n);
 	if (ret <= 0)
 	{
 		printf("lpush key:%s error\r\n", __key);
@@ -180,15 +180,15 @@ static bool test_lpush6(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_rpush(acl::redis_list& option, int n)
+static bool test_rpush(acl::redis_list& redis, int n)
 {
 	acl::string value;
 	int ret;
 	for (int i = 0; i < n; ++i)
 	{
 		value.format("%s_%d",__key, i);
-		option.reset();
-		ret = option.rpush(__key, value.c_str(), NULL);
+		redis.clear();
+		ret = redis.rpush(__key, value.c_str(), NULL);
 		if (ret <= 0)
 		{
 			printf("rpush key:%s error, \r\n", __key);
@@ -204,7 +204,7 @@ static bool test_rpush(acl::redis_list& option, int n)
 	return true;
 }
 
-static bool test_rpush2(acl::redis_list& option, int n)
+static bool test_rpush2(acl::redis_list& redis, int n)
 {
 	char **values = new char *[n];
 	for (int i = 0 ; i < n ; ++ i)
@@ -213,8 +213,8 @@ static bool test_rpush2(acl::redis_list& option, int n)
 		acl::safe_snprintf(values[i], __value_len, "%s_%d", __key, i);
 	}
 
-	option.reset();
-	int ret = option.rpush(__key, (const char **)values, n);
+	redis.clear();
+	int ret = redis.rpush(__key, (const char **)values, n);
 	if(ret < 0)
 		printf("rpush key:%s error\r\n",__key);
 	else
@@ -225,7 +225,7 @@ static bool test_rpush2(acl::redis_list& option, int n)
 	return ret > 0 ? true : false;
 }
 
-static bool test_rpush3(acl::redis_list &option, int n)
+static bool test_rpush3(acl::redis_list &redis, int n)
 {
 	std::vector<acl::string> values;
 	acl::string value;
@@ -235,8 +235,8 @@ static bool test_rpush3(acl::redis_list &option, int n)
 		values.push_back(value);
 	}
 
-	option.reset();
-	int ret = option.rpush(__key, values);
+	redis.clear();
+	int ret = redis.rpush(__key, values);
 	if (ret <= 0)
 	{
 		printf("rpush key:%s error", __key);
@@ -248,7 +248,7 @@ static bool test_rpush3(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_rpush4(acl::redis_list &option, int n)
+static bool test_rpush4(acl::redis_list &redis, int n)
 {
 	std::vector<const char*> values;
 	for (int i = 0; i < n; ++i) 
@@ -258,8 +258,8 @@ static bool test_rpush4(acl::redis_list &option, int n)
 		values.push_back(value);
 	}
 
-	option.reset();
-	int ret = option.rpush(__key, (const std::vector<const char*>&) values);
+	redis.clear();
+	int ret = redis.rpush(__key, (const std::vector<const char*>&) values);
 	if(ret <= 0)
 	{
 		printf("rpush key:%s ok",__key);
@@ -278,7 +278,7 @@ static bool test_rpush4(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_rpush5(acl::redis_list &option, int n)
+static bool test_rpush5(acl::redis_list &redis, int n)
 {
 	std::vector<const char*> values;
 	for (int i = 0; i < n; ++i) 
@@ -288,8 +288,8 @@ static bool test_rpush5(acl::redis_list &option, int n)
 		values.push_back(value);
 	}
 
-	option.reset();
-	int ret = option.rpush(__key, values);
+	redis.clear();
+	int ret = redis.rpush(__key, values);
 	if(ret <= 0)
 		printf("rpush key:%s ok",__key);
 	else
@@ -305,7 +305,7 @@ static bool test_rpush5(acl::redis_list &option, int n)
 	return ret > 0 ? true : false;
 }
 
-static bool test_rpush6(acl::redis_list &option, int n)
+static bool test_rpush6(acl::redis_list &redis, int n)
 {
 	char **values = new char *[n];
 	size_t *lens = new size_t[n];
@@ -316,8 +316,8 @@ static bool test_rpush6(acl::redis_list &option, int n)
 		acl::safe_snprintf(values[i], __value_len, "%s_%d", __key, i);
 	}
 
-	option.reset();
-	int ret = option.rpush(__key, (const char**) values,lens, n);
+	redis.clear();
+	int ret = redis.rpush(__key, (const char**) values,lens, n);
 	if (ret <= 0)
 		printf("rpush key:%s error", __key);
 	else
@@ -329,7 +329,7 @@ static bool test_rpush6(acl::redis_list &option, int n)
 	return ret > 0 ? true : false;
 }
 
-static bool test_lpushx(acl::redis_list& option, int n)
+static bool test_lpushx(acl::redis_list& redis, int n)
 {
 	acl::string value;
 	int ret;
@@ -337,8 +337,8 @@ static bool test_lpushx(acl::redis_list& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		value.format("%s_%d", __key, i);
-		option.reset();
-		ret = option.lpushx(__key, value.c_str());
+		redis.clear();
+		ret = redis.lpushx(__key, value.c_str());
 		if (ret <= 0)
 		{
 			printf("lpushx key: %s error\r\n", __key);
@@ -352,14 +352,14 @@ static bool test_lpushx(acl::redis_list& option, int n)
 	return true;
 }
 
-static bool test_lpushx2(acl::redis_list &option, int n)
+static bool test_lpushx2(acl::redis_list &redis, int n)
 {
 	acl::string value;
 	for (int i = 0; i < n; ++i)
 	{
 		value.format("%s_%d", __key, i);
-		option.reset();
-		int ret = option.lpushx(__key, value.c_str(), value.length());
+		redis.clear();
+		int ret = redis.lpushx(__key, value.c_str(), value.length());
 		if(ret <= 0)
 		{
 			printf("lpushx key:%s error \r\n", __key);
@@ -373,14 +373,14 @@ static bool test_lpushx2(acl::redis_list &option, int n)
 	
 }
 
-static bool test_rpushx (acl::redis_list &option, int n)
+static bool test_rpushx (acl::redis_list &redis, int n)
 {
 	acl::string value;
 	for (int i = 0; i < n; ++i)
 	{
 		value.format("%s_%d",__key, i);
-		option.reset();
-		int ret = option.rpushx(__key, value.c_str());
+		redis.clear();
+		int ret = redis.rpushx(__key, value.c_str());
 		if(ret <= 0)
 		{
 			printf("lpushx key:%s error \r\n", __key);
@@ -393,14 +393,14 @@ static bool test_rpushx (acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_rpushx2 (acl::redis_list &option, int n)
+static bool test_rpushx2 (acl::redis_list &redis, int n)
 {
 	acl::string value;
 	for (int i = 0; i < n; ++i)
 	{
 		value.format("%s_%d",__key, i);
-		option.reset();
-		int ret = option.rpushx(__key, value.c_str(), value.length());
+		redis.clear();
+		int ret = redis.rpushx(__key, value.c_str(), value.length());
 		if(ret <= 0)
 		{
 			printf("lpushx key:%s error \r\n", __key);
@@ -413,12 +413,12 @@ static bool test_rpushx2 (acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_lrange(acl::redis_list& option)
+static bool test_lrange(acl::redis_list& redis)
 {
 	std::vector<acl::string> result;
 
-	option.reset();
-	bool ret = option.lrange(__key, 0, 1000, &result);
+	redis.clear();
+	bool ret = redis.lrange(__key, 0, 1000, &result);
 	if (ret == false)
 	{
 		printf("lrang key: %s error\r\n", __key);
@@ -439,16 +439,16 @@ static bool test_lrange(acl::redis_list& option)
 	return true;
 }
 
-static bool test_rpop(acl::redis_list &option, int n)
+static bool test_rpop(acl::redis_list &redis, int n)
 {
 	int ret;
 	acl::string buf;
 
 	for (int i = 0; i < n; ++i)
 	{
-		option.reset();
+		redis.clear();
 		buf.clear();
-		ret = option.rpop(__key, buf);
+		ret = redis.rpop(__key, buf);
 		if (ret <= 0)
 		{
 			printf("rpop key: %s error\r\n", __key);
@@ -460,16 +460,16 @@ static bool test_rpop(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_lpop(acl::redis_list &option, int n)
+static bool test_lpop(acl::redis_list &redis, int n)
 {
 	int ret;
 	acl::string buf;
 
 	for (int i = 0; i < n; ++i)
 	{
-		option.reset();
+		redis.clear();
 		buf.clear();
-		ret = option.lpop(__key, buf);
+		ret = redis.lpop(__key, buf);
 		if (ret <= 0)
 		{
 			printf("lpop key: %s error\r\n", __key);
@@ -481,7 +481,7 @@ static bool test_lpop(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_blpop(acl::redis_list &option, int n)
+static bool test_blpop(acl::redis_list &redis, int n)
 {
 	std::vector<acl::string> keys;
 	acl::string key;
@@ -492,7 +492,7 @@ static bool test_blpop(acl::redis_list &option, int n)
 		key.format("%s_%d",__key, i);
 		keys.push_back(key);
 	}
-	bool ret = option.blpop(keys, n, result);
+	bool ret = redis.blpop(keys, n, result);
 	if (ret == false)
 	{
 		printf("blpop timeout\r\n");
@@ -505,7 +505,7 @@ static bool test_blpop(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_brpop(acl::redis_list &option, int n)
+static bool test_brpop(acl::redis_list &redis, int n)
 {
 	std::vector<acl::string> keys;
 	acl::string key;
@@ -517,8 +517,8 @@ static bool test_brpop(acl::redis_list &option, int n)
 		keys.push_back(key);
 	}
 
-	option.reset();
-	bool ret = option.brpop(keys, n, result);
+	redis.clear();
+	bool ret = redis.brpop(keys, n, result);
 	if (ret == false)
 	{
 		printf("brpop timeout\r\n");
@@ -531,14 +531,14 @@ static bool test_brpop(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_rpoplpush(acl::redis_list &option, int)
+static bool test_rpoplpush(acl::redis_list &redis, int)
 {
 	acl::string src("list_src");
 	acl::string dst("list_dst");
 	acl::string buf;
 
-	option.reset();
-	bool ret = option.rpoplpush(src.c_str(), dst.c_str(), &buf);
+	redis.clear();
+	bool ret = redis.rpoplpush(src.c_str(), dst.c_str(), &buf);
 	if(ret == false)
 	{
 		printf("rpoplpush src:%s, dst:%s error\r\n",
@@ -552,14 +552,14 @@ static bool test_rpoplpush(acl::redis_list &option, int)
 	return true;
 
 }
-static bool test_brpoplpush(acl::redis_list &option, int)
+static bool test_brpoplpush(acl::redis_list &redis, int)
 {
 	acl::string src("list1");
 	acl::string dst("list");
 	acl::string buf;
 
-	option.reset();
-	bool ret = option.brpoplpush(src.c_str(), dst.c_str(), 1, &buf);
+	redis.clear();
+	bool ret = redis.brpoplpush(src.c_str(), dst.c_str(), 1, &buf);
 	if(ret == false)
 	{
 		printf("brpoplpush src:%s, dst:%s timeout\r\n",
@@ -573,10 +573,10 @@ static bool test_brpoplpush(acl::redis_list &option, int)
 	return true;
 }
 
-static bool test_lrem(acl::redis_list &option, int n)
+static bool test_lrem(acl::redis_list &redis, int n)
 {
-	option.reset();
-	int ret = option.lrem(__key, n, "list1_1");
+	redis.clear();
+	int ret = redis.lrem(__key, n, "list1_1");
 	if (ret < 0)
 	{
 		printf("lrem key:%s,count:%d error\r\n", __key, n);
@@ -588,10 +588,10 @@ static bool test_lrem(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_ltrim(acl::redis_list &option, int n)
+static bool test_ltrim(acl::redis_list &redis, int n)
 {
-	option.reset();
-	bool ret = option.ltrim(__key, 0, n);
+	redis.clear();
+	bool ret = redis.ltrim(__key, 0, n);
 	if (ret == false)
 	{
 		printf("ltrim key:%s,start:%d end:%d error\r\n", __key, 0, n);
@@ -603,10 +603,10 @@ static bool test_ltrim(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_llen(acl::redis_list &option, int)
+static bool test_llen(acl::redis_list &redis, int)
 {
-	option.reset();
-	int len = option.llen(__key);
+	redis.clear();
+	int len = redis.llen(__key);
 	if (len < 0)
 	{
 		printf("llen key:%s error\r\n", __key);
@@ -618,12 +618,12 @@ static bool test_llen(acl::redis_list &option, int)
 	return true;
 }
 
-static bool test_lindex(acl::redis_list &option, int n)
+static bool test_lindex(acl::redis_list &redis, int n)
 {
 	acl::string buf;
 
-	option.reset();
-	bool ret = option.lindex(__key, n, buf);
+	redis.clear();
+	bool ret = redis.lindex(__key, n, buf);
 	if (ret == false)
 	{
 		printf("lindex key:%s error\r\n",__key);
@@ -635,10 +635,10 @@ static bool test_lindex(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_lset(acl::redis_list &option, int n)
+static bool test_lset(acl::redis_list &redis, int n)
 {
-	option.reset();
-	bool ret = option.lset(__key, n, "new_value");
+	redis.clear();
+	bool ret = redis.lset(__key, n, "new_value");
 	if (ret == false)
 	{
 		printf("lset key:%s ,index:%d error\r\n",__key, n);
@@ -650,10 +650,10 @@ static bool test_lset(acl::redis_list &option, int n)
 	return true;
 }
 
-static bool test_linsert_before(acl::redis_list &option, int)
+static bool test_linsert_before(acl::redis_list &redis, int)
 {
-	option.reset();
-	int ret  = option.linsert_before(__key, "list1_1","list1_new");
+	redis.clear();
+	int ret  = redis.linsert_before(__key, "list1_1","list1_new");
 	if (ret < 0)
 	{
 		printf("linsert_before key:%s,error\r\n", __key);
@@ -665,10 +665,10 @@ static bool test_linsert_before(acl::redis_list &option, int)
 	return true;
 }
 
-static bool test_linsert_after(acl::redis_list &option, int)
+static bool test_linsert_after(acl::redis_list &redis, int)
 {
-	option.reset();
-	int ret  = option.linsert_after(__key, "list1_1","list1_new");
+	redis.clear();
+	int ret  = redis.linsert_after(__key, "list1_1","list1_new");
 	if (ret < 0)
 	{
 		printf("linsert_before key:%s,error\r\n", __key);
@@ -725,58 +725,58 @@ int main(int argc, char* argv[])
 
 	acl::acl_cpp_init();
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
-	acl::redis_list option(&client);
+	acl::redis_list redis(&client);
 	
 	bool ret;
 
 	if (cmd == "lpush")
 	{
-		ret = test_lpush(option, n)
-			&& test_lpush2(option, n)
-			&& test_lpush3(option, n)
-			&& test_lpush4(option, n)
-			&& test_lpush5(option, n)
-			&& test_lpush6(option, n);
+		ret = test_lpush(redis, n)
+			&& test_lpush2(redis, n)
+			&& test_lpush3(redis, n)
+			&& test_lpush4(redis, n)
+			&& test_lpush5(redis, n)
+			&& test_lpush6(redis, n);
 	}
 	else if (cmd == "rpush")
-		ret = test_rpush(option, n)
-			&& test_rpush2(option, n)
-			&& test_rpush3(option, n)
-			&& test_rpush4(option, n)
-			&& test_rpush5(option, n)
-			&& test_rpush6(option, n);
+		ret = test_rpush(redis, n)
+			&& test_rpush2(redis, n)
+			&& test_rpush3(redis, n)
+			&& test_rpush4(redis, n)
+			&& test_rpush5(redis, n)
+			&& test_rpush6(redis, n);
 	else if (cmd == "lpushx")
-		ret = test_lpushx(option, n) && test_lpushx2(option, n);
+		ret = test_lpushx(redis, n) && test_lpushx2(redis, n);
 	else if (cmd == "rpushx")
-		ret = test_rpushx(option, n) && test_rpushx2(option, n);
+		ret = test_rpushx(redis, n) && test_rpushx2(redis, n);
 	else if (cmd == "lrange")
-		ret = test_lrange(option);
+		ret = test_lrange(redis);
 	else if (cmd == "rpop")
-		ret = test_rpop(option, n);
+		ret = test_rpop(redis, n);
 	else if (cmd == "lpop")
-		ret = test_lpop(option, n);
+		ret = test_lpop(redis, n);
 	else if (cmd == "blpop")
-		ret = test_blpop(option, n);
+		ret = test_blpop(redis, n);
 	else if (cmd == "brpop")
-		ret = test_brpop(option, n);
+		ret = test_brpop(redis, n);
 	else if (cmd == "rpoplpush")
-		ret = test_rpoplpush(option, n);
+		ret = test_rpoplpush(redis, n);
 	else if (cmd == "brpoplpush")
-		ret = test_brpoplpush(option, n);
+		ret = test_brpoplpush(redis, n);
 	else if (cmd == "lrem")
-		ret = test_lrem(option, n);
+		ret = test_lrem(redis, n);
 	else if (cmd == "ltrim")
-		ret = test_ltrim(option, n);
+		ret = test_ltrim(redis, n);
 	else if (cmd == "llen")
-		ret = test_llen(option, n);
+		ret = test_llen(redis, n);
 	else if (cmd == "lindex")
-		ret = test_lindex(option, n);
+		ret = test_lindex(redis, n);
 	else if (cmd == "lset")
-		ret = test_lset(option, n);
+		ret = test_lset(redis, n);
 	else if (cmd == "linsert_before")
-		ret = test_linsert_before(option,1);
+		ret = test_linsert_before(redis,1);
 	else if (cmd == "linsert_after")
-		ret = test_linsert_after(option,1);
+		ret = test_linsert_after(redis,1);
 	else
 	{
 		ret = false;

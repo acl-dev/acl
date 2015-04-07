@@ -2,7 +2,7 @@
 
 static acl::string __keypre("set_key");
 
-static bool test_sadd(acl::redis_set& option, int n)
+static bool test_sadd(acl::redis_set& redis, int n)
 {
 	acl::string key;
 	std::vector<acl::string> members;
@@ -20,8 +20,8 @@ static bool test_sadd(acl::redis_set& option, int n)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 
-		option.reset();
-		int ret = option.sadd(key, members);
+		redis.clear();
+		int ret = redis.sadd(key, members);
 		if (ret < 0)
 		{
 			printf("sadd key: %s error\r\n", key.c_str());
@@ -36,15 +36,15 @@ static bool test_sadd(acl::redis_set& option, int n)
 	return true;
 }
 
-static bool test_scard(acl::redis_set& option, int n)
+static bool test_scard(acl::redis_set& redis, int n)
 {
 	acl::string key;
 
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		int ret = option.scard(key.c_str());
+		redis.clear();
+		int ret = redis.scard(key.c_str());
 		if (ret < 0)
 		{
 			printf("scard key: %s error\r\n", key.c_str());
@@ -59,7 +59,7 @@ static bool test_scard(acl::redis_set& option, int n)
 	return true;
 }
 
-static bool test_sdiff(acl::redis_set& option, int n)
+static bool test_sdiff(acl::redis_set& redis, int n)
 {
 	acl::string key;
 	std::vector<acl::string> keys;
@@ -73,8 +73,8 @@ static bool test_sdiff(acl::redis_set& option, int n)
 
 	for (int i = 0; i < n; i++)
 	{
-		option.reset();
-		int ret = option.sdiff(keys, &result);
+		redis.clear();
+		int ret = redis.sdiff(keys, &result);
 		if (ret < 0)
 		{
 			printf("sdiff error\r\n");
@@ -87,7 +87,7 @@ static bool test_sdiff(acl::redis_set& option, int n)
 	return true;
 }
 
-static bool test_sdiffstore(acl::redis_set& option, int n)
+static bool test_sdiffstore(acl::redis_set& redis, int n)
 {
 	acl::string key, dest_key("set_dest_key");
 	std::vector<acl::string> keys;
@@ -100,8 +100,8 @@ static bool test_sdiffstore(acl::redis_set& option, int n)
 
 	for (int i = 0; i < n; i++)
 	{
-		option.reset();
-		int ret = option.sdiffstore(dest_key.c_str(), keys);
+		redis.clear();
+		int ret = redis.sdiffstore(dest_key.c_str(), keys);
 		if (ret < 0)
 		{
 			printf("sdiffstore error, dest: %s\r\n",
@@ -118,7 +118,7 @@ static bool test_sdiffstore(acl::redis_set& option, int n)
 	return true;
 }
 
-static bool test_sismember(acl::redis_set& option, int n)
+static bool test_sismember(acl::redis_set& redis, int n)
 {
 	bool ret;
 	acl::string key, member;
@@ -130,9 +130,9 @@ static bool test_sismember(acl::redis_set& option, int n)
 		for (int j = 0; j < 1000; j++)
 		{
 			member.format("member_%d", j);
-			option.reset();
-			ret = option.sismember(key.c_str(), member.c_str());
-			if (option.eof())
+			redis.clear();
+			ret = redis.sismember(key.c_str(), member.c_str());
+			if (redis.eof())
 			{
 				printf("sismmeber eof, key: %s, member: %s\r\n",
 					key.c_str(), member.c_str());
@@ -150,7 +150,7 @@ static bool test_sismember(acl::redis_set& option, int n)
 	return true;
 }
 
-static bool test_smembers(acl::redis_set& option, int n)
+static bool test_smembers(acl::redis_set& redis, int n)
 {
 	acl::string key;
 	std::vector<acl::string> members;
@@ -158,8 +158,8 @@ static bool test_smembers(acl::redis_set& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		int ret = option.smembers(key.c_str(), &members);
+		redis.clear();
+		int ret = redis.smembers(key.c_str(), &members);
 		if (ret < 0)
 		{
 			printf("smembers error, key: %s\r\n", key.c_str());
@@ -175,7 +175,7 @@ static bool test_smembers(acl::redis_set& option, int n)
 	return true;
 }
 
-static bool test_smove(acl::redis_set& option, int n)
+static bool test_smove(acl::redis_set& redis, int n)
 {
 	acl::string src_key, dst_key;
 	acl::string member;
@@ -189,8 +189,8 @@ static bool test_smove(acl::redis_set& option, int n)
 		for (int j = 0; j < 1000; j++)
 		{
 			member.format("member_%d", j);
-			option.reset();
-			ret = option.smove(src_key.c_str(), dst_key.c_str(),
+			redis.clear();
+			ret = redis.smove(src_key.c_str(), dst_key.c_str(),
 					member.c_str());
 
 			if (ret < 0)
@@ -211,7 +211,7 @@ static bool test_smove(acl::redis_set& option, int n)
 	return true;
 }
 
-static bool test_spop(acl::redis_set& option, int n)
+static bool test_spop(acl::redis_set& redis, int n)
 {
 	acl::string key;
 	acl::string member;
@@ -219,9 +219,9 @@ static bool test_spop(acl::redis_set& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		bool ret = option.spop(key.c_str(), member);
-		if (option.eof())
+		redis.clear();
+		bool ret = redis.spop(key.c_str(), member);
+		if (redis.eof())
 		{
 			printf("spop eof, key: %s\r\n", key.c_str());
 			return false;
@@ -237,7 +237,7 @@ static bool test_spop(acl::redis_set& option, int n)
 	return true;
 }
 
-static bool test_srandmember(acl::redis_set& option, int n)
+static bool test_srandmember(acl::redis_set& redis, int n)
 {
 	acl::string key;
 	acl::string member;
@@ -246,9 +246,9 @@ static bool test_srandmember(acl::redis_set& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		ret = option.srandmember(key.c_str(), member);
-		if (option.eof())
+		redis.clear();
+		ret = redis.srandmember(key.c_str(), member);
+		if (redis.eof())
 			return false;
 
 		if (i >= 10)
@@ -261,7 +261,7 @@ static bool test_srandmember(acl::redis_set& option, int n)
 	return true;
 }
 
-static bool test_srem(acl::redis_set& option, int n)
+static bool test_srem(acl::redis_set& redis, int n)
 {
 	acl::string key;
 	acl::string member;
@@ -279,8 +279,8 @@ static bool test_srem(acl::redis_set& option, int n)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 
-		option.reset();
-		int ret = option.srem(key.c_str(), members);
+		redis.clear();
+		int ret = redis.srem(key.c_str(), members);
 
 		if (ret < 0)
 		{
@@ -296,7 +296,7 @@ static bool test_srem(acl::redis_set& option, int n)
 	return true;
 }
 
-static bool test_sunion(acl::redis_set& option ,int n)
+static bool test_sunion(acl::redis_set& redis ,int n)
 {
 	acl::string key;
 	std::vector<acl::string> keys;
@@ -310,8 +310,8 @@ static bool test_sunion(acl::redis_set& option ,int n)
 
 	for (int i = 0; i < n; i++)
 	{
-		option.reset();
-		int ret = option.sunion(keys, &result);
+		redis.clear();
+		int ret = redis.sunion(keys, &result);
 		if (ret < 0)
 		{
 			printf("sunion error\r\n");
@@ -324,7 +324,7 @@ static bool test_sunion(acl::redis_set& option ,int n)
 	return true;
 }
 
-static bool test_sunionstore(acl::redis_set& option, int n)
+static bool test_sunionstore(acl::redis_set& redis, int n)
 {
 	acl::string key, dest_key("set_dest_key");
 	std::vector<acl::string> keys;
@@ -337,8 +337,8 @@ static bool test_sunionstore(acl::redis_set& option, int n)
 
 	for (int i = 0; i < n; i++)
 	{
-		option.reset();
-		int ret = option.sunionstore(dest_key.c_str(), keys);
+		redis.clear();
+		int ret = redis.sunionstore(dest_key.c_str(), keys);
 		if (ret < 0)
 		{
 			printf("sdiffstore error, dest: %s\r\n",
@@ -353,7 +353,7 @@ static bool test_sunionstore(acl::redis_set& option, int n)
 	return true;
 }
 
-static bool test_sscan(acl::redis_set& option, int n)
+static bool test_sscan(acl::redis_set& redis, int n)
 {
 	acl::string key;
 	int   ret = 0;
@@ -365,8 +365,8 @@ static bool test_sscan(acl::redis_set& option, int n)
 		key.format("%s_%d", __keypre.c_str(), i);
 		while (true)
 		{
-			option.reset();
-			ret = option.sscan(key.c_str(), ret, result);
+			redis.clear();
+			ret = redis.sscan(key.c_str(), ret, result);
 			if (ret < 0)
 			{
 				printf("sscan failed, key: %s\r\n",
@@ -439,51 +439,51 @@ int main(int argc, char* argv[])
 
 	acl::acl_cpp_init();
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
-	acl::redis_set option(&client);
+	acl::redis_set redis(&client);
 
 	bool ret;
 
 	if (cmd == "sadd")
-		ret = test_sadd(option, n);
+		ret = test_sadd(redis, n);
 	else if (cmd == "scard")
-		ret = test_scard(option, n);
+		ret = test_scard(redis, n);
 	else if (cmd == "sdiff")
-		ret = test_sdiff(option, n);
+		ret = test_sdiff(redis, n);
 	else if (cmd == "sdiffstore")
-		ret = test_sdiffstore(option, n);
+		ret = test_sdiffstore(redis, n);
 	else if (cmd == "sismember")
-		ret = test_sismember(option, n);
+		ret = test_sismember(redis, n);
 	else if (cmd == "smembers")
-		ret = test_smembers(option, n);
+		ret = test_smembers(redis, n);
 	else if (cmd == "smove")
-		ret = test_smove(option, n);
+		ret = test_smove(redis, n);
 	else if (cmd == "spop")
-		ret = test_spop(option, n);
+		ret = test_spop(redis, n);
 	else if (cmd == "srandmember")
-		ret = test_srandmember(option, n);
+		ret = test_srandmember(redis, n);
 	else if (cmd == "srem")
-		ret = test_srem(option, n);
+		ret = test_srem(redis, n);
 	else if (cmd == "sunion")
-		ret = test_sunion(option, n);
+		ret = test_sunion(redis, n);
 	else if (cmd == "sunionstore")
-		ret = test_sunionstore(option, n);
+		ret = test_sunionstore(redis, n);
 	else if (cmd == "sscan")
-		ret = test_sscan(option, n);
+		ret = test_sscan(redis, n);
 	else if (cmd == "all")
 	{
-		ret = test_sadd(option, n)
-			&& test_scard(option, n)
-			&& test_sdiff(option, n)
-			&& test_sdiffstore(option, n)
-			&& test_sismember(option, n)
-			&& test_smembers(option, n)
-			&& test_smove(option, n)
-			&& test_spop(option, n)
-			&& test_srandmember(option, n)
-			&& test_sunion(option, n)
-			&& test_sunionstore(option, n)
-			&& test_sscan(option, n)
-			&& test_srem(option, n);
+		ret = test_sadd(redis, n)
+			&& test_scard(redis, n)
+			&& test_sdiff(redis, n)
+			&& test_sdiffstore(redis, n)
+			&& test_sismember(redis, n)
+			&& test_smembers(redis, n)
+			&& test_smove(redis, n)
+			&& test_spop(redis, n)
+			&& test_srandmember(redis, n)
+			&& test_sunion(redis, n)
+			&& test_sunionstore(redis, n)
+			&& test_sscan(redis, n)
+			&& test_srem(redis, n);
 	}
 	else
 	{

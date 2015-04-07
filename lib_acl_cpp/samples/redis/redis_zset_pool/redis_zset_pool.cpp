@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-static bool test_zadd(acl::redis_zset& option, int i, const char* key,
+static bool test_zadd(acl::redis_zset& redis, int i, const char* key,
 	const char* big_data, size_t length, size_t base_length)
 {
 	// 将大数据进行分割，计算出分割后的数据块个数
@@ -9,7 +9,7 @@ static bool test_zadd(acl::redis_zset& option, int i, const char* key,
 		nmember++;
 
 	// 从连接对象中获得统一的内存池分配对象，分配小内存块
-	acl::dbuf_pool* pool = option.get_pool();
+	acl::dbuf_pool* pool = redis.get_pool();
 	// 动态分配数据块指针数组内存
 	const char** members = (const char**)
 		pool->dbuf_alloc(nmember * sizeof(char*));
@@ -47,10 +47,10 @@ static bool test_zadd(acl::redis_zset& option, int i, const char* key,
 
 	// 要求 redis 连接对象采用内存链协议组装方式，避免内部组装请求协议时
 	// 再组装成大内存
-	option.get_client()->set_slice_request(true);
+	redis.get_client()->set_slice_request(true);
 
 	// 开始向 redis 添加数据
-	int ret = option.zadd(key, members, lens, scores, nmember);
+	int ret = redis.zadd(key, members, lens, scores, nmember);
 	if (ret < 0)
 	{
 		printf("add key: %s error\r\n", key);
@@ -62,12 +62,12 @@ static bool test_zadd(acl::redis_zset& option, int i, const char* key,
 	return true;
 }
 
-static bool test_zcard(acl::redis_zset& option, int i, const char* key)
+static bool test_zcard(acl::redis_zset& redis, int i, const char* key)
 {
 	// 因为该协议数据比较小，所以在组装请求数据时不必采用分片方式
-	option.get_client()->set_slice_request(false);
+	redis.get_client()->set_slice_request(false);
 
-	int ret = option.zcard(key);
+	int ret = redis.zcard(key);
 	if (ret < 0)
 	{
 		printf("zcard key: %s error\r\n", key);
@@ -79,18 +79,18 @@ static bool test_zcard(acl::redis_zset& option, int i, const char* key)
 	return true;
 }
 
-static bool test_zrange(acl::redis_zset& option, int i, const char* key,
+static bool test_zrange(acl::redis_zset& redis, int i, const char* key,
 	const char* hmac)
 {
 	int start = 0, end = -1;
 
 	// 请求的数据量比较小，所以在组装请求协议时不必采用分片方式
-	option.get_client()->set_slice_request(false);
+	redis.get_client()->set_slice_request(false);
 
 	// 对服务器返回的数据也不分片
-	option.get_client()->set_slice_respond(false);
+	redis.get_client()->set_slice_respond(false);
 
-	int ret = option.zrange(key, start, end, NULL);
+	int ret = redis.zrange(key, start, end, NULL);
 	if (ret <= 0)
 	{
 		printf("zrange return: %d\r\n", ret);
@@ -98,7 +98,7 @@ static bool test_zrange(acl::redis_zset& option, int i, const char* key,
 	}
 
 	// 获得数组元素结果集
-	const acl::redis_result* result = option.get_result();
+	const acl::redis_result* result = redis.get_result();
 	if (result == NULL)
 	{
 		printf("result null\r\n");
@@ -188,9 +188,9 @@ static bool test_zrange(acl::redis_zset& option, int i, const char* key,
 	return true;
 }
 
-static bool test_del(acl::redis_key& option, int i, const char* key)
+static bool test_del(acl::redis_key& redis, int i, const char* key)
 {
-	int ret = option.del(key, NULL) < 0 ? false : true;
+	int ret = redis.del(key, NULL) < 0 ? false : true;
 	if (ret < 0)
 		printf("del %s error, i: %d\r\n", key, i);
 	else if (i < 10)
@@ -220,8 +220,8 @@ protected:
 	{
 		bool ret;
 		acl::redis_client* conn;
-		acl::redis_zset option;
-		acl::redis_key key_option;
+		acl::redis_zset redis;
+		acl::redis_key key_redis;
 		acl::string key;
 
 		for (int i = 0; i < n_; i++)
@@ -238,33 +238,33 @@ protected:
 			// 每个线程一个 ID 号，做为键值组成部分
 			key.format("%s_%d_%d", __keypre.c_str(), id_, i);
 
-			option.reset();
+			redis.clear();
 			// 将 redis 连接对象与 redis 命令操作类对象进行绑定关联
-			option.set_client(conn);
+			redis.set_client(conn);
 
 			if (cmd_ == "zadd")
-				ret = test_zadd(option, i, key.c_str(),
+				ret = test_zadd(redis, i, key.c_str(),
 					__big_data, __big_data_length,
 					__base_length);
 			else if (cmd_ == "zcard")
-				ret = test_zcard(option, i, key);
+				ret = test_zcard(redis, i, key);
 			else if (cmd_ == "zrange")
-				ret = test_zrange(option, i, key, __hmac);
+				ret = test_zrange(redis, i, key, __hmac);
 			else if (cmd_ == "del")
 			{
-				key_option.set_client(conn);
-				ret = test_del(key_option, i, key);
+				key_redis.set_client(conn);
+				ret = test_del(key_redis, i, key);
 			}
 			else if (cmd_ != "all")
 			{
 				printf("unknown cmd: %s\r\n", cmd_.c_str());
 				ret = false;
 			}
-			else if (test_zadd(option, i, key.c_str(),
+			else if (test_zadd(redis, i, key.c_str(),
 					__big_data, __big_data_length,
 					__base_length) == false
-				|| test_zcard(option, i, key) == false
-				|| test_zrange(option, i, key, __hmac) == false)
+				|| test_zcard(redis, i, key) == false
+				|| test_zrange(redis, i, key, __hmac) == false)
 			{
 				ret = false;
 			}

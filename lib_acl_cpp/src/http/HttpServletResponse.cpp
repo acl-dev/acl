@@ -155,6 +155,23 @@ bool HttpServletResponse::write(const void* data, size_t len)
 	if (data == NULL || len == 0)
 		return stream_.format("0\r\n\r\n") == -1 ? false : true;
 
+#if 1
+	struct iovec iov[3];
+
+	char hdr[32];
+	safe_snprintf(hdr, sizeof(hdr), "%x\r\n", (int) len);
+
+	iov[0].iov_base = (void*) hdr;
+	iov[0].iov_len = strlen(hdr);
+
+	iov[1].iov_base = (void*) data;
+	iov[1].iov_len = (int) len;
+
+	iov[2].iov_base = (void*) "\r\n";
+	iov[2].iov_len = 2;
+
+	return stream_.writev(iov, 3) == -1 ? false : true;
+#else
 	if (stream_.format("%x\r\n", (int) len) == -1)
 		return false;
 	if (stream_.write(data, len) == -1)
@@ -162,6 +179,7 @@ bool HttpServletResponse::write(const void* data, size_t len)
 	if (stream_.write("\r\n", 2) == -1)
 		return false;
 	return true;
+#endif
 }
 
 bool HttpServletResponse::write(const string& buf)

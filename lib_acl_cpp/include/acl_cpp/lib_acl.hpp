@@ -150,5 +150,6 @@
 #include "acl_cpp/redis/redis_hyperloglog.hpp"
 #include "acl_cpp/redis/redis_connection.hpp"
 #include "acl_cpp/redis/redis_cluster.hpp"
+#include "acl_cpp/redis/redis_slot.hpp"
 #include "acl_cpp/redis/redis_node.hpp"
 #include "acl_cpp/redis/redis.hpp"

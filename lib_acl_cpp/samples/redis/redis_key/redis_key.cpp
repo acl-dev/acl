@@ -2,15 +2,15 @@
 
 static acl::string __keypre("test_key");
 
-static bool test_del(acl::redis_key& option, int n)
+static bool test_del(acl::redis_key& redis, int n)
 {
 	acl::string key;
 
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		int ret = option.del_one(key.c_str());
+		redis.clear();
+		int ret = redis.del_one(key.c_str());
 		if (ret < 0)
 		{
 			printf("del key: %s error\r\n", key.c_str());
@@ -23,15 +23,15 @@ static bool test_del(acl::redis_key& option, int n)
 	return true;
 }
 
-static bool test_expire(acl::redis_key& option, int n)
+static bool test_expire(acl::redis_key& redis, int n)
 {
 	acl::string key;
 
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		if (option.expire(key.c_str(), 100) < 0)
+		redis.clear();
+		if (redis.expire(key.c_str(), 100) < 0)
 		{
 			printf("expire key: %s error\r\n", key.c_str());
 			return false;
@@ -43,7 +43,7 @@ static bool test_expire(acl::redis_key& option, int n)
 	return true;
 }
 
-static bool test_ttl(acl::redis_key& option, int n)
+static bool test_ttl(acl::redis_key& redis, int n)
 {
 	acl::string key;
 	int ttl;
@@ -51,8 +51,8 @@ static bool test_ttl(acl::redis_key& option, int n)
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		if ((ttl = option.ttl(key.c_str())) < 0)
+		redis.clear();
+		if ((ttl = redis.ttl(key.c_str())) < 0)
 		{
 			printf("get ttl key: %s error\r\n", key.c_str());
 			return false;
@@ -65,15 +65,15 @@ static bool test_ttl(acl::redis_key& option, int n)
 	return true;
 }
 
-static bool test_exists(acl::redis_key& option, int n)
+static bool test_exists(acl::redis_key& redis, int n)
 {
 	acl::string key;
 
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		if (option.exists(key.c_str()) == false)
+		redis.clear();
+		if (redis.exists(key.c_str()) == false)
 			printf("no exists key: %s\r\n", key.c_str());
 		else
 			printf("exists key: %s\r\n", key.c_str());
@@ -82,15 +82,15 @@ static bool test_exists(acl::redis_key& option, int n)
 	return true;
 }
 
-static bool test_type(acl::redis_key& option, int n)
+static bool test_type(acl::redis_key& redis, int n)
 {
 	acl::string key;
 
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
-		option.reset();
-		acl::redis_key_t ret = option.type(key.c_str());
+		redis.clear();
+		acl::redis_key_t ret = redis.type(key.c_str());
 		if (ret == acl::REDIS_KEY_UNKNOWN)
 		{
 			printf("unknown type key: %s\r\n", key.c_str());
@@ -149,27 +149,27 @@ int main(int argc, char* argv[])
 
 	acl::acl_cpp_init();
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
-	acl::redis_key option(&client);
+	acl::redis_key redis(&client);
 
 	bool ret;
 
 	if (cmd == "del")
-		ret = test_del(option, n);
+		ret = test_del(redis, n);
 	else if (cmd == "expire")
-		ret = test_expire(option, n);
+		ret = test_expire(redis, n);
 	else if (cmd == "ttl")
-		ret = test_ttl(option, n);
+		ret = test_ttl(redis, n);
 	else if (cmd == "exists")
-		ret = test_exists(option, n);
+		ret = test_exists(redis, n);
 	else if (cmd == "type")
-		ret = test_type(option, n);
+		ret = test_type(redis, n);
 	else if (cmd == "all")
 	{
-		ret = test_expire(option, n)
-			&& test_ttl(option, n)
-			&& test_exists(option, n)
-			&& test_type(option, n)
-			&& test_del(option, n);
+		ret = test_expire(redis, n)
+			&& test_ttl(redis, n)
+			&& test_exists(redis, n)
+			&& test_type(redis, n)
+			&& test_del(redis, n);
 	}
 	else
 	{

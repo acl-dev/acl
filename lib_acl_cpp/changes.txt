@@ -1,6 +1,22 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+298) 2015.4.7
+298.1) bugfix: redis_cluster 类中的 reset 方法与基类 redis_command 中的方法
+重名，造成了命名污染，现将 redis_cluster 中的所有方法都加了前缀 cluster_
+298.2) bugfix: acl::redis 类因为是虚继承了 redis_xxx 类，所以无法通过这些
+类的构造函数将参数传递给基类 redis_command 的构造函数，必须在 acl::redis
+的构造函数中显示地将参数传递给基类 redis_command 的构造函数
+298.3) feature: acl::redis_cluster 类中的 cluster_nodes, cluster_slots,
+cluster_slaves, cluster_info 方法返回组织好的结果集
+
+297) 2015.4.6
+297.1) feature: 增加了 redis_slot 类及 redis_node 类
+
+296) 2015.4.5
+296.1) performance: HttpServletResponse::write 当采用 chunk 传输时由原来的
+多次调用系统 API write 方式改为只调用一次 writev，从而减少了系统调用次数
+
 295) 2015.4.4
 295.1) feature: connect_monitor 连接池自动检测类支持应用重载 IO 处理过程，从而
 可以面向更复杂的通信协议处理情况

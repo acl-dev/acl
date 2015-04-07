@@ -1,50 +1,68 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <vector>
+#include <utility>
+#include "acl_cpp/stdlib/string.hpp"
 
 namespace acl
 {
 
-class redis_node
+class ACL_CPP_API redis_node
 {
 public:
-	redis_node(size_t slot_min, size_t slot_max, const char* ip, int port);
+	redis_node(const char* id, const char* addr);
+	redis_node(const redis_node& node);
 	~redis_node();
 
-	redis_node& add_slave(redis_node* node);
+	void set_master(const redis_node* master);
+	void set_master_id(const char* id);
+	bool add_slave(redis_node* slave);
+	const redis_node* remove_slave(const char* id);
+	void clear_slaves(bool free_all = false);
 
-	const std::vector<redis_node*>& get_slaves() const
+	void add_slot_range(size_t min, size_t max);
+	const std::vector<std::pair<size_t, size_t> >& get_slots() const
 	{
-		return slaves_;
+		return slots_;
 	}
 
-	const char* get_ip() const
+	const redis_node* get_master() const
 	{
-		return ip_;
+		return master_;
 	}
 
-	int get_port() const
+	const char* get_master_id() const
 	{
-		return port_;
+		return master_id_.c_str();
 	}
 
-	size_t get_slot_range_from() const
+	const std::vector<redis_node*>* get_slaves() const
 	{
-		return slot_range_from_;
+		return (master_ && master_ == this) ? &slaves_ : NULL;
 	}
 
-	size_t get_slot_range_to() const
+	bool is_master() const
 	{
-		return slot_range_to_;
+		return master_ == this;
+	}
+
+	const char* get_id() const
+	{
+		return id_.c_str();
+	}
+
+	const char* get_addr() const
+	{
+		return addr_.c_str();
 	}
 
 private:
-	size_t slot_range_from_;
-	size_t slot_range_to_;
-	char ip_[128];
-	int port_;
-
+	string id_;
+	string addr_;
+	const redis_node* master_;
+	string master_id_;
 	std::vector<redis_node*> slaves_;
+	std::vector<std::pair<size_t, size_t> > slots_;
 };
 
 } // namespace acl
