@@ -55,7 +55,8 @@ bool redis_node::add_slave(redis_node* slave)
 	std::vector<redis_node*>::const_iterator cit;
 	for (cit = slaves_.begin(); cit != slaves_.end(); ++cit)
 	{
-		if (*cit == slave)
+		if (*cit == slave
+			|| strcmp(slave->get_id(), (*cit)->get_id()) == 0)
 		{
 			logger_warn("slave exists, id: %s, addr: %s",
 				(*cit)->get_id(), (*cit)->get_addr());
@@ -67,7 +68,7 @@ bool redis_node::add_slave(redis_node* slave)
 	return true;
 }
 
-const redis_node* redis_node::remove_slave(const char* id)
+redis_node* redis_node::remove_slave(const char* id)
 {
 	std::vector<redis_node*>::iterator it;
 	for (it = slaves_.begin(); it != slaves_.end(); ++it)
@@ -98,6 +99,19 @@ void redis_node::add_slot_range(size_t min, size_t max)
 {
 	std::pair<size_t, size_t> range = std::make_pair(min, max);
 	slots_.push_back(range);
+}
+
+const std::vector<std::pair<size_t, size_t> >& redis_node::get_slots() const
+{
+	if (is_master())
+		return slots_;
+	else if (master_ != NULL)
+		return master_->get_slots();
+	else
+	{
+		logger_warn("not master and not slave!");
+		return slots_;
+	}
 }
 
 } // namespace acl

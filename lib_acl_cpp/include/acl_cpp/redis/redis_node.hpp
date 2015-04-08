@@ -7,50 +7,143 @@
 namespace acl
 {
 
+/**
+ * 该类主要用于 redis_cluster 命令类获取有关集群 redis 结点信息
+ * this class is mainly used for redis_cluster command class to
+ * get some information about the nodes in redis cluster
+ */
 class ACL_CPP_API redis_node
 {
 public:
+	/**
+	 * 构造函数
+	 * constructor
+	 * @param id {const char*} 集群中某个 redis 结点的唯一标识符
+	 *  the unique ID for one redis node in the redis cluster
+	 * @param addr {const char*} 集群中某个 redis 结点的监听地址
+	 *  the listening addr for one redis node in redis cluster
+	 */
 	redis_node(const char* id, const char* addr);
 	redis_node(const redis_node& node);
 	~redis_node();
 
+	/**
+	 * 当本结点为从结点时，设置当前结点的主结点
+	 * setting current slave node's master node
+	 * @param master {const redis_node*} 主结点对象
+	 *  the redis master node of the current slave in cluster
+	 */
 	void set_master(const redis_node* master);
+
+	/**
+	 * 当本结点为从结点时，设置当前结点的主结点标识符
+	 * setting current node's master node when the node is slave node
+	 * @param id {const char*} 主结点唯一标识符
+	 *  the unique ID of the master node
+	 */
 	void set_master_id(const char* id);
+
+	/**
+	 * 当本结点为主结点时，添加一个从结点
+	 * add one slave node to the current node if it's one master node
+	 * @return {bool} 添加是否成功，当从结点已经存在于当前主结点时则返回 false
+	 *  false will be returned when the slave to be added is already
+	 *  existing in the current master node
+	 */
 	bool add_slave(redis_node* slave);
-	const redis_node* remove_slave(const char* id);
+
+	/**
+	 * 当本结点为主结点时，根据结点唯一标识符删除一个从结点
+	 * when the current node is a master node, this function will
+	 * remove one slave node by the unique ID
+	 * @param id {const char*} redis 结点唯一标识符
+	 *  the unique ID of the redis node
+	 * @return {const redis_node*} 返回被删除的从结点，如果不存在则返回 NULL
+	 *  the slave node according to the ID will be returned, and if
+	 *  not exists NULL will be returned
+	 */
+	redis_node* remove_slave(const char* id);
+
+	/**
+	 * 当本结点为主结点时，清空本结点的所有从结点
+	 * clear all the slave nodes in the current master node
+	 * @param free_all {bool} 是否需要同时释放这些从结点
+	 *  if freeing the all slave nodes memory meanwhile
+	 */
 	void clear_slaves(bool free_all = false);
 
+	/**
+	 * 当本结点为主结点时，添加哈希槽范围
+	 * add hash-slots range to the master node
+	 * @param min {size_t} 哈希槽范围的起始值
+	 *  the begin hash-slot of the slots range
+	 * @param max {size_t} 哈希槽范围的结束值
+	 *  the end hash-slot of the slots range
+	 */
 	void add_slot_range(size_t min, size_t max);
-	const std::vector<std::pair<size_t, size_t> >& get_slots() const
-	{
-		return slots_;
-	}
 
+	/**
+	 * 当本结点为主结点时，则获得主结点的哈希槽范围，当为从结点时则获得其对应的
+	 * 主结点的哈希槽范围
+	 * @return {const std::vector<std::pair<size_t, size_t> >&}
+	 */
+	const std::vector<std::pair<size_t, size_t> >& get_slots() const;
+
+	/**
+	 * 当本结点为从结点时，获得该从结点的主结点对象
+	 * get the current slave's master node
+	 * @return {const redis_node*}
+	 */
 	const redis_node* get_master() const
 	{
 		return master_;
 	}
 
+	/**
+	 * 当本结点为从结点时，获得该从结点对应的主结点的 ID 标识
+	 * when the current node is slave, getting its master's ID
+	 * @return {const char*}
+	 */
 	const char* get_master_id() const
 	{
 		return master_id_.c_str();
 	}
 
+	/**
+	 * 当本结点为主结点时，获得该主结点的所有从结点
+	 * getting all the slaves of the master
+	 * @return {const std::vector<redis_node*>*}
+	 */
 	const std::vector<redis_node*>* get_slaves() const
 	{
 		return (master_ && master_ == this) ? &slaves_ : NULL;
 	}
 
+	/**
+	 * 判断当前结点是否为集群中的一个主结点
+	 * check if the current node is a master in the redis cluster
+	 * @return {bool}
+	 */
 	bool is_master() const
 	{
 		return master_ == this;
 	}
 
+	/**
+	 * 获得当前结点的 ID 标识
+	 * get the unique ID of the current node, set in constructor
+	 * @return {const char*}
+	 */
 	const char* get_id() const
 	{
 		return id_.c_str();
 	}
 
+	/**
+	 * 获得当前结点的监听地址
+	 * get the listening addr of the current node, set in constructor
+	 * @reutrn {const char*}
+	 */
 	const char* get_addr() const
 	{
 		return addr_.c_str();
