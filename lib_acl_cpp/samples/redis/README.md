@@ -39,7 +39,7 @@ static void test_redis_string(acl::redis_string& cmd, const char* key)
 	val.clear();
 
 	// reset the redis command object for reusing it
-	cmd.reset();
+	cmd.clear();
 
 	// call redis-server: GET key
 	if (cmd.get(key, val) == false)
@@ -126,7 +126,7 @@ static void test_redis_string(acl::redis& cmd, const char* key)
 	val.clear();
 
 	// reset the redis command object for reusing it
-	cmd.reset();
+	cmd.clear();
 
 	// call redis-server: GET key
 	if (cmd.get(key, val) == false)
