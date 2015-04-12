@@ -389,10 +389,7 @@ redis_key_t redis_key::type(const char* key)
 	build_request(2, argv, lens);
 	const char* ptr = get_status();
 
-	if (ptr == NULL || *ptr == 0)
-		return REDIS_KEY_UNKNOWN;
-
-	if (strcasecmp(ptr, "none") == 0)
+	if (ptr == NULL || *ptr == 0 || strcasecmp(ptr, "none") == 0)
 		return REDIS_KEY_NONE;
 	else if (strcasecmp(ptr, "string") == 0)
 		return REDIS_KEY_STRING;
@@ -405,7 +402,7 @@ redis_key_t redis_key::type(const char* key)
 	else
 	{
 		logger_error("unknown type: %s, key: %s", ptr, key);
-		return REDIS_KEY_UNKNOWN;
+		return REDIS_KEY_NONE;
 	}
 }
 

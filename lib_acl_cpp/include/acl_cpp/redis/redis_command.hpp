@@ -149,8 +149,9 @@ public:
 
 	/**
 	 * 获得当前结果结点存储的对象的个数, 该方法可以获得结果为下面两个方法
-	 * (get_child/get_value) 所需要的数组元素的个数;
-	 * get number of result objects, just for functions get_child/get_value 
+	 * (result_child/result_value) 所需要的数组元素的个数;
+	 * get number of result objects, just for functions
+	 * result_child/result_value 
 	 * @return {size_t} 返回值与存储类型的对应关系如下：
 	 *  the relation between return value and result type, as below:
 	 *  REDIS_RESULT_ERROR: 1
@@ -227,13 +228,20 @@ public:
 	/**
 	 * 当从 redis-server 获得的数据是一组字符串类型的结果集时，可以调用
 	 * 本函数获得某个指定下标位置的数据;
+	 * when the reply from redis-serveer are strings array, this
+	 * function can be used to get the string specified by a subscript
 	 * @param i {size_t} 下标（从 0 开始）
+	 *  the subscript of strings array
 	 * @param len {size_t*} 若该指针非空，则存储所返回结果的长度（仅当该
 	 *  方法返回非空指针时有效）
+	 *  if len not a NULL pointer, it will store the length of string
+	 *  specified by the subscript
 	 * @return {const char*} 返回对应下标的值，当返回 NULL 时表示该下标没
 	 *  有值，为了保证使用上的安全性，返回的数据总能保证最后是以 \0 结尾，
 	 *  在计算数据长度时不包含该结尾符，但为了兼容二进制情形，调用者还是
 	 *  应该通过返回的 len 存放的长度值来获得数据的真实长度
+	 *  the string will be returned associate with the subscript, if there
+	 *  are nothing with the subscript, NULL will be returned
 	 */
 	const char* result_value(size_t i, size_t* len = NULL) const;
 
@@ -241,14 +249,24 @@ public:
 	/**
 	 * 设置是否对请求数据进行分片处理，如果为 true 则内部在组装请求协议的时候不会
 	 * 将所有数据块重新组装成一个连续的大数据块
+	 * just for request package, setting flag for sending data with
+	 * multi data chunks; this is useful when the request data is large
 	 * @param on {bool} 内部默认值为 false
+	 *  if true the request data will not be combined one package,
+	 *  internal default is false
 	 */
 	void set_slice_request(bool on);
 
 	/**
 	 * 设置是否对响应数据进行分片处理，如果为 true 则当服务器的返回数据比较大时则
 	 * 将数据进行分片，分成一些不连续的数据块
+	 * just for response package, settint flag for receiving data
+	 * if split the large response data into multi little chunks
 	 * @param on {bool} 内部默认值为 false
+	 *  if true the response data will be splitted into multi little
+	 *  data, which is useful for large reponse data for avoiding
+	 *  malloc large continuously memory from system.
+	 *  internal default is false
 	 */
 	void set_slice_respond(bool on);
 

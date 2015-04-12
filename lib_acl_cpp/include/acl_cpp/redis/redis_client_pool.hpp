@@ -16,9 +16,13 @@ class ACL_CPP_API redis_client_pool : public connect_pool
 public:
 	/**
 	 * 构造函数
+	 * constructor
 	 * @param addr {const char*} 服务端地址，格式：ip:port
+	 *  the redis-server's listening address, format: ip:port
 	 * @param count {int} 连接池的最大连接数限制
+	 *  the max connections for each connection pool
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
+	 *  the subscript of the connection pool in the connection cluster
 	 */
 	redis_client_pool(const char* addr, int count, size_t idx = 0);
 
@@ -26,8 +30,11 @@ public:
 
 	/**
 	 * 设置网络连接超时时间及网络 IO 读写超时时间(秒)
+	 * set the connect and read/write timeout in seconds
 	 * @param conn_timeout {int} 连接超时时间
+	 *  the timeout to connect in seconds
 	 * @param rw_timeout {int} 网络 IO 读写超时时间(秒)
+	 *  the timeout to read/write in seconds
 	 * @return {redis_client_pool&}
 	 */
 	redis_client_pool& set_timeout(int conn_timeout, int rw_timeout);
@@ -35,6 +42,7 @@ public:
 protected:
 	/**
 	 * 基类纯虚函数: 调用此函数用来创建一个新的连接
+	 * virtual function in class connect_pool to create a new connection
 	 * @return {connect_client*}
 	 */
 	virtual connect_client* create_connect();
