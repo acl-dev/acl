@@ -13,6 +13,7 @@ class redis_result;
 
 /**
  * 所有的字符串对象的命令都已实现
+ * all the commands in redis Strings are be implemented.
  */
 class ACL_CPP_API redis_string : virtual public redis_command
 {
@@ -37,9 +38,14 @@ public:
 
 	/**
 	 * 将字符串值 value 关联到 key
+	 * set the string value of a key
 	 * @param key {const char*} 字符串对象的 key
+	 *  the key of a string
 	 * @param value {const char*} 字符串对象的 value
+	 *  the value of a string
 	 * @return {bool} 操作是否成功，返回 false 表示出错或该 key 对象非字符串对象
+	 *  true if SET was executed correctly, false if error happened or
+	 *  the key's object isn't a string.
 	 */
 	bool set(const char* key, const char* value);
 	bool set(const char* key, size_t key_len,
@@ -48,10 +54,17 @@ public:
 	/**
 	 * 将值 value 关联到 key ，并将 key 的生存时间设为 timeout (以秒为单位)，
 	 * 如果 key 已经存在， SETEX 命令将覆写旧值
+	 * set key to hold the strnig value, and set key to timeout after
+	 * a given number of seconds.
 	 * @param key {const char*} 字符串对象的 key
+	 *  the key of a string
 	 * @param value {const char*} 字符串对象的 value
+	 *  the value of a string
 	 * @param timeout {int} 过期值，单位为秒
+	 *  the timeout in seconds of a string
 	 * @return {bool} 操作是否成功，返回 false 表示出错或该 key 对象非字符串对象
+	 *  true if SETEX was executed correctly, false if error happened
+	 *  or the object specified by the key is not a string
 	 */
 	bool setex(const char* key, const char* value, int timeout);
 	bool setex(const char* key, size_t key_len, const char* value,
@@ -60,10 +73,17 @@ public:
 	/**
 	 * 将值 value 关联到 key ，并将 key 的生存时间设为 timeout (以毫秒为单位)，
 	 * 如果 key 已经存在， SETEX 命令将覆写旧值
+	 * set key to hold the string value, and set key to timeout after
+	 * a given number of milliseconds.
 	 * @param key {const char*} 字符串对象的 key
+	 *  the key of a string
 	 * @param value {const char*} 字符串对象的 value
+	 *  the value of a string
 	 * @param timeout {int} 过期值，单位为毫秒
+	 *  the timeout in milliseconds of a string
 	 * @return {bool} 操作是否成功，返回 false 表示出错或该 key 对象非字符串对象
+	 *  true if SETEX was executed correctly, false if error happened
+	 *  or the object specified by the key is not a string
 	 */
 	bool psetex(const char* key, const char* value, int timeout);
 	bool psetex(const char* key, size_t key_len, const char* value,
@@ -72,12 +92,19 @@ public:
 	/**
 	 * 将 key 的值设为 value ，当且仅当 key 不存在，若给定的 key 已经存在，
 	 * 则 SETNX 不做任何动作
+	 * set the value of a key, only if the key does not exist.
 	 * @param key {const char*} 字符串对象的 key
+	 *  the key of the string
 	 * @param value {const char*} 字符串对象的 value
+	 *  the value of the string
 	 * @return {int} 返回值含义如下：
+	 *  return the value as below:
 	 *  -1：出错或 key 非字符串对象
+	 *      error happened or the object by the key isn't a string
 	 *   0：给定 key 的对象存在
+	 *      the string of the key already exists
 	 *   1：添加成功
+	 *      the command was executed correctly
 	 */
 	int setnx(const char* key, const char* value);
 	int setnx(const char* key, size_t key_len,
@@ -86,18 +113,28 @@ public:
 	/**
 	 * 如果 key 已经存在并且是一个字符串， APPEND 命令将 value 追加到 key 原来
 	 * 的值的末尾；如果 key 不存在， APPEND 就简单地将给定 key 设为 value
+	 * append a value to a key
 	 * @param key {const char*} 字符串对象的 key
+	 *  the key of a string
 	 * @param value {const char*} 字符串对象的值
+	 *  the value to be appended to a key
 	 * @return {int} 返回当前该字符串的长度，-1 表示出错或 key 非字符串对象
+	 *  return the length of the string after appending, -1 if error
+	 *  happened or the key's object isn't a string
 	 */
 	int append(const char* key, const char* value);
 	int append(const char* key, const char* value, size_t size);
 
 	/**
 	 * 返回 key 所关联的字符串值
+	 * get the value of a key 
 	 * @param key {const char*} 字符串对象的 key
+	 *  the key of a string
 	 * @param buf {string&} 操作成功后存储字符串对象的值
+	 *  store the value of a key after GET executed correctly
 	 * @return {bool} 操作是否成功，返回 false 表示出错或 key 非字符串对象
+	 *  if the GET was executed correctly, false if error happened or
+	 *  is is not a string of the key
 	 */
 	bool get(const char* key, string& buf);
 	bool get(const char* key, size_t len, string& buf);
