@@ -78,7 +78,7 @@ static bool test_type(acl::redis_key& redis, int i)
 	key.format("%s_%d", __keypre.c_str(), i);
 	redis.clear();
 	acl::redis_key_t ret = redis.type(key.c_str());
-	if (ret == acl::REDIS_KEY_UNKNOWN)
+	if (ret == acl::REDIS_KEY_NONE)
 	{
 		printf("unknown type key: %s\r\n", key.c_str());
 		return false;
