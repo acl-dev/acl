@@ -5,31 +5,12 @@
 namespace acl
 {
 
-redis_node::redis_node(const char* id, const char* addr)
-	: id_(id)
-	, addr_(addr)
+redis_node::redis_node()
+	: myself_(false)
+	, handshaking_(false)
+	, connected_(false)
 	, master_(NULL)
 {
-
-}
-
-redis_node::redis_node(const redis_node& node)
-{
-	id_ = node.get_id();
-	addr_ = node.get_addr();
-	master_ = node.get_master();
-	const std::vector<redis_node*>* slaves = node.get_slaves();
-	if (slaves != NULL)
-	{
-		std::vector<redis_node*>::const_iterator cit;
-		for (cit = slaves_.begin(); cit != slaves_.end(); ++cit)
-			slaves_.push_back(*cit);
-	}
-
-	const std::vector<std::pair<size_t, size_t> >& slots = node.get_slots();
-	std::vector<std::pair<size_t, size_t> >::const_iterator cit2;
-	for (cit2 = slots.begin(); cit2 != slots.end(); ++cit2)
-		slots_.push_back(*cit2);
 }
 
 redis_node::~redis_node()
@@ -37,15 +18,53 @@ redis_node::~redis_node()
 
 }
 
-void redis_node::set_master(const redis_node* master)
+redis_node& redis_node::set_id(const char* id)
 {
-	master_ = master;
+	id_ = id;
+	return *this;
 }
 
-void redis_node::set_master_id(const char* id)
+redis_node& redis_node::set_addr(const char* addr)
+{
+	addr_ = addr;
+	return *this;
+}
+
+redis_node& redis_node::set_type(const char* type)
+{
+	type_ = type;
+	return *this;
+}
+
+redis_node& redis_node::set_myself(bool yesno)
+{
+	myself_ = yesno;
+	return *this;
+}
+
+redis_node& redis_node::set_handshaking(bool yesno)
+{
+	handshaking_ = yesno;
+	return *this;
+}
+
+redis_node& redis_node::set_connected(bool yesno)
+{
+	connected_ = yesno;
+	return *this;
+}
+
+redis_node& redis_node::set_master(const redis_node* master)
+{
+	master_ = master;
+	return *this;
+}
+
+redis_node& redis_node::set_master_id(const char* id)
 {
 	if (id && *id)
 		master_id_ = id;
+	return *this;
 }
 
 bool redis_node::add_slave(redis_node* slave)
@@ -55,11 +74,20 @@ bool redis_node::add_slave(redis_node* slave)
 	std::vector<redis_node*>::const_iterator cit;
 	for (cit = slaves_.begin(); cit != slaves_.end(); ++cit)
 	{
-		if (*cit == slave
-			|| strcmp(slave->get_id(), (*cit)->get_id()) == 0)
+		if (*cit == slave)
 		{
-			logger_warn("slave exists, id: %s, addr: %s",
-				(*cit)->get_id(), (*cit)->get_addr());
+			printf("slave exists: %s, id: %s, addr: %s\r\n",
+				slave->get_id(), (*cit)->get_id(),
+				(*cit)->get_addr());
+			return false;
+		}
+		if ((*slave->get_id()) == 0)
+			continue;
+		if (strcmp(slave->get_id(), (*cit)->get_id()) == 0)
+		{
+			printf("slave exists: %s, id: %s, addr: %s\r\n",
+				slave->get_id(), (*cit)->get_id(),
+				(*cit)->get_addr());
 			return false;
 		}
 	}

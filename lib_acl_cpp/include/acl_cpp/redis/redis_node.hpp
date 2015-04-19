@@ -16,32 +16,79 @@ class ACL_CPP_API redis_node
 {
 public:
 	/**
-	 * 构造函数
-	 * constructor
-	 * @param id {const char*} 集群中某个 redis 结点的唯一标识符
-	 *  the unique ID for one redis node in the redis cluster
-	 * @param addr {const char*} 集群中某个 redis 结点的监听地址
-	 *  the listening addr for one redis node in redis cluster
+	 * 当使用此构造函数实例化类对象时，需要调用 set_id 和 set_addr 方法设置
+	 * 该 redis 结点的唯一标识符及服务监听地址，同时还可调用其它的 set_xxx 设置方法
 	 */
-	redis_node(const char* id, const char* addr);
-	redis_node(const redis_node& node);
+	redis_node();
 	~redis_node();
+
+	/**
+	 * 除了在构造函数中的参数中传入该结点的 ID 标识符外，还可以通过此函数设置
+	 * set the node's  ID
+	 * @param id {const char*} 集群中 redis 结点的唯一标识符
+	 *  the unique ID for one redis node in the reids cluster
+	 * @return {redis_node&}
+	 */
+	redis_node& set_id(const char* id);
+
+	/**
+	 * 除了在构造函数中的参数中传入该结点的地址外，还可以通过此函数设置
+	 * set the node's listening addr
+	 * @param addr {const char*} 集群中 redis 结点的服务地址，格式：ip:port
+	 *  the listening addr of one redis node in the reids cluster
+	 * @return {redis_node&}
+	 */
+	redis_node& set_addr(const char* addr);
+
+	/**
+	 * 设置当前结点的类型
+	 * set the current node's type
+	 * @param type {const char*}
+	 * @return {redis_node&}
+	 */
+	redis_node& set_type(const char* type);
+
+	/**
+	 * 设置当前结点是否为当前的连接对象
+	 * set if the current node is belonging to the current connection
+	 * @param yesno {bool}
+	 * @return {redis_node&}
+	 */
+	redis_node& set_myself(bool yesno);
 
 	/**
 	 * 当本结点为从结点时，设置当前结点的主结点
 	 * setting current slave node's master node
 	 * @param master {const redis_node*} 主结点对象
 	 *  the redis master node of the current slave in cluster
+	 * @return {redis_node&}
 	 */
-	void set_master(const redis_node* master);
+	redis_node& set_master(const redis_node* master);
+
+	/**
+	 * 设置当前结点正处于握手阶段
+	 * set the current node being in handshaking status
+	 * @param yesno {bool}
+	 * @return {redis_node&}
+	 */
+	redis_node& set_handshaking(bool yesno);
+
+	/**
+	 * 设置当前结点处于连线状态
+	 * set the node been connected in the cluster
+	 * @param yesno {bool}
+	 * @return {redis_node&}
+	 */
+	redis_node& set_connected(bool yesno);
 
 	/**
 	 * 当本结点为从结点时，设置当前结点的主结点标识符
 	 * setting current node's master node when the node is slave node
 	 * @param id {const char*} 主结点唯一标识符
 	 *  the unique ID of the master node
+	 * @return {redis_node&}
 	 */
-	void set_master_id(const char* id);
+	redis_node& set_master_id(const char* id);
 
 	/**
 	 * 当本结点为主结点时，添加一个从结点
@@ -90,6 +137,46 @@ public:
 	const std::vector<std::pair<size_t, size_t> >& get_slots() const;
 
 	/**
+	 * 获得当前结点的类型
+	 * get the node's type
+	 * @return {const char*}
+	 */
+	const char* get_type() const
+	{
+		return type_.c_str();
+	}
+
+	/**
+	 * 判断当前结点是否为当前的连接对象结点
+	 * check if the node belongs to the current connection
+	 * @return {bool}
+	 */
+	bool is_myself() const
+	{
+		return myself_;
+	}
+
+	/**
+	 * 判断当前结点是否正处于握手阶段
+	 * check if the node is in handshaking status
+	 * @return {bool}
+	 */
+	bool is_handshaking() const
+	{
+		return handshaking_;
+	}
+
+	/**
+	 * 判断当前结点是否已经处于连线状态
+	 * check if the node is connected in the cluster
+	 * @return {bool}
+	 */
+	bool is_connected() const
+	{
+		return connected_;
+	}
+
+	/**
 	 * 当本结点为从结点时，获得该从结点的主结点对象
 	 * get the current slave's master node
 	 * @return {const redis_node*}
@@ -116,7 +203,7 @@ public:
 	 */
 	const std::vector<redis_node*>* get_slaves() const
 	{
-		return (master_ && master_ == this) ? &slaves_ : NULL;
+		return &slaves_;
 	}
 
 	/**
@@ -152,6 +239,10 @@ public:
 private:
 	string id_;
 	string addr_;
+	string type_;
+	bool myself_;
+	bool handshaking_;
+	bool connected_;
 	const redis_node* master_;
 	string master_id_;
 	std::vector<redis_node*> slaves_;

@@ -301,10 +301,9 @@ private:
 	std::map<string, redis_node*> masters_;
 
 	redis_node* get_node(string& line);
-	redis_node* get_master_node(std::vector<string>& tokens);
 	void add_slot_range(redis_node* node, char* slots);
-	redis_node* get_slave_node(std::vector<string>& tokens);
 	void free_masters();
+	redis_node* get_slave(const std::vector<string>& tokens);
 
 private:
 	std::vector<redis_node*> slaves_;

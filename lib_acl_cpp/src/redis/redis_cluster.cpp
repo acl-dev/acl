@@ -638,13 +638,27 @@ const std::vector<redis_node*>* redis_cluster::cluster_slaves(const char* node)
 			node_type = ptr + 1;
 		if (strcasecmp(node_type, "slave") != 0)
 			continue;
-
-		redis_node* slave = get_slave_node(tokens);
+		redis_node* slave = get_slave(tokens);
 		if (slave != NULL)
 			slaves_.push_back(slave);
 	}
 
 	return &slaves_;
+}
+
+redis_node* redis_cluster::get_slave(const std::vector<string>& tokens)
+{
+	if (tokens.size() < 8)
+		return NULL;
+
+	redis_node* node = NEW redis_node;
+	node->set_id(tokens[0].c_str());
+	node->set_addr(tokens[1].c_str());
+	node->set_myself(false);
+	node->set_connected(strcasecmp(tokens[7].c_str(), "connected") == 0);
+	node->set_master_id(tokens[3].c_str());
+	node->set_type("slave");
+	return node;
 }
 
 void redis_cluster::free_slaves()
@@ -712,51 +726,61 @@ const std::map<string, redis_node*>* redis_cluster::cluster_nodes()
 // 94e5d32cbcc9539cc1539078ca372094c14f9f49 127.0.0.1:16380 myself,master - 0 0 1 connected 0-9 11-5460
 // e7b21f65e8d0d6e82dee026de29e499bb518db36 127.0.0.1:16381 slave d52ea3cb4cdf7294ac1fb61c696ae6483377bcfc 0 1428410625373 73 connected
 // 6a78b47b2e150693fc2bed8578a7ca88b8f1e04c 127.0.0.1:16383 myself,slave 94e5d32cbcc9539cc1539078ca372094c14f9f49 0 0 4 connected
+
+// 70a2cd8936a3d28d94b4915afd94ea69a596376a :16381 myself,master - 0 0 0 connected
+
 redis_node* redis_cluster::get_node(string& line)
 {
 	std::vector<string>& tokens = line.split2(" ");
-	if (tokens.size() < 3)
+	if (tokens.size() < 8)
+	{
+		logger_warn("invalid tokens's size: %d < 8",
+			(int) tokens.size());
 		return NULL;
+	}
 
+	bool myself = false;
 	char* node_type = tokens[2].c_str();
 	char* ptr = strchr(node_type, ',');
 	if (ptr != NULL && *(ptr + 1) != 0)
-		node_type = ptr + 1;
+	{
+		*ptr++ = 0;
+		if (strcasecmp(node_type, "myself") == 0)
+			myself = true;
+		node_type = ptr;
+	}
+
+	redis_node* node = NEW redis_node;
+	node->set_id(tokens[0].c_str());
+	node->set_addr(tokens[1].c_str());
+	node->set_myself(myself);
+	node->set_connected(strcasecmp(tokens[7].c_str(), "connected") == 0);
+	node->set_master_id(tokens[3].c_str());
 
 	if (strcasecmp(node_type, "master") == 0)
-		return get_master_node(tokens);
+	{
+		node->set_master(node);
+		node->set_type("master");
+		masters_[tokens[0]] = node;
+		size_t n = tokens.size();
+		for (size_t i = 8; i < n; i++)
+			add_slot_range(node, tokens[i].c_str());
+	}
 	else if (strcasecmp(node_type, "slave") == 0)
-		return get_slave_node(tokens);
+		node->set_type("slave");
+	else if (strcasecmp(node_type, "handshake") == 0)
+	{
+		node->set_master(node);
+		node->set_type("handshake");
+		node->set_handshaking(true);
+		masters_[tokens[0]] = node;
+		size_t n = tokens.size();
+		for (size_t i = 8; i < n; i++)
+			add_slot_range(node, tokens[i].c_str());
+	}
 	else
-	{
-		logger_error("unknown node type: %s", node_type);
-		return NULL;
-	}
-}
+		logger_warn("unknown node type: %s", node_type);
 
-redis_node* redis_cluster::get_master_node(std::vector<string>& tokens)
-{
-	if (tokens.size() < 9)
-	{
-		logger_warn("invalid tokens's size: %d", (int) tokens.size());
-		return NULL;
-	}
-
-	std::map<string, redis_node*>::const_iterator cit;
-	if ((cit = masters_.find(tokens[0].c_str())) != masters_.end())
-	{
-		logger_warn("already exists master: %s", tokens[0].c_str());
-		return NULL;
-	}
-
-	redis_node* node = NEW redis_node(tokens[0].c_str(), tokens[1].c_str());
-	node->set_master(node);
-
-	masters_[tokens[0]] = node;
-
-	size_t n = tokens.size();
-	for (size_t i = 8; i < n; i++)
-		add_slot_range(node, tokens[i].c_str());
 	return node;
 }
 
@@ -781,19 +805,6 @@ void redis_cluster::add_slot_range(redis_node* node, char* slots)
 	}
 
 	node->add_slot_range(slot_min, slot_max);
-}
-
-redis_node* redis_cluster::get_slave_node(std::vector<string>& tokens)
-{
-	if (tokens.size() < 4)
-	{
-		logger_warn("invalid tokens's size: %d", (int) tokens.size());
-		return NULL;
-	}
-
-	redis_node* node = NEW redis_node(tokens[0].c_str(), tokens[1].c_str());
-	node->set_master_id(tokens[3].c_str());
-	return node;
 }
 
 void redis_cluster::free_masters()
