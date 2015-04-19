@@ -45,3 +45,15 @@ the cluster.xml's content just like:
 '-S' specifys the new redis node added was as a slave node,
 '-N' specify the new redis addr to be added
 '-a' specify the cmd of this tool
+
+4) compile this redis_builder tool
+4.1) because redis_builder depends on lib_acl/lib_protocol/lib_acl_cpp,
+so you need to compile the lib_acl/lib_protocol/lib_acl_cpp first
+$cd lib_acl; make
+$cd lib_protocol; make
+$cd lib_acl_cpp; make
+4.2) compile redis_builder
+$cd app/redis_tools/redis_builder; make
+
+5) see redis module in acl:
+[lib_acl_cpp/samples/redis/README.md](redis of acl)
