@@ -146,7 +146,7 @@ redis_result* redis_client::get_redis_string(dbuf_pool* pool)
 	{
 		rr->set_size(1);
 		buf = (char*) pool->dbuf_alloc(len + 1);
-		if (conn_.read(buf, (size_t) len) == -1)
+		if (len > 0 && conn_.read(buf, (size_t) len) == -1)
 			return NULL;
 		buf[len] = 0;
 		rr->put(buf, (size_t) len);
