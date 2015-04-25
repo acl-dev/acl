@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_timer_callback.hpp"
 #include "aio_timer_delay_free.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
@@ -111,8 +112,17 @@ void aio_handle::on_timer_callback(int, ACL_EVENT*,
 	acl_int64 next_delay = callback->trigger();
 
 	// 如果定时器中的任务为空或未设置定时器的重复使用，则删除定时器
-	if (callback->empty() || !callback->keep_timer())
+
+	if (callback->empty())
 	{
+		logger("timer empty, delete it");
+		handle->del_timer(callback);
+		return;
+	}
+
+	if (!callback->keep_timer())
+	{
+		logger("timer no keep delete it");
 		handle->del_timer(callback);
 		return;
 	}

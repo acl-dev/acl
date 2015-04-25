@@ -145,7 +145,8 @@ public:
 	 */
 	bool cluster_setslot_stable(size_t slot);
 
-	/**设置指定的哈希槽至指定的某个 redis 结点，该指令有较为复杂的行为特征，具体
+	/**
+	 * 设置指定的哈希槽至指定的某个 redis 结点，该指令有较为复杂的行为特征，具体
 	 * 请参见官方在线文档
 	 * set one hash-slot to one redis node, for more help see online doc
 	 * @param slot {size_t} 哈希槽值

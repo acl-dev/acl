@@ -100,31 +100,24 @@ public:
 	 *  操作成功后可以通过以下任一方式获得数据
 	 *  if successul, one of below ways can be used to get the result:
 	 *  1、在调用方法中传入非空的存储结果对象的地址
-	 *     input the no-NULL result parameter when call hmget, when
-	 *     success, the result will store the values of the given fileds
-	 *
+	 *     the most easily way is to set a non-NULL result parameter
+	 *     for this function 
 	 *  2、基类方法 get_value 获得指定下标的元素数据
 	 *     call redis_command::result_value with the specified subscript
-	 *
 	 *  3、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
 	 *     redis_result::argv_to_string 方法获得元素数据
-	 *     call redis_command::result_child with specified subscript to
-	 *     get redis_result object, then call redis_result::argv_to_string
-	 *     with above result to get the values of the give fileds
-	 *
+	 *     get redis_result object with the given subscript, and get the
+	 *     element by redis_result::argv_to_string
 	 *  4、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
 	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
 	 *     的方法获得该元素的数据
-	 *     call redis_command::get_result with the specified subscript to
-	 *     get redis_result object, and use redis_result::get_child to
-	 *     get one result object, then call redis_result::argv_to_string
-	 *     to get the value of one filed.
-	 *
+	 *     get redis_result object by redis_command::get_result, and get
+	 *     the first element by redis_result::get_child, then get the
+	 *     element by the way same as the way 2 above
 	 *  5、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
 	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
-	 *     use redis_command::get_children to get the redis_result array,
-	 *     then use redis_result::argv_to_string to get every value of
-	 *     the given fileds
+	 *     get child array by redis_command::get_children, and get the
+	 *     element from one of redis_result array by argv_to_string
 	 */
 	int smembers(const char* key, std::vector<string>* members);
 
@@ -167,32 +160,24 @@ public:
 	 *  操作成功后可以通过以下任一方式获得数据
 	 *  if successul, one of below ways can be used to get the result:
 	 *  1、在调用方法中传入非空的存储结果对象的地址
-	 *     input the no-NULL result parameter when call hmget, when
-	 *     success, the result will store the values of the given fileds
-	 *
+	 *     the most easily way is to set a non-NULL result parameter
+	 *     for this function
 	 *  2、基类方法 get_value 获得指定下标的元素数据
-	 *     call redis_command::result_value with the specified subscript
-	 *
+	 *     get the specified subscript's element by redis_command::get_value
 	 *  3、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
 	 *     redis_result::argv_to_string 方法获得元素数据
-	 *     call redis_command::result_child with specified subscript to
-	 *     get redis_result object, then call redis_result::argv_to_string
-	 *     with above result to get the values of the give fileds
-	 *
+	 *     get redis_result object with the given subscript, and get the
+	 *     element by redis_result::argv_to_string
 	 *  4、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
 	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
 	 *     的方法获得该元素的数据
-	 *     call redis_command::get_result with the specified subscript to
-	 *     get redis_result object, and use redis_result::get_child to
-	 *     get one result object, then call redis_result::argv_to_string
-	 *     to get the value of one filed.
-	 *
+	 *     get redis_result object by redis_command::get_result, and get
+	 *     the first element by redis_result::get_child, then get the
+	 *     element by the way same as the way 2 above.
 	 *  5、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
 	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
-	 *     use redis_command::get_children to get the redis_result array,
-	 *     then use redis_result::argv_to_string to get every value of
-	 *     the given fileds
-	 
+	 *     get child array by redis_command::get_children, and get the
+	 *     element from one of redis_result array by argv_to_string
 	 */
 	int sdiff(std::vector<string>* members, const char* first_key, ...);
 	int sdiff(const std::vector<const char*>& keys,

@@ -179,6 +179,8 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="check_async.cpp" />
+    <ClCompile Include="check_sync.cpp" />
     <ClCompile Include="connect_client.cpp" />
     <ClCompile Include="connect_manager.cpp" />
     <ClCompile Include="connect_pool.cpp" />
@@ -192,6 +194,8 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="check_async.h" />
+    <ClInclude Include="check_sync.h" />
     <ClInclude Include="connect_client.h" />
     <ClInclude Include="connect_manager.h" />
     <ClInclude Include="connect_pool.h" />

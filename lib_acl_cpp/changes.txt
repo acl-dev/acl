@@ -1,6 +1,20 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+304) 2015.4.25
+304.1) bugfix: 类 aio_timer_callback 中的方法 set_time 中在给成员变量 present_
+赋值时，在 32 位系统下会造成计算结果值的整形溢出，以前的问题的写法为：
+present_ = ((unsigned long) now.tv_sec) * 1000000
+		+ ((unsigned long) now.tv_usec);
+现改成：
+present_ = ((long long int) now.tv_sec) * 1000000
+		+ ((long long int) now.tv_usec);
+这样编译器在编译时才会强制将计算后的结果值按 64 位对待.
+
+303) 2015.4.23
+303.1) bugfix: samples/connect_manager，异步检测对象应该是局部的，不应与 monitor
+绑定在一起，增加了 check_async 回调类
+
 302) 2015.4.21
 302.1) buffix: redis_client::get_redis_string 当数据长度为 0 时会出现异常,
 从而兼容 redis 是允许数据值为空串的情况

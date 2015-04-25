@@ -80,8 +80,8 @@ void aio_timer_callback::set_time(void)
 {
 	struct timeval now;
 	gettimeofday(&now, NULL);
-	present_ = ((unsigned long) now.tv_sec) * 1000000
-		+ ((unsigned long) now.tv_usec);
+	present_ = ((long long int) now.tv_sec) * 1000000
+		+ ((long long int) now.tv_usec);
 }
 
 #define TIMER_EMPTY		-1
@@ -238,7 +238,7 @@ acl_int64 aio_timer_callback::trigger(void)
 	if (destroy_on_unlock_)
 	{
 		destroy();
-		return -1;
+		return TIMER_EMPTY;
 	}
 	return delay < 0 ? 0 : delay;
 }

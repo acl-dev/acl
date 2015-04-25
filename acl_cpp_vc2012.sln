@@ -319,6 +319,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aio_connect", "lib_acl_cpp\
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "redis", "redis", "{14531A45-383C-4CCF-870B-B5C867A314F2}"
+	ProjectSection(SolutionItems) = preProject
+		lib_acl_cpp\samples\redis\README.md = lib_acl_cpp\samples\redis\README.md
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_key", "lib_acl_cpp\samples\redis\redis_key\redis_key_vc2012.vcxproj", "{9D97ED04-8BE4-4321-9B27-DD798CD3878C}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -470,6 +473,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{C65ABD0D-658D-4FE6-8221-4400B8387F27}"
 	ProjectSection(SolutionItems) = preProject
 		changes.txt = changes.txt
+		README.md = README.md
+		SAMPLES.md = SAMPLES.md
 	EndProjectSection
 EndProject
 Global

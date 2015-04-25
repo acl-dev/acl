@@ -8,15 +8,10 @@ public:
 	redis_builder(int meet_wait = 100);
 	~redis_builder(void);
 
-	bool build(const char* conf);
+	bool build(const char* conf, size_t replicas = 0);
 
 	bool add_node(const char* addr, const char* new_node_addr, bool slave);
 	bool del_node(const char* addr, const char* node_id);
-
-	// get the node's id of the given addr
-	bool get_node_id(const char* addr, acl::string& node_id);
-	// get the current node's ID
-	const char* myself_id(acl::redis& redis);
 
 private:
 	int meet_wait_;
@@ -24,13 +19,30 @@ private:
 	time_t last_check_;
 
 	// load the cluster.xml configure and create redis nodes for creating
-	bool load(const char* conf);
+	bool load(const char* conf, size_t replicas);
+
+	// parse xml and create cluster nodes before connecting them
+	bool create_cluster(acl::xml& xml);
+
+	// parse xml and create cluster nodes before connecting them,
+	// don't use the master/slave relation from xml configure,
+	// use the replicas param to build the cluster automatic
+	bool create_cluster(acl::xml& xml, size_t replicas);
+
+	// peek one master node and remove it from nodes
+	acl::redis_node* peek_master(std::vector<acl::redis_node*>& nodes,
+		std::map<acl::string, size_t>& addrs);
+
+	// peek one slave node and remove it from nodes
+	acl::redis_node* peek_slave(const char* master_addr,
+		std::vector<acl::redis_node*>& nodes,
+		std::map<acl::string, size_t>& addrs);
 
 	// create one master node according to one xml node of configure
 	acl::redis_node* create_master(acl::xml_node& node);
 
-	// create one slave node
-	acl::redis_node* create_slave(acl::xml_node& node);
+	// create one node
+	acl::redis_node* create_node(acl::xml_node& node);
 
 	// begin build the redis cluster, connect all redis nodes
 	bool build_cluster();

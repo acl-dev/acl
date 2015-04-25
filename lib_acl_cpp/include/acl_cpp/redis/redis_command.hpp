@@ -90,6 +90,17 @@ public:
 	}
 
 	/**
+	 * 获得当前 redis 命令对象所绑定的服务器地址，只有当该对象与 redis_client
+	 * 绑定时（即调用 set_client) 才可以调用本函数
+	 * get the redis-server's addr used by the current command. this
+	 * method can only be used only if the redis_client was set by
+	 * set_client method.
+	 * @return {const char*} 返回空串 "" 表示没有绑定 redis 连接对象
+	 *  if "" was resturned, the redis connection was not set
+	 */
+	const char* get_client_addr() const;
+
+	/**
 	 * 设置连接池集群管理器;
 	 * set the redis cluster object in redis cluster mode
 	 * @param cluster {redis_client_cluster*} redis 集群连接对象;

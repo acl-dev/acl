@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "redis_status.h"
+#include "redis_util.h"
 #include "redis_builder.h"
+#include "redis_reshard.h"
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -8,20 +10,24 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		"-s redis_addr[ip:port]\r\n"
-		"-a cmd[nodes|slots|create|add_node|del_node|node_id]\r\n"
+		"-a cmd[nodes|slots|create|add_node|del_node|node_id|reshard]\r\n"
 		"-N new_node[ip:port]\r\n"
 		"-S [add node as slave]\r\n"
+		"-r replicas[default 0]\r\n"
 		"-f configure_file\r\n",
 		procname);
 
 	printf("\r\nfor samples:\r\n"
 		"%s -s 127.0.0.1:6379 -a create -f cluster.xml\r\n"
+		"%s -s 127.0.0.1:6379 -a create -f nodes4.xml -r 2\r\n"
 		"%s -s 127.0.0.1:6379 -a nodes\r\n"
 		"%s -s 127.0.0.1:6379 -a slots\r\n"
 		"%s -s 127.0.0.1:6379 -a del_node -I node_id\r\n"
 		"%s -s 127.0.0.1:6379 -a node_id\r\n"
+		"%s -s 127.0.0.1:6379 -a reshard\r\n"
 		"%s -s 127.0.0.1:6379 -a add_node -N 127.0.0.1:6380 -S\r\n",
-		procname, procname, procname, procname, procname, procname);
+		procname, procname, procname, procname,
+		procname, procname, procname, procname);
 }
 
 int main(int argc, char* argv[])
@@ -31,10 +37,11 @@ int main(int argc, char* argv[])
 	acl::log::stdout_open(true);
 
 	int  ch;
+	size_t replicas = 0;
 	bool add_slave = false;
 	acl::string addr, cmd, conf, new_addr, node_id;
 
-	while ((ch = getopt(argc, argv, "hs:a:f:N:SI:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:a:f:N:SI:r:")) > 0)
 	{
 		switch (ch)
 		{
@@ -58,6 +65,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'I':
 			node_id = optarg;
+			break;
+		case 'r':
+			replicas = (size_t) atoi(optarg);
 			break;
 		default:
 			break;
@@ -96,7 +106,7 @@ int main(int argc, char* argv[])
 			goto END;
 		}
 		redis_builder builder;
-		builder.build(conf.c_str());
+		builder.build(conf.c_str(), replicas);
 	}
 	else if (cmd == "add_node")
 	{
@@ -126,12 +136,22 @@ int main(int argc, char* argv[])
 			goto END;
 		}
 		node_id.clear();
-		redis_builder builder;
-		if (builder.get_node_id(addr, node_id) == false)
+		if (redis_util::get_node_id(addr, node_id) == false)
 			printf("can't get node id, addr: %s\r\n", addr.c_str());
 		else
 			printf("addr: %s, node_id: %s\r\n", addr.c_str(),
 				node_id.c_str());
+	}
+	else if (cmd == "reshard")
+	{
+		if (addr.empty())
+		{
+			printf("usage: %s -s ip:port -a reshard\r\n", argv[0]);
+			goto END;
+		}
+
+		redis_reshard reshard(addr);
+		reshard.run();
 	}
 	else
 		printf("unknown cmd: %s\r\n", cmd.c_str());

@@ -179,18 +179,24 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="redis_builder.cpp" />
+    <ClCompile Include="redis_migrate.cpp" />
+    <ClCompile Include="redis_reshard.cpp" />
     <ClCompile Include="redis_status.cpp" />
+    <ClCompile Include="redis_util.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="redis_builder.h" />
+    <ClInclude Include="redis_migrate.h" />
+    <ClInclude Include="redis_reshard.h" />
     <ClInclude Include="redis_status.h" />
+    <ClInclude Include="redis_util.h" />
     <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

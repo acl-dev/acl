@@ -137,7 +137,7 @@ const std::vector<std::pair<size_t, size_t> >& redis_node::get_slots() const
 		return master_->get_slots();
 	else
 	{
-		logger_warn("not master and not slave!");
+		//logger_warn("not master and not slave!");
 		return slots_;
 	}
 }

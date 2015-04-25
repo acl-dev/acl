@@ -33,12 +33,21 @@ public:
 
 	/**
 	 * 添加对应 key 的有序集
+	 * add one or more members to a sorted set, or update its score if
+	 * it already exists
 	 * @param key {const char*} 有序集键值
-	 * @param members "分值-成员" 对数组
+	 *  the key of a sorted set
+	 * @param members "分值-成员"集合
+	 *  the set storing values and stores
 	 * @return {int} 新成功添加的 "分值-成员" 对的数量
+	 *  the number of elements added to the sorted set, not including
+	 *  elements already existing for which the score was updated
 	 *  0：表示一个也未添加，可能因为该成员已经存在于有序集中
+	 *     nothing was added to the sorted set
 	 * -1：表示出错或 key 对象非有序集对象
+	 *     error or it was not a sorted set by the key
 	 * >0：新添加的成员数量
+	 *     the number of elements added
 	 */
 	int zadd(const char* key, const std::map<string, double>& members);
 	int zadd(const char* key,
@@ -56,32 +65,52 @@ public:
 
 	/**
 	 * 获得相应键的有序集的成员数量
+	 * get the number of elements in a sorted set
 	 * @param key {const char*} 有序集键值
+	 *  the key of a a sorted set
 	 * @return {int} 一个键的有序集的成员数量
-	 *  0：该键不存在
+	 *  the number of elements of the sorted set
+	 *   0：该键不存在
+	 *      the key doesn't exist
 	 *  -1：出错或该键的数据对象不是有效的有序集对象
-	 *  > 0：当前键值对应的数据对象中的成员个数
+	 *      error or it wasn't a sorted set by the key
+	 *  >0：当前键值对应的数据对象中的成员个数
+	 *      the number of elements in the sorted set
 	 */
 	int zcard(const char* key);
 
 	/**
 	 * 获得 key 的有序集中指定分值区间的成员个数
+	 * get the number of elements in a sorted set with scores within
+	 * the given values
 	 * @param key {const char*} 有序集键值
+	 *  the key of a sorted set
 	 * @param min {double} 最小分值
+	 *  the min score specified
 	 * @param max {double} 最大分值
+	 *  the max socre specified
 	 * @return {int} 符合条件的成员个数
+	 *  the number of elements in specified score range
 	 *  0：该键对应的有序集不存在或该 KEY 有序集的对应分值区间成员为空
+	 *     nothing in the specified score range, or the key doesn't exist
 	 *  -1: 出错或该键的数据对象不是有效的有序集对象
+	 *     error or it is not a sorted set by the key
 	 */
 	int zcount(const char* key, double min, double max);
 
 	/**
 	 * 将 key 的有序集中的某个成员的分值加上增量 inc
+	 * increase the score of a memeber in a sorted set
 	 * @param key {const char*} 有序集键值
+	 *  the key of the sorted set
 	 * @param inc {double} 增量值
+	 *  the value to be increased
 	 * @param member{const char*} 有序集中成员名
+	 *  the specified memeber of a sorted set
 	 * @param result {double*} 非空时存储结果值
+	 *  if not null, it will store the score result after increment
 	 * @return {bool} 操作是否成功
+	 *  if successful about the operation
 	 */
 	bool zincrby(const char* key, double inc, const char* member,
 		double* result = NULL);
@@ -90,28 +119,51 @@ public:
 
 	/**
 	 * 从 key 的有序集中获得指定位置区间的成员名列表，成员按分值递增方式排序
+	 * get the specified range memebers of a sorted set sotred at key
 	 * @param key {const char*} 有序集键值
+	 *  the key of a sorted set
 	 * @param start {int} 起始下标位置
+	 *  the begin index of the sorted set
 	 * @param stop {int} 结束下标位置（结果集同时含该位置）
+	 *  the end index of the sorted set
 	 * @param result {std::vector<string>*} 非空时存储结果集，内部先调用
 	 *  result.clear() 清除其中的元素
+	 *  if not NULL, it will store the memebers result
 	 * @return {int} 结果集中成员的数量
+	 *  the number of memebers
 	 *  0: 表示结果集为空或 key 不存在
+	 *     the result is empty or the key doesn't exist
 	 * -1: 表示出错或 key 对象非有序集对象
+	 *     error or it's not a sorted set by the key
 	 * >0: 结果集的数量
+	 *     the number of the memebers result
 	 *  注：对于下标位置，0 表示第一个成员，1 表示第二个成员；-1 表示最后一个成员，
 	 *     -2 表示倒数第二个成员，以此类推
+	 *  Notice: about the index, element by index 0 is the first
+	 *   of the sorted set, element by index -1 is the last one. 
 	 *
 	 *  操作成功后可以通过以下任一方式获得数据
-	 *  1、基类方法 get_value 获得指定下标的元素数据
-	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *  when success, the result can be got by one of the below proccess: 
+	 *  1、在调用方法中传入非空的存储结果对象的地址
+	 *     the most easily way is to set a non-NULL result parameter
+	 *     for this function
+	 *  2、基类方法 get_value 获得指定下标的元素数据
+	 *     get the specified subscript's element by redis_command::get_value
+	 *  3、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
 	 *     redis_result::argv_to_string 方法获得元素数据
-	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *     redis_result::argv_to_string 方法获得元素数据
+	 *     get redis_result object with the given subscript, and get the
+	 *     element by redis_result::argv_to_string
+	 *  4、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
 	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
 	 *     的方法获得该元素的数据
-	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *     get redis_result object by redis_command::get_result, and get
+	 *     the first element by redis_result::get_child, then get the
+	 *     element by the way same as the way 2 above.
+	 *  5、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
 	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
-	 *  5、在调用方法中传入非空的存储结果对象的地址
+	 *     get child array by redis_command::get_children, and get the
+	 *     element from one of redis_result array by argv_to_string
 	 */
 	int zrange(const char* key, int start, int stop,
 		std::vector<string>* result);
@@ -148,15 +200,15 @@ public:
 	 *  注：offset 和 count 必须同时为非空指针时才有效
 	 *
 	 *  操作成功后可以通过以下任一方式获得数据
-	 *  1、基类方法 get_value 获得指定下标的元素数据
-	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *  1、在调用方法中传入非空的存储结果对象的地址
+	 *  2、基类方法 get_value 获得指定下标的元素数据
+	 *  3、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
 	 *     redis_result::argv_to_string 方法获得元素数据
-	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *  4、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
 	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
 	 *     的方法获得该元素的数据
-	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *  5、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
 	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
-	 *  5、在调用方法中传入非空的存储结果对象的地址
 	 */
 	int zrangebyscore(const char* key, double min, double max,
 		std::vector<string>* out, const int* offset = NULL,
@@ -184,15 +236,15 @@ public:
 	 * 3.2）"ZRANGEBYSCORE zset (5 (10" 返回所有符合条件 5 < score < 10 的成员
 	 *
 	 *  操作成功后可以通过以下任一方式获得数据
-	 *  1、基类方法 get_value 获得指定下标的元素数据
-	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
+	 *  1、在调用方法中传入非空的存储结果对象的地址
+	 *  2、基类方法 get_value 获得指定下标的元素数据
+	 *  3、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
 	 *     redis_result::argv_to_string 方法获得元素数据
-	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
+	 *  4、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
 	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
 	 *     的方法获得该元素的数据
-	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
+	 *  5、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
 	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
-	 *  5、在调用方法中传入非空的存储结果对象的地址
 	 */
 	int zrangebyscore(const char* key, const char* min, const char* max,
 		std::vector<string>* out, const int* offset = NULL,

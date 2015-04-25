@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -28,6 +25,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="redis_status.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="redis_reshard.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="redis_util.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="redis_migrate.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,5 +47,17 @@
     <ClInclude Include="redis_status.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="redis_reshard.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="redis_util.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="redis_migrate.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.md" />
   </ItemGroup>
 </Project>

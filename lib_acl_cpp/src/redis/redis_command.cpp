@@ -188,6 +188,16 @@ void redis_command::hash_slot(const char* key, size_t len)
 	slot_ = (int) (n % max_slot);
 }
 
+const char* redis_command::get_client_addr() const
+{
+	if (conn_ == NULL)
+		return "";
+	socket_stream* stream = conn_->get_stream();
+	if (stream == NULL)
+		return "";
+	return stream->get_peer(true);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 
 size_t redis_command::result_size() const

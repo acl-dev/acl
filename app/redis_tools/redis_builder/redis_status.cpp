@@ -52,7 +52,7 @@ void redis_status::show_master_slots(const acl::redis_node* master)
 	std::vector<std::pair<size_t, size_t> >::const_iterator cit;
 	for (cit = slots.begin(); cit != slots.end(); ++cit)
 		printf("slots range: %d-%d\r\n",
-		(int) (*cit).first, (int) (*cit).second);
+			(int) (*cit).first, (int) (*cit).second);
 }
 
 bool redis_status::show_nodes(
