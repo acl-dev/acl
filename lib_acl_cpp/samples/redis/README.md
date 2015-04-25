@@ -244,5 +244,9 @@ main.o: main.cpp
 ### On WIN32
 Open acl_cpp_vc2003.sln/acl_cpp_vc2008.sln/acl_cpp_vc2010.sln/acl_cpp_vc2012.sln, and looat at the redis samples project option setting.
 
+## reference
+- redis include in acl: [redis include files](../../include/acl_cpp/redis/)
+- redis src in acl: [redis source files](../../src/redis/)
+
 ## Authors
 the acl redis lib was written by zsx, the lib is just one part of acl project which includes lib_acl(base C lib), lib_protocol(http/icmp/smtp C libs) and lib_acl_cpp(a wrapper of lib_acl and lib_protocol witch C++, including one more other useful libs).
