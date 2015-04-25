@@ -3,6 +3,7 @@ add one new redis node to the existing one or cluster, show the information
 of the redis cluster about nodes and slots. Below are the using method of
 the tool:
 ## 1) show help information:
+```help
 ./redis_build -h
 usage: redis_builder.exe -h[help]
 -s redis_addr[ip:port]
@@ -19,6 +20,7 @@ for samples:
 ./redis_builder -s 127.0.0.1:6379 -a node_id
 ./redis_builder -s 127.0.0.1:6379 -a add_node -N 127.0.0.1:6380 -S
 ./redis_builder -s 127.0.0.1:6379 -a reshard
+```
 
 ## 2) build a new redis cluster after all of the redis nodes started:
 ### 2.1) build cluster and the relationship between master and slave
@@ -90,11 +92,13 @@ master: 192.168.136.173:16387
 ```
 
 ## 3) add a new slave redis node to the master node:
+```help
 ./redis_builder -s 127.0.0.1:6379 -a add_node -S -N 127.0.0.1:6380
 '-s' specifys the existing master node,
 '-S' specifys the new redis node added was as a slave node,
 '-N' specify the new redis addr to be added
 '-a' specify the cmd of this tool
+```
 
 ## 4) compile this redis_builder tool
 ### 4.1) because redis_builder depends on lib_acl/lib_protocol/lib_acl_cpp,
@@ -107,7 +111,7 @@ $cd app/redis_tools/redis_builder; make
 
 ## 5) reference
 - redis module in acl:
-[redis of acl](lib_acl_cpp/samples/redis/README.md)
+[redis of acl](../../../lib_acl_cpp/samples/redis/README.md)
 - redis include in acl: lib_acl_cpp/include/acl_cpp/redis
 - redis src in acl: lib_acl_cpp/src/redis
 
