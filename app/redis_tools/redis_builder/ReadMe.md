@@ -101,7 +101,8 @@ master: 192.168.136.173:16387
 ```
 
 ## 4) compile this redis_builder tool
-### 4.1) because redis_builder depends on lib_acl/lib_protocol/lib_acl_cpp,
+### 4.1) build the base three libs for redis_builder:
+because redis_builder depends on lib_acl/lib_protocol/lib_acl_cpp,
 so you need to compile the lib_acl/lib_protocol/lib_acl_cpp first
 ```compile
 $cd lib_acl; make
