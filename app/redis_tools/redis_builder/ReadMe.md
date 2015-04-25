@@ -43,6 +43,7 @@ the cluster.xml's content just like:
 </xml>
 ```
 The result maybe like as:
+```result
 master: 192.168.136.172:16380
         slave: 192.168.136.172:16381
         slave: 192.168.136.172:16382
@@ -52,6 +53,7 @@ master: 192.168.136.172:16383
 master: 192.168.136.172:16386
         slave: 192.168.136.172:16387
         slave: 192.168.136.172:16388
+```
 
 ### 2.2) build cluster and the relationship between master and slave was specified
 by the command args.
@@ -75,6 +77,7 @@ The redis_builder will create three master nodes that each master will have
 two slave nodes. The three master will be in different hosts, and each
 master's slave nodes will be in other host than its master. The redis nodes
 of the cluster maybe like as:
+```result
 master: 192.168.136.171:16380
         slave: 192.168.136.172:16383
         slave: 192.168.136.173:16386
@@ -84,6 +87,7 @@ master: 192.168.136.172:16384
 master: 192.168.136.173:16387
         slave: 192.168.136.172:16385
         slave: 192.168.136.171:16381
+```
 
 ## 3) add a new slave redis node to the master node:
 ./redis_builder -s 127.0.0.1:6379 -a add_node -S -N 127.0.0.1:6380
