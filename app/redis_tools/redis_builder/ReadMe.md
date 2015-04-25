@@ -114,8 +114,7 @@ $cd app/redis_tools/redis_builder; make
 ```
 
 ## 5) reference
-- redis module in acl:
-[redis of acl](../../../lib_acl_cpp/samples/redis/README.md)
+- redis samples in acl: [redis of acl](../../../lib_acl_cpp/samples/redis/README.md)
 - redis include in acl: [lib_acl_cpp/include/acl_cpp/redis](../../../lib_acl_cpp/include/acl_cpp/redis)
-- redis src in acl: lib_acl_cpp/src/redis: [lib_acl_cpp/src/redis](../../../lib_acl_cpp/src/redis)
+- redis source  in acl: lib_acl_cpp/src/redis: [lib_acl_cpp/src/redis](../../../lib_acl_cpp/src/redis)
 
