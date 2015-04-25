@@ -103,15 +103,19 @@ master: 192.168.136.173:16387
 ## 4) compile this redis_builder tool
 ### 4.1) because redis_builder depends on lib_acl/lib_protocol/lib_acl_cpp,
 so you need to compile the lib_acl/lib_protocol/lib_acl_cpp first
+```compile
 $cd lib_acl; make
 $cd lib_protocol; make
 $cd lib_acl_cpp; make
+```
 ### 4.2) compile redis_builder
+```compile
 $cd app/redis_tools/redis_builder; make
+```
 
 ## 5) reference
 - redis module in acl:
 [redis of acl](../../../lib_acl_cpp/samples/redis/README.md)
-- redis include in acl: lib_acl_cpp/include/acl_cpp/redis
-- redis src in acl: lib_acl_cpp/src/redis
+- redis include in acl: [lib_acl_cpp/include/acl_cpp/redis](../../../lib_acl_cpp/include/acl_cpp/redis)
+- redis src in acl: lib_acl_cpp/src/redis: [lib_acl_cpp/src/redis](../../../lib_acl_cpp/src/redis)
 

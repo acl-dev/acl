@@ -57,11 +57,12 @@ void redis_reshard::run()
 	int nslots = 0;
 	while (true)
 	{
-		printf("How many slots do you want to move (from 1 to 16384)?");
+		printf("How many slots do you want to move (from 1 to 16384) ? ");
 		fflush(stdout);
 		int ret = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
 		if (ret == ACL_VSTREAM_EOF)
 			exit(1);
+		acl_mystr_trim(buf);
 		nslots = atoi(buf);
 		if (nslots > 0 && nslots < 16384)
 			break;
@@ -71,14 +72,17 @@ void redis_reshard::run()
 	acl::redis_node* target = NULL;
 	while (true)
 	{
-		printf("What is the receiving node ID?");
+		printf("What is the receiving node ID? ");
 		fflush(stdout);
 		int ret = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
 		if (ret == ACL_VSTREAM_EOF)
 			exit(1);
+
+		acl_mystr_trim(buf);
 		target = find_node(buf);
 		if (target != NULL)
 			break;
+
 		printf("...The specified node(%s) is not known or not "
 			"a master, please try again.\r\n", buf);
 	}
@@ -91,11 +95,13 @@ void redis_reshard::run()
 	std::vector<acl::redis_node*> sources;
 	while (true)
 	{
-		printf("Source node #%d:", (int) sources.size() + 1);
+		printf("Source node #%d: ", (int) sources.size() + 1);
 		fflush(stdout);
 		int ret = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
 		if (ret == ACL_VSTREAM_EOF)
 			exit(1);
+
+		acl_mystr_trim(buf);
 		if (strcasecmp(buf, "done") == 0)
 			break;
 		if (strcasecmp(buf, "all") == 0)
@@ -103,6 +109,7 @@ void redis_reshard::run()
 			copy_all(sources, target->get_id());
 			break;
 		}
+
 		acl::redis_node* source = find_node(buf);
 		if (source == NULL)
 		{
