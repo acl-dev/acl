@@ -114,12 +114,13 @@ static void* thread_main(void* arg)
 
 int main(void)
 {
-	const char* disque_addr = "127.0.0.1:7711";
 	int conn_timeout = 10, rw_timeout = 10;
 
 	// declare disque cluster ojbect
 	acl::disque_client_cluster cluster(conn_timeout, rw_timeout);
-	cluster.set(disque_addr, __max_conns);
+	cluster.set("127.0.0.1:7711", __max_conns);
+	cluster.set("127.0.0.1:7712", __max_conns);
+	cluster.set("127.0.0.1:7713", __max_conns);
 
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
