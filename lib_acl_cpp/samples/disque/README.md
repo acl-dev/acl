@@ -36,6 +36,7 @@ static void test_disque(acl::disque& cmd)
 
 	// call disque-server with ADDJOB
 	const char* jobid = cmd.addjob(queue, job, timeout, &cond);
+	if (jobid == NULL)
 	{
 		printf("disque addjob error\r\n");
 		return;
@@ -58,11 +59,11 @@ static void test_disque(acl::disque& cmd)
 	}
 
 	std::vector<acl::string> job_ids;
-	std::vector<acl::disque_job*>::const_iterator cit1;
+	std::vector<acl::disque_job*>::const_iterator cit;
 
-	for (cit1 = jobs->begin(); cit1 != jobs->end(); ++cit1)
+	for (cit = jobs->begin(); cit != jobs->end(); ++cit)
 	{
-		jobid = (*cit1)->get_id();
+		jobid = (*cit)->get_id();
 		if (*jobid)
 			job_ids.push_back(jobid);
 	}
@@ -76,7 +77,7 @@ static void test_disque(acl::disque& cmd)
 		int ret = cmd.ackjob(job_ids);
 		if (ret < 0)
 			printf("ackjob error: %s\r\n", cmd.result_error());
-		else if (i < 10)
+		else
 			printf("ackjob ok, ret: %d\r\n", ret);
 	}
 }
