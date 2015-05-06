@@ -34,9 +34,9 @@ redis_client::~redis_client()
 socket_stream* redis_client::get_stream()
 {
 	if (conn_.opened())
-		return &conn_;
+		return (socket_stream*) &conn_;
 	else if (open())
-		return &conn_;
+		return (socket_stream*) &conn_;
 	else
 		return NULL;
 }

@@ -361,6 +361,7 @@ protected:
 	void hash_slot(const char* key, size_t len);
 
 private:
+	char  addr_[32];
 	redis_client* conn_;
 	redis_client_cluster* cluster_;
 	size_t max_conns_;
@@ -372,6 +373,8 @@ private:
 	redis_client* peek_conn(redis_client_cluster* cluster, int slot);
 	redis_client* redirect(redis_client_cluster* cluster, const char* addr);
 	const char* get_addr(const char* info);
+	void set_client_addr(const char* addr);
+	void set_client_addr(redis_client& conn);
 
 private:
 	/************************** request ********************************/
