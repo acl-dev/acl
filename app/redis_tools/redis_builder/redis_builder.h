@@ -8,7 +8,7 @@ public:
 	redis_builder(int meet_wait = 100);
 	~redis_builder(void);
 
-	bool build(const char* conf, size_t replicas = 0);
+	bool build(const char* conf, size_t replicas, bool just_display);
 
 	bool add_node(const char* addr, const char* new_node_addr, bool slave);
 	bool del_node(const char* addr, const char* node_id);

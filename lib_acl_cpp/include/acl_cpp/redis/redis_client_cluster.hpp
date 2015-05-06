@@ -28,7 +28,7 @@ public:
 	 *  read/write timeout in seconds from/to the redis-server
 	 * @param max_slot {int} ¹þÏ£²Û×î´óÖµ; the max hash-slot value of keys
 	 */
-	redis_client_cluster(int conn_timeout, int rw_timeout,
+	redis_client_cluster(int conn_timeout = 30, int rw_timeout = 30,
 		int max_slot = 16384);
 	virtual ~redis_client_cluster();
 

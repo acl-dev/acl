@@ -90,7 +90,7 @@ bool redis_builder::del_node(const char* addr, const char* node_id)
 
 //////////////////////////////////////////////////////////////////////////
 
-bool redis_builder::build(const char* conf, size_t replicas /* = 0 */)
+bool redis_builder::build(const char* conf, size_t replicas, bool just_display)
 {
 	if (load(conf, replicas) == false)
 		return false;
@@ -104,6 +104,9 @@ bool redis_builder::build(const char* conf, size_t replicas /* = 0 */)
 	printf("===================================================\r\n");
 
 	redis_util::print_nodes(0, masters_);
+
+	if (just_display)
+		return true;
 
 	return build_cluster();
 }

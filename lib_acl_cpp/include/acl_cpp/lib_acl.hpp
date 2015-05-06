@@ -153,3 +153,8 @@
 #include "acl_cpp/redis/redis_slot.hpp"
 #include "acl_cpp/redis/redis_node.hpp"
 #include "acl_cpp/redis/redis.hpp"
+
+#include "acl_cpp/disque/disque.hpp"
+#include "acl_cpp/disque/disque_cond.hpp"
+#include "acl_cpp/disque/disque_job.hpp"
+#include "acl_cpp/disque/disque_node.hpp"

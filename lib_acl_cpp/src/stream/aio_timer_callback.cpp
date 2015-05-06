@@ -80,8 +80,8 @@ void aio_timer_callback::set_time(void)
 {
 	struct timeval now;
 	gettimeofday(&now, NULL);
-	present_ = ((long long int) now.tv_sec) * 1000000
-		+ ((long long int) now.tv_usec);
+	present_ = ((acl_int64) now.tv_sec) * 1000000
+		+ ((acl_int64) now.tv_usec);
 }
 
 #define TIMER_EMPTY		-1

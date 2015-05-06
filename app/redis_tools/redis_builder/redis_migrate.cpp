@@ -133,7 +133,7 @@ bool redis_migrate::move_slot(size_t slot, acl::redis& from, acl::redis& to)
 		return false;
 
 	// the number of keys to be moved in each moving
-	size_t max = 10;
+	size_t max = 1000;
 	std::list<acl::string> keys;
 
 	std::list<acl::string>::const_iterator cit;
@@ -151,6 +151,10 @@ bool redis_migrate::move_slot(size_t slot, acl::redis& from, acl::redis& to)
 			return false;
 		}
 
+		printf("Moving slot %d from %s to %s: ", (int) slot,
+			from.get_client_addr(), to.get_client_addr());
+		fflush(stdout);
+
 		// move all the keys stored by the specifed key
 		for (cit = keys.begin(); cit != keys.end(); ++cit)
 		{
@@ -163,7 +167,12 @@ bool redis_migrate::move_slot(size_t slot, acl::redis& from, acl::redis& to)
 					to.get_client_addr());
 				return false;
 			}
+
+			putchar('.');
+			fflush(stdout);
 		}
+
+		printf("\r\n");
 	}
 
 	return notify_cluster(slot, to_id_.c_str());
@@ -229,6 +238,6 @@ bool redis_migrate::notify_cluster(size_t slot, const char* id)
 		}
 	}
 
-	printf("slot: %d, moved to %s ok\r\n", (int) slot, id);
+	printf("Notify all: slot %d, moved to %s ok\r\n", (int) slot, id);
 	return true;
 }
