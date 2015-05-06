@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="disque_manager"
-	ProjectGUID="{71A55E11-A1AD-44A2-8D7E-B717B8EDF76B}"
+	Name="disque_cluster"
+	ProjectGUID="{1D480138-D65E-4B4E-A2B6-372927EFD61A}"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -63,11 +63,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/disque_manager.exe"
+				OutputFile="$(OutDir)/disque_cluster.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/disque_manager.pdb"
+				ProgramDatabaseFile="$(OutDir)/disque_cluster.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -140,7 +140,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib wsock32.lib"
-				OutputFile="$(OutDir)/disque_manager.exe"
+				OutputFile="$(OutDir)/disque_cluster.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32"
 				GenerateDebugInformation="true"
@@ -221,11 +221,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/disque_manager.exe"
+				OutputFile="$(OutDir)/disque_cluster.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/disque_manager.pdb"
+				ProgramDatabaseFile="$(OutDir)/disque_cluster.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -301,11 +301,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/disque_manager.exe"
+				OutputFile="$(OutDir)/disque_cluster.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/disque_manager.pdb"
+				ProgramDatabaseFile="$(OutDir)/disque_cluster.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -343,7 +343,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\disque_manager.cpp"
+				RelativePath=".\disque_cluster.cpp"
 				>
 			</File>
 			<File

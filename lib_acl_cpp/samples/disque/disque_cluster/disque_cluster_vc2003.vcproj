@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="disque_manager"
+	Name="disque_cluster"
 	ProjectGUID="{2DABFAD1-114B-4F96-9185-DC0C56A3662D}"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -33,11 +33,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="lib_acl_vc2003d.lib ws2_32.lib"
-				OutputFile="$(OutDir)/disque_manager.exe"
+				OutputFile="$(OutDir)/disque_cluster.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/disque_manager.pdb"
+				ProgramDatabaseFile="$(OutDir)/disque_cluster.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -81,7 +81,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib wsock32.lib lib_acl_vc2003.lib"
-				OutputFile="$(OutDir)/disque_manager.exe"
+				OutputFile="$(OutDir)/disque_cluster.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32"
 				GenerateDebugInformation="TRUE"
@@ -133,11 +133,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/disque_manager.exe"
+				OutputFile="$(OutDir)/disque_cluster.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/disque_manager.pdb"
+				ProgramDatabaseFile="$(OutDir)/disque_cluster.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -184,11 +184,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/disque_manager.exe"
+				OutputFile="$(OutDir)/disque_cluster.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/disque_manager.pdb"
+				ProgramDatabaseFile="$(OutDir)/disque_cluster.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -248,7 +248,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\disque_manager.cpp">
+				RelativePath=".\disque_cluster.cpp">
 			</File>
 		</Filter>
 		<Filter

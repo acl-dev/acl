@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{067E9700-A518-4747-AE70-0C6F433AE478}</ProjectGuid>
+    <ProjectGuid>{AFC106A8-C78A-43C6-BA55-1B7EB541F559}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>disque_manager</ProjectName>
+    <ProjectName>disque_cluster</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'" Label="Configuration">
@@ -101,10 +101,10 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>lib_acl_vc2012d.lib;lib_acl_cpp_vc2012d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)disque_manager.exe</OutputFile>
+      <OutputFile>$(OutDir)disque_cluster.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)disque_manager.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)disque_cluster.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <IgnoreSpecificDefaultLibraries>
@@ -122,7 +122,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2012.lib;lib_acl_cpp_vc2012.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)disque_manager.exe</OutputFile>
+      <OutputFile>$(OutDir)disque_cluster.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -147,10 +147,10 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>lib_acl_d.lib;lib_acl_cpp_d.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)disque_manager.exe</OutputFile>
+      <OutputFile>$(OutDir)disque_cluster.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)disque_manager.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)disque_cluster.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -169,10 +169,10 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>lib_acl.lib;lib_acl_cpp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)disque_manager.exe</OutputFile>
+      <OutputFile>$(OutDir)disque_cluster.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)disque_manager.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)disque_cluster.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -188,7 +188,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="disque_manager.cpp" />
+    <ClCompile Include="disque_cluster.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
