@@ -186,13 +186,26 @@ private:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		"-s redis_addr[127.0.0.1:6379]\r\n"
+		"-s redis_addr[127.0.0.1:7711]\r\n"
 		"-n count[default: 10]\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-c max_threads[default: 10]\r\n"
+		"-D delay\r\n"
+		"-R replicate\r\n"
+		"-r retry\r\n"
+		"-T ttl\r\n"
+		"-M maxlen\r\n"
+		"-A [async]\r\n"
 		"-a cmd[addjob|getjob|qlen|qpeek]\r\n",
 		procname);
+
+	printf("sample:\r\n"
+		"%s -s 127.0.0.1:7711 -n 10000 -c 10 -D 1 -R 2 -M 1000000 -A -a addjob\r\n"
+		"%s -s 127.0.0.1:7711 -n 10000 -c 10 -a getjob\r\n"
+		"%s -s 127.0.0.1:7711 -n 1 -c 10 -a qlen\r\n"
+		"%s -s 127.0.0.1:7711 -n 1 -c 10 -a qpeek\r\n",
+		procname, procname, procname, procname);
 }
 
 int main(int argc, char* argv[])

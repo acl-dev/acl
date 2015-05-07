@@ -8,9 +8,9 @@ The header files of acl redis are in lib_acl_cpp\include\acl_cpp\redis; the sour
 Because acl redis lib is a part of lib_acl_cpp lib, and lib_acl_cpp depend lib_acl and lib_protocol, you should compile lib_acl and lib_protocol libs first, and compile lib_acl_cpp lib. After you've compiled lib_acl_cpp lib, the redis lib is also compiled OK.
 
 ### compile on UNIX/LINUX
-- 1 compile lib_acl.a: Enter into lib_acl path and type make, the lib_acl.a will be compiled
-- 2 compile lib_protocol.a: Enter into lib_protocol path and type make, the lib_protocol.a will be compiled
-- 3 compile lib_acl_cpp.a: Enter into lib_acl_cpp path and type make, the lib_acl_cpp.a will be compiled
+- 1 compile ** lib_acl.a **: Enter into lib_acl path and type make, the lib_acl.a will be compiled
+- 2 compile ** lib_protocol.a **: Enter into lib_protocol path and type make, the lib_protocol.a will be compiled
+- 3 compile ** lib_acl_cpp.a **: Enter into lib_acl_cpp path and type make, the lib_acl_cpp.a will be compiled
 - 4 compile redis samples: Enter into lib_acl_cpp\samples\redis and type make, all the redis samples(including redis_cluster, redis_connection, redis_hash, redis_hyperloglog, redis_key, redis_lib, redis_manager, redis_pool, redis_pubsub, redis_server, redis_set, redis_string, redis_trans, redis_zset, redis_zset_pool, redis_client_cluster) will be compiled.
 
 ### compile on WINDOWS
@@ -214,10 +214,12 @@ int main(void)
 ```
 
 ### add acl redis to your projects
-Before you use the acl redis, you should compile the three base libraries which redis depending on. Enter the lib_acl, lib_protocol, lib_acl_cpp, and build the lib_acl.a, lib_protocol.a and lib_acl_cpp.a.
+Before you use the acl redis, you should compile the three base libraries which redis depending on. Enter the lib_acl, lib_protocol, lib_acl_cpp, and build the ** lib_acl.a, lib_protocol.a and lib_acl_cpp.a **.
+```compile
 $cd lib_acl; make
 $cd lib_protocol; make
 $cd lib_acl_cpp; make
+```
 
 #### On UNIX/LINUX
 In your Makefile, you should add below compiling flags:
@@ -242,7 +244,7 @@ main.o: main.cpp
 	gcc $(CFLAGS) main.cpp -o main.o
 ```
 ### On WIN32
-Open acl_cpp_vc2003.sln/acl_cpp_vc2008.sln/acl_cpp_vc2010.sln/acl_cpp_vc2012.sln, and looat at the redis samples project option setting.
+Open acl_cpp_vc2003.sln/acl_cpp_vc2008.sln/acl_cpp_vc2010.sln/acl_cpp_vc2012.sln, and look at at the redis samples project option setting.
 
 ## reference
 - redis include in acl: [redis include files](../../include/acl_cpp/redis/)

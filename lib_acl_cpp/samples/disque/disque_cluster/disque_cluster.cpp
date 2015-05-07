@@ -196,6 +196,13 @@ static void usage(const char* procname)
 		"-A [async]\r\n"
 		"-a cmd[addjob|getjob|qlen|qpeek]\r\n",
 		procname);
+
+	printf("sample:\r\n"
+		"%s -s \"127.0.0.1:7711, 127.0.0.1:7712, 127.0.0.1:7713\" -n 10000 -c 10 -D 1 -R 2 -M 1000000 -A -a addjob\r\n"
+		"%s -s \"127.0.0.1:7711, 127.0.0.1:7712, 127.0.0.1:7713\" -n 10000 -c 10 -a getjob\r\n"
+		"%s -s \"127.0.0.1:7711, 127.0.0.1:7712, 127.0.0.1:7713\" -n 1 -c 10 -a qlen\r\n"
+		"%s -s \"127.0.0.1:7711, 127.0.0.1:7712, 127.0.0.1:7713\" -n 1 -c 10 -a qpeek\r\n",
+		procname, procname, procname, procname);
 }
 
 int main(int argc, char* argv[])

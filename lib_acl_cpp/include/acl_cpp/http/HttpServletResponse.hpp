@@ -154,7 +154,7 @@ public:
 	 * 向客户端发送 HTTP 数据体响应数据，可以循环调用此函数，该函数
 	 * 内部调用 HttpServletResponse::write(const void*, size_t) 过程，
 	 * 另外，在使用 chunked 方式传输数据时，应该应该最后再调用一次本函数，
-	 * 且参数均设为 0 表示数据结束
+	 * 且输入空串，即 buf.empty() == true
 	 * @param buf {const string&} 数据缓冲区
 	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
 	 */

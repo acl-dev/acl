@@ -195,7 +195,7 @@ private:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		"-s redis_addr[127.0.0.1:6379]\r\n"
+		"-s redis_addr_list[127.0.0.1:7711, 127.0.0.1:7712, 127.0.0.1:7713]\r\n"
 		"-n count[default: 10]\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
@@ -208,6 +208,13 @@ static void usage(const char* procname)
 		"-A [async]\r\n"
 		"-a cmd[addjob|getjob|qlen|qpeek]\r\n",
 		procname);
+
+	printf("sample:\r\n"
+		"%s -s \"127.0.0.1:7711, 127.0.0.1:7712, 127.0.0.1:7713\" -n 10000 -c 10 -D 1 -R 2 -M 1000000 -A -a addjob\r\n"
+		"%s -s \"127.0.0.1:7711, 127.0.0.1:7712, 127.0.0.1:7713\" -n 10000 -c 10 -a getjob\r\n"
+		"%s -s \"127.0.0.1:7711, 127.0.0.1:7712, 127.0.0.1:7713\" -n 1 -c 10 -a qlen\r\n"
+		"%s -s \"127.0.0.1:7711, 127.0.0.1:7712, 127.0.0.1:7713\" -n 1 -c 10 -a qpeek\r\n",
+		procname, procname, procname, procname);
 }
 
 int main(int argc, char* argv[])
@@ -215,7 +222,7 @@ int main(int argc, char* argv[])
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
 	int  max_threads = 10;
 	acl::disque_cond cond;
-	acl::string addr("127.0.0.1:6379"), cmd;
+	acl::string addr_list("127.0.0.1:7711, 127.0.0.1:7712, 127.0.0.1:7713"), cmd;
 
 	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:D:R:r:T:M:A")) > 0)
 	{
@@ -225,7 +232,7 @@ int main(int argc, char* argv[])
 			usage(argv[0]);
 			return 0;
 		case 's':
-			addr = optarg;
+			addr_list = optarg;
 			break;
 		case 'n':
 			n = atoi(optarg);
@@ -267,8 +274,18 @@ int main(int argc, char* argv[])
 
 	acl::acl_cpp_init();
 
+	if (addr_list.empty())
+	{
+		usage(argv[0]);
+		return 1;
+	}
+
 	acl::disque_client_cluster manager(conn_timeout, rw_timeout);
-	manager.set(addr.c_str(), max_threads);
+	const std::vector<acl::string>& tokens = addr_list.split2(";, \t");
+
+	std::vector<acl::string>::const_iterator cit;
+	for (cit = tokens.begin(); cit != tokens.end(); ++cit)
+		manager.set((*cit).c_str(), max_threads);
 
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++)
