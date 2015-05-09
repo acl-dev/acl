@@ -91,7 +91,10 @@ redis_result* redis_client::get_redis_error(dbuf_pool* pool)
 {
 	buf_.clear();
 	if (conn_.gets(buf_) == false)
+	{
+		logger_error("gets line error, server: %s", addr_);
 		return NULL;
+	}
 
 	redis_result* rr = new(pool) redis_result(pool);
 	rr->set_type(REDIS_RESULT_ERROR);
@@ -105,7 +108,10 @@ redis_result* redis_client::get_redis_status(dbuf_pool* pool)
 {
 	buf_.clear();
 	if (conn_.gets(buf_) == false)
+	{
+		logger_error("gets line error, server: %s", addr_);
 		return NULL;
+	}
 
 	redis_result* rr = new(pool) redis_result(pool);
 	rr->set_type(REDIS_RESULT_STATUS);
@@ -119,7 +125,10 @@ redis_result* redis_client::get_redis_integer(dbuf_pool* pool)
 {
 	buf_.clear();
 	if (conn_.gets(buf_) == false)
+	{
+		logger_error("gets line error, server: %s", addr_);
 		return NULL;
+	}
 
 	redis_result* rr = new(pool) redis_result(pool);
 	rr->set_type(REDIS_RESULT_INTEGER);
@@ -133,7 +142,10 @@ redis_result* redis_client::get_redis_string(dbuf_pool* pool)
 {
 	buf_.clear();
 	if (conn_.gets(buf_) == false)
+	{
+		logger_error("gets line error, server: %s", addr_);
 		return NULL;
+	}
 	redis_result* rr = new(pool) redis_result(pool);
 	rr->set_type(REDIS_RESULT_STRING);
 	int len = atoi(buf_.c_str());
@@ -147,14 +159,20 @@ redis_result* redis_client::get_redis_string(dbuf_pool* pool)
 		rr->set_size(1);
 		buf = (char*) pool->dbuf_alloc(len + 1);
 		if (len > 0 && conn_.read(buf, (size_t) len) == -1)
+		{
+			logger_error("read data error, server: %s", addr_);
 			return NULL;
+		}
 		buf[len] = 0;
 		rr->put(buf, (size_t) len);
 
 		// ¶Á \r\n
 		buf_.clear();
 		if (conn_.gets(buf_) == false)
+		{
+			logger_error("gets line error, server: %s", addr_);
 			return NULL;
+		}
 		return rr;
 	}
 
@@ -173,7 +191,10 @@ redis_result* redis_client::get_redis_string(dbuf_pool* pool)
 		n = len > CHUNK_LENGTH - 1 ? CHUNK_LENGTH - 1 : len;
 		buf = (char*) pool->dbuf_alloc((size_t) (n + 1));
 		if (conn_.read(buf, (size_t) n) == -1)
+		{
+			logger_error("read data error, server: %s", addr_);
 			return NULL;
+		}
 		buf[n] = 0;
 		rr->put(buf, (size_t) n);
 		len -= n;
@@ -181,7 +202,10 @@ redis_result* redis_client::get_redis_string(dbuf_pool* pool)
 	
 	buf_.clear();
 	if (conn_.gets(buf_) == false)
+	{
+		logger_error("gets line error, server: %s", addr_);
 		return NULL;
+	}
 	return rr;
 }
 
@@ -215,7 +239,7 @@ redis_result* redis_client::get_redis_object(dbuf_pool* pool)
 	char ch;
 	if (conn_.read(ch) == false)
 	{
-		logger_error("read first char error");
+		logger_error("read first char error, server: %s", addr_);
 		return NULL;
 	}
 
