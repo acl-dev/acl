@@ -457,6 +457,15 @@
     <ClCompile Include="src\redis\redis_slot.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\disque\disque.cpp">
+      <Filter>src\disque</Filter>
+    </ClCompile>
+    <ClCompile Include="src\disque\disque_cond.cpp">
+      <Filter>src\disque</Filter>
+    </ClCompile>
+    <ClCompile Include="src\disque\disque_job.cpp">
+      <Filter>src\disque</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -936,6 +945,18 @@
     <ClInclude Include="include\acl_cpp\redis\redis_slot.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\disque\disque.hpp">
+      <Filter>include\disque</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\disque\disque_cond.hpp">
+      <Filter>include\disque</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\disque\disque_job.hpp">
+      <Filter>include\disque</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\disque\disque_node.hpp">
+      <Filter>include\disque</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl_cpp_vc2010.rc" />
@@ -1046,6 +1067,12 @@
     </Filter>
     <Filter Include="src\event">
       <UniqueIdentifier>{484e9df8-18fb-4d8f-bc99-940873adca7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\disque">
+      <UniqueIdentifier>{6eb43458-7e08-4455-8129-cce9934ac360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\disque">
+      <UniqueIdentifier>{8cd1597f-0491-4bb1-81d1-4a8e9f30edf5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

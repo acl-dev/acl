@@ -271,6 +271,16 @@ static void usage(const char* procname)
 		"-C [if need ackjob for getjob]\r\n"
 		"-a cmd[addjob|getjob|qlen|qpeek|show|ackjob|fastack|enqueue|dequeue|deljob|info|hello]\r\n",
 		procname);
+
+	printf("sample:\r\n"
+		"%s -s 127.0.0.1:7711 -n 10000 -D 1 -R 2 -r 1 -T 1000 -M 1000000 -a addjob\r\n"
+		"%s -s 127.0.0.1:7711 -n 10000 -a getjob\r\n"
+		"%s -s 127.0.0.1:7711 -n 10000 -a getjob -C\r\n"
+		"%s -s 127.0.0.1:7711 -n 10 -a qlen\r\n"
+		"%s -s 127.0.0.1:7711 -n 100 -a qpeek\r\n"
+		"%s -s 127.0.0.1:7711 -n 1 -a info\r\n"
+		"%s -s 127.0.0.1:7711 -n 1 -a hello\r\n",
+		procname, procname, procname, procname, procname, procname, procname);
 }
 
 int main(int argc, char* argv[])

@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;USE_WIN_ICONV;HAS_SQLITE;HAS_MYSQL"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;USE_WIN_ICONV"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -111,7 +111,7 @@
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV;HAS_SQLITE;HAS_MYSQL"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -176,7 +176,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_SQLITE;HAS_MYSQL"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -255,7 +255,7 @@
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;HAS_SQLITE;HAS_MYSQL"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -1082,6 +1082,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="disque"
+				>
+				<File
+					RelativePath=".\src\disque\disque.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\disque\disque_cond.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\disque\disque_job.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
@@ -1713,6 +1729,26 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\stream_hook.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="disque"
+				>
+				<File
+					RelativePath=".\include\acl_cpp\disque\disque.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\disque\disque_cond.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\disque\disque_job.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\disque\disque_node.hpp"
 					>
 				</File>
 			</Filter>

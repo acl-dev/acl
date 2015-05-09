@@ -141,16 +141,18 @@ int main(void)
 ```
 
 ### add acl disque to your projects
-Before you use the acl disque, you should compile the three base libraries which disque depending on. Enter the lib_acl, lib_protocol, lib_acl_cpp, and build the lib_acl.a, lib_protocol.a and lib_acl_cpp.a.
+Before you use the acl disque, you should compile the three base libraries which disque depending on. Enter the ** lib_acl, lib_protocol, lib_acl_cpp,** and build the lib_acl.a, lib_protocol.a and lib_acl_cpp.a.
+```compile
 $cd lib_acl; make
 $cd lib_protocol; make
 $cd lib_acl_cpp; make
+```
 
 #### On UNIX/LINUX
 In your Makefile, you should add below compiling flags:
 -DLINUX2 for LINUX, -DFREEBSD for FreeBSD, -DMACOSX for MAXOS, -DSUNOS5 for Solaris X86;
 -I path specify the lib_acl.hpp's parent path, for exmaple: -I./lib_acl_cpp/include, in the lib_acl_cpp/include path the acl_cpp path should be included;
-At last, link with -L{path_to_acl_cpp} -l_acl_cpp -L{path_to_protocol} -l_protocol -L{path_to_acl) -l_acl
+At last, link with ** -L{path_to_acl_cpp} -l_acl_cpp -L{path_to_protocol} -l_protocol -L{path_to_acl) -l_acl **
 Of couse you can look at the Makefile.in in lib_acl_cpp\samples and Makfile in lib_acl_cpp\samples\disque\ to find the build conditions.
 One Makefile as below:
 ```Makefile
@@ -169,7 +171,7 @@ main.o: main.cpp
 	gcc $(CFLAGS) main.cpp -o main.o
 ```
 ### On WIN32
-Open acl_cpp_vc2003.sln/acl_cpp_vc2008.sln/acl_cpp_vc2010.sln/acl_cpp_vc2012.sln, and looat at the disque samples project option setting.
+Open acl_cpp_vc2003.sln/acl_cpp_vc2008.sln/acl_cpp_vc2010.sln/acl_cpp_vc2012.sln, and look at at the disque samples project option setting.
 
 ## reference
 - disque include in acl: [disque include files](../../include/acl_cpp/disque/)
