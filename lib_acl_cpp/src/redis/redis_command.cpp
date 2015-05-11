@@ -55,7 +55,10 @@ redis_command::redis_command(redis_client* conn)
 , result_(NULL)
 {
 	pool_ = NEW dbuf_pool(128000);
-	addr_[0] = 0;
+	if (conn != NULL)
+		set_client_addr(*conn);
+	else
+		addr_[0] = 0;
 }
 
 redis_command::redis_command(redis_client_cluster* cluster, size_t max_conns)
