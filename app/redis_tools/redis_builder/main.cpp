@@ -93,100 +93,99 @@ int main(int argc, char* argv[])
 	}
 
 	int conn_timeout = 10, rw_timeout = 120;
-	acl::redis_client client(addr, conn_timeout, rw_timeout);
-	acl::redis redis(&client);
 
-	if (cmd == "nodes")
+	if (cmd == "hash_slot")
+	{
+		if (key.empty())
+			printf("usage: %s -a hash_slot -k key\r\n", argv[0]);
+		else
+		{
+			size_t max_slot = 16384;
+			unsigned short n = acl_hash_crc16(key.c_str(), key.length());
+			unsigned short slot = n %  max_slot;
+			printf("key: %s, slot: %d\r\n", key.c_str(), (int) slot);
+		}
+	}
+	else if (cmd == "nodes")
 	{
 		if (addr.empty())
-		{
 			printf("usage: %s -s ip:port -a nodes\r\n", argv[0]);
-			goto END;
+		else {
+			acl::redis_client client(addr, conn_timeout, rw_timeout);
+			acl::redis redis(&client);
+			redis_status status(addr, conn_timeout, rw_timeout);
+			status.show_nodes(redis);
 		}
-		redis_status status(addr, conn_timeout, rw_timeout);
-		status.show_nodes(redis);
 	}
 	else if (cmd == "slots")
 	{
 		if (addr.empty())
-		{
 			printf("usage: %s -a ip:port -a slots\r\n", argv[0]);
-			goto END;
+		else
+		{
+			acl::redis_client client(addr, conn_timeout, rw_timeout);
+			acl::redis redis(&client);
+			redis_status status(addr, conn_timeout, rw_timeout);
+			status.show_slots(redis);
 		}
-		redis_status status(addr, conn_timeout, rw_timeout);
-		status.show_slots(redis);
 	}
 	else if (cmd == "create")
 	{
 		if (conf.empty())
-		{
 			printf("usage: %s -a create -f cluster.xml\r\n", argv[0]);
-			goto END;
+		else
+		{
+			redis_builder builder;
+			builder.build(conf.c_str(), replicas, just_display);
 		}
-		redis_builder builder;
-		builder.build(conf.c_str(), replicas, just_display);
 	}
 	else if (cmd == "add_node")
 	{
 		if (addr.empty() || new_addr.empty())
-		{
 			printf("usage: %s -s ip:port -a add_node -N ip:port -S\r\n", argv[0]);
-			goto END;
+		else
+		{
+			redis_builder builder;
+			builder.add_node(addr, new_addr, add_slave);
 		}
-		redis_builder builder;
-		builder.add_node(addr, new_addr, add_slave);
 	}
 	else if (cmd == "del_node")
 	{
 		if (addr.empty() || node_id.empty())
-		{
 			printf("usage: %s -s ip:port -a del_node -I nod_id\r\n", argv[0]);
-			goto END;
+		else
+		{
+			redis_builder builder;
+			builder.del_node(addr, node_id);
 		}
-		redis_builder builder;
-		builder.del_node(addr, node_id);
 	}
 	else if (cmd == "node_id")
 	{
 		if (addr.empty())
-		{
 			printf("usage: %s -s ip:port -a node_id\r\n", argv[0]);
-			goto END;
-		}
-		node_id.clear();
-		if (redis_util::get_node_id(addr, node_id) == false)
-			printf("can't get node id, addr: %s\r\n", addr.c_str());
 		else
-			printf("addr: %s, node_id: %s\r\n", addr.c_str(),
-				node_id.c_str());
+		{
+			node_id.clear();
+			if (redis_util::get_node_id(addr, node_id) == false)
+				printf("can't get node id, addr: %s\r\n",
+					addr.c_str());
+			else
+				printf("addr: %s, node_id: %s\r\n",
+					addr.c_str(), node_id.c_str());
+		}
 	}
 	else if (cmd == "reshard")
 	{
 		if (addr.empty())
-		{
 			printf("usage: %s -s ip:port -a reshard\r\n", argv[0]);
-			goto END;
-		}
-
-		redis_reshard reshard(addr);
-		reshard.run();
-	}
-	else if (cmd == "hash_slot")
-	{
-		if (key.empty())
+		else
 		{
-			printf("usage: %s -a hash_slot -k key\r\n", argv[0]);
-			goto END;
+			redis_reshard reshard(addr);
+			reshard.run();
 		}
-		size_t max_slot = 16384;
-		unsigned short n = acl_hash_crc16(key.c_str(), key.length());
-		unsigned short slot = n %  max_slot;
-		printf("key: %s, slot: %d\r\n", key.c_str(), (int) slot);
 	}
 	else
 		printf("unknown cmd: %s\r\n", cmd.c_str());
-
-END:
 
 #ifdef WIN32
 	printf("enter any key to exit\r\n");
