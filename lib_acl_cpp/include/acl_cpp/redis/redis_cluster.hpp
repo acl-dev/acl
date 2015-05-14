@@ -145,7 +145,8 @@ public:
 	 */
 	bool cluster_setslot_stable(size_t slot);
 
-	/**设置指定的哈希槽至指定的某个 redis 结点，该指令有较为复杂的行为特征，具体
+	/**
+	 * 设置指定的哈希槽至指定的某个 redis 结点，该指令有较为复杂的行为特征，具体
 	 * 请参见官方在线文档
 	 * set one hash-slot to one redis node, for more help see online doc
 	 * @param slot {size_t} 哈希槽值
@@ -301,10 +302,9 @@ private:
 	std::map<string, redis_node*> masters_;
 
 	redis_node* get_node(string& line);
-	redis_node* get_master_node(std::vector<string>& tokens);
 	void add_slot_range(redis_node* node, char* slots);
-	redis_node* get_slave_node(std::vector<string>& tokens);
 	void free_masters();
+	redis_node* get_slave(const std::vector<string>& tokens);
 
 private:
 	std::vector<redis_node*> slaves_;

@@ -84,7 +84,7 @@ static bool test_type(acl::redis_key& cmd, int i)
 
 	key.format("%s_%d", __keypre.c_str(), i);
 	acl::redis_key_t ret = cmd.type(key.c_str());
-	if (ret == acl::REDIS_KEY_UNKNOWN)
+	if (ret == acl::REDIS_KEY_NONE)
 	{
 		printf("unknown type key: %s\r\n", key.c_str());
 		return false;

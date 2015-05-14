@@ -33,6 +33,12 @@
     <ClCompile Include="mymonitor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="check_async.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="check_sync.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -48,6 +54,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="mymonitor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="check_async.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="check_sync.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

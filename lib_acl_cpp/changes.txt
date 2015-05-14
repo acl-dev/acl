@@ -1,6 +1,38 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+307) 2015.5.6
+307.1) bugfix: redis_command 类中的方法 get_client_addr 当采用集群模式时不能
+取得当前所用连接的服务端地址
+
+306) 2015.5.3-5.5
+306.1) feature: 增加了分布式消息队列 disque 的客户端库模块
+
+305) 2015.4.27
+305.1) bugfix: redis_command.cpp 中的 run 方法在处理服务器返回的 ASK 响应后应该
+向目标服务器先发送 ASKING 指令
+
+304) 2015.4.25
+304.1) bugfix: 类 aio_timer_callback 中的方法 set_time 中在给成员变量 present_
+赋值时，在 32 位系统下会造成计算结果值的整形溢出，以前的问题的写法为：
+present_ = ((unsigned long) now.tv_sec) * 1000000
+		+ ((unsigned long) now.tv_usec);
+现改成：
+present_ = ((long long int) now.tv_sec) * 1000000
+		+ ((long long int) now.tv_usec);
+这样编译器在编译时才会强制将计算后的结果值按 64 位对待.
+
+303) 2015.4.23
+303.1) bugfix: samples/connect_manager，异步检测对象应该是局部的，不应与 monitor
+绑定在一起，增加了 check_async 回调类
+
+302) 2015.4.21
+302.1) buffix: redis_client::get_redis_string 当数据长度为 0 时会出现异常,
+从而兼容 redis 是允许数据值为空串的情况
+
+301) 2015.4.19
+301.1) feature: 完善了 redis_cluster 集群管理类
+
 300) 2015.4.12
 300.1) comment: 完善了 redis 模块的英文注释
 

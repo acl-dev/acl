@@ -33,6 +33,7 @@ redis_command::redis_command()
 , result_(NULL)
 {
 	pool_ = NEW dbuf_pool(128000);
+	addr_[0] = 0;
 }
 
 
@@ -54,6 +55,10 @@ redis_command::redis_command(redis_client* conn)
 , result_(NULL)
 {
 	pool_ = NEW dbuf_pool(128000);
+	if (conn != NULL)
+		set_client_addr(*conn);
+	else
+		addr_[0] = 0;
 }
 
 redis_command::redis_command(redis_client_cluster* cluster, size_t max_conns)
@@ -72,6 +77,7 @@ redis_command::redis_command(redis_client_cluster* cluster, size_t max_conns)
 , result_(NULL)
 {
 	pool_ = NEW dbuf_pool(128000);
+	addr_[0] = 0;
 
 	if (cluster != NULL)
 	{
@@ -128,6 +134,21 @@ void redis_command::set_slice_respond(bool on)
 void redis_command::set_client(redis_client* conn)
 {
 	conn_ = conn;
+	set_client_addr(*conn);
+}
+
+void redis_command::set_client_addr(redis_client& conn)
+{
+	socket_stream* stream = conn.get_stream();
+	if (stream == NULL)
+		addr_[0] = 0;
+	else
+		ACL_SAFE_STRNCPY(addr_, stream->get_peer(true), sizeof(addr_));
+}
+
+void redis_command::set_client_addr(const char* addr)
+{
+	ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
 }
 
 void redis_command::set_cluster(redis_client_cluster* cluster, size_t max_conns)
@@ -186,6 +207,11 @@ void redis_command::hash_slot(const char* key, size_t len)
 
 	unsigned short n = acl_hash_crc16(key, len);
 	slot_ = (int) (n % max_slot);
+}
+
+const char* redis_command::get_client_addr() const
+{
+	return addr_;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -357,6 +383,8 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 		return NULL;
 	}
 
+	set_client_addr(*conn);
+
 	redis_result_t type;
 	bool  last_moved = false;
 	int   n = 0;
@@ -381,11 +409,13 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			// 将连接对象归还给连接池对象
 			conn->get_pool()->put(conn, false);
 
+			// 从连接池集群中顺序取得一个连接对象
 			conn = peek_conn(cluster, slot_);
 			if (conn != NULL)
 			{
 				last_moved = true;
 				clear(true);
+				set_client_addr(*conn);
 				continue;
 			}
 
@@ -444,6 +474,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			}
 
 			conn = redirect(cluster, addr);
+
 			if (conn == NULL)
 			{
 				logger_error("redirect NULL, addr: %s", addr);
@@ -451,6 +482,9 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			}
 
 			ptr = conn->get_pool()->get_addr();
+
+			set_client_addr(ptr);
+
 			if (n >= 2 && redirect_sleep_ > 0
 				&& strcmp(ptr, addr) != 0)
 			{
@@ -481,12 +515,30 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			}
 
 			ptr = conn->get_pool()->get_addr();
+
+			set_client_addr(ptr);
+
 			if (n >= 2 && redirect_sleep_ > 0
 				&& strcmp(ptr, addr) != 0)
 			{
 				logger("redirect %d, curr %s, waiting %s ...",
 					n, ptr, addr);
 				acl_doze(redirect_sleep_);
+			}
+
+			result_ = conn->run(pool_, "ASKING\r\n", 0);
+			if (result_ == NULL)
+			{
+				logger_error("ASKING's reply null");
+				return NULL;
+			}
+
+			const char* status = result_->get_status();
+			if (status == NULL || strcasecmp(status, "OK") != 0)
+			{
+				logger_error("ASKING's reply error: %s",
+					status ? status : "null");
+				return NULL;
 			}
 
 			last_moved = false;
@@ -513,6 +565,8 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 				return result_;
 			}
 			clear(true);
+
+			set_client_addr(*conn);
 		}
 
 		// 对于其它错误类型，则直接返回本次得到的响应结果对象
@@ -666,7 +720,7 @@ int redis_command::get_status(std::vector<bool>& out)
 const char* redis_command::get_status()
 {
 	const redis_result* result = run();
-	return result == NULL ? NULL : result->get_status();
+	return result == NULL ? "" : result->get_status();
 }
 
 int redis_command::get_string(string& buf)

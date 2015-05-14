@@ -1,6 +1,6 @@
 #pragma once
 
-class mymonitor : public acl::connect_monitor, public acl::aio_callback
+class mymonitor : public acl::connect_monitor
 {
 public:
 	mymonitor(acl::connect_manager& manager, const acl::string& proto);
@@ -32,32 +32,6 @@ protected:
 	 */
 	void sio_check(acl::check_client& checker, acl::socket_stream& conn);
 
-protected:
-	// 重载父类 aio_callback 中的虚函数
-
-	/**
-	 * 客户端流的读成功回调过程
-	 * @param data {char*} 读到的数据地址
-	 * @param len {int} 读到的数据长度
-	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流
-	 */
-	bool read_callback(char* data, int len);
-
-	/**
-	 * 客户端流的超时回调过程
-	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流
-	 */
-	bool timeout_callback();
-
-	/**
-	 * 客户端流的超时回调过程
-	 */
-	void close_callback();
-
 private:
-	acl::check_client* checker_;
 	acl::string proto_;
-
-	void sio_check_pop3(acl::check_client& checker, acl::socket_stream& conn);
-	void sio_check_http(acl::check_client& checker, acl::socket_stream& conn);
 };

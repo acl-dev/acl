@@ -21,7 +21,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\lib_protocol\include;..\lib_acl\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;USE_WIN_ICONV;HAS_SQLITE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;USE_WIN_ICONV"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -69,7 +69,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=".\include;..\lib_protocol\include;..\lib_acl\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV;HAS_SQLITE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="acl_stdafx.hpp"
@@ -115,7 +115,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\lib_protocol\include;..\lib_acl\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_SQLITE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -181,7 +181,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\lib_protocol\include;..\lib_acl\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_SQLITE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="2"
@@ -782,6 +782,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\redis\redis_set.cpp">
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_slot.cpp">
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_string.cpp">
 				</File>
 				<File
@@ -854,6 +857,19 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Filter="">
 				<File
 					RelativePath=".\src\event\event_timer.cpp">
+				</File>
+			</Filter>
+			<Filter
+				Name="disque"
+				Filter="">
+				<File
+					RelativePath=".\src\disque\disque.cpp">
+				</File>
+				<File
+					RelativePath=".\src\disque\disque_cond.cpp">
+				</File>
+				<File
+					RelativePath=".\src\disque\disque_job.cpp">
 				</File>
 			</Filter>
 		</Filter>
@@ -1282,6 +1298,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\acl_cpp\redis\redis_set.hpp">
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\redis\redis_slot.hpp">
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\redis\redis_string.hpp">
 				</File>
 				<File
@@ -1345,6 +1364,22 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Filter="">
 				<File
 					RelativePath=".\include\acl_cpp\event\event_timer.hpp">
+				</File>
+			</Filter>
+			<Filter
+				Name="disque"
+				Filter="">
+				<File
+					RelativePath=".\include\acl_cpp\disque\disque.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\disque\disque_cond.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\disque\disque_job.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\disque\disque_node.hpp">
 				</File>
 			</Filter>
 		</Filter>

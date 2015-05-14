@@ -225,6 +225,12 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\check_async.cpp">
+			</File>
+			<File
+				RelativePath=".\check_sync.cpp">
+			</File>
+			<File
 				RelativePath=".\connect_client.cpp">
 			</File>
 			<File
@@ -271,6 +277,12 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y
 			Name="Í·ÎÄ¼þ"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath=".\check_async.h">
+			</File>
+			<File
+				RelativePath=".\check_sync.h">
+			</File>
 			<File
 				RelativePath=".\connect_client.h">
 			</File>

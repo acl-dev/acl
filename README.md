@@ -148,7 +148,8 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 -    13 queue: ´ÅÅÌÎÄ¼þ¶ÓÁÐ²Ù×÷¿â
 -    14 ipc: ×èÈû/·Ç×èÈûÍ¨ÐÅÕûºÏ¿â
 -    15 session: HTTP »á»°¿â
--    16 redis: ÍêÕûÊµÏÖÁË redis Ð­ÒéµÄ¿Í»§¶ËÍ¨ÐÅ¿â(×Ü¹² 12 ¸ö´óÀà£¬150 ¶à¸öÃüÁî)£¬Ö§³ÖÁ¬½Ó³Ø¼°Á¬½Ó³Ø¼¯Èº¹ÜÀí
+-    **16 redis: ÍêÕûÊµÏÖÁË redis Ð­ÒéµÄ¿Í»§¶ËÍ¨ÐÅ¿â(×Ü¹² 12 ¸ö´óÀà£¬150 ¶à¸öÃüÁî)£¬Ö§³ÖÁ¬½Ó³Ø¼°Á¬½Ó³Ø¼¯Èº¹ÜÀí**
+-    17 disque: Ö§³Ö¼¯ÈºÏûÏ¢¶ÓÁÐ·þÎñ disque µÄ¿Í»§¶Ë¿â£¬Ö§³ÖÁ¬½Ó³Ø¼°Á¬½Ó³Ø¼¯Èº¹ÜÀí
 
 ### 3.4¡¢Í¼Àý
 *    ÀàË÷ÒýÍ¼£º

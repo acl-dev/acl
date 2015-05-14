@@ -108,7 +108,8 @@ OBJS_DST = $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/*.cpp)
 	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/mime/*.cpp))) \
 	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/mime/internal/*.cpp))) \
 	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/connpool/*.cpp))) \
-	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/redis/*.cpp)))
+	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/redis/*.cpp))) \
+	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/disque/*.cpp)))
 
 OBJS_DEF = $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/*.cpp))) \
 	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/stdlib/*.cpp))) \
@@ -126,7 +127,8 @@ OBJS_DEF = $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/*.cp
 	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/mime/*.cpp))) \
 	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/mime/internal/*.cpp))) \
 	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/connpool/*.cpp))) \
-	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/redis/*.cpp)))
+	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/redis/*.cpp))) \
+	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/disque/*.cpp)))
 
 ###########################################################
 .PHONY = static shared clean
@@ -216,6 +218,8 @@ $(OBJ_PATH_DST)/%.o: ./src/mime/internal/%.cpp
 	$(COMPILE_OBJ)
 $(OBJ_PATH_DST)/%.o: ./src/redis/%.cpp
 	$(COMPILE_OBJ)
+$(OBJ_PATH_DST)/%.o: ./src/disque/%.cpp
+	$(COMPILE_OBJ)
 
 $(DEF_PATH_DST)/%.inc: ./src/%.cpp
 	$(CREATE_DEF)
@@ -250,6 +254,8 @@ $(DEF_PATH_DST)/%.inc: ./src/mime/%.cpp
 $(DEF_PATH_DST)/%.inc: ./src/mime/internal/%.cpp
 	$(CREATE_DEF)
 $(DEF_PATH_DST)/%.inc: ./src/redis/%.cpp
+	$(CREATE_DEF)
+$(DEF_PATH_DST)/%.inc: ./src/disque/%.cpp
 	$(CREATE_DEF)
 
 clean:
