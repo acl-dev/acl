@@ -288,22 +288,19 @@ const redis_result* redis_client::run(dbuf_pool* pool, const string& req,
 
 	while (true)
 	{
-		if (!conn_.opened() && conn_.open(addr_, conn_timeout_,
-			rw_timeout_) == false)
-		{
-			logger_error("connect server: %s error: %s",
-				addr_, last_serror());
+		if (open() == false)
 			return NULL;
-		}
 
 		if (!req.empty() && conn_.write(req) == -1)
 		{
-			conn_.close();
+			close();
+
 			if (retry_ && !retried)
 			{
 				retried = true;
 				continue;
 			}
+
 			logger_error("write to redis(%s) error: %s",
 				addr_, last_serror());
 			return NULL;
@@ -317,7 +314,7 @@ const redis_result* redis_client::run(dbuf_pool* pool, const string& req,
 		if (result != NULL)
 			return result;
 
-		conn_.close();
+		close();
 
 		if (!retry_ || retried)
 			break;
@@ -341,22 +338,19 @@ const redis_result* redis_client::run(dbuf_pool* pool, const redis_request& req,
 
 	while (true)
 	{
-		if (!conn_.opened() && conn_.open(addr_, conn_timeout_,
-			rw_timeout_) == false)
-		{
-			logger_error("connect server: %s error: %s",
-				addr_, last_serror());
+		if (open() == false)
 			return NULL;
-		}
 
 		if (size > 0 && conn_.writev(iov, (int) size) == -1)
 		{
-			conn_.close();
+			close();
+
 			if (retry_ && !retried)
 			{
 				retried = true;
 				continue;
 			}
+
 			logger_error("write to redis(%s) error: %s",
 				addr_, last_serror());
 			return NULL;
@@ -370,7 +364,7 @@ const redis_result* redis_client::run(dbuf_pool* pool, const redis_request& req,
 		if (result != NULL)
 			return result;
 
-		conn_.close();
+		close();
 
 		if (!retry_ || retried)
 			break;

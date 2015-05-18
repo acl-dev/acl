@@ -485,6 +485,8 @@ int redis_string::bitop_xor(const char* destkey, const char* keys[], size_t size
 int redis_string::bitop_and(const char* destkey, const char* key, ...)
 {
 	std::vector<const char*> keys;
+	keys.push_back(key);
+
 	va_list ap;
 	va_start(ap, key);
 	const char* ptr;
@@ -497,6 +499,8 @@ int redis_string::bitop_and(const char* destkey, const char* key, ...)
 int redis_string::bitop_or(const char* destkey, const char* key, ...)
 {
 	std::vector<const char*> keys;
+	keys.push_back(key);
+
 	va_list ap;
 	va_start(ap, key);
 	const char* ptr;
@@ -509,6 +513,8 @@ int redis_string::bitop_or(const char* destkey, const char* key, ...)
 int redis_string::bitop_xor(const char* destkey, const char* key, ...)
 {
 	std::vector<const char*> keys;
+	keys.push_back(key);
+
 	va_list ap;
 	va_start(ap, key);
 	const char* ptr;
@@ -674,6 +680,7 @@ bool redis_string::mget(std::vector<string>* out, const char* first_key, ...)
 {
 	std::vector<const char*> keys;
 	keys.push_back(first_key);
+
 	va_list ap;
 	va_start(ap, first_key);
 	const char* key;

@@ -284,7 +284,7 @@ int redis_pubsub::pubsub_channels(std::vector<string>* channels,
 	std::vector<const char*> patterns;
 	if (first_pattern)
 	{
-		patterns.push_back(NULL);
+		patterns.push_back(first_pattern);
 		va_list ap;
 		va_start(ap, first_pattern);
 		const char* pattern;

@@ -32,6 +32,8 @@ redis_set::~redis_set()
 int redis_set::sadd(const char* key, const char* first_member, ...)
 {
 	std::vector<const char*> members;
+	members.push_back(first_member);
+
 	va_list ap;
 	va_start(ap, first_member);
 	const char* member;
@@ -236,6 +238,8 @@ int redis_set::sunion(const std::vector<string>& keys,
 int redis_set::sdiffstore(const char* dst, const char* first_key, ...)
 {
 	std::vector<const char*> keys;
+	keys.push_back(first_key);
+
 	va_list ap;
 	va_start(ap, first_key);
 	const char* key;
@@ -261,6 +265,8 @@ int redis_set::sdiffstore(const char* dst, const std::vector<string>& keys)
 int redis_set::sinterstore(const char* dst, const char* first_key, ...)
 {
 	std::vector<const char*> keys;
+	keys.push_back(first_key);
+
 	va_list ap;
 	va_start(ap, first_key);
 	const char* key;
@@ -286,6 +292,8 @@ int redis_set::sinterstore(const char* dst, const std::vector<string>& keys)
 int redis_set::sunionstore(const char* dst, const char* first_key, ...)
 {
 	std::vector<const char*> keys;
+	keys.push_back(first_key);
+
 	va_list ap;
 	va_start(ap, first_key);
 	const char* key;
@@ -373,6 +381,7 @@ int redis_set::srem(const char* key, const char* first_member, ...)
 {
 	std::vector<const char*> members;
 	members.push_back(first_member);
+
 	va_list ap;
 	va_start(ap, first_member);
 	const char* member;
