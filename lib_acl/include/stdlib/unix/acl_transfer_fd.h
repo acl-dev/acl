@@ -7,7 +7,7 @@ extern "C" {
 
 #include "../acl_define.h"
 
-#ifdef ACL_UNIX
+#if defined(ACL_UNIX)
 
 #include <sys/types.h>
 #include <sys/socket.h>

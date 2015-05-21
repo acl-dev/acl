@@ -38,11 +38,13 @@ int acl_set_eugid(uid_t euid, gid_t egid)
 			acl_last_strerror(tbuf, sizeof(tbuf)));
 		return -1;
 	}
+#ifndef MINGW
 	if (setgroups(1, &egid) < 0) {
 		acl_msg_error("set_eugid: setgroups(%ld): %s", (long) egid,
 			acl_last_strerror(tbuf, sizeof(tbuf)));
 		return -1;
 	}
+#endif
 	if (euid != 0 && seteuid(euid) < 0) {
 		acl_msg_error("set_eugid: seteuid(%ld): %s", (long) euid,
 			acl_last_strerror(tbuf, sizeof(tbuf)));

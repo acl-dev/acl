@@ -3,7 +3,7 @@
 
 #include "stdlib/acl_define.h"
 
-#ifdef	ACL_LINUX
+#if defined(ACL_LINUX) && !defined(MINGW)
 # define	__USE_UNIX98
 # include <unistd.h>
 

@@ -36,7 +36,7 @@ endif
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD
-	SYSLIB = -lcrypt -lpthread
+	SYSLIB = -lcrypt -lpthread -rdynamic
 endif
 
 # For Darwin
@@ -44,6 +44,7 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-extended-offsetof
 	UNIXTYPE = MACOSX
+	SYSLIB +=  -rdynamic
 endif
 
 #Path for Linux
@@ -55,6 +56,14 @@ ifeq ($(findstring Linux, $(OSNAME)), Linux)
 		RPATH = linux64
 	endif
 	CFLAGS += -DLINUX2
+	SYSLIB +=  -rdynamic
+endif
+
+# For MINGW
+ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	SYSLIB = -lpthread-2 -liconv
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
 endif
 
 #Path for SunOS
@@ -103,7 +112,7 @@ endif
 CFLAGS += -I. -I$(BASE_PATH)/include -I$(BASE_PATH)/../lib_acl/include -I$(BASE_PATH)/../lib_protocol/include
 #EXTLIBS =
 LDFLAGS = -L$(BASE_PATH)/lib -l_acl_cpp -L$(BASE_PATH)/../lib_protocol/lib -l_protocol -L$(BASE_PATH)/../lib_acl/lib -l_acl \
-	  -L$(BASE_PATH)/../lib/$(RPATH) $(EXTLIBS) $(SYSLIB) -rdynamic
+	  -L$(BASE_PATH)/../lib/$(RPATH) $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)

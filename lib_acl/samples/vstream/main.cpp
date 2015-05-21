@@ -40,7 +40,11 @@ static void reply_client(ACL_VSTREAM *client)
 	int   i, dlen = 0, n;
 
 	for (i = 0; i < COUNT; i++) {
+#ifdef MINGW
+		vector[i].iov_base = (char*) acl_mycalloc(1,  SIZE);
+#else
 		vector[i].iov_base = acl_mycalloc(1,  SIZE);
+#endif
 		assert(vector[i].iov_base);
 		vector[i].iov_len = SIZE;
 		dlen += SIZE;

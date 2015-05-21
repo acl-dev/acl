@@ -17,10 +17,14 @@ ACL_DLL_HANDLE acl_dlopen(const char *dlname)
 	ACL_DLL_HANDLE handle;
 
 #ifdef ACL_UNIX
+# ifdef MINGW
+	handle = dlopen(dlname, RTLD_LAZY);
+# else
 	if (1)
 		handle = dlopen(dlname, RTLD_LOCAL | RTLD_LAZY);
 	else
 		handle = dlopen(dlname, RTLD_GLOBAL | RTLD_NOW);
+# endif
 #elif defined(WIN32)
 	handle = LoadLibrary(dlname);
 #endif

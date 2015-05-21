@@ -1,7 +1,11 @@
 #ifndef	ACL_DEFINE_INCLUDE_H
 #define	ACL_DEFINE_INCLUDE_H
 
-#include "acl_define_win32.h"
+#ifdef MINGW
+# undef WIN32
+#else
+# include "acl_define_win32.h"
+#endif
 #include "acl_define_unix.h"
 
 typedef	acl_int64	acl_off_t;

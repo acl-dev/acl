@@ -6,7 +6,7 @@ static void test(const char *name, int use_acl)
 {
 	ACL_DNS_DB *res = NULL;
 	ACL_HOSTNAME *h_host;
-#if	!defined(MACOSX) && !defined(ACL_SUNOS5)
+#if	!defined(MACOSX) && !defined(ACL_SUNOS5) && !defined(MINGW)
 	struct hostent  h_buf; 
 	int   errnum = 0;
 	char  buf[4096];
@@ -24,7 +24,7 @@ static void test(const char *name, int use_acl)
 			return;
 		}
 	}
-#if	!defined(MACOSX) && !defined(ACL_SUNOS5)
+#if	!defined(MACOSX) && !defined(ACL_SUNOS5) && !defined(MINGW)
 	else {
 		res = acl_netdb_new(name);
 		n = gethostbyname_r(name, &h_buf, buf, sizeof(buf), &h_addrp, &errnum);
@@ -67,7 +67,7 @@ static void test(const char *name, int use_acl)
 
 	printf("gethostbyaddr addr: %s\n", name);
 
-	h_addrp = gethostbyaddr(&addr, sizeof(addr), AF_INET);
+	h_addrp = gethostbyaddr((char*) &addr, sizeof(addr), AF_INET);
 	if (h_addrp) {
 		printf("h_name: %s\n", h_addrp->h_name);
 		for (pptr = h_addrp->h_addr_list; *pptr != NULL; pptr++) {

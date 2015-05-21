@@ -19,6 +19,7 @@
 #include <termios.h>
 #endif
 #include <unistd.h>
+#include <sys/socket.h>
 
 #endif
 

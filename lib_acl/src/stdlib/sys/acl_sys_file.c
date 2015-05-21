@@ -354,7 +354,11 @@ int acl_file_close(ACL_FILE_HANDLE fh)
 acl_off_t acl_lseek(ACL_FILE_HANDLE fh, acl_off_t offset, int whence)
 {
 #if	defined(ACL_LINUX) || defined(ACL_SUNOS5)
+# if    defined(MINGW)
+	return lseek(fh, offset, whence);
+# else
 	return lseek64(fh, offset, whence);
+# endif
 #else
 	return lseek(fh, offset, whence);
 #endif

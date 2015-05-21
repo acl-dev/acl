@@ -503,7 +503,7 @@ typedef struct pthread_atexit {
 	void   *arg;
 } pthread_atexit_t;
 
-static acl_pthread_key_t __pthread_atexit_key = ACL_TLS_OUT_OF_INDEXES;
+static acl_pthread_key_t __pthread_atexit_key = (acl_pthread_key_t ) ACL_TLS_OUT_OF_INDEXES;
 static acl_pthread_once_t __pthread_atexit_control_once = ACL_PTHREAD_ONCE_INIT;
 
 static void pthread_atexit_done(void *arg) 
@@ -617,7 +617,7 @@ typedef struct {
 
 static int acl_tls_ctx_max = 1024;
 static acl_pthread_once_t __tls_ctx_control_once = ACL_PTHREAD_ONCE_INIT;
-static acl_pthread_key_t __tls_ctx_key = ACL_TLS_OUT_OF_INDEXES;
+static acl_pthread_key_t __tls_ctx_key = (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
 static TLS_CTX *__main_tls_ctx = NULL;
 
 int acl_pthread_tls_set_max(int max)
@@ -700,7 +700,7 @@ void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr)
 		}
 		/* 初始化 */
 		for (i = 0; i < acl_tls_ctx_max; i++) {
-			tls_ctxes[i].key = ACL_TLS_OUT_OF_INDEXES;
+			tls_ctxes[i].key = (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
 			tls_ctxes[i].ptr = NULL;
 			tls_ctxes[i].free_fn = NULL;
 		}
@@ -714,27 +714,24 @@ void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr)
 
 	/* 如果该键已经存在则取出对应数据 */
 	if ((int) (*key_ptr) >= 0 && (int) (*key_ptr) < acl_tls_ctx_max) {
-		if (tls_ctxes[*key_ptr].key == *key_ptr)
-			return tls_ctxes[*key_ptr].ptr;
-		if (tls_ctxes[*key_ptr].key
+		if (tls_ctxes[(int) (*key_ptr)].key == *key_ptr)
+			return tls_ctxes[(int) (*key_ptr)].ptr;
+		if (tls_ctxes[(int) (*key_ptr)].key
 			== (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES)
 		{
-			tls_ctxes[*key_ptr].key = *key_ptr;
-			return tls_ctxes[*key_ptr].ptr;
+			tls_ctxes[(int) (*key_ptr)].key = *key_ptr;
+			return tls_ctxes[(int) (*key_ptr)].ptr;
 		}
 		acl_msg_warn("%s(%d): tls_ctxes[%d].key(%d)!= key(%d)",
 			myname, __LINE__, (int) (*key_ptr),
-			(int) tls_ctxes[*key_ptr].key, (int) (*key_ptr));
+			(int) tls_ctxes[(int) (*key_ptr)].key, (int) (*key_ptr));
 		return NULL;
 	}
 
 	/* 找出一个空位 */
 	for (i = 0; i < acl_tls_ctx_max; i++) {
-		if (tls_ctxes[i].key == (acl_pthread_key_t)
-				ACL_TLS_OUT_OF_INDEXES)
-		{
+		if (tls_ctxes[i].key == (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES)
 			break;
-		}
 	}
 
 	/* 如果没有空位可用则返回空并置错误标志位 */
@@ -778,18 +775,18 @@ int acl_pthread_tls_set(acl_pthread_key_t key, void *ptr,
 			myname, __LINE__, (int) __tls_ctx_key);
 		return -1;
 	}
-	if (tls_ctxes[key].key != key) {
+	if (tls_ctxes[(int) key].key != key) {
 		acl_msg_error("%s(%d): key(%d) invalid",
 			myname, __LINE__, (int) key);
 		acl_set_error(ACL_EINVAL);
 		return ACL_EINVAL;
 	}
 	/* 如果该键值存在旧数据则首先需要释放掉旧数据 */
-	if (tls_ctxes[key].ptr != NULL && tls_ctxes[key].free_fn != NULL)
-		tls_ctxes[key].free_fn(tls_ctxes[key].ptr);
+	if (tls_ctxes[(int) key].ptr != NULL && tls_ctxes[(int) key].free_fn != NULL)
+		tls_ctxes[(int) key].free_fn(tls_ctxes[(int) key].ptr);
 
-	tls_ctxes[key].free_fn = free_fn;
-	tls_ctxes[key].ptr = ptr;
+	tls_ctxes[(int) key].free_fn = free_fn;
+	tls_ctxes[(int) key].ptr = ptr;
 	return 0;
 }
 
@@ -819,16 +816,16 @@ int acl_pthread_tls_del(acl_pthread_key_t key)
 		return -1;
 	}
 
-	if (tls_ctxes[key].key != key) {
+	if (tls_ctxes[(int) key].key != key) {
 		acl_msg_error("%s(%d): key(%d) invalid",
 			myname, __LINE__, (int) key);
 		acl_set_error(ACL_EINVAL);
 		return ACL_EINVAL;
 	}
 
-	tls_ctxes[key].free_fn = NULL;
-	tls_ctxes[key].ptr = NULL;
-	tls_ctxes[key].key = (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
+	tls_ctxes[(int) key].free_fn = NULL;
+	tls_ctxes[(int) key].ptr = NULL;
+	tls_ctxes[(int) key].key = (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
 	return 0;
 }
 

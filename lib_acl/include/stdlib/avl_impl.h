@@ -36,7 +36,9 @@
 #include <sys/types.h>
 #include <stddef.h>
 #ifdef ACL_UNIX
+#if 1
 # include <stdint.h>	/* uintptr_t */
+#endif
 # define HAS_UINTPTR
 #elif defined(WIN32)
 # include <stddef.h>

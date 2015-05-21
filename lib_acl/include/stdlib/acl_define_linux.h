@@ -8,6 +8,7 @@
 #include <stddef.h>	/* just for size_t */
 
 /* for O_LARGEFILE flag define */
+#ifndef MINGW
 # ifndef _GNU_SOURCE
 #  ifndef _LARGEFILE64_SOURCE
 #   define _LARGEFILE64_SOURCE
@@ -16,6 +17,7 @@
 #   define _FILE_OFFSET_BITS 64
 #  endif
 # endif
+#endif
 
 /*
 # include <sys/types.h>
@@ -28,7 +30,9 @@
 #  define ACL_HAS_SPINLOCK
 # endif
 # define ACL_USE_PATHS_H
-# define ACL_HAS_FLOCK_LOCK
+# ifndef MINGW
+#  define ACL_HAS_FLOCK_LOCK
+# endif
 # define ACL_HAS_FCNTL_LOCK
 # define ACL_INTERNAL_LOCK	ACL_FLOCK_STYLE_FLOCK
 # define ACL_ROOT_PATH		"/bin:/usr/bin:/sbin:/usr/sbin"
@@ -37,12 +41,16 @@
 # define ACL_PATH_DEFPATH	"/usr/bin"
 # define ACL_PATH_STDPATH	"/usr/bin:/usr/sbin"
 
-# ifdef	ACL_HAVE_NO_STAT64
+# if defined(ACL_HAVE_NO_STAT64) || defined(MINGW)
 #  define	acl_stat	stat
 #  define	acl_fstat	fstat
 # else
 #  define	acl_stat	stat64
 #  define	acl_fstat	fstat64
+# endif
+
+# if defined(MINGW)
+typedef long int ssize_t;
 # endif
 
 # ifndef ACL_WAIT_STATUS_T

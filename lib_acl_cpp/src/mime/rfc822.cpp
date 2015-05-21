@@ -354,7 +354,7 @@ void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 # else
 	offset = - _timezone;
 # endif
-#elif !defined(ACL_FREEBSD)  // XXX -zsx
+#elif !defined(ACL_FREEBSD) && !defined(MINGW)  // XXX -zsx
 	offset = - timezone;
 #endif
 

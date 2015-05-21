@@ -105,7 +105,7 @@ static void thread_cache_free(ACL_ARRAY *pool)
 		acl_array_free(pool, (void (*)(void*)) http_hdr_req_free);
 }
 
-static acl_pthread_key_t cache_key = -1;
+static acl_pthread_key_t cache_key = (acl_pthread_key_t) -1;
 
 #ifndef	USE_TLS_EX
 static ACL_ARRAY *cache_pool = NULL;
@@ -940,7 +940,7 @@ static void free_vstring(ACL_VSTRING *buf)
 
 const char *http_hdr_req_url(HTTP_HDR_REQ *hh)
 {
-	static acl_pthread_key_t key = -1;
+	static acl_pthread_key_t key = (acl_pthread_key_t) -1;
 	ACL_VSTRING *buf;
 
 	buf = acl_pthread_tls_get(&key);

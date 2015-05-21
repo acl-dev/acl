@@ -304,7 +304,11 @@ unsigned long long beanstalk::put(const void* data, size_t n,
 		return 0;
 	}
 
+#ifdef MINGW
+	unsigned long long id = (unsigned long long) atol(tokens->argv[1]);
+#else
 	unsigned long long id = (unsigned long long) atoll(tokens->argv[1]);
+#endif
 	acl_argv_free(tokens);
 	return id;
 }
@@ -509,7 +513,11 @@ unsigned long long beanstalk::reserve(string& buf, int timeout /* = -1 */)
 		return 0;
 	}
 
+#ifdef MINGW
+	unsigned long long id = (unsigned long long) atol(tokens->argv[1]);
+#else
 	unsigned long long id = (unsigned long long) atoll(tokens->argv[1]);
+#endif
 	unsigned short n = (unsigned short) atoi(tokens->argv[2]);
 	acl_argv_free(tokens);
 
@@ -650,7 +658,12 @@ unsigned long long beanstalk::peek_fmt(string& buf, const char* fmt, ...)
 		acl_argv_free(tokens);
 		return 0;
 	}
+
+#ifdef MINGW
+	unsigned long long id = (unsigned long long) atol(tokens->argv[1]);
+#else
 	unsigned long long id = (unsigned long long) atoll(tokens->argv[1]);
+#endif
 	unsigned short n = (unsigned short) atoi(tokens->argv[2]);
 	acl_argv_free(tokens);
 

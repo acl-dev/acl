@@ -17,27 +17,27 @@
 
 #endif
 
-char *acl_lowercase(char *string)
+char *acl_lowercase(char *s)
 {
-	char *cp = string;
+	char *cp = s;
 
-	if (string == NULL)
-		return (NULL);
+	if (s == NULL)
+		return NULL;
 
 	while (*cp) {
 		*cp = tolower(*cp);
 		cp++;
 	}
 
-	return (string);
+	return s;
 }
 
-char *acl_lowercase2(char *string, size_t n)
+char *acl_lowercase2(char *s, size_t n)
 {
-	char *cp = string;
+	char *cp = s;
 
-	if (string == NULL)
-		return (NULL);
+	if (s == NULL)
+		return NULL;
 
 	while (*cp && n > 0) {
 		*cp = tolower(*cp);
@@ -45,45 +45,45 @@ char *acl_lowercase2(char *string, size_t n)
 		n--;
 	}
 
-	return (string);
+	return s;
 }
 
-char *acl_lowercase3(const char *string, char *buf, size_t size)
+char *acl_lowercase3(const char *s, char *buf, size_t size)
 {
 	char *cp = buf;
 
-	if (string == NULL || *string == 0 || buf == NULL)
-		return(NULL);
+	if (s == NULL || *s == 0 || buf == NULL)
+		return NULL;
 
-	while (size > 1 && *string) {
-		*cp++ = tolower(*string++);
+	while (size > 1 && *s) {
+		*cp++ = tolower(*s++);
 		size--;
 	}
 	*cp = 0;
 
-	return (buf);
+	return buf;
 }
 
-char *acl_uppercase(char *string)
+char *acl_uppercase(char *s)
 {
-	char *cp = string;
+	char *cp = s;
 
-	if (string == NULL)
-		return (NULL);
+	if (s == NULL)
+		return NULL;
 
 	while (*cp) {
 		*cp = toupper(*cp);
 		cp++;
 	}
 
-	return (string);
+	return s;
 }
 
-char *acl_uppercase2(char *string, size_t n)
+char *acl_uppercase2(char *s, size_t n)
 {
-	char *cp = string;
+	char *cp = s;
 
-	if (string == NULL)
+	if (s == NULL)
 		return (NULL);
 
 	while (*cp && n > 0) {
@@ -92,23 +92,23 @@ char *acl_uppercase2(char *string, size_t n)
 		n--;
 	}
 
-	return (string);
+	return s;
 }
 
-char *acl_uppercase3(const char *string, char *buf, size_t size)
+char *acl_uppercase3(const char *s, char *buf, size_t size)
 {
 	char *cp = buf;
 
-	if (string == NULL || *string == 0 || buf == NULL)
+	if (s == NULL || *s == 0 || buf == NULL)
 		return(NULL);
 
-	while (size > 1 && *string) {
-		*cp++ = toupper(*string++);
+	while (size > 1 && *s) {
+		*cp++ = toupper(*s++);
 		size--;
 	}
 	*cp = 0;
 
-	return (buf);
+	return buf;
 }
 
 /* acl_mystrtok - safe tokenizer */
@@ -124,7 +124,7 @@ char *acl_mystrtok(char **src, const char *sep)
 	start += strspn(start, sep);
 	if (*start == 0) {
 		*src = start;
-		return (0);
+		return 0;
 	}
 
 	/*
@@ -134,7 +134,7 @@ char *acl_mystrtok(char **src, const char *sep)
 	if (*end != 0)
 		*end++ = 0;
 	*src = end;
-	return (start);
+	return start;
 }
 
 /* acl_mystrline */
@@ -172,11 +172,13 @@ TAG_LOOP_END:
 
 	if (*end == '\n') {
 		*(end - nr) = 0;
-		*src = end + 1;  /* (*src) pointer to the next postion after '\n' */
+
+		/* (*src) pointer to the next postion after '\n' */
+		*src = end + 1;
 	} else
 		*src = 0;
 
-	return (start);
+	return start;
 }
 
 char *acl_mystr_trim(char *str)
@@ -199,7 +201,7 @@ char *acl_mystr_trim(char *str)
 		}
 	}
 
-	return (str);
+	return str;
 }
 
 int acl_mystr_strip(const char *haystack, const char *needle, char *buf, int bsize)
@@ -210,7 +212,7 @@ int acl_mystr_strip(const char *haystack, const char *needle, char *buf, int bsi
 
 	if (haystack == NULL || *haystack == 0 || needle == NULL
 	    || *needle == 0 || buf == NULL || bsize <= 0)
-		return(-1);
+		return -1;
 
 	ptr_src = haystack;
 	ptr_des = buf;
@@ -238,13 +240,13 @@ int acl_mystr_strip(const char *haystack, const char *needle, char *buf, int bsi
 		ptr_src += n + len;
 	}
 
-	return(ncpy);
+	return ncpy;
 }
 
 int acl_mystr_truncate_byln(char *str_src)
 {
 	if (str_src == NULL)
-		return (-1);
+		return -1;
 
 	while (*str_src) {
 		if (*str_src == '\r' || *str_src == '\n') {
@@ -254,7 +256,7 @@ int acl_mystr_truncate_byln(char *str_src)
 		str_src++;
 	}
 
-	return (0);
+	return 0;
 }
 
 /*---------------------------------------------------------------------------- 
@@ -269,7 +271,7 @@ static char *path_str_strip(const char *psrc, char *pbuf, int sizeb)
 	int     n;
 
 	if (ptr_src == NULL || *ptr_src == 0 || pbuf == NULL || sizeb <= 0)
-		return(NULL);
+		return NULL;
 
 	ptr_obj = pbuf;
 	n       = sizeb;
@@ -287,12 +289,12 @@ static char *path_str_strip(const char *psrc, char *pbuf, int sizeb)
 	}
 
 	if (n <= 0)      /* 说明所给的缓冲区空间不够大 */
-		return (NULL);
+		return NULL;
 
 	/* 必须保证最后一个字符是以 '\0' 结束 */
 	*ptr_obj = 0;
 
-	return (ptr_obj);
+	return ptr_obj;
 }
 /*----------------------------------------------------------------------------
  * 保证结果类似于如下形式:
@@ -304,8 +306,8 @@ int acl_file_path_correct(const char *psrc_file_path, char *pbuf, int sizeb)
 
 	ptr = path_str_strip(psrc_file_path, pbuf, sizeb);
 	if (ptr == NULL)
-		return (-1);
-	return (0);
+		return -1;
+	return 0;
 }
 /*----------------------------------------------------------------------------
  * 保证路径名经过此函数后都为如下格式:
@@ -322,17 +324,17 @@ int acl_dir_correct(const char *psrc_dir, char *pbuf, int sizeb)
 
 	/* 该函数若返回的结果不为空, 则 *ptr 定为 '\0' */
 	if (ptr == NULL)
-		return(-1);
+		return -1;
 
 	/* 为了保证最后一个字符肯定为 '/'(unix) or '\\'(windows), 需做如下处理 */
 
 	if (*(ptr - 1) != PATH_SEP_C) {
 		if (ptr >= pbuf + sizeb) /* 说明所给的内存空间不够 */
-			return(-1);
+			return -1;
 		*ptr++ = PATH_SEP_C;
 		*ptr = 0;
 	}
-	return(0);
+	return 0;
 }
 
 int acl_dir_getpath(const char *pathname, char *pbuf, int bsize)
@@ -341,11 +343,11 @@ int acl_dir_getpath(const char *pathname, char *pbuf, int bsize)
 	int   n;
 
 	if (pathname == NULL || pbuf == NULL || bsize <= 0)
-		return (-1);
+		return -1;
 	
 	n = acl_file_path_correct(pathname, pbuf, bsize);
 	if (n < 0)
-		return (-1);
+		return -1;
 	ptr = strrchr(pbuf, PATH_SEP_C);
 	if (ptr != NULL)
 		*ptr = 0;
@@ -354,7 +356,7 @@ int acl_dir_getpath(const char *pathname, char *pbuf, int bsize)
 			*(ptr + 1) = 0;
 	}
 
-	return (0);
+	return 0;
 }
 
 /**
@@ -368,63 +370,71 @@ size_t acl_strnlen(const char * s, size_t count)
 
         for (sc = s; count-- && *sc != '\0'; ++sc)
                 /* nothing */;
-        return (sc - s);
+        return sc - s;
 }
 
 #ifdef WIN32
 
 acl_uint64 acl_atoui64(const char *str)
 {
-	return ((acl_uint64) _atoi64(str));
+	return (acl_uint64) _atoi64(str);
 }
 
 acl_int64 acl_atoi64(const char *str)
 {
-	return (_atoi64(str));
+	return _atoi64(str);
 }
 
 const char *acl_ui64toa(acl_uint64 value, char *buf, size_t size)
 {
 	if (size < 21)
-		return (NULL);
-	return (_ui64toa(value, buf, 10));
+		return NULL;
+	return _ui64toa(value, buf, 10);
 }
 
 const char *acl_i64toa(acl_int64 value, char *buf, size_t size)
 {
 	if (size < 21)
-		return (NULL);
-	return (_i64toa(value, buf, 10));
+		return NULL;
+	return _i64toa(value, buf, 10);
 }
 
 #elif defined(ACL_UNIX)
 
 acl_uint64 acl_atoui64(const char *str)
 {
-	return ((acl_uint64) strtoull(str, NULL, 10));
+#ifdef MINGW
+	return (acl_uint64) atol(str);
+#else
+	return (acl_uint64) strtoull(str, NULL, 10);
+#endif
 }
 
 acl_int64 acl_atoi64(const char *str)
 {
-	return ((acl_int64) strtoull(str, NULL, 10));
+#ifdef MINGW
+	return (acl_int64) atol(str);
+#else
+	return (acl_int64) strtoull(str, NULL, 10);
+#endif
 }
 
 const char *acl_ui64toa(acl_uint64 value, char *buf, size_t size)
 {
 	if (size < 21)
-		return (NULL);
+		return NULL;
 
 	snprintf(buf, size, "%llu", value);
-	return (buf);
+	return buf;
 }
 
 const char *acl_i64toa(acl_int64 value, char *buf, size_t size)
 {
 	if (size < 21)
-		return (NULL);
+		return NULL;
 
 	snprintf(buf, size, "%lld", value);
-	return (buf);
+	return buf;
 }
 
 #endif

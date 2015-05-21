@@ -10,7 +10,6 @@ RANLIB  = ranlib
 CFLAGS = -c -g -W \
 -O3 \
 -Wall \
--Werror \
 -Wcast-qual \
 -Waggregate-return \
 -Wmissing-prototypes \
@@ -19,8 +18,7 @@ CFLAGS = -c -g -W \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \
 -D_USE_FAST_MACRO \
--Wno-long-long \
--fPIC
+-Wno-long-long
 
 # -Wcast-align
 #CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
@@ -56,20 +54,26 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD -pedantic
+	CFLAGS += -DFREEBSD -pedantic -fPIC -Werror
 	UNIXTYPE = FREEBSD
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof
+		  -Wno-extended-offsetof -fPIC -Werror
 	UNIXTYPE = FREEBSD
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	CFLAGS += -DLINUX2 -pedantic
+	CFLAGS += -DLINUX2 -pedantic -fPIC -Werror
+	UNIXTYPE = LINUX
+endif
+
+# For MINGW
+ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
 endif
 
@@ -81,13 +85,13 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
 		SYSLIB = -lsocket -lnsl -lrt
 	endif
-	CFLAGS += -DSUNOS5 -pedantic
+	CFLAGS += -DSUNOS5 -pedantic -fPIC -Werror
 	UNIXTYPE = SUNOS5
 endif
 
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
-	CFLAGS += -DHP_UX -DHPUX11
+	CFLAGS += -DHP_UX -DHPUX11 -fPIC -Werror
 	UNIXTYPE = HPUX
 endif
 

@@ -22,7 +22,7 @@
 static char *get_tls_buf(void)
 {
 	const char *myname = "get_tls_buf";
-	static acl_pthread_key_t buf_key = ACL_TLS_OUT_OF_INDEXES;
+	static acl_pthread_key_t buf_key = (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
 	char *buf;
 	static char  buf_unsafe[BUF_SIZE];
 

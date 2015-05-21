@@ -2,6 +2,7 @@
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <vector>
 #include <list>
+#include <stdarg.h>
 #include <utility>
 
 struct ACL_VSTRING;

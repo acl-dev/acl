@@ -92,11 +92,19 @@ static void vstream_parse_args(ACL_VSTREAM_POPEN_ARGS *args, va_list ap)
 #ifdef	ACL_UNIX
 		case ACL_VSTREAM_POPEN_UID:
 			args->privileged = 1;
+#ifdef MINGW
+			args->uid = (uid_t) va_arg(ap, int);
+#else
 			args->uid = va_arg(ap, uid_t);
+#endif
 			break;
 		case ACL_VSTREAM_POPEN_GID:
 			args->privileged = 1;
+#ifdef MINGW
+			args->gid = (gid_t) va_arg(ap, int);
+#else
 			args->gid = va_arg(ap, gid_t);
+#endif
 			break;
 		case ACL_VSTREAM_POPEN_WAITPID_FN:
 			args->waitpid_fn = va_arg(ap, ACL_VSTREAM_WAITPID_FN);

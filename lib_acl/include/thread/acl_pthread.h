@@ -175,6 +175,7 @@ ACL_API acl_pthread_mutex_t *acl_pthread_mutex_create(void);
 /* in acl_pthread.c */
 ACL_API int acl_pthread_atexit_add(void *arg, void (*free_callback)(void*));
 ACL_API int acl_pthread_atexit_remove(void *arg, void (*free_callback)(void*));
+
 ACL_API int acl_pthread_tls_set_max(int max);
 ACL_API int acl_pthread_tls_get_max(void);
 ACL_API void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr);

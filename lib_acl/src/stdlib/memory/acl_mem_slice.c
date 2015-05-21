@@ -30,7 +30,7 @@
 # include <pthread.h>
 #endif
 
-#ifdef  ACL_HAS_SPINLOCK
+#if  defined(ACL_HAS_SPINLOCK) && !defined(MINGW)
 typedef pthread_spinlock_t mylock_t;
 
 #define MUTEX_INIT(x)		pthread_spin_init(&(x)->lock, PTHREAD_PROCESS_PRIVATE)

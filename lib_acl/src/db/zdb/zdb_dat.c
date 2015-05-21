@@ -112,7 +112,7 @@ static int dat_inode(ZDB *db, int len)
  **/
 static ACL_VSTRING *dat_filepath(ZDB *db, ACL_VSTRING *buf, int idisk, int inode, int ifile)
 {
-	static acl_pthread_key_t buf_key = ACL_TLS_OUT_OF_INDEXES;
+	static acl_pthread_key_t buf_key = (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
 	ACL_VSTRING *buf_safe;
 	static ACL_VSTRING *__buf_unsafe = NULL;
 

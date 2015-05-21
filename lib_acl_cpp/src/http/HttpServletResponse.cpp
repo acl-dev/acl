@@ -161,13 +161,25 @@ bool HttpServletResponse::write(const void* data, size_t len)
 	char hdr[32];
 	safe_snprintf(hdr, sizeof(hdr), "%x\r\n", (int) len);
 
+#ifdef MINGW
+	iov[0].iov_base = hdr;
+#else
 	iov[0].iov_base = (void*) hdr;
+#endif
 	iov[0].iov_len = strlen(hdr);
 
+#ifdef MINGW
+	iov[1].iov_base = (char*) data;
+#else
 	iov[1].iov_base = (void*) data;
+#endif
 	iov[1].iov_len = (int) len;
 
+#ifdef MINGW
+	iov[2].iov_base = (char*) "\r\n";
+#else
 	iov[2].iov_base = (void*) "\r\n";
+#endif
 	iov[2].iov_len = 2;
 
 	return stream_.writev(iov, 3) == -1 ? false : true;

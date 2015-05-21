@@ -572,16 +572,22 @@ static void file_vsyslog(ACL_LOG *log, const char *info, const char *fmt, va_lis
 	acl_logtime_fmt(fmtstr, sizeof(fmtstr));
 
 	if (__log_thread_id) {
-#ifdef LINUX2
+#ifdef MINGW
+		snprintf(tbuf, sizeof(tbuf), "%s %s (pid=%d, tid=%u)(%s): ",
+			fmtstr, log->logpre, (int) getpid(),
+			(unsigned int) acl_pthread_self(), info);
+#elif defined(LINUX2)
 		snprintf(tbuf, sizeof(tbuf), "%s %s (pid=%d, tid=%llu)(%s): ",
 			fmtstr, log->logpre, (int) getpid(),
-			(unsigned long long int) pthread_self(), info);
+			(unsigned long long int) acl_pthread_self(), info);
 #elif defined(SUNOS5)
 		snprintf(tbuf, sizeof(tbuf), "%s %s (pid=%d, tid=%d)(%s): ",
-			fmtstr, log->logpre, (int) getpid(), (int) pthread_self(), info);
+			fmtstr, log->logpre, (int) getpid(),
+			(int) acl_pthread_self(), info);
 #elif defined(WIN32)
 		snprintf(tbuf, sizeof(tbuf), "%s %s (pid=%d, tid=%d)(%s): ",
-			fmtstr, log->logpre, (int) _getpid(), (int) acl_pthread_self(), info);
+			fmtstr, log->logpre, (int) _getpid(),
+			(int) acl_pthread_self(), info);
 #else
 		snprintf(tbuf, sizeof(tbuf), "%s %s: (%s): ",
 			fmtstr, log->logpre, info);
@@ -623,16 +629,22 @@ static void net_vsyslog(ACL_LOG *log, const char *info, const char *fmt, va_list
 	size_t len;
 
 	if (__log_thread_id) {
-#ifdef LINUX2
+#ifdef MINGW
+		snprintf(tbuf, sizeof(tbuf), " %s (pid=%d, tid=%u)(%s): ",
+			log->logpre, (int) getpid(),
+			(unsigned int) acl_pthread_self(), info);
+#elif defined(LINUX2)
 		snprintf(tbuf, sizeof(tbuf), " %s (pid=%d, tid=%llu)(%s): ",
 			log->logpre, (int) getpid(),
-			(unsigned long long int) pthread_self(), info);
+			(unsigned long long int) acl_pthread_self(), info);
 #elif defined(SUNOS5)
 		snprintf(tbuf, sizeof(tbuf), " %s (pid=%d, tid=%d)(%s): ",
-			log->logpre, (int) getpid(), (int) pthread_self(), info);
+			log->logpre, (int) getpid(),
+			(int) acl_pthread_self(), info);
 #elif defined(WIN32)
 		snprintf(tbuf, sizeof(tbuf), " %s (pid=%d, tid=%d)(%s): ",
-			log->logpre, (int) _getpid(), (int) acl_pthread_self(), info);
+			log->logpre, (int) _getpid(),
+			(int) acl_pthread_self(), info);
 #else
 		snprintf(tbuf, sizeof(tbuf), " %s: (%s): ", log->logpre, info);
 #endif

@@ -16,7 +16,6 @@ LIB_NAME  = lib_acl.a
 CFLAGS = -c -g -W \
 -O3 \
 -Wall \
--Werror \
 -Wshadow \
 -Wpointer-arith \
 -Waggregate-return \
@@ -26,8 +25,6 @@ CFLAGS = -c -g -W \
 -Wno-long-long \
 -Wuninitialized \
 -D_POSIX_PTHREAD_SEMANTICS \
--pedantic \
--fPIC
 #-Wno-invalid-source-encoding \
 #-Wno-extended-offsetof
 #-Wcast-align
@@ -62,21 +59,28 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD
+	CFLAGS += -DFREEBSD -fPIC -Werror
 	UNIXTYPE = FREEBSD
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof
+		  -Wno-extended-offsetof -fPIC -Werror
 	UNIXTYPE = MACOSX
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	CFLAGS += -DLINUX2
+	CFLAGS += -DLINUX2 -fPIC -Werror
 	UNIXTYPE = LINUX
+endif
+
+# For MINGW
+ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+	SYSLIB = -lpthread-2
 endif
 
 # For SunOS
@@ -87,13 +91,13 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
 		SYSLIB += -lsocket -lnsl -lrt
 	endif
-	CFLAGS += -DSUNOS5
+	CFLAGS += -DSUNOS5 -fPIC -Werror
 	UNIXTYPE = SUNOS5
 endif
 
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
-	CFLAGS += -DHP_UX -DHPUX11
+	CFLAGS += -DHP_UX -DHPUX11 -fPIC -Werror
 	UNIXTYPE = HPUX
 endif
 

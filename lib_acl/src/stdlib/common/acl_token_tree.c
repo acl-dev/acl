@@ -90,7 +90,7 @@ void acl_token_name(const ACL_TOKEN *token, ACL_VSTRING *buf)
 
 const char *acl_token_name1(const ACL_TOKEN *token)
 {
-	static acl_pthread_key_t buf_key = ACL_TLS_OUT_OF_INDEXES;
+	static acl_pthread_key_t buf_key = (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
 	ACL_VSTRING *buf;
 	static ACL_VSTRING *__buf_unsafe = NULL;
 

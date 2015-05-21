@@ -38,11 +38,13 @@ int acl_set_ugid(uid_t uid, gid_t gid)
 			acl_last_strerror(tbuf, sizeof(tbuf)));
 		return -1;
 	}
+#ifndef MINGW
 	if (setgroups(1, &gid) < 0) {
 		acl_msg_error("setgroups(1, &%ld): %s", (long) gid,
 			acl_last_strerror(tbuf, sizeof(tbuf)));
 		return -1;
 	}
+#endif
 	if (setuid(uid) < 0) {
 		acl_msg_error("setuid(%ld): %s", (long) uid,
 			acl_last_strerror(tbuf, sizeof(tbuf)));

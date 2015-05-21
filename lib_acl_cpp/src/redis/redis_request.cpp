@@ -39,7 +39,11 @@ void redis_request::reserve(size_t size)
 
 void redis_request::put(const char* data, size_t dlen)
 {
+#ifdef MINGW
+	iov_[argc_].iov_base = (char*) data;
+#else
 	iov_[argc_].iov_base = (void*) data;
+#endif
 	iov_[argc_].iov_len = dlen;
 	argc_++;
 }

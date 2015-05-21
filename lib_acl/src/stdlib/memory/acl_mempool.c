@@ -26,7 +26,7 @@
 # include <pthread.h>
 #endif
 
-#ifdef ACL_HAS_SPINLOCK
+#if defined(ACL_HAS_SPINLOCK) && !(MINGW)
 static pthread_spinlock_t __lock;
 
 #define	MUTEX_INIT	pthread_spin_init(&__lock, PTHREAD_PROCESS_PRIVATE)

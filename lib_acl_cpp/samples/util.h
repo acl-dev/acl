@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef MINGW
+#include <sys/time.h>
+#endif
+
 class util
 {
 public:

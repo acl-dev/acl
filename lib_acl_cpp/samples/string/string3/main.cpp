@@ -19,19 +19,17 @@ public:
 
 static void test(void)
 {
-	std::vector<acl::string> aclstr_vec;
-
 	for (int j = 0; j < 10000000; j++)
 	{
 //		const char* tmpstr = "this,is,a,test.";
 		const char* tmpstr = ",,,,";
 		acl::string aclstr(tmpstr); // = acl::string(tmpstr);
-		aclstr_vec = aclstr.split2(",");
-//		int vecsize = aclstr_vec.size();
-//		for (int i = 0; i< vecsize;++i)
-//			std::cout<<aclstr_vec[i].c_str()<<std::endl;
-//		if (j % 10000 == 0)
-//			sleep(1);
+		std::vector<acl::string>& aclstr_vec = aclstr.split2(",");
+		if (j >= 10)
+			continue;
+		int vecsize = (int) aclstr_vec.size();
+		for (int i = 0; i< vecsize;++i)
+			std::cout<<aclstr_vec[i].c_str()<<std::endl;
 	}
 
 	printf("enter any key to continue...");

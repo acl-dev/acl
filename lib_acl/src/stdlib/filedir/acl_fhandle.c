@@ -82,6 +82,8 @@ static ACL_FHANDLE *__fhandle_alloc(size_t size, unsigned int oflags)
 		pthread_mutexattr_init(&attr);
 # if	defined(ACL_FREEBSD) || defined(ACL_SUNOS5) || defined(ACL_MACOSX)
 		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+# elif	defined(MINGW)
+		pthread_mutex_init(&fs->mutex, &attr);
 # else
 		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
 # endif
@@ -426,6 +428,8 @@ void acl_fhandle_init(int cache_size, int debug_section, unsigned int flags)
 	pthread_mutexattr_init(&attr);
 # if	defined(ACL_FREEBSD) || defined(ACL_SUNOS5) || defined(ACL_MACOSX)
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+# elif	defined(MINGW)
+	pthread_mutex_init(&__fhandle_mutex, &attr);
 # else
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
 # endif

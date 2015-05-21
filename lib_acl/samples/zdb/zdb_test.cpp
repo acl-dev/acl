@@ -29,7 +29,10 @@ struct RANGE {
 
 /****************************************************************************/
 
+#ifdef WIN32
 static const char *var_md5_key = "hello world!";
+#endif
+
 static const char *var_str = "hi!";
 
 /* 模拟取得一个随机的整形数组 */

@@ -9,7 +9,7 @@ static char __path[256];
 static char __data[1024];
 static bool __kernel_event = false;
 
-#ifdef	SUNOS5
+#if	defined(SUNOS5) || defined(MINGW)
 static int __nok = 0;  // xxx
 #else
 static __thread int __nok = 0;

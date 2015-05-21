@@ -128,8 +128,13 @@ static ACL_DNS_DB *build_dns_db(const rfc1035_message *res, int count,
 			memcpy(&phost->saddr.sin_addr, res->answer[i].rdata, 4);
 #elif defined(ACL_UNIX)
 			/* 这样直接赋值要比用 memcpy 快些 */
+# ifdef MINGW
+			phost->saddr.sin_addr.s_addr =
+				*((unsigned int*) res->answer[i].rdata);
+# else
 			phost->saddr.sin_addr.s_addr =
 				*((in_addr_t*) res->answer[i].rdata);
+# endif
 #elif defined(WIN32)
 			phost->saddr.sin_addr.s_addr =
 				*((unsigned int*) res->answer[i].rdata);

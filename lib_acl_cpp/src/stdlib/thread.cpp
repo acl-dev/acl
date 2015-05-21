@@ -87,7 +87,7 @@ bool thread::start()
 #ifdef	WIN32
 	thread_id_ = ((acl_pthread_t*) thread_)->id;
 #elif	defined(LINUX2)
-	thread_id_ = thread_;
+	thread_id_ = (unsigned long int) thread_;
 #endif
 
 	return true;

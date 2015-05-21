@@ -131,11 +131,23 @@ AGAIN:
 	if (open() == false)
 		return false;
 
+#ifdef MINGW
+	v[0].iov_base = (char*) req_line_.c_str();
+#else
 	v[0].iov_base = (void*) req_line_.c_str();
+#endif
 	v[0].iov_len = req_line_.length();
+#ifdef MINGW
+	v[1].iov_base = (char*) dat;
+#else
 	v[1].iov_base = (void*) dat;
+#endif
 	v[1].iov_len = dlen;
+#ifdef MINGW
+	v[2].iov_base = (char*) "\r\n";
+#else
 	v[2].iov_base = (void*) "\r\n";
+#endif
 	v[2].iov_len = 2;
 
 	if (conn_->writev(v, 3) < 0)
@@ -278,9 +290,17 @@ bool memcache::set_data(const void* data, size_t dlen)
 
 	struct iovec v[2];
 
+#ifdef MINGW
+	v[0].iov_base = (char*) data;
+#else
 	v[0].iov_base = (void*) data;
+#endif
 	v[0].iov_len = dlen;
+#ifdef MINGW
+	v[1].iov_base = (char*) "\r\n";
+#else
 	v[1].iov_base = (void*) "\r\n";
+#endif
 	v[1].iov_len = 2;
 
 	if (conn_->writev(v, 2) < 0)

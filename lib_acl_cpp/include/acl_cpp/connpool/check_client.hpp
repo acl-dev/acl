@@ -2,6 +2,9 @@
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <map>
 #include <vector>
+#ifndef WIN32
+#include <sys/time.h>
+#endif
 #include "acl_cpp/stream/aio_socket_stream.hpp"                                
 #include "acl_cpp/stdlib/string.hpp"
 

@@ -38,51 +38,51 @@ extern "C" {
 
 /**
  * 将字符串转换为小写，直接在原内存空间进行操作
- * @param string {char *} 给定的字符串
+ * @param s {char *} 给定的字符串
  * @return {char*} 成功返回字符串地址，否则返回 NULL
  */
-ACL_API char *acl_lowercase(char *string);
+ACL_API char *acl_lowercase(char *s);
 
 /**
  * 将给定字符串的前 n 个字节转换为小写
- * @param string {char *} 给定的字符串
+ * @param s {char *} 给定的字符串
  * @param n {int} 最多仅转换的字节数
  * @return {char*} 成功返回字符串地址，否则返回 NULL
  */
-ACL_API char *acl_lowercase2(char *string, size_t n);
+ACL_API char *acl_lowercase2(char *s, size_t n);
 
 /**
  * 将给定字符串转换为小写，结果存储于另一个内存区内
- * @param string {const char*} 源字符串
+ * @param s {const char*} 源字符串
  * @param buf {char*} 存储转换结果的内存指针
  * @param size {size_t} buf 的空间大小
  * @return {char*} 成功返回字符串地址，否则返回 NULL
  */
-ACL_API char *acl_lowercase3(const char *string, char *buf, size_t size);
+ACL_API char *acl_lowercase3(const char *s, char *buf, size_t size);
 
 /**
  * 将字符串转换为大写，直接在原内存空间进行操作
- * @param string {char *} 给定的字符串
+ * @param s {char *} 给定的字符串
  * @return {char*} 成功返回字符串地址，否则返回 NULL
  */
-ACL_API char *acl_uppercase(char *string);
+ACL_API char *acl_uppercase(char *s);
 
 /**
  * 将字符串转换为大写，直接在原内存空间进行操作, 最大转换长度有限制
- * @param string {char *} 给定的字符串
+ * @param s {char *} 给定的字符串
  * @param n {int} 最多仅转换的字节数
  * @return {char*} 成功返回字符串地址，否则返回 NULL
  */
-ACL_API char *acl_uppercase2(char *string, size_t n);
+ACL_API char *acl_uppercase2(char *s, size_t n);
 
 /**
  * 将给定字符串的前 n 个字节转换为大写
- * @param string {char *} 给定的字符串
+ * @param s {char *} 给定的字符串
  * @param buf {char*} 存储转换结果的内存区
  * @param size {size_t} buf 的空间大小(字节)
  * @return {char*} 成功返回字符串地址，否则返回 NULL
  */
-ACL_API char *acl_uppercase3(const char *string, char *buf, size_t size);
+ACL_API char *acl_uppercase3(const char *s, char *buf, size_t size);
 
 /**
  * 将给定字符串用另一个分隔符字符串进行分割
@@ -123,7 +123,8 @@ ACL_API char *acl_mystr_trim(char *str);
  * @param bsize {int} buf 的空间大小
  * @return {int} 拷贝至 buf 中的字符串长度
  */
-ACL_API int acl_mystr_strip(const char *haystack, const char *needle, char *buf, int bsize);
+ACL_API int acl_mystr_strip(const char *haystack, const char *needle,
+		char *buf, int bsize);
 
 /**
  * 从源字符串中找到一行的结束位置并去掉包含回车换行符及其以后的字符串
@@ -231,7 +232,8 @@ ACL_API int acl_strncasecmp(const char *s1, const char *s2, size_t n);
  * @param sizeb {int} pbuf 的空间大小
  * @return {int} 0 成功，-1失败
  */
-ACL_API int acl_file_path_correct(const char *psrc_file_path, char *pbuf, int sizeb);
+ACL_API int acl_file_path_correct(const char *psrc_file_path,
+		char *pbuf, int sizeb);
 
 /*----------------------------------------------------------------------------
  * 保证路径名经过此函数后都为如下格式:
@@ -294,7 +296,8 @@ ACL_API const char *acl_i64toa(acl_int64 value, char *buf, size_t size);
  * @param radix {int} 进制, 如: 8 表示八进制, 10 表示十进制, 16 表示十六进制
  * @return {const char*} 转换的结果，如果转换成功则不为空，否则为空
  */
-ACL_API const char *acl_i64toa_radix(acl_int64 value, char *buf, size_t size, int radix);
+ACL_API const char *acl_i64toa_radix(acl_int64 value, char *buf,
+		size_t size, int radix);
 
 /**
  * 将64位无符号长整型转换为某进制的字符串
@@ -304,7 +307,8 @@ ACL_API const char *acl_i64toa_radix(acl_int64 value, char *buf, size_t size, in
  * @param radix {int} 进制, 如: 8 表示八进制, 10 表示十进制, 16 表示十六进制
  * @return {const char*} 转换的结果，如果转换成功则不为空，否则为空
  */
-ACL_API const char *acl_ui64toa_radix(acl_uint64 value, char *buf, size_t size, int radix);
+ACL_API const char *acl_ui64toa_radix(acl_uint64 value, char *buf,
+		size_t size, int radix);
 
 /*--------------------------------------------------------------------------*/
 
