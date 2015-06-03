@@ -7,7 +7,7 @@
 namespace acl
 {
 
-class redis_pool;
+class redis_client_pool;
 
 /**
  * redis 客户端集群类，通过将此类对象注册入 redis 客户端命令类(redis_command)，

@@ -292,6 +292,9 @@
     <ClCompile Include="src\session\memcache_session.cpp">
       <Filter>src\session</Filter>
     </ClCompile>
+    <ClCompile Include="src\session\redis_session.cpp">
+      <Filter>src\session</Filter>
+    </ClCompile>
     <ClCompile Include="src\session\session.cpp">
       <Filter>src\session</Filter>
     </ClCompile>
@@ -673,6 +676,9 @@
       <Filter>include\session</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\session\memcache_session.hpp">
+      <Filter>include\session</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\session\redis_session.hpp">
       <Filter>include\session</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\zlib_stream.hpp">

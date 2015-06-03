@@ -1119,10 +1119,37 @@ void redis_command::build_request1(size_t argc, const char* argv[], size_t lens[
 		request_buf_ = NEW string(256);
 	else
 		request_buf_->clear();
+
+//#define	USE_FORMAT
+//#define	USE_SNPRINTF
+
+#if	defined(USE_FORMAT)
 	request_buf_->format("*%lu\r\n", (unsigned long) argc);
+#elif	defined(USE_SNPRINTF)
+	char  buf[64];
+	snprintf(buf, sizeof(buf), "*%lu\r\n", (unsigned long) argc);
+	request_buf_->append(buf);
+#else
+	char  buf[64];
+	acl_ui64toa_radix((acl_uint64) argc, buf, sizeof(buf), 10);
+	request_buf_->append("*");
+	request_buf_->append(buf);
+	request_buf_->append("\r\n");
+#endif
+
 	for (size_t i = 0; i < argc; i++)
 	{
+#if	defined(USE_FORMAT)
 		request_buf_->format_append("$%lu\r\n", (unsigned long) lens[i]);
+#elif	defined(USE_SNPRINTF)
+		snprintf(buf, sizeof(buf), "$%lu\r\n", (unsigned long) lens[i]);
+		request_buf_->append(buf);
+#else
+		acl_ui64toa_radix((acl_uint64) lens[i], buf, sizeof(buf), 10);
+		request_buf_->append("$");
+		request_buf_->append(buf);
+		request_buf_->append("\r\n");
+#endif
 		request_buf_->append(argv[i], lens[i]);
 		request_buf_->append("\r\n");
 	}

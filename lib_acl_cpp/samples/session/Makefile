@@ -1,7 +1,7 @@
+base_path = ../..
+CFLAGS += -I../
+
 include ../Makefile.in
-#EXTLIBS = -lpolarssl
-#EXTLIBS = -liconv
-#Path for SunOS
 ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	EXTLIBS = -liconv
 endif

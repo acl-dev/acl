@@ -26,13 +26,13 @@ const char* HttpSession::getAttribute(const char* name) const
 
 const void* HttpSession::getAttribute(const char* name, size_t* size) const
 {
-	const VBUF* bf = const_cast<HttpSession*>
-		(this)->session_.get_vbuf(name);
+	const session_string* bf = const_cast<HttpSession*>
+		(this)->session_.get_buf(name);
 	if (bf == NULL)
 		return NULL;
 	if (size)
-		*size = bf->len;
-	return bf->buf;
+		*size = bf->length();
+	return bf->c_str();
 }
 
 bool HttpSession::setAttribute(const char* name, const char* value)
@@ -52,7 +52,7 @@ bool HttpSession::removeAttribute(const char* name)
 
 bool HttpSession::setMaxAge(time_t ttl)
 {
-	return session_.set_ttl(ttl);
+	return session_.set_ttl(ttl, false);
 }
 
 bool HttpSession::invalidate()

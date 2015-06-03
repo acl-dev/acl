@@ -220,6 +220,12 @@
 				RelativePath=".\session.cpp">
 			</File>
 			<File
+				RelativePath=".\memcache_session.cpp">
+			</File>
+			<File
+				RelativePath=".\redis_session.cpp">
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -251,6 +257,9 @@
 			Name="Í·ÎÄ¼þ"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath=".\session.h">
+			</File>
 			<File
 				RelativePath=".\stdafx.h">
 			</File>

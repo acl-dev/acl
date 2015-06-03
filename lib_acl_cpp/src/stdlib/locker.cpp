@@ -3,15 +3,20 @@
 
 namespace acl {
 
-locker::locker(bool use_mutex /* = true */)
+locker::locker(bool use_mutex /* = true */, bool use_spinlock /* = false */)
 : pFile_(NULL)
 , myFHandle_(false)
 {
 	fHandle_ = ACL_FILE_INVALID;
 	if (use_mutex)
-		init_mutex();
+		init_mutex(use_spinlock);
 	else
-		pMutex_ = NULL;
+	{
+		mutex_ = NULL;
+#if	!defined(WIN32) && !defined(MINGW)
+		spinlock_ = NULL;
+#endif
+	}
 }
 
 locker::~locker()
@@ -20,27 +25,48 @@ locker::~locker()
 		acl_myfree(pFile_);
 	if (myFHandle_ && fHandle_ != ACL_FILE_INVALID)
 		acl_file_close(fHandle_);
-	if (pMutex_)
+	if (mutex_)
 	{
-#ifndef WIN32
-		(void) pthread_mutexattr_destroy(&mutexAttr_);
+#ifndef	WIN32
+		(void) pthread_mutexattr_destroy(&mutex_attr_);
 #endif
-		(void) acl_pthread_mutex_destroy(pMutex_);
-		acl_myfree(pMutex_);
+		(void) acl_pthread_mutex_destroy(mutex_);
+		acl_myfree(mutex_);
 	}
+#if	!defined(WIN32) && !defined(MINGW)
+	if (spinlock_)
+	{
+		pthread_spin_destroy(spinlock_);
+		acl_myfree_fn((void*) spinlock_);
+	}
+#endif
 }
 
-void locker::init_mutex()
+void locker::init_mutex(bool use_spinlock acl_unused)
 {
-	pMutex_ = (acl_pthread_mutex_t*)
+
+#if	defined(ACL_UNIX) && !defined(MINGW)
+	if (use_spinlock)
+	{
+		spinlock_ = (pthread_spinlock_t*)
+			acl_mycalloc(1, sizeof(pthread_spinlock_t));
+		pthread_spin_init(spinlock_, PTHREAD_PROCESS_PRIVATE);
+		mutex_= NULL;
+		return;
+	}
+	else
+		spinlock_ = NULL;
+#endif
+
+	mutex_ = (acl_pthread_mutex_t*)
 		acl_mycalloc(1, sizeof(acl_pthread_mutex_t));
-#ifndef WIN32
-	acl_assert(pthread_mutexattr_init(&mutexAttr_) == 0);
-	acl_assert(pthread_mutexattr_settype(&mutexAttr_,
-		PTHREAD_MUTEX_RECURSIVE) == 0);
-	acl_assert(acl_pthread_mutex_init(pMutex_, &mutexAttr_) == 0);
+#ifdef WIN32
+	acl_assert(acl_pthread_mutex_init(mutex_, NULL) == 0);
 #else
-	acl_assert(acl_pthread_mutex_init(pMutex_, NULL) == 0);
+	acl_assert(pthread_mutexattr_init(&mutex_attr_) == 0);
+	acl_assert(pthread_mutexattr_settype(&mutex_attr_,
+				PTHREAD_MUTEX_RECURSIVE) == 0);
+	acl_assert(acl_pthread_mutex_init(mutex_, &mutex_attr_) == 0);
 #endif
 }
 
@@ -67,8 +93,19 @@ bool locker::open(ACL_FILE_HANDLE fh)
 
 bool locker::lock()
 {
-	if (pMutex_ && acl_pthread_mutex_lock(pMutex_) == -1)
-		return false;
+#if	defined(ACL_UNIX) && !defined(MINGW)
+	if (spinlock_)
+	{
+		if (pthread_spin_lock(spinlock_) != 0)
+			return false;
+	}
+	else
+#endif
+	if (mutex_)
+	{
+		if (acl_pthread_mutex_lock(mutex_) != 0)
+			return false;
+	}
 
 	if (fHandle_ == ACL_FILE_INVALID)
 		return true;
@@ -77,15 +114,26 @@ bool locker::lock()
 	if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL, operation) == 0)
 		return true;
 
-	if (pMutex_)
-		acl_assert(acl_pthread_mutex_unlock(pMutex_) == 0);
+	if (mutex_)
+		acl_assert(acl_pthread_mutex_unlock(mutex_) == 0);
 	return false;
 }
 
 bool locker::try_lock()
 {
-	if (pMutex_ && acl_pthread_mutex_trylock(pMutex_) == -1)
-		return false;
+#if	defined(ACL_UNIX) && !defined(MINGW)
+	if (spinlock_)
+	{
+		if (pthread_spin_trylock(spinlock_) != 0)
+			return false;
+	}
+	else
+#endif
+	if (mutex_)
+	{
+		if (acl_pthread_mutex_trylock(mutex_) != 0)
+			return false;
+	}
 
 	if (fHandle_ == ACL_FILE_INVALID)
 		return true;
@@ -94,8 +142,8 @@ bool locker::try_lock()
 	if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL, operation) == 0)
 		return true;
 
-	if (pMutex_)
-		acl_assert(acl_pthread_mutex_unlock(pMutex_) == 0);
+	if (mutex_)
+		acl_assert(acl_pthread_mutex_unlock(mutex_) == 0);
 	return false;
 }
 
@@ -103,12 +151,22 @@ bool locker::unlock()
 {
 	bool  ret;
 
-	if (pMutex_)
+#if	defined(ACL_UNIX) && !defined(MINGW)
+	if (spinlock_)
 	{
-		if (acl_pthread_mutex_unlock(pMutex_) == -1)
-			ret = false;
-		else
+		if (pthread_spin_unlock(spinlock_) == 0)
 			ret = true;
+		else
+			ret = false;
+	}
+	else
+#endif
+	if (mutex_)
+	{
+		if (acl_pthread_mutex_unlock(mutex_) == 0)
+			ret = true;
+		else
+			ret = false;
 	}
 	else
 		ret = true;

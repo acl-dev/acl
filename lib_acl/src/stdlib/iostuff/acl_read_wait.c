@@ -22,7 +22,95 @@
 #include "stdlib/acl_iostuff.h"
 #include "../../init/init.h"
 
-#ifdef ACL_UNIX
+#if	defined(LINUX2) && !defined(MINGW)
+
+#include "init/acl_init.h"
+#include "thread/acl_pthread.h"
+#include <sys/epoll.h>
+
+static int *main_epoll_read_fd = NULL;
+
+static void main_epoll_end(void)
+{
+	if (main_epoll_read_fd != NULL) {
+		close(*main_epoll_read_fd);
+		acl_myfree(main_epoll_read_fd);
+	}
+}
+
+static acl_pthread_key_t epoll_key;
+static acl_pthread_once_t epoll_once = ACL_PTHREAD_ONCE_INIT;
+
+static void thread_epoll_end(void *buf)
+{
+	int *epoll_fd = (int*) buf;
+
+	close(*epoll_fd);
+	acl_myfree(epoll_fd);
+}
+
+static void thread_epoll_init(void)
+{
+	acl_assert(acl_pthread_key_create(&epoll_key, thread_epoll_end) == 0);
+}
+
+int acl_read_wait(ACL_SOCKET fd, int timeout)
+{
+	const char *myname = "acl_read_wait";
+	int op = EPOLL_CTL_ADD, delay = timeout * 1000, *epoll_fd;
+	struct epoll_event ee, events[1];
+
+	acl_assert(acl_pthread_once(&epoll_once, thread_epoll_init) == 0);
+	epoll_fd = (int*) acl_pthread_getspecific(epoll_key);
+	if (epoll_fd == NULL) {
+		epoll_fd = (int*) acl_mymalloc(sizeof(int));
+		acl_assert(acl_pthread_setspecific(epoll_key, epoll_fd) == 0);
+		if ((unsigned long) acl_pthread_self()
+			== acl_main_thread_self())
+		{
+			main_epoll_read_fd = epoll_fd;
+			atexit(main_epoll_end);
+		}
+
+		*epoll_fd = epoll_create(1);
+	}
+
+	ee.events = EPOLLIN | EPOLLHUP | EPOLLERR;
+	ee.data.u64 = 0;
+	ee.data.fd = fd;
+	if (epoll_ctl(*epoll_fd, op, fd, &ee) == -1) {
+		acl_msg_error("%s(%d): epoll_ctl error: %s, fd: %d",
+			myname, __LINE__, acl_last_serror(), fd);
+		return -1;
+	}
+
+	if (epoll_wait(*epoll_fd, events, 1, delay) == -1) {
+		acl_msg_error("%s(%d): epoll_wait error: %s, fd: %d",
+			myname, __LINE__, acl_last_serror(), fd);
+		return -1;
+	}
+
+	if ((events[0].events & (EPOLLERR | EPOLLHUP)) != 0)
+		return -1;
+
+	if ((events[0].events & EPOLLIN) == 0) {
+		acl_set_error(ACL_ETIMEDOUT);
+		return -1;
+	}
+
+	ee.events = 0;
+	ee.data.u64 = 0;
+	ee.data.fd = fd;
+	if (epoll_ctl(*epoll_fd, EPOLL_CTL_DEL, fd, &ee) == -1) {
+		acl_msg_error("%s(%d): epoll_ctl error: %s, fd: %d",
+			myname, __LINE__, acl_last_serror(), fd);
+		return -1;
+	}
+
+	return 0;
+}
+
+#elif	defined(ACL_UNIX)
 
 int acl_read_wait(ACL_SOCKET fd, int timeout)
 {

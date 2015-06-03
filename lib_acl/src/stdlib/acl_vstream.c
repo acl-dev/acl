@@ -910,8 +910,10 @@ int acl_vstream_read(ACL_VSTREAM *fp, void *buf, size_t size)
 
 	/* fp->read_cnt == 0 */
 	else {
-		int   read_cnt = sys_read(fp, buf, size);
-		return read_cnt <= 0 ? ACL_VSTREAM_EOF : read_cnt;
+		int   read_cnt = read_once(fp);
+		if (read_cnt <= 0)
+			return ACL_VSTREAM_EOF;
+		return acl_vstream_bfcp_some(fp, (unsigned char*) buf, size);
 	}
 }
 

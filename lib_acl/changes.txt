@@ -1,6 +1,13 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+488) 2015.5.25
+488.1) performance: acl_dbuf_pool.c 性能优化，将内存分配次数由原来的三次减少
+至一次
+488.2) performance: acl_vstream.c 性能优化，acl_vstream_read 提供预读功能
+488.3) performance: acl_read_wait.c 中函数 acl_read_wait 在 linux 下采用
+epoll，性能提升不少
+
 487) 2015.4.4
 487.1) compile: acl_define_win32.h 中的 socklen_t 的定义原来使用宏定义 #define
 方式，有时会因为有些版本的 VC 提供了此类型而导致编译报错，现在改为 typedef 定义方式

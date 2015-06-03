@@ -19,6 +19,9 @@
 
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_malloc.h"
+#ifdef	ACL_UNIX
+#include "stdlib/unix/acl_trace.h"
+#endif
 
 #endif
 
@@ -158,6 +161,10 @@ void *acl_default_malloc(const char *filename, int line, size_t len)
 	char *ptr;
 	MBLOCK *real_ptr;
 	const char *pname = NULL;
+#if 0
+	printf("%s:%d, len: %d\r\n", filename, line, (int) len);
+	acl_trace_info();
+#endif
 
 	if (filename && *filename)
 		SET_FILE(pname, filename);

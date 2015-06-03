@@ -898,6 +898,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\session\redis_session.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\session\session.cpp"
 					>
 				</File>
@@ -1545,6 +1549,10 @@
 				>
 				<File
 					RelativePath=".\include\acl_cpp\session\memcache_session.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\session\redis_session.hpp"
 					>
 				</File>
 				<File

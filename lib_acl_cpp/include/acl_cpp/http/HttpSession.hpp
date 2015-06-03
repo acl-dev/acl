@@ -80,7 +80,8 @@ public:
 
 	/**
 	 * 获得所产生的 session ID 标识
-	 * @return {const char*} 永远返回以 '\0' 结尾的非空指针
+	 * @return {const char*} 永远返回以 '\0' 结尾的非空指针，可根据返回
+	 *  值是否为空串("\0")来判断 sid 是否存在
 	 */
 	const char* getSid(void) const;
 

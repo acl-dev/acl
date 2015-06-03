@@ -33,6 +33,7 @@
 #include "acl_cpp/memcache/memcache_manager.hpp"
 
 #include "acl_cpp/session/session.hpp"
+#include "acl_cpp/session/redis_session.hpp"
 #include "acl_cpp/session/memcache_session.hpp"
 
 #include "acl_cpp/stream/stream.hpp"

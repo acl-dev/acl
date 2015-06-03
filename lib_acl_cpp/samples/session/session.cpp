@@ -2,142 +2,65 @@
 //
 
 #include "stdafx.h"
-#include "acl_cpp/acl_cpp_init.hpp"
-#include "acl_cpp/session/memcache_session.hpp"
+#include "session.h"
 
-using namespace acl;
-
-#ifdef WIN32
-#define snprintf _snprintf
-#endif
-
-static int session_test1(const char* addr, int n)
+static void usage(const char* procname)
 {
-	memcache_session s(addr);
-
-	char  name[32], value[32];
-
-	printf(">>>>>>>>>>>>> set session <<<<<<<<<<<<<<<<<<<\r\n");
-	for (int i = 0; i < n; i++)
-	{
-		snprintf(name, sizeof(name), "name-%d", i);
-		snprintf(value, sizeof(value), "value-%d", i);
-		if (s.set(name, value) == 0)
-		{
-			printf("set error, name: %s, value: %s\r\n", name, value);
-			return 1;
-		}
-		printf("set ok, name: %s, value: %s\r\n", name, value);
-	}
-
-	printf("\r\n>>>>>>>>>>>>> get session <<<<<<<<<<<<<<<<<<<\r\n");
-	for (int i = 0; i < n; i++)
-	{
-		snprintf(name, sizeof(name), "name-%d", i);
-		snprintf(value, sizeof(value), "value-%d", i);
-		const char* ptr = s.get(name);
-		if (ptr == NULL || *ptr == 0 || strcmp(ptr, value) != 0)
-		{
-			printf("get error, name: %s\r\n", name);
-			return 1;
-		}
-		printf("get ok, name: %s, value: %s\r\n", name, ptr);
-	}
-
-	printf("\r\n>>>>>>>>>>>>> del session <<<<<<<<<<<<<<<<<<<\r\n");
-	for (int i = 0; i < n; i++)
-	{
-		snprintf(name, sizeof(name), "name-%d", i);
-		if (s.del(name) == false)
-		{
-			printf("del error, name: %s\r\n", name);
-			return 1;
-		}
-		printf("del ok, name: %s\r\n", name);
-	}
-
-	printf("\r\n>>>>>>>>>>>>> get session <<<<<<<<<<<<<<<<<<<\r\n");
-	for (int i = 0; i < n; i++)
-	{
-		snprintf(name, sizeof(name), "name-%d", i);
-		const char* ptr = s.get(name);
-		if (ptr == NULL || *ptr == 0)
-			printf("get ok, name: %s no exist\r\n", name);
-		else
-		{
-			printf("get error, name: %s exist, value: %s\r\n",
-				name, value);
-			return 1;
-		}
-	}
-
-	printf("\r\n------------ test session ok now -------------\r\n");
-	return 0;
+	printf("usage: %s -h [help]\r\n"
+		"-s server_addr\r\n"
+		"-n count\r\n"
+		"-c max_threads\r\n"
+		"-a action[memcache|memcache_delay|redis]\r\n", procname);
 }
-
-static void session_delay_test(const char* addr)
-{
-	const char* sid = "XXXXXXXXXXXXXX";
-	memcache_session sess(addr, 120, 300, NULL, 0, sid);
-	sess.set_ttl(128, true);
-
-	char name[128], value[128];
-	for (int i = 0; i < 10; i++)
-	{
-		snprintf(name, sizeof(name), "name%d", i);
-		snprintf(value, sizeof(value), "value%d", i);
-		sess.set(name, value, true);
-		printf(">>>set %s: %s\r\n", name, value);
-	}
-
-	snprintf(name, sizeof(name), "name5");
-	sess.del(name, true);
-
-	if (sess.flush() == false)
-		printf("set session error\r\n");
-	else
-	{
-		printf("set session ok\r\n");
-		printf("begin get session:\r\n");
-
-		for (int i = 0; i < 11; i++)
-		{
-			snprintf(name, sizeof(name), "name%d", i);
-			snprintf(value, sizeof(value), "value%d", i);
-			const char* ptr = sess.get(name);
-			if (ptr == NULL)
-				printf(">>> %s not found\r\n", name);
-			else
-				printf(">>>get %s: %s, %s\r\n", name, ptr,
-					strcmp(ptr, value) == 0 ? "ok" : "failed");
-		}
-	}
-}
-
 
 int main(int argc, char* argv[])
 {
-	char  addr[256];
-	int   n = 10;
+	char  addr[256], action[32];
+	int   nloop = 10, ch, max_threads = 1;
 
-	if (argc >= 2)
+	acl::acl_cpp_init();
+
+	acl::safe_snprintf(action, sizeof(action), "redis");
+	acl::safe_snprintf(addr, sizeof(addr), "192.168.0.250:11211");
+
+	while ((ch = getopt(argc, argv, "hs:n:c:a:")) > 0)
 	{
-		snprintf(addr, sizeof(addr), "%s", argv[1]);
-		if (argc >= 3)
-			n = atoi(argv[2]);
-		if (n <= 0)
-			n = 10;
+		switch (ch)
+		{
+		case 'h':
+			usage(argv[0]);
+			return 0;
+		case 's':
+			acl::safe_snprintf(addr, sizeof(addr), "%s", optarg);
+			break;
+		case 'n':
+			nloop = atoi(optarg);
+			if (nloop <= 0)
+				nloop = 10;
+			break;
+		case 'c':
+			max_threads = atoi(optarg);
+			break;
+		case 'a':
+			acl::safe_snprintf(action, sizeof(action), "%s", optarg);
+			break;
+		default:
+			break;
+		}
 	}
+
+	printf("nloop: %d, max_threads: %d\r\n", nloop, max_threads);
+
+	if (strcasecmp(action, "memcache") == 0)
+		test_memcache_session(addr, nloop);
+	else if (strcasecmp(action, "memcache_delay") == 0)
+		test_memcache_session_delay(addr);
+	else if (strcasecmp(action, "redis") == 0)
+		test_redis_session(addr, nloop, max_threads);
+	else if (strcasecmp(action, "redis_attrs") == 0)
+		test_redis_session_attrs(addr, nloop);
 	else
-	{
-		snprintf(addr, sizeof(addr), "192.168.0.250:11211");
-		n = 10;
-	}
-
-	acl_cpp_init();
-
-	session_test1(addr, n);
-	session_delay_test(addr);
+		printf("unknown action: %s\r\n", action);
 
 #ifdef WIN32
 	printf("enter any key to exit\r\n");

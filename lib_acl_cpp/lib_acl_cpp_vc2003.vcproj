@@ -801,6 +801,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\session\memcache_session.cpp">
 				</File>
 				<File
+					RelativePath=".\src\session\redis_session.cpp">
+				</File>
+				<File
 					RelativePath=".\src\session\session.cpp">
 				</File>
 			</Filter>
@@ -1315,6 +1318,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Filter="">
 				<File
 					RelativePath=".\include\acl_cpp\session\memcache_session.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\session\redis_session.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\session\session.hpp">

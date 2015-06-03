@@ -61,8 +61,8 @@ public:
 	/**
 	 * 获得 HTTP 客户端请求的某个 cookie 值
 	 * @param name {const char*} cookie 名称，必须非空
-	 * @return {const char*} cookie 值，当返回 NULL 时表示
-	 *  cookie 值不存在
+	 * @return {const char*} cookie 值，若返回 NULL 则表示该 cookie
+	 *  不存在
 	 */
 	const char* getCookieValue(const char* name) const;
 

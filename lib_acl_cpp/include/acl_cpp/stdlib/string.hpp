@@ -46,7 +46,7 @@ public:
 	 * @param n {size_t} s 缓冲区数据长度
 	 */
 	string(const void* s, size_t n);
-	~string(void);
+	virtual ~string(void);
 
 	/**
 	 * 设置字符串类对象为二进制处理模式

@@ -14,12 +14,17 @@ typedef enum
 	TODO_DEL
 } todo_t;
 
-struct VBUF
+class ACL_CPP_API session_string : public string
 {
-	size_t len;
-	size_t size;
-	todo_t todo;
-	char  buf[1];
+public:
+	session_string(size_t n = 64) : string(n), todo_(TODO_NUL) {}
+	session_string(const session_string& ss)
+		: string(ss)
+	{
+		todo_ = ss.todo_;
+	}
+	~session_string() {}
+	todo_t todo_;
 };
 
 /**
@@ -52,7 +57,10 @@ public:
 	 * 获得本 session 对象的唯一 ID 标识
 	 * @return {const char*} 非空
 	 */
-	virtual const char* get_sid(void) const;
+	virtual const char* get_sid(void) const
+	{
+		return sid_.c_str();
+	}
 
 	/**
 	 * 设置本 session 对象的唯一 ID 标识
@@ -66,70 +74,67 @@ public:
 	 * 则必须通过调用本函数将数据真正进行更新
 	 * @return {bool} 数据更新是否成功
 	 */
-	bool flush();
+	virtual bool flush();
 
 	/**
 	 * 向 session 中添加新的字符串属性，同时设置该
 	 * session 的过期时间间隔(秒)
 	 * @param name {const char*} session 名，非空
 	 * @param value {const char*} session 值，非空
-	 * @param delay {bool} 当为 true 时，则延迟发送更新指令到后端的
-	 *  缓存服务器，当用户调用了 session::flush 后再进行数据更新，这
-	 *  样可以提高传输效率；当为 false 时，则立刻更新数据
 	 * @return {bool} 返回 false 表示出错
 	 */
-	bool set(const char* name, const char* value, bool delay = false);
+	virtual bool set(const char* name, const char* value);
 
 	/**
-	 * 向 session 中添加新的属性对象，同时设置该
-	 * session 的过期时间间隔(秒)
+	 * 向 session 中添加新的属性对象并设置该 session 的过期时间间隔(秒)，
 	 * @param name {const char*} session 属性名，非空
 	 * @param value {const char*} session 属性值，非空
 	 * @param len {size_t} value 值长度
-	 * @param delay {bool} 当为 true 时，则延迟发送更新指令到后端的
-	 *  缓存服务器，当用户调用了 session::flush 后再进行数据更新，这
-	 *  样可以提高传输效率；当为 false 时，则立刻更新数据
 	 * @return {bool} 返回 false 表示出错
 	 */
-	bool set(const char* name, const void* value, size_t len, bool delay = false);
+	virtual bool set(const char* name, const void* value, size_t len);
+
+	/**
+	 * 延迟向 session 中添加新的属性对象并设置该 session 的过期时间间隔(秒)，
+	 * 当用户调用了 session::flush 后再进行数据更新， 这样可以提高传输效率
+	 * @param name {const char*} session 属性名，非空
+	 * @param value {const char*} session 属性值，非空
+	 * @param len {size_t} value 值长度
+	 * @return {bool} 返回 false 表示出错
+	 */
+	virtual bool set_delay(const char* name, const void* value, size_t len);
 	
 	/**
 	 * 从 session 中取得字符串类型属性值
 	 * @param name {const char*} session 属性名，非空
-	 * @param local_cached {bool} 当本 session 对象从后端 cache 服务器
-	 *  取过一次数据后，如果该参数为 true，则连续调用本函数时，所用数据
-	 *  是本对象缓存的数据，而不是每次都要从后端取；否则，则每调用本函数
-	 *  都将从后端 cache 服务器取数据
 	 * @return {const char*} session 属性值，返回的指针地址永远非空，用户
 	 *  可以通过判断返回的是否是空串(即: "\0")来判断出错或不存在
 	 *  注：该函数返回非空数据后，用户应该立刻保留此返回值，因为下次
 	 *      的其它函数调用可能会清除该临时返回数据
 	 */
-	const char* get(const char* name, bool local_cached = false);
+	const char* get(const char* name);
 
 	/**
 	 * 从 session 中取得二进制数据类型的属性值
 	 * @param name {const char*} session 属性名，非空
-	 * @param local_cached {bool} 当本 session 对象从后端 cache 服务器
-	 *  取过一次数据后，如果该参数为 true，则连续调用本函数时，所用数据
-	 *  是本对象缓存的数据，而不是每次都要从后端取；否则，则每调用本函数
-	 *  都将从后端 cache 服务器取数据
-	 * @return {const VBUF*} session 属性值，返回空时表示出错或不存在
+	 * @return {const session_string*} session 属性值，返回空时
+	 *  表示出错或不存在
 	 *  注：该函数返回非空数据后，用户应该立刻保留此返回值，因为下次
 	 *      的其它函数调用可能会清除该临时返回数据
 	 */
-	const VBUF* get_vbuf(const char* name, bool local_cached = false);
+	virtual const session_string* get_buf(const char* name);
 
 	/**
 	 * 从 session 中删除指定属性值，当所有的变量都删除
 	 * 时会将整个对象从 memcached 中删除
 	 * @param name {const char*} session 属性名，非空
-	 * @param delay {bool} 当为 true 时，则延迟发送更新指令到后端的
-	 *  缓存服务器，当用户调用了 session::flush 后再进行数据更新，这
-	 *  样可以提高传输效率；当为 false 时，则立刻更新数据
 	 * @return {bool} true 表示成功(含不存在情况)，false 表示删除失败
+	 *  注：当采用延迟方式删除某个属性时，则延迟发送更新指令到后端的
+	 *  缓存服务器，当用户调用了 session::flush 后再进行数据更新，这
+	 *  样可以提高传输效率；否则，则立刻更新数据
 	 */
-	bool del(const char* name, bool delay = false);
+	virtual bool del_delay(const char* name);
+	virtual bool del(const char* name);
 
 	/**
 	 * 重新设置 session 在缓存服务器上的缓存时间
@@ -139,7 +144,7 @@ public:
 	 *  样可以提高传输效率；当为 false 时，则立刻更新数据
 	 * @return {bool} 设置是否成功
 	 */
-	bool set_ttl(time_t ttl, bool delay = true);
+	bool set_ttl(time_t ttl, bool delay);
 
 	/**
 	 * 获得本 session 对象中记录的 session 生存周期；该值有可能
@@ -147,62 +152,58 @@ public:
 	 * 重新设置了 session 在缓存服务器上的生存周期
 	 * @return {time_t}
 	 */
-	time_t get_ttl(void) const;
+	time_t get_ttl(void) const
+	{
+		return ttl_;
+	}
 
 	/**
 	 * 使 session 从服务端的缓存中删除即使 session 失效
 	 * @return {bool} 是否使 session 失效
 	 */
-	bool remove(void);
+	virtual bool remove(void) = 0;
+
+	/**
+	 * 从后端缓存中获得对应 sid 的属性对象集合
+	 * @param attrs {std::map<string, session_string>&}
+	 * @return {bool}
+	 */
+	virtual bool get_attrs(std::map<string, session_string>& attrs) = 0;
+
+	/**
+	 * 向后端缓存写入对应 sid 的属性对象集合
+	 * @param attrs {std::map<string, session_string>&}
+	 * @return {bool}
+	 */
+	virtual bool set_attrs(const std::map<string, session_string>& attrs) = 0;
 
 protected:
-	// 获得对应 sid 的数据
-	virtual bool get_data(const char* sid, string& buf) = 0;
-
-	// 设置对应 sid 的数据
-	virtual bool set_data(const char* sid, const char* buf,
-		size_t len, time_t ttl) = 0;
-
-	// 删除对应 sid 的数据
-	virtual bool del_data(const char* sid) = 0;
-
 	// 设置对应 sid 数据的过期时间
-	virtual bool set_timeout(const char* sid, time_t ttl) = 0;
+	virtual bool set_timeout(time_t ttl) = 0;
+
+protected:
+	// 将 session 数据序列化
+	static void serialize(const std::map<string, session_string>& attrs,
+		string& out);
+
+	// 将 session 数据反序列化
+	static void deserialize(string& buf,
+		std::map<string, session_string>& attrs);
+
+	// 清空 session 属性集合
+	static void attrs_clear(std::map<string, session_string>& attrs);
 
 private:
+	session_string sid_;
 	time_t ttl_;
-	VBUF* sid_;
 
 	// 该变量主要用在 set_ttl 函数中，如果推测该 sid_ 只是新产生的
 	// 且还没有在后端 cache 服务端存储，则 set_ttl 不会立即更新后端
 	// 的 cache 服务器
 	bool sid_saved_;
 	bool dirty_;
-	std::map<string, VBUF*> attrs_;
-	std::map<string, VBUF*> attrs_cache_;
-
-	// 将 session 数据序列化
-	static void serialize(const std::map<string, VBUF*>& attrs, string& out);
-
-	static void serialize(const char* name, const void* value,
-		size_t len, string& buf);
-
-	// 将 session 数据反序列化
-	static void deserialize(string& buf, std::map<string, VBUF*>& attrs);
-
-	// 清空 session 属性集合
-	static void attrs_clear(std::map<string, VBUF*>& attrs);
-
-	// 分配内存对象
-	static VBUF* vbuf_new(const void* str, size_t len, todo_t todo);
-
-	// 对内存对象赋值，如果内存对象空间不够，则重新分配
-	// 内存，调用者必须用返回值做为新的内存对象，该对象
-	// 可能是原有的内存对象，也有可能是新的内存对象
-	static VBUF* vbuf_set(VBUF* buf, const void* str, size_t len, todo_t todo);
-
-	// 释放内存对象
-	static void vbuf_free(VBUF* buf);
+	std::map<string, session_string> attrs_;
+	std::map<string, session_string> attrs_cache_;
 };
 
 } // namespace acl

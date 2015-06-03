@@ -117,7 +117,15 @@ static bool test_get(acl::redis& cmd, int i)
 	cmd.clear();
 
 	acl::string key;
+#if 0
 	key.format("%s_%d", __keypre.c_str(), i);
+#else
+	key.append(__keypre.c_str());
+	key.append("_");
+	char buf[64];
+	acl_ui64toa_radix((acl_uint64) i, buf, sizeof(buf), 10);
+	key.append(buf);
+#endif
 
 	acl::string value;
 

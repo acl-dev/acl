@@ -15,25 +15,20 @@
 #endif
 
 typedef struct ACL_DBUF {
-        void *buf;
-        void *ptr;
         struct ACL_DBUF *next;
+        char *ptr;
+        char  buf_addr[1];
 } ACL_DBUF;
 
 struct ACL_DBUF_POOL {
-        ACL_DBUF *head;
         size_t block_size;
+        ACL_DBUF *head;
+	char  buf_addr[1];
 };
 
 ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size)
 {
-#ifdef	USE_VALLOC
-	ACL_DBUF_POOL *pool = (ACL_DBUF_POOL*) valloc(sizeof(ACL_DBUF_POOL));
-	memset(pool, 0, sizeof(ACL_DBUF_POOL));
-#else
-	ACL_DBUF_POOL *pool = (ACL_DBUF_POOL*) acl_mycalloc(1,
-			sizeof(ACL_DBUF_POOL));
-#endif
+	ACL_DBUF_POOL *pool;
 	size_t size;
 	int    page_size;
 
@@ -55,8 +50,18 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size)
 	if (size == 0)
 		size = page_size;
 
+#ifdef	USE_VALLOC
+	pool = (ACL_DBUF_POOL*) valloc(sizeof(struct ACL_DBUF_POOL)
+			+ sizeof(ACL_DBUF) + size);
+#else
+	pool = (ACL_DBUF_POOL*) acl_mymalloc(sizeof(struct ACL_DBUF_POOL)
+			+ sizeof(ACL_DBUF) + size);
+#endif
+
 	pool->block_size = size;
-	pool->head = NULL;
+	pool->head = (ACL_DBUF*) pool->buf_addr;
+	pool->head->next = NULL;
+	pool->head->ptr = pool->head->buf_addr;
 	return pool;
 }
 
@@ -68,13 +73,13 @@ void acl_dbuf_pool_destroy(ACL_DBUF_POOL *pool)
 	while (iter) {
 		tmp = iter;
 		iter = iter->next;
+		if ((char*) tmp != pool->buf_addr) {
 #ifdef	USE_VALLOC
-		free(tmp->buf);
-		free(tmp);
+			free(tmp);
 #else
-		acl_myfree(tmp->buf);
-		acl_myfree(tmp);
+			acl_myfree(tmp);
 #endif
+		}
 	}
 
 #ifdef	USE_VALLOC
@@ -87,61 +92,20 @@ void acl_dbuf_pool_destroy(ACL_DBUF_POOL *pool)
 static ACL_DBUF *acl_dbuf_alloc(ACL_DBUF_POOL *pool, size_t length)
 {
 #ifdef	USE_VALLOC
-	ACL_DBUF *dbuf = (ACL_DBUF*) valloc(sizeof(ACL_DBUF));
-	memset(dbuf, 0, sizeof(ACL_DBUF));
+	ACL_DBUF *dbuf = (ACL_DBUF*) valloc(sizeof(ACL_DBUF) + length);
 #else
-	ACL_DBUF *dbuf = (ACL_DBUF*) acl_mycalloc(1, sizeof(ACL_DBUF));
+	ACL_DBUF *dbuf = (ACL_DBUF*) acl_mymalloc(sizeof(ACL_DBUF) + length);
 #endif
 	dbuf->next = NULL;
+	dbuf->ptr = (void*) dbuf->buf_addr;
 
-#ifdef	USE_VALLOC
-	dbuf->buf = dbuf->ptr = (void*) valloc(length);
-#else
-	dbuf->buf = dbuf->ptr = (void*) acl_mymalloc(length);
-#endif
-	if (pool->head == NULL) {
+	if (pool->head == NULL)
 		pool->head = dbuf;
-	} else {
+	else {
 		dbuf->next = pool->head;
 		pool->head = dbuf;
 	}
 	return dbuf;
-}
-
-static int acl_dbuf_free(ACL_DBUF *dbuf)
-{
-	if (dbuf->ptr != dbuf->buf)
-		return 0;
-
-#ifdef	USE_VALLOC
-	free(dbuf->ptr);
-	free(dbuf);
-#else
-	acl_myfree(dbuf->ptr);
-	acl_myfree(dbuf);
-#endif
-	return 1;
-}
-
-void acl_dbuf_pool_free(ACL_DBUF_POOL *pool, void *ptr, size_t length)
-{
-	ACL_DBUF *dbuf, *next;
-
-	if (pool->head == NULL)
-		return;
-
-	dbuf = pool->head;
-	if (ptr < dbuf->buf || (char*) dbuf->ptr != (char*) ptr + length) {
-		return;
-	}
-
-	dbuf->ptr = ptr;
-
-	if (length > pool->block_size) {
-		next = dbuf->next;
-		if (acl_dbuf_free(dbuf))
-			pool->head = next;
-	}
 }
 
 void *acl_dbuf_pool_alloc(ACL_DBUF_POOL *pool, size_t length)
@@ -156,7 +120,7 @@ void *acl_dbuf_pool_alloc(ACL_DBUF_POOL *pool, size_t length)
 	else if (pool->head == NULL)
 		dbuf = acl_dbuf_alloc(pool, pool->block_size);
 	else if (pool->block_size < ((char*) pool->head->ptr
-		- (char*) pool->head->buf) + length)
+		- (char*) pool->head->buf_addr) + length)
 	{
 		dbuf = acl_dbuf_alloc(pool, pool->block_size);
 	}

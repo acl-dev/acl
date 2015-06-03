@@ -24,8 +24,9 @@ public:
 	/**
 	 * 构造函数
 	 * @param use_mutex {bool} 是否创建线程锁
+	 * @param use_spinlock {bool} 内部当使用线程锁时是否需要自旋锁
 	 */
-	locker(bool use_mutex = true);
+	locker(bool use_mutex = true, bool use_spinlock = false);
 	virtual ~locker();
 
 	/**
@@ -66,20 +67,20 @@ public:
 	bool unlock();
 
 private:
-	void init_mutex(void);
-
-#ifndef WIN32
-	pthread_mutexattr_t  mutexAttr_;
-#endif
-	acl_pthread_mutex_t* pMutex_;
-
+	acl_pthread_mutex_t* mutex_;
 	char* pFile_;
 #ifdef WIN32
 	void* fHandle_;
 #else
 	int   fHandle_;
+	pthread_mutexattr_t  mutex_attr_;
+# ifndef MINGW
+	pthread_spinlock_t*  spinlock_;
+# endif
 #endif
 	bool  myFHandle_;
+
+	void init_mutex(bool use_spinlock);
 };
 
 }  // namespace acl

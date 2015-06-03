@@ -2,7 +2,6 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "stdlib/acl_define.h"
 #include "stdlib/acl_msg.h"
-#include "stdlib/acl_mymalloc.h"
 #include "thread/acl_pthread.h"
 #include "init/acl_init.h"
 #include "stdlib/unix/acl_trace.h"
@@ -45,13 +44,13 @@ static unsigned int *__main_buf = NULL;
 static void trace_buf_free(void *buf)
 {
 	if ((unsigned long) acl_pthread_self() != acl_main_thread_self())
-		acl_myfree(buf);
+		free(buf);
 }
 
 static void main_buf_free(void)
 {
 	if (__main_buf)
-		acl_myfree(__main_buf);
+		free(__main_buf);
 }
 
 static void trace_buf_init(void)
@@ -71,7 +70,7 @@ void acl_trace_info(void)
 		return;
 	intbuf = acl_pthread_getspecific(__trace_key);
 	if (intbuf == NULL) {
-		intbuf = acl_mymalloc(sizeof(int));
+		intbuf = malloc(sizeof(int));
 		*intbuf = 0;
 		acl_assert(acl_pthread_setspecific(__trace_key, intbuf) == 0);
 		if ((unsigned long) acl_pthread_self()
