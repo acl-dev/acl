@@ -35,19 +35,16 @@ bool http_servlet::doGet(acl::HttpServletRequest& req,
 bool http_servlet::doPost(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
-	// 取得 session 数据，如果 session 不存在，则创建
-	// 注意: getAttribute 永远返回非空地址，需要根据是否是空串来判断
-	// 该 session 的属性是否存在
-	acl::string session_name = req.getSession().getAttribute("session_name");
-	if (session_name.empty())
+	const char* session_name = req.getSession().getAttribute("session_name");
+	if (*session_name == 0)
 	{
 		req.getSession().setAttribute("session_name", "name");
 		req.getSession().setMaxAge(100);
 	}
 	session_name = req.getSession().getAttribute("session_name");
 
-	acl::string session_user = req.getSession().getAttribute("session_user");
-	if (session_user.empty())
+	const char* session_user = req.getSession().getAttribute("session_user");
+	if (*session_user == 0)
 		req.getSession().setAttribute("session_user", "user");
 	session_user = req.getSession().getAttribute("session_user");
 
