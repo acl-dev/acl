@@ -18,6 +18,9 @@ redis_session::redis_session(redis_client_cluster& cluster, size_t max_conns,
 redis_session::~redis_session()
 {
 	delete command_;
+	std::map<string, session_string*>::iterator it;
+	for (it = buffers_.begin(); it != buffers_.end(); ++it)
+		delete it->second;
 }
 
 bool redis_session::set(const char* name, const char* value)
@@ -42,16 +45,30 @@ bool redis_session::set(const char* name, const void* value, size_t len)
 
 const session_string* redis_session::get_buf(const char* name)
 {
+	command_->clear();
 	const char* sid = get_sid();
 	if (sid == NULL || *sid == 0)
 		return NULL;
 
-	ss_.clear();
-	command_->clear();
+	// 先尝试从缓存池中获得一个缓冲区，如果没有合适的，则创建新的缓冲区对象
+	// 并将之加入至缓冲池中，以备下次重复查询相同属性时使用
 
-	if (command_->hget(sid, name, ss_) == false)
+	session_string* ss;
+	std::map<string, session_string*>::iterator it = buffers_.find(name);
+	if (it == buffers_.end())
+	{
+		ss = NEW session_string;
+		buffers_[name] = ss;
+	}
+	else
+	{
+		ss = it->second;
+		ss->clear();
+	}
+
+	if (command_->hget(sid, name, *ss) == false)
 		return NULL;
-	return &ss_;
+	return ss;
 }
 
 bool redis_session::del(const char* name)

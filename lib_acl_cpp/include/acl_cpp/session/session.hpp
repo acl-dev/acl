@@ -193,7 +193,7 @@ protected:
 	// 清空 session 属性集合
 	static void attrs_clear(std::map<string, session_string>& attrs);
 
-private:
+protected:
 	session_string sid_;
 	time_t ttl_;
 

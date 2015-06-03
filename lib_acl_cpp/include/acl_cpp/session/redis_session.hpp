@@ -46,7 +46,7 @@ private:
 	redis_client_cluster& cluster_;
 	redis* command_;
 	size_t max_conns_;
-	session_string ss_;
+	std::map<string, session_string*> buffers_;
 };
 
 } // namespace acl
