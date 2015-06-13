@@ -37,10 +37,10 @@ static bool test_subscribe(acl::redis_pubsub& redis, int n)
 		msg.clear();
 		redis.clear();
 
-		if ((ret = redis.get_message(channel1, msg)) < 0)
+		if ((redis.get_message(channel1, msg)) == false)
 		{
-			printf("get_message error(%s), ret: %d\r\n",
-				redis.result_error(), ret);
+			printf("get_message error(%s)\r\n",
+				redis.result_error());
 			return false;
 		}
 		else if (i < 10)
@@ -51,10 +51,10 @@ static bool test_subscribe(acl::redis_pubsub& redis, int n)
 		msg.clear();
 		redis.clear();
 
-		if ((ret = redis.get_message(channel2, msg)) < 0)
+		if ((redis.get_message(channel2, msg)) == false)
 		{
-			printf("get_message error(%s), ret: %d\r\n",
-				redis.result_error(), ret);
+			printf("get_message error(%s)\r\n",
+				redis.result_error());
 			return false;
 		}
 		else if (i < 10)

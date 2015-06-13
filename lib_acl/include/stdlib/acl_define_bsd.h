@@ -15,15 +15,14 @@
 # define ACL_PATH_BSHELL	"/bin/sh"
 # define ACL_PATH_DEFPATH	"/usr/bin:/usr/bsd"
 # define ACL_PATH_STDPATH	"/usr/bin:/usr/sbin:/usr/bsd"
-
-# define	ACL_HAVE_NO_STAT64
+# define ACL_HAVE_NO_STAT64
 
 # ifdef	ACL_HAVE_NO_STAT64
-#  define	acl_stat	stat
-#  define	acl_fstat	fstat
+#  define acl_stat	stat
+#  define acl_fstat	fstat
 # else
-#  define	acl_stat	stat64
-#  define	acl_fstat	fstat64
+#  define acl_stat	stat64
+#  define acl_fstat	fstat64
 # endif
 
 # ifndef ACL_WAIT_STATUS_T

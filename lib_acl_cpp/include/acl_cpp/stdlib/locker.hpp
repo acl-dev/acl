@@ -74,7 +74,7 @@ private:
 #else
 	int   fHandle_;
 	pthread_mutexattr_t  mutex_attr_;
-# ifndef MINGW
+# if !defined(MINGW) && !defined(MACOSX)
 	pthread_spinlock_t*  spinlock_;
 # endif
 #endif

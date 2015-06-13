@@ -2142,12 +2142,6 @@ char *acl_vstream_loadfile2(const char *path, ssize_t *size)
 	}
 
 	vbuf = acl_vstring_alloc(1024);
-	if (buf == NULL) {
-		acl_msg_error("%s, %s(%d): alloc vstring error(%s)",
-			myname, __FILE__, __LINE__, acl_last_serror());
-		acl_vstream_close(fp);
-		return NULL;
-	}
 
 	while (1) {
 		ret = acl_vstream_read(fp, buf, sizeof(buf));

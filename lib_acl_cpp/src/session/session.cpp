@@ -334,7 +334,7 @@ void session::deserialize(string& buf, std::map<string, session_string>& attrs)
 		if (p1 == NULL || *(p1 + 1) == 0)
 			continue;
 		*p1++ = 0;
-		std::map<string, session_string>::iterator it = attrs.find(ptr);
+		//std::map<string, session_string>::iterator it = attrs.find(ptr);
 
 		size_t len = buf.length() - (p1 - buf.c_str());
 		session_string ss(len);

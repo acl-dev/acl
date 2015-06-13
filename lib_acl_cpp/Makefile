@@ -48,7 +48,8 @@ endif
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof -fPIC -Werror
+		  -Wno-extended-offsetof -fPIC -Werror \
+		  -Wno-unused-private-field
 	UNIXTYPE = MACOSX
 endif
 

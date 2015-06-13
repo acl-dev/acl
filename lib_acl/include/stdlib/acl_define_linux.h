@@ -26,13 +26,12 @@
 # include <unistd.h>
 */
 
-# ifndef ACL_HAS_SPINLOCK
-#  define ACL_HAS_SPINLOCK
-# endif
 # define ACL_USE_PATHS_H
 # ifndef MINGW
 #  define ACL_HAS_FLOCK_LOCK
+#  define ACL_HAS_SPINLOCK
 # endif
+
 # define ACL_HAS_FCNTL_LOCK
 # define ACL_INTERNAL_LOCK	ACL_FLOCK_STYLE_FLOCK
 # define ACL_ROOT_PATH		"/bin:/usr/bin:/sbin:/usr/sbin"
