@@ -276,7 +276,7 @@ bool redis_key::randmkey(string& buf)
 	size_t lens[1];
 
 	argv[0] = "RANDOMKEY";
-	lens[0] = sizeof("RANDOMKEY");
+	lens[0] = sizeof("RANDOMKEY") - 1;
 
 	build_request(1, argv, lens);
 	return get_string(buf) > 0 ? true : false;
