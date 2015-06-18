@@ -84,6 +84,13 @@ ACL_API int acl_aqueue_last_error(const ACL_AQUEUE *queue);
  */
 ACL_API void acl_aqueue_set_quit(ACL_AQUEUE *queue);
 
+/**
+ * 获得当前队列中队列元素的个数
+ * @param queue {ACL_AQUEUE*}
+ * @return {int} 队列中元素个数，< 0 表示出错
+ */
+ACL_API int acl_aqueue_qlen(ACL_AQUEUE* queue);
+
 #ifdef __cplusplus
 }
 #endif

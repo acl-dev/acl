@@ -335,6 +335,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\stdlib\string.cpp" />
     <ClCompile Include="src\stdlib\thread.cpp" />
     <ClCompile Include="src\stdlib\thread_pool.cpp" />
+    <ClCompile Include="src\stdlib\thread_queue.cpp" />
     <ClCompile Include="src\stdlib\url_coder.cpp" />
     <ClCompile Include="src\stdlib\util.cpp" />
     <ClCompile Include="src\stdlib\xml.cpp" />
@@ -484,6 +485,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stdlib\string.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\thread.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\thread_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\thread_queue.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\url_coder.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\util.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\vld.h" />

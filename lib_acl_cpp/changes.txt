@@ -1,6 +1,14 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+316) 2015.6.17
+316.1) feature: 增加了类 thread_queue 用来处理线程消息队列
+
+315) 2015.6.16
+315.1) feature: db_handle.cpp 中的 db_row 类增加了 field_double 方法
+315.2) decprecate: 类 db_pool 中的 peek 方法被注为过期的，建议使用 peek_open 方法，
+使用方式更为简单
+
 314) 2015.6.15
 314.1) bugfix: redis_key.cpp -> randmkey 请求命令组包有误
 

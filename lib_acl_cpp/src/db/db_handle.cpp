@@ -27,9 +27,9 @@ const char* db_row::field_name(size_t ifield) const
 	{
 		logger_error("ifield: %d > names_.size: %d",
 			(int) ifield, (int) names_.size());
-		return (NULL);
+		return NULL;
 	}
-	return (names_[ifield]);
+	return names_[ifield];
 }
 
 const char* db_row::field_value(const char* name) const
@@ -52,12 +52,12 @@ const char* db_row::field_value(const char* name) const
 	}
 
 	// 直接返回相应下标的字段值
-	return (values_[i]);
+	return values_[i];
 }
 
 const char* db_row::operator [](const char* name) const
 {
-	return (field_value(name));
+	return field_value(name);
 }
 
 const char* db_row::field_value(size_t ifield) const
@@ -66,69 +66,87 @@ const char* db_row::field_value(size_t ifield) const
 	{
 		logger_error("ifield(%d) invalid, values_.size: %d",
 			(int) ifield, (int) values_.size());
-		return (NULL);
+		return NULL;
 	}
 
-	return (values_[ifield]);
+	return values_[ifield];
 }
 
 const char* db_row::operator [](size_t ifield) const
 {
-	return (field_value(ifield));
+	return field_value(ifield);
 }
 
 int db_row::field_int(size_t ifield, int null_value /* = 0 */) const
 {
 	const char* ptr = field_value(ifield);
 	if (ptr == NULL)
-		return (null_value);
+		return null_value;
 	else
-		return (atoi(ptr));
+		return atoi(ptr);
 }
 
 int db_row::field_int(const char* name, int null_value /* = 0 */) const
 {
 	const char* ptr = field_value(name);
 	if (ptr == NULL)
-		return (null_value);
+		return null_value;
 	else
-		return (atoi(ptr));
+		return atoi(ptr);
 }
 
 acl_int64 db_row::field_int64(size_t ifield, acl_int64 null_value /* = 0 */) const
 {
 	const char* ptr = field_value(ifield);
 	if (ptr == NULL)
-		return (null_value);
+		return null_value;
 	else
-		return (ACL_DB_ATOU(ptr));
+		return ACL_DB_ATOU(ptr);
 }
 
 acl_int64 db_row::field_int64(const char* name, acl_int64 null_value /* = 0 */) const
 {
 	const char* ptr = field_value(name);
 	if (ptr == NULL)
-		return (null_value);
+		return null_value;
 	else
-		return (ACL_DB_ATOU(ptr));
+		return ACL_DB_ATOU(ptr);
+}
+
+double db_row::field_double(size_t ifield, double null_value /* = 0 */) const
+{
+	const char* ptr = field_value(ifield);
+	if (ptr == NULL)
+		return null_value;
+	else
+		return atof(ptr);
+}
+
+double db_row::field_double(const char* name, double null_value /* = 0 */) const
+{
+	const char* ptr = field_value(name);
+	if (ptr == NULL)
+		return null_value;
+	else
+		return atof(ptr);
 }
 
 const char* db_row::field_string(size_t ifield) const
 {
 	const char* ptr = field_value(ifield);
 	if (ptr == NULL)
-		return (NULL);
+		return NULL;
 	else
-		return (ptr);
+		return ptr;
 }
 
 const char* db_row::field_string(const char* name) const
 {
 	const char* ptr = field_value(name);
 	if (ptr == NULL)
-		return (NULL);
+		return NULL;
 	else
-		return (ptr);
+		return ptr;
 }
 
 void db_row::push_back(const char* value)
@@ -138,7 +156,7 @@ void db_row::push_back(const char* value)
 
 size_t db_row::length() const
 {
-	return (values_.size());
+	return values_.size();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -162,7 +180,7 @@ const std::vector<const db_row*>& db_rows::get_rows(
 	rows_tmp_.clear();
 
 	if (empty())
-		return (rows_tmp_);
+		return rows_tmp_;
 
 	size_t icolumn, ncolumn = names_.size();
 
@@ -187,12 +205,12 @@ const std::vector<const db_row*>& db_rows::get_rows(
 			rows_tmp_.push_back(row);
 	}
 
-	return (rows_tmp_);
+	return rows_tmp_;
 }
 
 const std::vector<db_row*>& db_rows::get_rows() const
 {
-	return (rows_);
+	return rows_;
 }
 
 const db_row* db_rows::operator [](size_t idx) const
@@ -201,21 +219,21 @@ const db_row* db_rows::operator [](size_t idx) const
 	{
 		logger_error("idx(%d) >= rows_.size %d",
 			(int) idx, (int) rows_.size());
-		return (NULL);
+		return NULL;
 	}
 
 	db_row* row = rows_[idx];
-	return (row);
+	return row;
 }
 
 bool db_rows::empty() const
 {
-	return (rows_.empty());
+	return rows_.empty();
 }
 
 size_t db_rows::length() const
 {
-	return (rows_.size());
+	return rows_.size();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -306,7 +324,7 @@ void db_handle::print_out(size_t max /* = 0 */) const
 
 const db_rows* db_handle::get_result() const
 {
-	return (result_);
+	return result_;
 }
 
 const std::vector<const db_row*>* db_handle::get_rows(

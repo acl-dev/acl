@@ -24,6 +24,7 @@ public:
 	 * 由该函数获得的连接句柄不能 delete，否则会造成连接池的内部计数器出错
 	 * @return {db_handle*} 返回空，则表示出错
 	 */
+	ACL_CPP_DEPRECATED_FOR("peek_open")
 	db_handle* peek();
 
 	/**
@@ -109,6 +110,8 @@ private:
 
 	// 设置本实例的唯一 ID 标识
 	void set_id();
+
+	db_handle* peek_handle();
 };
 
 } // namespace acl

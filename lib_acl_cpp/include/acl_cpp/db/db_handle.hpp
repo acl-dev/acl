@@ -99,6 +99,9 @@ public:
 	long long int field_int64(const char* name, long long int null_value = 0) const;
 #endif
 
+	double field_double(size_t ifield, double null_value = 0) const;
+	double field_double(const char* name, double null_value = 0) const;
+
 	/**
 	 * 从查询结果的记录行中取得对应下标的字符串类型的字段值
 	 * @param ifield {size_t} 下标值

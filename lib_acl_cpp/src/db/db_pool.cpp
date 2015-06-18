@@ -50,7 +50,7 @@ db_pool& db_pool::set_idle(int idle)
 
 db_handle* db_pool::peek_open(const char* charset /* = "utf8" */)
 {
-	db_handle* conn = peek();
+	db_handle* conn = peek_handle();
 
 	if (conn == NULL)
 		return NULL;
@@ -63,6 +63,11 @@ db_handle* db_pool::peek_open(const char* charset /* = "utf8" */)
 }
 
 db_handle* db_pool::peek()
+{
+	return peek_handle();
+}
+
+db_handle* db_pool::peek_handle()
 {
 	db_handle* conn;
 

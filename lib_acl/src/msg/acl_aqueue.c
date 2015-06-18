@@ -68,14 +68,9 @@ struct ACL_AQUEUE {
 
 ACL_AQUEUE *acl_aqueue_new(void)
 {
-	const char *myname = "acl_aqueue_new";
 	ACL_AQUEUE *queue;
-	char  buf[256];
 
 	queue = (ACL_AQUEUE *) acl_mymalloc(sizeof(ACL_AQUEUE));
-	if (queue == NULL)
-		acl_msg_fatal("%s: malloc error(%s)",
-			myname, acl_last_strerror(buf, sizeof(buf)));
 
 	acl_pthread_mutex_init(&queue->lock, NULL);
 	acl_pthread_cond_init(&queue->cond, NULL);
@@ -88,7 +83,7 @@ ACL_AQUEUE *acl_aqueue_new(void)
 	queue->owner = (unsigned long) acl_pthread_self();
 	queue->check_owner = 0;
 	
-	return (queue);
+	return queue;
 }
 
 void acl_aqueue_check_owner(ACL_AQUEUE *queue, char flag)
@@ -107,24 +102,23 @@ void acl_aqueue_free(ACL_AQUEUE *queue, ACL_AQUEUE_FREE_FN free_fn)
 {
 	const char *myname = "acl_aqueue_free";
 	ACL_AQUEUE_ITEM *qi;
-	char  buf[256];
 	int   status;
 
 	if (queue == NULL)
 		return;
 
-	if (queue->check_owner && (unsigned long) acl_pthread_self() != queue->owner) {
-		acl_msg_error("%s: cur tid(%lu) != owner(%lu), denied",
-				myname, (unsigned long) acl_pthread_self(),
-				queue->owner);
+	if (queue->check_owner
+		&& (unsigned long) acl_pthread_self() != queue->owner)
+	{
+		acl_msg_error("%s: cur tid(%lu) != owner(%lu)!", myname,
+			(unsigned long) acl_pthread_self(), queue->owner);
 		return;
 	}
 
 	queue->quit = 1;
 	status = acl_pthread_mutex_lock(&queue->lock);
 	if (status != 0)
-		acl_msg_error("%s: lock error(%s)",
-				myname, acl_last_strerror(buf, sizeof(buf)));
+		acl_msg_error("%s: lock error(%s)", myname, acl_last_serror());
 
 	while (1) {
 		qi = queue->first;
@@ -138,8 +132,7 @@ void acl_aqueue_free(ACL_AQUEUE *queue, ACL_AQUEUE_FREE_FN free_fn)
 
 	status = acl_pthread_mutex_unlock(&queue->lock);
 	if (status != 0)
-		acl_msg_error("%s: lock error(%s)",
-				myname, acl_last_strerror(buf, sizeof(buf)));
+		acl_msg_error("%s: lock error(%s)", myname, acl_last_serror());
 
 	acl_pthread_mutex_destroy(&queue->lock);
 	acl_pthread_cond_destroy(&queue->cond);
@@ -154,7 +147,6 @@ void *acl_aqueue_pop(ACL_AQUEUE *queue)
 static int aqueue_wait(ACL_AQUEUE *queue, const struct  timespec *ptimeout)
 {
 	const char *myname = "aqueue_wait";
-	char  buf[256];
 	int   status;
 
 	while (queue->first == NULL && queue->quit == 0) {
@@ -168,27 +160,25 @@ static int aqueue_wait(ACL_AQUEUE *queue, const struct  timespec *ptimeout)
 			status = acl_pthread_mutex_unlock(&queue->lock);
 			if (status != 0)
 				acl_msg_error("%s(%d): unlock error(%s)",
-					myname, __LINE__,
-					acl_last_strerror(buf, sizeof(buf)));
+					myname, __LINE__, acl_last_serror());
 
 			queue->error = ACL_AQUEUE_ERR_TIMEOUT;
-			return (-1);
+			return -1;
 		} else if (status != 0) {
 			status = acl_pthread_mutex_unlock(&queue->lock);
 			if (status != 0)
 				acl_msg_error("%s(%d): unlock error(%s)",
-					myname, __LINE__,
-					acl_last_strerror(buf, sizeof(buf)));
+					myname, __LINE__, acl_last_serror());
 
 			queue->error = ACL_AQUEUE_ERR_COND_WAIT;
 			__SET_ERRNO(status);
 			acl_msg_error("%s: cond wait error(%s)",
-				myname, acl_last_strerror(buf, sizeof(buf)));
-			return (-1);
+				myname, acl_last_serror());
+			return -1;
 		}
 	}
 
-	return (0);
+	return 0;
 }
 
 void *acl_aqueue_pop_timedwait(ACL_AQUEUE *queue, int tmo_sec, int tmo_usec)
@@ -199,7 +189,6 @@ void *acl_aqueue_pop_timedwait(ACL_AQUEUE *queue, int tmo_sec, int tmo_usec)
 	struct	timespec  timeout, *ptimeout;
 	int   status;
 	void *data;
-	char  buf[256];
 
 	if (queue == NULL)
 		acl_msg_fatal("%s: queue null", myname);
@@ -209,11 +198,9 @@ void *acl_aqueue_pop_timedwait(ACL_AQUEUE *queue, int tmo_sec, int tmo_usec)
 	status = acl_pthread_mutex_lock(&queue->lock);
 	if (status) {
 		__SET_ERRNO(status);
-		acl_msg_error("%s: lock error(%s)",
-				myname, acl_last_strerror(buf, sizeof(buf)));
-		
 		queue->error = ACL_AQUEUE_ERR_LOCK;
-		return (NULL);
+		acl_msg_error("%s: lock error(%s)", myname, acl_last_serror());
+		return NULL;
 	}
 
 	qi = NULL;
@@ -229,7 +216,7 @@ void *acl_aqueue_pop_timedwait(ACL_AQUEUE *queue, int tmo_sec, int tmo_usec)
 		}
 
 		if (aqueue_wait(queue, ptimeout) < 0)
-			return (NULL);
+			return NULL;
 
 		qi = queue->first;
 		if (qi != NULL) {
@@ -243,18 +230,18 @@ void *acl_aqueue_pop_timedwait(ACL_AQUEUE *queue, int tmo_sec, int tmo_usec)
 			status = acl_pthread_mutex_unlock(&queue->lock);
 			if (status != 0) {
 				acl_msg_error("%s(%d): unlock error(%s)",
-					myname, __LINE__, acl_last_strerror(buf, sizeof(buf)));
+					myname, __LINE__, acl_last_serror());
 				queue->error = ACL_AQUEUE_ERR_UNLOCK;
 			}
 
-			return (NULL);
+			return NULL;
 		}
 	}
 
 	status = acl_pthread_mutex_unlock(&queue->lock);
 	if (status != 0)
 		acl_msg_error("%s(%d): unlock error(%s)",
-			myname, __LINE__, acl_last_strerror(buf, sizeof(buf)));
+			myname, __LINE__, acl_last_serror());
 
 	if (qi == NULL)
 		acl_msg_fatal("%s(%d): qi null", myname, __LINE__);
@@ -262,34 +249,28 @@ void *acl_aqueue_pop_timedwait(ACL_AQUEUE *queue, int tmo_sec, int tmo_usec)
 	data = qi->data;
 	acl_myfree(qi);
 
-	return (data);
+	return data;
 }
 
 int acl_aqueue_push(ACL_AQUEUE *queue, void *data)
 {
 	const char *myname = "acl_aqueue_push";
 	ACL_AQUEUE_ITEM *qi;
-	char  buf[256];
 	int   status;
 
 	if (queue == NULL)
 		acl_msg_fatal("%s: aqueue null", myname);
 
 	qi = acl_mycalloc(1, sizeof(ACL_AQUEUE_ITEM));
-	if (qi == NULL)
-		acl_msg_fatal("%s: calloc error(%s)",
-			myname, acl_last_strerror(buf, sizeof(buf)));
-
 	qi->data = data;
 
 	status = acl_pthread_mutex_lock(&queue->lock);
 	if (status != 0) {
 		__SET_ERRNO(status);
-		acl_msg_error("%s: lock error(%s)",
-				myname, acl_last_strerror(buf, sizeof(buf)));
+		acl_msg_error("%s: lock error(%s)", myname, acl_last_serror());
 		acl_myfree(qi);
 		queue->error = ACL_AQUEUE_ERR_LOCK;
-		return (-1);
+		return -1;
 	}
 
 	if (queue->first == NULL)
@@ -303,20 +284,43 @@ int acl_aqueue_push(ACL_AQUEUE *queue, void *data)
 	status = acl_pthread_mutex_unlock(&queue->lock);
 	if (status != 0) {
 		__SET_ERRNO(status);
-		acl_msg_error("%s: unlock error(%s)",
-				myname, acl_last_strerror(buf, sizeof(buf)));
-		return (-1);
+		acl_msg_error("%s: unlock error(%s)", myname, acl_last_serror());
+		return -1;
 	}
 
 	status = acl_pthread_cond_signal(&queue->cond);
 	if (status != 0) {
 		__SET_ERRNO(status);
 		acl_msg_error("%s: cond signal error(%s)",
-				myname, acl_last_strerror(buf, sizeof(buf)));
-		return (-1);
+			myname, acl_last_serror());
+		return -1;
 	}
 
-	return (0);
+	return 0;
+}
+
+int acl_aqueue_qlen(ACL_AQUEUE* queue)
+{
+	const char *myname = "acl_aqueue_qlen";
+	int   status, n;
+
+	status = acl_pthread_mutex_lock(&queue->lock);
+	if (status) {
+		acl_msg_error("%s(%d), %s: pthread_mutex_lock error(%s)",
+			__FILE__, __LINE__, myname, strerror(status));
+		return -1;
+	}
+
+	n = queue->qlen;
+
+	status = acl_pthread_mutex_unlock(&queue->lock);
+	if (status) {
+		acl_msg_error("%s(%d), %s: pthread_mutex_unlock error(%s)",
+			__FILE__, __LINE__, myname, strerror(status));
+		return -1;
+	}
+
+	return n;
 }
 
 void acl_aqueue_set_quit(ACL_AQUEUE *queue)
@@ -329,5 +333,5 @@ int acl_aqueue_last_error(const ACL_AQUEUE *queue)
 	if (queue == NULL)
 		return (ACL_AQUEUE_ERR_UNKNOWN);
 
-	return (queue->error);
+	return queue->error;
 }
