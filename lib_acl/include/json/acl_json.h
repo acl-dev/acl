@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include "stdlib/acl_define.h"
+#include "stdlib/acl_dbuf_pool.h"
 #include "stdlib/acl_iterator.h"
 #include "stdlib/acl_vstring.h"
 #include "stdlib/acl_ring.h"
@@ -94,12 +96,10 @@ struct ACL_JSON {
 
 	/* private */
 
-	int   status;                   /**< 状态机当前解析状态 */
+	int   status;               /**< 状态机当前解析状态 */
 
-	ACL_ARRAY *node_cache;      /**< json 结点缓存池 */
-	int   max_cache;            /**< json 结点缓存池的最大容量 */
 	ACL_JSON_NODE *curr_node;   /**< 当前正在处理的 json 结点 */
-	ACL_SLICE_POOL *slice;      /**< 内存池对象 */
+	ACL_DBUF_POOL *dbuf;        /**< 会话内存池对象 */
 };
 
 /*----------------------------- in acl_json.c -----------------------------*/
@@ -177,13 +177,6 @@ ACL_API const char *acl_json_node_type(const ACL_JSON_NODE *node);
 ACL_API ACL_JSON *acl_json_alloc(void);
 
 /**
- * 创建一个 json 对象，该 json 对象及所有的内部内存分配都在该内存池上进行分配
- * @param slice {ACL_SLICE_POOL*} 内存池对象，可以为空指针，表明不用内存池
- * @return {ACL_JSON*} 新创建的 json 对象
- */
-ACL_API ACL_JSON *acl_json_alloc1(ACL_SLICE_POOL *slice);
-
-/**
  * 根据一个 JSON 对象的一个 JSON 结点创建一个新的 JSON 对象
  * @param node {ACL_JSON_NODE*} 源 JSON 对象的一个 JSON 结点
  * @return {ACL_JSON*} 新创建的 JSON 对象
@@ -201,25 +194,10 @@ ACL_API ACL_JSON *acl_json_create(ACL_JSON_NODE *node);
 ACL_API void acl_json_foreach_init(ACL_JSON *json, ACL_JSON_NODE *node);
 
 /**
- * 打开或关闭 json 的缓存功能，当复用 ACL_JSON 对象时打开
- * json 的结点缓存功能有利提高效率
- * @param json {ACL_JSON*} json 对象
- * @param max_cache {int} 缓存的最大值，当该值 > 0 时会打开 json 解析器
- *  对 json 结点的缓存功能，否则会关闭 json 解析器对 json 结点的缓存功能
- */
-ACL_API void acl_json_cache(ACL_JSON *json, int max_cache);
-
-/**
- * 释放 JSON 中缓存的 JSON 结点对象
- * @param json {ACL_JSON*} json 对象
- */
-ACL_API void acl_json_cache_free(ACL_JSON *json);
-
-/**
  * 释放一个 json 对象, 同时释放该对象里容纳的所有 json 结点
  * @param json {ACL_JSON*} json 对象
  */
-ACL_API int acl_json_free(ACL_JSON *json);
+ACL_API void acl_json_free(ACL_JSON *json);
 
 /**
  * 重置 json 解析器对象

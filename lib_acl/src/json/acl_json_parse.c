@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include <stdio.h>
 #ifndef ACL_PREPARE_COMPILE
+#include "stdlib/acl_define.h"
 #include "json/acl_json.h"
 #endif
 

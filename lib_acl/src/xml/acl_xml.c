@@ -24,8 +24,8 @@ ACL_XML_ATTR *acl_xml_attr_alloc(ACL_XML_NODE *node)
 	else
 		attr = (ACL_XML_ATTR*) acl_mycalloc(1, sizeof(ACL_XML_ATTR));
 	attr->node = node;
-	attr->name = acl_vstring_alloc2(node->xml->slice, 16);
-	attr->value = acl_vstring_alloc2(node->xml->slice, 16);
+	attr->name = acl_vstring_slice_alloc(node->xml->slice, 16);
+	attr->value = acl_vstring_slice_alloc(node->xml->slice, 16);
 	attr->quote = 0;
 	attr->backslash = 0;
 	attr->part_word = 0;
@@ -170,9 +170,9 @@ ACL_XML_NODE *acl_xml_node_alloc(ACL_XML *xml)
 
 	node->xml = xml;
 	node->status = ACL_XML_S_NXT;
-	node->ltag = acl_vstring_alloc2(xml->slice, 16);
-	node->rtag = acl_vstring_alloc2(xml->slice, 16);
-	node->text = acl_vstring_alloc2(xml->slice, 16);
+	node->ltag = acl_vstring_slice_alloc(xml->slice, 16);
+	node->rtag = acl_vstring_slice_alloc(xml->slice, 16);
+	node->text = acl_vstring_slice_alloc(xml->slice, 16);
 	node->attr_list = acl_array_create(5);
 	xml->node_cnt++;
 

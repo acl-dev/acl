@@ -276,12 +276,9 @@ static void test_json_file(const char* path)
 	acl_myfree(buf);
 }
 
-static void test_json_benchmark(bool use_cache, bool once, int max)
+static void test_json_benchmark(bool once, int max)
 {
 	ACL_JSON *json = acl_json_alloc();
-
-	if (use_cache)
-		acl_json_cache(json, 1000);
 
 	ACL_METER_TIME("-------------bat begin--------------");
 
@@ -314,7 +311,7 @@ static void usage(const char* program)
 {
 	printf("usage: %s -h[help]\n"
 		" -f json_filepath\n"
-		" -b[benchmark] -c[cache for banchmark] -m benchmark_max\n"
+		" -b[benchmark] -m benchmark_max\n"
 		" -s[once parse]\n"
 		" -M[use mempool]\r\n", program);
 }
@@ -336,9 +333,9 @@ int main(int argc, char** argv)
 	int   ch;
 	int   benchmark_max = 100;
 	bool  use_default = true, benchmark = false;
-	bool  benchmark_cache = false, once = false, use_mempool = false;
+	bool  once = false, use_mempool = false;
 
-	while ((ch = getopt(argc, argv, "hf:bcm:sM")) > 0)
+	while ((ch = getopt(argc, argv, "hf:bm:sM")) > 0)
 	{
 		switch (ch)
 		{
@@ -353,10 +350,6 @@ int main(int argc, char** argv)
 		case 'b':
 			use_default = false;
 			benchmark = true;
-			break;
-		case 'c':
-			use_default = false;
-			benchmark_cache = true;
 			break;
 		case 'm':
 			use_default = false;
@@ -383,7 +376,7 @@ int main(int argc, char** argv)
 	}
 
 	if (benchmark)
-		test_json_benchmark(benchmark_cache, once, benchmark_max);
+		test_json_benchmark(once, benchmark_max);
 	else if (use_default)
 		test_json_default();
 

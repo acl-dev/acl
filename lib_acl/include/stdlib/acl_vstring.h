@@ -8,6 +8,7 @@ extern "C" {
 #include "acl_define.h"
 #include <stdarg.h>
 #include "acl_vbuf.h"
+#include "acl_dbuf_pool.h"
 #include "acl_slice.h"
 
 /**
@@ -17,6 +18,7 @@ typedef struct ACL_VSTRING {
     ACL_VBUF  vbuf;
     int       maxlen;
     ACL_SLICE_POOL *slice;
+    ACL_DBUF_POOL *dbuf;
 } ACL_VSTRING;
 
 /**
@@ -48,7 +50,16 @@ ACL_API ACL_VSTRING *acl_vstring_alloc(size_t len);
  * @param len {size_t} 初始时缓冲区大小
  * @return {ACL_VSTRING*} 新分配的 ACL_VSTRING 对象
  */
-ACL_API ACL_VSTRING *acl_vstring_alloc2(ACL_SLICE_POOL *slice, size_t len);
+ACL_API ACL_VSTRING *acl_vstring_slice_alloc(ACL_SLICE_POOL *slice, size_t len);
+
+/**
+ * 动态分配一个 ACL_VSTRING 对象并指定内部缓冲区的初始化大小，
+ * 同时指定内存池对象，优化内存分配
+ * @param slice {ACL_SLICE_POOL*} 切片内存池管理对象
+ * @param len {size_t} 初始时缓冲区大小
+ * @return {ACL_VSTRING*} 新分配的 ACL_VSTRING 对象
+ */
+ACL_API ACL_VSTRING *acl_vstring_dbuf_alloc(ACL_DBUF_POOL *dbuf, size_t len);
 
 /**
  * 设置 ACL_VSTRING 对象的属性, 目前该函数的功能还不够完善
@@ -72,9 +83,8 @@ ACL_API ACL_VSTRING *acl_vstring_truncate(ACL_VSTRING *vp, size_t len);
 /**
  * 释放由 acl_vstring_alloc 动态分配的 ACL_VSTRING 对象
  * @param vp {ACL_VSTRING*}
- * @return {ACL_VSTRING*} 永远为 NULL，所以不必关心返回值
  */
-ACL_API ACL_VSTRING *acl_vstring_free(ACL_VSTRING *vp);
+ACL_API void acl_vstring_free(ACL_VSTRING *vp);
 
 /**
  * 拷贝字符串

@@ -59,7 +59,12 @@ static void vstring_extend(ACL_VBUF *bp, int incr)
 	if (vp->slice)
 		bp->data = (unsigned char *) acl_slice_pool_realloc(
 			__FILE__, __LINE__, vp->slice, bp->data, new_len);
-	else
+	else if (vp->dbuf) {
+		const unsigned char *data = bp->data;
+		bp->data = (unsigned char *) acl_dbuf_pool_alloc(
+			vp->dbuf, new_len);
+		memcpy(bp->data, data, used);
+	} else
 		bp->data = (unsigned char *) acl_myrealloc(bp->data, new_len);
 	bp->len = new_len;
 	bp->ptr = bp->data + used;
@@ -98,11 +103,17 @@ static int vstring_buf_space(ACL_VBUF *bp, int len)
 void acl_vstring_init(ACL_VSTRING *vp, size_t len)
 {
 	if (len < 1)
-		acl_msg_panic("acl_vstring_alloc: bad input, vp null or len < 1");
+		acl_msg_panic("acl_vstring_alloc: bad input, len < 1");
+
+	if (vp->slice)
+		vp->vbuf.data = (unsigned char *) acl_slice_pool_alloc(
+			__FILE__, __LINE__, vp->slice, len);
+	else if (vp->dbuf)
+		vp->vbuf.data = (unsigned char *) acl_dbuf_pool_alloc(vp->dbuf, len);
+	else
+		vp->vbuf.data = (unsigned char *) acl_mymalloc(len);
 
 	vp->vbuf.flags = 0;
-	vp->vbuf.len = 0;
-	vp->vbuf.data = (unsigned char *) acl_mymalloc(len);
 	vp->vbuf.len = len;
 	ACL_VSTRING_RESET(vp);
 	vp->vbuf.data[0] = 0;
@@ -116,20 +127,24 @@ void acl_vstring_init(ACL_VSTRING *vp, size_t len)
 
 void acl_vstring_free_buf(ACL_VSTRING *vp)
 {
-	if (vp->vbuf.data) {
+	if (vp->vbuf.data == NULL)
+		return;
+
+	if (vp->slice)
+		acl_slice_pool_free(__FILE__, __LINE__, vp->vbuf.data);
+	else if (vp->dbuf == NULL)
 		acl_myfree(vp->vbuf.data);
-		vp->vbuf.data = NULL;
-	}
+	vp->vbuf.data = NULL;
 }
 
 /* acl_vstring_alloc - create variable-length string */
 
 ACL_VSTRING *acl_vstring_alloc(size_t len)
 {
-	return (acl_vstring_alloc2(NULL, len));
+	return (acl_vstring_slice_alloc(NULL, len));
 }
 
-ACL_VSTRING *acl_vstring_alloc2(ACL_SLICE_POOL *slice, size_t len)
+ACL_VSTRING *acl_vstring_slice_alloc(ACL_SLICE_POOL *slice, size_t len)
 {
 	ACL_VSTRING *vp;
 
@@ -139,17 +154,47 @@ ACL_VSTRING *acl_vstring_alloc2(ACL_SLICE_POOL *slice, size_t len)
 		vp = (ACL_VSTRING*) acl_slice_pool_alloc(__FILE__, __LINE__,
 			slice, sizeof(*vp));
 		vp->slice = slice;
+		vp->dbuf = NULL;
+		vp->vbuf.data = (unsigned char *) acl_slice_pool_alloc(
+			__FILE__, __LINE__, slice, len);
 	} else {
 		vp = (ACL_VSTRING *) acl_mymalloc(sizeof(*vp));
 		vp->slice = NULL;
-	}
-	vp->vbuf.flags = 0;
-	vp->vbuf.len = 0;
-	if (vp->slice)
-		vp->vbuf.data = (unsigned char *) acl_slice_pool_alloc(
-			__FILE__, __LINE__, vp->slice, len);
-	else
+		vp->dbuf = NULL;
 		vp->vbuf.data = (unsigned char *) acl_mymalloc(len);
+	}
+
+	vp->vbuf.flags = 0;
+	vp->vbuf.len = len;
+	ACL_VSTRING_RESET(vp);
+	vp->vbuf.data[0] = 0;
+	vp->vbuf.get_ready = vstring_buf_get_ready;
+	vp->vbuf.put_ready = vstring_buf_put_ready;
+	vp->vbuf.space = vstring_buf_space;
+	vp->vbuf.ctx = vp;
+	vp->maxlen = 0;
+	return (vp);
+}
+
+ACL_VSTRING *acl_vstring_dbuf_alloc(ACL_DBUF_POOL *dbuf, size_t len)
+{
+	ACL_VSTRING *vp;
+
+	if (len < 1)
+		acl_msg_panic("acl_vstring_alloc: bad length %d", (int) len);
+	if (dbuf) {
+		vp = (ACL_VSTRING*) acl_dbuf_pool_alloc(dbuf, sizeof(*vp));
+		vp->dbuf = dbuf;
+		vp->slice = NULL;
+		vp->vbuf.data = (unsigned char *) acl_dbuf_pool_alloc(dbuf, len);
+	} else {
+		vp = (ACL_VSTRING *) acl_mymalloc(sizeof(*vp));
+		vp->slice = NULL;
+		vp->dbuf = NULL;
+		vp->vbuf.data = (unsigned char *) acl_mymalloc(len);
+	}
+
+	vp->vbuf.flags = 0;
 	vp->vbuf.len = len;
 	ACL_VSTRING_RESET(vp);
 	vp->vbuf.data[0] = 0;
@@ -163,19 +208,17 @@ ACL_VSTRING *acl_vstring_alloc2(ACL_SLICE_POOL *slice, size_t len)
 
 /* acl_vstring_free - destroy variable-length string */
 
-ACL_VSTRING *acl_vstring_free(ACL_VSTRING *vp)
+void acl_vstring_free(ACL_VSTRING *vp)
 {
-	if (vp->vbuf.data) {
-		if (vp->slice)
+	if (vp->slice) {
+		if (vp->vbuf.data)
 			acl_slice_pool_free(__FILE__, __LINE__, vp->vbuf.data);
-		else
-			acl_myfree(vp->vbuf.data);
-	}
-	if (vp->slice)
 		acl_slice_pool_free(__FILE__, __LINE__, vp);
-	else
+	} else if (vp->dbuf == NULL) {
+		if (vp->vbuf.data)
+			acl_myfree(vp->vbuf.data);
 		acl_myfree(vp);
-	return (0);
+	}
 }
 
 /* acl_vstring_ctl - modify memory management policy */
@@ -650,9 +693,8 @@ const ACL_VSTRING *acl_buffer_gets_nonl(ACL_VSTRING *vp, const char **src, size_
 
 	/* È¥³ý¶àÓàµÄ \r\n */
 	while (pend >= pbegin) {
-		if (*pend != '\r' && *pend != '\n') {
+		if (*pend != '\r' && *pend != '\n')
 			break;
-		}
 		pend--;
 	}
 	if (pend < pbegin) {
