@@ -18,19 +18,53 @@ int main(int argc, char* argv[])
 
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
-		acl::log::stdout_open(true);  // 日志输出至标准输出
-		const char* addr = "127.0.0.1:8888";
-		printf("listen on: %s\r\n", addr);
+		// 日志输出至标准输出
+		acl::log::stdout_open(true);
+
+		// 监听的地址列表，格式：ip:port1,ip:port2,...
+		const char* addrs = "127.0.0.1:8888";
+		printf("listen on: %s\r\n", addrs);
+
+		// 测试时设置该值 > 0 则指定服务器处理客户端连接过程的
+		// 会话总数（一个连接从接收到关闭称之为一个会话），当
+		// 处理的连接会话数超过此值，测试过程结束；如果该值设
+		// 为 0，则测试过程永远不结束
+		int count = 0;
+
+		// 单独运行方式
 		if (argc >= 3)
-			ms.run_alone(addr, argv[2], 5);  // 单独运行方式
+			ms.run_alone(addrs, argv[2], count);
 		else
-			ms.run_alone(addr, NULL, 5);  // 单独运行方式
+			ms.run_alone(addrs, NULL, count);
 
 		printf("Enter any key to exit now\r\n");
 		getchar();
 	}
 	else
-		ms.run_daemon(argc, argv);  // acl_master 控制模式运行
+	{
+#ifdef	WIN32
+		// 日志输出至标准输出
+		acl::log::stdout_open(true);
+
+		// 监听的地址列表，格式：ip:port1,ip:port2,...
+		const char* addrs = "127.0.0.1:8888";
+		printf("listen on: %s\r\n", addrs);
+
+		// 测试时设置该值 > 0 则指定服务器处理客户端连接过程的
+		// 会话总数（一个连接从接收到关闭称之为一个会话），当
+		// 处理的连接会话数超过此值，测试过程结束；如果该值设
+		// 为 0，则测试过程永远不结束
+		int count = 0;
+
+		ms.run_alone(addrs, NULL, count);  // 单独运行方式
+		printf("Enter any key to exit now\r\n");
+		getchar();
+
+#else
+		// acl_master 控制模式运行
+		ms.run_daemon(argc, argv);
+#endif
+	}
 
 	return 0;
 }

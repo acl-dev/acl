@@ -18,11 +18,21 @@ int main(int argc, char* argv[])
 
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
-		acl::log::stdout_open(true);  // 日志输出至标准输出
+		// 日志输出至标准输出
+		acl::log::stdout_open(true);
+
+		// 当该值 > 0 时设定定时器被触发的次数限制，即当定时器触发
+		// 的次数达到此值时，程序退出；否则 (<=0) 则定时器会一直触发
+		int count = 5;
+
+		// 定时器触发的时间间隔（单位为：秒）
+		int interval = 1;
+
+		// 单独运行方式
 		if (argc >= 3)
-			ms.run_alone(argv[2], 5, 1);  // 单独运行方式
+			ms.run_alone(argv[2], count, interval);
 		else
-			ms.run_alone(NULL, 5, 1);  // 单独运行方式
+			ms.run_alone(NULL, count, interval);
 
 		printf("Enter any key to exit now\r\n");
 		getchar();
@@ -30,13 +40,23 @@ int main(int argc, char* argv[])
 	else
 	{
 #ifdef	WIN32
-		acl::log::stdout_open(true);  // 日志输出至标准输出
+		// 日志输出至标准输出
+		acl::log::stdout_open(true);
 
-		ms.run_alone(NULL, 5, 1);  // 单独运行方式
+		// 当该值 > 0 时设定定时器被触发的次数限制，即当定时器触发
+		// 的次数达到此值时，程序退出；否则 (<=0) 则定时器会一直触发
+		int count = 5;
+
+		// 定时器触发的时间间隔（单位为：秒）
+		int interval = 1;
+
+		// 单独运行方式
+		ms.run_alone(NULL, count, interval);
 		printf("Enter any key to exit now\r\n");
 		getchar();
 #else
-		ms.run_daemon(argc, argv);  // acl_master 控制模式运行
+		// acl_master 控制模式运行
+		ms.run_daemon(argc, argv);
 #endif
 	}
 

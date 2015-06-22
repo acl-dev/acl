@@ -1,6 +1,12 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+491) 2015.6.21
+491.1) feature: acl_dbuf_pool.c 增加了 acl_dbuf_pool_reset 方法，可以方便该
+内存池被重复使用
+491.2) performance: acl_json.c 中 acl_json_rest 方法中使用了 acl_dbuf_pool_reset
+来重复使用会话内存池
+
 490) 2015.6.19
 490.1) performance: acl_json.c/acl_vstring.c 支持使用 ACL_DBUF_POOL 内存池
 进行内存分配，从而大大提升了性能

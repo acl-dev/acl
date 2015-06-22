@@ -67,19 +67,18 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size)
 
 void acl_dbuf_pool_destroy(ACL_DBUF_POOL *pool)
 {
-	ACL_DBUF *iter, *tmp;
+	ACL_DBUF *iter = pool->head, *tmp;
 
-	iter = pool->head;
 	while (iter) {
 		tmp = iter;
 		iter = iter->next;
-		if ((char*) tmp != pool->buf_addr) {
+		if ((char*) tmp == pool->buf_addr)
+			break;
 #ifdef	USE_VALLOC
-			free(tmp);
+		free(tmp);
 #else
-			acl_myfree(tmp);
+		acl_myfree(tmp);
 #endif
-		}
 	}
 
 #ifdef	USE_VALLOC
@@ -87,6 +86,26 @@ void acl_dbuf_pool_destroy(ACL_DBUF_POOL *pool)
 #else
 	acl_myfree(pool);
 #endif
+}
+
+void acl_dbuf_pool_reset(ACL_DBUF_POOL *pool)
+{
+	ACL_DBUF *iter = pool->head, *tmp;
+
+	while (iter) {
+		tmp = iter;
+		iter = iter->next;
+		if ((char*) tmp == pool->buf_addr)
+			break;
+#ifdef	USE_VALLOC
+		free(tmp);
+#else
+		acl_myfree(tmp);
+#endif
+	}
+	pool->head = (ACL_DBUF*) pool->buf_addr;
+	pool->head->next = NULL;
+	pool->head->ptr = pool->head->buf_addr;
 }
 
 static ACL_DBUF *acl_dbuf_alloc(ACL_DBUF_POOL *pool, size_t length)

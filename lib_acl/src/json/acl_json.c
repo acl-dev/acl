@@ -439,8 +439,12 @@ void acl_json_free(ACL_JSON *json)
 
 void acl_json_reset(ACL_JSON *json)
 {
+#if 0
 	acl_dbuf_pool_destroy(json->dbuf);
 	json->dbuf = acl_dbuf_pool_create(81920);
+#else
+	acl_dbuf_pool_reset(json->dbuf);
+#endif
 
 	json->root = acl_json_node_alloc(json);
 	json->root->left_ch = '{';

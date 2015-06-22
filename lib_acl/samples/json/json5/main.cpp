@@ -56,18 +56,32 @@ static void test_json_benchmark(int max)
 	ACL_METER_TIME("-------------bat end--------------");
 }
 
+static int   benchmark_max = 100;
+
+static void *thread_func(void *ctx acl_unused)
+{
+	test_json_benchmark(benchmark_max);
+	return NULL;
+}
+
 static void usage(const char* program)
 {
-	printf("usage: %s -h[help]\n"
-		" -m benchmark_max\n", program);
+	printf("usage: %s -h[help]\r\n"
+		" -c max_threads\r\n"
+		" -m benchmark_max\r\n", program);
 }
 
 int main(int argc, char** argv)
 {
-	int   ch;
-	int   benchmark_max = 100;
+	int   ch, i;
+	int   max_threads = 1;
+	acl_pthread_attr_t attr;
+	acl_pthread_t tid;
+	acl_pthread_t* ids;
 
-	while ((ch = getopt(argc, argv, "hm:")) > 0)
+	acl_pthread_attr_init(&attr);
+
+	while ((ch = getopt(argc, argv, "hm:c:")) > 0)
 	{
 		switch (ch)
 		{
@@ -78,12 +92,27 @@ int main(int argc, char** argv)
 		case 'm':
 			benchmark_max = atoi(optarg);
 			break;
+		case 'c':
+			max_threads = atoi(optarg);
+			if (max_threads <= 0)
+				max_threads = 1;
+			break;
 		default:
 			break;
 		}
 	}
 
-	test_json_benchmark(benchmark_max);
+	ids = (acl_pthread_t*) acl_mymalloc(max_threads * sizeof(acl_pthread_t));
+
+	for (i = 0; i < max_threads; i++) {
+		acl_pthread_create(&tid, &attr, thread_func, NULL);
+		ids[i] = tid;
+	}
+
+	for (i = 0; i < max_threads; i++)
+		acl_pthread_join(ids[i], NULL);
+
+	acl_myfree(ids);
 
 #ifdef	WIN32
 	getchar();
