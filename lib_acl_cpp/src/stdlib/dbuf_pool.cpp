@@ -14,6 +14,11 @@ dbuf_pool::~dbuf_pool()
 	acl_dbuf_pool_destroy(pool_);
 }
 
+void dbuf_pool::dbuf_reset()
+{
+	acl_dbuf_pool_reset(pool_);
+}
+
 void* dbuf_pool::dbuf_alloc(size_t len)
 {
 	return acl_dbuf_pool_alloc(pool_, len);

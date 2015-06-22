@@ -1010,7 +1010,7 @@ int redis_zset::zrangebylex(const char* key, const char* min, const char* max,
 	size_t argc = 4;
 
 	argv[0] = "ZRANGEBYLEX";
-	lens[0] = sizeof("ZRANGEBYLEX");
+	lens[0] = sizeof("ZRANGEBYLEX") - 1;
 
 	argv[1] = key;
 	lens[1] = strlen(key);

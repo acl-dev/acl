@@ -113,8 +113,7 @@ void redis_command::clear(bool save_slot /* = false */)
 {
 	if (used_ > 0)
 	{
-		delete pool_;
-		pool_ = NEW dbuf_pool();
+		pool_->dbuf_reset();
 		result_ = NULL;
 	}
 	if (!save_slot)

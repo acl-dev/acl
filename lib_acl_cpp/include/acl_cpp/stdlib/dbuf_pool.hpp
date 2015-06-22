@@ -18,6 +18,11 @@ public:
 	~dbuf_pool();
 
 	/**
+	 * 重置内存池的状态以便于重复使用该内存池对象
+	 */
+	void dbuf_reset();
+
+	/**
 	 * 分配指定长度的内存
 	 * @param len {size_t} 需要分配的内存长度，当内存比较小时(小于构造函数中的
 	 *  block_size)时，所分配的内存是在 dbuf_pool 所管理的内存链上，当内存较大时
