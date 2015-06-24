@@ -105,13 +105,9 @@ void acl_vstring_init(ACL_VSTRING *vp, size_t len)
 	if (len < 1)
 		acl_msg_panic("acl_vstring_alloc: bad input, len < 1");
 
-	if (vp->slice)
-		vp->vbuf.data = (unsigned char *) acl_slice_pool_alloc(
-			__FILE__, __LINE__, vp->slice, len);
-	else if (vp->dbuf)
-		vp->vbuf.data = (unsigned char *) acl_dbuf_pool_alloc(vp->dbuf, len);
-	else
-		vp->vbuf.data = (unsigned char *) acl_mymalloc(len);
+	vp->slice = NULL;
+	vp->dbuf = NULL;
+	vp->vbuf.data = (unsigned char *) acl_mymalloc(len);
 
 	vp->vbuf.flags = 0;
 	vp->vbuf.len = len;

@@ -583,12 +583,14 @@ void http_hdr_fprint(ACL_VSTREAM *fp, const HTTP_HDR *hh, const char *msg)
 
 	n = acl_array_size(hh->entry_lnk);
 	if (n <= 0) {
-		acl_msg_info("%s, %s(%d): array empty",	myname, __FILE__, __LINE__);
+		acl_msg_info("%s, %s(%d): array empty",
+			myname, __FILE__, __LINE__);
 		return;
 	}
 
-	acl_vstream_fprintf(fp, "------------- in %s - (%s)----------------\r\n",
-		myname, msg ? msg : "begin");
+	if (msg && *msg)
+		acl_vstream_fprintf(fp, "---------- in %s - (%s) -------\r\n",
+			myname, msg ? msg : "begin");
 	entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, 0);
 	if (entry)
 		acl_vstream_fprintf(fp, "%s %s\r\n", entry->name, entry->value);
@@ -598,7 +600,9 @@ void http_hdr_fprint(ACL_VSTREAM *fp, const HTTP_HDR *hh, const char *msg)
 			break;
 		acl_vstream_fprintf(fp, "%s: %s\r\n", entry->name, entry->value);
 	}
-	acl_vstream_fprintf(fp, "--------------- end -----------------\r\n");
+
+	if (msg && *msg)
+		acl_vstream_fprintf(fp, "------------ end -------------\r\n");
 }
 
 void http_hdr_sprint(ACL_VSTRING *bf, const HTTP_HDR *hh, const char *msg)
@@ -614,12 +618,15 @@ void http_hdr_sprint(ACL_VSTRING *bf, const HTTP_HDR *hh, const char *msg)
 
 	n = acl_array_size(hh->entry_lnk);
 	if (n <= 0) {
-		acl_msg_info("%s, %s(%d): array empty",	myname, __FILE__, __LINE__);
+		acl_msg_info("%s, %s(%d): array empty",
+			myname, __FILE__, __LINE__);
 		return;
 	}
 
-	acl_vstring_sprintf(bf, "------------- in %s - (%s)----------------\r\n",
-		myname, msg ? msg : "begin");
+	if (msg && *msg)
+		acl_vstring_sprintf(bf, "----------- in %s - (%s)-------\r\n",
+			myname, msg ? msg : "begin");
+
 	entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, 0);
 	if (entry)
 		acl_vstring_sprintf_append(bf, "%s %s\r\n",
@@ -631,5 +638,7 @@ void http_hdr_sprint(ACL_VSTRING *bf, const HTTP_HDR *hh, const char *msg)
 		acl_vstring_sprintf_append(bf, "%s: %s\r\n",
 			entry->name, entry->value);
 	}
-	acl_vstring_strcat(bf, "--------------- end -----------------\r\n");
+
+	if (msg && *msg)
+		acl_vstring_strcat(bf, "------------- end -------------\r\n");
 }

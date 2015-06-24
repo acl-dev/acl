@@ -825,9 +825,9 @@ void http_client::sprint_header(string& out, const char* prompt)
 		return;
 	}
 	if (hdr_res_)
-		http_hdr_sprint(bf, &hdr_res_->hdr, prompt ? prompt : "dummy");
+		http_hdr_sprint(bf, &hdr_res_->hdr, prompt);
 	else if (hdr_req_)
-		http_hdr_sprint(bf, &hdr_req_->hdr, prompt ? prompt : "dummy");
+		http_hdr_sprint(bf, &hdr_req_->hdr, prompt);
 }
 
 }  // namespace acl

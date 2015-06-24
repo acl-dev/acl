@@ -517,7 +517,7 @@ bool HttpServletRequest::readHeader(void)
 		method_ = HTTP_METHOD_DELETE;
 	else if (strcasecmp(method, "HEAD") == 0)
 		method_ = HTTP_METHOD_HEAD;
-	else if (strcasecmp(method, "OPTION") == 0)
+	else if (strcasecmp(method, "OPTIONS") == 0)
 		method_ = HTTP_METHOD_OPTION;
 	else
 	{
