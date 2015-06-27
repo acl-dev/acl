@@ -431,19 +431,21 @@ unsigned beanstalk::ignore_all()
 	}
 
 	unsigned ret = 1;  // at least one default tube is watched
-	std::vector<char*>::iterator it_next = tubes_watched_.begin(), it;
-	++it_next;  // skip first default tube
-	for (it = it_next; it != tubes_watched_.end(); it = it_next)
+	std::vector<char*>::iterator it = tubes_watched_.begin();
+	++it;  // skip first default tube
+	for (; it != tubes_watched_.end();)
 	{
-		++it_next;
 		ret = ignore_one(*it);
 		if (ret == 0)
 		{
 			logger_error("ignore tube %s failed", *it);
 			errbuf_ = "ignore";
+			acl_myfree(*it);
 			return 0;
 		}
-		tubes_watched_.erase(it);
+		acl_myfree(*it);
+		it = tubes_watched_.erase(it);
+		ret++;
 	}
 
 	return ret;

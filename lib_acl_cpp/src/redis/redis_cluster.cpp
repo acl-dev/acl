@@ -702,14 +702,11 @@ const std::map<string, redis_node*>* redis_cluster::cluster_nodes()
 		line.clear();
 	}
 
-	std::map<string, redis_node*>::iterator it2;
-	std::vector<redis_node*>::iterator it = slaves.begin(), it_next;
-
-	for (it_next = it; it != slaves.end(); it = it_next)
+	for (std::vector<redis_node*>::iterator it = slaves.begin();
+		it != slaves.end(); ++it)
 	{
-		++it_next;
 		const char* id = (*it)->get_master_id();
-		it2 = masters_.find(id);
+		std::map<string, redis_node*>::iterator it2 = masters_.find(id);
 		if (it2 != masters_.end())
 			it2->second->add_slave(*it);
 		else

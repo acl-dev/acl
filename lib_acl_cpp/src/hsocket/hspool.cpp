@@ -65,18 +65,17 @@ hsclient* hspool::peek(const char* dbn, const char* tbl,
 
 	// 查询地址匹配的连接对象，如果存在一个匹配的连接对象，则
 	// 打开新的表
-	it = pool_.begin();
-	std::list<hsclient*>::iterator it_next = it;
-
-	for (; it != pool_.end(); it = it_next)
+	for (it = pool_.begin(); it != pool_.end();)
 	{
-		++it_next;
 		// 如果地址不匹配查跳过，地址必须匹配
 		if (strcmp((*it)->get_addr(), addr) != 0)
+		{
+			++it;
 			continue;
+		}
 
 		client = *it;
-		pool_.erase(it); // 从连接池中删除
+		it = pool_.erase(it); // 从连接池中删除
 
 		// 打开新的表
 		if (client->open_tbl(dbn, tbl, idx, flds, true))

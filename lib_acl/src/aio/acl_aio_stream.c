@@ -21,7 +21,8 @@
 #include "../event/events.h"
 #include "aio.h"
 
-static int accept_callback(ACL_ASTREAM *astream acl_unused, void *context acl_unused)
+static int accept_callback(ACL_ASTREAM *astream acl_unused,
+	void *context acl_unused)
 {
 	const char *myname = "accept_callback";
 
@@ -29,7 +30,8 @@ static int accept_callback(ACL_ASTREAM *astream acl_unused, void *context acl_un
 	return (-1);
 }
 
-static int listen_callback(ACL_ASTREAM *astream acl_unused, void *context acl_unused)
+static int listen_callback(ACL_ASTREAM *astream acl_unused,
+	void *context acl_unused)
 {
 	const char *myname = "listen_callback";
 
@@ -57,16 +59,11 @@ void *acl_aio_get_ctx(ACL_ASTREAM *stream)
 
 ACL_ASTREAM *acl_aio_open(ACL_AIO *aio, ACL_VSTREAM *stream)
 {
-	const char *myname = "acl_aio_open";
-	char  ebuf[256];
 	ACL_ASTREAM *astream;
 	
 	acl_non_blocking(ACL_VSTREAM_SOCK(stream), ACL_NON_BLOCKING);
 
 	astream = acl_mymalloc(sizeof(ACL_ASTREAM));
-	if (astream == NULL)
-		acl_msg_fatal("%s: calloc error(%s)",
-			myname, acl_last_strerror(ebuf, sizeof(ebuf)));
 	
 	astream->aio = aio;
 	astream->stream = stream;
@@ -89,11 +86,6 @@ ACL_ASTREAM *acl_aio_open(ACL_AIO *aio, ACL_VSTREAM *stream)
 	if ((stream->type & ACL_VSTREAM_TYPE_LISTEN)) {
 		if (stream->read_buf == NULL)
 			stream->read_buf_len = aio->rbuf_size;
-/*
-		else
-			acl_msg_warn("%s(%d): stream->read_buf not null, fixed",
-				myname, __LINE__);
-*/
 		astream->accept_nloop = 1;
 	}
 
@@ -210,8 +202,8 @@ static void aio_delay_close(ACL_ASTREAM *astream)
 		astream->flag |= ACL_AIO_FLAG_IOCP_CLOSE;
 		/* 放在延迟关闭队列中 */
 		if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE) == 0) {
-			astream->aio->dead_streams->push_back(astream->aio->dead_streams,
-							astream);
+			astream->aio->dead_streams->push_back(
+				astream->aio->dead_streams, astream);
 			astream->flag |= ACL_AIO_FLAG_DELAY_CLOSE;
 		}
 		return;
@@ -254,7 +246,8 @@ void aio_delay_check(ACL_AIO *aio)
 
 static acl_pthread_key_t __aio_tls_key = ACL_TLS_OUT_OF_INDEXES;
 
-static VOID CALLBACK CloseTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+static VOID CALLBACK CloseTimer(HWND hwnd, UINT uMsg,
+	UINT_PTR idEvent, DWORD dwTime)
 {
 	const char *myname = "CloseTimer";
 	ACL_AIO *tls_aio;
@@ -262,12 +255,14 @@ static VOID CALLBACK CloseTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dw
 	KillTimer(hwnd, idEvent);
 
 	if (__aio_tls_key == ACL_TLS_OUT_OF_INDEXES)
-		acl_msg_fatal("%s(%d): __aio_tls_key invalid", myname, __LINE__);
+		acl_msg_fatal("%s(%d): __aio_tls_key invalid",
+			myname, __LINE__);
 
 	tls_aio = acl_pthread_tls_get(&__aio_tls_key);
 	if (tls_aio == NULL)
 		acl_msg_fatal("%s(%d): get tls aio error(%s), tls_key: %d",
-			myname, __LINE__, acl_last_serror(), (int) __aio_tls_key);
+			myname, __LINE__, acl_last_serror(),
+			(int) __aio_tls_key);
 	aio_delay_check(tls_aio);
 }
 
@@ -286,7 +281,8 @@ static void CloseTimer(int event_type acl_unused, ACL_EVENT *event, void *ctx)
 static acl_pthread_key_t  __aio_tls_key = ACL_TLS_OUT_OF_INDEXES;
 static acl_pthread_once_t __aio_once_control = ACL_PTHREAD_ONCE_INIT;
 
-static VOID CALLBACK CloseTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+static VOID CALLBACK CloseTimer(HWND hwnd, UINT uMsg,
+	UINT_PTR idEvent, DWORD dwTime)
 {
 	const char *myname = "CloseTimer";
 	ACL_AIO *tls_aio;
@@ -294,7 +290,8 @@ static VOID CALLBACK CloseTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dw
 	KillTimer(hwnd, idEvent);
 
 	if (__aio_tls_key == ACL_TLS_OUT_OF_INDEXES)
-		acl_msg_fatal("%s(%d): __aio_tls_key invalid", myname, __LINE__);
+		acl_msg_fatal("%s(%d): __aio_tls_key invalid",
+			myname, __LINE__);
 
 	tls_aio = acl_pthread_getspecific(__aio_tls_key);
 	if (tls_aio == NULL)
@@ -337,10 +334,8 @@ void acl_aio_iocp_close(ACL_ASTREAM *astream)
 	acl_foreach(iter, aio->dead_streams) {
 		ACL_ASTREAM *s = (ACL_ASTREAM*) iter.data;
 		if (s == astream)
-		{
 			acl_msg_fatal("%s(%d): flag: %d, size: %d",
 				myname, __LINE__, astream->flag, iter.size);
-		}
 	}
 	/* 放在延迟关闭队列中 */
 	aio->dead_streams->push_back(aio->dead_streams, astream);
@@ -356,11 +351,13 @@ void acl_aio_iocp_close(ACL_ASTREAM *astream)
 
 		acl_assert(hWnd != NULL);
 		if (__aio_tls_key == ACL_TLS_OUT_OF_INDEXES)
-			acl_msg_fatal("%s(%d): __tls_key invalid", myname, __LINE__);
+			acl_msg_fatal("%s(%d): __tls_key invalid",
+				myname, __LINE__);
 		if (tls_aio == NULL)
 			acl_pthread_tls_set(__aio_tls_key, aio, NULL);
 		else if (tls_aio != aio)
-			acl_msg_fatal("%s(%d): tls_aio != aio", myname, __LINE__);
+			acl_msg_fatal("%s(%d): tls_aio != aio",
+				myname, __LINE__);
 		aio->timer_active = 1;
 		SetTimer(hWnd, aio->tid, 1000, CloseTimer);
 	}
@@ -382,13 +379,15 @@ void acl_aio_iocp_close(ACL_ASTREAM *astream)
 		(void) acl_pthread_once(&__aio_once_control, init_thread_aio);
 
 		if (__aio_tls_key == ACL_TLS_OUT_OF_INDEXES)
-			acl_msg_fatal("%s(%d): __tls_key invalid", myname, __LINE__);
+			acl_msg_fatal("%s(%d): __tls_key invalid",
+				myname, __LINE__);
 
 		tls_aio = acl_pthread_getspecific(__aio_tls_key);
 		if (tls_aio == NULL)
 			acl_pthread_setspecific(__aio_tls_key, aio);
 		else if (tls_aio != aio)
-			acl_msg_fatal("%s(%d): tls_aio != aio", myname, __LINE__);
+			acl_msg_fatal("%s(%d): tls_aio != aio",
+				myname, __LINE__);
 
 		aio->timer_active = 1;
 		SetTimer(hWnd, aio->tid, 1, CloseTimer);
@@ -399,7 +398,8 @@ void acl_aio_iocp_close(ACL_ASTREAM *astream)
 #endif  /* WIN32 */
 }
 
-void acl_aio_add_read_hook(ACL_ASTREAM *astream, ACL_AIO_READ_FN callback, void *ctx)
+void acl_aio_add_read_hook(ACL_ASTREAM *astream,
+	ACL_AIO_READ_FN callback, void *ctx)
 {
 	const char *myname = "acl_aio_add_read_hook";
 	AIO_READ_HOOK *handle;
@@ -425,7 +425,8 @@ void acl_aio_add_read_hook(ACL_ASTREAM *astream, ACL_AIO_READ_FN callback, void 
 			__FILE__, __LINE__, myname);
 }
 
-void acl_aio_add_write_hook(ACL_ASTREAM *astream, ACL_AIO_WRITE_FN callback, void *ctx)
+void acl_aio_add_write_hook(ACL_ASTREAM *astream,
+	ACL_AIO_WRITE_FN callback, void *ctx)
 {
 	const char *myname = "acl_aio_add_write_hook";
 	AIO_WRITE_HOOK *handle;
@@ -451,7 +452,8 @@ void acl_aio_add_write_hook(ACL_ASTREAM *astream, ACL_AIO_WRITE_FN callback, voi
 			__FILE__, __LINE__, myname);
 }
 
-void acl_aio_add_close_hook(ACL_ASTREAM *astream, ACL_AIO_CLOSE_FN callback, void *ctx)
+void acl_aio_add_close_hook(ACL_ASTREAM *astream,
+	ACL_AIO_CLOSE_FN callback, void *ctx)
 {
 	const char *myname = "acl_aio_add_close_hook";
 	AIO_CLOSE_HOOK *handle;
@@ -477,7 +479,8 @@ void acl_aio_add_close_hook(ACL_ASTREAM *astream, ACL_AIO_CLOSE_FN callback, voi
 			__FILE__, __LINE__, myname);
 }
 
-void acl_aio_add_timeo_hook(ACL_ASTREAM *astream, ACL_AIO_TIMEO_FN callback, void *ctx)
+void acl_aio_add_timeo_hook(ACL_ASTREAM *astream,
+	ACL_AIO_TIMEO_FN callback, void *ctx)
 {
 	const char *myname = "acl_aio_add_timeo_hook";
 	AIO_TIMEO_HOOK *handle;
@@ -503,7 +506,8 @@ void acl_aio_add_timeo_hook(ACL_ASTREAM *astream, ACL_AIO_TIMEO_FN callback, voi
 			__FILE__, __LINE__, myname);
 }
 
-void acl_aio_add_connect_hook(ACL_ASTREAM *astream, ACL_AIO_CONNECT_FN callback, void *ctx)
+void acl_aio_add_connect_hook(ACL_ASTREAM *astream,
+	ACL_AIO_CONNECT_FN callback, void *ctx)
 {
 	const char *myname = "acl_aio_add_connect_hook";
 	AIO_CONNECT_HOOK *handle;
@@ -529,7 +533,8 @@ void acl_aio_add_connect_hook(ACL_ASTREAM *astream, ACL_AIO_CONNECT_FN callback,
 			__FILE__, __LINE__, myname);
 }
 
-void acl_aio_del_read_hook(ACL_ASTREAM *astream, ACL_AIO_READ_FN callback, void *ctx)
+void acl_aio_del_read_hook(ACL_ASTREAM *astream,
+	ACL_AIO_READ_FN callback, void *ctx)
 {
 	ACL_ITER iter;
 
@@ -551,7 +556,8 @@ void acl_aio_del_read_hook(ACL_ASTREAM *astream, ACL_AIO_READ_FN callback, void 
 	}
 }
 
-void acl_aio_del_write_hook(ACL_ASTREAM *astream, ACL_AIO_WRITE_FN callback, void *ctx)
+void acl_aio_del_write_hook(ACL_ASTREAM *astream,
+	ACL_AIO_WRITE_FN callback, void *ctx)
 {
 	ACL_ITER iter;
 
@@ -573,7 +579,8 @@ void acl_aio_del_write_hook(ACL_ASTREAM *astream, ACL_AIO_WRITE_FN callback, voi
 	}
 }
 
-void acl_aio_del_close_hook(ACL_ASTREAM *astream, ACL_AIO_CLOSE_FN callback, void *ctx)
+void acl_aio_del_close_hook(ACL_ASTREAM *astream,
+	ACL_AIO_CLOSE_FN callback, void *ctx)
 {
 	ACL_ITER iter;
 
@@ -587,7 +594,8 @@ void acl_aio_del_close_hook(ACL_ASTREAM *astream, ACL_AIO_CLOSE_FN callback, voi
 	}
 }
 
-void acl_aio_del_timeo_hook(ACL_ASTREAM *astream, ACL_AIO_TIMEO_FN callback, void *ctx)
+void acl_aio_del_timeo_hook(ACL_ASTREAM *astream,
+	ACL_AIO_TIMEO_FN callback, void *ctx)
 {
 	ACL_ITER iter;
 
@@ -601,7 +609,8 @@ void acl_aio_del_timeo_hook(ACL_ASTREAM *astream, ACL_AIO_TIMEO_FN callback, voi
 	}
 }
 
-void acl_aio_del_connect_hook(ACL_ASTREAM *astream, ACL_AIO_CONNECT_FN callback, void *ctx)
+void acl_aio_del_connect_hook(ACL_ASTREAM *astream,
+	ACL_AIO_CONNECT_FN callback, void *ctx)
 {
 	ACL_ITER iter;
 

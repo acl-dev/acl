@@ -220,20 +220,15 @@ void dns_service::lookup(dns_result_callback* callback)
 
 void dns_service::on_result(const dns_res& res)
 {
-	std::list<dns_result_callback*>::iterator it, next;
-
-	it= callbacks_.begin();
-	for (; it != callbacks_.end();)
+	for (std::list<dns_result_callback*>::iterator it= callbacks_.begin();
+		it != callbacks_.end();)
 	{
-		next = it;
-		++next;
 		if ((*it)->get_domain() == res.domain_.c_str())
 		{
 			// 通知请求对象的解析结果
 			(*it)->on_result((*it)->get_domain(), res);
 			(*it)->destroy(); // 调用请求对象的销毁过程
-			callbacks_.erase(it);
-			it = next;
+			it = callbacks_.erase(it);
 		}
 		else
 			++it;

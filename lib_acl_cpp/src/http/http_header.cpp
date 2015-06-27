@@ -333,7 +333,7 @@ http_header& http_header::set_method(http_method_t method)
 		CP(method_s_, "HEAD");
 		break;
 	case  HTTP_METHOD_OPTION:
-		CP(method_s_, "OPTION");
+		CP(method_s_, "OPTIONS");
 		break;
 	default:
 		CP(method_s_, "UNKNOWN");
@@ -358,7 +358,7 @@ http_header& http_header::set_method(const char* method)
 		method_ = HTTP_METHOD_DELETE;
 	else if (strcasecmp(method, "HEAD") == 0)
 		method_ = HTTP_METHOD_HEAD;
-	else if (strcasecmp(method, "OPTION") == 0)
+	else if (strcasecmp(method, "OPTIONS") == 0)
 		method_ = HTTP_METHOD_OPTION;
 	else
 		method_ = HTTP_METHOD_UNKNOWN;

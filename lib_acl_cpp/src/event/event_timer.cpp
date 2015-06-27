@@ -176,21 +176,18 @@ acl_int64 event_timer::trigger(void)
 
 	set_time();
 
-	std::list<event_task*>::iterator it, next;
 	std::list<event_task*> tasks;
-	event_task* task;
 
 	// 从定时器中取出到达的定时任务
-	for (it = tasks_.begin(); it != tasks_.end(); it = next)
+	for (std::list<event_task*>::iterator it = tasks_.begin();
+		it != tasks_.end();)
 	{
 		if ((*it)->when > present_)
 			break;
-		next = it;
-		++next;
-		task = *it;
-		tasks_.erase(it);
+
+		tasks.push_back(*it);
+		it = tasks_.erase(it);
 		length_--;
-		tasks.push_back(task);
 	}
 
 	if (tasks.empty())
@@ -202,7 +199,8 @@ acl_int64 event_timer::trigger(void)
 		return delay < 0 ? 0 : delay;
 	}
 
-	for (it = tasks.begin(); it != tasks.end(); ++it)
+	for (std::list<event_task*>::iterator it = tasks.begin();
+		it != tasks.end(); ++it)
 	{
 		set_task(*it);
 		// 调用子类虚函数，触发定时器任务过程

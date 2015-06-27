@@ -2,7 +2,7 @@
 #include <assert.h>
 #include "mysql.h"
 #include "errmsg.h"
-#include "mysqld_error.h"
+//#include "mysqld_error.h"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/db/db_mysql.hpp"

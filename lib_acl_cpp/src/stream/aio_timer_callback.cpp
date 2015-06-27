@@ -176,19 +176,17 @@ acl_int64 aio_timer_callback::trigger(void)
 
 	set_time();
 
-	std::list<aio_timer_task*>::iterator it, next;
+	std::list<aio_timer_task*>::iterator it;
 	std::list<aio_timer_task*> tasks;
 	aio_timer_task* task;
 
 	// 从定时器中取出到达的定时任务
-	for (it = tasks_.begin(); it != tasks_.end(); it = next)
+	for (it = tasks_.begin(); it != tasks_.end();)
 	{
 		if ((*it)->when > present_)
 			break;
-		next = it;
-		++next;
 		task = *it;
-		tasks_.erase(it);
+		it = tasks_.erase(it);
 		length_--;
 		tasks.push_back(task);
 	}
