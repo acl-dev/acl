@@ -44,7 +44,7 @@ static ACL_MDT_IDX *mdt_idx_create(ACL_MDT *mdt, size_t init_capacity,
 	if ((flag & ACL_MDT_FLAG_KMR))
 		flag2 |= ACL_BINHASH_FLAG_KEY_REUSE;
 
-	idx->table = acl_binhash_create(init_capacity, flag2);
+	idx->table = acl_binhash_create((int) init_capacity, flag2);
 	idx->idx.name = acl_mystrdup(name);
 	idx->idx.flag = flag;
 	return ((ACL_MDT_IDX*) idx);
@@ -73,7 +73,8 @@ static void mdt_idx_add(ACL_MDT_IDX *idx, const char *key, ACL_MDT_REC *rec)
 	ACL_MDT_IDX_BHASH *idx_bhash = (ACL_MDT_IDX_BHASH*) idx;
 	ACL_BINHASH_INFO *info;
 
-	info = acl_binhash_enter(idx_bhash->table, key, strlen(key) + 1, (char*) rec);
+	info = acl_binhash_enter(idx_bhash->table, key,
+		(int) strlen(key) + 1, (char*) rec);
 	if (info == NULL)
 		acl_msg_error("%s(%d): binhash_enter error, value(%s)",
 			myname, __LINE__, key);
@@ -92,7 +93,8 @@ static ACL_MDT_REC *mdt_idx_get(ACL_MDT_IDX *idx, const char *key)
 	ACL_MDT_IDX_BHASH *idx_bhash = (ACL_MDT_IDX_BHASH*) idx;
 	ACL_MDT_REC *rec;
 
-	rec = (ACL_MDT_REC*) acl_binhash_find(idx_bhash->table, key, strlen(key) + 1);
+	rec = (ACL_MDT_REC*) acl_binhash_find(idx_bhash->table, key,
+		(int) strlen(key) + 1);
 	return (rec);
 }
 
@@ -108,7 +110,7 @@ static void mdt_idx_del(ACL_MDT_IDX *idx, const char *key)
 	/* idx->table 哈希表里存储的是: rec->key: rec 对，所以不需要在
 	 * 哈希表内部释放 rec 内存，因为可以显示地释放该资源
 	 */
-	acl_binhash_delete(idx_bhash->table, key, strlen(key) + 1, NULL);
+	acl_binhash_delete(idx_bhash->table, key, (int) strlen(key) + 1, NULL);
 }
 
 /**

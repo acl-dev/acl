@@ -140,7 +140,7 @@ url_coder& url_coder::set(const char* name, int value,
 {
 	char buf[24];
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 # if _MSC_VER >= 1500
 	_snprintf_s(buf, sizeof(buf), sizeof(buf), "%d", value);
 # else

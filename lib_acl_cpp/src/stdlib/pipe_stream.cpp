@@ -47,7 +47,7 @@ int pipe_string::push_pop(const char* in, size_t len,
 
 	out->append(m_pBuf->c_str() + m_pos, n);
 	m_pos += n;
-	return (n);
+	return (int) (n);
 }
 
 int pipe_string::pop_end(string* out, size_t max /* = 0 */)
@@ -63,7 +63,7 @@ int pipe_string::pop_end(string* out, size_t max /* = 0 */)
 		n = max;
 	out->append(m_pBuf->c_str() + m_pos, n);
 	m_pos += n;
-	return (n);
+	return (int) (n);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -5,7 +5,7 @@
 
 #endif  /* ACL_PREPARE_COMPILE */
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 #include "stdlib/acl_stdlib.h"
 #include "thread/acl_thread.h"
@@ -461,4 +461,4 @@ int proctl_service_join(void)
 	return (0);
 }
 
-#endif /*WIN32 */
+#endif /*ACL_WINDOWS */

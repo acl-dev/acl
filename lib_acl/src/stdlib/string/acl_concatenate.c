@@ -31,9 +31,9 @@ char   *acl_concatenate(const char *arg0,...)
 	 * Compute the length of the resulting string.
 	 */
 	va_start(ap, arg0);
-	len = strlen(arg0);
+	len = (int) strlen(arg0);
 	while ((arg = va_arg(ap, char *)) != 0)
-		len += strlen(arg);
+		len += (int) strlen(arg);
 	va_end(ap);
 
 	/*

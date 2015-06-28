@@ -202,7 +202,7 @@ void http_header::build_common(string& buf) const
 	else if (content_length_ >= 0)
 	{
 		char length[64];
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 # if _MSC_VER >= 1500
 		_snprintf_s(length, sizeof(length), sizeof(length),
 			"%I64d", content_length_);
@@ -467,7 +467,7 @@ http_header& http_header::add_int(const char* name, unsigned long value)
 http_header& http_header::add_int(const char* name, acl_int64 value)
 {
 	char buf[32];
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	safe_snprintf(buf, sizeof(buf), "%I64d", value);
 #else
 	safe_snprintf(buf, sizeof(buf), "%lld", value);
@@ -478,7 +478,7 @@ http_header& http_header::add_int(const char* name, acl_int64 value)
 http_header& http_header::add_int(const char* name, acl_uint64 value)
 {
 	char buf[32];
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	safe_snprintf(buf, sizeof(buf), "%I64u", value);
 #else
 	safe_snprintf(buf, sizeof(buf), "%llu", value);

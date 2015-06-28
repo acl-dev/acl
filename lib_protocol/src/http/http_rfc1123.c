@@ -7,7 +7,7 @@
 
 const char *http_mkrfc1123(char *buf, size_t size, time_t t)
 {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 # if _MSC_VER >= 1500
 	struct tm gmt_buf, *gmt = &gmt_buf;
 

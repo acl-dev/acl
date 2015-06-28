@@ -25,7 +25,7 @@ ACL_DLL_HANDLE acl_dlopen(const char *dlname)
 	else
 		handle = dlopen(dlname, RTLD_GLOBAL | RTLD_NOW);
 # endif
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	handle = LoadLibrary(dlname);
 #endif
 	if (handle == NULL)
@@ -38,7 +38,7 @@ void acl_dlclose(ACL_DLL_HANDLE handle)
 {
 #ifdef ACL_UNIX
 	dlclose(handle);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	FreeLibrary(handle);
 #endif
 }
@@ -47,7 +47,7 @@ ACL_DLL_FARPROC acl_dlsym(void *handle, const char *name)
 {
 #ifdef ACL_UNIX
 	return (dlsym(handle, name));
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	return (GetProcAddress(handle, name));
 #endif
 }

@@ -481,14 +481,14 @@ ACL_DB_POOL *acl_dbpool_mysql_create(const ACL_DB_INFO *db_info)
 /*----------------------------------------------------------------------------*/
 
 #if 0
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 /* XXX: just for the poor mysql */
 extern void _dosmaperr(unsigned long error);
 void _dosmaperr(unsigned long error)
 {
 
 }
-#endif /* WIN32 */
+#endif /* ACL_WINDOWS */
 #endif
 
 #endif	/* HAS_MYSQL */

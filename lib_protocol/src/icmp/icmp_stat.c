@@ -57,7 +57,7 @@ static void icmp_status(ICMP_HOST *host, int flag)
 	host->icmp_stat.nsent = host->nsent;
 	host->icmp_stat.nreceived = nok;
 	host->icmp_stat.loss = host->nsent > 0 ?
-		(host->nsent - nok) * 100/host->nsent : 0;
+		((double) host->nsent - nok) * 100/(double) host->nsent : 0;
 	host->icmp_stat.tmax = Maximum;
 	host->icmp_stat.tmin = Minimun;
 	host->icmp_stat.tsum = Total;

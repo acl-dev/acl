@@ -606,7 +606,7 @@ HTTP_API void http_hdr_put_int(HTTP_HDR *hdr, const char *name, int value);
  * @param name {const char*} 变量名，如 Accept-Encoding: deflate, gzip 中的 Accept-Encoding
  * @param fmt {const char*} 变参格式字符串
  */
-#ifdef	WIN32
+# if defined(WIN32) || defined(WIN64)
 HTTP_API void http_hdr_put_fmt(HTTP_HDR *hdr, const char *name, const char *fmt, ...);
 #else
 HTTP_API void __attribute__((format(printf,3,4)))

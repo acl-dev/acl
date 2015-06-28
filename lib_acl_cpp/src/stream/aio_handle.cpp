@@ -21,7 +21,7 @@ aio_handle::aio_handle(aio_handle_type engine_type /* = ENGINE_SELECT */,
 		event_type = ACL_EVENT_POLL;
 	else if (engine_type == ENGINE_KERNEL)
 		event_type = ACL_EVENT_KERNEL;
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	else if (engine_type == ENGINE_WINMSG)
 		event_type = ACL_EVENT_WMSG;
 #endif

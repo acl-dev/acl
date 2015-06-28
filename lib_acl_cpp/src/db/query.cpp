@@ -144,7 +144,7 @@ query& query::set_parameter(const char* name, const char *value)
 	param->type = DB_PARAM_STR;
 	memcpy(param->v.S, value, len);
 	param->v.S[len] = 0;
-	param->dlen = len;
+	param->dlen = (int) len;
 
 	params_[key] = param;
 	return *this;
@@ -234,7 +234,7 @@ query& query::set_date(const char* name, time_t value,
 	param->type = DB_PARAM_STR;
 	memcpy(param->v.S, buf.c_str(), len);
 	param->v.S[len] = 0;
-	param->dlen = len;
+	param->dlen = (int) len;
 
 	params_[key] = param;
 	return *this;
@@ -264,7 +264,7 @@ query& query::set_vformat(const char* name, const char* fmt, va_list ap)
 	param->type = DB_PARAM_STR;
 	memcpy(param->v.S, val.c_str(), len);
 	param->v.S[len] = 0;
-	param->dlen = len;
+	param->dlen = (int) len;
 
 	params_[key] = param;
 	return *this;
@@ -333,7 +333,7 @@ const char* query::to_date(time_t t, string& out,
 	
 	struct tm* local_ptr;
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 # ifdef __STDC_WANT_SECURE_LIB__
 
 	struct tm local;

@@ -7,7 +7,7 @@ extern "C" {
 
 #include "acl_define.h"
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 
 #if !defined(_UNICODE)
 

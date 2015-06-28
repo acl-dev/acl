@@ -1,6 +1,6 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 # include <WinSock2.h>
 #endif
 #include "acl_cpp/stream/aio_istream.hpp"
@@ -56,7 +56,7 @@ public:
 	 * @param handle {aio_handle*} 异步引擎句柄
 	 * @param fd {ACL_SOCKET} 连接套接口句柄
 	 */
-#ifdef	WIN32
+#if defined(WIN32) || defined(WIN64)
 	aio_socket_stream(aio_handle* handle, SOCKET fd);
 #else
 	aio_socket_stream(aio_handle* handle, int fd);

@@ -19,9 +19,9 @@
 
 #include "../private/private_fifo.h"
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 
-/*--------------------  WIN32 下模拟实现 Posix 标准接口函数 ----------------*/
+/*--------------------  ACL_WINDOWS 下模拟实现 Posix 标准接口函数 ----------------*/
 
 #include <process.h>
 
@@ -225,7 +225,7 @@ int  acl_pthread_create(acl_pthread_t *thread, acl_pthread_attr_t *attr,
 
 #ifdef ACL_WIN32_STDC
 	h_thread->handle = handle = (HANDLE) _beginthreadex(NULL,
-			attr ? attr->stacksize : 0,
+			attr ? (unsigned int) attr->stacksize : 0,
 			RunThreadWrap,
 			(void *) h_thread,
 			flag,
@@ -492,7 +492,7 @@ int acl_pthread_join(acl_pthread_t thread, void **thread_return)
 	return 0;
 }
 
-#endif /* WIN32 */
+#endif /* ACL_WINDOWS */
 
 /*----------------- 跨平台的通用函数集，是 Posix 标准的扩展 ----------------*/
 

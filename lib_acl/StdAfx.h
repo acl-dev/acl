@@ -10,7 +10,7 @@
 # include <ctype.h>
 # include <limits.h>			/* CHAR_BIT */
 
-# ifdef	WIN32
+#if defined(WIN32) || defined(WIN64)
 #  include <process.h>
 #  include <stdio.h>
 #  include <stdarg.h>

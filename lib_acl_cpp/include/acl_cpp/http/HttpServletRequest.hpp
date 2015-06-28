@@ -126,7 +126,7 @@ public:
 	 * @return {acl_int64} 返回 -1 表示可能为 GET 方法，
 	 *  或 HTTP 请求头中没有 Content-Length 字段
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	__int64 getContentLength(void) const;
 #else
 	long long int getContentLength(void) const;

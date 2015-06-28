@@ -7,9 +7,9 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # include <process.h>
-# ifdef	WIN32
+# ifdef	ACL_WINDOWS
 /* #include <io.h> */
 #  include <fcntl.h>
 #  include <sys/stat.h>
@@ -76,7 +76,7 @@ struct ACL_LOG {
 	time_t reopen_inter;		/**< 日志重新打开的最小时间间隔 */
 };
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 # define strdup _strdup
 #endif
 
@@ -128,7 +128,7 @@ void acl_log_fp_set(ACL_VSTREAM *fp, const char *logpre)
 static int open_file_log(const char *filename, const char *logpre)
 {
 	const char *myname = "open_file_log";
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	int   flag = O_RDWR | O_CREAT | O_APPEND | O_BINARY;
 #else
 	int   flag = O_RDWR | O_CREAT | O_APPEND;
@@ -290,7 +290,7 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 #ifdef ACL_UNIX
 	ret = recvfrom(fd, buf, size, 0, (struct sockaddr*) &log->from,
 		(socklen_t*) &log->from_len);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	ret = recvfrom(fd, (char*) buf, (int) size, 0,
 		(struct sockaddr*) &log->from, &log->from_len);
 #else
@@ -308,7 +308,7 @@ static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
 #ifdef ACL_UNIX
 	ret = sendto(fd, buf, size, 0, (struct sockaddr*) &log->dest,
 		sizeof(log->dest));
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	ret = sendto(fd, (const char*) buf, (int) size, 0,
 		(struct sockaddr*) &log->dest, sizeof(log->dest));
 #else
@@ -470,7 +470,7 @@ void acl_logtime_fmt(char *buf, size_t size)
 	(void) time (&now);
 	(void) localtime_r(&now, &local_time);
 	strftime(buf, size, "%Y/%m/%d %H:%M:%S", &local_time);
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 	struct tm *local_time;
 
 	(void) time (&now);
@@ -584,7 +584,7 @@ static void file_vsyslog(ACL_LOG *log, const char *info, const char *fmt, va_lis
 		snprintf(tbuf, sizeof(tbuf), "%s %s (pid=%d, tid=%d)(%s): ",
 			fmtstr, log->logpre, (int) getpid(),
 			(int) acl_pthread_self(), info);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 		snprintf(tbuf, sizeof(tbuf), "%s %s (pid=%d, tid=%d)(%s): ",
 			fmtstr, log->logpre, (int) _getpid(),
 			(int) acl_pthread_self(), info);
@@ -596,7 +596,7 @@ static void file_vsyslog(ACL_LOG *log, const char *info, const char *fmt, va_lis
 #if defined(SUNOS5)
 		snprintf(tbuf, sizeof(tbuf), "%s %s (pid=%d)(%s): ",
 			fmtstr, log->logpre, (int) getpid(), info);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 		snprintf(tbuf, sizeof(tbuf), "%s %s (pid=%d)(%s): ",
 			fmtstr, log->logpre, (int) _getpid(), info);
 #else
@@ -641,7 +641,7 @@ static void net_vsyslog(ACL_LOG *log, const char *info, const char *fmt, va_list
 		snprintf(tbuf, sizeof(tbuf), " %s (pid=%d, tid=%d)(%s): ",
 			log->logpre, (int) getpid(),
 			(int) acl_pthread_self(), info);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 		snprintf(tbuf, sizeof(tbuf), " %s (pid=%d, tid=%d)(%s): ",
 			log->logpre, (int) _getpid(),
 			(int) acl_pthread_self(), info);
@@ -652,7 +652,7 @@ static void net_vsyslog(ACL_LOG *log, const char *info, const char *fmt, va_list
 #if defined(SUNOS5)
 		snprintf(tbuf, sizeof(tbuf), " %s (pid=%d)(%s): ",
 			log->logpre, (int) getpid(), info);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 		snprintf(tbuf, sizeof(tbuf), " %s (pid=%d)(%s): ",
 			log->logpre, (int) _getpid(), info);
 #else

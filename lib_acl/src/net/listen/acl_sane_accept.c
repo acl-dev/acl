@@ -107,7 +107,7 @@ ACL_SOCKET acl_sane_accept(ACL_SOCKET sock, struct sockaddr * sa, socklen_t *len
 
 ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size, int* sock_type)
 {
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	struct {
 		union {
 			struct sockaddr_in in;
@@ -136,7 +136,7 @@ ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size, int* sock_type)
 
 	if (buf != NULL && size > 0) {
 		size_t n;
-#ifndef	WIN32
+#ifndef	ACL_WINDOWS
 		if (sa->sa_family == AF_UNIX)
 			snprintf(buf, size, "%s", addr.sa.un.sun_path);
 #endif

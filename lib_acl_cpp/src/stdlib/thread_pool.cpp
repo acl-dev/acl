@@ -48,7 +48,7 @@ void thread_pool::start()
 		return;
 
 	acl_pthread_pool_attr_set_stacksize(thr_attr_, stack_size_);
-	acl_pthread_pool_attr_set_threads_limit(thr_attr_, threads_limit_);
+	acl_pthread_pool_attr_set_threads_limit(thr_attr_, (int) threads_limit_);
 	acl_pthread_pool_attr_set_idle_timeout(thr_attr_, thread_idle_);
 
 	thr_pool_ = acl_pthread_pool_create(thr_attr_);

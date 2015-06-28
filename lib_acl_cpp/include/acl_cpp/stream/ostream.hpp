@@ -64,7 +64,7 @@ public:
 	 * @param n {acl_int64} 64 位数据
 	 * @return {int} 写入的数据长度，返回 -1 表示出错
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	int write(__int64 n);
 #else
 	int write(long long int n);
@@ -114,7 +114,7 @@ public:
 
 	ostream& operator<<(const string& s);
 	ostream& operator<<(const char* s);
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	ostream& operator<<(__int64 n);
 #else
 	ostream& operator<<(long long int n);

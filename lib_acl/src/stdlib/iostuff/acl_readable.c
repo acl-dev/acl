@@ -98,10 +98,12 @@ int acl_readable(ACL_SOCKET fd)
 	 * Loop until we have an authoritative answer.
 	 */
 	for (;;) {
-		switch (select(fd + 1, &rfds, (fd_set *) 0, &xfds, &tv)) {
+		switch (select((int) fd + 1, &rfds, (fd_set *) 0,
+			&xfds, &tv))
+		{
 		case -1:
 			errnum = acl_last_error();
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 			if (errnum == WSAEINPROGRESS
 				|| errnum == WSAEWOULDBLOCK
 				|| errnum == ACL_EINTR)

@@ -5,7 +5,7 @@
 #define logger_open	acl::log::open
 #define logger_close	acl::log::close
 
-#if defined(WIN32)
+#if defined(WIN32) || defined(WIN64)
 
 # if _MSC_VER >= 1500
 #define logger(fmt, ...)  \

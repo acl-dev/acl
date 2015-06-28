@@ -514,7 +514,7 @@ int json::push_pop(const char* in, size_t len acl_unused,
 	if (max > 0 && len > max)
 		len = max;
 	out->append(in, len);
-	return len;
+	return (int) len;
 }
 
 int json::pop_end(string* out acl_unused, size_t max /* = 0 */ acl_unused)

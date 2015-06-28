@@ -216,12 +216,12 @@ int acl_mystr_strip(const char *haystack, const char *needle, char *buf, int bsi
 
 	ptr_src = haystack;
 	ptr_des = buf;
-	len     = strlen(needle);
+	len     = (int) strlen(needle);
 
 	while(1) {
 		ptr = strstr(ptr_src, needle);
 		if (ptr == NULL) {
-			n = strlen(ptr_src);
+			n = (int) strlen(ptr_src);
 			if (bsize > n) {
 				ACL_SAFE_STRNCPY(ptr_des, ptr_src, bsize);
 				ncpy += n;
@@ -229,7 +229,7 @@ int acl_mystr_strip(const char *haystack, const char *needle, char *buf, int bsi
 			}
 			break;
 		}
-		n = ptr - ptr_src;
+		n = (int) (ptr - ptr_src);
 		if (bsize <= n)
 			break;
 		ACL_SAFE_STRNCPY(ptr_des, ptr_src, bsize);
@@ -373,7 +373,7 @@ size_t acl_strnlen(const char * s, size_t count)
         return sc - s;
 }
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 acl_uint64 acl_atoui64(const char *str)
 {

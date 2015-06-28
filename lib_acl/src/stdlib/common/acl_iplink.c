@@ -165,7 +165,7 @@ static char *__sane_inet_ntoa(unsigned int src, char *dst, size_t size)
 	snprintf (dst, 18, "%d.%d.%d.%d", bytes[0], bytes[1], bytes[2], bytes[3]);
 #elif defined(HP_UX)
 	snprintf (dst, 18, "%d.%d.%d.%d", bytes[0], bytes[1], bytes[2], bytes[3]);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	snprintf (dst, 18, "%d.%d.%d.%d", bytes[3], bytes[2], bytes[1], bytes[0]);
 #else
 	snprintf (dst, 18, "%d.%d.%d.%d", bytes[0], bytes[1], bytes[2], bytes[3]);

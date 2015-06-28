@@ -165,12 +165,12 @@ http_mime::http_mime(const char* boundary,
 	// 为了使用邮件的 mime 解析器，需要模拟出一个头部字段
 	mime_state_update(mime_state_, ctype_pre, sizeof(ctype_pre) - 1);
 	size_t len = strlen(boundary);
-	mime_state_update(mime_state_, boundary, len);
+	mime_state_update(mime_state_, boundary, (int) len);
 	mime_state_update(mime_state_, "\r\n\r\n", 4);
 
 	// 因为该头作为解析器的主头是额外加进去的，所以会造成实际的偏移量，
 	// 通过 off_ 来进行偏移量补偿
-	off_ = 0 - (sizeof(ctype_pre) - 1 + len + 4);
+	off_ = 0 - ((off_t) sizeof(ctype_pre) - 1 + (off_t) len + 4);
 
 	parsed_ = false;
 }
@@ -196,7 +196,8 @@ void http_mime::set_saved_path(const char* path)
 
 bool http_mime::update(const char* data, size_t len)
 {
-	return mime_state_update(mime_state_, data, len) == 1 ? true : false;
+	return mime_state_update(mime_state_, data, (int) len) == 1
+		? true : false;
 }
 
 const std::list<http_mime_node*>& http_mime::get_nodes(void) const

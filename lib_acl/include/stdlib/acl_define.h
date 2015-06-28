@@ -3,6 +3,7 @@
 
 #ifdef MINGW
 # undef WIN32
+# undef WIN64
 #else
 # include "acl_define_win32.h"
 #endif

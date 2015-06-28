@@ -23,8 +23,8 @@ static bool has_called = false;
 
 void master_proc::run_daemon(int argc, char** argv)
 {
-#ifdef WIN32
-	logger_fatal("not support WIN32!");
+#ifdef ACL_WINDOWS
+	logger_fatal("not support ACL_WINDOWS!");
 #else
 	// 每个进程只能有一个实例在运行
 	acl_assert(has_called == false);
@@ -85,7 +85,7 @@ bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 	__count_limit = count;
 	acl_assert(addrs && *addrs);
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	acl_init();
 #endif
 	ACL_EVENT* eventp = acl_event_new_select(1, 0);
@@ -137,7 +137,7 @@ void master_proc::service_main(ACL_VSTREAM *stream, char*, char**)
 		logger_fatal("open stream error!");
 
 	acl_assert(__mp != NULL);
-#ifndef	WIN32
+#ifndef	ACL_WINDOWS
 	if (__mp->daemon_mode_)
 		acl_watchdog_pat();  // 必须通知 acl_master 框架一下
 #endif
@@ -150,7 +150,7 @@ void master_proc::service_pre_jail(char*, char**)
 {
 	acl_assert(__mp != NULL);
 
-#ifndef WIN32
+#ifndef ACL_WINDOWS
 	if (__mp->daemon_mode())
 	{
 		ACL_EVENT* eventp = acl_single_server_event();

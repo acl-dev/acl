@@ -169,7 +169,7 @@ md5& md5::update(const void *in, size_t len)
 	/* Update byte count */
 
 	t = bytes_[0];
-	if ((bytes_[0] = t + len) < t)
+	if ((bytes_[0] = t + (unsigned int) len) < t)
 		bytes_[1]++;	/* Carry from low to high */
 
 	t = 64 - (t & 0x3f);	/* Space available in in_ (at least 1) */

@@ -4,7 +4,7 @@
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/queue/queue_manager.hpp"
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #define PATH_SEP	'\\'
 #else
 #define PATH_SEP	'/'

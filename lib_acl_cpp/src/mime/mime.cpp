@@ -101,7 +101,8 @@ void mime::update_begin(const char* path)
 
 bool mime::update(const char* data, size_t len)
 {
-	return (mime_state_update(m_pMimeState, data, len) == 1 ? true : false);
+	return (mime_state_update(m_pMimeState, data, (int) len) == 1
+			? true : false);
 }
 
 void mime::update_end()
@@ -345,7 +346,7 @@ bool mime::save_as(const char* file_path)
 	bool ret = save_as(out);
 	if (ret == false)
 	{
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 		_unlink(file_path);
 #else
 		unlink(file_path);
@@ -826,7 +827,7 @@ void mime::mime_debug(const char* save_path, bool decode /* = true */)
 		{
 			header_filename.clear();
 			if (rfc2047::decode(node->header_filename,
-				strlen(node->header_filename),
+				(int) strlen(node->header_filename),
 				&header_filename,
 				"gbk", true, false) == false)
 			{
@@ -843,7 +844,7 @@ void mime::mime_debug(const char* save_path, bool decode /* = true */)
 		{
 			header_name.clear();
 			if (rfc2047::decode(node->header_name,
-				strlen(node->header_name),
+				(int) strlen(node->header_name),
 				&header_name, "gbk", true, false) == false)
 			{
 				printf(">>name: %s\r\n", node->header_name);

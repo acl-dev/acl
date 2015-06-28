@@ -327,7 +327,7 @@ void acl_fhandle_close(ACL_FHANDLE *fs, int delay_timeout)
 void acl_fhandle_lock(ACL_FHANDLE *fs)
 {
 	const char *myname = "acl_fhandle_lock";
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	unsigned long tid = acl_pthread_self();
 #else
 	acl_pthread_t tid = acl_pthread_self();
@@ -376,7 +376,7 @@ void acl_fhandle_unlock(ACL_FHANDLE *fs)
 	}
 
 	/* xxx: 必须清除线程锁的所有者 */
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	fs->lock_mutex_tid = (unsigned int) -1;
 #else
 	fs->lock_mutex_tid = (acl_pthread_t) -1;
@@ -413,7 +413,7 @@ void acl_fhandle_init(int cache_size, int debug_section, unsigned int flags)
 
 	__cache_max_size = cache_size > 0 ? cache_size : 100;
 	__debug_section = debug_section;
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	/* win32 下文件名及路径名是不区分大小写的，所以基于文件路径为键的哈希表
 	 * 需要设置为自动转为小写键值的情况
 	 */

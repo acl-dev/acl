@@ -391,10 +391,10 @@ int acl_allocator_pool_inuse_size(ACL_ALLOCATOR *allocator, acl_mem_type type)
 	const char *myname = "acl_allocator_pool_inuse_size";
 
 	CHECK_TYPE(type);
-	return allocator->pool_inuse_size(allocator->MemPools[type]);
+	return (int) allocator->pool_inuse_size(allocator->MemPools[type]);
 }
 
 int acl_allocator_pool_total_allocated(ACL_ALLOCATOR *allocator)
 {
-	return allocator->pool_total_allocated(allocator);
+	return (int) allocator->pool_total_allocated(allocator);
 }

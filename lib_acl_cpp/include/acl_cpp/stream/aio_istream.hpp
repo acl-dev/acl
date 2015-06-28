@@ -117,7 +117,7 @@ public:
 	 * @param callback {aio_timer_reader*} 定时器到达时的回调函数类对象，
 	 *  当 delay > 0，如果该值为空，则采用缺省的对象
 	 */
-#ifdef	WIN32
+#if defined(WIN32) || defined(WIN64)
 	void gets(int timeout = 0, bool nonl = true,
 		__int64 delay = 0, aio_timer_reader* callback = NULL);
 #else
@@ -138,7 +138,7 @@ public:
 	 * @param callback {aio_timer_reader*} 定时器到达时的回调函数类对象，
 	 *  如果该值为空，则采用缺省的对象
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	void read(int count = 0, int timeout = 0,
 		__int64 delay = 0, aio_timer_reader* callback = NULL);
 #else

@@ -314,9 +314,9 @@ int mime_code::push_pop(const char* in, size_t len,
 	if (in && len > 0)
 	{
 		if (m_encoding)
-			encode_update(in, len, m_pBuf);
+			encode_update(in, (int) len, m_pBuf);
 		else
-			decode_update(in, len, m_pBuf);
+			decode_update(in, (int) len, m_pBuf);
 	}
 
 	if (out == NULL)
@@ -339,7 +339,7 @@ int mime_code::push_pop(const char* in, size_t len,
 	else
 		m_pBuf->clear();
 
-	return (n);
+	return (int) (n);
 }
 
 int mime_code::pop_end(acl::string* out, size_t max /* = 0 */)
@@ -367,7 +367,7 @@ int mime_code::pop_end(acl::string* out, size_t max /* = 0 */)
 		n = max;
 	out->append(m_pBuf->c_str(), n);
 	m_pBuf->clear();
-	return (n);
+	return (int) (n);
 }
 
 void mime_code::clear()

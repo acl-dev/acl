@@ -399,7 +399,7 @@ AGAIN:
 	// 如果服务端返回数据体长度值为 0 则当不存在处理
 	if (content_length_ == 0)
 		return 0;
-	return content_length_;
+	return (int) content_length_;
 }
 
 int memcache::get_data(void* buf, size_t size)
@@ -436,7 +436,7 @@ int memcache::get_data(void* buf, size_t size)
 		return -1;
 	}
 	length_ += n;
-	return n;
+	return (int) n;
 }
 
 bool memcache::get(const char* key, size_t klen, string& out,
@@ -541,7 +541,7 @@ const string& memcache::build_key(const char* key, size_t klen)
 
 	if (encode_key_)
 	{
-		coder_.encode_update(key, klen, &kbuf_);
+		coder_.encode_update(key, (int) klen, &kbuf_);
 		coder_.encode_finish(&kbuf_);
 		return kbuf_;
 	}

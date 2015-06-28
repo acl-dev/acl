@@ -250,7 +250,7 @@ int acl_vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 				if (!s)
 					s = "<NULL>";
 
-				len = acl_strnlen(s, precision);
+				len = (int) acl_strnlen(s, precision);
 
 				if (!(flags & LEFT)) {
 					while (len < field_width--) {
@@ -287,13 +287,13 @@ int acl_vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 				* What does C99 say about the overflow case here? */
 				if (qualifier == 'l') {
 					long * ip = va_arg(args, long *);
-					*ip = (str - buf);
+					*ip = (long) (str - buf);
 				} else if (qualifier == 'Z') {
 					size_t * ip = va_arg(args, size_t *);
 					*ip = (str - buf);
 				} else {
 					int * ip = va_arg(args, int *);
-					*ip = (str - buf);
+					*ip = (int) (str - buf);
 				}
 				continue;
 
@@ -340,7 +340,7 @@ int acl_vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 			if (flags & SIGN)
 				num = (signed long) num;
 		} else if (qualifier == 'Z') {
-			num = va_arg(args, size_t);
+			num = (long) va_arg(args, size_t);
 		} else if (qualifier == 'h') {
 			num = (unsigned short) va_arg(args, int);
 			if (flags & SIGN)
@@ -361,7 +361,7 @@ int acl_vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 	/* the trailing null byte doesn't count towards the total
 	* ++str;
 	*/
-	return str-buf;
+	return (int) (str - buf);
 }
 
 /**

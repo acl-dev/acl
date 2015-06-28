@@ -14,7 +14,7 @@ namespace acl
 
 ipc_request::ipc_request()
 {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	hWnd_ = NULL;
 #endif
 }
@@ -29,7 +29,7 @@ void ipc_request::run(ipc_client* ipc acl_unused)
 	logger_fatal("ipc_request::run(ipc_client*) be called now");
 }
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 void ipc_request::run(HWND hWnd acl_unused)
 {
 	logger_fatal("ipc_request::run(HWND) be called now");
@@ -48,7 +48,7 @@ struct REQ_CTX
 static void thread_pool_main(REQ_CTX* ctx)
 {
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	HWND hWnd = ctx->req->get_hwnd();
 	if (hWnd != NULL)
 		ctx->req->run(hWnd);
@@ -100,7 +100,7 @@ static void thread_pool_main(REQ_CTX* ctx)
 
 static void* thread_once_main(REQ_CTX* ctx)
 {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	HWND hWnd = ctx->req->get_hwnd();
 	if (hWnd != NULL)
 		ctx->req->run(hWnd);
@@ -152,13 +152,13 @@ static void* thread_once_main(REQ_CTX* ctx)
 
 ///////////////////////////////////////////////////////////////////////////
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg,
 	WPARAM wParam, LPARAM lParam)
 {
 	ipc_service* service = (ipc_service*)
-		GetWindowLongPtr(hWnd, GWL_USERDATA);
+		GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	if (service == NULL)
 		return (DefWindowProc(hWnd, msg, wParam, lParam));
 
@@ -220,7 +220,7 @@ static HWND InitInstance(const char *class_name, HINSTANCE hInstance)
 
 	cs.dwExStyle = 0;
 	cs.lpszClass = class_name;
-	cs.lpszName = "WIN32 IPC Notification";
+	cs.lpszName = "ACL_WINDOWS IPC Notification";
 	cs.style = WS_OVERLAPPED;
 	cs.x = 0;
 	cs.y = 0;
@@ -252,7 +252,7 @@ bool ipc_service::create_window(void)
 			__class_name, acl_last_serror());
 
 	// 添加窗口句柄的关联对象
-	SetWindowLongPtr(hWnd_, GWL_USERDATA, (LONG) this);
+	SetWindowLongPtr(hWnd_, GWLP_USERDATA, (LONG) this);
 
 	// 调用子类处理过程
 	on_open("win32 gui message");
@@ -277,7 +277,7 @@ void ipc_service::close_window(void)
 ipc_service::ipc_service(int nthread, bool ipc_keep /* true */)
 : magic_(-1)
 {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	hWnd_ = NULL;
 #endif
 	ipc_keep_ = ipc_keep;
@@ -289,7 +289,7 @@ ipc_service::ipc_service(int nthread, bool ipc_keep /* true */)
 
 ipc_service::~ipc_service()
 {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	if (hWnd_ != NULL)
 		close_window();
 #endif
@@ -301,7 +301,7 @@ ipc_service::~ipc_service()
 	logger("delete service ipc_service");
 }
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 void ipc_service::win32_proc(HWND hWnd, UINT msg,
 	WPARAM wParam, LPARAM lParam)
 {
@@ -313,7 +313,7 @@ void ipc_service::win32_proc(HWND hWnd, UINT msg,
 void ipc_service::request(ipc_request* req)
 {
 	REQ_CTX* req_ctx = (REQ_CTX*) acl_mycalloc(1, sizeof(REQ_CTX));
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	if (hWnd_ != NULL)
 		req->set_hwnd(hWnd_);
 	else

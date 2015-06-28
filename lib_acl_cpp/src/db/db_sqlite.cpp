@@ -6,7 +6,7 @@
 
 #ifdef HAS_SQLITE
 
-#if defined(WIN32) || defined(USE_DYNAMIC)
+#if defined(ACL_WINDOWS) || defined(USE_DYNAMIC)
  typedef char* (*sqlite3_libversion_fn)(void);
  typedef int   (*sqlite3_open_fn)(const char*, sqlite3**);
  typedef int   (*sqlite3_close_fn)(sqlite3*);
@@ -182,7 +182,7 @@ db_sqlite::db_sqlite(const char* dbfile)
 , conv_(NULL)
 {
 	acl_assert(dbfile && *dbfile);
-#if defined(WIN32) || defined(USE_DYNAMIC)
+#if defined(ACL_WINDOWS) || defined(USE_DYNAMIC)
 	acl_pthread_once(&__sqlite_once, __sqlite_dll_load);
 #endif
 }

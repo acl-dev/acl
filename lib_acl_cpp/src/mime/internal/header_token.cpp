@@ -172,7 +172,7 @@ ssize_t header_token(HEADER_TOKEN *token, ssize_t token_len,
 		 */
 		if (ch == '"') {
 			if (tok_count < token_len) {
-				token[tok_count].u.offset = LEN(token_buffer);
+				token[tok_count].u.offset = (ssize_t) LEN(token_buffer);
 				token[tok_count].type = HEADER_TOK_QSTRING;
 			}
 			while ((ch = *cp) != 0) {
@@ -181,7 +181,7 @@ ssize_t header_token(HEADER_TOKEN *token, ssize_t token_len,
 					break;
 				if (ch == '\n') {		/* unfold */
 					if (tok_count < token_len) {
-						len = LEN(token_buffer);
+						len = (ssize_t) LEN(token_buffer);
 						while (len > 0 && IS_SPACE_TAB_CR_LF(STR(token_buffer)[len - 1]))
 							len--;
 						if (len < (ssize_t) LEN(token_buffer))
@@ -213,7 +213,7 @@ ssize_t header_token(HEADER_TOKEN *token, ssize_t token_len,
 		 */
 		if (strchr(user_specials, ch) || ACL_ISCNTRL(ch)) {
 			if (tok_count < token_len) {
-				token[tok_count].u.offset = LEN(token_buffer);
+				token[tok_count].u.offset = (ssize_t) LEN(token_buffer);
 				token[tok_count].type = ch;
 				ACL_VSTRING_ADDCH(token_buffer, ch);
 				ACL_VSTRING_ADDCH(token_buffer, 0);
@@ -227,7 +227,7 @@ ssize_t header_token(HEADER_TOKEN *token, ssize_t token_len,
 		 */
 		else {
 			if (tok_count < token_len) {
-				token[tok_count].u.offset = LEN(token_buffer);
+				token[tok_count].u.offset = (ssize_t) LEN(token_buffer);
 				token[tok_count].type = HEADER_TOK_TOKEN;
 				ACL_VSTRING_ADDCH(token_buffer, ch);
 			}

@@ -394,7 +394,7 @@ ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error)
 
 	h_addrp = NULL;
 
-#if	defined(WIN32) || defined(ACL_MACOSX) || defined(MINGW)
+#if	defined(ACL_WINDOWS) || defined(ACL_MACOSX) || defined(MINGW)
 	h_addrp = gethostbyname(name);
 	if (h_addrp == NULL) {
 		acl_msg_error("%s, %s(%d): gethostbyname error(%s), addr=%s",

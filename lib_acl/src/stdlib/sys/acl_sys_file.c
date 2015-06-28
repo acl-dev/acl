@@ -3,7 +3,7 @@
 
 #include "stdlib/acl_define.h"
 
-#ifdef  WIN32
+#ifdef  ACL_WINDOWS
 #include <io.h>
 #include <stdarg.h>
 #include <errno.h>
@@ -33,7 +33,7 @@
 
 #endif
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 ACL_FILE_HANDLE acl_file_open(const char *filepath, int flags, int mode)
 {
@@ -128,7 +128,7 @@ int acl_file_read(ACL_FILE_HANDLE fh, void *buf, size_t size,
 {
 	DWORD nRead = 0;
 
-	if (!ReadFile(fh, buf, size, &nRead, NULL))
+	if (!ReadFile(fh, buf, (DWORD) size, &nRead, NULL))
 		return ACL_VSTREAM_EOF;
 
 	return nRead;
@@ -140,7 +140,7 @@ int acl_file_write(ACL_FILE_HANDLE fh, const void *buf, size_t size,
 {
 	DWORD nWritten = 0;
 
-	if (!WriteFile(fh, buf, size, &nWritten, NULL))
+	if (!WriteFile(fh, buf, (DWORD) size, &nWritten, NULL))
 		return ACL_VSTREAM_EOF;
 
 	return nWritten;
@@ -156,7 +156,7 @@ int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vector, int count,
 	n = 0;
 	for (i = 0; i < count; i++)	{
 		if (!WriteFile(fh, vector[i].iov_base,
-			vector[i].iov_len, &nWritten, NULL))
+			(DWORD) vector[i].iov_len, &nWritten, NULL))
 		{
 			return ACL_VSTREAM_EOF;
 		}
@@ -164,7 +164,7 @@ int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vector, int count,
 			n += nWritten;
 			break;
 		}
-		n += vector[i].iov_len;
+		n += (int) vector[i].iov_len;
 	}
 	return n;
 }

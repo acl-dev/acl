@@ -11,7 +11,7 @@
 #include <fcntl.h>
 #include <sys/stat.h> /* for S_IREAD */
 
-#ifdef  WIN32
+#ifdef  ACL_WINDOWS
 # include <io.h>
 #elif defined(ACL_UNIX)
 # include <sys/types.h>
@@ -75,7 +75,9 @@ static int  __read_wait(ACL_SOCKET fd, int timeout)
 		tp = 0;
 
 	for (;;) {
-		switch (select(fd + 1, &read_fds, (fd_set *) 0, &except_fds, tp)) {
+		switch (select((int) fd + 1, &read_fds, (fd_set *) 0,
+			&except_fds, tp))
+		{
 		case -1:
 			if (acl_last_error() != ACL_EINTR)
 				return -1;
@@ -383,7 +385,7 @@ TAG_AGAIN:
 
 	if (stream->type == ACL_VSTREAM_TYPE_FILE) {
 		if ((stream->oflags & O_APPEND)) {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 			stream->sys_offset = acl_lseek(
 				ACL_VSTREAM_FILE(stream), 0, SEEK_END);
 			if (stream->sys_offset < 0)
@@ -438,7 +440,7 @@ static int __loop_writen(ACL_VSTREAM *stream, const void *vptr, size_t dlen)
 
 	ptr   = (const unsigned char *) vptr;
 	while (dlen > 0) {
-		n = __vstream_sys_write(stream, ptr, dlen);
+		n = __vstream_sys_write(stream, ptr, (int) dlen);
 		if (n <= 0) {
 			if (acl_last_error() == ACL_EINTR
 				|| acl_last_error() == ACL_EAGAIN)
@@ -452,7 +454,7 @@ static int __loop_writen(ACL_VSTREAM *stream, const void *vptr, size_t dlen)
 		ptr   += n;
 	}
 
-	return (ptr - (const unsigned char *) vptr);
+	return (int) (ptr - (const unsigned char *) vptr);
 }
 
 int private_vstream_writen(ACL_VSTREAM *stream, const void *vptr, size_t dlen)
@@ -468,7 +470,7 @@ int private_vstream_writen(ACL_VSTREAM *stream, const void *vptr, size_t dlen)
 
 int private_vstream_write(ACL_VSTREAM *stream, const void *vptr, size_t dlen)
 {
-	return (__vstream_sys_write(stream, vptr, dlen));
+	return (__vstream_sys_write(stream, vptr, (int) dlen));
 }
 
 int private_vstream_buffed_writen(ACL_VSTREAM *stream,
@@ -487,7 +489,7 @@ int private_vstream_buffed_writen(ACL_VSTREAM *stream,
 		else if (__loop_writen(stream, vptr, dlen) == ACL_VSTREAM_EOF)
 			return (ACL_VSTREAM_EOF);
 		else
-			return (dlen);
+			return (int) (dlen);
 	} else if (dlen + (size_t) stream->wbuf_dlen >=
 		(size_t) stream->wbuf_size)
 	{
@@ -496,8 +498,8 @@ int private_vstream_buffed_writen(ACL_VSTREAM *stream,
 	}
 
 	memcpy(stream->wbuf + (size_t) stream->wbuf_dlen, vptr, dlen);
-	stream->wbuf_dlen += dlen;
-	return(dlen);
+	stream->wbuf_dlen += (int) dlen;
+	return (int) (dlen);
 }
 
 int private_vstream_fflush(ACL_VSTREAM *stream)
@@ -527,7 +529,7 @@ int private_vstream_fflush(ACL_VSTREAM *stream)
 
 	acl_assert(stream->wbuf_dlen >= 0);
 
-	return (ptr - stream->wbuf);
+	return (int) (ptr - stream->wbuf);
 }
 
 ACL_VSTREAM *private_vstream_fhopen(ACL_FILE_HANDLE fh, unsigned int oflags)
@@ -576,10 +578,10 @@ ACL_VSTREAM *private_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	if (fdtype == 0)
 		fdtype = ACL_VSTREAM_TYPE_SOCK;
 
-	stream->read_buf_len     = buflen;
+	stream->read_buf_len     = (int) buflen;
 	stream->type             = fdtype;
 	ACL_VSTREAM_SOCK(stream) = fd;
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	stream->iocp_sock        = ACL_SOCKET_INVALID;
 #endif
 
@@ -630,7 +632,7 @@ ACL_VSTREAM *private_vstream_fopen(const char *path, unsigned int oflags,
 	oflags |= O_LARGEFILE;
 #endif
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	oflags |= O_BINARY;
 #endif
 
@@ -712,7 +714,7 @@ ACL_VSTREAM *private_vstream_connect_ex(const char *addr, int block_mode,
 	if (ptr)
 		fd = acl_inet_connect_ex(addr, ACL_BLOCKING,
 			conn_timeout, he_errorp);
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	else
 		return (NULL);
 #elif defined(ACL_UNIX)

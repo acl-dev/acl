@@ -21,7 +21,7 @@ public:
 	 */
 	aio_fstream(aio_handle* handle);
 
-#ifdef	WIN32
+#if defined(WIN32) || defined(WIN64)
 	aio_fstream(aio_handle* handle, HANDLE fd, unsigned int oflags = 0600);
 #else
 	aio_fstream(aio_handle* handle, int fd, unsigned int oflags = 0600);

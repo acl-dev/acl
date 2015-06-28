@@ -23,7 +23,7 @@ server_socket::~server_socket()
 
 bool server_socket::open(const char* addr)
 {
-#ifndef WIN32
+#ifndef ACL_WINDOWS
 	if (strchr(addr, '/') != NULL)
 	{
 		fd_ = acl_unix_listen(addr, backlog_, block_

@@ -130,7 +130,7 @@ ACL_VBUF *acl_vbuf_print(ACL_VBUF *bp, const char *format, va_list ap)
 		if (*cp == '*') {		/* dynamic field width */
 			width = va_arg(ap, int);
 			sprintf(fmt + i, "%d", width);
-			i = strlen(fmt);	/* reset i to string length */
+			i = (int) strlen(fmt);	/* reset i to string length */
 			cp++;
 		} else {			/* hard-coded field width */
 			for (width = 0; ACL_ISDIGIT(ch = *cp); cp++) {
@@ -144,7 +144,7 @@ ACL_VBUF *acl_vbuf_print(ACL_VBUF *bp, const char *format, va_list ap)
 		if (*cp == '*') {		/* dynamic precision */
 			prec = va_arg(ap, int);
 			sprintf(fmt + i, "%d", prec);
-			i = strlen(fmt);	/* reset i to string length */
+			i = (int) strlen(fmt);	/* reset i to string length */
 			cp++;
 		} else {			/* hard-coded precision */
 			for (prec = 0; ACL_ISDIGIT(ch = *cp); cp++) {
@@ -153,7 +153,7 @@ ACL_VBUF *acl_vbuf_print(ACL_VBUF *bp, const char *format, va_list ap)
 				CHECK_OVERFLOW(i, MAX_LEN);
 			}
 		}
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 		if (*cp == 'l') {
 			if (*(cp + 1) == 'l') {
 				fmt[i++] = 'I';

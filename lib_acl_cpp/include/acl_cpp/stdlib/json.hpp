@@ -118,7 +118,7 @@ public:
 	 * @return {json_node&} return_child 为 true 时创建的新结点的引用，
 	 *  否则返回本 json 结点对象的引用
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	json_node& add_number(const char* tag, __int64 value,
 		bool return_child = false);
 #else
@@ -156,7 +156,7 @@ public:
 	 * @return {json_node&} return_child 为 true 时创建的新结点的引用，
 	 *  否则返回本 json 结点对象的引用
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	json_node& add_array_number(__int64 value, bool return_child = false);
 #else
 	json_node& add_array_number(long long int value, bool return_child = false);
@@ -364,7 +364,7 @@ public:
 	 *  因为在 json 对象被释放时这些结点会自动被释放，当然用户也可以在
 	 *  不用时调用 reset 来释放这些 json_node 结点对象
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	json_node& create_node(const char* tag, __int64 value);
 #else
 	json_node& create_node(const char* tag, long long int value);
@@ -402,7 +402,7 @@ public:
 	 *  因为在 json 对象被释放时这些结点会自动被释放，当然用户也可以在
 	 * 不用时调用 reset 来释放这些 json_node 结点对象
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	json_node& create_array_number(__int64 value);
 #else
 	json_node& create_array_number(long long int value);

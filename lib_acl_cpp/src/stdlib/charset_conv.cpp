@@ -25,7 +25,7 @@ static const char UTF8_HEADER[] = { (char) 0xEF, (char) 0xBB, (char) 0xBF, (char
 #  define __iconv_open    iconv_open
 #  define __iconv_close   iconv_close
 #  define __iconv         iconv
-# elif defined(WIN32)
+# elif defined(ACL_WINDOWS)
 
 typedef iconv_t (*iconv_open_fn)(const char*, const char*);
 typedef int     (*iconv_close_fn)(iconv_t);
@@ -108,7 +108,7 @@ charset_conv::charset_conv()
 	m_iconv = (iconv_t) -1;
 	m_pInBuf = NULL;
 	m_pOutBuf = NULL;
-# ifdef WIN32 
+# ifdef ACL_WINDOWS 
 #  ifndef USE_WIN_ICONV
 	acl_pthread_once(&__iconv_once, __iconv_dll_load);
 #  endif
@@ -235,7 +235,7 @@ bool charset_conv::update_begin(const char* fromCharset,
 	}
 	else
 	{
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 # ifndef USE_WIN_ICONV
 		int  n = 1;
 		__iconvctl(m_iconv, ICONV_TRIVIALP, &n);
@@ -250,7 +250,7 @@ bool charset_conv::update_begin(const char* fromCharset,
 
 		char *pNil = NULL;
 		size_t zero = 0;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # ifdef USE_WIN_ICONV
 		__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
 # else
@@ -319,7 +319,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 	if (m_pOutBuf == NULL)
 		m_pOutBuf = acl_vstring_alloc(len);
 	else
-		ACL_VSTRING_SPACE(m_pOutBuf, len);
+		ACL_VSTRING_SPACE(m_pOutBuf, (int) len);
 
 	// 先将输入数据进行缓冲
 	if (*m_pUtf8Pre && m_pUtf8Pre - UTF8_HEADER > 0)
@@ -340,7 +340,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 		pOut = STR(m_pOutBuf);
 		nOut = SIZE(m_pOutBuf);
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # ifdef USE_WIN_ICONV
 		ret = __iconv(m_iconv, (const char**) &pIn, &nIn,
 				&pOut, &nOut);
@@ -382,7 +382,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 			size_t zero = 0;
 
 			// 重置状态, 似乎也没啥用处
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # ifdef USE_WIN_ICONV
 			__iconv(m_iconv, (const char**) &pNil,
 				&zero, &pNil, &zero);
@@ -426,7 +426,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 			size_t zero = 0;
 
 			// 重置状态, 似乎也没啥用处
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # ifdef USE_WIN_ICONV
 			__iconv(m_iconv, (const char**) &pNil,
 				&zero, &pNil, &zero);
@@ -516,7 +516,7 @@ int charset_conv::push_pop(const char* in, size_t len,
 	else
 		m_pBuf->clear();
 
-	return (n);
+	return (int) (n);
 }
 
 int charset_conv::pop_end(acl::string* out, size_t max /* = 0 */)
@@ -542,7 +542,7 @@ int charset_conv::pop_end(acl::string* out, size_t max /* = 0 */)
 		n = max;
 	out->append(m_pBuf->c_str(), m_pBuf->length());
 	m_pBuf->clear();
-	return (n);
+	return (int) (n);
 }
 
 void charset_conv::clear()

@@ -23,7 +23,7 @@ struct ACL_FHANDLE {
 	acl_int64 fsize;			/**< 存储文件大小 */
 	int   nrefer;				/**< 该存储句柄被引用的计数值 */
 	acl_pthread_mutex_t mutex;		/**< 线程锁 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	unsigned long tid;			/**< 打开该存储的线程号 */
 	unsigned long lock_mutex_tid;		/**< 加线程锁的线程号 */
 #else

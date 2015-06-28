@@ -22,7 +22,7 @@ int acl_unsafe(void)
 #endif
 		|| getgid() != getegid());
 }
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 int acl_unsafe(void)
 {
 	return (0);

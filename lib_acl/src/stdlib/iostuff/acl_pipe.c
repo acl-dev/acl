@@ -8,7 +8,7 @@
 
 #endif
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 #include "thread/acl_pthread.h"
 #include <process.h>

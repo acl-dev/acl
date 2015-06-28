@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 
 #include <direct.h>
 #define __S_ISTYPE(mode, mask)  (((mode) & _S_IFMT) == (mask))

@@ -7,7 +7,7 @@ extern "C" {
 #endif
 #include "stdlib/acl_define.h"
 
-#ifdef	WIN32
+#if defined(WIN32) || defined(WIN64)
 #include "thread/acl_sem.h"
 
 ACL_SEM *sem_create2(const char *pathname, unsigned int initial_value);

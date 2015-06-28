@@ -35,7 +35,7 @@ static ACL_MDT_IDX *mdt_idx_create(ACL_MDT *mdt acl_unused, size_t init_capacity
 	if ((flag & ACL_MDT_FLAG_KMR))
 		flag2 |= ACL_HTABLE_FLAG_KEY_REUSE;
 
-	idx->table = acl_htable_create(init_capacity, flag2);
+	idx->table = acl_htable_create((int) init_capacity, flag2);
 	idx->idx.name = acl_mystrdup(name);
 	idx->idx.flag = flag;
 	return ((ACL_MDT_IDX*) idx);

@@ -9,7 +9,7 @@ void acl_cpp_init(void)
 	acl_init();
 }
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 static FILE* dos_fp_ = NULL;
 

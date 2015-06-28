@@ -228,7 +228,7 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 	/*
 	 * Sanity checks.
 	 */
-#ifndef WIN32
+#ifndef ACL_WINDOWS
 	if (FD_SETSIZE <= (unsigned) fd)
 		acl_msg_fatal("%s(%d), %s: descriptor %d does not fit "
 			"FD_SETSIZE %d", __FILE__, __LINE__, myname,
@@ -256,14 +256,14 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 	acl_set_error(0);
 
 	for (;;) {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 		switch (select(1, &rfds, (fd_set *) 0, &xfds, tp)) {
 #else
 		switch (select(fd + 1, &rfds, (fd_set *) 0, &xfds, tp)) {
 #endif
 		case -1:
 			errnum = acl_last_error();
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 			if (errnum == WSAEINPROGRESS
 				|| errnum == WSAEWOULDBLOCK
 				|| errnum == ACL_EINTR)

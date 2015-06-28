@@ -63,7 +63,7 @@ public:
 	 * @param loop {bool} 是否阻塞式读完8个字节
 	 * @return {bool} 是否读取成功
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	bool read(__int64& n, bool loop = true);
 #else
 	bool read(long long int& n, bool loop = true);
@@ -204,7 +204,7 @@ public:
 	 */
 
 	istream& operator>>(string& s);
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	istream& operator>>(__int64& n);
 #else
 	istream& operator>>(long long int& n);

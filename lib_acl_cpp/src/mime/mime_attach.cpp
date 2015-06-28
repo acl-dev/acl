@@ -18,7 +18,7 @@ mime_attach::mime_attach(const char* emailFile, const MIME_NODE* node,
 		{
 			rfc2047 rfc;
 			rfc.decode_update(node->header_filename,
-					strlen(node->header_filename));
+					(int) strlen(node->header_filename));
 			rfc.decode_finish(toCharset, &m_filename);
 		}
 		else

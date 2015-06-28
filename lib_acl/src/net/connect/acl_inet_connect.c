@@ -19,7 +19,7 @@
 
 /* Utility library. */
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 #include "stdlib/acl_mystring.h"
 #endif
 
@@ -209,7 +209,7 @@ static ACL_SOCKET inet_connect_one(const char *ip, int port,
 			acl_set_error(err);
 		}
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 		if (errno_saved == ACL_EINPROGRESS || errno_saved == ACL_EWOULDBLOCK)
 			return sock;
 #elif defined(ACL_UNIX)

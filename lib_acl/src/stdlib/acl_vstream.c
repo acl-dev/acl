@@ -11,7 +11,7 @@
 #include <fcntl.h>
 #include <sys/stat.h> /* for S_IREAD */
 
-#ifdef  WIN32
+#ifdef  ACL_WINDOWS
 # include <io.h>
 #elif defined(ACL_UNIX)
 # include <sys/types.h>
@@ -58,7 +58,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 	{       
 #ifdef ACL_UNIX
 		{ STDIN_FILENO },               /* h_file */
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 		-1,                             /* h_file */
 #endif
 		0,                              /* is_nonblock */
@@ -105,7 +105,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		0,                              /* oflags */
 		0,                              /* nrefer */
 		0,                              /* pid */
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 		NULL,                           /* hproc */
 		ACL_SOCKET_INVALID,             /* iocp_sock */
 #endif
@@ -115,7 +115,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 	{
 #ifdef ACL_UNIX
 		{ STDOUT_FILENO },              /* h_file */
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 		-1,                             /* h_file */
 #endif
 		0,                              /* is_nonblock */
@@ -162,7 +162,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		0,                              /* oflags */
 		0,                              /* nrefer */
 		0,                              /* pid */
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 		NULL,                           /* hproc */
 		ACL_SOCKET_INVALID,             /* iocp_sock */
 #endif
@@ -171,7 +171,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 	{
 #ifdef ACL_UNIX
 		{ STDERR_FILENO },              /* h_file */
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 		-1,                             /* h_file */
 #endif
 		0,                              /* is_nonblock */
@@ -218,7 +218,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		0,                              /* oflags */
 		0,                              /* nrefer */
 		0,                              /* pid */
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 		NULL,                           /* hproc */
 		ACL_SOCKET_INVALID,             /* iocp_sock */
 #endif
@@ -237,7 +237,7 @@ void acl_vstream_init()
 		return;
 	__called = 1;
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 # if 0
 	ACL_VSTREAM_IN->fd.h_file = (HANDLE) _get_osfhandle(_fileno(stdin));
 	ACL_VSTREAM_OUT->fd.h_file = (HANDLE) _get_osfhandle(_fileno(stdout));
@@ -418,7 +418,7 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *fp, char *buf, int size)
 		return ACL_VSTREAM_EOF;
 	}
 	acl_non_blocking(ACL_VSTREAM_SOCK(fp), 1);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	if (fp->type != ACL_VSTREAM_TYPE_FILE)
 		acl_non_blocking(ACL_VSTREAM_SOCK(fp), 1);
 #endif
@@ -444,13 +444,13 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *fp, char *buf, int size)
 		return ACL_VSTREAM_EOF;
 	}
 
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 	if (fp->is_nonblock == 0 && fp->type != ACL_VSTREAM_TYPE_FILE)
 		acl_non_blocking(ACL_VSTREAM_SOCK(fp), ACL_BLOCKING);
 #endif
 
 	if (read_cnt < 0) {
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 		if (fp->errnum == ACL_EWOULDBLOCK)
 #elif	defined(ACL_UNIX)
 		if (fp->errnum == ACL_EWOULDBLOCK
@@ -508,7 +508,7 @@ int acl_vstream_probe_status(ACL_VSTREAM *fp)
 		return -1;
 	}
 	acl_non_blocking(ACL_VSTREAM_SOCK(fp), 1);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	if (fp->type != ACL_VSTREAM_TYPE_FILE)
 		acl_non_blocking(ACL_VSTREAM_SOCK(fp), 1);
 #endif
@@ -535,13 +535,13 @@ int acl_vstream_probe_status(ACL_VSTREAM *fp)
 		return -1;
 	}
 
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 	if (fp->is_nonblock == 0 && fp->type != ACL_VSTREAM_TYPE_FILE)
 		acl_non_blocking(ACL_VSTREAM_SOCK(fp), ACL_BLOCKING);
 #endif
 
 	if (ch == ACL_VSTREAM_EOF) {
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 		if (fp->errnum == ACL_EWOULDBLOCK)
 #elif	defined(ACL_UNIX)
 		if (fp->errnum == ACL_EWOULDBLOCK || fp->errnum == ACL_EAGAIN)
@@ -593,7 +593,7 @@ static void *__vstream_memmove(ACL_VSTREAM *fp, size_t n)
 int acl_vstream_unread(ACL_VSTREAM *fp, const void *ptr, size_t length)
 {
 	size_t capacity = fp->read_ptr - fp->read_buf;
-	ssize_t k = capacity - length;
+	ssize_t k = (ssize_t) (capacity - length);
 
 	/* 如果读缓冲中前部分空间不足, 则需要调整数据位置或扩充读缓冲区空间 */
 
@@ -611,7 +611,7 @@ int acl_vstream_unread(ACL_VSTREAM *fp, const void *ptr, size_t length)
 
 			memcpy(fp->read_buf, ptr, length);
 			fp->read_ptr = fp->read_buf;
-			fp->read_cnt += length;
+			fp->read_cnt += (int) length;
 			fp->offset = 0;
 			return (int) length;
 		}
@@ -620,7 +620,7 @@ int acl_vstream_unread(ACL_VSTREAM *fp, const void *ptr, size_t length)
 
 		n = min_delta * ((n + min_delta - 1) / min_delta);
 		acl_assert(n > 0);
-		fp->read_buf_len += n;
+		fp->read_buf_len += (int) n;
 		pbuf = acl_mymalloc((size_t) fp->read_buf_len);
 
 		memcpy(pbuf, ptr, length);
@@ -631,14 +631,14 @@ int acl_vstream_unread(ACL_VSTREAM *fp, const void *ptr, size_t length)
 
 		fp->read_buf = pbuf;
 		fp->read_ptr = fp->read_buf;
-		fp->read_cnt += length;
+		fp->read_cnt += (int) length;
 		fp->offset = 0;
 		return (int) length;
 	}
 
 	fp->read_ptr -= length;
 	memcpy(fp->read_ptr, ptr, length);
-	fp->read_cnt += length;
+	fp->read_cnt += (int) length;
 	fp->offset -= length;
 	return (int) length;
 }
@@ -866,7 +866,7 @@ int acl_vstream_readn(ACL_VSTREAM *fp, void *buf, size_t size)
 		ptr += n;
 		size -= n;
 		if (size == 0)
-			return size_saved;
+			return (int) size_saved;
 	}
 
 	/* 为减少 read 次数，当输入缓冲区较小时，则自动启用双缓冲读方式 */
@@ -889,7 +889,7 @@ int acl_vstream_readn(ACL_VSTREAM *fp, void *buf, size_t size)
 		}
 	}
 
-	return size_saved;
+	return (int) size_saved;
 }
 
 int acl_vstream_read(ACL_VSTREAM *fp, void *buf, size_t size)
@@ -971,7 +971,7 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 			myname, __FILE__, __LINE__);
 
 	*ready = 0;
-	n = LEN(buf);
+	n = (int) LEN(buf);
 
 	if (fp->read_cnt < 0)
 		acl_msg_fatal("%s, %s(%d): read_cnt(%d) < 0",
@@ -980,7 +980,7 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	if (fp->read_cnt > 0) {
 		bfgets_crlf_peek(fp, buf, ready);
 		if (*ready)
-			return LEN(buf) - n;
+			return (int) LEN(buf) - n;
 	}
 
 	/* XXX: 调用者通过检查 *ready 值来判断是否读够数据, 系统IO读操作出错
@@ -990,14 +990,14 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 
 	if (fp->sys_read_ready) {
 		if (read_once(fp) <= 0) {
-			n = LEN(buf) - n;
+			n = (int) LEN(buf) - n;
 			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
 	if (fp->read_cnt > 0)
 		bfgets_crlf_peek(fp, buf, ready);
-	return LEN(buf) - n;
+	return (int) LEN(buf) - n;
 }
 
 static int bfgets_no_crlf_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
@@ -1008,7 +1008,7 @@ static int bfgets_no_crlf_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 		return ch;
 
 	if (ch == '\n') {
-		int   n = LEN(buf) - 1;
+		int   n = (int) LEN(buf) - 1;
 
 		while (n >= 0) {
 			ch = acl_vstring_charat(buf, n);
@@ -1038,7 +1038,7 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 			myname, __FILE__, __LINE__);
 
 	*ready = 0;
-	n = LEN(buf);
+	n = (int) LEN(buf);
 
 	if (fp->read_cnt < 0)
 		acl_msg_fatal("%s, %s(%d): read_cnt(=%d) < 0",
@@ -1047,7 +1047,7 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	if (fp->read_cnt > 0) {
 		bfgets_no_crlf_peek(fp, buf, ready);
 		if (*ready)
-			return LEN(buf) - n;
+			return (int) LEN(buf) - n;
 	}
 
 	/* XXX: 调用者通过检查 *ready 值来判断是否读够数据, 系统IO读操作出错
@@ -1057,7 +1057,7 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 
 	if (fp->sys_read_ready) {
 		if (read_once(fp) <= 0) {
-			n = LEN(buf) - n;
+			n = (int) LEN(buf) - n;
 
 			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
@@ -1066,7 +1066,7 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	if (fp->read_cnt > 0)
 		bfgets_no_crlf_peek(fp, buf, ready);
 
-	return LEN(buf) - n;
+	return (int) LEN(buf) - n;
 }
 
 static int bfread_cnt_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
@@ -1154,7 +1154,7 @@ int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 		acl_msg_fatal("%s, %s(%d): invalid input",
 			myname, __FILE__, __LINE__);
 
-	n = LEN(buf);
+	n = (int) LEN(buf);
 
 	if (fp->read_cnt < 0)
 		acl_msg_fatal("%s, %s(%d): read_cnt(=%d) < 0",
@@ -1169,14 +1169,14 @@ int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 
 	if (fp->sys_read_ready) {
 		if (read_once(fp) <= 0) {
-			n = LEN(buf) - n;
+			n = (int) LEN(buf) - n;
 			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
 	if (fp->read_cnt > 0)
 		bfread_peek(fp, buf);
-	return LEN(buf) - n;
+	return (int) LEN(buf) - n;
 }
 
 int acl_vstream_can_read(ACL_VSTREAM *fp)
@@ -1244,7 +1244,7 @@ TAG_AGAIN:
 
 	if (fp->type == ACL_VSTREAM_TYPE_FILE) {
 		if ((fp->oflags & O_APPEND)) {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 			fp->sys_offset = acl_lseek(
 				ACL_VSTREAM_FILE(fp), 0, SEEK_END);
 			if (fp->sys_offset < 0) {
@@ -1347,7 +1347,7 @@ TAG_AGAIN:
 
 	if (fp->type == ACL_VSTREAM_TYPE_FILE) {
 		if ((fp->oflags & O_APPEND)) {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 			fp->sys_offset = acl_lseek(
 				ACL_VSTREAM_FILE(fp), 0, SEEK_END);
 			if (fp->sys_offset < 0) {
@@ -1483,7 +1483,7 @@ int acl_vstream_writevn(ACL_VSTREAM *fp, const struct iovec *vec, int count)
 		for (i = 0; i < count; i++) {
 			if (n >= (int) vect[i].iov_len) {
 				/* written */
-				n -= vect[i].iov_len;
+				n -= (int) vect[i].iov_len;
 				k++;
 			} else {
 				/* partially written */
@@ -1525,7 +1525,7 @@ int acl_vstream_vfprintf(ACL_VSTREAM *fp, const char *fmt, va_list ap)
 		acl_msg_fatal("%s, %s(%d): vsprintf return null",
 			myname, __FILE__, __LINE__);
 
-	n = LEN(buf);
+	n = (int) LEN(buf);
 	if (n <= 0)
 		acl_msg_fatal("%s, %s(%d): len(%d) <= 0",
 			myname, __FILE__, __LINE__, n);
@@ -1653,7 +1653,7 @@ static int loop_writen(ACL_VSTREAM *fp, const void *vptr, size_t size)
 		return ACL_VSTREAM_EOF;
 	}
 
-	return ptr - (const unsigned char *) vptr;
+	return (int) (ptr - (const unsigned char *) vptr);
 }
 
 int acl_vstream_writen(ACL_VSTREAM *fp, const void *vptr, size_t dlen)
@@ -1684,7 +1684,7 @@ int acl_vstream_buffed_writen(ACL_VSTREAM *fp, const void *vptr, size_t dlen)
 		else if (loop_writen(fp, vptr, dlen) == ACL_VSTREAM_EOF)
 			return ACL_VSTREAM_EOF;
 		else
-			return dlen;
+			return (int) dlen;
 	} else if (dlen + (size_t) fp->wbuf_dlen >=
 		(size_t) fp->wbuf_size)
 	{
@@ -1694,7 +1694,7 @@ int acl_vstream_buffed_writen(ACL_VSTREAM *fp, const void *vptr, size_t dlen)
 
 	memcpy(fp->wbuf + (size_t) fp->wbuf_dlen, vptr, dlen);
 	fp->wbuf_dlen += (int) dlen;
-	return dlen;
+	return (int) dlen;
 }
 
 int acl_vstream_buffed_vfprintf(ACL_VSTREAM *fp, const char *fmt, va_list ap)
@@ -1719,7 +1719,7 @@ int acl_vstream_buffed_vfprintf(ACL_VSTREAM *fp, const char *fmt, va_list ap)
 		acl_msg_fatal("%s, %s(%d): vsprintf return null",
 			myname, __FILE__, __LINE__);
 
-	n = LEN(buf);
+	n = (int) LEN(buf);
 	if (n <= 0)
 		acl_msg_fatal("%s, %s(%d): len(%d) <= 0",
 			myname, __FILE__, __LINE__, n);
@@ -1952,10 +1952,10 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 			myname, __LINE__);
 	}
 
-	fp->read_buf_len     = buflen;
+	fp->read_buf_len     = (int) buflen;
 	fp->type             = fdtype;
 	ACL_VSTREAM_SOCK(fp) = fd;
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	fp->iocp_sock        = ACL_SOCKET_INVALID;
 #endif
 	fp->read_ptr         = fp->read_buf;
@@ -2086,7 +2086,7 @@ ACL_VSTREAM *acl_vstream_fopen(const char *path, unsigned int oflags,
 	oflags |= O_LARGEFILE;
 #endif
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	oflags |= O_BINARY;
 #endif
 
@@ -2114,7 +2114,7 @@ char *acl_vstream_loadfile2(const char *path, ssize_t *size)
 {
 	const char *myname = "acl_vstream_loadfile";
 	ACL_VSTREAM *fp;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	int   oflags = O_RDONLY | O_BINARY;
 #else
 	int   oflags = O_RDONLY;
@@ -2404,7 +2404,7 @@ acl_off_t acl_vstream_ftell(ACL_VSTREAM *fp)
 	return fp->offset - fp->read_cnt;
 }
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 int acl_file_ftruncate(ACL_VSTREAM *fp, acl_off_t length)
 {
 	const char *myname = "acl_file_ftruncate";
@@ -2412,11 +2412,11 @@ int acl_file_ftruncate(ACL_VSTREAM *fp, acl_off_t length)
 
 	/* 参见：C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\crt\src
 	 * osfinfo.c
-	 * _open_osfhandle: 将WIN32 API的文件句柄转换为标准C的文件句柄
-	 * _get_osfhandle: 根据标准C文件句柄查询WIN32 API文件句柄
+	 * _open_osfhandle: 将ACL_WINDOWS API的文件句柄转换为标准C的文件句柄
+	 * _get_osfhandle: 根据标准C文件句柄查询ACL_WINDOWS API文件句柄
 	 * _free_osfhnd: 释放由 _open_osfhandle 打开的标准C文件句柄的资源，
-	 *               但并不实际关闭该WIN32 API句柄，所以还得要对其真实
-	 *               WIN32 API文件句柄进行关闭
+	 *               但并不实际关闭该ACL_WINDOWS API句柄，所以还得要对其真实
+	 *               ACL_WINDOWS API文件句柄进行关闭
 	 * close.c
 	 * _close: 关闭并释放标准C的文件句柄
 	*/
@@ -2476,7 +2476,7 @@ int acl_file_truncate(const char *path, acl_off_t length)
 	return truncate(path, length);
 }
 
-#endif /* !WIN32, ACL_UNIX */
+#endif /* !ACL_WINDOWS, ACL_UNIX */
 
 int acl_vstream_fstat(ACL_VSTREAM *fp, struct acl_stat *buf)
 {

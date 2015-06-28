@@ -461,7 +461,7 @@ int http_client::read_response_body(char* buf, size_t size)
 	// 缓冲区太大了没有任何意义
 	if (size >= 1024000)
 		size = 1024000;
-	http_off_t ret = http_res_body_get_sync(res_, vstream, buf, size);
+	http_off_t ret = http_res_body_get_sync(res_, vstream, buf, (int) size);
 
 	if (ret <= 0)
 	{

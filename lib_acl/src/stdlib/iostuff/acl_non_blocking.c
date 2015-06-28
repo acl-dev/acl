@@ -30,7 +30,7 @@ int acl_non_blocking(ACL_SOCKET fd, int on)
 #ifdef	ACL_UNIX
 	int   flags;
 	int   nonb = PATTERN;
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 	unsigned long n = on;
 #endif
 #ifdef	NBLOCK_SYSV
@@ -69,7 +69,7 @@ int acl_non_blocking(ACL_SOCKET fd, int on)
 		acl_msg_error("fcntl(fd, F_SETL, nonb) failed");
 		return -1;
 	}
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	if (ioctlsocket(fd, FIONBIO, &n) < 0) {
 		acl_msg_error("ioctlsocket(fd,FIONBIO) failed");
 		return -1;
@@ -89,7 +89,7 @@ int acl_is_blocking(ACL_SOCKET fd)
 		return -1;
 	}
 	return (flags & PATTERN) == 0 ? 1 : 0;
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	const char *myname = "acl_is_blocking";
 
 	acl_msg_error("%s(%d), %s: unsport in win32",

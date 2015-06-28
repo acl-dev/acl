@@ -3,7 +3,7 @@
 
 #include "stdlib/acl_define.h"
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 #include "stdlib/acl_stdlib.h"
 
 #ifdef __cplusplus

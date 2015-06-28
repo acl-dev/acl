@@ -485,7 +485,7 @@ unsigned acl_hash_func3(const void *buf, size_t len)
 	n = 0;
 	k = (const unsigned char *) buf;
 
-	loop = (len + 8 - 1) >> 3;
+	loop = ((unsigned int) len + 8 - 1) >> 3;
 	switch (len & (8 - 1)) {
 	case 0:
 		do {

@@ -117,7 +117,7 @@ public:
 	 * 获得 HTTP 响应的数据体长度
 	 * @return {int64) 返回值若为 -1 则表明 HTTP 头不存在或没有长度字段
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	__int64 body_length(void) const;
 #else
 	long long int body_length(void) const;
@@ -227,7 +227,7 @@ public:
 	 */
 	bool support_range(void) const;
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	/**
 	 * 当调用了 http_request::request_header().set_range() 且读取服务器
 	 * 返回的数据头后，此函数用来获得支持分段功能的起始偏移位置
@@ -312,7 +312,7 @@ private:
 	http_header  header_;
 	bool cookie_inited_;
 	std::vector<HttpCookie*>* cookies_;
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	__int64 range_from_;
 	__int64 range_to_;
 	__int64 range_max_;

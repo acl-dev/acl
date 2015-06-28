@@ -77,7 +77,7 @@ public:
 private:
 	bool detachable_;
 	size_t stack_size_;
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	void* thread_;
 	unsigned long thread_id_;
 #else

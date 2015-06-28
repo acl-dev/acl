@@ -3,7 +3,7 @@
 
 #include "stdlib/acl_define.h"
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #pragma once
 #endif
 
@@ -40,7 +40,7 @@ void acl_doze(unsigned delay)
 			acl_msg_fatal("doze: select: %s",
 				acl_last_strerror(tbuf, sizeof(tbuf)));
 		}
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 	Sleep(delay);
 #else
 #error "unknown OS"

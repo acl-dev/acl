@@ -8,7 +8,7 @@
 namespace acl
 {
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #define atoll _atoi64
 #endif
 

@@ -3,7 +3,7 @@
 #include "icmp_private.h"
 #include "icmp/lib_icmp.h"
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #include <process.h>
 #elif	defined(ACL_UNIX)
 #include <unistd.h>
@@ -21,7 +21,7 @@ ICMP_CHAT *icmp_chat_create(ACL_AIO* aio, int check_tid)
 	chat->count = 0;
 #ifdef ACL_UNIX
 	chat->pid = getpid();
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	chat->pid = _getpid();
 #endif
 	chat->tid = (unsigned long) acl_pthread_self();

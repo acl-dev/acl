@@ -13,11 +13,11 @@
 #if defined(ACL_CPP_DLL) || defined(USE_DYNAMIC)
 
 #ifndef STDCALL
-# ifdef WIN32
+# ifdef ACL_WINDOWS
 #  define STDCALL __stdcall
 # else
 #  define STDCALL
-# endif // WIN32
+# endif // ACL_WINDOWS
 #endif // STDCALL
 
 typedef unsigned long (STDCALL *mysql_libversion_fn)(void);

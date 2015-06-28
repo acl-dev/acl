@@ -4,7 +4,7 @@
 
 #ifdef HOOK_NEW
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 # ifdef NDEBUG
 void* operator new(size_t n)
@@ -18,7 +18,7 @@ void  operator delete(void *p)
 }
 # endif
 
-#else  // WIN32
+#else  // ACL_WINDOWS
 
 void* operator new(size_t n) throw (std::bad_alloc)
 {
@@ -29,7 +29,7 @@ void  operator delete(void *p) throw()
 	acl::acl_delete(p, __FILE__, __FUNCTION__, __LINE__);
 }
 
-#endif  // !WIN32
+#endif  // !ACL_WINDOWS
 
 #endif  // HOOK_NEW
 

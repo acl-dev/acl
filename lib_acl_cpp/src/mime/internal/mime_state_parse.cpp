@@ -623,7 +623,7 @@ static int mime_bound_body(const char *boundary, MIME_NODE *node,
 					*finish = 1;
 
 					node->body_end = node->state->curr_off
-						- strlen(node->state->curr_bound);
+						- (off_t) strlen(node->state->curr_bound);
 					node->body_data_end = node->body_end;
 
 					// 因为 body_end 记录的是某个结点最后的位置，其中会包含
@@ -666,7 +666,7 @@ static int mime_bound_body(const char *boundary, MIME_NODE *node,
 				/* 说明完全匹配 */
 				if (*node->bound_ptr == 0) {
 					node->body_end = node->state->curr_off
-						- strlen(node->state->curr_bound);
+						- (off_t) strlen(node->state->curr_bound);
 					node->body_data_end = node->body_end;
 
 					// 因为 body_end 记录的是某个结点最后的位置，其中会包含
@@ -691,7 +691,7 @@ static int mime_bound_body(const char *boundary, MIME_NODE *node,
 		}
 	}
 
-	return (n - ((const char*) cp - s));
+	return (int) (n - ((const char*) cp - s));
 }
 
 // 分析邮件体或 multipart 部分体
@@ -887,7 +887,7 @@ static int mime_state_multi_bound(MIME_STATE *state, const char *s, int n)
 		}
 	}
 
-	return (n - ((const char*) cp - s));
+	return (int) (n - ((const char*) cp - s));
 }
 
 static int mime_state_multi_bound_crlf(MIME_STATE *state, const char *s, int n)

@@ -18,7 +18,7 @@ ACL_FILE *acl_fopen(const char *filename, const char *mode)
 	ACL_FILE *fp;
 	ACL_VSTREAM *stream;
 	int   oflags = 0, whileflag;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	int   commodeset = 0, scanset = 0;
 #endif
 
@@ -67,14 +67,14 @@ ACL_FILE *acl_fopen(const char *filename, const char *mode)
 			}
 			break;
 		case 'b':
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 			if (oflags & (O_TEXT | O_BINARY))
 				whileflag = 0;
 			else
 				oflags |= O_BINARY;
 #endif
 			break;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 		case 't':
 			if (oflags & (O_TEXT | O_BINARY))
 				whileflag = 0;
@@ -126,7 +126,7 @@ ACL_FILE *acl_fopen(const char *filename, const char *mode)
 		case 'N':
 			oflags |= O_NOINHERIT;
 			break;
-#endif  /* WIN32 */
+#endif  /* ACL_WINDOWS */
 		default:
 			errno = EINVAL;
 			acl_msg_error("Invalid file open mode");
@@ -182,7 +182,7 @@ size_t acl_fread(void *buf, size_t size, size_t nitems, ACL_FILE *fp)
 		return EOF;
 	}
 
-	ret /= size;
+	ret /= (int) size;
 	if (ret == (int) nitems)
 		return (nitems);
 	else if (ret == 0) {

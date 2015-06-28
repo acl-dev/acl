@@ -66,7 +66,7 @@ protected:
 		(void) client;
 	}
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	/**
 	 * 对于基于 WIN32 窗口消息的情况，当调用 open 时，则内部
 	 * 会自动调用 create_windows 过程

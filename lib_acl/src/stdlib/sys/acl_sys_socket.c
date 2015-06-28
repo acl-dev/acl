@@ -4,7 +4,7 @@
 #include "stdlib/acl_define.h"
 
 #include <errno.h>
-#ifdef  WIN32
+#ifdef  ACL_WINDOWS
 #include <io.h>
 #include <stdarg.h>
 
@@ -34,7 +34,7 @@
 
 #endif
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 static int __socket_inited = 0;
 static int __socket_ended = 0;
@@ -123,7 +123,7 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 		return -1;
 	}
 
-	ret = recv(fd, buf, size, 0);
+	ret = recv(fd, buf, (int) size, 0);
 	if (ret <= 0)
 		errno = acl_last_error();
 	return ret;
@@ -157,7 +157,7 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 	(void) timeout;
 #endif
 
-	ret = send(fd, buf, size, 0);
+	ret = send(fd, buf, (int) size, 0);
 	if (ret <= 0)
 		errno = acl_last_error();
 	return ret;
@@ -180,8 +180,7 @@ int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
 
 	n = 0;
 	for (i = 0; i < count; i++)	{
-		ret = send(fd, vec[i].iov_base,
-				vec[i].iov_len, 0);
+		ret = send(fd, vec[i].iov_base, (int) vec[i].iov_len, 0);
 		if (ret == SOCKET_ERROR) {
 			errno = acl_last_error();
 			return -1;

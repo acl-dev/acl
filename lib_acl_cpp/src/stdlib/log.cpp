@@ -18,7 +18,7 @@ void log::open(const char* recipients, const char* procname /* = unknown */,
 	const char* ptr = strrchr(procname, '/');
 	if (ptr)
 		procname = ptr + 1;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	if (ptr == NULL)
 	{
 		ptr = strrchr(procname, '\\');
@@ -77,7 +77,7 @@ void log::vmsg5(const char* fname, int line, const char* func,
 	const char* ptr = strrchr(fname, '/');
 	if (ptr)
 		fname = ptr + 1;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	if (ptr == NULL)
 	{
 		ptr = strrchr(fname, '\\');
@@ -125,7 +125,7 @@ void log::vmsg7(size_t section, size_t level, const char* fname,
 	const char* ptr = strrchr(fname, '/');
 	if (ptr)
 		fname = ptr + 1;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	if (ptr == NULL)
 	{
 		ptr = strrchr(fname, '\\');
@@ -170,7 +170,7 @@ void log::vwarn5(const char* fname, int line, const char* func,
 	const char* ptr = strrchr(fname, '/');
 	if (ptr)
 		fname = ptr + 1;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	if (ptr == NULL)
 	{
 		ptr = strrchr(fname, '\\');
@@ -215,7 +215,7 @@ void log::verror5(const char* fname, int line, const char* func,
 	const char* ptr = strrchr(fname, '/');
 	if (ptr)
 		fname = ptr + 1;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	if (ptr == NULL)
 	{
 		ptr = strrchr(fname, '\\');
@@ -260,7 +260,7 @@ void log::vfatal5(const char* fname, int line, const char* func,
 	const char* ptr = strrchr(fname, '/');
 	if (ptr)
 		fname = ptr + 1;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	if (ptr == NULL)
 	{
 		ptr = strrchr(fname, '\\');

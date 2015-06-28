@@ -13,7 +13,7 @@
 #include <sys/types.h>
 #endif
 
-#ifdef  WIN32
+#ifdef  ACL_WINDOWS
 #include <io.h>
 #endif
 
@@ -235,7 +235,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 	
 #ifdef ACL_UNIX
 	filefd = acl_file_open(pathname, O_RDWR, S_IREAD | S_IWRITE | S_IRGRP);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	filefd = acl_file_open(pathname, O_RDWR, S_IREAD | S_IWRITE);
 #else
 # error "unknown OS"
@@ -496,7 +496,7 @@ static int _cfg_line_dump(ACL_FILE_HANDLE filefd, const ACL_CFG_LINE *cfg_line, 
 
 	n = cfg_line->ncount;
 	if (delimiter != NULL)
-		j = strlen(delimiter);
+		j = (int) strlen(delimiter);
 	else
 		j = 0;
 
@@ -504,7 +504,7 @@ static int _cfg_line_dump(ACL_FILE_HANDLE filefd, const ACL_CFG_LINE *cfg_line, 
 		for (i = 0; i < n; i++) {
 			if (cfg_line->value[i] == NULL)
 				break;
-			dlen += strlen(cfg_line->value[i]) + j;
+			dlen += (int) strlen(cfg_line->value[i]) + j;
 		}
 		dlen += 2;   /* for '\n' and '\0' */
 		pbuf = (char *) acl_mycalloc(1, dlen);
@@ -528,7 +528,7 @@ static int _cfg_line_dump(ACL_FILE_HANDLE filefd, const ACL_CFG_LINE *cfg_line, 
 			return (-1);
 		}
 	} else if (cfg_line->pdata != NULL) {
-		dlen = strlen(cfg_line->pdata) + 2;
+		dlen = (int) strlen(cfg_line->pdata) + 2;
 		pbuf = (char *) acl_mycalloc(1, dlen);
 		if (pbuf == NULL)
 			return (-1);
@@ -564,7 +564,7 @@ int acl_cfg_parser_dump(const ACL_CFG_PARSER *parser,
 	filefd = acl_file_open(pathname,
 			O_CREAT | O_TRUNC | O_APPEND | O_WRONLY,
 			S_IREAD | S_IWRITE | S_IRGRP);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	filefd = acl_file_open(pathname,
 		O_CREAT | O_TRUNC | O_APPEND | O_WRONLY,
 		S_IREAD | S_IWRITE);

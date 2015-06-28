@@ -15,7 +15,7 @@
 
 #include "acl_cpp/stdlib/malloc.hpp"
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 # include "acl_cpp/stdlib/snprintf.hpp"
 # ifdef _DEBUG
 #  ifndef _CRTDBG_MAP_ALLOC
@@ -34,6 +34,6 @@
 #endif
 
 // 加入下面一行可以加快在 VC 下的编译速度
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 #include "acl_cpp/lib_acl.hpp"
 #endif

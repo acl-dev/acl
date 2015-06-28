@@ -326,7 +326,7 @@ static bool decoder_update(rfc2047_entry* entry,
 {
 	buf1->clear();
 	pDecoder->decode_update(entry->pData->c_str(),
-			entry->pData->length(), buf1);
+			(int) entry->pData->length(), buf1);
 	if (buf1->empty())
 		return (true);
 

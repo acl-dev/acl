@@ -77,7 +77,7 @@ void acl_token_name(const ACL_TOKEN *token, ACL_VSTRING *buf)
 	pend = acl_vstring_end(buf) - 1;
 	ptr = STR(buf);
 	i = 0;
-	n = (pend - ptr + 1) / 2;
+	n = (int) (pend - ptr + 1) / 2;
 	while (i < n) {
 		ch = *ptr;
 		*ptr = *pend;

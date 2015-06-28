@@ -13,7 +13,7 @@ enum
 	RPC_SIG
 };
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #define RPC_WIN32_MSG	(WM_USER + 100)
 #define RPC_WIN32_SIG	(WM_USER + 101)
 #endif
@@ -72,7 +72,7 @@ void rpc_request::run(ipc_client* ipc)
 }
 
 // 该函数在子线程中被调用
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 void rpc_request::run(HWND hWnd)
 {
 	rpc_run();
@@ -84,7 +84,7 @@ void rpc_request::run(HWND hWnd)
 // 该函数在子线程中被调用
 void rpc_request::rpc_signal(void* ctx)
 {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	HWND hWnd = get_hwnd();
 	if (hWnd != NULL)
 	{
@@ -247,14 +247,14 @@ protected:
 private:
 };
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #include <process.h>
 #endif
 
 rpc_service::rpc_service(int nthread, bool ipc_keep /* = true */)
 : ipc_service(nthread, ipc_keep)
 {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	magic_ = _getpid() + time(NULL);
 #else
 	magic_ = getpid() + time(NULL);
@@ -273,7 +273,7 @@ void rpc_service::on_accept(aio_socket_stream* client)
 	ipc->wait();
 }
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 void rpc_service::win32_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (msg == RPC_WIN32_MSG)

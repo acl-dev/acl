@@ -113,7 +113,7 @@ static int __try_fflush(ACL_ASTREAM *astream)
 		 * 定为全局性的。--- zsx :)
 		 */
 
-		dlen = ACL_VSTRING_LEN(str) - astream->write_offset;
+		dlen = (int) ACL_VSTRING_LEN(str) - astream->write_offset;
 		ptr = acl_vstring_str(str) + astream->write_offset;
 		/* 开始进行非阻塞式写操作 */
 		n = acl_vstream_write(astream->stream, ptr, dlen);
@@ -335,7 +335,7 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 			const char *ptr;
 
 			ptr = acl_vstring_str(str);
-			len = ACL_VSTRING_LEN(str);
+			len = (int) ACL_VSTRING_LEN(str);
 			n = acl_vstream_write(astream->stream, ptr, len);
 			if (n == ACL_VSTREAM_EOF) {
 				if (acl_last_error() != ACL_EAGAIN) {
@@ -385,13 +385,13 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 
 	acl_assert(n >= 0);
 
-	len = ACL_VSTRING_LEN(str);
+	len = (int) ACL_VSTRING_LEN(str);
 	if (n < len)
 		acl_vstring_memmove(str, acl_vstring_str(str) + n, len - n);
 
 	/* 将数据置入该流的写队列中 */
 	acl_fifo_push(&astream->write_fifo, str);
-	astream->write_left += ACL_VSTRING_LEN(str);
+	astream->write_left += (int) ACL_VSTRING_LEN(str);
 
 	/* 将该流的写事件置入事件监控中 */
 	WRITE_SAFE_ENABLE(astream, __writen_notify_callback);
@@ -465,7 +465,7 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 	for (i = 0; i < count; i++) {
 		if (n >= (int) vector[i].iov_len) {
 			/* written */
-			n -= vector[i].iov_len;
+			n -= (int) vector[i].iov_len;
 		} else {
 			/* partially written */
 			break;
@@ -496,10 +496,10 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 	/* 计算剩余的数据总长度 */
 
 	j = i;
-	dlen = vector[i].iov_len - n;
+	dlen = (int) vector[i].iov_len - n;
 	i++;  /* skipt this */
 	for (; i < count; i++) {
-		dlen += vector[i].iov_len;
+		dlen += (int) vector[i].iov_len;
 	}
 
 	/* 将数据置入该流的写队列中 */

@@ -31,7 +31,7 @@
 static void vstring_extend(ACL_VBUF *bp, int incr)
 {
 	const char *myname = "vstring_extend";
-	unsigned used = bp->ptr - bp->data;
+	unsigned used = (unsigned) (bp->ptr - bp->data);
 	int     new_len;
 	ACL_VSTRING *vp = (ACL_VSTRING *) bp->ctx;
 
@@ -110,7 +110,7 @@ void acl_vstring_init(ACL_VSTRING *vp, size_t len)
 	vp->vbuf.data = (unsigned char *) acl_mymalloc(len);
 
 	vp->vbuf.flags = 0;
-	vp->vbuf.len = len;
+	vp->vbuf.len = (int) len;
 	ACL_VSTRING_RESET(vp);
 	vp->vbuf.data[0] = 0;
 	vp->vbuf.get_ready = vstring_buf_get_ready;
@@ -161,7 +161,7 @@ ACL_VSTRING *acl_vstring_slice_alloc(ACL_SLICE_POOL *slice, size_t len)
 	}
 
 	vp->vbuf.flags = 0;
-	vp->vbuf.len = len;
+	vp->vbuf.len = (int) len;
 	ACL_VSTRING_RESET(vp);
 	vp->vbuf.data[0] = 0;
 	vp->vbuf.get_ready = vstring_buf_get_ready;
@@ -191,7 +191,7 @@ ACL_VSTRING *acl_vstring_dbuf_alloc(ACL_DBUF_POOL *dbuf, size_t len)
 	}
 
 	vp->vbuf.flags = 0;
-	vp->vbuf.len = len;
+	vp->vbuf.len = (int) len;
 	ACL_VSTRING_RESET(vp);
 	vp->vbuf.data[0] = 0;
 	vp->vbuf.get_ready = vstring_buf_get_ready;
@@ -246,7 +246,7 @@ void  acl_vstring_ctl(ACL_VSTRING *vp,...)
 ACL_VSTRING *acl_vstring_truncate(ACL_VSTRING *vp, size_t len)
 {
 	if (len < ACL_VSTRING_LEN(vp)) {
-		ACL_VSTRING_AT_OFFSET(vp, len);
+		ACL_VSTRING_AT_OFFSET(vp, (int) len);
 		ACL_VSTRING_TERMINATE(vp);
 	}
 	return (vp);
@@ -310,9 +310,9 @@ ACL_VSTRING *acl_vstring_memcpy(ACL_VSTRING *vp, const char *src, size_t len)
 {
 	ACL_VSTRING_RESET(vp);
 
-	ACL_VSTRING_SPACE(vp, len);
+	ACL_VSTRING_SPACE(vp, (int) len);
 	memcpy(acl_vstring_str(vp), src, len);
-	ACL_VSTRING_AT_OFFSET(vp, len);
+	ACL_VSTRING_AT_OFFSET(vp, (int) len);
 	ACL_VSTRING_TERMINATE(vp);
 	return (vp);
 }
@@ -326,7 +326,7 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 	{
 		/* 说明是同一内存区间的数据移动 */
 		memmove(acl_vstring_str(vp), src, len);
-		ACL_VSTRING_AT_OFFSET(vp, len);
+		ACL_VSTRING_AT_OFFSET(vp, (int) len);
 		ACL_VSTRING_TERMINATE(vp);
 		return (vp);
 	} else {
@@ -336,8 +336,8 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 		memcpy(ptr, src, len);
 		acl_myfree(vp->vbuf.data);
 		vp->vbuf.data = (unsigned char *) ptr;
-		vp->vbuf.len = len;
-		ACL_VSTRING_AT_OFFSET(vp, len);
+		vp->vbuf.len = (int) len;
+		ACL_VSTRING_AT_OFFSET(vp, (int) len);
 		ACL_VSTRING_TERMINATE(vp);
 		vp->maxlen = 0;
 		return (vp);
@@ -348,10 +348,10 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 
 ACL_VSTRING *acl_vstring_memcat(ACL_VSTRING *vp, const char *src, size_t len)
 {
-	ACL_VSTRING_SPACE(vp, len);
+	ACL_VSTRING_SPACE(vp, (int) len);
 	memcpy(acl_vstring_end(vp), src, len);
 	len += ACL_VSTRING_LEN(vp);
-	ACL_VSTRING_AT_OFFSET(vp, len);
+	ACL_VSTRING_AT_OFFSET(vp, (int) len);
 	ACL_VSTRING_TERMINATE(vp);
 	return (vp);
 }
@@ -513,12 +513,12 @@ ACL_VSTRING *acl_vstring_insert(ACL_VSTRING *vp, size_t start,
 	 * Move the existing content and copy the new content.
 	 */
 	new_len = ACL_VSTRING_LEN(vp) + len;
-	ACL_VSTRING_SPACE(vp, len);
+	ACL_VSTRING_SPACE(vp, (int) len);
 	memmove(acl_vstring_str(vp) + start + len,
 		acl_vstring_str(vp) + start,
 		ACL_VSTRING_LEN(vp) - start);
 	memcpy(acl_vstring_str(vp) + start, buf, len);
-	ACL_VSTRING_AT_OFFSET(vp, new_len);
+	ACL_VSTRING_AT_OFFSET(vp, (int) new_len);
 	ACL_VSTRING_TERMINATE(vp);
 	return (vp);
 }
@@ -532,8 +532,8 @@ ACL_VSTRING *acl_vstring_prepend(ACL_VSTRING *vp, const char *buf, size_t len)
 	/*
 	 * Move the existing content and copy the new content.
 	 */
-	new_len = ACL_VSTRING_LEN(vp) + len;
-	ACL_VSTRING_SPACE(vp, len);
+	new_len = (ssize_t) (ACL_VSTRING_LEN(vp) + len);
+	ACL_VSTRING_SPACE(vp, (int) len);
 	memmove(acl_vstring_str(vp) + len, acl_vstring_str(vp), ACL_VSTRING_LEN(vp));
 	memcpy(acl_vstring_str(vp), buf, len);
 	ACL_VSTRING_AT_OFFSET(vp, new_len);
@@ -562,7 +562,7 @@ ACL_VSTRING *acl_vstring_import(char *str)
 
 	vp = (ACL_VSTRING *) acl_mymalloc(sizeof(*vp));
 	vp->slice = NULL;
-	len = strlen(str);
+	len = (int) strlen(str);
 	vp->vbuf.data = (unsigned char *) str;
 	vp->vbuf.len = len + 1;
 	ACL_VSTRING_AT_OFFSET(vp, len);
@@ -574,7 +574,7 @@ void acl_vstring_glue(ACL_VSTRING *vp, void *buf, size_t len)
 {
 	vp->vbuf.flags = 0;
 	vp->vbuf.data = buf;
-	vp->vbuf.len = len;
+	vp->vbuf.len = (int) len;
 	ACL_VSTRING_RESET(vp);
 	vp->vbuf.data[0] = 0;
 	vp->vbuf.get_ready = vstring_buf_get_ready;
@@ -646,14 +646,14 @@ ACL_VSTRING *acl_vstring_vsprintf_append(ACL_VSTRING *vp, const char *format, va
 ACL_VSTRING *acl_vstring_sprintf_prepend(ACL_VSTRING *vp, const char *format,...)
 {
 	va_list ap;
-	ssize_t old_len = ACL_VSTRING_LEN(vp);
+	ssize_t old_len = (ssize_t) ACL_VSTRING_LEN(vp);
 	ssize_t result_len;
 
 	/* Construct: old|new|free */
 	va_start(ap, format);
 	vp = acl_vstring_vsprintf_append(vp, format, ap);
 	va_end(ap);
-	result_len = ACL_VSTRING_LEN(vp);
+	result_len = (ssize_t) ACL_VSTRING_LEN(vp);
 
 	/* Construct: old|new|old|free */
 	ACL_VSTRING_SPACE(vp, old_len);  /* avoid dangling pointer */

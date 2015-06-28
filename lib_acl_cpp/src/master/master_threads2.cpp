@@ -23,7 +23,7 @@ static bool has_called = false;
 
 void master_threads2::run_daemon(int argc, char** argv)
 {
-#ifndef WIN32
+#ifndef ACL_WINDOWS
 	// 每个进程只能有一个实例在运行
 	acl_assert(has_called == false);
 	has_called = true;
@@ -83,7 +83,7 @@ bool master_threads2::run_alone(const char* addrs, const char* path /* = NULL */
 
 	std::vector<ACL_VSTREAM*> sstreams;
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	acl_init();
 	ACL_EVENT* eventp = acl_event_new_select_thr(1, 0);
 #else
@@ -257,7 +257,7 @@ void master_threads2::service_pre_jail(void*)
 {
 	acl_assert(__mt != NULL);
 
-#ifndef WIN32
+#ifndef ACL_WINDOWS
 	if (__mt->daemon_mode())
 	{
 		ACL_EVENT* eventp = acl_threads_server_event();

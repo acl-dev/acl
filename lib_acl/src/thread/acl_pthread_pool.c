@@ -107,7 +107,7 @@ struct acl_pthread_pool_t {
 };
 
 #undef	SET_ERRNO
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # define	SET_ERRNO(_x_) (void) 0
 #elif	defined(ACL_UNIX)
 # define	SET_ERRNO(_x_) (acl_set_error(_x_))
@@ -115,7 +115,7 @@ struct acl_pthread_pool_t {
 # error "unknown OS type"
 #endif
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 #define	sleep(_x_) do {  \
 	Sleep(_x_ * 1000);  \
 } while (0)
@@ -130,7 +130,7 @@ static void *poller_thread(void *arg)
 	time_t now_t, pre_loop_t;
 #ifdef	ACL_UNIX
 	pthread_t id = pthread_self();
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 	unsigned long id = acl_pthread_self();
 #else
         # error "unknown OS"

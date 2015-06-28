@@ -134,7 +134,7 @@ protected:
 	std::map<string, void*> ctx_table_;
 
 private:
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	static int read_hook(SOCKET fd, void *buf, size_t len,
 		int timeout, ACL_VSTREAM* stream, void *ctx);
 	static int send_hook(SOCKET fd, const void *buf, size_t len,

@@ -155,7 +155,7 @@ ACL_EVENT *acl_event_new_kernel(int delay_sec, int delay_usec)
 	ACL_EVENT *eventp;
 	int   fdsize;
 
-	/* 在 WIN32 下的 iocp 可以支撑更大的连接，默认设为 102400 个连接
+	/* 在 ACL_WINDOWS 下的 iocp 可以支撑更大的连接，默认设为 102400 个连接
 	 */
 	fdsize = 102400;
 	eventp = event_new_iocp(fdsize);

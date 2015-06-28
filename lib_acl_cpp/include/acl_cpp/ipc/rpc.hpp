@@ -1,7 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include "acl_cpp/ipc/ipc_service.hpp"
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
  struct acl_pthread_mutex_t;
  struct acl_pthread_cond_t;
 #else
@@ -109,7 +109,7 @@ private:
 
 	// 基类 ipc_request 虚函数，在子线程中被调用
 	virtual void run(ipc_client* ipc);
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	/**
 	 * 虚接口，子类实现此类用于处理具体的任务，该接口适用
 	 * 于采用 WIN32 消息的模式
@@ -151,7 +151,7 @@ private:
 	// ipc 连接请求时的回调函数
 	virtual void on_accept(aio_socket_stream* client);
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	/**
 	 * 基类虚函数，当收到来自于子线程的 win32 消息时的回调函数
 	 * @param hWnd {HWND} 窗口句柄

@@ -399,7 +399,7 @@ static void event_loop(ACL_EVENT *eventp)
 	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
 	event_thr->event.blocked = 1;
-	nready = select(eventp->maxfd + 1, &rmask, &wmask, &xmask, tvp);
+	nready = select((int) eventp->maxfd + 1, &rmask, &wmask, &xmask, tvp);
 	event_thr->event.blocked = 0;
 
 	if (nready < 0) {

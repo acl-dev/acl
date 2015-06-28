@@ -170,9 +170,9 @@ public:
 		delete this;
 	}
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	// 基类会自动调用此回调处理请求过程
-	// 基类虚接口，使子线程可以在执行完任务后向主线程发送 WIN32 窗口消息
+	// 基类虚接口，使子线程可以在执行完任务后向主线程发送 ACL_WINDOWS 窗口消息
 	virtual void run(HWND hWnd)
 	{
 		unsigned int nredirect_limit = data_.callback->get_redirect();
@@ -272,7 +272,7 @@ private:
 		ipc->send_message(nMsg, &data_, sizeof(data_));
 	}
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	void report_error(HWND hWnd, http_status_t errnum)
 	{
 		HTTP_IPC_DAT* data = (HTTP_IPC_DAT*)
@@ -416,7 +416,7 @@ private:
 		report(ipc, HTTP_MSG_DAT);
 	}
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	void read_respond_body(HWND hWnd)
 	{
 		acl_assert(hdr_res_);
@@ -562,7 +562,7 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #include <process.h>
 #endif
 
@@ -573,7 +573,7 @@ http_service::http_service(int nthread /* = 1 */, int nwait,
 , nwait_(nwait)
 , handle_type_(ENGINE_SELECT)
 {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	magic_ = _getpid() + time(NULL);
 #else
 	magic_ = getpid() + time(NULL);
@@ -586,7 +586,7 @@ http_service::~http_service()
 		acl_myfree(addr_);
 }
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 void http_service::win32_proc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {

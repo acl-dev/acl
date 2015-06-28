@@ -310,7 +310,8 @@ redis_client* redis_command::redirect(redis_client_cluster* cluster,
 
 	// 如果服务器地址不存在，则根据服务器地址动态创建连接池对象
 	if ((conns = (redis_client_pool*) cluster->get(addr)) == NULL)
-		conns = (redis_client_pool*) &cluster->set(addr, max_conns_);
+		conns = (redis_client_pool*)
+			&cluster->set(addr, (int) max_conns_);
 
 	if (conns == NULL)
 		return NULL;
@@ -649,7 +650,7 @@ int redis_command::get_number(std::vector<int>& out)
 		out.push_back(rr->get_integer());
 	}
 
-	return size;
+	return (int) size;
 }
 
 int redis_command::get_number64(std::vector<long long int>& out)
@@ -673,7 +674,7 @@ int redis_command::get_number64(std::vector<long long int>& out)
 		out.push_back(rr->get_integer64());
 	}
 
-	return size;
+	return (int) size;
 }
 
 bool redis_command::check_status(const char* success /* = "OK" */)
@@ -759,7 +760,7 @@ int redis_command::get_strings(std::vector<string>* out)
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
 	if (out == NULL)
-		return result->get_size();
+		return (int) result->get_size();
 
 	out->clear();
 
@@ -804,7 +805,7 @@ int redis_command::get_strings(std::list<string>* out)
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
 	if (out == NULL)
-		return result->get_size();
+		return (int) result->get_size();
 
 	out->clear();
 

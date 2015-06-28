@@ -121,7 +121,7 @@ public:
 	 * 获得 HTTP 请求的数据体或响应的数据体长度
 	 * @return {int64) 返回值若为 -1 则表明 HTTP 头不存在或没有长度字段
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	__int64 body_length(void) const;
 #else
 	long long int body_length(void) const;

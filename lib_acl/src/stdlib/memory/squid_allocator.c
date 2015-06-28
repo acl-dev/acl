@@ -337,7 +337,7 @@ static int memPoolWasUsed(const ACL_MEM_POOL * pool)
 static int memPoolInUseCount(const ACL_MEM_POOL * pool)
 {
 	acl_assert(pool);
-	return ((const MemPool *) pool)->meter.inuse.level;
+	return (int) (((const MemPool *) pool)->meter.inuse.level);
 }
 
 static size_t memPoolInUseSize(const ACL_MEM_POOL * pool)

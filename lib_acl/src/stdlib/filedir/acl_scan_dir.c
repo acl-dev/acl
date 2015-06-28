@@ -31,7 +31,7 @@
 
 #include "stdlib/acl_dir.h"
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 # define SANE_RMDIR _rmdir
 # define SANE_UNLINK _unlink
 #else
@@ -198,7 +198,7 @@ int acl_scan_dir_push(ACL_SCAN_DIR *scan, const char *path)
 		size_t len = strlen(path);
 		const char *ptr = path + len - 1;
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 		while (ptr > path && (*ptr == '/' || *ptr == '\\'))
 #else
 		while (ptr > path && *ptr == '/')

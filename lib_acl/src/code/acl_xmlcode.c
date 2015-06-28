@@ -160,7 +160,7 @@ int acl_xml_decode(const char *in, ACL_VSTRING *out)
 		token = acl_token_tree_match(__token_tree, &ptr, NULL, NULL);
 		if (token == NULL) {
 			pre = markup_unescape(pre, out);
-			len = ptr - pre;
+			len = (int) (ptr - pre);
 			if (len > 0)
 				acl_vstring_memcat(out, pre, len);
 			break;
@@ -168,7 +168,7 @@ int acl_xml_decode(const char *in, ACL_VSTRING *out)
 		spec = (const XML_SPEC*) token->ctx;
 		acl_assert(spec != NULL);
 
-		len = ptr - pre - spec->len;
+		len = (int) (ptr - pre - spec->len);
 		if (len > 0)
 			acl_vstring_memcat(out, pre, len);
 		acl_vstring_strcat(out, spec->str);

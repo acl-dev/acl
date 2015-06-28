@@ -8,7 +8,7 @@ extern "C" {
 #include "acl_define.h"
 #include "acl_vstream.h"
 
-#ifdef	WIN32
+#if defined(WIN32) || defined(WIN64)
 struct iovec {
 	void *iov_base;   /**< Starting address */
 	size_t iov_len;   /**< Number of bytes */

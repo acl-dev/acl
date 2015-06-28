@@ -144,7 +144,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 	return (ifconf);
 }
 
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 
 #ifdef	MS_VC6
 
@@ -320,7 +320,7 @@ void acl_free_ifaddrs(ACL_IFCONF *ifconf)
 	if (ifconf == NULL)
 		return;
 	for (i = 0; i < ifconf->length; i++) {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 		if (ifconf->addrs[i].desc != NULL)
 			acl_myfree(ifconf->addrs[i].desc);
 #endif

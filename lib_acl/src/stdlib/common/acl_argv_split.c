@@ -52,7 +52,7 @@ ACL_ARGV   *acl_argv_splitn(const char *str, const char *delim, size_t n)
 ACL_ARGV   *acl_argv_splitn4(const char *str, const char *delim,
 	size_t n, ACL_SLICE_POOL *slice)
 {
-	ACL_ARGV   *argvp = acl_argv_alloc2(n > 0 ? n : 1, slice);
+	ACL_ARGV   *argvp = acl_argv_alloc2(n > 0 ? (int) n : 1, slice);
 	char   *saved_string = slice ?
 		acl_slice_pool_strdup(__FILE__, __LINE__, slice, str) :
 		acl_mystrdup(str);

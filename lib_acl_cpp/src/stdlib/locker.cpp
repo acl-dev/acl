@@ -27,7 +27,7 @@ locker::~locker()
 		acl_file_close(fHandle_);
 	if (mutex_)
 	{
-#ifndef	WIN32
+#ifndef	ACL_WINDOWS
 		(void) pthread_mutexattr_destroy(&mutex_attr_);
 #endif
 		(void) acl_pthread_mutex_destroy(mutex_);
@@ -60,7 +60,7 @@ void locker::init_mutex(bool use_spinlock acl_unused)
 
 	mutex_ = (acl_pthread_mutex_t*)
 		acl_mycalloc(1, sizeof(acl_pthread_mutex_t));
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	acl_assert(acl_pthread_mutex_init(mutex_, NULL) == 0);
 #else
 	acl_assert(pthread_mutexattr_init(&mutex_attr_) == 0);

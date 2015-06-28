@@ -276,7 +276,7 @@ int acl_valid_ipv6_hostaddr(const char *addr, int gripe)
 			break;
 		default:
 			/* Advance by at least 1 character position or terminate. */
-			len = strspn((const char *) cp, "0123456789abcdefABCDEF");
+			len = (int) strspn((const char *) cp, "0123456789abcdefABCDEF");
 			if (len /* - strspn((char *) cp, "0") */ > 4) {
 				if (gripe)
 					acl_msg_warn("%s: malformed IPv6 address: %.100s",

@@ -41,7 +41,7 @@ int uni2utf8(unsigned int c, char *buf, size_t size)
 
 	if (buf && size > 0) {
 		if (len > size)
-			len = size;
+			len = (unsigned int) size;
 		for (i = len - 1; i > 0; --i) {
 			buf[i] = (c & 0x3f) | 0x80;
 			c >>= 6;

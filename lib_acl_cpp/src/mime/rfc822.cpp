@@ -270,7 +270,7 @@ void rfc822::mkdate_gmt(time_t t, char *buf, size_t size)
 {
 	struct tm *p;
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # if _MSC_VER >= 1500
 	struct tm gmt_buf;
 	p = &gmt_buf;
@@ -301,7 +301,7 @@ void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 	struct tm *p;
 	int offset = 0;
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # if _MSC_VER >= 1500
 	struct tm tm_buf;
 	long s;
@@ -330,7 +330,7 @@ void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 	if (offset % 60)
 	{
 		offset = 0;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # if _MSC_VER >= 1500
 		p = &tm_buf;
 		if (gmtime_s(p, &t) != 0)
@@ -346,7 +346,7 @@ void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 #else
 #if	USE_TIME_DAYLIGHT
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 # if _MSC_VER >= 1500
 	if ( _get_timezone(&s) != 0)
 		s = 0;
@@ -365,7 +365,7 @@ void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 		offset += 60 * 60;
 	if (offset % 60) {
 		offset = 0;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # if _MSC_VER >= 1500
 		p = &tm_buf;
 		if (gmtime_s(p, &t) != 0)
@@ -384,7 +384,7 @@ void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 
 	if (offset % 60) {
 		offset = 0;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # if _MSC_VER >= 1500
 		p = &tm_buf;
 		if (gmtime_s(p, &t) != 0)
@@ -398,7 +398,7 @@ void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 	}
 	offset /= 60;
 #else
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # if _MSC_VER >= 1500
 	p = &tm_buf;
 	if (gmtime_s(p, &t) != 0)
@@ -416,7 +416,7 @@ void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 
 	offset = (offset % 60) + offset / 60 * 100;
 
-#if defined(WIN32) && _MSC_VER >= 1500
+#if defined(ACL_WINDOWS) && _MSC_VER >= 1500
 	_snprintf_s(buf, size, size, "%s, %02d %s %04d %02d:%02d:%02d %+05d (CST)",
 		wdays[p->tm_wday],
 		p->tm_mday,
@@ -479,8 +479,8 @@ const std::list<rfc822_addr*>& rfc822::parse_addrs(const char* in)
 		if (comment_prev)
 		{
 			buf.clear();
-			rfc2047::decode(STR(comment_prev), LEN(comment_prev),
-				&buf, "gb18030");
+			rfc2047::decode(STR(comment_prev),
+				(int) LEN(comment_prev), &buf, "gb18030");
 			addr->comment = acl_mystrdup(buf.c_str());
 			comment_prev = NULL;
 		}

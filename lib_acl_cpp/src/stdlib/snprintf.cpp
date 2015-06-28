@@ -4,7 +4,7 @@
 namespace acl
 {
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #include <stdarg.h>
 
 # ifdef __STDC_WANT_SECURE_LIB__
@@ -83,6 +83,6 @@ int safe_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 	return ::vsnprintf(buf, size, fmt, ap);
 }
 
-#endif // !WIN32
+#endif // !ACL_WINDOWS
 
 } // namespace acl

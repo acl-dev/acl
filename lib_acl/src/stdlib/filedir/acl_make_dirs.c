@@ -119,7 +119,7 @@ int acl_make_dirs(const char *path, int perms)
 	return (ret);
 }
 
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 
 int acl_make_dirs(const char *path, int perms)
 {

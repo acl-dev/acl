@@ -62,7 +62,7 @@ private:
 	 */
 	virtual bool accept_callback(aio_socket_stream* client);
 private:
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	// 当接收到一个客户端连接时回调此函数
 	static void service_main(SOCKET, void*);
 #else

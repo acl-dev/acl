@@ -124,7 +124,7 @@ int ostream::push_pop(const char* in, size_t len,
 	if (max > 0 && len > max)
 		len = max;
 	out->append(in, len);
-	return len;
+	return (int) len;
 }
 
 

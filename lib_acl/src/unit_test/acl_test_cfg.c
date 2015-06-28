@@ -63,7 +63,7 @@ ACL_ARRAY *aut_parse_args_list(const char *str_in)
 #define	SKIP_WHILE(_cond, _ptr) { while (*_ptr && (_cond)) _ptr++; }
 #define	SKIP_WHILE_DEC(_cond, _ptr) { while (*_ptr && (_cond)) _ptr--; }
 
-	len = strlen("=");
+	len = (int) strlen("=");
 	while (1) {
 		/* 找到每一参数项, 分隔符为逗号 */
 		ptr_item = acl_mystrtok(&pstr, ",");

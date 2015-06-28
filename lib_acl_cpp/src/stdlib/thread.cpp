@@ -14,7 +14,7 @@ thread::thread()
 , stack_size_(0)
 , thread_id_(0)
 {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	thread_ = (acl_pthread_t*) acl_mycalloc(1, sizeof(acl_pthread_t));
 #endif
 	return_arg_ = NULL;
@@ -22,7 +22,7 @@ thread::thread()
 
 thread::~thread()
 {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	acl_myfree(thread_);
 #endif
 }
@@ -42,7 +42,7 @@ thread& thread::set_stacksize(size_t size)
 void* thread::thread_run(void* arg)
 {
 	thread* thr = (thread*) arg;
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	thr->thread_id_ = GetCurrentThreadId();
 #elif	defined(ACL_FREEBSD)
 	thr->thread_id_ = pthread_getthreadid_np();
@@ -70,7 +70,7 @@ bool thread::start()
 	if (stack_size_ > 0)
 		acl_pthread_attr_setstacksize(&attr, stack_size_);
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	int   ret = acl_pthread_create((acl_pthread_t*) thread_,
 			&attr, thread_run, this);
 #else
@@ -84,7 +84,7 @@ bool thread::start()
 		return false;
 	}
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	thread_id_ = ((acl_pthread_t*) thread_)->id;
 #elif	defined(LINUX2)
 	thread_id_ = (unsigned long int) thread_;
@@ -116,7 +116,7 @@ bool thread::wait(void** out /* = NULL */)
 
 	void* ptr;
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	int   ret = acl_pthread_join(*((acl_pthread_t*) thread_), &ptr);
 #else
 	int   ret = acl_pthread_join(thread_, &ptr);

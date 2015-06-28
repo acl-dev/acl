@@ -161,7 +161,7 @@ const char *acl_chain_data(ACL_CHAIN *chain)
 
 int acl_chain_data_len(ACL_CHAIN *chain)
 {
-	return (ACL_VSTRING_LEN(&chain->sbuf));
+	return (int) (ACL_VSTRING_LEN(&chain->sbuf));
 }
 
 int acl_chain_size(ACL_CHAIN *chain)

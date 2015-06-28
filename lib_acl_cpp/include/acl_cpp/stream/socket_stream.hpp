@@ -1,6 +1,6 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 #include <WinSock2.h>
 #endif
 #include "acl_cpp/stream/istream.hpp"
@@ -23,7 +23,7 @@ public:
 	 * @param fd 套接字
 	 * @return {bool} 连接是否成功
 	 */
-#ifdef	WIN32
+#if defined(WIN32) || defined(WIN64)
 	bool open(SOCKET fd);
 #else
 	bool open(int fd);
@@ -62,7 +62,7 @@ public:
 	 * @return {ACL_SOCKET} 若出错，则返回 - 1(UNIX 平台)
 	 *  或 INVALID_SOCKET(win32平台)
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	SOCKET sock_handle() const;
 #else
 	int   sock_handle() const;
@@ -77,7 +77,7 @@ public:
 	 * @return {ACL_SOCKET} 返回 ACL_SOCKET_INVALID 表示该流对象
 	 *  已经将套接字解绑
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	SOCKET unbind_sock();
 #else
 	int    unbind_sock();

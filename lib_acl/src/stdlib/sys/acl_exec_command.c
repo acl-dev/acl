@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #ifdef	ACL_UNIX
 #include <unistd.h>
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 #include <process.h>
 #endif
 
@@ -50,7 +50,7 @@ void acl_exec_command(const char *command)
 		argv = acl_argv_split(command, SPACE_TAB);
 #ifdef ACL_UNIX
 		(void) execvp(argv->argv[0], argv->argv);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 		(void) _execvp(argv->argv[0], argv->argv);
 #endif
 
@@ -72,7 +72,7 @@ void acl_exec_command(const char *command)
 #ifdef ACL_UNIX
 	(void) execl(ACL_PATH_BSHELL, "sh", "-c", command, (char *) 0);
 	acl_msg_fatal("execl %s: %s", ACL_PATH_BSHELL, acl_last_serror());
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	(void) _execl(command, command, _execl, NULL);
 	acl_msg_fatal("execl %s: %s", command, acl_last_serror());
 #endif

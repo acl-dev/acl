@@ -17,7 +17,7 @@ extern "C" {
 #define	ACL_EVENTS_STYLE_DEVPOLL	3
 #define	ACL_EVENTS_STYLE_KQUEUE		4
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 # if(_MSC_VER >= 1300)
 #  define ACL_EVENTS_STYLE_IOCP		5
 # endif

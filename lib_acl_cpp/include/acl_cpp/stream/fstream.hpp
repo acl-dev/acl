@@ -42,7 +42,7 @@ public:
 	 */
 	bool create(const char* path);
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	/**
 	 * 根据系统的文件句柄打开 fstream 文件流对象
 	 * @param fh 系统文件句柄

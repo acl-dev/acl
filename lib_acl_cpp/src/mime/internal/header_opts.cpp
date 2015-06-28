@@ -174,7 +174,8 @@ const HEADER_OPTS *header_opts_find(const char *string, ACL_VSTRING *key_buffer)
 		}
 		ACL_VSTRING_ADDCH(header_key, ACL_TOLOWER(*cp));
 	}
-	acl_vstring_truncate(header_key, trimblanks(STR(header_key), cp - string)
+	acl_vstring_truncate(header_key,
+		trimblanks(STR(header_key), (int) (cp - string))
 			- STR(header_key));
 	ACL_VSTRING_TERMINATE(header_key);
 

@@ -12,7 +12,8 @@
  * vc++11.0	VS 2012	1700
  */
 
-#if defined (WIN32)
+#if defined (WIN32) || defined(WIN64)
+# define ACL_WINDOWS
 # if _MSC_VER >= 1500
 #  ifndef _CRT_SECURE_NO_WARNINGS
 #   define _CRT_SECURE_NO_WARNINGS
@@ -22,7 +23,7 @@
 # define ACL_BCB_COMPILER
 #endif
 
-#ifdef	WIN32
+#if defined(WIN32) || defined(WIN64)
 
 # ifdef acl_assert
 #  undef acl_assert
@@ -43,9 +44,23 @@
 #  define ACL_API
 # endif
 
-/* see WINSOCK2.H, 用户需要预先定义此值，因其默认值为64 */
+/**
+ * see WINSOCK2.H, 用户需要预先定义此值，因其默认值为64，此外，该值不能设得太大，
+ * 尤其是在 X64 编译时更是如此，参考 fd_set 的结构定义：
+ * typedef struct fd_set {
+ *   u_int fd_count;
+ *   SOCKET  fd_array[FD_SETSIZE];
+ * } fd_set;
+ * 当在 x64 环境下，当 FD_SETSIZE=50000 时，该结构占的空间大小为：
+ * 8 + sizeof(SOCKET) * FD_SETSIZE = 400008
+ * 而在 events_select_thr.c 的函数 event_loop 中声明了三个 fd_set 变量，
+ * 则该函数其所占用的栈空间大小 > 1MB，而 VC 默认的栈大小为 1MB，则当调用此
+ * 函数时就会造成线程栈溢出；
+ * 当需要将 FD_SSETSIZE 设得很大时，则需要调整可执行程序的栈空间大小，即在程序
+ * 编译链接时的选项中，将“堆栈保留大小”选项设大一些
+ */
 # ifndef	FD_SETSIZE
-#  define	FD_SETSIZE	50000
+#  define	FD_SETSIZE	40000
 # endif
 
 # include <fcntl.h>
@@ -82,7 +97,7 @@
 #endif /* WIN32 */
 
 /* errno define */
-#ifdef	WIN32
+#if defined(WIN32) || defined(WIN64)
 # define	ACL_ETIMEDOUT		WSAETIMEDOUT
 # define	ACL_ENOMEM		WSAENOBUFS
 # define	ACL_EINVAL		WSAEINVAL
@@ -151,6 +166,6 @@ ACL_API int acl_fstat(ACL_FILE_HANDLE fh, struct acl_stat *buf);
 #  define	offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 # endif
 */
-#endif /* WIN32 */
+#endif /* WIN32 / WIN64 */
 
 #endif /* __ACL_DEFINE_WIN32_INCLUDE_H__ */

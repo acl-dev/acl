@@ -44,7 +44,7 @@ int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr * sa,
 #ifdef	ACL_UNIX
 	if (errno != ACL_EINPROGRESS)
 		return (-1);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	if (errno != ACL_EINPROGRESS && errno != ACL_EWOULDBLOCK)
 		return (-1);
 #endif

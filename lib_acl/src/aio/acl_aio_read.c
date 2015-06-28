@@ -154,7 +154,7 @@ static int __gets_peek(ACL_ASTREAM *astream)
 		 */
 		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
 			char *ptr = acl_vstring_str(&astream->strbuf);
-			int   len = ACL_VSTRING_LEN(&astream->strbuf);
+			int   len = (int) ACL_VSTRING_LEN(&astream->strbuf);
 
 			(void) read_complete_callback(astream, ptr, len);
 		}
@@ -164,7 +164,7 @@ static int __gets_peek(ACL_ASTREAM *astream)
 		return -1;
 	} else if (ready) {
 		char *ptr = acl_vstring_str(&astream->strbuf);
-		int   len = ACL_VSTRING_LEN(&astream->strbuf);
+		int   len = (int) ACL_VSTRING_LEN(&astream->strbuf);
 
 		/* 回调用户的读行成功处理函数 */
 		n = read_complete_callback(astream, ptr, len);
@@ -344,7 +344,7 @@ static int __read_peek(ACL_ASTREAM *astream)
 		/* 必须查看缓冲区中是否还有数据, 必须兼容数据读不够的情况! */
 		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
 			char *ptr = acl_vstring_str(&astream->strbuf);
-			int   len = ACL_VSTRING_LEN(&astream->strbuf);
+			int   len = (int) ACL_VSTRING_LEN(&astream->strbuf);
 
 			(void) read_complete_callback(astream, ptr, len);
 		}
@@ -354,7 +354,7 @@ static int __read_peek(ACL_ASTREAM *astream)
 		return -1;
 	} else if (n > 0) {
 		char *ptr = acl_vstring_str(&astream->strbuf);
-		int   len = ACL_VSTRING_LEN(&astream->strbuf);
+		int   len = (int) ACL_VSTRING_LEN(&astream->strbuf);
 
 		/* 回调用户的读成功处理函数 */
 		n = read_complete_callback(astream, ptr, len);
@@ -493,7 +493,7 @@ static int __readn_peek(ACL_ASTREAM *astream)
 	const char *myname = "__readn_peek";
 	int   n, ready = 0;
 
-	n = ACL_VSTRING_LEN(&astream->strbuf);
+	n = (int) ACL_VSTRING_LEN(&astream->strbuf);
 
 	if (astream->count <= n)
 		acl_msg_fatal("%s: count(%d) < strlen(%d), read_netsted(%d)",
@@ -516,7 +516,7 @@ static int __readn_peek(ACL_ASTREAM *astream)
 		/* XXX: 查看缓冲区中是否还有数据, 必须兼容数据读不够的情况! */
 		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
 			char *ptr = acl_vstring_str(&astream->strbuf);
-			int   len = ACL_VSTRING_LEN(&astream->strbuf);
+			int   len = (int) ACL_VSTRING_LEN(&astream->strbuf);
 
 			acl_msg_warn("%s: nneed(%d), nread(%d),"
 				" read_netsted(%d), nrefer(%d)",
@@ -532,7 +532,7 @@ static int __readn_peek(ACL_ASTREAM *astream)
 	} else if (ready) {
 		/* ok, 已经满足读条件，即已经获得了所要求数据长度的数据 */
 		char *ptr = acl_vstring_str(&astream->strbuf);
-		int   len = ACL_VSTRING_LEN(&astream->strbuf);
+		int   len = (int) ACL_VSTRING_LEN(&astream->strbuf);
 
 		if (len != astream->count)
 			acl_msg_fatal("%s: len: %d != count: %d",

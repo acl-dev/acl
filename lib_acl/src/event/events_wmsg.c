@@ -451,13 +451,13 @@ static void set_hwnd_event(HWND hWnd acl_unused, EVENT_WMSG *ev)
 
 static EVENT_WMSG *get_hwnd_event(HWND hWnd)
 {
-	EVENT_WMSG *ev = (EVENT_WMSG*) GetWindowLongPtr(hWnd, GWL_USERDATA);
+	EVENT_WMSG *ev = (EVENT_WMSG*) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	return ev;
 }
 
 static void set_hwnd_event(HWND hWnd, EVENT_WMSG *ev)
 {
-	SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG) ev);
+	SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG) ev);
 }
 
 #endif

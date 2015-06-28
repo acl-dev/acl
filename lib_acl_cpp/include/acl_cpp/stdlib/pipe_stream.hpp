@@ -136,7 +136,7 @@ public:
 	pipe_manager& operator<<(const string&);
 	pipe_manager& operator<<(const string*);
 	pipe_manager& operator<<(const char*);
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	pipe_manager& operator<<(__int64);
 	pipe_manager& operator<<(unsigned __int64);
 #else

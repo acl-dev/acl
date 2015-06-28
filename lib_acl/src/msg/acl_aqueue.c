@@ -17,18 +17,18 @@
 #include <time.h>
 #include <unistd.h>
 
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 #include <time.h>
 
 #ifdef ACL_BCB_COMPILER
 #pragma hdrstop
 #endif
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #pragma once
 #endif
 
-#endif	/* defined(WIN32) */
+#endif	/* defined(ACL_WINDOWS) */
 
 #include "stdlib/acl_sys_patch.h"
 #include "thread/acl_thread.h"
@@ -39,7 +39,7 @@
 #endif
 
 #undef	__SET_ERRNO
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 # define	__SET_ERRNO(_x_) (void) 0
 #elif	defined(ACL_UNIX)
 # define	__SET_ERRNO(_x_) (acl_set_error(_x_))

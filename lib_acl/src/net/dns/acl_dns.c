@@ -56,7 +56,7 @@ static int dns_read(ACL_SOCKET fd, void *buf, size_t size,
 	ret = recvfrom(fd, buf, size, 0,
 			(struct sockaddr*) &dns->addr_from.addr,
 			(socklen_t*) &dns->addr_from.addr_len);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	ret = recvfrom(fd, (char*) buf, (int) size, 0,
 			(struct sockaddr*) &dns->addr_from.addr,
 			&dns->addr_from.addr_len);
@@ -94,7 +94,7 @@ static int dns_write(ACL_SOCKET fd, const void *buf, size_t size,
 #ifdef ACL_UNIX 
 	ret = sendto(fd, buf, size, 0,
 			(struct sockaddr*) &addr->addr, addr->addr_len);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	ret = sendto(fd, (const char*) buf, (int) size,
 			0, (struct sockaddr*) &addr->addr, addr->addr_len);
 #else
@@ -135,7 +135,7 @@ static ACL_DNS_DB *build_dns_db(const rfc1035_message *res, int count,
 			phost->saddr.sin_addr.s_addr =
 				*((in_addr_t*) res->answer[i].rdata);
 # endif
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 			phost->saddr.sin_addr.s_addr =
 				*((unsigned int*) res->answer[i].rdata);
 #endif
@@ -618,7 +618,7 @@ void acl_dns_add_group(ACL_DNS *dns, const char *group, const char *refer,
 
 	ACL_SAFE_STRNCPY(dmgrp->group, group, sizeof(dmgrp->group));
 	acl_lowercase(dmgrp->group);
-	dmgrp->group_len = strlen(dmgrp->group);
+	dmgrp->group_len = (int) strlen(dmgrp->group);
 
 	if (refer == NULL || *refer == 0)
 		ACL_SAFE_STRNCPY(dmgrp->domain, dmgrp->group, sizeof(dmgrp->domain));

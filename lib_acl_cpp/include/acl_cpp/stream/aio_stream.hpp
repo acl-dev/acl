@@ -1,7 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <list>
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 #include <WinSock2.h>
 #endif
 
@@ -180,7 +180,7 @@ public:
 	 * 获得异步流中的 SOCKET 描述符
 	 * @return {ACL_SOCKET} 若不存在则返回 -1(UNIX) 或 INVALID_SOCKET(win32)
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	SOCKET get_socket() const;
 	SOCKET sock_handle() const
 #else
@@ -270,7 +270,7 @@ private:
 	const char* get_ip(const char* addr, char* buf, size_t size);
 
 private:
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	static int read_hook(SOCKET fd, void *buf, size_t len,
 		int timeout, ACL_VSTREAM* stream, void *ctx);
 	static int send_hook(SOCKET fd, const void *buf, size_t len,

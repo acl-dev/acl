@@ -125,5 +125,5 @@ int acl_base64_decode(const char *in, char **pptr_in)
 	}
 
 	*result = 0;
-	return (result - *pptr);
+	return (int) (result - *pptr);
 }

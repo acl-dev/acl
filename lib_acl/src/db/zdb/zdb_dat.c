@@ -1049,7 +1049,7 @@ int zdb_dat_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off,
 	}
 
 	/* 计算新的 inode 相对路径号 */
-	inode_new = dat_inode(db, len);
+	inode_new = dat_inode(db, (int) len);
 	if (inode_new < 0) {
 		acl_msg_error("%s(%d): inode(%d) invalid, dat len(%d)",
 			myname, __LINE__, inode_new, (int) len);
@@ -1163,7 +1163,7 @@ int zdb_dat_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off,
 
 	/* 向另一个值存储中添加新记录 */
 
-	ret = zdb_dat_add(db, key, dat, len);
+	ret = zdb_dat_add(db, key, dat, (int) len);
 	RETURN (ret);
 }
 

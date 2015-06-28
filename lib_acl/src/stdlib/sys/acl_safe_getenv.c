@@ -16,7 +16,7 @@ char *acl_safe_getenv(const char *name)
 {
 #ifdef	ACL_UNIX
 	return (acl_unsafe() == 0 ? getenv(name) : 0);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	return (getenv(name));
 #endif
 }

@@ -62,9 +62,9 @@ public:
 		delete this;
 	}
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
-	// 基类虚接口，使子线程可以在执行完任务后向主线程发送 WIN32 窗口消息
+	// 基类虚接口，使子线程可以在执行完任务后向主线程发送 ACL_WINDOWS 窗口消息
 
 	virtual void run(HWND hWnd)
 	{
@@ -140,14 +140,14 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #include <process.h>
 #endif
 
 dns_service::dns_service(int nthread /* = 1 */, bool win32_gui /* = false */)
 : ipc_service(nthread, win32_gui)
 {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	magic_ = _getpid() + time(NULL);
 #else
 	magic_ = getpid() + time(NULL);
@@ -169,7 +169,7 @@ void dns_service::on_accept(aio_socket_stream* client)
 	ipc->wait();
 }
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 void dns_service::win32_proc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -190,7 +190,7 @@ void dns_service::win32_proc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 	on_result(*res);
 	delete res;
 
-	// 在采用 WIN32 消息时该对象空间是动态分配的，所以需要释放
+	// 在采用 ACL_WINDOWS 消息时该对象空间是动态分配的，所以需要释放
 	acl_myfree(dat);
 }
 

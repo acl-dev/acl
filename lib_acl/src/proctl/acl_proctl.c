@@ -7,7 +7,7 @@
 
 #endif  /* ACL_PREPARE_COMPILE */
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 #include "net/acl_net.h"
 #include "thread/acl_thread.h"
@@ -372,5 +372,5 @@ void acl_proctl_child(const char *progname acl_unused,
 
 	acl_msg_fatal("%s(%d): not support!", myname, __LINE__);
 }
-#endif  /* WIN32 */
+#endif  /* ACL_WINDOWS */
 

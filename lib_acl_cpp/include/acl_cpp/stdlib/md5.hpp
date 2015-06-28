@@ -83,7 +83,7 @@ public:
 	 *  2) 未从文件中读到数据
 	 *  3) out 缓冲区大小 size 小于 33 字节长度
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	static __int64 md5_file(const char* path, const void *key,
 		size_t klen, char* out, size_t size);
 #else
@@ -102,7 +102,7 @@ public:
 	 *  1) 未从输入流中读取数据时
 	 *  2) out 缓冲区大小 size 小于 33 字节长度
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	static __int64 md5_file(istream& in, const void *key,
 		size_t klen, char* out, size_t size);
 #else

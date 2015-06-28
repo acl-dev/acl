@@ -28,7 +28,7 @@ public:
 	 * 设置 HTTP 响应数据体的长度
 	 * @param n {acl_int64} 数据体长度
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	HttpServletResponse& setContentLength(__int64 n);
 #else
 	HttpServletResponse& setContentLength(long long int n);

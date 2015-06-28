@@ -461,7 +461,7 @@ int redis_zset::zrange_get_with_scores(const char* cmd, const char* key,
 		buf.clear();
 	}
 
-	return size;
+	return (int) size;
 }
 
 int redis_zset::zrange_with_scores(const char* key, int start, int stop,
@@ -613,7 +613,7 @@ int redis_zset::zrangebyscore_get_with_scores(const char* cmd,
 		buf.clear();
 	}
 
-	return size;
+	return (int) size;
 }
 
 int redis_zset::zrangebyscore_with_scores(const char* key, const char* min,

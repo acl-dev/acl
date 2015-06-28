@@ -120,13 +120,13 @@ char& string::operator [](size_t n)
 			memset(END(vbf_), 0, new_len - len);
 
 		// 将 vbf_->vbuf.ptr 指向 n 字节处，同时修改 vbf_->vbuf.cnt 值
-		ACL_VSTRING_AT_OFFSET(vbf_, n);
+		ACL_VSTRING_AT_OFFSET(vbf_, (int) n);
 	}
 	// 当偏移位置大于当前数据长度时，通过重置指针位置以修改数据长度，
 	// 这样当调用 length() 方法时可以获得长度
 	else if (n >= LEN(vbf_))
 	{
-		ACL_VSTRING_AT_OFFSET(vbf_, n);
+		ACL_VSTRING_AT_OFFSET(vbf_, (int) n);
 		// 因为本函数返回了偏移位置 n 处的地址引用后，调用者对此引用
 		// 地址赋值，但并不会使缓冲区数据长度增加，所以此处在函数返回
 		// 前调用 ADDCH 相当于调用者外部赋值后将数据长度加 1

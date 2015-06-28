@@ -28,8 +28,8 @@ bool ipc_server::open(aio_handle* handle, const char* addr /* = "127.0.0.1:0" */
 	else
 		handle_ = handle;
 
-#ifdef WIN32
-	// 如果事件引擎是基于 WIN32 窗口消息，则直接返回
+#ifdef ACL_WINDOWS
+	// 如果事件引擎是基于 ACL_WINDOWS 窗口消息，则直接返回
 	if (handle->get_engine_type() == ENGINE_WINMSG)
 		return create_window();
 #endif

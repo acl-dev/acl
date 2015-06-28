@@ -157,16 +157,19 @@ void zdb_io_cache_open(ZDB_STORE *store, size_t blk_len)
 	int   page_size = 4096 * 10;
 
 	if ((int) blk_len >= page_size)
-		page_size = blk_len * 100;
+		page_size = (int) blk_len * 100;
 
 	io->store = store;
 	io->blk_len = blk_len;
 	avl_create(&io->blk_tree, cmp_fn, sizeof(ZDB_IO_BLK),
 			offsetof(ZDB_IO_BLK, node));
-	io->blk_cache = acl_cache_create(store->cache_max, store->cache_timeout, free_blk_cache);
+	io->blk_cache = acl_cache_create(store->cache_max,
+		store->cache_timeout, free_blk_cache);
 	if ((store->flag & STORE_FLAG_IO_SLICE)) {
-		io->blk_slice = acl_slice_create("blk_slice", 0, sizeof(ZDB_IO_BLK), flag);
-		io->dat_slice = acl_slice_create("dat_slice", page_size, blk_len, flag);
+		io->blk_slice = acl_slice_create("blk_slice", 0,
+			(int) sizeof(ZDB_IO_BLK), flag);
+		io->dat_slice = acl_slice_create("dat_slice",
+			page_size, (int) blk_len, flag);
 	} else {
 		io->blk_slice = NULL;
 		io->dat_slice = NULL;
@@ -315,17 +318,17 @@ static int zdb_io_cache_write(ZDB_IO *io, const void *buf,
 			blk->dlen = len;
 		memcpy(blk->dat, buf, len);  /* just override */
 		if ((blk->flag & BLK_F_DIRTY))  /* 说明已经在写缓存了 */
-			return (len);
+			return (int) (len);
 		/* 需要添加进写缓存 */
 		blk->flag |= BLK_F_DIRTY;
 		avl_add(&io->blk_tree, blk);
-		return (len);
+		return (int) (len);
 	}
 
 	/* 说明是新数据 */
 
 	zdb_io_cache_add(io, buf, len, off, 1);
-	return (len);
+	return (int) (len);
 }
 
 static int zdb_io_cache_read(ZDB_IO *io, void *buf,

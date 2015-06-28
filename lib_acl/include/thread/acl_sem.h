@@ -6,7 +6,7 @@ extern "C" {
 #endif
 #include "stdlib/acl_define.h"
 
-#ifdef	WIN32
+#if defined(WIN32) || defined(WIN64)
 
 typedef struct ACL_SEM ACL_SEM;
 struct ACL_SEM {

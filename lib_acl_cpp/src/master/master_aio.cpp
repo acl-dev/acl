@@ -35,7 +35,7 @@ static bool has_called = false;
 
 void master_aio::run_daemon(int argc, char** argv)
 {
-#ifndef WIN32
+#ifndef ACL_WINDOWS
 	// 每个进程只能有一个实例在运行
 	acl_assert(has_called == false);
 	has_called = true;
@@ -70,7 +70,7 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 {
 	acl_assert(__handle == NULL);
 	daemon_mode_ = false;
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	acl_init();
 #endif
 	std::vector<aio_listen_stream*> sstreams;
@@ -148,11 +148,11 @@ public:
 protected:
 	void close_callback()
 	{
-#ifndef WIN32
+#ifndef ACL_WINDOWS
 		// 通过下面调用通知服务器框架目前已经处理的连接个数，便于
 		// 服务器框架半驻留操作
 		acl_aio_server_on_close(stream_);
-#endif // !WIN32
+#endif // !ACL_WINDOWS
 		delete this;
 	}
 
@@ -166,7 +166,7 @@ void master_aio::service_pre_jail(void*)
 {
 	acl_assert(__ma != NULL);
 
-#ifndef WIN32
+#ifndef ACL_WINDOWS
 	if (__ma->daemon_mode_)
 	{
 		acl_assert(__handle == NULL);

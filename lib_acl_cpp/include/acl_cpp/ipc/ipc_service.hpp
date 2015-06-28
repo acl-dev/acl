@@ -21,7 +21,7 @@ public:
 	 */
 	virtual void run(ipc_client* ipc);
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	/**
 	 * 虚接口，子类实现此类用于处理具体的任务，该接口适用
 	 * 于采用 WIN32 消息的模式
@@ -47,7 +47,7 @@ public:
 	}
 #endif
 private:
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	HWND  hWnd_;
 #endif
 };
@@ -66,7 +66,7 @@ public:
 
 	virtual ~ipc_service();
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	/**
 	 * 当采用 WIN32 消息模式时，子类需要实现此虚接口用于处理具体的
 	 * 消息过程，子类必须实现该接口
@@ -91,7 +91,7 @@ public:
 	 */
 	void push_conn(ipc_client* conn);
 protected:
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	__int64   magic_;
 #else
 	long long int magic_;
@@ -105,7 +105,7 @@ protected:
 private:
 	bool  ipc_keep_;
 	acl_pthread_pool_t* thread_pool_;
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	HWND hWnd_;
 	HINSTANCE hInstance_;
 

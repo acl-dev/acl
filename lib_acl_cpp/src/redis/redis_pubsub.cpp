@@ -370,7 +370,7 @@ int redis_pubsub::pubsub_numsub(std::map<string, int>& out)
 		buf.clear();
 	}
 
-	return size / 2;
+	return (int) size / 2;
 }
 
 int redis_pubsub::pubsub_numpat()

@@ -73,7 +73,7 @@ public:
 	 * @param id {unsigned int} 定时器某个任务的 ID 号
 	 * @return {int64} 定时器生效时间(从1970.1.1以来的微秒数)
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	__int64 set_timer(aio_timer_callback* callback,
 		__int64 delay, unsigned int id = 0);
 #else
@@ -86,7 +86,7 @@ public:
 	 * @param callback {aio_timer_callback*} 定时器回调函数类对象
 	 * @return {time_t} 定时器生效时间(从1970.1.1以来的微秒数)
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	__int64 del_timer(aio_timer_callback* callback);
 #else
 	long long int del_timer(aio_timer_callback* callback);
@@ -98,7 +98,7 @@ public:
 	 * @param id {unsigned int} 定时器某个任务的 ID 号
 	 * @return {time_t} 定时器生效时间(从1970.1.1以来的微秒数)
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	__int64 del_timer(aio_timer_callback* callback, unsigned int id);
 #else
 	long long del_timer(aio_timer_callback* callback, unsigned int id);

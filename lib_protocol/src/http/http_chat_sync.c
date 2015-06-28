@@ -155,7 +155,7 @@ static http_off_t chunked_data_get(HTTP_CHAT_CTX *ctx, void *buf, int size)
 static int chunked_hdr_get(HTTP_CHAT_CTX *ctx)
 {
 	const char *myname = "chunked_hdr_get";
-#if defined(WIN32) && _MSC_VER >= 1500
+#if defined(ACL_WINDOWS) && _MSC_VER >= 1500
 	char  ext[64];
 #else
 	char *ext = NULL;
@@ -170,7 +170,7 @@ static int chunked_hdr_get(HTTP_CHAT_CTX *ctx)
 	ctx->read_cnt = 0;  /* reset the len to be read */
 	ctx->body_len += n;
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 # if _MSC_VER >= 1500
 	ret = sscanf_s(buf, "%X %s", (unsigned int *) &chunk_len, ext, sizeof(ext));
 # else

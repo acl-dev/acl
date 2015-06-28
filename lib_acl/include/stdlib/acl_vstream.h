@@ -162,7 +162,7 @@ struct ACL_VSTREAM {
 
 	int   nrefer;                   /**< refer count, used for engine moudle */
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	int   pid;
 	HANDLE hproc;
 	ACL_SOCKET iocp_sock;

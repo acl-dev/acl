@@ -43,7 +43,7 @@ char *acl_sane_basename(ACL_VSTRING *bp, const char *path)
 	last = path + strlen(path) - 1;
 #ifdef	ACL_UNIX
 	while (*last == '/') {
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 	while (*last == '/' || *last == '\\') {
 #endif
 		if (last == path)
@@ -57,7 +57,7 @@ char *acl_sane_basename(ACL_VSTRING *bp, const char *path)
 	first = last - 1;
 #ifdef	ACL_UNIX
 	while (first >= path && *first != '/')
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 	while (first >= path && *first != '/' && *first != '\\')
 #endif
 		first--;
@@ -93,7 +93,7 @@ char *acl_sane_dirname(ACL_VSTRING *bp, const char *path)
 	last = path + strlen(path) - 1;
 #ifdef	ACL_UNIX
 	while (*last == '/') {
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 	while (*last == '/' || *last == '\\') {
 #endif
 		if (last == path)
@@ -106,7 +106,7 @@ char *acl_sane_dirname(ACL_VSTRING *bp, const char *path)
 	 */
 #ifdef	ACL_UNIX
 	while (last >= path && *last != '/')
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 	while (last >= path && *last != '/' && *last != '\\')
 #endif
 		last--;
@@ -118,7 +118,7 @@ char *acl_sane_dirname(ACL_VSTRING *bp, const char *path)
 	 */
 #ifdef	ACL_UNIX
 	while (last > path && *last == '/')
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 	while (last > path && (*last == '/' || *last == '\\'))
 #endif
 		last--;

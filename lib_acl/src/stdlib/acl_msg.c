@@ -470,7 +470,7 @@ void acl_msg_panic2(const char *fmt, va_list ap)
 const char *acl_strerror(unsigned int errnum, char *buffer, int size)
 {
 	const char *myname = "acl_strerror";
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
         int   L;
 
 	if (buffer == NULL || size <= 0) {
@@ -560,7 +560,7 @@ const char *acl_last_serror(void)
 
 int acl_last_error(void)
 {
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	int   error;
 
 	error = WSAGetLastError();
@@ -573,7 +573,7 @@ int acl_last_error(void)
 
 void acl_set_error(int errnum)
 {
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	WSASetLastError(errnum);
 #endif
 	errno = errnum;

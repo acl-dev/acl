@@ -23,7 +23,7 @@ static int __len = 1024;
 
 static void vstring_extend(ACL_VBUF *bp, int incr)
 {
-	unsigned used = bp->ptr - bp->data;
+	unsigned used = (unsigned int) (bp->ptr - bp->data);
 	int    new_len;
 
 	/*

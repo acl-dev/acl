@@ -383,7 +383,7 @@ int zdb_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off_saved,
 
 	if (blk_off_saved == NULL) {
 		db->status |= ZDB_STAT_KEY_NEW;  /* 设置状态位以表明当前为新值 */
-		ret = db->dat_add(db, key, dat, len);
+		ret = db->dat_add(db, key, dat, (int) len);
 		db->status &= ~ZDB_STAT_KEY_NEW;  /* 清除标志位 */
 	} else {
 		db->status &=~ ZDB_STAT_KEY_NEW;  /* 清除标志位表明是修改旧数据 */

@@ -78,7 +78,7 @@ const char* scan_dir::next_file(bool full /* = false */)
 		file_buf_ = NEW string(256);
 
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	file_buf_->format("%s%c%s", path, PATH_SEP_C, file);
 #else
 	if (*path == '/' && *(path + 1) == 0)
@@ -108,7 +108,7 @@ const char* scan_dir::next_dir(bool full /* = false */)
 	if (file_buf_ == NULL)
 		file_buf_ = NEW string(256);
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	file_buf_->format("%s%c%s", path, PATH_SEP_C, dir);
 #else
 	if (*path == '/' && *(path + 1) == 0)
@@ -143,7 +143,7 @@ const char* scan_dir::next(bool full /* = false */, bool* is_file /* = NULL */)
 		file_buf_ = NEW string(256);
 
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 	file_buf_->format("%s%c%s", path, PATH_SEP_C, name);
 #else
 	if (*path == '/' && *(path + 1) == 0)
@@ -171,7 +171,7 @@ bool scan_dir::get_cwd(string& out)
 #endif
 	char  buf[MAX_PATH];
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	if (::GetCurrentDirectory(MAX_PATH, buf) == 0)
 	{
 		logger_error("can't get process path: %s", last_serror());
@@ -183,7 +183,7 @@ bool scan_dir::get_cwd(string& out)
 		logger_error("can't get process path: %s", last_serror());
 		return false;
 	}
-#endif // WIN32
+#endif // ACL_WINDOWS
 
 	// xxx: can this happen ?
 	if (buf[0] == 0)
@@ -193,7 +193,7 @@ bool scan_dir::get_cwd(string& out)
 	char* end = buf + strlen(buf) - 1;
 	while (end > buf)
 	{
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 		if (*end == '/' || *end == '\\')
 			end--;
 #else

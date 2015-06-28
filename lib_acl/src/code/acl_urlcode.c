@@ -19,7 +19,7 @@ char *acl_url_encode(const char *str)
 	register int i, j, len, tmp_len;
 	unsigned char *tmp;
 
-	len = strlen(str);
+	len = (int) strlen(str);
 	tmp_len = len;
 	tmp = (unsigned char*) acl_mymalloc(len+1);
 	if (tmp == NULL)
@@ -71,7 +71,7 @@ char *acl_url_decode(const char *str)
 	char *tmp;
 	register int i, len, pos = 0;
 
-	len = strlen(str);
+	len = (int) strlen(str);
 	tmp = (char *) acl_mymalloc(len + 1);
 	if (tmp == NULL)
 		acl_msg_fatal("%s(%d): malloc error", myname, __LINE__);

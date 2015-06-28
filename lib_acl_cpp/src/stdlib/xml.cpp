@@ -160,7 +160,7 @@ xml_node& xml_node::add_attr(const char* name, size_t n)
 xml_node& xml_node::add_attr(const char* name, acl_int64 n)
 {
 	char buf[32];
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	safe_snprintf(buf, sizeof(buf), "%I64d", n);
 #else
 	safe_snprintf(buf, sizeof(buf), "%lld", n);
@@ -642,7 +642,7 @@ int xml::push_pop(const char* in, size_t len acl_unused,
 	if (max > 0 && len > max)
 		len = max;
 	out->append(in, len);
-	return len;
+	return (int) len;
 }
 
 int xml::pop_end(string* out acl_unused, size_t max /* = 0 */ acl_unused)

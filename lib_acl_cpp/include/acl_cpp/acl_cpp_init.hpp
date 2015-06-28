@@ -10,7 +10,7 @@ namespace acl
 	 */
 	ACL_CPP_API void acl_cpp_init(void);
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	/**
 	 * win32 下打开 DOS 窗口
 	 */

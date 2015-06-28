@@ -63,7 +63,7 @@ public:
 	 * @param value {long long int} ±‰¡ø÷µ
 	 * @return {query&}
 	 */
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	query& set_parameter(const char* name, __int64 value);
 #else
 	query& set_parameter(const char* name, long long int value);

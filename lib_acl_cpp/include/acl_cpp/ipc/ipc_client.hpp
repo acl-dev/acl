@@ -9,7 +9,7 @@ typedef struct MSG_HDR
 {
 	int nMsg;
 	int dlen;
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	__int64   magic;
 #else
 	long long int magic;
@@ -33,7 +33,7 @@ class socket_stream;
 class ACL_CPP_API ipc_client : private aio_open_callback
 {
 public:
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	ipc_client(__int64 magic = -1);
 #else
 	ipc_client(long long int magic = -1);
@@ -156,7 +156,7 @@ protected:
 	 */
 	void trigger(int nMsg, void* data, int dlen);
 private:
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	__int64   magic_;
 #else
 	long long int magic_;

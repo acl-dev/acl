@@ -12,7 +12,7 @@
 #include "stdlib/unix/acl_sane_socketpair.h"
 #endif
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 #define	HAS_DUPLEX_PIPE
 #endif
 

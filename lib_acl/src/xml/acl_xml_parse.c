@@ -270,7 +270,7 @@ static const char *xml_parse_meta_text(ACL_XML *xml, const char *data)
 				off = ACL_VSTRING_LEN(xml->curr_node->text) - 1;
 				if (off == 0)
 					break;
-				ACL_VSTRING_AT_OFFSET(xml->curr_node->text, off);
+				ACL_VSTRING_AT_OFFSET(xml->curr_node->text, (int) off);
 				ACL_VSTRING_TERMINATE(xml->curr_node->text);
 				xml_meta_attr(xml->curr_node);
 				break;

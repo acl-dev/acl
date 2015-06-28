@@ -20,7 +20,7 @@
  */
 #include "acl_stdafx.hpp"
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #ifdef USE_WIN_ICONV
 #include "win_iconv.hpp"
 
@@ -60,7 +60,7 @@
         return -1;          \
     } while (0)
 
-#if defined(WIN32) && _MSC_VER >= 1500
+#if defined(ACL_WINDOWS) && _MSC_VER >= 1500
 #define xstrlcpy(dst, src, size)                   \
     do {                                           \
         strncpy_s(dst, size, src, strlen(src));    \
@@ -814,7 +814,8 @@ win_iconv(iconv_t _cd, const char **inbuf, size_t *inbytesleft, char **outbuf, s
     {
         if (outbuf != NULL && *outbuf != NULL && cd->to.flush != NULL)
         {
-            outsize = cd->to.flush(&cd->to, (uchar *)*outbuf, *outbytesleft);
+            outsize = cd->to.flush(&cd->to, (uchar *)*outbuf,
+		    (int) (*outbytesleft));
             if (outsize == -1)
                 return (size_t)(-1);
             *outbuf += outsize;
@@ -832,7 +833,8 @@ win_iconv(iconv_t _cd, const char **inbuf, size_t *inbytesleft, char **outbuf, s
         mode = cd->from.mode;
         wsize = MB_CHAR_MAX;
 
-        insize = cd->from.mbtowc(&cd->from, (const uchar *)*inbuf, *inbytesleft, wbuf, &wsize);
+        insize = cd->from.mbtowc(&cd->from, (const uchar *)*inbuf,
+		(int) (*inbytesleft), wbuf, &wsize);
         if (insize == -1)
             return (size_t)(-1);
 
@@ -877,7 +879,8 @@ win_iconv(iconv_t _cd, const char **inbuf, size_t *inbytesleft, char **outbuf, s
             }
         }
 
-        outsize = cd->to.wctomb(&cd->to, wbuf, wsize, (uchar *)*outbuf, *outbytesleft);
+        outsize = cd->to.wctomb(&cd->to, wbuf, wsize, (uchar *)*outbuf,
+		(int) (*outbytesleft));
         if (outsize == -1)
         {
             cd->from.mode = mode;
@@ -1116,7 +1119,7 @@ check_utf_bom(rec_iconv_t *cd, ushort *wbuf, int *wbufsize)
 static char *
 strrstr(const char *str, const char *token)
 {
-    int len = strlen(token);
+    int len = (int) strlen(token);
     const char *p = str + strlen(str);
 
     while (str <= --p)
@@ -1961,4 +1964,4 @@ main(int argc, char **argv)
 }
 #endif
 #endif // USE_WIN_ICONV
-#endif // WIN32
+#endif // ACL_WINDOWS

@@ -99,7 +99,7 @@ char *acl_strcasestr(char *haystack, const char *needle)
 	return 0;
 }
 
-#ifdef  WIN32
+#ifdef  ACL_WINDOWS
 #if 0
 char *strcasestr(char *haystack, char *needle)
 {
@@ -121,4 +121,4 @@ char *strcasestr(char *haystack, char *needle)
 	return 0;
 }
 #endif
-#endif  /* WIN32 */
+#endif  /* ACL_WINDOWS */

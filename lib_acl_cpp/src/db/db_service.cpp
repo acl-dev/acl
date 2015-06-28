@@ -74,9 +74,9 @@ protected:
 		delete this;
 	}
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
-	// 基类虚接口，使子线程可以在执行完任务后向主线程发送 WIN32 窗口消息
+	// 基类虚接口，使子线程可以在执行完任务后向主线程发送 ACL_WINDOWS 窗口消息
 
 	virtual void run(HWND hWnd)
 	{
@@ -170,7 +170,7 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #include <process.h>
 #endif
 
@@ -184,7 +184,7 @@ db_service::db_service(size_t dblimit /* = 100 */, int nthread /* = 2 */,
 		dblimit_ = (int) dblimit > nthread ? nthread : dblimit;
 	else
 		dblimit_ = dblimit;
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	magic_ = _getpid() + time(NULL);
 #else
 	magic_ = getpid() + time(NULL);
@@ -224,7 +224,7 @@ void db_service::on_accept(acl::aio_socket_stream* client)
 	ipc->wait();
 }
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 void db_service::win32_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -258,7 +258,7 @@ void db_service::win32_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		push_back(dat->db);
 		query->destroy();
 
-		// 在采用 WIN32 消息时该对象空间是动态分配的，所以需要释放
+		// 在采用 ACL_WINDOWS 消息时该对象空间是动态分配的，所以需要释放
 		acl_myfree(dat);
 	}
 }

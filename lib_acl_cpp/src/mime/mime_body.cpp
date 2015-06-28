@@ -69,7 +69,7 @@ bool mime_body::save_body(const char* file_path, const char* src /* = NULL */,
 	bool ret = save_body(out, src, len);
 	if (ret == false)
 	{
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 		_unlink(file_path);
 #else
 		unlink(file_path);

@@ -26,7 +26,7 @@
 
 #endif
 
-#ifdef	WIN32
+#ifdef	ACL_WINDOWS
 struct SOCK_ADDR {
 	union {
 		struct sockaddr_in in;
@@ -57,7 +57,7 @@ int acl_getpeername(ACL_SOCKET sockfd, char *buf, size_t size)
 	if (getpeername(sockfd, sa, &len) == -1)
 		return -1;
 
-#ifndef	WIN32
+#ifndef	ACL_WINDOWS
 	if (sa->sa_family == AF_UNIX) {
 		memset(&addr, 0, sizeof(addr));
 		len = sizeof(addr);
@@ -94,7 +94,7 @@ int acl_getsockname(ACL_SOCKET sockfd, char *buf, size_t size)
 	if (getsockname(sockfd, sa, &len) == -1)
 		return -1;
 
-#ifndef	WIN32
+#ifndef	ACL_WINDOWS
 	if (sa->sa_family == AF_UNIX) {
 		snprintf(buf, size, "%s", addr.sa.un.sun_path);
 		return 0;
@@ -121,7 +121,7 @@ int acl_getsocktype(ACL_SOCKET sockfd)
 	if (getsockname(sockfd, sa, &len) == -1)
 		return -1;
 
-#ifndef	WIN32
+#ifndef	ACL_WINDOWS
 	if (sa->sa_family == AF_UNIX)
 		return AF_UNIX;
 #endif

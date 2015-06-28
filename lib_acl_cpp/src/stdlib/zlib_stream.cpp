@@ -7,7 +7,7 @@
 #define HAVE_H_ZLIB
 
 #ifdef HAVE_H_ZLIB
-# if defined(WIN32) || defined(USE_DYNAMIC)
+# if defined(ACL_WINDOWS) || defined(USE_DYNAMIC)
 
 typedef int     (*deflateInit_fn)(z_stream*, int, const char*, int);
 typedef int     (*deflate_fn)(z_stream*, int);
@@ -48,7 +48,7 @@ static void __zlib_dll_load(void)
 	if (__zlib_dll != NULL)
 		logger_fatal("__zlib_dll not null");
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	__zlib_dll = acl_dlopen("zlib.dll");
 #else
 	__zlib_dll = acl_dlopen("libz.so");
@@ -137,7 +137,7 @@ zlib_stream::zlib_stream()
 	flush_ = zlib_flush_off;
 
 #ifdef  HAVE_H_ZLIB
-#if defined(WIN32) || defined(USE_DYNAMIC)
+#if defined(ACL_WINDOWS) || defined(USE_DYNAMIC)
 	acl_pthread_once(&__zlib_once, __zlib_dll_load);
 # endif
 #endif
@@ -443,12 +443,12 @@ int zlib_stream::push_pop(const char* in, size_t len,
 
 	if (is_compress_)
 	{
-		if (zip_update(in, len, out, flush_) == false)
+		if (zip_update(in, (int) len, out, flush_) == false)
 			return (-1);
 	}
 	else
 	{
-		if (unzip_update(in, len, out, flush_) == false)
+		if (unzip_update(in, (int) len, out, flush_) == false)
 			return (-1);
 	}
 

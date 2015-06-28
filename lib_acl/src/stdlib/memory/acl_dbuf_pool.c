@@ -34,7 +34,7 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size)
 
 #ifdef ACL_UNIX
 	page_size = getpagesize();
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	SYSTEM_INFO info;
 
 	memset(&info, 0, sizeof(SYSTEM_INFO));

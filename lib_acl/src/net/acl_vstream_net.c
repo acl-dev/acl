@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#ifdef  WIN32
+#ifdef  ACL_WINDOWS
 #include <io.h>
 #include <fcntl.h>
 #endif
@@ -121,7 +121,7 @@ ACL_VSTREAM *acl_vstream_accept_ex(ACL_VSTREAM *listen_stream,
 	char buf[256];
 
 	if ((listen_stream->type & ACL_VSTREAM_TYPE_LISTEN_INET)) {
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 		if (!(listen_stream->type & ACL_VSTREAM_TYPE_LISTEN_IOCP))
 			connfd = acl_inet_accept_ex(servfd, buf, sizeof(buf));
 		else if (listen_stream->iocp_sock == ACL_SOCKET_INVALID)
@@ -207,7 +207,7 @@ ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
 		connfd = acl_inet_connect_ex(addr, block_mode,
 			connect_timeout, he_errorp);
 	}
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	else {
 		acl_msg_error("%s(%d): addr(%s) invalid",
 			myname, __LINE__, addr);
@@ -259,7 +259,8 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 
 	memset(&sa, 0, sizeof(sa));
 
-	ret = recvfrom(fd, buf, size, 0, (struct sockaddr*) &sa, &sa_len);
+	ret = recvfrom(fd, buf, (int) size, 0,
+		(struct sockaddr*) &sa, &sa_len);
 
 	if (ret > 0 && memcmp(stream->sa_peer, &sa, sizeof(sa)) != 0)
 		acl_vstream_set_peer_addr(stream, &sa);
@@ -276,8 +277,9 @@ static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
 		acl_msg_fatal("%s, %s(%d): peer addr null",
 			myname, __FILE__, __LINE__);
 
-	ret = sendto(fd, buf, size, 0, (struct sockaddr*) stream->sa_peer,
-			stream->sa_peer_len);
+	ret = sendto(fd, buf, (int) size, 0,
+		(struct sockaddr*) stream->sa_peer,
+		(int) stream->sa_peer_len);
 	return ret;
 }
 
@@ -318,7 +320,7 @@ ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout)
 	sa.sin_port = htons(port);
 	sa.sin_addr.s_addr = inet_addr(host);
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 #else
 	sock = socket(AF_INET, SOCK_DGRAM, 0);

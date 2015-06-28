@@ -13,12 +13,12 @@
 
 #endif /* ACL_PREPARE_COMPILE */
 
-#if  defined(WIN32)
+#if  defined(ACL_WINDOWS)
 #pragma comment(lib,"ws2_32")
 #pragma comment(lib, "wsock32")
 #endif
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #include <Tlhelp32.h>
 #endif
 
@@ -33,7 +33,7 @@ const char *acl_version(void)
 
 #ifdef ACL_UNIX
 static acl_pthread_t acl_var_main_tid = (acl_pthread_t) -1;
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 static unsigned long acl_var_main_tid = (unsigned long) -1;
 #else
 #error "Unknown OS"
@@ -52,7 +52,7 @@ void acl_init(void)
 	__have_inited = 1;
 #ifdef ACL_UNIX
 	signal(SIGPIPE, SIG_IGN);
-#elif  defined(WIN32)
+#elif  defined(ACL_WINDOWS)
 	acl_socket_init();
 	acl_vstream_init();
 #endif
@@ -70,7 +70,7 @@ void acl_end(void)
 	if (__have_ended)
 		return;
 	__have_ended = 1;
-#if  defined(WIN32)
+#if  defined(ACL_WINDOWS)
 	acl_socket_end();
 	acl_pthread_end();
 #endif
@@ -83,7 +83,7 @@ void acl_poll_prefered(int yesno)
 	__acl_var_use_poll = yesno;
 }
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 static acl_pthread_once_t __once_control = ACL_PTHREAD_ONCE_INIT;
 
 static void get_main_thread_id(void)
@@ -113,7 +113,7 @@ unsigned long acl_main_thread_self()
 {
 #ifdef ACL_UNIX
 	return ((unsigned long) acl_var_main_tid);
-#elif defined(WIN32)
+#elif defined(ACL_WINDOWS)
 	if (acl_var_main_tid == (unsigned long) -1)
 		acl_pthread_once(&__once_control, get_main_thread_id);
 	return (acl_var_main_tid);

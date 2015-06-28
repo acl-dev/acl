@@ -42,7 +42,7 @@ static bool has_called = false;
 
 void master_udp::run_daemon(int argc, char** argv)
 {
-#ifndef WIN32
+#ifndef ACL_WINDOWS
 	// 每个进程只能有一个实例在运行
 	acl_assert(has_called == false);
 	has_called = true;
@@ -85,7 +85,7 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 	__count_limit = count;
 	acl_assert(addrs && *addrs);
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	acl_init();
 #endif
 	ACL_EVENT* eventp = acl_event_new_select(1, 0);
@@ -162,7 +162,7 @@ void master_udp::service_main(ACL_VSTREAM *stream, char*, char**)
 		acl_vstream_add_close_handle(stream, on_close, ss);
 	}
 
-#ifndef	WIN32
+#ifndef	ACL_WINDOWS
 	if (__mu->daemon_mode_)
 		acl_watchdog_pat();  // 必须通知 acl_master 框架一下
 #endif
@@ -173,7 +173,7 @@ void master_udp::service_pre_jail(char*, char**)
 {
 	acl_assert(__mu != NULL);
 
-#ifndef WIN32
+#ifndef ACL_WINDOWS
 	ACL_EVENT* eventp = acl_udp_server_event();
 	__mu->set_event(eventp);
 #endif
@@ -185,7 +185,7 @@ void master_udp::service_init(char*, char**)
 {
 	acl_assert(__mu != NULL);
 
-#ifndef	WIN32
+#ifndef	ACL_WINDOWS
 	if (__mu->daemon_mode_)
 	{
 		ACL_VSTREAM** streams = acl_udp_server_streams();

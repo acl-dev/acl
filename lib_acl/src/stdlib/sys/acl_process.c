@@ -176,7 +176,7 @@ const char *acl_getcwd()
 	}
 	return (ptr);
 }
-#elif	defined(WIN32)
+#elif	defined(ACL_WINDOWS)
 #include <direct.h>
 
 const char *acl_process_path()

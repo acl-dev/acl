@@ -37,7 +37,7 @@ mime_node::mime_node(const char* emailFile, const MIME_NODE* node,
 		{
 			rfc2047 rfc;
 			rfc.decode_update(node->header_name,
-				strlen(node->header_name));
+				(int) strlen(node->header_name));
 			rfc.decode_finish(toCharset, &m_name);
 		}
 		else

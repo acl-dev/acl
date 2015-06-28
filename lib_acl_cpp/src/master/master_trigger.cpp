@@ -22,8 +22,8 @@ static bool has_called = false;
 
 void master_trigger::run_daemon(int argc, char** argv)
 {
-#ifdef WIN32
-	logger_fatal("not support WIN32!");
+#ifdef ACL_WINDOWS
+	logger_fatal("not support ACL_WINDOWS!");
 #else
 	// 每个进程只能有一个实例在运行
 	acl_assert(has_called == false);
@@ -49,7 +49,7 @@ void master_trigger::run_alone(const char* path /* = NULL */,
 	acl_assert(has_called == false);
 	has_called = true;
 	daemon_mode_ = false;
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	acl_init();
 #endif
 	if (interval <= 0)
@@ -78,7 +78,7 @@ void master_trigger::run_alone(const char* path /* = NULL */,
 void master_trigger::service_main(char*, int, char*, char**)
 {
 	acl_assert(__mt != NULL);
-#ifndef	WIN32
+#ifndef	ACL_WINDOWS
 	if (__mt->daemon_mode_)
 		acl_watchdog_pat();
 #endif
@@ -89,7 +89,7 @@ void master_trigger::service_pre_jail(char*, char**)
 {
 	acl_assert(__mt != NULL);
 
-#ifndef WIN32
+#ifndef ACL_WINDOWS
 	if (__mt->daemon_mode())
 	{
 		ACL_EVENT* eventp = acl_trigger_server_event();

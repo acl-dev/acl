@@ -8,12 +8,12 @@
 #include "acl_cpp/queue/queue_manager.hpp"
 #include "acl_cpp/queue/queue_file.hpp"
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #include <process.h>
 #define getpid _getpid
 #endif
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 #define PATH_SEP	'\\'
 #else
 #define PATH_SEP	'/'
@@ -304,7 +304,7 @@ int queue_file::read(void* buf, size_t len)
 bool queue_file::remove()
 {
 	this->close();
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	if (_unlink(m_filePath.c_str()) != 0)
 #else
 	if (unlink(m_filePath.c_str()) != 0)
@@ -328,7 +328,7 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 		buf << m_home << PATH_SEP << queueName << PATH_SEP << m_queueSub
 			<< PATH_SEP << m_partName << "." << extName;
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 		// 在win32下必须先关闭文件句柄
 		this->close();
 #endif
@@ -362,7 +362,7 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 		}
 	}
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 	// win32 下需要重新再打开
 	return open(m_home, queueName, m_queueSub, m_partName, extName);
 #else

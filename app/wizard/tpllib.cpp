@@ -220,7 +220,7 @@ static tpl_fcell_t* tpl_produce_field(tpl_t *tpl,
 }
 
 #define tpl_get_field(tpl, key) \
-    tpl_produce_field((tpl), (key), strlen((key)), 0, 0)
+    tpl_produce_field((tpl), (key), (int) strlen((key)), 0, 0)
 
 #define tpl_new_field(tpl, key, key_len) \
     tpl_produce_field((tpl), (key), (key_len), 0, 1)
@@ -263,7 +263,7 @@ static tpl_tcell_t* tpl_produce_section(tpl_t *tpl,
 }
 
 #define tpl_get_section(tpl, key) \
-    tpl_produce_section(tpl, key, strlen(key), 0)
+    tpl_produce_section(tpl, key, (int) strlen(key), 0)
 
 #define tpl_make_section(tpl, key, key_len) \
     tpl_produce_section(tpl, key, key_len, 1)
@@ -278,14 +278,15 @@ static int tpl_construct(tpl_t *tpl, const char *p_last, const char *p_end)
     tpl_tcell_t **last_section = &tpl->first;
 
     /* While a field delimiter can be found in what is left */
-    while ((p_curr = tpl_strstr(p_last, p_end - p_last, 
+    while ((p_curr = tpl_strstr(p_last, (ssize_t) (p_end - p_last), 
                                 DELIMITER_LEFT, DELIM_LEN_LEFT)) != NULL)
     {
         /* Advance to beginning of field/section name */
         p_curr += DELIM_LEN_LEFT;
 
         /* Find end delimiter of identifier or fail with syntax error */
-        p_next = tpl_strstr(p_curr, p_end - p_curr, DELIMITER_RIGHT, DELIM_LEN_RIGHT);
+        p_next = tpl_strstr(p_curr, (ssize_t) (p_end - p_curr),
+		DELIMITER_RIGHT, DELIM_LEN_RIGHT);
 
         if (p_next == NULL)
         {
@@ -305,7 +306,7 @@ static int tpl_construct(tpl_t *tpl, const char *p_last, const char *p_end)
 
             if ((p_curr - SEC_HEAD_LEN - p_last) != 0)
             {
-                int val_len = p_curr - SEC_HEAD_LEN - p_last;
+                int val_len = (int) (p_curr - SEC_HEAD_LEN - p_last);
                 *tail = create_node(val_len);
                 (*tail)->val[val_len] = 0;
                 (void)memcpy((*tail)->val, p_last, val_len);
@@ -313,7 +314,7 @@ static int tpl_construct(tpl_t *tpl, const char *p_last, const char *p_end)
             }
         
             /* Create and chain in entry for section */
-            section = tpl_make_section(tpl, p_curr, p_next - p_curr);
+            section = tpl_make_section(tpl, p_curr, (int) (p_next - p_curr));
 
             if (section != NULL)
             {
@@ -330,9 +331,9 @@ static int tpl_construct(tpl_t *tpl, const char *p_last, const char *p_end)
 
                 /* Find next occurrence of this section tag */
                 ending = tpl_strstr(beginning, 
-                                    p_end - beginning,
+                                    (int) (p_end - beginning),
                                     p_curr - SEC_HEAD_LEN,
-                                    beginning - p_curr + SEC_HEAD_LEN);
+                                    (int) (beginning - p_curr + SEC_HEAD_LEN));
 
                 p_last = ending + (SEC_HEAD_LEN + p_last - p_curr);
         
@@ -366,7 +367,7 @@ static int tpl_construct(tpl_t *tpl, const char *p_last, const char *p_end)
         {
             if ((p_curr - DELIM_LEN_LEFT - p_last) != 0)
             {
-                int val_len = p_curr - DELIM_LEN_LEFT - p_last;
+                int val_len = (int) (p_curr - DELIM_LEN_LEFT - p_last);
                 *tail = create_node(val_len);
                 (*tail)->val[val_len] = 0;
                 (void)memcpy((*tail)->val, p_last, val_len);
@@ -378,7 +379,7 @@ static int tpl_construct(tpl_t *tpl, const char *p_last, const char *p_end)
             /* Create node and set fval to new field cell */
             *tail = create_node(0);
             (*tail)->val = NULL;
-            (*tail)->fval = tpl_new_field(tpl, p_curr, p_next - p_curr);
+            (*tail)->fval = tpl_new_field(tpl, p_curr, (int) (p_next - p_curr));
             tail = &(*tail)->next;
         }
     }
@@ -386,7 +387,7 @@ static int tpl_construct(tpl_t *tpl, const char *p_last, const char *p_end)
     /* Store rest of the text */
     if (p_last < p_end)
     {
-        int val_len = p_end - p_last;
+        int val_len = (int) (p_end - p_last);
         *tail = create_node(val_len);
         (void)memcpy((*tail)->val, p_last, val_len);
         (*tail)->val[val_len] = 0;
@@ -600,7 +601,7 @@ void tpl_copy(tpl_t* tpl, const tpl_t* srctpl)
                 tpl_cpy_field((*tail)->fval, 
                               tpl,
                               curr_node->fval->key,
-                              strlen(curr_node->fval->key),
+                              (int) strlen(curr_node->fval->key),
                               curr_node->fval->val,
                               curr_node->fval->len);
 
@@ -613,7 +614,7 @@ void tpl_copy(tpl_t* tpl, const tpl_t* srctpl)
         /* Create emtpy section entry for current section */
         *last_section = tpl_make_section(tpl,
                                          curr_section->key,
-                                         strlen(curr_section->key));
+                                         (int) strlen(curr_section->key));
 
         (*last_section)->preceding = tail;
 
@@ -675,7 +676,7 @@ void tpl_copy(tpl_t* tpl, const tpl_t* srctpl)
             tpl_cpy_field((*tail)->fval, 
                           tpl,
                           curr_node->fval->key,
-                          strlen(curr_node->fval->key),
+                          (int) strlen(curr_node->fval->key),
                           curr_node->fval->val,
                           curr_node->fval->len);
         }
@@ -1184,7 +1185,7 @@ int tpl_save_as(const tpl_t* tpl, const char* filename)
 
         tpl_get_content(tpl, content);
 
-        n = fwrite(content, len, 1, fp);
+        n = (int) fwrite(content, len, 1, fp);
 	if (n != 1)
         {
             (void)fclose(fp);
@@ -1252,7 +1253,8 @@ int tpl_http_write(const tpl_t* tpl, int fd)
     str_p += sizeof(TPL_NPH_HTTP_HEADER_END) - 1;
 
     tpl_get_content(tpl, str_p);
-    content_len = write(fd, response, content_len + (str_p - response));
+    content_len = write(fd, response, content_len
+	    + (unsigned int) (str_p - response));
     acl_myfree(response);
 
     if (content_len < 0)

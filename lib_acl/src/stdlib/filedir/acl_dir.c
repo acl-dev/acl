@@ -9,7 +9,7 @@
 
 #endif  /* ACL_PREPARE_COMPILE */
 
-#ifdef WIN32
+#ifdef ACL_WINDOWS
 
 #include <direct.h>
 #include <stdlib.h>
@@ -66,7 +66,7 @@ _tDIR * _topendir(const _TCHAR *dirname)
 	/* Allocate space for a copy of the directory name, plus
 	* room for the "*.*" we will concatenate to the end.
 	*/
-	len = _tcslen(dirname);
+	len = (int) _tcslen(dirname);
 	if ((name = malloc((len+5) * sizeof(_TCHAR))) == NULL) {
 		acl_set_error(ENOMEM);
 		return (NULL);
@@ -260,4 +260,4 @@ int _tclosedir(_tDIR *dir)
 	return 0;
 }
 
-#endif /* WIN32 */
+#endif /* ACL_WINDOWS */

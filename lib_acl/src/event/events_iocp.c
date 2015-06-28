@@ -776,7 +776,7 @@ TAG_DONE:
 		IOCP_EVENT *iocp_event = NULL;
 
 		isSuccess = GetQueuedCompletionStatus(ev->h_iocp,
-			&bytesTransferred, (DWORD*) &fdp,
+			&bytesTransferred, (PULONG_PTR) &fdp,
 			(OVERLAPPED**) &iocp_event, delay);
 
 		if (!isSuccess) {

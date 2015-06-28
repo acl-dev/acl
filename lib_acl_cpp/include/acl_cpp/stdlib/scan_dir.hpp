@@ -85,7 +85,7 @@ public:
 	 */
 	size_t file_count() const;
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	/**
 	 * 获得当前已经扫描的文件及目录大小的总和
 	 * @return {acl_uint64}

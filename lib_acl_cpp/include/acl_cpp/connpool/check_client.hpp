@@ -2,7 +2,7 @@
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <map>
 #include <vector>
-#ifndef WIN32
+#if !defined(WIN32) && !defined(WIN64)
 #include <sys/time.h>
 #endif
 #include "acl_cpp/stream/aio_socket_stream.hpp"                                

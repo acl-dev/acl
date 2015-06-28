@@ -93,7 +93,7 @@ protected:
 	 */
 	virtual void on_accept(aio_socket_stream* client);
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	/**
 	 * 基类虚函数，当收到来自于子线程的 win32 消息时的回调函数
 	 * @param hWnd {HWND} 窗口句柄
