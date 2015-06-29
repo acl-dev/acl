@@ -109,7 +109,7 @@ public:
 	 * @param delay {int64} 如果该值 > 0 则采用延迟发送的模式(单位为微秒)
 	 * @param callback {aio_timer_writer*} 定时器到达时的回调函数类对象，
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	void write(const void* data, int len, __int64 delay = 0,
 		aio_timer_writer* callback = NULL);
 #else

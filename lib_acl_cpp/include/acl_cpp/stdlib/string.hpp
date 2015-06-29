@@ -132,7 +132,7 @@ public:
 	 */
 	string& operator=(const string* s);
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 对目标字符串类对象赋值
 	 * @param n {long long int} 源 64 位符号长整数，若当前对象的当前状态为
@@ -249,7 +249,7 @@ public:
 	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(const string* s);
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 向目标字符串对象尾部添加有符号长整型数字，当为目标字符串对象为
 	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
@@ -354,7 +354,7 @@ public:
 	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(const char* s);
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 向目标字符串对象尾部添加有符号长整型数字，当为目标字符串对象为
 	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
@@ -445,7 +445,7 @@ public:
 	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(string* s);
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 将字符串对象中的内容赋予目标 64 位有符号整数
 	 * @param n {string*} 目标 64 位有符号整数
@@ -1114,7 +1114,7 @@ public:
 	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
 	 */
 	static string& parse_int(unsigned int n);
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	static string& parse_int64(__int64 n);
 	static string& parse_int64(unsigned __int64 n);
 #else

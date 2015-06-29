@@ -31,7 +31,7 @@
 
 namespace acl {
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 #  pragma warning(push)
 #  pragma warning(disable : 4511 4512)
 #endif
@@ -201,7 +201,7 @@ public:
 template <typename T>
 typename singleton2<T>::object_creator singleton2<T>::create_object;
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 #pragma warning(pop)
 #endif
 

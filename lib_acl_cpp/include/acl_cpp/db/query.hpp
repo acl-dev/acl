@@ -63,7 +63,7 @@ public:
 	 * @param value {long long int} 变量值
 	 * @return {query&}
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	query& set_parameter(const char* name, __int64 value);
 #else
 	query& set_parameter(const char* name, long long int value);
@@ -122,8 +122,8 @@ public:
 	 * 将时间转换成 DateTime 格式的字符串(YYYY-MM-DD HH:MM:SS)
 	 * @param t {time_t} 时间截
 	 * @param out {string&} 存储转换结果的缓冲区
-	 * @param fmt {const char*} 日期格式，在 WIN32 下必须保证该格式的正确性，
-	 *  否则 WIN32 API 会产生断言，格式如："%Y-%m-%d %H:%M:%S"
+	 * @param fmt {const char*} 日期格式，在 _WIN32 下必须保证该格式的正确性，
+	 *  否则 _WIN32 API 会产生断言，格式如："%Y-%m-%d %H:%M:%S"
 	 * @return {const char*} 转换后缓冲区地址，若返回 NULL 则表示转换失败
 	 */
 	static const char* to_date(time_t t, string& out,

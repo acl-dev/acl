@@ -71,7 +71,7 @@ public:
 	 * @param n {int64} 设置值
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	http_header& set_content_length(__int64 n);
 
 	/**
@@ -217,7 +217,7 @@ public:
 	 *  位置
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	http_header& set_range(__int64 from, __int64 to);
 #else
 	http_header& set_range(long long int from, long long int to);
@@ -228,7 +228,7 @@ public:
 	 * @param from {http_off_t*} 非空时存储起始位置偏移
 	 * @param to {http_off_t*} 非空时存储结束位置偏移
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	void get_range(__int64* from, __int64* to);
 #else
 	void get_range(long long int* from, long long int* to);
@@ -259,7 +259,7 @@ public:
 	http_header& add_int(const char* name, unsigned long value);
 	http_header& add_format(const char* name, const char* fmt, ...)
 		ACL_CPP_PRINTF(3, 4);
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	http_header& add_int(const char* name, __int64 vlaue);
 	http_header& add_int(const char* name, unsigned __int64 vlaue);
 #else
@@ -353,7 +353,7 @@ private:
 	int  status_;                         // 响应头的状态字
 	bool is_request_;                     // 是请求头还是响应头
 	bool cgi_mode_;                       // 是否 CGI 响应头
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	__int64 range_from_;                  // 请求头中，range 起始位置
 	__int64 range_to_;                    // 请求头中，range 结束位置
 	__int64 content_length_;              // HTTP 数据体长度

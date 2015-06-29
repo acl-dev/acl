@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 #ifdef USE_WIN_ICONV
 
 typedef void* iconv_t;

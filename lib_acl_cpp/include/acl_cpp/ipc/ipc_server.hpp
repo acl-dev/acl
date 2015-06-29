@@ -66,9 +66,9 @@ protected:
 		(void) client;
 	}
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * 对于基于 WIN32 窗口消息的情况，当调用 open 时，则内部
+	 * 对于基于 _WIN32 窗口消息的情况，当调用 open 时，则内部
 	 * 会自动调用 create_windows 过程
 	 */
 	virtual bool create_window()

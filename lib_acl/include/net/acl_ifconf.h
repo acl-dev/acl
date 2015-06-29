@@ -9,7 +9,7 @@ extern "C" {
 
 typedef struct ACL_IFADDR {
 	char *name;		/* 接口名称 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	char *desc;		/* 接口描述 */
 #endif
 	char  ip[32];		/* 以字符串表示的IP地址 */

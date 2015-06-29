@@ -20,7 +20,7 @@ class ACL_CPP_API db_service_mysql : public db_service
 	 * @param dblimit {size_t} 数据库连接池的个数限制
 	 * @param nthread {int} 子线程池的最大线程数
 	 * @param win32_gui {bool} 是否是窗口类的消息，如果是，则内部的
-	 *  通讯模式自动设置为基于 WIN32 的消息，否则依然采用通用的套接
+	 *  通讯模式自动设置为基于 _WIN32 的消息，否则依然采用通用的套接
 	 *  口通讯方式
 	 */
 	db_service_mysql(const char* dbaddr, const char* dbname,

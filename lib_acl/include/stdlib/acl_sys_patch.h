@@ -8,7 +8,7 @@ extern "C" {
 #include "acl_define.h"
 #include "acl_vstream.h"
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 struct iovec {
 	void *iov_base;   /**< Starting address */
 	size_t iov_len;   /**< Number of bytes */
@@ -39,20 +39,20 @@ ACL_API void sleep(int sec);
  */
 ACL_API int gettimeofday(struct timeval *tv, struct timezone *tz);
 
-#endif  /* WIN32 */
+#endif  /* _WIN32 */
 #ifdef	ACL_UNIX
 # include <sys/uio.h>
 #endif
 
 /**
- * 套接字初始化，对于WIN32平台：需要调用WSAStartup来初始化SOCKET，
+ * 套接字初始化，对于_WIN32平台：需要调用WSAStartup来初始化SOCKET，
  * 而对于UNIX平台：需要通过 signal(SIGPIPE, SIG_IGN) 来忽略信号
  * @return {int} 0: OK; -1: error
  */
 ACL_API int acl_socket_init(void);
 
 /**
- * 程序退出前调用此函数释放全局套接字资源（仅WIN32下有效）
+ * 程序退出前调用此函数释放全局套接字资源（仅_WIN32下有效）
  * @return {int} 0: OK; -1: error
  */
 ACL_API int acl_socket_end(void);

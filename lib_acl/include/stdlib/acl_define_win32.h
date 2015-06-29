@@ -12,7 +12,7 @@
  * vc++11.0	VS 2012	1700
  */
 
-#if defined (WIN32) || defined(WIN64)
+#if defined (_WIN32) || defined(_WIN64)
 # define ACL_WINDOWS
 # if _MSC_VER >= 1500
 #  ifndef _CRT_SECURE_NO_WARNINGS
@@ -23,7 +23,7 @@
 # define ACL_BCB_COMPILER
 #endif
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 
 # ifdef acl_assert
 #  undef acl_assert
@@ -94,10 +94,10 @@
 # endif
 
 # undef	ACL_HAS_PTHREAD
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 /* errno define */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 # define	ACL_ETIMEDOUT		WSAETIMEDOUT
 # define	ACL_ENOMEM		WSAENOBUFS
 # define	ACL_EINVAL		WSAEINVAL
@@ -166,6 +166,6 @@ ACL_API int acl_fstat(ACL_FILE_HANDLE fh, struct acl_stat *buf);
 #  define	offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 # endif
 */
-#endif /* WIN32 / WIN64 */
+#endif /* _WIN32 / _WIN64 */
 
 #endif /* __ACL_DEFINE_WIN32_INCLUDE_H__ */

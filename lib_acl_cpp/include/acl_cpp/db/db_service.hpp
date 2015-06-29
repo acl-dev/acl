@@ -54,7 +54,7 @@ public:
 	 * @param dblimit {size_t} 数据库连接池的个数限制
 	 * @param nthread {int} 子线程池的最大线程数
 	 * @param win32_gui {bool} 是否是窗口类的消息，如果是，则内部的
-	 *  通讯模式自动设置为基于 WIN32 的消息，否则依然采用通用的套接
+	 *  通讯模式自动设置为基于 _WIN32 的消息，否则依然采用通用的套接
 	 *  口通讯方式
 	 */
 	db_service(size_t dblimit = 100, int nthread = 2, bool win32_gui = false);
@@ -92,7 +92,7 @@ protected:
 	 */
 	virtual void on_accept(aio_socket_stream* client);
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 基类虚函数，当收到来自于子线程的 win32 消息时的回调函数
 	 * @param hWnd {HWND} 窗口句柄

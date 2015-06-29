@@ -55,7 +55,7 @@ public:
 	 * 当正常监听服务器地址后调用本函数可以获得监听套接口
 	 * @return {int}
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	SOCKET sock_handle() const
 #else
 	int sock_handle() const
@@ -78,7 +78,7 @@ private:
 	bool  unix_sock_;
 	char  addr_[64];
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	SOCKET fd_;
 #else
 	int   fd_;

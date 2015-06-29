@@ -40,7 +40,7 @@
 # include <stdint.h>	/* uintptr_t */
 #endif
 # define HAS_UINTPTR
-#elif defined(WIN32) || defined(WIN64)
+#elif defined(_WIN32) || defined(_WIN64)
 # include <stddef.h>
 # define HAS_UINTPTR
 #endif

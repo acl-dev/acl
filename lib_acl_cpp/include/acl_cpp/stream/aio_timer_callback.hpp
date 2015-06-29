@@ -81,7 +81,7 @@ protected:
 	/****************************************************************/
 	/*        子类可以调用如下函数添加一些新的定时器任务 ID 号              */
 	/****************************************************************/
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	__int64 present_;
 
 	/**
@@ -117,7 +117,7 @@ private:
 	std::list<aio_timer_task*> tasks_;
 	bool keep_;  // 该定时器是否允许自动重启
 	bool destroy_on_unlock_;  // 解锁后是否 destroy
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	__int64 set_task(aio_timer_task* task);
 	__int64 trigger(void);
 #else

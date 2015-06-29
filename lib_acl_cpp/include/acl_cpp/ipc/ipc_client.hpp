@@ -9,7 +9,7 @@ typedef struct MSG_HDR
 {
 	int nMsg;
 	int dlen;
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	__int64   magic;
 #else
 	long long int magic;
@@ -33,7 +33,7 @@ class socket_stream;
 class ACL_CPP_API ipc_client : private aio_open_callback
 {
 public:
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	ipc_client(__int64 magic = -1);
 #else
 	ipc_client(long long int magic = -1);
@@ -70,7 +70,7 @@ public:
 	 * 与消息服务器之间建立连接并创建异步流
 	 * @param handle {aio_handle*} 异步引擎句柄
 	 * @param addr {const char*} 消息服务器监听地址，格式为:
-	 *  IP:PORT(支持WIN32/UNIX)，unix_path (仅支持UNIX)
+	 *  IP:PORT(支持_WIN32/UNIX)，unix_path (仅支持UNIX)
 	 * @param timeout {int} 连接超时时间
 	 */
 	bool open(aio_handle* handle, const char* addr, int timeout);
@@ -84,7 +84,7 @@ public:
 	/**
 	 * 与消息服务器之间建立连接并创建同步流
 	 * @param addr {const char*} 消息服务器监听地址，格式为:
-	 *  IP:PORT(支持WIN32/UNIX)，unix_path (仅支持UNIX)
+	 *  IP:PORT(支持_WIN32/UNIX)，unix_path (仅支持UNIX)
 	 * @param timeout {int} 连接超时时间
 	 */
 	bool open(const char* addr, int timeout);
@@ -156,7 +156,7 @@ protected:
 	 */
 	void trigger(int nMsg, void* data, int dlen);
 private:
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	__int64   magic_;
 #else
 	long long int magic_;

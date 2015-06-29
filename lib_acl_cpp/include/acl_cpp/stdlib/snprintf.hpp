@@ -11,8 +11,8 @@ namespace acl {
  * @param fmt {const char*} 变参格式字符串
  * @return {int} 当缓冲区长度够用时返回实际拷贝的数据长度，否则:
  *  1) UNIX/LINUX 平台下返回实际需要的缓冲区长度，即当缓冲区长度不够时返回值
- *     >= size；需要注意该返回值的含义与 WIN32 下的不同
- *  2) WIN32 平台下返回 -1
+ *     >= size；需要注意该返回值的含义与 _WIN32 下的不同
+ *  2) _WIN32 平台下返回 -1
  */
 ACL_CPP_API int ACL_CPP_PRINTF(3, 4) safe_snprintf(char *buf, size_t size,
 	const char *fmt, ...);
@@ -25,8 +25,8 @@ ACL_CPP_API int ACL_CPP_PRINTF(3, 4) safe_snprintf(char *buf, size_t size,
  * @param ap {va_list} 变参变量
  * @return {int} 当缓冲区长度够用时返回实际拷贝的数据长度，否则:
  *  1) UNIX/LINUX 平台下返回实际需要的缓冲区长度，即当缓冲区长度不够时返回值
- *     >= size；需要注意该返回值的含义与 WIN32 下的不同
- *  2) WIN32 平台下返回 -1
+ *     >= size；需要注意该返回值的含义与 _WIN32 下的不同
+ *  2) _WIN32 平台下返回 -1
  */
 ACL_CPP_API int safe_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include "acl_cpp/ipc/ipc_service.hpp"
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
  struct acl_pthread_mutex_t;
  struct acl_pthread_cond_t;
 #else
@@ -47,7 +47,7 @@ protected:
 	/**
 	 * 虚接口：当子线程调用本对象的 rpc_signal 时，在主线程中会
 	 * 调用本接口，通知在任务未完成前(即调用 rpc_onover 前)收到
-	 * 子线程运行的中间状态信息；内部自动支持套接口或 WIN32 窗口
+	 * 子线程运行的中间状态信息；内部自动支持套接口或 _WIN32 窗口
 	 * 消息；应用场景，例如，对于 HTTP 下载应用，在子线程中可以
 	 * 一边下载，一边向主线程发送(调用 rpc_signal 方法)下载进程，
 	 * 则主线程会调用本类实例的此方法来处理此消息
@@ -61,7 +61,7 @@ protected:
 	virtual void rpc_run(void) = 0;
 
 	/**
-	 * 在子线程中被调用，内部自动支持套接口或 WIN32 窗口消息
+	 * 在子线程中被调用，内部自动支持套接口或 _WIN32 窗口消息
 	 * 子类实例的 rpc_run 方法中可以多次调用此方法向主线程的
 	 * 本类实例发送消息，主线程中调用本对象 rpc_wakeup 方法
 	 * @param ctx {void*} 传递的参数指针，一般应该是动态地址
@@ -109,10 +109,10 @@ private:
 
 	// 基类 ipc_request 虚函数，在子线程中被调用
 	virtual void run(ipc_client* ipc);
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 虚接口，子类实现此类用于处理具体的任务，该接口适用
-	 * 于采用 WIN32 消息的模式
+	 * 于采用 _WIN32 消息的模式
 	 * @param hWnd {HWND} WIN2 窗口句柄
 	 */
 	virtual void run(HWND hWnd);
@@ -151,7 +151,7 @@ private:
 	// ipc 连接请求时的回调函数
 	virtual void on_accept(aio_socket_stream* client);
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 基类虚函数，当收到来自于子线程的 win32 消息时的回调函数
 	 * @param hWnd {HWND} 窗口句柄

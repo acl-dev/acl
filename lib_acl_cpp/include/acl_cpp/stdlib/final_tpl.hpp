@@ -3,7 +3,7 @@
 
 namespace acl {
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 template<typename TDerive, typename TProvider>
 class final_tpl_base
 {

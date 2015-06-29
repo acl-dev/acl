@@ -67,7 +67,7 @@ public:
 	 * @param nthread {int} 如果该值 > 1 则内部自动采用线程池，否则
 	 *  则是一个请求一个线程
 	 * @param win32_gui {bool} 是否是窗口类的消息，如果是，则内部的
-	 *  通讯模式自动设置为基于 WIN32 的消息，否则依然采用通用的套接
+	 *  通讯模式自动设置为基于 _WIN32 的消息，否则依然采用通用的套接
 	 *  口通讯方式
 	 */
 	dns_service(int nthread = 1, bool win32_gui = false);
@@ -93,7 +93,7 @@ protected:
 	 */
 	virtual void on_accept(aio_socket_stream* client);
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 基类虚函数，当收到来自于子线程的 win32 消息时的回调函数
 	 * @param hWnd {HWND} 窗口句柄

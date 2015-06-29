@@ -3,7 +3,7 @@
 
 #include "stdlib/acl_define.h"
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 #include "stdlib/acl_stdlib.h"
 
 #ifdef __cplusplus
@@ -68,6 +68,6 @@ ACL_VSTREAM *local_listen(void);
 }
 #endif
 
-#endif /* WIN32 */
+#endif /* _WIN32 */
 #endif
 

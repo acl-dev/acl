@@ -24,7 +24,7 @@ extern "C" {
  * For now use FD_SETSIZE as defined along with the fd-set type.
  */
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 typedef struct IOCP_EVENT IOCP_EVENT;
 #endif
 
@@ -55,7 +55,7 @@ struct ACL_EVENT_FDTABLE {
 	int   fdidx_ready;
 	ACL_RING delay_entry;
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	HANDLE h_iocp;
 	IOCP_EVENT *event_read;
 	IOCP_EVENT *event_write;

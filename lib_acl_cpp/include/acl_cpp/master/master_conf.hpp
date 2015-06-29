@@ -35,7 +35,7 @@ typedef struct master_bool_tbl
 typedef struct master_int64_tbl
 {
 	const char *name;
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	__int64  defval;
 	__int64 *target;
 	__int64  min;

@@ -81,7 +81,7 @@ public:
 	 * @param null_value {acl_int64} 当结果为空时，返回此值表示未有相应结果
 	 * @return {acl_int64} 当返回值与用户输入的 null_value 值相同时表明没有查到结果
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	__int64 field_int64(size_t ifield, __int64 null_value = 0) const;
 #else
 	long long int field_int64(size_t ifield, long long int null_value = 0) const;
@@ -93,7 +93,7 @@ public:
 	 * @param null_value {acl_int64} 当结果为空时，返回此值表示未有相应结果
 	 * @return {acl_int64} 当返回值与用户输入的 null_value 值相同时表明没有查到结果
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	__int64 field_int64(const char* name, __int64 null_value = 0) const;
 #else
 	long long int field_int64(const char* name, long long int null_value = 0) const;

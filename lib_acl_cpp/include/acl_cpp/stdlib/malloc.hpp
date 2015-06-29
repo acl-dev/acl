@@ -3,7 +3,7 @@
 
 #ifdef HOOK_NEW
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 # ifdef NDEBUG
 void* operator new(size_t n);
 void  operator delete(void *p);

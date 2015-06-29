@@ -92,13 +92,13 @@ public:
 		DAT_HDR res_hdr;
 
 		// 将主机字节序转为网络字节序
-		res_hdr.len = htonl(dat_len);
+		res_hdr.len = (int) htonl(dat_len);
 		ACL_SAFE_STRNCPY(res_hdr.cmd, "ok", sizeof(res_hdr.cmd));
 
 		// 异步写响应数据包: 数据头及数据体
 
 		client_->write(&res_hdr, sizeof(res_hdr));
-		client_->write(OK, dat_len);
+		client_->write(OK, (int) dat_len);
 
 		// 设置状态为读取下一个数据包
 		status_ = STATUS_T_HDR;

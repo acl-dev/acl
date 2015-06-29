@@ -7,7 +7,7 @@ extern "C" {
 
 #include "acl_define.h"
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 
 #if !defined(_UNICODE)
 
@@ -79,7 +79,7 @@ ACL_API void wrewinddir(wDIR *dir);
 
 #endif	/* _UNICODE */
 
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #ifdef __cplusplus
 }

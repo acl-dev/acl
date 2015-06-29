@@ -162,7 +162,7 @@ struct ACL_VSTREAM {
 
 	int   nrefer;                   /**< refer count, used for engine moudle */
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	int   pid;
 	HANDLE hproc;
 	ACL_SOCKET iocp_sock;
@@ -180,7 +180,7 @@ extern ACL_API ACL_VSTREAM acl_vstream_fstd[];  /**< pre-defined streams */
 /*--------------------------------------------------------------------------*/
 /**
  * 初始化ACL_VSTREAM流的函数库
- * 对于WIN32来说，如果想要用标准输入输出，则需要调用此函数进行初始化
+ * 对于_WIN32来说，如果想要用标准输入输出，则需要调用此函数进行初始化
  */
 ACL_API void acl_vstream_init(void);
 

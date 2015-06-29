@@ -38,7 +38,7 @@ static bool test_zadd(acl::redis_zset& redis, int i, const char* key,
 		members[j] = buf;
 
 		lens[j] = len + n; // 该数据块的总长度：唯一前缀+数据
-		scores[j] = j;
+		scores[j] = (double) j;
 
 		// 剩余数据块长度
 		length -= len;

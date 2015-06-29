@@ -1,7 +1,7 @@
 #ifndef __STD_AFX_INCLUDE_H__
 #define __STD_AFX_INCLUDE_H__
 
-# if defined(WIN32) || defined(WIN64)
+# if defined(_WIN32) || defined(_WIN64)
 #  include <stdio.h>
 #  include <stdarg.h>
 #  ifdef __STDC_WANT_SECURE_LIB__

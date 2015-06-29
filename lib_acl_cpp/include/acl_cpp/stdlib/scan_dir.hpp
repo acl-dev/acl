@@ -60,7 +60,7 @@ public:
 	/**
 	 * 获得当前扫描过程所在的目录路径，返回的路径尾部不包含路径分隔符 '/'
 	 * 或 '\\' (win32)，如对于路径：/home/zsx/，则会返回 /home/zsx，如果
-	 * 路径为根路径：/ 则该 '/' 将会保留；在 WIN32 下，返回类似于
+	 * 路径为根路径：/ 则该 '/' 将会保留；在 _WIN32 下，返回类似于
 	 * C:\Users\zsx 的路径
 	 * @return {const char*} 当目录打开时该函数返回非空指针，否则返回 NULL
 	 */
@@ -85,7 +85,7 @@ public:
 	 */
 	size_t file_count() const;
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 获得当前已经扫描的文件及目录大小的总和
 	 * @return {acl_uint64}

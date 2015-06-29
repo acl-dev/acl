@@ -2,8 +2,8 @@
 #define	ACL_DEFINE_INCLUDE_H
 
 #ifdef MINGW
-# undef WIN32
-# undef WIN64
+# undef _WIN32
+# undef _WIN64
 #else
 # include "acl_define_win32.h"
 #endif

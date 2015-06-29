@@ -79,7 +79,7 @@ public:
 	/****************************************************************/
 	/*        子类可以调用如下函数添加一些新的定时器任务 ID 号      */
 	/****************************************************************/
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 针对本定时器增加新的任务ID号，这样便可以通过一个定时器启动
 	 * 多个定时任务
@@ -107,7 +107,7 @@ public:
 	 * 触发所有到时的定时任务
 	 * @return {long lont int} 下一个将要到时的任务
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	__int64 trigger(void);
 	__int64 min_delay(void) const
 	{
@@ -122,7 +122,7 @@ public:
 #endif
 
 protected:
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	__int64 min_delay_;
 	__int64 present_;
 #else
@@ -134,7 +134,7 @@ private:
 	size_t length_;
 	std::list<event_task*> tasks_;
 	bool keep_;  // 该定时器是否允许自动重启
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	__int64 set_task(event_task* task);
 #else
 	long long int set_task(event_task* task);

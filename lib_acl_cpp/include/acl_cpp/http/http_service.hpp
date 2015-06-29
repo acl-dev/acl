@@ -97,11 +97,11 @@ public:
 	 * @param nthread {int} 如果该值 > 1 则内部自动采用线程池，否则
 	 *  则是一个请求一个线程
 	 * @param nwait {int} 当异步引擎采用 ENGINE_WINMSG 时，为了避免
-	 *  因任务线程发送的数据消息过快而阻塞了主线程的 WIN32 消息循环，
+	 *  因任务线程发送的数据消息过快而阻塞了主线程的 _WIN32 消息循环，
 	 *  在任务线程发送数据消息时自动休眠的毫秒数；对于其它异步引擎，
 	 *  该值也可以用于限速功能
 	 * @param win32_gui {bool} 是否是窗口类的消息，如果是，则内部的
-	 *  通讯模式自动设置为基于 WIN32 的消息，否则依然采用通用的套接
+	 *  通讯模式自动设置为基于 _WIN32 的消息，否则依然采用通用的套接
 	 *  口通讯方式
 	 */
 	http_service(int nthread = 1, int nwait = 1, bool win32_gui = false);
@@ -114,7 +114,7 @@ public:
 	 */
 	void do_request(http_service_request* req);
 protected:
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 基类虚函数，当收到来自于子线程的 win32 消息时的回调函数
 	 * @param hWnd {HWND} 窗口句柄

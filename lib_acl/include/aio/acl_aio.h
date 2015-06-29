@@ -193,7 +193,7 @@ ACL_API ACL_AIO *acl_aio_create(int event_mode);
  * 创建异步框架实例句柄, 可以指定是否采用 epoll/devpoll/windows message
  * @param event_mode {int} 事件监听方式: ACL_EVENT_SELECT, ACL_EVENT_POLL
  *  , ACL_EVENT_KERNEL, ACL_EVENT_WMSG
- * @param nMsg {unsigned int} 当与 WIN32 界面的消息整合时，即 event_mode 设为
+ * @param nMsg {unsigned int} 当与 _WIN32 界面的消息整合时，即 event_mode 设为
  *  ACL_EVENT_WMSG 时该值才有效，其表示与异步句柄绑定的消息值
  * @return {ACL_AIO*} 返回一个异步框架引擎句柄. OK: != NULL; ERR: == NULL.
  */

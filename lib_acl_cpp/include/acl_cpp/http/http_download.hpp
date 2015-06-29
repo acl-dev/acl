@@ -45,7 +45,7 @@ public:
 	 *  可能是输入参数非法，或 URL 不存在，或服务器不支持断点传输，或
 	 *  在下载过程中子类返回 false 禁止继续下载
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	bool get(__int64 range_from = -1, __int64 range_to = -1,
 		const char* req_body = NULL, size_t len = 0);
 #else
@@ -89,7 +89,7 @@ protected:
 	 * @param n {__int64} 完整文件长度
 	 * @return {bool} 若子类返回 false 则停止继续下载
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	virtual bool on_length(__int64 n);
 #else
 	virtual bool on_length(long long int n);
@@ -112,7 +112,7 @@ private:
 	bool save_total(const char* body, size_t len);
 
 	// 断点下载部分文件
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	bool save_range(const char* body, size_t len,
 		__int64 range_from, __int64 range_to);
 #else

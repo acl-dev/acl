@@ -1,11 +1,11 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <stdlib.h>
-#if !defined(WIN32) && !defined(WIN64)
+#if !defined(_WIN32) && !defined(_WIN64)
 #include <pthread.h>
 #endif
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 struct acl_pthread_mutex_t;
 #else
 # ifndef	acl_pthread_mutex_t
@@ -42,7 +42,7 @@ public:
 	 * @param fh {int} 文件句柄
 	 * @return {bool} 是否成功
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	bool open(void* fh);
 #else
 	bool open(int fh);
@@ -69,7 +69,7 @@ public:
 private:
 	acl_pthread_mutex_t* mutex_;
 	char* pFile_;
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	void* fHandle_;
 #else
 	int   fHandle_;

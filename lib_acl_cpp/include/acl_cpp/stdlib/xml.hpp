@@ -137,7 +137,7 @@ public:
 	 * @param n {acl_int64} 属性值
 	 * @return {xml_node&}
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	xml_node& add_attr(const char* name, __int64 n);
 #else
 	xml_node& add_attr(const char* name, long long int n);
@@ -155,7 +155,7 @@ public:
 	 * @param number {long long int} 64 位整数
 	 * @return {xml_node&}
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	xml_node& set_text(__int64 number);
 #else
 	xml_node& set_text(long long int number);
@@ -198,7 +198,7 @@ public:
 	 * @return {xml_node&} return_child 为 true 返回子结点的引用，
 	 *  否则返回本 xml 结点引用
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	xml_node& add_child(const char* tag, __int64 number,
 		bool return_child = false);
 #else
@@ -417,7 +417,7 @@ public:
 	 *  xml 对象被释放时这些结点会自动被释放，当然用户也可以在不用时调用
 	 *  reset 来释放这些 xml_node 结点对象
 	 */
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32) || defined(_WIN64)
 	xml_node& create_node(const char* tag, __int64 number);
 #else
 	xml_node& create_node(const char* tag, long long int number);
