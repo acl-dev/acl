@@ -197,7 +197,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lib_protocol_d.lib lib_acl_d.lib polarssl.lib"
+				AdditionalDependencies="lib_protocol_d.lib lib_acl_d.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				AdditionalLibraryDirectories="..\lib\win32;..\dist\lib\win32;"
 				GenerateDebugInformation="true"
@@ -275,7 +275,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lib_protocol.lib lib_acl.lib polarssl.lib"
+				AdditionalDependencies="lib_protocol.lib lib_acl.lib"
 				AdditionalLibraryDirectories="..\lib\win32;..\dist\lib\win32;"
 			/>
 			<Tool

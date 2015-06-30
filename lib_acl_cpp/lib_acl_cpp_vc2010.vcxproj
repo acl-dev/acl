@@ -147,7 +147,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y</Command>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>lib_protocol_d.lib;lib_acl_d.lib;polarssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_protocol_d.lib;lib_acl_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)_d.dll</OutputFile>
       <AdditionalLibraryDirectories>..\lib\win32;..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
@@ -180,7 +180,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>lib_protocol.lib;lib_acl.lib;polarssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_protocol.lib;lib_acl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <AdditionalLibraryDirectories>..\lib\win32;..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
