@@ -14,8 +14,8 @@ CFLAGS = -c -g -W \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \
 -Wno-long-long \
--Wformat
-#-DHAS_POLARSSL
+-Wformat \
+-DHAS_POLARSSL
 #-DUSE_DYNAMIC
 # -Wcast-align
 #-Wcast-qual

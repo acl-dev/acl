@@ -349,16 +349,56 @@ bool http_client::keep_alive() const
 	return false;
 }
 
-const char* http_client::header_value(const char* name) const
+HTTP_HDR* http_client::get_http_hdr() const
 {
 	if (is_request_)
 	{
-		if (hdr_res_)
-			return http_hdr_entry_value(&hdr_res_->hdr, name);
+		if (hdr_res_ == NULL)
+			return NULL;
+		return &hdr_res_->hdr;
 	}
-	else if (hdr_req_)
-		return http_hdr_entry_value(&hdr_req_->hdr, name);
-	return NULL;
+	else if (hdr_req_ != NULL)
+		return &hdr_req_->hdr;
+	else
+		return NULL;
+}
+
+const char* http_client::header_value(const char* name) const
+{
+	HTTP_HDR* hdr = get_http_hdr();
+
+	return hdr != NULL ? http_hdr_entry_value(hdr, name) : NULL;
+}
+
+void http_client::header_disable(const char* name)
+{
+	HTTP_HDR* hdr = get_http_hdr();
+
+	if (hdr != NULL)
+		http_hdr_entry_off(hdr, name);
+}
+
+bool http_client::header_update(const char* name, const char* value,
+	bool force_add /* = true */)
+{
+	HTTP_HDR* hdr = get_http_hdr();
+
+	if (hdr == NULL)
+		return false;
+
+	return http_hdr_entry_replace(hdr, name, value, force_add ? 1 : 0)
+			== 0 ? true : false;
+}
+
+int http_client::header_update(const char* name, const char* match,
+	const char* to, bool case_sensitive /* = false */)
+{
+	HTTP_HDR* hdr = get_http_hdr();
+
+	if (hdr == NULL)
+		return -1;
+	return http_hdr_entry_replace2(hdr, name, match, to,
+			case_sensitive ? 0 : 1);
 }
 
 int http_client::response_status(void) const
@@ -794,15 +834,15 @@ HTTP_HDR_REQ* http_client::get_request_head(string* buf)
 	return hdr_req_;
 }
 
-void http_client::print_header(const char* prompt)
+void http_client::print_header(const char* prompt /* = NULL */)
 {
 	if (hdr_res_)
-		http_hdr_print(&hdr_res_->hdr, prompt ? prompt : "dummy");
+		http_hdr_print(&hdr_res_->hdr, prompt);
 	else if (hdr_req_)
-		http_hdr_print(&hdr_req_->hdr, prompt ? prompt : "dummy");
+		http_hdr_print(&hdr_req_->hdr, prompt);
 }
 
-void http_client::fprint_header(ostream& out, const char* prompt)
+void http_client::fprint_header(ostream& out, const char* prompt /* = NULL */)
 {
 	ACL_VSTREAM* fp = out.get_vstream();
 	if (fp == NULL)
@@ -811,12 +851,12 @@ void http_client::fprint_header(ostream& out, const char* prompt)
 		return;
 	}
 	if (hdr_res_)
-		http_hdr_fprint(fp, &hdr_res_->hdr, prompt ? prompt : "dummy");
+		http_hdr_fprint(fp, &hdr_res_->hdr, prompt);
 	else if (hdr_req_)
-		http_hdr_fprint(fp, &hdr_req_->hdr, prompt ? prompt : "dummy");
+		http_hdr_fprint(fp, &hdr_req_->hdr, prompt);
 }
 
-void http_client::sprint_header(string& out, const char* prompt)
+void http_client::sprint_header(string& out, const char* prompt /* = NULL */)
 {
 	ACL_VSTRING* bf = out.vstring();
 	if (bf == NULL)

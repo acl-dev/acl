@@ -420,7 +420,8 @@ int http_hdr_parse(HTTP_HDR *hh)
 		{ "Server" },
 		{ "Transfer-Encoding" },
 	};
-	int care_size = sizeof(header_list)/sizeof(struct HEADER_LIST), care_cnt = 0, i, n;
+	int care_size = sizeof(header_list)/sizeof(struct HEADER_LIST);
+	int care_cnt = 0, i, n;
 
 	n = acl_array_size(hh->entry_lnk);
 	for (i = 0; i < n; i++) {
@@ -484,7 +485,8 @@ int http_hdr_parse(HTTP_HDR *hh)
 		{ "Content-Length" },
 		{ "Transfer-Encoding" },
 	};
-	int care_size = sizeof(header_list)/sizeof(struct HEADER_LIST), care_cnt = 0;
+	int care_size = sizeof(header_list)/sizeof(struct HEADER_LIST);
+	int care_cnt = 0;
 
 	acl_foreach(iter, hh->entry_lnk) {
 		entry = (HTTP_HDR_ENTRY *) iter.data;
@@ -557,7 +559,7 @@ void http_hdr_print(const HTTP_HDR *hh, const char *msg)
 	}
 
 	printf("------------- in %s - msg=(%s)----------------\r\n",
-		myname, msg ? msg : "null");
+		myname, msg ? msg : "");
 	entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, 0);
 	if (entry)
 		printf("%s %s\r\n", entry->name, entry->value);
@@ -565,7 +567,8 @@ void http_hdr_print(const HTTP_HDR *hh, const char *msg)
 		entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, i);
 		if (entry == NULL)
 			break;
-		printf("%s: %s\r\n", entry->name, entry->value);
+		if (entry->off == 0)
+			printf("%s: %s\r\n", entry->name, entry->value);
 	}
 	printf("--------------- end -----------------\r\n");
 }
@@ -590,7 +593,7 @@ void http_hdr_fprint(ACL_VSTREAM *fp, const HTTP_HDR *hh, const char *msg)
 
 	if (msg && *msg)
 		acl_vstream_fprintf(fp, "---------- in %s - (%s) -------\r\n",
-			myname, msg ? msg : "begin");
+			myname, msg);
 	entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, 0);
 	if (entry)
 		acl_vstream_fprintf(fp, "%s %s\r\n", entry->name, entry->value);
@@ -598,7 +601,9 @@ void http_hdr_fprint(ACL_VSTREAM *fp, const HTTP_HDR *hh, const char *msg)
 		entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, i);
 		if (entry == NULL)
 			break;
-		acl_vstream_fprintf(fp, "%s: %s\r\n", entry->name, entry->value);
+		if (entry->off == 0)
+			acl_vstream_fprintf(fp, "%s: %s\r\n",
+				entry->name, entry->value);
 	}
 
 	if (msg && *msg)
@@ -625,7 +630,7 @@ void http_hdr_sprint(ACL_VSTRING *bf, const HTTP_HDR *hh, const char *msg)
 
 	if (msg && *msg)
 		acl_vstring_sprintf(bf, "----------- in %s - (%s)-------\r\n",
-			myname, msg ? msg : "begin");
+			myname, msg);
 
 	entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, 0);
 	if (entry)
@@ -635,8 +640,9 @@ void http_hdr_sprint(ACL_VSTRING *bf, const HTTP_HDR *hh, const char *msg)
 		entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, i);
 		if (entry == NULL)
 			break;
-		acl_vstring_sprintf_append(bf, "%s: %s\r\n",
-			entry->name, entry->value);
+		if (entry->off == 0)
+			acl_vstring_sprintf_append(bf, "%s: %s\r\n",
+				entry->name, entry->value);
 	}
 
 	if (msg && *msg)

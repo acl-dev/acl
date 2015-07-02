@@ -310,7 +310,7 @@ bool redis_hash::hexists(const char* key, const char* name, size_t name_len)
 
 	hash_slot(key);
 	build("HEXISTS", key, names, names_len, 1);
-	return get_number() < 0 ? false : true;
+	return get_number() > 0 ? true : false;
 }
 
 int redis_hash::hlen(const char* key)

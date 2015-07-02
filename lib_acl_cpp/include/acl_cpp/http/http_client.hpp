@@ -1,6 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 
+struct HTTP_HDR;
 struct HTTP_HDR_RES;
 struct HTTP_RES;
 struct HTTP_HDR_REQ;
@@ -75,8 +76,8 @@ public:
 	/**
 	 * 发送 HTTP 数据体，可以循环调用此函数，当在第一次调用 write 函数写入
 	 * HTTP 头时设置了 chunked 传输方式，则内部自动采用 chunked 传输方式; 
-	 * 另外，在使用 chunked 方式传输数据时，应该最后再调用一次本函数，且参数
-	 * 均设为 0 表示数据结束
+	 * 另外，在使用 chunked 方式传输数据时，应该最后再调用一次本函数，且参
+	 * 数均设为 0 表示数据结束
 	 * @param data {const void*} 数据地址
 	 * @param len {size_t} data 数据长度
 	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
@@ -139,6 +140,37 @@ public:
 	 * @return {const char*} 字段值，为空时表示不存在
 	 */
 	const char* header_value(const char* name) const;
+
+	/**
+	 * 禁止 HTTP 请求/响应头中的某些字段
+	 * @param name {const char*} 字段名
+	 */
+	void header_disable(const char* name);
+
+	/**
+	 * 将 HTTP 头中的某个字段进行替换
+	 * @param name {const char*} HTTP 头的字段名，如：Content-Length，
+	 *   该字段不区分大小写
+	 * @param value {const char*} 该头部字段的值
+	 * @param force {bool} 如果该头部字段不存在是否需要强制添加
+	 * @return {bool} 返回 false 表示输入出错，或头部字段名不存在且参数
+	 *  force_add 为 false
+	 */
+	bool header_update(const char* name, const char* value,
+		bool force_add = true);
+
+	/**
+	 * 将 HTTP 头中的某个字段中包含某个字符串的源字符串进行替换, 可以
+	 * 支持多次匹配替换
+	 * @param name {const char*} HTTP 头的字段名，如：Content-Length，
+	 *   该字段不区分大小写
+	 * @param match {const char*} 字段值中匹配的字符串
+	 * @param to {const char*} 替换成的目标字符串值
+	 * @param case_sensitive {bool} 在查找替换时是否区分大小写
+	 * @return {int} 匹配替换的次数，0 表示未做任何替换，< 0 表示出错
+	 */
+	int header_update(const char* name, const char* match,
+		const char* to, bool case_sensitive = false);
 
 	/**
 	 * 获得 HTTP 服务器返回的 HTTP 响应状态：
@@ -215,9 +247,9 @@ public:
 	 *  通过该指针返回的数据值永远 >= 0
 	 * @return {int} 返回值含义如下：
 	 *  > 0: 表示已经读到的数据，并且数据还未读完
-	 *  == 0: 如果返回值为此值，则可以调用 disconnected()函数来判断连接是否已经
-	 *  关闭；调用 body_finish 函数来判断是否已经读完 HTTP 响应体数据，如果已经
-	 *  读完且连接未关闭，则还可以继续保持长连接
+	 *  == 0: 如果返回值为此值，则可以调用 disconnected()函数来判断连接
+	 *  是否已经关闭；调用 body_finish 函数来判断是否已经读完 HTTP 响应
+	 *  体数据，如果已经读完且连接未关闭，则还可以继续保持长连接
 	 *  < 0: 表示连接关闭
 	 * 注：read_body 的两个函数不能混用；
 	 *     当为解压缩数据时，则返回的值为解压缩后的数据长度
@@ -237,18 +269,19 @@ public:
 	int read_body(char* buf, size_t size);
 
 	/**
-	 * 从 HTTP 服务器响应数据或客户端请求数据中读取一行数据，此函数内部将会对原始数据
-	 * 进行解压操作；可以循环调用此函数直到该函数返回 false 或 body_finish() 返回
-	 * true 为止；当该函数返回 false 时表示连接已经关闭，当返回 true 时表示读到了
-	 * 一行数据，此时可以通过判断 body_finish() 返回值来判断是否已经读完了数据体
-	 * @param out {string&} 存储数据体的缓冲区，在该函数内部不会自动清理该缓冲区，
-	 *  用户可在调用该函数前自行清理该缓冲区中的数据(可调用:out.clear())
+	 * 从 HTTP 服务器响应数据或客户端请求数据中读取一行数据，此函数内部将
+	 * 会对原始数据进行解压操作；可以循环调用此函数直到该函数返回 false
+	 * 或 body_finish() 返回 true 为止；当该函数返回 false 时表示连接已经
+	 * 关闭，当返回 true 时表示读到了一行数据，此时可以通过判断
+	 * body_finish() 返回值来判断是否已经读完了数据体
+	 * @param out {string&} 存储数据体的缓冲区，在该函数内部不会自动清理该
+	 *  缓冲区，用户可在调用该函数前自行清理该缓冲区中的数据(可调用:out.clear())
 	 * @param nonl {bool} 读取一行数据时是否自动去掉尾部的 "\r\n" 或 "\n"
-	 * @param size {size_t*} 当读到完整的一行数据时存放该行数据的长度，当读到一个
-	 *  空行且 nonl 为 true 时，则该值为 0
-	 * @return {bool} 是否读到了一行数据，当该函数返回 false 时表示读完毕或读出错，
-	 *  且没有读到完整的一行数据；如果返回 true 表示读到了一行数据，当读到一个空行时
-	 *  该函数也会返回 true，只是 *size = 0
+	 * @param size {size_t*} 当读到完整的一行数据时存放该行数据的长度，
+	 *  当读到一个空行且 nonl 为 true 时，则该值为 0
+	 * @return {bool} 是否读到了一行数据，当该函数返回 false 时表示读完毕
+	 *  或读出错，且没有读到完整的一行数据；如果返回 true 表示读到了一行
+	 *  数据，当读到一个空行时该函数也会返回 true，只是 *size = 0
 	 */
 	bool body_gets(string& out, bool nonl = true, size_t* size = NULL);
 
@@ -286,21 +319,21 @@ public:
 	 * 输出服务器返回的 HTTP 响应头信息至标准输出
 	 * @param prompt {const char*} 若非空则随同 HTTP 头信息一起输出
 	 */
-	void print_header(const char* prompt);
+	void print_header(const char* prompt = NULL);
 
 	/**
 	 * 输出服务器返回的 HTTP 响应头信息至输出流中
 	 * @param out {ostream&} 输出流，可以是文件流，也可以是网络流
 	 * @param prompt {const char*} 若非空则随同 HTTP 头信息一起输出
 	 */
-	void fprint_header(ostream& out, const char* prompt);
+	void fprint_header(ostream& out, const char* prompt = NULL);
 
 	/**
 	 * 输出服务器返回的 HTTP 响应头信息至缓冲区中
 	 * @param out {string&} 存储结果的数据缓冲区
 	 * @param prompt {const char*} 若非空则随同 HTTP 头信息一起输出
 	 */
-	void sprint_header(string& out, const char* prompt);
+	void sprint_header(string& out, const char* prompt = NULL);
 
 private:
 	socket_stream* stream_;     // HTTP 数据流
@@ -327,6 +360,8 @@ private:
 	int  read_response_body(char* buf, size_t size);
 	int  read_request_body(string& out, bool clean, int* real_size);
 	int  read_response_body(string& out, bool clean, int* real_size);
+
+	HTTP_HDR* get_http_hdr() const;
 };
 
 }  // namespace acl
