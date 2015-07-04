@@ -144,7 +144,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y</Command>
     <Link>
       <AdditionalDependencies>ws2_32.lib;lib_acl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(ProjectName).dll</OutputFile>
-      <AdditionalLibraryDirectories>..\lib_acl;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\lib\win32;..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -168,7 +168,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <Link>
       <AdditionalDependencies>ws2_32.lib;lib_acl_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(ProjectName)_d.dll</OutputFile>
-      <AdditionalLibraryDirectories>..\lib_acl;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\lib\win32;..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AssemblyDebug>true</AssemblyDebug>
       <GenerateMapFile>true</GenerateMapFile>

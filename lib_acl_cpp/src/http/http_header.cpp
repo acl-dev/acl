@@ -49,6 +49,7 @@ void http_header::init()
 	cgi_mode_ = false;
 	range_from_ = -1;
 	range_to_ = -1;
+	range_total_ = -1;
 	content_length_ = -1;
 	chunked_transfer_ = false;
 }
@@ -365,6 +366,12 @@ http_header& http_header::set_method(const char* method)
 
 	CP(method_s_, method);
 
+	return *this;
+}
+
+http_header& http_header::set_range_total(http_off_t total)
+{
+	range_total_ = total;
 	return *this;
 }
 
@@ -792,6 +799,11 @@ bool http_header::build_response(string& out) const
 			out << "\r\n";
 		}
 	}
+
+	// Ìí¼Ó·Ö¶ÎÏìÓ¦×Ö¶Î
+	if (range_from_ >= 0 && range_to_ >= range_from_ && range_total_ > 0)
+		out << "Content-Range: bytes=" << range_from_ << '-'
+			<< range_to_ << '/' << range_total_ << "\r\n";
 
 	build_common(out);
 	out << "\r\n";

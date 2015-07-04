@@ -91,6 +91,43 @@ public:
 #endif
 
 	/**
+	 * 设置 HTTP 请求头（响应头）中的 Range 字段，用于分段请求（响应）数据，
+	 * 多用于支持断点续传的 WEB 服务器中
+	 * @param from {http_off_t} 起始偏移位置，下标从 0 开始，该
+	 *  值当 >= 0 时才有效
+	 * @param to {http_off_t} 请求结束偏移位置，下标从 0 开始，
+	 *  在请求头中当该值输入 < 0 时，则认为是请求从起始位置开始至最终长度位置
+	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
+	 */
+#if defined(_WIN32) || defined(_WIN64)
+	http_header& set_range(__int64 from, __int64 to);
+#else
+	http_header& set_range(long long from, long long to);
+#endif
+
+	/**
+	 * 对于响应头在分段传输前需要调用此函数设置数据体总长度
+	 * @param total {http_off_t} 仅对于响应头，该参数需要设为数据总长度
+	 * @return {http_header&}
+	 */
+#if defined(_WIN32) || defined(_WIN64)
+	http_header& set_range_total(__int64 total);
+#else
+	http_header& set_range_total(long long total);
+#endif
+
+	/**
+	 * 获得由 set_range 设置的分段请求位置值
+	 * @param from {http_off_t*} 非空时存储起始位置偏移
+	 * @param to {http_off_t*} 非空时存储结束位置偏移
+	 */
+#if defined(_WIN32) || defined(_WIN64)
+	void get_range(__int64* from, __int64* to);
+#else
+	void get_range(long long int* from, long long int* to);
+#endif
+
+	/**
 	 * 设置 HTTP 头中的 Content-Type 字段
 	 * @param value {const char*} 设置值
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
@@ -206,33 +243,6 @@ public:
 	{
 		return method_;
 	}
-
-	/**
-	 * 设置 HTTP 请求头中 Range 字段，用于分段请求数据，多用于
-	 * 支持断点续传的 WEB 服务器中
-	 * @param from {http_off_t} 起始偏移位置，下标从 0 开始，该
-	 *  值当 >= 0 时才有效
-	 * @param to {http_off_t} 请求结束偏移位置，下标从 0 开始，
-	 *  当该值输入 < 0 时，则认为是请求从起始位置开始至最终长度
-	 *  位置
-	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
-	 */
-#if defined(_WIN32) || defined(_WIN64)
-	http_header& set_range(__int64 from, __int64 to);
-#else
-	http_header& set_range(long long int from, long long int to);
-#endif
-
-	/**
-	 * 获得由 set_range 设置的分段请求位置值
-	 * @param from {http_off_t*} 非空时存储起始位置偏移
-	 * @param to {http_off_t*} 非空时存储结束位置偏移
-	 */
-#if defined(_WIN32) || defined(_WIN64)
-	void get_range(__int64* from, __int64* to);
-#else
-	void get_range(long long int* from, long long int* to);
-#endif
 
 	/**
 	 * 设置 HTTP 请求头中是否允许接收压缩数据，对应的 HTTP 头字段为：
@@ -356,10 +366,12 @@ private:
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 range_from_;                  // 请求头中，range 起始位置
 	__int64 range_to_;                    // 请求头中，range 结束位置
+	__int64 range_total_;                 // range 传输模式下记录数据总长度
 	__int64 content_length_;              // HTTP 数据体长度
 #else
 	long long int range_from_;            // 请求头中，range 起始位置
 	long long int range_to_;              // 请求头中，range 结束位置
+	long long int range_total_;           // range 传输模式下记录数据总长度
 	long long int content_length_;        // HTTP 数据体长度
 #endif
 	bool chunked_transfer_;               // 是否为 chunked 传输模式

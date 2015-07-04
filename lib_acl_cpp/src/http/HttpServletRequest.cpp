@@ -267,12 +267,32 @@ acl_int64 HttpServletRequest::getContentLength(void) const
 	return client_->body_length();
 }
 
+bool HttpServletRequest::getRange(http_off_t& range_from, http_off_t& range_to)
+{
+	if (cgi_mode_)
+	{
+		logger_error("cant' support CGI mode");
+		return false;
+	}
+	if (client_ == NULL)
+	{
+		logger_error("client_ null");
+		return false;
+	}
+	return client_->request_range(range_from, range_to);
+}
+
 const char* HttpServletRequest::getContentType(bool part /* = true */) const
 {
 	if (part)
 		return content_type_.get_ctype();
 	if (cgi_mode_)
 		return acl_getenv("CONTENT_TYPE");
+	if (client_ == NULL)
+	{
+		logger_error("client_ null");
+		return "";
+	}
 	return client_->header_value("Content-Type");
 }
 

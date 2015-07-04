@@ -337,6 +337,23 @@ acl_int64 http_client::body_length() const
 	return -1;
 }
 
+bool http_client::request_range(acl_int64& range_from, acl_int64& range_to)
+{
+	if (hdr_req_ == NULL)
+		return false;
+	return http_hdr_req_range(hdr_req_, &range_from, &range_to)
+			< 0 ? false : true;
+}
+
+bool http_client::response_range(acl_int64& range_from,
+	acl_int64& range_to, acl_int64& total)
+{
+	if (hdr_res_ == NULL)
+		return false;
+	return http_hdr_res_range(hdr_res_, &range_from, &range_to, &total)
+			< 0 ? false : true;
+}
+
 bool http_client::keep_alive() const
 {
 	if (is_request_)

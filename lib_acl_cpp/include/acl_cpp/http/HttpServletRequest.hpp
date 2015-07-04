@@ -131,6 +131,19 @@ public:
 #else
 	long long int getContentLength(void) const;
 #endif
+
+	/**
+	 * 如果客户端的请求是分段数据，则该函数将获得请求头中的长度起始地址及结束地址
+	 * @param range_from {long long int&} 偏移起始位置
+	 * @param range_to {long long int&} 偏移结束位置
+	 * @return {bool} 若出错或非分段请求则返回 false，若是分段请求则返回 true
+	 *  注：range_from/range_to 下标从 0 开始
+	 */
+#if defined(_WIN32) || defined(_WIN64)
+	bool getRange(__int64& range_from, __int64& range_to);
+#else
+	bool getRange(long long int& range_from, long long& int range_to);
+#endif
 	/**
 	 * 获得 HTTP 请求头中 Content-Type: text/html; charset=gb2312
 	 * Content-Type 的字段值

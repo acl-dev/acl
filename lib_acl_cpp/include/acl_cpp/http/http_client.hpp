@@ -129,6 +129,43 @@ public:
 #endif
 
 	/**
+	 * 当该对象为请求端流对象时，该函数将获得请求头中的长度起始地址及结束地址
+	 * @param range_from {long long int&} 偏移起始位置
+	 * @param range_to {long long int&} 偏移结束位置
+	 * @return {bool} 若出错或非分段请求数据则返回 false；
+	 *  若是分段请求则返回 true，同时给 range_from 和 range_to 赋值
+	 *  注：range_from/range_to 下标从 0 开始
+	 *  数据格式：
+	 *  Range: bytes={range_from}-{range_to} 或
+	 *  Range: bytes={range_from}-
+	 */
+#if defined(_WIN32) || defined(_WIN64)
+	bool request_range(__int64& range_from, __int64& range_to);
+#else
+	bool request_range(long long int& range_from, long long& int range_to);
+#endif
+
+	/**
+	 * 当该对象为响应端流对象时，该函数将获得响应头中的长度起始地址及结束地址
+	 * @param range_from {long long int&} 偏移起始位置
+	 * @param range_to {long long int&} 偏移结束位置
+	 * @param total {long long int} 存放总长度
+	 * @return {bool} 若出错或非分段响应数据则返回 false；
+	 *  若是分段响应则返回 true，同时给 range_from 和 range_to 赋值
+	 *  注：range_from/range_to 下标从 0 开始
+	 *  数据格式：
+	 *  Content-Range: bytes {range_from}-{range_to}/{total_length}
+	 *  如：Content-Range: bytes 2250000-11665200/11665201
+	 */ 
+#if defined(_WIN32) || defined(_WIN64)
+	bool response_range(__int64& range_from, __int64& range_to,
+		__int64& total);
+#else
+	bool response_range(long long int& range_from,
+		long long& int range_to, long long int& total);
+#endif
+
+	/**
 	 * HTTP 数据流(请求流或响应流是否允许保持长连接)
 	 * @return {bool}
 	 */
