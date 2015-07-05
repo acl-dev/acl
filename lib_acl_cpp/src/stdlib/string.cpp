@@ -1403,6 +1403,18 @@ string& string::hex_decode(const char* s, size_t len)
 	return *this;
 }
 
+string& string::basename(const char* path)
+{
+	(void) acl_sane_basename(vbf_, path);
+	return *this;
+}
+
+string& string::dirname(const char* path)
+{
+	(void) acl_sane_dirname(vbf_, path);
+	return *this;
+}
+
 static void dummy_free(void*)
 {
 }

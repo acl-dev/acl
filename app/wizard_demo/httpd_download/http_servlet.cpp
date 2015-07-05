@@ -68,6 +68,8 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 		req.getSession().setAttribute("sid", "xxxxxx");
 	sid = req.getSession().getAttribute("sid");
 	*/
+
+	// 调试：将客户端请求头记录在日志中
 	acl::string hdr;
 	req.getClient()->sprint_header(hdr);
 	logger("request head:\r\n%s\r\n", hdr.c_str());
@@ -79,6 +81,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 		return transfer_file(req, res, range_from, range_to);
 }
 
+// 普通下载过程
 bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
@@ -99,11 +102,18 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 
 	bool keep_alive = req.isKeepAlive();
 
+	acl::string hdr_entry;
+	acl::string filename;
+	filename.basename(in.file_path());  // 从文件全路径中提取文件名
+	hdr_entry.format("attachment;filename=\"%s\"", filename.c_str());
+
 	// 设置 HTTP 响应头中的字段
 	res.setStatus(200)
 		.setKeepAlive(keep_alive)
 		.setContentLength(fsize)
-		.setContentType("application/octet-stream");
+		.setContentType("application/octet-stream")
+		// 设置 HTTP 头中的文件名
+		.setHeader("Content-Disposition", hdr_entry.c_str());
 
 	acl::string hdr;
 	res.getHttpHeader().build_response(hdr);
@@ -129,7 +139,8 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 
 // 支持断点续传的数据传输过程
 bool http_servlet::transfer_file(acl::HttpServletRequest& req,
-	acl::HttpServletResponse& res, long long range_from, long long range_to)
+	acl::HttpServletResponse& res,
+	long long range_from, long long range_to)
 {
 	if (range_from < 0)
 		return reply(req, res, 400, "invalid range_from: %lld",
@@ -175,19 +186,23 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 
 	bool keep_alive = req.isKeepAlive();
 
+	acl::string hdr_entry;
+	acl::string filename;
+	filename.basename(in.file_path());  // 从文件全路径中提取文件名
+	hdr_entry.format("attachment;filename=\"%s\"", filename.c_str());
+
 	// 设置 HTTP 响应头中的字段
-	res.setStatus(206)			// 响应状态必须为 206
+	res.setStatus(206)			// 响应状态 206 表示部分数据
 		.setKeepAlive(keep_alive)	// 是否保持长连接
 		.setContentLength(length)	// 实际要传输的数据长度
-		.setContentType("application/octet-stream");  // 数据类型
-
-	// 设置分段传输数据的范围
-	res.getHttpHeader()
-		// 设置本次传输区间
-		.set_range(range_from, range_to > 0 ? range_to : fsize - 1)
-		// 设置数据总长度
-		.set_range_total(fsize);
-
+		.setContentType("application/octet-stream")  // 数据类型
+		// 设置 HTTP 头中的文件名
+		.setHeader("Content-Disposition", hdr_entry.c_str())
+		// 设置本次传输区间的起始偏移位置及数据的总长度
+		.setRange(range_from, range_to > 0
+				? range_to : fsize - 1, fsize);
+	
+	// 调试：将 HTTP 响应头记在本地日志中
 	acl::string hdr;
 	res.getHttpHeader().build_response(hdr);
 	logger("response head:\r\n%s\r\n", hdr.c_str());
@@ -196,9 +211,13 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 	int   ret;
 	size_t size;
 
+	// 从文件指定位置读取数据，并将数据传输给客户端
 	while (!in.eof() && length > 0)
 	{
-		size = sizeof(buf) > (size_t) length ? (size_t) length : sizeof(buf);
+		size = sizeof(buf) > (size_t) length ?
+				(size_t) length : sizeof(buf);
+
+		// 第三个参数为 false 表示仅进行一次读操作，不必待缓冲区满后再返回
 		ret = in.read(buf, size, false);
 		if (ret == -1)
 		{
@@ -212,6 +231,10 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 	}
 
 	if (length != 0)
+	{
+		logger_error("read file failed");
 		return false;
-	return true;
+	}
+
+	return true && keep_alive;
 }

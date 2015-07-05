@@ -85,6 +85,22 @@ public:
 	HttpServletResponse& setHeader(const char* name, int value);
 
 	/**
+	 * 对于分区下载，调用本函数设置数据下载的偏移位置（下标从 0 开始）
+	 * @param from {http_off_t} 数据区间起始偏移位置（下标从 0 开始计算）
+	 * @param to {http_off_t} 数据区间结束位置（该值需小于总数据长度）
+	 * @param total {http_off_t} 总数据长度，当数据源为一个静态文件时该值应
+	 *  等于该文件的总长度大小
+	 * @return {HttpServletResponse&}
+	 */
+#if  defined(_WIN32) || defined(_WIN64)
+	HttpServletResponse& setRange(__int64 from,
+		__int64 to, __int64 total);
+#else
+	HttpServletResponse& setRange(long long from,
+		long long to, long long total);
+#endif
+
+	/**
 	 * 设置 HTTP 响应头中的状态码：1xx, 2xx, 3xx, 4xx, 5xx
 	 * @param status {int} HTTP 响应状态码, 如：200
 	 */

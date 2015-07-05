@@ -1102,6 +1102,20 @@ public:
 	string& hex_decode(const char* s, size_t len);
 
 	/**
+	 * 从文件全路径中提取文件名
+	 * @param path {const char*} 文件全路径字符串，非空字符串
+	 * @return {string&} 当前对象的引用
+	 */
+	string& basename(const char* path);
+
+	/**
+	 * 从文件全路径中提取文件所在目录
+	 * @param path {const char*} 文件全路径字符串，非空字符串
+	 * @return {string&} 当前对象的引用
+	 */
+	string& dirname(const char* path);
+
+	/**
 	 * 将 32 位有符号整数转为字符串存（内部使用了线程局部变量）
 	 * @param n {int} 32 位有符号整数
 	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量

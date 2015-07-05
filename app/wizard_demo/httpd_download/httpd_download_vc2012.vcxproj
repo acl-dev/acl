@@ -35,7 +35,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}</ProjectGuid>
+    <ProjectGuid>{1A38C49B-F712-4115-980B-6DBD632D25CF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <ProjectName>httpd_download</ProjectName>
   </PropertyGroup>

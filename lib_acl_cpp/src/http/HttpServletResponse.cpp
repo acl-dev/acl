@@ -95,6 +95,14 @@ HttpServletResponse& HttpServletResponse::setStatus(int status)
 	return *this;
 }
 
+HttpServletResponse& HttpServletResponse::setRange(
+	http_off_t from, http_off_t to, http_off_t total)
+{
+	header_->set_range(from, to);
+	header_->set_range_total(total);
+	return *this;
+}
+
 HttpServletResponse& HttpServletResponse::setCgiMode(bool on)
 {
 	header_->set_cgi_mode(on);
