@@ -142,7 +142,7 @@ public:
 #if defined(_WIN32) || defined(_WIN64)
 	bool getRange(__int64& range_from, __int64& range_to);
 #else
-	bool getRange(long long int& range_from, long long& int range_to);
+	bool getRange(long long int& range_from, long long int& range_to);
 #endif
 	/**
 	 * 获得 HTTP 请求头中 Content-Type: text/html; charset=gb2312

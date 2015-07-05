@@ -198,7 +198,7 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 
 	while (!in.eof() && length > 0)
 	{
-		size = sizeof(buf) > length ? (size_t) length : sizeof(buf);
+		size = sizeof(buf) > (size_t) length ? (size_t) length : sizeof(buf);
 		ret = in.read(buf, size, false);
 		if (ret == -1)
 		{
