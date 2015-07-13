@@ -1153,7 +1153,7 @@ void redis_command::build_request1(size_t argc, const char* argv[], size_t lens[
 		request_buf_->append(argv[i], lens[i]);
 		request_buf_->append("\r\n");
 	}
-	printf("%s:\r\n%s\r\n", __FUNCTION__, request_buf_->c_str());
+	//printf("%s:\r\n%s\r\n", __FUNCTION__, request_buf_->c_str());
 }
 
 void redis_command::build_request2(size_t argc, const char* argv[], size_t lens[])
