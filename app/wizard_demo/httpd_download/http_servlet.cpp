@@ -20,12 +20,11 @@ bool http_servlet::reply(acl::HttpServletRequest& req,
 	acl::string  buf;
 	buf.vformat(fmt, ap);
 	va_end(ap);
-	bool keep_alive = req.isKeepAlive();
 	res.setStatus(status)
-		.setKeepAlive(keep_alive)
+		.setKeepAlive(req.isKeepAlive())
 		.setContentType("text/html; charset=utf-8")
 		.setContentLength(buf.length());
-	return res.write(buf) && keep_alive;
+	return res.write(buf);
 }
 
 bool http_servlet::doError(acl::HttpServletRequest& req,
@@ -100,8 +99,6 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 	if (fsize <= 0)
 		return reply(req, res, 500, "invalid file size: %lld", fsize);
 
-	bool keep_alive = req.isKeepAlive();
-
 	acl::string hdr_entry;
 	acl::string filename;
 	filename.basename(in.file_path());  // 从文件全路径中提取文件名
@@ -109,7 +106,7 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 
 	// 设置 HTTP 响应头中的字段
 	res.setStatus(200)
-		.setKeepAlive(keep_alive)
+		.setKeepAlive(req.isKeepAlive())
 		.setContentLength(fsize)
 		.setContentType("application/octet-stream")
 		// 设置 HTTP 头中的文件名
@@ -184,8 +181,6 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 		return reply(req, res, 500, "fseek(%lld) error %s",
 			range_from, acl::last_serror());
 
-	bool keep_alive = req.isKeepAlive();
-
 	acl::string hdr_entry;
 	acl::string filename;
 	filename.basename(in.file_path());  // 从文件全路径中提取文件名
@@ -193,7 +188,7 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 
 	// 设置 HTTP 响应头中的字段
 	res.setStatus(206)			// 响应状态 206 表示部分数据
-		.setKeepAlive(keep_alive)	// 是否保持长连接
+		.setKeepAlive(req.isKeepAlive())// 是否保持长连接
 		.setContentLength(length)	// 实际要传输的数据长度
 		.setContentType("application/octet-stream")  // 数据类型
 		// 设置 HTTP 头中的文件名
@@ -236,5 +231,5 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 		return false;
 	}
 
-	return true && keep_alive;
+	return true;
 }

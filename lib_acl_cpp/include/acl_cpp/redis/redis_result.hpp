@@ -82,6 +82,15 @@ public:
 	long long int get_integer64(bool* success = NULL) const;
 
 	/**
+	 * 当返回值为 REDIS_RESULT_STRING 类型时，本方法返回对应的 double 类型值
+	 * get the double value for REDIS_RESULT_STRING result
+	 * @param success {bool*} 本指针非 NULL 时记录操作过程是否成功
+	 *  when not NULL, storing the status of success
+	 * @return {double}
+	 */
+	double get_double(bool* success = NULL) const;
+
+	/**
 	 * 当返回值为 REDIS_RESULT_STATUS 类型时，本方法返回状态信息
 	 * get operation status for REDIS_RESULT_STATUS result
 	 * @return {const char*} 返回 "" 表示出错

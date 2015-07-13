@@ -140,7 +140,7 @@ public:
 	/**
 	 * 当 HTTP 请求为 OPTION 方式时的虚函数
 	 */
-	virtual bool doOption(HttpServletRequest&, HttpServletResponse&)
+	virtual bool doOptions(HttpServletRequest&, HttpServletResponse&)
 	{
 		logger_error("child not implement doPurge yet!");
 		return false;

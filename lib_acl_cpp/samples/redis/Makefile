@@ -16,6 +16,7 @@ all:
 	@(cd redis_client_cluster; make)
 	@(cd redis_client_cluster2; make)
 	@(cd redis; make)
+	@(cd redis_geo; make)
 #	@(cd redis_server; make)
 
 clean:
@@ -36,4 +37,5 @@ clean:
 	@(cd redis_client_cluster; make clean)
 	@(cd redis_client_cluster2; make clean)
 	@(cd redis; make clean)
+	@(cd redis_geo; make clean)
 #	@(cd redis_server; make)

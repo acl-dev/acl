@@ -174,7 +174,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_LIB;_MT;USE_WIN_ICONV;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;_MT;USE_WIN_ICONV;HAS_POLARSSL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -491,6 +491,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include="src\redis\redis_cluster.cpp" />
     <ClCompile Include="src\redis\redis_command.cpp" />
     <ClCompile Include="src\redis\redis_connection.cpp" />
+    <ClCompile Include="src\redis\redis_geo.cpp" />
     <ClCompile Include="src\redis\redis_hash.cpp" />
     <ClCompile Include="src\redis\redis_hyperloglog.cpp" />
     <ClCompile Include="src\redis\redis_key.cpp" />
@@ -640,6 +641,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\redis\redis_cluster.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_command.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_connection.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_geo.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_hash.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_hyperloglog.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_key.hpp" />

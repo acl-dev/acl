@@ -11,42 +11,36 @@
 
 #endif
 
-static unsigned char hex_enc_table[] = "0123456789ABCDEF";
+static unsigned char enc_tab[] = "0123456789ABCDEF";
 
 char *acl_url_encode(const char *str)
 {
-	const char *myname = "acl_url_encode";
 	register int i, j, len, tmp_len;
 	unsigned char *tmp;
 
 	len = (int) strlen(str);
 	tmp_len = len;
-	tmp = (unsigned char*) acl_mymalloc(len+1);
-	if (tmp == NULL)
-		acl_msg_fatal("%s(%d): malloc error", myname, __LINE__);
+	tmp = (unsigned char*) acl_mymalloc(len + 1);
 
 	for (i = 0, j = 0; i < len; i++, j++) {
-		tmp[j] = (unsigned char)str[i];
+		tmp[j] = (unsigned char) str[i];
 		if (tmp[j] == ' ')
 			tmp[j] = '+';
 		else if (!isalnum(tmp[j]) && strchr("_-.", tmp[j]) == NULL) {
 			tmp_len += 3;
 			tmp = acl_myrealloc(tmp, tmp_len);
-			if (!tmp)
-				acl_msg_fatal("%s(%d): realloc error", myname, __LINE__);
 
 			tmp[j++] = '%';
-			tmp[j++] = hex_enc_table[(unsigned char)str[i] >> 4];
-			tmp[j] = hex_enc_table[(unsigned char)str[i] & 0x0F];
+			tmp[j++] = enc_tab[(unsigned char)str[i] >> 4];
+			tmp[j] = enc_tab[(unsigned char)str[i] & 0x0F];
 		}
 	}
 
 	tmp[j] = '\0';
-
-	return ((char*) tmp);
+	return (char*) tmp;
 }
 
-static unsigned char hex_dec_table[256] = {
+static unsigned char dec_tab[256] = {
 	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -67,34 +61,39 @@ static unsigned char hex_dec_table[256] = {
 
 char *acl_url_decode(const char *str)
 {
-	const char *myname = "acl_url_decode";
 	char *tmp;
 	register int i, len, pos = 0;
 
 	len = (int) strlen(str);
 	tmp = (char *) acl_mymalloc(len + 1);
-	if (tmp == NULL)
-		acl_msg_fatal("%s(%d): malloc error", myname, __LINE__);
 
 	for (i = 0; i < len; i++) {
-		/* If we found a '%' character, then the next two are the character
-		 * hexa code. Converting a hexadecimal code to their decimal is easy:
-		 * The first character needs to be multiplied by 16 ( << 4 ), and the
+		/* If we found a '%' character, then the next two are
+		 * the character hexa code. Converting a hexadecimal
+		 * code to their decimal is easy: The first character
+		 * needs to be multiplied by 16 ( << 4 ), and the
 		 * another one we just get the value from hextable variable
 		 */
-		if ((str[i] == '%') && isalnum(str[i+1]) && isalnum(str[i+2])) {
-			tmp[pos] = (hex_dec_table[(unsigned char) str[i+1]] << 4)
-				+ hex_dec_table[(unsigned char) str[i+2]];
-			i += 2;
-		} else if (str[i] == '+')
+		if (str[i] == '+')
 			tmp[pos] = ' ';
-		else
+		else if (str[i] != '%')
+			tmp[pos] = str[i];
+		else if (i + 2 >= len) {  /* check boundary */
+			tmp[pos++] = '%';  /* keep it */
+			if (++i >= len)
+				break;
+			tmp[pos] = str[i];
+			break;
+		} else if (isalnum(str[i + 1]) && isalnum(str[i + 2])) {
+			tmp[pos] = (dec_tab[(unsigned char) str[i + 1]] << 4)
+				+ dec_tab[(unsigned char) str[i + 2]];
+			i += 2;
+		} else
 			tmp[pos] = str[i];
 
 		pos++;
 	}
 
 	tmp[pos] = '\0';
-
-	return (tmp);
+	return tmp;
 }

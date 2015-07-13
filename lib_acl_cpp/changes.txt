@@ -1,6 +1,15 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+325) 2015.7.13
+325.1) sample: 增加示例 samples/redis/redis_geo 用来测试地理信息模块类 redis_geo
+
+324) 2015.7.11-12
+324.1) feature: 增加了 redis_geo 类，用于支持 redis 地理位置信息处理功能
+
+323) 2015.7.6
+323.1) feature: HttpServlet 类增加了自动判断是否需要与客户端保持长连接的方法
+
 322) 2015.7.4
 322.1) feature: http_client 类增加了 get_range 方法，用于数据断点续传过程中
 322.2) feature: HttpServletRequest 类增加了 getRange 方法用于数据断点续传过程中

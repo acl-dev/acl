@@ -144,6 +144,14 @@ public:
 	http_header& set_keep_alive(bool on);
 
 	/**
+	 * 检查当前头是否设置了保持长连接选项
+	 */
+	bool get_keep_alive() const
+	{
+		return keep_alive_;
+	}
+
+	/**
 	 * 向 HTTP 头中添加 cookie
 	 * @param name {const char*} cookie 名
 	 * @param value {const char*} cookie 值
@@ -346,7 +354,6 @@ public:
 	 */
 	http_header& set_cgi_mode(bool on);
 
-protected:
 private:
 	//char* domain_;  // HTTP 服务器域名
 	//unsigned short port_;                 // HTTP 服务器端口

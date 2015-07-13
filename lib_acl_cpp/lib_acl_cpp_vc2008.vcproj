@@ -826,6 +826,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_geo.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_hash.cpp"
 					>
 				</File>
@@ -1485,6 +1489,10 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_connection.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_geo.hpp"
 					>
 				</File>
 				<File

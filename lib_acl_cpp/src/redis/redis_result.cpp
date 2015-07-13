@@ -128,6 +128,20 @@ long long int redis_result::get_integer64(bool* success /* = NULL */) const
 	return acl_atoi64(ptr);
 }
 
+double redis_result::get_double(bool* success /* = NULL */) const
+{
+	if (success)
+		*success = false;
+	if (result_type_ != REDIS_RESULT_STRING)
+		return -1;
+	const char* ptr = get(0);
+	if (ptr == NULL || *ptr == 0)
+		return -1;
+	if (success)
+		*success = true;
+	return atof(ptr);
+}
+
 const char* redis_result::get_status() const
 {
 	if (result_type_ != REDIS_RESULT_STATUS)

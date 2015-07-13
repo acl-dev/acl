@@ -746,6 +746,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\redis\redis_connection.cpp">
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_geo.cpp">
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_hash.cpp">
 				</File>
 				<File
@@ -1269,6 +1272,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_connection.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_geo.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_hash.hpp">

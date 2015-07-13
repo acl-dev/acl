@@ -13,6 +13,7 @@
 #include "acl_cpp/redis/redis_transaction.hpp"
 #include "acl_cpp/redis/redis_zset.hpp"
 #include "acl_cpp/redis/redis_cluster.hpp"
+#include "acl_cpp/redis/redis_geo.hpp"
 
 namespace acl
 {
@@ -37,6 +38,7 @@ class ACL_CPP_API redis
 	, public redis_transaction
 	, public redis_zset
 	, public redis_cluster
+	, public redis_geo
 {
 public:
 	redis(redis_client* conn = NULL);

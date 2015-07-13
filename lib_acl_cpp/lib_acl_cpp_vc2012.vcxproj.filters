@@ -472,6 +472,9 @@
     <ClCompile Include="src\stdlib\thread_queue.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\redis\redis_geo.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -974,6 +977,9 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\thread_queue.hpp">
       <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_geo.hpp">
+      <Filter>Header Files\redis</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
