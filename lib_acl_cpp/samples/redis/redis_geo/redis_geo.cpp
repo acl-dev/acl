@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#define MAX_MEMBER	2
+#define MAX_MEMBER	1000
 
 static acl::string __keypre("geo_key");
 
@@ -75,11 +75,8 @@ static bool test_geohash(acl::redis& redis, int n)
 
 		for (size_t j = 0; j  < members.size(); j ++)
 		{
-			//printf(">> %s: %s\r\n", members[j].c_str(),
-			//	results[j].c_str());
-			printf(">>member: %s\r\n", members[j].c_str());
-			printf(">>size: %d\r\n", (int) results[j].length());
-			printf(">>result: %s\r\n", results[j].c_str());
+			printf(">> %s: %s\r\n", members[j].c_str(),
+				results[j].c_str());
 		}
 	}
 
@@ -157,7 +154,7 @@ static bool test_geodist(acl::redis& redis, int n)
 static bool test_georadius(acl::redis& redis, int n)
 {
 	acl::string key;
-	double longitude = 48, latitude = 45, radius = 10;
+	double longitude = 48, latitude = 45, radius = 10000;
 
 	for (int i = 0; i < n; i++)
 	{
@@ -185,13 +182,14 @@ static bool test_georadiusbymember(acl::redis& redis, int n)
 {
 	acl::string key;
 	double radius = 10;
-	const char* member = "member_10";
+	const char* member = "member_1";
 
 	for (int i = 0; i < n; i++)
 	{
 		key.format("%s_%d", __keypre.c_str(), i);
 		const std::vector<acl::geo_member>& members =
-			redis.georadiusbymember(key.c_str(), member, radius);
+			redis.georadiusbymember(key.c_str(), member,
+				radius, acl::GEO_UNIT_KM);
 		if (members.empty())
 			continue;
 		if (i >= 10)
