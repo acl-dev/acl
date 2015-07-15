@@ -305,7 +305,7 @@ long long int redis_script::eval_number64(const char* cmd, const char* script,
 		status.push_back(success);
 	}
 
-	return (int) size;
+	return (long long int) size;
 }
 
 int redis_script::eval_strings(const char* cmd, const char* script,
@@ -383,10 +383,10 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 	argv[1] = script;
 	lens[1] = strlen(script);
 
-	char argc_s[LONG_LEN];
-	safe_snprintf(argc_s, sizeof(argc_s), "%lu", (unsigned long) argc);
-	argv[2] = argc_s;
-	lens[2] = strlen(argc_s);
+	char buf[LONG_LEN];
+	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) keys.size());
+	argv[2] = buf;
+	lens[2] = strlen(buf);
 
 	size_t i = 3;
 	std::vector<string>::const_iterator cit = keys.begin();
@@ -428,10 +428,10 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 	argv[1] = script;
 	lens[1] = strlen(script);
 
-	char argc_s[LONG_LEN];
-	safe_snprintf(argc_s, sizeof(argc_s), "%lu", (unsigned long) argc);
-	argv[2] = argc_s;
-	lens[2] = strlen(argc_s);
+	char buf[LONG_LEN];
+	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) keys.size());
+	argv[2] = buf;
+	lens[2] = strlen(buf);
 
 	size_t i = 3;
 	std::vector<const char*>::const_iterator cit = keys.begin();
