@@ -1,6 +1,11 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+327) 2015.7.16
+327.1) bugfix: redis_comman.cpp 中的 run(redis_client_cluster*, size_t) 函数
+中，当 conf->eof() 时，若 conn = peek_conn(xxx) 返回 NULL，则应直接返回 NULL，否则
+会引起下面的空指针引用异常
+
 326) 2015.7.15
 326.1) bugfix: redis_script.cpp 中 eval_cmd 函数的 key 个数计算方式有误
 

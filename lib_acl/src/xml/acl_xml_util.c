@@ -331,6 +331,7 @@ static void xml_escape_append(ACL_VSTRING *buf, const char *src, int quoted)
 
 	if (quoted)
 		ACL_VSTRING_ADDCH(buf, '"');
+
 	while (*ptr) {
 		if (*ptr == '"' || *ptr == '\\' || *ptr == '<' || *ptr == '>')
 			ACL_VSTRING_ADDCH(buf, '\\');
@@ -355,21 +356,31 @@ ACL_VSTRING *acl_xml_build(ACL_XML *xml, ACL_VSTRING *buf)
 		node = (ACL_XML_NODE*) iter1.data;
 		if (ACL_XML_IS_COMMENT(node)) {
 			acl_vstring_strcat(buf, "<!-- ");
-			xml_escape_append(buf, STR(node->text), 0);
+			acl_vstring_strcat(buf, STR(node->text));
 		} else if ((node->flag & ACL_XML_F_META_QM)) {
-			acl_vstring_sprintf_append(buf, "<?%s ", STR(node->ltag));
+			acl_vstring_strcat(buf, "<?");
+			acl_vstring_strcat(buf, STR(node->ltag));
+			ACL_VSTRING_ADDCH(buf, ' ');
+			/*
 			if (LEN(node->text) > 0)
-				xml_escape_append(buf, STR(node->text), 0);
+				acl_vstring_strcat(buf, STR(node->text));
+			*/
 		} else if ((node->flag & ACL_XML_F_META_EM)) {
-			acl_vstring_sprintf_append(buf, "<!%s ", STR(node->ltag));
+			acl_vstring_strcat(buf, "<!");
+			acl_vstring_strcat(buf, STR(node->ltag));
+			ACL_VSTRING_ADDCH(buf, ' ');
 			if (LEN(node->text) > 0)
-				xml_escape_append(buf, STR(node->text), 0);
-		} else
-			acl_vstring_sprintf_append(buf, "<%s", STR(node->ltag));
+				acl_vstring_strcat(buf, STR(node->text));
+		} else {
+			ACL_VSTRING_ADDCH(buf, '<');
+			acl_vstring_strcat(buf, STR(node->ltag));
+		}
 
 		acl_foreach(iter2, node->attr_list) {
 			attr = (ACL_XML_ATTR*) iter2.data;
-			acl_vstring_sprintf_append(buf, " %s=", STR(attr->name));
+			ACL_VSTRING_ADDCH(buf, ' ');
+			acl_vstring_strcat(buf, STR(attr->name));
+			ACL_VSTRING_ADDCH(buf, '=');
 			xml_escape_append(buf, STR(attr->value), 1);
 		}
 
@@ -383,7 +394,11 @@ ACL_VSTRING *acl_xml_build(ACL_XML *xml, ACL_VSTRING *buf)
 			acl_vstring_strcat(buf, "-->");
 			continue;
 		}
-		if ((node->flag & ACL_XML_F_META_QM) || (node->flag & ACL_XML_F_META_EM)) {
+		if (node->flag & ACL_XML_F_META_QM) {
+			acl_vstring_strcat(buf, "?>");
+			continue;
+		}
+		if (node->flag & ACL_XML_F_META_EM) {
 			acl_vstring_strcat(buf, ">");
 			continue;
 		}
@@ -393,8 +408,11 @@ ACL_VSTRING *acl_xml_build(ACL_XML *xml, ACL_VSTRING *buf)
 			acl_vstring_sprintf_append(buf, ">%s</%s>",
 				STR(node->text), STR(node->ltag));
 
-		while (node->parent != node->xml->root && acl_xml_node_next(node) == NULL) {
-			acl_vstring_sprintf_append(buf, "</%s>", STR(node->parent->ltag));
+		while (node->parent != node->xml->root
+			&& acl_xml_node_next(node) == NULL)
+		{
+			acl_vstring_sprintf_append(buf, "</%s>",
+				STR(node->parent->ltag));
 			node = node->parent;
 		}
 	}

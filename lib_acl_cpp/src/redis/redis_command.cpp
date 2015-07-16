@@ -411,15 +411,16 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 
 			// 从连接池集群中顺序取得一个连接对象
 			conn = peek_conn(cluster, slot_);
-			if (conn != NULL)
+			if (conn == NULL)
 			{
-				last_moved = true;
-				clear(true);
-				set_client_addr(*conn);
-				continue;
+				logger_error("peek_conn NULL");
+				return result_;
 			}
 
-			last_moved = false;
+			last_moved = true;
+			clear(true);
+			set_client_addr(*conn);
+			continue;
 		}
 
 		// 将连接对象归还给连接池对象
