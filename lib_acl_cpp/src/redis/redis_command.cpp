@@ -425,7 +425,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 
 		if (result_ == NULL)
 		{
-			// 将连接对象归还给连接池对象
+			// 将旧连接对象归还给连接池对象
 			conn->get_pool()->put(conn, true);
 			logger_error("result NULL");
 
@@ -437,7 +437,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 
 		if (type == REDIS_RESULT_UNKOWN)
 		{
-			// 将连接对象归还给连接池对象
+			// 将旧连接对象归还给连接池对象
 			conn->get_pool()->put(conn, true);
 			logger_error("unknown result type: %d", type);
 
@@ -465,22 +465,25 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			return result_;
 		}
 
-		// 以下过程不再引用该次的 conn 对象，此处将连接对象归还给连接池对象
-		conn->get_pool()->put(conn, true);
-
 #define	EQ(x, y) !strncasecmp((x), (y), sizeof(y) -1)
 
 		// 对于结果类型为错误类型，则需要进一步判断是否是重定向指令
 		const char* ptr = result_->get_error();
 		if (ptr == NULL || *ptr == 0)
 		{
+			// 将旧连接对象归还给连接池对象
+			conn->get_pool()->put(conn, true);
 			logger_error("result error: null");
+
 			return result_;
 		}
 
 		// 如果出错信息为重定向指令，则执行重定向过程
 		if (EQ(ptr, "MOVED"))
 		{
+			// 将旧连接对象归还给连接池对象
+			conn->get_pool()->put(conn, true);
+
 			const char* addr = get_addr(ptr);
 			if (addr == NULL)
 			{
@@ -515,6 +518,9 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 		}
 		else if (EQ(ptr, "ASK"))
 		{
+			// 将旧连接对象归还给连接池对象
+			conn->get_pool()->put(conn, true);
+
 			const char* addr = get_addr(ptr);
 			if (addr == NULL)
 			{
@@ -573,20 +579,26 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 				acl_doze(redirect_sleep_);
 			}
 
+			// 将旧连接对象归还给连接池对象
+			conn->get_pool()->put(conn, true);
+
 			conn = peek_conn(cluster, -1);
 			if (conn == NULL)
 			{
 				logger_error("peek_conn NULL");
 				return result_;
 			}
-			clear(true);
 
+			clear(true);
 			set_client_addr(*conn);
 		}
 
 		// 对于其它错误类型，则直接返回本次得到的响应结果对象
 		else
 		{
+			// 将旧连接对象归还给连接池对象
+			conn->get_pool()->put(conn, true);
+
 			logger_error("server error: %s", ptr);
 			return result_;
 		}
