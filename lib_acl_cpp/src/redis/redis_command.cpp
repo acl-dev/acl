@@ -423,13 +423,12 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			continue;
 		}
 
-		// 将连接对象归还给连接池对象
-		else
-			conn->get_pool()->put(conn, true);
-
 		if (result_ == NULL)
 		{
+			// 将连接对象归还给连接池对象
+			conn->get_pool()->put(conn, true);
 			logger_error("result NULL");
+
 			return NULL;
 		}
 
@@ -438,7 +437,10 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 
 		if (type == REDIS_RESULT_UNKOWN)
 		{
+			// 将连接对象归还给连接池对象
+			conn->get_pool()->put(conn, true);
 			logger_error("unknown result type: %d", type);
+
 			return NULL;
 		}
 
@@ -446,13 +448,25 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 		{
 			// 如果发生重定向过程，则设置哈希槽对应 redis 服务地址
 			if (slot_ < 0 || !last_moved)
+			{
+				// 将连接对象归还给连接池对象
+				conn->get_pool()->put(conn, true);
 				return result_;
+			}
 
+			// XXX: 因为此处还要引用一次 conn 对象，所以将 conn
+			// 归还给连接池的过程须放在此段代码之后
 			const char* addr = conn->get_pool()->get_addr();
 			cluster->set_slot(slot_, addr);
 
+			// 将连接对象归还给连接池对象
+			conn->get_pool()->put(conn, true);
+
 			return result_;
 		}
+
+		// 以下过程不再引用该次的 conn 对象，此处将连接对象归还给连接池对象
+		conn->get_pool()->put(conn, true);
 
 #define	EQ(x, y) !strncasecmp((x), (y), sizeof(y) -1)
 

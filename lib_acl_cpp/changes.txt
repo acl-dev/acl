@@ -1,8 +1,12 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+328) 2015.7.19
+328.1) bugfix: redis_command.cpp 中的 run(redis_client_cluster*, size_t) 函数
+中可能存在当 conn 对象被释放后再次非法引用的情形，现在将该对象的释放放在引用的代码之后
+
 327) 2015.7.16
-327.1) bugfix: redis_comman.cpp 中的 run(redis_client_cluster*, size_t) 函数
+327.1) bugfix: redis_command.cpp 中的 run(redis_client_cluster*, size_t) 函数
 中，当 conf->eof() 时，若 conn = peek_conn(xxx) 返回 NULL，则应直接返回 NULL，否则
 会引起下面的空指针引用异常
 
