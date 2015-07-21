@@ -26,9 +26,10 @@ int main(void)
 
 	int age = 20;
 	query.create_sql("update table set name=:name, age=%d"
-		", home=:home where nick=:name", age)
+		", home=:home where nick=:name and price=:price", age)
 		.set_parameter("name", "zsx1&xsz1")
-		.set_parameter("home", "回龙观");
+		.set_parameter("home", "回龙观")
+		.set_parameter("price", 1.00212, 6);
 	printf("sql: %s\r\n", query.to_string().c_str());
 
 	query.reset();

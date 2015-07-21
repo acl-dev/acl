@@ -61,17 +61,19 @@ public:
 	 * 设置单精度浮点类型的变量值
 	 * @param name {const char*} 变量名
 	 * @param value {float} 单精度浮点类型
+	 * @param precision {int} 尾数的精度值
 	 * @return {query&}
 	 */
-	query& set_parameter(const char* name, float value);
+	query& set_parameter(const char* name, float value, int precision = 8);
 
 	/**
 	 * 设置双精度浮点类型的变量值
 	 * @param name {const char*} 变量名
 	 * @param value {double} 双精度浮点类型
+	 * @param precision {int} 尾数的精度值
 	 * @return {query&}
 	 */
-	query& set_parameter(const char* name, double value);
+	query& set_parameter(const char* name, double value, int precision = 8);
 
 	/**
 	 * 设置 64 位短整类型的变量值
@@ -161,6 +163,7 @@ private:
 	{
 		char type;
 		int  dlen;
+		int  precision;
 		union
 		{
 			char  c;
