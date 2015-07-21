@@ -3,6 +3,7 @@
 ------------------------------------------------------------------------
 329) 2015.7.21
 329.1) feature: db 模块的查询类 query 添加了 double/float 类型
+329.2) perfomance: dbuf_pool 类对象也创建在内存池上，从而再次减少 malloc/free 调用
 
 328) 2015.7.19
 328.1) bugfix: redis_command.cpp 中的 run(redis_client_cluster*, size_t) 函数

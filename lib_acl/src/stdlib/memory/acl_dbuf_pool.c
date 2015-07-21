@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include "stdlib/acl_sys_patch.h"
 #include "stdlib/acl_mymalloc.h"
+#include "stdlib/acl_msg.h"
 #include "stdlib/acl_dbuf_pool.h"
 
 #endif
@@ -88,7 +89,7 @@ void acl_dbuf_pool_destroy(ACL_DBUF_POOL *pool)
 #endif
 }
 
-void acl_dbuf_pool_reset(ACL_DBUF_POOL *pool)
+void acl_dbuf_pool_reset(ACL_DBUF_POOL *pool, size_t off)
 {
 	ACL_DBUF *iter = pool->head, *tmp;
 
@@ -105,7 +106,13 @@ void acl_dbuf_pool_reset(ACL_DBUF_POOL *pool)
 	}
 	pool->head = (ACL_DBUF*) pool->buf_addr;
 	pool->head->next = NULL;
-	pool->head->ptr = pool->head->buf_addr;
+
+	if (pool->head->buf_addr + off >= (char*) pool + pool->block_size)
+		acl_msg_fatal("%s(%d) off(%ld) too big, should < %ld",
+			__FUNCTION__, __LINE__, (long) off, (char*) pool
+			+ pool->block_size - pool->head->buf_addr);
+
+	pool->head->ptr = pool->head->buf_addr + off;
 }
 
 static ACL_DBUF *acl_dbuf_alloc(ACL_DBUF_POOL *pool, size_t length)

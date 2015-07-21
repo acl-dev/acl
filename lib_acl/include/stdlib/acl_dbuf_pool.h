@@ -9,7 +9,7 @@ typedef struct ACL_DBUF_POOL ACL_DBUF_POOL;
 
 /* public */
 ACL_API ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size);
-ACL_API void acl_dbuf_pool_reset(ACL_DBUF_POOL *pool);
+ACL_API void acl_dbuf_pool_reset(ACL_DBUF_POOL *pool, size_t off);
 ACL_API void acl_dbuf_pool_destroy(ACL_DBUF_POOL *pool);
 ACL_API void *acl_dbuf_pool_alloc(ACL_DBUF_POOL *pool, size_t length);
 ACL_API void *acl_dbuf_pool_calloc(ACL_DBUF_POOL *pool, size_t length);

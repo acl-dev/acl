@@ -443,7 +443,7 @@ void acl_json_reset(ACL_JSON *json)
 	acl_dbuf_pool_destroy(json->dbuf);
 	json->dbuf = acl_dbuf_pool_create(81920);
 #else
-	acl_dbuf_pool_reset(json->dbuf);
+	acl_dbuf_pool_reset(json->dbuf, 0);
 #endif
 
 	json->root = acl_json_node_alloc(json);
