@@ -113,7 +113,7 @@ acl_int64 db_row::field_int64(const char* name, acl_int64 null_value /* = 0 */) 
 		return ACL_DB_ATOU(ptr);
 }
 
-double db_row::field_double(size_t ifield, double null_value /* = 0 */) const
+double db_row::field_double(size_t ifield, double null_value /* = 0.0 */) const
 {
 	const char* ptr = field_value(ifield);
 	if (ptr == NULL)
@@ -122,7 +122,7 @@ double db_row::field_double(size_t ifield, double null_value /* = 0 */) const
 		return atof(ptr);
 }
 
-double db_row::field_double(const char* name, double null_value /* = 0 */) const
+double db_row::field_double(const char* name, double null_value /* = 0.0 */) const
 {
 	const char* ptr = field_value(name);
 	if (ptr == NULL)

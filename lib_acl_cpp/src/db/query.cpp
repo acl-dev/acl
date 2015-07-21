@@ -156,8 +156,7 @@ query& query::set_parameter(const char* name, char value)
 	key.lower();
 	del_param(key);
 
-	query_param* param = (query_param*)
-		acl_mymalloc(sizeof(query_param));
+	query_param* param = (query_param*) acl_mymalloc(sizeof(query_param));
 	param->type = DB_PARAM_CHAR;
 	param->v.c = value;
 	param->dlen = sizeof(char);
@@ -172,8 +171,7 @@ query& query::set_parameter(const char* name, short value)
 	key.lower();
 	del_param(key);
 
-	query_param* param = (query_param*)
-		acl_mymalloc(sizeof(query_param));
+	query_param* param = (query_param*) acl_mymalloc(sizeof(query_param));
 	param->type = DB_PARAM_SHORT;
 	param->v.s = value;
 	param->dlen = sizeof(short);
@@ -188,8 +186,7 @@ query& query::set_parameter(const char* name, int value)
 	key.lower();
 	del_param(key);
 
-	query_param* param = (query_param*)
-		acl_mymalloc(sizeof(query_param));
+	query_param* param = (query_param*) acl_mymalloc(sizeof(query_param));
 	param->type = DB_PARAM_INT32;
 	param->v.n = value;
 	param->dlen = sizeof(int);
@@ -204,11 +201,40 @@ query& query::set_parameter(const char* name, acl_int64 value)
 	key.lower();
 	del_param(key);
 
-	query_param* param = (query_param*)
-		acl_mymalloc(sizeof(query_param));
+	query_param* param = (query_param*) acl_mymalloc(sizeof(query_param));
 	param->type = DB_PARAM_INT64;
 	param->v.l = value;
 	param->dlen = sizeof(long long int);
+
+	params_[key] = param;
+	return *this;
+}
+
+query& query::set_parameter(const char* name, float value)
+{
+	string key(name);
+	key.lower();
+	del_param(key);
+
+	query_param* param = (query_param*) acl_mymalloc(sizeof(query_param));
+	param->type = DB_PARAM_FLOAT;
+	param->v.f = value;
+	param->dlen = sizeof(float);
+
+	params_[key] = param;
+	return *this;
+}
+
+query& query::set_parameter(const char* name, double value)
+{
+	string key(name);
+	key.lower();
+	del_param(key);
+
+	query_param* param = (query_param*) acl_mymalloc(sizeof(query_param));
+	param->type = DB_PARAM_DOUBLE;
+	param->v.d = value;
+	param->dlen = sizeof(double);
 
 	params_[key] = param;
 	return *this;

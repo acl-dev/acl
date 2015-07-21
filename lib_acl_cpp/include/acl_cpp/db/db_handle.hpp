@@ -99,8 +99,21 @@ public:
 	long long int field_int64(const char* name, long long int null_value = 0) const;
 #endif
 
-	double field_double(size_t ifield, double null_value = 0) const;
-	double field_double(const char* name, double null_value = 0) const;
+	/**
+	 * 从查询结果的记录行中取得字段名的浮点类型的字段值
+	 * @param ifield {size_t} 下标值
+	 * @param null_value {double} 当结果为空时，返回此值表示未有相应结果
+	 * @return {double} 当返回值与用户输入的 null_value 值相同时表明没有查到结果
+	 */
+	double field_double(size_t ifield, double null_value = 0.0) const;
+
+	/**
+	 * 从查询结果的记录行中取得字段名的浮点类型的字段值
+	 * @param name {const char*} 下标值
+	 * @param null_value {double} 当结果为空时，返回此值表示未有相应结果
+	 * @return {double} 当返回值与用户输入的 null_value 值相同时表明没有查到结果
+	 */
+	double field_double(const char* name, double null_value = 0.0) const;
 
 	/**
 	 * 从查询结果的记录行中取得对应下标的字符串类型的字段值
@@ -127,7 +140,7 @@ public:
 	 * @return {size_t}
 	 */
 	size_t length() const;
-protected:
+
 private:
 	// 数据表的字段名集合的引用
 	const std::vector<const char*>& names_;
@@ -181,6 +194,7 @@ public:
 	 * @return {size_t} 行记录个数
 	 */
 	size_t length() const;
+
 protected:
 	// 数据表字段名
 	std::vector<const char*> names_;
@@ -191,7 +205,6 @@ protected:
 
 	// 临时结果行集合
 	std::vector<const db_row*> rows_tmp_;
-private:
 };
 
 class db_pool;
@@ -404,6 +417,7 @@ public:
 	{
 		return when_;
 	}
+
 protected:
 	// 临时结果对象
 	db_rows* result_;
