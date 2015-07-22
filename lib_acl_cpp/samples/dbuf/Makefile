@@ -1,4 +1,5 @@
 UTIL = $(wildcard ../*.cpp)
+base_path = ../..
 PROG = dbuf
-include ../Makefile.in
 CFLAGS += -I../
+include ../Makefile.in

@@ -101,7 +101,7 @@ redis_command::~redis_command()
 		acl_myfree(argv_lens_);
 	delete request_buf_;
 	delete request_obj_;
-	delete pool_;
+	pool_->destroy();
 }
 
 void redis_command::reset(bool save_slot /* = false */)

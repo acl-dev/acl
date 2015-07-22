@@ -12,6 +12,11 @@ dbuf_pool::~dbuf_pool()
 {
 }
 
+void dbuf_pool::destroy()
+{
+	delete this;
+}
+
 void *dbuf_pool::operator new(size_t size)
 {
 	ACL_DBUF_POOL* pool = acl_dbuf_pool_create(8192);
