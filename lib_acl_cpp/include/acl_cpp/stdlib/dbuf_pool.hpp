@@ -14,8 +14,16 @@ namespace acl
 class ACL_CPP_API dbuf_pool
 {
 public:
+	/**
+	 * 该类对象必须动态创建
+	 */
 	dbuf_pool();
-	~dbuf_pool();
+
+	/**
+	 * 该类对象必须要动态创建，所以隐藏了析构函数，使用者需要调用 destroy
+	 * 函数来销毁动态对象
+	 */
+	void destroy();
 
 	/**
 	 * 重载了 new/delete 操作符，在 new dbuf_pool 对象时，使之创建在内存池上，
@@ -63,6 +71,8 @@ public:
 private:
 	ACL_DBUF_POOL* pool_;
 	size_t mysize_;
+
+	~dbuf_pool();
 };
 
 } // namespace acl
