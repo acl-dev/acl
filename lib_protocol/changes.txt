@@ -1,5 +1,8 @@
 修改历史列表：
 ------------------------------------------------------------------------
+256) 2015.7.23
+256.1) compile: 去掉了 -pedantic 编译选项，因为其与 __FUNCTION__ 冲突
+
 255) 2015.7.2
 255.1) bugfix: http_hdr.c 中的函数 http_hdr_print/http_hdr_fprint/http_hdr_sprint
 应过滤掉被禁掉的 HTTP 部字段
