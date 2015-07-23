@@ -20,6 +20,7 @@ CFLAGS = -c -g -W \
 -D_USE_FAST_MACRO \
 -Wno-long-long
 
+#-pedantic
 # -Wcast-align
 #CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 #-Waggregate-return -Wmissing-prototypes \
@@ -54,7 +55,7 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD -pedantic -fPIC -Werror
+	CFLAGS += -DFREEBSD -fPIC -Werror
 	UNIXTYPE = FREEBSD
 endif
 
@@ -67,7 +68,7 @@ endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	CFLAGS += -DLINUX2 -pedantic -fPIC -Werror
+	CFLAGS += -DLINUX2 -fPIC -Werror
 	UNIXTYPE = LINUX
 endif
 
@@ -85,7 +86,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
 		SYSLIB = -lsocket -lnsl -lrt
 	endif
-	CFLAGS += -DSUNOS5 -pedantic -fPIC -Werror
+	CFLAGS += -DSUNOS5 -fPIC -Werror
 	UNIXTYPE = SUNOS5
 endif
 
