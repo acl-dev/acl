@@ -51,6 +51,12 @@ typedef enum
 	// Content-Type: application/octet-stream
 	HTTP_REQUEST_OCTET_STREAM,
 
+	// Content-Type: text/xml
+	HTTP_REQUEST_TEXT_XML,
+
+	// Content-Type: text/json
+	HTTP_REQUEST_TEXT_JSON,
+
 	// 其它类型
 	HTTP_REQUEST_OTHER
 } http_request_t;

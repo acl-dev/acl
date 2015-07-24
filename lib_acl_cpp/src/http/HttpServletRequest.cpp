@@ -6,6 +6,8 @@
 #include "acl_cpp/session/session.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stdlib/charset_conv.hpp"
+#include "acl_cpp/stdlib/xml.hpp"
+#include "acl_cpp/stdlib/json.hpp"
 #include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/http/HttpCookie.hpp"
 #include "acl_cpp/http/http_client.hpp"
@@ -34,6 +36,8 @@ HttpServletRequest::HttpServletRequest(HttpServletResponse& res, session& store,
 , method_(HTTP_METHOD_UNKNOWN)
 , request_type_(HTTP_REQUEST_NORMAL)
 , mime_(NULL)
+, json_(NULL)
+, xml_(NULL)
 , readHeaderCalled_(false)
 {
 	ACL_SAFE_STRNCPY(cookie_name_, "ACL_SESSION_ID", sizeof(cookie_name_));
@@ -64,6 +68,8 @@ HttpServletRequest::~HttpServletRequest(void)
 		acl_myfree(*it1);
 	}
 	delete mime_;
+	delete json_;
+	delete xml_;
 	delete http_session_;
 }
 
@@ -418,6 +424,16 @@ http_mime* HttpServletRequest::getHttpMime(void) const
 	return mime_;
 }
 
+json* HttpServletRequest::getJson(void) const
+{
+	return json_;
+}
+
+xml* HttpServletRequest::getXml(void) const
+{
+	return xml_;
+}
+
 http_request_t HttpServletRequest::getRequestType(void) const
 {
 	return request_type_;
@@ -551,67 +567,126 @@ bool HttpServletRequest::readHeader(void)
 	if (ptr && *ptr)
 		parseParameters(ptr);
 
-	if (method_ == HTTP_METHOD_GET)
-		request_type_ = HTTP_REQUEST_NORMAL;
-	else if (method_ == HTTP_METHOD_POST)
+	if (method_ != HTTP_METHOD_POST)
 	{
-		acl_int64 len = getContentLength();
-		if (len < -1)
-			return false;
-		if (len == 0)
-		{
-			request_type_ = HTTP_REQUEST_NORMAL;
-			return true;
-		}
-
-		const char* ctype = getContentType();
-		const char* stype = content_type_.get_stype();
-
-		// 数据体为文件上传的 MIME 类型
-		if (ctype == NULL)
-			request_type_ = HTTP_REQUEST_OTHER;
-		else if (strcasecmp(ctype, "multipart") == 0
-			&& strcasecmp(stype, "form-data") == 0)
-		{
-			const char* bound = content_type_.get_bound();
-			if (bound == NULL)
-				request_type_ = HTTP_REQUEST_NORMAL;
-			else
-			{
-				request_type_ = HTTP_REQUEST_MULTIPART_FORM;
-				mime_ = NEW http_mime(bound, localCharset_);
-			}
-		}
-
-		// 数据体为数据流类型
-		else if (strcasecmp(ctype, "application") == 0
-			&& strcasecmp(stype, "octet-stream") == 0)
-		{
-			request_type_ = HTTP_REQUEST_OCTET_STREAM;
-		}
-
-		// 数据体为普通的 name=value 类型
-		else if (body_parse_)
-		{
-			if (len >= body_limit_)
-				return false;
-
-			request_type_ = HTTP_REQUEST_NORMAL;
-
-			char* query = (char*) acl_mymalloc((size_t) len + 1);
-			int ret = getInputStream().read(query, (size_t) len);
-			if (ret > 0)
-			{
-				query[ret] = 0;
-				parseParameters(query);
-			}
-			acl_myfree(query);
-			return ret == -1 ? false : true;
-		}
-		else
-			request_type_ = HTTP_REQUEST_OTHER;
+		request_type_ = HTTP_REQUEST_NORMAL;
+		return true;
 	}
 
+	acl_int64 len = getContentLength();
+	if (len < -1)
+		return false;
+	if (len == 0)
+	{
+		request_type_ = HTTP_REQUEST_NORMAL;
+		return true;
+	}
+
+	const char* ctype = getContentType();
+	const char* stype = content_type_.get_stype();
+
+	// 数据体为文件上传的 MIME 类型
+	if (ctype == NULL || stype == NULL)
+	{
+		request_type_ = HTTP_REQUEST_OTHER;
+		return true;
+	}
+
+#define EQ	!strcasecmp
+
+	// 当数据体为 HTTP MIME 上传数据时
+	if (EQ(ctype, "multipart") && EQ(stype, "form-data"))
+	{
+		const char* bound = content_type_.get_bound();
+		if (bound == NULL)
+			request_type_ = HTTP_REQUEST_NORMAL;
+		else
+		{
+			request_type_ = HTTP_REQUEST_MULTIPART_FORM;
+			mime_ = NEW http_mime(bound, localCharset_);
+		}
+
+		return true;
+	}
+
+	// 数据体为数据流类型
+	if (EQ(ctype, "application") && EQ(stype, "octet-stream"))
+	{
+		request_type_ = HTTP_REQUEST_OCTET_STREAM;
+		return true;
+	}
+
+	// 数据体为普通的 name=value 类型
+	if (!body_parse_)
+	{
+		request_type_ = HTTP_REQUEST_OTHER;
+		return true;
+	}
+
+	// 如果需要分析数据体的参数时的数据体长度过大，则直接返回错误
+	if (body_limit_ > 0 && len >= body_limit_)
+		return false;
+
+	// 当数据体为 form 格式时：
+	if (EQ(ctype, "application") && EQ(stype, "x-www-form-urlencoded"))
+	{
+		request_type_ = HTTP_REQUEST_NORMAL;
+		char* query = (char*) acl_mymalloc((size_t) len + 1);
+		int ret = getInputStream().read(query, (size_t) len);
+		if (ret > 0)
+		{
+			query[ret] = 0;
+			parseParameters(query);
+		}
+		acl_myfree(query);
+		return ret == -1 ? false : true;
+	}
+
+	// 当数据类型为 text/json 格式时：
+	if (EQ(ctype, "text") && EQ(stype, "json"))
+	{
+		request_type_ = HTTP_REQUEST_TEXT_JSON;
+		json_ = NEW json();
+		char buf[8192];
+		acl_int64  n;
+		istream& in = getInputStream();
+		while (len > 0)
+		{
+			n = sizeof(buf) - 1 > len ? len : sizeof(buf) - 1;
+			n = in.read(buf, (size_t) n);
+			if (n == -1)
+				return false;
+
+			buf[n] = 0;
+			json_->update(buf);
+			len -= n;
+		}
+		return true;
+	}
+
+	// 当数据类型为 text/xml 格式时：
+	if (EQ(ctype, "text") && EQ(stype, "xml"))
+	{
+		request_type_ = HTTP_REQUEST_TEXT_XML;
+		xml_ = NEW xml();
+		char buf[8192];
+		acl_int64  n;
+		istream& in = getInputStream();
+		while (len > 0)
+		{
+			n = sizeof(buf) - 1 > len ? len : sizeof(buf) - 1;
+			n = in.read(buf, (size_t) n);
+			if (n == -1)
+				return false;
+
+			buf[n] = 0;
+			xml_->update(buf);
+			len -= n;
+		}
+		return true;
+	}
+
+	request_type_ = HTTP_REQUEST_OTHER;
 	return true;
 }
 

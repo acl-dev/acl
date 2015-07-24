@@ -47,7 +47,8 @@ public:
 	/**
 	 * 针对 POST 方法，该方法设置解析数据体的最大长度，如果数据体，该函数必须在 doRun
 	 * 之前调用才有效
-	 * @param length {int} 最大长度限制，如果请求的数据体长度过大，则直接返回 false
+	 * @param length {int} 最大长度限制，如果请求的数据体长度过大，则直接返回
+	 *  false，如果该值 <= 0 则内部不限制数据体长度，调用该函数前内部缺省值为 0
 	 * @return {HttpServlet&}
 	 */
 	HttpServlet& setParseBodyLimit(int length);

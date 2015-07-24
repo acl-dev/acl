@@ -12,6 +12,8 @@ class ostream;
 class socket_stream;
 class http_client;
 class http_mime;
+class json;
+class xml;
 class session;
 class HttpSession;
 class HttpCookie;
@@ -222,6 +224,26 @@ public:
 	http_mime* getHttpMime(void) const;
 
 	/**
+	 * 数据类型为 text/json 格式构造函数中的 body_parse 为 true 时，则内部自动
+	 * 解析数据并创建 json 对象
+	 * @return {json*} 返回解析好的 json 对象，若返回 NULL 则有以下几个原因：
+	 *  1、读数据出错
+	 *  2、非 json 数据格式
+	 *  3、body_parse 在构造函数中设置的为 false
+	 */
+	json* getJson(void) const;
+
+	/**
+	 * 数据类型为 text/xml 格式构造函数中的 body_parse 为 true 时，则内部自动
+	 * 解析数据并创建 xml 对象
+	 * @return {xml*} 返回解析好的 xml 对象，若返回 NULL 则有以下几个原因：
+	 *  1、读数据出错
+	 *  2、非 xml 数据格式
+	 *  3、body_parse 在构造函数中设置的为 false
+	 */
+	xml* getXml(void) const;
+
+	/**
 	 * 获得 HTTP 请求数据的类型
 	 * @return {http_request_t}，一般对 POST 方法中的上传
 	 *  文件应用而言，需要调用该函数获得是否是上传数据类型，
@@ -304,6 +326,8 @@ private:
 	std::vector<HTTP_PARAM*> params_;
 	http_request_t request_type_;
 	http_mime* mime_;
+	json* json_;
+	xml* xml_;
 
 	bool readHeaderCalled_;
 	bool readHeader(void);
