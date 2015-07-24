@@ -647,19 +647,20 @@ bool HttpServletRequest::readHeader(void)
 	{
 		request_type_ = HTTP_REQUEST_TEXT_JSON;
 		json_ = NEW json();
-		char buf[8192];
-		acl_int64  n;
+		ssize_t dlen = (ssize_t) len, n;
+		char  buf[8192];
 		istream& in = getInputStream();
-		while (len > 0)
+		while (dlen > 0)
 		{
-			n = sizeof(buf) - 1 > len ? len : sizeof(buf) - 1;
+			n = (ssize_t) sizeof(buf) - 1 > dlen
+				? dlen : (ssize_t) sizeof(buf) - 1;
 			n = in.read(buf, (size_t) n);
 			if (n == -1)
 				return false;
 
 			buf[n] = 0;
 			json_->update(buf);
-			len -= n;
+			dlen -= n;
 		}
 		return true;
 	}
@@ -669,19 +670,20 @@ bool HttpServletRequest::readHeader(void)
 	{
 		request_type_ = HTTP_REQUEST_TEXT_XML;
 		xml_ = NEW xml();
-		char buf[8192];
-		acl_int64  n;
+		ssize_t dlen = (ssize_t) len, n;
+		char  buf[8192];
 		istream& in = getInputStream();
-		while (len > 0)
+		while (dlen > 0)
 		{
-			n = sizeof(buf) - 1 > len ? len : sizeof(buf) - 1;
+			n = (ssize_t) sizeof(buf) - 1 > dlen
+				? dlen : (ssize_t) sizeof(buf) - 1;
 			n = in.read(buf, (size_t) n);
 			if (n == -1)
 				return false;
 
 			buf[n] = 0;
 			xml_->update(buf);
-			len -= n;
+			dlen -= n;
 		}
 		return true;
 	}
