@@ -56,6 +56,9 @@ static void test_redis_key(acl::redis_key& cmd, const char* key)
 
 int main()
 {
+	// init socket module for windows
+	acl::acl_cpp_init();
+
 	const char* redis_addr = "127.0.0.1:6379";
 	int conn_timeout = 10, rw_timeout = 10;
 
