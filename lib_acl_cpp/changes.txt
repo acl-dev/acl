@@ -1,6 +1,10 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+332) 2015.7.30
+332.1) bugfix: redis_command::redirect() 函数内当 cluster->peek() 返回 NULL
+时应该直接返回 NULL
+
 331) 2015.7.25
 331.1) feature: HttpServletRequest 类增加了直接提出 xml 和 json 对象的方法
 

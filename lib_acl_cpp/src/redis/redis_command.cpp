@@ -328,6 +328,12 @@ redis_client* redis_command::redirect(redis_client_cluster* cluster,
 
 		conns->set_alive(false);
 		conns = (redis_client_pool*) cluster->peek();
+		if (conns == NULL)
+		{
+			logger_error("no connections availabble, "
+				"i: %d, addr: %s", i, addr);
+			return NULL;
+		}
 	}
 
 	logger_warn("too many retry: %d, addr: %s", i, addr);
