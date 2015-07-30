@@ -84,6 +84,9 @@ static void test_disque(acl::disque& cmd)
 
 int main()
 {
+	// init socket module for windows
+	acl::acl_cpp_init();
+
 	const char* disque_addr = "127.0.0.1:7711";
 	int conn_timeout = 10, rw_timeout = 10;
 
@@ -114,6 +117,9 @@ static void* thread_main(void* arg)
 
 int main(void)
 {
+	// init socket module for windows
+	acl::acl_cpp_init();
+
 	int conn_timeout = 10, rw_timeout = 10;
 
 	// declare disque cluster ojbect

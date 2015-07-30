@@ -78,6 +78,9 @@ int main()
 ```c++
 int main(void)
 {
+	// init socket module for windows
+	acl::acl_cpp_init();
+
 	const char* redis_addr = "127.0.0.1:6379";
 	int conn_timeout = 10, rw_timeout = 10, max_conns = 100;
 
@@ -143,6 +146,9 @@ static void test_redis_key(acl::redis& cmd, const char* key)
 
 int main(void)
 {
+	// init socket module for windows
+	acl::acl_cpp_init();
+
 	const char* redis_addr = "127.0.0.1:6379";
 	int conn_timeout = 10, rw_timeout = 10, max_conns = 100;
 
@@ -188,6 +194,9 @@ static void* thread_main(void* arg)
 
 int main(void)
 {
+	// init socket module for windows
+	acl::acl_cpp_init();
+
 	const char* redis_addr = "127.0.0.1:6379";
 	int conn_timeout = 10, rw_timeout = 10;
 
