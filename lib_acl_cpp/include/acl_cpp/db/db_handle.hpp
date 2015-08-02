@@ -245,10 +245,10 @@ public:
 
 	/**
 	 * 纯虚接口，子类必须实现此接口用于打开数据库
-	 * @param local_charset {const char*} 本地字符集(GBK, UTF8, ...)
+	 * @param local_charset {const char*} 本地字符集(gbk, utf8, ...)
 	 * @return {bool} 打开是否成功
 	 */
-	virtual bool open(const char* local_charset = "GBK") = 0;
+	virtual bool open(const char* local_charset = "utf8") = 0;
 
 	/**
 	 * 数据库是否已经打开了
@@ -417,6 +417,17 @@ public:
 	{
 		return when_;
 	}
+
+	/**
+	 * 当采用动态加载方式加载动态库时，可以使用此函数设置动态库的加载全路径
+	 */
+	static void set_loadpath(const char* path);
+
+	/**
+	 * 当设置了动态库的动态加载全路径时，可以通过本函数获得动态库加载全路径
+	 * @return {const char*} 当未设置时则返回 NULL
+	 */
+	static const char* get_loadpath();
 
 protected:
 	// 临时结果对象

@@ -29,6 +29,9 @@ static bool db_create(const char* dbaddr, const char* dbname,
 		return false;
 	}
 
+	printf("mysqlclient lib's version: %ld, info: %s\r\n",
+		db.mysql_libversion(), db.mysql_client_info());
+
 	acl::string sql;
 	sql.format("use mysql");
 	if (db.sql_update(sql.c_str()) == false)
@@ -77,6 +80,9 @@ static bool tbl_create(const char* dbaddr, const char* dbname,
 			dbaddr, dbuser, dbpass);
 		return false;
 	}
+
+	printf("mysqlclient lib's version: %ld, info: %s\r\n",
+		db.mysql_libversion(), db.mysql_client_info());
 
 	if (db.tbl_exists("group_tbl"))
 	{
@@ -229,6 +235,99 @@ static bool tbl_delete(acl::db_handle& db, int n)
 	return (true);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
+class db_thread : public acl::thread
+{
+public:
+	db_thread(acl::db_pool& dp, int max) : pool_(dp), max_(max) {}
+	~db_thread() {}
+
+protected:
+	void* run()
+	{
+		int n = 0;
+
+		for (int i = 0; i < max_; i++)
+		{
+			acl::db_handle* db = pool_.peek_open();
+			if (db == NULL)
+			{
+				printf("peek db connection error\r\n");
+				break;
+			}
+
+			bool ret = tbl_insert(*db, i);
+			if (ret)
+			{
+				printf(">>insert ok: i=%d, affected: %d\r",
+					i, db->affect_count());
+				n++;
+			}
+			else
+				printf(">>insert error: i = %d\r\n", i);
+
+			pool_.put(db);
+		}
+		printf("\r\n");
+		printf(">>insert total: %d\r\n", n);
+
+		n = 0;
+		// 批量查询数据
+		for (int i = 0; i < max_; i++)
+		{
+			acl::db_handle* db = pool_.peek_open();
+			if (db == NULL)
+			{
+				printf("peek db connection error\r\n");
+				break;
+			}
+
+			int  ret = tbl_select(*db, i);
+			if (ret >= 0)
+			{
+				n += ret;
+				printf(">>select ok: i=%d, ret=%d\r", i, ret);
+			}
+			else
+				printf(">>select error: i = %d\r\n", i);
+
+			pool_.put(db);
+		}
+		printf("\r\n");
+		printf(">>select total: %d\r\n", n);
+
+		// 批量删除数据
+		for (int i = 0; i < max_; i++)
+		{
+			acl::db_handle* db = pool_.peek_open();
+			if (db == NULL)
+			{
+				printf("peek db connection error\r\n");
+				break;
+			}
+
+			bool ret = tbl_delete(*db, i);
+			if (ret)
+				printf(">>delete ok: %d, affected: %d\r",
+					i, (int) db->affect_count());
+			else
+				printf(">>delete error: i = %d\r\n", i);
+
+			pool_.put(db);
+		}
+		printf("\r\n");
+
+		return NULL;
+	}
+
+private:
+	acl::db_pool& pool_;
+	int   max_;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
 int main(void)
 {
 	// WIN32 下需要调用此函数进行有关 SOCKET 的初始化
@@ -318,70 +417,47 @@ int main(void)
 
 	//////////////////////////////////////////////////////////////////////
 
-	acl::db_mysql db(dbaddr, dbname, dbuser, dbpass);
-	int   max = 100;
-
-	// 先打开数据库连接
-	if (db.open() == false)
-	{
-		printf("open db(%s@%s) error\r\n",
-			dbaddr.c_str(), dbname.c_str());
-		getchar();
-		return 1;
-	}
-
-	printf("open db %s ok\r\n", dbname.c_str());
 	out.puts("Enter any key to continue ...");
 	(void) in.gets(line);
 
-	// 批量添加数据
-	for (int i = 0; i < max; i++)
-	{
-		bool ret = tbl_insert(db, i);
-		if (ret)
-			printf(">>insert ok: i=%d, affected: %d\r",
-				i, db.affect_count());
-		else
-			printf(">>insert error: i = %d\r\n", i);
-	}
-	printf("\r\n");
-	int  n = 0;
+	// 连接池中最大连接数量限制，该值应和线程池中的最大线程数相等，
+	// 以保证每个线程都可以获得一个连接
+	int  dblimit = 10;
 
-	// 批量查询数据
-	for (int i = 0; i < max; i++)
-	{
-		int  ret = tbl_select(db, i);
-		if (ret >= 0)
-		{
-			n += ret;
-			printf(">>select ok: i=%d, ret=%d\r", i, ret);
-		}
-		else
-			printf(">>select error: i = %d\r\n", i);
-	}
-	printf("\r\n");
-	printf(">>select total: %d\r\n", n);
+	// 创建数据库连接池对象
+	acl::db_pool* dp = new acl::mysql_pool(dbaddr, dbname,
+			dbuser, dbpass, dblimit);
 
-	// 批量删除数据
-	for (int i = 0; i < max; i++)
+	// 设置连接池中每个连接的空闲时间(秒)
+	dp->set_idle(120);
+
+	// 每个处理线程内部针对每个操作执行的次数
+	int  max = 10;
+
+	// 创建多个线程
+	std::vector<db_thread*> threads;
+	for (int i = 0; i < dblimit; i++)
 	{
-		bool ret = tbl_delete(db, i);
-		if (ret)
-			printf(">>delete ok: %d, affected: %d\r",
-			i, (int) db.affect_count());
-		else
-			printf(">>delete error: i = %d\r\n", i);
+		db_thread* thread = new db_thread(*dp, max);
+		threads.push_back(thread);
+		thread->set_detachable(false);
+		thread->start();
 	}
-	printf("\r\n");
+
+	// 等待所有工作线程退出
+	std::vector<db_thread*>::iterator it;
+	for (it = threads.begin(); it != threads.end(); ++it)
+	{
+		(*it)->wait(NULL);
+		delete *it;
+	}
 
 //#ifndef WIN32
 //	mysql_server_end();
 //	mysql_thread_end();
 //#endif
 
-	printf("mysqlclient lib's version: %ld, info: %s\r\n",
-		db.mysql_libversion(), db.mysql_client_info());
-
+	delete dp;
 	printf("Enter any key to exit.\r\n");
 	getchar();
 	return 0;

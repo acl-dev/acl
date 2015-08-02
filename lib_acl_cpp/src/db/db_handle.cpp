@@ -402,4 +402,17 @@ db_handle& db_handle::set_when(time_t now)
 	return *this;
 }
 
+static string __loadpath;
+
+void db_handle::set_loadpath(const char* path)
+{
+	if (path && *path)
+		__loadpath = path;
+}
+
+const char* db_handle::get_loadpath()
+{
+	return __loadpath.empty() ? NULL : __loadpath.c_str();
+}
+
 } // namespace acl

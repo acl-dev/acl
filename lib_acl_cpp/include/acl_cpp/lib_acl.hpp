@@ -55,6 +55,8 @@
 #include "acl_cpp/stream/aio_listen_stream.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 #include "acl_cpp/stream/aio_fstream.hpp"
+#include "acl_cpp/stream/stdin_stream.hpp"
+#include "acl_cpp/stream/stdout_stream.hpp"
 
 #include "acl_cpp/stream/polarssl_conf.hpp"
 #include "acl_cpp/stream/polarssl_io.hpp"

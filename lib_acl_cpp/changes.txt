@@ -1,6 +1,23 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+335) 2015.8.2
+335.1) feature: db_handle/db_mysql/db_sqlite 类中提供了静态方法用来设置动态库动态
+加载的全路径
+335.2) feature: mysql 模块功能在默认编译时被编译进 lib_acl_cpp 库中，
+且 db_mysql 模块默认采用动态加载方式
+335.3) samples/db/mysql_query: 完善了示例功能
+335.4) samples: 增加了示例 samples/db/mysql_pool，用来测试多线程环境下的数据库
+连接池操作
+
+334) 2015.8.1
+334.1) feature: 针对标准输入输出增加了两个流对象：stdin_stream, stdout_stream
+334.2) sample: db/mysql_query 例子完善
+
+333) 2015.7.31
+333.1) feature: HttpServlet 类中的方法 doRun 内部在响应客户端请求时，会首先
+根据客户端的请求头字段(Connection) 自动设置响应头中的 Connection 头字段
+
 332) 2015.7.30
 332.1) bugfix: redis_command::redirect() 函数内当 cluster->peek() 返回 NULL
 时应该直接返回 NULL

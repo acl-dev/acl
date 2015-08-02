@@ -4,19 +4,30 @@
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/db/db_sqlite.hpp"
 
-#ifdef HAS_SQLITE
+#if defined(HAS_SQLITE) || defined(HAS_SQLITE_DLL)
 
-#if defined(ACL_WINDOWS) || defined(USE_DYNAMIC)
- typedef char* (*sqlite3_libversion_fn)(void);
- typedef int   (*sqlite3_open_fn)(const char*, sqlite3**);
- typedef int   (*sqlite3_close_fn)(sqlite3*);
- typedef int   (*sqlite3_get_table_fn)(sqlite3*, const char*, char***, int*, int*, char**);
- typedef void  (*sqlite3_free_table_fn)(char**);
- typedef int   (*sqlite3_busy_handler_fn)(sqlite3*, int(*)(void*,int), void*);
- typedef const char* (*sqlite3_errmsg_fn)(sqlite3*);
- typedef int   (*sqlite3_errcode_fn)(sqlite3*);
- typedef int   (*sqlite3_changes_fn)(sqlite3*);
- typedef int   (*sqlite3_total_changes_fn)(sqlite3*);
+#if defined(ACL_WINDOWS) || defined(HAS_SQLITE_DLL)
+
+#ifndef STDCALL
+# ifdef ACL_WINDOWS
+#  define STDCALL __stdcall
+# else
+#  define STDCALL
+# endif // ACL_WINDOWS
+#endif // STDCALL
+
+ typedef char* (STDCALL *sqlite3_libversion_fn)(void);
+ typedef int   (STDCALL *sqlite3_open_fn)(const char*, sqlite3**);
+ typedef int   (STDCALL *sqlite3_close_fn)(sqlite3*);
+ typedef int   (STDCALL *sqlite3_get_table_fn)(sqlite3*, const char*,
+	 char***, int*, int*, char**);
+ typedef void  (STDCALL *sqlite3_free_table_fn)(char**);
+ typedef int   (STDCALL *sqlite3_busy_handler_fn)(sqlite3*,
+	 int(*)(void*,int), void*);
+ typedef const char* (STDCALL *sqlite3_errmsg_fn)(sqlite3*);
+ typedef int   (STDCALL *sqlite3_errcode_fn)(sqlite3*);
+ typedef int   (STDCALL *sqlite3_changes_fn)(sqlite3*);
+ typedef int   (STDCALL *sqlite3_total_changes_fn)(sqlite3*);
 
  static sqlite3_libversion_fn __sqlite3_libversion = NULL;
  static sqlite3_open_fn __sqlite3_open = NULL;
@@ -49,71 +60,78 @@
 	if (__sqlite_dll != NULL)
 		logger_fatal("__sqlite_dll not null");
 
+	const char* path;
+	const char* ptr = acl::db_handle::get_loadpath();
+	if (ptr)
+		path = ptr;
+	else
+		path = "sqlite3.dll";
+
 	__sqlite_dll = acl_dlopen("sqlite3.dll");
 	if (__sqlite_dll == NULL)
-		logger_fatal("load sqlite3.dll error: %s", acl_last_serror());
+		logger_fatal("load %s error: %s", path, acl_last_serror());
 
 	__sqlite3_libversion = (sqlite3_libversion_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_libversion");
 	if (__sqlite3_libversion == NULL)
-		logger_fatal("load sqlite3_libversion from sqlite3.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load sqlite3_libversion from %s error: %s",
+			path, acl_last_serror());
 
 	__sqlite3_open = (sqlite3_open_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_open");
 	if (__sqlite3_open == NULL)
-		logger_fatal("load sqlite3_open from sqlite3.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load sqlite3_open from %s error: %s",
+			path, acl_last_serror());
 
 	__sqlite3_close = (sqlite3_close_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_close");
 	if (__sqlite3_close == NULL)
-		logger_fatal("load sqlite3_close from sqlite3.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load sqlite3_close from %s error: %s",
+			path, acl_last_serror());
 
 	__sqlite3_get_table = (sqlite3_get_table_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_get_table");
 	if (__sqlite3_get_table == NULL)
-		logger_fatal("load sqlite3_get_table from sqlite3.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load sqlite3_get_table from %s error: %s",
+			path, acl_last_serror());
 
 	__sqlite3_free_table = (sqlite3_free_table_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_free_table");
 	if (__sqlite3_free_table == NULL)
-		logger_fatal("load sqlite3_free_table from sqlite3.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load sqlite3_free_table from %s error: %s",
+			path, acl_last_serror());
 
 	__sqlite3_busy_handler = (sqlite3_busy_handler_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_busy_handler");
 	if (__sqlite3_busy_handler == NULL)
-		logger_fatal("load sqlite3_busy_handler from sqlite3.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load sqlite3_busy_handler from %s error: %s",
+			path, acl_last_serror());
 
 	__sqlite3_errmsg = (sqlite3_errmsg_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_errmsg");
 	if (__sqlite3_errmsg == NULL)
-		logger_fatal("load sqlite3_errmsg from sqlite3.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load sqlite3_errmsg from %s error: %s",
+			path, acl_last_serror());
 
 	__sqlite3_errcode = (sqlite3_errcode_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_errcode");
 	if (__sqlite3_errcode == NULL)
-		logger_fatal("load sqlite3_errcode from sqlite3.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load sqlite3_errcode from %s error: %s",
+			path, acl_last_serror());
 
 	__sqlite3_changes = (sqlite3_changes_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_changes");
 	if (__sqlite3_changes == NULL)
-		logger_fatal("load sqlite3_changes from sqlite3.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load sqlite3_changes from %s error: %s",
+			path, acl_last_serror());
 
 	__sqlite3_total_changes = (sqlite3_total_changes_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_total_changes");
 	if (__sqlite3_total_changes == NULL)
-		logger_fatal("load sqlite3_total_changes from sqlite3.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load sqlite3_total_changes from %s error: %s",
+			path, acl_last_serror());
 
-	logger("sqlite3.dll loaded");
+	logger("%s loaded", path);
 	atexit(__sqlite_dll_unload);
  }
 #else
@@ -225,7 +243,7 @@ const char* db_sqlite::get_error() const
 	else
 		return "sqlite not opened yet!";
 }
-bool db_sqlite::open(const char* local_charset /* = "GBK" */)
+bool db_sqlite::open(const char* local_charset /* = "gbk" */)
 {
 	// 如果数据库已经打开，则直接返回 true
 	if (db_ != NULL)

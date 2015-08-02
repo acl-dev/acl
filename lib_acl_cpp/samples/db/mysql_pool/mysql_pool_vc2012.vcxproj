@@ -35,9 +35,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2495A6D4-777F-48BF-99C0-702E4A11FD23}</ProjectGuid>
+    <ProjectGuid>{EB430C52-31E4-4018-AD8A-8F56ADAD586A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>mysql_query</ProjectName>
+    <ProjectName>mysql_pool</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'" Label="Configuration">
@@ -165,10 +165,10 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <OutputFile>$(OutDir)mysql_query.exe</OutputFile>
+      <OutputFile>$(OutDir)mysql_pool.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)mysql_query.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)mysql_pool.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <IgnoreSpecificDefaultLibraries>
@@ -189,10 +189,10 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <OutputFile>$(OutDir)mysql_query.exe</OutputFile>
+      <OutputFile>$(OutDir)mysql_pool.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\lib\win64;..\..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)mysql_query.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)mysql_pool.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -211,7 +211,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2012.lib;lib_acl_cpp_vc2012.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)mysql_query.exe</OutputFile>
+      <OutputFile>$(OutDir)mysql_pool.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -234,7 +234,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2012.lib;lib_acl_cpp_vc2012.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)mysql_query.exe</OutputFile>
+      <OutputFile>$(OutDir)mysql_pool.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\lib\win64;..\..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -259,10 +259,10 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_d.lib;lib_acl_cpp_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)mysql_query.exe</OutputFile>
+      <OutputFile>$(OutDir)mysql_pool.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)mysql_query.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)mysql_pool.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -281,10 +281,10 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_d.lib;lib_acl_cpp_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)mysql_query.exe</OutputFile>
+      <OutputFile>$(OutDir)mysql_pool.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)mysql_query.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)mysql_pool.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -303,11 +303,11 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl.lib;lib_acl_cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)mysql_query.exe</OutputFile>
+      <OutputFile>$(OutDir)mysql_pool.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)mysql_query.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)mysql_pool.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -330,11 +330,11 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl.lib;lib_acl_cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)mysql_query.exe</OutputFile>
+      <OutputFile>$(OutDir)mysql_pool.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(OutDir)mysql_query.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(OutDir)mysql_pool.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>

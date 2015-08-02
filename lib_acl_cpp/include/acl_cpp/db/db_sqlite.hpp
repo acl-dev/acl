@@ -71,44 +71,44 @@ public:
 	 * 返回数据库的类型描述
 	 * @return {const char*}
 	 */
-	virtual const char* dbtype() const;
+	const char* dbtype() const;
 
 	/**
 	 * 获得上次数据库操作的出错错误号
 	 * @return {int}
 	 */
-	virtual int get_errno() const;
+	int get_errno() const;
 
 	/**
 	 * 获得上次数据库操作的出错错描述
 	 * @return {const char*}
 	 */
-	virtual const char* get_error() const;
+	const char* get_error() const;
 
 	/**
 	 * 基类 db_handle 的纯虚接口
-	 * @param local_charset {const char*} 本地字符集
+	 * @param local_charset {const char*} 本地字符集(gbk, utf-8, ...)
 	 * @return {bool} 打开是否成功
 	 */
-	virtual bool open(const char* local_charset = "GBK");
+	bool open(const char* local_charset = "utf-8");
 
 	/**
 	 * 基类 db_handle 的纯虚接口，数据库是否已经打开了
 	 * @return {bool} 返回 true 表明数据库已经打开了
 	 */
-	virtual bool is_opened() const;
+	bool is_opened() const;
 
 	/**
 	 * 基类 db_handle 的纯虚接口
 	 * @return {bool} 关闭是否成功
 	 */
-	virtual bool close(void);
+	bool close(void);
 
 	/**
 	 * 基类 db_handle 的纯虚接口，子类必须实现此接口用于判断数据表是否存在
 	 * @return {bool} 是否存在
 	 */
-	virtual bool tbl_exists(const char* tbl_name);
+	bool tbl_exists(const char* tbl_name);
 
 	/**
 	 * 基类 db_handle 的纯虚接口
@@ -116,7 +116,7 @@ public:
 	 *  SQL 语句必须经过转义处理，以防止 SQL 注入攻击
 	 * @return {bool} 执行是否成功
 	 */
-	virtual bool sql_select(const char* sql);
+	bool sql_select(const char* sql);
 
 	/**
 	 * 基类 db_handle 的纯虚接口
@@ -124,13 +124,14 @@ public:
 	 *  SQL 语句必须经过转义处理，以防止 SQL 注入攻击
 	 * @return {bool} 执行是否成功
 	 */
-	virtual bool sql_update(const char* sql);
+	bool sql_update(const char* sql);
 
 	/**
 	 * 基类 db_handle 的纯虚接口：上次 sql 操作影响的记录行数
 	 * @return {int} 影响的行数，-1 表示出错
 	 */
-	virtual int affect_count() const;
+	int affect_count() const;
+
 private:
 	// sqlite 引擎
 	sqlite3* db_;

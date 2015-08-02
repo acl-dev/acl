@@ -336,6 +336,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\stream\socket_stream.cpp">
 				</File>
 				<File
+					RelativePath=".\src\stream\stdin_stream.cpp">
+				</File>
+				<File
+					RelativePath=".\src\stream\stdout_stream.cpp">
+				</File>
+				<File
 					RelativePath=".\src\stream\stream.cpp">
 				</File>
 			</Filter>
@@ -954,6 +960,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\socket_stream.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\stdin_stream.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\stdout_stream.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\stream.hpp">

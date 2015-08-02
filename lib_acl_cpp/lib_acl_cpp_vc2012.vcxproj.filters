@@ -475,6 +475,12 @@
     <ClCompile Include="src\redis\redis_geo.cpp">
       <Filter>Source Files\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\stream\stdin_stream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\stdout_stream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -980,6 +986,12 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_geo.hpp">
       <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\stdin_stream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\stdout_stream.hpp">
+      <Filter>Header Files\stream</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -15,7 +15,8 @@ CFLAGS = -c -g -W \
 -D_POSIX_PTHREAD_SEMANTICS \
 -Wno-long-long \
 -Wformat \
--DHAS_POLARSSL
+-DHAS_POLARSSL \
+-DHAS_MYSQL_DLL
 #-DUSE_DYNAMIC
 # -Wcast-align
 #-Wcast-qual

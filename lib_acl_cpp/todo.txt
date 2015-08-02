@@ -17,7 +17,7 @@ http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=270070
 11) db: 数据库部分还需要增加字段转义功能，以防止 SQL 注入攻击，已经在 db_handle 增加了字符转义功能，
 ---ok, zsx, 2012.6.1
 12) http 中的 WEB 编程模块应该支持 FCGI 模式
-13) session 应该增加一个 session_pool
+13) session 应该增加一个 session_pool --- ok, 已经可以使用 redis 集群方式实现了
 14) 整合 thrift/buffer 协议到 acl_master 服务器框架中
 15) 应支持 redis 客户端协议 -- 完成
 16) 能支持 mysql 协议到 mongodb 协议的转换协议实现
@@ -26,3 +26,4 @@ http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=270070
 19) http 协议库支持 websocket
 20) 应该使 stream 流对象支持 openssl
 21) 应该重新设计 aio_stream 中对 polarssl 的支持方式 -- 完成
+22) db_pool: 支持更为简洁的数据库操作接口

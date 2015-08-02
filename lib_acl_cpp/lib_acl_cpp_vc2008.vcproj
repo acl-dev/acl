@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;USE_WIN_ICONV"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;USE_WIN_ICONV;HAS_MYSQL_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -111,7 +111,7 @@
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV;HAS_MYSQL_DLL"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -1086,6 +1086,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stream\stdin_stream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\stream\stdout_stream.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stream\stream.cpp"
 					>
 				</File>
@@ -1737,6 +1745,14 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\socket_stream.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\stdin_stream.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\stdout_stream.hpp"
 					>
 				</File>
 				<File

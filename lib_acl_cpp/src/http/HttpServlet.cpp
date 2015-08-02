@@ -93,6 +93,10 @@ bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */)
 
 	http_method_t method = req.getMethod();
 
+	// 根据请求的值自动设定是否需要保持长连接
+	if (!cgi_mode)
+		res.setKeepAlive(req.isKeepAlive());
+
 	switch (method)
 	{
 	case HTTP_METHOD_GET:
