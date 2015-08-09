@@ -15,7 +15,8 @@ static bool test_set(acl::redis_string& redis, int n)
 		redis.clear();
 		if (redis.set(key.c_str(), value.c_str()) == false)
 		{
-			printf("set key: %s error\r\n", key.c_str());
+			printf("set key: %s error: %s\r\n",
+				key.c_str(), redis.result_error());
 			return false;
 		}
 		else if (i < 10)
@@ -37,7 +38,8 @@ static bool test_setex(acl::redis_string& redis, int n, int ttl)
 		redis.clear();
 		if (redis.setex(key.c_str(), value.c_str(), ttl) == false)
 		{
-			printf("setex key: %s error\r\n", key.c_str());
+			printf("setex key: %s error: %s\r\n",
+				key.c_str(), redis.result_error());
 			return false;
 		}
 		else if (i < 10)
@@ -61,7 +63,8 @@ static bool test_setnx(acl::redis_string& redis, int n)
 		int ret = redis.setnx(key.c_str(), value.c_str());
 		if (ret < 0)
 		{
-			printf("setnx key: %s error\r\n", key.c_str());
+			printf("setnx key: %s error: %s\r\n",
+				key.c_str(), redis.result_error());
 			return false;
 		}
 		printf("%s: ret: %d, key: %s\r\n", __FUNCTION__, ret,
@@ -133,7 +136,8 @@ static bool test_getset(acl::redis_string& redis, int n)
 		redis.clear();
 		if (redis.getset(key.c_str(), value.c_str(), result) == false)
 		{
-			printf("getset error, key: %s\r\n", key.c_str());
+			printf("getset error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)
@@ -156,7 +160,8 @@ static bool test_strlen(acl::redis_string& redis, int n)
 		int ret = redis.get_strlen(key.c_str());
 		if (ret < 0)
 		{
-			printf("str_len error, key: %s\r\n", key.c_str());
+			printf("str_len error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)
@@ -190,7 +195,7 @@ static bool test_mset(acl::redis_string& redis, int n)
 		redis.clear();
 		if (redis.mset(objs) == false)
 		{
-			printf("mset error\r\n");
+			printf("mset error: %s\r\n", redis.result_error());
 			return false;
 		}
 		else if (i < 10)
@@ -225,7 +230,7 @@ static bool test_mget(acl::redis_string& redis, int n)
 		redis.clear();
 		if (redis.mget(keys, 3, &result) == false)
 		{
-			printf("mset error\r\n");
+			printf("mset error: %s\r\n", redis.result_error());
 			return false;
 		}
 		else if (i >= 10)
@@ -275,7 +280,7 @@ static bool test_msetnx(acl::redis_string& redis, int n)
 		ret = redis.msetnx(objs);
 		if (ret < 0)
 		{
-			printf("mset error\r\n");
+			printf("mset error: %s\r\n", redis.result_error());
 			return false;
 		}
 		else if (i < 10)
@@ -306,8 +311,8 @@ static bool test_setrange(acl::redis_string& redis, int n)
 		ret = redis.setrange(key.c_str(), off, value.c_str());
 		if (ret < 0)
 		{
-			printf("setrange error, key: %s, off: %u, value: %s\r\n",
-				key.c_str(), off, value.c_str());
+			printf("setrange error: %s, key: %s, off: %u, value: %s\r\n",
+				redis.result_error(), key.c_str(), off, value.c_str());
 			return false;
 		}
 		else if (i < 10)
@@ -331,8 +336,8 @@ static bool test_getrange(acl::redis_string& redis, int n)
 		redis.clear();
 		if (redis.getrange(key, start, end, value) == false)
 		{
-			printf("getrange error, key: %s, start: %d, end: %d\r\n",
-				key.c_str(), start, end);
+			printf("getrange error: %s, key: %s, start: %d, end: %d\r\n",
+				redis.result_error(), key.c_str(), start, end);
 			return false;
 		}
 		else if (i >= 10)
@@ -357,8 +362,8 @@ static bool test_setbit(acl::redis_string& redis, int n)
 		redis.clear();
 		if (redis.setbit(key.c_str(), off, 1) == false)
 		{
-			printf("setbit error, key: %s, off: %u\r\n",
-				key.c_str(), off);
+			printf("setbit error: %s, key: %s, off: %u\r\n",
+				redis.result_error(), key.c_str(), off);
 			return false;
 		}
 		else if (i >= 10)
@@ -383,8 +388,8 @@ static bool test_getbit(acl::redis_string& redis, int n)
 		redis.clear();
 		if (redis.getbit(key.c_str(), off, bit) == false)
 		{
-			printf("getbit error, key: %s, off: %u\r\n",
-				key.c_str(), off);
+			printf("getbit error: %s, key: %s, off: %u\r\n",
+				redis.result_error(), key.c_str(), off);
 			return false;
 		}
 		else if (i >= 10)
@@ -410,7 +415,8 @@ static bool test_bitcount(acl::redis_string& redis, int n)
 		ret = redis.bitcount(key.c_str());
 		if (ret < 0)
 		{
-			printf("bitcount error, key: %s\r\n", key.c_str());
+			printf("bitcount error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)
@@ -441,7 +447,8 @@ static bool test_bitop_and(acl::redis_string& redis, int n)
 		ret = redis.bitop_and(key.c_str(), keys, 3);
 		if (ret < 0)
 		{
-			printf("bitop_and error, key: %s\r\n", key.c_str());
+			printf("bitop_and error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)
@@ -472,12 +479,13 @@ static bool test_bitop_or(acl::redis_string& redis, int n)
 		ret = redis.bitop_or(key.c_str(), keys, 3);
 		if (ret < 0)
 		{
-			printf("bitop_or error, key: %s\r\n", key.c_str());
+			printf("bitop_or error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)
 			printf("bitop_or ok, key: %s, bits: %u\n",
-			key.c_str(), ret);
+				key.c_str(), ret);
 	}
 
 	return true;
@@ -503,7 +511,8 @@ static bool test_bitop_xor(acl::redis_string& redis, int n)
 		ret = redis.bitop_xor(key.c_str(), keys, 3);
 		if (ret < 0)
 		{
-			printf("bitop_xor error, key: %s\r\n", key.c_str());
+			printf("bitop_xor error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)
@@ -527,7 +536,8 @@ static bool test_incr(acl::redis_string& redis, int n)
 		redis.clear();
 		if (redis.incr(key.c_str(), &result) == false)
 		{
-			printf("incr error, key: %s\r\n", key.c_str());
+			printf("incr error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)
@@ -550,7 +560,8 @@ static bool test_incrby(acl::redis_string& redis, int n)
 		redis.clear();
 		if (redis.incrby(key.c_str(), 10, &result) == false)
 		{
-			printf("incrby error, key: %s\r\n", key.c_str());
+			printf("incrby error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)
@@ -573,7 +584,8 @@ static bool test_incrbyfloat(acl::redis_string& redis, int n)
 		redis.clear();
 		if (redis.incrbyfloat(key.c_str(), 8.8, &result) == false)
 		{
-			printf("incrbyfloat error, key: %s\r\n", key.c_str());
+			printf("incrbyfloat error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)
@@ -596,7 +608,8 @@ static bool test_decr(acl::redis_string& redis, int n)
 		redis.clear();
 		if (redis.decr(key.c_str(), &result) == false)
 		{
-			printf("decr error, key: %s\r\n", key.c_str());
+			printf("decr error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)
@@ -619,7 +632,8 @@ static bool test_decrby(acl::redis_string& redis, int n)
 		redis.clear();
 		if (redis.decrby(key.c_str(), 10, &result) == false)
 		{
-			printf("decrby error, key: %s\r\n", key.c_str());
+			printf("decrby error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)

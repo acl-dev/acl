@@ -92,4 +92,10 @@ protected:
 	 * 当进程退出前调用的回调函数
 	 */
 	virtual void proc_on_exit();
+
+private:
+	// redis 集群对象
+	acl::redis_client_cluster* cluster_;
+	// 管理 session 的集群对象
+	acl::session* session_;
 };

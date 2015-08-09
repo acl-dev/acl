@@ -10,7 +10,7 @@ json_node::json_node(ACL_JSON_NODE* node, json* json_ptr)
 , json_(json_ptr)
 , parent_(NULL)
 , parent_saved_(NULL)
-, child_(NULL)
+, children_(NULL)
 , iter_(NULL)
 , buf_(NULL)
 , obj_(NULL)
@@ -21,11 +21,12 @@ json_node::json_node(ACL_JSON_NODE* node, json* json_ptr)
 json_node::~json_node(void)
 {
 	delete parent_saved_;
-	delete child_;
+	delete children_;
 	if (iter_)
 		acl_myfree(iter_);
 	delete buf_;
 	delete obj_;
+	clear();
 }
 
 const char* json_node::tag_name(void) const
@@ -196,23 +197,26 @@ json_node* json_node::first_child(void)
 	if (node == NULL)
 		return NULL;
 
-	if (child_ == NULL)
-		child_ = NEW json_node(node, json_);
-	else
-		child_->node_me_ = node;
-	return child_;
+	prepare_iter();
+	json_node* child = NEW json_node(node, json_);
+	children_->push_back(child);
+
+	return child;
 }
 
 json_node* json_node::next_child(void)
 {
 	acl_assert(iter_);
-	acl_assert(child_);
+	acl_assert(children_);
 
 	ACL_JSON_NODE* node = node_me_->iter_next(iter_, node_me_);
 	if (node == NULL)
 		return NULL;
-	child_->node_me_ = node;
-	return child_;
+
+	json_node* child = NEW json_node(node, json_);
+	children_->push_back(child);
+
+	return child;
 }
 
 int   json_node::depth(void) const
@@ -223,6 +227,34 @@ int   json_node::depth(void) const
 int   json_node::children_count(void) const
 {
 	return acl_ring_size(&node_me_->children);
+}
+
+void json_node::prepare_iter()
+{
+	if (children_ == NULL)
+	{
+		children_ = NEW std::vector<json_node*>;
+		int  n = children_count();
+		if (n < 0)
+		{
+			logger_error("invalid children_count: %d", n);
+			n = 1;
+		}
+		else
+			n++;
+		children_->reserve(n);
+	}
+}
+
+void json_node::clear()
+{
+	if (children_)
+	{
+		std::vector<json_node*>::iterator it = children_->begin();
+		for (; it != children_->end(); ++it)
+			delete *it;
+		children_->clear();
+	}
 }
 
 json& json_node::get_json(void) const
@@ -246,7 +278,6 @@ json::json(const char* data /* = NULL */)
 {
 	json_ = acl_json_alloc();
 	root_ = NULL;
-	node_tmp_ = NULL;
 	buf_ = NULL;
 	iter_ = NULL;
 	if (data && *data)
@@ -257,7 +288,6 @@ json::json(const json_node& node)
 {
 	json_ = acl_json_create(node.get_json_node());
 	root_ = NEW json_node(json_->root, this);
-	node_tmp_ = NULL;
 	buf_ = NULL;
 	iter_ = NULL;
 }
@@ -267,12 +297,8 @@ json::~json(void)
 	clear();
 	if (json_)
 		acl_json_free(json_);
-	if (root_)
-		delete root_;
-	if (node_tmp_)
-		delete node_tmp_;
-	if (buf_)
-		delete buf_;
+	delete root_;
+	delete buf_;
 	if (iter_)
 		acl_myfree(iter_);
 }
@@ -296,18 +322,18 @@ const std::vector<json_node*>& json::getElementsByTagName(const char* tag) const
 	const_cast<json*>(this)->clear();
 	ACL_ARRAY* a = acl_json_getElementsByTagName(json_, tag);
 	if (a == NULL)
-		return nodes_tmp_;
+		return nodes_query_;
 
 	ACL_ITER iter;
 	acl_foreach(iter, a)
 	{
 		ACL_JSON_NODE *tmp = (ACL_JSON_NODE*) iter.data;
 		json_node* node = NEW json_node(tmp, const_cast<json*>(this));
-		const_cast<json*>(this)->nodes_tmp_.push_back(node);
+		const_cast<json*>(this)->nodes_query_.push_back(node);
 	}
 	acl_json_free_array(a);
 
-	return nodes_tmp_;
+	return nodes_query_;
 }
 
 const std::vector<json_node*>& json::getElementsByTags(const char* tags) const
@@ -316,18 +342,18 @@ const std::vector<json_node*>& json::getElementsByTags(const char* tags) const
 
 	ACL_ARRAY* a = acl_json_getElementsByTags(json_, tags);
 	if (a == NULL)
-		return nodes_tmp_;
+		return nodes_query_;
 
 	ACL_ITER iter;
 	acl_foreach(iter, a)
 	{
 		ACL_JSON_NODE *tmp = (ACL_JSON_NODE*) iter.data;
 		json_node* node = NEW json_node(tmp, const_cast<json*>(this));
-		const_cast<json*>(this)->nodes_tmp_.push_back(node);
+		const_cast<json*>(this)->nodes_query_.push_back(node);
 	}
 	acl_json_free_array(a);
 
-	return nodes_tmp_;
+	return nodes_query_;
 }
 
 ACL_JSON* json::get_json(void) const
@@ -339,7 +365,7 @@ json_node& json::create_node(const char* tag, const char* value)
 {
 	ACL_JSON_NODE* node = acl_json_create_text(json_, tag, value);
 	json_node* n = NEW json_node(node, this);
-	nodes_.push_back(n);
+	nodes_tmp_.push_back(n);
 	return *n;
 }
 
@@ -347,7 +373,7 @@ json_node& json::create_node(const char* tag, acl_int64 value)
 {
 	ACL_JSON_NODE* node = acl_json_create_int64(json_, tag, value);
 	json_node* n = NEW json_node(node, this);
-	nodes_.push_back(n);
+	nodes_tmp_.push_back(n);
 	return *n;
 }
 
@@ -355,7 +381,7 @@ json_node& json::create_node(const char* tag, bool value)
 {
 	ACL_JSON_NODE* node = acl_json_create_bool(json_, tag, value ? 1 : 0);
 	json_node* n = NEW json_node(node, this);
-	nodes_.push_back(n);
+	nodes_tmp_.push_back(n);
 	return *n;
 }
 
@@ -363,7 +389,7 @@ json_node& json::create_array_text(const char* text)
 {
 	ACL_JSON_NODE* node = acl_json_create_array_text(json_, text);
 	json_node* n = NEW json_node(node, this);
-	nodes_.push_back(n);
+	nodes_tmp_.push_back(n);
 	return *n;
 }
 
@@ -376,7 +402,7 @@ json_node& json::create_array_number(acl_int64 value)
 {
 	ACL_JSON_NODE* node = acl_json_create_array_int64(json_, value);
 	json_node* n = NEW json_node(node, this);
-	nodes_.push_back(n);
+	nodes_tmp_.push_back(n);
 	return *n;
 }
 
@@ -384,7 +410,7 @@ json_node& json::create_array_bool(bool value)
 {
 	ACL_JSON_NODE* node = acl_json_create_array_bool(json_, value);
 	json_node* n = NEW json_node(node, this);
-	nodes_.push_back(n);
+	nodes_tmp_.push_back(n);
 	return *n;
 }
 
@@ -395,7 +421,7 @@ json_node& json::create_node(bool as_array /* = false */)
 
 	ACL_JSON_NODE* node = acl_json_create_obj(json_);
 	json_node* n = NEW json_node(node, this);
-	nodes_.push_back(n);
+	nodes_tmp_.push_back(n);
 	return *n;
 }
 
@@ -403,7 +429,7 @@ json_node& json::create_array()
 {
 	ACL_JSON_NODE* node = acl_json_create_array(json_);
 	json_node* n = NEW json_node(node, this);
-	nodes_.push_back(n);
+	nodes_tmp_.push_back(n);
 	return *n;
 }
 
@@ -412,7 +438,7 @@ json_node& json::create_node(const char* tag, json_node* node)
 	ACL_JSON_NODE* tmp = acl_json_create_node(json_,
 		tag, node->get_json_node());
 	json_node* n = NEW json_node(tmp, this);
-	nodes_.push_back(n);
+	nodes_tmp_.push_back(n);
 	return *n;
 }
 
@@ -421,7 +447,7 @@ json_node& json::create_node(const char* tag, json_node& node)
 	ACL_JSON_NODE* tmp = acl_json_create_node(json_,
 		tag, node.get_json_node());
 	json_node* n = NEW json_node(tmp, this);
-	nodes_.push_back(n);
+	nodes_tmp_.push_back(n);
 	return *n;
 }
 
@@ -431,7 +457,7 @@ json_node& json::duplicate_node(const json_node* node)
 		node->get_json_node());
 	acl_assert(tmp);
 	json_node* n = NEW json_node(tmp, this);
-	nodes_.push_back(n);
+	nodes_tmp_.push_back(n);
 	return *n;
 }
 
@@ -441,7 +467,7 @@ json_node& json::duplicate_node(const json_node& node)
 		node.get_json_node());
 	acl_assert(tmp);
 	json_node* n = NEW json_node(tmp, this);
-	nodes_.push_back(n);
+	nodes_tmp_.push_back(n);
 	return *n;
 }
 
@@ -460,22 +486,21 @@ json_node* json::first_node(void)
 	ACL_JSON_NODE* node = json_->iter_head(iter_, json_);
 	if (node == NULL)
 		return NULL;
-	if (node_tmp_ == NULL)
-		node_tmp_ = NEW json_node(node, this);
-	else
-		node_tmp_->set_json_node(node);
-	return node_tmp_;
+	json_node* n = NEW json_node(node, this);
+	nodes_tmp_.push_back(n);
+	return n;
 }
 
 json_node* json::next_node(void)
 {
 	acl_assert(iter_);
-	acl_assert(node_tmp_);
 	ACL_JSON_NODE* node = json_->iter_next(iter_, json_);
 	if (node == NULL)
 		return NULL;
-	node_tmp_->set_json_node(node);
-	return node_tmp_;
+
+	json_node* n = NEW json_node(node, this);
+	nodes_tmp_.push_back(n);
+	return n;
 }
 
 const string& json::to_string(void)
@@ -527,15 +552,15 @@ void json::clear(void)
 	if (buf_)
 		buf_->clear();
 
-	std::vector<json_node*>::iterator it = nodes_tmp_.begin();
-	for (; it != nodes_tmp_.end(); ++it)
+	std::vector<json_node*>::iterator it = nodes_query_.begin();
+	for (; it != nodes_query_.end(); ++it)
 		delete (*it);
-	nodes_tmp_.clear();
+	nodes_query_.clear();
 
-	std::list<json_node*>::iterator it1 = nodes_.begin();
-	for (; it1 != nodes_.end(); ++it1)
+	std::list<json_node*>::iterator it1 = nodes_tmp_.begin();
+	for (; it1 != nodes_tmp_.end(); ++it1)
 		delete (*it1);
-	nodes_.clear();
+	nodes_tmp_.clear();
 }
 
 } // namespace acl

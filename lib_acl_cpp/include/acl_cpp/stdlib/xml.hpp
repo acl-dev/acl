@@ -39,6 +39,7 @@ public:
 	 *  有可能为 "\0"
 	 */
 	const char* get_value(void) const;
+
 private:
 	friend class xml_node;
 
@@ -237,6 +238,13 @@ public:
 	int   children_count(void) const;
 
 	/**
+	 * 当在遍历该 xml 结点时，内部会动态产生一些临时 xml_node 对象，调用此函数
+	 * 可以清空这些对象，一旦调用此函数进行了清除，则由 first_child/next_child
+	 * 返回的 xml_node 结点对象将不再可用，否则会产生内存非法访问
+	 */
+	void clear();
+
+	/**
 	 * 获得 xml 对象的引用
 	 * @return {xml&}
 	 */
@@ -274,10 +282,10 @@ private:
 	xml* xml_;
 	xml_node* parent_;
 	xml_node* parent_saved_;
-	xml_node* child_;
 	ACL_ITER* child_iter_;
-	xml_attr* attr_;
 	ACL_ITER* attr_iter_;
+	std::vector<xml_node*> nodes_tmp_;
+	std::vector<xml_attr*> attrs_tmp_;
 };
 
 class string;
@@ -461,14 +469,13 @@ public:
 
 private:
 	ACL_XML *xml_;
-	xml_node* node_;
 	xml_node* root_;
 	std::vector<xml_node*> elements_;
 	string* buf_;
 	//bool dummyRootAdded_;
 
 	ACL_TOKEN* m_pTokenTree;
-	std::list<xml_node*> nodes_;
+	std::list<xml_node*> nodes_tmp_;
 	ACL_ITER* iter_;
 };
 

@@ -200,13 +200,15 @@ public:
 
 	/**
 	 * 获得本结点的第一个子结点，需要遍历子结点时必须首先调用此函数
-	 * @return {json_node*} 返回空表示没有子结点
+	 * @return {json_node*} 返回空表示没有子结点，返回的非空对象不能
+	 *  在外部 delete，因为内部会自动释放
 	 */
 	json_node* first_child(void);
 
 	/**
 	 * 获得本结点的下一个子结点
-	 * @return {json_node*} 返回空表示遍历过程结束
+	 * @return {json_node*} 返回空表示遍历过程结束，返回的非空对象不能
+	 *  在外部 delete，因为内部会自动释放
 	 */
 	json_node* next_child(void);
 
@@ -221,6 +223,13 @@ public:
 	 * @return {int} 永远 >= 0
 	 */
 	int   children_count(void) const;
+
+	/**
+	 * 当在遍历该 json 结点时，内部会动态产生一些临时 json_node 对象，调用此函数
+	 * 可以清空这些对象，一旦调用此函数进行了清除，则由 first_child/next_child
+	 * 返回的 json_node 结点对象将不再可用，否则会产生内存非法访问
+	 */
+	void clear();
 
 	/**
 	 * 获得 json 对象的引用
@@ -258,10 +267,12 @@ private:
 	json* json_;
 	json_node* parent_;
 	json_node* parent_saved_;
-	json_node* child_;
+	std::vector<json_node*>* children_;
 	ACL_ITER* iter_;
 	string* buf_;
 	json_node* obj_;
+
+	void prepare_iter();
 };
 
 class ACL_CPP_API json : public pipe_stream
@@ -507,17 +518,16 @@ public:
 		string* out, size_t max = 0);
 	virtual int pop_end(string* out, size_t max = 0);
 	virtual void clear(void);
+
 private:
 	// 对应于 acl 库中的 ACL_JSON 对象
 	ACL_JSON *json_;
 	// json 对象树中的根结点对象
 	json_node* root_;
-	// 由该 json 容器分配的 json 结点集合
-	std::list<json_node*> nodes_;
-	// 临时的 json 结点对象
-	json_node* node_tmp_;
 	// 临时的 json 结点查询结果集
-	std::vector<json_node*> nodes_tmp_;
+	std::vector<json_node*> nodes_query_;
+	// 由该 json 容器分配的 json 结点集合
+	std::list<json_node*> nodes_tmp_;
 	// 缓冲区
 	string* buf_;
 	ACL_ITER* iter_;

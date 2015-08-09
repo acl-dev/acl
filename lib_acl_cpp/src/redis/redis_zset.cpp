@@ -444,7 +444,7 @@ int redis_zset::zrange_get_with_scores(const char* cmd, const char* key,
 
 	for (size_t i = 0; i < size; i++)
 	{
-		child = children[i * 2];
+		child = children[2 * i + 1];
 		if (child == NULL)
 			continue;
 
@@ -452,7 +452,7 @@ int redis_zset::zrange_get_with_scores(const char* cmd, const char* key,
 		score = atof(buf.c_str());
 		buf.clear();
 
-		child = children[(i + 1) * 2];
+		child = children[2 * i];
 		if (child == NULL)
 			continue;
 

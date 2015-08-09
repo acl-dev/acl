@@ -26,7 +26,8 @@ static bool test_hmset(acl::redis_hash& redis, int n)
 		redis.clear();
 		if (redis.hmset(key.c_str(), attrs) == false)
 		{
-			printf("hmset error, key: %s\r\n", key.c_str());
+			printf("hmset error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)
@@ -62,7 +63,7 @@ static bool test_hmget(acl::redis_hash& redis, int n)
 		redis.clear();
 		if (redis.hmget(key, attrs, 3, &result) == false)
 		{
-			printf("hmget error\r\n");
+			printf("hmget error: %s\r\n", redis.result_error());
 			return false;
 		}
 		else if (i >= 10)
@@ -103,7 +104,8 @@ static bool test_hset(acl::redis_hash& redis, int n)
 		if (redis.hset(key.c_str(), attr.c_str(),
 			value.c_str()) < 0)
 		{
-			printf("hset key: %s error\r\n", key.c_str());
+			printf("hset key: %s error: %s\r\n",
+				key.c_str(), redis.result_error());
 			return false;
 		}
 		else if (i < 10)
@@ -129,7 +131,8 @@ static bool test_hsetnx(acl::redis_hash& redis, int n)
 		if ((ret = redis.hsetnx(key.c_str(), attr.c_str(),
 			value.c_str())) <0)
 		{
-			printf("hsetnx key: %s error\r\n", key.c_str());
+			printf("hsetnx key: %s error: %s\r\n",
+				key.c_str(), redis.result_error());
 			return false;
 		}
 		else if (i < 10)
@@ -213,7 +216,8 @@ static bool test_hdel(acl::redis_hash& redis, int n)
 		int ret = redis.hdel(key.c_str(), attr.c_str(), NULL);
 		if (ret < 0)
 		{
-			printf("hdel key: %s error\r\n", key.c_str());
+			printf("hdel key: %s error: %s\r\n",
+				key.c_str(), redis.result_error());
 			return false;
 		}
 		else if (i < 10)
@@ -237,8 +241,8 @@ static bool test_hincrby(acl::redis_hash& redis, int n)
 		if (redis.hincrby(key.c_str(), attr.c_str(), 10,
 			&result) == false)
 		{
-			printf("hincrby error, key: %s, attr: %s\r\n",
-				key.c_str(), attr.c_str());
+			printf("hincrby error: %s, key: %s, attr: %s\r\n",
+				redis.result_error(), key.c_str(), attr.c_str());
 			return false;
 		}
 		else if (i < 10)
@@ -263,7 +267,8 @@ static bool test_hincrbyfloat(acl::redis_hash& redis, int n)
 		if (redis.hincrbyfloat(key.c_str(), attr.c_str(),
 			8.8, &result) == false)
 		{
-			printf("hincrbyfloat error, key: %s\r\n", key.c_str());
+			printf("hincrbyfloat error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i >= 10)
@@ -289,7 +294,8 @@ static bool test_hkeys(acl::redis_hash& redis, int n)
 		redis.clear();
 		if (redis.hkeys(key.c_str(), attrs) == false)
 		{
-			printf("hkeys error, key: %s\r\n", key.c_str());
+			printf("hkeys error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i >= 10)
@@ -341,7 +347,8 @@ static bool test_hlen(acl::redis_hash& redis, int n)
 		int ret = redis.hlen(key.c_str());
 		if (ret < 0)
 		{
-			printf("hlen error, key: %s\r\n", key.c_str());
+			printf("hlen error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i < 10)

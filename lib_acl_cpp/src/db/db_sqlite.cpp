@@ -65,9 +65,13 @@
 	if (ptr)
 		path = ptr;
 	else
+#ifdef ACL_WINDOWS
 		path = "sqlite3.dll";
+#else
+		path = "sqlite3.so";
+#endif
 
-	__sqlite_dll = acl_dlopen("sqlite3.dll");
+	__sqlite_dll = acl_dlopen(path);
 	if (__sqlite_dll == NULL)
 		logger_fatal("load %s error: %s", path, acl_last_serror());
 

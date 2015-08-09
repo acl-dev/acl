@@ -258,7 +258,7 @@ ACL_XML_NODE *acl_xml_node_next(ACL_XML_NODE *node)
 
 ACL_XML_NODE *acl_xml_node_prev(ACL_XML_NODE *node)
 {
-	ACL_RING *ring_ptr = acl_ring_succ(&node->node);
+	ACL_RING *ring_ptr = acl_ring_pred(&node->node);
 	ACL_XML_NODE *parent;
 
 	if (ring_ptr == &node->node)

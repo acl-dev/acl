@@ -22,7 +22,8 @@ static bool test_pfadd(acl::redis_hyperloglog& redis, int n)
 		int ret = redis.pfadd(key.c_str(), elements);
 		if (ret < 0)
 		{
-			printf("pfadd error, key: %s\r\n", key.c_str());
+			printf("pfadd error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 
@@ -50,7 +51,7 @@ static bool test_pfcount(acl::redis_hyperloglog& redis, int n)
 	int ret = redis.pfcount(keys);
 	if (ret < 0)
 	{
-		printf("pfcount error\r\n");
+		printf("pfcount error: %s\r\n", redis.result_error());
 		return false;
 	}
 
@@ -74,7 +75,8 @@ static bool test_pfmerge(acl::redis_hyperloglog& redis, int n)
 	redis.clear();
 	if (redis.pfmerge(dest_key, keys) == false)
 	{
-		printf("pfmerge failed, dest: %s\r\n", dest_key.c_str());
+		printf("pfmerge failed: %s, dest: %s\r\n",
+			redis.result_error(), dest_key.c_str());
 		return false;
 	}
 

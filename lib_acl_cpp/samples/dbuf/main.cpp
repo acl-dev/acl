@@ -7,12 +7,25 @@
 class test_buf
 {
 public:
-	test_buf(acl::dbuf_pool* pool)
-		: pool_(pool)
+	test_buf()
 	{
 	}
 
 	~test_buf()
+	{
+	}
+};
+
+class test_buf2
+{
+public:
+	test_buf2(acl::dbuf_pool* pool)
+		: pool_(pool)
+	{
+		(void) pool_;
+	}
+
+	~test_buf2()
 	{
 	}
 
@@ -70,13 +83,13 @@ private:
 	void test_pool()
 	{
 		acl::dbuf_pool* pool = new acl::dbuf_pool;
-		test_buf* buf;
+		test_buf2* buf;
 
 		for (int i = 0; i < max_loop_; i++)
 		{
 			for (int j = 0; j < max_count_; j++)
 			{
-				buf = new (pool) test_buf(pool);
+				buf = new (pool) test_buf2(pool);
 				delete buf;
 			}
 
@@ -94,8 +107,8 @@ private:
 		{
 			for (int j = 0; j < max_count_; j++)
 			{
-				buf = (test_buf*) malloc(sizeof(test_buf));
-				free(buf);
+				buf = new test_buf;
+				delete buf;
 			}
 		}
 	}

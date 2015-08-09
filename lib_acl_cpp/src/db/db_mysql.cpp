@@ -89,7 +89,11 @@ static void __mysql_dll_load(void)
 	if (ptr)
 		path = ptr;
 	else
+#ifdef ACL_WINDOWS
 		path = "libmysql.dll";
+#else
+		path = "libmysqlclient_r.so";
+#endif
 
 	__mysql_dll = acl_dlopen(path);
 

@@ -104,10 +104,9 @@ static bool tbl_create(const char* dbaddr, const char* dbname,
 // 添加表数据
 static bool tbl_insert(acl::db_handle& db, int n)
 {
-	const char* sql_fmt = "insert into group_tbl(group_name, uvip_tbl,"
-		" update_date) values(:group, :test, :date)";
 	acl::query query;
-	query.create_sql(sql_fmt)
+	query.create_sql("insert into group_tbl(group_name, uvip_tbl,"
+		" update_date) values(:group, :test, :date)")
 		.set_format("group", "group:%d", n)
 		.set_parameter("test", "test")
 		.set_date("date", time(NULL), "%Y-%m-%d");
@@ -135,10 +134,9 @@ static bool tbl_insert(acl::db_handle& db, int n)
 // 查询表数据
 static int tbl_select(acl::db_handle& db, int n)
 {
-	const char* sql_fmt = "select * from group_tbl where"
-		" group_name=:group and uvip_tbl=:test";
 	acl::query query;
-	query.create_sql(sql_fmt)
+	query.create_sql("select * from group_tbl where group_name=:group"
+		" and uvip_tbl=:test")
 		.set_format("group", "group:%d", n)
 		.set_format("test", "test");
 
@@ -212,9 +210,9 @@ static int tbl_select(acl::db_handle& db, int n)
 // 删除表数据
 static bool tbl_delete(acl::db_handle& db, int n)
 {
-	const char* sql_fmt = "delete from group_tbl where group_name=:group";
 	acl::query query;
-	query.create_sql(sql_fmt).set_format("group", "group-%d", n);
+	query.create_sql("delete from group_tbl where group_name=:group")
+		.set_format("group", "group-%d", n);
 
 	if (db.exec_update(query) == false)
 	{

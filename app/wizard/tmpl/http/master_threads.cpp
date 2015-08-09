@@ -5,28 +5,31 @@
 ////////////////////////////////////////////////////////////////////////////////
 // ÅäÖÃÄÚÈÝÏî
 
-char *var_cfg_str;
+char *var_cfg_redis_addrs;
 acl::master_str_tbl var_conf_str_tab[] = {
-	{ "str", "test_msg", &var_cfg_str },
+	{ "redis_addrs", "127.0.0.1:6379", &var_cfg_redis_addrs },
 
 	{ 0, 0, 0 }
 };
 
-int  var_cfg_bool;
+int   var_cfg_use_redis_session;
 acl::master_bool_tbl var_conf_bool_tab[] = {
-	{ "bool", 1, &var_cfg_bool },
+	{ "use_redis_session", 1, &var_cfg_use_redis_session },
 
 	{ 0, 0, 0 }
 };
 
-int  var_cfg_int;
+int   var_cfg_conn_timeout;
+int   var_cfg_rw_timeout;
+int   var_cfg_max_threads;
 acl::master_int_tbl var_conf_int_tab[] = {
-	{ "int", 120, &var_cfg_int, 0, 0 },
+	{ "rw_timeout", 120, &var_cfg_rw_timeout, 0, 0 },
+	{ "ioctl_max_threads", 128, &var_cfg_max_threads, 0, 0 },
 
 	{ 0, 0 , 0 , 0, 0 }
 };
 
-long long int  var_cfg_int64;
+long long int   var_cfg_int64;
 acl::master_int64_tbl var_conf_int64_tab[] = {
 	{ "int64", 120, &var_cfg_int64, 0, 0 },
 
@@ -37,6 +40,8 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 
 master_service::master_service()
 {
+	session_ = NULL;
+	cluster_ = NULL;
 }
 
 master_service::~master_service()
@@ -49,14 +54,17 @@ bool master_service::thread_on_read(acl::socket_stream* conn)
 	if (servlet == NULL)
 		logger_fatal("servlet null!");
 
-	return servlet->doRun("127.0.0.1:11211", conn);
+	if (var_cfg_use_redis_session)
+		return servlet->doRun(*session_, conn);
+	else
+		return servlet->doRun("127.0.0.1:11211", conn);
 }
 
 bool master_service::thread_on_accept(acl::socket_stream* conn)
 {
 	logger("connect from %s, fd: %d", conn->get_peer(true),
 		conn->sock_handle());
-	conn->set_rw_timeout(5);
+	conn->set_rw_timeout(var_cfg_rw_timeout);
 
 	http_servlet* servlet = new http_servlet();
 	conn->set_ctx(servlet);
@@ -91,6 +99,19 @@ void master_service::thread_on_exit()
 
 void master_service::proc_on_init()
 {
+	// create redis cluster for session cluster
+	cluster_ = new acl::redis_client_cluster(var_cfg_conn_timeout,
+			var_cfg_rw_timeout);
+	cluster_->init(NULL, var_cfg_redis_addrs, var_cfg_max_threads);
+
+	// create session cluster
+	session_ = new acl::redis_session(*cluster_, var_cfg_max_threads);
+}
+
+void master_service::proc_on_exit()
+{
+	delete session_;
+	delete cluster_;
 }
 
 bool master_service::proc_exit_timer(size_t nclients, size_t nthreads)
@@ -103,8 +124,4 @@ bool master_service::proc_exit_timer(size_t nclients, size_t nthreads)
 	}
 
 	return false;
-}
-
-void master_service::proc_on_exit()
-{
 }

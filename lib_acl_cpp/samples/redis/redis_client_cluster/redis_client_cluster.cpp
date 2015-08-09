@@ -13,7 +13,8 @@ static bool test_del(acl::redis_key& cmd, int i)
 	int ret = cmd.del(key.c_str(), NULL);
 	if (ret < 0)
 	{
-		printf("del key: %s error\r\n", key.c_str());
+		printf("del key: %s error: %s\r\n",
+			key.c_str(), cmd.result_error());
 		return false;
 	}
 	else if (i < 10)
@@ -30,7 +31,8 @@ static bool test_expire(acl::redis_key& cmd, int i)
 	key.format("%s_%d", __keypre.c_str(), i);
 	if (cmd.expire(key.c_str(), 100) < 0)
 	{
-		printf("expire key: %s error\r\n", key.c_str());
+		printf("expire key: %s error: %s\r\n",
+			key.c_str(), cmd.result_error());
 		return false;
 	}
 	else if (i < 10)
@@ -48,7 +50,8 @@ static bool test_ttl(acl::redis_key& cmd, int i)
 	key.format("%s_%d", __keypre.c_str(), i);
 	if ((ttl = cmd.ttl(key.c_str())) < 0)
 	{
-		printf("get ttl key: %s error\r\n", key.c_str());
+		printf("get ttl key: %s error: %s\r\n",
+			key.c_str(), cmd.result_error());
 		return false;
 	}
 	else if (i < 10)

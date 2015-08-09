@@ -24,7 +24,7 @@ static bool test_echo(acl::redis_connection& redis, int n)
 		redis.clear();
 		if (redis.echo(buf.c_str()) == false)
 		{
-			printf("echo error\r\n");
+			printf("echo error: %s\r\n", redis.result_error());
 			return false;
 		}
 		else if (i >= 10)
@@ -42,7 +42,7 @@ static bool test_ping(acl::redis_connection& redis, int n)
 		redis.clear();
 		if (redis.ping() == false)
 		{
-			printf("ping failed\r\n");
+			printf("ping failed: %s\r\n", redis.result_error());
 			return false;
 		}
 		else if (i < 10)
@@ -56,7 +56,7 @@ static bool test_quit(acl::redis_connection& redis)
 	redis.clear();
 	if (redis.quit() == false)
 	{
-		printf("quit error\r\n");
+		printf("quit error: %s\r\n", redis.result_error());
 		return false;
 	}
 	else
@@ -73,7 +73,8 @@ static bool test_select(acl::redis_connection& redis, int n)
 		redis.clear();
 		if (redis.select(i % 2) == false)
 		{
-			printf("select %d error\r\n", i % 2);
+			printf("select %d error: %s\r\n",
+				i % 2, redis.result_error());
 			return false;
 		}
 		else if (i < 10)

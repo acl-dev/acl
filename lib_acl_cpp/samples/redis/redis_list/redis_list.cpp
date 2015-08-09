@@ -29,7 +29,8 @@ static bool test_lpush(acl::redis_list& redis, int n)
 		int ret = redis.lpush(__key, value.c_str(), NULL);
 		if (ret <= 0)
 		{
-			printf("lpush key: %s error\r\n", __key);
+			printf("lpush key: %s error: %s\r\n",
+				__key, redis.result_error());
 			return false;
 		}
 		else if (i < max_print_line)
@@ -54,7 +55,7 @@ static bool test_lpush2(acl::redis_list& redis, int n)
 	int ret = redis.lpush(__key, (const char**) value, n);
 	if (ret <= 0)
 	{
-		printf("lpush key: %s error\r\n", __key);
+		printf("lpush key: %s error: %s\r\n", __key, redis.result_error());
 		return false;
 	}
 	else
@@ -83,7 +84,7 @@ static bool test_lpush3(acl::redis_list &redis, int n)
 	int ret = redis.lpush(__key, values);
 	if (ret <= 0)
 	{
-		printf("lpush key:%s error\r\n", __key);
+		printf("lpush key:%s error: %s\r\n", __key, redis.result_error());
 		return false;
 	}
 	else
@@ -108,7 +109,7 @@ static bool test_lpush4(acl::redis_list &redis, int n)
 	int ret = redis.lpush(__key, (std::vector<const char*>&) values);
 	if(ret <= 0)
 	{
-		printf("lpush key:%s error\r\n", __key);
+		printf("lpush key:%s error: %s\r\n", __key, redis.result_error());
 		return false;
 	}
 	else
@@ -137,7 +138,7 @@ static bool test_lpush5(acl::redis_list &redis, int n)
 	int ret = redis.lpush(__key, values);
 	if(ret <= 0)
 	{
-		printf("lpush key:%s error\r\n", __key);
+		printf("lpush key:%s error: %s\r\n", __key, redis.result_error());
 		return false;
 	}
 	else
@@ -166,7 +167,7 @@ static bool test_lpush6(acl::redis_list &redis, int n)
 	int ret = redis.lpush(__key, (const char**)values, lens, n);
 	if (ret <= 0)
 	{
-		printf("lpush key:%s error\r\n", __key);
+		printf("lpush key:%s error: %s\r\n", __key, redis.result_error());
 		return false;
 	}
 	else
@@ -191,7 +192,8 @@ static bool test_rpush(acl::redis_list& redis, int n)
 		ret = redis.rpush(__key, value.c_str(), NULL);
 		if (ret <= 0)
 		{
-			printf("rpush key:%s error, \r\n", __key);
+			printf("rpush key:%s error, %s\r\n",
+				__key, redis.result_error());
 			return false;
 		}
 		else if (i < max_print_line)
@@ -216,7 +218,7 @@ static bool test_rpush2(acl::redis_list& redis, int n)
 	redis.clear();
 	int ret = redis.rpush(__key, (const char **)values, n);
 	if(ret < 0)
-		printf("rpush key:%s error\r\n",__key);
+		printf("rpush key:%s error: %s\r\n",__key, redis.result_error());
 	else
 		printf("rpush key:%s ret : %d ok\r\n", __key, ret);
 
@@ -239,7 +241,7 @@ static bool test_rpush3(acl::redis_list &redis, int n)
 	int ret = redis.rpush(__key, values);
 	if (ret <= 0)
 	{
-		printf("rpush key:%s error", __key);
+		printf("rpush key:%s error: %s", __key, redis.result_error());
 		return false;
 	}
 	else
@@ -319,7 +321,7 @@ static bool test_rpush6(acl::redis_list &redis, int n)
 	redis.clear();
 	int ret = redis.rpush(__key, (const char**) values,lens, n);
 	if (ret <= 0)
-		printf("rpush key:%s error", __key);
+		printf("rpush key:%s error: %s", __key, redis.result_error());
 	else
 		printf("rpush key:%s ret : %d ok\r\n", __key, ret);
 
@@ -341,7 +343,8 @@ static bool test_lpushx(acl::redis_list& redis, int n)
 		ret = redis.lpushx(__key, value.c_str());
 		if (ret <= 0)
 		{
-			printf("lpushx key: %s error\r\n", __key);
+			printf("lpushx key: %s error: %s\r\n",
+				__key, redis.result_error());
 			return false;
 		}
 		else if (i < max_print_line)
@@ -362,7 +365,8 @@ static bool test_lpushx2(acl::redis_list &redis, int n)
 		int ret = redis.lpushx(__key, value.c_str(), value.length());
 		if(ret <= 0)
 		{
-			printf("lpushx key:%s error \r\n", __key);
+			printf("lpushx key:%s error: %s\r\n",
+				__key, redis.result_error());
 			return false;
 		}
 		else if(i < max_print_line)
@@ -383,7 +387,8 @@ static bool test_rpushx (acl::redis_list &redis, int n)
 		int ret = redis.rpushx(__key, value.c_str());
 		if(ret <= 0)
 		{
-			printf("lpushx key:%s error \r\n", __key);
+			printf("lpushx key:%s error: %s\r\n",
+				__key, redis.result_error());
 			return false;
 		}
 		else if(i < max_print_line)
@@ -403,7 +408,8 @@ static bool test_rpushx2 (acl::redis_list &redis, int n)
 		int ret = redis.rpushx(__key, value.c_str(), value.length());
 		if(ret <= 0)
 		{
-			printf("lpushx key:%s error \r\n", __key);
+			printf("lpushx key:%s error: %s\r\n",
+				__key, redis.result_error());
 			return false;
 		}
 		else if(i < max_print_line)
@@ -421,7 +427,8 @@ static bool test_lrange(acl::redis_list& redis)
 	bool ret = redis.lrange(__key, 0, 1000, &result);
 	if (ret == false)
 	{
-		printf("lrang key: %s error\r\n", __key);
+		printf("lrang key: %s error: %s\r\n",
+			__key, redis.result_error());
 		return false;
 	}
 
@@ -451,7 +458,8 @@ static bool test_rpop(acl::redis_list &redis, int n)
 		ret = redis.rpop(__key, buf);
 		if (ret <= 0)
 		{
-			printf("rpop key: %s error\r\n", __key);
+			printf("rpop key: %s error: %s\r\n",
+				__key, redis.result_error());
 			return false;
 		}
 		printf("rpop key:%s ,buf:%s ok \r\n", __key, buf.c_str());
@@ -472,7 +480,8 @@ static bool test_lpop(acl::redis_list &redis, int n)
 		ret = redis.lpop(__key, buf);
 		if (ret <= 0)
 		{
-			printf("lpop key: %s error\r\n", __key);
+			printf("lpop key: %s error: %s\r\n",
+				__key, redis.result_error());
 			return false;
 		}
 		printf("lpop key:%s ,buf:%s ok \r\n", __key, buf.c_str());
@@ -495,7 +504,7 @@ static bool test_blpop(acl::redis_list &redis, int n)
 	bool ret = redis.blpop(keys, n, result);
 	if (ret == false)
 	{
-		printf("blpop timeout\r\n");
+		printf("blpop timeout: %s\r\n", redis.result_error());
 		return false;
 	}
 	else
@@ -521,7 +530,7 @@ static bool test_brpop(acl::redis_list &redis, int n)
 	bool ret = redis.brpop(keys, n, result);
 	if (ret == false)
 	{
-		printf("brpop timeout\r\n");
+		printf("brpop timeout: %s\r\n", redis.result_error());
 		return false;
 	}
 	else
@@ -541,8 +550,8 @@ static bool test_rpoplpush(acl::redis_list &redis, int)
 	bool ret = redis.rpoplpush(src.c_str(), dst.c_str(), &buf);
 	if(ret == false)
 	{
-		printf("rpoplpush src:%s, dst:%s error\r\n",
-			src.c_str(), dst.c_str());
+		printf("rpoplpush src:%s, dst:%s error: %s\r\n",
+			src.c_str(), dst.c_str(), redis.result_error());
 		return false;
 	}
 	else
@@ -562,8 +571,8 @@ static bool test_brpoplpush(acl::redis_list &redis, int)
 	bool ret = redis.brpoplpush(src.c_str(), dst.c_str(), 1, &buf);
 	if(ret == false)
 	{
-		printf("brpoplpush src:%s, dst:%s timeout\r\n",
-			src.c_str(), dst.c_str());
+		printf("brpoplpush src:%s, dst:%s timeout: %s\r\n",
+			src.c_str(), dst.c_str(), redis.result_error());
 		return false;
 	}
 	else
@@ -579,7 +588,8 @@ static bool test_lrem(acl::redis_list &redis, int n)
 	int ret = redis.lrem(__key, n, "list1_1");
 	if (ret < 0)
 	{
-		printf("lrem key:%s,count:%d error\r\n", __key, n);
+		printf("lrem key:%s,count:%d error: %s\r\n",
+			__key, n, redis.result_error());
 		return false;
 	}
 	else
@@ -594,7 +604,8 @@ static bool test_ltrim(acl::redis_list &redis, int n)
 	bool ret = redis.ltrim(__key, 0, n);
 	if (ret == false)
 	{
-		printf("ltrim key:%s,start:%d end:%d error\r\n", __key, 0, n);
+		printf("ltrim key:%s,start:%d end:%d error: %s\r\n",
+			__key, 0, n, redis.result_error());
 		return false;
 	}
 	else
@@ -609,7 +620,7 @@ static bool test_llen(acl::redis_list &redis, int)
 	int len = redis.llen(__key);
 	if (len < 0)
 	{
-		printf("llen key:%s error\r\n", __key);
+		printf("llen key:%s error: %s\r\n", __key, redis.result_error());
 		return false;
 	}
 	else
@@ -626,7 +637,7 @@ static bool test_lindex(acl::redis_list &redis, int n)
 	bool ret = redis.lindex(__key, n, buf);
 	if (ret == false)
 	{
-		printf("lindex key:%s error\r\n",__key);
+		printf("lindex key:%s error: %s\r\n",__key, redis.result_error());
 		return false;
 	}
 	else
@@ -641,7 +652,8 @@ static bool test_lset(acl::redis_list &redis, int n)
 	bool ret = redis.lset(__key, n, "new_value");
 	if (ret == false)
 	{
-		printf("lset key:%s ,index:%d error\r\n",__key, n);
+		printf("lset key:%s ,index:%d error: %s\r\n",
+			__key, n, redis.result_error());
 		return false;
 	}
 	else
@@ -656,7 +668,8 @@ static bool test_linsert_before(acl::redis_list &redis, int)
 	int ret  = redis.linsert_before(__key, "list1_1","list1_new");
 	if (ret < 0)
 	{
-		printf("linsert_before key:%s,error\r\n", __key);
+		printf("linsert_before key:%s, error: %s\r\n",
+			__key, redis.result_error());
 		return false;
 	}
 	else
@@ -671,7 +684,8 @@ static bool test_linsert_after(acl::redis_list &redis, int)
 	int ret  = redis.linsert_after(__key, "list1_1","list1_new");
 	if (ret < 0)
 	{
-		printf("linsert_before key:%s,error\r\n", __key);
+		printf("linsert_before key:%s, error: %s\r\n",
+			__key, redis.result_error());
 		return false;
 	}
 	else

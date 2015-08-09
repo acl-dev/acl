@@ -65,7 +65,8 @@ static bool test_geohash(acl::redis& redis, int n)
 		bool ret = redis.geohash(key.c_str(), members, results);
 		if (!ret)
 		{
-			printf("geohash key: %s error\r\n", key.c_str());
+			printf("geohash key: %s error: %s\r\n",
+				key.c_str(), redis.result_error());
 			return false;
 		}
 		else if (i >= 10)
@@ -107,7 +108,7 @@ static bool test_geopos(acl::redis& redis, int n)
 		bool ret = redis.geopos(key.c_str(), members, results);
 		if (!ret)
 		{
-			printf("geopos error\r\n");
+			printf("geopos error: %s\r\n", redis.result_error());
 			return false;
 		}
 		else if (i >= 10)
@@ -138,7 +139,8 @@ static bool test_geodist(acl::redis& redis, int n)
 			member2.c_str());
 		if (ret < 0)
 		{
-			printf("geodist error, key: %s\r\n", key.c_str());
+			printf("geodist error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
 			return false;
 		}
 		else if (i >= 10)
