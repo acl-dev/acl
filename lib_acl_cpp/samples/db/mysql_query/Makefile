@@ -1,4 +1,6 @@
 base_path = ../../..
 include ../../Makefile.in
 PROG = mysql_query
-EXTLIBS += -ldl
+ifneq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
+	EXTLIBS += -ldl
+endif
