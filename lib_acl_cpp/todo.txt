@@ -28,3 +28,4 @@ http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=270070
 21) 应该重新设计 aio_stream 中对 polarssl 的支持方式 -- 完成
 22) db_pool: 支持更为简洁的数据库操作接口
 23) 流数据传输支持 tlv 格式
+24) http 模块支持 HTTP 认证

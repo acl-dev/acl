@@ -1,5 +1,6 @@
 #include "acl_stdafx.hpp"
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/json.hpp"
 
 namespace acl

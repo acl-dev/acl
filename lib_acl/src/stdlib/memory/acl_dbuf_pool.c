@@ -109,8 +109,9 @@ void acl_dbuf_pool_reset(ACL_DBUF_POOL *pool, size_t off)
 
 	if (pool->head->buf_addr + off >= (char*) pool + pool->block_size)
 		acl_msg_fatal("%s(%d) off(%ld) too big, should < %ld",
-			__FUNCTION__, __LINE__, (long) off, (char*) pool
-			+ pool->block_size - pool->head->buf_addr);
+			__FUNCTION__, __LINE__, (long) off, (long)
+			((char*) pool + pool->block_size
+			 - pool->head->buf_addr));
 
 	pool->head->ptr = pool->head->buf_addr + off;
 }

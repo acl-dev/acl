@@ -168,7 +168,7 @@ int db_pool::check_idle(time_t ttl, bool exclusive /* = true */)
 		{
 			delete *it;
 			n++;
-		};
+		}
 		pool_.clear();
 		dbcount_ = 0;
 		locker_->unlock();
