@@ -11,7 +11,7 @@ class mysql_conf;
 class ACL_CPP_API mysql_manager : public connect_manager
 {
 public:
-	mysql_manager();
+	mysql_manager(time_t idle_ttl = 120);
 	~mysql_manager();
 
 	/**
@@ -52,16 +52,7 @@ protected:
 	connect_pool* create_pool(const char* addr, int count, size_t idx);
 
 private:
-	char* dbaddr_;		// 数据库监听地址
-	char* dbname_;          // 数据库名
-	char* dbuser_;          // 数据库账号
-	char* dbpass_;          // 数据库账号密码
-	int   dblimit_;         // 数据库连接池连接数上限
-	unsigned long dbflags_; // 打开数据库时的标志位
-	bool  auto_commit_;     // 是否自动提交修改后的数据
-	int   conn_timeout_;    // 连接数据库的超时时间
-	int   rw_timeout_;      // 与数据库通信的超时时间
-
+	time_t idle_ttl_;       // 数据库连接的空闲过期时间
 	std::map<string, mysql_conf*> dbs_;
 };
 

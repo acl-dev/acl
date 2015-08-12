@@ -4,6 +4,7 @@
 341) 2015.8.12
 341.1) mysql_manager: mysql 连接池集群测试通过，增加了 mysql_conf 配置类，方便
 添加 mysql 连接对象
+341.2) feature: mysql_manager 支持设置连接池中每个连接的空闲生存周期
 
 340) 2015.8.11
 340.1) feature: db 模块增加了数据库连接池集群管理，涉及的修改有：

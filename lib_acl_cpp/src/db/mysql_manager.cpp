@@ -6,7 +6,8 @@
 
 namespace acl {
 
-mysql_manager::mysql_manager()
+mysql_manager::mysql_manager(time_t idle_ttl /* = 120 */)
+	: idle_ttl_(idle_ttl)
 {
 }
 
@@ -96,6 +97,10 @@ connect_pool* mysql_manager::create_pool(const char* key, int, size_t)
 		conf->get_dbpass(), conf->get_dblimit(),
 		conf->get_dbflags(), conf->get_auto_commit(),
 		conf->get_conn_timeout(), conf->get_rw_timeout());
+
+	if (idle_ttl_ > 0)
+		dbpool->set_idle_ttl(idle_ttl_);
+
 	return dbpool;
 }
 
