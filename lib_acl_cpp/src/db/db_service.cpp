@@ -49,7 +49,7 @@ protected:
 		data.rows = NULL;
 		data.affected_rows = 0;
 
-		if (db_->open() == false)
+		if (db_->dbopen("utf8") == false)
 			ipc->send_message(DB_ERR_OPEN, &data, sizeof(data));
 		else if (has_res_)
 		{
@@ -87,7 +87,7 @@ protected:
 		data->rows = NULL;
 		data->affected_rows = 0;
 
-		if (db_->open() == false)
+		if (db_->dbopen("utf8") == false)
 			::PostMessage(hWnd, DB_ERR_OPEN + WM_USER, 0, (LPARAM) data);
 		else if (has_res_)
 		{

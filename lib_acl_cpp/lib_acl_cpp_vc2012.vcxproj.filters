@@ -481,6 +481,15 @@
     <ClCompile Include="src\stream\stdout_stream.cpp">
       <Filter>Source Files\stream</Filter>
     </ClCompile>
+    <ClCompile Include="src\db\mysql_manager.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\sqlite_manager.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\mysql_conf.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -992,6 +1001,15 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stream\stdout_stream.hpp">
       <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\mysql_manager.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\sqlite_manager.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\mysql_conf.hpp">
+      <Filter>Header Files\db</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

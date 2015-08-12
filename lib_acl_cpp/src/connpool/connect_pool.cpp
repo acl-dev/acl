@@ -51,6 +51,12 @@ connect_pool& connect_pool::set_retry_inter(int retry_inter)
 	return *this;
 }
 
+connect_pool& connect_pool::set_check_inter(int n)
+{
+	check_inter_ = n;
+	return *this;
+}
+
 bool connect_pool::aliving()
 {
 	// XXX，虽然此处未加锁，但也应该不会有问题，因为下面的 peek() 过程会再次
@@ -112,12 +118,12 @@ connect_client* connect_pool::peek()
 		return NULL;
 	}
 
+	// 调用虚函数的子类实现方法，创建新连接对象，并打开连接
 	conn = create_connect();
 	if (conn->open() == false)
 	{
 		delete conn;
 		alive_ = false;
-		time(&last_dead_);
 		(void) time(&last_dead_);
 		lock_.unlock();
 		return NULL;

@@ -217,8 +217,11 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\db\db_service_mysql.cpp" />
     <ClCompile Include="src\db\db_service_sqlite.cpp" />
     <ClCompile Include="src\db\db_sqlite.cpp" />
+    <ClCompile Include="src\db\mysql_conf.cpp" />
+    <ClCompile Include="src\db\mysql_manager.cpp" />
     <ClCompile Include="src\db\mysql_pool.cpp" />
     <ClCompile Include="src\db\query.cpp" />
+    <ClCompile Include="src\db\sqlite_manager.cpp" />
     <ClCompile Include="src\db\sqlite_pool.cpp" />
     <ClCompile Include="src\disque\disque.cpp" />
     <ClCompile Include="src\disque\disque_cond.cpp" />
@@ -377,7 +380,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\db\db_service_mysql.hpp" />
     <ClInclude Include="include\acl_cpp\db\db_service_sqlite.hpp" />
     <ClInclude Include="include\acl_cpp\db\db_sqlite.hpp" />
+    <ClInclude Include="include\acl_cpp\db\mysql_conf.hpp" />
+    <ClInclude Include="include\acl_cpp\db\mysql_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\db\mysql_pool.hpp" />
     <ClInclude Include="include\acl_cpp\db\query.hpp" />
+    <ClInclude Include="include\acl_cpp\db\sqlite_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\db\sqlite_pool.hpp" />
     <ClInclude Include="include\acl_cpp\disque\disque.hpp" />
     <ClInclude Include="include\acl_cpp\disque\disque_cond.hpp" />
     <ClInclude Include="include\acl_cpp\disque\disque_job.hpp" />

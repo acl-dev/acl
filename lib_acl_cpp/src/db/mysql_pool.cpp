@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/connpool/connect_client.hpp"
 #include "acl_cpp/db/db_handle.hpp"
 #include "acl_cpp/db/db_mysql.hpp"
 #include "acl_cpp/db/mysql_pool.hpp"
@@ -10,12 +11,22 @@ mysql_pool::mysql_pool(const char* dbaddr, const char* dbname,
 	const char* dbuser, const char* dbpass, int dblimit /* = 64 */,
 	unsigned long dbflags /* = 0 */, bool auto_commit /* = true */,
 	int conn_timeout /* = 60 */, int rw_timeout /* = 60 */)
-: db_pool(dblimit)
+: db_pool(dbaddr, dblimit)
 {
 	acl_assert(dbaddr && *dbaddr);
 	acl_assert(dbname && *dbname);
-	dbaddr_ = acl_mystrdup(dbaddr);
+
+	// µÿ÷∑∏Ò Ω£∫[dbname@]dbaddr
+	const char* ptr = strchr(dbaddr, '@');
+	if (ptr != NULL)
+		ptr++;
+	else
+		ptr = dbaddr;
+	acl_assert(*ptr);
+
+	dbaddr_ = acl_mystrdup(ptr);
 	dbname_ = acl_mystrdup(dbname);
+
 	if (dbuser)
 		dbuser_ = acl_mystrdup(dbuser);
 	else
@@ -44,7 +55,7 @@ mysql_pool::~mysql_pool()
 		acl_myfree(dbpass_);
 }
 
-db_handle* mysql_pool::create()
+connect_client* mysql_pool::create_connect()
 {
 	return NEW db_mysql(dbaddr_, dbname_, dbuser_,
 		dbpass_, dbflags_, auto_commit_,

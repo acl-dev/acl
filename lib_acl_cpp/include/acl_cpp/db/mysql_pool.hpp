@@ -6,7 +6,7 @@ namespace acl {
 
 class db_handle;
 
-class ACL_CPP_API mysql_pool : public acl::db_pool
+class ACL_CPP_API mysql_pool : public db_pool
 {
 public:
 	/**
@@ -28,18 +28,20 @@ public:
 		bool auto_commit = true, int conn_timeout = 60,
 		int rw_timeout = 60);
 	~mysql_pool();
+
 protected:
-	// 基类虚函数：创建数据库连接句柄
-	virtual db_handle* create();
+	// 基类 connect_pool 纯虚函数：创建数据库连接句柄
+	connect_client* create_connect();
+
 private:
 	char* dbaddr_;  // 数据库监听地址
 	char* dbname_;  // 数据库名
 	char* dbuser_;  // 数据库账号
 	char* dbpass_;  // 数据库账号密码
 	unsigned long dbflags_;
-	int   conn_timeout_;
-	int   rw_timeout_;
-	bool  auto_commit_;
+	bool  auto_commit_;  // 是否自动提交修改后的数据
+	int   conn_timeout_; // 连接数据库的超时时间
+	int   rw_timeout_;   // 与数据库通信的超时时间
 };
 
 } // namespace acl

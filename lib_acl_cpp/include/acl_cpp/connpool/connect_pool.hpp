@@ -49,6 +49,13 @@ public:
 	connect_pool& set_idle_ttl(time_t ttl);
 
 	/**
+	 * 设置自动检查空闲连接的时间间隔，缺省值为 30 秒
+	 * @param n {int} 时间间隔
+	 * @return {connect_pool&}
+	 */
+	connect_pool& set_check_inter(int n);
+
+	/**
 	 * 从连接池中尝试性获取一个连接，当服务器不可用、距上次服务端连接异常时间间隔
 	 * 未过期或连接池连接个数达到连接上限则将返回 NULL；当创建一个新的与服务器的
 	 * 连接时失败，则该连接池会被置为不可用状态
@@ -96,6 +103,15 @@ public:
 
 	/**
 	 * 获取连接池最大连接数限制
+	 * @return {int}
+	 */
+	int get_max() const
+	{
+		return max_;
+	}
+
+	/**
+	 * 获取连接池当前连接数个数
 	 * @return {int}
 	 */
 	int get_count() const
@@ -146,6 +162,10 @@ public:
 	}
 
 protected:
+	/**
+	 * 纯虚函数，需要子类实现
+	 * @return {connect_client*}
+	 */
 	virtual connect_client* create_connect() = 0;
 
 	friend class connect_manager;

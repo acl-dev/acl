@@ -1,6 +1,17 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+341) 2015.8.12
+341.1) mysql_manager: mysql 连接池集群测试通过，增加了 mysql_conf 配置类，方便
+添加 mysql 连接对象
+
+340) 2015.8.11
+340.1) feature: db 模块增加了数据库连接池集群管理，涉及的修改有：
+(1) db_handle 继承于 connect_client；db_pool 继承于 connect_pool;
+(2) 修改 mysql_pool/sqlite_pool，使之实现了基类 connect_pool 中的虚方法
+(3) 修改 db_mysql/db_mysql，使之实现了基类 connect_client 中的虚方法
+(4) 增加了 mysql_manager/sqlite_manager，使之继承于 connect_manager
+
 339) 2015.8.9
 339.1) bugfix: redis_zset::zrange_get_with_scores 在取得结果时处理的顺序存在问题
 

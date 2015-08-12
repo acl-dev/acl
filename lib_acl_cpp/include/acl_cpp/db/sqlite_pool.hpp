@@ -6,7 +6,7 @@ namespace acl {
 
 class db_handle;
 
-class ACL_CPP_API sqlite_pool : public acl::db_pool
+class ACL_CPP_API sqlite_pool : public db_pool
 {
 public:
 	/**
@@ -16,9 +16,11 @@ public:
 	 */
 	sqlite_pool(const char* dbfile, int dblimit = 64);
 	~sqlite_pool();
+
 protected:
-	// 基类虚函数：创建数据库连接句柄
-	virtual db_handle* create();
+	// 基类 connect_pool 纯虚函数：创建数据库连接句柄
+	connect_client* create_connect();
+
 private:
 	// sqlite 数据文件名
 	char* dbfile_;

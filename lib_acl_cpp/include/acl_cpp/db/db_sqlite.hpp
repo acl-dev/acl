@@ -90,7 +90,7 @@ public:
 	 * @param local_charset {const char*} 本地字符集(gbk, utf-8, ...)
 	 * @return {bool} 打开是否成功
 	 */
-	bool open(const char* local_charset = "utf-8");
+	bool dbopen(const char* local_charset);
 
 	/**
 	 * 基类 db_handle 的纯虚接口，数据库是否已经打开了

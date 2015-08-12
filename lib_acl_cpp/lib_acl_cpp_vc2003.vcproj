@@ -705,13 +705,22 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\db\db_sqlite.cpp">
 				</File>
 				<File
+					RelativePath=".\src\db\mysql_conf.cpp">
+				</File>
+				<File
 					RelativePath=".\src\db\mysql_pool.cpp">
+				</File>
+				<File
+					RelativePath=".\src\db\mysql_manager.cpp">
 				</File>
 				<File
 					RelativePath=".\src\db\query.cpp">
 				</File>
 				<File
 					RelativePath=".\src\db\sqlite_pool.cpp">
+				</File>
+				<File
+					RelativePath=".\src\db\sqlite_manager.cpp">
 				</File>
 			</Filter>
 			<Filter
@@ -1239,13 +1248,22 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\acl_cpp\db\db_sqlite.hpp">
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\db\mysql_conf.hpp">
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\db\mysql_pool.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\db\mysql_manager.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\db\query.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\db\sqlite_pool.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\db\sqlite_manager.hpp">
 				</File>
 			</Filter>
 			<Filter

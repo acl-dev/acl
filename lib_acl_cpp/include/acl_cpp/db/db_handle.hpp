@@ -2,6 +2,7 @@
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <vector>
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/connpool/connect_client.hpp"
 
 namespace acl {
 
@@ -213,11 +214,37 @@ class query;
 /**
  * 数据库操作句柄对象类型
  */
-class ACL_CPP_API db_handle
+class ACL_CPP_API db_handle : public connect_client
 {
 public:
-	db_handle(void);
+	db_handle(const char* charset = "utf8");
 	virtual ~db_handle(void);
+
+	/////////////////////////////////////////////////////////////////////
+
+	/**
+	 * 基类 connect_client 虚函数的实现
+	 * @return {bool} 打开数据库连接是否成功
+	 */
+	bool open();
+
+	/////////////////////////////////////////////////////////////////////
+
+	/**
+	 * 设置字符集
+	 * @param charset {const char*} 字符集，非 NULL 字符串
+	 * @return {db_handle&}
+	 */
+	db_handle& set_charset(const char* charset);
+
+	/**
+	 * 获得当前数据库句柄的字符集
+	 * @return {const char*}
+	 */
+	const char* get_charset() const
+	{
+		return charset_.c_str();
+	}
 
 	/**
 	 * 返回数据库的类型描述
@@ -248,7 +275,7 @@ public:
 	 * @param local_charset {const char*} 本地字符集(gbk, utf8, ...)
 	 * @return {bool} 打开是否成功
 	 */
-	virtual bool open(const char* local_charset = "utf8") = 0;
+	virtual bool dbopen(const char* local_charset) = 0;
 
 	/**
 	 * 数据库是否已经打开了
@@ -430,6 +457,9 @@ public:
 	static const char* get_loadpath();
 
 protected:
+	// 连接数据库所用的字符集
+	string charset_;
+
 	// 临时结果对象
 	db_rows* result_;
 

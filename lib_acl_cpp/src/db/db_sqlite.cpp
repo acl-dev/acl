@@ -247,7 +247,7 @@ const char* db_sqlite::get_error() const
 	else
 		return "sqlite not opened yet!";
 }
-bool db_sqlite::open(const char* local_charset /* = "gbk" */)
+bool db_sqlite::dbopen(const char* local_charset)
 {
 	// 如果数据库已经打开，则直接返回 true
 	if (db_ != NULL)
@@ -524,7 +524,7 @@ namespace acl
 db_sqlite::db_sqlite(const char*) {}
 db_sqlite::~db_sqlite(void) {}
 const char* db_sqlite::dbtype() const { return NULL; }
-bool db_sqlite::open(const char*) { return false; }
+bool db_sqlite::dbopen(const char*) { return false; }
 bool db_sqlite::is_opened() const { return false; }
 bool db_sqlite::close(void) { return false; }
 bool db_sqlite::tbl_exists(const char*) { return false; }

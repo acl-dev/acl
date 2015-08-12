@@ -21,13 +21,13 @@ json_node::json_node(ACL_JSON_NODE* node, json* json_ptr)
 
 json_node::~json_node(void)
 {
+	clear();
 	delete parent_saved_;
 	delete children_;
 	if (iter_)
 		acl_myfree(iter_);
 	delete buf_;
 	delete obj_;
-	clear();
 }
 
 const char* json_node::tag_name(void) const

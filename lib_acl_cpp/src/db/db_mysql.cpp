@@ -296,7 +296,14 @@ db_mysql::db_mysql(const char* dbaddr, const char* dbname,
 	if (dbname == NULL || *dbname == 0)
 		logger_fatal("dbname null");
 
-	dbaddr_ = acl_mystrdup(dbaddr);
+	// 地址格式：[dbname@]dbaddr
+	const char* ptr = strchr(dbaddr, '@');
+	if (ptr)
+		ptr++;
+	else
+		ptr = dbaddr;
+	acl_assert(*ptr);
+	dbaddr_ = acl_mystrdup(ptr);
 	dbname_ = acl_mystrdup(dbname);
 
 	if (dbuser && *dbuser)
@@ -364,7 +371,7 @@ const char* db_mysql::get_error() const
 		return "mysql not opened yet!";
 }
 
-bool db_mysql::open(const char* local_charset /* = utf8 */)
+bool db_mysql::dbopen(const char* local_charset)
 {
 	if (conn_)
 		return true;
@@ -512,7 +519,7 @@ bool db_mysql::sane_mysql_query(const char* sql)
 
 	/* 重新打开MYSQL连接进行重试 */
 	close();
-	if (open("GBK") == false)
+	if (dbopen("GBK") == false)
 	{
 		logger_error("reopen db(%s) error", dbname_);
 		return false;
