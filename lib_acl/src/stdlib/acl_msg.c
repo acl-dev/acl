@@ -91,9 +91,8 @@ void acl_msg_open2(ACL_VSTREAM *fp, const char *info_pre)
 			__msg_ctx = NULL;
 			acl_log_fp_set(fp, info_pre);
 		}
-	} else {
+	} else
 		acl_log_fp_set(fp, info_pre);
-	}
 
 	__log_open_flag = 1;
 }
@@ -150,16 +149,17 @@ void acl_msg_info(const char *fmt,...)
 
 	va_start (ap, fmt);
 
-	if (__pre_write_fn) {
+	if (__pre_write_fn)
 		__pre_write_fn(__pre_write_ctx, fmt, ap);
-	}
 
 	if (__log_open_flag) {
 		if (__write_fn != NULL)
 			__write_fn(__msg_ctx, fmt, ap);
 		else
 			acl_write_to_log2("info", fmt, ap);
-	} else if (__stdout_enable) {
+	}
+
+	if (__stdout_enable) {
 #ifdef LINUX
 		printf("acl_msg_info->pid(%d), ", getpid());
 #elif defined(SOLARIS)
@@ -182,7 +182,9 @@ void acl_msg_info2(const char *fmt, va_list ap)
 			__write_fn(__msg_ctx, fmt, ap);
 		else
 			acl_write_to_log2("info", fmt, ap);
-	} else if (__stdout_enable) {
+	}
+	
+	if (__stdout_enable) {
 #ifdef LINUX
 		printf("acl_msg_info->pid(%d), ", getpid());
 #elif defined(SOLARIS)
@@ -207,7 +209,9 @@ void acl_msg_warn(const char *fmt,...)
 			__write_fn(__msg_ctx, fmt, ap);
 		else
 			acl_write_to_log2("warn", fmt, ap);
-	} else if (__stdout_enable) {
+	}
+	
+	if (__stdout_enable) {
 #ifdef LINUX
 		printf("acl_msg_warn->pid(%d), ", getpid());
 #elif defined(SOLARIS)
@@ -234,7 +238,9 @@ void acl_msg_warn2(const char *fmt, va_list ap)
 			__write_fn(__msg_ctx, fmt, ap);
 		else
 			acl_write_to_log2("warn", fmt, ap);
-	} else if (__stdout_enable) {
+	}
+	
+	if (__stdout_enable) {
 #ifdef LINUX
 		printf("acl_msg_warn->pid(%d), ", getpid());
 #elif defined(SOLARIS)
@@ -262,7 +268,9 @@ void acl_msg_error(const char *fmt,...)
 			__write_fn(__msg_ctx, fmt, ap);
 		else
 			acl_write_to_log2("error", fmt, ap);
-	} else if (__stdout_enable) {
+	}
+	
+	if (__stdout_enable) {
 #ifdef LINUX
 		printf("acl_msg_error->pid(%d), ", getpid());
 #elif defined(SOLARIS)
@@ -288,7 +296,9 @@ void acl_msg_error2(const char *fmt, va_list ap)
 			__write_fn(__msg_ctx, fmt, ap);
 		else
 			acl_write_to_log2("error", fmt, ap);
-	} else if (__stdout_enable) {
+	}
+	
+	if (__stdout_enable) {
 #ifdef LINUX
 		printf("acl_msg_error->pid(%d), ", getpid());
 #elif defined(SOLARIS)
@@ -316,7 +326,9 @@ void acl_msg_fatal(const char *fmt,...)
 			__write_fn(__msg_ctx, fmt, ap);
 		else
 			acl_write_to_log2("fatal", fmt, ap);
-	} else if (__stdout_enable) {
+	}
+	
+	if (__stdout_enable) {
 #ifdef LINUX
 		printf("acl_msg_fatal->pid(%d), ", getpid());
 #elif defined(SOLARIS)
@@ -343,7 +355,9 @@ void acl_msg_fatal2(const char *fmt, va_list ap)
 			__write_fn(__msg_ctx, fmt, ap);
 		else
 			acl_write_to_log2("fatal", fmt, ap);
-	} else if (__stdout_enable) {
+	}
+	
+	if (__stdout_enable) {
 #ifdef LINUX
 		printf("acl_msg_fatal->pid(%d), ", getpid());
 #elif defined(SOLARIS)
@@ -371,7 +385,9 @@ void acl_msg_fatal_status(int status, const char *fmt,...)
 			__write_fn(__msg_ctx, fmt, ap);
 		else
 			acl_write_to_log2("fatal", fmt, ap);
-	} else if (__stdout_enable) {
+	}
+	
+	if (__stdout_enable) {
 #ifdef LINUX
 		printf("acl_msg_fatal_status->pid(%d), ", getpid());
 #elif defined(SOLARIS)
@@ -396,7 +412,9 @@ void acl_msg_fatal_status2(int status, const char *fmt, va_list ap)
 			__write_fn(__msg_ctx, fmt, ap);
 		else
 			acl_write_to_log2("fatal", fmt, ap);
-	} else if (__stdout_enable) {
+	}
+	
+	if (__stdout_enable) {
 #ifdef LINUX
 		printf("acl_msg_fatal_status->pid(%d), ", getpid());
 #elif defined(SOLARIS)
@@ -425,7 +443,9 @@ void acl_msg_panic(const char *fmt,...)
 			__write_fn(__msg_ctx, fmt, ap);
 		else
 			acl_write_to_log2("panic", fmt, ap);
-	} else if (__stdout_enable) {
+	}
+	
+	if (__stdout_enable) {
 #ifdef LINUX
 		printf("acl_msg_panic->pid(%d), ", getpid());
 #elif defined(SOLARIS)
@@ -451,7 +471,9 @@ void acl_msg_panic2(const char *fmt, va_list ap)
 			__write_fn(__msg_ctx, fmt, ap);
 		else
 			acl_write_to_log2("panic", fmt, ap);
-	} else if (__stdout_enable) {
+	}
+	
+	if (__stdout_enable) {
 #ifdef LINUX
 		printf("acl_msg_panic->pid(%d), ", getpid());
 #elif defined(SOLARIS)
@@ -487,10 +509,9 @@ const char *acl_strerror(unsigned int errnum, char *buffer, int size)
 			buffer,
 			size,
 			NULL);
-	while((L > 0) &&
-		((buffer[L - 1] >= 0 && 
-		  buffer[L - 1] <= 32) || 
-		 (buffer[L - 1] == '.'))) {
+	while ((L > 0) && ((buffer[L - 1] >= 0 && buffer[L - 1] <= 32) || 
+		 (buffer[L - 1] == '.')))
+	{
 		buffer[L - 1] = '\0';
 		L--;
 	}

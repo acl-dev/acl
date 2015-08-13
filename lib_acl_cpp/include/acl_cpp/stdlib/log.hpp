@@ -56,7 +56,7 @@ public:
 	 *  该配置要求将所有日志同时发给 /tmp/test.log, UDP:127.0.0.1:12345,
 	 *  TCP:127.0.0.1:12345 和 UNIX:/tmp/test.sock 四个日志接收器对象
 	 * @param procname 程序名, 如: test
-	 * @param cfg 日志配置, 格式为: {section}:{level}; {section}:{level}; ...
+	 * @param cfg 调试日志配置, 格式为: {section}:{level}; {section}:{level}; ...
 	 *  如: 100:2; 101:3; 102: 4, 表示只记录标识为 100/级别 < 2,
 	 *  以及标识为 101/级别 < 3, 以及标识为 102/级别 < 4 的日志项
 	 */
@@ -67,6 +67,14 @@ public:
 	 * 程序退出前调用此函数关闭日志
 	 */
 	static void close(void);
+
+	/**
+	 * 初始化日志调试调用接口
+	 * @param cfg {const char*} 调试标签及级别字符串, 格式如下:
+	 *  {section}:{level}; {section}:{level}; ...
+	 *  如: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8... or all:1
+	 */
+	static void debug_init(const char* cfg);
 
 	/**
 	 * 当未通过 open 打开日志流而调用记日志等相关函数时是否需要将信息

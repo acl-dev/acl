@@ -42,6 +42,12 @@ void log::close(void)
 	}
 }
 
+void log::debug_init(const char* cfg)
+{
+	if (cfg && *cfg)
+		acl_debug_init(cfg);
+}
+
 void log::stdout_open(bool onoff)
 {
 	acl_msg_stdout_enable(onoff ? 1 : 0);

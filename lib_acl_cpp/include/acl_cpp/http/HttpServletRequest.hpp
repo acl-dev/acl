@@ -151,9 +151,11 @@ public:
 	 * Content-Type 的字段值
 	 * @param part {bool} 如果为 true 则返回 text，否则返回完整的
 	 * 值，如：text/html; charset=gb2312
+	 * @param ctype {http_ctype*} 为非空指针时，将存储完整的 http_ctype 信息
 	 * @return {const char*} 返回 NULL 表示 Content-Type 字段不存在
 	 */
-	const char* getContentType(bool part = true) const;
+	const char* getContentType(
+		bool part = true, http_ctype* ctype = NULL) const;
 
 	/**
 	 * 获得 HTTP 请求头中的 Content-Type: text/html; charset=gb2312
@@ -303,6 +305,14 @@ public:
 	 * @param prompt {const char*} 提示内容
 	 */	 
 	void fprint_header(ostream& out, const char* prompt);
+
+	/**
+	 * 将 HTTP 请求头输出至给定缓冲区中
+	 * @param out {string&}
+	 * @param prompt {const char*} 提示内容
+	 */
+	void sprint_header(string& out, const char* prompt);
+
 private:
 	http_request_error_t req_error_;
 	char cookie_name_[64];

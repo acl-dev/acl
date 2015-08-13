@@ -288,8 +288,11 @@ bool HttpServletRequest::getRange(http_off_t& range_from, http_off_t& range_to)
 	return client_->request_range(range_from, range_to);
 }
 
-const char* HttpServletRequest::getContentType(bool part /* = true */) const
+const char* HttpServletRequest::getContentType(
+	bool part /* = true */, http_ctype* ctype /* = NULL */) const
 {
+	if (ctype != NULL)
+		*ctype = content_type_;
 	if (part)
 		return content_type_.get_ctype();
 	if (cgi_mode_)
@@ -772,9 +775,19 @@ http_client* HttpServletRequest::getClient(void) const
 void HttpServletRequest::fprint_header(ostream& out, const char* prompt)
 {
 	if (client_)
-	{
 		client_->fprint_header(out, prompt);
+	else
+	{
+		const char* ptr = acl_getenv_list();
+		if (ptr)
+			out.format("%s", ptr);
 	}
+}
+
+void HttpServletRequest::sprint_header(string& out, const char* prompt)
+{
+	if (client_)
+		client_->sprint_header(out, prompt);
 	else
 	{
 		const char* ptr = acl_getenv_list();

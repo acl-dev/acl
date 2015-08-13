@@ -165,8 +165,8 @@ public:
 		return false;
 	}
 
-protected:
 private:
+	bool first_;
 	char local_charset_[32];
 	int  rw_timeout_;
 	bool parse_body_enable_;

@@ -1,6 +1,13 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+342) 2015.8.13
+342.1) feature: http_ctype 类支持对象拷贝功能
+342.2) feature: HttpServletRequest 类的方法 getContentType 增加了一个 http_ctype
+类对象指针，允许用户可以获得更多的 Content-Type 中的信息
+342.3) feature: HttpServlet::doRun 方法在第一次 IO 出错时才会调用 doError 方法
+342.4) feature: 增加静态方式 log::debug_init 方便打调试日志记录接口
+
 341) 2015.8.12
 341.1) mysql_manager: mysql 连接池集群测试通过，增加了 mysql_conf 配置类，方便
 添加 mysql 连接对象

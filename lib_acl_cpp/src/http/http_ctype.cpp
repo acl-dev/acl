@@ -20,6 +20,24 @@ http_ctype::~http_ctype()
 	reset();
 }
 
+http_ctype& http_ctype::operator = (const http_ctype& ctype)
+{
+	reset();
+
+	if (ctype.ctype_ && *ctype.ctype_)
+		ctype_ = acl_mystrdup(ctype.ctype_);
+	if (ctype.stype_ && *ctype.stype_)
+		stype_ = acl_mystrdup(ctype.stype_);
+	if (ctype.charset_ && *ctype.charset_)
+		charset_ = acl_mystrdup(ctype.charset_);
+	if (ctype.name_ && *ctype.name_)
+		name_ = acl_mystrdup(ctype.name_);
+	if (ctype.bound_ && !ctype.bound_->empty())
+		bound_ = NEW string(*ctype.bound_);
+
+	return *this;
+}
+
 void http_ctype::reset()
 {
 	if (ctype_)

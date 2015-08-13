@@ -238,7 +238,7 @@ static bool tbl_delete(acl::db_handle& db, int n)
 class db_thread : public acl::thread
 {
 public:
-	db_thread(acl::mysql_manager& manager, int max, const char* dbkey)
+	db_thread(acl::connect_manager& manager, int max, const char* dbkey)
 		: manager_(manager), max_(max), addr_(dbkey) {}
 	~db_thread() {}
 
@@ -343,7 +343,7 @@ protected:
 	}
 
 private:
-	acl::mysql_manager& manager_;
+	acl::connect_manager& manager_;
 	int   max_;
 	acl::string addr_;
 };
@@ -447,7 +447,7 @@ int main(void)
 	int  dblimit = 10;
 
 	// 创建数据库连接池对象
-	acl::mysql_manager* manager = new acl::mysql_manager;
+	acl::connect_manager* manager = new acl::mysql_manager;
 	manager->add(dbaddr, dbname, dbuser, dbpass, dblimit);
 
 	// 设置连接池中每个连接的空闲时间(秒)
