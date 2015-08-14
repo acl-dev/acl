@@ -5,7 +5,7 @@
 namespace acl
 {
 
-redis_client_pool::redis_client_pool(const char* addr, int count,
+redis_client_pool::redis_client_pool(const char* addr, size_t count,
 	size_t idx /* = 0 */)
 : connect_pool(addr, count, idx)
 , conn_timeout_(30)

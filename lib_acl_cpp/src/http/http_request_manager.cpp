@@ -7,16 +7,14 @@ namespace acl
 
 http_request_manager::http_request_manager()
 {
-
 }
 
 http_request_manager::~http_request_manager()
 {
-
 }
 
 connect_pool* http_request_manager::create_pool(const char* addr,
-	int count, size_t idx)
+	size_t count, size_t idx)
 {
 	http_request_pool* conns = NEW http_request_pool(addr, count, idx);
 

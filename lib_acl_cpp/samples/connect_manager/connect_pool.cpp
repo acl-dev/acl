@@ -2,7 +2,7 @@
 #include "connect_client.h"
 #include "connect_pool.h"
 
-connect_pool::connect_pool(const char* addr, int count, size_t idx)
+connect_pool::connect_pool(const char* addr, size_t count, size_t idx)
 : acl::connect_pool(addr, count, idx)
 , addr_(addr)
 , count_(count)

@@ -12,7 +12,7 @@ public:
 
 	mysql_conf& set_dbuser(const char* dbuser);
 	mysql_conf& set_dbpass(const char* dbpass);
-	mysql_conf& set_dblimit(int dblimit);
+	mysql_conf& set_dblimit(size_t dblimit);
 	mysql_conf& set_dbflags(unsigned long dbflags);
 	mysql_conf& set_auto_commit(bool on);
 	mysql_conf& set_conn_timeout(int timeout);
@@ -38,7 +38,7 @@ public:
 		return dbpass_;
 	}
 
-	int get_dblimit() const
+	size_t get_dblimit() const
 	{
 		return dblimit_;
 	}
@@ -68,7 +68,7 @@ private:
 	char* dbname_;          // 数据库名
 	char* dbuser_;          // 数据库账号
 	char* dbpass_;          // 数据库账号密码
-	int   dblimit_;         // 数据库连接池连接数上限
+	size_t dblimit_;        // 数据库连接池连接数上限
 	unsigned long dbflags_; // 打开数据库时的标志位
 	bool  auto_commit_;     // 是否自动提交修改后的数据
 	int   conn_timeout_;    // 连接数据库的超时时间

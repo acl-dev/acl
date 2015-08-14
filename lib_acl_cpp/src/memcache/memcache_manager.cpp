@@ -14,7 +14,7 @@ memcache_manager::~memcache_manager()
 }
 
 connect_pool* memcache_manager::create_pool(const char* addr,
-	int count, size_t idx)
+	size_t count, size_t idx)
 {
 	memcache_pool* conns = NEW memcache_pool(addr, count, idx);
 

@@ -19,7 +19,7 @@ mysql_manager::~mysql_manager()
 }
 
 mysql_manager& mysql_manager::add(const char* dbaddr, const char* dbname,
-	const char* dbuser, const char* dbpass, int dblimit /* = 64 */,
+	const char* dbuser, const char* dbpass, size_t dblimit /* = 64 */,
 	unsigned long dbflags /* = 0 */, bool auto_commit /* = true */,
 	int conn_timeout /* = 60 */, int rw_timeout /* = 60 */)
 {
@@ -80,7 +80,7 @@ mysql_manager& mysql_manager::add(const mysql_conf& conf)
 	return *this;
 }
 
-connect_pool* mysql_manager::create_pool(const char* key, int, size_t)
+connect_pool* mysql_manager::create_pool(const char* key, size_t, size_t)
 {
 	std::map<string, mysql_conf*>::iterator it = dbs_.find(key);
 	if (it == dbs_.end())

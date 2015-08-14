@@ -3,13 +3,14 @@
 class connect_pool : public acl::connect_pool
 {
 public:
-	connect_pool(const char* addr, int count, size_t idx);
+	connect_pool(const char* addr, size_t count, size_t idx);
 	virtual ~connect_pool();
 
 	void set_timeout(int conn_timeout, int rw_timeout);
 
 protected:
-	virtual acl::connect_client* create_connect();
+	// 基类纯虚函数的实现
+	acl::connect_client* create_connect();
 
 private:
 	acl::string addr_;

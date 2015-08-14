@@ -12,14 +12,14 @@ sqlite_manager::~sqlite_manager()
 {
 }
 
-sqlite_manager& sqlite_manager::add(const char* dbfile, int dblimit)
+sqlite_manager& sqlite_manager::add(const char* dbfile, size_t dblimit)
 {
 	// 调用基类 connect_manager::set 方法添加
 	set(dbfile, dblimit);
 	return *this;
 }
 
-connect_pool* sqlite_manager::create_pool(const char*, int, size_t)
+connect_pool* sqlite_manager::create_pool(const char*, size_t, size_t)
 {
 	sqlite_pool* dbpool = NEW sqlite_pool(dbfile_, dblimit_);
 	return dbpool;

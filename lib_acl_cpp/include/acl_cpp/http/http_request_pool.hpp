@@ -19,10 +19,10 @@ public:
 	/**
 	 * 构造函数
 	 * @param addr {const char*} 服务器监听地址，格式：ip:port(domain:port)
-	 * @param count {int} 连接池最大连接个数限制
+	 * @param count {size_t} 连接池最大连接个数限制
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 */
-	http_request_pool(const char* addr, int count, size_t idx = 0);
+	http_request_pool(const char* addr, size_t count, size_t idx = 0);
 	~http_request_pool();
 
 	/**

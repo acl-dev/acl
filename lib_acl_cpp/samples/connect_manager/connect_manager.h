@@ -8,6 +8,7 @@ public:
 	virtual ~connect_manager();
 
 protected:
-	virtual acl::connect_pool* create_pool(const char* addr,
-		int count, size_t idx);
+	// 基类纯虚函数的实现
+	acl::connect_pool* create_pool(const char* addr,
+		size_t count, size_t idx);
 };

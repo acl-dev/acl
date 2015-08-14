@@ -16,7 +16,7 @@ public:
 	 * @param dbname {const char*} 数据库名
 	 * @param dbuser {const char*} 数据库用户
 	 * @param dbpass {const char*} 数据库用户密码
-	 * @param dblimit {int} 数据库连接池的最大连接数限制
+	 * @param dblimit {size_t} 数据库连接池的最大连接数限制
 	 * @param dbflags {unsigned long} mysql 标记位
 	 * @param auto_commit {bool} 是否自动提交
 	 * @param conn_timeout {int} 连接数据库超时时间(秒)
@@ -24,7 +24,7 @@ public:
 	 */
 	mysql_pool(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,
-		int dblimit = 64, unsigned long dbflags = 0,
+		size_t dblimit = 64, unsigned long dbflags = 0,
 		bool auto_commit = true, int conn_timeout = 60,
 		int rw_timeout = 60);
 	~mysql_pool();

@@ -444,10 +444,10 @@ int main(void)
 
 	// 连接池中最大连接数量限制，该值应和线程池中的最大线程数相等，
 	// 以保证每个线程都可以获得一个连接
-	int  dblimit = 10;
+	size_t  dblimit = 10;
 
 	// 创建数据库连接池对象
-	acl::connect_manager* manager = new acl::mysql_manager;
+	acl::mysql_manager* manager = new acl::mysql_manager;
 	manager->add(dbaddr, dbname, dbuser, dbpass, dblimit);
 
 	// 设置连接池中每个连接的空闲时间(秒)
@@ -461,7 +461,7 @@ int main(void)
 
 	// 创建多个线程
 	std::vector<db_thread*> threads;
-	for (int i = 0; i < dblimit; i++)
+	for (size_t i = 0; i < dblimit; i++)
 	{
 		db_thread* thread = new db_thread(*manager, max, dbkey);
 		threads.push_back(thread);

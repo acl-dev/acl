@@ -7,7 +7,7 @@
 namespace acl
 {
 
-connect_pool::connect_pool(const char* addr, int max, size_t idx /* = 0 */)
+connect_pool::connect_pool(const char* addr, size_t max, size_t idx /* = 0 */)
 : alive_(true)
 , delay_destroy_(false)
 , last_dead_(0)
@@ -113,7 +113,7 @@ connect_client* connect_pool::peek()
 	else if (count_ >= max_)
 	{
 		logger_error("too many connections, max: %d, curr: %d,"
-			" server: %s", count_, max_, addr_);
+			" server: %s", (int) max_, (int) count_, addr_);
 		lock_.unlock();
 		return NULL;
 	}
@@ -174,9 +174,9 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 	}
 	else
 	{
+		acl_assert(count_ > 0);
 		delete conn;
 		count_--;
-		acl_assert(count_ >= 0);
 	}
 
 	if (idle_ttl_ >= 0 && now - last_check_ >= check_inter_)

@@ -29,20 +29,20 @@ public:
 	 *  格式: IP:PORT:COUNT;IP:PORT:COUNT;IP:PORT;IP:PORT ...
 	 *    或  IP:PORT:COUNT,IP:PORT:COUNT,IP:PORT;IP:PORT ...
 	 *  如：127.0.0.1:7777:50;192.168.1.1:7777:10;127.0.0.1:7778
-	 * @param default_count {int} 当 addr_list 中分隔的某个服务没有
+	 * @param default_count {size_t} 当 addr_list 中分隔的某个服务没有
 	 *  COUNT 信息时便用此值
 	 *  注：default_addr 和 addr_list 不能同时为空
 	 */
 	void init(const char* default_addr, const char* addr_list,
-		int default_count);
+		size_t default_count);
 
 	/**
 	* 添加服务器的客户端连接池，该函数可以在程序运行时被调用，内部自动加锁
 	 * @param addr {const char*} 服务器地址(ip:port)
-	 * @param count {int} 连接池数量限制
+	 * @param count {size_t} 连接池数量限制
 	 * @return {connect_pool&} 返回新添加的连接池对象
 	 */
-	connect_pool& set(const char* addr, int count);
+	connect_pool& set(const char* addr, size_t count);
 
 	/**
 	 * 设置连接池失败后重试的时间时间隔（秒），该函数可以在程序运行时被调用，内部自动加锁
@@ -163,12 +163,12 @@ protected:
 	/**
 	 * 纯虚函数，子类必须实现此函数用来创建连接池对象
 	 * @param addr {const char*} 服务器监听地址，格式：ip:port
-	 * @param count {int} 连接池的大小限制
+	 * @param count {size_t} 连接池的大小限制
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 * @return {connect_pool*} 返回创建的连接池对象
 	 */
 	virtual connect_pool* create_pool(const char* addr,
-		int count, size_t idx) = 0;
+		size_t count, size_t idx) = 0;
 
 private:
 	string default_addr_;			// 缺省的服务地址

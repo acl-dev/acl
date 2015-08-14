@@ -14,10 +14,10 @@ public:
 	/**
 	 * 数据库构造函数
 	 * @param dbaddr {const char*} 数据库地址
-	 * @param count {int} 连接池最大连接个数限制
+	 * @param count {size_t} 连接池最大连接个数限制
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 */
-	db_pool(const char* dbaddr, int count, size_t idx = 0);
+	db_pool(const char* dbaddr, size_t count, size_t idx = 0);
 	virtual ~db_pool() {};
 
 	/**
@@ -32,18 +32,18 @@ public:
 
 	/**
 	 * 获得当前数据库连接池的最大连接数限制
-	 * @return {int}
+	 * @return {size_t}
 	 */
-	int get_dblimit() const
+	size_t get_dblimit() const
 	{
 		return get_max();
 	}
 
 	/**
 	 * 获得当前数据库连接池当前的连接数
-	 * @return {int}
+	 * @return {size_t}
 	 */
-	int get_dbcount() const
+	size_t get_dbcount() const
 	{
 		return get_count();
 	}

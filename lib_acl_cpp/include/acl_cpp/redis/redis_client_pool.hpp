@@ -19,12 +19,12 @@ public:
 	 * constructor
 	 * @param addr {const char*} 服务端地址，格式：ip:port
 	 *  the redis-server's listening address, format: ip:port
-	 * @param count {int} 连接池的最大连接数限制
+	 * @param count {size_t} 连接池的最大连接数限制
 	 *  the max connections for each connection pool
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 *  the subscript of the connection pool in the connection cluster
 	 */
-	redis_client_pool(const char* addr, int count, size_t idx = 0);
+	redis_client_pool(const char* addr, size_t count, size_t idx = 0);
 
 	virtual ~redis_client_pool();
 
@@ -45,7 +45,7 @@ protected:
 	 * virtual function in class connect_pool to create a new connection
 	 * @return {connect_client*}
 	 */
-	virtual connect_client* create_connect();
+	connect_client* create_connect();
 
 private:
 	int   conn_timeout_;

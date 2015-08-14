@@ -21,7 +21,7 @@ public:
 	 * @param dbname {const char*} 数据库名
 	 * @param dbuser {const char*} 数据库用户
 	 * @param dbpass {const char*} 数据库用户密码
-	 * @param dblimit {int} 数据库连接池的最大连接数限制
+	 * @param dblimit {size_t} 数据库连接池的最大连接数限制
 	 * @param dbflags {unsigned long} mysql 标记位
 	 * @param auto_commit {bool} 是否自动提交
 	 * @param conn_timeout {int} 连接数据库超时时间(秒)
@@ -30,7 +30,7 @@ public:
 	 */
 	mysql_manager& add(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,
-		int dblimit = 64, unsigned long dbflags = 0,
+		size_t dblimit = 64, unsigned long dbflags = 0,
 		bool auto_commit = true, int conn_timeout = 60,
 		int rw_timeout = 60);
 
@@ -45,11 +45,11 @@ protected:
 	/**
 	 * 基类 connect_manager 虚函数的实现
 	 * @param addr {const char*} 服务器监听地址，格式：ip:port
-	 * @param count {int} 连接池的大小限制
+	 * @param count {size_t} 连接池的大小限制
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 * @return {connect_pool*} 返回创建的连接池对象
 	 */
-	connect_pool* create_pool(const char* addr, int count, size_t idx);
+	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
 
 private:
 	time_t idle_ttl_;       // 数据库连接的空闲过期时间

@@ -71,7 +71,7 @@ mysql_conf& mysql_conf::set_dbpass(const char* dbpass)
 	return *this;
 }
 
-mysql_conf& mysql_conf::set_dblimit(int dblimit)
+mysql_conf& mysql_conf::set_dblimit(size_t dblimit)
 {
 	dblimit_ = dblimit;
 	return *this;

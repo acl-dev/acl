@@ -42,7 +42,7 @@ void redis_client_cluster::set_redirect_sleep(int n)
 }
 
 connect_pool* redis_client_cluster::create_pool(const char* addr,
-	int count, size_t idx)
+	size_t count, size_t idx)
 {
 	redis_client_pool* pool = NEW redis_client_pool(addr, count, idx);
 	pool->set_timeout(conn_timeout_, rw_timeout_);

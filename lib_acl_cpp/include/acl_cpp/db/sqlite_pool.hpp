@@ -12,9 +12,9 @@ public:
 	/**
 	 * 构造函数
 	 * @param dbfile {const char*} sqlite 数据库的数据文件
-	 * @param dblimit {int} 数据库连接池最大连接数限制
+	 * @param dblimit {size_t} 数据库连接池最大连接数限制
 	 */
-	sqlite_pool(const char* dbfile, int dblimit = 64);
+	sqlite_pool(const char* dbfile, size_t dblimit = 64);
 	~sqlite_pool();
 
 protected:

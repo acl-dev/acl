@@ -8,7 +8,7 @@ namespace acl
 {
 
 mysql_pool::mysql_pool(const char* dbaddr, const char* dbname,
-	const char* dbuser, const char* dbpass, int dblimit /* = 64 */,
+	const char* dbuser, const char* dbpass, size_t dblimit /* = 64 */,
 	unsigned long dbflags /* = 0 */, bool auto_commit /* = true */,
 	int conn_timeout /* = 60 */, int rw_timeout /* = 60 */)
 : db_pool(dbaddr, dblimit)

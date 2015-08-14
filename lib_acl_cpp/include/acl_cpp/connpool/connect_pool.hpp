@@ -21,10 +21,10 @@ public:
 	/**
 	 * 构造函数
 	 * @param addr {const char*} 服务器监听地址，格式：ip:port(domain:port)
-	 * @param count {int} 连接池最大连接个数限制
+	 * @param count {size_t} 连接池最大连接个数限制
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 */
-	connect_pool(const char* addr, int count, size_t idx = 0);
+	connect_pool(const char* addr, size_t count, size_t idx = 0);
 
 	/**
 	 * 该类当允许自行销毁时，类实例应为动态对象
@@ -103,18 +103,18 @@ public:
 
 	/**
 	 * 获取连接池最大连接数限制
-	 * @return {int}
+	 * @return {size_t}
 	 */
-	int get_max() const
+	size_t get_max() const
 	{
 		return max_;
 	}
 
 	/**
 	 * 获取连接池当前连接数个数
-	 * @return {int}
+	 * @return {size_t}
 	 */
-	int get_count() const
+	size_t get_count() const
 	{
 		return count_;
 	}
@@ -184,8 +184,8 @@ protected:
 
 	size_t idx_;				// 该连接池对象在集合中的下标位置
 	char  addr_[256];			// 连接池对应的服务器地址，IP:PORT
-	int   max_;				// 最大连接数
-	int   count_;				// 当前的连接数
+	size_t max_;				// 最大连接数
+	size_t count_;				// 当前的连接数
 	time_t idle_ttl_;			// 空闲连接的生命周期
 	time_t last_check_;			// 上次检查空闲连接的时间截
 	int   check_inter_;			// 检查空闲连接的时间间隔

@@ -5,7 +5,7 @@
 namespace acl
 {
 
-memcache_pool::memcache_pool(const char* addr, int count,
+memcache_pool::memcache_pool(const char* addr, size_t count,
 	size_t idx /* = 0 */)
 : connect_pool(addr, count, idx)
 {

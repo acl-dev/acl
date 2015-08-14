@@ -7,7 +7,7 @@
 namespace acl
 {
 
-sqlite_pool::sqlite_pool(const char* dbfile, int dblimit /* = 64 */)
+sqlite_pool::sqlite_pool(const char* dbfile, size_t dblimit /* = 64 */)
 : db_pool(dbfile, dblimit)
 {
 	acl_assert(dbfile && *dbfile);
