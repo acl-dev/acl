@@ -54,6 +54,9 @@ guess_os() {
 	FreeBSD)
 		RPATH="freebsd"
 		;;
+	Darwin)
+		RPATH="macos"
+		;;
 	*)
 		echo "unknown OS - $os_name $os_type"
 		exit 1

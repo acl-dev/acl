@@ -96,7 +96,8 @@ service $<PROGRAM> {
 #	aio_dispatch_type = default
 
 #	允许访问的客户端IP地址范围
-	aio_access_allow = 127.0.0.1:255.255.255.255, 127.0.0.1:127.0.0.1
+#	aio_access_allow = 127.0.0.1:255.255.255.255, 127.0.0.1:127.0.0.1
+	aio_access_allow = all
 
 #	当 acl_master 退出时，如果该值置1则该程序不等所有连接处理完毕便立即退出
 	aio_quick_abort = 1

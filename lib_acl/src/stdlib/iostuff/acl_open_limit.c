@@ -36,22 +36,32 @@
 
 int acl_open_limit(int limit)
 {
+	const char *myname = "acl_open_limit";
+	int   rlim_cur = -1;
+
 #ifdef RLIMIT_NOFILE
 	struct rlimit rl;
-	int rlim_cur = -1;
 
-	if (getrlimit(RLIMIT_NOFILE, &rl) < 0)
-		return -1;
+	if (getrlimit(RLIMIT_NOFILE, &rl) < 0) {
+		rlim_cur = getdtablesize();
+		acl_msg_warn("%s(%d): getrlimit error: %s, use: %d",
+			myname, __LINE__, acl_last_serror(), rlim_cur);
+		return rlim_cur;
+	}
 
+	if (rl.rlim_max <= 0)
+		rl.rlim_max = 204800;
 	rlim_cur = (int) rl.rlim_cur;
+
 	if (limit > 0) {
 		if (limit > (int) rl.rlim_max)
 			rl.rlim_cur = rl.rlim_max;
 		else
 			rl.rlim_cur = limit;
 		if (setrlimit(RLIMIT_NOFILE, &rl) < 0) {
-			acl_msg_warn("setrlimit error: %s, %d",
-				acl_last_serror(), (int) limit);
+			acl_msg_warn("%s(%d): setrlimit error: %s, limit: %d,"
+				" curr: %d", myname, __LINE__,
+				acl_last_serror(), limit, rlim_cur);
 			return rlim_cur;
 		}
 		else
@@ -60,8 +70,10 @@ int acl_open_limit(int limit)
 		rlim_cur = (int) rl.rlim_cur;
 		rl.rlim_cur = rl.rlim_max;
 		if (setrlimit(RLIMIT_NOFILE, &rl) < 0) {
-			acl_msg_warn("setrlimit error: %s, %d",
-				acl_last_serror(), (int) limit);
+			acl_msg_warn("%s(%d): setrlimit error: %s,"
+				" cur: %d, max: %d", myname, __LINE__,
+				acl_last_serror(), (int) rl.rlim_cur,
+				(int) rl.rlim_max);
 			return rlim_cur;
 		}
 
@@ -70,8 +82,11 @@ int acl_open_limit(int limit)
 		return (int) rl.rlim_cur;
 
 #else
-	(void) limit;
-	return getdtablesize();
+	rlim_cur = getdtablesize();
+	if (rlim_cur < 0)
+		acl_msg_error("%s(%d): getdtablesize(%d) < 0, limit: %d",
+			myname, __LINE__, rlim_cur, limit);
+	return rlim_cur;
 #endif
 }
 

@@ -103,7 +103,8 @@ service $<PROGRAM> {
 #	线程的堆栈空间大小，单位为字节，0表示使用系统缺省值
 	ioctl_stacksize = 0
 #	允许访问 udserver 的客户端IP地址范围
-	ioctl_access_allow = 127.0.0.1:255.255.255.255, 127.0.0.1:127.0.0.1
+#	ioctl_access_allow = 127.0.0.1:255.255.255.255, 127.0.0.1:127.0.0.1
+	ioctl_access_allow = all
 
 #	当 acl_master 退出时，如果该值置1则该程序不等所有连接处理完毕便立即退出
 	ioctl_quick_abort = 1

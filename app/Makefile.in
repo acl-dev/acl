@@ -8,7 +8,7 @@ CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
-SYSLIB = -lpthread -lcrypt -lz
+SYSLIB = -lpthread -lz
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
 
@@ -25,12 +25,21 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	SYSLIB = -lcrypt -lpthread
 endif
 
+# For Darwin
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
+		  -Wno-extended-offsetof
+	UNIXTYPE = MACOSX
+	SYSLIB +=  -liconv -rdynamic
+endif
+
 #Path for Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	ifeq ($CC, "gcc")
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DLINUX2 -D_REENTRANT
+	SYSLIB += -lcrypt
 endif
 
 #Path for SunOS

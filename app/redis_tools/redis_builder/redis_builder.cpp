@@ -296,7 +296,6 @@ acl::redis_node* redis_builder::peek_slave(const char* master_addr,
 
 	size_t n = 100000;
 	acl::string min_addr;
-	std::vector<acl::redis_node*>::iterator min_node = slaves.end();
 	acl::redis_node* slave = NULL;
 
 	std::map<acl::string, size_t>::iterator iter_addr;

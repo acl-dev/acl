@@ -46,7 +46,7 @@ master_service::~master_service()
 bool master_service::thread_on_read(acl::socket_stream* conn)
 {
 	logger_servlet servlet;
-	return servlet.doRun("127.0.0.1:11211", conn, false);
+	return servlet.doRun("127.0.0.1:11211", conn);
 }
 
 bool master_service::thread_on_accept(acl::socket_stream* conn)

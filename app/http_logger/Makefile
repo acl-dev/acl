@@ -1,2 +1,2 @@
-include ./Makefile.in
+include ../Makefile.in
 PROG = http_logger
