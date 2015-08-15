@@ -520,7 +520,7 @@ private:
 	int bitop(const char* op, const char* destkey,
 		const char* keys[], size_t size);
 
-	bool incoper(const char* cmd, const char* key, long long int inc,
+	bool incoper(const char* cmd, const char* key, long long int* inc,
 		long long int* result);
 
 };

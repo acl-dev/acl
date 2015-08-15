@@ -1,6 +1,10 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+343) 2015.8.15
+343.1) bugfix: redis_string::incoper 内部在区分 INCR 与 INCRBY, DECR 与 DECRBY
+的方法有误
+
 342) 2015.8.13
 342.1) feature: http_ctype 类支持对象拷贝功能
 342.2) feature: HttpServletRequest 类的方法 getContentType 增加了一个 http_ctype

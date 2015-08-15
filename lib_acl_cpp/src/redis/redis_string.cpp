@@ -711,14 +711,14 @@ bool redis_string::mget(const char* keys[], const size_t keys_len[],
 bool redis_string::incr(const char* key, long long int* result /* = NULL */)
 {
 	hash_slot(key);
-	return incoper("INCR", key, 1, result);
+	return incoper("INCR", key, NULL, result);
 }
 
 bool redis_string::incrby(const char* key, long long int inc,
 	long long int* result /* = NULL */)
 {
 	hash_slot(key);
-	return incoper("INCRBY", key, inc, result);
+	return incoper("INCRBY", key, &inc, result);
 }
 
 bool redis_string::incrbyfloat(const char* key, double inc,
@@ -750,16 +750,16 @@ bool redis_string::incrbyfloat(const char* key, double inc,
 
 bool redis_string::decr(const char* key, long long int* result /* = NULL */)
 {
-	return incoper("DECR", key, 1, result);
+	return incoper("DECR", key, NULL, result);
 }
 
 bool redis_string::decrby(const char* key, long long int dec,
 	long long int* result /* = NULL */)
 {
-	return incoper("DECRBY", key, dec, result);
+	return incoper("DECRBY", key, &dec, result);
 }
 
-bool redis_string::incoper(const char* cmd, const char* key, long long int n,
+bool redis_string::incoper(const char* cmd, const char* key, long long int* n,
 	long long int* result)
 {
 	size_t argc = 2;
@@ -773,9 +773,9 @@ bool redis_string::incoper(const char* cmd, const char* key, long long int n,
 	lens[1] = strlen(key);
 
 	char buf[INT64_LEN];
-	if (n != 1)
+	if (n != NULL)
 	{
-		(void) acl_i64toa(n, buf, sizeof(buf));
+		(void) acl_i64toa(*n, buf, sizeof(buf));
 		argv[2] = buf;
 		lens[2] = strlen(buf);
 		argc++;

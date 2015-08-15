@@ -137,6 +137,15 @@ static bool test_get(acl::redis& cmd, int i)
 		printf("get key: %s, value: %s %s, len: %d\r\n",
 			key.c_str(), value.c_str(), ret ? "ok" : "error",
 			(int) value.length());
+	if (ret == false)
+		return false;
+
+	ret = cmd.get(key.c_str(), value);
+	if (i < 10)
+		printf("get key: %s, value: %s %s, len: %d\r\n",
+			key.c_str(), value.c_str(), ret ? "ok" : "error",
+			(int) value.length());
+
 	return ret;
 }
 
@@ -151,6 +160,45 @@ static bool test_lrem(acl::redis& cmd, int i)
 	if (i < 10)
 		printf("lrem key: %s, ret: %d\r\n", key.c_str(), ret);
 	return i >= 0 ? true : false;
+}
+
+static bool test_incrby(acl::redis& cmd, int i)
+{
+	cmd.clear();
+
+	acl::string key;
+	key.format("incrby_%s_%d", __keypre.c_str(), i);
+
+	long long result;
+	bool ret = cmd.incrby(key.c_str(), 1, &result);
+	if (ret == false)
+	{
+		printf("incrby(1) error: %s, key: %s\r\n",
+			cmd.result_error(), key.c_str());
+		return false;
+	}
+	printf("incrby(1) key: %s, retuls: %lld\r\n", key.c_str(), result);
+
+	cmd.clear();
+	ret = cmd.incrby(key.c_str(), 10, &result);
+	if (ret == false)
+	{
+		printf("incrby(2) error: %s, key: %s\r\n",
+			cmd.result_error(), key.c_str());
+		return false;
+	}
+	printf("incrby(2) key: %s, retuls: %lld\r\n", key.c_str(), result);
+
+	ret = cmd.incr(key.c_str(), &result);
+	if (ret == false)
+	{
+		printf("incr error: %s, key: %s\r\n",
+			cmd.result_error(), key.c_str());
+		return false;
+	}
+	printf("incr key: %s, retuls: %lld\r\n", key.c_str(), result);
+
+	return true;
 }
 
 static int __threads_exit = 0;
@@ -194,6 +242,8 @@ protected:
 				ret = test_type(cmd, i);
 			else if (cmd_ == "lrem")
 				ret = test_lrem(cmd, i);
+			else if (cmd_ == "incrby")
+				ret = test_incrby(cmd, i);
 			else if (cmd_ == "all")
 			{
 				if (test_set(cmd, i) == false
@@ -202,6 +252,7 @@ protected:
 					|| test_type(cmd, i) == false
 					|| test_expire(cmd, i) == false
 					|| test_ttl(cmd, i) == false
+					|| test_incrby(cmd, i) == false
 					|| test_del(cmd, i) == false)
 				{
 					ret = false;
@@ -256,7 +307,7 @@ static void usage(const char* procname)
 		"-w wait_for_cluster_resume[default: 500 ms]\r\n"
 		"-r retry_for_cluster_resnum[default: 10]\r\n"
 		"-p [preset all hash-slots of the cluster]\r\n"
-		"-a cmd[set|get|expire|ttl|exists|type|del|lrem]\r\n",
+		"-a cmd[set|get|incrby|expire|ttl|exists|type|del|lrem]\r\n",
 		procname);
 }
 
