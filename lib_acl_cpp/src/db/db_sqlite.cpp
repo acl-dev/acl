@@ -523,6 +523,11 @@ namespace acl
 
 db_sqlite::db_sqlite(const char*) {}
 db_sqlite::~db_sqlite(void) {}
+const char* db_sqlite::version(void) const { return NULL; }
+bool db_sqlite::set_conf(const char*) { return false; }
+const char* db_sqlite::get_conf(const char*, string&) { return NULL; }
+void db_sqlite::show_conf(const char*) {}
+int db_sqlite::affect_total_count() const { return 0; }
 const char* db_sqlite::dbtype() const { return NULL; }
 bool db_sqlite::dbopen(const char*) { return false; }
 bool db_sqlite::is_opened() const { return false; }

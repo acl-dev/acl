@@ -638,7 +638,7 @@ const char* db_mysql::dbtype() const
 	return NULL;
 }
 
-bool db_mysql::open(const char*)
+bool db_mysql::dbopen(const char*)
 {
 	return false;
 }

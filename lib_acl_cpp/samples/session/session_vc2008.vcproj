@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include"
+				AdditionalIncludeDirectories="..\;..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -119,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include"
+				AdditionalIncludeDirectories="..\;..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -197,8 +197,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\;..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;ACL_CPP_DLL;ACL_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -275,8 +275,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\;..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;ACL_CPP_DLL;ACL_DLL"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -337,15 +337,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\session.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\memcache_session.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\redis_session.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\session.cpp"
 				>
 			</File>
 			<File
@@ -384,6 +384,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="..\util.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
@@ -396,6 +400,10 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\util.h"
 				>
 			</File>
 		</Filter>
