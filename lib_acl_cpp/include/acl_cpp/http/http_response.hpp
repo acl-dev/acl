@@ -125,7 +125,7 @@ public:
 	 * 关闭 HTTP 连接流
 	 */
 	void close(void);
-protected:
+
 private:
 	bool debug_;
 	bool header_ok_;

@@ -35,6 +35,7 @@ bool http_servlet::doGet(acl::HttpServletRequest& req,
 bool http_servlet::doPost(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
+#if 0
 	const char* session_name = req.getSession().getAttribute("session_name");
 	if (*session_name == 0)
 	{
@@ -47,6 +48,9 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	if (*session_user == 0)
 		req.getSession().setAttribute("session_user", "user");
 	session_user = req.getSession().getAttribute("session_user");
+#else
+	const char* session_name = "name", *session_user = "user";
+#endif
 
 	// 取得浏览器 cookie
 	const char* cookie_name = req.getCookieValue("cookie_name");
@@ -89,6 +93,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 #else
 	res.setContentType("text/xml; charset=utf-8")	// 设置响应字符集
 		.setKeepAlive(keep_alive)		// 设置是否保持长连接
+		.setContentEncoding(true)		// 设置是否压缩数据
 		.setChunkedTransferEncoding(true);	// 采用 chunk 传输方式
 #endif
 
@@ -96,5 +101,5 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 
 	// 发送 http 响应体，因为设置了 chunk 传输模式，所以需要多调用一次
 	// res.write 且两个参数均为 0 以表示 chunk 传输数据结束
-	return res.write(buf) && res.write(NULL, 0) && keep_alive;
+	return res.write(buf) && res.write(NULL, 0);
 }

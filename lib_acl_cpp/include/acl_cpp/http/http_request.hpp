@@ -202,20 +202,22 @@ public:
 	 *  与真实读到的数据不同，真实读到的数据长度应该通过参数 real_size 来
 	 *  获得); < 0 表示数据流关闭，此时若 real_size 非空，则 real_size 存
 	 *  储的值应该为 0
+	 *  当返回 0 时，可调用 body_finish 函数判断是否读完了所有数据体
 	 */
 	int read_body(string& out, bool clean = false, int* real_size = NULL);
 
 	/**
-	 * 当调用 request 成功后调用本函数来从 HTTP 服务端读一行数据，可以循环调用
+	 * 调用 request 成功后调用本函数来从 HTTP 服务端读一行数据，可循环调用
 	 * 本函数，直到返回 false 或 body_finish() 返回 true 为止；
-	 * 本函数内部自动对压缩数据进行解压，如果在调用本函数之前调用 set_charset 设置了
+	 * 内部自动对压缩数据解压，如果在调用本函数之前调用 set_charset 设置了
 	 * 本地字符集，则还同时对数据进行字符集转码操作
 	 * @param out {string&} 存储结果数据
 	 * @param nonl {bool} 读到的一行数据是否自动去掉尾部的 "\r\n" 或 "\n"
 	 * @param size {size_t*} 该指针非空时存放读到的数据长度
-	 * @return {bool} 是否读到了一行数据：当返回 true 时表示读到了一行数据，可以
-	 *  通过 body_finish() 是否为 true 来判断是否读数据体已经结束，当读到一个空行
-	 *  且 nonl = true 时，则 *size = 0；当返回 false 时表示未读完整行且读完毕，
+	 * @return {bool} 是否读到一行数据：返回 true 时表示读到了一行数据，
+	 *  可以通过 body_finish() 是否为 true 来判断是否读数据体已经结束，
+	 *  当读到一个空行 且 nonl = true 时，则 *size = 0；当返回 false 时
+	 *  表示未读完整行且读完毕，
 	 *  *size 中存放着读到的数据长度
 	 */
 	bool body_gets(string& out, bool nonl = true, size_t* size = NULL);
@@ -295,7 +297,7 @@ public:
 
 protected:
 	/**
-	 * 基类 connect_client 的纯虚函数，显式地调用本函数用来打开与服务端的连接
+	 * 基类 connect_client 纯虚函数，显式调用本函数用来打开与服务端的连接
 	 * @return {bool} 连接是否成功
 	 */
 	virtual bool open();

@@ -10,16 +10,19 @@
 # if defined(ACL_WINDOWS) || defined(USE_DYNAMIC)
 
 typedef int     (*deflateInit_fn)(z_stream*, int, const char*, int);
+typedef int     (*deflateInit2_fn)(z_stream*, int, int, int, int, int);
 typedef int     (*deflate_fn)(z_stream*, int);
 typedef int     (*deflateReset_fn)(z_stream*);
 typedef int     (*deflateEnd_fn)(z_stream*);
 
 typedef int     (*inflateInit_fn)(z_stream*, int, const char*, int);
+typedef int     (*inflateInit2_fn)(z_stream*, int, int, int, int, int);
 typedef int     (*inflate_fn)(z_stream*, int);
 typedef int     (*inflateReset_fn)(z_stream*);
 typedef int     (*inflateEnd_fn)(z_stream*);
 
 static deflateInit_fn __deflateInit = NULL;
+static deflateInit2_fn __deflateInit2 = NULL;
 static deflate_fn __deflate = NULL;
 static deflateReset_fn __deflateReset = NULL;
 static deflateEnd_fn __deflateEnd = NULL;
@@ -58,6 +61,11 @@ static void __zlib_dll_load(void)
 
 	__deflateInit = (deflateInit_fn) acl_dlsym(__zlib_dll, "deflateInit_");
 	if (__deflateInit == NULL)
+		logger_fatal("load deflateInit from zlib.dll error: %s",
+			acl_last_serror());
+
+	__deflateInit2 = (deflateInit2_fn) acl_dlsym(__zlib_dll, "deflateInit2");
+	if (__deflateInit2 == NULL)
 		logger_fatal("load deflateInit from zlib.dll error: %s",
 			acl_last_serror());
 
@@ -101,6 +109,7 @@ static void __zlib_dll_load(void)
 }
 # else
 #  define __deflateInit         deflateInit_
+#  define __deflateInit2        deflateInit2
 #  define __deflate             deflate
 #  define __deflateReset	deflateReset
 #  define __deflateEnd          deflateEnd
@@ -353,11 +362,16 @@ bool zlib_stream::flush_out(int (*func)(z_stream*, int),
 	return (true);
 }
 
-bool zlib_stream::zip_begin(zlib_level_t level /* = zlib_default */)
+bool zlib_stream::zip_begin(zlib_level_t level /* = zlib_default */,
+	int wbits /* = zlib_wbits_15 */,
+	zlib_mlevel_t mlevel /* = zlib_memlevel_9 */)
 {
 	is_compress_ = true;
-	int   ret = __deflateInit(zstream_, level,
-		ZLIB_VERSION, sizeof(z_stream));
+//	int   ret = __deflateInit(zstream_, level,
+//		ZLIB_VERSION, sizeof(z_stream));
+
+	int ret = __deflateInit2(zstream_, level, Z_DEFLATED,
+			wbits, mlevel, Z_DEFAULT_STRATEGY);
 	if (ret != Z_OK)
 	{
 		logger_error("deflateInit error");

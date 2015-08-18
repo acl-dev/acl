@@ -69,9 +69,9 @@ public:
 	/**
 	 * 写 HTTP 请求头数据至输出流中
 	 * @param header {http_header&}
-	 * @return {int} 真实写入的数据量, 返回 -1 表示出错
+	 * @return {bool} 写头部数据是否成功
 	 */
-	int write_head(const http_header& header);
+	bool write_head(const http_header& header);
 
 	/**
 	 * 发送 HTTP 数据体，可以循环调用此函数，当在第一次调用 write 函数写入
@@ -282,11 +282,15 @@ public:
 	 * @param clean {bool} 在接收数据前是否自动清空 buf 缓冲区
 	 * @param real_size {int*} 若该指针非空，则记录真正读到的数据长度，
 	 *  通过该指针返回的数据值永远 >= 0
-	 * @return {int} 返回值含义如下：
+	 * @return {int} 返回值含义如下：(应用需要通过 body_finish 函数和
+	 *       disconnected 函数来判断数据体是否读完或连接是否关闭)
 	 *  > 0: 表示已经读到的数据，并且数据还未读完
-	 *  == 0: 如果返回值为此值，则可以调用 disconnected()函数来判断连接
-	 *  是否已经关闭；调用 body_finish 函数来判断是否已经读完 HTTP 响应
-	 *  体数据，如果已经读完且连接未关闭，则还可以继续保持长连接
+	 *  == 0: 有两种原因会返回 0，当数据读完时返回 0，可调用 body_finish
+	 *        函数判断是否已经读完 HTTP 响应数据；当读到压缩数据的尾部时，
+	 *        因压缩数据的8字节尾部数据是控制字段，所以不做为数据体返回，
+	 *        此时也会返回 0；
+	 *        还可以通过 disconnected() 函数判断连接是否已经被关闭
+	 *        如果数据读完且连接半未关闭，则可以继续保持长连接
 	 *  < 0: 表示连接关闭
 	 * 注：read_body 的两个函数不能混用；
 	 *     当为解压缩数据时，则返回的值为解压缩后的数据长度
@@ -312,7 +316,7 @@ public:
 	 * 关闭，当返回 true 时表示读到了一行数据，此时可以通过判断
 	 * body_finish() 返回值来判断是否已经读完了数据体
 	 * @param out {string&} 存储数据体的缓冲区，在该函数内部不会自动清理该
-	 *  缓冲区，用户可在调用该函数前自行清理该缓冲区中的数据(可调用:out.clear())
+	 *  缓冲区，用户可在调用该函数前自行清理该缓冲区(可调用:out.clear())
 	 * @param nonl {bool} 读取一行数据时是否自动去掉尾部的 "\r\n" 或 "\n"
 	 * @param size {size_t*} 当读到完整的一行数据时存放该行数据的长度，
 	 *  当读到一个空行且 nonl 为 true 时，则该值为 0
@@ -386,9 +390,12 @@ private:
 	bool is_request_;           // 是否是客户请求端
 	int  gzip_header_left_;     // gzip 头剩余的长度
 	int  last_ret_;             // 数据读完后记录最后的返回值
+	bool head_sent_;            // 头部数据是否已经发送完毕
 	bool body_finish_;          // 是否已经读完 HTTP 响应体数据
 	bool disconnected_;         // 网络连接是否已经关闭
 	bool chunked_transfer_;     // 是否为 chunked 传输模式
+	unsigned gzip_crc32_;       // gzip 压缩数据时的检验值
+	unsigned gzip_total_in_;    // gzip 压缩前的总数据长度      
 	string* buf_;               // 内部缓冲区，用在按行读等操作中
 
 	bool read_request_head(void);
@@ -399,6 +406,11 @@ private:
 	int  read_response_body(string& out, bool clean, int* real_size);
 
 	HTTP_HDR* get_http_hdr() const;
+	bool write_chunk(ostream& out, const void* data, size_t len);
+	bool write_chunk_trailer(ostream& out);
+
+	bool write_gzip(ostream& out, const void* data, size_t len);
+	bool write_gzip_trailer(ostream& out);
 };
 
 }  // namespace acl

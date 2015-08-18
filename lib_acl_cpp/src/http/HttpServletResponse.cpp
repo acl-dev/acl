@@ -4,7 +4,9 @@
 #include "acl_cpp/stream/ostream.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/http/http_header.hpp"
+#include "acl_cpp/http/http_client.hpp"
 #include "acl_cpp/http/HttpServlet.hpp"
+#include "acl_cpp/http/HttpServletRequest.hpp"
 #include "acl_cpp/http/HttpServletResponse.hpp"
 
 namespace acl
@@ -12,7 +14,9 @@ namespace acl
 
 HttpServletResponse::HttpServletResponse(socket_stream& stream)
 : stream_(stream)
+, request_(NULL)
 {
+	client_ = NEW http_client(&stream_, stream_.get_rw_timeout());
 	header_ = NEW http_header();
 	header_->set_request_mode(false);
 	charset_[0] = 0;
@@ -22,6 +26,7 @@ HttpServletResponse::HttpServletResponse(socket_stream& stream)
 
 HttpServletResponse::~HttpServletResponse(void)
 {
+	delete client_;
 	delete header_;
 }
 
@@ -61,6 +66,12 @@ HttpServletResponse& HttpServletResponse::setChunkedTransferEncoding(bool on)
 HttpServletResponse& HttpServletResponse::setContentType(const char* value)
 {
 	safe_snprintf(content_type_, sizeof(content_type_), "%s", value);
+	return *this;
+}
+
+HttpServletResponse& HttpServletResponse::setContentEncoding(bool gzip)
+{
+	header_->set_transfer_gzip(gzip);
 	return *this;
 }
 
@@ -136,70 +147,46 @@ bool HttpServletResponse::sendHeader(void)
 	head_sent_ = true;
 
 	acl_assert(header_->is_request() == false);
-	string buf;
-	if (charset_[0] != 0)
-		buf.format("%s; charset=%s", content_type_, charset_);
-	else
-		buf.format("%s", content_type_);
-	header_->set_content_type(buf.c_str());
 
-	buf.clear();
-	header_->build_response(buf);
-	return getOutputStream().write(buf) == -1 ? false : true;
+	char  buf[256];
+	if (charset_[0] != 0)
+		safe_snprintf(buf, sizeof(buf), "%s; charset=%s",
+			content_type_, charset_);
+	else
+		safe_snprintf(buf, sizeof(buf), "%s", content_type_);
+
+	header_->set_content_type(buf);
+
+	// 虽然服务端在响应头中设置了 gzip 压缩方式，但如果请求端不接收
+	// gzip 压缩数据，则需要从响应头中禁止
+	if (header_->is_transfer_gzip() && request_)
+	{
+		bool accept_gzip = false;
+		std::vector<string> tokens;
+		request_->getAcceptEncoding(tokens);
+		std::vector<string>::const_iterator it;
+
+		for (it = tokens.begin(); it != tokens.end(); ++it)
+		{
+			if ((*it).compare("gzip", false) == 0)
+			{
+				accept_gzip = true;
+				break;
+			}
+		}
+
+		if (!accept_gzip)
+			header_->set_transfer_gzip(false);
+	}
+
+	return client_->write_head(*header_);
 }
 
 bool HttpServletResponse::write(const void* data, size_t len)
 {
 	if (!head_sent_ && sendHeader() == false)
 		return false;
-
-	if (header_->chunked_transfer() == false)
-	{
-		if (data == NULL || len == 0)
-			return true;
-		return stream_.write(data, len) == -1 ? false : true;
-	}
-
-	if (data == NULL || len == 0)
-		return stream_.format("0\r\n\r\n") == -1 ? false : true;
-
-#if 1
-	struct iovec iov[3];
-
-	char hdr[32];
-	safe_snprintf(hdr, sizeof(hdr), "%x\r\n", (int) len);
-
-#ifdef MINGW
-	iov[0].iov_base = hdr;
-#else
-	iov[0].iov_base = (void*) hdr;
-#endif
-	iov[0].iov_len = strlen(hdr);
-
-#ifdef MINGW
-	iov[1].iov_base = (char*) data;
-#else
-	iov[1].iov_base = (void*) data;
-#endif
-	iov[1].iov_len = (int) len;
-
-#ifdef MINGW
-	iov[2].iov_base = (char*) "\r\n";
-#else
-	iov[2].iov_base = (void*) "\r\n";
-#endif
-	iov[2].iov_len = 2;
-
-	return stream_.writev(iov, 3) == -1 ? false : true;
-#else
-	if (stream_.format("%x\r\n", (int) len) == -1)
-		return false;
-	if (stream_.write(data, len) == -1)
-		return false;
-	if (stream_.write("\r\n", 2) == -1)
-		return false;
-	return true;
-#endif
+	return client_->write_body(data, len);
 }
 
 bool HttpServletResponse::write(const string& buf)
@@ -234,6 +221,11 @@ void HttpServletResponse::encodeUrl(string& out, const char* url)
 ostream& HttpServletResponse::getOutputStream(void) const
 {
 	return stream_;
+}
+
+void HttpServletResponse::setHttpServletRequest(HttpServletRequest* request)
+{
+	request_ = request;
 }
 
 } // namespace acl

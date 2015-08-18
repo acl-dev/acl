@@ -52,6 +52,7 @@ void http_header::init()
 	range_total_ = -1;
 	content_length_ = -1;
 	chunked_transfer_ = false;
+	transfer_gzip_ = false;
 }
 
 void http_header::clear()
@@ -805,6 +806,18 @@ bool http_header::build_response(string& out) const
 		out << "Content-Range: bytes=" << range_from_ << '-'
 			<< range_to_ << '/' << range_total_ << "\r\n";
 
+	// 如果是 gzip 压缩数据，当非 chunked 传输时，必须取消 Content-Length 字段，
+	// 同时禁止保持长连接，即： Connection: close
+	if (transfer_gzip_)
+	{
+		out << "Content-Encoding: gzip\r\n";
+
+		if (!chunked_transfer_ && keep_alive_)
+			const_cast<http_header*>(this)->keep_alive_ = false;
+		if (content_length_ > 0)
+			const_cast<http_header*>(this)->content_length_ = -1;
+	}
+
 	build_common(out);
 	out << "\r\n";
 	return true;
@@ -821,6 +834,14 @@ http_header& http_header::set_cgi_mode(bool on)
 {
 	cgi_mode_ = on;
 	if (cgi_mode_)
+		is_request_ = false;
+	return *this;
+}
+
+http_header& http_header::set_transfer_gzip(bool on)
+{
+	transfer_gzip_ = on;
+	if (transfer_gzip_)
 		is_request_ = false;
 	return *this;
 }

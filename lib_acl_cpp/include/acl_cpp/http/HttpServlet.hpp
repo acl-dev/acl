@@ -20,8 +20,8 @@ public:
 	virtual ~HttpServlet(void) = 0;
 
 	/**
-	 * 设置本地字符集，如果设置了本地字符集，则在接收 HTTP 请求数据时，会自动将请求的
-	 * 字符集转为本地字符集；该函数必须在 doRun 之前调用才有效
+	 * 设置本地字符集，如果设置了本地字符集，则在接收 HTTP 请求数据时，会
+	 * 自动将请求的字符集转为本地字符集；该函数必须在 doRun 之前调用才有效
 	 * @param charset {const char*} 本地字符集，如果该指针为空，
 	 *  则清除本地字符集
 	 * @return {HttpServlet&}
@@ -29,26 +29,27 @@ public:
 	HttpServlet& setLocalCharset(const char* charset);
 
 	/**
-	 * 设置 HTTP 会话过程的 IO 读写超时时间；该函数必须在 doRun 之前调用才有效
+	 * 设置 HTTP 会话过程 IO 读写超时时间；该函数必须在 doRun 前调用才有效
 	 * @param rw_timeout {int} 读写超时时间(秒)
 	 * @return {HttpServlet&}
 	 */
 	HttpServlet& setRwTimeout(int rw_timeout);
 
 	/**
-	 * 针对 POST 方法，该方法设置是否需要解析数据体数据，默认为解析，该函数必须在 doRun
-	 * 之前调用才有效；当数据体为数据流或 MIME 格式，即使调用本方法设置了解析数据，也不
-	 * 会对数据体进行解析
+	 * 针对 POST 方法，该方法设置是否需要解析数据体数据，默认为解析，该函
+	 * 数必须在 doRun 之前调用才有效；当数据体为数据流或 MIME 格式，即使
+	 * 调用本方法设置了解析数据，也不会对数据体进行解析
 	 * @param on {bool} 是否需要解析
 	 * @return {HttpServlet&}
 	 */
 	HttpServlet& setParseBody(bool on);
 
 	/**
-	 * 针对 POST 方法，该方法设置解析数据体的最大长度，如果数据体，该函数必须在 doRun
-	 * 之前调用才有效
-	 * @param length {int} 最大长度限制，如果请求的数据体长度过大，则直接返回
-	 *  false，如果该值 <= 0 则内部不限制数据体长度，调用该函数前内部缺省值为 0
+	 * 针对 POST 方法，该方法设置解析数据体的最大长度，如果数据体，该函数
+	 * 必须在 doRun 之前调用才有效
+	 * @param length {int} 最大长度限制，如果请求的数据体长度过大，则直接
+	 *  返回 false，如果该值 <= 0 则内部不限制数据体长度，调用该函数前
+	 *  内部缺省值为 0
 	 * @return {HttpServlet&}
 	 */
 	HttpServlet& setParseBodyLimit(int length);

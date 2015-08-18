@@ -7,8 +7,10 @@ class string;
 class ostream;
 class socket_stream;
 class http_header;
+class http_client;
 class HttpCookie;
 class HttpServlet;
+class HttpServletRequest;
 
 /**
  * 与 HTTP 客户端响应相关的类，该类不应被继承，用户也不需要
@@ -46,6 +48,7 @@ public:
 	/**
 	 * 设置与 HTTP 客户端保持联系长连接
 	 * @param on {bool}
+	 * @return {HttpServletResponse&}
 	 */
 	HttpServletResponse& setKeepAlive(bool on);
 
@@ -53,13 +56,22 @@ public:
 	 * 设置 HTTP 响应数据体的 Content-Type 字段值，可字段值可以为：
 	 * text/html 或 text/html; charset=utf8 格式
 	 * @param value {const char*} 字段值
+	 * @return {HttpServletResponse&}
 	 */
 	HttpServletResponse& setContentType(const char* value);
+
+	/**
+	 * 设置 HTTP 响应数据体采用 gzip 压缩格式
+	 * @param gzip {bool} 是否采用 gzip 压缩格式
+	 * @return {HttpServletResponse&}
+	 */
+	HttpServletResponse& setContentEncoding(bool gzip);
 
 	/**
 	 * 设置 HTTP 响应数据体中字符集，当已经在 setContentType 设置
 	 * 了字符集，则就不必再调用本函数设置字符集
 	 * @param charset {const char*} 响应体数据的字符集
+	 * @return {HttpServletResponse&}
 	 */
 	HttpServletResponse& setCharacterEncoding(const char* charset);
 
@@ -88,8 +100,8 @@ public:
 	 * 对于分区下载，调用本函数设置数据下载的偏移位置（下标从 0 开始）
 	 * @param from {http_off_t} 数据区间起始偏移位置（下标从 0 开始计算）
 	 * @param to {http_off_t} 数据区间结束位置（该值需小于总数据长度）
-	 * @param total {http_off_t} 总数据长度，当数据源为一个静态文件时该值应
-	 *  等于该文件的总长度大小
+	 * @param total {http_off_t} 总数据长度，当数据源为一个静态文件时该值
+	 *  应等于该文件的总长度大小
 	 * @return {HttpServletResponse&}
 	 */
 #if  defined(_WIN32) || defined(_WIN64)
@@ -178,8 +190,9 @@ public:
 
 	/**
 	 * 带格式方式向 HTTP 客户端发送响应数据，内部自动调用
-	 * HttpServletResponse::write(const void*, size_t) 过程，
-	 * 在使用 chunked 方式传输数据时，应该应该最后再调用 write(NULL, 0) 表示数据结束
+	 * HttpServletResponse::write(const void*, size_t) 过程，在使用
+	 * chunked 方式传输数据时，应该应该最后再调用 write(NULL, 0)
+	 * 表示数据结束
 	 * @param fmt {const char*} 变参格式字符串
 	 * @return {int} 成功则返回值 > 0，否则返回 -1
 	 */
@@ -187,8 +200,8 @@ public:
 
 	/**
 	 * 带格式方式向 HTTP 客户端发送响应数据，内部自动调用
-	 * HttpServletResponse::write(const string&) 过程，
-	 * 在使用 chunked 方式传输数据时，应该应该最后再调用 write(NULL, 0) 表示数据结束
+	 * HttpServletResponse::write(const string&) 过程，在使用 chunked
+	 * 方式传输数据时，应该应该最后再调用 write(NULL, 0) 表示数据结束
 	 * @param fmt {const char*} 变参格式字符串
 	 * @param ap {va_list} 变参列表
 	 * @return {int} 成功则返回值 > 0，否则返回 -1
@@ -214,8 +227,16 @@ public:
 	 */
 	ostream& getOutputStream(void) const;
 
+	/**
+	 * 设置 http 请求对象，该函数目前只应被 HttpServlet 类内部调用
+	 * @param request {HttpServletRequest*}
+	 */
+	void setHttpServletRequest(HttpServletRequest* request);
+
 private:
 	socket_stream& stream_;		// 客户端连接流
+	HttpServletRequest* request_;	// http 请求对象
+	http_client* client_;		// http 响应流对象
 	http_header* header_;		// http 响应头
 	char  charset_[32];		// 字符集
 	char  content_type_[32];	// content-type 类型

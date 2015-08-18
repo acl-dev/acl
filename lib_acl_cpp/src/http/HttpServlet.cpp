@@ -89,18 +89,21 @@ bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */)
 	HttpServletRequest req(res, session, *in, local_charset_,
 		parse_body_enable_, parse_body_limit_);
 
+	// 设置 HttpServletRequest 对象
+	res.setHttpServletRequest(&req);
+
 	if (rw_timeout_ >= 0)
 		req.setRwTimeout(rw_timeout_);
 
 	res.setCgiMode(cgi_mode);
-
-	bool  ret;
 
 	http_method_t method = req.getMethod();
 
 	// 根据请求的值自动设定是否需要保持长连接
 	if (!cgi_mode)
 		res.setKeepAlive(req.isKeepAlive());
+
+	bool  ret;
 
 	switch (method)
 	{

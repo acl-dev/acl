@@ -755,6 +755,31 @@ int HttpServletRequest::getKeepAlive(void) const
 	return atoi(ptr);
 }
 
+void HttpServletRequest::getAcceptEncoding(std::vector<string>& out) const
+{
+	out.clear();
+	const char* ptr;
+
+	if (cgi_mode_)
+		ptr = acl_getenv("HTTP_ACCEPT_ENCODING");
+	else if (client_)
+		ptr = client_->header_value("Accept-Encoding");
+	else
+		return;
+
+	if (ptr == NULL || *ptr == 0)
+		return;
+
+	ACL_ARGV* tokens = acl_argv_split(ptr, ",; \t");
+	ACL_ITER iter;
+	acl_foreach(iter, tokens)
+	{
+		const char* token = (const char*) iter.data;
+		out.push_back(token);
+	}
+	acl_argv_free(tokens);
+}
+
 void HttpServletRequest::setRwTimeout(int rw_timeout)
 {
 	rw_timeout_ = rw_timeout;

@@ -3,15 +3,20 @@
 
 static void usage(const char* procname)
 {
-	printf("usage: %s -h [help] -s server_addr[127.0.0.1:8194] -n max_loop\r\n", procname);
+	printf("usage: %s -h [help] \r\n"
+		"\t-s server_addr[127.0.0.1:8194] \r\n"
+		"\t-n max_loop \r\n"
+		"\t-z[accept_gzip]\r\n"
+		"\t-B[send_body data]\r\n", procname);
 }
 
 int main(int argc, char* argv[])
 {
 	int  ch, max = 10;
+	bool accept_gzip = false, send_body = false;
 	acl::string addr("127.0.0.1:8194");
 
-	while ((ch = getopt(argc, argv, "hs:n:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:zB")) > 0)
 	{
 		switch (ch)
 		{
@@ -24,10 +29,18 @@ int main(int argc, char* argv[])
 		case 'n':
 			max = atoi(optarg);
 			break;
+		case 'z':
+			accept_gzip = true;
+			break;
+		case 'B':
+			send_body = true;
+			break;
 		default:
 			break;
 		}
 	}
+
+	acl::log::stdout_open(true);
 
 	acl::string buf(1024);
 	for (size_t i = 0; i < 1024; i++)
@@ -39,35 +52,57 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < max; i++)
 	{
 		acl::http_header& header = req.request_header();
+		//header.set_method(acl::HTTP_METHOD_POST);
 		header.set_url("/");
 		header.set_keep_alive(true);
-		header.set_content_length(buf.length());
+		header.accept_gzip(accept_gzip ? true : false);
+		//header.set_content_length(buf.length());
 
-		if (req.request(buf.c_str(), buf.length()) == false)
+		bool rc;
+
+		if (send_body)
+			rc = req.request(buf.c_str(), buf.length());
+		else
+			rc = req.request(NULL, 0);
+
+		// 只所以将 build_request 放在 req.request 后面，是因为
+		// req.request 内部可能会修改请求头中的字段
+		acl::string hdr;
+		header.build_request(hdr);
+		printf("request header:\r\n%s\r\n", hdr.c_str());
+
+		if (rc == false)
 		{
 			printf("send request error\n");
 			break;
 		}
 
-		if (i < 10)
-			printf("send request ok\r\n");
+		printf("send request ok\r\n");
 
 		tmp.clear();
 
-		int  size = 0;
+		int  size = 0, real_size = 0, n;
 		while (true)
 		{
-			int ret = req.read_body(tmp, false);
+			int ret = req.read_body(tmp, false, &n);
 			if (ret < 0) {
 				printf("read_body error\n");
 				return 1;
 			}
 			else if (ret == 0)
+			{
+				printf("-------------read over---------\r\n");
 				break;
+			}
+
 			size += ret;
+			real_size += n;
 		}
-		if (i < 10)
-			printf(">>size: %d\n", size);
+
+		printf("read body size: %d, real_size: %d, %s\n",
+			size, real_size, tmp.c_str());
+
+		printf("===============================================\r\n");
 	}
 
 	return 0;

@@ -28,6 +28,38 @@ typedef enum
 } zlib_level_t;
 
 /**
+ * 压缩过程中的压缩窗口参数类型，值越大则压缩效果越好且占用内存越多，
+ * 针对 HTTP 压缩传输，需要设置这些值的负值：-zlib_wbits_t
+ */
+enum
+{
+	zlib_wbits_8  = 8,
+	zlib_wbits_9  = 9,
+	zlib_wbits_10 = 10,
+	zlib_wbits_11 = 11,
+	zlib_wbits_12 = 12,
+	zlib_wbits_13 = 13,
+	zlib_wbits_14 = 14,
+	zlib_wbits_15 = 15,
+};
+
+/**
+ * 压缩过程中的内存分配策略，值越大使用内存越多
+ */
+typedef enum
+{
+	zlib_mlevel_1 = 1,
+	zlib_mlevel_2 = 2,
+	zlib_mlevel_3 = 3,
+	zlib_mlevel_4 = 4,
+	zlib_mlevel_5 = 5,
+	zlib_mlevel_6 = 6,
+	zlib_mlevel_7 = 7,
+	zlib_mlevel_8 = 8,
+	zlib_mlevel_9 = 9,
+} zlib_mlevel_t;
+
+/**
  * 压缩或解压过程中的缓存模式，即在压缩或解压过程中是否立刻刷新
  * 到缓冲区为了获得比较高的压缩比，应该选择 zlib_flush_off 方式
  */
@@ -85,10 +117,17 @@ public:
 	 * 过程失败，则应该调用 zip_reset
 	 * @param level {zlib_level_t} 压缩级别，级别越高，则压缩比
 	 *  越高，但压缩速度越低
+	 * @param wbits {zlib_wbits_t} 压缩过程中的滑动窗口级别，值越大，则
+	 *  压缩效率越高且使用内存越多，针对 HTTP 数据压缩传输，应该采用该
+	 *  值的负值，如：-zlib_wbits_15
+	 * @param mlevel {zlib_mlevel_t} 压缩过程中的内存分配策略，值越大，
+	 *  则压缩效率越高且内存使用越多
 	 * @return {bool} 压缩初始化过程是否成功，失败的原因一般
 	 *  应该是输入的参数非法
 	 */
-	bool zip_begin(zlib_level_t level = zlib_default);
+	bool zip_begin(zlib_level_t level = zlib_default,
+		int wbits = zlib_wbits_15,
+		zlib_mlevel_t mlevel = zlib_mlevel_9);
 
 	/**
 	 * 循环调用此函数对源数据进行压缩
@@ -176,6 +215,15 @@ public:
 	 */
 	bool unzip_reset();
 
+	/**
+	 * 获得当前的 zstream 对象
+	 * @return {z_stream*}
+	 */
+	z_stream* get_zstream() const
+	{
+		return zstream_;
+	}
+
 	///////////////////////////////////////////////////////////////
 
 	bool pipe_zip_begin(zlib_level_t level = zlib_default,
@@ -188,7 +236,7 @@ public:
 		string* out, size_t max = 0);
 	virtual int pop_end(string* out, size_t max = 0);
 	virtual void clear();
-protected:
+
 private:
 	z_stream* zstream_;
 	bool finished_;

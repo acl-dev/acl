@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 		acl::log::stdout_open(true);
 
 		// 监听的地址列表，格式：ip:port1,ip:port2,...
-		const char* addrs = "127.0.0.1:8888";
+		const char* addrs = ":8888";
 		printf("listen on: %s\r\n", addrs);
 
 		// 测试时设置该值 > 0 则指定服务器处理客户端连接过程的

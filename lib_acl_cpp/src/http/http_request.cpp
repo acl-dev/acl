@@ -207,7 +207,7 @@ bool http_request::write_head()
 		client_->reset();  // 重置状态
 
 		// 发送 HTTP 请求头
-		if (client_->write_head(header_) > 0)
+		if (client_->write_head(header_) == true)
 			return true;
 
 		close();
@@ -274,7 +274,7 @@ bool http_request::send_request(const void* data, size_t len)
 	client_->reset();  // 重置状态
 
 	// 写 HTTP 请求头
-	if (client_->write_head(header_) < 0)
+	if (client_->write_head(header_) == false)
 	{
 		close();
 		return false;
@@ -632,7 +632,7 @@ bool http_request::get_body(string& out, const char* to_charset /* = NULL */)
 	return true;
 }
 
-int http_request::read_body(string& out, bool clean /* = NULL */,
+int http_request::read_body(string& out, bool clean /* = false */,
 	int* real_size /* = NULL */)
 {
 	if (clean)

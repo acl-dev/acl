@@ -183,9 +183,9 @@ public:
 	 */
 	bool is_request(void) const;
 
-	//////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
 	//            HTTP 请求方法函数
-	//////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * 创建 HTTP 请求头数据
@@ -313,9 +313,9 @@ public:
 	 */
 	virtual void redicrect_reset(void) {}
 
-	//////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
 	//            HTTP 响应方法函数
-	//////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 创建 HTTP 响应头数据
@@ -354,9 +354,34 @@ public:
 	 */
 	http_header& set_cgi_mode(bool on);
 
+	/**
+	 * 是否设置了 CGI 模式
+	 * @return {bool}
+	 */
+	bool is_cgi_mode() const
+	{
+		return cgi_mode_;
+	}
+
+	/**
+	 * 设置传输的数据是否采用 gzip 方式进行压缩
+	 * @param on {bool}
+	 * @return {http_header&}
+	 */
+	http_header& set_transfer_gzip(bool on);
+
+	/**
+	 * 获得当前的数据传输是否设置了采用 gzip 压缩方式
+	 * @return {bool}
+	 */
+	bool is_transfer_gzip() const
+	{
+		return transfer_gzip_;
+	}
+
 private:
 	//char* domain_;  // HTTP 服务器域名
-	//unsigned short port_;                 // HTTP 服务器端口
+	//unsigned short port_;               // HTTP 服务器端口
 	char* url_;                           // HTTP 请求的 URL
 	std::list<HTTP_PARAM*> params_;       // 请求参数集合
 	std::list<HttpCookie*> cookies_;      // cookies 集合
@@ -382,6 +407,7 @@ private:
 	long long int content_length_;        // HTTP 数据体长度
 #endif
 	bool chunked_transfer_;               // 是否为 chunked 传输模式
+	bool transfer_gzip_;                  // 数据是否采用 gzip 压缩
 	void init(void);                      // 初始化
 	void clear(void);
 	void build_common(string& buf) const; // 构建通用头
