@@ -98,6 +98,12 @@ static bool tbl_create(const char* dbaddr, const char* dbname,
 // 添加表数据
 static bool tbl_insert(acl::db_handle& db, int n)
 {
+	if (db.begin_transaction() == false)
+	{
+		printf("begin transaction false: %s\r\n", db.get_error());
+		return false;
+	}
+
 	acl::query query;
 	query.create_sql("insert into group_tbl(group_name, uvip_tbl,"
 		" update_date) values(:group, :test, :date)")
@@ -107,6 +113,12 @@ static bool tbl_insert(acl::db_handle& db, int n)
 
 	if (db.exec_update(query) == false)
 		return (false);
+
+	if (db.commit() == false)
+	{
+		printf("commit error: %s\r\n", db.get_error());
+		return false;
+	}
 
 	const acl::db_rows* result = db.get_result();
 	if (result)
@@ -263,7 +275,7 @@ int main(void)
 	acl::db_handle::set_loadpath(path);
 
 	acl::string dbaddr("127.0.0.1:3306");
-	acl::string dbname("acl_db"), dbuser("root"), dbpass("111111");
+	acl::string dbname("acl_db"), dbuser("root"), dbpass;
 
 	out.format("Enter dbaddr [default: %s]: ", dbaddr.c_str());
 	if (in.gets(line) && !line.empty())
@@ -316,7 +328,7 @@ int main(void)
 
 	//////////////////////////////////////////////////////////////////////
 
-	acl::db_mysql db(dbaddr, dbname, dbuser, dbpass);
+	acl::db_mysql db(dbaddr, dbname, dbuser, dbpass, 0, false);
 	int   max = 100;
 
 	// 先打开数据库连接

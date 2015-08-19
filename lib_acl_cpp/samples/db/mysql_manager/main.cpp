@@ -386,7 +386,7 @@ int main(void)
 	acl::db_handle::set_loadpath(path);
 
 	acl::string dbaddr("127.0.0.1:3306");
-	acl::string dbname("acl_db"), dbuser("root"), dbpass("111111");
+	acl::string dbname("acl_db"), dbuser("root"), dbpass;
 
 	out.format("Enter dbaddr [default: %s]: ", dbaddr.c_str());
 	if (in.gets(line) && !line.empty())

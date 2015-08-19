@@ -157,8 +157,8 @@ bool HttpServletResponse::sendHeader(void)
 
 	header_->set_content_type(buf);
 
-	// è™½ç„¶æœåŠ¡ç«¯åœ¨å“åº”å¤´ä¸­è®¾ç½®äº† gzip åŽ‹ç¼©æ–¹å¼ï¼Œä½†å¦‚æžœè¯·æ±‚ç«¯ä¸æŽ¥æ”¶
-	// gzip åŽ‹ç¼©æ•°æ®ï¼Œåˆ™éœ€è¦ä»Žå“åº”å¤´ä¸­ç¦æ­¢
+	// ËäÈ»·þÎñ¶ËÔÚÏìÓ¦Í·ÖÐÉèÖÃÁË gzip Ñ¹Ëõ·½Ê½£¬µ«Èç¹ûÇëÇó¶Ë²»½ÓÊÕ
+	// gzip Ñ¹ËõÊý¾Ý£¬ÔòÐèÒª´ÓÏìÓ¦Í·ÖÐ½ûÖ¹
 	if (header_->is_transfer_gzip() && request_)
 	{
 		bool accept_gzip = false;

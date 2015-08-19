@@ -42,6 +42,7 @@
 
  static acl_pthread_once_t __sqlite_once = ACL_PTHREAD_ONCE_INIT;
  static ACL_DLL_HANDLE __sqlite_dll = NULL;
+ static acl::string __sqlite_path;
 
  // 程序退出释放动态加载的库
  static void __sqlite_dll_unload(void)
@@ -50,7 +51,7 @@
 	 {
 		 acl_dlclose(__sqlite_dll);
 		 __sqlite_dll = NULL;
-		 logger("sqlite3.dll unload ok");
+		 logger("%s unload ok", __sqlite_path.c_str());
 	 }
  }
 
@@ -58,7 +59,11 @@
  static void __sqlite_dll_load(void)
  {
 	if (__sqlite_dll != NULL)
-		logger_fatal("__sqlite_dll not null");
+	{
+		logger_warn("sqlite(%s) to be loaded again!",
+			__sqlite_path.c_str());
+		return;
+	}
 
 	const char* path;
 	const char* ptr = acl::db_handle::get_loadpath();
@@ -74,6 +79,8 @@
 	__sqlite_dll = acl_dlopen(path);
 	if (__sqlite_dll == NULL)
 		logger_fatal("load %s error: %s", path, acl_last_serror());
+
+	__sqlite_path = path;
 
 	__sqlite3_libversion = (sqlite3_libversion_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_libversion");

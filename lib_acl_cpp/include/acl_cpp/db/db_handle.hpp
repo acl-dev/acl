@@ -63,7 +63,7 @@ public:
 	 * 从查询结果的记录行中取得对应下标的整数类型的字段值
 	 * @param ifield {size_t} 下标值
 	 * @param null_value {int} 当结果为空时，返回此值表示未有相应结果
-	 * @return {int} 当返回值与用户输入的 null_value 值相同时表明没有查到结果
+	 * @return {int} 当返回值与用户输入的 null_value 相同表明没有查到结果
 	 */
 	int field_int(size_t ifield, int null_value = 0) const;
 
@@ -71,7 +71,7 @@ public:
 	 * 从查询结果的记录行中取得字段名的整数类型的字段值
 	 * @param name {const char*} 下标值
 	 * @param null_value {int} 当结果为空时，返回此值表示未有相应结果
-	 * @return {int} 当返回值与用户输入的 null_value 值相同时表明没有查到结果
+	 * @return {int} 当返回值与用户输入的 null_value 相同表明没有查到结果
 	 */
 	int field_int(const char* name, int null_value = 0) const;
 
@@ -80,31 +80,36 @@ public:
 	 * 从查询结果的记录行中取得对应下标的整数类型的字段值
 	 * @param ifield {size_t} 下标值
 	 * @param null_value {acl_int64} 当结果为空时，返回此值表示未有相应结果
-	 * @return {acl_int64} 当返回值与用户输入的 null_value 值相同时表明没有查到结果
+	 * @return {acl_int64} 当返回值与用户输入的 null_value 值相同时表明
+	 *  没有查到结果
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 field_int64(size_t ifield, __int64 null_value = 0) const;
 #else
-	long long int field_int64(size_t ifield, long long int null_value = 0) const;
+	long long int field_int64(size_t ifield,
+		long long int null_value = 0) const;
 #endif
 
 	/**
 	 * 从查询结果的记录行中取得字段名的整数类型的字段值
 	 * @param name {const char*} 下标值
 	 * @param null_value {acl_int64} 当结果为空时，返回此值表示未有相应结果
-	 * @return {acl_int64} 当返回值与用户输入的 null_value 值相同时表明没有查到结果
+	 * @return {acl_int64} 当返回值与用户输入的 null_value 值相同时表明
+	 *  没有查到结果
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 field_int64(const char* name, __int64 null_value = 0) const;
 #else
-	long long int field_int64(const char* name, long long int null_value = 0) const;
+	long long int field_int64(const char* name,
+		long long int null_value = 0) const;
 #endif
 
 	/**
 	 * 从查询结果的记录行中取得字段名的浮点类型的字段值
 	 * @param ifield {size_t} 下标值
 	 * @param null_value {double} 当结果为空时，返回此值表示未有相应结果
-	 * @return {double} 当返回值与用户输入的 null_value 值相同时表明没有查到结果
+	 * @return {double} 当返回值与用户输入的 null_value 值相同时表明没有
+	 *  查到结果
 	 */
 	double field_double(size_t ifield, double null_value = 0.0) const;
 
@@ -112,7 +117,8 @@ public:
 	 * 从查询结果的记录行中取得字段名的浮点类型的字段值
 	 * @param name {const char*} 下标值
 	 * @param null_value {double} 当结果为空时，返回此值表示未有相应结果
-	 * @return {double} 当返回值与用户输入的 null_value 值相同时表明没有查到结果
+	 * @return {double} 当返回值与用户输入的 null_value 值相同时表明没有
+	 *  查到结果
 	 */
 	double field_double(const char* name, double null_value = 0.0) const;
 
@@ -312,16 +318,28 @@ public:
 	virtual bool sql_update(const char* sql) = 0;
 
 	/**
-	 * 更安全易用的查询过程，调用此函数功能等同于 sql_select，只是查询对象 query
-	 * 构建的 sql 语句是安全的，可以防止 sql 注入
+	 * 开始执行事务
+	 * @return {bool}
+	 */
+	virtual bool begin_transaction() { return false; }
+
+	/**
+	 * 提交事务
+	 * @return {bool}
+	 */
+	virtual bool commit() { return false; }
+
+	/**
+	 * 更安全易用的查询过程，调用此函数功能等同于 sql_select，只是查询
+	 * 对象 query 构建的 sql 语句是安全的，可以防止 sql 注入
 	 * @param query {query&}
 	 * @return {bool} 执行是否成功
 	 */
 	bool exec_select(query& query);
 
 	/**
-	 * 更安全易用的更新过程，调用此函数功能等同于 sql_update，只是查询对象 query
-	 * 构建的 sql 语句是安全的，可以防止 sql 注入
+	 * 更安全易用的更新过程，调用此函数功能等同于 sql_update，只是查询
+	 * 对象 query 构建的 sql 语句是安全的，可以防止 sql 注入
 	 * @param query {query&}
 	 * @return {bool} 执行是否成功
 	 */
@@ -372,9 +390,9 @@ public:
 	const std::vector<db_row*>* get_rows() const;
 
 	/**
-	 * 获得执行 SQL 语句后的第一行结果，这对于唯一键的数据查询时显得比较便捷些
-	 * @return {const db_row*} 返回空表示查询结果为空，如果返回结果非空，则必须
-	 *  调用 free_result() 函数来释放中间的结果内存，否则会引起内存泄露
+	 * 获得执行 SQL 语句后的第一行结果，针对唯一键的数据查询比较方便
+	 * @return {const db_row*} 返回空表示查询结果为空，否则， 则必须调用
+	 * free_result() 函数来释放中间的结果内存，否则会引起内存泄露
 	 */
 	const db_row* get_first_row() const;
 

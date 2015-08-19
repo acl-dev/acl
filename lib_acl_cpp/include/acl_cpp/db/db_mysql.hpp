@@ -38,7 +38,7 @@ public:
 	}
 
 	/********************************************************************/
-	/*            以下为基类 db_handle 的虚接口                            */
+	/*         以下为基类 db_handle 的虚接口                            */
 	/********************************************************************/
 
 	/**
@@ -105,6 +105,19 @@ public:
 	 * @return {int} 影响的行数，-1 表示出错
 	 */
 	int affect_count() const;
+
+	/**
+	 * 基类 db_handle 的虚函数，用来表示事务的开始，注意若要使用事务方式，
+	 * 则需要在 db_mysql 的构造函数中传入的参数 auto_commit 为 false
+	 * @return {bool}
+	 */
+	bool begin_transaction();
+
+	/**
+	 * 基类 db_handle 的虚函数，用来表示事务的结束
+	 * @return {bool}
+	 */
+	bool commit();
 
 private:
 	char* dbaddr_;  // 数据库监听地址

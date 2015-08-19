@@ -67,6 +67,8 @@ static mysql_character_set_name_fn __mysql_character_set_name = NULL;
 static acl_pthread_once_t __mysql_once = ACL_PTHREAD_ONCE_INIT;
 static ACL_DLL_HANDLE __mysql_dll = NULL;
 
+static acl::string __mysql_path;
+
 // 程序退出释放动态加载的库
 static void __mysql_dll_unload(void)
 {
@@ -74,7 +76,7 @@ static void __mysql_dll_unload(void)
 	{
 		acl_dlclose(__mysql_dll);
 		__mysql_dll = NULL;
-		logger("libmysql.dll unload ok");
+		logger("%s unload ok", __mysql_path.c_str());
 	}
 }
 
@@ -82,7 +84,8 @@ static void __mysql_dll_unload(void)
 static void __mysql_dll_load(void)
 {
 	if (__mysql_dll != NULL)
-		logger_fatal("__mysql_dll not null");
+		logger_fatal("mysql(%s) to be loaded again!",
+			__mysql_path.c_str());
 
 	const char* path;
 	const char* ptr = acl::db_handle::get_loadpath();
@@ -99,6 +102,8 @@ static void __mysql_dll_load(void)
 
 	if (__mysql_dll == NULL)
 		logger_fatal("load %s error: %s", path, acl_last_serror());
+
+	__mysql_path = path;
 
 	__mysql_libversion = (mysql_libversion_fn)
 		acl_dlsym(__mysql_dll, "mysql_get_client_version");
@@ -615,6 +620,28 @@ int db_mysql::affect_count() const
 	return (int) __mysql_affected_rows(conn_);
 }
 
+bool db_mysql::begin_transaction()
+{
+	const char* sql = "start transaction";
+	if (sql_update(sql) == false)
+	{
+		logger_error("%s error: %s", sql, get_error());
+		return false;
+	}
+	return true;
+}
+
+bool db_mysql::commit()
+{
+	const char* sql = "commit";
+	if (sql_update(sql) == false)
+	{
+		logger_error("%s error: %s", sql, get_error());
+		return false;
+	}
+	return true;
+}
+
 }  // namespace acl
 
 #else
@@ -664,6 +691,16 @@ bool db_mysql::sql_select(const char*)
 }
 
 bool db_mysql::sql_update(const char*)
+{
+	return false;
+}
+
+bool db_mysql::begin_transaction()
+{
+	return false;
+}
+
+bool db_mysql::commit()
 {
 	return false;
 }
