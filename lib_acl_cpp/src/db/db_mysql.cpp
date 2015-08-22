@@ -11,15 +11,15 @@
 
 #if defined(HAS_MYSQL) || defined(HAS_MYSQL_DLL)
 
-#if defined(ACL_CPP_DLL) || defined(HAS_MYSQL_DLL)
+# if defined(ACL_CPP_DLL) || defined(HAS_MYSQL_DLL)
 
-#ifndef STDCALL
-# ifdef ACL_WINDOWS
-#  define STDCALL __stdcall
-# else
-#  define STDCALL
-# endif // ACL_WINDOWS
-#endif // STDCALL
+#  ifndef STDCALL
+#   ifdef ACL_WINDOWS
+#    define STDCALL __stdcall
+#   else
+#    define STDCALL
+#   endif // ACL_WINDOWS
+#  endif // STDCALL
 
 typedef unsigned long (STDCALL *mysql_libversion_fn)(void);
 typedef const char* (STDCALL *mysql_client_info_fn)(void);
@@ -67,6 +67,7 @@ static mysql_character_set_name_fn __mysql_character_set_name = NULL;
 static acl_pthread_once_t __mysql_once = ACL_PTHREAD_ONCE_INIT;
 static ACL_DLL_HANDLE __mysql_dll = NULL;
 
+// 记录动态加载库的全路径
 static acl::string __mysql_path;
 
 // 程序退出释放动态加载的库
@@ -103,6 +104,7 @@ static void __mysql_dll_load(void)
 	if (__mysql_dll == NULL)
 		logger_fatal("load %s error: %s", path, acl_last_serror());
 
+	// 记录动态库路径，以便于在动态库卸载时输出库路径名
 	__mysql_path = path;
 
 	__mysql_libversion = (mysql_libversion_fn)
@@ -221,29 +223,29 @@ static void __mysql_dll_load(void)
 	logger("%s loaded!", path);
 	atexit(__mysql_dll_unload);
 }
-#else
+# else
 
-# define  __mysql_libversion mysql_get_client_version
-# define  __mysql_client_info mysql_get_client_info
-# define  __mysql_init mysql_init
-# define  __mysql_open mysql_real_connect
-# define  __mysql_close mysql_close
-# define  __mysql_options mysql_options
-# define  __mysql_autocommit mysql_autocommit
-# define  __mysql_errno mysql_errno
-# define  __mysql_error mysql_error
-# define  __mysql_query mysql_query
-# define  __mysql_num_fields mysql_num_fields
-# define  __mysql_fetch_fields mysql_fetch_fields
-# define  __mysql_fetch_row mysql_fetch_row
-# define  __mysql_store_result mysql_store_result
-# define  __mysql_num_rows mysql_num_rows
-# define  __mysql_free_result mysql_free_result
-# define  __mysql_affected_rows mysql_affected_rows
-# define  __mysql_set_character_set mysql_set_character_set
-# define  __mysql_character_set_name mysql_character_set_name
+#  define  __mysql_libversion mysql_get_client_version
+#  define  __mysql_client_info mysql_get_client_info
+#  define  __mysql_init mysql_init
+#  define  __mysql_open mysql_real_connect
+#  define  __mysql_close mysql_close
+#  define  __mysql_options mysql_options
+#  define  __mysql_autocommit mysql_autocommit
+#  define  __mysql_errno mysql_errno
+#  define  __mysql_error mysql_error
+#  define  __mysql_query mysql_query
+#  define  __mysql_num_fields mysql_num_fields
+#  define  __mysql_fetch_fields mysql_fetch_fields
+#  define  __mysql_fetch_row mysql_fetch_row
+#  define  __mysql_store_result mysql_store_result
+#  define  __mysql_num_rows mysql_num_rows
+#  define  __mysql_free_result mysql_free_result
+#  define  __mysql_affected_rows mysql_affected_rows
+#  define  __mysql_set_character_set mysql_set_character_set
+#  define  __mysql_character_set_name mysql_character_set_name
 
-#endif
+# endif
 
 //////////////////////////////////////////////////////////////////////////
 

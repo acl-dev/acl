@@ -302,16 +302,16 @@ public:
 	virtual bool close() = 0;
 
 	/**
-	 * 纯虚接口，子类必须实现此接口用于执行 SQL 语句
-	 * @param sql {const char*} 标准的 SQL 语句，非空，并且一定得要注册该
+	 * 纯虚接口，子类必须实现此接口用于执行 SELECT SQL 语句
+	 * @param sql {const char*} 标准的 SQL 语句，非空，并且一定得要注意该
 	 *  SQL 语句必须经过转义处理，以防止 SQL 注入攻击
 	 * @return {bool} 执行是否成功
 	 */
 	virtual bool sql_select(const char* sql) = 0;
 
 	/**
-	 * 纯虚接口，子类必须实现此接口用于执行 SQL 语句
-	 * @param sql {const char*} 标准的 SQL 语句，非空，并且一定得要注册该
+	 * 纯虚接口，子类必须实现此接口用于执行 INSERT/UPDATE/DELETE SQL 语句
+	 * @param sql {const char*} 标准的 SQL 语句，非空，并且一定得要注意该
 	 *  SQL 语句必须经过转义处理，以防止 SQL 注入攻击
 	 * @return {bool} 执行是否成功
 	 */
@@ -331,7 +331,8 @@ public:
 
 	/**
 	 * 更安全易用的查询过程，调用此函数功能等同于 sql_select，只是查询
-	 * 对象 query 构建的 sql 语句是安全的，可以防止 sql 注入
+	 * 对象 query 构建的 sql 语句是安全的，可以防止 sql 注入，该方法
+	 * 执行 SELECT SQL 语句
 	 * @param query {query&}
 	 * @return {bool} 执行是否成功
 	 */
@@ -339,7 +340,8 @@ public:
 
 	/**
 	 * 更安全易用的更新过程，调用此函数功能等同于 sql_update，只是查询
-	 * 对象 query 构建的 sql 语句是安全的，可以防止 sql 注入
+	 * 对象 query 构建的 sql 语句是安全的，可以防止 sql 注入，该方法
+	 * 执行 INSERT/UPDATE/DELETE SQL 语句
 	 * @param query {query&}
 	 * @return {bool} 执行是否成功
 	 */

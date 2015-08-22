@@ -324,12 +324,12 @@ bool redis_string::getrange(const char* key, size_t key_len,
 
 /////////////////////////////////////////////////////////////////////////////
 
-bool redis_string::setbit(const char* key, unsigned offset, bool bit)
+bool redis_string::setbit_(const char* key, unsigned offset, bool bit)
 {
-	return setbit(key, strlen(key), offset, bit);
+	return setbit_(key, strlen(key), offset, bit);
 }
 
-bool redis_string::setbit(const char* key, size_t len,
+bool redis_string::setbit_(const char* key, size_t len,
 	unsigned offset, bool bit)
 {
 	const char* argv[4];

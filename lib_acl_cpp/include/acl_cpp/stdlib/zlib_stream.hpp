@@ -167,6 +167,15 @@ public:
 	bool zip_reset();
 
 	/**
+	 * 在压缩过程中可使用此函数计算数据的 crc32 校验值
+	 * @param n {unsigned} 上次计算的校验和值，第一次时可写 0
+	 * @param buf {const void*} 需要校验的数据地址，第一次使用时写 NULL
+	 * @param dlen {size_t} buf 数据的长度，第一次使用时写 0
+	 * @return {unsinged} 本次计算的校验和值
+	 */
+	unsigned crc32_update(unsigned n, const void* buf, size_t dlen);
+
+	/**
 	 * 开始解压缩过程，如果采用流式解压缩方式，则调用顺序必须是：
 	 * unzip_begin->unzip_update->unzip_finish，如果中间任何一个
 	 * 过程失败，则应该调用 unzip_reset
@@ -223,6 +232,17 @@ public:
 	{
 		return zstream_;
 	}
+
+	/**
+	 * 当采用动态加载方式加载动态库时，可以使用此函数设置动态库的加载全路径
+	 */
+	static void set_loadpath(const char* path);
+
+	/**
+	 * 当设置了动态库的动态加载全路径时，可以通过本函数获得动态库加载全路径
+	 * @return {const char*} 当未设置时则返回 NULL
+	 */
+	static const char* get_loadpath();
 
 	///////////////////////////////////////////////////////////////
 

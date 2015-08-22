@@ -112,16 +112,16 @@ public:
 
 	/**
 	 * 基类 db_handle 的纯虚接口
-	 * @param sql {const char*} 标准的 SQL 语句，非空，并且一定得要注册该
-	 *  SQL 语句必须经过转义处理，以防止 SQL 注入攻击
+	 * @param sql {const char*} 标准的 SELECT SQL 语句，并且一定得要
+	 *  注意该 SQL 语句必须经过转义处理，以防止 SQL 注入攻击
 	 * @return {bool} 执行是否成功
 	 */
 	bool sql_select(const char* sql);
 
 	/**
 	 * 基类 db_handle 的纯虚接口
-	 * @param sql {const char*} 标准的 SQL 语句，非空，并且一定得要注册该
-	 *  SQL 语句必须经过转义处理，以防止 SQL 注入攻击
+	 * @param sql {const char*} 标准的 INSERT/UPDATE/DELETE SQL 语句，
+	 *  并且一定得要注意该 SQL 语句必须经过转义处理，以防止 SQL 注入攻击
 	 * @return {bool} 执行是否成功
 	 */
 	bool sql_update(const char* sql);

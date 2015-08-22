@@ -4,22 +4,25 @@
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/zlib_stream.hpp"
 
-#define HAVE_H_ZLIB
+#ifndef	HAS_ZLIB
+# define HAS_ZLIB
+#endif
 
-#ifdef HAVE_H_ZLIB
-# if defined(ACL_WINDOWS) || defined(USE_DYNAMIC)
+#if defined(HAS_ZLIB) || defined(HAS_ZLIB_DLL)
+# if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
 
-typedef int     (*deflateInit_fn)(z_stream*, int, const char*, int);
-typedef int     (*deflateInit2_fn)(z_stream*, int, int, int, int, int);
-typedef int     (*deflate_fn)(z_stream*, int);
-typedef int     (*deflateReset_fn)(z_stream*);
-typedef int     (*deflateEnd_fn)(z_stream*);
+typedef int (*deflateInit_fn)(z_stream*, int, const char*, int);
+typedef int (*deflateInit2_fn)(z_stream*, int, int, int, int, int);
+typedef int (*deflate_fn)(z_stream*, int);
+typedef int (*deflateReset_fn)(z_stream*);
+typedef int (*deflateEnd_fn)(z_stream*);
 
-typedef int     (*inflateInit_fn)(z_stream*, int, const char*, int);
-typedef int     (*inflateInit2_fn)(z_stream*, int, int, int, int, int);
-typedef int     (*inflate_fn)(z_stream*, int);
-typedef int     (*inflateReset_fn)(z_stream*);
-typedef int     (*inflateEnd_fn)(z_stream*);
+typedef int (*inflateInit_fn)(z_stream*, int, const char*, int);
+typedef int (*inflateInit2_fn)(z_stream*, int, int, int, int, int);
+typedef int (*inflate_fn)(z_stream*, int);
+typedef int (*inflateReset_fn)(z_stream*);
+typedef int (*inflateEnd_fn)(z_stream*);
+typedef unsigned long (*crc32_fn)(unsigned long, const Bytef*, unsigned);
 
 static deflateInit_fn __deflateInit = NULL;
 static deflateInit2_fn __deflateInit2 = NULL;
@@ -30,9 +33,11 @@ static inflateInit_fn __inflateInit = NULL;
 static inflate_fn __inflate = NULL;
 static inflateReset_fn __inflateReset = NULL;
 static inflateEnd_fn __inflateEnd = NULL;
+static crc32_fn __crc32 = NULL;
 
 static acl_pthread_once_t __zlib_once = ACL_PTHREAD_ONCE_INIT;
 static ACL_DLL_HANDLE __zlib_dll = NULL;
+static acl::string __zlib_path;
 
 // 程序退出时释放动态加载的 zlib.dll 库
 static void __zlib_dll_unload(void)
@@ -41,7 +46,7 @@ static void __zlib_dll_unload(void)
 	{
 		acl_dlclose(__zlib_dll);
 		__zlib_dll = NULL;
-		logger("zlib.dll unload ok");
+		logger("%s unload ok", __zlib_path.c_str());
 	}
 }
 
@@ -51,62 +56,79 @@ static void __zlib_dll_load(void)
 	if (__zlib_dll != NULL)
 		logger_fatal("__zlib_dll not null");
 
+	const char* path;
+	const char* ptr = acl::zlib_stream::get_loadpath();
+	if (ptr)
+		path = ptr;
+	else
 #ifdef ACL_WINDOWS
-	__zlib_dll = acl_dlopen("zlib.dll");
+		path = "zlib.dll";
 #else
-	__zlib_dll = acl_dlopen("libz.so");
+		path = "/usr/lib/libz.so";
 #endif
+
+	__zlib_dll = acl_dlopen(path);
+
 	if (__zlib_dll == NULL)
-		logger_fatal("load zlib.dll error: %s", acl_last_serror());
+		logger_fatal("load %s error: %s", path, acl_last_serror());
+
+	// 记录动态库路径，以便于在动态库卸载时输出库路径名
+	__zlib_path = path;
 
 	__deflateInit = (deflateInit_fn) acl_dlsym(__zlib_dll, "deflateInit_");
 	if (__deflateInit == NULL)
-		logger_fatal("load deflateInit from zlib.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load deflateInit from %s error: %s",
+			path, acl_last_serror());
 
 	__deflateInit2 = (deflateInit2_fn) acl_dlsym(__zlib_dll, "deflateInit2");
 	if (__deflateInit2 == NULL)
-		logger_fatal("load deflateInit from zlib.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load deflateInit from %s error: %s",
+			path, acl_last_serror());
 
 	__deflate = (deflate_fn) acl_dlsym(__zlib_dll, "deflate");
 	if (__deflate == NULL)
-		logger_fatal("load deflate from zlib.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load deflate from %s error: %s",
+			path, acl_last_serror());
 
 	__deflateReset = (deflateReset_fn) acl_dlsym(__zlib_dll, "deflateReset");
 	if (__deflateReset == NULL)
-		logger_fatal("load deflateReset from zlib.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load deflateReset from %s error: %s",
+			path, acl_last_serror());
 
 	__deflateEnd = (deflateEnd_fn) acl_dlsym(__zlib_dll, "deflateEnd");
 	if (__deflateEnd == NULL)
-		logger_fatal("load deflateEnd from zlib.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load deflateEnd from %s error: %s",
+			path, acl_last_serror());
 
 	__inflateInit = (inflateInit_fn) acl_dlsym(__zlib_dll, "inflateInit2_");
 	if (__inflateInit == NULL)
-		logger_fatal("load inflateInit from zlib.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load inflateInit from %s error: %s",
+			path, acl_last_serror());
 
 	__inflate = (inflate_fn) acl_dlsym(__zlib_dll, "inflate");
 	if (__inflate == NULL)
-		logger_fatal("load inflate from zlib.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load inflate from %s error: %s",
+			path, acl_last_serror());
 
 	__inflateReset = (inflateReset_fn) acl_dlsym(__zlib_dll, "inflateReset");
 	if (__inflateReset == NULL)
-		logger_fatal("load inflateReset from zlib.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load inflateReset from %s error: %s",
+			path, acl_last_serror());
 
 	__inflateEnd = (inflateEnd_fn) acl_dlsym(__zlib_dll, "inflateEnd");
 	if (__inflateEnd == NULL)
-		logger_fatal("load inflateEnd from zlib.dll error: %s",
-			acl_last_serror());
+		logger_fatal("load inflateEnd from %s error: %s",
+			path, acl_last_serror());
 
-	logger("zlib.dll loaded");
+	__crc32 = (crc32_fn) acl_dlsym(__zlib_dll, "__crc32");
+	if (__crc32 == NULL)
+		logger_fatal("load __crc32 from %s error: %s",
+			path, acl_last_serror());
+
+	logger("%s loaded", path);
 	atexit(__zlib_dll_unload);
 }
+
 # else
 #  define __deflateInit         deflateInit_
 #  define __deflateInit2        deflateInit2
@@ -117,8 +139,8 @@ static void __zlib_dll_load(void)
 #  define __inflate             inflate
 #  define __inflateReset	inflateReset
 #  define __inflateEnd          inflateEnd
+#  define __crc32               crc32
 # endif
-#endif
 
 namespace acl
 {
@@ -134,6 +156,19 @@ static void __zlib_free(void* ctx acl_unused, void* ptr)
 	acl_myfree(ptr);
 }
 
+static string __loadpath;
+
+void zlib_stream::set_loadpath(const char* path)
+{
+	if (path && *path)
+		__loadpath = path;
+}
+
+const char* zlib_stream::get_loadpath()
+{
+	return __loadpath.empty() ? NULL : __loadpath.c_str();
+}
+
 zlib_stream::zlib_stream()
 {
 	finished_ = false;
@@ -145,8 +180,8 @@ zlib_stream::zlib_stream()
 	is_compress_ = true;  // 默认为压缩状态
 	flush_ = zlib_flush_off;
 
-#ifdef  HAVE_H_ZLIB
-#if defined(ACL_WINDOWS) || defined(USE_DYNAMIC)
+#ifdef  HAS_ZLIB
+# if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
 	acl_pthread_once(&__zlib_once, __zlib_dll_load);
 # endif
 #endif
@@ -400,6 +435,11 @@ bool zlib_stream::zip_reset()
 	return (__deflateEnd(zstream_) == Z_OK ? true : false);
 }
 
+unsigned zlib_stream::crc32_update(unsigned n, const void* buf, size_t dlen)
+{
+	return __crc32(n, (const Bytef*) buf, (unsigned) dlen);
+}
+
 bool zlib_stream::unzip_begin(bool have_zlib_header /* = true */,
 	int wsize /* = 15 */)
 {
@@ -498,3 +538,7 @@ void zlib_stream::clear()
 }
 
 } // namespace acl
+
+#else  // !HAS_ZLIB && !HAS_ZLIB_DLL
+# error "You should define HAS_ZLIB or HAS_ZLIB_DLL first!"
+#endif

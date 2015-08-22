@@ -240,8 +240,8 @@ public:
 	 * @return {bool} 操作是否成功
 	 *  if the command was executed correctly
 	 */
-	bool setbit(const char* key, unsigned offset, bool bit);
-	bool setbit(const char* key, size_t len, unsigned offset, bool bit);
+	bool setbit_(const char* key, unsigned offset, bool bit);
+	bool setbit_(const char* key, size_t len, unsigned offset, bool bit);
 
 	/**
 	 * 对 key 所储存的字符串值，获取指定偏移量上的位(bit)，当 offset 比字符串值

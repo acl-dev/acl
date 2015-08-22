@@ -360,7 +360,7 @@ static bool test_setbit(acl::redis_string& redis, int n)
 		key.format("bit_%s_%d", __keypre.c_str(), i);
 
 		redis.clear();
-		if (redis.setbit(key.c_str(), off, 1) == false)
+		if (redis.setbit_(key.c_str(), off, 1) == false)
 		{
 			printf("setbit error: %s, key: %s, off: %u\r\n",
 				redis.result_error(), key.c_str(), off);

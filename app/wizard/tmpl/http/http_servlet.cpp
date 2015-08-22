@@ -51,6 +51,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 
 	res.setContentType("text/xml; charset=utf-8")	// 设置响应字符集
 		.setKeepAlive(req.isKeepAlive())	// 设置是否保持长连接
+		.setContentEncoding(true)		// 自动支持压缩传输
 		.setChunkedTransferEncoding(true);	// 采用 chunk 传输方式
 
 	const char* param1 = req.getParameter("name1");

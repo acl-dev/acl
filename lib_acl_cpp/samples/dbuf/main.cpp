@@ -7,13 +7,27 @@
 class test_buf
 {
 public:
-	test_buf()
+	test_buf(int i)
 	{
+		i_ = i;
 	}
 
 	~test_buf()
 	{
 	}
+
+	void set(int i)
+	{
+		i_ = i;
+	}
+
+	int get() const
+	{
+		return i_;
+	}
+
+private:
+	int  i_;
 };
 
 class test_buf2
@@ -45,10 +59,11 @@ private:
 class test_thread : public acl::thread
 {
 public:
-	test_thread(int max_loop, int max_count, bool use_pool)
+	test_thread(int max_loop, int max_count, bool use_pool, bool replace)
 	: max_loop_(max_loop)
 	, max_count_(max_count)
 	, use_pool_(use_pool)
+	, replace_(replace)
 	{
 	}
 
@@ -63,7 +78,12 @@ protected:
 		gettimeofday(&begin, NULL);
 
 		if (use_pool_)
-			test_pool();
+		{
+			if (replace_)
+				test_pool2();
+			else
+				test_pool();
+		}
 		else
 			test_malloc();
 
@@ -99,6 +119,28 @@ private:
 		pool->destroy();
 	}
 
+	void test_pool2()
+	{
+		acl::dbuf_pool* pool = new acl::dbuf_pool;
+		test_buf* buf;
+		char* ptr;
+
+		for (int i = 0; i < max_loop_; i++)
+		{
+			for (int j = 0; j < max_count_; j++)
+			{
+				ptr = (char*) pool->dbuf_alloc(sizeof(test_buf));
+				buf = new (ptr) test_buf(i);
+				// buf->set(i);
+				buf->~test_buf();
+			}
+
+			pool->dbuf_reset();
+		}
+
+		pool->destroy();
+	}
+
 	void test_malloc()
 	{
 		test_buf* buf;
@@ -107,7 +149,7 @@ private:
 		{
 			for (int j = 0; j < max_count_; j++)
 			{
-				buf = new test_buf;
+				buf = new test_buf(i);
 				delete buf;
 			}
 		}
@@ -117,6 +159,7 @@ private:
 	int max_loop_;
 	int max_count_;
 	bool use_pool_;
+	bool replace_;
 };
 
 static void usage(const char* procname)
@@ -125,15 +168,16 @@ static void usage(const char* procname)
 		"\t-n loop \r\n"
 		"\t-m count \r\n"
 		"\t-c max_threads \r\n"
-		"\t-p [use memory pool]\r\n", procname);
+		"\t-p [use memory pool]\r\n"
+		"\t-r [replace new when using pool]\r\n", procname);
 }
 
 int main(int argc, char* argv[])
 {
-	bool use_pool = false;
+	bool use_pool = false, replace = false;
 	int  ch, loop = 100, count = 10000, nthreads = 1;
 
-	while ((ch = getopt(argc, argv, "hpn:m:c:")) > 0)
+	while ((ch = getopt(argc, argv, "hpn:m:c:r")) > 0)
 	{
 		switch (ch)
 		{
@@ -142,6 +186,9 @@ int main(int argc, char* argv[])
 			return 0;
 		case 'p':
 			use_pool = true;
+			break;
+		case 'r':
+			replace = true;
 			break;
 		case 'n':
 			loop = atoi(optarg);
@@ -160,7 +207,8 @@ int main(int argc, char* argv[])
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < nthreads; i++)
 	{
-		test_thread* thread = new test_thread(loop, count, use_pool);
+		test_thread* thread = new
+			test_thread(loop, count, use_pool, replace);
 
 		thread->set_detachable(false);
 		thread->start();

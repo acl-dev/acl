@@ -33,9 +33,13 @@ static void handle_request(acl::socket_stream* conn)
 
 		acl::http_header& header = res.response_header();
 		header.set_status(200);
-		header.set_keep_alive(true);
-		header.set_transfer_gzip(true);
-		header.set_chunked(true);
+
+		acl::http_client* client = res.get_client();
+		header.set_keep_alive(client->keep_alive());
+		const char* ptr = client->header_value("Accept-Encoding");
+		if (ptr && strstr(ptr, "gzip") != NULL)
+			header.set_transfer_gzip(true);
+		header.set_chunked(client->keep_alive() ? true : false);
 		// header.set_content_length(buf.length());
 
 		acl::string hdr;
@@ -57,6 +61,9 @@ static void handle_request(acl::socket_stream* conn)
 		printf("===============================================\r\n");
 
 		n++;
+
+		if (!client->keep_alive())
+			break;
 	}
 
 	conn->close();

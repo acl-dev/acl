@@ -225,9 +225,9 @@ bool http_client::write_gzip(ostream& out, const void* data, size_t len)
 		gzip_total_in_ += len;
 
 		// 计算 crc32 数据校验和
-		gzip_crc32_ = crc32(gzip_crc32_, (const Bytef*) data,
-			(unsigned) len);
+		gzip_crc32_ = zstream_->crc32_update(gzip_crc32_, data, len);
 
+		// 对该段数据进行压缩处理
 		if (!zstream_->zip_update((const char*) data, len, buf_))
 		{
 			logger_error("zip_update error!");
@@ -356,7 +356,7 @@ bool http_client::write_head(const http_header& header)
 		}
 
 		// 初始化 crc32 校验和
-		gzip_crc32_ = crc32(0, Z_NULL, 0);
+		gzip_crc32_ = zstream_->crc32_update(0, Z_NULL, 0);
 		// 初始化非压缩数据总长度
 		gzip_total_in_ = 0;
 	}

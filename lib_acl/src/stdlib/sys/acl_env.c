@@ -43,12 +43,15 @@ void acl_clean_env(char **preserve_list)
 #define STRING_AND_LENGTH(x, y) (x), (ssize_t) (y)
 
 	save_list = acl_argv_alloc(10);
-	for (cpp = preserve_list; *cpp; cpp++)
+	for (cpp = preserve_list; *cpp; cpp++) {
 		if ((eq = strchr(*cpp, '=')) != 0)
-			acl_argv_addn(save_list, STRING_AND_LENGTH(*cpp, eq - *cpp),
-				STRING_AND_LENGTH(eq + 1, strlen(eq + 1)), (char *) 0);
+			acl_argv_addn(save_list,
+				STRING_AND_LENGTH(*cpp, eq - *cpp),
+				STRING_AND_LENGTH(eq + 1, strlen(eq + 1)),
+				(char *) 0);
 		else if ((value = acl_safe_getenv(*cpp)) != 0)
 			acl_argv_add(save_list, *cpp, value, (char *) 0);
+	}
 
 	/*
 	 * Truncate the process environment, if available. On some systems
@@ -66,7 +69,8 @@ void acl_clean_env(char **preserve_list)
 #elif defined(ACL_WINDOWS)
 		if (!SetEnvironmentVariable(cpp[0], cpp[1]))
 #endif
-			acl_msg_error("setenv(%s, %s): %s", cpp[0], cpp[1], acl_last_serror());
+			acl_msg_error("setenv(%s, %s): %s",
+				cpp[0], cpp[1], acl_last_serror());
 
 	/*
 	 * Cleanup.
@@ -143,7 +147,8 @@ int acl_putenv(char *str)
 	}
 	if (!SetEnvironmentVariable(argv->argv[0], argv->argv[1])) {
 		acl_msg_error("%s(%d): putenv(%s, %s) error(%s)",
-			myname, __LINE__, argv->argv[0], argv->argv[1], acl_last_serror());
+			myname, __LINE__, argv->argv[0],
+			argv->argv[1], acl_last_serror());
 		return (-1);
 	}
 	return (0);
@@ -192,7 +197,8 @@ const char *acl_getenv_list(void)
 	ACL_VSTRING_TERMINATE(buf);
 	return (acl_vstring_str(buf));
 #else
-	static acl_pthread_key_t buf_key = (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
+	static acl_pthread_key_t buf_key =
+		(acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
 	ACL_VSTRING *buf;
 	extern char **environ;
 	char **pptr = environ;
@@ -216,6 +222,7 @@ const char *acl_getenv_list(void)
 		acl_vstring_strcat(buf, *pptr);
 		pptr++;
 	}
+
 	return (acl_vstring_str(buf));
 #endif
 }

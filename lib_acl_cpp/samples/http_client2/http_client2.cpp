@@ -39,7 +39,7 @@ static void get_url(const char* url, const char* host,
 		return;
 	}
 
-	if (client.write_head(header) == -1)
+	if (client.write_head(header) == false)
 	{
 		printf("write request header error\r\n");
 		return;
