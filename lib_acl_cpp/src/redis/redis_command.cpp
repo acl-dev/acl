@@ -1122,7 +1122,7 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 	const redis_result** children = rr->get_children(&size);
 	if (children == NULL)
 	{
-		cursor = 0;
+		//cursor = 0;
 		size = 0;
 	}
 

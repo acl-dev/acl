@@ -54,8 +54,8 @@ void master_service::on_read(acl::socket_stream* stream)
 		logger_error("write to %s error %s",
 			stream->get_peer(true), acl::last_serror());
 	if (0)
-	logger(">>Peer: %s, Local: %s", stream->get_peer(true),
-		stream->get_local(true));
+		logger(">>Peer: %s, Local: %s", stream->get_peer(true),
+			stream->get_local(true));
 }
 
 void master_service::proc_on_init()

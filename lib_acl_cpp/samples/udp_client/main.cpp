@@ -24,7 +24,7 @@ static void run(void)
 	else
 		stream.set_peer(__server_addr);
 
-	stream.set_rw_timeout(0);
+	stream.set_rw_timeout(1);
 
 	// ·ÖÅäÄÚ´æ
 	buf = (char*) malloc(__dat_length + 1);
@@ -57,7 +57,7 @@ static void run(void)
 			break;
 		}
 
-		if (i == 0)
+		if (i % 1000 == 0)
 		{
 			res[ret] = 0;
 			printf("read >>> %s\r\n", res);

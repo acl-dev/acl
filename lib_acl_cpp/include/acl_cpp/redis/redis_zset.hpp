@@ -469,7 +469,7 @@ public:
 	 * @return {int} 下一个游标位置，含义如下：
 	 *   0：遍历结束
 	 *  -1: 出错
-	 *  >0: 游标的下一个位置
+	 *  >0: 游标的下一个位置，即使这样，具体有多少结果还需要检查 out，因为有可能为空
 	 */
 	int zscan(const char* key, int cursor,
 		std::vector<std::pair<string, double> >& out,

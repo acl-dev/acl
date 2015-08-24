@@ -346,7 +346,7 @@ public:
 	 *     scan finish
 	 *  -1: 出错
 	 *     some error happened
-	 *  >0: 游标的下一个位置
+	 *  >0: 游标的下一个位置，即使这样，具体有多少结果还需要检查 out，因为有可能为空
 	 *     the next cursor postion to scan
 	 */
 	int sscan(const char* key, int cursor, std::vector<string>& out,
