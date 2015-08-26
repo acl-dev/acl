@@ -43,8 +43,8 @@ endif
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-extended-offsetof
-	UNIXTYPE = MACOSX
 	SYSLIB +=  -rdynamic
+	UNIXTYPE = MACOSX
 endif
 
 #Path for Linux
@@ -56,7 +56,7 @@ ifeq ($(findstring Linux, $(OSNAME)), Linux)
 		RPATH = linux64
 	endif
 	CFLAGS += -DLINUX2
-	SYSLIB +=  -rdynamic
+	SYSLIB += -rdynamic
 endif
 
 # For MINGW

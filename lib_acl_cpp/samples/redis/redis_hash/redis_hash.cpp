@@ -367,6 +367,7 @@ static void usage(const char* procname)
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-S [if slice request, default: no]\r\n"
+		"-c [cluster mode]\r\n"
 		"-a cmd[hmset|hmget|hset|hsetnx|hget|hgetall|hincrby|hincrbyfloat|hkeys|hexists|hlen|hdel]\r\n",
 		procname);
 }
@@ -375,9 +376,9 @@ int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
 	acl::string addr("127.0.0.1:6379"), cmd;
-	bool slice_req = false;
+	bool slice_req = false, cluster_mode = false;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:a:S")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:I:a:Sc")) > 0)
 	{
 		switch (ch)
 		{
@@ -402,15 +403,27 @@ int main(int argc, char* argv[])
 		case 'S':
 			slice_req = true;
 			break;
+		case 'c':
+			cluster_mode = true;
+			break;
 		default:
 			break;
 		}
 	}
 
 	acl::acl_cpp_init();
+
+	acl::redis_client_cluster cluster(conn_timeout, rw_timeout);
+	cluster.set(addr.c_str(), 100);
+
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	client.set_slice_request(slice_req);
-	acl::redis_hash redis(&client);
+
+	acl::redis_hash redis;
+	if (cluster_mode)
+		redis.set_cluster(&cluster, 100);
+	else
+		redis.set_client(&client);
 
 	bool ret;
 

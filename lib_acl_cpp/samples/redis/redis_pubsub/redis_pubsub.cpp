@@ -119,6 +119,7 @@ static void usage(const char* procname)
 		"-n count\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 0]\r\n"
+		"-c [use cluster mode]\r\n"
 		"-a cmd[subscribe|publish]\r\n",
 		procname);
 }
@@ -127,8 +128,9 @@ int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 0;
 	acl::string addr("127.0.0.1:6379"), cmd;
+	bool cluster_mode = false;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:a:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:I:a:c")) > 0)
 	{
 		switch (ch)
 		{
@@ -150,6 +152,9 @@ int main(int argc, char* argv[])
 		case 'a':
 			cmd = optarg;
 			break;
+		case 'c':
+			cluster_mode = true;
+			break;
 		default:
 			break;
 		}
@@ -157,8 +162,18 @@ int main(int argc, char* argv[])
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
+
+	acl::redis_client_cluster cluster(conn_timeout, rw_timeout);
+	cluster.set(addr.c_str(), 100);
+
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
-	acl::redis_pubsub redis(&client);
+
+	acl::redis_pubsub redis;
+
+	if (cluster_mode)
+		redis.set_cluster(&cluster, 100);
+	else
+		redis.set_client(&client);
 
 	bool ret;
 

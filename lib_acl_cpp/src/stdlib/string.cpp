@@ -1351,16 +1351,16 @@ string& string::base64_decode(void)
 		RSET(s);
 	FREE(vbf_);
 	vbf_ = s;
+	TERM(vbf_);
 	return *this;
 }
 
 string& string::base64_decode(const char* s)
 {
-	if (acl_vstring_base64_decode(vbf_,
-		s, (int) strlen(s)) == NULL)
-	{
+	if (acl_vstring_base64_decode(vbf_, s, (int) strlen(s)) == NULL)
 		RSET(vbf_);
-	}
+
+	TERM(vbf_);
 	return *this;
 }
 
@@ -1371,6 +1371,7 @@ string& string::base64_decode(const void* ptr, size_t len)
 	{
 		RSET(vbf_);
 	}
+	TERM(vbf_);
 	return *this;
 }
 

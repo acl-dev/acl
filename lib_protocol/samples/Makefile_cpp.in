@@ -43,27 +43,28 @@ endif
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD -pedantic
-	SYSLIB += -lcrypt
+	SYSLIB += -lcrypt -rdynamic
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-extended-offsetof
+	SYSLIB += -rdynamic
 	UNIXTYPE = MACOSX
 endif
 
 #Path for Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -DLINUX2 -pedantic
-	SYSLIB += -lcrypt
+	SYSLIB += -lcrypt -rdynamic
 endif
 
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	SYSLIB = -lpthread-2
 	CFLAGS += -DLINUX2 -DMINGW
-	UNIXTYPE = LINUX
+	UNIXTYPE = LINUX -rdynamic
 endif
 
 #Path for SunOS
@@ -82,12 +83,7 @@ endif
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
 	CFLAGS += -DHP_UX -DHPUX11
 	PLAT_NAME=hp-ux
-	SYSLIB += -lcrypt
-endif
-
-# For Darwin
-ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
-	CFLAGS += -DMACOSX
+	SYSLIB += -lcrypt -rdynamic
 endif
 
 #Find system type.

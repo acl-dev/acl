@@ -605,6 +605,9 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			conn->get_pool()->put(conn, true);
 
 			logger_error("server error: %s", ptr);
+			if (!slice_req_)
+				logger_error("request: %s",
+					request_buf_->c_str());
 			return result_;
 		}
 	}

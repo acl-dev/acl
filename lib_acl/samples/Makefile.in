@@ -20,7 +20,7 @@ CFLAGS = -c -g -W -Wall -Wcast-qual \
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
-SYSLIB = -lpthread -rdynamic
+SYSLIB = -lpthread
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
 
@@ -52,32 +52,28 @@ endif
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD
-	SYSLIB += -lcrypt
+	SYSLIB += -lcrypt -rdynamic
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-extended-offsetof
+	SYSLIB += -rdynamic
 	UNIXTYPE = MACOSX
 endif
 
 #Path for Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -DLINUX2
-	SYSLIB += -lcrypt
+	SYSLIB += -lcrypt -rdynamic
 endif
 
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
-	SYSLIB = -lpthread-2
 	CFLAGS += -DLINUX2 -DMINGW
+	SYSLIB  = -lpthread-2 -rdynamic
 	UNIXTYPE = LINUX
-endif
-
-# For Darwin
-ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
-	CFLAGS += -DMACOSX
 endif
 
 #Path for SunOS
@@ -89,14 +85,14 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 		SYSLIB += -lsocket -lnsl -lrt
 	endif
 	CFLAGS += -DSUNOS5
-	SYSLIB += -lcrypt
+	SYSLIB += -lcrypt -rdynamic
 endif
 
 #Path for HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
 	CFLAGS += -DHP_UX -DHPUX11
 	PLAT_NAME=hp-ux
-	SYSLIB += -lcrypt
+	SYSLIB += -lcrypt -rdynamic
 endif
 
 #Find system type.

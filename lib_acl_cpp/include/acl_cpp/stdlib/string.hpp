@@ -1052,14 +1052,16 @@ public:
 	/**
 	 * 如果当前对象的缓冲区中的数据是经 base64 编码的，则此函数将这些
 	 * 数据进行解码
-	 * @return {string&} 当前对象的引用
+	 * @return {string&} 当前对象的引用，如果解码出错，则内部缓冲区会被自动清空，
+	 *  调用 string::empty() 返回 true
 	 */
 	string& base64_decode(void);
 
 	/**
 	 * 将输入的 base64 编码的数据进行解码并存入当前对象的缓冲区中
 	 * @param s {const char*} 经 base64 编码的源数据
-	 * @return {string&} 当前对象的引用
+	 * @return {string&} 当前对象的引用，如果解码出错，则内部缓冲区会被自动清空，
+	 *  调用 string::empty() 返回 true
 	 */
 	string& base64_decode(const char* s);
 
@@ -1067,7 +1069,8 @@ public:
 	 * 将输入的 base64 编码的数据进行解码并存入当前对象的缓冲区中
 	 * @param ptr {const void*} 经 base64 编码的源数据
 	 * @param len {size_t} ptr 数据长度
-	 * @return {string&} 当前对象的引用
+	 * @return {string&} 当前对象的引用，如果解码出错，则内部缓冲区会被自动清空，
+	 *  调用 string::empty() 返回 true
 	 */
 	string& base64_decode(const void* ptr, size_t len);
 
