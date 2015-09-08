@@ -4,6 +4,9 @@
 namespace acl
 {
 
+/**
+ * 在添加任务时，此类指定的任务的添加条件限定
+ */
 class ACL_CPP_API disque_cond
 {
 public:

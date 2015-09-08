@@ -8,22 +8,40 @@ namespace acl
 
 class redis_result;
 
+/**
+ * 在从 disque 队列中获得的任务信息的类
+ */
 class ACL_CPP_API disque_job
 {
 public:
 	disque_job();
 	~disque_job();
 
+	/**
+	 * get the ID of the job
+	 * 获得当前任务的 ID 号
+	 * @return {const char*}
+	 */
 	const char* get_id() const
 	{
 		return id_.c_str();
 	}
 
+	/**
+	 * get the queue name holding the job
+	 * 获得当前任务所在的队列
+	 * @return {const char*}
+	 */
 	const char* get_queue() const
 	{
 		return queue_.c_str();
 	}
 
+	/**
+	 * get the job's data
+	 * 获得当前任务的消息内容
+	 * @return {const string&}
+	 */
 	const string& get_body() const
 	{
 		return body_;

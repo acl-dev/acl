@@ -169,6 +169,14 @@ void disque::free_jobs()
 	jobs_.clear();
 }
 
+const std::vector<disque_job*>* disque::getjob(const char* name,
+	size_t timeout, size_t count)
+{
+	std::vector<string> names;
+	names.push_back(name);
+	return getjob(names, timeout, count);
+}
+
 const std::vector<disque_job*>* disque::getjob(const std::vector<string>& names,
 	size_t timeout, size_t count)
 {

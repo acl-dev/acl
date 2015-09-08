@@ -403,18 +403,13 @@ const char *acl_i64toa(acl_int64 value, char *buf, size_t size)
 
 acl_uint64 acl_atoui64(const char *str)
 {
-#ifdef MINGW
-	return (acl_uint64) atol(str);
-#else
-	return (acl_uint64) strtoull(str, NULL, 10);
-#endif
+	return (acl_uint64) atoll(str);
 }
 
 acl_int64 acl_atoi64(const char *str)
 {
-#ifdef MINGW
-	return (acl_int64) atol(str);
-#else
+	return (acl_int64) atoll(str);
+#if 0
 	return (acl_int64) strtoull(str, NULL, 10);
 #endif
 }

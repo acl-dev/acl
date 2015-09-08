@@ -68,18 +68,22 @@ public:
 	 *  "\t\"=?GB2312?B?t+vBosn6?=\" <fenglisheng@51iker.com>;\r\n"
 	 *  "\t\"zhengshuxin3\";\"zhengshuxin4\" <zhengshuxin2@51iker.com>;"
 	 *  "<xuganghui@51iker.com>;<wangwenquan@51iker.com>;"
+	 * @param to_charset {const char*} 目标字符集，例如：gbk, gb18030, utf-8
 	 * @return {const std::list<rfc822_addr*>&} 解析结果
 	 */
-	const std::list<rfc822_addr*>& parse_addrs(const char* in);
+	const std::list<rfc822_addr*>& parse_addrs(const char* in,
+		const char* to_charset = "utf-8");
 
 	/**
 	 * 解析一个符合 RFC822 标准的邮件地址，同时将用户名注释部分按
 	 * RFC2047 标准进行解码
 	 * @param in {const char*} RFC822 格式的邮件地址
+	 * @param to_charset {const char*} 目标字符集，例如：gbk, gb18030, utf-8
 	 * @return {const rfc822_addr*} 返回 NULL 表明输入的邮件地址不符合
 	 *  RFC822 规范
 	 */
-	const rfc822_addr* parse_addr(const char* in);
+	const rfc822_addr* parse_addr(const char* in,
+		const char* to_charset = "utf-8");
 
 	/**
 	 * 检查邮件地址是否合法

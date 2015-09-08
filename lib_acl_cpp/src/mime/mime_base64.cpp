@@ -25,20 +25,14 @@ static const unsigned char un_b64_tab[] = {
 	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
 };
 
-mime_base64::mime_base64()
-{
-	init(to_b64_tab, un_b64_tab, '=');
-}
-
-mime_base64::mime_base64(bool addCrlf, bool addInvalid)
-	: mime_code(addCrlf, addInvalid)
+mime_base64::mime_base64(bool addCrlf /* = false */, bool addInvalid /* = false */)
+	: mime_code(addCrlf, addInvalid, "base64")
 {
 	init(to_b64_tab, un_b64_tab, '=');
 }
 
 mime_base64::~mime_base64()
 {
-
 }
 
 void mime_base64::encode(const char* in, int n, acl::string* out)

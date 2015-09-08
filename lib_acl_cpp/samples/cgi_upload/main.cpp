@@ -312,7 +312,7 @@ static void do_alone(void)
 	acl::log::stdout_open(true);
 	const char* addr = "0.0.0.0:8081";
 	printf("listen: %s ...\r\n", addr);
-	service.run_alone(addr, NULL, 1);  // 单独运行方式
+	service.run_alone(addr, NULL, 0);  // 单独运行方式
 }
 
 // WEB CGI 模式

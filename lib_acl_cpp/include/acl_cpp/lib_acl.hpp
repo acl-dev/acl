@@ -120,6 +120,11 @@
 #include "acl_cpp/mime/rfc2047.hpp"
 #include "acl_cpp/mime/rfc822.hpp"
 
+#include "acl_cpp/smtp/mail_attach.hpp"
+#include "acl_cpp/smtp/mail_body.hpp"
+#include "acl_cpp/smtp/mail_message.hpp"
+#include "acl_cpp/smtp/smtp_client.hpp"
+
 #include "acl_cpp/event/event_timer.hpp"
 
 #include "acl_cpp/master/master_base.hpp"

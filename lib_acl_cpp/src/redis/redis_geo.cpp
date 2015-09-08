@@ -51,7 +51,7 @@ void geo_member::set_coordinate(double longitude, double latitude)
 		&& latitude <= GEO_LATITUDE_MAX)
 	{
 		longitude_ = longitude;
-		latitude_ = longitude;
+		latitude_ = latitude;
 	}
 }
 

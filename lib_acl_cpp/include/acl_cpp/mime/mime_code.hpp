@@ -8,15 +8,23 @@ namespace acl {
 class ACL_CPP_API mime_code : public pipe_stream
 {
 public:
-	mime_code();
-
 	/**
 	 * 构造函数
 	 * @param addCrlf {bool} 非流式编码时是否在末尾添加 "\r\n"
 	 * @param addInvalid {bool} 流式解码时是否遇到非法字符是否原样拷贝
+	 * @param encoding {const char*} 编码类型标识符
 	 */
-	mime_code(bool addCrlf, bool addInvalid);
+	mime_code(bool addCrlf, bool addInvalid, const char* encoding_type);
 	virtual ~mime_code() = 0;
+
+	/**
+	 * 获得编码类型标识符
+	 * @return {const char*}
+	 */
+	const char* get_encoding_type() const
+	{
+		return encoding_type_;
+	}
 
 	/* 流式编码函数，使用方法： encode_update->encode_update->...->encode_finish */
 
@@ -144,6 +152,7 @@ private:
 	const unsigned char *m_unTab;
 	unsigned char m_fillChar;
 	string* m_pBuf;
+	char* encoding_type_;
 };
 
 } // namespace acl

@@ -439,9 +439,13 @@ void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 #endif
 }
 
-const std::list<rfc822_addr*>& rfc822::parse_addrs(const char* in)
+const std::list<rfc822_addr*>& rfc822::parse_addrs(const char* in,
+	const char* to_charset /* = "utf-8" */)
 {
 	reset();
+
+	if (to_charset == NULL)
+		to_charset = "gb18030";
 
 	if (in == NULL || *in == 0)
 	{
@@ -480,7 +484,7 @@ const std::list<rfc822_addr*>& rfc822::parse_addrs(const char* in)
 		{
 			buf.clear();
 			rfc2047::decode(STR(comment_prev),
-				(int) LEN(comment_prev), &buf, "gb18030");
+				(int) LEN(comment_prev), &buf, to_charset);
 			addr->comment = acl_mystrdup(buf.c_str());
 			comment_prev = NULL;
 		}
@@ -493,9 +497,10 @@ const std::list<rfc822_addr*>& rfc822::parse_addrs(const char* in)
 	return (addrs_);
 }
 
-const rfc822_addr* rfc822::parse_addr(const char* in)
+const rfc822_addr* rfc822::parse_addr(const char* in,
+	const char* to_charset /* = "utf-8" */)
 {
-	const std::list<rfc822_addr*> addr_list = parse_addrs(in);
+	const std::list<rfc822_addr*> addr_list = parse_addrs(in, to_charset);
 	if (addr_list.empty())
 		return (NULL);
 	std::list<rfc822_addr*>::const_iterator cit = addr_list.begin();

@@ -15,19 +15,7 @@ namespace acl {
 #define UCHAR_MAX 0xff
 #endif
 
-mime_code::mime_code()
-: m_addCrLf(true)
-, m_addInvalid(false)
-, m_encoding(false)
-, m_toTab(NULL)
-, m_unTab(NULL)
-, m_fillChar('=')
-, m_pBuf(NULL)
-{
-	reset();
-}
-
-mime_code::mime_code(bool addCrlf, bool addInvalid)
+mime_code::mime_code(bool addCrlf, bool addInvalid, const char* encoding_type)
 : m_addCrLf(addCrlf)
 , m_addInvalid(addInvalid)
 , m_encoding(false)
@@ -36,11 +24,16 @@ mime_code::mime_code(bool addCrlf, bool addInvalid)
 , m_fillChar('=')
 , m_pBuf(NULL)
 {
+	if (encoding_type)
+		encoding_type_ = acl_mystrdup(encoding_type);
+	else
+		encoding_type_ = acl_mystrdup("unknown");
 	reset();
 }
 
 mime_code::~mime_code()
 {
+	acl_myfree(encoding_type_);
 	delete m_pBuf;
 }
 

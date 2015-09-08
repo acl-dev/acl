@@ -505,7 +505,7 @@ int redis_zset::zrangebyscore_get(const char* cmd, const char* key,
 		argv[6] = count_s;
 		lens[6] = strlen(count_s);
 
-		argc += 2;
+		argc += 3;
 	}
 
 	hash_slot(key);
@@ -571,7 +571,7 @@ int redis_zset::zrangebyscore_get_with_scores(const char* cmd,
 		argv[7] = count_s;
 		lens[7] = strlen(count_s);
 
-		argc += 2;
+		argc += 3;
 	}
 
 	hash_slot(key);

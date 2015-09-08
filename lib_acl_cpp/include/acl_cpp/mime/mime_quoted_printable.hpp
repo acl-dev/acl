@@ -9,14 +9,12 @@ class string;
 class ACL_CPP_API mime_quoted_printable : public mime_code
 {
 public:
-	mime_quoted_printable();
-
 	/**
 	 * 构造函数
 	 * @param addCrlf {bool} 非流式编码时是否在末尾添加 "\r\n"
 	 * @param addInvalid {bool} 流式解码时是否遇到非法字符是否原样拷贝
 	 */
-	mime_quoted_printable(bool addCrlf, bool addInvalid);
+	mime_quoted_printable(bool addCrlf = false, bool addInvalid = false);
 	~mime_quoted_printable();
 
 	// 基类的虚函数重载

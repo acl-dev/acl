@@ -489,7 +489,7 @@ const char *mime_ctype_name(size_t ctype)
 
 const char *mime_stype_name(size_t stype)
 {
-	if (stype > MIME_STYPE_MAX)
+	if (stype > MIME_STYPE_MAX || stype < MIME_STYPE_MIN)
 		return (OTHER_NAME);
-	return (mime_stype_map[stype].name);
+	return (mime_stype_map[stype - MIME_STYPE_MIN].name);
 }

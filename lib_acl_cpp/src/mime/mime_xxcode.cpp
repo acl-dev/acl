@@ -25,20 +25,14 @@ static const unsigned char un_xx_tab[] = {
 	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
 };
 
-mime_xxcode::mime_xxcode()
-{
-	init(to_xx_tab, un_xx_tab, '~');
-}
-
-mime_xxcode::mime_xxcode(bool addCrlf, bool addInvalid)
-	: mime_code(addCrlf, addInvalid)
+mime_xxcode::mime_xxcode(bool addCrlf /* = false */, bool addInvalid /* = false */)
+	: mime_code(addCrlf, addInvalid, "xxcode")
 {
 	init(to_xx_tab, un_xx_tab, '~');
 }
 
 mime_xxcode::~mime_xxcode()
 {
-
 }
 
 void mime_xxcode::encode(const char* in, int n, acl::string* out)

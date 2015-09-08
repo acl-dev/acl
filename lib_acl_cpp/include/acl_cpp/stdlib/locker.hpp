@@ -83,4 +83,14 @@ private:
 	void init_mutex(bool use_spinlock);
 };
 
+class ACL_CPP_API lock_guard
+{
+public:
+	lock_guard(locker& lk);
+	~lock_guard();
+
+private:
+	locker& lk_;
+};
+
 }  // namespace acl

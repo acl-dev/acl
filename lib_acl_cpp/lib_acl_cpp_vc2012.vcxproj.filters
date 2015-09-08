@@ -490,6 +490,18 @@
     <ClCompile Include="src\db\mysql_conf.cpp">
       <Filter>Source Files\db</Filter>
     </ClCompile>
+    <ClCompile Include="src\smtp\smtp_client.cpp">
+      <Filter>Source Files\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\smtp\mail_message.cpp">
+      <Filter>Source Files\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\smtp\mail_attach.cpp">
+      <Filter>Source Files\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\smtp\mail_body.cpp">
+      <Filter>Source Files\smtp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -1011,6 +1023,18 @@
     <ClInclude Include="include\acl_cpp\db\mysql_conf.hpp">
       <Filter>Header Files\db</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\smtp\smtp_client.hpp">
+      <Filter>Header Files\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\smtp\mail_message.hpp">
+      <Filter>Header Files\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\smtp\mail_attach.hpp">
+      <Filter>Header Files\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\smtp\mail_body.hpp">
+      <Filter>Header Files\smtp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -1129,6 +1153,12 @@
     </Filter>
     <Filter Include="Source Files\disque">
       <UniqueIdentifier>{a6fc0af4-630b-4f95-9d1a-eb8fcaf1c78f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\smtp">
+      <UniqueIdentifier>{bdeed402-2f54-4ea3-8f25-f3e8663fbe8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\smtp">
+      <UniqueIdentifier>{d34f52dc-798d-4c26-b23f-25210566d571}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

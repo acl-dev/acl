@@ -25,20 +25,14 @@ static const unsigned char un_uucode_tab[] = {
 	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
 };
 
-mime_uucode::mime_uucode()
-{
-	init(to_uucode_tab, un_uucode_tab, '~');
-}
-
-mime_uucode::mime_uucode(bool addCrlf, bool addInvalid)
-	: mime_code(addCrlf, addInvalid)
+mime_uucode::mime_uucode(bool addCrlf /* = false */, bool addInvalid /* = false */)
+	: mime_code(addCrlf, addInvalid, "uucode")
 {
 	init(to_uucode_tab, un_uucode_tab, '~');
 }
 
 mime_uucode::~mime_uucode()
 {
-
 }
 
 void mime_uucode::encode(const char* in, int n, acl::string* out)

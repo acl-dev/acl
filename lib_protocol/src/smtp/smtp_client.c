@@ -33,7 +33,9 @@ SMTP_CLIENT *smtp_open(const char *addr, int conn_timeout,
 
 void smtp_close(SMTP_CLIENT *client)
 {
-	acl_vstream_close(client->conn);
+	/* 此变量有可能被外部释放置空 */
+	if (client->conn)
+		acl_vstream_close(client->conn);
 	acl_myfree(client->buf);
 	acl_myfree(client);
 }

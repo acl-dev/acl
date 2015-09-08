@@ -180,4 +180,17 @@ bool locker::unlock()
 	return ret;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+
+lock_guard::lock_guard(locker& lk)
+: lk_(lk)
+{
+	acl_assert(lk_.lock());
+}
+
+lock_guard::~lock_guard()
+{
+	acl_assert(lk_.unlock());
+}
+
 } // namespace acl

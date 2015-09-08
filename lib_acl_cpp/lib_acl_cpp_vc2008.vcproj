@@ -986,6 +986,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stdlib\thread_queue.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stdlib\url_coder.cpp"
 					>
 				</File>
@@ -1123,6 +1127,26 @@
 				</File>
 				<File
 					RelativePath=".\src\disque\disque_job.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="smtp"
+				>
+				<File
+					RelativePath=".\src\smtp\mail_attach.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\smtp\mail_body.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\smtp\mail_message.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\smtp\smtp_client.cpp"
 					>
 				</File>
 			</Filter>
@@ -1676,6 +1700,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\stdlib\thread_queue.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\stdlib\url_coder.hpp"
 					>
 				</File>
@@ -1805,6 +1833,26 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\disque\disque_node.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="smtp"
+				>
+				<File
+					RelativePath=".\include\acl_cpp\smtp\mail_attach.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\smtp\mail_body.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\smtp\mail_message.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\smtp\smtp_client.hpp"
 					>
 				</File>
 			</Filter>

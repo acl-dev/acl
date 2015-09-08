@@ -817,12 +817,14 @@ void mime::mime_debug(const char* save_path, bool decode /* = true */)
 	acl_foreach(iter, &state_dummy)
 	{
 		MIME_NODE *node = (MIME_NODE*) iter.data;
-		printf("ctype: %s, stype: %s\r\n",
-			mime_ctype_name(node->ctype),
-			mime_stype_name(node->stype));
+		const char* ctype = mime_ctype_name(node->ctype);
+		const char* stype = mime_stype_name(node->stype);
+		printf("ctype: %s, stype: %s\r\n", ctype, stype);
+
 		if (node->boundary)
 			printf(">>boundary: %s\r\n",
 				acl_vstring_str(node->boundary));
+
 		if (node->header_filename)
 		{
 			header_filename.clear();

@@ -52,7 +52,8 @@ static const unsigned char un_b64[] = {
 
 /* vstring_base64_encode - raw data to encoded */
 
-ACL_VSTRING *acl_vstring_base64_encode(ACL_VSTRING *result, const char *in, int len)
+ACL_VSTRING *acl_vstring_base64_encode(ACL_VSTRING *result,
+	const char *in, int len)
 {
 	const unsigned char *cp;
 	int     count;
@@ -89,7 +90,8 @@ ACL_VSTRING *acl_vstring_base64_encode(ACL_VSTRING *result, const char *in, int 
 
 /* acl_vstring_base64_decode - encoded data to raw */
 
-ACL_VSTRING *acl_vstring_base64_decode(ACL_VSTRING *result, const char *in, int len)
+ACL_VSTRING *acl_vstring_base64_decode(ACL_VSTRING *result,
+	const char *in, int len)
 {
 	const unsigned char *cp;
 	int     count;

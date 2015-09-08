@@ -15,7 +15,8 @@ extern "C" {
  * @param len {int} in 源数据的长度
  * @return {ACL_VSTRING*} 与 vp 相同
  */
-ACL_API ACL_VSTRING *acl_vstring_base64_encode(ACL_VSTRING *vp, const char *in, int len);
+ACL_API ACL_VSTRING *acl_vstring_base64_encode(ACL_VSTRING *vp,
+	const char *in, int len);
 
 /**
  * BASE64 解码函数
@@ -24,7 +25,8 @@ ACL_API ACL_VSTRING *acl_vstring_base64_encode(ACL_VSTRING *vp, const char *in, 
  * @param len {int} in 数据长度
  * @return {ACL_VSTRING*} NULL: 解码失败; !=NULL: 解码成功且与 vp 相同地址
  */
-ACL_API ACL_VSTRING *acl_vstring_base64_decode(ACL_VSTRING *vp, const char *in, int len);
+ACL_API ACL_VSTRING *acl_vstring_base64_decode(ACL_VSTRING *vp,
+	const char *in, int len);
 
 #ifdef  __cplusplus
 }

@@ -13,7 +13,7 @@ int main(void)
 	dp->set_idle(1);
 	for (int i = 0; i < 10; i++)
 	{
-		db_handle* dh = dp->peek();
+		db_handle* dh = (db_handle*) dp->peek();
 		dbs.push_back(dh);
 	}
 

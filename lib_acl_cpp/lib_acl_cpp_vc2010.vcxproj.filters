@@ -487,6 +487,21 @@
     <ClCompile Include="src\db\mysql_conf.cpp">
       <Filter>src\db</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\thread_queue.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\smtp\smtp_client.cpp">
+      <Filter>src\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\smtp\mail_attach.cpp">
+      <Filter>src\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\smtp\mail_body.cpp">
+      <Filter>src\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\smtp\mail_message.cpp">
+      <Filter>src\smtp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -1005,6 +1020,21 @@
     <ClInclude Include="include\acl_cpp\db\mysql_conf.hpp">
       <Filter>include\db</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread_queue.hpp">
+      <Filter>include\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\smtp\smtp_client.hpp">
+      <Filter>include\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\smtp\mail_attach.hpp">
+      <Filter>include\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\smtp\mail_body.hpp">
+      <Filter>include\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\smtp\mail_message.hpp">
+      <Filter>include\smtp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl_cpp_vc2010.rc" />
@@ -1121,6 +1151,12 @@
     </Filter>
     <Filter Include="src\disque">
       <UniqueIdentifier>{8cd1597f-0491-4bb1-81d1-4a8e9f30edf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\smtp">
+      <UniqueIdentifier>{1a00c331-81cd-42b7-bf85-1715c2801ed1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\smtp">
+      <UniqueIdentifier>{49f8268a-7d4d-4e7e-930c-13e26dc8cd2c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

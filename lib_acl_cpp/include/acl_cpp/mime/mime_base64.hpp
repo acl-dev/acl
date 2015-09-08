@@ -7,14 +7,12 @@ namespace acl {
 class ACL_CPP_API mime_base64 : public mime_code
 {
 public:
-	mime_base64();
-
 	/**
 	 * 构造函数
 	 * @param addCrlf {bool} 非流式编码时是否在末尾添加 "\r\n"
 	 * @param addInvalid {bool} 流式解码时是否遇到非法字符是否原样拷贝
 	 */
-	mime_base64(bool addCrlf, bool addInvalid);
+	mime_base64(bool addCrlf = false, bool addInvalid = false);
 	~mime_base64();
 
 	/**
@@ -33,9 +31,6 @@ public:
 	 * @param out {string*} 存储解析结果
 	 */
 	static void decode(const char* in, int n, string* out);
-
-protected:
-private:
 };
 
 } // namespace acl

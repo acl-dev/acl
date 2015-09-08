@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "util.h"
 
 static acl::string __queue("greeting");
 static acl::string __jobpre("test_job");
@@ -35,7 +36,7 @@ static bool test_ackjob(acl::disque& cmd,
 	int ret = cmd.ackjob(job_ids);
 	if (ret < 0)
 		printf("ackjob error: %s\r\n", cmd.result_error());
-	else if (i >= 10)
+	else if (i >= 20)
 		return true;
 
 	printf("%s -> addr: %s, tid: %lu\r\n", __FUNCTION__,
@@ -43,10 +44,13 @@ static bool test_ackjob(acl::disque& cmd,
 	return true;
 }
 
-static bool test_getjob(acl::disque& cmd, int i)
+static bool test_getjob(acl::disque& cmd, int max, int& i, int count)
 {
+	if (i >= max)
+		return true;
+
 	std::vector<acl::string> queues;
-	size_t timeout = 10, count = 10;
+	size_t timeout = 10;
 
 	queues.push_back(__queue);
 
@@ -72,11 +76,14 @@ static bool test_getjob(acl::disque& cmd, int i)
 	if (!job_ids.empty() && !test_ackjob(cmd, job_ids, i))
 		return false;
 
-	if (i >= 10)
+	i += jobs->size();
+
+	if (i >= 2 * (int) count)
 		return true;
 
-	printf("%s -> addr: %s, tid: %lu\r\n", __FUNCTION__,
-		cmd.get_client_addr(), acl::thread::thread_self());
+	printf("%s -> addr: %s, tid: %lu, count: %d, %d\r\n", __FUNCTION__,
+		cmd.get_client_addr(), acl::thread::thread_self(),
+		(int) count, (int) jobs->size());
 
 	std::vector<acl::disque_job*>::const_iterator cit2;
 	for (cit2 = jobs->begin(); cit2 != jobs->end(); ++cit2)
@@ -137,8 +144,8 @@ class test_thread : public acl::thread
 {
 public:
 	test_thread(acl::disque_client_cluster& cluster,
-		acl::disque_cond& cond, const char* cmd, int n)
-		: cluster_(cluster), cond_(cond), cmd_(cmd), n_(n) {}
+		acl::disque_cond& cond, const char* cmd, int n, int count)
+		: cluster_(cluster), cond_(cond), cmd_(cmd), n_(n), m_(count) {}
 
 	~test_thread() {}
 
@@ -147,15 +154,18 @@ protected:
 	{
 		bool ret;
 		acl::disque cmd;
-		int max_conns = 1000;
+		int max_conns = 1000, i;
 		cmd.set_cluster(&cluster_, max_conns);
 
-		for (int i = 0; i < n_; i++)
+		struct timeval begin;
+		gettimeofday(&begin, NULL);
+
+		for (i = 0; i < n_;)
 		{
 			if (cmd_ == "addjob")
 				ret = test_addjob(cmd, cond_, i);
 			else if (cmd_ == "getjob")
-				ret = test_getjob(cmd, i);
+				ret = test_getjob(cmd, n_, i, m_);
 			else if (cmd_ == "qlen")
 				ret = test_qlen(cmd, i);
 			else if (cmd_ == "qpeek")
@@ -166,9 +176,23 @@ protected:
 				break;
 			}
 
-			if (ret == false)
+			if (ret == false || i >= n_)
 				break;
+			i++;
+			if (i % 1000 == 0)
+			{
+				char tmp[128];
+				acl::safe_snprintf(tmp, sizeof(tmp), "%d", i);
+				acl::meter_time(__FILE__, __LINE__, tmp);
+			}
 		}
+
+		struct timeval end;
+		gettimeofday(&end, NULL);
+		double spent = util::stamp_sub(&end, &begin);
+
+		printf(">>>total: %d, curr: %d, spent: %.2f, speed: %.2f\r\n",
+			i, i, spent, i * 1000 / (spent > 0 ? spent : 1));
 
 		return NULL;
 	}
@@ -178,6 +202,7 @@ private:
 	acl::disque_cond& cond_;
 	acl::string cmd_;
 	int n_;
+	int m_;
 };
 
 static void usage(const char* procname)
@@ -194,6 +219,7 @@ static void usage(const char* procname)
 		"-T ttl\r\n"
 		"-M maxlen\r\n"
 		"-A [async]\r\n"
+		"-w result_max_for_every_getjob[default: 10]\r\n"
 		"-a cmd[addjob|getjob|qlen|qpeek]\r\n",
 		procname);
 
@@ -207,12 +233,12 @@ static void usage(const char* procname)
 
 int main(int argc, char* argv[])
 {
-	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
+	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10, get_count = 10;
 	int  max_threads = 10;
 	acl::disque_cond cond;
 	acl::string addrs("127.0.0.1:7711,127.0.0.1:7712,127.0.0.1:7713"), cmd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:D:R:r:T:M:A")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:D:R:r:T:M:Aw:")) > 0)
 	{
 		switch (ch)
 		{
@@ -255,6 +281,9 @@ int main(int argc, char* argv[])
 		case 'A':
 			cond.set_async(true);
 			break;
+		case 'w':
+			get_count = atoi(optarg);
+			break;
 		default:
 			break;
 		}
@@ -275,7 +304,7 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < max_threads; i++)
 	{
 		test_thread* thread = new test_thread(cluster, cond,
-			cmd.c_str(), n);
+			cmd.c_str(), n, get_count);
 		threads.push_back(thread);
 		thread->set_detachable(false);
 		thread->start();
