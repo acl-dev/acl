@@ -887,6 +887,15 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Name="smtp"
 				Filter="">
 				<File
+					RelativePath=".\src\smtp\mail_attach.cpp">
+				</File>
+				<File
+					RelativePath=".\src\smtp\mail_body.cpp">
+				</File>
+				<File
+					RelativePath=".\src\smtp\mail_message.cpp">
+				</File>
+				<File
 					RelativePath=".\src\smtp\smtp_client.cpp">
 				</File>
 			</Filter>
@@ -1424,6 +1433,15 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 			<Filter
 				Name="smtp"
 				Filter="">
+				<File
+					RelativePath=".\include\acl_cpp\smtp\mail_attach.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\smtp\mail_body.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\smtp\mail_message.hpp">
+				</File>
 				<File
 					RelativePath=".\include\acl_cpp\smtp\smtp_client.hpp">
 				</File>

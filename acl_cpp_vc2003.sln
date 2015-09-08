@@ -543,14 +543,19 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_geo", "lib_acl_cpp\sa
 		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mail_build", "lib_acl_cpp\samples\mime\mail_build\mail_build.vcproj", "{5DC79C83-9DE8-46B3-A172-8A4E3371878B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
 		DebugDll = DebugDll
 		Release = Release
 		Releasedll = Releasedll
-	EndGlobalSection
-	GlobalSection(ProjectDependencies) = postSolution
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{41FA5224-3315-4CDA-9C44-19085049F179}.Debug.ActiveCfg = Debug|Win32
@@ -1241,6 +1246,14 @@ Global
 		{2DABFAD1-114B-4F96-9185-DC0C56A3662D}.Release.Build.0 = Release|Win32
 		{2DABFAD1-114B-4F96-9185-DC0C56A3662D}.Releasedll.ActiveCfg = Releasedll|Win32
 		{2DABFAD1-114B-4F96-9185-DC0C56A3662D}.Releasedll.Build.0 = Releasedll|Win32
+		{5DC79C83-9DE8-46B3-A172-8A4E3371878B}.Debug.ActiveCfg = Debug|Win32
+		{5DC79C83-9DE8-46B3-A172-8A4E3371878B}.Debug.Build.0 = Debug|Win32
+		{5DC79C83-9DE8-46B3-A172-8A4E3371878B}.DebugDll.ActiveCfg = DebugDll|Win32
+		{5DC79C83-9DE8-46B3-A172-8A4E3371878B}.DebugDll.Build.0 = DebugDll|Win32
+		{5DC79C83-9DE8-46B3-A172-8A4E3371878B}.Release.ActiveCfg = Release|Win32
+		{5DC79C83-9DE8-46B3-A172-8A4E3371878B}.Release.Build.0 = Release|Win32
+		{5DC79C83-9DE8-46B3-A172-8A4E3371878B}.Releasedll.ActiveCfg = Releasedll|Win32
+		{5DC79C83-9DE8-46B3-A172-8A4E3371878B}.Releasedll.Build.0 = Releasedll|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
