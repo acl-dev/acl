@@ -2,7 +2,7 @@
 #include "http_servlet.h"
 #include "master_service.h"
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 // ≈‰÷√ƒ⁄»›œÓ
 
 char *var_cfg_str;
@@ -33,7 +33,7 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 	{ 0, 0 , 0 , 0, 0 }
 };
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 master_service::master_service()
 {
@@ -52,7 +52,9 @@ void master_service::on_accept(acl::socket_stream* conn)
 
 	acl::memcache_session session("127.0.0.1:11211");
 	http_servlet servlet;
-	servlet.setLocalCharset("utf-8");  // charset: big5, gb2312, gb18030, gbk, utf-8
+
+	// charset: big5, gb2312, gb18030, gbk, utf-8
+	servlet.setLocalCharset("utf-8");
 	while (true)
 	{
 		if (servlet.doRun(session, conn) == false)

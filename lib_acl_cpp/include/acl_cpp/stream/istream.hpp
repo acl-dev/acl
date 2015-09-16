@@ -18,8 +18,6 @@ public:
 	istream() {}
 	virtual ~istream() {}
 
-	int read();
-
 	/**
 	 * 从输入流中读数据
 	 * @param buf {void*} 用户缓冲区
@@ -140,7 +138,8 @@ public:
 
 	/**
 	 * 从输入流中读一个字节数据
-	 * @return {int} 所读字节的 ASCII 码值
+	 * @return {int} 所读字节的 ASCII 码值，如果返回值为 -1 则表示对方关闭或
+	 *  读出错
 	 */
 	int getch(void);
 

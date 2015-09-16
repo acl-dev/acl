@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 		printf("after set sendbuf's size: %d, readbuf's size: %d\r\n",
 			client->get_tcp_sendbuf(), client->get_tcp_recvbuf());
 
-		if (client->write("hello world\r\n") == false)
+		if (client->write("hello world\r\n") == -1)
 		{
 			printf("write error\r\n");
 			delete client;

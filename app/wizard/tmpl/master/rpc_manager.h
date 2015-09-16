@@ -11,15 +11,12 @@ public:
 
 	/**
 	 * 单例初始化函数
-	 * @param handle {acl::aio_handle*} 异步引擎句柄，当该值为空时，
-	 *  内部会自动生成一个
+	 * @param handle {acl::aio_handle&} 异步引擎句柄
 	 * @param max_threads {int} 子线程池的最大线程数量
-	 * @param type {acl::aio_handle_type} 当需要内部自动创建异步引擎时，
-	 *  此值规定了内部所创建的异步引擎的类型，当 handle 为空时该参数
-	 *  没有意义
+	 * @param addr {const char*} rpc 服务监听的地址，如果为空，则内部由系
+	 *  统自动给定一个 127.0.0.1:PORT 地址进行监听，非空时则监听指定的地址
 	 */
-	void init(acl::aio_handle* handle, int max_threads = 10,
-		acl::aio_handle_type type = acl::ENGINE_SELECT,
+	void init(acl::aio_handle& handle, int max_threads = 10,
 		const char* addr = NULL);
 
 	/**
@@ -31,7 +28,7 @@ public:
 private:
 	// 异步消息句柄
 	acl::aio_handle* handle_;
-	bool internal_handle_;
+
 	// 异步 RPC 通信服务句柄
 	acl::rpc_service* service_;
 };

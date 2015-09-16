@@ -2,7 +2,7 @@
 #include "rpc_manager.h"
 #include "master_service.h"
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 // 配置内容项
 
 char *var_cfg_str;
@@ -35,7 +35,7 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 	{ 0, 0 , 0 , 0, 0 }
 };
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 class request_rpc : public acl::rpc_request
 {
@@ -76,9 +76,9 @@ protected:
 		// 开始处理该请求
 		handle_conn(stream);
 
-		// 将 ACL_VSTREAM 与阻塞流对象解绑定，这样才能保证当释放阻塞流对象时
-		// 不会关闭与请求者的连接，因为该连接本身是属于非阻塞流对象的，需要采
-		// 用异步流关闭方式进行关闭
+		// 将 ACL_VSTREAM 与阻塞流对象解绑定，这样才能保证当释放阻塞
+		// 流对象时不会关闭与请求者的连接，因为该连接本身是属于非阻塞
+		// 流对象的，需要采用异步流关闭方式进行关闭
 		stream.unbind();
 	}
 
@@ -127,7 +127,7 @@ private:
 	}
 };
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 // acl::aio_callback 虚类的子类定义
 class io_callback : public acl::aio_callback
@@ -153,7 +153,7 @@ protected:
 	{
 		if (strncmp(data, "quit", len) == 0)
 		{
-			// 可以显式地调用异步流的关闭过程，也可以直接返回 false，
+			// 可以显式调用异步流的关闭过程，也可以直接返回 false
 			// 通知异步框架自动关闭该异步流
 			// client_->close();
 			return false;
@@ -209,7 +209,7 @@ private:
 	acl::aio_socket_stream* client_;
 };
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 master_service::master_service()
 {
@@ -249,9 +249,11 @@ void master_service::proc_on_init()
 {
 	// 获得异步框架的事件引擎句柄
 	acl::aio_handle* handle = get_handle();
+	if (handle == NULL)
+		logger_fatal("aio handle null!");
 
 	// 初始化 rpc 服务对象
-	rpc_manager::get_instance().init(handle, var_cfg_thread_pool_limit);
+	rpc_manager::get_instance().init(*handle, var_cfg_thread_pool_limit);
 }
 
 void master_service::proc_on_exit()

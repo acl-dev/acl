@@ -202,9 +202,9 @@ const char* mail_message::get_header_value(const char* name) const
 	return NULL;
 }
 
-mail_message& mail_message::set_body(const mail_body* body)
+mail_message& mail_message::set_body(const mail_body& body)
 {
-	body_ = body;
+	body_ = &body;
 	return *this;
 }
 

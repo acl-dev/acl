@@ -43,7 +43,7 @@ bool mail_attach::save_to(mime_code* coder, string& out)
 	if (coder)
 		build_header(coder->get_encoding_type(), out);
 	else
-		build_header("base64", out);
+		build_header(NULL, out);
 
 	string buf;
 	if (ifstream::load(filepath_.c_str(), &buf) == false)
@@ -72,7 +72,7 @@ bool mail_attach::save_to(mime_code* coder, ostream& out)
 	if (coder)
 		build_header(coder->get_encoding_type(), header);
 	else
-		build_header("base64", header);
+		build_header(NULL, header);
 
 	if (out.write(header) == -1)
 	{
@@ -140,8 +140,10 @@ void mail_attach::build_header(const char* transfer_encoding, string& out)
 {
 	out.format_append("Content-Type: %s;\r\n", ctype_.c_str());
 	out.format_append("\tname=\"%s\"\r\n", filename_.c_str());
-	out.format_append("Content-Transfer-Encoding: %s\r\n",
-		transfer_encoding);
+
+	if (transfer_encoding && *transfer_encoding)
+		out.format_append("Content-Transfer-Encoding: %s\r\n",
+			transfer_encoding);
 
 	if (cid_.empty())
 		out.format_append("Content-Disposition: attachment;\r\n"

@@ -28,9 +28,7 @@ memcache_pool& memcache_pool::set_timeout(int conn_timeout /* = 30 */,
 
 connect_client* memcache_pool::create_connect()
 {
-	memcache* conn = NEW memcache(addr_, conn_timeout_,
-		rw_timeout_);
-	return conn;
+	return NEW memcache(addr_, conn_timeout_, rw_timeout_);
 }
 
 } // namespace acl

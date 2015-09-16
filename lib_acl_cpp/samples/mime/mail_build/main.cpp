@@ -18,7 +18,7 @@ static void build_html(void)
 	const char* html = "<html><body>中国人民银行 HTML 格式</body></html>";
 	acl::mail_body body("gbk");
 	body.set_html(html, strlen(html));
-	message.set_body(&body);
+	message.set_body(body);
 
 	const char* filepath = "./html.eml";
 	if (message.save_to(filepath) == false)
@@ -41,7 +41,7 @@ static void build_text(void)
 	const char* text = "中国人民银行 TEXT 格式";
 	acl::mail_body body("gbk");
 	body.set_text(text, strlen(text));
-	message.set_body(&body);
+	message.set_body(body);
 
 	const char* filepath = "./text.eml";
 	if (message.save_to(filepath) == false)
@@ -67,7 +67,7 @@ static void build_alternative(void)
 	const char* html = "<html><body>中国人民银行 HTML 格式</body></html>";
 	acl::mail_body body("gbk");
 	body.set_alternative(html, strlen(html), text, strlen(text));
-	message.set_body(&body);
+	message.set_body(body);
 
 	const char* filepath = "./alternative.eml";
 	if (message.save_to(filepath) == false)
@@ -182,7 +182,7 @@ static void build_relative(void)
 	acl::mail_body body("gbk");
 	body.set_relative(html.c_str(), html.size(),
 		text.c_str(), text.size(), attachments);
-	message.set_body(&body);
+	message.set_body(body);
 
 	const char* filepath = "./relative.eml";
 	if (message.save_to(filepath) == false)

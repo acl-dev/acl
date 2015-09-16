@@ -118,8 +118,8 @@ bool mail_body::save_to(string& out) const
 
 void mail_body::set_content_type(const char* content_type)
 {
-	content_type_.format(content_type);
-	ctype_.parse(content_type_);
+	content_type_ = content_type;
+	ctype_.parse(content_type);
 }
 
 bool mail_body::save_html(const char* html, size_t len, string& out) const

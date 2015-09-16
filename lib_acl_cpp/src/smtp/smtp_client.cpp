@@ -10,7 +10,8 @@
 
 namespace acl {
 
-smtp_client::smtp_client(const char* addr, int conn_timeout, int rw_timeout)
+smtp_client::smtp_client(const char* addr, int conn_timeout /* = 60 */,
+	int rw_timeout /* = 60 */)
 {
 	addr_ = acl_mystrdup(addr);
 	conn_timeout_ = conn_timeout;
@@ -18,24 +19,14 @@ smtp_client::smtp_client(const char* addr, int conn_timeout, int rw_timeout)
 	client_ = NULL;
 
 	ehlo_ = true;
+	reuse_ = false;
 	ssl_conf_ = NULL;
 }
 
 smtp_client::~smtp_client()
 {
 	acl_myfree(addr_);
-
-	if (client_)
-	{
-		// 将 SMTP_CLIENT 对象的流置空，以避免内部再次释放，
-		// 因为该流对象会在下面 stream_.close() 时被释放
-		client_->conn = NULL;
-		smtp_close(client_);
-	}
-
-	// 当 socket 流对象打开着，则关闭之，同时将依附于其的 SSL 对象释放
-	if (stream_.opened())
-		stream_.close();
+	close();
 }
 
 smtp_client& smtp_client::set_ssl(polarssl_conf* ssl_conf)
@@ -57,37 +48,53 @@ const char* smtp_client::get_status() const
 bool smtp_client::send(const mail_message& message,
 	const char* email /* = NULL */)
 {
+	// 发送 SMTP 邮件信封过程
+	if (send_envelope(message) == false)
+		return false;
+
+	// 优先使用参数给出的邮件文件，然后才是 message 中自动生成的邮件文件
+	if (email == NULL)
+		email = message.get_email();
+
+	// 如果没有可发送的邮件文件，则认为调用者想通过 write 等接口直接发送数据
+	if (email == NULL)
+		return true;
+
+	// 发送 DATA 命令
+	if (data_begin() == false)
+		return false;
+
+	// 发送邮件
+	if (send_email(email) == false)
+		return false;
+
+	// 发送 DATA 结束符
+	return data_end();
+}
+
+bool smtp_client::send_envelope(const mail_message& message)
+{
 	if (open() == false)
 		return false;
 	if (get_banner() == false)
 		return false;
 	if (greet() == false)
 		return false;
-	if (!auth_login(message.get_auth_user(), message.get_auth_pass()))
+
+	const char* user = message.get_auth_user();
+	const char* pass = message.get_auth_pass();
+	if (user && pass && auth_login(user, pass) == false)
 		return false;
+
 	const rfc822_addr* from = message.get_from();
-	if (from == NULL || from->addr == NULL)
+	if (from == NULL)
+	{
+		logger_error("from null");
 		return false;
+	}
 	if (mail_from(from->addr) == false)
 		return false;
-	if (to_recipients(message.get_recipients()) == false)
-		return false;
-	if (email != NULL)
-	{
-		if (send_email(email) == false)
-			return false;
-		return true;
-	}
-
-	email = message.get_email();
-	if (email != NULL)
-	{
-		if (send_email(email) == false)
-			return false;
-		return true;
-	}
-
-	return true;
+	return to_recipients(message.get_recipients());
 }
 
 bool smtp_client::open()
@@ -96,8 +103,11 @@ bool smtp_client::open()
 	{
 		acl_assert(client_ != NULL);
 		acl_assert(client_->conn == stream_.get_vstream());
+		reuse_ = true;
 		return true;
 	}
+
+	reuse_ = false;
 
 	client_ = smtp_open(addr_, conn_timeout_, rw_timeout_, 1024);
 	if (client_ == NULL)
@@ -106,9 +116,10 @@ bool smtp_client::open()
 		return false;
 	}
 
-	// 打开流对象
+	// 打开流对象，只所以使用 stream_ 主要为了使用 SSL 通信
 	stream_.open(client_->conn);
 
+	// 如果设置了 SSL 通信方式，则需要打开 SSL 通信接口
 	if (ssl_conf_)
 	{
 		polarssl_io* ssl = new polarssl_io(*ssl_conf_, false);
@@ -119,11 +130,34 @@ bool smtp_client::open()
 			return false;
 		}
 	}
+
 	return true;
+}
+
+void smtp_client::close()
+{
+	if (client_)
+	{
+		// 将 SMTP_CLIENT 对象的流置空，以避免内部再次释放，
+		// 因为该流对象会在下面 stream_.close() 时被释放
+		client_->conn = NULL;
+		smtp_close(client_);
+		client_ = NULL;
+	}
+
+	// 当 socket 流对象打开着，则关闭之，同时将依附于其的 SSL 对象释放
+	if (stream_.opened())
+		stream_.close();
+
+	// 重置连接是否被重用的状态
+	reuse_ = false;
 }
 
 bool smtp_client::get_banner()
 {
+	// 如果是同一个连接被使用，则不必再获得服务端的欢迎信息
+	if (reuse_)
+		return true;
 	return smtp_get_banner(client_) == 0 ? true : false;
 }
 
@@ -173,7 +207,7 @@ bool smtp_client::to_recipients(const std::vector<rfc822_addr*>& recipients)
 	std::vector<rfc822_addr*>::const_iterator cit;
 	for (cit = recipients.begin(); cit != recipients.end(); ++cit)
 	{
-		if ((*cit)->addr && rcpt_to((*cit)->addr) != 0)
+		if ((*cit)->addr && rcpt_to((*cit)->addr) == false)
 			return false;
 	}
 	return true;

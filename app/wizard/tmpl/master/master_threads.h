@@ -1,6 +1,6 @@
 #pragma once
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 // 配置内容项
 
 extern char *var_cfg_str;
@@ -15,7 +15,7 @@ extern acl::master_int_tbl var_conf_int_tab[];
 extern long long int  var_cfg_int64;
 extern acl::master_int64_tbl var_conf_int64_tab[];
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 //class acl::socket_stream;
 
@@ -44,8 +44,8 @@ protected:
 	virtual bool thread_on_accept(acl::socket_stream* stream);
 
 	/**
-	 * 当某个网络连接的 IO 读写超时时的回调函数，如果该函数返回 true 则表示继续等待下一次
-	 * 读写，否则则希望关闭该连接
+	 * 当某个网络连接的 IO 读写超时时的回调函数，如果该函数返回 true 则
+	 * 表示继续等待下一次读写，否则则希望关闭该连接
 	 * @param stream {socket_stream*}
 	 * @return {bool} 如果返回 false 则表示子类要求关闭连接，而不
 	 *  必将该连接再传递至 thread_main 过程
