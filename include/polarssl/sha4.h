@@ -31,7 +31,7 @@
 
 #include <string.h>
 
-#if defined(_MSC_VER) || defined(__WATCOMC__)
+#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(MINGW)
   #define UL64(x) x##ui64
   typedef unsigned __int64 uint64_t;
 #else

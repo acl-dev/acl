@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "http_servlet.h"
 
-http_servlet::http_servlet(void)
+http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session)
+	: acl::HttpServlet(stream, session)
 {
 
 }

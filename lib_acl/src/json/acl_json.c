@@ -213,7 +213,7 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 
 	node = (struct ACL_JSON_NODE*) it->data;
 
-	/* 先遍历当前结点的子结点 */
+	/* 先遍历当前节点的子节点 */
 
 	ring_ptr = acl_ring_succ(&node->children);
 	if (ring_ptr != &node->children) {
@@ -223,7 +223,7 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 		return (it->ptr);
 	}
 
-	/* 当前结点的子结点遍历完毕，再遍历当前结点的兄弟结点 */
+	/* 当前节点的子节点遍历完毕，再遍历当前节点的兄弟节点 */
 
 	parent = acl_json_node_parent(node);
 	ring_ptr = acl_ring_succ(&node->node);
@@ -234,7 +234,7 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 		return (it->ptr);
 	}
 
-	/* 当前结点的兄弟结点遍历完毕，最后遍历当前结点的父结点的兄弟结点 */
+	/* 当前节点的兄弟节点遍历完毕，最后遍历当前节点的父节点的兄弟节点 */
 
 	do {
 		if (parent == json->root)
@@ -253,7 +253,7 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 		}
 	} while (ring_ptr != &json->root->children);
 
-	/* 遍历完所有结点 */
+	/* 遍历完所有节点 */
 
 	it->ptr = it->data = NULL;
 	return (NULL);
@@ -287,7 +287,7 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 
 	node = (struct ACL_JSON_NODE*) it->data;
 
-	/* 先遍历当前结点的子结点 */
+	/* 先遍历当前节点的子节点 */
 
 	ring_ptr = acl_ring_pred(&node->children);
 	if (ring_ptr != &node->children) {
@@ -297,7 +297,7 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 		return (it->ptr);
 	}
 
-	/* 当前结点的子结点遍历完毕，再遍历当前结点的兄弟结点 */
+	/* 当前节点的子节点遍历完毕，再遍历当前节点的兄弟节点 */
 
 	parent = acl_json_node_parent(node);
 	ring_ptr = acl_ring_pred(&node->node);
@@ -308,7 +308,7 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 		return (it->ptr);
 	}
 
-	/* 当前结点的兄弟结点遍历完毕，最后遍历当前结点的父结点的兄弟结点 */
+	/* 当前节点的兄弟节点遍历完毕，最后遍历当前节点的父节点的兄弟节点 */
 
 	do {
 		if (parent == json->root)
@@ -326,7 +326,7 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 		}
 	} while (ring_ptr != &json->root->children);
 
-	/* 遍历完所有结点 */
+	/* 遍历完所有节点 */
 
 	it->ptr = it->data = NULL;
 	return (NULL);
@@ -340,7 +340,7 @@ ACL_JSON *acl_json_alloc()
 	json->dbuf = acl_dbuf_pool_create(81920);
 
 	json->root = acl_json_node_alloc(json);
-	/* 将根结点作为当前结点 */
+	/* 将根节点作为当前节点 */
 	json->curr_node = json->root;
 	/* 设置状态机的状态 */
 #if 0
@@ -392,7 +392,7 @@ ACL_JSON *acl_json_create(ACL_JSON_NODE *node)
 	json = (ACL_JSON*) acl_mycalloc(1, sizeof(ACL_JSON));
 	json->dbuf = acl_dbuf_pool_create(81920);
 
-	/* 如果传入的结点为 root 结点，则直接赋值创建 root 即可 */
+	/* 如果传入的节点为 root 节点，则直接赋值创建 root 即可 */
 	if (node == root) {
 		json->root = acl_json_node_duplicate(json, node);
 	} else {
@@ -401,7 +401,7 @@ ACL_JSON *acl_json_create(ACL_JSON_NODE *node)
 		acl_json_node_add_child(json->root, first);
 	}
 
-	/* 将根结点作为当前结点 */
+	/* 将根节点作为当前节点 */
 	json->curr_node = json->root;
 	/* 设置状态机的状态 */
 #if 0

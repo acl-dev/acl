@@ -43,7 +43,7 @@ public:
 	}
 
 	/**
-	 * 设置邮件正文为 HTML 格式
+	 * 设置邮件正文为 TEXT/HTML 格式
 	 * @param html {const char*} HTML 数据
 	 * @param len {size_t} html 数据长度(虽然 html 是字符串格式，但提供
 	 *  数据长度有利于调用更灵活高效，内部不再重新通过 strlen 计算长度)
@@ -52,42 +52,42 @@ public:
 	mail_body& set_html(const char* html, size_t len);
 
 	/**
-	 * 设置邮件正文为 TEXT 格式
-	 * @param text {const char*} TEXT 数据
-	 * @param len {size_t} text 数据长度(虽然 text 是文本格式，但提供
+	 * 设置邮件正文为 TEXT/PLAIN 格式
+	 * @param plain {const char*} TEXT 数据
+	 * @param len {size_t} plain 数据长度(虽然 plain 是文本格式，但提供
 	 *  数据长度有利于调用更灵活高效，内部不再重新通过 strlen 计算长度)
 	 * @return {mail_body&}
 	 */
-	mail_body& set_text(const char* text, size_t len);
+	mail_body& set_plain(const char* plain, size_t len);
 
 	/**
 	 * 当邮件内容为 multipart/alternative 格式时调用此函数设置相应类型的
 	 * 正文内容
 	 * @param html {const char*} 正文中的 HTML 数据(非空)
 	 * @param hlen {size_t} html 数据长度(>0)
-	 * @param text {const char*} 正文中的 TEXT 数据(非空)
-	 * @param tlen {size_t} text 数据长度(>0)
+	 * @param plain {const char*} 正文中的 TEXT 数据(非空)
+	 * @param plen {size_t} plain 数据长度(>0)
 	 * @return {mail_body&}
 	 */
 	mail_body& set_alternative(const char* html, size_t hlen,
-		const char* text, size_t tlen);
+		const char* plain, size_t plen);
 
 	/**
 	 * 当邮件正文内容为 multipart/relative 格式时调用此函数设置正文内容
 	 * @param html {const char*} 正文中的 HTML 数据(非空)
 	 * @param hlen {size_t} html 数据长度(>0)
-	 * @param text {const char*} 正文中的 TEXT 数据(非空)
-	 * @param tlen {size_t} text 数据长度(>0)
+	 * @param plain {const char*} 正文中的 plain 数据(非空)
+	 * @param plen {size_t} plain 数据长度(>0)
 	 * @param attachments {const std::vector<mail_attach*>&} 存放
 	 *  与 html 中的 cid 相关的图片等附件对象
 	 * @return {mail_body&}
 	 */
 	mail_body& set_relative(const char* html, size_t hlen,
-		const char* text, size_t tlen,
+		const char* plain, size_t plen,
 		const std::vector<mail_attach*>& attachments);
 
 	/**
-	 * 获得 set_html 函数设置的 html 数据
+	 * 获得 set_html 函数设置的 html/plain 数据
 	 * @param len {size_t} 存放数据长度结果
 	 * @return {const char*}
 	 */
@@ -98,14 +98,14 @@ public:
 	}
 
 	/**
-	 * 获得 set_text 函数设置的 text 数据
+	 * 获得 set_plain 函数设置的 plain/plain 数据
 	 * @param len {size_t} 存放数据长度结果
 	 * @return {const char*}
 	 */
-	const char* get_text(size_t& len) const
+	const char* get_plain(size_t& len) const
 	{
-		len = tlen_;
-		return text_;
+		len = plen_;
+		return plain_;
 	}
 
 	/**
@@ -147,21 +147,21 @@ public:
 	 * @param out {string&} 以数据追加方式存储结果
 	 * @return {bool} 操作是否成功
 	 */
-	bool save_text(const char* in, size_t len, string& out) const;
+	bool save_plain(const char* in, size_t len, string& out) const;
 
 	/**
 	 * multipart/relative 格式的邮件正文构造过程，并将结果追加于给定的缓冲区中
 	 * @param html {const char*} 输入的 html 格式数据
 	 * @param hlen {size_t} html 的数据长度
-	 * @param text {const char*} 正文中的 TEXT 数据(非空)
-	 * @param tlen {size_t} text 数据长度(>0)
+	 * @param plain {const char*} 正文中的 TEXT 数据(非空)
+	 * @param plen {size_t} plain 数据长度(>0)
 	 * @param attachments {const std::vector<mail_attach*>&} 存放
 	 *  与 html 中的 cid 相关的图片等附件对象
 	 * @param out {string&} 以数据追加方式存储结果
 	 * @return {bool} 操作是否成功
 	 */
 	bool save_relative(const char* html, size_t hlen,
-		const char* text, size_t tlen,
+		const char* plain, size_t plen,
 		const std::vector<mail_attach*>& attachments,
 		string& out) const;
 
@@ -169,13 +169,13 @@ public:
 	 * multipart/alternative 格式的邮件正文构造过程，并将结果追加于给定的缓冲区中
 	 * @param html {const char*} 输入的 html 格式数据
 	 * @param hlen {size_t} html 的数据长度
-	 * @param text {const char*} 正文中的 TEXT 数据(非空)
-	 * @param tlen {size_t} text 数据长度(>0)
+	 * @param plain {const char*} 正文中的 TEXT 数据(非空)
+	 * @param plen {size_t} plain 数据长度(>0)
 	 * @param out {string&} 以数据追加方式存储结果
 	 * @return {bool} 操作是否成功
 	 */
 	bool save_alternative(const char* html, size_t hlen,
-		const char* text, size_t tlen, string& out) const;
+		const char* plain, size_t plen, string& out) const;
 
 private:
 	string  charset_;
@@ -188,11 +188,17 @@ private:
 
 	const char* html_;
 	size_t hlen_;
-	const char* text_;
-	size_t tlen_;
+	const char* plain_;
+	size_t plen_;
 	const std::vector<mail_attach*>* attachments_;
 
-	bool build(const char* in, size_t len, string& out) const;
+	bool build(const char* in, size_t len, const char* content_type,
+		const char* charset, mime_code& coder, string& out) const;
+	bool build_html(const char* in, size_t len,
+		const char* charset, string& out) const;
+	bool build_plain(const char* in, size_t len,
+		const char* charset, string& out) const;
+
 	void set_content_type(const char* content_type);
 };
 

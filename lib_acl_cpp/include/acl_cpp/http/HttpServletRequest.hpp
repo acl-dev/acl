@@ -32,28 +32,31 @@ public:
 	 * @param res {HttpServletResponse&}
 	 * @param store {session&} 存储会话数据的对象
 	 * @param stream {socket_stream&} 数据流，内部不会主动关闭流
-	 * @param local_charset {const char*} 本地字符集，该值非空时，
+	 * @param charset {const char*} 本地字符集，该值非空时，
 	 *  内部会自动将 HTTP 请求的数据转换为本地字符集，否则不转换
 	 * @param body_parse {bool} 针对 POST 方法，该参数指定是否需要
-	 *  读取 HTTP 请求数据体并按 n/v 方式进行分析；当为 true 则内
-	 *  部会读取 HTTP 请求体数据，并进行分析，当用户调用 getParameter
-	 *  时，不仅可以获得 URL 中的参数，同时可以获得 POST 数据体中
-	 *  的参数；当该参数为 false 时则不读取数据体，把读数据体的任务
-	 *  交给子类处理
+	 *  读取 HTTP 请求数据体类型判断是否需要自动进行分析，内部缺省为 true；
+	 *  当为 true 则内部会读取 HTTP 请求体数据，并进行分析，针对以下情况：
+	 *  1) x-www-form-urlencoded 格式：调用 getParameter 时，
+	 *  不仅可以获得 URL 中的参数，同时可以获得 POST 数据体中的参数
+	 *  2) xml 格式：可调用 getXml 获得解析好的 xml 对象
+	 *  3) json 格式：可调用 getJson 获得解析好的 json 对象
+	 *  当该参数为 false 时则不读取数据体，把读数据体的任务交给子类处理
 	 * @param body_limit {int} 针对 POST 方法，当数据体为文本参数
 	 *  类型时，此参数限制数据体的长度；当数据体为数据流或 MIME
-	 *  格式或 body_read 为 false，此参数无效
+	 *  格式或 on 为 false，此参数无效
 	 */
 	HttpServletRequest(HttpServletResponse& res, session& store,
-		socket_stream& stream, const char* local_charset = NULL,
+		socket_stream& stream, const char* charset = NULL,
 		bool body_parse = true, int body_limit = 102400);
 	~HttpServletRequest(void);
 
 	/**
 	 * 获得 HTTP 客户端请求方法：GET, POST, PUT, CONNECT, PURGE
+	 * @param method_s {string*} 非空时存储字符串方式的请求方法
 	 * @return {http_method_t}
 	 */
-	http_method_t getMethod(void) const;
+	http_method_t getMethod(string* method_s = NULL) const;
 
 	/**
 	 * 获得 HTTP 客户端请求的所有 cookie 对象集合
@@ -348,7 +351,7 @@ private:
 	xml* xml_;
 
 	bool readHeaderCalled_;
-	bool readHeader(void);
+	bool readHeader(string* method_s);
 
 	void parseParameters(const char* str);
 };

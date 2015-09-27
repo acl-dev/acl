@@ -66,7 +66,7 @@ static void test(void)
 	{
 		printf("%s(%d): result should:\r\n%s\r\n",
 			__FUNCTION__, __LINE__, default_result);
-		return;
+		exit (1);
 	}
 	else
 		printf("%s(%d): Build json OK!\r\n", __FUNCTION__, __LINE__);
@@ -170,6 +170,7 @@ static void test(void)
 			__FUNCTION__, __LINE__, json1.to_string().c_str());
 		printf(">>%s(%d)->json3:\r\n%s\r\n",
 			__FUNCTION__, __LINE__, json3.to_string().c_str());
+		exit (1);
 	}
 	printf("-------------------------------------------------\r\n");
 }

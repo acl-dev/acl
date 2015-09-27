@@ -19,7 +19,7 @@ public:
 	/**
 	 * 构造函数
 	 * @param addr {const char*} 服务器监听地址，格式：ip:port(domain:port)
-	 * @param count {size_t} 连接池最大连接个数限制
+	 * @param count {size_t} 连接池最大连接个数限制，当该值为 0 时则没有限制
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 */
 	http_request_pool(const char* addr, size_t count, size_t idx = 0);
@@ -31,7 +31,7 @@ public:
 	 * @param rw_timeout {int} 网络 IO 读写超时时间(秒)
 	 * @return {http_request_pool&}
 	 */
-	http_request_pool& set_timeout(int conn_timeout = 30, int rw_timeout = 60);
+	http_request_pool& set_timeout(int conn_timeout, int rw_timeout);
 
 protected:
 	// 基类纯虚函数

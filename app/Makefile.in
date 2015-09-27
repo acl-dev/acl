@@ -99,4 +99,5 @@ RM:
 clean:
 	rm -f $(PROG)
 	rm -f $(OBJ)
+rebuild rb: clean all
 ###########################################################

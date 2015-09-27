@@ -122,7 +122,7 @@ protected:
 	{
 		(void) nclients;
 		(void) nthreads;
-		return false;
+		return true;
 	}
 
 private:

@@ -32,8 +32,8 @@ connect_manager::~connect_manager()
 }
 
 // 分析一个服务器地址，格式：IP:PORT[:MAX_CONN]
-// 返回值 0 表示非法的地址
-static size_t check_addr(const char* addr, string& buf, size_t default_count)
+// 返回值 < 0 表示非法的地址
+static int check_addr(const char* addr, string& buf, size_t default_count)
 {
 	// 数据格式：IP:PORT[:CONNECT_COUNT]
 	ACL_ARGV* tokens = acl_argv_split(addr, ":|");
@@ -41,7 +41,7 @@ static size_t check_addr(const char* addr, string& buf, size_t default_count)
 	{
 		logger_error("invalid addr: %s", addr);
 		acl_argv_free(tokens);
-		return 0;
+		return -1;
 	}
 
 	int port = atoi(tokens->argv[1]);
@@ -49,16 +49,16 @@ static size_t check_addr(const char* addr, string& buf, size_t default_count)
 	{
 		logger_error("invalid addr: %s, port: %d", addr, port);
 		acl_argv_free(tokens);
-		return 0;
+		return -1;
 	}
 	buf.format("%s:%d", tokens->argv[0], port);
-	size_t conn_max;
+	int conn_max;
 	if (tokens->argc >= 3)
-		conn_max = (size_t) atoi(tokens->argv[2]);
+		conn_max = atoi(tokens->argv[2]);
 	else
-		conn_max = default_count;
-	if (conn_max <= 0)
-		conn_max = default_count;
+		conn_max = (int) default_count;
+	if (conn_max < 0)
+		conn_max = (int) default_count;
 	acl_argv_free(tokens);
 	return conn_max;
 }
@@ -89,11 +89,12 @@ void connect_manager::init(const char* default_addr,
 	if (default_addr != NULL && *default_addr != 0)
 	{
 		logger("default_pool: %s", default_addr);
-		size_t max = check_addr(default_addr, default_addr_, count);
-		if (max > 0)
-			default_pool_ = &set(default_addr_.c_str(), max);
-		else
+		int max = check_addr(default_addr, default_addr_, count);
+		if (max < 0)
 			logger("no default connection set");
+		else
+			default_pool_ = &set(default_addr_.c_str(),
+						(size_t) max);
 	}
 	else
 		logger("no default connection set");
@@ -121,12 +122,12 @@ void connect_manager::set_service_list(const char* addr_list, int count)
 	{
 		const char* ptr = (const char*) iter.data;
 		int max = check_addr(ptr, addr, count);
-		if (max <= 0)
+		if (max < 0)
 		{
 			logger_error("invalid server addr: %s", addr.c_str());
 			continue;
 		}
-		set(addr.c_str(), max);
+		(void) set(addr.c_str(), max);
 		logger("add one service: %s, max connect: %d",
 			addr.c_str(), max);
 	}

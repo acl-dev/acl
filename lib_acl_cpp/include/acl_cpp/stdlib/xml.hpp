@@ -458,7 +458,7 @@ public:
 	 * 将 xml 对象树转成字符串
 	 * @param out {string&} 存储转换结果的缓冲区
 	 */
-	void build_xml(string& out);
+	void build_xml(string& out) const;
 
 	// pipe_stream 虚函数重载
 

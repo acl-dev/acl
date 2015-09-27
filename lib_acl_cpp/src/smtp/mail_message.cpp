@@ -376,7 +376,7 @@ bool mail_message::append_header(ofstream& fp)
 
 void mail_message::create_boundary(const char* id, string& out)
 {
-	out.format("====_%s_aclPart_%lu_%lu_%lu_====",
+	out.format("====_%s_acl_part_%lu_%lu_%lu_====",
 		id, (unsigned long) PID(), thread::thread_self(),
 		(unsigned long) time(NULL));
 }
@@ -397,13 +397,17 @@ bool mail_message::append_multipart(ofstream& fp)
 		charset_, boundary.c_str());
 
 	const char *prompt = "This is a multi-part message in MIME format.";
-	buf.format_append("%s\r\n\r\n--%s\r\n", prompt, boundary.c_str());
+	buf.format_append("%s\r\n\r\n", prompt);
 
 	// 添加数据体
-	if (body_->save_to(buf) == false)
-		return false;
+	if (body_ != NULL)
+	{
+		buf.format_append("--%s\r\n", boundary.c_str());
+		if (body_->save_to(buf) == false)
+			return false;
 
-	buf.append("\r\n");
+		buf.append("\r\n");
+	}
 
 	if (fp.write(buf) == -1)
 	{
@@ -448,12 +452,6 @@ bool mail_message::append_multipart(ofstream& fp)
 
 bool mail_message::save_to(const char* filepath)
 {
-	if (body_ == NULL)
-	{
-		logger_error("body null!");
-		return false;
-	}
-
 	ofstream fp;
 	if (fp.open_write(filepath) == false)
 	{
@@ -473,6 +471,11 @@ bool mail_message::save_to(const char* filepath)
 	if (!attachments_.empty())
 		return append_multipart(fp);
 
+	if (body_ == NULL)
+	{
+		logger_error("body null!");
+		return false;
+	}
 
 	// 对非 multipart 格式，直接将正文数据输出至文件流中
 

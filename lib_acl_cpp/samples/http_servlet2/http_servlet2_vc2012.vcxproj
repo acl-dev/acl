@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}</ProjectGuid>
+    <ProjectGuid>{685428CA-8DD4-489F-AC7F-0F5B70191D0F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <ProjectName>http_servlet2</ProjectName>
   </PropertyGroup>

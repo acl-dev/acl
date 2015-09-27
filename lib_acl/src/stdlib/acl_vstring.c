@@ -76,7 +76,7 @@ static void vstring_extend(ACL_VBUF *bp, int incr)
 static int vstring_buf_get_ready(ACL_VBUF *buf acl_unused)
 {
 	acl_msg_panic("vstring_buf_get: write-only buffer");
-	return (0);
+	return 0;
 }
 
 /* vstring_buf_put_ready - vbuf callback for write buffer full condition */
@@ -84,7 +84,7 @@ static int vstring_buf_get_ready(ACL_VBUF *buf acl_unused)
 static int vstring_buf_put_ready(ACL_VBUF *bp)
 {
 	vstring_extend(bp, 0);
-	return (0);
+	return 0;
 }
 
 /* vstring_buf_space - vbuf callback to reserve space */
@@ -97,7 +97,7 @@ static int vstring_buf_space(ACL_VBUF *bp, int len)
 		acl_msg_panic("vstring_buf_space: bad length %d", len);
 	if ((need = len - bp->cnt) > 0)
 		vstring_extend(bp, need);
-	return (0);
+	return 0;
 }
 
 void acl_vstring_init(ACL_VSTRING *vp, size_t len)
@@ -137,7 +137,7 @@ void acl_vstring_free_buf(ACL_VSTRING *vp)
 
 ACL_VSTRING *acl_vstring_alloc(size_t len)
 {
-	return (acl_vstring_slice_alloc(NULL, len));
+	return acl_vstring_slice_alloc(NULL, len);
 }
 
 ACL_VSTRING *acl_vstring_slice_alloc(ACL_SLICE_POOL *slice, size_t len)
@@ -169,7 +169,7 @@ ACL_VSTRING *acl_vstring_slice_alloc(ACL_SLICE_POOL *slice, size_t len)
 	vp->vbuf.space = vstring_buf_space;
 	vp->vbuf.ctx = vp;
 	vp->maxlen = 0;
-	return (vp);
+	return vp;
 }
 
 ACL_VSTRING *acl_vstring_dbuf_alloc(ACL_DBUF_POOL *dbuf, size_t len)
@@ -199,7 +199,7 @@ ACL_VSTRING *acl_vstring_dbuf_alloc(ACL_DBUF_POOL *dbuf, size_t len)
 	vp->vbuf.space = vstring_buf_space;
 	vp->vbuf.ctx = vp;
 	vp->maxlen = 0;
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_free - destroy variable-length string */
@@ -249,7 +249,7 @@ ACL_VSTRING *acl_vstring_truncate(ACL_VSTRING *vp, size_t len)
 		ACL_VSTRING_AT_OFFSET(vp, (int) len);
 		ACL_VSTRING_TERMINATE(vp);
 	}
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_strcpy - copy string */
@@ -263,7 +263,7 @@ ACL_VSTRING *acl_vstring_strcpy(ACL_VSTRING *vp, const char *src)
 		src++;
 	}
 	ACL_VSTRING_TERMINATE(vp);
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_strncpy - copy string of limited length */
@@ -277,7 +277,7 @@ ACL_VSTRING *acl_vstring_strncpy(ACL_VSTRING *vp, const char *src, size_t len)
 		src++;
 	}
 	ACL_VSTRING_TERMINATE(vp);
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_strcat - append string */
@@ -289,7 +289,7 @@ ACL_VSTRING *acl_vstring_strcat(ACL_VSTRING *vp, const char *src)
 		src++;
 	}
 	ACL_VSTRING_TERMINATE(vp);
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_strncat - append string of limited length */
@@ -301,7 +301,7 @@ ACL_VSTRING *acl_vstring_strncat(ACL_VSTRING *vp, const char *src, size_t len)
 		src++;
 	}
 	ACL_VSTRING_TERMINATE(vp);
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_memcpy - copy buffer of limited length */
@@ -310,17 +310,22 @@ ACL_VSTRING *acl_vstring_memcpy(ACL_VSTRING *vp, const char *src, size_t len)
 {
 	ACL_VSTRING_RESET(vp);
 
-	ACL_VSTRING_SPACE(vp, (int) len);
-	memcpy(acl_vstring_str(vp), src, len);
-	ACL_VSTRING_AT_OFFSET(vp, (int) len);
+	if (len > 0) {
+		ACL_VSTRING_SPACE(vp, (int) len);
+		memcpy(acl_vstring_str(vp), src, len);
+		ACL_VSTRING_AT_OFFSET(vp, (int) len);
+	}
 	ACL_VSTRING_TERMINATE(vp);
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_memmove - move buffer of limited length */
 
 ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 {
+	if (len == 0)
+		return vp;
+
 	if (src >= acl_vstring_str(vp)
 		&& (src + len <= acl_vstring_str(vp) + ACL_VSTRING_SIZE(vp)))
 	{
@@ -328,7 +333,7 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 		memmove(acl_vstring_str(vp), src, len);
 		ACL_VSTRING_AT_OFFSET(vp, (int) len);
 		ACL_VSTRING_TERMINATE(vp);
-		return (vp);
+		return vp;
 	} else {
 		/* 说明不是同一内存区间的数据移动 */
 		char *ptr = acl_mymalloc(len);
@@ -340,7 +345,7 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 		ACL_VSTRING_AT_OFFSET(vp, (int) len);
 		ACL_VSTRING_TERMINATE(vp);
 		vp->maxlen = 0;
-		return (vp);
+		return vp;
 	}
 }
 
@@ -348,12 +353,14 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 
 ACL_VSTRING *acl_vstring_memcat(ACL_VSTRING *vp, const char *src, size_t len)
 {
-	ACL_VSTRING_SPACE(vp, (int) len);
-	memcpy(acl_vstring_end(vp), src, len);
-	len += ACL_VSTRING_LEN(vp);
-	ACL_VSTRING_AT_OFFSET(vp, (int) len);
+	if (len > 0) {
+		ACL_VSTRING_SPACE(vp, (int) len);
+		memcpy(acl_vstring_end(vp), src, len);
+		len += ACL_VSTRING_LEN(vp);
+		ACL_VSTRING_AT_OFFSET(vp, (int) len);
+	}
 	ACL_VSTRING_TERMINATE(vp);
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_memchr - locate byte in buffer */
@@ -367,7 +374,7 @@ char *acl_vstring_memchr(ACL_VSTRING *vp, int ch)
 		if (*cp == ch)
 			return ((char *) cp);
 	}
-	return (NULL);
+	return NULL;
 }
 
 /* acl_vstring_strstr - locate byte in buffer */
@@ -378,7 +385,7 @@ char *acl_vstring_strstr(ACL_VSTRING *vp, const char *needle)
 	const unsigned char *np = 0;
 
 	if (vp == NULL || needle == NULL || *needle == 0)
-		return (NULL);
+		return NULL;
 
 	for (cp = (unsigned char *) acl_vstring_str(vp);
 		cp < (unsigned char *) acl_vstring_end(vp); cp++) {
@@ -397,7 +404,7 @@ char *acl_vstring_strstr(ACL_VSTRING *vp, const char *needle)
 		}
 	}
 
-	return (NULL);
+	return NULL;
 }
 
 /* acl_vstring_strcasestr - locate byte in buffer */
@@ -409,7 +416,7 @@ char *acl_vstring_strcasestr(ACL_VSTRING *vp, const char *needle)
 	const unsigned char *np = 0;
 
 	if (vp == NULL || needle == NULL || *needle == 0)
-		return (NULL);
+		return NULL;
 
 	for (cp = (unsigned char *) acl_vstring_str(vp);
 		cp < (unsigned char *) acl_vstring_end(vp); cp++) {
@@ -428,7 +435,7 @@ char *acl_vstring_strcasestr(ACL_VSTRING *vp, const char *needle)
 		}
 	}
 
-	return (NULL);
+	return NULL;
 }
 
 /* acl_vstring_rstrstr - locate byte in buffer */
@@ -439,7 +446,7 @@ char *acl_vstring_rstrstr(ACL_VSTRING *vp, const char *needle)
 	const unsigned char *np = 0, *needle_end;
 
 	if (vp == NULL || needle == NULL || *needle == 0)
-		return (NULL);
+		return NULL;
 
 	needle_end = (const unsigned char *) needle + strlen(needle) - 1;
 
@@ -459,7 +466,7 @@ char *acl_vstring_rstrstr(ACL_VSTRING *vp, const char *needle)
 		}
 	}
 
-	return (NULL);
+	return NULL;
 }
 
 /* acl_vstring_rstrcasestr - locate byte in buffer */
@@ -471,7 +478,7 @@ char *acl_vstring_rstrcasestr(ACL_VSTRING *vp, const char *needle)
 	const unsigned char *np = 0, *needle_end;
 
 	if (vp == NULL || needle == NULL || *needle == 0)
-		return (NULL);
+		return NULL;
 
 	needle_end = (const unsigned char *) needle + strlen(needle) - 1;
 
@@ -487,11 +494,11 @@ char *acl_vstring_rstrcasestr(ACL_VSTRING *vp, const char *needle)
 		if (!np && *cp == cm[*needle_end]) {
 			np = needle_end - 1;
 			if (np < (const unsigned char *) needle)
-				return ((char *) cp);
+				return (char *) cp;
 		}
 	}
 
-	return (NULL);
+	return NULL;
 }
 
 /* acl_vstring_insert - insert text into string */
@@ -520,7 +527,7 @@ ACL_VSTRING *acl_vstring_insert(ACL_VSTRING *vp, size_t start,
 	memcpy(acl_vstring_str(vp) + start, buf, len);
 	ACL_VSTRING_AT_OFFSET(vp, (int) new_len);
 	ACL_VSTRING_TERMINATE(vp);
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_prepend - prepend text to string */
@@ -538,7 +545,7 @@ ACL_VSTRING *acl_vstring_prepend(ACL_VSTRING *vp, const char *buf, size_t len)
 	memcpy(acl_vstring_str(vp), buf, len);
 	ACL_VSTRING_AT_OFFSET(vp, new_len);
 	ACL_VSTRING_TERMINATE(vp);
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_export - VSTRING to bare string */
@@ -550,7 +557,7 @@ char   *acl_vstring_export(ACL_VSTRING *vp)
 	cp = (char *) vp->vbuf.data;
 	vp->vbuf.data = 0;
 	acl_myfree(vp);
-	return (cp);
+	return cp;
 }
 
 /* acl_vstring_import - bare string to vstring */
@@ -567,7 +574,7 @@ ACL_VSTRING *acl_vstring_import(char *str)
 	vp->vbuf.len = len + 1;
 	ACL_VSTRING_AT_OFFSET(vp, len);
 	vp->maxlen = 0;
-	return (vp);
+	return vp;
 }
 
 void acl_vstring_glue(ACL_VSTRING *vp, void *buf, size_t len)
@@ -607,7 +614,7 @@ ACL_VSTRING *acl_vstring_sprintf(ACL_VSTRING *vp, const char *format,...)
 	va_start(ap, format);
 	vp = acl_vstring_vsprintf(vp, format, ap);
 	va_end(ap);
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_vsprintf - format string, vsprintf-like interface */
@@ -617,7 +624,7 @@ ACL_VSTRING *acl_vstring_vsprintf(ACL_VSTRING *vp, const char *format, va_list a
 	ACL_VSTRING_RESET(vp);
 	acl_vbuf_print(&vp->vbuf, format, ap);
 	ACL_VSTRING_TERMINATE(vp);
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_sprintf_append - append formatted string */
@@ -629,7 +636,7 @@ ACL_VSTRING *acl_vstring_sprintf_append(ACL_VSTRING *vp, const char *format,...)
 	va_start(ap, format);
 	vp = acl_vstring_vsprintf_append(vp, format, ap);
 	va_end(ap);
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_vsprintf_append - append format string, vsprintf-like interface */
@@ -638,7 +645,7 @@ ACL_VSTRING *acl_vstring_vsprintf_append(ACL_VSTRING *vp, const char *format, va
 {
 	acl_vbuf_print(&vp->vbuf, format, ap);
 	ACL_VSTRING_TERMINATE(vp);
-	return (vp);
+	return vp;
 }
 
 /* acl_vstring_sprintf_prepend - format + prepend string, vsprintf-like interface */
@@ -663,7 +670,7 @@ ACL_VSTRING *acl_vstring_sprintf_prepend(ACL_VSTRING *vp, const char *format,...
 	memmove(acl_vstring_str(vp), acl_vstring_str(vp) + old_len, result_len);
 	ACL_VSTRING_AT_OFFSET(vp, result_len);
 	ACL_VSTRING_TERMINATE(vp);
-	return (vp);
+	return vp;
 }
 
 const ACL_VSTRING *acl_buffer_gets_nonl(ACL_VSTRING *vp, const char **src, size_t dlen)
@@ -673,8 +680,8 @@ const ACL_VSTRING *acl_buffer_gets_nonl(ACL_VSTRING *vp, const char **src, size_
 
 	if (dlen <= 0) {
 		acl_msg_warn("%s(%d): dlen(%d) invalid",
-				myname, __LINE__, (int) dlen);
-		return (NULL);
+			myname, __LINE__, (int) dlen);
+		return NULL;
 	}
 
 	ptr = memchr(pbegin, '\n', dlen);
@@ -682,7 +689,7 @@ const ACL_VSTRING *acl_buffer_gets_nonl(ACL_VSTRING *vp, const char **src, size_
 		acl_vstring_memcat(vp, pbegin, dlen);
 		ACL_VSTRING_TERMINATE(vp);
 		*src += dlen;  /* 移动 *src 指针位置 */
-		return (NULL);
+		return NULL;
 	}
 	*src = ptr + 1;  /* 移动 *src 指针位置 */
 	pend = ptr;
@@ -696,11 +703,11 @@ const ACL_VSTRING *acl_buffer_gets_nonl(ACL_VSTRING *vp, const char **src, size_
 	if (pend < pbegin) {
 		/* 说明 data 中只包括 \r, \n */
 		ACL_VSTRING_TERMINATE(vp);
-		return (vp);
+		return vp;
 	}
 	acl_vstring_memcat(vp, pbegin, pend - pbegin + 1);
 	ACL_VSTRING_TERMINATE(vp);
-	return (vp);
+	return vp;
 }
 
 const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp, const char **src, size_t dlen)
@@ -711,7 +718,7 @@ const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp, const char **src, size_t dle
 	if (dlen <= 0) {
 		acl_msg_warn("%s(%d): dlen(%d) invalid",
 			myname, __LINE__, (int) dlen);
-		return (NULL);
+		return NULL;
 	}
 
 	ptr = memchr(*src, '\n', dlen);
@@ -719,11 +726,11 @@ const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp, const char **src, size_t dle
 		acl_vstring_memcat(vp, *src, dlen);
 		ACL_VSTRING_TERMINATE(vp);
 		*src += dlen;
-		return (NULL);
+		return NULL;
 	}
 
 	acl_vstring_memcat(vp, *src, ptr - *src + 1);
 	ACL_VSTRING_TERMINATE(vp);
 	*src = ptr + 1;  /* 修改 *src 指针位置 */
-	return (vp);
+	return vp;
 }

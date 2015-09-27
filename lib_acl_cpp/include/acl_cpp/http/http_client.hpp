@@ -406,6 +406,8 @@ private:
 	int  read_response_body(string& out, bool clean, int* real_size);
 
 	HTTP_HDR* get_http_hdr() const;
+
+public:
 	bool write_chunk(ostream& out, const void* data, size_t len);
 	bool write_chunk_trailer(ostream& out);
 

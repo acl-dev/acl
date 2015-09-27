@@ -612,7 +612,7 @@ xml_node* xml::next_node(void)
 	return n;
 }
 
-void xml::build_xml(string& out)
+void xml::build_xml(string& out) const
 {
 	ACL_VSTRING* buf = out.vstring();
 	(void) acl_xml_build(xml_, buf);

@@ -57,39 +57,39 @@ bool http_servlet::doUnknown(acl::HttpServletRequest& req,
 }
 
 bool http_servlet::doPut(acl::HttpServletRequest& req,
-	acl::HttpServletResponse&)
+	acl::HttpServletResponse& res)
 {
 	handled_ = true;
 	out_.format(">>> request method: PUT <<<\r\n");
 	logger_request(req);
-	return true;
+	return doPost(req, res);
 }
 
 bool http_servlet::doConnect(acl::HttpServletRequest& req,
-	acl::HttpServletResponse&)
+	acl::HttpServletResponse& res)
 {
 	handled_ = true;
 	out_.format(">>> request method: CONNECT <<<\r\n");
 	logger_request(req);
-	return true;
+	return doPost(req, res);
 }
 
 bool http_servlet::doDelete(acl::HttpServletRequest& req,
-	acl::HttpServletResponse&)
+	acl::HttpServletResponse& res)
 {
 	handled_ = true;
 	out_.format(">>> request method: DELETE <<<\r\n");
 	logger_request(req);
-	return true;
+	return doPost(req, res);
 }
 
 bool http_servlet::doHead(acl::HttpServletRequest& req,
-	acl::HttpServletResponse&)
+	acl::HttpServletResponse& res)
 {
 	handled_ = true;
 	out_.format(">>> request method: HEAD <<<\r\n");
 	logger_request(req);
-	return true;
+	return doPost(req, res);
 }
 
 bool http_servlet::doOptions(acl::HttpServletRequest& req,
@@ -97,6 +97,22 @@ bool http_servlet::doOptions(acl::HttpServletRequest& req,
 {
 	handled_ = true;
 	out_.format(">>> request method: OPTIONS <<<\r\n");
+	return doPost(req, res);
+}
+
+bool http_servlet::doPropfind(acl::HttpServletRequest& req,
+	acl::HttpServletResponse& res)
+{
+	handled_ = true;
+	out_.format(">>> request method: PROPFIND <<<\r\n");
+	return doPost(req, res);
+}
+
+bool http_servlet::doOther(acl::HttpServletRequest& req,
+	acl::HttpServletResponse& res, const char* method)
+{
+	handled_ = true;
+	out_.format(">>> request method: %s <<<\r\n", method);
 	return doPost(req, res);
 }
 

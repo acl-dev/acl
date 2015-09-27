@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 			printf("====================================================================\r\n");
 			printf("ERROR, not equal, item: %d\r\n", (int) i);
 			print(json);
-			return 0;
+			exit (1);
 		}
 		else
 		{

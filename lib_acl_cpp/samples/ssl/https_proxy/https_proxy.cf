@@ -8,7 +8,7 @@ service http_server {
 #	for master_type = unix
 #	master_service = echo.sock
 #	for master_type = sock
-	master_service = 1443
+	master_service = 443
 
 #	服务监听为域套接口
 #	master_service = aio_echo.sock
@@ -120,6 +120,8 @@ service http_server {
 			m.hotmail.com:443|65.54.225.167:443, \
 			blu405-m.hotmail.com:443|134.170.0.216:443, \
 			i.163.com:443|61.135.251.139:443, \
-			ex.qq.com:443|183.60.15.145:443
+			ex.qq.com:443|183.60.15.145:443, \
+			dav.qq.com:443|183.60.15.193:443, \
+			192.168.188.173:443|183.60.15.193:443
 }
 

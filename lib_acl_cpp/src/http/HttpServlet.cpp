@@ -12,7 +12,43 @@
 namespace acl
 {
 
-HttpServlet::HttpServlet(void)
+HttpServlet::HttpServlet(socket_stream* stream, session* session)
+: stream_(stream)
+{
+	init();
+
+	if (session == NULL)
+	{
+		session_ = NEW memcache_session("127.0.0.1");
+		session_ptr_ = session_;
+	}
+	else
+	{
+		session_ = session;
+		session_ptr_ = NULL;
+	}
+}
+
+HttpServlet::HttpServlet(socket_stream* stream,
+	const char* memcache_addr /* = "127.0.0.1:11211" */)
+: stream_(stream)
+{
+	init();
+
+	session_ = NEW memcache_session(memcache_addr);
+	session_ptr_ = session_;
+}
+
+HttpServlet::HttpServlet()
+{
+	init();
+
+	stream_ = NULL;
+	session_ = NULL;
+	session_ptr_ = NULL;
+}
+
+void HttpServlet::init()
 {
 	first_ = true;
 	local_charset_[0] = 0;
@@ -23,13 +59,15 @@ HttpServlet::HttpServlet(void)
 
 HttpServlet::~HttpServlet(void)
 {
+	delete session_ptr_;
 }
+
+#define COPY(x, y) ACL_SAFE_STRNCPY((x), (y), sizeof((x)))
 
 HttpServlet& HttpServlet::setLocalCharset(const char* charset)
 {
 	if (charset && *charset)
-		safe_snprintf(local_charset_, sizeof(local_charset_),
-			"%s", charset);
+		COPY(local_charset_, charset);
 	else
 		local_charset_[0] =0;
 	return *this;
@@ -54,7 +92,7 @@ HttpServlet& HttpServlet::setParseBodyLimit(int length)
 	return *this;
 }
 
-bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */)
+bool HttpServlet::doRun()
 {
 	socket_stream* in;
 	socket_stream* out;
@@ -64,29 +102,27 @@ bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */)
 	if (first_)
 		first_ = false;
 
-	if (stream == NULL)
+	if (stream_ == NULL)
 	{
 		// 数据流为空，则当 CGI 模式处理，将标准输入输出
 		// 作为数据流
-		stream = NEW socket_stream();
-		(void) stream->open(ACL_VSTREAM_IN);
-		in = stream;
+		in = NEW socket_stream();
+		in->open(ACL_VSTREAM_IN);
 
-		stream = NEW socket_stream();
-		(void) stream->open(ACL_VSTREAM_OUT);
-		out = stream;
+		out = NEW socket_stream();
+		out->open(ACL_VSTREAM_OUT);
 		cgi_mode = true;
 	}
 	else
 	{
-		in = out = stream;
+		in = out = stream_;
 		cgi_mode = false;
 	}
 
 	// req/res 采用栈变量，减少内存分配次数
 
 	HttpServletResponse res(*out);
-	HttpServletRequest req(res, session, *in, local_charset_,
+	HttpServletRequest req(res, *session_, *in, local_charset_,
 		parse_body_enable_, parse_body_limit_);
 
 	// 设置 HttpServletRequest 对象
@@ -97,7 +133,8 @@ bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */)
 
 	res.setCgiMode(cgi_mode);
 
-	http_method_t method = req.getMethod();
+	string method_s(32);
+	http_method_t method = req.getMethod(&method_s);
 
 	// 根据请求的值自动设定是否需要保持长连接
 	if (!cgi_mode)
@@ -131,6 +168,12 @@ bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */)
 	case HTTP_METHOD_OPTION:
 		ret = doOptions(req, res);
 		break;
+	case HTTP_METHOD_PROPFIND:
+		ret = doPropfind(req, res);
+		break;
+	case HTTP_METHOD_OTHER:
+		ret = doOther(req, res, method_s.c_str());
+		break;
 	default:
 		ret = false; // 有可能是IO失败或未知方法
 		if (req.getLastError() == HTTP_REQ_ERR_METHOD)
@@ -156,8 +199,14 @@ bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */)
 		&& res.getHttpHeader().get_keep_alive();
 }
 
-bool HttpServlet::doRun(const char* memcached_addr /* = "127.0.0.1:11211" */,
-	socket_stream* stream /* = NULL */)
+bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */)
+{
+	stream_ = stream;
+	session_ = &session;
+	return doRun();
+}
+
+bool HttpServlet::doRun(const char* memcached_addr, socket_stream* stream)
 {
 	memcache_session session(memcached_addr);
 	return doRun(session, stream);

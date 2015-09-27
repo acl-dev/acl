@@ -21,9 +21,12 @@
 namespace acl
 {
 
-HttpServletRequest::HttpServletRequest(HttpServletResponse& res, session& store,
-	socket_stream& stream, const char* local_charset /* = NULL */,
-	bool body_parse /* = true */, int body_limit /* = 102400 */)
+#define COPY(x, y) ACL_SAFE_STRNCPY((x), (y), sizeof((x)))
+
+HttpServletRequest::HttpServletRequest(HttpServletResponse& res,
+	session& store, socket_stream& stream,
+	const char* charset /* = NULL */, bool body_parse /* = true */,
+	int body_limit /* = 102400 */)
 : req_error_(HTTP_REQ_OK)
 , res_(res)
 , store_(store)
@@ -40,15 +43,16 @@ HttpServletRequest::HttpServletRequest(HttpServletResponse& res, session& store,
 , xml_(NULL)
 , readHeaderCalled_(false)
 {
-	ACL_SAFE_STRNCPY(cookie_name_, "ACL_SESSION_ID", sizeof(cookie_name_));
+	COPY(cookie_name_, "ACL_SESSION_ID");
 	ACL_VSTREAM* in = stream.get_vstream();
 	if (in == ACL_VSTREAM_IN)
 		cgi_mode_ = true;
 	else
 		cgi_mode_ = false;
-	if (local_charset && *local_charset)
-		safe_snprintf(localCharset_, sizeof(localCharset_),
-			"%s", local_charset);
+	if (charset && *charset)
+	{
+		COPY(localCharset_, charset);
+	}
 	else
 		localCharset_[0] = 0;
 	rw_timeout_ = 60;
@@ -73,7 +77,7 @@ HttpServletRequest::~HttpServletRequest(void)
 	delete http_session_;
 }
 
-http_method_t HttpServletRequest::getMethod(void) const
+http_method_t HttpServletRequest::getMethod(string* method_s /* = NULL */) const
 {
 	// HttpServlet 类对象的 doRun 运行时 readHeader 必须先被调用，
 	// 而 HttpSevlet 类在初始化请求时肯定会调用 getMethod 方法，
@@ -83,7 +87,7 @@ http_method_t HttpServletRequest::getMethod(void) const
 	// 类声明本类的友元类
 
 	if (readHeaderCalled_ == false)
-		const_cast<HttpServletRequest*>(this)->readHeader();
+		const_cast<HttpServletRequest*>(this)->readHeader(method_s);
 	return method_;
 }
 
@@ -503,7 +507,7 @@ void HttpServletRequest::parseParameters(const char* str)
 // Content-Type: multipart/form-data; boundary=---------------------------41184676334
 // Content-Type: application/octet-stream
 
-bool HttpServletRequest::readHeader(void)
+bool HttpServletRequest::readHeader(string* method_s)
 {
 	acl_assert(readHeaderCalled_ == false);
 	readHeaderCalled_ = true;
@@ -542,6 +546,10 @@ bool HttpServletRequest::readHeader(void)
 		logger_error("method null");
 		return false;
 	}
+
+	// 缓存字符串类型的请求方法
+	method_s->copy(method);
+
 	if (strcasecmp(method, "GET") == 0)
 		method_ = HTTP_METHOD_GET;
 	else if (strcasecmp(method, "POST") == 0)
@@ -558,13 +566,10 @@ bool HttpServletRequest::readHeader(void)
 		method_ = HTTP_METHOD_HEAD;
 	else if (strcasecmp(method, "OPTIONS") == 0)
 		method_ = HTTP_METHOD_OPTION;
+	else if (strcasecmp(method, "PROPFIND") == 0)
+		method_ = HTTP_METHOD_PROPFIND;
 	else
-	{
-		logger_error("unkown method: %s", method);
-		method_ = HTTP_METHOD_UNKNOWN;
-		req_error_ = HTTP_REQ_ERR_METHOD;
-		return false;
-	}
+		method_ = HTTP_METHOD_OTHER;
 
 	const char* ptr = getQueryString();
 	if (ptr && *ptr)

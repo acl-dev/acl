@@ -233,6 +233,15 @@ public:
 	 */
 	void setHttpServletRequest(HttpServletRequest* request);
 
+	/**
+	 * 获得底层的 http_client 通信对象
+	 * @return {http_client*} 非 NULL
+	 */
+	http_client* getClient() const
+	{
+		return client_;
+	}
+
 private:
 	socket_stream& stream_;		// 客户端连接流
 	HttpServletRequest* request_;	// http 请求对象

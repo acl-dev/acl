@@ -43,8 +43,11 @@ public:
 	 * cluster mode.
 	 * @param cluster {redis_client_cluster*} redis 集群连接对象
 	 *  redis cluster object in cluster mode
-	 * @param max_conns {size_t} 与集群中所有结点之间的每个连接池的最大连接数
-	 *  the max of every connection pool with all the redis nodes
+	 * @param max_conns {size_t} 与集群中所有结点之间的每个连接池的最大连接数，
+	 *  如果该值为 0，则在集群方式下连接池不设连接数上限
+	 *  the max of every connection pool with all the redis nodes,
+	 *  if be set 0, then there is no connections limit in
+	 *  connections pool.
 	 */
 	redis_command(redis_client_cluster* cluster, size_t max_conns);
 

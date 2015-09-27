@@ -3,7 +3,8 @@
 class http_servlet : public acl::HttpServlet
 {
 public:
-	http_servlet(const char* filepath);
+	http_servlet(const char* filepath, acl::socket_stream* conn,
+		acl::session* session);
 	~http_servlet();
 
 protected:

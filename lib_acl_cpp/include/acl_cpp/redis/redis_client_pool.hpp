@@ -19,8 +19,10 @@ public:
 	 * constructor
 	 * @param addr {const char*} 服务端地址，格式：ip:port
 	 *  the redis-server's listening address, format: ip:port
-	 * @param count {size_t} 连接池的最大连接数限制
-	 *  the max connections for each connection pool
+	 * @param count {size_t} 连接池的最大连接数限制，如果此值为 0，则连接池
+	 *  没有上限限制。
+	 *  the max connections for each connection pool. there is
+	 *  no connections limit of the pool when the count is 0.
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 *  the subscript of the connection pool in the connection cluster
 	 */

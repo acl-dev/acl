@@ -299,7 +299,7 @@ static ACL_XML_NODE *xml_iter_next(ACL_ITER *it, ACL_XML *xml)
 
 	node = (struct ACL_XML_NODE*) it->data;
 
-	/* 先遍历当前结点的子结点 */
+	/* 先遍历当前节点的子节点 */
 
 	ring_ptr = acl_ring_succ(&node->children);
 	if (ring_ptr != &node->children) {
@@ -309,7 +309,7 @@ static ACL_XML_NODE *xml_iter_next(ACL_ITER *it, ACL_XML *xml)
 		return (it->ptr);
 	}
 
-	/* 当前结点的子结点遍历完毕，再遍历当前结点的兄弟结点 */
+	/* 当前节点的子节点遍历完毕，再遍历当前节点的兄弟节点 */
 
 	parent = acl_xml_node_parent(node);
 	ring_ptr = acl_ring_succ(&node->node);
@@ -320,7 +320,7 @@ static ACL_XML_NODE *xml_iter_next(ACL_ITER *it, ACL_XML *xml)
 		return (it->ptr);
 	}
 
-	/* 当前结点的兄弟结点遍历完毕，最后遍历当前结点的父结点的兄弟结点 */
+	/* 当前节点的兄弟节点遍历完毕，最后遍历当前节点的父节点的兄弟节点 */
 
 	do {
 		if (parent == xml->root)
@@ -338,7 +338,7 @@ static ACL_XML_NODE *xml_iter_next(ACL_ITER *it, ACL_XML *xml)
 		}
 	} while (ring_ptr != &xml->root->children);
 
-	/* 遍历完所有结点 */
+	/* 遍历完所有节点 */
 
 	it->ptr = it->data = NULL;
 	return (NULL);
@@ -372,7 +372,7 @@ static ACL_XML_NODE *xml_iter_prev(ACL_ITER *it, ACL_XML *xml)
 
 	node = (struct ACL_XML_NODE*) it->data;
 
-	/* 先遍历当前结点的子结点 */
+	/* 先遍历当前节点的子节点 */
 
 	ring_ptr = acl_ring_pred(&node->children);
 	if (ring_ptr != &node->children) {
@@ -382,7 +382,7 @@ static ACL_XML_NODE *xml_iter_prev(ACL_ITER *it, ACL_XML *xml)
 		return (it->ptr);
 	}
 
-	/* 当前结点的子结点遍历完毕，再遍历当前结点的兄弟结点 */
+	/* 当前节点的子节点遍历完毕，再遍历当前节点的兄弟节点 */
 
 	parent = acl_xml_node_parent(node);
 	ring_ptr = acl_ring_pred(&node->node);
@@ -393,7 +393,7 @@ static ACL_XML_NODE *xml_iter_prev(ACL_ITER *it, ACL_XML *xml)
 		return (it->ptr);
 	}
 
-	/* 当前结点的兄弟结点遍历完毕，最后遍历当前结点的父结点的兄弟结点 */
+	/* 当前节点的兄弟节点遍历完毕，最后遍历当前节点的父节点的兄弟节点 */
 
 	do {
 		if (parent == xml->root)
@@ -411,7 +411,7 @@ static ACL_XML_NODE *xml_iter_prev(ACL_ITER *it, ACL_XML *xml)
 		}
 	} while (ring_ptr != &xml->root->children);
 
-	/* 遍历完所有结点 */
+	/* 遍历完所有节点 */
 
 	it->ptr = it->data = NULL;
 	return (NULL);
@@ -520,7 +520,7 @@ void acl_xml_reset(ACL_XML *xml)
 		(void) acl_xml_node_delete(node);
 	}
 
-	/* 因为根结点是一个虚结点，所以不需要释放，其会在调用
+	/* 因为根节点是一个虚节点，所以不需要释放，其会在调用
 	 * acl_xml_free 时被释放
 	 */ 
 	acl_ring_detach(&xml->root->node);
@@ -539,18 +539,18 @@ int acl_xml_is_closure(ACL_XML *xml)
 	ACL_RING *ring_ptr;
 	ACL_XML_NODE *node;
 
-	/* 获得 xml->root 结点的最后一个一级子结点 */
+	/* 获得 xml->root 节点的最后一个一级子节点 */
 	ring_ptr = acl_ring_succ(&xml->root->children);
 
 	if (ring_ptr == &xml->root->children) {
-		/* 说明没有真实子结点 */
+		/* 说明没有真实子节点 */
 		return (0);
 	}
 
 	node = acl_ring_to_appl(ring_ptr, ACL_XML_NODE, node);
 
 	if ((node->flag & ACL_XML_F_SELF_CL)) {
-		/* 说明该结点是自闭合结点 */
+		/* 说明该节点是自闭合节点 */
 		return (1);
 	}
 
@@ -558,7 +558,7 @@ int acl_xml_is_closure(ACL_XML *xml)
 		return (1);
 	}
 
-	/* 说明最后一个一级子结点还未处理完毕 */
+	/* 说明最后一个一级子节点还未处理完毕 */
 	return (0);
 }
 
@@ -567,23 +567,23 @@ int acl_xml_is_complete(ACL_XML *xml, const char *tag)
 	ACL_RING *ring_ptr;
 	ACL_XML_NODE *node;
 
-	/* 获得 xml->root 结点的最后一个一级子结点 */
+	/* 获得 xml->root 节点的最后一个一级子节点 */
 	ring_ptr = acl_ring_succ(&xml->root->children);
 
 	if (ring_ptr == &xml->root->children) {
-		/* 说明没有真实子结点 */
+		/* 说明没有真实子节点 */
 		return (0);
 	}
 
 	node = acl_ring_to_appl(ring_ptr, ACL_XML_NODE, node);
 
 	if ((node->flag & ACL_XML_F_SELF_CL)) {
-		/* 说明该结点是自闭合结点 */
+		/* 说明该节点是自闭合节点 */
 		return (1);
 	}
 
 	if (node->status != ACL_XML_S_RGT) {
-		/* 说明最后一个一级子结点还未处理完毕 */
+		/* 说明最后一个一级子节点还未处理完毕 */
 		return (0);
 	}
 
@@ -591,6 +591,6 @@ int acl_xml_is_complete(ACL_XML *xml, const char *tag)
 		return (1);
 	}
 
-	/* 说明 xml 中的最后一个结点与所给标签不匹配 */
+	/* 说明 xml 中的最后一个节点与所给标签不匹配 */
 	return (0);
 }

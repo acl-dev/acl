@@ -95,7 +95,5 @@ protected:
 
 private:
 	// redis 集群对象
-	acl::redis_client_cluster* cluster_;
-	// 管理 session 的集群对象
-	acl::session* session_;
+	acl::redis_client_cluster* redis_;
 };

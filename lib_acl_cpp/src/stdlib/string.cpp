@@ -9,7 +9,7 @@
 #define LEN(x)	ACL_VSTRING_LEN((x))
 #define	CAP(x)	ACL_VSTRING_SIZE((x))
 #define ADDCH(x, ch) ACL_VSTRING_ADDCH((x), (ch))
-#define MCP(x, from, n) acl_vstring_memcpy((x), (from), (n))
+#define MCP(to, from, n) acl_vstring_memcpy((to), (from), (n))
 #define MCAT(x, from, n) acl_vstring_memcat((x), (from), (n))
 #define SCP(x, from) acl_vstring_strcpy((x), (from))
 #define SCAT(x, from) acl_vstring_strcat((x), (from))

@@ -14,7 +14,7 @@ class ACL_CPP_API mail_attach
 {
 public:
 	/**
-	 * 构造函数
+	 * 将一个普通文件打包进邮件时的构造函数
 	 * @param filepath {const char*} 附件文件存储路径（含文件名）
 	 * @param content_type {const char*} 附件文件类型
 	 * @param charset {const char*} 若为纯文件，此参数表明纯文本的字符集

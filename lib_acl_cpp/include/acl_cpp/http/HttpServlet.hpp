@@ -16,8 +16,39 @@ class HttpServletResponse;
 class ACL_CPP_API HttpServlet
 {
 public:
-	HttpServlet(void);
+	/**
+	 * 构造函数
+	 * @param stream {socket_stream*} 当在 acl_master 服务器框架控制下
+	 *  运行时，该参数必须非空；当在 apache 下以 CGI 方式运行时，该参数
+	 *  设为 NULL；另外，该函数内部不会关闭流连接，应用应自行处理流对象
+	 *  的关闭情况，这样可以方便与 acl_master 架构结合
+	 * @param session {session*} 每一个 HttpServlet 对象一个 session 对象
+	 */
+	HttpServlet(socket_stream* stream, session* session);
+
+	/**
+	 * 构造函数
+	 * @param stream {socket_stream*} 当在 acl_master 服务器框架控制下
+	 *  运行时，该参数必须非空；当在 apache 下以 CGI 方式运行时，该参数
+	 *  设为 NULL；另外，该函数内部不会关闭流连接，应用应自行处理流对象
+	 *  的关闭情况，这样可以方便与 acl_master 架构结合
+	 * @param memcache_addr {const char*}
+	 */
+	HttpServlet(socket_stream* stream,
+		const char* memcache_addr = "127.0.0.1:11211");
+
+	HttpServlet();
 	virtual ~HttpServlet(void) = 0;
+
+	session& getSession() const
+	{
+		return *session_;
+	}
+
+	socket_stream* getStream() const
+	{
+		return stream_;
+	}
 
 	/**
 	 * 设置本地字符集，如果设置了本地字符集，则在接收 HTTP 请求数据时，会
@@ -56,6 +87,12 @@ public:
 
 	/**
 	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数
+	 * @return {bool} 返回处理结果
+	 */
+	bool doRun();
+
+	/**
+	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数
 	 * @param session {session&} 存储 session 数据的对象
 	 * @param stream {socket_stream*} 当在 acl_master 服务器框架控制下
 	 *  运行时，该参数必须非空；当在 apache 下以 CGI 方式运行时，该参数
@@ -72,8 +109,7 @@ public:
 	 * @param stream {socket_stream*} 含义同上
 	 * @return {bool} 返回处理结果
 	 */
-	bool doRun(const char* memcached_addr = "127.0.0.1:11211",
-		socket_stream* stream = NULL);
+	bool doRun(const char* memcached_addr, socket_stream* stream);
 
 	/**
 	 * 当 HTTP 请求为 GET 方式时的虚函数
@@ -149,6 +185,27 @@ public:
 	}
 
 	/**
+	 * 当 HTTP 请求为 PROPFIND 方式时的虚函数
+	 */
+	virtual bool doPropfind(HttpServletRequest&, HttpServletResponse&)
+	{
+		logger_error("child not implement doPurge yet!");
+		return false;
+	}
+
+	/**
+	 * 当 HTTP 请求方法未知时的虚函数
+	 * @param method {const char*} 其它未知的请求方法
+	 */
+	virtual bool doOther(HttpServletRequest&, HttpServletResponse&,
+		const char* method)
+	{
+		(void) method;
+		logger_error("child not implement doOther yet!");
+		return false;
+	}
+
+	/**
 	 * 当 HTTP 请求方法未知时的虚函数
 	 */
 	virtual bool doUnknown(HttpServletRequest&, HttpServletResponse&)
@@ -167,11 +224,16 @@ public:
 	}
 
 private:
+	session* session_;
+	session* session_ptr_;
+	socket_stream* stream_;
 	bool first_;
 	char local_charset_[32];
 	int  rw_timeout_;
 	bool parse_body_enable_;
 	int  parse_body_limit_;
+
+	void init();
 };
 
 } // namespace acl

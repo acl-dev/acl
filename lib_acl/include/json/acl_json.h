@@ -23,17 +23,20 @@ struct ACL_JSON_NODE {
 #define	ACL_JSON_T_A_STRING      (1 << 0)
 #define	ACL_JSON_T_A_NUMBER      (1 << 1)
 #define	ACL_JSON_T_A_BOOL        (1 << 2)
-#define	ACL_JSON_T_NUMBER        (1 << 3)
-#define ACL_JSON_T_OBJ           (1 << 4)
-#define ACL_JSON_T_ARRAY         (1 << 5)
+#define	ACL_JSON_T_A_NULL        (1 << 3)
+
+#define	ACL_JSON_T_STRING        (1 << 4)
+#define	ACL_JSON_T_NUMBER        (1 << 5)
 #define	ACL_JSON_T_BOOL          (1 << 6)
 #define	ACL_JSON_T_NULL          (1 << 7)
 
-#define ACL_JSON_T_TEXT          (1 << 8)
+#define ACL_JSON_T_ARRAY         (1 << 8)
+#define ACL_JSON_T_OBJ           (1 << 9)
+#define ACL_JSON_T_TEXT          (1 << 10)
 #define ACL_JSON_T_LEAF          ACL_JSON_T_TEXT
-#define ACL_JSON_T_MEMBER        (1 << 9)
-#define ACL_JSON_T_PAIR          (1 << 10)
-#define	ACL_JSON_T_ELEMENT       (1 << 11)
+#define ACL_JSON_T_MEMBER        (1 << 11)
+#define ACL_JSON_T_PAIR          (1 << 12)
+#define	ACL_JSON_T_ELEMENT       (1 << 13)
 
 	ACL_JSON_NODE *parent;      /**< 父结点 */
 	ACL_RING children;          /**< 子结点集合 */
@@ -211,9 +214,18 @@ ACL_API void acl_json_reset(ACL_JSON *json);
  * 解析 json 数据, 并持续地自动生成 json 结点树
  * @param json {ACL_JSON*} json 对象
  * @param data {const char*} 以 '\0' 结尾的数据字符串, 可以是完整的 json 数据;
- *  也可以是不完整的 json 数据, 允许循环调用此函数, 将不完整数据持续地输入
+ *  也可以是不完整的 json 数据, 允许循环调用此函数, 将不完整数据持续地输入; 该参数
+ *  若为 NULL，则直接返回空串地址，因此禁止为 NULL
+ * @return {const char*} 当解析结束后，该返回值表示剩余数据的指针地址
  */
-ACL_API void acl_json_update(ACL_JSON *json, const char *data);
+ACL_API const char* acl_json_update(ACL_JSON *json, const char *data);
+
+/**
+ * 判断 JSON 解析是否完成
+ * @param json {ACL_JSON*} json 对象
+ * @return {int} 返回非 0 值表示解析完成，否则表示未完成
+ */
+ACL_API int acl_json_finish(ACL_JSON *json);
 
 /*------------------------- in acl_json_util.c ----------------------------*/
 

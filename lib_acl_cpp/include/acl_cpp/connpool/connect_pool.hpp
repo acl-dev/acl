@@ -21,10 +21,11 @@ public:
 	/**
 	 * 构造函数
 	 * @param addr {const char*} 服务器监听地址，格式：ip:port(domain:port)
-	 * @param count {size_t} 连接池最大连接个数限制
+	 * @param max {size_t} 连接池最大连接个数限制，如果该值设为 0，则不设置
+	 *  连接池的连接上限
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 */
-	connect_pool(const char* addr, size_t count, size_t idx = 0);
+	connect_pool(const char* addr, size_t max, size_t idx = 0);
 
 	/**
 	 * 该类当允许自行销毁时，类实例应为动态对象
@@ -102,7 +103,7 @@ public:
 	}
 
 	/**
-	 * 获取连接池最大连接数限制
+	 * 获取连接池最大连接数限制，如果返回值为 0 则表示没有最大连接数限制
 	 * @return {size_t}
 	 */
 	size_t get_max() const

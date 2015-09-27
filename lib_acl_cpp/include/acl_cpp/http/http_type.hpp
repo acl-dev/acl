@@ -36,8 +36,9 @@ typedef enum
 	HTTP_METHOD_PURGE,      // PURGE 方法
 	HTTP_METHOD_DELETE,     // DELETE 方法
 	HTTP_METHOD_HEAD,       // HEAD 方法
-	HTTP_METHOD_OPTION      // OPTION 方法
-
+	HTTP_METHOD_OPTION,     // OPTION 方法
+	HTTP_METHOD_PROPFIND,	// PROPFIND 方法
+	HTTP_METHOD_OTHER,	// 其它的方法
 } http_method_t;
 
 typedef enum

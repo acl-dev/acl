@@ -1,7 +1,9 @@
 #include "StdAfx.h"
 #include <stdio.h>
+#include <string.h>
 #ifndef ACL_PREPARE_COMPILE
 #include "stdlib/acl_define.h"
+#include "stdlib/acl_stringops.h"
 #include "json/acl_json.h"
 #endif
 
@@ -17,22 +19,33 @@
 
 static const char *json_root(ACL_JSON *json, const char *data)
 {
-	SKIP_WHILE(*data != '{', data);
+	SKIP_WHILE(*data != '{' && *data != '[', data);
 	if (*data == 0)
-		return NULL;
+		return data;
+
+	if (*data == '{') {
+		json->root->left_ch = '{';
+		json->root->right_ch = '}';
+		json->status = ACL_JSON_S_MEMBER;
+		json->root->type = ACL_JSON_T_OBJ;
+	}
+	else
+	{
+		json->root->left_ch = '[';
+		json->root->right_ch = ']';
+		json->status = ACL_JSON_S_ELEMENT;
+		json->root->type = ACL_JSON_T_ARRAY;
+	}
+
 	data++;
 
-	json->root->left_ch = '{';
-	json->root->right_ch = '}';
-	json->status = ACL_JSON_S_MEMBER;
 	json->curr_node = json->root;
-	json->root->type = ACL_JSON_T_OBJ;
 	json->depth = json->depth;
 
 	return data;
 }
 
-/* 分析结点对象值，必须找到 '{' 或 '[' */
+/* 分析节点对象值，必须找到 '{' 或 '[' */
 
 static const char *json_obj(ACL_JSON *json, const char *data)
 {
@@ -40,9 +53,9 @@ static const char *json_obj(ACL_JSON *json, const char *data)
 
 	SKIP_SPACE(data);
 	if (*data == 0)
-		return NULL;
+		return data;
 
-	/* 创建对象 '{}' 子结点 */
+	/* 创建对象 '{}' 子节点 */
 
 	obj = acl_json_node_alloc(json);
 	obj->type = ACL_JSON_T_OBJ;
@@ -50,7 +63,7 @@ static const char *json_obj(ACL_JSON *json, const char *data)
 	if (obj->depth > json->depth)
 		json->depth = obj->depth;
 
-	/* 根据 json 结点对象前缀的不同，记录不同的对象后缀 */
+	/* 根据 json 节点对象前缀的不同，记录不同的对象后缀 */
 	obj->left_ch = '{';
 	obj->right_ch = '}';
 
@@ -67,7 +80,7 @@ static const char *json_obj(ACL_JSON *json, const char *data)
 
 static const char *json_member(ACL_JSON *json, const char *data)
 {
-	/* 创建上面所建对象结点的成员对象 */
+	/* 创建上面所建对象节点的成员对象 */
 	ACL_JSON_NODE *member = acl_json_node_alloc(json);
 
 	member->type = ACL_JSON_T_MEMBER;
@@ -77,14 +90,14 @@ static const char *json_member(ACL_JSON *json, const char *data)
 
 	acl_json_node_add_child(json->curr_node, member);
 
-	/* 将该成员对象置为当前 JSON 分析结点 */
+	/* 将该成员对象置为当前 JSON 分析节点 */
 	json->curr_node = member;
 	json->status = ACL_JSON_S_PAIR;
 
 	return data;
 }
 
-/* 解析结点的标签名称，结点允许没有标签名；叶结点没有 { } [ ] 分隔符 */
+/* 解析节点的标签名称，节点允许没有标签名；叶节点没有 { } [ ] 分隔符 */
 
 static const char *json_pair(ACL_JSON *json, const char *data)
 {
@@ -92,27 +105,26 @@ static const char *json_pair(ACL_JSON *json, const char *data)
 
 	SKIP_SPACE(data);
 	if (*data == 0)
-		return NULL;
+		return data;
 
 	acl_assert(parent);
 
-	/* 如果当前字符为父结点的右分隔符，则表示父结点结束 */
+	/* 如果当前字符为父节点的右分隔符，则表示父节点结束 */
 	if (*data == parent->right_ch) {
-		data++;  /* 去掉父结点的右分隔符 */
-
+		data++;  /* 去掉父节点的右分隔符 */
 		if (parent == json->root) {
-			/* 如果根结点分析结束则整个 json 分析完毕 */
+			/* 如果根节点分析结束则整个 json 分析完毕 */
 			json->finish = 1;
-			return NULL;
+			return data;
 		}
-		/* 弹出父结点 */
+		/* 弹出父节点 */
 		json->curr_node = parent;
-		/* 查询父结点的下一个兄弟结点 */
+		/* 查询父节点的下一个兄弟节点 */
 		json->status = ACL_JSON_S_NEXT;
 		return data;
 	}
 
-	/* 为 '{' 或 '[' 时说明遇到了当前结点的子结点 */
+	/* 为 '{' 或 '[' 时说明遇到了当前节点的子节点 */
 	if (*data == '{') {
 		data++;
 		json->status = ACL_JSON_S_OBJ;
@@ -134,7 +146,7 @@ static const char *json_pair(ACL_JSON *json, const char *data)
 	return data;
 }
 
-/* 解析结点的标签名称，结点允许没有标签名；叶结点没有 { } [ ] 分隔符 */
+/* 解析节点的标签名称，节点允许没有标签名；叶节点没有 { } [ ] 分隔符 */
 
 static const char *json_tag(ACL_JSON *json, const char *data)
 {
@@ -177,7 +189,7 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 
 				acl_assert(parent);
 
-				/* 数组对象的子结点允许为单独的字符串或对象 */
+				/* 数组对象的子节点允许为单独的字符串或对象 */
 				if (parent->left_ch == '[')
 					json->status = ACL_JSON_S_NEXT;
 
@@ -185,6 +197,10 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 				else
 					json->status = ACL_JSON_S_COLON;
 
+				/* 当在分析标签名结束后，需要把 quote 赋 0，
+				 * 这样在分析标签值时，可以复用该 quote 变量,
+				 * 如果不清 0，则会干扰分析标签值过程
+				 */
 				node->quote = 0;
 				node->part_word = 0;
 				data++;
@@ -257,7 +273,7 @@ static const char *json_colon(ACL_JSON *json, const char *data)
 {
 	SKIP_SPACE(data);
 	if (*data == 0)
-		return NULL;
+		return data;
 
 	if (*data != ':') {
 		data++;
@@ -267,7 +283,7 @@ static const char *json_colon(ACL_JSON *json, const char *data)
 	data++;
 
 	/* 下一步分析标签名所对应的标签值，有可能为字符串，
-	 * 也有可能为子结点对象
+	 * 也有可能为子节点对象
 	 */
 	json->status = ACL_JSON_S_VALUE;
 
@@ -280,7 +296,7 @@ static const char *json_array(ACL_JSON *json, const char *data)
 
 	SKIP_SPACE(data);
 	if (*data == 0)
-		return NULL;
+		return data;
 
 	/* 创建数组对象 */
 	array = acl_json_node_alloc(json);
@@ -309,7 +325,7 @@ static const char *json_element(ACL_JSON *json, const char *data)
 
 	SKIP_SPACE(data);
 	if (*data == 0)
-		return NULL;
+		return data;
 
 	if (*data == '{') {
 		data++;
@@ -329,22 +345,22 @@ static const char *json_element(ACL_JSON *json, const char *data)
 
 	acl_json_node_add_child(json->curr_node, element);
 
-	/* 将该数组成员对象置为当前 JSON 分析结点 */
+	/* 将该数组成员对象置为当前 JSON 分析节点 */
 	json->curr_node = element;
 	json->status = ACL_JSON_S_VALUE;
 
 	return data;
 }
 
-/* 分析标签值，该值有可能是纯文本(即该结点为叶结点)，也有可能是一个子结点 */
+/* 分析标签值，该值有可能是纯文本(即该节点为叶节点)，也有可能是一个子节点 */
 
 static const char *json_value(ACL_JSON *json, const char *data)
 {
 	SKIP_SPACE(data);
 	if (*data == 0)
-		return NULL;
+		return data;
 
-	/* 为 '{' 或 '[' 时说明遇到了当前结点的子结点 */
+	/* 为 '{' 或 '[' 时说明遇到了当前节点的子节点 */
 	if (*data == '{') {
 		data++;
 		json->status = ACL_JSON_S_OBJ;
@@ -356,7 +372,7 @@ static const char *json_value(ACL_JSON *json, const char *data)
 	/* 兼容一下有些数据格式为 "xxx: ," 的方式 */
 	else if (*data == ',' || *data == ';') {
 		data++;
-		/* 切换至查询该结点的兄弟结点的过程 */
+		/* 切换至查询该节点的兄弟节点的过程 */
 		json->status = ACL_JSON_S_NEXT;
 	}
 
@@ -365,7 +381,8 @@ static const char *json_value(ACL_JSON *json, const char *data)
 	else if (IS_QUOTE(*data)) { /* && json->curr_node->quote == 0) { */
 		json->curr_node->quote = *data++;
 		json->status = ACL_JSON_S_STRING;
-	} else
+	}
+	else
 		json->status = ACL_JSON_S_STRING;
 
 	json->curr_node->type = ACL_JSON_T_LEAF;
@@ -383,10 +400,10 @@ static const char *json_string(ACL_JSON *json, const char *data)
 		/* 先过滤开头没用的空格 */
 		SKIP_SPACE(data);
 		if (*data == 0)
-			return NULL;
+			return data;
 	}
 
-	/* 说明本结点是叶结点 */
+	/* 说明本节点是叶节点 */
 
 	while ((ch = *data) != 0) {
 		/* 如果开始有引号，则需要以该引号作为结尾符 */
@@ -420,9 +437,12 @@ static const char *json_string(ACL_JSON *json, const char *data)
 				} else
 					node->backslash = 1;
 			} else if (ch == node->quote) {
-				node->quote = 0;
+				/* 对节点的值，必须保留该 quote 值，以便于区分
+				 * 不同的值类型：bool, null, number, string
+				 * node->quote = 0;
+				 */
 
-				/* 切换至查询该结点的兄弟结点的过程 */
+				/* 切换至查询该节点的兄弟节点的过程 */
 				json->status = ACL_JSON_S_STREND;
 				node->part_word = 0;
 				data++;
@@ -459,7 +479,7 @@ static const char *json_string(ACL_JSON *json, const char *data)
 		} else if (IS_SPACE(ch) || ch == ',' || ch == ';'
 			|| ch == '}' || ch == ']')
 		{
-			/* 切换至查询该结点的兄弟结点的过程 */
+			/* 切换至查询该节点的兄弟节点的过程 */
 			json->status = ACL_JSON_S_STREND;
 			break;
 		}
@@ -487,11 +507,46 @@ static const char *json_string(ACL_JSON *json, const char *data)
 
 static const char *json_strend(ACL_JSON *json, const char *data)
 {
+	ACL_JSON_NODE *node = json->curr_node;
 	ACL_JSON_NODE *parent;
 
 	SKIP_SPACE(data);
 	if (*data == 0)
-		return NULL;
+		return data;
+
+#define	EQ(x, y) !strcasecmp((x), ((y)))
+
+	if (node->parent && node->parent->type == ACL_JSON_T_ARRAY)
+	{
+		if (EQ(STR(node->text), "null"))
+			node->type = ACL_JSON_T_A_NULL;
+		else if (EQ(STR(node->text), "true")
+			|| EQ(STR(node->text), "false"))
+		{
+			node->type = ACL_JSON_T_A_BOOL;
+		}
+		else if (acl_alldig(STR(node->text)))
+			node->type = ACL_JSON_T_A_NUMBER;
+		else
+			node->type = ACL_JSON_T_A_STRING;
+	}
+	else if (node->quote == 0)
+	{
+		if (EQ(STR(node->text), "null"))
+			node->type = ACL_JSON_T_NULL;
+		else if (EQ(STR(node->text), "true")
+			|| EQ(STR(node->text), "false"))
+		{
+			node->type = ACL_JSON_T_BOOL;
+		}
+		else if (acl_alldig(STR(node->text)))
+			node->type = ACL_JSON_T_NUMBER;
+		else
+			node->type = ACL_JSON_T_STRING;
+	}
+	else
+		node->type = ACL_JSON_T_STRING;
+
 
 	if (*data == ',' || *data == ';') {
 		json->status = ACL_JSON_S_NEXT;
@@ -504,18 +559,18 @@ static const char *json_strend(ACL_JSON *json, const char *data)
 		return data;
 	}
 
+	data++;
 	if (parent == json->root) {
 		json->finish = 1;
-		return NULL;
+		return data;
 	}
 
-	data++;
 	json->curr_node = parent;
 	json->status = ACL_JSON_S_NEXT;
 	return data;
 }
 
-/* 尝试分析本结点的下一个兄弟结点，必须能找到分隔符 ',' 或 ';' */
+/* 尝试分析本节点的下一个兄弟节点，必须能找到分隔符 ',' 或 ';' */
 
 static const char *json_brother(ACL_JSON *json, const char *data)
 {
@@ -523,14 +578,14 @@ static const char *json_brother(ACL_JSON *json, const char *data)
 
 	if (json->curr_node == json->root) {
 		json->finish = 1;
-		return NULL;
+		return data;
 	}
 
 	SKIP_SPACE(data);
 	if (*data == 0)
-		return NULL;
+		return data;
 
-	/* 如果到达根结点的结束符，则 json 解析过程完毕 */
+	/* 如果到达根节点的结束符，则 json 解析过程完毕 */
 	parent = acl_json_node_parent(json->curr_node);
 	acl_assert(parent);
 
@@ -550,14 +605,13 @@ static const char *json_brother(ACL_JSON *json, const char *data)
 
 	if (*data == parent->right_ch) {
 		data++;
-
 		if (parent == json->root) {
 			json->finish = 1;
-			return NULL;
+			return data;
 		}
 
 		json->curr_node = parent;
-		/* 查询父结点的下一个兄弟结点 */
+		/* 查询父节点的下一个兄弟节点 */
 		json->status = ACL_JSON_S_NEXT;
 		return data;
 	}
@@ -590,7 +644,7 @@ static struct JSON_STATUS_MACHINE status_tab[] = {
 	{ ACL_JSON_S_ARRAY,	json_array },   /* json array node */
 	{ ACL_JSON_S_ELEMENT,	json_element },
 	{ ACL_JSON_S_PAIR,	json_pair },    /* json pair node */
-	{ ACL_JSON_S_NEXT,	json_brother },    /* json brother node */
+	{ ACL_JSON_S_NEXT,	json_brother }, /* json brother node */
 	{ ACL_JSON_S_TAG,	json_tag },     /* json tag name */
 	{ ACL_JSON_S_VALUE,	json_value },   /* json node's value */
 	{ ACL_JSON_S_COLON,	json_colon },	/* json tag's ':' */
@@ -598,17 +652,26 @@ static struct JSON_STATUS_MACHINE status_tab[] = {
 	{ ACL_JSON_S_STREND,	json_strend },
 };
 
-void acl_json_update(ACL_JSON *json, const char *data)
+const char* acl_json_update(ACL_JSON *json, const char *data)
 {
 	const char *ptr = data;
 
+	if (data == NULL)
+		return "";
+
 	/* 检查是否已经解析完毕 */
 	if (json->finish)
-		return;
+		return ptr;
 
 	/* json 解析器状态机循环处理过程 */
 
-	while (ptr && *ptr) {
+	while (*ptr && !json->finish)
 		ptr = status_tab[json->status].callback(json, ptr);
-	}
+
+	return ptr;
+}
+
+int acl_json_finish(ACL_JSON *json)
+{
+	return json->finish;
 }

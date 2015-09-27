@@ -1,6 +1,24 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+359) 2015.9.25
+359.1) feature: http 模块中的 HttpServlet 类增加了 doOther 虚接口，从而可以
+支持其它未知的 HTTP 请求方法
+359.2) feature: smtp 模块下组装邮件的功能完善
+359.3) samples/mime/mail_builder: 示例功能完善
+
+358) 2015.9.22
+358.1) feature: json 解析器增加支持判断是否解析完毕的功能
+
+357) 2015.9.21
+357.1) bugfix（严重）: 连接池基础类 connect_pool 中的方法 check_idle 当参数
+exclusive 为 false 时会造成提前解锁; 该 BUG 影响所有该类的子类。
+357.2) safety: string 类中的宏 MCP 增加了安全性检测
+
+356) 2015.9.18
+356.1) feature: connect_pool/connect_manager 连接池及连接池管理类允许设置
+无连接数上限
+
 355) 2015.9.9
 355.1) feature: smtp_client 类已经可以非常方便地发送邮件
 355.2) samples/smtp_client: 测试邮件发送过程

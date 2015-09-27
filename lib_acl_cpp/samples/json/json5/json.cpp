@@ -49,7 +49,7 @@ static void test(bool once)
 		printf(">>>src:\r\n%s\r\n>>>dst:\r\n%s\r\n",
 			default_data, json.to_string().c_str());
 		printf("%s(%d): build json ERROR!\r\n", __FUNCTION__, __LINE__);
-		return;
+		exit (1);
 	}
 	printf("-------------------------------------------------\r\n");
 
@@ -96,7 +96,7 @@ static void test(bool once)
 		else
 		{
 			printf(">>>%s(%d)->ERROR not parent\r\n", __FUNCTION__, __LINE__);
-			return;
+			exit (1);
 		}
 
 		printf("-------------------------------------------------\r\n");

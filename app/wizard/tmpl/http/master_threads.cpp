@@ -40,8 +40,7 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 
 master_service::master_service()
 {
-	session_ = NULL;
-	cluster_ = NULL;
+	redis_ = NULL;
 }
 
 master_service::~master_service()
@@ -54,10 +53,7 @@ bool master_service::thread_on_read(acl::socket_stream* conn)
 	if (servlet == NULL)
 		logger_fatal("servlet null!");
 
-	if (var_cfg_use_redis_session)
-		return servlet->doRun(*session_, conn);
-	else
-		return servlet->doRun("127.0.0.1:11211", conn);
+	return servlet->doRun();
 }
 
 bool master_service::thread_on_accept(acl::socket_stream* conn)
@@ -66,7 +62,13 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 		conn->sock_handle());
 	conn->set_rw_timeout(var_cfg_rw_timeout);
 
-	http_servlet* servlet = new http_servlet();
+	acl::session* session;
+	if (var_cfg_use_redis_session)
+		session = new acl::redis_session(*redis_, var_cfg_max_threads);
+	else
+		session = new acl::memcache_session("127.0.0.1:11211");
+
+	http_servlet* servlet = new http_servlet(conn, session);
 	conn->set_ctx(servlet);
 
 	return true;
@@ -85,8 +87,9 @@ void master_service::thread_on_close(acl::socket_stream* conn)
 		conn->sock_handle());
 
 	http_servlet* servlet = (http_servlet*) conn->get_ctx();
-	if (servlet)
-		delete servlet;
+	acl::session* session = &servlet->getSession();
+	delete session;
+	delete servlet;
 }
 
 void master_service::thread_on_init()
@@ -100,18 +103,14 @@ void master_service::thread_on_exit()
 void master_service::proc_on_init()
 {
 	// create redis cluster for session cluster
-	cluster_ = new acl::redis_client_cluster(var_cfg_conn_timeout,
+	redis_ = new acl::redis_client_cluster(var_cfg_conn_timeout,
 			var_cfg_rw_timeout);
-	cluster_->init(NULL, var_cfg_redis_addrs, var_cfg_max_threads);
-
-	// create session cluster
-	session_ = new acl::redis_session(*cluster_, var_cfg_max_threads);
+	redis_->init(NULL, var_cfg_redis_addrs, var_cfg_max_threads);
 }
 
 void master_service::proc_on_exit()
 {
-	delete session_;
-	delete cluster_;
+	delete redis_;
 }
 
 bool master_service::proc_exit_timer(size_t nclients, size_t nthreads)

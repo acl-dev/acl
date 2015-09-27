@@ -3,7 +3,7 @@
 class http_servlet : public acl::HttpServlet
 {
 public:
-	http_servlet();
+	http_servlet(acl::socket_stream* stream, acl::session* session);
 	~http_servlet();
 
 protected:

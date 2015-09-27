@@ -72,9 +72,14 @@ bool https_client::http_request(acl::HttpServletRequest& req,
 
 	acl::http_client* front = req.getClient();
 
+	// 可以在此处强制替换 HTTP 请求头中的 HOST 字段
+	//front->header_update("Host", "www.test.com:443");
+
 	// 取得  HTTP 请求头数据
 	acl::string req_hdr;
 	front->sprint_header(req_hdr, NULL);
+
+	printf(">>>req_hdr: %s\r\n", req_hdr.c_str());
 
 	// 转发 HTTP 请求头至服务器
 	if (backend->get_ostream().write(req_hdr) == -1)

@@ -401,15 +401,45 @@ const char *acl_i64toa(acl_int64 value, char *buf, size_t size)
 
 #elif defined(ACL_UNIX)
 
+# ifdef MINGW
+static long long atoll(const char *s)
+{
+	long long num = 0;
+	int neg = 0;
+
+	while (isspace(*s))
+		s++;
+
+	if (*s == '-') {	
+		neg = 1;
+		s++;
+	}
+
+	while (isdigit(*s)) {
+		num = 10*num + (*s - '0');
+		s++;
+	}
+
+	if (neg)
+		num = -num;
+	return num;
+}
+# endif
+
 acl_uint64 acl_atoui64(const char *str)
 {
+#if 1
 	return (acl_uint64) atoll(str);
+#else
+	return (acl_uint64) strtoull(str, NULL, 10);
+#endif
 }
 
 acl_int64 acl_atoi64(const char *str)
 {
+#if 1
 	return (acl_int64) atoll(str);
-#if 0
+#else
 	return (acl_int64) strtoull(str, NULL, 10);
 #endif
 }

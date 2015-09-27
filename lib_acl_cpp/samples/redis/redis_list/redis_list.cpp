@@ -29,13 +29,13 @@ static bool test_lpush(acl::redis_list& redis, int n)
 		int ret = redis.lpush(__key, value.c_str(), NULL);
 		if (ret <= 0)
 		{
-			printf("lpush key: %s error: %s\r\n",
-				__key, redis.result_error());
+			printf("lpush key: %s error: %s, ret: %d\r\n",
+				__key, redis.result_error(), ret);
 			return false;
 		}
 		else if (i < max_print_line)
-			printf("lpush ok, key:%s ,value:%s \r\n",
-				__key, value.c_str());
+			printf("lpush ok, key:%s, value:%s, ret: %d\r\n",
+				__key, value.c_str(), ret);
 	}
 
 	return true;
@@ -711,6 +711,8 @@ int main(int argc, char* argv[])
 	int  ch, n = 50, conn_timeout = 10, rw_timeout = 10;
 	acl::string addr("127.0.0.1:6379"), cmd("all");
 	bool cluster_mode = false;
+
+	acl::log::stdout_open(true);
 
 	while ((ch = getopt(argc, argv, "hs:n:C:T:a:c")) > 0)
 	{

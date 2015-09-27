@@ -13,7 +13,8 @@ using namespace acl;
 class http_servlet : public HttpServlet
 {
 public:
-	http_servlet(void)
+	http_servlet(socket_stream* stream, session* session)
+		: HttpServlet(stream, session)
 	{
 
 	}
@@ -106,9 +107,9 @@ protected:
 	virtual void on_accept(socket_stream* stream)
 	{
 		memcache_session session("127.0.0.1:11211");
-		http_servlet servlet;
+		http_servlet servlet(stream, &session);
 		servlet.setLocalCharset("gb2312");
-		servlet.doRun(session, stream);
+		servlet.doRun();
 	}
 };
 
@@ -125,7 +126,7 @@ int main(int argc, char* argv[])
 	{
 		format = (void (*)(const char*, ...)) printf;
 		printf("listen: 0.0.0.0:8888 ...\r\n");
-		service.run_alone("0.0.0.0:8888", NULL, 1);  // 单独运行方式
+		service.run_alone("0.0.0.0:8888", NULL, 0);  // 单独运行方式
 	}
 	else
 	{

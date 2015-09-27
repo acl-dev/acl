@@ -10,7 +10,8 @@ using namespace acl;
 class http_servlet : public HttpServlet
 {
 public:
-	http_servlet(void)
+	http_servlet(socket_stream* stream, session* session)
+		: HttpServlet(stream, session)
 	{
 
 	}
@@ -20,7 +21,8 @@ public:
 
 	}
 
-	virtual bool doUnknown(HttpServletRequest&, HttpServletResponse& res)
+	virtual bool doOther(HttpServletRequest&, HttpServletResponse& res,
+		const char* method)
 	{
 		res.setStatus(400);
 		res.setContentType("text/xml; charset=gb2312");
@@ -28,7 +30,8 @@ public:
 		if (res.sendHeader() == false)
 			return false;
 		// 发送 http 响应体
-		string buf("<root error='unkown request method' />\r\n");
+		string buf;
+		buf.format("<root error='unkown method: %s' />\r\n", method);
 		(void) res.getOutputStream().write(buf);
 		return false;
 	}
@@ -107,9 +110,9 @@ private:
 static void do_run(socket_stream* stream)
 {
 	memcache_session session("127.0.0.1:11211");
-	http_servlet servlet;
+	http_servlet servlet(stream, &session);
 	servlet.setLocalCharset("gb2312");
-	servlet.doRun(session, stream);
+	servlet.doRun();
 }
 
 // 服务器方式运行时的服务类

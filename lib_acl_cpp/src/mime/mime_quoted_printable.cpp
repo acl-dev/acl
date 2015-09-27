@@ -7,7 +7,7 @@ namespace acl {
 
 mime_quoted_printable::mime_quoted_printable(
 	bool addCrlf /* = false */, bool addInvalid /* = false */)
-	: mime_code(addCrlf, addInvalid, "quoted_printable")
+	: mime_code(addCrlf, addInvalid, "quoted-printable")
 {
 	m_addCrLf = addCrlf;
 	m_addInvalid = addInvalid;

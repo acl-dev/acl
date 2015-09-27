@@ -51,13 +51,13 @@ void master_service::on_accept(acl::socket_stream* conn)
 	conn->set_rw_timeout(10);
 
 	acl::memcache_session session("127.0.0.1:11211");
-	http_servlet servlet;
+	http_servlet servlet(conn, &session);
 
 	// charset: big5, gb2312, gb18030, gbk, utf-8
 	servlet.setLocalCharset("utf-8");
 	while (true)
 	{
-		if (servlet.doRun(session, conn) == false)
+		if (servlet.doRun() == false)
 			break;
 	}
 
@@ -74,7 +74,8 @@ void master_service::proc_on_exit()
 
 void master_service::do_cgi()
 {
-        http_servlet servlet;
+	acl::memcache_session session("127.0.0.1:11211");
+        http_servlet servlet(NULL, &session);
         servlet.setLocalCharset("utf-8");
-        servlet.doRun("127.0.0.1:11211", NULL);
+        servlet.doRun();
 }

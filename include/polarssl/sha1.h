@@ -31,7 +31,7 @@
 
 #include <string.h>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(MINGW)
 #include <basetsd.h>
 typedef UINT32 uint32_t;
 #else

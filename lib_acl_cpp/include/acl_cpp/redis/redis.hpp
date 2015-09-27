@@ -41,8 +41,26 @@ class ACL_CPP_API redis
 	, public redis_geo
 {
 public:
+	/**
+	 * 非集群方式的构造函数
+	 * the constructor with no redis cluster
+	 * @param conn {redis_client*} 一个 redis 节点的连接对象
+	 *  one redis node's connection
+	 */
 	redis(redis_client* conn = NULL);
-	redis(redis_client_cluster* cluster, size_t max_conns);
+
+	/**
+	 * 集群方式的构造函数
+	 * the constructor in redis cluster mode
+	 * @param cluster {redis_client_cluster*} 集群对象
+	 *  the redis cluster object
+	 * @param max_conns {size_t} 集群方式下连接每个 redis 服务节点的
+	 *  连接池连接上限，如果设为 0，则每个连接池没有上限限制
+	 *  the limit of each connections pool in redis cluster mode,
+	 *  there is no connections limit of each pool if the max_conns
+	 *  is set to 0.
+	 */
+	redis(redis_client_cluster* cluster, size_t max_conns = 0);
 	~redis() {}
 };
 

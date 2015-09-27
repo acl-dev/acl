@@ -522,12 +522,12 @@ static const char *xml_parse_attr_val(ACL_XML *xml, const char *data)
 			if (acl_htable_find(xml->id_table, ptr) == NULL) {
 				acl_htable_enter(xml->id_table, ptr, attr);
 
-				/* 只有当该属性被加入哈希表后才会赋于结点的 id */
+				/* 只有当该属性被加入哈希表后才会赋于节点的 id */
 				xml->curr_node->id = attr->value;
 			}
 		}
 
-		/* 必须将该结点的当前属性对象置空，以便于继续解析时
+		/* 必须将该节点的当前属性对象置空，以便于继续解析时
 		 * 可以创建新的属性对象
 		 */
 		xml->curr_node->curr_attr = NULL;
@@ -561,8 +561,8 @@ static const char *xml_parse_text(ACL_XML *xml, const char *data)
 		return (data);
 
 	if ((xml->curr_node->flag & ACL_XML_F_SELF_CL)) {
-		/* 如果该标签是自关闭类型，则应使父结点直接跳至右边 '/' 处理位置,
-		 * 同时使本结点跳至右边 '>' 处理位置
+		/* 如果该标签是自关闭类型，则应使父节点直接跳至右边 '/' 处理位置,
+		 * 同时使本节点跳至右边 '>' 处理位置
 		 */
 		ACL_XML_NODE *parent = acl_xml_node_parent(xml->curr_node);
 		if (parent != xml->root)
@@ -596,12 +596,12 @@ static const char *xml_parse_right_lt(ACL_XML *xml, const char *data)
 		return (data);
 	}
 
-	/* 说明遇到了当前结点的子结点 */
+	/* 说明遇到了当前节点的子节点 */
 
-	/* 重新设置当前结点状态，以便于其可以找到 "</" */
+	/* 重新设置当前节点状态，以便于其可以找到 "</" */
 	xml->curr_node->status = ACL_XML_S_TXT;
 
-	/* 创建新的子结点，并将其加入至当前结点的子结点集合中 */
+	/* 创建新的子节点，并将其加入至当前节点的子节点集合中 */
 
 	node = acl_xml_node_alloc(xml);
 	acl_xml_node_add_child(xml->curr_node, node);
@@ -622,8 +622,8 @@ static const char *xml_parse_right_gt(ACL_XML *xml, const char *data)
 	return (data);
 }
 
-/* 因为该父结点其实为叶结点，所以需要更新附属于该伪父结点的
- * 子结点的深度值，都应与该伪父结点相同
+/* 因为该父节点其实为叶节点，所以需要更新附属于该伪父节点的
+ * 子节点的深度值，都应与该伪父节点相同
  */ 
 static void update_children_depth(ACL_XML_NODE *parent)
 {
@@ -637,7 +637,7 @@ static void update_children_depth(ACL_XML_NODE *parent)
 	}
 }
 
-/* 查找与右标签相同的父结点 */
+/* 查找与右标签相同的父节点 */
 static int search_match_node(ACL_XML *xml)
 {
 	ACL_XML_NODE *parent, *node;
@@ -717,7 +717,7 @@ static const char *xml_parse_right_tag(ACL_XML *xml, const char *data)
 		if ((xml->flag & ACL_XML_FLAG_IGNORE_SLASH))
 			ret = search_match_node(xml);
 		if (ret == 0) {
-			/* 如果结点标签名与开始标签名不匹配，
+			/* 如果节点标签名与开始标签名不匹配，
 			 * 则需要继续寻找真正的结束标签
 			 */ 
 			acl_vstring_strcat(curr_node->text,
@@ -725,7 +725,7 @@ static const char *xml_parse_right_tag(ACL_XML *xml, const char *data)
 			ACL_VSTRING_RESET(curr_node->rtag);
 			ACL_VSTRING_TERMINATE(curr_node->rtag);
 
-			/* 重新设置当前结点状态，以便于其可以找到 "</" */
+			/* 重新设置当前节点状态，以便于其可以找到 "</" */
 			curr_node->status = ACL_XML_S_TXT;
 		}
 	}

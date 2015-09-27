@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "http_servlet.h"
 
-http_servlet::http_servlet(const char* filepath)
+http_servlet::http_servlet(const char* filepath, acl::socket_stream* conn,
+	acl::session* session)
+	: acl::HttpServlet(conn, session)
 {
 	if (filepath && *filepath)
 		filepath_ = filepath;

@@ -45,7 +45,7 @@ protected:
 	/**
 	 * 基类 connect_manager 虚函数的实现
 	 * @param addr {const char*} 服务器监听地址，格式：ip:port
-	 * @param count {size_t} 连接池的大小限制
+	 * @param count {size_t} 连接池的大小限制，该值为 0 时则没有限制
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 * @return {connect_pool*} 返回创建的连接池对象
 	 */

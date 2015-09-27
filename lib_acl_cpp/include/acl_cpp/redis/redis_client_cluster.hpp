@@ -137,13 +137,13 @@ protected:
 	 * the connection pool
 	 * @param addr {const char*} 服务器监听地址，格式：ip:port;
 	 * the server addr for the connection pool, such as ip:port
-	 * @param count {size_t} 连接池的大小限制;
-	 * the max connections in one connection pool
+	 * @param count {size_t} 连接池的大小限制，该值没有 0 时则没有限制
+	 * the max connections in one connection pool, if it's 0 there
+	 * is no limit of the connections pool.
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始);
 	 * the index of the connection pool in pool array
 	 */
-	connect_pool* create_pool(const char* addr,
-		size_t count, size_t idx);
+	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
 
 private:
 	int   conn_timeout_;

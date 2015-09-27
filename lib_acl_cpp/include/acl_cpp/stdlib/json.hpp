@@ -309,8 +309,15 @@ public:
 	 * 对象，则应该在解析下一个 json 对象前调用 reset() 方法来清
 	 * 除上一次的解析结果
 	 * @param data {const char*} json 数据
+	 @return {const char*} 当解析结束后，该返回值表示剩余数据的指针地址
 	 */
-	void update(const char* data);
+	const char* update(const char* data);
+
+	/**
+	 * 判断是否解析完毕
+	 * @return {bool}
+	 */
+	bool finish();
 
 	/**
 	 * 重置 json 解析器状态，该 json 对象可以用来对多个 json 数据
@@ -504,7 +511,7 @@ public:
 	 * 将 json 对象树转成字符串
 	 * @param out {string&} 存储转换结果的缓冲区
 	 */
-	void build_json(string& out);
+	void build_json(string& out) const;
 
 	/**
 	 * 将 json 对象树转换成 json 字符串

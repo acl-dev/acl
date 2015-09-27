@@ -19,7 +19,7 @@ public:
 	/**
 	 * 构造函数
 	 * @param addr {const char*} 服务端地址，格式：ip:port
-	 * @param count {size_t} 连接池的最大连接数限制
+	 * @param count {size_t} 连接池的最大连接数限制，当该值为 0 时则没有限制
 	 * @param idx {size_t} 该连接池对象在集合中的下标位置(从 0 开始)
 	 */
 	memcache_pool(const char* addr, size_t count, size_t idx = 0);

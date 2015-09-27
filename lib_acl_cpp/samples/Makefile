@@ -93,3 +93,5 @@ clean:
 	@(cd socket; make clean)
 	@(cd db; make clean)
 	@(cd redis; make clean)
+
+rebuild rb: clean all

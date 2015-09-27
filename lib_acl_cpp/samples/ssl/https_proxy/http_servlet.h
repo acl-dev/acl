@@ -25,6 +25,10 @@ protected:
 		acl::HttpServletResponse& res);
 	bool doOptions(acl::HttpServletRequest& req,
 		acl::HttpServletResponse& res);
+	bool doPropfind(acl::HttpServletRequest& req,
+		acl::HttpServletResponse& res);
+	bool doOther(acl::HttpServletRequest& req,
+		acl::HttpServletResponse& res, const char* method);
 
 private:
 	bool handled_;
