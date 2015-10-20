@@ -5,6 +5,7 @@
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/redis/redis_result.hpp"
+#include "acl_cpp/redis/redis_connection.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
 #include "redis_request.hpp"
 
@@ -22,13 +23,28 @@ redis_client::redis_client(const char* addr, int conn_timeout /* = 60 */,
 , slice_res_(false)
 {
 	addr_ = acl_mystrdup(addr);
+	pass_ = NULL;
 }
 
 redis_client::~redis_client()
 {
 	acl_myfree(addr_);
+	if (pass_)
+		acl_myfree(pass_);
+
 	if (conn_.opened())
 		conn_.close();
+}
+
+redis_client& redis_client::set_password(const char* pass)
+{
+	if (pass_)
+		acl_myfree(pass_);
+	if (pass && *pass)
+		pass_ = acl_mystrdup(pass);
+	else
+		pass_ = NULL;
+	return *this;
 }
 
 socket_stream* redis_client::get_stream()
@@ -51,6 +67,22 @@ bool redis_client::open()
 			addr_, last_serror());
 		return false;
 	}
+
+	// 如果连接密码非空，则尝试用该密码向 redis-server 认证合法性
+	if (pass_ && *pass_)
+	{
+		redis_connection connection(this);
+		if (connection.auth(pass_) == false)
+		{
+			logger_error("auth error, addr: %s, passwd: %s",
+				addr_, pass_);
+			// 此处返回 true，以便于上层使用该连接访问时
+			// 由 redis-server 直接给命令报未认证的错训，
+			// 从而免得在 redis_command 类中不断地重试连接
+			return true;
+		}
+	}
+
 	return true;
 }
 

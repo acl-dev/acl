@@ -38,6 +38,13 @@ public:
 	~redis_client();
 
 	/**
+	 * 调用本函数设置连接 redis 服务的连接密码
+	 * @param pass {const char*}
+	 * @return {redis_client&}
+	 */
+	redis_client& set_password(const char* pass);
+
+	/**
 	 * 判断该网络连接对象是否已经关闭
 	 * check if the connection has been finish
 	 * @return {bool}
@@ -120,6 +127,7 @@ private:
 	char* addr_;
 	int   conn_timeout_;
 	int   rw_timeout_;
+	char* pass_;
 	bool  retry_;
 	string  buf_;
 	bool slice_req_;

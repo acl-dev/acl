@@ -47,6 +47,15 @@ connect_pool* redis_client_cluster::create_pool(const char* addr,
 	redis_client_pool* pool = NEW redis_client_pool(addr, count, idx);
 	pool->set_timeout(conn_timeout_, rw_timeout_);
 
+	string key(addr);
+	key.lower();
+	std::map<string, string>::const_iterator cit;
+	if ((cit = passwds_.find(key)) != passwds_.end()
+		|| (cit = passwds_.find("default")) != passwds_.end())
+	{
+		pool->set_password(cit->second.c_str());
+	}
+
 	return pool;
 }
 
@@ -150,6 +159,21 @@ void redis_client_cluster::set_all_slot(const char* addr, int max_conns)
 		for (size_t i = slot_min; i <= slot_max; i++)
 			set_slot((int) i, buf);
 	}
+}
+
+redis_client_cluster& redis_client_cluster::set_password(
+	const char* addr, const char* pass)
+{
+	// 允许 pass 为空字符串且非空指针，这样就可以当 default 值被设置时，
+	// 允许部分 redis 节点无需连接密码
+	if (addr && *addr && pass)
+	{
+		string key(addr);
+		key.lower();
+		passwds_[key] = pass;
+	}
+
+	return *this;
 }
 
 } // namespace acl

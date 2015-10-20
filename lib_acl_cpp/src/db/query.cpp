@@ -14,8 +14,7 @@ query::query()
 
 query::~query()
 {
-	if (sql_buf_)
-		delete sql_buf_;
+	delete sql_buf_;
 	reset();
 }
 

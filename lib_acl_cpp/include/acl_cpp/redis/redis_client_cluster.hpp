@@ -1,6 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <vector>
+#include <map>
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/connpool/connect_manager.hpp"
 
@@ -130,6 +131,19 @@ public:
 		return redirect_sleep_;
 	}
 
+	/**
+	 * 设置某个 redis 服务相应的连接密码
+	 * set the password of one redis-server
+	 * @param addr {const char*} 指定的某 redis 服务器地址，当该参数的值为
+	 *  default 时，则指定了集群中所有 redis 服务器的缺省连接密码
+	 *  the specified redis-server's addr, the default password of all
+	 *  redis-server will be set when the addr's value is 'default'
+	 * @param pass {const char*} 指定的 redis 服务器连接密码
+	 *  the password of the specified redis-server
+	 * @return {redis_client_cluster&}
+	 */
+	redis_client_cluster& set_password(const char* addr, const char* pass);
+
 protected:
 	/**
 	 * 基类纯虚函数，用来创建连接池对象;
@@ -153,6 +167,7 @@ private:
 	std::vector<char*> addrs_;
 	int   redirect_max_;
 	int   redirect_sleep_;
+	std::map<string, string> passwds_;
 };
 
 } // namespace acl

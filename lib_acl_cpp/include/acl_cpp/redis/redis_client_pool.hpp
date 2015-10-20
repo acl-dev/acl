@@ -41,6 +41,13 @@ public:
 	 */
 	redis_client_pool& set_timeout(int conn_timeout, int rw_timeout);
 
+	/**
+	 * 设置连接 redis 服务器的连接密码
+	 * @param pass {const char*} 连接密码
+	 * @return {redis_client_pool&}
+	 */
+	redis_client_pool& set_password(const char* pass);
+
 protected:
 	/**
 	 * 基类纯虚函数: 调用此函数用来创建一个新的连接
@@ -52,6 +59,7 @@ protected:
 private:
 	int   conn_timeout_;
 	int   rw_timeout_;
+	char* pass_;
 };
 
 } // namespace acl

@@ -331,7 +331,8 @@ public:
 	bool lset(const char* key, int idx, const char* value, size_t len);
 
 	/**
-	 * 对指定的列表对象，根据限定区间范围进行删除；区间以偏移量 start 和 end 指定；
+	 * 对指定的列表对象，对一个列表进行修剪，让列表只保留指定区间内的元素，
+	 * 不在指定区间之内的元素都将被删除；区间以偏移量 start 和 end 指定；
 	 * 下标起始值从 0 开始，-1 表示最后一个下标值
 	 * remove elements in a list by range betwwen start and end.
 	 * @param key {const char*} 列表对象的 key

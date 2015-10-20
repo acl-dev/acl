@@ -1,6 +1,17 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+498) 2015.10.7
+498.1) bugfix: acl_atoui64/acl_atoi64 在 WINDOWS 平台使用 VC2012 编译时有问题，
+因为内部所用的 VC 提供的 API _atoi64 有问题，当转换最大的 64 位整数（18446744073709551615）
+时会自动截断，而 VC2003 却没有此问题
+
+498.2) 整理 acl_mystring.c 中的代码
+498.3) feature: json 解析器增加了函数 acl_json_getFirstElementByTagName，该方法在
+遍历过程中当匹配到一个符合的节点后便立即返回，因而效率比 acl_json_getElementsByTagName 更高
+498.4) feature: xml 解析器增加了函数 acl_xml_getFirstElementByTagName，该方法在
+遍历过程中当匹配到一个符合的节点后便立即返回，因而效率比 acl_xml_getElementsByTagName 更高
+
 497) 2015.9.23
 497.1) feature: json 解析器支持最外层为数组类型，同时完全支持：bool, number, null 类型的数据
 

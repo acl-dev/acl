@@ -145,7 +145,8 @@ ACL_VSTRING *acl_vstring_slice_alloc(ACL_SLICE_POOL *slice, size_t len)
 	ACL_VSTRING *vp;
 
 	if (len < 1)
-		acl_msg_panic("acl_vstring_alloc: bad length %d", (int) len);
+		len = 64;
+
 	if (slice) {
 		vp = (ACL_VSTRING*) acl_slice_pool_alloc(__FILE__, __LINE__,
 			slice, sizeof(*vp));

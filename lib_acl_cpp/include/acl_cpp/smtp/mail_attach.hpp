@@ -24,6 +24,15 @@ public:
 	~mail_attach();
 
 	/**
+	 * 设置附件的文件名，内部会自动对文件名用 rfc2047 格式进行编码
+	 * @param name {const char*} 非空字符串
+	 * @param charset {const char*} 该参数指定字符集，当非 NULL 时，则内
+	 *  部自动使用 rfc2047 格式对文件名进行编码，否则内部直接存储输入名称
+	 * @return {mail_attach&}
+	 */
+	mail_attach& set_filename(const char* name, const char* charset = NULL);
+
+	/**
 	 * 当邮件中的数据体为 multipart/relative 类型时，调用此函数设置其中的
 	 * html 正文中 cid 标识符
 	 * @param id {const char*} cid 标识符
@@ -96,6 +105,8 @@ private:
 	string ctype_;
 	string cid_;
 	string charset_;
+
+	bool rfc2047_encode(const char* name, const char* charset, string& out);
 };
 
 } // namespace acl

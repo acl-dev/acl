@@ -111,9 +111,9 @@ char *acl_uppercase3(const char *s, char *buf, size_t size)
 	return buf;
 }
 
-/* acl_mystrtok - safe tokenizer */
+/* acl_strtok - safe tokenizer */
 
-char *acl_mystrtok(char **src, const char *sep)
+char *acl_strtok(char **src, const char *sep)
 {
 	char   *start = *src;
 	char   *end;
@@ -137,8 +137,7 @@ char *acl_mystrtok(char **src, const char *sep)
 	return start;
 }
 
-/* acl_mystrline */
-char *acl_mystrline(char **src)
+char *acl_strline(char **src)
 {
 	char *start = *src;
 	char *end = *src;
@@ -181,7 +180,7 @@ TAG_LOOP_END:
 	return start;
 }
 
-char *acl_mystr_trim(char *str)
+char *acl_strtrim(char *str)
 {
 	size_t len;
 	char *ptr = str;
@@ -191,7 +190,9 @@ char *acl_mystr_trim(char *str)
 	while (*ptr) {
 		if (*ptr == ' ' || *ptr == '\t') {
 			memmove(ptr, ptr + 1, len--);
-		} else if (((*ptr) &0xff) == 0xa1 && ((*(ptr + 1)) & 0xff) == 0xa1) {
+		} else if (((*ptr) &0xff) == 0xa1
+			&& ((*(ptr + 1)) & 0xff) == 0xa1)
+		{
 			/* 对于全角的空格为: '　', 即 0xa10xa1 */
 			len--;
 			memmove(ptr, ptr + 2, len--);
@@ -204,97 +205,98 @@ char *acl_mystr_trim(char *str)
 	return str;
 }
 
-int acl_mystr_strip(const char *haystack, const char *needle, char *buf, int bsize)
+int acl_strstrip(const char *haystack, const char *needle,
+	char *buf, int bsize)
 {
-	const char *ptr_src;
-	char *ptr_des, *ptr;
+	const char *src;
+	char *des, *ptr;
 	int len, n, ncpy = 0;
 
 	if (haystack == NULL || *haystack == 0 || needle == NULL
 	    || *needle == 0 || buf == NULL || bsize <= 0)
 		return -1;
 
-	ptr_src = haystack;
-	ptr_des = buf;
-	len     = (int) strlen(needle);
+	src = haystack;
+	des = buf;
+	len = (int) strlen(needle);
 
 	while(1) {
-		ptr = strstr(ptr_src, needle);
+		ptr = strstr(src, needle);
 		if (ptr == NULL) {
-			n = (int) strlen(ptr_src);
+			n = (int) strlen(src);
 			if (bsize > n) {
-				ACL_SAFE_STRNCPY(ptr_des, ptr_src, bsize);
+				ACL_SAFE_STRNCPY(des, src, bsize);
 				ncpy += n;
-				*(ptr_des + n) = 0;
+				*(des + n) = 0;
 			}
 			break;
 		}
-		n = (int) (ptr - ptr_src);
+		n = (int) (ptr - src);
 		if (bsize <= n)
 			break;
-		ACL_SAFE_STRNCPY(ptr_des, ptr_src, bsize);
+		ACL_SAFE_STRNCPY(des, src, bsize);
 		ncpy    += n;
 		bsize   -= n;
-		ptr_des += n;
-		*ptr_des = 0;
-		ptr_src += n + len;
+		des += n;
+		*des = 0;
+		src += n + len;
 	}
 
 	return ncpy;
 }
 
-int acl_mystr_truncate_byln(char *str_src)
+int acl_strtrunc_byln(char *str)
 {
-	if (str_src == NULL)
+	if (str == NULL)
 		return -1;
 
-	while (*str_src) {
-		if (*str_src == '\r' || *str_src == '\n') {
-			*str_src = 0;
+	while (*str) {
+		if (*str == '\r' || *str == '\n') {
+			*str = 0;
 			break;
 		}
-		str_src++;
+		str++;
 	}
 
 	return 0;
 }
 
-/*---------------------------------------------------------------------------- 
+/*--------------------------------------------------------------------------
  * 返回指针的当前位置, 并且删除路径中多余的 '/'(for unix) or '\\'(for windows)
  * 并且返回的当前指针所存储的字符为 '\0', 而到数第二个字符有可能为 '/' or '\\',
  * 也有可能不为 //'/' or '\\', 但在结果集中绝不会出现连续的 '/' or '\\'
  */
 static char *path_str_strip(const char *psrc, char *pbuf, int sizeb)
 {
-	const   char *ptr_src = psrc;
-	char    *ptr_obj;
+	const   char *ptr = psrc;
+	char    *obj;
 	int     n;
 
-	if (ptr_src == NULL || *ptr_src == 0 || pbuf == NULL || sizeb <= 0)
+	if (ptr == NULL || *ptr == 0 || pbuf == NULL || sizeb <= 0)
 		return NULL;
 
-	ptr_obj = pbuf;
-	n       = sizeb;
+	obj = pbuf;
+	n   = sizeb;
 
-	while (*ptr_src && n > 0) {
-		if (*ptr_src == PATH_SEP_C
-		    && *(ptr_src + 1) == PATH_SEP_C)
-			; /* skip any useless '/'(in unix) or '\\'(in windows) */
+	while (*ptr && n > 0) {
+		/* skip any useless '/'(in unix) or '\\'(in windows) */
+		if (*ptr == PATH_SEP_C && *(ptr + 1) == PATH_SEP_C)
+		    ;
 		else {
-			*ptr_obj++ = *ptr_src;
+			*obj++ = *ptr;
 			n--;
 		}
 
-		ptr_src++;
+		ptr++;
 	}
 
 	if (n <= 0)      /* 说明所给的缓冲区空间不够大 */
 		return NULL;
 
 	/* 必须保证最后一个字符是以 '\0' 结束 */
-	*ptr_obj = 0;
+	*obj = 0;
 
-	return ptr_obj;
+	return obj;
 }
 /*----------------------------------------------------------------------------
  * 保证结果类似于如下形式:
@@ -373,16 +375,47 @@ size_t acl_strnlen(const char * s, size_t count)
         return sc - s;
 }
 
+long long acl_atoll(const char *s)
+{
+	long long num = 0;
+	int neg = 0;
+
+	while (isspace(*s))
+		s++;
+
+	if (*s == '-') {	
+		neg = 1;
+		s++;
+	}
+
+	while (isdigit(*s)) {
+		num = 10 * num + (*s - '0');
+		s++;
+	}
+
+	if (neg)
+		num = -num;
+	return num;
+}
+
 #ifdef ACL_WINDOWS
 
 acl_uint64 acl_atoui64(const char *str)
 {
+#if 0
 	return (acl_uint64) _atoi64(str);
+#else
+	return (acl_uint64) acl_atoll(str);
+#endif
 }
 
 acl_int64 acl_atoi64(const char *str)
 {
+#if 0
 	return _atoi64(str);
+#else
+	return (acl_int64) acl_atoll(str);
+#endif
 }
 
 const char *acl_ui64toa(acl_uint64 value, char *buf, size_t size)
@@ -401,35 +434,10 @@ const char *acl_i64toa(acl_int64 value, char *buf, size_t size)
 
 #elif defined(ACL_UNIX)
 
-# ifdef MINGW
-static long long atoll(const char *s)
-{
-	long long num = 0;
-	int neg = 0;
-
-	while (isspace(*s))
-		s++;
-
-	if (*s == '-') {	
-		neg = 1;
-		s++;
-	}
-
-	while (isdigit(*s)) {
-		num = 10*num + (*s - '0');
-		s++;
-	}
-
-	if (neg)
-		num = -num;
-	return num;
-}
-# endif
-
 acl_uint64 acl_atoui64(const char *str)
 {
-#if 1
-	return (acl_uint64) atoll(str);
+#ifdef MINGW
+	return (acl_uint64) acl_atoll(str);
 #else
 	return (acl_uint64) strtoull(str, NULL, 10);
 #endif
@@ -437,8 +445,8 @@ acl_uint64 acl_atoui64(const char *str)
 
 acl_int64 acl_atoi64(const char *str)
 {
-#if 1
-	return (acl_int64) atoll(str);
+#ifdef MINGW
+	return (acl_int64) acl_atoll(str);
 #else
 	return (acl_int64) strtoull(str, NULL, 10);
 #endif
@@ -464,7 +472,8 @@ const char *acl_i64toa(acl_int64 value, char *buf, size_t size)
 
 #endif
 
-static void x64toa(acl_uint64 val, char *buf, size_t size, unsigned radix, int is_neg)
+static void x64toa(acl_uint64 val, char *buf, size_t size,
+	unsigned radix, int is_neg)
 {
 	char *p;                /* pointer to traverse string */
 	char *firstdig;         /* pointer to first digit */
@@ -505,7 +514,7 @@ static void x64toa(acl_uint64 val, char *buf, size_t size, unsigned radix, int i
 		*firstdig = temp;   /* swap *p and *firstdig */
 		--p;
 		++firstdig;         /* advance to next two digits */
-	} while (firstdig < p); /* repeat until halfway */
+	} while (firstdig < p);     /* repeat until halfway */
 }
 
 /* Actual functions just call conversion helper with neg flag set correctly,

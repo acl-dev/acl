@@ -67,6 +67,19 @@ void acl_xml_free_array(ACL_ARRAY *a)
 	acl_array_destroy(a, NULL);
 }
 
+ACL_XML_NODE *acl_xml_getFirstElementByTagName(ACL_XML *xml, const char *tag)
+{
+	ACL_ITER iter;
+
+	acl_foreach(iter, xml) {
+		ACL_XML_NODE *node = (ACL_XML_NODE*) iter.data;
+		if (strcasecmp(tag, STR(node->ltag)) == 0)
+			return node;
+	}
+
+	return NULL;
+}
+
 ACL_ARRAY *acl_xml_getElementsByTagName(ACL_XML *xml, const char *tag)
 {
 	ACL_ITER iter;

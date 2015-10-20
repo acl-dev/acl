@@ -516,21 +516,22 @@ static const char *json_strend(ACL_JSON *json, const char *data)
 
 #define	EQ(x, y) !strcasecmp((x), ((y)))
 
-	if (node->parent && node->parent->type == ACL_JSON_T_ARRAY)
-	{
-		if (EQ(STR(node->text), "null"))
-			node->type = ACL_JSON_T_A_NULL;
-		else if (EQ(STR(node->text), "true")
-			|| EQ(STR(node->text), "false"))
-		{
-			node->type = ACL_JSON_T_A_BOOL;
-		}
-		else if (acl_alldig(STR(node->text)))
-			node->type = ACL_JSON_T_A_NUMBER;
-		else
-			node->type = ACL_JSON_T_A_STRING;
-	}
-	else if (node->quote == 0)
+	if (node->parent && node->parent->type == ACL_JSON_T_ARRAY) {
+		if (node->quote == 0) {
+			if (EQ(STR(node->text), "null"))
+				node->type = ACL_JSON_T_A_NULL;
+			else if (EQ(STR(node->text), "true")
+					|| EQ(STR(node->text), "false"))
+			{
+				node->type = ACL_JSON_T_A_BOOL;
+			}
+			else if (acl_alldig(STR(node->text)))
+				node->type = ACL_JSON_T_A_NUMBER;
+			else
+				node->type = ACL_JSON_T_A_STRING;
+		} else
+			node->type = ACL_JSON_T_STRING;
+	} else if (node->quote == 0)
 	{
 		if (EQ(STR(node->text), "null"))
 			node->type = ACL_JSON_T_NULL;
@@ -543,8 +544,7 @@ static const char *json_strend(ACL_JSON *json, const char *data)
 			node->type = ACL_JSON_T_NUMBER;
 		else
 			node->type = ACL_JSON_T_STRING;
-	}
-	else
+	} else
 		node->type = ACL_JSON_T_STRING;
 
 

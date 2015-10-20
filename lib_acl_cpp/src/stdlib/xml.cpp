@@ -363,17 +363,9 @@ const std::vector<xml_node*>& xml::getElementsByTagName(const char* tag) const
 
 const xml_node* xml::getFirstElementByTag(const char* tag) const
 {
-	ACL_ARRAY* a = acl_xml_getElementsByTagName(xml_, tag);
-	if (a == NULL)
-		return NULL;
-
-	ACL_XML_NODE* node = (ACL_XML_NODE*) acl_array_index(a, 0);
-	acl_assert(node);
-
+	ACL_XML_NODE* node = acl_xml_getFirstElementByTagName(xml_, tag);
 	xml_node* n = NEW xml_node(node, const_cast<xml*>(this));
 	const_cast<xml*>(this)->nodes_tmp_.push_back(n);
-
-	acl_xml_free_array(a);
 	return n;
 }
 

@@ -13,6 +13,20 @@
 #define STR	acl_vstring_str
 #define	LEN	ACL_VSTRING_LEN
 
+ACL_JSON_NODE *acl_json_getFirstElementByTagName(
+	ACL_JSON *json, const char *tag)
+{
+	ACL_ITER iter;
+
+	acl_foreach(iter, json) {
+		ACL_JSON_NODE *node = (ACL_JSON_NODE*) iter.data;
+		if (strcasecmp(tag, STR(node->ltag)) == 0)
+			return node;
+	}
+
+	return NULL;
+}
+
 void acl_json_free_array(ACL_ARRAY *a)
 {
 	acl_array_destroy(a, NULL);

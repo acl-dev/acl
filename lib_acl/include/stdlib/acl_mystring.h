@@ -25,13 +25,13 @@ extern "C" {
 } while (0)
 #else
 #define ACL_SAFE_STRNCPY(_obj, _src, _size) do {            \
-    if (_obj != NULL && _src != NULL && (int)_size >= 0) {  \
+    if (_size > 0) {  \
         strncpy(_obj, _src, _size);                         \
             if ((int)_size > 0)                             \
                 _obj[_size - 1] = 0;                        \
             else                                            \
                 _obj[_size] = 0;                            \
-	}                                                       \
+    }                                                       \
 } while (0)
 #endif
 #endif
@@ -98,7 +98,8 @@ ACL_API char *acl_uppercase3(const char *s, char *buf, size_t size);
  *  举例: 源字符串："abcd=|efg=|hijk", 分隔符 "=|"，则第一次分隔后
  *  src 将指向 "efg"，而返回的地址为 "abcd"
  */
-ACL_API char *acl_mystrtok(char **src, const char *sep);
+ACL_API char *acl_strtok(char **src, const char *sep);
+#define acl_mystrtok	acl_strtok
 
 /**
  * 获得一个逻辑行, 如果某行的尾部由连接符 "\\" 连接，则将下一行合并至本行,
@@ -106,14 +107,16 @@ ACL_API char *acl_mystrtok(char **src, const char *sep);
  * @param src {char**} 源字符串的地址指针
  * @return {char*} 返回一行数据, 如果返回空则表示没有可用的逻辑行
  */
-ACL_API char *acl_mystrline(char **src);
+ACL_API char *acl_strline(char **src);
+#define acl_mystrline	acl_strline
 
 /**
  * 去掉给定字符串中的 " ", "\t"
  * @param str {char*} 源字符串
  * @return {char*} 与源字符串相同的地址
  */
-ACL_API char *acl_mystr_trim(char *str);
+ACL_API char *acl_strtrim(char *str);
+#define acl_mystr_trim	acl_strtrim
 
 /**
  * 从源字符串中去掉给定字符串
@@ -123,15 +126,17 @@ ACL_API char *acl_mystr_trim(char *str);
  * @param bsize {int} buf 的空间大小
  * @return {int} 拷贝至 buf 中的字符串长度
  */
-ACL_API int acl_mystr_strip(const char *haystack, const char *needle,
+ACL_API int acl_strstrip(const char *haystack, const char *needle,
 		char *buf, int bsize);
+#define acl_mystr_strip	acl_strstrip
 
 /**
  * 从源字符串中找到一行的结束位置并去掉包含回车换行符及其以后的字符串
- * @param str_src {char*} 源字符串
+ * @param str {char*} 源字符串
  * @return {int} 0 表示成功，-1表示失败, 也许应该返回最后转换结果的长度!
  */
-ACL_API int acl_mystr_truncate_byln(char *str_src);
+ACL_API int acl_strtrunc_byln(char *str);
+#define acl_mystr_truncate_byln	acl_strtrunc_byln
 
 /**
  * 从后向前比较两个给定字符串，大小写不敏感且限定最大比较范围
@@ -255,6 +260,13 @@ ACL_API int acl_dir_correct(const char *psrc_dir, char *pbuf, int sizeb);
  * @return {int} 0 成功，-1失败
  */
 ACL_API int acl_dir_getpath(const char *pathname, char *pbuf, int bsize);
+
+/**
+ * 将数据字符串转换为64位有符号长整型
+ * @param s {const char*} 字符串指针
+ * @return {long long} 有符号长整型
+ */
+ACL_API long long acl_atoll(const char *s);
 
 /**
  * 将数据字符串转换为64位无符号长整型

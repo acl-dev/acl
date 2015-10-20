@@ -27,7 +27,7 @@
 
 # ifndef ACL_WAIT_STATUS_T
    typedef int ACL_WAIT_STATUS_T;
-#  define ACL_NORMAL_EXIT_STATUS(status)      ((status) == 0)
+#  define ACL_NORMAL_EXIT_STATUS(status)      !(status)
 # endif
 
 # define ACL_FIONREAD_IN_TERMIOS_H

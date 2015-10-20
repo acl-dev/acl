@@ -25,8 +25,8 @@ const char *acl_split_nameval(char *buf, char **name, char **value)
 
 #define TRIM(s) { \
 	char *p; \
-	for (p = (s) + strlen(s); p > (s) && ACL_ISSPACE(p[-1]); p--); \
-		*p = 0; \
+	for (p = (s) + strlen(s); p > (s) && ACL_ISSPACE(p[-1]); p--) {} \
+	*p = 0; \
 }
 
 	SKIP(buf, np, ACL_ISSPACE(*np));		/* find name begin */
