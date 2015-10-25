@@ -163,7 +163,7 @@ shared: $(OBJS_DST)
 			-R$(rpath) -L$(rpath) $(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	else \
-		echo 'skip build $(SHARED_LIBNAME); usage: make rpath=xxx'; \
+		echo 'skip build $(SHARED_LIBNAME); usage: make shared rpath=xxx'; \
 	fi
 
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/%.c

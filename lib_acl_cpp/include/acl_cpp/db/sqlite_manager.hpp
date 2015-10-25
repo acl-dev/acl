@@ -7,7 +7,11 @@ namespace acl {
 class ACL_CPP_API sqlite_manager : public connect_manager
 {
 public:
-	sqlite_manager();
+	/**
+	 * 构造函数
+	 * @param charset {const char*} 数据文件名字符集
+	 */
+	sqlite_manager(const char* charset = "utf-8");
 	~sqlite_manager();
 
 	/**
@@ -30,6 +34,7 @@ protected:
 private:
 	// sqlite 数据文件名
 	char* dbfile_;
+	char* charset_;
 	size_t dblimit_;
 };
 

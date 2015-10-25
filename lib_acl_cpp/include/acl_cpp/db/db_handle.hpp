@@ -223,7 +223,7 @@ class query;
 class ACL_CPP_API db_handle : public connect_client
 {
 public:
-	db_handle(const char* charset = "utf8");
+	db_handle(void);
 	virtual ~db_handle(void);
 
 	/////////////////////////////////////////////////////////////////////
@@ -235,22 +235,6 @@ public:
 	bool open();
 
 	/////////////////////////////////////////////////////////////////////
-
-	/**
-	 * 设置字符集
-	 * @param charset {const char*} 字符集，非 NULL 字符串
-	 * @return {db_handle&}
-	 */
-	db_handle& set_charset(const char* charset);
-
-	/**
-	 * 获得当前数据库句柄的字符集
-	 * @return {const char*}
-	 */
-	const char* get_charset() const
-	{
-		return charset_.c_str();
-	}
 
 	/**
 	 * 返回数据库的类型描述
@@ -278,10 +262,9 @@ public:
 
 	/**
 	 * 纯虚接口，子类必须实现此接口用于打开数据库
-	 * @param local_charset {const char*} 本地字符集(gbk, utf8, ...)
 	 * @return {bool} 打开是否成功
 	 */
-	virtual bool dbopen(const char* local_charset) = 0;
+	virtual bool dbopen() = 0;
 
 	/**
 	 * 数据库是否已经打开了
@@ -477,9 +460,6 @@ public:
 	static const char* get_loadpath();
 
 protected:
-	// 连接数据库所用的字符集
-	string charset_;
-
 	// 临时结果对象
 	db_rows* result_;
 

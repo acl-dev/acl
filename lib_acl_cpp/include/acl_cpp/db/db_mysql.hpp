@@ -6,13 +6,35 @@ typedef struct st_mysql MYSQL;
 
 namespace acl {
 
+class mysql_conf;
+
 class ACL_CPP_API db_mysql : public db_handle
 {
 public:
+	/**
+	 * 构造函数方式一
+	 * @param dbaddr {const char*} 数据库监听地址，可以为 TCP 套接口或在 UNIX
+	 *  平台下的域套接口，格式如：127.0.0.1:3306，或 /tmp/mysql.sock
+	 * @param dbname {const char*} 数据库名称，非 NULL
+	 * @param dbuser {const char*} 连接数据库时的用户名
+	 * @param dbpass {const char*} 连接数据库时的用户密码
+	 * @param dbflags {unsigned long} 连接 MYSQL 时的标志位
+	 * @param auto_commit {bool} 当对数据库进行修改时是否自动提交事务
+	 * @param conn_timeout {int} 连接数据库的超时时间（秒）
+	 * @param rw_timeout {int} 进行数据库操作时的超时时间（秒）
+	 * @param charset {const char*} 连接数据库时的本地字符集（gbk, utf8, ...）
+	 */
 	db_mysql(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,
 		unsigned long dbflags = 0, bool auto_commit = true,
-		int conn_timeout = 60, int rw_timeout = 60);
+		int conn_timeout = 60, int rw_timeout = 60,
+		const char* charset = "utf8");
+
+	/**
+	 * 构造函数方式二：使用参数配置类对象进行构造
+	 * @param conf {const mysql_conf&} mysql 数据库连接配置类对象
+	 */
+	db_mysql(const mysql_conf& conf);
 	~db_mysql(void);
 
 	/**
@@ -61,10 +83,9 @@ public:
 
 	/**
 	 * 基类 db_handle 的纯虚接口
-	 * @param local_charset {const char*} 本地字符集(gbk, utf8, ...)
 	 * @return {bool} 打开是否成功
 	 */
-	bool dbopen(const char* local_charset);
+	bool dbopen();
 
 	/**
 	 * 基类 db_handle 的纯虚接口，数据库是否已经打开了
@@ -124,6 +145,7 @@ private:
 	char* dbname_;  // 数据库名
 	char* dbuser_;  // 数据库账号
 	char* dbpass_;  // 数据库账号密码
+	char* charset_; // 连接数据库采用的字符集
 
 	unsigned long dbflags_;
 	int   conn_timeout_;
@@ -132,6 +154,11 @@ private:
 	MYSQL* conn_;
 
 	bool sane_mysql_query(const char* sql);
+	void sane_mysql_init(const char* dbaddr, const char* dbname,
+		const char* dbuser, const char* dbpass,
+		unsigned long dbflags, bool auto_commit,
+		int conn_timeout, int rw_timeout,
+		const char* charset);
 };
 
 } // namespace acl

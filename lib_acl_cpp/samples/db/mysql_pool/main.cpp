@@ -423,8 +423,9 @@ int main(void)
 	int  dblimit = 10;
 
 	// 创建数据库连接池对象
-	acl::db_pool* dp = new acl::mysql_pool(dbaddr, dbname,
-			dbuser, dbpass, dblimit);
+	acl::mysql_conf dbconf(dbaddr, dbname);
+	dbconf.set_dbuser(dbuser).set_dbpass(dbpass).set_dblimit(dblimit);
+	acl::db_pool* dp = new acl::mysql_pool(dbconf);
 
 	// 设置连接池中每个连接的空闲时间(秒)
 	dp->set_idle(120);

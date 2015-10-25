@@ -205,11 +205,18 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-db_sqlite::db_sqlite(const char* dbfile)
+db_sqlite::db_sqlite(const char* dbfile, const char* charset /* ="utf-8" */)
 : db_(NULL)
 , dbfile_(dbfile)
-, conv_(NULL)
 {
+	if (charset && strcasecmp(charset, "utf-8") !=0)
+	{
+		charset_ = charset;
+		conv_ = NEW charset_conv();
+	}
+	else
+		conv_ = NULL;
+
 	acl_assert(dbfile && *dbfile);
 #if defined(ACL_WINDOWS) || defined(USE_DYNAMIC)
 	acl_pthread_once(&__sqlite_once, __sqlite_dll_load);
@@ -254,32 +261,26 @@ const char* db_sqlite::get_error() const
 	else
 		return "sqlite not opened yet!";
 }
-bool db_sqlite::dbopen(const char* local_charset)
+bool db_sqlite::dbopen()
 {
 	// 如果数据库已经打开，则直接返回 true
 	if (db_ != NULL)
-		return (true);
+		return true;
 
 	string buf;
 
-	if (local_charset && strcasecmp(local_charset, "UTF-8"))
-	{
-		local_charset_ = local_charset;
-		conv_ = NEW charset_conv();
-	}
-
 	const char* ptr;
 
-	// 转换成 [UTF-8] 编码格式
+	// 转换成 [utf-8] 编码格式
 
 	if (conv_ == NULL)
 		ptr = dbfile_.c_str();
-	else if (conv_->convert(local_charset_.c_str(), "UTF-8",
+	else if (conv_->convert(charset_.c_str(), "utf-8",
 		dbfile_.c_str(), dbfile_.length(), &buf) == false)
 	{
-		logger_error("charset convert(%s) from %s to UTF-8 error",
-			dbfile_.c_str(), local_charset_.c_str());
-		return (false);
+		logger_error("charset convert(%s) from %s to utf-8 error",
+			dbfile_.c_str(), charset_.c_str());
+		return false;
 	}
 	else
 		ptr = buf.c_str();
@@ -293,7 +294,7 @@ bool db_sqlite::dbopen(const char* local_charset)
 		__sqlite3_close(db_);
 		db_ = NULL;
 
-		return (false);
+		return false;
 	}
 
 	// 当 SQLITE 忙时的回调函数
@@ -301,29 +302,29 @@ bool db_sqlite::dbopen(const char* local_charset)
 
 	// 关闭 SQLITE 实时刷新磁盘的特性，从而提高性能
 	set_conf("PRAGMA synchronous = off");
-	return (true);
+	return true;
 }
 
 bool db_sqlite::is_opened() const
 {
-	return (db_ != NULL ? true : false);
+	return db_ != NULL ? true : false;
 }
 
 bool db_sqlite::close()
 {
 	if (db_ == NULL)
-		return (false);
+		return false;
 
 	// 关闭 sqlite 数据库
 	int   ret = __sqlite3_close(db_);
 	if (ret == SQLITE_BUSY)
 	{
 		logger_error("close %s error SQLITE_BUSY", dbfile_.c_str());
-		return (false);
+		return false;
 	}
 
 	db_ = NULL;
-	return (true);
+	return true;
 }
 
 bool db_sqlite::set_conf(const char* pragma)
@@ -331,18 +332,18 @@ bool db_sqlite::set_conf(const char* pragma)
 	bool ret = exec_sql(pragma);
 	if (result_)
 		free_result();
-	return (ret);
+	return ret;
 }
 
 const char* db_sqlite::get_conf(const char* pragma, string& out)
 {
 	bool ret = exec_sql(pragma);
 	if (ret == false)
-		return (NULL);
+		return NULL;
 	else if (length() == 0)
 	{
 		free_result();
-		return (NULL);
+		return NULL;
 	}
 	else
 	{
@@ -352,11 +353,11 @@ const char* db_sqlite::get_conf(const char* pragma, string& out)
 		if (ptr == NULL)
 		{
 			free_result();
-			return (NULL);
+			return NULL;
 		}
 		out = ptr;
 		free_result();
-		return (out.c_str());
+		return out.c_str();
 	}
 }
 
@@ -419,7 +420,7 @@ bool db_sqlite::tbl_exists(const char* tbl_name)
 	if (tbl_name == NULL || *tbl_name == 0)
 	{
 		logger_error("tbl_name null");
-		return (false);
+		return false;
 	}
 
 	acl::string sql;
@@ -429,13 +430,13 @@ bool db_sqlite::tbl_exists(const char* tbl_name)
 	if (exec_sql(sql.c_str()) == false)
 	{
 		free_result();
-		return (false);
+		return false;
 	}
 
 	if (length() == 0)
 	{
 		free_result();
-		return (false);
+		return false;
 	}
 	else
 	{
@@ -447,18 +448,18 @@ bool db_sqlite::tbl_exists(const char* tbl_name)
 
 		if (n == 0)
 			return (false);
-		return (true);
+		return true;
 	}
 }
 
 bool db_sqlite::sql_select(const char* sql)
 {
-	return (exec_sql(sql));
+	return exec_sql(sql);
 }
 
 bool db_sqlite::sql_update(const char* sql)
 {
-	return (exec_sql(sql));
+	return exec_sql(sql);
 }
 
 bool db_sqlite::exec_sql(const char* sql)
@@ -473,12 +474,12 @@ bool db_sqlite::exec_sql(const char* sql)
 	if (sql == NULL || *sql == 0)
 	{
 		logger_error("invalid params");
-		return (false);
+		return false;
 	}
 	else if (db_ == NULL)
 	{
 		logger_error("db not open yet!");
-		return (false);
+		return false;
 	}
 
 	char** results = NULL, *err;
@@ -492,7 +493,7 @@ bool db_sqlite::exec_sql(const char* sql)
 		logger_error("sqlites_get_table(%s) error(%s)",
 			sql, __sqlite3_errmsg(db_));
 		__sqlite3_free_table(results);
-		return (false);
+		return false;
 	}
 
 	if (nrow > 0)
@@ -502,7 +503,7 @@ bool db_sqlite::exec_sql(const char* sql)
 		result_ = NULL;
 		__sqlite3_free_table(results);
 	}
-	return (true);
+	return true;
 }
 
 int db_sqlite::affect_count() const
@@ -510,15 +511,15 @@ int db_sqlite::affect_count() const
 	if (db_ == NULL)
 	{
 		logger_error("db not opened yet!");
-		return (-1);
+		return -1;
 	}
 
-	return (__sqlite3_changes(db_));
+	return __sqlite3_changes(db_);
 }
 
 int db_sqlite::affect_total_count() const
 {
-	return (__sqlite3_total_changes(db_));
+	return __sqlite3_total_changes(db_);
 }
 
 } // namespace acl
@@ -528,7 +529,7 @@ int db_sqlite::affect_total_count() const
 namespace acl
 {
 
-db_sqlite::db_sqlite(const char*) {}
+db_sqlite::db_sqlite(const char*, const char*) {}
 db_sqlite::~db_sqlite(void) {}
 const char* db_sqlite::version(void) const { return NULL; }
 bool db_sqlite::set_conf(const char*) { return false; }
@@ -536,7 +537,7 @@ const char* db_sqlite::get_conf(const char*, string&) { return NULL; }
 void db_sqlite::show_conf(const char*) {}
 int db_sqlite::affect_total_count() const { return 0; }
 const char* db_sqlite::dbtype() const { return NULL; }
-bool db_sqlite::dbopen(const char*) { return false; }
+bool db_sqlite::dbopen() { return false; }
 bool db_sqlite::is_opened() const { return false; }
 bool db_sqlite::close(void) { return false; }
 bool db_sqlite::tbl_exists(const char*) { return false; }

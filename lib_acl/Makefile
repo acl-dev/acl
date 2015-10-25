@@ -278,7 +278,7 @@ shared: depends $(OBJS_DST)
 			-L$(rpath) $(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	else \
-		echo 'skip build $(SHARED_LIBNAME); usage: make rpath=xxx'; \
+		echo 'skip build $(SHARED_LIBNAME); usage: make shared rpath=xxx'; \
 	fi
 
 depends: $(OBJS_DEF)

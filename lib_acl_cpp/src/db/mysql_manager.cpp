@@ -21,13 +21,15 @@ mysql_manager::~mysql_manager()
 mysql_manager& mysql_manager::add(const char* dbaddr, const char* dbname,
 	const char* dbuser, const char* dbpass, size_t dblimit /* = 64 */,
 	unsigned long dbflags /* = 0 */, bool auto_commit /* = true */,
-	int conn_timeout /* = 60 */, int rw_timeout /* = 60 */)
+	int conn_timeout /* = 60 */, int rw_timeout /* = 60 */,
+	const char* charset /* = "utf8" */)
 {
 	const char* ptr = strchr(dbaddr, '@');
 	if (ptr != NULL)
 		ptr++;
 	else
 		ptr = dbaddr;
+	acl_assert(*ptr);
 
 	string key;
 	key.format("%s@%s", dbname, ptr);
@@ -46,6 +48,8 @@ mysql_manager& mysql_manager::add(const char* dbaddr, const char* dbname,
 		conf->set_dbuser(dbuser);
 	if (dbpass && *dbpass)
 		conf->set_dbpass(dbpass);
+	if (charset && *charset)
+		conf->set_charset(charset);
 	conf->set_dblimit(dblimit);
 	conf->set_dbflags(dbflags);
 	conf->set_auto_commit(auto_commit);
@@ -61,10 +65,7 @@ mysql_manager& mysql_manager::add(const char* dbaddr, const char* dbname,
 
 mysql_manager& mysql_manager::add(const mysql_conf& conf)
 {
-	string key;
-	key.format("%s@%s", conf.get_dbname(), conf.get_dbaddr());
-	key.lower();
-
+	const char* key = conf.get_dbkey();
 	std::map<string, mysql_conf*>::iterator it = dbs_.find(key);
 	if (it != dbs_.end())
 	{
@@ -75,7 +76,7 @@ mysql_manager& mysql_manager::add(const mysql_conf& conf)
 	mysql_conf* mc = NEW mysql_conf(conf);
 	dbs_[key] = mc;
 	// 调用基类 connect_manager::set 方法添加
-	set(key.c_str(), conf.get_dblimit());
+	set(key, conf.get_dblimit());
 
 	return *this;
 }
@@ -90,13 +91,7 @@ connect_pool* mysql_manager::create_pool(const char* key, size_t, size_t)
 	}
 
 	mysql_conf* conf = it->second;
-	string dbkey;
-	dbkey.format("%s@%s", conf->get_dbname(), conf->get_dbaddr());
-	mysql_pool* dbpool = NEW mysql_pool(dbkey.c_str(),
-		conf->get_dbname(), conf->get_dbuser(),
-		conf->get_dbpass(), conf->get_dblimit(),
-		conf->get_dbflags(), conf->get_auto_commit(),
-		conf->get_conn_timeout(), conf->get_rw_timeout());
+	mysql_pool* dbpool = NEW mysql_pool(*conf);
 
 	if (idle_ttl_ > 0)
 		dbpool->set_idle_ttl(idle_ttl_);

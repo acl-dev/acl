@@ -12,7 +12,11 @@ class charset_conv;
 class ACL_CPP_API db_sqlite : public db_handle
 {
 public:
-	db_sqlite(const char* dbfile);
+	/**
+	 * 构造函数
+	 * @param charset {const char*} 本地字符集(gbk, utf-8, ...)
+	 */
+	db_sqlite(const char* dbfile, const char* charset = "utf-8");
 	~db_sqlite(void);
 
 	/**
@@ -87,10 +91,9 @@ public:
 
 	/**
 	 * 基类 db_handle 的纯虚接口
-	 * @param local_charset {const char*} 本地字符集(gbk, utf-8, ...)
 	 * @return {bool} 打开是否成功
 	 */
-	bool dbopen(const char* local_charset);
+	bool dbopen();
 
 	/**
 	 * 基类 db_handle 的纯虚接口，数据库是否已经打开了
@@ -143,7 +146,7 @@ private:
 	charset_conv* conv_;
 
 	// 本地字符集
-	string local_charset_;
+	string charset_;
 
 	// 真正执行SQL查询的函数
 	bool exec_sql(const char* sql);

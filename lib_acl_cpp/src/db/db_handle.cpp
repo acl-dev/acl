@@ -238,9 +238,8 @@ size_t db_rows::length() const
 
 //////////////////////////////////////////////////////////////////////////
 
-db_handle::db_handle(const char* charset /* = "utf8" */)
-: charset_(charset)
-, result_(NULL)
+db_handle::db_handle()
+: result_(NULL)
 , id_(NULL)
 {
 	time(&when_);
@@ -252,17 +251,10 @@ db_handle::~db_handle()
 		acl_myfree(id_);
 }
 
-db_handle& db_handle::set_charset(const char* charset)
-{
-	if (charset && *charset)
-		charset_ = charset;
-	return *this;
-}
-
 bool db_handle::open()
 {
 	// 调用虚方法的子类实现过程
-	return dbopen(charset_.c_str());
+	return dbopen();
 }
 
 bool db_handle::exec_select(query& query)

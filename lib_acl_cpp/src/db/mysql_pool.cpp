@@ -2,64 +2,51 @@
 #include "acl_cpp/connpool/connect_client.hpp"
 #include "acl_cpp/db/db_handle.hpp"
 #include "acl_cpp/db/db_mysql.hpp"
+#include "acl_cpp/db/mysql_conf.hpp"
 #include "acl_cpp/db/mysql_pool.hpp"
 
 namespace acl
 {
 
 mysql_pool::mysql_pool(const char* dbaddr, const char* dbname,
-	const char* dbuser, const char* dbpass, size_t dblimit /* = 64 */,
+	const char* dbuser, const char* dbpass, int dblimit /* = 64 */,
 	unsigned long dbflags /* = 0 */, bool auto_commit /* = true */,
-	int conn_timeout /* = 60 */, int rw_timeout /* = 60 */)
-: db_pool(dbaddr, dblimit)
+	int conn_timeout /* = 60 */, int rw_timeout /* = 60 */,
+	const char* charset /* = "utf8" */)
+	: db_pool(dbaddr, dblimit)
 {
 	acl_assert(dbaddr && *dbaddr);
 	acl_assert(dbname && *dbname);
 
-	// µØÖ·¸ñÊ½£º[dbname@]dbaddr
-	const char* ptr = strchr(dbaddr, '@');
-	if (ptr != NULL)
-		ptr++;
-	else
-		ptr = dbaddr;
-	acl_assert(*ptr);
+	conf_ = NEW mysql_conf(dbaddr, dbname);
 
-	dbaddr_ = acl_mystrdup(ptr);
-	dbname_ = acl_mystrdup(dbname);
+	if (dbuser && *dbuser)
+		conf_->set_dbuser(dbuser);
+	if (dbpass && *dbpass)
+		conf_->set_dbpass(dbpass);
+	if (charset && *charset)
+		conf_->set_charset(charset);
+	conf_->set_dbflags(dbflags);
+	conf_->set_dblimit(dblimit);
+	conf_->set_auto_commit(auto_commit);
+	conf_->set_conn_timeout(conn_timeout);
+	conf_->set_rw_timeout(rw_timeout);
+}
 
-	if (dbuser)
-		dbuser_ = acl_mystrdup(dbuser);
-	else
-		dbuser_ = NULL;
-
-	if (dbpass)
-		dbpass_ = acl_mystrdup(dbpass);
-	else
-		dbpass_ = NULL;
-
-	dbflags_ = dbflags;
-	auto_commit_ = auto_commit;
-	conn_timeout_ = conn_timeout;
-	rw_timeout_ = rw_timeout;
+mysql_pool::mysql_pool(const mysql_conf& conf)
+: db_pool(conf.get_dbkey(), conf.get_dblimit())
+{
+	conf_ = NEW mysql_conf(conf);
 }
 
 mysql_pool::~mysql_pool()
 {
-	if (dbaddr_)
-		acl_myfree(dbaddr_);
-	if (dbname_)
-		acl_myfree(dbname_);
-	if (dbuser_)
-		acl_myfree(dbuser_);
-	if (dbpass_)
-		acl_myfree(dbpass_);
+	delete conf_;
 }
 
 connect_client* mysql_pool::create_connect()
 {
-	return NEW db_mysql(dbaddr_, dbname_, dbuser_,
-		dbpass_, dbflags_, auto_commit_,
-		conn_timeout_, rw_timeout_);
+	return NEW db_mysql(*conf_);
 }
 
 } // namespace acl

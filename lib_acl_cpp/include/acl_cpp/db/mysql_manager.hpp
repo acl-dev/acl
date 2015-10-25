@@ -15,7 +15,7 @@ public:
 	~mysql_manager();
 
 	/**
-	 * 添加一个数据库实例
+	 * 添加一个数据库实例方法一
 	 * @param dbaddr {const char*} mysql 服务器地址，格式：IP:PORT，
 	 *  在 UNIX 平台下可以为 UNIX 域套接口
 	 * @param dbname {const char*} 数据库名
@@ -26,16 +26,17 @@ public:
 	 * @param auto_commit {bool} 是否自动提交
 	 * @param conn_timeout {int} 连接数据库超时时间(秒)
 	 * @param rw_timeout {int} 与数据库通信时的IO时间(秒)
+	 * @param charset {const char*} 连接数据库时的字符集
 	 * @return {mysql_manager&}
 	 */
 	mysql_manager& add(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,
 		size_t dblimit = 64, unsigned long dbflags = 0,
 		bool auto_commit = true, int conn_timeout = 60,
-		int rw_timeout = 60);
+		int rw_timeout = 60, const char* charset = "utf8");
 
 	/**
-	 * 添加一个数据库实例
+	 * 添加一个数据库实例方法二
 	 * @param conf {const mysql_conf&}
 	 * @return {mysql_manager&}
 	 */

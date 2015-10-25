@@ -5,6 +5,7 @@
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/db/mysql_conf.hpp"
 #include "acl_cpp/db/db_mysql.hpp"
 
 //////////////////////////////////////////////////////////////////////////
@@ -293,10 +294,11 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-db_mysql::db_mysql(const char* dbaddr, const char* dbname,
+void db_mysql::sane_mysql_init(const char* dbaddr, const char* dbname,
 	const char* dbuser, const char* dbpass,
-	unsigned long dbflags /* = 0 */, bool auto_commit /* = true */,
-	int conn_timeout /* = 60 */, int rw_timeout /* = 60 */)
+	unsigned long dbflags, bool auto_commit,
+	int conn_timeout, int rw_timeout,
+	const char* charset)
 {
 	if (dbaddr == NULL || *dbaddr == 0)
 		logger_fatal("dbaddr null");
@@ -323,6 +325,11 @@ db_mysql::db_mysql(const char* dbaddr, const char* dbname,
 	else
 		dbpass_ = NULL;
 
+	if (charset && *charset)
+		charset_ = acl_mystrdup(charset);
+	else
+		charset_ = NULL;
+
 	dbflags_ = dbflags;
 	auto_commit_ = auto_commit;
 	conn_timeout_ = conn_timeout;
@@ -334,6 +341,24 @@ db_mysql::db_mysql(const char* dbaddr, const char* dbname,
 	conn_ = NULL;
 }
 
+db_mysql::db_mysql(const char* dbaddr, const char* dbname,
+	const char* dbuser, const char* dbpass,
+	unsigned long dbflags /* = 0 */, bool auto_commit /* = true */,
+	int conn_timeout /* = 60 */, int rw_timeout /* = 60 */,
+	const char* charset /* = "utf8" */)
+{
+	sane_mysql_init(dbaddr, dbname, dbuser, dbpass, dbflags,
+		auto_commit, conn_timeout, rw_timeout, charset);
+}
+
+db_mysql::db_mysql(const mysql_conf& conf)
+{
+	sane_mysql_init(conf.get_dbaddr(), conf.get_dbname(),
+		conf.get_dbuser(), conf.get_dbpass(), conf.get_dbflags(),
+		conf.get_auto_commit(), conf.get_conn_timeout(),
+		conf.get_rw_timeout(), conf.get_charset());
+}
+
 db_mysql::~db_mysql()
 {
 	acl_myfree(dbaddr_);
@@ -342,6 +367,8 @@ db_mysql::~db_mysql()
 		acl_myfree(dbuser_);
 	if (dbpass_)
 		acl_myfree(dbpass_);
+	if (charset_)
+		acl_myfree(charset_);
 	if (conn_)
 		__mysql_close(conn_);
 }
@@ -378,7 +405,7 @@ const char* db_mysql::get_error() const
 		return "mysql not opened yet!";
 }
 
-bool db_mysql::dbopen(const char* local_charset)
+bool db_mysql::dbopen()
 {
 	if (conn_)
 		return true;
@@ -466,14 +493,14 @@ bool db_mysql::dbopen(const char* local_charset)
 		return false;
 	}
 
-	if (local_charset)
+	if (charset_)
 	{
-		if (!__mysql_set_character_set(conn_, local_charset))
-			logger("set mysql charset to %s, %s", local_charset,
+		if (!__mysql_set_character_set(conn_, charset_))
+			logger("set mysql charset to %s, %s", charset_,
 				__mysql_character_set_name(conn_));
 		else
 			logger_error("set mysql to %s error %s",
-				local_charset, __mysql_error(conn_));
+				charset_, __mysql_error(conn_));
 	}
 
 #if MYSQL_VERSION_ID >= 50000
@@ -526,7 +553,7 @@ bool db_mysql::sane_mysql_query(const char* sql)
 
 	/* 重新打开MYSQL连接进行重试 */
 	close();
-	if (dbopen("GBK") == false)
+	if (dbopen() == false)
 	{
 		logger_error("reopen db(%s) error", dbname_);
 		return false;
@@ -535,7 +562,6 @@ bool db_mysql::sane_mysql_query(const char* sql)
 		return true;
 	logger_error("db(%s), sql(%s) error(%s)",
 		dbname_, sql, __mysql_error(conn_));
-	close();
 	return false;
 }
 
@@ -651,9 +677,20 @@ bool db_mysql::commit()
 namespace acl
 {
 
+void db_mysql::sane_mysql_init(const char*, const char*,
+	const char*, const char*,
+	unsigned long, bool, int, int, const char*)
+{
+}
+
 db_mysql::db_mysql(const char*, const char*,
 	const char*, const char*,
-	unsigned long, bool, int, int)
+	unsigned long, bool, int, int, const char*)
+{
+	logger_fatal("Please #define HAS_MYSQL or HAS_MYSQL_DLL first");
+}
+
+db_mysql::db_mysql(const mysql_conf&)
 {
 	logger_fatal("Please #define HAS_MYSQL or HAS_MYSQL_DLL first");
 }
@@ -667,7 +704,7 @@ const char* db_mysql::dbtype() const
 	return NULL;
 }
 
-bool db_mysql::dbopen(const char*)
+bool db_mysql::dbopen()
 {
 	return false;
 }
