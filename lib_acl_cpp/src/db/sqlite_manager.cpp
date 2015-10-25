@@ -6,7 +6,7 @@ namespace acl {
 
 sqlite_manager::sqlite_manager(const char* charset /* = "utf-8" */)
 {
-	if (charset && &charset)
+	if (charset && *charset)
 		charset_ = acl_mystrdup(charset);
 	else
 		charset_ = NULL;
