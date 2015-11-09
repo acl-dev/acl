@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/http/HttpCookie.hpp"
@@ -6,35 +7,82 @@
 namespace acl
 {
 
-HttpCookie::HttpCookie(const char* name, const char* value)
+HttpCookie::HttpCookie(const char* name, const char* value,
+	dbuf_pool* dbuf /* = NULL */)
 {
+	if (dbuf != NULL)
+	{
+		dbuf_ = dbuf;
+		dbuf_internal_ = NULL;
+	}
+	else
+	{
+		dbuf_internal_ = new dbuf_pool;
+		dbuf_ = dbuf_internal_;
+	}
+
 	acl_assert(name && *name && value);
-	name_ = acl_mystrdup(name);
-	value_ = acl_mystrdup(value);
+	name_ = dbuf_->dbuf_strdup(name);
+	value_ = dbuf_->dbuf_strdup(value);
 	dummy_[0] = 0;
 }
 
-HttpCookie::HttpCookie(void)
+HttpCookie::HttpCookie(dbuf_pool* dbuf /* = NULL */)
 {
+	if (dbuf != NULL)
+	{
+		dbuf_ = dbuf;
+		dbuf_internal_ = NULL;
+	}
+	else
+	{
+		dbuf_internal_ = new dbuf_pool;
+		dbuf_ = dbuf_internal_;
+	}
+
 	name_ = NULL;
 	value_ = NULL;
 	dummy_[0] = 0;
 }
 
+HttpCookie::HttpCookie(const HttpCookie* cookie, dbuf_pool* dbuf /* = NULL */)
+{
+	if (dbuf != NULL)
+	{
+		dbuf_ = dbuf;
+		dbuf_internal_ = NULL;
+	}
+	else
+	{
+		dbuf_internal_ = new dbuf_pool;
+		dbuf_ = dbuf_internal_;
+	}
+
+	dummy_[0] = 0;
+	if (cookie->name_)
+		name_ = dbuf_->dbuf_strdup(cookie->name_);
+	else
+		name_ = NULL;
+	if (cookie->value_)
+		value_ = dbuf_->dbuf_strdup(cookie->value_);
+	else
+		value_ = NULL;
+
+	std::list<HTTP_PARAM*>::const_iterator cit = cookie->params_.begin();
+	for (; cit != cookie->params_.end(); ++cit)
+	{
+		HTTP_PARAM* param = (HTTP_PARAM*)
+			dbuf_->dbuf_alloc(sizeof(HTTP_PARAM));
+		param->name = dbuf_->dbuf_strdup((*cit)->name);
+		param->value = dbuf_->dbuf_strdup((*cit)->value);
+		params_.push_back(param);
+	}
+}
+
 HttpCookie::~HttpCookie(void)
 {
-	if (name_)
-		acl_myfree(name_);
-	if (value_)
-		acl_myfree(value_);
-
-	std::list<HTTP_PARAM*>::iterator it = params_.begin();
-	for (; it != params_.end(); ++it)
-	{
-		acl_myfree((*it)->name);
-		acl_myfree((*it)->value);
-		acl_myfree(*it);
-	}
+	if (dbuf_internal_)
+		dbuf_internal_->destroy();
 }
 
 void HttpCookie::destroy(void)
@@ -85,9 +133,10 @@ bool HttpCookie::setCookie(const char* value)
 	if (value == NULL || *value == 0)
 		return false;
 
-	HTTP_PARAM param;
 	ACL_ARGV* tokens = acl_argv_split(value, ";");
 	acl_assert(tokens->argc > 0);
+
+	HTTP_PARAM param;
 
 	// 从第一个 name=value 字段中取得 cookie 名及 cookie 值
 	if (splitNameValue(tokens->argv[0], &param) == false)
@@ -96,8 +145,8 @@ bool HttpCookie::setCookie(const char* value)
 		return false;
 	}
 	// name 肯定非 "\0"，而 value 可以为 "\0"
-	name_ = acl_mystrdup(param.name);
-	value_ = acl_mystrdup(param.value);
+	name_ = dbuf_->dbuf_strdup(param.name);
+	value_ = dbuf_->dbuf_strdup(param.value);
 
 	for (int i = 1; i < tokens->argc; i++)
 	{
@@ -165,9 +214,9 @@ HttpCookie& HttpCookie::add(const char* name, const char* value)
 	if (name == NULL || *name == 0 || value == NULL)
 		return *this;
 
-	HTTP_PARAM* param = (HTTP_PARAM*) acl_mymalloc(sizeof(HTTP_PARAM));
-	param->name = acl_mystrdup(name);
-	param->value = acl_mystrdup(value);
+	HTTP_PARAM* param = (HTTP_PARAM*) dbuf_->dbuf_alloc(sizeof(HTTP_PARAM));
+	param->name = dbuf_->dbuf_strdup(name);
+	param->value = dbuf_->dbuf_strdup(value);
 	params_.push_back(param);
 	return *this;
 }

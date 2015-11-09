@@ -156,23 +156,23 @@ static void test(void)
 		.add_child(json.create_node("name18", "value18"));
 
 	//////////////////////////////////////////////////////////////////////////
-	node0->add_child("name19", "value19")
-		.add_child("name20", "value20")
-		.add_child("name21", "value21");
+	node0->add_text("name19", "value19")
+		.add_text("name20", "value20")
+		.add_text("name21", "value21");
 	(*node0).add_child("name23",
 			json.create_node()
-			.add_child("name24", "value24")
-			.add_child("name24_1", "value24_1"))
+			.add_text("name24", "value24")
+			.add_text("name24_1", "value24_1"))
 			.add_number("name24_int", 1000)
 			.add_bool("name24_bool", true)
 		.add_child(true, true)
-			.add_child("name25", "value25")
-			.add_child("name26", "value26")
-			.add_child("name27", "value27")
+			.add_text("name25", "value25")
+			.add_text("name26", "value26")
+			.add_text("name27", "value27")
 			.get_parent()
-		.add_child("name28", "value28")
-		.add_child("name29", "value29")
-		.add_child("name30", "value30");
+		.add_text("name28", "value28")
+		.add_text("name29", "value29")
+		.add_text("name30", "value30");
 	//////////////////////////////////////////////////////////////////////////
 
 	// 遍历所有有标签名的结点

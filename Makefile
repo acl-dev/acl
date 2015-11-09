@@ -1,4 +1,9 @@
 SHELL = /bin/sh
+CC      = g++
+AR      = ar
+ARFL    = rv
+RANLIB  = ranlib
+
 #OSNAME = $(shell uname -sm)
 #OSTYPE = $(shell uname -p)
 OSNAME = $(shell uname -a)
@@ -20,9 +25,8 @@ RPATH =
 DATE_NOW = 20`date +%y`.`date +%m`.`date +%d`
 MAKE_ARGS =
 
-ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
-	RPATH = freebsd
-endif
+SYSLIB = -lpthread -lz
+LDFLAGS = -shared
 
 ifeq ($(findstring Linux, $(OSNAME)), Linux)
 	ifeq ($(findstring i686, $(OSTYPE)), i686)
@@ -33,30 +37,47 @@ ifeq ($(findstring Linux, $(OSNAME)), Linux)
 	endif
 	n = `cat /proc/cpuinfo | grep processor | wc -l`
 	MAKE_ARGS = -j $(n)
+	SYSLIB += -lrt -ldl
 endif
+
+# For Darwin
+ifeq ($(findstring Darwin, $(OSNAME)), Darwin)
+	RPATH = macos
+	SYSLIB +=  -rdynamic -L/usr/lib -liconv
+	LDFLAGS = -dynamiclib -shared
+endif
+
+ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
+	RPATH = freebsd
+	SYSLIB += -L/usr/local/lib -liconv
+endif
+
 ifeq ($(findstring SunOS, $(OSNAME)), SunOS)
 	ifeq ($(findstring i386, $(OSTYPE)), i386)
 		RPATH = sunos_x86
 	endif
+	SYSLIB += -liconv
 endif
 ##############################################################################
 
-.PHONY = check help all clean install uninstall uninstall_all build_bin build_src
+.PHONY = check help all_lib all samples all clean install uninstall uninstall_all build_bin build_src build_one
 VERSION = 3.1.3
 
 help:
-	@(echo "usage: make help|all|clean|install|uninstall|uninstall_all|build_bin|build_src")
-all:
+	@(echo "usage: make help|all|all_lib|all_samples|clean|install|uninstall|uninstall_all|build_bin|build_src|build_one")
+all_lib:
 	@(cd lib_acl; make $(MAKE_ARGS))
 	@(cd lib_protocol; make $(MAKE_ARGS))
 	@(cd lib_acl_cpp; make $(MAKE_ARGS))
 	@(cd lib_rpc; make $(MAKE_ARGS))
+all_samples: all_lib
 	@(cd unit_test; make $(MAKE_ARGS))
 	@(cd lib_acl/samples; make)
 	@(cd lib_protocol/samples; make)
 	@(cd lib_acl_cpp/samples; make)
 #	@(cd lib_dict; make $(MAKE_ARGS))
 #	@(cd lib_tls; make $(MAKE_ARGS))
+all: all_lib all_samples
 clean:
 	@(cd lib_acl; make clean)
 	@(cd lib_protocol; make clean)
@@ -65,6 +86,7 @@ clean:
 	@(cd unit_test; make clean)
 	@(cd lib_acl/samples; make clean)
 	@(cd lib_protocol/samples; make clean)
+	@(rm -f lib_acl.a lib_acl.so)
 #	@(cd lib_dict; make clean)
 #	@(cd lib_tls; make clean)
 
@@ -203,5 +225,29 @@ build_src: clean uninstall_all
 	@(mv acl.src.tgz ../acl$(VERSION).src.$(DATE_NOW).tgz)
 #	@(echo "move acl.src.tgz to ../acl$(VERSION).src.tgz")
 #	@(mv acl.src.tgz ../acl$(VERSION).src.tgz)
+RELEASE_PATH = release
+build_one: all_lib
+	@(mkdir -p $(RELEASE_PATH); mkdir -p $(RELEASE_PATH)/acl; \
+		mkdir -p $(RELEASE_PATH)/protocol; \
+		mkdir -p $(RELEASE_PATH)/acl_cpp)
+	@(cp lib_acl/lib/lib_acl.a $(RELEASE_PATH)/acl/)
+	@(cp lib_protocol/lib/lib_protocol.a $(RELEASE_PATH)/protocol/)
+	@(cp lib_acl_cpp/lib/lib_acl_cpp.a $(RELEASE_PATH)/acl_cpp/)
+	@(cd $(RELEASE_PATH)/acl; ar -x lib_acl.a)
+	@(cd $(RELEASE_PATH)/protocol; ar -x lib_protocol.a)
+	@(cd $(RELEASE_PATH)/acl_cpp; ar -x lib_acl_cpp.a)
+	$(AR) $(ARFL) ./lib_acl.a $(RELEASE_PATH)/acl/*.o \
+		$(RELEASE_PATH)/protocol/*.o $(RELEASE_PATH)/acl_cpp/*.o
+	$(RANLIB) ./lib_acl.a
+	$(CC) $(LDFLAGS) -o ./lib_acl.so $(RELEASE_PATH)/acl_cpp/*.o \
+		$(RELEASE_PATH)/protocol/*.o $(RELEASE_PATH)/acl/*.o \
+		$(SYSLIB)
+	@(rm -rf $(RELEASE_PATH))
+	@echo ""
+	@echo "Over, lib_acl.a and lib_acl.so were built ok!"
+	@echo ""
+
 check:
-	echo "TYPE=$(OSTYPE), OSNAME=$(OSNAME), RPATH=$(RPATH)"
+	@(echo "TYPE:	$(OSTYPE)")
+	@(echo "OSNAME:	$(OSNAME)")
+	@(echo "RPATH:	$(RPATH)")

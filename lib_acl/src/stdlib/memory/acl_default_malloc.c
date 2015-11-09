@@ -36,7 +36,7 @@ static size_t  __malloc_limit = 100000000;
   * integer alignment or better.
   */
 typedef struct MBLOCK {
-	int    signature;		/* set when block is active */
+	size_t signature;		/* set when block is active */
 	size_t length;			/* user requested length */
 	union {
 		ALIGN_TYPE align;
@@ -48,32 +48,34 @@ typedef struct MBLOCK {
 #define FILLER		0x0
 
 #define CHECK_PTR(_ptr_, _real_ptr_, _len_, _fname_, _line_) { \
-	if (_ptr_ == 0) \
-		acl_msg_fatal("%s(%d): null pointer input", _fname_, _line_); \
-	_real_ptr_ = (MBLOCK *) (((char *) _ptr_) - offsetof(MBLOCK, u.payload[0])); \
-	if (_real_ptr_->signature != SIGNATURE) \
-		acl_msg_fatal("%s(%d): corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
-			_fname_, _line_, (int) _real_ptr_->length, _real_ptr_->signature, SIGNATURE); \
-	if ((_len_ = _real_ptr_->length) < 1) \
-		acl_msg_fatal("%s(%d): corrupt memory block length", _fname_, _line_); \
+  if (_ptr_ == 0) \
+    acl_msg_fatal("%s(%d): null pointer input", _fname_, _line_); \
+  _real_ptr_ = (MBLOCK *) (((char*)_ptr_) - offsetof(MBLOCK, u.payload[0])); \
+  if (_real_ptr_->signature != SIGNATURE) \
+    acl_msg_fatal("%s(%d): corrupt or unallocated block(%d, 0x%x, 0x%x)", \
+      _fname_, _line_, (int) _real_ptr_->length, \
+      (int) _real_ptr_->signature, SIGNATURE); \
+  if ((_len_ = _real_ptr_->length) < 1) \
+    acl_msg_fatal("%s(%d): corrupt memory block length", _fname_, _line_); \
 }
 
 #define CHECK_IN_PTR(_ptr_, _real_ptr_, _len_, _fname_, _line_) { \
-	if (_ptr_ == 0) \
-		acl_msg_fatal("%s(%d): null pointer input", _fname_, _line_); \
-	_real_ptr_ = (MBLOCK *) (((char *) _ptr_) - offsetof(MBLOCK, u.payload[0])); \
-	if (_real_ptr_->signature != SIGNATURE) \
-		acl_msg_fatal("%s(%d): corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
-			_fname_, _line_, (int) _real_ptr_->length, _real_ptr_->signature, SIGNATURE); \
-	_real_ptr_->signature = 0; \
-	if ((_len_ = _real_ptr_->length) < 1) \
-		acl_msg_fatal("%s(%d): corrupt memory block length", _fname_, _line_); \
+  if (_ptr_ == 0) \
+    acl_msg_fatal("%s(%d): null pointer input", _fname_, _line_); \
+  _real_ptr_ = (MBLOCK *) (((char*)_ptr_) - offsetof(MBLOCK, u.payload[0])); \
+  if (_real_ptr_->signature != SIGNATURE) \
+    acl_msg_fatal("%s(%d): corrupt or unallocated block(%d, 0x%x, 0x%x)", \
+      _fname_, _line_, (int) _real_ptr_->length, \
+      (int) _real_ptr_->signature, SIGNATURE); \
+  _real_ptr_->signature = 0; \
+  if ((_len_ = _real_ptr_->length) < 1) \
+    acl_msg_fatal("%s(%d): corrupt memory block length", _fname_, _line_); \
 }
 
 #define CHECK_OUT_PTR(_ptr_, _real_ptr_, _len_) { \
-	_real_ptr_->signature = SIGNATURE; \
-	_real_ptr_->length = _len_; \
-	_ptr_ = _real_ptr_->u.payload; \
+  _real_ptr_->signature = SIGNATURE; \
+  _real_ptr_->length = _len_; \
+  _ptr_ = _real_ptr_->u.payload; \
 }
 
 #define SPACE_FOR(len)	(offsetof(MBLOCK, u.payload[0]) + len)

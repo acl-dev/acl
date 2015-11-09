@@ -1,0 +1,146 @@
+CC	= ${MY_ENV_CC}
+
+CFLAGS = -c -g -W \
+-O3 \
+-Wall \
+-Werror \
+-Wshadow \
+-Wno-long-long \
+-Wpointer-arith \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
+-D_USE_FAST_MACRO
+#-Wno-invalid-source-encoding
+
+#-Wcast-qual
+# -Wcast-align
+#-Waggregate-return
+
+LDFLAGS = -Wl,-rpath,$(BASE_PATH) -L$(BASE_PATH) -l_acl \
+	  $(EXTLIBS) $(SYSLIB)
+
+###########################################################
+#Check system:
+#       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
+SYSLIB = -lpthread -lz -ldl
+CHECKSYSRES = @echo "Unknow system type!";exit 1
+OSNAME = $(shell uname -sm)
+UNIXNAME = $(OSNAME)
+RPATH =
+
+ifeq ($(CC),)
+        CC = g++
+endif
+
+ifeq ($(findstring clang++, $(CC)), clang++)
+	CFLAGS += -Wno-invalid-source-encoding \
+		  -Wno-extended-offsetof
+endif
+
+# For FreeBSD
+ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
+	CFLAGS += -DFREEBSD
+	SYSLIB = -lcrypt -lpthread -rdynamic
+	LDFLAGS = -R$(BASE_PATH) -L$(BASE_PATH) -l_acl \
+		  $(EXTLIBS) $(SYSLIB)
+endif
+
+# For Darwin
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
+		  -Wno-extended-offsetof
+	SYSLIB +=  -rdynamic
+	UNIXTYPE = MACOSX
+	LDFLAGS = -Wl,-rpath,$(BASE_PATH) -R$(BASE_PATH) -L$(BASE_PATH) -l_acl \
+		  $(EXTLIBS) $(SYSLIB)
+endif
+
+#Path for Linux
+ifeq ($(findstring Linux, $(OSNAME)), Linux)
+	ifeq ($(findstring i686, $(OSNAME)), i686)
+		RPATH = linux32
+	endif
+	ifeq ($(findstring x86_64, $(OSNAME)), x86_64)
+		RPATH = linux64
+	endif
+	CFLAGS += -DLINUX2
+	SYSLIB += -rdynamic
+endif
+
+# For MINGW
+ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	SYSLIB = -lpthread-2 -liconv
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
+#Path for SunOS
+ifeq ($(findstring SunOS, $(OSNAME)), SunOS)
+	ifeq ($(findstring 86, $(OSNAME)), 86)
+		SYSLIB += -lsocket -lnsl -lrt
+	endif
+	ifeq ($(findstring sun4u, $(OSNAME)), sun4u)
+		SYSLIB += -lsocket -lnsl -lrt
+	endif
+	ifeq ($CC, "gcc")
+		CFLAGS += -Wstrict-prototypes
+	endif
+	CFLAGS += -DSUNOS5
+endif
+
+#Path for HP-UX
+ifeq ($(findstring HP-UX, $(OSNAME)), HP-UX)
+	CFLAGS += -DHP_UX -DHPUX11 -Wshadow
+	PLAT_NAME=hp-ux
+endif
+
+#Find system type.
+ifneq ($(SYSPATH),)
+	CHECKSYSRES = @echo "System is $(shell uname -sm)"
+endif
+###########################################################
+SRC =
+BASE_PATH =
+UTIL_PATH =
+ifneq ($(base_path),)
+	BASE_PATH = $(base_path)
+	UTIL_PATH = $(base_path)/samples
+	CFLAGS += -I$(base_path)/samples
+	SRC = $(wildcard $(UTIL_PATH)/*.cpp)
+else
+	BASE_PATH = ../..
+endif
+
+CFLAGS += -I. -I$(BASE_PATH)/lib_acl_cpp/include -I$(BASE_PATH)/lib_acl/include -I$(BASE_PATH)/lib_protocol/include
+
+COMPILE = $(CC) $(CFLAGS)
+LINK = $(CC) $(OBJ) $(LDFLAGS)
+###########################################################
+OBJ_PATH = .
+
+#Project's objs
+#UTIL = $(wildcard $(UTIL_PATH)/*.cpp)
+SRC += $(wildcard *.cpp)
+#SRC = $(wildcard *.cpp)
+OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
+
+$(OBJ_PATH)/%.o: %.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: $(UTIL_PATH)/%.cpp
+	$(COMPILE) $< -o $@
+
+.PHONY = all clean
+all: RM $(OBJ)
+	$(LINK) -o $(PROG)
+	@echo ""
+	@echo "All ok! Output:$(PROG)"
+	@echo ""
+rebuild rb: clean all
+RM:
+	rm -f $(PROG)
+clean cl:
+	rm -f $(PROG)
+	rm -f $(OBJ)
+
+rebuild rb: clean all
+###########################################################

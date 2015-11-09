@@ -15,13 +15,15 @@ CFLAGS = -c -g -W \
 -D_POSIX_PTHREAD_SEMANTICS \
 -Wno-long-long \
 -Wformat \
--DHAS_POLARSSL \
 -DHAS_MYSQL_DLL
+#-DHAS_POLARSSL
 #-DUSE_DYNAMIC
 # -Wcast-align
 #-Wcast-qual
 #just for freebsd's iconv.h
 CFLAGS += -I/usr/local/include
+
+shared_ldflags = -l_protocol -l_acl -lz -lpthread
 
 ###########################################################
 #Check system:
@@ -44,6 +46,7 @@ endif
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD -fPIC -Werror
 	UNIXTYPE = FREEBSD
+	shared_ldflags = -l_protocol -l_acl -L/usr/local/lib -liconv -lz -lpthread
 endif
 
 # For Darwin
@@ -52,12 +55,14 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 		  -Wno-extended-offsetof -fPIC -Werror \
 		  -Wno-unused-private-field
 	UNIXTYPE = MACOSX
+	shared_ldflags = -l_protocol -l_acl -L/usr/lib -liconv -lz -lpthread
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -DLINUX2 -fPIC -Werror
 	UNIXTYPE = LINUX
+	shared_ldflags = -l_protocol -l_acl -lrt -lpthread -lz -ldl
 endif
 
 # For MINGW
@@ -172,7 +177,6 @@ static: depends $(OBJS_DST)
 	@$(RANLIB) $(LIB_PATH_DST)/$(STATIC_LIBNAME)
 	@echo 'create $(LIB_PATH_DST)/$(STATIC_LIBNAME) ok!'
 
-shared_ldflags = -l_protocol -l_acl -lrt -lpthread -lz -ldl
 shared: depends $(OBJS_DST)
 	@echo 'creating $(SHARED_LIBNAME)'
 	@if test -n "$(rpath)" && test "$(UNIXTYPE)" = "LINUX"; then \
@@ -182,6 +186,16 @@ shared: depends $(OBJS_DST)
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "SUNOS5"; then \
 		echo "building for sunos5"; \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+			-R$(rpath) -L$(rpath) $(shared_ldflags); \
+		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
+	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "MACOSX"; then \
+		echo "building for Darwin"; \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+			-R$(rpath) -L$(rpath) $(shared_ldflags); \
+		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
+	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "FREEBSD"; then \
+		echo "building for Darwin"; \
 		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
 			-R$(rpath) -L$(rpath) $(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \

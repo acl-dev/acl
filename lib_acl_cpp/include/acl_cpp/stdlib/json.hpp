@@ -131,6 +131,8 @@ public:
 	 */
 	const string& to_string(void);
 
+	/////////////////////////////////////////////////////////////////////
+
 	/**
 	 * 给本 json 节点添加 json_node 子节点对象
 	 * @param child {json_node*} 子节点对象
@@ -157,7 +159,37 @@ public:
 	 *  否则返回本 json 节点对象的引用
 	 */
 	json_node& add_array(bool return_child = false);
-	json_node& add_child(bool as_array = false,
+	json_node& add_child(bool as_array = false, bool return_child = false);
+
+	/**
+	 * 创建一个 json 节点对象，并将之添加为本 json 节点的子节点
+	 * @param tag {const char*} 标签名
+	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
+	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
+	 *  否则返回本 json 节点对象的引用
+	 */
+	json_node& add_child(const char* tag, bool return_child = false);
+
+	/**
+	 * 创建一个 json 节点对象，并将之添加为本 json 节点的子节点
+	 * @param tag {const char*} 标签名
+	 * @param node {json_node*} 标签值指针
+	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
+	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
+	 *  否则返回本 json 节点对象的引用
+	 */
+	json_node& add_child(const char* tag, json_node* node,
+		bool return_child = false);
+
+	/**
+	 * 创建一个 json 节点对象，并将之添加为本 json 节点的子节点
+	 * @param tag {const char*} 标签名
+	 * @param node {json_node&} 标签值引用
+	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
+	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
+	 *  否则返回本 json 节点对象的引用
+	 */
+	json_node& add_child(const char* tag, json_node& node,
 		bool return_child = false);
 
 	/**
@@ -170,9 +202,6 @@ public:
 	 * 注：此处的 add_text 和 add_child 是同样的功能
 	 */
 	json_node& add_text(const char* tag, const char* value,
-		bool return_child = false);
-
-	json_node& add_child(const char* tag, const char* value,
 		bool return_child = false);
 
 	/**
@@ -212,9 +241,6 @@ public:
 	json_node& add_array_text(const char* text,
 		bool return_child = false);
 
-	ACL_CPP_DEPRECATED_FOR("add_text")
-	json_node& add_child(const char* text, bool return_child = false);
-
 	/**
 	 * 创建一个 json 数字对象，并将之添加为本 json 节点的子节点
 	 * @param value {acl_int64} 数字值
@@ -240,31 +266,12 @@ public:
 	json_node& add_array_bool(bool value, bool return_child = false);
 
 	/**
-	 * 创建一个 json 节点对象，并将之添加为本 json 节点的子节点
-	 * @param tag {const char*} 标签名
-	 * @param node {json_node*} 标签值指针
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
-	 */
-	json_node& add_child(const char* tag, json_node* node,
-		bool return_child = false);
-
-	/**
-	 * 创建一个 json 节点对象，并将之添加为本 json 节点的子节点
-	 * @param tag {const char*} 标签名
-	 * @param node {json_node&} 标签值引用
-	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
-	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
-	 *  否则返回本 json 节点对象的引用
-	 */
-	json_node& add_child(const char* tag, json_node& node,
-		bool return_child = false);
-
-	/**
-	 * @return {json_node&} 返回本节点的父节点引用
+	 * @return {json_node&} 返回本节点的父节点引用，在采用级联方式创建 json
+	 *  对象时，本函数常被用于返回父节点
 	 */
 	json_node& get_parent(void) const;
+
+	/////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 获得本节点的第一个子节点，需要遍历子节点时必须首先调用此函数
@@ -464,6 +471,8 @@ public:
 	 */
 	ACL_JSON* get_json(void) const;
 
+	/////////////////////////////////////////////////////////////////////
+
 	/**
 	 * 创建一个 json_node 叶节点对象，该节点对象的格式为：
 	 * "tag_name": "tag_value"
@@ -510,9 +519,6 @@ public:
 	 *  不用时调用 reset 来释放这些 json_node 节点对象
 	 */
 	json_node& create_array_text(const char* text);
-
-	ACL_CPP_DEPRECATED_FOR("create_array_text")
-	json_node& create_node(const char* text);
 
 	/**
 	 * 创建一个 json_node 叶节点数值对象
@@ -570,6 +576,8 @@ public:
 	 *  不用时调用 reset 来释放这些 json_node 节点对象
 	 */
 	json_node& create_node(const char* tag, json_node& node);
+
+	/////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 将一个 json 对象中的一个 json 节点复制至任一 json 对象中的一个

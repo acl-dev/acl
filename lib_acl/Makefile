@@ -277,6 +277,16 @@ shared: depends $(OBJS_DST)
 		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
 			-L$(rpath) $(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
+	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "MACOSX"; then \
+		echo "building for Darwin"; \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+			-L$(rpath) -lpthread; \
+		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
+	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "FREEBSD"; then \
+		echo "building for FreeBSD"; \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+			-L$(rpath) -lpthread; \
+		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	else \
 		echo 'skip build $(SHARED_LIBNAME); usage: make shared rpath=xxx'; \
 	fi

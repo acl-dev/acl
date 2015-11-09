@@ -18,7 +18,7 @@ extern "C" {
 # elif defined(__ia64__)
 #  define ALIGN_TYPE	long double
 # else
-#  define ALIGN_TYPE	double
+#  define ALIGN_TYPE	size_t
 # endif
 #endif
 
@@ -55,7 +55,7 @@ ACL_API void acl_mempool_ctl(int name, ...);
  */
 ACL_API int acl_mempool_total_allocated(void);
 
-/*---------------- ACL库中缺省的内存分配、释放等管理接口 ---------------------*/
+/*---------------- ACL库中缺省的内存分配、释放等管理接口 -------------------*/
 
 /**
  * 获得当前内存指针的一些状态信息，如该内存的实际大小与对外分配大小
@@ -102,7 +102,8 @@ ACL_API void *acl_default_malloc(const char *filename, int line, size_t size);
  * @return {void*} 分配的可用地址, 如果分配失败，则内部会自动coredump
  *   需要调用 acl_default_free 释放
  */
-ACL_API void *acl_default_calloc(const char *filename, int line, size_t nmemb, size_t size);
+ACL_API void *acl_default_calloc(const char *filename, int line,
+		size_t nmemb, size_t size);
 
 /**
  * ACL库中缺省的内存分配器接口, 类似于标准库的 realloc
@@ -113,7 +114,8 @@ ACL_API void *acl_default_calloc(const char *filename, int line, size_t nmemb, s
  * @return {void*} 分配的可用地址, 如果分配失败，则内部会自动coredump
  *   需要调用 acl_default_free 释放
  */
-ACL_API void *acl_default_realloc(const char *filename, int line, void *ptr, size_t size);
+ACL_API void *acl_default_realloc(const char *filename, int line,
+		void *ptr, size_t size);
 
 /**
  * 复制字符串，类似于标准库中的 strdup
@@ -132,7 +134,8 @@ ACL_API char *acl_default_strdup(const char *filename, int line, const char *str
  * @param len {size_t} 限制新字符串的最大长度值
  * @return {char*} 新复制的字符串地址，需要调用 acl_default_free 释放
  */
-ACL_API char *acl_default_strndup(const char *filename, int line, const char *str, size_t len);
+ACL_API char *acl_default_strndup(const char *filename, int line,
+		const char *str, size_t len);
 
 /**
  * 复制内存数据
@@ -142,7 +145,8 @@ ACL_API char *acl_default_strndup(const char *filename, int line, const char *st
  * @param len {size_t} 源内存区域的长度
  * @return {void*} 新复制的内存地址 
  */
-ACL_API void *acl_default_memdup(const char *filename, int line, const void *ptr, size_t len);
+ACL_API void *acl_default_memdup(const char *filename, int line,
+		const void *ptr, size_t len);
 
 /**
  * 释放由 acl_devault_xxx 所分配的内存动态内存
@@ -151,9 +155,10 @@ ACL_API void *acl_default_memdup(const char *filename, int line, const void *ptr
  */
 ACL_API void  acl_default_free(const char *filename, int line, void *ptr);
 
-/*------- acl_mymalloc.h 内存管理接口中的宏调用所使用的内存管理函数接口 ------*/
-/* 该函数接口集其实是调用了其它的内存管理来进行内存的分配与释放等管理操作的，它
- * 提供了高级宏调用的外部使用接口，方便用户操作。
+/*----- acl_mymalloc.h 内存管理接口中的宏调用所使用的内存管理函数接口 ------*/
+
+/* 该函数接口集其实是调用了其它的内存管理来进行内存的分配与释放等管理操作的，
+ * 它提供了高级宏调用的外部使用接口，方便用户操作。
  */
 
 ACL_API void *acl_malloc_glue(const char *filename, int line, size_t size);

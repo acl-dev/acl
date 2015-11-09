@@ -1,5 +1,6 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
+#include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/db/db_handle.hpp"
 
 typedef struct st_mysql MYSQL;
@@ -83,9 +84,11 @@ public:
 
 	/**
 	 * 基类 db_handle 的纯虚接口
+	 * @param charset {const char*} 打开数据库连接时采用的字符集，当该
+	 *  参数非空时将会覆盖构造函数中传入的字符集
 	 * @return {bool} 打开是否成功
 	 */
-	bool dbopen();
+	bool dbopen(const char* charset = NULL);
 
 	/**
 	 * 基类 db_handle 的纯虚接口，数据库是否已经打开了
@@ -145,7 +148,7 @@ private:
 	char* dbname_;  // 数据库名
 	char* dbuser_;  // 数据库账号
 	char* dbpass_;  // 数据库账号密码
-	char* charset_; // 连接数据库采用的字符集
+	string charset_; // 连接数据库采用的字符集
 
 	unsigned long dbflags_;
 	int   conn_timeout_;

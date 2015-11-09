@@ -296,7 +296,7 @@ void http_hdr_req_free(HTTP_HDR_REQ *hh)
 	if (hh == NULL)
 		return;
 
-	if (var_http_tls_cache <= 0) {
+	if (var_http_tls_cache <= 0 || cache_pool == NULL) {
 		__hdr_free_member(hh);
 		http_hdr_free((HTTP_HDR *) hh);
 		return;

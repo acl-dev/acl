@@ -8,6 +8,7 @@
 
 namespace acl {
 
+class dbuf_pool;
 class istream;
 class ostream;
 class socket_stream;
@@ -45,10 +46,12 @@ public:
 	 * @param body_limit {int} 针对 POST 方法，当数据体为文本参数
 	 *  类型时，此参数限制数据体的长度；当数据体为数据流或 MIME
 	 *  格式或 on 为 false，此参数无效
+	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
 	 */
 	HttpServletRequest(HttpServletResponse& res, session& store,
 		socket_stream& stream, const char* charset = NULL,
-		bool body_parse = true, int body_limit = 102400);
+		bool body_parse = true, int body_limit = 102400,
+		dbuf_pool* dbuf = NULL);
 	~HttpServletRequest(void);
 
 	/**
@@ -325,6 +328,8 @@ public:
 	void sprint_header(string& out, const char* prompt);
 
 private:
+	dbuf_pool* dbuf_internal_;
+	dbuf_pool* dbuf_;
 	http_request_error_t req_error_;
 	char cookie_name_[64];
 	HttpServletResponse& res_;
@@ -353,6 +358,7 @@ private:
 	bool readHeaderCalled_;
 	bool readHeader(string* method_s);
 
+	void add_cookie(char* data);
 	void parseParameters(const char* str);
 };
 

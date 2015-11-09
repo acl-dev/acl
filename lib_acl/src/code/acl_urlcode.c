@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "stdlib/acl_mymalloc.h"
+#include "stdlib/acl_dbuf_pool.h"
 #include "stdlib/acl_msg.h"
 #include "code/acl_urlcode.h"
 
@@ -13,14 +14,18 @@
 
 static unsigned char enc_tab[] = "0123456789ABCDEF";
 
-char *acl_url_encode(const char *str)
+char *acl_url_encode(const char *str, ACL_DBUF_POOL *dbuf)
 {
-	register int i, j, len, tmp_len;
+	int i, j, len, tmp_len;
 	unsigned char *tmp;
 
 	len = (int) strlen(str);
 	tmp_len = len;
-	tmp = (unsigned char*) acl_mymalloc(len + 1);
+
+	if (dbuf != NULL)
+		tmp = (unsigned char*) acl_dbuf_pool_alloc(dbuf, len + 1);
+	else
+		tmp = (unsigned char*) acl_mymalloc(len + 1);
 
 	for (i = 0, j = 0; i < len; i++, j++) {
 		tmp[j] = (unsigned char) str[i];
@@ -28,7 +33,14 @@ char *acl_url_encode(const char *str)
 			tmp[j] = '+';
 		else if (!isalnum(tmp[j]) && strchr("_-.", tmp[j]) == NULL) {
 			tmp_len += 3;
-			tmp = acl_myrealloc(tmp, tmp_len);
+			if (dbuf != NULL) {
+				unsigned char *t = (unsigned char*) 
+					acl_dbuf_pool_alloc(dbuf, tmp_len);
+				if (j > 0)
+					memcpy(t, tmp, j);
+				tmp = t;
+			} else
+				tmp = acl_myrealloc(tmp, tmp_len);
 
 			tmp[j++] = '%';
 			tmp[j++] = enc_tab[(unsigned char)str[i] >> 4];
@@ -59,13 +71,16 @@ static unsigned char dec_tab[256] = {
 	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 };
 
-char *acl_url_decode(const char *str)
+char *acl_url_decode(const char *str, ACL_DBUF_POOL *dbuf)
 {
 	char *tmp;
-	register int i, len, pos = 0;
+	int i, len, pos = 0;
 
 	len = (int) strlen(str);
-	tmp = (char *) acl_mymalloc(len + 1);
+	if (dbuf != NULL)
+		tmp = (char*) acl_dbuf_pool_alloc(dbuf, len + 1);
+	else
+		tmp = (char*) acl_mymalloc(len + 1);
 
 	for (i = 0; i < len; i++) {
 		/* If we found a '%' character, then the next two are

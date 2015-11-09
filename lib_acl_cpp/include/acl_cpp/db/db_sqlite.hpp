@@ -91,9 +91,11 @@ public:
 
 	/**
 	 * 基类 db_handle 的纯虚接口
+	 * @param charset {const char*} 打开数据库连接时采用的字符集，当该
+	 *  参数非空时将会覆盖构造函数中传入的字符集
 	 * @return {bool} 打开是否成功
 	 */
-	bool dbopen();
+	bool dbopen(const char* charset = NULL);
 
 	/**
 	 * 基类 db_handle 的纯虚接口，数据库是否已经打开了

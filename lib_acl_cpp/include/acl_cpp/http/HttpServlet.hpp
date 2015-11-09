@@ -5,6 +5,7 @@
 
 namespace acl {
 
+class dbuf_pool;
 class socket_stream;
 class session;
 class HttpServletRequest;
@@ -224,8 +225,10 @@ public:
 	}
 
 private:
+	dbuf_pool* dbuf_;
 	session* session_;
 	session* session_ptr_;
+	size_t   reserve_size_;
 	socket_stream* stream_;
 	bool first_;
 	char local_charset_[32];
@@ -234,6 +237,7 @@ private:
 	int  parse_body_limit_;
 
 	void init();
+	bool doRun(dbuf_pool* dbuf);
 };
 
 } // namespace acl

@@ -326,9 +326,7 @@ void db_mysql::sane_mysql_init(const char* dbaddr, const char* dbname,
 		dbpass_ = NULL;
 
 	if (charset && *charset)
-		charset_ = acl_mystrdup(charset);
-	else
-		charset_ = NULL;
+		charset_ = charset;
 
 	dbflags_ = dbflags;
 	auto_commit_ = auto_commit;
@@ -367,8 +365,6 @@ db_mysql::~db_mysql()
 		acl_myfree(dbuser_);
 	if (dbpass_)
 		acl_myfree(dbpass_);
-	if (charset_)
-		acl_myfree(charset_);
 	if (conn_)
 		__mysql_close(conn_);
 }
@@ -405,7 +401,7 @@ const char* db_mysql::get_error() const
 		return "mysql not opened yet!";
 }
 
-bool db_mysql::dbopen()
+bool db_mysql::dbopen(const char* charset /* = NULL */)
 {
 	if (conn_)
 		return true;
@@ -493,14 +489,17 @@ bool db_mysql::dbopen()
 		return false;
 	}
 
-	if (charset_)
+	if (charset != NULL && *charset != 0)
+		charset_ = charset;
+
+	if (!charset_.empty())
 	{
-		if (!__mysql_set_character_set(conn_, charset_))
-			logger("set mysql charset to %s, %s", charset_,
+		if (!__mysql_set_character_set(conn_, charset_.c_str()))
+			logger("set mysql charset to %s, %s", charset_.c_str(),
 				__mysql_character_set_name(conn_));
 		else
 			logger_error("set mysql to %s error %s",
-				charset_, __mysql_error(conn_));
+				charset_.c_str(), __mysql_error(conn_));
 	}
 
 #if MYSQL_VERSION_ID >= 50000
@@ -704,7 +703,7 @@ const char* db_mysql::dbtype() const
 	return NULL;
 }
 
-bool db_mysql::dbopen()
+bool db_mysql::dbopen(const char*)
 {
 	return false;
 }

@@ -63,7 +63,7 @@ endif
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-extended-offsetof -fPIC -Werror
-	UNIXTYPE = FREEBSD
+	UNIXTYPE = MACOSX
 endif
 
 # For Linux
@@ -161,6 +161,16 @@ shared: $(OBJS_DST)
 		echo "building for sunos5"; \
 		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
 			-R$(rpath) -L$(rpath) $(shared_ldflags); \
+		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
+	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "MACOSX"; then \
+		echo "building for Darwin"; \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+			-R$(rpath) -L$(rpath) -l_acl -lpthread; \
+		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
+	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "FREEBSD"; then \
+		echo "building for FreeBSD"; \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+			-R$(rpath) -L$(rpath) -l_acl -lpthread; \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	else \
 		echo 'skip build $(SHARED_LIBNAME); usage: make shared rpath=xxx'; \

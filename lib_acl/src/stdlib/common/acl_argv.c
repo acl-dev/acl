@@ -14,6 +14,7 @@
 /* Application-specific. */
 
 #include "stdlib/acl_mymalloc.h"
+#include "stdlib/acl_dbuf_pool.h"
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_argv.h"
 
@@ -28,9 +29,13 @@ static void argv_extend(ACL_ARGV *argvp)
 	int     new_len;
 
 	new_len = argvp->len * 2;
-	if (argvp->slice)
-		argvp->argv = (char **) acl_slice_pool_realloc(__FILE__, __LINE__,
-			argvp->slice, argvp->argv, (new_len + 1) * sizeof(char *));
+	if (argvp->dbuf) {
+		char** argv = (char **) acl_dbuf_pool_alloc(argvp->dbuf,
+				(new_len + 1) * sizeof(char *));
+		memcpy(argv, argvp->argv, argvp->len * sizeof(char*));
+		acl_dbuf_pool_free(argvp->dbuf, argvp->argv);
+		argvp->argv = argv;
+	}
 	else
 		argvp->argv = (char **) acl_myrealloc((char *) argvp->argv,
 			(new_len + 1) * sizeof(char *));
@@ -53,9 +58,8 @@ static void argv_push_front(struct ACL_ARGV *argvp, const char *s)
 	for (i = argvp->argc; i > 0; i--) {
 		argvp->argv[i] = argvp->argv[i - 1];
 	}
-	if (argvp->slice)
-		argvp->argv[0] = acl_slice_pool_strdup(__FILE__, __LINE__,
-			argvp->slice, s);
+	if (argvp->dbuf)
+		argvp->argv[0] = acl_dbuf_pool_strdup(argvp->dbuf, s);
 	else
 		argvp->argv[0] = acl_mystrdup(s);
 	argvp->argc++;
@@ -65,7 +69,7 @@ static char *argv_pop_back(struct ACL_ARGV *argvp)
 {
 	if (argvp->argc <= 0)
 		return (NULL);
-	return (argvp->argv[--argvp->argc]);
+	return argvp->argv[--argvp->argc];
 }
 
 static char *argv_pop_front(struct ACL_ARGV *argvp)
@@ -77,10 +81,10 @@ static char *argv_pop_front(struct ACL_ARGV *argvp)
 		return (NULL);
 	s = argvp->argv[0];
 	argvp->argc--;
-	for (i = 0; i < argvp->argc; i++) {
+	for (i = 0; i < argvp->argc; i++)
 		argvp->argv[i] = argvp->argv[i + 1];
-	}
-	return (s);
+
+	return s;
 }
 
 /* argv_iter_head - get the head of the array */
@@ -96,7 +100,7 @@ static void *argv_iter_head(ACL_ITER *iter, struct ACL_ARGV *argv)
 	iter->ptr = argv->argv[0];
 
 	iter->data = iter->ptr;
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 /* argv_iter_next - get the next of the array */
@@ -108,7 +112,7 @@ static void *argv_iter_next(ACL_ITER *iter, struct ACL_ARGV *argv)
 		iter->data = iter->ptr = 0;
 	else
 		iter->data = iter->ptr = argv->argv[iter->i];
-	return (iter->ptr);
+	return iter->ptr;
 }
  
 /* argv_iter_tail - get the tail of the array */
@@ -125,7 +129,7 @@ static void *argv_iter_tail(ACL_ITER *iter, struct ACL_ARGV *argv)
 		iter->data = iter->ptr = 0;
 	else
 		iter->data = iter->ptr = argv->argv[iter->i];
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 /* argv_iter_prev - get the prev of the array */
@@ -137,7 +141,7 @@ static void *argv_iter_prev(ACL_ITER *iter, struct ACL_ARGV *argv)
 		iter->data = iter->ptr = 0;
 	else
 		iter->data = iter->ptr = argv->argv[iter->i];
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 /* acl_argv_free - destroy string array */
@@ -147,50 +151,50 @@ ACL_ARGV   *acl_argv_free(ACL_ARGV *argvp)
 	char  **cpp;
 
 	for (cpp = argvp->argv; cpp < argvp->argv + argvp->argc; cpp++) {
-		if (argvp->slice)
-			acl_slice_pool_free(__FILE__, __LINE__, *cpp);
+		if (argvp->dbuf)
+			acl_dbuf_pool_free(argvp->dbuf, *cpp);
 		else
 			acl_myfree(*cpp);
 	}
-	if (argvp->slice) {
-		acl_slice_pool_free(__FILE__, __LINE__, argvp->argv);
-		acl_slice_pool_free(__FILE__, __LINE__, argvp);
+	if (argvp->dbuf) {
+		acl_dbuf_pool_free(argvp->dbuf, argvp->argv);
+		acl_dbuf_pool_free(argvp->dbuf, argvp);
 	} else {
 		acl_myfree(argvp->argv);
 		acl_myfree(argvp);
 	}
-	return (NULL);
+	return NULL;
 }
 
 /* acl_argv_alloc - initialize string array */
 
 ACL_ARGV   *acl_argv_alloc(int size)
 {
-	return (acl_argv_alloc2(size, NULL));
+	return acl_argv_alloc2(size, NULL);
 }
 
-ACL_ARGV   *acl_argv_alloc2(int len, ACL_SLICE_POOL *slice)
+ACL_ARGV   *acl_argv_alloc2(int len, ACL_DBUF_POOL *dbuf)
 {
 	ACL_ARGV   *argvp;
 	int     sane_len;
 
 	/* Make sure that always argvp->argc < argvp->len. */
 
-	if (slice) {
-		argvp = (ACL_ARGV *) acl_slice_pool_alloc(__FILE__, __LINE__,
-			slice, sizeof(*argvp));
-		argvp->slice = slice;
+	if (dbuf) {
+		argvp = (ACL_ARGV *) acl_dbuf_pool_alloc(dbuf, sizeof(*argvp));
+		argvp->dbuf = dbuf;
 	} else {
 		argvp = (ACL_ARGV *) acl_mymalloc(sizeof(*argvp));
-		argvp->slice = NULL;
+		argvp->dbuf = NULL;
 	}
 	argvp->len = 0;
 	sane_len = (len < 2 ? 2 : len);
-	if (argvp->slice)
-		argvp->argv = (char **) acl_slice_pool_alloc(__FILE__, __LINE__,
-			argvp->slice, (sane_len + 1) * sizeof(char *));
+	if (argvp->dbuf)
+		argvp->argv = (char **) acl_dbuf_pool_alloc(argvp->dbuf,
+				(sane_len + 1) * sizeof(char *));
 	else
-		argvp->argv = (char **) acl_mymalloc((sane_len + 1) * sizeof(char *));
+		argvp->argv = (char **)
+			acl_mymalloc((sane_len + 1) * sizeof(char *));
 	argvp->len = sane_len;
 	argvp->argc = 0;
 	argvp->argv[0] = 0;
@@ -206,7 +210,7 @@ ACL_ARGV   *acl_argv_alloc2(int len, ACL_SLICE_POOL *slice)
 	argvp->iter_tail = argv_iter_tail;
 	argvp->iter_prev = argv_iter_prev;
 
-	return (argvp);
+	return argvp;
 }
 
 /* acl_argv_add - add string to vector */
@@ -222,9 +226,9 @@ void    acl_argv_add(ACL_ARGV *argvp,...)
 	while ((arg = va_arg(ap, const char *)) != 0) {
 		if (SPACE_LEFT(argvp) <= 0)
 			argv_extend(argvp);
-		if (argvp->slice)
-			argvp->argv[argvp->argc++] = acl_slice_pool_strdup(__FILE__, __LINE__,
-				argvp->slice, arg);
+		if (argvp->dbuf)
+			argvp->argv[argvp->argc++] = acl_dbuf_pool_strdup(
+				argvp->dbuf, arg);
 		else
 			argvp->argv[argvp->argc++] = acl_mystrdup(arg);
 	}
@@ -241,9 +245,9 @@ void    acl_argv_addv(ACL_ARGV *argvp, va_list ap)
 	while ((arg = va_arg(ap, const char *)) != 0) {
 		if (SPACE_LEFT(argvp) <= 0)
 			argv_extend(argvp);
-		if (argvp->slice)
-			argvp->argv[argvp->argc++] = acl_slice_pool_strdup(__FILE__, __LINE__,
-				argvp->slice, arg);
+		if (argvp->dbuf)
+			argvp->argv[argvp->argc++] = acl_dbuf_pool_strdup(
+				argvp->dbuf, arg);
 		else
 			argvp->argv[argvp->argc++] = acl_mystrdup(arg);
 	}
@@ -267,9 +271,9 @@ void    acl_argv_addn(ACL_ARGV *argvp,...)
 			acl_msg_panic("%s: bad string length %d", myname, len);
 		if (SPACE_LEFT(argvp) <= 0)
 			argv_extend(argvp);
-		if (argvp->slice)
-			argvp->argv[argvp->argc++] = acl_slice_pool_strndup(__FILE__, __LINE__,
-				argvp->slice, arg, len);
+		if (argvp->dbuf)
+			argvp->argv[argvp->argc++] = acl_dbuf_pool_strndup(
+				argvp->dbuf, arg, len);
 		else
 			argvp->argv[argvp->argc++] = acl_mystrndup(arg, len);
 	}
@@ -290,9 +294,9 @@ void    acl_argv_addnv(ACL_ARGV *argvp, va_list ap)
 			acl_msg_panic("%s: bad string length %d", myname, len);
 		if (SPACE_LEFT(argvp) <= 0)
 			argv_extend(argvp);
-		if (argvp->slice)
-			argvp->argv[argvp->argc++] = acl_slice_pool_strndup(__FILE__, __LINE__,
-				argvp->slice, arg, len);
+		if (argvp->dbuf)
+			argvp->argv[argvp->argc++] = acl_dbuf_pool_strndup(
+				argvp->dbuf, arg, len);
 		else
 			argvp->argv[argvp->argc++] = acl_mystrndup(arg, len);
 	}
@@ -313,14 +317,14 @@ char  *acl_argv_index(ACL_ARGV *argvp, int idx)
 	if (argvp == NULL || idx < 0 || idx > argvp->argc - 1)
 		return(NULL);
 
-	return(argvp->argv[idx]);
+	return argvp->argv[idx];
 }
 
 int   acl_argv_size(ACL_ARGV *argvp)
 {
 	if (argvp == NULL)
-		return (-1);
+		return -1;
 
-	return (argvp->argc);
+	return argvp->argc;
 }
 

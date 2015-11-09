@@ -1,6 +1,30 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+371) 2015.11.7
+371.1) feature: dbuf_pool.cpp 中增加了内存池管理类 dbuf_guard 及内存池对象类
+dbuf_obj，以方便使用 dbuf_pool 内存池
+371.2) feature: dbuf_pool 类重载的 new 允许调用者指定所分配的内存块的倍数
+
+370) 2015.11.3
+370.1) feature: url_coder 类内部采用 dbuf_pool 内存对象进行分配管理
+370.2) feature: string 类增加了方法 equal 用来比较两个 string 对象里的内容
+
+369) 2015.11.1
+369.1) workaround: 整理 json_node 类
+
+368) 2015.10.28
+368.1) performance: http 模块的相关类（HttpCookie, http_header, HttpServlet,
+HttpServletRequest, HttpServerResponse）通过引入会话内存池(dbuf_pool)进行内存
+管理，从而大大提高了处理性能
+368.2) feature: dbuf_pool::dbuf_reset 增加参数 reserve，从而允许应用在重置内存池
+时可以保留部分已经分配的缓冲区
+
+367) 2015.10.27
+367.1) bugfix: HttpServletRequest 类中方法 readHeader 当调用方法
+getContentLength 时返回 -1，则会造成下面调用 acl_mymalloc((size_t) len + 1)
+时崩溃，现在针对 getContentLength 返回 -1时，直接返回
+
 366) 2015.10.25
 366.1) bugfix: db_mysql 类内部在出错重连时，没有使用初始连接时使用的字符集
 366.2) 重构：重构了数据库连接池模块的代码，当使用 dbopen 时不再需要指定字符集

@@ -3,6 +3,7 @@
 
 namespace acl {
 
+class dbuf_pool;
 class string;
 class ostream;
 class socket_stream;
@@ -22,8 +23,9 @@ public:
 	/**
 	 * 构造函数
 	 * @param stream {socket_stream&} 数据流，内部不会自动关闭流
+	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
 	 */
-	HttpServletResponse(socket_stream& stream);
+	HttpServletResponse(socket_stream& stream, dbuf_pool* dbuf = NULL);
 	~HttpServletResponse(void);
 
 	/**
@@ -243,6 +245,8 @@ public:
 	}
 
 private:
+	dbuf_pool* dbuf_internal_;
+	dbuf_pool* dbuf_;
 	socket_stream& stream_;		// 客户端连接流
 	HttpServletRequest* request_;	// http 请求对象
 	http_client* client_;		// http 响应流对象

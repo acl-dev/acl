@@ -79,6 +79,7 @@ COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)
 ###########################################################
 OBJ_PATH = ./debug
+$(shell mkdir -p $(OBJ_PATH))
 
 #Project's objs
 SRC =	$(wildcard *.cpp) \

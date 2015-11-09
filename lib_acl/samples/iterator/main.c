@@ -297,9 +297,8 @@ static void ring_iter(void)
 static void argv_iter(int use_slice)
 {
 	const char *s = "hello world, you are welcome!";
-	ACL_SLICE_POOL *slice = use_slice ? acl_slice_pool_create(10, 100,
-		ACL_SLICE_FLAG_GC2 | ACL_SLICE_FLAG_RTGC_OFF) : NULL;
-	ACL_ARGV *argv = acl_argv_split3(s, " ,!", slice);
+	ACL_DBUF_POOL *dbuf = use_slice ? acl_dbuf_pool_create(8192) : NULL;
+	ACL_ARGV *argv = acl_argv_split3(s, " ,!", dbuf);
 	ACL_ITER iter;
 
 	printf("\nacl_foreach for ACL_ARGV:\n");
@@ -312,10 +311,10 @@ static void argv_iter(int use_slice)
 		printf(">> i: %d, value: %s\n", iter.i, (char*) iter.data);
 	}
 
-	if (slice == NULL)
+	if (dbuf == NULL)
 		acl_argv_free(argv);
 	else
-		acl_slice_pool_destroy(slice);
+		acl_dbuf_pool_destroy(dbuf);
 }
 
 static void array_iter(void)

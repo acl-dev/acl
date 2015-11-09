@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
@@ -15,17 +16,21 @@ namespace acl
 HttpServlet::HttpServlet(socket_stream* stream, session* session)
 : stream_(stream)
 {
+	dbuf_ = new dbuf_pool;
 	init();
 
 	if (session == NULL)
 	{
-		session_ = NEW memcache_session("127.0.0.1");
+		session_ = new (dbuf_->dbuf_alloc(sizeof(memcache_session)))
+			memcache_session("127.0.0.1");
 		session_ptr_ = session_;
+		reserve_size_ = sizeof(memcache_session);
 	}
 	else
 	{
 		session_ = session;
 		session_ptr_ = NULL;
+		reserve_size_ = 0;
 	}
 }
 
@@ -33,19 +38,26 @@ HttpServlet::HttpServlet(socket_stream* stream,
 	const char* memcache_addr /* = "127.0.0.1:11211" */)
 : stream_(stream)
 {
+	dbuf_ = new dbuf_pool;
+
 	init();
 
-	session_ = NEW memcache_session(memcache_addr);
+	session_ = new (dbuf_->dbuf_alloc(sizeof(memcache_session)))
+		memcache_session(memcache_addr);
 	session_ptr_ = session_;
+	reserve_size_ = sizeof(memcache_session);
 }
 
 HttpServlet::HttpServlet()
 {
+	dbuf_ = new dbuf_pool;
+
 	init();
 
 	stream_ = NULL;
 	session_ = NULL;
 	session_ptr_ = NULL;
+	reserve_size_ = 0;
 }
 
 void HttpServlet::init()
@@ -59,7 +71,9 @@ void HttpServlet::init()
 
 HttpServlet::~HttpServlet(void)
 {
-	delete session_ptr_;
+	if (session_ptr_)
+		session_ptr_->~session();
+	dbuf_->destroy();
 }
 
 #define COPY(x, y) ACL_SAFE_STRNCPY((x), (y), sizeof((x)))
@@ -92,7 +106,7 @@ HttpServlet& HttpServlet::setParseBodyLimit(int length)
 	return *this;
 }
 
-bool HttpServlet::doRun()
+bool HttpServlet::doRun(dbuf_pool* dbuf)
 {
 	socket_stream* in;
 	socket_stream* out;
@@ -121,9 +135,9 @@ bool HttpServlet::doRun()
 
 	// req/res 采用栈变量，减少内存分配次数
 
-	HttpServletResponse res(*out);
+	HttpServletResponse res(*out, dbuf);
 	HttpServletRequest req(res, *session_, *in, local_charset_,
-		parse_body_enable_, parse_body_limit_);
+		parse_body_enable_, parse_body_limit_, dbuf);
 
 	// 设置 HttpServletRequest 对象
 	res.setHttpServletRequest(&req);
@@ -197,6 +211,15 @@ bool HttpServlet::doRun()
 	// 返回给上层调用者：true 表示继续保持长连接，否则表示需断开连接
 	return ret && req.isKeepAlive()
 		&& res.getHttpHeader().get_keep_alive();
+}
+
+bool HttpServlet::doRun()
+{
+	bool ret = doRun(dbuf_);
+
+	// 重置内存池状态
+	dbuf_->dbuf_reset(reserve_size_);
+	return ret;
 }
 
 bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */)

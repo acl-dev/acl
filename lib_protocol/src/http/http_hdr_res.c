@@ -25,8 +25,11 @@ static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
 static ACL_ARRAY *main_cache = NULL;
 static void main_cache_free(void)
 {
-	if (main_cache)
+	if (main_cache) {
 		acl_array_free(main_cache, (void (*)(void*)) http_hdr_res_free);
+		/* 需要将该全局值设为 NULL，以便于 http_hdr_res_free 中的判断 */
+		main_cache = NULL;
+	}
 }
 
 static void thread_cache_init(void)
@@ -111,7 +114,12 @@ void http_hdr_res_free(HTTP_HDR_RES *hh)
 	if (hh == NULL)
 		return;
 
-	if (var_http_tls_cache <= 0) {
+	/**
+	 * bugfix: 增加判断 main_cache 是否为 NULL，在 lib_acl_cpp 中采用
+	 * 单例模式下，单例的释放会比 main_cache_free 调用过程更晚，所以
+	 * 会造成内存冲突 --- zsx, 2015.11.6
+	 */
+	if (var_http_tls_cache <= 0 || main_cache == NULL) {
 		__hdr_free_member(hh);
 		http_hdr_free((HTTP_HDR *) hh);
 		return;
@@ -130,7 +138,6 @@ void http_hdr_res_free(HTTP_HDR_RES *hh)
 		return;
 	}
 #endif
-
 	__hdr_free_member(hh);
 	http_hdr_free((HTTP_HDR *) hh);
 }

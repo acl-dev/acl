@@ -450,7 +450,7 @@ ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table, const char *key_in, void *v
 	const char *myname = "acl_htable_enter";
 	ACL_HTABLE_INFO *ht;
 	int   ret;
-	unsigned n;
+	unsigned hash, n;
 	char *keybuf = NULL;
 	const char *key;
 
@@ -478,7 +478,7 @@ ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table, const char *key_in, void *v
 		key = key_in;
 
 	table->status = ACL_HTABLE_STAT_OK;
-	n = table->hash_fn(key, strlen(key));
+	hash = table->hash_fn(key, strlen(key));
 
 	if (table->used >= table->size) {
 		ret = htable_grow(table);
@@ -487,7 +487,7 @@ ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table, const char *key_in, void *v
 		}
 	}
 
-	n = n % table->size;
+	n = hash % table->size;
 
 	for (ht = table->data[n]; ht; ht = ht->next) {
 		if (STREQ(key, ht->key.c_key)) {
@@ -526,6 +526,7 @@ ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table, const char *key_in, void *v
 		}
 	}
 
+	ht->hash  = hash;
 	ht->value = value;
 	htable_link(table, ht, n);
 	RETURN (ht);
@@ -537,7 +538,7 @@ int acl_htable_enter_r(ACL_HTABLE *table, const char *key_in, void *value,
 	const char *myname = "acl_htable_enter_r";
 	ACL_HTABLE_INFO *ht;
 	int   ret;
-	unsigned n;
+	unsigned hash, n;
 	char *keybuf = NULL;
 	const char *key;
 
@@ -564,7 +565,7 @@ int acl_htable_enter_r(ACL_HTABLE *table, const char *key_in, void *value,
 	} else
 		key = key_in;
 
-	n = table->hash_fn(key, strlen(key));
+	hash = table->hash_fn(key, strlen(key));
 
 	table->status = ACL_HTABLE_STAT_OK;
 	LOCK_TABLE_WRITE(table);
@@ -577,7 +578,7 @@ int acl_htable_enter_r(ACL_HTABLE *table, const char *key_in, void *value,
 		}
 	}
 
-	n = n % table->size;
+	n = hash % table->size;
 
 	for (ht = table->data[n]; ht; ht = ht->next) {
 		if (STREQ(key, ht->key.c_key)) {
@@ -605,6 +606,7 @@ int acl_htable_enter_r(ACL_HTABLE *table, const char *key_in, void *value,
 	else
 		ht->key.key = acl_mystrdup(key);
 
+	ht->hash  = hash;
 	ht->value = value;
 	htable_link(table, ht, n);
 
@@ -617,61 +619,11 @@ int acl_htable_enter_r(ACL_HTABLE *table, const char *key_in, void *value,
 }
 /* acl_htable_find - lookup value */
 
-void *acl_htable_find(ACL_HTABLE *table, const char *key_in)
+void *acl_htable_find(ACL_HTABLE *table, const char *key)
 {
-	ACL_HTABLE_INFO *ht;
-	unsigned  n;
-	char *keybuf = NULL;
-	const char *key;
+	ACL_HTABLE_INFO *ht = acl_htable_locate(table, key);
 
-#undef RETURN
-#define RETURN(x) do \
-{ \
-	if (keybuf) { \
-		if (table->slice) \
-			acl_slice_pool_free(__FILE__, __LINE__, keybuf); \
-		else \
-			acl_myfree(keybuf); \
-	} \
-	return (x); \
-} while (0)
-
-	if ((table->flag & ACL_HTABLE_FLAG_KEY_LOWER)) {
-		if (table->slice)
-			keybuf = acl_slice_pool_strdup(__FILE__, __LINE__,
-					table->slice, key_in);
-		else
-			keybuf = acl_mystrdup(key_in);
-		acl_lowercase(keybuf);
-		key = keybuf;
-	} else
-		key = key_in;
-
-	n = table->hash_fn(key, strlen(key));
-
-	n = n % table->size;
-
-	for (ht = table->data[n]; ht; ht = ht->next) {
-		if (STREQ(key, ht->key.c_key)) {
-			if (!(table->flag & ACL_HTABLE_FLAG_MSLOOK))
-				RETURN (ht->value);
-			if (ht == table->data[n])
-				RETURN (ht->value);
-			if (ht->next) {
-				ht->prev->next = ht->next;
-				ht->next->prev = ht->prev;
-			} else {
-				ht->prev->next = NULL;
-			}
-			table->data[n]->prev = ht;
-			ht->prev = NULL;
-			ht->next = table->data[n];
-			table->data[n] = ht;
-			RETURN (ht->value);
-		}
-	}
-
-	RETURN (NULL);
+	return ht != NULL ? ht->value : NULL;
 }
 
 int  acl_htable_find_r(ACL_HTABLE *table, const char *key_in,
@@ -783,6 +735,20 @@ ACL_HTABLE_INFO *acl_htable_locate(ACL_HTABLE *table, const char *key_in)
 
 	for (ht = table->data[n]; ht; ht = ht->next) {
 		if (STREQ(key, ht->key.c_key)) {
+			if (!(table->flag & ACL_HTABLE_FLAG_MSLOOK))
+				RETURN (ht);
+			if (ht == table->data[n])
+				RETURN (ht);
+			if (ht->next) {
+				ht->prev->next = ht->next;
+				ht->next->prev = ht->prev;
+			} else {
+				ht->prev->next = NULL;
+			}
+			table->data[n]->prev = ht;
+			ht->prev = NULL;
+			ht->next = table->data[n];
+			table->data[n] = ht;
 			RETURN (ht);
 		}
 	}
@@ -841,9 +807,36 @@ int acl_htable_locate_r(ACL_HTABLE *table, const char *key_in,
 	RETURN (-1);
 }
 
+void acl_htable_delete_entry(ACL_HTABLE *table, ACL_HTABLE_INFO *ht,
+	void (*free_fn) (void *))
+{
+	ACL_HTABLE_INFO **h = table->data + ht->hash % table->size;
+
+	if (ht->next)
+		ht->next->prev = ht->prev;
+	if (ht->prev)
+		ht->prev->next = ht->next;
+	else
+		*h = ht->next;
+	if (!(table->flag & ACL_HTABLE_FLAG_KEY_REUSE)) {
+		if (table->slice)
+			acl_slice_pool_free(__FILE__, __LINE__, ht->key.key);
+		else
+			acl_myfree(ht->key.key);
+	}
+	if (free_fn && ht->value)
+		(*free_fn) (ht->value);
+	if (table->slice)
+		acl_slice_pool_free(__FILE__, __LINE__, ht);
+	else
+		acl_myfree(ht);
+	table->used--;
+}
+
 /* acl_htable_delete - delete one entry */
 
-int acl_htable_delete(ACL_HTABLE *table, const char *key_in, void (*free_fn) (void *))
+int acl_htable_delete(ACL_HTABLE *table, const char *key_in,
+	void (*free_fn) (void *))
 {
 	ACL_HTABLE_INFO *ht;
 	unsigned  n;
@@ -883,26 +876,7 @@ int acl_htable_delete(ACL_HTABLE *table, const char *key_in, void (*free_fn) (vo
 	h = table->data + n;
 	for (ht = *h; ht; ht = ht->next) {
 		if (STREQ(key, ht->key.c_key)) {
-			if (ht->next)
-				ht->next->prev = ht->prev;
-			if (ht->prev)
-				ht->prev->next = ht->next;
-			else
-				*h = ht->next;
-			if (!(table->flag & ACL_HTABLE_FLAG_KEY_REUSE)) {
-				if (table->slice)
-					acl_slice_pool_free(__FILE__, __LINE__,
-						ht->key.key);
-				else
-					acl_myfree(ht->key.key);
-			}
-			if (free_fn && ht->value)
-				(*free_fn) (ht->value);
-			if (table->slice)
-				acl_slice_pool_free(__FILE__, __LINE__, ht);
-			else
-				acl_myfree(ht);
-			table->used--;
+			acl_htable_delete_entry(table, ht, free_fn);
 			UNLOCK_TABLE(table);
 			RETURN(0);
 		}

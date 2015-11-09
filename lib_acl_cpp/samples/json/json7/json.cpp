@@ -10,7 +10,7 @@ int main(void)
 #if 1
 	acl::json_node& root = json.get_root();
 
-	root.add_child("name1", "value1")
+	root.add_text("name1", "value1")
 		.add_number("name2", 111111)
 		.add_bool("name3", true);
 	root.add_array(true)
@@ -222,7 +222,7 @@ int main(void)
 	json.get_root().add_child(array4);
 
 	acl::json_node& n4 = json.create_node();
-	n4.add_child("hello", "world");
+	n4.add_text("hello", "world");
 	array4.add_child(n4);
 	json.build_json(buf);
 	printf("%s\r\n", buf.c_str());

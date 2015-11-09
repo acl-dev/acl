@@ -44,7 +44,7 @@ public:
 	const char* get_ctype(void) const;
 
 	/**
-	 * 获得 Content-Type 字段值 text/html; charset=utf8 中的 text
+	 * 获得 Content-Type 字段值 text/html; charset=utf8 中的 html
 	 * @return {const char*} 返回 NULL 说明没有该数据
 	 */
 	const char* get_stype(void) const;

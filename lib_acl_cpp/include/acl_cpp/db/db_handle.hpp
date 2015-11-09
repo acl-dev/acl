@@ -262,9 +262,10 @@ public:
 
 	/**
 	 * 纯虚接口，子类必须实现此接口用于打开数据库
+	 * @param charset {const char*} 打开数据库连接时采用的字符集
 	 * @return {bool} 打开是否成功
 	 */
-	virtual bool dbopen() = 0;
+	virtual bool dbopen(const char* charset = NULL) = 0;
 
 	/**
 	 * 数据库是否已经打开了

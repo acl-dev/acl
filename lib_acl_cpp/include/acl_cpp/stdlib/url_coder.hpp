@@ -5,6 +5,7 @@
 namespace acl {
 
 class string;
+class dbuf_pool;
 
 struct URL_NV
 {
@@ -18,14 +19,16 @@ public:
 	/**
 	 * 构造函数
 	 * @param nocase {bool} 当为 true 时表示参数名不区别大小写
+	 * @param dbuf {dbuf_pool*} 内存池对象
 	 */
-	url_coder(bool nocase = true);
+	url_coder(bool nocase = true, dbuf_pool* dbuf = NULL);
 
 	/**
 	 * 构造函数，通过类实例对象构造
 	 * @param coder {const url_coder&}
+	 * @param dbuf {dbuf_pool*} 内存池对象
 	 */
-	url_coder(const url_coder& coder);
+	url_coder(const url_coder& coder, dbuf_pool* dbuf = NULL);
 
 	~url_coder();
 
@@ -107,10 +110,12 @@ public:
 
 private:
 	bool nocase_;
+	dbuf_pool* dbuf_;
+	dbuf_pool* dbuf_internal_;
 	std::vector<URL_NV*> params_;
 	string*  buf_;
 
-	void free_param(URL_NV*);
+	void init_dbuf(dbuf_pool* dbuf);
 };
 
 } // namespace acl end

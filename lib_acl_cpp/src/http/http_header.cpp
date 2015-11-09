@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
@@ -12,20 +13,50 @@ namespace acl
 
 #define CP(x, y) ACL_SAFE_STRNCPY(x, y, sizeof(x))
 
-http_header::http_header(void)
+http_header::http_header(dbuf_pool* dbuf /* = NULL */)
 {
+	if (dbuf != NULL)
+	{
+		dbuf_ = dbuf;
+		dbuf_internal_ = NULL;
+	}
+	else
+	{
+		dbuf_internal_ = new dbuf_pool;
+		dbuf_ = dbuf_internal_;
+	}
 	init();
 }
 
-http_header::http_header(const char* url)
+http_header::http_header(const char* url, dbuf_pool* dbuf /* = NULL */)
 {
+	if (dbuf != NULL)
+	{
+		dbuf_ = dbuf;
+		dbuf_internal_ = NULL;
+	}
+	else
+	{
+		dbuf_internal_ = new dbuf_pool;
+		dbuf_ = dbuf_internal_;
+	}
 	init();
 	if (url && *url)
 		set_url(url);
 }
 
-http_header::http_header(int status)
+http_header::http_header(int status, dbuf_pool* dbuf /* = NULL */)
 {
+	if (dbuf != NULL)
+	{
+		dbuf_ = dbuf;
+		dbuf_internal_ = NULL;
+	}
+	else
+	{
+		dbuf_internal_ = new dbuf_pool;
+		dbuf_ = dbuf_internal_;
+	}
 	init();
 	set_status(status);
 }
@@ -33,6 +64,8 @@ http_header::http_header(int status)
 http_header::~http_header(void)
 {
 	clear();
+	if (dbuf_internal_)
+		dbuf_internal_->destroy();
 }
 
 void http_header::init()
@@ -57,35 +90,11 @@ void http_header::init()
 
 void http_header::clear()
 {
-	if (url_)
-	{
-		acl_myfree(url_);
-		url_ = NULL;
-	}
-
-	std::list<HttpCookie*>::iterator cookies_it = cookies_.begin();
-	for (; cookies_it != cookies_.end(); ++cookies_it)
-		(*cookies_it)->destroy();
+	std::list<HttpCookie*>::iterator it = cookies_.begin();
+	for (; it != cookies_.end(); ++it)
+		(*it)->~HttpCookie();
 	cookies_.clear();
-
-	std::list<HTTP_HDR_ENTRY*>::iterator entries_it = entries_.begin();
-	for (; entries_it != entries_.end(); ++entries_it)
-	{
-		acl_myfree((*entries_it)->name);
-		acl_myfree((*entries_it)->value);
-		acl_myfree(*entries_it);
-	}
 	entries_.clear();
-
-	std::list<HTTP_PARAM*>::iterator params_it = params_.begin();
-	for (; params_it != params_.end(); ++params_it)
-	{
-		acl_myfree((*params_it)->name);
-		// 在调用 add_param 时允许 value 为空指针
-		if ((*params_it)->value)
-			acl_myfree((*params_it)->value);
-		acl_myfree(*params_it);
-	}
 	params_.clear();
 }
 
@@ -93,6 +102,9 @@ void http_header::reset()
 {
 	clear();
 	init();
+
+	if (dbuf_internal_)
+		dbuf_internal_->dbuf_reset();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -114,16 +126,15 @@ http_header& http_header::add_entry(const char* name, const char* value)
 	{
 		if (strcasecmp((*it)->name, name) == 0)
 		{
-			acl_myfree((*it)->value);
-			(*it)->value = acl_mystrdup(value);
+			(*it)->value = dbuf_->dbuf_strdup(value);
 			return *this;
 		}
 	}
 
 	HTTP_HDR_ENTRY* entry = (HTTP_HDR_ENTRY*)
-		acl_mycalloc(1, sizeof(HTTP_HDR_ENTRY));
-	entry->name = acl_mystrdup(name);
-	entry->value = acl_mystrdup(value);
+		dbuf_->dbuf_calloc(sizeof(HTTP_HDR_ENTRY));
+	entry->name = dbuf_->dbuf_strdup(name);
+	entry->value = dbuf_->dbuf_strdup(value);
 	entries_.push_back(entry);
 	return *this;
 }
@@ -159,7 +170,9 @@ http_header& http_header::add_cookie(const char* name, const char* value,
 	if (name == NULL || *name == 0 || value == NULL)
 		return *this;
 
-	HttpCookie* cookie = NEW HttpCookie(name, value);
+	HttpCookie* cookie = new (dbuf_->dbuf_alloc((sizeof(HttpCookie))))
+		HttpCookie(name, value, dbuf_);
+
 	if (domain && *domain)
 		cookie->setDomain(domain);
 	if (path && *path)
@@ -170,10 +183,14 @@ http_header& http_header::add_cookie(const char* name, const char* value,
 	return *this;
 }
 
-http_header& http_header::add_cookie(HttpCookie* cookie)
+http_header& http_header::add_cookie(const HttpCookie* in)
 {
-	if (cookie)
-		cookies_.push_back(cookie);
+	if (in == NULL)
+		return *this;
+
+	HttpCookie* cookie = new (dbuf_->dbuf_alloc(sizeof(HttpCookie)))
+		HttpCookie(in);
+	cookies_.push_back(cookie);
 	return *this;
 }
 
@@ -193,8 +210,7 @@ void http_header::build_common(string& buf) const
 {
 	if (!entries_.empty())
 	{
-		std::list<HTTP_HDR_ENTRY*>::const_iterator it =
-			entries_.begin();
+		std::list<HTTP_HDR_ENTRY*>::const_iterator it = entries_.begin();
 		for (; it != entries_.end(); ++it)
 			buf << (*it)->name << ": " << (*it)->value << "\r\n";
 	}
@@ -231,15 +247,12 @@ void http_header::build_common(string& buf) const
 http_header& http_header::set_url(const char* url)
 {
 	acl_assert(url && *url);
+
 	is_request_ = true;
-
-	if (url_)
-		acl_myfree(url_);
-
 	size_t len = strlen(url);
 
 	// 多分配两个字节：'\0' 及可能添加的 '/'
-	url_ = (char*) acl_mymalloc(len + 2);
+	url_ = (char*) dbuf_->dbuf_alloc(len + 2);
 	memcpy(url_, url, len);
 	url_[len] = 0;
 
@@ -417,20 +430,18 @@ http_header& http_header::add_param(const char* name, const char* value)
 	{
 		if (strcasecmp((*it)->name, name) == 0)
 		{
-			if ((*it)->value)
-				acl_myfree((*it)->value);
 			if (value)
-				(*it)->value = acl_mystrdup(value);
+				(*it)->value = dbuf_->dbuf_strdup(value);
 			else
 				(*it)->value = NULL;
 			return *this;
 		}
 	}
 
-	HTTP_PARAM* param = (HTTP_PARAM*) acl_mycalloc(1, sizeof(HTTP_PARAM));
-	param->name = acl_mystrdup(name);
+	HTTP_PARAM* param = (HTTP_PARAM*) dbuf_->dbuf_calloc(sizeof(HTTP_PARAM));
+	param->name = dbuf_->dbuf_strdup(name);
 	if (value)
-		param->value = acl_mystrdup(value);
+		param->value = dbuf_->dbuf_strdup(value);
 	else
 		param->value = NULL;
 	params_.push_back(param);
@@ -594,7 +605,7 @@ bool http_header::redirect(const char* url)
 	if (url == NULL || *url == 0)
 	{
 		logger_error("url null");
-		return (false);
+		return false;
 	}
 
 	size_t n = 0;
@@ -605,38 +616,33 @@ bool http_header::redirect(const char* url)
 	else if (strncasecmp(url, "https://", sizeof("https://") - 1) == 0)
 		n = sizeof("https://") - 1;
 	if (url_)
-	{
-		acl_myfree(url_);
 		url_ = NULL;
-	}
 
 	if (n > 0)
 	{
 		url += n;
-		char* ptr = acl_mystrdup(url);
+		char* ptr = dbuf_->dbuf_strdup(url);
 		char* p = strchr(ptr, '/');
 		if (p)
 			*p = 0;
 		if (*ptr == 0)
 		{
 			logger_error("invalid url(%s)", url);
-			acl_myfree(ptr);
-			return (false);
+			return false;
 		}
 		set_host(ptr);
 		if (*(p + 1))
 		{
 			*p = '/';
-			url_ = acl_mystrdup(p);
+			url_ = p;
 		}
 		else
-			url_ = acl_mystrdup("/");
-		acl_myfree(ptr);
+			url_ = dbuf_->dbuf_strdup("/");
 	}
 	else
-		url_ = acl_mystrdup(url);
+		url_ = dbuf_->dbuf_strdup(url);
 
-	return (true);
+	return true;
 }
 
 http_header& http_header::set_redirect(unsigned int n /* = 5 */)

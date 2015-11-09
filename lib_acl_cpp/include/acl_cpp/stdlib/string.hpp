@@ -10,6 +10,8 @@ struct ACL_LINE_STATE;
 
 namespace acl {
 
+class dbuf_pool;
+
 /**
  * 该类为字符串处理类，支持大部分 std::string 中的功能，同时支持其不支持的一些
  * 功能；该类内部自动保证最后一个字符为 \0
@@ -586,6 +588,14 @@ public:
 	/**
 	 * 比较两个字符串对象的内容是否相同（区分大小写）
 	 * @param s {const string&} 输入的字符串对象的引用
+	 * @param case_sensitive {bool} 为 true 表示区分大小写
+	 * @return {bool} 返回 true 表示二者相等
+	 */
+	bool equal(const string& s, bool case_sensitive = true) const;
+
+	/**
+	 * 比较两个字符串对象的内容是否相同（区分大小写）
+	 * @param s {const string&} 输入的字符串对象的引用
 	 * @return {int} 0：表示二者相同； > 0：当前字符串内容大于输入的内容；
 	 *  < 0 ：当前字符串内容小于输入的内容
 	 */
@@ -1077,16 +1087,21 @@ public:
 	/**
 	 * 将输入的源数据进行 url 编码并存入当前对象的缓冲区中
 	 * @param s {const char*} 源数据
+	 * @param dbuf {dbuf_pool*} 内存池对象，如果非空，则内部的动态内存在
+	 *  该对象上分配且当调用者在释放该对象时内部临时动态内存随之被释放，
+	 *  否则使用 acl_mymalloc 分配并自动释放
 	 * @return {string&} 当前对象的引用
 	 */
-	string& url_encode(const char* s);
+	string& url_encode(const char* s, dbuf_pool* dbuf = NULL);
 
 	/**
 	 * 将输入的用 url 编码的源数据解码并存入当前对象的缓冲区中
 	 * @param s {const char*} 经 url 编码的源数据
+	 * @param dbuf {dbuf_pool*} 内存池对象，如果非空，则内部的动态内存在
+	 *  该对象上分配且当调用者在释放该对象时内部临时动态内存随之被释放，
 	 * @return {string&} 当前对象的引用
 	 */
-	string& url_decode(const char* s);
+	string& url_decode(const char* s, dbuf_pool* dbuf = NULL);
 
 	/**
 	 * 将源数据进行 H2B 编码并存入当前对象的缓冲区中

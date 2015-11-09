@@ -6,7 +6,7 @@ extern "C" {
 # endif
 #include "acl_define.h"
 #include <stdarg.h>
-#include "acl_slice.h"
+#include "acl_dbuf_pool.h"
 #include "acl_iterator.h"
 
 /**
@@ -40,7 +40,7 @@ typedef struct ACL_ARGV {
 	void *(*iter_prev)(ACL_ITER*, struct ACL_ARGV*);
 
 	/* private */
-	ACL_SLICE_POOL *slice;
+	ACL_DBUF_POOL *dbuf;
 } ACL_ARGV;
 
 /* in acl_argv.c */
@@ -51,7 +51,7 @@ typedef struct ACL_ARGV {
  */
 ACL_API ACL_ARGV *acl_argv_alloc(int size);
 
-ACL_API ACL_ARGV *acl_argv_alloc2(int size, ACL_SLICE_POOL *slice);
+ACL_API ACL_ARGV *acl_argv_alloc2(int size, ACL_DBUF_POOL *dbuf);
 
 /**
  * 向字符串动态数组中添加一至多个字符串，最后一个NULL字符串表示结束
@@ -70,7 +70,8 @@ ACL_API void acl_argv_addv(ACL_ARGV *argvp, va_list ap);
 /**
  * 向字符串动态数组中添加字段长度有限制的字符串列表
  * @param argvp {ACL_ARGV*} 字符串动态数组指针
- * @param ... 一组有长度限制的字符串列表，如: {s1}, {len1}, {s2}, {len2}, ... NULL
+ * @param ... 一组有长度限制的字符串列表，
+ *  如: {s1}, {len1}, {s2}, {len2}, ... NULL
  */
 ACL_API void acl_argv_addn(ACL_ARGV *argvp,...);
 
@@ -122,12 +123,12 @@ ACL_API ACL_ARGV *acl_argv_split(const char *str, const char *delim);
  * 对象做为内存分配器
  * @param str {const char*} 源字符串
  * @param delim {const char*} 分隔字符串
- * @param slice {ACL_SLICE_POOL*} 内存池对象，可以为空，当为空时则采用
+ * @param dbuf {ACL_DBUF_POOL*} 内存池对象，可以为空，当为空时则采用
  *  缺省的内存分配方式
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_split3(const char *str, const char *delim,
-	ACL_SLICE_POOL *slice);
+	ACL_DBUF_POOL *dbuf);
 
 /**
  * 根据源字符串及分隔字符串生成一个字符串动态数组, 但限定最大分隔次数
@@ -144,12 +145,12 @@ ACL_API ACL_ARGV *acl_argv_splitn(const char *str, const char *delim, size_t n);
  * @param str {const char*} 源字符串
  * @param delim {const char*} 分隔字符串
  * @param n {size_t} 最大分隔次数
- * @param slice {ACL_SLICE_POOL*} 内存池对象，可以为空，当为空时则采用
+ * @param dbuf {ACL_DBUF_POOL*} 内存池对象，可以为空，当为空时则采用
  *  缺省的内存分配方式
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_splitn4(const char *str, const char *delim,
-	size_t n, ACL_SLICE_POOL *slice);
+	size_t n, ACL_DBUF_POOL *dbuf);
 
 /**
  * 源字符串经分隔符分解后，其结果被附加至一个字符串动态数组

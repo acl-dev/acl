@@ -210,7 +210,7 @@ int main(void)
 	}
 
 	printf("src(%s)\n", src);
-	dst = acl_url_decode(src);
+	dst = acl_url_decode(src, NULL);
 	printf("dst(%s)\n", dst);
 
 /*

@@ -5,6 +5,8 @@
 
 namespace acl {
 
+class dbuf_pool;
+
 /**
  * http 协议头中 cookie 对象类
  */
@@ -12,17 +14,31 @@ class ACL_CPP_API HttpCookie
 {
 public:
 	/**
-	 * 构造函数，该类对象必须动态创建，且必须调用 destroy 来释放类对象
+	 * 构造函数
 	 * @param name {const char*} cookie 名，为非空字符串且字符串长度 > 0
 	 * @param value {const char*} cookie 值，指针非空，字符串长度可以为 0
 	 * 注：如果输入的两个参数不符合条件，内部将会产生断言
+	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
 	 */
-	HttpCookie(const char* name, const char* value);
+	HttpCookie(const char* name, const char* value, dbuf_pool* dbuf = NULL);
 
 	/**
 	 * 当使用该构造函数时，可以使用 setCookie 来添加 cookie 项
+	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
 	 */
-	HttpCookie(void);
+	HttpCookie(dbuf_pool* dbuf = NULL);
+
+	/**
+	 * 拷贝构造函数
+	 * @param cookie {const HttpCookie*} 该参数必须非 NULL，内部将复制拷贝其
+	 *  成员变量
+	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
+	 */
+	HttpCookie(const HttpCookie* cookie, dbuf_pool* dbuf = NULL);
+	/**
+	 * 析构函数
+	 */
+	~HttpCookie(void);
 
 	/**
 	 * 对于 Set-Cookie: xxx=xxx; domain=xxx; expires=xxx; path=xxx; max-age=xxx; ...
@@ -137,13 +153,15 @@ public:
 	 * @return {const std::list<HTTP_PARAM*>&}
 	 */
 	const std::list<HTTP_PARAM*>& getParams(void) const;
+
 private:
+	dbuf_pool* dbuf_internal_;
+	dbuf_pool* dbuf_;
 	char  dummy_[1];
 	char* name_;
 	char* value_;
 	std::list<HTTP_PARAM*> params_;
 
-	~HttpCookie(void);
 	bool splitNameValue(char* data, HTTP_PARAM* param);
 };
 

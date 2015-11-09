@@ -261,7 +261,7 @@ const char* db_sqlite::get_error() const
 	else
 		return "sqlite not opened yet!";
 }
-bool db_sqlite::dbopen()
+bool db_sqlite::dbopen(const char* charset /* = NULL */)
 {
 	// 如果数据库已经打开，则直接返回 true
 	if (db_ != NULL)
@@ -270,6 +270,9 @@ bool db_sqlite::dbopen()
 	string buf;
 
 	const char* ptr;
+
+	if (charset != NULL && *charset != 0)
+		charset_ = charset;
 
 	// 转换成 [utf-8] 编码格式
 
@@ -537,7 +540,7 @@ const char* db_sqlite::get_conf(const char*, string&) { return NULL; }
 void db_sqlite::show_conf(const char*) {}
 int db_sqlite::affect_total_count() const { return 0; }
 const char* db_sqlite::dbtype() const { return NULL; }
-bool db_sqlite::dbopen() { return false; }
+bool db_sqlite::dbopen(const char*) { return false; }
 bool db_sqlite::is_opened() const { return false; }
 bool db_sqlite::close(void) { return false; }
 bool db_sqlite::tbl_exists(const char*) { return false; }

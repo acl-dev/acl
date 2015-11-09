@@ -12,9 +12,9 @@ int main()
 	printf(">>>>{%s}\r\n", tablename);
 	acl::json json;
 	acl::json_node& first = json.get_root().add_child(false, true);
-	first.add_child("type", type);
-	first.add_child("tablename", tablename);
-	first.add_child("name", name);
+	first.add_text("type", type);
+	first.add_text("tablename", tablename);
+	first.add_text("name", name);
 
 	// Éú³Éjson×Ö·û´®
 	printf("json to string:%s\r\n", json.to_string().c_str());

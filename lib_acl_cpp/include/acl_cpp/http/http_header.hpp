@@ -8,16 +8,21 @@ struct HTTP_HDR_ENTRY;
 
 namespace acl {
 
+class dbuf_pool;
 class string;
 class HttpCookie;
 
 /**
-	* HTTP 头类，可以构建请求头或响应头
-	*/
+ * HTTP 头类，可以构建请求头或响应头
+*/
 class ACL_CPP_API http_header
 {
 public:
-	http_header(void);
+	/**
+	 * 构造函数
+	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
+	 */
+	http_header(dbuf_pool* dbuf = NULL);
 
 	/**
 	 * HTTP 请求头构造函数
@@ -32,14 +37,17 @@ public:
 	 * 调用该函数后用户仍可以调用 add_param 等函数添加其它参数；
 	 * 当参数字段只有参数名没有参数值时，该参数将会被忽略，所以如果想
 	 * 单独添加参数名，应该调用 add_param 方法来添加
+	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
 	 */
-	http_header(const char* url);
+	http_header(const char* url, dbuf_pool* dbuf = NULL);
 
 	/**
 	 * HTTP 响应头构造函数
 	 * @param status {int} 状态字如：1xx, 2xx, 3xx, 4xx, 5xx
+	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
 	 */
-	http_header(int status);
+	http_header(int status, dbuf_pool* dbuf = NULL);
+
 	virtual ~http_header(void);
 
 	/**
@@ -167,10 +175,10 @@ public:
 
 	/**
 	 * 向 HTTP 头中添加 cookie
-	 * @param cookie {http_cookie*} 必须是动态分配的 cookie 对象
+	 * @param cookie {const http_cookie*} cookie 对象
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
 	 */
-	http_header& add_cookie(HttpCookie* cookie);
+	http_header& add_cookie(const HttpCookie* cookie);
 
 	/**
 	 * 将整型的日期转换为 rfc1123 字符串格式的日期
@@ -380,6 +388,8 @@ public:
 	}
 
 private:
+	dbuf_pool* dbuf_internal_;
+	dbuf_pool* dbuf_;
 	//char* domain_;  // HTTP 服务器域名
 	//unsigned short port_;               // HTTP 服务器端口
 	char* url_;                           // HTTP 请求的 URL
