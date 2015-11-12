@@ -4,6 +4,7 @@
 374) 2015.11.12
 374.1) feature: http_request_manager 的构造函数增加了连接 http 服务器的超时时间
 及 IO 读写超时时间
+374.2) bugfix: 修复了 dbuf_obj 构造函数中的 BUG，应该首先将 nrefer_ 初始化为 0
 
 373) 2015.11.11
 373.1) bugfix: mail_message 类中的 append_addrs 方法存在一处指针溢出的 BUG

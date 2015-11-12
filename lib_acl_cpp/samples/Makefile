@@ -45,6 +45,7 @@ all:
 	@(cd socket; make)
 	@(cd db; make)
 	@(cd redis; make)
+	@(cd dbuf; make)
 
 clean:
 	@(cd string; make clean)
@@ -93,5 +94,6 @@ clean:
 	@(cd socket; make clean)
 	@(cd db; make clean)
 	@(cd redis; make clean)
+	@(cd dbuf; make clean)
 
 rebuild rb: clean all

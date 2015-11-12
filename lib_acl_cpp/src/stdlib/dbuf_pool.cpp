@@ -89,14 +89,10 @@ bool dbuf_pool::dbuf_unkeep(const void* addr)
 //////////////////////////////////////////////////////////////////////////////
 
 dbuf_obj::dbuf_obj(dbuf_guard* guard /* = NULL */)
+	: nrefer_(0)
 {
 	if (guard)
-	{
-		nrefer_ = 1;
 		guard->push_back(this);
-	}
-	else
-		nrefer_ = 0;
 }
 
 dbuf_guard::dbuf_guard(acl::dbuf_pool* dbuf /* = NULL */, size_t nblock /* = 2 */)
