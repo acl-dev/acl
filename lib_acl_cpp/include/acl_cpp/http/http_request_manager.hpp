@@ -11,7 +11,12 @@ namespace acl
 class ACL_CPP_API http_request_manager : public acl::connect_manager
 {
 public:
-	http_request_manager();
+	/**
+	 * 构造函数
+	 * @param conn_timeout {int} 连接超时时间(秒)
+	 * @param rw_timeout {int} 网络 IO 读写超时时间(秒)
+	 */
+	http_request_manager(int conn_timeout = 30, int rw_timeout = 30);
 	virtual ~http_request_manager();
 
 protected:
@@ -23,6 +28,10 @@ protected:
 	 * @return {connect_pool*} 返回创建的连接池对象
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
+
+private:
+	int conn_timeout_;
+	int rw_timeout_;
 };
 
 } // namespace acl

@@ -169,6 +169,12 @@ public:
 	dbuf_obj(dbuf_guard* guard = NULL);
 
 	virtual ~dbuf_obj() {}
+
+private:
+	friend class dbuf_guard;
+
+	// 该变量便于 dbuf_guard 对象使用，以增加安全性
+	int nrefer_;
 };
 
 /**
@@ -298,7 +304,7 @@ public:
 	 * dbuf_guard 对象统一进行销毁管理
 	 * @param obj {dbuf_obj*}
 	 * @return {int} 返回 obj 被添加后其在 dbuf_obj 对象数组中的下标位置，
-	 *  如果返回值 < 0 则说明输入参数非法
+	 *  如果返回值 < 0 则说明输入的对象已经在 dbuf_guard 的监管中
 	 */
 	int push_back(dbuf_obj* obj);
 

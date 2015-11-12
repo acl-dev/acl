@@ -515,32 +515,32 @@ static const char *json_strend(ACL_JSON *json, const char *data)
 		return data;
 
 #define	EQ(x, y) !strcasecmp((x), ((y)))
+#define	IS_NUMBER(x) (acl_alldig((x)) \
+		|| ((*(x) == '-' || *(x) == '+') \
+			&& *((x) + 1) != 0 && acl_alldig((x) + 1)))
 
 	if (node->parent && node->parent->type == ACL_JSON_T_ARRAY) {
 		if (node->quote == 0) {
-			if (EQ(STR(node->text), "null"))
+			const char* txt = STR(node->text);
+
+			if (EQ(txt, "null"))
 				node->type = ACL_JSON_T_A_NULL;
-			else if (EQ(STR(node->text), "true")
-					|| EQ(STR(node->text), "false"))
-			{
+			else if (EQ(txt, "true") || EQ(txt, "false"))
 				node->type = ACL_JSON_T_A_BOOL;
-			}
-			else if (acl_alldig(STR(node->text)))
+			else if (IS_NUMBER(txt))
 				node->type = ACL_JSON_T_A_NUMBER;
 			else
 				node->type = ACL_JSON_T_A_STRING;
 		} else
 			node->type = ACL_JSON_T_STRING;
-	} else if (node->quote == 0)
-	{
-		if (EQ(STR(node->text), "null"))
+	} else if (node->quote == 0) {
+		const char* txt = STR(node->text);
+
+		if (EQ(txt, "null"))
 			node->type = ACL_JSON_T_NULL;
-		else if (EQ(STR(node->text), "true")
-			|| EQ(STR(node->text), "false"))
-		{
+		else if (EQ(txt, "true") || EQ(txt, "false"))
 			node->type = ACL_JSON_T_BOOL;
-		}
-		else if (acl_alldig(STR(node->text)))
+		else if (IS_NUMBER(txt))
 			node->type = ACL_JSON_T_NUMBER;
 		else
 			node->type = ACL_JSON_T_STRING;

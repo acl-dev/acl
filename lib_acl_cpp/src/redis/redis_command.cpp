@@ -1244,11 +1244,11 @@ void redis_command::build(const char* cmd, const char* key,
 	for (; cit != attrs.end(); ++cit)
 	{
 		argv_[i] = cit->first.c_str();
-		argv_lens_[i] = strlen(argv_[i]);
+		argv_lens_[i] = cit->first.size();
 		i++;
 
 		argv_[i] = cit->second.c_str();
-		argv_lens_[i] = strlen(argv_[i]);
+		argv_lens_[i] = cit->second.size();
 		i++;
 	}
 
@@ -1279,7 +1279,7 @@ void redis_command::build(const char* cmd, const char* key,
 	for (; cit != attrs.end(); ++cit)
 	{
 		argv_[i] = cit->first.c_str();
-		argv_lens_[i] = strlen(argv_[i]);
+		argv_lens_[i] = cit->first.size();
 		i++;
 
 		argv_[i] = cit->second;
@@ -1323,11 +1323,11 @@ void redis_command::build(const char* cmd, const char* key,
 	for (size_t j = 0; j < size; j++)
 	{
 		argv_[i] = names[j].c_str();
-		argv_lens_[i] = strlen(argv_[i]);
+		argv_lens_[i] = names[j].size();
 		i++;
 
 		argv_[i] = values[j].c_str();
-		argv_lens_[i] = strlen(argv_[i]);
+		argv_lens_[i] = values[j].size();
 		i++;
 	}
 
@@ -1511,7 +1511,7 @@ void redis_command::build(const char* cmd, const char* key,
 	for (size_t j = 0; j < argc; j++)
 	{
 		argv_[i] = names[j].c_str();
-		argv_lens_[i] = strlen(argv_[i]);
+		argv_lens_[i] = names[j].size();
 		i++;
 	}
 

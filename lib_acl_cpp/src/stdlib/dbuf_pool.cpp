@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 
 namespace acl
@@ -90,7 +91,12 @@ bool dbuf_pool::dbuf_unkeep(const void* addr)
 dbuf_obj::dbuf_obj(dbuf_guard* guard /* = NULL */)
 {
 	if (guard)
+	{
+		nrefer_ = 1;
 		guard->push_back(this);
+	}
+	else
+		nrefer_ = 0;
 }
 
 dbuf_guard::dbuf_guard(acl::dbuf_pool* dbuf /* = NULL */, size_t nblock /* = 2 */)
@@ -114,7 +120,15 @@ dbuf_guard::~dbuf_guard()
 
 int dbuf_guard::push_back(dbuf_obj* obj)
 {
+	if (obj->nrefer_ >= 1)
+	{
+		logger_error("obj->nrefer_: %d >= 1", obj->nrefer_);
+		return -1;
+	}
+
 	objs_.push_back(obj);
+	obj->nrefer_++;
+
 	return (int) objs_.size() - 1;
 }
 

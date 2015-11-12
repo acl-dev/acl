@@ -1,6 +1,18 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+374) 2015.11.12
+374.1) feature: http_request_manager 的构造函数增加了连接 http 服务器的超时时间
+及 IO 读写超时时间
+
+373) 2015.11.11
+373.1) bugfix: mail_message 类中的 append_addrs 方法存在一处指针溢出的 BUG
+
+372) 2015.11.10
+372.1) bugfix: redis_command 类中有两处 build 函数在构建请求命令时应该支持二进制格式
+372.2) feature: dbuf_obj 类增加了 nrefer_，便于 dbuf_guard 进行安全管理，以防止被
+dbug_guard 类对象重复释放
+
 371) 2015.11.7
 371.1) feature: dbuf_pool.cpp 中增加了内存池管理类 dbuf_guard 及内存池对象类
 dbuf_obj，以方便使用 dbuf_pool 内存池

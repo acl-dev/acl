@@ -10,8 +10,9 @@ static void build_html(void)
 	message.set_from("zsxxsz@263.net")
 		.set_sender("zsx1@263.net")
 		.set_reply_to("zsx2@263.net")
-		.add_to("\"郑树新1\" <zsx1@sina.com>; \"郑树新2\" <zsx2@sina.com>")
-		.add_cc("\"郑树新3\" <zsx1@163.com>; \"郑树新4\" <zsx2@163.com>")
+		.add_to("\"郑树新1\" <zsx1@sina.com>")
+//		.add_to("\"郑树新1\" <zsx1@sina.com>; \"郑树新2\" <zsx2@sina.com>; <zsx3@sina.com>")
+//		.add_cc("\"郑树新3\" <zsx1@163.com>; \"郑树新4\" <zsx2@163.com>")
 		.set_subject("主题：中国人民银行！")
 		.add_header("X-Forward-For", "<zsx@263.net>");
 
