@@ -217,8 +217,8 @@ int main(int argc, char* argv[])
 
 	acl::acl_cpp_init();
 
-	acl::redis_client_cluster manager(conn_timeout, rw_timeout);
-	manager.set(addr.c_str(), max_threads);
+	acl::redis_client_cluster manager;
+	manager.set(addr.c_str(), max_threads, conn_timeout, rw_timeout);
 
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++)

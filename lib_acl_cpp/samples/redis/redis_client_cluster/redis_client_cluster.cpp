@@ -292,7 +292,7 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	acl::redis_client_cluster cluster(conn_timeout, rw_timeout);
+	acl::redis_client_cluster cluster;
 
 	// 当某个连接池结点出问题，设置探测该连接结点是否恢复的时间间隔(秒)，当该值
 	// 为 0 时，则不检测
@@ -304,7 +304,7 @@ int main(int argc, char* argv[])
 	// 当重定向次数 >= 2 时每次再重定向此函数设置休息的时间(毫秒)
 	cluster.set_redirect_sleep(nsleep);
 
-	cluster.init(NULL, addrs.c_str(), max_threads);
+	cluster.init(NULL, addrs.c_str(), max_threads, conn_timeout, rw_timeout);
 
 	// 设置连接 redis 集群的密码，第一个参数为一个 redis 服务节点的服务地址，
 	// 当第一个参数值为 default 时，则设置了所有节点的统一连接密码

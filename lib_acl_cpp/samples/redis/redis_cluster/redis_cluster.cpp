@@ -100,7 +100,7 @@ static bool test_info(acl::redis_cluster& redis)
 static bool preset_all(const char* addr)
 {
 	int max_slot = 16384;
-	acl::redis_client_cluster cluster(10, 10, max_slot);
+	acl::redis_client_cluster cluster(max_slot);
 	cluster.set_all_slot(addr, 100);
 
 	for (int i = 0; i < max_slot; i++)

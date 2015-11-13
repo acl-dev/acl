@@ -88,8 +88,8 @@ int main(void)
 	int conn_timeout = 10, rw_timeout = 10, max_conns = 100;
 
 	// declare redis cluster ojbect
-	acl::redis_client_cluster cluster(conn_timeout, rw_timeout);
-	cluster.set(redis_addr, max_conns);
+	acl::redis_client_cluster cluster;
+	cluster.set(redis_addr, max_conns, conn_timeout, rw_timeout);
 
 	// redis operation command
 	acl::redis_string cmd_string;
@@ -156,8 +156,8 @@ int main(void)
 	int conn_timeout = 10, rw_timeout = 10, max_conns = 100;
 
 	// declare redis cluster ojbect
-	acl::redis_client_cluster cluster(conn_timeout, rw_timeout);
-	cluster.set(redis_addr, max_conns);
+	acl::redis_client_cluster cluster;
+	cluster.set(redis_addr, max_conns, conn_timeout, rw_timeout);
 
 	// redis operation command
 	acl::redis cmd;
@@ -204,8 +204,8 @@ int main(void)
 	int conn_timeout = 10, rw_timeout = 10;
 
 	// declare redis cluster ojbect
-	acl::redis_client_cluster cluster(conn_timeout, rw_timeout);
-	cluster.set(redis_addr, __max_conns);
+	acl::redis_client_cluster cluster;
+	cluster.set(redis_addr, __max_conns, conn_timeout, rw_timeout);
 
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);

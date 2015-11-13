@@ -5,9 +5,7 @@
 namespace acl
 {
 
-http_request_manager::http_request_manager(
-	int conn_timeout /* = 30 */, int rw_timeout /* = 30 */)
-	: connect_manager(conn_timeout, rw_timeout)
+http_request_manager::http_request_manager()
 {
 }
 

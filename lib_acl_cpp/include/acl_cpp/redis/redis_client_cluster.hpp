@@ -23,14 +23,9 @@ public:
 	/**
 	 * 构造函数;
 	 * constructor
-	 * @param conn_timeout {int} 服务器连接超时时间(秒);
-	 *  timeout in seconds for connecting the redis-server
-	 * @param rw_timeout {int}　网络 IO 读写超时时间(秒);
-	 *  read/write timeout in seconds from/to the redis-server
 	 * @param max_slot {int} 哈希槽最大值; the max hash-slot value of keys
 	 */
-	redis_client_cluster(int conn_timeout = 30, int rw_timeout = 30,
-		int max_slot = 16384);
+	redis_client_cluster(int max_slot = 16384);
 	virtual ~redis_client_cluster();
 
 	/**

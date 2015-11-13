@@ -11,12 +11,7 @@ namespace acl
 class ACL_CPP_API http_request_manager : public acl::connect_manager
 {
 public:
-	/**
-	 * 构造函数
-	 * @param conn_timeout {int} 连接超时时间(秒)
-	 * @param rw_timeout {int} 网络 IO 读写超时时间(秒)
-	 */
-	http_request_manager(int conn_timeout = 30, int rw_timeout = 30);
+	http_request_manager();
 	virtual ~http_request_manager();
 
 protected:

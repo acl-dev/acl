@@ -10,10 +10,8 @@
 namespace acl
 {
 
-redis_client_cluster::redis_client_cluster(int conn_timeout /* = 30 */,
-	int rw_timeout /* = 30 */, int max_slot /* = 16384 */)
-: connect_manager(conn_timeout, rw_timeout)
-, max_slot_(max_slot)
+redis_client_cluster::redis_client_cluster(int max_slot /* = 16384 */)
+: max_slot_(max_slot)
 , redirect_max_(15)
 , redirect_sleep_(100)
 {

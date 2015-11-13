@@ -18,20 +18,8 @@ class connect_monitor;
 class ACL_CPP_API connect_manager
 {
 public:
-	/**
-	 * 构造函数
-	 * @param conn_timeout {int} 网络连接超时时间(秒)
-	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
-	 */
-	connect_manager(int conn_timeout = 30, int rw_timeout = 30);
+	connect_manager();
 	virtual ~connect_manager();
-
-	/**
-	 * 设置网络连接及网络 IO 超时时间
-	 * @param conn_timeout {int} 网络连接时间(秒)
-	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
-	 */
-	void set_timeout(int conn_timeout, int rw_timeout);
 
 	/**
 	 * 初始化所有服务器的连接池，该函数内部调用 set 过程添加每个服务的连接池
@@ -41,21 +29,26 @@ public:
 	 *  格式: IP:PORT:COUNT;IP:PORT:COUNT;IP:PORT;IP:PORT ...
 	 *    或  IP:PORT:COUNT,IP:PORT:COUNT,IP:PORT;IP:PORT ...
 	 *  如：127.0.0.1:7777:50;192.168.1.1:7777:10;127.0.0.1:7778
-	 * @param default_count {size_t} 当 addr_list 中分隔的某个服务没有
+	 * @param count {size_t} 当 addr_list 中分隔的某个服务没有
 	 *  COUNT 信息时便用此值，当此值为 0 时，则不限制连接数上限
+	 * @param conn_timeout {int} 网络连接时间(秒)
+	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
 	 *  注：default_addr 和 addr_list 不能同时为空
 	 */
 	void init(const char* default_addr, const char* addr_list,
-		size_t default_count);
+		size_t count, int conn_timeout = 30, int rw_timeout = 30);
 
 	/**
 	* 添加服务器的客户端连接池，该函数可以在程序运行时被调用，内部自动加锁
 	 * @param addr {const char*} 服务器地址(ip:port)
 	 * @param count {size_t} 连接池数量限制, 如果该值设为 0，则不设置
 	 *  连接池的连接上限
+	 * @param conn_timeout {int} 网络连接时间(秒)
+	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
 	 * @return {connect_pool&} 返回新添加的连接池对象
 	 */
-	connect_pool& set(const char* addr, size_t count);
+	connect_pool& set(const char* addr, size_t count,
+		int conn_timeout = 30, int rw_timeout = 30);
 
 	/**
 	 * 设置连接池失败后重试的时间时间隔（秒），该函数可以在程序运行时被调用，内部自动加锁
@@ -185,8 +178,6 @@ protected:
 
 protected:
 	string default_addr_;			// 缺省的服务地址
-	int  conn_timeout_;			// 连接服务器超时时间(秒)
-	int  rw_timeout_;			// 与服务器的 IO 超时时间(秒)
 	connect_pool* default_pool_;		// 缺省的服务连接池
 	std::vector<connect_pool*> pools_;	// 所有的服务连接池
 	size_t service_idx_;			// 下一个要访问的的下标值
@@ -196,7 +187,8 @@ protected:
 	connect_monitor* monitor_;		// 后台检测线程句柄
 
 	// 设置除缺省服务之外的服务器集群
-	void set_service_list(const char* addr_list, int count);
+	void set_service_list(const char* addr_list, int count,
+		int conn_timeout, int rw_timeout);
 };
 
 } // namespace acl

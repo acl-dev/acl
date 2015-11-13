@@ -360,7 +360,7 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	acl::redis_client_cluster cluster(conn_timeout, rw_timeout);
+	acl::redis_client_cluster cluster;
 
 	// 当某个连接池结点出问题，设置探测该连接结点是否恢复的时间间隔(秒)，当该值
 	// 为 0 时，则不检测
@@ -372,7 +372,7 @@ int main(int argc, char* argv[])
 	// 当重定向次数 >= 2 时每次再重定向此函数设置休息的时间(毫秒)
 	cluster.set_redirect_sleep(nsleep);
 
-	cluster.init(NULL, addrs.c_str(), max_threads);
+	cluster.init(NULL, addrs.c_str(), max_threads, conn_timeout, rw_timeout);
 
 	// 是否需要将所有哈希槽的对应关系提前设置好，这样可以去掉运行时动态添加
 	// 哈希槽的过程，从而可以提高运行时的效率

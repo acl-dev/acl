@@ -91,8 +91,8 @@ private:
 bool test_redis_session(const char* addr, int n, int max_threads)
 {
 	int conn_timeout = 10, rw_timeout = 10;
-	acl::redis_client_cluster cluster(conn_timeout, rw_timeout);
-	cluster.set(addr, max_threads);
+	acl::redis_client_cluster cluster;
+	cluster.set(addr, max_threads, conn_timeout, rw_timeout);
 
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++)
@@ -146,8 +146,8 @@ bool test_redis_session_attrs(const char* addr, int n)
 		attrs[name] = value;
 	}
 
-	acl::redis_client_cluster cluster(10, 10);
-	cluster.set(addr, 1);
+	acl::redis_client_cluster cluster;
+	cluster.set(addr, 1, 10, 10);
 
 	acl::redis_session sess(cluster, 1);
 	if (sess.set_attrs(attrs) == false)

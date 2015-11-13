@@ -9,10 +9,8 @@
 namespace acl
 {
 
-connect_manager::connect_manager(int conn_timeout, int rw_timeout)
-: conn_timeout_(conn_timeout)
-, rw_timeout_(rw_timeout)
-, default_pool_(NULL)
+connect_manager::connect_manager()
+: default_pool_(NULL)
 , service_idx_(0)
 , stat_inter_(1)
 , retry_inter_(1)
@@ -31,18 +29,6 @@ connect_manager::~connect_manager()
 		delete *it;
 
 	lock_.unlock();
-}
-
-void connect_manager::set_timeout(int conn_timeout, int rw_timeout)
-{
-	conn_timeout_ = conn_timeout;
-	rw_timeout_ = rw_timeout;
-
-	for (std::vector<connect_pool*>::iterator it = pools_.begin();
-		it != pools_.end(); ++it)
-	{
-		(*it)->set_timeout(conn_timeout, rw_timeout);
-	}
 }
 
 // 分析一个服务器地址，格式：IP:PORT[:MAX_CONN]
@@ -93,11 +79,11 @@ void connect_manager::set_retry_inter(int n)
 	lock_.unlock();
 }
 
-void connect_manager::init(const char* default_addr,
-	const char* addr_list, size_t count)
+void connect_manager::init(const char* default_addr, const char* addr_list,
+	size_t count, int conn_timeout /* = 30 */, int rw_timeout /* = 30 */)
 {
 	if (addr_list != NULL && *addr_list != 0)
-		set_service_list(addr_list, count);
+		set_service_list(addr_list, count, conn_timeout, rw_timeout);
 
 	// 创建缺省服务连接池对象，该对象一同放入总的连接池集群中
 	if (default_addr != NULL && *default_addr != 0)
@@ -107,8 +93,8 @@ void connect_manager::init(const char* default_addr,
 		if (max < 0)
 			logger("no default connection set");
 		else
-			default_pool_ = &set(default_addr_.c_str(),
-						(size_t) max);
+			default_pool_ = &set(default_addr_.c_str(), max,
+				conn_timeout, rw_timeout);
 	}
 	else
 		logger("no default connection set");
@@ -118,7 +104,8 @@ void connect_manager::init(const char* default_addr,
 		logger_fatal("no connection available!");
 }
 
-void connect_manager::set_service_list(const char* addr_list, int count)
+void connect_manager::set_service_list(const char* addr_list, int count,
+	int conn_timeout, int rw_timeout)
 {
 	if (addr_list == NULL || *addr_list == 0)
 	{
@@ -141,7 +128,7 @@ void connect_manager::set_service_list(const char* addr_list, int count)
 			logger_error("invalid server addr: %s", addr.c_str());
 			continue;
 		}
-		(void) set(addr.c_str(), max);
+		(void) set(addr.c_str(), max, conn_timeout, rw_timeout);
 		logger("add one service: %s, max connect: %d",
 			addr.c_str(), max);
 	}
@@ -149,7 +136,8 @@ void connect_manager::set_service_list(const char* addr_list, int count)
 	acl_myfree(buf);
 }
 
-connect_pool& connect_manager::set(const char* addr, size_t count)
+connect_pool& connect_manager::set(const char* addr, size_t count,
+	int conn_timeout /* = 30 */, int rw_timeout /* = 30 */)
 {
 	char key[256];
 	ACL_SAFE_STRNCPY(key, addr, sizeof(key));
@@ -169,7 +157,7 @@ connect_pool& connect_manager::set(const char* addr, size_t count)
 
 	connect_pool* pool = create_pool(key, count, pools_.size() - 1);
 	pool->set_retry_inter(retry_inter_);
-	pool->set_timeout(conn_timeout_, rw_timeout_);
+	pool->set_timeout(conn_timeout, rw_timeout);
 	pools_.push_back(pool);
 
 	lock_.unlock();
