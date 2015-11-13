@@ -25,21 +25,9 @@ public:
 	http_request_pool(const char* addr, size_t count, size_t idx = 0);
 	~http_request_pool();
 
-	/**
-	 * 设置网络连接超时时间及网络 IO 读写超时时间(秒)
-	 * @param conn_timeout {int} 连接超时时间
-	 * @param rw_timeout {int} 网络 IO 读写超时时间(秒)
-	 * @return {http_request_pool&}
-	 */
-	http_request_pool& set_timeout(int conn_timeout, int rw_timeout);
-
 protected:
-	// 基类纯虚函数
+	// 基类纯虚函数，该函数返回后由基类设置该连接池的网络连接及网络 IO 超时时间
 	virtual connect_client* create_connect();
-
-private:
-	int   conn_timeout_;
-	int   rw_timeout_;
 };
 
 } // namespace acl

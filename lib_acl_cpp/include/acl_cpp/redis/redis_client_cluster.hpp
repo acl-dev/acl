@@ -146,7 +146,7 @@ public:
 
 protected:
 	/**
-	 * 基类纯虚函数，用来创建连接池对象;
+	 * 基类纯虚函数，用来创建连接池对象，该函数返回后由基类设置网络连接及IO 超时时间
 	 * virtual function of base class, which is used to create
 	 * the connection pool
 	 * @param addr {const char*} 服务器监听地址，格式：ip:port;
@@ -160,8 +160,6 @@ protected:
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
 
 private:
-	int   conn_timeout_;
-	int   rw_timeout_;
 	int   max_slot_;
 	const char**  slot_addrs_;
 	std::vector<char*> addrs_;

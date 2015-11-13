@@ -8,8 +8,6 @@ namespace acl
 redis_client_pool::redis_client_pool(const char* addr, size_t count,
 	size_t idx /* = 0 */)
 : connect_pool(addr, count, idx)
-, conn_timeout_(30)
-, rw_timeout_(60)
 , pass_(NULL)
 {
 }
@@ -18,14 +16,6 @@ redis_client_pool::~redis_client_pool()
 {
 	if (pass_)
 		acl_myfree(pass_);
-}
-
-redis_client_pool& redis_client_pool::set_timeout(int conn_timeout,
-	int rw_timeout)
-{
-	conn_timeout_ = conn_timeout;
-	rw_timeout_ = rw_timeout;
-	return *this;
 }
 
 redis_client_pool& redis_client_pool::set_password(const char* pass)

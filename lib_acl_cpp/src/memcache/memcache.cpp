@@ -11,11 +11,9 @@ namespace acl
 {
 
 memcache::memcache(const char* addr /* = "127.0.0.1:11211" */,
-	int conn_timeout /* = 180 */, int rw_timeout /* = 300 */)
+	int conn_timeout /* = 30 */, int rw_timeout /* = 30 */)
 : keypre_(NULL)
 , coder_(false, false)
-, conn_timeout_(conn_timeout)
-, rw_timeout_(rw_timeout)
 , encode_key_(false)
 , opened_(false)
 , retry_(true)
@@ -25,6 +23,7 @@ memcache::memcache(const char* addr /* = "127.0.0.1:11211" */,
 {
 	acl_assert(addr && *addr);
 	addr_ = acl_mystrdup(addr);
+	set_timeout(conn_timeout, rw_timeout);
 }
 
 memcache::~memcache()

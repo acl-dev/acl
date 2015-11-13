@@ -16,14 +16,13 @@ namespace acl
 
 redis_client::redis_client(const char* addr, int conn_timeout /* = 60 */,
 	int rw_timeout /* = 30 */, bool retry /* = true */)
-: conn_timeout_(conn_timeout)
-, rw_timeout_(rw_timeout)
-, retry_(retry)
+: retry_(retry)
 , slice_req_(false)
 , slice_res_(false)
 {
 	addr_ = acl_mystrdup(addr);
 	pass_ = NULL;
+	set_timeout(conn_timeout, rw_timeout);
 }
 
 redis_client::~redis_client()
@@ -36,7 +35,7 @@ redis_client::~redis_client()
 		conn_.close();
 }
 
-redis_client& redis_client::set_password(const char* pass)
+void redis_client::set_password(const char* pass)
 {
 	if (pass_)
 		acl_myfree(pass_);
@@ -44,7 +43,6 @@ redis_client& redis_client::set_password(const char* pass)
 		pass_ = acl_mystrdup(pass);
 	else
 		pass_ = NULL;
-	return *this;
 }
 
 socket_stream* redis_client::get_stream()

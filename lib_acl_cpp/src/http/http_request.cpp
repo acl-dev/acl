@@ -34,11 +34,11 @@ http_request::http_request(socket_stream* client,
 	local_charset_[0] = 0;
 	conv_ = NULL;
 
+	set_timeout(client->get_vstream()->rw_timeout, conn_timeout);
+
 	const char* ptr = client->get_peer(true);
 	acl_assert(ptr);
 	ACL_SAFE_STRNCPY(addr_, ptr, sizeof(addr_));
-	rw_timeout_ = client->get_vstream()->rw_timeout;
-	conn_timeout_ = conn_timeout;
 	header_.set_url("/");
 	header_.set_keep_alive(true);
 	header_.set_host(addr_);
@@ -53,8 +53,8 @@ http_request::http_request(const char* addr, int conn_timeout /* = 60 */,
 {
 	acl_assert(addr && *addr);
 	ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
-	conn_timeout_ = conn_timeout;
-	rw_timeout_ = rw_timeout;
+	set_timeout(conn_timeout, rw_timeout);
+
 	unzip_ = unzip;
 	local_charset_[0] = 0;
 	conv_ = NULL;
@@ -102,12 +102,6 @@ void http_request::reset(void)
 	conv_ = NULL;
 	need_retry_ = true;
 	RESET_RANGE();
-}
-
-void http_request::set_timeout(int conn_timeout, int rw_timeout)
-{
-	conn_timeout_ = conn_timeout;
-	rw_timeout_ = rw_timeout;
 }
 
 http_request& http_request::set_unzip(bool on)

@@ -21,18 +21,18 @@ public:
 	* 构造函数
 	* @param addr {const char*} memcached 服务器监听地址，格式为：
 	*  ip:port，如: 127.0.0.1:11211
-	* @param conn_timeout {int} 连接超时时间(秒)
-	* @param rw_timeout {int} IO 读写超时时间(秒)
+	* @param conn_timeout {int} 连接服务器的超时时间(秒)
+	* @param rw_timeout {int} 网络 IO 超时时间(秒)
 	*/
-	memcache(const char* addr = "127.0.0.1:11211",
-		int conn_timeout = 180, int rw_timeout = 300);
+	memcache(const char* addr = "127.0.0.1:11211", int conn_timeout = 30,
+		int rw_timeout = 10);
 
 	~memcache();
 
 	/**
-	 * 设置 key 的前缀，即实际的 key 将由 该前缀+原始key 组成，缺省时不设前缀，
-	 * 当多个应用共用同一个 memcached 服务时，建议应用设置自身的 key 前缀，这样
-	 * 可以避免与其它应用的 key 产生重复问题
+	 * 设置 key 的前缀，即实际的 key 将由 该前缀+原始key 组成，缺省时不设
+	 * 前缀，当多个应用共用同一个 memcached 服务时，建议应用设置自身的
+	 * key 前缀，这样可以避免与其它应用的 key 产生重复问题
 	 * @param keypre {const char*} 非空时设置 key 前缀，否则取消 key 前缀
 	 * @return {memcache&}
 	 */
@@ -46,8 +46,8 @@ public:
 	memcache& auto_retry(bool onoff);
 
 	/**
-	 * 设置是否针对 KEY 键值进行编码，缺少时不对 key 编码，当应用的 key 中可能
-	 * 会有特殊字符或二进制值时，建议调用此函数对 key 进行编码
+	 * 设置是否针对 KEY 键值进行编码，缺少时不对 key 编码，当应用的 key 中
+	 * 可能会有特殊字符或二进制值时，建议调用此函数对 key 进行编码
 	 * @param onoff {bool} 为 true 表示内部需要对 key 进行编码
 	 * @return {memcache&}
 	 */
@@ -112,9 +112,9 @@ public:
 		time_t timeout = 0, unsigned short flags = 0);
 
 	/**
-	 * 循环调用本函数上传数据值，内部会自动计算已经上传的数据总和是否达到了 set_begin
-	 * 中设置的数据总长度，当达到后会自动补一个 "\r\n"，调用者不应再调用此函数上传数据，
-	 * 除非是一个新的上传过程开始了
+	 * 循环调用本函数上传数据值，内部会自动计算已经上传的数据总和是否达到
+	 * 了 set_begin 中设置的数据总长度，当达到后会自动补一个 "\r\n"，调用
+	 * 者不应再调用此函数上传数据，除非是一个新的上传过程开始了
 	 * @param data {const void*} 数据地址指针
 	 * @param len {data} data 数据长度
 	 * @return {bool} 是否成功
@@ -231,8 +231,6 @@ private:
 
 	string* keypre_;         // 非空时，该字符串被添加在 KEY 值前组成新的 KEY
 	rfc2047 coder_;          // 当需要对 KEY 编码时的编码器
-	int   conn_timeout_;     // 网络连接超时时间
-	int   rw_timeout_;       // 网络 IO 超时时间
 	bool  encode_key_;       // 是否需要对 KEY 进行编码
 
 	bool  opened_;           // 连接是否打开

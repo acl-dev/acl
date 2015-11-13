@@ -288,13 +288,6 @@ public:
 	 */
 	void reset(void);
 
-	/**
-	 * 设置网络连接超时及网络读写超时时间(秒)
-	 * @param conn_timeout {int} 网络连接超时
-	 * @param rw_timeout {int} 网络读写超时
-	 */
-	void set_timeout(int conn_timeout, int rw_timeout);
-
 protected:
 	/**
 	 * 基类 connect_client 纯虚函数，显式调用本函数用来打开与服务端的连接
@@ -304,9 +297,6 @@ protected:
 
 private:
 	char addr_[64];
-	//bool keep_alive_;
-	int  conn_timeout_;
-	int  rw_timeout_;
 	bool unzip_;
 	char local_charset_[64];
 	charset_conv* conv_;

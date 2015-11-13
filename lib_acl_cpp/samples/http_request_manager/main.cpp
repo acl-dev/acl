@@ -24,6 +24,7 @@ static void init(const char* addrs, int count)
 	// 创建 HTTP 请求连接池集群管理对象
 	__conn_manager = new http_request_manager();
 
+	__conn_manager->set_timeout(100, 120);
 	// 添加服务器集群地址
 	__conn_manager->init(addrs, addrs, 100);
 
@@ -155,9 +156,6 @@ static void thread_main(void*)
 			check_all_connections();
 			exit (1);
 		}
-
-		// 设置连接的超时时间及读超时时间
-		pool->set_timeout(2, 2);
 
 		// 从连接池中获取一个 HTTP 连接
 		http_request* conn = (http_request*) pool->peek();

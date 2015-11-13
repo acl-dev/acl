@@ -31,17 +31,6 @@ public:
 	virtual ~redis_client_pool();
 
 	/**
-	 * 设置网络连接超时时间及网络 IO 读写超时时间(秒)
-	 * set the connect and read/write timeout in seconds
-	 * @param conn_timeout {int} 连接超时时间
-	 *  the timeout to connect in seconds
-	 * @param rw_timeout {int} 网络 IO 读写超时时间(秒)
-	 *  the timeout to read/write in seconds
-	 * @return {redis_client_pool&}
-	 */
-	redis_client_pool& set_timeout(int conn_timeout, int rw_timeout);
-
-	/**
 	 * 设置连接 redis 服务器的连接密码
 	 * @param pass {const char*} 连接密码
 	 * @return {redis_client_pool&}
@@ -57,8 +46,6 @@ protected:
 	connect_client* create_connect();
 
 private:
-	int   conn_timeout_;
-	int   rw_timeout_;
 	char* pass_;
 };
 

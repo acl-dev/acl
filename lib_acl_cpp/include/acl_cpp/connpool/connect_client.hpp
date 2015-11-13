@@ -45,7 +45,23 @@ public:
 		return pool_;
 	}
 
-private:
+public:
+	/**
+	 * 虚函数，该函数设置网络连接超时时间及网络 IO 超时时间，子类可以重载该虚函数，
+	 * 以便于设置内部的对象超时时间
+	 * @param conn_timeout {int} 网络连接超时时间(秒)
+	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
+	 */
+	virtual void set_timeout(int conn_timeout, int rw_timeout)
+	{
+		conn_timeout_ = conn_timeout;
+		rw_timeout_ = rw_timeout;
+	}
+
+protected:
+	int   conn_timeout_;
+	int   rw_timeout_;
+
 	friend class connect_pool;
 
 	time_t when_;

@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 #CC      = gcc
 #CC      = g++
-CC	= ${MY_ENV_CC}
+CC	= ${ENV_CC}
 AR      = ar
 ARFL    = rv
 #ARFL    = cru

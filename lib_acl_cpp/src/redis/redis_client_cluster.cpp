@@ -12,8 +12,7 @@ namespace acl
 
 redis_client_cluster::redis_client_cluster(int conn_timeout /* = 30 */,
 	int rw_timeout /* = 30 */, int max_slot /* = 16384 */)
-: conn_timeout_(conn_timeout)
-, rw_timeout_(rw_timeout)
+: connect_manager(conn_timeout, rw_timeout)
 , max_slot_(max_slot)
 , redirect_max_(15)
 , redirect_sleep_(100)
@@ -45,7 +44,6 @@ connect_pool* redis_client_cluster::create_pool(const char* addr,
 	size_t count, size_t idx)
 {
 	redis_client_pool* pool = NEW redis_client_pool(addr, count, idx);
-	pool->set_timeout(conn_timeout_, rw_timeout_);
 
 	string key(addr);
 	key.lower();

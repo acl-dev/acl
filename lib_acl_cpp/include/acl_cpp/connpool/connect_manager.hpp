@@ -18,8 +18,20 @@ class connect_monitor;
 class ACL_CPP_API connect_manager
 {
 public:
-	connect_manager();
+	/**
+	 * 构造函数
+	 * @param conn_timeout {int} 网络连接超时时间(秒)
+	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
+	 */
+	connect_manager(int conn_timeout = 30, int rw_timeout = 30);
 	virtual ~connect_manager();
+
+	/**
+	 * 设置网络连接及网络 IO 超时时间
+	 * @param conn_timeout {int} 网络连接时间(秒)
+	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
+	 */
+	void set_timeout(int conn_timeout, int rw_timeout);
 
 	/**
 	 * 初始化所有服务器的连接池，该函数内部调用 set 过程添加每个服务的连接池
@@ -171,8 +183,10 @@ protected:
 	virtual connect_pool* create_pool(const char* addr,
 		size_t count, size_t idx) = 0;
 
-private:
+protected:
 	string default_addr_;			// 缺省的服务地址
+	int  conn_timeout_;			// 连接服务器超时时间(秒)
+	int  rw_timeout_;			// 与服务器的 IO 超时时间(秒)
 	connect_pool* default_pool_;		// 缺省的服务连接池
 	std::vector<connect_pool*> pools_;	// 所有的服务连接池
 	size_t service_idx_;			// 下一个要访问的的下标值

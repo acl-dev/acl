@@ -9,8 +9,10 @@
 namespace acl
 {
 
-connect_manager::connect_manager()
-: default_pool_(NULL)
+connect_manager::connect_manager(int conn_timeout, int rw_timeout)
+: conn_timeout_(conn_timeout)
+, rw_timeout_(rw_timeout)
+, default_pool_(NULL)
 , service_idx_(0)
 , stat_inter_(1)
 , retry_inter_(1)
@@ -29,6 +31,18 @@ connect_manager::~connect_manager()
 		delete *it;
 
 	lock_.unlock();
+}
+
+void connect_manager::set_timeout(int conn_timeout, int rw_timeout)
+{
+	conn_timeout_ = conn_timeout;
+	rw_timeout_ = rw_timeout;
+
+	for (std::vector<connect_pool*>::iterator it = pools_.begin();
+		it != pools_.end(); ++it)
+	{
+		(*it)->set_timeout(conn_timeout, rw_timeout);
+	}
 }
 
 // 分析一个服务器地址，格式：IP:PORT[:MAX_CONN]
@@ -155,6 +169,7 @@ connect_pool& connect_manager::set(const char* addr, size_t count)
 
 	connect_pool* pool = create_pool(key, count, pools_.size() - 1);
 	pool->set_retry_inter(retry_inter_);
+	pool->set_timeout(conn_timeout_, rw_timeout_);
 	pools_.push_back(pool);
 
 	lock_.unlock();

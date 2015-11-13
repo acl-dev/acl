@@ -11,6 +11,8 @@ connect_pool::connect_pool(const char* addr, size_t max, size_t idx /* = 0 */)
 : alive_(true)
 , delay_destroy_(false)
 , last_dead_(0)
+, conn_timeout_(30)
+, rw_timeout_(30)
 , idx_(idx)
 , max_(max)
 , count_(0)
@@ -30,6 +32,13 @@ connect_pool::~connect_pool()
 	std::list<connect_client*>::iterator it = pool_.begin();
 	for (; it != pool_.end(); ++it)
 		delete *it;
+}
+
+connect_pool& connect_pool::set_timeout(int conn_timeout, int rw_timeout)
+{
+	conn_timeout_ = conn_timeout;
+	rw_timeout_ = rw_timeout;
+	return *this;
 }
 
 connect_pool& connect_pool::set_idle_ttl(time_t ttl)
@@ -116,6 +125,9 @@ connect_client* connect_pool::peek()
 
 	// 调用虚函数的子类实现方法，创建新连接对象，并打开连接
 	conn = create_connect();
+	// 在调用 open 之前先设置超时时间
+	conn->set_timeout(conn_timeout_, rw_timeout_);
+	// 调用子类方法打开连接
 	if (conn->open() == false)
 	{
 		delete conn;

@@ -42,7 +42,7 @@ public:
 	 * @param pass {const char*}
 	 * @return {redis_client&}
 	 */
-	redis_client& set_password(const char* pass);
+	void set_password(const char* pass);
 
 	/**
 	 * 判断该网络连接对象是否已经关闭
@@ -125,8 +125,6 @@ protected:
 private:
 	socket_stream conn_;
 	char* addr_;
-	int   conn_timeout_;
-	int   rw_timeout_;
 	char* pass_;
 	bool  retry_;
 	string  buf_;

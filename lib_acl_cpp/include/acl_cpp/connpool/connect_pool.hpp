@@ -33,6 +33,13 @@ public:
 	virtual ~connect_pool();
 
 	/**
+	 * 此接口用来设置超时时间
+	 * @param conn_timeout {int} 网络连接超时时间(秒)
+	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
+	 */
+	connect_pool& set_timeout(int conn_timeout, int rw_timeout);
+
+	/**
 	 * 设置连接池异常的重试时间间隔
 	 * @param retry_inter {int} 当连接断开后，重新再次打开连接的时间间隔(秒)，
 	 *  当该值 <= 0 时表示允许连接断开后可以立即重连，否则必须超过该时间间隔后才
@@ -183,8 +190,10 @@ protected:
 	int   retry_inter_;
 	time_t last_dead_;			// 该连接池对象上次不可用时的时间截
 
-	size_t idx_;				// 该连接池对象在集合中的下标位置
 	char  addr_[256];			// 连接池对应的服务器地址，IP:PORT
+	int   conn_timeout_;			// 网络连接超时时间(秒)
+	int   rw_timeout_;			// 网络 IO 超时时间(秒)
+	size_t idx_;				// 该连接池对象在集合中的下标位置
 	size_t max_;				// 最大连接数
 	size_t count_;				// 当前的连接数
 	time_t idle_ttl_;			// 空闲连接的生命周期

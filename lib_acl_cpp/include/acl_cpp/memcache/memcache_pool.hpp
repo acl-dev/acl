@@ -25,21 +25,9 @@ public:
 	memcache_pool(const char* addr, size_t count, size_t idx = 0);
 	~memcache_pool();
 
-	/**
-	 * 设置网络连接超时时间及网络 IO 读写超时时间(秒)
-	 * @param conn_timeout {int} 连接超时时间
-	 * @param rw_timeout {int} 网络 IO 读写超时时间(秒)
-	 * @return {memcache_pool&}
-	 */
-	memcache_pool& set_timeout(int conn_timeout = 30, int rw_timeout = 60);
-
 protected:
 	// 基类纯虚函数
 	virtual connect_client* create_connect();
-
-private:
-	int   conn_timeout_;
-	int   rw_timeout_;
 };
 
 } // namespace acl
