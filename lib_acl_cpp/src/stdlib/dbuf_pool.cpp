@@ -89,51 +89,101 @@ bool dbuf_pool::dbuf_unkeep(const void* addr)
 //////////////////////////////////////////////////////////////////////////////
 
 dbuf_obj::dbuf_obj(dbuf_guard* guard /* = NULL */)
-	: nrefer_(0)
+	: guard_(guard)
+	, nrefer_(0)
+	, pos_(-1)
 {
 	if (guard)
 		guard->push_back(this);
 }
 
-dbuf_guard::dbuf_guard(acl::dbuf_pool* dbuf /* = NULL */, size_t nblock /* = 2 */)
+dbuf_guard::dbuf_guard(acl::dbuf_pool* dbuf, size_t capacity /* = 100 */)
+	: nblock_(2)
+	, size_(0)
+	, capacity_(capacity == 0 ? 100 : capacity)
+	, incr_(100)
 {
 	if (dbuf == NULL)
-		dbuf_ = new (nblock) acl::dbuf_pool;
+		dbuf_ = new (nblock_) acl::dbuf_pool;
 	else
 		dbuf_ = dbuf;
+	objs_ = (dbuf_obj**) dbuf_->dbuf_alloc(sizeof(dbuf_obj*) * capacity_);
+}
+
+dbuf_guard::dbuf_guard(size_t nblock /* = 2 */, size_t capacity /* = 100 */)
+	: nblock_(nblock == 0 ? 2 : nblock)
+	, size_(0)
+	, capacity_(capacity == 0 ? 100 : capacity)
+	, incr_(100)
+{
+	dbuf_ = new (nblock_) acl::dbuf_pool;
+	objs_ = (dbuf_obj**) dbuf_->dbuf_alloc(sizeof(dbuf_obj*) * capacity_);
 }
 
 dbuf_guard::~dbuf_guard()
 {
-	for (std::vector<dbuf_obj*>::iterator it = objs_.begin();
-		it != objs_.end(); ++it)
-	{
-		(*it)->~dbuf_obj();
-	}
+	for (size_t i = 0; i < size_; i++)
+		objs_[i]->~dbuf_obj();
 
 	dbuf_->destroy();
 }
 
+void dbuf_guard::extend_objs()
+{
+	dbuf_obj** old_objs = objs_;
+	capacity_ += incr_;
+	objs_ = (dbuf_obj**) dbuf_->dbuf_alloc(sizeof(dbuf_obj*) * capacity_);
+
+	for (size_t i = 0; i < size_; i++)
+		objs_[i] = old_objs[i];
+}
+
+void dbuf_guard::set_increment(size_t incr)
+{
+	if (incr > 0)
+		incr_ = incr;
+}
+
 int dbuf_guard::push_back(dbuf_obj* obj)
 {
-	if (obj->nrefer_ >= 1)
+	if (obj->nrefer_ < 1)
 	{
-		logger_error("obj->nrefer_: %d >= 1", obj->nrefer_);
-		return -1;
+		if (obj->guard_ == NULL)
+			obj->guard_ = this;
+		else if (obj->guard_ != this)
+		{
+			logger_fatal("obj->guard_(%p) != me(%p), nrefer: %d",
+				obj->guard_, this, obj->nrefer_);
+		}
+
+		if (size_ >= capacity_)
+			extend_objs();
+
+		objs_[size_] = obj;
+		obj->nrefer_++;
+		obj->pos_ = (int) size_;
+		size_++;
+	}
+	else if (obj->guard_ != this)
+	{
+		logger_fatal("obj->guard_(%p) != me(%p), nrefer: %d",
+			obj->guard_, this, obj->nrefer_);
 	}
 
-	objs_.push_back(obj);
-	obj->nrefer_++;
-
-	return (int) objs_.size() - 1;
+	return obj->pos_;
 }
 
 dbuf_obj* dbuf_guard::operator[](size_t pos) const
 {
-	if (pos >= objs_.size())
-		return NULL;
+	return get(pos);
+}
 
-	return objs_[pos];
+dbuf_obj* dbuf_guard::get(size_t pos) const
+{
+	if (pos >= size_)
+		return NULL;
+	else
+		return objs_[pos];
 }
 
 } // namespace acl

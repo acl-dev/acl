@@ -170,11 +170,36 @@ public:
 
 	virtual ~dbuf_obj() {}
 
+	/**
+	 * 获得该对象在 dbuf_guard 中的数组中的下标位置
+	 * @return {int} 返回该对象在 dbuf_guard 中的数组中的下标位置，当该
+	 *  对象没有被 dbuf_guard 保存时，则返回 -1，此时有可能会造成内存泄露
+	 */
+	int pos() const
+	{
+		return pos_;
+	}
+
+	/**
+	 * 返回构造函数中 dbuf_guard 对象
+	 * @return {dbuf_guard*}
+	 */
+	dbuf_guard* get_guard() const
+	{
+		return guard_;
+	}
+
 private:
 	friend class dbuf_guard;
 
+	// 记录本对象所属的 dbuf_guard 对象
+	dbuf_guard* guard_;
+
 	// 该变量便于 dbuf_guard 对象使用，以增加安全性
 	int nrefer_;
+
+	// 该对象在 dbuf_guard 对象中记录的数组的位置
+	int pos_;
 };
 
 /**
@@ -188,10 +213,17 @@ public:
 	 * 构造函数
 	 * @param dbuf {dbuf_pool*} 当该内存池对象非空时，dbuf 将由 dbuf_guard
 	 *  接管，如果为空，则本构造函数内部将会自动创建一个 dbuf_pool 对象
-	 * @param nblock {size_t} 当 dbuf 参数为 NULL 时，本类对象内部创建
-	 *  dbuf_pool 对象时，本参数指定了内存块(4096)的倍数
+	 * @param capacity {size_t} 内部创建的 objs_ 数组的初始长度
 	 */
-	dbuf_guard(dbuf_pool* dbuf = NULL, size_t nblock = 2);
+	dbuf_guard(dbuf_pool* dbuf, size_t capacity = 100);
+
+	/**
+	 * 构造函数
+	 * @param nblock {size_t} 本类对象内部创建 dbuf_pool 对象时，本参数
+	 *  指定了内存块(4096)的倍数
+	 * @param capacity {size_t} 内部创建的 objs_ 数组的初始长度
+	 */
+	dbuf_guard(size_t nblock = 2, size_t capacity = 100);
 
 	/**
 	 * 析构函数，在析构函数内部将会自动销毁由构造函数传入的 dbuf_pool 对象
@@ -301,10 +333,12 @@ public:
 
 	/**
 	 * 可以手动调用本函数，将在 dbuf_pool 上分配的 dbuf_obj 子类对象交给
-	 * dbuf_guard 对象统一进行销毁管理
+	 * dbuf_guard 对象统一进行销毁管理；严禁将同一个 dbuf_obj 子类对象同
+	 * 时将给多个 dbuf_guard 对象进行管理，否则将会产生对象的重复释放
 	 * @param obj {dbuf_obj*}
 	 * @return {int} 返回 obj 被添加后其在 dbuf_obj 对象数组中的下标位置，
-	 *  如果返回值 < 0 则说明输入的对象已经在 dbuf_guard 的监管中
+	 *  dbuf_guard 内部对 dbuf_obj 对象的管理具有防重添加机制，所以当多次
+	 *  将同一个 dbuf_obj 对象置入同一个 dbuf_guard 对象时，内部只会放一次
 	 */
 	int push_back(dbuf_obj* obj);
 
@@ -314,14 +348,16 @@ public:
 	 */
 	size_t size() const
 	{
-		return objs_.size();
+		return size_;
 	}
 
 	/**
-	 * 获得当前内存池中管理的对象集合
-	 * @return {std::vector<dbuf_obj*>&}
+	 * 获得当前内存池中管理的对象集合，该函数必须与 size() 函数配合使用，
+	 * 以免指针地址越界
+	 * @return {dbuf_obj**} 返回 dbuf_obj 对象集合，永远返回非 NULL 值，
+	 *  该数组的大小由 size() 函数决定
 	 */
-	const std::vector<dbuf_obj*>& get_objs() const
+	dbuf_obj** get_objs() const
 	{
 		return objs_;
 	}
@@ -333,9 +369,34 @@ public:
 	 */
 	dbuf_obj* operator[](size_t pos) const;
 
+	/**
+	 * 返回指定下标的对象
+	 * @param pos {size_t} 指定对象的下标位置，不应越界
+	 * @return {dbuf_obj*} 当下标位置越界时返回 NULL
+	 */
+	dbuf_obj* get(size_t pos) const;
+
+	/**
+	 * 设置内建 objs_ 数组对象每次在扩充空间时的增量，内部缺省值为 100
+	 * @param incr {size_t}
+	 */
+	void set_increment(size_t incr);
+
 private:
-	dbuf_pool* dbuf_;
-	std::vector<dbuf_obj*> objs_;
+	size_t nblock_;			// 内部自建 dbuf_pool 内存块的单位个数
+	dbuf_pool* dbuf_;		// 内存池对象
+
+	// 此处之所以使用自实现的 dbuf_obj 数组对象，而没有使用 std::vector，
+	// 一方面使数组对象也在 dbuf_pool 内存池上创建，另一方面可以避免
+	// std::vector 内部在扩容时的内存不可控性
+
+	dbuf_obj** objs_;		// 存储 dbuf_obj 对象的数组对象
+	size_t size_;			// 存储于 objs_ 中的对象个数
+	size_t capacity_;		// objs_ 数组的大小
+	size_t incr_;			// objs_ 数组扩充时的增量个数
+
+	// 扩充 objs_ 数组对象的空间
+	void extend_objs();
 };
 
 /**
