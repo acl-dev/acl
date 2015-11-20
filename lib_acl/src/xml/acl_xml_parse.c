@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include "stdlib/acl_mystring.h"
+#include "code/acl_xmlcode.h"
 #include "xml/acl_xml.h"
 
 #endif
@@ -11,6 +12,7 @@
 #define	LEN	ACL_VSTRING_LEN
 #define	STR	acl_vstring_str
 #define END	acl_vstring_end
+#define	STRCPY	acl_vstring_strcpy
 
 #define IS_DOCTYPE(ptr) ((*(ptr) == 'd' || *(ptr) == 'D')  \
 				&& (*(ptr + 1) == 'o' || *(ptr + 1) == 'O')  \
@@ -514,6 +516,13 @@ static const char *xml_parse_attr_val(ACL_XML *xml, const char *data)
 	ACL_VSTRING_TERMINATE(attr->value);
 
 	if (xml->curr_node->status != ACL_XML_S_AVAL) {
+		if (LEN(attr->value) > 0 && xml->decode_buf != NULL) {
+			ACL_VSTRING_RESET(xml->decode_buf);
+			acl_xml_decode(STR(attr->value), xml->decode_buf);
+			if (LEN(xml->decode_buf) > 0)
+				STRCPY(attr->value, STR(xml->decode_buf));
+		}
+
 		/* 将该标签ID号映射至哈希表中，以便于快速查询 */
 		if (IS_ID(STR(attr->name)) && LEN(attr->value) > 0) {
 			const char *ptr = STR(attr->value);
@@ -561,8 +570,8 @@ static const char *xml_parse_text(ACL_XML *xml, const char *data)
 		return (data);
 
 	if ((xml->curr_node->flag & ACL_XML_F_SELF_CL)) {
-		/* 如果该标签是自关闭类型，则应使父节点直接跳至右边 '/' 处理位置,
-		 * 同时使本节点跳至右边 '>' 处理位置
+		/* 如果该标签是自关闭类型，则应使父节点直接跳至右边 '/' 处理
+		 * 位置, 同时使本节点跳至右边 '>' 处理位置
 		 */
 		ACL_XML_NODE *parent = acl_xml_node_parent(xml->curr_node);
 		if (parent != xml->root)
@@ -570,8 +579,13 @@ static const char *xml_parse_text(ACL_XML *xml, const char *data)
 		xml->curr_node->status = ACL_XML_S_RGT;
 	}
 
-	if (LEN(xml->curr_node->text) == 0)
+	if (LEN(xml->curr_node->text) == 0 || xml->decode_buf == NULL)
 		return (data);
+
+	ACL_VSTRING_RESET(xml->decode_buf);
+	acl_xml_decode(STR(xml->curr_node->text), xml->decode_buf);
+	if (LEN(xml->decode_buf) > 0)
+		STRCPY(xml->curr_node->text, STR(xml->decode_buf));
 
 	return (data);
 }

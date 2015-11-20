@@ -15,6 +15,7 @@
 
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_mymalloc.h"
+#include "stdlib/acl_dbuf_pool.h"
 #include "stdlib/acl_array.h"
 
 static void array_push_back(struct ACL_ARRAY *a, void *obj)
@@ -31,10 +32,10 @@ static void *array_pop_back(struct ACL_ARRAY *a)
 {
 	void *obj;
 	if (a->count <= 0)
-		return (NULL);
+		return NULL;
 	a->count--;
 	obj = a->items[a->count];
-	return (obj);
+	return obj;
 }
 
 static void *array_pop_front(struct ACL_ARRAY *a)
@@ -43,13 +44,13 @@ static void *array_pop_front(struct ACL_ARRAY *a)
 	int   i;
 
 	if (a->count <= 0)
-		return (NULL);
+		return NULL;
 	obj = a->items[0];
 	a->count--;
 	for (i = 0; i < a->count; i++)
 		a->items[i] = a->items[i + 1];
 
-	return (obj);
+	return obj;
 }
 
 /* array_iter_head - get the head of the array */
@@ -66,7 +67,7 @@ static void *array_iter_head(ACL_ITER *iter, struct ACL_ARRAY *a)
 	else
 		iter->ptr = iter->data = a->items[0];
 
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 /* array_iter_next - get the next of the array */
@@ -78,7 +79,7 @@ static void *array_iter_next(ACL_ITER *iter, struct ACL_ARRAY *a)
 		iter->data = iter->ptr = 0;
 	else
 		iter->data = iter->ptr = a->items[iter->i];
-	return (iter->ptr);
+	return iter->ptr;
 }
  
 /* array_iter_tail - get the tail of the array */
@@ -94,7 +95,7 @@ static void *array_iter_tail(ACL_ITER *iter, struct ACL_ARRAY *a)
 		iter->ptr = iter->data = 0;
 	else
 		iter->data = iter->ptr = a->items[iter->i];
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 /* array_iter_prev - get the prev of the array */
@@ -106,18 +107,19 @@ static void *array_iter_prev(ACL_ITER *iter, struct ACL_ARRAY *a)
 		iter->data = iter->ptr = 0;
 	else
 		iter->data = iter->ptr = a->items[iter->i];
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 /* grows internal buffer to satisfy required minimal capacity */
 static void acl_array_grow(ACL_ARRAY *a, int min_capacity)
 {
-	const int min_delta = 16;
+	int min_delta = 16;
 	int delta;
 
 	/* don't need to grow the capacity of the array */
 	if(a->capacity >= min_capacity)
 		return;
+
 	delta = min_capacity;
 	/* make delta a multiple of min_delta */
 	delta += min_delta - 1;
@@ -126,13 +128,28 @@ static void acl_array_grow(ACL_ARRAY *a, int min_capacity)
 	/* actual grow */
 	if (delta <= 0)
 		return;
+
 	a->capacity += delta;
-	if (a->items) {
-		a->items = (void **) acl_myrealloc(a->items,
-			a->capacity * sizeof(void *));
+
+	if (a->items == NULL) {
+		if (a->dbuf == NULL) {
+			a->items = (void**)
+				acl_mymalloc(a->capacity * sizeof(void*));
+		} else {
+			a->items = (void**) acl_dbuf_pool_alloc(a->dbuf,
+					a->capacity * sizeof(void*));
+		}
+	} else if (a->dbuf == NULL) {
+		a->items = (void**) acl_myrealloc(a->items,
+				a->capacity * sizeof(void*));
+	} else if (a->count > 0) {
+		void **old_items = a->items;
+		a->items = (void**) acl_dbuf_pool_calloc(a->dbuf,
+				a->capacity * sizeof(void*));
+		memcpy(a->items, old_items, a->count * sizeof(void*));
 	} else {
-		a->items = (void **) acl_mymalloc(a->capacity
-						* sizeof(void *));
+		a->items = (void **) acl_dbuf_pool_calloc(a->dbuf,
+				a->capacity * sizeof(void *));
 	}
 
 	/* reset, just in case */
@@ -142,10 +159,21 @@ static void acl_array_grow(ACL_ARRAY *a, int min_capacity)
 
 ACL_ARRAY *acl_array_create(int init_size)
 {
-	int   ret;
+	return acl_array_dbuf_create(init_size, NULL);
+}
+
+ACL_ARRAY *acl_array_dbuf_create(int init_size, ACL_DBUF_POOL *dbuf)
+{
 	ACL_ARRAY *a;
 
-	a = (ACL_ARRAY *) acl_mycalloc(1, sizeof(ACL_ARRAY));
+	if (dbuf != NULL) {
+		a = (ACL_ARRAY *) acl_dbuf_pool_calloc(dbuf,
+				sizeof(ACL_ARRAY));
+		a->dbuf = dbuf;
+	} else {
+		a = (ACL_ARRAY *) acl_mycalloc(1, sizeof(ACL_ARRAY));
+		a->dbuf = NULL;
+	}
 
 	a->push_back = array_push_back;
 	a->push_front = array_push_front;
@@ -156,15 +184,12 @@ ACL_ARRAY *acl_array_create(int init_size)
 	a->iter_tail = array_iter_tail;
 	a->iter_prev = array_iter_prev;
 
-	if(init_size > 0) {
-		ret = acl_array_pre_append(a, init_size);
-		if(ret < 0) {
-			acl_myfree(a);
-			return(NULL);
-		}
-	}
+	if(init_size <= 0)
+		init_size = 100;
 
-	return(a);
+	acl_array_pre_append(a, init_size);
+
+	return a;
 }
 
 void acl_array_clean(ACL_ARRAY *a, void (*free_fn)(void *))
@@ -182,6 +207,10 @@ void acl_array_clean(ACL_ARRAY *a, void (*free_fn)(void *))
 void acl_array_free(ACL_ARRAY *a, void (*free_fn)(void *))
 {
 	acl_array_clean(a, free_fn);
+
+	if (a->dbuf)
+		return;
+
 	if (a->items)
 		acl_myfree(a->items);
 	acl_myfree(a);
@@ -192,7 +221,7 @@ int acl_array_append(ACL_ARRAY *a, void *obj)
 	if (a->count >= a->capacity)
 		acl_array_grow(a, a->count + 16);
 	a->items[a->count++] = obj;
-	return(a->count - 1);
+	return a->count - 1;
 }
 
 int acl_array_pred_insert(ACL_ARRAY *a, int position, void *obj)
@@ -203,8 +232,9 @@ int acl_array_pred_insert(ACL_ARRAY *a, int position, void *obj)
 	 * a->items[count - 1] should be the last valid item node
 	 * position should: positioin >= 0 && position <= a->count - 1
 	 */
-	if(obj == NULL || position < 0 || position >= a->count)
-		return(-1);
+	if(position < 0 || position >= a->count)
+		return -1;
+
 	if(a->count >= a->capacity)
 		acl_array_grow(a, a->count + 1);
 
@@ -220,7 +250,7 @@ int acl_array_pred_insert(ACL_ARRAY *a, int position, void *obj)
 	}
 	a->items[position] = obj;
 	a->count++;
-	return(position);
+	return position;
 }
 
 int acl_array_succ_insert(ACL_ARRAY *a, int position, void *obj)
@@ -231,101 +261,96 @@ int acl_array_succ_insert(ACL_ARRAY *a, int position, void *obj)
 	 * a->items[count - 1] should be the last valid item node
 	 * position should: position >= 0 && position <= a->count - 1
 	 */
-	if(a == NULL || obj == NULL || position < 0 || position >= a->count)
-		return(-1);
-	if(a->count >= a->capacity)
+	if (position < 0 || position >= a->count)
+		return -1;
+
+	if (a->count >= a->capacity)
 		acl_array_grow(a, a->count + 1);
 
 	position_succ = position + 1;
+
 	/*
 	 * position_succ should:
-	 * position_succ > 0 (because position >= 0 and position_succ = position + 1)
+	 * position_succ > 0 (position >= 0 and position_succ = position + 1)
 	 * and position_succ <= a->count (when position == a->count - 1,
-	 * position == a->count, and just append one new node after the last node)
+	 * position == a->count, and just append one new node after the
+	 * last node)
 	 * NOTICE: the C's index begin with 0
 	 */
-	for(idx = a->count; idx > position_succ; idx--)
+	for (idx = a->count; idx > position_succ; idx--)
 		a->items[idx] = a->items[idx - 1];
 	a->items[position_succ] = obj;
 	a->count++;
-	return(position_succ);
+	return position_succ;
 }
 
 int acl_array_prepend(ACL_ARRAY *a, void *obj)
 {
-	int	position = 0, ret;
-
-	if(a == NULL || obj == NULL)
-		return(-1);
-	ret = acl_array_pred_insert(a, position, obj);
-	return(ret);
+	return acl_array_pred_insert(a, 0, obj);
 }
 
 int acl_array_delete_idx(ACL_ARRAY *a, int position, void (*free_fn)(void *))
 {
 	int	idx;
 
-	if(a == NULL || position < 0 || position >= a->count)
-		return(-1);
-	if(free_fn != NULL && a->items[position] != NULL)
+	if (position < 0 || position >= a->count)
+		return -1;
+	if (free_fn != NULL && a->items[position] != NULL)
 		free_fn(a->items[position]);
 	a->items[position] = NULL;   /* sanity set to be null */
 
-	for(idx = position; idx < a->count - 1; idx++)
+	for (idx = position; idx < a->count - 1; idx++)
 		a->items[idx] = a->items[idx + 1];
 	a->count--;
-	return(0);
+	return 0;
 }
 
 int acl_array_delete(ACL_ARRAY *a, int idx, void (*free_fn)(void*))
 {
-	if (a == NULL)
-		return (-1);
 	if (idx < 0 || idx >= a->count)
-		return (-1);
+		return  -1;
 	if (free_fn != NULL && a->items[idx] != NULL)
 		free_fn(a->items[idx]);
 	a->count--;
 	if (a->count > 0)
 		a->items[idx] = a->items[a->count];
-	return (0);
+	return 0;
 }
 
 int acl_array_delete_obj(ACL_ARRAY *a, void *obj, void (*free_fn)(void *))
 {
-	int	idx, position, ret;
+	int   idx, position, ret;
 
-	if(a == NULL || obj == NULL)
-		return(-1);
 	position = -1;
-	for(idx = 0; idx < a->count; idx++) {
-		if(a->items[idx] == obj) {
+	for (idx = 0; idx < a->count; idx++) {
+		if (a->items[idx] == obj) {
 			position = idx;
 			break;
 		}
 	}
 
-	if(free_fn != NULL && obj != NULL)
+	if (free_fn != NULL && obj != NULL)
 		free_fn(obj);
-	if(position == -1) /* not found */
-		return(-1);
+	if (position == -1) /* not found */
+		return -1;
 
 	/* don't need to free the obj in acl_array_delete_idx */
 	a->items[idx] = NULL;
 	ret = acl_array_delete_idx(a, position, NULL);
-	if(ret < 0)
-		return(-1);
-	return(ret);
+	if (ret < 0)
+		return -1;
+	return ret;
 }
 
-int acl_array_delete_range(ACL_ARRAY *a, int ibegin, int iend, void (*free_fn)(void*))
+int acl_array_delete_range(ACL_ARRAY *a, int ibegin, int iend,
+	void (*free_fn)(void*))
 {
 	int   i, imax;
 
-	if (a == NULL || ibegin < 0 || iend < 0 || a->count <= 0)
-		return (-1);
+	if (ibegin < 0 || iend < 0 || a->count <= 0)
+		return -1;
 	if (ibegin > iend)
-		return (-1);
+		return -1;
 
 	imax = a->count - 1;
 	if (iend > imax)
@@ -345,66 +370,66 @@ int acl_array_delete_range(ACL_ARRAY *a, int ibegin, int iend, void (*free_fn)(v
 		a->items[ibegin++] = a->items[iend++];
 	}
 
-	return (0);
+	return 0;
 }
 
 int acl_array_mv_idx(ACL_ARRAY *a, int ito, int ifrom, void (*free_fn)(void *))
 {
-	int	i, i_obj, i_src, i_max;
+	int   i, i_obj, i_src, i_max;
 
-	if(a == NULL || ito < 0 || ifrom < 0 || a->count < 0)
-		return(-1);
+	if (ito < 0 || ifrom < 0 || a->count < 0)
+		return -1;
 
-	if(a->count == 0 || ito >= ifrom || ifrom >= a->count)
-		return(0);
+	if (a->count == 0 || ito >= ifrom || ifrom >= a->count)
+		return 0;
 
 	i_obj = ito;
 	i_src = ifrom;
 	i_max = a->count - 1;
 
-	if(free_fn != NULL) {
-		for(i = i_obj; i < i_src; i++) {
-			if(a->items[i] != NULL)
+	if (free_fn != NULL) {
+		for (i = i_obj; i < i_src; i++) {
+			if (a->items[i] != NULL)
 				free_fn(a->items[i]);
 			a->items[i] = NULL;
 		}
 	}
-	for(; i_src <= i_max; i_src++) {
+	for (; i_src <= i_max; i_src++) {
 		a->items[i_obj] = a->items[i_src];
 		i_obj++;
 	}
 
 	a->count -= ifrom - ito;
-	if(a->count < 0)	/* imposible, sanity check */
-		return(-1);
+	if (a->count < 0)	/* imposible, sanity check */
+		return -1;
 
-	return(0);
+	return 0;
 }
 
-/* if you are going to append a known and large number of items, call this first */
-int acl_array_pre_append(ACL_ARRAY *a, int app_count)
+/* if you are going to append a known and large number of items,
+ * call this first
+ */
+void acl_array_pre_append(ACL_ARRAY *a, int app_count)
 {
 	const char *myname = "acl_array_pre_append";
 
-	if(a == NULL || app_count <= 0)
+	if (app_count <= 0)
 		acl_msg_fatal("%s(%d)->%s: invalid input",
 				__FILE__, __LINE__, myname);
+
 	if (a->count + app_count > a->capacity)
 		acl_array_grow(a, a->count + app_count);
-	return(0);
 }
 
 void *acl_array_index(const ACL_ARRAY *a, int idx)
 {
-	if(a == NULL || idx < 0 || idx > a->count - 1)
-		return(NULL);
+	if (idx < 0 || idx > a->count - 1)
+		return NULL;
 
-	return(a->items[idx]);
+	return a->items[idx];
 }
 
 int acl_array_size(const ACL_ARRAY *a)
 {
-	if(a == NULL)
-		return(-1);
-	return(a->count);
+	return a->count;
 }

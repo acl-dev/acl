@@ -125,14 +125,12 @@ static const char* __data7 = "<?xml version=\"1.0\" encoding=\"gb2312\"?>\r\n"
 	"	</tags2>\r\n"
 	"</request>\r\n";
 
-static void parse_xml_benchmark(int once, int use_cache, int max, const char *data)
+static void parse_xml_benchmark(int once, int max, const char *data)
 {
 	int   i;
 	ACL_XML *xml = acl_xml_alloc();
 
 	acl_xml_slash(xml, 1);
-	if (use_cache)
-		acl_xml_cache(xml, 100);
 
 	ACL_METER_TIME("-------------bat begin--------------");
 	for (i = 0; i < max; i++) {
@@ -495,7 +493,7 @@ static void usage(const char *procname)
 		" -f {xml_file}\n"
 		" -s[parse once]\n"
 		" -M[use mempool]\n"
-		" -b[benchmark] -c[cache xml node] -m benchmark_max\n"
+		" -b[benchmark] -m benchmark_max\n"
 		" -p[print] data1|data2|data3|data4|data5|data6|data7\n"
 		" -d[which data] data1|data2|data3|data4|data5|data6|data7\n",
 		procname);
@@ -509,7 +507,7 @@ int main(int argc, char *argv[])
 {
 	int   ch, once = 0, bench_max = 10000;
 	char  filepath[256];
-	int   benchmark = 0, use_mempool = 0, use_cache = 0;
+	int   benchmark = 0, use_mempool = 0;
 	const char *data = __data1;
 
 	if (0) {
@@ -518,7 +516,7 @@ int main(int argc, char *argv[])
 
 	snprintf(filepath, sizeof(filepath), "xmlcatalog_man.xml");
 
-	while ((ch = getopt(argc, argv, "hf:sbm:cMp:d:")) > 0) {
+	while ((ch = getopt(argc, argv, "hf:sbm:Mp:d:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -534,9 +532,6 @@ int main(int argc, char *argv[])
 			break;
 		case 'M':
 			use_mempool = 1;
-			break;
-		case 'c':
-			use_cache = 1;
 			break;
 		case 'm':
 			bench_max = atoi(optarg);
@@ -582,7 +577,7 @@ int main(int argc, char *argv[])
 				ACL_SLICE_FLAG_RTGC_OFF |
 				ACL_SLICE_FLAG_LP64_ALIGN);
 	if (benchmark) {
-		parse_xml_benchmark(once, use_cache, bench_max, data);
+		parse_xml_benchmark(once, bench_max, data);
 		return (0);
 	}
 

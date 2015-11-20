@@ -3,7 +3,7 @@ include ../../Makefile.in
 #EXTLIBS = -lz -liconv
 #Path for SunOS
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	EXTLIBS = -L/usr/local/lib -liconv
+	EXTLIBS += -L/usr/local/lib -liconv
 endif
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	EXTLIBS += -L/usr/lib -liconv

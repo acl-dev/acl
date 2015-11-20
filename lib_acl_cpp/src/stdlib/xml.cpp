@@ -329,10 +329,13 @@ xml& xml::part_word(bool on)
 
 xml& xml::ignore_slash(bool on)
 {
-	if (on)
-		xml_->flag |= ACL_XML_FLAG_IGNORE_SLASH;
-	else
-		xml_->flag &= ~ACL_XML_FLAG_IGNORE_SLASH;
+	acl_xml_slash(xml_, on ? 1 : 0);
+	return *this;
+}
+
+xml& xml::xml_decode(bool on)
+{
+	acl_xml_decode_enable(xml_, on ? 1 : 0);
 	return *this;
 }
 

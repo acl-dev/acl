@@ -7,7 +7,7 @@
 namespace acl
 {
 
-void url_coder::init_dbuf(dbuf_pool* dbuf)
+void url_coder::init_dbuf(dbuf_guard* dbuf)
 {
 	if (dbuf != NULL)
 	{
@@ -16,20 +16,22 @@ void url_coder::init_dbuf(dbuf_pool* dbuf)
 	}
 	else
 	{
-		dbuf_internal_ = new dbuf_pool;
+		dbuf_internal_ = new dbuf_guard;
 		dbuf_ = dbuf_internal_;
 	}
 }
 
-url_coder::url_coder(bool nocase /* = true */, dbuf_pool* dbuf /* = NULL */)
-: nocase_(nocase)
+url_coder::url_coder(bool nocase /* = true */, dbuf_guard* dbuf /* = NULL */)
+	: dbuf_obj(dbuf)
+	, nocase_(nocase)
 {
 	init_dbuf(dbuf);
 
 	buf_ = NEW string(128);
 }
 
-url_coder::url_coder(const url_coder& coder, dbuf_pool* dbuf /* = NULL */)
+url_coder::url_coder(const url_coder& coder, dbuf_guard* dbuf /* = NULL */)
+	: dbuf_obj(dbuf)
 {
 	init_dbuf(dbuf);
 
@@ -44,10 +46,9 @@ url_coder::url_coder(const url_coder& coder, dbuf_pool* dbuf /* = NULL */)
 url_coder::~url_coder()
 {
 	reset();
-	delete buf_;
 
-	if (dbuf_internal_)
-		dbuf_internal_->destroy();
+	delete buf_;
+	delete dbuf_internal_;
 }
 
 const url_coder& url_coder::operator =(const url_coder& coder)
@@ -73,14 +74,17 @@ void url_coder::encode(string& buf, bool clean /* = true */) const
 {
 	if (clean)
 		buf.clear();
+
+	ACL_DBUF_POOL *dbuf = dbuf_->get_dbuf().get_dbuf();
 	std::vector<URL_NV*>::const_iterator cit = params_.begin();
 	char* name, *value;
+
 	for (; cit != params_.end(); ++cit)
 	{
 		if (cit != params_.begin())
 			buf << '&';
-		name = acl_url_encode((*cit)->name, dbuf_->get_dbuf());
-		value = acl_url_encode((*cit)->value, dbuf_->get_dbuf());
+		name = acl_url_encode((*cit)->name, dbuf);
+		value = acl_url_encode((*cit)->value, dbuf);
 		buf << name << '=' << value;
 		dbuf_->dbuf_free(name);
 		dbuf_->dbuf_free(value);
@@ -95,8 +99,10 @@ const string& url_coder::to_string() const
 
 void url_coder::decode(const char* str)
 {
-	ACL_ARGV* tokens = acl_argv_split3(str, "&", dbuf_->get_dbuf());
+	ACL_DBUF_POOL *dbuf = dbuf_->get_dbuf().get_dbuf();
+	ACL_ARGV* tokens = acl_argv_split3(str, "&", dbuf);
 	ACL_ITER iter;
+
 	acl_foreach(iter, tokens)
 	{
 		char* name = (char*) iter.data;
@@ -104,8 +110,8 @@ void url_coder::decode(const char* str)
 		if (value == NULL || *(value + 1) == 0)
 			continue;
 		*value++ = 0;
-		name = acl_url_decode(name, dbuf_->get_dbuf());
-		value = acl_url_decode(value, dbuf_->get_dbuf());
+		name = acl_url_decode(name, dbuf);
+		value = acl_url_decode(value, dbuf);
 		URL_NV* param = (URL_NV*) dbuf_->dbuf_alloc(sizeof(URL_NV));
 		param->name = name;
 		param->value = value;

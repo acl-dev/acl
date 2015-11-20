@@ -24,11 +24,11 @@ static ACL_JSON_NODE *node_iter_head(ACL_ITER *it, ACL_JSON_NODE *node)
 
 	if ((ring_ptr = acl_ring_succ(&node->children)) == &node->children) {
 		it->ptr = it->data = NULL;
-		return (NULL);
+		return NULL;
 	}
 	it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 	it->data = it->ptr;
-	return (it->ptr);
+	return it->ptr;
 }
 
 static ACL_JSON_NODE *node_iter_next(ACL_ITER *it, ACL_JSON_NODE *node)
@@ -39,12 +39,12 @@ static ACL_JSON_NODE *node_iter_next(ACL_ITER *it, ACL_JSON_NODE *node)
 	child = (struct ACL_JSON_NODE*) it->data;
 	if ((ring_ptr = acl_ring_succ(&child->node)) == &node->children) {
 		it->ptr = it->data = NULL;
-		return (NULL);
+		return NULL;
 	}
 	it->i++;
 	it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 	it->data = it->ptr;
-	return (it->ptr);
+	return it->ptr;
 }
 
 static ACL_JSON_NODE *node_iter_tail(ACL_ITER *it, ACL_JSON_NODE *node)
@@ -60,12 +60,12 @@ static ACL_JSON_NODE *node_iter_tail(ACL_ITER *it, ACL_JSON_NODE *node)
 
 	if ((ring_ptr = acl_ring_pred(&node->children)) == &node->children) {
 		it->ptr = it->data = NULL;
-		return (NULL);
+		return NULL;
 	}
 
 	it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 	it->data = it->ptr;
-	return (it->ptr);
+	return it->ptr;
 }
 
 static ACL_JSON_NODE *node_iter_prev(ACL_ITER *it, ACL_JSON_NODE *node)
@@ -76,12 +76,12 @@ static ACL_JSON_NODE *node_iter_prev(ACL_ITER *it, ACL_JSON_NODE *node)
 	child = (struct ACL_JSON_NODE*) it->data;
 	if ((ring_ptr = acl_ring_pred(&child->node)) == &node->children) {
 		it->ptr = it->data = NULL;
-		return (NULL);
+		return NULL;
 	}
 	it->i++;
 	it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 	it->data = it->ptr;
-	return (it->ptr);
+	return it->ptr;
 }
 
 ACL_JSON_NODE *acl_json_node_alloc(ACL_JSON *json)
@@ -104,7 +104,7 @@ ACL_JSON_NODE *acl_json_node_alloc(ACL_JSON *json)
 	node->iter_next = node_iter_next;
 	node->iter_tail = node_iter_tail;
 	node->iter_prev = node_iter_prev;
-	return (node);
+	return node;
 }
 
 int acl_json_node_delete(ACL_JSON_NODE *node)
@@ -120,7 +120,7 @@ int acl_json_node_delete(ACL_JSON_NODE *node)
 
 	node->json->node_cnt--;
 	acl_ring_detach(&node->node);
-	return (n);
+	return n;
 }
 
 void acl_json_node_append(ACL_JSON_NODE *node1, ACL_JSON_NODE *node2)
@@ -137,7 +137,7 @@ void acl_json_node_add_child(ACL_JSON_NODE *parent, ACL_JSON_NODE *child)
 
 ACL_JSON_NODE *acl_json_node_parent(ACL_JSON_NODE *node)
 {
-	return (node->parent);
+	return node->parent;
 }
 
 ACL_JSON_NODE *acl_json_node_next(ACL_JSON_NODE *node)
@@ -146,12 +146,12 @@ ACL_JSON_NODE *acl_json_node_next(ACL_JSON_NODE *node)
 	ACL_JSON_NODE *parent;
 
 	if (ring_ptr == &node->node)
-		return (NULL);
+		return NULL;
 	parent = node->parent;
 	acl_assert(parent != NULL);
 	if (ring_ptr == &parent->children)
-		return (NULL);
-	return (acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node));
+		return NULL;
+	return acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 }
 
 ACL_JSON_NODE *acl_json_node_prev(ACL_JSON_NODE *node)
@@ -160,13 +160,13 @@ ACL_JSON_NODE *acl_json_node_prev(ACL_JSON_NODE *node)
 	ACL_JSON_NODE *parent;
 
 	if (ring_ptr == &node->node)
-		return (NULL);
+		return NULL;
 	parent = node->parent;
 	acl_assert(parent != NULL);
 	if (ring_ptr == &parent->children)
-		return (NULL);
+		return NULL;
 
-	return (acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node));
+	return acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 }
 
 const char *acl_json_node_type(const ACL_JSON_NODE *node)
@@ -176,8 +176,8 @@ const char *acl_json_node_type(const ACL_JSON_NODE *node)
 	static char *unknown = "unknown";
 
 	if (node->type >= 0 && node->type <= 2)
-		return (types_tab[node->type]);
-	return (unknown);
+		return types_tab[node->type];
+	return unknown;
 }
 
 /************************************************************************/
@@ -198,12 +198,12 @@ static ACL_JSON_NODE *json_iter_head(ACL_ITER *it, ACL_JSON *json)
 	ring_ptr = acl_ring_succ(&json->root->children);
 	if (ring_ptr== &json->root->children) {
 		it->ptr = it->data = NULL;
-		return (NULL);
+		return NULL;
 	}
 	it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 	it->data = it->ptr;
 
-	return (it->ptr);
+	return it->ptr;
 }
 
 static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
@@ -220,7 +220,7 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 		it->i++;
 		it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 		it->data = it->ptr;
-		return (it->ptr);
+		return it->ptr;
 	}
 
 	/* 当前节点的子节点遍历完毕，再遍历当前节点的兄弟节点 */
@@ -231,7 +231,7 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 		it->i++;
 		it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 		it->data = it->ptr;
-		return (it->ptr);
+		return it->ptr;
 	}
 
 	/* 当前节点的兄弟节点遍历完毕，最后遍历当前节点的父节点的兄弟节点 */
@@ -249,14 +249,14 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 			it->i++;
 			it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 			it->data = it->ptr;
-			return (it->ptr);
+			return it->ptr;
 		}
 	} while (ring_ptr != &json->root->children);
 
 	/* 遍历完所有节点 */
 
 	it->ptr = it->data = NULL;
-	return (NULL);
+	return NULL;
 }
 
 static ACL_JSON_NODE *json_iter_tail(ACL_ITER *it, ACL_JSON *json)
@@ -273,11 +273,11 @@ static ACL_JSON_NODE *json_iter_tail(ACL_ITER *it, ACL_JSON *json)
 	ring_ptr = acl_ring_pred(&json->root->children);
 	if (ring_ptr== &json->root->children) {
 		it->ptr = it->data = NULL;
-		return (NULL);
+		return NULL;
 	}
 	it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 	it->data = it->ptr;
-	return (it->ptr);
+	return it->ptr;
 }
 
 static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
@@ -294,7 +294,7 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 		it->i++;
 		it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 		it->data = it->ptr;
-		return (it->ptr);
+		return it->ptr;
 	}
 
 	/* 当前节点的子节点遍历完毕，再遍历当前节点的兄弟节点 */
@@ -305,7 +305,7 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 		it->i++;
 		it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 		it->data = it->ptr;
-		return (it->ptr);
+		return it->ptr;
 	}
 
 	/* 当前节点的兄弟节点遍历完毕，最后遍历当前节点的父节点的兄弟节点 */
@@ -322,22 +322,36 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 			it->i++;
 			it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 			it->data = it->ptr;
-			return (it->ptr);
+			return it->ptr;
 		}
 	} while (ring_ptr != &json->root->children);
 
 	/* 遍历完所有节点 */
 
 	it->ptr = it->data = NULL;
-	return (NULL);
+	return NULL;
 }
 
 ACL_JSON *acl_json_alloc()
 {
+	return acl_json_dbuf_alloc(NULL);
+}
+
+ACL_JSON *acl_json_dbuf_alloc(ACL_DBUF_POOL *dbuf)
+{
 	ACL_JSON *json;
 
-	json = (ACL_JSON*) acl_mycalloc(1, sizeof(ACL_JSON));
-	json->dbuf = acl_dbuf_pool_create(81920);
+	if (dbuf == NULL) {
+		dbuf = acl_dbuf_pool_create(8192);
+		json = (ACL_JSON*) acl_dbuf_pool_calloc(dbuf, sizeof(ACL_JSON));
+		json->dbuf_inner = dbuf;
+	} else {
+		json = (ACL_JSON*) acl_dbuf_pool_calloc(dbuf, sizeof(ACL_JSON));
+		json->dbuf_inner = NULL;
+	}
+
+	json->dbuf = dbuf;
+	json->dbuf_keep = sizeof(ACL_JSON);
 
 	json->root = acl_json_node_alloc(json);
 	/* 将根节点作为当前节点 */
@@ -357,7 +371,8 @@ ACL_JSON *acl_json_alloc()
 	json->iter_next = json_iter_next;
 	json->iter_tail = json_iter_tail;
 	json->iter_prev = json_iter_prev;
-	return (json);
+
+	return json;
 }
 
 ACL_JSON_NODE *acl_json_node_duplicate(ACL_JSON *json, ACL_JSON_NODE *from)
@@ -387,15 +402,19 @@ ACL_JSON_NODE *acl_json_node_duplicate(ACL_JSON *json, ACL_JSON_NODE *from)
 ACL_JSON *acl_json_create(ACL_JSON_NODE *node)
 {
 	ACL_JSON *json;
-	ACL_JSON_NODE *root = node->json->root, *first;
+	ACL_JSON_NODE *root = node->json->root;
+	ACL_DBUF_POOL *dbuf = acl_dbuf_pool_create(8192);
 
-	json = (ACL_JSON*) acl_mycalloc(1, sizeof(ACL_JSON));
-	json->dbuf = acl_dbuf_pool_create(81920);
+	json = (ACL_JSON*) acl_dbuf_pool_calloc(dbuf, sizeof(ACL_JSON));
+	json->dbuf = dbuf;
+	json->dbuf_inner = dbuf;
 
 	/* 如果传入的节点为 root 节点，则直接赋值创建 root 即可 */
 	if (node == root) {
 		json->root = acl_json_node_duplicate(json, node);
 	} else {
+		ACL_JSON_NODE *first;
+
 		json->root = acl_json_node_alloc(json);
 		first = acl_json_node_duplicate(json, node);
 		acl_json_node_add_child(json->root, first);
@@ -433,18 +452,14 @@ void acl_json_foreach_init(ACL_JSON *json, ACL_JSON_NODE *node)
 
 void acl_json_free(ACL_JSON *json)
 {
-	acl_dbuf_pool_destroy(json->dbuf);
-	acl_myfree(json);
+	if (json->dbuf_inner)
+		acl_dbuf_pool_destroy(json->dbuf_inner);
 }
 
 void acl_json_reset(ACL_JSON *json)
 {
-#if 0
-	acl_dbuf_pool_destroy(json->dbuf);
-	json->dbuf = acl_dbuf_pool_create(81920);
-#else
-	acl_dbuf_pool_reset(json->dbuf, 0);
-#endif
+	if (json->dbuf_inner != NULL)
+		acl_dbuf_pool_reset(json->dbuf, json->dbuf_keep);
 
 	json->root = acl_json_node_alloc(json);
 	json->root->left_ch = '{';

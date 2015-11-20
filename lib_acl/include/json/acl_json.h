@@ -103,6 +103,8 @@ struct ACL_JSON {
 
 	ACL_JSON_NODE *curr_node;   /**< 当前正在处理的 json 节点 */
 	ACL_DBUF_POOL *dbuf;        /**< 会话内存池对象 */
+	ACL_DBUF_POOL *dbuf_inner;  /**< 会话内存池对象 */
+	size_t dbuf_keep;
 };
 
 /*----------------------------- in acl_json.c -----------------------------*/
@@ -180,6 +182,14 @@ ACL_API const char *acl_json_node_type(const ACL_JSON_NODE *node);
  * @return {ACL_JSON*} 新创建的 json 对象
  */
 ACL_API ACL_JSON *acl_json_alloc(void);
+
+/**
+ * 创建一个 json 对象
+ * @param dbuf {ACL_DBUF_POOL*} 内存池对象，当该针对非 NULL 时，则 json 对象
+ *  及所属节点内存在其基础上进行分配，否则，内部自动创建隶属于 json 的内存池
+ * @return {ACL_JSON*} 新创建的 json 对象
+ */
+ACL_API ACL_JSON *acl_json_dbuf_alloc(ACL_DBUF_POOL *dbuf);
 
 /**
  * 根据一个 JSON 对象的一个 JSON 节点创建一个新的 JSON 对象

@@ -235,10 +235,7 @@ public:
 	 * @param reserve {size_t}
 	 * @return {bool}
 	 */
-	bool dbuf_reset(size_t reserve = 0)
-	{
-		return dbuf_->dbuf_reset(reserve);
-	}
+	bool dbuf_reset(size_t reserve = 0);
 
 	/**
 	 * µ÷ÓÃ dbuf_pool::dbuf_alloc

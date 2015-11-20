@@ -629,7 +629,10 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */)
 		return result_;
 	}
 	else
+	{
+		logger_error("ERROR: cluster_ and conn_ are all NULL");
 		return NULL;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////

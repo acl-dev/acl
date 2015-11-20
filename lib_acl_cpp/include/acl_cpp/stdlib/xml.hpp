@@ -306,6 +306,7 @@ public:
 
 	xml& part_word(bool on);
 	xml& ignore_slash(bool on);
+	xml& xml_decode(bool on);
 
 	/**
 	 * 以流式方式循环调用本函数添加 XML 数据，也可以一次性添加

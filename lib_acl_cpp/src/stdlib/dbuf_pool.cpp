@@ -108,6 +108,7 @@ dbuf_guard::dbuf_guard(acl::dbuf_pool* dbuf, size_t capacity /* = 100 */)
 	else
 		dbuf_ = dbuf;
 	objs_ = (dbuf_obj**) dbuf_->dbuf_alloc(sizeof(dbuf_obj*) * capacity_);
+	dbuf_->dbuf_keep(objs_);
 }
 
 dbuf_guard::dbuf_guard(size_t nblock /* = 2 */, size_t capacity /* = 100 */)
@@ -118,6 +119,7 @@ dbuf_guard::dbuf_guard(size_t nblock /* = 2 */, size_t capacity /* = 100 */)
 {
 	dbuf_ = new (nblock_) acl::dbuf_pool;
 	objs_ = (dbuf_obj**) dbuf_->dbuf_alloc(sizeof(dbuf_obj*) * capacity_);
+	dbuf_->dbuf_keep(objs_);
 }
 
 dbuf_guard::~dbuf_guard()
@@ -128,14 +130,27 @@ dbuf_guard::~dbuf_guard()
 	dbuf_->destroy();
 }
 
+bool dbuf_guard::dbuf_reset(size_t reserve /* = 0 */)
+{
+	for (size_t i = 0; i < size_; i++)
+		objs_[i]->~dbuf_obj();
+
+	size_ = 0;
+	return dbuf_->dbuf_reset(reserve);
+}
+
 void dbuf_guard::extend_objs()
 {
 	dbuf_obj** old_objs = objs_;
 	capacity_ += incr_;
+
 	objs_ = (dbuf_obj**) dbuf_->dbuf_alloc(sizeof(dbuf_obj*) * capacity_);
 
 	for (size_t i = 0; i < size_; i++)
 		objs_[i] = old_objs[i];
+
+	dbuf_->dbuf_keep(objs_);
+	dbuf_->dbuf_unkeep(old_objs);
 }
 
 void dbuf_guard::set_increment(size_t incr)

@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "acl_define.h"
+#include "acl_dbuf_pool.h"
 #include "acl_iterator.h"
 
 /**
@@ -13,6 +14,7 @@ extern "C" {
  */
 typedef	struct ACL_ARRAY ACL_ARRAY;
 struct ACL_ARRAY{
+	ACL_DBUF_POOL *dbuf;	/**< 内存池对象 */
 	int     capacity;	/**< items 数组空间大小 */
 	int     count;		/**< items 中含有元素的个数 */
 	void    **items;	/**< 动态数组 */
@@ -48,6 +50,14 @@ struct ACL_ARRAY{
 ACL_API ACL_ARRAY *acl_array_create(int init_size);
 
 /**
+ * 创建一个动态数组
+ * @param init_size {int} 动态数组的初始大小
+ * @param dbuf {ACL_DBUF_POOL*} 非空时, 则内存(含数组对象本身)均在上面分配
+ * @return {ACL_ARRAY*} 动态数组指针
+ */
+ACL_API ACL_ARRAY *acl_array_dbuf_create(int init_size, ACL_DBUF_POOL *dbuf);
+
+/**
  * 释放掉动态数组内的成员变量，但并不释放动态数组对象
  * @param a {ACL_ARRAY*} 动态数组指针
  * @param free_fn {void (*)(void*)} 用于释放动态数组内成员变量的释放函数指针
@@ -55,7 +65,8 @@ ACL_API ACL_ARRAY *acl_array_create(int init_size);
 ACL_API void acl_array_clean(ACL_ARRAY *a, void (*free_fn)(void *));
 
 /**
- * 释放掉动态数组内的成员变量，并释放动态数组对象
+ * 释放掉动态数组内的成员变量，并释放动态数组对象，当数组对象创建 dbuf 对象
+ * 时，则该数组对象的释放将会在释放 dbuf 时被释放
  * @param a {ACL_ARRAY*} 动态数组指针
  * @param free_fn {void (*)(void*)} 用于释放动态数组内成员变量的释放函数指针
  */
@@ -159,9 +170,8 @@ ACL_API int acl_array_mv_idx(ACL_ARRAY *a, int ito, int ifrom, void (*free_fn)(v
  * 预先保证动态数组的空间长度
  * @param a {ACL_ARRAY*} 动态数组指针
  * @param app_count {int} 需要动态数组至少有 app_count 个空闲位置
- * @return {int} 0: 成功；-1: 失败
  */
-ACL_API int acl_array_pre_append(ACL_ARRAY *a, int app_count);
+ACL_API void acl_array_pre_append(ACL_ARRAY *a, int app_count);
 
 /**
  * 从动态数组中的某个下标位置取出动态对象

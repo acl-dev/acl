@@ -7,6 +7,8 @@ ARFL    = rv
 #ARFL    = cru
 RANLIB  = ranlib
 
+FLAGS   = ${ENV_FLAGS}
+
 # default lib name
 LIB_NAME  = lib_acl.a
 
@@ -74,6 +76,18 @@ endif
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -DLINUX2 -fPIC -Werror
 	UNIXTYPE = LINUX
+endif
+
+ifeq ($(findstring HAS_TRACE, $(FLAGS)), HAS_TRACE)
+	CFLAGS += -DHAS_TRACE
+endif
+
+EXECINFO_H = /usr/include/execinfo.h
+EXECINFO_H_EXIST = $(shell if [ -f $(EXECINFO_H) ]; \
+		   then echo "exist"; else echo "notexist"; fi;)
+
+ifeq ($(findstring exist, $(EXECINFO_H_EXIST)), exist)
+	CFLAGS += -DHAS_EXECINFO_HEAD
 endif
 
 # For MINGW

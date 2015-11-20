@@ -11,7 +11,7 @@ extern "C" {
 #include "stdlib/acl_htable.h"
 #include "stdlib/acl_vstring.h"
 #include "stdlib/acl_iterator.h"
-#include "stdlib/acl_slice.h"
+#include "stdlib/acl_dbuf_pool.h"
 
 typedef struct ACL_XML	ACL_XML;
 typedef struct ACL_XML_NODE	ACL_XML_NODE;
@@ -32,7 +32,8 @@ struct ACL_XML_ATTR {
 struct ACL_XML_NODE {
 	ACL_VSTRING *ltag;          /**< 左标签名 */
 	ACL_VSTRING *rtag;          /**< 右标签名 */
-	const ACL_VSTRING *id;      /**< ID标识符, 只有在 xml->id_table 存在的节点的 id 才非空 */
+	const ACL_VSTRING *id;      /**< ID标识符, 只有在 xml->id_table 存在的
+				         节点的 id 才非空 */
 	ACL_VSTRING *text;          /**< 文本显示内容 */
 	ACL_ARRAY *attr_list;       /**< 属性(ACL_XML_ATTR)列表 */
 	ACL_XML_NODE *parent;       /**< 父节点 */
@@ -57,6 +58,8 @@ struct ACL_XML_NODE {
 /**< 是否是元数据 */
 #define	ACL_XML_F_META		\
 	(ACL_XML_F_META_QM | ACL_XML_F_META_CM | ACL_XML_F_META_EM)
+
+#define	ACL_XML_IS_COMMENT(x)	(((x)->flag & ACL_XML_F_META_CM))
 
 	int   status;               /**< 状态机当前解析状态 */
 #define ACL_XML_S_NXT	0       /**< 下一个节点 */
@@ -97,13 +100,21 @@ struct ACL_XML {
 	/* private */
 	ACL_HTABLE *id_table;       /**< id 标识符哈希表 */
 	ACL_XML_NODE *curr_node;    /**< 当前正在处理的 XML 节点 */
-	ACL_SLICE_POOL *slice;      /**< 内存池对象 */
+	ACL_DBUF_POOL *dbuf;        /**< 内存池对象 */
+	ACL_DBUF_POOL *dbuf_inner;  /**< 内部分布的内存池对象 */
+	size_t dbuf_keep;           /**< 内存池中保留的长度 */
 
-	ACL_ARRAY *node_cache;      /**< XML节点缓存池 */
-	int   max_cache;            /**< XML节点缓存池的最大容量 */
 	unsigned flag;              /**< 标志位: ACL_XML_FLAG_xxx */ 
-#define	ACL_XML_FLAG_PART_WORD		(1 << 0) /**< 是否兼容后半个汉字为转义符 '\' 的情况 */
-#define	ACL_XML_FLAG_IGNORE_SLASH	(1 << 1) /**< 是否兼容单节点中没有 '/' 情况 */
+
+	/**< 是否兼容后半个汉字为转义符 '\' 的情况 */
+#define	ACL_XML_FLAG_PART_WORD		(1 << 0)
+
+	/**< 是否兼容单节点中没有 '/' 情况 */
+#define	ACL_XML_FLAG_IGNORE_SLASH	(1 << 1)
+
+	/**< 是否需要对文本数据进行 xml 解码  */
+#define	ACL_XML_FLAG_XML_DECODE		(1 << 2)
+	ACL_VSTRING *decode_buf;    /**< 当需要进行 xml 解码时非空 */
 
 	/* public: for acl_iterator, 通过 acl_foreach 可以列出所有子节点 */
 
@@ -116,8 +127,6 @@ struct ACL_XML {
 	/* 取迭代器上一个函数 */
 	ACL_XML_NODE *(*iter_prev)(ACL_ITER*, ACL_XML*);
 };
-
-#define	ACL_XML_IS_COMMENT(x)	(((x)->flag & ACL_XML_F_META_CM))
 
 /***************************************************************************/
 /*                  公共函数接口，用户可以放心使用该接口集                 */
@@ -134,8 +143,8 @@ struct ACL_XML {
 ACL_API int acl_xml_is_closure(ACL_XML *xml);
 
 /**
- * 根据指定的标签名判断 xml 解析已经完成, 当该标签与 xml 对象中 root 一级子节点
- * 中的最后一个 xml 节点的标签相同时, 则认为 xml 解析完成, 为了保证判断的正确性,
+ * 根据指定标签名判断 xml 解析已经完成, 当该标签与 xml 对象中 root 一级子节点
+ * 中的最后一个 xml 节点的标签相同时, 则认为 xml 解析完成, 为保证判断的正确性,
  * 数据源应保证最外层的根节点只有一个, 即 xml->root 的一级子节点只有一个, 否则
  * 会造成误判
  * @param xml {ACL_XML*} xml 对象
@@ -152,14 +161,15 @@ ACL_API ACL_XML *acl_xml_alloc(void);
 
 /**
  * 创建一个 xml 对象，该 xml 对象及所有的内部内存分配都在该内存池上进行分配
- * @param slice {ACL_SLICE_POOL*} 内存池对象，可以为空指针，表明不用内存池
+ * @param dbuf {ACL_DBUF_POOL*} 内存池对象，当该针对非 NULL 时，则 xml 对象
+ *  及所属节点内存在其基础上进行分配，否则，内部自动创建隶属于 xml 的内存池
  * @return {ACL_XML*} 新创建的 xml 对象
  */
-ACL_API ACL_XML *acl_xml_alloc1(ACL_SLICE_POOL *slice);
+ACL_API ACL_XML *acl_xml_dbuf_alloc(ACL_DBUF_POOL *dbuf);
 
 /**
  * 将某一个 ACL_XML_NODE 节点作为一个 XML 对象的根节点，从而可以方便地遍历出该
- * 节点的各级子节点(在遍历过程中的所有节点不含本节点自身)，该遍历方式有别于单独
+ * 节点各级子节点(在遍历过程中的所有节点不含本节点自身)，该遍历方式有别于单独
  * 遍历某一个 ACL_XML_NODE 节点时仅能遍历其一级子节点的情形
  * @param xml {ACL_XML*} xml 对象
  * @param node {ACL_XML_NODE*} AXL_XML_NODE 节点
@@ -177,22 +187,16 @@ ACL_API void acl_xml_foreach_init(ACL_XML *xml, ACL_XML_NODE *node);
 ACL_API void acl_xml_slash(ACL_XML *xml, int ignore);
 
 /**
- * 打开或关闭XML的缓存功能，当复用 ACL_XML 对象时打开XML的节点缓存功能有利提高效率
- * @param xml {ACL_XML*} xml 对象
- * @param max_cache {int} 缓存的最大值，当该值 > 0 时会打开 xml 解析器对 xml 节点的
- *  缓存功能，否则会关闭 xml 解析器对 xml 节点的缓存功能
+ * 设置是否需要对 xml 对象中的属性值及文本值进行 xml 解码，内部缺省为不解
+ * @param xml {ACL_XML*}
+ * @param on {int} 非 0 表示进行 xml 解码
  */
-ACL_API void acl_xml_cache(ACL_XML *xml, int max_cache);
-
-/**
- * 释放 XML 缓存的 XML 节点对象
- * @param xml {ACL_XML*} xml 对象
- */
-ACL_API void acl_xml_cache_free(ACL_XML *xml);
+ACL_API void acl_xml_decode_enable(ACL_XML *xml, int on);
 
 /**
  * 释放一个 xml 对象, 同时释放该对象里容纳的所有 xml 节点
  * @param xml {ACL_XML*} xml 对象
+ * @return {int} 返回释放的 xml 节点个数
  */
 ACL_API int acl_xml_free(ACL_XML *xml);
 
@@ -466,13 +470,6 @@ ACL_API void acl_xml_dump2(ACL_XML *xml, ACL_VSTRING *buf);
  * @return {ACL_XML_ATTR*} 新创建的节点属性
  */
 ACL_API ACL_XML_ATTR *acl_xml_attr_alloc(ACL_XML_NODE *node);
-
-/**
- * 释放 xml 节点的属性所占内存, 调用该函数前, 必须注意已经将该属性
- * 从其所从属的节点中删除
- * @param attr {ACL_XML_ATTR*} xml 节点的属性
- */
-ACL_API void acl_xml_attr_free(ACL_XML_ATTR *attr);
 
 /**
  * 创建一个 xml 节点

@@ -1,6 +1,18 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+506) 2015.11.20
+506.1) bugfix: acl_dbuf_pool.c 中在调用 acl_dbuf_pool_reset 时在遇到保留内存
+块时应该保留整个内存块，且偏移地址保持不变
+
+505) 2015.11.19
+505.1) feature & performance: acl_array.c, acl_xml.c 引入了 ACL_DBUF_POOL，
+从而提升了性能
+
+504) 2015.11.18
+504.1) bugfix: acl_xml_util.c 中 acl_xml_build 进行 xml 特殊字符转义时有误
+504.2) feature: acl_xml_parse.c 在解析时，允许进行 xml 数据格式的解码
+
 503) 2015.11.11
 503.1) bugfix: acl_json_parse.c 针对 -xxx 或 +xxx 也应识别为数值类型
 

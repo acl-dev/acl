@@ -1,5 +1,3 @@
-// xml.cpp : 定义控制台应用程序的入口点。
-//
 #include "stdafx.h"
 #include <sys/time.h>
 
@@ -225,10 +223,13 @@ static void test6()
 	myobj2* o2 = dbuf.create<myobj2>();
 	o2->run();
 
+	myobj3* o3 = dbuf.create<myobj3>(10);
+	o3->run();
+
 	for (int i = 0; i < 10; i++)
 	{
-		myobj3* o3 = dbuf.create<myobj3>(i);
-		o3->run();
+		myobj3* o4 = dbuf.create<myobj3>(i);
+		o4->run();
 	}
 
 	// below codes can't be compiled, because myobj_dummy isn't
