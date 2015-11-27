@@ -1045,6 +1045,18 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\xml\acl_xml2.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\xml\acl_xml2_parse.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\xml\acl_xml2_util.c"
+					>
+				</File>
+				<File
 					RelativePath=".\src\xml\acl_xml_parse.c"
 					>
 				</File>
@@ -2171,6 +2183,10 @@
 				>
 				<File
 					RelativePath=".\include\xml\acl_xml.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\xml\acl_xml2.h"
 					>
 				</File>
 			</Filter>

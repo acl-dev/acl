@@ -2,6 +2,7 @@
 #include <assert.h>
 #include "lib_acl.h"
 #include "acl_cpp/acl_cpp_init.hpp"
+#include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stream/polarssl_conf.hpp"
@@ -178,6 +179,44 @@ public:
 		return (false);
 	}
 
+	bool read_wakeup()
+	{
+		acl::polarssl_io* hook = (acl::polarssl_io*) client_->get_hook();
+		if (hook == NULL)
+		{
+			std::cout << "get hook error"<< std::endl;
+			return false;
+		}
+
+		// 尝试进行 SSL 握手
+		if (hook->handshake() == false)
+		{
+			logger_error("ssl handshake failed");
+			return false;
+		}
+
+		// 如果 SSL 握手已经成功，则开始按行读数据
+		if (hook->handshake_ok())
+		{
+			printf("ssl handshake ok\r\n");
+
+			// 由 reactor 模式转为 proactor 模式，从而取消
+			// read_wakeup 回调过程
+			client_->disable_read();
+
+			char  buf[256];
+			snprintf(buf, sizeof(buf), "hello world: %d\n", nwrite_);
+			client_->write(buf, (int) strlen(buf));
+
+			// 异步从服务器读取一行数据
+			client_->gets(ctx_->read_timeout, false);
+			return true;
+		}
+
+		// SSL 握手还未完成，等待本函数再次被触发
+		return true;
+	}
+
 	/**
 	 * 基类虚函数, 当异步连接成功后调用此函数
 	 * @return {bool} 返回给调用者 true 表示继续，否则表示需要关闭异步流
@@ -214,6 +253,9 @@ public:
 				ssl->destroy();
 				return false;
 			}
+
+			client_->read_wait(0);
+			return true;
 		}
 
 		// 异步向服务器发送数据
@@ -324,6 +366,7 @@ int main(int argc, char* argv[])
 
 	acl::meter_time(__FUNCTION__, __LINE__, "-----BEGIN-----");
 	acl::acl_cpp_init();
+	acl::log::stdout_open(true);
 
 	acl::aio_handle handle(use_kernel ? acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
 	ctx.handle = &handle;

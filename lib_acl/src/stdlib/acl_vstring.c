@@ -64,6 +64,7 @@ static void vstring_extend(ACL_VBUF *bp, int incr)
 		bp->data = (unsigned char *) acl_dbuf_pool_alloc(
 			vp->dbuf, new_len);
 		memcpy(bp->data, data, used);
+		acl_dbuf_pool_free(vp->dbuf, data);
 	} else
 		bp->data = (unsigned char *) acl_myrealloc(bp->data, new_len);
 	bp->len = new_len;

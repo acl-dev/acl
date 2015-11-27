@@ -925,7 +925,7 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 			return -1;
 		argc += weights->size() + 1;
 	}
-	if (aggregate != NULL || *aggregate != 0)
+	if (aggregate != NULL && *aggregate != 0)
 		argc += 2;
 
 	const char** argv = (const char**)

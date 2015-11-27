@@ -176,5 +176,138 @@ int acl_xml_decode(const char *in, ACL_VSTRING *out)
 	}
 
 	ACL_VSTRING_TERMINATE(out);
-	return (n);
+	return n;
+}
+
+/*--------------------------------------------------------------------------*/
+
+static int copy_buf(char **out, int *olen_ptr, const char *in, int *ilen_ptr)
+{
+	int ilen = *ilen_ptr, olen = *olen_ptr;
+
+	while (ilen > 0 && olen > 1) {
+		**out = *in++;
+		*out += 1;
+		ilen--;
+		olen--;
+	}
+
+	*olen_ptr = olen;
+	*ilen_ptr = ilen;
+
+	return ilen;
+}
+
+int acl_xml_encode2(const char **in, int *ilen, char **out, int *olen)
+{
+	const char *s;
+	int  n = 0;
+
+	*olen -= 1;  /* reserve space for '\0' */
+
+	while (*ilen > 0) {
+		if ((s = __charmap[(unsigned char)(**in)]) != NULL) {
+			int len = (int) strlen(s);
+			if (copy_buf(out, olen, s, &len) > 0)
+				break;
+			n++;
+		} else if (*olen > 0) {
+			**out = **in;
+			*out += 1;
+			*olen -= 1;
+			if (*olen <= 0)
+				break;
+		} else
+			break;
+
+		*in += 1;
+		*ilen -= 1;
+	}
+
+	**out = '\0';
+	*out += 1;
+	return n;
+}
+
+static const char* markup_unescape2(const char* in, char** out, int *size)
+{
+	unsigned int   n;
+	char  temp[2], buf[7];
+
+	while (*in != 0) {
+		if (*in == '&' && *(in + 1) == '#'
+			&& (sscanf(in, "&#%u%1[;]", &n, temp) == 2
+			|| sscanf(in, "&#x%x%1[;]", &n, temp) == 2)
+			&& n != 0)
+		{
+			int buflen = uni2utf8(n, buf, sizeof(buf));
+
+			if (copy_buf(out, size, buf, &buflen) > 0)
+				break;
+
+			n = *(in + 2) == 'x' ? 3 : 2;
+			while (isxdigit(in[n]))
+				n++;
+
+			if(in[n] == ';')
+				n++;
+			in += n;
+		} else {
+			if (*size <= 0)
+				break;
+			**out = *in++;
+			*out += 1;
+			*size -= 1;
+		}
+	}
+
+	return in;
+}
+
+
+int acl_xml_decode2(const char *in, char **out, int *size)
+{
+	int   n = 0, len;
+	const char *ptr = in, *pre;
+	const ACL_TOKEN *token;
+	const XML_SPEC *spec;
+
+	*size -= 1;  /* reserve space for '\0' */
+
+	acl_pthread_once(&__token_once, xml_decode_init);
+	if (__token_tree == NULL)
+		acl_msg_fatal("__token_tree null");
+
+	while (*ptr != 0) {
+		pre = ptr;
+		token = acl_token_tree_match(__token_tree, &ptr, NULL, NULL);
+		if (token == NULL) {
+			pre = markup_unescape2(pre, out, size);
+			if (*size <= 0)
+				break;
+			len = (int) (ptr - pre);
+			if (len > 0)
+				(void) copy_buf(out, size, pre, &len);
+			break;
+		}
+		spec = (const XML_SPEC*) token->ctx;
+		acl_assert(spec != NULL);
+
+		len = (int) (ptr - pre - spec->len);
+		if (len > 0)
+			(void) copy_buf(out, size, pre, &len);
+
+		if (*size > 0) {
+			len = (int) strlen(spec->str);
+			(void) copy_buf(out, size, spec->str, &len);
+			if (*size <= 0)
+				break;
+		} else
+			break;
+		n++;
+	}
+
+	**out = '\0';
+	*out += 1;
+	return n;
 }

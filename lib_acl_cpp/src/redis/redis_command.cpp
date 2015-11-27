@@ -154,6 +154,9 @@ void redis_command::set_cluster(redis_client_cluster* cluster, size_t max_conns)
 {
 	cluster_ = cluster;
 	max_conns_ = max_conns;
+	if (cluster == NULL)
+		return;
+
 	redirect_max_ = cluster->get_redirect_max();
 	if (redirect_max_ <= 0)
 		redirect_max_ = 15;

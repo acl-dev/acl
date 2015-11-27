@@ -4,6 +4,8 @@
 #include "acl_cpp/stdlib/xml.hpp"
 #include "acl_cpp/stdlib/json.hpp"
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/stream/polarssl_conf.hpp"
+#include "acl_cpp/stream/polarssl_io.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stdlib/charset_conv.hpp"
 #include "acl_cpp/stdlib/pipe_stream.hpp"
@@ -31,6 +33,7 @@ http_request::http_request(socket_stream* client,
 	client_ = NEW http_client(client, client->get_vstream()->rw_timeout,
 		true, unzip);
 	unzip_ = unzip;
+	ssl_conf_ = NULL;
 	local_charset_[0] = 0;
 	conv_ = NULL;
 
@@ -56,6 +59,7 @@ http_request::http_request(const char* addr, int conn_timeout /* = 60 */,
 	set_timeout(conn_timeout, rw_timeout);
 
 	unzip_ = unzip;
+	ssl_conf_ = NULL;
 	local_charset_[0] = 0;
 	conv_ = NULL;
 
@@ -110,6 +114,12 @@ http_request& http_request::set_unzip(bool on)
 	return *this;
 }
 
+http_request& http_request::set_ssl(polarssl_conf* ssl_conf)
+{
+	ssl_conf_ = ssl_conf;
+	return *this;
+}
+
 bool http_request::open()
 {
 	bool reuse;
@@ -134,6 +144,18 @@ bool http_request::try_open(bool* reuse_conn)
 	{
 		logger_error("connect server(%s) error(%s)",
 			addr_, last_serror());
+		close();
+		return false;
+	}
+
+	if (ssl_conf_ == NULL)
+		return true;
+
+	polarssl_io* ssl = new polarssl_io(*ssl_conf_, false);
+	if (client_->get_stream().setup_hook(ssl) == ssl)
+	{
+		logger_error("open client ssl error to: %s", addr_);
+		ssl->destroy();
 		close();
 		return false;
 	}

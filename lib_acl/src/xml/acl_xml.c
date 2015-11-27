@@ -25,7 +25,6 @@ ACL_XML_ATTR *acl_xml_attr_alloc(ACL_XML_NODE *node)
 	attr->value = acl_vstring_dbuf_alloc(node->xml->dbuf, 16);
 	attr->quote = 0;
 	attr->backslash = 0;
-	attr->part_word = 0;
 
 	acl_array_append(node->attr_list, attr);
 
@@ -355,6 +354,14 @@ static ACL_XML_NODE *xml_iter_prev(ACL_ITER *it, ACL_XML *xml)
 	return NULL;
 }
 
+void acl_xml_multi_root(ACL_XML *xml, int on)
+{
+	if (on)
+		xml->flag |= ACL_XML_FLAG_MULTI_ROOT;
+	else
+		xml->flag &= ~ACL_XML_FLAG_MULTI_ROOT;
+}
+
 void acl_xml_slash(ACL_XML *xml, int ignore)
 {
 	if (ignore)
@@ -398,6 +405,7 @@ ACL_XML *acl_xml_dbuf_alloc(ACL_DBUF_POOL *dbuf)
 
 	xml->dbuf = dbuf;
 	xml->dbuf_keep = sizeof(ACL_XML);
+	xml->flag     |= ACL_XML_FLAG_MULTI_ROOT;
 
 	xml->id_table = acl_htable_create(100, 0);
 
@@ -436,7 +444,7 @@ void acl_xml_reset(ACL_XML *xml)
 
 	xml->root = acl_xml_node_alloc(xml);
 	xml->node_cnt = 1;
-
+	xml->root_cnt  = 0;
 	xml->curr_node = NULL;
 }
 
@@ -479,32 +487,34 @@ int acl_xml_is_closure(ACL_XML *xml)
 
 int acl_xml_is_complete(ACL_XML *xml, const char *tag)
 {
-	ACL_RING *ring_ptr;
-	ACL_XML_NODE *node;
+	ACL_XML_NODE *last_node = NULL;
+	ACL_ITER iter;
 
-	/* 获得 xml->root 节点的最后一个一级子节点 */
-	ring_ptr = acl_ring_succ(&xml->root->children);
+	if (!(xml->flag & ACL_XML_FLAG_MULTI_ROOT) && xml->root_cnt > 0)
+		return 1;
 
-	if (ring_ptr == &xml->root->children) {
+	acl_foreach_reverse(iter, xml->root) {
+		ACL_XML_NODE *node = (ACL_XML_NODE*) iter.data;
+		if (!(node->flag & ACL_XML_F_META)) {
+			last_node = node;
+			break;
+		}
+	}
+
+	if (last_node == NULL)
 		/* 说明没有真实子节点 */
 		return 0;
-	}
 
-	node = acl_ring_to_appl(ring_ptr, ACL_XML_NODE, node);
-
-	if ((node->flag & ACL_XML_F_SELF_CL)) {
+	if ((last_node->flag & ACL_XML_F_SELF_CL))
 		/* 说明该节点是自闭合节点 */
 		return 1;
-	}
 
-	if (node->status != ACL_XML_S_RGT) {
+	if (last_node->status != ACL_XML_S_RGT)
 		/* 说明最后一个一级子节点还未处理完毕 */
 		return 0;
-	}
 
-	if (strcasecmp(STR(node->rtag), tag) == 0) {
+	if (strcasecmp(STR(last_node->rtag), tag) == 0)
 		return 1;
-	}
 
 	/* 说明 xml 中的最后一个节点与所给标签不匹配 */
 	return 0;

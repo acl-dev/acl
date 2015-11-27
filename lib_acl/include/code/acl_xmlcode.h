@@ -10,6 +10,8 @@ extern "C" {
 
 ACL_API int acl_xml_encode(const char *in, ACL_VSTRING *out);
 ACL_API int acl_xml_decode(const char *in, ACL_VSTRING *out);
+ACL_API int acl_xml_encode2(const char **in, int *ilen, char **out, int *olen);
+ACL_API int acl_xml_decode2(const char *in, char **out, int *size);
 
 #ifdef	__cplusplus
 }

@@ -101,18 +101,20 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-ACL_PATH   = ../../../lib_acl
+BASE_PATH =
+ifneq ($(base_path),)
+	BASE_PATH = $(base_path)
+else
+	BASE_PATH = ../..
+endif
+
+#ACL_PATH   = ../../../lib_acl
+ACL_PATH   = $(BASE_PATH)
 ACL_INC    = $(ACL_PATH)/include
 ACL_LIB    = $(ACL_PATH)/lib
 
-#PROTO_PATH = ../../../lib_protocol
-#PROTO_INC  = $(PROTO_PATH)/include
-#PROTO_LIB  = $(PROTO_PATH)/lib
-
 EXTLIBS =
-#CFLAGS += -I$(ACL_INC) -I$(PROTO_INC)
 CFLAGS += -I$(ACL_INC)
-#LDFLAGS = -L$(ACL_LIB) -L$(PROTO_LIB) -l_protocol -l_acl $(EXTLIBS) $(SYSLIB)
 LDFLAGS = -L$(ACL_LIB) -l_acl $(EXTLIBS) $(SYSLIB)
 
 ###########################################################

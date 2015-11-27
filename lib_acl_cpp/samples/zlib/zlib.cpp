@@ -255,6 +255,8 @@ static void test_pipe()
 
 int main(int argc, char* argv[])
 {
+	acl::log::stdout_open(true);
+
 	test_pipe();
 
 	(void) argc;

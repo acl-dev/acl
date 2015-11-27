@@ -10,6 +10,7 @@ class http_client;
 class http_pipe;
 class socket_stream;
 class charset_conv;
+class polarssl_conf;
 class xml;
 class json;
 
@@ -52,6 +53,13 @@ public:
 	 * @return {http_request&}
 	 */
 	http_request& set_unzip(bool on);
+
+	/**
+	 * 设置客户端 SSL 通信方式，内部缺省为非 SSL 通信方式
+	 * @param conf {polarssl_conf*} 客户端 SSL 配置对象
+	 * @return {http_request&}
+	 */
+	http_request& set_ssl(polarssl_conf* conf);
 
 	/**
 	 * 获得 HTTP 请求头对象，然后在返回的 HTTP 请求头对象中添加
@@ -298,6 +306,7 @@ protected:
 private:
 	char addr_[64];
 	bool unzip_;
+	polarssl_conf* ssl_conf_;
 	char local_charset_[64];
 	charset_conv* conv_;
         http_client* client_;

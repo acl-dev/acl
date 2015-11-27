@@ -40,7 +40,7 @@ all:
 	@(cd slice_mem; make)
 	@(cd htable; make)
 	@(cd server; make)
-#	@(cd xml; make)
+	@(cd xml; make)
 	@(cd log; make)
 #	@(cd mysql; make)
 #	@(cd mysql2; make)

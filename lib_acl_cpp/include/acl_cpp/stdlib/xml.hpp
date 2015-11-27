@@ -304,8 +304,21 @@ public:
 	xml(const char* data = NULL);
 	~xml(void);
 
+	ACL_CPP_DEPRECATED
 	xml& part_word(bool on);
+
+	/**
+	 * 对于非闭合的标签，是否需要忽略闭合字符 '/'，缺省为不忽略
+	 * @param on {bool}
+	 * @return {xml&}
+	 */
 	xml& ignore_slash(bool on);
+
+	/**
+	 * 是否自动进行 xml 解码，缺少为不解码
+	 * @param on {bool}
+	 * @return {xml&}
+	 */
 	xml& xml_decode(bool on);
 
 	/**

@@ -318,12 +318,8 @@ xml::~xml(void)
 		acl_myfree(iter_);
 }
 
-xml& xml::part_word(bool on)
+xml& xml::part_word(bool)
 {
-	if (on)
-		xml_->flag |= ACL_XML_FLAG_PART_WORD;
-	else
-		xml_->flag &= ~ACL_XML_FLAG_PART_WORD;
 	return *this;
 }
 

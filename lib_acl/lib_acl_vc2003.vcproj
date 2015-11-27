@@ -529,10 +529,10 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 							RelativePath=".\src\stdlib\sys\unix\acl_timed_wait.c">
 						</File>
 						<File
-							RelativePath=".\src\stdlib\sys\unix\acl_transfer_fd.c">
+							RelativePath=".\src\stdlib\sys\unix\acl_trace.c">
 						</File>
 						<File
-							RelativePath=".\src\stdlib\sys\unix\acl_trace.c">
+							RelativePath=".\src\stdlib\sys\unix\acl_transfer_fd.c">
 						</File>
 						<File
 							RelativePath=".\src\stdlib\sys\unix\acl_username.c">
@@ -785,6 +785,15 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Filter="">
 				<File
 					RelativePath=".\src\xml\acl_xml.c">
+				</File>
+				<File
+					RelativePath=".\src\xml\acl_xml2.c">
+				</File>
+				<File
+					RelativePath=".\src\xml\acl_xml2_parse.c">
+				</File>
+				<File
+					RelativePath=".\src\xml\acl_xml2_util.c">
 				</File>
 				<File
 					RelativePath=".\src\xml\acl_xml_parse.c">
@@ -1091,9 +1100,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 						RelativePath=".\src\master\template\acl_ioctl_server.c">
 					</File>
 					<File
-						RelativePath=".\src\master\template\master_log.c">
-					</File>
-					<File
 						RelativePath=".\src\master\template\acl_multi_server.c">
 					</File>
 					<File
@@ -1107,6 +1113,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					</File>
 					<File
 						RelativePath=".\src\master\template\acl_udp_server.c">
+					</File>
+					<File
+						RelativePath=".\src\master\template\master_log.c">
 					</File>
 					<File
 						RelativePath=".\src\master\template\master_log.h">
@@ -1559,10 +1568,10 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 						RelativePath=".\include\stdlib\unix\acl_timed_wait.h">
 					</File>
 					<File
-						RelativePath=".\include\stdlib\unix\acl_transfer_fd.h">
+						RelativePath=".\include\stdlib\unix\acl_trace.h">
 					</File>
 					<File
-						RelativePath=".\include\stdlib\unix\acl_trace.h">
+						RelativePath=".\include\stdlib\unix\acl_transfer_fd.h">
 					</File>
 					<File
 						RelativePath=".\include\stdlib\unix\acl_unix.h">
@@ -1658,6 +1667,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Filter="">
 				<File
 					RelativePath=".\include\xml\acl_xml.h">
+				</File>
+				<File
+					RelativePath=".\include\xml\acl_xml2.h">
 				</File>
 			</Filter>
 			<Filter

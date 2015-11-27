@@ -1,0 +1,837 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>写信 - 任我邮</title>
+<link rel="stylesheet" type="text/css" href="/mail/style/global.css" />
+<link rel="stylesheet" type="text/css" href="/mail/style/write.css" />
+<!--
+<link rel="stylesheet" type="text/css" href="/mail/style/address/base.css" />
+-->
+<link rel="stylesheet" type="text/css" href="/mail/style/address/index.css" />
+<script type="text/javascript" src="/mail/js/jquery.js"></script>
+<script type="text/javascript" src="/mail/js/ajaxupload.3.6.js"></script>
+<script type="text/javascript" src="/mail/js/jquery.metadata.js"></script>
+<script type="text/javascript" src="/mail/js/addr_deal.js"></script>
+<!--
+<script type="text/javascript" src="https://getfirebug.com/firebug-lite-debug.js"></script>
+<script type="text/javascript" charset="utf-8" src="/mail/editor/xheditor-zh-cn.src.js"></script>
+-->
+<script type="text/javascript" charset="utf-8" src="/mail/editor/xheditor-zh-cn.min.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+
+var g_input;
+var g_compose = "/cgi-bin/mail/compose/login/3567469987443046721278386028";
+
+var g_editorId = "xhe0_iframearea";
+
+$(function(){
+	$(window).resize(function(){
+		$("#tabBd > .tree").height($(window).height() - 144 + $(window).scrollTop());
+		if($(window).scrollTop() > 0) return;
+		if($("#message").hasClass("editorText")) {
+			$("#message").height(
+				$("#tabBd").outerHeight()
+				+ 28 //tabHd.height
+				- $("#formBd").outerHeight()
+				- 14 //#formBd.margin-top
+				-2 //编辑器自身的上下边框
+				- (!window.XMLHttpRequest ? 2 : 0)
+			);
+		} else {
+			if (g_editorId == "")
+				return;
+			//alert(g_editorId);
+			//$("#xhe0_iframearea").height(
+			$("#" + g_editorId).height(
+				$("#tabBd").outerHeight()
+				+ 28 //tabHd.height
+				- $("#formBd").outerHeight()
+				- 14 //#formBd.margin-top
+				- 27 //编辑器工具栏
+				-2 //编辑器自身的上下边框
+				- (!window.XMLHttpRequest ? 2 : 0)
+			);
+		}
+	});
+
+	//显示系统提示
+	var showSysTips = function(msg){
+		top.adv.showSysTips(msg);
+	};
+
+	//显示/隐藏通讯录
+	$("#switchBd").toggle(function(){
+			$("#tab").hide();
+			$("#switchBd").addClass("expandIcon");
+			return false;
+		},
+		function(){
+			$("#tab").show();
+			$("#switchBd").removeClass("expandIcon");
+			return false;
+		});	
+
+	//通讯录标签切换
+	$("#tabHd a").each(function(i){
+		$(this).click(function(){
+			$(this).parent().siblings().removeClass("selected").end().addClass("selected");
+			$("#tabBd > .tree").eq(i).siblings(".tree").hide().end().addClass("expandFlag").show();
+			return false;
+		});
+	});
+	
+	//关闭对话框
+	$("#dialog .close, #dialog .btn").click(function(){
+		$("#dialog").hide();
+		return false;
+	});
+
+	//添加密送
+	$("#addBcc").click(function(){
+		$("#bccTr").show().find("input").val("");
+	        return false;
+	});
+	
+	//展开/收起 联系人
+	$("#tabBd .subTreeHd").click(function(){
+		$(this).parent().toggleClass(function(){
+			if($(this).children("ul:first").is(":hidden")) {
+				$(this).removeClass("collapseFlag");
+				return "expandFlag";
+			} else {
+				$(this).removeClass("expandFlag");
+				return "collapseFlag";
+			}
+		});
+		return false;
+	});
+
+	// 获得邮件接收者列表
+	var getRecipients = function() {
+		var mail_to = $("#mail_to").val();
+		var mail_cc = $("#mail_cc").val();
+		var mail_bcc = $("#mail_bcc").val();
+		var recipients = "";
+
+		if (mail_to.length > 0)
+			recipients += "mail_to=" + encodeURIComponent(mail_to) + "&";
+		if (mail_cc.length > 0)
+			recipients += "mail_cc=" + encodeURIComponent(mail_cc) + "&";
+		if (mail_bcc.length > 0)
+			recipients += "mail_bcc=" + encodeURIComponent(mail_bcc) + "&";
+		return (recipients);
+	};
+
+	// 获得当前撰写界面中的参数列表
+	var getParams = function(){
+		var params = getRecipients();
+		var mail_subject = $("#mail_subject").val();
+		var message = $("#message").val();
+
+		if (mail_subject.length > 0)
+			params += "mail_subject=" + encodeURIComponent(mail_subject) + "&";
+		if (message.length > 0)
+			params += "message=" + encodeURIComponent(message) + "&";
+
+		params += "draft=" + encodeURIComponent("1278386028.3567.localhost.localdomain");
+		return (params);
+	};
+
+	// 发送邮件过程
+	$(".sendMail").live("click", function(){
+		var params = getRecipients();
+		params += "draft=" + encodeURIComponent("1278386028.3567.localhost.localdomain");
+		var url = g_compose + "?form=check_recipients&" + params;
+
+		// 先检查邮件接收者是否合法
+		$.get(url, function(response) {
+			if (response != "ok") {
+				alert(response);
+				return;
+			}
+			// 发送邮件
+			$("#sendSubmit").submit();
+			return true;
+		});
+		return false;
+	});
+
+	// 保存草稿过程
+	$("#saveDraft, #saveDraft2").live("click", function(){
+		var url = g_compose + "?form=save_draft";
+		var params = getParams();
+		$.post(url, params, function(response){
+			var o = window['eval']("([" + response + "])");
+			var status = o[0]['status'];
+			var msg = o[0]['msg'];
+			showSysTips("保存草稿成功!");
+		});
+		return false;
+	});
+
+	// 返回邮件列表页
+	var cancelAction = function() {
+		this.location = g_compose + "?folder=INBOX&form=cancel";
+	}
+	$("#cancel, #cancel2").live("click", function(){
+		cancelAction();
+		return true;
+	});
+
+	// 使用签名
+	$("#sign").live("click", function(){
+		var message = $("#message").val();
+		var url = g_compose + "?form=addsign";
+		$.get(url, function(response){
+			$("#message").val(message + '\r\n' + response);
+		});
+	});
+
+	var getIcon = function(ext) {
+		var icon = 'unknownIcon';
+		var iconMap = [
+			['js', 'jsIcon'], ['html', 'htmlIcon'], ['doc', 'docIcon'],
+			['docx', 'docIcon'], ['pdf', 'pdfIcon'], ['ppt', 'pptIcon'],
+			['pptx', 'pptIcon'], ['txt', 'txtIcon'], ['xls', 'xlsIcon'],
+			['xlsx', 'xlsIcon'], ['rtf', 'rtfIcon'], ['icon', 'iconIcon'],
+			['emf', 'emfIcon'], ['eml', 'emlIcon'], ['ai', 'aiIcon'],
+			['bmp', 'bmpIcon'], ['gif', 'gifIcon'], ['jpg', 'jpgIcon'],
+			['png', 'pngIcon'], ['psd', 'psdIcon'], ['tif', 'tifIcon'],
+			['wmf', 'wmfIcon'], ['raw', 'rawIcon'], ['rm', 'rmIcon'],
+			['mov', 'movIcon'], ['wma', 'wmaIcon'], ['swf', 'swfIcon'],
+			['avi', 'aviIcon'], ['mp3', 'mp3Icon'], ['wav', 'wavIcon'],
+			['zip', 'zipIcon'], ['gz', 'zipIcon'], ['tgz', 'zipIcon'],
+			['rar', 'rarIcon'], ['bat', 'batIcon'], ['fla', 'flaIcon'],
+			['reg', 'regIcon'], ['iso', 'isoIcon']
+		];
+		for (var i = 0; i < iconMap.length; i++) {
+			if (ext == iconMap[i][0]) {
+				icon = iconMap[i][1];
+				break;
+			}
+		}
+		return (icon);
+	};
+
+	// 添加附件过程
+	var button = $('#upload'), interval;
+	var upload = new AjaxUpload(button,{
+		action: g_compose,
+		name: 'attach',
+		//responseType: 'json',
+		onSubmit : function(file, ext){
+			// change button text, when user selects file
+			button.text('上传中...');
+
+			// If you want to allow uploading only 1 file at time,
+			// you can disable upload button
+			this.disable();
+			this.setData({'form': 'upload', 'draft': '1278386028.3567.localhost.localdomain'});
+
+			// Uploding -> Uploading. -> Uploading...
+			interval = window.setInterval(function(){
+				var text = button.text();
+				if (text.length < 13){
+					button.text(text + '.');
+				} else {
+					button.text('上传中...');
+				}
+			}, 200);
+		},
+		onComplete: function(file, response){
+			window.clearInterval(interval);
+			button.text('添加附件');
+			// enable upload button
+			this.enable();
+
+			// alert(response);
+			var o = window["eval"]("([" + response + "])");
+
+			var status = o[0]['status'];
+			var msg = o[0]['msg'];
+			var info;
+			if (msg.indexOf("already exist") >= 0)
+				info = "该文件已经上传!";
+			else
+				info = msg;
+			showSysTips(info);
+			if (status != 'ok') {
+				//alert('上传文件失败(' + info + ')!');
+				return;
+			}
+
+			var draft = o[0]['draft'];
+			if (!draft) {
+				alert("服务器返回错误!");
+				alert(response);
+				return;
+			}
+			var attach_name = o[0]['attach_name'];
+			if (!attach_name) {
+				alert("未发现附件名!");
+				alert(response);
+				return;
+			}
+
+			var pos = file.lastIndexOf(".");
+			var ext = file.substring(pos + 1, file.length);
+			var icon = getIcon(ext);
+			// add file to the list
+			$("#attachBd").append("<li class='" + icon + "'>" + file
+			       	+ "<a href='#2' attach=" + attach_name + " draft=" + draft + " >删除</a></li>");
+		}
+	});
+
+	//删除附件后调用函数
+	var remove = function(e){
+		$(e).parent().fadeOut("fast", function(){
+			$(this).fadeIn("fast", function(){
+				$(this).remove();
+				showSysTips("删除成功！");
+			});
+		});
+	}; 
+
+	// 删除附件过程
+	$("#attachBd a").live("click", function(){
+			var o = $(this);
+			var attach_name = o.attr('attach');
+			var draft = o.attr('draft');
+			var url = g_compose + "?form=delete";
+			var params = "draft=" + encodeURIComponent(draft)
+				+ "&attach_name=" + encodeURIComponent(attach_name);
+			$.post(url, params, function(response) {
+				var json = window['eval']('([' + response + '])');
+				var status = json[0]['status'];
+				var msg = json[0]['msg'];
+				if (status != 'ok') {
+					alert('删除附件失败(' + status + ')!');
+					alert(response);
+					showSysTips(msg);	
+					return;
+				}
+				showSysTips(msg);
+				remove(o);
+			});
+			return false;
+		});
+});
+
+function initEditor()
+{
+	var htmlEditor = true;
+	if (htmlEditor) {
+		var editor = $('#message').xheditor({tools:'Fullscreen,Cut,Copy,Paste,Pastetext,Separator,Fontface,FontSize,Bold,Italic,Underline,Strikethrough,FontColor,BackColor,Align,List,Link,Unlink,Img',skin:'o2007blue',width:'100%',height:'100%',forcePtag:false});
+		$('#btnInit').hide();
+		$(window).resize();
+		editor.setOnFullscreen(function(){
+			$(window).resize();
+		});
+	} else {
+		$(window).resize("");
+	}
+
+	
+}
+
+// 树型通讯录的回调函数
+function addAddr(addrList)
+{
+	var mails = g_input.val();
+
+	for(var i = 0; i < addrList.length; i++) {
+		var addr = addrList[i].addressName;
+		if (mails.indexOf(addr) >= 0)
+			continue;
+		if (mails.length > 0)
+			mails += '; ' + addr;
+		else
+			mails = addr;
+	}
+	g_input.val(mails);
+}
+
+function init()
+{
+	initEditor();
+
+	var mail_to = '';
+	var mail_cc = '';
+	var mail_bcc = '';
+	var mail_subject = '';
+
+	$('#mail_to').val(mail_to);
+	$('#mail_cc').val(mail_cc);
+	$('#mail_bcc').val(mail_bcc);
+	$('#mail_subject').val(mail_subject);
+
+	g_input = $('#mail_to');
+	$('#mail_to').live('click', function() { g_input = $(this); });
+	$('#mail_cc').live('click', function() { g_input = $(this); });
+	$('#mail_bcc').live('click', function() { g_input = $(this); });
+
+	// 设置地址簿添加回调函数
+	addrTreat=addAddr;
+}
+
+//]]>
+</script>
+</head>
+
+<body onload="javascript:init();">
+
+<!--正文开始 -->
+<div class="main">
+	<div class="tools clearfix" id="toolsTop">
+		<a class="btn sendMail" href="#2"><em>发 送</em></a>
+		<a class="btn" id="saveDraft" href="#2"><em>保存草稿</em></a>
+		<a class="btn" id="cancel" href="#2"><em>取 消</em></a>
+	</div>
+	
+	<table class="container">
+		<tr>
+			<td class="form">
+				<form id="sendSubmit" action="/cgi-bin/mail/compose/login/3567469987443046721278386028" method="post">
+					<input type="hidden" name="form" value="send" />
+					<input type="hidden" name="editor" value="html" />
+					<input type="hidden" name="folder" value="INBOX" />
+					<input type="hidden" name="draft" value="1278386028.3567.localhost.localdomain" />
+					<table class="formBd" id="formBd">
+						<tr><th width="75">收件人：</th><td><div class="to"><a class="blind" href="#2" id="addBcc">添加密送</a><input class="field" type="text" name="mail_to" id="mail_to" value="" /></div></td></tr>
+						<tr><th>抄送：</th><td><input class="field" type="text" name="mail_cc" id="mail_cc" value="" /></td></tr>
+						<tr style="display:none" id="bccTr"><th>密送：</th><td><input class="field" type="text" name="mail_bcc" id="mail_bcc" value="" /></td></tr>
+						<tr class="subject"><th>主题：</th><td><input class="field" type="text" name="mail_subject" id="mail_subject" value="" /></td></tr>
+						<tr>
+							<th>附件：</th>
+							<td class="attach">
+								<div id="upload" class="attachHd">添加附件</div>
+								<ul class="attachBd" id="attachBd">
+									<li id="attach_files">
+										<ol class="files"></ol>
+									</li>
+								</ul>
+							</td>
+						</tr>
+					</table>	
+					
+					<div class="editor">
+						<a class="sign" id="sign" href="#2">使用签名</a>
+						<!--编辑器引入区域开始 -->
+						<textarea name="message" id="message" rows="60" cols="80" class="editorHtml"></textarea>
+						 <!--编辑器引入区域结束 -->
+					</div>
+				</form>
+			</td>
+			<td class="switch"><a id="switchBd" class="switchBd" href="#2" title="显示/隐藏通讯录"></a></td>
+			<td class="tab" id="tab">
+			
+	<!--地址模板开始-->
+	<ul class="tabHd" id="tabHd">
+		<li class="first"><a href="#2">组织结构</a></li>
+		<li><a href="#2">共享通讯录</a></li>
+		<li class="selected"><a href="#2">个人通讯录</a></li>
+	</ul>
+	<div class="tabBd" id="tabBd">
+		<!--组织结构开始 -->
+		<ul class="tree" style="display:none;">
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g0" data="{indexId:'0',addressName:'group1',addressType:'Group'}">group1</a></div>
+			<ul>
+				
+				<li><a href="#2" id="o_l_u_n0" data="{indexId:'0',addressName:'admin@test.com',addressType:'Unit'}" title="邮件地址:admin@test.com">admin</a></li>
+				
+				<li><a href="#2" id="o_l_u_n1" data="{indexId:'1',addressName:'test1@test.com',addressType:'Unit'}" title="邮件地址:test1@test.com">sdfds</a></li>
+				
+				<li><a href="#2" id="o_l_u_n2" data="{indexId:'2',addressName:'test2@test.com',addressType:'Unit'}" title="邮件地址:test2@test.com">qwrqrqwr</a></li>
+				
+				<li><a href="#2" id="o_l_u_n12" data="{indexId:'12',addressName:'test_l2@test.com',addressType:'Unit'}" title="邮件地址:test_l2@test.com">test_l2</a></li>
+				
+				<li><a href="#2" id="o_l_u_n13" data="{indexId:'13',addressName:'test12@test.com',addressType:'Unit'}" title="邮件地址:test12@test.com">test12</a></li>
+				
+				<li><a href="#2" id="o_l_u_n14" data="{indexId:'14',addressName:'testzcc@test.com',addressType:'Unit'}" title="邮件地址:testzcc@test.com">testzcc</a></li>
+				
+				<li><a href="#2" id="o_l_u_n15" data="{indexId:'15',addressName:'dev@test.com',addressType:'Unit'}" title="邮件地址:dev@test.com">dev</a></li>
+				
+				<li><a href="#2" id="o_l_u_n20" data="{indexId:'20',addressName:'34545555@test.com',addressType:'Unit'}" title="邮件地址:34545555@test.com">55555555</a></li>
+				
+				<li><a href="#2" id="o_l_u_n21" data="{indexId:'21',addressName:'ewrwe@test.com',addressType:'Unit'}" title="邮件地址:ewrwe@test.com">sdfd</a></li>
+				
+				<li><a href="#2" id="o_l_u_n22" data="{indexId:'22',addressName:'222222222222222222@test.com',addressType:'Unit'}" title="邮件地址:222222222222222222@test.com">qweqw</a></li>
+				
+				<li><a href="#2" id="o_l_u_n23" data="{indexId:'23',addressName:'4444444444@test.com',addressType:'Unit'}" title="邮件地址:4444444444@test.com">sdfs</a></li>
+				
+				<li><a href="#2" id="o_l_u_n24" data="{indexId:'24',addressName:'11111111@test.com',addressType:'Unit'}" title="邮件地址:11111111@test.com">sdfs</a></li>
+				
+				<li><a href="#2" id="o_l_u_n25" data="{indexId:'25',addressName:'33333333@test.com',addressType:'Unit'}" title="邮件地址:33333333@test.com">tttttttt</a></li>
+				
+
+				<!-- 二级组 -->
+				
+				<li class="subTree collapse">
+				<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="g_l_t_p7" data="{indexId:'7',addressName:'1111',addressType:'Group'}">1111</a></div>
+				<ul>
+					
+				</ul>
+				</li>
+				
+				<li class="subTree collapse">
+				<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="g_l_t_p8" data="{indexId:'8',addressName:'gro2',addressType:'Group'}">gro2</a></div>
+				<ul>
+					
+					<li><a href="#2" id="o_l_t_u" data="{indexId:'8',addressName:'zjx@test.com',addressType:'Unit'}" title="邮件地址:zjx@test.com">zjx</a></li>
+					
+				</ul>
+				</li>
+				
+				<li class="subTree collapse">
+				<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="g_l_t_p9" data="{indexId:'9',addressName:'gro7',addressType:'Group'}">gro7</a></div>
+				<ul>
+					
+					<li><a href="#2" id="o_l_t_u" data="{indexId:'17',addressName:'group1_test1@test.com',addressType:'Unit'}" title="邮件地址:group1_test1@test.com">group1_test1</a></li>
+					
+				</ul>
+				</li>
+				
+				<li class="subTree collapse">
+				<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="g_l_t_p10" data="{indexId:'10',addressName:'gro1',addressType:'Group'}">gro1</a></div>
+				<ul>
+					
+					<li><a href="#2" id="o_l_t_u" data="{indexId:'4',addressName:'zsx@test.com',addressType:'Unit'}" title="邮件地址:zsx@test.com">zsx</a></li>
+					
+				</ul>
+				</li>
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g1" data="{indexId:'1',addressName:'dev2',addressType:'Group'}">dev2</a></div>
+			<ul>
+				
+				<li><a href="#2" id="o_l_u_n3" data="{indexId:'3',addressName:'dev2_admin@test.com',addressType:'Unit'}" title="邮件地址:dev2_admin@test.com">dev2_admin</a></li>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g2" data="{indexId:'2',addressName:'wych',addressType:'Group'}">wych</a></div>
+			<ul>
+				
+				<li><a href="#2" id="o_l_u_n7" data="{indexId:'7',addressName:'wyc@test.com',addressType:'Unit'}" title="邮件地址:wyc@test.com">wggggggg</a></li>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g3" data="{indexId:'3',addressName:'zu1',addressType:'Group'}">zu1</a></div>
+			<ul>
+				
+				<li><a href="#2" id="o_l_u_n10" data="{indexId:'10',addressName:'zhangjuntao@test.com',addressType:'Unit'}" title="邮件地址:zhangjuntao@test.com">zhangjuntao</a></li>
+				
+
+				<!-- 二级组 -->
+				
+				<li class="subTree collapse">
+				<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="g_l_t_p4" data="{indexId:'4',addressName:'sub_aaa',addressType:'Group'}">sub_aaa</a></div>
+				<ul>
+					
+					<li><a href="#2" id="o_l_t_u" data="{indexId:'11',addressName:'aaa@test.com',addressType:'Unit'}" title="邮件地址:aaa@test.com">aaa</a></li>
+					
+				</ul>
+				</li>
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g3" data="{indexId:'3',addressName:'zu1',addressType:'Group'}">zu1</a></div>
+			<ul>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g5" data="{indexId:'5',addressName:'depart1',addressType:'Group'}">depart1</a></div>
+			<ul>
+				
+				<li><a href="#2" id="o_l_u_n6" data="{indexId:'6',addressName:'zcc@test.com',addressType:'Unit'}" title="邮件地址:zcc@test.com">zcc</a></li>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g6" data="{indexId:'6',addressName:'gasfda',addressType:'Group'}">gasfda</a></div>
+			<ul>
+				
+				<li><a href="#2" id="o_l_u_n5" data="{indexId:'5',addressName:'zjt@test.com',addressType:'Unit'}" title="邮件地址:zjt@test.com">zjt</a></li>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g6" data="{indexId:'6',addressName:'gasfda',addressType:'Group'}">gasfda</a></div>
+			<ul>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g6" data="{indexId:'6',addressName:'gasfda',addressType:'Group'}">gasfda</a></div>
+			<ul>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g6" data="{indexId:'6',addressName:'gasfda',addressType:'Group'}">gasfda</a></div>
+			<ul>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g6" data="{indexId:'6',addressName:'gasfda',addressType:'Group'}">gasfda</a></div>
+			<ul>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g11" data="{indexId:'11',addressName:'455',addressType:'Group'}">455</a></div>
+			<ul>
+				
+				<li><a href="#2" id="o_l_u_n18" data="{indexId:'18',addressName:'8787@test.com',addressType:'Unit'}" title="邮件地址:8787@test.com">sdf</a></li>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g12" data="{indexId:'12',addressName:'ghjjj',addressType:'Group'}">ghjjj</a></div>
+			<ul>
+				
+				<li><a href="#2" id="o_l_u_n16" data="{indexId:'16',addressName:'123@test.com',addressType:'Unit'}" title="邮件地址:123@test.com">123</a></li>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g13" data="{indexId:'13',addressName:'lfsjlalfdls',addressType:'Group'}">lfsjlalfdls</a></div>
+			<ul>
+				
+				<li><a href="#2" id="o_l_u_n9" data="{indexId:'9',addressName:'yzl@test.com',addressType:'Unit'}" title="邮件地址:yzl@test.com">yzl</a></li>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g14" data="{indexId:'14',addressName:'gasafs',addressType:'Group'}">gasafs</a></div>
+			<ul>
+				
+				<li><a href="#2" id="o_l_u_n19" data="{indexId:'19',addressName:'ere@test.com',addressType:'Unit'}" title="邮件地址:ere@test.com">erer</a></li>
+				
+				<li><a href="#2" id="o_l_u_n26" data="{indexId:'26',addressName:'23423423@test.com',addressType:'Unit'}" title="邮件地址:23423423@test.com">ewerw</a></li>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<!-- 一级组 -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g15" data="{indexId:'15',addressName:'firL1',addressType:'Group'}">firL1</a></div>
+			<ul>
+				
+				<li><a href="#2" id="o_l_u_n27" data="{indexId:'27',addressName:'man1@test.com',addressType:'Unit'}" title="邮件地址:man1@test.com">man1</a></li>
+				
+
+				<!-- 二级组 -->
+				
+			</ul>
+			</li>
+			
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="defaultGroupId">默认组</a></div>
+			<ul id="defaultGroup">
+				
+			</ul>
+			</li>
+		</ul>
+		<!--组织结构结束 -->
+		<!--共享通讯录开始 -->
+		<ul class="tree" style="display:none;">
+			<li class="subTree expand">
+			<div class="subTreeHd"><span class="expandIcon"></span><a href="#2" id="companyId">企业通讯录</a></div>
+			<ul>
+				<!-- 组名-->
+				
+				<li><a href="#2" id="s_e_g_n0" data="{indexId:'0',addressName:'group',addressType:'Group',addressMaillist:'zsx@test.com;admin@test.com'}">group</a></li>
+				
+				<!-- 联系人名 -->
+				
+				<li><a href="#2" id="s_e_c_n0" data="{indexId:'0',addressName:'11111111@test.com',addressType:'Unit'}" title="邮件地址:11111111@test.com">11111111</a></li>
+				
+				<li><a href="#2" id="s_e_c_n1" data="{indexId:'1',addressName:'23423423@test.com',addressType:'Unit'}" title="邮件地址:23423423@test.com">23423423</a></li>
+				
+				<li><a href="#2" id="s_e_c_n2" data="{indexId:'2',addressName:'33333333@test.com',addressType:'Unit'}" title="邮件地址:33333333@test.com">33333333</a></li>
+				
+				<li><a href="#2" id="s_e_c_n3" data="{indexId:'3',addressName:'zcc@test.com',addressType:'Unit'}" title="邮件地址:zcc@test.com">张传昌</a></li>
+				
+				<li><a href="#2" id="s_e_c_n4" data="{indexId:'4',addressName:'zjt@test.com',addressType:'Unit'}" title="邮件地址:zjt@test.com">张俊涛</a></li>
+				
+				<!-- 域别名-->
+				
+				<li><a href="#2" id="s_e_a_n(null)" data="{indexId:'(null)',addressName:'deve_mail',addressType:'Alias',addressMaillist:'zsx@test.com;zjx@test.com;zjt@test.com;zcc@test.com;yzl@test.com;wyc@test.com'}">deve_mail</a></li>
+				
+			</ul>
+			</li>
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="departId">部门通讯录</a></div>
+			<ul>
+				<!-- 联系人 -->
+				
+				<!-- 邮件组 -->
+				
+			</ul>
+			</li>
+		</ul>
+		<!--共享通讯录结束 -->
+
+		<!--个人通讯录开始 -->
+		<ul class="tree">
+			<li class="subTree expand">
+			<div class="subTreeHd"><span class="expandIcon"></span><a href="#2" id="contactId">常用联系人</a></div>
+			<ul>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z10@test.com&treeValue=contactId" id="f_c_n0" data="{indexId:'0',addressName:'z10@test.com',addressType:'Unit'}" title="邮件地址:z10@test.com">z10</a></li>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z1@test.com&treeValue=contactId" id="f_c_n1" data="{indexId:'1',addressName:'z1@test.com',addressType:'Unit'}" title="邮件地址:z1@test.com">z1</a></li>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z2@test.com&treeValue=contactId" id="f_c_n2" data="{indexId:'2',addressName:'z2@test.com',addressType:'Unit'}" title="邮件地址:z2@test.com">z2</a></li>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z3@test.com&treeValue=contactId" id="f_c_n3" data="{indexId:'3',addressName:'z3@test.com',addressType:'Unit'}" title="邮件地址:z3@test.com">z3</a></li>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z4@test.com&treeValue=contactId" id="f_c_n4" data="{indexId:'4',addressName:'z4@test.com',addressType:'Unit'}" title="邮件地址:z4@test.com">z4</a></li>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z5@test.com&treeValue=contactId" id="f_c_n5" data="{indexId:'5',addressName:'z5@test.com',addressType:'Unit'}" title="邮件地址:z5@test.com">z5</a></li>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z6@test.com&treeValue=contactId" id="f_c_n6" data="{indexId:'6',addressName:'z6@test.com',addressType:'Unit'}" title="邮件地址:z6@test.com">z6</a></li>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z7@test.com&treeValue=contactId" id="f_c_n7" data="{indexId:'7',addressName:'z7@test.com',addressType:'Unit'}" title="邮件地址:z7@test.com">z7</a></li>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z8@test.com&treeValue=contactId" id="f_c_n8" data="{indexId:'8',addressName:'z8@test.com',addressType:'Unit'}" title="邮件地址:z8@test.com">z8</a></li>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z9@test.com&treeValue=contactId" id="f_c_n9" data="{indexId:'9',addressName:'z9@test.com',addressType:'Unit'}" title="邮件地址:z9@test.com">z9</a></li>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=admin@test.com&treeValue=contactId" id="f_c_n10" data="{indexId:'10',addressName:'admin@test.com',addressType:'Unit'}" title="邮件地址:admin@test.com">admin</a></li>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=zsx@test.com&treeValue=contactId" id="f_c_n11" data="{indexId:'11',addressName:'zsx@test.com',addressType:'Unit'}" title="邮件地址:zsx@test.com">zsx</a></li>
+				
+			</ul>
+			</li>
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="/cgi-bin/mail/maillist/login/3567469987443046721278386028?form=maillist&pos=0&type=2&treeValue=emailGroupId" id="emailGroupId">邮件组</a></div>
+			<ul>
+				
+				<li><a href="/cgi-bin/mail/maillist/login/3567469987443046721278386028?type=2&form=maillist&gaddr_look=zsx&treeValue=emailGroupId" id="u_g_n0" data="{indexId:'0',addressName:'zsx',addressType:'Group',addressMaillist:'zsx@test.com;zsx2@test.com;zsx3@test.com'}">zsx</a></li>
+				
+			</ul>
+			</li>
+
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&treeValue=allContactId" id="allContactId">所有联系人</a></div>
+			<ul>
+				
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&addr_edit=report-noreply@jiankongbao.com&treeValue=allContactId" id="a_l0" data="{indexId:'0',addressName:'report-noreply@jiankongbao.com',addressType:'Unit'}" title="邮件地址:report-noreply@jiankongbao.com">监控宝</a></li>
+				
+			</ul>
+			</li>
+		</ul>
+	<!--个人通讯录结束 -->					
+	</div>
+	<input id="personId" type="hidden" value="1"></input>
+	<input id="shareId" type="hidden" value="1"></input>
+	<input id="organizeId" type="hidden" value="1"></input>
+
+			</td>
+		</tr>	
+	</table>
+
+	<div class="tools clearfix" id="toolsBottom">
+		<a class="btn sendMail" href="#2"><em>发 送</em></a>
+		<a class="btn" id="saveDraft2" href="#2"><em>保存草稿</em></a>
+		<a class="btn" id="cancel2" href="#2"><em>取 消</em></a>
+	</div>
+</div>
+<!--正文结束 -->
+
+<!--dialog开始 -->
+<div class="dialog" id="dialog">
+	<div class="dialogHd"><a href="#2" class="right close" title="关闭">关闭</a><strong>提示！</strong></div>
+	<div class="dialogBd">
+		<p>你未填写邮件主题，确定发送吗？</p>
+		<div class="btnWrap clearfix">
+			<!--<a href="#2" class="btn"><em>取 消</em></a>-->
+			<a href="#2" class="btn"><em>确 定</em></a>
+		</div>
+	</div>
+</div>
+<!--dialog结束 -->
+
+<div class="sysTips" id="sysTips"></div>
+</body>
+</html>

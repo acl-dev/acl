@@ -1,4 +1,4 @@
-
+.PHONY = all clean
 all:
 	@(cd json; make)
 	@(cd json1; make)

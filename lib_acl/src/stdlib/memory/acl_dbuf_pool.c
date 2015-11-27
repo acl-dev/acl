@@ -17,15 +17,17 @@
 
 typedef struct ACL_DBUF {
         struct ACL_DBUF *next;
-	short used;
-	short keep;
-        char *addr;
-        char  buf[1];
+	short  used;
+	short  keep;
+	size_t size;
+        char  *addr;
+        char   buf[1];
 } ACL_DBUF;
 
 struct ACL_DBUF_POOL {
         size_t block_size;
 	size_t off;
+	size_t huge;
         ACL_DBUF *head;
 	char  buf[1];
 };
@@ -71,10 +73,12 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size)
 
 	pool->block_size = size;
 	pool->off        = 0;
+	pool->huge       = 0;
 	pool->head       = (ACL_DBUF*) pool->buf;
 	pool->head->next = NULL;
-	pool->head->keep = 0;
+	pool->head->keep = 1;
 	pool->head->used = 0;
+	pool->head->size = size;
 	pool->head->addr = pool->head->buf;
 
 	return pool;
@@ -89,6 +93,8 @@ void acl_dbuf_pool_destroy(ACL_DBUF_POOL *pool)
 		iter = iter->next;
 		if ((char*) tmp == pool->buf)
 			break;
+		if (tmp->size > pool->block_size)
+			pool->huge--;
 #ifdef	USE_VALLOC
 		free(tmp);
 #else
@@ -140,6 +146,9 @@ int acl_dbuf_pool_reset(ACL_DBUF_POOL *pool, size_t off)
 		/* off 为下一个内存块的 addr 所在的相对偏移位置  */
 		pool->off -=n;
 
+		if (tmp->size > pool->block_size)
+			pool->huge--;
+
 #ifdef	USE_VALLOC
 		free(tmp);
 #else
@@ -153,25 +162,48 @@ int acl_dbuf_pool_reset(ACL_DBUF_POOL *pool, size_t off)
 int acl_dbuf_pool_free(ACL_DBUF_POOL *pool, const void *addr)
 {
 	const char *ptr = (const char*) addr;
-	ACL_DBUF *iter = pool->head;
+	ACL_DBUF *iter = pool->head, *prev = iter;
 
 	while (iter) {
 		if (ptr < iter->addr && ptr >= iter->buf) {
 			iter->used--;
-			if (iter->used >= 0)
-				return 0;
-
-			acl_msg_warn("warning: %s(%d), used(%d) < 0",
-				__FUNCTION__, __LINE__, iter->used);
-			return -1;
+			break;
 		}
 
+		prev = iter;
 		iter = iter->next;
 	}
 
-	acl_msg_warn("warning: %s(%d), not found addr: %p",
-		__FUNCTION__, __LINE__, addr);
-	return -1;
+	if (iter == NULL) {
+		acl_msg_warn("warning: %s(%d), not found addr: %p",
+			__FUNCTION__, __LINE__, addr);
+		return -1;
+	}
+
+	if (iter->used < 0) {
+		acl_msg_warn("warning: %s(%d), used(%d) < 0",
+			__FUNCTION__, __LINE__, iter->used);
+		return -1;
+	}
+
+	if (iter->used > 0 || iter->keep)
+		return 0;
+
+	/* should free the ACL_DBUF block */
+
+	if (iter == pool->head)
+		pool->head = iter->next;
+	else
+		prev->next = iter->next;
+
+	pool->off -= iter->addr - iter->buf;
+
+	if (iter->size > pool->block_size)
+		pool->huge--;
+
+	acl_myfree(iter);
+
+	return 1;
 }
 
 static ACL_DBUF *acl_dbuf_alloc(ACL_DBUF_POOL *pool, size_t length)
@@ -186,7 +218,12 @@ static ACL_DBUF *acl_dbuf_alloc(ACL_DBUF_POOL *pool, size_t length)
 	dbuf->next = pool->head;
 	dbuf->used = 0;
 	dbuf->keep = 0;
+	dbuf->size = length;
+	dbuf->addr = dbuf->buf;
+
 	pool->head = dbuf;
+	if (length > pool->block_size)
+		pool->huge++;
 
 	return dbuf;
 }
