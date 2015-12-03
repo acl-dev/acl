@@ -18,7 +18,7 @@ static const char *__data1 =
   "      <email name='zsxxsz@263.net'/>"
   "      <phone>"
   "        <mobile number='111111'> mobile number </mobile>"
-  "        <office number='111111'> mobile number </office>"
+  "        <office number='111111'> office number </office>"
   "      </phone>"
   "    </other>"
   "  </user>\r\n"
@@ -130,44 +130,15 @@ static const char* __data7 = "<?xml version=\"1.0\" encoding=\"gb2312\"?>\r\n"
   "  </tags2>\r\n"
   "</request>\r\n";
 
-static char *mmap_addr(size_t len)
-{
-	const char *filepath = "./local.map";
-	int fd = open(filepath, O_RDWR | O_CREAT, 0600);
-	size_t mapped_size = len;
-	char *ptr;
-
-	if (fd == -1)
-	{
-		printf("open %s error %s\r\n", filepath, acl_last_serror());
-		exit (1);
-	}
-
-	ptr = (char*) mmap(NULL, mapped_size, PROT_READ | PROT_WRITE,
-		MAP_SHARED, fd, 0);
-	if (ptr == NULL) {
-		printf("mmap %s error %s\r\n", filepath, acl_last_serror());
-		exit (1);
-	}
-
-	lseek(fd, len, SEEK_SET);
-	write(fd, "\0", 1);
-	close(fd);
-
-	return ptr;
-}
-
-static void ummap_addr(char *addr, int len)
-{
-	munmap(addr, len);
-}
+ static const char* __data8 = "<?xml version=\"1.0\" encoding=\"gb2312\"?>\r\n"
+ "<root> hello world! </root>\r\n";
 
 static void parse_xml_benchmark(int once, int max, const char *data)
 {
 	int   i;
-	size_t size = strlen(data) * 2;
-	char *addr = mmap_addr(size);
-	ACL_XML2 *xml = acl_xml2_alloc(addr, size);
+	size_t size = strlen(data) * 4;
+	const char *mmap_file = "./local.map";
+	ACL_XML2 *xml = acl_xml2_mmap_file(mmap_file, size, 1024, 1, NULL);
 
 	acl_xml2_slash(xml, 1);
 
@@ -216,8 +187,8 @@ static int parse_xml_file(const char *filepath)
 	acl_int64 len;
 	char  buf[10240];
 	ACL_VSTREAM *fp = acl_vstream_fopen(filepath, O_RDONLY, 0600, 8192);
-	char *addr;
 	ACL_XML2 *xml;
+	const char *mmap_file = "./local.map";
 
 	if (fp == NULL) {
 		printf("open %s error %s\r\n", filepath, acl_last_serror());
@@ -229,15 +200,9 @@ static int parse_xml_file(const char *filepath)
 		acl_vstream_close(fp);
 		return -1;
 	}
-	len *= 2;
-	addr = mmap_addr(len);
-	if (addr == NULL)
-	{
-		printf("mmap_addr error %s\r\n", acl_last_serror());
-		acl_vstream_close(fp);
-		return -1;
-	}
-	xml = acl_xml2_alloc(addr, len);
+	len *= 4;
+
+	xml = acl_xml2_mmap_file(mmap_file, len, 1024, 1, NULL);
 
 	ACL_METER_TIME("-------------begin--------------");
 	while (1) {
@@ -256,8 +221,6 @@ static int parse_xml_file(const char *filepath)
 	else
 		printf("Xml is not complete, filepath: %s\r\n", filepath);
 	acl_xml2_free(xml);
-
-	ummap_addr(addr, len);
 
 	printf("Enter any key to continue ...\r\n");
 	getchar();
@@ -318,8 +281,8 @@ static void xml_node_attrs(ACL_XML2_NODE* node, int n)
 			printf("\t");
 
 		printf("attr->%s(%ld)=\"%s(%ld)\"\n",
-			attr->name, attr->name_size,
-			attr->value, attr->value_size);
+			attr->name, (long) attr->name_size,
+			attr->value, (long) attr->value_size);
 	}
 }
 
@@ -442,8 +405,8 @@ static ACL_XML2_NODE *test_getElementById(ACL_XML2 *xml, const char *id)
 static ACL_XML2 *get_xml(int once, const char *data,
 	const char* root, int multi_root)
 {
-	size_t size = strlen(data) * 2;
-	char *addr = mmap_addr(size);
+	size_t size = strlen(data) * 4;
+	char *addr = (char*) acl_mymalloc(size);
 	ACL_XML2 *xml;
 	const char *left;
 
@@ -455,6 +418,7 @@ static ACL_XML2 *get_xml(int once, const char *data,
 
 	xml = acl_xml2_alloc(addr, size);
 	acl_xml2_multi_root(xml, multi_root);
+	acl_xml2_decode_enable(xml, 1);
 	acl_xml2_slash(xml, 1);
 
 	if (once) {
@@ -499,6 +463,7 @@ static void parse_xml(int once, const char *data,
 	ACL_XML2 *xml = get_xml(once, data, root, multi_root);
 	ACL_XML2_NODE *node;
 	int total = xml->node_cnt, left;
+	const char *ptr;
 
 	/* 遍历所有 xml 节点 */
 	walk_xml(xml);
@@ -539,10 +504,18 @@ static void parse_xml(int once, const char *data,
 
 	list_xml_tags(xml);
 
+	printf("----------------- build xml -------------------------\r\n");
+	ptr = acl_xml2_build(xml);
+	printf("%s\r\n", ptr);
+	printf("----------------- build xml end ---------------------\r\n");
+
 	/* 释放 xml 对象 */
+	acl_myfree(xml->addr);
 	left = acl_xml2_free(xml);
 
 	printf("Free all node ok, total(%d), left is: %d\n", total, left);
+	printf("Enter any key to continue ...\r\n");
+	getchar();
 }
 
 static void test1(void)
@@ -558,8 +531,9 @@ static void test1(void)
 	ACL_XML2 *xml;
 	ACL_XML2_NODE *node;
 	const char *encoding, *type, *href;
-	size_t size = strlen(data) * 2;
-	char *addr = mmap_addr(size);
+	size_t size = strlen(data) * 3;
+	char *addr = acl_mymalloc(size);
+	const char *ptr;
 
 	xml = acl_xml2_alloc(addr, size);
 
@@ -597,7 +571,52 @@ static void test1(void)
 	getchar();
 	test_getElementsByTagName(xml, "root");
 
+	printf("----------------- build xml -------------------------\r\n");
+	ptr = acl_xml2_build(xml);
+	printf("%s\r\n", ptr);
+	printf("----------------- build xml end ---------------------\r\n");
+	acl_myfree(addr);
 	acl_xml2_free(xml);
+}
+
+static void build_xml(void)
+{
+	size_t size = 1024;
+	char *addr = acl_mymalloc(size);
+	ACL_XML2 *xml = acl_xml2_alloc(addr, size);
+	ACL_XML2_NODE *node1, *node2, *node3;
+	const char *buf;
+
+	node1 = acl_xml2_create_node(xml, "users", "text1");
+	acl_xml2_node_add_child(xml->root, node1);
+	(void) acl_xml2_node_add_attr(node1, "name", "users list");
+
+	node2 = acl_xml2_create_node(xml, "user", "text11");
+	acl_xml2_node_add_child(node1, node2);
+	acl_xml2_node_add_attrs(node2, "name", "user11", "value", "zsx11", NULL);
+
+	node3 = acl_xml2_create_node(xml, "age", "text111");
+	acl_xml2_node_add_child(node2, node3);
+	acl_xml2_node_add_attrs(node3, "name", "user111", "value", "zsx111", NULL);
+
+	node2 = acl_xml2_create_node(xml, "user", "text2");
+	acl_xml2_node_add_child(node1, node2);
+	acl_xml2_node_add_attrs(node2, "name", "value2", "value", "zsx2", NULL);
+
+	node2 = acl_xml2_create_node(xml, "user", "text3");
+	acl_xml2_node_add_child(node1, node2);
+	acl_xml2_node_add_attrs(node2, "name", "value3", "value", "zsx3", NULL);
+
+	printf("--------------------xml string-------------------\r\n");
+	buf = acl_xml2_build(xml);
+	printf("%s\n", buf);
+	printf("--------------------xml string end---------------\r\n");
+
+	acl_myfree(addr);
+	acl_xml2_free(xml);
+
+	printf("Enter any key to continue ...\r\n");
+	getchar();
 }
 
 static void usage(const char *procname)
@@ -605,9 +624,12 @@ static void usage(const char *procname)
 	printf("usage: %s -h[help]\r\n"
 		" -s[parse once]\r\n"
 		" -b benchmark_max\r\n"
+		" -B build_xml\r\n"
+		" -t [if test one xml]\r\n"
 		" -f xml_file\r\n"
 		" -m[if enable  multiple root xml node, default: no]\r\n"
 		" -p[print] data1|data2|data3|data4|data5|data6|data7\r\n"
+		" -P [if parse one xml with one data]\r\n"
 		" -d[parse] data1|data2|data3|data4|data5|data6|data7\r\n",
 		procname);
 }
@@ -618,26 +640,24 @@ static void usage(const char *procname)
 
 int main(int argc, char *argv[])
 {
-	int   ch, once = 0, multi_root = 0, benchmark_max = 10000;
+	int   ch, once = 0, multi_root = 0, benchmark_max = 0;
+	int   parse_one = 0, build = 0, test_one = 0;
 	const char *data = __data1;
 	const char* root = "root";
 	char  filepath[256];
 
+	acl_msg_stdout_enable(1);
+
 	filepath[0] = 0;
 
-	if (0)
-	{
-		test1();
-
-		printf("Enter any key to continue ...\r\n");
-		getchar();
-	}
-
-	while ((ch = getopt(argc, argv, "hsp:d:mb:f:")) > 0) {
+	while ((ch = getopt(argc, argv, "hsp:d:mb:f:PBt")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return (0);
+		case 't':
+			test_one = 1;
+			break;
 		case 'm':
 			multi_root = 1;
 			break;
@@ -646,6 +666,12 @@ int main(int argc, char *argv[])
 			break;
 		case 'b':
 			benchmark_max = atoi(optarg);
+			break;
+		case 'P':
+			parse_one = 1;
+			break;
+		case 'B':
+			build = 1;
 			break;
 		case 'd':
 			if (strcasecmp(optarg, "data2") == 0) {
@@ -666,6 +692,9 @@ int main(int argc, char *argv[])
 			} else if (strcasecmp(optarg, "data7") == 0) {
 				data = __data7;
 				root = "request";
+			} else if (strcasecmp(optarg, "data8") == 0) {
+				data = __data8;
+				root = "root";
 			}
 			break;
 		case 'p':
@@ -683,6 +712,8 @@ int main(int argc, char *argv[])
 				printf("%s\n", __data6);
 			else if (strcasecmp(optarg, "data7") == 0)
 				printf("%s\n", __data7);
+			else if (strcasecmp(optarg, "data8") == 0)
+				printf("%s\n", __data8);
 			return (0);
 		case 'f':
 			snprintf(filepath, sizeof(filepath), "%s", optarg);
@@ -695,10 +726,23 @@ int main(int argc, char *argv[])
 	if (benchmark_max > 0)
 		parse_xml_benchmark(once, benchmark_max, data);
 
-	parse_xml(once, data, root, multi_root);
+	if (test_one)
+	{
+		test1();
+
+		printf("Enter any key to continue ...\r\n");
+		getchar();
+	}
+
+
+	if (parse_one)
+		parse_xml(once, data, root, multi_root);
 
 	if (filepath[0] != 0)
 		parse_xml_file(filepath);
+
+	if (build)
+		build_xml();
 
 #ifdef	ACL_MS_WINDOWS
 	printf("ok, enter any key to exit ...\n");

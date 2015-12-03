@@ -20,7 +20,7 @@ int main(void)
 
 	// 将 JSON 数据转为 XML 数据的过程
 
-	acl::xml xml;
+	acl::xml1 xml;
 	acl::xml_node& server_node = xml.create_node("server");
 	xml.get_root().add_child(server_node);
 

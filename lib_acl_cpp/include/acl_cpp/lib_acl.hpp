@@ -17,6 +17,7 @@
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/xml.hpp"
+#include "acl_cpp/stdlib/xml1.hpp"
 #include "acl_cpp/stdlib/zlib_stream.hpp"
 #include "acl_cpp/stdlib/md5.hpp"
 #include "acl_cpp/stdlib/charset_conv.hpp"

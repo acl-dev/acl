@@ -8,6 +8,7 @@
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stdlib/charset_conv.hpp"
 #include "acl_cpp/stdlib/xml.hpp"
+#include "acl_cpp/stdlib/xml1.hpp"
 #include "acl_cpp/stdlib/json.hpp"
 #include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/http/HttpCookie.hpp"
@@ -704,7 +705,7 @@ bool HttpServletRequest::readHeader(string* method_s)
 	if (EQ(ctype, "text") && EQ(stype, "xml"))
 	{
 		request_type_ = HTTP_REQUEST_TEXT_XML;
-		xml_ = new (dbuf_->dbuf_alloc(sizeof(xml))) xml();
+		xml_ = new (dbuf_->dbuf_alloc(sizeof(xml1))) xml1();
 		ssize_t dlen = (ssize_t) len, n;
 		char  buf[8192];
 		istream& in = getInputStream();

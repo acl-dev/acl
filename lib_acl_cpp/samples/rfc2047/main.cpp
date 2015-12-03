@@ -150,7 +150,10 @@ static void rfc2047_test_file(acl::rfc2047& rfc2047, const char* filepath)
 		printf("load file %s error(%s)\r\n", filepath, strerror(errno));
 		return;
 	}
+
+	printf("-----------------------input data----------------------\r\n");
 	printf(">>src: \r\n|%s|\r\n", buf.c_str());
+	printf("-----------------------input data end------------------\r\n");
 
 	rfc2047.decode_update(buf.c_str(), (int) buf.length());
 
@@ -189,7 +192,7 @@ static void usage(const char* procname)
 
 int main(int argc, char* argv[])
 {
-	acl::rfc2047 rfc2047(false);
+	acl::rfc2047 rfc2047;
 
 	int   ch;
 

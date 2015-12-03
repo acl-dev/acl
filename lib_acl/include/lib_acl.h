@@ -22,6 +22,7 @@ extern "C" {
 #include "proctl/acl_proctl.h"
 #include "xml/acl_xml.h"
 #include "xml/acl_xml2.h"
+#include "xml/acl_xml3.h"
 #include "json/acl_json.h"
 #include "experiment/experiment.h"
 

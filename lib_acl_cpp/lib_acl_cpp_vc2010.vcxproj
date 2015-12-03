@@ -343,6 +343,8 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\stdlib\url_coder.cpp" />
     <ClCompile Include="src\stdlib\util.cpp" />
     <ClCompile Include="src\stdlib\xml.cpp" />
+    <ClCompile Include="src\stdlib\xml1.cpp" />
+    <ClCompile Include="src\stdlib\xml2.cpp" />
     <ClCompile Include="src\stdlib\zlib_stream.cpp" />
     <ClCompile Include="src\stream\aio_delay_free.cpp" />
     <ClCompile Include="src\stream\aio_fstream.cpp" />
@@ -504,6 +506,8 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stdlib\util.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\vld.h" />
     <ClInclude Include="include\acl_cpp\stdlib\xml.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\xml1.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\xml2.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\zlib_stream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\aio_delay_free.hpp" />
     <ClInclude Include="include\acl_cpp\stream\aio_fstream.hpp" />

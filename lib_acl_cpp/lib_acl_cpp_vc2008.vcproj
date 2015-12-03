@@ -1002,6 +1002,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stdlib\xml1.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\stdlib\xml2.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stdlib\zlib_stream.cpp"
 					>
 				</File>
@@ -1717,6 +1725,14 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\xml.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\xml1.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\xml2.hpp"
 					>
 				</File>
 				<File

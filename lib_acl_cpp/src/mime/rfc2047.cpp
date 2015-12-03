@@ -20,7 +20,7 @@ enum
 	rfc2047_status_question_equal
 };
 
-rfc2047::rfc2047(bool strip_sp /* false */, bool addCrlf /* true */)
+rfc2047::rfc2047(bool strip_sp /* = true */, bool addCrlf /* = true */)
 	: m_pCurrentEntry(NULL)
 	, m_coder(NULL)
 	, m_status(rfc2047_status_next)
@@ -37,7 +37,7 @@ rfc2047::~rfc2047()
 	delete m_coder;
 }
 
-void rfc2047::reset(bool strip_sp /* false */)
+void rfc2047::reset(bool strip_sp /* = true */)
 {
 	std::list<rfc2047_entry*>::iterator it, lt;
 	
@@ -60,7 +60,7 @@ void rfc2047::reset(bool strip_sp /* false */)
 
 const std::list<rfc2047_entry*>& rfc2047::get_list() const
 {
-	return (m_List);
+	return m_List;
 }
 
 void rfc2047::debug_rfc2047() const
@@ -102,7 +102,7 @@ int rfc2047::status_next(const char* s, int n)
 	if (m_stripSp)
 		SKIP(s, n);
 	if (n <= 0)
-		return (n);
+		return n;
 
 	rfc2047_entry* entry = NEW rfc2047_entry;
 	m_pCurrentEntry = entry;
@@ -115,11 +115,11 @@ int rfc2047::status_next(const char* s, int n)
 	if (*s == '=')
 	{
 		m_status = rfc2047_status_equal_question;
-		return (n - 1);
+		return n - 1;
 	}
 	m_status = rfc2047_status_data;
 	*m_pCurrentEntry->pData << *s;
-	return (n - 1);
+	return n - 1;
 }
 
 int rfc2047::status_data(const char* s, int n)
@@ -127,7 +127,7 @@ int rfc2047::status_data(const char* s, int n)
 	if (m_stripSp)
 		SKIP(s, n);
 	if (n <= 0)
-		return (n);
+		return n;
 	while (n > 0)
 	{
 		if (m_stripSp)
@@ -161,7 +161,7 @@ int rfc2047::status_data(const char* s, int n)
 			n--;
 		}
 	}
-	return (n);
+	return n;
 }
 
 int rfc2047::status_equal_question(const char* s, int n)
@@ -169,16 +169,16 @@ int rfc2047::status_equal_question(const char* s, int n)
 	if (m_stripSp)
 		SKIP(s, n);
 	if (n <= 0)
-		return (n);
+		return n;
 	if (*s == '?')
 	{
 		m_status = rfc2047_status_charset;
-		return (n - 1);
+		return n - 1;
 	}
 	m_status = rfc2047_status_data;
 	*m_pCurrentEntry->pData << '=';
 	*m_pCurrentEntry->pData << *s;
-	return (n - 1);
+	return n - 1;
 }
 
 int rfc2047::status_charset(const char* s, int n)
@@ -186,20 +186,20 @@ int rfc2047::status_charset(const char* s, int n)
 	if (m_stripSp)
 		SKIP(s, n);
 	if (n <= 0)
-		return (n);
+		return n;
 	if (*s == '?')
 	{
 		if (m_pCurrentEntry->pCharset->length() == 0)
 		{
 			*m_pCurrentEntry->pData = "=??";
 			m_status = rfc2047_status_data;
-			return (n - 1);
+			return n - 1;
 		}
 		m_status = rfc2047_status_question_first;
-		return (n - 1);
+		return n - 1;
 	}
 	*m_pCurrentEntry->pCharset << *s;
-	return (n - 1);
+	return n - 1;
 }
 
 int rfc2047::status_question_first(const char* s, int n)
@@ -207,9 +207,9 @@ int rfc2047::status_question_first(const char* s, int n)
 	if (m_stripSp)
 		SKIP(s, n);
 	if (n <= 0)
-		return (n);
+		return n;
 	m_status = rfc2047_status_coding;
-	return (n);
+	return n;
 }
 
 int rfc2047::status_coding(const char* s, int n)
@@ -217,18 +217,18 @@ int rfc2047::status_coding(const char* s, int n)
 	if (m_stripSp)
 		SKIP(s, n);
 	if (n <= 0)
-		return (n);
+		return n;
 	if (*s == 'B' || *s == 'b')
 	{
 		m_pCurrentEntry->coding = 'B';
 		m_status = rfc2047_status_question_second;
-		return (n - 1);
+		return n - 1;
 	}
 	else if (*s == 'Q' || *s == 'q')
 	{
 		m_pCurrentEntry->coding = 'Q';
 		m_status = rfc2047_status_question_second;
-		return (n - 1);
+		return n - 1;
 	}
 	
 	*m_pCurrentEntry->pData << "=?"
@@ -236,7 +236,7 @@ int rfc2047::status_coding(const char* s, int n)
 		<< "?";
 	m_pCurrentEntry->pCharset->clear();
 	m_pCurrentEntry->coding = 0;
-	return (n - 1);
+	return n - 1;
 }
 
 int rfc2047::status_question_second(const char* s, int n)
@@ -244,11 +244,11 @@ int rfc2047::status_question_second(const char* s, int n)
 	if (m_stripSp)
 		SKIP(s, n);
 	if (n <= 0)
-		return (n);
+		return n;
 	if (*s == '?')
 	{
 		m_status = rfc2047_status_data;
-		return (n - 1);
+		return n - 1;
 	}
 
 	*m_pCurrentEntry->pData << "=?"
@@ -257,7 +257,7 @@ int rfc2047::status_question_second(const char* s, int n)
 	*m_pCurrentEntry->pData << *s;
 	m_pCurrentEntry->coding = 0;
 	m_status = rfc2047_status_data;
-	return (n - 1);
+	return n - 1;
 }
 
 int rfc2047::status_question_equal(const char* s, int n)
@@ -265,12 +265,12 @@ int rfc2047::status_question_equal(const char* s, int n)
 	if (m_stripSp)
 		SKIP(s, n);
 	if (n <= 0)
-		return (n);
+		return n;
 	if (*s == '=')
 	{
 		m_status = rfc2047_status_next;
 		m_pCurrentEntry = NULL;
-		return (n - 1);
+		return n - 1;
 	}
 
 	size_t size = m_pCurrentEntry->pCharset->length()
@@ -285,7 +285,7 @@ int rfc2047::status_question_equal(const char* s, int n)
 	delete m_pCurrentEntry->pData;
 	m_pCurrentEntry->pData = pBuf;
 	m_status = rfc2047_status_data;
-	return (n - 1);
+	return n - 1;
 }
 
 struct rfc2047_status_matchine 
@@ -317,7 +317,7 @@ void rfc2047::decode_update(const char* in, int n)
 }
 
 #define EQ(x, y) (((x) == NULL && (y) == NULL)  \
-		  || ((x) != NULL && (y) != NULL && !strcasecmp((x), (y))))
+	  || ((x) != NULL && (y) != NULL && !strcasecmp((x), (y))))
 
 static bool decoder_update(rfc2047_entry* entry,
 	const char* fromCharset, const char* toCharset,
@@ -328,14 +328,14 @@ static bool decoder_update(rfc2047_entry* entry,
 	pDecoder->decode_update(entry->pData->c_str(),
 			(int) entry->pData->length(), buf1);
 	if (buf1->empty())
-		return (true);
+		return true;
 
 	// 如果源字符集与目标字符集相同则不进行字符集转码
 
 	if (EQ(fromCharset, toCharset) || pConv == NULL)
 	{
 		out->append(buf1->c_str(), buf1->length());
-		return (true);
+		return true;
 	}
 
 	// 进行字符集转码
@@ -349,7 +349,7 @@ static bool decoder_update(rfc2047_entry* entry,
 	else if (buf2->length() > 0)
 		out->append(buf2->c_str(), buf2->length());
 
-	return (true);
+	return true;
 }
 
 static bool decoder_finish(acl::mime_code* pDecoder, acl::charset_conv* pConv,
@@ -366,21 +366,19 @@ static bool decoder_finish(acl::mime_code* pDecoder, acl::charset_conv* pConv,
 			if (buf2->length() > 0)
 				out->append(buf2->c_str(), buf2->length());
 		}
-		return (true);
+		return true;
 	}
 
 	if (pConv == NULL)
 	{
 		out->append(buf1->c_str(), buf1->length());
-		return (true);
+		return true;
 	}
 
 	buf2->clear();
 
 	if (!pConv->update(buf1->c_str(), buf1->length(), buf2))
-	{
 		out->append(buf1->c_str(), buf1->length());
-	}
 	else
 	{
 		pConv->update_finish(buf2);
@@ -388,38 +386,43 @@ static bool decoder_finish(acl::mime_code* pDecoder, acl::charset_conv* pConv,
 			out->append(buf2->c_str(), buf2->length());
 	}
 
-	return (true);
+	return true;
 }
 
-bool rfc2047::decode_finish(const char* toCharset, acl::string* out,
-	bool addInvalid /* = true */)
+bool rfc2047::decode_finish(const char* toCharset,
+	string* out, bool addInvalid /* = true */)
 {
 	std::list<rfc2047_entry*>::const_iterator cit = m_List.begin();
-	acl::string buf1;
-	acl::string buf2;
-	acl::mime_base64 base64;
-	acl::mime_quoted_printable qp;
-	acl::mime_code* pDecoder = &base64; // 选择一个默认的解码器，然后根据需要变化
+	string buf1;
+	string buf2;
+	mime_base64 base64;
+	mime_quoted_printable qp;
+
+	// 选择一个默认的解码器，然后根据需要变化
+	mime_code* pDecoder = &base64;
 	const char *fromCharset = NULL;
-	acl::charset_conv conv;
+	charset_conv conv;
 	conv.set_add_invalid(addInvalid);
 
 	for (; cit != m_List.end(); ++cit)
 	{
 		if ((*cit)->coding == 'Q')
 		{
-			if (pDecoder != &qp || !EQ((*cit)->pCharset->c_str(), fromCharset))
+			if (pDecoder != &qp
+				|| !EQ((*cit)->pCharset->c_str(), fromCharset))
 			{
 				if (fromCharset == NULL)
 					fromCharset = (*cit)->pCharset->c_str();
 				if (*fromCharset == 0)
 					fromCharset = NULL;
 				if (fromCharset == NULL || toCharset == NULL)
-					decoder_finish(pDecoder, NULL, out, &buf1, &buf2);
+					decoder_finish(pDecoder, NULL, out,
+						&buf1, &buf2);
 				else
 				{
 					conv.update_begin(fromCharset, toCharset);
-					decoder_finish(pDecoder, &conv, out, &buf1, &buf2);
+					decoder_finish(pDecoder, &conv, out,
+						&buf1, &buf2);
 				}
 				pDecoder->reset();
 			}
@@ -432,18 +435,21 @@ bool rfc2047::decode_finish(const char* toCharset, acl::string* out,
 		}
 		else if ((*cit)->coding == 'B')
 		{
-			if (pDecoder != &base64 || !EQ((*cit)->pCharset->c_str(), fromCharset))
+			if (pDecoder != &base64
+				|| !EQ((*cit)->pCharset->c_str(), fromCharset))
 			{
 				if (fromCharset == NULL)
 					fromCharset = (*cit)->pCharset->c_str();
 				if (*fromCharset == 0)
 					fromCharset = NULL;
 				if (fromCharset == NULL && toCharset == NULL)
-					decoder_finish(pDecoder, NULL, out, &buf1, &buf2);
+					decoder_finish(pDecoder, NULL, out,
+						&buf1, &buf2);
 				else
 				{
 					conv.update_begin(fromCharset, toCharset);
-					decoder_finish(pDecoder, &conv, out, &buf1, &buf2);
+					decoder_finish(pDecoder, &conv, out,
+						&buf1, &buf2);
 				}
 				pDecoder->reset();
 			}
@@ -457,44 +463,45 @@ bool rfc2047::decode_finish(const char* toCharset, acl::string* out,
 		else
 		{
 			if (fromCharset == NULL || toCharset == NULL)
-				decoder_finish(pDecoder, NULL, out, &buf1, &buf2);
+				decoder_finish(pDecoder, NULL, out,
+					&buf1, &buf2);
 			else
 			{
 				conv.update_begin(fromCharset, toCharset);
-				decoder_finish(pDecoder, &conv, out, &buf1, &buf2);
+				decoder_finish(pDecoder, &conv, out,
+					&buf1, &buf2);
 			}
 			pDecoder->reset();
-			out->append((*cit)->pData->c_str(), (*cit)->pData->length());
+			out->append((*cit)->pData->c_str(),
+				(*cit)->pData->length());
 		}
 	}
 
 	if (fromCharset != NULL && toCharset != NULL)
 	{
 		conv.update_begin(fromCharset, toCharset);
-		return (decoder_finish(pDecoder, &conv, out, &buf1, &buf2));
+		return decoder_finish(pDecoder, &conv, out, &buf1, &buf2);
 	}
 	else
-	{
-		return (decoder_finish(pDecoder, NULL, out, &buf1, &buf2));
-	}
+		return decoder_finish(pDecoder, NULL, out, &buf1, &buf2);
 }
 
 bool rfc2047::encode_update(const char* in, int n, acl::string* out,
 	const char* charset /* = "gb2312" */, char coding /* = 'B' */)
 {
 	if (charset == NULL || *charset == 0)
-		return (false);
+		return false;
 	char ch = toupper(coding);
 	if (ch != 'B' && ch != 'Q')
-		return (false);
+		return false;
 
 	acl_assert(in);
 	acl_assert(n > 0);
 	acl_assert(out);
 
-	if (m_pCurrentEntry == NULL ||
-		strcasecmp(m_pCurrentEntry->pCharset->c_str(), charset) != 0 ||
-		 m_pCurrentEntry->coding != ch)
+	if (m_pCurrentEntry == NULL
+		|| !EQ(m_pCurrentEntry->pCharset->c_str(), charset)
+		|| m_pCurrentEntry->coding != ch)
 	{
 		if (m_coder)
 		{
@@ -531,7 +538,7 @@ bool rfc2047::encode_update(const char* in, int n, acl::string* out,
 	acl_assert(m_coder);
 
 	m_coder->encode_update(in, n, out);
-	return (true);
+	return true;
 }
 
 bool rfc2047::encode_finish(string* out)
@@ -542,7 +549,7 @@ bool rfc2047::encode_finish(string* out)
 
 	m_coder->encode_finish(out);
 	*out << "?=";
-	return (true);
+	return true;
 }
 
 bool rfc2047::encode(const char* in, int n, acl::string* out,
@@ -551,8 +558,8 @@ bool rfc2047::encode(const char* in, int n, acl::string* out,
 {
 	rfc2047 rfc(false, addCrlf);
 	if (rfc.encode_update(in, n, out, charset, coding) == false)
-		return (false);
-	return (rfc.encode_finish(out));
+		return false;
+	return rfc.encode_finish(out);
 }
 
 bool rfc2047::decode(const char* in, int n, acl::string* out,
@@ -561,7 +568,7 @@ bool rfc2047::decode(const char* in, int n, acl::string* out,
 {
 	rfc2047 rfc(strip_sp, false);
 	rfc.decode_update(in, n);
-	return (rfc.decode_finish(to_charset, out, addInvalid));
+	return rfc.decode_finish(to_charset, out, addInvalid);
 }
 
 } // namespace acl

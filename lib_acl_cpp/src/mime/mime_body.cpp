@@ -3,6 +3,7 @@
 #include "acl_cpp/stdlib/charset_conv.hpp"
 #include "acl_cpp/stream/ofstream.hpp"
 #include "acl_cpp/stdlib/xml.hpp"
+#include "acl_cpp/stdlib/xml1.hpp"
 #include "acl_cpp/mime/mime_define.hpp"
 #include "acl_cpp/mime/mime_body.hpp"
 
@@ -17,7 +18,7 @@ bool mime_body::save_body(pipe_manager& out, const char* src /* = NULL */,
 	if (m_htmlFirst == false && m_ctype == MIME_CTYPE_TEXT
 		&& m_stype == MIME_STYPE_HTML)
 	{
-		pXml = NEW xml();
+		pXml = NEW xml1();
 		out.push_front(pXml);
 	}
 	else

@@ -114,12 +114,14 @@ ACL_ARRAY *acl_xml_getElementsByTags(ACL_XML *xml, const char *tags)
 
 	ret = acl_array_create(acl_array_size(a));
 
+#define NE strcasecmp
+
 	acl_foreach(iter, a) {
 		ACL_XML_NODE *node = (ACL_XML_NODE*) iter.data, *parent = node;
 		int   i = tokens->argc - 2;
 		while (i >= 0 && (parent = parent->parent) != xml->root) {
-			if (strcasecmp(tokens->argv[i], "*") != 0 &&
-				strcasecmp(tokens->argv[i], STR(parent->ltag)) != 0)
+			if (strcasecmp(tokens->argv[i], "*") != 0
+				&& NE(tokens->argv[i], STR(parent->ltag)))
 			{
 				break;
 			}
@@ -204,7 +206,7 @@ ACL_XML_NODE *acl_xml_getElementMeta(ACL_XML *xml, const char *tag)
 
 	acl_foreach(iter, xml) {
 		node = (ACL_XML_NODE*) iter.data;
-		if ((node->flag & ACL_XML_F_META_QM) == 0 || node->ltag == NULL)
+		if ((node->flag & ACL_XML_F_META_QM) == 0 || !node->ltag)
 			continue;
 		if (strcasecmp(tag, STR(node->ltag)) == 0)
 			return node;
@@ -291,18 +293,20 @@ ACL_XML_ATTR *acl_xml_addElementAttr(ACL_XML_NODE *node,
 	return attr;
 }
 
-ACL_XML_NODE *acl_xml_create_node(ACL_XML *xml, const char* tagname, const char* text)
+ACL_XML_NODE *acl_xml_create_node(ACL_XML *xml, const char* tag,
+	const char* text)
 {
 	ACL_XML_NODE *node = acl_xml_node_alloc(xml);
 
-	acl_assert(tagname && *tagname);
-	acl_vstring_strcpy(node->ltag, tagname);
+	acl_assert(tag && *tag);
+	acl_vstring_strcpy(node->ltag, tag);
 	if (text && *text)
 		acl_vstring_strcpy(node->text, text);
 	return node;
 }
 
-ACL_XML_ATTR *acl_xml_node_add_attr(ACL_XML_NODE *node, const char *name, const char *value)
+ACL_XML_ATTR *acl_xml_node_add_attr(ACL_XML_NODE *node, const char *name,
+	const char *value)
 {
 	ACL_XML_ATTR *attr = acl_xml_attr_alloc(node);
 
@@ -368,8 +372,8 @@ ACL_VSTRING *acl_xml_build(ACL_XML *xml, ACL_VSTRING *buf)
 		} else if ((node->flag & ACL_XML_F_META_QM)) {
 			acl_vstring_strcat(buf, "<?");
 			acl_vstring_strcat(buf, STR(node->ltag));
-			ACL_VSTRING_ADDCH(buf, ' ');
 			/*
+			ACL_VSTRING_ADDCH(buf, ' ');
 			if (LEN(node->text) > 0)
 				acl_vstring_strcat(buf, STR(node->text));
 			*/

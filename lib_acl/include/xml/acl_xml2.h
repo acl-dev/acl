@@ -1,5 +1,5 @@
-#ifndef ACL_XML22_INCLUDE_H
-#define ACL_XML22_INCLUDE_H
+#ifndef ACL_XML2_INCLUDE_H
+#define ACL_XML2_INCLUDE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -107,10 +107,18 @@ struct ACL_XML2 {
 	ACL_XML2_NODE *root;            /**< XML 根节点 */
 
 	/* private */
-	char *addr;                     /**< 内存映射起始地址 */
-	char *ptr;                      /**< 内存映射地址 */
-	size_t size;			/**< addr 内存映射区的大小 */
-	size_t len;			/**< addr 内存映射区剩余大小 */
+	char *addr;                     /**< 内存起始地址 */
+	char *ptr;                      /**< 内存地址 */
+	size_t size;                    /**< addr 内存映射区的大小 */
+	size_t len;                     /**< addr 内存映射区剩余大小 */
+
+	char *mm_file;                  /**< 非空时指定内存映射文件名 */
+	char *mm_addr;                  /**< 内存映射起始地址 */
+	ACL_FILE_HANDLE fd;             /**< 采用内存映射方式时的文件句柄 */
+	size_t off;                     /**< 当前内存映射文件的实际映射大小 */
+	size_t block;                   /**< len 自增时的自增块长度大小 */
+	int   keep_open;                /**< 文件句柄是否一直打开 */
+
 	ACL_HTABLE *id_table;           /**< id 标识符哈希表 */
 	ACL_XML2_NODE *curr_node;       /**< 当前正在处理的 XML 节点 */
 	ACL_DBUF_POOL *dbuf;            /**< 内存池对象 */
@@ -127,7 +135,6 @@ struct ACL_XML2 {
 
 	/**< 是否需要对文本数据进行 xml 解码  */
 #define	ACL_XML2_FLAG_XML_DECODE	(1 << 2)
-	ACL_VSTRING *decode_buf;        /**< 当需要进行 xml 解码时非空 */
 
 	/* for acl_iterator, 通过 acl_foreach 可以列出所有子节点 */
 
@@ -176,14 +183,53 @@ ACL_API ACL_XML2 *acl_xml2_alloc(char *addr, size_t size);
 
 /**
  * 创建一个 xml 对象，该 xml 对象及所有的内部内存分配都在该内存池上进行分配
- * @param dbuf {ACL_DBUF_POOL*} 内存池对象，当该针对非 NULL 时，则 xml 对象
- *  及所属节点内存在其基础上进行分配，否则，内部自动创建隶属于 xml 的内存池
  * @param addr {char*} 内存映射起始地址
  * @param size {ssize_t} addr 内存映射地址大小
+ * @param dbuf {ACL_DBUF_POOL*} 内存池对象，当该针对非 NULL 时，则 xml 对象
+ *  及所属节点内存在其基础上进行分配，否则，内部自动创建隶属于 xml 的内存池
  * @return {ACL_XML2*} 新创建的 xml 对象
  */
 ACL_API ACL_XML2 *acl_xml2_dbuf_alloc(char *addr, size_t size,
 		ACL_DBUF_POOL *dbuf);
+
+/**
+ * 创建一个 xml 对象，其 xml 节点的创建的内存区建立在内存映射文件上
+ * @param filepath {const char*} 内存映射文件的文件名
+ * @param size {size_t} 所映射的文件大小
+ * @param block {size_t} 每次进行空间大小扩充时的单位长度，在扩充时最大长度
+ *  不会超过指定的 size 大小
+ * @param keep_open {int} 是否一直保持文件被打开至 xml 对象释放，如果否，则
+ *  当映射文件自动扩充时需要重新反复打开，会影响解析效率
+ * @param dbuf {ACL_DBUF_POOL*} 内存池对象，当该针对非 NULL 时，则 xml 对象
+ *  及所属节点内存在其基础上进行分配，否则，内部自动创建隶属于 xml 的内存池
+ * @return {ACL_XML2*} 新创建的 xml 对象
+ */
+ACL_API ACL_XML2 *acl_xml2_mmap_file(const char *filepath, size_t size,
+		size_t block, int keep_open, ACL_DBUF_POOL *dbuf);
+
+/**
+ * 创建一个 xml 对象，其 xml 节点的创建的内存区建立在内存映射文件上
+ * @param fd {ACL_FILE_HANDLE} 内存映射文件的文件句柄，当创建 xml 对象成功后，该句柄
+ *  需在 xml 对象释放后才关闭
+ * @param size {size_t} 所映射的文件大小
+ * @param block {size_t} 每次进行空间大小扩充时的单位长度，在扩充时最大长度
+ *  不会超过指定的 size 大小
+ * @param dbuf {ACL_DBUF_POOL*} 内存池对象，当该针对非 NULL 时，则 xml 对象
+ *  及所属节点内存在其基础上进行分配，否则，内部自动创建隶属于 xml 的内存池
+ * @return {ACL_XML2*} 新创建的 xml 对象
+ */
+ACL_API ACL_XML2 *acl_xml2_mmap_fd(ACL_FILE_HANDLE fd, size_t size,
+		size_t block, ACL_DBUF_POOL *dbuf);
+
+/**
+ * 当采用内存文件映射方式时，此函数用来扩充映射文件的空间大小，因为在初始化时
+ * 仅分配较小的空间，在使用过程中如果发现空间不足，则内部自动调用此函数扩展
+ * 文件大小，这样既可以满足实际需求，又可以节省磁盘空间
+ * @param xml {ACL_XML2*} 采用 acl_xml2_mmap_alloc 方式创建的 xml 对象
+ * @return {size_t} 扩充后新增加的空间大小，如果返回值为 0，则表示出错或已经
+ *  达到空间分配上限购
+ */
+ACL_API size_t acl_xml2_mmap_extend(ACL_XML2 *xml);
 
 /**
  * 将某一个 ACL_XML2_NODE 节点作为一个 XML 对象的根节点，从而可以方便地遍历出该
@@ -466,13 +512,9 @@ ACL_API void acl_xml2_node_set_text(ACL_XML2_NODE *node, const char *text);
 /**
  * 将 xml 对象转成字符串内容
  * @param xml {ACL_XML2*} xml 对象
- * @param buf {ACL_VSTRING*} 存储结果集的缓冲区，当该参数为空时则函数内部会
- *  自动分配一段缓冲区，应用用完后需要释放掉；非空函数内部会直接将结果存储其中
- * @return {ACL_VSTRING*} xml 对象转换成字符串后的存储缓冲区，该返回值永远非空，
- *  使用者可以通过 ACL_VSTRING_LEN(x) 宏来判断内容是否为空，返回的 ACL_VSTRING
- *  指针如果为该函数内部创建的，则用户名必须用 acl_vstring_free 进行释放
+ * @return {const char*}
  */
-ACL_API ACL_VSTRING* acl_xml2_build(ACL_XML2* xml, ACL_VSTRING *buf);
+ACL_API const char *acl_xml2_build(ACL_XML2* xml);
 
 /**
  * 将 xml 对象转储于指定流中，注：该转储信息仅为调试用的数据

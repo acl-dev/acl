@@ -10,7 +10,7 @@ static bool test_del(acl::redis_key& cmd, int i)
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
-	int ret = cmd.del(key.c_str(), NULL);
+	int ret = cmd.del(key.c_str());
 	if (ret < 0)
 	{
 		printf("del key: %s error: %s\r\n",

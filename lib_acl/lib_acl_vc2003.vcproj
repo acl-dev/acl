@@ -796,6 +796,15 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\xml\acl_xml2_util.c">
 				</File>
 				<File
+					RelativePath=".\src\xml\acl_xml3.c">
+				</File>
+				<File
+					RelativePath=".\src\xml\acl_xml3_parse.c">
+				</File>
+				<File
+					RelativePath=".\src\xml\acl_xml3_util.c">
+				</File>
+				<File
 					RelativePath=".\src\xml\acl_xml_parse.c">
 				</File>
 				<File
@@ -1670,6 +1679,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\xml\acl_xml2.h">
+				</File>
+				<File
+					RelativePath=".\include\xml\acl_xml3.h">
 				</File>
 			</Filter>
 			<Filter

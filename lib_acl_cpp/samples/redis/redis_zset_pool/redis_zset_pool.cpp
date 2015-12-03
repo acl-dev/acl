@@ -190,7 +190,7 @@ static bool test_zrange(acl::redis_zset& redis, int i, const char* key,
 
 static bool test_del(acl::redis_key& redis, int i, const char* key)
 {
-	int ret = redis.del(key, NULL) < 0 ? false : true;
+	int ret = redis.del(key) < 0 ? false : true;
 	if (ret < 0)
 		printf("del %s error, i: %d\r\n", key, i);
 	else if (i < 10)

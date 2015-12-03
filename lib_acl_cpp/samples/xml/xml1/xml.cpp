@@ -25,7 +25,7 @@ static void test(void)
 		"<!-- <edition>0.5</edition> -->\r\n"
 		"<!-- <edition> -- 0.5 -- </edition> -->\r\n"
 		"<root name='root' id='root_id'>test</root>\r\n";
-	acl::xml xml;
+	acl::xml1 xml;
 
 #if 1
 	const char* p = data;
@@ -79,7 +79,7 @@ static void test(void)
 	printf("%s\r\n", buf.c_str());
 
 	//////////////////////////////////////////////////////////////////////////
-	acl::xml xml2;
+	acl::xml1 xml2;
 	acl::xml_node& root = xml2.get_root();
 	acl::xml_node* node1, *node2, *node3, *node4;
 
@@ -201,7 +201,7 @@ static void test(void)
 
 static void test2(void)
 {
-	acl::xml body;
+	acl::xml1 body;
 	body.get_root().add_child("test", true)
 		.add_attr("mail", "\"zsxxsz1\" zsxxsz1@test.com")
 		.add_attr("title", "中<国>人\'，</test>中国人\"，中国人\\\"")
@@ -212,7 +212,7 @@ static void test2(void)
 
 	printf("------------------------------------------\r\n");
 
-	acl::xml xml(buf.c_str());
+	acl::xml1 xml(buf.c_str());
 	const acl::xml_node* node = xml.getFirstElementByTag("test");
 	if (node == NULL)
 		printf("test tag null\r\n");
@@ -236,7 +236,7 @@ static void get_html(const char* file)
 		return;
 	}
 
-	acl::xml xml(buf.c_str());
+	acl::xml1 xml(buf.c_str());
 	const acl::string& text = xml.getText();
 	printf("text:{%s}\r\n", text.c_str());
 }

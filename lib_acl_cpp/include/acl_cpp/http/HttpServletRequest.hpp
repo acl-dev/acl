@@ -220,6 +220,8 @@ public:
 	 * 转换成本地要求的字符集；针对 GET 方法，则是获得
 	 * URL 中 ? 后面的参数值；针对 POST 方法，则可以获得
 	 * URL 中 ? 后面的参数值或请求体中的参数值
+	 * @param name {const char*} 参数名
+	 * @return {const char*} 返回参数值，当参数不存在时返回 NULL
 	 */
 	const char* getParameter(const char* name) const;
 

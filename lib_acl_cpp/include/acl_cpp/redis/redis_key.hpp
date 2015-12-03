@@ -58,11 +58,16 @@ public:
 	 */
 	int del_one(const char* key);
 	int del_one(const char* key, size_t len);
-	int del(const char* first_key, ...);
+	int del(const char* key);
 	int del(const std::vector<string>& keys);
 	int del(const std::vector<const char*>& keys);
 	int del(const char* keys[], size_t argc);
 	int del(const char* keys[], const size_t lens[], size_t argc);
+	int del_keys(const char* first_key, ...);
+	int del_keys(const std::vector<string>& keys);
+	int del_keys(const std::vector<const char*>& keys);
+	int del_keys(const char* keys[], size_t argc);
+	int del_keys(const char* keys[], const size_t lens[], size_t argc);
 
 	/**
 	 * 序列化给定 key ，并返回被序列化的值，使用 RESTORE 命令可以将这个值反序列化

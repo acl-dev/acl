@@ -78,7 +78,7 @@ bool redis_session::del(const char* name)
 		return false;
 
 	command_->clear();
-	return command_->hdel(sid, name, NULL) >= 0 ? true : false;
+	return command_->hdel(sid, name) >= 0 ? true : false;
 }
 
 bool redis_session::set_attrs(const std::map<string, session_string>& attrs)
@@ -119,7 +119,7 @@ bool redis_session::remove()
 		return false;
 
 	command_->clear();
-	return command_->del(sid, NULL) >= 0 ? true : false;
+	return command_->del(sid) >= 0 ? true : false;
 }
 
 bool redis_session::set_timeout(time_t ttl)

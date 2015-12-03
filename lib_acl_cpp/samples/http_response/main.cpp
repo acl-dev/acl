@@ -113,7 +113,7 @@ private:
 	// 处理 text/xml 数据体
 	bool do_xml(http_response& res, const char* req_charset, string& err)
 	{
-		xml body;
+		xml1 body;
 		if (res.get_body(body, local_charset_) == false)
 		{
 			err += "get_body error";

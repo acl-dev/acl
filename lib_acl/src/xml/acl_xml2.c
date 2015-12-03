@@ -1,8 +1,19 @@
 #include "StdAfx.h"
+#include "stdlib/acl_define.h"
+
+
 #ifndef ACL_PREPARE_COMPILE
+
+#ifdef ACL_UNIX
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#endif
 
 #include <string.h>
 #include <stdio.h>
+#include "stdlib/acl_sys_patch.h"
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_mystring.h"
 #include "stdlib/acl_define.h"
@@ -381,25 +392,164 @@ void acl_xml2_slash(ACL_XML2 *xml, int ignore)
 
 void acl_xml2_decode_enable(ACL_XML2 *xml, int on)
 {
-	if (on) {
-		if (xml->decode_buf == NULL)
-			xml->decode_buf = acl_vstring_alloc(256);
+	if (on)
 		xml->flag |= ACL_XML2_FLAG_XML_DECODE;
-	} else {
-		if (xml->decode_buf != NULL) {
-			acl_vstring_free(xml->decode_buf);
-			xml->decode_buf = NULL;
-		}
+	else
 		xml->flag &= ~ACL_XML2_FLAG_XML_DECODE;
-	}
 }
 
-ACL_XML2 *acl_xml2_alloc(char *addr, size_t size)
+ACL_XML2 *acl_xml2_alloc(char *buf, size_t size)
 {
-	return acl_xml2_dbuf_alloc(addr, size, NULL);
+	return acl_xml2_dbuf_alloc(buf, size, NULL);
 }
 
-ACL_XML2 *acl_xml2_dbuf_alloc(char *addr, size_t size, ACL_DBUF_POOL *dbuf)
+ACL_XML2 *acl_xml2_mmap_file(const char *filepath, size_t size, size_t block,
+	int keep_open, ACL_DBUF_POOL *dbuf)
+{
+	const char *myname = "acl_xml2_mmap_alloc";
+	ACL_FILE_HANDLE fd;
+	ACL_XML2 *xml;
+
+	acl_assert(filepath && *filepath);
+
+	fd = acl_file_open(filepath, O_CREAT | O_RDWR, 0600);
+	if (fd == ACL_FILE_INVALID) {
+		acl_msg_error("%s(%d), %s: open %s error: %s", __FILE__,
+			__LINE__, myname, filepath, acl_last_serror());
+		return NULL;
+	}
+
+	xml = acl_xml2_mmap_fd(fd, size, block, dbuf);
+	if (xml == NULL) {
+		acl_file_close(fd);
+		return NULL;
+	}
+
+	if (!keep_open) {
+		acl_file_close(fd);
+		fd = ACL_FILE_INVALID;
+	}
+
+	xml->keep_open = keep_open;
+	xml->mm_file   = acl_dbuf_pool_strdup(xml->dbuf, filepath);
+
+	return xml;
+}
+
+ACL_XML2 *acl_xml2_mmap_fd(ACL_FILE_HANDLE fd, size_t size,
+	size_t block, ACL_DBUF_POOL *dbuf)
+{
+#ifdef	ACL_UNIX
+	size_t off = block - 1;
+	ACL_XML2 *xml;
+	char *addr;
+
+	acl_assert(size > 0);
+	acl_assert(block > 0);
+
+	if (block > size)
+		block = size;
+	if (acl_lseek(fd, off, SEEK_SET) != (acl_off_t) off) {
+		acl_msg_error("%s(%d), %s: lseek error: %s, block: %lu",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror(),
+			(unsigned long) off);
+		return NULL;
+	}
+
+	if (acl_file_write(fd, "\0", 1, 0, NULL, NULL) == ACL_VSTREAM_EOF)
+	{
+		acl_msg_error("%s(%d), %s: write error: %s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
+		return NULL;
+	}
+
+	addr = (char*) mmap(NULL, size, PROT_READ | PROT_WRITE,
+			MAP_SHARED, fd, 0);
+	if (addr == MAP_FAILED) {
+		acl_msg_error("%s(%d), %s: mmap error: %s, size: %lu",
+			__FILE__, __LINE__, __FUNCTION__,
+			acl_last_serror(), (unsigned long) size);
+		return NULL;
+	}
+
+	xml            = acl_xml2_dbuf_alloc(addr, size, dbuf);
+	xml->mm_file   = NULL;
+	xml->fd        = fd;
+	xml->mm_addr   = addr;
+	xml->block     = block;
+	xml->off       = off;
+	xml->keep_open = 1;
+	xml->len       = xml->off + 1;
+
+	return xml;
+#else
+	(void) fd;
+	(void) size;
+	(void) block;
+	(void) dbuf;
+
+	acl_msg_error("%s(%d), %s: not implement yet!",
+		__FILE__, __LINE__, __FUNCTION__);
+	return NULL;
+#endif
+}
+
+size_t acl_xml2_mmap_extend(ACL_XML2 *xml)
+{
+	const char *myname = "acl_xml2_mmap_extend";
+	size_t n;
+
+	if (xml->len >= xml->size)
+		return 0;
+	if (xml->block == 0)
+		return 0;
+
+	if (xml->fd == ACL_FILE_INVALID) {
+		if (xml->mm_file == NULL || *xml->mm_file == 0)
+			return 0;
+
+		xml->fd = acl_file_open(xml->mm_file, O_CREAT | O_RDWR, 0600);
+		if (xml->fd == ACL_FILE_INVALID) {
+			acl_msg_error("%s(%d), %s: open %s error: %s",
+				__FILE__, __LINE__, myname,
+				xml->mm_file, acl_last_serror());
+			return 0;
+		}
+	}
+
+	n = xml->size - xml->len;
+	if (n > xml->block)
+		n = xml->block;
+	xml->len += n;
+	xml->off += n;
+
+	if (acl_lseek(xml->fd, xml->off, SEEK_SET) != (acl_off_t) xml->off)
+	{
+		acl_msg_error("%s(%d), %s: lseek error: %s",
+			__FILE__, __LINE__, myname, acl_last_serror());
+		acl_file_close(xml->fd);
+		xml->fd = ACL_FILE_INVALID;
+		return 0;
+	}
+
+	if (acl_file_write(xml->fd, "\0", 1, 0, NULL, NULL) == ACL_VSTREAM_EOF)
+	{
+		acl_msg_error("%s(%d), %s: write error: %s",
+			__FILE__, __LINE__, myname, acl_last_serror());
+		acl_file_close(xml->fd);
+		xml->fd = ACL_FILE_INVALID;
+		return 0;
+	}
+
+	if (!xml->keep_open) {
+		acl_file_close(xml->fd);
+		xml->fd = ACL_FILE_INVALID;
+	}
+
+	return n;
+}
+
+ACL_XML2 *acl_xml2_dbuf_alloc(char *buf, size_t size, ACL_DBUF_POOL *dbuf)
 {
 	ACL_XML2 *xml;
 
@@ -414,12 +564,17 @@ ACL_XML2 *acl_xml2_dbuf_alloc(char *addr, size_t size, ACL_DBUF_POOL *dbuf)
 
 	xml->dbuf      = dbuf;
 	xml->dbuf_keep = sizeof(ACL_XML2);
-	xml->addr      = addr;
+	xml->addr      = buf;
 	xml->size      = size;
 	xml->len       = size;
 	xml->ptr       = xml->addr;
 	*xml->ptr++    = 0;
 	xml->flag     |= ACL_XML2_FLAG_MULTI_ROOT;
+
+	xml->mm_file   = NULL;
+	xml->fd        = ACL_FILE_INVALID;
+	xml->off       = size - 1;
+	xml->block     = size;
 
 	xml->iter_head = xml_iter_head;
 	xml->iter_next = xml_iter_next;
@@ -435,12 +590,26 @@ ACL_XML2 *acl_xml2_dbuf_alloc(char *addr, size_t size, ACL_DBUF_POOL *dbuf)
 
 int acl_xml2_free(ACL_XML2 *xml)
 {
+	const char *myname = "acl_xml2_free";
 	int  node_cnt = xml->node_cnt;
 
 	acl_htable_free(xml->id_table, NULL);
 
-	if (xml->decode_buf)
-		acl_vstring_free(xml->decode_buf);
+	if (xml->fd != ACL_FILE_INVALID) {
+		acl_file_close(xml->fd);
+		xml->fd = ACL_FILE_INVALID;
+	}
+
+#ifdef	ACL_UNIX
+	if (xml->mm_addr != NULL && munmap(xml->mm_addr, xml->size) < 0)
+		acl_msg_error("%s(%d), %s: munmap error: %s",
+			__FILE__, __LINE__, myname, acl_last_serror());
+#endif
+
+	if (xml->mm_file != NULL) {
+		acl_dbuf_pool_free(xml->dbuf, xml->mm_file);
+		xml->mm_file = NULL;
+	}
 
 	if (xml->dbuf_inner != NULL)
 		acl_dbuf_pool_destroy(xml->dbuf_inner);
@@ -455,7 +624,11 @@ void acl_xml2_reset(ACL_XML2 *xml)
 	if (xml->dbuf_inner != NULL)
 		acl_dbuf_pool_reset(xml->dbuf_inner, xml->dbuf_keep);
 
-	xml->len       = xml->size;
+	if (xml->fd != ACL_FILE_INVALID || xml->mm_file != NULL)
+		xml->len = xml->off + 1;
+	else
+		xml->len = xml->size;
+
 	xml->ptr       = xml->addr;
 	xml->root      = acl_xml2_node_alloc(xml);
 	xml->depth     = 0;

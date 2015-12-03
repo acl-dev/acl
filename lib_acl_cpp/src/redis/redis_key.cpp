@@ -53,7 +53,12 @@ int redis_key::del_one(const char* key, size_t len)
 	return get_number();
 }
 
-int redis_key::del(const char* first_key, ...)
+int redis_key::del(const char* key)
+{
+	return del_one(key);
+}
+
+int redis_key::del_keys(const char* first_key, ...)
 {
 	std::vector<const char*> keys;
 
@@ -69,13 +74,33 @@ int redis_key::del(const char* first_key, ...)
 
 int redis_key::del(const std::vector<string>& keys)
 {
+	return del_keys(keys);
+}
+
+int redis_key::del(const std::vector<const char*>& keys)
+{
+	return del_keys(keys);
+}
+
+int redis_key::del(const char* keys[], size_t argc)
+{
+	return del_keys(keys, argc);
+}
+
+int redis_key::del(const char* keys[], const size_t lens[], size_t argc)
+{
+	return del_keys(keys, lens, argc);
+}
+
+int redis_key::del_keys(const std::vector<string>& keys)
+{
 	if (keys.size() == 1)
 		hash_slot(keys[0].c_str());
 	build("DEL", NULL, keys);
 	return get_number();
 }
 
-int redis_key::del(const std::vector<const char*>& keys)
+int redis_key::del_keys(const std::vector<const char*>& keys)
 {
 	if (keys.size() == 1)
 		hash_slot(keys[0]);
@@ -83,7 +108,7 @@ int redis_key::del(const std::vector<const char*>& keys)
 	return get_number();
 }
 
-int redis_key::del(const char* keys[], size_t argc)
+int redis_key::del_keys(const char* keys[], size_t argc)
 {
 	if (argc == 1)
 		hash_slot(keys[0]);
@@ -91,7 +116,7 @@ int redis_key::del(const char* keys[], size_t argc)
 	return get_number();
 }
 
-int redis_key::del(const char* keys[], const size_t lens[], size_t argc)
+int redis_key::del_keys(const char* keys[], const size_t lens[], size_t argc)
 {
 	if (argc == 1)
 		hash_slot(keys[0], lens[0]);

@@ -18,10 +18,12 @@ public:
 	/**
 	 * 根据文件路径打开文件流, 这是最基础的打开文件的方式
 	 * @param path {const char*} 文件名
-	 * @param oflags {unsigned int} 标志位, We're assuming that O_RDONLY: 0x0000,
-	 *  O_WRONLY: 0x0001, O_RDWR: 0x0002, O_APPEND: 0x0008, O_CREAT: 0x0100,
-	 *  O_TRUNC: 0x0200, O_EXCL: 0x0400; just for win32, O_TEXT: 0x4000,
-	 *  O_BINARY: 0x8000, O_RAW: O_BINARY, O_SEQUENTIAL: 0x0020, O_RANDOM: 0x0010.
+	 * @param oflags {unsigned int} 标志位, We're assuming that
+	 *  O_RDONLY: 0x0000, O_WRONLY: 0x0001, O_RDWR: 0x0002,
+	 *  O_APPEND: 0x0008, O_CREAT: 0x0100, O_TRUNC: 0x0200,
+	 *  O_EXCL: 0x0400; just for win32, O_TEXT: 0x4000,
+	 *  O_BINARY: 0x8000, O_RAW: O_BINARY, O_SEQUENTIAL: 0x0020,
+	 *  O_RANDOM: 0x0010.
 	 * @param mode {int} 打开文件句柄时的模式(如: 0600)
 	 * @return {bool} 打开文件是否成功
 	 */
@@ -36,8 +38,8 @@ public:
 	bool open_trunc(const char* path);
 
 	/**
-	 * 以读/写方式建新文件，文件属性为 0700, 若文件不存在则创建新文件，若存在则
-	 * 打开旧文件
+	 * 以读/写方式建新文件，文件属性为 0700, 若文件不存在则创建新文件，
+	 * 若存在则打开旧文件
 	 * @return {bool} 文件创建是否成功
 	 */
 	bool create(const char* path);
@@ -54,7 +56,7 @@ public:
 	 * 移动文件指针位置
 	 * @param offset {__int64} 偏移量
 	 * @param whence {int} 移动方向：SEEK_SET（从文件起始位置后移动）,
-	 *  SEEK_CUR（从当前文件指针位置向后移动）, SEEK_END（从文件尾向前移动）
+	 *  SEEK_CUR(从当前文件指针位置向后移动), SEEK_END(从文件尾向前移动)
 	 * @return {acl_off_t} 正常时返回值 >= 0，出错时返回 -1
 	 */
 	__int64 fseek(__int64 offset, int whence);

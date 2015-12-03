@@ -274,6 +274,11 @@ AGAIN:
 	/* 清除系统错误号 */
 	acl_set_error(0);
 
+	/* 必须在调用 fread_fn/read_fn 前清除可读标志位，这样 IO 钩子函数
+	 * 在重置该标志位时才能生效
+	 */
+	in->sys_read_ready = 0;
+
 	if (in->type == ACL_VSTREAM_TYPE_FILE) {
 		read_cnt = in->fread_fn(ACL_VSTREAM_FILE(in), buf, size,
 			in->sys_read_ready ? 0 : in->rw_timeout,
@@ -288,9 +293,6 @@ AGAIN:
 			in->sys_read_ready ? 0 : in->rw_timeout,
 			in, in->context);
 	}
-
-	/* 清除可读标志位 */
-	in->sys_read_ready = 0;
 
 	if (read_cnt > 0) {
 		in->read_ptr = in->read_buf;

@@ -558,6 +558,7 @@ static void usage(const char *procname)
 		" -s[parse once]\r\n"
 		" -b benchmark_max\r\n"
 		" -f xml_file\r\n"
+		" -P [if parse one xml]\r\n"
 		" -m[if enable  multiple root xml node, default: no]\r\n"
 		" -p[print] data1|data2|data3|data4|data5|data6|data7\r\n"
 		" -d[parse] data1|data2|data3|data4|data5|data6|data7\r\n",
@@ -571,6 +572,7 @@ static void usage(const char *procname)
 int main(int argc, char *argv[])
 {
 	int   ch, once = 0, multi_root = 0, benchmark_max = 10000;
+	int   parse_one = 0;
 	const char *data = __data1;
 	const char* root = "root";
 	char  filepath[256];
@@ -587,11 +589,14 @@ int main(int argc, char *argv[])
 		getchar();
 	}
 
-	while ((ch = getopt(argc, argv, "hsp:d:mb:f:")) > 0) {
+	while ((ch = getopt(argc, argv, "hsp:d:mb:f:P")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return (0);
+		case 'P':
+			parse_one = 1;
+			break;
 		case 'm':
 			multi_root = 1;
 			break;
@@ -650,8 +655,8 @@ int main(int argc, char *argv[])
 	if (benchmark_max > 0)
 		parse_xml_benchmark(once, benchmark_max, data);
 
-	if (0)
-	parse_xml(once, data, root, multi_root);
+	if (parse_one)
+		parse_xml(once, data, root, multi_root);
 
 	if (filepath[0] != 0)
 		parse_xml_file(filepath);

@@ -311,6 +311,11 @@ int polarssl_io::read(void* buf, size_t len)
 			return ACL_VSTREAM_EOF;
 	}
 
+	// 如果 SSL 缓冲区中还有未读数据，则需要重置流可读标志位，
+	// 这样可以触发 acl_vstream.c 中的系统读过程
+	if (ssl_get_bytes_avail((ssl_context*) ssl_) > 0)
+		stream_->sys_read_ready = 1;
+
 	return ret;
 #else
 	(void) buf;

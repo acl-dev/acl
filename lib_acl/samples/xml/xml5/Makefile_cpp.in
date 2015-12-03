@@ -1,0 +1,141 @@
+CC = $(MY_ENV_CC)
+
+CFLAGS = -c -g -W \
+-Wall \
+-Wcast-qual \
+-Wno-long-long \
+-Wpointer-arith \
+-Werror \
+-O2 \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
+
+###########################################################
+#Check system:
+#       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
+SYSLIB = -lpthread
+CHECKSYSRES = @echo "Unknow system type!";exit 1
+UNIXNAME = $(shell uname -sm)
+
+ifeq ($(CC),)
+        CC = g++
+endif
+
+ifeq ($(findstring gcc, $(CC)), gcc)
+	CFLAGS += -Wstrict-prototypes
+endif
+
+ifeq ($(findstring clang, $(CC)), clang)
+	CFLAGS += -Wstrict-prototypes \
+		  -Wno-invalid-source-encoding \
+		  -Wno-extended-offsetof
+endif
+
+ifeq ($(findstring clang++, $(CC)), clang++)
+	CFLAGS += -Wno-invalid-source-encoding \
+		  -Wno-extended-offsetof
+endif
+
+# For FreeBSD
+ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
+	CFLAGS += -DFREEBSD -pedantic
+	SYSLIB += -lcrypt
+endif
+
+# For Darwin
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
+		  -Wno-extended-offsetof
+	UNIXTYPE = MACOSX
+endif
+
+#Path for Linux
+ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
+	CFLAGS += -DLINUX2 -pedantic
+	SYSLIB += -lcrypt
+endif
+
+# For MINGW
+ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	SYSLIB = -lpthread-2
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
+#Path for SunOS
+ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
+	ifeq ($(findstring 86, $(UNIXNAME)), 86)
+		SYSLIB += -lsocket -lnsl -lrt
+	endif
+	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
+		SYSLIB += -lsocket -lnsl -lrt
+	endif
+	CFLAGS += -DSUNOS5 -pedantic
+	SYSLIB += -lcrypt
+endif
+
+#Path for HP-UX
+ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
+	CFLAGS += -DHP_UX -DHPUX11
+	PLAT_NAME=hp-ux
+	SYSLIB += -lcrypt
+endif
+
+# For Darwin
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	CFLAGS += -DMACOSX
+endif
+
+#Find system type.
+ifneq ($(SYSPATH),)
+	CHECKSYSRES = @echo "System is $(shell uname -sm)"
+endif
+###########################################################
+
+BASE_PATH =
+ifneq ($(base_path),)
+	BASE_PATH = $(base_path)
+else
+	BASE_PATH = ../..
+endif
+
+ACL_PATH   = $(BASE_PATH)
+ACL_INC    = $(ACL_PATH)/include
+ACL_LIB    = $(ACL_PATH)/lib
+
+EXTLIBS =
+#CFLAGS += -I$(ACL_INC) -I$(PROTO_INC)
+#LDFLAGS = -L$(ACL_LIB) -L$(PROTO_LIB) -l_protocol -l_acl $(EXTLIBS) $(SYSLIB)
+CFLAGS += -I$(ACL_INC)
+LDFLAGS = -L$(ACL_LIB) -l_acl $(EXTLIBS) $(SYSLIB)
+
+
+###########################################################
+
+OUT_PATH = .
+OBJ_PATH = $(OUT_PATH)
+
+#Project's objs
+SRC = $(wildcard *.cpp)
+OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
+###########################################################
+
+.PHONY = all clean
+PROG =
+
+COMPILE = $(CC) $(CFLAGS)
+
+# -Wl,-rpath,$(ACL_LIB) -Wl,-rpath,$(PROTO_LIB) -o $(OBJ_PATH)/$(PROG)
+all: RM $(OBJ)
+	$(CC) $(OBJ) $(LDFLAGS) -o $(OBJ_PATH)/$(PROG)
+	@echo ""
+	@echo "All ok! Output:$(PROG)"
+	@echo ""
+$(OBJ_PATH)/%.o: %.cpp
+	$(COMPILE) $< -o $@
+RM:
+	rm -f $(PROG)
+clean:
+	rm -f $(PROG)
+	rm -f $(OBJ)
+###########################################################

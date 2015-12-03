@@ -1,8 +1,19 @@
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
+#include "stdlib/acl_define.h"
+
+#ifdef ACL_UNIX
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#endif
+
 #include <stdio.h>
 #include "stdlib/acl_mystring.h"
+#include "stdlib/acl_msg.h"
+#include "stdlib/acl_sys_patch.h"
 #include "code/acl_xmlcode.h"
 #include "xml/acl_xml2.h"
 
@@ -138,9 +149,9 @@ static const char *xml_parse_meta_tag(ACL_XML2 *xml, const char *data)
 				return data;
 			data++;
 			xml->len--;
-			*xml->ptr++ = 0;
 			xml->curr_node->ltag_size =
 				xml->ptr - xml->curr_node->ltag;
+			*xml->ptr++ = 0;
 			xml->curr_node->status = ACL_XML2_S_MTXT;
 			break;
 		}
@@ -170,14 +181,14 @@ static char *xml_meta_attr_name(ACL_XML2_ATTR *attr, char *data)
 
 	while ((ch = *data) != 0) {
 		if (ch == '=') {
-			*data++ = 0;
 			if (attr->name_size == 0)
 				attr->name_size = data - attr->name;
+			*data++ = 0;
 			break;
 		}
 		if (IS_SPACE(ch)) {
-			*data++ = 0;
 			attr->name_size = data - attr->name;
+			*data++ = 0;
 		} else
 			data++;
 	}
@@ -202,16 +213,26 @@ static char *xml_meta_attr_value(ACL_XML2_ATTR *attr, char *data)
 
 	while ((ch = *data) != 0) {
 		if (attr->quote && ch == attr->quote) {
-			*data++ = 0;
 			attr->value_size = data - attr->value;
+			*data++ = 0;
 			break;
 		} else if (IS_SPACE(ch)) {
-			*data++ = 0;
 			attr->value_size = data - attr->value;
+			*data++ = 0;
 			break;
 		}
 
 		data++;
+	}
+
+	if ((xml->flag & ACL_XML2_FLAG_XML_DECODE) && attr->value_size > 0
+		&& xml->len > 0)
+	{
+		const char *ptr = attr->value;
+
+		attr->value = xml->ptr;
+		(void) acl_xml_decode2(ptr, &xml->ptr, &xml->len);
+		attr->value_size = xml->ptr - attr->value - 1;
 	}
 
 	return data;
@@ -293,15 +314,15 @@ static const char *xml_parse_meta_text(ACL_XML2 *xml, const char *data)
 
 			data++;
 			xml->len--;
-			*xml->ptr++ = 0;
 			xml->curr_node->text_size = xml->ptr -
 				xml->curr_node->text;
+			*xml->ptr++ = 0;
 			xml->curr_node->status = ACL_XML2_S_MEND;
 
 			if ((xml->curr_node->flag & ACL_XML2_F_META_QM) == 0)
 				break;
 
-			last = xml->ptr;
+			last = xml->ptr - 1;
 			while (last > xml->curr_node->text) {
 				if (*last == '?') {
 					*last = 0;
@@ -325,6 +346,18 @@ static const char *xml_parse_meta_text(ACL_XML2 *xml, const char *data)
 		}
 
 		data++;
+	}
+
+	if (xml->curr_node->status == ACL_XML2_S_MEND
+		&& (xml->flag & ACL_XML2_FLAG_XML_DECODE)
+		&& xml->curr_node->text_size > 0 && xml->len > 0)
+	{
+		const char *txt = xml->curr_node->text;
+
+		xml->curr_node->text = xml->ptr;
+		(void) acl_xml_decode2(txt, &xml->ptr, &xml->len);
+		xml->curr_node->text_size = xml->ptr
+			- xml->curr_node->text - 1;
 	}
 
 	return data;
@@ -378,9 +411,9 @@ static const char *xml_parse_meta_comment(ACL_XML2 *xml, const char *data)
 
 				data++;
 				xml->len--;
-				*xml->ptr++ = 0;
 				xml->curr_node->text_size = xml->ptr -
 					xml->curr_node->text;
+				*xml->ptr++ = 0;
 				xml->curr_node->status = ACL_XML2_S_MEND;
 				break;
 			}
@@ -426,6 +459,19 @@ static const char *xml_parse_meta_comment(ACL_XML2 *xml, const char *data)
 		data++;
 	}
 
+	if (xml->curr_node->status == ACL_XML2_S_MEND
+		&& (xml->flag & ACL_XML2_FLAG_XML_DECODE)
+		&& xml->curr_node->text_size > 0
+		&& xml->len > 0)
+	{
+		const char *txt = xml->curr_node->text;
+
+		xml->curr_node->text = xml->ptr;
+		(void) acl_xml_decode2(txt, &xml->ptr, &xml->len);
+		xml->curr_node->text_size = xml->ptr
+			- xml->curr_node->text - 1;
+	}
+
 	return data;
 }
 
@@ -455,9 +501,9 @@ static const char *xml_parse_left_tag(ACL_XML2 *xml, const char *data)
 				return data;
 			data++;
 			xml->len--;
-			*xml->ptr++ = 0;
 			xml->curr_node->ltag_size = xml->ptr -
 				xml->curr_node->ltag;
+			*xml->ptr++ = 0;
 
 			xml_parse_check_self_closed(xml);
 
@@ -477,9 +523,9 @@ static const char *xml_parse_left_tag(ACL_XML2 *xml, const char *data)
 				return data;
 			data++;
 			xml->len--;
-			*xml->ptr++ = 0;
 			xml->curr_node->ltag_size = xml->ptr -
 				xml->curr_node->ltag;
+			*xml->ptr++ = 0;
 			xml->curr_node->status = ACL_XML2_S_ATTR;
 			xml->curr_node->last_ch = ch;
 			break;
@@ -553,8 +599,8 @@ static const char *xml_parse_attr(ACL_XML2 *xml, const char *data)
 				return data;
 			data++;
 			xml->len--;
-			*xml->ptr++ = 0;
 			attr->name_size = xml->ptr - attr->name;
+			*xml->ptr++ = 0;
 			xml->curr_node->status = ACL_XML2_S_AVAL;
 			break;
 		}
@@ -595,8 +641,8 @@ static const char *xml_parse_attr_val(ACL_XML2 *xml, const char *data)
 					return data;
 				data++;
 				xml->len--;
-				*xml->ptr++ = 0;
 				attr->value_size = xml->ptr - attr->value;
+				*xml->ptr++ = 0;
 				xml->curr_node->status = ACL_XML2_S_ATTR;
 				xml->curr_node->last_ch = ch;
 				break;
@@ -612,8 +658,8 @@ static const char *xml_parse_attr_val(ACL_XML2 *xml, const char *data)
 				return data;
 			data++;
 			xml->len--;
-			*xml->ptr++ = 0;
 			attr->value_size = xml->ptr - attr->value;
+			*xml->ptr++ = 0;
 
 			xml_parse_check_self_closed(xml);
 
@@ -631,8 +677,8 @@ static const char *xml_parse_attr_val(ACL_XML2 *xml, const char *data)
 				return data;
 			data++;
 			xml->len--;
-			*xml->ptr++ = 0;
 			attr->value_size = xml->ptr - attr->value;
+			*xml->ptr++ = 0;
 			xml->curr_node->status = ACL_XML2_S_ATTR;
 			xml->curr_node->last_ch = ch;
 			break;
@@ -647,35 +693,39 @@ static const char *xml_parse_attr_val(ACL_XML2 *xml, const char *data)
 		data++;
 	}
 
+	/* 说明属性值还未解析完，需要继续解析 */
+	if (xml->curr_node->status == ACL_XML2_S_AVAL)
+		return data;
+
 	/* 当状态发生改变时，则说明属性值已经完毕 */
-	if (xml->curr_node->status != ACL_XML2_S_AVAL) {
-		/*
-		if (LEN(attr->value) > 0 && xml->decode_buf != NULL) {
-			ACL_VSTRING_RESET(xml->decode_buf);
-			acl_xml_decode(STR(attr->value), xml->decode_buf);
-			if (LEN(xml->decode_buf) > 0)
-				STRCPY(attr->value, STR(xml->decode_buf));
-		}
-		*/
 
-		/* 将该标签ID号映射至哈希表中，以便于快速查询 */
-		if (IS_ID(attr->name) && *attr->value != 0) {
-			const char *ptr = attr->value;
+	if ((xml->flag & ACL_XML2_FLAG_XML_DECODE) && attr->value_size > 1
+		&& xml->len > 0)
+	{
+		const char *val = attr->value;
 
-			/* 防止重复ID被插入现象 */
-			if (acl_htable_find(xml->id_table, ptr) == NULL) {
-				acl_htable_enter(xml->id_table, ptr, attr);
-
-				/* 当该属性被加入哈希表后才会赋于节点 id */
-				xml->curr_node->id = attr->value;
-			}
-		}
-
-		/* 必须将该节点的当前属性对象置空，以便于继续解析时
-		 * 可以创建新的属性对象
-		 */
-		xml->curr_node->curr_attr = NULL;
+		attr->value = xml->ptr;
+		(void) acl_xml_decode2(val, &xml->ptr, &xml->len);
+		attr->value_size = xml->ptr - attr->value - 1;
 	}
+
+	/* 将该标签ID号映射至哈希表中，以便于快速查询 */
+	if (IS_ID(attr->name) && *attr->value != 0) {
+		const char *ptr = attr->value;
+
+		/* 防止重复ID被插入现象 */
+		if (acl_htable_find(xml->id_table, ptr) == NULL) {
+			acl_htable_enter(xml->id_table, ptr, attr);
+
+			/* 当该属性被加入哈希表后才会赋于节点 id */
+			xml->curr_node->id = attr->value;
+		}
+	}
+
+	/* 必须将该节点的当前属性对象置空，以便于继续解析时
+	 * 可以创建新的属性对象
+	 */
+	xml->curr_node->curr_attr = NULL;
 
 	return data;
 }
@@ -708,11 +758,10 @@ static const char *xml_parse_text(ACL_XML2 *xml, const char *data)
 
 			data++;
 			xml->len--;
-			*xml->ptr++ = 0;
 			xml->curr_node->text_size = xml->ptr
 				- xml->curr_node->text;
+			*xml->ptr++ = 0;
 			xml->curr_node->status = ACL_XML2_S_RLT;
-			/* 此处可对文本内容进行 xml 解码 */
 			break;
 		}
 
@@ -722,6 +771,30 @@ static const char *xml_parse_text(ACL_XML2 *xml, const char *data)
 		data++;
 		xml->len--;
 		*xml->ptr++ = ch;
+	}
+
+
+	if (xml->curr_node->status == ACL_XML2_S_RLT
+		&& (xml->flag & ACL_XML2_FLAG_XML_DECODE)
+		&& xml->curr_node->text_size > 1
+		&& xml->len > 0)
+	{
+		char *txt = xml->curr_node->text;
+
+		xml->curr_node->text = xml->ptr;
+		(void) acl_xml_decode2(txt, &xml->ptr, &xml->len);
+		xml->curr_node->text_size = xml->ptr
+			- xml->curr_node->text - 1;
+
+		/* xml->ptr pointer to the position after '\0', but we
+		 * want to get the position before '\0', so subtract 2.
+		 */
+		txt = xml->ptr - 2;
+
+		while (txt >= xml->curr_node->text && IS_SPACE(*txt)) {
+			*txt-- = 0;
+			xml->curr_node->text_size--;
+		}
 	}
 
 	return data;
@@ -859,8 +932,8 @@ static const char *xml_parse_right_tag(ACL_XML2 *xml, const char *data)
 				return data;
 			data++;
 			xml->len--;
-			*xml->ptr++ = 0;
 			curr_node->rtag_size = xml->ptr - curr_node->rtag;
+			*xml->ptr++ = 0;
 			curr_node->status = ACL_XML2_S_RGT;
 			break;
 		}
@@ -936,12 +1009,12 @@ static struct XML_STATUS_MACHINE status_tab[] = {
 
 const char *acl_xml2_update(ACL_XML2 *xml, const char *data)
 {
+	const char *myname = "acl_xml2_update";
+
 	if (data == NULL || *data == 0)
 		return data;
 
 	if (!(xml->flag & ACL_XML2_FLAG_MULTI_ROOT) && xml->root_cnt > 0)
-		return data;
-	if (xml->len < MIN_LEN)
 		return data;
 
 	/* XML 解析器状态机循环处理过程 */
@@ -966,8 +1039,12 @@ const char *acl_xml2_update(ACL_XML2 *xml, const char *data)
 		}
 
 		data = status_tab[xml->curr_node->status].callback(xml, data);
-		if (xml->len < MIN_LEN)
+
+		if (xml->len < MIN_LEN && acl_xml2_mmap_extend(xml) == 0) {
+			acl_msg_warn("%s(%d), %s: space not enougth!",
+				__FILE__, __LINE__, myname);
 			break;
+		}
 	}
 
 	return data;

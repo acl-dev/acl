@@ -502,6 +502,12 @@
     <ClCompile Include="src\smtp\mail_message.cpp">
       <Filter>src\smtp</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\xml1.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\xml2.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -1034,6 +1040,12 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\smtp\mail_message.hpp">
       <Filter>include\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\xml1.hpp">
+      <Filter>include\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\xml2.hpp">
+      <Filter>include\stdlib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

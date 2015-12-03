@@ -19,10 +19,11 @@ class ACL_CPP_API rfc2047
 public:
 	/**
 	 * 构造函数
-	 * @param strip_sp {bool} 在解码过程中是否去掉回车换行符及每行开头的空格及TAB
+	 * @param strip_sp {bool} 在解码过程中是否去掉回车换行符及每行开头的
+	 *  空格及TAB
 	 * @param addCrlf {bool} 在编码过程中当数据比较长时是否自动添加 "\r\n"
 	 */
-	rfc2047(bool strip_sp = false, bool addCrlf = true);
+	rfc2047(bool strip_sp = true, bool addCrlf = true);
 	~rfc2047();
 
 	/**
@@ -105,14 +106,13 @@ public:
 	 * 重置解析器状态后, 该解析器可再次使用
 	 * @param strip_sp {bool} 是否去掉回车换行符及每行开头的空格及TAB
 	 */
-	void reset(bool strip_sp = false);
+	void reset(bool strip_sp = true);
 
 	/**
 	 * 调试输出解析结果
 	 */
 	void debug_rfc2047(void) const;
 
-protected:
 private:
 	std::list<rfc2047_entry*> m_List;
 	rfc2047_entry* m_pCurrentEntry;

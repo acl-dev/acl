@@ -1,6 +1,21 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+385) 2015.12.3
+385.1) feature: xml2 类新增构造函数以文件句柄为构造参数
+385.2) bugfix: polarssl_io::read 中当 ssl_read 返回数据后，应该通过调用函数
+ssl_get_bytes_avail 判断 SSL 缓冲区中是否还有数据，如果有，则应该设置
+ACL_VSTREAM::sys_read_ready 标志位
+
+384) 2015.12.2
+384.1) 接口调整：redis 接口调整，尽量防止在使用变参时出错
+384.2) feature: 类 xml2 新增构造函数，可以更方便地使用内存文件映射方式解析
+和创建 xml 对象（目前仅支持 UNIX）
+
+383) 2015.11.30
+383.1) feature: 增加了 xml1.cpp/xml1.hpp 以便于支持第一个 xml 解析器
+383.2) feature: 增加了 xml2.cpp/xml2.hpp 以便于支持第二个 xml 解析器
+
 382) 2015.11.26
 382.1) bugfix: redis_zset::zstore 在判断 aggregate 时有误
 

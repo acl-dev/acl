@@ -430,6 +430,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\stdlib\xml.cpp">
 				</File>
 				<File
+					RelativePath=".\src\stdlib\xml1.cpp">
+				</File>
+				<File
+					RelativePath=".\src\stdlib\xml2.cpp">
+				</File>
+				<File
 					RelativePath=".\src\stdlib\zlib_stream.cpp">
 				</File>
 				<Filter
@@ -1070,6 +1076,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\xml.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\xml1.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\xml2.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\zlib_stream.hpp">

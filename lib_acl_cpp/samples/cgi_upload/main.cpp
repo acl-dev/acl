@@ -82,7 +82,7 @@ public:
 #endif
 
 		// 创建 xml 格式的数据体
-		xml body;
+		xml1 body;
 		body.get_root().add_child("root", true)
 			.add_child("content_type", true)
 				.add_attr("type", (int) req.getRequestType())

@@ -8,7 +8,7 @@ static bool test_del(acl::redis_key& redis, int i)
 
 	key.format("%s_%d", __keypre.c_str(), i);
 	redis.clear();
-	int ret = redis.del(key.c_str(), NULL);
+	int ret = redis.del(key.c_str());
 	if (ret < 0)
 	{
 		printf("del key: %s error\r\n", key.c_str());

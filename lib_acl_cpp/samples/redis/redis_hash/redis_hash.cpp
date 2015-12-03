@@ -213,7 +213,7 @@ static bool test_hdel(acl::redis_hash& redis, int n)
 		attr.format("attr1");
 
 		redis.clear();
-		int ret = redis.hdel(key.c_str(), attr.c_str(), NULL);
+		int ret = redis.hdel(key.c_str(), attr.c_str());
 		if (ret < 0)
 		{
 			printf("hdel key: %s error: %s\r\n",
