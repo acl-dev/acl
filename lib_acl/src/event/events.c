@@ -25,6 +25,10 @@ void event_check_fds(ACL_EVENT *ev)
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = ev->fdcnt_ready;
 				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+			} else if (fdp->stream->sys_read_ready) {
+				fdp->event_type |= ACL_EVENT_READ;
+				fdp->fdidx_ready = ev->fdcnt_ready;
+				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
 			} else if (fdp->r_ttl > 0 && ev->present > fdp->r_ttl) {
 				fdp->event_type |= ACL_EVENT_RW_TIMEOUT;
 				fdp->fdidx_ready = ev->fdcnt_ready;
@@ -62,6 +66,10 @@ int event_prepare(ACL_EVENT *ev)
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
 			if (ACL_VSTREAM_BFRD_CNT(fdp->stream) > 0) {
 				fdp->stream->sys_read_ready = 0;
+				fdp->event_type |= ACL_EVENT_READ;
+				fdp->fdidx_ready = ev->fdcnt_ready;
+				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+			} else if (fdp->stream->sys_read_ready) {
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = ev->fdcnt_ready;
 				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
@@ -191,6 +199,10 @@ int event_thr_prepare(ACL_EVENT *ev)
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
 			if (ACL_VSTREAM_BFRD_CNT(fdp->stream) > 0) {
 				fdp->stream->sys_read_ready = 0;
+				fdp->event_type = ACL_EVENT_READ;
+				fdp->fdidx_ready = ev->fdcnt_ready;
+				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+			} else if (fdp->stream->sys_read_ready) {
 				fdp->event_type = ACL_EVENT_READ;
 				fdp->fdidx_ready = ev->fdcnt_ready;
 				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
