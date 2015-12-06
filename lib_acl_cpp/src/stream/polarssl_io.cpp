@@ -312,9 +312,12 @@ int polarssl_io::read(void* buf, size_t len)
 	}
 
 	// 如果 SSL 缓冲区中还有未读数据，则需要重置流可读标志位，
-	// 这样可以触发 acl_vstream.c 中的系统读过程
+	// 这样可以触发 acl_vstream.c 及 events.c 中的系统读过程
 	if (ssl_get_bytes_avail((ssl_context*) ssl_) > 0)
 		stream_->sys_read_ready = 1;
+	// 否则，取消可读状态，表明 SSL 缓冲区里没有数据
+	else
+		stream_->sys_read_ready = 0;
 
 	return ret;
 #else
@@ -382,19 +385,9 @@ int polarssl_io::sock_read(void *ctx, unsigned char *buf, size_t len)
 		 // else: ret == 1
 	}
 
-	// 当事件引擎设置了套接字可读的状态时，超时等待为 0 秒
-
-	int  timeout;
-	if (vs->sys_read_ready)
-		timeout = 0;
-	else
-		timeout = vs->rw_timeout;
-
-	int ret = acl_socket_read(fd, buf, len, timeout, vs, NULL);
-
-	// 须将该标志位置 0，这样在非阻塞模式下，如果 polarssl 在重复
-	// 调用 sock_read 函数时，可以在前面提前返回以免阻塞在 IO 读过程
-	vs->sys_read_ready = 0;
+	// acl_socket_read 内部会根据 vs->sys_read_ready 标志位决定是否需要
+	// 以超时方式读数据，同时会自动清除 vs->sys_read_ready 标志位
+	int ret = acl_socket_read(fd, buf, len, vs->rw_timeout, vs, NULL);
 
 	if (ret < 0)
 	{

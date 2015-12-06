@@ -55,13 +55,19 @@ int acl_xml_encode(const char *in, ACL_VSTRING *out)
 {
 	const unsigned char *ptr = (const unsigned char*) in;
 	int  n = 0;
+	size_t len = strlen(in);
+
+	len += len / 2;
+
+	ACL_VSTRING_SPACE(out, len);
 
 	while (*ptr) {
 		if (__charmap[*ptr] != NULL) {
 			acl_vstring_strcat(out, __charmap[*ptr]);
 			n++;
-		} else
+		} else {
 			ACL_VSTRING_ADDCH(out, *ptr);
+		}
 		ptr++;
 	}
 
@@ -146,10 +152,12 @@ static const char* markup_unescape(const char* in, ACL_VSTRING* out)
 
 int acl_xml_decode(const char *in, ACL_VSTRING *out)
 {
-	int   n = 0, len;
+	int   n = 0, len = (int) strlen(in);
 	const char *ptr = in, *pre;
 	const ACL_TOKEN *token;
 	const XML_SPEC *spec;
+
+	ACL_VSTRING_SPACE(out, len);
 
 	acl_pthread_once(&__token_once, xml_decode_init);
 	if (__token_tree == NULL)

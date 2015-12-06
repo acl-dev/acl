@@ -108,7 +108,8 @@ acl_off_t acl_lseek(ACL_FILE_HANDLE fh, acl_off_t offset, int whence)
 	else if (whence == SEEK_END)
 		method = FILE_END;
 	else {
-		acl_msg_error("%s(%d): invalid whence(%d)", myname, __LINE__, whence);
+		acl_msg_error("%s(%d): invalid whence(%d)",
+			myname, __LINE__, whence);
 		return -1;
 	}
 
@@ -146,8 +147,8 @@ int acl_file_write(ACL_FILE_HANDLE fh, const void *buf, size_t size,
 	return nWritten;
 }
 
-int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vector, int count,
-	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
+int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vector,
+	int count, int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
 	int   i, n;
@@ -228,7 +229,8 @@ int acl_fstat(ACL_FILE_HANDLE fh, struct acl_stat *buf)
 				unsigned long ulAvail;
 				int rc;
 
-				rc = PeekNamedPipe(fh, NULL, 0, NULL, &ulAvail, NULL);
+				rc = PeekNamedPipe(fh, NULL, 0, NULL,
+					&ulAvail, NULL);
 				if (rc) {
 					buf->st_size = (_off_t) ulAvail;
 				} else {
@@ -260,8 +262,9 @@ int acl_fstat(ACL_FILE_HANDLE fh, struct acl_stat *buf)
 	if (bhfi.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
 		buf->st_mode |= (_S_IREAD + (_S_IREAD >> 3) + (_S_IREAD >> 6));
 	else
-		buf->st_mode |= ((_S_IREAD|_S_IWRITE) + ((_S_IREAD|_S_IWRITE) >> 3)
-				+ ((_S_IREAD|_S_IWRITE) >> 6));
+		buf->st_mode |= ((_S_IREAD|_S_IWRITE)
+			+ ((_S_IREAD|_S_IWRITE) >> 3)
+			+ ((_S_IREAD|_S_IWRITE) >> 6));
 
 	/* set file date fields */
 	if (!FileTimeToLocalFileTime(&(bhfi.ftLastWriteTime), &LocalFTime)
@@ -283,8 +286,8 @@ int acl_fstat(ACL_FILE_HANDLE fh, struct acl_stat *buf)
 		||bhfi.ftLastAccessTime.dwHighDateTime)
 	{
 
-		if (!FileTimeToLocalFileTime(&(bhfi.ftLastAccessTime),
-									&LocalFTime )
+		if (!FileTimeToLocalFileTime(
+			&(bhfi.ftLastAccessTime), &LocalFTime )
 			|| !FileTimeToSystemTime(&LocalFTime, &SystemTime))
 		{
 			retval = -1;
@@ -336,7 +339,7 @@ int acl_fstat(ACL_FILE_HANDLE fh, struct acl_stat *buf)
 
 /* Common return code */
 done:
-	return(retval);
+	return retval;
 }
 
 #elif defined(ACL_UNIX)

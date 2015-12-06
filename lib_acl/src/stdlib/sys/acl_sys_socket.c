@@ -99,7 +99,7 @@ int acl_socket_close(ACL_SOCKET fd)
 }
 
 int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
-	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
+	int timeout, ACL_VSTREAM *fp, void *arg acl_unused)
 {
 #if 0
 	WSABUF wsaData;
@@ -117,6 +117,11 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	return dwBytes;
 #else
 	int ret;
+
+	if (fp != NULL && fp->sys_read_ready) {
+		fp->sys_read_ready = 0;
+		timeout = 0;
+	}
 
 	if (timeout > 0 && acl_read_wait(fd, timeout) < 0) {
 		errno = acl_last_error();
@@ -212,12 +217,18 @@ int acl_socket_close(ACL_SOCKET fd)
 }
 
 int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
-	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
+	int timeout, ACL_VSTREAM *fp, void *arg acl_unused)
 {
+	if (fp != NULL && fp->sys_read_ready) {
+		fp->sys_read_ready = 0;
+		timeout = 0;
+	}
+
 	if (timeout > 0 && acl_read_wait(fd, timeout) < 0) {
 		errno = acl_last_error();
 		return -1;
 	}
+
 	return read(fd, buf, size);
 }
 
