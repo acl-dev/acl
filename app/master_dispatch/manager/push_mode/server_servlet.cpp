@@ -158,7 +158,7 @@ bool server_servlet::doJson(acl::HttpServletRequest& req,
 
 	// 将 JSON 数据转为 XML 数据的过程
 
-	acl::xml xml;
+	acl::xml1 xml;
 	acl::xml_node& server_node = xml.create_node("server");
 	xml.get_root().add_child(server_node);
 
@@ -284,7 +284,7 @@ bool server_servlet::doXml(acl::HttpServletRequest& req,
 	 * </server>
 	 */
 
-	acl::xml xml(data.c_str());
+	acl::xml1 xml(data.c_str());
 	acl::xml_node& root = xml.get_root();
 	acl::xml_node* child = root.first_child();
 	acl::xml_node* server = NULL;

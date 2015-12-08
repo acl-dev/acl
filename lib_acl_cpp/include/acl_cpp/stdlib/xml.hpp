@@ -209,7 +209,19 @@ public:
 	 * @return {xml_node&}
 	 */
 	virtual xml_node& get_parent(void) const = 0;
+
+	/**
+	 * 设置本节点的父级节点
+	 * @param node {xml_node*} 父节点
+	 * @return {xml_node&}
+	 */
 	virtual xml_node& set_parent(xml_node* node) = 0;
+
+	/**
+	 * 将本节点及其子节点从 xml 树中分离，其内存将由 xml 对象统一释放
+	 * @return {int} 返回被释放的节点个数
+	 */
+	virtual int detach(void) = 0;
 
 	/**
 	 * 获得本节点的第一个子节点，需要遍历子节点时必须首先调用此函数
@@ -328,10 +340,9 @@ public:
 	/**
 	 * 从 xml 对象中获得对应标签名的第一个 xml 节点对象
 	 * @param tag {const char*} 标签名(不区分大小写)
-	 * @return {const xml_node*} 返回空表明该标签对应的 xml 节点不存在
+	 * @return {xml_node*} 返回空表明该标签对应的 xml 节点不存在
 	 */
-	virtual const xml_node* getFirstElementByTag(
-			const char* tag) const = 0;
+	virtual xml_node* getFirstElementByTag(const char* tag) const = 0;
 
 	/**
 	 * 从 xml 对象中获得所有的与给定多级标签名相同的 xml 节点的集合
@@ -355,10 +366,9 @@ public:
 	 *  <root> <first> <second> <third name="test2"> text2 </third> </second> </first> ...
 	 *  <root> <first> <second> <third name="test3"> text3 </third> </second> </first> ...
 	 *  可以通过多级标签名：root/first/second/third 一次性查出所有符合条件的节点
-	 * @return {const xml_node*} 返回空表示不存在
+	 * @return {xml_node*} 返回空表示不存在
 	 */
-	virtual const xml_node* getFirstElementByTags(
-		const char* tags) const = 0;
+	virtual xml_node* getFirstElementByTags(const char* tags) const = 0;
 
 	/**
 	 * 从 xml 对象中获得所有与给定属性名 name 的属性值相同的 xml 节点集合
@@ -387,15 +397,15 @@ public:
 	 * @return {const xml_node*} xml 节点元素, 若返回 NULL 则表示没有符合
 	 *  条件的 xml 节点, 返回值不需要释放
 	 */
-	virtual const xml_node* getElementById(const char* id) const = 0;
+	virtual xml_node* getElementById(const char* id) const = 0;
 
 	/**
 	 * 创建一个 xml_node 节点对象
 	 * @param tag {const char*} 标签名
 	 * @param text {const char*} 文本字符串
-	 * @return {xml_node*} 新产生的 xml_node 对象不需要用户手工释放，因为在
-	 *  xml 对象被释放时这些节点会自动被释放，当然用户也可以在不用时调用
-	 *  reset 来释放这些 xml_node 节点对象
+	 * @return {xml_node*} 新产生的 xml_node 对象不需要用户手工释放，因为
+	 *  在 xml 对象被释放时这些节点会自动被释放，当然用户也可以在不用时调
+	 *  用 reset 来释放这些 xml_node 节点对象
 	 */
 	virtual xml_node& create_node(const char* tag,
 		const char* text = NULL) = 0;
@@ -404,8 +414,8 @@ public:
 	 * 创建一个 xml_node 节点对象
 	 * @param tag {const char*} 标签名
 	 * @param number {long long int} 64 位整数
-	 * @return {xml_node*} 新产生的 xml_node 对象不需要用户手工释放，因为在
-	 *  xml 对象被释放时这些节点会自动被释放，当然用户也可以在不用时调用
+	 * @return {xml_node*} 新产生的 xml_node 对象不需要用户手工释放，因为
+	 *  在xml 对象被释放时这些节点会自动被释放，当然用户也可以在不用时调用
 	 *  reset 来释放这些 xml_node 节点对象
 	 */
 #if defined(_WIN32) || defined(_WIN64)
@@ -443,7 +453,12 @@ public:
 	 */
 	virtual void build_xml(string& out) const { (void) out; };
 
-	virtual const char* to_string(size_t* len) const = 0;
+	/**
+	 * 将 xml 对象转换为字符串
+	 * @param len {size_t*} 非 NULL 时存放数据长度
+	 * @return {const char*} xml 字符串
+	 */
+	virtual const char* to_string(size_t* len = NULL) const = 0;
 
 public:
 	// pipe_stream 虚函数重载

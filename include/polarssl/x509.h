@@ -3,12 +3,9 @@
  *
  * \brief X.509 certificate and private key decoding
  *
- *  Copyright (C) 2006-2011, Brainspark B.V.
+ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
  *
- *  This file is part of PolarSSL (http://www.polarssl.org)
- *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
- *
- *  All rights reserved.
+ *  This file is part of mbed TLS (https://polarssl.org)
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,6 +33,18 @@
  * \{ 
  */
  
+#if !defined(POLARSSL_CONFIG_OPTIONS)
+/**
+ * Maximum number of intermediate CAs in a verification chain.
+ * That is, maximum length of the chain, excluding the end-entity certificate
+ * and the trusted root certificate.
+ *
+ * Set this to a low value to prevent an adversary from making you waste
+ * resources verifying an overlong certificate chain.
+ */
+#define POLARSSL_X509_MAX_INTERMEDIATE_CA   8
+#endif
+
 /** 
  * \name X509 Error codes
  * \{

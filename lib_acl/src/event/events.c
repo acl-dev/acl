@@ -69,7 +69,9 @@ int event_prepare(ACL_EVENT *ev)
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = ev->fdcnt_ready;
 				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
-			} else if (fdp->stream->sys_read_ready) {
+			} else if (fdp->stream->sys_read_ready
+				&& (fdp->event_type & ACL_EVENT_ACCEPT))
+			{
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = ev->fdcnt_ready;
 				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
@@ -86,10 +88,10 @@ int event_prepare(ACL_EVENT *ev)
 				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
 			} else
 				nwait++;
-		} else {
+		} else
 			nwait++;
-		}
 	}
+
 	return nwait;
 }
 
@@ -106,7 +108,7 @@ void event_fire(ACL_EVENT *ev)
 	for (i = 0; i < ev->fdcnt_ready; i++) {
 		fdp = ev->fdtabs_ready[i];
 
-		/* ev->fdtabs_ready[i] maybe be set NULL in timer callback */
+		/* ev->fdtabs_ready[i] maybe been set NULL in timer callback */
 		if (fdp == NULL || fdp->stream == NULL) 
 			continue;
 
@@ -121,7 +123,7 @@ void event_fire(ACL_EVENT *ev)
 				r_callback(ACL_EVENT_XCPT, ev,
 					fdp->stream, fdp->r_context);
 
-			/* ev->fdtabs_ready[i] maybe be set NULL in r_callback */
+			/* ev->fdtabs_ready[i] maybe been set NULL in r_callback */
 			if (w_callback && ev->fdtabs_ready[i])
 				w_callback(ACL_EVENT_XCPT, ev,
 					fdp->stream, fdp->w_context);
@@ -141,7 +143,7 @@ void event_fire(ACL_EVENT *ev)
 					fdp->stream, fdp->r_context);
 			}
 
-			/* ev->fdtabs_ready[i] maybe be set NULL in r_callback */
+			/* ev->fdtabs_ready[i] maybe been set NULL in r_callback */
 			if (w_timeout > 0 && w_callback && ev->fdtabs_ready[i]) {
 				fdp->w_ttl = ev->present + fdp->w_timeout;
 				fdp->w_callback(ACL_EVENT_RW_TIMEOUT, ev,
@@ -157,7 +159,7 @@ void event_fire(ACL_EVENT *ev)
 			fdp->r_callback(type, ev, fdp->stream, fdp->r_context);
 		}
 
-		/* ev->fdtabs_ready[i] maybe be set NULL in fdp->r_callback() */
+		/* ev->fdtabs_ready[i] maybe been set NULL in fdp->r_callback() */
 		if (ev->fdtabs_ready[i] == NULL)
 			continue;
 

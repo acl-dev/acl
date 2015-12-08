@@ -112,7 +112,7 @@ service http_server {
 
 #	crt_file = {install_path}/conf/ssl/mm263com1.crt
 #	key_file = {install_path}/conf/ssl/mm263com.key
-	crt_file = imap.crt
-	key_file = imap.key
+	crt_file = ssl_crt.pem
+	key_file = ssl_key.pem
 }
 

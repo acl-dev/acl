@@ -113,11 +113,11 @@ bool master_service::thread_on_read(acl::socket_stream* conn)
 
 	if (ssl->handshake_ok() == false)
 	{
-		//logger("handshake trying again...");
+		logger("handshake trying again...");
 		return true;
 	}
 
-	//logger("handshake_ok");
+	logger("handshake_ok");
 
 	return do_run(*conn, ssl);
 }

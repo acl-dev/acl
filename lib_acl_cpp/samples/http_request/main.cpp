@@ -98,7 +98,7 @@ private:
 	// 处理 text/xml 类型数据
 	bool do_xml(acl::http_request& req)
 	{
-		acl::xml body;
+		acl::xml1 body;
 		if (req.get_body(body, to_charset_) == false)
 		{
 			logger_error("get http body error");

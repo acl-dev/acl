@@ -51,17 +51,11 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 		res.addCookie("mycookie", "{xxx}");
 	*/
 
-	bool keep_alive = req.isKeepAlive();
-
-	res.setContentType("text/xml; charset=utf-8")	// 设置响应字符集
-		.setKeepAlive(keep_alive)		// 设置是否保持长连接
-		.setChunkedTransferEncoding(true);	// 采用 chunk 传输方式
-
 	const char* param1 = req.getParameter("name1");
 	const char* param2 = req.getParameter("name2");
 
 	// 创建 xml 格式的数据体
-	acl::xml body;
+	acl::xml1 body;
 	body.get_root()
 		.add_child("root", true)
 			.add_child("params", true)
@@ -73,7 +67,18 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	acl::string buf;
 	body.build_xml(buf);
 
+	printf(">>>buf: %s\r\n", buf.c_str());
+
+	bool keep_alive = req.isKeepAlive();
+
+	res.setContentType("text/xml; charset=utf-8")	// 设置响应字符集
+		.setKeepAlive(keep_alive)		// 设置是否保持长连接
+		.setContentLength(buf.size())
+		.setChunkedTransferEncoding(true);	// 采用 chunk 传输方式
+
 	// 发送 http 响应体，因为设置了 chunk 传输模式，所以需要多调用一次
 	// res.write 且两个参数均为 0 以表示 chunk 传输数据结束
-	return res.write(buf) && res.write(NULL, 0) && keep_alive;
+	bool ret = res.write(buf) && res.write(NULL, 0) && keep_alive;
+	printf(">>>ret: %s\r\n", ret ? "ok":"err");
+	return ret;
 }

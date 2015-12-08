@@ -16,15 +16,19 @@ int main(int argc, char* argv[])
 
 	// 开始运行
 
-	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
+	if (argc >= 2 && strcmp(argv[1], "help") == 0)
+	{
+		printf("usage: %s alone addr[ip:port] conf_file\r\n", argv[0]);
+	}
+	else if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
 		acl::log::stdout_open(true);  // 日志输出至标准输出
 		const char* addr = ":9800";
 		printf("listen on: %s\r\n", addr);
 		if (argc >= 3)
-			ms.run_alone(addr, argv[2], 1, 1);  // 单独运行方式
+			ms.run_alone(addr, argv[2], 0, 0);  // 单独运行方式
 		else
-			ms.run_alone(addr, NULL, 1, 1);  // 单独运行方式
+			ms.run_alone(addr, NULL, 0, 0);  // 单独运行方式
 
 		printf("Enter any key to exit now\r\n");
 		getchar();

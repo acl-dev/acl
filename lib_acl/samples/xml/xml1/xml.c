@@ -325,7 +325,7 @@ static void parse_xml(int once, const char *data)
 		}
 	}
 
-	pnode = acl_xml_getElementById(xml, "id2_3");
+	pnode = acl_xml_getElementById(xml, "id12");
 	if (pnode) {
 		int   ndel = 0, node_cnt;
 
@@ -333,7 +333,10 @@ static void parse_xml(int once, const char *data)
 		printf(">>>before delete %s, total: %d\n", STR(pnode->ltag), xml->node_cnt);
 		ndel = acl_xml_node_delete(pnode);
 		node_cnt = xml->node_cnt;
-		printf(">>>after delete id2_3(%d deleted), total: %d\n", ndel, node_cnt);
+		printf(">>>after delete id12(%d deleted), total: %d\n", ndel, node_cnt);
+
+		printf("Enter any key to continue ...\r\n");
+		getchar();
 	}
 
 	acl_foreach(iter1, xml) {
@@ -341,7 +344,7 @@ static void parse_xml(int once, const char *data)
 		printf(">>tag: %s\n", STR(node->ltag));
 	}
 
-	pnode = acl_xml_getElementById(xml, "id2_3");
+	pnode = acl_xml_getElementById(xml, "id12");
 	if (pnode) {
 		printf("-------------- walk %s node -------------------\n", STR(pnode->ltag));
 		/* 遍历该 xml 结点的属性 */
@@ -351,7 +354,7 @@ static void parse_xml(int once, const char *data)
 					STR(attr->name), STR(attr->value));
 		}
 	} else {
-		printf("---- the id2_3 be deleted----\n");
+		printf("---- the id12 be deleted----\n");
 	}
 
 	build_xml(xml, data);

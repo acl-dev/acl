@@ -3,12 +3,9 @@
  *
  * \brief Run-time version information
  *
- *  Copyright (C) 2006-2012, Brainspark B.V.
+ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
  *
- *  This file is part of PolarSSL (http://www.polarssl.org)
- *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
- *
- *  All rights reserved.
+ *  This file is part of mbed TLS (https://polarssl.org)
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,16 +36,16 @@
  */
 #define POLARSSL_VERSION_MAJOR  1
 #define POLARSSL_VERSION_MINOR  2
-#define POLARSSL_VERSION_PATCH  11
+#define POLARSSL_VERSION_PATCH  18
 
 /**
  * The single version number has the following structure:
  *    MMNNPP00
  *    Major version | Minor version | Patch version
  */
-#define POLARSSL_VERSION_NUMBER         0x01020B00
-#define POLARSSL_VERSION_STRING         "1.2.11"
-#define POLARSSL_VERSION_STRING_FULL    "PolarSSL 1.2.11"
+#define POLARSSL_VERSION_NUMBER         0x01021200
+#define POLARSSL_VERSION_STRING         "1.2.18"
+#define POLARSSL_VERSION_STRING_FULL    "PolarSSL 1.2.18"
 
 #if defined(POLARSSL_VERSION_C)
 

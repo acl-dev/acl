@@ -22,9 +22,9 @@ int main(int argc, char* argv[])
 		const char* addr = ":1443";
 		printf("listen on: %s\r\n", addr);
 		if (argc >= 3)
-			ms.run_alone(addr, argv[2], 5);  // 单独运行方式
+			ms.run_alone(addr, argv[2], 0);  // 单独运行方式
 		else
-			ms.run_alone(addr, NULL, 5);  // 单独运行方式
+			ms.run_alone(addr, NULL, 0);  // 单独运行方式
 
 		printf("Enter any key to exit now\r\n");
 		getchar();

@@ -280,12 +280,13 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	acl::disque_client_cluster manager(conn_timeout, rw_timeout);
+	acl::disque_client_cluster manager;
 	const std::vector<acl::string>& tokens = addr_list.split2(";, \t");
 
 	std::vector<acl::string>::const_iterator cit;
 	for (cit = tokens.begin(); cit != tokens.end(); ++cit)
-		manager.set((*cit).c_str(), max_threads);
+		manager.set((*cit).c_str(), max_threads,
+			conn_timeout, rw_timeout);
 
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++)

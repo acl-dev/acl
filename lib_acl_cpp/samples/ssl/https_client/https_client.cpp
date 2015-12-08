@@ -39,7 +39,7 @@ bool https_client::connect_server(acl::http_client& client)
 
 	if (ssl_conf_)
 	{
-		logger_debug(DEBUG, 1, "begin open ssl");
+		logger("begin open ssl");
 
 		acl::polarssl_io* ssl = new acl::polarssl_io(*ssl_conf_, false);
 		if (client.get_stream().setup_hook(ssl) == ssl)
@@ -49,7 +49,7 @@ bool https_client::connect_server(acl::http_client& client)
 			return false;
 		}
 		else
-			logger_debug(DEBUG, 1, "open ssl ok");
+			logger("open ssl ok");
 	}
 
 	return true;
@@ -101,9 +101,9 @@ int https_client::http_request(int count)
 			}
 			else if (ret == 0)
 				break;
-#if 0
+#if 1
 			buf[ret] = 0;
-			printf("%s", buf);
+			printf("[%s]\r\n", buf);
 			fflush(stdout);
 #endif
 		}
@@ -127,6 +127,8 @@ int https_client::http_request(int count)
 			tmp.format("total: %d, curr: %d", count, i);
 			ACL_METER_TIME(tmp.c_str());
 		}
+
+		printf("--------------------------------------------\r\n");
 	}
 
 	delete client;

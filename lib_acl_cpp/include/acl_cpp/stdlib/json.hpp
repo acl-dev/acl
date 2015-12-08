@@ -300,9 +300,16 @@ public:
 	int   children_count(void) const;
 
 	/**
-	 * 当在遍历该 json 节点时，内部会动态产生一些临时 json_node 对象，调用此函数
-	 * 可以清空这些对象，一旦调用此函数进行了清除，则由 first_child/next_child
-	 * 返回的 json_node 节点对象将不再可用，否则会产生内存非法访问
+	 * 将本节点及其子节点从 json 树中删除，其内存将由 json 对象统一释放
+	 * @return {int} 被释放的节点数量
+	 */
+	int detach(void);
+
+	/**
+	 * 当在遍历该 json 节点时，内部会动态产生一些临时 json_node 对象，调用
+	 * 此函数可以清空这些对象，一旦调用此函数进行了清除，则由 first_child,
+	 * next_child 返回的 json_node 节点对象将不再可用，否则会产生内存非法
+	 * 访问
 	 */
 	void clear(void);
 

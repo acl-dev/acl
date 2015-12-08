@@ -143,10 +143,11 @@ int acl_xml_node_delete(ACL_XML_NODE *node)
 		n += acl_xml_node_delete(node_next);
 	}
 
-	node->xml->node_cnt--;
-
 	if (node->id != NULL)
 		acl_htable_delete(node->xml->id_table, STR(node->id), NULL);
+
+	acl_ring_detach(&node->node);
+	node->xml->node_cnt--;
 
 	return n;
 }

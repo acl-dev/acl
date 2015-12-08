@@ -117,6 +117,13 @@ public:
 	xml_node& add_child(xml_node* child, bool return_child = false);
 
 	/**
+	 * @override 将本节点及其子节点从 xml 树中分离，其内存将由 xml
+	 *  对象统一释放
+	 * @return {int} 返回被释放的节点个数
+	 */
+	int detach(void);
+
+	/**
 	 * @override 获得本节点的父级节点对象的引用
 	 * @return {xml_node&}
 	 */
@@ -251,9 +258,9 @@ public:
 	/**
 	 * @override 从 xml 对象中获得对应标签名的第一个 xml 节点对象
 	 * @param tag {const char*} 标签名(不区分大小写)
-	 * @return {const xml_node*} 返回空表明该标签对应的 xml 节点不存在
+	 * @return {xml_node*} 返回空表明该标签对应的 xml 节点不存在
 	 */
-	const xml_node* getFirstElementByTag(const char* tag) const;
+	xml_node* getFirstElementByTag(const char* tag) const;
 
 	/**
 	 * @override 从 xml 对象中获得所有的与给定多级标签名相同的 xml 节点的集合
@@ -276,9 +283,9 @@ public:
 	 *  <root> <first> <second> <third name="test2"> text2 </third> </second> </first> ...
 	 *  <root> <first> <second> <third name="test3"> text3 </third> </second> </first> ...
 	 *  可以通过多级标签名：root/first/second/third 一次性查出所有符合条件的节点
-	 * @return {const xml_node*} 返回空表示不存在
+	 * @return {xml_node*} 返回空表示不存在
 	 */
-	const xml_node* getFirstElementByTags(const char* tags) const;
+	xml_node* getFirstElementByTags(const char* tags) const;
 
 	/**
 	 * @override 从 xml 对象中获得所有与给定属性名 name 的属性值相同的 xml 节点集合
@@ -304,10 +311,10 @@ public:
 	/**
 	 * @override 从 xml 对象中获得指定 id 值的 xml 节点元素
 	 * @param id {const char*} id 值
-	 * @return {const xml_node*} xml 节点元素, 若返回 NULL 则表示没有符合
-	 *  条件的 xml 节点, 返回值不需要释放
+	 * @return {xml_node*} xml 节点元素, 若返回 NULL 则表示没有符合条件的
+	 *  xml 节点, 返回值不需要释放
 	 */
-	const xml_node* getElementById(const char* id) const;
+	xml_node* getElementById(const char* id) const;
 
 	/**
 	 * @override 创建一个 xml_node 节点对象
@@ -351,7 +358,7 @@ public:
 	/**
 	 * @override
 	 */
-	const char* to_string(size_t* len) const;
+	const char* to_string(size_t* len = NULL) const;
 
 public:
 	/**

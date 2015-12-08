@@ -1200,18 +1200,13 @@ static int write_once(ACL_VSTREAM *fp, const void *vptr, int dlen)
 	const char *myname = "write_once";
 	int   n, neintr = 0;
 
-	if (fp == NULL || vptr == NULL || dlen <= 0) {
-		if (fp == NULL)
-			acl_msg_error("%s, %s(%d): fp null",
-				myname, __FILE__, __LINE__);
+	if (vptr == NULL || dlen <= 0) {
 		if (vptr == NULL)
 			acl_msg_error("%s, %s(%d): vptr null",
 				myname, __FILE__, __LINE__);
 		if (dlen <= 0)
 			acl_msg_error("%s, %s(%d): dlen(%d) <= 0",
 				myname, __FILE__, __LINE__, dlen);
-		acl_msg_error("%s, %s(%d): input invalid",
-			myname, __FILE__, __LINE__);
 		return ACL_VSTREAM_EOF;
 	}
 
@@ -1313,9 +1308,9 @@ TAG_AGAIN:
 static int writev_once(ACL_VSTREAM *fp, const struct iovec *vec, int count)
 {
 	const char *myname = "writev_once";
-	int   n, neintr = 0;
+	int   n = 0, neintr = 0;
 
-	if (fp == NULL || vec == NULL || count <= 0) {
+	if (vec == NULL || count <= 0) {
 		acl_msg_error("%s, %s(%d): input invalid",
 			myname, __FILE__, __LINE__);
 		return ACL_VSTREAM_EOF;
@@ -1366,8 +1361,21 @@ TAG_AGAIN:
 			}
 		}
 
-		n = fp->fwritev_fn(ACL_VSTREAM_FILE(fp), vec, count,
-			fp->rw_timeout, fp, fp->context);
+		if (fp->fwrite_fn == acl_file_write) {
+			n = fp->fwritev_fn(ACL_VSTREAM_FILE(fp), vec, count,
+				fp->rw_timeout, fp, fp->context);
+		} else {
+			int i, ret;
+
+			for (i = 0; i < count; i++) {
+				ret = write_once(fp, vec[i].iov_base,
+					vec[i].iov_len);
+				if (ret == ACL_VSTREAM_EOF)
+					return ret;
+				n += ret;
+			}
+		}
+
 		if (n > 0) {
 			fp->sys_offset += n;
 			fp->offset = fp->sys_offset;
@@ -1375,26 +1383,24 @@ TAG_AGAIN:
 			/* 防止缓冲区内的数据与实际不一致, 仅对文件IO有效 */
 			fp->read_cnt = 0;
 		}
-	} else {
-#if 0
-		if (fp->rw_timeout > 0 && acl_write_wait(ACL_VSTREAM_SOCK(fp),
-			fp->rw_timeout) < 0)
-		{
-			fp->errnum = acl_last_error();
-			if (fp->errnum == ACL_ETIMEDOUT) {
-				fp->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
-				SAFE_COPY(fp->errbuf, "write timeout");
-				return -1;
-			}
-			fp->flag |= ACL_VSTREAM_FLAG_ERR;
-			acl_strerror(fp->errnum, fp->errbuf,
-				sizeof(fp->errbuf));
-			return -1;
-		}
-#endif
+	}
 
+	/* 当写接口函数指针为系统默认的接口时，直接写入 */
+	else if (fp->write_fn == acl_socket_write) {
 		n = fp->writev_fn(ACL_VSTREAM_SOCK(fp), vec, count,
 			fp->rw_timeout, fp, fp->context);
+	}
+
+	/* 否则，则模拟 writev 的调用过程 */
+	else {
+		int i, ret;
+
+		for (i = 0; i < count; i++) {
+			ret = write_once(fp, vec[i].iov_base, vec[i].iov_len);
+			if (ret == ACL_VSTREAM_EOF)
+				return ret;
+			n += ret;
+		}
 	}
 
 	if (n > 0) {

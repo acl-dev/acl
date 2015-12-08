@@ -1,6 +1,18 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+515) 2015.12.8
+515.1) bugfix: acl_vstream.c 中当 read/write 接口被注入时，因为没有对应的
+writev 注入方式，所以需要多次调用 write 来模拟 writev 过程
+515.2) bugfix: events.c 中的函数 event_prepare 针对 sys_read_ready = 1 的情况
+需要将 event_type 为 ACL_EVENT_ACCEPT 的情形排除
+
+514) 2015.12.7
+514.1) performance: acl_xml_util.c 中的函数 acl_xml_create_node 在创建节点时，
+如果正文内容比较大，则会因内存的快速频繁膨胀而造成性能损耗，现在采用了预分配策略，
+以减少这种性能损耗
+514.2) bugfix: acl_xml.c/acl_xml2.c/acl_xml3.c 在删除节点时在在残留问题
+
 513) 2015.12.4
 513.1) bugfix: fdp->stream->sys_read_ready should be check in event_prepare
 513.2) performance: acl_xmlcode.c 中的函数 acl_xml_encode/acl_xml_decode 通过

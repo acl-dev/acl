@@ -8,8 +8,8 @@
 char *var_cfg_crt_file;
 char *var_cfg_key_file;
 acl::master_str_tbl var_conf_str_tab[] = {
-	{ "crt_file", "./mm263com1.crt", &var_cfg_crt_file },
-	{ "key_file", "./mm263com.key", &var_cfg_key_file },
+	{ "crt_file", "./ssl_crt.pem", &var_cfg_crt_file },
+	{ "key_file", "./ssl_key.pem", &var_cfg_key_file },
 
 	{ 0, 0, 0 }
 };
@@ -56,10 +56,10 @@ static acl::polarssl_io* setup_ssl(acl::socket_stream& conn,
 	// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册至网络
 	// 连接流对象中，即用 ssl io 替换 stream 中默认的底层 IO 过程
 
-	logger("begin setup ssl hook...");
+	//logger("begin setup ssl hook...");
 
-	// 采用非阻塞 SSL 握手方式
-	acl::polarssl_io* ssl = new acl::polarssl_io(conf, true, true);
+	// 采用阻塞 SSL 握手方式
+	acl::polarssl_io* ssl = new acl::polarssl_io(conf, true, false);
 	if (conn.setup_hook(ssl) == ssl)
 	{
 		logger_error("setup_hook error!");
@@ -67,7 +67,20 @@ static acl::polarssl_io* setup_ssl(acl::socket_stream& conn,
 		return NULL;
 	}
 
-	logger("setup hook ok, tid: %lu", acl::thread::thread_self());
+	if (ssl->handshake() == false)
+	{
+		logger_error("ssl handshake failed");
+		return NULL;
+	}
+
+	if (ssl->handshake_ok() == false)
+	{
+		logger("handshake trying again...");
+		return NULL;
+	}
+
+	logger("handshake_ok");
+
 	return ssl;
 }
 
@@ -83,18 +96,6 @@ bool master_service::thread_on_read(acl::socket_stream* conn)
 	acl::polarssl_io* ssl = setup_ssl(*conn, *conf_);
 	if (ssl == NULL)
 		return false;
-
-	if (ssl->handshake() == false)
-	{
-		logger_error("ssl handshake failed");
-		return false;
-	}
-
-	if (ssl->handshake_ok() == false)
-	{
-		logger("handshake trying ...");
-		return true;
-	}
 
 	return servlet->doRun("127.0.0.1:11211", conn);
 }

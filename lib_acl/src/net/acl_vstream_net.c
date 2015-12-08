@@ -120,6 +120,9 @@ ACL_VSTREAM *acl_vstream_accept_ex(ACL_VSTREAM *listen_stream,
 	ACL_SOCKET servfd = ACL_VSTREAM_SOCK(listen_stream);
 	char buf[256];
 
+	if (listen_stream->sys_read_ready)
+		listen_stream->sys_read_ready = 0;
+
 	if ((listen_stream->type & ACL_VSTREAM_TYPE_LISTEN_INET)) {
 #ifdef ACL_WINDOWS
 		if (!(listen_stream->type & ACL_VSTREAM_TYPE_LISTEN_IOCP))

@@ -3,12 +3,9 @@
  *
  * \brief The RSA public-key cryptosystem
  *
- *  Copyright (C) 2006-2010, Brainspark B.V.
+ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
  *
- *  This file is part of PolarSSL (http://www.polarssl.org)
- *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
- *
- *  All rights reserved.
+ *  This file is part of mbed TLS (https://polarssl.org)
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -580,7 +577,6 @@ int rsa_rsassa_pkcs1_v15_verify( rsa_context *ctx,
 
 /**
  * \brief          Perform a PKCS#1 v2.1 PSS verification (RSASSA-PSS-VERIFY)
- * \brief          Do a public RSA and check the message digest
  *
  * \param ctx      points to an RSA public key
  * \param f_rng    RNG function (Only needed for RSA_PRIVATE)

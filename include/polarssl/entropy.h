@@ -3,12 +3,9 @@
  *
  * \brief Entropy accumulator implementation
  *
- *  Copyright (C) 2006-2013, Brainspark B.V.
+ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
  *
- *  This file is part of PolarSSL (http://www.polarssl.org)
- *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
- *
- *  All rights reserved.
+ *  This file is part of mbed TLS (https://polarssl.org)
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -66,7 +63,7 @@ extern "C" {
  * \return          0 if no critical failures occurred,
  *                  POLARSSL_ERR_ENTROPY_SOURCE_FAILED otherwise
  */
-typedef int (*f_source_ptr)(void *, unsigned char *, size_t, size_t *);
+typedef int (*f_source_ptr)(void *data, unsigned char *output, size_t len, size_t *olen);
 
 /**
  * \brief           Entropy source state

@@ -3,12 +3,9 @@
  *
  * \brief Configuration options (set of defines)
  *
- *  Copyright (C) 2006-2013, Brainspark B.V.
+ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
  *
- *  This file is part of PolarSSL (http://www.polarssl.org)
- *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
- *
- *  All rights reserved.
+ *  This file is part of mbed TLS (https://polarssl.org)
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -334,8 +331,9 @@
  * If set, the X509 parser will not break-off when parsing an X509 certificate
  * and encountering an unknown critical extension.
  *
- * Uncomment to prevent an error.
+ * \warning Depending on your PKI use, enabling this can be a security risk!
  *
+ * Uncomment to prevent an error.
 #define POLARSSL_X509_ALLOW_UNSUPPORTED_CRITICAL_EXTENSION
  */
 
@@ -642,8 +640,8 @@
  * Requires: POLARSSL_TIMING_C
  *
  * Uncomment to enable the HAVEGE random generator.
- */
 #define POLARSSL_HAVEGE_C
+ */
 
 /**
  * \def POLARSSL_MD_C
@@ -1020,6 +1018,11 @@
 // SSL options
 //
 #define SSL_MAX_CONTENT_LEN             16384 /**< Size of the input / output buffer */
+#define SSL_MIN_DHM_BYTES                 128 /**< Min size of the Diffie-Hellman prime */
+
+// X509 options
+//
+#define POLARSSL_X509_MAX_INTERMEDIATE_CA   8 /**< Maximum number of intermediate CAs in a verification chain. */
 
 #endif /* POLARSSL_CONFIG_OPTIONS */
 

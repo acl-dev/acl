@@ -118,8 +118,9 @@ int acl_json_node_delete(ACL_JSON_NODE *node)
 		n += acl_json_node_delete(node_next);
 	}
 
-	node->json->node_cnt--;
 	acl_ring_detach(&node->node);
+	node->json->node_cnt--;
+
 	return n;
 }
 

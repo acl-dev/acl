@@ -5,12 +5,9 @@
  *
  * \author Mathias Olsson <mathias@kompetensum.com>
  *
- *  Copyright (C) 2006-2013, Brainspark B.V.
+ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
  *
- *  This file is part of PolarSSL (http://www.polarssl.org)
- *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
- *
- *  All rights reserved.
+ *  This file is part of mbed TLS (https://polarssl.org)
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -77,7 +74,7 @@ extern "C" {
  * \param pbe_params the ASN.1 algorithm parameters
  * \param mode       either PKCS5_DECRYPT or PKCS5_ENCRYPT
  * \param pwd        password to use when generating key
- * \param plen       length of password
+ * \param pwdlen     length of password
  * \param data       data to process
  * \param datalen    length of data
  * \param output     output buffer

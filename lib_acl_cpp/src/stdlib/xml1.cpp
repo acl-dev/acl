@@ -143,6 +143,11 @@ xml_node& xml1_node::add_child(xml_node* child, bool return_child /* = false */)
 	return *this;
 }
 
+int xml1_node::detach(void)
+{
+	return acl_xml_node_delete(node_);
+}
+
 xml_node& xml1_node::set_parent(xml_node* parent)
 {
 	parent_ = parent;
@@ -260,7 +265,7 @@ const std::vector<xml_node*>& xml1::getElementsByTagName(const char* tag) const
 	return elements_;
 }
 
-const xml_node* xml1::getFirstElementByTag(const char* tag) const
+xml_node* xml1::getFirstElementByTag(const char* tag) const
 {
 	ACL_XML_NODE* node = acl_xml_getFirstElementByTagName(xml_, tag);
 	xml1_node* n = NEW xml1_node(const_cast<xml1*>(this), node);
@@ -288,7 +293,7 @@ const std::vector<xml_node*>& xml1::getElementsByTags(const char* tags) const
 	return elements_;
 }
 
-const xml_node* xml1::getFirstElementByTags(const char* tags) const
+xml_node* xml1::getFirstElementByTags(const char* tags) const
 {
 	ACL_ARRAY* a = acl_xml_getElementsByTags(xml_, tags);
 	if (a == NULL)
@@ -343,7 +348,7 @@ const std::vector<xml_node*>& xml1::getElementsByAttr(
 	return elements_;
 }
 
-const xml_node* xml1::getElementById(const char* id) const
+xml_node* xml1::getElementById(const char* id) const
 {
 	ACL_XML_NODE* node = acl_xml_getElementById(xml_, id);
 	if (node == NULL)
@@ -493,7 +498,7 @@ void xml1::build_xml(string& out) const
 	(void) acl_xml_build(xml_, buf);
 }
 
-const char* xml1::to_string(size_t* len) const
+const char* xml1::to_string(size_t* len /* = NULL */) const
 {
 	if (buf_ == NULL)
 		const_cast<xml1*>(this)->buf_ = NEW string();

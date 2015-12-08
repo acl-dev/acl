@@ -3,12 +3,9 @@
  *
  * \brief SHA-384 and SHA-512 cryptographic hash function
  *
- *  Copyright (C) 2006-2013, Brainspark B.V.
+ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
  *
- *  This file is part of PolarSSL (http://www.polarssl.org)
- *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
- *
- *  All rights reserved.
+ *  This file is part of mbed TLS (https://polarssl.org)
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,7 +28,7 @@
 
 #include <string.h>
 
-#if defined(_MSC_VER) || defined(__WATCOMC__) || defined(MINGW)
+#if defined(_MSC_VER) || defined(__WATCOMC__)
   #define UL64(x) x##ui64
   typedef unsigned __int64 uint64_t;
 #else

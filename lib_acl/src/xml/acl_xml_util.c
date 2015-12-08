@@ -300,8 +300,12 @@ ACL_XML_NODE *acl_xml_create_node(ACL_XML *xml, const char* tag,
 
 	acl_assert(tag && *tag);
 	acl_vstring_strcpy(node->ltag, tag);
-	if (text && *text)
+	if (text && *text) {
+		size_t len = strlen(text);
+
+		ACL_VSTRING_SPACE(node->text, len);
 		acl_vstring_strcpy(node->text, text);
+	}
 	return node;
 }
 

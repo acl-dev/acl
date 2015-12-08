@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "util.h"
 #include "https_client.h"
+#include "https_request.h"
 
 static void usage(const char* procname)
 {
@@ -62,6 +63,7 @@ int main(int argc, char* argv[])
 	struct timeval begin;
 	gettimeofday(&begin, NULL);
 
+#if 0
 	std::list<https_client*> threads;
 
 	for (int i = 0; i < cocurrent; i++)
@@ -84,8 +86,6 @@ int main(int argc, char* argv[])
 		thread->start();
 	}
 
-//	sleep(2);
-
 	std::list<https_client*>::iterator it = threads.begin();
 	for (; it != threads.end(); ++it)
 	{
@@ -102,6 +102,45 @@ int main(int argc, char* argv[])
 		delete *it;
 
 	}
+#else
+	(void) length;
+
+	std::list<https_request*> threads;
+
+	for (int i = 0; i < cocurrent; i++)
+	{
+		// ´´½¨Ïß³Ì
+		https_request* thread = new https_request(server_addr,
+				use_ssl ? &ssl_conf : NULL);
+
+		// ÉèÖÃ´´½¨µÄÏß³ÌÎª·Ç·ÖÀëÄ£Ê½£¬ÒÔ±ãÓÚÏÂÃæ¿ÉÒÔµ÷Ó thread::wait
+		// µÈ´ýÏß³Ì½áÊø
+		thread->set_detachable(false);
+
+		// ½«Ïß³Ì·ÅÔÚ¶ÓÁÐÖÐ
+		threads.push_back(thread);
+
+		// Æô¶¯Ïß³Ì
+		thread->start();
+	}
+
+//	sleep(2);
+
+	std::list<https_request*>::iterator it = threads.begin();
+	for (; it != threads.end(); ++it)
+	{
+		// µÈ´ýÏß³Ì½áÊø
+		if ((*it)->wait(NULL) == false)
+			printf("wait one thread(%lu) error\r\n",
+				(*it)->thread_id());
+		else
+			printf("wait one thread(%lu) ok\r\n",
+				(*it)->thread_id());
+		// É¾³ý¶¯Ì¬´´½¨µÄÏß³Ì¶ÔÏó
+		delete *it;
+
+	}
+#endif
 
 	struct timeval end;
 	gettimeofday(&end, NULL);

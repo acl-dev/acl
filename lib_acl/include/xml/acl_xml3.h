@@ -397,6 +397,7 @@ ACL_API const char *acl_xml3_getElementAttrVal(
  */
 ACL_API int acl_xml3_removeElementAttr(ACL_XML3_NODE *node, const char *name);
 
+#if 0
 /**
  * 给 xml 节点添加属性, 如果该属性名已存在, 则用新的属性值替换其属性值, 否则
  * 创建并添加新的属性对象
@@ -470,6 +471,8 @@ ACL_API void acl_xml3_dump(ACL_XML3 *xml, ACL_VSTREAM *fp);
  * @param buf {ACL_VSTRING*} 缓冲区, 需要用户自己分配空间
  */
 ACL_API void acl_xml3_dump2(ACL_XML3 *xml, ACL_VSTRING *buf);
+
+#endif
 
 /***************************************************************************/
 /*          以下为更为低级的接口, 用户可以根据需要调用以下接口             */

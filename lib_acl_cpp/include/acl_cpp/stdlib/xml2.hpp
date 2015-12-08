@@ -90,6 +90,11 @@ public:
 	/**
 	 * @override
 	 */
+	int detach(void);
+
+	/**
+	 * @override
+	 */
 	xml_node& get_parent(void) const;
 
 	/**
@@ -226,7 +231,7 @@ public:
 	/**
 	 * @override
 	 */
-	const xml_node* getFirstElementByTag(const char* tag) const;
+	xml_node* getFirstElementByTag(const char* tag) const;
 
 	/**
 	 * @override
@@ -237,7 +242,7 @@ public:
 	/**
 	 * @override
 	 */
-	const xml_node* getFirstElementByTags(const char* tags) const;
+	xml_node* getFirstElementByTags(const char* tags) const;
 
 	/**
 	 * @override
@@ -254,7 +259,7 @@ public:
 	/**
 	 * @override
 	 */
-	const xml_node* getElementById(const char* id) const;
+	xml_node* getElementById(const char* id) const;
 
 	/**
 	 * @override
@@ -284,7 +289,7 @@ public:
 	/**
 	 * @override
 	 */
-	const char* to_string(size_t* len) const;
+	const char* to_string(size_t* len = NULL) const;
 
 public:
 	ACL_XML2* get_xml2(void) const

@@ -264,6 +264,11 @@ json_node& json_node::add_array_bool(bool value,
 	return add_child(json_->create_array_bool(value), return_child);
 }
 
+int json_node::detach(void)
+{
+	return acl_json_node_delete(node_me_);
+}
+
 json_node& json_node::get_parent(void) const
 {
 	if (parent_)

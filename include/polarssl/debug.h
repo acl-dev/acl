@@ -3,12 +3,9 @@
  *
  * \brief Debug functions
  *
- *  Copyright (C) 2006-2011, Brainspark B.V.
+ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
  *
- *  This file is part of PolarSSL (http://www.polarssl.org)
- *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
- *
- *  All rights reserved.
+ *  This file is part of mbed TLS (https://polarssl.org)
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,7 +30,7 @@
 #if defined(POLARSSL_DEBUG_C)
 
 #define SSL_DEBUG_MSG( level, args )                    \
-    debug_print_msg( ssl, level, __FILE__, __LINE__, debug_fmt args );
+    debug_print_msg_free( ssl, level, __FILE__, __LINE__, debug_fmt args );
 
 #define SSL_DEBUG_RET( level, text, ret )                \
     debug_print_ret( ssl, level, __FILE__, __LINE__, text, ret );
@@ -62,6 +59,9 @@ extern "C" {
 #endif
 
 char *debug_fmt( const char *format, ... );
+
+void debug_print_msg_free( const ssl_context *ssl, int level,
+                           const char *file, int line, char *text );
 
 void debug_print_msg( const ssl_context *ssl, int level,
                       const char *file, int line, const char *text );

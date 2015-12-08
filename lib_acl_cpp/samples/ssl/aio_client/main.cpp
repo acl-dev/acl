@@ -63,6 +63,7 @@ public:
 		std::cout << ">>>>>>>> current len: " << len
 			<< "; total_len: " << nread_ << std::endl;
 
+		client_->close();
 		return true;
 	}
 

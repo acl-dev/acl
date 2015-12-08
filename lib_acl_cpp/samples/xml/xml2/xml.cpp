@@ -25,8 +25,27 @@ static void test()
 	proc2.add_child("conns", false, "211");
 	proc2.add_child("load", false, "2.5");
 
+	printf("-------------- after build_xml -------------------\r\n");
 	xml.build_xml(buf);
 	printf("%s\r\n", buf.c_str());
+
+	printf("Enter any key to continue ...\r\n");
+	getchar();
+
+	proc1.detach();
+	printf("--------------- after detach proc1 --------------\r\n");
+	size_t len;
+	printf("%s\r\n", xml.to_string(&len));
+
+	printf("Enter any key to continue ...\r\n");
+	getchar();
+
+	proc2.detach();
+	printf("--------------- after detach proc2 --------------\r\n");
+	printf("%s\r\n", xml.to_string(&len));
+
+	printf("Enter any key to continue ...\r\n");
+	getchar();
 }
 
 static void print_attrs(acl::xml_node& node)
@@ -94,10 +113,64 @@ static void test2()
 	}
 }
 
+static void test3()
+{
+	const char* s = "<servers>"
+		"<proc><pid>1200</pid><load>2.5</load></proc>"
+		"<proc><pid>1300</pid><load>3.5</load></proc>"
+		"<proc><pid>1400</pid><load>4.5</load></proc>"
+		"</servers>";
+	acl::xml1 xml(s);
+
+	printf("---------------- after parse xml ---------------------\r\n");
+
+	if (strcmp(s, xml.to_string()) == 0)
+	{
+		printf("[%s]\r\n", xml.to_string());
+		printf("----OK----\r\n");
+	}
+	else
+	{
+		printf("[%s]\r\n", s);
+		printf("[%s]\r\n", xml.to_string());
+		printf("----Error----\r\n");
+	}
+
+	printf("Enter any key to continue ...\r\n");
+	getchar();
+
+	printf("--------------- after delete first pid ------------\r\n");
+
+	acl::xml_node* first_pid = xml.getFirstElementByTag("pid");
+	if (first_pid)
+		first_pid->detach();
+
+	printf("[%s]\r\n", xml.to_string());
+
+	printf("Enter any key to continue ...\r\n");
+	getchar();
+
+	printf("--------------- after delete all load --------------\r\n");
+	const std::vector<acl::xml_node*>& loads =
+		xml.getElementsByTagName("load");
+	for (std::vector<acl::xml_node*>::const_iterator cit = loads.begin();
+		cit != loads.end(); ++cit)
+	{
+		(*cit)->detach();
+	}
+
+	printf("[%s]\r\n", xml.to_string());
+
+	printf("Enter any key to continue ...\r\n");
+	getchar();
+}
+
 int main(void)
 {
 	test();
 	test2();
+	test3();
+
 #ifdef WIN32
 	printf("enter any key to exit\r\n");
 	getchar();

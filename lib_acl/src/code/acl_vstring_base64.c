@@ -56,7 +56,9 @@ ACL_VSTRING *acl_vstring_base64_encode(ACL_VSTRING *result,
 	const char *in, int len)
 {
 	const unsigned char *cp;
-	int     count;
+	int     count, size = len * 4 /3;
+
+	ACL_VSTRING_SPACE(result, size);
 
 	/*
 	 * Encode 3 -> 4.
@@ -120,10 +122,12 @@ ACL_VSTRING *acl_vstring_base64_decode(ACL_VSTRING *result,
 	 * }
 	 */
 
+	ACL_VSTRING_SPACE(result, len);
 	/*
 	 * Decode 4 -> 3.
 	 */
 	ACL_VSTRING_RESET(result);
+
 	for (cp = UNSIG_CHAR_PTR(in), count = 0; count < len; count += 4) {
 		if ((ch0 = un_b64[*cp++]) == INVALID
 		    || (ch1 = un_b64[*cp++]) == INVALID)

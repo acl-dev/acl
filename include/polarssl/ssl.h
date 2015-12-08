@@ -3,12 +3,9 @@
  *
  * \brief SSL/TLS functions.
  *
- *  Copyright (C) 2006-2013, Brainspark B.V.
+ *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
  *
- *  This file is part of PolarSSL (http://www.polarssl.org)
- *  Lead Maintainer: Paul Bakker <polarssl_maintainer at polarssl.org>
- *
- *  All rights reserved.
+ *  This file is part of mbed TLS (https://polarssl.org)
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -46,13 +43,10 @@
 #include "zlib.h"
 #endif
 
-#if defined(_MSC_VER) && !defined(inline)
-#define inline _inline
-#else
-#if defined(__ARMCC_VERSION) && !defined(inline)
+#if ( defined(__ARMCC_VERSION) || defined(_MSC_VER) ) && \
+    !defined(inline) && !defined(__cplusplus)
 #define inline __inline
-#endif /* __ARMCC_VERSION */
-#endif /*_MSC_VER */
+#endif
 
 /*
  * SSL Error codes
@@ -124,6 +118,8 @@
 #define SSL_LEGACY_ALLOW_RENEGOTIATION  1
 #define SSL_LEGACY_BREAK_HANDSHAKE      2
 
+#define SSL_MAX_HOST_NAME_LEN           255 /*!< Maximum host name defined in RFC 1035 */
+
 /*
  * Size of the input / output buffer.
  * Note: the RFC defines the default size of SSL / TLS messages. If you
@@ -133,6 +129,7 @@
  */
 #if !defined(POLARSSL_CONFIG_OPTIONS)
 #define SSL_MAX_CONTENT_LEN         16384   /**< Size of the input / output buffer */
+#define SSL_MIN_DHM_BYTES             128   /**< Min size of the Diffie-Hellman prime */
 #endif /* !POLARSSL_CONFIG_OPTIONS */
 
 /*
@@ -802,9 +799,9 @@ void ssl_set_own_cert( ssl_context *ssl, x509_cert *own_cert,
  * \param ssl      SSL context
  * \param own_cert own public certificate chain
  * \param rsa_key  alternate implementation private RSA key
- * \param rsa_decrypt_func  alternate implementation of \c rsa_pkcs1_decrypt()
- * \param rsa_sign_func     alternate implementation of \c rsa_pkcs1_sign()
- * \param rsa_key_len_func  function returning length of RSA key in bytes
+ * \param rsa_decrypt  alternate implementation of \c rsa_pkcs1_decrypt()
+ * \param rsa_sign     alternate implementation of \c rsa_pkcs1_sign()
+ * \param rsa_key_len  function returning length of RSA key in bytes
  */
 void ssl_set_own_cert_alt( ssl_context *ssl, x509_cert *own_cert,
                            void *rsa_key,
@@ -816,7 +813,7 @@ void ssl_set_own_cert_alt( ssl_context *ssl, x509_cert *own_cert,
 /**
  * \brief          Set the Diffie-Hellman public P and G values,
  *                 read as hexadecimal strings (server-side only)
- *                 (Default: POLARSSL_DHM_RFC5114_MODP_1024_[PG])
+ *                 (Default: POLARSSL_DHM_RFC5114_MODP_2048_[PG])
  *
  * \param ssl      SSL context
  * \param dhm_P    Diffie-Hellman-Merkle modulus
