@@ -72,7 +72,7 @@ static void __zlib_dll_load(void)
 	__zlib_dll = acl_dlopen(path);
 
 	if (__zlib_dll == NULL)
-		logger_fatal("load %s error: %s", path, acl_last_serror());
+		logger_fatal("load %s error: %s", path, acl_dlerror());
 
 	// 记录动态库路径，以便于在动态库卸载时输出库路径名
 	__zlib_path = path;
@@ -80,52 +80,52 @@ static void __zlib_dll_load(void)
 	//__deflateInit = (deflateInit_fn) acl_dlsym(__zlib_dll, "deflateInit_");
 	//if (__deflateInit == NULL)
 	//	logger_fatal("load deflateInit from %s error: %s",
-	//		path, acl_last_serror());
+	//		path, acl_dlerror());
 
 	__deflateInit2 = (deflateInit2_fn) acl_dlsym(__zlib_dll, "deflateInit2_");
 	if (__deflateInit2 == NULL)
 		logger_fatal("load deflateInit from %s error: %s",
-			path, acl_last_serror());
+			path, acl_dlerror());
 
 	__deflate = (deflate_fn) acl_dlsym(__zlib_dll, "deflate");
 	if (__deflate == NULL)
 		logger_fatal("load deflate from %s error: %s",
-			path, acl_last_serror());
+			path, acl_dlerror());
 
 	__deflateReset = (deflateReset_fn) acl_dlsym(__zlib_dll, "deflateReset");
 	if (__deflateReset == NULL)
 		logger_fatal("load deflateReset from %s error: %s",
-			path, acl_last_serror());
+			path, acl_dlerror());
 
 	__deflateEnd = (deflateEnd_fn) acl_dlsym(__zlib_dll, "deflateEnd");
 	if (__deflateEnd == NULL)
 		logger_fatal("load deflateEnd from %s error: %s",
-			path, acl_last_serror());
+			path, acl_dlerror());
 
 	__inflateInit2 = (inflateInit2_fn) acl_dlsym(__zlib_dll, "inflateInit2_");
 	if (__inflateInit2 == NULL)
 		logger_fatal("load inflateInit from %s error: %s",
-			path, acl_last_serror());
+			path, acl_dlerror());
 
 	__inflate = (inflate_fn) acl_dlsym(__zlib_dll, "inflate");
 	if (__inflate == NULL)
 		logger_fatal("load inflate from %s error: %s",
-			path, acl_last_serror());
+			path, acl_dlerror());
 
 	__inflateReset = (inflateReset_fn) acl_dlsym(__zlib_dll, "inflateReset");
 	if (__inflateReset == NULL)
 		logger_fatal("load inflateReset from %s error: %s",
-			path, acl_last_serror());
+			path, acl_dlerror());
 
 	__inflateEnd = (inflateEnd_fn) acl_dlsym(__zlib_dll, "inflateEnd");
 	if (__inflateEnd == NULL)
 		logger_fatal("load inflateEnd from %s error: %s",
-			path, acl_last_serror());
+			path, acl_dlerror());
 
 	__crc32 = (crc32_fn) acl_dlsym(__zlib_dll, "crc32");
 	if (__crc32 == NULL)
 		logger_fatal("load __crc32 from %s error: %s",
-			path, acl_last_serror());
+			path, acl_dlerror());
 
 	logger("%s loaded", path);
 	atexit(__zlib_dll_unload);

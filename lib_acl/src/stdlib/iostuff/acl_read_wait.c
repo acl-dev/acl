@@ -90,20 +90,20 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 		return -1;
 	}
 
-	if ((events[0].events & (EPOLLERR | EPOLLHUP)) != 0)
-		return -1;
-
-	if ((events[0].events & EPOLLIN) == 0) {
-		acl_set_error(ACL_ETIMEDOUT);
-		return -1;
-	}
-
 	ee.events = 0;
 	ee.data.u64 = 0;
 	ee.data.fd = fd;
 	if (epoll_ctl(*epoll_fd, EPOLL_CTL_DEL, fd, &ee) == -1) {
 		acl_msg_error("%s(%d): epoll_ctl error: %s, fd: %d",
 			myname, __LINE__, acl_last_serror(), fd);
+		return -1;
+	}
+
+	if ((events[0].events & (EPOLLERR | EPOLLHUP)) != 0)
+		return -1;
+
+	if ((events[0].events & EPOLLIN) == 0) {
+		acl_set_error(ACL_ETIMEDOUT);
 		return -1;
 	}
 

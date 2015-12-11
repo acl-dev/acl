@@ -1,6 +1,9 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+516) 2015.12.9
+516.1) feature: acl_xml_parse.c / acl_xml2_parse.c can parse CDATA
+
 515) 2015.12.8
 515.1) bugfix: acl_vstream.c 中当 read/write 接口被注入时，因为没有对应的
 writev 注入方式，所以需要多次调用 write 来模拟 writev 过程
