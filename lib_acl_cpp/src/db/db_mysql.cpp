@@ -259,7 +259,6 @@ static void __mysql_dll_load(void)
 		logger_warn("load mysql_server_init from %s error: %s",
 			path, acl_dlerror());
 
-		__mysql_thread_end();
 	__mysql_server_end = (mysql_server_end_fn)
 		acl_dlsym(__mysql_dll, "mysql_server_end");
 	if (__mysql_server_end == NULL)
