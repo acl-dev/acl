@@ -234,7 +234,7 @@ bool mail_message::append_addr(const rfc822_addr& addr, string& out)
 	if (addr.comment)
 	{
 		out.append("\"");
-		if (rfc2047::encode(addr.comment, strlen(addr.comment),
+		if (rfc2047::encode(addr.comment, (int) strlen(addr.comment),
 			&out, charset_, 'B', false) == false)
 		{
 			logger_error("rfc2047::encode(%s) error",

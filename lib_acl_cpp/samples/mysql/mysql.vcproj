@@ -32,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lib_acl_vc2003d.lib libmysql.lib"
+				AdditionalDependencies="lib_acl_vc2003d.lib"
 				OutputFile="$(OutDir)/mysql.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\win32;..\..\..\dist\lib\win32"
@@ -43,9 +43,7 @@
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\..\lib\win32\libmysql.dll $(OutDir)\ /Y
-"/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -182,7 +180,6 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libmysql.lib"
 				OutputFile="$(OutDir)/mysql.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\win32"
@@ -193,9 +190,7 @@
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\..\lib\win32\libmysql.dll $(OutDir)\ /Y
-"/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool

@@ -26,7 +26,11 @@
 	&& (*(ptr + 1) == 'd' || *(ptr + 1) == 'D'))
 
 #define IS_QUOTE(x) ((x) == '\"' || (x) == '\'')
+#if 1
 #define IS_SPACE(c) ((c) == ' ' || (c) == '\t' || (c) == '\r' || (c) == '\n')
+#else
+#define IS_SPACE(c) ((c) == ' ' || (c) == '\t')
+#endif
 #define SKIP_WHILE(cond, ptr) { while(*(ptr) && (cond)) (ptr)++; }
 #define SKIP_SPACE(ptr) { while(IS_SPACE(*(ptr))) (ptr)++; }
 
@@ -122,6 +126,72 @@ static const char *xml_parse_left_em(ACL_XML *xml, const char *data)
 	return data;
 }
 
+static const char *xml_parse_cdata(ACL_XML *xml, const char *data)
+{
+	ACL_XML_NODE *curr_node = xml->curr_node;
+	int   ch;
+
+	while ((ch = *data) != 0) {
+		data++;
+
+		if (ch == '>') {
+			if (curr_node->meta[0] == ']'
+				&& curr_node->meta[1] == ']')
+			{
+				curr_node->status = ACL_XML_S_MEND;
+				ACL_VSTRING_TERMINATE(curr_node->text);
+				return data;
+			}
+			if (curr_node->meta[0])
+				ADDCH(curr_node->text, curr_node->meta[0]);
+			curr_node->meta[0] = 0;
+			if (curr_node->meta[1])
+				ADDCH(curr_node->text, curr_node->meta[1]);
+			curr_node->meta[1] = 0;
+		} else if (ch == ']') {
+			if (curr_node->meta[0] == ']') {
+				if (curr_node->meta[1] == ']')
+					ADDCH(curr_node->text, ']');
+				else
+					curr_node->meta[1] = ']';
+			} else if (curr_node->meta[1] == ']') {
+				curr_node->meta[0] = ']';
+				curr_node->meta[1] = 0;
+				ADDCH(curr_node->text, ']');
+			} else
+				curr_node->meta[0] = ']';
+		} else if (curr_node->meta[0] == ']') {
+			ADDCH(curr_node->text, ']');
+			curr_node->meta[0] = 0;
+			if (curr_node->meta[1] == ']')
+				ADDCH(curr_node->text, ']');
+			curr_node->meta[1] = 0;
+		} else {
+			ADDCH(curr_node->text, ch);
+		}
+	}
+
+	ACL_VSTRING_TERMINATE(curr_node->text);
+	return data;
+}
+
+#define	IS_CDATA(x) (*(x) == '[' \
+	&& (*(x + 1) == 'C' || *(x + 1) == 'c') \
+	&& (*(x + 2) == 'D' || *(x + 2) == 'd') \
+	&& (*(x + 3) == 'A' || *(x + 3) == 'a') \
+	&& (*(x + 4) == 'T' || *(x + 4) == 't') \
+	&& (*(x + 5) == 'A' || *(x + 5) == 't') \
+	&& *(x + 6) == '[')
+
+static void cdata_prepare(ACL_XML_NODE *curr_node)
+{
+	char *ptr = STR(curr_node->ltag) + sizeof("[CDATA[") - 1;
+
+	acl_vstring_strcpy(curr_node->text, ptr);
+	ACL_VSTRING_AT_OFFSET(curr_node->ltag, sizeof("[CDATA[") - 1);
+	ACL_VSTRING_TERMINATE(curr_node->ltag);
+}
+
 static const char *xml_parse_meta_tag(ACL_XML *xml, const char *data)
 {
 	int   ch;
@@ -129,7 +199,13 @@ static const char *xml_parse_meta_tag(ACL_XML *xml, const char *data)
 	while ((ch = *data) != 0) {
 		data++;
 		if (IS_SPACE(ch) || ch == '>') {
-			xml->curr_node->status = ACL_XML_S_MTXT;
+			if (IS_CDATA(STR(xml->curr_node->ltag))) {
+				cdata_prepare(xml->curr_node);
+				ADDCH(xml->curr_node->text, ch);
+				xml->curr_node->status = ACL_XML_S_CDATA;
+				xml->curr_node->flag |= ACL_XML_F_CDATA;
+			} else
+				xml->curr_node->status = ACL_XML_S_MTXT;
 			break;
 		}
 		ADDCH(xml->curr_node->ltag, ch);
@@ -733,22 +809,23 @@ static const char *xml_parse_right_gt(ACL_XML *xml, const char *data)
 }
 
 static struct XML_STATUS_MACHINE status_tab[] = {
-	{ ACL_XML_S_NXT,  xml_parse_next_left_lt        },
-	{ ACL_XML_S_LLT,  xml_parse_left_lt             },
-	{ ACL_XML_S_LGT,  xml_parse_left_gt             },
-	{ ACL_XML_S_LCH,  xml_parse_left_ch             },
-	{ ACL_XML_S_LEM,  xml_parse_left_em             },
-	{ ACL_XML_S_LTAG, xml_parse_left_tag            },
-	{ ACL_XML_S_RLT,  xml_parse_right_lt            },
-	{ ACL_XML_S_RGT,  xml_parse_right_gt            },
-	{ ACL_XML_S_RTAG, xml_parse_right_tag           },
-	{ ACL_XML_S_ATTR, xml_parse_attr                },
-	{ ACL_XML_S_AVAL, xml_parse_attr_val            },
-	{ ACL_XML_S_TXT,  xml_parse_text                },
-	{ ACL_XML_S_MTAG, xml_parse_meta_tag            },
-	{ ACL_XML_S_MTXT, xml_parse_meta_text           },
-	{ ACL_XML_S_MCMT, xml_parse_meta_comment	},
-	{ ACL_XML_S_MEND, xml_parse_meta_end            },
+	{ ACL_XML_S_NXT,   xml_parse_next_left_lt        },
+	{ ACL_XML_S_LLT,   xml_parse_left_lt             },
+	{ ACL_XML_S_LGT,   xml_parse_left_gt             },
+	{ ACL_XML_S_LCH,   xml_parse_left_ch             },
+	{ ACL_XML_S_LEM,   xml_parse_left_em             },
+	{ ACL_XML_S_LTAG,  xml_parse_left_tag            },
+	{ ACL_XML_S_RLT,   xml_parse_right_lt            },
+	{ ACL_XML_S_RGT,   xml_parse_right_gt            },
+	{ ACL_XML_S_RTAG,  xml_parse_right_tag           },
+	{ ACL_XML_S_ATTR,  xml_parse_attr                },
+	{ ACL_XML_S_AVAL,  xml_parse_attr_val            },
+	{ ACL_XML_S_TXT,   xml_parse_text                },
+	{ ACL_XML_S_MTAG,  xml_parse_meta_tag            },
+	{ ACL_XML_S_MTXT,  xml_parse_meta_text           },
+	{ ACL_XML_S_MCMT,  xml_parse_meta_comment        },
+	{ ACL_XML_S_MEND,  xml_parse_meta_end            },
+	{ ACL_XML_S_CDATA, xml_parse_cdata               },
 };
 
 const char *acl_xml_update(ACL_XML *xml, const char *data)

@@ -32,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lib_acl_vc2003d.lib ws2_32.lib"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="mime.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32"
@@ -80,7 +80,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib wsock32.lib lib_acl_vc2003.lib"
+				AdditionalDependencies="ws2_32.lib wsock32.lib"
 				OutputFile="$(OutDir)/mime.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32"

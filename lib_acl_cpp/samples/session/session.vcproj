@@ -120,7 +120,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;..\"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;ACL_DLL;ACL_CPP_DLL"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -169,7 +169,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;..\"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;ACL_CLL;ACL_CPP_DLL"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="3"
 				WarningLevel="3"

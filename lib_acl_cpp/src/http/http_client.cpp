@@ -222,13 +222,13 @@ bool http_client::write_gzip(ostream& out, const void* data, size_t len)
 	if (data && len > 0)
 	{
 		// 增加非压缩数据总长度
-		gzip_total_in_ += len;
+		gzip_total_in_ += (unsigned int) len;
 
 		// 计算 crc32 数据校验和
 		gzip_crc32_ = zstream_->crc32_update(gzip_crc32_, data, len);
 
 		// 对该段数据进行压缩处理
-		if (!zstream_->zip_update((const char*) data, len, buf_))
+		if (!zstream_->zip_update((const char*) data, (int) len, buf_))
 		{
 			logger_error("zip_update error!");
 			return false;

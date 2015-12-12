@@ -76,7 +76,7 @@ static bool test_getjob(acl::disque& cmd, int max, int& i, int count)
 	if (!job_ids.empty() && !test_ackjob(cmd, job_ids, i))
 		return false;
 
-	i += jobs->size();
+	i += (int) jobs->size();
 
 	if (i >= 2 * (int) count)
 		return true;

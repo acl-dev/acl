@@ -3,9 +3,7 @@
 
 #include "stdafx.h"
 #include "lib_acl.h"
-#ifdef WIN32
-#include <vld.h>
-#else
+#ifndef WIN32
 #include <getopt.h>
 #endif
 #include <string>

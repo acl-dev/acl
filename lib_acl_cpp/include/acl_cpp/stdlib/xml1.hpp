@@ -148,6 +148,12 @@ public:
 	int depth(void) const;
 
 	/**
+	 * @override
+	 * @return {bool}
+	 */
+	bool is_root(void) const;
+
+	/**
 	 * @override 返回该 xml 节点的下一级子节点的个数
 	 * @return {int} 永远 >= 0
 	 */

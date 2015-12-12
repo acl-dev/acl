@@ -242,6 +242,12 @@ public:
 	virtual int depth(void) const = 0;
 
 	/**
+	 * 判断当前节点是否为 xml 对象中的 root 节点
+	 * @return {bool}
+	 */
+	virtual bool is_root(void) const = 0;
+
+	/**
 	 * 返回该 xml 节点的下一级子节点的个数
 	 * @return {int} 永远 >= 0
 	 */

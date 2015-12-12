@@ -218,8 +218,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "string", "lib_acl_cpp\sampl
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "string2", "lib_acl_cpp\samples\string\string2\string2_vc2012.vcxproj", "{D7CCE1AD-6E3E-49C0-BED7-4AEBB79AC9DE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "string3", "lib_acl_cpp\samples\string\string3\string3_vc2012.vcxproj", "{0FD53805-522C-4A04-938A-F05C1553828B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgi_upload", "lib_acl_cpp\samples\cgi_upload\cgi_upload_vc2012.vcxproj", "{A28B19ED-291C-47C8-BDD5-10BB038C371E}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -272,6 +282,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples_acl", "samples_acl", "{267F658E-44AF-4080-8577-EFCE99A5E030}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgi", "lib_acl_cpp\samples\cgi\cgi_vc2012.vcxproj", "{2C2212C1-01D2-4C8E-AB15-F7E31C7C134B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aio_server_ssl", "lib_acl_cpp\samples\aio\aio_server_ssl\aio_server_ssl_vc2012.vcxproj", "{A07145B7-36AE-4D6F-8536-30A8BE48529D}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -532,6 +547,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wizard_demo", "wizard_demo", "{1C02A405-3726-4410-80DF-91D60736352B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "httpd_download", "app\wizard_demo\httpd_download\httpd_download_vc2012.vcxproj", "{1A38C49B-F712-4115-980B-6DBD632D25CF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "https_proxy", "lib_acl_cpp\samples\ssl\https_proxy\https_proxy_vc2012.vcxproj", "{5F75216D-8263-4F6F-9390-76E7AC129AEE}"
 EndProject

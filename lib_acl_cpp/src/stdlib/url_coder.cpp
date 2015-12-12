@@ -124,7 +124,8 @@ url_coder& url_coder::set(const char* name, const char* value,
 {
 	if (name == NULL || *name == 0 || value == NULL || *value == 0)
 	{
-		logger_error("invalid input");
+		logger_error("invalid input: name: [%s], value: [%s]",
+			name ? name : "null", value ? value : "null");
 		return *this;
 	}
 

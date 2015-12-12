@@ -19,6 +19,7 @@ typedef struct ACL_DLL_ENV {
 ACL_API ACL_DLL_HANDLE acl_dlopen(const char *dlname);
 ACL_API void acl_dlclose(ACL_DLL_HANDLE handle);
 ACL_API ACL_DLL_FARPROC acl_dlsym(void *handle, const char *name);
+ACL_API const char *acl_dlerror(void);
 
 #ifdef	__cplusplus
 }

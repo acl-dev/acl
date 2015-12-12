@@ -44,8 +44,7 @@
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\..\lib\win32\zlib.dll $(OutDir)\ /Y"/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -94,8 +93,7 @@
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\..\lib\win32\zlib.dll $(OutDir)\ /Y"/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -145,8 +143,7 @@
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\..\lib\win32\zlib.dll $(OutDir)\ /Y"/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -194,8 +191,7 @@
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\..\lib\win32\zlib.dll $(OutDir)\ /Y"/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool

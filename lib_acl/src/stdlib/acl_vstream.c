@@ -1369,7 +1369,7 @@ TAG_AGAIN:
 
 			for (i = 0; i < count; i++) {
 				ret = write_once(fp, vec[i].iov_base,
-					vec[i].iov_len);
+					(int) vec[i].iov_len);
 				if (ret == ACL_VSTREAM_EOF)
 					return ret;
 				n += ret;
@@ -1396,7 +1396,8 @@ TAG_AGAIN:
 		int i, ret;
 
 		for (i = 0; i < count; i++) {
-			ret = write_once(fp, vec[i].iov_base, vec[i].iov_len);
+			ret = write_once(fp, vec[i].iov_base,
+				(int) vec[i].iov_len);
 			if (ret == ACL_VSTREAM_EOF)
 				return ret;
 			n += ret;

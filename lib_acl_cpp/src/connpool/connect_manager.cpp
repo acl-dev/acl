@@ -83,7 +83,8 @@ void connect_manager::init(const char* default_addr, const char* addr_list,
 	size_t count, int conn_timeout /* = 30 */, int rw_timeout /* = 30 */)
 {
 	if (addr_list != NULL && *addr_list != 0)
-		set_service_list(addr_list, count, conn_timeout, rw_timeout);
+		set_service_list(addr_list, (int) count,
+			conn_timeout, rw_timeout);
 
 	// 创建缺省服务连接池对象，该对象一同放入总的连接池集群中
 	if (default_addr != NULL && *default_addr != 0)

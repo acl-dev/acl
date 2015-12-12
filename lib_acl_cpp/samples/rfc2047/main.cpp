@@ -3,7 +3,7 @@
 #include <string.h>
 
 #ifdef WIN32
-#include "vld.h"  // win32 下进行内存泄露检测
+//#include "vld.h"  // win32 下进行内存泄露检测
 #include "lib_acl.h"
 #else
 #include <getopt.h>

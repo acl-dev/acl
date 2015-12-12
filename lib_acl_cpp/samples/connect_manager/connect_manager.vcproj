@@ -172,7 +172,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VC2003;ACL_CPP_DLL"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VC2003;ACL_CPP_DLL;ACL_DLL"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"

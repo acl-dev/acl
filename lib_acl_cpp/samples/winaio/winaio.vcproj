@@ -50,8 +50,6 @@
 				CommandLine="copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y
 copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir)\ /Y
 copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y
-copy ..\..\..\lib\win32\sqlite3.dll $(OutDir)\ /Y
-copy ..\..\..\lib\win32\vld.dll $(OutDir)\ /Y
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -113,10 +111,7 @@ copy ..\..\..\lib\win32\vld.dll $(OutDir)\ /Y
 				Name="VCPostBuildEventTool"
 				CommandLine="copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y
 copy ..\..\..\dist\lib\win32\lib_acl.dll $(OutDir)\ /Y
-copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y
-copy ..\..\..\lib\win32\sqlite3.dll $(OutDir)\ /Y
-copy ..\..\..\lib\win32\vld.dll $(OutDir)\ /Y
-"/>
+copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -181,8 +176,6 @@ copy ..\..\..\lib\win32\vld.dll $(OutDir)\ /Y
 				CommandLine="copy ..\..\..\dist\lib\win32\lib_acl_cpp_d.dll $(OutDir)\ /Y
 copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir)\ /Y
 copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y
-copy ..\..\..\lib\win32\sqlite3.dll $(OutDir)\ /Y
-copy ..\..\..\lib\win32\vld.dll $(OutDir)\ /Y
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -246,8 +239,6 @@ copy ..\..\..\lib\win32\vld.dll $(OutDir)\ /Y
 				CommandLine="copy ..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir)\ /Y
 copy ..\..\..\dist\lib\win32\lib_acl.dll $(OutDir)\ /Y
 copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir)\ /Y
-copy ..\..\..\lib\win32\sqlite3.dll $(OutDir)\ /Y
-copy ..\..\..\lib\win32\vld.dll $(OutDir)\ /Y
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>

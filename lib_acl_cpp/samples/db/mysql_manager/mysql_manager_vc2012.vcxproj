@@ -196,7 +196,7 @@
       <SubSystem>Console</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
-      <AdditionalDependencies>lib_acl_vc2012d.lib;lib_acl_cpp_vc2012d.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_acl_vc2012d.lib;lib_acl_cpp_vc2012d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -233,7 +233,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2012.lib;lib_acl_cpp_vc2012.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_vc2012.lib;lib_acl_cpp_vc2012.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)mysql_manager.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\lib\win64;..\..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -280,7 +280,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_d.lib;lib_acl_cpp_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl_d.lib;lib_protocol.lib;lib_acl_cpp_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)mysql_manager.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -329,7 +329,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl.lib;lib_acl_cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wsock32.lib;lib_acl.lib;lib_protocol.lib;lib_acl_cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)mysql_manager.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib;..\..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>

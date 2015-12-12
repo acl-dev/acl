@@ -267,7 +267,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>lib_acl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_acl.lib;wsock32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\dist\lib\win32</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -291,7 +291,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <AdditionalDependencies>lib_acl.lib;lib_protocol.lib;lib_acl_cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_acl.lib;wsock32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\dist\lib\win64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -316,7 +316,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>lib_acl_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_acl_d.lib;wsock32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\lib\win32;..\..\..\dist\lib\win32;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -340,7 +340,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <AdditionalDependencies>lib_acl_d.lib;lib_protocol_d.lib;lib_acl_cpp_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_acl_d.lib;wsock32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\dist\lib\win64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

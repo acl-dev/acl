@@ -114,6 +114,12 @@ public:
 
 	/**
 	 * @override
+	 * @return {bool}
+	 */
+	bool is_root(void) const;
+
+	/**
+	 * @override
 	 */
 	int children_count(void) const;
 

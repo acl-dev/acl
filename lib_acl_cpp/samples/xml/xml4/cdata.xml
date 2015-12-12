@@ -1,0 +1,14 @@
+<root>
+	<zone time="xxx" name="xxxx" value="xxxx">
+<![CDATA[BEGIN:VTIMEZONE
+TZID:Asia/Hong_Kong
+BEGIN:STANDARD
+TZOFFSETTO:+0800
+TZOFFSETFROM:+0800
+TZNAME:CST
+DTSTART:19710101T000000
+END:STANDARD
+END:VTIMEZONE
+]]>
+	</zone>
+</root>

@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\lib_acl\include"
+				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\lib_acl\include;..\..\"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -120,7 +120,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\lib_acl\include"
+				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\lib_acl\include;..\..\"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -199,7 +199,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\lib_acl\include"
+				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\lib_acl\include;..\..\"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VC2003;ACL_CPP_DLL;ACL_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -279,7 +279,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\lib_acl\include"
+				AdditionalIncludeDirectories="..\..\..\include;..\..\..\..\lib_acl\include;..\..\"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;VC2003;ACL_CPP_DLL;ACL_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -382,6 +382,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="..\..\util.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
@@ -390,6 +394,10 @@
 			>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\util.h"
 				>
 			</File>
 		</Filter>
@@ -404,4 +412,6 @@
 			>
 		</File>
 	</Files>
+	<Globals>
+	</Globals>
 </VisualStudioProject>

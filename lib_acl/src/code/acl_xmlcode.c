@@ -59,7 +59,7 @@ int acl_xml_encode(const char *in, ACL_VSTRING *out)
 
 	len += len / 2;
 
-	ACL_VSTRING_SPACE(out, len);
+	ACL_VSTRING_SPACE(out, (int) len);
 
 	while (*ptr) {
 		if (__charmap[*ptr] != NULL) {

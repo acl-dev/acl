@@ -53,6 +53,7 @@ struct ACL_XML_NODE {
 #define	ACL_XML_F_META_EM	(1 << 2)    /**< only '!' flag */
 #define ACL_XML_F_SELF_CL	(1 << 3)    /**< self closed flag */
 #define	ACL_XML_F_LEAF		(1 << 4)    /**< leaf node has no child node */
+#define	ACL_XML_F_CDATA		(1 << 5)    /**< CDATA data */
 
 /**< 是否是元数据 */
 #define	ACL_XML_F_META		\
@@ -60,23 +61,26 @@ struct ACL_XML_NODE {
 
 #define	ACL_XML_IS_COMMENT(x)	(((x)->flag & ACL_XML_F_META_CM))
 
+#define	ACL_XML_IS_CDATA(x)	(((x)->flag & ACL_XML_F_CDATA))
+
 	int   status;                   /**< 状态机当前解析状态 */
-#define ACL_XML_S_NXT	0               /**< 下一个节点 */
-#define ACL_XML_S_LLT	1               /**< 左边 '<' */
-#define ACL_XML_S_LGT	2               /**< 右边 '>' */
-#define	ACL_XML_S_LCH	3               /**< 左边 '<' 后第一个字节 */
-#define ACL_XML_S_LEM	4               /**< 左边 '<' 后的 '!' */
-#define ACL_XML_S_LTAG	5               /**< 左边的标签名 */
-#define ACL_XML_S_RLT	6               /**< 右边的 '<' */
-#define ACL_XML_S_RGT	7               /**< 右边的 '>' */
-#define ACL_XML_S_RTAG	8               /**< 右边的标签名 */
-#define ACL_XML_S_ATTR	9               /**< 标签属性名 */
-#define ACL_XML_S_AVAL	10              /**< 标签属性值 */
-#define ACL_XML_S_TXT	11              /**< 节点文本 */
-#define ACL_XML_S_MTAG	12              /**< 元数据标签 */
-#define ACL_XML_S_MTXT	13              /**< 元数据文本 */
-#define ACL_XML_S_MCMT	14              /**< 元数据注释 */
-#define ACL_XML_S_MEND	15              /**< 元数据结束 */
+#define ACL_XML_S_NXT		0       /**< 下一个节点 */
+#define ACL_XML_S_LLT		1       /**< 左边 '<' */
+#define ACL_XML_S_LGT		2       /**< 右边 '>' */
+#define	ACL_XML_S_LCH		3       /**< 左边 '<' 后第一个字节 */
+#define ACL_XML_S_LEM		4       /**< 左边 '<' 后的 '!' */
+#define ACL_XML_S_LTAG		5       /**< 左边的标签名 */
+#define ACL_XML_S_RLT		6       /**< 右边的 '<' */
+#define ACL_XML_S_RGT		7       /**< 右边的 '>' */
+#define ACL_XML_S_RTAG		8       /**< 右边的标签名 */
+#define ACL_XML_S_ATTR		9       /**< 标签属性名 */
+#define ACL_XML_S_AVAL		10      /**< 标签属性值 */
+#define ACL_XML_S_TXT		11      /**< 节点文本 */
+#define ACL_XML_S_MTAG		12      /**< 元数据标签 */
+#define ACL_XML_S_MTXT		13      /**< 元数据文本 */
+#define ACL_XML_S_MCMT		14      /**< 元数据注释 */
+#define ACL_XML_S_MEND		15      /**< 元数据结束 */
+#define	ACL_XML_S_CDATA		16      /**< CDATA 数据 */
 
 	/* public: for acl_iterator, 通过 acl_foreach 列出该节点的一级子节点 */
 

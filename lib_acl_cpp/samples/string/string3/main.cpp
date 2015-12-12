@@ -45,7 +45,7 @@ int main(void)
 
 	acl::string b(20);
 	size_t size = b.capacity();
-	for (int i = size - 1; i >= 0; i--)
+	for (int i = (int) size - 1; i >= 0; i--)
 	{
 		b[i] = '1';
 	}

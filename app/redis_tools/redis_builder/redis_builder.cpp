@@ -137,7 +137,7 @@ bool redis_builder::load(const char* conf, size_t replicas)
 	 * </xml>
 	 */
 	// parse the xml data
-	acl::xml xml(buf.c_str());
+	acl::xml1 xml(buf.c_str());
 
 	if (replicas > 0)
 		return create_cluster(xml, replicas);

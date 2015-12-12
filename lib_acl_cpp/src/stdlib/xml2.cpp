@@ -192,6 +192,13 @@ int xml2_node::depth(void) const
 	return node_->depth;
 }
 
+bool xml2_node::is_root(void) const
+{
+	xml2_node& node = (xml2_node&) ((xml2*) xml_)->get_root();
+	ACL_XML2_NODE* root = node.get_xml_node();
+	return root == node_;
+}
+
 int xml2_node::children_count(void) const
 {
 	return acl_ring_size(&node_->children);
