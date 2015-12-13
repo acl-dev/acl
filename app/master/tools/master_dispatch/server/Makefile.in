@@ -24,7 +24,7 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DFREEBSD -D_REENTRANT
-	SYSLIB = -lcrypt -lpthread
+	SYSLIB = -lcrypt -lpthread -lz -L/usr/local/lib -liconv
 endif
 
 # for MACOS
