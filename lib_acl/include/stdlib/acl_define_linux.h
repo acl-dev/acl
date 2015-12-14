@@ -29,7 +29,7 @@
 # define ACL_USE_PATHS_H
 # ifndef MINGW
 #  define ACL_HAS_FLOCK_LOCK
-#  define ACL_HAS_SPINLOCK
+/* #  define ACL_HAS_SPINLOCK */
 # endif
 
 # define ACL_HAS_FCNTL_LOCK
