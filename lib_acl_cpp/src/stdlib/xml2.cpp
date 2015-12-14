@@ -490,6 +490,8 @@ const char* xml2::to_string(size_t* len /* = NULL */) const
 void xml2::reset(void)
 {
 	clear();
+	delete root_;
+	root_ = NULL;
 	acl_xml2_reset(xml_);
 	//dummyRootAdded_ = false;
 }

@@ -521,6 +521,8 @@ const char* xml1::to_string(size_t* len /* = NULL */) const
 void xml1::reset(void)
 {
 	clear();
+	delete root_;
+	root_ = NULL;
 	acl_xml_reset(xml_);
 	//dummyRootAdded_ = false;
 }
