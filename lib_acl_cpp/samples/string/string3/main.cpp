@@ -29,7 +29,7 @@ static void test(void)
 			continue;
 		int vecsize = (int) aclstr_vec.size();
 		for (int i = 0; i< vecsize;++i)
-			std::cout<<aclstr_vec[i].c_str()<<std::endl;
+			printf("%s\r\n", aclstr_vec[i].c_str());
 	}
 
 	printf("enter any key to continue...");

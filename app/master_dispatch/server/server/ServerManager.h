@@ -59,6 +59,6 @@ public:
 private:
 	std::vector<ServerConnection*> conns_;
 	acl::json   json_;
-	acl::xml    xml_;
+	acl::xml1   xml_;
 	acl::locker lock_;
 };

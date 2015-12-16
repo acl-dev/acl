@@ -41,4 +41,11 @@ private:
 	polarssl_conf* ssl_conf_;
 };
 
+class ACL_CPP_API http_guard : public connect_guard
+{
+public:
+	http_guard(http_request_pool& pool);
+	~http_guard(void);
+};
+
 } // namespace acl

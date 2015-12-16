@@ -207,4 +207,35 @@ protected:
 	std::list<connect_client*> pool_;	// 连接池集合
 };
 
+class ACL_CPP_API connect_guard
+{
+public:
+	connect_guard(connect_pool& pool)
+		: keep_(true), pool_(pool), conn_(NULL)
+	{
+	}
+
+	virtual ~connect_guard(void)
+	{
+		if (conn_)
+			pool_.put(conn_, keep_);
+	}
+
+	void set_keep(bool keep)
+	{
+		keep_ = keep;
+	}
+
+	connect_client* peek(void)
+	{
+		conn_ = pool_.peek();
+		return conn_;
+	}
+
+protected:
+	bool keep_;
+	connect_pool& pool_;
+	connect_client* conn_;
+};
+
 } // namespace acl

@@ -29,4 +29,21 @@ connect_client* http_request_pool::create_connect()
 	return req;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+
+http_guard::http_guard(http_request_pool& pool)
+	: connect_guard(pool)
+{
+}
+
+http_guard::~http_guard(void)
+{
+	if (conn_)
+	{
+		http_request* req = (http_request*) conn_;
+		pool_.put(conn_, keep_& req->keep_alive());
+		conn_ = NULL;
+	}
+}
+
 } // namespace acl
