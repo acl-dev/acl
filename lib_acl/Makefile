@@ -39,6 +39,8 @@ SYSLIB = -lpthread
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
 UNIXTYPE = LINUX
+OSTYPE = $(shell uname -p)
+RPATH =
 
 ifeq ($(CC),)
         CC = gcc
@@ -63,6 +65,7 @@ endif
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD -fPIC -Werror
 	UNIXTYPE = FREEBSD
+	RPATH = freebsd
 endif
 
 # For Darwin
@@ -70,12 +73,19 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-extended-offsetof -fPIC -Werror
 	UNIXTYPE = MACOSX
+	RPATH = macos
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -DLINUX2 -fPIC -Werror
 	UNIXTYPE = LINUX
+	ifeq ($(findstring i686, $(OSTYPE)), i686)
+		RPATH = linux32
+	endif
+	ifeq ($(findstring x86_64, $(OSTYPE)), x86_64)
+		RPATH = linux64
+	endif
 endif
 
 ifeq ($(findstring HAS_TRACE, $(FLAGS)), HAS_TRACE)
@@ -95,6 +105,7 @@ ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
 	SYSLIB = -lpthread-2
+	RPATH = mingw
 endif
 
 # For SunOS
@@ -107,12 +118,14 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	endif
 	CFLAGS += -DSUNOS5 -fPIC -Werror
 	UNIXTYPE = SUNOS5
+	RPATH = sunos5_x86
 endif
 
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
 	CFLAGS += -DHP_UX -DHPUX11 -fPIC -Werror
 	UNIXTYPE = HPUX
+	RPATH = hpux
 endif
 
 #CCARGS =
@@ -518,6 +531,7 @@ acl_master: static $(MASTERD_OBJ)
 		$(CC) -o $(MASTER_OBJ_PATH)/$(MASTER) $(MASTERD_OBJ) \
 			$(LIB_PATH_DST)/$(LIB_NAME) $(SYSLIB); \
 	fi
+	cp $(MASTER_OBJ_PATH)/$(MASTER) ../dist/master/libexec/$(RPATH)/
 	@echo 'create acl_master ok!'
 
 $(MASTER_OBJ_PATH)/%.o: $(SRC_PATH_SRC)/master/daemon/%.c

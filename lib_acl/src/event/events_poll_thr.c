@@ -404,15 +404,17 @@ static void event_loop(ACL_EVENT *eventp)
 
 		revents = event_thr->fdset[i].revents;
 		if ((revents & POLLIN) != 0) {
-			fdp->stream->sys_read_ready = 1;
 			if ((fdp->event_type & ACL_EVENT_READ) == 0) {
 				fdp->event_type |= ACL_EVENT_READ;
-				if (fdp->listener)
-					fdp->event_type |= ACL_EVENT_ACCEPT;
 				fdp->fdidx_ready = eventp->fdcnt_ready;
 				eventp->fdtabs_ready[eventp->fdcnt_ready] = fdp;
 				eventp->fdcnt_ready++;
 			}
+
+			if (fdp->listener)
+				fdp->event_type |= ACL_EVENT_ACCEPT;
+			else
+				fdp->stream->sys_read_ready = 1;
 		} else if ((revents & POLLOUT) != 0) {
 			fdp->event_type |= ACL_EVENT_WRITE;
 			fdp->fdidx_ready = eventp->fdcnt_ready;

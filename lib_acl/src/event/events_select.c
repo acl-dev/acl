@@ -459,23 +459,23 @@ static void event_loop(ACL_EVENT *eventp)
 		/* 检查描述字是否可读 */
 
 		if (FD_ISSET(sockfd, &rmask)) {
+			/* 给该描述字对象附加可读属性 */
+			if ((fdp->event_type & (ACL_EVENT_READ
+				| ACL_EVENT_WRITE)) == 0)
+			{
+				fdp->event_type |= ACL_EVENT_READ;
+				fdp->fdidx_ready = eventp->fdcnt_ready;
+				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
+			}
+
+			if (fdp->listener)
+				fdp->event_type |= ACL_EVENT_ACCEPT;
 
 			/* 该描述字可读则设置 ACL_VSTREAM 的系统可读标志从而触发
 			 * ACL_VSTREAM 流在读时调用系统的 read 函数
 			 */
-
-			fdp->stream->sys_read_ready = 1;
-
-			/* 给该描述字对象附加可读属性 */
-
-			if ((fdp->event_type & (ACL_EVENT_READ | ACL_EVENT_WRITE)) == 0)
-			{
-				fdp->event_type |= ACL_EVENT_READ;
-				if (fdp->listener)
-					fdp->event_type |= ACL_EVENT_ACCEPT;
-				fdp->fdidx_ready = eventp->fdcnt_ready;
-				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
-			}
+			else
+				fdp->stream->sys_read_ready = 1;
 		}
 
 		/* 检查描述字是否可写 */
@@ -484,7 +484,8 @@ static void event_loop(ACL_EVENT *eventp)
 
 			/* 给该描述字对象附加可写属性 */
 
-			if ((fdp->event_type & (ACL_EVENT_READ | ACL_EVENT_WRITE)) == 0)
+			if ((fdp->event_type & (ACL_EVENT_READ
+				| ACL_EVENT_WRITE)) == 0)
 			{
 				fdp->event_type |= ACL_EVENT_WRITE;
 				fdp->fdidx_ready = eventp->fdcnt_ready;

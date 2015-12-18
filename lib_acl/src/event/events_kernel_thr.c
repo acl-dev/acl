@@ -460,9 +460,11 @@ static void event_loop(ACL_EVENT *eventp)
 				fdp->fdidx_ready = eventp->fdcnt_ready;
 				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
 			}
+
 			if (fdp->listener)
 				fdp->event_type |= ACL_EVENT_ACCEPT;
-			fdp->stream->sys_read_ready = 1;
+			else
+				fdp->stream->sys_read_ready = 1;
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
 			&& EVENT_TEST_WRITE(bp))
 		{

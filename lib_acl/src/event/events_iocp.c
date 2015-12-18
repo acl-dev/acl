@@ -814,17 +814,19 @@ TAG_DONE:
 		if (iocp_event->type == IOCP_EVENT_READ) {
 			acl_assert(fdp->event_read == iocp_event);
 			iocp_event->type &= ~IOCP_EVENT_READ;
-			fdp->stream->sys_read_ready = 1;
 			if ((fdp->event_type & (ACL_EVENT_READ
 				| ACL_EVENT_WRITE)) == 0)
 			{
 				fdp->event_type |= ACL_EVENT_READ;
-				if (fdp->listener)
-					fdp->event_type |= ACL_EVENT_ACCEPT;
 				fdp->fdidx_ready = eventp->fdcnt_ready;
 				eventp->fdtabs_ready[eventp->fdcnt_ready] = fdp;
 				eventp->fdcnt_ready++;
 			}
+
+			if (fdp->listener)
+				fdp->event_type |= ACL_EVENT_ACCEPT;
+			else
+				fdp->stream->sys_read_ready = 1;
 		}
 		if (iocp_event->type == IOCP_EVENT_WRITE) {
 			acl_assert(fdp->event_write == iocp_event);

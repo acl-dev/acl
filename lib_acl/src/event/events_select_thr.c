@@ -429,15 +429,17 @@ static void event_loop(ACL_EVENT *eventp)
 		}
 
 		if (FD_ISSET(sockfd, &rmask)) {
-			fdp->stream->sys_read_ready = 1;
 			/* has been set in fdtabs_ready ? */
 			if ((fdp->event_type & ACL_EVENT_READ) == 0) {
 				fdp->event_type |= ACL_EVENT_READ;
-				if (fdp->listener)
-					fdp->event_type |= ACL_EVENT_ACCEPT;
 				fdp->fdidx_ready = eventp->fdcnt_ready;
 				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
 			}
+
+			if (fdp->listener)
+				fdp->event_type |= ACL_EVENT_ACCEPT;
+			else
+				fdp->stream->sys_read_ready = 1;
 		} else if (fdp->w_callback && FD_ISSET(sockfd, &wmask)) {
 			fdp->event_type |= ACL_EVENT_WRITE;
 			fdp->fdidx_ready = eventp->fdcnt_ready;

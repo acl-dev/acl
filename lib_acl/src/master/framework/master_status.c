@@ -55,11 +55,11 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 	 * only its pid is known - we do not know what service it came from.
 	 */
 
-#if 1
-	n = read(ACL_VSTREAM_FILE(serv->status_read_stream),
+#if 0
+	n = read(ACL_VSTREAM_SOCK(serv->status_read_stream),
 		(char *) &stat_buf, sizeof(stat_buf));
 #else
-	n = acl_vstream_readn(serv->status_read_stream,
+	n = acl_vstream_read(serv->status_read_stream,
 		(char *) &stat_buf, sizeof(stat_buf));
 #endif
 

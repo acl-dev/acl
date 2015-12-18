@@ -2,12 +2,12 @@ acl 3.1.4 版本发布了，acl 是 one advanced C/C++ library 的简称，主要包括网络通信
 本次 acl 升级的主要内容有：完善并丰富的 dbuf（内存池）模块，并在 acl 的多个模块中使用，增加了撰写邮件模块类，增加了基于内存映射的 xml 解析器；修改一些 BUG 问题，同时增加了一些功能点。
 
 acl 包括以下丰富的常用函数库：
-1、常见网络应用库： SMTP 客户端库/PING 库/DNS 解析库/memcache 客户端库/handler socket 客户端库/beanstalk 客户端库/disque 客户端库
-2、redis 客户端库：实现了 redis 客户端命令中 12 个大类中的总共 150 多个命令，支持连接池及集群连接池方式
-3、HTTP 网络库：HTTP 客户端/服务端库，C++版 HttpServlet 类，HTTP COOKIE/HTTP SESSION 等
-4、邮件解析库：mime解析库/RFC2047/RFC2048/mime base64/mime qp/mime uucode 等
-5、网络通信库：阻塞/非阻塞网络 IO 库(其中 lib_acl_cpp 库通过嵌入 polarssl 而具备了 SSL 的能力)
-6、服务器框架：包括进程池模式、线程池模式、非阻塞模式、UDP通信模式及触发器模式
+1、服务器框架：包括进程池模式、线程池模式、非阻塞模式、UDP通信模式及触发器模式
+2、网络通信库：阻塞/非阻塞网络 IO 库(其中 lib_acl_cpp 库通过嵌入 polarssl 而具备了 SSL 的能力)
+3、HTTP 网络库：HTTP 客户端/服务端库，HTTP 服务端支持 HttpServlet 接口访问方式；支持 HTTP cookies/session；HTTP 客户端支持连接池及连接池集群
+4、redis 客户端库：实现了 redis 客户端命令中 12 个大类中的总共 150 多个命令，支持连接池及集群连接池方式
+5、常见网络应用库： SMTP 客户端库/PING 库/DNS 解析库/memcache 客户端库/handler socket 客户端库/beanstalk 客户端库/disque 客户端库
+6、邮件解析库：mime解析库/RFC2047/RFC2048/mime base64/mime qp/mime uucode 等
 7、事件引擎：支持 select、poll(for unix)、epoll(for linux)、kqueue(for bsd)、devpoll(for solaris)、iocp(for win32)、win32 窗口消息(for win32）事件引擎
 8、通用连接池库：高效的连接池基础类库，支持丰富的功能
 9、数据库客户端库：对原生的数据库客户端库进行了二次封装，使编程更为简易，功能更为丰富，支持连接池及连接池集群管理功能
@@ -31,7 +31,7 @@ acl 包括以下丰富的常用函数库：
 .新特性：acl_xml2 解析器新增接口 acl_xml2_mmap_alloc，方便以内存文件映射方式对 xml 文件进行解析和创建
 .新特性：acl_xml_parse.c / acl_xml2_parse.c 可以解析 CDATA
 
-.问题修复： acl_atoui64/acl_atoi64 在 WINDOWS 平台使用 VC2012 编译时有问题，因为内部所用的 VC 提供的 API _atoi64 有问题，当转换最大的 64 位整数（18446744073709551615）
+.问题修复：acl_atoui64/acl_atoi64 在 WINDOWS 平台使用 VC2012 编译时有问题，因为内部所用的 VC 提供的 API _atoi64 有问题，当转换最大的 64 位整数（18446744073709551615）
 .问题修复：acl_json_parse.c 针对 -xxx 或 +xxx 也应识别为数值类型
 .问题修复：acl_xml_util.c 中 acl_xml_build 进行 xml 特殊字符转义时有误
 .问题修复：acl_dbuf_pool.c 中在调用 acl_dbuf_pool_reset 时在遇到保留内存块时应该保留整个内存块，且偏移地址保持不变
@@ -48,32 +48,32 @@ acl 包括以下丰富的常用函数库：
 .问题修复： http_hdr_res.c/http_hdr_req.c 中有可能会因为 main_cache_free 的调用在 http_hdr_res_free/http_hdr_req_free 之前调用而造成内存冲突
 
 三、lib_acl_cpp 库
-.特性：locker 互斥类增加了 lock_guard 类以便于简化加锁/解锁操作
-.特性：添加 smtp_client 类用来发送电子邮件，同时支持 SSL 方式发送邮件
-.特性：smtp 模块增加了邮件合成的功能
-.特性：connect_pool/connect_manager 连接池及连接池管理类允许设置无连接数上限
-.特性：json 解析器增加支持判断是否解析完毕的功能
-.特性：json_node 类增加了节点类型的判断方法
-.特性：json 类添加了新方法 getFirstElementByTagName
-.特性：json 类增加了重载运行符[]接口，方便用户获得第一个匹配对象
-.特性：http 模块中的 HttpServlet 类增加了 doOther 虚接口，从而可以支持其它未知的 HTTP 请求方法
-.特性：string 类中的方法 strip 采用写时拷贝技术
-.特性：string 类增加了方法 equal 用来比较两个 string 对象里的内容
-.特性：redis_client_cluster/redis_client_pool/redis_client 支持连接成功后使用连接密码进行身份验证，从而使 redis 的集群模块支持密码验证功能
-.特性：url_coder 类内部采用 dbuf_pool 内存对象进行分配管理
-.特性：dbuf_pool 类重载的 new 允许调用者指定所分配的内存块的倍数
-.特性：dbuf_pool.cpp 中增加了内存池管理类 dbuf_guard 及内存池对象类 dbuf_obj，以方便使用 dbuf_pool 内存池
-.特性：dbuf_obj 类增加了 nrefer_，便于 dbuf_guard 进行安全管理，以防止被 dbug_guard 类对象重复释放
-.特性：dbuf_guard 类增加了更多方便操作的方法，同时使数组对象也在内存池对象上创建
-.特性：dbuf_guard 类增加了模板函数 create，可更加方便地创建任何继承于 dbuf_obj 的子类对象
-.特性：url_coder 类继承于 dbuf_obj 从而纳入 dbuf_guard 管理
-.特性：连接池模块简化接口设计，允许连接集群管理器在添加新的连接池时设置超时时间，从而使连接池集群管理器针对不同的服务器地址采用不同的超时时间，这样可以使连接池模块适应于异构网络环境中
-.特性：http_request/http_request_pool/http_request_manager 类支持 SSL 通信方式
-.特性：增加了 xml1.cpp/xml1.hpp 以便于支持第一个 xml 解析器
-.特性：增加了 xml2.cpp/xml2.hpp 以便于支持第二个 xml 解析器
-.特性： xml2 新增构造函数，可以更方便地使用内存文件映射方式解析和创建 xml 对象（目前仅支持 UNIX）
-.特性：xml2 类新增构造函数以文件句柄为构造参数
-.特性：xml_node 类中增加接口 detach 用于将一个 xml 节点从 xml 对象树中分离
+.新特性：locker 互斥类增加了 lock_guard 类以便于简化加锁/解锁操作
+.新特性：添加 smtp_client 类用来发送电子邮件，同时支持 SSL 方式发送邮件
+.新特性：smtp 模块增加了邮件合成的功能
+.新特性：connect_pool/connect_manager 连接池及连接池管理类允许设置无连接数上限
+.新特性：json 解析器增加支持判断是否解析完毕的功能
+.新特性：json_node 类增加了节点类型的判断方法
+.新特性：json 类添加了新方法 getFirstElementByTagName
+.新特性：json 类增加了重载运行符[]接口，方便用户获得第一个匹配对象
+.新特性：http 模块中的 HttpServlet 类增加了 doOther 虚接口，从而可以支持其它未知的 HTTP 请求方法
+.新特性：string 类中的方法 strip 采用写时拷贝技术
+.新特性：string 类增加了方法 equal 用来比较两个 string 对象里的内容
+.新特性：redis_client_cluster/redis_client_pool/redis_client 支持连接成功后使用连接密码进行身份验证，从而使 redis 的集群模块支持密码验证功能
+.新特性：url_coder 类内部采用 dbuf_pool 内存对象进行分配管理
+.新特性：dbuf_pool 类重载的 new 允许调用者指定所分配的内存块的倍数
+.新特性：dbuf_pool.cpp 中增加了内存池管理类 dbuf_guard 及内存池对象类 dbuf_obj，以方便使用 dbuf_pool 内存池
+.新特性：dbuf_obj 类增加了 nrefer_，便于 dbuf_guard 进行安全管理，以防止被 dbug_guard 类对象重复释放
+.新特性：dbuf_guard 类增加了更多方便操作的方法，同时使数组对象也在内存池对象上创建
+.新特性：dbuf_guard 类增加了模板函数 create，可更加方便地创建任何继承于 dbuf_obj 的子类对象
+.新特性：url_coder 类继承于 dbuf_obj 从而纳入 dbuf_guard 管理
+.新特性：连接池模块简化接口设计，允许连接集群管理器在添加新的连接池时设置超时时间，从而使连接池集群管理器针对不同的服务器地址采用不同的超时时间，这样可以使连接池模块适应于异构网络环境中
+.新特性：http_request/http_request_pool/http_request_manager 类支持 SSL 通信方式
+.新特性：增加了 xml1.cpp/xml1.hpp 以便于支持第一个 xml 解析器
+.新特性：增加了 xml2.cpp/xml2.hpp 以便于支持第二个 xml 解析器
+.新特性：xml2 新增构造函数，可以更方便地使用内存文件映射方式解析和创建 xml 对象（目前仅支持 UNIX）
+.新特性：xml2 类新增构造函数以文件句柄为构造参数
+.新特性：xml_node 类中增加接口 detach 用于将一个 xml 节点从 xml 对象树中分离
 
 .问题修复：redis_zset::zrangebyscore_get 其中的 argc 计数有误
 .问题修复：redis_command 类中有两处 build 函数在构建请求命令时应该支持二进制格式
@@ -82,7 +82,7 @@ acl 包括以下丰富的常用函数库：
 .问题修复：string 类中的方法 strip 在当其中的参数 each 为 true 时分析方法有误
 .问题修复：string 类中的方法 strip 当其中参数 each 为 false 时分析方式有误
 .问题修复：db_mysql 类内部在出错重连时，没有使用初始连接时使用的字符集
-.问题修复： HttpServletRequest 类中方法 readHeader 当调用方法 getContentLength 时返回 -1，则会造成下面调用 acl_mymalloc((size_t) len + 1) 时崩溃，现在针对 getContentLength 返回 -1时，直接返回
+.问题修复：HttpServletRequest 类中方法 readHeader 当调用方法 getContentLength 时返回 -1，则会造成下面调用 acl_mymalloc((size_t) len + 1) 时崩溃，现在针对 getContentLength 返回 -1时，直接返回
 .问题修复：mail_message 类中的 append_addrs 方法存在一处指针溢出的 BUG
 .问题修复：修复了 dbuf_obj 构造函数中的 BUG，应该首先将 nrefer_ 初始化为 0
 .问题修复：dbuf_guard 类在创建数组容器时需要调用 dbuf_keep 以保留内存池中的所在内存块
@@ -98,4 +98,4 @@ acl 包括以下丰富的常用函数库：
 四、参考链接：
 下载：http://sourceforge.net/projects/acl/
 国内镜像：https://git.oschina.net/zsxxsz/acl
-
+技术文章：http://zsxxsz.iteye.com/

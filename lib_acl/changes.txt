@@ -1,6 +1,14 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+517) 2015.12.18
+517.1) bugfix: events.c 中函数 event_prepare 针对监听描述符，应该忽略掉标志位
+sys_read_ready，该标志位仅对网络 IO 套接字有效
+517.2) bugfix: 事件引擎不应针对监听套接字设置 sys_read_ready 标志位
+517.3) bugfix: master_status.c 函数 master_status_event 中在读数据时应该使用
+acl_vstream_read，而不应使用系统 API read，因为 acl_vstream_read 内部才会清除
+sys_read_ready 标志位
+
 516) 2015.12.9
 516.1) feature: acl_xml_parse.c / acl_xml2_parse.c can parse CDATA
 
