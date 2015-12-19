@@ -3,7 +3,7 @@ acl 3.1.4 版本发布了，acl 是 one advanced C/C++ library 的简称，主要包括网络通信
 
 acl 包括以下丰富的常用函数库：
 1、服务器框架：包括进程池模式、线程池模式、非阻塞模式、UDP通信模式及触发器模式
-2、网络通信库：阻塞/非阻塞网络 IO 库(其中 lib_acl_cpp 库通过嵌入 polarssl 而具备了 SSL 的能力)
+2、网络通信库：阻塞/非阻塞网络 IO 库(其中 lib_acl_cpp 库通过嵌入 polarssl 而具备了 SSL 通信能力)
 3、HTTP 网络库：HTTP 客户端/服务端库，HTTP 服务端支持 HttpServlet 接口访问方式；支持 HTTP cookies/session；HTTP 客户端支持连接池及连接池集群
 4、redis 客户端库：实现了 redis 客户端命令中 12 个大类中的总共 150 多个命令，支持连接池及集群连接池方式
 5、常见网络应用库： SMTP 客户端库/PING 库/DNS 解析库/memcache 客户端库/handler socket 客户端库/beanstalk 客户端库/disque 客户端库
@@ -36,7 +36,7 @@ acl 包括以下丰富的常用函数库：
 .问题修复：acl_xml_util.c 中 acl_xml_build 进行 xml 特殊字符转义时有误
 .问题修复：acl_dbuf_pool.c 中在调用 acl_dbuf_pool_reset 时在遇到保留内存块时应该保留整个内存块，且偏移地址保持不变
 .问题修复：acl_vstream.c 中的函数 sys_read 中必须在调用 fread_fn/read_fn 前清除可读标志位，这样 IO 钩子函数在重置该标志位时才能生效
-.问题修复：将清楚 ACL_VSTREAM::sys_read_ready 标志位的操作从 acl_vstream.c 的函数 sys_read 中移除，在 acl_sys_socket.c 的函数 acl_socket_read 进行清除该标志位
+.问题修复：将清除 ACL_VSTREAM::sys_read_ready 标志位的操作从 acl_vstream.c 的函数 sys_read 中移除，在 acl_sys_socket.c 的函数 acl_socket_read 进行清除该标志位
 .问题修复：acl_xml.c/acl_xml2.c/acl_xml3.c 在删除节点时在在残留问题
 .问题修复：acl_vstream.c 中当 read/write 接口被注入时，因为没有对应的 writev 注入方式，所以需要多次调用 write 来模拟 writev 过程
 

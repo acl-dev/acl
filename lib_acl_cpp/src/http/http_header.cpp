@@ -390,6 +390,13 @@ http_header& http_header::set_method(const char* method)
 	return *this;
 }
 
+http_method_t http_header::get_method(string* buf /* = NULL */) const
+{
+	if (buf)
+		*buf = method_s_;
+	return method_;
+}
+
 http_header& http_header::set_range_total(http_off_t total)
 {
 	range_total_ = total;

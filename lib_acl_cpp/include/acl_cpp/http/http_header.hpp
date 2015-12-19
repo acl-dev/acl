@@ -253,12 +253,10 @@ public:
 
 	/**
 	 * 当作为请求头时，本函数取得当前邮件头的请求方法
+	 * @param buf {string*} 存储用字符串表示的请求方法
 	 * @return {http_method_t}
 	 */
-	http_method_t get_method(void) const
-	{
-		return method_;
-	}
+	http_method_t get_method(string* buf = NULL) const;
 
 	/**
 	 * 设置 HTTP 请求头中是否允许接收压缩数据，对应的 HTTP 头字段为：
