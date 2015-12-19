@@ -53,7 +53,7 @@ static int write_complete_callback(ACL_ASTREAM *astream)
 		ACL_ITER iter;
 		AIO_WRITE_HOOK *handle;
 
-		/* XXX: 必须将各个回调句柄从回调队列中一一提出置入一个单独队列中,
+		/* 必须将各个回调句柄从回调队列中一一提出置入一个单独队列中,
 		 * 因为 ACL_AIO 在回调过程中有可能发生嵌套，防止被重复调用
 		 */
 
@@ -62,7 +62,8 @@ static int write_complete_callback(ACL_ASTREAM *astream)
 				astream->write_handles);
 			if (handle == NULL)
 				break;
-			astream->writer_fifo.push_back(&astream->writer_fifo, handle);
+			astream->writer_fifo.push_back(
+					&astream->writer_fifo, handle);
 		}
 
 		acl_foreach_reverse(iter, &astream->writer_fifo) {
@@ -93,7 +94,8 @@ static int __try_fflush(ACL_ASTREAM *astream)
 	int   n, dlen;
 	int   i = 0;
 
-	/* 针对写队列，也许调用 writev 会更好，应该那个写的效率会更高些 --- zsx */
+	/* 针对写队列，也许调用 writev 会更好，应该那个写的效率会更高些
+	 * --- zsx */
 
 	while (1) {
 		/* 提取流写队列的数据头部分 */
@@ -106,11 +108,12 @@ static int __try_fflush(ACL_ASTREAM *astream)
 			return (astream->write_left);
 		}
 
-		/* 计算本数据块的长度及数据开始位置, write_offset 仅是本数据块的相对位置,
-		 * 即相对于数据块的起始位置的相对长度，所以 dlen 仅是本数据块中在本次写
-		 * 操作需要被写的数据的长度；而 write_left 则是全局性的，是整个写队列的
-		 * 数据长度，需要将该这两个变量区分开，将来也许应该将 write_offset 也设
-		 * 定为全局性的。--- zsx :)
+		/* 计算本数据块的长度及数据开始位置, write_offset 仅是本数据块
+		 * 的相对位置, 即相对于数据块的起始位置的相对长度，所以 dlen
+		 * 仅是本数据块中在本次写操作需要被写的数据的长度；而
+		 * write_left 则是全局性的，是整个写队列的数据长度，需要将该
+		 * 这两个变量区分开，将来也许应该将 write_offset 也设定为全局
+		 * 性的。--- zsx :)
 		 */
 
 		dlen = (int) ACL_VSTRING_LEN(str) - astream->write_offset;
@@ -122,7 +125,7 @@ static int __try_fflush(ACL_ASTREAM *astream)
 				astream->flag |= ACL_AIO_FLAG_DEAD;
 				return (-1);
 			}
-			/* 本次写操作未写入任务数据，仅需要返回剩余数据长度即可 */
+			/* 本次写操作未写入数据，仅需要返回剩余数据长度即可 */
 			return (astream->write_left);
 		}
 
@@ -130,8 +133,8 @@ static int __try_fflush(ACL_ASTREAM *astream)
 		astream->write_left -= n;
 
 		if (n < dlen) {
-			/* 未能将本数据块的可写数据全部写入，所以需要重新计算该数据块的
-			 * 可写数据的相对偏移位置
+			/* 未能将本数据块的可写数据全部写入，所以需要重新计算
+			 * 该数据块的可写数据的相对偏移位置
 			 */
 			astream->write_offset += n;
 			return (astream->write_left);
@@ -147,9 +150,9 @@ static int __try_fflush(ACL_ASTREAM *astream)
 		 */
 		astream->write_offset = 0;
 
-		/* 如果本轮写队列操作的循环次数过多，则应返回，以给其它的数据连接
-		 * 可读写的机会, 别忘了，在单线程条件下进行非阻塞写时可能会有很多
-		 * 数据连接需要被处理，总之，数据面前大家平等:)
+		/* 如果本轮写队列操作的循环次数过多，则应返回，以给其它的数据
+		 * 连接可读写的机会, 别忘了，在单线程条件下进行非阻塞写时可能
+		 * 会有很多数据连接需要被处理，总之，数据面前大家平等:)
 		 */
 		if (++i >= 10) {
 			if (acl_msg_verbose)
@@ -176,11 +179,12 @@ static void __writen_notify_callback(int event_type, ACL_EVENT *event acl_unused
 		WRITE_IOCP_CLOSE(astream);
 		return;
 	} else if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
-		/* 写操作超时，如果用户的回调函数返回 -1则启动IO完成延迟关闭过程 */
+		/* 写操作超时，若用户的回调函数返回 -1 则采用 IO 完成延迟
+		 * 关闭过程 */
 		if (aio_timeout_callback(astream) < 0) {
 			WRITE_IOCP_CLOSE(astream);
 		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
-			/* 该流正处于IO延迟关闭状态，因为本次写IO已经成功完成，
+			/* 该流正处于IO延迟关闭状态，因本次写IO已经成功完成，
 			 * 所以需要完成流的IO延迟关闭过程
 			 */
 			WRITE_IOCP_CLOSE(astream);
@@ -215,7 +219,8 @@ static void __writen_notify_callback(int event_type, ACL_EVENT *event acl_unused
 			WRITE_IOCP_CLOSE(astream);
 		}
 	} else {
-		/* 说明写队列里的数据未发送完毕，需要再次发送，所以将写事件置入事件监控中 */
+		/* 说明写队列里的数据未发送完毕，需要再次发送，所以将写事件置
+		 * 入事件监控中 */
 		WRITE_SAFE_ENABLE(astream, __writen_notify_callback);
 	}
 }
@@ -233,53 +238,8 @@ void acl_aio_writen(ACL_ASTREAM *astream, const char *data, int dlen)
 	astream->write_nested++;
 
 	/* 如果嵌套调用次数小于阀值，则允许进行嵌套调用 */
-	if (astream->write_nested < astream->write_nested_limit) {
-		/* 先尝试写流的写队列中的数据 */
-		n = __try_fflush(astream);
-
-		if (n < 0) { /* 说明尝试写失败，需要关闭流 */
-			astream->write_nested--;
-			WRITE_IOCP_CLOSE(astream);
-			return;
-		} else if (n == 0) {
-			/* __try_fflush 返回的是队列中的数据已经清空，
-			 * 本次可以真正调用一次写操作
-			 */
-			n = acl_vstream_write(astream->stream, data, dlen);
-			if (n == ACL_VSTREAM_EOF) {
-				if (acl_last_error() != ACL_EAGAIN) {
-					astream->write_nested--;
-					WRITE_IOCP_CLOSE(astream);
-					astream->flag |= ACL_AIO_FLAG_DEAD;
-					return;
-				}
-				/* 如果未写任何数据且诊断该流的对等点并未关闭，
-				 * 则将此次数据置入该流的写队列中
-				 */
-				n = 0;
-			} else if (n == dlen) { /* 说明已经成功写入了全部的数据 */
-				int  ret;
-
-				ret = write_complete_callback(astream);
-				if (ret < 0) {
-					/* 调用者希望关闭流 */
-					WRITE_IOCP_CLOSE(astream);
-				} else if ((astream->flag & ACL_AIO_FLAG_IOCP_CLOSE)) {
-					/* 因为本次写IO已经成功完成，所以需要完成流的IO延迟关闭过程 */
-					WRITE_IOCP_CLOSE(astream);
-				}
-				return;
-			}
-			/* 0 < n < dlen */
-			/* 只是成功写入了部分流，n 表示还剩余的数据长度 */
-		} else {
-			/* __try_fflush 并未全部写完写队列的所有的数据，所以也需要本次的数据
-			 * 全部加入流的写队列中
-			 */
-			n = 0;
-		}
-	} else {
-		/* 递归嵌套写次数达到了规定的阀值，只需记个警告信息即可，因为有嵌套限制 */
+	if (astream->write_nested >= astream->write_nested_limit) {
+		/* 递归写次数达到了阀值，只需记个警告信息，因为有嵌套限制 */
 		if (acl_msg_verbose)
 			acl_msg_warn("%s(%d): write_nested(%d) >= max(%d)",
 				myname, __LINE__, astream->write_nested,
@@ -287,11 +247,59 @@ void acl_aio_writen(ACL_ASTREAM *astream, const char *data, int dlen)
 		n = 0;
 	}
 
-	/* 否则，不允许继续嵌套，而是将写事件置于事件监控循环中，从而减少嵌套层次 */
+	/* 先尝试写流的写队列中的数据 */
+	else if ((n = __try_fflush(astream)) < 0) {
+		/* 说明尝试写失败，需要关闭流 */
+		astream->write_nested--;
+		WRITE_IOCP_CLOSE(astream);
+		return;
+	} else if (n > 0) {
+		/* __try_fflush 并未全部写完写队列的所有的数据，所以
+		 * 也需要本次的数据全部加入流的写队列中
+		 */
+		n = 0;
+	}
+
+	/* __try_fflush 返回 0, 队列中数据已经清空，可以真正调用一次写操作 */
+	else if ((n = acl_vstream_write(astream->stream, data, dlen)) == dlen)
+	{
+		/* 说明已经成功写入了全部的数据 */
+
+		if (write_complete_callback(astream) < 0) {
+			astream->write_nested--;
+
+			/* 调用者希望关闭流 */
+			WRITE_IOCP_CLOSE(astream);
+		} else if ((astream->flag & ACL_AIO_FLAG_IOCP_CLOSE)) {
+			astream->write_nested--;
+
+			/* 因为本次写IO已经成功完成，所以需要
+			 * 完成流的IO延迟关闭过程
+			 */
+			WRITE_IOCP_CLOSE(astream);
+		} else
+			astream->write_nested--;
+
+		return;
+	} else if (n == ACL_VSTREAM_EOF) {
+		if (acl_last_error() != ACL_EAGAIN) {
+			astream->write_nested--;
+			WRITE_IOCP_CLOSE(astream);
+			astream->flag |= ACL_AIO_FLAG_DEAD;
+			return;
+		}
+
+		/* 若未写任何数据且诊断该流的对等点并未关闭，
+		 * 则将此次数据置入该流的写队列中
+		 */
+		n = 0;
+	}
+
+	/* 否则，禁止继续嵌套，将写事件置于事件监控中，从而减少嵌套层次 */
 
 	astream->write_nested--;
 
-	/* Notice: in acl_vstring_memcpy, vstring_extend should not be called! */
+	/* XXX: In acl_vstring_memcpy, vstring_extend should not be called */
 
 	/* 将数据置入该流的写队列中 */
 
@@ -320,66 +328,68 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 	astream->write_nested++;
 
 	/* 如果嵌套调用次数小于阀值，则允许进行嵌套调用 */
-	if (astream->write_nested < astream->write_nested_limit) {
-		/* 先尝试写流的写队列中的数据 */
-		n = __try_fflush(astream);
-	
-		if (n < 0) { /* 说明尝试写失败，需要关闭流 */
-			astream->write_nested--;
-			WRITE_IOCP_CLOSE(astream);
-			return;
-		} else if (n == 0) {
-			/* __try_fflush 返回的是队列中的数据已经清空，
-			 * 本次可以真正调用一次写操作
-			 */
-			const char *ptr;
-
-			ptr = acl_vstring_str(str);
-			len = (int) ACL_VSTRING_LEN(str);
-			n = acl_vstream_write(astream->stream, ptr, len);
-			if (n == ACL_VSTREAM_EOF) {
-				if (acl_last_error() != ACL_EAGAIN) {
-					astream->flag |= ACL_AIO_FLAG_DEAD;
-					astream->write_nested--;
-					WRITE_IOCP_CLOSE(astream);
-					return;
-				}
-				/* 如果未写任何数据且诊断该流的对等点并未关闭，
-				 * 则将此次数据置入该流的写队列中
-				 */
-				n = 0;
-			} else if (n == len) { /* 说明已经成功写入了全部的数据 */
-				int   ret;
-
-				ret = write_complete_callback(astream);
-				astream->write_nested--;
-				acl_vstring_free(str);
-
-				if (ret < 0) /* 调用者希望关闭流 */
-					WRITE_IOCP_CLOSE(astream);
-				else if ((astream->flag & ACL_AIO_FLAG_IOCP_CLOSE)) {
-					/* 因为本次写IO已经成功完成，所以需要完成流的IO延迟关闭过程 */
-					WRITE_IOCP_CLOSE(astream);
-				}
-				return;
-			}
-			/* 0 < n < dlen */
-			/* 只是成功写入了部分流，n 表示还剩余的数据长度 */
-		} else {
-			/* __try_fflush 并未全部写完写队列的所有的数据，所以也需要本次的数据
-			 * 全部加入流的写队列中
-			 */
-			n = 0;
-		}
-	} else {
-		/* 递归嵌套写次数达到了规定的阀值，只需记个警告信息即可，因为有嵌套限制 */
+	if (astream->write_nested >= astream->write_nested_limit) {
+		/* 递归嵌套写次数达到了规定的阀值，只需记个警告信息即可，
+		 * 因为有嵌套限制 */
 		if (acl_msg_verbose)
 			acl_msg_warn("%s: write_nested(%d) >= max(%d)",
-				myname, astream->write_nested, astream->write_nested_limit);
+				myname, astream->write_nested,
+				astream->write_nested_limit);
 		n = 0;
 	}
 
-	/* 否则，不允许继续嵌套，而是将写事件置于事件监控循环中，从而减少嵌套层次 */
+	/* 先尝试写流的写队列中的数据 */
+	else if ((n = __try_fflush(astream)) < 0) {
+		/* 说明尝试写失败，需要关闭流 */
+		astream->write_nested--;
+		WRITE_IOCP_CLOSE(astream);
+		return;
+	} else if (n == 0) {
+		/* __try_fflush 返回的是队列中的数据已经清空，
+		 * 本次可以真正调用一次写操作
+		 */
+		const char *ptr = acl_vstring_str(str);
+		len = (int) ACL_VSTRING_LEN(str);
+		n = acl_vstream_write(astream->stream, ptr, len);
+		if (n == ACL_VSTREAM_EOF) {
+			if (acl_last_error() != ACL_EAGAIN) {
+				astream->flag |= ACL_AIO_FLAG_DEAD;
+				astream->write_nested--;
+				WRITE_IOCP_CLOSE(astream);
+				return;
+			}
+			/* 如果未写任何数据且诊断该流的对等点并未关闭，
+			 * 则将此次数据置入该流的写队列中
+			 */
+			n = 0;
+		} else if (n == len) {
+			/* 说明已经成功写入了全部的数据 */
+
+			int ret = write_complete_callback(astream);
+			acl_vstring_free(str);
+			astream->write_nested--;
+
+			if (ret < 0) /* 调用者希望关闭流 */
+				WRITE_IOCP_CLOSE(astream);
+			else if ((astream->flag & ACL_AIO_FLAG_IOCP_CLOSE)) {
+				/* 因为本次写IO已经成功完成，所以需要
+				 * 完成流的IO延迟关闭过程 */
+				WRITE_IOCP_CLOSE(astream);
+			}
+
+			return;
+		}
+	}
+
+	/* 只是成功写入了部分流，n 表示还剩余的数据长度 */
+	else {
+		/* __try_fflush 并未全部写完写队列的所有的数据，所以也
+		 * 需要本次的数据全部加入流的写队列中
+		 */
+		n = 0;
+	}
+
+	/* 否则，禁止继续嵌套，将写事件置于事件监控中，从而减少嵌套层次 */
 
 	astream->write_nested--;
 
@@ -422,41 +432,45 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 	astream->write_nested++;
 
 	/* 如果嵌套调用次数小于阀值，则允许进行嵌套调用 */
-	if (astream->write_nested < astream->write_nested_limit) {
-		/* 先尝试写流的写队列中的数据 */
-		n = __try_fflush(astream);
-		if (n < 0) { /* 说明尝试写失败，需要关闭流 */
+	if (astream->write_nested >= astream->write_nested_limit) {
+		/* 递归嵌套写次数达到了规定的阀值，只需记个警告信息即可，
+		 * 因为有嵌套限制 */
+		if (acl_msg_verbose)
+			acl_msg_warn("%s(%d): write_nested(%d) >= max(%d)",
+				myname, __LINE__, astream->write_nested,
+				astream->write_nested_limit);
+		n = 0;
+
+	}
+
+	/* 先尝试写流的写队列中的数据 */
+	else if ((n = __try_fflush(astream)) < 0) {
+		/* 说明尝试写失败，需要关闭流 */
+		astream->write_nested--;
+		WRITE_IOCP_CLOSE(astream);
+		return;
+	} else if (n > 0) {
+		/* __try_fflush 并未全部写完写队列的所有的数据，所以也
+		 * 需要本次的数据全部加入流的写队列中
+		 */
+		n = 0;
+	}
+
+	/* __try_fflush 返回的是队列中的数据已经清空，
+	 * 本次可以真正调用一次写操作
+	 */
+	else if ((n = acl_vstream_writev(astream->stream, vector, count))
+		== ACL_VSTREAM_EOF)
+	{
+		if (acl_last_error() != ACL_EAGAIN) {
+			astream->flag |= ACL_AIO_FLAG_DEAD;
 			astream->write_nested--;
 			WRITE_IOCP_CLOSE(astream);
 			return;
-		} else if (n == 0) {
-			/* __try_fflush 返回的是队列中的数据已经清空，
-			 * 本次可以真正调用一次写操作
-			 */
-			n = acl_vstream_writev(astream->stream, vector, count);
-			if (n == ACL_VSTREAM_EOF) {
-				if (acl_last_error() != ACL_EAGAIN) {
-					astream->flag |= ACL_AIO_FLAG_DEAD;
-					astream->write_nested--;
-					WRITE_IOCP_CLOSE(astream);
-					return;
-				}
-				/* 如果未写任何数据且诊断该流的对等点并未关闭，
-				 * 则将此次数据置入该流的写队列中
-				 */
-				n = 0;
-			}
-		} else {
-			/* __try_fflush 并未全部写完写队列的所有的数据，所以也需要本次的数据
-			 * 全部加入流的写队列中
-			 */
-			n = 0;
 		}
-	} else {
-		/* 递归嵌套写次数达到了规定的阀值，只需记个警告信息即可，因为有嵌套限制 */
-		if (acl_msg_verbose)
-			acl_msg_warn("%s(%d): write_nested(%d) >= max(%d)",
-				myname, __LINE__, astream->write_nested, astream->write_nested_limit);
+		/* 如果未写任何数据且诊断该流的对等点并未关闭，
+		 * 则将此次数据置入该流的写队列中
+		 */
 		n = 0;
 	}
 
@@ -483,13 +497,15 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 			/* 调用者希望关闭流 */
 			WRITE_IOCP_CLOSE(astream);
 		} else if ((astream->flag & ACL_AIO_FLAG_IOCP_CLOSE)) {
-			/* 因为本次写IO已经成功完成，所以需要完成流的IO延迟关闭过程 */
+			/* 因为本次写IO已经成功完成，所以需要完成流的IO延迟
+			 * 关闭过程 */
 			WRITE_IOCP_CLOSE(astream);
 		}
+
 		return;
 	}
 
-	/* 否则，不允许继续嵌套，而是将写事件置于事件监控循环中，从而减少嵌套层次 */
+	/* 否则，禁止继续嵌套，将写事件置于事件监控中，从而减少嵌套层次 */
 
 	astream->write_nested--;
 

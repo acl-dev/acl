@@ -116,22 +116,12 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 		return -1;
 	return dwBytes;
 #else
-	int ret;
-
-	if (fp != NULL && fp->sys_read_ready) {
+	if (fp != NULL && fp->sys_read_ready)
 		fp->sys_read_ready = 0;
-		timeout = 0;
-	}
-
-	if (timeout > 0 && acl_read_wait(fd, timeout) < 0) {
-		errno = acl_last_error();
+	else if (timeout > 0 && acl_read_wait(fd, timeout) < 0)
 		return -1;
-	}
 
-	ret = recv(fd, buf, (int) size, 0);
-	if (ret <= 0)
-		errno = acl_last_error();
-	return ret;
+	return recv(fd, buf, (int) size, 0);
 #endif
 }
 
@@ -216,35 +206,15 @@ int acl_socket_close(ACL_SOCKET fd)
 	return close(fd);
 }
 
-static int __sys_read(ACL_SOCKET fd, void *buf, size_t size, int readable)
-{
-	(void) readable;
-	return read(fd, buf, size);
-}
-
-static int __sys_socket_read(ACL_SOCKET fd, void *buf, size_t size,
-	int timeout, int sys_read_ready)
-{
-	int   readable;
-
-	if (sys_read_ready == 0 && timeout > 0) {
-		if (acl_read_wait(fd, timeout) < 0) {
-			errno = acl_last_error();
-			return -1;
-		}
-
-		readable = 1;
-	} else
-		readable = 0;
-
-	return __sys_read(fd, buf, size, readable);
-}
-
 int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	int timeout, ACL_VSTREAM *fp, void *arg acl_unused)
 {
-	return __sys_socket_read(fd, buf, size, timeout,
-			fp ? fp->sys_read_ready : 0);
+	if (fp != NULL && fp->sys_read_ready)
+		fp->sys_read_ready = 0;
+	else if (timeout > 0 && acl_read_wait(fd, timeout) < 0)
+		return -1;
+
+	return read(fd, buf, size);
 }
 
 int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,

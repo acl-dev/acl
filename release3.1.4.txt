@@ -39,6 +39,8 @@ acl 包括以下丰富的常用函数库：
 .问题修复：将清除 ACL_VSTREAM::sys_read_ready 标志位的操作从 acl_vstream.c 的函数 sys_read 中移除，在 acl_sys_socket.c 的函数 acl_socket_read 进行清除该标志位
 .问题修复：acl_xml.c/acl_xml2.c/acl_xml3.c 在删除节点时在在残留问题
 .问题修复：acl_vstream.c 中当 read/write 接口被注入时，因为没有对应的 writev 注入方式，所以需要多次调用 write 来模拟 writev 过程
+.问题修复：acl_sys_socket.c 的函数 acl_socket_read 中没有清除流对象的系统可读标志位, 可能会造成读阻塞或异步读时的死循环
+.问题修复：acl_aio_write.c 的函数 acl_aio_writen 中在一处返回时未将嵌套层级减一，可能会阻塞写过程
 
 .性能：acl_xml_util.c 中的函数 acl_xml_create_node 在创建节点时，如果正文内容比较大，则会因内存的快速频繁膨胀而造成性能损耗，现在采用了预分配策略，以减少这种性能损耗
 .性能：acl_xmlcode.c 中的函数 acl_xml_encode/acl_xml_decode 通过

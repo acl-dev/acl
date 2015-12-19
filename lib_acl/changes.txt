@@ -1,6 +1,12 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+518) 2015.12.19
+518.1) bugfix: acl_sys_socket.c 的函数 acl_socket_read 中没有清除流对象 fp
+的系统可读标志位(sys_read_ready 置 0)，则可能会造成读阻塞或异步读时的死循环
+518.2) bugfix: acl_aio_write.c 的函数 acl_aio_writen 中在一处返回时未将嵌套
+层级减一，可能会阻塞写过程
+
 517) 2015.12.18
 517.1) bugfix: events.c 中函数 event_prepare 针对监听描述符，应该忽略掉标志位
 sys_read_ready，该标志位仅对网络 IO 套接字有效
