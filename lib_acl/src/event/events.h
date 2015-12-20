@@ -86,6 +86,8 @@ struct	ACL_EVENT {
 	int   delay_sec;
 	/* 事件引擎的最大等待时间(微秒) */
 	int   delay_usec;
+	/* 本次循环前缓冲区有数据可读的描述字个数 */
+	int   read_ready;
 	/* 定时器任务列表头 */
 	ACL_RING timer_head;
 

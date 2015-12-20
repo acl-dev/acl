@@ -45,6 +45,7 @@ acl 包括以下丰富的常用函数库：
 .性能：acl_xml_util.c 中的函数 acl_xml_create_node 在创建节点时，如果正文内容比较大，则会因内存的快速频繁膨胀而造成性能损耗，现在采用了预分配策略，以减少这种性能损耗
 .性能：acl_xmlcode.c 中的函数 acl_xml_encode/acl_xml_decode 通过
 提前预分配内存，以减少重复分配/释放内存的次数，从而在一定程度上提升内存操作性能
+.性能：events.c, events_kernel.c, events_iocp.c, 在每一个事件循环处理完毕时，如果依然有一些描述字的缓冲区还有数据，则立即触发下一个事件循环过程，从而保证了 IO 读的处理效率
 
 二、lib_protocol 库
 .问题修复： http_hdr_res.c/http_hdr_req.c 中有可能会因为 main_cache_free 的调用在 http_hdr_res_free/http_hdr_req_free 之前调用而造成内存冲突

@@ -195,6 +195,26 @@ aio_handle_type aio_handle::get_engine_type() const
 	return engine_type_;
 }
 
+void aio_handle::set_delay_sec(int n)
+{
+	acl_aio_set_delay_sec(aio_, n);
+}
+
+void aio_handle::set_delay_usec(int n)
+{
+	acl_aio_set_delay_usec(aio_, n);
+}
+
+void aio_handle::set_check_inter(int n)
+{
+	acl_aio_set_check_inter(aio_, n);
+}
+
+void aio_handle::set_rbuf_size(int n)
+{
+	acl_aio_set_rbuf_size(aio_, n);
+}
+
 bool aio_handle::check()
 {
 	acl_aio_loop(aio_);

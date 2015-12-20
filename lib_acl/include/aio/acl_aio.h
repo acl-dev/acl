@@ -277,6 +277,13 @@ ACL_API void acl_aio_set_delay_sec(ACL_AIO *aio, int delay_sec);
 ACL_API void acl_aio_set_delay_usec(ACL_AIO *aio, int delay_usec);
 
 /**
+ * 设置事件循环过程中定时检查所有描述字状态的时间间隔，内部缺省值为 100 ms
+ * @param aio {ACL_AIO*} 异步框架引擎句柄
+ * @param check_inter {int} 定时查检时间间隔 (毫秒级)
+ */
+ACL_API void acl_aio_set_check_inter(ACL_AIO *aio, int check_inter);
+
+/**
  * 设置异步流的读缓存区大小
  * @param aio {ACL_AIO*} 异步框架引擎句柄
  * @param rbuf_size {int} 读缓冲区大小

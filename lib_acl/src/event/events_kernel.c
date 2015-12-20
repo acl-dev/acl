@@ -200,6 +200,9 @@ END:
 		fdp->r_context = context;
 	}
 
+	if (stream->sys_read_ready || ACL_VSTREAM_BFRD_CNT(stream) > 0)
+		eventp->read_ready++;
+
 	if (timeout > 0) {
 		fdp->r_timeout = timeout * 1000000;
 		fdp->r_ttl = eventp->present + fdp->r_timeout;
@@ -588,11 +591,14 @@ static void event_set_all(ACL_EVENT *eventp)
 	EVENT_KERNEL *ev = (EVENT_KERNEL *) eventp;
 	ACL_EVENT_FDTABLE *fdp;
 
-	/* 优先处理添加读/写监控任务, 这样可以把中间的 ADD 状态转换成正式状态 */
+	/* 优先处理添加读/写监控任务, 这样可以把 ADD 中间态转换成正式状态 */
 
 	eventp->fdcnt_ready = 0;
 
-	if (eventp->present - eventp->last_check >= eventp->check_inter) {
+	if (eventp->present - eventp->last_check >= eventp->check_inter
+		|| eventp->read_ready > 0)
+	{
+		eventp->read_ready = 0;
 		eventp->last_check = eventp->present;
 		event_check_fds(eventp);
 	}
@@ -763,11 +769,11 @@ static void event_loop(ACL_EVENT *eventp)
 TAG_DONE:
 
 	/*
-	 * Deliver timer events. Requests are sorted: we can stop when we reach
-	 * the future or the list end. Allow the application to update the timer
-	 * queue while it is being called back. To this end, we repeatedly pop
-	 * the first request off the timer queue before delivering the event to
-	 * the application.
+	 * Deliver timer events. Requests are sorted: we can stop when we
+	 * reach the future or the list end. Allow the application to update
+	 * the timer queue while it is being called back. To this end, we
+	 * repeatedly pop the first request off the timer queue before
+	 * delivering the event to the application.
 	 */
 
 	/* 调整事件引擎的时间截 */

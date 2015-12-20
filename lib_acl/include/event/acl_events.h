@@ -158,7 +158,7 @@ ACL_API void acl_event_set_fire_hook(ACL_EVENT *eventp,
 		void* ctx);
 
 /**
- * 设置事件循环过程中定时检查所有描述字状态的时间间隔，内部缺少值为 100 ms
+ * 设置事件循环过程中定时检查所有描述字状态的时间间隔，内部缺省值为 100 ms
  * @param eventp {ACL_EVENT*} 事件对象指针, 不为能为空
  * @param n {int} 定时查检时间间隔 (毫秒级)
  */

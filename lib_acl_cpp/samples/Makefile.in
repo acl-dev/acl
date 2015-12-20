@@ -43,6 +43,7 @@ endif
 ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD
 	SYSLIB = -lcrypt -lpthread -rdynamic
+	RPATH = freebsd
 endif
 
 # For Darwin
@@ -51,6 +52,7 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 		  -Wno-extended-offsetof
 	SYSLIB +=  -rdynamic
 	UNIXTYPE = MACOSX
+	RPATH = macos
 endif
 
 #Path for Linux
@@ -84,12 +86,14 @@ ifeq ($(findstring SunOS, $(OSNAME)), SunOS)
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DSUNOS5
+	RPATH = solaris
 endif
 
 #Path for HP-UX
 ifeq ($(findstring HP-UX, $(OSNAME)), HP-UX)
 	CFLAGS += -DHP_UX -DHPUX11 -Wshadow
 	PLAT_NAME=hp-ux
+	RPATH = hpux
 endif
 
 #Find system type.

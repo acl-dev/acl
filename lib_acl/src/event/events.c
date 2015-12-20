@@ -103,14 +103,15 @@ void event_fire(ACL_EVENT *ev)
 	int   i, type;
 	acl_int64   r_timeout, w_timeout;
 	ACL_EVENT_NOTIFY_RDWR r_callback, w_callback;
+	ACL_EVENT_FDTABLE **ready = ev->fdtabs_ready;
 
 	if (ev->fire_begin)
 		ev->fire_begin(ev, ev->fire_ctx);
 
 	for (i = 0; i < ev->fdcnt_ready; i++) {
-		fdp = ev->fdtabs_ready[i];
+		fdp = ready[i];
 
-		/* ev->fdtabs_ready[i] maybe been set NULL in timer callback */
+		/* ready[i] maybe been set NULL in timer callback */
 		if (fdp == NULL || fdp->stream == NULL) 
 			continue;
 
@@ -125,8 +126,8 @@ void event_fire(ACL_EVENT *ev)
 				r_callback(ACL_EVENT_XCPT, ev,
 					fdp->stream, fdp->r_context);
 
-			/* ev->fdtabs_ready[i] maybe been set NULL in r_callback */
-			if (w_callback && ev->fdtabs_ready[i])
+			/* ready[i] maybe been set NULL in r_callback */
+			if (w_callback && ready[i])
 				w_callback(ACL_EVENT_XCPT, ev,
 					fdp->stream, fdp->w_context);
 			continue;
@@ -145,8 +146,8 @@ void event_fire(ACL_EVENT *ev)
 					fdp->stream, fdp->r_context);
 			}
 
-			/* ev->fdtabs_ready[i] maybe been set NULL in r_callback */
-			if (w_timeout > 0 && w_callback && ev->fdtabs_ready[i]) {
+			/* ready[i] maybe been set NULL in r_callback */
+			if (w_timeout > 0 && w_callback && ready[i]) {
 				fdp->w_ttl = ev->present + fdp->w_timeout;
 				fdp->w_callback(ACL_EVENT_RW_TIMEOUT, ev,
 					fdp->stream, fdp->w_context);
@@ -159,10 +160,22 @@ void event_fire(ACL_EVENT *ev)
 			if (fdp->r_timeout > 0)
 				fdp->r_ttl = ev->present + fdp->r_timeout;
 			fdp->r_callback(type, ev, fdp->stream, fdp->r_context);
+
+			/* If there's some data lefting in stream's buf, then
+			 * increasing the eventp->read_ready to trigger the
+			 * event_check_fds proccess for next event loop
+			 * more quickly.
+			 */
+			if (ready[i] && ready[i]->stream
+				&& (ready[i]->stream->sys_read_ready ||
+				  ACL_VSTREAM_BFRD_CNT(ready[i]->stream) > 0))
+			{
+				ev->read_ready++;
+			}
 		}
 
-		/* ev->fdtabs_ready[i] maybe been set NULL in fdp->r_callback() */
-		if (ev->fdtabs_ready[i] == NULL)
+		/* ready[i] maybe been set NULL in fdp->r_callback() */
+		if (ready[i] == NULL)
 			continue;
 
 		if ((type & (ACL_EVENT_WRITE | ACL_EVENT_CONNECT))) {

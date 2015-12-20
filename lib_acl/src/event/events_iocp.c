@@ -644,11 +644,13 @@ static void event_set_all(ACL_EVENT *eventp)
 	ACL_EVENT_FDTABLE *fdp;
 	int   i;
 
-	/* 优先处理添加读/写监控任务, 这样可以把中间的 ADD 状态转换成正式状态 */
+	/* 优先处理添加读/写监控任务, 这样可以把 ADD 中间态转换成正式状态 */
 
 	eventp->fdcnt_ready = 0;
 
-	if (eventp->present - eventp->last_check >= eventp->check_inter) {
+	if (eventp->present - eventp->last_check >= eventp->check_inter
+		|| eventp->read_ready > 0)
+	{
 		eventp->last_check = eventp->present;
 		event_check_fds(eventp);
 	}

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <assert.h>
 #include "lib_acl.h"
+#include "../../util.h"
 #include "acl_cpp/lib_acl.hpp"
 
 typedef struct
@@ -15,6 +16,7 @@ typedef struct
 	int   nwrite_total;
 	int   nread_total;
 	int   id_begin;
+	int   dlen;
 } IO_CTX;
 
 static bool connect_server(acl::polarssl_conf* ssl_conf, IO_CTX* ctx, int id);
@@ -41,12 +43,18 @@ public:
 		, nread_(0)
 		, id_(id)
 	{
+		dlen_ = ctx->dlen;
+		buff_ = (char*) malloc(dlen_);
+		memset(buff_, 'x', dlen_);
+		buff_[dlen_ - 1] = '\n';
+		buff_[dlen_ - 2] = '\r';
 	}
 
 	~client_io_callback()
 	{
 		std::cout << ">>>ID: " << id_
 			<< ", io_callback deleted now!" << std::endl;
+		free(buff_);
 	}
 
 	/**
@@ -60,10 +68,17 @@ public:
 		nread_ += len;
 		ctx_->nread_total++;
 
-		std::cout << ">>>>>>>> current len: " << len
-			<< "; total_len: " << nread_ << std::endl;
+		if (nwrite_ < 100 || nwrite_ % 1000 == 0)
+		{
+			char buf[256];
 
-		client_->close();
+			acl::safe_snprintf(buf, sizeof(buf),
+				"current len: %d, total_len: %d, nwrite: %d",
+				len, nread_, nwrite_);
+			acl::meter_time(__FILE__, __LINE__, buf);
+		}
+
+		write_line();
 		return true;
 	}
 
@@ -198,6 +213,8 @@ private:
 	int   nwrite_;
 	int   nread_;
 	int   id_;
+	char *buff_;
+	int   dlen_;
 
 	bool setup_ssl(acl::polarssl_conf& ssl_conf)
 	{
@@ -227,19 +244,22 @@ private:
 
 	bool begin_run(void)
 	{
-		// 异步向服务器发送数据
-		char  buf[8194];
-
-		memset(buf, 'x', sizeof(buf));
-		buf[sizeof(buf) - 1] = '\n';
-		buf[sizeof(buf) - 2] = '\r';
-
-		client_->write(buf, (int) sizeof(buf));
+		write_line();
 
 		// 异步从服务器读取数据
-		client_->read();
+		//client_->read();
+		client_->gets(10, false);
 
 		return true;
+	}
+
+	void write_line(void)
+	{
+		// 异步向服务器发送数据
+		client_->write(buff_, dlen_);
+
+		if (nwrite_ >= ctx_->nwrite_limit)
+			client_->close();
 	}
 };
 
@@ -277,26 +297,34 @@ static bool connect_server(acl::polarssl_conf* ssl_conf, IO_CTX* ctx, int id)
 
 static void usage(const char* procname)
 {
-	printf("usage: %s -h[help] -l server_addr -c nconnect"
-		" -n io_max -k[use kernel event: epoll/kqueue/devpoll"
-		" -t connect_timeout -S[use_ssl]\n", procname);
+	printf("usage: %s -h[help] -l server_addr \r\n"
+		" -c nconnect\r\n"
+		" -n io_max\r\n"
+		" -k[use kernel event: epoll/kqueue/devpoll\r\n"
+		" -I check_fds_inter\r\n"
+		" -M delay_ms\r\n"
+		" -t connect_timeout\r\n"
+		" -S[use_ssl]\r\n"
+		" -L data_len[default: 8193]\n", procname);
 }
 
 int main(int argc, char* argv[])
 {
 	bool use_kernel = false;
-	int   ch;
 	IO_CTX ctx;
 	acl::polarssl_conf* ssl_conf = NULL;
+	int   ch;
+	int   check_fds_inter = 10, delay_ms = 100;
 
 	memset(&ctx, 0, sizeof(ctx));
 	ctx.connect_timeout = 5;
 	ctx.nopen_limit = 1;
 	ctx.id_begin = 1;
 	ctx.nwrite_limit = 1;
+	ctx.dlen = 8193;
 	acl::safe_snprintf(ctx.addr, sizeof(ctx.addr), "127.0.0.1:9800");
 
-	while ((ch = getopt(argc, argv, "hc:n:kl:t:S")) > 0)
+	while ((ch = getopt(argc, argv, "hc:n:kl:t:SL:I:M:")) > 0)
 	{
 		switch (ch)
 		{
@@ -325,6 +353,16 @@ int main(int argc, char* argv[])
 			break;
 		case 'S':
 			ssl_conf = new acl::polarssl_conf();
+			break;
+		case 'L':
+			ctx.dlen = atoi(optarg);
+			break;
+		case 'I':
+			check_fds_inter = atoi(optarg);
+			break;
+		case 'M':
+			delay_ms = atoi(optarg);
+			break;
 		default:
 			break;
 		}
@@ -335,6 +373,19 @@ int main(int argc, char* argv[])
 	acl::log::stdout_open(true);
 
 	acl::aio_handle handle(use_kernel ? acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
+
+	handle.set_check_inter(check_fds_inter);
+
+	int delay_sec = delay_ms / 1000;
+	int delay_usec = (delay_ms - delay_sec * 1000) * 1000;
+	handle.set_delay_sec(delay_sec);
+	handle.set_delay_usec(delay_usec);
+
+	printf(">>>delay_sec: %d, delay_usec: %d, check_fds_inter: %d\r\n",
+		delay_sec, delay_usec, check_fds_inter);
+	printf("Enter any key to continue ...\r\n");
+	getchar();
+
 	ctx.handle = &handle;
 
 	if (connect_server(ssl_conf, &ctx, ctx.id_begin) == false)
@@ -346,6 +397,9 @@ int main(int argc, char* argv[])
 
 	std::cout << "Connect " << ctx.addr << " ..." << std::endl;
 
+	struct timeval begin;
+	gettimeofday(&begin, NULL);
+
 	while (true)
 	{
 		// 如果返回 false 则表示不再继续，需要退出
@@ -353,13 +407,15 @@ int main(int argc, char* argv[])
 			break;
 	}
 
-	acl::string buf;
+	struct timeval end;
+	gettimeofday(&end, NULL);
 
-	buf << "total open: " << ctx.nopen_total
-		<< ", total write: " << ctx.nwrite_total
-		<< ", total read: " << ctx.nread_total;
+	double spent = util::stamp_sub(&end, &begin);
 
-	acl::meter_time(__FUNCTION__, __LINE__, buf.c_str());
+	printf("total open: %d, total write: %d, total read: %d,"
+		" spent: %.2f ms, speed: %.2f\r\n",
+		ctx.nopen_total, ctx.nwrite_total, ctx.nread_total,
+		spent, (ctx.nread_total * 1000) / (spent > 1 ? spent : 1));
 
 	delete ssl_conf;
 

@@ -128,6 +128,12 @@ void acl_aio_set_delay_usec(ACL_AIO *aio, int delay_usec)
 	}
 }
 
+void acl_aio_set_check_inter(ACL_AIO *aio, int check_inter)
+{
+	if (aio && check_inter >= 0)
+		acl_event_set_check_inter(aio->event, check_inter);
+}
+
 void acl_aio_loop(ACL_AIO *aio)
 {	
 	if (aio == NULL || aio->event == NULL)

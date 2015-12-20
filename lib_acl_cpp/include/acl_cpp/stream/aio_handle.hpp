@@ -147,6 +147,33 @@ public:
 	 */
 	void reset();
 
+public:
+	/**
+	 * 设置异步引擎循环的等待时间中的秒级部分
+	 * @param n {int} 设置用 select/poll/epoll/kqueue/devpoll
+	 *  时的秒级等待时间
+	 */
+	void set_delay_sec(int n);
+
+	/**
+	 * 设置异步引擎循环的等待时间中的微秒级部分
+	 * @param n {int} 设置用 select/poll/epoll/kqueue/devpoll
+	 *  时的微秒级等待时间
+	 */
+	void set_delay_usec(int n);
+
+	/**
+	 * 设置事件循环过程中定时检查所有描述字状态的时间间隔，
+	 * 内部缺省值 100 ms
+	 */
+	void set_check_inter(int n);
+
+	/**
+	 * 设置异步流的读缓存区大小
+	 * @param n {int} 读缓冲区大小
+	 */
+	void set_rbuf_size(int n);
+
 protected:
 	friend class aio_stream;
 

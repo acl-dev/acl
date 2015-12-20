@@ -237,7 +237,6 @@ void acl_aio_writen(ACL_ASTREAM *astream, const char *data, int dlen)
 	/* 将嵌套计数加1，以防止嵌套层次太深而使栈溢出 */
 	astream->write_nested++;
 
-	/* 如果嵌套调用次数小于阀值，则允许进行嵌套调用 */
 	if (astream->write_nested >= astream->write_nested_limit) {
 		/* 递归写次数达到了阀值，只需记个警告信息，因为有嵌套限制 */
 		if (acl_msg_verbose)
@@ -247,6 +246,7 @@ void acl_aio_writen(ACL_ASTREAM *astream, const char *data, int dlen)
 		n = 0;
 	}
 
+	/* 如果嵌套调用次数小于阀值，则允许进行嵌套调用 */
 	/* 先尝试写流的写队列中的数据 */
 	else if ((n = __try_fflush(astream)) < 0) {
 		/* 说明尝试写失败，需要关闭流 */
@@ -327,7 +327,6 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 	/* 将嵌套计数加1，以防止嵌套层次太深而使栈溢出 */
 	astream->write_nested++;
 
-	/* 如果嵌套调用次数小于阀值，则允许进行嵌套调用 */
 	if (astream->write_nested >= astream->write_nested_limit) {
 		/* 递归嵌套写次数达到了规定的阀值，只需记个警告信息即可，
 		 * 因为有嵌套限制 */
@@ -338,6 +337,7 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 		n = 0;
 	}
 
+	/* 如果嵌套调用次数小于阀值，则允许进行嵌套调用 */
 	/* 先尝试写流的写队列中的数据 */
 	else if ((n = __try_fflush(astream)) < 0) {
 		/* 说明尝试写失败，需要关闭流 */
@@ -431,7 +431,6 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 	/* 将嵌套计数加1，以防止嵌套层次太深而使栈溢出 */
 	astream->write_nested++;
 
-	/* 如果嵌套调用次数小于阀值，则允许进行嵌套调用 */
 	if (astream->write_nested >= astream->write_nested_limit) {
 		/* 递归嵌套写次数达到了规定的阀值，只需记个警告信息即可，
 		 * 因为有嵌套限制 */
@@ -443,6 +442,7 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 
 	}
 
+	/* 如果嵌套调用次数小于阀值，则允许进行嵌套调用 */
 	/* 先尝试写流的写队列中的数据 */
 	else if ((n = __try_fflush(astream)) < 0) {
 		/* 说明尝试写失败，需要关闭流 */
