@@ -202,7 +202,7 @@ END:
 	}
 
 	if (timeout > 0) {
-		fdp->r_timeout = timeout * 1000000;
+		fdp->r_timeout = ((acl_int64) timeout) * 1000000;
 		fdp->r_ttl = eventp->present + fdp->r_timeout;
 	} else {
 		fdp->r_ttl = 0;
@@ -216,16 +216,16 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
 {
 	ACL_EVENT_FDTABLE *fdp = read_enable(eventp, stream, timeout,
-			called, context);
-	fdp->listenr = 1;
+			callback, context);
+	fdp->listener = 1;
 }
 
 static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
 {
 	ACL_EVENT_FDTABLE *fdp = read_enable(eventp, stream, timeout,
-			called, context);
-	fdp->listenr = 0;
+			callback, context);
+	fdp->listener = 0;
 }
 
 static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
@@ -275,7 +275,7 @@ END:
 	}
 
 	if (timeout > 0) {
-		fdp->w_timeout = timeout * 1000000;
+		fdp->w_timeout = ((acl_int64) timeout) * 1000000;
 		fdp->w_ttl = eventp->present + fdp->w_timeout;
 	} else {
 		fdp->w_ttl = 0;
