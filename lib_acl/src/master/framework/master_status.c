@@ -46,22 +46,26 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 		return;
 
 	/*
-	 * We always keep the child end of the status pipe open, so an EOF read
-	 * condition means that we're seriously confused. We use non-blocking
-	 * reads so that we don't get stuck when someone sends a partial message.
-	 * Messages are short, so a partial read means someone wrote less than a
-	 * whole status message. Hopefully the next read will be in sync again...
-	 * We use a global child process status table because when a child dies
-	 * only its pid is known - we do not know what service it came from.
+	 * We always keep the child end of the status pipe open, so an EOF
+	 * read condition means that we're seriously confused. We use
+	 * non-blocking reads so that we don't get stuck when someone sends
+	 * a partial message. Messages are short, so a partial read means
+	 * someone wrote less than a whole status message. Hopefully the next
+	 * read will be in sync again... We use a global child process status
+	 * table because when a child dies only its pid is known - we do not
+	 * know what service it came from.
 	 */
 
-#if 0
-	n = read(ACL_VSTREAM_SOCK(serv->status_read_stream),
-		(char *) &stat_buf, sizeof(stat_buf));
-#else
+	if (serv->status_read_stream->rw_timeout > 0) {
+		acl_msg_warn("%s:%d, pipe(%d)'s rw_timeout(%d) > 0",
+			__FUNCTION__, __LINE__,
+			ACL_VSTREAM_SOCK(serv->status_read_stream),
+			serv->status_read_stream->rw_timeout);
+		serv->status_read_stream->rw_timeout = 0;
+	}
+
 	n = acl_vstream_read(serv->status_read_stream,
 		(char *) &stat_buf, sizeof(stat_buf));
-#endif
 
 	switch (n) {
 	case -1:
@@ -167,12 +171,16 @@ void    acl_master_status_init(ACL_MASTER_SERV *serv)
 	 */
 	if (acl_duplex_pipe(serv->status_fd) < 0)
 		acl_msg_fatal("pipe: %s", strerror(errno));
+
 	acl_non_blocking(serv->status_fd[0], ACL_BLOCKING);
 	acl_close_on_exec(serv->status_fd[0], ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(serv->status_fd[1], ACL_CLOSE_ON_EXEC);
+
+	/* Must set io rw_timeout to 0 to avoiding blocking read which
+	 * will blocking the main event loop.
+	 */
 	serv->status_read_stream = acl_vstream_fdopen(serv->status_fd[0],
-		O_RDWR, acl_var_master_buf_size,
-		acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_SOCK);
+		O_RDWR, acl_var_master_buf_size, 0, ACL_VSTREAM_TYPE_SOCK);
 
 	if (acl_msg_verbose)
 		acl_msg_info("%s(%d)->%s: call acl_event_enable_read, "
@@ -180,8 +188,7 @@ void    acl_master_status_init(ACL_MASTER_SERV *serv)
 			myname, serv->status_fd[0]);
 
 	acl_event_enable_read(acl_var_master_global_event,
-		serv->status_read_stream, 0, master_status_event,
-		(void *) serv);
+		serv->status_read_stream, 0, master_status_event, serv);
 }
 
 /* acl_master_status_cleanup - stop status event processing for this service */

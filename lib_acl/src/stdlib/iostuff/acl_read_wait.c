@@ -57,7 +57,7 @@ static void thread_epoll_init(void)
 int acl_read_wait(ACL_SOCKET fd, int timeout)
 {
 	const char *myname = "acl_read_wait";
-	int op = EPOLL_CTL_ADD, delay = timeout * 1000, *epoll_fd;
+	int op = EPOLL_CTL_ADD, delay = timeout * 1000, *epoll_fd, ret;
 	struct epoll_event ee, events[1];
 
 	acl_assert(acl_pthread_once(&epoll_once, thread_epoll_init) == 0);
@@ -78,16 +78,41 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 	ee.events = EPOLLIN | EPOLLHUP | EPOLLERR;
 	ee.data.u64 = 0;
 	ee.data.fd = fd;
-	if (epoll_ctl(*epoll_fd, op, fd, &ee) == -1) {
+	if (epoll_ctl(*epoll_fd, op, fd, &ee) == -1
+		&& acl_last_error() != EEXIST)
+	{
 		acl_msg_error("%s(%d): epoll_ctl error: %s, fd: %d",
 			myname, __LINE__, acl_last_serror(), fd);
 		return -1;
 	}
 
-	if (epoll_wait(*epoll_fd, events, 1, delay) == -1) {
-		acl_msg_error("%s(%d): epoll_wait error: %s, fd: %d",
-			myname, __LINE__, acl_last_serror(), fd);
-		return -1;
+	for (;;) {
+		switch (epoll_wait(*epoll_fd, events, 1, delay)) {
+		case -1:
+			if (acl_last_error() == ACL_EINTR)
+			{
+				acl_msg_warn(">>>>catch EINTR, try again<<<");
+				continue;
+			}
+
+			acl_msg_error("%s(%d): epoll_wait error: %s, fd: %d",
+				myname, __LINE__, acl_last_serror(), fd);
+			ret = -1;
+			break;
+		case 0:
+			acl_set_error(ACL_ETIMEDOUT);
+			ret = -1;
+			break;
+		default:
+			if ((events[0].events & (EPOLLERR | EPOLLHUP)) != 0)
+				ret = -1;
+			else if ((events[0].events & EPOLLIN) == 0) {
+				acl_set_error(ACL_ETIMEDOUT);
+				ret = -1;
+			} else
+				ret = 0;
+			break;
+		}
 	}
 
 	ee.events = 0;
@@ -99,15 +124,7 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 		return -1;
 	}
 
-	if ((events[0].events & (EPOLLERR | EPOLLHUP)) != 0)
-		return -1;
-
-	if ((events[0].events & EPOLLIN) == 0) {
-		acl_set_error(ACL_ETIMEDOUT);
-		return -1;
-	}
-
-	return 0;
+	return ret;
 }
 
 #elif	defined(ACL_UNIX)

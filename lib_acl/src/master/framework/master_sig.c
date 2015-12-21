@@ -51,7 +51,6 @@ int   acl_master_sig_pipe[2];
 #define ACL_SIG_PIPE_READ_FD acl_master_sig_pipe[0]
 #endif
 
-ACL_VSTREAM *ACL_SIG_PIPE_WRITE_STREAM = NULL;
 ACL_VSTREAM *ACL_SIG_PIPE_READ_STREAM = NULL;
 
 int   acl_var_master_gotsigchld = 0;
@@ -126,19 +125,29 @@ static void master_sigchld(int sig acl_unused)
 /* master_sig_event - called upon return from select() */
 
 static void master_sig_event(int type acl_unused, ACL_EVENT *event acl_unused,
-	ACL_VSTREAM *stream acl_unused, void *context acl_unused)
+	ACL_VSTREAM *stream, void *context acl_unused)
 {
 	char    c[1];
 
-#if 0
-	while (read(ACL_SIG_PIPE_READ_FD, c, 1) > 0)
-		/* void */ ;
-#else
-	while (acl_vstream_read(stream, c, 1) > 0)
-	{
-		/* void */
+	if (stream->rw_timeout > 0) {
+		acl_msg_warn("%s:%d, pipe(%d)'s rw_timeout(%d) > 0",
+			__FUNCTION__, __LINE__, ACL_VSTREAM_SOCK(stream),
+			stream->rw_timeout);
+		stream->rw_timeout = 0;
 	}
-#endif
+
+	while (1) {
+		if (acl_vstream_read(stream, c, 1) == ACL_VSTREAM_EOF) {
+			if (acl_msg_verbose)
+				acl_msg_info(">>>%s:%d: %s<<<", __FUNCTION__,
+					__LINE__, acl_last_serror());
+			break;
+		} else if (acl_msg_verbose) {
+			acl_msg_info(">>>%s:%d: %s, c: %d<<<", __FUNCTION__,
+				__LINE__, acl_last_serror(), c[0]);
+		}
+	}
+
 	acl_var_master_gotsigchld = 1;
 }
 
@@ -231,14 +240,18 @@ void    acl_master_sigsetup(void)
 #ifdef USE_SIG_PIPE
 	if (pipe(acl_master_sig_pipe))
 		acl_msg_fatal("pipe: %s", strerror(errno));
+
 	acl_non_blocking(ACL_SIG_PIPE_WRITE_FD, ACL_NON_BLOCKING);
 	acl_non_blocking(ACL_SIG_PIPE_READ_FD, ACL_NON_BLOCKING);
 	acl_close_on_exec(ACL_SIG_PIPE_WRITE_FD, ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(ACL_SIG_PIPE_READ_FD, ACL_CLOSE_ON_EXEC);
 
+	/* Must set io rw_timeout to 0 to avoiding blocking read which
+	 * will blocking the main event loop.
+	 */
 	ACL_SIG_PIPE_READ_STREAM = acl_vstream_fdopen(ACL_SIG_PIPE_READ_FD,
-			O_RDONLY, acl_var_master_buf_size,
-			acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_SOCK);
+		O_RDONLY, acl_var_master_buf_size, 0, ACL_VSTREAM_TYPE_SOCK);
+
 	if (ACL_SIG_PIPE_READ_STREAM == NULL)
 		acl_msg_fatal("%s(%d)->%s: acl_vstream_fdopen error=%s",
 			__FILE__, __LINE__, myname, strerror(errno));
@@ -247,6 +260,7 @@ void    acl_master_sigsetup(void)
 		acl_msg_info("%s(%d)->%s: call acl_event_enable_read, "
 			"SIG_PIPE_READ_FD = %d", __FILE__, __LINE__, myname,
 			ACL_SIG_PIPE_READ_FD);
+
 	acl_event_enable_read(acl_var_master_global_event,
 		ACL_SIG_PIPE_READ_STREAM, 0, master_sig_event, (void *) 0);
 #endif
