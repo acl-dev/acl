@@ -17,30 +17,28 @@ void event_check_fds(ACL_EVENT *ev)
 		if ((fdp->stream->flag & ACL_VSTREAM_FLAG_BAD) != 0) {
 			fdp->stream->flag &= ~ACL_VSTREAM_FLAG_BAD;
 			fdp->event_type |= ACL_EVENT_XCPT;
-			fdp->fdidx_ready = ev->fdcnt_ready;
-			ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+			fdp->fdidx_ready = ev->ready_cnt;
+			ev->ready[ev->ready_cnt++] = fdp;
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
 			if (ACL_VSTREAM_BFRD_CNT(fdp->stream) > 0) {
-				fdp->stream->sys_read_ready = 0;
+				fdp->stream->read_ready = 0;
 				fdp->event_type |= ACL_EVENT_READ;
-				fdp->fdidx_ready = ev->fdcnt_ready;
-				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
-			} else if (fdp->stream->sys_read_ready
-				&& !fdp->listener)
-			{
+				fdp->fdidx_ready = ev->ready_cnt;
+				ev->ready[ev->ready_cnt++] = fdp;
+			} else if (fdp->stream->read_ready && !fdp->listener) {
 				fdp->event_type |= ACL_EVENT_READ;
-				fdp->fdidx_ready = ev->fdcnt_ready;
-				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+				fdp->fdidx_ready = ev->ready_cnt;
+				ev->ready[ev->ready_cnt++] = fdp;
 			} else if (fdp->r_ttl > 0 && ev->present > fdp->r_ttl) {
 				fdp->event_type |= ACL_EVENT_RW_TIMEOUT;
-				fdp->fdidx_ready = ev->fdcnt_ready;
-				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+				fdp->fdidx_ready = ev->ready_cnt;
+				ev->ready[ev->ready_cnt++] = fdp;
 			}
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
 			if (fdp->w_ttl > 0 && ev->present > fdp->w_ttl) {
 				fdp->event_type |= ACL_EVENT_RW_TIMEOUT;
-				fdp->fdidx_ready = ev->fdcnt_ready;
-				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+				fdp->fdidx_ready = ev->ready_cnt;
+				ev->ready[ev->ready_cnt++] = fdp;
 			}
 		}
 	}
@@ -52,7 +50,7 @@ int event_prepare(ACL_EVENT *ev)
 	ACL_SOCKET sockfd;
 	int   i, nwait = 0;
 
-	ev->fdcnt_ready = 0;
+	ev->ready_cnt = 0;
 
 	for (i = 0; i < ev->fdcnt; i++) {
 		fdp = ev->fdtabs[i];
@@ -63,31 +61,29 @@ int event_prepare(ACL_EVENT *ev)
 		if ((fdp->stream->flag & ACL_VSTREAM_FLAG_BAD) != 0) {
 			fdp->stream->flag &= ~ACL_VSTREAM_FLAG_BAD;
 			fdp->event_type |= ACL_EVENT_XCPT;
-			fdp->fdidx_ready = ev->fdcnt_ready;
-			ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+			fdp->fdidx_ready = ev->ready_cnt;
+			ev->ready[ev->ready_cnt++] = fdp;
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
 			if (ACL_VSTREAM_BFRD_CNT(fdp->stream) > 0) {
-				fdp->stream->sys_read_ready = 0;
+				fdp->stream->read_ready = 0;
 				fdp->event_type |= ACL_EVENT_READ;
-				fdp->fdidx_ready = ev->fdcnt_ready;
-				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
-			} else if (fdp->stream->sys_read_ready
-				&& !fdp->listener)
-			{
+				fdp->fdidx_ready = ev->ready_cnt;
+				ev->ready[ev->ready_cnt++] = fdp;
+			} else if (fdp->stream->read_ready && !fdp->listener) {
 				fdp->event_type |= ACL_EVENT_READ;
-				fdp->fdidx_ready = ev->fdcnt_ready;
-				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+				fdp->fdidx_ready = ev->ready_cnt;
+				ev->ready[ev->ready_cnt++] = fdp;
 			} else if (fdp->r_ttl > 0 && ev->present > fdp->r_ttl) {
 				fdp->event_type |= ACL_EVENT_RW_TIMEOUT;
-				fdp->fdidx_ready = ev->fdcnt_ready;
-				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+				fdp->fdidx_ready = ev->ready_cnt;
+				ev->ready[ev->ready_cnt++] = fdp;
 			} else
 				nwait++;
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
 			if (fdp->w_ttl > 0 && ev->present > fdp->w_ttl) {
 				fdp->event_type |= ACL_EVENT_RW_TIMEOUT;
-				fdp->fdidx_ready = ev->fdcnt_ready;
-				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+				fdp->fdidx_ready = ev->ready_cnt;
+				ev->ready[ev->ready_cnt++] = fdp;
 			} else
 				nwait++;
 		} else
@@ -103,12 +99,12 @@ void event_fire(ACL_EVENT *ev)
 	int   i, type;
 	acl_int64   r_timeout, w_timeout;
 	ACL_EVENT_NOTIFY_RDWR r_callback, w_callback;
-	ACL_EVENT_FDTABLE **ready = ev->fdtabs_ready;
+	ACL_EVENT_FDTABLE **ready = ev->ready;
 
 	if (ev->fire_begin)
 		ev->fire_begin(ev, ev->fire_ctx);
 
-	for (i = 0; i < ev->fdcnt_ready; i++) {
+	for (i = 0; i < ev->ready_cnt; i++) {
 		fdp = ready[i];
 
 		/* ready[i] maybe been set NULL in timer callback */
@@ -167,7 +163,7 @@ void event_fire(ACL_EVENT *ev)
 			 * more quickly.
 			 */
 			if (ready[i] && ready[i]->stream
-				&& (ready[i]->stream->sys_read_ready ||
+				&& (ready[i]->stream->read_ready ||
 				  ACL_VSTREAM_BFRD_CNT(ready[i]->stream) > 0))
 			{
 				ev->read_ready++;
@@ -211,31 +207,29 @@ int event_thr_prepare(ACL_EVENT *ev)
 		if (fdp->stream->flag & ACL_VSTREAM_FLAG_BAD) {
 			fdp->stream->flag &= ~ACL_VSTREAM_FLAG_BAD;
 			fdp->event_type |= ACL_EVENT_XCPT;
-			fdp->fdidx_ready = ev->fdcnt_ready;
-			ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+			fdp->fdidx_ready = ev->ready_cnt;
+			ev->ready[ev->ready_cnt++] = fdp;
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
 			if (ACL_VSTREAM_BFRD_CNT(fdp->stream) > 0) {
-				fdp->stream->sys_read_ready = 0;
+				fdp->stream->read_ready = 0;
 				fdp->event_type = ACL_EVENT_READ;
-				fdp->fdidx_ready = ev->fdcnt_ready;
-				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
-			} else if (fdp->stream->sys_read_ready
-				&& !fdp->listener)
-			{
+				fdp->fdidx_ready = ev->ready_cnt;
+				ev->ready[ev->ready_cnt++] = fdp;
+			} else if (fdp->stream->read_ready && !fdp->listener) {
 				fdp->event_type = ACL_EVENT_READ;
-				fdp->fdidx_ready = ev->fdcnt_ready;
-				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+				fdp->fdidx_ready = ev->ready_cnt;
+				ev->ready[ev->ready_cnt++] = fdp;
 			} else if (fdp->r_ttl > 0 && ev->present > fdp->r_ttl) {
 				fdp->event_type = ACL_EVENT_RW_TIMEOUT;
-				fdp->fdidx_ready = ev->fdcnt_ready;
-				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+				fdp->fdidx_ready = ev->ready_cnt;
+				ev->ready[ev->ready_cnt++] = fdp;
 			} else
 				nwait++;
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
 			if (fdp->w_ttl > 0 && ev->present > fdp->w_ttl) {
 				fdp->event_type = ACL_EVENT_RW_TIMEOUT;
-				fdp->fdidx_ready = ev->fdcnt_ready;
-				ev->fdtabs_ready[ev->fdcnt_ready++] = fdp;
+				fdp->fdidx_ready = ev->ready_cnt;
+				ev->ready[ev->ready_cnt++] = fdp;
 			} else
 				nwait++;
 		} else
@@ -257,10 +251,10 @@ void event_thr_fire(ACL_EVENT *ev)
 	if (ev->fire_begin)
 		ev->fire_begin(ev, ev->fire_ctx);
 
-	for (i = 0; i < ev->fdcnt_ready; i++) {
-		fdp = ev->fdtabs_ready[i];
+	for (i = 0; i < ev->ready_cnt; i++) {
+		fdp = ev->ready[i];
 
-		/* ev->fdtabs_ready[i] maybe be set NULL by timer callback */
+		/* ev->ready[i] maybe be set NULL by timer callback */
 		if (fdp == NULL || fdp->stream == NULL)
 			continue;
 

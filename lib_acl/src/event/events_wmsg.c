@@ -82,10 +82,10 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	}
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < ev->event.fdcnt_ready
-		&& ev->event.fdtabs_ready[fdp->fdidx_ready] == fdp)
+		&& fdp->fdidx_ready < ev->event.ready_cnt
+		&& ev->event.ready[fdp->fdidx_ready] == fdp)
 	{
-		ev->event.fdtabs_ready[fdp->fdidx_ready] = NULL;
+		ev->event.ready[fdp->fdidx_ready] = NULL;
 		fdp->fdidx_ready = -1;
 	}
 	event_fdtable_free(fdp);
@@ -272,10 +272,10 @@ static void event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	fdp->fdidx = -1;
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < eventp->fdcnt_ready
-		&& eventp->fdtabs_ready[fdp->fdidx_ready] == fdp)
+		&& fdp->fdidx_ready < eventp->ready_cnt
+		&& eventp->ready[fdp->fdidx_ready] == fdp)
 	{
-		eventp->fdtabs_ready[fdp->fdidx_ready] = NULL;
+		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
 
@@ -329,10 +329,10 @@ static void event_disable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	fdp->fdidx = -1;
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < eventp->fdcnt_ready
-		&& eventp->fdtabs_ready[fdp->fdidx_ready] == fdp)
+		&& fdp->fdidx_ready < eventp->ready_cnt
+		&& eventp->ready[fdp->fdidx_ready] == fdp)
 	{
-		eventp->fdtabs_ready[fdp->fdidx_ready] = NULL;
+		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
 
@@ -381,10 +381,10 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	WSAAsyncSelect(sockfd, ev->hWnd, ev->nMsg, FD_CLOSE);
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < eventp->fdcnt_ready
-		&& eventp->fdtabs_ready[fdp->fdidx_ready] == fdp)
+		&& fdp->fdidx_ready < eventp->ready_cnt
+		&& eventp->ready[fdp->fdidx_ready] == fdp)
 	{
-		eventp->fdtabs_ready[fdp->fdidx_ready] = NULL;
+		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
 	event_fdtable_free(fdp);
@@ -557,7 +557,7 @@ static void handleRead(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 		/* 该描述字可读则设置 ACL_VSTREAM 的系统可读标志从而触发
 		 * ACL_VSTREAM 流在读时调用系统的 read 函数
 		 */
-		fdp->stream->sys_read_ready = 1;
+		fdp->stream->read_ready = 1;
 		fdp->r_callback(ACL_EVENT_READ, &ev->event,
 			fdp->stream, fdp->r_context);
 	}
@@ -861,7 +861,7 @@ ACL_EVENT *event_new_wmsg(UINT nMsg)
 	eventp->free_fn              = event_free;
 	eventp->enable_read_fn       = event_enable_read;
 	eventp->enable_write_fn      = event_enable_write;
-	eventp->enable_listen_fn     = event_enable_read;
+	eventp->enable_listen_fn     = event_enable_listen;
 	eventp->disable_read_fn      = event_disable_read;
 	eventp->disable_write_fn     = event_disable_write;
 	eventp->disable_readwrite_fn = event_disable_readwrite;

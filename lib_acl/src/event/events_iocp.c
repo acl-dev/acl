@@ -138,10 +138,10 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	fdp->fdidx = -1;
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < ev->event.fdcnt_ready
-		&& ev->event.fdtabs_ready[fdp->fdidx_ready] == fdp)
+		&& fdp->fdidx_ready < ev->event.ready_cnt
+		&& ev->event.ready[fdp->fdidx_ready] == fdp)
 	{
-		ev->event.fdtabs_ready[fdp->fdidx_ready] = NULL;
+		ev->event.ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
 	event_fdtable_free(fdp);
@@ -343,10 +343,10 @@ DEL_READ_TAG:
 	fdp->fdidx = -1;
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < eventp->fdcnt_ready
-		&& eventp->fdtabs_ready[fdp->fdidx_ready] == fdp)
+		&& fdp->fdidx_ready < eventp->ready_cnt
+		&& eventp->ready[fdp->fdidx_ready] == fdp)
 	{
-		eventp->fdtabs_ready[fdp->fdidx_ready] = NULL;
+		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
 }
@@ -410,10 +410,10 @@ DEL_WRITE_TAG:
 	fdp->fdidx = -1;
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < eventp->fdcnt_ready
-		&& eventp->fdtabs_ready[fdp->fdidx_ready] == fdp)
+		&& fdp->fdidx_ready < eventp->ready_cnt
+		&& eventp->ready[fdp->fdidx_ready] == fdp)
 	{
-		eventp->fdtabs_ready[fdp->fdidx_ready] = NULL;
+		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
 }
@@ -665,7 +665,7 @@ static void event_set_all(ACL_EVENT *eventp)
 
 	/* 优先处理添加读/写监控任务, 这样可以把 ADD 中间态转换成正式状态 */
 
-	eventp->fdcnt_ready = 0;
+	eventp->ready_cnt = 0;
 
 	if (eventp->present - eventp->last_check >= eventp->check_inter
 		|| eventp->read_ready > 0)
@@ -749,12 +749,12 @@ static void event_loop(ACL_EVENT *eventp)
 	event_set_all(eventp);
 
 	if (eventp->fdcnt == 0) {
-		if (eventp->fdcnt_ready == 0)
+		if (eventp->ready_cnt == 0)
 			sleep(1);
 		goto TAG_DONE;
 	}
 
-	if (eventp->fdcnt_ready > 0)
+	if (eventp->ready_cnt > 0)
 		delay = 0;
 
 TAG_DONE:
@@ -773,13 +773,15 @@ TAG_DONE:
 		timer_fn  = timer->callback;
 		timer_arg = timer->context;
 
-		/* 如果定时器的时间间隔 > 0 且允许定时器被循环调用，则再重设定时器 */
+		/* 如果定时器的时间间隔 > 0 且允许定时器被循环调用，
+		 * 则再重设定时器
+		 */
 		if (timer->delay > 0 && timer->keep) {
 			timer->ncount++;
 			eventp->timer_request(eventp, timer->callback,
 				timer->context, timer->delay, timer->keep);
 		} else {
-			acl_ring_detach(&timer->ring);		/* first this */
+			acl_ring_detach(&timer->ring);  /* first this */
 			timer->nrefer--;
 			if (timer->nrefer != 0)
 				acl_msg_fatal("%s(%d): nrefer(%d) != 0",
@@ -817,9 +819,9 @@ TAG_DONE:
 				| ACL_EVENT_RW_TIMEOUT)))
 			{
 				fdp->event_type |= ACL_EVENT_XCPT;
-				fdp->fdidx_ready = eventp->fdcnt_ready;
-				eventp->fdtabs_ready[eventp->fdcnt_ready] = fdp;
-				eventp->fdcnt_ready++;
+				fdp->fdidx_ready = eventp->ready_cnt;
+				eventp->ready[eventp->ready_cnt] = fdp;
+				eventp->ready_cnt++;
 			}
 			continue;
 		}
@@ -839,15 +841,15 @@ TAG_DONE:
 				| ACL_EVENT_WRITE)) == 0)
 			{
 				fdp->event_type |= ACL_EVENT_READ;
-				fdp->fdidx_ready = eventp->fdcnt_ready;
-				eventp->fdtabs_ready[eventp->fdcnt_ready] = fdp;
-				eventp->fdcnt_ready++;
+				fdp->fdidx_ready = eventp->ready_cnt;
+				eventp->ready[eventp->ready_cnt] = fdp;
+				eventp->ready_cnt++;
 			}
 
 			if (fdp->listener)
 				fdp->event_type |= ACL_EVENT_ACCEPT;
 			else
-				fdp->stream->sys_read_ready = 1;
+				fdp->stream->read_ready = 1;
 		}
 		if (iocp_event->type == IOCP_EVENT_WRITE) {
 			acl_assert(fdp->event_write == iocp_event);
@@ -856,15 +858,15 @@ TAG_DONE:
 				| ACL_EVENT_WRITE)) == 0)
 			{
 				fdp->event_type |= ACL_EVENT_WRITE;
-				fdp->fdidx_ready = eventp->fdcnt_ready;
-				eventp->fdtabs_ready[eventp->fdcnt_ready] = fdp;
-				eventp->fdcnt_ready++;
+				fdp->fdidx_ready = eventp->ready_cnt;
+				eventp->ready[eventp->ready_cnt] = fdp;
+				eventp->ready_cnt++;
 			}
 		}
 		delay = 0;
 	}
 
-	if (eventp->fdcnt_ready > 0)
+	if (eventp->ready_cnt > 0)
 		event_fire(eventp);
 	eventp->nested--;
 }

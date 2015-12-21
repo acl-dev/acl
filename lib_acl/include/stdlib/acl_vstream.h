@@ -87,7 +87,7 @@ struct ACL_VSTREAM {
 	int   read_buf_len;             /**< read_buf's capacity */
 	int   read_cnt;                 /**< data's length in read_buf */
 	unsigned char *read_ptr;        /**< pointer to next position in read_buf */
-	int   sys_read_ready;           /**< if the system buffer has some data */
+	int   read_ready;               /**< if the system buffer has some data */
 
 	acl_off_t total_read_cnt;       /**< total read count of the fp */
 	acl_off_t total_write_cnt;      /**< total write count of the fp */

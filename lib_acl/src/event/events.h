@@ -96,11 +96,11 @@ struct	ACL_EVENT {
 	/* 当前套接字个数 */
 	int   fdcnt;
 	/* 事件循环时准备好的套接字个数 */
-	int   fdcnt_ready;
+	int   ready_cnt;
 	/* 套接字事件对象表集合 */
 	ACL_EVENT_FDTABLE **fdtabs;
 	/* 准备好的套接字事件对象表集合 */
-	ACL_EVENT_FDTABLE **fdtabs_ready;
+	ACL_EVENT_FDTABLE **ready;
 	/* 本进程中最大套接字值 */
 	ACL_SOCKET   maxfd;
 

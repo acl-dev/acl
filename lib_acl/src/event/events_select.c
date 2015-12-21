@@ -68,10 +68,10 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	}
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < ev->event.fdcnt_ready
-		&& ev->event.fdtabs_ready[fdp->fdidx_ready] == fdp)
+		&& fdp->fdidx_ready < ev->event.ready_cnt
+		&& ev->event.ready[fdp->fdidx_ready] == fdp)
 	{
-		ev->event.fdtabs_ready[fdp->fdidx_ready] = NULL;
+		ev->event.ready[fdp->fdidx_ready] = NULL;
 		fdp->fdidx_ready = -1;
 	}
 	event_fdtable_free(fdp);
@@ -231,19 +231,16 @@ static void event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	fdp->fdidx = -1;
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < eventp->fdcnt_ready
-		&& eventp->fdtabs_ready[fdp->fdidx_ready] == fdp)
+		&& fdp->fdidx_ready < eventp->ready_cnt
+		&& eventp->ready[fdp->fdidx_ready] == fdp)
 	{
-		eventp->fdtabs_ready[fdp->fdidx_ready] = NULL;
+		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
+
 	fdp->fdidx_ready = -1;
 
 	FD_CLR(sockfd, &ev->xmask);
 	FD_CLR(sockfd, &ev->rmask);
-#if 0
-	event_fdtable_free(fdp);
-	stream->fdp = NULL;
-#endif
 }
 
 /* event_disable_write - disable request for write events */
@@ -293,19 +290,16 @@ static void event_disable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	fdp->fdidx = -1;
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < eventp->fdcnt_ready
-		&& eventp->fdtabs_ready[fdp->fdidx_ready] == fdp)
+		&& fdp->fdidx_ready < eventp->ready_cnt
+		&& eventp->ready[fdp->fdidx_ready] == fdp)
 	{
-		eventp->fdtabs_ready[fdp->fdidx_ready] = NULL;
+		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
+
 	fdp->fdidx_ready = -1;
 
 	FD_CLR(sockfd, &ev->xmask);
 	FD_CLR(sockfd, &ev->wmask);
-#if 0
-	event_fdtable_free(fdp);
-	stream->fdp = NULL;
-#endif
 }
 
 /* event_disable_readwrite - disable request for read or write events */
@@ -355,11 +349,12 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	FD_CLR(sockfd, &ev->xmask);
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < eventp->fdcnt_ready
-		&& eventp->fdtabs_ready[fdp->fdidx_ready] == fdp)
+		&& fdp->fdidx_ready < eventp->ready_cnt
+		&& eventp->ready[fdp->fdidx_ready] == fdp)
 	{
-		eventp->fdtabs_ready[fdp->fdidx_ready] = NULL;
+		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
+
 	fdp->fdidx_ready = -1;
 	event_fdtable_free(fdp);
 	stream->fdp = NULL;
@@ -401,7 +396,7 @@ static void event_loop(ACL_EVENT *eventp)
 	/* 调用 event_prepare 检查有多少个描述字需要通过 select 进行检测 */
 
 	if (event_prepare(eventp) == 0) {
-		if (eventp->fdcnt_ready == 0) {
+		if (eventp->ready_cnt == 0) {
 			delay /= 1000000;
 			if (delay <= 0)
 				delay = 1;
@@ -412,7 +407,7 @@ static void event_loop(ACL_EVENT *eventp)
 		goto TAG_DONE;
 	}
 
-	if (eventp->fdcnt_ready > 0) {
+	if (eventp->ready_cnt > 0) {
 		tv.tv_sec  = 0;
 		tv.tv_usec = 0;
 		tvp = &tv;
@@ -440,8 +435,8 @@ static void event_loop(ACL_EVENT *eventp)
 			myname, __LINE__, eventp->nested);
 	if (nready < 0) {
 		if (acl_last_error() != ACL_EINTR) {
-			acl_msg_fatal("%s(%d), %s: select: %s",
-				__FILE__, __LINE__, myname, acl_last_serror());
+			acl_msg_fatal("%s(%d), %s: select: %s", __FILE__,
+				__LINE__, myname, acl_last_serror());
 		}
 		goto TAG_DONE;
 	} else if (nready == 0)
@@ -467,8 +462,8 @@ static void event_loop(ACL_EVENT *eventp)
 
 		if (FD_ISSET(sockfd, &xmask)) {
 			fdp->event_type |= ACL_EVENT_XCPT;
-			fdp->fdidx_ready = eventp->fdcnt_ready;
-			eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
+			fdp->fdidx_ready = eventp->ready_cnt;
+			eventp->ready[eventp->ready_cnt++] = fdp;
 			continue;
 		}
 
@@ -480,8 +475,8 @@ static void event_loop(ACL_EVENT *eventp)
 				| ACL_EVENT_WRITE)) == 0)
 			{
 				fdp->event_type |= ACL_EVENT_READ;
-				fdp->fdidx_ready = eventp->fdcnt_ready;
-				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
+				fdp->fdidx_ready = eventp->ready_cnt;
+				eventp->ready[eventp->ready_cnt++] = fdp;
 			}
 
 			if (fdp->listener)
@@ -491,7 +486,7 @@ static void event_loop(ACL_EVENT *eventp)
 			 * 触发 ACL_VSTREAM 流在读时调用系统的 read 函数
 			 */
 			else
-				fdp->stream->sys_read_ready = 1;
+				fdp->stream->read_ready = 1;
 		}
 
 		/* 检查描述字是否可写 */
@@ -504,8 +499,8 @@ static void event_loop(ACL_EVENT *eventp)
 				| ACL_EVENT_WRITE)) == 0)
 			{
 				fdp->event_type |= ACL_EVENT_WRITE;
-				fdp->fdidx_ready = eventp->fdcnt_ready;
-				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
+				fdp->fdidx_ready = eventp->ready_cnt;
+				eventp->ready[eventp->ready_cnt++] = fdp;
 			}
 		}
 	}
@@ -524,7 +519,9 @@ TAG_DONE:
 		timer_fn  = timer->callback;
 		timer_arg = timer->context;
 
-		/* 如果定时器的时间间隔 > 0 且允许定时器被循环调用，则再重设定时器 */
+		/* 如果定时器的时间间隔 > 0 且允许定时器被循环调用，
+		 * 则再重设定时器
+		 */
 		if (timer->delay > 0 && timer->keep) {
 			timer->ncount++;
 			eventp->timer_request(eventp, timer->callback,
@@ -542,7 +539,7 @@ TAG_DONE:
 
 	/* 处理准备好的描述字事件 */
 
-	if (eventp->fdcnt_ready > 0)
+	if (eventp->ready_cnt > 0)
 		event_fire(eventp);
 
 	eventp->nested--;
@@ -584,6 +581,7 @@ ACL_EVENT *event_new_select(void)
 	eventp = event_alloc(sizeof(EVENT_SELECT));
 
 	snprintf(eventp->name, sizeof(eventp->name), "events - select");
+
 	eventp->event_mode           = ACL_EVENT_SELECT;
 	eventp->use_thread           = 0;
 	eventp->loop_fn              = event_loop;
@@ -606,5 +604,6 @@ ACL_EVENT *event_new_select(void)
 	FD_ZERO(&ev->rmask);
 	FD_ZERO(&ev->wmask);
 	FD_ZERO(&ev->xmask);
+
 	return eventp;
 }

@@ -297,10 +297,10 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 			myname, __LINE__, fdp->fdidx);
 
 	if (fdp->fdidx_ready > 0
-	    && fdp->fdidx_ready < eventp->fdcnt_ready
-	    && eventp->fdtabs_ready[fdp->fdidx_ready] == fdp)
+	    && fdp->fdidx_ready < eventp->ready_cnt
+	    && eventp->ready[fdp->fdidx_ready] == fdp)
 	{
-		eventp->fdtabs_ready[fdp->fdidx_ready] = NULL;
+		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	event_fdtable_free(fdp);
 	stream->fdp = NULL;
@@ -368,12 +368,12 @@ static void event_loop(ACL_EVENT *eventp)
 
 	THREAD_LOCK(&event_thr->event.tb_mutex);
 
-	eventp->fdcnt_ready = 0;
+	eventp->ready_cnt = 0;
 
 	if (event_thr_prepare(eventp) == 0) {
 		THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
-		if (eventp->fdcnt_ready == 0) {
+		if (eventp->ready_cnt == 0) {
 			select_delay /= 1000000;
 			if (select_delay <= 0)
 				select_delay = 1;
@@ -384,7 +384,7 @@ static void event_loop(ACL_EVENT *eventp)
 		goto TAG_DONE;
 	}
 
-	if (eventp->fdcnt_ready > 0) {
+	if (eventp->ready_cnt > 0) {
 		tv.tv_sec  = 0;
 		tv.tv_usec = 0;
 		tvp = &tv;
@@ -419,7 +419,7 @@ static void event_loop(ACL_EVENT *eventp)
 	for (i = 0; i < eventp->fdcnt; i++) {
 		fdp = eventp->fdtabs[i];
 
-		/* if fdp has been set in eventp->fdtabs_ready ? */
+		/* if fdp has been set in eventp->ready ? */
 		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT)))
 			continue;
 
@@ -427,27 +427,27 @@ static void event_loop(ACL_EVENT *eventp)
 
 		if (FD_ISSET(sockfd, &xmask)) {
 			fdp->event_type |= ACL_EVENT_XCPT;
-			fdp->fdidx_ready = eventp->fdcnt_ready;
-			eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
+			fdp->fdidx_ready = eventp->ready_cnt;
+			eventp->ready[eventp->ready_cnt++] = fdp;
 			continue;
 		}
 
 		if (FD_ISSET(sockfd, &rmask)) {
-			/* has been set in fdtabs_ready ? */
+			/* has been set in ready ? */
 			if ((fdp->event_type & ACL_EVENT_READ) == 0) {
 				fdp->event_type |= ACL_EVENT_READ;
-				fdp->fdidx_ready = eventp->fdcnt_ready;
-				eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
+				fdp->fdidx_ready = eventp->ready_cnt;
+				eventp->ready[eventp->ready_cnt++] = fdp;
 			}
 
 			if (fdp->listener)
 				fdp->event_type |= ACL_EVENT_ACCEPT;
 			else
-				fdp->stream->sys_read_ready = 1;
+				fdp->stream->read_ready = 1;
 		} else if (fdp->w_callback && FD_ISSET(sockfd, &wmask)) {
 			fdp->event_type |= ACL_EVENT_WRITE;
-			fdp->fdidx_ready = eventp->fdcnt_ready;
-			eventp->fdtabs_ready[eventp->fdcnt_ready++] = fdp;
+			fdp->fdidx_ready = eventp->ready_cnt;
+			eventp->ready[eventp->ready_cnt++] = fdp;
 		}
 	}
 
@@ -491,7 +491,7 @@ TAG_DONE:
 		acl_myfree(timer);
 	}
 
-	if (eventp->fdcnt_ready > 0)
+	if (eventp->ready_cnt > 0)
 		event_thr_fire(eventp);
 }
 

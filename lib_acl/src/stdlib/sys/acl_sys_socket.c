@@ -116,8 +116,8 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 		return -1;
 	return dwBytes;
 #else
-	if (fp != NULL && fp->sys_read_ready)
-		fp->sys_read_ready = 0;
+	if (fp != NULL && fp->read_ready)
+		fp->read_ready = 0;
 	else if (timeout > 0 && acl_read_wait(fd, timeout) < 0)
 		return -1;
 
@@ -209,8 +209,8 @@ int acl_socket_close(ACL_SOCKET fd)
 int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	int timeout, ACL_VSTREAM *fp, void *arg acl_unused)
 {
-	if (fp != NULL && fp->sys_read_ready)
-		fp->sys_read_ready = 0;
+	if (fp != NULL && fp->read_ready)
+		fp->read_ready = 0;
 	else if (timeout > 0 && acl_read_wait(fd, timeout) < 0)
 		return -1;
 

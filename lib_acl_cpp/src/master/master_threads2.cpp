@@ -217,7 +217,7 @@ void master_threads2::run_once(ACL_VSTREAM* client)
 		// 等待连接有数据可读，当为 0 时则会立即返回，当
 		// > 0 时则等待最多指定超时时间
 		if(acl_read_wait(fd, timeout > 0 ? timeout : -1) == 0)
-			client->sys_read_ready = 1;
+			client->read_ready = 1;
 		else if (service_on_timeout(client, NULL) == 0)
 			continue;
 		else

@@ -72,7 +72,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		sizeof(__vstream_stdin_buf),    /* read_buf_len */
 		0,                              /* read_cnt */
 		__vstream_stdin_buf,            /* read_ptr */
-		0,                              /* sys_read_ready */
+		0,                              /* read_ready */
 		0,                              /* total_read_cnt */
 		0,                              /* total_write_cnt */
 		NULL,                           /* ioctl_read_ctx */
@@ -129,7 +129,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		sizeof(__vstream_stdout_buf),   /* read_buf_len */
 		0,                              /* read_cnt */
 		__vstream_stdout_buf,           /* read_ptr */
-		0,                              /* sys_read_ready */
+		0,                              /* read_ready */
 		0,                              /* total_read_cnt */
 		0,                              /* total_write_cnt */
 		NULL,                           /* ioctl_read_ctx */
@@ -185,7 +185,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		sizeof(__vstream_stderr_buf),   /* read_buf_len */
 		0,                              /* read_cnt */
 		__vstream_stderr_buf,           /* read_ptr */
-		0,                              /* sys_read_ready */
+		0,                              /* read_ready */
 		0,                              /* total_read_cnt */
 		0,                              /* total_write_cnt */
 		NULL,                           /* ioctl_read_ctx */
@@ -257,11 +257,11 @@ static int sys_read(ACL_VSTREAM *in, void *buf, size_t size)
 
 	if (in->type == ACL_VSTREAM_TYPE_FILE) {
 		if (ACL_VSTREAM_FILE(in) == ACL_FILE_INVALID) {
-			in->sys_read_ready = 0;
+			in->read_ready = 0;
 			return -1;
 		}
 	} else if (ACL_VSTREAM_SOCK(in) == ACL_SOCKET_INVALID) {
-		in->sys_read_ready = 0;
+		in->read_ready = 0;
 		return -1;
 	}
 
@@ -980,7 +980,7 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	 * 检查缓冲区长度来处理未被处理的数据
 	 */
 
-	if (fp->sys_read_ready) {
+	if (fp->read_ready) {
 		if (read_once(fp) <= 0) {
 			n = (int) LEN(buf) - n;
 			return n > 0 ? n : ACL_VSTREAM_EOF;
@@ -1047,7 +1047,7 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	 * 检查缓冲区长度来处理未被处理的数据
 	 */
 
-	if (fp->sys_read_ready) {
+	if (fp->read_ready) {
 		if (read_once(fp) <= 0) {
 			n = (int) LEN(buf) - n;
 
@@ -1111,7 +1111,7 @@ int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
 	 * 检查缓冲区长度来处理未被处理的数据
 	 */
 
-	if (fp->sys_read_ready) {
+	if (fp->read_ready) {
 		if (read_once(fp) <= 0) {
 			int   n = cnt_saved - cnt;
 			return n > 0 ? n : ACL_VSTREAM_EOF;
@@ -1159,7 +1159,7 @@ int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 	 * 则调用者应该通过检查缓冲区长度来处理未被处理的数据
 	 */
 
-	if (fp->sys_read_ready) {
+	if (fp->read_ready) {
 		if (read_once(fp) <= 0) {
 			n = (int) LEN(buf) - n;
 			return n > 0 ? n : ACL_VSTREAM_EOF;
@@ -1183,7 +1183,7 @@ int acl_vstream_can_read(ACL_VSTREAM *fp)
 		return ACL_VSTREAM_EOF;
 	else if (fp->read_cnt > 0)
 		return 1;
-	else if (fp->sys_read_ready == 0)
+	else if (fp->read_ready == 0)
 		return 0;
 	else if ((fp->flag & ACL_VSTREAM_FLAG_PREREAD) != 0) {
 		if (read_once(fp) <= 0)
@@ -2515,7 +2515,7 @@ void acl_vstream_reset(ACL_VSTREAM *fp)
 		fp->flag     = ACL_VSTREAM_FLAG_RW;
 		fp->total_read_cnt = 0;
 		fp->total_write_cnt = 0;
-		fp->sys_read_ready = 0;
+		fp->read_ready = 0;
 		fp->wbuf_dlen = 0;
 		fp->offset = 0;
 		fp->nrefer = 0;

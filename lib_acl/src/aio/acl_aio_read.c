@@ -206,7 +206,7 @@ static void __gets_notify_callback(int event_type, ACL_ASTREAM *astream)
 		acl_non_blocking(ACL_VSTREAM_SOCK(astream->stream),
 			ACL_NON_BLOCKING);
 		do {
-			astream->stream->sys_read_ready = 1;
+			astream->stream->read_ready = 1;
 			ret = __gets_peek(astream);
 			if (astream->keep_read == 0)
 				break;
@@ -396,7 +396,7 @@ static void __read_notify_callback(int event_type, ACL_ASTREAM *astream)
 		acl_non_blocking(ACL_VSTREAM_SOCK(astream->stream),
 			ACL_NON_BLOCKING);
 		do {
-			astream->stream->sys_read_ready = 1;
+			astream->stream->read_ready = 1;
 			ret = __read_peek(astream);
 		} while (ret > 0);
 
@@ -574,7 +574,7 @@ static void __readn_notify_callback(int event_type, ACL_ASTREAM *astream)
 		acl_non_blocking(ACL_VSTREAM_SOCK(astream->stream),
 			ACL_NON_BLOCKING);
 		do {
-			astream->stream->sys_read_ready = 1;
+			astream->stream->read_ready = 1;
 			ret = __readn_peek(astream);
 		} while (astream->keep_read && ret > 0);
 

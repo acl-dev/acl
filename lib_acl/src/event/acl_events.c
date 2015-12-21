@@ -34,10 +34,10 @@ static void event_init(ACL_EVENT *eventp, int fdsize,
 	eventp->fdsize = fdsize;
 	/* eventp->fdtab_free_cnt = 0; */
 	eventp->fdcnt  = 0;
-	eventp->fdcnt_ready  = 0;
+	eventp->ready_cnt  = 0;
 	eventp->fdtabs = (ACL_EVENT_FDTABLE **)
 		acl_mycalloc(fdsize,sizeof(ACL_EVENT_FDTABLE *));
-	eventp->fdtabs_ready = (ACL_EVENT_FDTABLE **)
+	eventp->ready = (ACL_EVENT_FDTABLE **)
 		acl_mycalloc(fdsize, sizeof(ACL_EVENT_FDTABLE *));
 
 	eventp->maxfd  = 0;
@@ -295,7 +295,7 @@ void acl_event_free(ACL_EVENT *eventp)
 	}
 
 	acl_myfree(eventp->fdtabs);
-	acl_myfree(eventp->fdtabs_ready);
+	acl_myfree(eventp->ready);
 	free_fn(eventp);
 }
 
