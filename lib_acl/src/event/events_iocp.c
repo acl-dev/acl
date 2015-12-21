@@ -148,10 +148,9 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	stream->fdp = NULL;
 }
 
-static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
+static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
 {
-	const char *myname = "event_enable_read";
 	EVENT_KERNEL *ev = (EVENT_KERNEL *) eventp;
 	ACL_EVENT_FDTABLE *fdp = (ACL_EVENT_FDTABLE *) stream->fdp;
 	ACL_SOCKET sockfd = ACL_VSTREAM_SOCK(stream);
@@ -164,6 +163,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		acl_ring_append(&ev->fdp_delay_list, &fdp->delay_entry);
 		fdp->flag |= EVENT_FDTABLE_FLAG_DELAY_OPER;
 		stream->fdp = (void *) fdp;
+
 		/* 添加流关闭时的回调函数 */
 		acl_vstream_add_close_handle(stream, stream_on_close, eventp);
 	} else if ((fdp->flag & EVENT_FDTABLE_FLAG_ADD_READ)) {
@@ -192,6 +192,7 @@ END:
 		fdp->fdidx = eventp->fdcnt;
 		eventp->fdtabs[eventp->fdcnt++] = fdp;
 	}
+
 	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd)
 		eventp->maxfd = sockfd;
 
@@ -207,6 +208,24 @@ END:
 		fdp->r_ttl = 0;
 		fdp->r_timeout = 0;
 	}
+
+	return fdp;
+}
+
+static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
+	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
+{
+	ACL_EVENT_FDTABLE *fdp = read_enable(eventp, stream, timeout,
+			called, context);
+	fdp->listenr = 1;
+}
+
+static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
+	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
+{
+	ACL_EVENT_FDTABLE *fdp = read_enable(eventp, stream, timeout,
+			called, context);
+	fdp->listenr = 0;
 }
 
 static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
@@ -895,7 +914,7 @@ ACL_EVENT *event_new_iocp(int fdsize acl_unused)
 	eventp->free_fn              = event_free;
 	eventp->enable_read_fn       = event_enable_read;
 	eventp->enable_write_fn      = event_enable_write;
-	eventp->enable_listen_fn     = event_enable_read;
+	eventp->enable_listen_fn     = event_enable_listen;
 	eventp->disable_read_fn      = event_disable_read;
 	eventp->disable_write_fn     = event_disable_write;
 	eventp->disable_readwrite_fn = event_disable_readwrite;

@@ -59,8 +59,11 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 			__FILE__, __LINE__, myname, sockfd);
 
 	fdp = stream->fdp;
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		fdp = event_fdtable_alloc();
+		fdp->listener = 0;
+	} else
+		fdp->listener = 0;
 
 	if (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
 		acl_msg_panic("%s(%d)->%s: fd %d: multiple I/O request",
@@ -79,7 +82,6 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		stream->fdp = (void *) fdp;
 		stream->nrefer++;
 		fdp->stream = stream;
-		fdp->listener = 0;
 		fdp->fdidx = eventp->fdcnt;
 		eventp->fdtabs[eventp->fdcnt] = fdp;
 		eventp->fdcnt++;
@@ -130,8 +132,11 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 			__FILE__, __LINE__, myname, sockfd);
 
 	fdp = stream->fdp;
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		fdp = event_fdtable_alloc();
+		fdp->listener = 1;
+	} else
+		fdp->listener = 1;
 
 	if (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
 		acl_msg_panic("%s(%d)->%s: fd %d: multiple I/O request",
@@ -150,7 +155,6 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		stream->fdp = (void *) fdp;
 		stream->nrefer++;
 		fdp->stream = stream;
-		fdp->listener = 1;
 		fdp->fdidx = eventp->fdcnt;
 		eventp->fdtabs[eventp->fdcnt] = fdp;
 		eventp->fdcnt++;

@@ -78,7 +78,7 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	stream->fdp = NULL;
 }
 
-static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
+static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
 {
 	EVENT_SELECT *ev = (EVENT_SELECT *) eventp;
@@ -87,7 +87,6 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	if (fdp == NULL) {
 		fdp = event_fdtable_alloc();
-
 		fdp->stream = stream;
 		stream->fdp = (void *) fdp;
 		acl_vstream_add_close_handle(stream, stream_on_close, eventp);
@@ -98,11 +97,11 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		eventp->fdtabs[eventp->fdcnt++] = fdp;
 	}
 
-	if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
+	if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE))
 		fdp->flag |= EVENT_FDTABLE_FLAG_READ;
-	} else {
+	else
 		fdp->flag = EVENT_FDTABLE_FLAG_READ | EVENT_FDTABLE_FLAG_EXPT;
-	}
+
 	FD_SET(sockfd, &ev->rmask);
 	FD_SET(sockfd, &ev->xmask);
 
@@ -115,12 +114,30 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	}
 
 	if (timeout > 0) {
-		fdp->r_timeout = timeout * 1000000;
+		fdp->r_timeout = ((acl_int64) timeout) * 1000000;
 		fdp->r_ttl = eventp->present + fdp->r_timeout;
 	} else {
 		fdp->r_ttl = 0;
 		fdp->r_timeout = 0;
 	}
+
+	return fdp;
+}
+
+static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
+	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
+{
+	ACL_EVENT_FDTABLE *fdp = read_enable(eventp, stream, timeout,
+			callback, context);
+	fdp->listener = 1;
+}
+
+static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
+	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
+{
+	ACL_EVENT_FDTABLE *fdp = read_enable(eventp, stream, timeout,
+			callback, context);
+	fdp->listener = 0;
 }
 
 static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
@@ -132,7 +149,6 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	if (fdp == NULL) {
 		fdp = event_fdtable_alloc();
-
 		fdp->stream = stream;
 		stream->fdp = (void *) fdp;
 		acl_vstream_add_close_handle(stream, stream_on_close, eventp);
@@ -143,11 +159,11 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		eventp->fdtabs[eventp->fdcnt++] = fdp;
 	}
 
-	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
+	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ))
 		fdp->flag |= EVENT_FDTABLE_FLAG_WRITE;
-	} else {
+	else
 		fdp->flag = EVENT_FDTABLE_FLAG_WRITE | EVENT_FDTABLE_FLAG_EXPT;
-	}
+
 	FD_SET(sockfd, &ev->wmask);
 	FD_SET(sockfd, &ev->xmask);
 
@@ -160,7 +176,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	}
 
 	if (timeout > 0) {
-		fdp->w_timeout = timeout * 1000000;
+		fdp->w_timeout = ((acl_int64) timeout) * 1000000;
 		fdp->w_ttl = eventp->present + fdp->w_timeout;
 	} else {
 		fdp->w_ttl = 0;
@@ -301,9 +317,8 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	ACL_EVENT_FDTABLE *fdp = (ACL_EVENT_FDTABLE *) stream->fdp;
 	ACL_SOCKET sockfd = ACL_VSTREAM_SOCK(stream);
 
-	if (fdp == NULL) {
+	if (fdp == NULL)
 		return;
-	}
 
 	if (fdp->flag == 0 || fdp->fdidx < 0 || fdp->fdidx >= eventp->fdcnt) {
 		acl_msg_warn("%s(%d): sockfd(%d) no set, fdp no null",
@@ -328,6 +343,7 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 		eventp->fdtabs[fdp->fdidx] = eventp->fdtabs[eventp->fdcnt];
 		eventp->fdtabs[fdp->fdidx]->fdidx = fdp->fdidx;
 	}
+
 	fdp->fdidx = -1;
 
 	if (FD_ISSET(sockfd, &ev->rmask)) {
@@ -471,8 +487,8 @@ static void event_loop(ACL_EVENT *eventp)
 			if (fdp->listener)
 				fdp->event_type |= ACL_EVENT_ACCEPT;
 
-			/* 该描述字可读则设置 ACL_VSTREAM 的系统可读标志从而触发
-			 * ACL_VSTREAM 流在读时调用系统的 read 函数
+			/* 该描述字可读则设置 ACL_VSTREAM 的系统可读标志从而
+			 * 触发 ACL_VSTREAM 流在读时调用系统的 read 函数
 			 */
 			else
 				fdp->stream->sys_read_ready = 1;
@@ -514,7 +530,7 @@ TAG_DONE:
 			eventp->timer_request(eventp, timer->callback,
 				timer->context, timer->delay, timer->keep);
 		} else {
-			acl_ring_detach(&timer->ring);		/* first this */
+			acl_ring_detach(&timer->ring); /* first this */
 			timer->nrefer--;
 			if (timer->nrefer != 0)
 				acl_msg_fatal("%s(%d): nrefer(%d) != 0",
@@ -574,7 +590,7 @@ ACL_EVENT *event_new_select(void)
 	eventp->free_fn              = event_free;
 	eventp->enable_read_fn       = event_enable_read;
 	eventp->enable_write_fn      = event_enable_write;
-	eventp->enable_listen_fn     = event_enable_read;
+	eventp->enable_listen_fn     = event_enable_listen;
 	eventp->disable_read_fn      = event_disable_read;
 	eventp->disable_write_fn     = event_disable_write;
 	eventp->disable_readwrite_fn = event_disable_readwrite;

@@ -111,10 +111,10 @@ static ACL_EVENT_FDTABLE *stream_on_open(EVENT_WMSG *ev, ACL_VSTREAM *stream)
 	return fdp;
 }
 
-static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
+static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
 {
-	const char *myname = "event_enable_read";
+	const char *myname = "read_enable";
 	EVENT_WMSG *ev = (EVENT_WMSG *) eventp;
 	ACL_SOCKET sockfd = ACL_VSTREAM_SOCK(stream);
 	ACL_EVENT_FDTABLE *fdp = (ACL_EVENT_FDTABLE *) stream->fdp;
@@ -158,6 +158,24 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		fdp->r_ttl = 0;
 		fdp->r_timeout = 0;
 	}
+
+	return fdp;
+}
+
+static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
+	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
+{
+	ACL_EVENT_FDTABLE *fdp = read_enable(eventp, stream, timeout,
+			callback, context);
+	fdp->listener = 1;
+}
+
+static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
+	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
+{
+	ACL_EVENT_FDTABLE *fdp = read_enable(eventp, stream, timeout,
+			callback, context);
+	fdp->listener = 0;
 }
 
 static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,

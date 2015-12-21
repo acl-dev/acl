@@ -130,8 +130,15 @@ static void master_sig_event(int type acl_unused, ACL_EVENT *event acl_unused,
 {
 	char    c[1];
 
+#if 0
 	while (read(ACL_SIG_PIPE_READ_FD, c, 1) > 0)
 		/* void */ ;
+#else
+	while (acl_vstream_read(stream, c, 1) > 0)
+	{
+		/* void */
+	}
+#endif
 	acl_var_master_gotsigchld = 1;
 }
 
