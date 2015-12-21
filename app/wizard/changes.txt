@@ -1,3 +1,7 @@
+9) 2015.12.21
+9.1) bugfix: master_threads.cpp 中的函数 proc_exit_timer 在只有当 nclients 为0
+时才允许退出
+
 8) 2015.6.22
 8.1) comment: 向导生成的服务器工程中的 main 源程序中增加了注释，指明使用方法
 

@@ -87,10 +87,10 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 	}
 
 	for (;;) {
-		switch (epoll_wait(*epoll_fd, events, 1, delay)) {
-		case -1:
-			if (acl_last_error() == ACL_EINTR)
-			{
+		ret = epoll_wait(*epoll_fd, events, 1, delay);
+
+		if (ret == -1) {
+			if (acl_last_error() == ACL_EINTR) {
 				acl_msg_warn(">>>>catch EINTR, try again<<<");
 				continue;
 			}
@@ -99,11 +99,11 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 				myname, __LINE__, acl_last_serror(), fd);
 			ret = -1;
 			break;
-		case 0:
+		} else if (ret == 0) {
 			acl_set_error(ACL_ETIMEDOUT);
 			ret = -1;
 			break;
-		default:
+		} else {
 			if ((events[0].events & (EPOLLERR | EPOLLHUP)) != 0)
 				ret = -1;
 			else if ((events[0].events & EPOLLIN) == 0) {
