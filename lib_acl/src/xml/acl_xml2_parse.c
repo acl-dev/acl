@@ -212,15 +212,8 @@ static const char *xml_parse_cdata(ACL_XML2 *xml, const char *data)
 	*xml->ptr = 0;
 	return data;
 }
-#define	IS_CDATA(x) (*(x) == '[' \
-	&& (*(x + 1) == 'C' || *(x + 1) == 'c') \
-	&& (*(x + 2) == 'D' || *(x + 2) == 'd') \
-	&& (*(x + 3) == 'A' || *(x + 3) == 'a') \
-	&& (*(x + 4) == 'T' || *(x + 4) == 't') \
-	&& (*(x + 5) == 'A' || *(x + 5) == 't') \
-	&& *(x + 6) == '[')
 
-static void cdata_prepare(ACL_XML2 *xml, int last_ch)
+static void cdata_prepare(ACL_XML2 *xml)
 {
 	size_t cdata_len = sizeof("[CDATA[") - 1, len, max, i;
 	ACL_XML2_NODE *curr_node = xml->curr_node;
@@ -252,11 +245,22 @@ static void cdata_prepare(ACL_XML2 *xml, int last_ch)
 	curr_node->ltag_size = cdata_len;
 	curr_node->ltag[curr_node->ltag_size] = 0;
 
+#if 0
 	if (xml->len < MIN_LEN)
 		return;
 	*xml->ptr++ = last_ch;
 	xml->len--;
+#endif
 }
+
+#define	CDATA_SIZE	(sizeof("[CDATA[") - 1)
+#define	IS_CDATA(x) (*(x) == '[' \
+	&& (*(x + 1) == 'C' || *(x + 1) == 'c') \
+	&& (*(x + 2) == 'D' || *(x + 2) == 'd') \
+	&& (*(x + 3) == 'A' || *(x + 3) == 'a') \
+	&& (*(x + 4) == 'T' || *(x + 4) == 't') \
+	&& (*(x + 5) == 'A' || *(x + 5) == 't') \
+	&& *(x + 6) == '[')
 
 static const char *xml_parse_meta_tag(ACL_XML2 *xml, const char *data)
 {
@@ -269,6 +273,7 @@ static const char *xml_parse_meta_tag(ACL_XML2 *xml, const char *data)
 		xml->curr_node->ltag = xml->ptr;
 
 	while ((ch = *data) != 0) {
+#if 0
 		if (IS_SPACE(ch) || ch == '>') {
 			if (xml->len < MIN_LEN)
 				return data;
@@ -289,6 +294,29 @@ static const char *xml_parse_meta_tag(ACL_XML2 *xml, const char *data)
 			}
 			break;
 		}
+#else
+
+		if (xml->ptr - xml->curr_node->ltag >= (ssize_t) CDATA_SIZE
+			&& IS_CDATA(xml->curr_node->ltag))
+		{
+			xml->curr_node->ltag_size =
+				xml->ptr - xml->curr_node->ltag;
+			cdata_prepare(xml);
+			xml->curr_node->status = ACL_XML2_S_CDATA;
+			xml->curr_node->flag |= ACL_XML2_F_CDATA;
+			break;
+		} else if (IS_SPACE(ch) || ch == '>') {
+			xml->curr_node->ltag_size =
+				xml->ptr - xml->curr_node->ltag;
+			if (xml->len < MIN_LEN)
+				return data;
+			data++;
+			*xml->ptr++ = 0;
+			xml->len--;
+			xml->curr_node->status = ACL_XML2_S_MTXT;
+			break;
+		}
+#endif
 
 		if (xml->len < MIN_LEN)
 			return data;

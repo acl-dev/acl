@@ -1,6 +1,17 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+523) 2015.12.28
+523.1) acl_read_wait.c 中的函数 acl_read_wait 在 32 位的低版本 LINUX 平台下
+使用 epoll 方法模拟读超时可能有问题，所以改用 poll 方法来实现读超时机制
+
+522) 2015.12.24
+522.1) bugfix: 修复了 valgrind 检测出的 acl_xml_parse.c 中函数 cdata_prepare
+存在指针非法访问问题
+
+521) 2015.12.23
+521.1) bugfix: acl_xml_parse.c/acl_xml2_parse.c 当解析一个空的 CDATA 时有问题
+
 520) 2015.12.21
 520.1) bugfix: master_sig.c 中在读数据时应该使用 acl_vstream_read，而不是
 调用系统 API read，否则会形成死循环

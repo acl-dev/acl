@@ -319,6 +319,9 @@ const std::vector<xml_node*>& xml2::getElementsByTagName(const char* tag) const
 xml_node* xml2::getFirstElementByTag(const char* tag) const
 {
 	ACL_XML2_NODE* node = acl_xml2_getFirstElementByTagName(xml_, tag);
+	if (node == NULL)
+		return NULL;
+
 	xml2_node* n = NEW xml2_node(const_cast<xml2*>(this), node);
 	const_cast<xml2*>(this)->nodes_tmp_.push_back(n);
 	return n;

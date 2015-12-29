@@ -22,72 +22,108 @@
 #include "stdlib/acl_iostuff.h"
 #include "../../init/init.h"
 
-#if	defined(LINUX2) && !defined(MINGW)
+#if defined(LINUX2) && !defined(MINGW) && defined(USE_EPOLL)
 
 #include "init/acl_init.h"
 #include "thread/acl_pthread.h"
 #include <sys/epoll.h>
 
-static int *main_epoll_read_fd = NULL;
+typedef struct EPOLL_CTX
+{
+	acl_pthread_t tid;
+	int  epfd;
+} EPOLL_CTX;
+
+static EPOLL_CTX *main_epoll_ctx = NULL;
 
 static void main_epoll_end(void)
 {
-	if (main_epoll_read_fd != NULL) {
-		close(*main_epoll_read_fd);
-		acl_myfree(main_epoll_read_fd);
+	const char *myname = "main_epoll_end";
+
+	if (main_epoll_ctx != NULL) {
+		acl_msg_info("%s(%d), %s: close epoll_fd: %d, tid: %lu, %lu",
+			__FILE__, __LINE__, myname, main_epoll_ctx->epfd,
+			main_epoll_ctx->tid, acl_pthread_self());
+
+		close(main_epoll_ctx->epfd);
+		acl_myfree(main_epoll_ctx);
+		main_epoll_ctx = NULL;
 	}
 }
 
 static acl_pthread_key_t epoll_key;
 static acl_pthread_once_t epoll_once = ACL_PTHREAD_ONCE_INIT;
 
-static void thread_epoll_end(void *buf)
+static void thread_epoll_end(void *ctx)
 {
-	int *epoll_fd = (int*) buf;
+	const char *myname = "thread_epoll_end";
+	EPOLL_CTX *epoll_ctx = (EPOLL_CTX*) ctx;
 
-	close(*epoll_fd);
-	acl_myfree(epoll_fd);
+	acl_msg_info("%s(%d), %s: close epoll_fd: %d, tid: %lu, %lu",
+		__FILE__, __LINE__, myname, epoll_ctx->epfd,
+		epoll_ctx->tid, acl_pthread_self());
+
+	close(epoll_ctx->epfd);
+	acl_myfree(epoll_ctx);
 }
 
-static void thread_epoll_init(void)
+static void thread_epoll_once(void)
 {
 	acl_assert(acl_pthread_key_create(&epoll_key, thread_epoll_end) == 0);
+}
+
+static EPOLL_CTX *thread_epoll_init(void)
+{
+	const char *myname = "thread_epoll_init";
+	EPOLL_CTX *epoll_ctx = (EPOLL_CTX*) acl_mymalloc(sizeof(EPOLL_CTX));
+
+	acl_assert(acl_pthread_setspecific(epoll_key, epoll_ctx) == 0);
+
+	epoll_ctx->tid = acl_pthread_self();
+	epoll_ctx->epfd = epoll_create(1);
+
+	if (acl_pthread_self() == acl_main_thread_self()) {
+		main_epoll_ctx = epoll_ctx;
+		atexit(main_epoll_end);
+		acl_msg_info("%s(%d): %s, create epoll_fd: %d, tid: %lu, %lu",
+			__FILE__, __LINE__, myname, epoll_ctx->epfd,
+			epoll_ctx->tid, acl_pthread_self());
+	} else {
+		acl_msg_info("%s(%d): %s, create epoll_fd: %d, tid: %lu, %lu",
+			__FILE__, __LINE__, myname, epoll_ctx->epfd,
+			epoll_ctx->tid, acl_pthread_self());
+	}
+
+	return epoll_ctx;
 }
 
 int acl_read_wait(ACL_SOCKET fd, int timeout)
 {
 	const char *myname = "acl_read_wait";
-	int op = EPOLL_CTL_ADD, delay = timeout * 1000, *epoll_fd, ret;
+	int   delay = timeout * 1000, ret;
+	EPOLL_CTX *epoll_ctx;
 	struct epoll_event ee, events[1];
 
-	acl_assert(acl_pthread_once(&epoll_once, thread_epoll_init) == 0);
-	epoll_fd = (int*) acl_pthread_getspecific(epoll_key);
-	if (epoll_fd == NULL) {
-		epoll_fd = (int*) acl_mymalloc(sizeof(int));
-		acl_assert(acl_pthread_setspecific(epoll_key, epoll_fd) == 0);
-		if ((unsigned long) acl_pthread_self()
-			== acl_main_thread_self())
-		{
-			main_epoll_read_fd = epoll_fd;
-			atexit(main_epoll_end);
-		}
-
-		*epoll_fd = epoll_create(1);
-	}
+	acl_assert(acl_pthread_once(&epoll_once, thread_epoll_once) == 0);
+	epoll_ctx = (EPOLL_CTX*) acl_pthread_getspecific(epoll_key);
+	if (epoll_ctx == NULL)
+		epoll_ctx = thread_epoll_init();
 
 	ee.events = EPOLLIN | EPOLLHUP | EPOLLERR;
 	ee.data.u64 = 0;
 	ee.data.fd = fd;
-	if (epoll_ctl(*epoll_fd, op, fd, &ee) == -1
+	if (epoll_ctl(epoll_ctx->epfd, EPOLL_CTL_ADD, fd, &ee) == -1
 		&& acl_last_error() != EEXIST)
 	{
-		acl_msg_error("%s(%d): epoll_ctl error: %s, fd: %d",
-			myname, __LINE__, acl_last_serror(), fd);
+		acl_msg_error("%s(%d): epoll_ctl error: %s, fd: %d, epfd: %d,"
+			" tid: %lu, %lu", myname, __LINE__, acl_last_serror(),
+			fd, epoll_ctx->epfd, epoll_ctx->tid,
+			acl_pthread_self());
 		return -1;
 	}
 
 	for (;;) {
-		ret = epoll_wait(*epoll_fd, events, 1, delay);
+		ret = epoll_wait(epoll_ctx->epfd, events, 1, delay);
 
 		if (ret == -1) {
 			if (acl_last_error() == ACL_EINTR) {
@@ -95,8 +131,10 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 				continue;
 			}
 
-			acl_msg_error("%s(%d): epoll_wait error: %s, fd: %d",
-				myname, __LINE__, acl_last_serror(), fd);
+			acl_msg_error("%s(%d): epoll_wait error: %s, fd: %d,"
+				" epfd: %d, tid: %lu, %lu", myname, __LINE__,
+				acl_last_serror(), fd, epoll_ctx->epfd,
+				epoll_ctx->tid, acl_pthread_self());
 			ret = -1;
 			break;
 		} else if (ret == 0) {
@@ -118,9 +156,11 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 	ee.events = 0;
 	ee.data.u64 = 0;
 	ee.data.fd = fd;
-	if (epoll_ctl(*epoll_fd, EPOLL_CTL_DEL, fd, &ee) == -1) {
-		acl_msg_error("%s(%d): epoll_ctl error: %s, fd: %d",
-			myname, __LINE__, acl_last_serror(), fd);
+	if (epoll_ctl(epoll_ctx->epfd, EPOLL_CTL_DEL, fd, &ee) == -1) {
+		acl_msg_error("%s(%d): epoll_ctl error: %s, fd: %d, epfd: %d,"
+			" tid: %lu, %lu", myname, __LINE__, acl_last_serror(),
+			fd, epoll_ctx->epfd, epoll_ctx->tid,
+			acl_pthread_self());
 		return -1;
 	}
 

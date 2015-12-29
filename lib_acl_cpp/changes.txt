@@ -1,6 +1,26 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+393) 2015.12.28
+393.1) bugfix: 类 xml1, xml2 中的函数 getFirstElementByTag 内部没有判断 NULL
+393.2) bugfix: 取消了 http_request 类中的 acl_assert(client_) 断言判断
+
+392.1) 2015.12.25
+392.1) bugfix: dbuf_guard 类应禁止引用拷贝，否则在调用 create 的参数中如果有
+dbuf_guard 对象作为参数会有问题，如：
+class myobj : public acl::dbuf_obj
+{
+public:
+	myobj(acl::dbuf_guard& dbuf) : dbuf_(dbuf) {}
+	~myobj(void) {}
+};
+
+acl::dbuf_guard dbuf;
+myobj* obj = dbuf.create<myobj, acl::dbuf_guard>(dbuf);
+
+虽然 myobj 构造函数接受一个引用，但依然会在 create 时形成引用拷贝隐患，从而
+会造成 dbuf 内的缓冲区被二次释放，所以解决方式是禁止 dbuf_guard 类引用拷贝
+
 391.1) 2015.12.22
 391.1) compile: polarssl_io.cpp 中将 sys_read_ready 改名为 read_ready
 

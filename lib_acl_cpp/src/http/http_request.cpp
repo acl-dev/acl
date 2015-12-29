@@ -175,7 +175,13 @@ http_client* http_request::get_client(void) const
 
 bool http_request::write_head()
 {
-	acl_assert(client_);  // 必须保证该连接已经打开
+	// 必须保证该连接已经打开
+	if (client_ == NULL)
+	{
+		logger_error("connection not opened!");
+		return false;
+	}
+
 	bool  reuse_conn;
 	http_method_t method = header_.get_method();
 
@@ -286,7 +292,10 @@ bool http_request::write_body(const void* data, size_t len)
 
 bool http_request::send_request(const void* data, size_t len)
 {
-	acl_assert(client_);  // 必须保证该连接已经打开
+	// 必须保证该连接已经打开
+	if (client_ == NULL)
+		return false;
+
 	client_->reset();  // 重置状态
 
 	// 写 HTTP 请求头
@@ -385,32 +394,27 @@ bool http_request::request(const void* data, size_t len)
 
 int http_request::http_status() const
 {
-	acl_assert(client_);
-	return client_->response_status();
+	return client_ ? client_->response_status() : -1;
 }
 
 acl_int64 http_request::body_length() const
 {
-	acl_assert(client_);
-	return client_->body_length();
+	return client_ ? client_->body_length() : -1;
 }
 
 bool http_request::keep_alive() const
 {
-	acl_assert(client_);
-	return client_->keep_alive();
+	return client_ ? client_->keep_alive() : false;
 }
 
 const char* http_request::header_value(const char* name) const
 {
-	acl_assert(client_);
-	return client_->header_value(name);
+	return client_ ? client_->header_value(name) : NULL;
 }
 
 bool http_request::body_finish() const
 {
-	acl_assert(client_);
-	return client_->body_finish();
+	return client_ ? client_->body_finish() : false;
 }
 
 void http_request::check_range()
