@@ -1,6 +1,9 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+394) 2015.12.29
+394.1) bugfix: redis_key 类中的 type 函数命令少一个 hash 类型
+
 393) 2015.12.28
 393.1) bugfix: 类 xml1, xml2 中的函数 getFirstElementByTag 内部没有判断 NULL
 393.2) bugfix: 取消了 http_request 类中的 acl_assert(client_) 断言判断

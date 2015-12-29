@@ -418,6 +418,8 @@ redis_key_t redis_key::type(const char* key)
 		return REDIS_KEY_NONE;
 	else if (strcasecmp(ptr, "string") == 0)
 		return REDIS_KEY_STRING;
+	else if (strcasecmp(ptr, "hash") == 0)
+		return REDIS_KEY_HASH;
 	else if (strcasecmp(ptr, "list") == 0)
 		return REDIS_KEY_LIST;
 	else if (strcasecmp(ptr, "set") == 0)
