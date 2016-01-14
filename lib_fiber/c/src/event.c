@@ -271,6 +271,7 @@ static inline void event_process_poll(EVENT *ev)
 	ring_init(&ev->poll_list);
 }
 
+#ifdef	HAS_EPOLL
 static void event_process_epoll(EVENT *ev)
 {
 	while (1) {
@@ -283,6 +284,7 @@ static void event_process_epoll(EVENT *ev)
 		ee->proc(ev, ee);
 	}
 }
+#endif
 
 int event_process(EVENT *ev, int timeout)
 {
@@ -308,7 +310,9 @@ int event_process(EVENT *ev, int timeout)
 	event_prepare(ev);
 	ret = ev->event_loop(ev, timeout);
 	event_process_poll(ev);
+#ifdef	HAS_EPOLL
 	event_process_epoll(ev);
+#endif
 
 	return ret;
 }

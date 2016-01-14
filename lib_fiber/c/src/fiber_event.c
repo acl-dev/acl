@@ -1,9 +1,12 @@
 #include "stdafx.h"
 #include "common.h"
 
-#include <linux/version.h>
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
-#include <sys/eventfd.h>
+#ifdef	LINUX
+# include <linux/version.h>
+# if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
+#  define	HAS_EVENTFD
+# include <sys/eventfd.h>
+# endif
 #endif
 #include "fiber/lib_fiber.h"
 #include "fiber.h"
@@ -69,7 +72,7 @@ void acl_fiber_event_free(ACL_FIBER_EVENT *event)
 
 static inline void channel_open(FIBER_BASE *fbase)
 {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
+#if defined(HAS_EVENTFD)
 	int flags = 0;
 # if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
 	flags |= FD_CLOEXEC;
@@ -239,7 +242,7 @@ int acl_fiber_event_notify(ACL_FIBER_EVENT *event)
 
 		msg_error("%s(%d), %s: tid(%ld) is not the owner(%ld)",
 			__FILE__, __LINE__, __FUNCTION__,
-			event->tid, pthread_self());
+			(long) event->tid, (long) pthread_self());
 		return -1;
 	}
 

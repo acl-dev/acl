@@ -272,7 +272,7 @@ bool charset_conv::update_begin(const char* fromCharset,
 #elif defined(ACL_SUNOS5)
 		__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
 #elif defined(ACL_FREEBSD)
-		__iconv(m_iconv, (char**) &pNil, &zero, &pNil, &zero);
+		__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
 #else
 		__iconv(m_iconv, &pNil, &zero, &pNil, &zero);
 #endif
@@ -368,7 +368,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 #elif defined(ACL_SUNOS5)
 		ret = __iconv(m_iconv, (const char**) &pIn, &nIn, &pOut, &nOut);
 #elif defined(ACL_FREEBSD)
-		ret = __iconv(m_iconv, (char**) &pIn, &nIn, &pOut, &nOut);
+		ret = __iconv(m_iconv, (const char**) &pIn, &nIn, &pOut, &nOut);
 #else
 		ret = __iconv(m_iconv, &pIn, &nIn, &pOut, &nOut);
 #endif
@@ -410,7 +410,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 			__iconv(m_iconv, (const char**) &pNil,
 				&zero, &pNil, &zero);
 #elif defined(ACL_FREEBSD)
-			__iconv(m_iconv, (char**) &pNil, &zero, &pNil, &zero);
+			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
 #else
 			__iconv(m_iconv, &pNil, &zero, &pNil, &zero);
 #endif
@@ -456,7 +456,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 #elif defined(ACL_SUNOS5)
 			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
 #elif defined(ACL_FREEBSD)
-			__iconv(m_iconv, (char**) &pNil, &zero, &pNil, &zero);
+			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
 #else
 			__iconv(m_iconv, &pNil, &zero, &pNil, &zero);
 #endif

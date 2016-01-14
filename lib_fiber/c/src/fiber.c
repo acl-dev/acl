@@ -928,7 +928,11 @@ void acl_fiber_schedule(void)
 	for (;;) {
 		head = ring_pop_head(&__thread_fiber->ready);
 		if (head == NULL) {
+#ifdef	FREEBSD
+			msg_info("thread-%lu: NO FIBER NOW", (long) pthread_self());
+#else
 			msg_info("thread-%lu: NO FIBER NOW", pthread_self());
+#endif
 			break;
 		}
 
@@ -990,7 +994,11 @@ void acl_fiber_switch(void)
 
 	head = ring_pop_head(&__thread_fiber->ready);
 	if (head == NULL) {
+#ifdef	FREEBSD
+		msg_info("thread-%lu: NO FIBER in ready", (long) pthread_self());
+#else
 		msg_info("thread-%lu: NO FIBER in ready", pthread_self());
+#endif
 		fiber_swap(current, &__thread_fiber->original);
 		return;
 	}

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "common.h"
 
+#ifdef	HAS_EPOLL
+
 #ifndef __USE_GNU
 #define __USE_GNU
 #endif
@@ -259,3 +261,5 @@ EVENT *event_epoll_create(int size)
 
 	return (EVENT*) ep;
 }
+
+#endif	// end HAS_EPOLL

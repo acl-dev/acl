@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <netdb.h>
 #include "dns/dns.h"
 #include "dns/sane_inet.h"
 #include "common.h"
@@ -108,6 +109,13 @@ int getaddrinfo(const char *node, const char *service,
 		hook_init();
 	}
 
+#ifndef	EAI_NODATA
+# if	defined(NO_DATA)
+#  define EAI_NODATA NO_DATA
+# else
+#  define EAI_NODATA 7
+# endif
+#endif
 	if (!var_hook_sys_api) {
 		return __sys_getaddrinfo ? __sys_getaddrinfo
 			(node, service, hints, res) : EAI_NODATA;

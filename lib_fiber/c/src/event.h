@@ -1,7 +1,9 @@
 #ifndef EVENT_INCLUDE_H
 #define EVENT_INCLUDE_H
 
+#ifdef	HAS_EPOLL
 #include <sys/epoll.h>
+#endif
 #include "fiber/lib_fiber.h"
 
 #define SET_TIME(x) do { \
@@ -50,7 +52,9 @@ struct FILE_EVENT {
 	event_proc   *r_proc;
 	event_proc   *w_proc;
 	POLLFD       *pfd;
+#ifdef	HAS_EPOLL
 	EPOLL_CTX    *epx;
+#endif
 };
 
 struct POLLFD {
@@ -68,6 +72,7 @@ struct POLL_EVENT {
 	POLLFD    *fds;
 };
 
+#ifdef	HAS_EPOLL
 struct EPOLL_CTX {
 	int  fd;
 	int  op;
@@ -90,6 +95,7 @@ struct EPOLL_EVENT {
 	int maxevents;
 	int nready;
 };
+#endif
 
 struct EVENT {
 	RING events;

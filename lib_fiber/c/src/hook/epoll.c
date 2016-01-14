@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#ifdef	HAS_EPOLL
+
 #include "common.h"
 #include "fiber/lib_fiber.h"
 #include "event.h"
@@ -460,3 +463,5 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 
 	return ee->nready;
 }
+
+#endif	// end HAS_EPOLL

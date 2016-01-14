@@ -70,6 +70,7 @@ endif
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
+	CFLAGS += -DFREEBSD
 endif
 
 # For Darwin
@@ -82,6 +83,7 @@ endif
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
+	CFLAGS  += -DLINUX
 endif
 
 # For MINGW
