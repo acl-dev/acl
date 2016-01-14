@@ -103,7 +103,7 @@ static int kqueue_add_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 	struct kevent *kev;
 
 	if (ek->nchanges >= ek->setsize) {
-		if (kqueue_events_fflush(ek) == -1) {
+		if (kqueue_fflush(ek) == -1) {
 			return -1;
 		}
 
@@ -121,7 +121,7 @@ static int kqueue_del_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 	struct kevent *kev;
 
 	if (ek->nchanges >= ek->setsize) {
-		if (kqueue_events_fflush(ek) == -1) {
+		if (kqueue_fflush(ek) == -1) {
 			return -1;
 		}
 
@@ -139,7 +139,7 @@ static int kqueue_del_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 	struct kevent *kev;
 
 	if (ek->nchanges >= ek->setsize) {
-		if (kqueue_events_fflush(ek) == -1) {
+		if (kqueue_fflush(ek) == -1) {
 			return -1;
 		}
 
@@ -225,7 +225,7 @@ EVENT *event_kqueue_create(int size)
 	ek->event.handle = kqueue_handle;
 	ek->event.free   = kqueue_free;
 
-	ek->event.event_wait = kqueue_event_wait;
+	ek->event.event_wait = kqueue_wait;
 	ek->event.add_read   = (event_oper *) kqueue_add_read;
 	ek->event.add_write  = (event_oper *) kqueue_add_write;
 	ek->event.del_read   = (event_oper *) kqueue_del_read;
