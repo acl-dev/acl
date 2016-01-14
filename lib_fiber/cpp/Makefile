@@ -193,7 +193,7 @@ shared: $(OBJ)
 # src
 $(OBJ_PATH_DST)/%.o: ./src/%.cpp
 	$(COMPILE_OBJ)
-$(OBJ_PATH_DST)/%.o: ./src/*/%.cpp
+$(OBJ_PATH_DST)/%.o: ./src/keeper/%.cpp
 	$(COMPILE_OBJ)
 
 clean cl:

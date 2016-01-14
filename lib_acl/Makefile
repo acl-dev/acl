@@ -95,6 +95,7 @@ endif
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
 	RPATH = freebsd
+	CFLAGS += -O3
 endif
 
 # For Darwin
@@ -137,6 +138,7 @@ endif
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	CFLAGS += -DLINUX2 -DMINGW
+	CFLAGS += -O3
 	UNIXTYPE = LINUX
 	SYSLIB = -lpthread-2
 	RPATH = mingw
@@ -145,6 +147,7 @@ endif
 # For MSYS
 ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
 	CFLAGS += -DLINUX2 -DMINGW
+	CFLAGS += -O3
 	UNIXTYPE = LINUX
 	SYSLIB = -lpthread-2
 	RPATH = mingw
@@ -159,6 +162,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 		SYSLIB += -lsocket -lnsl -lrt
 	endif
 	CFLAGS += -DSUNOS5 -fPIC -Werror
+	CFLAGS += -O3
 	UNIXTYPE = SUNOS5
 	RPATH = sunos5_x86
 endif
@@ -166,6 +170,7 @@ endif
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
 	CFLAGS += -DHP_UX -DHPUX11 -fPIC -Werror
+	CFLAGS += -O3
 	UNIXTYPE = HPUX
 	RPATH = hpux
 endif
