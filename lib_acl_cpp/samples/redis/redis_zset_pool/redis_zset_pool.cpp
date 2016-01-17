@@ -9,7 +9,7 @@ static bool test_zadd(acl::redis_zset& redis, int i, const char* key,
 		nmember++;
 
 	// 从连接对象中获得统一的内存池分配对象，分配小内存块
-	acl::dbuf_pool* pool = redis.get_pool();
+	acl::dbuf_pool* pool = redis.get_dbuf();
 	// 动态分配数据块指针数组内存
 	const char** members = (const char**)
 		pool->dbuf_alloc(nmember * sizeof(char*));
