@@ -76,7 +76,7 @@ endif
 ##############################################################################
 
 .PHONY = check help all_lib all samples all clean install uninstall uninstall_all build_bin build_src build_one
-VERSION = 3.1.4.3
+VERSION = 3.1.4.4
 
 help:
 	@(echo "usage: make help|all|all_lib|all_samples|clean|install|uninstall|uninstall_all|build_bin|build_src|build_one")
