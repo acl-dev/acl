@@ -35,7 +35,7 @@ public:
 	 */
 	redis_client(const char* addr, int conn_timeout = 60,
 		int rw_timeout = 30, bool retry = true);
-	~redis_client();
+	~redis_client(void);
 
 	/**
 	 * 调用本函数设置连接 redis 服务的连接密码

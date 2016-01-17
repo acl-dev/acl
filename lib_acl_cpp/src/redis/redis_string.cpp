@@ -528,8 +528,8 @@ int redis_string::bitop(const char* op, const char* destkey,
 	const std::vector<string>& keys)
 {
 	size_t argc = 3 + keys.size();
-	const char** argv = (const char**) pool_->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
+	const char** argv = (const char**) dbuf_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) dbuf_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = "BITOP";
 	lens[0] = sizeof("BITOP") - 1;
@@ -555,8 +555,8 @@ int redis_string::bitop(const char* op, const char* destkey,
 	const std::vector<const char*>& keys)
 {
 	size_t argc = 3 + keys.size();
-	const char** argv = (const char**) pool_->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
+	const char** argv = (const char**) dbuf_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) dbuf_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = "BITOP";
 	lens[0] = sizeof("BITOP") - 1;
@@ -582,8 +582,8 @@ int redis_string::bitop(const char* op, const char* destkey,
 	const char* keys[], size_t size)
 {
 	size_t argc = 3 + size;
-	const char** argv = (const char**) pool_->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
+	const char** argv = (const char**) dbuf_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) dbuf_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = "BITOP";
 	lens[0] = sizeof("BITOP") - 1;

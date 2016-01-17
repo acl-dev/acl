@@ -1,6 +1,25 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+526) 2016.1.17
+526.1) feature: acl_default_malloc.c，函数 acl_default_realloc 当输入的地址为
+NULL，则自动切换至 acl_default_malloc 过程
+526.2) feature: acl_vstream.c，函数 acl_vstream_fdopen 会自动判断所给描述符是否
+为监听描述符，避免了用户输入的参数 fdtype 的非法性
+526.3) feature: events_select.c/events_poll.c/events_kernel.c，内部自动判断是否
+为监听描述符，从而降低了事件模块与流模块之间以及其它模块之间的耦合度
+
+525) 2016.1.16
+525.1) bugfix: acl_multi_server.c/acl_single_server.c/acl_trigger_server.c，在
+将监控监听套接口的读事件时，应该调用 acl_event_enable_listen，而不是调用
+acl_event_enable_read
+525.2) feature: 增加函数 acl_check_socket 用来检查所给套接字是否为监听套接字
+
+524) 2016.1.8
+524.1) bugfix: acl_xml_parse.c/acl_xml2_parse.c/acl_xml_util.c/acl_xml2_util.c,
+修复了当数据节点为 META, COMMENT, CDATA 时解析与创建 xml 对象时的 BUG
+
+------------------------------------------------------------------------
 523) 2015.12.28
 523.1) acl_read_wait.c 中的函数 acl_read_wait 在 32 位的低版本 LINUX 平台下
 使用 epoll 方法模拟读超时可能有问题，所以改用 poll 方法来实现读超时机制

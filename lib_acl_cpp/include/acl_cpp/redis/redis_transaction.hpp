@@ -16,7 +16,7 @@ public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_transaction();
+	redis_transaction(void);
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -26,9 +26,9 @@ public:
 	/**
 	 * see redis_command::redis_command(redis_client_cluster*， size_t)
 	 */
-	redis_transaction(redis_client_cluster* cluster, size_t max_conns);
+	redis_transaction(redis_client_cluster* cluster, size_t max_conns = 0);
 
-	virtual ~redis_transaction();
+	virtual ~redis_transaction(void);
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -51,7 +51,7 @@ public:
 	 * @return {bool} 操作是否成功
 	 * if success of this operation
 	 */
-	bool unwatch();
+	bool unwatch(void);
 
 	/**
 	 * 标记一个事务块的开始，事务块内的多条命令会按照先后顺序被放进一个队列当中，
@@ -60,7 +60,7 @@ public:
 	 * @return {bool} 操作是否成功
 	 *  if success of this operation
 	 */
-	bool multi();
+	bool multi(void);
 
 	/**
 	 * 执行所有事务块内的命令，假如某个(或某些) key 正处于 WATCH 命令的监视之下，
@@ -72,7 +72,7 @@ public:
 	 * @return {bool} 操作是否成功
 	 *  if success of this operation
 	 */
-	bool exec();
+	bool exec(void);
 
 	/**
 	 * 取消事务，放弃执行事务块内的所有命令，如果正在使用 WATCH 命令监视某个(或某些)
@@ -80,7 +80,7 @@ public:
 	 * discard all commands issued after MULTI
 	 * @return {bool}
 	 */
-	bool discard();
+	bool discard(void);
 
 	/**
 	 * 在 multi 和 exec 之间可多次调用本函数执行多条 redis 客户端命令
@@ -117,7 +117,7 @@ public:
 	 * get the result array's length after EXEC
 	 * @return {size_t}
 	 */
-	size_t get_size() const;
+	size_t get_size(void) const;
 
 	/**
 	 * 获取指定下标的对应的命令的执行结果对象
@@ -136,7 +136,7 @@ public:
 	 * get all the commands issued between MULTI and EXEC
 	 * @return {const std::vector<string>&}
 	 */
-	const std::vector<string>& get_commands() const
+	const std::vector<string>& get_commands(void) const
 	{
 		return cmds_;
 	}

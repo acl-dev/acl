@@ -41,7 +41,7 @@ class ACL_CPP_API geo_member
 public:
 	geo_member(const char* name);
 	geo_member(const geo_member& member);
-	~geo_member();
+	~geo_member(void);
 
 	void set_name(const char* name);
 	const char* get_name() const
@@ -108,7 +108,7 @@ public:
 	/**
 	 * see redis_command::redis_command(redis_client_cluster*£¬ size_t)
 	 */
-	redis_geo(redis_client_cluster* cluster, size_t max_conns);
+	redis_geo(redis_client_cluster* cluster, size_t max_conns = 0);
 	virtual ~redis_geo();
 
 	/////////////////////////////////////////////////////////////////////

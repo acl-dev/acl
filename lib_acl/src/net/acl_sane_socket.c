@@ -42,7 +42,7 @@ struct SOCK_ADDR {
 };
 #endif
 
-int acl_getpeername(ACL_SOCKET sockfd, char *buf, size_t size)
+int acl_getpeername(ACL_SOCKET fd, char *buf, size_t size)
 {
 	struct SOCK_ADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
@@ -50,11 +50,11 @@ int acl_getpeername(ACL_SOCKET sockfd, char *buf, size_t size)
 	char  ip[32];
 	int   port;
 
-	if (sockfd == ACL_SOCKET_INVALID || buf == NULL || size <= 0)
+	if (fd == ACL_SOCKET_INVALID || buf == NULL || size <= 0)
 		return -1;
 
 	memset(&addr, 0, sizeof(addr));
-	if (getpeername(sockfd, sa, &len) == -1)
+	if (getpeername(fd, sa, &len) == -1)
 		return -1;
 
 #ifndef	ACL_WINDOWS
@@ -62,7 +62,7 @@ int acl_getpeername(ACL_SOCKET sockfd, char *buf, size_t size)
 		memset(&addr, 0, sizeof(addr));
 		len = sizeof(addr);
 
-		if (getsockname(sockfd, sa, &len) == -1)
+		if (getsockname(fd, sa, &len) == -1)
 			return -1;
 
 		snprintf(buf, size, "%s", addr.sa.un.sun_path);
@@ -78,7 +78,7 @@ int acl_getpeername(ACL_SOCKET sockfd, char *buf, size_t size)
 	return 0;
 }
 
-int acl_getsockname(ACL_SOCKET sockfd, char *buf, size_t size)
+int acl_getsockname(ACL_SOCKET fd, char *buf, size_t size)
 {
 	struct SOCK_ADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
@@ -86,12 +86,12 @@ int acl_getsockname(ACL_SOCKET sockfd, char *buf, size_t size)
 	char  ip[32];
 	int   port;
 
-	if (sockfd == ACL_SOCKET_INVALID || buf == NULL || size <= 0)
+	if (fd == ACL_SOCKET_INVALID || buf == NULL || size <= 0)
 		return -1;
 
 	memset(&addr, 0, sizeof(addr));
 
-	if (getsockname(sockfd, sa, &len) == -1)
+	if (getsockname(fd, sa, &len) == -1)
 		return -1;
 
 #ifndef	ACL_WINDOWS
@@ -109,16 +109,16 @@ int acl_getsockname(ACL_SOCKET sockfd, char *buf, size_t size)
 	return 0;
 }
 
-int acl_getsocktype(ACL_SOCKET sockfd)
+int acl_getsocktype(ACL_SOCKET fd)
 {
 	struct SOCK_ADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
 
-	if (sockfd == ACL_SOCKET_INVALID)
+	if (fd == ACL_SOCKET_INVALID)
 		return -1;
 
-	if (getsockname(sockfd, sa, &len) == -1)
+	if (getsockname(fd, sa, &len) == -1)
 		return -1;
 
 #ifndef	ACL_WINDOWS
@@ -128,4 +128,23 @@ int acl_getsocktype(ACL_SOCKET sockfd)
 	if (sa->sa_family == AF_INET)
 		return AF_INET;
 	return -1;
+}
+
+int acl_check_socket(ACL_SOCKET fd)
+{
+	int val, ret;
+	socklen_t len = sizeof(val);
+
+	ret = getsockopt(fd, SOL_SOCKET, SO_ACCEPTCONN, (void*) &val, &len);
+	if (ret == -1)
+		return -1;
+	else if (val)
+		return 1;
+	else
+		return 0;
+}
+
+int acl_is_listening_socket(ACL_SOCKET fd)
+{
+	return acl_check_socket(fd) == 1;
 }

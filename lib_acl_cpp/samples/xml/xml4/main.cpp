@@ -87,6 +87,10 @@ static void test_parse(const char* filepath)
 	//printf("[%s]\r\n", xml.to_string());
 	printf("------------- xml node walk -----------------------\r\n");
 	xml_node_walk(xml.get_root(), 0);
+
+	printf("------------- build xml ---------------------------\r\n");
+	printf("%s\r\n", xml.to_string());
+	printf("------------- build xml end -----------------------\r\n");
 }
 
 static void test_parse_mmap(const char* filepath)
@@ -103,6 +107,11 @@ static void test_parse_mmap(const char* filepath)
 	xml.update(buf.c_str());
 	printf("------------- xml node walk -----------------------\r\n");
 	xml_node_walk(xml.get_root(), 0);
+	printf("------------- xml node walk end -------------------\r\n");
+
+	printf("------------- build xml ---------------------------\r\n");
+	printf("%s\r\n", xml.to_string());
+	printf("------------- build xml end -----------------------\r\n");
 }
 
 static void usage(const char* procname)

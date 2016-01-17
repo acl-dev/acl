@@ -39,6 +39,8 @@ struct MIME_NODE
 	/* Õ®”√Õ∑ */
 	int   ctype;                            /**< MIME_CTYPE_XXX */
 	int   stype;                            /**< MIME_STYPE_XXX */
+	char *ctype_s;
+	char *stype_s;
 	char *charset;
 	char *header_name;
 

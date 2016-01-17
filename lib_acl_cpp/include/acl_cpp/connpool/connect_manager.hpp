@@ -18,8 +18,8 @@ class connect_monitor;
 class ACL_CPP_API connect_manager
 {
 public:
-	connect_manager();
-	virtual ~connect_manager();
+	connect_manager(void);
+	virtual ~connect_manager(void);
 
 	/**
 	 * 初始化所有服务器的连接池，该函数内部调用 set 过程添加每个服务的连接池
@@ -53,9 +53,21 @@ public:
 	/**
 	 * 设置连接池失败后重试的时间时间隔（秒），该函数可以在程序运行时被调用，内部自动加锁
 	 * @param n {int} 当该值 <= 0 时，若连接池出现问题则会立即被重试
-	 * @return {void}
 	 */
 	void set_retry_inter(int n);
+
+	/**
+	 * 设置连接池中空闲连接的空闲生存周期
+	 * @param ttl {time_t} 空闲连接的生存周期，当该值 < 0 则表示空闲连接不过期，
+	 *  == 0 时表示立刻过期，> 0 表示空闲该时间段后将被释放
+	 */
+	void set_idle_ttl(time_t ttl);
+
+	/**
+	 * 设置自动检查空闲连接的时间间隔，缺省值为 30 秒
+	 * @param n {int} 时间间隔
+	 */
+	void set_check_inter(int n);
 
 	/**
 	 * 从连接池集群中删除某个地址的连接池，该函数可以在程序运行过程中
@@ -184,6 +196,8 @@ protected:
 	locker lock_;				// 访问 pools_ 时的互斥锁
 	int  stat_inter_;			// 统计访问量的定时器间隔
 	int  retry_inter_;			// 连接池失败后重试的时间间隔
+	time_t idle_ttl_;			// 空闲连接的生命周期
+	int  check_inter_;			// 检查空闲连接的时间间隔
 	connect_monitor* monitor_;		// 后台检测线程句柄
 
 	// 设置除缺省服务之外的服务器集群

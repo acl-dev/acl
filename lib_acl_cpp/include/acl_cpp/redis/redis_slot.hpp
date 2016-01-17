@@ -25,7 +25,7 @@ public:
 		const char* ip, int port);
 	redis_slot(const redis_slot& node);
 
-	~redis_slot();
+	~redis_slot(void);
 
 	/**
 	 * 将一个 redis 哈希槽从结点添加至当前结点中
@@ -50,7 +50,7 @@ public:
 	 * get the ip of the current node
 	 * @return {const char*}
 	 */
-	const char* get_ip() const
+	const char* get_ip(void) const
 	{
 		return ip_;
 	}
@@ -60,7 +60,7 @@ public:
 	 * get the port of the current node
 	 * @return {int}
 	 */
-	int get_port() const
+	int get_port(void) const
 	{
 		return port_;
 	}
@@ -70,7 +70,7 @@ public:
 	 * get the min hash slot of the current node
 	 * @return {size_t}
 	 */
-	size_t get_slot_min() const
+	size_t get_slot_min(void) const
 	{
 		return slot_min_;
 	}
@@ -80,7 +80,7 @@ public:
 	 * get the max hash slot of the current node
 	 * @return {size_t}
 	 */
-	size_t get_slot_max() const
+	size_t get_slot_max(void) const
 	{
 		return slot_max_;
 	}

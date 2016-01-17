@@ -142,8 +142,8 @@ int redis_pubsub::punsubscribe(const std::vector<string>& patterns)
 int redis_pubsub::subop(const char* cmd, const std::vector<const char*>& channels)
 {
 	size_t argc = 1 + channels.size();
-	const char** argv = (const char**) pool_->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t *) pool_->dbuf_alloc(argc * sizeof(size_t));
+	const char** argv = (const char**) dbuf_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t *) dbuf_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = cmd;
 	lens[0] = strlen(cmd);
@@ -179,8 +179,8 @@ int redis_pubsub::subop(const char* cmd, const std::vector<const char*>& channel
 int redis_pubsub::subop(const char* cmd, const std::vector<string>& channels)
 {
 	size_t argc = 1 + channels.size();
-	const char** argv = (const char**) pool_->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t *) pool_->dbuf_alloc(argc * sizeof(size_t));
+	const char** argv = (const char**) dbuf_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t *) dbuf_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = cmd;
 	lens[0] = strlen(cmd);

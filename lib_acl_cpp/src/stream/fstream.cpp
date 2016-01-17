@@ -13,7 +13,8 @@ fstream::~fstream()
 	close();
 }
 
-void fstream::open(ACL_FILE_HANDLE fh, unsigned int oflags)
+void fstream::open(ACL_FILE_HANDLE fh, unsigned int oflags,
+	const char* path /* = NULL */)
 {
 	open_stream(true);  // 调用基类方法先创建空流对象
 
@@ -29,11 +30,14 @@ void fstream::open(ACL_FILE_HANDLE fh, unsigned int oflags)
 	stream_->oflags = oflags;
 	opened_ = true;
 	eof_ = false;
+
+	if (path && *path)
+		acl_vstream_set_path(stream_, path);
 }
 
 bool fstream::open(const char* path, unsigned int oflags, int mode)
 {
-	if (path == NULL)
+	if (path == NULL || *path == 0)
 		return false;
 
 	ACL_FILE_HANDLE fh;
@@ -56,6 +60,21 @@ bool fstream::open(const char* path, unsigned int oflags, int mode)
 	opened_ = true;
 	eof_ = false;
 	return true;
+}
+
+bool fstream::remove(void)
+{
+	const char* filepath = file_path();
+	if (filepath == NULL || *filepath == 0)
+		return false;
+
+#if defined(_WIN32) || defined(_WIN64)
+	// WINDOWS 下必须先关闭文件句柄
+	close();
+	return ::_unlink(filepath) == 0 ? true : false;
+#else
+	return ::unlink(filepath) == 0 ? true : false;
+#endif
 }
 
 const char* fstream::file_path() const
@@ -89,7 +108,9 @@ acl_off_t fstream::ftell()
 
 bool fstream::ftruncate(acl_off_t length)
 {
-	fseek(0, SEEK_SET); // 需要先将文件指针移到开始位置
+	// 需要先将文件指针移到开始位置
+	if (fseek(0, SEEK_SET) < 0)
+		return false;
 	return acl_file_ftruncate(stream_, length) == 0 ? true : false;
 }
 

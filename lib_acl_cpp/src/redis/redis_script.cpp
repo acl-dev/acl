@@ -374,8 +374,8 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 {
 	size_t argc = 3 + keys.size() + args.size();
 	const char** argv = (const char**)
-		pool_->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
+		dbuf_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) dbuf_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = cmd;
 	lens[0] = strlen(cmd);
@@ -419,8 +419,8 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 {
 	size_t argc = 3 + keys.size() + args.size();
 	const char** argv = (const char**)
-		pool_->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
+		dbuf_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) dbuf_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = cmd;
 	lens[0] = strlen(cmd);

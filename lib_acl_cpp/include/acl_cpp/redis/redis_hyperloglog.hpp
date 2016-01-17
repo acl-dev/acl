@@ -16,7 +16,7 @@ public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_hyperloglog();
+	redis_hyperloglog(void);
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -26,9 +26,9 @@ public:
 	/**
 	 * see redis_command::redis_command(redis_client_cluster*， size_t)
 	 */
-	redis_hyperloglog(redis_client_cluster* cluster, size_t max_conns);
+	redis_hyperloglog(redis_client_cluster* cluster, size_t max_conns = 0);
 
-	virtual ~redis_hyperloglog();
+	virtual ~redis_hyperloglog(void);
 
 	/**
 	 * 将任意数量的元素添加到指定的 HyperLogLog 里面

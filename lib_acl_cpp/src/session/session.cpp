@@ -14,11 +14,11 @@ session::session(time_t ttl /* = 0 */, const char* sid /* = NULL */)
 , ttl_(ttl)
 , dirty_(false)
 {
-	struct timeval tv;
-
-	(void) gettimeofday(&tv, NULL);
 	if (sid == NULL || *sid == 0)
 	{
+		struct timeval tv;
+
+		(void) gettimeofday(&tv, NULL);
 		sid_.format("acl.%d.%d.%d", (int) tv.tv_sec,
 			(int) tv.tv_usec, rand());
 		sid_.todo_ = TODO_NUL;

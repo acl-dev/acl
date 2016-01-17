@@ -7,9 +7,9 @@
 namespace acl
 {
 
-redis_result::redis_result(dbuf_pool* pool)
+redis_result::redis_result(dbuf_pool* dbuf)
 : result_type_(REDIS_RESULT_NIL)
-, pool_(pool)
+, dbuf_(dbuf)
 , size_(0)
 , idx_(0)
 , argv_(NULL)
@@ -18,7 +18,7 @@ redis_result::redis_result(dbuf_pool* pool)
 , children_size_(10)
 , children_idx_(0)
 {
-	acl_assert(pool_ != NULL);
+	acl_assert(dbuf_ != NULL);
 }
 
 redis_result::~redis_result()
@@ -75,8 +75,8 @@ redis_result& redis_result::put(const char* buf, size_t len)
 	}
 	if (argv_ == NULL)
 	{
-		argv_ = (const char**) pool_->dbuf_alloc(sizeof(char*) * size_);
-		lens_ = (size_t*) pool_->dbuf_alloc(sizeof(size_t) * size_);
+		argv_ = (const char**) dbuf_->dbuf_alloc(sizeof(char*) * size_);
+		lens_ = (size_t*) dbuf_->dbuf_alloc(sizeof(size_t) * size_);
 	}
 
 	argv_[idx_] = buf;
@@ -229,7 +229,7 @@ int redis_result::argv_to_string(char* buf, size_t size) const
 redis_result& redis_result::put(const redis_result* rr, size_t idx)
 {
 	if (children_ == NULL)
-		children_ = (const redis_result**) pool_->dbuf_alloc(
+		children_ = (const redis_result**) dbuf_->dbuf_alloc(
 				sizeof(redis_result*) * children_size_);
 	else if (idx == 0)
 		children_idx_ = 0;
@@ -243,7 +243,7 @@ redis_result& redis_result::put(const redis_result* rr, size_t idx)
 
 	children_size_ *= 2;
 	const redis_result** children =(const redis_result**)
-	       	pool_->dbuf_calloc(sizeof(redis_result*) * children_size_);
+	       	dbuf_->dbuf_calloc(sizeof(redis_result*) * children_size_);
 
 	for (size_t i = 0; i < children_idx_; i++)
 		children[i] = children_[i];
@@ -266,6 +266,33 @@ const redis_result** redis_result::get_children(size_t* size) const
 	if (size)
 		*size = children_idx_;
 	return children_;
+}
+
+const string& redis_result::to_string(string& out) const
+{
+	redis_result_t type = get_type();
+	if (type != REDIS_RESULT_ARRAY)
+	{
+		string buf;
+		argv_to_string(buf);
+		out += buf;
+		out += "\r\n";
+		return out;
+	}
+
+	size_t size;
+	const redis_result** children = get_children(&size);
+	if (children == NULL)
+		return out;
+
+	for (size_t i = 0; i < size; i++)
+	{
+		const redis_result* rr = children[i];
+		if (rr != NULL)
+			rr->to_string(out);
+	}
+
+	return out;
 }
 
 } // namespace acl

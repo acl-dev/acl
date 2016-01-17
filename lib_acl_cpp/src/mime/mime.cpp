@@ -117,7 +117,7 @@ void mime::primary_head_finish()
 
 	MIME_NODE* node = m_pMimeState->root;
 
-	m_primaryHeader.set_type(node->ctype, node->stype);
+	m_primaryHeader.set_type(node->ctype_s, node->stype_s);
 
 	// 针对邮件主头部
 	ACL_ITER iter;
@@ -806,9 +806,8 @@ void mime::mime_debug(const char* save_path, bool decode /* = true */)
 	if (save_path == NULL)
 		return;
 
-	logger("ctype: %s, stype: %s\r\n",
-		mime_ctype_name(state->root->ctype),
-		mime_stype_name(state->root->stype));
+	printf("primary node ctype: %s, stype: %s\r\n",
+		get_ctype(), get_stype());
 
 	state_dummy.root = state->root;
 	mime_state_foreach_init(&state_dummy);
@@ -817,9 +816,9 @@ void mime::mime_debug(const char* save_path, bool decode /* = true */)
 	acl_foreach(iter, &state_dummy)
 	{
 		MIME_NODE *node = (MIME_NODE*) iter.data;
-		const char* ctype = mime_ctype_name(node->ctype);
-		const char* stype = mime_stype_name(node->stype);
-		printf("ctype: %s, stype: %s\r\n", ctype, stype);
+		printf("child node->ctype: %s, stype: %s\r\n",
+			node->ctype_s ? node->ctype_s : "null",
+			node->stype_s ? node->stype_s : "null");
 
 		if (node->boundary)
 			printf(">>boundary: %s\r\n",

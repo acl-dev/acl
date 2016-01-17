@@ -238,6 +238,10 @@ static void walk_xml(ACL_XML3* xml)
 
 		printf("tag->%s, size: %ld\n", node->ltag,
 			(long) node->ltag_size);
+		if (node->ltag_size != strlen(node->ltag)) {
+			printf("ltag_size invalid\r\n");
+			exit (1);
+		}
 
 		/* 遍历 xml 结点的属性 */
 		acl_foreach(iter2, node->attr_list) {
@@ -275,6 +279,17 @@ static void xml_node_attrs(ACL_XML3_NODE* node, int n)
 		printf("attr-><%s>(size=%ld)=\"<%s>(size=%ld)\"\n",
 			attr->name, (long) attr->name_size,
 			attr->value, (long) attr->value_size);
+
+		if (attr->name_size != strlen(attr->name)) {
+			printf("%s(%d): name_size invalid\r\n",
+				__FUNCTION__, __LINE__);
+			exit (1);
+		}
+		if (attr->value_size != strlen(attr->value)) {
+			printf("%s(%d): value_size invaid\r\n",
+				__FUNCTION__, __LINE__);
+			exit (1);
+		}
 	}
 }
 
@@ -291,16 +306,28 @@ static void walk_xml_node(ACL_XML3_NODE *node, int n)
 		for (i = 0; i < n; i++)
 			printf("\t");
 
-		printf("tag->%s, size: %ld\n", child->ltag,
-			(long) child->ltag_size);
+		printf("tag->%s, size: %ld, %ld\n", child->ltag,
+			(long) child->ltag_size, (long) strlen(child->ltag));
+
+		if (child->ltag_size != strlen(child->ltag)) {
+			printf("%s(%d): ltag_size invalid\r\n",
+				__FUNCTION__, __LINE__);
+			exit (1);
+		}
 
 		xml_node_attrs(child, n + 1);
 
 		for (i = 0; i < n + 1; i++)
 			printf("\t");
 
-		printf("text->%s, size: %ld\n", child->text,
-			(long) child->text_size);
+		printf("text->%s, size: %ld, %ld\n", child->text,
+			(long) child->text_size, (long) strlen(child->text));
+
+		if (child->text_size != strlen(child->text)) {
+			printf("%s(%d): text_size invalid\r\n",
+				__FUNCTION__, __LINE__);
+			exit (1);
+		}
 
 		walk_xml_node(child, n + 1);
 	}

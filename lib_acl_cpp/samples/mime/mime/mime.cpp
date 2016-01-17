@@ -140,6 +140,9 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 	header_out(&mime);
 	mime.mime_debug("./var");
 
+	printf(">>>ctype: %s, stype: %s\r\n",
+		mime.get_ctype(), mime.get_stype());
+
 	buf = "./var/";
 	buf += path;
 	mime.save_as(buf.c_str());

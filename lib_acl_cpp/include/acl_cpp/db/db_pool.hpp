@@ -1,6 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <list>
+#include "acl_cpp/db/db_handle.hpp"
 #include "acl_cpp/connpool/connect_pool.hpp"
 
 namespace acl {
@@ -56,6 +57,13 @@ public:
 	{
 		set_idle_ttl(ttl);
 	}
+};
+
+class ACL_CPP_API db_guard : public connect_guard
+{
+public:
+	db_guard(db_pool& pool) : connect_guard(pool) {}
+	~db_guard(void);
 };
 
 } // namespace acl

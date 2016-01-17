@@ -370,17 +370,18 @@ ACL_VSTRING *acl_xml_build(ACL_XML *xml, ACL_VSTRING *buf)
 
 	acl_foreach(iter1, xml) {
 		node = (ACL_XML_NODE*) iter1.data;
-		if (ACL_XML_IS_COMMENT(node)) {
-			acl_vstring_strcat(buf, "<!-- ");
+
+		if (ACL_XML_IS_CDATA(node)) {
+			acl_vstring_strcat(buf, "<![CDATA[");
+			if (LEN(node->text) > 0) {
+				acl_vstring_strcat(buf, STR(node->text));
+			}
+		} else if (ACL_XML_IS_COMMENT(node)) {
+			acl_vstring_strcat(buf, "<!--");
 			acl_vstring_strcat(buf, STR(node->text));
 		} else if ((node->flag & ACL_XML_F_META_QM)) {
 			acl_vstring_strcat(buf, "<?");
 			acl_vstring_strcat(buf, STR(node->ltag));
-			/*
-			ACL_VSTRING_ADDCH(buf, ' ');
-			if (LEN(node->text) > 0)
-				acl_vstring_strcat(buf, STR(node->text));
-			*/
 		} else if ((node->flag & ACL_XML_F_META_EM)) {
 			acl_vstring_strcat(buf, "<!");
 			acl_vstring_strcat(buf, STR(node->ltag));
@@ -406,19 +407,16 @@ ACL_VSTRING *acl_xml_build(ACL_XML *xml, ACL_VSTRING *buf)
 				xml_escape_append(buf, STR(node->text), 0, tmp);
 			continue;
 		}
-		if (ACL_XML_IS_COMMENT(node)) {
+	       
+		if (ACL_XML_IS_CDATA(node)) {
+			acl_vstring_strcat(buf, "]]>");
+		} else if (ACL_XML_IS_COMMENT(node)) {
 			acl_vstring_strcat(buf, "-->");
-			continue;
-		}
-		if (node->flag & ACL_XML_F_META_QM) {
+		} else if (node->flag & ACL_XML_F_META_QM) {
 			acl_vstring_strcat(buf, "?>");
-			continue;
-		}
-		if (node->flag & ACL_XML_F_META_EM) {
+		} else if (node->flag & ACL_XML_F_META_EM) {
 			ACL_VSTRING_ADDCH(buf, '>');
-			continue;
-		}
-		if (LEN(node->text) == 0) {
+		} else if (LEN(node->text) == 0) {
 			acl_vstring_strcat(buf, "></");
 			xml_escape_append(buf, STR(node->ltag), 0, tmp);
 			ACL_VSTRING_ADDCH(buf, '>');

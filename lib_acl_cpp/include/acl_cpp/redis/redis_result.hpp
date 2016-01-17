@@ -28,7 +28,7 @@ class redis_client;
 class ACL_CPP_API redis_result
 {
 public:
-	redis_result(dbuf_pool* pool);
+	redis_result(dbuf_pool* dbuf);
 
 	/**
 	 * 重载了 new/delete 操作符，在 new 新对象时，使内存的分配在
@@ -45,7 +45,7 @@ public:
 	 * @return {redis_result_t}
 	 *  defined above REDIS_RESULT_
 	 */
-	redis_result_t get_type() const
+	redis_result_t get_type(void) const
 	{
 		return result_type_;
 	}
@@ -61,7 +61,7 @@ public:
 	 *  REDIS_RESULT_STRING: > 0 时表示该字符串数据被切分成非连接内存块的个数
 	 *  REDIS_RESULT_ARRAY: children_->size()
 	 */
-	size_t get_size() const;
+	size_t get_size(void) const;
 
 	/**
 	 * 当返回值为 REDIS_RESULT_INTEGER 类型时，本方法返回对应的 32 位整数值
@@ -104,7 +104,7 @@ public:
 	 * @return {const char*} 返回空串 "" 表示没有出错信息
 	 *  there was no error information if empty string returned
 	 */
-	const char* get_error() const;
+	const char* get_error(void) const;
 
 	/**
 	 * 返回对应下标的数据(当数据类型非 REDIS_RESULT_ARRAY 时）
@@ -124,7 +124,7 @@ public:
 	 * return all data's array if the type isn't REDIS_RESULT_ARRAY
 	 * @return {const char**}
 	 */
-	const char** gets_argv() const
+	const char** gets_argv(void) const
 	{
 		return (const char**) argv_;
 	}
@@ -134,7 +134,7 @@ public:
 	 * return all length's array if the type isn't REDIS_RESULT_ARRAY
 	 * @return {const size_t*}
 	 */
-	const size_t* get_lens() const
+	const size_t* get_lens(void) const
 	{
 		return lens_;
 	}
@@ -144,7 +144,7 @@ public:
 	 * return the total length of all data for no REDIS_RESULT_ARRAY
 	 * @return {size_t}
 	 */
-	size_t get_length() const;
+	size_t get_length(void) const;
 
 	/**
 	 * 当数据类型为 REDIS_RESULT_STRING 类型时，该函数将按内存块存放的数据
@@ -182,16 +182,23 @@ public:
 	 * get the memory pool object set in constructor
 	 * @return {dbuf_pool*}
 	 */
-	dbuf_pool* get_pool()
+	dbuf_pool* get_dbuf(void)
 	{
-		return pool_;
+		return dbuf_;
 	}
 
+	/**
+	 * 将整个对象转换成字符串
+	 * @param out {string&} 存储结果(以追加方式添加)
+	 * @return {const string&}
+	 */
+	const string& to_string(string& out) const;
+
 private:
-	~redis_result();
+	~redis_result(void);
 
 	friend class redis_client;
-	void clear();
+	void clear(void);
 
 	redis_result& set_type(redis_result_t type);
 	redis_result& set_size(size_t size);
@@ -200,7 +207,7 @@ private:
 
 private:
 	redis_result_t result_type_;
-	dbuf_pool* pool_;
+	dbuf_pool* dbuf_;
 
 	size_t  size_;
 	size_t  idx_;

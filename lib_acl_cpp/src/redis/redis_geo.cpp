@@ -89,12 +89,12 @@ int redis_geo::geoadd(const char* key, const char* member,
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char* buf = (char*) pool_->dbuf_alloc(BUFLEN);
+	char* buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 	safe_snprintf(buf, BUFLEN, "%.8f", longitude);
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 
-	buf = (char*) pool_->dbuf_alloc(BUFLEN);
+	buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 	safe_snprintf(buf, BUFLEN, "%.8f", latitude);
 	argv[3] = buf;
 	lens[3] = strlen(buf);
@@ -112,8 +112,8 @@ int redis_geo::geoadd(const char* key, size_t size, const char* members[],
 {
 	size_t argc = 2 + 3 * size;
 	const char** argv = (const char**)
-		pool_->dbuf_alloc(argc * sizeof(char*));
-	size_t *lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
+		dbuf_->dbuf_alloc(argc * sizeof(char*));
+	size_t *lens = (size_t*) dbuf_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = "GEOADD";
 	lens[0] = sizeof("GEOADD") - 1;
@@ -123,13 +123,13 @@ int redis_geo::geoadd(const char* key, size_t size, const char* members[],
 
 	for (size_t i = 0, n = 2; i < size; i++)
 	{
-		char* buf = (char*) pool_->dbuf_alloc(BUFLEN);
+		char* buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 		safe_snprintf(buf, BUFLEN, "%.8f", longitudes[i]);
 		argv[n] = buf;
 		lens[n] = strlen(argv[n]);
 		n++;
 
-		buf = (char*) pool_->dbuf_alloc(BUFLEN);
+		buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 		safe_snprintf(buf, BUFLEN, "%.8f", latitudes[i]);
 		argv[n] = buf;
 		lens[n] = strlen(argv[n]);
@@ -169,8 +169,8 @@ int redis_geo::geoadd(const char* key, const std::vector<string>& members,
 
 	size_t argc = 2 + 3 * members.size();
 	const char** argv = (const char**)
-		pool_->dbuf_alloc(argc * sizeof(char*));
-	size_t *lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
+		dbuf_->dbuf_alloc(argc * sizeof(char*));
+	size_t *lens = (size_t*) dbuf_->dbuf_alloc(argc * sizeof(size_t));
 
 	argv[0] = "GEOADD";
 	lens[0] = sizeof("GEOADD") - 1;
@@ -181,13 +181,13 @@ int redis_geo::geoadd(const char* key, const std::vector<string>& members,
 	size_t size = members.size();
 	for (size_t i = 0, n = 2; i < size; i++)
 	{
-		char* buf = (char*) pool_->dbuf_alloc(BUFLEN);
+		char* buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 		safe_snprintf(buf, BUFLEN, "%.8f", longitudes[i]);
 		argv[n] = buf;
 		lens[n] = strlen(argv[n]);
 		n++;
 
-		buf = (char*) pool_->dbuf_alloc(BUFLEN);
+		buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 		safe_snprintf(buf, BUFLEN, "%.8f", latitudes[i]);
 		argv[n] = buf;
 		lens[n] = strlen(argv[n]);
@@ -377,19 +377,19 @@ const std::vector<geo_member>& redis_geo::georadius(const char* key,
 	lens[argc] = strlen(key);
 	argc++;
 
-	char* buf = (char*) pool_->dbuf_alloc(BUFLEN);
+	char* buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 	safe_snprintf(buf, BUFLEN, "%.8f", longitude);
 	argv[argc] = buf;
 	lens[argc] = strlen(buf);
 	argc++;
 
-	buf = (char*) pool_->dbuf_alloc(BUFLEN);
+	buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 	safe_snprintf(buf, BUFLEN, "%.8f", latitude);
 	argv[argc] = buf;
 	lens[argc] = strlen(buf);
 	argc++;
 
-	buf = (char*) pool_->dbuf_alloc(BUFLEN);
+	buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 	safe_snprintf(buf, BUFLEN, "%.8f", radius);
 	argv[argc] = buf;
 	lens[argc] = strlen(buf);
@@ -475,7 +475,7 @@ const std::vector<geo_member>& redis_geo::georadiusbymember(const char* key,
 	lens[argc] = strlen(member);
 	argc++;
 
-	char* buf = (char*) pool_->dbuf_alloc(BUFLEN);
+	char* buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 	safe_snprintf(buf, BUFLEN, "%.8f", radius);
 	argv[argc] = buf;
 	lens[argc] = strlen(buf);

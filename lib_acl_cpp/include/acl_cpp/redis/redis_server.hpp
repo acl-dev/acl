@@ -16,7 +16,7 @@ public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_server();
+	redis_server(void);
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -26,9 +26,9 @@ public:
 	/**
 	 * see redis_command::redis_command(redis_client_cluster*， size_t)
 	 */
-	redis_server(redis_client_cluster* cluster, size_t max_conns);
+	redis_server(redis_client_cluster* cluster, size_t max_conns = 0);
 
-	virtual ~redis_server();
+	virtual ~redis_server(void);
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -39,7 +39,7 @@ public:
 	 * BGREWRITEAOF 成功之前不会被修改
 	 * @return {bool}
 	 */
-	bool bgrewriteaof();
+	bool bgrewriteaof(void);
 
 	/**
 	 * 在后台异步(Asynchronously)保存当前数据库的数据到磁盘，BGSAVE 命令执行之后
@@ -48,7 +48,7 @@ public:
 	 * LASTSAVE 命令查看相关信息，判断 BGSAVE 命令是否执行成功
 	 * @return {bool}
 	 */
-	bool bgsave();
+	bool bgsave(void);
 
 	/**
 	 * 返回 CLIENT SETNAME 命令为连接设置的名字
@@ -92,13 +92,13 @@ public:
 	 * 重置 INFO 命令中的某些统计数据
 	 * @return {bool} 重置是否成功
 	 */
-	bool config_resetstat();
+	bool config_resetstat(void);
 
 	/**
 	 * 对启动 Redis 服务器时所指定的 redis.conf 文件进行改写
 	 * @return {bool} 重写配置是否成功
 	 */
-	bool config_rewrite();
+	bool config_rewrite(void);
 
 	/**
 	 * 动态地调整 Redis 服务器的配置而无需重启服务
@@ -112,21 +112,21 @@ public:
 	 * 返回当前数据库的 key 的数量
 	 * @return {int} 返回 -1 表示出错
 	 */
-	int dbsize();
+	int dbsize(void);
 
 	/**
 	 * 清空整个 Redis 服务器的数据(删除所有数据库的所有 key )
 	 * @return {bool}
 	 *  注：此命令要慎用，以免造成误操作
 	 */
-	bool flushall();
+	bool flushall(void);
 
 	/**
 	 * 清空当前数据库中的所有 key
 	 * @return {bool}
 	 *  注：此命令要慎用，以免造成误操作
 	 */
-	bool flushdb();
+	bool flushdb(void);
 
 	/**
 	 * 返回关于 Redis 服务器的各种信息和统计数值
@@ -139,14 +139,14 @@ public:
 	 * 返回最近一次 Redis 成功将数据保存到磁盘上的时间，以 UNIX 时间戳格式表示
 	 * @return {time_t}
 	 */
-	time_t lastsave();
+	time_t lastsave(void);
 
 	/**
 	 * 实时打印出 Redis 服务器接收到的命令，调试用; 调用本命令后可以循环调用下面的
 	 * get_command 方法获得服务器收到的命令
 	 * @return {bool}
 	 */
-	bool monitor();
+	bool monitor(void);
 
 	/**
 	 * 调用 monitor 方法后需要调用本方法获得服务器收到的命令，可以循环调用本方法
@@ -161,7 +161,7 @@ public:
 	 * 以 RDB 文件的形式保存到硬盘
 	 * @return {bool}
 	 */
-	bool save();
+	bool save(void);
 
 	/**
 	 * 停止所有客户端连接将数据保存至磁盘后服务器程序退出
@@ -188,13 +188,13 @@ public:
 	 * 可以查看当前日志的数量
 	 * @return {int}
 	 */
-	int slowlog_len();
+	int slowlog_len(void);
 
 	/**
 	 * 可以清空 slow log
 	 * @return {bool}
 	 */
-	bool slowlog_reset();
+	bool slowlog_reset(void);
 
 	/**
 	 * 返回当前服务器时间

@@ -1,4 +1,4 @@
-CC	= ${MY_ENV_CC}
+CC	= ${ENV_CPP}
 
 CFLAGS = -c -g -W \
 -O3 \

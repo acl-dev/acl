@@ -151,6 +151,11 @@ static void mime_node_free(MIME_NODE *node)
 	if (node->charset)
 		acl_myfree(node->charset);
 
+	if (node->ctype_s)
+		acl_myfree(node->ctype_s);
+	if (node->stype_s)
+		acl_myfree(node->stype_s);
+
 	acl_vstring_free(node->buffer);
 	if (node->boundary)
 		acl_vstring_free(node->boundary);

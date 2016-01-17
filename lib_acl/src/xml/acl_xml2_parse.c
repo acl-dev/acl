@@ -219,7 +219,7 @@ static void cdata_prepare(ACL_XML2 *xml)
 	ACL_XML2_NODE *curr_node = xml->curr_node;
 	char *src, *dst;
 
-	if (xml->len <= MIN_LEN || curr_node->ltag_size <= cdata_len)
+	if (xml->len <= MIN_LEN || curr_node->ltag_size < cdata_len)
 		return;
 
 	/* compute the max bytes for data copying */

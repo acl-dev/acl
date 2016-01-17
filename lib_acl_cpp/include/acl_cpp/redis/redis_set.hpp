@@ -15,7 +15,7 @@ public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_set();
+	redis_set(void);
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -25,9 +25,9 @@ public:
 	/**
 	 * see redis_command::redis_command(redis_client_cluster*£¬ size_t)
 	 */
-	redis_set(redis_client_cluster* cluster, size_t max_conns);
+	redis_set(redis_client_cluster* cluster, size_t max_conns = 0);
 
-	virtual ~redis_set();
+	virtual ~redis_set(void);
 
 	/////////////////////////////////////////////////////////////////////
 

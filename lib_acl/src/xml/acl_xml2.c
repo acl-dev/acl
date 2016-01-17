@@ -497,8 +497,9 @@ size_t acl_xml2_mmap_extend(ACL_XML2 *xml)
 	const char *myname = "acl_xml2_mmap_extend";
 	size_t n;
 
-	if (xml->len >= xml->size)
+	if (xml->ptr >= xml->addr + xml->size)
 		return 0;
+
 	if (xml->block == 0)
 		return 0;
 
@@ -518,6 +519,25 @@ size_t acl_xml2_mmap_extend(ACL_XML2 *xml)
 	n = xml->size - xml->len;
 	if (n > xml->block)
 		n = xml->block;
+
+	return acl_xml2_mmap_extend_size(xml, n);
+}
+
+size_t acl_xml2_mmap_extend_size(ACL_XML2 *xml, size_t size)
+{
+	const char *myname = "acl_xml2_mmap_extend_size";
+	size_t n;
+
+	if (size == 0)
+		size = xml->block;
+
+	if (xml->ptr >= xml->addr + xml->size)
+		return 0;
+
+	n = xml->size - xml->len;
+	if (n > size)
+		n = size;
+
 	xml->len += n;
 	xml->off += n;
 

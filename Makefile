@@ -1,8 +1,11 @@
 SHELL = /bin/sh
-CC      = g++
-AR      = ar
+#CC      = g++
+CC	= ${ENV_CC}
+#AR      = ar
+AR      = ${ENV_AR}
 ARFL    = rv
-RANLIB  = ranlib
+#RANLIB  = ranlib
+RANLIB  = ${ENV_RANLIB}
 
 #OSNAME = $(shell uname -sm)
 #OSTYPE = $(shell uname -p)
@@ -27,6 +30,18 @@ MAKE_ARGS =
 
 SYSLIB = -lpthread -lz
 LDFLAGS = -shared
+
+ifeq ($(CC),)
+        CC = g++
+endif
+
+ifeq ($(AR),)
+	AR = ar
+endif
+
+ifeq ($(RANLIB),)
+	RANLIB = ranlib
+endif
 
 ifeq ($(findstring Linux, $(OSNAME)), Linux)
 	ifeq ($(findstring i686, $(OSTYPE)), i686)

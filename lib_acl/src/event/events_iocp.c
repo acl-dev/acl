@@ -15,6 +15,7 @@
 #include "stdlib/acl_vstream.h"
 #include "stdlib/acl_fifo.h"
 #include "stdlib/acl_mystring.h"
+#include "net/acl_sane_socket.h"
 #include "event/acl_events.h"
 
 #endif  /* ACL_PREPARE_COMPILE */
@@ -217,7 +218,7 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 {
 	ACL_EVENT_FDTABLE *fdp = read_enable(eventp, stream, timeout,
 			callback, context);
-	fdp->listener = 1;
+	fdp->listener = acl_is_listening_socket(ACL_VSTREAM_SOCK(stream));
 }
 
 static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
@@ -225,7 +226,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 {
 	ACL_EVENT_FDTABLE *fdp = read_enable(eventp, stream, timeout,
 			callback, context);
-	fdp->listener = 0;
+	fdp->listener = acl_is_listening_socket(ACL_VSTREAM_SOCK(stream));
 }
 
 static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,

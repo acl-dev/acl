@@ -61,7 +61,7 @@ public:
 	 *  is set to 0.
 	 */
 	redis(redis_client_cluster* cluster, size_t max_conns = 0);
-	~redis() {}
+	~redis(void) {}
 };
 
 } // namespace acl

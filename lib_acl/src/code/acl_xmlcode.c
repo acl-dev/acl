@@ -48,7 +48,7 @@ static const char *__charmap[] = {
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 };
 
 int acl_xml_encode(const char *in, ACL_VSTRING *out)
@@ -190,6 +190,71 @@ int acl_xml_decode(const char *in, ACL_VSTRING *out)
 
 /*--------------------------------------------------------------------------*/
 
+size_t acl_xml_encode2(const char **in, size_t ilen, char *out, size_t olen)
+{
+	size_t olen_saved = olen;
+
+	if (olen == 0)
+		return 0;
+
+	while (ilen > 0 && olen > 1) {
+		unsigned char ch = (unsigned char)(**in);
+		if (__charmap[ch] != NULL) {
+			size_t n = strlen(__charmap[ch]);
+			if (olen < n)
+				break;
+			memcpy(out, __charmap[ch], n);
+			out += n;
+			olen -= n;
+		} else {
+			*out = (char) ch;
+			out++;
+			olen--;
+		}
+
+		(*in)++;
+		ilen--;
+	}
+
+	*out = '\0';
+	return olen_saved - olen;
+}
+
+#if 0
+const char *acl_xml_encode2(const char *in, size_t ilen,
+	char **out, size_t *olen)
+{
+	const unsigned char *ptr = (const unsigned char*) in;
+	const char *s;
+
+	if (*olen == 0)
+		return in;
+
+	*olen -= 1;  /* reserve space for '\0' */
+
+	while (ilen > 0 && *olen > 0) {
+		if ((s = __charmap[*ptr]) != NULL) {
+			size_t n = strlen(s);
+			if (*olen < n)
+				break;
+			memcpy(*out, s, n);
+			*out += n;
+			*olen -= n;
+		} else if (*olen > 0) {
+			**out = *ptr;
+			*out += 1;
+			*olen -= 1;
+		} else
+			break;
+		ptr++;
+		ilen--;
+	}
+
+	**out = '\0';
+	return (const char*) ptr;
+}
+#endif
+
 /* return the left char of in, > 0 when the out buf is not enough */
 
 static size_t copy_buf(char **out, size_t *olen, const char *in, size_t ilen)
@@ -204,39 +269,7 @@ static size_t copy_buf(char **out, size_t *olen, const char *in, size_t ilen)
 	return ilen;
 }
 
-const char *acl_xml_encode2(const char *in, size_t ilen, char **out, size_t *olen)
-{
-	const unsigned char *ptr = (const unsigned char*) in;
-	const char *s;
-
-	if (*olen == 0)
-		return in;
-
-	*olen -= 1;  /* reserve space for '\0' */
-
-	while (ilen > 0) {
-		if ((s = __charmap[*ptr]) != NULL) {
-			if (copy_buf(out, olen, s, strlen(s)) > 0)
-				break;
-		} else if (*olen > 0) {
-			**out = *ptr;
-			*out += 1;
-			*olen -= 1;
-			if (*olen == 0)
-				break;
-		} else
-			break;
-		ptr++;
-		ilen--;
-	}
-
-	**out = '\0';
-	*out += 1;
-
-	return (const char*) ptr;
-}
-
-static const char* markup_unescape2(const char *in, char **out, size_t *size)
+static const char *markup_unescape2(const char *in, char **out, size_t *size)
 {
 	unsigned int   n;
 	char  temp[2], buf[7];

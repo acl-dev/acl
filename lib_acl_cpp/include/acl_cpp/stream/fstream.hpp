@@ -44,13 +44,22 @@ public:
 	 */
 	bool create(const char* path);
 
+	/**
+	 * 将本类对象对应的文件从磁盘上删除，该函数只有当内部知道文件路径
+	 * 时才能正确删除文件，否则无法删除
+	 * @return {bool} 删除文件是否成功
+	 */
+	bool remove(void);
+
 #if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 根据系统的文件句柄打开 fstream 文件流对象
 	 * @param fh 系统文件句柄
 	 * @param oflags 打开标志位
+	 * @param path {const char*} 非 NULL 时当被作为该文件句柄的文件路径
+	 *  来存储，以便于 file_path, remove 使用
 	 */
-	void open(void* fh, unsigned int oflags);
+	void open(void* fh, unsigned int oflags, const char* path = NULL);
 
 	/**
 	 * 移动文件指针位置
@@ -86,7 +95,7 @@ public:
 	 */
 	void* file_handle() const;
 #else
-	void open(int fh, unsigned int oflags);
+	void open(int fh, unsigned int oflags, const char* path = NULL);
 	long long int fseek(long long int offset, int whence);
 	long long int ftell();
 	bool ftruncate(long long int length);

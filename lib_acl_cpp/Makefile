@@ -1,10 +1,10 @@
 SHELL = /bin/sh
-CC	= ${ENV_CC}
 #CC      = g++
-AR      = ar
+CC	= ${ENV_CPP}
+AR      = ${ENV_AR}
 ARFL    = rv
 #ARFL    = cru
-RANLIB  = ranlib
+RANLIB  = ${ENV_RANLIB}
 
 FLAGS   = ${ENV_FLAGS}
 
@@ -37,6 +37,14 @@ UNIXTYPE = LINUX
 
 ifeq ($(CC),)
         CC = g++
+endif
+
+ifeq ($(AR),)
+	AR = ar
+endif
+
+ifeq ($(RANLIB),)
+	RANLIB = ranlib
 endif
 
 ifeq ($(findstring HAS_POLARSSL, $(FLAGS)), HAS_POLARSSL)

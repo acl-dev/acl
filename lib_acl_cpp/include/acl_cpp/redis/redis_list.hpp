@@ -13,7 +13,7 @@ public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_list();
+	redis_list(void);
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -23,9 +23,9 @@ public:
 	/**
 	 * see redis_command::redis_command(redis_client_cluster*£¬ size_t)
 	 */
-	redis_list(redis_client_cluster* cluster, size_t max_conns);
+	redis_list(redis_client_cluster* cluster, size_t max_conns = 0);
 
-	virtual ~redis_list();
+	virtual ~redis_list(void);
 
 	/////////////////////////////////////////////////////////////////////
 

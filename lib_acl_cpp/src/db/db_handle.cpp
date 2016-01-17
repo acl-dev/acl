@@ -249,6 +249,7 @@ db_handle::~db_handle()
 {
 	if (id_)
 		acl_myfree(id_);
+	free_result();
 }
 
 bool db_handle::open()
@@ -373,7 +374,7 @@ void db_handle::free_result()
 const db_row* db_handle::operator [](size_t idx) const
 {
 	if (result_ == NULL)
-		return (NULL);
+		return NULL;
 	if (idx >= result_->length())
 		return (NULL);
 	return (*result_)[idx];
@@ -389,7 +390,7 @@ size_t db_handle::length() const
 
 bool db_handle::empty() const
 {
-	return (length() == 0 ? true : false);
+	return length() == 0 ? true : false;
 }
 
 db_handle& db_handle::set_id(const char* id)

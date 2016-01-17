@@ -23,7 +23,7 @@ public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_hash();
+	redis_hash(void);
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -33,9 +33,9 @@ public:
 	/**
 	 * see redis_command::redis_command(redis_client_cluster*£¬ size_t)
 	 */
-	redis_hash(redis_client_cluster* cluster, size_t max_conns);
+	redis_hash(redis_client_cluster* cluster, size_t max_conns = 0);
 
-	virtual ~redis_hash();
+	virtual ~redis_hash(void);
 
 	/////////////////////////////////////////////////////////////////////
 

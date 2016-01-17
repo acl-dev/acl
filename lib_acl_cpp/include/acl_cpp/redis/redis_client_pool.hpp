@@ -28,7 +28,7 @@ public:
 	 */
 	redis_client_pool(const char* addr, size_t count, size_t idx = 0);
 
-	virtual ~redis_client_pool();
+	virtual ~redis_client_pool(void);
 
 	/**
 	 * 设置连接 redis 服务器的连接密码

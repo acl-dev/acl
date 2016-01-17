@@ -762,7 +762,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 			acl_msg_fatal("%s(%d)->%s: stream null, fd = %d",
 				__FILE__, __LINE__, myname, fd);
 
-		acl_event_enable_read(__eventp, stream, 0,
+		acl_event_enable_listen(__eventp, stream, 0,
 			__service_accept, stream);
 		acl_close_on_exec(ACL_VSTREAM_SOCK(stream), ACL_CLOSE_ON_EXEC);
 		__listen_streams[i] = stream;

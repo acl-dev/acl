@@ -61,7 +61,6 @@ public:
 
 	/**
 	 * 从磁盘上删除队列文件, 并释放该文件对象
-	 * 自己删除该对象
 	 * @param fp {queue_file*} 队列文件对象
 	 * @return {bool} 删除文件是否成功
 	 */

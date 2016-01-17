@@ -32,7 +32,7 @@ redis_command::redis_command()
 , slice_res_(false)
 , result_(NULL)
 {
-	pool_ = new dbuf_pool();
+	dbuf_ = new dbuf_pool();
 	addr_[0] = 0;
 }
 
@@ -54,7 +54,7 @@ redis_command::redis_command(redis_client* conn)
 , slice_res_(false)
 , result_(NULL)
 {
-	pool_ = new dbuf_pool();
+	dbuf_ = new dbuf_pool();
 	if (conn != NULL)
 		set_client_addr(*conn);
 	else
@@ -76,7 +76,7 @@ redis_command::redis_command(redis_client_cluster* cluster, size_t max_conns)
 , slice_res_(false)
 , result_(NULL)
 {
-	pool_ = new dbuf_pool();
+	dbuf_ = new dbuf_pool();
 	addr_[0] = 0;
 
 	if (cluster != NULL)
@@ -101,7 +101,7 @@ redis_command::~redis_command()
 		acl_myfree(argv_lens_);
 	delete request_buf_;
 	delete request_obj_;
-	pool_->destroy();
+	dbuf_->destroy();
 }
 
 void redis_command::reset(bool save_slot /* = false */)
@@ -113,7 +113,7 @@ void redis_command::clear(bool save_slot /* = false */)
 {
 	if (used_ > 0)
 	{
-		pool_->dbuf_reset();
+		dbuf_->dbuf_reset();
 		result_ = NULL;
 	}
 	if (!save_slot)
@@ -272,7 +272,7 @@ const char* redis_command::result_value(size_t i, size_t* len /* = NULL */) cons
 	// 大内存有可能被切片成多个不连续的小内存
 	size = child->get_length();
 	size++;
-	char* buf = (char*) pool_->dbuf_alloc(size);
+	char* buf = (char*) dbuf_->dbuf_alloc(size);
 	size = child->argv_to_string(buf, size);
 	if (len)
 		*len = size;
@@ -287,7 +287,7 @@ const redis_result* redis_command::get_result() const
 // 分析重定向信息，获得重定向的服务器地址
 const char* redis_command::get_addr(const char* info)
 {
-	char* cmd = pool_->dbuf_strdup(info);
+	char* cmd = dbuf_->dbuf_strdup(info);
 	char* slot = strchr(cmd, ' ');
 	if (slot == NULL)
 		return NULL;
@@ -399,9 +399,9 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 	{
 		// 根据请求过程是否采用内存分片方式调用不同的请求过程
 		if (slice_req_)
-			result_ = conn->run(pool_, *request_obj_, nchild);
+			result_ = conn->run(dbuf_, *request_obj_, nchild);
 		else
-			result_ = conn->run(pool_, *request_buf_, nchild);
+			result_ = conn->run(dbuf_, *request_buf_, nchild);
 
 		// 如果连接异常断开，则需要进行重试
 		if (conn->eof())
@@ -553,7 +553,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 				acl_doze(redirect_sleep_);
 			}
 
-			result_ = conn->run(pool_, "ASKING\r\n", 0);
+			result_ = conn->run(dbuf_, "ASKING\r\n", 0);
 			if (result_ == NULL)
 			{
 				logger_error("ASKING's reply null");
@@ -626,9 +626,9 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */)
 	else if (conn_ != NULL)
 	{
 		if (slice_req_)
-			result_ = conn_->run(pool_, *request_obj_, nchild);
+			result_ = conn_->run(dbuf_, *request_obj_, nchild);
 		else
-			result_ = conn_->run(pool_, *request_buf_, nchild);
+			result_ = conn_->run(dbuf_, *request_buf_, nchild);
 		return result_;
 	}
 	else
@@ -640,6 +640,22 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */)
 
 /////////////////////////////////////////////////////////////////////////////
 
+void redis_command::logger_result(const redis_result* result)
+{
+	if (result == NULL)
+	{
+		logger_error("result NULL");
+		return;
+	}
+
+	string res;
+	result->to_string(res);
+
+	logger_error("result type: %d， error: %s, res: [%s], req: [%s]",
+		result->get_type(), result_error(), res.c_str(),
+		request_buf_ ? request_buf_->c_str() : "slice request");
+}
+
 int redis_command::get_number(bool* success /* = NULL */)
 {
 	const redis_result* result = run();
@@ -647,6 +663,7 @@ int redis_command::get_number(bool* success /* = NULL */)
 	{
 		if (success)
 			*success = false;
+		logger_result(result);
 		return -1;
 	}
 	if (success)
@@ -661,6 +678,7 @@ long long int redis_command::get_number64(bool* success /* = NULL */)
 	{
 		if (success)
 			*success = false;
+		logger_result(result);
 		return -1;
 	}
 	if (success)
@@ -674,7 +692,10 @@ int redis_command::get_number(std::vector<int>& out)
 
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+	{
+		logger_result(result);
 		return -1;
+	}
 
 	size_t size;
 	const redis_result** children = result->get_children(&size);
@@ -698,7 +719,10 @@ int redis_command::get_number64(std::vector<long long int>& out)
 
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+	{
+		logger_result(result);
 		return -1;
+	}
 
 	size_t size;
 	const redis_result** children = result->get_children(&size);
@@ -720,7 +744,10 @@ bool redis_command::check_status(const char* success /* = "OK" */)
 {
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_STATUS)
+	{
+		logger_result(result);
 		return false;
+	}
 
 	const char* status = result->get_status();
 	if (status == NULL || *status == '\0')
@@ -737,7 +764,10 @@ int redis_command::get_status(std::vector<bool>& out)
 
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+	{
+		logger_result(result);
 		return -1;
+	}
 
 	size_t size;
 	const redis_result** children = result->get_children(&size);
@@ -759,14 +789,22 @@ int redis_command::get_status(std::vector<bool>& out)
 const char* redis_command::get_status()
 {
 	const redis_result* result = run();
-	return result == NULL ? "" : result->get_status();
+	if (result == NULL || result->get_type() != REDIS_RESULT_STATUS)
+	{
+		logger_result(result);
+		return "";
+	}
+	return result->get_status();
 }
 
 int redis_command::get_string(string& buf)
 {
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_STRING)
+	{
+		logger_result(result);
 		return -1;
+	}
 	return result->argv_to_string(buf);
 }
 
@@ -774,7 +812,10 @@ int redis_command::get_string(string* buf)
 {
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_STRING)
+	{
+		logger_result(result);
 		return -1;
+	}
 	if (buf == NULL)
 		return (int) result->get_length();
 	return result->argv_to_string(*buf);
@@ -784,7 +825,10 @@ int redis_command::get_string(char* buf, size_t size)
 {
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_STRING)
+	{
+		logger_result(result);
 		return -1;
+	}
 	return result->argv_to_string(buf, size);
 }
 
@@ -797,7 +841,11 @@ int redis_command::get_strings(std::vector<string>* out)
 {
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+	{
+		logger_result(result);
 		return -1;
+	}
+
 	if (out == NULL)
 		return (int) result->get_size();
 
@@ -842,7 +890,10 @@ int redis_command::get_strings(std::list<string>* out)
 {
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+	{
+		logger_result(result);
 		return -1;
+	}
 	if (out == NULL)
 		return (int) result->get_size();
 
@@ -880,7 +931,10 @@ int redis_command::get_strings(std::map<string, string>& out)
 
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+	{
+		logger_result(result);
 		return -1;
+	}
 	if (result->get_size() == 0)
 		return 0;
 
@@ -930,7 +984,10 @@ int redis_command::get_strings(std::vector<string>& names,
 
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+	{
+		logger_result(result);
 		return -1;
+	}
 	if (result->get_size() == 0)
 		return 0;
 
@@ -982,7 +1039,10 @@ int redis_command::get_strings(std::vector<const char*>& names,
 
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+	{
+		logger_result(result);
 		return -1;
+	}
 	if (result->get_size() == 0)
 		return 0;
 
@@ -1007,7 +1067,7 @@ int redis_command::get_strings(std::vector<const char*>& names,
 			continue;
 		}
 		len = rr->get_length() + 1;
-		nbuf = (char*) pool_->dbuf_alloc(len);
+		nbuf = (char*) dbuf_->dbuf_alloc(len);
 		rr->argv_to_string(nbuf, len);
 		i++;
 
@@ -1018,7 +1078,7 @@ int redis_command::get_strings(std::vector<const char*>& names,
 			continue;
 		}
 		len = rr->get_length() + 1;
-		vbuf = (char*) pool_->dbuf_alloc(len);
+		vbuf = (char*) dbuf_->dbuf_alloc(len);
 		rr->argv_to_string(vbuf, len);
 		i++;
 
@@ -1206,20 +1266,20 @@ void redis_command::build_request2(size_t argc, const char* argv[], size_t lens[
 
 #define BLEN	32
 
-	char* buf = (char*) pool_->dbuf_alloc(BLEN);
+	char* buf = (char*) dbuf_->dbuf_alloc(BLEN);
 	int  len = safe_snprintf(buf, BLEN, "*%lu\r\n", (unsigned long) argc);
 	request_obj_->put(buf, len);
 
 	for (size_t i = 0; i < argc; i++)
 	{
-		buf = (char*) pool_->dbuf_alloc(BLEN);
+		buf = (char*) dbuf_->dbuf_alloc(BLEN);
 		len = safe_snprintf(buf, BLEN, "$%lu\r\n",
 			(unsigned long) lens[i]);
 		request_obj_->put(buf, len);
 
 		request_obj_->put(argv[i], lens[i]);
 
-		buf = (char*) pool_->dbuf_strdup("\r\n");
+		buf = (char*) dbuf_->dbuf_strdup("\r\n");
 		request_obj_->put(buf, 2);
 	}
 }
@@ -1442,7 +1502,7 @@ void redis_command::build(const char* cmd, const char* key,
 	char* buf4int;
 	for (size_t j = 0; j < argc; j++)
 	{
-		buf4int = (char*) pool_->dbuf_alloc(INT_LEN);
+		buf4int = (char*) dbuf_->dbuf_alloc(INT_LEN);
 		(void) safe_snprintf(buf4int, INT_LEN, "%d", names[j]);
 		argv_[i] = buf4int;
 		argv_lens_[i] = strlen(argv_[i]);
@@ -1579,7 +1639,7 @@ void redis_command::build(const char* cmd, const char* key,
 	char* buf4int;
 	for (size_t j = 0; j < argc; j++)
 	{
-		buf4int = (char*) pool_->dbuf_alloc(INT_LEN);
+		buf4int = (char*) dbuf_->dbuf_alloc(INT_LEN);
 		safe_snprintf(buf4int, INT_LEN, "%d", names[j]);
 		argv_[i] = buf4int;
 		argv_lens_[i] = strlen(argv_[i]);
@@ -1672,7 +1732,7 @@ void redis_command::build(const char* cmd, const char* key,
 	char* buf4int;
 	for (size_t j = 0; j < argc; j++)
 	{
-		buf4int = (char*) pool_->dbuf_alloc(INT_LEN);
+		buf4int = (char*) dbuf_->dbuf_alloc(INT_LEN);
 		safe_snprintf(buf4int, INT_LEN, "%d", names[j]);
 		argv_[i] = buf4int;
 		argv_lens_[i] = strlen(argv_[i]);

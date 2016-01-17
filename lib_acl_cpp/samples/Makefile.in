@@ -1,4 +1,4 @@
-CC	= ${ENV_CC}
+CC	= ${ENV_CPP}
 FLAGS   = ${ENV_FLAGS}
 
 CFLAGS = -c -g -W \

@@ -173,9 +173,11 @@ void *acl_default_malloc(const char *filename, int line, size_t len)
 	else
 		pname = __FILENAME_UNKNOWN;
 
-	if (len < 1)
-		acl_msg_fatal("%s(%d), %s: malloc: length %ld invalid",
+	if (len < 1) {
+		acl_msg_warn("%s(%d), %s: malloc: length %ld invalid",
 			pname, line, myname, (long) len);
+		len = 128;
+	}
 
 	new_len = SPACE_FOR(len);
 	if (new_len <= 0)
@@ -240,9 +242,15 @@ void *acl_default_realloc(const char *filename, int line,
 		return acl_default_malloc(pname, line, len);
 #endif
 
-	if (len < 1)
-		acl_msg_fatal("%s(%d)->%s: realloc: requested length %ld",
+	if (len < 1) {
+		acl_msg_warn("%s(%d)->%s: realloc: requested length %ld",
 			pname, line, myname, (long) len);
+		len = 128;
+	}
+
+	if (ptr == NULL)
+		return acl_default_malloc(pname, line, len);
+
 	CHECK_IN_PTR(ptr, real_ptr, old_len, pname, line);
 
 	new_len = SPACE_FOR(len);

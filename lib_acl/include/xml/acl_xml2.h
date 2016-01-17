@@ -236,6 +236,18 @@ ACL_API ACL_XML2 *acl_xml2_mmap_fd(ACL_FILE_HANDLE fd, size_t size,
 ACL_API size_t acl_xml2_mmap_extend(ACL_XML2 *xml);
 
 /**
+ * 当采用内存文件映射方式时，此函数用来扩充映射文件的空间大小，因为在初始化时
+ * 仅分配较小的空间，在使用过程中如果发现空间不足，则内部自动调用此函数扩展
+ * 文件大小，这样既可以满足实际需求，又可以节省磁盘空间
+ * @param xml {ACL_XML2*} 采用 acl_xml2_mmap_alloc 方式创建的 xml 对象
+ * @param n {size_t} 希望本次扩充的空间大小，如果该值超过最大限制，则返回实际
+ *  扩充的空间大小
+ * @return {size_t} 扩充后新增加的空间大小，如果返回值为 0，则表示出错或已经
+ *  达到空间分配上限购
+ */
+ACL_API size_t acl_xml2_mmap_extend_size(ACL_XML2 *xml, size_t n);
+
+/**
  * 将某一个 ACL_XML2_NODE 节点作为一个 XML 对象的根节点，从而可以方便地遍历出该
  * 节点各级子节点(在遍历过程中的所有节点不含本节点自身)，该遍历方式有别于单独
  * 遍历某一个 ACL_XML2_NODE 节点时仅能遍历其一级子节点的情形
@@ -516,7 +528,7 @@ ACL_API void acl_xml2_node_set_text(ACL_XML2_NODE *node, const char *text);
 /**
  * 将 xml 对象转成字符串内容
  * @param xml {ACL_XML2*} xml 对象
- * @return {const char*}
+ * @return {const char*} 返回转换后字符串的起始地址
  */
 ACL_API const char *acl_xml2_build(ACL_XML2* xml);
 

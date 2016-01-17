@@ -19,7 +19,7 @@ public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_cluster();
+	redis_cluster(void);
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -29,9 +29,9 @@ public:
 	/**
 	 * see redis_command::redis_command(redis_client_cluster*， size_t)
 	 */
-	redis_cluster(redis_client_cluster* cluster, size_t max_conns);
+	redis_cluster(redis_client_cluster* cluster, size_t max_conns = 0);
 
-	virtual ~redis_cluster();
+	virtual ~redis_cluster(void);
 
 	/**
 	 * 批量添加可用的哈希槽，最后必须以小于 0 的哈希槽值表示结束

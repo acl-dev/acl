@@ -159,6 +159,10 @@ connect_pool& connect_manager::set(const char* addr, size_t count,
 	connect_pool* pool = create_pool(key, count, pools_.size() - 1);
 	pool->set_retry_inter(retry_inter_);
 	pool->set_timeout(conn_timeout, rw_timeout);
+	if (idle_ttl_ >= 0)
+		pool->set_idle_ttl(idle_ttl_);
+	if (check_inter_ > 0)
+		pool->set_check_inter(check_inter_);
 	pools_.push_back(pool);
 
 	lock_.unlock();

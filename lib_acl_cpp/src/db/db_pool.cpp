@@ -24,4 +24,17 @@ db_handle* db_pool::peek_open(const char* charset /* = NULL */)
 	return NULL;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
+db_guard::~db_guard(void)
+{
+	if (conn_)
+	{
+		db_handle* db = (db_handle*) conn_;
+		db->free_result();
+		pool_.put(conn_, keep_);
+		conn_ = NULL;
+	}
+}
+
 } // namespace acl

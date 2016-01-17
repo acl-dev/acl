@@ -274,11 +274,11 @@ public:
 
 	/**
 	 * 设置邮件头的内容类型: Content-Type: text/plain
-	 * @param ctype {size_t} 主类型
-	 * @param stype {size_t} 子类型
+	 * @param ctype {const char*} 主类型
+	 * @param stype {const char*} 子类型
 	 * @return {mime&}
 	 */
-	mime& set_type(size_t ctype, size_t stype)
+	mime& set_type(const char* ctype, const char* stype)
 	{
 		m_primaryHeader.set_type(ctype, stype);
 		return (*this);

@@ -26,7 +26,7 @@ public:
 	 * default constructor. You must set the communication method by
 	 * set_client or set_cluster functions.
 	 */
-	redis_command();
+	redis_command(void);
 
 	/**
 	 * 当使用非集群模式时的构造函数，可以使用此构造函数设置 redis 通信类对象。
@@ -51,7 +51,7 @@ public:
 	 */
 	redis_command(redis_client_cluster* cluster, size_t max_conns);
 
-	virtual ~redis_command() = 0;
+	virtual ~redis_command(void) = 0;
 
 	/**
 	 * 在重复使用一个继承于 redis_command 的子类操作 redis 时，需要在
@@ -131,9 +131,9 @@ public:
 	 * get memory pool handle be set
 	 * @return {dbuf_pool*}
 	 */
-	dbuf_pool* get_pool() const
+	dbuf_pool* get_dbuf() const
 	{
-		return pool_;
+		return dbuf_;
 	}
 
 	/**
@@ -357,7 +357,7 @@ protected:
 
 	/************************** common *********************************/
 protected:
-	dbuf_pool* pool_;
+	dbuf_pool* dbuf_;
 
 	// 根据键值计算哈希槽值
 	void hash_slot(const char* key);
@@ -397,6 +397,8 @@ private:
 	/************************** respond ********************************/
 	bool slice_res_;
 	const redis_result* result_;
+
+	void logger_result(const redis_result* result);
 };
 
 } // namespace acl

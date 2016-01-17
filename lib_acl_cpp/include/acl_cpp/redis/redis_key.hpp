@@ -27,7 +27,7 @@ public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_key();
+	redis_key(void);
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -37,9 +37,9 @@ public:
 	/**
 	 * see redis_command::redis_command(redis_client_cluster*， size_t)
 	 */
-	redis_key(redis_client_cluster* cluster, size_t max_conns);
+	redis_key(redis_client_cluster* cluster, size_t max_conns = 0);
 
-	virtual ~redis_key();
+	virtual ~redis_key(void);
 
 	/**
 	 * 删除一个或一组 KEY，对于变参的接口，则要求最后一个参数必须以 NULL 结束

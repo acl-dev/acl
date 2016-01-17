@@ -581,8 +581,11 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 	{
 		logger_error("connect mysql error(%s), db_host=%s, db_port=%d,"
 			" db_unix=%s, db_name=%s, db_user=%s, db_pass=%s",
-			__mysql_error(conn_), db_host ? db_host : "null", db_port,
-			db_unix ? db_unix : "null", dbname_, dbuser_,
+			__mysql_error(conn_),
+			db_host ? db_host : "null", db_port,
+			db_unix ? db_unix : "null",
+			dbname_ ? dbname_ : "null",
+			dbuser_ ? dbuser_ : "null",
 			dbpass_ ? dbpass_ : "null");
 
 		__mysql_close(conn_);
@@ -701,6 +704,9 @@ bool db_mysql::tbl_exists(const char* tbl_name)
 
 bool db_mysql::sql_select(const char* sql)
 {
+	// 优先调用基类方法释放上次的查询结果
+	free_result();
+
 	if (sane_mysql_query(sql) == false)
 		return false;
 	MYSQL_RES *my_res = __mysql_store_result(conn_);
@@ -729,6 +735,8 @@ bool db_mysql::sql_select(const char* sql)
 
 bool db_mysql::sql_update(const char* sql)
 {
+	free_result();
+
 	if (sane_mysql_query(sql) == false)
 		return false;
 	int ret = (int) __mysql_affected_rows(conn_);

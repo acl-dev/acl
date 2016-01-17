@@ -26,7 +26,7 @@ public:
 	 * @param max_slot {int} 哈希槽最大值; the max hash-slot value of keys
 	 */
 	redis_client_cluster(int max_slot = 16384);
-	virtual ~redis_client_cluster();
+	virtual ~redis_client_cluster(void);
 
 	/**
 	 * 根据哈希槽值获得对应的连接池;

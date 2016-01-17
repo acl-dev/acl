@@ -356,8 +356,8 @@ bool redis_list::bpop(const char* cmd, const std::vector<const char*>& keys,
 	size_t timeout, std::pair<string, string>& result)
 {
 	size_t argc = 2 + keys.size();
-	const char** args = (const char**) pool_->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
+	const char** args = (const char**) dbuf_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) dbuf_->dbuf_alloc(argc * sizeof(size_t));
 
 	args[0] = cmd;
 	lens[0] = strlen(cmd);
@@ -384,8 +384,8 @@ bool redis_list::bpop(const char* cmd, const std::vector<string>& keys,
 	size_t timeout, std::pair<string, string>& result)
 {
 	size_t argc = 2 + keys.size();
-	const char** args = (const char**) pool_->dbuf_alloc(argc * sizeof(char*));
-	size_t* lens = (size_t*) pool_->dbuf_alloc(argc * sizeof(size_t));
+	const char** args = (const char**) dbuf_->dbuf_alloc(argc * sizeof(char*));
+	size_t* lens = (size_t*) dbuf_->dbuf_alloc(argc * sizeof(size_t));
 
 	args[0] = cmd;
 	lens[0] = strlen(cmd);

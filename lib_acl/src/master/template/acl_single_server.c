@@ -671,7 +671,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 				acl_var_single_rw_timeout, fdtype);
 		__sstreams[i++] = stream;
 
-		acl_event_enable_read(__eventp, stream, 0,
+		acl_event_enable_listen(__eventp, stream, 0,
 			__service_accept, stream);
 		acl_close_on_exec(ACL_VSTREAM_SOCK(stream), ACL_CLOSE_ON_EXEC);
 	}

@@ -2,10 +2,10 @@ SHELL = /bin/sh
 CC      = gcc
 #CC      = g++
 CC	= ${ENV_CC}
-AR      = ar
+AR      = ${ENV_AR}
 ARFL    = rv
 #ARFL    = cru
-RANLIB  = ranlib
+RANLIB  = ${ENV_RANLIB}
 
 CFLAGS = -c -g -W \
 -O3 \
@@ -36,6 +36,14 @@ UNIXTYPE = LINUX
 
 ifeq ($(CC),)
         CC = gcc
+endif
+
+ifeq ($(AR),)
+	AR = ar
+endif
+
+ifeq ($(RANLIB),)
+	RANLIB = ranlib
 endif
 
 ifeq ($(findstring gcc, $(CC)), gcc)

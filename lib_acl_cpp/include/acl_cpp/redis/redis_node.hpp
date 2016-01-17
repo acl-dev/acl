@@ -19,8 +19,8 @@ public:
 	 * 当使用此构造函数实例化类对象时，需要调用 set_id 和 set_addr 方法设置
 	 * 该 redis 结点的唯一标识符及服务监听地址，同时还可调用其它的 set_xxx 设置方法
 	 */
-	redis_node();
-	~redis_node();
+	redis_node(void);
+	~redis_node(void);
 
 	/**
 	 * 除了在构造函数中的参数中传入该结点的 ID 标识符外，还可以通过此函数设置
