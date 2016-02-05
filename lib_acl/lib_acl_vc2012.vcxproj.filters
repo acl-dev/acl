@@ -1533,6 +1533,9 @@
     <ClInclude Include="include\xml\acl_xml3.h">
       <Filter>Header Files\xml</Filter>
     </ClInclude>
+    <ClInclude Include="include\code\acl_xmlcode.h">
+      <Filter>Header Files\code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".\changes.txt">

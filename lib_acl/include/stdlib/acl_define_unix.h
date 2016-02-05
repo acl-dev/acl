@@ -39,6 +39,8 @@
 #ifdef	ACL_UNIX
 
 # include <assert.h>
+# include <sys/types.h>
+
 # ifndef acl_assert
 #  define acl_assert assert
 # endif

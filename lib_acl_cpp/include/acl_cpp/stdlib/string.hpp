@@ -48,6 +48,17 @@ public:
 	 * @param n {size_t} s 缓冲区数据长度
 	 */
 	string(const void* s, size_t n);
+
+#if !defined(_WIN32) && !defined(_WIN64)
+	/**
+	 * 采用内存映射文件方式构造对象
+	 * @param fd {int} 文件句柄
+	 * @param max {size_t} 所映射的最大空间大小
+	 * @param n {size_t} 初始化大小
+	 */
+	string(int fd, size_t max, size_t n);
+#endif
+
 	virtual ~string(void);
 
 	/**

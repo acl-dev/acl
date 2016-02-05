@@ -15,10 +15,11 @@ extern "C" {
  * 封装了 ACL_VBUF，ACL_VSTRING 结构类型定义
  */
 typedef struct ACL_VSTRING {
-    ACL_VBUF  vbuf;
-    int       maxlen;
+    ACL_VBUF        vbuf;
+    ssize_t         maxlen;
     ACL_SLICE_POOL *slice;
-    ACL_DBUF_POOL *dbuf;
+    ACL_DBUF_POOL  *dbuf;
+    ACL_FILE_HANDLE fd;
 } ACL_VSTRING;
 
 /**
@@ -60,6 +61,16 @@ ACL_API ACL_VSTRING *acl_vstring_slice_alloc(ACL_SLICE_POOL *slice, size_t len);
  * @return {ACL_VSTRING*} 新分配的 ACL_VSTRING 对象
  */
 ACL_API ACL_VSTRING *acl_vstring_dbuf_alloc(ACL_DBUF_POOL *dbuf, size_t len);
+
+/**
+ * 采用内存映射文件方式分配内存时，调用此函数创建 ACL_VSTRING 动态缓冲区对象
+ * @param fd {ACL_FILE_HANDLE} 有效的文件句柄
+ * @param max_len {ssize_t} 所映射的最大内存大小
+ * @param init_len {ssize_t} 初始化时的内存映射大小
+ * @return {ACL_VSTRING*} 新创建的 ACL_VSTRING 对象
+ */
+ACL_API ACL_VSTRING *acl_vstring_mmap_alloc(ACL_FILE_HANDLE fd,
+	ssize_t max_len, ssize_t init_len);
 
 /**
  * 设置 ACL_VSTRING 对象的属性, 目前该函数的功能还不够完善
@@ -373,8 +384,14 @@ ACL_API const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp,
  */
 #define ACL_VSTRING_TERMINATE(vp) { \
 	if ((vp)->vbuf.cnt <= 0) \
-		ACL_VSTRING_SPACE((vp),1); \
-	*(vp)->vbuf.ptr = 0; \
+		ACL_VSTRING_SPACE((vp), 1); \
+	if ((vp)->vbuf.cnt > 0) \
+		*(vp)->vbuf.ptr = 0; \
+	else if ((vp)->vbuf.ptr > (vp)->vbuf.data) { \
+		(vp)->vbuf.ptr--; \
+		*(vp)->vbuf.ptr = 0; \
+		(vp)->vbuf.cnt++; \
+	} \
 }
 
 /**
@@ -385,6 +402,7 @@ ACL_API const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp,
 #define ACL_VSTRING_RESET(vp) {	\
 	(vp)->vbuf.ptr = (vp)->vbuf.data; \
 	(vp)->vbuf.cnt = (vp)->vbuf.len; \
+	acl_vbuf_clearerr(&(vp)->vbuf); \
 }
 
 /**

@@ -611,6 +611,11 @@ const std::list<mime_node*>& mime::get_mime_nodes(bool enableDecode /* = true */
 	return (*m_pNodes);
 }
 
+static bool has_content_id(MIME_NODE* node)
+{
+	return mime_head_value(node, "Content-ID") == NULL ? false : true;
+}
+
 const std::list<mime_attach*>& mime::get_attachments(bool enableDecode /* = true */,
 	const char* toCharset /* = "gb2312" */, off_t off /* = 0 */)
 {
@@ -628,11 +633,12 @@ const std::list<mime_attach*>& mime::get_attachments(bool enableDecode /* = true
 	acl_foreach(iter, m_pMimeState)
 	{
 		node = (MIME_NODE*) iter.data;
-		if (node->header_filename == NULL)
-			continue;
-		attach = NEW mime_attach(m_pFilePath, node,
-				enableDecode, toCharset, off);
-		m_pAttaches->push_back(attach);
+		if (node->header_filename != NULL || has_content_id(node))
+		{
+			attach = NEW mime_attach(m_pFilePath, node,
+					enableDecode, toCharset, off);
+			m_pAttaches->push_back(attach);
+		}
 	}
 	return (*m_pAttaches);
 }

@@ -1,16 +1,15 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <list>
+#include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/http/http_type.hpp"
 
 namespace acl {
 
-class dbuf_pool;
-
 /**
  * http 协议头中 cookie 对象类
  */
-class ACL_CPP_API HttpCookie
+class ACL_CPP_API HttpCookie : public dbuf_obj
 {
 public:
 	/**
@@ -18,23 +17,23 @@ public:
 	 * @param name {const char*} cookie 名，为非空字符串且字符串长度 > 0
 	 * @param value {const char*} cookie 值，指针非空，字符串长度可以为 0
 	 * 注：如果输入的两个参数不符合条件，内部将会产生断言
-	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
+	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
 	 */
-	HttpCookie(const char* name, const char* value, dbuf_pool* dbuf = NULL);
+	HttpCookie(const char* name, const char* value, dbuf_guard* dbuf = NULL);
 
 	/**
 	 * 当使用该构造函数时，可以使用 setCookie 来添加 cookie 项
-	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
+	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
 	 */
-	HttpCookie(dbuf_pool* dbuf = NULL);
+	HttpCookie(dbuf_guard* dbuf = NULL);
 
 	/**
 	 * 拷贝构造函数
-	 * @param cookie {const HttpCookie*} 该参数必须非 NULL，内部将复制拷贝其
-	 *  成员变量
-	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
+	 * @param cookie {const HttpCookie*} 非 NULL， 内部将复制拷贝其成员变量
+	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
 	 */
-	HttpCookie(const HttpCookie* cookie, dbuf_pool* dbuf = NULL);
+	HttpCookie(const HttpCookie* cookie, dbuf_guard* dbuf = NULL);
+
 	/**
 	 * 析构函数
 	 */
@@ -155,14 +154,18 @@ public:
 	const std::list<HTTP_PARAM*>& getParams(void) const;
 
 private:
-	dbuf_pool* dbuf_internal_;
-	dbuf_pool* dbuf_;
+	dbuf_guard* dbuf_internal_;
+	dbuf_guard* dbuf_;
 	char  dummy_[1];
 	char* name_;
 	char* value_;
 	std::list<HTTP_PARAM*> params_;
 
 	bool splitNameValue(char* data, HTTP_PARAM* param);
+
+protected:
+//	HttpCookie(HttpCookie&) {}
+//	HttpCookie(const HttpCookie&) {}
 };
 
 } // namespace acl end

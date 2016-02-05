@@ -3,14 +3,13 @@
 
 namespace acl {
 
-class dbuf_pool;
+class dbuf_guard;
 class string;
 class ostream;
 class socket_stream;
 class http_header;
 class http_client;
 class HttpCookie;
-class HttpServlet;
 class HttpServletRequest;
 
 /**
@@ -23,9 +22,8 @@ public:
 	/**
 	 * 构造函数
 	 * @param stream {socket_stream&} 数据流，内部不会自动关闭流
-	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
 	 */
-	HttpServletResponse(socket_stream& stream, dbuf_pool* dbuf = NULL);
+	HttpServletResponse(socket_stream& stream);
 	~HttpServletResponse(void);
 
 	/**
@@ -245,8 +243,8 @@ public:
 	}
 
 private:
-	dbuf_pool* dbuf_internal_;
-	dbuf_pool* dbuf_;
+	dbuf_guard* dbuf_internal_;
+	dbuf_guard* dbuf_;
 	socket_stream& stream_;		// 客户端连接流
 	HttpServletRequest* request_;	// http 请求对象
 	http_client* client_;		// http 响应流对象

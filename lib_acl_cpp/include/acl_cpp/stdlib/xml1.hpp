@@ -175,6 +175,7 @@ public:
 
 protected:
 	friend class xml1;
+	friend class dbuf_guard;
 
 	/**
 	 * xml 节点构造函数

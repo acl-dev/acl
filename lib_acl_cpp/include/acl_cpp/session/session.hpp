@@ -1,6 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <map>
+#include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 
 namespace acl {
@@ -30,7 +31,7 @@ public:
 /**
  * session 类，该类使用 memcached 存储 session 数据
  */
-class ACL_CPP_API session
+class ACL_CPP_API session : public dbuf_obj
 {
 public:
 	/**

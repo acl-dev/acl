@@ -264,7 +264,10 @@ const std::vector<xml_node*>& xml1::getElementsByTagName(const char* tag) const
 	acl_foreach(iter, a)
 	{
 		ACL_XML_NODE *tmp = (ACL_XML_NODE*) iter.data;
-		xml1_node* node = NEW xml1_node(const_cast<xml1*>(this), tmp);
+//		xml1_node* node = NEW xml1_node(const_cast<xml1*>(this), tmp);
+		xml1_node* node = const_cast<dbuf_guard&>(dbuf_)
+			.create<xml1_node, xml1*, ACL_XML_NODE*>
+			(const_cast<xml1*>(this), tmp);
 		const_cast<xml1*>(this)->elements_.push_back(node);
 	}
 
@@ -278,8 +281,11 @@ xml_node* xml1::getFirstElementByTag(const char* tag) const
 	if (node == NULL)
 		return NULL;
 
-	xml1_node* n = NEW xml1_node(const_cast<xml1*>(this), node);
-	const_cast<xml1*>(this)->nodes_tmp_.push_back(n);
+//	xml1_node* n = NEW xml1_node(const_cast<xml1*>(this), node);
+//	const_cast<xml1*>(this)->nodes_tmp_.push_back(n);
+	xml1_node* n = const_cast<dbuf_guard&>(dbuf_)
+		.create<xml1_node, xml1*, ACL_XML_NODE*>
+		(const_cast<xml1*>(this), node);
 	return n;
 }
 
@@ -295,7 +301,10 @@ const std::vector<xml_node*>& xml1::getElementsByTags(const char* tags) const
 	acl_foreach(iter, a)
 	{
 		ACL_XML_NODE *tmp = (ACL_XML_NODE*) iter.data;
-		xml1_node* node = NEW xml1_node(const_cast<xml1*>(this), tmp);
+//		xml1_node* node = NEW xml1_node(const_cast<xml1*>(this), tmp);
+		xml1_node* node = const_cast<dbuf_guard&>(dbuf_)
+			.create<xml1_node, xml1*, ACL_XML_NODE*>
+			(const_cast<xml1*>(this), tmp);
 		const_cast<xml1*>(this)->elements_.push_back(node);
 	}
 
@@ -312,8 +321,11 @@ xml_node* xml1::getFirstElementByTags(const char* tags) const
 	ACL_XML_NODE* node = (ACL_XML_NODE*) acl_array_index(a, 0);
 	acl_assert(node);
 
-	xml1_node* n = NEW xml1_node(const_cast<xml1*>(this), node);
-	const_cast<xml1*>(this)->nodes_tmp_.push_back(n);
+//	xml1_node* n = NEW xml1_node(const_cast<xml1*>(this), node);
+//	const_cast<xml1*>(this)->nodes_tmp_.push_back(n);
+	xml1_node* n = const_cast<dbuf_guard&>(dbuf_)
+		.create<xml1_node, xml1*, ACL_XML_NODE*>
+		(const_cast<xml1*>(this), node);
 
 	acl_xml_free_array(a);
 	return n;
@@ -330,7 +342,10 @@ const std::vector<xml_node*>& xml1::getElementsByName(const char* value) const
 	acl_foreach(iter, a)
 	{
 		ACL_XML_NODE *tmp = (ACL_XML_NODE*) iter.data;
-		xml1_node* node = NEW xml1_node(const_cast<xml1*>(this), tmp);
+//		xml1_node* node = NEW xml1_node(const_cast<xml1*>(this), tmp);
+		xml1_node* node = const_cast<dbuf_guard&>(dbuf_)
+			.create<xml1_node, xml1*, ACL_XML_NODE*>
+			(const_cast<xml1*>(this), tmp);
 		const_cast<xml1*>(this)->elements_.push_back(node);
 	}
 
@@ -350,7 +365,10 @@ const std::vector<xml_node*>& xml1::getElementsByAttr(
 	acl_foreach(iter, a)
 	{
 		ACL_XML_NODE *tmp = (ACL_XML_NODE*) iter.data;
-		xml1_node* node = NEW xml1_node(const_cast<xml1*>(this), tmp);
+//		xml1_node* node = NEW xml1_node(const_cast<xml1*>(this), tmp);
+		xml1_node* node = const_cast<dbuf_guard&>(dbuf_)
+			.create<xml1_node, xml1*, ACL_XML_NODE*>
+			(const_cast<xml1*>(this), tmp);
 		const_cast<xml1*>(this)->elements_.push_back(node);
 	}
 
@@ -364,8 +382,11 @@ xml_node* xml1::getElementById(const char* id) const
 	if (node == NULL)
 		return NULL;
 
-	xml1_node* n = NEW xml1_node(const_cast<xml1*>(this), node);
-	const_cast<xml1*>(this)->nodes_tmp_.push_back(n);
+//	xml1_node* n = NEW xml1_node(const_cast<xml1*>(this), node);
+//	const_cast<xml1*>(this)->nodes_tmp_.push_back(n);
+	xml1_node* n = const_cast<dbuf_guard&>(dbuf_)
+		.create<xml1_node, xml1*, ACL_XML_NODE*>
+		(const_cast<xml1*>(this), node);
 	return n;
 }
 
@@ -462,8 +483,10 @@ const acl::string& xml1::getText()
 xml_node& xml1::create_node(const char* tag, const char* text /* = NULL */)
 {
 	ACL_XML_NODE* node = acl_xml_create_node(xml_, tag, text);
-	xml1_node* n = NEW xml1_node(this, node);
-	nodes_tmp_.push_back(n);
+//	xml1_node* n = NEW xml1_node(this, node);
+//	nodes_tmp_.push_back(n);
+	xml1_node* n = dbuf_.create<xml1_node, xml1*, ACL_XML_NODE*>
+		(this, node);
 	return *n;
 }
 
@@ -484,8 +507,10 @@ xml_node* xml1::first_node(void)
 	if (node == NULL)
 		return NULL;
 
-	xml1_node* n = NEW xml1_node(this, node);
-	nodes_tmp_.push_back(n);
+//	xml1_node* n = NEW xml1_node(this, node);
+//	nodes_tmp_.push_back(n);
+	xml1_node* n = dbuf_.create<xml1_node, xml1*, ACL_XML_NODE*>
+		(this, node);
 	return n;
 }
 
@@ -497,8 +522,10 @@ xml_node* xml1::next_node(void)
 	if (node == NULL)
 		return NULL;
 
-	xml1_node* n = NEW xml1_node(this, node);
-	nodes_tmp_.push_back(n);
+//	xml1_node* n = NEW xml1_node(this, node);
+//	nodes_tmp_.push_back(n);
+	xml1_node* n = dbuf_.create<xml1_node, xml1*, ACL_XML_NODE*>
+		(this, node);
 	return n;
 }
 

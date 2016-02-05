@@ -131,6 +131,7 @@ public:
 
 protected:
 	friend class xml2;
+	friend class dbuf_guard;
 
 	xml2_node(xml* xml_ptr, ACL_XML2_NODE* node);
 	~xml2_node(void);
@@ -150,55 +151,43 @@ class ACL_CPP_API xml2 : public xml
 {
 public:
 	/**
-	 * 构造函数，使 xml 对象树创建在指定的内存块上
-	 * @param addr {char*} 内存映射的地址或内存地址，解析过程中产生的数据
-	 *  将存储于该内存区域中
-	 * @param size {size_t} addr 内存空间大小，当解析产生的数据超过此值
-	 *  时则解析过程停止，所以必须保证该空间大小足够用
-	 * @param data {const char*} 非空时自动调用解析过程
-	 */
-	xml2(char* addr, size_t size, const char* data = NULL);
-
-	/**
 	 * 构造函数，使 xml 对象树创建在指定内存映射文件上
 	 * @param filepath {const char*} 内存映射文件名
-	 * @param size {size_t} 内存映射文件的最大大小，即内存映射文件在自动
+	 * @param max_len {size_t} 内存映射文件的最大大小，即内存映射文件在自动
 	 *  增长时不应超过此大小
 	 * @param data {const char*} 非空时自动调用解析过程
-	 * @param block {size_t} 内存映射文件创建时的初始大小
-	 * @param keep_open {bool} 打开的内存映射文件的句柄是否一直保持打开
-	 *  状态，这样可以提高文件增长时的效率
+	 * @param init_len {size_t} 内存映射文件创建时的初始大小
 	 */
-	xml2(const char* filepath, size_t size, const char* data = NULL,
-		size_t block = 8192, bool keep_open = true);
+	xml2(const char* filepath, size_t max_len, const char* data = NULL,
+		size_t init_len = 8192);
 
 	/**
 	 * 构造函数，使 xml 对象树创建在指定内存映射文件上
 	 * @param fp {fstream&} 内存映射文件句柄，该文件句柄应在本 xml 对象
 	 *  释放前一直保持打开状态，即 fp 必须在 xml 对象释放后才可以关闭
-	 * @param size {size_t} 内存映射文件的最大大小，即内存映射文件在自动
+	 * @param max_len {size_t} 内存映射文件的最大大小，即内存映射文件在自动
 	 *  增长时不应超过此大小
 	 * @param data {const char*} 非空时自动调用解析过程
-	 * @param block {size_t} 内存映射文件创建时的初始大小
+	 * @param init_len {size_t} 内存映射文件创建时的初始大小
 	 */
-	xml2(fstream& fp, size_t size, const char* data = NULL,
-		size_t block = 8192);
+	xml2(fstream& fp, size_t max_len, const char* data = NULL,
+		size_t init_len = 8192);
 
 	/**
 	 * 构造函数，使 xml 对象树创建在指定内存映射文件上
 	 * @param fd {ACL_FILE_HANDLE} 内存映射文件句柄，该文件句柄应在本 xml
 	 *  对象释放前一直保持打开状态，即 fp 必须在 xml 对象释放后才可以关闭
-	 * @param size {size_t} 内存映射文件的最大大小，即内存映射文件在自动
+	 * @param max_len {size_t} 内存映射文件的最大大小，即内存映射文件在自动
 	 *  增长时不应超过此大小
 	 * @param data {const char*} 非空时自动调用解析过程
-	 * @param block {size_t} 内存映射文件创建时的初始大小
+	 * @param init_len {size_t} 内存映射文件创建时的初始大小
 	 */
 #if defined(_WIN32) || defined(_WIN64)
-	xml2(void* fd,  size_t size, const char* data = NULL,
-		size_t block = 8192);
+	xml2(void* fd,  size_t max_len, const char* data = NULL,
+		size_t init_len = 8192);
 #else
-	xml2(int fd, size_t size, const char* data = NULL,
-		size_t block = 8192);
+	xml2(int fd, size_t max_len, const char* data = NULL,
+		size_t init_len = 8192);
 #endif
 
 	~xml2(void);

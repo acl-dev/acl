@@ -2,6 +2,7 @@
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <list>
 #include <vector>
+#include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/pipe_stream.hpp"
 
 struct ACL_JSON_NODE;
@@ -23,7 +24,7 @@ class json;
 /**
  * json 节点，该类对象必须以 json.create_node() 方式创建
  */
-class ACL_CPP_API json_node
+class ACL_CPP_API json_node : public dbuf_obj
 {
 public:
 	/**
@@ -367,7 +368,7 @@ private:
 	void prepare_iter(void);
 };
 
-class ACL_CPP_API json : public pipe_stream
+class ACL_CPP_API json : public pipe_stream, public dbuf_obj
 {
 public:
 	/**

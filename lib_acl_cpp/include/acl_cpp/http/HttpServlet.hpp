@@ -5,9 +5,8 @@
 
 namespace acl {
 
-class dbuf_pool;
-class socket_stream;
 class session;
+class socket_stream;
 class HttpServletRequest;
 class HttpServletResponse;
 
@@ -85,10 +84,21 @@ public:
 	 * @return {HttpServlet&}
 	 */
 	HttpServlet& setParseBodyLimit(int length);
+	
+	/**
+	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数，
+	 * @return {bool} 返回处理结果，返回 false 表示处理失败，则应关闭连接，
+	 *  返回 true 表示处理成功，调用此函数后应该继续通过判断请求/响应对象中
+	 *  是否需要保持长连接来确实最终是否保持长连接
+	 */
+	bool start(void);
 
 	/**
-	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数
-	 * @return {bool} 返回处理结果
+	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数，
+	 * 该函数首先会调用 start 过程，然后根据 start 的返回结果及请求/响应
+	 * 对象是否要求保持长连接来决定是否需要与客户端保持长连接
+	 * @return {bool} 返回处理结果，返回 false 表示处理失败或处理成功且不保持
+	 *  长连接，应关闭连接
 	 */
 	bool doRun();
 
@@ -224,11 +234,13 @@ public:
 		return false;
 	}
 
+protected:
+	HttpServletRequest* req_;
+	HttpServletResponse* res_;
+
 private:
-	dbuf_pool* dbuf_;
 	session* session_;
 	session* session_ptr_;
-	size_t   reserve_size_;
 	socket_stream* stream_;
 	bool first_;
 	char local_charset_[32];
@@ -237,7 +249,6 @@ private:
 	int  parse_body_limit_;
 
 	void init();
-	bool doRun(dbuf_pool* dbuf);
 };
 
 } // namespace acl

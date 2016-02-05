@@ -1,6 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <list>
+#include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/http/http_type.hpp"
 
 struct HTTP_HDR_RES;
@@ -8,21 +9,20 @@ struct HTTP_HDR_ENTRY;
 
 namespace acl {
 
-class dbuf_pool;
 class string;
 class HttpCookie;
 
 /**
  * HTTP 头类，可以构建请求头或响应头
 */
-class ACL_CPP_API http_header
+class ACL_CPP_API http_header : public dbuf_obj
 {
 public:
 	/**
 	 * 构造函数
-	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
+	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
 	 */
-	http_header(dbuf_pool* dbuf = NULL);
+	http_header(dbuf_guard* dbuf = NULL);
 
 	/**
 	 * HTTP 请求头构造函数
@@ -37,16 +37,16 @@ public:
 	 * 调用该函数后用户仍可以调用 add_param 等函数添加其它参数；
 	 * 当参数字段只有参数名没有参数值时，该参数将会被忽略，所以如果想
 	 * 单独添加参数名，应该调用 add_param 方法来添加
-	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
+	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
 	 */
-	http_header(const char* url, dbuf_pool* dbuf = NULL);
+	http_header(const char* url, dbuf_guard* dbuf = NULL);
 
 	/**
 	 * HTTP 响应头构造函数
 	 * @param status {int} 状态字如：1xx, 2xx, 3xx, 4xx, 5xx
-	 * @param dbuf {dbuf_pool*} 非空时将做为内存分配池
+	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
 	 */
-	http_header(int status, dbuf_pool* dbuf = NULL);
+	http_header(int status, dbuf_guard* dbuf = NULL);
 
 	virtual ~http_header(void);
 
@@ -386,8 +386,8 @@ public:
 	}
 
 private:
-	dbuf_pool* dbuf_internal_;
-	dbuf_pool* dbuf_;
+	dbuf_guard* dbuf_internal_;
+	dbuf_guard* dbuf_;
 	//char* domain_;  // HTTP 服务器域名
 	//unsigned short port_;               // HTTP 服务器端口
 	char* url_;                           // HTTP 请求的 URL

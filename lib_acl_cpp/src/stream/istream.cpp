@@ -256,7 +256,8 @@ bool istream::read_peek(string& buf, bool clear /* = false */)
 	if (clear)
 		buf.clear();
 
-	if (acl_vstream_read_peek(stream_, buf.vstring()) == ACL_VSTREAM_EOF)
+	int n = acl_vstream_read_peek(stream_, buf.vstring());
+	if (n == ACL_VSTREAM_EOF)
 	{
 #if ACL_EWOULDBLOCK == ACL_EAGAIN
 		if (stream_->errnum != ACL_EWOULDBLOCK)
@@ -269,6 +270,8 @@ bool istream::read_peek(string& buf, bool clear /* = false */)
 		}
 		return false;
 	}
+	else if (n == 0)
+		return false;
 	else
 		return true;
 }

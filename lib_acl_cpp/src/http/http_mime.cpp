@@ -135,9 +135,7 @@ http_mime::http_mime(const char* boundary,
 	if (boundary == NULL || strlen(boundary) < 2)
 	{
 		logger_error("boundary invalid");
-		boundary = NULL;
 		mime_state_ = NULL;
-		save_path_ = NULL;
 		return;
 	}
 	// HTTP 的 MIME 格式与 邮件的 MIME 的分隔符有所不同，
@@ -149,7 +147,7 @@ http_mime::http_mime(const char* boundary,
 		boundary++;
 	if (*boundary == '-')
 		boundary++;
-	boundary_ = acl_mystrdup(boundary);
+	boundary_ = boundary;
 
 	if (local_charset && *local_charset)
 		safe_snprintf(local_charset_, sizeof(local_charset_),
@@ -159,7 +157,7 @@ http_mime::http_mime(const char* boundary,
 
 	decode_on_ = true;
 
-	save_path_ = NULL;
+	save_path_.clear();
 	mime_state_ = mime_state_alloc();
 
 	// 为了使用邮件的 mime 解析器，需要模拟出一个头部字段
@@ -177,10 +175,6 @@ http_mime::http_mime(const char* boundary,
 
 http_mime::~http_mime()
 {
-	if (boundary_)
-		acl_myfree(boundary_);
-	if (save_path_)
-		acl_myfree(save_path_);
 	if (mime_state_)
 		mime_state_free(mime_state_);
 	std::list<http_mime_node*>::iterator it = mime_nodes_.begin();
@@ -191,7 +185,7 @@ http_mime::~http_mime()
 void http_mime::set_saved_path(const char* path)
 {
 	if (path && *path)
-		save_path_ = acl_mystrdup(path);
+		save_path_ = path;
 }
 
 bool http_mime::update(const char* data, size_t len)

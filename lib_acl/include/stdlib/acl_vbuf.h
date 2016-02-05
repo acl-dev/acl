@@ -10,13 +10,13 @@ extern "C" {
 typedef struct ACL_VBUF ACL_VBUF;
 typedef int (*ACL_VBUF_GET_READY_FN) (ACL_VBUF *);
 typedef int (*ACL_VBUF_PUT_READY_FN) (ACL_VBUF *);
-typedef int (*ACL_VBUF_SPACE_FN) (ACL_VBUF *, int);
+typedef int (*ACL_VBUF_SPACE_FN) (ACL_VBUF *, ssize_t);
 
 struct ACL_VBUF {
-    int     flags;			/* status, see below */
+    unsigned flags;			/* status, see below */
     unsigned char *data;		/* variable-length buffer */
-    int     len;			/* buffer length */
-    int     cnt;			/* bytes left to read/write */
+    ssize_t len;			/* buffer length */
+    ssize_t cnt;			/* bytes left to read/write */
     unsigned char *ptr;			/* read/write position */
     ACL_VBUF_GET_READY_FN get_ready;	/* read buffer empty action */
     ACL_VBUF_PUT_READY_FN put_ready;	/* write buffer full action */
@@ -41,26 +41,29 @@ struct ACL_VBUF {
 #define	ACL_VBUF_FLAG_ERR	(1<<0)		/* some I/O error */
 #define ACL_VBUF_FLAG_EOF	(1<<1)		/* end of data */
 #define ACL_VBUF_FLAG_TIMEOUT	(1<<2)		/* timeout error */
-#define ACL_VBUF_FLAG_BAD	(ACL_VBUF_FLAG_ERR | ACL_VBUF_FLAG_EOF | ACL_VBUF_FLAG_TIMEOUT)
+#define ACL_VBUF_FLAG_BAD \
+	(ACL_VBUF_FLAG_ERR | ACL_VBUF_FLAG_EOF | ACL_VBUF_FLAG_TIMEOUT)
 #define ACL_VBUF_FLAG_FIXED	(1<<3)		/* fixed-size buffer */
 
-#define acl_vbuf_error(v)	((v)->flags & ACL_VBUF_FLAG_ERR)
-#define acl_vbuf_eof(v)	((v)->flags & ACL_VBUF_FLAG_EOF)
+#define acl_vbuf_error(v)	((v)->flags & ACL_VBUF_FLAG_BAD)
+#define acl_vbuf_eof(v)		((v)->flags & ACL_VBUF_FLAG_EOF)
 #define acl_vbuf_timeout(v)	((v)->flags & ACL_VBUF_FLAG_TIMEOUT)
-#define acl_vbuf_clearerr(v) ((v)->flags &= ~ACL_VBUF_FLAG_BAD)
+#define acl_vbuf_clearerr(v)	((v)->flags &= ~ACL_VBUF_FLAG_BAD)
 
  /*
   * Buffer I/O-like operations and results.
   */
-#define ACL_VBUF_GET(v)	((v)->cnt < 0 ? ++(v)->cnt, \
-				(int) *(v)->ptr++ : acl_vbuf_get(v))
-#define ACL_VBUF_PUT(v,c)	((v)->cnt > 0 ? --(v)->cnt, \
-				(int) (*(v)->ptr++ = (c)) : acl_vbuf_put((v),(c)))
+#define ACL_VBUF_GET(v) ((v)->cnt < 0 ? ++(v)->cnt, \
+	(int) *(v)->ptr++ : acl_vbuf_get(v))
+
+#define ACL_VBUF_PUT(v,c) ((v)->cnt > 0 ? --(v)->cnt, \
+	(int) (*(v)->ptr++ = (c)) : acl_vbuf_put((v),(c)))
+
 #define ACL_VBUF_SPACE(v,n) ((v)->space((v),(n)))
 
-#define	ACL_VBUF_CHARAT(v, offset)	((int) (v).data[offset])
+#define	ACL_VBUF_CHARAT(v, offset) ((int) (v).data[offset])
 
-#define ACL_VBUF_EOF	(-1)		/* no more space or data */
+#define ACL_VBUF_EOF		(-1)		/* no more space or data */
 
 ACL_API int acl_vbuf_get(ACL_VBUF *);
 ACL_API int acl_vbuf_put(ACL_VBUF *, int);
@@ -73,4 +76,3 @@ ACL_API int acl_vbuf_write(ACL_VBUF *, const char *, int);
 #endif
 
 #endif
-

@@ -22,6 +22,7 @@
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_ring.h"
 #include "stdlib/acl_vstream.h"
+#include "net/acl_sane_socket.h"
 #include "event/acl_events.h"
 
 #endif
@@ -42,36 +43,34 @@ typedef struct EVENT_EPOLL_THR {
 	int   handle;
 } EVENT_EPOLL_THR;
 
-static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
+static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
 {
 	const char *myname = "event_enable_read";
-	EVENT_EPOLL_THR *event_thr = (EVENT_EPOLL_THR *) eventp;
+	EVENT_EPOLL_THR *evthr = (EVENT_EPOLL_THR *) eventp;
 	ACL_EVENT_FDTABLE *fdp;
-	ACL_SOCKET sockfd;
+	ACL_SOCKET fd;
 	struct epoll_event ev;
 	int   fd_ready;
 
-	if (ACL_VSTREAM_BFRD_CNT(stream) > 0
-		|| (stream->flag & ACL_VSTREAM_FLAG_BAD))
-	{
+	if (ACL_VSTREAM_BFRD_CNT(fp) > 0 || (fp->flag & ACL_VSTREAM_FLAG_BAD)) {
 		fd_ready = 1;
 	} else
 		fd_ready = 0;
 
-	sockfd = ACL_VSTREAM_SOCK(stream);
-	fdp = (ACL_EVENT_FDTABLE*) stream->fdp;
+	fd = ACL_VSTREAM_SOCK(fp);
+	fdp = (ACL_EVENT_FDTABLE*) fp->fdp;
 	if (fdp == NULL) {
 		fdp = event_fdtable_alloc();
 		fdp->listener = 0;
-		fdp->stream = stream;
-		stream->fdp = (void *) fdp;
+		fdp->stream = fp;
+		fp->fdp = (void *) fdp;
 	} else if (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
 		acl_msg_panic("%s(%d), %s: fd %d: multiple I/O request",
-			__FILE__, __LINE__, myname, sockfd);
+			__FILE__, __LINE__, myname, fd);
 	else {
 		fdp->listener = 0;
-		fdp->stream = stream;
+		fdp->stream = fp;
 	}
 
 	if (fdp->r_callback != callback || fdp->r_context != context) {
@@ -93,7 +92,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		return;
 	}
 
-	stream->nrefer++;
+	fp->nrefer++;
 	fdp->flag = EVENT_FDTABLE_FLAG_READ | EVENT_FDTABLE_FLAG_EXPT;
 
 #if 0
@@ -104,67 +103,76 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	ev.data.u64 = 0;  /* avoid valgrind warning */
 	ev.data.ptr = fdp;
 
-	THREAD_LOCK(&event_thr->event.tb_mutex);
+	THREAD_LOCK(&evthr->event.tb_mutex);
 
 	fdp->fdidx = eventp->fdcnt;
 	eventp->fdtabs[eventp->fdcnt++] = fdp;
 
 	if (fd_ready) {
-		if (epoll_ctl(event_thr->handle, EPOLL_CTL_ADD,
-			sockfd, &ev) < 0)
-		{
+		if (epoll_ctl(evthr->handle, EPOLL_CTL_ADD, fd, &ev) < 0) {
 			if (errno == EEXIST)
 				acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
-					myname, acl_last_serror(), sockfd);
-			else
-				acl_msg_fatal("%s: epoll_ctl: %s, fd: %d",
-					myname, acl_last_serror(), sockfd);
+					myname, acl_last_serror(), fd);
+			else if (errno == EBADF && acl_getsocktype(fd) < 0) {
+				acl_msg_error("%s: epool_ctl: %s, fd: %d",
+					myname, acl_last_serror(), fd);
+				ACL_VSTREAM_SET_SOCK(fp, ACL_SOCKET_INVALID);
+				fp->flag |= ACL_VSTREAM_FLAG_ERR;
+			} else
+				acl_msg_fatal("%s: epoll_ctl: %s, fd: %d, "
+					"epfd: %d", myname, acl_last_serror(),
+					fd, evthr->handle);
 		}
 
-		THREAD_UNLOCK(&event_thr->event.tb_mutex);
+		THREAD_UNLOCK(&evthr->event.tb_mutex);
 
-		if (event_thr->event.blocked && event_thr->event.evdog
-			&& event_dog_client(event_thr->event.evdog) != stream)
+		if (evthr->event.blocked && evthr->event.evdog
+			&& event_dog_client(evthr->event.evdog) != fp)
 		{
-			event_dog_notify(event_thr->event.evdog);
+			event_dog_notify(evthr->event.evdog);
 		}
-	} else {
-		THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
-		if (epoll_ctl(event_thr->handle, EPOLL_CTL_ADD,
-			sockfd, &ev) < 0)
-		{
-			if (errno == EEXIST)
-				acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
-					myname, acl_last_serror(), sockfd);
-			else
-				acl_msg_fatal("%s: epoll_ctl: %s, fd: %d",
-					myname, acl_last_serror(), sockfd);
-		}
+		return;
+	}
+
+	THREAD_UNLOCK(&evthr->event.tb_mutex);
+
+	if (epoll_ctl(evthr->handle, EPOLL_CTL_ADD, fd, &ev) < 0) {
+		if (errno == EEXIST)
+			acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
+				myname, acl_last_serror(), fd);
+		else if (errno == EBADF && acl_getsocktype(fd) < 0) {
+			acl_msg_error("%s: epool_ctl: %s, fd: %d",
+				myname, acl_last_serror(), fd);
+			ACL_VSTREAM_SET_SOCK(fp, ACL_SOCKET_INVALID);
+			fp->flag |= ACL_VSTREAM_FLAG_ERR;
+		} else
+			acl_msg_fatal("%s: epoll_ctl: %s, fd: %d, epfd: %d",
+				myname, acl_last_serror(), fd, evthr->handle);
 	}
 }
 
-static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
+static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
 {
 	const char *myname = "event_enable_listen";
-	EVENT_EPOLL_THR *event_thr = (EVENT_EPOLL_THR *) eventp;
+	EVENT_EPOLL_THR *evthr = (EVENT_EPOLL_THR *) eventp;
 	ACL_EVENT_FDTABLE *fdp;
-	ACL_SOCKET sockfd;
+	ACL_SOCKET fd;
 	struct epoll_event ev;
 
-	sockfd = ACL_VSTREAM_SOCK(stream);
-	fdp = (ACL_EVENT_FDTABLE*) stream->fdp;
+	fd = ACL_VSTREAM_SOCK(fp);
+	fdp = (ACL_EVENT_FDTABLE*) fp->fdp;
 	if (fdp == NULL) {
 		fdp = event_fdtable_alloc();
-		fdp->stream = stream;
+		fdp->stream = fp;
 		fdp->listener = 1;
-		stream->fdp = (void *) fdp;
+		fp->fdp = (void *) fdp;
 	} else if (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
 		acl_msg_panic("%s(%d)->%s: fd %d: multiple I/O request",
-			__FILE__, __LINE__, myname, sockfd);
+			__FILE__, __LINE__, myname, fd);
 	else {
-		fdp->stream = stream;
+		fdp->stream = fp;
 		fdp->listener = 1;
 	}
 
@@ -185,57 +193,57 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		return;
 
 	fdp->flag = EVENT_FDTABLE_FLAG_READ | EVENT_FDTABLE_FLAG_EXPT;
-	stream->nrefer++;
+	fp->nrefer++;
 
 	ev.events = EPOLLIN | EPOLLHUP | EPOLLERR;
 	ev.data.u64 = 0;  /* avoid valgrind warning */
 	ev.data.ptr = fdp;
 
-	THREAD_LOCK(&event_thr->event.tb_mutex);
+	THREAD_LOCK(&evthr->event.tb_mutex);
 
 	fdp->fdidx = eventp->fdcnt;
 	eventp->fdtabs[eventp->fdcnt++] = fdp;
 
-	THREAD_UNLOCK(&event_thr->event.tb_mutex);
+	THREAD_UNLOCK(&evthr->event.tb_mutex);
 
-	if (epoll_ctl(event_thr->handle, EPOLL_CTL_ADD, sockfd, &ev) < 0) {
+	if (epoll_ctl(evthr->handle, EPOLL_CTL_ADD, fd, &ev) < 0) {
 		if (errno == EEXIST)
 			acl_msg_warn("%s: epool_ctl: %s, fd: %d",
-				myname, acl_last_serror(), sockfd);
+				myname, acl_last_serror(), fd);
 		else
 			acl_msg_fatal("%s: epool_ctl: %s, fd: %d",
-				myname, acl_last_serror(), sockfd);
+				myname, acl_last_serror(), fd);
 	}
 }
 
-static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
+static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 	int timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context)
 {
 	const char *myname = "event_enable_write";
-	EVENT_EPOLL_THR *event_thr = (EVENT_EPOLL_THR *) eventp;
+	EVENT_EPOLL_THR *evthr = (EVENT_EPOLL_THR *) eventp;
 	ACL_EVENT_FDTABLE *fdp;
-	ACL_SOCKET sockfd;
+	ACL_SOCKET fd;
 	struct epoll_event ev;
 	int   fd_ready;
 
-	if ((stream->flag & ACL_VSTREAM_FLAG_BAD))
+	if ((fp->flag & ACL_VSTREAM_FLAG_BAD))
 		fd_ready = 1;
 	else
 		fd_ready = 0;
 
-	sockfd = ACL_VSTREAM_SOCK(stream);
-	fdp = (ACL_EVENT_FDTABLE*) stream->fdp;
+	fd = ACL_VSTREAM_SOCK(fp);
+	fdp = (ACL_EVENT_FDTABLE*) fp->fdp;
 	if (fdp == NULL) {
 		fdp = event_fdtable_alloc();
 		fdp->listener = 0;
-		fdp->stream = stream;
-		stream->fdp = (void *) fdp;
+		fdp->stream = fp;
+		fp->fdp = (void *) fdp;
 	} else if (fdp->flag & EVENT_FDTABLE_FLAG_READ)
 		acl_msg_panic("%s(%d)->%s: fd %d: multiple I/O request",
-			__FILE__, __LINE__, myname, sockfd);
+			__FILE__, __LINE__, myname, fd);
 	else {
 		fdp->listener = 0;
-		fdp->stream = stream;
+		fdp->stream = fp;
 	}
 
 	if (fdp->w_callback != callback || fdp->w_context != context) {
@@ -255,43 +263,51 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		return;
 
 	fdp->flag = EVENT_FDTABLE_FLAG_WRITE | EVENT_FDTABLE_FLAG_EXPT;
-	stream->nrefer++;
+	fp->nrefer++;
 
 	ev.events = EPOLLIN | EPOLLHUP | EPOLLERR;
 	ev.data.u64 = 0;  /* avoid valgrind warning */
 	ev.data.ptr = fdp;
 
-	THREAD_LOCK(&event_thr->event.tb_mutex);
+	THREAD_LOCK(&evthr->event.tb_mutex);
 
 	fdp->fdidx = eventp->fdcnt;
 	eventp->fdtabs[eventp->fdcnt++] = fdp;
 
 	if (fd_ready) {
-		if (epoll_ctl(event_thr->handle, EPOLL_CTL_ADD,
-			sockfd, &ev) < 0)
-		{
+		if (epoll_ctl(evthr->handle, EPOLL_CTL_ADD, fd, &ev) < 0) {
 			if (errno == EEXIST)
 				acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
-					myname, acl_last_serror(), sockfd);
-			else
-				acl_msg_fatal("%s: epoll_ctl: %s, fd: %d",
-					myname, acl_last_serror(), sockfd);
+					myname, acl_last_serror(), fd);
+			else if (errno == EBADF && acl_getsocktype(fd) < 0) {
+				acl_msg_error("%s: epool_ctl: %s, fd: %d",
+					myname, acl_last_serror(), fd);
+				ACL_VSTREAM_SET_SOCK(fp, ACL_SOCKET_INVALID);
+				fp->flag |= ACL_VSTREAM_FLAG_ERR;
+			} else
+				acl_msg_fatal("%s: epoll_ctl: %s, fd: %d, "
+					"epfd: %d", myname, acl_last_serror(),
+					fd, evthr->handle);
 		}
 
-		THREAD_UNLOCK(&event_thr->event.tb_mutex);
-	} else {
-		THREAD_UNLOCK(&event_thr->event.tb_mutex);
+		THREAD_UNLOCK(&evthr->event.tb_mutex);
+		return;
+	}
 
-		if (epoll_ctl(event_thr->handle, EPOLL_CTL_ADD,
-			sockfd, &ev) < 0)
-		{
-			if (errno == EEXIST)
-				acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
-					myname, acl_last_serror(), sockfd);
-			else
-				acl_msg_fatal("%s: epoll_ctl: %s, fd: %d",
-					myname, acl_last_serror(), sockfd);
-		}
+	THREAD_UNLOCK(&evthr->event.tb_mutex);
+	
+	if (epoll_ctl(evthr->handle, EPOLL_CTL_ADD, fd, &ev) < 0) {
+		if (errno == EEXIST)
+			acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
+				myname, acl_last_serror(), fd);
+		else if (errno == EBADF && acl_getsocktype(fd) < 0) {
+			acl_msg_error("%s: epool_ctl: %s, fd: %d",
+				myname, acl_last_serror(), fd);
+			ACL_VSTREAM_SET_SOCK(fp, ACL_SOCKET_INVALID);
+			fp->flag |= ACL_VSTREAM_FLAG_ERR;
+		} else
+			acl_msg_fatal("%s: epoll_ctl: %s, fd: %d, epfd: %d",
+				myname, acl_last_serror(), fd, evthr->handle);
 	}
 }
 
@@ -356,7 +372,7 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 			acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
 				myname, acl_last_serror(), sockfd);
 		else
-			acl_msg_fatal("%s: epoll_ctl: %s, fd: %d",
+			acl_msg_error("%s: epoll_ctl: %s, fd: %d",
 				myname, acl_last_serror(), sockfd);
 	}
 

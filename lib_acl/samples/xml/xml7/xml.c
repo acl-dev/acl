@@ -38,7 +38,7 @@ static int parse_xml_file(const char *filepath)
 
 	len *= 4;
 
-	xml = acl_xml2_mmap_file(mmap_file, len, 10, 1, NULL);
+	xml = acl_xml2_mmap_file(mmap_file, len, 10, NULL);
 
 	len = 0;
 	while (1) {
@@ -58,8 +58,9 @@ static int parse_xml_file(const char *filepath)
 	if (ptr == NULL)
 		printf("acl_xml2_build error\r\n");
 
-	len = xml->ptr - ptr;
-	acl_vstream_printf(">>>build xml's size:%lld\r\n", len);
+	len = acl_vstring_end(xml->vbuf) - ptr;
+	acl_vstream_printf(">>>build xml's size:%lld, strlen: %ld\r\n",
+		len, (long) strlen(ptr));
 	acl_vstream_printf(">>> ptr: {%s}\r\n", ptr);
 
 	if (acl_vstream_writen(out, ptr, len) == ACL_VSTREAM_EOF) {

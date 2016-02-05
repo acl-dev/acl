@@ -1,5 +1,6 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
+#include "acl_cpp/stdlib//dbuf_pool.hpp"
 #include <map>
 
 namespace acl {
@@ -9,7 +10,7 @@ class session;
 /**
  * 服务端 HttpSession 类，目前该类的数据存储只能支持存在 memcached 上
  */
-class ACL_CPP_API HttpSession
+class ACL_CPP_API HttpSession : public dbuf_obj
 {
 public:
 	/**

@@ -250,7 +250,10 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 	for (; cit != attaches.end(); cit++)
 	{
 		buf = "./var/";
-		buf << (*cit)->get_filename();
+		const char* filename = (*cit)->get_filename();
+		if (filename == NULL)
+			continue;
+		buf << filename;
 
 		acl::string attach_name;
 		acl::rfc2047 rfc2047;
@@ -448,6 +451,7 @@ int main(int argc, char* argv[])
 	bool  htmlFirst = false;
 	acl::string path("test.eml");
 	acl::string cmd("test1");
+	acl::log::stdout_open(true);
 
 	while ((ch = (char) getopt(argc, argv, "hst:f:")) > 0)
 	{

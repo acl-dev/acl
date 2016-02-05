@@ -68,14 +68,16 @@ bool mime_builder::save_as(acl::ofstream& fp)
 	acl::string buf;
 	if (attachs_.empty())
 	{
-		header_.set_type(MIME_CTYPE_TEXT, body_html_ ?
-			MIME_STYPE_HTML : MIME_STYPE_PLAIN);
+		//header_.set_type(MIME_CTYPE_TEXT, body_html_ ?
+		//	MIME_STYPE_HTML : MIME_STYPE_PLAIN);
+		header_.set_type("text", body_html_ ? "html" : "plain");
 		header_.add_header("Content-Transfer-Encoding", "base64");
 	}
 	else
 	{
-		header_.set_type(MIME_CTYPE_MULTIPART,
-			MIME_STYPE_MIXED);
+		//header_.set_type(MIME_CTYPE_MULTIPART,
+		//	MIME_STYPE_MIXED);
+		header_.set_type("multipart", "mixed");
 		delimeter_.format("------=_Part_%d_%ld.%ld", getpid(),
 			acl_pthread_self(), time(NULL));
 		header_.set_boundary(delimeter_.c_str());

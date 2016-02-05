@@ -1,6 +1,23 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+403) 2016.1.31
+403.1) feature: string 类支持内存映射文件方式管理内存，从而可以支持更多的内存空间
+403.2) samples: string/string5, 用于测试内存映射文件
+403.3) feature: xml/xml1/xml2 支持使用 dbuf_guard 会话内存池来创建临时对象，
+从而提升了内存使用效率
+
+402) 2016.1.27
+402.1) bugfix: charset_conv 类中的方法 update，当 m_addInvalid 为 false，应该
+过滤掉无效的字符
+402.2) performance: mime_state_parse.cpp 中的 mime_bound_body 函数优化了处理
+大邮件的性能
+
+401) 2016.1.22
+401.1) feature: HttpServlet 类增加了请求/响应成员函数(req_/res_)，以便于将
+读取 HTTP 请求数据体分离
+401.2) bugfix: connect_manager 类少两个设置函数 set_check_inter/set_idle_ttl
+
 400) 2016.1.15
 400.1) feature: redis 库增加了出错日志输出，便于运行时进行信息调试
 

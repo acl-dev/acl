@@ -14,6 +14,8 @@ connect_manager::connect_manager()
 , service_idx_(0)
 , stat_inter_(1)
 , retry_inter_(1)
+, idle_ttl_(-1)
+, check_inter_(-1)
 , monitor_(NULL)
 {
 }
@@ -77,6 +79,16 @@ void connect_manager::set_retry_inter(int n)
 		(*it)->set_retry_inter(retry_inter_);
 
 	lock_.unlock();
+}
+
+void connect_manager::set_check_inter(int n)
+{
+	check_inter_ = n;
+}
+
+void connect_manager::set_idle_ttl(time_t ttl)
+{
+	idle_ttl_ = ttl;
 }
 
 void connect_manager::init(const char* default_addr, const char* addr_list,

@@ -15,6 +15,8 @@ struct MAIL_ADDR
 	char *comment;
 };
 
+//#define SAVE_BODY
+
 struct MIME_NODE
 {
 	ACL_RING children;                      /**< 子结点集合 */
@@ -59,7 +61,9 @@ struct MIME_NODE
 
 	char  bound_term[3];
 	ACL_VSTRING *buffer;                    /**< headers, quoted-printable body */
+#ifdef SAVE_BODY
 	ACL_VSTRING *body;
+#endif
 	ACL_RING node;                          /**< 当前结点 */
 
 	off_t header_begin;			/**< 结点头开始位置 */
@@ -131,5 +135,6 @@ int mime_node_delete(MIME_NODE *node);
 void mime_node_add_child(MIME_NODE *parent, MIME_NODE *child);
 const char *mime_ctype_name(size_t ctype);
 const char *mime_stype_name(size_t stype);
+const char *mime_head_value(MIME_NODE *node, const char *name);
 
 #endif

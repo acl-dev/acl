@@ -379,6 +379,9 @@ int main(int argc, char* argv[])
 	rfc2047_test(rfc2047, s10);
 
 	/////////////////////////////////////////////////////////////////////
+	
+	const char* s11 = "=?utf-8?B?57rnur/kuIrmg4XlhrXnu5/orqE=?=";
+	rfc2047_test(rfc2047, s11);
 
 	getchar();
 	return (0);

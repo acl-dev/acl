@@ -57,12 +57,12 @@ static int vstring_buf_put_ready(ACL_VBUF *bp)
 	return (0);
 }
 
-static int vstring_buf_space(ACL_VBUF *bp, int len)
+static int vstring_buf_space(ACL_VBUF *bp, ssize_t len)
 {
-	int     need;
+	ssize_t need;
 
 	if (len < 0)
-		acl_msg_panic("vstring_buf_space: bad length %d", len);
+		acl_msg_panic("vstring_buf_space: bad length %ld", (long) len);
 	if ((need = len - bp->cnt) > 0)
 		vstring_extend(bp, need);
 	return (0);

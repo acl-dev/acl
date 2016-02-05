@@ -124,15 +124,17 @@ void xml::clear(void)
 	if (buf_)
 		buf_->clear();
 
-	std::vector<acl::xml_node*>::iterator it = elements_.begin();
-	for (; it != elements_.end(); ++it)
-		delete (*it);
+	//std::vector<acl::xml_node*>::iterator it = elements_.begin();
+	//for (; it != elements_.end(); ++it)
+	//	delete (*it);
 	elements_.clear();
 
-	std::list<xml_node*>::iterator it1 = nodes_tmp_.begin();
-	for (; it1 != nodes_tmp_.end(); ++it1)
-		delete (*it1);
-	nodes_tmp_.clear();
+	//std::list<xml_node*>::iterator it1 = nodes_tmp_.begin();
+	//for (; it1 != nodes_tmp_.end(); ++it1)
+	//	delete (*it1);
+	//nodes_tmp_.clear();
+
+	dbuf_.dbuf_reset();
 }
 
 const acl::string& xml::getText()

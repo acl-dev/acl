@@ -1,5 +1,6 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
+#include "acl_cpp/stdlib/noncopyable.hpp"
 #include <vector>
 
 struct ACL_DBUF_POOL;
@@ -206,7 +207,7 @@ private:
  * 会话内存池管理器，由该类对象管理 dbuf_pool 对象及在其上分配的对象，当该类
  * 对象销毁时，dbuf_pool 对象及在上面均被释放。
  */
-class ACL_CPP_API dbuf_guard
+class ACL_CPP_API dbuf_guard : public noncopyable
 {
 public:
 	/**
@@ -499,9 +500,6 @@ private:
 
 	// 扩充 objs_ 数组对象的空间
 	void extend_objs();
-
-	// 禁止引用拷贝
-	dbuf_guard(dbuf_guard&) {}
 };
 
 /**

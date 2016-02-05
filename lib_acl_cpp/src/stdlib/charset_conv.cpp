@@ -356,7 +356,6 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 		ret = __iconv(m_iconv, &pIn, &nIn, &pOut, &nOut);
 #endif
 
-
 		if (ret != (size_t) -1)
 		{
 			if ((ret = SIZE(m_pOutBuf) - nOut) > 0)
@@ -411,8 +410,9 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 
 			acl_assert(pIn >= STR(m_pInBuf));
 
-			// 跳过无效字节
-			(*out) += (char)(*pIn); // 直接拷贝无效字节
+			// 是否跳过无效字节?
+			if (m_addInvalid)
+				(*out) += (char)(*pIn); // 直接拷贝无效字节
 			nIn--;
 			pIn++;
 			if (nIn > 0)

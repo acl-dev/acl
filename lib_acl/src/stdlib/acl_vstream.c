@@ -1035,7 +1035,7 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	if (fp->read_ready) {
 		if (read_once(fp) <= 0) {
 			n = (int) LEN(buf) - n;
-			return n > 0 ? n : ACL_VSTREAM_EOF;
+			return n >= 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
@@ -1106,7 +1106,7 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 		if (read_once(fp) <= 0) {
 			n = (int) LEN(buf) - n;
 
-			return n > 0 ? n : ACL_VSTREAM_EOF;
+			return n >= 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
@@ -1168,7 +1168,7 @@ int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
 	if (fp->read_ready) {
 		if (read_once(fp) <= 0) {
 			int   n = cnt_saved - cnt;
-			return n > 0 ? n : ACL_VSTREAM_EOF;
+			return n >= 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
@@ -1219,7 +1219,7 @@ int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 	if (fp->read_ready) {
 		if (read_once(fp) <= 0) {
 			n = (int) LEN(buf) - n;
-			return n > 0 ? n : ACL_VSTREAM_EOF;
+			return n >= 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 

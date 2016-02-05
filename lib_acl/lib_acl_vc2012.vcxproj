@@ -729,6 +729,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include=".\src\private\sem.h" />
     <ClInclude Include=".\src\private\thread.h" />
     <ClInclude Include=".\include\lib_acl.h" />
+    <ClInclude Include="include\code\acl_xmlcode.h" />
     <ClInclude Include="include\stdlib\unix\acl_trace.h" />
     <ClInclude Include="include\xml\acl_xml2.h" />
     <ClInclude Include="include\xml\acl_xml3.h" />

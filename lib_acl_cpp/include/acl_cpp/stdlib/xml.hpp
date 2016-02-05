@@ -2,6 +2,7 @@
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <vector>
 #include <list>
+#include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/pipe_stream.hpp"
 
@@ -20,7 +21,7 @@ namespace acl {
 class xml;
 class xml_node;
 
-class ACL_CPP_API xml_attr
+class ACL_CPP_API xml_attr : public dbuf_obj
 {
 public:
 	/**
@@ -46,7 +47,7 @@ protected:
 	xml_node* node_;
 };
 
-class ACL_CPP_API xml_node
+class ACL_CPP_API xml_node : public dbuf_obj
 {
 public:
 	/**
@@ -269,6 +270,7 @@ public:
 
 protected:
 	friend class xml;
+	friend class dbuf_guard;
 
 	/**
 	 * xml 节点构造函数
@@ -289,7 +291,7 @@ protected:
 
 class string;
 
-class ACL_CPP_API xml : public pipe_stream
+class ACL_CPP_API xml : public pipe_stream, public dbuf_obj
 {
 public:
 	xml(void);
@@ -475,12 +477,13 @@ public:
 	virtual void clear(void);
 
 protected:
+	dbuf_guard dbuf_;
 	std::vector<xml_node*> elements_;
 	string* buf_;
 	//bool dummyRootAdded_;
 
 	ACL_TOKEN* m_pTokenTree;
-	std::list<xml_node*> nodes_tmp_;
+	//std::list<xml_node*> nodes_tmp_;
 };
 
 } // namespace acl

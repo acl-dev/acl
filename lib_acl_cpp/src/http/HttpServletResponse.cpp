@@ -6,33 +6,22 @@
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/http/http_client.hpp"
-#include "acl_cpp/http/HttpServlet.hpp"
 #include "acl_cpp/http/HttpServletRequest.hpp"
 #include "acl_cpp/http/HttpServletResponse.hpp"
 
 namespace acl
 {
 
-HttpServletResponse::HttpServletResponse(socket_stream& stream,
-	dbuf_pool* dbuf /* = NULL */)
+HttpServletResponse::HttpServletResponse(socket_stream& stream)
 : stream_(stream)
 , request_(NULL)
 {
-	if (dbuf != NULL)
-	{
-		dbuf_ = dbuf;
-		dbuf_internal_ = NULL;
-	}
-	else
-	{
-		dbuf_internal_ = new dbuf_pool;
-		dbuf_ = dbuf_internal_;
-	}
+	dbuf_internal_ = new dbuf_guard;
+	dbuf_ = dbuf_internal_;
 
 	client_ = new (dbuf_->dbuf_alloc(sizeof(http_client)))
 		http_client(&stream_, stream_.get_rw_timeout());
-	header_ = new (dbuf_->dbuf_alloc(sizeof(http_header)))
-		http_header(dbuf_);
+	header_ = dbuf_->create<http_header, dbuf_guard*>(dbuf_);
 
 	header_->set_request_mode(false);
 	charset_[0] = 0;
@@ -43,10 +32,7 @@ HttpServletResponse::HttpServletResponse(socket_stream& stream,
 HttpServletResponse::~HttpServletResponse(void)
 {
 	client_->~http_client();
-	header_->~http_header();
-
-	if (dbuf_internal_)
-		dbuf_internal_->destroy();
+	delete dbuf_internal_;
 }
 
 HttpServletResponse& HttpServletResponse::setRedirect(
