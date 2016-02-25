@@ -17,7 +17,9 @@ CFLAGS = -c -g -W \
 -D_POSIX_PTHREAD_SEMANTICS \
 -Wno-long-long \
 -Wformat \
--DHAS_MYSQL_DLL
+-DHAS_MYSQL_DLL \
+-Winvalid-pch \
+-DACL_PREPARE_COMPILE
 #-DHAS_POLARSSL
 #-DUSE_DYNAMIC
 # -Wcast-align
@@ -164,6 +166,7 @@ DATE_NOW = 20`date +%y`.`date +%m`.`date +%d`
 
 STATIC_LIBNAME = lib_acl_cpp.a
 SHARED_LIBNAME = lib_acl_cpp.so
+PCH = src/acl_stdafx.hpp.gch
 
 lib: static
 all: static shared sample
@@ -191,7 +194,7 @@ static: depends $(OBJS_DST)
 	@$(RANLIB) $(LIB_PATH_DST)/$(STATIC_LIBNAME)
 	@echo 'create $(LIB_PATH_DST)/$(STATIC_LIBNAME) ok!'
 
-shared: depends $(OBJS_DST)
+shared: depends pch $(OBJS_DST)
 	@echo 'creating $(SHARED_LIBNAME)'
 	@if test -n "$(rpath)" && test "$(UNIXTYPE)" = "LINUX"; then \
 		echo "building for linux"; \
@@ -218,6 +221,8 @@ shared: depends $(OBJS_DST)
 	fi
 
 depends: $(OBJS_DEF)
+pch: src/acl_stdafx.hpp
+	$(CC) -o $(PCH) -x c++-header $(CFLAGS) src/acl_stdafx.hpp
 
 # src
 $(OBJ_PATH_DST)/%.o: ./src/%.cpp
@@ -303,6 +308,7 @@ clean:
 	rm -f $(LIB_PATH_DST)/lib_acl_cpp.so
 	rm -f $(OBJS_DST)
 	rm -f $(OBJS_DEF)
+	rm -f $(PCH)
 	@(cd samples; make clean)
 
 rebuild rb: clean static

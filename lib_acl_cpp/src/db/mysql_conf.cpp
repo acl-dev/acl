@@ -1,5 +1,7 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/db/mysql_conf.hpp"
+#endif
 
 namespace acl {
 

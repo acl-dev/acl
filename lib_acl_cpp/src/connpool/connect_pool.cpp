@@ -1,8 +1,10 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/locker.hpp"
 #include "acl_cpp/connpool/connect_client.hpp"
 #include "acl_cpp/connpool/connect_pool.hpp"
+#endif
 
 namespace acl
 {

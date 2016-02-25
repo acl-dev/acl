@@ -35,6 +35,10 @@ public:
 	// 基类纯虚函数，从 redis 中获得数据
 	bool get_attrs(std::map<string, session_string>& attrs);
 
+	// 基类虚函数，从 redis 中获得数据
+	bool get_attrs(const std::vector<string>& names,
+		std::vector<session_string>& values);
+
 	// 基类纯虚函数，向 redis 中添加或修改数据
 	bool set_attrs(const std::map<string, session_string>& attrs);
 

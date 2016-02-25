@@ -24,6 +24,8 @@ public:
 	{
 		todo_ = ss.todo_;
 	}
+	session_string(const string& s) : string(s), todo_(TODO_NUL) {}
+	session_string(const char* s) : string(s), todo_(TODO_NUL) {}
 	~session_string() {}
 	todo_t todo_;
 };
@@ -170,6 +172,15 @@ public:
 	 * @return {bool}
 	 */
 	virtual bool get_attrs(std::map<string, session_string>& attrs) = 0;
+
+	/**
+	 * 从后端缓存中获得对应 sid 的指定属性集合
+	 * @param names {const std::vector<string>&} 属性名集合
+	 * @param values {std::vector<session_string>&} 存储对应的属性值结果集
+	 * @return {bool} 操作是否成功
+	 */
+	virtual bool get_attrs(const std::vector<string>& names,
+		std::vector<session_string>& values);
 
 	/**
 	 * 向后端缓存写入对应 sid 的属性对象集合

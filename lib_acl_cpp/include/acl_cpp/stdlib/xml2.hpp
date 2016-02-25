@@ -19,13 +19,11 @@ class ACL_CPP_API xml2_attr : public xml_attr
 public:
 	/**
 	 * @override
-	 * @return {const char*}
 	 */
 	const char* get_name() const;
 
 	/**
 	 * @override
-	 * @return {const char*}
 	 */
 	const char* get_value() const;
 
@@ -80,7 +78,12 @@ public:
 	/**
 	 * @override
 	 */
-	xml_node& set_text(const char* str);
+	xml_node& set_text(const char* str, bool append = false);
+
+	/**
+	 * @override
+	 */
+	xml_node& set_text(istream& in, size_t off = 0, size_t len = 0);
 
 	/**
 	 * @override
@@ -91,6 +94,11 @@ public:
 	 * @override
 	 */
 	int detach(void);
+
+	/**
+	 * @override
+	 */
+	xml_node& set_parent(xml_node* node);
 
 	/**
 	 * @override
@@ -114,7 +122,6 @@ public:
 
 	/**
 	 * @override
-	 * @return {bool}
 	 */
 	bool is_root(void) const;
 
@@ -127,7 +134,6 @@ public:
 	void set_xml2_node(ACL_XML2_NODE* node);
 
 	ACL_XML2_NODE* get_xml_node(void) const;
-	xml_node& set_parent(xml_node* node);
 
 protected:
 	friend class xml2;
@@ -205,7 +211,22 @@ public:
 	/**
 	 * @override
 	 */
+	xml& xml_encode(bool on);
+
+	/**
+	 * @override
+	 */
+	xml& xml_multi_root(bool on);
+
+	/**
+	 * @override
+	 */
 	void update(const char* data);
+
+	/**
+	 * @override
+	 */
+	bool complete(const char* root_tag);
 
 	/**
 	 * @override
@@ -264,6 +285,12 @@ public:
 	/**
 	 * @override
 	 */
+	xml_node& create_node(const char* tag, istream& in,
+		size_t off = 0, size_t len = 0);
+
+	/**
+	 * @override
+	 */
 	xml_node& get_root(void);
 
 	/**
@@ -285,6 +312,26 @@ public:
 	 * @override
 	 */
 	const char* to_string(size_t* len = NULL) const;
+
+	/**
+	 * @override
+	 */
+	size_t space(void) const;
+
+	/**
+	 * @override
+	 */
+	void space_clear(void);
+
+	/**
+	 * @override
+	 */
+	size_t node_count(void) const;
+
+	/**
+	 * @override
+	 */
+	size_t attr_count(void) const;
 
 public:
 	ACL_XML2* get_xml2(void) const

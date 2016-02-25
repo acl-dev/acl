@@ -10,8 +10,11 @@
 # endif
 # include "polarssl/ssl_cache.h"
 #endif
+
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/polarssl_conf.hpp"
+#endif
 
 namespace acl
 {

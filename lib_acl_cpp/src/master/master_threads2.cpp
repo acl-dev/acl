@@ -1,7 +1,9 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/master/master_threads2.hpp"
+#endif
 
 namespace acl
 {
@@ -200,11 +202,12 @@ void master_threads2::run_once(ACL_VSTREAM* client)
 	socket_stream* stream = (socket_stream*) client->context;
 	acl_assert(stream);
 	ACL_SOCKET fd = stream->sock_handle();
-	int   timeout = stream->get_rw_timeout();
 	int   ret;
 
 	while (true)
 	{
+		int   timeout = stream->get_rw_timeout();
+
 		if (ACL_VSTREAM_BFRD_CNT(client) > 0)
 		{
 			// 当函数返回 1 时表示 client 已经被关闭了

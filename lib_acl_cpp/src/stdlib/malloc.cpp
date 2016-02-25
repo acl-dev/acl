@@ -1,6 +1,8 @@
 #include "acl_stdafx.hpp"
 #include <new>
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/malloc.hpp"
+#endif
 
 #ifdef HOOK_NEW
 

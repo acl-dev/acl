@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include <assert.h>
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
@@ -6,6 +7,7 @@
 #include "acl_cpp/ipc/ipc_client.hpp"
 #include "acl_cpp/ipc/ipc_server.hpp"
 #include "acl_cpp/ipc/ipc_service.hpp"
+#endif
 
 namespace acl
 {

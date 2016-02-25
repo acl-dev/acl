@@ -81,8 +81,10 @@ VERSION = 3.1.4.4
 help:
 	@(echo "usage: make help|all|all_lib|all_samples|clean|install|uninstall|uninstall_all|build_bin|build_src|build_one")
 all_lib:
+	@(cd lib_acl; make pch)
 	@(cd lib_acl; make $(MAKE_ARGS))
 	@(cd lib_protocol; make $(MAKE_ARGS))
+	@(cd lib_acl_cpp; make pch)
 	@(cd lib_acl_cpp; make $(MAKE_ARGS))
 	@(cd lib_rpc; make $(MAKE_ARGS))
 all_samples: all_lib

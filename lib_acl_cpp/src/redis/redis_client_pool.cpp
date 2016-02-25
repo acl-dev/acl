@@ -1,6 +1,8 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/redis/redis_client.hpp"
 #include "acl_cpp/redis/redis_client_pool.hpp"
+#endif
 
 namespace acl
 {

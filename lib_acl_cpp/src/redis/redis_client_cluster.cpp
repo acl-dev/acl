@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include <vector>
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/redis/redis_cluster.hpp"
@@ -6,6 +7,7 @@
 #include "acl_cpp/redis/redis_client.hpp"
 #include "acl_cpp/redis/redis_client_pool.hpp"
 #include "acl_cpp/redis/redis_client_cluster.hpp"
+#endif
 
 namespace acl
 {

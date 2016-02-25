@@ -1,8 +1,10 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/master/master_udp.hpp"
+#endif
 
 namespace acl
 {

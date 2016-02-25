@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
@@ -7,6 +8,7 @@
 #include "acl_cpp/stdlib/url_coder.hpp"
 #include "acl_cpp/http/HttpCookie.hpp"
 #include "acl_cpp/http/http_header.hpp"
+#endif
 
 namespace acl
 {

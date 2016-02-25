@@ -1,9 +1,11 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include <stdarg.h>
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/beanstalk/beanstalk.hpp"
+#endif
 
 namespace acl
 {

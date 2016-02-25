@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/xml.hpp"
@@ -15,6 +16,7 @@
 #include "acl_cpp/http/http_ctype.hpp"
 #include "acl_cpp/http/http_pipe.hpp"
 #include "acl_cpp/http/http_request.hpp"
+#endif
 
 namespace acl
 {

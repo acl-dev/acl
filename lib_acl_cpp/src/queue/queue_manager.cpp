@@ -1,8 +1,10 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/queue/queue_manager.hpp"
+#endif
 
 #ifdef ACL_WINDOWS
 #define PATH_SEP	'\\'

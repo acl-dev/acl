@@ -1,8 +1,10 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include <utility>
 #include <stdarg.h>
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/string.hpp"
+#endif
 
 #define ALLOC(n) acl_vstring_alloc((n))
 #define FREE(x) acl_vstring_free((x))
@@ -63,8 +65,7 @@ string::string(const void* s, size_t n) : use_bin_(false)
 	TERM(vbf_);
 }
 
-#if !defined(_WIN32) && !defined(_WIN64)
-string::string(int fd, size_t max, size_t n)
+string::string(ACL_FILE_HANDLE fd, size_t max, size_t n)
 {
 	if (n < 1)
 		n = 1;
@@ -79,7 +80,6 @@ string::string(int fd, size_t max, size_t n)
 	line_state_ = NULL;
 	line_state_offset_ = 0;
 }
-#endif
 
 string::~string()
 {

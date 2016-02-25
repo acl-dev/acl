@@ -1,5 +1,4 @@
 #include "acl_stdafx.hpp"
-#include <string.h>
 
 #ifndef HAVE_H_ICONV
 # define HAVE_H_ICONV
@@ -11,9 +10,12 @@
 # endif
 #endif
 
+#ifndef ACL_PREPARE_COMPILE
+#include <string.h>
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/charset_conv.hpp"
+#endif
 
 #define SCOPY ACL_SAFE_STRNCPY
 

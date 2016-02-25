@@ -1,8 +1,10 @@
 #include "acl_stdafx.hpp"
 #include "sqlite3.h"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/charset_conv.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/db/db_sqlite.hpp"
+#endif
 
 #if defined(HAS_SQLITE) || defined(HAS_SQLITE_DLL)
 

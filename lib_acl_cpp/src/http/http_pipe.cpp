@@ -1,7 +1,9 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/charset_conv.hpp"
 #include "acl_cpp/stdlib/pipe_stream.hpp"
 #include "acl_cpp/http/http_pipe.hpp"
+#endif
 
 namespace acl
 {

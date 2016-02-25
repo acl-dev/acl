@@ -1,6 +1,8 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/http/http_request.hpp"
 #include "acl_cpp/http/http_request_pool.hpp"
+#endif
 
 namespace acl
 {

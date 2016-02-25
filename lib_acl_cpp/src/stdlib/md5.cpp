@@ -3,12 +3,14 @@
  * building the SSL support.
  */
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include <string.h>
 #include "acl_cpp/stream/istream.hpp"
 #include "acl_cpp/stream/ifstream.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/md5.hpp"
+#endif
 
 #ifdef WORDS_BIGENDIAN
 static void byteSwap(uint32_t * buf, unsigned words)

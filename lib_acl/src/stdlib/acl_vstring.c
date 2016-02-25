@@ -93,6 +93,7 @@ static int vstring_extend(ACL_VBUF *bp, ssize_t incr)
 		memcpy(bp->data, data, used);
 		acl_dbuf_pool_free(vp->dbuf, data);
 	} else if (vp->fd != ACL_FILE_INVALID) {
+#ifdef ACL_UNIX
 		acl_off_t off = new_len - 1;
 		if (acl_lseek(vp->fd, off, SEEK_SET) != (acl_off_t) off)
 			acl_msg_fatal("lseek failed: %s, off: %lld",
@@ -102,6 +103,7 @@ static int vstring_extend(ACL_VBUF *bp, ssize_t incr)
 		{
 			acl_msg_fatal("write error: %s", acl_last_serror());
 		}
+#endif
 	} else
 		bp->data = (unsigned char *) acl_myrealloc(bp->data, new_len);
 
@@ -176,6 +178,11 @@ void acl_vstring_free_buf(ACL_VSTRING *vp)
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_last_serror());
 	}
+#elif defined(_WIN32) || defined(_WIN64)
+	if (vp->fd != ACL_FILE_INVALID && vp->hmap != NULL) {
+		UnmapViewOfFile(vp->vbuf.data);
+		CloseHandle(vp->hmap);
+	}
 #endif
 	else if (vp->dbuf == NULL)
 		acl_myfree(vp->vbuf.data);
@@ -211,6 +218,9 @@ ACL_VSTRING *acl_vstring_slice_alloc(ACL_SLICE_POOL *slice, size_t len)
 	}
 
 	vp->fd = ACL_FILE_INVALID;
+#if defined(_WIN32) || defined(_WIN64)
+	vp->hmap = NULL;
+#endif
 	vp->vbuf.flags = 0;
 	vp->vbuf.len = (int) len;
 	ACL_VSTRING_RESET(vp);
@@ -245,6 +255,9 @@ ACL_VSTRING *acl_vstring_dbuf_alloc(ACL_DBUF_POOL *dbuf, size_t len)
 	}
 
 	vp->fd = ACL_FILE_INVALID;
+#if defined(_WIN32) || defined(_WIN64)
+	vp->hmap = NULL;
+#endif
 	vp->vbuf.flags = 0;
 	vp->vbuf.len = (int) len;
 	ACL_VSTRING_RESET(vp);
@@ -258,19 +271,30 @@ ACL_VSTRING *acl_vstring_dbuf_alloc(ACL_DBUF_POOL *dbuf, size_t len)
 	return vp;
 }
 
-static void vstring_buf_init(ACL_VSTRING *vp, ssize_t init_len)
+static void mmap_buf_init(ACL_VSTRING *vp)
 {
-	if (acl_lseek(vp->fd, init_len, SEEK_SET) != init_len)
+#ifdef ACL_UNIX
+	if (acl_lseek(vp->fd, vp->vbuf.len, SEEK_SET) != vp->vbuf.len)
 		acl_msg_fatal("lseek failed: %s, off: %ld",
-			acl_last_serror(), (long) init_len);
+			acl_last_serror(), (long) vp->vbuf.len);
 	if (acl_file_write(vp->fd, "\0", 1, 0, NULL, NULL) == ACL_VSTREAM_EOF)
 		acl_msg_fatal("write error: %s", acl_last_serror());
+#endif
 
 #ifdef ACL_UNIX
 	vp->vbuf.data = (unsigned char*) mmap(NULL, vp->maxlen,
 			PROT_READ | PROT_WRITE, MAP_SHARED, vp->fd, 0);
 	if (vp->vbuf.data == MAP_FAILED)
 		acl_msg_fatal("mmap error: %s", acl_last_serror());
+#elif defined(_WIN32) || defined(_WIN64)
+	vp->hmap = CreateFileMapping(vp->fd, NULL, PAGE_READWRITE, 0,
+		vp->maxlen, NULL);
+	if (vp->hmap == NULL)
+		acl_msg_fatal("CreateFileMapping: %s", acl_last_serror());
+	vp->vbuf.data = (unsigned char *) MapViewOfFile(vp->hmap,
+		FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+	if (vp->vbuf.data == NULL)
+		acl_msg_fatal("MapViewOfFile error: %s", acl_last_serror());
 #else
 	acl_msg_fatal("%s: not supported yet!", __FUNCTION__);
 #endif
@@ -302,7 +326,7 @@ ACL_VSTRING *acl_vstring_mmap_alloc(ACL_FILE_HANDLE fd,
 	vp->vbuf.ctx = NULL;
 	vp->maxlen = max_len;
 
-	vstring_buf_init(vp, init_len);
+	mmap_buf_init(vp);
 
 	ACL_VSTRING_RESET(vp);
 	vp->vbuf.data[0] = 0;
@@ -319,6 +343,9 @@ void acl_vstring_free(ACL_VSTRING *vp)
 		acl_slice_pool_free(__FILE__, __LINE__, vp);
 #ifdef ACL_UNIX
 	else if (vp->fd != ACL_FILE_INVALID)
+		acl_myfree(vp);
+#elif defined(_WIN32) || defined(_WIN64)
+	else if (vp->hmap != NULL)
 		acl_myfree(vp);
 #endif
 	else if (vp->dbuf == NULL)
@@ -449,6 +476,8 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 
 	acl_vstring_free_buf(vp);
 
+	vp->vbuf.len = (ssize_t) len;
+
 	if (vp->slice != NULL)
 		vp->vbuf.data = (unsigned char *) acl_slice_pool_alloc(
 			__FILE__, __LINE__, vp->slice, len);
@@ -459,14 +488,19 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 	else if (vp->fd != ACL_FILE_INVALID) {
 		if (len > (size_t) vp->maxlen)
 			vp->maxlen = (ssize_t) len;
-		vstring_buf_init(vp, len);
+		mmap_buf_init(vp);
+	}
+#elif defined(_WIN32) || defined(_WIN64)
+	else if (vp->fd != ACL_FILE_INVALID && vp->hmap != NULL) {
+		if (len > (size_t) vp->maxlen)
+			vp->maxlen = (ssize_t) len;
+		mmap_buf_init(vp);
 	}
 #endif
 	else
 		vp->vbuf.data = acl_mymalloc(len);
 
 	memcpy(vp->vbuf.data, src, len);
-	vp->vbuf.len = (ssize_t) len;
 	ACL_VSTRING_AT_OFFSET(vp, len);
 	ACL_VSTRING_TERMINATE(vp);
 

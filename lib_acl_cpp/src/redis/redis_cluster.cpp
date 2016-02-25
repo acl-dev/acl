@@ -1,10 +1,11 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/redis/redis_node.hpp"
 #include "acl_cpp/redis/redis_slot.hpp"
 #include "acl_cpp/redis/redis_cluster.hpp"
-
+#endif
 
 namespace acl
 {

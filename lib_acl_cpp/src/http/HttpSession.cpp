@@ -1,6 +1,8 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/session/session.hpp"
 #include "acl_cpp/http/HttpSession.hpp"
+#endif
 
 namespace acl
 {
@@ -35,6 +37,17 @@ const void* HttpSession::getAttribute(const char* name, size_t* size) const
 	return bf->c_str();
 }
 
+bool HttpSession::getAttributes(std::map<string, session_string>& attrs) const
+{
+	return const_cast<HttpSession*> (this)->session_.get_attrs(attrs);
+}
+
+bool HttpSession::getAttributes(const std::vector<string>& names,
+	std::vector<session_string>& values) const
+{
+	return const_cast<HttpSession*> (this)->session_.get_attrs(names, values);
+}
+
 bool HttpSession::setAttribute(const char* name, const char* value)
 {
 	return setAttribute(name, value, strlen(value));
@@ -43,6 +56,11 @@ bool HttpSession::setAttribute(const char* name, const char* value)
 bool HttpSession::setAttribute(const char* name, const void* value, size_t len)
 {
 	return session_.set(name, value, len);
+}
+
+bool HttpSession::setAttributes(const std::map<string, session_string>& attrs)
+{
+	return session_.set_attrs(attrs);
 }
 
 bool HttpSession::removeAttribute(const char* name)

@@ -176,6 +176,7 @@ void *acl_default_malloc(const char *filename, int line, size_t len)
 	if (len < 1) {
 		acl_msg_warn("%s(%d), %s: malloc: length %ld invalid",
 			pname, line, myname, (long) len);
+		acl_trace_info();
 		len = 128;
 	}
 
@@ -186,6 +187,7 @@ void *acl_default_malloc(const char *filename, int line, size_t len)
 	else if (new_len >= __malloc_limit) {
 		acl_msg_warn("%s(%d): new_len(%d) too large",
 			myname, __LINE__, (int) new_len);
+		acl_trace_info();
 	}
 
 #ifdef	_USE_GLIB
@@ -245,6 +247,7 @@ void *acl_default_realloc(const char *filename, int line,
 	if (len < 1) {
 		acl_msg_warn("%s(%d)->%s: realloc: requested length %ld",
 			pname, line, myname, (long) len);
+		acl_trace_info();
 		len = 128;
 	}
 
@@ -260,6 +263,7 @@ void *acl_default_realloc(const char *filename, int line,
 	else if (new_len >= __malloc_limit) {
 		acl_msg_warn("%s(%d): new_len(%d) too large",
 			myname, __LINE__, (int) new_len);
+		acl_trace_info();
 	}
 
 #ifdef	_USE_GLIB

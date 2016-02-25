@@ -1,9 +1,11 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/connpool/connect_client.hpp"
 #include "acl_cpp/db/db_handle.hpp"
 #include "acl_cpp/db/db_mysql.hpp"
 #include "acl_cpp/db/mysql_conf.hpp"
 #include "acl_cpp/db/mysql_pool.hpp"
+#endif
 
 namespace acl
 {

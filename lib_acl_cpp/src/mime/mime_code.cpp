@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/mime/mime_define.hpp"
@@ -7,6 +8,7 @@
 #include "acl_cpp/mime/mime_xxcode.hpp"
 #include "acl_cpp/mime/mime_quoted_printable.hpp"
 #include "acl_cpp/mime/mime_code.hpp"
+#endif
 
 namespace acl {
 

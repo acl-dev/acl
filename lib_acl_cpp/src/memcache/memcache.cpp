@@ -1,9 +1,11 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/mime/rfc2047.hpp"
 #include "acl_cpp/memcache/memcache.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
+#endif
 
 #define	SPECIAL_CHAR(x)	((x) == ' ' || (x) == '\t' || (x) == '\r' || (x) == '\n')
 

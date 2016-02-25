@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/log.hpp"
@@ -7,6 +8,7 @@
 #include "acl_cpp/redis/redis_result.hpp"
 #include "acl_cpp/redis/redis_connection.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
+#endif
 #include "redis_request.hpp"
 
 namespace acl

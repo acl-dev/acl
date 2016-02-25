@@ -40,6 +40,7 @@ ACL_XML2_ATTR *acl_xml2_attr_alloc(ACL_XML2_NODE *node)
 	attr->backslash  = 0;
 
 	acl_array_append(node->attr_list, attr);
+	node->xml->attr_cnt++;
 
 	return attr;
 }
@@ -163,6 +164,12 @@ int acl_xml2_node_delete(ACL_XML2_NODE *node)
 	if (node->id != NULL)
 		acl_htable_delete(node->xml->id_table, node->id, NULL);
 
+	if (node->attr_list != NULL) {
+		int k = acl_array_size(node->attr_list);
+		if (node->xml->attr_cnt >= k)
+			node->xml->attr_cnt -= k;
+	}
+
 	acl_ring_detach(&node->node);
 	node->xml->node_cnt--;
 
@@ -219,7 +226,7 @@ ACL_XML2_NODE *acl_xml2_node_prev(ACL_XML2_NODE *node)
 	return acl_ring_to_appl(ring_ptr, ACL_XML2_NODE, node);
 }
 
-static ACL_XML2_NODE *xml_iter_head(ACL_ITER *it, ACL_XML2 *xml)
+static ACL_XML2_NODE *xml_iter_head(ACL_ITER *it, const ACL_XML2 *xml)
 {
 	ACL_RING *ring_ptr;
 
@@ -242,7 +249,7 @@ static ACL_XML2_NODE *xml_iter_head(ACL_ITER *it, ACL_XML2 *xml)
 	return it->ptr;
 }
 
-static ACL_XML2_NODE *xml_iter_next(ACL_ITER *it, ACL_XML2 *xml)
+static ACL_XML2_NODE *xml_iter_next(ACL_ITER *it, const ACL_XML2 *xml)
 {
 	ACL_RING *ring_ptr;
 	struct ACL_XML2_NODE *node, *parent;
@@ -297,7 +304,7 @@ static ACL_XML2_NODE *xml_iter_next(ACL_ITER *it, ACL_XML2 *xml)
 	return NULL;
 }
 
-static ACL_XML2_NODE *xml_iter_tail(ACL_ITER *it, ACL_XML2 *xml)
+static ACL_XML2_NODE *xml_iter_tail(ACL_ITER *it, const ACL_XML2 *xml)
 {
 	ACL_RING *ring_ptr;
 
@@ -318,7 +325,7 @@ static ACL_XML2_NODE *xml_iter_tail(ACL_ITER *it, ACL_XML2 *xml)
 	return it->ptr;
 }
 
-static ACL_XML2_NODE *xml_iter_prev(ACL_ITER *it, ACL_XML2 *xml)
+static ACL_XML2_NODE *xml_iter_prev(ACL_ITER *it, const ACL_XML2 *xml)
 {
 	ACL_RING *ring_ptr;
 	struct ACL_XML2_NODE *node, *parent;
@@ -396,6 +403,14 @@ void acl_xml2_decode_enable(ACL_XML2 *xml, int on)
 		xml->flag &= ~ACL_XML2_FLAG_XML_DECODE;
 }
 
+void acl_xml2_encode_enable(ACL_XML2 *xml, int on)
+{
+	if (on)
+		xml->flag |= ACL_XML2_FLAG_XML_ENCODE;
+	else
+		xml->flag &=~ACL_XML2_FLAG_XML_ENCODE;
+}
+
 ACL_XML2 *acl_xml2_mmap_file(const char *filepath, size_t max_len,
 	size_t init_len, ACL_DBUF_POOL *dbuf)
 {
@@ -469,7 +484,9 @@ ACL_XML2 *acl_xml2_dbuf_alloc(ACL_VSTRING *vbuf, ACL_DBUF_POOL *dbuf)
 	xml->vbuf_inner = NULL;
 	xml->dummy[0]   = '\0';
 	xml->dbuf_keep  = sizeof(ACL_XML2);
-	xml->flag      |= ACL_XML2_FLAG_MULTI_ROOT;
+	xml->flag       = ACL_XML2_FLAG_MULTI_ROOT |
+			  ACL_XML2_FLAG_XML_ENCODE |
+			  ACL_XML2_FLAG_XML_DECODE;
 
 	xml->iter_head  = xml_iter_head;
 	xml->iter_next  = xml_iter_next;
@@ -479,8 +496,19 @@ ACL_XML2 *acl_xml2_dbuf_alloc(ACL_VSTRING *vbuf, ACL_DBUF_POOL *dbuf)
 	xml->id_table   = acl_htable_create(100, 0);
 	xml->root       = acl_xml2_node_alloc(xml);
 	xml->node_cnt   = 1;
+	xml->attr_cnt   = 0;
 
 	return xml;
+}
+
+size_t acl_xml2_space(ACL_XML2 *xml)
+{
+	return LEN(xml->vbuf);
+}
+
+void acl_xml2_space_clear(ACL_XML2 *xml)
+{
+	ACL_VSTRING_RESET(xml->vbuf);
 }
 
 int acl_xml2_free(ACL_XML2 *xml)
@@ -517,6 +545,7 @@ void acl_xml2_reset(ACL_XML2 *xml)
 	xml->depth     = 0;
 	xml->node_cnt  = 1;
 	xml->root_cnt  = 0;
+	xml->attr_cnt  = 0;
 	xml->curr_node = NULL;
 }
 

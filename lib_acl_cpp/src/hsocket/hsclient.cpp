@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include <stdarg.h>
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
@@ -9,6 +10,7 @@
 #include "acl_cpp/hsocket/hsproto.hpp"
 #include "acl_cpp/hsocket/hserror.hpp"
 #include "acl_cpp/hsocket/hsclient.hpp"
+#endif
 
 namespace acl
 {

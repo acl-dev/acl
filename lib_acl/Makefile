@@ -27,6 +27,8 @@ CFLAGS = -c -g -W \
 -Wno-long-long \
 -Wuninitialized \
 -D_POSIX_PTHREAD_SEMANTICS \
+-DACL_PREPARE_COMPILE \
+-Winvalid-pch
 #-Wno-invalid-source-encoding \
 #-Wno-extended-offsetof
 #-Wcast-align
@@ -280,7 +282,7 @@ endif
 clean: clean_lib clean_master
 rebuild: clean all
 
-LIB_GCH = StdAfx.h.gch
+PCH = StdAfx.h.gch
 
 ###########################################################
 
@@ -328,8 +330,8 @@ shared: depends $(OBJS_DST)
 
 depends: $(OBJS_DEF)
 
-lib_gch: include/StdAfx.h
-	$(CC) -o include/$(LIB_GCH) -x c-header $(CFLAGS) include/StdAfx.h
+pch: StdAfx.h
+	$(CC) -o $(PCH) -x c-header $(CFLAGS) StdAfx.h
 
 ###########################################################
 
@@ -518,7 +520,7 @@ clean_lib:
 	rm -f $(LIB_PATH_DST)/lib_acl.so
 	rm -f $(OBJS_DST)
 	rm -f $(OBJS_DEF)
-	rm -f include/$(LIB_GCH)
+	rm -f $(PCH)
 
 ###########################################################
 

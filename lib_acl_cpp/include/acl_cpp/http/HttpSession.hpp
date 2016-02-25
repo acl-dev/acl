@@ -1,6 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
-#include "acl_cpp/stdlib//dbuf_pool.hpp"
+#include "acl_cpp/stdlib/dbuf_pool.hpp"
+#include "acl_cpp/session/session.hpp"
 #include <map>
 
 namespace acl {
@@ -43,6 +44,22 @@ public:
 	virtual const void* getAttribute(const char* name, size_t* size) const;
 
 	/**
+	 * 从服务端获得对应客户端的所有会话属性对象，这样可以减少与服务端的交互次数
+	 * @param attrs {std::map<string, session_string>&}
+	 * @return {bool} 是否成功
+	 */
+	virtual bool getAttributes(std::map<string, session_string>& attrs) const;
+
+	/**
+	 * 从服务端获得对应客户端的相应属性集合
+	 * @param names {const std::vector<string>&} 属性名集合
+	 * @param values {std::vector<session_string>&} 存储对应的属性值结果集
+	 * @return {bool} 是否成功
+	 */
+	virtual bool getAttributes(const std::vector<string>& names,
+		std::vector<session_string>& values) const;
+
+	/**
 	 * 在设置服务端设置 session 的字符串属性值
 	 * @param name {const char*} session 属性名，非空
 	 * @param value {const char*} session 属性值，非空
@@ -58,6 +75,13 @@ public:
 	 * @return {bool} 返回 false 说明设置失败
 	 */
 	virtual bool setAttribute(const char* name, const void* value, size_t len);
+
+	/**
+	 * 在服务端设置 session 属性集合，这样可以减少与后端的交互次数
+	 * @param attrs {const std::map<string, session_string>&} 属性集合对象
+	 * @return {bool} 设置是否成功
+	 */
+	virtual bool setAttributes(const std::map<string, session_string>& attrs);
 
 	/**
 	 * 删除客户端 session 中的某个属性值

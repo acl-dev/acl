@@ -1,11 +1,13 @@
 #include "acl_stdafx.hpp"
+#include "internal/tok822.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include <string.h>
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/mime/rfc2047.hpp"
-#include "internal/tok822.hpp"
 #include "acl_cpp/mime/rfc822.hpp"
+#endif
 
 namespace acl {
 

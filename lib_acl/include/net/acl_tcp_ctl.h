@@ -69,8 +69,9 @@ ACL_API void acl_tcp_so_linger(ACL_SOCKET fd, int onoff, int timeout);
 /**
  * 获得 TCP 套接字的 linger 值
  * @param fd {ACL_SOCKET} 套接字
- * @return {int} 返回 -1 表示未设置 linger 选项或内部出错，>= 0 表示设置了 linger
- *  选项且该值表示套接字关闭后该 TCP 连接在内核中维持 TIME_WAIT 状态的逗留时间(秒)
+ * @return {int} 返回 -1 表示未设置 linger 选项或内部出错，>= 0 表示设置了
+ *  linger 选项且该值表示套接字关闭后该 TCP 连接在内核中维持 TIME_WAIT 状态
+ *  的逗留时间(秒)
  */
 ACL_API int acl_get_tcp_solinger(ACL_SOCKET fd);
 
@@ -82,6 +83,13 @@ ACL_API int acl_get_tcp_solinger(ACL_SOCKET fd);
  *  给应用
  */
 ACL_API void acl_tcp_defer_accept(ACL_SOCKET fd, int timeout);
+
+/**
+ * 设置监听套接字的快速建立 TCP 连接过程(需要内核支持)
+ * @param fd {ACL_SOCKET}
+ * @param on {int} 非 0 时打开此功能，否则关闭此功能
+ */
+ACL_API void acl_tcp_fastopen(ACL_SOCKET fd, int on);
 
 #ifdef __cplusplus
 }

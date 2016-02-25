@@ -1,8 +1,10 @@
 #include "acl_stdafx.hpp"
 #include "internal/mime_state.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/mime/rfc822.hpp"
 #include "acl_cpp/mime/mime_head.hpp"
+#endif
 
 namespace acl {
 

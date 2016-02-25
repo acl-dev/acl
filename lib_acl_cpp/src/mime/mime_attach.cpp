@@ -1,7 +1,9 @@
 #include "acl_stdafx.hpp"
 #include "internal/mime_state.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/mime/rfc2047.hpp"
 #include "acl_cpp/mime/mime_attach.hpp"
+#endif
 
 namespace acl {
 

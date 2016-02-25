@@ -1,7 +1,9 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/aio_delay_free.hpp"
+#endif
 #include "aio_timer_delay_free.hpp"
 
 namespace acl

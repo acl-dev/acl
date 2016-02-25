@@ -89,11 +89,31 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int block_mode)
 
 	on = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
-		(char *) &on, sizeof(on)) < 0)
+		(const void *) &on, sizeof(on)) < 0)
 	{
 		acl_msg_error("%s: setsockopt(SO_REUSEADDR): %s",
 			myname, acl_last_serror());
 	}
+
+#ifdef SO_REUSEPORT
+	on = 1;
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT,
+		(const void *) &on, sizeof(on)) < 0)
+	{
+		acl_msg_error("%s: setsocket(SO_REUSEPORT): %s",
+			myname, acl_last_serror());
+	}
+#endif
+
+#if defined(TCP_FASTOPEN) && defined(USE_FASTOPEN)
+	on = 1;
+	if (setsockopt(sock, IPPROTO_TCP, TCP_FASTOPEN,
+		(const void *) &on, sizeof(on)) < 0)
+	{
+		acl_msg_error("%s: setsocket(TCP_FASTOPEN): %s",
+			myname, acl_last_serror());
+	}
+#endif
 
 	if (bind(sock, (struct sockaddr *) &sa, sizeof(struct sockaddr)) < 0) {
 		acl_msg_error("%s: bind %s error %s",

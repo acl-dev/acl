@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/mime/mime_code.hpp"
@@ -6,6 +7,7 @@
 #include "acl_cpp/stream/ostream.hpp"
 #include "acl_cpp/stream/ifstream.hpp"
 #include "acl_cpp/smtp/mail_attach.hpp"
+#endif
 
 namespace acl {
 

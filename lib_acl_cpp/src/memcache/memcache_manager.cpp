@@ -1,6 +1,8 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/memcache/memcache_pool.hpp"
 #include "acl_cpp/memcache/memcache_manager.hpp"
+#endif
 
 namespace acl
 {

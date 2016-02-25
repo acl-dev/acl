@@ -2,7 +2,7 @@
 // 或是常用但不常更改的项目特定的包含文件
 //
 
-#pragma once
+//#pragma once
 
 //#define WIN32_LEAN_AND_MEAN		// 从 Windows 头中排除极少使用的资料
 
@@ -12,6 +12,19 @@
 
 #include "lib_acl.h"
 #include "lib_protocol.h"
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <stdarg.h>
+#include <assert.h>
+#include <vector>
+#include <map>
+#include <list>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include "acl_cpp/stdlib/malloc.hpp"
 
@@ -33,7 +46,13 @@
 # define NEW new
 #endif
 
-// 加入下面一行可以加快在 VC 下的编译速度
-#if defined(_WIN32) || defined(_WIN64)
-#include "acl_cpp/lib_acl.hpp"
+#if defined(ACL_UNIX)
+#include <pthread.h>
+#include <unistd.h>
+#include <zlib.h>
 #endif
+
+// 加入下面一行可以加快在 VC 下的编译速度
+//#if defined(_WIN32) || defined(_WIN64)
+#include "acl_cpp/lib_acl.hpp"
+//#endif

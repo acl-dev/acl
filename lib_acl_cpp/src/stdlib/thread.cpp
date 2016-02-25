@@ -1,7 +1,10 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/thread.hpp"
+#endif
+
 #ifdef	ACL_FREEBSD
 #include <pthread_np.h>
 #endif

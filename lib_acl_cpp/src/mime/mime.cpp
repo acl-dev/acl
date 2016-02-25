@@ -1,6 +1,7 @@
 #include "acl_stdafx.hpp"
 #include "internal/mime_state.hpp"
 #include "internal/header_opts.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/xml.hpp"
 #include "acl_cpp/stream/ifstream.hpp"
@@ -15,8 +16,8 @@
 #include "acl_cpp/mime/mime_xxcode.hpp"
 #include "acl_cpp/mime/mime_quoted_printable.hpp"
 #include "acl_cpp/mime/rfc2047.hpp"
-
 #include "acl_cpp/mime/mime.hpp"
+#endif
 
 namespace acl {
 

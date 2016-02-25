@@ -286,7 +286,6 @@ AGAIN:
 	}
 
 	if (read_cnt > 0) {
-		in->read_ptr = in->read_buf;
 		in->flag &= ~ACL_VSTREAM_FLAG_BAD;
 		in->errnum = 0;
 		in->errbuf[0] = 0;
@@ -329,20 +328,25 @@ AGAIN:
 	return -1;
 }
 
-static int read_once(ACL_VSTREAM *fp)
+static int read_to_buffer(ACL_VSTREAM *fp, void *buf, size_t size)
 {
-	fp->read_cnt = sys_read(fp, fp->read_buf, (size_t) fp->read_buf_len);
-
-	if (fp->read_cnt < 0) {
-		fp->read_cnt = 0;
+	int n = sys_read(fp, buf, size);
+	if (n <= 0)
 		return -1;
-	} else
-		return fp->read_cnt;
+	return n;
+}
+
+static int read_buffed(ACL_VSTREAM *fp)
+{
+	fp->read_ptr = fp->read_buf;
+	fp->read_cnt =  read_to_buffer(fp, fp->read_buf,
+		(size_t) fp->read_buf_len);
+	return fp->read_cnt;
 }
 
 static int read_char(ACL_VSTREAM *fp)
 {
-	fp->read_cnt = read_once(fp);
+	fp->read_cnt = read_buffed(fp);
 	if (fp->read_cnt <= 0)
 		return ACL_VSTREAM_EOF;
 	else
@@ -353,7 +357,7 @@ int acl_vstream_getc(ACL_VSTREAM *fp)
 {
 	if (fp == NULL)
 		return ACL_VSTREAM_EOF;
-	if (fp->read_cnt <= 0 && read_once(fp) <= 0)
+	if (fp->read_cnt <= 0 && read_buffed(fp) <= 0)
 		return ACL_VSTREAM_EOF;
 
 	fp->read_cnt--;
@@ -427,7 +431,7 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *fp, char *buf, int size)
 	fp->rw_timeout = 0;
 	fp->errnum = 0;
 
-	read_cnt = read_once(fp);
+	read_cnt = read_buffed(fp);
 
 	fp->rw_timeout = rw_timeout;
 
@@ -911,15 +915,18 @@ int acl_vstream_readn(ACL_VSTREAM *fp, void *buf, size_t size)
 
 	if (size_saved  < (size_t) fp->read_buf_len / 4) {
 		while (size > 0) {
-			if (read_once(fp) <= 0)
+			if (read_buffed(fp) <= 0)
 				return ACL_VSTREAM_EOF;
 			n = acl_vstream_bfcp_some(fp, ptr, size);
 			ptr += n;
 			size -= n;
 		}
-	} else {
+	}
+
+	/* 否则，则直接将读到的数据存入缓冲区，从而避免大数据的二次拷贝 */
+	else {
 		while (size > 0) {
-			n = sys_read(fp, ptr, size);
+			n = read_to_buffer(fp, ptr, size);
 			if (n <= 0)
 				return ACL_VSTREAM_EOF;
 			size -= n;
@@ -950,8 +957,15 @@ int acl_vstream_read(ACL_VSTREAM *fp, void *buf, size_t size)
 		return acl_vstream_bfcp_some(fp, (unsigned char*) buf, size);
 
 	/* fp->read_cnt == 0 */
+
+	/* 当缓冲区较大时，则直接将数据读到该缓冲区从而避免大数据拷贝 */
+	if (size >= (size_t) fp->read_buf_len / 4) {
+		int n = read_to_buffer(fp, buf, size);
+		return n <= 0 ? ACL_VSTREAM_EOF : n;
+	}
+	/* 否则将数据读到流缓冲区中，然后再拷贝，从而减少 read 次数 */
 	else {
-		int   read_cnt = read_once(fp);
+		int   read_cnt = read_buffed(fp);
 		if (read_cnt <= 0)
 			return ACL_VSTREAM_EOF;
 		return acl_vstream_bfcp_some(fp, (unsigned char*) buf, size);
@@ -1033,7 +1047,7 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	 */
 
 	if (fp->read_ready) {
-		if (read_once(fp) <= 0) {
+		if (read_buffed(fp) <= 0) {
 			n = (int) LEN(buf) - n;
 			return n >= 0 ? n : ACL_VSTREAM_EOF;
 		}
@@ -1103,7 +1117,7 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	 */
 
 	if (fp->read_ready) {
-		if (read_once(fp) <= 0) {
+		if (read_buffed(fp) <= 0) {
 			n = (int) LEN(buf) - n;
 
 			return n >= 0 ? n : ACL_VSTREAM_EOF;
@@ -1166,7 +1180,7 @@ int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
 	 */
 
 	if (fp->read_ready) {
-		if (read_once(fp) <= 0) {
+		if (read_buffed(fp) <= 0) {
 			int   n = cnt_saved - cnt;
 			return n >= 0 ? n : ACL_VSTREAM_EOF;
 		}
@@ -1217,7 +1231,7 @@ int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 	 */
 
 	if (fp->read_ready) {
-		if (read_once(fp) <= 0) {
+		if (read_buffed(fp) <= 0) {
 			n = (int) LEN(buf) - n;
 			return n >= 0 ? n : ACL_VSTREAM_EOF;
 		}
@@ -1249,7 +1263,7 @@ int acl_vstream_can_read(ACL_VSTREAM *fp)
 	else if (fp->read_ready == 0)
 		return 0;
 	else if ((fp->flag & ACL_VSTREAM_FLAG_PREREAD) != 0) {
-		if (read_once(fp) <= 0)
+		if (read_buffed(fp) <= 0)
 			return ACL_VSTREAM_EOF;
 		else
 			return 1;
@@ -2045,7 +2059,7 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	}
 #endif
 
-	if (acl_is_listening_socket(fd)) {
+	if (fd != ACL_SOCKET_INVALID && acl_is_listening_socket(fd)) {
 		int ret = acl_getsocktype(fd);
 		if (ret == AF_INET)
 			fdtype |= ACL_VSTREAM_TYPE_LISTEN_INET;

@@ -27,6 +27,7 @@ ACL_XML_ATTR *acl_xml_attr_alloc(ACL_XML_NODE *node)
 	attr->backslash = 0;
 
 	acl_array_append(node->attr_list, attr);
+	node->xml->attr_cnt++;
 
 	return attr;
 }
@@ -145,6 +146,12 @@ int acl_xml_node_delete(ACL_XML_NODE *node)
 
 	if (node->id != NULL)
 		acl_htable_delete(node->xml->id_table, STR(node->id), NULL);
+
+	if (node->attr_list != NULL) {
+		int k = acl_array_size(node->attr_list);
+		if (node->xml->attr_cnt >= k)
+			node->xml->attr_cnt -= k;
+	}
 
 	acl_ring_detach(&node->node);
 	node->xml->node_cnt--;
@@ -376,6 +383,8 @@ void acl_xml_decode_enable(ACL_XML *xml, int on)
 	if (on) {
 		if (xml->decode_buf == NULL)
 			xml->decode_buf = acl_vstring_alloc(256);
+		else
+			ACL_VSTRING_RESET(xml->decode_buf);
 		xml->flag |= ACL_XML_FLAG_XML_DECODE;
 	} else {
 		if (xml->decode_buf != NULL) {
@@ -384,6 +393,14 @@ void acl_xml_decode_enable(ACL_XML *xml, int on)
 		}
 		xml->flag &= ~ACL_XML_FLAG_XML_DECODE;
 	}
+}
+
+void acl_xml_encode_enable(ACL_XML *xml, int on)
+{
+	if (on)
+		xml->flag |= ACL_XML_FLAG_XML_ENCODE;
+	else
+		xml->flag &=~ACL_XML_FLAG_XML_ENCODE;
 }
 
 ACL_XML *acl_xml_alloc()
@@ -404,21 +421,34 @@ ACL_XML *acl_xml_dbuf_alloc(ACL_DBUF_POOL *dbuf)
 		xml->dbuf_inner = NULL;
 	}
 
-	xml->dbuf = dbuf;
-	xml->dbuf_keep = sizeof(ACL_XML);
-	xml->flag     |= ACL_XML_FLAG_MULTI_ROOT;
+	xml->dbuf       = dbuf;
+	xml->dbuf_keep  = sizeof(ACL_XML);
+	xml->space      = 0;
+	xml->flag       = ACL_XML_FLAG_MULTI_ROOT |
+			  ACL_XML_FLAG_XML_DECODE |
+			  ACL_XML_FLAG_XML_ENCODE;
+	xml->decode_buf = acl_vstring_alloc(256);
+	xml->id_table   = acl_htable_create(100, 0);
+	xml->root       = acl_xml_node_alloc(xml);
+	xml->node_cnt   = 1;
+	xml->attr_cnt   = 0;
 
-	xml->id_table = acl_htable_create(100, 0);
-
-	xml->root = acl_xml_node_alloc(xml);
-	xml->node_cnt = 1;
-
-	xml->iter_head = xml_iter_head;
-	xml->iter_next = xml_iter_next;
-	xml->iter_tail = xml_iter_tail;
-	xml->iter_prev = xml_iter_prev;
+	xml->iter_head  = xml_iter_head;
+	xml->iter_next  = xml_iter_next;
+	xml->iter_tail  = xml_iter_tail;
+	xml->iter_prev  = xml_iter_prev;
 
 	return xml;
+}
+
+size_t acl_xml_space(ACL_XML *xml)
+{
+	return xml->space;
+}
+
+void acl_xml_space_clear(ACL_XML *xml)
+{
+	xml->space = 0;
 }
 
 int acl_xml_free(ACL_XML *xml)
@@ -443,10 +473,12 @@ void acl_xml_reset(ACL_XML *xml)
 	if (xml->dbuf_inner != NULL)
 		acl_dbuf_pool_reset(xml->dbuf_inner, xml->dbuf_keep);
 
-	xml->root = acl_xml_node_alloc(xml);
-	xml->node_cnt = 1;
+	xml->root      = acl_xml_node_alloc(xml);
+	xml->node_cnt  = 1;
 	xml->root_cnt  = 0;
+	xml->attr_cnt  = 0;
 	xml->curr_node = NULL;
+	xml->space     = 0;
 }
 
 void acl_xml_foreach_init(ACL_XML *xml, ACL_XML_NODE *node)

@@ -1,8 +1,10 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/connpool/connect_client.hpp"
 #include "acl_cpp/db/db_handle.hpp"
 #include "acl_cpp/db/db_sqlite.hpp"
 #include "acl_cpp/db/sqlite_pool.hpp"
+#endif
 
 namespace acl
 {

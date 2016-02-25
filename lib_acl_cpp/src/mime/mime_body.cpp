@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/charset_conv.hpp"
 #include "acl_cpp/stream/ofstream.hpp"
@@ -6,6 +7,7 @@
 #include "acl_cpp/stdlib/xml1.hpp"
 #include "acl_cpp/mime/mime_define.hpp"
 #include "acl_cpp/mime/mime_body.hpp"
+#endif
 
 namespace acl {
 

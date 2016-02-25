@@ -1,5 +1,7 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/disque/disque_cond.hpp"
+#endif
 
 namespace acl
 {

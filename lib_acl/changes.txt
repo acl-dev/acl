@@ -1,6 +1,24 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+533) 2016.2.22
+533.1) feature: acl_inet_listen.c 在创建监听描述符时支持使用 SO_REUSEPORT,
+TCP_FASTOPEN 以提升 TCP 的处理性能（此两个特性均需要内核支持，同时 TCP_FASTOPEN
+还需要在编译 lib_acl.a 时定义预编译条件：USE_FASTOPEN）
+
+532) 2016.2.18
+532.1) feature: acl_xml/acl_xml2 增加函数接口，允许以文件流为创建 xml 节点的文本
+
+531) 2016.2.16
+531.1) performance: 优化 acl_vstream.c 中 acl_vstream_read 函数的读性能:
+同时兼顾大数据读取与小数据读取的性能问题
+
+530) 2016.2.13
+530.1) compile: 使用预编译，优化 gcc 编译速度
+
+529) 2016.2.5
+529.1) feature: acl_vstring.c 以内存映射文件方式管理内存同时支持 UNIX/WINDOWS
+
 528) 2016.2.1
 528.1) feature: acl_vstring.c, 优化代码结构
 

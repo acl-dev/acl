@@ -1,5 +1,9 @@
 #include "lib_acl.h"
 
+#if defined(_WIN32) || defined(_WIN64)
+#define snprintf _snprintf
+#endif
+
 static void incr_string(ACL_VSTRING *vp, int len, const char* s, int debug)
 {
 	int   i;
@@ -18,13 +22,15 @@ static void incr_string(ACL_VSTRING *vp, int len, const char* s, int debug)
 	if (debug)
 		printf("[%s]\r\n", acl_vstring_str(vp));
 
-	printf("len: %ld, %ld, max: %ld\r\n", (long) strlen(acl_vstring_str(vp)),
+	printf("strlen: %ld, ACL_VSTRING_LEN: %ld, max: %ld\r\n",
+		(long) strlen(acl_vstring_str(vp)),
 		(long) ACL_VSTRING_LEN(vp), (long) vp->maxlen);
 
 	printf("Enter any key to continue ...\r\n\r\n");
 	getchar();
 
 	ACL_VSTRING_RESET(vp);
+	ACL_VSTRING_TERMINATE(vp);
 }
 
 static void test_string(ACL_FILE_HANDLE fd, ssize_t max, int debug)
@@ -56,6 +62,11 @@ static void test_string(ACL_FILE_HANDLE fd, ssize_t max, int debug)
 	acl_vstring_strcat(vp, s);
 	incr_string(vp, max + 10, NULL, debug);
 
+	printf(">>>[%s]\r\n", acl_vstring_str(vp));
+	printf(">>>len: %ld, %ld, %p, %p\r\n",
+		(long) strlen(acl_vstring_str(vp)),
+		(long) ACL_VSTRING_LEN(vp),
+		acl_vstring_str(vp), acl_vstring_end(vp));
 	acl_vstring_free(vp);
 }
 

@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
@@ -6,6 +7,7 @@
 #include "acl_cpp/disque/disque_job.hpp"
 #include "acl_cpp/disque/disque_cond.hpp"
 #include "acl_cpp/disque/disque.hpp"
+#endif
 
 namespace acl
 {

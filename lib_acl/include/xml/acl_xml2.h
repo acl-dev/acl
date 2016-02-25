@@ -108,6 +108,7 @@ struct ACL_XML2 {
 	int   depth;                    /**< 最大深度 */
 	int   node_cnt;                 /**< 节点总数, 包括 root 节点 */
 	int   root_cnt;                 /**< 根节点个数 */
+	int   attr_cnt;                 /**< 属性总数 */
 	ACL_XML2_NODE *root;            /**< XML 根节点 */
 
 	/* private */
@@ -130,26 +131,29 @@ struct ACL_XML2 {
 	/**< 是否兼容单节点中没有 '/' 情况 */
 #define	ACL_XML2_FLAG_IGNORE_SLASH	(1 << 1)
 
-	/**< 是否需要对文本数据进行 xml 解码  */
+	/**< 解析 xml 对象时是否需要对数据进行 xml 解码  */
 #define	ACL_XML2_FLAG_XML_DECODE	(1 << 2)
+
+	/**< 创建 xml 对象时是否需要对数据进行 xml 编码 */
+#define ACL_XML2_FLAG_XML_ENCODE	(1 << 3)
 
 	/* for acl_iterator, 通过 acl_foreach 可以列出所有子节点 */
 
 	/* 取迭代器头函数 */
-	ACL_XML2_NODE *(*iter_head)(ACL_ITER*, ACL_XML2*);
+	ACL_XML2_NODE *(*iter_head)(ACL_ITER*, const ACL_XML2*);
 	/* 取迭代器下一个函数 */
-	ACL_XML2_NODE *(*iter_next)(ACL_ITER*, ACL_XML2*);
+	ACL_XML2_NODE *(*iter_next)(ACL_ITER*, const ACL_XML2*);
 	/* 取迭代器尾函数 */
-	ACL_XML2_NODE *(*iter_tail)(ACL_ITER*, ACL_XML2*);
+	ACL_XML2_NODE *(*iter_tail)(ACL_ITER*, const ACL_XML2*);
 	/* 取迭代器上一个函数 */
-	ACL_XML2_NODE *(*iter_prev)(ACL_ITER*, ACL_XML2*);
+	ACL_XML2_NODE *(*iter_prev)(ACL_ITER*, const ACL_XML2*);
 };
 
 /****************************************************************************/
 /*                  公共函数接口，用户可以放心使用该接口集                  */
 /****************************************************************************/
 
-/*----------------------------- in acl_xml2.c ------------------------------*/
+/*----------------------------- in acl_xml2.c ----------------------------*/
 
 /**
  * 判断 xml 对象是否闭合的, 即是否所解析的数据是否完整, 如果该 xml 对象里的
@@ -212,6 +216,19 @@ ACL_API ACL_XML2 *acl_xml2_mmap_fd(ACL_FILE_HANDLE fd, size_t max_len,
 		size_t init_len, ACL_DBUF_POOL *dbuf);
 
 /**
+ * 获得当前 xml 对象内部已经分配的内存空间大小
+ * @param xml {ACL_XML2*}
+ * @return {size_t} 当前 xml 对象内部已分配的内存大小
+ */
+ACL_API size_t acl_xml2_space(ACL_XML2 *xml);
+
+/**
+ * 将 xml 对象内部记录内存大小的变量清 0
+ * @param xml {ACL_XML2*}
+ */
+ACL_API void acl_xml2_space_clear(ACL_XML2 *xml);
+
+/**
  * 将某一个 ACL_XML2_NODE 节点作为一个 XML 对象的根节点，从而可以方便地遍历出该
  * 节点各级子节点(在遍历过程中的所有节点不含本节点自身)，该遍历方式有别于单独
  * 遍历某一个 ACL_XML2_NODE 节点时仅能遍历其一级子节点的情形
@@ -239,11 +256,16 @@ ACL_API void acl_xml2_multi_root(ACL_XML2 *xml, int on);
 ACL_API void acl_xml2_slash(ACL_XML2 *xml, int ignore);
 
 /**
- * 设置是否需要对 xml 对象中的属性值及文本值进行 xml 解码，内部缺省为不解
+ * 解析 xml 对象时是否对属性值及文本值进行 xml 解码，内部缺省解码
  * @param xml {ACL_XML2*}
  * @param on {int} 非 0 表示进行 xml 解码
  */
 ACL_API void acl_xml2_decode_enable(ACL_XML2 *xml, int on);
+
+/**
+ * 创建 xml 对象时是否对属性值及文本值进行 xml 编码，内部缺省编码
+ */
+ACL_API void acl_xml2_encode_enable(ACL_XML2 *xml, int on);
 
 /**
  * 释放一个 xml 对象, 同时释放该对象里容纳的所有 xml 节点
@@ -464,6 +486,19 @@ ACL_API ACL_XML2_NODE *acl_xml2_create_node(ACL_XML2 *xml,
 	const char* tagname, const char* text);
 
 /**
+ * 创建 xml 节点，使用文件流做为节点的文本内容项，同时会自动进行 XML 编码处理
+ * @param xml {ACL_XML2*} xml 对象
+ * @param tag {const char*} 标签名，非 NULL 字符串
+ * @param in {ACL_VSTREAM *} 输入流，非 NULL 时，其中内容将做为 xml 节点的文本内容
+ * @param off {size_t} 当 in 为文件流时指定所拷贝内容在文件中的起始位置
+ * @param len {size_t} 指定从输入流中拷贝的最大数据长度，当为 0 时则一直拷贝至流结束
+ * @return {ACL_XML2_NODE*} 返回新创建的 xml 节点，永远返回非 NULL 对象，
+ *  如果输入参数非法则内部产生断言
+ */
+ACL_API ACL_XML2_NODE *acl_xml2_create_node_with_text_stream(ACL_XML2 *xml,
+	const char *tag, ACL_VSTREAM *in, size_t off, size_t len);
+
+/**
  * 给一个 xml 节点添加属性，该函数主要用在构建 xml 对象时
  * @param node {ACL_XML2_NODE*} 由 acl_xml2_create_node 创建的节点
  * @param name {const char*} 属性名，必须为非空字符串且字符串长度大于 0
@@ -483,11 +518,30 @@ ACL_API ACL_XML2_ATTR *acl_xml2_node_add_attr(ACL_XML2_NODE *node,
 ACL_API void acl_xml2_node_add_attrs(ACL_XML2_NODE *node, ...);
 
 /**
- * 给一个 xml 节点添加文本内容，该函数主要用在构建 xml 对象时
+ * 给一个 xml 节点添加文本内容，该函数主要用在构建 xml 对象时，当该节点之前有文本内容时
+ * 则用新文本覆盖原文本
  * @param node {ACL_XML2_NODE*} 由 acl_xml2_create_node 创建的节点
  * @param text {const char*} 文本内容
  */
 ACL_API void acl_xml2_node_set_text(ACL_XML2_NODE *node, const char *text);
+
+/**
+* 给一个 xml 节点的文本追加内容，该函数主要用在构建 xml 对象时，在该节点的文本内容上
+* 追加新的文本内容
+* @param node {ACL_XML2_NODE*} 由 acl_xml2_create_node 创建的节点
+* @param text {const char*} 文本内容 
+ */
+ACL_API void acl_xml2_node_add_text(ACL_XML2_NODE *node, const char *text);
+
+/**
+ * 用文件流中的内容给一个 xml 节点添加文本内容
+ * @param node {ACL_XML2_NODE*} 由 acl_xml2_create_node 创建的节点 
+ * @param in {ACL_VSTREAM*} 输入流对象
+ * @param off {size_t} 当 in 为文件流，指定在文件中的起始位置
+ * @param len {size_t} 要拷贝的最大数据长度，当为 0 时则一直拷贝至流结束
+ */
+ACL_API void acl_xml2_node_set_text_stream(ACL_XML2_NODE *node,
+	ACL_VSTREAM *in, size_t off, size_t len);
 
 /**
  * 将 xml 对象转成字符串内容
@@ -495,6 +549,14 @@ ACL_API void acl_xml2_node_set_text(ACL_XML2_NODE *node, const char *text);
  * @return {const char*} 返回转换后字符串的起始地址
  */
 ACL_API const char *acl_xml2_build(ACL_XML2* xml);
+
+/**
+ * 将 xml 对象转成字符串内容
+ * @param xml {const ACL_XML2*} xml 对象
+ * @param vbuf {ACL_VSTRING*} 存储结果
+ * @return {const char*} 返回转换后字符串的起始地址
+ */
+ACL_API const char *acl_xml2_build2(const ACL_XML2* xml, ACL_VSTRING *vbuf);
 
 /**
  * 将 xml 对象转储于指定流中，注：该转储信息仅为调试用的数据

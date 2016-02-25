@@ -1,8 +1,10 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/xml.hpp"
+#endif
 
 namespace acl {
 
@@ -95,10 +97,22 @@ xml_node& xml_node::add_child(const char* tag, bool return_child /* = false */,
 	return add_child(xml_->create_node(tag, str), return_child);
 }
 
+xml_node& xml_node::add_child(const char* tag, const char* txt,
+	bool return_child /* = false */)
+{
+	return add_child(xml_->create_node(tag, txt), return_child);
+}
+
 xml_node& xml_node::add_child(const char* tag, acl_int64 number,
 	bool return_child /* = false */)
 {
 	return add_child(xml_->create_node(tag, number), return_child);
+}
+
+xml_node& xml_node::add_child(const char* tag, istream& in, size_t off /* = 0 */,
+	size_t len /* = 0 */, bool return_child /* = false */)
+{
+	return add_child(xml_->create_node(tag, in, off, len), return_child);
 }
 
 //////////////////////////////////////////////////////////////////////

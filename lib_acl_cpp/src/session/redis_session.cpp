@@ -1,7 +1,9 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/redis/redis_client_cluster.hpp"
 #include "acl_cpp/redis/redis.hpp"
 #include "acl_cpp/session/redis_session.hpp"
+#endif
 
 namespace acl
 {
@@ -101,14 +103,33 @@ bool redis_session::set_attrs(const std::map<string, session_string>& attrs)
 bool redis_session::get_attrs(std::map<string, session_string>& attrs)
 {
 	attrs_clear(attrs);
-
 	const char* sid = get_sid();
 	if (sid == NULL || *sid == 0)
 		return false;
 
 	command_->clear();
-	if (command_->hgetall(sid, (std::map<string, string>&) attrs) == false)
+	return command_->hgetall(sid, (std::map<string, string>&) attrs);
+}
+
+bool redis_session::get_attrs(const std::vector<string>& names,
+	std::vector<session_string>& values)
+{
+	values.clear();
+	const char* sid = get_sid();
+	if (sid == NULL || *sid == 0)
 		return false;
+
+	command_->clear();
+	std::vector<string> vals;
+	if (command_->hmget(sid, names, &vals) == false)
+		return false;
+
+	for (std::vector<string>::const_iterator cit = vals.begin();
+		cit != vals.end(); ++cit)
+	{
+		values.push_back(*cit);
+	}
+
 	return true;
 }
 

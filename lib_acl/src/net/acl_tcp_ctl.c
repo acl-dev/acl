@@ -168,3 +168,22 @@ void acl_tcp_defer_accept(ACL_SOCKET fd, int timeout)
 	(void) timeout;
 #endif
 }
+
+void acl_tcp_fastopen(ACL_SOCKET fd, int on)
+{
+#if defined(TCP_FASTOPEN)
+	const char *myname = "acl_tcp_fastopen";
+
+	if (on)
+		on = 1;
+	if (setsockopt(fd, IPPROTO_TCP, TCP_FASTOPEN,
+		(const void *) &on, sizeof(on)) < 0)
+	{
+		acl_msg_error("%s: setsocket(TCP_FASTOPEN): %s",
+			myname, acl_last_serror());
+	}
+#else
+	(void) fd;
+	(void) on;
+#endif
+}

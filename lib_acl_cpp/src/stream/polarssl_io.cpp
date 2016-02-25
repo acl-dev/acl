@@ -5,12 +5,14 @@
 # include "polarssl/ctr_drbg.h"
 # include "polarssl/entropy.h"
 #endif
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stream/stream.hpp"
 #include "acl_cpp/stream/polarssl_conf.hpp"
 #include "acl_cpp/stream/polarssl_io.hpp"
+#endif
 
 namespace acl {
 

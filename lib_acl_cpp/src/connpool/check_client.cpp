@@ -1,9 +1,11 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 #include "acl_cpp/connpool/connect_monitor.hpp"
 #include "acl_cpp/connpool/connect_manager.hpp"
 #include "acl_cpp/connpool/check_client.hpp"
+#endif
 #include "check_timer.hpp"
 
 namespace acl

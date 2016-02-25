@@ -1,12 +1,14 @@
 #include "acl_stdafx.hpp"
-#include <assert.h>
 #include "mysql.h"
 #include "errmsg.h"
+#ifndef ACL_PREPARE_COMPILE
+#include <assert.h>
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/db/mysql_conf.hpp"
 #include "acl_cpp/db/db_mysql.hpp"
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 

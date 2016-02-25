@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include <map>
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
@@ -6,6 +7,7 @@
 #include "acl_cpp/connpool/connect_manager.hpp"
 #include "acl_cpp/connpool/connect_monitor.hpp"
 #include "acl_cpp/connpool/check_client.hpp"
+#endif
 #include "check_timer.hpp"
 #include "check_rpc.hpp"
 

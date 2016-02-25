@@ -1,7 +1,9 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/locker.hpp"
 #include "acl_cpp/beanstalk/beanstalk.hpp"
 #include "acl_cpp/beanstalk/beanstalk_pool.hpp"
+#endif
 
 namespace acl {
 

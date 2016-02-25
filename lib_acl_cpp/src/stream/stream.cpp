@@ -1,8 +1,10 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/stream_hook.hpp"
 #include "acl_cpp/stream/stream.hpp"
+#endif
 
 namespace acl {
 

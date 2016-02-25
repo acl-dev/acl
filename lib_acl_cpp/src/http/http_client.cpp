@@ -1,5 +1,6 @@
 #include "acl_stdafx.hpp"
-#include "zlib.h"
+#ifndef ACL_PREPARE_COMPILE
+#include <zlib.h>
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/zlib_stream.hpp"
@@ -7,6 +8,7 @@
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/http/http_client.hpp"
+#endif
 
 namespace acl
 {

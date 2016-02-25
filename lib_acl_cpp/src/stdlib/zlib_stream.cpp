@@ -1,8 +1,10 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "zlib.h"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/zlib_stream.hpp"
+#endif
 
 #ifndef	HAS_ZLIB
 # define HAS_ZLIB
@@ -266,7 +268,12 @@ bool zlib_stream::update(int (*func)(z_stream*, int),
 
 		dlen = (int) out->length();
 		nbuf = (int) out->capacity() - dlen;
-		acl_assert(nbuf >= BUF_MIN);
+		if (nbuf < BUF_MIN)
+		{
+			logger_error("no space available, nbuf: %d < %d",
+				nbuf, BUF_MIN);
+			return false;
+		}
 
 		zstream_->next_in = (unsigned char*) in + pos;
 		zstream_->avail_in = (unsigned int) len;
@@ -344,7 +351,12 @@ bool zlib_stream::flush_out(int (*func)(z_stream*, int),
 
 		dlen = (int) out->length();
 		nbuf = (int) out->capacity() - dlen;
-		acl_assert(nbuf >= BUF_MIN);
+		if (nbuf < BUF_MIN)
+		{
+			logger_error("no space available, nbuf: %d < %d",
+				nbuf, BUF_MIN);
+			return false;
+		}
 
 		zstream_->next_out = (unsigned char*) out->c_str() + dlen;
 		zstream_->avail_out = (unsigned int) nbuf;

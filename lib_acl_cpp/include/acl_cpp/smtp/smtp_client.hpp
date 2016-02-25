@@ -194,6 +194,15 @@ public:
 	 */
 	bool reset();
 
+	/**
+	 * 获得与 SMTP 服务器之间的连接流对象，该函数只有当 open 成功后才可调用
+	 * @return {socket_stream&}
+	 */
+	socket_stream& get_stream(void)
+	{
+		return stream_;
+	}
+
 private:
 	polarssl_conf* ssl_conf_;
 	char* addr_;
