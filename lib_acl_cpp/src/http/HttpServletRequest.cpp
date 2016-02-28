@@ -196,8 +196,9 @@ const char* HttpServletRequest::getQueryString(void) const
 	if (cgi_mode_)
 		return acl_getenv("QUERY_STRING");
 	if (client_ == NULL)
-		return NULL;
-	return client_->request_params();
+		return "";
+	const char* ptr = client_->request_params();
+	return ptr ? ptr : "";
 }
 
 const char* HttpServletRequest::getPathInfo(void) const
@@ -208,11 +209,12 @@ const char* HttpServletRequest::getPathInfo(void) const
 		if (ptr != NULL)
 			return ptr;
 		ptr = acl_getenv("PATH_INFO");
-		return ptr;
+		return ptr ? ptr : "";
 	}
 	if (client_ == NULL)
-		return NULL;
-	return client_->request_path();
+		return "";
+	const char* ptr = client_->request_path();
+	return ptr ? ptr : "";
 }
 
 const char* HttpServletRequest::getRequestUri(void) const
@@ -220,9 +222,12 @@ const char* HttpServletRequest::getRequestUri(void) const
 	if (cgi_mode_)
 		return acl_getenv("REQUEST_URI");
 	if (client_ == NULL)
-		return NULL;
+		return "";
 	else
-		return client_->request_url();
+	{
+		const char* ptr = client_->request_url();
+		return ptr ? ptr : "";
+	}
 }
 
 HttpSession& HttpServletRequest::getSession(bool create /* = true */,

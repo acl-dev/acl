@@ -6,7 +6,6 @@ extern "C" {
 #endif
 
 #include "stdlib/acl_define.h"
-#ifdef ACL_UNIX
 
 extern char *acl_var_threads_procname;
 extern char *acl_var_threads_log_file;
@@ -130,8 +129,6 @@ extern char *acl_var_threads_dispatch_addr;
 #define	ACL_VAR_THREADS_DISPATCH_TYPE		"ioctl_dispatch_type"
 #define	ACL_DEF_THREADS_DISPATCH_TYPE		"default"
 extern char *acl_var_threads_dispatch_type;
-
-#endif /* ACL_UNIX */
 
 #ifdef	__cplusplus
 }

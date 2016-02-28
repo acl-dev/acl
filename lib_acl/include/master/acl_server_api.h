@@ -6,7 +6,6 @@ extern "C" {
 #endif
 
 #include "stdlib/acl_define.h"
-#ifdef ACL_UNIX
 
  /*
   * Utility library.
@@ -116,13 +115,17 @@ ACL_DEPRECATED void acl_ioctl_server_enable_read(ACL_IOCTL*, ACL_VSTREAM*,
 
 typedef int (*ACL_THREADS_SERVER_FN) (ACL_VSTREAM*, void*);
 
-void acl_threads_server_main(int argc, char **argv, ACL_THREADS_SERVER_FN,
-	void *service_ctx, int name, ...);
+void acl_threads_server_main(int argc, char *argv[],
+	ACL_THREADS_SERVER_FN, void *service_ctx, int name, ...);
 #define	acl_ioctl_app_main	acl_threads_server_main
 
 ACL_EVENT *acl_threads_server_event(void);
 acl_pthread_pool_t *acl_threads_server_threads(void);
 ACL_VSTREAM **acl_threads_server_streams(void);
+
+void acl_threads_server_enable_read(ACL_EVENT *event,
+	acl_pthread_pool_t *threads, ACL_VSTREAM *stream);
+void acl_threads_server_disable_read(ACL_EVENT *event, ACL_VSTREAM *stream);
 
  /*
   * acl_aio_server.c
@@ -189,8 +192,6 @@ void acl_trigger_server_main(int, char **, ACL_TRIGGER_SERVER_FN, ...);
 ACL_EVENT *acl_trigger_server_event(void);
 
 #define ACL_TRIGGER_BUF_SIZE	1024
-
-#endif /* ACL_UNIX */
 
 #ifdef	__cplusplus
 }

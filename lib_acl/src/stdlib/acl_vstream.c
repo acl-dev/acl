@@ -331,6 +331,7 @@ AGAIN:
 static int read_to_buffer(ACL_VSTREAM *fp, void *buf, size_t size)
 {
 	int n = sys_read(fp, buf, size);
+
 	if (n <= 0)
 		return -1;
 	return n;
@@ -338,16 +339,26 @@ static int read_to_buffer(ACL_VSTREAM *fp, void *buf, size_t size)
 
 static int read_buffed(ACL_VSTREAM *fp)
 {
+	int  n;
+
 	fp->read_ptr = fp->read_buf;
-	fp->read_cnt =  read_to_buffer(fp, fp->read_buf,
-		(size_t) fp->read_buf_len);
-	return fp->read_cnt;
+	n =  read_to_buffer(fp, fp->read_buf, (size_t) fp->read_buf_len);
+	if (n >= 0)
+		fp->read_cnt = n;
+	else
+		fp->read_cnt = 0;
+	return n;
 }
 
 static int read_char(ACL_VSTREAM *fp)
 {
-	fp->read_cnt = read_buffed(fp);
-	if (fp->read_cnt <= 0)
+	int n = read_buffed(fp);
+
+	if (n >= 0)
+		fp->read_cnt = n;
+	else
+		fp->read_cnt = 0;
+	if (n <= 0)
 		return ACL_VSTREAM_EOF;
 	else
 		return ACL_VSTREAM_GETC(fp);
@@ -382,10 +393,12 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *fp, char *buf, int size)
 		return ACL_VSTREAM_EOF;
 	}
 
-	if (fp->read_cnt < 0)
-		acl_msg_fatal("%s, %s(%d): read_cnt(%d) < 0, fd(%d)",
+	if (fp->read_cnt < 0) {
+		acl_msg_error("%s, %s(%d): read_cnt(%d) < 0, fd(%d)",
 			myname, __FILE__, __LINE__,
 			(int) fp->read_cnt, ACL_VSTREAM_SOCK(fp));
+		return ACL_VSTREAM_EOF;
+	}
 
 	ptr = (unsigned char *) buf;
 	nread = 0;
@@ -677,9 +690,11 @@ int acl_vstream_bfcp_some(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
 	}
 
 	/* internal fatal error */
-	if (fp->read_cnt < 0)
-		acl_msg_fatal("%s, %s(%d): read_cnt(=%d) < 0",
+	if (fp->read_cnt < 0) {
+		acl_msg_error("%s, %s(%d): read_cnt(=%d) < 0",
 			myname, __FILE__, __LINE__, (int) fp->read_cnt);
+		return ACL_VSTREAM_EOF;
+	}
 
 	/* there is no any data in buf */
 	if (fp->read_cnt == 0) {
@@ -949,9 +964,11 @@ int acl_vstream_read(ACL_VSTREAM *fp, void *buf, size_t size)
 		return ACL_VSTREAM_EOF;
 	}
 
-	if (fp->read_cnt < 0)
-		acl_msg_fatal("%s, %s(%d): read_cnt(%d) < 0",
+	if (fp->read_cnt < 0) {
+		acl_msg_error("%s, %s(%d): read_cnt(%d) < 0",
 			myname, __FILE__, __LINE__, (int) fp->read_cnt);
+		return ACL_VSTREAM_EOF;
+	}
 
 	if (fp->read_cnt > 0)
 		return acl_vstream_bfcp_some(fp, (unsigned char*) buf, size);
@@ -1031,9 +1048,11 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	*ready = 0;
 	n = (int) LEN(buf);
 
-	if (fp->read_cnt < 0)
-		acl_msg_fatal("%s, %s(%d): read_cnt(%d) < 0",
+	if (fp->read_cnt < 0) {
+		acl_msg_error("%s, %s(%d): read_cnt(%d) < 0",
 			myname, __FILE__, __LINE__, (int) fp->read_cnt);
+		return ACL_VSTREAM_EOF;
+	}
 
 	if (fp->read_cnt > 0) {
 		bfgets_crlf_peek(fp, buf, ready);
@@ -1101,9 +1120,11 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	*ready = 0;
 	n = (int) LEN(buf);
 
-	if (fp->read_cnt < 0)
-		acl_msg_fatal("%s, %s(%d): read_cnt(=%d) < 0",
+	if (fp->read_cnt < 0) {
+		acl_msg_error("%s, %s(%d): read_cnt(=%d) < 0",
 			myname, __FILE__, __LINE__, (int) fp->read_cnt);
+		return ACL_VSTREAM_EOF;
+	}
 
 	if (fp->read_cnt > 0) {
 		bfgets_no_crlf_peek(fp, buf, ready);
@@ -1164,9 +1185,11 @@ int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
 			ready ? "not null" : "null");
 
 	*ready = 0;
-	if (fp->read_cnt < 0)
-		acl_msg_fatal("%s, %s(%d): read_cnt(=%d) < 0",
+	if (fp->read_cnt < 0) {
+		acl_msg_error("%s, %s(%d): read_cnt(=%d) < 0",
 			myname, __FILE__, __LINE__, (int) fp->read_cnt);
+		return ACL_VSTREAM_EOF;
+	}
 
 	if (fp->read_cnt > 0) {
 		cnt -= bfread_cnt_peek(fp, buf, cnt, ready);
@@ -1217,11 +1240,13 @@ int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 		return ACL_VSTREAM_EOF;
 	}
 
-	n = (int) LEN(buf);
-
-	if (fp->read_cnt < 0)
-		acl_msg_fatal("%s, %s(%d): read_cnt(=%d) < 0",
+	if (fp->read_cnt < 0) {
+		acl_msg_error("%s, %s(%d): read_cnt(=%d) < 0",
 			myname, __FILE__, __LINE__, (int) fp->read_cnt);
+		return ACL_VSTREAM_EOF;
+	}
+
+	n = (int) LEN(buf);
 
 	if (fp->read_cnt > 0)
 		bfread_peek(fp, buf);
@@ -1252,9 +1277,11 @@ int acl_vstream_can_read(ACL_VSTREAM *fp)
 		return ACL_VSTREAM_EOF;
 	}
 
-	if (fp->read_cnt < 0)
-		acl_msg_fatal("%s, %s(%d): read_cnt(=%d) < 0",
+	if (fp->read_cnt < 0) {
+		acl_msg_error("%s, %s(%d): read_cnt(=%d) < 0",
 			myname, __FILE__, __LINE__, (int) fp->read_cnt);
+		return ACL_VSTREAM_EOF;
+	}
 
 	if (fp->flag & (ACL_VSTREAM_FLAG_ERR | ACL_VSTREAM_FLAG_EOF))
 		return ACL_VSTREAM_EOF;
@@ -2400,9 +2427,10 @@ acl_off_t acl_vstream_fseek2(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 			n = offset;  /* 计算出真实的文件位置 */
 			fp->read_cnt = 0;
 		} else { /* fp->read_cnt < 0 ? */
-			acl_msg_fatal("%s, %s(%d): invalud read_cnt = %d",
+			acl_msg_error("%s, %s(%d): invalud read_cnt = %d",
 				myname, __FILE__, __LINE__,
 				(int) fp->read_cnt);
+			return -1;
 		}
 	} else {
 		n = offset;
@@ -2533,7 +2561,7 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 			return fp->offset;
 		}
 		fp->read_cnt = 0;
-	}
+	} else
 		fp->read_cnt = 0;
 
 SYS_SEEK:

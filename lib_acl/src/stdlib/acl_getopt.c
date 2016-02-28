@@ -24,7 +24,7 @@ void acl_getopt_init(void)
 	scan = NULL;
 }
 
-int acl_getopt(int argc, char *argv[], const char *optstring)
+int acl_getopt(int argc, char * argv[], const char *optstring)
 {
 	register char c;
 	register char *place;

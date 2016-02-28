@@ -1,13 +1,11 @@
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
-
 #include "stdlib/acl_define.h"
-
 #endif
 
-#ifdef	ACL_UNIX
 #include <stdlib.h>
 #include "stdlib/acl_msg.h"
+#include "stdlib/acl_env.h"
 #include "master_log.h"
 
 static int  var_master_log_opened = 0;
@@ -18,7 +16,7 @@ void master_log_open(const char *procname)
 	char *master_log;
 
 	/* use master's log before chroot */
-	master_log = getenv("MASTER_LOG");
+	master_log = acl_getenv("MASTER_LOG");
 	if (master_log == NULL)
 		acl_msg_info("%s(%d): no MASTER_LOG's env value",
 			myname, __LINE__);
@@ -37,4 +35,3 @@ void master_log_close()
 		var_master_log_opened = 0;
 	}
 }
-#endif

@@ -91,21 +91,21 @@ public:
 	/**
 	 * 获得 HTTP GET 请求方式 URL 中的参数部分，即 ? 后面的部分
 	 * @return {const char*} 没有进行URL 解码的请求参数部分，
-	 *  返回 NULL 则表示 URL 中没有参数
+	 *  返回空串则表示 URL 中没有参数
 	 */
 	const char* getQueryString(void) const;
 
 	/**
 	 * 获得  http://test.com.cn/cgi-bin/test?name=value 中的
 	 * /cgi-bin/test 路径部分
-	 * @return {const char*} 返回空表示不存在？
+	 * @return {const char*} 返回空串表示不存在
 	 */
 	const char* getPathInfo(void) const;
 
 	/**
 	 * 获得  http://test.com.cn/cgi-bin/test?name=value 中的
 	 * /cgi-bin/test?name=value 路径部分
-	 * @return {const char*} 返回空表示不存在？
+	 * @return {const char*} 返回空串表示不存在
 	 */
 	const char* getRequestUri(void) const;
 

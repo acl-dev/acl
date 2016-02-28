@@ -11,7 +11,7 @@ extern ACL_API int   acl_optind;
 extern ACL_API char *acl_optarg;
 
 ACL_API void acl_getopt_init(void);
-ACL_API int acl_getopt(int argc, char **argv, const char *opts);
+ACL_API int acl_getopt(int argc, char *argv[], const char *opts);
 
 #if defined(_WIN32) || defined(_WIN64)
 # define optind acl_optind

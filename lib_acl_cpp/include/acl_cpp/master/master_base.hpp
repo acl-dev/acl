@@ -90,6 +90,15 @@ protected:
 	// 子类必须调用本方法设置事件引擎句柄
 	void set_event(ACL_EVENT* event);
 
+	/**
+	 * 获得事件引擎够本
+	 * @return {ACL_EVENT*}
+	 */
+	ACL_EVENT* get_event(void) const
+	{
+		return event_;
+	}
+
 private:
 	ACL_EVENT* event_;
 };

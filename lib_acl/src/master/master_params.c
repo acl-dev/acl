@@ -293,18 +293,15 @@ void acl_app_conf_load(const char *pathname)
 
 void  acl_get_app_conf_int_table(ACL_CONFIG_INT_TABLE *table)
 {
-	const char *myname = "acl_get_app_conf_int_table";
 	int   i, n, ret;
 	char *name, *value;
 
-	if (__app_cfg == NULL)
-		acl_msg_fatal("%s(%d), %s: app_cfg null, app_conf_load first",
-			__FILE__, __LINE__, myname);
-
 	if (table == NULL)
 		return;
-
 	__init_conf_int_vars(table);
+
+	if (__app_cfg == NULL)
+		return;
 
 	n = acl_xinetd_cfg_size(__app_cfg);
 
@@ -317,18 +314,15 @@ void  acl_get_app_conf_int_table(ACL_CONFIG_INT_TABLE *table)
 
 void  acl_get_app_conf_int64_table(ACL_CONFIG_INT64_TABLE *table)
 {
-	const char *myname = "acl_get_app_conf_int64_table";
 	int   i, n, ret;
 	char *name, *value;
 
-	if (__app_cfg == NULL)
-		acl_msg_fatal("%s(%d), %s: app_cfg null, app_conf_load first",
-			__FILE__, __LINE__, myname);
-
 	if (table == NULL)
 		return;
-
 	__init_conf_int64_vars(table);
+
+	if (__app_cfg == NULL)
+		return;
 
 	n = acl_xinetd_cfg_size(__app_cfg);
 
@@ -341,18 +335,15 @@ void  acl_get_app_conf_int64_table(ACL_CONFIG_INT64_TABLE *table)
 
 void  acl_get_app_conf_str_table(ACL_CONFIG_STR_TABLE *table)
 {
-	const char *myname = "acl_get_app_conf_str_table";
 	int   i, n, ret;
 	char *name, *value;
 
-	if (__app_cfg == NULL)
-		acl_msg_fatal("%s(%d), %s: app_cfg null, app_conf_load first",
-			__FILE__, __LINE__, myname);
-
 	if (table == NULL)
 		return;
-
 	__init_conf_str_vars(table);
+
+	if (__app_cfg == NULL)
+		return;
 
 	n = acl_xinetd_cfg_size(__app_cfg);
 
@@ -365,18 +356,15 @@ void  acl_get_app_conf_str_table(ACL_CONFIG_STR_TABLE *table)
 
 void  acl_get_app_conf_bool_table(ACL_CONFIG_BOOL_TABLE *table)
 {
-	const char *myname = "acl_get_app_conf_bool_table";
 	int   i, n, ret;
 	char *name, *value;
 
-	if (__app_cfg == NULL)
-		acl_msg_fatal("%s(%d), %s: app_cfg null, app_conf_load first",
-			__FILE__, __LINE__, myname);
-
 	if (table == NULL)
 		return;
-
 	__init_conf_bool_vars(table);
+
+	if (__app_cfg == NULL)
+		return;
 
 	n = acl_xinetd_cfg_size(__app_cfg);
 

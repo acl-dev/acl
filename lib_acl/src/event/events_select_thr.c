@@ -263,8 +263,6 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 
 	THREAD_LOCK(&event_thr->event.tb_mutex);
 	if (!FD_ISSET(sockfd, &event_thr->xmask)) {
-		acl_msg_error("%s(%d): sockfd(%d) not be set",
-			myname, __LINE__, sockfd);
 		THREAD_UNLOCK(&event_thr->event.tb_mutex);
 		return;
 	}
@@ -405,7 +403,6 @@ static void event_loop(ACL_EVENT *eventp)
 	event_thr->event.blocked = 1;
 	nready = select((int) eventp->maxfd + 1, &rmask, &wmask, &xmask, tvp);
 	event_thr->event.blocked = 0;
-
 	if (nready < 0) {
 		if (acl_last_error() != ACL_EINTR)
 			acl_msg_fatal("%s(%d), %s: event_loop: select: %s",

@@ -36,9 +36,7 @@
 ACL_SOCKET acl_sane_accept(ACL_SOCKET sock, struct sockaddr * sa, socklen_t *len)
 {
 	static int accept_ok_errors[] = {
-#ifdef ACL_UNIX
 		ACL_EAGAIN,
-#endif
 		ACL_ECONNREFUSED,
 		ACL_ECONNRESET,
 		ACL_EHOSTDOWN,
@@ -102,7 +100,8 @@ ACL_SOCKET acl_sane_accept(ACL_SOCKET sock, struct sockaddr * sa, socklen_t *len
 			(char *) &on, sizeof(on));
 #endif
 	}
-	return (fd);
+
+	return fd;
 }
 
 ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size, int* sock_type)

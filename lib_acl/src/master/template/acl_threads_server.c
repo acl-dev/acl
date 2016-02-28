@@ -28,6 +28,8 @@
 #include <time.h>
 #include <pthread.h>
 
+#endif /* ACL_UNIX */
+
 /* Utility library. */
 
 #include "init/acl_init.h"
@@ -50,9 +52,13 @@
 
 /* Global library. */
 
+#ifdef ACL_UNIX
+
 #include "../master_flow.h"
 #include "../master_params.h"
 #include "../master_proto.h"
+
+#endif /* ACL_UNIX */
 
 /* Application-specific */
 #include "master/acl_threads_params.h"
@@ -141,7 +147,6 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 static int __client_count;
 static int __use_count;
 static int __use_limit_delay = 1;
-static int __socket_count = 1;
 static int __listen_disabled = 0;
 static int __aborting = 0;
 
@@ -150,21 +155,21 @@ static acl_pthread_pool_t *__threads = NULL;
 static ACL_VSTREAM **__sstreams;
 
 static time_t __last_closing_time = 0;
-static pthread_mutex_t __closing_time_mutex;
-static pthread_mutex_t __counter_mutex;
+static acl_pthread_mutex_t __closing_time_mutex;
+static acl_pthread_mutex_t __counter_mutex;
 
-static ACL_THREADS_SERVER_FN __service_main;
+static unsigned __server_generation;
+
 static void *__service_ctx;
 static char *__service_name;
-static char **__service_argv;
 static void (*__server_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
+static ACL_THREADS_SERVER_FN		__service_main;
 static ACL_MASTER_SERVER_EXIT_FN	__server_onexit;
-static unsigned __server_generation;
-static ACL_MASTER_SERVER_ACCEPT_FN __server_on_accept;
-static ACL_MASTER_SERVER_HANDSHAKE_FN __server_on_handshake;
-static ACL_MASTER_SERVER_DISCONN_FN __server_on_close;
-static ACL_MASTER_SERVER_TIMEOUT_FN __server_on_timeout;
-static ACL_MASTER_SERVER_EXIT_TIMER_FN __server_exit_timer;
+static ACL_MASTER_SERVER_ACCEPT_FN	__server_on_accept;
+static ACL_MASTER_SERVER_HANDSHAKE_FN	__server_on_handshake;
+static ACL_MASTER_SERVER_DISCONN_FN	__server_on_close;
+static ACL_MASTER_SERVER_TIMEOUT_FN	__server_on_timeout;
+static ACL_MASTER_SERVER_EXIT_TIMER_FN	__server_exit_timer;
 
 static char *__deny_info = NULL;
 
@@ -173,22 +178,22 @@ static void dispatch_open(ACL_EVENT *event, acl_pthread_pool_t *threads);
 
 static void lock_closing_time(void)
 {
-	acl_assert(pthread_mutex_lock(&__closing_time_mutex) == 0);
+	acl_assert(acl_pthread_mutex_lock(&__closing_time_mutex) == 0);
 }
 
 static void unlock_closing_time(void)
 {
-	acl_assert(pthread_mutex_unlock(&__closing_time_mutex) == 0);
+	acl_assert(acl_pthread_mutex_unlock(&__closing_time_mutex) == 0);
 }
 
 static void lock_counter(void)
 {
-	acl_assert(pthread_mutex_lock(&__counter_mutex) == 0);
+	acl_assert(acl_pthread_mutex_lock(&__counter_mutex) == 0);
 }
 
 static void unlock_counter(void)
 {
-	acl_assert(pthread_mutex_unlock(&__counter_mutex) == 0);
+	acl_assert(acl_pthread_mutex_unlock(&__counter_mutex) == 0);
 }
 
 static void update_closing_time(void)
@@ -337,12 +342,13 @@ static void server_exiting(int type acl_unused, ACL_EVENT *event, void *ctx)
 		/* 关闭所有监听套接口 */
 		listen_cleanup(event);
 
+#ifdef ACL_UNIX
 		/* 通知 acl_master 框架，本进程不再接收新连接 */
 		acl_master_notify(acl_var_threads_pid, __server_generation,
 				ACL_MASTER_STAT_TAKEN);
-
 		/* 关闭与 TCP 连接派发器 master_dispatch 的通道 */
 		dispatch_close(event);
+#endif /* ACL_UNIX */
 	}
 
 	if (__server_exit_timer != NULL
@@ -545,7 +551,7 @@ static void decrease_counter_callback(ACL_VSTREAM *stream acl_unused,
 	decrease_client_counter();
 }
 
-static void create_job(ACL_EVENT *event, acl_pthread_pool_t *threads,
+static READ_CTX *create_job(ACL_EVENT *event, acl_pthread_pool_t *threads,
 	ACL_VSTREAM *stream)
 {
 	READ_CTX *ctx = (READ_CTX*) acl_mymalloc(sizeof(READ_CTX));
@@ -570,22 +576,19 @@ static void create_job(ACL_EVENT *event, acl_pthread_pool_t *threads,
 	stream->ioctl_read_ctx = ctx;
 	acl_vstream_add_close_handle(stream, free_ctx, ctx);
 
-	if (ctx->serv_accept != NULL && ctx->serv_accept(stream) < 0) {
-		if (ctx->serv_close != NULL)
-			ctx->serv_close(stream, ctx->serv_arg);
-		acl_vstream_close(stream);
-	} else {
-		ctx->event_type = ACL_EVENT_ACCEPT;
-		acl_pthread_pool_add_job(ctx->threads, ctx->job);
-	}
+	return ctx;
 }
 
 static void client_open(ACL_EVENT *event, acl_pthread_pool_t *threads,
-	int fd, const char *remote, const char *local)
+	ACL_SOCKET fd, const char *remote, const char *local)
 {
 	ACL_VSTREAM *stream;
+	READ_CTX *ctx;
 
+#ifdef ACL_UNIX
 	acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
+#endif
+
 	increase_client_counter();
 
 	__use_count++;
@@ -603,6 +606,7 @@ static void client_open(ACL_EVENT *event, acl_pthread_pool_t *threads,
 	 */
 	acl_vstream_add_close_handle(stream, decrease_counter_callback, NULL);
 
+#ifdef ACL_UNIX
 	if (acl_var_threads_status_notify && acl_var_threads_master_maxproc > 1
 	    && acl_master_notify(acl_var_threads_pid, __server_generation,
 		ACL_MASTER_STAT_TAKEN) < 0)
@@ -610,10 +614,20 @@ static void client_open(ACL_EVENT *event, acl_pthread_pool_t *threads,
 		server_abort(ACL_EVENT_NULL_TYPE, event, stream,
 			ACL_EVENT_NULL_CONTEXT);
 	}
+#endif
 
 	/* create one job running in one thread*/
-	create_job(event, threads, stream);
+	ctx = create_job(event, threads, stream);
+	if (ctx->serv_accept != NULL && ctx->serv_accept(stream) < 0) {
+		if (ctx->serv_close != NULL)
+			ctx->serv_close(stream, ctx->serv_arg);
+		acl_vstream_close(stream);
+	} else {
+		ctx->event_type = ACL_EVENT_ACCEPT;
+		acl_pthread_pool_add_job(ctx->threads, ctx->job);
+	}
 
+#ifdef ACL_UNIX
 	if (acl_var_threads_status_notify && acl_var_threads_master_maxproc > 1
 	    && acl_master_notify(acl_var_threads_pid, __server_generation,
 		ACL_MASTER_STAT_AVAIL) < 0)
@@ -621,6 +635,25 @@ static void client_open(ACL_EVENT *event, acl_pthread_pool_t *threads,
 		server_abort(ACL_EVENT_NULL_TYPE, event, stream,
 			ACL_EVENT_NULL_CONTEXT);
 	}
+#endif
+}
+
+void acl_threads_server_enable_read(ACL_EVENT *event,
+	acl_pthread_pool_t *threads, ACL_VSTREAM *stream)
+{
+	READ_CTX *ctx = (READ_CTX *) stream->ioctl_read_ctx;
+
+	if (ctx == NULL || ctx->read_callback == NULL)
+		ctx = create_job(event, threads, stream);
+
+	ctx->event_type = ACL_EVENT_READ;
+	acl_event_enable_read(event, stream, stream->rw_timeout,
+		ctx->read_callback, ctx);
+}
+
+void acl_threads_server_disable_read(ACL_EVENT *event, ACL_VSTREAM *stream)
+{
+	acl_event_disable_readwrite(event, stream);
 }
 
 /* restart listening */
@@ -642,8 +675,8 @@ static void server_accept_sock(int event_type, ACL_EVENT *event,
 	ACL_VSTREAM *stream, void *ctx)
 {
 	const char *myname = "server_accept_sock";
-	int   listen_fd = ACL_VSTREAM_SOCK(stream);
-	int   time_left = -1, i = 0, delay_listen = 0, fd, sock_type;
+	ACL_SOCKET listen_fd = ACL_VSTREAM_SOCK(stream), fd;
+	int   time_left = -1, i = 0, delay_listen = 0, sock_type, errnum;
 	char  remote[64], local[64];
 	acl_pthread_pool_t *threads = (acl_pthread_pool_t*) ctx;
 
@@ -664,7 +697,7 @@ static void server_accept_sock(int event_type, ACL_EVENT *event,
 
 	while (i++ < acl_var_threads_max_accept) {
 		fd = acl_accept(listen_fd, remote, sizeof(remote), &sock_type);
-		if (fd >= 0) {
+		if (fd >= 0 && fd != ACL_SOCKET_INVALID) {
 			/* set NODELAY for TCP socket */
 			if (sock_type == AF_INET)
 				acl_tcp_set_nodelay(fd);
@@ -676,18 +709,18 @@ static void server_accept_sock(int event_type, ACL_EVENT *event,
 
 		/* else: fd < 0 */
 
-		if (errno == EMFILE) {
+		errnum = acl_last_error();
+		if (errnum == EMFILE) {
 			delay_listen = 1;
-			acl_msg_warn("accept connection: %s",
-				acl_last_serror());
+			acl_msg_warn("accept error: %s", acl_last_serror());
 			break;
 		}
 
-		if (errno == EAGAIN || errno == EINTR)
+		if (errnum == ACL_EAGAIN || errnum == ACL_EINTR)
 			break;
 
-		acl_msg_warn("accept connection: %s, stoping ...",
-			acl_last_serror());
+		acl_msg_warn("accept connection: %s(%d, %d), stoping ...",
+			acl_last_serror(), errnum, ACL_EAGAIN);
 		acl_event_disable_readwrite(event, stream);
 		server_abort(0, event, stream, threads);
 		return;
@@ -722,7 +755,9 @@ static void server_init(const char *procname)
 	/*
 	 * Don't die when a process goes away unexpectedly.
 	 */
+#ifdef SIGPIPE
 	signal(SIGPIPE, SIG_IGN);
+#endif
 
 	/*
 	 * Don't die for frivolous reasons.
@@ -734,13 +769,19 @@ static void server_init(const char *procname)
 	/*
 	 * May need this every now and then.
 	 */
+#ifdef ACL_UNIX
 	acl_var_threads_pid = getpid();
+#elif defined(ACL_WINDOWS)
+	acl_var_threads_pid = _getpid();
+#else
+	acl_var_threads_pid = 0;
+#endif
 	acl_var_threads_procname = acl_mystrdup(acl_safe_basename(procname));
 
-	acl_var_threads_log_file = getenv("SERVICE_LOG");
+	acl_var_threads_log_file = acl_getenv("SERVICE_LOG");
 	if (acl_var_threads_log_file == NULL) {
 		acl_var_threads_log_file = acl_mystrdup("acl_master.log");
-		acl_msg_warn("%s(%d)->%s: can't get SERVICE_LOG's env value,"
+		acl_msg_info("%s(%d)->%s: can't get SERVICE_LOG's env value,"
 			" use %s log", __FILE__, __LINE__, myname,
 			acl_var_threads_log_file);
 	}
@@ -748,7 +789,9 @@ static void server_init(const char *procname)
 	acl_get_app_conf_int_table(__conf_int_tab);
 	acl_get_app_conf_str_table(__conf_str_tab);
 
+#ifdef ACL_UNIX
 	acl_master_vars_init(acl_var_threads_buf_size, acl_var_threads_rw_timeout);
+#endif
 
 	if (__deny_info == NULL)
 		__deny_info = acl_var_threads_deny_banner;
@@ -779,7 +822,9 @@ static void log_event_mode(int event_mode)
 static void open_service_log(int event_mode)
 {
 	/* first, close the master's log */
+#ifdef ACL_UNIX
 	master_log_close();
+#endif
 
 	/* second, open the service's log */
 	acl_msg_open(acl_var_threads_log_file, acl_var_threads_procname);
@@ -834,6 +879,8 @@ static ACL_EVENT *event_open(int event_mode, acl_pthread_pool_t *threads)
 }
 
 /*==========================================================================*/
+
+#ifdef ACL_UNIX
 
 static void dispatch_connect_timer(int type acl_unused,
 	ACL_EVENT *event, void *ctx)
@@ -978,6 +1025,8 @@ static void dispatch_open(ACL_EVENT *event, acl_pthread_pool_t *threads)
 			threads, 1000000, 0);
 }
 
+#endif /* ACL_UNIX */
+
 /*==========================================================================*/
 
 static acl_pthread_pool_t *threads_create(ACL_MASTER_SERVER_THREAD_INIT_FN init_fn,
@@ -1003,8 +1052,8 @@ static acl_pthread_pool_t *threads_create(ACL_MASTER_SERVER_THREAD_INIT_FN init_
 	if (exit_fn)
 		acl_pthread_pool_atfree(threads, exit_fn, exit_ctx);
 
-	pthread_mutex_init(&__closing_time_mutex, NULL);
-	pthread_mutex_init(&__counter_mutex, NULL);
+	acl_pthread_mutex_init(&__closing_time_mutex, NULL);
+	acl_pthread_mutex_init(&__counter_mutex, NULL);
 	__last_closing_time = time(NULL);
 
 	__use_limit_delay = acl_var_threads_delay_sec > 1 ?
@@ -1013,17 +1062,21 @@ static acl_pthread_pool_t *threads_create(ACL_MASTER_SERVER_THREAD_INIT_FN init_
 	return threads;
 }
 
-static ACL_VSTREAM **server_open(ACL_EVENT *event, acl_pthread_pool_t *threads,
-	int count, int fdtype)
+#ifdef ACL_UNIX
+
+static ACL_VSTREAM **server_daemon_open(ACL_EVENT *event,
+	acl_pthread_pool_t *threads, int count, int fdtype)
 {
-	const char *myname = "server_open";
+	const char *myname = "server_daemon_open";
 	ACL_VSTREAM *stream, **streams;
-	int   fd, i;
+	ACL_SOCKET fd;
+	int i;
 
 	/* socket count is as same listen_fd_count in parent process */
 
-	streams = (ACL_VSTREAM **) acl_mycalloc(count + 1,
-			sizeof(ACL_VSTREAM *));
+	streams = (ACL_VSTREAM **)
+		acl_mycalloc(count + 1, sizeof(ACL_VSTREAM *));
+
 	for (i = 0; i < count + 1; i++)
 		streams[i] = NULL;
 
@@ -1054,7 +1107,40 @@ static ACL_VSTREAM **server_open(ACL_EVENT *event, acl_pthread_pool_t *threads,
 	return streams;
 }
 
-static void usage(int argc, char *argv[])
+#endif
+
+static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
+	acl_pthread_pool_t *threads, const char *addrs)
+{
+	const char   *myname = "server_alone_open";
+	ACL_ARGV*     tokens = acl_argv_split(addrs, ";,| \t");
+	ACL_ITER      iter;
+	int           i;
+	ACL_VSTREAM **streams = (ACL_VSTREAM **)
+		acl_mycalloc(tokens->argc + 1, sizeof(ACL_VSTREAM *));
+
+	for (i = 0; i < tokens->argc + 1; i++)
+		streams[i] = NULL;
+
+	acl_foreach(iter, tokens) {
+		const char* addr = (const char*) iter.data;
+		ACL_VSTREAM* sstream = acl_vstream_listen(addr, 128);
+		if (sstream == NULL) {
+			acl_msg_error("%s(%d): listen %s error(%s)",
+				myname, __LINE__, addr, acl_last_serror());
+			exit(1);
+		}
+
+		acl_non_blocking(ACL_VSTREAM_SOCK(sstream), ACL_NON_BLOCKING);
+		acl_event_enable_listen(event, sstream, 0,
+			__server_accept, threads);
+	}
+
+	acl_argv_free(tokens);
+	return streams;
+}
+
+static void usage(int argc, char * argv[])
 {
 	int   i;
 	char *service_name;
@@ -1075,23 +1161,24 @@ static void usage(int argc, char *argv[])
 		" -t transport"
 		" -u [use setgid initgroups setuid]"
 		" -v [on acl_msg_verbose]"
-		" -f conf_file",
+		" -f conf_file"
+		" -L listen_addrs",
 		service_name);
 }
 
 /* acl_threads_server_main - the real main program */
 
-void acl_threads_server_main(int argc, char **argv,
+void acl_threads_server_main(int argc, char * argv[],
 	ACL_THREADS_SERVER_FN service, void *service_ctx, int name, ...)
 {
 	const char *myname = "acl_threads_server_main";
-	char *root_dir = 0, *user_name = 0, *transport = 0;
+	char *root_dir = NULL, *user = NULL, *addrs = NULL;
 	char *service_name = acl_mystrdup(acl_safe_basename(argv[0]));
-	int   c, fdtype = 0, event_mode;
+	int   c, fdtype = 0, event_mode, socket_count = 0, daemon_mode;
 	char *generation, conf_file[1024];
 	void *thread_init_ctx = NULL, *thread_exit_ctx = NULL;
-	ACL_MASTER_SERVER_INIT_FN pre_jail = 0;
-	ACL_MASTER_SERVER_INIT_FN post_init = 0;
+	ACL_MASTER_SERVER_INIT_FN pre_jail = NULL;
+	ACL_MASTER_SERVER_INIT_FN post_init = NULL;
 	void *pre_jail_ctx = NULL, *post_init_ctx = NULL;
 	ACL_MASTER_SERVER_THREAD_INIT_FN thread_init_fn = NULL;
 	ACL_MASTER_SERVER_THREAD_EXIT_FN thread_exit_fn = NULL;
@@ -1099,12 +1186,9 @@ void acl_threads_server_main(int argc, char **argv,
 
 	/*******************************************************************/
 
-	/* If not connected to stdin, stdin must not be a terminal. */
-	if (isatty(STDIN_FILENO)) {
-		printf("%s(%d), %s: do not run this command by hand\r\n",
-			__FILE__, __LINE__, myname);
-		exit (1);
-	}
+#ifdef ACL_UNIX
+	opterr = 0;
+#endif
 
 	/*******************************************************************/
 
@@ -1116,10 +1200,9 @@ void acl_threads_server_main(int argc, char **argv,
 	 * messages to stderr, because no-one is going to see them.
 	 */
 
-	opterr = 0;
 	conf_file[0] = 0;
 
-	while ((c = getopt(argc, argv, "hc:n:s:t:uvf:")) > 0) {
+	while ((c = getopt(argc, argv, "hc:n:s:t:uvf:L:")) > 0) {
 		switch (c) {
 		case 'h':
 			usage(argc, argv);
@@ -1135,17 +1218,19 @@ void acl_threads_server_main(int argc, char **argv,
 			service_name = optarg;
 			break;
 		case 's':
-			if ((__socket_count = atoi(optarg)) <= 0)
-				acl_msg_fatal("invalid socket_count: %s", optarg);
+			socket_count = atoi(optarg);
 			break;
 		case 'u':
-			user_name = "setme";
+			user = "setme";
 			break;
 		case 't':
-			transport = optarg;
+			/* deprecated, just go through */
 			break;
 		case 'v':
 			acl_msg_verbose++;
+			break;
+		case 'L':
+			addrs = optarg;
 			break;
 		default:
 			break;
@@ -1153,11 +1238,16 @@ void acl_threads_server_main(int argc, char **argv,
 	}
 
 	if (conf_file[0] == 0)
-		acl_msg_fatal("%s(%d)->%s: need \"-f pathname\"",
+		acl_msg_info("%s(%d)->%s: no configure file",
 			__FILE__, __LINE__, myname);
-	if (acl_msg_verbose)
+	else
 		acl_msg_info("%s(%d)->%s: configure file = %s", 
 			__FILE__, __LINE__, myname, conf_file);
+
+	if (addrs && *addrs)
+		daemon_mode = 0;
+	else
+		daemon_mode = 1;
 
 	/*******************************************************************/
 
@@ -1185,14 +1275,12 @@ void acl_threads_server_main(int argc, char **argv,
 			acl_get_app_conf_str_table(
 				va_arg(ap, ACL_CONFIG_STR_TABLE *));
 			break;
-
 		case ACL_MASTER_SERVER_PRE_INIT:
 			pre_jail = va_arg(ap, ACL_MASTER_SERVER_INIT_FN);
 			break;
 		case ACL_MASTER_SERVER_POST_INIT:
 			post_init = va_arg(ap, ACL_MASTER_SERVER_INIT_FN);
 			break;
-
 		case ACL_MASTER_SERVER_ON_ACCEPT:
 			__server_on_accept =
 				va_arg(ap, ACL_MASTER_SERVER_ACCEPT_FN);
@@ -1209,17 +1297,14 @@ void acl_threads_server_main(int argc, char **argv,
 			__server_on_close =
 				va_arg(ap, ACL_MASTER_SERVER_DISCONN_FN);
 			break;
-
 		case ACL_MASTER_SERVER_EXIT_TIMER:
 			__server_exit_timer =
 				va_arg(ap, ACL_MASTER_SERVER_EXIT_TIMER_FN);
 			break;
-
 		case ACL_MASTER_SERVER_EXIT:
 			__server_onexit =
 				va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
 			break;
-
 		case ACL_MASTER_SERVER_THREAD_INIT:
 			thread_init_fn =
 				va_arg(ap, ACL_MASTER_SERVER_THREAD_INIT_FN);
@@ -1234,7 +1319,6 @@ void acl_threads_server_main(int argc, char **argv,
 		case ACL_MASTER_SERVER_THREAD_EXIT_CTX:
 			thread_exit_ctx = va_arg(ap, void*);
 			break;
-
 		case ACL_MASTER_SERVER_DENY_INFO:
 			__deny_info = acl_mystrdup(va_arg(ap, const char*));
 			break;
@@ -1249,23 +1333,11 @@ void acl_threads_server_main(int argc, char **argv,
 
 	if (root_dir)
 		root_dir = acl_var_threads_queue_dir;
-	if (user_name)
-		user_name = acl_var_threads_owner;
+	if (user)
+		user = acl_var_threads_owner;
 
-	if (transport == NULL)
-		acl_msg_fatal("no transport type specified");
-
-	if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_INET) == 0) {
-		__server_accept = server_accept_sock;
-		fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
-	} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_UNIX) == 0) {
-		__server_accept = server_accept_sock;
-		fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_UNIX;
-	} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_SOCK) == 0) {
-		__server_accept = server_accept_sock;
-		fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
-	} else
-		acl_msg_fatal("unsupported transport type: %s", transport);
+	__server_accept = server_accept_sock;
+	fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 
 	if (strcasecmp(acl_var_threads_event_mode, "poll") == 0)
 		event_mode = ACL_EVENT_POLL;
@@ -1276,6 +1348,7 @@ void acl_threads_server_main(int argc, char **argv,
 
 	/*******************************************************************/
 
+#ifdef ACL_UNIX
 	/* Retrieve process generation from environment. */
 	if ((generation = getenv(ACL_MASTER_GEN_NAME)) != 0) {
 		if (!acl_alldig(generation))
@@ -1285,19 +1358,24 @@ void acl_threads_server_main(int argc, char **argv,
 			acl_msg_info("process generation: %s (%o)",
 				generation, __server_generation);
 	}
+#else
+	(void) generation;
+	__server_generation = 0;
+#endif
 
 	/* Set up call-back info. */
 	__service_main = service;
 	__service_ctx = service_ctx;
 	__service_name = service_name;
-	__service_argv = argv + optind;
 
 	/*******************************************************************/
 
+#ifdef ACL_UNIX
 	/* Run pre-jail initialization. */
-	if (chdir(acl_var_threads_queue_dir) < 0)
+	if (daemon_mode && chdir(acl_var_threads_queue_dir) < 0)
 		acl_msg_fatal("chdir(\"%s\"): %s", acl_var_threads_queue_dir,
 			acl_last_serror());
+#endif
 
 	/* create threads pool */
 	__threads = threads_create(thread_init_fn, thread_exit_fn,
@@ -1307,27 +1385,46 @@ void acl_threads_server_main(int argc, char **argv,
 	__event = event_open(event_mode, __threads);
 
 	/* open all listen streams */
-	__sstreams = server_open(__event, __threads, __socket_count, fdtype);
+
+	if (daemon_mode == 0)
+		__sstreams = server_alone_open(__event, __threads, addrs);
+#ifdef ACL_UNIX
+	else if (socket_count <= 0)
+		acl_msg_fatal("%s(%d): invalid socket_count: %d",
+			myname, __LINE__, socket_count);
+	else
+		__sstreams = server_daemon_open(__event, __threads,
+			socket_count, fdtype);
+#else
+	else
+		acl_msg_fatal("%s(%d): addrs NULL", myname, __LINE__);
+#endif
 
 	if (pre_jail)
 		pre_jail(pre_jail_ctx);
 
-	acl_chroot_uid(root_dir, user_name);
+#ifdef ACL_UNIX
+	acl_chroot_uid(root_dir, user);
+#endif
 
 	/* open the server's log */
 	open_service_log(event_mode);
 
+#ifdef ACL_UNIX
 	/* if enable dump core when program crashed ? */
 	if (acl_var_threads_enable_core)
 		acl_set_core_limit(0);
+#endif
 
 	/* Run post-jail initialization. */
 	if (post_init)
 		post_init(post_init_ctx);
 
+#ifdef ACL_UNIX
 	/* connect the dispatch server */
 	if (acl_var_threads_dispatch_addr && *acl_var_threads_dispatch_addr)
 		dispatch_open(__event, __threads);
+#endif
 
 	acl_msg_info("%s(%d), %s daemon started, log: %s",
 		myname, __LINE__, argv[0], acl_var_threads_log_file);
@@ -1338,4 +1435,3 @@ void acl_threads_server_main(int argc, char **argv,
 	/* not reached here */
 	server_exit();
 }
-#endif /* ACL_UNIX */

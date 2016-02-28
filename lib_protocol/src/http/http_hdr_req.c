@@ -643,20 +643,22 @@ static void __parse_url_and_port(HTTP_HDR_REQ *hh, const char *url)
 		ACL_VSTRING_ADDCH(hh->url_path, '/');
 		ACL_VSTRING_TERMINATE(hh->url_path);
 		return;
+	} else {
+		acl_vstring_strcpy(hh->url_part, url);
+		url++;
 	}
 
 	/* get url_path and url_params */
 	ptr = strchr(url, '?');
 	if (ptr == NULL)
 		__strip_url_path(hh->url_path, url);
-	else if (*url != '?') {
+	else {
 		acl_vstring_strncpy(hh->url_path, url, ptr - url);
 		__strip_url_path(hh->url_path, acl_vstring_str(hh->url_path));
 		ptr++;  /* skip '?' */
 		if (*ptr)
 			acl_vstring_strcpy(hh->url_params, ptr);
-	} else
-		acl_vstring_strcpy(hh->url_path, "/");  /* xxx */
+	}
 
 	if ((hh->flag & HTTP_HDR_REQ_FLAG_PARSE_PARAMS) == 0)
 		return;
