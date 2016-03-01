@@ -336,7 +336,7 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	if ((fdp->flag & (EVENT_FDTABLE_FLAG_READ
 		| EVENT_FDTABLE_FLAG_WRITE)) == 0)
 	{
-		acl_msg_error("%s(%d): sockfd(%d) not be set",
+		acl_msg_warn("%s(%d): sockfd(%d) not be set",
 			myname, __LINE__, sockfd);
 		return;
 	}

@@ -1174,7 +1174,7 @@ void acl_threads_server_main(int argc, char * argv[],
 	const char *myname = "acl_threads_server_main";
 	char *root_dir = NULL, *user = NULL, *addrs = NULL;
 	char *service_name = acl_mystrdup(acl_safe_basename(argv[0]));
-	int   c, fdtype = 0, event_mode, socket_count = 0, daemon_mode;
+	int   c, fdtype = 0, event_mode, socket_count = 1, daemon_mode;
 	char *generation, conf_file[1024];
 	void *thread_init_ctx = NULL, *thread_exit_ctx = NULL;
 	ACL_MASTER_SERVER_INIT_FN pre_jail = NULL;
