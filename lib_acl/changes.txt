@@ -1,6 +1,10 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+537) 2016.3.3
+537.1) compile: acl_env.c 中去掉了变量 _environ
+537.2) compile: acl_server_api.h 中的函数前需加 ACL_API 以便于生成动态库
+
 536) 2016.3.1
 536.1) bugfix: acl_threads_server.c 在 daemon 模式下当只监听一个端口时，控制
 服务器 acl_master 不会传递 -s 参数，应该 socket_count 值初始化为 1

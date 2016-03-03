@@ -28,9 +28,6 @@ void acl_clean_env(char **preserve_list)
 #ifdef ACL_UNIX
 	extern char **environ;
 	char  **env = environ;
-#elif defined(ACL_WINDOWS)
-	extern char **_environ;
-	char  **env = _environ;
 #endif
 	ACL_ARGV   *save_list;
 	char   *value;
@@ -57,8 +54,10 @@ void acl_clean_env(char **preserve_list)
 	 * Truncate the process environment, if available. On some systems
 	 * (Ultrix!), environ can be a null pointer.
 	 */
+#ifdef ACL_UNIX
 	if (env)
 		env[0] = 0;
+#endif
 
 	/*
 	 * Restore preserved environment variables.
