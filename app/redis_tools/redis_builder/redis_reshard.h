@@ -4,13 +4,14 @@
 class redis_reshard
 {
 public:
-	redis_reshard(const char* addr);
+	redis_reshard(const char* addr, const char* passw);
 	~redis_reshard();
 
 	void run();
 
 private:
 	acl::string addr_;
+	acl::string passwd_;
 	std::vector<acl::redis_node*> masters_;
 
 	acl::redis_node* find_node(const char* id);

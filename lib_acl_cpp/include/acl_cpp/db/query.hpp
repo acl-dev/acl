@@ -17,13 +17,22 @@ public:
 	~query();
 
 	/**
-	 * 创建 sql 语句
+	 * 创建 sql 语句，变参方式，用法和 printf 类似
 	 * @param sql_fmt {const char*} sql 语句，格式如：
+	 *  select * from xxx where name = :name and len >= %d
+	 *  其中的 :name, 将由 set_parameter 中的值进行替换, len 为整形值
+	 * @return {query&}
+	 */
+	query& create_sql(const char* sql_fmt, ...) ACL_CPP_PRINTF(2, 3);;
+
+	/**
+	 * 创建 sql 语句，非变参方式
+	 * @param sql {const char*}  sql 语句，格式如：
 	 *  select * from xxx where name = :name and len >= :len
 	 *  其中的 :name, :len 将由 set_parameter 中的值进行替换
 	 * @return {query&}
 	 */
-	query& create_sql(const char* sql_fmt, ...) ACL_CPP_PRINTF(2, 3);;
+	query& create(const char* sql);
 
 	/**
 	 * 设置字符串类型的变量值

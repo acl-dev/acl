@@ -30,6 +30,12 @@ query& query::create_sql(const char* sql_fmt, ...)
 	return *this;
 }
 
+query& query::create(const char* sql)
+{
+	sql_ = sql;
+	return *this;
+}
+
 bool query::append_key(string& buf, char* key)
 {
 	acl_lowercase(key);

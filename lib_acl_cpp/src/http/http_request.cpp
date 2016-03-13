@@ -177,12 +177,14 @@ http_client* http_request::get_client(void) const
 
 bool http_request::write_head()
 {
+#if 0
 	// 必须保证该连接已经打开
 	if (client_ == NULL)
 	{
 		logger_error("connection not opened!");
 		return false;
 	}
+#endif
 
 	bool  reuse_conn;
 	http_method_t method = header_.get_method();

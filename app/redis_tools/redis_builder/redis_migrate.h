@@ -4,7 +4,8 @@
 class redis_migrate
 {
 public:
-	redis_migrate(std::vector<acl::redis_node*>& masters);
+	redis_migrate(std::vector<acl::redis_node*>& masters,
+		const char* passwd);
 	~redis_migrate(void);
 
 	int move_slots(std::vector<acl::redis_node*>& from,
@@ -22,6 +23,7 @@ private:
 	std::vector<acl::redis_node*>& masters_;
 	acl::string from_id_;
 	acl::string to_id_;
+	acl::string passwd_;
 
 	bool check_nodes_id(acl::redis& from, acl::redis& to);
 };

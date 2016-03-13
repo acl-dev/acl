@@ -9,9 +9,12 @@ redis_util::~redis_util(void)
 {
 }
 
-bool redis_util::get_node_id(const char* addr, acl::string& node_id)
+bool redis_util::get_node_id(const char* addr, acl::string& node_id,
+	const char* passwd)
 {
 	acl::redis_client client(addr);
+	if (passwd && *passwd)
+		client.set_password(passwd);
 	acl::redis redis(&client);
 	return get_node_id(redis, node_id);
 }
@@ -55,17 +58,32 @@ bool redis_util::get_node_id(acl::redis& redis, acl::string& node_id)
 	return false;
 }
 
-bool redis_util::get_ip(const char* addr, acl::string& buf)
+bool redis_util::get_ip(const char* addr, acl::string& ip)
 {
-	acl::string tmp(addr);
-	const std::vector<acl::string>& tokens = tmp.split2(":");
+	acl::string buf(addr);
+	const std::vector<acl::string>& tokens = buf.split2(":");
 	if (tokens.size() != 2)
 	{
 		printf("%s: invalid addr: %s\r\n", __FUNCTION__, addr);
 		return false;
 	}
 
-	buf = tokens[0].c_str();
+	ip = tokens[0].c_str();
+	return true;
+}
+
+bool redis_util::addr_split(const char* addr, acl::string& ip, int& port)
+{
+	acl::string buf(addr);
+	const std::vector<acl::string>& tokens = buf.split2(":");
+	if (tokens.size() != 2)
+	{
+		printf("%s: invalid addr: %s\r\n", __FUNCTION__, addr);
+		return false;
+	}
+
+	ip = tokens[0];
+	port = atoi(tokens[1].c_str());
 	return true;
 }
 
@@ -96,5 +114,49 @@ void redis_util::print_nodes(int nested,
 			(*cit)->get_slaves();
 		if (!slaves->empty())
 			print_nodes(nested, *slaves);
+	}
+}
+
+void redis_util::clear_nodes_container(
+	std::map<acl::string, std::vector<acl::redis_node*>* >& nodes)
+{
+	for (std::map<acl::string, std::vector<acl::redis_node*>* >
+		::const_iterator cit = nodes.begin();
+		cit != nodes.end(); ++cit)
+	{
+		delete cit->second;
+	}
+
+	nodes.clear();
+}
+
+void redis_util::sort(const std::map<acl::string, acl::redis_node*>& in,
+	std::map<acl::string, std::vector<acl::redis_node*>* >& out)
+{
+	acl::string ip;
+	int port;
+
+	for (std::map<acl::string, acl::redis_node*>::const_iterator cit =
+		in.begin(); cit != in.end(); ++cit)
+	{
+		if (redis_util::addr_split(
+			cit->second->get_addr(), ip, port) == false)
+		{
+			printf("invalid addr: %s\r\n",
+				cit->second->get_addr());
+			continue;
+		}
+
+		std::map<acl::string, std::vector<acl::redis_node*>* >
+			::const_iterator cit_node = out.find(ip);
+		if (cit_node == out.end())
+		{
+			std::vector<acl::redis_node*>* a = new
+				std::vector<acl::redis_node*>;
+			a->push_back(cit->second);
+			out[ip] = a;
+		}
+		else
+			cit_node->second->push_back(cit->second);
 	}
 }

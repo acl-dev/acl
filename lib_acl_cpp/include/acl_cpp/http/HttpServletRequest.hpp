@@ -219,9 +219,11 @@ public:
 	 * URL 中 ? 后面的参数值；针对 POST 方法，则可以获得
 	 * URL 中 ? 后面的参数值或请求体中的参数值
 	 * @param name {const char*} 参数名
+	 * @param case_sensitive {bool} 比较时针对参数名是否区分大小写
 	 * @return {const char*} 返回参数值，当参数不存在时返回 NULL
 	 */
-	const char* getParameter(const char* name) const;
+	const char* getParameter(const char* name,
+		bool case_sensitive = false) const;
 
 	/**
 	 * 当 HTTP 请求头中的 Content-Type 为

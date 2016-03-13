@@ -3,9 +3,11 @@
 #include "redis_migrate.h"
 #include "redis_reshard.h"
 
-redis_reshard::redis_reshard(const char* addr)
+redis_reshard::redis_reshard(const char* addr, const char* passwd)
 	: addr_(addr)
 {
+	if (passwd && *passwd)
+		passwd_ = passwd;
 }
 
 redis_reshard::~redis_reshard()
@@ -130,7 +132,7 @@ void redis_reshard::run()
 		exit(1);
 	}
 
-	redis_migrate migrate(masters_);
+	redis_migrate migrate(masters_, passwd_);
 	migrate.move_slots(sources, *target, nslots);
 }
 

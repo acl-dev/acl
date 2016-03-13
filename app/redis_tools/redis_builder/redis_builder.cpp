@@ -5,10 +5,12 @@
 
 #define MAX_SLOTS 16384
 
-redis_builder::redis_builder(int meet_wait /* = 100 */)
+redis_builder::redis_builder(const char* passwd /* = NULL */, int meet_wait /* = 100 */)
 	: meet_wait_(meet_wait)
 	, last_check_(0)
 {
+	if (passwd && *passwd)
+		passwd_ = passwd;
 }
 
 redis_builder::~redis_builder(void)
@@ -22,6 +24,7 @@ bool redis_builder::add_node(const char* addr,
 	const char* new_node_addr, bool slave)
 {
 	acl::redis_client client(new_node_addr);
+	client.set_password(passwd_);
 	acl::redis redis(&client);
 
 	acl::string buf(addr);
@@ -53,7 +56,7 @@ bool redis_builder::add_node(const char* addr,
 		return true;
 
 	acl::string node_id;
-	if (redis_util::get_node_id(addr, node_id) == false)
+	if (redis_util::get_node_id(addr, node_id, passwd_) == false)
 	{
 		printf("%s: can't get master(%s)'s node_id\r\n",
 			__FUNCTION__, addr);
@@ -75,6 +78,7 @@ bool redis_builder::add_node(const char* addr,
 bool redis_builder::del_node(const char* addr, const char* node_id)
 {
 	acl::redis_client client(addr);
+	client.set_password(passwd_);
 	acl::redis redis(&client);
 	if (redis.cluster_forget(node_id) == false)
 	{
@@ -434,6 +438,7 @@ bool redis_builder::build_cluster()
 
 	it = masters_.begin();
 	acl::redis_client client((*it)->get_addr());
+	client.set_password(passwd_);
 	acl::redis master(&client);
 
 	// let one master to connect all other master nodes
@@ -483,7 +488,11 @@ bool redis_builder::build_cluster()
 		return false;
 	}
 
+#ifdef ACL_UNIX
+	redis_status::show_nodes_tree(*nodes);
+#else
 	redis_status::show_nodes(nodes);
+#endif
 	return true;
 }
 
@@ -521,6 +530,7 @@ bool redis_builder::cluster_meet(acl::redis& redis,
 bool redis_builder::build_master(acl::redis_node& master)
 {
 	acl::redis_client client(master.get_addr());
+	client.set_password(passwd_);
 	acl::redis redis(&client);
 
 	if (master_set_slots(redis, master) == false)
@@ -553,6 +563,7 @@ bool redis_builder::add_slave(const acl::redis_node& master,
 	const acl::redis_node& slave)
 {
 	acl::redis_client client(slave.get_addr());
+	client.set_password(passwd_);
 	acl::redis redis(&client);
 	const char* master_addr = master.get_addr();
 	if (master_addr == NULL || *master_addr == 0)

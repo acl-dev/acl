@@ -1,11 +1,15 @@
 #include "stdafx.h"
+#include "redis_util.h"
 #include "redis_status.h"
 
-redis_status::redis_status(const char* addr, int conn_timeout, int rw_timeout)
+redis_status::redis_status(const char* addr, int conn_timeout, int rw_timeout,
+	const char* passwd)
 	: addr_(addr)
 	, conn_timeout_(conn_timeout)
 	, rw_timeout_(rw_timeout)
 {
+	if (passwd && *passwd)
+		passwd_ = passwd;
 }
 
 
@@ -15,9 +19,10 @@ redis_status::~redis_status(void)
 
 //////////////////////////////////////////////////////////////////////////
 
-void redis_status::show_nodes()
+void redis_status::show_nodes(void)
 {
 	acl::redis_client client(addr_, conn_timeout_, rw_timeout_);
+	client.set_password(passwd_);
 	acl::redis redis(&client);
 
 	show_nodes(redis);
@@ -27,9 +32,92 @@ void redis_status::show_nodes(acl::redis& redis)
 {
 	const std::map<acl::string, acl::redis_node*>* masters;
 	if ((masters = redis.cluster_nodes())== NULL)
+	{
 		printf("can't get cluster nodes\r\n");
-	else
-		show_nodes(masters);
+		return;
+	}
+
+#ifdef ACL_UNIX
+	show_nodes_tree(*masters);
+#else
+	show_nodes(masters);
+#endif
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+void redis_status::show_nodes_tree(
+	const std::map<acl::string, acl::redis_node*>& nodes)
+{
+	std::map<acl::string, std::vector<acl::redis_node*>* > sorted_nodes;
+	redis_util::sort(nodes, sorted_nodes);
+
+	std::map<acl::string, std::vector<acl::redis_node*>* >
+		::const_iterator cit = sorted_nodes.begin();
+	for (; cit != sorted_nodes.end(); ++cit)
+	{
+		printf("\033[1;31;40mmachine: %s\033[0m\r\n",
+			cit->first.c_str());
+		show_nodes_tree(*cit->second);
+		printf("\r\n");
+	}
+
+	redis_util::clear_nodes_container(sorted_nodes);
+}
+
+void redis_status::show_nodes_tree(const std::vector<acl::redis_node*>& nodes)
+{
+	const std::vector<acl::redis_node*>* slaves;
+
+	for (std::vector<acl::redis_node*>::const_iterator cit = nodes.begin();
+		cit != nodes.end(); ++cit)
+	{
+		printf("\033[1;32;40m|--- master: %s\033[0m, "
+			"\033[0;34;40mid: %s\033[0m, "
+			"\033[1;33;40mslots\033[0m:",
+			(*cit)->get_addr(), (*cit)->get_id());
+		slaves = (*cit)->get_slaves();
+		show_master_slots(*cit);
+		printf("\r\n");
+		show_slave_tree(*slaves);
+	}
+}
+
+void redis_status::show_slave_tree(const std::vector<acl::redis_node*>& slaves)
+{
+	for (std::vector<acl::redis_node*>::const_iterator cit =
+		slaves.begin(); cit != slaves.end(); ++cit)
+	{
+		printf("\t\033[1;32;40m|--- slave: %s\033[0m, "
+			"\033[0;34;40mid: %s\033[0m\r\n",
+			(*cit)->get_addr(), (*cit)->get_id());
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+bool redis_status::show_nodes(
+	const std::map<acl::string, acl::redis_node*>* masters)
+{
+	const std::vector<acl::redis_node*>* slaves;
+	std::map<acl::string, acl::redis_node*>::const_iterator cit;
+	for (cit = masters->begin(); cit != masters->end(); ++cit)
+	{
+		if (cit != masters->begin())
+			printf("---------------------------------------\r\n");
+		
+		printf("master, id: %s, addr: %s\r\n",
+			cit->first.c_str(), cit->second->get_addr());
+
+		printf("slots range: ");
+		show_master_slots(cit->second);
+		printf("\r\n");
+
+		slaves = cit->second->get_slaves();
+		show_slave_nodes(*slaves);
+	}
+
+	return true;
 }
 
 void redis_status::show_slave_nodes(
@@ -51,28 +139,13 @@ void redis_status::show_master_slots(const acl::redis_node* master)
 
 	std::vector<std::pair<size_t, size_t> >::const_iterator cit;
 	for (cit = slots.begin(); cit != slots.end(); ++cit)
-		printf("slots range: %d-%d\r\n",
+#ifdef ACL_UNIX
+		printf(" \033[1;33;40m[%d-%d]\033[0m",
 			(int) (*cit).first, (int) (*cit).second);
-}
-
-bool redis_status::show_nodes(
-	const std::map<acl::string, acl::redis_node*>* masters)
-{
-	const std::vector<acl::redis_node*>* slaves;
-	std::map<acl::string, acl::redis_node*>::const_iterator cit;
-	for (cit = masters->begin(); cit != masters->end(); ++cit)
-	{
-		if (cit != masters->begin())
-			printf("---------------------------------------\r\n");
-		
-		printf("master, id: %s, addr: %s\r\n",
-			cit->first.c_str(), cit->second->get_addr());
-		show_master_slots(cit->second);
-		slaves = cit->second->get_slaves();
-		show_slave_nodes(*slaves);
-	}
-
-	return true;
+#else
+		printf(" [%d-%d]",
+			(int) (*cit).first, (int) (*cit).second);
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -80,6 +153,7 @@ bool redis_status::show_nodes(
 void redis_status::show_slots()
 {
 	acl::redis_client client(addr_, conn_timeout_, rw_timeout_);
+	client.set_password(passwd_);
 	acl::redis redis(&client);
 
 	show_slots(redis);

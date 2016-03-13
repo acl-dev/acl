@@ -124,9 +124,7 @@ bool json_node::is_object(void) const
 
 bool json_node::is_array(void) const
 {
-	if (node_me_->tag_node == NULL)
-		return false;
-	if (node_me_->tag_node->type == ACL_JSON_T_ARRAY)
+	if (node_me_->type == ACL_JSON_T_ARRAY)
 		return true;
 	else
 		return false;

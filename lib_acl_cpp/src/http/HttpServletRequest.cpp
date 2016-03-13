@@ -409,13 +409,25 @@ unsigned short HttpServletRequest::getRemotePort(void) const
 	return atoi(port);
 }
 
-const char* HttpServletRequest::getParameter(const char* name) const
+const char* HttpServletRequest::getParameter(const char* name,
+	bool case_sensitive /* = false */) const
 {
 	std::vector<HTTP_PARAM*>::const_iterator cit = params_.begin();
-	for (; cit != params_.end(); ++cit)
+	if (case_sensitive)
 	{
-		if (strcmp((*cit)->name, name) == 0)
-			return (*cit)->value;
+		for (; cit != params_.end(); ++cit)
+		{
+			if (strcmp((*cit)->name, name) == 0)
+				return (*cit)->value;
+		}
+	}
+	else
+	{
+		for (; cit != params_.end(); ++cit)
+		{
+			if (strcasecmp((*cit)->name, name) == 0)
+				return (*cit)->value;
+		}
 	}
 
 	// 如果是 MIME 格式，则尝试从 mime_ 对象中查询参数

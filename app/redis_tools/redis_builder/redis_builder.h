@@ -5,7 +5,7 @@
 class redis_builder
 {
 public:
-	redis_builder(int meet_wait = 100);
+	redis_builder(const char* passwd = NULL, int meet_wait = 100);
 	~redis_builder(void);
 
 	bool build(const char* conf, size_t replicas, bool just_display);
@@ -14,6 +14,7 @@ public:
 	bool del_node(const char* addr, const char* node_id);
 
 private:
+	acl::string passwd_;
 	int meet_wait_;
 	std::vector<acl::redis_node*> masters_;
 	time_t last_check_;

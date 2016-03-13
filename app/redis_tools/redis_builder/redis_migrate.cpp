@@ -2,9 +2,12 @@
 #include "redis_util.h"
 #include "redis_migrate.h"
 
-redis_migrate::redis_migrate(std::vector<acl::redis_node*>& masters)
+redis_migrate::redis_migrate(std::vector<acl::redis_node*>& masters,
+	const char* passwd)
 	: masters_(masters)
 {
+	if (passwd && *passwd)
+		passwd_ = passwd;
 }
 
 redis_migrate::~redis_migrate(void)
@@ -68,8 +71,11 @@ int redis_migrate::move_slots(acl::redis_node& from,
 	acl::redis_node& to, int count)
 {
 	acl::redis_client from_conn(from.get_addr());
+	from_conn.set_password(passwd_);
 	acl::redis from_redis(&from_conn);
+
 	acl::redis_client to_conn(to.get_addr());
+	to_conn.set_password(passwd_);
 	acl::redis to_redis(&to_conn);
 
 	// get all the specified source node's slots
@@ -226,6 +232,7 @@ bool redis_migrate::notify_cluster(size_t slot, const char* id)
 	for (cit = masters_.begin(); cit != masters_.end(); ++cit)
 	{
 		acl::redis_client client((*cit)->get_addr());
+		client.set_password(passwd_);
 		redis.set_client(&client);
 		redis.clear();
 

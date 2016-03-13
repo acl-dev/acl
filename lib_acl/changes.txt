@@ -1,6 +1,10 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+538) 2016.3.8
+538.1) bugfix: acl_vstream_net.c 中的函数 udp_read 应该设置 read_ready = 0，
+否则当该 UDP 对象置入 event 事件循环时，会造成无用的事件触发
+
 537) 2016.3.3
 537.1) compile: acl_env.c 中去掉了变量 _environ
 537.2) compile: acl_server_api.h 中的函数前需加 ACL_API 以便于生成动态库

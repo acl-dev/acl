@@ -11,6 +11,7 @@ static void usage(const char* procname)
 	printf("usage: %s -h[help]\r\n"
 		" -s redis_addr[ip:port]\r\n"
 		" -a cmd[nodes|slots|create|add_node|del_node|node_id|reshard|hash_slot]\r\n"
+		" -p passwd\r\n"
 		" -N new_node[ip:port]\r\n"
 		" -S [add node as slave]\r\n"
 		" -r replicas[default 0]\r\n"
@@ -30,8 +31,10 @@ static void usage(const char* procname)
 
 	printf("\r\nfor samples:\r\n"
 		" %s -s 127.0.0.1:6379 -a create -f cluster.xml\r\n"
+		" %s -s 127.0.0.1:6379 -a create -f cluster.xml p 123456\r\n"
 		" %s -s 127.0.0.1:6379 -a create -f nodes4.xml -r 2\r\n"
 		" %s -s 127.0.0.1:6379 -a nodes\r\n"
+		" %s -s 127.0.0.1:6379 -a nodes -p 123456\r\n"
 		" %s -s 127.0.0.1:6379 -a slots\r\n"
 		" %s -s 127.0.0.1:6379 -a del_node -I node_id\r\n"
 		" %s -s 127.0.0.1:6379 -a node_id\r\n"
@@ -39,7 +42,7 @@ static void usage(const char* procname)
 		" %s -a hash_slot -k key\r\n"
 		" %s -s 127.0.0.1:6379 -a add_node -N 127.0.0.1:6380 -S\r\n",
 		procname, procname, procname, procname, procname, procname,
-		procname, procname, procname);
+		procname, procname, procname, procname, procname);
 }
 
 int main(int argc, char* argv[])
@@ -51,9 +54,9 @@ int main(int argc, char* argv[])
 	int  ch;
 	size_t replicas = 0;
 	bool add_slave = false, just_display = false;
-	acl::string addr, cmd, conf, new_addr, node_id, key;
+	acl::string addr, cmd, conf, new_addr, node_id, key, passwd;
 
-	while ((ch = getopt(argc, argv, "hs:a:f:N:SI:r:dk:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:a:f:N:SI:r:dk:p:")) > 0)
 	{
 		switch (ch)
 		{
@@ -87,6 +90,9 @@ int main(int argc, char* argv[])
 		case 'k':
 			key = optarg;
 			break;
+		case 'p':
+			passwd = optarg;
+			break;
 		default:
 			break;
 		}
@@ -112,8 +118,9 @@ int main(int argc, char* argv[])
 			printf("usage: %s -s ip:port -a nodes\r\n", argv[0]);
 		else {
 			acl::redis_client client(addr, conn_timeout, rw_timeout);
+			client.set_password(passwd);
 			acl::redis redis(&client);
-			redis_status status(addr, conn_timeout, rw_timeout);
+			redis_status status(addr, conn_timeout, rw_timeout, passwd);
 			status.show_nodes(redis);
 		}
 	}
@@ -124,8 +131,9 @@ int main(int argc, char* argv[])
 		else
 		{
 			acl::redis_client client(addr, conn_timeout, rw_timeout);
+			client.set_password(passwd);
 			acl::redis redis(&client);
-			redis_status status(addr, conn_timeout, rw_timeout);
+			redis_status status(addr, conn_timeout, rw_timeout, passwd);
 			status.show_slots(redis);
 		}
 	}
@@ -135,7 +143,7 @@ int main(int argc, char* argv[])
 			printf("usage: %s -a create -f cluster.xml\r\n", argv[0]);
 		else
 		{
-			redis_builder builder;
+			redis_builder builder(passwd);
 			builder.build(conf.c_str(), replicas, just_display);
 		}
 	}
@@ -145,7 +153,7 @@ int main(int argc, char* argv[])
 			printf("usage: %s -s ip:port -a add_node -N ip:port -S\r\n", argv[0]);
 		else
 		{
-			redis_builder builder;
+			redis_builder builder(passwd);
 			builder.add_node(addr, new_addr, add_slave);
 		}
 	}
@@ -155,7 +163,7 @@ int main(int argc, char* argv[])
 			printf("usage: %s -s ip:port -a del_node -I nod_id\r\n", argv[0]);
 		else
 		{
-			redis_builder builder;
+			redis_builder builder(passwd);
 			builder.del_node(addr, node_id);
 		}
 	}
@@ -166,7 +174,7 @@ int main(int argc, char* argv[])
 		else
 		{
 			node_id.clear();
-			if (redis_util::get_node_id(addr, node_id) == false)
+			if (redis_util::get_node_id(addr, node_id, passwd) == false)
 				printf("can't get node id, addr: %s\r\n",
 					addr.c_str());
 			else
@@ -180,7 +188,7 @@ int main(int argc, char* argv[])
 			printf("usage: %s -s ip:port -a reshard\r\n", argv[0]);
 		else
 		{
-			redis_reshard reshard(addr);
+			redis_reshard reshard(addr, passwd);
 			reshard.run();
 		}
 	}

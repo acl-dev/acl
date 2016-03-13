@@ -262,8 +262,10 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 
 	memset(&sa, 0, sizeof(sa));
 
-	ret = recvfrom(fd, buf, (int) size, 0,
-		(struct sockaddr*) &sa, &sa_len);
+	if (stream->read_ready)
+		stream->read_ready = 0;
+
+	ret = recvfrom(fd, buf, (int) size, 0, (struct sockaddr*) &sa, &sa_len);
 
 	if (ret > 0 && memcmp(stream->sa_peer, &sa, sizeof(sa)) != 0)
 		acl_vstream_set_peer_addr(stream, &sa);
