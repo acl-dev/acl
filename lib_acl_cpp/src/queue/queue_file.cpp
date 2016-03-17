@@ -65,9 +65,9 @@ bool queue_file::create(const char* home, const char* queueName,
 		memset(&tv, 0, sizeof(tv));
 		gettimeofday(&tv, NULL);
 		safe_snprintf(m_partName, sizeof(m_partName),
-			"%08x%08x%08x%08x%08x",
+			"%u_%lu_%08x_%08x_%u",
 			(unsigned int) getpid(),
-			(unsigned int) acl::thread::thread_self(),
+			(unsigned long) acl::thread::thread_self(),
 			(unsigned int) tv.tv_sec,
 			(unsigned int) tv.tv_usec,
 			(unsigned int) __counter);

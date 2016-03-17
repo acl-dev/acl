@@ -134,10 +134,11 @@ public:
 	 * @param enableDecode {bool} 转储时是否自动进行解码
 	 * @param toCharset {const char*} 目标字符集
 	 * @param off {off_t} 调用者希望给邮件结点附加的相对偏移量
+	 * @param all {bool} 提取所有包括 message/application/image 在内的所有节点
 	 * @return {const std::list<mime_attach*>&}
 	 */
 	const std::list<mime_attach*>& get_attachments(bool enableDecode = true,
-		const char* toCharset = "gb2312", off_t off = 0);
+		const char* toCharset = "gb2312", off_t off = 0, bool all = true);
 
 	/**
 	 * 获得图片列表

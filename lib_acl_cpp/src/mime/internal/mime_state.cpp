@@ -159,10 +159,6 @@ static void mime_node_free(MIME_NODE *node)
 	acl_vstring_free(node->buffer);
 	if (node->boundary)
 		acl_vstring_free(node->boundary);
-#ifdef SAVE_BODY
-	if (node->body)
-		acl_vstring_free(node->body);
-#endif
 	acl_myfree(node);
 }
 

@@ -164,11 +164,24 @@ redis_client_cluster& redis_client_cluster::set_password(
 {
 	// 允许 pass 为空字符串且非空指针，这样就可以当 default 值被设置时，
 	// 允许部分 redis 节点无需连接密码
-	if (addr && *addr && pass)
+	if (addr == NULL || *addr == 0 || pass == NULL || *pass == 0)
+		return *this;
+
+	string key(addr);
+	key.lower();
+	passwds_[key] = pass;
+
+	for (std::vector<connect_pool*>::iterator it = pools_.begin();
+		it != pools_.end(); ++it)
 	{
-		string key(addr);
+		redis_client_pool* pool = (redis_client_pool*) (*it);
+		key = pool->get_addr();
 		key.lower();
-		passwds_[key] = pass;
+
+		std::map<string, string>::const_iterator cit =
+			passwds_.find(key);
+		if (cit != passwds_.end() || !strcasecmp(addr, "default"))
+			pool->set_password(pass);
 	}
 
 	return *this;

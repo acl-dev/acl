@@ -271,7 +271,8 @@ redis_result* redis_client::get_redis_object(dbuf_pool* pool)
 	char ch;
 	if (conn_.read(ch) == false)
 	{
-		logger_error("read first char error, server: %s", addr_);
+		logger_warn("read first char error: %s, server: %s",
+			last_serror(), addr_);
 		return NULL;
 	}
 

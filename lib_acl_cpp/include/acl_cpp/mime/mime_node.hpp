@@ -48,7 +48,7 @@ public:
 	 * 函数返回 MIME_CTYPE_IMAGE (在 mime_define.hpp 中定义)
 	 * @return {int} 返回 mime_define.hpp 中定义的 MIME_CTYPE_XXX
 	 */
-	int get_ctype() const
+	int get_ctype(void) const
 	{
 		return (m_ctype);
 	}
@@ -62,6 +62,18 @@ public:
 	{
 		return (m_stype);
 	}
+
+	/**
+	 * 获得 Content-Type 中的主类型，以字符串方式表示
+	 * @return {const char*} 返回 "" 表示不存在
+	 */
+	const char* get_ctype_s(void) const;
+
+	/**
+	 * 获得 Content-Type 中的从类型，以字符串方式表示
+	 * @return {const char*} 返回 "" 表示不存在
+	 */
+	const char* get_stype_s(void) const;
 
 	/**
 	 * 获得传输编码类型 (对应于 Content-Transfer-Encoding)
@@ -194,14 +206,16 @@ public:
 	 * 则说明父结点不存在或父结点的主类型未知
 	 * @return {int} MIME_CTYPE_XXX
 	 */
-	int parent_ctype() const;
+	int parent_ctype(void) const;
+	const char* parent_ctype_s(void) const;
 
 	/**
 	 * 获得父结点的从类型 (MIME_STYPE_XXX), 如果为 MIME_STYPE_OTHER
 	 * 则说明父结点不存在或父结点的从类型未知
 	 * @return {int} MIME_STYPE_XXX
 	 */
-	int parent_stype() const;
+	int parent_stype(void) const;
+	const char* parent_stype_s(void) const;
 
 	/**
 	 * 获得父结点的编码类型 (MIME_ENC_XXX), 如果返回值为 MIME_ENC_OTHER

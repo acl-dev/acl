@@ -15,8 +15,6 @@ struct MAIL_ADDR
 	char *comment;
 };
 
-//#define SAVE_BODY
-
 struct MIME_NODE
 {
 	ACL_RING children;                      /**< 子结点集合 */
@@ -61,9 +59,6 @@ struct MIME_NODE
 
 	char  bound_term[3];
 	ACL_VSTRING *buffer;                    /**< headers, quoted-printable body */
-#ifdef SAVE_BODY
-	ACL_VSTRING *body;
-#endif
 	ACL_RING node;                          /**< 当前结点 */
 
 	off_t header_begin;			/**< 结点头开始位置 */

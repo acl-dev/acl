@@ -288,6 +288,8 @@ public:
 	 */
 	json_node* next_child(void);
 
+	const char* operator[] (const char* tag);
+
 	/**
 	 * 返回该 json 节点在整个 json 树中的深度
 	 * @return {int}
@@ -471,6 +473,22 @@ public:
 	 */
 	const std::vector<json_node*>&
 		getElementsByTags(const char* tags) const;
+
+	/**
+	 * 从 json 对象中获得所有的与给定多级标签名相同的 json 节点的集合
+	 * @param tags {const char*} 多级标签名，由 '/' 分隔各级标签名，
+	 *  如针对 json 数据：
+	 *  { 'root': [
+	 *      'first': { 'second': { 'third': 'test1' } },
+	 *      'first': { 'second': { 'third': 'test2' } },
+	 *      'first': { 'second': { 'third': 'test3' } }
+	 *    ]
+	 *  }
+	 *  可以通过多级标签名：root/first/second/third 一次性查出所有符合
+	 *  条件的节点
+	 * @return {json_node*} 返回 NULL 表示不存在
+	 */
+	json_node* getFirstElementByTags(const char* tags) const;
 
 	/**
 	 * 取得 acl 库中的 ACL_JSON 对象

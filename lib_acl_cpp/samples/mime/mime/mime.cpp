@@ -269,6 +269,27 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 
 	printf(">>>> saved attach file ok ...\r\n");
 	//////////////////////////////////////////////////////////////////////
+	// 遍历所有节点
+	printf("------------------------------------------------------\r\n");
+
+	acl::string tmp;
+	int i = 0;
+	const std::list<acl::mime_node*>& nodes = mime.get_mime_nodes();
+	for (std::list<acl::mime_node*>::const_iterator cit2 = nodes.begin();
+		cit2 != nodes.end(); ++cit2)
+	{
+		printf("ctype: %s, stype: %s, begin: %ld, end: %ld\r\n",
+			(*cit2)->get_ctype_s(), (*cit2)->get_stype_s(),
+			(long) (*cit2)->get_bodyBegin(),
+			(long) (*cit2)->get_bodyEnd());
+		tmp.format("var/node-%d-body.txt", i++);
+		(*cit2)->save(tmp);
+		printf(">>>save to file: %s\r\n", tmp.c_str());
+	}
+
+	printf("------------------------------------------------------\r\n");
+
+	//////////////////////////////////////////////////////////////////////
 
 	// 将解析后的邮件再重新组合并保存在磁盘上
 

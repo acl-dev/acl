@@ -3,7 +3,8 @@
 #include "acl_cpp/stdlib/pipe_stream.hpp"
 
 namespace acl {
-	class string;
+	
+class string;
 
 class ACL_CPP_API mime_code : public pipe_stream
 {

@@ -114,6 +114,11 @@ bool json_node::is_null(void) const
 
 bool json_node::is_object(void) const
 {
+	if (node_me_->type == ACL_JSON_T_OBJ)
+		return true;
+	else
+		return false;
+
 	if (node_me_->tag_node == NULL)
 		return false;
 	if (node_me_->tag_node->type == ACL_JSON_T_OBJ)
@@ -315,6 +320,20 @@ json_node* json_node::next_child(void)
 	return child;
 }
 
+const char* json_node::operator[](const char* tag)
+{
+	json_node* iter = first_child();
+	while (iter)
+	{
+		const char* ptr = iter->tag_name();
+		if (ptr != NULL && strcasecmp(ptr, tag) == 0)
+			return iter->get_text();
+		iter = next_child();
+	}
+
+	return NULL;
+}
+
 int   json_node::depth(void) const
 {
 	return node_me_->depth;
@@ -470,6 +489,22 @@ const std::vector<json_node*>& json::getElementsByTags(const char* tags) const
 	acl_json_free_array(a);
 
 	return nodes_query_;
+}
+
+json_node* json::getFirstElementByTags(const char* tags) const
+{
+	ACL_ARRAY* a = acl_json_getElementsByTags(json_, tags);
+	if (a == NULL)
+		return NULL;
+
+	ACL_JSON_NODE* n = (ACL_JSON_NODE*) acl_array_index(a, 0);
+	acl_assert(n);
+
+	json_node* node = NEW json_node(n, const_cast<json*>(this));
+	const_cast<json*>(this)->nodes_query_.push_back(node);
+
+	acl_json_free_array(a);
+	return node;
 }
 
 ACL_JSON* json::get_json(void) const
