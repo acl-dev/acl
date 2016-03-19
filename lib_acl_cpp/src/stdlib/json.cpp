@@ -620,7 +620,10 @@ json_node& json::duplicate_node(const json_node& node)
 json_node& json::get_root(void)
 {
 	if (root_)
+	{
+		root_->node_me_ = json_->root;
 		return *root_;
+	}
 	root_ = NEW json_node(json_->root, this);
 	return *root_;
 }
@@ -670,7 +673,11 @@ void json::reset(void)
 {
 	clear();
 	if (json_)
+	{
 		acl_json_reset(json_);
+		if (root_)
+			root_->node_me_ = json_->root;
+	}
 	else
 		json_ = acl_json_alloc();
 }

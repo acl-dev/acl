@@ -95,7 +95,7 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int block_mode)
 			myname, acl_last_serror());
 	}
 
-#ifdef SO_REUSEPORT
+#if defined(SO_REUSEPORT) && defined(USE_REUSEPORT)
 	on = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT,
 		(const void *) &on, sizeof(on)) < 0)

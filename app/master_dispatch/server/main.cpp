@@ -25,6 +25,8 @@ int main(int argc, char* argv[])
 
 		printf("listen on: %s\r\n", addr);
 
+		acl::log::debug_init("all:1");
+
 		if (argc >= 4)
 			ms.run_alone(addr, argv[3], acl::ENGINE_KERNEL); 
 		else
