@@ -19,6 +19,8 @@ char *var_cfg_session_addr;  // memcache 服务器地址，以备将来使用
 char *var_cfg_rpc_addr;
 char *var_cfg_manager_allow;
 char *var_cfg_service_name;
+char *var_cfg_nic_names;
+char *var_cfg_net_addrs;
 acl::master_str_tbl var_conf_str_tab[] = {
 	{ "backend_service", "dispatch.sock", &var_cfg_backend_service },
 	{ "status_servers", "", &var_cfg_status_servers },
@@ -28,6 +30,8 @@ acl::master_str_tbl var_conf_str_tab[] = {
 	{ "manager_allow", "127.0.0.1:127.0.0.1, 192.168.0.0:192.168.255.255",
 		&var_cfg_manager_allow },
 	{ "service_name", "dispatch_service", &var_cfg_service_name },
+	{ "nic_names", "em; eth", &var_cfg_nic_names },
+	{ "net_addrs", "192.168;10.0", &var_cfg_net_addrs },
 
 	{ 0, 0, 0 }
 };
@@ -78,16 +82,15 @@ bool master_service::on_accept(acl::aio_socket_stream* client)
 
 	acl_non_blocking(client->sock_handle(), ACL_BLOCKING);
 
+	IConnection* conn;
+
 	// 根据客户端连接服务端口号的不同来区分不同的服务应用协议
 	const char* local = client->get_local(true);
 	if (acl_strrncasecmp(local, var_cfg_backend_service,
 		strlen(var_cfg_backend_service)) == 0)
 	{
 		// 创建服务对象处理来自于后端服务模块的请求
-		IConnection* conn = new ServerConnection(client);
-
-		conn->run();
-		return true;
+		conn = new ServerConnection(client);
 	}
 	else if (acl_strrncasecmp(local, var_cfg_status_service,
 		strlen(var_cfg_status_service)) == 0)
@@ -105,25 +108,19 @@ bool master_service::on_accept(acl::aio_socket_stream* client)
 		}
 
 		// 创建服务对象处理状态汇报的请求
-		IConnection* conn = new StatusConnection(client);
-
-		conn->run();
-		return true;
+		conn = new StatusConnection(client);
 	}
 	else
-	{
 		// 创建对象处理来自于前端客户端模块的请求
-		IConnection* conn = new ClientConnection(client,
-				var_cfg_conn_expired);
+		conn = new ClientConnection(client, var_cfg_conn_expired);
 
-		conn->run();
-		return true;
-	}
+	conn->run();
 
 	return true;
 }
 
-static void get_local_ip()
+void master_service::find_addr_include(acl::string& name, acl::string& addr,
+	const char* nic_names, const char* net_addrs)
 {
 	ACL_IFCONF *ifconf;	/* 网卡查询结果对象 */
 	ACL_IFADDR *ifaddr;	/* 每个网卡信息对象 */
@@ -134,36 +131,82 @@ static void get_local_ip()
 
 	if (ifconf == NULL)
 	{
-		var_cfg_local_addr = "127.0.0.1";
+		logger_error("acl_get_ifaddrs error: %s, use 127.0.0.1",
+			acl::last_serror());
+		name = "lo";
+		addr = "127.0.0.1";
 		return;
 	}
 
-	const char* ip = NULL;
+	acl::string nic_names_buf(nic_names);
+	acl::string net_addrs_buf(net_addrs);
+	const std::vector<acl::string>& names = nic_names_buf.split2(";, \t");
+	const std::vector<acl::string>& addrs = net_addrs_buf.split2(";, \t");
 
-#define	EQ(x, y) strncmp((x), (y), sizeof((y)) - 1) == 0
+	bool find_nic;
 
-	/* 遍历所有网卡的信息 */
-	acl_foreach(iter, ifconf) {
+	/* 遍历所有网卡的信息, 从中找出匹配内网网卡地址的选项 */
+	acl_foreach(iter, ifconf)
+	{
 		ifaddr = (ACL_IFADDR*) iter.data;
-		ip = ifaddr->ip;
-		if (EQ(ifaddr->ip, "192.168.") || EQ(ifaddr->ip, "10.0."))
+		const char* ptr = ifaddr->name;
+
+		if (ptr == NULL || *ptr == 0)
+		{
+			logger_error("ifaddr->name NULL");
+			continue;
+		}
+
+		// 找到网卡名匹配的地址
+		find_nic = false;
+		for (std::vector<acl::string>::const_iterator cit
+			= names.begin(); cit != names.end(); ++cit)
+		{
+			if ((*cit).ncompare(ptr, (*cit).size(), false) == 0)
+			{
+				find_nic = true;
+				name = ptr;
+				break;
+			}
+		}
+
+		if (find_nic == false)
+			continue;
+
+		// 找到 IP 地址匹配的地址
+		for (std::vector<acl::string>::const_iterator cit
+			= addrs.begin(); cit != addrs.end(); ++cit)
+		{
+			if (strstr(ifaddr->ip, (*cit).c_str()) != NULL)
+			{
+				addr = ifaddr->ip;
+				break;
+			}
+		}
+
+		if (!addr.empty())
 			break;
 	}
 
-	if (ip)
-		var_cfg_local_addr = ip;
-	else
-		var_cfg_local_addr = "127.0.0.1";
-
-	var_cfg_local_addr << ":" << var_cfg_service_name;
-
 	/* 释放查询结果 */
 	acl_free_ifaddrs(ifconf);
+
+	if (addr.empty())
+	{
+		logger_warn("no addr matched, use 127.0.0.1 instead");
+		name = "lo";
+		addr = "127.0.0.1";
+	}
 }
 
 void master_service::proc_on_init()
 {
-	get_local_ip();
+	acl::string name, addr;
+	find_addr_include(name, addr, var_cfg_nic_names, var_cfg_net_addrs);
+
+	var_cfg_local_addr << addr << ":" << var_cfg_service_name;
+
+	logger("-----local addr: %s------", var_cfg_local_addr.c_str());
 
 	if (var_cfg_manager_allow && *var_cfg_manager_allow)
 		allow_list::get_instance()

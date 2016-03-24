@@ -241,7 +241,22 @@ int master_threads::service_main(ACL_VSTREAM *client, void*)
 	// 1 表示不再监控该连接
 
 	if (__mt->thread_on_read(stream) == true)
-		return __mt->keep_read(stream) ? 0 : 1;
+	{
+		// 如果子类在返回 true 后不希望框架继续监控流，则直接返回给框架 1
+		if (!__mt->keep_read(stream))
+			return 1;
+
+		// 否则，需要检查该流是否已经关闭，如果关闭，则必须返回 -1
+		if (stream->eof())
+		{
+			logger_error("DISCONNECTED, CLOSING, FD: %d",
+				(int) stream->sock_handle());
+			return -1;
+		}
+
+		// 返回 0 表示继续监控该流的可读状态
+		return 0;
+	}
 
 	// 返回 -1 表示由上层框架真正关闭流，上层框架在真正关闭流前
 	// 将会回调 service_on_close 过程进行流关闭前的善后处理工作，

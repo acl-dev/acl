@@ -162,6 +162,7 @@ void acl_vstring_init(ACL_VSTRING *vp, size_t len)
 	vp->vbuf.ctx = NULL;
 	vp->maxlen = 0;
 	vp->slice = NULL;
+	vp->fd = ACL_FILE_INVALID;
 }
 
 void acl_vstring_free_buf(ACL_VSTRING *vp)
@@ -217,7 +218,6 @@ ACL_VSTRING *acl_vstring_slice_alloc(ACL_SLICE_POOL *slice, size_t len)
 		vp->vbuf.data = (unsigned char *) acl_mymalloc(len);
 	}
 
-	vp->fd = ACL_FILE_INVALID;
 #if defined(_WIN32) || defined(_WIN64)
 	vp->hmap = NULL;
 #endif
@@ -230,6 +230,7 @@ ACL_VSTRING *acl_vstring_slice_alloc(ACL_SLICE_POOL *slice, size_t len)
 	vp->vbuf.space = vstring_buf_space;
 	vp->vbuf.ctx = NULL;
 	vp->maxlen = 0;
+	vp->fd = ACL_FILE_INVALID;
 
 	return vp;
 }
@@ -254,7 +255,6 @@ ACL_VSTRING *acl_vstring_dbuf_alloc(ACL_DBUF_POOL *dbuf, size_t len)
 		vp->vbuf.data = (unsigned char *) acl_mymalloc(len);
 	}
 
-	vp->fd = ACL_FILE_INVALID;
 #if defined(_WIN32) || defined(_WIN64)
 	vp->hmap = NULL;
 #endif
@@ -267,6 +267,7 @@ ACL_VSTRING *acl_vstring_dbuf_alloc(ACL_DBUF_POOL *dbuf, size_t len)
 	vp->vbuf.space = vstring_buf_space;
 	vp->vbuf.ctx = NULL;
 	vp->maxlen = 0;
+	vp->fd = ACL_FILE_INVALID;
 
 	return vp;
 }

@@ -26,6 +26,13 @@ protected:
 	 */
 	virtual void proc_on_exit();
 
+public:
+	/*
+	 * 找到匹配的内地址
+	 */
+	static void find_addr_include(acl::string& name, acl::string& addr,
+		const char* nic_names, const char* net_addrs);
+
 private:
 	acl::event_timer* manage_timer_;
 	acl::event_timer* status_timer_;
