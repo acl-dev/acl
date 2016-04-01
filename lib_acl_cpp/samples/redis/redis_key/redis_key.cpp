@@ -18,7 +18,7 @@ static bool test_del(acl::redis_key& redis, int n)
 			return false;
 		}
 		else if (i < 10)
-			printf("del ok, key: %s\r\n", key.c_str());
+			printf("del ok, key: %s, ret: %d\r\n", key.c_str(), ret);
 	}
 
 	return true;

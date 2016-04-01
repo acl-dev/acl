@@ -51,7 +51,7 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int b_mode,
 	const char *myname = "acl_inet_connect_ex";
 	ACL_SOCKET  sock = ACL_SOCKET_INVALID;
 	char  buf[256], *ptr;
-	const char *pip, *remote, *local_ip;
+	const char *ip, *remote, *local_ip;
 	int   port, i, n;
 	ACL_DNS_DB *h_dns_db;
 
@@ -104,15 +104,15 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int b_mode,
 	n = acl_netdb_size(h_dns_db);
 
 	for (i = 0; i < n; i++) {
-		pip = acl_netdb_index_ip(h_dns_db, i);
-		if (pip == NULL)
+		ip = acl_netdb_index_ip(h_dns_db, i);
+		if (ip == NULL)
 			break;
 
-		sock = inet_connect_one(pip, port, local_ip, b_mode, timeout);
+		sock = inet_connect_one(ip, port, local_ip, b_mode, timeout);
 		if (sock != ACL_SOCKET_INVALID)
 			break;
-		acl_msg_error("%s(%d): connect ip(%s) port(%d) error",
-				myname, __LINE__, pip, port);
+		acl_msg_error("%s(%d): connect error: %s, addr: %s:%d, fd: %d",
+			myname, __LINE__, acl_last_serror(), ip, port, sock);
 	}
 
 	acl_netdb_free(h_dns_db);
@@ -135,7 +135,7 @@ static ACL_SOCKET inet_connect_one(const char *ip, int port,
 	/* sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); */
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s(%d): create socket error(%s)",
+		acl_msg_error("%s(%d): create socket error: %s",
 			myname, __LINE__, acl_last_serror());
 		return ACL_SOCKET_INVALID;
 	}
@@ -151,8 +151,9 @@ static ACL_SOCKET inet_connect_one(const char *ip, int port,
 			sizeof(struct sockaddr)) < 0)
 		{
 			acl_socket_close(sock);
-			acl_msg_error("%s(%d): bind local ip(%s) error(%s)",
-				myname, __LINE__, local_ip, acl_last_serror());
+			acl_msg_error("%s(%d): bind ip(%s) error: %s, fd: %d",
+				myname, __LINE__, local_ip,
+				acl_last_serror(), sock);
 			return ACL_SOCKET_INVALID;
 		}
 	}
@@ -185,10 +186,10 @@ static ACL_SOCKET inet_connect_one(const char *ip, int port,
 	if (acl_sane_connect(sock, (const struct sockaddr *) &saddr,
 		sizeof(saddr)) < 0)
 	{
-		int  ret, err, errno_saved;
+		int  ret, err, errnum;
 		socklen_t len;
 
-		errno_saved = acl_last_error();
+		errnum = acl_last_error();
 		len = sizeof(err);
 		ret = getsockopt(sock, SOL_SOCKET, SO_ERROR, (char *) &err, &len);
 		if (ret < 0) {
@@ -197,7 +198,7 @@ static ACL_SOCKET inet_connect_one(const char *ip, int port,
 			 * Solaris 2.4's socket emulation doesn't allow you
 			 * to determine the error from a failed non-blocking
 			 * connect and just returns EPIPE.  Create a fake
-			 * error message for connect.   -- fenner@parc.xerox.com
+			 * error message for connect. -- fenner@parc.xerox.com
 			 */
 			if (errno == EPIPE)
 				acl_set_error(ACL_ENOTCONN);
@@ -205,15 +206,15 @@ static ACL_SOCKET inet_connect_one(const char *ip, int port,
 			acl_socket_close(sock);
 			return ACL_SOCKET_INVALID;
 		} else if (err != 0) {
-			errno_saved = err;
+			errnum = err;
 			acl_set_error(err);
 		}
 
 #ifdef	ACL_WINDOWS
-		if (errno_saved == ACL_EINPROGRESS || errno_saved == ACL_EWOULDBLOCK)
+		if (errnum == ACL_EINPROGRESS || errnum == ACL_EWOULDBLOCK)
 			return sock;
 #elif defined(ACL_UNIX)
-		if (errno_saved == ACL_EINPROGRESS || errno_saved == EISCONN)
+		if (errnum == ACL_EINPROGRESS || errnum == EISCONN)
 			return sock;
 #endif
 		acl_socket_close(sock);

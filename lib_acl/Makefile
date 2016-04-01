@@ -331,6 +331,7 @@ shared: depends $(OBJS_DST)
 depends: $(OBJS_DEF)
 
 pch: StdAfx.h
+	rm -f $(PCH)
 	$(CC) -o $(PCH) -x c-header $(CFLAGS) StdAfx.h
 
 ###########################################################

@@ -134,8 +134,12 @@ void redis_command::set_slice_respond(bool on)
 
 void redis_command::set_client(redis_client* conn)
 {
-	conn_ = conn;
-	set_client_addr(*conn);
+	if (conn != NULL)
+	{
+		conn_ = conn;
+		cluster_ = NULL;
+		set_client_addr(*conn);
+	}
 }
 
 void redis_command::set_client_addr(redis_client& conn)
@@ -159,6 +163,7 @@ void redis_command::set_cluster(redis_client_cluster* cluster, size_t max_conns)
 	if (cluster == NULL)
 		return;
 
+	conn_ = NULL;
 	redirect_max_ = cluster->get_redirect_max();
 	if (redirect_max_ <= 0)
 		redirect_max_ = 15;

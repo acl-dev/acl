@@ -222,6 +222,7 @@ shared: depends pch $(OBJS_DST)
 
 depends: $(OBJS_DEF)
 pch: src/acl_stdafx.hpp
+	rm -f $(PCH)
 	$(CC) -o $(PCH) -x c++-header $(CFLAGS) src/acl_stdafx.hpp
 
 # src

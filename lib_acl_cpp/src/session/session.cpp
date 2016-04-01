@@ -239,12 +239,14 @@ bool session::set_ttl(time_t ttl, bool delay)
 		return true;
 	}
 
+#if 0
 	// 如果该 sid 还没有在后端 cache 上存储过，则仅在对象中本地设置一下
 	else if (!sid_saved_)
 	{
 		ttl_ = ttl;
 		return true;
 	}
+#endif
 
 	// 修改后端 cache 上针对该 sid 的 ttl
 	else if (set_timeout(ttl) == true)

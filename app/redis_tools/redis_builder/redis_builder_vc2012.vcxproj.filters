@@ -24,6 +24,9 @@
     <ClCompile Include="redis_builder.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="redis_commands.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="redis_status.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -42,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="redis_builder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="redis_commands.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="redis_status.h">

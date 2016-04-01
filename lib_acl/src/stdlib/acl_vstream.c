@@ -83,8 +83,8 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		"\0",                           /* errbuf */
 		0,                              /* errnum */
 		0,                              /* rw_timeout */
-		"\0",                           /* addr_local */
-		"\0",                           /* addr_peer */
+		NULL,                           /* addr_local */
+		NULL,                           /* addr_peer */
 		NULL,                           /* sa_local */
 		NULL,                           /* sa_peer */
 		0,                              /* sa_local_size */
@@ -140,8 +140,8 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		"\0",                           /* errbuf */
 		0,                              /* errnum */
 		0,                              /* rw_timeout */
-		"\0",                           /* addr_local */
-		"\0",                           /* addr_peer */
+		NULL,                           /* addr_local */
+		NULL,                           /* addr_peer */
 		NULL,                           /* sa_local */
 		NULL,                           /* sa_peer */
 		0,                              /* sa_local_size */
@@ -196,8 +196,8 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		"\0",                           /* errbuf */
 		0,                              /* errnum */
 		0,                              /* rw_timeout */
-		"\0",                           /* addr_local */
-		"\0",                           /* addr_peer */
+		NULL,                           /* addr_local */
+		NULL,                           /* addr_peer */
 		NULL,                           /* sa_local */
 		NULL,                           /* sa_peer */
 		0,                              /* sa_local_size */
@@ -2189,7 +2189,7 @@ ACL_VSTREAM *acl_vstream_clone(const ACL_VSTREAM *from)
 	to->ioctl_write_ctx = NULL;
 	to->fdp = NULL;
 	to->context = from->context;
-	to->close_handle_lnk = acl_array_create(5);
+	to->close_handle_lnk = acl_array_create(8);
 
 	if (from->close_handle_lnk == NULL)
 		return to;
@@ -2764,8 +2764,12 @@ void acl_vstream_free(ACL_VSTREAM *fp)
 
 	if (fp->fdp != NULL)
 		event_fdtable_free(fp->fdp);
-	if (fp->read_buf != NULL)
+	if (fp->read_buf != NULL && fp->read_buf != __vstream_stdin_buf
+		&& fp->read_buf != __vstream_stdout_buf
+		&& fp->read_buf != __vstream_stderr_buf)
+	{
 		acl_myfree(fp->read_buf);
+	}
 	if (fp->wbuf != NULL)
 		acl_myfree(fp->wbuf);
 
@@ -2780,7 +2784,11 @@ void acl_vstream_free(ACL_VSTREAM *fp)
 	if (fp->path && fp->path != __empty_string)
 		acl_myfree(fp->path);
 
-	acl_myfree(fp);
+	if (fp != &acl_vstream_fstd[0] && fp != &acl_vstream_fstd[1]
+		&& fp != &acl_vstream_fstd[2])
+	{
+		acl_myfree(fp);
+	}
 }
 
 int acl_vstream_close(ACL_VSTREAM *fp)
@@ -3093,8 +3101,8 @@ void acl_vstream_add_close_handle(ACL_VSTREAM *fp,
 	}
 
 	if (fp->close_handle_lnk == NULL)
-		acl_msg_fatal("%s, %s(%d): close_handle_lnk null",
-			myname, __FILE__, __LINE__);
+		fp->close_handle_lnk = acl_array_create(8);
+
 	if (close_fn == NULL)
 		acl_msg_fatal("%s, %s(%d): close_fn null",
 			myname, __FILE__, __LINE__);
@@ -3133,11 +3141,9 @@ void acl_vstream_delete_close_handle(ACL_VSTREAM *fp,
 		acl_msg_error("%s(%d): fp null", myname, __LINE__);
 		return;
 	}
-	if (fp->close_handle_lnk == NULL) {
-		acl_msg_error("%s(%d): close_handle_lnk null",
-			myname, __LINE__);
+	if (fp->close_handle_lnk == NULL)
 		return;
-	}
+
 	if (close_fn == NULL) {
 		acl_msg_error("%s(%d): close_fn null", myname, __LINE__);
 		return;

@@ -59,8 +59,9 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 			}
 			if (fds.revents & POLLOUT)
 				return 0;
-			acl_msg_error("%s(%d), %s: unknown error, fd: %d",
-				__FILE__, __LINE__, myname, fd);
+			acl_msg_error("%s(%d), %s: poll error: %s, fd: %d",
+				__FILE__, __LINE__, myname,
+				acl_last_serror(), fd);
 			return -1;
 		}
 	}
