@@ -1751,4 +1751,35 @@ void redis_command::build(const char* cmd, const char* key,
 
 /////////////////////////////////////////////////////////////////////////////
 
+const redis_result* redis_command::request(size_t argc, const char* argv[],
+	size_t lens[], size_t nchild /* = 0 */)
+{
+	build_request(argc, argv, lens);
+	const redis_result* result = run(nchild);
+	return result;
+}
+
+const redis_result* redis_command::request(const std::vector<string>& args,
+	size_t nchild /* = 0 */)
+{
+	argc_ = args.size();
+	if (argc_ == 0)
+	{
+		logger_error("args empty!");
+		return NULL;
+	}
+
+	argv_space(argc_);
+
+	for (size_t i = 0; i < argc_; i++)
+	{
+		argv_[i] = args[i].c_str();
+		argv_lens_[i] = args[i].size();
+	}
+
+	return request(argc_, argv_, argv_lens_, nchild);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
 } // namespace acl

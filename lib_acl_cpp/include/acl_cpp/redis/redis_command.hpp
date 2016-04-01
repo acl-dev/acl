@@ -51,7 +51,7 @@ public:
 	 */
 	redis_command(redis_client_cluster* cluster, size_t max_conns);
 
-	virtual ~redis_command(void) = 0;
+	virtual ~redis_command(void);
 
 	/**
 	 * 在重复使用一个继承于 redis_command 的子类操作 redis 时，需要在
@@ -283,6 +283,27 @@ public:
 	 *  internal default is false
 	 */
 	void set_slice_respond(bool on);
+
+public:
+	/**
+	 * 直接组合 redis 协议命令方式，从 redis 服务器获得结果
+	 * @param argc {size_t} 后面数组中数组元素个数
+	 * @param argv {const char*[]} redis 命令组成的数组
+	 * @param lens {size_t[]} argv 中数组元素的长度
+	 * @param nchild {size_t} 有的 redis 命令需要获取多个结果集，如：subop
+	 * @return {const redis_result*} 返回的结果集
+	 */
+	const redis_result* request(size_t argc, const char* argv[],
+		size_t lens[], size_t nchild = 0);
+
+	/**
+	 * 直接组合 redis 协议命令方式，从 redis 服务器获得结果
+	 * @param args {const std::vector<string>&} redis 命令组成的数组
+	 * @param nchild {size_t} 有的 redis 命令需要获取多个结果集，如：subop
+	 * @return {const redis_result*} 返回的结果集
+	 */
+	const redis_result* request(const std::vector<string>& args,
+		size_t nchind = 0);
 
 protected:
 	const redis_result* run(size_t nchild = 0);

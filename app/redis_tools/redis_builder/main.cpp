@@ -11,7 +11,7 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		" -s redis_addr[ip:port]\r\n"
-		" -a cmd[nodes|slots|create|add_node|del_node|node_id|reshard|hash_slot|console]\r\n"
+		" -a cmd[nodes|slots|create|add_node|del_node|node_id|reshard|hash_slot|run]\r\n"
 		" -p passwd\r\n"
 		" -N new_node[ip:port]\r\n"
 		" -S [add node as slave]\r\n"
@@ -193,10 +193,10 @@ int main(int argc, char* argv[])
 			reshard.run();
 		}
 	}
-	else if (cmd == "console")
+	else if (cmd == "run")
 	{
 		if (addr.empty())
-			printf("usage: %s -s ip:port -a console\r\n", argv[0]);
+			printf("usage: %s -s ip:port -a run\r\n", argv[0]);
 		else
 		{
 			redis_commands cmds(addr, passwd, conn_timeout, rw_timeout);

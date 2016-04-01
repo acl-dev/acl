@@ -42,12 +42,4 @@ redis::redis(redis_client_cluster* cluster, size_t max_conns /* = 0 */)
 {
 }
 
-const redis_result* redis::request(size_t argc, const char* argv[],
-	size_t lens[], size_t nchild /* = 0 */)
-{
-	build_request(argc, argv, lens);
-	const redis_result* result = run(nchild);
-	return result;
-}
-
 } // namespace acl
