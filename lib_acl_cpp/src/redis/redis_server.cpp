@@ -238,6 +238,35 @@ int redis_server::info(string& buf)
 	return get_string(buf);
 }
 
+int redis_server::info(std::map<string, string>& out)
+{
+	out.clear();
+	string buf;
+	int ret = info(buf);
+	if (ret <= 0)
+		return ret;
+
+	string line;
+	while (!buf.empty())
+	{
+		line.clear();
+		buf.scan_line(line);
+		if (line.empty())
+			continue;
+
+		char* name = line.c_str();
+		if (*name == ':')
+			name++;
+		char* value = strchr(name, ':');
+		if (value == NULL || *(value + 1) == 0)
+			continue;
+		*value++ = 0;
+		out[name] = value;
+	}
+
+	return (int) out.size();
+}
+
 time_t redis_server::lastsave()
 {
 	const char* argv[1];

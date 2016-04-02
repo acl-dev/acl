@@ -18,6 +18,16 @@ ifeq ($(CC),)
         CC = gcc
 endif
 
+EXIST_READLINE = $(shell if [ -f "/usr/lib/libreadline.a" -o -f "/usr/lib/libreadline.so" ]; then echo "exist"; else echo "notexist"; fi;)
+EXIST_CURSOR = $(shell if [ -f "/usr/lib/liblibcurses.a" -o -f "/usr/lib/libcurses.so" ]; then echo "exist"; else echo "notexist"; fi;)
+
+ifeq ($(EXIST_READLINE), exist)
+	ifeq ($(EXIST_CURSOR), exist)
+		CFLAGS += -DHAS_READLINE
+		SYSLIB = -lreadline -lcurses -lpthread -lz
+	endif
+endif
+
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	ifeq ($(findstring gcc, $(CC)), gcc)
@@ -116,6 +126,7 @@ RM:
 clean:
 	rm -f $(PROG)
 	rm -f $(OBJ)
+rebuild rb: clean all
 install:
 	cp $(PROG) ../../../dist/master/libexec/$(RPATH)/
 	cp $(PROG).cf ../../../dist/master/conf/service/

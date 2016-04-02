@@ -16,6 +16,8 @@ private:
 	int rw_timeout_;
 	acl::redis_client_cluster* conns_;
 
+	void set_addr(const char* in, acl::string& out);
+	void getline(acl::string& buf, const char* prompt = NULL);
 	void create_cluster();
 	const std::map<acl::string, acl::redis_node*>* get_masters(acl::redis&);
 	void help(void);
@@ -41,6 +43,7 @@ private:
 	void zset_get(const char* key, size_t max);
 
 	void pattern_remove(const std::vector<acl::string>& tokens);
+	int pattern_remove(const char* addr, const char* pattern);
 	int remove(const std::vector<acl::string>& keys);
 
 	void check_type(const std::vector<acl::string>& tokens);

@@ -136,6 +136,13 @@ public:
 	int info(string& buf);
 
 	/**
+	 * 返回关于 Redis 服务器的各种信息和统计数值
+	 * @param out {std::map<string, string>&} 存储结果
+	 * @return {int} 返回所存储的数据条目数量, -1 表示出错
+	 */
+	int info(std::map<string, string>& out);
+
+	/**
 	 * 返回最近一次 Redis 成功将数据保存到磁盘上的时间，以 UNIX 时间戳格式表示
 	 * @return {time_t}
 	 */

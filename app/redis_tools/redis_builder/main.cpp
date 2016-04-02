@@ -7,6 +7,28 @@
 
 //////////////////////////////////////////////////////////////////////////
 
+#ifdef	HAS_READLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+
+static void test_readline(void)
+{
+	while (true)
+	{
+		char* ptr = readline("> ");
+		if (ptr == NULL || *ptr == 0)
+			break;
+		if (strcasecmp(ptr, "q") == 0)
+		{
+			printf("Bye!\r\n");
+			break;
+		}
+		printf("%s", ptr);
+		add_history(ptr);
+	}
+}
+#endif
+
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
@@ -193,16 +215,15 @@ int main(int argc, char* argv[])
 			reshard.run();
 		}
 	}
-	else if (cmd == "run")
+	else if (cmd == "run" || cmd.empty())
 	{
-		if (addr.empty())
-			printf("usage: %s -s ip:port -a run\r\n", argv[0]);
-		else
-		{
-			redis_commands cmds(addr, passwd, conn_timeout, rw_timeout);
-			cmds.run();
-		}
+		redis_commands cmds(addr, passwd, conn_timeout, rw_timeout);
+		cmds.run();
 	}
+#ifdef	HAS_READLINE
+	else if (cmd == "readline")
+		test_readline();
+#endif
 	else
 		printf("unknown cmd: %s\r\n", cmd.c_str());
 
