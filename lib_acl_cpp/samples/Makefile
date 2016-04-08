@@ -46,6 +46,9 @@ all:
 	@(cd db; make)
 	@(cd redis; make)
 	@(cd dbuf; make)
+	@(cd http_aio_proxy; make)
+	@(cd https_aio_proxy; make)
+	@(cd redis_aio_proxy; make)
 
 clean:
 	@(cd string; make clean)
@@ -95,5 +98,8 @@ clean:
 	@(cd db; make clean)
 	@(cd redis; make clean)
 	@(cd dbuf; make clean)
+	@(cd http_aio_proxy; make clean)
+	@(cd https_aio_proxy; make clean)
+	@(cd redis_aio_proxy; make clean)	
 
 rebuild rb: clean all
