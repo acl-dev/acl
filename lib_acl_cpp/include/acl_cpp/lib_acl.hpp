@@ -103,7 +103,6 @@
 #include "acl_cpp/hsocket/hsclient.hpp"
 #include "acl_cpp/hsocket/hstable.hpp"
 #include "acl_cpp/hsocket/hsrow.hpp"
-#include "acl_cpp/hsocket/hserror.hpp"
 
 #include "acl_cpp/beanstalk/beanstalk.hpp"
 #include "acl_cpp/beanstalk/beanstalk_pool.hpp"
@@ -168,6 +167,7 @@
 #include "acl_cpp/redis/redis_slot.hpp"
 #include "acl_cpp/redis/redis_node.hpp"
 #include "acl_cpp/redis/redis_geo.hpp"
+#include "acl_cpp/redis/redis_proxy.hpp"
 #include "acl_cpp/redis/redis.hpp"
 
 #include "acl_cpp/disque/disque.hpp"
