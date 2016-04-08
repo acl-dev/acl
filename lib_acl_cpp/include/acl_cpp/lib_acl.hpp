@@ -103,6 +103,7 @@
 #include "acl_cpp/hsocket/hsclient.hpp"
 #include "acl_cpp/hsocket/hstable.hpp"
 #include "acl_cpp/hsocket/hsrow.hpp"
+#include "acl_cpp/hsocket/hserror.hpp"
 
 #include "acl_cpp/beanstalk/beanstalk.hpp"
 #include "acl_cpp/beanstalk/beanstalk_pool.hpp"
