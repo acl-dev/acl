@@ -13,7 +13,7 @@ static int var_cfg_conn_timeout;
 static int var_cfg_rw_timeout;
 
 acl::master_str_tbl var_conf_str_tab[] = {
-	{ "https_backend_addr", "127.0.0.1:80", &var_cfg_backend_addr },
+	{ "https_backend_addr", "127.0.0.1:443", &var_cfg_backend_addr },
 	{ "https_request_file", "", &var_cfg_request_file },
 	{ "https_respond_file", "", &var_cfg_respond_file },
 	{ "https_interface", "/test/test_jqredis.php", &var_cfg_interface },	
