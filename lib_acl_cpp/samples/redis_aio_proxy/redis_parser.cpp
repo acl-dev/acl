@@ -1,7 +1,7 @@
 //
 //  redis_parser.c
 //  supex
-//
+//  Modified by laochen 增加了redis命令适配（改遍自redis里面的源码)
 //  Created by 周凯 on 16/1/16.
 //  Copyright © 2016年 zhoukai. All rights reserved.
 //
