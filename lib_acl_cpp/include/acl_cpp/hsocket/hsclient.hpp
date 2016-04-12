@@ -17,148 +17,148 @@ class ACL_CPP_API hsclient
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param addr {const char*} handlersocket ²å¼şÔÚ Mysql ÉÏµÄ¼àÌıµØÖ·£¬
-	 * @param cache_enable {bool} ÄÚ²¿ÊÇ·ñÆôÓÃĞĞ»º´æ¹¦ÄÜ
-	 * @param retry_enable {bool} µ±ÒòÎªÍøÂçÔ­Òò³ö´íÊ±ÊÇ·ñĞèÒªÖØÊÔ
-	 *  ¸ñÊ½Îª£ºip:port
+	 * æ„é€ å‡½æ•°
+	 * @param addr {const char*} handlersocket æ’ä»¶åœ¨ Mysql ä¸Šçš„ç›‘å¬åœ°å€ï¼Œ
+	 * @param cache_enable {bool} å†…éƒ¨æ˜¯å¦å¯ç”¨è¡Œç¼“å­˜åŠŸèƒ½
+	 * @param retry_enable {bool} å½“å› ä¸ºç½‘ç»œåŸå› å‡ºé”™æ—¶æ˜¯å¦éœ€è¦é‡è¯•
+	 *  æ ¼å¼ä¸ºï¼šip:port
 	 */
 	hsclient(const char* addr, bool cache_enable = true, bool retry_enable = true);
 	~hsclient();
 
 	/**
-	 * ²éÑ¯ÓëËù¸ø×Ö¶ÎÖµÆ¥ÅäµÄ½á¹û
-	 * @param values {const char*[]} Æ¥Åä×Ö¶ÎÖµÊı×é£¬×Ö¶ÎÖµµÄ¼ÓÈëË³ĞòÓ¦Óë open
-	 *  º¯ÊıÖĞ flds ÖĞ¸÷¸ö×Ö¶ÎµÄË³ĞòÏàÍ¬
-	 * @param num {int} values Êı×é³¤¶È£¬¸ÃÖµ²»Ó¦³¬¹ı¹¹Ôìº¯ÊıÖĞ flds Ëùº¬ÓĞµÄ
-	 *  ×Ö¶Î¸öÊı
-	 * @param cond {const char*} Æ¥ÅäÌõ¼ş£¬¿ÉÒÔÎª£º
-	 *  = µÈÓÚ; >= ´óÓÚµÈÓÚ; > ´óÓÚ; < Ğ¡ÓÚ; <= Ğ¡ÓÚµÈÓÚ
-	 * @param nlimit {int} ½á¹û¼¯¸öÊıÏŞÖÆ£¬0 ±íÊ¾²»ÏŞÖÆ¸öÊı
-	 * @param noffset {int} ½á¹û¼¯¿ªÊ¼Î»ÖÃ(0±íÊ¾´ÓµÚÒ»¸ö½á¹û¿ªÊ¼)
-	 * @return {const std::verctor<hsrow*>&} ·µ»Ø½á¹û¼¯
+	 * æŸ¥è¯¢ä¸æ‰€ç»™å­—æ®µå€¼åŒ¹é…çš„ç»“æœ
+	 * @param values {const char*[]} åŒ¹é…å­—æ®µå€¼æ•°ç»„ï¼Œå­—æ®µå€¼çš„åŠ å…¥é¡ºåºåº”ä¸ open
+	 *  å‡½æ•°ä¸­ flds ä¸­å„ä¸ªå­—æ®µçš„é¡ºåºç›¸åŒ
+	 * @param num {int} values æ•°ç»„é•¿åº¦ï¼Œè¯¥å€¼ä¸åº”è¶…è¿‡æ„é€ å‡½æ•°ä¸­ flds æ‰€å«æœ‰çš„
+	 *  å­—æ®µä¸ªæ•°
+	 * @param cond {const char*} åŒ¹é…æ¡ä»¶ï¼Œå¯ä»¥ä¸ºï¼š
+	 *  = ç­‰äº; >= å¤§äºç­‰äº; > å¤§äº; < å°äº; <= å°äºç­‰äº
+	 * @param nlimit {int} ç»“æœé›†ä¸ªæ•°é™åˆ¶ï¼Œ0 è¡¨ç¤ºä¸é™åˆ¶ä¸ªæ•°
+	 * @param noffset {int} ç»“æœé›†å¼€å§‹ä½ç½®(0è¡¨ç¤ºä»ç¬¬ä¸€ä¸ªç»“æœå¼€å§‹)
+	 * @return {const std::verctor<hsrow*>&} è¿”å›ç»“æœé›†
 	 */
 	const std::vector<hsrow*>& get(const char* values[], int num,
 		const char* cond = "=", int nlimit = 0, int noffset = 0);
 
 	/**
-	 * ²éÑ¯ÓëËù¸ø×Ö¶ÎÖµÆ¥ÅäµÄ½á¹û
-	 * @param first_value {const char*} Îª¶ÔÓ¦ÓÚ¹¹Ôìº¯ÊıÖĞ flds ×Ö¶Î¼¯ÖĞ
-	 *  µÄµÚÒ»¸ö×Ö¶ÎµÄ×Ö¶ÎÖµ
-	 * @param ... {const char*} ²ÎÊıÁĞ±í£¬×îºóÒ»¸ö²ÎÊıÎª NULL ±íÊ¾½áÊø
-	 * @return {const std::verctor<hsrow*>&} ·µ»Ø½á¹û¼¯
+	 * æŸ¥è¯¢ä¸æ‰€ç»™å­—æ®µå€¼åŒ¹é…çš„ç»“æœ
+	 * @param first_value {const char*} ä¸ºå¯¹åº”äºæ„é€ å‡½æ•°ä¸­ flds å­—æ®µé›†ä¸­
+	 *  çš„ç¬¬ä¸€ä¸ªå­—æ®µçš„å­—æ®µå€¼
+	 * @param ... {const char*} å‚æ•°åˆ—è¡¨ï¼Œæœ€åä¸€ä¸ªå‚æ•°ä¸º NULL è¡¨ç¤ºç»“æŸ
+	 * @return {const std::verctor<hsrow*>&} è¿”å›ç»“æœé›†
 	 */
 	const std::vector<hsrow*>& get(const char* first_value, ...)
 		ACL_CPP_PRINTF(2, 3);
 
 	/**
-	 * ¸üĞÂÊı¾İ¿â±íÖĞÆ¥Åä×Ö¶ÎµÄÊıÖµ
-	 * @param values {const char*[]} Æ¥Åä×Ö¶ÎÖµÊı×é£¬×Ö¶ÎÖµµÄ¼ÓÈëË³ĞòÓ¦Óë open
-	 *  º¯ÊıÖĞ flds ÖĞ¸÷¸ö×Ö¶ÎµÄË³ĞòÏàÍ¬
-	 * @param num {int} values Êı×é³¤¶È£¬¸ÃÖµ²»Ó¦³¬¹ı¹¹Ôìº¯ÊıÖĞ flds Ëùº¬ÓĞµÄ
-	 *  ×Ö¶Î¸öÊı
-	 * @param to_values {cosnt *[]} Æ¥Åä×Ö¶ÎĞÂÖµ£¬×Ö¶ÎÖµµÄË³ĞòÓ¦Óë open ·½·¨ÖĞ
-	 *  µÄ×Ö¶ÎË³ĞòÏàÍ¬
-	 * @param to_num {int} to_values Êı×é³¤¶È
-	 * @param cond {const char*} Æ¥ÅäÌõ¼ş£¬¿ÉÒÔÎª£º
-	 *  = µÈÓÚ; >= ´óÓÚµÈÓÚ; > ´óÓÚ; < Ğ¡ÓÚ; <= Ğ¡ÓÚµÈÓÚ
-	 * @param nlimit {int} ½á¹û¼¯¸öÊıÏŞÖÆ£¬0 ±íÊ¾²»ÏŞÖÆ¸öÊı
-	 * @param noffset {int} ½á¹û¼¯¿ªÊ¼Î»ÖÃ(0±íÊ¾´ÓµÚÒ»¸ö½á¹û¿ªÊ¼)
-	 * @return {bool} ¸üĞÂÊÇ·ñ³É¹¦
+	 * æ›´æ–°æ•°æ®åº“è¡¨ä¸­åŒ¹é…å­—æ®µçš„æ•°å€¼
+	 * @param values {const char*[]} åŒ¹é…å­—æ®µå€¼æ•°ç»„ï¼Œå­—æ®µå€¼çš„åŠ å…¥é¡ºåºåº”ä¸ open
+	 *  å‡½æ•°ä¸­ flds ä¸­å„ä¸ªå­—æ®µçš„é¡ºåºç›¸åŒ
+	 * @param num {int} values æ•°ç»„é•¿åº¦ï¼Œè¯¥å€¼ä¸åº”è¶…è¿‡æ„é€ å‡½æ•°ä¸­ flds æ‰€å«æœ‰çš„
+	 *  å­—æ®µä¸ªæ•°
+	 * @param to_values {cosnt *[]} åŒ¹é…å­—æ®µæ–°å€¼ï¼Œå­—æ®µå€¼çš„é¡ºåºåº”ä¸ open æ–¹æ³•ä¸­
+	 *  çš„å­—æ®µé¡ºåºç›¸åŒ
+	 * @param to_num {int} to_values æ•°ç»„é•¿åº¦
+	 * @param cond {const char*} åŒ¹é…æ¡ä»¶ï¼Œå¯ä»¥ä¸ºï¼š
+	 *  = ç­‰äº; >= å¤§äºç­‰äº; > å¤§äº; < å°äº; <= å°äºç­‰äº
+	 * @param nlimit {int} ç»“æœé›†ä¸ªæ•°é™åˆ¶ï¼Œ0 è¡¨ç¤ºä¸é™åˆ¶ä¸ªæ•°
+	 * @param noffset {int} ç»“æœé›†å¼€å§‹ä½ç½®(0è¡¨ç¤ºä»ç¬¬ä¸€ä¸ªç»“æœå¼€å§‹)
+	 * @return {bool} æ›´æ–°æ˜¯å¦æˆåŠŸ
 	 */
 	bool mod(const char* values[], int num,
 		const char* to_values[], int to_num,
 		const char* cond = "=", int nlimit = 0, int noffset = 0);
 
 	/**
-	 * É¾³ıÊı¾İ¿â±íÖĞÆ¥Åä×Ö¶ÎµÄ¼ÇÂ¼
-	 * @param values {const char*[]} Æ¥Åä×Ö¶ÎÖµÊı×é£¬×Ö¶ÎÖµµÄ¼ÓÈëË³ĞòÓ¦Óë open
-	 *  º¯ÊıÖĞ flds ÖĞ¸÷¸ö×Ö¶ÎµÄË³ĞòÏàÍ¬
-	 * @param num {int} values Êı×é³¤¶È£¬¸ÃÖµ²»Ó¦³¬¹ı¹¹Ôìº¯ÊıÖĞ flds Ëùº¬ÓĞµÄ
-	 *  ×Ö¶Î¸öÊı
-	 * @param cond {const char*} Æ¥ÅäÌõ¼ş£¬¿ÉÒÔÎª£º
-	 *  = µÈÓÚ; >= ´óÓÚµÈÓÚ; > ´óÓÚ; < Ğ¡ÓÚ; <= Ğ¡ÓÚµÈÓÚ
-	 * @param nlimit {int} É¾³ıÊı¾İµÄ¸öÊı, 0 ±íÊ¾²»ÏŞÖÆ
-	 * @param noffset {int} ½á¹û¼¯¿ªÊ¼Î»ÖÃ(0±íÊ¾´ÓµÚÒ»¸ö½á¹û¿ªÊ¼)
-	 * @return {bool} ¸üĞÂÊÇ·ñ³É¹¦
+	 * åˆ é™¤æ•°æ®åº“è¡¨ä¸­åŒ¹é…å­—æ®µçš„è®°å½•
+	 * @param values {const char*[]} åŒ¹é…å­—æ®µå€¼æ•°ç»„ï¼Œå­—æ®µå€¼çš„åŠ å…¥é¡ºåºåº”ä¸ open
+	 *  å‡½æ•°ä¸­ flds ä¸­å„ä¸ªå­—æ®µçš„é¡ºåºç›¸åŒ
+	 * @param num {int} values æ•°ç»„é•¿åº¦ï¼Œè¯¥å€¼ä¸åº”è¶…è¿‡æ„é€ å‡½æ•°ä¸­ flds æ‰€å«æœ‰çš„
+	 *  å­—æ®µä¸ªæ•°
+	 * @param cond {const char*} åŒ¹é…æ¡ä»¶ï¼Œå¯ä»¥ä¸ºï¼š
+	 *  = ç­‰äº; >= å¤§äºç­‰äº; > å¤§äº; < å°äº; <= å°äºç­‰äº
+	 * @param nlimit {int} åˆ é™¤æ•°æ®çš„ä¸ªæ•°, 0 è¡¨ç¤ºä¸é™åˆ¶
+	 * @param noffset {int} ç»“æœé›†å¼€å§‹ä½ç½®(0è¡¨ç¤ºä»ç¬¬ä¸€ä¸ªç»“æœå¼€å§‹)
+	 * @return {bool} æ›´æ–°æ˜¯å¦æˆåŠŸ
 	 */
 	bool del(const char* values[], int num, const char* cond = "=",
 		int nlimit = 0, int noffset = 0);
 
 	/**
-	 * É¾³ıÊı¾İ¿â±íÖĞÆ¥Åä×Ö¶ÎµÄ¼ÇÂ¼
-	 * @param first_value {const char*} Îª¶ÔÓ¦ÓÚ¹¹Ôìº¯ÊıÖĞ flds ×Ö¶Î¼¯ÖĞ
-	 *  µÄµÚÒ»¸ö×Ö¶ÎµÄ×Ö¶ÎÖµ
-	 * @param ... {const char*} ²ÎÊıÁĞ±í£¬×îºóÒ»¸ö²ÎÊıÎª NULL ±íÊ¾½áÊø
-	 * @return {bool} Ìí¼Ó¼ÇÂ¼ÊÇ·ñ³É¹¦
+	 * åˆ é™¤æ•°æ®åº“è¡¨ä¸­åŒ¹é…å­—æ®µçš„è®°å½•
+	 * @param first_value {const char*} ä¸ºå¯¹åº”äºæ„é€ å‡½æ•°ä¸­ flds å­—æ®µé›†ä¸­
+	 *  çš„ç¬¬ä¸€ä¸ªå­—æ®µçš„å­—æ®µå€¼
+	 * @param ... {const char*} å‚æ•°åˆ—è¡¨ï¼Œæœ€åä¸€ä¸ªå‚æ•°ä¸º NULL è¡¨ç¤ºç»“æŸ
+	 * @return {bool} æ·»åŠ è®°å½•æ˜¯å¦æˆåŠŸ
 	 */
 	bool fmt_del(const char* first_value, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
-	 * ÏòÊı¾İ¿âÌí¼ÓĞÂ¼ÇÂ¼
-	 * @param values {const char*[]} Æ¥Åä×Ö¶ÎÖµÊı×é£¬×Ö¶ÎÖµµÄ¼ÓÈëË³ĞòÓ¦Óë¹¹Ôì
-	 *  º¯ÊıÖĞ flds ÖĞ¸÷¸ö×Ö¶ÎµÄË³ĞòÏàÍ¬
-	 * @param num {int} values Êı×é³¤¶È£¬¸ÃÖµ²»Ó¦³¬¹ı¹¹Ôìº¯ÊıÖĞ flds Ëùº¬ÓĞµÄ
-	 *  ×Ö¶Î¸öÊı
-	 * @return {bool} Ìí¼Ó¼ÇÂ¼ÊÇ·ñ³É¹¦
+	 * å‘æ•°æ®åº“æ·»åŠ æ–°è®°å½•
+	 * @param values {const char*[]} åŒ¹é…å­—æ®µå€¼æ•°ç»„ï¼Œå­—æ®µå€¼çš„åŠ å…¥é¡ºåºåº”ä¸æ„é€ 
+	 *  å‡½æ•°ä¸­ flds ä¸­å„ä¸ªå­—æ®µçš„é¡ºåºç›¸åŒ
+	 * @param num {int} values æ•°ç»„é•¿åº¦ï¼Œè¯¥å€¼ä¸åº”è¶…è¿‡æ„é€ å‡½æ•°ä¸­ flds æ‰€å«æœ‰çš„
+	 *  å­—æ®µä¸ªæ•°
+	 * @return {bool} æ·»åŠ è®°å½•æ˜¯å¦æˆåŠŸ
 	 */
 	bool add(const char* values[], int num);
 
 	/**
-	 * ÏòÊı¾İ¿âÖĞÌí¼ÓĞÂ¼ÇÂ¼
-	 * @param first_value {const char*} Îª¶ÔÓ¦ÓÚ¹¹Ôìº¯ÊıÖĞ flds ×Ö¶Î¼¯ÖĞ
-	 *  µÄµÚÒ»¸ö×Ö¶ÎµÄ×Ö¶ÎÖµ
-	 * @param ... {const char*} ²ÎÊıÁĞ±í£¬×îºóÒ»¸ö²ÎÊıÎª NULL ±íÊ¾½áÊø
-	 * @return {bool} Ìí¼Ó¼ÇÂ¼ÊÇ·ñ³É¹¦
+	 * å‘æ•°æ®åº“ä¸­æ·»åŠ æ–°è®°å½•
+	 * @param first_value {const char*} ä¸ºå¯¹åº”äºæ„é€ å‡½æ•°ä¸­ flds å­—æ®µé›†ä¸­
+	 *  çš„ç¬¬ä¸€ä¸ªå­—æ®µçš„å­—æ®µå€¼
+	 * @param ... {const char*} å‚æ•°åˆ—è¡¨ï¼Œæœ€åä¸€ä¸ªå‚æ•°ä¸º NULL è¡¨ç¤ºç»“æŸ
+	 * @return {bool} æ·»åŠ è®°å½•æ˜¯å¦æˆåŠŸ
 	 */
 	bool fmt_add(const char* first_value, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
-	 * ÉèÖÃÊÇ·ñ½øĞĞµ÷ÊÔ
-	 * @param on {bool} true Ôò±íÊ¾½øĞĞµ÷ÊÔ£¬»á½«Ò»Ğ©ÖĞ¼äĞÅÏ¢¼ÇÈëÈÕÖ¾ÖĞ
+	 * è®¾ç½®æ˜¯å¦è¿›è¡Œè°ƒè¯•
+	 * @param on {bool} true åˆ™è¡¨ç¤ºè¿›è¡Œè°ƒè¯•ï¼Œä¼šå°†ä¸€äº›ä¸­é—´ä¿¡æ¯è®°å…¥æ—¥å¿—ä¸­
 	 */
 	void debug_enable(bool on);
 
 	/**
-	 * ´ò¿ªÊı¾İ¿â±í
-	 * @param dbn {const char*} Êı¾İ¿âÃû³Æ
-	 * @param tbl {const char*} Êı¾İ¿â±íÃû
-	 * @param idx {const char*} Ë÷Òı×Ö¶ÎÃû
-	 * @param flds {const char*} Òª´ò¿ªµÄÊı¾İ×Ö¶ÎÃû¼¯ºÏ£¬¸ñÊ½Îª
-	 *  ÓÉ·Ö¸ô·û ",; \t" ·Ö¸ôµÄ×Ö¶ÎÃû³Æ£¬Èç£ºuser_id,user_name,user_mail
-	 * @param auto_open {bool} µ±±íÎ´´ò¿ªÊÇ·ñ×Ô¶¯´ò¿ª
-	 * @return {bool} true ±íÊ¾Õı³£´ò¿ª£¬·ñÔò±íÊ¾´ò¿ª±íÊ§°Ü
+	 * æ‰“å¼€æ•°æ®åº“è¡¨
+	 * @param dbn {const char*} æ•°æ®åº“åç§°
+	 * @param tbl {const char*} æ•°æ®åº“è¡¨å
+	 * @param idx {const char*} ç´¢å¼•å­—æ®µå
+	 * @param flds {const char*} è¦æ‰“å¼€çš„æ•°æ®å­—æ®µåé›†åˆï¼Œæ ¼å¼ä¸º
+	 *  ç”±åˆ†éš”ç¬¦ ",; \t" åˆ†éš”çš„å­—æ®µåç§°ï¼Œå¦‚ï¼šuser_id,user_name,user_mail
+	 * @param auto_open {bool} å½“è¡¨æœªæ‰“å¼€æ˜¯å¦è‡ªåŠ¨æ‰“å¼€
+	 * @return {bool} true è¡¨ç¤ºæ­£å¸¸æ‰“å¼€ï¼Œå¦åˆ™è¡¨ç¤ºæ‰“å¼€è¡¨å¤±è´¥
 	 */
 	bool open_tbl(const char* dbn, const char* tbl,
 		const char* idx, const char* flds, bool auto_open = true);
 
 	/**
-	 * »ñµÃÁ¬½ÓµØÖ·
-	 * @return {const char*} ÓÀ²»Îª¿Õ
+	 * è·å¾—è¿æ¥åœ°å€
+	 * @return {const char*} æ°¸ä¸ä¸ºç©º
 	 */
 	const char* get_addr() const;
 
 	/**
-	 * »ñµÃ³ö´í´íÎóºÅ
+	 * è·å¾—å‡ºé”™é”™è¯¯å·
 	 * @return {int}
 	 */
 	int  get_error() const;
 
 	/**
-	 * »ñµÃ³ö´í´íÎóĞÅÏ¢ÃèÊö
-	 * @param errnum {int} ÓÉ get_error »ñµÃµÄ´íÎóºÅ
+	 * è·å¾—å‡ºé”™é”™è¯¯ä¿¡æ¯æè¿°
+	 * @param errnum {int} ç”± get_error è·å¾—çš„é”™è¯¯å·
 	 * @return {const char*}
 	 */
 	const char* get_serror(int errnum) const;
 
 	/**
-	 * »ñµÃÉÏ´Î³ö´íÊ±µÄ´íÎóÃèÊöĞÅÏ¢
+	 * è·å¾—ä¸Šæ¬¡å‡ºé”™æ—¶çš„é”™è¯¯æè¿°ä¿¡æ¯
 	 * @return {const char*}
 	 */
 	const char* get_last_serror() const;
 
 	/**
-	 * »ñµÃµ±Ç° hsclient ¶ÔÏóËùÓÃµÄ id ºÅ
+	 * è·å¾—å½“å‰ hsclient å¯¹è±¡æ‰€ç”¨çš„ id å·
 	 * @return {int}
 	 */
 	int get_id() const;
@@ -171,7 +171,7 @@ private:
 	hstable* tbl_curr_;
 	string buf_;
 
-	// ·şÎñÆ÷Á¬½ÓÁ÷
+	// æœåŠ¡å™¨è¿æ¥æµ
 	socket_stream stream_;
 	std::map<string, hstable*> tables_;
 
@@ -179,18 +179,18 @@ private:
 	int    error_;
 	const char* serror_;
 
-	// ´ò¿ªÊı¾İ¿âÁ¬½Ó
+	// æ‰“å¼€æ•°æ®åº“è¿æ¥
 	bool open_tbl(const char* dbn, const char* tbl,
 		const char* idx, const char* flds, const char* key);
 
-	// µ±¶ÁĞ´Êı¾İ¿âÁ¬½ÓÁ÷³ö´íÊ±ĞèÒªµ÷ÓÃ´Ëº¯ÊıÀ´¹Ø±ÕÁ¬½ÓÁ÷¼°ÊÍ·Å
-	// ±í¶ÔÏó
+	// å½“è¯»å†™æ•°æ®åº“è¿æ¥æµå‡ºé”™æ—¶éœ€è¦è°ƒç”¨æ­¤å‡½æ•°æ¥å…³é—­è¿æ¥æµåŠé‡Šæ”¾
+	// è¡¨å¯¹è±¡
 	void close_stream();
 
-	// ÇåÀíÄÚ²¿´ò¿ªµÄÊı¾İ¿â±íµÄ¶ÔÏó
+	// æ¸…ç†å†…éƒ¨æ‰“å¼€çš„æ•°æ®åº“è¡¨çš„å¯¹è±¡
 	void clear_tables();
 
-	// ÏòÊı¾İ¿â·¢ËÍ²éÑ¯ÃüÁî²¢È¡µÃ½á¹ûÊı¾İ
+	// å‘æ•°æ®åº“å‘é€æŸ¥è¯¢å‘½ä»¤å¹¶å–å¾—ç»“æœæ•°æ®
 	bool query(const char* oper, const char* values[], int num,
 		const char* limit_offset, char mop,
 		const char* to_values[], int to_num);

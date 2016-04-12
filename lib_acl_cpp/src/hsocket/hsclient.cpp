@@ -135,10 +135,10 @@ void hsclient::clear_tables()
 
 void hsclient::close_stream()
 {
-	// ¹Ø±ÕÁ÷Á¬½Ó£¬µ«²¢²»ÊÍ·ÅÁ÷¶ÔÏó
+	// å…³é—­æµè¿æ¥ï¼Œä½†å¹¶ä¸é‡Šæ”¾æµå¯¹è±¡
 	stream_.close();
 
-	// ±ØĞëÇå³ıÓë¸ÃÁ÷¶ÔÏóÏà¹ØµÄÒÑ¾­´ò¿ªµÄ±í¶ÔÏó
+	// å¿…é¡»æ¸…é™¤ä¸è¯¥æµå¯¹è±¡ç›¸å…³çš„å·²ç»æ‰“å¼€çš„è¡¨å¯¹è±¡
 	clear_tables();
 }
 
@@ -404,7 +404,7 @@ bool hsclient::query(const char* oper, const char* values[], int num,
 
 	while (true)
 	{
-		// ´´½¨ÇëÇóÊı¾İ
+		// åˆ›å»ºè¯·æ±‚æ•°æ®
 		hsproto::build_request(buf_, tbl_curr_->id_, oper, values,
 			num, limit_offset, mop, to_values, to_num);
 
@@ -412,11 +412,11 @@ bool hsclient::query(const char* oper, const char* values[], int num,
 			printf("%s(%d)>>>send: (%s)\n",
 				__FUNCTION__, __LINE__, buf_.c_str());
 
-		// ÓëÊı¾İ¿âÍ¨ĞÅ²¢´ÓÊı¾İ¿â»ñµÃ½á¹û
+		// ä¸æ•°æ®åº“é€šä¿¡å¹¶ä»æ•°æ®åº“è·å¾—ç»“æœ
 		if (chat() == true)
 			break;
 
-		// Èç¹ûÓëÊı¾İ¿âÍ¨ĞÅÊ§°Üµ±ÔÊĞíÖØÊÔÊ±ÈôÖØÊÔÒ²Ê§°ÜÔò·µ»Ø´íÎó
+		// å¦‚æœä¸æ•°æ®åº“é€šä¿¡å¤±è´¥å½“å…è®¸é‡è¯•æ—¶è‹¥é‡è¯•ä¹Ÿå¤±è´¥åˆ™è¿”å›é”™è¯¯
 		if (retry_enable_ == false || retried)
 		{
 			close_stream();
@@ -425,14 +425,14 @@ bool hsclient::query(const char* oper, const char* values[], int num,
 
 		retried = true;
 
-		// ÏÈ»º³åµ±Ç°±í½á¹¹ÖĞµÄĞÅÏ¢
+		// å…ˆç¼“å†²å½“å‰è¡¨ç»“æ„ä¸­çš„ä¿¡æ¯
 		string dbn(tbl_curr_->dbn_), tbl(tbl_curr_->tbl_);
 		string idx(tbl_curr_->idx_), flds(tbl_curr_->flds_);
 
-		// ÏÈ¹Ø±Õ¾ÉµÄÁ¬½Ó¶ÔÏó¼°ËùÓĞµÄ±í¶ÔÏó
+		// å…ˆå…³é—­æ—§çš„è¿æ¥å¯¹è±¡åŠæ‰€æœ‰çš„è¡¨å¯¹è±¡
 		close_stream();
 
-		// ÔÙÖØĞÂ´ò¿ªÁ¬½Ó¶ÔÏó²¢´ò¿ª±í¶ÔÏó
+		// å†é‡æ–°æ‰“å¼€è¿æ¥å¯¹è±¡å¹¶æ‰“å¼€è¡¨å¯¹è±¡
 		if (open_tbl(dbn.c_str(), tbl.c_str(), idx.c_str(),
 				flds.c_str(), true) == false)
 		{

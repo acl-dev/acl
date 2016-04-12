@@ -72,4 +72,3 @@ bool redis_parse_request(struct redis_parse_t *info);
 
 __END_DECLS
 #endif  /* redis_parse_h */
-

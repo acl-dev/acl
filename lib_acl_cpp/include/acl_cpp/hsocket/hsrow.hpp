@@ -10,27 +10,27 @@ class ACL_CPP_API hsrow
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param ncolum {int} Êı¾İ¿â²éÑ¯Ê±Ã¿Ìõ¼ÇÂ¼µÄÁĞÊı
+	 * æ„é€ å‡½æ•°
+	 * @param ncolum {int} æ•°æ®åº“æŸ¥è¯¢æ—¶æ¯æ¡è®°å½•çš„åˆ—æ•°
 	 */
 	hsrow(int ncolum);
 	~hsrow();
 
 	/**
-	 * ÖØÖÃÊı¾İ²éÑ¯Ê±µÚÌõ¼ÇÂ¼µÄÁĞÊı
-	 * @param ncolum {int} Êı¾İ¿â²éÑ¯Ê±Ã¿Ìõ¼ÇÂ¼µÄÁĞÊı
+	 * é‡ç½®æ•°æ®æŸ¥è¯¢æ—¶ç¬¬æ¡è®°å½•çš„åˆ—æ•°
+	 * @param ncolum {int} æ•°æ®åº“æŸ¥è¯¢æ—¶æ¯æ¡è®°å½•çš„åˆ—æ•°
 	 */
 	void reset(int ncolum);
 
 	/**
-	 * Ïò¸Ã²éÑ¯¼ÇÂ¼ÖĞÌí¼ÓÁĞÊıÖµ
-	 * @param value {const char*} ÁĞÖµ
-	 * @param dlen {size_t} ÁĞÖµ³¤¶È
+	 * å‘è¯¥æŸ¥è¯¢è®°å½•ä¸­æ·»åŠ åˆ—æ•°å€¼
+	 * @param value {const char*} åˆ—å€¼
+	 * @param dlen {size_t} åˆ—å€¼é•¿åº¦
 	 */
 	void push_back(const char* value, size_t dlen);
 
 	/**
-	 * È¡µÃ²éÑ¯¼ÇÂ¼
+	 * å–å¾—æŸ¥è¯¢è®°å½•
 	 * @return {const std::vector<const char*>&}
 	 */
 	const std::vector<const char*>& get_row() const;

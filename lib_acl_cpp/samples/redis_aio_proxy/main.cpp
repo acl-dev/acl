@@ -36,21 +36,21 @@ acl::redis_client_cluster __manager;
 void setRedis(){
     __manager.set_retry_inter(1);
     // 设置重定向的最大阀值，若重定向次数超过此阀值则报错
-    if(var_conf_int_tab[0].target){
+    if (var_conf_int_tab[0].target){
         __manager.set_redirect_max(*var_conf_int_tab[0].target);        
     }else{
         __manager.set_redirect_max(var_conf_int_tab[0].defval);
     }
 
     // 当重定向次数 >= 2 时每次再重定向此函数设置休息的时间(毫秒)
-    if(var_conf_int_tab[1].target){
+    if (var_conf_int_tab[1].target){
         __manager.set_redirect_sleep(*var_conf_int_tab[1].target);        
     }else{
         __manager.set_redirect_max(var_conf_int_tab[1].defval);
     }
 
     acl::string backend_addr;
-    if(var_conf_str_tab[0].target){
+    if (var_conf_str_tab[0].target){
         backend_addr = (*var_conf_str_tab[0].target);        
     }else{
         backend_addr = (*var_conf_str_tab[0].defval); 
@@ -58,20 +58,20 @@ void setRedis(){
     const std::vector<acl::string>& token = backend_addr.split2(",; \t");
 
     int redis_max_conns = var_conf_int_tab[2].defval;
-    if(var_conf_int_tab[2].target){
+    if (var_conf_int_tab[2].target){
         redis_max_conns = *var_conf_int_tab[2].target;
     }
     int redis_conn_timeout = var_conf_int_tab[3].defval;
-    if(var_conf_int_tab[3].target){
+    if (var_conf_int_tab[3].target){
         redis_conn_timeout = *var_conf_int_tab[3].target;
     }
     int redis_rw_timeout = var_conf_int_tab[4].defval;
-    if(var_conf_int_tab[4].target){
+    if (var_conf_int_tab[4].target){
         redis_rw_timeout = *var_conf_int_tab[4].target;
     }
     __manager.set(backend_addr.c_str(), redis_max_conns, redis_conn_timeout, redis_rw_timeout);
     __manager.set_all_slot(token[0], redis_max_conns);
-    if(var_conf_str_tab[1].target){
+    if (var_conf_str_tab[1].target){
         __manager.set_password("default", *var_conf_str_tab[1].target);
     }
 }
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
         if (argc >= 3){
             logger("config path: %s", argv[2]);
             fp = acl_fopen((const char*)argv[2],"r");
-            if(fp){
+            if (fp){
                 acl_fclose(fp);
                 conf->load(argv[2]);
                 setRedis();
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
             pathname = acl_concatenate(argv[0], ".cf", (char *) 0);
             logger("config path: %s", pathname);
             fp = acl_fopen((const char*)pathname,"r");
-            if(fp){
+            if (fp){
                 acl_fclose(fp);
                 conf->load(pathname);
                 acl_myfree(pathname);
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
         pathname = acl_concatenate(argv[0],".cf", (char *) 0);
         logger("config path: %s", pathname);
         fp = acl_fopen((const char*)pathname,"r");
-        if(fp){
+        if (fp){
             acl_fclose(fp);
             conf->load(pathname);
             acl_myfree(pathname);
@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
 #else
         if (argc >= 2 && strcmp(argv[1], "-f") == 0){
             fp = acl_fopen(argv[2],"r");
-            if(fp){
+            if (fp){
                 acl_fclose(fp);
                 conf->load(argv[2]);
                 setRedis();
@@ -169,11 +169,10 @@ int main(int argc, char* argv[])
         }else{
                 acl::log::stdout_open(true);  // 日志输出至标准输出
                 logger_error("This program only run with alone or daemon mode");
-        }
+            }
 #endif
+        }
+        if (conf)
+            delete conf;
+        return 0;
     }
-    if(conf)
-        delete conf;
-    return 0;
-}
-

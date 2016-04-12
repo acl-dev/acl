@@ -1,14 +1,14 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 
-#define	HS_ERR_INVALID_REPLY	-7		// ·şÎñÆ÷·µ»ØÊı¾İ´íÎó
-#define	HS_ERR_EMPTY		-6		// ·şÎñÆ÷·µ»ØÊı¾İÎª¿Õ
-#define	HS_ERR_PARAMS		-5		// ÊäÈë²ÎÊı´íÎó
-#define	HS_ERR_NOT_OPEN		-4		// ±íÎ´´ò¿ª
-#define	HS_ERR_READ		-3		// ¶ÁÊı¾İÊ§°Ü
-#define	HS_ERR_WRITE		-2		// Ğ´Êı¾İÊ§°Ü
-#define	HS_ERR_CONN		-1		// Á¬½ÓÊ§°Ü
-#define	HS_ERR_OK		0		// ÕıÈ·
+#define	HS_ERR_INVALID_REPLY	-7		// æœåŠ¡å™¨è¿”å›æ•°æ®é”™è¯¯
+#define	HS_ERR_EMPTY		-6		// æœåŠ¡å™¨è¿”å›æ•°æ®ä¸ºç©º
+#define	HS_ERR_PARAMS		-5		// è¾“å…¥å‚æ•°é”™è¯¯
+#define	HS_ERR_NOT_OPEN		-4		// è¡¨æœªæ‰“å¼€
+#define	HS_ERR_READ		-3		// è¯»æ•°æ®å¤±è´¥
+#define	HS_ERR_WRITE		-2		// å†™æ•°æ®å¤±è´¥
+#define	HS_ERR_CONN		-1		// è¿æ¥å¤±è´¥
+#define	HS_ERR_OK		0		// æ­£ç¡®
 
 namespace acl {
 
