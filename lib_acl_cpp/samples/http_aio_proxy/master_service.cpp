@@ -16,7 +16,7 @@ acl::master_str_tbl var_conf_str_tab[] = {
     { "http_backend_addr", "127.0.0.1:80", &var_cfg_backend_addr },
     { "http_request_file", "", &var_cfg_request_file },
     { "http_respond_file", "", &var_cfg_respond_file },
-    { "http_interface", "/test/test_jqredis.php", &var_cfg_interface }, 
+    { "http_interface", "/test/test_jqredis.php", &var_cfg_interface },
     { 0, 0, 0 }
 };
 
@@ -26,9 +26,9 @@ acl::master_bool_tbl var_conf_bool_tab[] = {
 };
 
 acl::master_int_tbl var_conf_int_tab[] = {
-    {"http_max_conns",100,&var_cfg_max_conns,0,0},
-    {"http_conn_timeout",10,&var_cfg_conn_timeout,0,0},
-    {"http_rw_timeout",10,&var_cfg_rw_timeout,0,0},
+    {"http_max_conns", 100, &var_cfg_max_conns, 0, 0},
+    {"http_conn_timeout", 10, &var_cfg_conn_timeout, 0, 0},
+    {"http_rw_timeout", 10, &var_cfg_rw_timeout, 0, 0},
     { 0, 0 , 0 , 0, 0 }
 };
 
@@ -49,10 +49,10 @@ master_service::~master_service()
 
 bool master_service::on_accept(acl::aio_socket_stream* client)
 {
-    logger("connect from %s, fd %d", client->get_peer(true),client->sock_handle());
+    logger("connect from %s, fd %d", client->get_peer(true), client->sock_handle());
 
-    req_callback* callback = new req_callback(__conn_manager,client,
-        __req_fp, __res_fp);
+    req_callback* callback = new req_callback(__conn_manager, client,
+            __req_fp, __res_fp);
     callback->start();
     return true;
 }
@@ -65,7 +65,7 @@ void master_service::proc_on_init()
         if (__req_fp->open_trunc(var_cfg_request_file) == false)
         {
             logger_error("open file %s error %s",
-                var_cfg_request_file, acl::last_serror());
+                         var_cfg_request_file, acl::last_serror());
             delete __req_fp;
             __req_fp = NULL;
         }
@@ -77,7 +77,7 @@ void master_service::proc_on_init()
         if (__res_fp->open_trunc(var_cfg_respond_file) == false)
         {
             logger_fatal("open file %s error %s",
-                var_cfg_respond_file, acl::last_serror());
+                         var_cfg_respond_file, acl::last_serror());
             delete __res_fp;
             __res_fp = NULL;
         }
@@ -94,8 +94,8 @@ void master_service::proc_on_exit()
     if (__res_fp)
         delete __res_fp;
 
-    if (__conn_manager){
+    if (__conn_manager) {
         // 销毁连接池
-        delete __conn_manager;  
+        delete __conn_manager;
     }
 }
