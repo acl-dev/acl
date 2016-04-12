@@ -798,6 +798,7 @@ bool http_header::build_response(string& out) const
 			char buf[64];
 			date_format(buf, sizeof(buf), now);
 			out << "Date: " << buf << "\r\n";
+			out << "Server: acl\r\n";
 		}
 	}
 

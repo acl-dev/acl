@@ -45,6 +45,15 @@ public:
 	void set_password(const char* pass);
 
 	/**
+	 * 获得当前连接的服务器地址，即由 redis_client 构造时传入的地址
+	 * @return {const char*}
+	 */
+	const char* get_addr(void) const
+	{
+		return addr_;
+	}
+
+	/**
 	 * 判断该网络连接对象是否已经关闭
 	 * check if the connection has been finish
 	 * @return {bool}

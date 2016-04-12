@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "redis_util.h"
 #include "redis_status.h"
 #include "redis_commands.h"
 
@@ -10,9 +11,10 @@
 #define LIMIT	40
 
 redis_commands::redis_commands(const char* addr, const char* passwd,
-	int conn_timeout, int rw_timeout)
+	int conn_timeout, int rw_timeout, bool prefer_master)
 	: conn_timeout_(conn_timeout)
 	, rw_timeout_(rw_timeout)
+	, prefer_master_(prefer_master)
 {
 	if (passwd && *passwd)
 		passwd_ = passwd;
@@ -81,36 +83,34 @@ void redis_commands::create_cluster(void)
 
 void redis_commands::help(void)
 {
+#ifdef ACL_UNIX
+	printf("> \033[1;33;40mkeys\033[0m"
+		" \033[1;36;40mpattern limit\033[0m\r\n");
+	printf("> \033[1;33;40mget\033[0m"
+		" \033[1;36;40m[:limit] parameter ...\033[0m\r\n");
+	printf("> \033[1;33;40mgetn\033[0m"
+		" \033[1;36;40mparameter limit\033[0m\r\n");
+	printf("> \033[1;33;40mremove\033[0m"
+		" \033[1;36;40mpattern\033[0m\r\n");
+	printf("> \033[1;33;40mtype\033[0m"
+		" \033[1;36;40mparameter ...\033[0m\r\n");
+	printf("> \033[1;33;40mttl\033[0m"
+		" \033[1;36;40mparameter ...\033[0m\r\n");
+	printf("> \033[1;33;40mserver\033[0m"
+		" \033[1;36;40mredis_addr\033[0m\r\n");
+	printf("> \033[1;33;40mdbsize\033[0m\r\n");
+	printf("> \033[1;33;40mnodes\033[0m\r\n");
+#else
 	printf("> keys pattern limit\r\n");
 	printf("> get [:limit] parameter ...\r\n");
 	printf("> getn parameter limit\r\n");
 	printf("> remove pattern\r\n");
 	printf("> type parameter ...\r\n");
 	printf("> ttl parameter ...\r\n");
-	printf("> dbsize\r\n");
 	printf("> server redis_addr\r\n");
+	printf("> dbsize\r\n");
 	printf("> nodes\r\n");
-}
-
-const std::map<acl::string, acl::redis_node*>* redis_commands::get_masters(
-	acl::redis& redis)
-{
-	std::map<acl::string, acl::string> res;
-	if (redis.info(res) <= 0)
-		return NULL;
-
-	const char* name = "cluster_enabled";
-	std::map<acl::string, acl::string>::const_iterator cit = res.find(name);
-	if (cit == res.end())
-		return NULL;
-	if (!cit->second.equal("1"))
-		return NULL;
-
-	const std::map<acl::string, acl::redis_node*>* masters =
-		redis.cluster_nodes();
-	if (masters == NULL)
-		printf("masters NULL\r\n");
-	return masters;
+#endif
 }
 
 void redis_commands::run(void)
@@ -159,6 +159,13 @@ void redis_commands::run(void)
 			check_ttl(tokens);
 		else if (cmd == "dbsize")
 			get_dbsize(tokens);
+#ifdef HAS_READLINE
+		else if (cmd == "clear" || cmd == "cl")
+		{
+			rl_clear_screen(0, 0);
+			printf("\r\n");
+		}
+#endif
 		else
 			request(tokens);
 	}
@@ -230,16 +237,16 @@ void redis_commands::get_keys(const std::vector<acl::string>& tokens)
 		max = 10;
 
 	acl::redis redis(conns_);
-	const std::map<acl::string, acl::redis_node*>* masters =
-		get_masters(redis);
+	std::vector<acl::redis_node*> nodes;
+	redis_util::get_nodes(redis, prefer_master_, nodes);
 
 	int  n = 0;
-	if (masters != NULL)
+	if (!nodes.empty())
 	{
-		for (std::map<acl::string, acl::redis_node*>::const_iterator
-			cit = masters->begin(); cit != masters->end(); ++cit)
+		for (std::vector<acl::redis_node*>::const_iterator
+			cit = nodes.begin(); cit != nodes.end(); ++cit)
 		{
-			n += get_keys(cit->second->get_addr(), pattern, max);
+			n += get_keys((*cit)->get_addr(), pattern, max);
 		}
 	}
 	else
@@ -626,7 +633,7 @@ void redis_commands::pattern_remove(const std::vector<acl::string>& tokens)
 
 	acl::redis redis(conns_);
 	const std::map<acl::string, acl::redis_node*>* masters =
-		get_masters(redis);
+		redis_util::get_masters(redis);
 
 	int deleted = 0;
 
@@ -771,17 +778,17 @@ void redis_commands::check_ttl(const std::vector<acl::string>& tokens)
 void redis_commands::get_dbsize(const std::vector<acl::string>&)
 {
 	acl::redis redis(conns_);
-	const std::map<acl::string, acl::redis_node*>* masters =
-		get_masters(redis);
+	std::vector<acl::redis_node*> nodes;
+	redis_util::get_nodes(redis, prefer_master_, nodes);
 
 	int total = 0;
 
-	if (masters != NULL)
+	if (!nodes.empty())
 	{
-		for (std::map<acl::string, acl::redis_node*>::const_iterator
-			cit = masters->begin(); cit != masters->end(); ++cit)
+		for (std::vector<acl::redis_node*>::const_iterator
+			cit = nodes.begin(); cit != nodes.end(); ++cit)
 		{
-			const char* addr = cit->second->get_addr();
+			const char* addr = (*cit)->get_addr();
 			if (addr == NULL || *addr == 0)
 			{
 				printf("addr NULL\r\n");

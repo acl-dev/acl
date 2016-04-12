@@ -39,6 +39,12 @@
     <ClCompile Include="redis_migrate.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="redis_monitor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="redis_cmdump.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -60,6 +66,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="redis_migrate.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="redis_monitor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="redis_cmdump.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

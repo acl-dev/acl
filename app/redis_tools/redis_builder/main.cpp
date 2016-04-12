@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "redis_status.h"
+#include "redis_monitor.h"
 #include "redis_util.h"
 #include "redis_builder.h"
 #include "redis_reshard.h"
 #include "redis_commands.h"
+#include "redis_cmdump.h"
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -33,13 +35,16 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		" -s redis_addr[ip:port]\r\n"
-		" -a cmd[nodes|slots|create|add_node|del_node|node_id|reshard|hash_slot|run]\r\n"
+		" -a cmd[nodes|slots|create|add_node|del_node|node_id|reshard|hash_slot|status|dump|run]\r\n"
 		" -p passwd\r\n"
 		" -N new_node[ip:port]\r\n"
 		" -S [add node as slave]\r\n"
 		" -r replicas[default 0]\r\n"
 		" -d [if just display the result for create command]\r\n"
 		" -k key\r\n"
+		" -T dump_to_file\r\n"
+		" -A [dump_all_masters_cmds, default: no]\r\n"
+		" -M [prefer using masters]\r\n"
 		" -f configure_file\r\n",
 		procname);
 
@@ -63,9 +68,12 @@ static void usage(const char* procname)
 		" %s -s 127.0.0.1:6379 -a node_id\r\n"
 		" %s -s 127.0.0.1:6379 -a reshard\r\n"
 		" %s -a hash_slot -k key\r\n"
+		" %s -s 127.0.0.1:6379 -a status\r\n"
+		" %s -s 127.0.0.1:6379 -a dump -f dump.txt -A all -M\r\n"
 		" %s -s 127.0.0.1:6379 -a add_node -N 127.0.0.1:6380 -S\r\n",
 		procname, procname, procname, procname, procname, procname,
-		procname, procname, procname, procname, procname);
+		procname, procname, procname, procname, procname, procname,
+		procname);
 }
 
 int main(int argc, char* argv[])
@@ -78,8 +86,10 @@ int main(int argc, char* argv[])
 	size_t replicas = 0;
 	bool add_slave = false, just_display = false;
 	acl::string addr, cmd, conf, new_addr, node_id, key, passwd;
+	bool dump_all = false, prefer_master = false;
+	acl::string filepath("dump.txt");
 
-	while ((ch = getopt(argc, argv, "hs:a:f:N:SI:r:dk:p:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:a:f:N:SI:r:dk:p:T:AM")) > 0)
 	{
 		switch (ch)
 		{
@@ -115,6 +125,15 @@ int main(int argc, char* argv[])
 			break;
 		case 'p':
 			passwd = optarg;
+			break;
+		case 'T':
+			filepath = optarg;
+			break;
+		case 'A':
+			dump_all = true;
+			break;
+		case 'M':
+			prefer_master = true;
 			break;
 		default:
 			break;
@@ -215,9 +234,32 @@ int main(int argc, char* argv[])
 			reshard.run();
 		}
 	}
+	else if (cmd == "status")
+	{
+		if (addr.empty())
+			printf("usage: %s -s ip:port -a status\r\n", argv[0]);
+		else
+		{
+			redis_monitor monitor(addr, conn_timeout, rw_timeout,
+				passwd, prefer_master);
+			monitor.status();
+		}
+	}
+	else if (cmd == "dump")
+	{
+		if (addr.empty())
+			printf("usage: %s -s ip:port -a monitor -f dump.txt\r\n", argv[0]);
+		else
+		{
+			redis_cmdump dump(addr, conn_timeout, rw_timeout,
+				passwd, prefer_master);
+			dump.saveto(filepath, dump_all);
+		}
+	}
 	else if (cmd == "run" || cmd.empty())
 	{
-		redis_commands cmds(addr, passwd, conn_timeout, rw_timeout);
+		redis_commands cmds(addr, passwd, conn_timeout,
+			rw_timeout, prefer_master);
 		cmds.run();
 	}
 #ifdef	HAS_READLINE

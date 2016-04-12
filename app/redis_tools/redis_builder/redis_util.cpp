@@ -24,7 +24,7 @@ bool redis_util::get_node_id(acl::redis& redis, acl::string& node_id)
 	acl::socket_stream* conn = redis.get_client()->get_stream();
 	if (conn == NULL)
 	{
-		printf("%s: connection disconnected!\r\n", __FUNCTION__);
+		logger_error("%s: connection disconnected!", __FUNCTION__);
 		return false;
 	}
 
@@ -34,7 +34,7 @@ bool redis_util::get_node_id(acl::redis& redis, acl::string& node_id)
 		redis.cluster_nodes();
 	if (nodes == NULL)
 	{
-		printf("%s: cluster_nodes null, addr: %s\r\n",
+		logger_error("%s: cluster_nodes null, addr: %s",
 			__FUNCTION__, addr);
 		return false;
 	}
@@ -53,7 +53,7 @@ bool redis_util::get_node_id(acl::redis& redis, acl::string& node_id)
 		}
 	}
 
-	printf("cluster_nodes no myself id, addr: %s\r\n", addr);
+	logger_error("cluster_nodes no myself id, addr: %s", addr);
 
 	return false;
 }
@@ -64,7 +64,7 @@ bool redis_util::get_ip(const char* addr, acl::string& ip)
 	const std::vector<acl::string>& tokens = buf.split2(":");
 	if (tokens.size() != 2)
 	{
-		printf("%s: invalid addr: %s\r\n", __FUNCTION__, addr);
+		logger_error("%s: invalid addr: %s", __FUNCTION__, addr);
 		return false;
 	}
 
@@ -78,7 +78,7 @@ bool redis_util::addr_split(const char* addr, acl::string& ip, int& port)
 	const std::vector<acl::string>& tokens = buf.split2(":");
 	if (tokens.size() != 2)
 	{
-		printf("%s: invalid addr: %s\r\n", __FUNCTION__, addr);
+		logger_error("%s: invalid addr: %s", __FUNCTION__, addr);
 		return false;
 	}
 
@@ -142,7 +142,7 @@ void redis_util::sort(const std::map<acl::string, acl::redis_node*>& in,
 		if (redis_util::addr_split(
 			cit->second->get_addr(), ip, port) == false)
 		{
-			printf("invalid addr: %s\r\n",
+			logger_error("invalid addr: %s",
 				cit->second->get_addr());
 			continue;
 		}
@@ -159,4 +159,104 @@ void redis_util::sort(const std::map<acl::string, acl::redis_node*>& in,
 		else
 			cit_node->second->push_back(cit->second);
 	}
+}
+
+void redis_util::get_nodes(acl::redis& redis, bool prefer_master,
+	std::vector<acl::redis_node*>& nodes)
+{
+	const std::map<acl::string, acl::redis_node*>* masters
+		= get_masters(redis);
+	if (masters == NULL)
+	{
+		logger_error("get_masters NULL");
+		return;
+	}
+
+	if (prefer_master)
+	{
+		for (std::map<acl::string, acl::redis_node*>::const_iterator
+			cit = masters->begin(); cit != masters->end(); ++cit)
+		{
+			nodes.push_back(cit->second);
+		}
+
+		return;
+	}
+
+	const std::vector<acl::redis_node*>* slaves;
+
+	for (std::map<acl::string, acl::redis_node*>::const_iterator cit
+		= masters->begin(); cit != masters->end(); ++cit)
+	{
+		slaves = cit->second->get_slaves();
+		if (slaves != NULL && !slaves->empty())
+			nodes.push_back((*slaves)[0]);
+		else
+			nodes.push_back(cit->second);
+	}
+}
+
+const std::map<acl::string, acl::redis_node*>* redis_util::get_masters(
+	acl::redis& redis)
+{
+	const std::map<acl::string, acl::redis_node*>* masters =
+		get_masters2(redis);
+	if (masters != NULL)
+		return masters;
+
+	acl::redis_client* conn = redis.get_client();
+	if (conn == NULL)
+		return NULL;
+
+	const char* addr = conn->get_addr();
+	if (addr == NULL || *addr == 0)
+	{
+		logger_error("get_addr NULL");
+		return NULL;
+	}
+
+	static std::map<acl::string, acl::redis_node*> single_master_;
+
+	for (std::map<acl::string, acl::redis_node*>::iterator it
+		= single_master_.begin(); it != single_master_.end(); ++it)
+	{
+		delete it->second;
+	}
+	single_master_.clear();
+
+	acl::redis_node* node = new acl::redis_node;
+	node->set_addr(addr);
+	single_master_[addr] = node;
+	return &single_master_;
+}
+
+const std::map<acl::string, acl::redis_node*>* redis_util::get_masters2(
+	acl::redis& redis)
+{
+	std::map<acl::string, acl::string> res;
+	if (redis.info(res) <= 0)
+	{
+		logger_error("redis.info error: %s", redis.result_error());
+		return NULL;
+	}
+
+	const char* name = "cluster_enabled";
+	std::map<acl::string, acl::string>::const_iterator cit = res.find(name);
+	if (cit == res.end())
+	{
+		logger("no cluster_enabled");
+		return NULL;
+	}
+	if (!cit->second.equal("1"))
+	{
+		logger("cluster_enabled: %s", cit->second.c_str());
+		return NULL;
+	}
+
+	const std::map<acl::string, acl::redis_node*>* masters =
+		redis.cluster_nodes();
+	if (masters == NULL)
+		logger_error("masters NULL");
+
+	return masters;
 }

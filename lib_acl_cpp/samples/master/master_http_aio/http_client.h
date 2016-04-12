@@ -19,4 +19,5 @@ private:
 	acl::string res_hdr_;
 	acl::string res_hdr2_;
 	acl::string res_body_;
+	bool keep_alive_;
 };

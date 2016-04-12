@@ -15,13 +15,20 @@ int main(int argc, char* argv[])
 
 	// 开始运行
 
-	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
+	if (argc >= 2 && strcmp(argv[1], "help") == 0)
+		printf("usage: %s addr conf\r\n", argv[0]);
+	else if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
 		const char* addr = "127.0.0.1:8888";
 		if (argc >= 3)
 			addr = argv[2];
 		printf("listen on: %s\r\n", addr);
-		ms.run_alone(addr, NULL, acl::ENGINE_SELECT);  // 单独运行方式
+
+		const char* conf = "master_http_aio.cf";
+		if (argc >= 4)
+			conf = argv[3];
+
+		ms.run_alone(addr, conf, acl::ENGINE_KERNEL);  // 单独运行方式
 	}
 	else
 	{

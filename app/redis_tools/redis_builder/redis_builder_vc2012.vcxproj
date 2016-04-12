@@ -330,8 +330,10 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="redis_builder.cpp" />
+    <ClCompile Include="redis_cmdump.cpp" />
     <ClCompile Include="redis_commands.cpp" />
     <ClCompile Include="redis_migrate.cpp" />
+    <ClCompile Include="redis_monitor.cpp" />
     <ClCompile Include="redis_reshard.cpp" />
     <ClCompile Include="redis_status.cpp" />
     <ClCompile Include="redis_util.cpp" />
@@ -339,8 +341,10 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="redis_builder.h" />
+    <ClInclude Include="redis_cmdump.h" />
     <ClInclude Include="redis_commands.h" />
     <ClInclude Include="redis_migrate.h" />
+    <ClInclude Include="redis_monitor.h" />
     <ClInclude Include="redis_reshard.h" />
     <ClInclude Include="redis_status.h" />
     <ClInclude Include="redis_util.h" />

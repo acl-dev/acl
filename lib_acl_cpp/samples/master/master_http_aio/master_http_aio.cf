@@ -91,7 +91,7 @@ service master_http_aio {
 #	应用自己的配置选项
 
 #	响应体的数据长度
-	buf_size = 1024
+	buf_size = 152
 #	是否启用预读过程
 	preread = 1
 }
