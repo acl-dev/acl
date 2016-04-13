@@ -554,6 +554,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "httpd_download", "app\wizar
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "https_proxy", "lib_acl_cpp\samples\ssl\https_proxy\https_proxy_vc2012.vcxproj", "{5F75216D-8263-4F6F-9390-76E7AC129AEE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dgate", "lib_acl\samples\dgate\dgate_vc2012.vcxproj", "{9073FA9F-26A1-482C-91D0-876434C3E4EB}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -596,6 +601,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mail_build", "lib_acl_cpp\s
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "http_servlet2", "lib_acl_cpp\samples\http_servlet2\http_servlet2_vc2012.vcxproj", "{685428CA-8DD4-489F-AC7F-0F5B70191D0F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
+		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
+		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "json", "json", "{3C576B18-D253-4CA2-986E-7173C2978AC3}"
 EndProject
