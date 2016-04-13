@@ -223,7 +223,8 @@ shared: depends pch $(OBJS_DST)
 depends: $(OBJS_DEF)
 pch: src/acl_stdafx.hpp
 	rm -f $(PCH)
-	@if test -n "$(rpath)" && test "$(UNIXTYPE)" = "LINUX"; then \
+	@if test "$(UNIXTYPE)" = "LINUX" || test "$(UNIXTYPE)" = "FREEBSD" \
+		|| test "$(UNIXTYPE)" = "MACOSX"; then \
 		$(CC) -o $(PCH) -x c++-header $(CFLAGS) src/acl_stdafx.hpp; \
 	fi
 
