@@ -841,10 +841,11 @@ void redis_commands::request(const std::vector<acl::string>& tokens)
 		return;
 	}
 
-	show_result(*result);
+	show_result(*result, NULL);
 }
 
-bool redis_commands::show_result(const acl::redis_result& result)
+bool redis_commands::show_result(const acl::redis_result& result,
+	const char* addr)
 {
 	acl::string buf;
 	size_t size;
@@ -854,15 +855,23 @@ bool redis_commands::show_result(const acl::redis_result& result)
 	switch (type)
 	{
 	case acl::REDIS_RESULT_NIL:
+		if (addr && *addr)
+			printf("%s-->", addr);
 		printf("[nil]\r\n");
 		break;
 	case acl::REDIS_RESULT_ERROR:
+		if (addr && *addr)
+			printf("%s-->", addr);
 		printf("-%s\r\n", result.get_error());
 		return false;
 	case acl::REDIS_RESULT_STATUS:
+		if (addr && *addr)
+			printf("%s-->", addr);
 		printf("+%s\r\n", result.get_status());
 		break;
 	case acl::REDIS_RESULT_INTEGER:
+		if (addr && *addr)
+			printf("%s-->", addr);
 		printf(":%lld\r\n", result.get_integer64());
 		break;
 	case acl::REDIS_RESULT_STRING:
@@ -879,12 +888,13 @@ bool redis_commands::show_result(const acl::redis_result& result)
 		{
 			const acl::redis_result* rr = children[i];
 			acl_assert(rr != NULL);
-			show_result(*rr);
+			show_result(*rr, addr);
 		}
 		break;
 	case acl::REDIS_RESULT_UNKOWN:
-		printf("unknown type: %d\r\n", (int) type);
 	default:
+		if (addr && *addr)
+			printf("%s-->", addr);
 		printf("unknown type: %d\r\n", (int) type);
 		return false;
 	}
@@ -972,7 +982,7 @@ void redis_commands::request_one(const char* addr,
 	}
 	else
 	{
-		if (show_result(*result) == false)
+		if (show_result(*result, addr) == false)
 		{
 			printf("request error\r\n");
 			show_request(tokens);

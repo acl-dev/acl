@@ -118,9 +118,6 @@ ACL_ARGV *acl_argv_quote_split4(const char *str, const char *delim,
 	ACL_DBUF_POOL *dbuf)
 {
 	ACL_ARGV *argvp = acl_argv_alloc2(1, dbuf);
-	char   *saved_string =
-		dbuf ? acl_dbuf_pool_strdup(dbuf, str) : acl_mystrdup(str);
-	char   *bp = saved_string;
 	int     ch, quote = 0, backslash = 0;
 	ACL_VSTRING *buf = acl_vstring_dbuf_alloc(dbuf, 128);
 
@@ -130,7 +127,7 @@ ACL_ARGV *acl_argv_quote_split4(const char *str, const char *delim,
 #define	STR	acl_vstring_str
 #define	RESET	ACL_VSTRING_RESET
 
-	while ((ch = *bp) != 0) {
+	while ((ch = *str) != 0) {
 		if (quote) {
 			if (backslash) {
 				ADDCH(buf, ch);
@@ -166,7 +163,7 @@ ACL_ARGV *acl_argv_quote_split4(const char *str, const char *delim,
 			TERM(buf);
 		}
 
-		bp++;;
+		str++;;
 	}
 
 	if (LEN(buf) > 0)
@@ -175,12 +172,6 @@ ACL_ARGV *acl_argv_quote_split4(const char *str, const char *delim,
 	acl_argv_terminate(argvp);
 
 	acl_vstring_free(buf);
-
-	if (dbuf)
-		acl_dbuf_pool_free(dbuf, saved_string);
-
-	else
-		acl_myfree(saved_string);
 
 	return argvp;
 }

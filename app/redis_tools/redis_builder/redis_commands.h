@@ -50,7 +50,7 @@ private:
 	void check_ttl(const std::vector<acl::string>& tokens);
 	void get_dbsize(const std::vector<acl::string>& tokens);
 	void request(const std::vector<acl::string>& tokens);
-	bool show_result(const acl::redis_result& result);
+	bool show_result(const acl::redis_result& result, const char* addr);
 
 	void show_request(const std::vector<acl::string>& tokens);
 
