@@ -100,6 +100,9 @@ void redis_commands::help(void)
 		" \033[1;36;40mredis_addr\033[0m\r\n");
 	printf("> \033[1;33;40mdbsize\033[0m\r\n");
 	printf("> \033[1;33;40mnodes\033[0m\r\n");
+	printf("> \033[1;33;40mconfig set|get parameter\033[0m\r\n");
+	printf("> \033[1;33;40mconfig rewrite\033[0m\r\n");
+	printf("> \033[1;33;40mconfig resetstat\033[0m\r\n");
 #else
 	printf("> keys pattern limit\r\n");
 	printf("> get [:limit] parameter ...\r\n");
@@ -110,6 +113,9 @@ void redis_commands::help(void)
 	printf("> server redis_addr\r\n");
 	printf("> dbsize\r\n");
 	printf("> nodes\r\n");
+	printf("> config set|get parameter\r\n");
+	printf("> config rewrite\r\n");
+	printf("> config resetstat\r\n");
 #endif
 }
 
@@ -135,7 +141,8 @@ void redis_commands::run(void)
 			continue;
 		}
 
-		std::vector<acl::string>& tokens = buf.split2(" \t");
+		std::vector<acl::string>& tokens = buf.quote_split2(" \t");
+
 		acl::string& cmd = tokens[0];
 		cmd.lower();
 
@@ -159,6 +166,8 @@ void redis_commands::run(void)
 			check_ttl(tokens);
 		else if (cmd == "dbsize")
 			get_dbsize(tokens);
+		else if (cmd == "config")
+			config(tokens);
 #ifdef HAS_READLINE
 		else if (cmd == "clear" || cmd == "cl")
 		{
@@ -827,14 +836,7 @@ void redis_commands::request(const std::vector<acl::string>& tokens)
 	if (result == NULL)
 	{
 		printf("request error: %s\r\n", cmd.result_error());
-		for (std::vector<acl::string>::const_iterator cit =
-			tokens.begin(); cit != tokens.end(); ++cit)
-		{
-			if (cit == tokens.begin())
-				printf("%s", (*cit).c_str());
-			else
-				printf(" %s", (*cit).c_str());
-		}
+		show_request(tokens);
 		printf("\r\n");
 		return;
 	}
@@ -842,7 +844,7 @@ void redis_commands::request(const std::vector<acl::string>& tokens)
 	show_result(*result);
 }
 
-void redis_commands::show_result(const acl::redis_result& result)
+bool redis_commands::show_result(const acl::redis_result& result)
 {
 	acl::string buf;
 	size_t size;
@@ -856,7 +858,7 @@ void redis_commands::show_result(const acl::redis_result& result)
 		break;
 	case acl::REDIS_RESULT_ERROR:
 		printf("-%s\r\n", result.get_error());
-		break;
+		return false;
 	case acl::REDIS_RESULT_STATUS:
 		printf("+%s\r\n", result.get_status());
 		break;
@@ -882,10 +884,99 @@ void redis_commands::show_result(const acl::redis_result& result)
 		break;
 	case acl::REDIS_RESULT_UNKOWN:
 		printf("unknown type: %d\r\n", (int) type);
-		break;
 	default:
 		printf("unknown type: %d\r\n", (int) type);
-		break;
+		return false;
+	}
+
+	return true;
+}
+
+void redis_commands::show_request(const std::vector<acl::string>& tokens)
+{
+	for (std::vector<acl::string>::const_iterator cit =
+			tokens.begin(); cit != tokens.end(); ++cit)
+	{
+		if (cit == tokens.begin())
+			printf("%s", (*cit).c_str());
+		else
+			printf(" \"%s\"", (*cit).c_str());
 	}
 }
 
+void redis_commands::config_usage(void)
+{
+	logger_error("> usage: config get parameter");
+	logger_error("> usage: config set parameter");
+	logger_error("> usage: config rewrite");
+	logger_error("> usage: config resetstat");
+}
+
+void redis_commands::config(const std::vector<acl::string>& tokens)
+{
+	if (tokens.size() < 2)
+	{
+		config_usage();
+		return;
+	}
+
+	acl::redis_client client(addr_, conn_timeout_, rw_timeout_);
+	client.set_password(passwd_);
+	acl::redis redis(&client);
+	std::vector<const acl::redis_node*> nodes;
+
+	redis_util::get_all_nodes(redis, nodes);
+	if (nodes.empty())
+	{
+		logger_error("no node of the cluster: %s", addr_.c_str());
+		return;
+	}
+
+	for (std::vector<const acl::redis_node*>::const_iterator cit
+		= nodes.begin(); cit != nodes.end(); ++cit)
+	{
+		const char* addr = (*cit)->get_addr();
+		if (addr == NULL || *addr == 0)
+		{
+			logger_error("addr NULL");
+			continue;
+		}
+
+		config(addr, tokens);
+	}
+}
+
+void redis_commands::config(const char* addr,
+	const std::vector<acl::string>& tokens)
+{
+	if (tokens.size() < 2)
+	{
+		config_usage();
+		return;
+	}
+	request_one(addr, tokens);
+}
+
+void redis_commands::request_one(const char* addr,
+	const std::vector<acl::string>& tokens)
+{
+	acl::redis_client client(addr, conn_timeout_, rw_timeout_);
+	client.set_password(passwd_);
+	acl::redis redis(&client);
+	const acl::redis_result* result = redis.request(tokens);
+	if (result == NULL)
+	{
+		printf("request error: %s\r\n", redis.result_error());
+		show_request(tokens);
+		printf("\r\n");
+	}
+	else
+	{
+		if (show_result(*result) == false)
+		{
+			printf("request error\r\n");
+			show_request(tokens);
+			printf("\r\n");
+		}
+	}
+}

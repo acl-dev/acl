@@ -260,3 +260,39 @@ const std::map<acl::string, acl::redis_node*>* redis_util::get_masters2(
 
 	return masters;
 }
+
+void redis_util::get_all_nodes(acl::redis& redis,
+	std::vector<const acl::redis_node*>& nodes)
+{
+	const std::map<acl::string, acl::redis_node*>* masters
+		= get_masters(redis);
+	if (masters == NULL)
+	{
+		logger_error("get_masters NULL");
+		return;
+	}
+
+	for (std::map<acl::string, acl::redis_node*>::const_iterator cit
+		= masters->begin(); cit != masters->end(); ++cit)
+	{
+		add_slaves(cit->second, nodes);
+	}
+}
+
+void redis_util::add_slaves(const acl::redis_node* node,
+	std::vector<const acl::redis_node*>& nodes)
+{
+	if (node == NULL)
+		return;
+	nodes.push_back(node);
+
+	const std::vector<acl::redis_node*>* slaves = node->get_slaves();
+	if (slaves == NULL)
+		return;
+
+	for (std::vector<acl::redis_node*>::const_iterator cit
+		= slaves->begin(); cit != slaves->end(); ++cit)
+	{
+		add_slaves(*cit, nodes);
+	}
+}

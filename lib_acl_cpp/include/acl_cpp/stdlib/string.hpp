@@ -838,6 +838,24 @@ public:
 	std::vector<string>& split2(const char* sep);
 
 	/**
+	 * 将当前对象存储的字符串进行分割，该分割不会破坏被单/双引号引用的
+	 * 字符串
+	 * @param sep {const char*} 进行分割时的分割标记
+	 * @return {std::list<string>&} 返回 list 格式的分割结果，返回的结果
+	 *  不需要释放，其引用了当前对象的一个内部指针
+	 */
+	std::list<string>& quote_split(const char* sep);
+
+	/**
+	 * 将当前对象存储的字符串进行分割，该分割不会破坏被单/双引号引用的
+	 * 字符串
+	 * @param sep {const char*} 进行分割时的分割标记
+	 * @return {std::vector<string>&} 返回 vector 格式的分割结果，返回的
+	 *  结果不需要释放，其引用了当前对象的一个内部指针
+	 */
+	std::vector<string>& quote_split2(const char* sep);
+
+	/**
 	 * 以 '=' 为分隔符将当前对象存储的字符串分割成 name/value 对，分割时会
 	 * 自动去掉源字符串的起始处、结尾处以及分隔符 '=' 两边的空格及 TAB
 	 * @return {std::pair<string, string>&} 如果当前对象存储的字符串

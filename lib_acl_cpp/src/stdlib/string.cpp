@@ -1003,6 +1003,42 @@ std::vector<acl::string>& string::split2(const char* sep)
 	return *vector_tmp_;
 }
 
+std::list<acl::string>& string::quote_split(const char* sep)
+{
+	ACL_ARGV *argv = acl_argv_quote_split(STR(vbf_), sep);
+	ACL_ITER it;
+
+	if (list_tmp_ == NULL)
+		list_tmp_ = NEW std::list<acl::string>;
+	else
+		list_tmp_->clear();
+	acl_foreach(it, argv)
+	{
+		char* ptr = (char*) it.data;
+		list_tmp_->push_back(ptr);
+	}
+	acl_argv_free(argv);
+	return *list_tmp_;
+}
+
+std::vector<acl::string>& string::quote_split2(const char* sep)
+{
+	ACL_ARGV *argv = acl_argv_quote_split(STR(vbf_), sep);
+	ACL_ITER it;
+
+	if (vector_tmp_ == NULL)
+		vector_tmp_ = NEW std::vector<acl::string>;
+	else
+		vector_tmp_->clear();
+	acl_foreach(it, argv)
+	{
+		char* ptr = (char*) it.data;
+		vector_tmp_->push_back(ptr);
+	}
+	acl_argv_free(argv);
+	return *vector_tmp_;
+}
+
 std::pair<acl::string, acl::string>& string::split_nameval()
 {
 	char *name, *value;

@@ -42,7 +42,14 @@ public:
 	static void get_nodes(acl::redis& redis, bool prefer_master,
 		std::vector<acl::redis_node*>& nodes);
 
+	// get all the nodes of the cluster
+	static void get_all_nodes(acl::redis& redis,
+		std::vector<const acl::redis_node*>& nodes);
+
 private:
 	static const std::map<acl::string, acl::redis_node*>*
 		get_masters2(acl::redis&);
+
+	static void add_slaves(const acl::redis_node* node,
+		std::vector<const acl::redis_node*>& nodes);
 };

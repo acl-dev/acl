@@ -173,6 +173,27 @@ ACL_API ACL_ARGV *acl_argv_split_append(ACL_ARGV *argvp, const char *str,
 ACL_API ACL_ARGV *acl_argv_splitn_append(ACL_ARGV *argvp, const char *str,
 	const char *delim, size_t n);
 
+/**
+ * 根据源字符串及分隔字符串生成一个字符串动态数组，针对由 "" 或 '' 引用的
+ * 字符串不做分隔
+ * @param str {const char*} 源字符串
+ * @param delim {const char*} 分隔字符串
+ * @return {ACL_ARGV*}
+ */
+ACL_API ACL_ARGV *acl_argv_quote_split(const char *str, const char *delim);
+
+/**
+ * 根据源字符串及分隔字符串生成一个字符串动态数组，针对由 "" 或 '' 引用的
+ * 字符串不做分隔，其中将传入的内存池对象做为内存分配器
+ * @param str {const char*} 源字符串
+ * @param delim {const char*} 分隔字符串
+ * @param dbuf {ACL_DBUF_POOL*} 内存池对象，可以为空，当为空时则采用
+ *  缺省的内存分配方式
+ * @return {ACL_ARGV*}
+ */
+ACL_API	ACL_ARGV *acl_argv_quote_split4(const char *str, const char *delim,
+	ACL_DBUF_POOL *dbuf);
+
 #define ACL_ARGV_END	((char *) 0)
 
 # ifdef	__cplusplus
