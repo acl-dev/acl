@@ -45,7 +45,8 @@ static void usage(const char* procname)
 		" -T dump_to_file\r\n"
 		" -A [dump_all_masters_cmds, default: no]\r\n"
 		" -M [prefer using masters]\r\n"
-		" -f configure_file\r\n",
+		" -f configure_file\r\n"
+		" -F redis_commands_file\r\n",
 		procname);
 
 	printf("\r\nabout command:\r\n"
@@ -87,9 +88,9 @@ int main(int argc, char* argv[])
 	bool add_slave = false, just_display = false;
 	acl::string addr, cmd, conf, new_addr, node_id, key, passwd;
 	bool dump_all = false, prefer_master = false;
-	acl::string filepath("dump.txt");
+	acl::string filepath("dump.txt"), cmds_file;
 
-	while ((ch = getopt(argc, argv, "hs:a:f:N:SI:r:dk:p:T:AM")) > 0)
+	while ((ch = getopt(argc, argv, "hs:a:f:N:SI:r:dk:p:T:AMF:")) > 0)
 	{
 		switch (ch)
 		{
@@ -134,6 +135,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'M':
 			prefer_master = true;
+			break;
+		case 'F':
+			cmds_file = optarg;
 			break;
 		default:
 			break;
@@ -259,7 +263,7 @@ int main(int argc, char* argv[])
 	else if (cmd == "run" || cmd.empty())
 	{
 		redis_commands cmds(addr, passwd, conn_timeout,
-			rw_timeout, prefer_master);
+			rw_timeout, prefer_master, cmds_file);
 		cmds.run();
 	}
 #ifdef	HAS_READLINE

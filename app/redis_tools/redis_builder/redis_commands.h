@@ -1,10 +1,17 @@
 #pragma once
 
+struct REDIS_CMD
+{
+	acl::string cmd;
+	bool broadcast;
+	bool dangerous;
+};
+
 class redis_commands
 {
 public:
-	redis_commands(const char* addr, const char* passwd,
-		int conn_timeout, int rw_timeout, bool prefer_master);
+	redis_commands(const char* addr, const char* passwd, int conn_timeout,
+		int rw_timeout, bool prefer_master, const char* cmds_file);
 	~redis_commands(void);
 
 	void run(void);
@@ -16,6 +23,15 @@ private:
 	int rw_timeout_;
 	bool prefer_master_;
 	acl::redis_client_cluster* conns_;
+	std::map<acl::string, REDIS_CMD> redis_cmds_;
+	bool check_all_cmds_;
+
+	void init(const char* cmds_file);
+	void set_commands(void);
+	void load_commands(acl::istream& in);
+	void add_cmdline(acl::string& line, size_t i);
+	void show_commands(void);
+	bool check(const char* command);
 
 	void set_addr(const char* in, acl::string& out);
 	void getline(acl::string& buf, const char* prompt = NULL);
@@ -50,6 +66,8 @@ private:
 	void check_ttl(const std::vector<acl::string>& tokens);
 	void get_dbsize(const std::vector<acl::string>& tokens);
 	void request(const std::vector<acl::string>& tokens);
+	void request_one(const std::vector<acl::string>& tokens);
+	void request_all(const std::vector<acl::string>& tokens);
 	bool show_result(const acl::redis_result& result, const char* addr);
 
 	void show_request(const std::vector<acl::string>& tokens);

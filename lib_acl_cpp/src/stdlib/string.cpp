@@ -998,9 +998,9 @@ std::vector<acl::string>& string::split2(const char* sep, bool quoted /* = false
 	ACL_ARGV *argv;
 
 	if (quoted)
-		argv = acl_argv_split(STR(vbf_), sep);
-	else
 		argv = acl_argv_quote_split(STR(vbf_), sep);
+	else
+		argv = acl_argv_split(STR(vbf_), sep);
 
 	if (vector_tmp_ == NULL)
 		vector_tmp_ = NEW std::vector<acl::string>;
