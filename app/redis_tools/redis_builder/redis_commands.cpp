@@ -141,7 +141,7 @@ void redis_commands::run(void)
 			continue;
 		}
 
-		std::vector<acl::string>& tokens = buf.quote_split2(" \t");
+		std::vector<acl::string>& tokens = buf.split2(" \t", true);
 
 		acl::string& cmd = tokens[0];
 		cmd.lower();

@@ -967,75 +967,53 @@ string string::right(size_t npos)
 	return string(STR(vbf_) + npos, nLeft);
 }
 
-std::list<acl::string>& string::split(const char* sep)
+std::list<acl::string>& string::split(const char* sep, bool quoted /* = false */)
 {
-	ACL_ARGV *argv = acl_argv_split(STR(vbf_), sep);
 	ACL_ITER it;
+	ACL_ARGV *argv;
+
+	if (quoted)
+		argv = acl_argv_quote_split(STR(vbf_), sep);
+	else
+		argv = acl_argv_split(STR(vbf_), sep);
 
 	if (list_tmp_ == NULL)
 		list_tmp_ = NEW std::list<acl::string>;
 	else
 		list_tmp_->clear();
+
 	acl_foreach(it, argv)
 	{
 		char* ptr = (char*) it.data;
 		list_tmp_->push_back(ptr);
 	}
 	acl_argv_free(argv);
+
 	return *list_tmp_;
 }
 
-std::vector<acl::string>& string::split2(const char* sep)
+std::vector<acl::string>& string::split2(const char* sep, bool quoted /* = false */)
 {
-	ACL_ARGV *argv = acl_argv_split(STR(vbf_), sep);
 	ACL_ITER it;
+	ACL_ARGV *argv;
+
+	if (quoted)
+		argv = acl_argv_split(STR(vbf_), sep);
+	else
+		argv = acl_argv_quote_split(STR(vbf_), sep);
 
 	if (vector_tmp_ == NULL)
 		vector_tmp_ = NEW std::vector<acl::string>;
 	else
 		vector_tmp_->clear();
+
 	acl_foreach(it, argv)
 	{
 		char* ptr = (char*) it.data;
 		vector_tmp_->push_back(ptr);
 	}
 	acl_argv_free(argv);
-	return *vector_tmp_;
-}
 
-std::list<acl::string>& string::quote_split(const char* sep)
-{
-	ACL_ARGV *argv = acl_argv_quote_split(STR(vbf_), sep);
-	ACL_ITER it;
-
-	if (list_tmp_ == NULL)
-		list_tmp_ = NEW std::list<acl::string>;
-	else
-		list_tmp_->clear();
-	acl_foreach(it, argv)
-	{
-		char* ptr = (char*) it.data;
-		list_tmp_->push_back(ptr);
-	}
-	acl_argv_free(argv);
-	return *list_tmp_;
-}
-
-std::vector<acl::string>& string::quote_split2(const char* sep)
-{
-	ACL_ARGV *argv = acl_argv_quote_split(STR(vbf_), sep);
-	ACL_ITER it;
-
-	if (vector_tmp_ == NULL)
-		vector_tmp_ = NEW std::vector<acl::string>;
-	else
-		vector_tmp_->clear();
-	acl_foreach(it, argv)
-	{
-		char* ptr = (char*) it.data;
-		vector_tmp_->push_back(ptr);
-	}
-	acl_argv_free(argv);
 	return *vector_tmp_;
 }
 

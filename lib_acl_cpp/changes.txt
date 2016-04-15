@@ -2,8 +2,8 @@
 
 -----------------------------------------------------------------------
 421) 2016.4.14
-421.1) feature: string 类增加两个方法 quote_split/quote_split2，对 lib_acl C
-库中新增的字符串分割函数进行封装
+421.1) feature: string 类修改两个方法 split/split2，对 lib_acl C 库中新增的
+字符串分割函数(带引号引用的字符串)进行封装
 
 420) 2016.4.6
 420.1) feature&safety: redis_command::run 中当发现 used_ > 0 时会强制调用 clear

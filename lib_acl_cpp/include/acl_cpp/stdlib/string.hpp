@@ -824,36 +824,22 @@ public:
 	/**
 	 * 将当前对象存储的字符串进行分割
 	 * @param sep {const char*} 进行分割时的分割标记
+	 * @param quoted {bool} 当为 true 时，则对于由单/双引号引起来的
+	 *  字符串内容，不做分割，但此时要求 sep 中不得存在单/双号
 	 * @return {std::list<string>&} 返回 list 格式的分割结果，返回的结果
 	 *  不需要释放，其引用了当前对象的一个内部指针
 	 */
-	std::list<string>& split(const char* sep);
+	std::list<string>& split(const char* sep, bool quoted = false);
 
 	/**
 	 * 将当前对象存储的字符串进行分割
 	 * @param sep {const char*} 进行分割时的分割标记
+	 * @param quoted {bool} 当为 true 时，则对于由单/双引号引起来的
+	 *  字符串内容，不做分割，但此时要求 sep 中不得存在单/双号
 	 * @return {std::vector<string>&} 返回 vector 格式的分割结果，返回的
 	 *  结果不需要释放，其引用了当前对象的一个内部指针
 	 */
-	std::vector<string>& split2(const char* sep);
-
-	/**
-	 * 将当前对象存储的字符串进行分割，该分割不会破坏被单/双引号引用的
-	 * 字符串
-	 * @param sep {const char*} 进行分割时的分割标记
-	 * @return {std::list<string>&} 返回 list 格式的分割结果，返回的结果
-	 *  不需要释放，其引用了当前对象的一个内部指针
-	 */
-	std::list<string>& quote_split(const char* sep);
-
-	/**
-	 * 将当前对象存储的字符串进行分割，该分割不会破坏被单/双引号引用的
-	 * 字符串
-	 * @param sep {const char*} 进行分割时的分割标记
-	 * @return {std::vector<string>&} 返回 vector 格式的分割结果，返回的
-	 *  结果不需要释放，其引用了当前对象的一个内部指针
-	 */
-	std::vector<string>& quote_split2(const char* sep);
+	std::vector<string>& split2(const char* sep, bool quoted = false);
 
 	/**
 	 * 以 '=' 为分隔符将当前对象存储的字符串分割成 name/value 对，分割时会
