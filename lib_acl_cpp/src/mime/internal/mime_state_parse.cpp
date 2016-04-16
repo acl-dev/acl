@@ -644,7 +644,7 @@ static int mime_bound_body(MIME_STATE *state, const char * const boundary,
 			/* 说明完全匹配 */
 			*finish = 1;
 
-			node->body_end = curr_off - bound_len;
+			node->body_end = (off_t) (curr_off - bound_len);
 			node->body_data_end = node->body_end;
 
 			// 因为 body_end 记录的是某个结点最后的位置，

@@ -443,7 +443,8 @@ ACL_XML2 *acl_xml2_mmap_fd(ACL_FILE_HANDLE fd, size_t max_len,
 	size_t init_len, ACL_DBUF_POOL *dbuf)
 {
 	ACL_XML2 *xml;
-	ACL_VSTRING *vbuf = acl_vstring_mmap_alloc(fd, max_len, init_len);
+	ACL_VSTRING *vbuf = acl_vstring_mmap_alloc(fd, (ssize_t) max_len,
+		(ssize_t) init_len);
 
 	if (vbuf == NULL)
 		return NULL;

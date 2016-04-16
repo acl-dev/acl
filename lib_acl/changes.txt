@@ -1,6 +1,12 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+543) 2016.4.16
+543.1) bugfix: acl_xml_util.c->acl_xml_node_set_text_stream->acl_vstream_fseek
+及 acl_xml2_util.c->acl_xml2_node_set_text_stream->acl_vstream_fseek 中的第二、
+第三个顺序相反
+543.2) compile: 消除了 VC2012 使用 x64 方式编译时的一些编译警告
+
 542) 2016.4.14
 542.1) feature: acl_argv_split.c 新增字符串分隔函数 acl_argv_quote_split 允许
 在对字符串进行分隔时，不破坏被单引号/双引号引用的字符串

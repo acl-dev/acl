@@ -417,7 +417,7 @@ void acl_xml_node_set_text_stream(ACL_XML_NODE *node, ACL_VSTREAM *in,
 		return;
 
 	if (in->type == ACL_VSTREAM_TYPE_FILE
-		&& acl_vstream_fseek(in, SEEK_SET, (acl_off_t) off) < 0)
+		&& acl_vstream_fseek(in, (acl_off_t) off, SEEK_SET) < 0)
 	{
 		const char *path = ACL_VSTREAM_PATH(in);
 

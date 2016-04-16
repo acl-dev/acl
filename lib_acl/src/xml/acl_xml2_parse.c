@@ -156,8 +156,8 @@ static const char *xml_parse_cdata(ACL_XML2 *xml, const char *data)
 				&& curr_node->meta[1] == ']')
 			{
 				curr_node->status = ACL_XML2_S_MEND;
-				curr_node->text_size =
-					END(xml) - curr_node->text;
+				curr_node->text_size = (ssize_t)
+					(END(xml) - curr_node->text);
 				ADD(xml, '\0');
 				return data;
 			}
@@ -222,16 +222,16 @@ static const char *xml_parse_meta_tag(ACL_XML2 *xml, const char *data)
 		if (END(xml) - xml->curr_node->ltag >= (ssize_t) CDATA_SIZE
 			&& IS_CDATA(xml->curr_node->ltag))
 		{
-			xml->curr_node->ltag_size =
-				END(xml) - xml->curr_node->ltag;
+			xml->curr_node->ltag_size = (ssize_t)
+				(END(xml) - xml->curr_node->ltag);
 			ADD(xml, '\0');
 			xml->curr_node->text = END(xml);
 			xml->curr_node->status = ACL_XML2_S_CDATA;
 			xml->curr_node->flag |= ACL_XML2_F_CDATA;
 			break;
 		} else if (IS_SPACE(ch) || ch == '>') {
-			xml->curr_node->ltag_size =
-				END(xml) - xml->curr_node->ltag;
+			xml->curr_node->ltag_size = (ssize_t)
+				(END(xml) - xml->curr_node->ltag);
 			if (NO_SPACE(xml))
 				return data;
 			ADD(xml, '\0');
@@ -263,12 +263,12 @@ static char *xml_meta_attr_name(ACL_XML2_ATTR *attr, char *data)
 	while ((ch = *data) != 0) {
 		if (ch == '=') {
 			if (attr->name_size == 0)
-				attr->name_size = data - attr->name;
+				attr->name_size = (ssize_t) (data - attr->name);
 			*data++ = 0;
 			break;
 		}
 		if (IS_SPACE(ch)) {
-			attr->name_size = data - attr->name;
+			attr->name_size = (ssize_t) (data - attr->name);
 			*data++ = 0;
 		} else
 			data++;
@@ -294,11 +294,11 @@ static char *xml_meta_attr_value(ACL_XML2_ATTR *attr, char *data)
 
 	while ((ch = *data) != 0) {
 		if (attr->quote && ch == attr->quote) {
-			attr->value_size = data - attr->value;
+			attr->value_size = (ssize_t) (data - attr->value);
 			*data++ = 0;
 			break;
 		} else if (IS_SPACE(ch)) {
-			attr->value_size = data - attr->value;
+			attr->value_size = (ssize_t) (data - attr->value);
 			*data++ = 0;
 			break;
 		}
@@ -311,7 +311,7 @@ static char *xml_meta_attr_value(ACL_XML2_ATTR *attr, char *data)
 
 		attr->value = END(xml);
 		(void) acl_xml_decode(ptr, xml->vbuf);
-		attr->value_size = END(xml) - attr->value;
+		attr->value_size = (ssize_t) (END(xml) - attr->value);
 		ADD(xml, '\0');  /* skip one byte */
 	}
 
@@ -388,8 +388,8 @@ static const char *xml_parse_meta_text(ACL_XML2 *xml, const char *data)
 			if (NO_SPACE(xml))
 				return data;
 
-			xml->curr_node->text_size =
-				END(xml) - xml->curr_node->text;
+			xml->curr_node->text_size = (ssize_t)
+				(END(xml) - xml->curr_node->text);
 			xml->curr_node->status = ACL_XML2_S_MEND;
 
 			ADD(xml, '\0');
@@ -402,8 +402,8 @@ static const char *xml_parse_meta_text(ACL_XML2 *xml, const char *data)
 			while (last > xml->curr_node->text) {
 				if (*last == '?') {
 					*last = 0;
-					xml->curr_node->text_size = last -
-						xml->curr_node->text;
+					xml->curr_node->text_size = (ssize_t)
+						(last - xml->curr_node->text);
 					break;
 				}
 				last--;
@@ -431,7 +431,8 @@ static const char *xml_parse_meta_text(ACL_XML2 *xml, const char *data)
 
 		xml->curr_node->text = END(xml);
 		(void) acl_xml_decode(txt, xml->vbuf);
-		xml->curr_node->text_size = END(xml) - xml->curr_node->text;
+		xml->curr_node->text_size = (ssize_t) 
+			(END(xml) - xml->curr_node->text);
 		ADD(xml, '\0');  /* skip one byte */
 	}
 
@@ -480,8 +481,8 @@ static const char *xml_parse_meta_comment(ACL_XML2 *xml, const char *data)
 					return data;
 
 				data++;
-				xml->curr_node->text_size =
-					END(xml) - xml->curr_node->text;
+				xml->curr_node->text_size = (ssize_t)
+					(END(xml) - xml->curr_node->text);
 				ADD(xml, '\0');
 				xml->curr_node->status = ACL_XML2_S_MEND;
 				break;
@@ -532,7 +533,8 @@ static const char *xml_parse_meta_comment(ACL_XML2 *xml, const char *data)
 
 		xml->curr_node->text = END(xml);
 		(void) acl_xml_decode(txt, xml->vbuf);
-		xml->curr_node->text_size = END(xml) - xml->curr_node->text;
+		xml->curr_node->text_size = (ssize_t)
+			(END(xml) - xml->curr_node->text);
 		ADD(xml, '\0');  /* skip one byte */
 	}
 
@@ -563,8 +565,8 @@ static const char *xml_parse_left_tag(ACL_XML2 *xml, const char *data)
 		if (ch == '>') {
 			if (NO_SPACE(xml))
 				return data;
-			xml->curr_node->ltag_size =
-				END(xml) - xml->curr_node->ltag;
+			xml->curr_node->ltag_size = (ssize_t)
+				(END(xml) - xml->curr_node->ltag);
 			ADD(xml, '\0');
 			data++;
 
@@ -588,8 +590,8 @@ static const char *xml_parse_left_tag(ACL_XML2 *xml, const char *data)
 			if (NO_SPACE(xml))
 				return data;
 			data++;
-			xml->curr_node->ltag_size =
-				END(xml) - xml->curr_node->ltag;
+			xml->curr_node->ltag_size = (ssize_t)
+				(END(xml) - xml->curr_node->ltag);
 			ADD(xml, '\0');
 			xml->curr_node->status = ACL_XML2_S_ATTR;
 			xml->curr_node->last_ch = ch;
@@ -661,7 +663,7 @@ static const char *xml_parse_attr(ACL_XML2 *xml, const char *data)
 			if (NO_SPACE(xml))
 				return data;
 			data++;
-			attr->name_size = END(xml) - attr->name;
+			attr->name_size = (ssize_t) (END(xml) - attr->name);
 			ADD(xml, '\0');
 			xml->curr_node->status = ACL_XML2_S_AVAL;
 			break;
@@ -701,7 +703,8 @@ static const char *xml_parse_attr_val(ACL_XML2 *xml, const char *data)
 				if (NO_SPACE(xml))
 					return data;
 				data++;
-				attr->value_size = END(xml) - attr->value;
+				attr->value_size = (ssize_t)
+					(END(xml) - attr->value);
 				ADD(xml, '\0');
 				xml->curr_node->status = ACL_XML2_S_ATTR;
 				xml->curr_node->last_ch = ch;
@@ -716,7 +719,7 @@ static const char *xml_parse_attr_val(ACL_XML2 *xml, const char *data)
 			if (NO_SPACE(xml))
 				return data;
 			data++;
-			attr->value_size = END(xml) - attr->value;
+			attr->value_size = (ssize_t) (END(xml) - attr->value);
 			ADD(xml, '\0');
 
 			xml_parse_check_self_closed(xml);
@@ -734,7 +737,7 @@ static const char *xml_parse_attr_val(ACL_XML2 *xml, const char *data)
 			if (NO_SPACE(xml))
 				return data;
 			data++;
-			attr->value_size = END(xml) - attr->value;
+			attr->value_size = (ssize_t) (END(xml) - attr->value);
 			ADD(xml, '\0');
 			xml->curr_node->status = ACL_XML2_S_ATTR;
 			xml->curr_node->last_ch = ch;
@@ -760,7 +763,7 @@ static const char *xml_parse_attr_val(ACL_XML2 *xml, const char *data)
 
 		attr->value = END(xml);
 		(void) acl_xml_decode(val, xml->vbuf);
-		attr->value_size = END(xml) - attr->value;
+		attr->value_size = (ssize_t) (END(xml) - attr->value);
 		ADD(xml, '\0');  /* skip one byte */
 	}
 
@@ -812,8 +815,8 @@ static const char *xml_parse_text(ACL_XML2 *xml, const char *data)
 				return data;
 
 			data++;
-			xml->curr_node->text_size =
-				END(xml) - xml->curr_node->text;
+			xml->curr_node->text_size = (ssize_t)
+				(END(xml) - xml->curr_node->text);
 			ADD(xml, '\0');
 			xml->curr_node->status = ACL_XML2_S_RLT;
 			break;
@@ -835,7 +838,8 @@ static const char *xml_parse_text(ACL_XML2 *xml, const char *data)
 
 		xml->curr_node->text = END(xml);
 		(void) acl_xml_decode(txt, xml->vbuf);
-		xml->curr_node->text_size = END(xml) - xml->curr_node->text;
+		xml->curr_node->text_size = (ssize_t)
+			(END(xml) - xml->curr_node->text);
 		txt = END(xml) - 1;
 
 		while (txt >= xml->curr_node->text && IS_SPACE(*txt)) {
@@ -974,7 +978,8 @@ static const char *xml_parse_right_tag(ACL_XML2 *xml, const char *data)
 			if (NO_SPACE(xml))
 				return data;
 			data++;
-			curr_node->rtag_size = END(xml) - curr_node->rtag;
+			curr_node->rtag_size = (ssize_t)
+				(END(xml) - curr_node->rtag);
 			ADD(xml, '\0');
 			curr_node->status = ACL_XML2_S_RGT;
 			break;

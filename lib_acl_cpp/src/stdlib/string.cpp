@@ -70,7 +70,7 @@ string::string(ACL_FILE_HANDLE fd, size_t max, size_t n)
 	if (n < 1)
 		n = 1;
 	if (fd >= 0)
-		vbf_ = acl_vstring_mmap_alloc(fd, max, n);
+		vbf_ = acl_vstring_mmap_alloc(fd, (ssize_t) max, (ssize_t) n);
 	else
 		vbf_ = ALLOC(n);
 	list_tmp_ = NULL;

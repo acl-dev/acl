@@ -502,7 +502,7 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 		vp->vbuf.data = acl_mymalloc(len);
 
 	memcpy(vp->vbuf.data, src, len);
-	ACL_VSTRING_AT_OFFSET(vp, len);
+	ACL_VSTRING_AT_OFFSET(vp, (ssize_t) len);
 	ACL_VSTRING_TERMINATE(vp);
 
 	return vp;
@@ -528,7 +528,7 @@ ACL_VSTRING *acl_vstring_memcat(ACL_VSTRING *vp, const char *src, size_t len)
 
 		if (n > 0 ) {
 			memcpy(acl_vstring_end(vp), src, n);
-			n += ACL_VSTRING_LEN(vp);
+			n += (ssize_t) ACL_VSTRING_LEN(vp);
 			ACL_VSTRING_AT_OFFSET(vp, n);
 		} else
 			acl_msg_warn("%s(%d): no space, avail: 0, len: %ld",
