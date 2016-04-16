@@ -1,7 +1,8 @@
-#command	broadcast	dangerous
-del		false		true
-set		false		false
-get		false		false
-incr		false		false
+#command	broadcast	permission
+del		no		warn
+set		no		yes
+get		no		yes
+incr		no		yes
 
-#all		false		true
+#dbsize		yes		yes
+all		no		yes

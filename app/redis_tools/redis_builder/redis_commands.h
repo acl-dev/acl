@@ -4,7 +4,7 @@ struct REDIS_CMD
 {
 	acl::string cmd;
 	bool broadcast;
-	bool dangerous;
+	acl::string perm;
 };
 
 class redis_commands
@@ -24,7 +24,7 @@ private:
 	bool prefer_master_;
 	acl::redis_client_cluster* conns_;
 	std::map<acl::string, REDIS_CMD> redis_cmds_;
-	bool check_all_cmds_;
+	acl::string all_cmds_perm_;
 
 	void init(const char* cmds_file);
 	void set_commands(void);

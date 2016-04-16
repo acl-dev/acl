@@ -12,22 +12,23 @@
 
 static const REDIS_CMD  __redis_cmds[] =
 {
-	{ "BGREWRITEAOF", true, false },
-	{ "BGSAVE", true, false },
-	{ "CONFIG", true, false },
-	{ "DBSIZE", true, false },
-	{ "FLUSHALL", true, true },
-	{ "FLUSHDB", true, true },
-	{ "LASTSAVE", true, false },
-	{ "MONITOR", true, false },
-	{ "PSYNC", true, false },
-	{ "SAVE", true, false },
-	{ "SHUTDOWN", true, true },
-	{ "SLOWLOG", true, false },
-	{ "SYNC", true, false },
-	{ "TIME", true, false },
-	{ "KEYS", true, false },
-	{ "", false, false },
+	{ "ALL",		false,	"yes" },
+	{ "BGREWRITEAOF",	true,	"yes" },
+	{ "BGSAVE",		true,	"yes" },
+	{ "CONFIG",		true,	"yes" },
+	{ "DBSIZE",		true,	"yes" },
+	{ "FLUSHALL",		true,	"yes" },
+	{ "FLUSHDB",		true,	"yes" },
+	{ "LASTSAVE",		true,	"yes" },
+	{ "MONITOR",		true,	"yes" },
+	{ "PSYNC",		true,	"yes" },
+	{ "SAVE",		true,	"yes" },
+	{ "SHUTDOWN",		true,	"yes" },
+	{ "SLOWLOG",		true,	"yes" },
+	{ "SYNC",		true,	"yes" },
+	{ "TIME",		true,	"yes" },
+	{ "KEYS",		true,	"yes" },
+	{ "",			false,	"no" },
 };
 
 redis_commands::redis_commands(const char* addr, const char* passwd,
@@ -36,7 +37,7 @@ redis_commands::redis_commands(const char* addr, const char* passwd,
 	: conn_timeout_(conn_timeout)
 	, rw_timeout_(rw_timeout)
 	, prefer_master_(prefer_master)
-	, check_all_cmds_(false)
+	, all_cmds_perm_("yes")
 {
 	if (passwd && *passwd)
 		passwd_ = passwd;
@@ -56,13 +57,14 @@ redis_commands::~redis_commands(void)
 void redis_commands::init(const char* cmds_file)
 {
 	set_commands();
+
 	if (cmds_file && *cmds_file)
 	{
 		acl::ifstream in;
 		if (in.open_read(cmds_file) == false)
 		{
-			logger_error("load file %s error: %s", cmds_file,
-				acl::last_serror());
+			logger_error("load file %s error: %s",
+				cmds_file, acl::last_serror());
 			return;
 		}
 
@@ -77,7 +79,7 @@ void redis_commands::set_commands(void)
 	for (size_t i = 0; !__redis_cmds[i].cmd.empty(); i++)
 	{
 		acl::string cmd(__redis_cmds[i].cmd);
-		cmd.upper();
+		cmd.lower();
 
 		std::map<acl::string, REDIS_CMD>::const_iterator cit =
 			redis_cmds_.find(cmd);
@@ -118,16 +120,24 @@ void redis_commands::add_cmdline(acl::string& line, size_t i)
 
 	acl::string cmd(tokens[0]);
 	cmd.upper();
-	if (cmd == "ALL" && tokens[2].equal("true", false))
+
+	if (cmd == "ALL")
 	{
-		check_all_cmds_ = true;
+		all_cmds_perm_ = tokens[2];
+		all_cmds_perm_.lower();
+		if (all_cmds_perm_ == "warn" || all_cmds_perm_ == "no")
+			return;
 		return;
 	}
 
 	REDIS_CMD redis_cmd;
 	redis_cmd.cmd = cmd;
-	redis_cmd.broadcast = tokens[1].equal("true", false) ? true : false;
-	redis_cmd.dangerous = tokens[2].equal("true", false) ? true : false;
+	redis_cmd.broadcast = tokens[1].equal("yes", false) ? true : false;
+
+	redis_cmd.perm = tokens[2];
+	redis_cmd.perm.lower();
+	if (redis_cmd.perm != "yes" && redis_cmd.perm != "warn")
+		redis_cmd.perm = "no";
 
 	redis_cmds_[cmd] = redis_cmd;
 }
@@ -136,26 +146,26 @@ void redis_commands::show_commands(void)
 {
 #ifdef ACL_UNIX
 	printf("\033[1;34;40m%-20s\033[0m"
-		" \033[1;34;40m%-20s\033[0m"
-		" \033[1;34;40m%-20s\033[0m\r\n",
-		"command", "broadcast", "dangerous");
+		"\033[1;34;40m%-20s\033[0m"
+		"\033[1;34;40m%-20s\033[0m\r\n",
 #else
-	printf("command, broadcast, dangerous\r\n");
+	printf("%-20s%-20s%-20s\r\n",
 #endif
+		"Command", "Broadcast", "Permission");
 
 	for (std::map<acl::string, REDIS_CMD>::const_iterator cit =
 		redis_cmds_.begin(); cit != redis_cmds_.end(); ++cit)
 	{
 #ifdef ACL_UNIX
 		printf("\033[1;32;40m%-20s\033[0m"
-			" \033[1;36;40m%-20s\033[0m"
-			" \033[1;36;40m%-20s\033[0m\r\n",
+			"\033[1;36;40m%-20s\033[0m"
+			"\033[1;36;40m%-20s\033[0m\r\n",
 #else
-		printf("%s, %s, %s\r\n",
+		printf("%-20s%-20s%-20s\r\n",
 #endif
 			cit->second.cmd.c_str(),
 			cit->second.broadcast ? "yes" : "no",
-			cit->second.dangerous ? "yes" : "no");
+			cit->second.perm.c_str());
 	}
 }
 
@@ -250,23 +260,30 @@ void redis_commands::help(void)
 
 bool redis_commands::check(const char* command)
 {
+	if (all_cmds_perm_ == "no")
+	{
+		printf("All commands disable!\r\n");
+		return false;
+	}
+
 	std::map<acl::string, REDIS_CMD>::const_iterator cit =
 		redis_cmds_.find(command);
 
-	bool broadcast, dangerous;
+	bool broadcast;
+	acl::string perm;
 
 	if (cit == redis_cmds_.end())
 	{
 		broadcast = false;
-		dangerous = false;
+		perm = "yes";
 	}
 	else
 	{
 		broadcast = cit->second.broadcast;
-		dangerous = cit->second.dangerous;
+		perm = cit->second.perm;
 	}
 
-	if (check_all_cmds_ || dangerous)
+	if (all_cmds_perm_ == "warn" || perm == "warn")
 	{
 		acl::string buf;
 		acl::string prompt;
