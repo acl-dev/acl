@@ -87,12 +87,15 @@ bool thread::start()
 		return false;
 	}
 
+	// 如果线程创建足够快，在 thread_run 中有可能用户将线程对象释放，
+	// 则下面的代码就会造成内存非法访问
+#if 0
 #ifdef	ACL_WINDOWS
 	thread_id_ = ((acl_pthread_t*) thread_)->id;
 #elif	defined(LINUX2)
 	thread_id_ = (unsigned long int) thread_;
 #endif
-
+#endif
 	return true;
 }
 
@@ -104,6 +107,7 @@ bool thread::wait(void** out /* = NULL */)
 		return false;
 	}
 
+	// 尝试等待线程创建成功
 	for (int i = 0; i < 10; i++)
 	{
 		if (thread_id_ != 0)
@@ -143,6 +147,20 @@ bool thread::wait(void** out /* = NULL */)
 
 unsigned long thread::thread_id() const
 {
+	// 尝试等待线程创建成功
+	for (int i = 0; i < 10; i++)
+	{
+		if (thread_id_ != 0)
+			break;
+		sleep(1);
+	}
+
+	if (thread_id_ == 0)
+	{
+		logger_error("thread not running!");
+		return 0;
+	}
+
 	return thread_id_;
 }
 
