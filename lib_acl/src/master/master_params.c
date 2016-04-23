@@ -291,6 +291,19 @@ void acl_app_conf_load(const char *pathname)
 	__app_conf_file = acl_mystrdup(pathname);
 }
 
+void acl_app_conf_unload(void)
+{
+	if (__app_cfg) {
+		acl_xinetd_cfg_free(__app_cfg);
+		__app_cfg = NULL;
+	}
+
+	if (__app_conf_file) {
+		acl_myfree(__app_conf_file);
+		__app_conf_file = NULL;
+	}
+}
+
 void  acl_get_app_conf_int_table(ACL_CONFIG_INT_TABLE *table)
 {
 	int   i, n, ret;
@@ -351,6 +364,19 @@ void  acl_get_app_conf_str_table(ACL_CONFIG_STR_TABLE *table)
 		ret = acl_xinetd_cfg_index(__app_cfg, i, &name, &value);
 		if (ret == 0)
 			__update_conf_str_vars(table, name, value);
+	}
+}
+
+void  acl_free_app_conf_str_table(ACL_CONFIG_STR_TABLE *table)
+{
+	int   i;
+
+	if (table == NULL)
+		return;
+
+	for (i = 0; table[i].name != 0; i++) {
+		if (*(table[i].target) != 0)
+			acl_myfree(*(table[i].target));
 	}
 }
 

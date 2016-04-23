@@ -152,6 +152,7 @@ void acl_master_params_load(const char *pathname);
   */
 extern acl_pthread_pool_t *acl_var_master_thread_pool;
 extern void acl_master_vars_init(int buf_size, int rw_timeout);
+extern void acl_master_vars_end(void);
 
 #endif /* ACL_UNIX */
 

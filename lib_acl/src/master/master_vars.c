@@ -35,7 +35,7 @@ ACL_VSTREAM *ACL_MASTER_FLOW_READ_STREAM = NULL;
 ACL_VSTREAM *ACL_MASTER_FLOW_WRITE_STREAM = NULL;
 acl_pthread_pool_t *acl_var_master_thread_pool = NULL;
 
-/* acl_master_vars_init - initialize from global Postfix configuration file */
+/* acl_master_vars_init - initialize from global configuration file */
 
 void    acl_master_vars_init(int buf_size, int rw_timeout)
 {
@@ -60,4 +60,25 @@ void    acl_master_vars_init(int buf_size, int rw_timeout)
 		acl_msg_fatal("%s(%d): create thread pool error(%s)",
 			myname, __LINE__, strerror(errno));
 }
+
+void   acl_master_vars_end(void)
+{
+	if (ACL_MASTER_STAT_STREAM) {
+		acl_vstream_close(ACL_MASTER_STAT_STREAM);
+		ACL_MASTER_STAT_STREAM = NULL;
+	}
+	if (ACL_MASTER_FLOW_READ_STREAM) {
+		acl_vstream_close(ACL_MASTER_FLOW_READ_STREAM);
+		ACL_MASTER_FLOW_READ_STREAM = NULL;
+	}
+	if (ACL_MASTER_FLOW_WRITE_STREAM) {
+		acl_vstream_close(ACL_MASTER_FLOW_WRITE_STREAM);
+		ACL_MASTER_FLOW_WRITE_STREAM = NULL;
+	}
+	if (acl_var_master_thread_pool) {
+		acl_pthread_pool_destroy(acl_var_master_thread_pool);
+		acl_var_master_thread_pool = NULL;
+	}
+}
+
 #endif /* ACL_UNIX */

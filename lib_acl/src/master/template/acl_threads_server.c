@@ -66,8 +66,8 @@
 #include "master_log.h"
 
 int   acl_var_threads_pid;
-char *acl_var_threads_procname;
-char *acl_var_threads_log_file;
+char *acl_var_threads_procname = NULL;
+char *acl_var_threads_log_file = NULL;
 
 int   acl_var_threads_buf_size;
 int   acl_var_threads_rw_timeout;
@@ -144,6 +144,7 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
  /*
   * Global state.
   */
+static int __daemon_mode = 0;
 static int __client_count;
 static int __use_count;
 static int __use_limit_delay = 1;
@@ -161,7 +162,7 @@ static acl_pthread_mutex_t __counter_mutex;
 static unsigned __server_generation;
 
 static void *__service_ctx;
-static char *__service_name;
+static char  __service_name[256];
 static void (*__server_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
 static ACL_THREADS_SERVER_FN		__service_main;
 static ACL_MASTER_SERVER_EXIT_FN	__server_onexit;
@@ -260,6 +261,9 @@ static void server_close(ACL_VSTREAM **streams)
 {
 	int   i;
 
+	if (streams == NULL)
+		return;
+
 	for (i = 0; streams[i] != NULL; i++) {
 		if (streams[i] != NULL) {
 			acl_vstream_close(streams[i]);
@@ -316,7 +320,31 @@ static void server_exit(void)
 	if (__server_onexit)
 		__server_onexit(__service_ctx);
 
+	if (acl_var_threads_procname)
+		acl_myfree(acl_var_threads_procname);
+	if (acl_var_threads_log_file)
+		acl_myfree(acl_var_threads_log_file);
+
+	if (__sstreams) {
+		server_close(__sstreams);
+		__sstreams = NULL;
+	}
+	if (__daemon_mode == 0) {
+		if (__event)
+			acl_event_free(__event);
+		if (__threads)
+			acl_pthread_pool_destroy(__threads);
+#ifdef ACL_UNIX
+		acl_master_vars_end();
+#endif
+	}
+
+	acl_free_app_conf_str_table(__conf_str_tab);
+	acl_app_conf_unload();
+
 	acl_msg_info("---- SERVER EXIT NOW ----");
+	acl_msg_close();
+
 	exit(0);
 }
 
@@ -743,6 +771,7 @@ static void server_init(const char *procname)
 {
 	const char *myname = "server_init";
 	static int inited = 0;
+	const char* ptr;
 
 	if (inited)
 		return;
@@ -778,8 +807,10 @@ static void server_init(const char *procname)
 #endif
 	acl_var_threads_procname = acl_mystrdup(acl_safe_basename(procname));
 
-	acl_var_threads_log_file = acl_getenv("SERVICE_LOG");
-	if (acl_var_threads_log_file == NULL) {
+	ptr = acl_getenv("SERVICE_LOG");
+	if ((ptr = acl_getenv("SERVICE_LOG")) != NULL && *ptr != 0)
+		acl_var_threads_log_file = acl_mystrdup(ptr);
+	else {
 		acl_var_threads_log_file = acl_mystrdup("acl_master.log");
 		acl_msg_info("%s(%d)->%s: can't get SERVICE_LOG's env value,"
 			" use %s log", __FILE__, __LINE__, myname,
@@ -1129,6 +1160,7 @@ static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
 	for (i = 0; i < tokens->argc + 1; i++)
 		streams[i] = NULL;
 
+	i = 0;
 	acl_foreach(iter, tokens) {
 		const char* addr = (const char*) iter.data;
 		ACL_VSTREAM* sstream = acl_vstream_listen(addr, 128);
@@ -1137,6 +1169,8 @@ static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
 				myname, __LINE__, addr, acl_last_serror());
 			exit(1);
 		}
+
+		streams[i++] = sstream;
 
 		acl_non_blocking(ACL_VSTREAM_SOCK(sstream), ACL_NON_BLOCKING);
 		acl_event_enable_listen(event, sstream, 0,
@@ -1150,13 +1184,13 @@ static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
 static void usage(int argc, char * argv[])
 {
 	int   i;
-	char *service_name;
+	const char *service_name;
 
 	if (argc <= 0)
 		acl_msg_fatal("%s(%d): argc(%d) invalid",
 			__FILE__, __LINE__, argc);
 
-	service_name = acl_mystrdup(acl_safe_basename(argv[0]));
+	service_name = acl_safe_basename(argv[0]);
 
 	for (i = 0; i < argc; i++)
 		acl_msg_info("argv[%d]: %s", i, argv[i]);
@@ -1180,8 +1214,8 @@ void acl_threads_server_main(int argc, char * argv[],
 {
 	const char *myname = "acl_threads_server_main";
 	char *root_dir = NULL, *user = NULL, *addrs = NULL;
-	char *service_name = acl_mystrdup(acl_safe_basename(argv[0]));
-	int   c, fdtype = 0, event_mode, socket_count = 1, daemon_mode;
+	const char *service_name = acl_safe_basename(argv[0]);
+	int   c, fdtype = 0, event_mode, socket_count = 1;
 	char *generation, conf_file[1024];
 	void *thread_init_ctx = NULL, *thread_exit_ctx = NULL;
 	ACL_MASTER_SERVER_INIT_FN pre_jail = NULL;
@@ -1252,9 +1286,9 @@ void acl_threads_server_main(int argc, char * argv[],
 			__FILE__, __LINE__, myname, conf_file);
 
 	if (addrs && *addrs)
-		daemon_mode = 0;
+		__daemon_mode = 0;
 	else
-		daemon_mode = 1;
+		__daemon_mode = 1;
 
 	/*******************************************************************/
 
@@ -1373,13 +1407,13 @@ void acl_threads_server_main(int argc, char * argv[],
 	/* Set up call-back info. */
 	__service_main = service;
 	__service_ctx = service_ctx;
-	__service_name = service_name;
+	ACL_SAFE_STRNCPY(__service_name, service_name, sizeof(__service_name));
 
 	/*******************************************************************/
 
 #ifdef ACL_UNIX
 	/* Run pre-jail initialization. */
-	if (daemon_mode && chdir(acl_var_threads_queue_dir) < 0)
+	if (__daemon_mode && chdir(acl_var_threads_queue_dir) < 0)
 		acl_msg_fatal("chdir(\"%s\"): %s", acl_var_threads_queue_dir,
 			acl_last_serror());
 #endif
@@ -1393,7 +1427,7 @@ void acl_threads_server_main(int argc, char * argv[],
 
 	/* open all listen streams */
 
-	if (daemon_mode == 0)
+	if (__daemon_mode == 0)
 		__sstreams = server_alone_open(__event, __threads, addrs);
 #ifdef ACL_UNIX
 	else if (socket_count <= 0)

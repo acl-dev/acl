@@ -262,6 +262,19 @@ int main(int argc, char* argv[])
 	}
 	else if (cmd == "run" || cmd.empty())
 	{
+		acl::string path;
+		const char* ptr = acl_process_path();
+		if (ptr && *ptr)
+		{
+			path.dirname(ptr);
+			filepath.format("%s/redis_commands.txt", path.c_str());
+			acl::ifstream in;
+			if (in.open_read(filepath))
+			{
+				in.close();
+				cmds_file = filepath;
+			}
+		}
 		redis_commands cmds(addr, passwd, conn_timeout,
 			rw_timeout, prefer_master, cmds_file);
 		cmds.run();
