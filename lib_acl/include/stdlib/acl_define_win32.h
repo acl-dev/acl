@@ -10,6 +10,7 @@
  * vc++9.0	VS 2008	1500
  * vc++10.0	VS 2010	1600
  * vc++11.0	VS 2012	1700
+ * vc++14.0	VS 2015	1900
  */
 
 #if defined (_WIN32) || defined(_WIN64)
@@ -18,6 +19,11 @@
 #  ifndef _CRT_SECURE_NO_WARNINGS
 #   define _CRT_SECURE_NO_WARNINGS
 #  endif
+# if _MSC_VER >= 1900
+#   ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
+#    define _WINSOCK_DEPRECATED_NO_WARNINGS
+#   endif
+# endif
 # endif
 #elif	defined(BORLAND_CB)
 # define ACL_BCB_COMPILER

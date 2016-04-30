@@ -230,7 +230,9 @@ int xml1_node::children_count(void) const
 
 //////////////////////////////////////////////////////////////////////
 
-xml1::xml1(const char* data /* = NULL */)
+xml1::xml1(const char* data /* = NULL */, size_t dbuf_nblock /* = 2 */,
+	size_t dbuf_capacity /* = 100 */)
+	: xml(dbuf_nblock, dbuf_capacity)
 {
 	iter_ = NULL;
 	root_ = NULL;

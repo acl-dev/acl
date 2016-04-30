@@ -1,5 +1,7 @@
 #include "stdafx.h"
+#if !defined(_WIN32) && !defined(_WIN64)
 #include <sys/time.h>
+#endif
 
 /**
  * dbuf_obj 子类，在 dbuf_pool 上动态分配，由 dbuf_guard 统一进行管理

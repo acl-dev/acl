@@ -182,8 +182,11 @@ public:
 	 *  无论如何，用户依然可以用部分或完整的 xml 字符串调用 update
 	 *  函数，在调用 update 过程中解析 xml；其实，当构造函数的
 	 *  的 data 参数非空时，它也会调用 update
+	 * @param dbuf_nblock {size_t} 内部所用 dbuf_guard 的初始化参数
+	 * @param dbuf_capacity {size_t} 内部所用 dbuf_guard 的初始化参数
 	 */
-	xml1(const char* data = NULL);
+	xml1(const char* data = NULL, size_t dbuf_nblock = 2,
+		size_t dbuf_capacity = 100);
 	~xml1(void);
 
 	/**

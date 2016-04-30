@@ -113,10 +113,12 @@ struct acl_pthread_condattr_t {
 	char  unused_name[1];
 };
 
+# if _MSC_VER < 1900
 struct timespec {
 	time_t tv_sec;		/* Seconds. */
 	long int tv_nsec;	/* Nanoseconds. */
 };
+#endif
 
 /* in acl_pthread.c */
 ACL_API void acl_pthread_end(void);

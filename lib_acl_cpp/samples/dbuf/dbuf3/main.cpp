@@ -1,7 +1,9 @@
 // xml.cpp : 定义控制台应用程序的入口点。
 //
 #include "stdafx.h"
+#if !defined(_WIN32) && !defined(_WIN64)
 #include <sys/time.h>
+#endif
 
 #define	CHECK(r, x, y) do { \
 	if ((x) == (r)) { \

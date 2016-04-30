@@ -168,7 +168,7 @@ static int bench_random_add(ZDB *db, int max, int mod)
 	ACL_METER_TIME(" ");
 
 	printf("================= update ok, time: %ld ===============\n",
-		time(NULL) - begin);
+		(long) (time(NULL) - begin));
 
 	random_free(a);
 	return (max);
@@ -218,7 +218,7 @@ static int bench_random_get(ZDB *db, int max, int mod)
 	ACL_METER_TIME(" ");
 
 	printf("================= lookup ok, time: %ld ===============\n",
-		time(NULL) - begin);
+		(long) (time(NULL) - begin));
 
 	random_free(a);
 	return (max);
@@ -258,7 +258,7 @@ static int bench_add(ZDB *db, int max)
 	ACL_METER_TIME("----end---");
 
 	printf("================= add ok, time: %ld ===============\n",
-		time(NULL) - begin);
+		(long) (time(NULL) - begin));
 
 	return (max);
 }
@@ -300,7 +300,7 @@ static int bench_update(ZDB *db, int max, int num)
 	ACL_METER_TIME("----end---");
 
 	printf("================= update ok, time: %ld ===============\n",
-		time(NULL) - begin);
+		(long) (time(NULL) - begin));
 
 	acl_myfree(dummy);
 
@@ -353,7 +353,7 @@ static int bench_get(ZDB *db, int max)
 	ACL_METER_TIME("----end---");
 
 	printf("================= lookup ok, time: %ld ===============\n",
-		time(NULL) - begin);
+		(long) (time(NULL) - begin));
 	return (max);
 }
 
@@ -503,7 +503,7 @@ static int test_zdb_key_walk(ZDB *db)
 	time(&begin);
 	ret = zdb_key_walk(db, key_walk_fn);
 	printf(">>>%s, acl_foreach for key, total: %d, time: %ld\n",
-		myname, ret, time(NULL) - begin);
+		myname, ret, (long) (time(NULL) - begin));
 	return (0);
 }
 
@@ -543,7 +543,7 @@ static int test_zdb_dat_walk(ZDB *db)
 	time(&begin);
 	ret = zdb_dat_walk(db, dat_walk_fn);
 	printf(">>>%s, acl_foreach for dat, total: %d, time: %ld\n",
-		myname, ret, time(NULL) - begin);
+		myname, ret, (long) (time(NULL) - begin));
 	return (ret);
 }
 

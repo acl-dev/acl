@@ -331,7 +331,11 @@ class string;
 class ACL_CPP_API xml : public pipe_stream, public dbuf_obj
 {
 public:
-	xml(void);
+	/**
+	 * @param dbuf_nblock {size_t} 内部所用 dbuf_guard 的初始化参数
+	 * @param dbuf_capacity {size_t} 内部所用 dbuf_guard 的初始化参数
+	 */
+	xml(size_t dbuf_nblock = 2, size_t dbuf_capacity = 100);
 	virtual ~xml(void);
 
 	/**

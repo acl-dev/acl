@@ -614,28 +614,28 @@ static int mime_bound_body(MIME_STATE *state, const char * const boundary,
 	const unsigned char *cp = (const unsigned char*) s;
 	const unsigned char *end = (const unsigned char*) s + n;
 	size_t bound_len = strlen(boundary);
-	off_t curr_off = state->curr_off;
-	off_t last_cr_pos = node->last_cr_pos;
+	register off_t curr_off = state->curr_off;
+	register off_t last_cr_pos = node->last_cr_pos;
 	off_t last_lf_pos = node->last_lf_pos;
 	const char *bound_ptr = node->bound_ptr;
-	unsigned char ch;
+	unsigned char ch = 0;
 
 	for (; cp < end; cp++) {
-		ch = *cp;
-
 		// 记录下 \r\n 的位置
-		if (ch == '\r')
-			last_cr_pos = curr_off;
-		else if (ch == '\n')
+		if (*cp == '\n') {
 			last_lf_pos = curr_off;
+			if (ch == '\r')
+				last_cr_pos = curr_off - 1;
+		}
 
+		ch = *cp;
 		curr_off++;
 
 		if (bound_ptr == NULL) {
-			if (ch != *boundary)
+			if (ch == *boundary)
+				bound_ptr = boundary;
+			else
 				continue;
-
-			bound_ptr = boundary;
 		}
 
 		if (ch != *bound_ptr) {
@@ -647,10 +647,9 @@ static int mime_bound_body(MIME_STATE *state, const char * const boundary,
 			node->body_end = (off_t) (curr_off - bound_len);
 			node->body_data_end = node->body_end;
 
-			// 因为 body_end 记录的是某个结点最后的位置，
-			// 其中会包含, 根据协议附加的 \r\n，所以真实
-			// 数据的结束位置 body_data_end 是去掉这些数据
-			// 后的位置
+			// body_end 记录的是某个结点最后的位置，根据协议,
+			// 其中会包含附加的 \r\n，所以真实数据的结束位置
+			// body_data_end 是去掉这些数据后的位置
 			if (last_lf_pos + (off_t) bound_len == curr_off - 1)
 			{
 				node->body_data_end--;

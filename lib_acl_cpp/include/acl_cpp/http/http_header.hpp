@@ -216,9 +216,10 @@ public:
 	 * 当参数字段只有参数名没有参数值时，该参数将会被忽略，所以如果想
 	 * 单独添加参数名，应该调用 add_param 方法来添加
 	 * @param url {const char*} 请求的 url，非空指针
+	 * @param encoding {bool} 是否对存在于 url 中的参数进行 url 编码
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
 	 */
-	http_header& set_url(const char* url);
+	http_header& set_url(const char* url, bool encoding = true);
 
 	/**
 	 * 设置 HTTP 请求头的 HOST 字段

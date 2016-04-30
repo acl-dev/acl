@@ -220,7 +220,9 @@ int xml2_node::children_count(void) const
 //////////////////////////////////////////////////////////////////////
 
 xml2::xml2(const char* filepath, size_t max_len, const char* data /* = NULL */,
-	size_t init_len /* = 8192 */)
+	size_t init_len /* = 8192 */, size_t dbuf_nblock /* = 2 */,
+	size_t dbuf_capacity /* = 100 */)
+	: xml(dbuf_nblock, dbuf_capacity)
 {
 	acl_assert(filepath && max_len > 0 && init_len > 0);
 
@@ -238,7 +240,9 @@ xml2::xml2(const char* filepath, size_t max_len, const char* data /* = NULL */,
 }
 
 xml2::xml2(fstream& fp, size_t max_len, const char* data /* = NULL */,
-	size_t init_len /* = 8192 */)
+	size_t init_len /* = 8192 */, size_t dbuf_nblock /* = 2 */,
+	size_t dbuf_capacity /* = 100 */)
+	: xml(dbuf_nblock, dbuf_capacity)
 {
 	acl_assert(max_len > 0 && init_len > 0);
 
@@ -256,7 +260,9 @@ xml2::xml2(fstream& fp, size_t max_len, const char* data /* = NULL */,
 }
 
 xml2::xml2(ACL_FILE_HANDLE fd, size_t max_len, const char* data /* = NULL */,
-	size_t init_len /* = 8192 */)
+	size_t init_len /* = 8192 */, size_t dbuf_nblock /* = 2 */,
+	size_t dbuf_capacity /* = 100 */)
+	: xml(dbuf_nblock, dbuf_capacity)
 {
 	acl_assert(fd != ACL_FILE_INVALID);
 	acl_assert(max_len > 0);

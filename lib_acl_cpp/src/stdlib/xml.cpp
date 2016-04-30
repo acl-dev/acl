@@ -117,7 +117,8 @@ xml_node& xml_node::add_child(const char* tag, istream& in, size_t off /* = 0 */
 
 //////////////////////////////////////////////////////////////////////
 
-xml::xml(void)
+xml::xml(size_t dbuf_nblock /* = 2 */, size_t dbuf_capacity /* = 100 */)
+	: dbuf_(dbuf_nblock, dbuf_capacity)
 {
 	//dummyRootAdded_ = false;
 	buf_ = NULL;

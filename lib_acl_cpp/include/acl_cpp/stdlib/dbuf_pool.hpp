@@ -35,11 +35,11 @@ public:
 	 * @param nblock {size_t} 内部采用的内存块（4096）的倍数
 	 */
 	void *operator new(size_t size, size_t nblock = 2);
+
 #if defined(_WIN32) || defined(_WIN64)
 	void operator delete(void* ptr, size_t);
-#else
-	void operator delete(void* ptr);
 #endif
+	void operator delete(void* ptr);
 
 	/**
 	 * 重置内存池的状态以便于重复使用该内存池对象
@@ -216,7 +216,7 @@ public:
 	 *  接管，如果为空，则本构造函数内部将会自动创建一个 dbuf_pool 对象
 	 * @param capacity {size_t} 内部创建的 objs_ 数组的初始长度
 	 */
-	dbuf_guard(dbuf_pool* dbuf, size_t capacity = 100);
+	dbuf_guard(dbuf_pool* dbuf, size_t capacity = 500);
 
 	/**
 	 * 构造函数
@@ -224,7 +224,7 @@ public:
 	 *  指定了内存块(4096)的倍数
 	 * @param capacity {size_t} 内部创建的 objs_ 数组的初始长度
 	 */
-	dbuf_guard(size_t nblock = 2, size_t capacity = 100);
+	dbuf_guard(size_t nblock = 2, size_t capacity = 500);
 
 	/**
 	 * 析构函数，在析构函数内部将会自动销毁由构造函数传入的 dbuf_pool 对象
@@ -347,17 +347,6 @@ public:
 	size_t size() const
 	{
 		return size_;
-	}
-
-	/**
-	 * 获得当前内存池中管理的对象集合，该函数必须与 size() 函数配合使用，
-	 * 以免指针地址越界
-	 * @return {dbuf_obj**} 返回 dbuf_obj 对象集合，永远返回非 NULL 值，
-	 *  该数组的大小由 size() 函数决定
-	 */
-	dbuf_obj** get_objs() const
-	{
-		return objs_;
 	}
 
 	/**
@@ -487,16 +476,28 @@ public:
 
 private:
 	size_t nblock_;			// 内部自建 dbuf_pool 内存块的单位个数
+	size_t incr_;			// 增加新的 dbuf_objs_link 时的
+					// capacity 大小
 	dbuf_pool* dbuf_;		// 内存池对象
 
 	// 此处之所以使用自实现的 dbuf_obj 数组对象，而没有使用 std::vector，
 	// 一方面使数组对象也在 dbuf_pool 内存池上创建，另一方面可以避免
 	// std::vector 内部在扩容时的内存不可控性
 
-	dbuf_obj** objs_;		// 存储 dbuf_obj 对象的数组对象
-	size_t size_;			// 存储于 objs_ 中的对象个数
-	size_t capacity_;		// objs_ 数组的大小
-	size_t incr_;			// objs_ 数组扩充时的增量个数
+	struct dbuf_objs_link
+	{
+		dbuf_obj** objs;	// 存储 dbuf_obj 对象的数组对象
+		size_t size;		// 存储于 objs 中的对象个数
+		size_t capacity;	// objs 数组的大小
+
+		struct dbuf_objs_link* next;
+	};
+
+	dbuf_objs_link  head_;
+	dbuf_objs_link* curr_;
+	size_t size_;
+
+	void init(size_t capacity);
 
 	// 扩充 objs_ 数组对象的空间
 	void extend_objs();

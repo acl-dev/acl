@@ -242,7 +242,7 @@ void http_header::build_common(string& buf) const
 //////////////////////////////////////////////////////////////////////////
 // 与 HTTP 请求头相关的函数
 
-http_header& http_header::set_url(const char* url)
+http_header& http_header::set_url(const char* url, bool encoding /* = true */)
 {
 	acl_assert(url && *url);
 
@@ -268,7 +268,12 @@ http_header& http_header::set_url(const char* url)
 
 	// 当 url 中只有相对路径时
 	if (ptr == url_)
-		params = strchr(ptr, '?');
+	{
+		if (encoding)
+			params = strchr(ptr, '?');
+		else
+			params = NULL;
+	}
 
 	// 当 url 为绝对路径时
 	else if ((slash = strchr(ptr, '/')) != NULL && slash > ptr)
@@ -279,7 +284,11 @@ http_header& http_header::set_url(const char* url)
 
 		// 添加主机地址
 		ACL_SAFE_STRNCPY(host_, ptr, n);
-		params = strchr(slash, '?');
+
+		if (encoding)
+			params = strchr(slash, '?');
+		else
+			params = NULL;
 	}
 
 	// 当 url 为绝对路径且主机地址后没有 '/'
@@ -291,7 +300,11 @@ http_header& http_header::set_url(const char* url)
 			url_[len] = '/';
 			url_[len + 1] = 0;
 		}
-		params = strchr(ptr, '?');
+
+		if (encoding)
+			params = strchr(ptr, '?');
+		else
+			params = NULL;
 	}
 
 	if (params == NULL)

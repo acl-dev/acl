@@ -202,13 +202,8 @@ PROCTL_SRC   = $(wildcard $(SRC_PATH_SRC)/proctl/*.c)
 XML_SRC      = $(wildcard $(SRC_PATH_SRC)/xml/*.c)
 JSON_SRC      = $(wildcard $(SRC_PATH_SRC)/json/*.c)
 UTEST_SRC    = $(wildcard $(SRC_PATH_SRC)/unit_test/*.c)
+FIBER_SRC    = $(wildcard $(SRC_PATH_SRC)/fiber/*.c)
 #EXP_SRC      = $(wildcard $(SRC_PATH_SRC)/experiment/avl/*.c)
-
-SOURCES_SRC  = $(INIT_SRC) $(STDLIB_SRC) $(NET_SRC) \
-		$(ENGINE_SRC) $(IOCTL_SRC) $(AIO_SRC) \
-		$(MSG_SRC) $(THREAD_SRC) $(SVR_SRC) \
-		$(DB_SRC) $(CODE_SRC) $(MASTER_SRC) \
-		$(PROCTL_SRC) $(XML_SRC) $(UTEST_SRC)
 #$(EXP_SRC)
 
 ###########################################################
@@ -229,6 +224,7 @@ PROCTL_OBJ   = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(PROCTL_SRC)))
 XML_OBJ      = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(XML_SRC)))
 JSON_OBJ     = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(JSON_SRC)))
 UTEST_OBJ    = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(UTEST_SRC)))
+FIBER_OBJ    = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(FIBER_SRC)))
 #EXP_OBJ      = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(EXP_SRC)))
 
 OBJS_DST     = $(INIT_OBJ) $(PRIV_OBJ) $(STDLIB_OBJ) \
@@ -236,7 +232,7 @@ OBJS_DST     = $(INIT_OBJ) $(PRIV_OBJ) $(STDLIB_OBJ) \
 		$(AIO_OBJ) $(MSG_OBJ) $(THREAD_OBJ) \
 		$(SVR_OBJ) $(DB_OBJ) $(CODE_OBJ) \
 		$(MASTER_OBJ) $(PROCTL_OBJ) $(XML_OBJ) \
-		$(JSON_OBJ) $(UTEST_OBJ)
+		$(JSON_OBJ) $(UTEST_OBJ) $(FIBER_OBJ)
 #$(EXP_OBJ)
 
 ###########################################################
@@ -257,14 +253,16 @@ PROCTL_DEF   = $(patsubst %.c, $(DEF_PATH_DST)/%.inc, $(notdir $(PROCTL_SRC)))
 XML_DEF      = $(patsubst %.c, $(DEF_PATH_DST)/%.inc, $(notdir $(XML_SRC)))
 JSON_DEF     = $(patsubst %.c, $(DEF_PATH_DST)/%.inc, $(notdir $(JSON_SRC)))
 UTEST_DEF    = $(patsubst %.c, $(DEF_PATH_DST)/%.inc, $(notdir $(UTEST_SRC)))
+FIBER_DEF    = $(patsubst %.c, $(DEF_PATH_DST)/%.inc, $(notdir $(FIBER_SRC)))
 #EXP_DEF      = $(patsubst %.c, $(DEF_PATH_DST)/%.inc, $(notdir $(EXP_SRC)))
+FIBER_DEF    = $(patsubst %.c, $(DEF_PATH_DST)/%.inc, $(notdir $(FIBER_SRC)))
 
 OBJS_DEF     = $(INIT_DEF) $(PRIV_DEF) $(STDLIB_DEF) \
 	        $(NET_DEF) $(ENGINE_DEF) $(IOCTL_DEF) \
 		$(AIO_DEF) $(MSG_DEF) $(THREAD_DEF) \
 		$(SVR_DEF) $(DB_DEF) $(CODE_DEF) \
 		$(MASTER_DEF) $(PROCTL_DEF) $(XML_DEF) \
-		$(JSON_DEF) $(UTEST_DEF)
+		$(JSON_DEF) $(UTEST_DEF) $(FIBER_DEF)
 
 ###########################################################
 .PHONY = all static shared acl_master clean clean_lib clean_master rebuild
@@ -508,6 +506,12 @@ $(DEF_PATH_DST)/%.inc: $(SRC_PATH_SRC)/json/%.c
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/unit_test/%.c
 	$(COMPILE_OBJ)
 $(DEF_PATH_DST)/%.inc: $(SRC_PATH_SRC)/unit_test/%.c
+	$(CREATE_DEF)
+
+# fiber
+$(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/fiber/%.c
+	$(COMPILE_OBJ)
+$(DEF_PATH_DST)/%.inc: $(SRC_PATH_SRC)/fiber/%.c
 	$(CREATE_DEF)
 
 # experiment

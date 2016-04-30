@@ -163,9 +163,12 @@ public:
 	 *  增长时不应超过此大小
 	 * @param data {const char*} 非空时自动调用解析过程
 	 * @param init_len {size_t} 内存映射文件创建时的初始大小
+	 * @param dbuf_nblock {size_t} 内部所用 dbuf_guard 的初始化参数
+	 * @param dbuf_capacity {size_t} 内部所用 dbuf_guard 的初始化参数
 	 */
 	xml2(const char* filepath, size_t max_len, const char* data = NULL,
-		size_t init_len = 8192);
+		size_t init_len = 8192, size_t dbuf_nblock = 2,
+		size_t dbuf_capacity = 100);
 
 	/**
 	 * 构造函数，使 xml 对象树创建在指定内存映射文件上
@@ -175,9 +178,12 @@ public:
 	 *  增长时不应超过此大小
 	 * @param data {const char*} 非空时自动调用解析过程
 	 * @param init_len {size_t} 内存映射文件创建时的初始大小
+	 * @param dbuf_nblock {size_t} 内部所用 dbuf_guard 的初始化参数
+	 * @param dbuf_capacity {size_t} 内部所用 dbuf_guard 的初始化参数
 	 */
 	xml2(fstream& fp, size_t max_len, const char* data = NULL,
-		size_t init_len = 8192);
+		size_t init_len = 8192, size_t dbuf_nblock = 2,
+		size_t dbuf_capacity = 100);
 
 	/**
 	 * 构造函数，使 xml 对象树创建在指定内存映射文件上
@@ -187,13 +193,17 @@ public:
 	 *  增长时不应超过此大小
 	 * @param data {const char*} 非空时自动调用解析过程
 	 * @param init_len {size_t} 内存映射文件创建时的初始大小
+	 * @param dbuf_nblock {size_t} 内部所用 dbuf_guard 的初始化参数
+	 * @param dbuf_capacity {size_t} 内部所用 dbuf_guard 的初始化参数
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	xml2(void* fd,  size_t max_len, const char* data = NULL,
-		size_t init_len = 8192);
+		size_t init_len = 8192, size_t dbuf_nblock = 2,
+		size_t dbuf_capacity = 100);
 #else
 	xml2(int fd, size_t max_len, const char* data = NULL,
-		size_t init_len = 8192);
+		size_t init_len = 8192, size_t dbuf_nblock = 2,
+		size_t dbuf_capacity = 100);
 #endif
 
 	~xml2(void);

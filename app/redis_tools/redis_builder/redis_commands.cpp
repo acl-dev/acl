@@ -28,6 +28,7 @@ static const REDIS_CMD  __redis_cmds[] =
 	{ "SYNC",		true,	"yes" },
 	{ "TIME",		true,	"yes" },
 	{ "KEYS",		true,	"yes" },
+	{ "SCAN",		true,	"yes" },
 	{ "",			false,	"no" },
 };
 
@@ -190,7 +191,9 @@ void redis_commands::getline(acl::string& buf, const char* prompt /* = NULL */)
 	if (ptr == NULL)
 		exit (0);
 	buf = ptr;
-	add_history(ptr);
+	buf.trim_right_line();
+	if (!buf.empty() && !buf.equal("y", false) && !buf.equal("n", false))
+		add_history(buf.c_str());
 #else
 	printf("%s", prompt);
 	fflush(stdout);
@@ -225,6 +228,8 @@ void redis_commands::help(void)
 #ifdef ACL_UNIX
 	printf("> \033[1;33;40mkeys\033[0m"
 		" \033[1;36;40mpattern limit\033[0m\r\n");
+	printf("> \033[1;33;40mscan\033[0m"
+		" \033[1;36;40mpattern display_count ip:port\033[0m\r\n");
 	printf("> \033[1;33;40mget\033[0m"
 		" \033[1;36;40m[:limit] parameter ...\033[0m\r\n");
 	printf("> \033[1;33;40mgetn\033[0m"
@@ -244,6 +249,7 @@ void redis_commands::help(void)
 	printf("> \033[1;33;40mconfig resetstat\033[0m\r\n");
 #else
 	printf("> keys pattern limit\r\n");
+	printf("> scan pattern display_count ip:port\r\n");
 	printf("> get [:limit] parameter ...\r\n");
 	printf("> getn parameter limit\r\n");
 	printf("> remove pattern\r\n");
@@ -338,6 +344,8 @@ void redis_commands::run(void)
 			show_nodes();
 		else if (cmd == "KEYS")
 			get_keys(tokens);
+		else if (cmd == "SCAN")
+			scan_keys(tokens);
 		else if (cmd == "GET")
 			get(tokens);
 		else if (cmd == "GETN")
@@ -480,6 +488,115 @@ int redis_commands::get_keys(const char* addr, const char* pattern, int max)
 		addr, (int) res.size(), max, n);
 
 	return (int) res.size();
+}
+
+void redis_commands::scan_keys(const std::vector<acl::string>& tokens)
+{
+	const char* pattern = NULL;
+	size_t display_count = 10;
+	acl::string addr;
+
+	size_t size = tokens.size();
+	if (size >= 2)
+		pattern = tokens[1].c_str();
+	else
+		pattern = "*";
+
+	if (size >= 3)
+		display_count = (size_t) atoi(tokens[2].c_str());
+	if (size >= 4)
+		addr = tokens[3];
+
+	if (!addr.empty())
+	{
+		scan(addr, pattern, display_count);
+		return;
+	}
+
+	acl::redis redis(conns_);
+	std::vector<acl::redis_node*> nodes;
+	redis_util::get_nodes(redis, prefer_master_, nodes);
+
+	int total = 0;
+	for (std::vector<acl::redis_node*>::const_iterator cit
+		= nodes.begin(); cit != nodes.end();)
+	{
+		int n = scan((*cit)->get_addr(), pattern, display_count);
+		if (n > 0)
+			total += n;
+
+		printf("There are %d keys in %s.", n, (*cit)->get_addr());
+
+		if (++cit == nodes.end())
+		{
+			printf("\r\n");
+			break;
+		}
+
+		acl::string prompt;
+		prompt.format(" Do you want to scan next %s? [y/n] ",
+			(*cit)->get_addr());
+
+		acl::string buf;
+		getline(buf, prompt);
+		if (!buf.empty() && !buf.equal("y", false))
+			break;
+	}
+
+	printf("-----scan keys %s: total count: %d----\r\n",
+		pattern ? pattern : "*", total);
+}
+
+int redis_commands::scan(const char* addr, const char* pattern,
+	size_t display_count)
+{
+	acl::redis_client conn(addr, conn_timeout_, rw_timeout_);
+	if (!passwd_.empty())
+		conn.set_password(passwd_);
+	acl::redis redis(&conn);
+
+	size_t count = 10000;
+	std::vector<acl::string> res;
+	res.reserve(count);
+
+	int cursor = 0, n = 0, i = 0;
+	size_t n1 = 0;
+
+	while (true)
+	{
+		cursor = redis.scan(cursor, res, pattern, &count);
+		if (cursor < 0)
+		{
+			printf("scan error: %s\r\n", redis.result_error());
+			break;
+		}
+
+		i++;
+		n += res.size();
+
+		if (display_count > 0 && n1++ < display_count)
+		{
+			size_t n2 = 0;
+			for (std::vector<acl::string>::const_iterator cit
+				= res.begin(); cit != res.end(); ++cit)
+			{
+				if (display_count > 0 && n2 >= display_count)
+					break;
+				get((*cit).c_str(), display_count);
+				n2++;
+			}
+		}
+
+		if (cursor == 0)
+			break;
+		redis.clear();
+		res.clear();
+
+		if (i > 0 && i % 10 == 0)
+			acl_doze(100);
+	}
+
+	return n;
 }
 
 void redis_commands::getn(const std::vector<acl::string>& tokens)
@@ -857,9 +974,9 @@ int redis_commands::pattern_remove(const char* addr, const char* pattern)
 	acl::string buf;
 	std::vector<acl::string> res;
 
-	acl::redis_client conn(addr, conn_timeout_, rw_timeout_);
-	if (!passwd_.empty())
-		conn.set_password(passwd_);
+	//acl::redis_client conn(addr, conn_timeout_, rw_timeout_);
+	//if (!passwd_.empty())
+	//	conn.set_password(passwd_);
 
 	acl::redis redis(conns_);
 	redis.keys_pattern(pattern, &res);
