@@ -18,7 +18,7 @@ extern "C" {
  * 设置套接口为阻塞或非阻塞
  * @param fd {ACL_SOCKET} SOCKET 套接字
  * @param on {int} 是否设置该套接字为非阻塞, ACL_BLOCKING 或 ACL_NON_BLOCKING
- * @return {int} 0: 成功; -1: 失败
+ * @return {int} >= 0: 成功, 返回值 > 0 表示设置之前的标志位; -1: 失败
  */
 ACL_API int acl_non_blocking(ACL_SOCKET fd, int on);
 

@@ -1059,7 +1059,9 @@ const char *acl_xml2_update(ACL_XML2 *xml, const char *data)
 {
 	const char *myname = "acl_xml2_update";
 
-	if (data == NULL || *data == 0)
+	if (data == NULL)
+		return "";
+	else if (*data == 0)
 		return data;
 
 	if (!(xml->flag & ACL_XML2_FLAG_MULTI_ROOT) && xml->root_cnt > 0)

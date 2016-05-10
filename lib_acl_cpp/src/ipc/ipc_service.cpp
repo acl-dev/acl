@@ -254,7 +254,7 @@ bool ipc_service::create_window(void)
 			__class_name, acl_last_serror());
 
 	// 添加窗口句柄的关联对象
-	SetWindowLongPtr(hWnd_, GWLP_USERDATA, (LONG) this);
+	SetWindowLongPtr(hWnd_, GWLP_USERDATA, (ULONG_PTR) this);
 
 	// 调用子类处理过程
 	on_open("win32 gui message");

@@ -852,7 +852,9 @@ static struct XML_STATUS_MACHINE status_tab[] = {
 
 const char *acl_xml_update(ACL_XML *xml, const char *data)
 {
-	if (data == NULL || *data == 0)
+	if (data == NULL)
+		return "";
+	else if (*data == 0)
 		return data;
 
 	if (!(xml->flag & ACL_XML_FLAG_MULTI_ROOT) && xml->root_cnt > 0)

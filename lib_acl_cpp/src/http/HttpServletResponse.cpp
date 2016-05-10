@@ -22,7 +22,7 @@ HttpServletResponse::HttpServletResponse(socket_stream& stream)
 	dbuf_ = dbuf_internal_;
 
 	client_ = new (dbuf_->dbuf_alloc(sizeof(http_client)))
-		http_client(&stream_, stream_.get_rw_timeout());
+		http_client(&stream_, false, true);
 	header_ = dbuf_->create<http_header, dbuf_guard*>(dbuf_);
 
 	header_->set_request_mode(false);

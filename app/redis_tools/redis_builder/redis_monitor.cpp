@@ -98,6 +98,25 @@ long long redis_monitor::check(const std::map<acl::string, acl::string>& info,
 	}
 }
 
+double redis_monitor::check(const std::map<acl::string, acl::string>& info,
+	const char* name, std::vector<double>& res)
+{
+	std::map<acl::string, acl::string>::const_iterator cit
+		= info.find(name);
+	if (cit == info.end())
+	{
+		logger_error("no %s", name);
+		res.push_back(0.0);
+		return 0.0;
+	}
+	else
+	{
+		double n = atof(cit->second.c_str());
+		res.push_back(n);
+		return n;
+	}
+}
+
 int redis_monitor::check_keys(const char* name, const char* value)
 {
 	if (strncmp(name, "db", 2) != 0 || *value == 0)
@@ -142,6 +161,32 @@ int redis_monitor::check_keys(const std::map<acl::string, acl::string>& info,
 	return count;
 }
 
+static double to_human(long long n, acl::string& units)
+{
+	double msize;
+
+#define KB	1024
+#define MB	(1024 * 1024)
+#define	GB	(1024 * 1024 * 1024)
+	long long TB = (long long) GB * 1024;
+
+	if ((msize = (double) (n / TB)) >= 1)
+		units = "T";
+	else if ((msize = ((double) n) / GB) >= 1)
+		units = "G";
+	else if ((msize = ((double) n) / MB) >= 1)
+		units = "M";
+	else if ((msize = ((double) n) / KB) >= 1)
+		units = "K";
+	else
+	{
+		msize = (double) n;
+		units = "B";
+	}
+
+	return msize;
+}
+
 void redis_monitor::show_status(std::vector<acl::redis_client*>& conns)
 {
 	std::vector<acl::string> addrs;
@@ -149,6 +194,9 @@ void redis_monitor::show_status(std::vector<acl::redis_client*>& conns)
 	std::vector<int> clients;
 	std::vector<int> keys;
 	std::vector<long long> memory;
+	std::vector<long long> memory_rss;
+	std::vector<long long> memory_peak;
+	std::vector<double>    memory_frag;
 
 	for (std::vector<acl::redis_client*>::iterator it = conns.begin();
 		it != conns.end(); ++it)
@@ -167,51 +215,50 @@ void redis_monitor::show_status(std::vector<acl::redis_client*>& conns)
 		check(info, "connected_clients", clients);
 		check_keys(info, keys);
 		check(info, "used_memory", memory);
+		check(info, "used_memory_rss", memory_rss);
+		check(info, "used_memory_peak", memory_peak);
+		check(info, "mem_fragmentation_ratio", memory_frag);
 	}
 
 	int  all_tps = 0, all_client = 0, all_keys = 0;
 	size_t size = addrs.size();
 
-#define KB	1024
-#define MB	(1024 * 1024)
-#define	GB	(1024 * 1024 * 1024)
 
-	const char* units;
-	double msize;
-	long long total_msize = 0;
+	acl::string units, rss_units, peak_units;
+	double msize, mrss, mpeak;
+	long long total_msize = 0, total_rss = 0, total_peak = 0;
 
 	for (size_t i = 0; i < size; i++)
 	{
-		if ((msize = ((double) memory[i]) / GB) >= 1)
-			units = "G";
-		else if ((msize = ((double) memory[i]) / MB) >= 1)
-			units = "M";
-		else if ((msize = ((double) memory[i]) / KB) >= 1)
-			units = "K";
-		else
-		{
-			msize = (double) memory[i];
-			units = "B";
-		}
-
+		msize = to_human(memory[i], units);
+		mrss  = to_human(memory_rss[i], rss_units);
+		mpeak = to_human(memory_peak[i], peak_units);
 #ifdef ACL_UNIX
 		printf("\033[1;32;40mredis:\033[0m"
 			" \033[1;36;40m%20s\033[0m,"
 			" \033[1;33;40mtps:\033[0m"
 			" \033[1;36;40m%8d\033[0m,"
 			" \033[1;33;40mclients:\033[0m"
-			" \033[1;36;40m%8d\033[0m,"
+			" \033[1;36;40m%6d\033[0m,"
 			" \033[1;33;40mkeys:\033[0m"
-			" \033[1;36;40m%8d\033[0m,"
-			" \033[1;33;40mmemory:\033[0m"
-			" \033[1;36;40m%8.2f %s\033[0m\r\n",
-			addrs[i].c_str(), tpses[i], clients[i], keys[i],
-			msize, units);
+			" \033[1;36;40m%10d\033[0m,"
+			" \033[1;33;40mmem:\033[0m"
+			" \033[1;36;40m%8.2f %s\033[0m,"
+			" \033[1;33;40mmem rss:\033[0m"
+			" \033[1;36;40m%8.2f %s\033[0m,"
+			" \033[1;33;40mmem peak:\033[0m"
+			" \033[1;36;40m%8.2f %s\033[0m,"
+			" \033[1;33;40mfrag ratio:\033[0m"
+			" \033[1;36;40m%4.2f\033[0m\r\n",
 #else
-		printf("redis: %s, tps: %d, client: %d, keys: %d,"
-			" memory: %.2f %s\r\n", addrs[i].c_str(), tpses[i],
-			clients[i], keys[i], msize, units);
+		printf("redis: %15s, tps: %8d, clients: %6d, keys: %10d,"
+			" mem: %8.2f %s, mem rss: %8.2f %s,"
+			" mem peak: %8.2f %s, frag ratio: %4.2f\r\n",
 #endif
+			addrs[i].c_str(), tpses[i], clients[i], keys[i],
+			msize, units.c_str(), mrss, rss_units.c_str(),
+			mpeak, peak_units.c_str(), memory_frag[i]);
+
 		if (tpses[i] > 0)
 			all_tps += tpses[i];
 		if (clients[i] > 0)
@@ -220,20 +267,15 @@ void redis_monitor::show_status(std::vector<acl::redis_client*>& conns)
 			all_keys += keys[i];
 		if (memory[i] > 0)
 			total_msize += memory[i];
+		if (memory_rss[i] > 0)
+			total_rss += memory_rss[i];
+		if (memory_peak[i] > 0)
+			total_peak += memory_peak[i];
 	}
 
-	if ((msize = ((double) total_msize) / GB) >= 1)
-		units = "G";
-	else if ((msize = ((double) total_msize) / MB) >= 1)
-		units = "M";
-	else if ((msize = ((double) total_msize) / KB) >= 1)
-		units = "K";
-	else
-	{
-		msize = (double) total_msize;
-		units = "B";
-	}
-
+	msize = to_human(total_msize, units);
+	mrss  = to_human(total_rss, rss_units);
+	mpeak = to_human(total_peak, peak_units);
 
 #ifdef ACL_UNIX
 	printf("\033[1;34;40mtotal masters:\033[0m"
@@ -241,15 +283,21 @@ void redis_monitor::show_status(std::vector<acl::redis_client*>& conns)
 		" \033[1;34;40mtps:\033[0m"
 		" \033[1;36;40m%8d\033[0m,"
 		" \033[1;34;40mclients:\033[0m"
-		" \033[1;36;40m%8d\033[0m,"
+		" \033[1;36;40m%6d\033[0m,"
 		" \033[1;34;40mkeys:\033[0m"
-		" \033[1;36;40m%8d\033[0m,"
-		" \033[1;34;40mmemory:\033[0m"
+		" \033[1;36;40m%10d\033[0m,"
+		" \033[1;34;40mmem:\033[0m"
+		" \033[1;36;40m%8.2f %s\033[0m,"
+		" \033[1;34;40mmem rss:\033[0m"
+		" \033[1;36;40m%8.2f %s\033[0m,"
+		" \033[1;34;40mmem peak:\033[0m"
 		" \033[1;36;40m%8.2f %s\033[0m\r\n",
-		(int) size, all_tps, all_client, all_keys, msize, units);
 #else
-	printf("total masters: %d, total tps: %d, total clients: %d,"
-		" total keys: %d, total memory: %.2f %s\r\n",
-		(int) size, all_tps, all_client, all_keys, msize, units);
+	printf("total masters: %12d, tps: %8d, clients: %6d,"
+		" keys: %10d, mem: %8.2f %s, mem rss: %8.2f %s,"
+		" mem peak: %8.2f %s\r\n",
 #endif
+		(int) size, all_tps, all_client, all_keys,
+		msize, units.c_str(), mrss, rss_units.c_str(),
+		mpeak, peak_units.c_str());
 }

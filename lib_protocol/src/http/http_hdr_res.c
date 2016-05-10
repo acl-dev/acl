@@ -236,10 +236,12 @@ int http_hdr_res_parse(HTTP_HDR_RES *hdr_res)
 	}
 
 	hdr_res->reply_status = atoi(buf);
+#if 0
 	if (hdr_res->reply_status < 100 || hdr_res->reply_status >= 600) {
 		acl_msg_error("%s: status(%s) invalid", myname, buf);
 		return (-1);
 	}
+#endif
 
 	return (http_hdr_parse(hdr));
 }

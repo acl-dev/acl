@@ -274,9 +274,9 @@ xml& xml1::xml_multi_root(bool on)
 	return *this;
 }
 
-void xml1::update(const char* data)
+const char* xml1::update(const char* data)
 {
-	acl_xml_update(xml_, data);
+	return acl_xml_update(xml_, data);
 }
 
 bool xml1::complete(const char* root_tag)

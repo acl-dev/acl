@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -206,6 +207,42 @@ int acl_socket_close(ACL_SOCKET fd)
 	return close(fd);
 }
 
+#if 0
+
+int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
+	int timeout, ACL_VSTREAM *fp, void *arg acl_unused)
+{
+	int ret, error;
+
+	if (fp != NULL && fp->read_ready) {
+		fp->read_ready = 0;
+		return read(fd, buf, size);
+	}
+
+	ret = read(fd, buf, size);
+	if (ret > 0)
+		return ret;
+
+	if (timeout <= 0)
+		return ret;
+
+	error = acl_last_error();
+
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+	if (error != ACL_EWOULDBLOCK)
+#else
+	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN)
+#endif
+		return ret;
+
+	if (acl_read_wait(fd, timeout) < 0)
+		return -1;
+
+	return read(fd, buf, size);
+}
+
+#else
+
 int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	int timeout, ACL_VSTREAM *fp, void *arg acl_unused)
 {
@@ -217,32 +254,68 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	return read(fd, buf, size);
 }
 
+#endif
+
 int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
-#ifdef ACL_WRITEABLE_CHECK
-	if (timeout > 0 && acl_write_wait(fd, timeout) < 0) {
-		errno = acl_last_error();
-		return -1;
-	}
+	int ret, error;
+
+	ret = write(fd, buf, size);
+	if (ret > 0)
+		return ret;
+
+	if (timeout <= 0)
+		return ret;
+
+	error = acl_last_error();
+
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+	if (error != ACL_EWOULDBLOCK)
 #else
-	(void) timeout;
+	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN)
 #endif
-	return write(fd, buf, size);
+		return ret;
+
+#ifdef ACL_WRITEABLE_CHECK
+	if (acl_write_wait(fd, timeout) < 0)
+		return -1;
+
+	ret = write(fd, buf, size);
+#endif
+
+	return ret;
 }
 
 int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
 	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
-#ifdef ACL_WRITEABLE_CHECK
-	if (timeout > 0 && acl_write_wait(fd, timeout) < 0) {
-		errno = acl_last_error();
-		return -1;
-	}
+	int ret, error;
+
+	ret = writev(fd, vec, count);
+	if (ret > 0)
+		return ret;
+
+	if (timeout <= 0)
+		return ret;
+
+	error = acl_last_error();
+
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+	if (error != ACL_EWOULDBLOCK)
 #else
-	(void) timeout;
+	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN)
 #endif
-	return writev(fd, vec, count);
+		return ret;
+
+#ifdef ACL_WRITEABLE_CHECK
+	if (acl_write_wait(fd, timeout) < 0)
+		return -1;
+
+	ret = writev(fd, vec, count);
+#endif
+
+	return ret;
 }
 
 #else

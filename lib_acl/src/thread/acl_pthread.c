@@ -131,7 +131,7 @@ static void tls_value_list_free(void)
 }
 
 #ifdef ACL_WIN32_STDC
-static unsigned long __stdcall RunThreadWrap(void *data)
+static DWORD __stdcall RunThreadWrap(void *data)
 #else
 static DWORD WINAPI RunThreadWrap(LPVOID data)
 #endif

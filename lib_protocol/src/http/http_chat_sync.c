@@ -172,7 +172,7 @@ static int chunked_hdr_get(HTTP_CHAT_CTX *ctx)
 
 #ifdef ACL_WINDOWS
 # if _MSC_VER >= 1500
-	ret = sscanf_s(buf, "%X %s", (unsigned int *) &chunk_len, ext, sizeof(ext));
+	ret = sscanf_s(buf, "%X %s", (unsigned int *) &chunk_len, ext, (int) sizeof(ext));
 # else
 	ret = sscanf(buf, "%X %s", (unsigned int *) &chunk_len, ext);
 # endif

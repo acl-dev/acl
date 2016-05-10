@@ -261,8 +261,8 @@ static ACL_MEM_SLICE *mem_slice_create(void)
 	if ((unsigned long) acl_pthread_self() == acl_main_thread_self())
 		__main_mem_slice = mem_slice;
 
-	acl_msg_info("%s(%d): thread(%ld) set myown mem_slice(%lx)",
-		myname, __LINE__, (long) mem_slice->tid, (long) mem_slice);
+	acl_msg_info("%s(%d): thread(%ld) set myown mem_slice(%p)",
+		myname, __LINE__, (long) mem_slice->tid, mem_slice);
 
 	return (mem_slice);
 }

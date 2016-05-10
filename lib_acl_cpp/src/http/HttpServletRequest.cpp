@@ -547,7 +547,7 @@ bool HttpServletRequest::readHeader(string* method_s)
 	else
 	{
 		client_ = new (dbuf_->dbuf_alloc(sizeof(http_client)))
-			http_client(&stream_, rw_timeout_);
+			http_client(&stream_, false, true);
 		if (client_->read_head() == false)
 		{
 			req_error_ = HTTP_REQ_ERR_IO;

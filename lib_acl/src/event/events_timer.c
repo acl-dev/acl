@@ -118,8 +118,8 @@ acl_int64 event_timer_cancel(ACL_EVENT *eventp,
 		}
 	}
 	if (acl_msg_verbose > 2)
-		acl_msg_info("%s: 0x%lx 0x%lx %lld", myname,
-			(long) callback, (long) context, time_left);
+		acl_msg_info("%s: 0x%p 0x%p %lld", myname,
+			callback, context, time_left);
 	return (time_left);
 }
 

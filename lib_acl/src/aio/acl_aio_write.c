@@ -562,8 +562,8 @@ static void can_write_callback(int event_type, ACL_EVENT *event acl_unused,
 	}
 
 	if (astream->can_write_fn == NULL)
-		acl_msg_fatal("%s(%d): can_write_fn null for astream(%lx)",
-			myname, __LINE__, (long) astream);
+		printf("%s(%d): can_write_fn null for astream(%p)",
+			myname, __LINE__, astream);
 
 	astream->nrefer++;
 	if (astream->can_write_fn(astream, astream->can_write_ctx) < 0) {

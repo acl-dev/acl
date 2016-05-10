@@ -27,8 +27,8 @@
 
 int acl_non_blocking(ACL_SOCKET fd, int on)
 {
-#ifdef	ACL_UNIX
 	int   flags;
+#ifdef	ACL_UNIX
 	int   nonb = PATTERN;
 #elif	defined(ACL_WINDOWS)
 	unsigned long n = on;
@@ -70,6 +70,7 @@ int acl_non_blocking(ACL_SOCKET fd, int on)
 		return -1;
 	}
 #elif defined(ACL_WINDOWS)
+	flags = 0;
 	if (ioctlsocket(fd, FIONBIO, &n) < 0) {
 		acl_msg_error("ioctlsocket(fd,FIONBIO) failed");
 		return -1;
@@ -77,7 +78,7 @@ int acl_non_blocking(ACL_SOCKET fd, int on)
 #else
 # error "unknown OS type"
 #endif
-	return (0);
+	return flags;
 }
 
 int acl_is_blocking(ACL_SOCKET fd)

@@ -231,7 +231,7 @@ public:
 	/**
 	 * @override
 	 */
-	void update(const char* data);
+	const char* update(const char* data);
 
 	/**
 	 * @override

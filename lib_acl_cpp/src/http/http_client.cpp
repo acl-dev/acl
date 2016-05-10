@@ -20,7 +20,6 @@ http_client::http_client(void)
 , res_(NULL)
 , hdr_req_(NULL)
 , req_(NULL)
-, rw_timeout_(120)
 , unzip_(true)
 , zstream_(NULL)
 , is_request_(true)
@@ -34,15 +33,14 @@ http_client::http_client(void)
 {
 }
 
-http_client::http_client(socket_stream* client, int rw_timeout /* = 120 */,
-	bool is_request /* = false */, bool unzip /* = true */)
+http_client::http_client(socket_stream* client, bool is_request /* = false */,
+	bool unzip /* = true */)
 : stream_(client)
 , stream_fixed_(true)
 , hdr_res_(NULL)
 , res_(NULL)
 , hdr_req_(NULL)
 , req_(NULL)
-, rw_timeout_(rw_timeout)
 , unzip_(unzip)
 , zstream_(NULL)
 , is_request_(is_request)
@@ -128,7 +126,6 @@ bool http_client::open(const char* addr, int conn_timeout /* = 60 */,
 	}
 
 	socket_stream* stream = NEW socket_stream();
-	rw_timeout_ = rw_timeout;
 	unzip_ = unzip;
 
 	if (stream->open(addr, conn_timeout, rw_timeout) == false)
@@ -503,7 +500,7 @@ bool http_client::read_response_head(void)
 	}
 
 	hdr_res_ = http_hdr_res_new();
-	int   ret = http_hdr_res_get_sync(hdr_res_, vstream, rw_timeout_);
+	int ret = http_hdr_res_get_sync(hdr_res_, vstream, vstream->rw_timeout);
 	if (ret == -1)
 	{
 		http_hdr_res_free(hdr_res_);
@@ -577,7 +574,7 @@ bool http_client::read_request_head(void)
 	}
 
 	hdr_req_ = http_hdr_req_new();
-	int   ret = http_hdr_req_get_sync(hdr_req_, vstream, rw_timeout_);
+	int ret = http_hdr_req_get_sync(hdr_req_, vstream, vstream->rw_timeout);
 	if (ret == -1)
 	{
 		http_hdr_req_free(hdr_req_);

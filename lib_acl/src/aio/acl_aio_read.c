@@ -438,8 +438,8 @@ void acl_aio_read(ACL_ASTREAM *astream)
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
 		return;
 	if (astream->stream == NULL)
-		acl_msg_fatal("%s: astream(%lx)->stream null",
-			myname, (long) astream);
+		acl_msg_fatal("%s: astream(%p)->stream null",
+			myname, astream);
 
 	astream->event_read_callback = __read_notify_callback;
 	/* XXX: 必须将缓冲区重置 */

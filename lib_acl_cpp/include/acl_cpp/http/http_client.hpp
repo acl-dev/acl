@@ -37,14 +37,13 @@ public:
 	 * @param client {socket_stream*} HTTP 连接流对象，可以是请求端的流，
 	 *  也可以是响应端的流；在本类对象被销毁时该流对象并不会被销毁，所以
 	 *  用户需自行释放之
-	 * @param rw_timeout {int} IO 读写超时时间(秒)
 	 * @param is_request {bool} 是请求端还是响应端的客户端流
 	 * @param unzip {bool} 当用来读取服务器的响应数据时，如果服务器返回的
 	 *  数据体为压缩数据时，该参数控制在调用下面的函数时是否自动解压缩:
 	 *  read_body(string&, bool, int*)
 	 */
-	http_client(socket_stream* client, int rw_timeout = 120,
-		bool is_request = false, bool unzip = true);
+	http_client(socket_stream* client, bool is_request = false,
+		bool unzip = true);
 
 	virtual ~http_client(void);
 
@@ -384,7 +383,6 @@ private:
 	struct HTTP_RES* res_;      // HTTP 响应对象
 	HTTP_HDR_REQ* hdr_req_;     // HTTP 头请求对象
 	struct HTTP_REQ* req_;      // HTTP 请求对象
-	int  rw_timeout_;           // IO 读写超时时间
 	bool unzip_;                // 是否对压缩数据进行解压缩
 	zlib_stream* zstream_;      // 解压对象
 	bool is_request_;           // 是否是客户请求端

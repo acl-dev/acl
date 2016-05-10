@@ -876,8 +876,8 @@ static void slice1_mbuf_free(ACL_SLICE *slice, void *buf)
 		}
 	}
 
-	acl_msg_fatal("%s: unknown buf addr: 0x%lx",
-		myname, buf ? (long) buf : 0);
+	acl_msg_fatal("%s: unknown buf addr: 0x%p",
+		myname, buf ? buf : 0);
 }
 
 static int cmp_fn(const void *p1, const void *p2)

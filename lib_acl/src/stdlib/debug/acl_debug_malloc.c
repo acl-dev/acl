@@ -52,7 +52,7 @@ static void *acl_debug_malloc(const char *filename, int line, size_t size)
 
 	ptr = malloc(size);
 	ASSERT(ptr);
-	snprintf(key, sizeof(key), "0x%lx", (long) ptr);
+	snprintf(key, sizeof(key), "0x%p", ptr);
 	value = (char*) malloc(DLEN);
 	snprintf(value, DLEN, "%s%c%d%c%d", filename, SEP, line, SEP, (int) size);
 	LOCK;
@@ -70,7 +70,7 @@ static void *acl_debug_calloc(const char *filename, int line, size_t nmemb, size
 
 	ptr = calloc(nmemb, size);
 	ASSERT(ptr);
-	snprintf(key, sizeof(key), "0x%lx", (long) ptr);
+	snprintf(key, sizeof(key), "0x%p", ptr);
 	value = (char*) malloc(DLEN);
 	ASSERT(value);
 	snprintf(value, DLEN, "%s%c%d%c%d", filename, SEP, line, SEP, (int) (nmemb * size));
@@ -87,7 +87,7 @@ static void *acl_debug_realloc(const char *filename, int line, void *old, size_t
 
 	ASSERT(__debug_mem);
 
-	snprintf(key, sizeof(key), "0x%lx", (long) old);
+	snprintf(key, sizeof(key), "0x%p", old);
 	LOCK;
 	value = (char*) debug_htable_find(__debug_mem->table, key);
 	if (value == NULL) {
@@ -100,7 +100,7 @@ static void *acl_debug_realloc(const char *filename, int line, void *old, size_t
 
 	ptr = realloc(old, size);
 	ASSERT(ptr);
-	snprintf(key, sizeof(key), "0x%lx", (long) ptr);
+	snprintf(key, sizeof(key), "0x%p", ptr);
 	value = (char*) malloc(DLEN);
 	ASSERT(value);
 	snprintf(value, DLEN, "%s%c%d%c%d", filename, SEP, line, SEP, (int) size);
@@ -120,7 +120,7 @@ static char *acl_debug_strdup(const char *filename, int line, const char *str)
 
 	ptr = SANE_STRDUP(str);
 	ASSERT(ptr);
-	snprintf(key, sizeof(key), "0x%lx", (long) ptr);
+	snprintf(key, sizeof(key), "0x%p", ptr);
 	value = (char*) malloc(DLEN);
 	ASSERT(value);
 	snprintf(value, DLEN, "%s%c%d%c%d", filename, SEP, line, SEP, (int) size);
@@ -146,7 +146,7 @@ static char *acl_debug_strndup(const char *filename, int line, const char *str, 
 	memcpy(ptr, str, n);
 	ptr[n] = 0;
 
-	snprintf(key, sizeof(key), "0x%lx", (long) ptr);
+	snprintf(key, sizeof(key), "0x%p", ptr);
 	value = (char*) malloc(DLEN);
 	ASSERT(value);
 	snprintf(value, DLEN, "%s%c%d%c%d", filename, SEP, line, SEP, (int) n);
@@ -167,7 +167,7 @@ static void *acl_debug_memdup(const char *filename, int line, const void *data, 
 	ASSERT(ptr);
 	memcpy(ptr, data, size);
 
-	snprintf(key, sizeof(key), "0x%lx", (long) ptr);
+	snprintf(key, sizeof(key), "0x%p", ptr);
 	value = (char*) malloc(DLEN);
 	ASSERT(value);
 	snprintf(value, DLEN, "%s%c%d%c%d", filename, SEP, line, SEP, (int) size);
@@ -185,7 +185,7 @@ static void acl_debug_free(const char *filename, int line, void *ptr)
 		return;
 	ASSERT(__debug_mem);
 
-	snprintf(key, sizeof(key), "0x%lx", (long) ptr);
+	snprintf(key, sizeof(key), "0x%p", ptr);
 
 	LOCK;
 	value = (char*) debug_htable_find(__debug_mem->table, key);

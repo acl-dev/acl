@@ -308,9 +308,9 @@ xml& xml2::xml_multi_root(bool on)
 	return *this;
 }
 
-void xml2::update(const char* data)
+const char* xml2::update(const char* data)
 {
-	acl_xml2_update(xml_, data);
+	return acl_xml2_update(xml_, data);
 }
 
 bool xml2::complete(const char* root_tag)

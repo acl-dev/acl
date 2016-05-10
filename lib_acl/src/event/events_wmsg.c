@@ -476,7 +476,7 @@ static EVENT_WMSG *get_hwnd_event(HWND hWnd)
 
 static void set_hwnd_event(HWND hWnd, EVENT_WMSG *ev)
 {
-	SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG) ev);
+	SetWindowLongPtr(hWnd, GWLP_USERDATA, (ULONG_PTR) ev);
 }
 
 #endif

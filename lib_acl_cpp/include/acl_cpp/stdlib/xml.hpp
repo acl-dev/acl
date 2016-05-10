@@ -372,8 +372,10 @@ public:
 	 * 对象，则应该在解析下一个 XML 对象前调用 reset() 方法来清
 	 * 除上一次的解析结果
 	 * @param data {const char*} xml 数据
+	 * @return {const char*} 当解析完毕时还有剩余数据，则该返回值返回
+	 *  剩余的数据; 如果 data 为 '\0'，则说明已经处理完输入的数据
 	 */
-	virtual void update(const char* data) = 0;
+	virtual const char* update(const char* data) = 0;
 
 	/**
 	 * 判断 XML 解析是否完毕

@@ -307,10 +307,17 @@ AGAIN:
 		if (nagain++ < 5)
 			goto AGAIN;
 
+#ifdef ACL_WINDOWS
+		acl_msg_error("%s(%d), %s: nagain: %d too much, fd: %lld",
+			__FILE__, __LINE__, myname, nagain,
+			in->type == ACL_VSTREAM_TYPE_FILE ?
+			(long long) ACL_VSTREAM_FILE(in) : ACL_VSTREAM_SOCK(in));
+#else
 		acl_msg_error("%s(%d), %s: nagain: %d too much, fd: %d",
 			__FILE__, __LINE__, myname, nagain,
 			in->type == ACL_VSTREAM_TYPE_FILE ?
 			(int) ACL_VSTREAM_FILE(in) : ACL_VSTREAM_SOCK(in));
+#endif
 	} else if (in->errnum == ACL_ETIMEDOUT) {
 		in->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
 		SAFE_COPY(in->errbuf, "read timeout");
@@ -1742,12 +1749,16 @@ int acl_vstream_puts(const char *s)
 
 static int loop_writen(ACL_VSTREAM *fp, const void *vptr, size_t size)
 {
+#if 0
 	const char *myname = "loop_writen";
+#endif
 	const unsigned char *ptr = (const unsigned char *) vptr;
 	int   once_dlen = 64 * 1024 * 1024;  /* xxx: 以 64KB 为单位写 */
 	int   nleft = (int) size, n, len;
+#if 0
 	time_t begin, end;
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(fp);
+#endif
 
 	while (nleft > 0) {
 		len = nleft > once_dlen ? once_dlen : nleft;
@@ -1758,11 +1769,12 @@ static int loop_writen(ACL_VSTREAM *fp, const void *vptr, size_t size)
 		nleft -= n;
 		ptr   += n;
 
+#if 0
 		if (n == len || fp->writev_fn == NULL || fp->rw_timeout <= 0)
 			continue;
 
-		/* 对于套接口写操作，如果一次性写没有写完，可能是系统写缓冲区满，
-		 * 需要检测超时写
+		/* 对于套接口写操作，如果一次性写没有写完，可能是系统
+		 * 写缓冲区满，需要检测超时写
 		 */
 		begin = time(NULL);
 
@@ -1776,6 +1788,7 @@ static int loop_writen(ACL_VSTREAM *fp, const void *vptr, size_t size)
 			myname, (int) size, nleft, ACL_VSTREAM_PEER(fp), fd,
 			fp->rw_timeout, end - begin);
 		return ACL_VSTREAM_EOF;
+#endif
 	}
 
 	return (int) (ptr - (const unsigned char *) vptr);
@@ -2051,12 +2064,42 @@ ACL_VSTREAM *acl_vstream_fhopen(ACL_FILE_HANDLE fh, unsigned int oflags)
 	return fp;
 }
 
+
+static ACL_VSTREAM_RD_FN acl_socket_read_fn   = acl_socket_read;
+static ACL_VSTREAM_WR_FN acl_socket_write_fn  = acl_socket_write;
+static ACL_VSTREAM_WV_FN acl_socket_writev_fn = acl_socket_writev;
+static int (*acl_socket_close_fn)(ACL_SOCKET) = acl_socket_close;
+
+void acl_socket_read_hook(ACL_VSTREAM_RD_FN read_fn)
+{
+	if (read_fn)
+		acl_socket_read_fn = read_fn;
+}
+
+void acl_socket_write_hook(ACL_VSTREAM_WR_FN write_fn)
+{
+	if (write_fn)
+		acl_socket_write_fn = write_fn;
+}
+
+void acl_socket_writev_hook(ACL_VSTREAM_WV_FN writev_fn)
+{
+	if (writev_fn)
+		acl_socket_writev_fn = writev_fn;
+}
+
+void acl_socket_close_hook(int (*close_fn)(ACL_SOCKET))
+{
+	if (close_fn)
+		acl_socket_close_fn = close_fn;
+}
+
 /* 定义流的缓冲区的默认大小 */
 
 #define ACL_VSTREAM_DEF_MAXLEN  8192
 
 ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
-	size_t buflen, int rw_timeo, int fdtype)
+	size_t buflen, int rw_timeout, int fdtype)
 {
 	const char *myname = "acl_vstream_fdopen";
 	ACL_VSTREAM *fp;
@@ -2115,20 +2158,26 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	fp->oflags           = oflags;
 	ACL_SAFE_STRNCPY(fp->errbuf, "OK", sizeof(fp->errbuf));
 
-	if (rw_timeo > 0)
-		fp->rw_timeout = rw_timeo;
+	if (rw_timeout > 0)
+		fp->rw_timeout = rw_timeout;
 
 	fp->sys_getc = read_char;
 	if (fdtype == ACL_VSTREAM_TYPE_FILE) {
-		fp->fread_fn  = acl_file_read;
-		fp->fwrite_fn = acl_file_write;
+		fp->fread_fn   = acl_file_read;
+		fp->fwrite_fn  = acl_file_write;
 		fp->fwritev_fn = acl_file_writev;
-		fp->fclose_fn = acl_file_close;
+		fp->fclose_fn  = acl_file_close;
 	} else {
-		fp->read_fn  = acl_socket_read;
-		fp->write_fn = acl_socket_write;
-		fp->writev_fn = acl_socket_writev;
-		fp->close_fn = acl_socket_close;
+		fp->read_fn    = acl_socket_read_fn;
+		fp->write_fn   = acl_socket_write_fn;
+		fp->writev_fn  = acl_socket_writev_fn;
+		fp->close_fn   = acl_socket_close_fn;
+
+		/* xxx: 对于带有读写超时的流，需要先将 socket 设为非阻塞模式，
+		 * 否则在写大数据包时会造成阻塞，超时作用失效
+		 */
+		if (rw_timeout > 0)
+			acl_non_blocking(fd, ACL_NON_BLOCKING);
 	}
 
 	fp->addr_local = __empty_string;

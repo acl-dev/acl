@@ -464,7 +464,7 @@ static void enable_read(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 
 	if (fdp->h_iocp == NULL) {
 		fdp->h_iocp = CreateIoCompletionPort((HANDLE) sockfd,
-						ev->h_iocp, (DWORD) fdp, 0);
+			ev->h_iocp, (ULONG_PTR) fdp, 0);
 		if (fdp->h_iocp != ev->h_iocp)
 			acl_msg_fatal("%s(%d): CreateIoCompletionPort error(%s)",
 				myname, __LINE__, acl_last_serror());
@@ -604,7 +604,7 @@ static void enable_write(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 
 	if (fdp->h_iocp == NULL) {
 		fdp->h_iocp = CreateIoCompletionPort((HANDLE) sockfd,
-					ev->h_iocp, (DWORD) fdp, 0);
+			ev->h_iocp, (ULONG_PTR) fdp, 0);
 		if (fdp->h_iocp != ev->h_iocp)
 			acl_msg_fatal("%s(%d): CreateIoCompletionPort error(%s)",
 				myname, __LINE__, acl_last_serror());

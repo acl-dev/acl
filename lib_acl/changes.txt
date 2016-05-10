@@ -1,6 +1,23 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+548) 2016.5.9
+548.1) 将几个 socket IO 的 hook 函数由 acl_sys_socket.c 移至 acl_vstream.c 中
+
+547) 2016.5.8
+547.1) feature: acl_sys_socket.c 中的 SOCKET IO 过程允许被 HOOK，这样
+acl_vstream.c 中的 acl_vstream_fdopen 在创建 SOCKET 流对象时允许使用被 HOOK 的函数
+
+546) 2016.5.5
+546.1) safety: acl_xml_parse.c/acl_xml2_parse.c 当输入为 NULL 时返回 ""
+546.2) feature: 在 acl_vstream.c 的 acl_vstream_fdopen 时针对带有读写超时
+的 socket 的设置为非阻塞模式，这样代码逻辑更为清晰
+546.3) feature: acl_read_wait.c 中的读超时重新使用 epoll 来判断，为防止 epoll
+句柄被异外关闭，内部增加了重新打开 epoll 句柄的功能
+
+545) 2016.5.4
+545.1) bugfix: acl_sys_socket.c 中函数 acl_socket_write 修改了写超时的问题
+
 544) 2016.4.20
 544.1) feature: acl_threads_server.c 在 alone 模式下运行时，释放全局分配的
 动态对象，以便于用户使用 valgrind 查找内存问题

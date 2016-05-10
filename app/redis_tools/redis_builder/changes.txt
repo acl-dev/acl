@@ -1,3 +1,7 @@
+
+10) 2016.5.4
+10.1) feature: redis_monitor 类可以显示 rss, peak, radio 等项
+
 9) 2016.4.25
 9.1) feature: redis_commands 类增加了对 scan 命令的支持
 

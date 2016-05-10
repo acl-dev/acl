@@ -99,7 +99,7 @@ _tDIR * _topendir(const _TCHAR *dirname)
 	/* Everything is OK.  Save information in the DIR structure, return it.
 	*/
 	dir->_d_nfiles  = 1;
-	dir->_d_hdir    = (unsigned long)h;
+	dir->_d_hdir    = h;
 	dir->_d_dirname = name;
 	dir->_d_magic   = DIRMAGIC;
 	return dir;
@@ -138,11 +138,11 @@ void _trewinddir(_tDIR *dir)
 	/* Close the handle, start searching at the beginning with a new
 	* handle
 	*/
-	FindClose((HANDLE)dir->_d_hdir);
+	FindClose(dir->_d_hdir);
 
 	if ((h = FindFirstFile((LPSTR)dir->_d_dirname,
 		(LPWIN32_FIND_DATA)&dir->_d_buf[0])) != (HANDLE)-1)	{
-		dir->_d_hdir   = (unsigned long)h;
+		dir->_d_hdir   = h;
 		dir->_d_nfiles = 1;
 	}
 }
@@ -205,7 +205,7 @@ struct _tdirent * _treaddir(_tDIR *dir)
 	/* If all files in the buffer have been returned, find some more files.
 	*/
 	if (dir->_d_nfiles == 0) {
-		if (FindNextFile((HANDLE)dir->_d_hdir,
+		if (FindNextFile(dir->_d_hdir,
 			(LPWIN32_FIND_DATA)&dir->_d_buf[0]) != TRUE)
 			return (NULL);
 	}
@@ -254,7 +254,7 @@ int _tclosedir(_tDIR *dir)
 	}
 
 	dir->_d_magic = 0;              /* prevent accidental use after closing */
-	FindClose((HANDLE)dir->_d_hdir);/* close directory handle */
+	FindClose(dir->_d_hdir);        /* close directory handle */
 	free(dir->_d_dirname);          /* free directory name */
 	free(dir);                      /* free directory structure */
 	return 0;

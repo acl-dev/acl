@@ -20,7 +20,7 @@ http_response::http_response(socket_stream* client)
 	debug_ = false;
 	header_ok_ = false;
 	head_sent_ = false;
-	client_ = NEW http_client(client);
+	client_ = NEW http_client(client, false, true);
 }
 
 http_response::~http_response(void)
