@@ -381,6 +381,10 @@
 				Name="stdlib"
 				>
 				<File
+					RelativePath=".\src\stdlib\acl_atomic.c"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stdlib\acl_chunk_chain.c"
 					>
 				</File>
@@ -577,6 +581,14 @@
 					</File>
 					<File
 						RelativePath=".\src\stdlib\common\acl_token_tree.c"
+						>
+					</File>
+					<File
+						RelativePath=".\src\stdlib\common\acl_ypipe.c"
+						>
+					</File>
+					<File
+						RelativePath=".\src\stdlib\common\acl_yqueue.c"
 						>
 					</File>
 					<File
@@ -1762,6 +1774,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\stdlib\acl_atomic.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\stdlib\acl_binhash.h"
 					>
 				</File>
@@ -2019,6 +2035,14 @@
 				</File>
 				<File
 					RelativePath=".\include\stdlib\acl_xinetd_cfg.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\stdlib\acl_ypipe.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\stdlib\acl_yqueue.h"
 					>
 				</File>
 				<File

@@ -120,12 +120,6 @@
       <UniqueIdentifier>{729d8b0e-de47-4916-a69a-b8cbe555d0ae}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
-    <Filter Include="Header Files\stdlb">
-      <UniqueIdentifier>{929ad0d6-4d30-4fd7-a07f-152d6044043a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\stdlb\unix">
-      <UniqueIdentifier>{872a9249-19b2-45ca-a49d-683e8750faea}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\net">
       <UniqueIdentifier>{77757d9e-a544-4dbb-9003-07d3214c022c}</UniqueIdentifier>
     </Filter>
@@ -173,6 +167,12 @@
     </Filter>
     <Filter Include="doc">
       <UniqueIdentifier>{39ba72d7-77d0-4034-b7fd-0da49add37bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stdlib">
+      <UniqueIdentifier>{929ad0d6-4d30-4fd7-a07f-152d6044043a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stdlib\unix">
+      <UniqueIdentifier>{872a9249-19b2-45ca-a49d-683e8750faea}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -926,6 +926,15 @@
     <ClCompile Include="src\xml\acl_xml3_parse.c">
       <Filter>Source Files\xml</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\acl_atomic.c">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\common\acl_yqueue.c">
+      <Filter>Source Files\stdlib\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\common\acl_ypipe.c">
+      <Filter>Source Files\stdlib\common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl.rc">
@@ -1090,250 +1099,250 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_allocator.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_argv.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_array.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_binhash.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_bits_map.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_btree.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_cache.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_cache2.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_cfg_macro.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_chunk_chain.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_dbuf_pool.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_debug.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_debug_malloc.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_define.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_define_bsd.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_define_linux.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_define_sunx86.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_define_unix.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_define_win32.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_dir.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_dlink.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_dll.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_env.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_exec_command.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_fhandle.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_fifo.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_file.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_getopt.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_hash.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_hex_code.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_htable.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_iostuff.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_iplink.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_iterator.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_loadcfg.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_make_dirs.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_malloc.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_mem_hook.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_mem_slice.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_meter_time.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_msg.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_myflock.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_mylog.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_mymalloc.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_mystring.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_process.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_readline.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_ring.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_safe.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_sane_basename.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_scan_dir.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_slice.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_split_at.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_stack.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_stdlib.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_stringops.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_sys_patch.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_timeops.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_token_tree.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_vbuf.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_vbuf_print.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_vsprintf.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_vstream.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_vstream_popen.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_vstring.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_vstring_vstream.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_xinetd_cfg.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\avl.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\avl_impl.h">
-      <Filter>Header Files\stdlb</Filter>
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_chroot_uid.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_core_limit.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_mychown.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_open_lock.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_safe_open.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_sane_socketpair.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_set_eugid.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_set_ugid.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_timed_wait.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_transfer_fd.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_unix.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_username.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_watchdog.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\net\acl_access.h">
       <Filter>Header Files\net</Filter>
@@ -1528,13 +1537,22 @@
       <Filter>Source Files\code</Filter>
     </ClInclude>
     <ClInclude Include="include\stdlib\unix\acl_trace.h">
-      <Filter>Header Files\stdlb\unix</Filter>
+      <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include="include\xml\acl_xml2.h">
       <Filter>Header Files\xml</Filter>
     </ClInclude>
     <ClInclude Include="include\xml\acl_xml3.h">
       <Filter>Header Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stdlib\acl_atomic.h">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stdlib\acl_ypipe.h">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stdlib\acl_yqueue.h">
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

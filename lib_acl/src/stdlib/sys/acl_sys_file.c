@@ -47,9 +47,13 @@ ACL_FILE_HANDLE acl_file_open(const char *filepath, int flags, int mode)
 		break;
 	case O_WRONLY:         /* write access */
 		fileaccess = GENERIC_WRITE;
+		if ((flags & O_APPEND) != 0)
+			fileaccess |= FILE_APPEND_DATA;
 		break;
 	case O_RDWR:           /* read and write access */
 		fileaccess = GENERIC_READ | GENERIC_WRITE;
+		if ((flags & O_APPEND) != 0)
+			fileaccess = GENERIC_READ | FILE_APPEND_DATA;
 		break;
 	default:                /* error, bad flags */
 		acl_set_error(ERROR_INVALID_PARAMETER);

@@ -23,7 +23,7 @@ public:
 	 *  其中的 :name, 将由 set_parameter 中的值进行替换, len 为整形值
 	 * @return {query&}
 	 */
-	query& create_sql(const char* sql_fmt, ...) ACL_CPP_PRINTF(2, 3);;
+	query& create_sql(const char* sql_fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
 	 * 创建 sql 语句，非变参方式

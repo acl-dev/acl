@@ -273,6 +273,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Name="stdlib"
 				Filter="">
 				<File
+					RelativePath=".\src\stdlib\acl_atomic.c">
+				</File>
+				<File
 					RelativePath=".\src\stdlib\acl_chunk_chain.c">
 				</File>
 				<File
@@ -422,6 +425,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					</File>
 					<File
 						RelativePath=".\src\stdlib\common\acl_token_tree.c">
+					</File>
+					<File
+						RelativePath=".\src\stdlib\common\acl_ypipe.c">
+					</File>
+					<File
+						RelativePath=".\src\stdlib\common\acl_yqueue.c">
 					</File>
 					<File
 						RelativePath=".\src\stdlib\common\avl.c">
@@ -1334,7 +1343,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				RelativePath=".\resource.h">
 			</File>
 			<Filter
-				Name="stdlb"
+				Name="stdlib"
 				Filter="">
 				<File
 					RelativePath=".\include\stdlib\acl_allocator.h">
@@ -1344,6 +1353,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\stdlib\acl_array.h">
+				</File>
+				<File
+					RelativePath=".\include\stdlib\acl_atomic.h">
 				</File>
 				<File
 					RelativePath=".\include\stdlib\acl_binhash.h">
@@ -1539,6 +1551,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\stdlib\acl_xinetd_cfg.h">
+				</File>
+				<File
+					RelativePath=".\include\stdlib\acl_ypipe.h">
+				</File>
+				<File
+					RelativePath=".\include\stdlib\acl_yqueue.h">
 				</File>
 				<File
 					RelativePath=".\include\stdlib\avl.h">

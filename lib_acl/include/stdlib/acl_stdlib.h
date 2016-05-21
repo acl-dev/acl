@@ -76,6 +76,9 @@ extern "C" {
 #include "acl_env.h"
 
 #include "acl_dll.h"
+#include "acl_atomic.h"
+#include "acl_yqueue.h"
+#include "acl_ypipe.h"
 
 #ifdef	__cplusplus
 }

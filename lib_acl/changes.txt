@@ -1,6 +1,14 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+550) 2016.5.21
+550.1) bugfix: acl_sys_file.c 中的函数 acl_file_open 当以 O_APPEND 方式打开文件时，
+文件指针没有指向文件尾部
+
+549) 2016.5.12
+549.1) feature: 增加原子操作 acl_atomic.c, 无锁队列 acl_yqueue.c, acl_ypipe.c
+--- by niukey@qq.com
+
 548) 2016.5.9
 548.1) 将几个 socket IO 的 hook 函数由 acl_sys_socket.c 移至 acl_vstream.c 中
 
