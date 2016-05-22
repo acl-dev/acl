@@ -24,7 +24,7 @@ public:
 	redis_zset(redis_client* conn);
 
 	/**
-	 * see redis_command::redis_command(redis_client_cluster*£¬ size_t)
+	 * see redis_command::redis_command(redis_client_cluster*, size_t)
 	 */
 	redis_zset(redis_client_cluster* cluster, size_t max_conns = 0);
 	virtual ~redis_zset(void);
