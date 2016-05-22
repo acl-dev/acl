@@ -13,13 +13,13 @@ class ACL_CPP_API hspool
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param addr_rw {const char*} handlersocket ²å¼şÔÚ Mysql ÉÏµÄ¼àÌıµØÖ·£¬
-	 * ¸ñÊ½Îª£ºip:port£¬×¢£º¸ÃµØÖ·ÊÇ handlersocket µÄ¶ÁĞ´µØÖ·
-	 * @param addr_rd {const char*} handlersocket ²å¼şÔÚ Mysql ÉÏµÄ¼àÌıµØÖ·£¬
-	 * ¸ñÊ½Îª£ºip:port£¬×¢£º¸ÃµØÖ·ÊÇ handlersocket µÄÖ»¶ÁµØÖ·
-	 * @param cache_enable {bool} ÊÇ·ñÄÚ²¿×Ô¶¯ÆôÓÃĞĞ¶ÔÏó»º´æ»úÖÆ
-	 * @param retry_enable {bool} µ±ÒòÎªÍøÂçÔ­Òò¶ø³ö´íÊ±ÊÇ·ñĞèÒª½øĞĞÖØÊÔ
+	 * æ„é€ å‡½æ•°
+	 * @param addr_rw {const char*} handlersocket æ’ä»¶åœ¨ Mysql ä¸Šçš„ç›‘å¬åœ°å€ï¼Œ
+	 * æ ¼å¼ä¸ºï¼šip:portï¼Œæ³¨ï¼šè¯¥åœ°å€æ˜¯ handlersocket çš„è¯»å†™åœ°å€
+	 * @param addr_rd {const char*} handlersocket æ’ä»¶åœ¨ Mysql ä¸Šçš„ç›‘å¬åœ°å€ï¼Œ
+	 * æ ¼å¼ä¸ºï¼šip:portï¼Œæ³¨ï¼šè¯¥åœ°å€æ˜¯ handlersocket çš„åªè¯»åœ°å€
+	 * @param cache_enable {bool} æ˜¯å¦å†…éƒ¨è‡ªåŠ¨å¯ç”¨è¡Œå¯¹è±¡ç¼“å­˜æœºåˆ¶
+	 * @param retry_enable {bool} å½“å› ä¸ºç½‘ç»œåŸå› è€Œå‡ºé”™æ—¶æ˜¯å¦éœ€è¦è¿›è¡Œé‡è¯•
 	 */
 	hspool(const char* addr_rw, const char* addr_rd = NULL,
 		bool cache_enable = true, bool retry_enable = true);
@@ -27,19 +27,19 @@ public:
 	~hspool();
 
 	/**
-	 * ´ÓÁ¬½Ó³ØÖĞ»ñµÃÁ¬½Ó¶ÔÏó
-	 * @param dbn {const char*} Êı¾İ¿âÃû³Æ
-	 * @param tbl {const char*} Êı¾İ¿â±íÃû
-	 * @param idx {const char*} Ë÷Òı×Ö¶ÎÃû
-	 * @param flds {const char*} Òª´ò¿ªµÄÊı¾İ×Ö¶ÎÃû¼¯ºÏ£¬¸ñÊ½Îª
-	 *  ÓÉ·Ö¸ô·û ",; \t" ·Ö¸ôµÄ×Ö¶ÎÃû³Æ£¬Èç£ºuser_id,user_name,user_mail
-	 * @param readonly {bool} ÊÇ·ñ½öÒÔÖ»¶Á·½Ê½´ò¿ª
+	 * ä»è¿æ¥æ± ä¸­è·å¾—è¿æ¥å¯¹è±¡
+	 * @param dbn {const char*} æ•°æ®åº“åç§°
+	 * @param tbl {const char*} æ•°æ®åº“è¡¨å
+	 * @param idx {const char*} ç´¢å¼•å­—æ®µå
+	 * @param flds {const char*} è¦æ‰“å¼€çš„æ•°æ®å­—æ®µåé›†åˆï¼Œæ ¼å¼ä¸º
+	 *  ç”±åˆ†éš”ç¬¦ ",; \t" åˆ†éš”çš„å­—æ®µåç§°ï¼Œå¦‚ï¼šuser_id,user_name,user_mail
+	 * @param readonly {bool} æ˜¯å¦ä»…ä»¥åªè¯»æ–¹å¼æ‰“å¼€
 	 */
 	hsclient* peek(const char* dbn, const char* tbl,
 		const char* idx, const char* flds, bool readonly = false);
 
 	/**
-	 * ¹é»¹Á¬½Ó¶ÔÏó
+	 * å½’è¿˜è¿æ¥å¯¹è±¡
 	 * @param client {hsclient*}
 	 */
 	void put(hsclient* client);
