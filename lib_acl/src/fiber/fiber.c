@@ -4,8 +4,8 @@
 #endif
 #include "fiber/filber.h"
 
-FIBER *acl_fiber_create(void)
+ACL_FIBER *acl_fiber_create(void)
 {
-	FIBER *fiber = (FIBER*) acl_mycalloc(1, sizeof(FIBER));
+	ACL_FIBER *fiber = (ACL_FIBER *) acl_mycalloc(1, sizeof(ACL_FIBER));
 	return fiber;
 }

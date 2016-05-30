@@ -611,36 +611,35 @@ static int mime_state_head(MIME_STATE *state, const char *s, int n)
 static int mime_bound_body(MIME_STATE *state, const char * const boundary,
 	MIME_NODE *node, const char *s, int n, int *finish)
 {
-	const unsigned char *cp = (const unsigned char*) s;
+	const unsigned char *cp  = (const unsigned char*) s;
 	const unsigned char *end = (const unsigned char*) s + n;
-	size_t bound_len = strlen(boundary);
-	register off_t curr_off = state->curr_off;
-	register off_t last_cr_pos = node->last_cr_pos;
-	off_t last_lf_pos = node->last_lf_pos;
-	const char *bound_ptr = node->bound_ptr;
-	unsigned char ch = 0;
+	size_t bound_len         = strlen(boundary);
+	off_t curr_off           = state->curr_off;
+	off_t last_cr_pos        = node->last_cr_pos;
+	off_t last_lf_pos        = node->last_lf_pos;
+	const char *bound_ptr    = node->bound_ptr;
 
 	for (; cp < end; cp++) {
-		// 记录下 \r\n 的位置
-		if (*cp == '\n') {
-			last_lf_pos = curr_off;
-			if (ch == '\r')
-				last_cr_pos = curr_off - 1;
-		}
 
-		ch = *cp;
+		// 记录下 \r\n 的位置
+		if (*cp == '\r')
+			last_cr_pos = curr_off;
+		else if (*cp == '\n')
+			last_lf_pos = curr_off;
+
 		curr_off++;
 
 		if (bound_ptr == NULL) {
-			if (ch == *boundary)
-				bound_ptr = boundary;
-			else
+			if (*cp != *boundary)
 				continue;
-		}
 
-		if (ch != *bound_ptr) {
+			bound_ptr = boundary;
+		}
+		
+		if (*cp != *bound_ptr) {
 			bound_ptr = NULL;
 		} else if (*++bound_ptr == 0) {
+
 			/* 说明完全匹配 */
 			*finish = 1;
 

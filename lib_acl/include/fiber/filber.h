@@ -7,11 +7,11 @@ extern "C" {
 
 #include "stdlib/acl_define.h"
 
-typedef struct FIBER {
+typedef struct ACL_FIBER {
 	unsigned int id;
-} FIBER;
+} ACL_FIBER;
 
-ACL_API FIBER *acl_fiber_create(void);
+ACL_API ACL_FIBER *acl_fiber_create(void);
 
 #ifdef  __cplusplus
 }

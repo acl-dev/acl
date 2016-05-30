@@ -1,0 +1,7 @@
+#command	broadcast	dangerous
+del		false		true
+set		false		false
+get		false		false
+incr		false		false
+
+#all		false		true

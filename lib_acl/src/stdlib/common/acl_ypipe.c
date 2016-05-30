@@ -22,13 +22,12 @@ struct ACL_YPIPE {
 
 ACL_YPIPE *acl_ypipe_new(void)
 {
-	ACL_YPIPE *self = (ACL_YPIPE *) acl_mymalloc(sizeof(ACL_YPIPE));
+	ACL_YPIPE *self = (ACL_YPIPE *) acl_mycalloc(1, sizeof(ACL_YPIPE));
 	void **item;
 
-	memset(self, 0, sizeof(ACL_YPIPE));
 	self->queue = acl_yqueue_new();
 	acl_yqueue_push(self->queue);
-	item = acl_yqueue_back(self->queue);;
+	item    = acl_yqueue_back(self->queue);;
 	self->w = item;
 	self->f = item;
 	self->r = item;
@@ -46,16 +45,16 @@ void acl_ypipe_free(ACL_YPIPE *self, void(*free_data_fun)(void*))
 
 void *acl_ypipe_read(ACL_YPIPE *self)
 {
-	void **value;
+	void *value;
 
 	if (!acl_ypipe_check_read(self))
 		return NULL;
 
-	value = acl_yqueue_front(self->queue);
+	value = *acl_yqueue_front(self->queue);
 	acl_yqueue_pop(self->queue);
 	self->reads++;
 
-	return *value;
+	return value;
 }
 
 void acl_ypipe_write(ACL_YPIPE *self, void *data)
@@ -74,7 +73,7 @@ int acl_ypipe_flush(ACL_YPIPE *self)
 	if (acl_atomic_cas(self->c, self->w, self->f) != self->w) {
 		acl_atomic_set(self->c, self->f);
 		self->w = self->f;
-		return -1;
+		return 1;
 	}
 
 	self->w = self->f;
@@ -85,7 +84,7 @@ int acl_ypipe_check_read(ACL_YPIPE *self)
 {
 	void **front = acl_yqueue_front(self->queue);
 
-	if (front != self->r &&self->r && *self->r)
+	if (front != self->r && self->r && *self->r)
 		return 1;
 
 	self->r = (void **) acl_atomic_cas(self->c, front, NULL);

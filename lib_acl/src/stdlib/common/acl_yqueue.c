@@ -116,20 +116,20 @@ void acl_yqueue_push(ACL_YQUEUE *self)
 
 	self->pushs++;
 	self->back_chunk = self->end_chunk;
-	self->back_pos = self->end_pos;
+	self->back_pos   = self->end_pos;
 
 	self->end_pos++;
 	if (self->end_pos != CHUNK_SIZE)
 		return;
 
-	sc = (chunk_t *)acl_atomic_xchg(self->spare_chunk, NULL);
+	sc = (chunk_t *) acl_atomic_xchg(self->spare_chunk, NULL);
 
 	if (sc) {
 		self->end_chunk->next = sc;
 		sc->prev = self->end_chunk;
 	} else {
 		self->end_chunk->next =
-			(chunk_t*) acl_mymalloc(sizeof(chunk_t));
+			(chunk_t *) acl_mymalloc(sizeof(chunk_t));
 		memset(self->end_chunk->next, 0, sizeof(chunk_t));
 		acl_assert(self->end_chunk);
 		self->end_chunk->next->prev = self->end_chunk;
@@ -146,13 +146,13 @@ void acl_yqueue_pop(ACL_YQUEUE *self)
 
 	if (self->begin_pos == CHUNK_SIZE) {
 		chunk_t *cs;
-
 		chunk_t *o = self->begin_chunk;
+
 		self->begin_chunk = self->begin_chunk->next;
 		self->begin_chunk->prev = NULL;
 		self->begin_pos = 0;
 		memset(o, 0, sizeof(chunk_t));
-		cs = (chunk_t *)acl_atomic_xchg(self->spare_chunk, o);
+		cs = (chunk_t *) acl_atomic_xchg(self->spare_chunk, o);
 		if (cs)
 			acl_myfree(cs);
 	}
