@@ -29,8 +29,8 @@ CFLAGS = -c -g -W \
 -Wuninitialized \
 -D_POSIX_PTHREAD_SEMANTICS \
 -DACL_PREPARE_COMPILE \
--DUSE_EPOLL \
 -Winvalid-pch
+#-DUSE_EPOLL \
 #-Wno-invalid-source-encoding \
 #-Wno-extended-offsetof
 #-Wcast-align

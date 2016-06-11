@@ -1,0 +1,15 @@
+
+4) 2016.6.11
+4.1) valgrind: 增加编译开关以防止 valgrind 工具对 swapcontext 跳转的误报
+
+3) 2016.6.9
+3.1) performance: fiber_schedule.c，由星形切换改为环形切换，从而提升了上下文件
+切换的效率 --- by niukey@qq.com
+
+2) 2016.6.5
+2.1) feature: 将 fiber_schedule.c, fiber_io.c 中的全局静态变量调整为线程局部
+变量，为实现多线程化协程做准备
+
+1) 2016.6.4
+1.1) 当前的协程支持 hook: read/redv/redv/recvfrom/recvmsg,
+write/writev/send/sendto/sendmsg, poll/select/sleep/gethostbyname/gethostbyname_r

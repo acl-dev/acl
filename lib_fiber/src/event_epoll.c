@@ -9,7 +9,7 @@ typedef struct EVENT_EPOLL {
 	struct epoll_event *epoll_events;
 } EVENT_EPOLL;
 
-static void __event_free(EVENT *ev)
+static void epoll_event_free(EVENT *ev)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 
@@ -18,7 +18,7 @@ static void __event_free(EVENT *ev)
 	acl_myfree(ep);
 }
 
-static int __event_add(EVENT *ev, int fd, int mask)
+static int epoll_event_add(EVENT *ev, int fd, int mask)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 	struct epoll_event ee;
@@ -32,11 +32,20 @@ static int __event_add(EVENT *ev, int fd, int mask)
 	ee.data.ptr = NULL;
 	ee.data.fd  = fd;
 
+	//printf(">>>fd: %d, mask: %d, op: %s\r\n",
+	//	fd, mask, op == EPOLL_CTL_ADD ?  "add" : "mod");
+
 	mask |= ev->events[fd].mask; /* Merge old events */
 	if (mask & EVENT_READABLE)
 		ee.events |= EPOLLIN;
 	if (mask & EVENT_WRITABLE)
 		ee.events |= EPOLLOUT;
+
+#ifdef	EPOLLRDHUP
+	ee.events |= EPOLLERR | EPOLLRDHUP | EPOLLHUP;
+#else
+	ee.events |= EPOLLERR | EPOLLHUP;
+#endif
 
 	if (epoll_ctl(ep->epfd, op, fd, &ee) == -1) {
 		acl_msg_error("%s, %s(%d): epoll_ctl error %s",
@@ -47,7 +56,7 @@ static int __event_add(EVENT *ev, int fd, int mask)
 	return 0;
 }
 
-static void __event_del(EVENT *ev, int fd, int delmask)
+static void epoll_event_del(EVENT *ev, int fd, int delmask)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 	struct epoll_event ee;
@@ -73,13 +82,14 @@ static void __event_del(EVENT *ev, int fd, int delmask)
 	}
 }
 
-static int __event_loop(EVENT *ev, struct timeval *tv)
+static int epoll_event_loop(EVENT *ev, struct timeval *tv)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 	int retval, numevents = 0;
 
 	retval = epoll_wait(ep->epfd, ep->epoll_events, ev->setsize,
 			tv ? (tv->tv_sec * 1000 + tv->tv_usec / 1000) : -1);
+
 	if (retval > 0) {
 		int j, mask;
 		struct epoll_event *e;
@@ -94,9 +104,9 @@ static int __event_loop(EVENT *ev, struct timeval *tv)
 			if (e->events & EPOLLOUT)
 				mask |= EVENT_WRITABLE;
 			if (e->events & EPOLLERR)
-				mask |= EVENT_WRITABLE;
+				mask |= EVENT_READABLE;
 			if (e->events & EPOLLHUP)
-				mask |= EVENT_WRITABLE;
+				mask |= EVENT_READABLE;
 
 			ev->fired[j].fd = e->data.fd;
 			ev->fired[j].mask = mask;
@@ -106,7 +116,7 @@ static int __event_loop(EVENT *ev, struct timeval *tv)
 	return numevents;
 }
 
-static const char *__event_name(void)
+static const char *epoll_event_name(void)
 {
 	return "epoll";
 }
@@ -121,11 +131,11 @@ EVENT *event_epoll_create(int setsize)
 	ep->epfd = epoll_create(1024);
 	acl_assert(ep->epfd >= 0);
 
-	ep->event.name = __event_name;
-	ep->event.loop = __event_loop;
-	ep->event.add  = __event_add;
-	ep->event.del  = __event_del;
-	ep->event.free = __event_free;
+	ep->event.name = epoll_event_name;
+	ep->event.loop = epoll_event_loop;
+	ep->event.add  = epoll_event_add;
+	ep->event.del  = epoll_event_del;
+	ep->event.free = epoll_event_free;
 
 	return (EVENT*) ep;
 }

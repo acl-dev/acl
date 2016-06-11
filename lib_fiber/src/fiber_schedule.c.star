@@ -1,16 +1,10 @@
 #include "stdafx.h"
-
-#ifdef USE_VALGRIND
-#include <valgrind/valgrind.h>
-#endif
-
 #include "fiber/fiber_io.h"
 #include "fiber/fiber_schedule.h"
 #include "fiber.h"
 
 typedef struct {
 	ACL_RING queue;
-	ACL_RING dead;     //dead fiber queue
 	FIBER  **fibers;
 	size_t   size;
 	int      exitcode;
@@ -70,7 +64,6 @@ static void fiber_check(void)
 	__thread_fiber->idgen  = 0;
 	__thread_fiber->count  = 0;
 	acl_ring_init(&__thread_fiber->queue);
-	acl_ring_init(&__thread_fiber->dead);
 
 	if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
 		__main_fiber = __thread_fiber;
@@ -102,21 +95,15 @@ void fiber_exit(int exit_code)
 	fiber_switch();
 }
 
-union cc_arg
-{
-	void *p;
-	int   i[2];
-};
-
 static void fiber_start(unsigned int x, unsigned int y)
 {
-	union cc_arg arg;
 	FIBER *fiber;
+	unsigned long z;
 
-	arg.i[0] = x;
-	arg.i[1] = y;
-	
-	fiber = (FIBER *) arg.p;
+	z = x << 16;
+	z <<= 16;
+	z |= y;
+	fiber = (FIBER *) z;
 
 	fiber->fn(fiber, fiber->arg);
 	fiber_exit(0);
@@ -126,20 +113,12 @@ static FIBER *fiber_alloc(void (*fn)(FIBER *, void *), void *arg, size_t size)
 {
 	FIBER *fiber;
 	sigset_t zero;
-	union cc_arg carg;
-	ACL_RING *head;
+	unsigned long z;
+	unsigned int x, y;
 
 	fiber_check();
 
-	head = acl_ring_pop_head(&__thread_fiber->dead);
-	if (head == NULL) {
-		fiber = (FIBER *) acl_mycalloc(1, sizeof(FIBER) + size);
-	} else if ((fiber = ACL_RING_TO_APPL(head, FIBER, me))->size < size) {
-		fiber_free(fiber);
-		fiber = (FIBER *) acl_mycalloc(1, sizeof(FIBER) + size);
-	} else
-		size = fiber->size;
-
+	fiber        = (FIBER *) acl_mycalloc(1, sizeof(FIBER) + size);
 	fiber->fn    = fn;
 	fiber->arg   = arg;
 	fiber->stack = fiber->buf;
@@ -155,17 +134,13 @@ static FIBER *fiber_alloc(void (*fn)(FIBER *, void *), void *arg, size_t size)
 
 	fiber->uctx.uc_stack.ss_sp   = fiber->stack + 8;
 	fiber->uctx.uc_stack.ss_size = fiber->size - 64;
-	fiber->uctx.uc_link = &__thread_fiber->schedule.uctx;
 
-#ifdef USE_VALGRIND
-	fiber->vid = VALGRIND_STACK_REGISTER(fiber->uctx.uc_stack.ss_sp,
-			fiber->uctx.uc_stack.ss_sp
-			+ fiber->uctx.uc_stack.ss_size);
-#endif
+	z = (unsigned long) fiber;
+	y = z;
+	z >>= 16;
+	x = z >> 16;
 
-	carg.p = fiber;
-	makecontext(&fiber->uctx, (void(*)(void)) fiber_start,
-		2, carg.i[0], carg.i[1]);
+	makecontext(&fiber->uctx, (void(*)(void)) fiber_start, 2, x, y);
 
 	return fiber;
 }
@@ -231,16 +206,19 @@ void fiber_schedule(void)
 
 		fiber_swap(&__thread_fiber->schedule, fiber);
 		__thread_fiber->running = NULL;
-	}
 
-	// release dead fiber 
-	for (;;) {
-		head = acl_ring_pop_head(&__thread_fiber->dead);
-		if (head == NULL)
-			break;
+		if (fiber->status == FIBER_STATUS_EXITING) {
+			size_t slot = fiber->slot;
 
-		fiber = ACL_RING_TO_APPL(head, FIBER, me);
-		fiber_free (fiber);
+			if (!fiber->sys)
+				__thread_fiber->count--;
+
+			__thread_fiber->fibers[slot] =
+				__thread_fiber->fibers[--__thread_fiber->size];
+			__thread_fiber->fibers[slot]->slot = slot;
+
+			fiber_free(fiber);
+		}
 	}
 }
 
@@ -280,36 +258,5 @@ void fiber_count_dec(void)
 
 void fiber_switch(void)
 {
-	FIBER *fiber, *current = __thread_fiber->running;
-	ACL_RING *head;
-
-#ifdef _DEBUG
-	acl_assert(current);
-#endif
-
-	if (current->status == FIBER_STATUS_EXITING) {
-		size_t slot = current->slot;
-
-		if (!current->sys)
-			__thread_fiber->count--;
-
-		__thread_fiber->fibers[slot] =
-			__thread_fiber->fibers[--__thread_fiber->size];
-		__thread_fiber->fibers[slot]->slot = slot;
-		acl_ring_append(&__thread_fiber->dead, &current->me);
-	}
-
-	head = acl_ring_pop_head(&__thread_fiber->queue);
-
-	if (head == NULL) {
-		fiber_swap(current, &__thread_fiber->schedule);
-		return;
-	}
-
-	fiber = ACL_RING_TO_APPL(head, FIBER, me);
-	fiber->status = FIBER_STATUS_READY;
-
-	__thread_fiber->running = fiber;
-	__thread_fiber->switched++;
-	fiber_swap(current, __thread_fiber->running);
+	fiber_swap(__thread_fiber->running, &__thread_fiber->schedule);
 }

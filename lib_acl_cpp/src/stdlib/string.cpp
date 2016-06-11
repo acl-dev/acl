@@ -40,21 +40,22 @@ string::string(size_t len /* = 64 */, bool bin /* = false */)
 : use_bin_(bin)
 {
 	init(len);
+	TERM(vbf_);
 }
 
 string::string(const string& s) : use_bin_(false)
 {
 	init(s.length() + 1);
-	if (!s.empty())
-		MCP(vbf_, STR(s.vbf_), LEN(s.vbf_));
+	MCP(vbf_, STR(s.vbf_), LEN(s.vbf_));
 	TERM(vbf_);
 }
 
 string::string(const char* s) : use_bin_(false)
 {
-	if (s == NULL || *s == 0)
+	if (s == NULL)
 	{
 		init(128);
+		TERM(vbf_);
 		return;
 	}
 
@@ -198,7 +199,7 @@ char& string::operator [](int n)
 
 string& string::operator =(const char* s)
 {
-	if (s != NULL && *s != 0)
+	if (s != NULL)
 		SCP(vbf_, s);
 
 	return *this;
@@ -206,17 +207,15 @@ string& string::operator =(const char* s)
 
 string& string::operator =(const string& s)
 {
-	if (!s.empty())
-	{
-		MCP(vbf_, STR(s.vbf_), LEN(s.vbf_));
-		TERM(vbf_);
-	}
+	MCP(vbf_, STR(s.vbf_), LEN(s.vbf_));
+	TERM(vbf_);
+
 	return *this;
 }
 
 string& string::operator =(const string* s)
 {
-	if (s == NULL || s->empty())
+	if (s == NULL)
 		return *this;
 
 	MCP(vbf_, STR(s->vbf_), LEN(s->vbf_));
@@ -336,7 +335,7 @@ string& string::operator =(unsigned char n)
 
 string& string::operator +=(const char* s)
 {
-	if (s == NULL || *s == 0)
+	if (s == NULL)
 		return *this;
 
 	SCAT(vbf_, s);
@@ -352,7 +351,7 @@ string& string::operator +=(const string& s)
 
 string& string::operator +=(const string* s)
 {
-	if (s == NULL || s->empty())
+	if (s == NULL)
 		return *this;
 
 	MCAT(vbf_, STR(s->vbf_), LEN(s->vbf_));
@@ -473,7 +472,7 @@ string& string::operator <<(const string& s)
 
 string& string::operator <<(const string* s)
 {
-	if (s == NULL || s->empty())
+	if (s == NULL )
 		return *this;
 
 	*this += s;
@@ -482,7 +481,7 @@ string& string::operator <<(const string* s)
 
 string& string::operator <<(const char* s)
 {
-	if (s == NULL || *s == 0)
+	if (s == NULL)
 		return *this;
 
 	*this += s;
@@ -1093,7 +1092,7 @@ std::pair<acl::string, acl::string>& string::split_nameval()
 
 string& string::copy(const char* ptr)
 {
-	if (ptr == NULL || *ptr == 0)
+	if (ptr == NULL)
 		return *this;
 
 	SCP(vbf_, ptr);
@@ -1134,7 +1133,7 @@ string& string::append(const string& s)
 
 string& string::append(const string* s)
 {
-	if (s == NULL || s->empty())
+	if (s == NULL)
 		return *this;
 
 	return append(s->c_str(), s->length());
@@ -1142,7 +1141,7 @@ string& string::append(const string* s)
 
 string& string::append(const char* ptr)
 {
-	if (ptr == NULL || *ptr == 0)
+	if (ptr == NULL)
 		return *this;
 
 	SCAT(vbf_, ptr);
@@ -1524,7 +1523,7 @@ string& string::base64_decode(void)
 
 string& string::base64_decode(const char* s)
 {
-	if (s == NULL || *s == 0)
+	if (s == NULL)
 		return *this;
 
 	if (acl_vstring_base64_decode(vbf_, s, (int) strlen(s)) == NULL)
@@ -1550,7 +1549,7 @@ string& string::base64_decode(const void* ptr, size_t len)
 
 string& string::url_encode(const char* s, dbuf_pool* dbuf /* = NULL */)
 {
-	if (s == NULL || *s == 0)
+	if (s == NULL)
 		return *this;
 
 	char *ptr = acl_url_encode(s, dbuf ? dbuf->get_dbuf() : NULL);
@@ -1563,7 +1562,7 @@ string& string::url_encode(const char* s, dbuf_pool* dbuf /* = NULL */)
 
 string& string::url_decode(const char* s, dbuf_pool* dbuf /* = NULL */)
 {
-	if (s == NULL || *s == 0)
+	if (s == NULL)
 		return *this;
 
 	char *ptr = acl_url_decode(s, dbuf ? dbuf->get_dbuf() : NULL);
@@ -1594,7 +1593,7 @@ string& string::hex_decode(const char* s, size_t len)
 
 string& string::basename(const char* path)
 {
-	if (path == NULL || *path == 0)
+	if (path == NULL)
 		return *this;
 
 	(void) acl_sane_basename(vbf_, path);
@@ -1603,7 +1602,7 @@ string& string::basename(const char* path)
 
 string& string::dirname(const char* path)
 {
-	if (path == NULL || *path == 0)
+	if (path == NULL)
 		return *this;
 
 	(void) acl_sane_dirname(vbf_, path);

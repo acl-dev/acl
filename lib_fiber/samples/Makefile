@@ -1,0 +1,26 @@
+
+all:
+	@(cd dns; make)
+	@(cd fiber; make)
+	@(cd read; make)
+	@(cd httpd; make)
+	@(cd httpd2; make)
+	@(cd client; make)
+	@(cd server; make)
+	@(cd sleep; make)
+	@(cd poll; make)
+	@(cd redis; make)
+	@(cd redis_threads; make)
+
+cl clean:
+	@(cd dns; make clean)
+	@(cd fiber; make clean)
+	@(cd read; make clean)
+	@(cd httpd; make clean)
+	@(cd httpd2; make clean)
+	@(cd client; make clean)
+	@(cd server; make clean)
+	@(cd sleep; make clean)
+	@(cd poll; make clean)
+	@(cd redis; make clean)
+	@(cd redis_threads; make clean)

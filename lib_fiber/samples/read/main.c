@@ -3,26 +3,39 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "lib_fiber.h"
+#include "fiber/lib_fiber.h"
 
-int main(void)
+static void fiber_io(FIBER *fiber acl_unused, void *ctx acl_unused)
 {
 	int   ret;
 	char  buf[8192];
 
-	//acl_sys_hook();
+	printf("please input: ");
+	fflush(stdout);
 
 	ret = read(0, buf, sizeof(buf) - 1);
 
-	if (ret <= 0) {
-		printf("read error\r\n");
-		return 1;
-	}
+	if (ret > 0) {
+		const char *prompt = "your input: ";
 
-	buf[ret] = 0;
-	printf("read: [%s]\r\n", buf);
+		buf[ret] = 0;
+		//printf("read: [%s]\r\n", buf);
 
-	write(1, buf, strlen(buf));
+		if (write(1, prompt, strlen(prompt)) != (int) strlen(prompt))
+			printf("write error: %s\r\n", acl_last_serror());
+		else if (write(1, buf, strlen(buf)) != (int) strlen(buf))
+			printf("write to stdout error: %s\r\n",
+				acl_last_serror());
+	} else
+		printf("read error: %s\r\n", acl_last_serror());
+
+	fiber_io_stop();
+}
+
+int main(void)
+{
+	fiber_create(fiber_io, NULL, 320000);
+	fiber_schedule();
 
 	return 0;
 }
