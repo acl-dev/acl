@@ -1,6 +1,10 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+551) 2016.6.21
+551.1) safety: acl_vstream.c->acl_vstream_fdopen 中的 rw_timeout > 0 时，应该
+再通过 acl_getsocktype 判断一下是否是需要设置非阻塞模式
+
 550) 2016.5.21
 550.1) bugfix: acl_sys_file.c 中的函数 acl_file_open 当以 O_APPEND 方式打开文件时，
 文件指针没有指向文件尾部

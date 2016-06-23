@@ -4,6 +4,7 @@
 #include "http_servlet.h"
 
 #define	 STACK_SIZE	32000
+static int __rw_timeout = 0;
 
 static void http_server(FIBER *, void *ctx)
 {
@@ -26,18 +27,18 @@ static void http_server(FIBER *, void *ctx)
 	delete conn;
 }
 
-static void fiber_accept(FIBER *, void *)
+static void fiber_accept(FIBER *, void *ctx)
 {
-	acl::string addr = "127.0.0.1:9001";
+	const char* addr = (const char* ) ctx;
 	acl::server_socket server;
 
 	if (server.open(addr) == false)
 	{
-		printf("open %s error\r\n", addr.c_str());
+		printf("open %s error\r\n", addr);
 		exit (1);
 	}
 	else
-		printf("open %s ok\r\n", addr.c_str());
+		printf("open %s ok\r\n", addr);
 
 	while (true)
 	{
@@ -48,6 +49,7 @@ static void fiber_accept(FIBER *, void *)
 			break;
 		}
 
+		client->set_rw_timeout(__rw_timeout);
 		printf("accept one: %d\r\n", client->sock_handle());
 		fiber_create(http_server, client, STACK_SIZE);
 	}
@@ -55,13 +57,38 @@ static void fiber_accept(FIBER *, void *)
 	exit (0);
 }
 
-#include <signal.h>
-
-int main(void)
+static void usage(const char* procname)
 {
+	printf("usage: %s -h [help] -s listen_addr -r rw_timeout\r\n", procname);
+}
+
+int main(int argc, char *argv[])
+{
+	acl::string addr("127.0.0.1:9001");
+	int  ch;
+
+	while ((ch = getopt(argc, argv, "hs:r:")) > 0)
+	{
+		switch (ch)
+		{
+		case 'h':
+			usage(argv[0]);
+			return 0;
+		case 's':
+			addr = optarg;
+			break;
+		case 'r':
+			__rw_timeout = atoi(optarg);
+			break;
+		default:
+			break;
+		}
+	}
+
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
-	signal(SIGPIPE, SIG_IGN);
-	fiber_create(fiber_accept, NULL, STACK_SIZE);
+
+	fiber_create(fiber_accept, addr.c_str(), STACK_SIZE);
+
 	fiber_schedule();
 }

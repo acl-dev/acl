@@ -19,7 +19,7 @@ static int http_client(ACL_VSTREAM *cstream, const char* res, size_t len)
 	while (1) {
 		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
 		if (ret == ACL_VSTREAM_EOF) {
-			printf("gets error\r\n");
+			printf("gets error: %s\r\n", acl_last_serror());
 			return -1;
 		}
 
@@ -81,7 +81,7 @@ static void fiber_accept(FIBER *fiber acl_unused, void *ctx)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -r rw_timeout\r\n", procname);
+	printf("usage: %s -h [help] -s listen_addr -r rw_timeout\r\n", procname);
 }
 
 static void fiber_dummy(FIBER *fiber, void *ctx acl_unused)
@@ -91,15 +91,20 @@ static void fiber_dummy(FIBER *fiber, void *ctx acl_unused)
 
 int main(int argc, char *argv[])
 {
-	const char *addr = "0.0.0.0:9001";
+	char addr[64];
 	ACL_VSTREAM *sstream;
 	int  ch;
 
-	while ((ch = getopt(argc, argv, "hr:")) > 0) {
+	snprintf(addr, sizeof(addr), "%s", "127.0.0.1:9001");
+
+	while ((ch = getopt(argc, argv, "hs:r:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 's':
+			snprintf(addr, sizeof(addr), "%s", optarg);
+			break;
 		case 'r':
 			__rw_timeout = atoi(optarg);
 			break;

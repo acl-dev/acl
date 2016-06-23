@@ -20,6 +20,28 @@ static bool create_master_threads(file_tmpl& tmpl)
 	return tmpl.files_copy(name, tab);
 }
 
+static bool create_master_fiber(file_tmpl& tmpl)
+{
+	string file(tmpl.get_project_name());
+	file << ".cf";
+	if (tmpl.copy_and_replace("master_fiber.cf", file.c_str()) == false)
+		return false;
+
+	const char* name = "master_fiber";
+	const FILE_FROM_TO tab[] = {
+		{ "main_fiber.cpp", "main.cpp" },
+		{ "master_fiber.h", "master_service.h" },
+		{ "master_fiber.cpp", "master_service.cpp" },
+		{ "stdafx_fiber.h", "stdafx.h" },
+		{ NULL, NULL }
+	};
+
+	return tmpl.files_copy(name, tab)
+		&& tmpl.copy_and_replace("Makefile_fiber", "Makefile")
+		&& tmpl.file_copy("tmpl/Makefile_fiber.in",
+			"Makefile.in");
+}
+
 static bool create_master_proc(file_tmpl& tmpl)
 {
 	string file(tmpl.get_project_name());
@@ -144,6 +166,7 @@ void master_creator()
 			"	g: for master_trigger\r\n"
 			"	r: for master_rpc\r\n"
 			"	u: for master_udp\r\n"
+			"	f: for master_fiber\r\n"
 			"	s: skip choose, try again\r\n");
 		printf(">");
 		fflush(stdout);
@@ -153,32 +176,44 @@ void master_creator()
 			break;
 		else if (strcasecmp(buf, "t") == 0)
 		{
+			tmpl.create_common();
 			create_master_threads(tmpl);
 			break;
 		}
 		else if (strcasecmp(buf, "p") == 0)
 		{
+			tmpl.create_common();
 			create_master_proc(tmpl);
 			break;
 		}
 		else if (strcasecmp(buf, "a") == 0)
 		{
+			tmpl.create_common();
 			create_master_aio(tmpl);
 			break;
 		}
 		else if (strcasecmp(buf, "r") == 0)
 		{
+			tmpl.create_common();
 			create_master_rpc(tmpl);
 			break;
 		}
 		else if (strcasecmp(buf, "g") == 0)
 		{
+			tmpl.create_common();
 			create_master_trigger(tmpl);
 			break;
 		}
 		else if (strcasecmp(buf, "u") == 0)
 		{
+			tmpl.create_common();
 			create_master_udp(tmpl);
+			break;
+		}
+		else if (strcasecmp(buf, "f") == 0)
+		{
+			tmpl.create_common();
+			create_master_fiber(tmpl);
 			break;
 		}
 		else if (strcasecmp(buf, "s") == 0)
@@ -186,8 +221,6 @@ void master_creator()
 		else
 			printf("unknown ch: %s\r\n", buf);
 	}
-
-	tmpl.create_common();
 
 END:
 	for (int i = 0; i < 78; i++)

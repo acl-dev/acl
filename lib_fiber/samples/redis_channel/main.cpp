@@ -1,0 +1,369 @@
+#include "stdafx.h"
+
+static int __fibers_count = 2;
+static int __fibers_max   = 2;
+static int __oper_count = 100;
+//static struct timeval __begin, __end;
+
+static acl::redis_client_cluster __redis_cluster;
+
+#if 0
+static double stamp_sub(const struct timeval *from, const struct timeval *by)
+{
+	struct timeval res;
+
+	memcpy(&res, from, sizeof(struct timeval));
+
+	res.tv_usec -= by->tv_usec;
+	if (res.tv_usec < 0) {
+		--res.tv_sec;
+		res.tv_usec += 1000000;
+	}
+	res.tv_sec -= by->tv_sec;
+
+	return (res.tv_sec * 1000.0 + res.tv_usec/1000.0);
+}
+#endif
+
+typedef struct {
+	CHANNEL *chan;
+	int   id;
+	bool  busy;
+	acl::string cmd;
+} MYCHAN;
+
+typedef struct {
+	MYCHAN *chans;
+	size_t  size;
+	size_t  off;
+} MYCHANS;
+
+typedef struct {
+	acl::string cmd;
+	acl::string key;
+	acl::string val;
+	bool success;
+} PKT;
+
+static bool redis_set(FIBER& fiber, CHANNEL &chan, PKT& pkt)
+{
+	acl::redis cmd(&__redis_cluster);
+
+	pkt.success = false;
+
+	if (pkt.key.empty())
+	{
+		printf("%s(%d): fiber-%d: key empty!\r\n",
+			__FUNCTION__, __LINE__, fiber_id(&fiber));
+		pkt.val = "key empty";
+		channel_sendp(&chan, &pkt);
+
+		return false;
+	}
+	if (pkt.val.empty())
+	{
+		printf("%s(%d): fiber-%d: val empty\r\n",
+			__FUNCTION__, __LINE__, fiber_id(&fiber));
+		pkt.val = "val empty";
+		channel_sendp(&chan, &pkt);
+
+		return false;
+	}
+
+	if (cmd.set(pkt.key, pkt.val) == false)
+	{
+		printf("%s(%d): fiber-%d: set error, key: %s, val: %s\r\n",
+			__FUNCTION__, __LINE__, fiber_id(&fiber),
+			pkt.key.c_str(), pkt.val.c_str());
+		channel_sendp(&chan, &pkt);
+
+		return false;
+	}
+
+	pkt.success = true;
+	if (channel_sendp(&chan, &pkt) < 0)
+	{
+		printf("%s(%d): fiber-%d: channel_sendp error, key %s\r\n",
+			__FUNCTION__, __LINE__, fiber_id(&fiber),
+			pkt.key.c_str());
+
+		return false;
+	}
+
+	return true;
+}
+
+static bool redis_get(FIBER& fiber, CHANNEL &chan, PKT &pkt)
+{
+	acl::redis cmd(&__redis_cluster);
+
+	pkt.success = false;
+
+	if (pkt.key.empty())
+	{
+		printf("fiber-%d: key empty!\r\n", fiber_id(&fiber));
+		pkt.val = "key empty";
+		channel_sendp(&chan, &pkt);
+
+		return false;
+	}
+
+	if (cmd.get(pkt.key, pkt.val) == false)
+	{
+		printf("fiber-%d: get error, key: %s\r\n",
+			fiber_id(&fiber), pkt.key.c_str());
+		pkt.val = "get error";
+		channel_sendp(&chan, &pkt);
+
+		return false;
+	}
+
+	pkt.success = true;
+	if (channel_sendp(&chan, &pkt) < 0)
+	{
+		printf("fiber-%d: channel_sendp error, key: %s\r\n",
+			fiber_id(&fiber), pkt.key.c_str());
+
+		return false;
+	}
+
+	return true;
+}
+
+static bool redis_del(FIBER& fiber, CHANNEL &chan, PKT &pkt)
+{
+	acl::redis cmd(&__redis_cluster);
+
+	pkt.success = false;
+
+	if (pkt.key.empty())
+	{
+		printf("fiber-%d: key empty!\r\n", fiber_id(&fiber));
+		pkt.val = "key empty";
+		channel_sendp(&chan, &pkt);
+
+		return false;
+	}
+
+	if (cmd.del_one(pkt.key) < 0)
+	{
+		printf("fiber-%d: del_one error, key: %s\r\n",
+			fiber_id(&fiber), pkt.key.c_str());
+		pkt.val = "del error";
+		channel_sendp(&chan, &pkt);
+
+		return false;
+	}
+
+	pkt.success = true;
+	if (channel_sendp(&chan, &pkt) < 0)
+	{
+		printf("fiber-%d: channel_sendp error, key: %s\r\n",
+			fiber_id(&fiber), pkt.key.c_str());
+
+		return false;
+	}
+
+	return true;
+}
+
+static void fiber_redis_worker(FIBER *fiber, void *ctx)
+{
+	CHANNEL *chan = ((MYCHAN *) ctx)->chan;
+
+	while (true)
+	{
+		PKT* pkt = (PKT *) channel_recvp(chan);
+
+		if (pkt == NULL)
+		{
+			printf("fiber-%d: channel_recvp NULL\r\n",
+				fiber_id(fiber));
+			break;
+		}
+
+		if (pkt->cmd.equal("set", false))
+		{
+			if (redis_set(*fiber, *chan, *pkt) == false)
+			{
+				printf("fiber-%d: redis_set error\r\n",
+					fiber_id(fiber));
+				break;
+			}
+		}
+		else if (pkt->cmd.equal("get", false))
+		{
+			if (redis_get(*fiber, *chan, *pkt) == false)
+			{
+				printf("fiber-%d: redis_get error\r\n",
+					fiber_id(fiber));
+				break;
+			}
+		}
+		else if (pkt->cmd.equal("del", false))
+		{
+			if (redis_del(*fiber, *chan, *pkt) == false)
+			{
+				printf("fiber-%d: redis_del error\r\n",
+					fiber_id(fiber));
+				break;
+			}
+		}
+		else
+			printf("unknown cmd: %s\r\n", pkt->cmd.c_str());
+	}
+}
+
+static int __display = 0;
+
+static void fiber_redis(FIBER *fiber, void *ctx)
+{
+	MYCHANS *mychans = (MYCHANS *) ctx;
+	MYCHAN  *mychan  = &mychans->chans[mychans->off++];
+	CHANNEL    *chan    = mychan->chan;
+	PKT pkt;
+
+	if (mychans->off == mychans->size)
+		mychans->off = 0;
+
+	pkt.cmd = mychan->cmd;
+
+	for (int i = 0; i < __oper_count; i++)
+	{
+		pkt.key.format("key-%d-%d", fiber_id(fiber), i);
+		pkt.val.format("val-%d-%d", fiber_id(fiber), i);
+
+		if (channel_sendp(chan, &pkt) < 0)
+		{
+			printf("%s(%d): fiber-%d: channel_sendp error, key = %s\r\n",
+				__FUNCTION__, __LINE__, fiber_id(fiber),
+				pkt.key.c_str());
+			break;
+		}
+
+		PKT* res = (PKT *) channel_recvp(chan);
+		if (res == NULL)
+		{
+			printf("%s(%d): fiber-%d: channel_recvp errork, key = %s\r\n",
+				__FUNCTION__, __LINE__, fiber_id(fiber),
+				pkt.key.c_str());
+			break;
+		}
+
+		//assert(res == &pkt);
+
+		if (!res->success)
+		{
+			printf("%s(%d): fiber-%d: cmd = %s, key = %s, failed\r\n",
+				__FUNCTION__, __LINE__, fiber_id(fiber),
+				pkt.cmd.c_str(), pkt.key.c_str());
+			continue;
+		}
+
+		if (++__display >= 10)
+			continue;
+
+		if (pkt.cmd.equal("get", false))
+			printf("fiber-%d: cmd = %s, key = %s, val = %s\r\n",
+				fiber_id(fiber), pkt.cmd.c_str(),
+				pkt.key.c_str(), res->val.c_str());
+		else
+			printf("fiber-%d: cmd = %s, key = %s\r\n",
+				fiber_id(fiber), pkt.cmd.c_str(),
+				pkt.key.c_str());
+	}
+
+	if (--__fibers_count == 0)
+	{
+		printf("---All fibers are over!---\r\n");
+		fiber_io_stop();
+	}
+}
+
+static void usage(const char *procname)
+{
+	printf("usage: %s -h [help]\r\n"
+		" -s redis_addr\r\n"
+		" -a command[set|get|del]\r\n"
+		" -n operation_count\r\n"
+		" -c fibers count\r\n"
+		" -w workers count\r\n"
+		" -t connect timoeut\r\n"
+		" -r rw_timeout\r\n", procname);
+}
+
+int main(int argc, char *argv[])
+{
+	int   ch, conn_timeout = 0, rw_timeout = 0, nworkers = 10;
+	acl::string addr("127.0.0.1:6379"), cmd("set");
+
+	while ((ch = getopt(argc, argv, "hs:n:c:r:t:w:a:")) > 0) {
+		switch (ch) {
+		case 'h':
+			usage(argv[0]);
+			return 0;
+		case 'a':
+			cmd = optarg;
+			break;
+		case 'w':
+			nworkers = atoi(optarg);
+			break;
+		case 's':
+			addr = optarg;
+			break;
+		case 'n':
+			__oper_count = atoi(optarg);
+			break;
+		case 'c':
+			__fibers_max = atoi(optarg);
+			break;
+		case 'r':
+			rw_timeout = atoi(optarg);
+			break;
+		case 't':
+			conn_timeout = atoi(optarg);
+			break;
+		default:
+			break;
+		}
+	}
+
+	acl::acl_cpp_init();
+
+	__redis_cluster.set(addr.c_str(), 0, conn_timeout, rw_timeout);
+
+	//gettimeofday(&__begin, NULL);
+
+	if (nworkers > __fibers_max)
+		nworkers = __fibers_max;
+
+	nworkers = __fibers_max;
+
+	MYCHANS mychans;
+	mychans.size  = nworkers;
+	mychans.off   = 0;
+	mychans.chans = new MYCHAN[nworkers];
+
+	for (int i = 0; i < nworkers; i++)
+	{
+		mychans.chans[i].chan = channel_create(sizeof(void*), 1000);
+		mychans.chans[i].cmd  = cmd;
+	}
+
+	for (int i = 0; i < nworkers; i++)
+		fiber_create(fiber_redis_worker, &mychans.chans[i], 32000);
+
+	__fibers_count = __fibers_max;
+
+	for (int i = 0; i < __fibers_max; i++)
+		fiber_create(fiber_redis, &mychans, 32000);
+
+	fiber_schedule();
+
+	for (int i = 0; i < nworkers; i++)
+		channel_free(mychans.chans[i].chan);
+
+	delete [] mychans.chans;
+
+	return 0;
+}

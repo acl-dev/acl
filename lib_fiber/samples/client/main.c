@@ -5,38 +5,17 @@
 #include <unistd.h>
 #include "fiber/lib_fiber.h"
 
+static long long int __total_count = 0;
+static int __total_clients         = 0;
+static int __total_error_clients   = 0;
+
 static int __conn_timeout = 0;
 static int __rw_timeout   = 0;
 static int __max_loop     = 10000;
 static int __max_fibers   = 100;
 static int __left_fibers  = 100;
-static struct timeval __begin, __end;
-
-static void echo_client(ACL_VSTREAM *cstream)
-{
-	char  buf[8192];
-	int   ret, i;
-	const char *str = "hello world\r\n";
-
-	for (i = 0; i < __max_loop; i++) {
-		if (acl_vstream_writen(cstream, str, strlen(str))
-			== ACL_VSTREAM_EOF)
-		{
-			printf("write error: %s\r\n", acl_last_serror());
-			break;
-		}
-
-		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
-		if (ret == ACL_VSTREAM_EOF) {
-			printf("gets error: %s, i: %d\r\n", acl_last_serror(), i);
-			break;
-		}
-		buf[ret] = 0;
-		//printf("gets line: %s", buf);
-	}
-
-	acl_vstream_close(cstream);
-}
+static int __read_data    = 0;
+static struct timeval __begin;
 
 static double stamp_sub(const struct timeval *from, const struct timeval *sub_by)
 {
@@ -54,30 +33,84 @@ static double stamp_sub(const struct timeval *from, const struct timeval *sub_by
 	return (res.tv_sec * 1000.0 + res.tv_usec/1000.0);
 }
 
+static void echo_client(ACL_VSTREAM *cstream)
+{
+	char  buf[8192];
+	int   ret, i;
+	const char *str = "hello world\r\n";
+
+	for (i = 0; i < __max_loop; i++) {
+		if (acl_vstream_writen(cstream, str, strlen(str))
+			== ACL_VSTREAM_EOF)
+		{
+			printf("write error: %s\r\n", acl_last_serror());
+			break;
+		}
+
+
+		if (!__read_data) {
+			__total_count++;
+			continue;
+		}
+
+		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
+		if (ret == ACL_VSTREAM_EOF) {
+			printf("gets error: %s, i: %d\r\n", acl_last_serror(), i);
+			break;
+		}
+
+		__total_count++;
+		//buf[ret] = 0;
+		//printf("gets line: %s", buf);
+	}
+
+	acl_vstream_close(cstream);
+}
+
 static void fiber_connect(FIBER *fiber acl_unused, void *ctx)
 {
 	const char *addr = (const char *) ctx;
 	ACL_VSTREAM *cstream = acl_vstream_connect(addr, ACL_BLOCKING,
 			__conn_timeout, __rw_timeout, 4096);
-	if (cstream == NULL)
+	if (cstream == NULL) {
 		printf("connect %s error %s\r\n", addr, acl_last_serror());
-	else
+		__total_error_clients++;
+	} else {
+		__total_clients++;
+		printf("connect %s ok, clients: %d, fd: %d\r\n",
+			addr, __total_clients, ACL_VSTREAM_SOCK(cstream));
 		echo_client(cstream);
+	}
 
 	--__left_fibers;
 	printf("max_fibers: %d, left: %d\r\n", __max_fibers, __left_fibers);
 
 	if (__left_fibers == 0) {
 		double spent;
-		long long count = __max_loop * __max_fibers;
+		struct timeval end;
 
-		gettimeofday(&__end, NULL);
-		spent = stamp_sub(&__end, &__begin);
-		printf("fibers: %d, count: %lld, spent: %.2f, speed: %.2f\r\n",
-			__max_fibers, count, spent,
-			(count * 1000) / (spent > 0 ? spent : 1));
+		gettimeofday(&end, NULL);
+		spent = stamp_sub(&end, &__begin);
+
+		printf("fibers: %d, clients: %d, error: %d, count: %lld, "
+			"spent: %.2f, speed: %.2f\r\n", __max_fibers,
+			__total_clients, __total_error_clients,
+			__total_count, spent,
+			(__total_count * 1000) / (spent > 0 ? spent : 1));
 
 		fiber_io_stop();
+	}
+}
+
+static void fiber_main(FIBER *fiber acl_unused, void *ctx)
+{
+	char *addr = (char *) ctx;
+	int i;
+
+	for (i = 0; i < __max_fibers; i++)
+	{
+		fiber_create(fiber_connect, addr, 32768);
+		//fiber_sleep(1);
 	}
 }
 
@@ -88,19 +121,20 @@ static void usage(const char *procname)
 		" -t connt_timeout\r\n"
 		" -r rw_timeout\r\n"
 		" -c max_fibers\r\n"
+		" -w [if wait for echo data from server, dafault: no]\r\n"
 		" -n max_loop\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
-	int   ch, i;
+	int   ch;
 	char  addr[256];
        
 	acl_msg_stdout_enable(1);
 
 	snprintf(addr, sizeof(addr), "%s", "0.0.0.0:9002");
 
-	while ((ch = getopt(argc, argv, "hc:n:s:t:r:")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:n:s:t:r:w")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -121,6 +155,9 @@ int main(int argc, char *argv[])
 		case 's':
 			snprintf(addr, sizeof(addr), "%s", optarg);
 			break;
+		case 'w':
+			__read_data = 1;
+			break;
 		default:
 			break;
 		}
@@ -128,8 +165,7 @@ int main(int argc, char *argv[])
 
 	gettimeofday(&__begin, NULL);
 
-	for (i = 0; i < __max_fibers; i++)
-		fiber_create(fiber_connect, addr, 32768);
+	fiber_create(fiber_main, addr, 32768);
 
 	printf("call fiber_schedule\r\n");
 

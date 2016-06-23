@@ -132,8 +132,13 @@ bool file_tmpl::create_common()
 	return files_copy(name, tab);
 }
 
-bool file_tmpl::file_copy(const char* from, const char* to)
+bool file_tmpl::file_copy(const char* from, const char* to_in)
 {
+	string to_buf;
+	to_buf.format("%s/%s", path_to_.c_str(), to_in);
+
+	const char* to = to_buf.c_str();
+
 	if (strcasecmp(from, to) == 0)
 	{
 		printf("from(%s) == to(%s)\r\n", from, to);
@@ -177,14 +182,15 @@ bool file_tmpl::files_copy(const char* name, const FILE_FROM_TO* tab)
 
 	from = "tmpl/Makefile.in";
 	to.format("%s/Makefile.in", path_to_.c_str());
-	if (file_copy(from.c_str(), to.c_str()) == false)
+
+	if (file_copy(from.c_str(), "Makefile.in") == false)
 		return false;
 
 	for (size_t i = 0; tab[i].from != NULL; i++)
 	{
 		from.format("%s/%s", path_from_.c_str(), tab[i].from);
-		to.format("%s/%s", path_to_.c_str(), tab[i].to);
-		if (file_copy(from, to) == false)
+		//to.format("%s/%s", path_to_.c_str(), tab[i].to);
+		if (file_copy(from, tab[i].to) == false)
 		{
 			printf("create %s failed!\r\n", name);
 			return false;

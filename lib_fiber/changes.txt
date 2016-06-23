@@ -1,4 +1,25 @@
 
+10) 2016.6.22
+10.1) feature: fiber_server.c 服务模块支持空闲超时退出及处理连接数达上限退出
+
+9) 2016.6.21
+9.1) feature: 将非 socket 类型的 fd 采用同步模式
+9.2) feature: master_fiber.c 支持 dispatch 方式获得客户端连接
+
+8) 2016.6.19
+8.1) feature: 增加了 FIBER 锁功能
+8.2) feature: 增加 fiber_server.c 模块，可由 acl_master 服务器框架控制
+
+7) 2016.6.18
+7.1) feature: 增加了 FIBER_CHANNEL 用于协程间的交互通信
+
+6) 2016.6.15
+6.1) feature: 增加定时器功能 -- fiber_create_timer()
+
+5) 2016.6.14
+5.1) feature: hook 了 errno 所依赖的函数 __errno_location，从而使 errno 针对
+每个协程是安全的
+
 4) 2016.6.11
 4.1) valgrind: 增加编译开关以防止 valgrind 工具对 swapcontext 跳转的误报
 

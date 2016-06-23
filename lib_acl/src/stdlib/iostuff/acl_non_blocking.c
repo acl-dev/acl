@@ -61,12 +61,16 @@ int acl_non_blocking(ACL_SOCKET fd, int on)
 		return -1;
 	}
 #elif defined(ACL_UNIX)
-	if ((flags = fcntl(fd, F_GETFL, 0)) == -1) {
-		acl_msg_error("fcntl(fd, F_GETFL) failed");
+	if ((flags = fcntl(fd, F_GETFL)) == -1) {
+		acl_msg_error("%s(%d), %s: fcntl(%d, F_GETFL) error: %s",
+			__FILE__, __LINE__, __FUNCTION__,
+			fd, acl_last_serror());
 		return -1;
 	}
 	if (fcntl(fd, F_SETFL, on ? flags | nonb : flags & ~nonb) < 0) {
-		acl_msg_error("fcntl(fd, F_SETL, nonb) failed");
+		acl_msg_error("%s(%d), %s: fcntl(%d, F_SETL, nonb) error: %s",
+			__FILE__, __LINE__, __FUNCTION__,
+			fd, acl_last_serror());
 		return -1;
 	}
 #elif defined(ACL_WINDOWS)

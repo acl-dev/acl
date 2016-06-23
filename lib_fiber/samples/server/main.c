@@ -6,12 +6,13 @@
 #include "fiber/lib_fiber.h"
 
 static int __rw_timeout = 0;
+static int __echo_data  = 0;
 
 static void echo_client(FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *cstream = (ACL_VSTREAM *) ctx;
 	char  buf[8192];
-	int   ret;
+	int   ret, count = 0;
 
 	cstream->rw_timeout = __rw_timeout;
 
@@ -20,16 +21,24 @@ static void echo_client(FIBER *fiber acl_unused, void *ctx)
 	while (1) {
 		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
 		if (ret == ACL_VSTREAM_EOF) {
-			printf("gets error, fd: %d\r\n", SOCK(cstream));
+			printf("gets error: %s, fd: %d, count: %d\r\n",
+				acl_last_serror(), SOCK(cstream), count);
 			break;
 		}
 		buf[ret] = 0;
 		//printf("gets line: %s", buf);
 
+		if (!__echo_data) {
+			count++;
+			continue;
+		}
+
 		if (acl_vstream_writen(cstream, buf, ret) == ACL_VSTREAM_EOF) {
 			printf("write error, fd: %d\r\n", SOCK(cstream));
 			break;
 		}
+
+		count++;
 	}
 
 	acl_vstream_close(cstream);
@@ -47,9 +56,8 @@ static void fiber_accept(FIBER *fiber acl_unused, void *ctx)
 			break;
 		}
 
-		printf("accept one\r\n");
+		printf("accept one, fd: %d\r\n", ACL_VSTREAM_SOCK(cstream));
 		fiber_create(echo_client, cstream, 32768);
-		printf("accept one over\r\n");
 	}
 
 	acl_vstream_close(sstream);
@@ -81,32 +89,50 @@ static void fiber_sleep2_main(FIBER *fiber acl_unused, void *ctx acl_unused)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -r rw_timeout -S [if sleep]\r\n", procname);
+	printf("usage: %s -h [help]\r\n"
+		"  -s listen_addr\r\n"
+		"  -r rw_timeout\r\n"
+		"  -S [if sleep]\r\n"
+		"  -q listen_queue\r\n"
+		"  -w [if echo data, default: no]\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
-	const char *addr = "0.0.0.0:9002";
+	char addr[64];
 	ACL_VSTREAM *sstream;
-	int   ch, enable_sleep = 0;
+	int   ch, enable_sleep = 0, qlen = 128;
 
-	while ((ch = getopt(argc, argv, "hr:S")) > 0) {
+	acl_msg_stdout_enable(1);
+
+	snprintf(addr, sizeof(addr), "%s", "127.0.0.1:9002");
+
+	while ((ch = getopt(argc, argv, "hs:r:Sq:w")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 's':
+			snprintf(addr, sizeof(addr), "%s", optarg);
+			break;
 		case 'r':
 			__rw_timeout = atoi(optarg);
 			break;
 		case 'S':
 			enable_sleep = 1;
 			break;
+		case 'q':
+			qlen = atoi(optarg);
+			break;
+		case 'w':
+			__echo_data = 1;
+			break;
 		default:
 			break;
 		}
 	}
 
-	sstream = acl_vstream_listen(addr, 128);
+	sstream = acl_vstream_listen(addr, qlen);
 	if (sstream == NULL) {
 		printf("acl_vstream_listen error %s\r\n", acl_last_serror());
 		return 1;

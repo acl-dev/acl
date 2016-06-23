@@ -2176,7 +2176,7 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 		/* xxx: 对于带有读写超时的流，需要先将 socket 设为非阻塞模式，
 		 * 否则在写大数据包时会造成阻塞，超时作用失效
 		 */
-		if (rw_timeout > 0)
+		if (rw_timeout > 0 && acl_getsocktype(fd) >= 0)
 			acl_non_blocking(fd, ACL_NON_BLOCKING);
 	}
 

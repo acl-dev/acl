@@ -34,6 +34,7 @@ static void fiber_io(FIBER *fiber acl_unused, void *ctx acl_unused)
 
 int main(void)
 {
+	acl_msg_stdout_enable(1);
 	fiber_create(fiber_io, NULL, 320000);
 	fiber_schedule();
 

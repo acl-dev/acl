@@ -146,7 +146,7 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
   */
 static int __daemon_mode = 0;
 static int __client_count;
-static int __use_count;
+static unsigned __use_count;
 static int __use_limit_delay = 1;
 static int __listen_disabled = 0;
 static int __aborting = 0;
@@ -442,8 +442,8 @@ static void server_use_timer(int type, ACL_EVENT *event, void *ctx)
 		acl_msg_fatal("%s: invalid acl_var_threads_use_limit: %d",
 			myname, acl_var_threads_use_limit);
 
-	if (__use_count >= acl_var_threads_use_limit) {
-		acl_msg_info("%s: use limit reached(%d, %d) -- exiting",
+	if ((int) __use_count >= acl_var_threads_use_limit) {
+		acl_msg_info("%s: use limit reached(%u, %d) -- exiting",
 			myname, __use_count, acl_var_threads_use_limit);
 		server_exiting(type, event, ctx);
 	} else
@@ -937,7 +937,7 @@ static int dispatch_report(void)
 		return -1;
 	}
 
-	snprintf(buf, sizeof(buf), "count=%d&used=%d&pid=%u&type=%s"
+	snprintf(buf, sizeof(buf), "count=%d&used=%u&pid=%u&type=%s"
 		"&max_threads=%d&curr_threads=%d&busy_threads=%d&qlen=%d\r\n",
 		get_client_count(), __use_count, (unsigned) getpid(),
 		acl_var_threads_dispatch_type,

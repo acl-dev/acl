@@ -44,6 +44,29 @@ static bool create_threads(file_tmpl& tmpl)
 	return tmpl.files_copy(name, tab);
 }
 
+static bool create_fiber(file_tmpl& tmpl)
+{
+	string file(tmpl.get_project_name());
+	file << ".cf";
+	if (tmpl.copy_and_replace("master_fiber.cf", file.c_str()) == false)
+		return false;
+
+	const char* name = "master_fiber";
+	const FILE_FROM_TO tab[] = {
+		{ "main_fiber.cpp", "main.cpp" },
+		{ "master_fiber.h", "master_service.h" },
+		{ "master_fiber.cpp", "master_service.cpp" },
+		{ "stdafx_fiber.h", "stdafx.h" },
+		{ "http_servlet.h", "http_servlet.h" },
+		{ NULL, NULL }
+	};
+
+	return tmpl.files_copy(name, tab)
+		&& tmpl.copy_and_replace("Makefile_fiber", "Makefile")
+		&& tmpl.file_copy("tmpl/Makefile_fiber.in",
+			"Makefile.in");
+}
+
 static bool create_proc(file_tmpl& tmpl)
 {
 	string file(tmpl.get_project_name());
@@ -67,6 +90,7 @@ static bool create_service(file_tmpl& tmpl)
 {
 	printf("choose master_service type:\r\n");
 	printf("	t: for master_threads\r\n"
+		"	f: for master_fiber\r\n"
 		"	p: for master_proc\r\n");
 	printf(">");
 	fflush(stdout);
@@ -79,6 +103,8 @@ static bool create_service(file_tmpl& tmpl)
 		create_threads(tmpl);
 	else if (strcasecmp(buf, "p") == 0)
 		create_proc(tmpl);
+	else if (strcasecmp(buf, "f") == 0)
+		create_fiber(tmpl);
 	else
 	{
 		printf("invalid: %s\r\n", buf);
@@ -151,8 +177,8 @@ void http_creator()
 			break;
 		else if (strcasecmp(buf, "s") == 0)
 		{
-			create_http_servlet(tmpl);
 			tmpl.create_common();
+			create_http_servlet(tmpl);
 		}
 		else
 			printf("unknown flag: %s\r\n", buf);
