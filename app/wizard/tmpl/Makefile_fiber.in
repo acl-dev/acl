@@ -85,7 +85,8 @@ endif
 CFLAGS += -I../../../lib_acl/include \
 	  -I../../../lib_protocol/include \
 	  -I../../../lib_acl_cpp/include \
-	  -I../../../lib_fiber/include
+	  -I../../../lib_fiber/c/include \
+	  -I../../../lib_fiber/cpp/include
 EXTLIBS =
 LDFLAGS = -L../../../lib_fiber/lib -l_fiber_cpp -l_fiber \
 	  -L../../../lib_acl_cpp/lib -l_acl_cpp \

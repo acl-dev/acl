@@ -42,21 +42,35 @@ master_service::~master_service(void)
 
 void master_service::on_accept(acl::socket_stream& conn)
 {
-	acl_msg_info(">>>accept connection: %d", conn.sock_handle());
+	logger(">>>accept connection: %d", conn.sock_handle());
 	conn.set_rw_timeout(0);
+
+	acl::string buf;
+
+	while (true)
+	{
+		if (conn.gets(buf, false) == false)
+			break;
+
+		if (conn.write(buf) == -1)
+		{
+			logger_error("write error!");
+			break;
+		}
+	}
 }
 
 void master_service::proc_pre_jail(void)
 {
-	acl_msg_info(">>>proc_pre_jail<<<");
+	logger(">>>proc_pre_jail<<<");
 }
 
 void master_service::proc_on_init(void)
 {
-	acl_msg_info(">>>proc_on_init<<<");
+	logger(">>>proc_on_init<<<");
 }
 
 void master_service::proc_on_exit(void)
 {
-	acl_msg_info(">>>proc_on_exit<<<");
+	logger(">>>proc_on_exit<<<");
 }

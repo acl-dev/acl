@@ -101,7 +101,7 @@ ACL_INC    = $(ACL_PATH)/include
 ACL_LIB    = $(ACL_PATH)/lib
 
 FIBER_PATH = ../../../lib_fiber
-FIBER_INC  = $(FIBER_PATH)/include
+FIBER_INC  = $(FIBER_PATH)/c/include
 FIBER_LIB  = $(FIBER_PATH)/lib
 
 EXTLIBS =
