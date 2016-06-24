@@ -1,1 +1,0 @@
-#include "stdafx.hpp"
