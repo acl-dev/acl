@@ -10,6 +10,11 @@ typedef enum {
 	FIBER_STATUS_EXITING,
 } fiber_status_t;
 
+typedef struct {
+	void  *ctx;
+	void (*free_fn)(void *);
+} FIBER_LOCAL;
+
 struct FIBER {
 #ifdef USE_VALGRIND
 	unsigned int   vid;
@@ -23,6 +28,9 @@ struct FIBER {
 	int            sys;
 	unsigned int   flag;
 #define FIBER_F_SAVE_ERRNO	1 << 0
+
+	FIBER_LOCAL  **locals;
+	int            nlocal;
 
 	ucontext_t     uctx;
 	void         (*fn)(FIBER *, void *);

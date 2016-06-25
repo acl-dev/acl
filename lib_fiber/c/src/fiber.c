@@ -16,8 +16,8 @@ static errno_fn __sys_errno = NULL;
 static fcntl_fn __sys_fcntl = NULL;
 
 typedef struct {
-	ACL_RING queue;
-	ACL_RING dead;     //dead fiber queue
+	ACL_RING queue;		/* ready fiber queue */
+	ACL_RING dead;		/* dead fiber queue */
 	FIBER  **fibers;
 	size_t   size;
 	int      exitcode;
@@ -219,8 +219,9 @@ union cc_arg
 
 static void fiber_start(unsigned int x, unsigned int y)
 {
-	union cc_arg arg;
+	union  cc_arg arg;
 	FIBER *fiber;
+	int i;
 
 	arg.i[0] = x;
 	arg.i[1] = y;
@@ -228,6 +229,18 @@ static void fiber_start(unsigned int x, unsigned int y)
 	fiber = (FIBER *) arg.p;
 
 	fiber->fn(fiber, fiber->arg);
+
+	for (i = 0; i < fiber->nlocal; i++) {
+		if (fiber->locals[i]->free_fn)
+			fiber->locals[i]->free_fn(fiber->locals[i]->ctx);
+	}
+
+	if (fiber->locals) {
+		acl_myfree(fiber->locals);
+		fiber->locals = NULL;
+		fiber->nlocal = 0;
+	}
+
 	fiber_exit(0);
 }
 
@@ -241,9 +254,9 @@ static FIBER *fiber_alloc(void (*fn)(FIBER *, void *), void *arg, size_t size)
 	fiber_check();
 
 	head = acl_ring_pop_head(&__thread_fiber->dead);
-	if (head == NULL) {
+	if (head == NULL)
 		fiber = (FIBER *) acl_mycalloc(1, sizeof(FIBER) + size);
-	} else if ((fiber = ACL_RING_TO_APPL(head, FIBER, me))->size < size) {
+	else if ((fiber = ACL_RING_TO_APPL(head, FIBER, me))->size < size) {
 		fiber_free(fiber);
 		fiber = (FIBER *) acl_mycalloc(1, sizeof(FIBER) + size);
 	} else
@@ -421,4 +434,42 @@ void fiber_switch(void)
 	__thread_fiber->running = fiber;
 	__thread_fiber->switched++;
 	fiber_swap(current, __thread_fiber->running);
+}
+
+int fiber_set_specific(void *ctx, void (*free_fn)(void *))
+{
+	FIBER_LOCAL *local;
+	FIBER *curr;
+	int key;
+
+	if (__thread_fiber == NULL || __thread_fiber->running == NULL)
+		return -1;
+
+	curr = __thread_fiber->running;
+
+	key = curr->nlocal;
+	local = (FIBER_LOCAL *) acl_mymalloc(sizeof(FIBER_LOCAL));
+	local->ctx = ctx;
+	local->free_fn = free_fn;
+
+	if (curr->nlocal % 64 == 0)
+		curr->locals = (FIBER_LOCAL **) acl_myrealloc(curr->locals,
+			(curr->nlocal + 64) * sizeof(FIBER_LOCAL*));
+	curr->locals[curr->nlocal++] = local;
+
+	return key;
+}
+
+void *fiber_get_specific(int key)
+{
+	FIBER *curr;
+
+	if (__thread_fiber == NULL || __thread_fiber->running == NULL)
+		return NULL;
+
+	curr = __thread_fiber->running;
+	if (key >= curr->nlocal || key < 0)
+		return NULL;
+
+	return curr->locals[key];
 }

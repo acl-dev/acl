@@ -118,6 +118,23 @@ void fiber_reset_timer(FIBER *timer, unsigned int milliseconds);
  */
 void fiber_set_dns(const char* ip, int port);
 
+/* for fiber specific */
+
+/**
+ * 设定当前协程的局部变量
+ * @param ctx {void *} 协程局部变量
+ * @param free_fn {void (*)(void*)} 当协程退出时会调用此函数释放协程局部变量
+ * @return {int} 返回所设置的协程局部变量的键值，返回 -1 表示当前协程不存在
+ */
+int fiber_set_specific(void *ctx, void (*free_fn)(void *));
+
+/**
+ * 获得当前协程局部变量
+ * @param key {int} 由 fiber_set_specific 返回的键值
+ * @retur {void*} 返回 NULL 表示不存在
+ */
+void *fiber_get_specific(int key);
+
 /* fiber locking */
 
 /**
