@@ -401,6 +401,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stdlib\acl_mbox.c"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stdlib\acl_meter_time.c"
 					>
 				</File>
@@ -664,6 +668,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\src\stdlib\sys\acl_sane_socketpair.c"
+						>
+					</File>
+					<File
 						RelativePath=".\src\stdlib\sys\acl_sys_file.c"
 						>
 					</File>
@@ -708,10 +716,6 @@
 						</File>
 						<File
 							RelativePath=".\src\stdlib\sys\unix\acl_safe_open.c"
-							>
-						</File>
-						<File
-							RelativePath=".\src\stdlib\sys\unix\acl_sane_socketpair.c"
 							>
 						</File>
 						<File
@@ -1918,6 +1922,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\stdlib\acl_mbox.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\stdlib\acl_mem_hook.h"
 					>
 				</File>
@@ -2074,10 +2082,6 @@
 					</File>
 					<File
 						RelativePath=".\include\stdlib\unix\acl_safe_open.h"
-						>
-					</File>
-					<File
-						RelativePath=".\include\stdlib\unix\acl_sane_socketpair.h"
 						>
 					</File>
 					<File

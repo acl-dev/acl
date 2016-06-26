@@ -5,14 +5,11 @@
 extern "C" {
 #endif
 
-#include "../acl_define.h"
-#ifdef ACL_UNIX
+#include "acl_define.h"
 
  /* External interface. */
 
-int acl_sane_socketpair(int domain, int type, int protocol, int result[2]);
-
-#endif /* ACL_UNIX */
+int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2]);
 
 #ifdef  __cplusplus
 }

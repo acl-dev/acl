@@ -9,7 +9,6 @@ extern "C" {
 #include "acl_timed_wait.h"
 #include "acl_set_ugid.h"
 #include "acl_set_eugid.h"
-#include "acl_sane_socketpair.h"
 #include "acl_mychown.h"
 #include "acl_chroot_uid.h"
 #include "acl_safe_open.h"

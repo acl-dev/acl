@@ -345,8 +345,8 @@ static void fiber_init(void)
 	__sys_errno = (errno_fn) dlsym(RTLD_NEXT, "__errno_location");
 	__sys_fcntl = (fcntl_fn) dlsym(RTLD_NEXT, "fcntl");
 
-	fiber_io_hook();
-	fiber_net_hook();
+	fiber_hook_io();
+	fiber_hook_net();
 }
 
 void fiber_schedule(void)

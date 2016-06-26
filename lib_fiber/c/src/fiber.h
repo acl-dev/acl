@@ -103,15 +103,18 @@ void fiber_count_inc(void);
 void fiber_count_dec(void);
 
 /* in fiber_io.c */
-void fiber_io_hook(void);
 void fiber_io_check(void);
+void fiber_io_close(int fd);
 void fiber_wait_read(int fd);
 void fiber_wait_write(int fd);
 void fiber_io_dec(void);
 void fiber_io_inc(void);
 EVENT *fiber_io_event(void);
 
+/* in hook_io.c */
+void fiber_hook_io(void);
+
 /* in fiber_net.c */
-void fiber_net_hook(void);
+void fiber_hook_net(void);
 
 #endif

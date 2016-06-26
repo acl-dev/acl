@@ -80,6 +80,8 @@ extern "C" {
 #include "acl_yqueue.h"
 #include "acl_ypipe.h"
 
+#include "acl_mbox.h"
+
 #ifdef	__cplusplus
 }
 #endif

@@ -191,6 +191,9 @@
     <ClCompile Include=".\src\stdlib\acl_getopt.c">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include=".\src\stdlib\acl_mbox.c">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
     <ClCompile Include=".\src\stdlib\acl_meter_time.c">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
@@ -393,9 +396,6 @@
       <Filter>Source Files\stdlib\sys\unix</Filter>
     </ClCompile>
     <ClCompile Include=".\src\stdlib\sys\unix\acl_safe_open.c">
-      <Filter>Source Files\stdlib\sys\unix</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\stdlib\sys\unix\acl_sane_socketpair.c">
       <Filter>Source Files\stdlib\sys\unix</Filter>
     </ClCompile>
     <ClCompile Include=".\src\stdlib\sys\unix\acl_set_eugid.c">
@@ -935,6 +935,9 @@
     <ClCompile Include="src\stdlib\acl_atomic.c">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\sys\acl_sane_socketpair.c">
+      <Filter>Source Files\stdlib\sys</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl.rc">
@@ -1209,6 +1212,9 @@
     <ClInclude Include=".\include\stdlib\acl_malloc.h">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
+    <ClInclude Include=".\include\stdlib\acl_mbox.h">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_mem_hook.h">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
@@ -1318,9 +1324,6 @@
       <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_safe_open.h">
-      <Filter>Header Files\stdlib\unix</Filter>
-    </ClInclude>
-    <ClInclude Include=".\include\stdlib\unix\acl_sane_socketpair.h">
       <Filter>Header Files\stdlib\unix</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\unix\acl_set_eugid.h">
@@ -1552,6 +1555,9 @@
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\stdlib\acl_yqueue.h">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stdlib\acl_sane_socketpair.h">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
   </ItemGroup>

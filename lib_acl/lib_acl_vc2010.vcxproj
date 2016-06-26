@@ -224,6 +224,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include=".\src\stdlib\acl_debug.c" />
     <ClCompile Include=".\src\stdlib\acl_file.c" />
     <ClCompile Include=".\src\stdlib\acl_getopt.c" />
+    <ClCompile Include=".\src\stdlib\acl_mbox.c" />
     <ClCompile Include=".\src\stdlib\acl_meter_time.c" />
     <ClCompile Include=".\src\stdlib\acl_msg.c" />
     <ClCompile Include=".\src\stdlib\acl_myflock.c" />
@@ -281,6 +282,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include=".\src\stdlib\sys\acl_exec_command.c" />
     <ClCompile Include=".\src\stdlib\sys\acl_process.c" />
     <ClCompile Include=".\src\stdlib\sys\acl_safe_getenv.c" />
+    <ClCompile Include=".\src\stdlib\sys\acl_sane_socketpair.c" />
     <ClCompile Include=".\src\stdlib\sys\acl_sys_file.c" />
     <ClCompile Include=".\src\stdlib\sys\acl_sys_socket.c" />
     <ClCompile Include=".\src\stdlib\sys\acl_unsafe.c" />
@@ -292,7 +294,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include=".\src\stdlib\sys\unix\acl_mychown.c" />
     <ClCompile Include=".\src\stdlib\sys\unix\acl_open_lock.c" />
     <ClCompile Include=".\src\stdlib\sys\unix\acl_safe_open.c" />
-    <ClCompile Include=".\src\stdlib\sys\unix\acl_sane_socketpair.c" />
     <ClCompile Include=".\src\stdlib\sys\unix\acl_set_eugid.c" />
     <ClCompile Include=".\src\stdlib\sys\unix\acl_set_ugid.c" />
     <ClCompile Include=".\src\stdlib\sys\unix\acl_timed_wait.c" />
@@ -569,6 +570,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\include\stdlib\acl_loadcfg.h" />
     <ClInclude Include=".\include\stdlib\acl_make_dirs.h" />
     <ClInclude Include=".\include\stdlib\acl_malloc.h" />
+    <ClInclude Include=".\include\stdlib\acl_mbox.h" />
     <ClInclude Include=".\include\stdlib\acl_mem_hook.h" />
     <ClInclude Include=".\include\stdlib\acl_mem_slice.h" />
     <ClInclude Include=".\include\stdlib\acl_meter_time.h" />
@@ -606,7 +608,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\include\stdlib\unix\acl_mychown.h" />
     <ClInclude Include=".\include\stdlib\unix\acl_open_lock.h" />
     <ClInclude Include=".\include\stdlib\unix\acl_safe_open.h" />
-    <ClInclude Include=".\include\stdlib\unix\acl_sane_socketpair.h" />
     <ClInclude Include=".\include\stdlib\unix\acl_set_eugid.h" />
     <ClInclude Include=".\include\stdlib\unix\acl_set_ugid.h" />
     <ClInclude Include=".\include\stdlib\unix\acl_timed_wait.h" />

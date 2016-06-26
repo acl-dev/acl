@@ -10,18 +10,20 @@
 #include "fiber.h"
 
 typedef int (*socket_fn)(int, int, int);
+typedef int (*socketpair_fn)(int, int, int, int sv[2]);
 typedef int (*bind_fn)(int, const struct sockaddr *, socklen_t);
 typedef int (*listen_fn)(int, int);
 typedef int (*accept_fn)(int, struct sockaddr *, socklen_t *);
 typedef int (*connect_fn)(int, const struct sockaddr *, socklen_t);
 
-static socket_fn   __sys_socket   = NULL;
-static bind_fn     __sys_bind     = NULL;
-static listen_fn   __sys_listen   = NULL;
-static accept_fn   __sys_accept   = NULL;
-static connect_fn  __sys_connect  = NULL;
+static socket_fn     __sys_socket   = NULL;
+static socketpair_fn __sys_socketpair = NULL;
+static bind_fn       __sys_bind     = NULL;
+static listen_fn     __sys_listen   = NULL;
+static accept_fn     __sys_accept   = NULL;
+static connect_fn    __sys_connect  = NULL;
 
-void fiber_net_hook(void)
+void fiber_hook_net(void)
 {
 	static int __called = 0;
 
@@ -30,11 +32,12 @@ void fiber_net_hook(void)
 
 	__called++;
 
-	__sys_socket   = (socket_fn) dlsym(RTLD_NEXT, "socket");
-	__sys_bind     = (bind_fn) dlsym(RTLD_NEXT, "bind");
-	__sys_listen   = (listen_fn) dlsym(RTLD_NEXT, "listen");
-	__sys_accept   = (accept_fn) dlsym(RTLD_NEXT, "accept");
-	__sys_connect  = (connect_fn) dlsym(RTLD_NEXT, "connect");
+	__sys_socket     = (socket_fn) dlsym(RTLD_NEXT, "socket");
+	__sys_socketpair = (socketpair_fn) dlsym(RTLD_NEXT, "socketpair");
+	__sys_bind       = (bind_fn) dlsym(RTLD_NEXT, "bind");
+	__sys_listen     = (listen_fn) dlsym(RTLD_NEXT, "listen");
+	__sys_accept     = (accept_fn) dlsym(RTLD_NEXT, "accept");
+	__sys_connect    = (connect_fn) dlsym(RTLD_NEXT, "connect");
 }
 
 int socket(int domain, int type, int protocol)
@@ -46,6 +49,15 @@ int socket(int domain, int type, int protocol)
 	else
 		fiber_save_errno();
 	return sockfd;
+}
+
+int socketpair(int domain, int type, int protocol, int sv[2])
+{
+	int ret = __sys_socketpair(domain, type, protocol, sv);
+
+	if (ret < 0)
+		fiber_save_errno();
+	return ret;
 }
 
 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)

@@ -193,6 +193,17 @@ ACL_API acl_int64 acl_file_size(const char *filename);
  */
 ACL_API acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp, void *arg);
 
+/**
+ * 创建 SOCKET 对
+ * @param domain {int}
+ * @param type {int}
+ * @param protocol {int}
+ * @param result {ACL_SOCKET [2]} 存储结果
+ * @return {int} 成功返回 0，失败返回 -1
+ */
+ACL_API int acl_sane_socketpair(int domain, int type, int protocol,
+		ACL_SOCKET result[2]);
+
 # ifdef	__cplusplus
 }
 # endif
