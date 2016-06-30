@@ -105,7 +105,7 @@ FIBER_INC  = $(FIBER_PATH)/c/include
 FIBER_LIB  = $(FIBER_PATH)/lib
 
 EXTLIBS =
-CFLAGS += -I$(ACL_INC) -I$(FIBER_INC)
+CFLAGS += -I.. -I$(ACL_INC) -I$(FIBER_INC)
 LDFLAGS = -L$(ACL_LIB) -L$(FIBER_LIB) -l_fiber -l_acl $(EXTLIBS) $(SYSLIB)
 
 ###########################################################

@@ -22,16 +22,19 @@ static void *thread_producer(void *arg)
 static void *thread_consumer(void *arg)
 {
 	ACL_YPIPE *ypipe = (ACL_YPIPE*) arg;
-	int   i;
+	int   i, n = 0;
 
 	for (i = 0; i < __max; i++) {
 		char *ptr = (char*) acl_ypipe_read(ypipe);
-		if (ptr == NULL) {
+		if (ptr != NULL)
+			n++;
+		else {
+			i--;
 			//printf("ptr NULL, i: %d\r\n", i);
 		}
 	}
 
-	printf("i: %d\r\n", i);
+	printf("i: %d, n: %d\r\n", i, n);
 	return NULL;
 }
 

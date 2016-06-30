@@ -317,6 +317,12 @@ int event_process(EVENT *ev, int left)
 		tv.tv_usec = (ev->timeout - tv.tv_sec * 1000) * 1000;
 	}
 
+	/* limit the event wait time just for fiber schedule exiting
+	 * quickly when no tasks left
+	 */
+	if (tv.tv_sec > 1)
+		tv.tv_sec = 1;
+
 	tvp = &tv;
 
 	ndefer = ev->ndefer;

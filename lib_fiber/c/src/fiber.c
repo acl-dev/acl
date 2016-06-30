@@ -31,8 +31,14 @@ typedef struct {
 
 static FIBER_TLS *__main_fiber = NULL;
 static __thread FIBER_TLS *__thread_fiber = NULL;
+__thread int acl_var_hook_sys_api = 1;
 
 static acl_pthread_key_t __fiber_key;
+
+void fiber_hook_api(int onoff)
+{
+	acl_var_hook_sys_api = onoff;
+}
 
 static void thread_free(void *ctx)
 {
@@ -92,6 +98,9 @@ static void fiber_check(void)
 /* see /usr/include/bits/errno.h for __errno_location */
 int *__errno_location(void)
 {
+	if (!acl_var_hook_sys_api)
+		return __sys_errno();
+
 	if (__thread_fiber == NULL)
 		fiber_check();
 
@@ -137,6 +146,7 @@ int fcntl(int fd, int cmd, ...)
 
 	if (ret < 0)
 		fiber_save_errno();
+
 	return ret;
 }
 

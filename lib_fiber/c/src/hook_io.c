@@ -84,6 +84,9 @@ int pipe(int pipefd[2])
 {
 	int ret = __sys_pipe(pipefd);
 
+	if (!acl_var_hook_sys_api)
+		return ret;
+
 	if (ret < 0)
 		fiber_save_errno();
 	return ret;
@@ -94,6 +97,9 @@ int pipe2(int pipefd[2], int flags)
 {
 	int ret = __sys_pipe2(pipefd, flags);
 
+	if (!acl_var_hook_sys_api)
+		return ret;
+
 	if (ret < 0)
 		fiber_save_errno();
 	return ret;
@@ -103,6 +109,9 @@ int pipe2(int pipefd[2], int flags)
 FILE *popen(const char *command, const char *type)
 {
 	FILE *fp = __sys_popen(command, type);
+
+	if (!acl_var_hook_sys_api)
+		return fp;
 
 	if (fp == NULL)
 		fiber_save_errno();
@@ -117,6 +126,9 @@ int close(int fd)
 		acl_msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
 		return -1;
 	}
+
+	if (!acl_var_hook_sys_api)
+		return __sys_close(fd);
 
 	fiber_io_close(fd);
 
@@ -141,6 +153,9 @@ ssize_t read(int fd, void *buf, size_t count)
 		return -1;
 	}
 
+	if (!acl_var_hook_sys_api)
+		return __sys_read(fd, buf, count);
+
 	fiber_wait_read(fd);
 
 	ret = __sys_read(fd, buf, count);
@@ -160,6 +175,9 @@ ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
 		return -1;
 	}
 
+	if (!acl_var_hook_sys_api)
+		return readv(fd, iov, iovcnt);
+
 	fiber_wait_read(fd);
 	ret = __sys_readv(fd, iov, iovcnt);
 	if (ret > 0)
@@ -177,6 +195,9 @@ ssize_t recv(int sockfd, void *buf, size_t len, int flags)
 		acl_msg_error("%s: invalid sockfd: %d", __FUNCTION__, sockfd);
 		return -1;
 	}
+
+	if (!acl_var_hook_sys_api)
+		return __sys_recv(sockfd, buf, len, flags);
 
 	fiber_wait_read(sockfd);
 	ret = __sys_recv(sockfd, buf, len, flags);
@@ -197,6 +218,10 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
 		return -1;
 	}
 
+	if (!acl_var_hook_sys_api)
+		return __sys_recvfrom(sockfd, buf, len,
+				flags, src_addr, addrlen);
+
 	fiber_wait_read(sockfd);
 	ret = __sys_recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
 	if (ret > 0)
@@ -215,6 +240,9 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 		return -1;
 	}
 
+	if (!acl_var_hook_sys_api)
+		return __sys_recvmsg(sockfd, msg, flags);
+
 	fiber_wait_read(sockfd);
 	ret = __sys_recvmsg(sockfd, msg, flags);
 	if (ret > 0)
@@ -230,6 +258,9 @@ ssize_t read(int fd, void *buf, size_t count)
 {
 	while (1) {
 		ssize_t n = __sys_read(fd, buf, count);
+
+		if (!acl_var_hook_sys_api)
+			return n;
 
 		if (n >= 0)
 			return n;
@@ -251,6 +282,9 @@ ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
 	while (1) {
 		ssize_t n = __sys_readv(fd, iov, iovcnt);
 
+		if (!acl_var_hook_sys_api)
+			return n;
+
 		if (n >= 0)
 			return n;
 
@@ -271,6 +305,9 @@ ssize_t recv(int sockfd, void *buf, size_t len, int flags)
 {
 	while (1) {
 		ssize_t n = __sys_recv(sockfd, buf, len, flags);
+
+		if (!acl_var_hook_sys_api)
+			return n;
 
 		if (n >= 0)
 			return n;
@@ -295,6 +332,9 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
 		ssize_t n = __sys_recvfrom(sockfd, buf, len, flags,
 				src_addr, addrlen);
 
+		if (!acl_var_hook_sys_api)
+			return n;
+
 		if (n >= 0)
 			return n;
 
@@ -316,6 +356,9 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 	while (1) {
 		ssize_t n = __sys_recvmsg(sockfd, msg, flags);
 
+		if (!acl_var_hook_sys_api)
+			return n;
+
 		if (n >= 0)
 			return n;
 
@@ -332,12 +375,15 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 	}
 }
 
-#endif
+#endif  /* READ_WAIT_FIRST */
 
 ssize_t write(int fd, const void *buf, size_t count)
 {
 	while (1) {
 		ssize_t n = __sys_write(fd, buf, count);
+
+		if (!acl_var_hook_sys_api)
+			return n;
 
 		if (n >= 0)
 			return n;
@@ -360,6 +406,9 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
 	while (1) {
 		ssize_t n = __sys_writev(fd, iov, iovcnt);
 
+		if (!acl_var_hook_sys_api)
+			return n;
+
 		if (n >= 0)
 			return n;
 
@@ -380,6 +429,9 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 {
 	while (1) {
 		ssize_t n = __sys_send(sockfd, buf, len, flags);
+
+		if (!acl_var_hook_sys_api)
+			return n;
 
 		if (n >= 0)
 			return n;
@@ -404,6 +456,9 @@ ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
 		ssize_t n = __sys_sendto(sockfd, buf, len, flags,
 				dest_addr, addrlen);
 
+		if (!acl_var_hook_sys_api)
+			return n;
+
 		if (n >= 0)
 			return n;
 
@@ -424,6 +479,9 @@ ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags)
 {
 	while (1) {
 		ssize_t n = __sys_sendmsg(sockfd, msg, flags);
+
+		if (!acl_var_hook_sys_api)
+			return n;
 
 		if (n >= 0)
 			return n;

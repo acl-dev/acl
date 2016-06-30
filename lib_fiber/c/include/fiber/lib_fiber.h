@@ -11,6 +11,12 @@ extern "C" {
 typedef struct FIBER FIBER;
 
 /**
+ * 设置是否需要 hook 系统中的 IO 相关的 API，内部缺省值为 1
+ * @param onoff {int} 是否需要 hook
+ */
+void fiber_hook_api(int onoff);
+
+/**
  * 创建一个协程
  * @param fn {void (*)(FIBER*, void*)} 协程运行时的回调函数地址
  * @param arg {void*} 回调 fn 函数时的第二个参数

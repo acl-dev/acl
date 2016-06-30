@@ -19,9 +19,12 @@ CHANNEL* channel_create(int elemsize, int bufsize)
 void channel_free(CHANNEL *c)
 {
 	if(c != NULL) {
-		acl_myfree(c->name);
-		acl_myfree(c->arecv.a);
-		acl_myfree(c->asend.a);
+		if (c->name)
+			acl_myfree(c->name);
+		if (c->arecv.a)
+			acl_myfree(c->arecv.a);
+		if (c->asend.a)
+			acl_myfree(c->asend.a);
 		acl_myfree(c);
 	}
 }
@@ -67,6 +70,7 @@ static int alt_can_exec(FIBER_ALT *a)
 
 	if (a->op == CHANNOP)
 		return 0;
+
 	c = a->c;
 	if (c->bufsize == 0) {
 		ar = channel_array(c, otherop(a->op));
@@ -97,10 +101,9 @@ static void alt_dequeue(FIBER_ALT *a)
 	unsigned int i;
 
 	ar = channel_array(a->c, a->op);
-	if (ar == NULL){
-		fprintf(stderr, "bad use of altdequeue op=%d\n", a->op);
-		abort();
-	}
+	if (ar == NULL)
+		acl_msg_fatal("%s(%d), %s: bad use of altdequeue op=%d",
+			__FILE__, __LINE__, __FUNCTION__, a->op);
 
 	for (i = 0; i < ar->n; i++) {
 		if (ar->a[i] == a) {
@@ -109,15 +112,15 @@ static void alt_dequeue(FIBER_ALT *a)
 		}
 	}
 
-	fprintf(stderr, "cannot find self in altdq\n");
-	abort();
+	acl_msg_fatal("%s(%d), %s: cannot find self in altdq",
+		__FILE__, __LINE__, __FUNCTION__);
 }
 
-static void alt_all_dequeue(FIBER_ALT *a)
+static void alt_all_dequeue(FIBER_ALT a[])
 {
 	int i;
 
-	for ( i = 0; a[i].op != CHANEND && a[i].op != CHANNOBLK; i++) {
+	for (i = 0; a[i].op != CHANEND && a[i].op != CHANNOBLK; i++) {
 		if (a[i].op != CHANNOP)
 			alt_dequeue(&a[i]);
 	}
@@ -143,7 +146,6 @@ static void amove(void *dst, void *src, unsigned int n)
  */
 static void alt_copy(FIBER_ALT *s, FIBER_ALT *r)
 {
-	FIBER_ALT *t;
 	CHANNEL *c;
 	unsigned char *cp;
 
@@ -152,15 +154,19 @@ static void alt_copy(FIBER_ALT *s, FIBER_ALT *r)
 	 */
 	if (s == NULL && r == NULL)
 		return;
+
 	assert(s != NULL);
 	c = s->c;
+
 	if (s->op == CHANRCV) {
-		t = s;
+		FIBER_ALT *t = s;
+
 		s = r;
 		r = t;
 	}
-	assert(s==NULL || s->op == CHANSND);
-	assert(r==NULL || r->op == CHANRCV);
+
+	assert(s == NULL || s->op == CHANSND);
+	assert(r == NULL || r->op == CHANRCV);
 
 	/*
 	 * CHANNEL is empty (or unbuffered) - copy directly.
@@ -174,7 +180,7 @@ static void alt_copy(FIBER_ALT *s, FIBER_ALT *r)
 	 * Otherwise it's always okay to receive and then send.
 	 */
 	if (r) {
-		cp = c->buf + c->off*c->elemsize;
+		cp = c->buf + c->off * c->elemsize;
 		amove(r->v, cp, c->elemsize);
 		--c->nbuf;
 		if (++c->off == c->bufsize)
@@ -200,7 +206,6 @@ static void alt_exec(FIBER_ALT *a)
 
 	if (ar && ar->n) {
 		i = rand() % ar->n;
-		printf("...i: %d, n: %d\r\n", i, ar->n);
 		other = ar->a[i];
 		alt_copy(a, other);
 		alt_all_dequeue(other->xalt);
@@ -213,7 +218,7 @@ static void alt_exec(FIBER_ALT *a)
 
 #define dbgalt 0
 
-static int channel_alt(FIBER_ALT *a)
+static int channel_alt(FIBER_ALT a[])
 {
 	int i, j, ncan, n, canblock;
 	CHANNEL *c;
@@ -239,9 +244,8 @@ static int channel_alt(FIBER_ALT *a)
 	for (i = 0; i < n; i++) {
 		c = a[i].c;
 
-		if (dbgalt)
-			printf(" %c:", "esrnb"[a[i].op]);
 		if (dbgalt) {
+			printf(" %c:", "esrnb"[a[i].op]);
 			if (c->name)
 				printf("%s", c->name);
 			else

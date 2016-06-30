@@ -4,28 +4,13 @@
 #include <string.h>
 #include <unistd.h>
 #include "fiber/lib_fiber.h"
+#include "stamp.h"
 
 static int __max_loop = 1000;
 static int __max_fiber = 1000;
 
 static __thread struct timeval __begin;
 static __thread int __left_fiber = 1000;
-
-static double stamp_sub(const struct timeval *from, const struct timeval *sub_by)
-{
-	struct timeval res;
-
-	memcpy(&res, from, sizeof(struct timeval));
-
-	res.tv_usec -= sub_by->tv_usec;
-	if (res.tv_usec < 0) {
-		--res.tv_sec;
-		res.tv_usec += 1000000;
-	}
-	res.tv_sec -= sub_by->tv_sec;
-
-	return (res.tv_sec * 1000.0 + res.tv_usec/1000.0);
-}
 
 static void fiber_main(FIBER *fiber, void *ctx acl_unused)
 {

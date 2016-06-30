@@ -5,52 +5,57 @@
 #include <unistd.h>
 #include "fiber/lib_fiber.h"
 
-static unsigned long __max = 10;
+static int __max = 10;
+static int __nsend = 0;
+static int __nread = 0;
+static int __display = 10;
 
 static void fiber_producer(FIBER *fiber, void *ctx)
 {
 	CHANNEL *chan = (CHANNEL *) ctx;
-	unsigned long  i;
 
-	for (i = 0; i < __max; i++) {
-		int ret = channel_sendul(chan, i);
+	while (__nsend < __max) {
+		int ret = channel_sendul(chan, __nsend);
+		__nsend++;
+
 		if (ret <= 0) {
 			printf("fiber-%d, channel_sendul error!\r\n",
 				fiber_id(fiber));
 			break;
 		}
 
-		if (i < 10)
-			printf(">>fiber-%d, send: %lu %s\r\n",
-				fiber_id(fiber), i, ret > 0 ? "ok" : "error");
+		if (__nsend < __display)
+			printf(">>fiber-%d, send: %d %s\r\n",
+				fiber_id(fiber), __nsend,
+				ret > 0 ? "ok" : "error");
 	}
 }
 
 static void fiber_consumer(FIBER *fiber, void *ctx)
 {
 	CHANNEL *chan = (CHANNEL *) ctx;
-	unsigned long i;
 
-	for (i = 0; i < __max; i++) {
+	while (__nread < __max) {
 		unsigned long n = channel_recvul(chan);
-		if (i < 10)
+		__nread++;
+
+		if (__nread < __display)
 			printf(">>fiber-%d, recv: %lu\r\n", fiber_id(fiber), n);
 	}
-
-	channel_free(chan);
 }
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -n count\r\n", procname);
+	printf("usage: %s -h [help] -n count -s nsenders -r nreceivers"
+		" -b buf_size -d display_count\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
-	int   ch;
+	int   ch, i, nsenders = 1, nreceivers = 1, nbuf = 10;
 	CHANNEL *chan;
 
-	while ((ch = getopt(argc, argv, "hn:")) > 0) {
+	while ((ch = getopt(argc, argv, "hn:s:r:b:d:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -58,19 +63,36 @@ int main(int argc, char *argv[])
 		case 'n':
 			__max = (unsigned long) atol(optarg);
 			break;
+		case 's':
+			nsenders = atoi(optarg);
+			break;
+		case 'r':
+			nreceivers = atoi(optarg);
+			break;
+		case 'b':
+			nbuf = atoi(optarg);
+			break;
+		case 'd':
+			__display = atoi(optarg);
+			break;
 		default:
 			break;
 		}
 	}
 
-	printf("max_count: %lu\r\n", __max);
+	printf("max_count: %d\r\n", __max);
 
-	chan = channel_create(sizeof(unsigned long), 100);
+	chan = channel_create(sizeof(unsigned long), nbuf);
 
-	fiber_create(fiber_consumer, chan, 32000);
-	fiber_create(fiber_producer, chan, 32000);
+	for (i = 0; i < nsenders; i++)
+		fiber_create(fiber_producer, chan, 32000);
+
+	for (i = 0; i < nreceivers; i++)
+		fiber_create(fiber_consumer, chan, 32000);
 
 	fiber_schedule();
+
+	channel_free(chan);
 
 	return 0;
 }

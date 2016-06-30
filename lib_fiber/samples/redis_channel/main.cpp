@@ -1,4 +1,5 @@
 #include "stdafx.h"
+//#include "stamp.h"
 
 static int __fibers_count = 2;
 static int __fibers_max   = 2;
@@ -6,24 +7,6 @@ static int __oper_count = 100;
 //static struct timeval __begin, __end;
 
 static acl::redis_client_cluster __redis_cluster;
-
-#if 0
-static double stamp_sub(const struct timeval *from, const struct timeval *by)
-{
-	struct timeval res;
-
-	memcpy(&res, from, sizeof(struct timeval));
-
-	res.tv_usec -= by->tv_usec;
-	if (res.tv_usec < 0) {
-		--res.tv_sec;
-		res.tv_usec += 1000000;
-	}
-	res.tv_sec -= by->tv_sec;
-
-	return (res.tv_sec * 1000.0 + res.tv_usec/1000.0);
-}
-#endif
 
 typedef struct {
 	CHANNEL *chan;

@@ -18,6 +18,9 @@ all:
 	@(cd fiber_lock; make)
 	@(cd master_fiber; make)
 	@(cd master_proxy; make)
+	@(cd thread_mbox; make)
+	@(cd fiber_cpp; make)
+	@(cd channel_cpp; make)
 
 cl clean:
 	@(cd dns; make clean)
@@ -38,3 +41,6 @@ cl clean:
 	@(cd fiber_lock; make clean)
 	@(cd master_fiber; make clean)
 	@(cd master_proxy; make clean)
+	@(cd thread_mbox; make clean)
+	@(cd fiber_cpp; make clean)
+	@(cd channel_cpp; make clean)

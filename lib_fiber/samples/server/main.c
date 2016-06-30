@@ -69,7 +69,7 @@ static void fiber_sleep_main(FIBER *fiber acl_unused, void *ctx acl_unused)
 
 	while (1) {
 		time(&last);
-		sleep(1);
+		fiber_sleep(1);
 		time(&now);
 		printf("wakeup, cost %ld seconds\r\n", (long) now - last);
 	}
@@ -81,7 +81,7 @@ static void fiber_sleep2_main(FIBER *fiber acl_unused, void *ctx acl_unused)
 
 	while (1) {
 		time(&last);
-		sleep(3);
+		fiber_sleep(3);
 		time(&now);
 		printf(">>>wakeup, cost %ld seconds<<<\r\n", (long) now - last);
 	}
