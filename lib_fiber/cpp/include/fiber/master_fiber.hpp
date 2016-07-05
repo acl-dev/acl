@@ -39,7 +39,7 @@ protected:
 
 private:
 	static void service_main(ACL_VSTREAM*, void*);
-	static int service_on_accept(ACL_VSTREAM*);
+	static int  service_on_accept(ACL_VSTREAM*);
 	static void service_pre_jail(void*);
 	static void service_init(void*);
 	static void service_exit(void*);

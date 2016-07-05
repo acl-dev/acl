@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include "fiber/lib_fiber.h"
 
-static void fiber_io(FIBER *fiber acl_unused, void *ctx acl_unused)
+static void fiber_io(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
 	int   ret;
 	char  buf[8192];
@@ -29,14 +29,14 @@ static void fiber_io(FIBER *fiber acl_unused, void *ctx acl_unused)
 	} else
 		printf("read error: %s\r\n", acl_last_serror());
 
-	fiber_io_stop();
+	acl_fiber_io_stop();
 }
 
 int main(void)
 {
 	acl_msg_stdout_enable(1);
-	fiber_create(fiber_io, NULL, 320000);
-	fiber_schedule();
+	acl_fiber_create(fiber_io, NULL, 320000);
+	acl_fiber_schedule();
 
 	return 0;
 }

@@ -23,7 +23,7 @@ void master_fiber::run_daemon(int argc, char** argv)
 	has_called = true;
 	daemon_mode_ = true;
 
-	fiber_server_main(argc, argv, service_main, NULL,
+	acl_fiber_server_main(argc, argv, service_main, NULL,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
 		ACL_MASTER_SERVER_EXIT, service_exit,
@@ -55,7 +55,7 @@ bool master_fiber::run_alone(const char* addrs, const char* path /* = NULL */,
 		argv[argc++] = path;
 	}
 
-	fiber_server_main(argc, (char**) argv, service_main, NULL,
+	acl_fiber_server_main(argc, (char**) argv, service_main, NULL,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,

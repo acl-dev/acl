@@ -6,7 +6,7 @@ static int __fibers_max   = 2;
 static int __oper_count = 100;
 static struct timeval __begin, __end;
 
-static void fiber_redis(FIBER *fiber, void *ctx)
+static void fiber_redis(ACL_FIBER *fiber, void *ctx)
 {
 	acl::redis_client_cluster *cluster = (acl::redis_client_cluster *) ctx;
 	acl::redis cmd(cluster);
@@ -20,15 +20,15 @@ static void fiber_redis(FIBER *fiber, void *ctx)
 	gettimeofday(&last, NULL);
 
 	for (; i < __oper_count; i++) {
-		key.format("key-%d-%d", fiber_id(fiber), i);
-		val.format("val-%d-%d", fiber_id(fiber), i);
+		key.format("key-%d-%d", acl_fiber_id(fiber), i);
+		val.format("val-%d-%d", acl_fiber_id(fiber), i);
 		if (cmd.set(key, val) == false) {
 			printf("fiber-%d: set error: %s, key: %s\r\n",
-				fiber_id(fiber), cmd.result_error(), key.c_str());
+				acl_fiber_id(fiber), cmd.result_error(), key.c_str());
 			break;
 		} else if (i < 5)
 			printf("fiber-%d: set ok, key: %s\r\n",
-				fiber_id(fiber), key.c_str());
+				acl_fiber_id(fiber), key.c_str());
 		cmd.clear();
 	}
 
@@ -40,10 +40,10 @@ static void fiber_redis(FIBER *fiber, void *ctx)
 	gettimeofday(&last, NULL);
 
 	for (int j = 0; j < i; j++) {
-		key.format("key-%d-%d", fiber_id(fiber), j);
+		key.format("key-%d-%d", acl_fiber_id(fiber), j);
 		if (cmd.get(key, val) == false) {
 			printf("fiber-%d: get error: %s, key: %s\r\n",
-				fiber_id(fiber), cmd.result_error(), key.c_str());
+				acl_fiber_id(fiber), cmd.result_error(), key.c_str());
 			break;
 		}
 		val.clear();
@@ -58,10 +58,10 @@ static void fiber_redis(FIBER *fiber, void *ctx)
 	gettimeofday(&last, NULL);
 
 	for (int j = 0; j < i; j++) {
-		key.format("key-%d-%d", fiber_id(fiber), j);
+		key.format("key-%d-%d", acl_fiber_id(fiber), j);
 		if (cmd.del_one(key) < 0) {
 			printf("fiber-%d: del error: %s, key: %s\r\n",
-				fiber_id(fiber), cmd.result_error(), key.c_str());
+				acl_fiber_id(fiber), cmd.result_error(), key.c_str());
 			break;
 		}
 		cmd.clear();
@@ -80,7 +80,7 @@ static void fiber_redis(FIBER *fiber, void *ctx)
 		printf("fibers: %d, count: %lld, spent: %.2f, speed: %.2f\r\n",
 			__fibers_max, total, spent,
 			(total * 1000) / (spent > 0 ? spent : 1));
-		fiber_io_stop();
+		acl_fiber_io_stop();
 	}
 }
 
@@ -133,9 +133,9 @@ int main(int argc, char *argv[])
 	gettimeofday(&__begin, NULL);
 
 	for (i = 0; i < __fibers_count; i++)
-		fiber_create(fiber_redis, &cluster, 327680);
+		acl_fiber_create(fiber_redis, &cluster, 327680);
 
-	fiber_schedule();
+	acl_fiber_schedule();
 
 	return 0;
 }

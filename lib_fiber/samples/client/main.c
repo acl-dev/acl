@@ -52,7 +52,7 @@ static void echo_client(ACL_VSTREAM *cstream)
 	acl_vstream_close(cstream);
 }
 
-static void fiber_connect(FIBER *fiber acl_unused, void *ctx)
+static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	const char *addr = (const char *) ctx;
 	ACL_VSTREAM *cstream = acl_vstream_connect(addr, ACL_BLOCKING,
@@ -83,19 +83,19 @@ static void fiber_connect(FIBER *fiber acl_unused, void *ctx)
 			__total_count, spent,
 			(__total_count * 1000) / (spent > 0 ? spent : 1));
 
-		fiber_io_stop();
+		acl_fiber_io_stop();
 	}
 }
 
-static void fiber_main(FIBER *fiber acl_unused, void *ctx)
+static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	char *addr = (char *) ctx;
 	int i;
 
 	for (i = 0; i < __max_fibers; i++)
 	{
-		fiber_create(fiber_connect, addr, 32768);
-		//fiber_sleep(1);
+		acl_fiber_create(fiber_connect, addr, 32768);
+		//acl_fiber_sleep(1);
 	}
 }
 
@@ -150,11 +150,11 @@ int main(int argc, char *argv[])
 
 	gettimeofday(&__begin, NULL);
 
-	fiber_create(fiber_main, addr, 32768);
+	acl_fiber_create(fiber_main, addr, 32768);
 
 	printf("call fiber_schedule\r\n");
 
-	fiber_schedule();
+	acl_fiber_schedule();
 
 	return 0;
 }

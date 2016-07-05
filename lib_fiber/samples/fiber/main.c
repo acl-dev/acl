@@ -12,15 +12,16 @@ static int __max_fiber = 1000;
 static __thread struct timeval __begin;
 static __thread int __left_fiber = 1000;
 
-static void fiber_main(FIBER *fiber, void *ctx acl_unused)
+static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 {
 	int  i;
 
-	errno = fiber_id(fiber);
+	errno = acl_fiber_errno(fiber);
 	for (i = 0; i < __max_loop; i++) {
-		fiber_yield();
+		acl_fiber_yield();
 		if (i <= 2)
-			printf("fiber-%d, errno: %d\r\n", fiber_id(fiber), errno);
+			printf("fiber-%d, errno: %d\r\n",
+				acl_fiber_id(fiber), errno);
 	}
 
 	if (--__left_fiber == 0) {
@@ -45,9 +46,9 @@ static void *thread_main(void *ctx acl_unused)
 
 	printf("thread: %lu\r\n", (unsigned long) acl_pthread_self());
 	for (i = 0; i < __max_fiber; i++)
-		fiber_create(fiber_main, NULL, 32768);
+		acl_fiber_create(fiber_main, NULL, 32768);
 
-	fiber_schedule();
+	acl_fiber_schedule();
 
 	return NULL;
 }

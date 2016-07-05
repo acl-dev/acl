@@ -28,8 +28,9 @@ EVENT *event_create(int size)
 	 * vector with it.
 	 */
 	for (i = 0; i < size; i++) {
-		ev->events[i].mask  = EVENT_NONE;
-		ev->events[i].defer = NULL;
+		ev->events[i].mask        = EVENT_NONE;
+		ev->events[i].mask_fired  = EVENT_NONE;
+		ev->events[i].defer       = NULL;
 	}
 
 	return ev;
@@ -84,10 +85,9 @@ void event_poll(EVENT *ev, POLL_EVENTS *pe, int timeout)
 
 static int check_fdtype(int fd)
 {
-	struct stat buf;
+	struct stat s;
 
-	if (fstat(fd, &buf) < 0)
-	{
+	if (fstat(fd, &s) < 0) {
 		acl_msg_info("fd: %d fstat error", fd);
 		return -1;
 	}
@@ -95,19 +95,15 @@ static int check_fdtype(int fd)
 	/*
 	acl_msg_info("fd: %d, S_ISSOCK: %s, S_ISFIFO: %s, S_ISCHR: %s, "
 		"S_ISBLK: %s, S_ISREG: %s", fd,
-		S_ISSOCK(buf.st_mode) ? "yes" : "no",
-		S_ISFIFO(buf.st_mode) ? "yes" : "no",
-		S_ISCHR(buf.st_mode) ? "yes" : "no",
-		S_ISBLK(buf.st_mode) ? "yes" : "no",
-		S_ISREG(buf.st_mode) ? "yes" : "no");
+		S_ISSOCK(s.st_mode) ? "yes" : "no",
+		S_ISFIFO(s.st_mode) ? "yes" : "no",
+		S_ISCHR(s.st_mode) ? "yes" : "no",
+		S_ISBLK(s.st_mode) ? "yes" : "no",
+		S_ISREG(s.st_mode) ? "yes" : "no");
 	*/
 
-	if (S_ISSOCK(buf.st_mode)
-		|| S_ISFIFO(buf.st_mode)
-		|| S_ISCHR(buf.st_mode))
-	{
+	if (S_ISSOCK(s.st_mode) || S_ISFIFO(s.st_mode) || S_ISCHR(s.st_mode))
 		return 0;
-	}
 
 	return -1;
 
@@ -201,14 +197,14 @@ static void __event_del(EVENT *ev, int fd, int mask)
 		return;
 	}
 
-	fe          = &ev->events[fd];
-	fe->type    = TYPE_NONE;
-	fe->defer   = NULL;
-	fe->pevents = NULL;
-	fe->pfd     = NULL;
+	fe             = &ev->events[fd];
+	fe->type       = TYPE_NONE;
+	fe->defer      = NULL;
+	fe->pevents    = NULL;
+	fe->pfd        = NULL;
+	fe->mask_fired = EVENT_NONE;
 
-	if (fe->mask == EVENT_NONE)
-	{
+	if (fe->mask == EVENT_NONE) {
 		acl_msg_info("----mask NONE, fd: %d----", fd);
 		return;
 	}
@@ -283,14 +279,6 @@ void event_del(EVENT *ev, int fd, int mask)
 #endif
 }
 
-int event_mask(EVENT *ev, int fd)
-{
-	if (fd >= ev->setsize)
-		return 0;
-
-	return ev->events[fd].mask;
-}
-
 int event_process(EVENT *ev, int left)
 {
 	int processed = 0, numevents, j;
@@ -337,9 +325,10 @@ int event_process(EVENT *ev, int left)
 	numevents = ev->loop(ev, tvp);
 
 	for (j = 0; j < numevents; j++) {
-		fd   = ev->fired[j].fd;
-		mask = ev->fired[j].mask;
-		fe   = &ev->events[fd];
+		fd             = ev->fired[j].fd;
+		mask           = ev->fired[j].mask;
+		fe             = &ev->events[fd];
+		fe->mask_fired = mask;
 
 		if (fe->pevents != NULL) {
 			if (fe->mask & mask & EVENT_READABLE) {
@@ -386,4 +375,59 @@ int event_process(EVENT *ev, int left)
 
 	/* return the number of processed file/time events */
 	return processed;
+}
+
+int event_readable(EVENT *ev, int fd)
+{
+	if (fd >= ev->setsize) {
+		acl_msg_error("fd: %d >= setsize: %d", fd, ev->setsize);
+		errno = ERANGE;
+		return 0;
+	}
+
+	return ev->events[fd].mask_fired & EVENT_READABLE;
+}
+
+int event_writeable(EVENT *ev, int fd)
+{
+	if (fd >= ev->setsize) {
+		acl_msg_error("fd: %d >= setsize: %d", fd, ev->setsize);
+		errno = ERANGE;
+		return 0;
+	}
+
+	return ev->events[fd].mask_fired & EVENT_WRITABLE;
+}
+
+void event_clear_readable(EVENT *ev, int fd)
+{
+	if (fd >= ev->setsize) {
+		acl_msg_error("fd: %d >= setsize: %d", fd, ev->setsize);
+		errno = ERANGE;
+		return;
+	}
+
+	ev->events[fd].mask_fired &= ~EVENT_READABLE;
+}
+
+void event_clear_writeable(EVENT *ev, int fd)
+{
+	if (fd >= ev->setsize) {
+		acl_msg_error("fd: %d >= setsize: %d", fd, ev->setsize);
+		errno = ERANGE;
+		return;
+	}
+
+	ev->events[fd].mask_fired &= ~ EVENT_WRITABLE;
+}
+
+void event_clear(EVENT *ev, int fd)
+{
+	if (fd >= ev->setsize) {
+		acl_msg_error("fd: %d >= setsize: %d", fd, ev->setsize);
+		errno = ERANGE;
+		return;
+	}
+	
+	ev->events[fd].mask_fired = EVENT_NONE;
 }

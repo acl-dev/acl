@@ -37,7 +37,7 @@ static int http_client(ACL_VSTREAM *cstream, const char* res, size_t len)
 	return 0;
 }
 
-static void echo_client(FIBER *fiber acl_unused, void *ctx)
+static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *cstream = (ACL_VSTREAM *) ctx;
 	const char* res = "HTTP/1.1 200 OK\r\n"
@@ -58,7 +58,7 @@ static void echo_client(FIBER *fiber acl_unused, void *ctx)
 	acl_vstream_close(cstream);
 }
 
-static void fiber_accept(FIBER *fiber acl_unused, void *ctx)
+static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx;
 	int  fd;
@@ -72,7 +72,7 @@ static void fiber_accept(FIBER *fiber acl_unused, void *ctx)
 		}
 
 		fd = ACL_VSTREAM_SOCK(cstream);
-		fiber_create(echo_client, cstream, STACK_SIZE);
+		acl_fiber_create(echo_client, cstream, STACK_SIZE);
 		printf("accept one over: %d\r\n", fd);
 	}
 
@@ -84,9 +84,9 @@ static void usage(const char *procname)
 	printf("usage: %s -h [help] -s listen_addr -r rw_timeout\r\n", procname);
 }
 
-static void fiber_dummy(FIBER *fiber, void *ctx acl_unused)
+static void fiber_dummy(ACL_FIBER *fiber, void *ctx acl_unused)
 {
-	printf(">>>curr fiber: %d\r\n", fiber_id(fiber));
+	printf(">>>curr fiber: %d\r\n", acl_fiber_id(fiber));
 }
 
 int main(int argc, char *argv[])
@@ -119,16 +119,16 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	fiber_create(fiber_dummy, NULL, 1024000);
-	fiber_create(fiber_dummy, NULL, 1024000);
+	acl_fiber_create(fiber_dummy, NULL, 1024000);
+	acl_fiber_create(fiber_dummy, NULL, 1024000);
 
 	printf("listen %s ok\r\n", addr);
 
 	printf("%s: call fiber_creater\r\n", __FUNCTION__);
-	fiber_create(fiber_accept, sstream, STACK_SIZE);
+	acl_fiber_create(fiber_accept, sstream, STACK_SIZE);
 
 	printf("call fiber_schedule\r\n");
-	fiber_schedule();
+	acl_fiber_schedule();
 
 	return 0;
 }

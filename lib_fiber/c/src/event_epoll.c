@@ -1,8 +1,29 @@
 #include "stdafx.h"
+#define __USE_GNU
+#include <dlfcn.h>
 #include <sys/epoll.h>
 #include "fiber.h"
 #include "event.h"
 #include "event_epoll.h"
+
+typedef int (*epoll_wait_fn)(int, struct epoll_event *,int, int);
+typedef int (*epoll_ctl_fn)(int, int, int, struct epoll_event *);
+
+static epoll_wait_fn __sys_epoll_wait = NULL;
+static epoll_ctl_fn  __sys_epoll_ctl  = NULL;
+
+void hook_epoll(void)
+{
+	static int __called = 0;
+
+	if (__called)
+		return;
+
+	__called++;
+
+	__sys_epoll_wait = (epoll_wait_fn) dlsym(RTLD_NEXT, "epoll_wait");
+	__sys_epoll_ctl  = (epoll_ctl_fn) dlsym(RTLD_NEXT, "epoll_ctl");
+}
 
 typedef struct EVENT_EPOLL {
 	EVENT event;
@@ -52,7 +73,7 @@ static int epoll_event_add(EVENT *ev, int fd, int mask)
 #endif
 #endif
 
-	if (epoll_ctl(ep->epfd, op, fd, &ee) == -1) {
+	if (__sys_epoll_ctl(ep->epfd, op, fd, &ee) == -1) {
 		fiber_save_errno();
 		acl_msg_error("%s, %s(%d): epoll_ctl error %s",
 			__FILE__, __FUNCTION__, __LINE__, acl_last_serror());
@@ -79,7 +100,7 @@ static void epoll_event_del(EVENT *ev, int fd, int delmask)
 		ee.events |= EPOLLOUT;
 
 	if (mask != EVENT_NONE) {
-		if (epoll_ctl(ep->epfd, EPOLL_CTL_MOD, fd, &ee) < 0) {
+		if (__sys_epoll_ctl(ep->epfd, EPOLL_CTL_MOD, fd, &ee) < 0) {
 			fiber_save_errno();
 			acl_msg_error("%s(%d), epoll_ctl error: %s, fd: %d",
 				__FUNCTION__, __LINE__, acl_last_serror(), fd);
@@ -88,7 +109,7 @@ static void epoll_event_del(EVENT *ev, int fd, int delmask)
 		/* Note, Kernel < 2.6.9 requires a non null event pointer
 		 * even for EPOLL_CTL_DEL.
 		 */
-		if (epoll_ctl(ep->epfd, EPOLL_CTL_DEL, fd, &ee) < 0) {
+		if (__sys_epoll_ctl(ep->epfd, EPOLL_CTL_DEL, fd, &ee) < 0) {
 			fiber_save_errno();
 			acl_msg_error("%s(%d), epoll_ctl error: %s, fd: %d",
 				__FUNCTION__, __LINE__, acl_last_serror(), fd);
@@ -102,7 +123,7 @@ static int epoll_event_loop(EVENT *ev, struct timeval *tv)
 	int retval, j, mask;
 	struct epoll_event *e;
 
-	retval = epoll_wait(ep->epfd, ep->epoll_events, ev->setsize,
+	retval = __sys_epoll_wait(ep->epfd, ep->epoll_events, ev->setsize,
 			tv ? (tv->tv_sec * 1000 + tv->tv_usec / 1000) : -1);
 
 	if (retval <= 0)

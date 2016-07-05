@@ -8,27 +8,27 @@
 static int __rw_timeout = 0;
 
 typedef struct {
-	FIBER *fiber;
-	FIBER *timer;
+	ACL_FIBER *fiber;
+	ACL_FIBER *timer;
 	ACL_VSTREAM *conn;
 } FIBER_TIMER;
 
-static void io_timer(FIBER *fiber, void *ctx)
+static void io_timer(ACL_FIBER *fiber, void *ctx)
 {
 	FIBER_TIMER *ft = (FIBER_TIMER *) ctx;
 
 	assert(fiber == ft->timer);
 
-	fiber_set_errno(ft->fiber, ETIMEDOUT);
+	acl_fiber_set_errno(ft->fiber, ETIMEDOUT);
 
 	printf("timer-%d wakeup, set fiber-%d, errno: %d, %d\r\n",
-		fiber_id(fiber), fiber_id(ft->fiber),
-		ETIMEDOUT, fiber_errno(ft->fiber));
+		acl_fiber_id(fiber), acl_fiber_id(ft->fiber),
+		ETIMEDOUT, acl_fiber_errno(ft->fiber));
 
-	fiber_ready(ft->fiber);
+	acl_fiber_ready(ft->fiber);
 }
 
-static void echo_client(FIBER *fiber, void *ctx)
+static void echo_client(ACL_FIBER *fiber, void *ctx)
 {
 	ACL_VSTREAM *cstream = (ACL_VSTREAM *) ctx;
 	char  buf[8192];
@@ -37,7 +37,7 @@ static void echo_client(FIBER *fiber, void *ctx)
 	FIBER_TIMER *ft = (FIBER_TIMER *) acl_mymalloc(sizeof(FIBER_TIMER));
 
 	ft->fiber = fiber;
-	ft->timer = fiber_create_timer(__rw_timeout * 1000, io_timer, ft);
+	ft->timer = acl_fiber_create_timer(__rw_timeout * 1000, io_timer, ft);
 	ft->conn  = cstream;
 
 #define	SOCK ACL_VSTREAM_SOCK
@@ -47,8 +47,8 @@ static void echo_client(FIBER *fiber, void *ctx)
 
 		if (ret == ACL_VSTREAM_EOF) {
 			printf("fiber-%d, gets error: %s, %d, %d, fd: %d, "
-				"count: %d\r\n", fiber_id(fiber),
-				acl_last_serror(), errno, fiber_errno(fiber),
+				"count: %d\r\n", acl_fiber_id(fiber),
+				acl_last_serror(), errno, acl_fiber_errno(fiber),
 				SOCK(cstream), count);
 
 			if (errno != ETIMEDOUT)
@@ -58,11 +58,11 @@ static void echo_client(FIBER *fiber, void *ctx)
 				break;
 
 			printf("ntimeout: %d\r\n", ntimeout);
-			ft->timer = fiber_create_timer(__rw_timeout * 1000,
+			ft->timer = acl_fiber_create_timer(__rw_timeout * 1000,
 					io_timer, ft);
 		}
 
-		fiber_reset_timer(ft->timer, __rw_timeout * 1000);
+		acl_fiber_reset_timer(ft->timer, __rw_timeout * 1000);
 		buf[ret] = 0;
 		//printf("gets line: %s", buf);
 
@@ -78,7 +78,7 @@ static void echo_client(FIBER *fiber, void *ctx)
 	acl_vstream_close(cstream);
 }
 
-static void fiber_accept(FIBER *fiber acl_unused, void *ctx)
+static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx;
 
@@ -91,31 +91,31 @@ static void fiber_accept(FIBER *fiber acl_unused, void *ctx)
 		}
 
 		printf("accept one, fd: %d\r\n", ACL_VSTREAM_SOCK(cstream));
-		fiber_create(echo_client, cstream, 32768);
+		acl_fiber_create(echo_client, cstream, 32768);
 	}
 
 	acl_vstream_close(sstream);
 }
 
-static void fiber_sleep_main(FIBER *fiber acl_unused, void *ctx acl_unused)
+static void fiber_sleep_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
 	time_t last, now;
 
 	while (1) {
 		time(&last);
-		fiber_sleep(1);
+		acl_fiber_sleep(1);
 		time(&now);
 		printf("wakeup, cost %ld seconds\r\n", (long) now - last);
 	}
 }
 
-static void fiber_sleep2_main(FIBER *fiber acl_unused, void *ctx acl_unused)
+static void fiber_sleep2_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
 	time_t last, now;
 
 	while (1) {
 		time(&last);
-		fiber_sleep(3);
+		acl_fiber_sleep(3);
 		time(&now);
 		printf(">>>wakeup, cost %ld seconds<<<\r\n", (long) now - last);
 	}
@@ -173,15 +173,15 @@ int main(int argc, char *argv[])
 	acl_non_blocking(ACL_VSTREAM_SOCK(sstream), ACL_NON_BLOCKING);
 
 	printf("%s: call fiber_creater\r\n", __FUNCTION__);
-	fiber_create(fiber_accept, sstream, 32768);
+	acl_fiber_create(fiber_accept, sstream, 32768);
 
 	if (enable_sleep) {
-		fiber_create(fiber_sleep_main, NULL, 32768);
-		fiber_create(fiber_sleep2_main, NULL, 32768);
+		acl_fiber_create(fiber_sleep_main, NULL, 32768);
+		acl_fiber_create(fiber_sleep2_main, NULL, 32768);
 	}
 
 	printf("call fiber_schedule\r\n");
-	fiber_schedule();
+	acl_fiber_schedule();
 
 	return 0;
 }

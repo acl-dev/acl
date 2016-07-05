@@ -1,6 +1,6 @@
 #pragma once
 
-struct FIBER;
+struct ACL_FIBER;
 
 namespace acl {
 
@@ -71,9 +71,9 @@ public:
 
 	/**
 	 * 返回本协程对象对应的 C 语言的协程对象
-	 * @return {FIBER *}
+	 * @return {ACL_FIBER *}
 	 */
-	FIBER *get_fiber(void) const;
+	ACL_FIBER *get_fiber(void) const;
 
 	/**
 	 * 线程启动后调用此函数设置当前线程是否需要 hook 系统 API，内部缺省
@@ -90,9 +90,9 @@ protected:
 	virtual void run(void) = 0;
 
 private:
-	FIBER *f_;
+	ACL_FIBER *f_;
 
-	static void fiber_callback(FIBER *f, void *ctx);
+	static void fiber_callback(ACL_FIBER *f, void *ctx);
 };
 
 } // namespace acl

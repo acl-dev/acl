@@ -46,5 +46,5 @@ private:
 	struct timeval begin_;
 	acl::redis_client_cluster cluster_;
 
-	static void fiber_redis(FIBER *fiber, void *ctx);
+	static void fiber_redis(ACL_FIBER *fiber, void *ctx);
 };

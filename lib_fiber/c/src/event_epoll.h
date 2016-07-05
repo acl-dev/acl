@@ -3,6 +3,7 @@
 
 #include "event.h"
 
+void hook_epoll(void);
 EVENT *event_epoll_create(int setsize);
 
 #endif

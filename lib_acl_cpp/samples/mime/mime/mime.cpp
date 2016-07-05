@@ -127,7 +127,17 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 
 	ACL_METER_TIME("---------------parse end  --------------------");
 
-	pBody = mime.get_body_node(htmlFirst, true, "iso-2022-jp");
+	const char* ctype = mime.get_ctype();
+	bool is_text;
+	if (!strcasecmp(ctype, "multipart") ||  !strcasecmp(ctype, "text"))
+		is_text = true;
+	else
+		is_text = false;
+
+	if (is_text)
+		pBody = mime.get_body_node(htmlFirst, true, "iso-2022-jp");
+	else
+		pBody = mime.get_body_node(htmlFirst, false, NULL);
 
 	//////////////////////////////////////////////////////////////////////
 
@@ -171,7 +181,7 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 	//////////////////////////////////////////////////////////////////////
 
 	// 将邮件正文内容以 utf-8 存在磁盘上
-	if (pBody)
+	if (pBody && is_text)
 	{
 		printf("\r\n");
 		ACL_METER_TIME("---------------save_body begin--------------------");

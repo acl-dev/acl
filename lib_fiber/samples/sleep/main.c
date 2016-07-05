@@ -7,23 +7,23 @@
 
 static int __fibers_count = 2;
 
-static void sleep_main(FIBER *fiber, void *ctx)
+static void sleep_main(ACL_FIBER *fiber, void *ctx)
 {
 	int *n = (int *) ctx;
 	time_t last, now;
 
-	printf("fiber-%d: begin sleep %d\r\n", fiber_id(fiber), *n);
+	printf("fiber-%d: begin sleep %d\r\n", acl_fiber_id(fiber), *n);
 	time(&last);
-	*n = (int) fiber_sleep(*n);
+	*n = (int) acl_fiber_sleep(*n);
 	time(&now);
 
 	printf("fiber-%d: wakup, n: %d, sleep: %ld\r\n",
-		fiber_id(fiber), *n, (long) (now - last));
+		acl_fiber_id(fiber), *n, (long) (now - last));
 
 	acl_myfree(n);
 
 	if (--__fibers_count == 0)
-		fiber_io_stop();
+		acl_fiber_io_stop();
 }
 
 static void usage(const char *procname)
@@ -53,10 +53,10 @@ int main(int argc, char *argv[])
 	for (i = 1; i <= __fibers_count; i++) {
 		int *n = (int *) acl_mymalloc(sizeof(int));
 		*n = i;
-		fiber_create(sleep_main, n, 32768);
+		acl_fiber_create(sleep_main, n, 32768);
 	}
 
-	fiber_schedule();
+	acl_fiber_schedule();
 
 	return 0;
 }

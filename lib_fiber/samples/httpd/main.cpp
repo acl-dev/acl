@@ -6,7 +6,7 @@
 #define	 STACK_SIZE	32000
 static int __rw_timeout = 0;
 
-static void http_server(FIBER *, void *ctx)
+static void http_server(ACL_FIBER *, void *ctx)
 {
 	acl::socket_stream *conn = (acl::socket_stream *) ctx;
 
@@ -27,7 +27,7 @@ static void http_server(FIBER *, void *ctx)
 	delete conn;
 }
 
-static void fiber_accept(FIBER *, void *ctx)
+static void fiber_accept(ACL_FIBER *, void *ctx)
 {
 	const char* addr = (const char* ) ctx;
 	acl::server_socket server;
@@ -51,7 +51,7 @@ static void fiber_accept(FIBER *, void *ctx)
 
 		client->set_rw_timeout(__rw_timeout);
 		printf("accept one: %d\r\n", client->sock_handle());
-		fiber_create(http_server, client, STACK_SIZE);
+		acl_fiber_create(http_server, client, STACK_SIZE);
 	}
 
 	exit (0);
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	fiber_create(fiber_accept, addr.c_str(), STACK_SIZE);
+	acl_fiber_create(fiber_accept, addr.c_str(), STACK_SIZE);
 
-	fiber_schedule();
+	acl_fiber_schedule();
 }

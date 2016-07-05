@@ -39,11 +39,11 @@ static void *thread_main(void *ctx)
 
 static void free_msg(void *msg)
 {
-	printf("---fiber-%d: free one ---\r\n", fiber_self());
+	printf("---fiber-%d: free one ---\r\n", acl_fiber_self());
 	acl_myfree(msg);
 }
 
-static void fiber_main(FIBER *fiber acl_unused, void *ctx)
+static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_MBOX *mbox = (ACL_MBOX *) ctx;
 	acl_pthread_attr_t attr;
@@ -86,7 +86,7 @@ static void fiber_main(FIBER *fiber acl_unused, void *ctx)
 		fflush(stdout);
 		getchar();
 
-		fiber_io_stop();
+		acl_fiber_io_stop();
 	}
 }
 
@@ -123,10 +123,10 @@ int main(int argc, char *argv[])
 
 	for (i = 0; i < __fibers_max; i++) {
 		ACL_MBOX *mbox = acl_mbox_create();
-		fiber_create(fiber_main, mbox, 64000);
+		acl_fiber_create(fiber_main, mbox, 64000);
 	}
 
-	fiber_schedule();
+	acl_fiber_schedule();
 
 	return 0;
 }

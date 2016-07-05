@@ -8,7 +8,7 @@ static char  __dns_ip[256];
 static int   __dns_port = 53;
 static int   __count = 0;
 
-static void nslookup(FIBER *fiber acl_unused, void *ctx)
+static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	const char *name = (const char *)ctx;
 
@@ -45,7 +45,7 @@ static void nslookup(FIBER *fiber acl_unused, void *ctx)
 	printf("__count: %d\r\n", __count);
 
 	if (__count == 0)
-		fiber_io_stop();
+		acl_fiber_io_stop();
 }
 
 static void usage(const char *procname)
@@ -92,10 +92,10 @@ int main(int argc, char *argv[])
 
 	acl_foreach(iter, tokens) {
 		char* addr = (char* ) iter.data;
-		fiber_create(nslookup, addr, 8192);
+		acl_fiber_create(nslookup, addr, 8192);
 	}
 
-	fiber_schedule();
+	acl_fiber_schedule();
 
 	acl_argv_free(tokens);
 

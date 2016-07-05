@@ -18,7 +18,7 @@ static int __left_fibers  = 100;
 static int __read_data    = 0;
 static struct timeval __begin;
 
-static void http_client(FIBER *fiber, const char* addr)
+static void http_client(ACL_FIBER *fiber, const char* addr)
 {
 	acl::string body;
 	acl::http_request req(addr, 0, 0);
@@ -43,7 +43,7 @@ static void http_client(FIBER *fiber, const char* addr)
 
 		if (i < 1)
 			printf(">>>fiber-%d: body: %s\r\n",
-				fiber_id(fiber), body.c_str());
+				acl_fiber_id(fiber), body.c_str());
 
 		__total_count++;
 		body.clear();
@@ -51,7 +51,7 @@ static void http_client(FIBER *fiber, const char* addr)
 	}
 }
 
-static void fiber_connect(FIBER *fiber, void *ctx)
+static void fiber_connect(ACL_FIBER *fiber, void *ctx)
 {
 	const char *addr = (const char *) ctx;
 
@@ -73,17 +73,17 @@ static void fiber_connect(FIBER *fiber, void *ctx)
 			__total_count, spent,
 			(__total_count * 1000) / (spent > 0 ? spent : 1));
 
-		fiber_io_stop();
+		acl_fiber_io_stop();
 	}
 }
 
-static void fiber_main(FIBER *fiber acl_unused, void *ctx)
+static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	char *addr = (char *) ctx;
 	int i;
 
 	for (i = 0; i < __max_fibers; i++)
-		fiber_create(fiber_connect, addr, 32768);
+		acl_fiber_create(fiber_connect, addr, 32768);
 }
 
 static void usage(const char *procname)
@@ -137,11 +137,11 @@ int main(int argc, char *argv[])
 
 	gettimeofday(&__begin, NULL);
 
-	fiber_create(fiber_main, addr, 32768);
+	acl_fiber_create(fiber_main, addr, 32768);
 
 	printf("call fiber_schedule\r\n");
 
-	fiber_schedule();
+	acl_fiber_schedule();
 
 	return 0;
 }

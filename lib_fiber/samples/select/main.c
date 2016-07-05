@@ -6,31 +6,35 @@
 
 static  int  __nfibers = 0;
 
-static void poll_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
+static void select_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
 {
 	int  in = 0, fd = dup(in), n;
-	struct pollfd pfd;
+	fd_set rset;
+	struct timeval tv;
 
-	memset(&pfd, 0, sizeof(pfd));
 	acl_non_blocking(fd, ACL_NON_BLOCKING);
-	pfd.fd = fd;
-	pfd.events = POLLIN;
 
 	while (1) {
-		n = poll(&pfd, 1, 1000);
+		FD_ZERO(&rset);
+		FD_SET(fd, &rset);
+
+		tv.tv_sec = 1;
+		tv.tv_usec = 0;
+
+		n = select(fd + 1, &rset, NULL, NULL, &tv);
 		if (n < 0) {
 			printf("poll error: %s\r\n", acl_last_serror());
 			break;
 		}
 
 		if (n == 0)
-			printf("fiber-%d: poll wakeup\r\n", acl_fiber_id(fiber));
+			printf("fiber-%d: select wakeup\r\n",
+				acl_fiber_id(fiber));
 		else
-			printf("fiber-%d: fd = %d read ready %s\r\n",
-				acl_fiber_id(fiber), pfd.fd,
-				pfd.revents & POLLIN ? "yes" : "no");
+			printf("fiber-%d: fd = %d read ready: %d\r\n",
+				acl_fiber_id(fiber), fd, n);
 
-		if (pfd.revents & POLLIN) {
+		if (FD_ISSET(fd, &rset)) {
 			char buf[256];
 
 			n = read(fd, buf, sizeof(buf) - 1);
@@ -53,7 +57,6 @@ static void poll_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
 			buf[n] = 0;
 			printf("fiber-%d: %s", acl_fiber_id(fiber), buf);
 			fflush(stdout);
-			pfd.revents = 0;
 		}
 	}
 
@@ -64,17 +67,18 @@ static void poll_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -a cmd\r\n", procname);
+	printf("usage: %s -h [help] -a cmd -c fibers_count\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
-	int   ch, n = 1;
+	int   ch, n = 1, i;
 	char  cmd[128];
 
 	snprintf(cmd, sizeof(cmd), "sleep");
+	__nfibers = 1;
 
-	while ((ch = getopt(argc, argv, "ha:")) > 0) {
+	while ((ch = getopt(argc, argv, "ha:c:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -82,22 +86,16 @@ int main(int argc, char *argv[])
 		case 'a':
 			snprintf(cmd, sizeof(cmd), "%s", optarg);
 			break;
+		case 'c':
+			__nfibers = atoi(optarg);
+			break;
 		default:
 			break;
 		}
 	}
 
-	__nfibers++;
-	acl_fiber_create(poll_sleep, &n, 32768);
-
-	__nfibers++;
-	acl_fiber_create(poll_sleep, &n, 32768);
-
-	__nfibers++;
-	acl_fiber_create(poll_sleep, &n, 32768);
-
-	__nfibers++;
-	acl_fiber_create(poll_sleep, &n, 32768);
+	for (i = 0; i < __nfibers; i++)
+		acl_fiber_create(select_sleep, &n, 32768);
 
 	acl_fiber_schedule();
 

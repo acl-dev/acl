@@ -14,59 +14,59 @@ fiber::~fiber(void)
 
 int fiber::get_id(void) const
 {
-	return f_ ? fiber_id(f_) : -1;
+	return f_ ? acl_fiber_id(f_) : -1;
 }
 
 int fiber::self(void)
 {
-	return fiber_self();
+	return acl_fiber_self();
 }
 
 int fiber::get_errno(void) const
 {
-	return f_ ? fiber_errno(f_) : -1;
+	return f_ ? acl_fiber_errno(f_) : -1;
 }
 
 void fiber::set_errno(int errnum)
 {
 	if (f_)
-		fiber_set_errno(f_, errnum);
+		acl_fiber_set_errno(f_, errnum);
 }
 
 void fiber::yield(void)
 {
-	(void) fiber_yield();
+	(void) acl_fiber_yield();
 }
 
 void fiber::switch_to_next(void)
 {
-	fiber_switch();
+	acl_fiber_switch();
 }
 
 void fiber::ready(fiber& f)
 {
-	FIBER *fb = f.get_fiber();
+	ACL_FIBER *fb = f.get_fiber();
 
 	if (fb)
-		fiber_ready(f.get_fiber());
+		acl_fiber_ready(f.get_fiber());
 }
 
 void fiber::hook_api(bool on)
 {
-	fiber_hook_api(on ? 1 : 0);
+	acl_fiber_hook_api(on ? 1 : 0);
 }
 
-FIBER *fiber::get_fiber(void) const
+ACL_FIBER *fiber::get_fiber(void) const
 {
 	return f_;
 }
 
 void fiber::start(size_t stack_size /* = 64000 */)
 {
-	fiber_create(fiber_callback, this, stack_size);
+	acl_fiber_create(fiber_callback, this, stack_size);
 }
 
-void fiber::fiber_callback(FIBER *f, void *ctx)
+void fiber::fiber_callback(ACL_FIBER *f, void *ctx)
 {
 	fiber* me = (fiber *) ctx;
 	me->f_ = f;
@@ -76,12 +76,12 @@ void fiber::fiber_callback(FIBER *f, void *ctx)
 
 void fiber::schedule(void)
 {
-	fiber_schedule();
+	acl_fiber_schedule();
 }
 
 void fiber::stop(void)
 {
-	fiber_io_stop();
+	acl_fiber_io_stop();
 }
 
 } // namespace acl

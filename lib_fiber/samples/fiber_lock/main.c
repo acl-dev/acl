@@ -5,24 +5,24 @@
 
 static int __fibers_count = 10;
 
-static void fiber_main(FIBER *fiber, void *ctx)
+static void fiber_main(ACL_FIBER *fiber, void *ctx)
 {
-	FIBER_MUTEX *l = (FIBER_MUTEX *) ctx;
+	ACL_FIBER_MUTEX *l = (ACL_FIBER_MUTEX *) ctx;
 
-	printf("fiber-%d begin to lock\r\n", fiber_id(fiber));
-	fiber_mutex_lock(l);
-	printf("fiber-%d lock ok\r\n", fiber_id(fiber));
+	printf("fiber-%d begin to lock\r\n", acl_fiber_id(fiber));
+	acl_fiber_mutex_lock(l);
+	printf("fiber-%d lock ok\r\n", acl_fiber_id(fiber));
 
-	printf("fiber-%d begin sleep\r\n", fiber_id(fiber));
-	fiber_sleep(1);
-	printf("fiber-%d wakeup\r\n", fiber_id(fiber));
+	printf("fiber-%d begin sleep\r\n", acl_fiber_id(fiber));
+	acl_fiber_sleep(1);
+	printf("fiber-%d wakeup\r\n", acl_fiber_id(fiber));
 
-	fiber_mutex_unlock(l);
-	printf("fiber-%d unlock ok\r\n", fiber_id(fiber));
+	acl_fiber_mutex_unlock(l);
+	printf("fiber-%d unlock ok\r\n", acl_fiber_id(fiber));
 
 	if (--__fibers_count == 0) {
 		printf("--- All fibers Over ----\r\n");
-		fiber_io_stop();
+		acl_fiber_io_stop();
 	}
 }
 
@@ -34,7 +34,7 @@ static void usage(const char *procname)
 int main(int argc, char *argv[])
 {
 	int  ch, n = __fibers_count, i;
-	FIBER_MUTEX *l = fiber_mutex_create();
+	ACL_FIBER_MUTEX *l = acl_fiber_mutex_create();
 
 	while ((ch = getopt(argc, argv, "hn:")) > 0) {
 		switch (ch) {
@@ -52,10 +52,10 @@ int main(int argc, char *argv[])
 	__fibers_count = n;
 
 	for (i = 0; i < n; i++)
-		fiber_create(fiber_main, l, 32000);
+		acl_fiber_create(fiber_main, l, 32000);
 
-	fiber_schedule();
-	fiber_mutex_free(l);
+	acl_fiber_schedule();
+	acl_fiber_mutex_free(l);
 
 	return 0;
 }

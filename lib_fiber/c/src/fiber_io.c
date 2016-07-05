@@ -4,32 +4,32 @@
 #include "fiber.h"
 
 typedef struct {
-	EVENT   *event;
-	FIBER  **io_fibers;
-	size_t   io_count;
-	FIBER   *ev_fiber;
-	ACL_RING ev_timer;
-	int      nsleeping;
-	int      io_stop;
+	EVENT     *event;
+	ACL_FIBER **io_fibers;
+	size_t      io_count;
+	ACL_FIBER  *ev_fiber;
+	ACL_RING    ev_timer;
+	int         nsleeping;
+	int         io_stop;
 } FIBER_TLS;
 
 static FIBER_TLS *__main_fiber = NULL;
 static __thread FIBER_TLS *__thread_fiber = NULL;
 
-static void fiber_io_loop(FIBER *fiber, void *ctx);
+static void fiber_io_loop(ACL_FIBER *fiber, void *ctx);
 
 #define MAXFD		1024
 #define STACK_SIZE	819200
 static int __maxfd    = 1024;
 
-void fiber_io_stop(void)
+void acl_fiber_io_stop(void)
 {
 	fiber_io_check();
 	__thread_fiber->io_stop = 1;
 }
 
 #define RING_TO_FIBER(r) \
-	((FIBER *) ((char *) (r) - offsetof(FIBER, me)))
+	((ACL_FIBER *) ((char *) (r) - offsetof(ACL_FIBER, me)))
 
 #define FIRST_FIBER(head) \
 	(acl_ring_succ(head) != (head) ? RING_TO_FIBER(acl_ring_succ(head)) : 0)
@@ -89,9 +89,9 @@ void fiber_io_check(void)
 
 	__thread_fiber = (FIBER_TLS *) acl_mymalloc(sizeof(FIBER_TLS));
 	__thread_fiber->event = event_create(__maxfd);
-	__thread_fiber->io_fibers = (FIBER **)
-		acl_mycalloc(__maxfd, sizeof(FIBER *));
-	__thread_fiber->ev_fiber = fiber_create(fiber_io_loop,
+	__thread_fiber->io_fibers = (ACL_FIBER **)
+		acl_mycalloc(__maxfd, sizeof(ACL_FIBER *));
+	__thread_fiber->ev_fiber = acl_fiber_create(fiber_io_loop,
 			__thread_fiber->event, STACK_SIZE);
 	__thread_fiber->io_count = 0;
 	__thread_fiber->nsleeping = 0;
@@ -129,18 +129,18 @@ void fiber_io_close(int fd)
 		event_del(__thread_fiber->event, fd, EVENT_ERROR);
 }
 
-static void fiber_io_loop(FIBER *self acl_unused, void *ctx)
+static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 {
 	EVENT *ev = (EVENT *) ctx;
 	int timer_left;
-	FIBER *timer;
+	ACL_FIBER *timer;
 	int now, last = 0;
 	struct timeval tv;
 
 	fiber_system();
 
 	for (;;) {
-		while (fiber_yield() > 0) {}
+		while (acl_fiber_yield() > 0) {}
 
 		timer = FIRST_FIBER(&__thread_fiber->ev_timer);
 
@@ -180,18 +180,18 @@ static void fiber_io_loop(FIBER *self acl_unused, void *ctx)
 			if (!timer->sys && --__thread_fiber->nsleeping == 0)
 				fiber_count_dec();
 
-			fiber_ready(timer);
+			acl_fiber_ready(timer);
 			timer = FIRST_FIBER(&__thread_fiber->ev_timer);
 
 		} while (timer != NULL && now >= timer->when);
 	}
 }
 
-unsigned int fiber_delay(unsigned int milliseconds)
+unsigned int acl_fiber_delay(unsigned int milliseconds)
 {
 	acl_int64 when, now;
 	struct timeval tv;
-	FIBER *fiber;
+	ACL_FIBER *fiber;
 	ACL_RING_ITER iter;
 
 	fiber_io_check();
@@ -200,7 +200,7 @@ unsigned int fiber_delay(unsigned int milliseconds)
 	when += milliseconds;
 
 	acl_ring_foreach_reverse(iter, &__thread_fiber->ev_timer) {
-		fiber = acl_ring_to_appl(iter.ptr, FIBER, me);
+		fiber = acl_ring_to_appl(iter.ptr, ACL_FIBER, me);
 		if (when >= fiber->when)
 			break;
 	}
@@ -214,7 +214,7 @@ unsigned int fiber_delay(unsigned int milliseconds)
 	if (!fiber->sys && __thread_fiber->nsleeping++ == 0)
 		fiber_count_inc();
 
-	fiber_switch();
+	acl_fiber_switch();
 
 	SET_TIME(now);
 
@@ -223,7 +223,7 @@ unsigned int fiber_delay(unsigned int milliseconds)
 	return (unsigned int) (now - when);
 }
 
-static void fiber_timer_callback(FIBER *fiber, void *ctx)
+static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
 {
 	struct timeval tv;
 	acl_int64 now, left;
@@ -235,7 +235,7 @@ static void fiber_timer_callback(FIBER *fiber, void *ctx)
 		if (left == 0)
 			break;
 
-		fiber_delay(left);
+		acl_fiber_delay(left);
 
 		SET_TIME(now);
 		if (fiber->when <= now)
@@ -246,25 +246,25 @@ static void fiber_timer_callback(FIBER *fiber, void *ctx)
 	fiber_exit(0);
 }
 
-FIBER *fiber_create_timer(unsigned int milliseconds,
-	void (*fn)(FIBER *, void *), void *ctx)
+ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds,
+	void (*fn)(ACL_FIBER *, void *), void *ctx)
 {
 	acl_int64 when;
 	struct timeval tv;
-	FIBER *fiber;
+	ACL_FIBER *fiber;
 
 	fiber_io_check();
 
 	SET_TIME(when);
 	when += milliseconds;
 
-	fiber           = fiber_create(fiber_timer_callback, ctx, 4000);
+	fiber           = acl_fiber_create(fiber_timer_callback, ctx, 4000);
 	fiber->when     = when;
 	fiber->timer_fn = fn;
 	return fiber;
 }
 
-void fiber_reset_timer(FIBER *fiber, unsigned int milliseconds)
+void acl_fiber_reset_timer(ACL_FIBER *fiber, unsigned int milliseconds)
 {
 	acl_int64 when;
 	struct timeval tv;
@@ -277,15 +277,15 @@ void fiber_reset_timer(FIBER *fiber, unsigned int milliseconds)
 	fiber->status = FIBER_STATUS_READY;
 }
 
-unsigned int fiber_sleep(unsigned int seconds)
+unsigned int acl_fiber_sleep(unsigned int seconds)
 {
-	return fiber_delay(seconds * 1000) / 1000;
+	return acl_fiber_delay(seconds * 1000) / 1000;
 }
 
 static void read_callback(EVENT *ev, int fd, void *ctx acl_unused, int mask)
 {
 	event_del(ev, fd, mask);
-	fiber_ready(__thread_fiber->io_fibers[fd]);
+	acl_fiber_ready(__thread_fiber->io_fibers[fd]);
 
 	__thread_fiber->io_count--;
 	__thread_fiber->io_fibers[fd] = NULL;
@@ -306,13 +306,13 @@ void fiber_wait_read(int fd)
 	__thread_fiber->io_fibers[fd] = fiber_running();
 	__thread_fiber->io_count++;
 
-	fiber_switch();
+	acl_fiber_switch();
 }
 
 static void write_callback(EVENT *ev, int fd, void *ctx acl_unused, int mask)
 {
 	event_del(ev, fd, mask);
-	fiber_ready(__thread_fiber->io_fibers[fd]);
+	acl_fiber_ready(__thread_fiber->io_fibers[fd]);
 
 	__thread_fiber->io_count--;
 	__thread_fiber->io_fibers[fd] = NULL;
@@ -331,5 +331,5 @@ void fiber_wait_write(int fd)
 	__thread_fiber->io_fibers[fd] = fiber_running();
 	__thread_fiber->io_count++;
 
-	fiber_switch();
+	acl_fiber_switch();
 }

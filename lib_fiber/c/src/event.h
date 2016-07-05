@@ -24,6 +24,7 @@ typedef void events_proc(EVENT *ev, POLL_EVENTS *pe);
 struct FILE_EVENT {
 	int type;
 	int mask;
+	int mask_fired;
 	event_proc  *r_proc;
 	event_proc  *w_proc;
 	POLL_EVENTS *pevents;
@@ -37,7 +38,7 @@ struct POLL_EVENTS {
 	struct pollfd *fds;
 	int    nfds;
 	int    nready;
-	FIBER *curr;
+	ACL_FIBER *curr;
 	events_proc *proc;
 };
 
@@ -76,7 +77,11 @@ void event_free(EVENT *ev);
 int  event_add(EVENT *ev, int fd, int mask, event_proc *proc, void *ctx);
 void event_poll(EVENT *ev, POLL_EVENTS *pe, int timeout);
 void event_del(EVENT *ev, int fd, int mask);
-int  event_mask(EVENT *ev, int fd);
 int  event_process(EVENT *ev, int left);
+int  event_readable(EVENT *ev, int fd);
+int  event_writeable(EVENT *ev, int fd);
+void event_clear_readable(EVENT *ev, int fd);
+void event_clear_writeable(EVENT *ev, int fd);
+void event_clear(EVENT *ev, int fd);
 
 #endif

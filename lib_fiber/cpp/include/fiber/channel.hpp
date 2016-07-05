@@ -1,9 +1,11 @@
 #pragma once
 
-struct CHANNEL;
+struct ACL_CHANNEL;
 extern "C" {
-	extern CHANNEL *channel_create(int elemsize, int bufsize);
-	extern void channel_free(CHANNEL *c);
+	extern ACL_CHANNEL *acl_channel_create(int elemsize, int bufsize);
+	extern void acl_channel_free(ACL_CHANNEL *c);
+	extern int acl_channel_send(ACL_CHANNEL *c, void *v);
+	extern int acl_channel_recv(ACL_CHANNEL *c, void *v);
 }
 
 namespace acl {
@@ -14,12 +16,12 @@ class channel
 public:
 	channel(void)
 	{
-		chan_ = channel_create(sizeof(T), 100);
+		chan_ = acl_channel_create(sizeof(T), 100);
 	}
 
 	~channel(void)
 	{
-		channel_free(chan_);
+		acl_channel_free(chan_);
 	}
 
 	channel& operator << (T& t)
@@ -29,17 +31,17 @@ public:
 
 	channel& put(T& t)
 	{
-		channel_send(chan_, &t);
+		acl_channel_send(chan_, &t);
 		return *this;
 	}
 
 	void pop(T& t)
 	{
-		channel_recv(chan_, &t);
+		acl_channel_recv(chan_, &t);
 	}
 
 private:
-	CHANNEL* chan_;
+	ACL_CHANNEL* chan_;
 };
 
 } // namespace acl

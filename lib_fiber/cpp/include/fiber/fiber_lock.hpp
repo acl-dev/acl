@@ -1,7 +1,7 @@
 #pragma once
 
-struct FIBER_MUTEX;
-struct FIBER_RWLOCK;
+struct ACL_FIBER_MUTEX;
+struct ACL_FIBER_RWLOCK;
 
 namespace acl {
 
@@ -16,7 +16,7 @@ public:
 	void unlock(void);
 
 private:
-	FIBER_MUTEX* lock_;
+	ACL_FIBER_MUTEX* lock_;
 };
 
 class fiber_rwlock
@@ -34,7 +34,7 @@ public:
 	void wunlock(void);
 
 private:
-	FIBER_RWLOCK* rwlk_;
+	ACL_FIBER_RWLOCK* rwlk_;
 };
 
 } // namespace acl

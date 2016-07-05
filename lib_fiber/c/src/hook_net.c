@@ -3,6 +3,7 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/epoll.h>
 #define __USE_GNU
 #include <dlfcn.h>
 #include "fiber/lib_fiber.h"
@@ -21,6 +22,9 @@ typedef int (*select_fn)(int, fd_set *, fd_set *, fd_set *, struct timeval *);
 typedef int (*gethostbyname_r_fn)(const char *, struct hostent *, char *,
 	size_t, struct hostent **, int *);
 
+typedef int (*epoll_wait_fn)(int, struct epoll_event *,int, int);
+typedef int (*epoll_ctl_fn)(int, int, int, struct epoll_event *);
+
 static socket_fn     __sys_socket   = NULL;
 static socketpair_fn __sys_socketpair = NULL;
 static bind_fn       __sys_bind     = NULL;
@@ -32,7 +36,10 @@ static poll_fn       __sys_poll     = NULL;
 static select_fn     __sys_select   = NULL;
 static gethostbyname_r_fn __sys_gethostbyname_r = NULL;
 
-void fiber_hook_net(void)
+static epoll_wait_fn __sys_epoll_wait = NULL;
+static epoll_ctl_fn  __sys_epoll_ctl  = NULL;
+
+void hook_net(void)
 {
 	static int __called = 0;
 
@@ -48,10 +55,12 @@ void fiber_hook_net(void)
 	__sys_accept     = (accept_fn) dlsym(RTLD_NEXT, "accept");
 	__sys_connect    = (connect_fn) dlsym(RTLD_NEXT, "connect");
 
-	__sys_poll     = (poll_fn) dlsym(RTLD_NEXT, "poll");
-	__sys_select   = (select_fn) dlsym(RTLD_NEXT, "select");
+	__sys_poll       = (poll_fn) dlsym(RTLD_NEXT, "poll");
+	__sys_select     = (select_fn) dlsym(RTLD_NEXT, "select");
 	__sys_gethostbyname_r = (gethostbyname_r_fn) dlsym(RTLD_NEXT,
 			"gethostbyname_r");
+	__sys_epoll_wait = (epoll_wait_fn) dlsym(RTLD_NEXT, "epoll_wait");
+	__sys_epoll_ctl  = (epoll_ctl_fn) dlsym(RTLD_NEXT, "epoll_ctl");
 }
 
 int socket(int domain, int type, int protocol)
@@ -174,7 +183,7 @@ static void poll_callback(EVENT *ev, POLL_EVENTS *pe)
 		fiber_io_dec();
 	}
 
-	fiber_ready(pe->curr);
+	acl_fiber_ready(pe->curr);
 }
 
 #define SET_TIME(x) do { \
@@ -194,12 +203,12 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 
 	fiber_io_check();
 
-	event     = fiber_io_event();
+	event   = fiber_io_event();
 
-	pe.fds    = fds;
-	pe.nfds   = nfds;
-	pe.curr   = fiber_running();
-	pe.proc   = poll_callback;
+	pe.fds  = fds;
+	pe.nfds = nfds;
+	pe.curr = fiber_running();
+	pe.proc = poll_callback;
 
 	SET_TIME(last);
 
@@ -207,7 +216,7 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		event_poll(event, &pe, timeout);
 
 		fiber_io_inc();
-		fiber_switch();
+		acl_fiber_switch();
 
 		if (pe.nready != 0)
 			break;
@@ -224,7 +233,7 @@ int select(int nfds, fd_set *readfds, fd_set *writefds,
 	fd_set *exceptfds, struct timeval *timeout)
 {
 	struct pollfd *fds;
-	int fd, timo;
+	int fd, timo, n, nready = 0;
 
 	if (!acl_var_hook_sys_api)
 		return __sys_select(nfds, readfds, writefds,
@@ -233,17 +242,17 @@ int select(int nfds, fd_set *readfds, fd_set *writefds,
 	fds = (struct pollfd *) acl_mycalloc(nfds + 1, sizeof(struct pollfd));
 
 	for (fd = 0; fd < nfds; fd++) {
-		if (FD_ISSET(fd, readfds)) {
+		if (readfds && FD_ISSET(fd, readfds)) {
 			fds[fd].fd = fd;
 			fds[fd].events |= POLLIN;
 		}
 
-		if (FD_ISSET(fd, writefds)) {
+		if (writefds && FD_ISSET(fd, writefds)) {
 			fds[fd].fd = fd;
 			fds[fd].events |= POLLOUT;
 		}
 
-		if (FD_ISSET(fd, exceptfds)) {
+		if (exceptfds && FD_ISSET(fd, exceptfds)) {
 			fds[fd].fd = fd;
 			fds[fd].events |= POLLERR | POLLHUP;
 		}
@@ -254,12 +263,66 @@ int select(int nfds, fd_set *readfds, fd_set *writefds,
 	else
 		timo = -1;
 
-	nfds = poll(fds, nfds, timo);
+	n = poll(fds, nfds, timo);
+
+	if (readfds)
+		FD_ZERO(readfds);
+	if (writefds)
+		FD_ZERO(writefds);
+	if (exceptfds)
+		FD_ZERO(exceptfds);
+
+	for (fd = 0; fd < nfds && nready < n; fd++) {
+		if (fds[fd].fd < 0 || fds[fd].fd != fd)
+			continue;
+
+		if (readfds && (fds[fd].revents & POLLIN)) {
+			FD_SET(fd, readfds);
+			nready++;
+		}
+		if (writefds && (fds[fd].revents & POLLOUT)) {
+			FD_SET(fd, writefds);
+			nready++;
+		}
+		if (exceptfds && (fds[fd].revents & (POLLERR | POLLHUP))) {
+			FD_SET(fd, exceptfds);
+			nready++;
+		}
+	}
 
 	acl_myfree(fds);
 
-	return nfds;
+	return nready;
 }
+
+#if 0
+
+static void epoll_callback(EVENT *ev, EPOLL_EVENTS *ee)
+{
+}
+
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
+{
+	EVENT *event;
+	int    mask = 0;
+
+	if (op & EPOLLIN)
+		mask |= EVENT_READABLE;
+	if (op & EPOLLOUT)
+		mask |= EVENT_WRITABLE;
+
+	fiber_io_check();
+
+	event = fiber_io_event();
+	return event_add(event, fd, mask, epoll_callback, NULL);
+}
+
+int epoll_wait(int epfd, struct epoll_event *events,
+	int maxevents, int timeout)
+{
+}
+
+#endif
 
 struct hostent *gethostbyname(const char *name)
 {
@@ -274,7 +337,7 @@ struct hostent *gethostbyname(const char *name)
 static char dns_ip[128] = "8.8.8.8";
 static int dns_port = 53;
 
-void fiber_set_dns(const char* ip, int port)
+void acl_fiber_set_dns(const char* ip, int port)
 {
 	snprintf(dns_ip, sizeof(dns_ip), "%s", ip);
 	dns_port = port;

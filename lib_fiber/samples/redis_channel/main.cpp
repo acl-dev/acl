@@ -9,7 +9,7 @@ static int __oper_count = 100;
 static acl::redis_client_cluster __redis_cluster;
 
 typedef struct {
-	CHANNEL *chan;
+	ACL_CHANNEL *chan;
 	int   id;
 	bool  busy;
 	acl::string cmd;
@@ -28,7 +28,7 @@ typedef struct {
 	bool success;
 } PKT;
 
-static bool redis_set(FIBER& fiber, CHANNEL &chan, PKT& pkt)
+static bool redis_set(ACL_FIBER& fiber, ACL_CHANNEL &chan, PKT& pkt)
 {
 	acl::redis cmd(&__redis_cluster);
 
@@ -37,18 +37,18 @@ static bool redis_set(FIBER& fiber, CHANNEL &chan, PKT& pkt)
 	if (pkt.key.empty())
 	{
 		printf("%s(%d): fiber-%d: key empty!\r\n",
-			__FUNCTION__, __LINE__, fiber_id(&fiber));
+			__FUNCTION__, __LINE__, acl_fiber_id(&fiber));
 		pkt.val = "key empty";
-		channel_sendp(&chan, &pkt);
+		acl_channel_sendp(&chan, &pkt);
 
 		return false;
 	}
 	if (pkt.val.empty())
 	{
 		printf("%s(%d): fiber-%d: val empty\r\n",
-			__FUNCTION__, __LINE__, fiber_id(&fiber));
+			__FUNCTION__, __LINE__, acl_fiber_id(&fiber));
 		pkt.val = "val empty";
-		channel_sendp(&chan, &pkt);
+		acl_channel_sendp(&chan, &pkt);
 
 		return false;
 	}
@@ -56,18 +56,18 @@ static bool redis_set(FIBER& fiber, CHANNEL &chan, PKT& pkt)
 	if (cmd.set(pkt.key, pkt.val) == false)
 	{
 		printf("%s(%d): fiber-%d: set error, key: %s, val: %s\r\n",
-			__FUNCTION__, __LINE__, fiber_id(&fiber),
+			__FUNCTION__, __LINE__, acl_fiber_id(&fiber),
 			pkt.key.c_str(), pkt.val.c_str());
-		channel_sendp(&chan, &pkt);
+		acl_channel_sendp(&chan, &pkt);
 
 		return false;
 	}
 
 	pkt.success = true;
-	if (channel_sendp(&chan, &pkt) < 0)
+	if (acl_channel_sendp(&chan, &pkt) < 0)
 	{
-		printf("%s(%d): fiber-%d: channel_sendp error, key %s\r\n",
-			__FUNCTION__, __LINE__, fiber_id(&fiber),
+		printf("%s(%d): fiber-%d: acl_channel_sendp error, key %s\r\n",
+			__FUNCTION__, __LINE__, acl_fiber_id(&fiber),
 			pkt.key.c_str());
 
 		return false;
@@ -76,7 +76,7 @@ static bool redis_set(FIBER& fiber, CHANNEL &chan, PKT& pkt)
 	return true;
 }
 
-static bool redis_get(FIBER& fiber, CHANNEL &chan, PKT &pkt)
+static bool redis_get(ACL_FIBER& fiber, ACL_CHANNEL &chan, PKT &pkt)
 {
 	acl::redis cmd(&__redis_cluster);
 
@@ -84,9 +84,9 @@ static bool redis_get(FIBER& fiber, CHANNEL &chan, PKT &pkt)
 
 	if (pkt.key.empty())
 	{
-		printf("fiber-%d: key empty!\r\n", fiber_id(&fiber));
+		printf("fiber-%d: key empty!\r\n", acl_fiber_id(&fiber));
 		pkt.val = "key empty";
-		channel_sendp(&chan, &pkt);
+		acl_channel_sendp(&chan, &pkt);
 
 		return false;
 	}
@@ -94,18 +94,18 @@ static bool redis_get(FIBER& fiber, CHANNEL &chan, PKT &pkt)
 	if (cmd.get(pkt.key, pkt.val) == false)
 	{
 		printf("fiber-%d: get error, key: %s\r\n",
-			fiber_id(&fiber), pkt.key.c_str());
+			acl_fiber_id(&fiber), pkt.key.c_str());
 		pkt.val = "get error";
-		channel_sendp(&chan, &pkt);
+		acl_channel_sendp(&chan, &pkt);
 
 		return false;
 	}
 
 	pkt.success = true;
-	if (channel_sendp(&chan, &pkt) < 0)
+	if (acl_channel_sendp(&chan, &pkt) < 0)
 	{
-		printf("fiber-%d: channel_sendp error, key: %s\r\n",
-			fiber_id(&fiber), pkt.key.c_str());
+		printf("fiber-%d: acl_channel_sendp error, key: %s\r\n",
+			acl_fiber_id(&fiber), pkt.key.c_str());
 
 		return false;
 	}
@@ -113,7 +113,7 @@ static bool redis_get(FIBER& fiber, CHANNEL &chan, PKT &pkt)
 	return true;
 }
 
-static bool redis_del(FIBER& fiber, CHANNEL &chan, PKT &pkt)
+static bool redis_del(ACL_FIBER& fiber, ACL_CHANNEL &chan, PKT &pkt)
 {
 	acl::redis cmd(&__redis_cluster);
 
@@ -121,9 +121,9 @@ static bool redis_del(FIBER& fiber, CHANNEL &chan, PKT &pkt)
 
 	if (pkt.key.empty())
 	{
-		printf("fiber-%d: key empty!\r\n", fiber_id(&fiber));
+		printf("fiber-%d: key empty!\r\n", acl_fiber_id(&fiber));
 		pkt.val = "key empty";
-		channel_sendp(&chan, &pkt);
+		acl_channel_sendp(&chan, &pkt);
 
 		return false;
 	}
@@ -131,18 +131,18 @@ static bool redis_del(FIBER& fiber, CHANNEL &chan, PKT &pkt)
 	if (cmd.del_one(pkt.key) < 0)
 	{
 		printf("fiber-%d: del_one error, key: %s\r\n",
-			fiber_id(&fiber), pkt.key.c_str());
+			acl_fiber_id(&fiber), pkt.key.c_str());
 		pkt.val = "del error";
-		channel_sendp(&chan, &pkt);
+		acl_channel_sendp(&chan, &pkt);
 
 		return false;
 	}
 
 	pkt.success = true;
-	if (channel_sendp(&chan, &pkt) < 0)
+	if (acl_channel_sendp(&chan, &pkt) < 0)
 	{
-		printf("fiber-%d: channel_sendp error, key: %s\r\n",
-			fiber_id(&fiber), pkt.key.c_str());
+		printf("fiber-%d: acl_channel_sendp error, key: %s\r\n",
+			acl_fiber_id(&fiber), pkt.key.c_str());
 
 		return false;
 	}
@@ -150,18 +150,18 @@ static bool redis_del(FIBER& fiber, CHANNEL &chan, PKT &pkt)
 	return true;
 }
 
-static void fiber_redis_worker(FIBER *fiber, void *ctx)
+static void fiber_redis_worker(ACL_FIBER *fiber, void *ctx)
 {
-	CHANNEL *chan = ((MYCHAN *) ctx)->chan;
+	ACL_CHANNEL *chan = ((MYCHAN *) ctx)->chan;
 
 	while (true)
 	{
-		PKT* pkt = (PKT *) channel_recvp(chan);
+		PKT* pkt = (PKT *) acl_channel_recvp(chan);
 
 		if (pkt == NULL)
 		{
-			printf("fiber-%d: channel_recvp NULL\r\n",
-				fiber_id(fiber));
+			printf("fiber-%d: acl_channel_recvp NULL\r\n",
+				acl_fiber_id(fiber));
 			break;
 		}
 
@@ -170,7 +170,7 @@ static void fiber_redis_worker(FIBER *fiber, void *ctx)
 			if (redis_set(*fiber, *chan, *pkt) == false)
 			{
 				printf("fiber-%d: redis_set error\r\n",
-					fiber_id(fiber));
+					acl_fiber_id(fiber));
 				break;
 			}
 		}
@@ -179,7 +179,7 @@ static void fiber_redis_worker(FIBER *fiber, void *ctx)
 			if (redis_get(*fiber, *chan, *pkt) == false)
 			{
 				printf("fiber-%d: redis_get error\r\n",
-					fiber_id(fiber));
+					acl_fiber_id(fiber));
 				break;
 			}
 		}
@@ -188,7 +188,7 @@ static void fiber_redis_worker(FIBER *fiber, void *ctx)
 			if (redis_del(*fiber, *chan, *pkt) == false)
 			{
 				printf("fiber-%d: redis_del error\r\n",
-					fiber_id(fiber));
+					acl_fiber_id(fiber));
 				break;
 			}
 		}
@@ -199,11 +199,11 @@ static void fiber_redis_worker(FIBER *fiber, void *ctx)
 
 static int __display = 0;
 
-static void fiber_redis(FIBER *fiber, void *ctx)
+static void fiber_redis(ACL_FIBER *fiber, void *ctx)
 {
 	MYCHANS *mychans = (MYCHANS *) ctx;
 	MYCHAN  *mychan  = &mychans->chans[mychans->off++];
-	CHANNEL    *chan    = mychan->chan;
+	ACL_CHANNEL *chan    = mychan->chan;
 	PKT pkt;
 
 	if (mychans->off == mychans->size)
@@ -213,22 +213,22 @@ static void fiber_redis(FIBER *fiber, void *ctx)
 
 	for (int i = 0; i < __oper_count; i++)
 	{
-		pkt.key.format("key-%d-%d", fiber_id(fiber), i);
-		pkt.val.format("val-%d-%d", fiber_id(fiber), i);
+		pkt.key.format("key-%d-%d", acl_fiber_id(fiber), i);
+		pkt.val.format("val-%d-%d", acl_fiber_id(fiber), i);
 
-		if (channel_sendp(chan, &pkt) < 0)
+		if (acl_channel_sendp(chan, &pkt) < 0)
 		{
-			printf("%s(%d): fiber-%d: channel_sendp error, key = %s\r\n",
-				__FUNCTION__, __LINE__, fiber_id(fiber),
+			printf("%s(%d): fiber-%d: acl_channel_sendp error, key = %s\r\n",
+				__FUNCTION__, __LINE__, acl_fiber_id(fiber),
 				pkt.key.c_str());
 			break;
 		}
 
-		PKT* res = (PKT *) channel_recvp(chan);
+		PKT* res = (PKT *) acl_channel_recvp(chan);
 		if (res == NULL)
 		{
-			printf("%s(%d): fiber-%d: channel_recvp errork, key = %s\r\n",
-				__FUNCTION__, __LINE__, fiber_id(fiber),
+			printf("%s(%d): fiber-%d: acl_channel_recvp errork, key = %s\r\n",
+				__FUNCTION__, __LINE__, acl_fiber_id(fiber),
 				pkt.key.c_str());
 			break;
 		}
@@ -238,7 +238,7 @@ static void fiber_redis(FIBER *fiber, void *ctx)
 		if (!res->success)
 		{
 			printf("%s(%d): fiber-%d: cmd = %s, key = %s, failed\r\n",
-				__FUNCTION__, __LINE__, fiber_id(fiber),
+				__FUNCTION__, __LINE__, acl_fiber_id(fiber),
 				pkt.cmd.c_str(), pkt.key.c_str());
 			continue;
 		}
@@ -248,18 +248,18 @@ static void fiber_redis(FIBER *fiber, void *ctx)
 
 		if (pkt.cmd.equal("get", false))
 			printf("fiber-%d: cmd = %s, key = %s, val = %s\r\n",
-				fiber_id(fiber), pkt.cmd.c_str(),
+				acl_fiber_id(fiber), pkt.cmd.c_str(),
 				pkt.key.c_str(), res->val.c_str());
 		else
 			printf("fiber-%d: cmd = %s, key = %s\r\n",
-				fiber_id(fiber), pkt.cmd.c_str(),
+				acl_fiber_id(fiber), pkt.cmd.c_str(),
 				pkt.key.c_str());
 	}
 
 	if (--__fibers_count == 0)
 	{
 		printf("---All fibers are over!---\r\n");
-		fiber_io_stop();
+		acl_fiber_io_stop();
 	}
 }
 
@@ -329,22 +329,22 @@ int main(int argc, char *argv[])
 
 	for (int i = 0; i < nworkers; i++)
 	{
-		mychans.chans[i].chan = channel_create(sizeof(void*), 1000);
+		mychans.chans[i].chan = acl_channel_create(sizeof(void*), 1000);
 		mychans.chans[i].cmd  = cmd;
 	}
 
 	for (int i = 0; i < nworkers; i++)
-		fiber_create(fiber_redis_worker, &mychans.chans[i], 32000);
+		acl_fiber_create(fiber_redis_worker, &mychans.chans[i], 32000);
 
 	__fibers_count = __fibers_max;
 
 	for (int i = 0; i < __fibers_max; i++)
-		fiber_create(fiber_redis, &mychans, 32000);
+		acl_fiber_create(fiber_redis, &mychans, 32000);
 
-	fiber_schedule();
+	acl_fiber_schedule();
 
 	for (int i = 0; i < nworkers; i++)
-		channel_free(mychans.chans[i].chan);
+		acl_channel_free(mychans.chans[i].chan);
 
 	delete [] mychans.chans;
 

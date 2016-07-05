@@ -12,7 +12,7 @@ static int __max_fiber   = 1000;
 static __thread struct timeval __begin;
 static __thread int __left_fiber = 1000;
 
-static void timer_main(FIBER *fiber, void *ctx acl_unused)
+static void timer_main(ACL_FIBER *fiber, void *ctx acl_unused)
 {
 	struct timeval now;
 	double spent;
@@ -21,10 +21,10 @@ static void timer_main(FIBER *fiber, void *ctx acl_unused)
 	spent = stamp_sub(&now, &__begin);
 
 	printf("thread-%lu, timer-%d wakeup, spend: %.2f ms\r\n",
-		(unsigned long) acl_pthread_self(), fiber_id(fiber), spent);
+		(unsigned long) acl_pthread_self(), acl_fiber_id(fiber), spent);
 
 	if (--__left_fiber == 0)
-		fiber_io_stop();
+		acl_fiber_io_stop();
 }
 
 static void *thread_main(void *ctx acl_unused)
@@ -36,9 +36,9 @@ static void *thread_main(void *ctx acl_unused)
 
 	printf("thread: %lu\r\n", (unsigned long) acl_pthread_self());
 	for (i = 0; i < __max_fiber; i++)
-		fiber_create_timer(__timer_sleep, timer_main, NULL);
+		acl_fiber_create_timer(__timer_sleep, timer_main, NULL);
 
-	fiber_schedule();
+	acl_fiber_schedule();
 
 	return NULL;
 }

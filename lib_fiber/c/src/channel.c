@@ -3,11 +3,11 @@
 #include "stdafx.h"
 #include "fiber.h"
 
-CHANNEL* channel_create(int elemsize, int bufsize)
+ACL_CHANNEL* acl_channel_create(int elemsize, int bufsize)
 {
-	CHANNEL *c;
+	ACL_CHANNEL *c;
 
-	c = (CHANNEL *) acl_mycalloc(1, sizeof(*c) + bufsize * elemsize);
+	c = (ACL_CHANNEL *) acl_mycalloc(1, sizeof(*c) + bufsize * elemsize);
 	c->elemsize = elemsize;
 	c->bufsize  = bufsize;
 	c->nbuf     = 0;
@@ -16,7 +16,7 @@ CHANNEL* channel_create(int elemsize, int bufsize)
 }
 
 /* bug - work out races */
-void channel_free(CHANNEL *c)
+void acl_channel_free(ACL_CHANNEL *c)
 {
 	if(c != NULL) {
 		if (c->name)
@@ -47,11 +47,11 @@ static void array_del(FIBER_ALT_ARRAY *a, int i)
 
 /*
  * doesn't really work for things other than CHANSND and CHANRCV
- * but is only used as arg to channel_array, which can handle it
+ * but is only used as arg to acl_channel_array, which can handle it
  */
 #define otherop(op)	(CHANSND + CHANRCV - (op))
 
-static FIBER_ALT_ARRAY* channel_array(CHANNEL *c, unsigned int op)
+static FIBER_ALT_ARRAY* channel_array(ACL_CHANNEL *c, unsigned int op)
 {
 	switch (op) {
 	case CHANSND:
@@ -66,7 +66,7 @@ static FIBER_ALT_ARRAY* channel_array(CHANNEL *c, unsigned int op)
 static int alt_can_exec(FIBER_ALT *a)
 {
 	FIBER_ALT_ARRAY *ar;
-	CHANNEL *c;
+	ACL_CHANNEL *c;
 
 	if (a->op == CHANNOP)
 		return 0;
@@ -146,7 +146,7 @@ static void amove(void *dst, void *src, unsigned int n)
  */
 static void alt_copy(FIBER_ALT *s, FIBER_ALT *r)
 {
-	CHANNEL *c;
+	ACL_CHANNEL *c;
 	unsigned char *cp;
 
 	/*
@@ -169,7 +169,7 @@ static void alt_copy(FIBER_ALT *s, FIBER_ALT *r)
 	assert(r == NULL || r->op == CHANRCV);
 
 	/*
-	 * CHANNEL is empty (or unbuffered) - copy directly.
+	 * ACL_CHANNEL is empty (or unbuffered) - copy directly.
 	 */
 	if (s && r && c->nbuf == 0) {
 		amove(r->v, s->v, c->elemsize);
@@ -198,7 +198,7 @@ static void alt_exec(FIBER_ALT *a)
 {
 	FIBER_ALT_ARRAY *ar;
 	FIBER_ALT *other;
-	CHANNEL *c;
+	ACL_CHANNEL *c;
 	int i;
 
 	c = a->c;
@@ -211,7 +211,7 @@ static void alt_exec(FIBER_ALT *a)
 		alt_all_dequeue(other->xalt);
 		other->xalt[0].xalt = other;
 
-		fiber_ready(other->fiber);
+		acl_fiber_ready(other->fiber);
 	 } else
 		alt_copy(a, NULL);
 }
@@ -221,8 +221,8 @@ static void alt_exec(FIBER_ALT *a)
 static int channel_alt(FIBER_ALT a[])
 {
 	int i, j, ncan, n, canblock;
-	CHANNEL *c;
-	FIBER *t;
+	ACL_CHANNEL *c;
+	ACL_FIBER *t;
 
 	for (i = 0; a[i].op != CHANEND && a[i].op != CHANNOBLK; i++) {}
 
@@ -295,7 +295,7 @@ static int channel_alt(FIBER_ALT a[])
 			alt_queue(&a[i]);
 	}
 
-	fiber_switch();
+	acl_fiber_switch();
 
 	/*
 	 * the guy who ran the op took care of dequeueing us
@@ -304,7 +304,7 @@ static int channel_alt(FIBER_ALT a[])
 	return a[0].xalt - a;
 }
 
-static int channel_op(CHANNEL *c, int op, void *p, int canblock)
+static int channel_op(ACL_CHANNEL *c, int op, void *p, int canblock)
 {
 	FIBER_ALT a[2];
 
@@ -318,32 +318,32 @@ static int channel_op(CHANNEL *c, int op, void *p, int canblock)
 	return 1;
 }
 
-int channel_send(CHANNEL *c, void *v)
+int acl_channel_send(ACL_CHANNEL *c, void *v)
 {
 	return channel_op(c, CHANSND, v, 1);
 }
 
-int channel_send_nb(CHANNEL *c, void *v)
+int acl_channel_send_nb(ACL_CHANNEL *c, void *v)
 {
 	return channel_op(c, CHANSND, v, 0);
 }
 
-int channel_recv(CHANNEL *c, void *v)
+int acl_channel_recv(ACL_CHANNEL *c, void *v)
 {
 	return channel_op(c, CHANRCV, v, 1);
 }
 
-int channel_recv_nb(CHANNEL *c, void *v)
+int acl_channel_recv_nb(ACL_CHANNEL *c, void *v)
 {
 	return channel_op(c, CHANRCV, v, 0);
 }
 
-int channel_sendp(CHANNEL *c, void *v)
+int acl_channel_sendp(ACL_CHANNEL *c, void *v)
 {
 	return channel_op(c, CHANSND, (void *) &v, 1);
 }
 
-void *channel_recvp(CHANNEL *c)
+void *acl_channel_recvp(ACL_CHANNEL *c)
 {
 	void *v;
 
@@ -351,12 +351,12 @@ void *channel_recvp(CHANNEL *c)
 	return v;
 }
 
-int channel_sendp_nb(CHANNEL *c, void *v)
+int acl_channel_sendp_nb(ACL_CHANNEL *c, void *v)
 {
 	return channel_op(c, CHANSND, (void *) &v, 0);
 }
 
-void *channel_recvp_nb(CHANNEL *c)
+void *acl_channel_recvp_nb(ACL_CHANNEL *c)
 {
 	void *v;
 
@@ -364,12 +364,12 @@ void *channel_recvp_nb(CHANNEL *c)
 	return v;
 }
 
-int channel_sendul(CHANNEL *c, ulong val)
+int acl_channel_sendul(ACL_CHANNEL *c, ulong val)
 {
 	return channel_op(c, CHANSND, &val, 1);
 }
 
-unsigned long channel_recvul(CHANNEL *c)
+unsigned long acl_channel_recvul(ACL_CHANNEL *c)
 {
 	unsigned long val;
 
@@ -377,12 +377,12 @@ unsigned long channel_recvul(CHANNEL *c)
 	return val;
 }
 
-int channel_sendul_nb(CHANNEL *c, ulong val)
+int acl_channel_sendul_nb(ACL_CHANNEL *c, ulong val)
 {
 	return channel_op(c, CHANSND, &val, 0);
 }
 
-unsigned long channel_recvul_nb(CHANNEL *c)
+unsigned long acl_channel_recvul_nb(ACL_CHANNEL *c)
 {
 	unsigned long val;
 

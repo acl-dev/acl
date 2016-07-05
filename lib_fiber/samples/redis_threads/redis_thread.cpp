@@ -19,7 +19,7 @@ double redis_thread::stamp_sub(const struct timeval *from,
 	return (res.tv_sec * 1000.0 + res.tv_usec/1000.0);
 }
 
-void redis_thread::fiber_redis(FIBER *fiber, void *ctx)
+void redis_thread::fiber_redis(ACL_FIBER *fiber, void *ctx)
 {
 	redis_thread* thread = (redis_thread*) ctx;
 	acl::redis_client_cluster *cluster = &thread->get_cluster();
@@ -37,19 +37,19 @@ void redis_thread::fiber_redis(FIBER *fiber, void *ctx)
 	for (; i < oper_count; i++)
 	{
 		key.format("key-%lu-%d-%d", thread->thread_id(),
-			fiber_id(fiber), i);
+			acl_fiber_id(fiber), i);
 		val.format("val-%lu-%d-%d", thread->thread_id(),
-			fiber_id(fiber), i);
+			acl_fiber_id(fiber), i);
 
 		if (cmd.set(key, val) == false)
 		{
 			printf("fiber-%d: set error: %s, key: %s\r\n",
-				fiber_id(fiber), cmd.result_error(),
+				acl_fiber_id(fiber), cmd.result_error(),
 				key.c_str());
 			break;
 		} else if (i < 5)
 			printf("fiber-%d: set ok, key: %s\r\n",
-				fiber_id(fiber), key.c_str());
+				acl_fiber_id(fiber), key.c_str());
 		cmd.clear();
 	}
 
@@ -63,12 +63,12 @@ void redis_thread::fiber_redis(FIBER *fiber, void *ctx)
 	for (int j = 0; j < i; j++)
 	{
 		key.format("key-%lu-%d-%d", thread->thread_id(),
-			fiber_id(fiber), j);
+			acl_fiber_id(fiber), j);
 
 		if (cmd.get(key, val) == false)
 		{
 			printf("fiber-%d: get error: %s, key: %s\r\n",
-				fiber_id(fiber), cmd.result_error(),
+				acl_fiber_id(fiber), cmd.result_error(),
 				key.c_str());
 			break;
 		}
@@ -86,12 +86,12 @@ void redis_thread::fiber_redis(FIBER *fiber, void *ctx)
 	for (int j = 0; j < i; j++)
 	{
 		key.format("key-%lu-%d-%d", thread->thread_id(),
-			fiber_id(fiber), j);
+			acl_fiber_id(fiber), j);
 
 		if (cmd.del_one(key) < 0)
 		{
 			printf("fiber-%d: del error: %s, key: %s\r\n",
-				fiber_id(fiber), cmd.result_error(),
+				acl_fiber_id(fiber), cmd.result_error(),
 				key.c_str());
 			break;
 		}
@@ -126,9 +126,9 @@ void* redis_thread::run(void)
 	gettimeofday(&begin_, NULL);
 
 	for (int i = 0; i < fibers_max_; i++)
-		fiber_create(fiber_redis, this, stack_size_);
+		acl_fiber_create(fiber_redis, this, stack_size_);
 
-	fiber_schedule();
+	acl_fiber_schedule();
 
 	return NULL;
 }
@@ -147,5 +147,5 @@ void redis_thread::fiber_dec(int cnt)
 		fibers_max_, total, spent,
 		(total * 1000) / (spent > 0 ? spent : 1));
 		
-	fiber_io_stop();
+	acl_fiber_io_stop();
 }

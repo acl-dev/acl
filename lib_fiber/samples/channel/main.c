@@ -10,37 +10,38 @@ static int __nsend = 0;
 static int __nread = 0;
 static int __display = 10;
 
-static void fiber_producer(FIBER *fiber, void *ctx)
+static void fiber_producer(ACL_FIBER *fiber, void *ctx)
 {
-	CHANNEL *chan = (CHANNEL *) ctx;
+	ACL_CHANNEL *chan = (ACL_CHANNEL *) ctx;
 
 	while (__nsend < __max) {
-		int ret = channel_sendul(chan, __nsend);
+		int ret = acl_channel_sendul(chan, __nsend);
 		__nsend++;
 
 		if (ret <= 0) {
 			printf("fiber-%d, channel_sendul error!\r\n",
-				fiber_id(fiber));
+				acl_fiber_id(fiber));
 			break;
 		}
 
 		if (__nsend < __display)
 			printf(">>fiber-%d, send: %d %s\r\n",
-				fiber_id(fiber), __nsend,
+				acl_fiber_id(fiber), __nsend,
 				ret > 0 ? "ok" : "error");
 	}
 }
 
-static void fiber_consumer(FIBER *fiber, void *ctx)
+static void fiber_consumer(ACL_FIBER *fiber, void *ctx)
 {
-	CHANNEL *chan = (CHANNEL *) ctx;
+	ACL_CHANNEL *chan = (ACL_CHANNEL *) ctx;
 
 	while (__nread < __max) {
-		unsigned long n = channel_recvul(chan);
+		unsigned long n = acl_channel_recvul(chan);
 		__nread++;
 
 		if (__nread < __display)
-			printf(">>fiber-%d, recv: %lu\r\n", fiber_id(fiber), n);
+			printf(">>fiber-%d, recv: %lu\r\n",
+				acl_fiber_id(fiber), n);
 	}
 }
 
@@ -53,7 +54,7 @@ static void usage(const char *procname)
 int main(int argc, char *argv[])
 {
 	int   ch, i, nsenders = 1, nreceivers = 1, nbuf = 10;
-	CHANNEL *chan;
+	ACL_CHANNEL *chan;
 
 	while ((ch = getopt(argc, argv, "hn:s:r:b:d:")) > 0) {
 		switch (ch) {
@@ -82,17 +83,17 @@ int main(int argc, char *argv[])
 
 	printf("max_count: %d\r\n", __max);
 
-	chan = channel_create(sizeof(unsigned long), nbuf);
+	chan = acl_channel_create(sizeof(unsigned long), nbuf);
 
 	for (i = 0; i < nsenders; i++)
-		fiber_create(fiber_producer, chan, 32000);
+		acl_fiber_create(fiber_producer, chan, 32000);
 
 	for (i = 0; i < nreceivers; i++)
-		fiber_create(fiber_consumer, chan, 32000);
+		acl_fiber_create(fiber_consumer, chan, 32000);
 
-	fiber_schedule();
+	acl_fiber_schedule();
 
-	channel_free(chan);
+	acl_channel_free(chan);
 
 	return 0;
 }

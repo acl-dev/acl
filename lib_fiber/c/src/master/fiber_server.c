@@ -22,7 +22,7 @@ int   acl_var_fiber_rw_timeout;
 int   acl_var_fiber_max_debug;
 int   acl_var_fiber_enable_core;
 int   acl_var_fiber_use_limit;
-int   acl_var_fiber_idle_limit;
+int   acl_var_acl_fiber_idle_limit;
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ "fiber_stack_size", STACK_SIZE, &acl_var_fiber_stack_size, 0, 0 },
 	{ "fiber_buf_size", 8192, &acl_var_fiber_buf_size, 0, 0 },
@@ -30,7 +30,7 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ "fiber_max_debug", 1000, &acl_var_fiber_max_debug, 0, 0 },
 	{ "fiber_enable_core", 1, &acl_var_fiber_enable_core, 0, 0 },
 	{ "fiber_use_limit", 0, &acl_var_fiber_use_limit, 0, 0 },
-	{ "fiber_idle_limit", 0, &acl_var_fiber_idle_limit, 0 , 0 },
+	{ "acl_fiber_idle_limit", 0, &acl_var_acl_fiber_idle_limit, 0 , 0 },
 
 	{ 0, 0, 0, 0, 0 },
 };
@@ -70,32 +70,32 @@ static int           __server_stopping = 0;
 static int           __nclients = 0;
 static unsigned      __nused = 0;
 
-static void server_exit(FIBER *fiber, int status)
+static void server_exit(ACL_FIBER *fiber, int status)
 {
 	acl_msg_info("%s(%d), %s: fiber = %d, service exit now!",
-		__FILE__, __LINE__, __FUNCTION__, fiber_id(fiber));
+		__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(fiber));
 	exit (status);
 }
 
-static void server_abort(FIBER *fiber)
+static void server_abort(ACL_FIBER *fiber)
 {
 	acl_msg_info("%s(%d), %s: service abort now",
 		__FILE__, __LINE__, __FUNCTION__);
 	server_exit(fiber, 1);
 }
 
-static void server_stop(FIBER *fiber)
+static void server_stop(ACL_FIBER *fiber)
 {
 	if (__server_stopping)
 		return;
 
 	__server_stopping = 1;
 
-	fiber_sleep(2);
+	acl_fiber_sleep(2);
 	server_exit(fiber, 0);
 }
 
-static void fiber_monitor_master(FIBER *fiber, void *ctx)
+static void fiber_monitor_master(ACL_FIBER *fiber, void *ctx)
 {
 	ACL_VSTREAM *stat_stream = (ACL_VSTREAM *) ctx;
 	char  buf[8192];
@@ -109,7 +109,7 @@ static void fiber_monitor_master(FIBER *fiber, void *ctx)
 	server_exit(fiber, 0);
 }
 
-static void fiber_monitor_used(FIBER *fiber, void *ctx acl_unused)
+static void fiber_monitor_used(ACL_FIBER *fiber, void *ctx acl_unused)
 {
 	if (acl_var_fiber_use_limit <= 0) {
 		acl_msg_warn("%s(%d), %s: invalid fiber_use_limit(%d)",
@@ -120,7 +120,7 @@ static void fiber_monitor_used(FIBER *fiber, void *ctx acl_unused)
 
 	while (!__server_stopping) {
 		if (__nclients > 0) {
-			fiber_sleep(1);
+			acl_fiber_sleep(1);
 			continue;
 		}
 
@@ -132,34 +132,34 @@ static void fiber_monitor_used(FIBER *fiber, void *ctx acl_unused)
 			break;
 		}
 
-		fiber_sleep(1);
+		acl_fiber_sleep(1);
 	}
 }
 
-static void fiber_monitor_idle(FIBER *fiber, void *ctx acl_unused)
+static void fiber_monitor_idle(ACL_FIBER *fiber, void *ctx acl_unused)
 {
 	time_t last = time(NULL);
 
 	while (!__server_stopping) {
 		if (__nclients > 0) {
-			fiber_sleep(1);
+			acl_fiber_sleep(1);
 			time(&last);
 			continue;
 		}
 
-		if (time(NULL) - last >= acl_var_fiber_idle_limit) {
+		if (time(NULL) - last >= acl_var_acl_fiber_idle_limit) {
 			acl_msg_info("%s(%d), %s: idle_limit reached %d",
 				__FILE__, __LINE__, __FUNCTION__,
-				acl_var_fiber_idle_limit);
+				acl_var_acl_fiber_idle_limit);
 			server_stop(fiber);
 			break;
 		}
 
-		fiber_sleep(1);
+		acl_fiber_sleep(1);
 	}
 }
 
-static void fiber_client(FIBER *fiber acl_unused, void *ctx)
+static void fiber_client(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *cstream = (ACL_VSTREAM *) ctx;
 	const char *peer = ACL_VSTREAM_PEER(cstream);
@@ -215,7 +215,7 @@ static int dispatch_receive(int dispatch_fd)
 	if (acl_getpeername(fd, remote, sizeof(remote)) == 0)
 		acl_vstream_set_peer(cstream, remote);
 
-	fiber_create(fiber_client, cstream, acl_var_fiber_stack_size);
+	acl_fiber_create(fiber_client, cstream, acl_var_fiber_stack_size);
 
 	return 0;
 }
@@ -273,7 +273,7 @@ static void dispatch_poll(ACL_VSTREAM *conn)
 	}
 }
 
-static void fiber_dispatch(FIBER *fiber, void *ctx acl_unused)
+static void fiber_dispatch(ACL_FIBER *fiber, void *ctx acl_unused)
 {
 	ACL_VSTREAM *conn;
 
@@ -287,7 +287,7 @@ static void fiber_dispatch(FIBER *fiber, void *ctx acl_unused)
 			acl_msg_warn("%s(%d), %s: connect %s error %s",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_var_fiber_dispatch_addr, acl_last_serror());
-			fiber_sleep(1);
+			acl_fiber_sleep(1);
 			continue;
 		}
 
@@ -301,10 +301,10 @@ static void fiber_dispatch(FIBER *fiber, void *ctx acl_unused)
 	}
 
 	acl_msg_info("%s(%d), %s: fiber-%d exit now", __FILE__, __LINE__,
-		__FUNCTION__, fiber_id(fiber));
+		__FUNCTION__, acl_fiber_id(fiber));
 }
 
-static void fiber_accept_main(FIBER *fiber, void *ctx)
+static void fiber_accept_main(ACL_FIBER *fiber, void *ctx)
 {
 	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx, *cstream;
 	char  ip[64];
@@ -312,7 +312,7 @@ static void fiber_accept_main(FIBER *fiber, void *ctx)
 	while (!__server_stopping) {
 		cstream = acl_vstream_accept(sstream, ip, sizeof(ip));
 		if (cstream != NULL) {
-			fiber_create(fiber_client, cstream,
+			acl_fiber_create(fiber_client, cstream,
 				acl_var_fiber_stack_size);
 			continue;
 		}
@@ -331,7 +331,7 @@ static void fiber_accept_main(FIBER *fiber, void *ctx)
 	}
 
 	acl_msg_info("%s(%d), %s: fiber-%d exit now", __FILE__, __LINE__,
-		__FUNCTION__, fiber_id(fiber));
+		__FUNCTION__, acl_fiber_id(fiber));
 	acl_vstream_close(sstream);
 }
 
@@ -363,11 +363,11 @@ static ACL_VSTREAM **server_daemon_open(int count, int fdtype)
 				__FILE__, __LINE__, myname, fd);
 
 		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
-		fiber_create(fiber_accept_main, sstream, STACK_SIZE);
+		acl_fiber_create(fiber_accept_main, sstream, STACK_SIZE);
 		sstreams[i++] = sstream;
 	}
 
-	fiber_create(fiber_monitor_master, ACL_MASTER_STAT_STREAM, STACK_SIZE);
+	acl_fiber_create(fiber_monitor_master, ACL_MASTER_STAT_STREAM, STACK_SIZE);
 
 	acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
@@ -402,7 +402,7 @@ static ACL_VSTREAM **server_alone_open(const char *addrs)
 
 		streams[i++] = sstream;
 
-		fiber_create(fiber_accept_main, sstream, STACK_SIZE);
+		acl_fiber_create(fiber_accept_main, sstream, STACK_SIZE);
 	}
 
 	acl_argv_free(tokens);
@@ -519,7 +519,7 @@ static void usage(int argc, char * argv[])
 static int __first_name;
 static va_list __ap_dest;
 
-static void fiber_main(FIBER *fiber acl_unused, void *ctx acl_unused)
+static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
 	const char *myname = "fiber_main";
 	const char *service_name = acl_safe_basename(__argv[0]);
@@ -672,13 +672,13 @@ static void fiber_main(FIBER *fiber acl_unused, void *ctx acl_unused)
 #endif
 
 	if (acl_var_fiber_dispatch_addr && *acl_var_fiber_dispatch_addr)
-		fiber_create(fiber_dispatch, NULL, STACK_SIZE);
+		acl_fiber_create(fiber_dispatch, NULL, STACK_SIZE);
 
 	if (acl_var_fiber_use_limit > 0)
-		fiber_create(fiber_monitor_used, NULL, STACK_SIZE);
+		acl_fiber_create(fiber_monitor_used, NULL, STACK_SIZE);
 
-	if (acl_var_fiber_idle_limit > 0)
-		fiber_create(fiber_monitor_idle, NULL, STACK_SIZE);
+	if (acl_var_acl_fiber_idle_limit > 0)
+		acl_fiber_create(fiber_monitor_idle, NULL, STACK_SIZE);
 
 	if (pre_jail)
 		pre_jail(pre_jail_ctx);
@@ -705,7 +705,7 @@ static void fiber_main(FIBER *fiber acl_unused, void *ctx acl_unused)
 		myname, __LINE__, __argv[0], acl_var_fiber_log_file);
 }
 
-void fiber_server_main(int argc, char *argv[],
+void acl_fiber_server_main(int argc, char *argv[],
 	void (*service)(ACL_VSTREAM*, void*), void *ctx, int name, ...)
 {
 	va_list ap;
@@ -722,6 +722,6 @@ void fiber_server_main(int argc, char *argv[],
 	va_copy(__ap_dest, ap);
 	va_end(ap);
 
-	fiber_create(fiber_main, NULL, STACK_SIZE);
-	fiber_schedule();
+	acl_fiber_create(fiber_main, NULL, STACK_SIZE);
+	acl_fiber_schedule();
 }
