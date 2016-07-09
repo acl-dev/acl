@@ -83,9 +83,10 @@ void acl_fiber_switch(void);
 void acl_fiber_schedule(void);
 
 /**
- * 停止 IO 协程过程
+ * 停止协程过程
  */
 void acl_fiber_io_stop(void);
+#define acl_fiber_stop acl_fiber_io_stop
 
 /**
  * 使当前运行的协程休眠指定毫秒数
@@ -239,6 +240,44 @@ void acl_fiber_rwlock_runlock(ACL_FIBER_RWLOCK *l);
  * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  */
 void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK *l);
+
+/* fiber semaphore */
+
+typedef struct ACL_FIBER_SEM ACL_FIBER_SEM;
+
+/**
+ * 创建协程信号量
+ * @param max {int} 信号量最大值（必须 > 0）
+ * @return {ACL_FIBER_SEM *}
+ */
+ACL_FIBER_SEM *acl_fiber_sem_create(int max);
+
+/**
+ * 释放协程信号量
+ * @param {ACL_FIBER_SEM *}
+ */
+void acl_fiber_sem_free(ACL_FIBER_SEM *sem);
+
+/**
+ * 当协程信号量 > 0 时使信号量减 1，否则等待信号量 > 0
+ * @param sem {ACL_FIBER_SEM *}
+ * @retur {int} 返回信号量当前值
+ */
+int acl_fiber_sem_wait(ACL_FIBER_SEM *sem);
+
+/**
+ * 尝试使协程信号量减 1
+ * @param sem {ACL_FIBER_SEM *}
+ * @retur {int} 成功减 1 时返回值 >= 0，返回 -1 表示当前信号量不可用
+ */
+int acl_fiber_sem_trywait(ACL_FIBER_SEM *sem);
+
+/**
+ * 使协程信号量加 1
+ * @param sem {ACL_FIBER_SEM *}
+ * @retur {int} 返回信号量当前值
+ */
+int acl_fiber_sem_post(ACL_FIBER_SEM *sem);
 
 /* channel communication */
 

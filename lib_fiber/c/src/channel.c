@@ -364,7 +364,7 @@ void *acl_channel_recvp_nb(ACL_CHANNEL *c)
 	return v;
 }
 
-int acl_channel_sendul(ACL_CHANNEL *c, ulong val)
+int acl_channel_sendul(ACL_CHANNEL *c, unsigned long val)
 {
 	return channel_op(c, CHANSND, &val, 1);
 }
@@ -377,7 +377,7 @@ unsigned long acl_channel_recvul(ACL_CHANNEL *c)
 	return val;
 }
 
-int acl_channel_sendul_nb(ACL_CHANNEL *c, ulong val)
+int acl_channel_sendul_nb(ACL_CHANNEL *c, unsigned long val)
 {
 	return channel_op(c, CHANSND, &val, 0);
 }

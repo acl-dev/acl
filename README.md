@@ -1,15 +1,16 @@
 # acl -- one advanced C/C++ lib for UNIX and WINDOWS
 
 ## Ò»¡¢ÃèÊö
-acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·þÎñÆ÷±à³Ì¿ò¼Ü£¬Í¬Ê±Ìá¹©¸ü¶àµÄÊµÓÃ¹¦ÄÜ¿â¡£Í¨¹ý¸Ã¿â£¬ÓÃ»§¿ÉÒÔ·Ç³£ÈÝÒ×µØ±àÐ´Ö§³Ö¶àÖÖÄ£Ê½(¶àÏß³Ì¡¢¶à½ø³Ì¡¢·Ç×èÈû¡¢´¥·¢Æ÷¡¢UDP·½Ê½)µÄ·þÎñÆ÷³ÌÐò£¬WEB Ó¦ÓÃ³ÌÐò£¬Êý¾Ý¿âÓ¦ÓÃ³ÌÐò¡£´ËÍâ£¬¸Ã¿â»¹Ìá¹©ÁË³£¼ûÓ¦ÓÃµÄ¿Í»§¶ËÍ¨ÐÅ¿â£¨Èç£ºHTTP¡¢SMTP¡¢ICMP¡¢redis¡¢memcache¡¢beanstalk¡¢handler socket£©£¬³£¼ûÁ÷Ê½±à½âÂë¿â£ºXML/JSON/MIME/BASE64/UUCODE/QPCODE/RFC2047 etc¡£
+acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·þÎñÆ÷±à³Ì¿ò¼Ü£¬Í¬Ê±Ìá¹©¸ü¶àµÄÊµÓÃ¹¦ÄÜ¿â¡£Í¨¹ý¸Ã¿â£¬ÓÃ»§¿ÉÒÔ·Ç³£ÈÝÒ×µØ±àÐ´Ö§³Ö¶àÖÖÄ£Ê½(¶àÏß³Ì¡¢¶à½ø³Ì¡¢·Ç×èÈû¡¢´¥·¢Æ÷¡¢UDP·½Ê½¡¢Ð­³Ì·½Ê½)µÄ·þÎñÆ÷³ÌÐò£¬WEB Ó¦ÓÃ³ÌÐò£¬Êý¾Ý¿âÓ¦ÓÃ³ÌÐò¡£´ËÍâ£¬¸Ã¿â»¹Ìá¹©ÁË³£¼ûÓ¦ÓÃµÄ¿Í»§¶ËÍ¨ÐÅ¿â£¨Èç£ºHTTP¡¢SMTP¡¢ICMP¡¢redis¡¢memcache¡¢beanstalk¡¢handler socket£©£¬³£¼ûÁ÷Ê½±à½âÂë¿â£ºXML/JSON/MIME/BASE64/UUCODE/QPCODE/RFC2047 etc¡£
 
 ### 1.1¡¢¿â×é³É
 ±¾¹¤³ÌÖ÷Òª°üº¬ 5 ¸ö¿â¼°´óÁ¿Ê¾Àý¡£5 ¸ö¿âµÄËµÃ÷ÈçÏÂ£º
 -    1) lib_acl: ¸Ã¿âÊÇ×î»ù´¡µÄ¿â£¬ÆäËü 4 ¸ö¿â¾ùÒÀÀµÓÚ¸Ã¿â; ¸Ã¿âÒÔ C ÓïÑÔÊµÏÖ¡£
 -    2) lib_protocol: ¸Ã¿âÖ÷ÒªÊµÏÖÁË http Ð­Òé¼° icmp/ping Ð­Òé; ¸Ã¿âÒÔ C ÓïÑÔÊµÏÖ¡£
 -    3) lib_acl_cpp: ¸Ã¿âÓÃ C++ ÓïÑÔ·â×°ÁË lib_acl/lib_protocol Á½¸ö¿â£¬Í¬Ê±Ôö¼ÓÁËÒ»Ð©ÆäËüÓÐ¼ÛÖµµÄ¹¦ÄÜÓ¦ÓÃ¡£
--    4) lib_dict: ¸Ã¿âÖ÷ÒªÊµÏÖÁË KEY-VALUE µÄ×ÖµäÊ½´æ´¢¿â£¬¸Ã¿âÁíÍâ»¹ÒÀÀµÓÚ BDB, CDB ÒÔ¼° tokyocabinet ¿â¡£
--    5) lib_tls: ¸Ã¿â·â×°ÁË openssl ¿â£¬Ê¹ lib_acl µÄÍ¨ÐÅÄ£Ê½¿ÉÒÔÖ§³Ö ssl¡£
+-    4) lib_fiber: ¸Ã¿âÎªÖ§³ÖÐ­³Ì¿â£¬Ö±½Ó hook ÏµÍ³ read/write µÈ API£¬Óë epoll ÅäºÏÖ§³Ö¸ß²¢·¢ÍøÂç±à³Ì¡£
+-    5) lib_dict: ¸Ã¿âÖ÷ÒªÊµÏÖÁË KEY-VALUE µÄ×ÖµäÊ½´æ´¢¿â£¬¸Ã¿âÁíÍâ»¹ÒÀÀµÓÚ BDB, CDB ÒÔ¼° tokyocabinet ¿â¡£
+-    6) lib_tls: ¸Ã¿â·â×°ÁË openssl ¿â£¬Ê¹ lib_acl µÄÍ¨ÐÅÄ£Ê½¿ÉÒÔÖ§³Ö ssl¡£
 
 ### 1.2¡¢¹¦ÄÜÄ£¿é×é³É
 #### 1.2.1¡¢ÍøÂçÍ¨ÐÅ¿â
@@ -86,6 +87,9 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 #### 1.2.13¡¢ÎÄ¼þ¶ÓÁÐ´¦Àí¿â
 Ö§³Ö¶à×éÄ¿Â¼¶ÓÁÐÎÄ¼þµÄ´´½¨¡¢É¨Ãè¡¢É¾³ýµÈ²Ù×÷£»³£ÓÃÓÚÁÙÊ±ÎÄ¼þ¶ÓÁÐµ÷¶ÈµÄ·þÎñ³ÌÐòÖÐ¡£
 
+#### 1.2.14¡¢ÍøÂçÐ­ºÍ¿â
+Ö±½Ó hook ÏµÍ³µ×²ã IO API£¬Óë epoll ÅäºÏÊµÏÖÍøÂç IO µÄ¸ß²¢·¢¡¢¸ßÐÔÄÜ±à³Ì¿ò¼Ü£¬Í¨¹ý¸ÃÄ£¿é¿ÉÒÔÊ¹Ò»Ð©Ô­ÉúµÄ³£¼û×èÈûÊ½ÍøÂç¿â£¨Èç mysql/redis/http µÈ¿Í»§¶Ë¿â£©Ö±½ÓÖ§³Ö¸ß²¢·¢ÍøÂç²Ù×÷£»Í¨¹ýÊ¹ÓÃ¸ÃÄ£¿é£¬±à³ÌÕß²ÉÓÃË³ÐòË¼Î¬±à³Ì·½Ê½£¬ÔÚÐ­³Ì¿âÄÚ²¿½«×èÈûÄ£Ê½×ªÎª·Ç×èÈûÄ£Ê½£¬Òò¶ø´ó´óÌá¸ßÁËÍøÂç²¢·¢ÄÜÁ¦¼°´¦ÀíÐÔÄÜ¡£
+
 ## ¶þ¡¢Æ½Ì¨Ö§³Ö¼°±àÒë
 Õû¸ö¹¤³ÌÄ¿Ç°Ö§³Ö Linux(AS4,5,6, CS4,5,6, ubuntu), Windows, MacOS, FreeBSD, Solaris¡£
 * Linux/UNIX: ±àÒëÆ÷Îª gcc£¬Ö±½ÓÔÚÖÕ¶ËÃüÁîÐÐ·½Ê½ÏÂ·Ö±ð½øÈë lib_acl/lib_protocol/lib_acl_cpp/lib_dict/lib_tls Ä¿Â¼ÏÂ£¬ÔËÐÐ make ÃüÁî¼´¿É¡£
@@ -151,7 +155,12 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 -    **16 redis: ÍêÕûÊµÏÖÁË redis Ð­ÒéµÄ¿Í»§¶ËÍ¨ÐÅ¿â(×Ü¹² 12 ¸ö´óÀà£¬150 ¶à¸öÃüÁî)£¬Ö§³ÖÁ¬½Ó³Ø¼°Á¬½Ó³Ø¼¯Èº¹ÜÀí**
 -    17 disque: Ö§³Ö¼¯ÈºÏûÏ¢¶ÓÁÐ·þÎñ disque µÄ¿Í»§¶Ë¿â£¬Ö§³ÖÁ¬½Ó³Ø¼°Á¬½Ó³Ø¼¯Èº¹ÜÀí
 
-### 3.4¡¢Í¼Àý
+### 3.4¡¢lib_fiber
+-    1 c Ä¿Â¼£º¸ÃÄ¿Â¼ÏÂÖ÷ÒªÎª C ÓïÑÔ°æ±¾ÊµÏÖµÄÍøÂçÐ­³Ì¿â£¬ÆäÖÐ°üº¬Ô´ÎÄ¼þ¼°Í·ÎÄ¼þ
+-    2 cpp Ä¿Â¼£º¸ÃÄ¿Â¼ÏÂ·â×°ÁË C ÓïÑÔ°æ±¾µÄÍøÂçÐ­³Ì¿â
+-    3 samples Ä¿Â¼£º¸ÃÄ¿Â¼ÏÂÓÐ´óÁ¿µÄÊ¹ÓÃÐ­³Ì¿â±à³ÌµÄÀý×Ó
+
+### 3.5¡¢Í¼Àý
 *    ÀàË÷ÒýÍ¼£º
      ![ÀàË÷ÒýÍ¼](res/img/index.jpg)
 *    Òì²½ IO Àà¼Ì³ÐÍ¼
@@ -169,7 +178,7 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 *    ÍøÒ³ÏÂÔØ³ÌÐò£º
      ![ÍøÒ³ÏÂÔØ³ÌÐò](res/img/http_client.jpg)
 
-### 3.5¡¢acl ¿âÖÐÓÐ´óÁ¿Ê¾Àý¿É¹©²Î¿¼£¬Çë²Î¿¼£º[SAMPLES.md](SAMPLES.md)
+### 3.6¡¢acl ¿âÖÐÓÐ´óÁ¿Ê¾Àý¿É¹©²Î¿¼£¬Çë²Î¿¼£º[SAMPLES.md](SAMPLES.md)
 
 ## ËÄ¡¢Ê¹ÓÃÐí¿É
 - BSD license (license.bsd)
@@ -178,4 +187,5 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ÐÅ¿â¼°·
 ## Îå¡¢ÆäËü
 - WEB Õ¾µã: http://www.iteye.com
 - Download: https://sourceforge.net/projects/acl
+- Î¢ ²©£ºhttp://weibo.com/zsxxsz
 - QQ Èº: 242722074

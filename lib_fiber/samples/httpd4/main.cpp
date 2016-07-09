@@ -124,7 +124,7 @@ static void fiber_event(ACL_FIBER *fiber acl_unused, void *ctx)
 	acl_vstream_close(sstream);
 	acl_event_free(event);
 
-	acl_fiber_io_stop();
+	acl_fiber_stop();
 }
 
 static void usage(const char *procname)
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	sstream = acl_vstream_listen(addr, 128);
+	sstream = acl_vstream_listen(addr, 1024);
 	if (sstream == NULL) {
 		printf("acl_vstream_listen error %s\r\n", acl_last_serror());
 		return 1;

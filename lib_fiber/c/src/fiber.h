@@ -93,6 +93,11 @@ struct ACL_FIBER_RWLOCK {
 	ACL_RING   wwaiting;
 };
 
+struct ACL_FIBER_SEM {
+	int num;
+	ACL_RING waiting;
+};
+
 /* in fiber.c */
 extern __thread int acl_var_hook_sys_api;
 

@@ -493,77 +493,120 @@ bool mime::save_mail(const char* path, const char* filename,
 	return (true);
 }
 
-// 找到邮件正文结点
-static MIME_NODE* body_node(MIME_STATE* pMime, bool htmlFirst)
+static MIME_NODE *get_alternative(MIME_STATE *pMime)
 {
-	// 如果不是 multipart 格式则返回根结点为邮件正文结点
-	if (pMime->root->ctype != MIME_CTYPE_MULTIPART)
-	{
-		return (pMime->root);
-	}
-	else if (pMime->root->boundary == NULL)
-	{
-		logger_warn("no boundary for multipart");
-		return (pMime->root);
-	}
-
-	ACL_ITER iter;
-
-	if (htmlFirst)
-	{
-		MIME_NODE* pHtml = NULL, *pText = NULL;
-		acl_foreach(iter, pMime)
-		{
-			MIME_NODE* pNode = (MIME_NODE*) iter.data;
-			if (pNode->ctype != MIME_CTYPE_TEXT)
-				continue;
-
-			if (pNode->stype == MIME_STYPE_HTML)
-			{
-				pHtml = pNode;
-				break;
-			}
-			else if (pNode->stype == MIME_STYPE_PLAIN)
-			{
-				// 仅保留第一个纯文本的结点
-				if (pText == NULL)
-					pText = pNode;
-			}
-		}
-
-		return (pHtml != NULL ? pHtml : pText);
-	}
-
 	// 从根结点开始遍历整个 multipart 邮件中所有的子结点，
 	// 直至找到第一个不包含子结点的结点，因为遍历过程本身
 	// 保证了遍历是自上而下遍历的，即先遍历根结点的子结点，
 	// 然后层层遍历子结点的子结点直至满足条件为止
-	//
 
-	MIME_NODE* pAlterNativeNode = NULL;
+	MIME_NODE* pAlterNative = NULL;
+	ACL_ITER iter;
 
 	acl_foreach(iter, pMime)
 	{
 		MIME_NODE* pNode = (MIME_NODE*) iter.data;
 		if (pNode->ctype != MIME_CTYPE_MULTIPART
-			&& pNode->stype != MIME_STYPE_ALTERNATIVE)
+			|| pNode->stype != MIME_STYPE_ALTERNATIVE)
 		{
 			continue;
 		}
 		// 如果该结点的子结点数小于 2 则说明邮件格式有误
 		if (acl_ring_size(&pNode->children) < 2)
 			continue;
-		pAlterNativeNode = pNode;
+		pAlterNative = pNode;
 	}
 
-	if (pAlterNativeNode == NULL)
+	return pAlterNative;
+}
+
+static MIME_NODE *get_text_html(MIME_NODE *pAlterNative)
+{
+	ACL_ITER iter;
+	MIME_NODE* pHtml = NULL, *pText = NULL;
+
+	acl_foreach(iter, pAlterNative)
 	{
-		logger_warn("no alternative node");
-		return (pMime->root);
+		MIME_NODE* pNode = (MIME_NODE*) iter.data;
+		if (pNode->ctype != MIME_CTYPE_TEXT)
+			continue;
+
+		if (pNode->stype == MIME_STYPE_HTML)
+		{
+			pHtml = pNode;
+			break;
+		}
+		else if (pNode->stype == MIME_STYPE_PLAIN)
+		{
+			// 仅保留第一个纯文本的结点
+			if (pText == NULL)
+				pText = pNode;
+		}
 	}
 
-	return (acl_ring_first_appl(&pAlterNativeNode->children,
-			MIME_NODE, node));
+	return pHtml != NULL ? pHtml : pText;
+}
+
+static MIME_NODE *get_text_plain(MIME_NODE *pAlterNative)
+{
+	ACL_ITER iter;
+	MIME_NODE* pHtml = NULL, *pText = NULL;
+
+	acl_foreach(iter, pAlterNative)
+	{
+		MIME_NODE* pNode = (MIME_NODE*) iter.data;
+		if (pNode->ctype != MIME_CTYPE_TEXT)
+			continue;
+
+		if (pNode->stype == MIME_STYPE_PLAIN)
+		{
+			pText = pNode;
+			break;
+		}
+		else if (pNode->stype == MIME_STYPE_HTML)
+		{
+			// 仅保留第一个HTML结点
+			if (pHtml == NULL)
+				pHtml = pNode;
+		}
+	}
+
+	return pText != NULL ? pText : pHtml;
+}
+
+// 找到邮件正文结点
+static MIME_NODE* body_node(MIME_STATE* pMime, bool htmlFirst)
+{
+	if (pMime->root->ctype == MIME_CTYPE_TEXT)
+		return pMime->root;
+
+	if (pMime->root->ctype != MIME_CTYPE_MULTIPART)
+		return NULL;
+	else if (pMime->root->boundary == NULL)
+	{
+		logger_warn("no boundary for multipart");
+		return NULL;
+	}
+
+	MIME_NODE *pAlterNative;
+
+	if (pMime->root->stype == MIME_STYPE_ALTERNATIVE)
+		pAlterNative = pMime->root;
+	else
+		pAlterNative = get_alternative(pMime);
+
+	if (pAlterNative != NULL)
+	{
+		if (htmlFirst)
+			return get_text_html(pAlterNative);
+		else
+			return get_text_plain(pAlterNative);
+	}
+
+	if (htmlFirst)
+		return get_text_html(pMime->root);
+	else
+		return get_text_plain(pMime->root);
 }
 
 mime_body* mime::get_body_node(bool htmlFirst,

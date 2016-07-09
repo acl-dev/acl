@@ -52,10 +52,10 @@ int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *l)
 }
 
 #define RING_TO_FIBER(r) \
-	((ACL_FIBER *) ((char *) (r) - offsetof(ACL_FIBER, me)))
+    ((ACL_FIBER *) ((char *) (r) - offsetof(ACL_FIBER, me)))
 
 #define FIRST_FIBER(head) \
-	(acl_ring_succ(head) != (head) ? RING_TO_FIBER(acl_ring_succ(head)) : 0)
+    (acl_ring_succ(head) != (head) ? RING_TO_FIBER(acl_ring_succ(head)) : 0)
 
 void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *l)
 {

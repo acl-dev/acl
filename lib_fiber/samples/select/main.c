@@ -6,7 +6,10 @@
 
 static  int  __nfibers = 0;
 
-static void select_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
+/**
+ * 协程入口
+ */
+static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 {
 	int  in = 0, fd = dup(in), n;
 	fd_set rset;
@@ -21,6 +24,7 @@ static void select_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
 		tv.tv_sec = 1;
 		tv.tv_usec = 0;
 
+		/* 监控该描述符句柄是否可读 */
 		n = select(fd + 1, &rset, NULL, NULL, &tv);
 		if (n < 0) {
 			printf("poll error: %s\r\n", acl_last_serror());
@@ -37,6 +41,7 @@ static void select_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
 		if (FD_ISSET(fd, &rset)) {
 			char buf[256];
 
+			/* 当描述符可读时，从中读取数据 */
 			n = read(fd, buf, sizeof(buf) - 1);
 			if (n < 0) {
 				if (errno != EWOULDBLOCK) {
@@ -61,6 +66,8 @@ static void select_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
 	}
 
 	printf(">>>fiber-%d exit\r\n", acl_fiber_id(fiber));
+
+	/* 当所有协程都执行完时停止协程调度过程 */
 	if (--__nfibers == 0)
 		acl_fiber_io_stop();
 }
@@ -94,9 +101,11 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	/* 循环创建指定数量的协程 */
 	for (i = 0; i < __nfibers; i++)
-		acl_fiber_create(select_sleep, &n, 32768);
+		acl_fiber_create(fiber_main, &n, 32768);
 
+	/* 开始调度协程过程 */
 	acl_fiber_schedule();
 
 	return 0;
