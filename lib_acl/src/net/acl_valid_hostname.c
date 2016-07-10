@@ -224,7 +224,7 @@ int acl_valid_ipv6_hostaddr(const char *addr, int gripe)
 					acl_msg_warn("%s: too few `:' in IPv6"
 						" address: %.100s",
 						myname, addr);
-					return (0);
+				return (0);
 			} else if (len == 0 && null_field != field - 1) {
 				if (gripe)
 					acl_msg_warn("%s: bad null last field"

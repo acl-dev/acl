@@ -534,7 +534,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 			if (!zerolimit)
 				acl_msg_fatal("service %s requires a process"
 					" limit of 0", service_name);
-				break;
+			break;
 		default:
 			acl_msg_panic("%s: unknown argument type: %d", myname, key);
 		}

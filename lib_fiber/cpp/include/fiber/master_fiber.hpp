@@ -1,12 +1,14 @@
 #pragma once
-#include "acl_cpp/lib_acl.hpp"
+#include "acl_cpp/acl_cpp_define.hpp"
+#include "acl_cpp/master/master_base.hpp"
+#include "acl_cpp/stream/socket_stream.hpp"
 
 namespace acl {
 
 /**
  * 基于协程方式的网络服务类
  */
-class master_fiber : public acl::master_base
+class master_fiber : public master_base
 {
 public:
 	/**

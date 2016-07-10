@@ -1,4 +1,6 @@
 #pragma once
+#include "acl_cpp/acl_cpp_define.hpp"
+#include "acl_cpp/stdlib/noncopyable.hpp"
 
 struct ACL_FIBER_SEM;
 
