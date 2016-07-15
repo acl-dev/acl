@@ -104,4 +104,5 @@ service master_fiber {
 #	debug_mem = 1
 #	是否在一个线程中连接读
 #	loop_read = 1
+	remote_addr = 127.0.0.1:8888
 }

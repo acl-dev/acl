@@ -14,6 +14,7 @@ static void client_callback(int type, ACL_EVENT *event,
 static int __rw_timeout = 0;
 static int __stop = 0;
 static int __real_http = 0;
+static int __use_kernel = 0;
 
 static int http_demo(ACL_VSTREAM *cstream, const char* res, size_t len)
 {
@@ -114,7 +115,12 @@ static void listen_callback(int type acl_unused, ACL_EVENT *event,
 static void fiber_event(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx;
-	ACL_EVENT *event = acl_event_new(ACL_EVENT_POLL, 0, 1, 0);
+	ACL_EVENT *event;
+
+	if (__use_kernel)
+		event = acl_event_new(ACL_EVENT_KERNEL, 0, 1, 0);
+	else
+		event = acl_event_new(ACL_EVENT_POLL, 0, 1, 0);
 
 	acl_event_enable_listen(event, sstream, 0, listen_callback, NULL);
 
@@ -129,7 +135,11 @@ static void fiber_event(ACL_FIBER *fiber acl_unused, void *ctx)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -s listen_addr -r rw_timeout -R [use real http]\r\n", procname);
+	printf("usage: %s -h [help]\r\n"
+		" -s listen_addr\r\n"
+		" -r rw_timeout\r\n"
+		" -R [use real http]\r\n"
+		" -k [use kernel event]\r\n", procname);
 }
 
 int main(int argc, char *argv[])
@@ -138,9 +148,10 @@ int main(int argc, char *argv[])
 	ACL_VSTREAM *sstream;
 	int  ch;
 
+	acl::log::stdout_open(true);
 	snprintf(addr, sizeof(addr), "%s", "127.0.0.1:9001");
 
-	while ((ch = getopt(argc, argv, "hs:r:R")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:r:Rk")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -153,6 +164,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'R':
 			__real_http = 1;
+			break;
+		case 'k':
+			__use_kernel = 1;
 			break;
 		default:
 			break;

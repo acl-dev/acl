@@ -6,11 +6,13 @@
 #include "event.h"
 #include "event_epoll.h"
 
+typedef int (*epoll_create_fn)(int);
 typedef int (*epoll_wait_fn)(int, struct epoll_event *,int, int);
 typedef int (*epoll_ctl_fn)(int, int, int, struct epoll_event *);
 
-static epoll_wait_fn __sys_epoll_wait = NULL;
-static epoll_ctl_fn  __sys_epoll_ctl  = NULL;
+static epoll_create_fn __sys_epoll_create = NULL;
+static epoll_wait_fn   __sys_epoll_wait   = NULL;
+static epoll_ctl_fn    __sys_epoll_ctl    = NULL;
 
 void hook_epoll(void)
 {
@@ -21,8 +23,9 @@ void hook_epoll(void)
 
 	__called++;
 
-	__sys_epoll_wait = (epoll_wait_fn) dlsym(RTLD_NEXT, "epoll_wait");
-	__sys_epoll_ctl  = (epoll_ctl_fn) dlsym(RTLD_NEXT, "epoll_ctl");
+	__sys_epoll_create = (epoll_create_fn) dlsym(RTLD_NEXT, "epoll_create");
+	__sys_epoll_wait   = (epoll_wait_fn) dlsym(RTLD_NEXT, "epoll_wait");
+	__sys_epoll_ctl    = (epoll_ctl_fn) dlsym(RTLD_NEXT, "epoll_ctl");
 }
 
 typedef struct EVENT_EPOLL {
@@ -83,7 +86,7 @@ static int epoll_event_add(EVENT *ev, int fd, int mask)
 	return 0;
 }
 
-static void epoll_event_del(EVENT *ev, int fd, int delmask)
+static int epoll_event_del(EVENT *ev, int fd, int delmask)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 	struct epoll_event ee;
@@ -104,7 +107,9 @@ static void epoll_event_del(EVENT *ev, int fd, int delmask)
 			fiber_save_errno();
 			acl_msg_error("%s(%d), epoll_ctl error: %s, fd: %d",
 				__FUNCTION__, __LINE__, acl_last_serror(), fd);
+			return -1;
 		}
+		return 0;
 	} else {
 		/* Note, Kernel < 2.6.9 requires a non null event pointer
 		 * even for EPOLL_CTL_DEL.
@@ -113,7 +118,9 @@ static void epoll_event_del(EVENT *ev, int fd, int delmask)
 			fiber_save_errno();
 			acl_msg_error("%s(%d), epoll_ctl error: %s, fd: %d",
 				__FUNCTION__, __LINE__, acl_last_serror(), fd);
+			return -1;
 		}
+		return 1;
 	}
 }
 
@@ -144,11 +151,18 @@ static int epoll_event_loop(EVENT *ev, struct timeval *tv)
 				mask |= EVENT_WRITABLE;
 		}
 
-		ev->fired[j].fd = e->data.fd;
+		ev->fired[j].fd   = e->data.fd;
 		ev->fired[j].mask = mask;
 	}
 
 	return retval;
+}
+
+static int epoll_event_handle(EVENT *ev)
+{
+	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
+
+	return ep->epfd;
 }
 
 static const char *epoll_event_name(void)
@@ -163,14 +177,15 @@ EVENT *event_epoll_create(int setsize)
 	ep->epoll_events = (struct epoll_event *)
 		acl_mymalloc(sizeof(struct epoll_event) * setsize);
 
-	ep->epfd = epoll_create(1024);
+	ep->epfd = __sys_epoll_create(1024);
 	acl_assert(ep->epfd >= 0);
 
-	ep->event.name = epoll_event_name;
-	ep->event.loop = epoll_event_loop;
-	ep->event.add  = epoll_event_add;
-	ep->event.del  = epoll_event_del;
-	ep->event.free = epoll_event_free;
+	ep->event.name   = epoll_event_name;
+	ep->event.handle = epoll_event_handle;
+	ep->event.loop   = epoll_event_loop;
+	ep->event.add    = epoll_event_add;
+	ep->event.del    = epoll_event_del;
+	ep->event.free   = epoll_event_free;
 
 	return (EVENT*) ep;
 }

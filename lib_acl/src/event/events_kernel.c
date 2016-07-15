@@ -69,8 +69,7 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	int   err = 0, ret = 0;
 
 	if (fdp == NULL)
-		acl_msg_fatal("%s(%d): fdp null, sockfd(%d)",
-			myname, __LINE__, sockfd);
+		return;
 
 #ifdef EVENT_REG_DEL_BOTH
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)

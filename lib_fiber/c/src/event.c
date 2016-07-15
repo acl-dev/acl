@@ -13,7 +13,7 @@
 EVENT *event_create(int size)
 {
 	int i;
-	EVENT *ev = event_epoll_create(size);
+	EVENT *ev   = event_epoll_create(size);
 
 	ev->events  = (FILE_EVENT *) acl_mycalloc(size, sizeof(FILE_EVENT));
 	ev->defers  = (DEFER_DELETE *) acl_mycalloc(size, sizeof(FILE_EVENT));
@@ -22,7 +22,8 @@ EVENT *event_create(int size)
 	ev->maxfd   = -1;
 	ev->ndefer  = 0;
 	ev->timeout = -1;
-	acl_ring_init(&ev->pevents_list);
+	acl_ring_init(&ev->poll_list);
+	acl_ring_init(&ev->epoll_list);
 
 	/* Events with mask == AE_NONE are not set. So let's initialize the
 	 * vector with it.
@@ -34,6 +35,16 @@ EVENT *event_create(int size)
 	}
 
 	return ev;
+}
+
+const char *event_name(EVENT *ev)
+{
+	return ev->name();
+}
+
+int event_handle(EVENT *ev)
+{
+	return ev->handle(ev);
 }
 
 /* Return the current set size. */
@@ -53,34 +64,6 @@ void event_free(EVENT *ev)
 	acl_myfree(events);
 	acl_myfree(defers);
 	acl_myfree(fired);
-}
-
-void event_poll(EVENT *ev, POLL_EVENTS *pe, int timeout)
-{
-	int i;
-
-	acl_ring_prepend(&ev->pevents_list, &pe->me);
-	pe->nready = 0;
-	for (i = 0; i < pe->nfds; i++) {
-		if (pe->fds[i].events & POLLIN) {
-			event_add(ev, pe->fds[i].fd, EVENT_READABLE, NULL, pe);
-			ev->events[pe->fds[i].fd].pevents = pe;
-			ev->events[pe->fds[i].fd].pfd = &pe->fds[i];
-		}
-
-		if (pe->fds[i].events & POLLOUT) {
-			event_add(ev, pe->fds[i].fd, EVENT_WRITABLE, NULL, pe);
-			ev->events[pe->fds[i].fd].pevents = pe;
-			ev->events[pe->fds[i].fd].pfd = &pe->fds[i];
-		}
-
-		pe->fds[i].revents = 0;
-	}
-
-	if (timeout > 0) {
-		if (ev->timeout < 0 || timeout < ev->timeout)
-			ev->timeout = timeout;
-	}
 }
 
 static int check_fdtype(int fd)
@@ -106,7 +89,6 @@ static int check_fdtype(int fd)
 		return 0;
 
 	return -1;
-
 }
 
 int event_add(EVENT *ev, int fd, int mask, event_proc *proc, void *ctx)
@@ -177,9 +159,7 @@ int event_add(EVENT *ev, int fd, int mask, event_proc *proc, void *ctx)
 	if (mask & EVENT_WRITABLE)
 		fe->w_proc = proc;
 
-	fe->ctx     = ctx;
-	fe->pevents = NULL;
-	fe->pfd     = NULL;
+	fe->ctx = ctx;
 
 	if (fd > ev->maxfd)
 		ev->maxfd = fd;
@@ -197,19 +177,20 @@ static void __event_del(EVENT *ev, int fd, int mask)
 		return;
 	}
 
-	fe             = &ev->events[fd];
-	fe->type       = TYPE_NONE;
-	fe->defer      = NULL;
-	fe->pevents    = NULL;
-	fe->pfd        = NULL;
-	fe->mask_fired = EVENT_NONE;
+	fe = &ev->events[fd];
 
 	if (fe->mask == EVENT_NONE) {
 		acl_msg_info("----mask NONE, fd: %d----", fd);
 		return;
 	}
 
-	ev->del(ev, fd, mask);
+	if (ev->del(ev, fd, mask) == 1) {
+		fe->mask_fired = EVENT_NONE;
+		fe->type       = TYPE_NONE;
+		fe->defer      = NULL;
+		fe->pe         = NULL;
+	}
+
 	fe->mask = fe->mask & (~mask);
 
 	if (fd == ev->maxfd && fe->mask == EVENT_NONE) {
@@ -230,6 +211,7 @@ void event_del(EVENT *ev, int fd, int mask)
 	FILE_EVENT *fe;
 
 	fe = &ev->events[fd];
+
 	if (fe->type == TYPE_NOSOCK) {
 		fe->type = TYPE_NONE;
 		return;
@@ -330,20 +312,6 @@ int event_process(EVENT *ev, int left)
 		fe             = &ev->events[fd];
 		fe->mask_fired = mask;
 
-		if (fe->pevents != NULL) {
-			if (fe->mask & mask & EVENT_READABLE) {
-				fe->pfd->revents |= POLLIN;
-				fe->pevents->nready++;
-			}
-
-			if (fe->mask & mask & EVENT_WRITABLE) {
-				fe->pfd->revents |= POLLOUT;
-				fe->pevents->nready++;
-			}
-
-			continue;
-		}
-
 		/* note the fe->mask & mask & ... code: maybe an already
 		 * processed event removed an element that fired and we
 		 * still didn't processed, so we check if the event is
@@ -363,15 +331,23 @@ int event_process(EVENT *ev, int left)
 		processed++;
 	}
 
-	acl_ring_foreach(ev->iter, &ev->pevents_list) {
-		POLL_EVENTS *pe = acl_ring_to_appl(ev->iter.ptr,
-				POLL_EVENTS, me);
+#define TO_APPL	acl_ring_to_appl
+
+	acl_ring_foreach(ev->iter, &ev->poll_list) {
+		POLL_EVENT *pe = TO_APPL(ev->iter.ptr, POLL_EVENT, me);
 
 		pe->proc(ev, pe);
 		processed++;
 	}
+	acl_ring_init(&ev->poll_list);
 
-	acl_ring_init(&ev->pevents_list);
+	acl_ring_foreach(ev->iter, &ev->epoll_list) {
+		EPOLL_EVENT *ee = TO_APPL(ev->iter.ptr, EPOLL_EVENT, me);
+
+		ee->proc(ev, ee);
+		processed++;
+	}
+	acl_ring_init(&ev->epoll_list);
 
 	/* return the number of processed file/time events */
 	return processed;

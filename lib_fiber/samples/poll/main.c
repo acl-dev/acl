@@ -64,24 +64,18 @@ static void poll_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -a cmd\r\n", procname);
+	printf("usage: %s -h [help]\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
 	int   ch, n = 1;
-	char  cmd[128];
 
-	snprintf(cmd, sizeof(cmd), "sleep");
-
-	while ((ch = getopt(argc, argv, "ha:")) > 0) {
+	while ((ch = getopt(argc, argv, "h")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
-		case 'a':
-			snprintf(cmd, sizeof(cmd), "%s", optarg);
-			break;
 		default:
 			break;
 		}

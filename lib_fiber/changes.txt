@@ -1,3 +1,7 @@
+
+12) 2016.7.14
+12.1) feature: hook_net.c 增加了 epoll 的 hook 支持
+
 11) 2016.7.9
 11.1) feature: fiber_sem.c 增加协程信号量
 

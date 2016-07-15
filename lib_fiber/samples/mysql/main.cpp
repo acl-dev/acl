@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//#define USE_THREADS
+
 class mysql_oper
 {
 public:
@@ -164,6 +166,8 @@ protected:
 
 		delete this;
 
+		printf("----__cur_fibers: %d----\r\n", __cur_fibers);
+
 		if (--__cur_fibers == 0)
 		{
 			printf("All fibers Over\r\n");
@@ -195,7 +199,7 @@ static void usage(const char* procname)
 
 int main(int argc, char *argv[])
 {
-	int  ch, count = 10, conn_timeout = 10, rw_timeout = 10, cocurrent = 10;
+	int  ch, count = 10, conn_timeout = 10, rw_timeout = 10, cocurrent = 2;
 	acl::string mysql_path("../../lib/libmysqlclient_r.so");
 	acl::string dbaddr("127.0.0.1:3306"), dbname("acl_db");
 	acl::string dbuser("root"), dbpass(""), oper("get");

@@ -17,9 +17,9 @@ CFLAGS = -c -g -W \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \
 -D_USE_FAST_MACRO \
--Wno-long-long
+-Wno-long-long \
+-DUSE_VALGRIND
 #-Wno-clobbered
-#-DUSE_VALGRIND
 
 #-pedantic
 # -Wcast-align
@@ -139,6 +139,7 @@ SHARED_LIBNAME = lib_fiber.so
 COMPILE = $(CC) $(CFLAGS)
 
 all: static shared
+rebuild rb: clean all
 
 $(shell mkdir -p $(OBJ_PATH_DST))
 
@@ -181,7 +182,7 @@ $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/%.c
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/master/%.c
 	$(COMPILE) $< -o $@
 
-clean:
+clean cl:
 	rm -f $(LIB_PATH_DST)/lib_fiber.a
 	rm -f $(LIB_PATH_DST)/lib_fiber.so
 	rm -f $(OBJ)

@@ -74,25 +74,20 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -a cmd -c fibers_count\r\n", procname);
+	printf("usage: %s -h [help] -c fibers_count\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
 	int   ch, n = 1, i;
-	char  cmd[128];
 
-	snprintf(cmd, sizeof(cmd), "sleep");
 	__nfibers = 1;
 
-	while ((ch = getopt(argc, argv, "ha:c:")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
-		case 'a':
-			snprintf(cmd, sizeof(cmd), "%s", optarg);
-			break;
 		case 'c':
 			__nfibers = atoi(optarg);
 			break;
