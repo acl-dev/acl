@@ -35,6 +35,11 @@ static void echo_client(ACL_VSTREAM *cstream)
 
 		if (!__read_data) {
 			__total_count++;
+			if (__total_count % 10000 == 0) {
+				printf("fiber-%d: total %lld, curr %d\r\n",
+					acl_fiber_self(), __total_count, i);
+				acl_fiber_yield();
+			}
 			continue;
 		}
 
@@ -58,12 +63,14 @@ static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx)
 	ACL_VSTREAM *cstream = acl_vstream_connect(addr, ACL_BLOCKING,
 			__conn_timeout, __rw_timeout, 4096);
 	if (cstream == NULL) {
-		printf("connect %s error %s\r\n", addr, acl_last_serror());
+		printf("fiber-%d: connect %s error %s\r\n",
+			acl_fiber_self(), addr, acl_last_serror());
 		__total_error_clients++;
 	} else {
 		__total_clients++;
-		printf("connect %s ok, clients: %d, fd: %d\r\n",
-			addr, __total_clients, ACL_VSTREAM_SOCK(cstream));
+		printf("fiber-%d: connect %s ok, clients: %d, fd: %d\r\n",
+			acl_fiber_self(), addr, __total_clients,
+			ACL_VSTREAM_SOCK(cstream));
 		echo_client(cstream);
 	}
 

@@ -55,7 +55,7 @@ static void *thread_main(void *ctx acl_unused)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -n max_loop -m max_fiber -t max_threads\r\n", procname);
+	printf("usage: %s -h [help] -n max_loop -c max_fiber -t max_threads\r\n", procname);
 }
 
 int main(int argc, char *argv[])
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 	acl_pthread_attr_t attr;
 	acl_pthread_t *tids;
 
-	while ((ch = getopt(argc, argv, "hn:m:t:")) > 0) {
+	while ((ch = getopt(argc, argv, "hn:c:t:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 		case 'n':
 			__max_loop = atoi(optarg);
 			break;
-		case 'm':
+		case 'c':
 			__max_fiber = atoi(optarg);
 			break;
 		case 't':

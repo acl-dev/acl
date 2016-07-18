@@ -17,9 +17,10 @@ CFLAGS = -c -g -W \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \
 -D_USE_FAST_MACRO \
--Wno-long-long \
--DUSE_VALGRIND
+-Wno-long-long
+#-DUSE_VALGRIND
 #-Wno-clobbered
+#-O3
 
 #-pedantic
 # -Wcast-align

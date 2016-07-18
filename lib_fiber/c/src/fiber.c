@@ -32,7 +32,7 @@ typedef struct {
 
 static FIBER_TLS *__main_fiber = NULL;
 static __thread FIBER_TLS *__thread_fiber = NULL;
-__thread int acl_var_hook_sys_api = 1;
+__thread int acl_var_hook_sys_api = 0;
 
 static acl_pthread_key_t __fiber_key;
 
@@ -366,6 +366,8 @@ void acl_fiber_schedule(void)
 	ACL_FIBER *fiber;
 	ACL_RING *head;
 
+	acl_fiber_hook_api(1);
+
 	for (;;) {
 		head = acl_ring_pop_head(&__thread_fiber->queue);
 		if (head == NULL) {
@@ -383,14 +385,14 @@ void acl_fiber_schedule(void)
 		__thread_fiber->running = NULL;
 	}
 
-	// release dead fiber 
+	/* release dead fiber */
 	for (;;) {
 		head = acl_ring_pop_head(&__thread_fiber->dead);
 		if (head == NULL)
 			break;
 
 		fiber = ACL_RING_TO_APPL(head, ACL_FIBER, me);
-		fiber_free (fiber);
+		fiber_free(fiber);
 	}
 }
 

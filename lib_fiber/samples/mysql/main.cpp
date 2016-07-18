@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//#define USE_THREADS
-
 class mysql_oper
 {
 public:
@@ -104,7 +102,8 @@ private:
 	}
 };
 
-#ifdef USE_THREADS
+//////////////////////////////////////////////////////////////////////////////
+// mysql thread class
 
 class mysql_thread : public acl::thread
 {
@@ -116,8 +115,6 @@ public:
 protected:
 	void* run(void)
 	{
-		acl::fiber::hook_api(false);
-
 		mysql_oper dboper(dbp_, id_);
 
 		if (oper_.equal("add", false))
@@ -137,7 +134,8 @@ private:
 	int count_;
 };
 
-#else
+//////////////////////////////////////////////////////////////////////////////
+// mysql fiber class
 
 static int __max_fibers = 2;
 static int __cur_fibers = 2;
@@ -182,11 +180,12 @@ private:
 	int count_;
 };
 
-#endif
+//////////////////////////////////////////////////////////////////////////////
 
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help] -c cocurrent\r\n"
+		" -t [use threads mode]\r\n"
 		" -n oper_count\r\n"
 		" -o db_oper[add|get]\r\n"
 		" -f mysqlclient_path\r\n"
@@ -203,11 +202,12 @@ int main(int argc, char *argv[])
 	acl::string mysql_path("../../lib/libmysqlclient_r.so");
 	acl::string dbaddr("127.0.0.1:3306"), dbname("acl_db");
 	acl::string dbuser("root"), dbpass(""), oper("get");
+	bool use_threads = false;
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hc:n:f:u:o:p:C:R:")) > 0)
+	while ((ch = getopt(argc, argv, "hc:tn:f:u:o:p:C:R:")) > 0)
 	{
 		switch (ch)
 		{
@@ -216,6 +216,9 @@ int main(int argc, char *argv[])
 			return 0;
 		case 'c':
 			cocurrent = atoi(optarg);
+			break;
+		case 't':
+			use_threads = true;
 			break;
 		case 'n':
 			count = atoi(optarg);
@@ -243,9 +246,10 @@ int main(int argc, char *argv[])
 		}
 	}
 
-
+	// setup libmysqlclient_r.so path
 	acl::db_handle::set_loadpath(mysql_path);
 
+	// init mysql connection configure
 	acl::mysql_conf dbconf(dbaddr, dbname);
 	dbconf.set_dbuser(dbuser)
 		.set_dbpass(dbpass)
@@ -253,41 +257,43 @@ int main(int argc, char *argv[])
 		.set_conn_timeout(conn_timeout)
 		.set_rw_timeout(rw_timeout);
 
+	// init mysql connections pool
 	acl::mysql_pool dbpool(dbconf);
 
-#ifdef USE_THREADS
-
-	std::vector<acl::thread*> threads;
-
-	for (int i = 0; i < cocurrent; i++)
+	if (use_threads)
 	{
-		acl::thread* thread = new mysql_thread(i, dbpool, oper, count);
+		std::vector<acl::thread*> threads;
 
-		thread->set_detachable(false);
-		threads.push_back(thread);
-		thread->start();
+		for (int i = 0; i < cocurrent; i++)
+		{
+			acl::thread* thread = new
+				mysql_thread(i, dbpool, oper, count);
+
+			thread->set_detachable(false);
+			threads.push_back(thread);
+			thread->start();
+		}
+
+		for (std::vector<acl::thread*>::iterator it = threads.begin();
+				it != threads.end(); ++it)
+		{
+			(*it)->wait(NULL);
+			delete (*it);
+		}
 	}
-
-	for (std::vector<acl::thread*>::iterator it = threads.begin();
-		it != threads.end(); ++it)
+	else
 	{
-		(*it)->wait(NULL);
-		delete (*it);
+		__max_fibers = cocurrent;
+		__cur_fibers = __max_fibers;
+
+		for (int i = 0; i < __max_fibers; i++)
+		{
+			acl::fiber* f = new mysql_fiber(i, dbpool, oper, count);
+			f->start();
+		}
+
+		acl::fiber::schedule();
 	}
-#else
-
-	__max_fibers = cocurrent;
-	__cur_fibers = __max_fibers;
-
-	for (int i = 0; i < __max_fibers; i++)
-	{
-		acl::fiber* f = new mysql_fiber(i, dbpool, oper, count);
-		f->start();
-	}
-
-	acl::fiber::schedule();
-
-#endif
 
 	printf("---- exit now ----\r\n");
 
