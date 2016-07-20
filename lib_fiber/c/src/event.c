@@ -113,9 +113,9 @@ int event_add(EVENT *ev, int fd, int mask, event_proc *proc, void *ctx)
 		fd2 = ev->defers[ev->ndefer].fd;
 
 		if (ev->ndefer > 0) {
-			ev->defers[pos].mask  = ev->defers[ev->ndefer].mask;
-			ev->defers[pos].pos   = pos;
-			ev->defers[pos].fd    = fd2;
+			ev->defers[pos].mask = ev->defers[ev->ndefer].mask;
+			ev->defers[pos].pos  = pos;
+			ev->defers[pos].fd   = fd2;
 
 			ev->events[fd2].defer = &ev->defers[pos];
 		} else {

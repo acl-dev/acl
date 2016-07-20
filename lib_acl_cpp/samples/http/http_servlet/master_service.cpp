@@ -109,8 +109,7 @@ void master_service::thread_on_exit()
 void master_service::proc_on_init()
 {
 	// 创建 redis 集群客户端对象，并使用 redis 集群来存储 session
-	session_server = new acl::redis_client_cluster(var_cfg_conn_timeout,
-			var_cfg_rw_timeout);
+	session_server = new acl::redis_client_cluster;
 	session_server->init(NULL, var_cfg_redis_servers, var_cfg_max_threads);
 }
 

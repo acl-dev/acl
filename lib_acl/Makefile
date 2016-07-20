@@ -93,9 +93,11 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -DLINUX2 -fPIC -Werror
 	UNIXTYPE = LINUX
 	ifeq ($(findstring i686, $(OSTYPE)), i686)
+		CFLAGS += -march=i686
 		RPATH = linux32
 	endif
 	ifeq ($(findstring x86_64, $(OSTYPE)), x86_64)
+#		CFLAGS += -m64
 		RPATH = linux64
 	endif
 endif

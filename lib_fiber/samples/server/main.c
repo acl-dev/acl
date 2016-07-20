@@ -140,8 +140,6 @@ int main(int argc, char *argv[])
 
 	printf("listen %s ok\r\n", addr);
 
-	acl_non_blocking(ACL_VSTREAM_SOCK(sstream), ACL_NON_BLOCKING);
-
 	printf("%s: call fiber_creater\r\n", __FUNCTION__);
 	acl_fiber_create(fiber_accept, sstream, 32768);
 

@@ -61,7 +61,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	const char* param2 = req.getParameter("name2");
 
 	// 创建 xml 格式的数据体
-	acl::xml body;
+	acl::xml1 body;
 	body.get_root()
 		.add_child("root", true)
 			.add_child("session", true)

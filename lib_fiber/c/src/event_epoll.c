@@ -62,7 +62,10 @@ static int epoll_event_add(EVENT *ev, int fd, int mask)
 	ee.data.ptr = NULL;
 	ee.data.fd  = fd;
 
+#if 0
 	mask |= ev->events[fd].mask; /* Merge old events */
+#endif
+
 	if (mask & EVENT_READABLE)
 		ee.events |= EPOLLIN;
 	if (mask & EVENT_WRITABLE)
@@ -133,6 +136,11 @@ static int epoll_event_loop(EVENT *ev, struct timeval *tv)
 	retval = __sys_epoll_wait(ep->epfd, ep->epoll_events, ev->setsize,
 			tv ? (tv->tv_sec * 1000 + tv->tv_usec / 1000) : -1);
 
+	if (0)
+	{
+		int n = tv->tv_sec * 1000 + tv->tv_usec / 1000;
+		printf(">>n: %d, ret: %d\r\n", n, retval);
+	}
 	if (retval <= 0)
 		return retval;
 

@@ -19,7 +19,7 @@ all:
 	@(cd zlib; make)
 	@(cd http_servlet; make)
 	@(cd cgi; make)
-	@(cd cgi_upload; make)
+#	@(cd cgi_upload; make)
 	@(cd http_mime; make)
 	@(cd http_test; make)
 	@(cd session; make)
