@@ -21,7 +21,7 @@ EVENT *event_create(int size)
 	ev->setsize = size;
 	ev->maxfd   = -1;
 	ev->ndefer  = 0;
-	ev->timeout = -1;
+	ev->timeout = 100;  /* 100 ms for event loop wait */
 	acl_ring_init(&ev->poll_list);
 	acl_ring_init(&ev->epoll_list);
 
@@ -270,8 +270,8 @@ int event_process(EVENT *ev, int left)
 
 	if (ev->timeout < 0) {
 		if (left < 0) {
-			tv.tv_sec = 1;
-			tv.tv_usec = 0;
+			tv.tv_sec = 0;
+			tv.tv_usec = 100;
 		} else {
 			tv.tv_sec  = left / 1000;
 			tv.tv_usec = (left - tv.tv_sec * 1000) * 1000;

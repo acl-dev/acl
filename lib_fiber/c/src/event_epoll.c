@@ -141,6 +141,7 @@ static int epoll_event_loop(EVENT *ev, struct timeval *tv)
 		int n = tv->tv_sec * 1000 + tv->tv_usec / 1000;
 		printf(">>n: %d, ret: %d\r\n", n, retval);
 	}
+
 	if (retval <= 0)
 		return retval;
 
