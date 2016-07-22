@@ -184,11 +184,14 @@ private:
 
 static void usage(const char* procname)
 {
-	printf("usage: %s -h [help] -c cocurrent\r\n"
+	printf("usage: %s\r\n"
+		" -h [help]\r\n"
+		" -c cocurrent\r\n"
 		" -t [use threads mode]\r\n"
 		" -n oper_count\r\n"
-		" -o db_oper[add|get]\r\n"
 		" -f mysqlclient_path\r\n"
+		" -s mysql_addr\r\n"
+		" -o db_oper[add|get]\r\n"
 		" -C conn_timeout\r\n"
 		" -R rw_timeout\r\n"
 		" -u dbuser\r\n"
@@ -207,7 +210,7 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hc:tn:f:u:o:p:C:R:")) > 0)
+	while ((ch = getopt(argc, argv, "hc:tn:f:s:u:o:p:C:R:")) > 0)
 	{
 		switch (ch)
 		{
@@ -225,6 +228,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'f':
 			mysql_path = optarg;
+			break;
+		case 's':
+			dbaddr = optarg;
 			break;
 		case 'u':
 			dbuser = optarg;

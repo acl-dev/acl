@@ -127,25 +127,19 @@ static int epoll_event_del(EVENT *ev, int fd, int delmask)
 	}
 }
 
-static int epoll_event_loop(EVENT *ev, struct timeval *tv)
+static int epoll_event_loop(EVENT *ev, int timeout)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
-	int retval, j, mask;
+	int ret, j, mask;
 	struct epoll_event *e;
 
-	retval = __sys_epoll_wait(ep->epfd, ep->epoll_events, ev->setsize,
-			tv ? (tv->tv_sec * 1000 + tv->tv_usec / 1000) : -1);
+	ret = __sys_epoll_wait(ep->epfd, ep->epoll_events,
+			ev->setsize, timeout);
 
-	if (0)
-	{
-		int n = tv->tv_sec * 1000 + tv->tv_usec / 1000;
-		printf(">>n: %d, ret: %d\r\n", n, retval);
-	}
+	if (ret <= 0)
+		return ret;
 
-	if (retval <= 0)
-		return retval;
-
-	for (j = 0; j < retval; j++) {
+	for (j = 0; j < ret; j++) {
 		mask = 0;
 		e = ep->epoll_events + j;
 
@@ -164,7 +158,7 @@ static int epoll_event_loop(EVENT *ev, struct timeval *tv)
 		ev->fired[j].mask = mask;
 	}
 
-	return retval;
+	return ret;
 }
 
 static int epoll_event_handle(EVENT *ev)

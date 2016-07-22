@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <poll.h>
 #include "lib_acl.h"
 #include "fiber/lib_fiber.h"
 
@@ -14,6 +15,30 @@ static int  __listen_port = 9001;
 static int  __listen_qlen = 64;
 static int  __rw_timeout = 0;
 static int  __echo_data  = 1;
+static int  __stack_size = 32000;
+
+static int check_read(int fd, int timeout)
+{
+	struct pollfd pfd;
+	int n;
+
+	memset(&pfd, 0, sizeof(struct pollfd));
+	pfd.fd = fd;
+	pfd.events = POLLIN;
+
+	n = poll(&pfd, 1, timeout);
+	if (n < 0) {
+		printf("poll error: %s\r\n", strerror(errno));
+		return -1;
+	}
+
+	if (n == 0)
+		return 0;
+	if (pfd.revents & POLLIN)
+		return 1;
+	else
+		return 0;
+}
 
 static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 {
@@ -22,7 +47,16 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	int   ret;
 
 	printf("client fiber-%d: fd: %d\r\n", acl_fiber_self(), *cfd);
+
 	while (1) {
+		if (__rw_timeout > 0) {
+			ret = check_read(*cfd, 10000);
+			if (ret < 0)
+				break;
+			if (ret == 0)
+				continue;
+		}
+
 		ret = read(*cfd, buf, sizeof(buf));
 		if (ret <= 0) {
 			if (errno == EINTR)
@@ -101,7 +135,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 
 		__nconnect++;
 		printf("accept one, fd: %d\r\n", cfd);
-		acl_fiber_create(echo_client, fd, 32768);
+		acl_fiber_create(echo_client, fd, __stack_size);
 	}
 
 	close(lfd);
@@ -115,6 +149,7 @@ static void usage(const char *procname)
 		"  -p listen_port\r\n"
 		"  -r rw_timeout\r\n"
 		"  -q listen_queue\r\n"
+		"  -z stack_size\r\n"
 		"  -S [if using single IO, default: no]\r\n", procname);
 }
 
@@ -124,7 +159,7 @@ int main(int argc, char *argv[])
 
 	snprintf(__listen_ip, sizeof(__listen_ip), "%s", "127.0.0.1");
 
-	while ((ch = getopt(argc, argv, "hs:p:r:q:S")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:p:r:q:Sz:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -143,6 +178,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'S':
 			__echo_data = 0;
+			break;
+		case 'z':
+			__stack_size = atoi(optarg);
 			break;
 		default:
 			break;

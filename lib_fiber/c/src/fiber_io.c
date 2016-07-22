@@ -132,7 +132,7 @@ void fiber_io_close(int fd)
 static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 {
 	EVENT *ev = (EVENT *) ctx;
-	int timer_left;
+	int left;
 	ACL_FIBER *timer;
 	int now, last = 0;
 	struct timeval tv;
@@ -143,21 +143,19 @@ static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 		while (acl_fiber_yield() > 0) {}
 
 		timer = FIRST_FIBER(&__thread_fiber->ev_timer);
-
 		if (timer == NULL)
-			timer_left = -1;
+			left = -1;
 		else {
 			SET_TIME(now);
 			last = now;
 			if (now >= timer->when)
-				timer_left = 0;
+				left = 0;
 			else
-				timer_left = timer->when - now;
+				left = timer->when - now;
 		}
 
 		/* add 1 just for the deviation of epoll_wait */
-		event_process(ev, timer_left > 0 ?
-			timer_left + 1 : timer_left);
+		event_process(ev, left > 0 ? left + 1 : left);
 
 		if (__thread_fiber->io_stop) {
 			if (__thread_fiber->io_count > 0)
@@ -171,7 +169,7 @@ static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 
 		SET_TIME(now);
 
-		if (now - last < timer_left)
+		if (now - last < left)
 			continue;
 
 		do {

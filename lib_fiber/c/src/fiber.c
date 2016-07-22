@@ -214,8 +214,12 @@ void acl_fiber_ready(ACL_FIBER *fiber)
 
 int acl_fiber_yield(void)
 {
-	int  n = __thread_fiber->switched;
+	int  n;
 
+	if (acl_ring_size(&__thread_fiber->queue) == 0)
+		return 0;
+
+	n = __thread_fiber->switched;
 	acl_fiber_ready(__thread_fiber->running);
 	acl_fiber_switch();
 
@@ -255,7 +259,8 @@ static void fiber_start(unsigned int x, unsigned int y)
 	fiber_exit(0);
 }
 
-static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *), void *arg, size_t size)
+static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
+	void *arg, size_t size)
 {
 	ACL_FIBER *fiber;
 	sigset_t zero;

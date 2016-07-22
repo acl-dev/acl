@@ -22,6 +22,7 @@ static int __max_loop     = 10000;
 static int __max_fibers   = 100;
 static int __left_fibers  = 100;
 static int __read_data    = 1;
+static int __stack_size   = 32000;
 static struct timeval __begin;
 
 static void echo_client(int fd)
@@ -116,7 +117,7 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	int i;
 
 	for (i = 0; i < __max_fibers; i++)
-		acl_fiber_create(fiber_connect, NULL, 32768);
+		acl_fiber_create(fiber_connect, NULL, __stack_size);
 }
 
 static void usage(const char *procname)
@@ -128,6 +129,7 @@ static void usage(const char *procname)
 		" -c max_fibers\r\n"
 		" -S [if using single IO, dafault: no]\r\n"
 		" -d fiber_delay_ms\r\n"
+		" -z stack_size\r\n"
 		" -n max_loop\r\n", procname);
 }
 
@@ -140,7 +142,7 @@ int main(int argc, char *argv[])
 
 	snprintf(__server_ip, sizeof(__server_ip), "%s", "127.0.0.1");
 
-	while ((ch = getopt(argc, argv, "hc:n:s:p:t:r:Sd:")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:n:s:p:t:r:Sd:z:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -169,6 +171,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'd':
 			__fiber_delay = atoi(optarg);
+			break;
+		case 'z':
+			__stack_size = atoi(optarg);
 			break;
 		default:
 			break;

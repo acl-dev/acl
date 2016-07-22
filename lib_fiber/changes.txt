@@ -1,4 +1,9 @@
 
+13) 2016.7.22
+13.1) bugfix: poll/epoll_wait API 的超时值设置的不对
+13.1) performance: fiber.c 中 acl_fiber_yield 函数首先判断是否有待处理协程，
+然后再决定是否需要切换协程上下文，从而减少上下文的切换次数
+
 12) 2016.7.14
 12.1) feature: hook_net.c 增加了 epoll 的 hook 支持
 

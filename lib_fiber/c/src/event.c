@@ -21,7 +21,7 @@ EVENT *event_create(int size)
 	ev->setsize = size;
 	ev->maxfd   = -1;
 	ev->ndefer  = 0;
-	ev->timeout = 100;  /* 100 ms for event loop wait */
+	ev->timeout = -1;
 	acl_ring_init(&ev->poll_list);
 	acl_ring_init(&ev->epoll_list);
 
@@ -113,9 +113,9 @@ int event_add(EVENT *ev, int fd, int mask, event_proc *proc, void *ctx)
 		fd2 = ev->defers[ev->ndefer].fd;
 
 		if (ev->ndefer > 0) {
-			ev->defers[pos].mask = ev->defers[ev->ndefer].mask;
-			ev->defers[pos].pos  = pos;
-			ev->defers[pos].fd   = fd2;
+			ev->defers[pos].mask  = ev->defers[ev->ndefer].mask;
+			ev->defers[pos].pos   = pos;
+			ev->defers[pos].fd    = fd2;
 
 			ev->events[fd2].defer = &ev->defers[pos];
 		} else {
@@ -261,39 +261,25 @@ void event_del(EVENT *ev, int fd, int mask)
 #endif
 }
 
-int event_process(EVENT *ev, int left)
+int event_process(EVENT *ev, int timeout)
 {
 	int processed = 0, numevents, j;
-	struct timeval tv, *tvp;
 	int mask, fd, rfired, ndefer;
 	FILE_EVENT *fe;
 
 	if (ev->timeout < 0) {
-		if (left < 0) {
-			tv.tv_sec = 0;
-			tv.tv_usec = 100;
-		} else {
-			tv.tv_sec  = left / 1000;
-			tv.tv_usec = (left - tv.tv_sec * 1000) * 1000;
-		}
-	} else if (left < 0) {
-		tv.tv_sec = ev->timeout / 1000;
-		tv.tv_usec = (ev->timeout - tv.tv_sec * 1000) * 1000;
-	} else if (left < ev->timeout) {
-		tv.tv_sec  = left / 1000;
-		tv.tv_usec = (left - tv.tv_sec * 1000) * 1000;
-	} else {
-		tv.tv_sec = ev->timeout / 1000;
-		tv.tv_usec = (ev->timeout - tv.tv_sec * 1000) * 1000;
-	}
+		if (timeout < 0)
+			timeout = 1000;
+	} else if (timeout < 0)
+		timeout = ev->timeout;
+	else if (timeout > ev->timeout)
+		timeout = ev->timeout;
 
 	/* limit the event wait time just for fiber schedule exiting
 	 * quickly when no tasks left
 	 */
-	if (tv.tv_sec > 1)
-		tv.tv_sec = 1;
-
-	tvp = &tv;
+	if (timeout > 1000)
+		timeout = 1000;
 
 	ndefer = ev->ndefer;
 
@@ -304,7 +290,7 @@ int event_process(EVENT *ev, int left)
 		ev->ndefer--;
 	}
 
-	numevents = ev->loop(ev, tvp);
+	numevents = ev->loop(ev, timeout);
 
 	for (j = 0; j < numevents; j++) {
 		fd             = ev->fired[j].fd;

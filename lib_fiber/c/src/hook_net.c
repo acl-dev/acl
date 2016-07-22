@@ -253,10 +253,8 @@ static void event_poll_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 		pe->fds[i].revents = 0;
 	}
 
-	if (timeout > 0) {
-		if (ev->timeout < 0 || timeout < ev->timeout)
-			ev->timeout = timeout;
-	}
+	if (timeout >= 0 && (ev->timeout < 0 || timeout < ev->timeout))
+		ev->timeout = timeout;
 }
 
 static void poll_callback(EVENT *ev acl_unused, POLL_EVENT *pe)
@@ -267,7 +265,7 @@ static void poll_callback(EVENT *ev acl_unused, POLL_EVENT *pe)
 int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	POLL_EVENT pe;
-	EVENT *event;
+	EVENT *ev;
 	acl_int64 begin, now;
 
 	if (!acl_var_hook_sys_api)
@@ -275,26 +273,28 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 
 	fiber_io_check();
 
-	event     = fiber_io_event();
-
-	pe.fds    = fds;
-	pe.nfds   = nfds;
-	pe.fiber  = fiber_running();
-	pe.proc   = poll_callback;
+	ev       = fiber_io_event();
+	pe.fds   = fds;
+	pe.nfds  = nfds;
+	pe.fiber = fiber_running();
+	pe.proc  = poll_callback;
 
 	SET_TIME(begin);
 
 	while (1) {
-		event_poll_set(event, &pe, timeout);
+		event_poll_set(ev, &pe, timeout);
 		fiber_io_inc();
 		acl_fiber_switch();
 
+		ev->timeout = -1;
 		if (pe.nready != 0)
 			break;
 
 		SET_TIME(now);
 		if (now - begin >= timeout)
 			break;
+
+		timeout -= now - begin;
 	}
 
 	return pe.nready;
@@ -624,10 +624,8 @@ static void event_epoll_set(EVENT *ev, EPOLL_EVENT *ee, int timeout)
 	acl_ring_prepend(&ev->epoll_list, &ee->me);
 	ee->nready = 0;
 
-	if (timeout > 0) {
-		if (ev->timeout < 0 || timeout < ev->timeout)
-			ev->timeout = timeout;
-	}
+	if (timeout >= 0 && (ev->timeout < 0 || timeout < ev->timeout))
+		ev->timeout = timeout;
 }
 
 int epoll_wait(int epfd, struct epoll_event *events,
@@ -663,12 +661,15 @@ int epoll_wait(int epfd, struct epoll_event *events,
 		fiber_io_inc();
 		acl_fiber_switch();
 
+		ev->timeout = -1;
 		if (ee->nready != 0)
 			break;
 
 		SET_TIME(now);
 		if (now - begin >= timeout)
 			break;
+
+		timeout -= now - begin;
 	}
 
 	return ee->nready;

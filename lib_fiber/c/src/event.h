@@ -93,7 +93,7 @@ struct EVENT {
 
 	const char *(*name)(void);
 	int  (*handle)(EVENT *);
-	int  (*loop)(EVENT *, struct timeval *);
+	int  (*loop)(EVENT *, int timeout);
 	int  (*add)(EVENT *, int, int);
 	int  (*del)(EVENT *, int, int);
 	void (*free)(EVENT *);

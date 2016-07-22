@@ -16,6 +16,7 @@ static int __total_error_clients   = 0;
 static int __fiber_delay  = 10; 
 static int __max_fibers   = 100;
 static int __left_fibers  = 100;
+static int __stack_size   = 32000;
 
 static void echo_client(int fd)
 {
@@ -74,7 +75,7 @@ static void create_fibers(void)
 	int i;
 
 	for (i = 0; i < __max_fibers; i++)
-		acl_fiber_create(fiber_connect, NULL, 32768);
+		acl_fiber_create(fiber_connect, NULL, __stack_size);
 }
 
 static void usage(const char *procname)
@@ -83,6 +84,7 @@ static void usage(const char *procname)
 		" -s server_ip\r\n"
 		" -p server_port\r\n"
 		" -d fiber_delay_ms\r\n"
+		" -z stack_size\r\n"
 		" -c max_fibers\r\n", procname);
 }
 
@@ -95,7 +97,7 @@ int main(int argc, char *argv[])
 
 	snprintf(__server_ip, sizeof(__server_ip), "%s", "127.0.0.1");
 
-	while ((ch = getopt(argc, argv, "hc:s:p:d:")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:s:p:d:z:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -112,6 +114,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'd':
 			__fiber_delay = atoi(optarg);
+			break;
+		case 'z':
+			__stack_size = atoi(optarg);
 			break;
 		default:
 			break;
