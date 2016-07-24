@@ -105,7 +105,6 @@ extern __thread int acl_var_hook_sys_api;
 ACL_FIBER *fiber_running(void);
 void fiber_save_errno(void);
 void fiber_exit(int exit_code);
-void fiber_free(ACL_FIBER *fiber);
 void fiber_system(void);
 void fiber_count_inc(void);
 void fiber_count_dec(void);
