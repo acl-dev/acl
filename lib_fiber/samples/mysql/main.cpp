@@ -21,7 +21,7 @@ public:
 			acl::db_handle* db = dbp_.peek_open();
 			if (db == NULL)
 			{
-				printf("peek db connection error\r\n");
+				printf("peek db connection error i: %d\r\n", i);
 				break;
 			}
 
@@ -37,7 +37,9 @@ public:
 			acl::db_handle* db = dbp_.peek_open();
 			if (db == NULL)
 			{
-				printf("peek db connection error\r\n");
+				printf("peek db connection error i: %d\r\n", i);
+				sleep(1000);
+				exit (1);
 				break;
 			}
 
@@ -151,7 +153,7 @@ protected:
 	// @override
 	void run(void)
 	{
-		printf("fiber-%d-%d running\r\n", get_id(), acl::fiber::self());
+//		printf("fiber-%d-%d running\r\n", get_id(), acl::fiber::self());
 
 		mysql_oper dboper(dbp_, id_);
 

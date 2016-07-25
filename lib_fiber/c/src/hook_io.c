@@ -144,6 +144,47 @@ int close(int fd)
 
 #ifdef READ_WAIT_FIRST
 
+#if 0
+static int check_fdtype(int fd)
+{
+	struct stat s;
+
+	if (fstat(fd, &s) < 0) {
+		acl_msg_info("fd: %d fstat error", fd);
+		return -1;
+	}
+
+	if (S_ISSOCK(s.st_mode))
+		acl_msg_info("fd %d S_ISSOCK", fd);
+	else if (S_ISFIFO(s.st_mode))
+		acl_msg_info("fd %d S_ISFIFO", fd);
+	else if (S_ISCHR(s.st_mode))
+		acl_msg_info("fd %d S_ISCHR", fd);
+
+	if (S_ISSOCK(s.st_mode) || S_ISFIFO(s.st_mode) || S_ISCHR(s.st_mode))
+		return 0;
+
+	if (S_ISLNK(s.st_mode))
+		acl_msg_info("fd %d S_ISLNK", fd);
+	else if (S_ISREG(s.st_mode))
+		acl_msg_info("fd %d S_ISREG", fd);
+	else if (S_ISDIR(s.st_mode))
+		acl_msg_info("fd %d S_ISDIR", fd);
+	else if (S_ISCHR(s.st_mode))
+		acl_msg_info("fd %d S_ISCHR", fd);
+	else if (S_ISBLK(s.st_mode))
+		acl_msg_info("fd %d S_ISBLK", fd);
+	else if (S_ISFIFO(s.st_mode))
+		acl_msg_info("fd %d S_ISFIFO", fd);
+	else if (S_ISSOCK(s.st_mode))
+		acl_msg_info("fd %d S_ISSOCK", fd);
+	else
+		acl_msg_info("fd: %d, unknoiwn st_mode: %d", fd, s.st_mode);
+
+	return -1;
+}
+#endif
+
 ssize_t read(int fd, void *buf, size_t count)
 {
 	ssize_t ret;
@@ -164,7 +205,9 @@ ssize_t read(int fd, void *buf, size_t count)
 		ret = __sys_read(fd, buf, count);
 		if (ret > 0)
 			return ret;
+
 		fiber_save_errno();
+
 		return ret;
 	}
 

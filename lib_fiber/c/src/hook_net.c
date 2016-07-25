@@ -168,6 +168,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 
 	acl_non_blocking(sockfd, ACL_NON_BLOCKING);
 
+	errno = 0;
 	int ret = __sys_connect(sockfd, addr, addrlen);
 	if (ret >= 0) {
 		acl_tcp_nodelay(sockfd, 1);
@@ -176,7 +177,11 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 
 	fiber_save_errno();
 
-	if (errno != EINPROGRESS)
+	acl_msg_info("%s(%d), %s: connect error: %s, errno: %d, %d, %d, %d, fd: %d",
+		__FILE__, __LINE__, __FUNCTION__,
+		acl_last_serror(), errno, EISCONN, EWOULDBLOCK, EAGAIN, sockfd);
+
+	if (errno != EINPROGRESS && errno != EAGAIN)
 		return -1;
 
 	fiber_wait_write(sockfd);
@@ -211,18 +216,18 @@ static void pollfd_callback(EVENT *ev, int fd, void *ctx, int mask)
 	int n = 0;
 
 	if (mask & EVENT_READABLE) {
+		if (pfd->events & POLLIN)
+			event_del(ev, fd, EVENT_READABLE);
 		pfd->revents |= POLLIN;
-		n++;
+		n = 1;
 	}
-	if (pfd->events & POLLIN)
-		event_del(ev, fd, EVENT_READABLE);
 
 	if (mask & EVENT_WRITABLE) {
+		if (pfd->events & POLLOUT)
+			event_del(ev, fd, EVENT_WRITABLE);
 		pfd->revents |= POLLOUT;
-		n++;
+		n |= 1 << 1;
 	}
-	if (pfd->events & POLLOUT)
-		event_del(ev, fd, EVENT_WRITABLE);
 
 	if (n > 0) {
 		acl_assert(pe);
@@ -282,15 +287,17 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	SET_TIME(begin);
 
 	while (1) {
+		errno = 0;
 		event_poll_set(ev, &pe, timeout);
 		fiber_io_inc();
 		acl_fiber_switch();
 
 		ev->timeout = -1;
-		if (pe.nready != 0)
+		if (pe.nready != 0 || timeout <= 0)
 			break;
 
 		SET_TIME(now);
+
 		if (now - begin >= timeout)
 			break;
 
