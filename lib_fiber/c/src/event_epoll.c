@@ -145,9 +145,11 @@ static int epoll_event_loop(EVENT *ev, int timeout)
 
 		if (e->events & EPOLLIN)
 			mask |= EVENT_READABLE;
+
 		if (e->events & EPOLLOUT)
 			mask |= EVENT_WRITABLE;
-		if (e->events & EPOLLERR || e->events & EPOLLHUP ) {
+
+		if (e->events & EPOLLERR || e->events & EPOLLHUP) {
 			if (ev->events[e->data.fd].mask & EVENT_READABLE)
 				mask |= EVENT_READABLE;
 			if (ev->events[e->data.fd].mask & EVENT_WRITABLE)

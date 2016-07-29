@@ -132,6 +132,13 @@ int close(int fd)
 
 	fiber_io_close(fd);
 
+	/* when the fd was closed by epoll_event_close normally, the fd
+	 * must be a epoll fd which was created by epoll_create function
+	 * hooked in hook_net.c
+	 */
+	if (epoll_event_close(fd) == 0)
+		return 0;
+
 	ret = __sys_close(fd);
 	if (ret == 0)
 		return ret;
@@ -207,7 +214,6 @@ ssize_t read(int fd, void *buf, size_t count)
 			return ret;
 
 		fiber_save_errno();
-
 		return ret;
 	}
 
@@ -216,8 +222,10 @@ ssize_t read(int fd, void *buf, size_t count)
 		event_clear_readable(ev, fd);
 
 	ret = __sys_read(fd, buf, count);
+	//printf("---read ret: %ld----\r\n", ret);
 	if (ret > 0)
 		return ret;
+
 	fiber_save_errno();
 	return ret;
 }
@@ -242,6 +250,7 @@ ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
 		ret = __sys_readv(fd, iov, iovcnt);
 		if (ret > 0)
 			return ret;
+
 		fiber_save_errno();
 		return ret;
 	}
@@ -253,6 +262,7 @@ ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
 	ret = __sys_readv(fd, iov, iovcnt);
 	if (ret > 0)
 		return ret;
+
 	fiber_save_errno();
 	return ret;
 }
@@ -277,6 +287,7 @@ ssize_t recv(int sockfd, void *buf, size_t len, int flags)
 		ret = __sys_recv(sockfd, buf, len, flags);
 		if (ret > 0)
 			return ret;
+
 		fiber_save_errno();
 		return ret;
 	}
@@ -288,6 +299,7 @@ ssize_t recv(int sockfd, void *buf, size_t len, int flags)
 	ret = __sys_recv(sockfd, buf, len, flags);
 	if (ret > 0)
 		return ret;
+
 	fiber_save_errno();
 	return ret;
 }
@@ -315,6 +327,7 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
 				flags, src_addr, addrlen);
 		if (ret > 0)
 			return ret;
+
 		fiber_save_errno();
 		return ret;
 	}
@@ -326,6 +339,7 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
 	ret = __sys_recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
 	if (ret > 0)
 		return ret;
+
 	fiber_save_errno();
 	return ret;
 }
@@ -350,6 +364,7 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 		ret = __sys_recvmsg(sockfd, msg, flags);
 		if (ret > 0)
 			return ret;
+
 		fiber_save_errno();
 		return ret;
 	}
@@ -361,6 +376,7 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 	ret = __sys_recvmsg(sockfd, msg, flags);
 	if (ret > 0)
 		return ret;
+
 	fiber_save_errno();
 	return ret;
 }

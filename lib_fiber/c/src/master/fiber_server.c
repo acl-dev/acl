@@ -225,9 +225,9 @@ static int dispatch_report(ACL_VSTREAM *conn)
 	char buf[256];
 
 	snprintf(buf, sizeof(buf), "count=%d&used=%u&pid=%u&type=%s"
-		"&max_threads=%d&curr_threads=%d&busy_threads=%d&qlen=%d\r\n",
+		"&max_threads=%d&curr_threads=%d&busy_threads=%d&qlen=0\r\n",
 		__nclients, __nused, (unsigned) getpid(),
-		acl_var_fiber_dispatch_type, 1, 1, 1, 1);
+		acl_var_fiber_dispatch_type, 1, 1, 1);
 
 	if (acl_vstream_writen(conn, buf, strlen(buf)) == ACL_VSTREAM_EOF) {
 		acl_msg_warn("%s(%d), %s: write to master_dispatch(%s) failed",

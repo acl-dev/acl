@@ -76,6 +76,17 @@ const acl_int64* json_node::get_int64(void) const
 	return &node_val_.n;
 }
 
+const double* json_node::get_double(void) const
+{
+	if (!is_double())
+		return NULL;
+	const char* txt = get_text();
+	if (txt == NULL || *txt == 0)
+		return NULL;
+	const_cast<json_node*>(this)->node_val_.d = atof(txt);
+	return &node_val_.d;
+}
+
 const bool* json_node::get_bool(void) const
 {
 	if (!is_bool())
@@ -98,6 +109,12 @@ bool json_node::is_number(void) const
 {
 	return node_me_->type == ACL_JSON_T_A_NUMBER
 		|| node_me_->type == ACL_JSON_T_NUMBER;
+}
+
+bool json_node::is_double(void) const
+{
+	return node_me_->type == ACL_JSON_T_A_DOUBLE
+		|| node_me_->type == ACL_JSON_T_DOUBLE;
 }
 
 bool json_node::is_bool(void) const
@@ -245,6 +262,12 @@ json_node& json_node::add_number(const char* tag, acl_int64 value,
 	return add_child(json_->create_node(tag, value), return_child);
 }
 
+json_node& json_node::add_double(const char* tag, double value,
+	bool return_child /* = false */)
+{
+	return add_child(json_->create_double(tag, value), return_child);
+}
+
 json_node& json_node::add_bool(const char* tag, bool value,
 	bool return_child /* = false */)
 {
@@ -261,6 +284,12 @@ json_node& json_node::add_array_number(acl_int64 value,
 	bool return_child /* = false */)
 {
 	return add_child(json_->create_array_number(value), return_child);
+}
+
+json_node& json_node::add_array_double(double value,
+	bool return_child /* = false */)
+{
+	return add_child(json_->create_array_double(value), return_child);
 }
 
 json_node& json_node::add_array_bool(bool value,
@@ -528,6 +557,14 @@ json_node& json::create_node(const char* tag, acl_int64 value)
 	return *n;
 }
 
+json_node& json::create_double(const char* tag, double value)
+{
+	ACL_JSON_NODE* node = acl_json_create_double(json_, tag, value);
+	json_node* n = NEW json_node(node, this);
+	nodes_tmp_.push_back(n);
+	return *n;
+}
+
 json_node& json::create_node(const char* tag, bool value)
 {
 	ACL_JSON_NODE* node = acl_json_create_bool(json_, tag, value ? 1 : 0);
@@ -547,6 +584,14 @@ json_node& json::create_array_text(const char* text)
 json_node& json::create_array_number(acl_int64 value)
 {
 	ACL_JSON_NODE* node = acl_json_create_array_int64(json_, value);
+	json_node* n = NEW json_node(node, this);
+	nodes_tmp_.push_back(n);
+	return *n;
+}
+
+json_node& json::create_array_double(double value)
+{
+	ACL_JSON_NODE* node = acl_json_create_array_double(json_, value);
 	json_node* n = NEW json_node(node, this);
 	nodes_tmp_.push_back(n);
 	return *n;

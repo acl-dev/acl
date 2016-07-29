@@ -24,11 +24,13 @@ struct ACL_JSON_NODE {
 #define	ACL_JSON_T_A_NUMBER      (1 << 1)
 #define	ACL_JSON_T_A_BOOL        (1 << 2)
 #define	ACL_JSON_T_A_NULL        (1 << 3)
+#define	ACL_JSON_T_A_DOUBLE      (1 << 4)
 
 #define	ACL_JSON_T_STRING        (1 << 4)
 #define	ACL_JSON_T_NUMBER        (1 << 5)
 #define	ACL_JSON_T_BOOL          (1 << 6)
 #define	ACL_JSON_T_NULL          (1 << 7)
+#define ACL_JSON_T_DOUBLE        (1 << 8)
 
 #define ACL_JSON_T_ARRAY         (1 << 8)
 #define ACL_JSON_T_OBJ           (1 << 9)
@@ -323,6 +325,17 @@ ACL_API ACL_JSON_NODE *acl_json_create_int64(ACL_JSON *json,
 	const char *name, acl_int64 value);
 
 /**
+ * 构建 json 对象时创建 json double 类型的叶节点
+ * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
+ * @param name {const char*} 标签名，非空
+ * @param value {double} 有符号整形值
+ * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
+ *  一起被释放，所以不需要单独释放
+ */
+ACL_API ACL_JSON_NODE *acl_json_create_double(ACL_JSON *json,
+	const char *name, double value);
+
+/**
  * 构建 json 对象的字符串节点，按 json 规范，该节点只能加入至数组对象中
  * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
  * @param text {const char*}
@@ -337,12 +350,22 @@ ACL_API ACL_JSON_NODE *acl_json_create_string(ACL_JSON *json,
 /**
  * 构建 json 对象的数值节点，按 json 规范，该节点只能加入至数组对象中
  * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @param text {const char*}
+ * @param text {acl_int64}
  * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
  *  一起被释放，所以不需要单独释放
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array_int64(ACL_JSON *json,
 	acl_int64 value);
+/**
+ * 构建 json 对象的数值节点，按 json 规范，该节点只能加入至数组对象中
+ * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
+ * @param text {double}
+ * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
+ *  一起被释放，所以不需要单独释放
+ */
+
+ACL_API ACL_JSON_NODE *acl_json_create_array_double(ACL_JSON *json,
+	double value);
 
 /**
  * 构建 json 对象的布尔节点，按 json 规范，该节点只能加入至数组对象中

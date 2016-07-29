@@ -17,14 +17,45 @@
 
 /* acl_alldig - return true if string is all digits */
 
-int acl_alldig(const char *string)
+int acl_alldig(const char *s)
 {
-	const char *cp;
+	if (s == NULL || *s == 0)
+		return 0;
+	for (; *s != 0; s++)
+		if (!ACL_ISDIGIT(*s))
+			return 0;
+	return 1;
+}
 
-	if (*string == 0)
-		return (0);
-	for (cp = string; *cp != 0; cp++)
-		if (!ACL_ISDIGIT(*cp))
-			return (0);
-	return (1);
+int acl_is_double(const char *s)
+{
+	if (s == NULL || *s == 0)
+		return 0;
+	if (*s == '-' || *s == '+')
+		s++;
+	if (*s == 0 || *s == '.')
+		return 0;
+
+	while (*s != 0) {
+		if (*s == '.') {
+			s++;
+			if (*s == 0)
+				return 0;
+			break;
+		}
+		if (!ACL_ISDIGIT(*s))
+			return 0;
+		s++;
+	}
+
+	if (*s == 0)
+		return 1;
+
+	while (*s != 0) {
+		if (!ACL_ISDIGIT(*s))
+			return 0;
+		s++;
+	}
+
+	return 1;
 }

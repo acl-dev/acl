@@ -15,6 +15,13 @@ extern "C" {
 ACL_API int acl_alldig(const char *str);
 
 /**
+ * 判断给定字符串是否为浮点数
+ * @param str {const char*} 字符串
+ * @return {int} 0: 否; 1: 是
+ */
+ACL_API int acl_is_double(const char *s);
+
+/**
  * 将多个字符串拼接成一个字符串
  * @param arg0 {const char*} 第一个非空字符串
  * @param ... 后续的字符串集合，结束符是 NULL

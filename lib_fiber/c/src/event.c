@@ -189,7 +189,7 @@ static void __event_del(EVENT *ev, int fd, int mask)
 	fe = &ev->events[fd];
 
 	if (fe->mask == EVENT_NONE) {
-		acl_msg_info("----mask NONE, fd: %d----", fd);
+		/* acl_msg_info("----mask NONE, fd: %d----", fd); */
 		fe->mask_fired = EVENT_NONE;
 		fe->defer      = NULL;
 		fe->pe         = NULL;

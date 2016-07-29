@@ -136,6 +136,17 @@ ACL_JSON_NODE *acl_json_create_int64(ACL_JSON *json,
 	return (node);
 }
 
+ACL_JSON_NODE *acl_json_create_double(ACL_JSON *json,
+	const char *name, double value)
+{
+	ACL_JSON_NODE *node = acl_json_node_alloc(json);
+
+	acl_vstring_strcpy(node->ltag, name);
+	acl_vstring_sprintf(node->text, "%.4f", value);
+	node->type = ACL_JSON_T_DOUBLE;
+	return (node);
+}
+
 ACL_JSON_NODE *acl_json_create_array_text(ACL_JSON *json, const char *text)
 {
 	ACL_JSON_NODE *node = acl_json_node_alloc(json);
@@ -156,6 +167,15 @@ ACL_JSON_NODE *acl_json_create_array_int64(ACL_JSON *json, acl_int64 value)
 
 	acl_vstring_sprintf(node->text, "%lld", value);
 	node->type = ACL_JSON_T_A_NUMBER;
+	return (node);
+}
+
+ACL_JSON_NODE *acl_json_create_array_double(ACL_JSON *json, double value)
+{
+	ACL_JSON_NODE *node = acl_json_node_alloc(json);
+
+	acl_vstring_sprintf(node->text, "%.4f", value);
+	node->type = ACL_JSON_T_A_DOUBLE;
 	return (node);
 }
 
@@ -297,6 +317,7 @@ void acl_json_building(ACL_JSON *json, size_t length,
 				break;
 			case ACL_JSON_T_BOOL:
 			case ACL_JSON_T_NUMBER:
+			case ACL_JSON_T_DOUBLE:
 				acl_vstring_strcat(buf, STR(node->text));
 				break;
 			default:
@@ -315,6 +336,7 @@ void acl_json_building(ACL_JSON *json, size_t length,
 				break;
 			case ACL_JSON_T_A_BOOL:
 			case ACL_JSON_T_A_NUMBER:
+			case ACL_JSON_T_A_DOUBLE:
 				acl_vstring_strcat(buf, STR(node->text));
 				break;
 			default:
@@ -422,6 +444,7 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 				break;
 			case ACL_JSON_T_BOOL:
 			case ACL_JSON_T_NUMBER:
+			case ACL_JSON_T_DOUBLE:
 				acl_vstring_strcat(buf, STR(node->text));
 				break;
 			default:
@@ -443,6 +466,7 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 				break;
 			case ACL_JSON_T_A_BOOL:
 			case ACL_JSON_T_A_NUMBER:
+			case ACL_JSON_T_A_DOUBLE:
 				acl_vstring_strcat(buf, STR(node->text));
 				break;
 			default:

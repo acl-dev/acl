@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static bool __show_results = false;
+
 class mysql_oper
 {
 public:
@@ -38,8 +40,6 @@ public:
 			if (db == NULL)
 			{
 				printf("peek db connection error i: %d\r\n", i);
-				sleep(1000);
-				exit (1);
 				break;
 			}
 
@@ -84,7 +84,7 @@ private:
 		}
 
 		const acl::db_rows* result = db.get_result();
-		if (result)
+		if (__show_results && result)
 		{
 			const std::vector<acl::db_row*>& rows =
 				result->get_rows();
@@ -154,6 +154,7 @@ protected:
 	void run(void)
 	{
 //		printf("fiber-%d-%d running\r\n", get_id(), acl::fiber::self());
+		acl_fiber_delay(10);
 
 		mysql_oper dboper(dbp_, id_);
 
@@ -194,6 +195,7 @@ static void usage(const char* procname)
 		" -f mysqlclient_path\r\n"
 		" -s mysql_addr\r\n"
 		" -o db_oper[add|get]\r\n"
+		" -d [show results of get]\r\n"
 		" -C conn_timeout\r\n"
 		" -R rw_timeout\r\n"
 		" -u dbuser\r\n"
@@ -212,7 +214,7 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hc:tn:f:s:u:o:p:C:R:")) > 0)
+	while ((ch = getopt(argc, argv, "hc:tn:f:s:u:o:p:C:R:d")) > 0)
 	{
 		switch (ch)
 		{
@@ -248,6 +250,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'R':
 			rw_timeout = atoi(optarg);
+			break;
+		case 'd':
+			__show_results = true;
 			break;
 		default:
 			break;

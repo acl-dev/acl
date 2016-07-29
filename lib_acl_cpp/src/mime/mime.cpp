@@ -520,7 +520,7 @@ static MIME_NODE *get_alternative(MIME_STATE *pMime)
 	return pAlterNative;
 }
 
-static MIME_NODE *get_text_html(MIME_NODE *pAlterNative)
+static MIME_NODE *get_text_html(MIME_NODE *pAlterNative, bool *is_html = NULL)
 {
 	ACL_ITER iter;
 	MIME_NODE* pHtml = NULL, *pText = NULL;
@@ -544,10 +544,18 @@ static MIME_NODE *get_text_html(MIME_NODE *pAlterNative)
 		}
 	}
 
+	if (is_html)
+	{
+		if (pHtml != NULL)
+			*is_html = true;
+		else
+			*is_html = false;
+	}
+
 	return pHtml != NULL ? pHtml : pText;
 }
 
-static MIME_NODE *get_text_plain(MIME_NODE *pAlterNative)
+static MIME_NODE *get_text_plain(MIME_NODE *pAlterNative, bool *is_html = NULL)
 {
 	ACL_ITER iter;
 	MIME_NODE* pHtml = NULL, *pText = NULL;
@@ -571,14 +579,27 @@ static MIME_NODE *get_text_plain(MIME_NODE *pAlterNative)
 		}
 	}
 
+	if (is_html)
+	{
+		if (pText == NULL && pHtml != NULL)
+			*is_html = true;
+		else
+			*is_html = false;
+	}
+
 	return pText != NULL ? pText : pHtml;
 }
 
 // 找到邮件正文结点
-static MIME_NODE* body_node(MIME_STATE* pMime, bool htmlFirst)
+static MIME_NODE* body_node(MIME_STATE* pMime, bool htmlFirst,
+	bool *is_html = NULL)
 {
 	if (pMime->root->ctype == MIME_CTYPE_TEXT)
+	{
+		if (is_html)
+			*is_html = pMime->root->stype == MIME_STYPE_HTML;
 		return pMime->root;
+	}
 
 	if (pMime->root->ctype != MIME_CTYPE_MULTIPART)
 		return NULL;
@@ -598,39 +619,74 @@ static MIME_NODE* body_node(MIME_STATE* pMime, bool htmlFirst)
 	if (pAlterNative != NULL)
 	{
 		if (htmlFirst)
-			return get_text_html(pAlterNative);
+			return get_text_html(pAlterNative, is_html);
 		else
-			return get_text_plain(pAlterNative);
+			return get_text_plain(pAlterNative, is_html);
 	}
 
 	if (htmlFirst)
-		return get_text_html(pMime->root);
+		return get_text_html(pMime->root, is_html);
 	else
-		return get_text_plain(pMime->root);
+		return get_text_plain(pMime->root, is_html);
 }
+
+#if 0
+#define EQ2(x, y) (((x) == NULL && (y) == NULL)  \
+	|| ((x) != NULL && (y) != NULL && !strcasecmp((x), (y))))
+#endif
 
 mime_body* mime::get_body_node(bool htmlFirst,
 	bool enableDecode /* = true */,
 	const char* toCharset /* = "gb2312" */,
 	off_t off /* = 0 */)
 {
-#define EQ2(x, y) (((x) == NULL && (y) == NULL)  \
-	|| ((x) != NULL && (y) != NULL && !strcasecmp((x), (y))))
-
 	if (m_pBody != NULL)
 	{
-		const char* ptr = m_pBody->get_toCharset();
-		if (EQ2(toCharset, ptr))
-			return (m_pBody);
+		//const char* ptr = m_pBody->get_toCharset();
+		//if (EQ2(toCharset, ptr))
+		//	return m_pBody;
 		delete m_pBody;
 	}
 
 	MIME_NODE* node = body_node(m_pMimeState, htmlFirst);
 	if (node == NULL)
-		return (NULL);
+		return NULL;
+
 	m_pBody = NEW mime_body(m_pFilePath, node, htmlFirst,
 			enableDecode, toCharset, off);
-	return (m_pBody);
+	return m_pBody;
+}
+
+mime_body* mime::get_html_body(bool enableDecode /* = true */,
+	const char* toCharset /* = "gb2312" */, off_t off /* = 0 */)
+{
+	if (m_pBody != NULL)
+		delete m_pBody;
+
+	bool is_html = false;
+	MIME_NODE* node = body_node(m_pMimeState, true, &is_html);
+	if (node == NULL || !is_html)
+		return NULL;
+
+	m_pBody = NEW mime_body(m_pFilePath, node, true,
+		enableDecode, toCharset, off);
+	return m_pBody;
+}
+
+mime_body* mime::get_plain_body(bool enableDecode /* = true */,
+	const char* toCharset /* = "gb2312" */, off_t off /* = 0 */)
+{
+	if (m_pBody != NULL)
+		delete m_pBody;
+
+	bool is_html = false;
+	MIME_NODE* node = body_node(m_pMimeState, false, &is_html);
+	if (node == NULL || is_html)
+		return NULL;
+
+	m_pBody = NEW mime_body(m_pFilePath, node, false,
+		enableDecode, toCharset, off);
+	return m_pBody;
 }
 
 const std::list<mime_node*>& mime::get_mime_nodes(bool enableDecode /* = true */,

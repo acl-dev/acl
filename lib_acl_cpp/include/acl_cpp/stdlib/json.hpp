@@ -56,13 +56,19 @@ public:
 
 	/**
 	 * 当 json 节点为长整型类型时，该函数返回长整型值的指针地址
-	 * @return {long long int*} 当返回 NULL 时表示该对象非长整型类型
+	 * @return {const long long int*} 当返回 NULL 时表示该对象非长整型类型
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	const __int64* get_int64(void) const;
 #else
 	const long long int* get_int64(void) const;
 #endif
+
+	/**
+	 * 当 json 节点为浮点类型时，该函数返回长整型值的指针地址
+	 * @return {const double*} 当返回 NULL 时表示该对象非浮点类型
+	 */
+	const double *get_double(void) const;
 
 	/**
 	 * 当 json 节点为布尔类型时，该函数返回布尔值的指针地址
@@ -81,6 +87,12 @@ public:
 	 * @return {bool}
 	 */
 	bool is_number(void) const;
+
+	/**
+	 * 判断本节点数据是否为浮点类型
+	 * @return {bool}
+	 */
+	bool is_double(void) const;
 
 	/**
 	 * 判断本节点数据是否为布尔类型
@@ -222,6 +234,17 @@ public:
 #endif
 
 	/**
+	 * 创建一个 double 类型的 json 节点对象，并将之添加为本 json 节点的子节点
+	 * @param tag {const char*} 标签名
+	 * @param value {double} 标签值
+	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
+	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
+	 *  否则返回本 json 节点对象的引用
+	 */
+	json_node& add_double(const char* tag, double value,
+		bool return_child = false);
+
+	/**
 	 * 创建一个布尔类型的 json 节点对象，并将之添加为本 json 节点的子节点
 	 * @param tag {const char*} 标签名
 	 * @param value {bool} 标签值
@@ -256,6 +279,15 @@ public:
 	json_node& add_array_number(long long int value,
 		bool return_child = false);
 #endif
+
+	/**
+	 * 创建一个 json double 对象，并将之添加为本 json 节点的子节点
+	 * @param value {double} 值
+	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
+	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
+	 *  否则返回本 json 节点对象的引用
+	 */
+	json_node& add_array_double(double value, bool return_child = false);
 
 	/**
 	 * 创建一个 json 布尔对象，并将之添加为本 json 节点的子节点
@@ -364,7 +396,8 @@ private:
 #else
 		long long int n;
 #endif
-		bool b;
+		bool   b;
+		double d;
 	} node_val_;
 
 	void prepare_iter(void);
@@ -527,6 +560,17 @@ public:
 
 	/**
 	 * 创建一个 json_node 叶节点对象，该节点对象的格式为：
+	 * "tag_name": tag_value
+	 * @param tag {const char*} 标签名
+	 * @param value {double} 标签值
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
+	 *  不用时调用 reset 来释放这些 json_node 节点对象
+	 */
+	json_node& create_double(const char* tag, double value);
+
+	/**
+	 * 创建一个 json_node 叶节点对象，该节点对象的格式为：
 	 * "tag_name": true|false
 	 * @param tag {const char*} 标签名
 	 * @param value {bool} 标签值
@@ -559,6 +603,16 @@ public:
 #else
 	json_node& create_array_number(long long int value);
 #endif
+
+	/**
+	 * 创建一个 json_node 叶节点数值对象
+	 * 按 json 规范，该节点只能加入至数组对象中
+	 * @param value {double} 值
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
+	 * 不用时调用 reset 来释放这些 json_node 节点对象
+	 */
+	json_node& create_array_double(double value);
 
 	/**
 	 * 创建一个 json_node 叶节点布尔对象

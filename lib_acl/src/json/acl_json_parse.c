@@ -529,6 +529,8 @@ static const char *json_strend(ACL_JSON *json, const char *data)
 				node->type = ACL_JSON_T_A_BOOL;
 			else if (IS_NUMBER(txt))
 				node->type = ACL_JSON_T_A_NUMBER;
+			else if (acl_is_double(txt))
+				node->type = ACL_JSON_T_A_DOUBLE;
 			else
 				node->type = ACL_JSON_T_A_STRING;
 		} else
@@ -542,6 +544,8 @@ static const char *json_strend(ACL_JSON *json, const char *data)
 			node->type = ACL_JSON_T_BOOL;
 		else if (IS_NUMBER(txt))
 			node->type = ACL_JSON_T_NUMBER;
+		else if (acl_is_double(txt))
+			node->type = ACL_JSON_T_DOUBLE;
 		else
 			node->type = ACL_JSON_T_STRING;
 	} else

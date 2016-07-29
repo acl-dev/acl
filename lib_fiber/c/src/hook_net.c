@@ -10,6 +10,7 @@
 #include "event.h"
 #include "fiber.h"
 
+typedef int (*close_fn)(int);
 typedef int (*socket_fn)(int, int, int);
 typedef int (*socketpair_fn)(int, int, int, int sv[2]);
 typedef int (*bind_fn)(int, const struct sockaddr *, socklen_t);
@@ -26,6 +27,7 @@ typedef int (*epoll_create_fn)(int);
 typedef int (*epoll_wait_fn)(int, struct epoll_event *,int, int);
 typedef int (*epoll_ctl_fn)(int, int, int, struct epoll_event *);
 
+static close_fn      __sys_close    = NULL;
 static socket_fn     __sys_socket   = NULL;
 static socketpair_fn __sys_socketpair = NULL;
 static bind_fn       __sys_bind     = NULL;
@@ -50,6 +52,7 @@ void hook_net(void)
 
 	__called++;
 
+	__sys_close      = (close_fn) dlsym(RTLD_NEXT, "close");
 	__sys_socket     = (socket_fn) dlsym(RTLD_NEXT, "socket");
 	__sys_socketpair = (socketpair_fn) dlsym(RTLD_NEXT, "socketpair");
 	__sys_bind       = (bind_fn) dlsym(RTLD_NEXT, "bind");
@@ -138,6 +141,7 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 		clifd = __sys_accept(sockfd, addr, addrlen);
 		if (clifd > 0)
 			return clifd;
+
 		fiber_save_errno();
 		return clifd;
 	}
@@ -168,7 +172,6 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 
 	acl_non_blocking(sockfd, ACL_NON_BLOCKING);
 
-	errno = 0;
 	int ret = __sys_connect(sockfd, addr, addrlen);
 	if (ret >= 0) {
 		acl_tcp_nodelay(sockfd, 1);
@@ -177,18 +180,57 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 
 	fiber_save_errno();
 
-	acl_msg_info("%s(%d), %s: connect error: %s, errno: %d, %d, %d, %d, fd: %d",
-		__FILE__, __LINE__, __FUNCTION__,
-		acl_last_serror(), errno, EISCONN, EWOULDBLOCK, EAGAIN, sockfd);
+	if (errno != EINPROGRESS) {
+		if (errno == ECONNREFUSED)
+			acl_msg_error("%s(%d), %s: connect ECONNREFUSED",
+				__FILE__, __LINE__, __FUNCTION__);
+		else if (errno == ECONNRESET)
+			acl_msg_error("%s(%d), %s: connect ECONNRESET",
+				__FILE__, __LINE__, __FUNCTION__);
+		else if (errno == ENETDOWN)
+			acl_msg_error("%s(%d), %s: connect ENETDOWN",
+				__FILE__, __LINE__, __FUNCTION__);
+		else if (errno == ENETUNREACH)
+			acl_msg_error("%s(%d), %s: connect ENETUNREACH",
+				__FILE__, __LINE__, __FUNCTION__);
+		else if (errno == EHOSTDOWN)
+			acl_msg_error("%s(%d), %s: connect EHOSTDOWN",
+				__FILE__, __LINE__, __FUNCTION__);
+		else if (errno == EHOSTUNREACH)
+			acl_msg_error("%s(%d), %s: connect EHOSTUNREACH",
+				__FILE__, __LINE__, __FUNCTION__);
+#ifdef	ACL_LINUX
+		/* Linux returns EAGAIN instead of ECONNREFUSED
+		 * for unix sockets if listen queue is full -- see nginx
+		 */
+		else if (errno == EAGAIN)
+			acl_msg_error("%s(%d), %s: connect EAGAIN",
+				__FILE__, __LINE__, __FUNCTION__);
+#endif
+		else
+			acl_msg_error("%s(%d), %s: connect errno=%d, %s",
+				__FILE__, __LINE__, __FUNCTION__, errno,
+				acl_last_serror());
 
-	if (errno != EINPROGRESS && errno != EAGAIN)
 		return -1;
+	}
 
 	fiber_wait_write(sockfd);
 
 	ret = getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (char *) &err, &len);
 	if (ret == 0 && err == 0)
-		return 0;
+	{
+		char peer[256];
+		len = sizeof(peer);
+		if (acl_getpeername(sockfd, peer, len) == 0)
+			return 0;
+
+		fiber_save_errno();
+		acl_msg_error("%s(%d), %s: getpeername error %s, fd: %d",
+			__FILE__, __LINE__, __FUNCTION__,
+			acl_last_serror(), sockfd);
+		return -1;
+	}
 
 	acl_set_error(err);
 
@@ -201,9 +243,9 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 /****************************************************************************/
 
 #define SET_TIME(x) do { \
-	struct timeval tv; \
-	gettimeofday(&tv, NULL); \
-	(x) = ((acl_int64) tv.tv_sec) * 1000 + ((acl_int64) tv.tv_usec)/ 1000; \
+    struct timeval tv; \
+    gettimeofday(&tv, NULL); \
+    (x) = ((acl_int64) tv.tv_sec) * 1000 + ((acl_int64) tv.tv_usec)/ 1000; \
 } while (0)
 
 /****************************************************************************/
@@ -264,6 +306,7 @@ static void event_poll_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 
 static void poll_callback(EVENT *ev acl_unused, POLL_EVENT *pe)
 {
+	fiber_io_dec();
 	acl_fiber_ready(pe->fiber);
 }
 
@@ -287,21 +330,18 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	SET_TIME(begin);
 
 	while (1) {
-		errno = 0;
 		event_poll_set(ev, &pe, timeout);
 		fiber_io_inc();
 		acl_fiber_switch();
 
 		ev->timeout = -1;
-		if (pe.nready != 0 || timeout <= 0)
+		if (pe.nready != 0 || timeout == 0)
 			break;
 
 		SET_TIME(now);
 
-		if (now - begin >= timeout)
+		if (timeout > 0 && (now - begin >= timeout))
 			break;
-
-		timeout -= now - begin;
 	}
 
 	return pe.nready;
@@ -358,10 +398,12 @@ int select(int nfds, fd_set *readfds, fd_set *writefds,
 			FD_SET(fd, readfds);
 			nready++;
 		}
+
 		if (writefds && (fds[fd].revents & POLLOUT)) {
 			FD_SET(fd, writefds);
 			nready++;
 		}
+
 		if (exceptfds && (fds[fd].revents & (POLLERR | POLLHUP))) {
 			FD_SET(fd, exceptfds);
 			nready++;
@@ -414,6 +456,10 @@ static void thread_free(void *ctx acl_unused)
 			if (ee->fds[j] != NULL)
 				acl_myfree(ee->fds[j]);
 		}
+
+		if (ee->epfd >= 0 && __sys_close(ee->epfd) < 0)
+			fiber_save_errno();
+
 		acl_myfree(ee->fds);
 		acl_myfree(ee);
 	}
@@ -438,9 +484,9 @@ static void thread_init(void)
 static EPOLL_EVENT *epoll_event_create(int epfd)
 { 
 	EPOLL_EVENT *ee = NULL;
-	ACL_ITER iter;
 	size_t i;
 
+	/* using thread specific to store the epoll handles for each thread*/
 	if (__epfds == NULL) {
 		acl_assert(!acl_pthread_once(&__once_control, thread_init));
 
@@ -454,19 +500,13 @@ static EPOLL_EVENT *epoll_event_create(int epfd)
 			acl_msg_fatal("acl_pthread_setspecific error!");
 	}
 
-	acl_foreach(iter, __epfds) {
-		EPOLL_EVENT *e = (EPOLL_EVENT *) iter.data;
-		if (e->epfd == epfd) {
-			ee = e;
-			break;
-		}
-	}
+	ee = epfd_alloc();
+	acl_array_append(__epfds, ee);
 
-	if (ee == NULL) {
-		ee = epfd_alloc();
-		acl_array_append(__epfds, ee);
-	}
-
+	/* duplicate the current thread's epoll fd, so we can assosiate the
+	 * connection handles with one epoll fd for the current thread, and
+	 * use one epoll fd for each thread to handle all fds
+	 */
 	ee->epfd = dup(epfd);
 
 	for (i = 0; i < ee->nfds; i++)
@@ -494,6 +534,40 @@ static EPOLL_EVENT *epoll_event_find(int epfd)
 	return NULL;
 }
 
+int epoll_event_close(int epfd)
+{
+	ACL_ITER iter;
+	EPOLL_EVENT *ee = NULL;
+	int pos = -1;
+	size_t i;
+
+	if (__epfds == NULL || epfd < 0)
+		return -1;
+
+	acl_foreach(iter, __epfds) {
+		EPOLL_EVENT *e = (EPOLL_EVENT *) iter.data;
+		if (e->epfd == epfd) {
+			ee = e;
+			pos = iter.i;
+			break;
+		}
+	}
+
+	if (ee == NULL)
+		return -1;
+
+	for (i = 0; i < ee->nfds; i++) {
+		if (ee->fds[i] != NULL)
+			acl_myfree(ee->fds[i]);
+	}
+
+	acl_myfree(ee->fds);
+	acl_myfree(ee);
+	acl_array_delete(__epfds, pos, NULL);
+
+	return __sys_close(epfd);
+}
+
 int epoll_create(int size acl_unused)
 {
 	EPOLL_EVENT *ee;
@@ -508,6 +582,7 @@ int epoll_create(int size acl_unused)
 		return -1;
 	}
 
+	/* get the current thread's epoll fd */
 	epfd = event_handle(ev);
 	if (epfd < 0) {
 		acl_msg_error("%s(%d), %s: invalid event_handle %d",
@@ -669,14 +744,13 @@ int epoll_wait(int epfd, struct epoll_event *events,
 		acl_fiber_switch();
 
 		ev->timeout = -1;
-		if (ee->nready != 0)
+		if (ee->nready != 0 || timeout == 0)
 			break;
 
 		SET_TIME(now);
-		if (now - begin >= timeout)
-			break;
 
-		timeout -= now - begin;
+		if (timeout > 0 && (now - begin >= timeout))
+			break;
 	}
 
 	return ee->nready;

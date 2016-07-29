@@ -108,7 +108,7 @@ public:
 		off_t off = 0);
 
 	/**
-	 * 获得邮件正文结点
+	 * 获得邮件正文节点
 	 * @param htmlFirst {bool} 优先获得HTML格式的文本；否则优先获得
 	 *  纯文本，且如果只有HTML文本则转换为纯文本
 	 * @param enableDecode {bool} 转储时是否对原文进行解码
@@ -120,7 +120,27 @@ public:
                 const char* toCharset = "gb2312", off_t off = 0);
 
 	/**
-	 * 获得所有的 mime 结点列表
+	 * 获得 text/plain 格式的正文节点
+	 * @param enableDecode {bool} 转储时是否对原文进行解码
+	 * @param toCharset {const char*} 目标字符集
+	 * @param off {off_t} 调用者希望给邮件体结点附加的相对偏移量
+	 * @return {mime_body*} 若未找到 plain 格式的正文内容则返回 NULL
+	 */
+	mime_body* get_plain_body(bool enableDecode = true,
+		const char* toCharset = "gb2312", off_t off = 0);
+
+	/**
+	 * 获得 text/html 格式的正文节点
+	 * @param enableDecode {bool} 转储时是否对原文进行解码
+	 * @param toCharset {const char*} 目标字符集
+	 * @param off {off_t} 调用者希望给邮件体结点附加的相对偏移量
+	 * @return {mime_body*} 若未找到 html 格式的正文内容则返回 NULL
+	 */
+	mime_body* get_html_body(bool enableDecode = true,
+		const char* toCharset = "gb2312", off_t off = 0);
+
+	/**
+	 * 获得所有的 mime 节点列表
 	 * @param enableDecode {bool} 转储时是否自动进行解码
 	 * @param toCharset {const char*} 目标字符集
 	 * @param off {off_t} 调用者希望给邮件结点附加的相对偏移量

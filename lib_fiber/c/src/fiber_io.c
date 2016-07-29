@@ -296,8 +296,8 @@ void fiber_wait_read(int fd)
 	if (event_add(__thread_fiber->event,
 		fd, EVENT_READABLE, read_callback, NULL) <= 0)
 	{
-		acl_msg_info(">>>%s(%d): fd: %d, not sock<<<",
-			__FUNCTION__, __LINE__, fd);
+		//acl_msg_info(">>>%s(%d): fd: %d, not sock<<<",
+		//	__FUNCTION__, __LINE__, fd);
 		return;
 	}
 

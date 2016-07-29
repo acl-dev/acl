@@ -6,6 +6,7 @@
 # include "stdlib/acl_define.h"
 
 # include <string.h>
+# include <errno.h>
 # include <float.h>			/* DBL_MAX_10_EXP */
 # include <ctype.h>
 # include <limits.h>			/* CHAR_BIT */

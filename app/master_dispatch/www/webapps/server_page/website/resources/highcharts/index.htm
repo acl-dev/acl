@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Highcharts Example</title>
+<script type="text/javascript" src="../jquery-1.8.2.min.js"></script>
+
+<script type="text/javascript">
+
+$(function() {
+    Highcharts.setOptions({
+        global: { useUTC: false }
+    });
+
+    function CreateChart(title, container) {
+        return new Highcharts.Chart({
+                chart: {
+                    type: 'spline',
+                    width: 600,
+                    height: 300,
+                    animation: Highcharts.svg,  // svg or canvas
+                    marginRight: 10,
+                    renderTo: container
+                },
+                title: { text: title },
+                xAxis: { type: 'datetime', tickPixelInterval: 150 },
+                yAxis: {
+                    title: { text: 'Value' },
+                    plotLines: [{ value: 0, width: 1, color: '#808080' }]
+                },
+                legend: { enabled: false },
+                exporting: { enabled: false },
+                series: [{ name: 'Update data', data: [] }]
+            });
+    }
+
+    var totalConns = CreateChart("总连接数", "total_conns");
+    var totalQlen = CreateChart("等待任务数", "total_qlen");
+    var currThreads = CreateChart("总线程数", "curr_threads");
+    var busyThreads = CreateChart("繁忙线程数", "busy_threads");
+    
+    function initData() {
+        var data = [];
+        var x = (new Date()).getTime();
+        for (var i = -19; i <= 0; i++) {
+            data.push({ x: x + i * 1000, y: 0 });
+        }
+        totalConns.series[0].setData(data);
+        totalQlen.series[0].setData(data);
+        currThreads.series[0].setData(data);
+        busyThreads.series[0].setData(data);
+    }
+    
+    function getResult() {
+        var x = (new Date()).getTime();
+        var y = Math.random() * 10000 % 100;
+        /*
+        totalConns.series[0].addPoint([x, y], true, true);
+        totalQlen.series[0].addPoint([x, y], true, true);
+        currThreads.series[0].addPoint([x, y], true, true);
+        busyThreads.series[0].addPoint([x, y], true, true);
+        return;
+        */
+        jQuery.getJSON('/server_page/page/showAll', null, function(data) {
+            var servers = data['servers'];
+            alert(servers);
+            //chart_conns.series[0].addPoint([x, y], true, true);
+        });
+    }
+
+    $(document).ready(function() {
+        initData();
+        window.setInterval(getResult, 1000);
+    });
+});
+
+</script>
+</head>
+<body>
+
+<table>
+  <tr>
+    <td id="total_conns" style="min-width: 310px; height: 310px; margin: 0 auto"></td>
+    <td id="total_qlen" style="min-width: 310px; height: 310px; margin: 0 auto"></td>
+  </tr>
+  <tr>
+    <td id="curr_threads" style="min-width: 310px; height: 310px; margin: 0 auto"></td>
+    <td id="busy_threads" style="min-width: 310px; height: 310px; margin: 0 auto"></td>
+  </tr>
+</table>
+<hr/>
+
+<script src="js/highcharts.js"></script>
+<script src="js/exporting.js"></script>
+
+</body>
+</html>

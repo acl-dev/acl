@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
+#include <errno.h>
+#include <string.h>
 #include "stdlib/acl_define.h"
 #include "thread/acl_pthread.h"
 #include "stdlib/acl_msg.h"

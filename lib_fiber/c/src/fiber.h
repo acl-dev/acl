@@ -123,5 +123,6 @@ void hook_io(void);
 
 /* in fiber_net.c */
 void hook_net(void);
+int  epoll_event_close(int epfd);
 
 #endif

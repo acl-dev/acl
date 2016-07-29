@@ -24,9 +24,9 @@ static void echo_client(int fd)
 	int   ret = read(fd, buf, sizeof(buf));
 
 	if (ret <= 0)
-		printf("read error: %s\r\n", strerror(errno));
+		printf("read error: %s, ret: %d\r\n", strerror(errno), ret);
 	else
-		printf("read some data\r\n");
+		printf("read some data, ret: %d\r\n", ret);
 
 	close(fd);
 }
