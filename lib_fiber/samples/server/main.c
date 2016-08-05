@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "fiber/lib_fiber.h"
 
+static int __stack_size = 32000;
 static int __rw_timeout = 0;
 static int __echo_data  = 0;
 
@@ -57,7 +58,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 		}
 
 		printf("accept one, fd: %d\r\n", ACL_VSTREAM_SOCK(cstream));
-		acl_fiber_create(echo_client, cstream, 32768);
+		acl_fiber_create(echo_client, cstream, __stack_size);
 	}
 
 	acl_vstream_close(sstream);
@@ -94,6 +95,7 @@ static void usage(const char *procname)
 		"  -r rw_timeout\r\n"
 		"  -S [if sleep]\r\n"
 		"  -q listen_queue\r\n"
+		"  -z stack_size\r\n"
 		"  -w [if echo data, default: no]\r\n", procname);
 }
 
@@ -107,7 +109,7 @@ int main(int argc, char *argv[])
 
 	snprintf(addr, sizeof(addr), "%s", "127.0.0.1:9002");
 
-	while ((ch = getopt(argc, argv, "hs:r:Sq:w")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:r:Sq:wz:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -126,6 +128,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'w':
 			__echo_data = 1;
+			break;
+		case 'z':
+			__stack_size = atoi(optarg);
 			break;
 		default:
 			break;

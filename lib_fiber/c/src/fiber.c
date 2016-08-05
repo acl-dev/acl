@@ -17,7 +17,7 @@ static errno_fn __sys_errno = NULL;
 static fcntl_fn __sys_fcntl = NULL;
 
 typedef struct {
-	ACL_RING       queue;		/* ready fiber queue */
+	ACL_RING       ready;		/* ready fiber queue */
 	ACL_RING       dead;		/* dead fiber queue */
 	ACL_FIBER    **fibers;
 	size_t         size;
@@ -28,9 +28,6 @@ typedef struct {
 	size_t         idgen;
 	int            count;
 	int            switched;
-#ifdef	USE_DBUF
-	ACL_DBUF_POOL *dbuf;
-#endif
 } FIBER_TLS;
 
 static FIBER_TLS *__main_fiber = NULL;
@@ -50,10 +47,6 @@ static void thread_free(void *ctx)
 
 	if (__thread_fiber == NULL)
 		return;
-
-#ifdef	USE_DBUF
-	acl_dbuf_pool_destroy(tf->dbuf);
-#endif
 
 	if (tf->fibers)
 		acl_myfree(tf->fibers);
@@ -92,11 +85,8 @@ static void fiber_check(void)
 	__thread_fiber->size   = 0;
 	__thread_fiber->idgen  = 0;
 	__thread_fiber->count  = 0;
-#ifdef	USE_DBUF
-	__thread_fiber->dbuf   = acl_dbuf_pool_create(640000);
-#endif
 
-	acl_ring_init(&__thread_fiber->queue);
+	acl_ring_init(&__thread_fiber->ready);
 	acl_ring_init(&__thread_fiber->dead);
 
 	if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
@@ -219,14 +209,14 @@ void fiber_exit(int exit_code)
 void acl_fiber_ready(ACL_FIBER *fiber)
 {
 	fiber->status = FIBER_STATUS_READY;
-	acl_ring_prepend(&__thread_fiber->queue, &fiber->me);
+	acl_ring_prepend(&__thread_fiber->ready, &fiber->me);
 }
 
 int acl_fiber_yield(void)
 {
 	int  n;
 
-	if (acl_ring_size(&__thread_fiber->queue) == 0)
+	if (acl_ring_size(&__thread_fiber->ready) == 0)
 		return 0;
 
 	n = __thread_fiber->switched;
@@ -273,12 +263,8 @@ static void fiber_start(unsigned int x, unsigned int y)
 
 static void fiber_free(FIBER_TLS *tls, ACL_FIBER *fiber)
 {
-#ifdef	USE_DBUF
-	acl_dbuf_pool_free(tls->dbuf, fiber);
-#else
 	(void) tls;
 	acl_myfree(fiber);
-#endif
 }
 
 static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
@@ -306,20 +292,10 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 
 	head = acl_ring_pop_head(&__thread_fiber->dead);
 	if (head == NULL)
-#ifdef	USE_DBUF
-		fiber = (ACL_FIBER *) acl_dbuf_pool_calloc(
-			__thread_fiber->dbuf, sizeof(ACL_FIBER) + size);
-#else
 		fiber = (ACL_FIBER *) acl_mycalloc(1, sizeof(ACL_FIBER) + size);
-#endif
 	else if ((fiber = ACL_RING_TO_APPL(head, ACL_FIBER, me))->size < size) {
 		fiber_free(__thread_fiber, fiber);
-#ifdef	USE_DBUF
-		fiber = (ACL_FIBER *) acl_dbuf_pool_calloc(
-			__thread_fiber->dbuf, sizeof(ACL_FIBER) + size);
-#else
 		fiber = (ACL_FIBER *) acl_mycalloc(1, sizeof(ACL_FIBER) + size);
-#endif
 	} else
 		size = fiber->size;
 
@@ -414,7 +390,7 @@ void acl_fiber_schedule(void)
 	acl_fiber_hook_api(1);
 
 	for (;;) {
-		head = acl_ring_pop_head(&__thread_fiber->queue);
+		head = acl_ring_pop_head(&__thread_fiber->ready);
 		if (head == NULL) {
 			acl_msg_info("------- NO ACL_FIBER NOW --------");
 			break;
@@ -476,7 +452,7 @@ void acl_fiber_switch(void)
 		acl_ring_append(&__thread_fiber->dead, &current->me);
 	}
 
-	head = acl_ring_pop_head(&__thread_fiber->queue);
+	head = acl_ring_pop_head(&__thread_fiber->ready);
 
 	if (head == NULL) {
 		fiber_swap(current, &__thread_fiber->schedule);

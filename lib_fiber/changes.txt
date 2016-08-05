@@ -1,4 +1,11 @@
 
+17) 2016.8.5
+17.1) feature: hook_io.c 中增加系统 API sleep 的 hook 函数
+
+16) 2016.8.4
+16.1) bugfix: hook_net.c 中的 gethostbyname_r 在解析域名时的地址所用字节序有误
+--- found by 陈晓勇
+
 15) 2016.7.28
 15.1) bugfix: hook_net.c 中的 poll/epoll_wait 对于超时的计数有误，会导致超时
 时间提前

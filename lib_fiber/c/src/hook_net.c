@@ -848,28 +848,34 @@ int gethostbyname_r(const char *name, struct hostent *ret,
 
 	acl_foreach(iter, res) {
 		ACL_HOSTNAME *h = (ACL_HOSTNAME*) iter.data;
+		struct in_addr addr;
 
-		len = strlen(h->ip);
+		len = sizeof(struct in_addr);
 		n += len;
-		memcpy(buf, h->ip, len);
-		buf[len] = 0;
+		if (n > buflen)
+			break;
+
+		memset(&addr, 0, sizeof(addr));
+		addr.s_addr = inet_addr(h->ip);
+		memcpy(buf, &addr, len);
 
 		if (i >= MAX_COUNT)
 			break;
 		ret->h_addr_list[i++] = buf;
-		buf += len + 1;
+		buf += len;
 		ret->h_length += len;
 	}
 
-	if (i == 0) {
-		acl_msg_error("%s(%d), %s: i == 0",
-			__FILE__, __LINE__, __FUNCTION__);
-		if (h_errnop)
-			*h_errnop = ERANGE;
-		RETURN (-1);
+	if (i > 0) {
+		*result = ret;
+		RETURN (0);
 	}
 
-	*result = ret;
+	acl_msg_error("%s(%d), %s: i == 0, n: %d, buflen: %d",
+		__FILE__, __LINE__, __FUNCTION__, (int) n, (int) buflen);
 
-	RETURN (0);
+	if (h_errnop)
+		*h_errnop = ERANGE;
+
+	RETURN (-1);
 }

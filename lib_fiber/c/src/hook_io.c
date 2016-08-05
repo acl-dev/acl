@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include "fiber.h"
 
+typedef unsigned int (*sleep_fn)(unsigned int seconds);
 typedef int     (*pipe_fn)(int pipefd[2]);
 #ifdef HAS_PIPE2
 typedef int     (*pipe2_fn)(int pipefd[2], int flags);
@@ -32,6 +33,7 @@ typedef ssize_t (*sendto_fn)(int, const void *, size_t, int,
 	const struct sockaddr *, socklen_t);
 typedef ssize_t (*sendmsg_fn)(int, const struct msghdr *, int);
 
+static sleep_fn    __sys_sleep    = NULL;
 static pipe_fn     __sys_pipe     = NULL;
 #ifdef HAS_PIPE2
 static pipe2_fn    __sys_pipe2    = NULL;
@@ -60,6 +62,7 @@ void hook_io(void)
 
 	__called++;
 
+	__sys_sleep    = (sleep_fn) dlsym(RTLD_NEXT, "sleep");
 	__sys_pipe     = (pipe_fn) dlsym(RTLD_NEXT, "pipe");
 #ifdef HAS_PIPE2
 	__sys_pipe2    = (pipe2_fn) dlsym(RTLD_NEXT, "pipe2");
@@ -78,6 +81,14 @@ void hook_io(void)
 	__sys_send     = (send_fn) dlsym(RTLD_NEXT, "send");
 	__sys_sendto   = (sendto_fn) dlsym(RTLD_NEXT, "sendto");
 	__sys_sendmsg  = (sendmsg_fn) dlsym(RTLD_NEXT, "sendmsg");
+}
+
+unsigned int sleep(unsigned int seconds)
+{
+	if (!acl_var_hook_sys_api)
+		return __sys_sleep(seconds);
+
+	return acl_fiber_sleep(seconds);
 }
 
 int pipe(int pipefd[2])
