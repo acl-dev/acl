@@ -475,6 +475,8 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include=".\src\stdlib\common\acl_ring.c" />
     <ClCompile Include=".\src\stdlib\common\acl_stack.c" />
     <ClCompile Include=".\src\stdlib\common\acl_token_tree.c" />
+    <ClCompile Include=".\src\stdlib\common\acl_ypipe.c" />
+    <ClCompile Include=".\src\stdlib\common\acl_yqueue.c" />
     <ClCompile Include=".\src\stdlib\common\avl.c" />
     <ClCompile Include=".\src\stdlib\configure\acl_loadcfg.c" />
     <ClCompile Include=".\src\stdlib\configure\acl_xinetd_cfg.c" />
@@ -803,6 +805,8 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include=".\include\stdlib\acl_vstring.h" />
     <ClInclude Include=".\include\stdlib\acl_vstring_vstream.h" />
     <ClInclude Include=".\include\stdlib\acl_xinetd_cfg.h" />
+    <ClInclude Include=".\include\stdlib\acl_ypipe.h" />
+    <ClInclude Include=".\include\stdlib\acl_yqueue.h" />
     <ClInclude Include=".\include\stdlib\avl.h" />
     <ClInclude Include=".\include\stdlib\avl_impl.h" />
     <ClInclude Include=".\include\stdlib\unix\acl_chroot_uid.h" />

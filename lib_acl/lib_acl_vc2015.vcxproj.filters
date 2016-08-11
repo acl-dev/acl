@@ -323,6 +323,12 @@
     <ClCompile Include=".\src\stdlib\common\acl_token_tree.c">
       <Filter>Source Files\stdlib\common</Filter>
     </ClCompile>
+    <ClCompile Include=".\src\stdlib\common\acl_ypipe.c">
+      <Filter>Source Files\stdlib\common</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\stdlib\common\acl_yqueue.c">
+      <Filter>Source Files\stdlib\common</Filter>
+    </ClCompile>
     <ClCompile Include=".\src\stdlib\common\avl.c">
       <Filter>Source Files\stdlib\common</Filter>
     </ClCompile>
@@ -1294,6 +1300,12 @@
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_xinetd_cfg.h">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include=".\include\stdlib\acl_ypipe.h">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include=".\include\stdlib\acl_yqueue.h">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\avl.h">
