@@ -1,34 +1,32 @@
 SHELL = /bin/sh
-CC      = gcc
 #CC      = g++
-CC	= ${ENV_CC}
+CC	= ${ENV_CPP}
 AR      = ${ENV_AR}
 ARFL    = rv
 #ARFL    = cru
 RANLIB  = ${ENV_RANLIB}
 
+FLAGS   = ${ENV_FLAGS}
+
 CFLAGS = -c -g -W \
+-O3 \
 -Wall \
--Wcast-qual \
--Waggregate-return \
--Wmissing-prototypes \
 -Wpointer-arith \
 -Wshadow \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \
--D_USE_FAST_MACRO \
 -Wno-long-long \
--DUSE_JMP
-#-DUSE_VALGRIND
-#-Wno-clobbered
-#-O3
-
-#-pedantic
+-Wformat \
+-Winvalid-pch \
+-DACL_PREPARE_COMPILE
+#-DUSE_DYNAMIC
 # -Wcast-align
-#CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
-#-Waggregate-return -Wmissing-prototypes \
-#-Wpointer-arith -Werror -Wshadow -O2 \
-#-D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO
+#-Wcast-qual
+#just for freebsd's iconv.h
+CFLAGS += -I/usr/local/include
+
+shared_ldflags = -l_acl_cpp -l_protocol -l_acl -lz -lpthread
+
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
@@ -38,7 +36,7 @@ UNIXNAME = $(shell uname -sm)
 UNIXTYPE = LINUX
 
 ifeq ($(CC),)
-        CC = gcc
+        CC = g++
 endif
 
 ifeq ($(AR),)
@@ -47,16 +45,6 @@ endif
 
 ifeq ($(RANLIB),)
 	RANLIB = ranlib
-endif
-
-ifeq ($(findstring gcc, $(CC)), gcc)
-	CFLAGS += -Wstrict-prototypes
-endif
-
-ifeq ($(findstring clang, $(CC)), clang)
-	CFLAGS += -Wstrict-prototypes \
-		  -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof
 endif
 
 ifeq ($(findstring clang++, $(CC)), clang++)
@@ -68,19 +56,23 @@ endif
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD -fPIC -Werror
 	UNIXTYPE = FREEBSD
+	shared_ldflags = -l_acl_cpp -l_protocol -l_acl -L/usr/local/lib -liconv -lz -lpthread
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof -fPIC -Werror
+		  -Wno-extended-offsetof -fPIC -Werror \
+		  -Wno-unused-private-field
 	UNIXTYPE = MACOSX
+	shared_ldflags = -l_acl_cpp -l_protocol -l_acl -L/usr/lib -liconv -lz -lpthread
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -DLINUX2 -fPIC -Werror
 	UNIXTYPE = LINUX
+	shared_ldflags = -l_acl_cpp -l_protocol -l_acl -lrt -lpthread -lz -ldl
 endif
 
 # For MINGW
@@ -113,84 +105,98 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-LIB_PATH_DST = ../lib
 OBJ_PATH_DST = ./debug
+LIB_PATH_DST = ../lib
+DEF_PATH_DST = ./debug
 
-SRC_PATH_SRC = ./src
-
-INC_COMPILE  = -I./include -I./src
-CFLAGS += $(INC_COMPILE)
+CFLAGS += -I./src -I../c/include  -I./include -I../../lib_acl/include -I../../lib_acl_cpp/include
 
 #Project's objs
-SRC = $(wildcard $(SRC_PATH_SRC)/*.c)  \
-	$(wildcard $(SRC_PATH_SRC)/master/*.c) \
 
-OBJ = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC)))
-
-###########################################################
-
-LIB_ACL_PATH = ../../lib_acl
-CFLAGS += -I $(LIB_ACL_PATH)/include -I$(LIB_ACL_PATH)/src/master
-
-STATIC_LIBNAME = lib_fiber.a
-SHARED_LIBNAME = lib_fiber.so
+OBJS_DST = $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/*.cpp)))
+OBJS_DEF = $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/*.cpp)))
 
 ###########################################################
-
 .PHONY = static shared clean
+VERSION = 0.9
+DATE_NOW = 20`date +%y`.`date +%m`.`date +%d`
+
+STATIC_LIBNAME = lib_fiber_cpp.a
+SHARED_LIBNAME = lib_fiber_cpp.so
+PCH = ./acl_stdafx.hpp.gch
+
+lib: static
+all: static shared sample
+
+$(shell mkdir -p $(DEF_PATH_DST))
+ifneq ($(MAKECMDGOALS),clean)
+-include $(OBJS_DEF)
+endif
+
 COMPILE = $(CC) $(CFLAGS)
+COMPILE_OBJ = @(echo 'building $<'; $(COMPILE) $< -o $@)
+CREATE_DEF = @(echo 'creating $@'; rm -f $@; \
+	$(COMPILE) -MM $< > $@.$$$$; \
+	sed 's,.*.o\( \)*:,$(patsubst %.inc,%.o,$@) $@ :,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$)
 
-all: static shared
-rebuild rb: clean all
+###########################################################
 
-$(shell mkdir -p $(OBJ_PATH_DST))
+sample: static
+	@(cd samples; make)
 
-static: $(OBJ)
+static: depends $(OBJS_DST)
 	@echo 'creating $(LIB_PATH_DST)/$(STATIC_LIBNAME)'
-	$(AR) $(ARFL) $(LIB_PATH_DST)/$(STATIC_LIBNAME) $(OBJ)
-	$(RANLIB) $(LIB_PATH_DST)/$(STATIC_LIBNAME)
-	@echo 'build $(LIB_PATH_DST)/$(STATIC_LIBNAME) ok!'
+	@$(AR) $(ARFL) $(LIB_PATH_DST)/$(STATIC_LIBNAME) $(OBJS_DST)
+	@$(RANLIB) $(LIB_PATH_DST)/$(STATIC_LIBNAME)
+	@echo 'create $(LIB_PATH_DST)/$(STATIC_LIBNAME) ok!'
 
-shared_ldflags = -l_acl -lrt -lpthread
-shared: $(OBJ)
-	@echo ''
+shared: depends pch $(OBJS_DST)
 	@echo 'creating $(SHARED_LIBNAME)'
 	@if test -n "$(rpath)" && test "$(UNIXTYPE)" = "LINUX"; then \
 		echo "building for linux"; \
-		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJ) \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
 			-L$(rpath) $(shared_ldflags) -Wl,-rpath,$(rpath); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "SUNOS5"; then \
 		echo "building for sunos5"; \
-		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJ) \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
 			-R$(rpath) -L$(rpath) $(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "MACOSX"; then \
 		echo "building for Darwin"; \
-		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJ) \
-			-R$(rpath) -L$(rpath) -l_acl -lpthread; \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+			-R$(rpath) -L$(rpath) $(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "FREEBSD"; then \
-		echo "building for FreeBSD"; \
-		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJ) \
-			-R$(rpath) -L$(rpath) -l_acl -lpthread; \
+		echo "building for Darwin"; \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+			-R$(rpath) -L$(rpath) $(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	else \
 		echo 'skip build $(SHARED_LIBNAME); usage: make shared rpath=xxx'; \
 	fi
 
-$(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/%.c
-	$(COMPILE) $< -o $@
-$(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/master/%.c
-	$(COMPILE) $< -o $@
+depends: $(OBJS_DEF)
+pch: ./acl_stdafx.hpp
+	rm -f $(PCH)
+	@if test "$(UNIXTYPE)" = "LINUX" || test "$(UNIXTYPE)" = "FREEBSD" \
+		|| test "$(UNIXTYPE)" = "MACOSX"; then \
+		$(CC) -o $(PCH) -x c++-header $(CFLAGS) src/acl_stdafx.hpp; \
+	fi
 
-clean cl:
-	rm -f $(LIB_PATH_DST)/lib_fiber.a
-	rm -f $(LIB_PATH_DST)/lib_fiber.so
-	rm -f $(OBJ)
+# src
+$(OBJ_PATH_DST)/%.o: ./src/%.cpp
+	$(COMPILE_OBJ)
 
-all_lib: $(OBJ)
-	@(cd debug; ar x ../../lib_acl/lib/lib_acl.a)
-	$(AR) $(ARFL) $(LIB_PATH_DST)/lib_fiber.a debug/*.o
-	$(RANLIB) $(LIB_PATH_DST)/lib_fiber.a
-	@(cd debug; rm -f `ar -t ../../lib_acl/lib/lib_acl.a`)
+$(DEF_PATH_DST)/%.inc: ./src/%.cpp
+	$(CREATE_DEF)
+
+clean:
+	rm -f $(LIB_PATH_DST)/lib_fiber_cpp.a
+	rm -f $(LIB_PATH_DST)/lib_fiber_cpp.so
+	rm -f $(OBJS_DST)
+	rm -f $(OBJS_DEF)
+	rm -f $(PCH)
+
+rebuild rb: clean static

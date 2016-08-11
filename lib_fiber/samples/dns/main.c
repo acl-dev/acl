@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
 	acl_foreach(iter, tokens) {
 		char* addr = (char* ) iter.data;
-		acl_fiber_create(nslookup, addr, 8192);
+		acl_fiber_create(nslookup, addr, 32000);
 	}
 
 	acl_fiber_schedule();
