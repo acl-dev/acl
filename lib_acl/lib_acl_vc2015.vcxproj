@@ -665,6 +665,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include=".\src\json\acl_json_util.c" />
     <ClCompile Include="src\event\events_epoll_thr.c" />
     <ClCompile Include="src\master\template\acl_udp_server.c" />
+    <ClCompile Include="src\stdlib\acl_atomic.c" />
     <ClCompile Include="src\stdlib\sys\unix\acl_trace.c" />
     <ClCompile Include="src\xml\acl_xml2.c" />
     <ClCompile Include="src\xml\acl_xml2_parse.c" />
@@ -733,6 +734,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include=".\src\private\thread.h" />
     <ClInclude Include=".\include\lib_acl.h" />
     <ClInclude Include="include\code\acl_xmlcode.h" />
+    <ClInclude Include="include\stdlib\acl_atomic.h" />
     <ClInclude Include="include\stdlib\unix\acl_trace.h" />
     <ClInclude Include="include\xml\acl_xml2.h" />
     <ClInclude Include="include\xml\acl_xml3.h" />

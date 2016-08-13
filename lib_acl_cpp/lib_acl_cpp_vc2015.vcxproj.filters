@@ -903,9 +903,6 @@
     <ClInclude Include="include\acl_cpp\stdlib\scan_dir.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
-    <ClInclude Include="resource_vc2012.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\acl_cpp\stream\polarssl_io.hpp">
       <Filter>Header Files\stream</Filter>
     </ClInclude>
@@ -1047,6 +1044,7 @@
     <ClInclude Include="include\acl_cpp\stdlib\xml2.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
+    <ClInclude Include="resource_vc2015.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -1174,7 +1172,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="lib_acl_cpp_vc2012.rc" />
+    <ResourceCompile Include="lib_acl_cpp_vc2015.rc" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

@@ -935,6 +935,9 @@
     <ClCompile Include="src\xml\acl_xml3_util.c">
       <Filter>Source Files\xml</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\acl_atomic.c">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl.rc">
@@ -1550,6 +1553,9 @@
     </ClInclude>
     <ClInclude Include="include\code\acl_xmlcode.h">
       <Filter>Header Files\code</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stdlib\acl_atomic.h">
+      <Filter>Header Files\stdlib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

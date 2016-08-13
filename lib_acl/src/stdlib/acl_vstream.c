@@ -1484,6 +1484,8 @@ TAG_AGAIN:
 				if (ret == ACL_VSTREAM_EOF)
 					return ret;
 				n += ret;
+				if (ret < (int) vec[i].iov_len)
+					break;
 			}
 		}
 
@@ -1512,10 +1514,12 @@ TAG_AGAIN:
 			if (ret == ACL_VSTREAM_EOF)
 				return ret;
 			n += ret;
+			if (ret < (int) vec[i].iov_len)
+				break;
 		}
 	}
 
-	if (n > 0) {
+	if (n >= 0) {
 		fp->total_write_cnt += n;
 		return n;
 	}
@@ -1580,8 +1584,8 @@ int acl_vstream_writev(ACL_VSTREAM *fp, const struct iovec *vec, int count)
 int acl_vstream_writevn(ACL_VSTREAM *fp, const struct iovec *vec, int count)
 {
 	const char *myname = "acl_vstream_writevn";
-	int   n, i, dlen, k;
-	struct iovec *vect;
+	int   n, i, nskip, nwrite = 0;
+	struct iovec *iv, *iv_saved;
 
 	if (fp == NULL || count <= 0 || vec == NULL) {
 		acl_msg_error("%s, %s(%d): fp %s, vec %s, count %d", myname,
@@ -1594,43 +1598,47 @@ int acl_vstream_writevn(ACL_VSTREAM *fp, const struct iovec *vec, int count)
 		if (acl_vstream_fflush(fp) == ACL_VSTREAM_EOF)
 			return ACL_VSTREAM_EOF;
 	}
-	vect = (struct iovec*) acl_mycalloc(count, sizeof(struct iovec));
+
+	iv = (struct iovec*) acl_mycalloc(count, sizeof(struct iovec));
+	iv_saved = iv;  /* saving the memory for freeing */
+
 	for (i = 0; i < count; i++) {
-		vect[i].iov_base = vec[i].iov_base;
-		vect[i].iov_len = vec[i].iov_len;
+		iv[i].iov_base = vec[i].iov_base;
+		iv[i].iov_len = vec[i].iov_len;
 	}
 
-	dlen = 0;
-
 	while (1) {
-		n = writev_once(fp, vect, count);
+		n = writev_once(fp, iv, count);
 		if (n == ACL_VSTREAM_EOF) {
-			acl_myfree(vect);
+			acl_myfree(iv_saved);
 			return ACL_VSTREAM_EOF;
-		}
-		dlen += n;
+		} else if (n == 0)
+			continue;
 
-		k = 0;
+		nwrite += n;
+		nskip   = 0;
+
 		for (i = 0; i < count; i++) {
-			if (n >= (int) vect[i].iov_len) {
-				/* written */
-				n -= (int) vect[i].iov_len;
-				k++;
+			if (n >= (int) iv[i].iov_len) {
+				/* fully written one vector item */
+				n -= (int) iv[i].iov_len;
+				nskip++;
 			} else {
 				/* partially written */
-				vect[i].iov_base = (void *) ((unsigned char*)
-					vect[i].iov_base + n);
-				vect[i].iov_len -= n;
+				iv[i].iov_base = (void *) ((unsigned char*)
+					iv[i].iov_base + n);
+				iv[i].iov_len -= n;
 				break;
 			}
 		}
 
 		if (i >= count) {
-			acl_myfree(vect);
-			return dlen;
+			acl_myfree(iv_saved);
+			return nwrite;
 		}
-		count -= k;
-		vec += k;
+
+		count -= nskip;
+		iv    += nskip;
 	}
 }
 
