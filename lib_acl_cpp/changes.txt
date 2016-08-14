@@ -1,6 +1,10 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+433) 2016.8.14
+433.1) feature: Makefile 添加条件编译选项：允许在编译时以 make polarssl=on
+方式将 POLARSSL 编译进去
+ 
 432) 2016.7.29
 432.1) feature: mime 类增加两个方法 get_plain_body/get_html_body 便于提取不同类型的
 432.2) feature: json 增加对 double 类型的支持
