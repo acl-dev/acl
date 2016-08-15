@@ -208,8 +208,6 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 	fdp->fdidx = eventp->fdcnt;
 	eventp->fdtabs[eventp->fdcnt++] = fdp;
 
-	THREAD_UNLOCK(&evthr->event.tb_mutex);
-
 	if (epoll_ctl(evthr->handle, EPOLL_CTL_ADD, fd, &ev) < 0) {
 		if (errno == EEXIST)
 			acl_msg_warn("%s: epool_ctl: %s, fd: %d",
@@ -218,6 +216,8 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 			acl_msg_fatal("%s: epool_ctl: %s, fd: %d",
 				myname, acl_last_serror(), fd);
 	}
+
+	THREAD_UNLOCK(&evthr->event.tb_mutex);
 }
 
 static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *fp,

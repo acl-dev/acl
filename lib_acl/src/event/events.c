@@ -64,12 +64,12 @@ int event_prepare(ACL_EVENT *ev)
 			fdp->fdidx_ready = ev->ready_cnt;
 			ev->ready[ev->ready_cnt++] = fdp;
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
-			if (ACL_VSTREAM_BFRD_CNT(fdp->stream) > 0) {
-				fdp->stream->read_ready = 0;
+			if (fdp->stream->read_ready && !fdp->listener) {
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = ev->ready_cnt;
 				ev->ready[ev->ready_cnt++] = fdp;
-			} else if (fdp->stream->read_ready && !fdp->listener) {
+			} else if (ACL_VSTREAM_BFRD_CNT(fdp->stream) > 0) {
+				fdp->stream->read_ready = 0;
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = ev->ready_cnt;
 				ev->ready[ev->ready_cnt++] = fdp;
@@ -210,12 +210,12 @@ int event_thr_prepare(ACL_EVENT *ev)
 			fdp->fdidx_ready = ev->ready_cnt;
 			ev->ready[ev->ready_cnt++] = fdp;
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
-			if (ACL_VSTREAM_BFRD_CNT(fdp->stream) > 0) {
-				fdp->stream->read_ready = 0;
+			if (fdp->stream->read_ready && !fdp->listener) {
 				fdp->event_type = ACL_EVENT_READ;
 				fdp->fdidx_ready = ev->ready_cnt;
 				ev->ready[ev->ready_cnt++] = fdp;
-			} else if (fdp->stream->read_ready && !fdp->listener) {
+			} else if (ACL_VSTREAM_BFRD_CNT(fdp->stream) > 0) {
+				fdp->stream->read_ready = 0;
 				fdp->event_type = ACL_EVENT_READ;
 				fdp->fdidx_ready = ev->ready_cnt;
 				ev->ready[ev->ready_cnt++] = fdp;
