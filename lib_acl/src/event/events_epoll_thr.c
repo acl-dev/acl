@@ -69,13 +69,6 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 		fdp->stream = fp;
 	}
 
-	if (ACL_VSTREAM_BFRD_CNT(fp) > 0 || fp->read_ready
-		|| (fp->flag & ACL_VSTREAM_FLAG_BAD))
-	{
-		fdp->flag |= EVENT_FDTABLE_FLAG_FIRE;
-	} else
-		fdp->flag &= ~EVENT_FDTABLE_FLAG_FIRE;
-
 	if (fdp->r_callback != callback || fdp->r_context != context) {
 		fdp->r_callback = callback;
 		fdp->r_context = context;
@@ -96,6 +89,13 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 
 	fp->nrefer++;
 	fdp->flag = EVENT_FDTABLE_FLAG_READ | EVENT_FDTABLE_FLAG_EXPT;
+
+	if (ACL_VSTREAM_BFRD_CNT(fp) > 0 || fp->read_ready
+		|| (fp->flag & ACL_VSTREAM_FLAG_BAD))
+	{
+		fdp->flag |= EVENT_FDTABLE_FLAG_FIRE;
+	} else
+		fdp->flag &= ~EVENT_FDTABLE_FLAG_FIRE;
 
 #if 0
 	ev.events = EPOLLIN | EPOLLHUP | EPOLLERR | EPOLLET;
