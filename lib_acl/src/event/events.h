@@ -50,6 +50,7 @@ struct ACL_EVENT_FDTABLE {
 #define EVENT_FDTABLE_FLAG_DEL_WRITE    (1 << 7)
 #define EVENT_FDTABLE_FLAG_DELAY_OPER   (1 << 8)
 #define EVENT_FDTABLE_FLAG_IOCP         (1 << 9)
+#define	EVENT_FDTABLE_FLAG_FIRE		(1 << 10)
 
 	int   fdidx;
 	int   fdidx_ready;

@@ -6,6 +6,9 @@
 ACL_VSTREAM_BFRD_CNT 及 read_ready 两个条件同时满足时，ACL_VSTREAM_BFRD_CNT
 满足条件如果放置在 read_ready 前面，会造成 read_ready 被提醒清除，因此，需要
 把 read_ready 条件放置在前面
+559.2) performance: events_epoll_thr.c 的 event_enable_read 函数中，通过设置
+/清除标志位 EVENT_FDTABLE_FLAG_FIRE 来达到减少 epoll_ctl 的调用次数，从而提高
+事件处理性能
 
 558) 2016.8.13
 558.1) bugfix: acl_vstream.c 中的 acl_vstream_writevn 函数数据指针偏移有问题，

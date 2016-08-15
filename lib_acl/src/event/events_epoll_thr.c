@@ -51,12 +51,6 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 	ACL_EVENT_FDTABLE *fdp;
 	ACL_SOCKET fd;
 	struct epoll_event ev;
-	int   fd_ready;
-
-	if (ACL_VSTREAM_BFRD_CNT(fp) > 0 || (fp->flag & ACL_VSTREAM_FLAG_BAD)) {
-		fd_ready = 1;
-	} else
-		fd_ready = 0;
 
 	fd = ACL_VSTREAM_SOCK(fp);
 	fdp = (ACL_EVENT_FDTABLE*) fp->fdp;
@@ -75,6 +69,13 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 		fdp->stream = fp;
 	}
 
+	if (ACL_VSTREAM_BFRD_CNT(fp) > 0 || fp->read_ready
+		|| (fp->flag & ACL_VSTREAM_FLAG_BAD))
+	{
+		fdp->flag |= EVENT_FDTABLE_FLAG_FIRE;
+	} else
+		fdp->flag &= ~EVENT_FDTABLE_FLAG_FIRE;
+
 	if (fdp->r_callback != callback || fdp->r_context != context) {
 		fdp->r_callback = callback;
 		fdp->r_context = context;
@@ -88,9 +89,8 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 		fdp->r_timeout = 0;
 	}
 
-	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ) != 0)
-	{
-		acl_msg_info("has set read");
+	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ) != 0) {
+		acl_msg_info("has set read, fd: %d", fd);
 		return;
 	}
 
@@ -110,7 +110,8 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 	fdp->fdidx = eventp->fdcnt;
 	eventp->fdtabs[eventp->fdcnt++] = fdp;
 
-	if (fd_ready) {
+	if (fdp->flag & EVENT_FDTABLE_FLAG_FIRE) {
+#if 0
 		if (epoll_ctl(evthr->handle, EPOLL_CTL_ADD, fd, &ev) < 0) {
 			if (errno == EEXIST)
 				acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
@@ -125,6 +126,11 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 					"epfd: %d", myname, acl_last_serror(),
 					fd, evthr->handle);
 		}
+#else
+		/* reset the last_check to trigger event_thr_prepare */
+		SET_TIME(eventp->last_check);
+		eventp->last_check -= eventp->check_inter;
+#endif
 
 		THREAD_UNLOCK(&evthr->event.tb_mutex);
 
@@ -373,7 +379,11 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 
 	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
-	if (epoll_ctl(event_thr->handle, EPOLL_CTL_DEL, sockfd, &dummy) < 0) {
+	if ((fdp->flag & EVENT_FDTABLE_FLAG_FIRE) != 0)
+		fdp->flag &= ~EVENT_FDTABLE_FLAG_FIRE;
+	else if (epoll_ctl(event_thr->handle, EPOLL_CTL_DEL,
+			sockfd, &dummy) < 0)
+	{
 		if (errno == ENOENT)
 			acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
 				myname, acl_last_serror(), sockfd);
@@ -466,12 +476,16 @@ static void event_loop(ACL_EVENT *eventp)
 
 	eventp->ready_cnt = 0;
 
+	THREAD_LOCK(&event_thr->event.tb_mutex);
+
 	if (eventp->present - eventp->last_check >= eventp->check_inter) {
+
+		/* reset the last_check for next call event_thr_prepare */
 		eventp->last_check = eventp->present;
 
-		THREAD_LOCK(&event_thr->event.tb_mutex);
-
+		/* check all fds' read/write status */
 		if (event_thr_prepare(eventp) == 0) {
+
 			THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
 			if (eventp->ready_cnt == 0)
@@ -485,7 +499,8 @@ static void event_loop(ACL_EVENT *eventp)
 
 		if (eventp->ready_cnt > 0)
 			delay = 0;
-	}
+	} else
+		THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
 	event_thr->event.blocked = 1;
 	nready = epoll_wait(event_thr->handle, event_thr->ebuf,
