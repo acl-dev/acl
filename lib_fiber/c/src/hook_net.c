@@ -134,6 +134,43 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 	if (!acl_var_hook_sys_api)
 		return __sys_accept(sockfd, addr, addrlen);
 
+#define FAST_ACCEPT
+
+#ifdef	FAST_ACCEPT
+	ev = fiber_io_event();
+	if (ev && event_readable(ev, sockfd))
+		event_clear_readable(ev, sockfd);
+
+	clifd = __sys_accept(sockfd, addr, addrlen);
+	if (clifd >= 0) {
+		acl_non_blocking(clifd, ACL_NON_BLOCKING);
+		acl_tcp_nodelay(clifd, 1);
+		return clifd;
+	}
+
+	fiber_save_errno();
+#if EAGAIN == EWOULDBLOCK
+	if (errno != EAGAIN)
+#else
+	if (errno != EAGAIN && errno != EWOULDBLOCK)
+#endif
+		return -1;
+
+	fiber_wait_read(sockfd);
+	if (ev)
+		event_clear_readable(ev, sockfd);
+
+	clifd = __sys_accept(sockfd, addr, addrlen);
+
+	if (clifd >= 0) {
+		acl_non_blocking(clifd, ACL_NON_BLOCKING);
+		acl_tcp_nodelay(clifd, 1);
+		return clifd;
+	}
+
+	fiber_save_errno();
+	return clifd;
+#else
 	ev = fiber_io_event();
 	if (ev && event_readable(ev, sockfd)) {
 		event_clear_readable(ev, sockfd);
@@ -160,6 +197,7 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 
 	fiber_save_errno();
 	return clifd;
+#endif
 }
 
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)

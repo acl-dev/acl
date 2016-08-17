@@ -192,7 +192,9 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	ACL_FIBER *fiber;
 	ACL_RING_ITER iter;
 	EVENT *ev;
+#ifdef	CHECK_MIN
 	acl_int64 min = -1;
+#endif
 
 	fiber_io_check();
 
@@ -204,15 +206,20 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	acl_ring_foreach_reverse(iter, &__thread_fiber->ev_timer) {
 		fiber = acl_ring_to_appl(iter.ptr, ACL_FIBER, me);
 		if (when >= fiber->when) {
+#ifdef	CHECK_MIN
 			acl_int64 n = when - fiber->when;
 			if (min == -1 || n < min)
 				min = n;
+#endif
 			break;
 		}
 	}
 
+#ifdef	CHECK_MIN
 	if ((min >= 0 && min < ev->timeout) || ev->timeout < 0)
 		ev->timeout = (int) min;
+#endif
+
 	ev->timeout = 1;
 
 	fiber = fiber_running();

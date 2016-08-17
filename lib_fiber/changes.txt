@@ -4,6 +4,8 @@
 原来的 calloc，避免内存提交，仅使用虚存，从而有效控制了协程的实际占用内存大小
 21.2) bugfix: hook_io.c 中的 read 等读函数只有当读返回 < 0 时才需要设置 errno
 21.3) bugfix: fiber_io.c, acl_fiber_delay 函数需要合理设置 ev->timeout 值
+21.4) performance: hook_net.c 中 hook 的系统 accept API 优化了接收连接的顺序，
+从而使 accept 速度更快
 
 20) 2016.8.16
 20.1) portable: fiber.c 中增强了 SETJMP 汇编代码移植性
