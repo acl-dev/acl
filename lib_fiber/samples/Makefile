@@ -28,8 +28,8 @@ all:
 	@(cd thread_mbox; make)
 	@(cd fiber_cpp; make)
 	@(cd channel_cpp; make)
-	@(cd https_client; make)
-	@(cd https_server; make)
+#	@(cd https_client; make)
+#	@(cd https_server; make)
 	@(cd mysql; make)
 
 cl clean:

@@ -96,6 +96,9 @@ int socketpair(int domain, int type, int protocol, int sv[2])
 	return ret;
 }
 
+#define FAST_ACCEPT
+
+#ifndef	FAST_ACCEPT
 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
 	if (__sys_bind(sockfd, addr, addrlen) == 0)
@@ -120,6 +123,7 @@ int listen(int sockfd, int backlog)
 	fiber_save_errno();
 	return -1;
 }
+#endif
 
 int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
@@ -134,9 +138,10 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 	if (!acl_var_hook_sys_api)
 		return __sys_accept(sockfd, addr, addrlen);
 
-#define FAST_ACCEPT
-
 #ifdef	FAST_ACCEPT
+
+	acl_non_blocking(sockfd, ACL_NON_BLOCKING);
+
 	ev = fiber_io_event();
 	if (ev && event_readable(ev, sockfd))
 		event_clear_readable(ev, sockfd);
