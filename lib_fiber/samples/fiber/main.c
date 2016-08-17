@@ -9,6 +9,7 @@
 static int __max_loop = 1000;
 static int __max_fiber = 1000;
 static int __display   = 0;
+static int __stack_size = 64000;
 
 static __thread struct timeval __begin;
 static __thread int __left_fiber = 1000;
@@ -60,7 +61,7 @@ static void *thread_main(void *ctx acl_unused)
 
 	printf("thread: %lu\r\n", (unsigned long) acl_pthread_self());
 	for (i = 0; i < __max_fiber; i++)
-		acl_fiber_create(fiber_main, NULL, 32768);
+		acl_fiber_create(fiber_main, NULL, __stack_size);
 
 	acl_fiber_schedule();
 
@@ -69,7 +70,12 @@ static void *thread_main(void *ctx acl_unused)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -n max_loop -c max_fiber -t max_threads -e [if display]\r\n", procname);
+	printf("usage: %s -h [help]\r\n"
+		" -n max_loop\r\n"
+		" -c max_fiber\r\n"
+		" -t max_threads\r\n"
+		" -d stack_size\r\n"
+		" -e [if display]\r\n", procname);
 }
 
 int main(int argc, char *argv[])
@@ -78,7 +84,7 @@ int main(int argc, char *argv[])
 	acl_pthread_attr_t attr;
 	acl_pthread_t *tids;
 
-	while ((ch = getopt(argc, argv, "hn:c:t:e")) > 0) {
+	while ((ch = getopt(argc, argv, "hn:c:t:d:e")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -93,6 +99,9 @@ int main(int argc, char *argv[])
 			nthreads = atoi(optarg);
 			if (nthreads <= 0)
 				nthreads = 1;
+			break;
+		case 'd':
+			__stack_size = atoi(optarg);
 			break;
 		case 'e':
 			__display = 1;

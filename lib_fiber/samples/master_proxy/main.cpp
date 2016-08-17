@@ -119,9 +119,18 @@ private:
 
 		int ret = from.read(buf, sizeof(buf), false);
 		if (ret < 0)
+		{
+			logger("read over, fd: %d, error: %s",
+				from.sock_handle(), acl::last_serror());
 			return false;
+		}
+
 		if (to.write(buf, ret) < 0)
+		{
+			logger("write over, fd: %d, error: %s",
+				to.sock_handle(), acl::last_serror());
 			return false;
+		}
 
 		return true;
 	}

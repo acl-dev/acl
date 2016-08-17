@@ -196,9 +196,17 @@ void fiber_save_errno(void)
 }
 
 #if defined(__x86_64__)
-#define SETJMP(ctx) ({\
+# if defined(__AVX__)
+#  define CLOBBER \
+        , "ymm0", "ymm1", "ymm2", "ymm3", "ymm4", "ymm5", "ymm6", "ymm7",\
+        "ymm8", "ymm9", "ymm10", "ymm11", "ymm12", "ymm13", "ymm14", "ymm15"
+# else
+#  define CLOBBER
+# endif
+
+# define SETJMP(ctx) ({\
     int ret;\
-    asm ("lea     LJMPRET%=(%%rip), %%rcx\n\t"\
+    asm("lea     LJMPRET%=(%%rip), %%rcx\n\t"\
         "xor     %%rax, %%rax\n\t"\
         "mov     %%rbx, (%%rdx)\n\t"\
         "mov     %%rbp, 8(%%rdx)\n\t"\
@@ -212,10 +220,16 @@ void fiber_save_errno(void)
         "mov     %%rsi, 72(%%rdx)\n\t"\
         "LJMPRET%=:\n\t"\
         : "=a" (ret)\
-        : "d" (ctx) : "memory");\
+        : "d" (ctx)\
+        : "memory", "rcx", "r8", "r9", "r10", "r11",\
+          "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7",\
+          "xmm8", "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14", "xmm15"\
+          CLOBBER\
+          );\
     ret;\
 })
-#define LONGJMP(ctx) \
+
+# define LONGJMP(ctx) \
     asm("movq   (%%rax), %%rbx\n\t"\
 	    "movq   8(%%rax), %%rbp\n\t"\
 	    "movq   16(%%rax), %%r12\n\t"\
@@ -230,10 +244,11 @@ void fiber_save_errno(void)
 	    "jmp    *%%rdx\n\t"\
         : : "a" (ctx) : "rdx" \
     )
+
 #else
-#define SETJMP(ctx) \
+# define SETJMP(ctx) \
     sigsetjmp(ctx, 0)
-#define LONGJMP(ctx) \
+# define LONGJMP(ctx) \
     siglongjmp(ctx, 1)
 #endif
 
@@ -378,7 +393,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	head = acl_ring_pop_head(&__thread_fiber->dead);
 	if (head == NULL) {
 		fiber = (ACL_FIBER *) acl_mycalloc(1, sizeof(ACL_FIBER));
-		fiber->buff = (char *) acl_mycalloc(1, size);
+		fiber->buff = (char *) acl_mymalloc(size);
 	} else if ((fiber = APPL(head, ACL_FIBER, me))->size < size)
 		fiber->buff = (char *) acl_myrealloc(fiber->buff, size);
 	else

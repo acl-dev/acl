@@ -334,7 +334,8 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		fiber_io_inc();
 		acl_fiber_switch();
 
-		ev->timeout = -1;
+		if (acl_ring_size(&ev->poll_list) == 0)
+			ev->timeout = -1;
 		if (pe.nready != 0 || timeout == 0)
 			break;
 

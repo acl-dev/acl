@@ -59,7 +59,8 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 
 		ret = read(*cfd, buf, sizeof(buf));
 		if (ret == 0) {
-			printf("read close by peer fd: %d\r\n", *cfd);
+			printf("read close by peer fd: %d, %s\r\n",
+				*cfd, strerror(errno));
 			break;
 		} else if (ret < 0) {
 			if (errno == EINTR) {

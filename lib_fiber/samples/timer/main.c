@@ -35,8 +35,10 @@ static void *thread_main(void *ctx acl_unused)
 	__left_fiber = __max_fiber;
 
 	printf("thread: %lu\r\n", (unsigned long) acl_pthread_self());
-	for (i = 0; i < __max_fiber; i++)
+	for (i = 0; i < __max_fiber; i++) {
+		printf("--- create one timer ---\r\n");
 		acl_fiber_create_timer(__timer_sleep, timer_main, NULL);
+	}
 
 	acl_fiber_schedule();
 

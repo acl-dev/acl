@@ -221,10 +221,8 @@ ssize_t read(int fd, void *buf, size_t count)
 		event_clear_readable(ev, fd);
 
 		ret = __sys_read(fd, buf, count);
-		if (ret > 0)
-			return ret;
-
-		fiber_save_errno();
+		if (ret < 0)
+			fiber_save_errno();
 		return ret;
 	}
 
@@ -233,10 +231,8 @@ ssize_t read(int fd, void *buf, size_t count)
 		event_clear_readable(ev, fd);
 
 	ret = __sys_read(fd, buf, count);
-	if (ret > 0)
-		return ret;
-
-	fiber_save_errno();
+	if (ret < 0)
+		fiber_save_errno();
 	return ret;
 }
 
@@ -258,10 +254,8 @@ ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
 		event_clear_readable(ev, fd);
 
 		ret = __sys_readv(fd, iov, iovcnt);
-		if (ret > 0)
-			return ret;
-
-		fiber_save_errno();
+		if (ret < 0)
+			fiber_save_errno();
 		return ret;
 	}
 
@@ -270,10 +264,8 @@ ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
 		event_clear_readable(ev, fd);
 
 	ret = __sys_readv(fd, iov, iovcnt);
-	if (ret > 0)
-		return ret;
-
-	fiber_save_errno();
+	if (ret < 0)
+		fiber_save_errno();
 	return ret;
 }
 
@@ -295,10 +287,8 @@ ssize_t recv(int sockfd, void *buf, size_t len, int flags)
 		event_clear_readable(ev, sockfd);
 
 		ret = __sys_recv(sockfd, buf, len, flags);
-		if (ret > 0)
-			return ret;
-
-		fiber_save_errno();
+		if (ret < 0)
+			fiber_save_errno();
 		return ret;
 	}
 
@@ -307,10 +297,8 @@ ssize_t recv(int sockfd, void *buf, size_t len, int flags)
 		event_clear_readable(ev, sockfd);
 
 	ret = __sys_recv(sockfd, buf, len, flags);
-	if (ret > 0)
-		return ret;
-
-	fiber_save_errno();
+	if (ret < 0)
+		fiber_save_errno();
 	return ret;
 }
 
@@ -335,10 +323,8 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
 
 		ret = __sys_recvfrom(sockfd, buf, len,
 				flags, src_addr, addrlen);
-		if (ret > 0)
-			return ret;
-
-		fiber_save_errno();
+		if (ret < 0)
+			fiber_save_errno();
 		return ret;
 	}
 
@@ -347,10 +333,8 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
 		event_clear_readable(ev, sockfd);
 
 	ret = __sys_recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
-	if (ret > 0)
-		return ret;
-
-	fiber_save_errno();
+	if (ret < 0)
+		fiber_save_errno();
 	return ret;
 }
 
@@ -372,10 +356,8 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 		event_clear_readable(ev, sockfd);
 
 		ret = __sys_recvmsg(sockfd, msg, flags);
-		if (ret > 0)
-			return ret;
-
-		fiber_save_errno();
+		if (ret < 0)
+			fiber_save_errno();
 		return ret;
 	}
 
@@ -384,10 +366,8 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 		event_clear_readable(ev, sockfd);
 
 	ret = __sys_recvmsg(sockfd, msg, flags);
-	if (ret > 0)
-		return ret;
-
-	fiber_save_errno();
+	if (ret < 0)
+		fiber_save_errno();
 	return ret;
 }
 

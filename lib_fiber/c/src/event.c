@@ -278,7 +278,7 @@ int event_process(EVENT *ev, int timeout)
 
 	if (ev->timeout < 0) {
 		if (timeout < 0)
-			timeout = 1000;
+			timeout = 100;
 	} else if (timeout < 0)
 		timeout = ev->timeout;
 	else if (timeout > ev->timeout)

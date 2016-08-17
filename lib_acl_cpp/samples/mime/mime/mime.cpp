@@ -261,9 +261,17 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 	{
 		buf = "./var/";
 		const char* filename = (*cit)->get_filename();
-		if (filename == NULL)
-			continue;
-		buf << filename;
+		if (filename != NULL)
+			buf << filename;
+		else
+		{
+			filename = (*cit)->header_value("Content-ID");
+			if (filename == NULL || *filename == 0)
+				continue;
+			acl::string tmp(filename);
+			tmp.strip("<>", true);
+			buf << tmp;
+		}
 
 		acl::string attach_name;
 		acl::rfc2047 rfc2047;
