@@ -34,7 +34,11 @@ struct ACL_FIBER {
 	int            nlocal;
 
 #ifdef	USE_JMP
-	jmp_buf        jbuf;
+# if defined(__x86_64__)
+	unsigned long long env[10];
+# else
+	sigjmp_buf     env;
+# endif
 #endif
 	ucontext_t    *context;
 	void         (*fn)(ACL_FIBER *, void *);

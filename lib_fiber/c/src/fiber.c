@@ -36,6 +36,10 @@ __thread int acl_var_hook_sys_api = 0;
 
 static acl_pthread_key_t __fiber_key;
 
+/* forward declare */
+static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
+	void *arg, size_t size);
+
 void acl_fiber_hook_api(int onoff)
 {
 	acl_var_hook_sys_api = onoff;
@@ -258,7 +262,7 @@ static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 	/* use setcontext() for the initial jump, as it allows us to set up
 	 * a stack, but continue with longjmp() as it's much faster.
 	 */
-	if (SETJMP(from->jbuf) == 0) {
+	if (SETJMP(from->env) == 0) {
 		/* context just be used once for set up a stack, which will
 		 * be freed in fiber_start. The context in __thread_fiber
 		 * was set NULL.
@@ -266,7 +270,7 @@ static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 		if (to->context != NULL)
 			setcontext(to->context);
 		else
-			LONGJMP(to->jbuf);
+			LONGJMP(to->env);
 	}
 #else
 	if (swapcontext(from->context, to->context) < 0)
@@ -356,6 +360,9 @@ static void fiber_start(unsigned int x, unsigned int y)
 
 static void fiber_free(ACL_FIBER *fiber)
 {
+#ifdef USE_VALGRIND
+	VALGRIND_STACK_DEREGISTER(fiber->vid);
+#endif
 	if (fiber->context)
 		acl_myfree(fiber->context);
 	acl_myfree(fiber->buff);

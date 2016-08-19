@@ -67,7 +67,8 @@ bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 	int  argc = 0;
 	const char *argv[9];
 
-	argv[argc++] = acl_process_path();
+	const char* proc = acl_process_path();
+	argv[argc++] = proc ? proc : "demo";
 	argv[argc++] = "-L";
 	argv[argc++] = addrs;
 	if (path && *path)

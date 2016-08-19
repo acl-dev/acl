@@ -17,7 +17,7 @@ public:
 	 * 在创建一个协程类后，需要本函数启动协程
 	 * @param stack_size {size_t} 创建的协程对象的栈大小
 	 */
-	void start(size_t stack_size = 64000);
+	void start(size_t stack_size = 320000);
 
 	/**
 	 * 获得本协程对象的 ID 号

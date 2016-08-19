@@ -33,7 +33,8 @@ void acl_mask_addr(unsigned char *addr_bytes,
 
 	/* abs just avoiding gcc6.1 warning */
 	if (network_bits != 0)
-		*p++ &= (unsigned char) ~0 << abs(CHAR_BIT - network_bits);
+		*p++ &= (unsigned char) ~0 << (unsigned)
+			(CHAR_BIT - network_bits);
 
 	while (p < addr_bytes + addr_byte_count)
 		*p++ = 0;
