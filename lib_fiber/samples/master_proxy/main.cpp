@@ -132,6 +132,20 @@ private:
 			return false;
 		}
 
+		acl::string sbuf(8192);
+
+		while (true)
+		{
+			if (from.read_peek(sbuf, true) == false)
+			{
+				if (from.eof())
+					return false;
+				break;
+			}
+			if (to.write(sbuf) == -1)
+				return false;
+		}
+
 		return true;
 	}
 };

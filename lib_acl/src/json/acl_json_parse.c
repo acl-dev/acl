@@ -524,32 +524,37 @@ static const char *json_strend(ACL_JSON *json, const char *data)
 			const char* txt = STR(node->text);
 
 			if (EQ(txt, "null"))
-				node->type = ACL_JSON_T_A_NULL;
+				node->type = ACL_JSON_T_A_NULL
+					| ACL_JSON_T_LEAF;
 			else if (EQ(txt, "true") || EQ(txt, "false"))
-				node->type = ACL_JSON_T_A_BOOL;
+				node->type = ACL_JSON_T_A_BOOL
+					| ACL_JSON_T_LEAF;
 			else if (IS_NUMBER(txt))
-				node->type = ACL_JSON_T_A_NUMBER;
+				node->type = ACL_JSON_T_A_NUMBER
+					| ACL_JSON_T_LEAF;
 			else if (acl_is_double(txt))
-				node->type = ACL_JSON_T_A_DOUBLE;
+				node->type = ACL_JSON_T_A_DOUBLE
+					| ACL_JSON_T_LEAF;
 			else
-				node->type = ACL_JSON_T_A_STRING;
+				node->type = ACL_JSON_T_A_STRING
+					| ACL_JSON_T_LEAF;
 		} else
-			node->type = ACL_JSON_T_STRING;
+			node->type = ACL_JSON_T_STRING | ACL_JSON_T_LEAF;
 	} else if (node->quote == 0) {
 		const char* txt = STR(node->text);
 
 		if (EQ(txt, "null"))
-			node->type = ACL_JSON_T_NULL;
+			node->type = ACL_JSON_T_NULL | ACL_JSON_T_LEAF;
 		else if (EQ(txt, "true") || EQ(txt, "false"))
-			node->type = ACL_JSON_T_BOOL;
+			node->type = ACL_JSON_T_BOOL | ACL_JSON_T_LEAF;
 		else if (IS_NUMBER(txt))
-			node->type = ACL_JSON_T_NUMBER;
+			node->type = ACL_JSON_T_NUMBER | ACL_JSON_T_LEAF;
 		else if (acl_is_double(txt))
-			node->type = ACL_JSON_T_DOUBLE;
+			node->type = ACL_JSON_T_DOUBLE | ACL_JSON_T_LEAF;
 		else
-			node->type = ACL_JSON_T_STRING;
+			node->type = ACL_JSON_T_STRING | ACL_JSON_T_LEAF;
 	} else
-		node->type = ACL_JSON_T_STRING;
+		node->type = ACL_JSON_T_STRING | ACL_JSON_T_LEAF;
 
 
 	if (*data == ',' || *data == ';') {
