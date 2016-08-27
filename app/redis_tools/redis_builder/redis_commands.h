@@ -3,7 +3,7 @@
 struct REDIS_CMD
 {
 	acl::string cmd;
-	bool broadcast;
+	acl::string broadcast;
 	acl::string perm;
 };
 
@@ -71,6 +71,8 @@ private:
 	void request(const std::vector<acl::string>& tokens);
 	void request_one(const std::vector<acl::string>& tokens);
 	void request_all(const std::vector<acl::string>& tokens);
+	void request_masters(const std::vector<acl::string>& tokens);
+	void request_slaves(const std::vector<acl::string>& tokens);
 	bool show_result(const acl::redis_result& result, const char* addr);
 
 	void show_request(const std::vector<acl::string>& tokens);

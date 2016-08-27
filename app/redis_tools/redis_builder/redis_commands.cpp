@@ -12,24 +12,24 @@
 
 static const REDIS_CMD  __redis_cmds[] =
 {
-	{ "ALL",		false,	"yes" },
-	{ "BGREWRITEAOF",	true,	"yes" },
-	{ "BGSAVE",		true,	"yes" },
-	{ "CONFIG",		true,	"yes" },
-	{ "DBSIZE",		true,	"yes" },
-	{ "FLUSHALL",		true,	"yes" },
-	{ "FLUSHDB",		true,	"yes" },
-	{ "LASTSAVE",		true,	"yes" },
-	{ "MONITOR",		true,	"yes" },
-	{ "PSYNC",		true,	"yes" },
-	{ "SAVE",		true,	"yes" },
-	{ "SHUTDOWN",		true,	"yes" },
-	{ "SLOWLOG",		true,	"yes" },
-	{ "SYNC",		true,	"yes" },
-	{ "TIME",		true,	"yes" },
-	{ "KEYS",		true,	"yes" },
-	{ "SCAN",		true,	"yes" },
-	{ "",			false,	"no" },
+	{ "ALL",		"none",		"yes" },
+	{ "BGREWRITEAOF",	"all",		"yes" },
+	{ "BGSAVE",		"all",		"yes" },
+	{ "CONFIG",		"all",		"yes" },
+	{ "DBSIZE",		"master",	"yes" },
+	{ "FLUSHALL",		"master",	"yes" },
+	{ "FLUSHDB",		"master",	"yes" },
+	{ "LASTSAVE",		"all",		"yes" },
+	{ "MONITOR",		"master",	"yes" },
+	{ "PSYNC",		"all",		"yes" },
+	{ "SAVE",		"all",		"yes" },
+	{ "SHUTDOWN",		"all",		"yes" },
+	{ "SLOWLOG",		"all",		"yes" },
+	{ "SYNC",		"all",		"yes" },
+	{ "TIME",		"all",		"yes" },
+	{ "KEYS",		"master",	"yes" },
+	{ "SCAN",		"master",	"yes" },
+	{ "",			"none",		"no"  },
 };
 
 redis_commands::redis_commands(const char* addr, const char* passwd,
@@ -133,7 +133,7 @@ void redis_commands::add_cmdline(acl::string& line, size_t i)
 
 	REDIS_CMD redis_cmd;
 	redis_cmd.cmd = cmd;
-	redis_cmd.broadcast = tokens[1].equal("yes", false) ? true : false;
+	redis_cmd.broadcast = tokens[1].lower();
 
 	redis_cmd.perm = tokens[2];
 	redis_cmd.perm.lower();
@@ -165,7 +165,7 @@ void redis_commands::show_commands(void)
 		printf("%-20s%-20s%-20s\r\n",
 #endif
 			cit->second.cmd.c_str(),
-			cit->second.broadcast ? "yes" : "no",
+			cit->second.broadcast.c_str(),
 			cit->second.perm.c_str());
 	}
 }
@@ -275,17 +275,19 @@ bool redis_commands::check(const char* command)
 	std::map<acl::string, REDIS_CMD>::const_iterator cit =
 		redis_cmds_.find(command);
 
-	bool broadcast;
+	acl::string info;
 	acl::string perm;
 
 	if (cit == redis_cmds_.end())
 	{
-		broadcast = false;
+		info = "BROADCAST";
 		perm = "yes";
 	}
 	else
 	{
-		broadcast = cit->second.broadcast;
+		info = cit->second.broadcast;
+		if (!info.equal("master", false) && !info.equal("slave", false))
+			info = "SEND";
 		perm = cit->second.perm;
 	}
 
@@ -295,7 +297,7 @@ bool redis_commands::check(const char* command)
 		acl::string prompt;
 		prompt.format("Do you want to %s DANGEROUS \"%s\""
 			" command to all redis nodes ? [y/n]: ",
-			broadcast ? "BROADCAST" : "SEND", command);
+			info.c_str(), command);
 		getline(buf, prompt);
 		buf.lower();
 		if (buf != "y" && buf != "yes")
@@ -1143,8 +1145,12 @@ void redis_commands::request(const std::vector<acl::string>& tokens)
 		return;
 	}
 
-	if (cit->second.broadcast)
+	if (cit->second.broadcast.equal("all", false))
 		request_all(tokens);
+	else if (cit->second.broadcast.equal("master", false))
+		request_masters(tokens);
+	else if (cit->second.broadcast.equal("slave", false))
+		request_slaves(tokens);
 	else
 		request_one(tokens);
 }
@@ -1181,6 +1187,56 @@ void redis_commands::request_all(const std::vector<acl::string>& tokens)
 
 	for (std::vector<const acl::redis_node*>::const_iterator cit
 		= nodes.begin(); cit != nodes.end(); ++cit)
+	{
+		const char* addr = (*cit)->get_addr();
+		if (addr == NULL || *addr == 0)
+		{
+			logger_error("addr NULL");
+			continue;
+		}
+
+		request_one(addr, tokens);
+	}
+}
+
+void redis_commands::request_masters(const std::vector<acl::string>& tokens)
+{
+	acl::redis redis(conns_);
+	const std::map<acl::string, acl::redis_node*>* masters =
+		redis_util::get_masters(redis);
+	if (masters == NULL)
+	{
+		logger_error("no masters node of the cluster");
+		return;
+	}
+
+	for (std::map<acl::string, acl::redis_node*>::const_iterator cit
+		= masters->begin(); cit != masters->end(); ++cit)
+	{
+		const char* addr = cit->second->get_addr();
+		if (addr == NULL || *addr == 0)
+		{
+			logger_error("addr NULL");
+			continue;
+		}
+
+		request_one(addr, tokens);
+	}
+}
+
+void redis_commands::request_slaves(const std::vector<acl::string>& tokens)
+{
+	acl::redis redis(conns_);
+	std::vector<const acl::redis_node*> slaves;
+	redis_util::get_slaves(redis, slaves);
+	if (slaves.empty())
+	{
+		logger_error("no slaves node of the cluster");
+		return;
+	}
+
+	for (std::vector<const acl::redis_node*>::const_iterator cit
+		= slaves.begin(); cit != slaves.end(); ++cit)
 	{
 		const char* addr = (*cit)->get_addr();
 		if (addr == NULL || *addr == 0)

@@ -493,6 +493,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 						RelativePath=".\src\stdlib\sys\acl_safe_getenv.c">
 					</File>
 					<File
+						RelativePath=".\src\stdlib\sys\acl_sane_socketpair.c">
+					</File>
+					<File
 						RelativePath=".\src\stdlib\sys\acl_sys_file.c">
 					</File>
 					<File
@@ -527,9 +530,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 						</File>
 						<File
 							RelativePath=".\src\stdlib\sys\unix\acl_safe_open.c">
-						</File>
-						<File
-							RelativePath=".\src\stdlib\sys\unix\acl_sane_socketpair.c">
 						</File>
 						<File
 							RelativePath=".\src\stdlib\sys\unix\acl_set_eugid.c">

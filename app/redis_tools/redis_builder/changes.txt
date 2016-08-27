@@ -1,3 +1,5 @@
+11) 2016.8.25
+11.1) feautre: redis_builder 广播消息时支持区分主节点和从节点
 
 10) 2016.5.4
 10.1) feature: redis_monitor 类可以显示 rss, peak, radio 等项

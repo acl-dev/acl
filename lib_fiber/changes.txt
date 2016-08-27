@@ -1,3 +1,5 @@
+22) 2016.8.25
+22.1) feature: hook_io.c 中提供了单独的 fiber_xxx IO 接口
 
 21) 2016.8.17
 21.1) performance: fiber.c 中函数 fiber_alloc 在创建协程栈时使用 malloc 代替了

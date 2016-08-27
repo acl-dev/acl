@@ -158,6 +158,8 @@ int close(int fd)
 	return ret;
 }
 
+/****************************************************************************/
+
 #define READ_WAIT_FIRST
 
 #ifdef READ_WAIT_FIRST
@@ -203,7 +205,7 @@ static int check_fdtype(int fd)
 }
 #endif
 
-ssize_t read(int fd, void *buf, size_t count)
+inline ssize_t fiber_read(int fd, void *buf, size_t count)
 {
 	ssize_t ret;
 	EVENT  *ev;
@@ -236,7 +238,7 @@ ssize_t read(int fd, void *buf, size_t count)
 	return ret;
 }
 
-ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
+inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 {
 	ssize_t ret;
 	EVENT  *ev;
@@ -269,7 +271,7 @@ ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
 	return ret;
 }
 
-ssize_t recv(int sockfd, void *buf, size_t len, int flags)
+inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 {
 	ssize_t ret;
 	EVENT  *ev;
@@ -302,7 +304,7 @@ ssize_t recv(int sockfd, void *buf, size_t len, int flags)
 	return ret;
 }
 
-ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
+inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 	struct sockaddr *src_addr, socklen_t *addrlen)
 {
 	ssize_t ret;
@@ -338,7 +340,7 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
 	return ret;
 }
 
-ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
+inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 {
 	ssize_t ret;
 	EVENT  *ev;
@@ -373,7 +375,7 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 
 #else
 
-ssize_t read(int fd, void *buf, size_t count)
+inline ssize_t fiber_read(int fd, void *buf, size_t count)
 {
 	while (1) {
 		ssize_t n = __sys_read(fd, buf, count);
@@ -396,7 +398,7 @@ ssize_t read(int fd, void *buf, size_t count)
 	}
 }
 
-ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
+inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 {
 	while (1) {
 		ssize_t n = __sys_readv(fd, iov, iovcnt);
@@ -420,7 +422,7 @@ ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
 	}
 }
 
-ssize_t recv(int sockfd, void *buf, size_t len, int flags)
+inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 {
 	while (1) {
 		ssize_t n = __sys_recv(sockfd, buf, len, flags);
@@ -444,7 +446,7 @@ ssize_t recv(int sockfd, void *buf, size_t len, int flags)
 	}
 }
 
-ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
+inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 	struct sockaddr *src_addr, socklen_t *addrlen)
 {
 	while (1) {
@@ -470,7 +472,7 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
 	}
 }
 
-ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
+inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 {
 	while (1) {
 		ssize_t n = __sys_recvmsg(sockfd, msg, flags);
@@ -496,7 +498,9 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 
 #endif  /* READ_WAIT_FIRST */
 
-ssize_t write(int fd, const void *buf, size_t count)
+/****************************************************************************/
+
+inline ssize_t fiber_write(int fd, const void *buf, size_t count)
 {
 	while (1) {
 		ssize_t n = __sys_write(fd, buf, count);
@@ -520,7 +524,7 @@ ssize_t write(int fd, const void *buf, size_t count)
 	}
 }
 
-ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
+inline ssize_t fiber_writev(int fd, const struct iovec *iov, int iovcnt)
 {
 	while (1) {
 		ssize_t n = __sys_writev(fd, iov, iovcnt);
@@ -544,7 +548,7 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
 	}
 }
 
-ssize_t send(int sockfd, const void *buf, size_t len, int flags)
+inline ssize_t fiber_send(int sockfd, const void *buf, size_t len, int flags)
 {
 	while (1) {
 		ssize_t n = __sys_send(sockfd, buf, len, flags);
@@ -568,7 +572,7 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 	}
 }
 
-ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+inline ssize_t fiber_sendto(int sockfd, const void *buf, size_t len, int flags,
 	const struct sockaddr *dest_addr, socklen_t addrlen)
 {
 	while (1) {
@@ -594,7 +598,7 @@ ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
 	}
 }
 
-ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags)
+inline ssize_t fiber_sendmsg(int sockfd, const struct msghdr *msg, int flags)
 {
 	while (1) {
 		ssize_t n = __sys_sendmsg(sockfd, msg, flags);
@@ -617,3 +621,59 @@ ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags)
 		fiber_wait_write(sockfd);
 	}
 }
+
+/****************************************************************************/
+
+ssize_t read(int fd, void *buf, size_t count)
+{
+	return fiber_read(fd, buf, count);
+}
+
+ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
+{
+	return fiber_readv(fd, iov, iovcnt);
+}
+
+ssize_t recv(int sockfd, void *buf, size_t len, int flags)
+{
+	return fiber_recv(sockfd, buf, len, flags);
+}
+
+ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
+	struct sockaddr *src_addr, socklen_t *addrlen)
+{
+	return fiber_recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
+}
+
+ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
+{
+	return fiber_recvmsg(sockfd, msg, flags);
+}
+
+ssize_t write(int fd, const void *buf, size_t count)
+{
+	return fiber_write(fd, buf, count);
+}
+
+ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
+{
+	return writev(fd, iov, iovcnt);
+}
+
+ssize_t send(int sockfd, const void *buf, size_t len, int flags)
+{
+	return fiber_send(sockfd, buf, len, flags);
+}
+
+ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+	const struct sockaddr *dest_addr, socklen_t addrlen)
+{
+	return fiber_sendto(sockfd, buf, len, flags, dest_addr, addrlen);
+}
+
+ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags)
+{
+	return fiber_sendmsg(sockfd, msg, flags);
+}
+
+/****************************************************************************/

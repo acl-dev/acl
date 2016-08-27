@@ -275,6 +275,22 @@ void redis_util::get_all_nodes(acl::redis& redis,
 	for (std::map<acl::string, acl::redis_node*>::const_iterator cit
 		= masters->begin(); cit != masters->end(); ++cit)
 	{
+		nodes.push_back(cit->second);
+		add_slaves(cit->second, nodes);
+	}
+}
+
+void redis_util::get_slaves(acl::redis& redis,
+	std::vector<const acl::redis_node*>& nodes)
+{
+	const std::map<acl::string, acl::redis_node*>* masters
+		= get_masters(redis);
+	if (masters == NULL)
+		return;
+
+	for (std::map<acl::string, acl::redis_node*>::const_iterator cit
+		= masters->begin(); cit != masters->end(); ++cit)
+	{
 		add_slaves(cit->second, nodes);
 	}
 }
@@ -284,7 +300,6 @@ void redis_util::add_slaves(const acl::redis_node* node,
 {
 	if (node == NULL)
 		return;
-	nodes.push_back(node);
 
 	const std::vector<acl::redis_node*>* slaves = node->get_slaves();
 	if (slaves == NULL)
@@ -293,6 +308,7 @@ void redis_util::add_slaves(const acl::redis_node* node,
 	for (std::vector<acl::redis_node*>::const_iterator cit
 		= slaves->begin(); cit != slaves->end(); ++cit)
 	{
+		nodes.push_back(*cit);
 		add_slaves(*cit, nodes);
 	}
 }

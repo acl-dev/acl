@@ -1,8 +1,8 @@
-#command	broadcast	permission
-del		no		warn
-set		no		yes
-get		no		yes
-incr		no		yes
+#command	broadcast(none/master/slave)	permission(yes/no/warn)
+del		none				warn
+set		none				yes
+get		none				yes
+incr		none				yes
 
-#dbsize		yes		yes
-all		no		yes
+#dbsize		master				yes
+all		none				yes
