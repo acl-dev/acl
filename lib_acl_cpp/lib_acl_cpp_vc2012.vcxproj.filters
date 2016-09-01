@@ -280,6 +280,9 @@
     <ClCompile Include="src\http\http_utils.cpp">
       <Filter>Source Files\http</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\sha1.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
     <ClCompile Include="src\stdlib\snprintf.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
@@ -751,6 +754,9 @@
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\singleton.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\sha1.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\snprintf.hpp">

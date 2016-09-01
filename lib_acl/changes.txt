@@ -1,8 +1,11 @@
 修改历史列表：
 
+561) 2016.9.1
+561.1) bugfix: acl_urlcode.c 中的解码字典 dec_tab 有误
+
 ------------------------------------------------------------------------
 560) 2016.8.23
-560.1) buffix: acl_json_parse.c 中，在解析 JSON 过程中需要设置叶节点标志
+560.1) bugfix: acl_json_parse.c 中，在解析 JSON 过程中需要设置叶节点标志
 
 559) 2016.8.15
 559.1) bugfix: events.c 中的函数 event_thr_prepare/event_prepare 中，如果当

@@ -970,6 +970,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stdlib\sha1.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stdlib\snprintf.cpp"
 					>
 				</File>
@@ -1689,6 +1693,10 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\singleton.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\sha1.hpp"
 					>
 				</File>
 				<File

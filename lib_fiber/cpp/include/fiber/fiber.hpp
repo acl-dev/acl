@@ -56,12 +56,12 @@ public:
 	/**
 	 * 将当前正在运行的协程(即本协程) 挂起
 	 */
-	void yield(void);
+	static void yield(void);
 
 	/**
 	 * 挂起当前协程，执行等待队列中的下一个协程
 	 */
-	void switch_to_next(void);
+	static void switch_to_next(void);
 
 	/**
 	 * 将指定协程对象置入待运行队列中
@@ -70,17 +70,18 @@ public:
 	static void ready(fiber& f);
 
 	/**
-	 * 返回本协程对象对应的 C 语言的协程对象
-	 * @return {ACL_FIBER *}
-	 */
-	ACL_FIBER *get_fiber(void) const;
-
-	/**
 	 * 线程启动后调用此函数设置当前线程是否需要 hook 系统 API，内部缺省
 	 * 会 hook 系统 API
 	 * @param on {bool}
 	 */
 	static void hook_api(bool on);
+
+public:
+	/**
+	 * 返回本协程对象对应的 C 语言的协程对象
+	 * @return {ACL_FIBER *}
+	 */
+	ACL_FIBER *get_fiber(void) const;
 
 protected:
 	/**
@@ -96,3 +97,71 @@ private:
 };
 
 } // namespace acl
+
+#if defined(__GNUC__) && (__GNUC__ > 4 ||(__GNUC__ == 4 && __GNUC_MINOR__ >= 8))
+# ifndef   ACL_USE_CPP11
+#  define  ACL_USE_CPP11
+# endif
+#endif
+
+#ifdef	ACL_USE_CPP11
+
+#include <functional>
+
+namespace acl
+{
+
+class go_fiber
+{
+public:
+	go_fiber(void) {}
+	go_fiber(size_t stack_size) : stack_size_(stack_size) {}
+
+	void operator=(std::function<void()> fn);
+
+private:
+	size_t stack_size_ = 320000;
+};
+
+} // namespace acl
+
+#define	go		acl::go_fiber()=
+#define	go_stack(size)	acl::go_fiber(size)=
+
+/**
+ * static void fiber1(void)
+ * {
+ * 	printf("fiber: %d\r\n", acl::fiber::self());
+ * }
+ *
+ * static void fiber2(acl::string& buf)
+ * {
+ * 	printf("in fiber: %d, buf: %s\r\n", acl::fiber::self(), buf.c_str());
+ * 	buf = "world";
+ * }
+ *
+ * static void fiber3(const acl::string& buf)
+ * {
+ * 	printf("in fiber: %d, buf: %s\r\n", acl::fiber::self(), buf.c_str());
+ * }
+ *
+ * static test(void)
+ * {
+ * 	go fiber1;
+ * 	
+ * 	acl::string buf("hello");
+ *
+ * 	go[&] {
+ * 		fiber2(buf);
+ * 	};
+ * 	
+ * 	go[=] {
+ * 		fiber3(buf);
+ * 	};
+ * 
+ * 	go[&] {
+ * 		fiber3(buf);
+ * 	};
+ * }
+ */
+#endif

@@ -335,6 +335,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\stdlib\md5.cpp" />
     <ClCompile Include="src\stdlib\pipe_stream.cpp" />
     <ClCompile Include="src\stdlib\scan_dir.cpp" />
+    <ClCompile Include="src\stdlib\sha1.cpp" />
     <ClCompile Include="src\stdlib\snprintf.cpp" />
     <ClCompile Include="src\stdlib\string.cpp" />
     <ClCompile Include="src\stdlib\thread.cpp" />
@@ -497,6 +498,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stdlib\pipe_stream.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\scan_dir.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\singleton.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\sha1.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\snprintf.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\string.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\thread.hpp" />

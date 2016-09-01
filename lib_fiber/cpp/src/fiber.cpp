@@ -85,3 +85,42 @@ void fiber::stop(void)
 }
 
 } // namespace acl
+
+//////////////////////////////////////////////////////////////////////////////
+
+#ifdef	ACL_USE_CPP11
+
+namespace acl
+{
+
+class fiber_ctx
+{
+public:
+	fiber_ctx(std::function<void()> fn) : fn_(fn) {}
+	~fiber_ctx() = default;
+
+	void start(void)
+	{
+		fn_();
+	}
+
+private:
+	std::function<void()> fn_;
+};
+
+static void fiber_main(ACL_FIBER*, void* ctx)
+{
+	fiber_ctx* fc = (fiber_ctx *) ctx;
+	fc->start();
+	delete fc;
+}
+
+void go_fiber::operator=(std::function<void()> fn)
+{
+	fiber_ctx* ctx = new fiber_ctx(fn);
+	acl_fiber_create(fiber_main, (void*) ctx, stack_size_);
+}
+
+} // namespace acl
+
+#endif // ACL_USE_CPP11

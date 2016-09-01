@@ -21,6 +21,7 @@
 #include "acl_cpp/stdlib/xml2.hpp"
 #include "acl_cpp/stdlib/zlib_stream.hpp"
 #include "acl_cpp/stdlib/md5.hpp"
+#include "acl_cpp/stdlib/sha1.hpp"
 #include "acl_cpp/stdlib/charset_conv.hpp"
 #include "acl_cpp/stdlib/escape.hpp"
 #include "acl_cpp/stdlib/pipe_stream.hpp"
