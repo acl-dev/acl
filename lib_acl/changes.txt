@@ -1,5 +1,11 @@
 修改历史列表：
 
+562) 2016.9.7
+562.1) bugfix: acl_vstream.c 中 acl_vstream_gets/acl_vstream_gets_nonl
+/acl_vstream_readtags/acl_vstream_gets_peek/acl_vstream_gets_nonl_peek
+应该在函数入口处先清除 ACL_VSTREAM_FLAG_TAGYES 标志位，否则在多次读行
+过程中第一次置 ACL_VSTREAM_FLAG_TAGYES 标志位后有可能会被后面的读行复用
+
 561) 2016.9.1
 561.1) bugfix: acl_urlcode.c 中的解码字典 dec_tab 有误
 

@@ -98,7 +98,7 @@ private:
 
 } // namespace acl
 
-#if defined(__GNUC__) && (__GNUC__ > 4 ||(__GNUC__ == 4 && __GNUC_MINOR__ >= 8))
+#if defined(__GNUC__) && (__GNUC__ > 6 ||(__GNUC__ == 6 && __GNUC_MINOR__ >= 0))
 # ifndef   ACL_USE_CPP11
 #  define  ACL_USE_CPP11
 # endif

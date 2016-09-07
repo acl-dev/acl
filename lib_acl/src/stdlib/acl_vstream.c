@@ -727,54 +727,6 @@ int acl_vstream_bfcp_some(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
 	return n;
 }
 
-int acl_vstream_gets(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
-{
-	const char *myname = "acl_vstream_gets";
-	int   n, ch;
-	unsigned char *ptr;
-
-	if (fp == NULL || vptr == NULL || maxlen <= 0) {
-		acl_msg_error("%s(%d), %s: fp %s, vptr %s, maxlen %d",
-			__FILE__, __LINE__, myname, fp ? "not null" : "null",
-			vptr ? "not null" : "null", (int) maxlen);
-		return ACL_VSTREAM_EOF;
-	}
-
-	ptr = (unsigned char *) vptr;
-	for (n = 1; n < (int) maxlen; n++) {
-		/* left one byte for '\0' */
-
-#ifdef	_USE_FAST_MACRO
-		ch = ACL_VSTREAM_GETC(fp);
-#else
-		ch = acl_vstream_getc(fp);
-#endif
-		if (ch == ACL_VSTREAM_EOF) {
-			fp->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
-			fp->flag |= ACL_VSTREAM_FLAG_TAGNO;
-
-			if (n == 1)  /* EOF, nodata read */
-				return ACL_VSTREAM_EOF;
-
-			break;  /* EOF, some data was read */
-		}
-
-		*ptr++ = ch;
-		if (ch == '\n'){
-			/* newline is stored, like fgets() */
-
-			fp->flag |= ACL_VSTREAM_FLAG_TAGYES;
-			fp->flag &= ~ACL_VSTREAM_FLAG_TAGNO;
-			break;
-		}
-	}
-
-	/* null terminate like fgets() */
-	*ptr = 0;
-
-	return n;
-}
-
 int acl_vstream_readtags(ACL_VSTREAM *fp, void *vptr, size_t maxlen,
 	const char *tag, size_t taglen)
 {
@@ -793,6 +745,8 @@ int acl_vstream_readtags(ACL_VSTREAM *fp, void *vptr, size_t maxlen,
 			(int) maxlen, tag ? tag : "null", (int) taglen);
 		return ACL_VSTREAM_EOF;
 	}
+
+	fp->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
 
 	needle_end = (const unsigned char *) tag;
 
@@ -813,9 +767,6 @@ int acl_vstream_readtags(ACL_VSTREAM *fp, void *vptr, size_t maxlen,
 		ch = acl_vstream_getc(fp);
 #endif
 		if (ch == ACL_VSTREAM_EOF) {
-			fp->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
-			fp->flag |= ACL_VSTREAM_FLAG_TAGNO;
-
 			if (n == 1)  /* EOF, nodata read */
 				return ACL_VSTREAM_EOF;
 
@@ -847,12 +798,57 @@ int acl_vstream_readtags(ACL_VSTREAM *fp, void *vptr, size_t maxlen,
 		ptr++;
 		if (matched) {
 			fp->flag |= ACL_VSTREAM_FLAG_TAGYES;
-			fp->flag &= ~ACL_VSTREAM_FLAG_TAGNO;
 			break;
 		}
 	}
 
 	*ptr = 0;  /* null terminate like fgets() */
+
+	return n;
+}
+
+int acl_vstream_gets(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
+{
+	const char *myname = "acl_vstream_gets";
+	int   n, ch;
+	unsigned char *ptr;
+
+	if (fp == NULL || vptr == NULL || maxlen <= 0) {
+		acl_msg_error("%s(%d), %s: fp %s, vptr %s, maxlen %d",
+			__FILE__, __LINE__, myname, fp ? "not null" : "null",
+			vptr ? "not null" : "null", (int) maxlen);
+		return ACL_VSTREAM_EOF;
+	}
+
+	fp->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
+
+	ptr = (unsigned char *) vptr;
+	for (n = 1; n < (int) maxlen; n++) {
+		/* left one byte for '\0' */
+
+#ifdef	_USE_FAST_MACRO
+		ch = ACL_VSTREAM_GETC(fp);
+#else
+		ch = acl_vstream_getc(fp);
+#endif
+		if (ch == ACL_VSTREAM_EOF) {
+			if (n == 1)  /* EOF, nodata read */
+				return ACL_VSTREAM_EOF;
+
+			break;  /* EOF, some data was read */
+		}
+
+		*ptr++ = ch;
+		if (ch == '\n'){
+			/* newline is stored, like fgets() */
+
+			fp->flag |= ACL_VSTREAM_FLAG_TAGYES;
+			break;
+		}
+	}
+
+	/* null terminate like fgets() */
+	*ptr = 0;
 
 	return n;
 }
@@ -870,6 +866,8 @@ int acl_vstream_gets_nonl(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
 		return ACL_VSTREAM_EOF;
 	}
 
+	fp->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
+
 	ptr = (unsigned char *) vptr;
 	for (n = 1; n < (int) maxlen; n++) {
 #ifdef	_USE_FAST_MACRO
@@ -878,9 +876,6 @@ int acl_vstream_gets_nonl(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
 		ch = acl_vstream_getc(fp);
 #endif
 		if (ch == ACL_VSTREAM_EOF) {
-			fp->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
-			fp->flag |= ACL_VSTREAM_FLAG_TAGNO;
-
 			if (n == 1)  /* EOF, nodata read */
 				return ACL_VSTREAM_EOF;
 
@@ -890,7 +885,6 @@ int acl_vstream_gets_nonl(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
 		*ptr++ = ch;
 		if (ch == '\n') {
 			fp->flag |= ACL_VSTREAM_FLAG_TAGYES;
-			fp->flag &= ~ACL_VSTREAM_FLAG_TAGNO;
 			break;  /* newline is stored, like fgets() */
 		}
 	}
@@ -904,6 +898,7 @@ int acl_vstream_gets_nonl(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
 		*ptr-- = 0;
 		n--;
 	}
+
 	return n;
 }
 
@@ -1015,7 +1010,6 @@ static int bfgets_crlf_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 		/* when get '\n', set ready 1 */
 		if (ch == '\n') {
 			*ready = 1;
-			fp->flag &= ~ACL_VSTREAM_FLAG_TAGNO;
 			fp->flag |= ACL_VSTREAM_FLAG_TAGYES;
 
 			break;
@@ -1024,9 +1018,6 @@ static int bfgets_crlf_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 		/* when reached the max limit, set ready 1 */
 		if (buf->maxlen > 0 && (int) LEN(buf) >= buf->maxlen) {
 			*ready = 1;
-			fp->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
-			fp->flag |= ACL_VSTREAM_FLAG_TAGNO;
-
 			acl_msg_warn("%s(%d), %s: line too long: %d, %d",
 				__FILE__, __LINE__, myname,
 				(int) buf->maxlen, (int) LEN(buf));
@@ -1051,6 +1042,8 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 			"not null" : "null", ready ? "not null" : "null");
 		return ACL_VSTREAM_EOF;
 	}
+
+	fp->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
 
 	*ready = 0;
 	n = (int) LEN(buf);
@@ -1123,6 +1116,8 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 			"not null" : "null", ready ? "not null" : "null");
 		return ACL_VSTREAM_EOF;
 	}
+
+	fp->flag &= ~ACL_VSTREAM_FLAG_TAGYES;
 
 	*ready = 0;
 	n = (int) LEN(buf);

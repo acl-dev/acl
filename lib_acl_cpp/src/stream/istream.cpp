@@ -53,7 +53,7 @@ bool istream::gets(void* buf, size_t* size, bool nonl /* = true */)
 		return false;
 	} else {
 		*size = ret;
-		if ((stream_->flag | ACL_VSTREAM_FLAG_TAGYES))
+		if ((stream_->flag & ACL_VSTREAM_FLAG_TAGYES))
 			return true;
 		return false;
 	}
@@ -155,7 +155,6 @@ bool istream::gets(string& s, bool nonl /* = true */, size_t max /* = 0 */)
 			s.append(buf, size);
 		max -= size;
 
-		// 如果读到的行长度达到最大限制，则直接返回 true
 		if (max == 0)
 		{
 			logger_warn("reached the max limit: %d",

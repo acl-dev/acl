@@ -99,20 +99,16 @@ public:
 	fiber_ctx(std::function<void()> fn) : fn_(fn) {}
 	~fiber_ctx() = default;
 
-	void start(void)
-	{
-		fn_();
-	}
-
-private:
 	std::function<void()> fn_;
 };
 
 static void fiber_main(ACL_FIBER*, void* ctx)
 {
 	fiber_ctx* fc = (fiber_ctx *) ctx;
-	fc->start();
+	std::function<void()> fn = fc->fn_;
 	delete fc;
+
+	fn();
 }
 
 void go_fiber::operator=(std::function<void()> fn)
