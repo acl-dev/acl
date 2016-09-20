@@ -1,6 +1,9 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+437) 2016.9.17 -- 9.19
+437.1) feature: 增加了 websocket 类
+
 436) 2016.9.7
 436.1) bugfix: istream.cpp 中的函数 gets 在调用 acl_vstream_gets 或
 acl_vstream_gets_nonl 后判断标志位 ACL_VSTREAM_FLAG_TAGYES 的方法有误

@@ -175,7 +175,7 @@ static void slice3_mbuf_alloc(ACL_SLICE *slice)
 #endif
 	SLICE3 *slice3 = (SLICE3*) slice;
 	MBUF3 *mbuf;
-	int   i, incr_real = 0;
+	int   i, incr_real = 0, n;
 	char *ptr;
 
 	mbuf = (MBUF3*) acl_default_malloc(__FILE__, __LINE__,
@@ -188,7 +188,8 @@ static void slice3_mbuf_alloc(ACL_SLICE *slice)
 	slice->nalloc++;
 	mbuf->mslots.slots = NULL;
 
-	MBUF_SLOTS_SPACE(slice, &mbuf->mslots, slice->page_nslots, incr_real);
+	n = slice->page_nslots;
+	MBUF_SLOTS_SPACE(slice, &mbuf->mslots, n, incr_real);
 	acl_assert(mbuf->mslots.islots == 0);
 
 	for (i = 0; i < slice->page_nslots; i++) {
@@ -448,7 +449,7 @@ static void slice2_mbuf_alloc(ACL_SLICE *slice)
 #endif
 	SLICE2 *slice2 = (SLICE2*) slice;
 	MBUF2 *mbuf;
-	int   i, incr_real = 0;
+	int   i, incr_real = 0, n;
 	char *ptr;
 
 	mbuf = (MBUF2*) acl_default_malloc(__FILE__, __LINE__, slice->page_size);
@@ -459,7 +460,8 @@ static void slice2_mbuf_alloc(ACL_SLICE *slice)
 	ptr = mbuf->payload;
 
 	slice->nalloc++;
-	MBUF_SLOTS_SPACE(slice, &slice2->mslots, slice->page_nslots, incr_real);
+	n = slice->page_nslots;
+	MBUF_SLOTS_SPACE(slice, &slice2->mslots, n, incr_real);
 
 	for (i = 0; i < slice->page_nslots; i++) {
 		ptr += SLICE2_HEAD_SIZE;
@@ -807,7 +809,7 @@ static void slice1_mbuf_alloc(ACL_SLICE *slice)
 	SLICE1 *slice1 = (SLICE1*) slice;
 	MBUF1 *mbuf = (MBUF1*) acl_default_malloc(__FILE__, __LINE__,
 			sizeof(MBUF1));
-	int   i, incr_real = 0;
+	int   i, incr_real = 0, n;
 	char *ptr;
 
 	mbuf->buf = (void*) acl_default_malloc(__FILE__, __LINE__,
@@ -816,7 +818,8 @@ static void slice1_mbuf_alloc(ACL_SLICE *slice)
 	ptr = (char*) mbuf->buf;
 
 	slice->nalloc++;
-	MBUF_SLOTS_SPACE(slice, &slice1->mslots, slice->page_nslots, incr_real);
+	n = slice->page_nslots;
+	MBUF_SLOTS_SPACE(slice, &slice1->mslots, n, incr_real);
 
 	for (i = 0; i < slice->page_nslots; i++) {
 		slice1->mslots.slots[slice1->mslots.islots++] = ptr;

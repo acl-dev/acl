@@ -250,6 +250,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\http\http_response.cpp" />
     <ClCompile Include="src\http\http_service.cpp" />
     <ClCompile Include="src\http\http_utils.cpp" />
+    <ClCompile Include="src\http\websocket.cpp" />
     <ClCompile Include="src\ipc\ipc_client.cpp" />
     <ClCompile Include="src\ipc\ipc_server.cpp" />
     <ClCompile Include="src\ipc\ipc_service.cpp" />
@@ -423,6 +424,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\http\http_service.hpp" />
     <ClInclude Include="include\acl_cpp\http\http_type.hpp" />
     <ClInclude Include="include\acl_cpp\http\http_utils.hpp" />
+    <ClInclude Include="include\acl_cpp\http\websocket.hpp" />
     <ClInclude Include="include\acl_cpp\ipc\ipc_client.hpp" />
     <ClInclude Include="include\acl_cpp\ipc\ipc_server.hpp" />
     <ClInclude Include="include\acl_cpp\ipc\ipc_service.hpp" />

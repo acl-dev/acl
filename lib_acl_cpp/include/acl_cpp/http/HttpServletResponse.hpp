@@ -228,10 +228,10 @@ public:
 	ostream& getOutputStream(void) const;
 
 	/**
-	 * 设置 http 请求对象，该函数目前只应被 HttpServlet 类内部调用
-	 * @param request {HttpServletRequest*}
+	 * 获得 HTTP 双向流对象，由构造函数的参数输入
+	 * @return {socket_stream&}
 	 */
-	void setHttpServletRequest(HttpServletRequest* request);
+	socket_stream& getSocketStream(void) const;
 
 	/**
 	 * 获得底层的 http_client 通信对象
@@ -241,6 +241,12 @@ public:
 	{
 		return client_;
 	}
+
+	/**
+	 * 设置 http 请求对象，该函数目前只应被 HttpServlet 类内部调用
+	 * @param request {HttpServletRequest*}
+	 */
+	void setHttpServletRequest(HttpServletRequest* request);
 
 private:
 	dbuf_guard* dbuf_internal_;

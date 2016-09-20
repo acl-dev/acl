@@ -101,6 +101,31 @@ HttpServlet& HttpServlet::setParseBodyLimit(int length)
 	return *this;
 }
 
+static bool upgradeWebsocket(HttpServletRequest& req, HttpServletResponse& res)
+{
+	const char* ptr = req.getHeader("Connection");
+	if (ptr == NULL)
+		return false;
+	if (acl_strcasestr(ptr, "Upgrade") == NULL)
+		return false;
+	ptr = req.getHeader("Upgrade");
+	if (ptr == NULL)
+		return false;
+	if (strcasecmp(ptr, "websocket") != 0)
+		return false;
+	const char* key = req.getHeader("Sec-WebSocket-Key");
+	if (key == NULL || *key == 0)
+	{
+		logger_warn("no Sec-WebSocket-Key");
+		return false;
+	}
+
+	http_header& header = res.getHttpHeader();
+	header.set_upgrade("websocket");
+	header.set_ws_accept(key);
+	return true;
+}
+
 bool HttpServlet::start()
 {
 	socket_stream* in;
@@ -156,7 +181,16 @@ bool HttpServlet::start()
 	switch (method)
 	{
 	case HTTP_METHOD_GET:
-		ret = doGet(*req_, *res_);
+		if (upgradeWebsocket(*req_, *res_))
+		{
+			if (res_->sendHeader() == false)
+			{
+				logger_error("sendHeader error!");
+				return false;
+			}
+			ret = doWebsocket(*req_, *res_);
+		} else
+			ret = doGet(*req_, *res_);
 		break;
 	case HTTP_METHOD_POST:
 		ret = doPost(*req_, *res_);

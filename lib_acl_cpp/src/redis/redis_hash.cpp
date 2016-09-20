@@ -351,6 +351,23 @@ int redis_hash::hlen(const char* key)
 	return get_number();
 }
 
+int redis_hash::hstrlen(const char* key, const char* name)
+{
+	return hstrlen(key, name, strlen(name));
+}
+
+int redis_hash::hstrlen(const char* key, const char* name, size_t name_len)
+{
+	const char* names[1];
+	names[0] = name;
+	size_t names_len[1];
+	names_len[0] = name_len;
+
+	hash_slot(key);
+	build("HSTRLEN", key, names, names_len, 1);
+	return get_number();
+}
+
 int redis_hash::hscan(const char* key, int cursor, std::map<string, string>& out,
 	  const char* pattern /* = NULL */, const size_t* count /* = NULL */)
 {

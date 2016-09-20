@@ -55,9 +55,9 @@ public:
 	 */
 	void reset(void);
 
-	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
 	//            HTTP 请求与 HTTP 响应通用的方法函数
-	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 设置 HTTP 头是客户端的请求头还是服务器的响应头
@@ -159,6 +159,12 @@ public:
 		return keep_alive_;
 	}
 
+	http_header& set_upgrade(const char* value = "websocket");
+	const char* get_upgrade(void) const
+	{
+		return upgrade_;
+	}
+
 	/**
 	 * 向 HTTP 头中添加 cookie
 	 * @param name {const char*} cookie 名
@@ -191,9 +197,9 @@ public:
 	 */
 	bool is_request(void) const;
 
-	/////////////////////////////////////////////////////////////////////
-	//            HTTP 请求方法函数
-	/////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	//                        HTTP 请求方法函数
+	//////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * 创建 HTTP 请求头数据
@@ -292,6 +298,37 @@ public:
 	http_header& add_int(const char* name, unsigned long long int value);
 #endif
 
+	http_header& set_ws_origin(const char* url);
+	http_header& set_ws_key(const char* key);
+	http_header& set_ws_protocol(const char* proto);
+	http_header& set_ws_version(int ver);
+
+	const char* get_ws_origin(void) const
+	{
+		return ws_origin_;
+	}
+
+	const char* get_ws_key(void) const
+	{
+		return ws_sec_key_;
+	}
+
+	const char* get_ws_protocol(void) const
+	{
+		return ws_sec_proto_;
+	}
+
+	int get_ws_version(void) const
+	{
+		return ws_sec_ver_;
+	}
+
+	http_header& set_ws_accept(const char* key);
+	const char* get_ws_accept(void) const
+	{
+		return ws_sec_accept_;
+	}
+
 	/**
 	 * url 重定向
 	 * @param url {const char*} 重定向的 URL，格式为：
@@ -320,9 +357,9 @@ public:
 	 */
 	virtual void redicrect_reset(void) {}
 
-	/////////////////////////////////////////////////////////////////////
-	//            HTTP 响应方法函数
-	/////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	//                       HTTP 响应方法函数
+	//////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 创建 HTTP 响应头数据
@@ -417,9 +454,20 @@ private:
 #endif
 	bool chunked_transfer_;               // 是否为 chunked 传输模式
 	bool transfer_gzip_;                  // 数据是否采用 gzip 压缩
+
+	char* upgrade_;
+	// just for websocket
+	char* ws_origin_;
+	char* ws_sec_key_;
+	char* ws_sec_proto_;
+	int   ws_sec_ver_;
+	char* ws_sec_accept_;
+
 	void init(void);                      // 初始化
 	void clear(void);
 	void build_common(string& buf) const; // 构建通用头
+
+	void append_accept_key(const char* sec_key, string& out) const;
 };
 
 }  // namespace acl end

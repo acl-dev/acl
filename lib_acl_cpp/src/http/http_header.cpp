@@ -6,6 +6,7 @@
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/url_coder.hpp"
+#include "acl_cpp/stdlib/sha1.hpp"
 #include "acl_cpp/http/HttpCookie.hpp"
 #include "acl_cpp/http/http_header.hpp"
 #endif
@@ -87,6 +88,13 @@ void http_header::init()
 	content_length_ = -1;
 	chunked_transfer_ = false;
 	transfer_gzip_ = false;
+
+	upgrade_ = NULL;
+	ws_origin_ = NULL;
+	ws_sec_key_ = NULL;
+	ws_sec_proto_ = NULL;
+	ws_sec_ver_ = -1;
+	ws_sec_accept_ = NULL;
 }
 
 void http_header::clear()
@@ -233,7 +241,10 @@ void http_header::build_common(string& buf) const
 
 	if (is_request_ == false && cgi_mode_)
 		return;
-	if (keep_alive_)
+
+	if (upgrade_ && *upgrade_)
+		buf << "Upgrade: " << upgrade_ << "\r\nConnection: Upgrade\r\n";
+	else if (keep_alive_)
 		buf << "Connection: " << "Keep-Alive\r\n";
 	else
 		buf << "Connection: " << "Close\r\n";
@@ -540,6 +551,52 @@ http_header& http_header::add_format(const char* name, const char* fmt, ...)
 	return add_param(name, buf.c_str());
 }
 
+http_header& http_header::set_upgrade(const char* value /* = "websocket" */)
+{
+	if (value && *value)
+	{
+		upgrade_ = dbuf_->dbuf_strdup(value);
+		status_ = 101;  // automatic set status_ to 101
+	}
+	else
+		upgrade_ = NULL;
+	return *this;
+}
+
+http_header& http_header::set_ws_origin(const char* url)
+{
+	if (url && *url)
+		ws_origin_ = dbuf_->dbuf_strdup(url);
+	return *this;
+}
+
+http_header& http_header::set_ws_key(const char* key)
+{
+	if (key && *key)
+		ws_sec_key_ = dbuf_->dbuf_strdup(key);
+	return *this;
+}
+
+http_header& http_header::set_ws_protocol(const char* proto)
+{
+	if (proto && *proto)
+		ws_sec_proto_ = dbuf_->dbuf_strdup(proto);
+	return *this;
+}
+
+http_header& http_header::set_ws_version(int ver)
+{
+	ws_sec_ver_ = ver;
+	return *this;
+}
+
+http_header& http_header::set_ws_accept(const char* key)
+{
+	if (key && *key)
+		ws_sec_key_ = dbuf_->dbuf_strdup(key);
+	return *this;
+}
+
 bool http_header::build_request(string& buf) const
 {
 	if (url_ == NULL || *url_ == 0)
@@ -582,7 +639,9 @@ bool http_header::build_request(string& buf) const
 			buf += tmp.c_str();
 		}
 	}
+
 	buf += " HTTP/1.1\r\n";
+
 	if (accept_compress_)
 		// 因为目前的 zlib_stream 仅支持于此
 		buf += "Accept-Encoding: gzip\r\n";
@@ -603,6 +662,17 @@ bool http_header::build_request(string& buf) const
 		buf += "\r\n";
 	}
 
+	build_common(buf);
+
+	if (ws_origin_ && *ws_origin_)
+		buf << "Origin: " << ws_origin_ << "\r\n";
+	if (ws_sec_key_ && *ws_sec_key_)
+		buf << "Sec-WebSocket-Key: " << ws_sec_key_ << "\r\n";
+	if (ws_sec_proto_ && *ws_sec_proto_)
+		buf << "Sec-Websocket-Protocol: " << ws_sec_proto_ << "\r\n";
+	if (ws_sec_ver_ > 0)
+		buf << "Sec-WebSocket-Version: " << ws_sec_ver_ << "\r\n";
+
 	// 添加分段请求字段
 	if (range_from_ >= 0)
 	{
@@ -612,7 +682,6 @@ bool http_header::build_request(string& buf) const
 		buf += "\r\n";
 	}
 
-	build_common(buf);
 	buf += "\r\n";
 
 	return (true);
@@ -794,6 +863,35 @@ static const char *http_status(int status)
 	return (__maps[i].hs[pos].title);
 }
 
+void http_header::append_accept_key(const char* sec_key, string& out) const
+{
+	string tmp(sec_key);
+	tmp += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+
+	sha1 sha;
+	sha.input(tmp.c_str(), tmp.size());
+	unsigned char digest[20];
+	sha.result((unsigned *) digest);
+
+	//little endian to big endian
+	for (int i = 0; i < 20; i += 4)
+	{
+		unsigned char c;
+
+		c = digest[i];
+		digest[i] = digest[i + 3];
+		digest[i + 3] = c;
+
+		c = digest[i + 1];
+		digest[i + 1] = digest[i + 2];
+		digest[i + 2] = c;
+	}
+
+	unsigned char* s = acl_base64_encode((char*) digest, 20);
+	out << "Sec-WebSocket-Accept: " << (char*) s << "\r\n";
+	acl_myfree(s);
+}
+
 bool http_header::build_response(string& out) const
 {
 	out.clear();
@@ -833,13 +931,23 @@ bool http_header::build_response(string& out) const
 		}
 	}
 
+	if (upgrade_ && *upgrade_)
+	{
+		build_common(out);
+		if (ws_sec_key_ && *ws_sec_key_)
+			append_accept_key(ws_sec_key_, out);
+
+		out << "\r\n";
+		return true;
+	}
+
 	// 添加分段响应字段
 	if (range_from_ >= 0 && range_to_ >= range_from_ && range_total_ > 0)
 		out << "Content-Range: bytes=" << range_from_ << '-'
 			<< range_to_ << '/' << range_total_ << "\r\n";
 
-	// 如果是 gzip 压缩数据，当非 chunked 传输时，必须取消 Content-Length 字段，
-	// 同时禁止保持长连接，即： Connection: close
+	// 如果是 gzip 压缩数据，当非 chunked 传输时，必须取消 Content-Length
+	// 字段，同时禁止保持长连接，即： Connection: close
 	if (transfer_gzip_)
 	{
 		out << "Content-Encoding: gzip\r\n";

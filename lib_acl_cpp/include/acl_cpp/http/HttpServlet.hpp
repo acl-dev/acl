@@ -123,7 +123,7 @@ public:
 	bool doRun(const char* memcached_addr, socket_stream* stream);
 
 	/**
-	 * 当 HTTP 请求为 GET 方式时的虚函数
+	 * 当 HTTP 请求为 GET 方式时调用的虚函数
 	 */
 	virtual bool doGet(HttpServletRequest&, HttpServletResponse&)
 	{
@@ -132,7 +132,16 @@ public:
 	}
 
 	/**
-	 * 当 HTTP 请求为 POST 方式时的虚函数
+	 * 当 HTTP 请求为 websocket 方式时调用的虚函数
+	 */
+	virtual bool doWebsocket(HttpServletRequest&, HttpServletResponse&)
+	{
+		logger_error("child not implement doWebsocket yet!");
+		return false;
+	}
+
+	/**
+	 * 当 HTTP 请求为 POST 方式时调用的虚函数
 	 */
 	virtual bool doPost(HttpServletRequest&, HttpServletResponse&)
 	{
@@ -141,7 +150,7 @@ public:
 	}
 
 	/**
-	 * 当 HTTP 请求为 PUT 方式时的虚函数
+	 * 当 HTTP 请求为 PUT 方式时调用的虚函数
 	 */
 	virtual bool doPut(HttpServletRequest&, HttpServletResponse&)
 	{
@@ -150,7 +159,7 @@ public:
 	}
 
 	/**
-	 * 当 HTTP 请求为 CONNECT 方式时的虚函数
+	 * 当 HTTP 请求为 CONNECT 方式时调用的虚函数
 	 */
 	virtual bool doConnect(HttpServletRequest&, HttpServletResponse&)
 	{
@@ -159,7 +168,7 @@ public:
 	}
 
 	/**
-	 * 当 HTTP 请求为 PURGE 方式时的虚函数，该方法在清除 SQUID 的缓存
+	 * 当 HTTP 请求为 PURGE 方式时调用的虚函数，该方法在清除 SQUID 的缓存
 	 * 时会用到
 	 */
 	virtual bool doPurge(HttpServletRequest&, HttpServletResponse&)
@@ -169,7 +178,7 @@ public:
 	}
 
 	/**
-	 * 当 HTTP 请求为 DELETE 方式时的虚函数
+	 * 当 HTTP 请求为 DELETE 方式时调用的虚函数
 	 */
 	virtual bool doDelete(HttpServletRequest&, HttpServletResponse&)
 	{
@@ -178,7 +187,7 @@ public:
 	}
 
 	/**
-	 * 当 HTTP 请求为 HEAD 方式时的虚函数
+	 * 当 HTTP 请求为 HEAD 方式时调用的虚函数
 	 */
 	virtual bool doHead(HttpServletRequest&, HttpServletResponse&)
 	{
@@ -187,7 +196,7 @@ public:
 	}
 
 	/**
-	 * 当 HTTP 请求为 OPTION 方式时的虚函数
+	 * 当 HTTP 请求为 OPTION 方式时调用的虚函数
 	 */
 	virtual bool doOptions(HttpServletRequest&, HttpServletResponse&)
 	{
@@ -196,7 +205,7 @@ public:
 	}
 
 	/**
-	 * 当 HTTP 请求为 PROPFIND 方式时的虚函数
+	 * 当 HTTP 请求为 PROPFIND 方式时调用的虚函数
 	 */
 	virtual bool doPropfind(HttpServletRequest&, HttpServletResponse&)
 	{
@@ -205,7 +214,7 @@ public:
 	}
 
 	/**
-	 * 当 HTTP 请求方法未知时的虚函数
+	 * 当 HTTP 请求方法未知时调用的虚函数
 	 * @param method {const char*} 其它未知的请求方法
 	 */
 	virtual bool doOther(HttpServletRequest&, HttpServletResponse&,
@@ -217,7 +226,7 @@ public:
 	}
 
 	/**
-	 * 当 HTTP 请求方法未知时的虚函数
+	 * 当 HTTP 请求方法未知时调用的虚函数
 	 */
 	virtual bool doUnknown(HttpServletRequest&, HttpServletResponse&)
 	{
@@ -226,7 +235,7 @@ public:
 	}
 
 	/**
-	 * 当 HTTP 请求出错时的虚函数
+	 * 当 HTTP 请求出错时调用的虚函数
 	 */
 	virtual bool doError(HttpServletRequest&, HttpServletResponse&)
 	{

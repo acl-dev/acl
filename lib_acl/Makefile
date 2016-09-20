@@ -31,6 +31,7 @@ CFLAGS = -c -g -W \
 -DACL_PREPARE_COMPILE \
 -Winvalid-pch
 #-DUSE_EPOLL \
+#-Wno-tautological-compare \
 #-Wno-invalid-source-encoding \
 #-Wno-extended-offsetof
 #-Wcast-align

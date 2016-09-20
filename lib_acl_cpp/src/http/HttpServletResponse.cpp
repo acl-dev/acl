@@ -230,6 +230,11 @@ ostream& HttpServletResponse::getOutputStream(void) const
 	return stream_;
 }
 
+socket_stream& HttpServletResponse::getSocketStream(void) const
+{
+	return stream_;
+}
+
 void HttpServletResponse::setHttpServletRequest(HttpServletRequest* request)
 {
 	request_ = request;

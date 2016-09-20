@@ -280,6 +280,9 @@
     <ClCompile Include="src\http\http_utils.cpp">
       <Filter>Source Files\http</Filter>
     </ClCompile>
+    <ClCompile Include="src\http\websocket.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
     <ClCompile Include="src\stdlib\sha1.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
@@ -622,6 +625,9 @@
       <Filter>Header Files\http</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\http\http_utils.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\websocket.hpp">
       <Filter>Header Files\http</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\http\HttpServlet.hpp">

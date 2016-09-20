@@ -164,15 +164,15 @@ ACL_API int acl_strrncmp(const char *s1, const char *s2, size_t n);
  * @param needle {const char *} 匹配查找的字符串
  * @return {char *} != NULL: Ok, NULL: 未发现
  */
-ACL_API char *acl_rstrstr(char *haystack, const char *needle);
+ACL_API char *acl_rstrstr(const char *haystack, const char *needle);
 
 /**
  * 从前向后扫描查找字符串，大小写不敏感
- * @param haystack {char *} 源字符串
+ * @param haystack {const char *} 源字符串
  * @param needle {const char *} 匹配查找的字符串
  * @return {char *} != NULL: Ok, NULL: 未发现
  */
-ACL_API char *acl_strcasestr(char *haystack, const char *needle);
+ACL_API char *acl_strcasestr(const char *haystack, const char *needle);
 
 /**
  * 从后向前扫描查找字符串，大小写不敏感
@@ -180,7 +180,7 @@ ACL_API char *acl_strcasestr(char *haystack, const char *needle);
  * @param needle {const char *} 匹配查找的字符串
  * @return {char *} != NULL: Ok, NULL: 未发现
  */
-ACL_API char *acl_rstrcasestr(char *haystack, const char *needle);
+ACL_API char *acl_rstrcasestr(const char *haystack, const char *needle);
 
 /**
  * 计算给定字符串的长度，但限制了最大计算长度，以免产生越界现象，要比 strlen

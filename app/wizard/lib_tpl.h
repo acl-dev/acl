@@ -37,8 +37,8 @@
 
 #define DELIMITER_LEFT "$<"
 #define DELIMITER_RIGHT ">"
-#define SECTIONTAG_HEAD "<!-- "DELIMITER_LEFT
-#define SECTIONTAG_TAIL DELIMITER_RIGHT" -->"
+#define SECTIONTAG_HEAD "<!-- " DELIMITER_LEFT
+#define SECTIONTAG_TAIL DELIMITER_RIGHT " -->"
  
 /* The object, holding template data */
 typedef struct template_s tpl_t;

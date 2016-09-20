@@ -129,6 +129,12 @@ public:
 	istream& getInputStream(void) const;
 
 	/**
+	 * 获得 HTTP 双向流对象，由构造函数的参数输入
+	 * @return {socket_stream&}
+	 */
+	socket_stream& getSocketStream(void) const;
+
+	/**
 	 * 获得 HTTP 请求数据的数据长度
 	 * @return {acl_int64} 返回 -1 表示可能为 GET 方法，
 	 *  或 HTTP 请求头中没有 Content-Length 字段

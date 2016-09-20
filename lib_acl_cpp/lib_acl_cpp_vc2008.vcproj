@@ -565,6 +565,10 @@
 					RelativePath=".\src\http\HttpSession.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\src\http\websocket.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="ipc"
@@ -1381,6 +1385,10 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\http\HttpSession.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\http\websocket.hpp"
 					>
 				</File>
 			</Filter>

@@ -15,7 +15,7 @@
 
 #include "../charmap.h"
 
-char *acl_rstrstr(char *haystack, const char *needle)
+char *acl_rstrstr(const char *haystack, const char *needle)
 {
 	unsigned char *cp, *haystack_end;
 	const unsigned char *np = 0, *needle_end;
@@ -44,7 +44,7 @@ char *acl_rstrstr(char *haystack, const char *needle)
 	return (NULL);
 }
 
-char *acl_rstrcasestr(char *haystack, const char *needle)
+char *acl_rstrcasestr(const char *haystack, const char *needle)
 {
 	const unsigned char *cm = maptolower;
 	unsigned char *cp, *haystack_end;
@@ -74,7 +74,7 @@ char *acl_rstrcasestr(char *haystack, const char *needle)
 	return (NULL);
 }
 
-char *acl_strcasestr(char *haystack, const char *needle)
+char *acl_strcasestr(const char *haystack, const char *needle)
 {
 	const unsigned char *cm = maptolower;
 	const unsigned char *np = 0;

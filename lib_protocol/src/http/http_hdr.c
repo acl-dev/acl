@@ -324,7 +324,7 @@ int http_hdr_entry_replace2(HTTP_HDR *hh, const char *name,
 	HTTP_HDR_ENTRY *entry;
 	ACL_VSTRING *value = acl_vstring_alloc(256);
 	int   once, n = 0, len = (int) strlen(from), i;
-	char *(*find_fn)(char *, const char*);
+	char *(*find_fn)(const char *, const char*);
 
 	if (strcasecmp(name, "Set-Cookie") == 0)
 		once = 0;
@@ -333,7 +333,7 @@ int http_hdr_entry_replace2(HTTP_HDR *hh, const char *name,
 	if (ignore_case)
 		find_fn = acl_strcasestr;
 	else
-		find_fn = (char *(*)(char*, const char*)) strstr;
+		find_fn = strstr;
 
 	for (i = 0; i < hh->entry_lnk->count; i++) {
 		char *ptr_prev, *ptr;

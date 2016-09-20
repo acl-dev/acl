@@ -464,6 +464,11 @@ istream& HttpServletRequest::getInputStream(void) const
 	return stream_;
 }
 
+socket_stream& HttpServletRequest::getSocketStream(void) const
+{
+	return stream_;
+}
+
 void HttpServletRequest::parseParameters(const char* str)
 {
 	const char* requestCharset = getCharacterEncoding();

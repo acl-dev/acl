@@ -307,6 +307,22 @@ public:
 	int hlen(const char* key);
 
 	/**
+	 * 获得某个 key 中的指定域的数据长度
+	 * Returns the string length of the value associated with field
+	 * in the hash stored at key
+	 * @param key {const char*} key 键值
+	 *  the hash key
+	 * @param name {const char*} key 对象的域字段名称
+	 *  the field's name
+	 * @return {int} 如果 key 或 name 不存在，则返回 0，如果 key 非哈希
+	 *  键或出错，则返回 -1
+	 *  If the key or the field do not exist, 0 is returned; If the key is
+	 *  not the hash key or error happened, -1 is returned.
+	 */
+	int hstrlen(const char* key, const char* name, size_t name_len);
+	int hstrlen(const char* key, const char *name);
+	
+	/**
 	 * 命令用于迭代哈希键中的键值对
 	 * scan the name and value of all fields in hash stored at key
 	 * @param key {const char*} 哈希键值

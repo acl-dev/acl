@@ -1,0 +1,73 @@
+<html>
+<meta charset="utf-8" />
+<title>WebSocket Test</title>
+<script language="javascript" type="text/javascript">
+    var wsUri = "ws://127.0.0.1:9001/";
+    var output;
+    var websocket = null;
+    function init() {
+        output = document.getElementById("output"); 
+        testWebSocket(); 
+    }
+    function testWebSocket() {
+	if (websocket != null)
+		websocket.close();
+        websocket = new WebSocket(wsUri);
+        websocket.onopen = function (evt) { onOpen(evt) };
+        websocket.onclose = function (evt) { onClose(evt) };
+        websocket.onmessage = function (evt) { onMessage(evt) };
+        websocket.onerror = function (evt) { onError(evt) };
+    } function onOpen(evt) {
+        writeToScreen("CONNECTED");
+         
+    }
+    function onClose(evt) {
+	    writeToScreen("DISCONNECTED");
+    }
+    function onMessage(evt) {
+	    document.getElementById('result').value = evt.data;
+    }
+    function onError(evt) {
+	    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+    }
+    function doLogin(user) {
+	    message = "login|" + user; websocket.send(message);
+    }
+    function doSend(to_user, msg) {
+	    message = "chat|" + msg + "|" + to_user; websocket.send(message);
+    }
+    function writeToScreen(message) {
+        var pre = document.createElement("p");
+	pre.style.wordWrap = "break-word";
+	pre.innerHTML = message; output.insertBefore(pre);
+    }
+ 
+    function OnConnect() {
+        wsUri = document.getElementById("url").value;
+        init();
+         
+    }
+     </script>
+<body>
+
+<fieldset>
+<legend>WebSocket</legend>
+    <p><span>Server url:</span>
+      <input id="url" type="text"  value="ws://127.0.0.1:9001/" />
+      <input type="button" value="Connected" onclick="OnConnect()" />
+    </p>
+    <p>
+      me: <input id="user" type="text" value="user1" />
+      <input type="button" value="login" onclick="doLogin(document.getElementById('user').value)" />
+    </p>
+    <p>
+      send to: <input id="to_user" type="text" value="user2" /> &nbsp;&nbsp;
+      msg: <input id="msg" type="text" value="test" />
+      <input type="button" value="send" onclick="doSend(document.getElementById('to_user').value, document.getElementById('msg').value)" />
+    </p>
+    <p><span>recv:</span><input id="result" type="text"  value="" /></p>
+</fieldset>
+
+<div id="output"> </div>
+</body>
+</html>

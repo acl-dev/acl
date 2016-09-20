@@ -82,10 +82,15 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-CFLAGS += -I../../../lib_acl/include -I../../../lib_protocol/include -I../../../lib_acl_cpp/include
+ACL_PATH = ../../..
+CFLAGS += -I$(ACL_PATH)/lib_acl/include \
+	  -I$(ACL_PATH)/lib_protocol/include \
+	  -I$(ACL_PATH)/lib_acl_cpp/include
 EXTLIBS =
-LDFLAGS = -L../../../lib_acl_cpp/lib -l_acl_cpp -L../../../lib_protocol/lib -l_protocol -L../../../lib_acl/lib -l_acl \
-	$(EXTLIBS) $(SYSLIB)
+LDFLAGS = -L$(ACL_PATH)/lib_acl_cpp/lib -l_acl_cpp \
+	  -L$(ACL_PATH)/lib_protocol/lib -l_protocol \
+	  -L$(ACL_PATH)/lib_acl/lib -l_acl \
+	  $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)
