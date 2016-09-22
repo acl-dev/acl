@@ -24,7 +24,7 @@ static void timer_main(ACL_FIBER *fiber, void *ctx acl_unused)
 		(unsigned long) acl_pthread_self(), acl_fiber_id(fiber), spent);
 
 	if (--__left_fiber == 0)
-		acl_fiber_stop();
+		acl_fiber_schedule_stop();
 }
 
 static void *thread_main(void *ctx acl_unused)

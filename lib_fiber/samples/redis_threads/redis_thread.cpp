@@ -147,5 +147,5 @@ void redis_thread::fiber_dec(int cnt)
 		fibers_max_, total, spent,
 		(total * 1000) / (spent > 0 ? spent : 1));
 		
-	acl_fiber_stop();
+	acl_fiber_schedule_stop();
 }

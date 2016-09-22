@@ -50,7 +50,7 @@ public:
 	/**
 	 *  停止协程调度过程
 	 */
-	static void stop(void);
+	static void schedule_stop(void);
 
 public:
 	/**

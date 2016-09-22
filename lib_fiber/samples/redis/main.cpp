@@ -80,7 +80,7 @@ static void fiber_redis(ACL_FIBER *fiber, void *ctx)
 		printf("fibers: %d, count: %lld, spent: %.2f, speed: %.2f\r\n",
 			__fibers_max, total, spent,
 			(total * 1000) / (spent > 0 ? spent : 1));
-		acl_fiber_stop();
+		acl_fiber_schedule_stop();
 	}
 }
 

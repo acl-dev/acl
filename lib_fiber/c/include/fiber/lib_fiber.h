@@ -85,8 +85,7 @@ void acl_fiber_schedule(void);
 /**
  * 停止协程过程
  */
-void acl_fiber_io_stop(void);
-#define acl_fiber_stop acl_fiber_io_stop
+void acl_fiber_schedule_stop(void);
 
 /**
  * 使当前运行的协程休眠指定毫秒数

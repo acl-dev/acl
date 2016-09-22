@@ -1,3 +1,9 @@
+25) 2016.9.22
+25.1) 函数改名： acl_fiber_stop --> acl_fiber_schedule_stop,
+acl::fiber::stop --> acl::fiber::schedule_stop
+
+24) 2016.9.21
+24.1) bugfix: hook_io.c 中的 writev() 函数应该调用 fiber_writev()
 
 23) 2016.9.1
 23.1) feature: 支持 C++11 功能，使用 lambda 表达式创建协程更加方便简洁

@@ -69,7 +69,7 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 
 	/* 当所有协程都执行完时停止协程调度过程 */
 	if (--__nfibers == 0)
-		acl_fiber_io_stop();
+		acl_fiber_schedule_stop();
 }
 
 static void usage(const char *procname)

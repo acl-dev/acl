@@ -59,7 +59,7 @@ static void poll_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
 
 	printf(">>>fiber-%d exit\r\n", acl_fiber_id(fiber));
 	if (--__nfibers == 0)
-		acl_fiber_stop();
+		acl_fiber_schedule_stop();
 }
 
 static void usage(const char *procname)

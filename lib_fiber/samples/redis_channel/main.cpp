@@ -259,7 +259,7 @@ static void fiber_redis(ACL_FIBER *fiber, void *ctx)
 	if (--__fibers_count == 0)
 	{
 		printf("---All fibers are over!---\r\n");
-		acl_fiber_stop();
+		acl_fiber_schedule_stop();
 	}
 }
 

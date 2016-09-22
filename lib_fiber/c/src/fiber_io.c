@@ -22,7 +22,7 @@ static void fiber_io_loop(ACL_FIBER *fiber, void *ctx);
 #define STACK_SIZE	819200
 static int __maxfd    = 1024;
 
-void acl_fiber_io_stop(void)
+void acl_fiber_schedule_stop(void)
 {
 	fiber_io_check();
 	__thread_fiber->io_stop = 1;

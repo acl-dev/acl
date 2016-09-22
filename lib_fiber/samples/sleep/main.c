@@ -23,7 +23,7 @@ static void sleep_main(ACL_FIBER *fiber, void *ctx)
 	acl_myfree(n);
 
 	if (--__fibers_count == 0)
-		acl_fiber_stop();
+		acl_fiber_schedule_stop();
 }
 
 static void usage(const char *procname)
