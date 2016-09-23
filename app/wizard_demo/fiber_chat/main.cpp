@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "configure.h"
 #include "master_service.h"
 
 int main(int argc, char *argv[])

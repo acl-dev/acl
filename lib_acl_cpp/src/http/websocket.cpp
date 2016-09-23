@@ -16,6 +16,7 @@ websocket::websocket(socket_stream& client)
 , payload_nread_(0)
 , header_sent_(false)
 {
+	reset();
 }
 
 websocket::~websocket(void)
@@ -30,7 +31,7 @@ websocket& websocket::reset(void)
 	header_.rsv1        = false;
 	header_.rsv2        = false;
 	header_.rsv3        = false;
-	header_.opcode      = FRAME_CONTINUATION;
+	header_.opcode      = FRAME_TEXT;
 	header_.mask        = false;
 	header_.payload_len = 0;
 	header_.masking_key = 0;
@@ -150,7 +151,25 @@ void websocket::make_frame_header(void)
 	}
 }
 
-bool websocket::send_frame_data(char* data, size_t len)
+bool websocket::send_frame_data(const char* str)
+{
+	return send_frame_data(str, strlen(str));
+}
+
+bool websocket::send_frame_data(const void* data, size_t len)
+{
+	void* buf = acl_mymemdup(data, len);
+	bool ret = send_frame_data(buf, len);
+	acl_myfree(buf);
+	return ret;
+}
+
+bool websocket::send_frame_data(char* str)
+{
+	return send_frame_data(str, strlen(str));
+}
+
+bool websocket::send_frame_data(void* data, size_t len)
 {
 	if (!header_sent_)
 	{
@@ -171,7 +190,7 @@ bool websocket::send_frame_data(char* data, size_t len)
 	{
 		unsigned char* mask = (unsigned char*) &header_.masking_key;
 		for (size_t i = 0; i < len; i++)
-			data[i] ^= mask[i % 4];
+			((char*) data)[i] ^= mask[i % 4];
 	}
 
 	if (client_.write(data, len) == -1)
@@ -183,7 +202,25 @@ bool websocket::send_frame_data(char* data, size_t len)
 	return true;
 }
 
-bool websocket::send_frame_pong(char* data, size_t len)
+bool websocket::send_frame_pong(const char* str)
+{
+	return send_frame_pong(str, strlen(str));
+}
+
+bool websocket::send_frame_pong(const void* data, size_t len)
+{
+	void* buf = acl_mymemdup(data, len);
+	bool ret = send_frame_pong(buf, len);
+	acl_myfree(buf);
+	return ret;
+}
+
+bool websocket::send_frame_pong(char* str)
+{
+	return send_frame_pong(str, strlen(str));
+}
+
+bool websocket::send_frame_pong(void* data, size_t len)
 {
 	reset();
 	set_frame_fin(true);
@@ -193,7 +230,25 @@ bool websocket::send_frame_pong(char* data, size_t len)
 	return send_frame_data(data, len);
 }
 
-bool websocket::send_frame_ping(char* data, size_t len)
+bool websocket::send_frame_ping(const char* str)
+{
+	return send_frame_ping(str, strlen(str));
+}
+
+bool websocket::send_frame_ping(const void* data, size_t len)
+{
+	void* buf = acl_mymemdup(data, len);
+	bool ret = send_frame_ping(buf, len);
+	acl_myfree(buf);
+	return ret;
+}
+
+bool websocket::send_frame_ping(char* str)
+{
+	return send_frame_ping(str, strlen(str));
+}
+
+bool websocket::send_frame_ping(void* data, size_t len)
 {
 	reset();
 	set_frame_fin(true);
