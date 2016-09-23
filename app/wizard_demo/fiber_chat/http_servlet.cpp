@@ -2,7 +2,7 @@
 #include "configure.h"
 #include "http_servlet.h"
 
-static std::vector<chat_client*> clients_;
+static std::vector<chat_client*> __clients;
 
 http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session)
 : acl::HttpServlet(stream, session)
@@ -89,7 +89,10 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 
 	// 发送 http 响应体，因为设置了 chunk 传输模式，所以需要多调用一次
 	// res.write 且两个参数均为 0 以表示 chunk 传输数据结束
-	return res.write(buf) && res.write(NULL, 0);
+	bool ret = res.write(buf) && res.write(NULL, 0);
+	if (ret == false)
+		remove(req.getSocketStream());
+	return ret;
 }
 
 bool http_servlet::doWebsocket(acl::HttpServletRequest& req,
@@ -102,6 +105,7 @@ bool http_servlet::doWebsocket(acl::HttpServletRequest& req,
 	{
 		if (in.read_frame_head() == false)
 		{
+			remove(ss);
 			printf("read_frame_head error\r\n");
 			return false;
 		}
@@ -126,15 +130,20 @@ bool http_servlet::doWebsocket(acl::HttpServletRequest& req,
 			break;
 		case acl::FRAME_CONTINUATION:
 			ret = false;
+			printf("1-invalid opcode: 0x%x\r\n", opcode);
 			break;
 		default:
-			printf("invalid opcode: 0x%x\r\n", opcode);
+			printf("2-invalid opcode: 0x%x\r\n", opcode);
 			ret = false;
 			break;
 		}
 
 		if (ret == false)
+		{
+			printf("remove one, opcode: 0x%x\r\n", opcode);
+			remove(ss);
 			return false;
+		}
 	}
 
 	// XXX: NOT REACHED
@@ -147,10 +156,7 @@ bool http_servlet::doPing(acl::websocket& in, acl::websocket& out)
 	if (len == 0)
 	{
 		if (out.send_frame_pong((const void*) NULL, 0) == false)
-		{
-			remove(out.get_stream());
 			return false;
-		}
 		else
 			return true;
 	}
@@ -168,7 +174,6 @@ bool http_servlet::doPing(acl::websocket& in, acl::websocket& out)
 		if (ret < 0)
 		{
 			printf("read_frame_data error\r\n");
-			remove(out.get_stream());
 			return false;
 		}
 
@@ -177,7 +182,6 @@ bool http_servlet::doPing(acl::websocket& in, acl::websocket& out)
 		if (out.send_frame_data(buf, ret) == false)
 		{
 			printf("send_frame_data error\r\n");
-			remove(out.get_stream());
 			return false;
 		}
 	}
@@ -185,7 +189,7 @@ bool http_servlet::doPing(acl::websocket& in, acl::websocket& out)
 	return true;
 }
 
-bool http_servlet::doPong(acl::websocket& in, acl::websocket& out)
+bool http_servlet::doPong(acl::websocket& in, acl::websocket&)
 {
 	unsigned long long len = in.get_frame_payload_len();
 	if (len == 0)
@@ -200,7 +204,6 @@ bool http_servlet::doPong(acl::websocket& in, acl::websocket& out)
 		if (ret < 0)
 		{
 			printf("read_frame_data error\r\n");
-			remove(out.get_stream());
 			return false;
 		}
 
@@ -211,10 +214,8 @@ bool http_servlet::doPong(acl::websocket& in, acl::websocket& out)
 	return true;
 }
 
-bool http_servlet::doClose(acl::websocket&, acl::websocket& out)
+bool http_servlet::doClose(acl::websocket&, acl::websocket&)
 {
-	acl::socket_stream& conn = out.get_stream();
-	remove(conn);
 	return false;
 }
 
@@ -232,7 +233,6 @@ bool http_servlet::doMsg(acl::websocket& in, acl::websocket& out)
 		if (ret < 0)
 		{
 			printf("read_frame_data error\r\n");
-			remove(conn);
 			return false;
 		}
 
@@ -247,10 +247,7 @@ bool http_servlet::doMsg(acl::websocket& in, acl::websocket& out)
 		if (cmd.equal("login", false))
 		{
 			if (doLogin(conn, tokens) == false)
-			{
-				remove(conn);
 				return false;
-			}
 			else
 				return true;
 		}
@@ -261,10 +258,7 @@ bool http_servlet::doMsg(acl::websocket& in, acl::websocket& out)
 	if (cmd.equal("chat", false))
 	{
 		if (doChat(conn, tokens) == false)
-		{
-			remove(conn);
 			return false;
-		}
 		else
 			return true;
 	}
@@ -327,7 +321,7 @@ bool http_servlet::doLogin(acl::socket_stream& conn,
 	}
 
 	client = new chat_client(user, conn);
-	clients_.push_back(client);
+	__clients.push_back(client);
 	username_ = user;
 
 	printf("status: ok, cmd: login, user: %s\r\n", user.c_str());
@@ -336,8 +330,8 @@ bool http_servlet::doLogin(acl::socket_stream& conn,
 
 	acl::string buf("users");
 
-	for (std::vector<chat_client*>::iterator it = clients_.begin();
-		it != clients_.end(); ++it)
+	for (std::vector<chat_client*>::iterator it = __clients.begin();
+		it != __clients.end(); ++it)
 	{
 		client = *it;
 		buf << "|" << (*it)->get_name();
@@ -354,8 +348,8 @@ bool http_servlet::doLogin(acl::socket_stream& conn,
 
 void http_servlet::oneLogin(const acl::string& user)
 {
-	for (std::vector<chat_client*>::iterator it = clients_.begin();
-		it != clients_.end(); ++it)
+	for (std::vector<chat_client*>::iterator it = __clients.begin();
+		it != __clients.end(); ++it)
 	{
 		if (user.equal((*it)->get_name()))
 			continue;
@@ -376,8 +370,8 @@ void http_servlet::oneLogin(chat_client& client, const acl::string& user)
 
 void http_servlet::oneLogout(const acl::string& user)
 {
-	for (std::vector<chat_client*>::iterator it = clients_.begin();
-		it != clients_.end(); ++it)
+	for (std::vector<chat_client*>::iterator it = __clients.begin();
+		it != __clients.end(); ++it)
 	{
 		if (user.equal((*it)->get_name()))
 			continue;
@@ -419,8 +413,8 @@ bool http_servlet::doChat(acl::socket_stream& from_conn,
 
 	if (to_user.equal("all", false))
 	{
-		for (std::vector<chat_client*>::iterator it = clients_.begin();
-			it != clients_.end(); ++it)
+		for (std::vector<chat_client*>::iterator it = __clients.begin();
+			it != __clients.end(); ++it)
 		{
 			doChat(from->get_name(), **it, msg);
 		}
@@ -459,8 +453,8 @@ bool http_servlet::doChat(const acl::string& from_user,
 
 chat_client* http_servlet::find(const char* user)
 {
-	for (std::vector<chat_client*>::iterator it = clients_.begin();
-		it != clients_.end(); ++it)
+	for (std::vector<chat_client*>::iterator it = __clients.begin();
+		it != __clients.end(); ++it)
 	{
 		printf("user: %s, %s\r\n", user, (*it)->get_name().c_str());
 		if (*(*it) == user)
@@ -472,8 +466,8 @@ chat_client* http_servlet::find(const char* user)
 
 chat_client* http_servlet::find(acl::socket_stream& conn)
 {
-	for (std::vector<chat_client*>::iterator it = clients_.begin();
-		it != clients_.end(); ++it)
+	for (std::vector<chat_client*>::iterator it = __clients.begin();
+		it != __clients.end(); ++it)
 	{
 		acl::socket_stream* ss = &(*it)->get_conn();
 		if (ss == &conn)
@@ -486,14 +480,14 @@ chat_client* http_servlet::find(acl::socket_stream& conn)
 
 void http_servlet::remove(acl::socket_stream& conn)
 {
-	for (std::vector<chat_client*>::iterator it = clients_.begin();
-		it != clients_.end(); ++it)
+	for (std::vector<chat_client*>::iterator it = __clients.begin();
+		it != __clients.end(); ++it)
 	{
 		acl::socket_stream* ss = &(*it)->get_conn();
 		if (ss == &conn)
 		{
 			printf("removed: %s\r\n", (*it)->get_name().c_str());
-			clients_.erase(it);
+			__clients.erase(it);
 			return;
 		}
 	}
