@@ -251,6 +251,12 @@ bool http_servlet::doMsg(acl::websocket& in, acl::websocket& out)
 			else
 				return true;
 		}
+		else
+		{
+			printf("invalid cmd: %s, tbuf: %s\r\n",
+				cmd.c_str(), tbuf.c_str());
+			return doStatus(conn, "please login first!");
+		}
 	}
 
 	if (cmd.equal("login", false))
