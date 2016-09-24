@@ -4,6 +4,7 @@
 <script language="javascript" type="text/javascript">
   var wsUri = "ws://121.42.12.244:9001/";
   var ws = null;
+  var logined = false;
   var user_list = new Array();
 
   function OnConnect(user) {
@@ -27,6 +28,10 @@
 
   function onClose(evt) {
     setStatus("disconnected ...");
+    logined = false;
+    user_list = new Array();
+    ws = null;
+    displayUsers();
   }
 
   function onError(evt) {
@@ -71,8 +76,7 @@
     }
     var from = data.substr(0, del2);
     var msg = data.substring(del2 + 1);
-    data = output.innerHTML + "<font color='blue'>" + from
-	    + "> " + msg + "</front><br>";
+    data = output.innerHTML + "<font color='blue'>" + from + "> " + msg + "</front><br>";
     output.innerHTML = data;
     output.scrollTop = output.scrollHeight;
   }
@@ -108,6 +112,7 @@
   }
 
   function onLogin(user) {
+    logined = true;
     if (userExist(user))
       return;
     document.getElementById("users").innerHTML += user + "<br>";
@@ -121,11 +126,15 @@
 	break;
       }
     }
-
     displayUsers();
   }
 
   function doLogin(user) {
+    if (ws == null) {
+      alert("Please connect first!");
+      document.all.connect.focus();
+      return;
+    }
     var user = document.getElementById(user).value;
     if (user.length == 0) {
       alert("Please enter your name!");
@@ -137,21 +146,17 @@
   }
 
   function doSend(to, msgid) {
+    if (!logined) {
+      alert("Please login first!");
+      document.all.login.focus();
+      return;
+    }
     var to_user = document.getElementById(to).value;
     var msg = document.getElementById(msgid).value;
     if (msg.length == 0)
       return;
     message = "chat|" + msg + "|" + to_user;
     ws.send(message);
-
-    /*
-    var me = document.getElementById("user").value;
-    data = output.innerHTML + "<font color='green'>" + me + " to " + to_user
-           + "> " + msg + "</font><br>";
-    output.innerHTML = data;
-    output.scrollTop = output.scrollHeight;
-    */
-
     document.getElementById(msgid).value = "";
   }
 
@@ -161,8 +166,7 @@
 
   function setStatus(message) {
     node = document.getElementById("status");
-    node.innerHTML = '<font style="color: blue; height: 10px;">'
-	    +  message + '</font>';
+    node.innerHTML = '<font style="color: blue; height: 10px;">' +  message + '</font>';
   }
  
 </script>
@@ -173,11 +177,11 @@
     <legend>WebSocket Chat</legend>
     <p><span>Server url:</span>
       <input id="url" type="text"  value="ws://121.42.12.244:9001/" />
-      <input type="button" value="Connect" onclick="OnConnect('user');" />
+      <input type="button" id="connect" value="connect" onclick="OnConnect('user');" />
     </p>
     <p>
       me: <input id="user" type="text" value="" />
-      <input type="button" value="login" onclick="doLogin('user');" />
+      <input type="button" id="login" value="login" onclick="doLogin('user');" />
     </p>
     <p>
       to: &nbsp;&nbsp;<input id="to_user" type="text" value="all" />
