@@ -12,7 +12,6 @@
 
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
-#include <string>
 
 namespace acl
 {
@@ -51,7 +50,7 @@ struct frame_header
 	unsigned int masking_key;
 };
 
-class websocket
+class ACL_CPP_API websocket
 {
 public:
 	websocket(socket_stream& client);
