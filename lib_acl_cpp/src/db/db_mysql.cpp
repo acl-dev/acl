@@ -533,8 +533,9 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 		*dummy = 1;
 		acl_assert(!acl_pthread_setspecific(__thread_key, dummy));
 
-		if (__mysql_thread_init != NULL)
-			__mysql_thread_init();
+		// 调用下面函数可能会造成内存越界
+		//if (__mysql_thread_init != NULL)
+		//	__mysql_thread_init();
 
 		if ((unsigned long) acl_pthread_self()
 			== acl_main_thread_self())

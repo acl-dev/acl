@@ -11,6 +11,8 @@ typedef struct {
 	ACL_RING    ev_timer;
 	int         nsleeping;
 	int         io_stop;
+	void      (*loop_fn)(void *);
+	void       *loop_ctx;
 } FIBER_TLS;
 
 static FIBER_TLS *__main_fiber = NULL;
@@ -129,6 +131,13 @@ void fiber_io_close(int fd)
 		event_del(__thread_fiber->event, fd, EVENT_ERROR);
 }
 
+void acl_fiber_post_event(void (*loop_fn)(void *), void *ctx)
+{
+	fiber_io_check();
+	__thread_fiber->loop_fn = loop_fn;
+	__thread_fiber->loop_ctx = ctx;
+}
+
 static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 {
 	EVENT *ev = (EVENT *) ctx;
@@ -156,6 +165,9 @@ static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 
 		/* add 1 just for the deviation of epoll_wait */
 		event_process(ev, left > 0 ? left + 1 : left);
+
+		if (__thread_fiber->loop_fn != NULL)
+			__thread_fiber->loop_fn(__thread_fiber->loop_ctx);
 
 		if (__thread_fiber->io_stop) {
 			if (__thread_fiber->io_count > 0)

@@ -449,7 +449,13 @@ bool http_servlet::doChat(const acl::string& from_user,
 		.set_frame_opcode(acl::FRAME_TEXT)
 		.set_frame_payload_len(buf.size());
 
-	(void) out.send_frame_data(buf.c_str(), buf.size());
+	if (out.send_frame_data(buf.c_str(), buf.size()) == false)
+	{
+		printf("----close socket: %d----\r\n",
+			to_client.get_conn().sock_handle());
+		shutdown(to_client.get_conn().sock_handle(), SHUT_RDWR);
+		//close(to_client.get_conn().sock_handle());
+	}
 
 	printf("status: ok, cmd: chat, msg: %s, to_user: %s\r\n",
 		msg.c_str(), to_client.get_name().c_str());

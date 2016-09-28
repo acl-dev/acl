@@ -1,3 +1,7 @@
+26) 2016.9.25
+26.1) feature: 增加 acl_fiber_post_event 函数，在每次事件循环过程中可以调用由
+该函数设置的回调函数
+
 25) 2016.9.22
 25.1) 函数改名： acl_fiber_stop --> acl_fiber_schedule_stop,
 acl::fiber::stop --> acl::fiber::schedule_stop

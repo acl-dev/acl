@@ -78,6 +78,13 @@ void acl_fiber_ready(ACL_FIBER *fiber);
 void acl_fiber_switch(void);
 
 /**
+ * 设置函数指针，被协程调度过程循环调用
+ * @param loop_fn {void (*)(void*)} 非空时，在事件处理过程会循环调用此函
+ * @param ctx {void*} fn 的回调参数
+ */
+void acl_fiber_post_event(void (*loop_fn)(void *), void *ctx);
+
+/**
  * 调用本函数启动协程的调度过程
  */
 void acl_fiber_schedule(void);
