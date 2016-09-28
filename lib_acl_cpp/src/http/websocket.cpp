@@ -5,6 +5,10 @@
 #include "acl_cpp/http/websocket.hpp"
 #endif
 
+#if defined(_WIN32) || defined(_WIN64)
+#pragma comment(lib, "ws2_32.lib")
+#endif
+
 namespace acl
 {
 
