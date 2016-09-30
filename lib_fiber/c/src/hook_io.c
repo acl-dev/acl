@@ -657,7 +657,7 @@ ssize_t write(int fd, const void *buf, size_t count)
 
 ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
 {
-	return writev(fd, iov, iovcnt);
+	return fiber_writev(fd, iov, iovcnt);
 }
 
 ssize_t send(int sockfd, const void *buf, size_t len, int flags)

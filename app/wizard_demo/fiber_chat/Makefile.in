@@ -1,8 +1,8 @@
 CC      = g++
 
 CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
--Waggregate-return -Wno-long-long \
--Wpointer-arith -Werror -Wshadow -O3 \
+-Wno-long-long \
+-Wpointer-arith -Werror -Wshadow \
 -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO
 
 ###########################################################

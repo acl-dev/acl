@@ -79,9 +79,9 @@ void fiber::schedule(void)
 	acl_fiber_schedule();
 }
 
-void fiber::stop(void)
+void fiber::schedule_stop(void)
 {
-	acl_fiber_stop();
+	acl_fiber_schedule_stop();
 }
 
 } // namespace acl

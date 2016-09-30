@@ -67,7 +67,7 @@ static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	printf("max_fibers: %d, left: %d\r\n", __max_fibers, __left_fibers);
 
 	if (__left_fibers == 0)
-		acl_fiber_stop();
+		acl_fiber_schedule_stop();
 }
 
 static void create_fibers(void)

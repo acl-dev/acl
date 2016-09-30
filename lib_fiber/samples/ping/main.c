@@ -54,7 +54,7 @@ static void fiber_ping(ACL_FIBER *fiber acl_unused, void *arg)
 	icmp_chat_free(chat);  /*  Õ∑≈ ICMP ∂‘œÛ */
 
 	if (--__nfibers == 0)
-		acl_fiber_stop();
+		acl_fiber_schedule_stop();
 }
 
 static void usage(const char* progname)

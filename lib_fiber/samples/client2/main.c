@@ -108,7 +108,7 @@ static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 			__total_count, spent,
 			(__total_count * 1000) / (spent > 0 ? spent : 1));
 
-		acl_fiber_stop();
+		acl_fiber_schedule_stop();
 	}
 }
 

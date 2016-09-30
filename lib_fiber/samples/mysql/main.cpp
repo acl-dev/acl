@@ -172,7 +172,7 @@ protected:
 		if (--__cur_fibers == 0)
 		{
 			printf("All fibers Over\r\n");
-			acl::fiber::stop();
+			acl::fiber::schedule_stop();
 		}
 	}
 

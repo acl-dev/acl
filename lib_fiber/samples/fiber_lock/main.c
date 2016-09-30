@@ -22,7 +22,7 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx)
 
 	if (--__fibers_count == 0) {
 		printf("--- All fibers Over ----\r\n");
-		acl_fiber_stop();
+		acl_fiber_schedule_stop();
 	}
 }
 

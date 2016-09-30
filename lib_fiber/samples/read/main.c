@@ -29,7 +29,7 @@ static void fiber_io(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	} else
 		printf("read error: %s\r\n", acl_last_serror());
 
-	acl_fiber_io_stop();
+	acl_fiber_schedule_stop();
 }
 
 int main(void)

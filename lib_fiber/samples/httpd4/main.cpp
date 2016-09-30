@@ -130,7 +130,7 @@ static void fiber_event(ACL_FIBER *fiber acl_unused, void *ctx)
 	acl_vstream_close(sstream);
 	acl_event_free(event);
 
-	acl_fiber_stop();
+	acl_fiber_schedule_stop();
 }
 
 static void usage(const char *procname)

@@ -184,7 +184,7 @@ protected:
 				__fibers_max, __total, spent,
 				(__total * 1000) / (spent > 0 ? spent : 1));
 
-			acl::fiber::stop();
+			acl::fiber::schedule_stop();
 		}
 	}
 
