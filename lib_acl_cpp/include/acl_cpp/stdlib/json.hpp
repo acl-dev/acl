@@ -320,7 +320,12 @@ public:
 	 */
 	json_node* next_child(void);
 
-	const char* operator[] (const char* tag);
+	/**
+	 * 从当前 json 节点的子节点中提取对应标签的 json 子节点
+	 * @param tag {const char*} json 子节点的标签名
+	 * @return {json_node*} 返回 NULL 表示不存在
+	 */
+	json_node* operator[] (const char* tag);
 
 	/**
 	 * 返回该 json 节点在整个 json 树中的深度
