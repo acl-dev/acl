@@ -71,7 +71,7 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-CFLAGS += -I../../lib_acl/include -I../../lib_protocol/include -I../../lib_acl_cpp/include
+CFLAGS += -I./include -I../../lib_acl/include -I../../lib_protocol/include -I../../lib_acl_cpp/include
 EXTLIBS =
 LDFLAGS = -L../../lib_acl_cpp/lib -l_acl_cpp -L../../lib_protocol/lib -l_protocol -L../../lib_acl/lib -l_acl \
 	$(EXTLIBS) $(SYSLIB)
@@ -79,13 +79,14 @@ LDFLAGS = -L../../lib_acl_cpp/lib -l_acl_cpp -L../../lib_protocol/lib -l_protoco
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)
 ###########################################################
-OBJ_PATH = .
+OBJ_PATH = ./debug
+$(shell mkdir -p $(OBJ_PATH))
 
 #Project's objs
-SRC = $(wildcard *.cpp)
+SRC = $(wildcard src/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 
-$(OBJ_PATH)/%.o: %.cpp
+$(OBJ_PATH)/%.o: src/%.cpp
 	$(COMPILE) $< -o $@
 
 .PHONY = all clean

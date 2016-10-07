@@ -11,6 +11,8 @@ CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 SYSLIB = -lpthread -lz
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
+OSTYPE = $(shell uname -p)
+RPATH = linux64
 
 ifeq ($(CC),)
         CC = gcc
@@ -22,7 +24,8 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DFREEBSD -D_REENTRANT
-	SYSLIB = -lcrypt -lpthread
+	SYSLIB = -lcrypt -lpthread -lz
+	RPATH = freebsd
 endif
 
 # For Darwin
@@ -37,6 +40,12 @@ endif
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	ifeq ($CC, "gcc")
 		CFLAGS += -Wstrict-prototypes
+	endif
+	ifeq ($(findstring i686, $(OSTYPE)), i686)
+		RPATH = linux32
+	endif
+	ifeq ($(findstring x86_64, $(OSTYPE)), x86_64)
+		RPATH = linux64
 	endif
 	CFLAGS += -DLINUX2 -D_REENTRANT
 	SYSLIB += -lcrypt
@@ -54,6 +63,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DSUNOS5 -D_REENTRANT
+	RPATH = sunos_x86
 endif
 
 #Path for HP-UX
@@ -71,9 +81,9 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-CFLAGS += -I../../lib_acl/include -I../../lib_protocol/include -I../../lib_acl_cpp/include
+CFLAGS += -I../../../lib_acl/include -I../../../lib_protocol/include -I../../../lib_acl_cpp/include
 EXTLIBS =
-LDFLAGS = -L../../lib_acl_cpp/lib -l_acl_cpp -L../../lib_protocol/lib -l_protocol -L../../lib_acl/lib -l_acl \
+LDFLAGS = -L../../../lib_acl_cpp/lib -l_acl_cpp -L../../../lib_protocol/lib -l_protocol -L../../../lib_acl/lib -l_acl \
 	$(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
@@ -99,5 +109,7 @@ RM:
 clean:
 	rm -f $(PROG)
 	rm -f $(OBJ)
-rebuild rb: clean all
+install:
+	cp $(PROG) ../../../dist/master/libexec/$(RPATH)/
+	cp $(PROG).cf ../../../dist/master/conf/service/
 ###########################################################

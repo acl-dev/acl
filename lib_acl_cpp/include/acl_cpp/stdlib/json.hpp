@@ -320,7 +320,8 @@ public:
 	 */
 	json_node* next_child(void);
 
-	const char* operator[] (const char* tag);
+	//const char *operator[] (const char* tag);
+	json_node* operator[] (const char* tag);
 
 	/**
 	 * 返回该 json 节点在整个 json 树中的深度

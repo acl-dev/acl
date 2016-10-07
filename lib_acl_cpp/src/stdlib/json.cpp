@@ -184,7 +184,7 @@ bool json_node::set_text(const char* text)
 {
 	if (text == NULL || *text == 0)
 		return false;
-	if (!(node_me_->type & ACL_JSON_T_LEAF) || node_me_->text == NULL)
+	if (node_me_->type != ACL_JSON_T_LEAF || node_me_->text == NULL)
 		return false;
 	acl_vstring_strcpy(node_me_->text, text);
 	return true;
@@ -349,14 +349,14 @@ json_node* json_node::next_child(void)
 	return child;
 }
 
-const char* json_node::operator[](const char* tag)
+json_node* json_node::operator[](const char* tag)
 {
 	json_node* iter = first_child();
 	while (iter)
 	{
 		const char* ptr = iter->tag_name();
 		if (ptr != NULL && strcasecmp(ptr, tag) == 0)
-			return iter->get_text();
+			return iter;
 		iter = next_child();
 	}
 
