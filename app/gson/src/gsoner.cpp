@@ -1,26 +1,12 @@
 #include "stdafx.h"
 #include "gsoner.h"
-#include <assert.h>
-#include <iostream>
-#include <algorithm>
-#include <fstream>
+
 
 namespace acl
 {
 namespace gson
 {
-#if 0
-#define GSON_EXCEPTION(E) \
-	struct E##:std::exception \
-	{ \
-		E() {} \
-		E(const char *msg):exception(msg){} \
-	};
 
-GSON_EXCEPTION(syntax_error);
-GSON_EXCEPTION(unsupported_type);
-GSON_EXCEPTION(parent_level_error);
-#else
 
 struct syntax_error : std::exception
 {
@@ -39,8 +25,6 @@ struct parent_level_error : std::exception
 	parent_level_error() {}
 	parent_level_error(const char*) : exception() {}
 };
-
-#endif
 
 gsoner::field_t::field_t(type_t t, const std::string &name, bool required)
 :type_(t)
@@ -95,6 +79,8 @@ gsoner::gsoner()
 	gen_header_filename_ = "gson.h";
 	gen_source_filename_ = "gson.cpp";
 	default_delimiters_ = "\\\r\n\t ";
+	pos_ = 0;
+	tab_ = "    ";
 }
 
 gsoner::parent_obj_t::level_t gsoner::get_level(std::string str)
@@ -814,7 +800,8 @@ bool gsoner::check_member()
 			{
 				if(token.size())
 				{
-					if(token.back() == ':')
+					//back
+					if(token[token.size() -1] == ':')
 					{
 						tokens.push_back("::");
 						token.clear();
@@ -1134,7 +1121,7 @@ void gsoner::parse_code()
 
 	catch(std::exception & e)
 	{
-		printf(e.what());
+		std::cout << e.what() << std::endl << std::endl;
 		return;
 	}
 }

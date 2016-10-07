@@ -123,13 +123,13 @@ private:
 	bool check_define();
 	bool check_pragma();
 	char cc;
-	int pos_ = 0;
+	int pos_;
 	int max_pos_;
 	std::string comment_begin_;
 	std::string comment_end_;
 	std::string codes_;
 	code_parser_status_t status_;
-	std::string tab_ = "    ";
+	std::string tab_ ;
 	bool required_;
 	bool default_;
 	object_t current_obj_;
