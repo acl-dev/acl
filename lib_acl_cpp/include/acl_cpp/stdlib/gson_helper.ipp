@@ -3,7 +3,6 @@
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/json.hpp"
 #include "acl_cpp/stdlib/string.hpp"
-#include "gson.h"
 
 namespace acl
 {
