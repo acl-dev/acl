@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "gsoner.h"
+#include <iostream>
 
 static void create_files(const std::vector<std::string>& files)
 {
@@ -39,9 +40,8 @@ static bool copy_file(const char* from, const char* to)
 static bool copy_files(const char* to_path)
 {
 	const char* files[] = {
-		"./src/gsoner.cpp",
-		"./include/gsoner.h",
-		"gson_helper.ipp",
+		"gson.cpp",
+		"gson.h",
 		NULL,
 	};
 
@@ -100,7 +100,7 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	std::vector<std::string> files;
-	acl::string path;
+	std::string path;
 	int  ch;
 
 	while ((ch = getopt(argc, argv, "hf:d:")) > 0)
@@ -154,8 +154,17 @@ int main(int argc, char* argv[])
 		printf("chdir to %s error %s\r\n", buf, acl::last_serror());
 		return 1;
 	}
-
-	copy_files(path.empty() ? "." : path.c_str());
-
+	if(path.empty())
+	{
+		path = files.front();
+		std::size_t pos = path.find_last_of('/');
+		if (pos == std::string::npos)
+			pos = path.find_last_of('\\');
+		if (pos == std::string::npos)
+			return 0;
+		path = path.substr(0, pos);
+		if(path.empty() == false)
+			copy_files(path.c_str());
+	}
 	return 0;
 }
