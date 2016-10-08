@@ -6,7 +6,6 @@
 #include <iostream>
 #include "struct.h"
 #include "gson.h"
-#include "gsoner.h"
 
 void test_base()
 {
@@ -44,7 +43,7 @@ void test_base()
 	obj.bases_ptr_list_ptr->push_back(new base(b));
 
 	acl::json json;
-	acl::json_node &node = acl::gson::gson(json, obj);
+	acl::json_node &node = acl::gson(json, obj);
 	printf("%s\n", node.to_string().c_str());
 
 
@@ -52,24 +51,24 @@ void test_base()
 	acl::json json2;
 	json2.update(node.to_string().c_str());
 	printf("%s\n",json2.to_string().c_str());
-	std::pair<bool,std::string> ret = acl::gson::gson(json2.get_root(), obj2);
+	std::pair<bool,std::string> ret = acl::gson(json2.get_root(), obj2);
 	if(ret.first == false)
 		printf("%s\n",ret.second.c_str());
 
 	acl::json json3;
-	acl::json_node &node3 = acl::gson::gson(json3, obj);
+	acl::json_node &node3 = acl::gson(json3, obj);
 	printf("%s\n", node3.to_string().c_str());
 }
 void test02()
 {
-	acl::gson::gsoner gr;
+	acl::gsoner gr;
 	gr.read_file("struct2.h");
 	gr.parse_code();
 }
 
 void test04()
 {
-	acl::gson::gsoner gr;
+	acl::gsoner gr;
 
 	gr.read_multi_file({"struct.h" });
 	gr.parse_code();

@@ -1,12 +1,11 @@
 #include "stdafx.h"
 #include <vector>
 #include <string>
-#include "gsoner.h"
 #include <iostream>
 
 static void create_files(const std::vector<std::string>& files)
 {
-	acl::gson::gsoner gr;
+	acl::gsoner gr;
 	gr.read_multi_file(files);
 	gr.parse_code();
 	gr.gen_gson();

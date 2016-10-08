@@ -235,6 +235,9 @@
     <ClCompile Include="src\db\db_service_sqlite.cpp">
       <Filter>Source Files\db</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\gsoner.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
     <ClCompile Include="src\stdlib\json.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
@@ -736,6 +739,9 @@
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\final_tpl.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\gsoner.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\json.hpp">
