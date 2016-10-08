@@ -116,11 +116,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\gsoner.h" />
     <ClInclude Include="include\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\gsoner.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
   </ItemGroup>

@@ -523,6 +523,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include="src\stdlib\dns_service.cpp" />
     <ClCompile Include="src\stdlib\escape.cpp" />
     <ClCompile Include="src\stdlib\internal\win_iconv.cpp" />
+    <ClCompile Include="src\stdlib\gsoner.cpp" />
     <ClCompile Include="src\stdlib\json.cpp" />
     <ClCompile Include="src\stdlib\locker.cpp" />
     <ClCompile Include="src\stdlib\log.cpp" />
@@ -685,6 +686,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stdlib\dns_service.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\escape.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\final_tpl.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\gsoner.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\json.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\locker.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\log.hpp" />
