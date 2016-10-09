@@ -114,7 +114,7 @@ private:
 	std::string get_static_string();
 	std::string get_include_files();
 
-	void skip_space_comment();
+	bool skip_space_comment();
 
 	bool check_namespace();
 	bool check_namespace_end();
@@ -124,7 +124,7 @@ private:
 	bool check_comment ();
 	bool check_function();
 	bool check_member();
-	void skip_space ();
+	bool skip_space ();
 	std::pair<bool, std::string> get_function_declare();
 
 	std::string add_4space(const std::string &code);
@@ -134,6 +134,7 @@ private:
 
 	bool check_define();
 	bool check_pragma();
+	std::list<std::string> get_initializelist ();
 	char cc;
 	int pos_;
 	int max_pos_;

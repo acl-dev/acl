@@ -493,18 +493,24 @@ bool gsoner::check_struct_end()
 	return false;
 }
 
-void gsoner::skip_space_comment()
+bool gsoner::skip_space_comment()
 {
+	bool result = false;
 again:
-	skip_space();
+	if (skip_space ())
+		result = true;
 	char ch = codes_[pos_];
 	if(ch == '/')
 	{
-		if(check_comment())
+		if (check_comment ())
+		{
+			result = true;
 			goto again;
+		}
 		else
 			throw syntax_error();
 	}
+	return result;
 }
 
 bool gsoner::check_include()
@@ -613,8 +619,9 @@ std::string gsoner::get_static_string()
 	return lines;
 }
 
-void gsoner::skip_space()
+bool gsoner::skip_space()
 {
+	bool result = false;
 	while(codes_[pos_] == ' ' ||
 		codes_[pos_] == '\r' ||
 		codes_[pos_] == '\n' ||
@@ -622,7 +629,9 @@ void gsoner::skip_space()
 		codes_[pos_] == '\\')
 	{
 		pos_++;
+		result = true;
 	}
+	return result;
 }
 
 std::pair<bool, std::string> gsoner::get_function_declare()
@@ -682,7 +691,82 @@ std::pair<bool, std::string> gsoner::get_function_declare()
 	pos_ = j;
 	return std::make_pair(true, lines);
 }
+std::list<std::string> gsoner::get_initializelist ()
+{
+	std::list<std::string> initialize_list;
+	std::list<char> syms;
+	std::string line;
+	if (codes_[pos_] != ':')
+		return initialize_list;
+	pos_++;//skip ':'
 
+	while (true)
+	{
+		skip_space_comment ();
+		if (codes_[pos_] == '(')
+		{
+			syms.push_back ('(');
+		}
+		else if (codes_[pos_] == ')')
+		{
+			line.push_back (')');
+			pos_++;
+			if (syms.size () && syms.back () == '(')
+			{
+				syms.pop_back ();
+				if (syms.empty ())
+				{
+					initialize_list.push_back (line);
+					line.clear ();
+					while (codes_[pos_] != ',' && codes_[pos_] != '{')
+					{
+						if (skip_space_comment () == false)
+							pos_++;
+					}
+					if (codes_[pos_] == ',')
+						pos_++;
+				}
+			}
+			else
+				throw syntax_error ();
+			continue;
+		}
+		else if (codes_[pos_] == '{')
+		{
+			if (line.empty())
+				break;
+			syms.push_back ('{');
+
+		}else if (codes_[pos_] == '}')
+		{
+			line.push_back ('}');
+			pos_++;
+			if (syms.size () && syms.back () == '{')
+			{
+				syms.pop_back ();
+				if (syms.empty ())
+				{
+					initialize_list.push_back (line);
+					line.clear ();
+					while (codes_[pos_] != ',' && codes_[pos_] != '{')
+					{
+						if (skip_space_comment () == false)
+							pos_++;
+					}
+					if (codes_[pos_] == ',')
+						pos_++;
+				}
+			}
+			else
+				throw syntax_error ();
+			continue;
+		}
+		line.push_back (codes_[pos_]);
+		pos_++;
+	}
+
+	return initialize_list;
+}
 bool gsoner::check_function()
 {
 	if(status_ != e_struct_begin)
@@ -696,6 +780,13 @@ bool gsoner::check_function()
 	{
 		pos_++;//skip ';' sym
 		return true;
+	}
+	if (codes_[pos_] == ':')
+	{
+		std::list<std::string> initializelist = get_initializelist ();
+		if (initializelist.empty ())
+			throw syntax_error ();
+		//what to do with this code.
 	}
 	pos_++;
 	int sym = 1;
@@ -1329,6 +1420,8 @@ bool gsoner::check_pragma()
 	}
 	return false;
 }
+
+
 
 } // namespace acl
 
