@@ -784,6 +784,8 @@ bool gsoner::check_function()
 	if (codes_[pos_] == ':')
 	{
 		std::list<std::string> initializelist = get_initializelist ();
+		if (initializelist.empty ())
+			throw syntax_error ();
 		//what to do with this code.
 	}
 	pos_++;
