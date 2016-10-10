@@ -256,6 +256,15 @@ public:
 		bool return_child = false);
 
 	/**
+	 * 创建一个 null 类型的 json 节点对象，并将之添加为本 json 节点的子节点
+	 * @param tag {const char*} 标签名
+	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
+	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
+	 *  否则返回本 json 节点对象的引用
+	 */
+	json_node& add_null(const char* tag, bool return_child = false);
+
+	/**
 	 * 创建一个 json 字符串对象，并将之添加为本 json 节点的子节点
 	 * @param text {const char*} 文本字符串
 	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
@@ -297,6 +306,14 @@ public:
 	 *  否则返回本 json 节点对象的引用
 	 */
 	json_node& add_array_bool(bool value, bool return_child = false);
+
+	/**
+	 * 创建一个 json null 对象，并将之添加为本 json 节点的子节点
+	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
+	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
+	 *  否则返回本 json 节点对象的引用
+	 */
+	json_node& add_array_null(bool return_child = false);
 
 	/**
 	 * @return {json_node&} 返回本节点的父节点引用，在采用级联方式创建 json
@@ -586,6 +603,16 @@ public:
 	json_node& create_node(const char* tag, bool value);
 
 	/**
+	 * 创建一个 json_node null 叶节点对象，该节点对象的格式为：
+	 * "tag_name": null
+	 * @param tag {const char*} 标签名
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
+	 *  不用时调用 reset 来释放这些 json_node 节点对象
+	 */
+	json_node& create_null(const char* tag);
+
+	/**
 	 * 创建一个 json_node 叶节点字符串对象，该节点对象的格式为："string"
 	 * 按 json 规范，该节点只能加入至数组对象中
 	 * @param text {const char*} 文本字符串
@@ -628,6 +655,15 @@ public:
 	 * 不用时调用 reset 来释放这些 json_node 节点对象
 	 */
 	json_node& create_array_bool(bool value);
+
+	/**
+	 * 创建一个 json_node 叶节点 null 对象
+	 * 按 json 规范，该节点只能加入至数组对象中
+	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
+	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
+	 * 不用时调用 reset 来释放这些 json_node 节点对象
+	 */
+	json_node& create_array_null(void);
 
 	/**
 	 * 创建一个 json_node 节点容器对象，该对象没有标签,

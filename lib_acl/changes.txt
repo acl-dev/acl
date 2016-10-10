@@ -1,5 +1,9 @@
 修改历史列表：
 
+563) 2016.10.10
+563.1) feature: acl_json_util.c 增加 acl_json_create_null 及
+acl_json_create_array_null 用于创建 null 类型的节点
+
 562) 2016.9.7
 562.1) bugfix: acl_vstream.c 中 acl_vstream_gets/acl_vstream_gets_nonl
 /acl_vstream_readtags/acl_vstream_gets_peek/acl_vstream_gets_nonl_peek

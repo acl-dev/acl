@@ -125,6 +125,16 @@ ACL_JSON_NODE *acl_json_create_bool(ACL_JSON *json,
 	return (node);
 }
 
+ACL_JSON_NODE *acl_json_create_null(ACL_JSON *json, const char *name)
+{
+	ACL_JSON_NODE *node = acl_json_node_alloc(json);
+
+	acl_vstring_strcpy(node->ltag, name);
+	acl_vstring_strcpy(node->text, "null");
+	node->type = ACL_JSON_T_NULL;
+	return (node);
+}
+
 ACL_JSON_NODE *acl_json_create_int64(ACL_JSON *json,
 	const char *name, acl_int64 value)
 {
@@ -156,11 +166,6 @@ ACL_JSON_NODE *acl_json_create_array_text(ACL_JSON *json, const char *text)
 	return (node);
 }
 
-ACL_JSON_NODE *acl_json_create_string(ACL_JSON *json, const char *text)
-{
-	return acl_json_create_array_text(json, text);
-}
-
 ACL_JSON_NODE *acl_json_create_array_int64(ACL_JSON *json, acl_int64 value)
 {
 	ACL_JSON_NODE *node = acl_json_node_alloc(json);
@@ -185,6 +190,15 @@ ACL_JSON_NODE *acl_json_create_array_bool(ACL_JSON *json, int value)
 
 	acl_vstring_strcpy(node->text, value ? "true" : "false");
 	node->type = ACL_JSON_T_A_BOOL;
+	return (node);
+}
+
+ACL_JSON_NODE *acl_json_create_array_null(ACL_JSON *json)
+{
+	ACL_JSON_NODE *node = acl_json_node_alloc(json);
+
+	acl_vstring_strcpy(node->text, "null");
+	node->type = ACL_JSON_T_A_NULL;
 	return (node);
 }
 
