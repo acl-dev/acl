@@ -211,7 +211,7 @@ static void test_json_data(const char* data)
 static void test_json_build(void)
 {
 	ACL_JSON* json = acl_json_alloc();
-	ACL_JSON_NODE* root, *node1, *node2, *node3;
+	ACL_JSON_NODE* root, *node1, *node2, *node3, *node4, *node5;
 
 	root  = acl_json_create_obj(json);
 	acl_json_node_append_child(json->root, root);
@@ -222,13 +222,19 @@ static void test_json_build(void)
 	node1 = acl_json_create_leaf(json, "name2", "value2");
 	acl_json_node_append_child(root, node1);
 
+	node4 = acl_json_create_bool(json, "VAR_BOOL", 1);
+	acl_json_node_append_child(root, node4);
+
+	node5 = acl_json_create_null(json, "VAR_NULL");
+	acl_json_node_append_child(root, node5);
+
 	node1 = acl_json_create_obj(json);
 	node2 = acl_json_create_leaf(json, "name3", "value3");
 	acl_json_node_append_child(node1, node2);
 	node2 = acl_json_create_node(json, "name4", node1);
 	acl_json_node_append_child(root, node2);
 
-	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
 
 	node1 = acl_json_create_array(json);
 	node2 = acl_json_create_node(json, "name5", node1);
@@ -247,9 +253,17 @@ static void test_json_build(void)
 	node2 = acl_json_create_leaf(json, "name9", "value9");
 	acl_json_node_append_child(node3, node2);
 
-	//////////////////////////////////////////////////////////////////////////
+	node4 = acl_json_create_array_null(json);
+	acl_json_node_append_child(node1, node4);
+
+	node5 = acl_json_create_array_bool(json, 1);
+	acl_json_node_append_child(node1, node5);
+
+	//////////////////////////////////////////////////////////////////////
 
 	ACL_VSTRING* buf = acl_json_build(json, NULL);
+
+	printf("--------------- after build --------------------------\r\n");
 	printf("%s\r\n", acl_vstring_str(buf));
 	acl_vstring_free(buf);
 
