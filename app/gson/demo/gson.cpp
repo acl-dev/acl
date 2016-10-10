@@ -1,0 +1,210 @@
+#include "stdafx.h"
+#include "gson.h"
+#include "acl_cpp/stdlib/gson_helper.ipp"
+namespace acl
+{
+    acl::json_node& gson (acl::json & json, const base &obj)
+    {
+        acl::json_node &node =  json.create_node();
+        node.add_text("string", acl::get_value(obj.string));
+        node.add_text("string_ptr", acl::get_value(obj.string_ptr));
+        node.add_number("a", acl::get_value(obj.a));
+        node.add_number("a_ptr", acl::get_value(obj.a_ptr));
+        node.add_number("b", acl::get_value(obj.b));
+        node.add_number("b_ptr", acl::get_value(obj.b_ptr));
+        node.add_number("c", acl::get_value(obj.c));
+        node.add_number("c_ptr", acl::get_value(obj.c_ptr));
+        node.add_number("d", acl::get_value(obj.d));
+        node.add_number("d_ptr", acl::get_value(obj.d_ptr));
+        node.add_number("e", acl::get_value(obj.e));
+        node.add_number("e_ptr", acl::get_value(obj.e_ptr));
+        node.add_number("f", acl::get_value(obj.f));
+        node.add_number("f_ptr", acl::get_value(obj.f_ptr));
+        node.add_number("g", acl::get_value(obj.g));
+        node.add_number("g_ptr", acl::get_value(obj.g_ptr));
+        node.add_text("acl_string", acl::get_value(obj.acl_string));
+        node.add_text("acl_string_ptr", acl::get_value(obj.acl_string_ptr));
+        node.add_double("h", acl::get_value(obj.h));
+        node.add_double("h_ptr", acl::get_value(obj.h_ptr));
+        node.add_double("i", acl::get_value(obj.i));
+        node.add_double("i_ptr", acl::get_value(obj.i_ptr));
+
+        return node;
+    }
+    acl::json_node& gson (acl::json & json, const base*obj)
+    {
+        return gson (json, *obj);
+    }
+
+
+    acl::string gson(const base &obj)
+    {
+        acl::json json;
+        acl::json_node &node = acl::gson (json, obj);
+        return node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &node, base &obj)
+    {
+        acl::json_node *string = node["string"];
+        acl::json_node *string_ptr = node["string_ptr"];
+        acl::json_node *a = node["a"];
+        acl::json_node *a_ptr = node["a_ptr"];
+        acl::json_node *b = node["b"];
+        acl::json_node *b_ptr = node["b_ptr"];
+        acl::json_node *c = node["c"];
+        acl::json_node *c_ptr = node["c_ptr"];
+        acl::json_node *d = node["d"];
+        acl::json_node *d_ptr = node["d_ptr"];
+        acl::json_node *e = node["e"];
+        acl::json_node *e_ptr = node["e_ptr"];
+        acl::json_node *f = node["f"];
+        acl::json_node *f_ptr = node["f_ptr"];
+        acl::json_node *g = node["g"];
+        acl::json_node *g_ptr = node["g_ptr"];
+        acl::json_node *acl_string = node["acl_string"];
+        acl::json_node *acl_string_ptr = node["acl_string_ptr"];
+        acl::json_node *h = node["h"];
+        acl::json_node *h_ptr = node["h_ptr"];
+        acl::json_node *i = node["i"];
+        acl::json_node *i_ptr = node["i_ptr"];
+        std::pair<bool, std::string> result;
+
+        if(string)
+            gson(*string,&obj.string);
+
+     
+        if(!string_ptr ||!(result = gson(*string_ptr,&obj.string_ptr), result.first))
+            return std::make_pair(false,"required [base.string_ptr] failed:{"+result.second+"}");
+     
+        if(!a ||!(result = gson(*a,&obj.a), result.first))
+            return std::make_pair(false,"required [base.a] failed:{"+result.second+"}");
+     
+        if(!a_ptr ||!(result = gson(*a_ptr,&obj.a_ptr), result.first))
+            return std::make_pair(false,"required [base.a_ptr] failed:{"+result.second+"}");
+     
+        if(!b ||!(result = gson(*b,&obj.b), result.first))
+            return std::make_pair(false,"required [base.b] failed:{"+result.second+"}");
+     
+        if(!b_ptr ||!(result = gson(*b_ptr,&obj.b_ptr), result.first))
+            return std::make_pair(false,"required [base.b_ptr] failed:{"+result.second+"}");
+     
+        if(!c ||!(result = gson(*c,&obj.c), result.first))
+            return std::make_pair(false,"required [base.c] failed:{"+result.second+"}");
+     
+        if(!c_ptr ||!(result = gson(*c_ptr,&obj.c_ptr), result.first))
+            return std::make_pair(false,"required [base.c_ptr] failed:{"+result.second+"}");
+     
+        if(!d ||!(result = gson(*d,&obj.d), result.first))
+            return std::make_pair(false,"required [base.d] failed:{"+result.second+"}");
+     
+        if(!d_ptr ||!(result = gson(*d_ptr,&obj.d_ptr), result.first))
+            return std::make_pair(false,"required [base.d_ptr] failed:{"+result.second+"}");
+     
+        if(!e ||!(result = gson(*e,&obj.e), result.first))
+            return std::make_pair(false,"required [base.e] failed:{"+result.second+"}");
+     
+        if(!e_ptr ||!(result = gson(*e_ptr,&obj.e_ptr), result.first))
+            return std::make_pair(false,"required [base.e_ptr] failed:{"+result.second+"}");
+     
+        if(!f ||!(result = gson(*f,&obj.f), result.first))
+            return std::make_pair(false,"required [base.f] failed:{"+result.second+"}");
+     
+        if(!f_ptr ||!(result = gson(*f_ptr,&obj.f_ptr), result.first))
+            return std::make_pair(false,"required [base.f_ptr] failed:{"+result.second+"}");
+     
+        if(!g ||!(result = gson(*g,&obj.g), result.first))
+            return std::make_pair(false,"required [base.g] failed:{"+result.second+"}");
+     
+        if(!g_ptr ||!(result = gson(*g_ptr,&obj.g_ptr), result.first))
+            return std::make_pair(false,"required [base.g_ptr] failed:{"+result.second+"}");
+     
+        if(!acl_string ||!(result = gson(*acl_string,&obj.acl_string), result.first))
+            return std::make_pair(false,"required [base.acl_string] failed:{"+result.second+"}");
+     
+        if(!acl_string_ptr ||!(result = gson(*acl_string_ptr,&obj.acl_string_ptr), result.first))
+            return std::make_pair(false,"required [base.acl_string_ptr] failed:{"+result.second+"}");
+     
+        if(!h ||!(result = gson(*h,&obj.h), result.first))
+            return std::make_pair(false,"required [base.h] failed:{"+result.second+"}");
+     
+        if(!h_ptr ||!(result = gson(*h_ptr,&obj.h_ptr), result.first))
+            return std::make_pair(false,"required [base.h_ptr] failed:{"+result.second+"}");
+     
+        if(!i ||!(result = gson(*i,&obj.i), result.first))
+            return std::make_pair(false,"required [base.i] failed:{"+result.second+"}");
+     
+        if(!i_ptr ||!(result = gson(*i_ptr,&obj.i_ptr), result.first))
+            return std::make_pair(false,"required [base.i_ptr] failed:{"+result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &node, base *obj)
+    {
+        return gson(node, *obj);
+    }
+
+
+    acl::json_node& gson (acl::json & json, const list1 &obj)
+    {
+        acl::json_node &node =  json.create_node();
+        node.add_child("b", acl::gson(json,obj.b));
+        node.add_child("b_ptr", acl::gson(json,obj.b_ptr));
+        node.add_child("bases_list", acl::gson(json,obj.bases_list));
+        node.add_child("bases_list_ptr", acl::gson(json,obj.bases_list_ptr));
+        node.add_child("bases_ptr_list_ptr", acl::gson(json,obj.bases_ptr_list_ptr));
+
+        return node;
+    }
+    acl::json_node& gson (acl::json & json, const list1*obj)
+    {
+        return gson (json, *obj);
+    }
+
+
+    acl::string gson(const list1 &obj)
+    {
+        acl::json json;
+        acl::json_node &node = acl::gson (json, obj);
+        return node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &node, list1 &obj)
+    {
+        acl::json_node *b = node["b"];
+        acl::json_node *b_ptr = node["b_ptr"];
+        acl::json_node *bases_list = node["bases_list"];
+        acl::json_node *bases_list_ptr = node["bases_list_ptr"];
+        acl::json_node *bases_ptr_list_ptr = node["bases_ptr_list_ptr"];
+        std::pair<bool, std::string> result;
+
+        if(!b ||!b->get_obj()||!(result = gson(*b->get_obj(), &obj.b), result.first))
+            return std::make_pair(false, "required [list1.b] failed:{"+result.second+"}");
+     
+        if(!b_ptr ||!b_ptr->get_obj()||!(result = gson(*b_ptr->get_obj(), &obj.b_ptr), result.first))
+            return std::make_pair(false, "required [list1.b_ptr] failed:{"+result.second+"}");
+     
+        if(!bases_list ||!bases_list->get_obj()||!(result = gson(*bases_list->get_obj(), &obj.bases_list), result.first))
+            return std::make_pair(false, "required [list1.bases_list] failed:{"+result.second+"}");
+     
+        if(!bases_list_ptr ||!bases_list_ptr->get_obj()||!(result = gson(*bases_list_ptr->get_obj(), &obj.bases_list_ptr), result.first))
+            return std::make_pair(false, "required [list1.bases_list_ptr] failed:{"+result.second+"}");
+     
+        if(!bases_ptr_list_ptr ||!bases_ptr_list_ptr->get_obj()||!(result = gson(*bases_ptr_list_ptr->get_obj(), &obj.bases_ptr_list_ptr), result.first))
+            return std::make_pair(false, "required [list1.bases_ptr_list_ptr] failed:{"+result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &node, list1 *obj)
+    {
+        return gson(node, *obj);
+    }
+
+
+}///end of acl.
