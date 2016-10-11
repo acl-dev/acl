@@ -325,7 +325,7 @@ void acl_json_building(ACL_JSON *json, size_t length,
 			ACL_VSTRING_ADDCH(buf, ':');
 			ACL_VSTRING_ADDCH(buf, ' ');
 
-			switch (node->type) {
+			switch (node->type & ~ACL_JSON_T_LEAF) {
 			case ACL_JSON_T_NULL:
 				acl_vstring_strcat(buf, "null");
 				break;
@@ -344,7 +344,7 @@ void acl_json_building(ACL_JSON *json, size_t length,
 		else if (LEN(node->text) > 0 && node->parent
 			&& node->parent->left_ch != 0)
 		{
-			switch (node->type) {
+			switch (node->type & ~ACL_JSON_T_LEAF) {
 			case ACL_JSON_T_A_NULL:
 				acl_vstring_strcat(buf, "null");
 				break;
@@ -452,7 +452,7 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 			ACL_VSTRING_ADDCH(buf, ':');
 			ACL_VSTRING_ADDCH(buf, ' ');
 
-			switch (node->type) {
+			switch (node->type & ~ACL_JSON_T_LEAF) {
 			case ACL_JSON_T_NULL:
 				acl_vstring_strcat(buf, "null");
 				break;
@@ -474,7 +474,7 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 			 */
 			&& node->parent->type == ACL_JSON_T_ARRAY)
 		{
-			switch (node->type) {
+			switch (node->type & ~ACL_JSON_T_LEAF) {
 			case ACL_JSON_T_A_NULL:
 				acl_vstring_strcat(buf, "null");
 				break;

@@ -59,16 +59,19 @@ static void test1(void)
 
 	acl::json json;
 	acl::json_node& node = acl::gson(json, msg);
-	printf("%s\r\n", node.to_string().c_str());
-
-	printf("------------------------------------------------------\r\n");
-	printf("%s\r\n", json.to_string().c_str());
-	printf("%s\r\n", node.to_string().c_str());
-	printf("------------------------------------------------------\r\n");
 
 	message msg1;
 	acl::json json1;
 	json1.update(node.to_string());
+
+	printf("------------------------------------------------------\r\n");
+	printf("json  to_string: %s\r\n", json.to_string().c_str());
+	printf("------------------------------------------------------\r\n");
+	printf("node  to_string: %s\r\n", node.to_string().c_str());
+	printf("------------------------------------------------------\r\n");
+	printf("json1 to_string: %s\r\n", json1.to_string().c_str());
+	printf("------------------------------------------------------\r\n");
+
 	std::pair<bool, std::string> ret = acl::gson(json1.get_root(), msg1);
 	if (ret.first == false)
 		printf("error: %s\r\n", ret.second.c_str());
