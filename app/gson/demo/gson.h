@@ -1,4 +1,3 @@
-#include "struct.h"
 namespace acl
 {
     //base

@@ -80,6 +80,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>lib_acl_vc2015d.lib;lib_acl_cpp_vc2015d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib_acl_cpp;$(SolutionDir)lib_acl;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

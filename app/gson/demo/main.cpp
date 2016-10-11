@@ -15,7 +15,7 @@ void test_base()
 	b.acl_string = "a";
 	b.acl_string_ptr = new acl::string("a");
 	b.string = "b";
-	b.string_ptr = new std::string("b");
+	b.string_ptr = 0;
 	b.b = 2;
 	b.b_ptr = new unsigned int( 2);
 	b.c = 3;
@@ -40,8 +40,10 @@ void test_base()
 	obj.bases_list_ptr = new std::list<base>;
 	obj.bases_list_ptr->push_back(b);
 	obj.bases_ptr_list_ptr = new std::list<base*>;
-	obj.bases_ptr_list_ptr->push_back(new base(b));
-
+	obj.bases_ptr_list_ptr->push_back(nullptr);
+	obj.bases_ptr_list_ptr->push_back(nullptr);
+	obj.bases_ptr_list_ptr->push_back(nullptr);
+	obj.bases_ptr_list_ptr->push_back(nullptr);
 	acl::json json;
 	acl::json_node &node = acl::gson(json, obj);
 	printf("%s\n", node.to_string().c_str());
@@ -54,38 +56,26 @@ void test_base()
 	std::pair<bool,std::string> ret = acl::gson(json2.get_root(), obj2);
 	if(ret.first == false)
 		printf("%s\n",ret.second.c_str());
-
-	acl::json json3;
-	acl::json_node &node3 = acl::gson(json3, obj);
-	printf("%s\n", node3.to_string().c_str());
+	else
+	{
+		acl::json json3;
+		acl::json_node &node3 = acl::gson(json3, obj2);
+		printf("%s\n", node3.to_string().c_str());
+	}
+	
 }
-void test02()
-{
-	acl::gsoner gr;
-	gr.read_file("struct2.h");
-	gr.parse_code();
-}
-
-void test04()
+void genfile()
 {
 	acl::gsoner gr;
 
-	gr.read_multi_file({"struct.h" });
+	gr.read_file("struct.h");
 	gr.parse_code();
 	gr.gen_gson();
 }
 
 int main(void)
 {
-	//test_vector();
 	test_base();
-	return 0;
-	std::string str = "std::string";
-	std::string sub = str.substr(str.find("::"));
-	printf("%s",sub.c_str());
 	getchar();
-	//test01();
-	return 0;
-	printf("enter any key to exit\r\n");
 	return 0;
 }

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "struct.h"
 #include "gson.h"
 #include "acl_cpp/stdlib/gson_helper.ipp"
 namespace acl
@@ -6,28 +7,117 @@ namespace acl
     acl::json_node& gson (acl::json & json, const base &obj)
     {
         acl::json_node &node =  json.create_node();
-        node.add_text("string", acl::get_value(obj.string));
-        node.add_text("string_ptr", acl::get_value(obj.string_ptr));
-        node.add_number("a", acl::get_value(obj.a));
-        node.add_number("a_ptr", acl::get_value(obj.a_ptr));
-        node.add_number("b", acl::get_value(obj.b));
-        node.add_number("b_ptr", acl::get_value(obj.b_ptr));
-        node.add_number("c", acl::get_value(obj.c));
-        node.add_number("c_ptr", acl::get_value(obj.c_ptr));
-        node.add_number("d", acl::get_value(obj.d));
-        node.add_number("d_ptr", acl::get_value(obj.d_ptr));
-        node.add_number("e", acl::get_value(obj.e));
-        node.add_number("e_ptr", acl::get_value(obj.e_ptr));
-        node.add_number("f", acl::get_value(obj.f));
-        node.add_number("f_ptr", acl::get_value(obj.f_ptr));
-        node.add_number("g", acl::get_value(obj.g));
-        node.add_number("g_ptr", acl::get_value(obj.g_ptr));
-        node.add_text("acl_string", acl::get_value(obj.acl_string));
-        node.add_text("acl_string_ptr", acl::get_value(obj.acl_string_ptr));
-        node.add_double("h", acl::get_value(obj.h));
-        node.add_double("h_ptr", acl::get_value(obj.h_ptr));
-        node.add_double("i", acl::get_value(obj.i));
-        node.add_double("i_ptr", acl::get_value(obj.i_ptr));
+
+        if (check_nullptr(obj.string))
+            node.add_null("string");
+        else
+            node.add_text("string", acl::get_value(obj.string));
+
+        if (check_nullptr(obj.string_ptr))
+            node.add_null("string_ptr");
+        else
+            node.add_text("string_ptr", acl::get_value(obj.string_ptr));
+
+        if (check_nullptr(obj.a))
+            node.add_null("a");
+        else
+            node.add_number("a", acl::get_value(obj.a));
+
+        if (check_nullptr(obj.a_ptr))
+            node.add_null("a_ptr");
+        else
+            node.add_number("a_ptr", acl::get_value(obj.a_ptr));
+
+        if (check_nullptr(obj.b))
+            node.add_null("b");
+        else
+            node.add_number("b", acl::get_value(obj.b));
+
+        if (check_nullptr(obj.b_ptr))
+            node.add_null("b_ptr");
+        else
+            node.add_number("b_ptr", acl::get_value(obj.b_ptr));
+
+        if (check_nullptr(obj.c))
+            node.add_null("c");
+        else
+            node.add_number("c", acl::get_value(obj.c));
+
+        if (check_nullptr(obj.c_ptr))
+            node.add_null("c_ptr");
+        else
+            node.add_number("c_ptr", acl::get_value(obj.c_ptr));
+
+        if (check_nullptr(obj.d))
+            node.add_null("d");
+        else
+            node.add_number("d", acl::get_value(obj.d));
+
+        if (check_nullptr(obj.d_ptr))
+            node.add_null("d_ptr");
+        else
+            node.add_number("d_ptr", acl::get_value(obj.d_ptr));
+
+        if (check_nullptr(obj.e))
+            node.add_null("e");
+        else
+            node.add_number("e", acl::get_value(obj.e));
+
+        if (check_nullptr(obj.e_ptr))
+            node.add_null("e_ptr");
+        else
+            node.add_number("e_ptr", acl::get_value(obj.e_ptr));
+
+        if (check_nullptr(obj.f))
+            node.add_null("f");
+        else
+            node.add_number("f", acl::get_value(obj.f));
+
+        if (check_nullptr(obj.f_ptr))
+            node.add_null("f_ptr");
+        else
+            node.add_number("f_ptr", acl::get_value(obj.f_ptr));
+
+        if (check_nullptr(obj.g))
+            node.add_null("g");
+        else
+            node.add_number("g", acl::get_value(obj.g));
+
+        if (check_nullptr(obj.g_ptr))
+            node.add_null("g_ptr");
+        else
+            node.add_number("g_ptr", acl::get_value(obj.g_ptr));
+
+        if (check_nullptr(obj.acl_string))
+            node.add_null("acl_string");
+        else
+            node.add_text("acl_string", acl::get_value(obj.acl_string));
+
+        if (check_nullptr(obj.acl_string_ptr))
+            node.add_null("acl_string_ptr");
+        else
+            node.add_text("acl_string_ptr", acl::get_value(obj.acl_string_ptr));
+
+        if (check_nullptr(obj.h))
+            node.add_null("h");
+        else
+            node.add_double("h", acl::get_value(obj.h));
+
+        if (check_nullptr(obj.h_ptr))
+            node.add_null("h_ptr");
+        else
+            node.add_double("h_ptr", acl::get_value(obj.h_ptr));
+
+        if (check_nullptr(obj.i))
+            node.add_null("i");
+        else
+            node.add_double("i", acl::get_value(obj.i));
+
+        if (check_nullptr(obj.i_ptr))
+            node.add_null("i_ptr");
+        else
+            node.add_double("i_ptr", acl::get_value(obj.i_ptr));
+
 
         return node;
     }
@@ -151,11 +241,32 @@ namespace acl
     acl::json_node& gson (acl::json & json, const list1 &obj)
     {
         acl::json_node &node =  json.create_node();
-        node.add_child("b", acl::gson(json,obj.b));
-        node.add_child("b_ptr", acl::gson(json,obj.b_ptr));
-        node.add_child("bases_list", acl::gson(json,obj.bases_list));
-        node.add_child("bases_list_ptr", acl::gson(json,obj.bases_list_ptr));
-        node.add_child("bases_ptr_list_ptr", acl::gson(json,obj.bases_ptr_list_ptr));
+
+        if (check_nullptr(obj.b))
+            node.add_null("b");
+        else
+            node.add_child("b", acl::gson(json,obj.b));
+
+        if (check_nullptr(obj.b_ptr))
+            node.add_null("b_ptr");
+        else
+            node.add_child("b_ptr", acl::gson(json,obj.b_ptr));
+
+        if (check_nullptr(obj.bases_list))
+            node.add_null("bases_list");
+        else
+            node.add_child("bases_list", acl::gson(json,obj.bases_list));
+
+        if (check_nullptr(obj.bases_list_ptr))
+            node.add_null("bases_list_ptr");
+        else
+            node.add_child("bases_list_ptr", acl::gson(json,obj.bases_list_ptr));
+
+        if (check_nullptr(obj.bases_ptr_list_ptr))
+            node.add_null("bases_ptr_list_ptr");
+        else
+            node.add_child("bases_ptr_list_ptr", acl::gson(json,obj.bases_ptr_list_ptr));
+
 
         return node;
     }
