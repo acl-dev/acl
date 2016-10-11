@@ -113,6 +113,7 @@ private:
 	function_code_t gen_unpack_code(const object_t &obj);
 	std::string get_static_string();
 	std::string get_include_files();
+	std::string get_filename(const char *filepath);
 
 	bool skip_space_comment();
 

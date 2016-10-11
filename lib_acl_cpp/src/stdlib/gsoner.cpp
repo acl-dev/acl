@@ -195,11 +195,25 @@ gsoner::function_code_t gsoner::gen_pack_code(const object_t &obj)
 
 	str += "\n{\n";
 	str += tab_;
-	str += "acl::json_node &node =  json.create_node();\n";
+	str += "acl::json_node &node =  json.create_node();\n\n";
 
+	/*
+	if (check_nullptr(obj.string_ptr))
+		node.add_null("string_ptr");
+	else
+		node.add_text("string_ptr", acl::get_value(obj.string_ptr));
+	*/
 	for(object_t::fields_t::const_iterator itr = obj.fields_.begin();
 		itr != obj.fields_.end(); ++itr)
 	{
+		str += tab_;
+		str += "if (check_nullptr(obj."+itr->name_+"))\n";
+		str += tab_;
+		str += tab_;
+		str += "node.add_null(\""+itr->name_+"\");\n";
+		str += tab_;
+		str += "else\n";
+		str += tab_;
 		str += tab_;
 		str += "node.";
 		str += get_node_func(*itr);
@@ -209,7 +223,7 @@ gsoner::function_code_t gsoner::gen_pack_code(const object_t &obj)
 		str += get_gson_func_laber(*itr);
 		str += "obj.";
 		str += itr->name_;
-		str += "));\n";
+		str += "));\n\n";
 	}
 	str += "\n";
 	str += tab_;
@@ -1129,18 +1143,22 @@ bool gsoner::read_file(const char *filepath)
 			std::istreambuf_iterator<char>());
 	codes_.append(str);
 
+	files_.push_back(get_filename(filepath));
+
+	return true;
+}
+std::string gsoner::get_filename(const char *filepath)
+{
 	std::string  filename;
 	int i = strlen(filepath) - 1;
-	while(i >= 0 && (filepath[i] != '\\' || filepath[i] != '/'))
+	while (i >= 0 && (filepath[i] != '\\' || filepath[i] != '/'))
 	{
 		filename.push_back(filepath[i]);
 		i--;
 	}
 	std::reverse(filename.begin(), filename.end());
-
-	return true;
+	return filename;
 }
-
 bool gsoner::read_multi_file(const std::vector<std::string>& files)
 {
 	for(std::vector<std::string>::const_iterator itr = files.begin();
@@ -1152,7 +1170,7 @@ bool gsoner::read_multi_file(const std::vector<std::string>& files)
 				<< itr->c_str() << " error" << std::endl;
 			return false;
 		}
-		files_.push_back(*itr);
+		files_.push_back(get_filename(itr->c_str()));
 	}
 	return true;
 }
@@ -1254,9 +1272,10 @@ void gsoner::gen_gson()
 	const char *namespace_end = "\n}///end of acl.";
 
 	write_source("#include \"stdafx.h\"\n");
+	write_source(get_include_files());
 	write_source("#include \"" + gen_header_filename_ + "\"\n");
 	write_source("#include \"acl_cpp/stdlib/gson_helper.ipp\"\n");
-	write_header(get_include_files());
+
 	write_header(namespace_start);
 	write_source(namespace_start);
 
