@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "struct.h"
+#include "struct.h"
 #include "gson.h"
 #include "acl_cpp/stdlib/gson_helper.ipp"
 namespace acl
@@ -161,9 +162,8 @@ namespace acl
         acl::json_node *i_ptr = node["i_ptr"];
         std::pair<bool, std::string> result;
 
-        if(string)
-            gson(*string,&obj.string);
-
+        if(!string ||!(result = gson(*string,&obj.string), result.first))
+            return std::make_pair(false,"required [base.string] failed:{"+result.second+"}");
      
         if(!string_ptr ||!(result = gson(*string_ptr,&obj.string_ptr), result.first))
             return std::make_pair(false,"required [base.string_ptr] failed:{"+result.second+"}");

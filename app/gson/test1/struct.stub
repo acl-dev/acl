@@ -50,8 +50,8 @@ struct user1
 
 	~user1()
 	{
-		delete username_;
-		delete domain_;
+		delete []username_;
+		delete []domain_;
 	}
 
 	char* username_;
