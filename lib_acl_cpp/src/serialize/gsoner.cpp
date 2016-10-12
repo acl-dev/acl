@@ -1274,7 +1274,7 @@ void gsoner::gen_gson()
 	write_source("#include \"stdafx.h\"\n");
 	write_source(get_include_files());
 	write_source("#include \"" + gen_header_filename_ + "\"\n");
-	write_source("#include \"acl_cpp/stdlib/gson_helper.ipp\"\n");
+	write_source("#include \"acl_cpp/serialize/gson_helper.ipp\"\n");
 
 	write_header(namespace_start);
 	write_source(namespace_start);
