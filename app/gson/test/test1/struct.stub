@@ -1,0 +1,61 @@
+#pragma once
+
+struct user
+{
+	user(const char* user_name, const char* user_domain,
+		int user_age, bool user_male)
+	: username(user_name)
+	, domain(user_domain)
+	, age(user_age)
+	, male(user_male)
+	{}
+
+	user() {}
+	~user() {}
+
+	acl::string username;
+	acl::string domain;
+	int age;
+	bool male;
+};
+
+struct message
+{
+	int type;
+	acl::string cmd;
+	std::list<user> user_list;
+	std::list<user> user_vector;
+	std::map<acl::string, user> user_map;
+
+	std::list<user*> *user_list_ptr;
+	std::vector<user*> *user_vector_ptr;
+	std::map<acl::string, user*> *user_map_ptr;
+
+	message()
+	: user_list_ptr(NULL)
+	, user_vector_ptr(NULL)
+	, user_map_ptr(NULL)
+	{}
+
+	~message()
+	{
+		if (user_list_ptr)
+		{
+			for (auto it : *user_list_ptr)
+				delete it;
+			delete user_list_ptr;
+		}
+		if (user_vector_ptr)
+		{
+			for (auto it : *user_vector_ptr)
+				delete it;
+			delete user_vector_ptr;
+		}
+		if (user_map_ptr)
+		{
+			for (auto it : *user_map_ptr)
+				delete it.second;
+			delete user_map_ptr;
+		}
+	}
+};
