@@ -874,16 +874,40 @@ bool gsoner::check_member()
 		{
 			e--;
 		}
-
+	get_name:
 		while(lines[e] != ' ' &&
 			lines[e] != '\r' &&
 			lines[e] != '\n' &&
 			lines[e] != '\t' &&
 			lines[e] != '*' &&
-			lines[e] != '&')
+			lines[e] != '&' &&
+			lines[e] != '=')
 		{
 			name.push_back(lines[e]);
 			e--;
+		}
+		//clear space;
+		while (lines[e] == ' ' ||
+			lines[e] == '\r' ||
+			lines[e] == '\n' ||
+			lines[e] == '\t')
+		{
+			e--;
+		}
+
+		if (lines[e] == '=')
+		{
+			//eg: int a = 0;
+			name.clear();
+			e--;
+			while (lines[e] == ' ' ||
+				lines[e] == '\r' ||
+				lines[e] == '\n' ||
+				lines[e] == '\t')
+			{
+				e--;
+			}
+			goto get_name;
 		}
 
 		//get name
