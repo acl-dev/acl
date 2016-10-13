@@ -1205,7 +1205,6 @@ bool gsoner::read_multi_file(const std::vector<std::string>& files)
 				<< itr->c_str() << " error" << std::endl;
 			return false;
 		}
-		files_.push_back(get_filename(itr->c_str()));
 	}
 	return true;
 }
