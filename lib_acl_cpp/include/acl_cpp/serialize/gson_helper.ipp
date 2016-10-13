@@ -668,8 +668,7 @@ static inline gson(acl::json_node &node, T **obj)
 }
 
 template<class T> 
-typename std::enable_if
-	<is_string<T>::value
+typename std::enable_if<is_string<T>::value
 	&& !std::is_pointer<T>::value, std::pair<bool, std::string>>::type
 static inline gson(acl::json_node &node, T *obj)
 {

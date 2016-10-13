@@ -235,9 +235,6 @@
     <ClCompile Include="src\db\db_service_sqlite.cpp">
       <Filter>Source Files\db</Filter>
     </ClCompile>
-    <ClCompile Include="src\serialize\gsoner.cpp">
-      <Filter>Source Files\serialize</Filter>
-    </ClCompile>
     <ClCompile Include="src\stdlib\json.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
@@ -517,6 +514,7 @@
     <ClCompile Include="src\stdlib\xml2.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\serialize\gsoner.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -716,9 +714,6 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\mime\rfc822.hpp">
       <Filter>Header Files\mime</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\serialize\gsoner.hpp">
-      <Filter>Header Files\serialize</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\session\memcache_session.hpp">
       <Filter>Header Files\session</Filter>
@@ -1063,6 +1058,7 @@
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="resource_vc2015.h" />
+    <ClInclude Include="include\acl_cpp\serialize\gsoner.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
