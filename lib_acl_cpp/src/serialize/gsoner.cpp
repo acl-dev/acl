@@ -1305,7 +1305,7 @@ void gsoner::parse_code()
 		std::cout << codes_.substr(start, ii - start).c_str() << std::endl;
 		ii = 0;
 		count = 0;
-		while (ii < pos_)
+		while (ii < (std::size_t) pos_)
 		{
 			if (codes_[ii] == '\n')
 			{
@@ -1510,8 +1510,6 @@ bool gsoner::check_pragma()
 	}
 	return false;
 }
-
-
 
 } // namespace acl
 
