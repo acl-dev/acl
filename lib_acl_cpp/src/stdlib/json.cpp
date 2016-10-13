@@ -42,8 +42,13 @@ const char* json_node::tag_name(void) const
 
 const char* json_node::get_text(void) const
 {
-	if (node_me_->text && ACL_VSTRING_LEN(node_me_->text) > 0)
-		return acl_vstring_str(node_me_->text);
+	if (node_me_->text)
+	{
+		if (ACL_VSTRING_LEN(node_me_->text) > 0)
+			return acl_vstring_str(node_me_->text);
+		else
+			return "";
+	}
 	else
 		return NULL;
 }
