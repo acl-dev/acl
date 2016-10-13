@@ -94,6 +94,7 @@ gsoner::gsoner()
 	gen_header_ = NULL;
 	gen_source_ = NULL;
 	default_ = true;
+	required_ = default_;
 	gen_header_filename_ = "gson.h";
 	gen_source_filename_ = "gson.cpp";
 	default_delimiters_ = "\\\r\n\t ";
@@ -272,13 +273,13 @@ std::string gsoner::get_unpack_code(const std::string &obj_name,
 
 		return tab_ +
 			"if(" + field.name_ + ")\n" + tab_ + tab_ +
-			"gson(*" + field.name_ + ",&obj." + field.name_ + ");\n";
+			"gson(*" + field.name_ + ",&obj." + field.name_ + ");";
 
 	else if(field.required_ == false)
 		return tab_
 			+ "if(" + field.name_ + "&& " + field.name_
 			+ "->get_obj())\n" + tab_ + tab_ + " gson(*" + field.name_
-			+ "->get_obj(), &obj." + field.name_ + ");\n";
+			+ "->get_obj(), &obj." + field.name_ + ");";
 
 	return "unknown_type";
 }
@@ -874,16 +875,40 @@ bool gsoner::check_member()
 		{
 			e--;
 		}
-
+	get_name:
 		while(lines[e] != ' ' &&
 			lines[e] != '\r' &&
 			lines[e] != '\n' &&
 			lines[e] != '\t' &&
 			lines[e] != '*' &&
-			lines[e] != '&')
+			lines[e] != '&' &&
+			lines[e] != '=')
 		{
 			name.push_back(lines[e]);
 			e--;
+		}
+		//clear space;
+		while (lines[e] == ' ' ||
+			lines[e] == '\r' ||
+			lines[e] == '\n' ||
+			lines[e] == '\t')
+		{
+			e--;
+		}
+
+		if (lines[e] == '=')
+		{
+			//eg: int a = 0;
+			name.clear();
+			e--;
+			while (lines[e] == ' ' ||
+				lines[e] == '\r' ||
+				lines[e] == '\n' ||
+				lines[e] == '\t')
+			{
+				e--;
+			}
+			goto get_name;
 		}
 
 		//get name
