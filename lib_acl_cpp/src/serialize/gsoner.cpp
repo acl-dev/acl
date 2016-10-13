@@ -693,7 +693,7 @@ std::pair<bool, std::string> gsoner::get_function_declare()
 		lines.push_back(codes_[j]);
 		j++;
 	}
-	if(codes_[j] == ';')
+	if(codes_[j] != '(')
 	{
 		//not function, maybe member field
 		return std::make_pair(false, "");
