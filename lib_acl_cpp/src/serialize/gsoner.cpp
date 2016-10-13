@@ -684,6 +684,8 @@ std::pair<bool, std::string> gsoner::get_function_declare()
 			std::string str = get_static_string(codes_,j);
 			j += str.size() + 2;
 		}
+		if(codes_[j] == '=')
+			break;
 		if(codes_[j] == ';')
 			break;
 		if(codes_[j] == '(')
