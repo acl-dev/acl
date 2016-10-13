@@ -27,15 +27,11 @@ struct message
 	std::list<user> user_vector;
 	std::map<acl::string, user> user_map;
 
-	std::list<user*> *user_list_ptr;
-	std::vector<user*> *user_vector_ptr;
-	std::map<acl::string, user*> *user_map_ptr;
+	std::list<user*> *user_list_ptr = nullptr;
+	std::vector<user*> *user_vector_ptr = nullptr;
+	std::map<acl::string, user*> *user_map_ptr = nullptr;
 
-	message()
-	: user_list_ptr(NULL)
-	, user_vector_ptr(NULL)
-	, user_map_ptr(NULL)
-	{}
+	message() {}
 
 	~message()
 	{

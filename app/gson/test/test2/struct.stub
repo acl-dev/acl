@@ -11,6 +11,7 @@ struct user
 	user() {}
 	~user() {}
 
+	//Gson@required
 	std::string name;
 	int  age;
 	bool male;

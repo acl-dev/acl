@@ -10,8 +10,8 @@
 
 static void print_user(const user& u)
 {
-	printf("\t\tuser ---> name: %s, male: %s, age: %d\r\n",
-		u.name.c_str(), u.male ? "yes" : "no", u.age);
+	printf("\t\tuser ---> name: %s, addr: %s, male: %s, age: %d\r\n",
+		u.name.c_str(), u.addr.c_str(), u.male ? "yes" : "no", u.age);
 }
 
 static void print_group(const group& g)
