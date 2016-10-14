@@ -1,5 +1,13 @@
 #pragma once
 
+struct people
+{
+	//Gson@optional
+	acl::string aa;
+	//Gson@optional
+	acl::string bb;
+};
+
 struct user
 {
 	user(const char* user_name, const char* user_domain,
@@ -30,6 +38,26 @@ struct message
 	std::list<user*> *user_list_ptr = nullptr;
 	std::vector<user*> *user_vector_ptr = nullptr;
 	std::map<acl::string, user*> *user_map_ptr = nullptr;
+
+	//const char* ptr = nullptr;		// error
+	//const char* data = "hello world";	// error
+	//char* data = "hello world";		// error
+	//char ch = 'A';			// error
+	//unsigned char ch = 'b';		// error
+	//char ch1;				// error
+	//const user* u1 = nullptr;		// error
+	int n = 100;				// ok
+	long n1 = 1000;				// ok
+	long long int n2 = 1000;		// ok
+	short n3 = 100;				// ok
+	//short* n3_1 = &n3;			// error
+	//Gson@optional
+	user* u = nullptr;			// ok
+
+	//const int n4 = 100;			// error
+	//const long n5 = 1000;			// error
+	//const long long int n6 = 1000;	// error
+	//const short n7 = 100;			// error
 
 	message() {}
 

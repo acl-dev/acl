@@ -16,8 +16,6 @@
 #include "acl_cpp/stdlib/json.hpp"
 #endif
 
-#ifdef ACL_USE_CPP11
-
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -590,46 +588,60 @@ bool gsoner::check_comment()
 			required_ = false;
 		else if(commemt.find("Gson@required") != std::string::npos)
 			required_ = true;
+		else if (commemt.find("Gson@") != std::string::npos)
+		{
+			std::cout << commemt.c_str() << std::endl;
+			std::size_t index = commemt.find("Gson@");
+			while(commemt[index] != ' ' &&
+				commemt[index] != '\t' &&
+				commemt[index] != '\n' &&
+				index < commemt.size())
+			{
+				index++;
+			}
+			std::cout << " nonsupport " << commemt.substr(commemt.find("Gson@"), index).c_str() << std::endl;
+			throw syntax_error();
+		}
 	}
 	return result;
 }
 
-std::string gsoner::get_static_string()
+std::string gsoner::get_static_string(const std::string &str, int index)
 {
-	if(codes_[pos_] != '"')
+	if(str[index] != '"')
 		return "";
-	pos_++;
+	index++;
 	//int sym = 1;
 	std::string lines;
 	while(true)
 	{
-		if(codes_[pos_] == '\\')
+		if(str[index] == '\\')
 		{
-			if(codes_[pos_ + 1] == '"')
+			if(str[index + 1] == '"')
 			{
 				lines.push_back('\\');
 				lines.push_back('\"');
-				pos_ += 2;
+				index += 2;
 				continue;
 			}
 		}
-		else if(codes_[pos_] == '\"')
+		else if(str[index] == '\"')
 		{
-			pos_++;
+			index++;
 			skip_space_comment();
-			if(codes_[pos_] == ';')
+			if(str[index] == ';')
 			{
-				pos_++;
+				index++;
 				break;
 			}
-			else if(codes_[pos_] == '\"')
+			else if(str[index] == '\"')
 			{
-				pos_++;
+				index++;
 				continue;
 			}
 		}
-		lines.push_back(codes_[pos_]);
-		pos_++;
+		lines.push_back(str[index]);
+		index++;
 	}
 	return lines;
 }
@@ -665,6 +677,13 @@ std::pair<bool, std::string> gsoner::get_function_declare()
 				throw syntax_error();
 			continue;
 		}
+		if (codes_[j] == '"')
+		{
+			std::string str = get_static_string(codes_,j);
+			j += str.size() + 2;
+		}
+		if(codes_[j] == '=')
+			break;
 		if(codes_[j] == ';')
 			break;
 		if(codes_[j] == '(')
@@ -672,7 +691,7 @@ std::pair<bool, std::string> gsoner::get_function_declare()
 		lines.push_back(codes_[j]);
 		j++;
 	}
-	if(codes_[j] == ';')
+	if(codes_[j] != '(')
 	{
 		//not function, maybe member field
 		return std::make_pair(false, "");
@@ -820,9 +839,11 @@ bool gsoner::check_function()
 		}
 		if(codes_[pos_] == '"')
 		{
+			std::string str = get_static_string(codes_, pos_);
 			lines.push_back('"');
-			lines += get_static_string();
+			lines += str;
 			lines.push_back('"');
+			pos_ += str.size();
 			continue;
 		}
 		else if(codes_[pos_] == '}')
@@ -857,6 +878,14 @@ bool gsoner::check_member()
 					throw syntax_error();
 				continue;
 			}
+			if (codes_[pos_] == '"')
+			{
+				std::string str = get_static_string(codes_, pos_);
+				lines.push_back('"');
+				lines += str;
+				lines.push_back('"');
+				pos_ += str.size() + 2;
+			}
 			if(codes_[pos_] == ';')
 				break;
 			lines.push_back(codes_[pos_]);
@@ -864,9 +893,14 @@ bool gsoner::check_member()
 		}
 		//skip ;
 		pos_++;
+
 		std::string name;
 		std::string types;
-		//remove back spacce. lilke "int a    ; "
+		// remove assignment =,
+		if (lines.find('=') != std::string::npos)
+		{
+			lines = lines.substr(0, lines.find('='));
+		}
 		int e = lines.size() - 1;
 		while(lines[e] == ' ' ||
 			lines[e] == '\r' ||
@@ -875,7 +909,6 @@ bool gsoner::check_member()
 		{
 			e--;
 		}
-	get_name:
 		while(lines[e] != ' ' &&
 			lines[e] != '\r' &&
 			lines[e] != '\n' &&
@@ -886,29 +919,6 @@ bool gsoner::check_member()
 		{
 			name.push_back(lines[e]);
 			e--;
-		}
-		//clear space;
-		while (lines[e] == ' ' ||
-			lines[e] == '\r' ||
-			lines[e] == '\n' ||
-			lines[e] == '\t')
-		{
-			e--;
-		}
-
-		if (lines[e] == '=')
-		{
-			//eg: int a = 0;
-			name.clear();
-			e--;
-			while (lines[e] == ' ' ||
-				lines[e] == '\r' ||
-				lines[e] == '\n' ||
-				lines[e] == '\t')
-			{
-				e--;
-			}
-			goto get_name;
 		}
 
 		//get name
@@ -1195,7 +1205,6 @@ bool gsoner::read_multi_file(const std::vector<std::string>& files)
 				<< itr->c_str() << " error" << std::endl;
 			return false;
 		}
-		files_.push_back(get_filename(itr->c_str()));
 	}
 	return true;
 }
@@ -1259,15 +1268,50 @@ void gsoner::parse_code()
 
 	catch(syntax_error &e)
 	{
-		std::cout << e.what() << std::endl << std::endl;
-
-		std::string current_codes =
-			codes_.substr(std::max<std::size_t>(pos_ - 10, 0),
-				std::min<std::size_t>(20, codes_.size() - pos_));
-
-		std::cout << "              " << current_codes.c_str() << std::endl;
-		std::cout << "exception pos:----------^----------" << std::endl;
-
+		(void)e;
+		int count = 2;
+		std::size_t ii = pos_;
+		int start = 0;
+		while (ii > 0)
+		{
+			if (codes_[ii] == '\n')
+			{
+				count--;
+				if (count == 0)
+				{
+					break;;
+				}
+			}
+			ii--;
+		}
+		ii++;
+		start = ii;
+		ii = pos_;
+		count = 2;
+		while (ii < codes_.size())
+		{
+			if (codes_[ii] == '\n')
+			{
+				count--;
+				if (count == 0)
+				{
+					break;;
+				}
+			}
+			ii++;
+		}
+		std::cout << codes_.substr(start, ii - start).c_str() << std::endl;
+		ii = 0;
+		count = 0;
+		while (ii < (std::size_t) pos_)
+		{
+			if (codes_[ii] == '\n')
+			{
+				count++;
+			}
+			ii++;
+		}
+		std::cout << "line:" << count << std::endl;
 		return;
 	}
 
@@ -1465,8 +1509,4 @@ bool gsoner::check_pragma()
 	return false;
 }
 
-
-
 } // namespace acl
-
-#endif // end ACL_USE_CPP11
