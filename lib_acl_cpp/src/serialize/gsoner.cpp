@@ -16,8 +16,6 @@
 #include "acl_cpp/stdlib/json.hpp"
 #endif
 
-#ifdef ACL_USE_CPP11
-
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -1512,5 +1510,3 @@ bool gsoner::check_pragma()
 }
 
 } // namespace acl
-
-#endif // end ACL_USE_CPP11

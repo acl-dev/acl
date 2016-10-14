@@ -18,7 +18,7 @@
 namespace acl
 {
 
-	///////////////////////////////////type_traits//////////////////////////
+	///////////////////////////////////type_traits////////////////////////
 
 
 	struct true_type
@@ -56,10 +56,9 @@ namespace acl
 	template<class T>
 	struct remove_cv
 	{
-		typedef typename remove_const<typename remove_volatile<T>::type>::type
-			type;
+		typedef typename remove_const
+			<typename remove_volatile<T>::type>::type type;
 	};
-
 
 	//remove_pointer
 	template<class T>
@@ -229,8 +228,7 @@ namespace acl
 	};
 
 	template<bool T>
-	struct _Is_object
-		:false_type
+	struct _Is_object :false_type
 	{
 	};
 
@@ -258,7 +256,7 @@ namespace acl
 	template<class T>
 	static inline bool check_nullptr(T *t)
 	{
-		if (t == nullptr)
+		if (t == NULL)
 			return true;
 		return false;
 	}
@@ -298,7 +296,7 @@ namespace acl
 	//number
 	template <class T>
 	typename enable_if<is_number<T>::value, T>::type
-		static inline get_value(const T t)
+	static inline get_value(const T t)
 	{
 		return t;
 	}
@@ -307,21 +305,21 @@ namespace acl
 	// eg: int * -> int .
 	template <class T>
 	typename enable_if<is_number<T>::value, T>::type
-		static inline get_value(const T *t)
+	static inline get_value(const T *t)
 	{
 		return *t;
 	}
 
 	template <class T>
 	typename enable_if<is_double<T>::value, T>::type
-		static inline get_value(const T &t)
+	static inline get_value(const T &t)
 	{
 		return t;
 	}
 
 	template <class T>
 	typename enable_if<is_double<T>::value, T>::type
-		static inline get_value(const T *t)
+	static inline get_value(const T *t)
 	{
 		return *t;
 	}
@@ -329,7 +327,7 @@ namespace acl
 	// obj
 	template<class T>
 	typename enable_if<is_object<T>::value, void>::type
-		static inline add_item(acl::json &json, acl::json_node &node, const T &obj)
+	static inline add_item(acl::json &json, acl::json_node &node, const T &obj)
 	{
 		if (check_nullptr(obj))
 			node.add_array_null();
@@ -339,7 +337,7 @@ namespace acl
 
 	template<class T>
 	typename enable_if<is_object<T>::value, void>::type
-		static inline add_item(acl::json &json, acl::json_node &node, const T *obj)
+	static inline add_item(acl::json &json, acl::json_node &node, const T *obj)
 	{
 		if (check_nullptr(obj))
 			node.add_array_null();
@@ -350,7 +348,7 @@ namespace acl
 	// number
 	template<class T>
 	typename enable_if<is_number<T>::value, void>::type
-		static inline add_item(acl::json &, acl::json_node &node, T value)
+	static inline add_item(acl::json &, acl::json_node &node, T value)
 	{
 		if (check_nullptr(value))
 			node.add_array_null();
@@ -360,7 +358,7 @@ namespace acl
 
 	template<class T>
 	typename enable_if<is_number<T>::value, void>::type
-		static inline add_item(acl::json &, acl::json_node &node, T *value)
+	static inline add_item(acl::json &, acl::json_node &node, T *value)
 	{
 		if (check_nullptr(value))
 			node.add_array_null();
@@ -370,7 +368,7 @@ namespace acl
 
 	template<class T>
 	typename enable_if<is_double<T>::value, void>::type
-		static inline add_item(acl::json &, acl::json_node &node, T value)
+	static inline add_item(acl::json &, acl::json_node &node, T value)
 	{
 		if (check_nullptr(value))
 			node.add_array_null();
@@ -381,7 +379,7 @@ namespace acl
 	//bool 
 	template<class T>
 	typename enable_if<is_bool<T>::value, void>::type
-		static inline add_item(acl::json &, acl::json_node &node, T value)
+	static inline add_item(acl::json &, acl::json_node &node, T value)
 	{
 		if (check_nullptr(value))
 			node.add_array_null();
@@ -391,7 +389,7 @@ namespace acl
 
 	template<class V>
 	static inline
-		acl::json_node &gson(acl::json &json, const std::list<V> &objects)
+	acl::json_node &gson(acl::json &json, const std::list<V> &objects)
 	{
 		acl::json_node &node = json.create_array();
 		for (typename std::list<V>::const_iterator
@@ -405,7 +403,7 @@ namespace acl
 
 	template<class T>
 	static inline
-		acl::json_node &gson(acl::json &json, const std::list<T> *objects)
+	acl::json_node &gson(acl::json &json, const std::list<T> *objects)
 	{
 		acl::json_node &node = json.create_array();
 		for (typename std::list<T>::const_iterator
@@ -419,7 +417,7 @@ namespace acl
 
 	template<class T>
 	static inline
-		acl::json_node &gson(acl::json &json, const std::vector<T> &objects)
+	acl::json_node &gson(acl::json &json, const std::vector<T> &objects)
 	{
 		acl::json_node &node = json.create_array();
 		for (typename std::vector<T>::const_iterator
@@ -433,7 +431,7 @@ namespace acl
 
 	template<class T>
 	static inline
-		acl::json_node &gson(acl::json &json, const std::vector<T> *objects)
+	acl::json_node &gson(acl::json &json, const std::vector<T> *objects)
 	{
 		return gson(json, *objects);
 	}
@@ -441,7 +439,7 @@ namespace acl
 	//define number map
 	template<class K, class V>
 	typename enable_if<is_number<V>::value, acl::json_node &>::type
-		static inline gson(acl::json &json, const std::map<K, V> &objects)
+	static inline gson(acl::json &json, const std::map<K, V> &objects)
 	{
 		acl::json_node &node = json.create_array();
 		for (typename std::map<K, V>::const_iterator itr = objects.begin();
@@ -465,7 +463,7 @@ namespace acl
 	//define number map
 	template<class K, class V>
 	typename enable_if< is_number<V>::value, acl::json_node &>::type
-		static inline gson(acl::json &json, const std::map<K, V> *objects)
+	static inline gson(acl::json &json, const std::map<K, V> *objects)
 	{
 		acl::json_node &node = json.create_array();
 		for (typename std::map<K, V>::const_iterator itr = objects->begin();
@@ -489,7 +487,7 @@ namespace acl
 	//define floating map
 	template<class K, class V>
 	typename enable_if<is_double<V>::value, acl::json_node &>::type
-		static inline gson(acl::json &json, const std::map<K, V> &objects)
+	static inline gson(acl::json &json, const std::map<K, V> &objects)
 	{
 		acl::json_node &node = json.create_array();
 		for (typename std::map<K, V>::const_iterator itr = objects.begin();
@@ -511,7 +509,7 @@ namespace acl
 
 	template<class K, class V>
 	typename enable_if<is_double<V>::value, acl::json_node &>::type
-		static inline gson(acl::json &json, const std::map<K, V> *objects)
+	static inline gson(acl::json &json, const std::map<K, V> *objects)
 	{
 		acl::json_node &node = json.create_array();
 		for (typename std::map<K, V>::const_iterator itr = objects->begin();
@@ -535,7 +533,7 @@ namespace acl
 	//define bool map
 	template<class K, class V>
 	typename enable_if<is_bool<V>::value, acl::json_node &>::type
-		static inline gson(acl::json &json, const std::map<K, V> &objects)
+	static inline gson(acl::json &json, const std::map<K, V> &objects)
 	{
 		acl::json_node &node = json.create_array();
 		for (typename std::map<K, V>::const_iterator itr = objects;
@@ -559,7 +557,7 @@ namespace acl
 	template<class K, class V>
 	typename enable_if<is_string<V>::value
 		|| is_char_ptr<V>::value, acl::json_node &>::type
-		static inline gson(acl::json &json, const std::map<K, V> & objects)
+	static inline gson(acl::json &json, const std::map<K, V> & objects)
 	{
 		acl::json_node &node = json.create_array();
 		for (typename std::map<K, V>::const_iterator itr = objects.begin();
@@ -582,7 +580,7 @@ namespace acl
 
 	template<class T, class V>
 	typename enable_if<is_object<V>::value, acl::json_node &>::type
-		static inline gson(acl::json &json, const std::map<T, V> &objects)
+	static inline gson(acl::json &json, const std::map<T, V> &objects)
 	{
 		acl::json_node &node = json.create_array();
 		for (typename std::map<T, V>::const_iterator
@@ -606,7 +604,7 @@ namespace acl
 
 	template<class T, class V>
 	typename enable_if<is_object<V>::value, acl::json_node &>::type
-		static inline gson(acl::json &json, const std::map<T, V> *objects)
+	static inline gson(acl::json &json, const std::map<T, V> *objects)
 	{
 		acl::json_node &node = json.create_array();
 		for (typename std::map<T, V>::const_iterator
@@ -632,8 +630,8 @@ namespace acl
 
 	template <class T>
 	typename enable_if<is_object<T>::value,
-		std::pair<bool, std::string>>::type
-		static inline gson(acl::json_node &node, T **obj);
+		std::pair<bool, std::string> >::type
+	static inline gson(acl::json_node &node, T **obj);
 
 	template<class T>
 	static inline void del(T **obj)
@@ -649,7 +647,8 @@ namespace acl
 	}
 
 	//bool
-	static inline std::pair<bool, std::string> gson(acl::json_node &node, bool *obj)
+	static inline std::pair<bool, std::string>
+		gson(acl::json_node &node, bool *obj)
 	{
 		if (node.is_bool() == false)
 			return std::make_pair(false, "get bool failed");
@@ -658,7 +657,8 @@ namespace acl
 		return std::make_pair(true, "");
 	}
 
-	static inline std::pair<bool, std::string> gson(acl::json_node &node, bool **obj)
+	static inline std::pair<bool, std::string>
+		gson(acl::json_node &node, bool **obj)
 	{
 		if (node.is_bool() == false)
 			return std::make_pair(false, "get bool failed");
@@ -671,8 +671,8 @@ namespace acl
 	//double
 	template <class T>
 	typename enable_if<is_double<T>::value,
-		std::pair<bool, std::string>>::type
-		static inline gson(acl::json_node &node, T *obj)
+		std::pair<bool, std::string> >::type
+	static inline gson(acl::json_node &node, T *obj)
 	{
 		if (node.is_double() == false)
 			return std::make_pair(false, "get double failed");
@@ -683,8 +683,8 @@ namespace acl
 
 	template <class T>
 	typename enable_if<is_double<T>::value,
-		std::pair<bool, std::string>>::type
-		static inline gson(acl::json_node &node, T **obj)
+		std::pair<bool, std::string> >::type
+	static inline gson(acl::json_node &node, T **obj)
 	{
 		if (node.is_double() == false)
 			return std::make_pair(false, "get double failed");;
@@ -696,8 +696,8 @@ namespace acl
 
 	//intergral
 	template <class T>
-	typename enable_if<is_number<T>::value, std::pair<bool, std::string>>::type
-		static inline gson(acl::json_node &node, T *obj)
+	typename enable_if<is_number<T>::value, std::pair<bool, std::string> >::type
+	static inline gson(acl::json_node &node, T *obj)
 	{
 		if (node.is_number() == false)
 			return std::make_pair(false, "get number failed");
@@ -707,8 +707,8 @@ namespace acl
 	}
 
 	template <class T>
-	typename enable_if<is_number<T>::value, std::pair<bool, std::string>>::type
-		static inline gson(acl::json_node &node, T **obj)
+	typename enable_if<is_number<T>::value, std::pair<bool, std::string> >::type
+	static inline gson(acl::json_node &node, T **obj)
 	{
 		if (node.is_number() == false)
 			return std::make_pair(false, "get number failed");;
@@ -720,7 +720,7 @@ namespace acl
 
 	//string
 	static inline 
-		std::pair<bool, std::string> gson(acl::json_node &node, char **obj)
+	std::pair<bool, std::string> gson(acl::json_node &node, char **obj)
 	{
 		if (node.is_string() == false)
 			return std::make_pair(false, "get char * string failed");
@@ -796,7 +796,7 @@ namespace acl
 	//vector
 	template<class T>
 	std::pair<bool, std::string>
-		static inline gson(acl::json_node &node, std::vector<T> *objs)
+	static inline gson(acl::json_node &node, std::vector<T> *objs)
 	{
 		std::pair<bool, std::string> result;
 		acl::json_node *itr = node.first_child();
@@ -818,8 +818,8 @@ namespace acl
 
 	template <class T>
 	typename enable_if<is_object<T>::value,
-		std::pair<bool, std::string>>::type
-		static inline gson(acl::json_node &node, T **obj)
+		std::pair<bool, std::string> >::type
+	static inline gson(acl::json_node &node, T **obj)
 	{
 		*obj = new T();
 		std::pair<bool, std::string> result = gson(node, *obj);
@@ -832,7 +832,7 @@ namespace acl
 		return result;
 	}
 
-	/////////////////////////////////////map///////////////////////////////
+	///////////////////////////////////map////////////////////////////////
 
 	//int map
 
@@ -843,8 +843,8 @@ namespace acl
 		is_number<T>::value||
 		is_double<T>::value||
 		is_char_ptr<T>::value,
-		std::pair<bool, std::string>>::type
-		static inline expand(acl::json_node &node, std::map<K, T> *objs)
+		std::pair<bool, std::string> >::type
+	static inline expand(acl::json_node &node, std::map<K, T> *objs)
 	{
 		std::pair<bool, std::string> result;
 		acl::json_node *itr = node.first_child();
@@ -874,8 +874,8 @@ namespace acl
 
 	template<class K, class T>
 	typename enable_if <is_object<T>::value ,
-		std::pair<bool, std::string >> ::type
-		static inline expand(acl::json_node &node, std::map<K, T> *objs)
+		std::pair<bool, std::string > > ::type
+	static inline expand(acl::json_node &node, std::map<K, T> *objs)
 	{
 		std::pair<bool, std::string> result;
 		acl::json_node *itr = node.first_child();
@@ -906,7 +906,7 @@ namespace acl
 	//map
 	template<class K, class V>
 	std::pair<bool, std::string>
-		static inline gson(acl::json_node &node, std::map<K, V> *objs)
+	static inline gson(acl::json_node &node, std::map<K, V> *objs)
 	{
 		std::pair<bool, std::string> result;
 		acl::json_node *itr = node.first_child();

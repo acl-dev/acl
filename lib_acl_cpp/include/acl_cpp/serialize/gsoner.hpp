@@ -14,8 +14,7 @@
 #include <list>
 #include <map>
 #include <vector>
-
-#ifdef ACL_USE_CPP11
+#include <string>
 
 namespace acl
 {
@@ -159,5 +158,3 @@ private:
 };
 
 }//end of acl
-
-#endif // end ACL_USE_CPP11

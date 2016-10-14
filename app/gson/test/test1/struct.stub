@@ -8,7 +8,7 @@ struct people
 	acl::string bb;
 };
 
-struct user : people
+struct user
 {
 	user(const char* user_name, const char* user_domain,
 		int user_age, bool user_male)
@@ -44,14 +44,15 @@ struct message
 	//char* data = "hello world";		// error
 	//char ch = 'A';			// error
 	//unsigned char ch = 'b';		// error
+	//char ch1;				// error
 	//const user* u1 = nullptr;		// error
 	int n = 100;				// ok
 	long n1 = 1000;				// ok
 	long long int n2 = 1000;		// ok
 	short n3 = 100;				// ok
+	//short* n3_1 = &n3;			// error
 	//Gson@optional
 	user* u = nullptr;			// ok
-	//char ch1;
 
 	//const int n4 = 100;			// error
 	//const long n5 = 1000;			// error
