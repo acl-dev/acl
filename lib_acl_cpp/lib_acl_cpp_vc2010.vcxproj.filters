@@ -514,6 +514,9 @@
     <ClCompile Include="src\stdlib\xml2.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\serialize\gsoner.cpp">
+      <Filter>src\serialize</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -1059,6 +1062,9 @@
     <ClInclude Include="include\acl_cpp\stdlib\xml2.hpp">
       <Filter>include\stdlib</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\serialize\gsoner.hpp">
+      <Filter>include\serialize</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="lib_acl_cpp_vc2010.rc" />
@@ -1181,6 +1187,12 @@
     </Filter>
     <Filter Include="src\smtp">
       <UniqueIdentifier>{49f8268a-7d4d-4e7e-930c-13e26dc8cd2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\serialize">
+      <UniqueIdentifier>{8a9406c6-05fa-479f-948e-33a8dd6ead0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\serialize">
+      <UniqueIdentifier>{b11cf93f-d6d7-4940-9406-ef655ebde884}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

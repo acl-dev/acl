@@ -1166,6 +1166,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="serialize"
+				>
+				<File
+					RelativePath=".\src\serialize\gsoner.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
@@ -1700,11 +1708,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\singleton.hpp"
+					RelativePath=".\include\acl_cpp\stdlib\sha1.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\stdlib\sha1.hpp"
+					RelativePath=".\include\acl_cpp\stdlib\singleton.hpp"
 					>
 				</File>
 				<File
@@ -1885,6 +1893,14 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\smtp\smtp_client.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="serialize"
+				>
+				<File
+					RelativePath=".\include\acl_cpp\serialize\gsoner.hpp"
 					>
 				</File>
 			</Filter>

@@ -10,7 +10,6 @@
 #include "acl_cpp/stdlib/dns_service.hpp"
 #include "acl_cpp/stdlib/final_tpl.hpp"
 #include "acl_cpp/stdlib/json.hpp"
-#include "acl_cpp/serialize/gsoner.hpp"
 #include "acl_cpp/stdlib/locker.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 //#include "malloc.hpp"
@@ -32,6 +31,8 @@
 #include "acl_cpp/stdlib/thread_queue.hpp"
 #include "acl_cpp/stdlib/scan_dir.hpp"
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
+
+#include "acl_cpp/serialize/gsoner.hpp"
 
 #include "acl_cpp/memcache/memcache.hpp"
 #include "acl_cpp/memcache/memcache_pool.hpp"
