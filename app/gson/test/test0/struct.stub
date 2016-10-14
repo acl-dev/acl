@@ -1,5 +1,38 @@
 #pragma once
 
+struct user1
+{
+	user1()
+		:a(/*
+		   */
+		(/*
+		 */(/*//
+		 */(/*//
+		 */(/*//
+		 */(/*//
+		 */int/*//
+		 */(/*
+		 */int/*
+		 */(/*
+		 */1/*
+		 */)/*
+		 */)/*
+		 */)/*
+		 */)/*
+		 */)/*
+		 */)/*
+		 */)/*
+		 */),b(
+	0
+)
+	{
+
+	}
+	int a;
+	int b;
+};
+
+
 struct user
 {
 	user(const char* user_name, const char* user_domain,

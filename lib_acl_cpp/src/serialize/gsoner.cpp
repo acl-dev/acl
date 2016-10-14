@@ -707,14 +707,12 @@ std::pair<bool, std::string> gsoner::get_function_declare()
 				throw syntax_error();
 			continue;
 		}
+		if(codes_[j] == ')')
+			syn--;
+		if(syn == 0)
 		{
-			if(codes_[j] == ')')
-				syn--;
-			if(syn == 0)
-			{
-				lines.push_back(codes_[j]);
-				break;
-			}
+			lines.push_back(codes_[j]);
+			break;
 		}
 		if(codes_[j] == '(')
 			syn++;
@@ -725,6 +723,7 @@ std::pair<bool, std::string> gsoner::get_function_declare()
 	pos_ = j;
 	return std::make_pair(true, lines);
 }
+
 std::list<std::string> gsoner::get_initializelist ()
 {
 	std::list<std::string> initialize_list;
@@ -743,26 +742,25 @@ std::list<std::string> gsoner::get_initializelist ()
 		}
 		else if (codes_[pos_] == ')')
 		{
+			if (!syms.size() || syms.back () != '(')
+				throw syntax_error ();
+
 			line.push_back (')');
 			pos_++;
-			if (syms.size () && syms.back () == '(')
+
+			syms.pop_back ();
+			if (!syms.empty ())
+				continue;
+
+			initialize_list.push_back (line);
+			line.clear ();
+			while (codes_[pos_] != ',' && codes_[pos_] != '{')
 			{
-				syms.pop_back ();
-				if (syms.empty ())
-				{
-					initialize_list.push_back (line);
-					line.clear ();
-					while (codes_[pos_] != ',' && codes_[pos_] != '{')
-					{
-						if (skip_space_comment () == false)
-							pos_++;
-					}
-					if (codes_[pos_] == ',')
-						pos_++;
-				}
+				if (skip_space_comment () == false)
+					pos_++;
 			}
-			else
-				throw syntax_error ();
+			if (codes_[pos_] == ',')
+				pos_++;
 			continue;
 		}
 		else if (codes_[pos_] == '{')
@@ -771,28 +769,29 @@ std::list<std::string> gsoner::get_initializelist ()
 				break;
 			syms.push_back ('{');
 
-		}else if (codes_[pos_] == '}')
+		}
+		else if (codes_[pos_] == '}')
 		{
+			if (!syms.size () || syms.back () != '{')
+				throw syntax_error ();
+
 			line.push_back ('}');
 			pos_++;
-			if (syms.size () && syms.back () == '{')
+
+			syms.pop_back ();
+			if (!syms.empty ())
+				continue;
+
+			initialize_list.push_back (line);
+			line.clear ();
+			while (codes_[pos_] != ',' && codes_[pos_] != '{')
 			{
-				syms.pop_back ();
-				if (syms.empty ())
-				{
-					initialize_list.push_back (line);
-					line.clear ();
-					while (codes_[pos_] != ',' && codes_[pos_] != '{')
-					{
-						if (skip_space_comment () == false)
-							pos_++;
-					}
-					if (codes_[pos_] == ',')
-						pos_++;
-				}
+				if (skip_space_comment () == false)
+					pos_++;
 			}
-			else
-				throw syntax_error ();
+			if (codes_[pos_] == ',')
+				pos_++;
+
 			continue;
 		}
 		line.push_back (codes_[pos_]);
@@ -1338,7 +1337,7 @@ std::string gsoner::get_include_files()
 void gsoner::gen_gson()
 {
 	const char *namespace_start = "namespace acl\n{";
-	const char *namespace_end = "\n}///end of acl.";
+	const char *namespace_end = "\n}///end of acl.\n";
 
 	write_source("#include \"stdafx.h\"\n");
 	write_source(get_include_files());
