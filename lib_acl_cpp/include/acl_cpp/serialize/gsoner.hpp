@@ -19,7 +19,7 @@
 namespace acl
 {
 
-class gsoner
+class ACL_CPP_API gsoner
 {
 public:
 	gsoner ();
