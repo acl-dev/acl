@@ -335,20 +335,10 @@ template<class T>
 typename enable_if<is_object<T>::value, void>::type
 static inline add_item(acl::json &json, acl::json_node &node, const T &obj)
 {
-	if (check_nullptr(obj))
+	if(check_nullptr(obj))
 		node.add_array_null();
 	else
 		node.add_child(gson(json, obj));
-}
-
-template<class T>
-typename enable_if<is_object<T>::value, void>::type
-static inline add_item(acl::json &json, acl::json_node &node, const T *obj)
-{
-	if (check_nullptr(obj))
-		node.add_array_null();
-	else
-		add_item(json, node, *obj);
 }
 
 // number
@@ -356,10 +346,7 @@ template<class T>
 typename enable_if<is_number<T>::value, void>::type
 static inline add_item(acl::json &, acl::json_node &node, T value)
 {
-	if (check_nullptr(value))
-		node.add_array_null();
-	else
-		node.add_array_number(get_value(value));
+	node.add_array_number(get_value(value));
 }
 
 template<class T>
@@ -376,7 +363,14 @@ template<class T>
 typename enable_if<is_double<T>::value, void>::type
 static inline add_item(acl::json &, acl::json_node &node, T value)
 {
-	if (check_nullptr(value))
+	node.add_array_double(get_value(value));
+}
+
+template<class T>
+typename enable_if<is_double<T>::value, void>::type
+static inline add_item(acl::json &, acl::json_node &node, T* value)
+{
+	if(check_nullptr(value))
 		node.add_array_null();
 	else
 		node.add_array_double(get_value(value));
@@ -385,12 +379,44 @@ static inline add_item(acl::json &, acl::json_node &node, T value)
 //bool 
 template<class T>
 typename enable_if<is_bool<T>::value, void>::type
-static inline add_item(acl::json &, acl::json_node &node, T value)
+static inline add_item(acl::json &, acl::json_node &node, T *value)
 {
 	if (check_nullptr(value))
 		node.add_array_null();
 	else
 		node.add_array_bool(get_value(value));
+}
+
+template<class T>
+typename enable_if<is_bool<T>::value, void>::type
+static inline add_item(acl::json &, acl::json_node &node, T value)
+{
+	node.add_array_bool(get_value(value));
+}
+
+template<class T>
+typename enable_if<is_string<T>::value, void>::type
+static inline add_item(acl::json &, acl::json_node &node, T value)
+{
+	node.add_array_text(get_value(value));
+}
+
+template<class T>
+typename enable_if<is_string<T>::value, void>::type
+static inline add_item(acl::json &, acl::json_node &node, T *value)
+{
+	if(check_nullptr(value))
+		node.add_array_null();
+	else
+		node.add_array_text(get_value(value));
+}
+
+static inline void add_item(acl::json &, acl::json_node &node, char *value)
+{
+	if(check_nullptr(value))
+		node.add_array_null();
+	else
+		node.add_array_text(value);
 }
 
 template<class V>
