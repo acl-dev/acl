@@ -40,27 +40,31 @@ void test_base()
 	obj.bases_list_ptr = new std::list<base>;
 	obj.bases_list_ptr->push_back(b);
 	obj.bases_ptr_list_ptr = new std::list<base*>;
-	obj.bases_ptr_list_ptr->push_back(nullptr);
-	obj.bases_ptr_list_ptr->push_back(nullptr);
-	obj.bases_ptr_list_ptr->push_back(nullptr);
-	obj.bases_ptr_list_ptr->push_back(nullptr);
+	obj.bases_ptr_list_ptr->push_back(NULL);
+	obj.bases_ptr_list_ptr->push_back(NULL);
+	obj.bases_ptr_list_ptr->push_back(NULL);
+	obj.bases_ptr_list_ptr->push_back(NULL);
+	obj.base_map.insert(std::make_pair("base", b));
+	obj.base_list_map.insert( std::make_pair("base", obj.bases_list));
+	obj.vector_list_base.push_back(obj.bases_list);
+
 	acl::json json;
 	acl::json_node &node = acl::gson(json, obj);
-	printf("%s\n", node.to_string().c_str());
+	printf("%s\n\n", node.to_string().c_str());
 
 
 	list1 obj2;
 	acl::json json2;
 	json2.update(node.to_string().c_str());
-	printf("%s\n",json2.to_string().c_str());
+	printf("%s\n\n",json2.to_string().c_str());
 	std::pair<bool,std::string> ret = acl::gson(json2.get_root(), obj2);
 	if(ret.first == false)
-		printf("%s\n",ret.second.c_str());
+		printf("%s\n\n",ret.second.c_str());
 	else
 	{
 		acl::json json3;
 		acl::json_node &node3 = acl::gson(json3, obj2);
-		printf("%s\n", node3.to_string().c_str());
+		printf("%s\n\n", node3.to_string().c_str());
 	}
 	
 }
