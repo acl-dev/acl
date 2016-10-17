@@ -671,6 +671,7 @@ static inline std::pair<bool, std::string> gson(acl::json_node &node, bool *obj)
 
 static inline std::pair<bool, std::string> gson(acl::json_node &node, bool **obj)
 {
+	*obj = NULL;
 	if (node.is_bool() == false)
 		return std::make_pair(false, "get bool failed");
 
@@ -698,6 +699,7 @@ typename enable_if<is_double<T>::value,
 	std::pair<bool, std::string> >::type
 static inline gson(acl::json_node &node, T **obj)
 {
+	*obj = NULL;
 	if (node.is_double() == false)
 		return std::make_pair(false, "get double failed");;
 
@@ -725,6 +727,7 @@ typename enable_if<is_number<T>::value,
 	 std::pair<bool, std::string> >::type
 static inline gson(acl::json_node &node, T **obj)
 {
+	*obj = NULL;
 	if (node.is_number() == false)
 		return std::make_pair(false, "get number failed");;
 
@@ -737,6 +740,7 @@ static inline gson(acl::json_node &node, T **obj)
 //string
 static inline std::pair<bool, std::string> gson(acl::json_node &node, char **obj)
 {
+	*obj = NULL;
 	if (node.is_string() == false)
 		return std::make_pair(false, "get char * string failed");
 
@@ -761,6 +765,7 @@ static inline std::pair<bool, std::string>
 static inline std::pair<bool, std::string>
 	gson(acl::json_node &node, acl::string **obj)
 {
+	*obj = NULL;
 	if (node.is_string() == false)
 		return std::make_pair(false, "get string failed");
 
@@ -783,6 +788,7 @@ static inline std::pair<bool, std::string>
 static inline std::pair<bool, std::string>
 	gson(acl::json_node &node, std::string **obj)
 {
+	*obj = NULL;
 	if (node.is_string() == false)
 		return std::make_pair(false, "get string failed");
 
