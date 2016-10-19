@@ -98,6 +98,8 @@ void fiber_io_check(void)
 	__thread_fiber->io_count = 0;
 	__thread_fiber->nsleeping = 0;
 	__thread_fiber->io_stop = 0;
+	__thread_fiber->loop_fn = NULL;
+	__thread_fiber->loop_ctx = NULL;
 	acl_ring_init(&__thread_fiber->ev_timer);
 
 	if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
