@@ -1,3 +1,6 @@
+27) 2016.10.19
+27.1) bugfix: fiber_io.c 中的 __thread_fiber->loop_fn 没有赋初值
+
 26) 2016.9.25
 26.1) feature: 增加 acl_fiber_post_event 函数，在每次事件循环过程中可以调用由
 该函数设置的回调函数
