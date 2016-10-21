@@ -345,9 +345,11 @@ unsigned short HttpServletRequest::getLocalPort(void) const
 
 	if (client_ == NULL)
 		return 0;
-	const char* ptr = client_->get_stream().get_local();
+
+	const char* ptr = client_->get_stream().get_local(true);
 	if (*ptr == 0)
 		return 0;
+
 	char* p = (char*) strchr(ptr, ':');
 	if (p == NULL || *(++p) == 0)
 		return 0;

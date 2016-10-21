@@ -157,11 +157,14 @@ void websocket::make_frame_header(void)
 
 bool websocket::send_frame_data(const char* str)
 {
-	return send_frame_data(str, strlen(str));
+	return send_frame_data(str, str ? strlen(str) : 0);
 }
 
 bool websocket::send_frame_data(const void* data, size_t len)
 {
+	if (data == NULL || len == 0)
+		return send_frame_data((void*) data, len);
+
 	void* buf = acl_mymemdup(data, len);
 	bool ret = send_frame_data(buf, len);
 	acl_myfree(buf);
@@ -170,7 +173,7 @@ bool websocket::send_frame_data(const void* data, size_t len)
 
 bool websocket::send_frame_data(char* str)
 {
-	return send_frame_data(str, strlen(str));
+	return send_frame_data(str, str ? strlen(str) : 0);
 }
 
 bool websocket::send_frame_data(void* data, size_t len)
@@ -208,11 +211,14 @@ bool websocket::send_frame_data(void* data, size_t len)
 
 bool websocket::send_frame_pong(const char* str)
 {
-	return send_frame_pong(str, strlen(str));
+	return send_frame_pong(str, str ? strlen(str) : 0);
 }
 
 bool websocket::send_frame_pong(const void* data, size_t len)
 {
+	if (data == NULL || len == 0)
+		return send_frame_pong((void*) NULL, 0);
+
 	void* buf = acl_mymemdup(data, len);
 	bool ret = send_frame_pong(buf, len);
 	acl_myfree(buf);
@@ -221,7 +227,7 @@ bool websocket::send_frame_pong(const void* data, size_t len)
 
 bool websocket::send_frame_pong(char* str)
 {
-	return send_frame_pong(str, strlen(str));
+	return send_frame_pong(str, str ? strlen(str) : 0);
 }
 
 bool websocket::send_frame_pong(void* data, size_t len)
@@ -236,11 +242,14 @@ bool websocket::send_frame_pong(void* data, size_t len)
 
 bool websocket::send_frame_ping(const char* str)
 {
-	return send_frame_ping(str, strlen(str));
+	return send_frame_ping(str, str ? strlen(str) : 0);
 }
 
 bool websocket::send_frame_ping(const void* data, size_t len)
 {
+	if (data == NULL || len == 0)
+		return send_frame_ping((void*) NULL, 0);
+
 	void* buf = acl_mymemdup(data, len);
 	bool ret = send_frame_ping(buf, len);
 	acl_myfree(buf);
@@ -249,7 +258,7 @@ bool websocket::send_frame_ping(const void* data, size_t len)
 
 bool websocket::send_frame_ping(char* str)
 {
-	return send_frame_ping(str, strlen(str));
+	return send_frame_ping(str, str ? strlen(str) : 0);
 }
 
 bool websocket::send_frame_ping(void* data, size_t len)
@@ -316,9 +325,9 @@ bool websocket::read_frame_head(void)
 	}
 	else if (ret == 2)
 	{
-		unsigned int n;
+		unsigned short n;
 		memcpy(&n, buf, ret);
-		header_.payload_len = ntohl(n);
+		header_.payload_len = ntohs(n);
 	}
 	else	// ret == 8
 	{
@@ -346,7 +355,7 @@ int websocket::read_frame_data(char* buf, size_t size)
 	if (header_.payload_len - payload_nread_ < size)
 		size = (size_t) (header_.payload_len - payload_nread_);
 
-	int ret = client_.read(buf, size);
+	int ret = client_.read(buf, size, false);
 	if (ret == -1)
 	{
 		logger_error("read frame data error %s", last_serror());

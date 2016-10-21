@@ -104,6 +104,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		acl_socket_close,               /* close_fn */
 		acl_file_close,                 /* fclose_fn */
 		0,                              /* oflags */
+		0600,                           /* omode */
 		0,                              /* nrefer */
 		0,                              /* pid */
 #ifdef ACL_WINDOWS
@@ -161,6 +162,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		acl_socket_close,               /* close_fn */
 		acl_file_close,                 /* fclose_fn */
 		0,                              /* oflags */
+		0600,                           /* omode */
 		0,                              /* nrefer */
 		0,                              /* pid */
 #ifdef ACL_WINDOWS
@@ -217,6 +219,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		acl_socket_close,               /* close_fn */
 		acl_file_close,                 /* fclose_fn */
 		0,                              /* oflags */
+		0600,                           /* omode */
 		0,                              /* nrefer */
 		0,                              /* pid */
 #ifdef ACL_WINDOWS
@@ -2186,6 +2189,8 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	fp->addr_local = __empty_string;
 	fp->addr_peer = __empty_string;
 	fp->path = __empty_string;
+	fp->oflags = 0;
+	fp->omode = 0600;
 
 	fp->close_handle_lnk = acl_array_create(8);
 	return fp;
@@ -2242,6 +2247,8 @@ ACL_VSTREAM *acl_vstream_clone(const ACL_VSTREAM *from)
 	to->fdp = NULL;
 	to->context = from->context;
 	to->close_handle_lnk = acl_array_create(8);
+	to->oflags = from->oflags;
+	to->omode = from->omode;
 
 	if (from->close_handle_lnk == NULL)
 		return to;
@@ -2318,7 +2325,10 @@ ACL_VSTREAM *acl_vstream_fopen(const char *path, unsigned int oflags,
 		return NULL;
 
 	fp->fd.h_file = fh;
+	fp->oflags = oflags;
+	fp->omode  = mode;
 	acl_vstream_set_path(fp, path);
+
 	return fp;
 }
 

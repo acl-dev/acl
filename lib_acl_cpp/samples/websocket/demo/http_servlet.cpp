@@ -13,6 +13,22 @@ http_servlet::~http_servlet(void)
 	delete session_;
 }
 
+bool http_servlet::doError(acl::HttpServletRequest&,
+	acl::HttpServletResponse& res)
+{
+	res.setStatus(400);
+	res.setContentType("text/html; charset=");
+	// 发送 http 响应头
+	if (res.sendHeader() == false)
+		return false;
+
+	// 发送 http 响应体
+	acl::string buf;
+	buf.format("<root error='some error happened!' />\r\n");
+	(void) res.getOutputStream().write(buf);
+	return false;
+}
+
 bool http_servlet::doUnknown(acl::HttpServletRequest&,
 	acl::HttpServletResponse& res)
 {
@@ -38,7 +54,7 @@ bool http_servlet::doPing(acl::websocket& in, acl::websocket& out)
 {
 	unsigned long long len = in.get_frame_payload_len();
 	if (len == 0)
-		return out.send_frame_pong(NULL, 0);
+		return out.send_frame_pong((const void*) NULL, 0);
 
 	out.reset().set_frame_fin(true)
 		.set_frame_opcode(acl::FRAME_PONG)
@@ -213,15 +229,22 @@ bool http_servlet::doWebsocket(acl::HttpServletRequest& req,
 	return false;
 }
 
-bool http_servlet::doPost(acl::HttpServletRequest&,
+bool http_servlet::doPost(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
-	res.setContentType("text/xml; charset=utf-8")	// 设置响应字符集
+	res.setContentType("text/html; charset=utf-8")	// 设置响应字符集
 		.setContentEncoding(true)		// 设置是否压缩数据
 		.setChunkedTransferEncoding(false);	// 采用 chunk 传输方式
 
-	printf("error\r\n");
-	acl::string buf("error");
+	acl::string html_file;
+	html_file << var_cfg_html_path << "/client.html";
+	acl::string buf;
+	if (acl::ifstream::load(html_file, &buf) == false)
+	{
+		logger_error("load %s error %s",
+			html_file.c_str(), acl::last_serror());
+		return doError(req, res);
+	}
 
 	// 发送 http 响应体，因为设置了 chunk 传输模式，所以需要多调用一次
 	// res.write 且两个参数均为 0 以表示 chunk 传输数据结束

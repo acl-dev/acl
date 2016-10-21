@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 		if (argc >= 3)
 			conf = argv[2];
 
-		const char* addr = "0.0.0.0:9001";
+		const char* addr = "0.0.0.0:9004";
 		if (argc >= 4)
 			addr = argv[3];
 

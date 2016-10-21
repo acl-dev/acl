@@ -18,3 +18,4 @@
 #endif
 
 extern char *var_cfg_html_path;
+extern char *var_cfg_upload_path;

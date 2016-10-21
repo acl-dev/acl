@@ -1,5 +1,8 @@
 修改历史列表：
 
+565) 2016.10.21
+565.1) feature: ACL_VSTREAM 结构体中新增标志位 omode，主要用于 UNIX 平台打开文件
+
 564) 2016.10.11
 564.1) bugfix: acl_json_util.c 中 acl_json_build/acl_json_building 创建 json
 字符串时，针对非文本类型不应该有双引号

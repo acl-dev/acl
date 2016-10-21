@@ -1,6 +1,14 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+444) 2016.10.21
+444.1) bugfix: HttpServletRequest.cpp 中的方法 getLocalPort 无法取得本地端口
+444.2) feature: fstream 类新方法 rename 用于修改文件名
+
+443) 2016.10.20
+443.1) bugfix: websocket 类中的函数 read_frame_head 里，当数据长度字段为两个
+字节时，应该使用 short 类型且要使用 ntohs 而非 ntohl 做转换
+
 442) 2016.10.14
 442.1) feature: gson C++ 对象序列化库支持非 C++11 模式
 

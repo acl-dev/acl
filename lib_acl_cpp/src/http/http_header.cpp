@@ -270,6 +270,10 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */)
 		ptr = url_ + sizeof("http://") - 1;
 	else if (strncasecmp(url_, "https://", sizeof("https://") - 1) == 0)
 		ptr = url_+ sizeof("https://") -1;
+	else if (strncasecmp(url_, "ws://", sizeof("ws://") - 1) == 0)
+		ptr = url_ + sizeof("ws://") - 1;
+	else if (strncasecmp(url_, "wss://", sizeof("wss://") - 1) == 0)
+		ptr = url_ + sizeof("wss://") - 1;
 	else
 		ptr = url_;
 
