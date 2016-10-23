@@ -514,7 +514,9 @@
     <ClCompile Include="src\stdlib\xml2.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
-    <ClCompile Include="src\serialize\gsoner.cpp" />
+    <ClCompile Include="src\serialize\gsoner.cpp">
+      <Filter>Source Files\serialize</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -1058,7 +1060,9 @@
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="resource_vc2015.h" />
-    <ClInclude Include="include\acl_cpp\serialize\gsoner.hpp" />
+    <ClInclude Include="include\acl_cpp\serialize\gsoner.hpp">
+      <Filter>Header Files\serialize</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -1183,6 +1187,12 @@
     </Filter>
     <Filter Include="Header Files\smtp">
       <UniqueIdentifier>{d34f52dc-798d-4c26-b23f-25210566d571}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\serialize">
+      <UniqueIdentifier>{61183180-d88a-4f27-96bf-34a9c11fd714}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\serialize">
+      <UniqueIdentifier>{2b06d3aa-a69d-4f30-a8c3-4c5443a1d0a8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
