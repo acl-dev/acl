@@ -110,7 +110,7 @@ ACL_JSON_NODE *acl_json_create_text(ACL_JSON *json,
 
 	acl_vstring_strcpy(node->ltag, name);
 	acl_vstring_strcpy(node->text, value);
-	node->type = ACL_JSON_T_TEXT;
+	node->type = ACL_JSON_T_STRING;
 	return (node);
 }
 

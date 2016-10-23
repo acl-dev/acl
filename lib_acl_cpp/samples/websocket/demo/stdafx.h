@@ -17,3 +17,4 @@
 #define	snprintf _snprintf
 #endif
 
+extern char *var_cfg_html_path;

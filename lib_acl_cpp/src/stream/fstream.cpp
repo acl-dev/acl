@@ -1,5 +1,7 @@
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
+#include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stream/fstream.hpp"
 #endif
 
@@ -30,6 +32,7 @@ void fstream::open(ACL_FILE_HANDLE fh, unsigned int oflags,
 	stream_->fd.h_file = fh;
 	stream_->type = ACL_VSTREAM_TYPE_FILE;
 	stream_->oflags = oflags;
+	stream_->omode = 0600;
 	opened_ = true;
 	eof_ = false;
 
@@ -58,6 +61,7 @@ bool fstream::open(const char* path, unsigned int oflags, int mode)
 	stream_->fd.h_file = fh;
 	stream_->type = ACL_VSTREAM_TYPE_FILE;
 	stream_->oflags = oflags;
+	stream_->omode = mode;
 	acl_vstream_set_path(stream_, path);
 	opened_ = true;
 	eof_ = false;
@@ -77,6 +81,56 @@ bool fstream::remove(void)
 #else
 	return ::unlink(filepath) == 0 ? true : false;
 #endif
+}
+
+bool fstream::rename(const char* from_path, const char* to_path)
+{
+	if (from_path == NULL || *from_path == 0)
+	{
+		logger_error("from_path NULL");
+		return false;
+	}
+	if (to_path == NULL || *to_path == 0)
+	{
+		logger_error("to_path NULL");
+		return false;
+	}
+
+	bool need_reopen;
+	unsigned int oflags, omode;
+
+#if defined(_WIN32) || defined(_WIN64)
+	if (opened() && stream_ != NULL)
+	{
+		oflags = stream_->oflags;
+		omode = stream_->omode;
+		// WINDOWS 下必须先关闭文件句柄
+		close();
+		need_reopen = true;
+	}
+	else
+	{
+		oflags = 0;
+		omode = 0;
+		need_reopen = false;
+	}
+#else
+	oflags = 0;
+	omode = 0;
+	need_reopen = false;
+#endif
+	if (::rename(from_path, to_path) == -1)
+	{
+		logger_error("rename from %s to %s error %s",
+			from_path, to_path, last_serror());
+		return false;
+	}
+
+	if (!need_reopen)
+		return true;
+
+	// 针对 windows 平台，需要重新打开该文件句柄
+	return open(to_path, oflags, omode);
 }
 
 const char* fstream::file_path() const

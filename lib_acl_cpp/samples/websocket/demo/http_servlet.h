@@ -13,6 +13,9 @@ public:
 
 protected:
 	// @override
+	bool doError(acl::HttpServletRequest&, acl::HttpServletResponse&);
+
+	// @override
 	bool doUnknown(acl::HttpServletRequest&, acl::HttpServletResponse&);
 
 	// @override

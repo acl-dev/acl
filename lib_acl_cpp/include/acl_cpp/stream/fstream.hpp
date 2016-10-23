@@ -51,6 +51,15 @@ public:
 	 */
 	bool remove(void);
 
+	/**
+	 * 将当前文件重命名为指定文件名，针对 WINDOWS 平台，需要先关闭当前文件
+	 * 句柄，当重命名成功后再重新打开新的目标文件
+	 * @param from_path {const char*} 源文件名
+	 * @param to_path {const char*} 目标文件名
+	 * @return {bool} 命名是否成功
+	 */
+	bool rename(const char* from_path, const char* to_path);
+
 #if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * 根据系统的文件句柄打开 fstream 文件流对象
