@@ -268,7 +268,8 @@ int main(int argc, char *argv[])
 		.set_dbpass(dbpass)
 		.set_dblimit(cocurrent)
 		.set_conn_timeout(conn_timeout)
-		.set_rw_timeout(rw_timeout);
+		.set_rw_timeout(rw_timeout)
+		.set_charset("utf8");
 
 	// init mysql connections pool
 	acl::mysql_pool dbpool(dbconf);

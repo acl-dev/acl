@@ -57,6 +57,11 @@ public:
 	{
 		set_idle_ttl(ttl);
 	}
+
+protected:
+	// 虚函数，子类根据需要设置字符集，当 peek_open 被调用时，此函数
+	// 会先被调用用来设置数据库连接的字符集
+	virtual void set_charset(const char*) {}
 };
 
 class ACL_CPP_API db_guard : public connect_guard
