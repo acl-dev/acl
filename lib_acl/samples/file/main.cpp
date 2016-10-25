@@ -8,7 +8,7 @@ static void end(void)
 	fflush(stdout);
 	getchar();
 #endif
-	acl_end();
+	acl_lib_end();
 }
 
 static void test_file(void)
@@ -81,7 +81,7 @@ static int test_vstream(void)
 	char  buf[256];
 	struct tm *local_time;
 
-	acl_init();
+	acl_lib_init();
 
 	if (fp == NULL) {
 		printf("open file(%s) error(%s)\r\n", filename, acl_last_serror());

@@ -28,7 +28,7 @@ static void init(int use_slice)
 		acl_mem_slice_init(8, 10240, 100000, ACL_SLICE_FLAG_GC2
 			| ACL_SLICE_FLAG_RTGC_OFF | ACL_SLICE_FLAG_LP64_ALIGN);
 
-	acl_init();
+	acl_lib_init();
 	echo_client_init(ECHO_CTL_SERV_ADDR, __svr_addr,
 			ECHO_CTL_MAX_CONNECT, __nconnect,
 			ECHO_CTL_MAX_LOOP, __nloop,

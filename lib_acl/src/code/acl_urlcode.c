@@ -29,9 +29,10 @@ char *acl_url_encode(const char *str, ACL_DBUF_POOL *dbuf)
 
 	for (i = 0, j = 0; i < len; i++, j++) {
 		tmp[j] = (unsigned char) str[i];
-		if (tmp[j] == ' ')
+		/* if (tmp[j] == ' ')
 			tmp[j] = '+';
-		else if (!isalnum(tmp[j]) && strchr("_-.", tmp[j]) == NULL) {
+		else */
+		if (!isalnum(tmp[j]) && strchr("_-.", tmp[j]) == NULL) {
 			tmp_len += 3;
 			if (dbuf != NULL) {
 				unsigned char *t = (unsigned char*) 
@@ -89,9 +90,11 @@ char *acl_url_decode(const char *str, ACL_DBUF_POOL *dbuf)
 		 * needs to be multiplied by 16 ( << 4 ), and the
 		 * another one we just get the value from hextable variable
 		 */
+		/*
 		if (str[i] == '+')
 			tmp[pos] = ' ';
-		else if (str[i] != '%')
+		else */
+		if (str[i] != '%')
 			tmp[pos] = str[i];
 		else if (i + 2 >= len) {  /* check boundary */
 			tmp[pos++] = '%';  /* keep it */

@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 	char  addr[64];
 	int   ch, can_quit = 0, need_echo = 0, inter = 1000;
 
-	acl_init();
+	acl_lib_init();
 
 	snprintf(addr, sizeof(addr), "127.0.0.1:8888");
 
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 	signal(SIGINT, on_sigint);
 	run(addr, can_quit, need_echo, inter);
 
-	acl_end();
+	acl_lib_end();
 
 	return 0;
 }

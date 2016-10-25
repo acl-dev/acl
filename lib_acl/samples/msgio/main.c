@@ -113,7 +113,7 @@ static void init(int nthread)
 	acl_pthread_attr_t attr;
 	int   i;
 
-	acl_init();
+	acl_lib_init();
 
 	__ipc_clients = (IPC_CLIENT*) acl_mycalloc(nthread, sizeof(IPC_CLIENT));
 

@@ -28,8 +28,8 @@ CFLAGS = -c -g -W \
 -Wno-long-long \
 -Wuninitialized \
 -D_POSIX_PTHREAD_SEMANTICS \
--DACL_PREPARE_COMPILE \
--Winvalid-pch
+#-DACL_PREPARE_COMPILE \
+#-Winvalid-pch
 #-DUSE_EPOLL \
 #-Wno-tautological-compare \
 #-Wno-invalid-source-encoding \

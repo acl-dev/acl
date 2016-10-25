@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 	dns_ips[0] = 0;
 	domains[0] = 0;
 
-	acl_init();
+	acl_lib_init();
 
 	while ((ch = getopt(argc, argv, "s:p:d:")) > 0) {
 		switch (ch) {

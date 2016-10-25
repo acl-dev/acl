@@ -1,5 +1,9 @@
 修改历史列表：
 
+566) 2016.10.25
+566.1) compile: 使用 gcc 编译时若打开预编译选项，个别文件会因头文件未包含而报错
+566.2) bugfix: 修复了 url coder 针对  '+' 编码时的不兼容性问题
+
 565) 2016.10.21
 565.1) feature: ACL_VSTREAM 结构体中新增标志位 omode，主要用于 UNIX 平台打开文件
 565.2) bugfix: acl_json.h 头文件中定义的 ACL_JSON_T_XXX 有重复值，容易造成混乱

@@ -18,6 +18,10 @@ typedef struct acl_stat acl_stat_t;
  */
 
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
 
 #define _ACL_UCHAR_(c)      ((unsigned char)(c))
 
