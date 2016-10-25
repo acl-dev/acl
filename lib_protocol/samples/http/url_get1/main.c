@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 	return (0);
 	*/
 
-	acl_init();  /* 初始化 acl 库 */
+	acl_lib_init();  /* 初始化 acl 库 */
 
 	ACL_SAFE_STRNCPY(method, "GET", sizeof(method));
 	url[0] = 0;
