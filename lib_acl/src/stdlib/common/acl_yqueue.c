@@ -2,8 +2,10 @@
 
 #ifndef ACL_PREPARE_COMPILE
 
+#include <string.h>
 #include "stdlib/acl_define.h"
 #include "stdlib/acl_mymalloc.h"
+#include "stdlib/acl_atomic.h"
 #include "stdlib/acl_yqueue.h"
 
 #endif

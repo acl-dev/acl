@@ -6,7 +6,7 @@ namespace acl
 
 void acl_cpp_init(void)
 {
-	acl_init();
+	acl_lib_init();
 }
 
 #ifdef ACL_WINDOWS

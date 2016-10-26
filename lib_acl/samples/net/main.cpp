@@ -169,7 +169,7 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	char  addr[256];
 	int   ch, n, f;
 
-	acl_init();
+	acl_lib_init();
 	acl_msg_stdout_enable(1);
 
 	addr[0] = 0;

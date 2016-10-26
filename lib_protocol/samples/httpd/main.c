@@ -11,12 +11,12 @@ typedef struct {
 
 static void init(void)
 {
-	acl_init();
+	acl_lib_init();
 }
 
 static void end(void)
 {
-	acl_end();
+	acl_lib_end();
 }
 
 static void thread_run(void *arg)

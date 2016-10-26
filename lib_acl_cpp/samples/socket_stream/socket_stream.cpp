@@ -20,7 +20,8 @@ int main(int argc, char* argv[])
 		"Connection: close\r\n\r\n";
 	acl::string respond;
 
-	acl_init();
+	acl::acl_cpp_init();
+
 	if (client.open(addr, 0, 0) == false) {
 		printf("connect %s error(%s)\n", addr.c_str(), acl_last_serror());
 		printf("input any key to exit\n");

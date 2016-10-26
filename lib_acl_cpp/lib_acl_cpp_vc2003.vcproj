@@ -923,6 +923,13 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\disque\disque_job.cpp">
 				</File>
 			</Filter>
+			<Filter
+				Name="serialize"
+				Filter="">
+				<File
+					RelativePath=".\src\serialize\gsoner.cpp">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
@@ -1483,6 +1490,13 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\disque\disque_node.hpp">
+				</File>
+			</Filter>
+			<Filter
+				Name="serialize"
+				Filter="">
+				<File
+					RelativePath=".\include\acl_cpp\serialize\gsoner.hpp">
 				</File>
 			</Filter>
 		</Filter>

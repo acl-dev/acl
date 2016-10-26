@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 	int   ch, out = 0;
 	char  url[256], dump[256], proxy[256], method[32];
 
-	acl_init();  /* 初始化 acl 库 */
+	acl_lib_init();  /* 初始化 acl 库 */
 
 	ACL_SAFE_STRNCPY(method, "GET", sizeof(method));
 	url[0] = 0;

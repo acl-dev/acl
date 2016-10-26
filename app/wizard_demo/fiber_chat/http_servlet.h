@@ -58,10 +58,20 @@ private:
 	bool doMsg(acl::websocket&, acl::websocket&);
 
 private:
+	acl::string username_;
+	bool logined_;
+	bool doStatus(acl::socket_stream& conn, const char* info);
 	bool doLogin(acl::socket_stream&, const std::vector<acl::string>&);
 	bool doChat(acl::socket_stream&, const std::vector<acl::string>& tokens);
+	bool doChat(const acl::string& from_user, chat_client& to_client, 
+		const acl::string& msg);
+
+	void oneLogin(const acl::string& user);
+	void oneLogin(chat_client& client, const acl::string& user);
+	void oneLogout(const acl::string& user);
+	void oneLogout(chat_client& client, const acl::string& user);
 
 	chat_client* find(const char* user);
+	chat_client* find(acl::socket_stream& conn);
 	void remove(acl::socket_stream& conn);
-
 };

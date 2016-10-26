@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 {
 	int   ret, i;
 
-	acl_init();
+	acl_lib_init();
 
 	if (argc != 2) {
 		printf("usage: %s conf_file\n", argv[0]);

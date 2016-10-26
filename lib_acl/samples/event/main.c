@@ -88,7 +88,7 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	int   meter = 0;
 
 	/* 初始化 acl 库 */
-	acl_init();
+	acl_lib_init();
 
 	/* 将错误日志输出至标准输出 */
 	acl_msg_stdout_enable(1);

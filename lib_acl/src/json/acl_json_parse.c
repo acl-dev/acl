@@ -539,7 +539,7 @@ static const char *json_strend(ACL_JSON *json, const char *data)
 				node->type = ACL_JSON_T_A_STRING
 					| ACL_JSON_T_LEAF;
 		} else
-			node->type = ACL_JSON_T_STRING | ACL_JSON_T_LEAF;
+			node->type = ACL_JSON_T_A_STRING | ACL_JSON_T_LEAF;
 	} else if (node->quote == 0) {
 		const char* txt = STR(node->text);
 

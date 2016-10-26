@@ -1,6 +1,5 @@
 #include "lib_acl.h"
-#include "acl_cpp/stream/socket_stream.hpp"
-#include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/lib_acl.hpp"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -9,7 +8,7 @@ int main(void)
 	acl::socket_stream client;
 	acl::string addr = "127.0.0.1:9001";
 
-	acl_init();
+	acl::acl_cpp_init();
 	if (client.open(addr, 0, 0) == false)
 	{
 		printf("open %s error\n", addr.c_str());

@@ -159,6 +159,8 @@ struct ACL_VSTREAM {
 	 * O_SEQUENTIAL: 0x0020, O_RANDOM: 0x0010.
 	 */
 
+	unsigned int omode;             /**< open mode, such as: 0600, 0777 */
+
 	int   nrefer;                   /**< refer count, used for engine moudle */
 
 #if defined(_WIN32) || defined(_WIN64)

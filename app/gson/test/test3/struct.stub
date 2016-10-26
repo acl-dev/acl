@@ -1,0 +1,21 @@
+#pragma once
+#include <string>
+
+struct student
+{
+	std::string shcool;
+	std::string class_name;
+};
+
+struct province
+{
+	std::string province_name;
+	std::string position;
+};
+
+struct user : student, province
+{
+	std::string name;
+	int  age;
+	bool male;
+};

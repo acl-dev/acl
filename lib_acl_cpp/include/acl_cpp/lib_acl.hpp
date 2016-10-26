@@ -32,6 +32,8 @@
 #include "acl_cpp/stdlib/scan_dir.hpp"
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 
+#include "acl_cpp/serialize/gsoner.hpp"
+
 #include "acl_cpp/memcache/memcache.hpp"
 #include "acl_cpp/memcache/memcache_pool.hpp"
 #include "acl_cpp/memcache/memcache_manager.hpp"

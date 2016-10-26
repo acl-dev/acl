@@ -12,7 +12,6 @@
 
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
-#include <string>
 
 namespace acl
 {
@@ -51,7 +50,7 @@ struct frame_header
 	unsigned int masking_key;
 };
 
-class websocket
+class ACL_CPP_API websocket
 {
 public:
 	websocket(socket_stream& client);
@@ -78,9 +77,21 @@ public:
 	websocket& set_frame_payload_len(unsigned long long len);
 	websocket& set_frame_masking_key(unsigned int mask);
 
-	bool send_frame_data(char* data, size_t len);
-	bool send_frame_pong(char* data, size_t len);
-	bool send_frame_ping(char* data, size_t len);
+	bool send_frame_data(const void* data, size_t len);
+	bool send_frame_pong(const void* data, size_t len);
+	bool send_frame_ping(const void* data, size_t len);
+
+	bool send_frame_data(void* data, size_t len);
+	bool send_frame_pong(void* data, size_t len);
+	bool send_frame_ping(void* data, size_t len);
+
+	bool send_frame_data(const char* str);
+	bool send_frame_pong(const char* str);
+	bool send_frame_ping(const char* str);
+
+	bool send_frame_data(char* str);
+	bool send_frame_pong(char* str);
+	bool send_frame_ping(char* str);
 
 	bool get_frame_fin(void) const
 	{

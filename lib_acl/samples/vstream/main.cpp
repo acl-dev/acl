@@ -152,7 +152,7 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	ACL_VSTRING *sbuf;
 	int   flag = 0;
 
-	acl_init();
+	acl_lib_init();
 
 #if 0
 	return (vstream_server());

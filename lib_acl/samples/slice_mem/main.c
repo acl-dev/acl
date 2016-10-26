@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	acl_init();
+	acl_lib_init();
 	if (use_slice)
 		acl_mem_slice_init(base, nslice, nalloc_gc, slice_flag);
 	if (use_thrpool)

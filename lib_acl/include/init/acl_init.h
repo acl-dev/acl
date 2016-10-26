@@ -10,12 +10,12 @@ extern "C" {
 /**
  * 初始化整个ACL库
  */
-ACL_API void acl_init(void);
+ACL_API void acl_lib_init(void);
 
 /**
  * 结束整个ACL库
  */
-ACL_API void acl_end(void);
+ACL_API void acl_lib_end(void);
 
 /**
  * 是否优先使用 poll 而非 select

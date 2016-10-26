@@ -12,17 +12,17 @@
 
 #define STACK_SIZE	64000
 
-int   acl_var_fiber_pid;
-char *acl_var_fiber_procname = NULL;
-char *acl_var_fiber_log_file = NULL;
+static int   acl_var_fiber_pid;
+static char *acl_var_fiber_procname = NULL;
+static char *acl_var_fiber_log_file = NULL;
 
-int   acl_var_fiber_stack_size = STACK_SIZE;
-int   acl_var_fiber_buf_size;
-int   acl_var_fiber_rw_timeout;
-int   acl_var_fiber_max_debug;
-int   acl_var_fiber_enable_core;
-int   acl_var_fiber_use_limit;
-int   acl_var_acl_fiber_idle_limit;
+static int   acl_var_fiber_stack_size = STACK_SIZE;
+static int   acl_var_fiber_buf_size;
+static int   acl_var_fiber_rw_timeout;
+static int   acl_var_fiber_max_debug;
+static int   acl_var_fiber_enable_core;
+static int   acl_var_fiber_use_limit;
+static int   acl_var_acl_fiber_idle_limit;
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ "fiber_stack_size", STACK_SIZE, &acl_var_fiber_stack_size, 0, 0 },
 	{ "fiber_buf_size", 8192, &acl_var_fiber_buf_size, 0, 0 },
@@ -35,13 +35,13 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ 0, 0, 0, 0, 0 },
 };
 
-char *acl_var_fiber_queue_dir;
-char *acl_var_fiber_log_debug;
-char *acl_var_fiber_deny_banner;
-char *acl_var_fiber_access_allow;
-char *acl_var_fiber_owner;
-char *acl_var_fiber_dispatch_addr;
-char *acl_var_fiber_dispatch_type;
+static char *acl_var_fiber_queue_dir;
+static char *acl_var_fiber_log_debug;
+static char *acl_var_fiber_deny_banner;
+static char *acl_var_fiber_access_allow;
+static char *acl_var_fiber_owner;
+static char *acl_var_fiber_dispatch_addr;
+static char *acl_var_fiber_dispatch_type;
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ "fiber_queue_dir", "", &acl_var_fiber_queue_dir },
 	{ "fiber_log_debug", "all:1", &acl_var_fiber_log_debug },
@@ -60,7 +60,7 @@ static int    __daemon_mode = 0;
 static void (*__service)(ACL_VSTREAM*, void*) = NULL;
 static int   *__service_ctx = NULL;
 static char   __service_name[256];
-static void (*__service_onexit) = NULL;
+static void (*__service_onexit)(void*) = NULL;
 static char  *__deny_info = NULL;
 
 static unsigned      __server_generation;

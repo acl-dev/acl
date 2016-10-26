@@ -1,0 +1,213 @@
+<html>
+<meta charset="utf-8" />
+<title>WebSocket Chat</title>
+<script language="javascript" type="text/javascript">
+  var wsUri = "ws://121.42.12.244:9001/";
+  var ws = null;
+  var logined = false;
+  var user_list = new Array();
+
+  function OnConnect(user) {
+    wsUri = document.getElementById("url").value;
+    openWebSocket(user); 
+  }
+
+  function openWebSocket(user) {
+    if (ws != null)
+        ws.close();
+    ws = new WebSocket(wsUri);
+    ws.onmessage = function (evt) { onMessage(evt); };
+    ws.onopen = function (evt) { onOpen(evt, user); };
+    ws.onclose = function (evt) { onClose(evt); };
+    ws.onerror = function (evt) { onError(evt); };
+  }
+
+  function onOpen(evt, user) {
+    setStatus("connected ...");
+  }
+
+  function onClose(evt) {
+    setStatus("disconnected ...");
+    logined = false;
+    user_list = new Array();
+    ws = null;
+    displayUsers();
+  }
+
+  function onError(evt) {
+    setStatus('<span style="color: red;">ERROR:</span> ' + evt.data);
+  }
+
+  function onMessage(evt) {
+    output = document.getElementById('output');
+    var data = evt.data;
+    var del1 = data.indexOf("|");
+    if (del1 == -1) {
+	    setStatus("invalid data: " + data);
+	    return;
+    }
+    var cmd = data.substr(0, del1);
+    switch (cmd) {
+    case "status":
+      onStatus(data.substring(del1 + 1));
+      break;
+    case "users":
+      onUsers(data.substring(del1 + 1));
+      break;
+    case "login":
+      onLogin(data.substring(del1 + 1));
+      break;
+    case "logout":
+      onLogout(data.substring(del1 + 1));
+      break;
+    case "chat":
+      onChat(data.substring(del1 + 1));
+      break;
+    default:
+      break;
+    }
+  }
+
+  function onChat(data) {
+    var del2 = data.indexOf("|");
+    if (del2 == -1) {
+	    setStatus("invalid data: " + data);
+	    return;
+    }
+    var from = data.substr(0, del2);
+    var msg = data.substring(del2 + 1);
+    data = output.innerHTML + "<font color='blue'>" + from + "> " + msg + "</front><br>";
+    output.innerHTML = data;
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function onStatus(data) {
+    setStatus(data);
+  }
+
+  function userExist(user) {
+    for (var i = 0; i < user_list.length; i++) {
+      if (user_list[i] == user)
+        return true;
+    }
+    return false;
+  }
+
+  function displayUsers() {
+    var users = "";
+    for (var i = 0; i < user_list.length; i++) {
+      users += user_list[i] + "<br>";
+    }
+    document.getElementById("users").innerHTML = users;
+  }
+
+  function onUsers(data) {
+    setStatus("login ok");
+    var tokens = data.split("|");
+    for (var i = 0; i < tokens.length; i++) {
+      if (!userExist(tokens[i]))
+        user_list.push(tokens[i]);
+    }
+    displayUsers();
+  }
+
+  function onLogin(user) {
+    logined = true;
+    if (userExist(user))
+      return;
+    document.getElementById("users").innerHTML += user + "<br>";
+    user_list.push(user);
+  }
+
+  function onLogout(user) {
+    for (var i = 0; i < user_list.length; i++) {
+      if (user_list[i] == user) {
+        user_list.splice(i, 1);
+	break;
+      }
+    }
+    displayUsers();
+  }
+
+  function doLogin(user) {
+    if (ws == null) {
+      alert("Please connect first!");
+      document.all.connect.focus();
+      return;
+    }
+    var user = document.getElementById(user).value;
+    if (user.length == 0) {
+      alert("Please enter your name!");
+      document.all.user.focus();
+      return;
+    }
+    message = "login|" + user;
+    ws.send(message);
+  }
+
+  function doSend(to, msgid) {
+    if (!logined) {
+      alert("Please login first!");
+      document.all.login.focus();
+      return;
+    }
+    var to_user = document.getElementById(to).value;
+    var msg = document.getElementById(msgid).value;
+    if (msg.length == 0)
+      return;
+    message = "chat|" + msg + "|" + to_user;
+    ws.send(message);
+    document.getElementById(msgid).value = "";
+  }
+
+  function doClear(output) {
+    document.getElementById(output).innerHTML = "";
+  }
+
+  function setStatus(message) {
+    node = document.getElementById("status");
+    node.innerHTML = '<font style="color: blue; height: 10px;">' +  message + '</font>';
+  }
+ 
+</script>
+<body>
+
+<div style="float:left;">
+  <fieldset style="width:530px;">
+    <legend>WebSocket Chat</legend>
+    <p><span>Server url:</span>
+      <input id="url" type="text"  value="ws://121.42.12.244:9001/" />
+      <input type="button" id="connect" value="connect" onclick="OnConnect('user');" />
+    </p>
+    <p>
+      me: <input id="user" type="text" value="" />
+      <input type="button" id="login" value="login" onclick="doLogin('user');" />
+    </p>
+    <p>
+      to: &nbsp;&nbsp;<input id="to_user" type="text" value="all" />
+      &nbsp;&nbsp;
+      <br>
+      <br>
+      <input type=text id="msg" size="60px" value="hello world!"
+        onkeydown = "if (event.keyCode==13) doSend('to_user', 'msg');"/>
+      <input type="button" value="send" onclick="doSend('to_user', 'msg');" />
+      <input type="button" value="clear" onclick="doClear('output');" />
+    </p>
+    <fieldset>
+      <div id="output" style="width:500px;height:300px; overflow:auto;"></div>
+      <hr>
+      <div id="status" style="width:500px;height:25px; overflow:auto;" align = "right"> </div>
+      <div><a href="https://github.com/zhengshuxin/acl/tree/master/app/wizard_demo/fiber_chat" target=_blank>源码</a></div>
+    </fieldset>
+  </fieldset>
+</div>
+
+<div style="float:auto; margin:10px">
+  <fieldset style="width:150px; height:500px;">
+    <legend>User List</legend>
+    <div id="users"></div>
+  </fieldset>
+</div>
+
+</body>
+</html>

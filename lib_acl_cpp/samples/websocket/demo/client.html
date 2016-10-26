@@ -1,0 +1,46 @@
+<html>
+<meta charset="utf-8" />
+<title>WebSocket Test</title>
+<script language="javascript" type="text/javascript">
+    var wsUri = "ws://121.42.12.244:9004/";
+    var output;
+    function init() {
+        output = document.getElementById("output"); 
+        testWebSocket(); 
+    }
+    function testWebSocket() {
+        websocket = new WebSocket(wsUri);
+        websocket.onopen = function (evt) { onOpen(evt) };
+        websocket.onclose = function (evt) { onClose(evt) };
+        websocket.onmessage = function (evt) { onMessage(evt) };
+        websocket.onerror = function (evt) { onError(evt) };
+    } function onOpen(evt) {
+        writeToScreen("CONNECTED");
+         
+    }
+    function onClose(evt) { writeToScreen("DISCONNECTED"); }
+    function onMessage(evt) { document.getElementById('result').value = evt.data; }
+    function onError(evt) { writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data); }
+    function doSend(message) {  websocket.send(message); }
+    function writeToScreen(message) {
+        var pre = document.createElement("p"); pre.style.wordWrap = "break-word"; pre.innerHTML = message; output.insertBefore(pre);
+    }
+ 
+    function OnConnect() {
+        wsUri = document.getElementById("url").value;
+        init();
+         
+    }
+     </script>
+<body>
+<fieldset>
+<legend>WebSocket</legend>
+    <p><span>Server url:</span><input id="url" type="text"  value="ws://121.42.12.244:9004/"/><input type="button" value="Connected" onclick="OnConnect()" /></p>
+    <p><span>send:</span><input id="youname" type="text"  value="test"/><input type="button" value="Submit" onclick="doSend(document.getElementById('youname').value)" /></p>
+    <p><span>recv:</span><input id="result" type="text"  value="" /></p>
+    </fieldset>
+<div id="output">
+ 
+</div>
+</body>
+</html>

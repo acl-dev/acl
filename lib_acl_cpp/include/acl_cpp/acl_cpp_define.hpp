@@ -80,3 +80,13 @@ typedef long ssize_t;
 #else
 #define	ACL_CPP_DEPRECATED_FOR(f)	ACL_CPP_DEPRECATED
 #endif // __GNUC__
+
+#if defined(__GNUC__) && (__GNUC__ > 6 ||(__GNUC__ == 6 && __GNUC_MINOR__ >= 0))
+# ifndef   ACL_USE_CPP11
+#  define  ACL_USE_CPP11
+# endif
+#elif	defined(_MSC_VER) && (_MSC_VER >= 1900)
+# ifndef   ACL_USE_CPP11
+#  define  ACL_USE_CPP11
+# endif
+#endif // __GNUC__

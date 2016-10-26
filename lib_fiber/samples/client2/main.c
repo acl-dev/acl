@@ -123,7 +123,8 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
-		" -s addr\r\n"
+		" -s server_ip\r\n"
+		" -p server_port\r\n"
 		" -t connt_timeout\r\n"
 		" -r rw_timeout\r\n"
 		" -c max_fibers\r\n"
