@@ -1,6 +1,10 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+446) 2016.10.26
+446.1) bugfix: redis_zset.cpp 中第二个 zrevrangebyscore_with_scores 返回结果
+集顺序是反的
+
 445) 2016.10.24
 445.1) bugfix: db_handle::peek_open 函数中的参数 charset 没有生效
 

@@ -3,6 +3,7 @@
 #include <getopt.h>
 #endif
 #include <iostream>
+#include "acl_cpp/acl_cpp_init.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stdlib/dns_service.hpp"
 
@@ -72,7 +73,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	acl_init();
+	acl_cpp_init();
 
 	aio_handle handle;
 

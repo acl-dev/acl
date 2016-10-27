@@ -88,7 +88,7 @@ bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 	acl_assert(addrs && *addrs);
 
 #ifdef ACL_WINDOWS
-	acl_init();
+	acl_cpp_init();
 #endif
 	ACL_EVENT* eventp = acl_event_new_select(1, 0);
 	set_event(eventp);  // 调用基类方法设置事件引擎句柄
