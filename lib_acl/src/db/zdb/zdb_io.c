@@ -3,18 +3,6 @@
 
 #include "stdlib/acl_define.h"
 
-#if defined(ACL_LINUX) && !defined(MINGW)
-# define	__USE_UNIX98
-# include <unistd.h>
-
-# define	PWRITE	pwrite64
-# define	PREAD	pread64
-
-#else
-# undef		PWRITE
-# undef		PREAD
-#endif
-
 #include <string.h>
 #include "stdlib/avl.h"
 #include "stdlib/acl_msg.h"
@@ -25,6 +13,18 @@
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_mystring.h"
 #include "db/zdb.h"
+
+# if defined(ACL_LINUX) && !defined(MINGW) && defined(__GNUC__) && __GNUC__ >= 4
+#  ifndef  _GNU_SOURCE
+#   define _GNU_SOURCE
+#  endif
+
+#  include <unistd.h>
+#  ifdef __USE_LARGEFILE64
+#   define PWRITE pwrite64
+#   define PREAD  pread64
+#  endif
+# endif
 
 #endif
 

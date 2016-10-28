@@ -7,6 +7,7 @@
 #endif
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #ifdef	ACL_WINDOWS
 #include <search.h>   /* just for qsort */
 #endif

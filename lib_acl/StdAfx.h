@@ -27,9 +27,6 @@ int acl_secure_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
 # endif  /* _WIN32 */
 
 # ifdef	ACL_UNIX
-#  ifndef  __USE_XOPEN2K
-#   define __USE_XOPEN2K
-#  endif
 #  ifndef  _GNU_SOURCE
 #   define _GNU_SOURCE
 #  endif

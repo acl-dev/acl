@@ -20,9 +20,6 @@
 # ifndef  _GNU_SOURCE
 #  define _GNU_SOURCE
 # endif
-# ifndef __USE_XOPEN2K
-#  define __USE_XOPEN2K
-# endif
 # include <pthread.h>
 #endif
 
