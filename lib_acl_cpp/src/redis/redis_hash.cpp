@@ -304,7 +304,7 @@ bool redis_hash::hincrbyfloat(const char* key, const char* name,
 
 	hash_slot(key);
 	build("HINCRBYFLOAT", key, names, values, 1);
-	if (get_string(buf, sizeof(buf)) == false)
+	if (get_string(buf, sizeof(buf)) <= 0)
 		return false;
 
 	if (result != NULL)

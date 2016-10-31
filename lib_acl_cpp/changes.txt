@@ -1,6 +1,10 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+447) 2016.10.31
+447.1) bugfix: redis_string::incrbyfloat 及 redis_hash::hincrbyfloat 中在
+调用 get_string 后判断是否出错的方式有问题，应该使用长度做为判定条件而不是 bool 值
+
 446) 2016.10.26
 446.1) bugfix: redis_zset.cpp 中第二个 zrevrangebyscore_with_scores 返回结果
 集顺序是反的

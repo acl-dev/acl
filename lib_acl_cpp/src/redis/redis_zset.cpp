@@ -358,7 +358,7 @@ bool redis_zset::zincrby(const char* key, double inc,
 	hash_slot(key);
 	build_request(4, argv, lens);
 	int ret = get_string(score, sizeof(score));
-	if (ret < 0)
+	if (ret <= 0)
 		return false;
 	if (result)
 		*result = atof(score);
