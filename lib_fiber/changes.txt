@@ -1,3 +1,8 @@
+
+28) 2016.10.31
+28.1) feature: fiber.c 中实现了 __i386__ 下 SETJMP，LONGJMP 的汇编方式，从
+libdill 借鉴而来
+
 27) 2016.10.19
 27.1) bugfix: fiber_io.c 中的 __thread_fiber->loop_fn 没有赋初值
 

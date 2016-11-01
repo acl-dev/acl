@@ -358,7 +358,7 @@ bool redis_zset::zincrby(const char* key, double inc,
 	hash_slot(key);
 	build_request(4, argv, lens);
 	int ret = get_string(score, sizeof(score));
-	if (ret < 0)
+	if (ret <= 0)
 		return false;
 	if (result)
 		*result = atof(score);
@@ -782,7 +782,8 @@ int redis_zset::zrevrangebyscore_with_scores(const char* key, double min,
 	safe_snprintf(min_s, sizeof(min_s), "%.8f", min);
 	safe_snprintf(max_s, sizeof(max_s), "%.8f", max);
 
-	return zrangebyscore_with_scores(key, min_s, max_s, out, offset, count);
+	return zrevrangebyscore_with_scores(key, min_s, max_s,
+		out, offset, count);
 }
 
 int redis_zset::zrevrank(const char* key, const char* member, size_t len)

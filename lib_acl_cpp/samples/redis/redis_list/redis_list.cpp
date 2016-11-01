@@ -13,8 +13,8 @@ static const int __value_len = 32;
 #define DELETE_VALUES(values,n)\
 do\
 {  for(int i = 0; i < (n) ; ++i)\
-	delete (values)[i];\
-   delete (values);\
+	delete [](values)[i];\
+   delete [](values);\
 } while (0);
 
 

@@ -2,8 +2,8 @@
 本网络协程库的协程部分是基于 Russ Cox (golang 的协程作者) 在 2005 年实现的 libtask，libtask 实现了协程编程的基本原型，lib_fiber 一方面使协程编程接口更加简单易用(用户可以直接调用 acl_fiber_create 创建协程)，另一方面 lib_fiber 实现了线程安全的协程库，通过给每个线程一个独立的协程调度器，从而方便用户使用多核，此外，lib_fiber 还增加了基于协程的信号量、协程局部变量等功能。
 本网络协程库的异步 IO 事件部分基于 redis 中的 event 模块改造而来，增加了延迟删除、句柄缓存等功能。
 
-下面是一个简单使用网络协程库编写的一个简单的高并发服务器：
-
+###**示例一**
+下面是一个简单使用网络协程库编写的一个**简单的高并发服务器**：
 ```c++
 #include <stdio.h>
 #include <stdlib.h>
@@ -217,8 +217,210 @@ int main(int argc, char *argv[])
 	return 0;
 }
 ```
+###**示例二**
+上面的例子中因为使用了系统原生的网络 API，所以感觉代码有些臃肿，下面的例子使用 acl 库中提供的网络 API，显得更为简单些：
+```c++
+#include "stdafx.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-参考：
-1、网络协程编程：http://zsxxsz.iteye.com/blog/2312043
-2、使用协程编写高并发网络服务：http://zsxxsz.iteye.com/blog/2309654
-3、使用协程方式编写高并发的WEB服务：http://zsxxsz.iteye.com/blog/2309665
+class fiber_client : public acl::fiber
+{
+public:
+	fiber_client(acl::socket_stream* conn) : conn_(conn) {}
+
+protected:
+	// @override
+	void run(void)
+	{
+		printf("fiber-%d-%d running\r\n", get_id(), acl::fiber::self());
+
+		char buf[8192];
+		while (true)
+		{
+			int ret = conn_->read(buf, sizeof(buf), false);
+			if (ret == -1)
+				break;
+			if (conn_->write(buf, ret) == -1)
+				break;
+		}
+
+		delete conn_;
+		delete this;
+	}
+
+private:
+	acl::socket_stream* conn_;
+
+	~fiber_client(void) {}
+};
+
+class fiber_server : public acl::fiber
+{
+public:
+	fiber_server(acl::server_socket& ss) : ss_(ss) {}
+	~fiber_server(void) {}
+
+protected:
+	// @override
+	void run(void)
+	{
+		while (true)
+		{
+			acl::socket_stream* conn = ss_.accept();
+			if (conn == NULL)
+			{
+				printf("accept error %s\r\n", acl::last_serror());
+				break;
+			}
+
+			printf("accept ok, fd: %d\r\n", conn->sock_handle());
+			// create one fiber for one connection
+			fiber_client* fc = new fiber_client(conn);
+			// start the fiber
+			fc->start();
+			continue;
+		}
+	}
+
+private:
+	acl::server_socket& ss_;
+};
+
+static void usage(const char* procname)
+{
+	printf("usage: %s -h [help] -s listen_addr\r\n", procname);
+}
+
+int main(int argc, char *argv[])
+{
+	int  ch;
+
+	acl::acl_cpp_init();
+	acl::string addr("127.0.0.1:9006");
+	acl::log::stdout_open(true);
+
+	while ((ch = getopt(argc, argv, "hs:")) > 0)
+	{
+		switch (ch)
+		{
+		case 'h':
+			usage(argv[0]);
+			return 0;
+		case 's':
+			addr = optarg;
+			break;
+		default:
+			break;
+		}
+	}
+
+	acl::server_socket ss;
+	if (ss.open(addr) == false)
+	{
+		printf("listen %s error %s\r\n", addr.c_str(), acl::last_serror());
+		return 1;
+	}
+	printf("listen %s ok\r\n", addr.c_str());
+
+	fiber_server fs(ss);
+	fs.start();		// start listen fiber
+
+	acl::fiber::schedule();	// start fiber schedule
+
+	return 0;
+}
+```
+###**示例三**
+如果使用C++11的特性，则示例二会更为简单，如下：
+```c++
+#include "stdafx.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+static void fiber_client(acl::socket_stream* conn)
+{
+	printf("fiber-%d running\r\n", acl::fiber::self());
+
+	char buf[8192];
+	while (true)
+	{
+		int ret = conn->read(buf, sizeof(buf), false);
+		if (ret == -1)
+			break;
+		if (conn->write(buf, ret) == -1)
+			break;
+	}
+
+	delete conn;
+}
+
+static void fiber_server(acl::server_socket& ss)
+{
+	while (true)
+	{
+		acl::socket_stream* conn = ss.accept();
+		if (conn == NULL)
+		{
+			printf("accept error %s\r\n", acl::last_serror());
+			break;
+		}
+
+		printf("accept ok, fd: %d\r\n", conn->sock_handle());
+
+		go[=] {
+			fiber_client(conn);
+		};
+	}
+}
+
+static void usage(const char* procname)
+{
+	printf("usage: %s -h [help] -s listen_addr\r\n", procname);
+}
+
+int main(int argc, char *argv[])
+{
+	int  ch;
+
+	acl::acl_cpp_init();
+	acl::string addr("127.0.0.1:9006");
+	acl::log::stdout_open(true);
+
+	while ((ch = getopt(argc, argv, "hs:")) > 0)
+	{
+		switch (ch)
+		{
+		case 'h':
+			usage(argv[0]);
+			return 0;
+		case 's':
+			addr = optarg;
+			break;
+		default:
+			break;
+		}
+	}
+
+	acl::server_socket ss;
+	if (ss.open(addr) == false)
+	{
+		printf("listen %s error %s\r\n", addr.c_str(), acl::last_serror());
+		return 1;
+	}
+	printf("listen %s ok\r\n", addr.c_str());
+
+	go[&] {
+		fiber_server(ss);
+	};
+
+	acl::fiber::schedule();	// start fiber schedule
+
+	return 0;
+}
+```
+###**参考**
+ 
+ - 网络协程编程：http://zsxxsz.iteye.com/blog/2312043     
+ - 用协程编写高并发网络服务：http://zsxxsz.iteye.com/blog/2309654    
+ - 使用协程方式编写高并发的WEB服务：http://zsxxsz.iteye.com/blog/2309665

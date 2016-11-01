@@ -2,6 +2,7 @@
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
+#include "stdlib/acl_msg.h"
 #include "stdlib/acl_mymalloc.h"
 #include "thread/acl_pthread.h"
 #include "stdlib/acl_atomic.h"
@@ -50,7 +51,14 @@ void acl_atomic_set(ACL_ATOMIC *self, void *value)
 #elif	defined(ACL_WINDOWS)
 	InterlockedExchangePointer((volatile PVOID*) &self->value, value);
 #elif	defined(ACL_LINUX)
+# if defined(__GNUC__) && (__GNUC__ >= 4)
 	(void) __sync_lock_test_and_set(&self->value, value);
+# else
+	(void) self;
+	(void) value;
+	acl_msg_error("%s(%d), %s: not support!",
+		 __FILE__, __LINE__, __FUNCTION__);
+# endif
 #endif
 }
 
@@ -70,7 +78,16 @@ void *acl_atomic_cas(ACL_ATOMIC *self, void *cmp, void *value)
 	return InterlockedCompareExchangePointer(
 		(volatile PVOID*)&self->value, value, cmp);
 #elif	defined(ACL_LINUX)
+# if defined(__GNUC__) && (__GNUC__ >= 4)
 	return __sync_val_compare_and_swap(&self->value, cmp, value);
+# else
+	(void) self;
+	(void) cmp;
+	(void) value;
+	acl_msg_error("%s(%d), %s: not support!",
+		 __FILE__, __LINE__, __FUNCTION__);
+	return NULL;
+# endif
 #endif
 }
 
@@ -88,6 +105,14 @@ void * acl_atomic_xchg(ACL_ATOMIC *self, void *value)
 #elif	defined(ACL_WINDOWS)
 	return InterlockedExchangePointer((volatile PVOID*)&self->value, value);
 #elif	defined(ACL_LINUX)
+# if defined(__GNUC__) && (__GNUC__ >= 4)
 	return __sync_lock_test_and_set(&self->value, value);
+# else
+	(void) self;
+	(void) value;
+	acl_msg_error("%s(%d), %s: not support!",
+		 __FILE__, __LINE__, __FUNCTION__);
+	return NULL;
+# endif
 #endif
 }

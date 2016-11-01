@@ -1,27 +1,29 @@
 
+#if defined(ACL_WINDOWS)
 #pragma comment(lib,"ws2_32")
+#endif
 
 #include "lib_acl.h"
 #include <assert.h>
 
 static void test_urlcode(void)
 {
-	const char *params = "name=中国&value=人民&name2=姓名&value2=逍遥仙";
+	const char *params = "n a m e=中国&value=人民&name2=姓名&value2=逍遥仙";
 	char *tmp1, *tmp2;
 
-	printf("params: (%s), len=%d\r\n", params, strlen(params));
-	tmp1 = acl_url_encode(params);
+	printf("params: (%s), len=%d\r\n", params, (int) strlen(params));
+	tmp1 = acl_url_encode(params, NULL);
 	assert(tmp1);
-	printf("encode: (%s), len=%d\r\n", tmp1, strlen(tmp1));
-	tmp2 = acl_url_decode(tmp1);
+	printf("encode: (%s), len=%d\r\n", tmp1, (int) strlen(tmp1));
+	tmp2 = acl_url_decode(tmp1, NULL);
 	assert(tmp2);
-	printf("decode: (%s), len=%d\r\n", tmp2, strlen(tmp2));
+	printf("decode: (%s), len=%d\r\n", tmp2, (int) strlen(tmp2));
 
 	acl_myfree(tmp1);
 	acl_myfree(tmp2);
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	test_urlcode();
 	printf(">>\\r: %d, \\n: %d\r\n", (int) '\r', (int) '\n');

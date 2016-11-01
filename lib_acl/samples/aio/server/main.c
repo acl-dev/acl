@@ -34,7 +34,7 @@ static void init(void)
 		acl_mem_slice_init(8, 10240, 100000,
 			ACL_SLICE_FLAG_GC2 | ACL_SLICE_FLAG_RTGC_OFF | ACL_SLICE_FLAG_LP64_ALIGN);
 
-	acl_init();
+	acl_lib_init();
 #ifdef	USE_LOG
 	acl_msg_open(logfile, logpre);
 #endif

@@ -10,6 +10,11 @@ extern "C" {
 #define ACL_MUTEX_MAXWAIT	(~(unsigned int)0)
 #ifdef	ACL_HAS_PTHREAD
 
+#ifdef ACL_UNIX
+# ifndef  _GNU_SOURCE
+#  define _GNU_SOURCE
+# endif
+#endif
 # include <pthread.h>
 
 typedef pthread_t acl_pthread_t;

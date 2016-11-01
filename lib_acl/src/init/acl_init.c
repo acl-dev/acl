@@ -24,7 +24,7 @@
 
 #include "init.h"
 
-static char *version = "acl_3.1.5";
+static char *version = "acl_3.2.2";
 
 const char *acl_version(void)
 {
@@ -40,10 +40,10 @@ static unsigned long acl_var_main_tid = (unsigned long) -1;
 #endif
 
 #ifdef	ACL_UNIX
-void acl_init(void) __attribute__ ((constructor));
+void acl_lib_init(void) __attribute__ ((constructor));
 #endif
 
-void acl_init(void)
+void acl_lib_init(void)
 {
 	static int __have_inited = 0;
 
@@ -60,10 +60,10 @@ void acl_init(void)
 }
 
 #ifdef	ACL_UNIX
-void acl_end(void) __attribute__ ((destructor));
+void acl_lib_end(void) __attribute__ ((destructor));
 #endif
 
-void acl_end(void)
+void acl_lib_end(void)
 {
 	static int __have_ended = 0;
 

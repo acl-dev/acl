@@ -73,7 +73,7 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	acl_assert(__handle == NULL);
 	daemon_mode_ = false;
 #ifdef ACL_WINDOWS
-	acl_init();
+	acl_cpp_init();
 #endif
 	std::vector<aio_listen_stream*> sstreams;
 	ACL_ARGV* tokens = acl_argv_split(addrs, ";,| \t");
