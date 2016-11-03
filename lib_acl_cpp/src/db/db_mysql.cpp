@@ -379,8 +379,6 @@ void db_mysql::sane_mysql_init(const char* dbaddr, const char* dbname,
 
 	if (charset && *charset)
 		charset_ = charset;
-	else
-		charset_ = NULL;
 
 	dbflags_ = dbflags;
 	auto_commit_ = auto_commit;

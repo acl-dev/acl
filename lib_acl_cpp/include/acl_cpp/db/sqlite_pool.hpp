@@ -23,9 +23,6 @@ protected:
 	// 基类 connect_pool 纯虚函数：创建数据库连接句柄
 	connect_client* create_connect();
 
-	//@override
-	void set_charset(const char* charset);
-
 private:
 	// sqlite 数据文件名
 	char* dbfile_;
