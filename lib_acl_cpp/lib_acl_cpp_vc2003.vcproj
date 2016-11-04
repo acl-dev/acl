@@ -590,9 +590,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\master\master_threads.cpp">
 				</File>
 				<File
-					RelativePath=".\src\master\master_threads2.cpp">
-				</File>
-				<File
 					RelativePath=".\src\master\master_trigger.cpp">
 				</File>
 				<File
@@ -1165,9 +1162,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\master\master_threads.hpp">
-				</File>
-				<File
-					RelativePath=".\include\acl_cpp\master\master_threads2.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\master\master_trigger.hpp">

@@ -614,10 +614,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\master\master_threads2.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\src\master\master_trigger.cpp"
 					>
 				</File>
@@ -1441,10 +1437,6 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\master\master_threads.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\include\acl_cpp\master\master_threads2.hpp"
 					>
 				</File>
 				<File
