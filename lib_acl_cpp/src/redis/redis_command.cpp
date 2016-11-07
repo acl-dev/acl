@@ -1179,7 +1179,7 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 		return NULL;
 	}
 	string tmp(128);
-	if (rr->argv_to_string(tmp) < 0)
+	if (rr->argv_to_string(tmp) <= 0)
 	{
 		cursor = -1;
 		return NULL;

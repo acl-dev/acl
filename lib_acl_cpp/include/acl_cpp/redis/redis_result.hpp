@@ -152,8 +152,8 @@ public:
 	 * compose a continus data for the slicing chunk data internal
 	 * @param buf {string&} 存储结果数据，内部会先调用 buf.clear()
 	 *  store the result
-	 * @return {int} 数据的总长度，返回值 -1 表示内部数组为空
-	 *  return the total length of data, -1 if data array has no elements
+	 * @return {int} 数据的总长度，返回值 0 表示内部数组为空
+	 *  return the total length of data, 0 if data array has no elements
 	 */
 	int argv_to_string(string& buf) const;
 	int argv_to_string(char* buf, size_t size) const;
