@@ -15,6 +15,7 @@
 #include "db/zdb.h"
 #endif
 
+#if 0
 #if defined(ACL_LINUX) && !defined(MINGW) && defined(__GNUC__) && __GNUC__ >= 4
 # ifndef  _GNU_SOURCE
 #  define _GNU_SOURCE
@@ -24,6 +25,7 @@
 #  define PWRITE pwrite64
 #  define PREAD  pread64
 # endif
+#endif
 #endif
 
 #include "zdb_private.h"
