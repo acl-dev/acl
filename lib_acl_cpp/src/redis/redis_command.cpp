@@ -621,6 +621,9 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 		}
 	}
 
+	if (conn != NULL)
+		conn->get_pool()->put(conn, true);
+
 	logger_warn("too many redirect: %d, max: %d", n, redirect_max_);
 	return NULL;
 }
