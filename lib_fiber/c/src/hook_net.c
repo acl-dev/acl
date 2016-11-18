@@ -98,7 +98,6 @@ int socketpair(int domain, int type, int protocol, int sv[2])
 
 #define FAST_ACCEPT
 
-#ifndef	FAST_ACCEPT
 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
 	if (__sys_bind(sockfd, addr, addrlen) == 0)
@@ -123,7 +122,6 @@ int listen(int sockfd, int backlog)
 	fiber_save_errno();
 	return -1;
 }
-#endif
 
 int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
