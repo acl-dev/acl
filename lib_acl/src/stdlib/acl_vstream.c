@@ -2179,11 +2179,17 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 		fp->writev_fn  = acl_socket_writev_fn;
 		fp->close_fn   = acl_socket_close_fn;
 
+		/**
+		 * bugfix: 不应在此处直接设为非阻塞方式，否则会影响上层调用者
+		 * 的行为，应该在应用自己来处理此事。---zsx, 2016.11.18
+		 */
 		/* xxx: 对于带有读写超时的流，需要先将 socket 设为非阻塞模式，
 		 * 否则在写大数据包时会造成阻塞，超时作用失效
 		 */
-		if (rw_timeout > 0 && acl_getsocktype(fd) >= 0)
-			acl_non_blocking(fd, ACL_NON_BLOCKING);
+		/**
+		 * if (rw_timeout > 0 && acl_getsocktype(fd) >= 0)
+		 *	acl_non_blocking(fd, ACL_NON_BLOCKING);
+		 */
 	}
 
 	fp->addr_local = __empty_string;

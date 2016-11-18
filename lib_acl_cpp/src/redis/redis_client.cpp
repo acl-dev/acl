@@ -313,7 +313,7 @@ redis_result* redis_client::get_redis_objects(dbuf_pool* pool, size_t nobjs)
 }
 
 const redis_result* redis_client::run(dbuf_pool* pool, const string& req,
-	size_t nchildren)
+	size_t nchildren, int* rw_timeout /* = NULL */)
 {
 	// 重置协议处理状态
 	bool retried = false;
@@ -327,6 +327,9 @@ const redis_result* redis_client::run(dbuf_pool* pool, const string& req,
 				last_serror(), addr_, req.c_str());
 			return NULL;
 		}
+
+		if (rw_timeout != NULL)
+			conn_.set_rw_timeout(*rw_timeout);
 
 		if (!req.empty() && conn_.write(req) == -1)
 		{
@@ -349,7 +352,11 @@ const redis_result* redis_client::run(dbuf_pool* pool, const string& req,
 			result = get_redis_object(pool);
 
 		if (result != NULL)
+		{
+			if (rw_timeout != NULL)
+				conn_.set_rw_timeout(rw_timeout_);
 			return result;
+		}
 
 		close();
 
@@ -375,7 +382,7 @@ const redis_result* redis_client::run(dbuf_pool* pool, const string& req,
 }
 
 const redis_result* redis_client::run(dbuf_pool* pool, const redis_request& req,
-	size_t nchildren)
+	size_t nchildren, int* rw_timeout /* = NULL */)
 {
 	// 重置协议处理状态
 	bool retried = false;
@@ -389,6 +396,9 @@ const redis_result* redis_client::run(dbuf_pool* pool, const redis_request& req,
 	{
 		if (open() == false)
 			return NULL;
+
+		if (rw_timeout != NULL)
+			conn_.set_rw_timeout(*rw_timeout);
 
 		if (size > 0 && conn_.writev(iov, (int) size) == -1)
 		{
@@ -411,7 +421,11 @@ const redis_result* redis_client::run(dbuf_pool* pool, const redis_request& req,
 			result = get_redis_object(pool);
 
 		if (result != NULL)
+		{
+			if (rw_timeout != NULL)
+				conn_.set_rw_timeout(rw_timeout_);
 			return result;
+		}
 
 		close();
 

@@ -1,5 +1,11 @@
 修改历史列表：
 
+568) 2016.11.18
+568.1) bugfix: acl_vstream.c 中的函数 acl_vstream_fdopen 设置 IO 句柄为非阻塞
+模式是存在问题的，上层应用应该自己决定是否设为非阻塞模式
+568.2) workaround: 将 acl_master 服务器中的所有服务器模板的 use_limit 和 idle_limit
+的缺省都设为 0，即服务子进程默认情况下是不退出的
+
 567) 2016.10.28
 567.1) compile: 可以在 centos4.7 上使用 gcc 3.x.x 编译
 

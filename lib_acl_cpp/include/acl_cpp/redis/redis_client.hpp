@@ -116,7 +116,7 @@ public:
 	 *  
 	 */
 	const redis_result* run(dbuf_pool* pool, const string& req,
-		size_t nchildren);
+		size_t nchildren, int* rw_timeout = NULL);
 
 	/**
 	 * 用于分片发送请求方式
@@ -125,7 +125,7 @@ public:
 	 *  request object
 	 */
 	const redis_result* run(dbuf_pool* pool, const redis_request& req,
-		size_t nchildren);
+		size_t nchildren, int* rw_timeout = NULL);
 
 protected:
 	// 基类虚函数

@@ -386,7 +386,7 @@ redis_client* redis_command::peek_conn(redis_client_cluster* cluster, int slot)
 }
 
 const redis_result* redis_command::run(redis_client_cluster* cluster,
-	size_t nchild)
+	size_t nchild, int* timeout /* = NULL */)
 {
 	redis_client* conn = peek_conn(cluster, slot_);
 
@@ -407,9 +407,9 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 	{
 		// 根据请求过程是否采用内存分片方式调用不同的请求过程
 		if (slice_req_)
-			result_ = conn->run(dbuf_, *request_obj_, nchild);
+			result_ = conn->run(dbuf_, *request_obj_, nchild, timeout);
 		else
-			result_ = conn->run(dbuf_, *request_buf_, nchild);
+			result_ = conn->run(dbuf_, *request_buf_, nchild, timeout);
 
 		// 如果连接异常断开，则需要进行重试
 		if (conn->eof())
@@ -628,7 +628,8 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 	return NULL;
 }
 
-const redis_result* redis_command::run(size_t nchild /* = 0 */)
+const redis_result* redis_command::run(size_t nchild /* = 0 */,
+	int* timeout /* = NULL */)
 {
 	// 如果上次操作时产生的内存分配没有被释放，在此处强制进行释放，以免用户
 	// 在反复使用一个命令对象时忘记了 clear 清理临时内存
@@ -637,20 +638,17 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */)
 	used_++;
 
 	if (cluster_ != NULL)
-		return run(cluster_, nchild);
-	else if (conn_ != NULL)
-	{
-		if (slice_req_)
-			result_ = conn_->run(dbuf_, *request_obj_, nchild);
-		else
-			result_ = conn_->run(dbuf_, *request_buf_, nchild);
-		return result_;
-	}
-	else
+		return run(cluster_, nchild, timeout);
+	if (conn_ == NULL)
 	{
 		logger_error("ERROR: cluster_ and conn_ are all NULL");
 		return NULL;
 	}
+	if (slice_req_)
+		result_ = conn_->run(dbuf_, *request_obj_, nchild, timeout);
+	else
+		result_ = conn_->run(dbuf_, *request_buf_, nchild, timeout);
+	return result_;
 }
 
 /////////////////////////////////////////////////////////////////////////////

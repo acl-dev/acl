@@ -306,8 +306,9 @@ public:
 		size_t nchind = 0);
 
 protected:
-	const redis_result* run(size_t nchild = 0);
-	const redis_result* run(redis_client_cluster* cluster, size_t nchild);
+	const redis_result* run(size_t nchild = 0, int* timeout = NULL);
+	const redis_result* run(redis_client_cluster* cluster,
+		size_t nchild, int* timeout = NULL);
 
 	void build_request(size_t argc, const char* argv[], size_t lens[]);
 	void clear_request();

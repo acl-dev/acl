@@ -22,7 +22,7 @@ extern int   acl_var_udp_buf_size;
 extern int   acl_var_udp_rw_timeout;
 
 #define	ACL_VAR_UDP_IDLE_LIMIT		"udp_idle_limit"
-#define	ACL_DEF_UDP_IDLE_LIMIT		180
+#define	ACL_DEF_UDP_IDLE_LIMIT		0
 extern int   acl_var_udp_idle_limit;
 
 #define	ACL_VAR_UDP_QUEUE_DIR		"udp_queue_dir"

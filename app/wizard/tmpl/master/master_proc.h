@@ -9,7 +9,7 @@ extern acl::master_str_tbl var_conf_str_tab[];
 extern int  var_cfg_bool;
 extern acl::master_bool_tbl var_conf_bool_tab[];
 
-extern int  var_cfg_int;
+extern int  var_cfg_rw_timeout;
 extern acl::master_int_tbl var_conf_int_tab[];
 
 extern long long int  var_cfg_int64;

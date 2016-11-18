@@ -412,7 +412,8 @@ bool redis_list::bpop(const char* cmd, const std::vector<string>& keys,
 
 bool redis_list::bpop(std::pair<string, string>& out)
 {
-	const redis_result* result = run();
+	int rw_timeout = -1;
+	const redis_result* result = run(0, &rw_timeout);
 	if (result == NULL)
 		return false;
 	if (result->get_type() != REDIS_RESULT_ARRAY)

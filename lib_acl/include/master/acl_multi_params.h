@@ -25,7 +25,7 @@ extern int   acl_var_multi_rw_timeout;
 extern int   acl_var_multi_in_flow_delay;
 
 #define	ACL_VAR_MULTI_IDLE_LIMIT	"multi_idle_limit"
-#define	ACL_DEF_MULTI_IDLE_LIMIT	180
+#define	ACL_DEF_MULTI_IDLE_LIMIT	0
 extern int   acl_var_multi_idle_limit;
 
 #define	ACL_VAR_MULTI_QUEUE_DIR		"multi_queue_dir"
@@ -53,7 +53,7 @@ extern int   acl_var_multi_delay_usec;
 extern int   acl_var_multi_daemon_timeout;
 
 #define	ACL_VAR_MULTI_USE_LIMIT		"multi_use_limit"
-#define	ACL_DEF_MULTI_USE_LIMIT		10
+#define	ACL_DEF_MULTI_USE_LIMIT		0
 extern int   acl_var_multi_use_limit;
 
 #define	ACL_VAR_MULTI_ENABLE_CORE	"multi_enable_core"
