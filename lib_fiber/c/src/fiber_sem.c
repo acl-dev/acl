@@ -26,7 +26,7 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 		return sem->num;
 	}
 
-	curr = fiber_running();
+	curr = acl_fiber_running();
 	acl_ring_prepend(&sem->waiting, &curr->me);
 	acl_fiber_switch();
 

@@ -1,4 +1,12 @@
 
+30) 2016.11.27
+30.1) bugfix: fiber.c 中函数 acl_fiber_create 中存在运行时内存增长问题，即
+__thread_fiber->fibers 对象在 realloc 过程中内存不断增长，因为 __thread_fier->size
+计算方法有问题
+
+29) 2016.11.24
+29.1) feature: 增加 acl_fiber_kill 接口用来通知指定协程退出
+
 28) 2016.10.31
 28.1) feature: fiber.c 中实现了 __i386__ 下 SETJMP，LONGJMP 的汇编方式，从
 libdill 借鉴而来

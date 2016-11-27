@@ -7,6 +7,21 @@
 
 namespace acl {
 
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+# define CHECK_ERROR(e) do { \
+	if (e != ACL_EINTR && e != ACL_ETIMEDOUT && e != ACL_EWOULDBLOCK) \
+		eof_ = true; \
+} while (0)
+#else
+# define CHECK_ERROR(e) do { \
+	if (e != ACL_EINTR && e != ACL_ETIMEDOUT \
+		&& e != ACL_EWOULDBLOCK && e != ACL_EAGAIN) \
+	{ \
+		eof_ = true; \
+	} \
+} while (0)
+#endif
+
 int istream::read(void* buf, size_t size, bool loop /* = true */)
 {
 	int   ret;
@@ -16,7 +31,7 @@ int istream::read(void* buf, size_t size, bool loop /* = true */)
 		ret = acl_vstream_read(stream_, buf, size);
 	if (ret == ACL_VSTREAM_EOF)
 	{
-		eof_ = true;
+		CHECK_ERROR(errno);
 		return -1;
 	} else
 		return ret;
@@ -28,7 +43,7 @@ bool istream::readtags(void *buf, size_t* size, const char *tag, size_t taglen)
 	if (ret == ACL_VSTREAM_EOF)
 	{
 		*size = 0;
-		eof_ = true;
+		CHECK_ERROR(errno);
 		return false;
 	}
 
@@ -38,25 +53,6 @@ bool istream::readtags(void *buf, size_t* size, const char *tag, size_t taglen)
 		return true;
 	else
 		return false;
-}
-
-bool istream::gets(void* buf, size_t* size, bool nonl /* = true */)
-{
-	int   ret;
-	if (nonl)
-		ret = acl_vstream_gets_nonl(stream_, buf, *size);
-	else
-		ret = acl_vstream_gets(stream_, buf, *size);
-	if (ret == ACL_VSTREAM_EOF) {
-		eof_ = true;
-		*size = 0;
-		return false;
-	} else {
-		*size = ret;
-		if ((stream_->flag & ACL_VSTREAM_FLAG_TAGYES))
-			return true;
-		return false;
-	}
 }
 
 bool istream::read(acl_int64& n, bool loop /* = true */)
@@ -113,6 +109,25 @@ bool istream::read(string* s, size_t max, bool loop /* = true */)
 	return read(*s, max, loop);
 }
 
+bool istream::gets(void* buf, size_t* size, bool nonl /* = true */)
+{
+	int   ret;
+	if (nonl)
+		ret = acl_vstream_gets_nonl(stream_, buf, *size);
+	else
+		ret = acl_vstream_gets(stream_, buf, *size);
+	if (ret == ACL_VSTREAM_EOF) {
+		CHECK_ERROR(errno);
+		*size = 0;
+		return false;
+	} else {
+		*size = ret;
+		if ((stream_->flag & ACL_VSTREAM_FLAG_TAGYES))
+			return true;
+		return false;
+	}
+}
+
 bool istream::gets(string& s, bool nonl /* = true */, size_t max /* = 0 */)
 {
 	char buf[8192];
@@ -132,8 +147,12 @@ bool istream::gets(string& s, bool nonl /* = true */, size_t max /* = 0 */)
 
 				return true;
 			}
-			if (size > 0)
-				s.append(buf, size);
+
+			if (size == 0)
+				break;
+
+			printf(">>>size: %d\r\n", (int) size);
+			s.append(buf, size);
 		}
 
 		return false;
@@ -151,8 +170,10 @@ bool istream::gets(string& s, bool nonl /* = true */, size_t max /* = 0 */)
 			return true;
 		}
 
-		if (size > 0)
-			s.append(buf, size);
+		if (size == 0)
+			break;
+
+		s.append(buf, size);
 		max -= size;
 
 		if (max == 0)
@@ -187,9 +208,13 @@ bool istream::readtags(string& s, const string& tag)
 				s.append(buf, size);
 			return true;
 		}
-		if (size > 0)
-			s.append(buf, size);
+
+		if (size == 0)
+			break;
+
+		s.append(buf, size);
 	}
+
 	return false;
 }
 
@@ -203,15 +228,15 @@ int istream::getch()
 {
 	int ret = acl_vstream_getc(stream_);
 	if (ret == ACL_VSTREAM_EOF)
-		eof_ = true;
+		CHECK_ERROR(errno);
 	return ret;
 }
 
 int istream::ugetch(int ch)
 {
-	int   ret = acl_vstream_ungetc(stream_, ch);
+	int ret = acl_vstream_ungetc(stream_, ch);
 	if (ret == ACL_VSTREAM_EOF)
-		eof_ = true;
+		CHECK_ERROR(errno);
 	return ret;
 }
 
@@ -242,6 +267,7 @@ bool istream::gets_peek(string& buf, bool nonl /* = true */,
 			eof_ = true;
 		}
 	}
+
 	return ready ? true : false;
 }
 

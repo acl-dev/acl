@@ -27,6 +27,18 @@ ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
 	void *arg, size_t size);
 
 /**
+ * 返回当前线程中处于消亡状态的协程数
+ * @retur {int}
+ */
+int acl_fiber_ndead(void);
+
+/**
+ * 返回当前正在运行的协程对象
+ * @retur {ACL_FIBER*} 返回 NULL 表示当前没有正在运行的协程
+ */
+ACL_FIBER *acl_fiber_running(void);
+
+/**
  * 获得所给协程的协程 ID 号
  * @param fiber {const ACL_FIBER*} 由 acl_fiber_create 创建的协程对象
  * @return {int} 协程 ID 号
@@ -54,11 +66,31 @@ void acl_fiber_set_errno(ACL_FIBER *fiber, int errnum);
 int acl_fiber_errno(ACL_FIBER *fiber);
 
 /**
+ * 是否保持所指定协程的错误号，当设置为“保持”后，则该协程仅保持当前状态下的
+ * 错误号，之后该协程的错误号 errno 将不再改变，走到再次调用本函数取消保持
+ * @param fiber {ACL_FIBER*} 协程对象
+ * @param yesno {int} 是否保持
+ */
+void acl_fiber_keep_errno(ACL_FIBER *fiber, int yesno);
+
+/**
  * 获得指定协程的当前状态
  * @param fiber {const ACL_FIBER*} 协程对象
  * @return {int} 协程状态
  */
 int acl_fiber_status(const ACL_FIBER *fiber);
+
+/**
+ * 通知指定协程退出
+ * @param fiber {const ACL_FIBER*} 协程对象
+ */
+void acl_fiber_kill(ACL_FIBER *fiber);
+
+/**
+ * 检查本协程是否被其它协程通知退出
+ * @param fiber {const ACL_FIBER*} 协程对象
+ */
+int acl_fiber_killed(ACL_FIBER *fiber);
 
 /**
  * 将当前运行的协程挂起，由调度器选择下一个需要运行的协程

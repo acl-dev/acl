@@ -327,7 +327,7 @@ static void fiber_accept_main(ACL_FIBER *fiber, void *ctx)
 
 		acl_msg_warn("accept connection: %s(%d, %d), stoping ...",
 			acl_last_serror(), errno, ACL_EAGAIN);
-		server_abort(fiber_running());
+		server_abort(acl_fiber_running());
 	}
 
 	acl_msg_info("%s(%d), %s: fiber-%d exit now", __FILE__, __LINE__,

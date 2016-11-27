@@ -236,7 +236,7 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 
 	ev->timeout = 1;
 
-	fiber = fiber_running();
+	fiber = acl_fiber_running();
 	fiber->when = when;
 	acl_ring_detach(&fiber->me);
 
@@ -337,7 +337,7 @@ void fiber_wait_read(int fd)
 		return;
 	}
 
-	__thread_fiber->io_fibers[fd] = fiber_running();
+	__thread_fiber->io_fibers[fd] = acl_fiber_running();
 	__thread_fiber->io_count++;
 
 	acl_fiber_switch();
@@ -362,7 +362,7 @@ void fiber_wait_write(int fd)
 		return;
 	}
 
-	__thread_fiber->io_fibers[fd] = fiber_running();
+	__thread_fiber->io_fibers[fd] = acl_fiber_running();
 	__thread_fiber->io_count++;
 
 	acl_fiber_switch();

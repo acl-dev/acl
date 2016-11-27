@@ -209,6 +209,7 @@ inline ssize_t fiber_read(int fd, void *buf, size_t count)
 {
 	ssize_t ret;
 	EVENT  *ev;
+	ACL_FIBER *me;
 
 	if (fd < 0) {
 		acl_msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
@@ -233,8 +234,16 @@ inline ssize_t fiber_read(int fd, void *buf, size_t count)
 		event_clear_readable(ev, fd);
 
 	ret = __sys_read(fd, buf, count);
-	if (ret < 0)
-		fiber_save_errno();
+	if (ret >= 0)
+		return ret;
+
+	fiber_save_errno();
+
+	me = acl_fiber_running();
+	if ((me->flag & FIBER_F_KILLED) != 0)
+		acl_msg_info("%s(%d), %s: fiber-%d is existing",
+			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(me));
+
 	return ret;
 }
 
@@ -242,6 +251,7 @@ inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 {
 	ssize_t ret;
 	EVENT  *ev;
+	ACL_FIBER *me;
 
 	if (fd < 0) {
 		acl_msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
@@ -266,8 +276,16 @@ inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 		event_clear_readable(ev, fd);
 
 	ret = __sys_readv(fd, iov, iovcnt);
-	if (ret < 0)
-		fiber_save_errno();
+	if (ret >= 0)
+		return ret;
+
+	fiber_save_errno();
+
+	me = acl_fiber_running();
+	if ((me->flag & FIBER_F_KILLED) != 0)
+		acl_msg_info("%s(%d), %s: fiber-%d is existing",
+			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(me));
+
 	return ret;
 }
 
@@ -275,6 +293,7 @@ inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 {
 	ssize_t ret;
 	EVENT  *ev;
+	ACL_FIBER *me;
 
 	if (sockfd < 0) {
 		acl_msg_error("%s: invalid sockfd: %d", __FUNCTION__, sockfd);
@@ -298,9 +317,18 @@ inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 	if (ev)
 		event_clear_readable(ev, sockfd);
 
+
 	ret = __sys_recv(sockfd, buf, len, flags);
-	if (ret < 0)
-		fiber_save_errno();
+	if (ret >= 0)
+		return ret;
+
+	fiber_save_errno();
+
+	me = acl_fiber_running();
+	if ((me->flag & FIBER_F_KILLED) != 0)
+		acl_msg_info("%s(%d), %s: fiber-%d is existing",
+			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(me));
+
 	return ret;
 }
 
@@ -309,6 +337,7 @@ inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 {
 	ssize_t ret;
 	EVENT  *ev;
+	ACL_FIBER *me;
 
 	if (sockfd < 0) {
 		acl_msg_error("%s: invalid sockfd: %d", __FUNCTION__, sockfd);
@@ -335,8 +364,18 @@ inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 		event_clear_readable(ev, sockfd);
 
 	ret = __sys_recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
-	if (ret < 0)
-		fiber_save_errno();
+	if (ret >= 0)
+		return ret;
+
+	fiber_save_errno();
+
+	me = acl_fiber_running();
+	if ((me->flag & FIBER_F_KILLED) != 0) {
+		acl_msg_info("%s(%d), %s: fiber-%d is existing",
+			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(me));
+		return -1;
+	}
+
 	return ret;
 }
 
@@ -344,6 +383,7 @@ inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 {
 	ssize_t ret;
 	EVENT  *ev;
+	ACL_FIBER *me;
 
 	if (sockfd < 0) {
 		acl_msg_error("%s: invalid sockfd: %d", __FUNCTION__, sockfd);
@@ -368,8 +408,16 @@ inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 		event_clear_readable(ev, sockfd);
 
 	ret = __sys_recvmsg(sockfd, msg, flags);
-	if (ret < 0)
-		fiber_save_errno();
+	if (ret >= 0)
+		return ret;
+
+	fiber_save_errno();
+
+	me = acl_fiber_running();
+	if ((me->flag & FIBER_F_KILLED) != 0)
+		acl_msg_info("%s(%d), %s: fiber-%d is existing",
+			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(me));
+
 	return ret;
 }
 
@@ -377,6 +425,8 @@ inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 
 inline ssize_t fiber_read(int fd, void *buf, size_t count)
 {
+	ACL_FIBER *me;
+
 	while (1) {
 		ssize_t n = __sys_read(fd, buf, count);
 
@@ -395,11 +445,19 @@ inline ssize_t fiber_read(int fd, void *buf, size_t count)
 #endif
 			return -1;
 		fiber_wait_read(fd);
+
+		me = acl_fiber_running();
+		if ((me->flag & FIBER_F_KILLED) != 0)
+			acl_msg_info("%s(%d), %s: fiber-%d is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(me));
 	}
 }
 
 inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 {
+	ACL_FIBER *me;
+
 	while (1) {
 		ssize_t n = __sys_readv(fd, iov, iovcnt);
 
@@ -419,11 +477,19 @@ inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 			return -1;
 
 		fiber_wait_read(fd);
+
+		me = acl_fiber_running();
+		if ((me->flag & FIBER_F_KILLED) != 0)
+			acl_msg_info("%s(%d), %s: fiber-%d is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(me));
 	}
 }
 
 inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 {
+	ACL_FIBER *me;
+
 	while (1) {
 		ssize_t n = __sys_recv(sockfd, buf, len, flags);
 
@@ -443,12 +509,20 @@ inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 			return -1;
 
 		fiber_wait_read(sockfd);
+
+		me = acl_fiber_running();
+		if ((me->flag & FIBER_F_KILLED) != 0)
+			acl_msg_info("%s(%d), %s: fiber-%d is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(me));
 	}
 }
 
 inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 	struct sockaddr *src_addr, socklen_t *addrlen)
 {
+	ACL_FIBER *me;
+
 	while (1) {
 		ssize_t n = __sys_recvfrom(sockfd, buf, len, flags,
 				src_addr, addrlen);
@@ -469,11 +543,19 @@ inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 			return -1;
 
 		fiber_wait_read(sockfd);
+
+		me = acl_fiber_running();
+		if ((me->flag & FIBER_F_KILLED) != 0)
+			acl_msg_info("%s(%d), %s: fiber-%d is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(me));
 	}
 }
 
 inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 {
+	ACL_FIBER *me;
+
 	while (1) {
 		ssize_t n = __sys_recvmsg(sockfd, msg, flags);
 
@@ -493,6 +575,12 @@ inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 			return -1;
 
 		fiber_wait_read(sockfd);
+
+		me = acl_fiber_running();
+		if ((me->flag & FIBER_F_KILLED) != 0)
+			acl_msg_info("%s(%d), %s: fiber-%d is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(me));
 	}
 }
 
@@ -502,6 +590,8 @@ inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 
 inline ssize_t fiber_write(int fd, const void *buf, size_t count)
 {
+	ACL_FIBER *me;
+
 	while (1) {
 		ssize_t n = __sys_write(fd, buf, count);
 
@@ -521,11 +611,19 @@ inline ssize_t fiber_write(int fd, const void *buf, size_t count)
 			return -1;
 
 		fiber_wait_write(fd);
+
+		me = acl_fiber_running();
+		if ((me->flag & FIBER_F_KILLED) != 0)
+			acl_msg_info("%s(%d), %s: fiber-%d is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(me));
 	}
 }
 
 inline ssize_t fiber_writev(int fd, const struct iovec *iov, int iovcnt)
 {
+	ACL_FIBER *me;
+
 	while (1) {
 		ssize_t n = __sys_writev(fd, iov, iovcnt);
 
@@ -545,11 +643,19 @@ inline ssize_t fiber_writev(int fd, const struct iovec *iov, int iovcnt)
 			return -1;
 
 		fiber_wait_write(fd);
+
+		me = acl_fiber_running();
+		if ((me->flag & FIBER_F_KILLED) != 0)
+			acl_msg_info("%s(%d), %s: fiber-%d is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(me));
 	}
 }
 
 inline ssize_t fiber_send(int sockfd, const void *buf, size_t len, int flags)
 {
+	ACL_FIBER *me;
+
 	while (1) {
 		ssize_t n = __sys_send(sockfd, buf, len, flags);
 
@@ -569,12 +675,20 @@ inline ssize_t fiber_send(int sockfd, const void *buf, size_t len, int flags)
 			return -1;
 
 		fiber_wait_write(sockfd);
+
+		me = acl_fiber_running();
+		if ((me->flag & FIBER_F_KILLED) != 0)
+			acl_msg_info("%s(%d), %s: fiber-%d is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(me));
 	}
 }
 
 inline ssize_t fiber_sendto(int sockfd, const void *buf, size_t len, int flags,
 	const struct sockaddr *dest_addr, socklen_t addrlen)
 {
+	ACL_FIBER *me;
+
 	while (1) {
 		ssize_t n = __sys_sendto(sockfd, buf, len, flags,
 				dest_addr, addrlen);
@@ -595,11 +709,19 @@ inline ssize_t fiber_sendto(int sockfd, const void *buf, size_t len, int flags,
 			return -1;
 
 		fiber_wait_write(sockfd);
+
+		me = acl_fiber_running();
+		if ((me->flag & FIBER_F_KILLED) != 0)
+			acl_msg_info("%s(%d), %s: fiber-%d is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(me));
 	}
 }
 
 inline ssize_t fiber_sendmsg(int sockfd, const struct msghdr *msg, int flags)
 {
+	ACL_FIBER *me;
+
 	while (1) {
 		ssize_t n = __sys_sendmsg(sockfd, msg, flags);
 
@@ -619,6 +741,12 @@ inline ssize_t fiber_sendmsg(int sockfd, const struct msghdr *msg, int flags)
 			return -1;
 
 		fiber_wait_write(sockfd);
+
+		me = acl_fiber_running();
+		if ((me->flag & FIBER_F_KILLED) != 0)
+			acl_msg_info("%s(%d), %s: fiber-%d is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(me));
 	}
 }
 

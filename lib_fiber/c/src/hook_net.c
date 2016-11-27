@@ -127,6 +127,7 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
 	int    clifd;
 	EVENT *ev;
+	ACL_FIBER *me = acl_fiber_running();
 
 	if (sockfd < 0) {
 		acl_msg_error("%s: invalid sockfd %d", __FUNCTION__, sockfd);
@@ -163,6 +164,12 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 	if (ev)
 		event_clear_readable(ev, sockfd);
 
+	if ((me->flag & FIBER_F_KILLED) != 0) {
+		acl_msg_info("%s(%d), %s: fiber-%d is existing",
+			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(me));
+		return -1;
+	}
+
 	clifd = __sys_accept(sockfd, addr, addrlen);
 
 	if (clifd >= 0) {
@@ -190,6 +197,12 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 	if (ev)
 		event_clear_readable(ev, sockfd);
 
+	if ((me->flag & FIBER_F_KILLED) != 0) {
+		acl_msg_info("%s(%d), %s: fiber-%d is existing",
+			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(me));
+		return -1;
+	}
+
 	clifd = __sys_accept(sockfd, addr, addrlen);
 
 	if (clifd >= 0) {
@@ -207,6 +220,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int err;
 	socklen_t len = sizeof(err);
+	ACL_FIBER *me = acl_fiber_running();
 
 	if (!acl_var_hook_sys_api)
 		return __sys_connect(sockfd, addr, addrlen);
@@ -257,6 +271,12 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 	}
 
 	fiber_wait_write(sockfd);
+
+	if ((me->flag & FIBER_F_KILLED) != 0) {
+		acl_msg_info("%s(%d), %s: fiber-%d is existing",
+			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(me));
+		return -1;
+	}
 
 	ret = getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (char *) &err, &len);
 	if (ret == 0 && err == 0)
@@ -365,7 +385,7 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	ev       = fiber_io_event();
 	pe.fds   = fds;
 	pe.nfds  = nfds;
-	pe.fiber = fiber_running();
+	pe.fiber = acl_fiber_running();
 	pe.proc  = poll_callback;
 
 	SET_TIME(begin);
@@ -375,8 +395,17 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		fiber_io_inc();
 		acl_fiber_switch();
 
+		if ((pe.fiber->flag & FIBER_F_KILLED) != 0) {
+			acl_ring_detach(&pe.me);
+			acl_msg_info("%s(%d), %s: fiber-%d is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(pe.fiber));
+			break;
+		}
+
 		if (acl_ring_size(&ev->poll_list) == 0)
 			ev->timeout = -1;
+
 		if (pe.nready != 0 || timeout == 0)
 			break;
 
@@ -775,7 +804,7 @@ int epoll_wait(int epfd, struct epoll_event *events,
 
 	ee->events    = events;
 	ee->maxevents = maxevents;
-	ee->fiber     = fiber_running();
+	ee->fiber     = acl_fiber_running();
 	ee->proc      = epoll_callback;
 
 	SET_TIME(begin);
@@ -786,6 +815,15 @@ int epoll_wait(int epfd, struct epoll_event *events,
 		acl_fiber_switch();
 
 		ev->timeout = -1;
+
+		if ((ee->fiber->flag & FIBER_F_KILLED) != 0) {
+			acl_ring_detach(&ee->me);
+			acl_msg_info("%s(%d), %s: fiber-%d is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(ee->fiber));
+			break;
+		}
+
 		if (ee->nready != 0 || timeout == 0)
 			break;
 

@@ -22,14 +22,14 @@ static int __lock(ACL_FIBER_MUTEX *l, int block)
 	ACL_FIBER *curr;
 
 	if (l->owner == NULL){
-		l->owner = fiber_running();
+		l->owner = acl_fiber_running();
 		return 1;
 	}
 
 	if(!block)
 		return 0;
 
-	curr = fiber_running();
+	curr = acl_fiber_running();
 	acl_ring_prepend(&l->waiting, &curr->me);
 
 	acl_fiber_switch();
@@ -105,7 +105,7 @@ static int __rlock(ACL_FIBER_RWLOCK *l, int block)
 	if (!block)
 		return 0;
 
-	curr = fiber_running();
+	curr = acl_fiber_running();
 	acl_ring_prepend(&l->rwaiting, &curr->me);
 	acl_fiber_switch();
 
@@ -127,14 +127,14 @@ static int __wlock(ACL_FIBER_RWLOCK *l, int block)
 	ACL_FIBER *curr;
 
 	if (l->writer == NULL && l->readers == 0) {
-		l->writer = fiber_running();
+		l->writer = acl_fiber_running();
 		return 1;
 	}
 
 	if (!block)
 		return 0;
 
-	curr = fiber_running();
+	curr = acl_fiber_running();
 	acl_ring_prepend(&l->wwaiting, &curr->me);
 	acl_fiber_switch();
 

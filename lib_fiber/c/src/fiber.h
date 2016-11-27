@@ -29,6 +29,7 @@ struct ACL_FIBER {
 	int            sys;
 	unsigned int   flag;
 #define FIBER_F_SAVE_ERRNO	(unsigned) 1 << 0
+#define	FIBER_F_KILLED		(unsigned) 1 << 1
 
 	FIBER_LOCAL  **locals;
 	int            nlocal;
@@ -109,7 +110,6 @@ struct ACL_FIBER_SEM {
 extern __thread int acl_var_hook_sys_api;
 
 /* in fiber_schedule.c */
-ACL_FIBER *fiber_running(void);
 void fiber_save_errno(void);
 void fiber_exit(int exit_code);
 void fiber_system(void);
