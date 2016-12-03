@@ -81,7 +81,8 @@ public:
 #ifdef USE_CHAN
 		chan_msg_.put(mtype);
 #else
-		(void) mtype;
+		if (mtype == MT_LOGOUT)
+			exiting_ = true;
 		(void) sem_msg_.post();
 #endif
 	}

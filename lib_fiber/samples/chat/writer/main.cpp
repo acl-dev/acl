@@ -15,7 +15,7 @@ static int __rw_timeout = 0;
 static int __max_client = 10;
 static int __cur_client = 10;
 static struct timeval __begin;
-static int __total_write = 0;
+static long long __total_write = 0;
 
 static bool client_login(user_client* uc)
 {
@@ -123,7 +123,7 @@ static void fiber_client(const char* addr, const char* user,
 		struct timeval end;
 		gettimeofday(&end, NULL);
 		double spent = stamp_sub(&end, &__begin);
-		printf("---Total write: %d, spent: %.2f, speed: %.2f---\r\n",
+		printf("---Total write: %lld, spent: %.2f, speed: %.2f---\r\n",
 			__total_write, spent,
 			(1000 * __total_write) / (spent < 1 ? 1 : spent));
 

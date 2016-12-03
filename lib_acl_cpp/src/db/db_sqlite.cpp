@@ -220,7 +220,7 @@ db_sqlite::db_sqlite(const char* dbfile, const char* charset /* ="utf-8" */)
 		conv_ = NULL;
 
 	acl_assert(dbfile && *dbfile);
-#if defined(ACL_WINDOWS) || defined(USE_DYNAMIC)
+#if defined(ACL_CPP_DLL) || defined(HAS_SQLITE_DLL)
 	acl_pthread_once(&__sqlite_once, __sqlite_dll_load);
 #endif
 }

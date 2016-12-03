@@ -3,6 +3,8 @@
 #include "acl_cpp/stream/aio_listen_stream.hpp"
 #include "acl_cpp/master/master_base.hpp"
 
+struct ACL_VSTREAM;
+
 namespace acl {
 
 class aio_handle;
@@ -11,8 +13,7 @@ class aio_socket_stream;
 /**
  * acl_master 服务器框架中单线程非阻塞方式的模板类，该类对象只能有一个实例运行
  */
-class ACL_CPP_API master_aio : public master_base,
-	public aio_accept_callback
+class ACL_CPP_API master_aio : public master_base, public aio_accept_callback
 {
 public:
 	/**
@@ -43,6 +44,7 @@ public:
 	 * 在 run_alone 模式下，通知服务器框架关闭引擎，退出程序
 	 */
 	void stop();
+
 protected:
 	master_aio();
 	virtual ~master_aio();
@@ -54,6 +56,7 @@ protected:
 	 *  远程客户端连接，否则继续接收客户端连接
 	 */
 	virtual bool on_accept(aio_socket_stream* stream) = 0;
+
 private:
 	/**
 	 * 基类 aio_accept_callback 的虚函数实现
@@ -61,6 +64,7 @@ private:
 	 * @return {bool} 返回 true 以通知监听流继续监听
 	 */
 	virtual bool accept_callback(aio_socket_stream* client);
+
 private:
 #if defined(_WIN32) || defined(_WIN64)
 	// 当接收到一个客户端连接时回调此函数
@@ -68,6 +72,9 @@ private:
 #else
 	static void service_main(int, void*);
 #endif
+
+	// 当监听一个服务地址时回调此函数
+	static void service_on_listen(ACL_VSTREAM*);
 
 	// 当进程切换用户身份后调用的回调函数
 	static void service_pre_jail(void*);

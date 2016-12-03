@@ -166,6 +166,7 @@ static char  __service_name[256];
 static void (*__server_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
 static ACL_THREADS_SERVER_FN		__service_main;
 static ACL_MASTER_SERVER_EXIT_FN	__server_onexit;
+static ACL_MASTER_SERVER_LISTEN_FN	__server_on_listen;
 static ACL_MASTER_SERVER_ACCEPT_FN	__server_on_accept;
 static ACL_MASTER_SERVER_HANDSHAKE_FN	__server_on_handshake;
 static ACL_MASTER_SERVER_DISCONN_FN	__server_on_close;
@@ -1131,7 +1132,9 @@ static ACL_VSTREAM **server_daemon_open(ACL_EVENT *event,
 		acl_non_blocking(fd, ACL_NON_BLOCKING);
 		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 		acl_event_enable_listen(event, stream, 0,
-				__server_accept, threads);
+			__server_accept, threads);
+		if (__server_on_listen)
+			__server_on_listen(stream);
 		streams[i++] = stream;
 	}
 
@@ -1170,6 +1173,8 @@ static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
 			exit(1);
 		}
 
+		if (__server_on_listen)
+			__server_on_listen(sstream);
 		streams[i++] = sstream;
 
 		acl_non_blocking(ACL_VSTREAM_SOCK(sstream), ACL_NON_BLOCKING);
@@ -1321,6 +1326,10 @@ void acl_threads_server_main(int argc, char * argv[],
 			break;
 		case ACL_MASTER_SERVER_POST_INIT:
 			post_init = va_arg(ap, ACL_MASTER_SERVER_INIT_FN);
+			break;
+		case ACL_MASTER_SERVER_ON_LISTEN:
+			__server_on_listen =
+				va_arg(ap, ACL_MASTER_SERVER_LISTEN_FN);
 			break;
 		case ACL_MASTER_SERVER_ON_ACCEPT:
 			__server_on_accept =

@@ -27,9 +27,9 @@ void acl_ring_init(ACL_RING *ring)
 int acl_ring_size(const ACL_RING *ring)
 {
 	if (ring == NULL)
-		return (-1);
+		return -1;
 
-	return (ring->len);
+	return ring->len;
 }
 
 /* acl_ring_append - insert entry after ring head */
@@ -90,15 +90,15 @@ ACL_RING *acl_ring_pop_head(ACL_RING *ring)
 	ACL_RING   *succ;
 
 	if (ring == NULL)
-		return (NULL);
+		return NULL;
 
 	succ = ring->succ;
 	if (succ == ring)
-		return (NULL);
+		return NULL;
 
 	acl_ring_detach(succ);
 
-	return (succ);
+	return succ;
 }
 
 /* acl_ring_pop_tail - pop ring's tail entry out from ring */
@@ -108,13 +108,13 @@ ACL_RING *acl_ring_pop_tail(ACL_RING *ring)
 	ACL_RING   *pred;
 
 	if (ring == NULL)
-		return (NULL);
+		return NULL;
 
 	pred = ring->pred;
 	if (pred == ring)
-		return (NULL);
+		return NULL;
 
 	acl_ring_detach(pred);
 
-	return (pred);
+	return pred;
 }

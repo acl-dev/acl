@@ -2109,6 +2109,7 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 {
 	const char *myname = "acl_vstream_fdopen";
 	ACL_VSTREAM *fp;
+	int   ret;
 
 	fp = (ACL_VSTREAM *) acl_mycalloc(1, sizeof(ACL_VSTREAM));
 
@@ -2119,13 +2120,17 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 			myname, __LINE__, (int) buflen);
 	}
 
-	if (buflen < ACL_VSTREAM_DEF_MAXLEN)
-		buflen = ACL_VSTREAM_DEF_MAXLEN;
-
 	/* XXX: 只有非监听流才需要有读缓冲区 */
 	/* XXX: 目前 UDP 服务端口号在 MASTER 框架中暂时当监听套接口用，所以
-	   需要给其分配读缓冲区
+	 * 需要给其分配读缓冲区
 	 */
+	if (buflen < ACL_VSTREAM_DEF_MAXLEN)
+		buflen = ACL_VSTREAM_DEF_MAXLEN;
+	fp->read_buf     = (unsigned char *) acl_mymalloc(buflen + 1);
+	fp->read_buf_len = (int) buflen;
+	fp->addr_local   = __empty_string;
+	fp->addr_peer    = __empty_string;
+	fp->path         = __empty_string;
 
 #ifdef ACL_MACOSX
 	if ((fdtype & ACL_VSTREAM_TYPE_LISTEN_INET)
@@ -2135,26 +2140,12 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	}
 #endif
 
-	if (fd != ACL_SOCKET_INVALID && acl_is_listening_socket(fd)) {
-		int ret = acl_getsocktype(fd);
-		if (ret == AF_INET)
-			fdtype |= ACL_VSTREAM_TYPE_LISTEN_INET;
-#ifndef ACL_WINDOWS
-		else if (ret == AF_UNIX)
-			fdtype |= ACL_VSTREAM_TYPE_LISTEN_UNIX;
-#endif
-		fdtype |= ACL_VSTREAM_TYPE_LISTEN;
-	}
-
-	fp->read_buf = (unsigned char *) acl_mymalloc(buflen + 1);
-
 	if (fdtype == 0) {
 		fdtype = ACL_VSTREAM_TYPE_SOCK;
 		acl_msg_warn("%s(%d): fdtype(0), set to ACL_VSTREAM_TYPE_SOCK",
 			myname, __LINE__);
 	}
 
-	fp->read_buf_len     = (int) buflen;
 	fp->type             = fdtype;
 	ACL_VSTREAM_SOCK(fp) = fd;
 #ifdef ACL_WINDOWS
@@ -2162,6 +2153,8 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 #endif
 	fp->read_ptr         = fp->read_buf;
 	fp->oflags           = oflags;
+	fp->omode            = 0600;
+	fp->close_handle_lnk = acl_array_create(8);
 	ACL_SAFE_STRNCPY(fp->errbuf, "OK", sizeof(fp->errbuf));
 
 	if (rw_timeout > 0)
@@ -2192,13 +2185,30 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 		 */
 	}
 
-	fp->addr_local = __empty_string;
-	fp->addr_peer = __empty_string;
-	fp->path = __empty_string;
-	fp->oflags = 0;
-	fp->omode = 0600;
+	if (fd == ACL_SOCKET_INVALID)
+		return fp;
 
-	fp->close_handle_lnk = acl_array_create(8);
+	if ((ret = acl_check_socket(fd)) == 1) {
+		ret = acl_getsocktype(fd);
+		if (ret == AF_INET)
+			fp->type |= ACL_VSTREAM_TYPE_LISTEN_INET;
+#ifndef ACL_WINDOWS
+		else if (ret == AF_UNIX)
+			fp->type |= ACL_VSTREAM_TYPE_LISTEN_UNIX;
+#endif
+		fp->type |= ACL_VSTREAM_TYPE_LISTEN;
+
+		if (acl_getsockname(fd, (char *) fp->read_buf, buflen) == 0)
+			acl_vstream_set_local(fp, (char *) fp->read_buf);
+	} else if (ret == 0
+		&& acl_getsockname(fd, (char *) fp->read_buf, buflen) == 0)
+	{
+		acl_vstream_set_local(fp, (char *) fp->read_buf);
+		fp->type |= ACL_VSTREAM_TYPE_SOCK;
+		if (acl_getpeername(fd, (char *) fp->read_buf, buflen) == 0)
+			acl_vstream_set_peer(fp, (char *) fp->read_buf);
+	}
+
 	return fp;
 }
 

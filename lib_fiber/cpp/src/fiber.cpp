@@ -74,6 +74,22 @@ void fiber::fiber_callback(ACL_FIBER *f, void *ctx)
 	me->run();
 }
 
+bool fiber::kill(void)
+{
+	if (f_ == NULL)
+		return false;
+	acl_fiber_kill(f_);
+	f_ = NULL;
+	return true;
+}
+
+bool fiber::killed(void) const
+{
+	if (f_ == NULL)
+		return true;
+	return acl_fiber_killed(f_) != 0;
+}
+
 void fiber::schedule(void)
 {
 	acl_fiber_schedule();

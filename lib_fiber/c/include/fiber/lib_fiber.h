@@ -89,6 +89,7 @@ void acl_fiber_kill(ACL_FIBER *fiber);
 /**
  * 检查本协程是否被其它协程通知退出
  * @param fiber {const ACL_FIBER*} 协程对象
+ * @return {int} 返回值为 0 表示没有被通知退出，非 0 表示被通知退出
  */
 int acl_fiber_killed(ACL_FIBER *fiber);
 

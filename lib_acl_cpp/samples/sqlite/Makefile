@@ -1,3 +1,6 @@
 include ../Makefile.in
 PROG = sqlite
-EXTLIBS += -lsqlite3 -lmysqlclient
+ifneq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
+	EXTLIBS += -ldl
+endif
+#EXTLIBS += -lsqlite3 -lmysqlclient

@@ -42,7 +42,6 @@ static acl_pthread_key_t __fiber_key;
 /* forward declare */
 static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	void *arg, size_t size);
-static void fiber_free(ACL_FIBER *fiber);
 
 void acl_fiber_hook_api(int onoff)
 {
@@ -366,21 +365,32 @@ ACL_FIBER *acl_fiber_running(void)
 
 void acl_fiber_kill(ACL_FIBER *fiber)
 {
+	ACL_FIBER *curr = __thread_fiber->running;
+
 	if (fiber == NULL) {
 		acl_msg_error("%s(%d), %s: fiber NULL",
 			__FILE__, __LINE__, __FUNCTION__);
 		return;
 	}
 
+	if (curr == NULL) {
+		acl_msg_error("%s(%d), %s: current fiber NULL",
+			__FILE__, __LINE__, __FUNCTION__);
+		return;
+	}
+
 	fiber->flag |= FIBER_F_KILLED;
 
-	if (fiber == acl_fiber_running()) {
+	if (fiber == curr) {
 		acl_msg_error("%s(%d), %s: fiber-%d kill itself disable!",
 			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(fiber));
 		return;
 	}
 
+	acl_ring_detach(&curr->me);
+	acl_ring_detach(&fiber->me);
 	acl_fiber_ready(fiber);
+	acl_fiber_yield();
 }
 
 int acl_fiber_killed(ACL_FIBER *fiber)
@@ -400,8 +410,10 @@ void fiber_exit(int exit_code)
 
 void acl_fiber_ready(ACL_FIBER *fiber)
 {
-	fiber->status = FIBER_STATUS_READY;
-	acl_ring_prepend(&__thread_fiber->ready, &fiber->me);
+	if (fiber->status != FIBER_STATUS_EXITING) {
+		fiber->status = FIBER_STATUS_READY;
+		acl_ring_prepend(&__thread_fiber->ready, &fiber->me);
+	}
 }
 
 int acl_fiber_yield(void)
@@ -466,7 +478,7 @@ int acl_fiber_ndead(void)
 	return acl_ring_size(&__thread_fiber->dead);
 }
 
-static void fiber_free(ACL_FIBER *fiber)
+void fiber_free(ACL_FIBER *fiber)
 {
 #ifdef USE_VALGRIND
 	VALGRIND_STACK_DEREGISTER(fiber->vid);
@@ -505,6 +517,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	fiber->size   = size;
 	fiber->id     = ++__thread_fiber->idgen;
 	fiber->flag   = 0;
+	fiber->status = FIBER_STATUS_READY;
 
 	carg.p = fiber;
 
@@ -663,7 +676,7 @@ void acl_fiber_switch(void)
 	}
 
 	fiber = ACL_RING_TO_APPL(head, ACL_FIBER, me);
-	fiber->status = FIBER_STATUS_READY;
+	//fiber->status = FIBER_STATUS_READY;
 
 	__thread_fiber->running = fiber;
 	__thread_fiber->switched++;

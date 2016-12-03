@@ -20,6 +20,18 @@ public:
 	void start(size_t stack_size = 320000);
 
 	/**
+	 * 在本协程运行时调用此函数通知该协程退出
+	 * @return {bool} 返回 false 表示本协程未启动或已经退出
+	 */
+	bool kill(void);
+
+	/**
+	 * 判断当前协程是否被通知退出
+	 * @return {bool} 本协程是否被通知退出
+	 */
+	bool killed(void) const;
+
+	/**
 	 * 获得本协程对象的 ID 号
 	 * @return {int}
 	 */

@@ -43,6 +43,7 @@ extern "C" {
 #define	ACL_MASTER_SERVER_DENY_INFO		25
 
 #define	ACL_MASTER_SERVER_EXIT_TIMER		26
+#define	ACL_MASTER_SERVER_ON_LISTEN		27
 
 #define	ACL_APP_CTL_END			ACL_MASTER_SERVER_END
 #define	ACL_APP_CTL_CFG_INT		ACL_MASTER_SERVER_INT_TABLE
@@ -64,6 +65,7 @@ extern "C" {
 typedef void (*ACL_MASTER_SERVER_INIT_FN) (void *);
 typedef int  (*ACL_MASTER_SERVER_LOOP_FN) (void *);
 typedef void (*ACL_MASTER_SERVER_EXIT_FN) (void *);
+typedef void (*ACL_MASTER_SERVER_LISTEN_FN) (void *);
 typedef int  (*ACL_MASTER_SERVER_ACCEPT_FN) (ACL_VSTREAM *);
 typedef int  (*ACL_MASTER_SERVER_HANDSHAKE_FN) (ACL_VSTREAM *);
 typedef void (*ACL_MASTER_SERVER_DISCONN_FN) (ACL_VSTREAM *, void *);

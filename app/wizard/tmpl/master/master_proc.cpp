@@ -65,6 +65,11 @@ void master_service::on_accept(acl::socket_stream* conn)
 	logger("disconnect from %s", conn->get_peer());
 }
 
+void master_service::proc_on_listen(acl::server_socket& ss)
+{
+	logger(">>>listen %s ok<<<", ss.get_addr());
+}
+
 void master_service::proc_on_init()
 {
 }

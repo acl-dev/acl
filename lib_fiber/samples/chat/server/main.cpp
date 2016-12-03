@@ -13,6 +13,7 @@ static int __rw_timeout = 0;
 static acl::channel<int> __chan_monitor;
 static std::map<acl::string, user_client*> __users;
 
+// 从客户端列表中删除指定的客户端对象
 static void remove_user(user_client* uc)
 {
 	const char* name = uc->get_name();
@@ -33,11 +34,14 @@ static void remove_user(user_client* uc)
 	}
 }
 
+// 客户端退出过程
 static void client_logout(user_client* client)
 {
+	// 从客户端列表中删除
 	if (client->already_login())
 		remove_user(client);
 
+	// 如果该客户端的读协程还在工作，则通知该读协程退出
 	if (client->is_reading())
 	{
 		printf("%s(%d): user: %s, kill_reader\r\n",
@@ -45,6 +49,7 @@ static void client_logout(user_client* client)
 		client->kill_reader();
 	}
 
+	// 如果该客户端的写协程还在工作，则通知该写协程退出
 	if (client->is_waiting())
 	{
 		printf("fiber-%d: %s(%d): user: %s, notify logout\r\n",
@@ -53,6 +58,7 @@ static void client_logout(user_client* client)
 		client->notify(MT_LOGOUT);
 	}
 
+	// 如果该客户端的读、写协程都已经退出，则通知该客户端退出
 	if (!client->is_reading() && !client->is_waiting())
 		client->notify_exit();
 }
@@ -64,6 +70,7 @@ static bool client_flush(user_client* client)
 
 	bool ret = true;
 
+	// 从客户端的消息队列中提取消息并发送至该客户端
 	while ((msg = client->pop()) != NULL)
 	{
 		if (conn.write(*msg) == -1)
@@ -83,6 +90,7 @@ static bool client_flush(user_client* client)
 
 static int __nwriter = 0;
 
+// 客户端的写协程处理过程
 static void fiber_writer(user_client* client)
 {
 	client->set_waiter();
@@ -91,7 +99,11 @@ static void fiber_writer(user_client* client)
 	while (true)
 	{
 		int mtype;
+
+		// 等待消息通知
 		client->wait(mtype);
+
+		// 从本身消息队列中提取消息并发送至本客户端
 		if (client_flush(client) == false)
 		{
 			printf("%s(%d), user: %s, flush error %s\r\n",
@@ -114,23 +126,34 @@ static void fiber_writer(user_client* client)
 			client->get_stream().write("You're kicked\r\n");
 			break;
 		}
+#else
+		if (client->exiting())
+		{
+			printf("%s(%d), user: %s exiting\r\n",
+				__FUNCTION__, __LINE__, client->get_name());
+			break;
+		}
 #endif
 	}
 
 	client->set_waiting(false);
 	printf(">>%s(%d), user: %s, logout\r\n", __FUNCTION__, __LINE__,
 		client->get_name());
+
+	// 通知该客户端退出
 	client_logout(client);
 
 	printf("-------__nwriter: %d-----\r\n", --__nwriter);
 }
 
+// 客户端登入过程
 static bool client_login(user_client* uc)
 {
 	acl::string buf;
 
 	while (true)
 	{
+		// 读取一行数据，且自动去掉尾部的 \r\n
 		if (uc->get_stream().gets(buf) == false)
 		{
 			printf("%s(%d): gets error %s\r\n",
@@ -147,6 +170,7 @@ static bool client_login(user_client* uc)
 			break;
 	}
 
+	// 分析登入消息，数据格式：login|xxx
 	std::vector<acl::string>& tokens = buf.split2("|");
 	if (tokens.size() < 2)
 	{
@@ -159,6 +183,7 @@ static bool client_login(user_client* uc)
 
 	acl::string msg;
 
+	// 当该客户端不存在时添加进客户端列表中
 	const acl::string& name = tokens[1];
 	std::map<acl::string, user_client*>::iterator it = __users.find(name);
 	if (it == __users.end())
@@ -172,9 +197,11 @@ static bool client_login(user_client* uc)
 
 	printf("%s", msg.c_str());
 
+	// 通知该客户端登入成功
 	return uc->get_stream().write(msg) != -1;
 }
 
+// 与其它客户端聊天过程
 static bool client_chat(user_client* uc, std::vector<acl::string>& tokens)
 {
 	if (tokens.size() < 3)
@@ -186,6 +213,7 @@ static bool client_chat(user_client* uc, std::vector<acl::string>& tokens)
 	const acl::string& to = tokens[1];
 	const acl::string& msg = tokens[2];
 
+	// 查找目标客户端对象
 	std::map<acl::string, user_client*>::iterator it = __users.find(to);
 	if (it == __users.end())
 	{
@@ -197,11 +225,14 @@ static bool client_chat(user_client* uc, std::vector<acl::string>& tokens)
 		return uc->get_stream().write(tmp) != -1;
 	}
 
+	// 将消息内容加入目标客户端的消息队列中
 	it->second->push(msg);
+	// 通知目标客户端的写协程处理该消息
 	it->second->notify(MT_MSG);
 	return true;
 }
 
+// 踢出一个客户端对象
 static bool client_kick(user_client* uc, std::vector<acl::string>& tokens)
 {
 	if (tokens.size() < 2)
@@ -212,6 +243,7 @@ static bool client_kick(user_client* uc, std::vector<acl::string>& tokens)
 
 	const acl::string& to = tokens[1];
 
+	// 查找将被踢出的客户端对象
 	std::map<acl::string, user_client*>::iterator it = __users.find(to);
 	if (it == __users.end())
 	{
@@ -223,6 +255,7 @@ static bool client_kick(user_client* uc, std::vector<acl::string>& tokens)
 		return uc->get_stream().write(tmp) != -1;
 	}
 
+	// 通知客户端写协程，其被踢出
 	it->second->notify(MT_KICK);
 
 	return true;
@@ -238,16 +271,20 @@ static void fiber_reader(user_client* client)
 	client->set_reader();
 	client->set_reading(true);
 
+	// 登入服务器
 	if (client_login(client) == false)
 	{
 		client->set_reading(false);
 		printf("----------client_logout-------\r\n");
+
+		// 失败，则退出客户端
 		client_logout(client);
 
 		printf("----__nreader: %d-----\r\n", --__nreader);
 		return;
 	}
 
+	// 登入成功，则创建写协程用来向客户端发送消息
 	go_stack(STACK_SIZE) [&] {
 		__nwriter++;
 		fiber_writer(client);
@@ -258,6 +295,7 @@ static void fiber_reader(user_client* client)
 	bool stop = false;
 	acl::string buf;
 
+	// 从客户端循环读取消息
 	while (true)
 	{
 		bool ret = conn.gets(buf);
@@ -267,6 +305,7 @@ static void fiber_reader(user_client* client)
 				__FUNCTION__, __LINE__, client->get_name(),
 				acl::last_serror(), acl_fiber_self());
 
+			// 客户端退出
 			if (client->exiting())
 			{
 				printf("----exiting now----\r\n");
@@ -295,22 +334,31 @@ static void fiber_reader(user_client* client)
 		if (buf.empty())
 			continue;
 
+		// 分析客户端发送的消息，交由不同的处理过程
 		std::vector<acl::string>& tokens = buf.split2("|");
+
+		// 本客户端要求退出
 		if (tokens[0] == "quit" || tokens[0] == "exit")
 		{
 			conn.write("Bye!\r\n");
 			break;
 		}
+
+		// 本客户端发送聊天消息
 		else if (tokens[0] == "chat")
 		{
 			if (client_chat(client, tokens) == false)
 				break;
 		}
+
+		// 本客户端踢出其它客户端
 		else if (tokens[0] == "kick")
 		{
 			if (client_kick(client, tokens) == false)
 				break;
 		}
+
+		// 要求整个服务进程退出
 		else if (tokens[0] == "stop")
 		{
 			stop = true;
@@ -325,6 +373,8 @@ static void fiber_reader(user_client* client)
 		client->get_name());
 
 	client->set_reading(false);
+
+	// 退出客户端
 	client_logout(client);
 
 	printf("----__nreader: %d-----\r\n", --__nreader);
@@ -332,6 +382,7 @@ static void fiber_reader(user_client* client)
 	if (stop)
 	{
 		int dumy = 1;
+		// 如果要停止服务，则通知监控协程
 		__chan_monitor.put(dumy);
 	}
 }
@@ -340,16 +391,21 @@ static int __nclients = 0;
 
 static void fiber_client(acl::socket_stream* conn)
 {
+	// 创建客户端对象
 	user_client* client = new user_client(*conn);
 
+	// 创建从客户端连接读取数据的协程
 	go_stack(STACK_SIZE) [=] {
 		__nreader++;
 		fiber_reader(client);
 	};
 
+	// 等待该客户端连接对象退出
 	client->wait_exit();
 
 	printf("----- client (%s), exit now -----\r\n", client->get_name());
+
+	// 删除客户端对象及客户端连接对象
 	delete client;
 	delete conn;
 
@@ -365,6 +421,7 @@ static void fiber_accept(acl::server_socket& ss)
 
 	while (true)
 	{
+		// 等待接收客户端连接
 		acl::socket_stream* conn = ss.accept();
 		if (conn == NULL)
 		{
@@ -372,6 +429,7 @@ static void fiber_accept(acl::server_socket& ss)
 			break;
 		}
 
+		// 创建处理客户端对象的协程
 		go_stack(STACK_SIZE) [=] {
 			__nclients++;
 			fiber_client(conn);
@@ -383,12 +441,15 @@ static void fiber_monitor(void)
 {
 	int n;
 
+	// 等待消息通知
 	__chan_monitor.pop(n);
 
 	printf("--- kill fiber_accept ---\r\n");
+	// 杀死监听协程
 	acl_fiber_kill(__fiber_accept);
 
 	printf("--- stop fiber schedule ---\r\n");
+	// 停止协程调度过程
 	acl_fiber_schedule_stop();
 }
 
@@ -404,6 +465,7 @@ int main(int argc, char *argv[])
 	char addr[64];
 	int  ch;
 
+	// 允许 acl 库的日志输出至屏幕
 	acl::log::stdout_open(true);
 	snprintf(addr, sizeof(addr), "%s", "127.0.0.1:9002");
 
@@ -423,7 +485,8 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	acl::server_socket ss;
+	acl::server_socket ss;	// 监听套接口对象
+	// 监听指定地址
 	if (ss.open(addr) == false)
 	{
 		printf("listen %s error %s\r\n", addr, acl::last_serror());
@@ -432,14 +495,17 @@ int main(int argc, char *argv[])
 
 	printf("listen %s ok\r\n", addr);
 
+	// 创建服务器接收连接协程
 	go[&] {
 		fiber_accept(ss);
 	};
 
+	// 创建监控协程
 	go[] {
 		fiber_monitor();
 	};
 
+	// 启动协程调度过程
 	acl::fiber::schedule();
 
 	return 0;

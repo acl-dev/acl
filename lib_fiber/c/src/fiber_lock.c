@@ -4,51 +4,56 @@
 
 ACL_FIBER_MUTEX *acl_fiber_mutex_create(void)
 {
-	ACL_FIBER_MUTEX *l = (ACL_FIBER_MUTEX *)
+	ACL_FIBER_MUTEX *lk = (ACL_FIBER_MUTEX *)
 		acl_mymalloc(sizeof(ACL_FIBER_MUTEX));
 
-	l->owner = NULL;
-	acl_ring_init(&l->waiting);
-	return l;
+	lk->owner = NULL;
+	acl_ring_init(&lk->waiting);
+	return lk;
 }
 
-void acl_fiber_mutex_free(ACL_FIBER_MUTEX *l)
+void acl_fiber_mutex_free(ACL_FIBER_MUTEX *lk)
 {
-	acl_myfree(l);
+	acl_myfree(lk);
 }
 
-static int __lock(ACL_FIBER_MUTEX *l, int block)
+static int __lock(ACL_FIBER_MUTEX *lk, int block)
 {
 	ACL_FIBER *curr;
 
-	if (l->owner == NULL){
-		l->owner = acl_fiber_running();
+	if (lk->owner == NULL) {
+		lk->owner = acl_fiber_running();
 		return 1;
 	}
 
-	if(!block)
+	if (!block)
 		return 0;
 
 	curr = acl_fiber_running();
-	acl_ring_prepend(&l->waiting, &curr->me);
-
+	acl_ring_prepend(&lk->waiting, &curr->me);
 	acl_fiber_switch();
 
-	if (l->owner != curr)
-		acl_msg_fatal("%s(%d), %s: qlock: owner=%p self=%p oops",
-			__FILE__, __LINE__, __FUNCTION__, l->owner, curr);
+	/* if switch to me because other killed me, I should detach myself;
+	 * else if because other unlock, I'll be detached twice which is
+	 * hamless because ACL_RING can deal with it.
+	 */
+	acl_ring_detach(&curr->me);
+
+	if (lk->owner != curr)
+		acl_msg_warn("%s(%d), %s: qlock: owner=%p self=%p oops",
+			__FILE__, __LINE__, __FUNCTION__, lk->owner, curr);
 
 	return 1;
 }
 
-void acl_fiber_mutex_lock(ACL_FIBER_MUTEX *l)
+void acl_fiber_mutex_lock(ACL_FIBER_MUTEX *lk)
 {
-	__lock(l, 1);
+	__lock(lk, 1);
 }
 
-int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *l)
+int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *lk)
 {
-	return __lock(l, 0);
+	return __lock(lk, 0);
 }
 
 #define RING_TO_FIBER(r) \
@@ -57,17 +62,17 @@ int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *l)
 #define FIRST_FIBER(head) \
     (acl_ring_succ(head) != (head) ? RING_TO_FIBER(acl_ring_succ(head)) : 0)
 
-void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *l)
+void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *lk)
 {
 	ACL_FIBER *ready;
 	
-	if (l->owner == 0)
+	if (lk->owner == NULL)
 		acl_msg_fatal("%s(%d), %s: qunlock: owner NULL",
 			__FILE__, __LINE__, __FUNCTION__);
 
-	ready = FIRST_FIBER(&l->waiting);
+	ready = FIRST_FIBER(&lk->waiting);
 
-	if ((l->owner = ready) != NULL) {
+	if ((lk->owner = ready) != NULL) {
 		acl_ring_detach(&ready->me);
 		acl_fiber_ready(ready);
 	}
@@ -77,28 +82,28 @@ void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *l)
 
 ACL_FIBER_RWLOCK *acl_fiber_rwlock_create(void)
 {
-	ACL_FIBER_RWLOCK *l = (ACL_FIBER_RWLOCK *)
+	ACL_FIBER_RWLOCK *lk = (ACL_FIBER_RWLOCK *)
 		acl_mymalloc(sizeof(ACL_FIBER_RWLOCK));
 
-	l->readers = 0;
-	l->writer  = NULL;
-	acl_ring_init(&l->rwaiting);
-	acl_ring_init(&l->wwaiting);
+	lk->readers = 0;
+	lk->writer  = NULL;
+	acl_ring_init(&lk->rwaiting);
+	acl_ring_init(&lk->wwaiting);
 
-	return l;
+	return lk;
 }
 
-void acl_fiber_rwlock_free(ACL_FIBER_RWLOCK *l)
+void acl_fiber_rwlock_free(ACL_FIBER_RWLOCK *lk)
 {
-	acl_myfree(l);
+	acl_myfree(lk);
 }
 
-static int __rlock(ACL_FIBER_RWLOCK *l, int block)
+static int __rlock(ACL_FIBER_RWLOCK *lk, int block)
 {
 	ACL_FIBER *curr;
 
-	if (l->writer == NULL && FIRST_FIBER(&l->wwaiting) == NULL) {
-		l->readers++;
+	if (lk->writer == NULL && FIRST_FIBER(&lk->wwaiting) == NULL) {
+		lk->readers++;
 		return 1;
 	}
 
@@ -106,28 +111,31 @@ static int __rlock(ACL_FIBER_RWLOCK *l, int block)
 		return 0;
 
 	curr = acl_fiber_running();
-	acl_ring_prepend(&l->rwaiting, &curr->me);
+	acl_ring_prepend(&lk->rwaiting, &curr->me);
 	acl_fiber_switch();
+
+	/* if switch to me because other killed me, I should detach myself */
+	acl_ring_detach(&curr->me);
 
 	return 1;
 }
 
-void acl_fiber_rwlock_rlock(ACL_FIBER_RWLOCK *l)
+void acl_fiber_rwlock_rlock(ACL_FIBER_RWLOCK *lk)
 {
-	(void) __rlock(l, 1);
+	(void) __rlock(lk, 1);
 }
 
-int acl_fiber_rwlock_tryrlock(ACL_FIBER_RWLOCK *l)
+int acl_fiber_rwlock_tryrlock(ACL_FIBER_RWLOCK *lk)
 {
-	return __rlock(l, 0);
+	return __rlock(lk, 0);
 }
 
-static int __wlock(ACL_FIBER_RWLOCK *l, int block)
+static int __wlock(ACL_FIBER_RWLOCK *lk, int block)
 {
 	ACL_FIBER *curr;
 
-	if (l->writer == NULL && l->readers == 0) {
-		l->writer = acl_fiber_running();
+	if (lk->writer == NULL && lk->readers == 0) {
+		lk->writer = acl_fiber_running();
 		return 1;
 	}
 
@@ -135,56 +143,59 @@ static int __wlock(ACL_FIBER_RWLOCK *l, int block)
 		return 0;
 
 	curr = acl_fiber_running();
-	acl_ring_prepend(&l->wwaiting, &curr->me);
+	acl_ring_prepend(&lk->wwaiting, &curr->me);
 	acl_fiber_switch();
+
+	/* if switch to me because other killed me, I should detach myself */
+	acl_ring_detach(&curr->me);
 
 	return 1;
 }
 
-void acl_fiber_rwlock_wlock(ACL_FIBER_RWLOCK *l)
+void acl_fiber_rwlock_wlock(ACL_FIBER_RWLOCK *lk)
 {
-	__wlock(l, 1);
+	__wlock(lk, 1);
 }
 
-int acl_fiber_rwlock_trywlock(ACL_FIBER_RWLOCK *l)
+int acl_fiber_rwlock_trywlock(ACL_FIBER_RWLOCK *lk)
 {
-	return __wlock(l, 0);
+	return __wlock(lk, 0);
 }
 
-void acl_fiber_rwlock_runlock(ACL_FIBER_RWLOCK *l)
+void acl_fiber_rwlock_runlock(ACL_FIBER_RWLOCK *lk)
 {
 	ACL_FIBER *fiber;
 
-	if (--l->readers == 0 && (fiber = FIRST_FIBER(&l->wwaiting)) != NULL) {
-		acl_ring_detach(&l->wwaiting);
-		l->writer = fiber;
+	if (--lk->readers == 0 && (fiber = FIRST_FIBER(&lk->wwaiting))) {
+		acl_ring_detach(&lk->wwaiting);
+		lk->writer = fiber;
 		acl_fiber_ready(fiber);
 	}
 }
 
-void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK *l)
+void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK *lk)
 {
 	ACL_FIBER *fiber;
 	
-	if (l->writer == NULL)
+	if (lk->writer == NULL)
 		acl_msg_fatal("%s(%d), %s: wunlock: not locked",
 			__FILE__, __LINE__, __FUNCTION__);
 
-	l->writer = NULL;
+	lk->writer = NULL;
 
-	if (l->readers != 0)
+	if (lk->readers != 0)
 		acl_msg_fatal("%s(%d), %s: wunlock: readers",
 			__FILE__, __LINE__, __FUNCTION__);
 
-	while ((fiber = FIRST_FIBER(&l->rwaiting)) != NULL) {
-		acl_ring_detach(&l->rwaiting);
-		l->readers++;
+	while ((fiber = FIRST_FIBER(&lk->rwaiting)) != NULL) {
+		acl_ring_detach(&lk->rwaiting);
+		lk->readers++;
 		acl_fiber_ready(fiber);
 	}
 
-	if (l->readers == 0 && (fiber = FIRST_FIBER(&l->wwaiting)) != NULL) {
-		acl_ring_detach(&l->wwaiting);
-		l->writer = fiber;
+	if (lk->readers == 0 && (fiber = FIRST_FIBER(&lk->wwaiting)) != NULL) {
+		acl_ring_detach(&lk->wwaiting);
+		lk->writer = fiber;
 		acl_fiber_ready(fiber);
 	}
 }

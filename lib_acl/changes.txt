@@ -1,5 +1,13 @@
 修改历史列表：
 
+571) 2016.12.1
+571.1) feature: acl_aio_server.c/acl_threads_server.c/acl_single_server.c 增加
+回调函数 __service_on_listen，以便于将监听的流对象传递给应用
+
+570) 2016.11.30
+570.1) feature: acl_master 服务器框架支持监听地址的模糊匹配机制，以便于多机部署
+时的配置文件一致性
+
 569) 2016.11.27
 569.1) feature: 增加了内存调试函数 acl_default_meminfo 用来显示内存分配及释放情况
 

@@ -62,6 +62,7 @@ static int   *__service_ctx = NULL;
 static char   __service_name[256];
 static void (*__service_onexit)(void*) = NULL;
 static char  *__deny_info = NULL;
+static ACL_MASTER_SERVER_LISTEN_FN __server_on_listen = NULL;
 
 static unsigned      __server_generation;
 static ACL_VSTREAM **__sstreams;
@@ -363,8 +364,10 @@ static ACL_VSTREAM **server_daemon_open(int count, int fdtype)
 				__FILE__, __LINE__, myname, fd);
 
 		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
-		acl_fiber_create(fiber_accept_main, sstream, STACK_SIZE);
+		if (__server_on_listen)
+			__server_on_listen(sstream);
 		sstreams[i++] = sstream;
+		acl_fiber_create(fiber_accept_main, sstream, STACK_SIZE);
 	}
 
 	acl_fiber_create(fiber_monitor_master, ACL_MASTER_STAT_STREAM, STACK_SIZE);
@@ -400,8 +403,9 @@ static ACL_VSTREAM **server_alone_open(const char *addrs)
 			exit(1);
 		}
 
+		if (__server_on_listen)
+			__server_on_listen(sstream);
 		streams[i++] = sstream;
-
 		acl_fiber_create(fiber_accept_main, sstream, STACK_SIZE);
 	}
 
@@ -614,6 +618,10 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 			break;
 		case ACL_MASTER_SERVER_POST_INIT:
 			post_init = va_arg(__ap_dest, ACL_MASTER_SERVER_INIT_FN);
+			break;
+		case ACL_MASTER_SERVER_ON_LISTEN:
+			__server_on_listen = va_arg(__ap_dest,
+				ACL_MASTER_SERVER_LISTEN_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
 			__service_onexit =
