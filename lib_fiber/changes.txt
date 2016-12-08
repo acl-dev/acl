@@ -1,3 +1,7 @@
+
+33) 2016.12.8
+33.1) bugfix: hook_net.c 中，当非协程模式下，hook epoll 相关 API 应该加以区别
+
 32) 2016.12.3
 32.1) feature: acl_fiber_kill 可以支持因调用 acl_fiber_sleep, acl_fiber_sem,
 acl_fiber_mutex_lock 而阻塞的协程

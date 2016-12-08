@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include "lib_acl.h"
+
 /**
  * 协程结构类型
  */
