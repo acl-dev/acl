@@ -40,6 +40,7 @@ int redis_pubsub::publish(const char* channel, const char* msg, size_t len)
 	argv[2] = msg;
 	lens[2] = len;
 
+	hash_slot(channel);
 	build_request(3, argv, lens);
 	return get_number();
 }
@@ -157,6 +158,9 @@ int redis_pubsub::subop(const char* cmd, const std::vector<const char*>& channel
 		lens[i] = strlen(argv[i]);
 	}
 
+	if (channels.size() == 1)
+		hash_slot(channels[0]);
+
 	build_request(argc, argv, lens);
 	const redis_result* result = run(channels.size());
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
@@ -193,6 +197,9 @@ int redis_pubsub::subop(const char* cmd, const std::vector<string>& channels)
 		argv[i] = (*cit).c_str();
 		lens[i] = (*cit).length();
 	}
+
+	if (channels.size() == 1)
+		hash_slot(channels[0].c_str());
 
 	build_request(argc, argv, lens);
 	const redis_result* result = run(channels.size());

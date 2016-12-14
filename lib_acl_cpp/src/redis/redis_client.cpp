@@ -360,6 +360,12 @@ const redis_result* redis_client::run(dbuf_pool* pool, const string& req,
 
 		close();
 
+		if (req.empty())
+		{
+			logger_error("no retry for request is empty");
+			break;
+		}
+
 		if (!retry_ || retried)
 		{
 			logger_error("result NULL, addr: %s, retry: %s, "
@@ -429,8 +435,13 @@ const redis_result* redis_client::run(dbuf_pool* pool, const redis_request& req,
 
 		close();
 
-		if (!retry_ || retried)
+		if (!retry_ || retried || size == 0)
+		{
+			logger_error("retry_: %s, retried: %s, size: %d",
+				retry_ ? "yes" : "no", retried ? "yes" : "no",
+				(int) size);
 			break;
+		}
 
 		retried = true;
 	}

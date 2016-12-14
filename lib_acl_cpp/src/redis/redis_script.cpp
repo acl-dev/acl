@@ -36,7 +36,7 @@ bool redis_script::eval_status(const char* script,
 	const std::vector<string>& args,
 	const char* success /* = "OK" */)
 {
-	const redis_result* result = eval_cmd(script, "EVAL", keys, args);
+	const redis_result* result = eval_cmd("EVAL", script, keys, args);
 	if (result == NULL)
 		return false;
 	const char* status = result->get_status();
@@ -50,7 +50,7 @@ bool redis_script::eval_number(const char* script,
 	const std::vector<string>& args,
 	int& out)
 {
-	const redis_result* result = eval_cmd(script, "EVAL", keys, args);
+	const redis_result* result = eval_cmd("EVAL", script, keys, args);
 	if (result == NULL)
 		return false;
 
@@ -64,7 +64,7 @@ bool redis_script::eval_number64(const char* script,
 	const std::vector<string>& args,
 	long long int& out)
 {
-	const redis_result* result = eval_cmd(script, "EVAL", keys, args);
+	const redis_result* result = eval_cmd("EVAL", script, keys, args);
 	if (result == NULL)
 		return false;
 
@@ -78,7 +78,7 @@ int redis_script::eval_string(const char* script,
 	const std::vector<string>& args,
 	string& out)
 {
-	const redis_result* result = eval_cmd(script, "EVAL", keys, args);
+	const redis_result* result = eval_cmd("EVAL", script, keys, args);
 	if (result == NULL)
 		return -1;
 
@@ -89,7 +89,7 @@ bool redis_script::evalsha_status(const char* script,
 	const std::vector<string>& keys, const std::vector<string>& args,
 	const char* success /* = "OK" */)
 {
-	const redis_result* result = eval_cmd(script, "EVALSHA", keys, args);
+	const redis_result* result = eval_cmd("EVALSHA", script, keys, args);
 	if (result == NULL)
 		return false;
 	const char* status = result->get_status();
@@ -103,7 +103,7 @@ bool redis_script::evalsha_number(const char* script,
 	const std::vector<string>& args,
 	int& out)
 {
-	const redis_result* result = eval_cmd(script, "EVALSHA", keys, args);
+	const redis_result* result = eval_cmd("EVALSHA", script, keys, args);
 	if (result == NULL)
 		return false;
 
@@ -117,7 +117,7 @@ bool redis_script::evalsha_number64(const char* script,
 	const std::vector<string>& args,
 	long long int& out)
 {
-	const redis_result* result = eval_cmd(script, "EVALSHA", keys, args);
+	const redis_result* result = eval_cmd("EVALSHA", script, keys, args);
 	if (result == NULL)
 		return false;
 
@@ -131,7 +131,7 @@ int redis_script::evalsha_string(const char* script,
 	const std::vector<string>& args,
 	string& out)
 {
-	const redis_result* result = eval_cmd(script, "EVALSHA", keys, args);
+	const redis_result* result = eval_cmd("EVALSHA", script, keys, args);
 	if (result == NULL)
 		return -1;
 
@@ -214,7 +214,7 @@ int redis_script::eval_status(const char* cmd, const char* script,
 	std::vector<bool>& out,
 	const char* success /* = "OK" */)
 {
-	const redis_result* result = eval_cmd(script, cmd, keys, args);
+	const redis_result* result = eval_cmd(cmd, script, keys, args);
 	if (result == NULL)
 		return -1;
 
@@ -248,7 +248,7 @@ int redis_script::eval_number(const char* cmd, const char* script,
 	std::vector<int>& out,
 	std::vector<bool>& status)
 {
-	const redis_result* result = eval_cmd(script, cmd, keys, args);
+	const redis_result* result = eval_cmd(cmd, script, keys, args);
 	if (result == NULL)
 		return -1;
 
@@ -282,7 +282,7 @@ long long int redis_script::eval_number64(const char* cmd, const char* script,
 	std::vector<long long int>& out,
 	std::vector<bool>& status)
 {
-	const redis_result* result = eval_cmd(script, cmd, keys, args);
+	const redis_result* result = eval_cmd(cmd, script, keys, args);
 	if (result == NULL)
 		return -1;
 
@@ -315,7 +315,7 @@ int redis_script::eval_strings(const char* cmd, const char* script,
 	const std::vector<string>& args,
 	std::vector<string>& out)
 {
-	const redis_result* result = eval_cmd(script, cmd, keys, args);
+	const redis_result* result = eval_cmd(cmd, script, keys, args);
 	if (result == NULL)
 		return -1;
 
@@ -391,17 +391,16 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 	lens[2] = strlen(buf);
 
 	size_t i = 3;
-	std::vector<string>::const_iterator cit = keys.begin();
+	std::vector<string>::const_iterator cit;
 
-	for (; cit != keys.end(); ++cit)
+	for (cit = keys.begin(); cit != keys.end(); ++cit)
 	{
 		argv[i] = (*cit).c_str();
 		lens[i] = (*cit).length();
 		i++;
 	}
 
-	cit = args.begin();
-	for (; cit != args.end(); ++cit)
+	for (cit = args.begin(); cit != args.end(); ++cit)
 	{
 		argv[i] = (*cit).c_str();
 		lens[i] = (*cit).length();
@@ -409,6 +408,9 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 	}
 
 	acl_assert(i == argc);
+
+	if (keys.size() == 1)
+		hash_slot(keys[0].c_str());
 
 	build_request(argc, argv, lens);
 	return run();
@@ -436,17 +438,16 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 	lens[2] = strlen(buf);
 
 	size_t i = 3;
-	std::vector<const char*>::const_iterator cit = keys.begin();
+	std::vector<const char*>::const_iterator cit;
 
-	for (; cit != keys.end(); ++cit)
+	for (cit = keys.begin(); cit != keys.end(); ++cit)
 	{
 		argv[i] = *cit;
 		lens[i] = strlen(argv[i]);
 		i++;
 	}
 
-	cit = args.begin();
-	for (; cit != args.end(); ++cit)
+	for (cit = args.begin(); cit != args.end(); ++cit)
 	{
 		argv[i] = *cit;
 		lens[i] = strlen(argv[i]);

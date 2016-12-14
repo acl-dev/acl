@@ -417,11 +417,18 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			// 删除哈希槽中的地址映射关系以便下次操作时重新获取
 			cluster->clear_slot(slot_);
 
-			// 将连接池对象置为不可用状态
-			conn->get_pool()->set_alive(false);
-
 			// 将连接对象归还给连接池对象
 			conn->get_pool()->put(conn, false);
+
+			// 如果连接断开且请求数据为空时，则无须重试
+			if (request_obj_->get_size() == 0 && request_buf_->empty())
+			{
+				logger_error("not retry when no request!");
+				return NULL;
+			}
+
+			// 将连接池对象置为不可用状态
+			conn->get_pool()->set_alive(false);
 
 			// 从连接池集群中顺序取得一个连接对象
 			conn = peek_conn(cluster, slot_);
