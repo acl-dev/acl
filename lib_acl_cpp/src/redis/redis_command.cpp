@@ -18,7 +18,8 @@ namespace acl
 #define	LONG_LEN	21
 
 redis_command::redis_command()
-: conn_(NULL)
+: check_addr_(false)
+, conn_(NULL)
 , cluster_(NULL)
 , max_conns_(0)
 , used_(0)
@@ -40,7 +41,8 @@ redis_command::redis_command()
 
 
 redis_command::redis_command(redis_client* conn)
-: conn_(conn)
+: check_addr_(false)
+, conn_(conn)
 , cluster_(NULL)
 , max_conns_(0)
 , used_(0)
@@ -64,7 +66,8 @@ redis_command::redis_command(redis_client* conn)
 }
 
 redis_command::redis_command(redis_client_cluster* cluster, size_t max_conns)
-: conn_(NULL)
+: check_addr_(false)
+, conn_(NULL)
 , cluster_(cluster)
 , max_conns_(max_conns)
 , used_(0)
@@ -104,6 +107,11 @@ redis_command::~redis_command()
 	delete request_buf_;
 	delete request_obj_;
 	dbuf_->destroy();
+}
+
+void redis_command::set_check_addr(bool on)
+{
+	check_addr_ = on;
 }
 
 void redis_command::reset(bool save_slot /* = false */)
@@ -398,6 +406,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 	}
 
 	set_client_addr(*conn);
+	conn->set_check_addr(check_addr_);
 
 	redis_result_t type;
 	bool  last_moved = false;
@@ -651,6 +660,9 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */,
 		logger_error("ERROR: cluster_ and conn_ are all NULL");
 		return NULL;
 	}
+
+	conn_->set_check_addr(check_addr_);
+
 	if (slice_req_)
 		result_ = conn_->run(dbuf_, *request_obj_, nchild, timeout);
 	else

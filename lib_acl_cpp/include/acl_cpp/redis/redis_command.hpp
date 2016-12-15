@@ -54,6 +54,14 @@ public:
 	virtual ~redis_command(void);
 
 	/**
+	 * 在进行每个命令处理前，是否要求检查 socket 句柄与地址的匹配情况，当
+	 * 打开该选项时，将会严格检查匹配情况，但会影响一定性能，因此该设置仅
+	 * 用在 DEBUG 时的运行场景
+	 * @param on {bool}
+	 */
+	void set_check_addr(bool on);
+
+	/**
 	 * 在重复使用一个继承于 redis_command 的子类操作 redis 时，需要在
 	 * 下一次调用前调用本方法以释放上次操作的临时对象;
 	 * when reusing a redis command sub-class, the reset method should be
@@ -386,14 +394,15 @@ protected:
 	void hash_slot(const char* key, size_t len);
 
 private:
-	char  addr_[32];
+	bool check_addr_;
+	char addr_[32];
 	redis_client* conn_;
 	redis_client_cluster* cluster_;
 	size_t max_conns_;
 	unsigned long long used_;
-	int slot_;
-	int redirect_max_;
-	int redirect_sleep_;
+	int  slot_;
+	int  redirect_max_;
+	int  redirect_sleep_;
 
 	redis_client* peek_conn(redis_client_cluster* cluster, int slot);
 	redis_client* redirect(redis_client_cluster* cluster, const char* addr);

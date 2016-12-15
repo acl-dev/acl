@@ -1,6 +1,12 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+456) 2016.12.15
+456.1) feature: redis_command/redis_client 增加连接 IP 地址校验检测功能，主要
+用于调试情况
+456.2) bugfix: redis_pubsub 类中如果通过 psubcribe 订阅消息时，get_message 则
+会出错，需要 get_message 使其同时支持 subcribe 及 psubscribe
+
 455) 2016.12.14
 455.1) bugfix: redis_client.cpp 中的 run 方法在进行连接重试时，如果请求数据为空，则不
 应进行重试，而是应直接给上层应用返回失败，由应用层处理，比如对于 redis_pubsub 类中的方法 

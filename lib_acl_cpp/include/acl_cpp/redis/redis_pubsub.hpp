@@ -121,10 +121,13 @@ public:
 	 *  buffer for storing the channel associate with the msg
 	 * @param msg {string&} 存放当前获得的消息内容
 	 *  store the message posted to the channel
+	 * @param message_type {string*} will store messsage or pmessage
+	 * @param pattern {string*} will store pattern set by psubscribe
 	 * @return {bool} 是否成功，如果返回 false 则表示出错
 	 *  true on success, false on error
 	 */
-	bool get_message(string& channel, string& msg);
+	bool get_message(string& channel, string& msg,
+		string* message_type = NULL, string* pattern = NULL);
 
 	/**
 	 * 列出当前的活跃频道：活跃频道指的是那些至少有一个订阅者的频道， 订阅模式的

@@ -18,7 +18,8 @@ namespace acl
 
 redis_client::redis_client(const char* addr, int conn_timeout /* = 60 */,
 	int rw_timeout /* = 30 */, bool retry /* = true */)
-: retry_(retry)
+: check_addr_(false)
+, retry_(retry)
 , slice_req_(false)
 , slice_res_(false)
 {
@@ -35,6 +36,11 @@ redis_client::~redis_client()
 
 	if (conn_.opened())
 		conn_.close();
+}
+
+void redis_client::set_check_addr(bool on)
+{
+	check_addr_ = on;
 }
 
 void redis_client::set_password(const char* pass)
@@ -55,6 +61,28 @@ socket_stream* redis_client::get_stream()
 		return (socket_stream*) &conn_;
 	else
 		return NULL;
+}
+
+bool redis_client::check_connection(socket_stream& conn)
+{
+	char peer[64];
+	ACL_SOCKET fd = conn.sock_handle();
+
+	if (acl_getpeername(fd, peer, sizeof(peer) - 1) == -1)
+	{
+		logger_error("getpeername failed: %s, fd: %d, addr: %s",
+			last_serror(), (int) fd, addr_);
+		return false;
+	}
+
+	if (strcmp(peer, addr_) != 0)
+	{
+		logger_error("addr no matched, peer: %s, addr: %s, fd: %d",
+			peer, addr_, (int) fd);
+		return false;
+	}
+
+	return true;
 }
 
 bool redis_client::open()
@@ -331,6 +359,13 @@ const redis_result* redis_client::run(dbuf_pool* pool, const string& req,
 		if (rw_timeout != NULL)
 			conn_.set_rw_timeout(*rw_timeout);
 
+		if (check_addr_ && check_connection(conn_) == false)
+		{
+			logger_error("CHECK_CONNECTION FAILED!");
+			close();
+			break;
+		}
+
 		if (!req.empty() && conn_.write(req) == -1)
 		{
 			close();
@@ -405,6 +440,13 @@ const redis_result* redis_client::run(dbuf_pool* pool, const redis_request& req,
 
 		if (rw_timeout != NULL)
 			conn_.set_rw_timeout(*rw_timeout);
+
+		if (check_addr_ && check_connection(conn_) == false)
+		{
+			logger_error("CHECK_CONNECTION FAILED!");
+			close();
+			break;
+		}
 
 		if (size > 0 && conn_.writev(iov, (int) size) == -1)
 		{
