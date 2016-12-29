@@ -140,9 +140,10 @@ public:
 
 	/**
 	 * 将当前 json 节点转换成 json 字符串(包含本 json 节点及其子节点)
+	 * @param out {string*} 非空时，则使用此缓冲区，否则使用内部缓冲区
 	 * @return {const char*}
 	 */
-	const string& to_string(void);
+	const string& to_string(string* out = NULL) const;
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -746,9 +747,10 @@ public:
 
 	/**
 	 * 将 json 对象树转换成 json 字符串
+	 * @param out {string*} 非空时，则使用此缓冲区，否则使用内部缓冲区
 	 * @return {const string&}
 	 */
-	const string& to_string(void);
+	const string& to_string(string* out = NULL) const;
 
 	// pipe_stream 虚函数重载
 

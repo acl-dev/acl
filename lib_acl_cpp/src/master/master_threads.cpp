@@ -206,8 +206,8 @@ int master_threads::service_on_accept(ACL_VSTREAM* client)
 	// 如果子类的 thread_on_handshake 方法返回 false，则直接返回给上层
 	// 框架 -1，由上层框架再调用 service_on_close 过程，从而在该过程
 	// 中将 stream 对象释放
-	if (__mt->thread_on_handshake(stream) == false)
-		return -1;
+	//if (__mt->thread_on_handshake(stream) == false)
+	//	return -1;
 
 	// 返回 0 表示可以继续处理该客户端连接，从而由上层框架将其置入
 	// 读监控集合中
@@ -223,6 +223,9 @@ int master_threads::service_on_handshake(ACL_VSTREAM *client)
 	if (stream == NULL)
 		logger_fatal("client->context is null!");
 
+	// 如果子类的 thread_on_handshake 方法返回 false，则直接返回给上层
+	// 框架 -1，由上层框架再调用 service_on_close 过程，从而在该过程
+	// 中将 stream 对象释放
 	if (__mt->thread_on_handshake(stream) == true)
 		return 0;
 	return -1;

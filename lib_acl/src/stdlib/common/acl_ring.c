@@ -67,7 +67,7 @@ void acl_ring_detach(ACL_RING *entry)
 	ACL_RING   *succ;
 	ACL_RING   *pred;
 
-	if (entry == NULL)
+	if (entry == NULL || entry->parent == entry)
 		return;
 	succ = entry->succ;
 	pred = entry->pred;

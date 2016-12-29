@@ -87,44 +87,52 @@ typedef struct {
 #define FILLER          0x0
 
 #define CHECK_PTR(_ptr, _real_ptr, _len, _fname, _line) { \
-	if (_ptr == 0) \
-		acl_msg_panic("%s(%d): null pointer input", _fname, _line); \
-	_real_ptr = (MBLOCK *) ((char *) _ptr - offsetof(MBLOCK, u.payload[0])); \
-	if (_real_ptr->signature != SIGNATURE) \
-		acl_msg_panic("%s(%d)(CHECK_PTR): corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
-			_fname, _line, (int) _real_ptr->length, _real_ptr->signature, SIGNATURE); \
-	if ((_len = _real_ptr->length) < 1) \
-		acl_msg_panic("%s(%d): corrupt memory block length", _fname, _line); \
+  if (_ptr == 0) \
+    acl_msg_panic("%s(%d), %s: in %s(%d), null pointer input", \
+      __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
+  _real_ptr = (MBLOCK *) ((char *) _ptr - offsetof(MBLOCK, u.payload[0])); \
+  if (_real_ptr->signature != SIGNATURE) \
+    acl_msg_panic("%s(%d), %s: in %s(%d), corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
+      __FILE__, __LINE__, __FUNCTION__, _fname, _line, \
+      (int) _real_ptr->length, _real_ptr->signature, SIGNATURE); \
+  if ((_len = _real_ptr->length) < 1) \
+    acl_msg_panic("%s(%d), %s: in %s(%d), corrupt memory block length", \
+      __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
 }
 
 #define CHECK_IN_PTR(_ptr, _real_ptr, _len, _fname, _line) { \
-	if (_ptr == 0) \
-		acl_msg_panic("%s(%d): null pointer input", _fname, _line); \
-	_real_ptr = (MBLOCK *) ((char *) _ptr - offsetof(MBLOCK, u.payload[0])); \
-	if (_real_ptr->signature != SIGNATURE) \
-		acl_msg_panic("%s(%d)(CHECK_IN_PTR): corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
-			_fname, _line, (int) _real_ptr->length, _real_ptr->signature, SIGNATURE); \
-	_real_ptr->signature = 0; \
-	if ((_len = _real_ptr->length) < 1) \
-		acl_msg_panic("%s(%d): corrupt memory block length", _fname, _line); \
+  if (_ptr == 0) \
+    acl_msg_panic("%s(%d), %s: in %s(%d), null pointer input", \
+      __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
+    _real_ptr = (MBLOCK *) ((char *) _ptr - offsetof(MBLOCK, u.payload[0])); \
+    if (_real_ptr->signature != SIGNATURE) \
+      acl_msg_panic("%s(%d), %s: in %s(%d), corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
+        __FILE__, __LINE__, __FUNCTION__, _fname, _line, \
+        (int) _real_ptr->length, _real_ptr->signature, SIGNATURE); \
+      _real_ptr->signature = 0; \
+      if ((_len = _real_ptr->length) < 1) \
+        acl_msg_panic("%s(%d), %s: in %s(%d), corrupt memory block length", \
+          __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
 }
 
 #define CHECK_IN_PTR2(_ptr, _real_ptr, _len, _fname, _line) { \
-	if (_ptr == 0) \
-		acl_msg_panic("%s(%d): null pointer input", _fname, _line); \
-	_real_ptr = (MBLOCK *) ((char *) _ptr - offsetof(MBLOCK, u.payload[0])); \
-	if (_real_ptr->signature != SIGNATURE) \
-		acl_msg_panic("%s(%d)(CHECK_IN_PTR2): corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
-			_fname, _line, (int) _real_ptr->length, _real_ptr->signature, SIGNATURE); \
-	if ((_len = _real_ptr->length) < 1) \
-		acl_msg_panic("%s(%d): corrupt memory block length", _fname, _line); \
+  if (_ptr == 0) \
+    acl_msg_panic("%s(%d), %s: in %s(%d), null pointer input", \
+      __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
+    _real_ptr = (MBLOCK *) ((char *) _ptr - offsetof(MBLOCK, u.payload[0])); \
+    if (_real_ptr->signature != SIGNATURE) \
+      acl_msg_panic("%s(%d)(CHECK_IN_PTR2): corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
+        _fname, _line, (int) _real_ptr->length, _real_ptr->signature, SIGNATURE); \
+    if ((_len = _real_ptr->length) < 1) \
+      acl_msg_panic("%s(%d), %s: in %s(%d) corrupt memory block length", \
+        __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
 }
 
 #define CHECK_OUT_PTR(_ptr, _real_ptr, _mem_slice, _len) { \
-	_real_ptr->signature = SIGNATURE; \
-	_real_ptr->mem_slice = _mem_slice; \
-	_real_ptr->length = _len; \
-	_ptr = _real_ptr->u.payload; \
+  _real_ptr->signature = SIGNATURE; \
+  _real_ptr->mem_slice = _mem_slice; \
+  _real_ptr->length = _len; \
+  _ptr = _real_ptr->u.payload; \
 }
 
 #define SPACE_FOR(_len)  (offsetof(MBLOCK, u.payload[0]) + _len)
@@ -236,7 +244,7 @@ static ACL_MEM_SLICE *mem_slice_create(void)
 
 	mem_slice = acl_pthread_getspecific(__mem_slice_key);
 	if (mem_slice != NULL)
-		return (mem_slice);
+		return mem_slice;
 
 	mem_slice = (ACL_MEM_SLICE*)
 		acl_default_calloc(__FILE__, __LINE__, 1, sizeof(ACL_MEM_SLICE));
@@ -261,7 +269,7 @@ static ACL_MEM_SLICE *mem_slice_create(void)
 	acl_msg_info("%s(%d): thread(%ld) set myown mem_slice(%p)",
 		myname, __LINE__, (long) mem_slice->tid, mem_slice);
 
-	return (mem_slice);
+	return mem_slice;
 }
 
 static void tls_mem_free(const char *filename, int line, void *ptr)
@@ -308,7 +316,7 @@ static void *tls_mem_alloc(const char *filename, int line, size_t len)
 	if (real_ptr == 0) {
 		acl_msg_error("%s(%d): malloc: insufficient memory",
 			myname, __LINE__);
-		return (0);
+		return 0;
 	}
 
 	mem_slice->nalloc++;
@@ -317,7 +325,7 @@ static void *tls_mem_alloc(const char *filename, int line, size_t len)
 		mem_slice_gc(mem_slice);
 	}
 	CHECK_OUT_PTR(ptr, real_ptr, mem_slice, len);
-	return (ptr);
+	return ptr;
 }
 
 static void *tls_mem_calloc(const char *filename, int line, size_t nmemb, size_t size)
@@ -325,7 +333,7 @@ static void *tls_mem_calloc(const char *filename, int line, size_t nmemb, size_t
 	void *ptr = tls_mem_alloc(filename, line, nmemb * size);
 
 	memset(ptr, 0, nmemb * size);
-	return (ptr);
+	return ptr;
 }
 
 static void *tls_mem_realloc(const char *filename, int line, void *ptr, size_t size)
@@ -334,6 +342,8 @@ static void *tls_mem_realloc(const char *filename, int line, void *ptr, size_t s
 	MBLOCK *old_real_ptr;
 	size_t old_len;
 
+	if (ptr == NULL)
+		return buf;
 	CHECK_IN_PTR2(ptr, old_real_ptr, old_len, filename, line);
 	memcpy(buf, ptr, old_len > size ? size : old_len);
 	if (old_real_ptr->mem_slice->tid != (unsigned long) acl_pthread_self()) {
@@ -343,7 +353,7 @@ static void *tls_mem_realloc(const char *filename, int line, void *ptr, size_t s
 	} else
 		acl_slice_pool_free(filename, line, old_real_ptr);
 
-	return (buf);
+	return buf;
 }
 
 static void *tls_mem_memdup(const char *filename, int line, const void *ptr, size_t len)
@@ -351,7 +361,7 @@ static void *tls_mem_memdup(const char *filename, int line, const void *ptr, siz
 	void *buf = tls_mem_alloc(filename, line, len);
 
 	memcpy(buf, ptr, len);
-	return (buf);
+	return buf;
 }
 
 static char *tls_mem_strdup(const char *filename, int line, const char *str)
@@ -360,7 +370,7 @@ static char *tls_mem_strdup(const char *filename, int line, const char *str)
 	void *buf = tls_mem_alloc(filename, line, size);
 
 	memcpy(buf, str, size);
-	return ((char*) buf);
+	return (char*) buf;
 }
 
 static char *tls_mem_strndup(const char *filename, int line, const char *str, size_t len)
@@ -371,7 +381,7 @@ static char *tls_mem_strndup(const char *filename, int line, const char *str, si
 	size = size > len ? len : size;
 	buf = (char*) tls_mem_alloc(filename, line, size + 1);
 	memcpy(buf, str, size);
-	return (buf);
+	return buf;
 }
 
 static int mem_slice_gc(ACL_MEM_SLICE *mem_slice)
@@ -393,7 +403,7 @@ static int mem_slice_gc(ACL_MEM_SLICE *mem_slice)
 	/* 实时进行垃圾回收? */
 	if ((mem_slice->slice_flag & ACL_SLICE_FLAG_RTGC_OFF) == 0)
 		acl_slice_pool_gc(mem_slice->slice_pool);
-	return (n);
+	return n;
 }
 
 int acl_mem_slice_gc(void)
@@ -401,8 +411,8 @@ int acl_mem_slice_gc(void)
 	ACL_MEM_SLICE *mem_slice = acl_pthread_getspecific(__mem_slice_key);
 
 	if (!mem_slice)
-		return (-1);
-	return (mem_slice_gc(mem_slice));
+		return -1;
+	return mem_slice_gc(mem_slice);
 }
 
 void acl_mem_slice_destroy(void)
@@ -461,7 +471,7 @@ ACL_MEM_SLICE *acl_mem_slice_init(int base, int nslice,
 
 	if (__mem_slice_key != (acl_pthread_key_t) -1) {
 		acl_msg_error("%s(%d): has been init", myname, __LINE__);
-		return (NULL);
+		return NULL;
 	}
 
 	__mem_base = base;
@@ -503,7 +513,7 @@ ACL_MEM_SLICE *acl_mem_slice_init(int base, int nslice,
 		tls_mem_memdup,
 		tls_mem_free);
 	acl_msg_info("%s(%d): use ACL_MEM_SLICE, with tls", myname, __LINE__);
-	return (mem_slice);
+	return mem_slice;
 }
 
 void acl_mem_slice_set(ACL_MEM_SLICE *mem_slice)

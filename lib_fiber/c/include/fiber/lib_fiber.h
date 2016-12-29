@@ -113,13 +113,6 @@ void acl_fiber_ready(ACL_FIBER *fiber);
 void acl_fiber_switch(void);
 
 /**
- * 设置函数指针，被协程调度过程循环调用
- * @param loop_fn {void (*)(void*)} 非空时，在事件处理过程会循环调用此函
- * @param ctx {void*} fn 的回调参数
- */
-void acl_fiber_post_event(void (*loop_fn)(void *), void *ctx);
-
-/**
  * 调用本函数启动协程的调度过程
  */
 void acl_fiber_schedule(void);
@@ -171,11 +164,14 @@ void acl_fiber_set_dns(const char* ip, int port);
 
 /**
  * 设定当前协程的局部变量
+ * @param key {int*} 协程局部变量的索引键的地址，初始时该值应 <= 0，内部会自动
+ *  分配一个 > 0 的索引键，并给该地址赋值，后面的协程可以复用该值设置各自的
+ *  局部变量，该指针必须非 NULL
  * @param ctx {void *} 协程局部变量
  * @param free_fn {void (*)(void*)} 当协程退出时会调用此函数释放协程局部变量
  * @return {int} 返回所设置的协程局部变量的键值，返回 -1 表示当前协程不存在
  */
-int acl_fiber_set_specific(void *ctx, void (*free_fn)(void *));
+int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void *));
 
 /**
  * 获得当前协程局部变量

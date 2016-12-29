@@ -1,5 +1,11 @@
 修改历史列表：
 
+573) 2016.12.29
+573.1) bugfix: acl_slice.c 中修复了 SLICE1 方式分配内存的一处 BUG
+
+572) 2016.12.28
+572.1) feature: acl_mem_slice.c 中的函数 tls_mem_realloc 允许源指针为 NULL
+
 571) 2016.12.1
 571.1) feature: acl_aio_server.c/acl_threads_server.c/acl_single_server.c 增加
 回调函数 __service_on_listen，以便于将监听的流对象传递给应用

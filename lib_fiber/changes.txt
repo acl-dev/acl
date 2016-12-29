@@ -1,3 +1,17 @@
+36) 2016.12.27
+36.1) bugfix: fiber.cpp 中 kill 方法需将 f_ 成员置 NULL，防止嵌套访问非法地址
+36.2) feature: fiber.cpp 允许将当前运行的协程与 fiber 类对象绑定(只需在构造
+函数中将构造参数设为 true)，从而可以方便使用类 fiber 中的方法
+
+35) 2016.12.19
+35.1) feature: fiber.c 中有关协程局部变量的接口调整，更符合实际应用场景
+35.2) bugfix: fiber.c 中当协程退出时，协程局部变量的对象未释放造成内存泄露
+35.3) sample: samples/fiber_local，该示例用于测试协程局部变量
+
+34) 2016.12.16
+34.1) bugfix: hook_net.c, hook_io.c, event_epoll.c 其中因为 hook 了很多系统的
+API，当个别应用在 main 函数执行前需要调用这些 API 时可能会因为 hook 操作还未
+进行而造成函数指针为 NULL，从而导致程序崩溃
 
 33) 2016.12.8
 33.1) bugfix: hook_net.c 中，当非协程模式下，hook epoll 相关 API 应该加以区别

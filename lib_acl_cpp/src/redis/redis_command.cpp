@@ -581,6 +581,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			if (result_ == NULL)
 			{
 				logger_error("ASKING's reply null");
+				conn->get_pool()->put(conn, !conn->eof());
 				return NULL;
 			}
 
@@ -589,6 +590,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			{
 				logger_error("ASKING's reply error: %s",
 					status ? status : "null");
+				conn->get_pool()->put(conn, !conn->eof());
 				return NULL;
 			}
 

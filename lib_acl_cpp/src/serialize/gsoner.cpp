@@ -341,7 +341,7 @@ bool gsoner::check_namespace()
 	std::string temp = codes_.substr(pos_, strlen("namespace"));
 	if (temp == "namespace")
 	{
-		pos_ += strlen("namespace");
+		pos_ += (int) strlen("namespace");
 		std::string name = next_token(default_delimiters_+"{");
 		namespaces_.push_back(name);
 		pos_++; //skip {
@@ -417,9 +417,9 @@ bool gsoner::check_struct_begin()
 
 	//struct user_t
 	if(struct_laber == "struct")
-		pos_ += strlen("struct");
+		pos_ += (int) strlen("struct");
 	else if(class_laber == "class")
-		pos_ += strlen("class");
+		pos_ += (int) strlen("class");
 	else
 		return false;
 
@@ -555,7 +555,7 @@ bool gsoner::check_include()
 	std::string tmp = codes_.substr(pos_, strlen("#include"));
 	if (tmp == "#include")
 	{
-		pos_ += strlen("#include");
+		pos_ += (int) strlen("#include");
 		skip_space_comment();
 		char sym = codes_[pos_++];
 		if(sym == '<')
@@ -714,7 +714,7 @@ std::pair<bool, std::string> gsoner::get_function_declare()
 		if (codes_[j] == '"')
 		{
 			std::string str = get_static_string(codes_,j);
-			j += str.size() + 2;
+			j += (int) str.size() + 2;
 		}
 		if (codes_[j] == '=')
 			break;
@@ -887,7 +887,7 @@ bool gsoner::check_function()
 			lines.push_back('"');
 			lines += str;
 			lines.push_back('"');
-			pos_ += str.size();
+			pos_ += (int) str.size();
 			continue;
 		}
 		else if (codes_[pos_] == '}')
@@ -932,7 +932,7 @@ bool gsoner::check_member()
 			lines.push_back('"');
 			lines += str;
 			lines.push_back('"');
-			pos_ += str.size() + 2;
+			pos_ += (int) str.size() + 2;
 		}
 
 		if(codes_[pos_] == ';')
@@ -950,7 +950,7 @@ bool gsoner::check_member()
 	if (lines.find('=') != std::string::npos)
 		lines = lines.substr(0, lines.find('='));
 
-	int e = lines.size() - 1;
+	int e = (int) lines.size() - 1;
 	while (lines[e] == ' ' ||
 		lines[e] == '\r' ||
 		lines[e] == '\n' ||
@@ -1240,7 +1240,7 @@ bool gsoner::read_file(const char *filepath)
 std::string gsoner::get_filename(const char *filepath)
 {
 	std::string  filename;
-	int i = strlen(filepath) - 1;
+	int i = (int) strlen(filepath) - 1;
 
 	while (i >= 0 && (filepath[i] != '\\' || filepath[i] != '/'))
 	{
@@ -1272,7 +1272,7 @@ bool gsoner::read_multi_file(const std::vector<std::string>& files)
 void gsoner::parse_code()
 {
 	//char c = '\n';
-	max_pos_ = codes_.size();
+	max_pos_ = (int) codes_.size();
 	try
 	{
 		do
@@ -1345,7 +1345,7 @@ void gsoner::parse_code()
 			ii--;
 		}
 		ii++;
-		start = ii;
+		start = (int) ii;
 		ii = pos_;
 		count = 2;
 		while (ii < codes_.size())
@@ -1438,7 +1438,7 @@ std::string gsoner::add_4space(const std::string &code)
 	result += tab_;
 	std::string tmp;
 
-	int len = code.size();
+	int len = (int) code.size();
 	int i = 0;
 	bool end = false;
 	int syn = 0;
@@ -1499,7 +1499,7 @@ bool gsoner::check_define()
 	if (tmp != "#define ")
 		return false;
 
-	pos_ += strlen("#define ");
+	pos_ += (int) strlen("#define ");
 	bool skip = false;
 	while (true)
 	{
@@ -1543,7 +1543,7 @@ bool gsoner::check_pragma()
 	if (tmp != "#pragma ")
 		return false;
 
-	pos_ += strlen("#pragma ");
+	pos_ += (int) strlen("#pragma ");
 	bool skip = false;
 	while (true)
 	{

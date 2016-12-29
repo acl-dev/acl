@@ -24,8 +24,13 @@ void hook_epoll(void)
 	__called++;
 
 	__sys_epoll_create = (epoll_create_fn) dlsym(RTLD_NEXT, "epoll_create");
+	acl_assert(__sys_epoll_create);
+
 	__sys_epoll_wait   = (epoll_wait_fn) dlsym(RTLD_NEXT, "epoll_wait");
+	acl_assert(__sys_epoll_wait);
+
 	__sys_epoll_ctl    = (epoll_ctl_fn) dlsym(RTLD_NEXT, "epoll_ctl");
+	acl_assert(__sys_epoll_ctl);
 }
 
 typedef struct EVENT_EPOLL {
@@ -79,6 +84,9 @@ static int epoll_event_add(EVENT *ev, int fd, int mask)
 #endif
 #endif
 
+	if (__sys_epoll_ctl == NULL)
+		hook_epoll();
+
 	if (__sys_epoll_ctl(ep->epfd, op, fd, &ee) == -1) {
 		fiber_save_errno();
 		acl_msg_error("%s, %s(%d): epoll_ctl error %s",
@@ -104,6 +112,9 @@ static int epoll_event_del(EVENT *ev, int fd, int delmask)
 		ee.events |= EPOLLIN;
 	if (mask & EVENT_WRITABLE)
 		ee.events |= EPOLLOUT;
+
+	if (__sys_epoll_ctl == NULL)
+		hook_epoll();
 
 	if (mask != EVENT_NONE) {
 		if (__sys_epoll_ctl(ep->epfd, EPOLL_CTL_MOD, fd, &ee) < 0) {
@@ -132,6 +143,9 @@ static int epoll_event_loop(EVENT *ev, int timeout)
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 	int ret, j, mask;
 	struct epoll_event *e;
+
+	if (__sys_epoll_wait == NULL)
+		hook_epoll();
 
 	ret = __sys_epoll_wait(ep->epfd, ep->epoll_events,
 			ev->setsize, timeout);
@@ -181,6 +195,9 @@ EVENT *event_epoll_create(int setsize)
 
 	ep->epoll_events = (struct epoll_event *)
 		acl_mymalloc(sizeof(struct epoll_event) * setsize);
+
+	if (__sys_epoll_create == NULL)
+		hook_epoll();
 
 	ep->epfd = __sys_epoll_create(1024);
 	acl_assert(ep->epfd >= 0);

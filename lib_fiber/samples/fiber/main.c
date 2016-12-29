@@ -52,13 +52,6 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 	}
 }
 
-__thread int __nloop = 0;
-static void loop_callback(void *ctx acl_unused)
-{
-	if (++__nloop <= 10)
-		printf("loop_callback called\r\n");
-}
-
 static void *thread_main(void *ctx acl_unused)
 {
 	int i;
@@ -69,11 +62,9 @@ static void *thread_main(void *ctx acl_unused)
 	for (i = 0; i < __max_fiber; i++)
 		acl_fiber_create(fiber_main, NULL, __stack_size);
 
-	acl_fiber_post_event(loop_callback, NULL);
 	acl_fiber_schedule();
 
-	printf("thread: %lu, loop: %d\r\n",
-		(unsigned long) acl_pthread_self(), __nloop);
+	printf("thread: %lu\r\n", (unsigned long) acl_pthread_self());
 
 	return NULL;
 }

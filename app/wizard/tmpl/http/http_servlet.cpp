@@ -16,15 +16,13 @@ bool http_servlet::doError(acl::HttpServletRequest&,
 	acl::HttpServletResponse& res)
 {
 	res.setStatus(400);
-	res.setContentType("text/html; charset=$<CHARSET>");
-	// 发送 http 响应头
-	if (res.sendHeader() == false)
-		return false;
+	res.setContentType("text/xml; charset=utf-8");
 
 	// 发送 http 响应体
 	acl::string buf;
 	buf.format("<root error='some error happened!' />\r\n");
-	(void) res.getOutputStream().write(buf);
+	res.write(buf);
+	res.write(NULL, 0);
 	return false;
 }
 
@@ -32,14 +30,12 @@ bool http_servlet::doOther(acl::HttpServletRequest&,
 	acl::HttpServletResponse& res, const char* method)
 {
 	res.setStatus(400);
-	res.setContentType("text/html; charset=$<CHARSET>");
-	// 发送 http 响应头
-	if (res.sendHeader() == false)
-		return false;
+	res.setContentType("text/xml; charset=utf-8");
 	// 发送 http 响应体
 	acl::string buf;
 	buf.format("<root error='unkown request method %s' />\r\n", method);
-	(void) res.getOutputStream().write(buf);
+	res.write(buf);
+	res.write(NULL, 0);
 	return false;
 }
 

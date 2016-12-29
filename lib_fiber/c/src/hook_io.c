@@ -63,37 +63,76 @@ void hook_io(void)
 	__called++;
 
 	__sys_sleep    = (sleep_fn) dlsym(RTLD_NEXT, "sleep");
+	acl_assert(__sys_sleep);
+
 	__sys_pipe     = (pipe_fn) dlsym(RTLD_NEXT, "pipe");
+	acl_assert(__sys_pipe);
+
 #ifdef HAS_PIPE2
 	__sys_pipe2    = (pipe2_fn) dlsym(RTLD_NEXT, "pipe2");
+	acl_assert(__sys_pipe2);
 #endif
+
 	__sys_popen    = (popen_fn) dlsym(RTLD_NEXT, "popen");
+	acl_assert(__sys_popen);
+
 	__sys_pclose   = (pclose_fn) dlsym(RTLD_NEXT, "pclose");
+	acl_assert(__sys_pclose);
+
 	__sys_close    = (close_fn) dlsym(RTLD_NEXT, "close");
+	acl_assert(__sys_close);
+
 	__sys_read     = (read_fn) dlsym(RTLD_NEXT, "read");
+	acl_assert(__sys_read);
+
 	__sys_readv    = (readv_fn) dlsym(RTLD_NEXT, "readv");
+	acl_assert(__sys_readv);
+
 	__sys_recv     = (recv_fn) dlsym(RTLD_NEXT, "recv");
+	acl_assert(__sys_recv);
+
 	__sys_recvfrom = (recvfrom_fn) dlsym(RTLD_NEXT, "recvfrom");
+	acl_assert(__sys_recvfrom);
+
 	__sys_recvmsg  = (recvmsg_fn) dlsym(RTLD_NEXT, "recvmsg");
+	acl_assert(__sys_recvmsg);
 
 	__sys_write    = (write_fn) dlsym(RTLD_NEXT, "write");
+	acl_assert(__sys_write);
+
 	__sys_writev   = (writev_fn) dlsym(RTLD_NEXT, "writev");
+	acl_assert(__sys_writev);
+
 	__sys_send     = (send_fn) dlsym(RTLD_NEXT, "send");
+	acl_assert(__sys_send);
+
 	__sys_sendto   = (sendto_fn) dlsym(RTLD_NEXT, "sendto");
+	acl_assert(__sys_sendto);
+
 	__sys_sendmsg  = (sendmsg_fn) dlsym(RTLD_NEXT, "sendmsg");
+	acl_assert(__sys_sendmsg);
 }
 
 unsigned int sleep(unsigned int seconds)
 {
-	if (!acl_var_hook_sys_api)
+	if (!acl_var_hook_sys_api) {
+		if (__sys_sleep == NULL)
+			hook_io();
+
 		return __sys_sleep(seconds);
+	}
 
 	return acl_fiber_sleep(seconds);
 }
 
 int pipe(int pipefd[2])
 {
-	int ret = __sys_pipe(pipefd);
+	int ret;
+
+	if (__sys_pipe == NULL)
+		hook_io();
+
+	ret = __sys_pipe(pipefd);
 
 	if (!acl_var_hook_sys_api)
 		return ret;
@@ -106,7 +145,12 @@ int pipe(int pipefd[2])
 #ifdef HAS_PIPE2
 int pipe2(int pipefd[2], int flags)
 {
-	int ret = __sys_pipe2(pipefd, flags);
+	int ret;
+
+	if (__sys_pipe2 == NULL)
+		hook_io();
+
+	ret = __sys_pipe2(pipefd, flags);
 
 	if (!acl_var_hook_sys_api)
 		return ret;
@@ -119,7 +163,12 @@ int pipe2(int pipefd[2], int flags)
 
 FILE *popen(const char *command, const char *type)
 {
-	FILE *fp = __sys_popen(command, type);
+	FILE *fp;
+
+	if (__sys_popen == NULL)
+		hook_io();
+
+	fp = __sys_popen(command, type);
 
 	if (!acl_var_hook_sys_api)
 		return fp;
@@ -138,8 +187,12 @@ int close(int fd)
 		return -1;
 	}
 
-	if (!acl_var_hook_sys_api)
+	if (!acl_var_hook_sys_api) {
+		if (__sys_close == NULL)
+			hook_io();
+
 		return __sys_close(fd);
+	}
 
 	fiber_io_close(fd);
 
@@ -216,8 +269,12 @@ inline ssize_t fiber_read(int fd, void *buf, size_t count)
 		return -1;
 	}
 
-	if (!acl_var_hook_sys_api)
+	if (!acl_var_hook_sys_api) {
+		if (__sys_read == NULL)
+			hook_io();
+
 		return __sys_read(fd, buf, count);
+	}
 
 	ev = fiber_io_event();
 	if (ev && event_readable(ev, fd)) {
@@ -258,8 +315,12 @@ inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 		return -1;
 	}
 
-	if (!acl_var_hook_sys_api)
+	if (!acl_var_hook_sys_api) {
+		if (__sys_readv == NULL)
+			hook_io();
+
 		return __sys_readv(fd, iov, iovcnt);
+	}
 
 	ev = fiber_io_event();
 	if (ev && event_readable(ev, fd)) {
@@ -300,8 +361,12 @@ inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 		return -1;
 	}
 
-	if (!acl_var_hook_sys_api)
+	if (!acl_var_hook_sys_api) {
+		if (__sys_recv == NULL)
+			hook_io();
+
 		return __sys_recv(sockfd, buf, len, flags);
+	}
 
 	ev = fiber_io_event();
 	if (ev && event_readable(ev, sockfd)) {
@@ -344,9 +409,13 @@ inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 		return -1;
 	}
 
-	if (!acl_var_hook_sys_api)
+	if (!acl_var_hook_sys_api) {
+		if (__sys_recvfrom == NULL)
+			hook_io();
+
 		return __sys_recvfrom(sockfd, buf, len,
 				flags, src_addr, addrlen);
+	}
 
 	ev = fiber_io_event();
 	if (ev && event_readable(ev, sockfd)) {
@@ -390,8 +459,12 @@ inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 		return -1;
 	}
 
-	if (!acl_var_hook_sys_api)
+	if (!acl_var_hook_sys_api) {
+		if (__sys_recvmsg == NULL)
+			hook_io();
+
 		return __sys_recvmsg(sockfd, msg, flags);
+	}
 
 	ev = fiber_io_event();
 	if (ev && event_readable(ev, sockfd)) {
@@ -427,6 +500,9 @@ inline ssize_t fiber_read(int fd, void *buf, size_t count)
 {
 	ACL_FIBER *me;
 
+	if (__sys_read == NULL)
+		hook_io();
+
 	while (1) {
 		ssize_t n = __sys_read(fd, buf, count);
 
@@ -457,6 +533,9 @@ inline ssize_t fiber_read(int fd, void *buf, size_t count)
 inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 {
 	ACL_FIBER *me;
+
+	if (__sys_readv == NULL)
+		hook_io();
 
 	while (1) {
 		ssize_t n = __sys_readv(fd, iov, iovcnt);
@@ -489,6 +568,9 @@ inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 {
 	ACL_FIBER *me;
+
+	if (__sys_recv == NULL)
+		hook_io();
 
 	while (1) {
 		ssize_t n = __sys_recv(sockfd, buf, len, flags);
@@ -523,6 +605,9 @@ inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 {
 	ACL_FIBER *me;
 
+	if (__sys_recvfrom == NULL)
+		hook_io();
+
 	while (1) {
 		ssize_t n = __sys_recvfrom(sockfd, buf, len, flags,
 				src_addr, addrlen);
@@ -555,6 +640,9 @@ inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 {
 	ACL_FIBER *me;
+
+	if (__sys_recvmsg == NULL)
+		hook_io();
 
 	while (1) {
 		ssize_t n = __sys_recvmsg(sockfd, msg, flags);
@@ -592,6 +680,9 @@ inline ssize_t fiber_write(int fd, const void *buf, size_t count)
 {
 	ACL_FIBER *me;
 
+	if (__sys_write == NULL)
+		hook_io();
+
 	while (1) {
 		ssize_t n = __sys_write(fd, buf, count);
 
@@ -624,6 +715,9 @@ inline ssize_t fiber_writev(int fd, const struct iovec *iov, int iovcnt)
 {
 	ACL_FIBER *me;
 
+	if (__sys_writev == NULL)
+		hook_io();
+
 	while (1) {
 		ssize_t n = __sys_writev(fd, iov, iovcnt);
 
@@ -655,6 +749,9 @@ inline ssize_t fiber_writev(int fd, const struct iovec *iov, int iovcnt)
 inline ssize_t fiber_send(int sockfd, const void *buf, size_t len, int flags)
 {
 	ACL_FIBER *me;
+
+	if (__sys_send == NULL)
+		hook_io();
 
 	while (1) {
 		ssize_t n = __sys_send(sockfd, buf, len, flags);
@@ -689,6 +786,9 @@ inline ssize_t fiber_sendto(int sockfd, const void *buf, size_t len, int flags,
 {
 	ACL_FIBER *me;
 
+	if (__sys_sendto == NULL)
+		hook_io();
+
 	while (1) {
 		ssize_t n = __sys_sendto(sockfd, buf, len, flags,
 				dest_addr, addrlen);
@@ -721,6 +821,9 @@ inline ssize_t fiber_sendto(int sockfd, const void *buf, size_t len, int flags,
 inline ssize_t fiber_sendmsg(int sockfd, const struct msghdr *msg, int flags)
 {
 	ACL_FIBER *me;
+
+	if (__sys_sendmsg == NULL)
+		hook_io();
 
 	while (1) {
 		ssize_t n = __sys_sendmsg(sockfd, msg, flags);

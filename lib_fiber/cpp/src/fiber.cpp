@@ -3,9 +3,17 @@
 
 namespace acl {
 
-fiber::fiber(void)
-	: f_(NULL)
+fiber::fiber(bool running /* = false */)
 {
+	if (running)
+	{
+		f_ = acl_fiber_running();
+		if (f_ == NULL)
+			acl_msg_fatal("%s(%d), %s: current fiber not running!",
+				__FILE__, __LINE__, __FUNCTION__);
+	}
+	else
+		f_ = NULL;
 }
 
 fiber::~fiber(void)
@@ -61,8 +69,18 @@ ACL_FIBER *fiber::get_fiber(void) const
 	return f_;
 }
 
+void fiber::run(void)
+{
+	acl_msg_fatal("%s(%d), %s: base function be called",
+		__FILE__, __LINE__, __FUNCTION__);
+}
+
 void fiber::start(size_t stack_size /* = 64000 */)
 {
+	if (f_ != NULL)
+		acl_msg_fatal("%s(%d), %s: fiber-%d, already running!",
+			__FILE__, __LINE__, __FUNCTION__, self());
+
 	acl_fiber_create(fiber_callback, this, stack_size);
 }
 
@@ -78,8 +96,9 @@ bool fiber::kill(void)
 {
 	if (f_ == NULL)
 		return false;
-	acl_fiber_kill(f_);
+	ACL_FIBER* fb = f_;
 	f_ = NULL;
+	acl_fiber_kill(fb);
 	return true;
 }
 
@@ -88,6 +107,14 @@ bool fiber::killed(void) const
 	if (f_ == NULL)
 		return true;
 	return acl_fiber_killed(f_) != 0;
+}
+
+bool fiber::self_killed(void)
+{
+	ACL_FIBER* curr = acl_fiber_running();
+	if (curr == NULL)
+		return false;
+	return acl_fiber_killed(curr);
 }
 
 void fiber::schedule(void)

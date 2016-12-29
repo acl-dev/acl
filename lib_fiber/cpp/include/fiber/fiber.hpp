@@ -11,11 +11,20 @@ namespace acl {
 class fiber
 {
 public:
-	fiber(void);
+	/**
+	 * 构造函数
+	 * @param running {bool} 当为 true 时，则表示当前协程已启动，仅是声明
+	 *  了一个协程对象而已，以便于与 ACL_FIBER 对象绑定，此时禁止调用本对
+	 *  象的 start 方法启动新协程; 当为 false 时，则需要调用 start 方法来
+	 *  启动新协程
+	 */
+	fiber(bool running = false);
 	virtual ~fiber(void);
 
 	/**
-	 * 在创建一个协程类后，需要本函数启动协程
+	 * 在创建一个协程类对象且构造参数 running 为 false 时，需要本函数启动
+	 * 协程，然后子类的重载的 run 方法将被回调，如果 running 为 true 时，
+	 * 则禁止调用 start 方法
 	 * @param stack_size {size_t} 创建的协程对象的栈大小
 	 */
 	void start(size_t stack_size = 320000);
@@ -31,6 +40,15 @@ public:
 	 * @return {bool} 本协程是否被通知退出
 	 */
 	bool killed(void) const;
+
+	/**
+	 * 判断当前正在运行的协程是否被通知退出，该方法与 killed 的区别为，
+	 * killed 首先必须有 acl::fiber 对象依托，且该协程对象有可能正在运行，
+	 * 也有可能被挂起，而 self_killed 不需要 acl::fiber 对象依托且一定表示
+	 * 当前正在运行的协程
+	 * @return {bool}
+	 */
+	static bool self_killed(void);
 
 	/**
 	 * 获得本协程对象的 ID 号
@@ -98,10 +116,11 @@ public:
 
 protected:
 	/**
-	 * 纯虚函数，子类必须实现本函数，当通过调用 start 方法启动协程后，本
-	 * 虚函数将会被调用，从而通知子类
+	 * 虚函数，子类须实现本函数，当通过调用 start 方法启动协程后，本
+	 * 虚函数将会被调用，从而通知子类协程已启动; 如果在构造函数中的参数
+	 * running 为 true ，则 start 将被禁止调用，故本虚方法也不会被调用
 	 */
-	virtual void run(void) = 0;
+	virtual void run(void);
 
 private:
 	ACL_FIBER *f_;
