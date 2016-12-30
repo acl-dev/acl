@@ -633,7 +633,7 @@ bool gsoner::check_comment()
 	return result;
 }
 
-std::string gsoner::get_static_string(const std::string &str, int index)
+std::string gsoner::get_static_string(const std::string &str, int &index)
 {
 	if (str[index] != '"')
 		return "";
@@ -667,6 +667,10 @@ std::string gsoner::get_static_string(const std::string &str, int index)
 			{
 				index++;
 				continue;
+			}
+			else
+			{
+				break;
 			}
 		}
 
@@ -713,7 +717,6 @@ std::pair<bool, std::string> gsoner::get_function_declare()
 		if (codes_[j] == '"')
 		{
 			std::string str = get_static_string(codes_,j);
-			j += str.size() + 2;
 		}
 		if (codes_[j] == '=')
 			break;
@@ -886,7 +889,6 @@ bool gsoner::check_function()
 			lines.push_back('"');
 			lines += str;
 			lines.push_back('"');
-			pos_ += str.size();
 			continue;
 		}
 		else if (codes_[pos_] == '}')
@@ -902,7 +904,9 @@ bool gsoner::check_function()
 		lines.push_back(codes_[pos_]);
 		pos_++;
 	}
-
+	std::cout << "find function:" << std::endl;
+	std::cout << res.second << std::endl;
+	std::cout << lines << std::endl;
 	return true;
 }
 
@@ -931,7 +935,6 @@ bool gsoner::check_member()
 			lines.push_back('"');
 			lines += str;
 			lines.push_back('"');
-			pos_ += str.size() + 2;
 		}
 
 		if(codes_[pos_] == ';')
@@ -1317,9 +1320,6 @@ void gsoner::parse_code()
 					continue;
 			case 's':
 				if(check_struct_begin())
-					continue;
-			case 'v':
-				if(check_function())
 					continue;
 			default:
 				if(check_function())

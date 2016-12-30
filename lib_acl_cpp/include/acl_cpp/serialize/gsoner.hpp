@@ -110,7 +110,7 @@ private:
 	std::string next_token(std::string delimiters);
 	std::string get_namespace();
 	function_code_t gen_unpack_code(const object_t &obj);
-	std::string get_static_string(const std::string &str, int index);
+	std::string get_static_string(const std::string &str, int &index);
 	std::string get_include_files();
 	std::string get_filename(const char *filepath);
 
