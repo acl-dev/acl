@@ -68,6 +68,8 @@ ACL_API int acl_mempool_total_allocated(void);
 ACL_API void acl_default_memstat(const char *filename, int line,
         void *ptr, size_t *len, size_t *real_len);
 
+ACL_API void acl_default_meminfo(void);
+
 /**
  * 设置内存分配最大报警值，即当调用者分配的内存大小达到此报警值后，内部会自动
  * 记录报警日志，同时将调用堆栈打印至日志中；内部缺少值是 100000000

@@ -26,9 +26,15 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 		return sem->num;
 	}
 
-	curr = fiber_running();
+	curr = acl_fiber_running();
 	acl_ring_prepend(&sem->waiting, &curr->me);
 	acl_fiber_switch();
+
+	/* if switch to me because other killed me, I should detach myself;
+	 * else if because other unlock, I'll be detached twice which is
+	 * hamless because ACL_RING can deal with it.
+	 */
+	acl_ring_detach(&curr->me);
 
 	return sem->num;
 }

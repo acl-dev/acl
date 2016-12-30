@@ -229,7 +229,7 @@ static int channel_alt(FIBER_ALT a[])
 	n = i;
 	canblock = a[i].op == CHANEND;
 
-	t = fiber_running();
+	t = acl_fiber_running();
 
 	for (i = 0; i < n; i++) {
 		a[i].fiber = t;
@@ -297,6 +297,9 @@ static int channel_alt(FIBER_ALT a[])
 
 	acl_fiber_switch();
 
+	if (acl_fiber_killed(t))
+		return -1;
+
 	/*
 	 * the guy who ran the op took care of dequeueing us
 	 * and then set a[0].alt to the one that was executed.
@@ -345,9 +348,10 @@ int acl_channel_sendp(ACL_CHANNEL *c, void *v)
 
 void *acl_channel_recvp(ACL_CHANNEL *c)
 {
-	void *v;
+	void *v = NULL;
 
-	channel_op(c, CHANRCV, (void *) &v, 1);
+	if (channel_op(c, CHANRCV, (void *) &v, 1) < 0)
+		return NULL;
 	return v;
 }
 
@@ -358,9 +362,10 @@ int acl_channel_sendp_nb(ACL_CHANNEL *c, void *v)
 
 void *acl_channel_recvp_nb(ACL_CHANNEL *c)
 {
-	void *v;
+	void *v = NULL;
 
-	channel_op(c, CHANRCV, (void *) &v, 0);
+	if (channel_op(c, CHANRCV, (void *) &v, 0) < 0)
+		return NULL;
 	return v;
 }
 
@@ -371,9 +376,10 @@ int acl_channel_sendul(ACL_CHANNEL *c, unsigned long val)
 
 unsigned long acl_channel_recvul(ACL_CHANNEL *c)
 {
-	unsigned long val;
+	unsigned long val = (unsigned long) -1;
 
-	channel_op(c, CHANRCV, &val, 1);
+	if (channel_op(c, CHANRCV, &val, 1) < 0)
+		return (unsigned long) -1;
 	return val;
 }
 
@@ -386,6 +392,7 @@ unsigned long acl_channel_recvul_nb(ACL_CHANNEL *c)
 {
 	unsigned long val;
 
-	channel_op(c, CHANRCV, &val, 0);
+	if (channel_op(c, CHANRCV, &val, 0) < 0)
+		return (unsigned long) -1;
 	return val;
 }

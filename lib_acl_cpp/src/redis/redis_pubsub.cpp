@@ -1,5 +1,6 @@
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
+#include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
 #include "acl_cpp/redis/redis_result.hpp"
@@ -40,6 +41,7 @@ int redis_pubsub::publish(const char* channel, const char* msg, size_t len)
 	argv[2] = msg;
 	lens[2] = len;
 
+	hash_slot(channel);
 	build_request(3, argv, lens);
 	return get_number();
 }
@@ -157,6 +159,9 @@ int redis_pubsub::subop(const char* cmd, const std::vector<const char*>& channel
 		lens[i] = strlen(argv[i]);
 	}
 
+	if (channels.size() == 1)
+		hash_slot(channels[0]);
+
 	build_request(argc, argv, lens);
 	const redis_result* result = run(channels.size());
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
@@ -193,6 +198,9 @@ int redis_pubsub::subop(const char* cmd, const std::vector<string>& channels)
 		argv[i] = (*cit).c_str();
 		lens[i] = (*cit).length();
 	}
+
+	if (channels.size() == 1)
+		hash_slot(channels[0].c_str());
 
 	build_request(argc, argv, lens);
 	const redis_result* result = run(channels.size());
@@ -246,17 +254,19 @@ int redis_pubsub::check_channel(const redis_result* obj, const char* cmd,
 	return rr->get_integer();
 }
 
-bool redis_pubsub::get_message(string& channel, string& msg)
+bool redis_pubsub::get_message(string& channel, string& msg,
+	string* message_type /* = NULL */, string* pattern /* = NULL */)
 {
 	clear_request();
-	const redis_result* result = run();
+	int rw_timeout = -1;
+	const redis_result* result = run(0, &rw_timeout);
 	if (result == NULL)
 		return false;
 	if (result->get_type() != REDIS_RESULT_ARRAY)
 		return false;
 
 	size_t size = result->get_size();
-	if (size != 3)
+	if (size < 3)
 		return false;
 
 	const redis_result* obj = result->get_child(0);
@@ -265,18 +275,62 @@ bool redis_pubsub::get_message(string& channel, string& msg)
 
 	string tmp;
 	obj->argv_to_string(tmp);
-	if (strcasecmp(tmp.c_str(), "message") != 0)
-		return false;
+	if (message_type)
+		*message_type = tmp;
+	if (tmp.equal("message", true))
+	{
+		if (pattern)
+			pattern->clear();
 
-	obj = result->get_child(1);
-	if (obj == NULL || obj->get_type() != REDIS_RESULT_STRING)
+		obj = result->get_child(1);
+		if (obj == NULL || obj->get_type() != REDIS_RESULT_STRING)
+			return false;
+		else
+			obj->argv_to_string(channel);
+
+		obj = result->get_child(2);
+		if (obj == NULL || obj->get_type() != REDIS_RESULT_STRING)
+			return false;
+		else
+			obj->argv_to_string(msg);
+
+		return true;
+	}
+
+	if (!tmp.equal("pmessage", false))
+	{
+		logger_error("unknown message type: %s", tmp.c_str());
 		return false;
-	obj->argv_to_string(channel);
+	}
+
+	if (size < 4)
+	{
+		logger_error("invalid size: %d, message type: %s",
+			(int) size, tmp.c_str());
+		return false;
+	}
+
+	if (pattern)
+	{
+		obj = result->get_child(1);
+		if (obj == NULL || obj->get_type() != REDIS_RESULT_STRING)
+			return false;
+		else
+			obj->argv_to_string(*pattern);
+	}
 
 	obj = result->get_child(2);
 	if (obj == NULL || obj->get_type() != REDIS_RESULT_STRING)
 		return false;
-	obj->argv_to_string(msg);
+	else
+		obj->argv_to_string(channel);
+
+	obj = result->get_child(3);
+	if (obj == NULL || obj->get_type() != REDIS_RESULT_STRING)
+		return false;
+	else
+		obj->argv_to_string(msg);
+
 	return true;
 }
 

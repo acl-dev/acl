@@ -13,11 +13,8 @@ db_pool::db_pool(const char* dbaddr, size_t count, size_t idx /* = 0 */)
 {
 }
 
-db_handle* db_pool::peek_open(const char* charset /* = NULL */)
+db_handle* db_pool::peek_open(void)
 {
-	if (charset)
-		set_charset(charset);
-
 	db_handle* conn = (db_handle*) peek();
 	if (conn == NULL)
 		logger_error("peek NULL");

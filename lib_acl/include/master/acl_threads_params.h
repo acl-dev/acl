@@ -31,11 +31,11 @@ extern int   acl_var_threads_thread_stacksize;
 extern int   acl_var_threads_thread_idle;
 
 #define	ACL_VAR_THREADS_IDLE_LIMIT		"ioctl_idle_limit"
-#define	ACL_DEF_THREADS_IDLE_LIMIT		180
+#define	ACL_DEF_THREADS_IDLE_LIMIT		0
 extern int   acl_var_threads_idle_limit;
 
 #define	ACL_VAR_THREADS_USE_LIMIT		"ioctl_use_limit"
-#define	ACL_DEF_THREADS_USE_LIMIT		10
+#define	ACL_DEF_THREADS_USE_LIMIT		0
 extern int   acl_var_threads_use_limit;
 
 #define	ACL_VAR_THREADS_QUEUE_DIR		"ioctl_queue_dir"

@@ -2,6 +2,7 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
+#include "acl_cpp/stream/server_socket.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 #include "acl_cpp/master/master_aio.hpp"
@@ -45,6 +46,7 @@ void master_aio::run_daemon(int argc, char** argv)
 
 	// 调用 acl 服务器框架的单线程非阻塞模板
 	acl_aio_server2_main(argc, argv, service_main,
+		ACL_MASTER_SERVER_ON_LISTEN, service_on_listen,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
 		ACL_MASTER_SERVER_EXIT, service_exit,
@@ -103,6 +105,8 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 			acl_argv_free(tokens);
 			return (false);
 		}
+
+		service_on_listen(sstream->get_vstream());
 		sstream->add_accept_callback(this);
 	}
 	acl_argv_free(tokens);
@@ -210,6 +214,14 @@ void master_aio::service_main(ACL_SOCKET fd, void*)
 	stream->add_close_callback(callback);
 
 	__ma->on_accept(stream);
+}
+
+void master_aio::service_on_listen(ACL_VSTREAM *sstream)
+{
+	acl_assert(__ma);
+	server_socket* ss = new server_socket(sstream);
+	__ma->servers_.push_back(ss);
+	__ma->proc_on_listen(*ss);
 }
 
 }  // namespace acl

@@ -33,15 +33,15 @@ protected:
 	virtual ~master_fiber();
 
 	/**
-	 * 纯虚函数，当协程服务器接收到客户端连接后调用本函数
+	 * 虚函数，当协程服务器接收到客户端连接后调用本函数
 	 * @param stream {socket_stream&} 客户端连接对象，本函数返回后，协程
 	 *  服务框架将会关闭该连接对象
 	 */
 	virtual void on_accept(socket_stream& stream) = 0;
 
 private:
-	static void service_main(ACL_VSTREAM*, void*);
-	static int  service_on_accept(ACL_VSTREAM*);
+	static void service_on_listen(ACL_VSTREAM*);
+	static void service_on_accept(ACL_VSTREAM*, void*);
 	static void service_pre_jail(void*);
 	static void service_init(void*);
 	static void service_exit(void*);

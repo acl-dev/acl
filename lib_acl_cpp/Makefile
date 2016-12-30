@@ -18,6 +18,7 @@ CFLAGS = -c -g -W \
 -Wno-long-long \
 -Wformat \
 -DHAS_MYSQL_DLL \
+-DHAS_SQLITE_DLL \
 -Winvalid-pch \
 -DACL_PREPARE_COMPILE
 #-DHAS_POLARSSL

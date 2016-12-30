@@ -130,8 +130,10 @@ public:
 	 * get the value of a key 
 	 * @param key {const char*} 字符串对象的 key
 	 *  the key of a string
-	 * @param buf {string&} 操作成功后存储字符串对象的值
-	 *  store the value of a key after GET executed correctly
+	 * @param buf {string&} 操作成功后存储字符串对象的值，如果返回 true 且
+	 *  该缓冲区为空则表示对应 key 不存在
+	 *  store the value of a key after GET executed correctly, key not
+	 *  exist if the buf is empty when return true
 	 * @return {bool} 操作是否成功，返回 false 表示出错或 key 非字符串对象
 	 *  if the GET was executed correctly, false if error happened or
 	 *  is is not a string of the key

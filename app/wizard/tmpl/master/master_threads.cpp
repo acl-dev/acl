@@ -18,9 +18,9 @@ acl::master_bool_tbl var_conf_bool_tab[] = {
 	{ 0, 0, 0 }
 };
 
-int  var_cfg_int;
+int  var_cfg_rw_timeout;
 acl::master_int_tbl var_conf_int_tab[] = {
-	{ "int", 120, &var_cfg_int, 0, 0 },
+	{ "rw_timeout", 30, &var_cfg_rw_timeout, 0, 0 },
 
 	{ 0, 0 , 0 , 0, 0 }
 };
@@ -64,7 +64,9 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 {
 	logger("connect from %s, fd: %d", conn->get_peer(true),
 		conn->sock_handle());
-	conn->set_rw_timeout(5);
+	conn->set_rw_timeout(var_cfg_rw_timeout);
+	if (var_cfg_rw_timeout > 0)
+		conn->set_tcp_non_blocking(true);
 	return true;
 }
 
@@ -87,6 +89,11 @@ void master_service::thread_on_init()
 
 void master_service::thread_on_exit()
 {
+}
+
+void master_service::proc_on_listen(acl::server_socket& ss)
+{
+	logger(">>>listen %s ok<<<", ss.get_addr());
 }
 
 void master_service::proc_on_init()

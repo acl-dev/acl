@@ -2,6 +2,7 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
+#include "acl_cpp/stream/server_socket.hpp"
 #include "acl_cpp/master/master_threads.hpp"
 #endif
 
@@ -35,6 +36,7 @@ void master_threads::run_daemon(int argc, char** argv)
 
 	// 调用 acl 服务器框架的多线程模板
 	acl_threads_server_main(argc, argv, service_main, NULL,
+		ACL_MASTER_SERVER_ON_LISTEN, service_on_listen,
 		ACL_MASTER_SERVER_ON_ACCEPT, service_on_accept,
 		ACL_MASTER_SERVER_ON_HANDSHAKE, service_on_handshake,
 		ACL_MASTER_SERVER_ON_TIMEOUT, service_on_timeout,
@@ -79,6 +81,7 @@ bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 
 	// 调用 acl 服务器框架的多线程模板
 	acl_threads_server_main(argc, (char**) argv, service_main, NULL,
+		ACL_MASTER_SERVER_ON_LISTEN, service_on_listen,
 		ACL_MASTER_SERVER_ON_ACCEPT, service_on_accept,
 		ACL_MASTER_SERVER_ON_HANDSHAKE, service_on_handshake,
 		ACL_MASTER_SERVER_ON_TIMEOUT, service_on_timeout,
@@ -203,8 +206,8 @@ int master_threads::service_on_accept(ACL_VSTREAM* client)
 	// 如果子类的 thread_on_handshake 方法返回 false，则直接返回给上层
 	// 框架 -1，由上层框架再调用 service_on_close 过程，从而在该过程
 	// 中将 stream 对象释放
-	if (__mt->thread_on_handshake(stream) == false)
-		return -1;
+	//if (__mt->thread_on_handshake(stream) == false)
+	//	return -1;
 
 	// 返回 0 表示可以继续处理该客户端连接，从而由上层框架将其置入
 	// 读监控集合中
@@ -220,6 +223,9 @@ int master_threads::service_on_handshake(ACL_VSTREAM *client)
 	if (stream == NULL)
 		logger_fatal("client->context is null!");
 
+	// 如果子类的 thread_on_handshake 方法返回 false，则直接返回给上层
+	// 框架 -1，由上层框架再调用 service_on_close 过程，从而在该过程
+	// 中将 stream 对象释放
 	if (__mt->thread_on_handshake(stream) == true)
 		return 0;
 	return -1;
@@ -263,6 +269,14 @@ int master_threads::service_main(ACL_VSTREAM *client, void*)
 	// 将会回调 service_on_close 过程进行流关闭前的善后处理工作，
 	// stream 对象将在 service_on_close 中被释放
 	return -1;
+}
+
+void master_threads::service_on_listen(ACL_VSTREAM* sstream)
+{
+	acl_assert(__mt != NULL);
+	server_socket* ss = new server_socket(sstream);
+	__mt->servers_.push_back(ss);
+	__mt->proc_on_listen(*ss);
 }
 
 int master_threads::service_on_timeout(ACL_VSTREAM* client, void*)

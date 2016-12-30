@@ -37,7 +37,7 @@ extern int   acl_var_ioctl_stacksize;
 extern int   acl_var_ioctl_thread_idle_limit;
 
 #define	ACL_VAR_IOCTL_IDLE_LIMIT	"ioctl_idle_limit"
-#define	ACL_DEF_IOCTL_IDLE_LIMIT	180
+#define	ACL_DEF_IOCTL_IDLE_LIMIT	0
 extern int   acl_var_ioctl_idle_limit;
 
 #define	ACL_VAR_IOCTL_QUEUE_DIR		"ioctl_queue_dir"
@@ -73,7 +73,7 @@ extern char *acl_var_ioctl_event_mode;
 extern int   acl_var_ioctl_daemon_timeout;
 
 #define	ACL_VAR_IOCTL_USE_LIMIT		"ioctl_use_limit"
-#define	ACL_DEF_IOCTL_USE_LIMIT		10
+#define	ACL_DEF_IOCTL_USE_LIMIT		0
 extern int   acl_var_ioctl_use_limit;
 
 #define	ACL_VAR_IOCTL_MASTER_MAXPROC	"master_maxproc"

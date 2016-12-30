@@ -9,7 +9,7 @@ extern acl::master_str_tbl var_conf_str_tab[];
 extern int  var_cfg_bool;
 extern acl::master_bool_tbl var_conf_bool_tab[];
 
-extern int  var_cfg_int;
+extern int  var_cfg_rw_timeout;
 extern acl::master_int_tbl var_conf_int_tab[];
 
 extern long long int  var_cfg_int64;
@@ -27,54 +27,69 @@ public:
 
 protected:
 	/**
-	 * 纯虚函数：当某个客户端连接有数据可读或关闭或出错时调用此函数
+	 * @override
+	 * 虚函数：当某个客户端连接有数据可读或关闭或出错时调用此函数
 	 * @param stream {socket_stream*}
 	 * @return {bool} 返回 false 则表示当函数返回后需要关闭连接，
 	 *  否则表示需要保持长连接，如果该流出错，则应用应该返回 false
 	 */
-	virtual bool thread_on_read(acl::socket_stream* stream);
+	bool thread_on_read(acl::socket_stream* stream);
 
 	/**
+	 * @override
 	 * 当线程池中的某个线程获得一个连接时的回调函数，
 	 * 子类可以做一些初始化工作
 	 * @param stream {socket_stream*}
 	 * @return {bool} 如果返回 false 则表示子类要求关闭连接，而不
 	 *  必将该连接再传递至 thread_main 过程
 	 */
-	virtual bool thread_on_accept(acl::socket_stream* stream);
+	bool thread_on_accept(acl::socket_stream* stream);
 
 	/**
+	 * @override
 	 * 当某个网络连接的 IO 读写超时时的回调函数，如果该函数返回 true 则
 	 * 表示继续等待下一次读写，否则则希望关闭该连接
 	 * @param stream {socket_stream*}
 	 * @return {bool} 如果返回 false 则表示子类要求关闭连接，而不
 	 *  必将该连接再传递至 thread_main 过程
 	 */
-	virtual bool thread_on_timeout(acl::socket_stream* stream);
+	bool thread_on_timeout(acl::socket_stream* stream);
 
 	/**
+	 * @override
 	 * 当与某个线程绑定的连接关闭时的回调函数
 	 * @param stream {socket_stream*}
 	 */
-	virtual void thread_on_close(acl::socket_stream* stream);
+	void thread_on_close(acl::socket_stream* stream);
 
 	/**
+	 * @override
 	 * 当线程池中一个新线程被创建时的回调函数
 	 */
-	virtual void thread_on_init();
+	void thread_on_init();
 
 	/**
+	 * @override
 	 * 当线程池中一个线程退出时的回调函数
 	 */
-	virtual void thread_on_exit();
+	void thread_on_exit();
 
 	/**
+	 * @override
+	 * 在进程启动时，服务进程每成功监听一个本地地址，便调用本函数
+	 * @param ss {acl::server_socket&} 监听对象
+	 */
+	void proc_on_listen(acl::server_socket& ss);
+
+	/**
+	 * @override
 	 * 当进程切换用户身份后调用的回调函数，此函数被调用时，进程
 	 * 的权限为普通受限级别
 	 */
-	virtual void proc_on_init();
+	void proc_on_init();
 
 	/**
+	 * @override
 	 * 当子进程需要退出时框架将回调此函数，框架决定子进程是否退出取决于：
 	 * 1) 如果此函数返回 true 则子进程立即退出，否则：
 	 * 2) 如果该子进程所有客户端连接都已关闭，则子进程立即退出，否则：
@@ -86,10 +101,11 @@ protected:
 	 * @return {bool} 返回 false 表示当前子进程还不能退出，否则表示当前
 	 *  子进程可以退出了
 	 */
-	virtual bool proc_exit_timer(size_t nclients, size_t nthreads);
+	bool proc_exit_timer(size_t nclients, size_t nthreads);
 
 	/**
+	 * @override
 	 * 当进程退出前调用的回调函数
 	 */
-	virtual void proc_on_exit();
+	void proc_on_exit();
 };

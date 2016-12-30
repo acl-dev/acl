@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+static bool __check_addr = false;
 static acl::string __keypre("test_key");
 
 static bool test_set(acl::redis_string& redis, int n)
@@ -13,6 +14,7 @@ static bool test_set(acl::redis_string& redis, int n)
 		value.format("value_%s", key.c_str());
 
 		redis.clear();
+		redis.set_check_addr(__check_addr);
 		if (redis.set(key.c_str(), value.c_str()) == false)
 		{
 			printf("set key: %s error: %s\r\n",
@@ -648,11 +650,12 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		"-s redis_addr[127.0.0.1:6379]\r\n"
-		"-n count\r\n"
+		"-n count[default: 1]\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-t object timeout[default: 10]\r\n"
 		"-c [use cluster mode]\r\n"
+		"-M [if check connection addr first]\r\n"
 		"-a cmd[set|setex|setnx|append|get|getset|strlen|mset|mget|msetnx|setrange|getrange|setbit|getbit|bitcount|bitop_and|bitop_or|bitop_xor|incr|incrby|incrbyfloat|decr|decrby]\r\n",
 		procname);
 }
@@ -663,7 +666,7 @@ int main(int argc, char* argv[])
 	acl::string addr("127.0.0.1:6379"), cmd;
 	bool cluster_mode = false;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:a:t:c")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:I:a:t:cM")) > 0)
 	{
 		switch (ch)
 		{
@@ -690,6 +693,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'c':
 			cluster_mode = true;
+			break;
+		case 'M':
+			__check_addr = true;
 			break;
 		default:
 			break;

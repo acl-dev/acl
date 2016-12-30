@@ -128,6 +128,12 @@ ACL_API char *acl_slice_pool_strdup(const char *filename, int line,
 ACL_API char *acl_slice_pool_strndup(const char *filename, int line,
 	ACL_SLICE_POOL *asp, const char *str, size_t len);
 
+ACL_API void acl_slice_mem_hook(void *(*malloc_hook)(const char*, int, size_t),
+		void *(*calloc_hook)(const char*, int, size_t, size_t),
+		void *(*realloc_hook)(const char*, int, void*, size_t),
+		void  (*free_hook)(const char*, int, void*));
+ACL_API void acl_slice_mem_unhook(void);
+
 #ifdef	__cplusplus
 }
 #endif

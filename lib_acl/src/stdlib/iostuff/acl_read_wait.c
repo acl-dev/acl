@@ -268,10 +268,12 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 				acl_last_serror(), (int) fd);
 			return -1;
 		case 0:
+			/*
 			acl_msg_warn("%s(%d), %s: poll timeout: %s, fd: %d, "
 				"delay: %d, spent: %ld", __FILE__, __LINE__,
 				myname, acl_last_serror(), fd, delay,
 				(long) (time(NULL) - begin));
+			*/
 			acl_set_error(ACL_ETIMEDOUT);
 			return -1;
 		default:

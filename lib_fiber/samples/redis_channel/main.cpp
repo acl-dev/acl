@@ -5,6 +5,8 @@ static int __fibers_count = 2;
 static int __fibers_max   = 2;
 static int __oper_count = 100;
 //static struct timeval __begin, __end;
+static ACL_FIBER **__workers = NULL;
+static ACL_CHANNEL *__chan_exit = NULL;
 
 static acl::redis_client_cluster __redis_cluster;
 
@@ -150,7 +152,7 @@ static bool redis_del(ACL_FIBER& fiber, ACL_CHANNEL &chan, PKT &pkt)
 	return true;
 }
 
-static void fiber_redis_worker(ACL_FIBER *fiber, void *ctx)
+static void fiber_worker(ACL_FIBER *fiber, void *ctx)
 {
 	ACL_CHANNEL *chan = ((MYCHAN *) ctx)->chan;
 
@@ -199,11 +201,11 @@ static void fiber_redis_worker(ACL_FIBER *fiber, void *ctx)
 
 static int __display = 0;
 
-static void fiber_redis(ACL_FIBER *fiber, void *ctx)
+static void fiber_result(ACL_FIBER *fiber, void *ctx)
 {
-	MYCHANS *mychans = (MYCHANS *) ctx;
-	MYCHAN  *mychan  = &mychans->chans[mychans->off++];
-	ACL_CHANNEL *chan    = mychan->chan;
+	MYCHANS *mychans  = (MYCHANS *) ctx;
+	MYCHAN  *mychan   = &mychans->chans[mychans->off++];
+	ACL_CHANNEL *chan = mychan->chan;
 	PKT pkt;
 
 	if (mychans->off == mychans->size)
@@ -227,7 +229,7 @@ static void fiber_redis(ACL_FIBER *fiber, void *ctx)
 		PKT* res = (PKT *) acl_channel_recvp(chan);
 		if (res == NULL)
 		{
-			printf("%s(%d): fiber-%d: acl_channel_recvp errork, key = %s\r\n",
+			printf("%s(%d): fiber-%d: acl_channel_recvp error, key = %s\r\n",
 				__FUNCTION__, __LINE__, acl_fiber_id(fiber),
 				pkt.key.c_str());
 			break;
@@ -259,8 +261,26 @@ static void fiber_redis(ACL_FIBER *fiber, void *ctx)
 	if (--__fibers_count == 0)
 	{
 		printf("---All fibers are over!---\r\n");
-		acl_fiber_schedule_stop();
+		unsigned long n = 100;
+		acl_channel_sendul(__chan_exit, n);
 	}
+}
+
+static void fiber_wait(ACL_FIBER *, void *ctx)
+{
+	ACL_CHANNEL *chan = (ACL_CHANNEL *) ctx;
+	unsigned long n = acl_channel_recvul(chan);
+	
+	printf("----fiber-%d: get n: %lu---\r\n", acl_fiber_self(), n);
+
+	for (int i = 0; __workers[i] != NULL; i++)
+	{
+		printf("kill fiber-%d\r\n", acl_fiber_id(__workers[i]));
+		acl_fiber_kill(__workers[i]);
+	}
+
+	printf("---- fiber schedul stopping now ----\r\n");
+	acl_fiber_schedule_stop();
 }
 
 static void usage(const char *procname)
@@ -333,13 +353,20 @@ int main(int argc, char *argv[])
 		mychans.chans[i].cmd  = cmd;
 	}
 
+	__workers = new ACL_FIBER*[nworkers + 1];
 	for (int i = 0; i < nworkers; i++)
-		acl_fiber_create(fiber_redis_worker, &mychans.chans[i], 32000);
+		__workers[i] =
+			acl_fiber_create(fiber_worker, &mychans.chans[i], 32000);
 
-	__fibers_count = __fibers_max;
+	__workers[nworkers] = NULL;
+
+	__fibers_count = nworkers;
 
 	for (int i = 0; i < __fibers_max; i++)
-		acl_fiber_create(fiber_redis, &mychans, 32000);
+		(void) acl_fiber_create(fiber_result, &mychans, 32000);
+
+	__chan_exit = acl_channel_create(sizeof(unsigned long), 1000);
+	acl_fiber_create(fiber_wait, __chan_exit, 32000);
 
 	acl_fiber_schedule();
 
@@ -347,6 +374,9 @@ int main(int argc, char *argv[])
 		acl_channel_free(mychans.chans[i].chan);
 
 	delete [] mychans.chans;
+	acl_channel_free(__chan_exit);
+
+	delete [] __workers;
 
 	return 0;
 }

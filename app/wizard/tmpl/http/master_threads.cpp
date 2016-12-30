@@ -60,7 +60,10 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 {
 	logger("connect from %s, fd: %d", conn->get_peer(true),
 		conn->sock_handle());
+
 	conn->set_rw_timeout(var_cfg_rw_timeout);
+	if (var_cfg_rw_timeout > 0)
+		conn->set_tcp_non_blocking(true);
 
 	acl::session* session;
 	if (var_cfg_use_redis_session)
@@ -98,6 +101,11 @@ void master_service::thread_on_init()
 
 void master_service::thread_on_exit()
 {
+}
+
+void master_service::proc_on_listen(acl::server_socket& ss)
+{
+	logger(">>>listen %s ok<<<", ss.get_addr());
 }
 
 void master_service::proc_on_init()

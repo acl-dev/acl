@@ -1,12 +1,14 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include "acl_cpp/master/master_conf.hpp"
+#include <vector>
 
 struct ACL_EVENT;
 
 namespace acl
 {
 
+class server_socket;
 class event_timer;
 
 class ACL_CPP_API master_base
@@ -62,9 +64,16 @@ public:
 protected:
 	bool daemon_mode_;
 	bool proc_inited_;
+	std::vector<server_socket*> servers_;
 
 	master_base();
 	virtual ~master_base();
+
+	/**
+	 * 在进程启动时，服务进程每成功监听一个本地地址，便调用本函数
+	 * @param ss {const server_socket&} 监听对象
+	 */
+	virtual void proc_on_listen(server_socket& ss) { (void) ss; }
 
 	/**
 	 * 当进程切换用户身份前调用的回调函数，可以在此函数中做一些

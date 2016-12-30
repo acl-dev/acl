@@ -3,8 +3,7 @@
 
 #include "stdafx.h"
 #include "lib_acl.h"
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/db/db_mysql.hpp"
+#include "acl_cpp/lib_acl.hpp"
 
 const char* CREATE_TBL =
 	"create table group_tbl\r\n"
@@ -173,6 +172,38 @@ static bool tbl_delete(acl::db_handle& db, int n)
 
 int main(void)
 {
+	// WIN32 下需要调用此函数进行有关 SOCKET 的初始化
+	acl::acl_cpp_init();
+
+	// 允许将错误日志输出至屏幕
+	acl::log::stdout_open(true);
+
+	acl::string line;
+	acl::stdin_stream in;
+	acl::stdout_stream out;
+
+#if	defined(_WIN32) || defined(_WIN64)
+	const char* libname = "libmysql.dll";
+#else
+	const char* libname = "libmysqlclient_r.so";
+#endif
+
+	acl::string path;
+
+	// 因为采用动态加载的方式，所以需要应用给出 mysql 客户端库所在的路径
+	out.format("Enter %s load path: ", libname);
+	if (in.gets(line) && !line.empty())
+#if	defined(_WIN32) || defined(_WIN64)
+		path.format("%s\\%s", line.c_str(), libname);
+#else
+		path.format("%s/%s", line.c_str(), libname);
+#endif
+	else
+		path = libname;
+
+	out.format("%s path: %s\r\n", libname, path.c_str());
+	// 设置动态库加载的全路径
+	acl::db_handle::set_loadpath(path);
 
 #ifdef WIN32
 	const char* dbaddr = "192.168.1.251:3306";

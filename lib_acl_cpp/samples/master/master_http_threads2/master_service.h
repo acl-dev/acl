@@ -1,5 +1,5 @@
 #pragma once
-#include "acl_cpp/master/master_threads2.hpp"
+#include "acl_cpp/master/master_threads.hpp"
 #include "acl_cpp/master/master_conf.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ extern acl::master_int64_tbl var_conf_int64_tab[];
 
 //class acl::socket_stream;
 
-class master_service : public acl::master_threads2
+class master_service : public acl::master_threads
 {
 public:
 	master_service();

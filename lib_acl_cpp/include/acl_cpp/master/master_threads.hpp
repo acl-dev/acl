@@ -173,6 +173,9 @@ private:
 	// 当接收到一个客户端连接时回调此函数
 	static int service_main(ACL_VSTREAM*, void*);
 
+	// 当监听一个服务地址时回调此函数
+	static void service_on_listen(ACL_VSTREAM*);
+
 	// 当接收到一个客户连接时的回调函数，可以进行一些初始化
 	static int service_on_accept(ACL_VSTREAM*);
 

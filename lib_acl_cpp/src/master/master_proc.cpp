@@ -2,6 +2,7 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
+#include "acl_cpp/stream/server_socket.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/master/master_proc.hpp"
 #endif
@@ -34,6 +35,7 @@ void master_proc::run_daemon(int argc, char** argv)
 	daemon_mode_ = true;
 
 	acl_single_server_main(argc, argv, service_main,
+		ACL_MASTER_SERVER_ON_LISTEN, service_on_listen,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
 		ACL_MASTER_SERVER_EXIT, service_exit,
@@ -109,6 +111,8 @@ bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 			acl_argv_free(tokens);
 			return false;
 		}
+
+		service_on_listen(sstream);
 		acl_event_enable_listen(eventp, sstream, 0,
 			listen_callback, sstream);
 		sstreams.push_back(sstream);
@@ -175,6 +179,15 @@ void master_proc::service_exit(char*, char**)
 {
 	acl_assert(__mp != NULL);
 	__mp->proc_on_exit();
+}
+
+void master_proc::service_on_listen(ACL_VSTREAM* sstream)
+{
+	acl_assert(__mp != NULL);
+	server_socket* ss = new server_socket(sstream);
+	__mp->servers_.push_back(ss);
+	server_socket m(sstream);
+	__mp->proc_on_listen(*ss);
 }
 
 }  // namespace acl

@@ -168,8 +168,9 @@ public:
 	 * @param result {acl::string&} 存储查询结果值(内部对该 string 进行内容追加)
 	 *  store the value result of the given field
 	 * @return {bool} 返回值含义：
-	 *  true -- 成功获得对象的域字段值
-	 *          get the value associated with field
+	 *  true -- 操作成功，当result为空时表示 KEY 或字段域不存在
+	 *          get the value associated with field; if result is empty then
+	 *          the key or the name field doesn't exist
 	 *  false -- 域字段不存在或操作失败或该 key 对象非哈希对象
 	 *           the field not exists, or error happened,
 	 *           or the key isn't a hash key

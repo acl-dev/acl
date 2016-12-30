@@ -1,5 +1,8 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
+#if defined(_WIN32) || defined(_WIN64)
+#include <WinSock2.h>
+#endif
 
 namespace acl {
 
@@ -12,11 +15,30 @@ class ACL_CPP_API server_socket
 {
 public:
 	/**
-	 * 构造函数
+	 * 构造函数，调用本构造函数后需调用类方法 open 来监听指定服务地址
 	 * @param backlog {int} 监听套接口队列长度
 	 * @param block {bool} 是阻塞模式还是非阻塞模式
 	 */
 	server_socket(int backlog = 128, bool block = true);
+
+	/**
+	 * 构造函数，调用本构造函数后禁止再调用 open 方法
+	 * @param sstream {ACL_VSTREAM*} 外部创建的监听流对象，本类仅使用
+	 *  但并不释放，由应用自行关闭该监听对象
+	 */
+	server_socket(ACL_VSTREAM* sstream);
+
+	/**
+	 * 构造函数，调用本构造函数后禁止再调用 open 方法
+	 * @param fd {ACL_SOCKET} 外部创建的监听句柄，本类仅使用但并不释放，
+	 *  由应用自行关闭该监听句柄
+	 */
+#if defined(_WIN32) || defined(_WIN64)
+	server_socket(SOCKET fd);
+#else
+	server_socket(int fd);
+#endif
+
 	~server_socket();
 
 	/**
@@ -80,8 +102,10 @@ private:
 
 #if defined(_WIN32) || defined(_WIN64)
 	SOCKET fd_;
+	SOCKET fd_local_;
 #else
 	int   fd_;
+	int   fd_local_;
 #endif
 };
 

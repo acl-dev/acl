@@ -18,7 +18,8 @@ CFLAGS = -c -g -W \
 -Wno-long-long \
 -Wformat \
 -Winvalid-pch \
--DACL_PREPARE_COMPILE
+-DACL_PREPARE_COMPILE \
+#-DACL_USE_CPP11 -std=c++11
 #-DUSE_DYNAMIC
 # -Wcast-align
 #-Wcast-qual

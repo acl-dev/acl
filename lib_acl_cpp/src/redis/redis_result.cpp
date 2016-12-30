@@ -189,7 +189,7 @@ int redis_result::argv_to_string(string& buf) const
 	buf.clear();
 
 	if (idx_ == 0)
-		return -1;
+		return 0;
 
 	int length = 0;
 	for (size_t i = 0; i < idx_; i++)
@@ -204,7 +204,7 @@ int redis_result::argv_to_string(string& buf) const
 int redis_result::argv_to_string(char* buf, size_t size) const
 {
 	if (idx_ == 0 || size == 0)
-		return -1;
+		return 0;
 
 	size--;
 	if (size == 0)

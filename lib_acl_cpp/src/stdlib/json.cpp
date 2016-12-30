@@ -197,15 +197,20 @@ bool json_node::set_text(const char* text)
 	return true;
 }
 
-const string& json_node::to_string(void)
+const string& json_node::to_string(string* out /* = NULL */) const
 {
-	if (buf_ == NULL)
-		buf_ = NEW string(256);
-	else
-		buf_->clear();
-	ACL_VSTRING* vbuf = buf_->vstring();
+	if (out == NULL)
+	{
+		if (buf_ == NULL)
+			const_cast<json_node*>(this)->buf_ = NEW string(256);
+		else
+			const_cast<json_node*>(this)->buf_->clear();
+		out = const_cast<json_node*>(this)->buf_;
+	}
+
+	ACL_VSTRING* vbuf = out->vstring();
 	(void) acl_json_node_build(node_me_, vbuf);
-	return *buf_;
+	return *out;
 }
 
 json_node& json_node::add_child(json_node* child,
@@ -730,15 +735,20 @@ json_node* json::next_node(void)
 	return n;
 }
 
-const string& json::to_string(void)
+const string& json::to_string(string* out /* = NULL */) const
 {
-	if (buf_ == NULL)
-		buf_ = new string(256);
-	else
-		buf_->clear();
-	ACL_VSTRING* vbuf = buf_->vstring();
+	if (out == NULL)
+	{
+		if (buf_ == NULL)
+			const_cast<json*>(this)->buf_ = NEW string(256);
+		else
+			const_cast<json*>(this)->buf_->clear();
+		out = const_cast<json*>(this)->buf_;
+	}
+
+	ACL_VSTRING* vbuf = out->vstring();
 	(void) acl_json_build(json_, vbuf);
-	return *buf_;
+	return *out;
 }
 
 void json::build_json(string& out) const
