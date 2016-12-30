@@ -99,6 +99,7 @@ gsoner::gsoner()
 	gen_header_ = NULL;
 	gen_source_ = NULL;
 	default_ = true;
+	skip_ = false;
 	required_ = default_;
 	gen_header_filename_ = "gson.h";
 	gen_source_filename_ = "gson.cpp";
@@ -611,26 +612,24 @@ bool gsoner::check_comment()
 
 	if (commemt.find("Gson@optional") != std::string::npos)
 		required_ = false;
-	else if (commemt.find("Gson@required") != std::string::npos)
+	if (commemt.find("Gson@required") != std::string::npos)
 		required_ = true;
-	else if (commemt.find("Gson@") != std::string::npos)
+	if (commemt.find("Gson@skip") != std::string::npos)
+		skip_ = true;
+	if (commemt.find("Gson@rename:") != std::string::npos)
 	{
-		std::cout << commemt.c_str() << std::endl;
-		std::size_t index = commemt.find("Gson@");
-		while (commemt[index] != ' ' &&
-			commemt[index] != '\t' &&
-			commemt[index] != '\n' &&
-			index < commemt.size())
+		std::size_t pos = commemt.find("Gson@rename:") + strlen("Gson@rename:");
+		newname_ = commemt.substr( pos ,commemt.size() - pos);
+		if (newname_.back() == '\n')
+			newname_.pop_back();
+		if (newname_.back() == '\r')
+			newname_.pop_back();
+		if (newname_.empty())
 		{
-			index++;
+			std::cout << "Gson@rename:{} error, new name empty" << std::endl;
+			throw syntax_error();
 		}
-
-		std::cout << " nonsupport "
-			<< commemt.substr(commemt.find("Gson@"), index).c_str()
-			<< std::endl;
-		throw syntax_error();
 	}
-
 	return result;
 }
 
@@ -944,6 +943,12 @@ bool gsoner::check_member()
 	//skip ;
 	pos_++;
 
+	//skip current field;
+	if (skip_)
+	{
+		skip_ = false;
+		return true;
+	}
 	std::string name;
 	std::string types;
 	// remove assignment =,
@@ -1060,6 +1065,11 @@ bool gsoner::check_member()
 		assert(false);
 	}
 
+	//check newname
+	if (newname_.size())
+		name = newname_;
+
+	newname_.clear();
 	//std    :: list <int> a;
 	std::string first = tokens.front();
 	if (first == "const")

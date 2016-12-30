@@ -144,7 +144,9 @@ private:
 	code_parser_status_t status_;
 	std::string tab_ ;
 	bool required_;
+	bool skip_;
 	bool default_;
+	std::string newname_;
 	object_t current_obj_;
 	std::map<std::string,object_t> objs_;
 	std::list<std::string> namespaces_;
