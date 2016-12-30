@@ -44,7 +44,11 @@ void test_base()
 	obj.bases_ptr_list_ptr->push_back(NULL);
 	obj.bases_ptr_list_ptr->push_back(NULL);
 	obj.bases_ptr_list_ptr->push_back(NULL);
-	obj.base_map.insert(std::make_pair("base", b));
+	obj.string_map.insert(std::make_pair("key", "value"));
+	obj.base_map.insert(std::make_pair("key", b));
+	obj.int_map.insert(std::make_pair("key", 12121));
+	obj.bool_map.insert(std::make_pair("key", false));
+
 	obj.base_list_map.insert( std::make_pair("base", obj.bases_list));
 	obj.vector_list_base.push_back(obj.bases_list);
 
