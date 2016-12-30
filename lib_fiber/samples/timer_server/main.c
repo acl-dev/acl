@@ -20,10 +20,11 @@ static void io_timer(ACL_FIBER *fiber, void *ctx)
 	assert(fiber == ft->timer);
 
 	acl_fiber_set_errno(ft->fiber, ETIMEDOUT);
+	acl_fiber_keep_errno(ft->fiber, 1);
 
-	printf("timer-%d wakeup, set fiber-%d, errno: %d, %d\r\n",
-		acl_fiber_id(fiber), acl_fiber_id(ft->fiber),
-		ETIMEDOUT, acl_fiber_errno(ft->fiber));
+//	printf("timer-%d wakeup, set fiber-%d, errno: %d, %d\r\n",
+//		acl_fiber_id(fiber), acl_fiber_id(ft->fiber),
+//		ETIMEDOUT, acl_fiber_errno(ft->fiber));
 
 	acl_fiber_ready(ft->fiber);
 }
@@ -55,7 +56,10 @@ static void echo_client(ACL_FIBER *fiber, void *ctx)
 				break;
 
 			if (++ntimeout > 2)
+			{
+				printf("too many timeout: %d\r\n", ntimeout);
 				break;
+			}
 
 			printf("ntimeout: %d\r\n", ntimeout);
 			ft->timer = acl_fiber_create_timer(__rw_timeout * 1000,

@@ -51,10 +51,4 @@ connect_client* mysql_pool::create_connect()
 	return NEW db_mysql(*conf_);
 }
 
-void mysql_pool::set_charset(const char* charset)
-{
-	if (charset)
-		conf_->set_charset(charset);
-}
-
 } // namespace acl

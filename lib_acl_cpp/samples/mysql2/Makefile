@@ -71,8 +71,7 @@ endif
 CFLAGS += $(INC_COMPILE)
 
 INC_COMPILE = -I../../include -I../../../lib_acl/include
-LIB_COMPILE = -L../../lib -l_acl_cpp -L../../../lib_acl/lib -l_acl \
-	      -Wl,-rpath,./ -L. -lmysqlclient_r -ldl
+LIB_COMPILE = -L../../lib -l_acl_cpp -L../../../lib_acl/lib -l_acl -ldl
 
 ###########################################################
 OUT_PATH = .

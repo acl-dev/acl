@@ -2,6 +2,7 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/event/event_timer.hpp"
+#include "acl_cpp/stream/server_socket.hpp"
 #include "acl_cpp/master/master_base.hpp"
 #endif
 
@@ -17,7 +18,11 @@ master_base::master_base()
 
 master_base::~master_base()
 {
-
+	for (std::vector<server_socket*>::iterator it = servers_.begin();
+		it != servers_.end(); ++it)
+	{
+		delete *it;
+	}
 }
 
 void master_base::set_cfg_bool(master_bool_tbl* table)

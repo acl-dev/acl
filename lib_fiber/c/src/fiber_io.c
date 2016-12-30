@@ -11,8 +11,6 @@ typedef struct {
 	ACL_RING    ev_timer;
 	int         nsleeping;
 	int         io_stop;
-	void      (*loop_fn)(void *);
-	void       *loop_ctx;
 } FIBER_TLS;
 
 static FIBER_TLS *__main_fiber = NULL;
@@ -98,8 +96,6 @@ void fiber_io_check(void)
 	__thread_fiber->io_count = 0;
 	__thread_fiber->nsleeping = 0;
 	__thread_fiber->io_stop = 0;
-	__thread_fiber->loop_fn = NULL;
-	__thread_fiber->loop_ctx = NULL;
 	acl_ring_init(&__thread_fiber->ev_timer);
 
 	if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
@@ -133,13 +129,6 @@ void fiber_io_close(int fd)
 		event_del(__thread_fiber->event, fd, EVENT_ERROR);
 }
 
-void acl_fiber_post_event(void (*loop_fn)(void *), void *ctx)
-{
-	fiber_io_check();
-	__thread_fiber->loop_fn = loop_fn;
-	__thread_fiber->loop_ctx = ctx;
-}
-
 static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 {
 	EVENT *ev = (EVENT *) ctx;
@@ -168,12 +157,10 @@ static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 		/* add 1 just for the deviation of epoll_wait */
 		event_process(ev, left > 0 ? left + 1 : left);
 
-		if (__thread_fiber->loop_fn != NULL)
-			__thread_fiber->loop_fn(__thread_fiber->loop_ctx);
-
 		if (__thread_fiber->io_stop) {
 			if (__thread_fiber->io_count > 0)
-				acl_msg_info("---------waiting io: %d-----",
+				acl_msg_info("%s(%d), %s: waiting io: %d",
+					__FILE__, __LINE__, __FUNCTION__,
 					(int) __thread_fiber->io_count);
 			break;
 		}
@@ -236,7 +223,7 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 
 	ev->timeout = 1;
 
-	fiber = fiber_running();
+	fiber = acl_fiber_running();
 	fiber->when = when;
 	acl_ring_detach(&fiber->me);
 
@@ -246,6 +233,8 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 		fiber_count_inc();
 
 	acl_fiber_switch();
+
+	//acl_ring_detach(&fiber->me);
 
 	if (acl_ring_size(&__thread_fiber->ev_timer) == 0)
 		ev->timeout = -1;
@@ -337,7 +326,7 @@ void fiber_wait_read(int fd)
 		return;
 	}
 
-	__thread_fiber->io_fibers[fd] = fiber_running();
+	__thread_fiber->io_fibers[fd] = acl_fiber_running();
 	__thread_fiber->io_count++;
 
 	acl_fiber_switch();
@@ -362,7 +351,7 @@ void fiber_wait_write(int fd)
 		return;
 	}
 
-	__thread_fiber->io_fibers[fd] = fiber_running();
+	__thread_fiber->io_fibers[fd] = acl_fiber_running();
 	__thread_fiber->io_count++;
 
 	acl_fiber_switch();

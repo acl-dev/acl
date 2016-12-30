@@ -2,9 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/stdlib/util.hpp"
-#include "acl_cpp/db/db_sqlite.hpp"
+#include "acl_cpp/lib_acl.hpp"
 
 const char* CREATE_TBL =
 	"create table group_tbl\r\n"
@@ -155,7 +153,37 @@ static bool tbl_delete(acl::db_handle& db, int n)
 
 int main(void)
 {
-	acl::string dbfile("测试.db");
+	acl::acl_cpp_init();
+
+	acl::stdin_stream in;
+	acl::stdout_stream out;
+	acl::string line;
+
+#if	defined(_WIN32) || defined(_WIN64)
+	const char* libname = "sqlite3.dll";
+#else
+	const char* libname = "libsqlite3.so";
+#endif
+
+	acl::string path;
+	out.format("Enter %s load path: ", libname);
+	if (in.gets(line) && !line.empty())
+#if     defined(_WIN32) || defined(_WIN64)
+		path.format("%s\\%s", line.c_str(), libname);
+#else
+		path.format("%s/%s", line.c_str(), libname);
+#endif
+	else
+		path = libname;
+
+	out.format("%s path: %s\r\n", libname, path.c_str());
+	// 设置动态库加载的全路径
+	acl::db_handle::set_loadpath(path);
+
+	acl::string dbfile("test.db");
+
+	// db_sqlite 类对象的声明需在 set_loadpath 之后，因为在 db_sqlite 的
+	// 构造函数中需要运行加载 libsqlite3.so
 	acl::db_sqlite db(dbfile);
 	int   max = 100;
 

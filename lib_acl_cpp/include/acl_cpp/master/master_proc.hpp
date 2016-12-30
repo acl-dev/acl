@@ -47,6 +47,9 @@ private:
 	// 当接收到一个客户端连接时回调此函数
 	static void service_main(ACL_VSTREAM *stream, char *service, char **argv);
 
+	// 当监听一个服务地址时回调此函数
+	static void service_on_listen(ACL_VSTREAM*);
+
 	// 当进程切换用户身份后调用的回调函数
 	static void service_pre_jail(char* service, char** argv);
 

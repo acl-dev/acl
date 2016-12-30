@@ -302,7 +302,9 @@ bool websocket::read_frame_head(void)
 
 	if (client_.read(buf, 2) == -1)
 	{
-		logger_error("read first two char error: %s", last_serror());
+		if (last_error() != ACL_ETIMEDOUT)
+			logger_error("read first two char error: %d, %s",
+				last_error(), last_serror());
 		return false;
 	}
 
@@ -320,7 +322,9 @@ bool websocket::read_frame_head(void)
 	// payload_len == 126 | 127
 	else if ((ret = client_.read(buf, payload_len == 126 ? 2 : 8)) == -1)
 	{
-		logger_error("read ext_payload_len error %s", last_serror());
+		if (last_error() != ACL_ETIMEDOUT)
+			logger_error("read ext_payload_len error: %d, %s",
+				last_error(), last_serror());
 		return false;
 	}
 	else if (ret == 2)
@@ -340,7 +344,9 @@ bool websocket::read_frame_head(void)
 
 	if (client_.read(&header_.masking_key, sizeof(unsigned int)) == -1)
 	{
-		logger_error("read masking_key error %s", last_serror());
+		if (last_error() != ACL_ETIMEDOUT)
+			logger_error("read masking_key error: %d, %s",
+				last_error(), last_serror());
 		return false;
 	}
 
@@ -358,7 +364,9 @@ int websocket::read_frame_data(char* buf, size_t size)
 	int ret = client_.read(buf, size, false);
 	if (ret == -1)
 	{
-		logger_error("read frame data error %s", last_serror());
+		if (last_error() != ACL_ETIMEDOUT)
+			logger_error("read frame data error: %d, %s",
+				last_error(), last_serror());
 		return -1;
 	}
 

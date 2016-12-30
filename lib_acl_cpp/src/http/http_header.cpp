@@ -873,7 +873,7 @@ void http_header::append_accept_key(const char* sec_key, string& out) const
 	tmp += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
 	sha1 sha;
-	sha.input(tmp.c_str(), tmp.size());
+	sha.input(tmp.c_str(), (unsigned int) tmp.size());
 	unsigned char digest[20];
 	sha.result((unsigned *) digest);
 

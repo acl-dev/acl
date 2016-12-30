@@ -18,7 +18,8 @@ namespace acl
 #define	LONG_LEN	21
 
 redis_command::redis_command()
-: conn_(NULL)
+: check_addr_(false)
+, conn_(NULL)
 , cluster_(NULL)
 , max_conns_(0)
 , used_(0)
@@ -40,7 +41,8 @@ redis_command::redis_command()
 
 
 redis_command::redis_command(redis_client* conn)
-: conn_(conn)
+: check_addr_(false)
+, conn_(conn)
 , cluster_(NULL)
 , max_conns_(0)
 , used_(0)
@@ -64,7 +66,8 @@ redis_command::redis_command(redis_client* conn)
 }
 
 redis_command::redis_command(redis_client_cluster* cluster, size_t max_conns)
-: conn_(NULL)
+: check_addr_(false)
+, conn_(NULL)
 , cluster_(cluster)
 , max_conns_(max_conns)
 , used_(0)
@@ -104,6 +107,11 @@ redis_command::~redis_command()
 	delete request_buf_;
 	delete request_obj_;
 	dbuf_->destroy();
+}
+
+void redis_command::set_check_addr(bool on)
+{
+	check_addr_ = on;
 }
 
 void redis_command::reset(bool save_slot /* = false */)
@@ -386,7 +394,7 @@ redis_client* redis_command::peek_conn(redis_client_cluster* cluster, int slot)
 }
 
 const redis_result* redis_command::run(redis_client_cluster* cluster,
-	size_t nchild)
+	size_t nchild, int* timeout /* = NULL */)
 {
 	redis_client* conn = peek_conn(cluster, slot_);
 
@@ -398,6 +406,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 	}
 
 	set_client_addr(*conn);
+	conn->set_check_addr(check_addr_);
 
 	redis_result_t type;
 	bool  last_moved = false;
@@ -407,9 +416,9 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 	{
 		// 根据请求过程是否采用内存分片方式调用不同的请求过程
 		if (slice_req_)
-			result_ = conn->run(dbuf_, *request_obj_, nchild);
+			result_ = conn->run(dbuf_, *request_obj_, nchild, timeout);
 		else
-			result_ = conn->run(dbuf_, *request_buf_, nchild);
+			result_ = conn->run(dbuf_, *request_buf_, nchild, timeout);
 
 		// 如果连接异常断开，则需要进行重试
 		if (conn->eof())
@@ -417,11 +426,18 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			// 删除哈希槽中的地址映射关系以便下次操作时重新获取
 			cluster->clear_slot(slot_);
 
-			// 将连接池对象置为不可用状态
-			conn->get_pool()->set_alive(false);
-
 			// 将连接对象归还给连接池对象
 			conn->get_pool()->put(conn, false);
+
+			// 如果连接断开且请求数据为空时，则无须重试
+			if (request_obj_->get_size() == 0 && request_buf_->empty())
+			{
+				logger_error("not retry when no request!");
+				return NULL;
+			}
+
+			// 将连接池对象置为不可用状态
+			conn->get_pool()->set_alive(false);
 
 			// 从连接池集群中顺序取得一个连接对象
 			conn = peek_conn(cluster, slot_);
@@ -565,6 +581,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			if (result_ == NULL)
 			{
 				logger_error("ASKING's reply null");
+				conn->get_pool()->put(conn, !conn->eof());
 				return NULL;
 			}
 
@@ -573,6 +590,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			{
 				logger_error("ASKING's reply error: %s",
 					status ? status : "null");
+				conn->get_pool()->put(conn, !conn->eof());
 				return NULL;
 			}
 
@@ -621,11 +639,15 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 		}
 	}
 
+	if (conn != NULL)
+		conn->get_pool()->put(conn, true);
+
 	logger_warn("too many redirect: %d, max: %d", n, redirect_max_);
 	return NULL;
 }
 
-const redis_result* redis_command::run(size_t nchild /* = 0 */)
+const redis_result* redis_command::run(size_t nchild /* = 0 */,
+	int* timeout /* = NULL */)
 {
 	// 如果上次操作时产生的内存分配没有被释放，在此处强制进行释放，以免用户
 	// 在反复使用一个命令对象时忘记了 clear 清理临时内存
@@ -634,20 +656,20 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */)
 	used_++;
 
 	if (cluster_ != NULL)
-		return run(cluster_, nchild);
-	else if (conn_ != NULL)
-	{
-		if (slice_req_)
-			result_ = conn_->run(dbuf_, *request_obj_, nchild);
-		else
-			result_ = conn_->run(dbuf_, *request_buf_, nchild);
-		return result_;
-	}
-	else
+		return run(cluster_, nchild, timeout);
+	if (conn_ == NULL)
 	{
 		logger_error("ERROR: cluster_ and conn_ are all NULL");
 		return NULL;
 	}
+
+	conn_->set_check_addr(check_addr_);
+
+	if (slice_req_)
+		result_ = conn_->run(dbuf_, *request_obj_, nchild, timeout);
+	else
+		result_ = conn_->run(dbuf_, *request_buf_, nchild, timeout);
+	return result_;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1179,7 +1201,7 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 		return NULL;
 	}
 	string tmp(128);
-	if (rr->argv_to_string(tmp) < 0)
+	if (rr->argv_to_string(tmp) <= 0)
 	{
 		cursor = -1;
 		return NULL;

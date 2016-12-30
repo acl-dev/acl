@@ -1,3 +1,36 @@
+36) 2016.12.27
+36.1) bugfix: fiber.cpp 中 kill 方法需将 f_ 成员置 NULL，防止嵌套访问非法地址
+36.2) feature: fiber.cpp 允许将当前运行的协程与 fiber 类对象绑定(只需在构造
+函数中将构造参数设为 true)，从而可以方便使用类 fiber 中的方法
+
+35) 2016.12.19
+35.1) feature: fiber.c 中有关协程局部变量的接口调整，更符合实际应用场景
+35.2) bugfix: fiber.c 中当协程退出时，协程局部变量的对象未释放造成内存泄露
+35.3) sample: samples/fiber_local，该示例用于测试协程局部变量
+
+34) 2016.12.16
+34.1) bugfix: hook_net.c, hook_io.c, event_epoll.c 其中因为 hook 了很多系统的
+API，当个别应用在 main 函数执行前需要调用这些 API 时可能会因为 hook 操作还未
+进行而造成函数指针为 NULL，从而导致程序崩溃
+
+33) 2016.12.8
+33.1) bugfix: hook_net.c 中，当非协程模式下，hook epoll 相关 API 应该加以区别
+
+32) 2016.12.3
+32.1) feature: acl_fiber_kill 可以支持因调用 acl_fiber_sleep, acl_fiber_sem,
+acl_fiber_mutex_lock 而阻塞的协程
+
+31) 2016.11.28
+31.1) feature: fiber.cpp 中，fiber 类增加了 kill 和 killed 方法用来”杀死“协程
+和判断指定协程是否已经退出
+
+30) 2016.11.27
+30.1) bugfix: fiber.c 中函数 acl_fiber_create 中存在运行时内存增长问题，即
+__thread_fiber->fibers 对象在 realloc 过程中内存不断增长，因为 __thread_fier->size
+计算方法有问题
+
+29) 2016.11.24
+29.1) feature: 增加 acl_fiber_kill 接口用来通知指定协程退出
 
 28) 2016.10.31
 28.1) feature: fiber.c 中实现了 __i386__ 下 SETJMP，LONGJMP 的汇编方式，从

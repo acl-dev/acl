@@ -71,7 +71,8 @@ static int check_fdtype(int fd)
 	struct stat s;
 
 	if (fstat(fd, &s) < 0) {
-		acl_msg_info("fd: %d fstat error", fd);
+		acl_msg_info("%s(%d), %s: fd: %d fstat error %s", __FILE__,
+			__LINE__, __FUNCTION__, fd, acl_last_serror());
 		return -1;
 	}
 

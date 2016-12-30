@@ -10,17 +10,32 @@
 #include "event_epoll.h"  /* just for hook_epoll */
 #include "fiber.h"
 
-typedef int *(*errno_fn)(void);
-typedef int  (*fcntl_fn)(int, int, ...);
+#define	MAX_CACHE	1000
 
-static errno_fn __sys_errno = NULL;
-static fcntl_fn __sys_fcntl = NULL;
+typedef int  *(*errno_fn)(void);
+typedef int   (*fcntl_fn)(int, int, ...);
+
+#ifdef __DEBUG_MEM
+typedef void *(*malloc_fn)(size_t);
+typedef void *(*calloc_fn)(size_t, size_t);
+typedef void *(*realloc_fn)(void*, size_t);
+#endif
+
+static errno_fn __sys_errno     = NULL;
+static fcntl_fn __sys_fcntl     = NULL;
+
+#ifdef __DEBUG_MEM
+static malloc_fn __sys_malloc   = NULL;
+//static calloc_fn __sys_calloc   = NULL;
+static realloc_fn __sys_realloc = NULL;
+#endif
 
 typedef struct {
 	ACL_RING       ready;		/* ready fiber queue */
 	ACL_RING       dead;		/* dead fiber queue */
 	ACL_FIBER    **fibers;
 	size_t         size;
+	size_t         slot;
 	int            exitcode;
 	ACL_FIBER     *running;
 	ACL_FIBER      original;
@@ -28,6 +43,7 @@ typedef struct {
 	size_t         idgen;
 	int            count;
 	int            switched;
+	int            nlocal;
 } FIBER_TLS;
 
 static FIBER_TLS *__main_fiber = NULL;
@@ -39,6 +55,7 @@ static acl_pthread_key_t __fiber_key;
 /* forward declare */
 static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	void *arg, size_t size);
+static void fiber_init(void);
 
 void acl_fiber_hook_api(int onoff)
 {
@@ -99,8 +116,10 @@ static void fiber_check(void)
 #endif
 	__thread_fiber->fibers = NULL;
 	__thread_fiber->size   = 0;
+	__thread_fiber->slot   = 0;
 	__thread_fiber->idgen  = 0;
 	__thread_fiber->count  = 0;
+	__thread_fiber->nlocal = 0;
 
 	acl_ring_init(&__thread_fiber->ready);
 	acl_ring_init(&__thread_fiber->dead);
@@ -167,6 +186,34 @@ int fcntl(int fd, int cmd, ...)
 	return ret;
 }
 
+#ifdef __DEBUG_MEM
+void *malloc(size_t size)
+{
+	if (__sys_malloc == NULL)
+		fiber_init();
+	//assert(size < 64000000);
+	return __sys_malloc(size);
+}
+
+/*
+void *calloc(size_t nmemb, size_t size)
+{
+	if (__sys_calloc == NULL)
+		fiber_init();
+	assert(size < 64000000);
+	return __sys_calloc(nmemb, size);
+}
+*/
+
+void *realloc(void *ptr, size_t size)
+{
+	if (__sys_realloc == NULL)
+		fiber_init();
+	//assert(size < 64000000);
+	return __sys_realloc(ptr, size);
+}
+#endif
+
 void acl_fiber_set_errno(ACL_FIBER *fiber, int errnum)
 {
 	fiber->errnum = errnum;
@@ -174,8 +221,15 @@ void acl_fiber_set_errno(ACL_FIBER *fiber, int errnum)
 
 int acl_fiber_errno(ACL_FIBER *fiber)
 {
-	fiber->flag |= FIBER_F_SAVE_ERRNO;
 	return fiber->errnum;
+}
+
+void acl_fiber_keep_errno(ACL_FIBER *fiber, int yesno)
+{
+	if (yesno)
+		fiber->flag |= FIBER_F_SAVE_ERRNO;
+	else
+		fiber->flag &= ~FIBER_F_SAVE_ERRNO;
 }
 
 void fiber_save_errno(void)
@@ -189,14 +243,14 @@ void fiber_save_errno(void)
 		curr = &__thread_fiber->original;
 
 	if (curr->flag & FIBER_F_SAVE_ERRNO) {
-		curr->flag &= ~FIBER_F_SAVE_ERRNO;
+		//curr->flag &= ~FIBER_F_SAVE_ERRNO;
 		return;
 	}
 
 	if (__sys_errno != NULL)
-		curr->errnum = *__sys_errno();
+		acl_fiber_set_errno(curr, *__sys_errno());
 	else
-		curr->errnum = errno;
+		acl_fiber_set_errno(curr, errno);
 }
 
 #if defined(__x86_64__)
@@ -286,8 +340,45 @@ void fiber_save_errno(void)
     siglongjmp(ctx, 1)
 #endif
 
+static void fiber_kick(int max)
+{
+	ACL_RING *head;
+	ACL_FIBER *fiber;
+
+	while (max > 0) {
+		head = acl_ring_pop_head(&__thread_fiber->dead);
+		if (head == NULL)
+			break;
+		fiber = ACL_RING_TO_APPL(head, ACL_FIBER,me);
+		fiber_free(fiber);
+		max--;
+	}
+}
+
 static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 {
+	if (from->status == FIBER_STATUS_EXITING) {
+		size_t slot = from->slot;
+		int n = acl_ring_size(&__thread_fiber->dead);
+
+		/* if the cached dead fibers reached the limit,
+		 * some will be freed
+		 */
+		if (n > MAX_CACHE) {
+			n -= MAX_CACHE;
+			fiber_kick(n);
+		}
+
+		if (!from->sys)
+			__thread_fiber->count--;
+
+		__thread_fiber->fibers[slot] =
+			__thread_fiber->fibers[--__thread_fiber->slot];
+		__thread_fiber->fibers[slot]->slot = slot;
+
+		acl_ring_prepend(&__thread_fiber->dead, &from->me);
+	}
+
 #ifdef	USE_JMP
 	/* use setcontext() for the initial jump, as it allows us to set up
 	 * a stack, but continue with longjmp() as it's much faster.
@@ -309,10 +400,42 @@ static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 #endif
 }
 
-ACL_FIBER *fiber_running(void)
+ACL_FIBER *acl_fiber_running(void)
 {
 	fiber_check();
 	return __thread_fiber->running;
+}
+
+void acl_fiber_kill(ACL_FIBER *fiber)
+{
+	ACL_FIBER *curr = __thread_fiber->running;
+
+	if (fiber == NULL) {
+		acl_msg_error("%s(%d), %s: fiber NULL",
+			__FILE__, __LINE__, __FUNCTION__);
+		return;
+	}
+
+	if (curr == NULL) {
+		acl_msg_error("%s(%d), %s: current fiber NULL",
+			__FILE__, __LINE__, __FUNCTION__);
+		return;
+	}
+
+	fiber->flag |= FIBER_F_KILLED;
+
+	if (fiber == curr) // just return if kill myself
+		return;
+
+	acl_ring_detach(&curr->me);
+	acl_ring_detach(&fiber->me);
+	acl_fiber_ready(fiber);
+	acl_fiber_yield();
+}
+
+int acl_fiber_killed(ACL_FIBER *fiber)
+{
+	return fiber->flag & FIBER_F_KILLED;
 }
 
 void fiber_exit(int exit_code)
@@ -327,8 +450,10 @@ void fiber_exit(int exit_code)
 
 void acl_fiber_ready(ACL_FIBER *fiber)
 {
-	fiber->status = FIBER_STATUS_READY;
-	acl_ring_prepend(&__thread_fiber->ready, &fiber->me);
+	if (fiber->status != FIBER_STATUS_EXITING) {
+		fiber->status = FIBER_STATUS_READY;
+		acl_ring_prepend(&__thread_fiber->ready, &fiber->me);
+	}
 }
 
 int acl_fiber_yield(void)
@@ -373,8 +498,11 @@ static void fiber_start(unsigned int x, unsigned int y)
 	fiber->fn(fiber, fiber->arg);
 
 	for (i = 0; i < fiber->nlocal; i++) {
+		if (fiber->locals[i] == NULL)
+			continue;
 		if (fiber->locals[i]->free_fn)
 			fiber->locals[i]->free_fn(fiber->locals[i]->ctx);
+		acl_myfree(fiber->locals[i]);
 	}
 
 	if (fiber->locals) {
@@ -386,9 +514,14 @@ static void fiber_start(unsigned int x, unsigned int y)
 	fiber_exit(0);
 }
 
-#define	MAX_CACHE	100
+int acl_fiber_ndead(void)
+{
+	if (__thread_fiber == NULL)
+		return 0;
+	return acl_ring_size(&__thread_fiber->dead);
+}
 
-static void fiber_free(ACL_FIBER *fiber)
+void fiber_free(ACL_FIBER *fiber)
 {
 #ifdef USE_VALGRIND
 	VALGRIND_STACK_DEREGISTER(fiber->vid);
@@ -406,23 +539,8 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	sigset_t zero;
 	union cc_arg carg;
 	ACL_RING *head;
-	size_t n;
 
 	fiber_check();
-
-	n = acl_ring_size(&__thread_fiber->dead);
-
-	/* if the cached dead fibers reached the limit, some will be freed */
-	if (n > MAX_CACHE) {
-		n -= MAX_CACHE;
-		while (n > 0) {
-			head = acl_ring_pop_head(&__thread_fiber->dead);
-			acl_assert(head != NULL);
-			fiber = ACL_RING_TO_APPL(head, ACL_FIBER,me);
-			fiber_free(fiber);
-			n--;
-		}
-	}
 
 #define	APPL	ACL_RING_TO_APPL
 
@@ -441,10 +559,13 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	fiber->arg    = arg;
 	fiber->size   = size;
 	fiber->id     = ++__thread_fiber->idgen;
+	fiber->flag   = 0;
+	fiber->status = FIBER_STATUS_READY;
 
 	carg.p = fiber;
 
-	fiber->context = (ucontext_t *) acl_mymalloc(sizeof(ucontext_t));
+	if (fiber->context == NULL)
+		fiber->context = (ucontext_t *) acl_mymalloc(sizeof(ucontext_t));
 	sigemptyset(&zero);
 	sigprocmask(SIG_BLOCK, &zero, &fiber->context->uc_sigmask);
 
@@ -479,13 +600,17 @@ ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
 	ACL_FIBER *fiber = fiber_alloc(fn, arg, size);
 
 	__thread_fiber->count++;
-	if (__thread_fiber->size % 64 == 0)
+
+	if (__thread_fiber->slot >= __thread_fiber->size) {
+		__thread_fiber->size += 128;
 		__thread_fiber->fibers = (ACL_FIBER **) acl_myrealloc(
 			__thread_fiber->fibers, 
-			(__thread_fiber->size + 64) * sizeof(ACL_FIBER *));
+			__thread_fiber->size * sizeof(ACL_FIBER *));
+	}
 
-	fiber->slot = __thread_fiber->size;
-	__thread_fiber->fibers[__thread_fiber->size++] = fiber;
+	fiber->slot = __thread_fiber->slot;
+	__thread_fiber->fibers[__thread_fiber->slot++] = fiber;
+
 	acl_fiber_ready(fiber);
 
 	return fiber;
@@ -493,12 +618,12 @@ ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
 
 int acl_fiber_id(const ACL_FIBER *fiber)
 {
-	return fiber->id;
+	return fiber ? fiber->id : 0;
 }
 
 int acl_fiber_self(void)
 {
-	ACL_FIBER *curr = fiber_running();
+	ACL_FIBER *curr = acl_fiber_running();
 	return acl_fiber_id(curr);
 }
 
@@ -518,8 +643,14 @@ static void fiber_init(void)
 
 	__called++;
 
-	__sys_errno = (errno_fn) dlsym(RTLD_NEXT, "__errno_location");
-	__sys_fcntl = (fcntl_fn) dlsym(RTLD_NEXT, "fcntl");
+#ifdef __DEBUG_MEM
+	//__sys_calloc  = (calloc_fn) dlsym(RTLD_NEXT, "calloc");
+	__sys_malloc  = (malloc_fn) dlsym(RTLD_NEXT, "malloc");
+	__sys_realloc = (realloc_fn) dlsym(RTLD_NEXT, "realloc");
+#endif
+
+	__sys_errno   = (errno_fn) dlsym(RTLD_NEXT, "__errno_location");
+	__sys_fcntl   = (fcntl_fn) dlsym(RTLD_NEXT, "fcntl");
 
 	hook_io();
 	hook_net();
@@ -586,18 +717,6 @@ void acl_fiber_switch(void)
 	acl_assert(current);
 #endif
 
-	if (current->status == FIBER_STATUS_EXITING) {
-		size_t slot = current->slot;
-
-		if (!current->sys)
-			__thread_fiber->count--;
-
-		__thread_fiber->fibers[slot] =
-			__thread_fiber->fibers[--__thread_fiber->size];
-		__thread_fiber->fibers[slot]->slot = slot;
-		acl_ring_append(&__thread_fiber->dead, &current->me);
-	}
-
 	head = acl_ring_pop_head(&__thread_fiber->ready);
 
 	if (head == NULL) {
@@ -606,47 +725,84 @@ void acl_fiber_switch(void)
 	}
 
 	fiber = ACL_RING_TO_APPL(head, ACL_FIBER, me);
-	fiber->status = FIBER_STATUS_READY;
+	//fiber->status = FIBER_STATUS_READY;
 
 	__thread_fiber->running = fiber;
 	__thread_fiber->switched++;
 	fiber_swap(current, __thread_fiber->running);
 }
 
-int acl_fiber_set_specific(void *ctx, void (*free_fn)(void *))
+int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void *))
 {
 	FIBER_LOCAL *local;
 	ACL_FIBER *curr;
-	int key;
 
-	if (__thread_fiber == NULL || __thread_fiber->running == NULL)
+	if (key == NULL) {
+		acl_msg_error("%s(%d), %s: key NULL",
+			__FILE__, __LINE__, __FUNCTION__);
 		return -1;
+	}
 
-	curr = __thread_fiber->running;
+	if (__thread_fiber == NULL) {
+		acl_msg_error("%s(%d), %s: __thread_fiber: NULL",
+			__FILE__, __LINE__, __FUNCTION__);
+		return -1;
+	} else if (__thread_fiber->running == NULL) {
+		acl_msg_error("%s(%d), %s: running: NULL",
+			__FILE__, __LINE__, __FUNCTION__);
+		return -1;
+	} else
+		curr = __thread_fiber->running;
 
-	key = curr->nlocal;
-	local = (FIBER_LOCAL *) acl_mymalloc(sizeof(FIBER_LOCAL));
+	if (*key <= 0)
+		*key = ++__thread_fiber->nlocal;
+	else if (*key > __thread_fiber->nlocal) {
+		acl_msg_error("%s(%d), %s: invalid key: %d > nlocal: %d",
+			__FILE__, __LINE__, __FUNCTION__,
+			*key, __thread_fiber->nlocal);
+		return -1;
+	}
+
+	if (curr->nlocal < __thread_fiber->nlocal) {
+		curr->nlocal = __thread_fiber->nlocal;
+		curr->locals = (FIBER_LOCAL **) acl_myrealloc(curr->locals,
+			curr->nlocal * sizeof(FIBER_LOCAL*));
+	}
+
+	local = (FIBER_LOCAL *) acl_mycalloc(1, sizeof(FIBER_LOCAL));
 	local->ctx = ctx;
 	local->free_fn = free_fn;
+	curr->locals[*key - 1] = local;
 
-	if (curr->nlocal % 64 == 0)
-		curr->locals = (FIBER_LOCAL **) acl_myrealloc(curr->locals,
-			(curr->nlocal + 64) * sizeof(FIBER_LOCAL*));
-	curr->locals[curr->nlocal++] = local;
-
-	return key;
+	return *key;
 }
 
 void *acl_fiber_get_specific(int key)
 {
+	FIBER_LOCAL *local;
 	ACL_FIBER *curr;
 
-	if (__thread_fiber == NULL || __thread_fiber->running == NULL)
+	if (key <= 0)
 		return NULL;
 
-	curr = __thread_fiber->running;
-	if (key >= curr->nlocal || key < 0)
+	if (__thread_fiber == NULL) {
+		acl_msg_error("%s(%d), %s: __thread_fiber NULL",
+			__FILE__, __LINE__, __FUNCTION__);
 		return NULL;
+	} else if (__thread_fiber->running == NULL) {
+		acl_msg_error("%s(%d), %s: running fiber NULL",
+			__FILE__, __LINE__, __FUNCTION__);
+		return NULL;
+	} else
+		curr = __thread_fiber->running;
 
-	return curr->locals[key];
+	if (key > curr->nlocal) {
+		acl_msg_error("%s(%d), %s: invalid key: %d > nlocal: %d",
+			__FILE__, __LINE__, __FUNCTION__,
+			key, curr->nlocal);
+		return NULL;
+	}
+
+	local = curr->locals[key - 1];
+	return local ? local->ctx : NULL;
 }

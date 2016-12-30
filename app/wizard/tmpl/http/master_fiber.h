@@ -21,6 +21,9 @@ protected:
 	void proc_pre_jail(void);
 
 	// @override
+	void proc_on_listen(acl::server_socket& ss);
+
+	// @override
 	void proc_on_init(void);
 
 	// @override

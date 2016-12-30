@@ -33,14 +33,4 @@ connect_client* sqlite_pool::create_connect()
 	return NEW db_sqlite(dbfile_, charset_);
 }
 
-void sqlite_pool::set_charset(const char* charset)
-{
-	if (charset == NULL || *charset == 0)
-		return;
-
-	if (charset_)
-		acl_myfree(charset_);
-	charset_ = acl_mystrdup(charset);
-}
-
 } // namespace acl

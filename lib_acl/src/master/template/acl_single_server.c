@@ -109,6 +109,7 @@ static int use_count;
 static ACL_EVENT *__eventp = NULL;
 static ACL_VSTREAM **__sstreams = NULL;
 
+static ACL_MASTER_SERVER_LISTEN_FN __service_on_listen;
 static ACL_SINGLE_SERVER_FN __service_main;
 static ACL_MASTER_SERVER_EXIT_FN __service_onexit;
 static char *__service_name;
@@ -506,6 +507,9 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 			acl_get_app_conf_bool_table(va_arg(ap, ACL_CONFIG_BOOL_TABLE *));
 			break;
 
+		case ACL_MASTER_SERVER_ON_LISTEN:
+			__service_on_listen = va_arg(ap, ACL_MASTER_SERVER_LISTEN_FN);
+			break;
 		case ACL_MASTER_SERVER_CTX:
 			__service_ctx = va_arg(ap, void *);
 			break;
@@ -669,6 +673,8 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	for (; fd < ACL_MASTER_LISTEN_FD + socket_count; fd++) {
 		stream = acl_vstream_fdopen(fd, O_RDWR, acl_var_single_buf_size,
 				acl_var_single_rw_timeout, fdtype);
+		if (__service_on_listen)
+			__service_on_listen(stream);
 		__sstreams[i++] = stream;
 
 		acl_event_enable_listen(__eventp, stream, 0,

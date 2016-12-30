@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include "lib_acl.h"
+
 /**
  * 协程结构类型
  */
@@ -25,6 +27,18 @@ void acl_fiber_hook_api(int onoff);
  */
 ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
 	void *arg, size_t size);
+
+/**
+ * 返回当前线程中处于消亡状态的协程数
+ * @retur {int}
+ */
+int acl_fiber_ndead(void);
+
+/**
+ * 返回当前正在运行的协程对象
+ * @retur {ACL_FIBER*} 返回 NULL 表示当前没有正在运行的协程
+ */
+ACL_FIBER *acl_fiber_running(void);
 
 /**
  * 获得所给协程的协程 ID 号
@@ -54,11 +68,32 @@ void acl_fiber_set_errno(ACL_FIBER *fiber, int errnum);
 int acl_fiber_errno(ACL_FIBER *fiber);
 
 /**
+ * 是否保持所指定协程的错误号，当设置为“保持”后，则该协程仅保持当前状态下的
+ * 错误号，之后该协程的错误号 errno 将不再改变，走到再次调用本函数取消保持
+ * @param fiber {ACL_FIBER*} 协程对象
+ * @param yesno {int} 是否保持
+ */
+void acl_fiber_keep_errno(ACL_FIBER *fiber, int yesno);
+
+/**
  * 获得指定协程的当前状态
  * @param fiber {const ACL_FIBER*} 协程对象
  * @return {int} 协程状态
  */
 int acl_fiber_status(const ACL_FIBER *fiber);
+
+/**
+ * 通知指定协程退出
+ * @param fiber {const ACL_FIBER*} 协程对象
+ */
+void acl_fiber_kill(ACL_FIBER *fiber);
+
+/**
+ * 检查本协程是否被其它协程通知退出
+ * @param fiber {const ACL_FIBER*} 协程对象
+ * @return {int} 返回值为 0 表示没有被通知退出，非 0 表示被通知退出
+ */
+int acl_fiber_killed(ACL_FIBER *fiber);
 
 /**
  * 将当前运行的协程挂起，由调度器选择下一个需要运行的协程
@@ -76,13 +111,6 @@ void acl_fiber_ready(ACL_FIBER *fiber);
  * 将当前运行的协程挂起，同时执行等待队列下一个待运行的协程
  */
 void acl_fiber_switch(void);
-
-/**
- * 设置函数指针，被协程调度过程循环调用
- * @param loop_fn {void (*)(void*)} 非空时，在事件处理过程会循环调用此函
- * @param ctx {void*} fn 的回调参数
- */
-void acl_fiber_post_event(void (*loop_fn)(void *), void *ctx);
 
 /**
  * 调用本函数启动协程的调度过程
@@ -136,11 +164,14 @@ void acl_fiber_set_dns(const char* ip, int port);
 
 /**
  * 设定当前协程的局部变量
+ * @param key {int*} 协程局部变量的索引键的地址，初始时该值应 <= 0，内部会自动
+ *  分配一个 > 0 的索引键，并给该地址赋值，后面的协程可以复用该值设置各自的
+ *  局部变量，该指针必须非 NULL
  * @param ctx {void *} 协程局部变量
  * @param free_fn {void (*)(void*)} 当协程退出时会调用此函数释放协程局部变量
  * @return {int} 返回所设置的协程局部变量的键值，返回 -1 表示当前协程不存在
  */
-int acl_fiber_set_specific(void *ctx, void (*free_fn)(void *));
+int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void *));
 
 /**
  * 获得当前协程局部变量

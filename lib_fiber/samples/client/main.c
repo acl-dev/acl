@@ -18,12 +18,6 @@ static int __left_fibers  = 100;
 static int __read_data    = 0;
 static struct timeval __begin;
 
-static int __nloop = 0;
-static void loop_callback(void *ctx acl_unused)
-{
-	__nloop++;
-}
-
 static void echo_client(ACL_VSTREAM *cstream)
 {
 	char  buf[8192];
@@ -91,11 +85,10 @@ static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx)
 		spent = stamp_sub(&end, &__begin);
 
 		printf("fibers: %d, clients: %d, error: %d, count: %lld, "
-			"spent: %.2f, speed: %.2f, loop: %d\r\n",
+			"spent: %.2f, speed: %.2f\r\n",
 			__max_fibers, __total_clients, __total_error_clients,
 			__total_count, spent,
-			(__total_count * 1000) / (spent > 0 ? spent : 1),
-			__nloop);
+			(__total_count * 1000) / (spent > 0 ? spent : 1));
 
 		acl_fiber_schedule_stop();
 	}
@@ -168,7 +161,6 @@ int main(int argc, char *argv[])
 
 	printf("call fiber_schedule\r\n");
 
-	acl_fiber_post_event(loop_callback, NULL);
 	acl_fiber_schedule();
 
 	return 0;

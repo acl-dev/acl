@@ -18,6 +18,9 @@ protected:
 	void on_accept(acl::socket_stream& conn);
 
 	// @override
+	void proc_on_listen(acl::server_socket& ss);
+
+	// @override
 	void proc_pre_jail(void);
 
 	// @override

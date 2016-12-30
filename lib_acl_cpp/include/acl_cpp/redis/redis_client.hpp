@@ -54,6 +54,14 @@ public:
 	}
 
 	/**
+	 * 在进行每个命令处理前，是否要求检查 socket 句柄与地址的匹配情况，当
+	 * 打开该选项时，将会严格检查匹配情况，但会影响一定性能，因此该设置仅
+	 * 用在 DEBUG 时的运行场景
+	 * @param on {bool}
+	 */
+	void set_check_addr(bool on);
+
+	/**
 	 * 判断该网络连接对象是否已经关闭
 	 * check if the connection has been finish
 	 * @return {bool}
@@ -96,8 +104,8 @@ public:
 	void set_slice_respond(bool on);
 
 	/**
-	 * 用于非分片发送方式，向 redis-server 发送请求数据，同时读取并分析服务端
-	 * 返回的响应数据
+	 * 用于非分片发送方式，向 redis-server 发送请求数据，同时读取并分析
+	 * 服务端返回的响应数据
 	 * send request to redis-server, and read/anlyse response from server,
 	 * this function will be used for no-slice request mode.
 	 * @param pool {dbuf_pool*} 内存池管理器对象
@@ -107,8 +115,8 @@ public:
 	 * @param nchildren {size_t} 响应数据有几个数据对象
 	 *  the data object number in the server's response data
 	 * @return {const redis_result*} 读到的服务器响应对象，返回 NULL 则出错,
-	 *  该对象不必手工释放，因为其是在 pool 内存池对象上动态分配的，所以当释放 pool
-	 *  时该结果对象一同被释放
+	 *  该对象不必手工释放，因为其是在 pool 内存池对象上动态分配的，所以当
+	 *  释放 pool 时该结果对象一同被释放
 	 *  the result object from server's response, NULL will be returned
 	 *  when some error happens; the result object needn't be freed
 	 *  manually, which was created in the pool object, and will be freed
@@ -116,7 +124,7 @@ public:
 	 *  
 	 */
 	const redis_result* run(dbuf_pool* pool, const string& req,
-		size_t nchildren);
+		size_t nchildren, int* rw_timeout = NULL);
 
 	/**
 	 * 用于分片发送请求方式
@@ -125,7 +133,7 @@ public:
 	 *  request object
 	 */
 	const redis_result* run(dbuf_pool* pool, const redis_request& req,
-		size_t nchildren);
+		size_t nchildren, int* rw_timeout = NULL);
 
 protected:
 	// 基类虚函数
@@ -133,6 +141,7 @@ protected:
 
 private:
 	socket_stream conn_;
+	bool  check_addr_;
 	char* addr_;
 	char* pass_;
 	bool  retry_;
@@ -150,6 +159,7 @@ private:
 
 	void put_data(dbuf_pool* pool, redis_result* rr,
 		const char* data, size_t len);
+	bool check_connection(socket_stream& conn);
 };
 
 } // end namespace acl

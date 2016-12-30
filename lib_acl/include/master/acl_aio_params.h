@@ -34,7 +34,7 @@ extern int   acl_var_aio_max_threads;
 extern int   acl_var_aio_thread_idle_limit;
 
 #define	ACL_VAR_AIO_IDLE_LIMIT		"aio_idle_limit"
-#define	ACL_DEF_AIO_IDLE_LIMIT		180
+#define	ACL_DEF_AIO_IDLE_LIMIT		0
 extern int   acl_var_aio_idle_limit;
 
 #define	ACL_VAR_AIO_QUEUE_DIR		"aio_queue_dir"
@@ -70,7 +70,7 @@ extern char *acl_var_aio_event_mode;
 extern int   acl_var_aio_daemon_timeout;
 
 #define	ACL_VAR_AIO_USE_LIMIT		"aio_use_limit"
-#define	ACL_DEF_AIO_USE_LIMIT		10
+#define	ACL_DEF_AIO_USE_LIMIT		0
 extern int   acl_var_aio_use_limit;
 
 #define	ACL_VAR_AIO_MASTER_MAXPROC	"master_maxproc"
