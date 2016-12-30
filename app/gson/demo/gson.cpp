@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "struct.h"
+#include ".\struct.h"
 #include "gson.h"
 #include "acl_cpp/serialize/gson_helper.ipp"
 namespace acl
@@ -272,6 +272,21 @@ namespace acl
         else
             $node.add_child("base_map", acl::gson($json, $obj.base_map));
 
+        if (check_nullptr($obj.string_map))
+            $node.add_null("string_map");
+        else
+            $node.add_child("string_map", acl::gson($json, $obj.string_map));
+
+        if (check_nullptr($obj.int_map))
+            $node.add_null("int_map");
+        else
+            $node.add_child("int_map", acl::gson($json, $obj.int_map));
+
+        if (check_nullptr($obj.bool_map))
+            $node.add_null("bool_map");
+        else
+            $node.add_child("bool_map", acl::gson($json, $obj.bool_map));
+
         if (check_nullptr($obj.base_list_map))
             $node.add_null("base_list_map");
         else
@@ -318,6 +333,9 @@ namespace acl
         acl::json_node *bases_list_ptr = $node["bases_list_ptr"];
         acl::json_node *bases_ptr_list_ptr = $node["bases_ptr_list_ptr"];
         acl::json_node *base_map = $node["base_map"];
+        acl::json_node *string_map = $node["string_map"];
+        acl::json_node *int_map = $node["int_map"];
+        acl::json_node *bool_map = $node["bool_map"];
         acl::json_node *base_list_map = $node["base_list_map"];
         acl::json_node *vector_string = $node["vector_string"];
         acl::json_node *vector_list_base = $node["vector_list_base"];
@@ -341,6 +359,15 @@ namespace acl
      
         if(!base_map ||!base_map->get_obj()||!(result = gson(*base_map->get_obj(), &$obj.base_map), result.first))
             return std::make_pair(false, "required [hello::world.base_map] failed:{"+result.second+"}");
+     
+        if(!string_map ||!string_map->get_obj()||!(result = gson(*string_map->get_obj(), &$obj.string_map), result.first))
+            return std::make_pair(false, "required [hello::world.string_map] failed:{"+result.second+"}");
+     
+        if(!int_map ||!int_map->get_obj()||!(result = gson(*int_map->get_obj(), &$obj.int_map), result.first))
+            return std::make_pair(false, "required [hello::world.int_map] failed:{"+result.second+"}");
+     
+        if(!bool_map ||!bool_map->get_obj()||!(result = gson(*bool_map->get_obj(), &$obj.bool_map), result.first))
+            return std::make_pair(false, "required [hello::world.bool_map] failed:{"+result.second+"}");
      
         if(!base_list_map ||!base_list_map->get_obj()||!(result = gson(*base_list_map->get_obj(), &$obj.base_list_map), result.first))
             return std::make_pair(false, "required [hello::world.base_list_map] failed:{"+result.second+"}");
@@ -398,6 +425,21 @@ namespace acl
         else
             $node.add_child("base_map", acl::gson($json, $obj.base_map));
 
+        if (check_nullptr($obj.string_map))
+            $node.add_null("string_map");
+        else
+            $node.add_child("string_map", acl::gson($json, $obj.string_map));
+
+        if (check_nullptr($obj.int_map))
+            $node.add_null("int_map");
+        else
+            $node.add_child("int_map", acl::gson($json, $obj.int_map));
+
+        if (check_nullptr($obj.bool_map))
+            $node.add_null("bool_map");
+        else
+            $node.add_child("bool_map", acl::gson($json, $obj.bool_map));
+
         if (check_nullptr($obj.base_list_map))
             $node.add_null("base_list_map");
         else
@@ -439,6 +481,9 @@ namespace acl
         acl::json_node *bases_list_ptr = $node["bases_list_ptr"];
         acl::json_node *bases_ptr_list_ptr = $node["bases_ptr_list_ptr"];
         acl::json_node *base_map = $node["base_map"];
+        acl::json_node *string_map = $node["string_map"];
+        acl::json_node *int_map = $node["int_map"];
+        acl::json_node *bool_map = $node["bool_map"];
         acl::json_node *base_list_map = $node["base_list_map"];
         acl::json_node *vector_string = $node["vector_string"];
         acl::json_node *vector_list_base = $node["vector_list_base"];
@@ -461,6 +506,15 @@ namespace acl
      
         if(!base_map ||!base_map->get_obj()||!(result = gson(*base_map->get_obj(), &$obj.base_map), result.first))
             return std::make_pair(false, "required [list1.base_map] failed:{"+result.second+"}");
+     
+        if(!string_map ||!string_map->get_obj()||!(result = gson(*string_map->get_obj(), &$obj.string_map), result.first))
+            return std::make_pair(false, "required [list1.string_map] failed:{"+result.second+"}");
+     
+        if(!int_map ||!int_map->get_obj()||!(result = gson(*int_map->get_obj(), &$obj.int_map), result.first))
+            return std::make_pair(false, "required [list1.int_map] failed:{"+result.second+"}");
+     
+        if(!bool_map ||!bool_map->get_obj()||!(result = gson(*bool_map->get_obj(), &$obj.bool_map), result.first))
+            return std::make_pair(false, "required [list1.bool_map] failed:{"+result.second+"}");
      
         if(!base_list_map ||!base_list_map->get_obj()||!(result = gson(*base_list_map->get_obj(), &$obj.base_list_map), result.first))
             return std::make_pair(false, "required [list1.base_list_map] failed:{"+result.second+"}");
