@@ -480,8 +480,7 @@ static inline gson(acl::json &json, const std::map<K, V> &objects)
 			node.add_child(json.create_node().add_null(tag));
 		else
 		{
-			acl::json_node &item = gson(json, itr->second);
-			node.add_child(json.create_node().add_child(tag, item));
+			node.add_child(json.create_node().add_number(tag, get_value(itr->second)));
 		}
 	}
 
@@ -502,8 +501,7 @@ static inline gson(acl::json &json, const std::map<K, V> *objects)
 			node.add_child(json.create_node().add_null(tag));
 		else
 		{
-			acl::json_node &item = gson(json, itr->second);
-			node.add_child(json.create_node().add_child(tag, item));
+			node.add_child(json.create_node().add_number(tag, get_value(itr->second)));
 		}
 	}
 
@@ -524,8 +522,7 @@ static inline gson(acl::json &json, const std::map<K, V> &objects)
 			node.add_child(json.create_node().add_null(tag));
 		else
 		{
-			acl::json_node &item = gson(json, itr->second);
-			node.add_child(json.create_node().add_child(tag, item));
+			node.add_child(json.create_node().add_double(tag, get_value(itr->second)));
 		}
 	}
 
@@ -545,8 +542,7 @@ static inline gson(acl::json &json, const std::map<K, V> *objects)
 			node.add_child(json.create_node().add_null(tag));
 		else
 		{
-			acl::json_node &item = gson(json, itr->second);
-			node.add_child(json.create_node().add_child(tag, item));
+			node.add_child(json.create_node().add_double(tag, get_value(itr->second)));
 		}
 	}
 
@@ -559,7 +555,7 @@ typename enable_if<is_bool<V>::value, acl::json_node &>::type
 static inline gson(acl::json &json, const std::map<K, V> &objects)
 {
 	acl::json_node &node = json.create_array();
-	for (typename std::map<K, V>::const_iterator itr = objects;
+	for (typename std::map<K, V>::const_iterator itr = objects.begin();
 		itr != objects.end(); ++itr)
 	{
 		const char *tag = get_value(itr->first);
@@ -567,8 +563,7 @@ static inline gson(acl::json &json, const std::map<K, V> &objects)
 			node.add_child(json.create_node().add_null(tag));
 		else
 		{
-			acl::json_node &item = gson(json, itr->second);
-			node.add_child(json.create_node().add_child(tag, item));
+			node.add_child(json.create_node().add_bool(tag, itr->second));
 		}
 	}
 
@@ -589,8 +584,7 @@ static inline gson(acl::json &json, const std::map<K, V> & objects)
 			node.add_child(json.create_node().add_null(tag));
 		else
 		{
-			acl::json_node &item = gson(json, itr->second);
-			node.add_child(json.create_node().add_child(tag, item));
+			node.add_child(json.create_node().add_text(tag, get_value(itr->second)));
 		}
 	}
 
