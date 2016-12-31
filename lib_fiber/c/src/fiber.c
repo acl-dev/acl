@@ -216,20 +216,29 @@ void *realloc(void *ptr, size_t size)
 
 void acl_fiber_set_errno(ACL_FIBER *fiber, int errnum)
 {
-	fiber->errnum = errnum;
+	if (fiber == NULL)
+		fiber = acl_fiber_running();
+	if (fiber)
+		fiber->errnum = errnum;
 }
 
 int acl_fiber_errno(ACL_FIBER *fiber)
 {
-	return fiber->errnum;
+	if (fiber == NULL)
+		fiber = acl_fiber_running();
+	return fiber ? fiber->errnum : 0;
 }
 
 void acl_fiber_keep_errno(ACL_FIBER *fiber, int yesno)
 {
-	if (yesno)
-		fiber->flag |= FIBER_F_SAVE_ERRNO;
-	else
-		fiber->flag &= ~FIBER_F_SAVE_ERRNO;
+	if (fiber == NULL)
+		fiber = acl_fiber_running();
+	if (fiber) {
+		if (yesno)
+			fiber->flag |= FIBER_F_SAVE_ERRNO;
+		else
+			fiber->flag &= ~FIBER_F_SAVE_ERRNO;
+	}
 }
 
 void fiber_save_errno(void)
@@ -408,6 +417,18 @@ ACL_FIBER *acl_fiber_running(void)
 
 void acl_fiber_kill(ACL_FIBER *fiber)
 {
+	acl_fiber_signal(fiber, SIGKILL);
+}
+
+int acl_fiber_killed(ACL_FIBER *fiber)
+{
+	if (fiber)
+		fiber = acl_fiber_running();
+	return fiber && (fiber->flag & FIBER_F_KILLED);
+}
+
+void acl_fiber_signal(ACL_FIBER *fiber, int signum)
+{
 	ACL_FIBER *curr = __thread_fiber->running;
 
 	if (fiber == NULL) {
@@ -422,7 +443,9 @@ void acl_fiber_kill(ACL_FIBER *fiber)
 		return;
 	}
 
-	fiber->flag |= FIBER_F_KILLED;
+	if (signum == SIGKILL || signum == SIGTERM || signum == SIGQUIT)
+		fiber->flag |= FIBER_F_KILLED;
+	fiber->signum = signum;
 
 	if (fiber == curr) // just return if kill myself
 		return;
@@ -433,9 +456,11 @@ void acl_fiber_kill(ACL_FIBER *fiber)
 	acl_fiber_yield();
 }
 
-int acl_fiber_killed(ACL_FIBER *fiber)
+int acl_fiber_signum(ACL_FIBER *fiber)
 {
-	return fiber->flag & FIBER_F_KILLED;
+	if (fiber)
+		fiber = acl_fiber_running();
+	return fiber ? fiber->signum : 0;
 }
 
 void fiber_exit(int exit_code)
@@ -555,6 +580,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 		size = fiber->size;
 
 	fiber->errnum = 0;
+	fiber->signum = 0;
 	fiber->fn     = fn;
 	fiber->arg    = arg;
 	fiber->size   = size;
@@ -629,7 +655,9 @@ int acl_fiber_self(void)
 
 int acl_fiber_status(const ACL_FIBER *fiber)
 {
-	return fiber->status;
+	if (fiber == NULL)
+		fiber = acl_fiber_running();
+	return fiber ? fiber->status : 0;
 }
 
 static void fiber_init(void) __attribute__ ((constructor));

@@ -27,6 +27,7 @@ struct ACL_FIBER {
 	acl_int64      when;
 	int            errnum;
 	int            sys;
+	int            signum;
 	unsigned int   flag;
 #define FIBER_F_SAVE_ERRNO	(unsigned) 1 << 0
 #define	FIBER_F_KILLED		(unsigned) 1 << 1

@@ -1,3 +1,6 @@
+37) 2016.12.31
+37.1) feature: 增加 acl_fiber_signal 函数，允许协程给其它协程发送唤醒信号
+
 36) 2016.12.27
 36.1) bugfix: fiber.cpp 中 kill 方法需将 f_ 成员置 NULL，防止嵌套访问非法地址
 36.2) feature: fiber.cpp 允许将当前运行的协程与 fiber 类对象绑定(只需在构造
