@@ -34,7 +34,7 @@ protected:
 private:
 };
 
-int main(int argc, char* argv[])
+int main(void)
 {
 	test_snprintf();
 #ifdef WIN32
