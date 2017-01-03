@@ -849,6 +849,16 @@ bool gsoner::check_function()
 {
 	if (status_ != e_struct_begin)
 		return false;
+	
+	auto function_begin = pos_;
+	while (function_begin > 1 &&
+		(codes_[function_begin-1] == '\r' ||
+		codes_[function_begin-1] == '\n'||
+		codes_[function_begin-1] == '\t'||
+		codes_[function_begin-1] == ' '))
+	{
+		function_begin --;
+	}
 
 	std::pair<bool, std::string> res = get_function_declare();
 	if (res.first == false)
@@ -868,7 +878,16 @@ bool gsoner::check_function()
 			throw syntax_error();
 		//what to do with this code.
 	}
-
+	if (codes_[pos_] == 'c' &&
+		codes_[pos_+1] == 'o'&&
+		codes_[pos_+2] == 'n'&&
+		codes_[pos_+3] == 's'&&
+		codes_[pos_+4] == 't')
+	{
+		pos_ += 5;
+		res.second.append(" const");
+		skip_space_comment();
+	}
 	pos_++;
 	int sym = 1;
 	std::string lines("{");
@@ -904,9 +923,10 @@ bool gsoner::check_function()
 		lines.push_back(codes_[pos_]);
 		pos_++;
 	}
-	std::cout << "find function:" << std::endl;
-	std::cout << res.second << std::endl;
-	std::cout << lines << std::endl;
+	auto function_end = pos_;
+
+	std::cout <<current_obj_.name_ << std::endl;
+	std::cout << codes_.substr(function_begin, function_end - function_begin) << std::endl;
 	return true;
 }
 
@@ -942,7 +962,8 @@ bool gsoner::check_member()
 		lines.push_back(codes_[pos_]);
 		pos_++;
 	}
-
+	std::cout << current_obj_.name_ << "     ";
+	std::cout << lines << std::endl;
 	//skip ;
 	pos_++;
 
