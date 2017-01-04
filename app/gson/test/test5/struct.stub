@@ -34,17 +34,21 @@ struct user
 		male = v;
 		return *this;
 	}
-	const char* get_name(void)
-	{
-		return name.c_str();
-	}
 
-	/*
 	const char* get_name(void) const
 	{
 		return name.c_str();
 	}
-	*/
+
+	bool is_male(void) const
+	{
+		return male;
+	}
+
+	int get_age(void) const
+	{
+		return age;
+	}
 
 	//Gson@skip
 	acl::string nick;
