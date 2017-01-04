@@ -250,24 +250,31 @@ gsoner::function_code_t gsoner::gen_pack_code(const object_t &obj)
 std::string gsoner::get_unpack_code(const std::string &obj_name,
 	const field_t &field)
 {
-	if((field.type_ == field_t::e_bool ||
+	if (field.type_ == field_t::e_bool ||
 		field.type_ == field_t::e_bool_ptr ||
 		field.type_ == field_t::e_number ||
 		field.type_ == field_t::e_ccstr ||
 		field.type_ == field_t::e_cstr ||
 		field.type_ == field_t::e_double ||
-		field.type_ == field_t::e_string) &&
-		field.required_)
-
-		return tab_
-			+ "if(!" + field.name_ + " ||"
-			+ "!(result = gson(*" + field.name_ + ", &$obj."
-			+ field.name_ + "), result.first))\n" + tab_ + tab_
-			+ "return std::make_pair(false, \"required ["
-			+ obj_name + "." + field.name_
-			+ "] failed:{\"+result.second+\"}\");";
-
-	else if(field.required_)
+		field.type_ == field_t::e_string)
+	{
+		if (field.required_)
+		{
+			return tab_
+				+ "if(!" + field.name_ + " ||"
+				+ "!(result = gson(*" + field.name_ + ", &$obj."
+				+ field.name_ + "), result.first))\n" + tab_ + tab_
+				+ "return std::make_pair(false, \"required ["
+				+ obj_name + "." + field.name_
+				+ "] failed:{\"+result.second+\"}\");";
+		}
+		else
+			return tab_ +
+				"if(" + field.name_ + ")\n" + tab_ + tab_ +
+				"gson(*" + field.name_ + ", &$obj." + field.name_ + ");";
+	}
+	if (field.required_)
+	{
 		return tab_
 			+ "if(!" + field.name_ + " ||" + "!" + field.name_
 			+ "->get_obj()||" + "!(result = gson(*" + field.name_
@@ -275,28 +282,12 @@ std::string gsoner::get_unpack_code(const std::string &obj_name,
 			+ tab_ + tab_ + "return std::make_pair(false, \"required ["
 			+ obj_name + "." + field.name_
 			+ "] failed:{\"+result.second+\"}\");";
-
-	else if((field.type_ == field_t::e_bool ||
-		field.type_ == field_t::e_bool_ptr ||
-		field.type_ == field_t::e_ccstr ||
-		field.type_ == field_t::e_cstr ||
-		field.type_ == field_t::e_double ||
-		field.type_ == field_t::e_string) &&
-		field.required_ == false)
-
-		return tab_ +
-			"if(" + field.name_ + ")\n" + tab_ + tab_ +
-			"gson(*" + field.name_ + ", &$obj." + field.name_ + ");";
-
-	else if(field.required_ == false)
-		return tab_
-			+ "if(" + field.name_ + "&& " + field.name_
-			+ "->get_obj())\n" + tab_ + tab_ + " gson(*" + field.name_
-			+ "->get_obj(), &$obj." + field.name_ + ");";
-
-	return "unknown_type";
+	}
+	return tab_
+		+ "if(" + field.name_ + "&& " + field.name_
+		+ "->get_obj())\n" + tab_ + tab_ + " gson(*" + field.name_
+		+ "->get_obj(), &$obj." + field.name_ + ");";
 }
-
 std::string gsoner::get_node_name(const std::string &name)
 {
 	return std::string(tab_ + "acl::json_node *")

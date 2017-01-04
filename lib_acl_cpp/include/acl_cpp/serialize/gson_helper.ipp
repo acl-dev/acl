@@ -751,7 +751,7 @@ static inline std::pair<bool, std::string>
 {
 	if (node.is_string() == false)
 		return std::make_pair(false, "get string failed");
-
+	obj->clear();
 	obj->append(node.get_string());
 	return std::make_pair(true, "");
 }
@@ -774,7 +774,7 @@ static inline std::pair<bool, std::string>
 {
 	if (node.is_string() == false)
 		return std::make_pair(false, "get string failed");
-
+	obj->clear();
 	obj->append(node.get_string());
 	return std::make_pair(true, "");
 }
