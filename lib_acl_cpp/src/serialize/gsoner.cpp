@@ -233,6 +233,12 @@ gsoner::function_code_t gsoner::gen_pack_code(const object_t &obj)
 	}
 
 	str += "\n";
+
+	if (obj.fields_.empty())
+	{
+		str += tab_;
+		str += "(void) $obj;\n";
+	}
 	str += tab_;
 	str += "return $node;\n}";
 
@@ -328,6 +334,11 @@ gsoner::function_code_t gsoner::gen_unpack_code(const object_t &obj)
 	{
 		code.definition_ += *itr;
 		code.definition_ += "\n \n";
+	}
+	if (unpack_codes.empty())
+	{
+		code.definition_ += tab_ + "(void) $node;\n";
+		code.definition_ += tab_ + "(void) $obj;\n";
 	}
 	code.definition_ += tab_ + "return std::make_pair(true,\"\");\n}\n\n";
 
@@ -619,11 +630,12 @@ bool gsoner::check_comment()
 	if (commemt.find("Gson@rename:") != std::string::npos)
 	{
 		std::size_t pos = commemt.find("Gson@rename:") + strlen("Gson@rename:");
-		newname_ = commemt.substr( pos ,commemt.size() - pos);
-		if (newname_.back() == '\n')
-			newname_.pop_back();
-		if (newname_.back() == '\r')
-			newname_.pop_back();
+		std::size_t n = 0;
+		if (commemt[commemt.size() - 1] == '\n')
+			n++;
+		if (commemt[commemt.size() - 2] == '\r')
+			n++;
+		newname_ = commemt.substr( pos ,commemt.size() - pos - n);
 		if (newname_.empty())
 		{
 			std::cout << "Gson@rename:{} error, new name empty" << std::endl;
@@ -850,7 +862,7 @@ bool gsoner::check_function()
 	if (status_ != e_struct_begin)
 		return false;
 	
-	auto function_begin = pos_;
+	int function_begin = pos_;
 	while (function_begin > 1 &&
 		(codes_[function_begin-1] == '\r' ||
 		codes_[function_begin-1] == '\n'||
@@ -923,7 +935,7 @@ bool gsoner::check_function()
 		lines.push_back(codes_[pos_]);
 		pos_++;
 	}
-	auto function_end = pos_;
+	int function_end = pos_;
 
 	std::cout <<current_obj_.name_ << std::endl;
 	std::cout << codes_.substr(function_begin, function_end - function_begin) << std::endl;
