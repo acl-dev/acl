@@ -88,7 +88,6 @@ void fiber::fiber_callback(ACL_FIBER *f, void *ctx)
 {
 	fiber* me = (fiber *) ctx;
 	me->f_ = f;
-
 	me->run();
 }
 
@@ -96,17 +95,19 @@ bool fiber::kill(void)
 {
 	if (f_ == NULL)
 		return false;
-	ACL_FIBER* fb = f_;
-	f_ = NULL;
-	acl_fiber_kill(fb);
+	else if (acl_fiber_killed(f_))
+		return true;
+	acl_fiber_kill(f_);
 	return true;
 }
 
 bool fiber::killed(void) const
 {
-	if (f_ == NULL)
-		return true;
-	return acl_fiber_killed(f_) != 0;
+	if (f_ != NULL)
+		return acl_fiber_killed(f_) != 0;
+
+	acl_msg_error("%s(%d), %s: f_ NULL", __FILE__, __LINE__, __FUNCTION__);
+	return true;
 }
 
 bool fiber::self_killed(void)

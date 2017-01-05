@@ -381,7 +381,7 @@ void acl_fiber_kill(ACL_FIBER *fiber)
 
 int acl_fiber_killed(ACL_FIBER *fiber)
 {
-	if (fiber)
+	if (!fiber)
 		fiber = acl_fiber_running();
 	return fiber && (fiber->flag & FIBER_F_KILLED);
 }

@@ -1,3 +1,6 @@
+38) 2017.1.5
+38.1) bugfix: fiber.c 中函数 acl_fiber_killed 中的判断有误
+
 37) 2016.12.31
 37.1) feature: 增加 acl_fiber_signal 函数，允许协程给其它协程发送唤醒信号
 
