@@ -299,10 +299,10 @@ typedef struct ACL_FIBER_SEM ACL_FIBER_SEM;
 
 /**
  * 创建协程信号量
- * @param max {int} 信号量最大值（必须 > 0）
+ * @param num {int} 信号量初始值（必须 >= 0）
  * @return {ACL_FIBER_SEM *}
  */
-ACL_FIBER_SEM *acl_fiber_sem_create(int max);
+ACL_FIBER_SEM *acl_fiber_sem_create(int num);
 
 /**
  * 释放协程信号量

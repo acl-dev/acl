@@ -32,9 +32,11 @@ struct FILE_EVENT {
 	int mask_fired;
 	event_proc   *r_proc;
 	event_proc   *w_proc;
+	void         *r_ctx;
+	void         *w_ctx;
 	POLL_EVENT   *pe;
-	void         *ctx;
-	DEFER_DELETE *defer;
+	DEFER_DELETE *r_defer;
+	DEFER_DELETE *w_defer;
 };
 
 struct POLL_EVENT {
@@ -80,20 +82,22 @@ struct DEFER_DELETE {
 };
 
 struct EVENT {
+	int   timeout;
 	int   setsize;
 	int   maxfd;
-	int   ndefer;
-	int   timeout;
+	int   r_ndefer;
+	int   w_ndefer;
 	FILE_EVENT   *events;
 	FIRED_EVENT  *fired;
-	DEFER_DELETE *defers;
+	DEFER_DELETE *r_defers;
+	DEFER_DELETE *w_defers;
 	ACL_RING poll_list;
 	ACL_RING epoll_list;
 	ACL_RING_ITER iter;
 
 	const char *(*name)(void);
 	int  (*handle)(EVENT *);
-	int  (*loop)(EVENT *, int timeout);
+	int  (*loop)(EVENT *, int);
 	int  (*add)(EVENT *, int, int);
 	int  (*del)(EVENT *, int, int);
 	void (*free)(EVENT *);

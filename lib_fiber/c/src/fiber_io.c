@@ -5,7 +5,6 @@
 
 typedef struct {
 	EVENT     *event;
-	ACL_FIBER **io_fibers;
 	size_t      io_count;
 	ACL_FIBER  *ev_fiber;
 	ACL_RING    ev_timer;
@@ -50,8 +49,6 @@ static void thread_free(void *ctx)
 
 	if (tf->event)
 		event_free(tf->event);
-	if (tf->io_fibers)
-		acl_myfree(tf->io_fibers);
 	acl_myfree(tf);
 
 	if (__main_fiber == __thread_fiber)
@@ -89,8 +86,6 @@ void fiber_io_check(void)
 
 	__thread_fiber = (FIBER_TLS *) acl_mymalloc(sizeof(FIBER_TLS));
 	__thread_fiber->event = event_create(__maxfd);
-	__thread_fiber->io_fibers = (ACL_FIBER **)
-		acl_mycalloc(__maxfd, sizeof(ACL_FIBER *));
 	__thread_fiber->ev_fiber = acl_fiber_create(fiber_io_loop,
 			__thread_fiber->event, STACK_SIZE);
 	__thread_fiber->io_count = 0;
@@ -305,53 +300,61 @@ unsigned int acl_fiber_sleep(unsigned int seconds)
 	return acl_fiber_delay(seconds * 1000) / 1000;
 }
 
-static void read_callback(EVENT *ev, int fd, void *ctx acl_unused, int mask)
+static void read_callback(EVENT *ev, int fd, void *ctx, int mask)
 {
+	ACL_FIBER *me = (ACL_FIBER *) ctx;
+
 	event_del(ev, fd, mask);
-	acl_fiber_ready(__thread_fiber->io_fibers[fd]);
+	acl_fiber_ready(me);
 
 	__thread_fiber->io_count--;
-	__thread_fiber->io_fibers[fd] = NULL;
 }
 
 void fiber_wait_read(int fd)
 {
+	ACL_FIBER *me;
+
 	fiber_io_check();
 
+	me = acl_fiber_running();
+
 	if (event_add(__thread_fiber->event,
-		fd, EVENT_READABLE, read_callback, NULL) <= 0)
+		fd, EVENT_READABLE, read_callback, me) <= 0)
 	{
 		//acl_msg_info(">>>%s(%d): fd: %d, not sock<<<",
 		//	__FUNCTION__, __LINE__, fd);
 		return;
 	}
 
-	__thread_fiber->io_fibers[fd] = acl_fiber_running();
 	__thread_fiber->io_count++;
 
 	acl_fiber_switch();
 }
 
-static void write_callback(EVENT *ev, int fd, void *ctx acl_unused, int mask)
+static void write_callback(EVENT *ev, int fd, void *ctx, int mask)
 {
+	ACL_FIBER *me = (ACL_FIBER *) ctx;
+
 	event_del(ev, fd, mask);
-	acl_fiber_ready(__thread_fiber->io_fibers[fd]);
+	acl_fiber_ready(me);
 
 	__thread_fiber->io_count--;
-	__thread_fiber->io_fibers[fd] = NULL;
 }
 
 void fiber_wait_write(int fd)
 {
+	ACL_FIBER *me;
+
 	fiber_io_check();
 
+	me = acl_fiber_running();
+
 	if (event_add(__thread_fiber->event, fd,
-		EVENT_WRITABLE, write_callback, NULL) <= 0)
+		EVENT_WRITABLE, write_callback, me) <= 0)
 	{
 		return;
 	}
 
-	__thread_fiber->io_fibers[fd] = acl_fiber_running();
 	__thread_fiber->io_count++;
 
 	acl_fiber_switch();
