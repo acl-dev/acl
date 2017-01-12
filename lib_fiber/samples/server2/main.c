@@ -50,7 +50,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 
 	while (1) {
 		if (__rw_timeout > 0) {
-			ret = check_read(*cfd, 10000);
+			ret = check_read(*cfd, 1000000);
 			if (ret < 0)
 				break;
 			if (ret == 0)

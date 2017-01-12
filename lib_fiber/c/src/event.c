@@ -10,18 +10,28 @@
 #include "event_epoll.h"
 #include "event.h"
 
+//#define DEBUG
+
+#ifdef DEBUG
+# define ASSERT assert
+#else
+# define ASSERT (void)
+#endif
+
 EVENT *event_create(int size)
 {
 	int i;
 	EVENT *ev   = event_epoll_create(size);
 
-	ev->events  = (FILE_EVENT *) acl_mycalloc(size, sizeof(FILE_EVENT));
-	ev->defers  = (DEFER_DELETE *) acl_mycalloc(size, sizeof(FILE_EVENT));
-	ev->fired   = (FIRED_EVENT *) acl_mycalloc(size, sizeof(FIRED_EVENT));
-	ev->setsize = size;
-	ev->maxfd   = -1;
-	ev->ndefer  = 0;
-	ev->timeout = -1;
+	ev->events   = (FILE_EVENT *) acl_mycalloc(size, sizeof(FILE_EVENT));
+	ev->r_defers = (DEFER_DELETE *) acl_mycalloc(size, sizeof(FILE_EVENT));
+	ev->w_defers = (DEFER_DELETE *) acl_mycalloc(size, sizeof(FILE_EVENT));
+	ev->fired    = (FIRED_EVENT *) acl_mycalloc(size, sizeof(FIRED_EVENT));
+	ev->timeout  = -1;
+	ev->setsize  = size;
+	ev->maxfd    = -1;
+	ev->r_ndefer = 0;
+	ev->w_ndefer = 0;
 	acl_ring_init(&ev->poll_list);
 	acl_ring_init(&ev->epoll_list);
 
@@ -29,9 +39,10 @@ EVENT *event_create(int size)
 	 * vector with it.
 	 */
 	for (i = 0; i < size; i++) {
-		ev->events[i].mask        = EVENT_NONE;
-		ev->events[i].mask_fired  = EVENT_NONE;
-		ev->events[i].defer       = NULL;
+		ev->events[i].mask       = EVENT_NONE;
+		ev->events[i].mask_fired = EVENT_NONE;
+		ev->events[i].r_defer    = NULL;
+		ev->events[i].w_defer    = NULL;
 	}
 
 	return ev;
@@ -55,14 +66,16 @@ int event_size(EVENT *ev)
 
 void event_free(EVENT *ev)
 {
-	FILE_EVENT *events   = ev->events;
-	DEFER_DELETE *defers = ev->defers;
-	FIRED_EVENT *fired   = ev->fired;
+	FILE_EVENT   *events   = ev->events;
+	FIRED_EVENT  *fired    = ev->fired;
+	DEFER_DELETE *r_defers = ev->r_defers;
+	DEFER_DELETE *w_defers = ev->w_defers;
 
 	ev->free(ev);
 
 	acl_myfree(events);
-	acl_myfree(defers);
+	acl_myfree(r_defers);
+	acl_myfree(w_defers);
 	acl_myfree(fired);
 }
 
@@ -101,9 +114,86 @@ static int check_fdtype(int fd)
 	return -1;
 }
 
+#define DEL_DELAY
+
+#ifdef DEL_DELAY
+static int event_defer_r_merge(EVENT *ev, int fd, int mask)
+{
+	FILE_EVENT *fe = &ev->events[fd];
+	int fd2, pos = fe->r_defer->pos;
+	int to_mask = mask | (fe->mask & ~(ev->r_defers[pos].mask));
+
+	ASSERT(to_mask != 0);
+
+	ev->r_ndefer--;
+	ASSERT(ev->r_ndefer >= 0);
+
+	fd2 = ev->r_defers[ev->r_ndefer].fd;
+
+	if (ev->r_ndefer > 0) {
+		ev->r_defers[pos].mask  = ev->r_defers[ev->r_ndefer].mask;
+		ev->r_defers[pos].pos   = pos;
+		ev->r_defers[pos].fd    = fd2;
+
+		ev->events[fd2].r_defer = &ev->r_defers[pos];
+	} else {
+		if (fd2 >= 0)
+			ev->events[fd2].r_defer = NULL;
+		ev->r_defers[0].mask = EVENT_NONE;
+		ev->r_defers[0].pos  = 0;
+	}
+
+	if (ev->add(ev, fd, to_mask) == -1) {
+		acl_msg_error("mod fd(%d) error: %s", fd, acl_last_serror());
+		return -1;
+	}
+
+	ev->r_defers[ev->r_ndefer].fd  = -1;
+	fe->r_defer = NULL;
+	fe->mask    = to_mask;
+	return 0;
+}
+
+static int event_defer_w_merge(EVENT *ev, int fd, int mask)
+{
+	FILE_EVENT *fe = &ev->events[fd];
+	int fd2, pos = fe->w_defer->pos;
+	int to_mask = mask | (fe->mask & ~(ev->w_defers[pos].mask));
+
+	ASSERT(to_mask != 0);
+
+	ev->w_ndefer--;
+	fd2 = ev->w_defers[ev->w_ndefer].fd;
+
+	if (ev->w_ndefer > 0) {
+		ev->w_defers[pos].mask  = ev->w_defers[ev->w_ndefer].mask;
+		ev->w_defers[pos].pos   = pos;
+		ev->w_defers[pos].fd    = fd2;
+
+		ev->events[fd2].w_defer = &ev->w_defers[pos];
+	} else {
+		if (fd2 >= 0)
+			ev->events[fd2].w_defer = NULL;
+		ev->w_defers[0].mask = EVENT_NONE;
+		ev->w_defers[0].pos  = 0;
+	}
+
+	if (ev->add(ev, fd, to_mask) == -1) {
+		acl_msg_error("mod fd(%d) error: %s", fd, acl_last_serror());
+		return -1;
+	}
+
+	ev->w_defers[ev->w_ndefer].fd  = -1;
+	fe->w_defer = NULL;
+	fe->mask    = to_mask;
+	return 0;
+}
+#endif /* !DEL_DELAY */
+
 int event_add(EVENT *ev, int fd, int mask, event_proc *proc, void *ctx)
 {
 	FILE_EVENT *fe;
+	int nmerged = 0;
 
 	if (fd >= ev->setsize) {
 		acl_msg_error("fd: %d >= setsize: %d", fd, ev->setsize);
@@ -113,48 +203,34 @@ int event_add(EVENT *ev, int fd, int mask, event_proc *proc, void *ctx)
 
 	fe = &ev->events[fd];
 
-	if (fe->defer != NULL) {
-		int fd2, pos = fe->defer->pos;
-		int to_mask = mask | (fe->mask & ~(ev->defers[pos].mask));
-
-		assert(to_mask != 0);
-
-		ev->ndefer--;
-		fd2 = ev->defers[ev->ndefer].fd;
-
-		if (ev->ndefer > 0) {
-			ev->defers[pos].mask  = ev->defers[ev->ndefer].mask;
-			ev->defers[pos].pos   = pos;
-			ev->defers[pos].fd    = fd2;
-
-			ev->events[fd2].defer = &ev->defers[pos];
-		} else {
-			if (fd2 >= 0)
-				ev->events[fd2].defer = NULL;
-			ev->defers[0].mask = EVENT_NONE;
-			ev->defers[0].pos  = 0;
-		}
-
-		if (ev->add(ev, fd, to_mask) == -1) {
-			acl_msg_error("mod fd(%d) error: %s",
-				fd, acl_last_serror());
-			return -1;
-		}
-
-		ev->defers[ev->ndefer].fd  = -1;
-		fe->defer = NULL;
-		fe->mask  = to_mask;
-	} else {
-		if (fe->type == TYPE_NONE) {
-			if (check_fdtype(fd) < 0) {
-				fe->type = TYPE_NOSOCK;
-				return 0;
-			}
-
+	if (fe->type == TYPE_NOSOCK)
+		return 0;
+	else if (fe->type == TYPE_NONE) {
+		if (check_fdtype(fd) == 0)
 			fe->type = TYPE_SOCK;
-		} else if (fe->type == TYPE_NOSOCK)
+		else {
+			fe->type = TYPE_NOSOCK;
 			return 0;
+		}
+	}
 
+#ifdef	DEL_DELAY
+	if ((mask & EVENT_READABLE) && fe->r_defer != NULL) {
+		if (event_defer_r_merge(ev, fd, mask) < 0)
+			return -1;
+		else
+			nmerged++;
+	}
+
+	if ((mask & EVENT_WRITABLE) && fe->w_defer != NULL) {
+		if (event_defer_w_merge(ev, fd, mask) < 0)
+			return -1;
+		else
+			nmerged++;
+	}
+#endif
+
+	if (nmerged == 0) {
 		if (ev->add(ev, fd, mask) == -1) {
 			acl_msg_error("add fd(%d) error: %s",
 				fd, acl_last_serror());
@@ -164,12 +240,15 @@ int event_add(EVENT *ev, int fd, int mask, event_proc *proc, void *ctx)
 		fe->mask |= mask;
 	}
 
-	if (mask & EVENT_READABLE)
+	if (mask & EVENT_READABLE) {
 		fe->r_proc = proc;
-	if (mask & EVENT_WRITABLE)
-		fe->w_proc = proc;
+		fe->r_ctx  = ctx;
+	}
 
-	fe->ctx = ctx;
+	if (mask & EVENT_WRITABLE) {
+		fe->w_proc = proc;
+		fe->w_ctx  = ctx;
+	}
 
 	if (fd > ev->maxfd)
 		ev->maxfd = fd;
@@ -190,18 +269,17 @@ static void __event_del(EVENT *ev, int fd, int mask)
 	fe = &ev->events[fd];
 
 	if (fe->mask == EVENT_NONE) {
-		/* acl_msg_info("----mask NONE, fd: %d----", fd); */
 		fe->mask_fired = EVENT_NONE;
-		fe->defer      = NULL;
+		fe->r_defer    = NULL;
+		fe->w_defer    = NULL;
 		fe->pe         = NULL;
 	} else if (ev->del(ev, fd, mask) == 1) {
 		fe->mask_fired = EVENT_NONE;
 		fe->type       = TYPE_NONE;
-		fe->defer      = NULL;
 		fe->pe         = NULL;
-		fe->mask = fe->mask & (~mask);
+		fe->mask       = fe->mask & (~mask);
 	} else
-		fe->mask = fe->mask & (~mask);
+		fe->mask       = fe->mask & (~mask);
 
 	if (fd == ev->maxfd && fe->mask == EVENT_NONE) {
 		/* Update the max fd */
@@ -214,68 +292,130 @@ static void __event_del(EVENT *ev, int fd, int mask)
 	}
 }
 
-#define DEL_DELAY
+#ifdef	DEL_DELAY
+
+static void event_defer_r_del(EVENT *ev, FILE_EVENT *fe)
+{
+	int fd;
+
+	ev->r_ndefer--;
+	ASSERT(ev->r_ndefer >= 0);
+
+	fd = ev->r_defers[ev->r_ndefer].fd;
+
+	if (ev->r_ndefer > 0) {
+		int pos = fe->r_defer->pos;
+
+		ev->r_defers[pos].mask = ev->r_defers[ev->r_ndefer].mask;
+		ev->r_defers[pos].pos  = fe->r_defer->pos;
+		ev->r_defers[pos].fd   = fd;
+
+		/* move the last item here */
+		ev->events[fd].r_defer = &ev->r_defers[pos];
+	} else {
+		if (fd >= 0)
+			ev->events[fd].r_defer = NULL;
+		ev->r_defers[0].mask = EVENT_NONE;
+		ev->r_defers[0].pos = 0;
+	}
+
+	ev->r_defers[ev->r_ndefer].fd  = -1;
+	fe->r_defer = NULL;
+}
+
+static void event_defer_w_del(EVENT *ev, FILE_EVENT *fe)
+{
+	int fd;
+
+	ev->w_ndefer--;
+	fd = ev->w_defers[ev->w_ndefer].fd;
+
+	if (ev->w_ndefer > 0) {
+		int pos = fe->w_defer->pos;
+
+		ev->w_defers[pos].mask = ev->w_defers[ev->w_ndefer].mask;
+		ev->w_defers[pos].pos  = fe->w_defer->pos;
+		ev->w_defers[pos].fd   = fd;
+
+		/* move the last item here */
+		ev->events[fd].w_defer = &ev->w_defers[pos];
+	} else {
+		if (fd >= 0)
+			ev->events[fd].w_defer = NULL;
+		ev->w_defers[0].mask = EVENT_NONE;
+		ev->w_defers[0].pos = 0;
+	}
+
+	ev->w_defers[ev->w_ndefer].fd  = -1;
+	fe->w_defer = NULL;
+}
+
+static void event_error_del(EVENT *ev, int fd)
+{
+	FILE_EVENT *fe = &ev->events[fd];
+
+	if (fe->r_defer != NULL)
+		event_defer_r_del(ev, fe);
+	if (fe->w_defer != NULL)
+		event_defer_w_del(ev, fe);
+
+	__event_del(ev, fd, fe->mask);
+}
+
+static void event_defer_r_add(EVENT *ev, int fd)
+{
+	ev->r_defers[ev->r_ndefer].fd   = fd;
+	ev->r_defers[ev->r_ndefer].mask = EVENT_READABLE;
+	ev->r_defers[ev->r_ndefer].pos  = ev->r_ndefer;
+
+	ev->events[fd].r_defer = &ev->r_defers[ev->r_ndefer];
+	ev->r_ndefer++;
+}
+
+static void event_defer_w_add(EVENT *ev, int fd)
+{
+	ev->w_defers[ev->w_ndefer].fd   = fd;
+	ev->w_defers[ev->w_ndefer].mask = EVENT_WRITABLE;
+	ev->w_defers[ev->w_ndefer].pos  = ev->w_ndefer;
+
+	ev->events[fd].w_defer = &ev->w_defers[ev->w_ndefer];
+	ev->w_ndefer++;
+}
 
 void event_del(EVENT *ev, int fd, int mask)
 {
-	FILE_EVENT *fe;
-
-	fe = &ev->events[fd];
-
-	if (fe->type == TYPE_NOSOCK) {
-		fe->type = TYPE_NONE;
-		return;
+	if (ev->events[fd].type == TYPE_NOSOCK)
+		ev->events[fd].type = TYPE_NONE;
+	else if ((mask & EVENT_ERROR) != 0)
+		event_error_del(ev, fd);
+	else {
+		if (mask & EVENT_READABLE)
+			event_defer_r_add(ev, fd);
+		if (mask & EVENT_WRITABLE)
+			event_defer_w_add(ev, fd);
 	}
-
-#ifdef DEL_DELAY
-	if ((mask & EVENT_ERROR) == 0 && (mask & EVENT_WRITABLE) == 0) {
-		ev->defers[ev->ndefer].fd   = fd;
-		ev->defers[ev->ndefer].mask = mask;
-		ev->defers[ev->ndefer].pos  = ev->ndefer;
-		ev->events[fd].defer        = &ev->defers[ev->ndefer];
-
-		ev->ndefer++;
-		return;
-	}
-#endif
-
-	if (fe->defer != NULL) {
-		int fd2;
-
-		ev->ndefer--;
-		fd2 = ev->defers[ev->ndefer].fd;
-
-		if (ev->ndefer > 0) {
-			int pos = fe->defer->pos;
-
-			ev->defers[pos].mask  = ev->defers[ev->ndefer].mask;
-			ev->defers[pos].pos   = fe->defer->pos;
-			ev->defers[pos].fd    = fd2;
-
-			ev->events[fd2].defer = &ev->defers[pos];
-		} else {
-			if (fd2 >= 0)
-				ev->events[fd2].defer = NULL;
-			ev->defers[0].mask = EVENT_NONE;
-			ev->defers[0].pos = 0;
-		}
-
-		ev->defers[ev->ndefer].fd  = -1;
-		fe->defer = NULL;
-	}
-
-#ifdef DEL_DELAY
-	__event_del(ev, fd, fe->mask);
-#else
-	__event_del(ev, fd, mask);
-#endif
 }
+
+#else
+
+void event_del(EVENT *ev, int fd, int mask)
+{
+	if (ev->events[fd].type == TYPE_NOSOCK)
+		ev->events[fd].type = TYPE_NONE;
+	else
+		__event_del(ev, fd, mask);
+}
+
+#endif /* !DEL_DELAY */
 
 int event_process(EVENT *ev, int timeout)
 {
 	int processed = 0, numevents, j;
-	int mask, fd, rfired, ndefer;
+	int mask, fd, rfired;
 	FILE_EVENT *fe;
+#ifdef	DEL_DELAY
+	int ndefer;
+#endif
 
 	if (ev->timeout < 0) {
 		if (timeout < 0)
@@ -291,14 +431,26 @@ int event_process(EVENT *ev, int timeout)
 	if (timeout > 1000)
 		timeout = 1000;
 
-	ndefer = ev->ndefer;
+#ifdef	DEL_DELAY
+	ndefer = ev->r_ndefer;
 
 	for (j = 0; j < ndefer; j++) {
-		__event_del(ev, ev->defers[j].fd, ev->defers[j].mask);
-		ev->events[ev->defers[j].fd].defer = NULL;
-		ev->defers[j].fd = -1;
-		ev->ndefer--;
+		__event_del(ev, ev->r_defers[j].fd, ev->r_defers[j].mask);
+		ev->events[ev->r_defers[j].fd].r_defer = NULL;
+		ev->r_defers[j].fd = -1;
+		ev->r_ndefer--;
 	}
+	ASSERT(ev->r_ndefer == 0);
+
+	ndefer = ev->w_ndefer;
+	for (j = 0; j < ndefer; j++) {
+		__event_del(ev, ev->w_defers[j].fd, ev->w_defers[j].mask);
+		ev->events[ev->w_defers[j].fd].w_defer = NULL;
+		ev->w_defers[j].fd = -1;
+		ev->w_ndefer--;
+	}
+	ASSERT(ev->w_ndefer == 0);
+#endif
 
 	numevents = ev->loop(ev, timeout);
 
@@ -315,13 +467,13 @@ int event_process(EVENT *ev, int timeout)
 		 */
 		if (fe->mask & mask & EVENT_READABLE) {
 			rfired = 1;
-			fe->r_proc(ev, fd, fe->ctx, mask);
+			fe->r_proc(ev, fd, fe->r_ctx, EVENT_READABLE);
 		} else
 			rfired = 0;
 
 		if (fe->mask & mask & EVENT_WRITABLE) {
 			if (!rfired || fe->w_proc != fe->r_proc)
-				fe->w_proc(ev, fd, fe->ctx, mask);
+				fe->w_proc(ev, fd, fe->w_ctx, EVENT_WRITABLE);
 		}
 
 		processed++;
