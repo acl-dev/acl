@@ -24,6 +24,9 @@ Advanced C/C++ library(ACL) for UNIX-like OS and WIN32 OS, including sync/async/
 - In Chinese: [README.md](README.md)
 - Samples: [SAMPLES.md](SAMPLES.md)
 
+## License
+- LGPL-v3 license (see LICENSE.txt in the acl project)
+
 ## Contact
 - Website: http://www.iteye.com
 - Download: https://sourceforge.net/projects/acl

@@ -181,8 +181,7 @@ acl ¹¤³ÌÊÇÒ»¸ö¿çÆ½Ì¨£¨Ö§³ÖLINUX£¬WIN32£¬Solaris£¬MacOS£¬FreeBSD£©µÄÍøÂçÍ¨ĞÅ¿â¼°·
 ### 3.6¡¢acl ¿âÖĞÓĞ´óÁ¿Ê¾Àı¿É¹©²Î¿¼£¬Çë²Î¿¼£º[SAMPLES.md](SAMPLES.md)
 
 ## ËÄ¡¢Ê¹ÓÃĞí¿É
-- BSD license (license.bsd)
-- IBM public license (license.ibm)
+- LGPL-v3 license (see LICENSE.txt in the acl project)
 
 ## Îå¡¢ÆäËü
 - WEB Õ¾µã: http://www.iteye.com
