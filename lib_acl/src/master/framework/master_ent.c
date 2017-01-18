@@ -31,6 +31,7 @@
 #include "stdlib/acl_argv.h"
 #include "net/acl_sane_inet.h"
 #include "net/acl_host_port.h"
+#include "net/acl_ifconf.h"
 
 /* Application specific */
 #include "../master_proto.h"

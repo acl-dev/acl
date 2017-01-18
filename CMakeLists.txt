@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 2.8)
+project(acl)
+add_subdirectory(lib_acl/src lib_acl)
+add_subdirectory(lib_protocol/src lib_protocol)
+add_subdirectory(lib_acl_cpp/src lib_acl_cpp)
+if (CMAKE_SYSTEM_NAME MATCHES "Linuxxx")
+	add_subdirectory(lib_fiber/src lib_fiber)
+endif()

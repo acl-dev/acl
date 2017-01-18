@@ -1,0 +1,38 @@
+cmake_minimum_required(VERSION 2.8)
+
+add_definitions("-g")
+add_definitions("-W")
+add_definitions("-O3")
+add_definitions("-Wall")
+add_definitions("-Werror")
+add_definitions("-Wshadow")
+add_definitions("-Wpointer-arith")
+add_definitions("-Waggregate-return")
+add_definitions("-Wmissing-prototypes")
+add_definitions("-D_REENTRANT")
+add_definitions("-D_USE_FAST_MACRO")
+add_definitions("-Wno-long-long")
+add_definitions("-Wuninitialized")
+add_definitions("-D_POSIX_PTHREAD_SEMANTICS")
+
+if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+	add_definitions("-DLINUX2")
+	add_definitions("-Wstrict-prototypes")
+	add_definitions("-fPIC")
+endif()
+
+set(rpath lib_protocol)
+set(src ${PROJECT_SOURCE_DIR}/${rpath}/src)
+set(acl_path ${PROJECT_SOURCE_DIR}/lib_acl)
+set(acl_include ${acl_path}/include)
+
+include_directories(${acl_include})
+include_directories(${PROJECT_SOURCE_DIR}/${rpath}/src)
+include_directories(${PROJECT_SOURCE_DIR}/${rpath}/include)
+
+aux_source_directory(${src} lib_src)
+aux_source_directory(${src}/http lib_src)
+aux_source_directory(${src}/smtp lib_src)
+aux_source_directory(${src}/icmp lib_src)
+
+add_library(_protocol ${lib_src})
