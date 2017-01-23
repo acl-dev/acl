@@ -552,7 +552,8 @@ static void main_free_buf(void)
 
 static void thread_buf_init(void)
 {
-	acl_assert(acl_pthread_key_create(&__errbuf_key, thread_free_buf) == 0);
+	if (acl_pthread_key_create(&__errbuf_key, thread_free_buf) != 0)
+		abort();
 }
 
 static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
@@ -563,7 +564,8 @@ const char *acl_last_serror(void)
 	int   error = acl_last_error();
 	static int __buf_size = 4096;
 
-	acl_assert(acl_pthread_once(&once_control, thread_buf_init) == 0);
+	if (acl_pthread_once(&once_control, thread_buf_init) != 0)
+		abort();
 
 	buf = acl_pthread_getspecific(__errbuf_key);
 	if (buf == NULL) {

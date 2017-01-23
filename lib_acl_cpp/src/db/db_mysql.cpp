@@ -485,7 +485,8 @@ static acl_pthread_once_t __thread_once_control = ACL_PTHREAD_ONCE_INIT;
 
 static void thread_once(void)
 {
-	acl_assert(!acl_pthread_key_create(&__thread_key, thread_free_dummy));
+	if (acl_pthread_key_create(&__thread_key, thread_free_dummy) != 0)
+		abort();
 }
 
 bool db_mysql::dbopen(const char* charset /* = NULL */)

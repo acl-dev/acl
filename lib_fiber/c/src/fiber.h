@@ -22,8 +22,8 @@ struct ACL_FIBER {
 #endif
 	fiber_status_t status;
 	ACL_RING       me;
-	size_t         id;
-	size_t         slot;
+	unsigned       id;
+	unsigned       slot;
 	acl_int64      when;
 	int            errnum;
 	int            sys;

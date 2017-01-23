@@ -209,7 +209,7 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 		event_clear_readable(ev, sockfd);
 
 	if (acl_fiber_killed(me)) {
-		acl_msg_info("%s(%d), %s: fiber-%d was killed",
+		acl_msg_info("%s(%d), %s: fiber-%u was killed",
 			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(me));
 		return -1;
 	}
@@ -242,7 +242,7 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 		event_clear_readable(ev, sockfd);
 
 	if (acl_fiber_killed(me)) {
-		acl_msg_info("%s(%d), %s: fiber-%d was killed",
+		acl_msg_info("%s(%d), %s: fiber-%u was killed",
 			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(me));
 		return -1;
 	}
@@ -321,7 +321,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 	fiber_wait_write(sockfd);
 
 	if (acl_fiber_killed(me)) {
-		acl_msg_info("%s(%d), %s: fiber-%d was killed",
+		acl_msg_info("%s(%d), %s: fiber-%u was killed",
 			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(me));
 		return -1;
 	}
@@ -449,7 +449,7 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 
 		if (acl_fiber_killed(pe.fiber)) {
 			acl_ring_detach(&pe.me);
-			acl_msg_info("%s(%d), %s: fiber-%d was killed",
+			acl_msg_info("%s(%d), %s: fiber-%u was killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(pe.fiber));
 			break;
@@ -891,7 +891,7 @@ int epoll_wait(int epfd, struct epoll_event *events,
 
 		if (acl_fiber_killed(ee->fiber)) {
 			acl_ring_detach(&ee->me);
-			acl_msg_info("%s(%d), %s: fiber-%d was killed",
+			acl_msg_info("%s(%d), %s: fiber-%u was killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(ee->fiber));
 			break;

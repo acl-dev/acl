@@ -173,10 +173,12 @@ static void dispatch_close(ACL_AIO *aio);
 
 static void aio_init(void)
 {
-	acl_assert(pthread_mutex_init(&__closing_time_mutex, NULL) == 0);
-	acl_assert(pthread_mutex_init(&__counter_mutex, NULL) == 0);
-	__last_closing_time = time(NULL);
+	if (pthread_mutex_init(&__closing_time_mutex, NULL) != 0)
+		abort();
+	if (pthread_mutex_init(&__counter_mutex, NULL) != 0)
+		abort();
 
+	__last_closing_time = time(NULL);
 	__use_limit_delay = acl_var_aio_delay_sec > 1 ?
 				acl_var_aio_delay_sec : 1;
 }

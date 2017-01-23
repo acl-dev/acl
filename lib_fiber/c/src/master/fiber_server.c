@@ -73,7 +73,7 @@ static unsigned      __nused = 0;
 
 static void server_exit(ACL_FIBER *fiber, int status)
 {
-	acl_msg_info("%s(%d), %s: fiber = %d, service exit now!",
+	acl_msg_info("%s(%d), %s: fiber = %u, service exit now!",
 		__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(fiber));
 	exit (status);
 }
@@ -301,7 +301,7 @@ static void fiber_dispatch(ACL_FIBER *fiber, void *ctx acl_unused)
 		acl_vstream_close(conn);
 	}
 
-	acl_msg_info("%s(%d), %s: fiber-%d exit now", __FILE__, __LINE__,
+	acl_msg_info("%s(%d), %s: fiber-%u exit now", __FILE__, __LINE__,
 		__FUNCTION__, acl_fiber_id(fiber));
 }
 
@@ -339,7 +339,7 @@ static void fiber_accept_main(ACL_FIBER *fiber, void *ctx)
 		server_abort(acl_fiber_running());
 	}
 
-	acl_msg_info("%s(%d), %s: fiber-%d exit now", __FILE__, __LINE__,
+	acl_msg_info("%s(%d), %s: fiber-%u exit now", __FILE__, __LINE__,
 		__FUNCTION__, acl_fiber_id(fiber));
 	acl_vstream_close(sstream);
 }

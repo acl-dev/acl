@@ -1,6 +1,12 @@
 #ifndef	ACL_DEFINE_LINUX_INCLUDE_H
 #define	ACL_DEFINE_LINUX_INCLUDE_H
 
+#ifdef ACL_ARM_LINUX
+# ifndef LINUX2
+#  define LINUX2
+# endif
+#endif
+
 #ifdef LINUX2
 # define ACL_LINUX
 # define ACL_UNIX

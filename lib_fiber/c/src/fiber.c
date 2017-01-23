@@ -22,13 +22,13 @@ typedef struct {
 	ACL_RING       ready;		/* ready fiber queue */
 	ACL_RING       dead;		/* dead fiber queue */
 	ACL_FIBER    **fibers;
-	size_t         size;
-	size_t         slot;
+	unsigned       size;
+	unsigned       slot;
 	int            exitcode;
 	ACL_FIBER     *running;
 	ACL_FIBER      original;
 	int            errnum;
-	size_t         idgen;
+	unsigned       idgen;
 	int            count;
 	int            switched;
 	int            nlocal;
@@ -543,7 +543,10 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	fiber->fn     = fn;
 	fiber->arg    = arg;
 	fiber->size   = size;
-	fiber->id     = ++__thread_fiber->idgen;
+	__thread_fiber->idgen++;
+	if (__thread_fiber->idgen == 0)  /* overflow ? */
+		__thread_fiber->idgen++;
+	fiber->id     = __thread_fiber->idgen;
 	fiber->flag   = 0;
 	fiber->status = FIBER_STATUS_READY;
 
@@ -601,12 +604,12 @@ ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
 	return fiber;
 }
 
-int acl_fiber_id(const ACL_FIBER *fiber)
+unsigned int acl_fiber_id(const ACL_FIBER *fiber)
 {
 	return fiber ? fiber->id : 0;
 }
 
-int acl_fiber_self(void)
+unsigned int acl_fiber_self(void)
 {
 	ACL_FIBER *curr = acl_fiber_running();
 	return acl_fiber_id(curr);
@@ -777,13 +780,10 @@ void *acl_fiber_get_specific(int key)
 	} else
 		curr = __thread_fiber->running;
 
-	if (key > curr->nlocal) {
-		acl_msg_error("%s(%d), %s: invalid key: %d > nlocal: %d",
-			__FILE__, __LINE__, __FUNCTION__,
-			key, curr->nlocal);
+	if (key > curr->nlocal)
 		return NULL;
-	}
 
 	local = curr->locals[key - 1];
+
 	return local ? local->ctx : NULL;
 }

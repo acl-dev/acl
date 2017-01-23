@@ -52,14 +52,15 @@ public:
 
 	/**
 	 * 获得本协程对象的 ID 号
-	 * @return {int}
+	 * @return {unsigned int}
 	 */
-	int get_id(void) const;
+	unsigned int get_id(void) const;
 
 	/**
 	 * 获得当前运行的协程对象的 ID 号
+	 * @return {unsigned int}
 	 */
-	static int self(void);
+	static unsigned int self(void);
 
 	/**
 	 * 获得当前协程在执行某个系统 API 出错时的错误号

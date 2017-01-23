@@ -685,7 +685,7 @@ void redis_command::logger_result(const redis_result* result)
 	string res;
 	result->to_string(res);
 
-	logger_error("result type: %d£¬ error: %s, res: [%s], req: [%s]",
+	logger_error("result type: %d, error: %s, res: [%s], req:[%s]",
 		result->get_type(), result_error(), res.c_str(),
 		request_buf_ ? request_buf_->c_str() : "slice request");
 }

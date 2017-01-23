@@ -43,15 +43,15 @@ ACL_FIBER *acl_fiber_running(void);
 /**
  * 获得所给协程的协程 ID 号
  * @param fiber {const ACL_FIBER*} acl_fiber_create 创建的协程对象，必须非空
- * @return {int} 协程 ID 号
+ * @return {unsigned int} 协程 ID 号
  */
-int acl_fiber_id(const ACL_FIBER *fiber);
+unsigned int acl_fiber_id(const ACL_FIBER *fiber);
 
 /**
  * 获得当前所运行的协程的 ID 号
- * @return {int} 当前运行协程的 ID 号
+ * @return {unsigned int} 当前运行协程的 ID 号
  */
-int acl_fiber_self(void);
+unsigned int acl_fiber_self(void);
 
 /**
  * 设置所给协程的错误号

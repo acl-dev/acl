@@ -20,12 +20,12 @@ fiber::~fiber(void)
 {
 }
 
-int fiber::get_id(void) const
+unsigned int fiber::get_id(void) const
 {
-	return f_ ? acl_fiber_id(f_) : -1;
+	return f_ ? acl_fiber_id(f_) : 0;
 }
 
-int fiber::self(void)
+unsigned int fiber::self(void)
 {
 	return acl_fiber_self();
 }
@@ -78,7 +78,7 @@ void fiber::run(void)
 void fiber::start(size_t stack_size /* = 64000 */)
 {
 	if (f_ != NULL)
-		acl_msg_fatal("%s(%d), %s: fiber-%d, already running!",
+		acl_msg_fatal("%s(%d), %s: fiber-%u, already running!",
 			__FILE__, __LINE__, __FUNCTION__, self());
 
 	acl_fiber_create(fiber_callback, this, stack_size);

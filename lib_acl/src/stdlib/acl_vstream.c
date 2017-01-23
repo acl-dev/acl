@@ -275,7 +275,7 @@ static int sys_read(ACL_VSTREAM *in, void *buf, size_t size)
 
 AGAIN:
 
-	/* Çå³ýÏµÍ³´íÎóºÅ */
+	/* ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½ï¿½ï¿½ */
 	acl_set_error(0);
 
 	if (in->type == ACL_VSTREAM_TYPE_FILE) {
@@ -447,8 +447,8 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *fp, char *buf, int size)
 		acl_non_blocking(ACL_VSTREAM_SOCK(fp), 1);
 #endif
 
-	/* ÏÈ±£Áô¶ÁÐ´³¬Ê±Ê±¼äÖµ£¬²¢½«¸ÃÁ÷µÄ³¬Ê±ÖµÖÃÎª0£¬ÒÔÃâ
-	 * Æô¶¯¶Á³¬Ê±¹ý³Ì(select)¡£
+	/* ï¿½È±ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½Ê±Ê±ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½Ê±Öµï¿½ï¿½Îª0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½(select)ï¿½ï¿½
 	 */
 	rw_timeout = fp->rw_timeout;
 	fp->rw_timeout = 0;
@@ -458,7 +458,7 @@ int acl_vstream_nonb_readn(ACL_VSTREAM *fp, char *buf, int size)
 
 	fp->rw_timeout = rw_timeout;
 
-	/* »Ö¸´¸ÃÌ×½Ó×ÖµÄÔ­ÓÐ±ê¼ÇÎ» */
+	/* ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½×½ï¿½ï¿½Öµï¿½Ô­ï¿½Ð±ï¿½ï¿½Î» */
 #ifdef	ACL_UNIX
 	flags = fcntl(ACL_VSTREAM_SOCK(fp), F_SETFL, flags);
 	if (flags < 0) {
@@ -541,8 +541,8 @@ int acl_vstream_probe_status(ACL_VSTREAM *fp)
 
 	rw_timeout = fp->rw_timeout;
 
-	/* ÏÈ±£Áô¶ÁÐ´³¬Ê±Ê±¼äÖµ£¬²¢½«¸ÃÁ÷µÄ³¬Ê±ÖµÖÃÎª0£¬ÒÔÃâ
-	 * Æô¶¯¶Á³¬Ê±¹ý³Ì(select)¡£
+	/* ï¿½È±ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½Ê±Ê±ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½Ê±Öµï¿½ï¿½Îª0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½(select)ï¿½ï¿½
 	 */
 	fp->rw_timeout = 0;
 	fp->errnum = 0;
@@ -551,7 +551,7 @@ int acl_vstream_probe_status(ACL_VSTREAM *fp)
 
 	fp->rw_timeout = rw_timeout;
 
-	/* »Ö¸´¸ÃÌ×½Ó×ÖµÄÔ­ÓÐ±ê¼ÇÎ» */
+	/* ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½×½ï¿½ï¿½Öµï¿½Ô­ï¿½Ð±ï¿½ï¿½Î» */
 #ifdef	ACL_UNIX
 	flags = fcntl(ACL_VSTREAM_SOCK(fp), F_SETFL, flags);
 	if (flags < 0) {
@@ -576,7 +576,7 @@ int acl_vstream_probe_status(ACL_VSTREAM *fp)
 		else
 			return -1;
 	} else {
-		/* ½«¶Áµ½µÄÊý¾ÝÔÙ·Å»ØÔ­´¦:) */
+		/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù·Å»ï¿½Ô­ï¿½ï¿½:) */
 		fp->read_cnt++;
 		fp->read_ptr--;
 		fp->offset--;
@@ -612,7 +612,7 @@ static void *__vstream_memmove(ACL_VSTREAM *fp, size_t n)
 	src = (char*) fp->read_ptr + fp->read_cnt - 1;
 	dst_saved = dst = (char*) fp->read_ptr + n + fp->read_cnt - 1;
 
-	/* ÎªÁË·ÀÖ¹ÄÚ´æÊý¾Ý¸²¸ÇÎÊÌâ, ²ÉÓÃÊý¾Ý´ÓÎ²²¿¿½±´·½Ê½ */
+	/* Îªï¿½Ë·ï¿½Ö¹ï¿½Ú´ï¿½ï¿½ï¿½ï¿½Ý¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý´ï¿½Î²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ */
 	while (src >= (char*) fp->read_ptr)
 		*dst-- = *src--;
 	return dst_saved;
@@ -637,7 +637,7 @@ int acl_vstream_unread(ACL_VSTREAM *fp, const void *ptr, size_t length)
 	capacity = fp->read_ptr - fp->read_buf;
 	k = (ssize_t) (capacity - length);
 
-	/* Èç¹û¶Á»º³åÖÐÇ°²¿·Ö¿Õ¼ä²»×ã, ÔòÐèÒªµ÷ÕûÊý¾ÝÎ»ÖÃ»òÀ©³ä¶Á»º³åÇø¿Õ¼ä */
+	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ö¿Õ¼ä²»ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ */
 
 	if (k < 0) {
 		void *pbuf;
@@ -645,7 +645,7 @@ int acl_vstream_unread(ACL_VSTREAM *fp, const void *ptr, size_t length)
 
 		n = (size_t) -k;
 
-		/* Èç¹û¶Á»º³åÇøºó²¿·Ö¿Õ¼ä¹»ÓÃ, ÔòÖ»ÐèºóÒÆ»º³åÇøÖÐµÄÊý¾Ý */
+		/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ó²¿·Ö¿Õ¼ä¹»ï¿½ï¿½, ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½Æ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ */
 
 		if (fp->read_buf_len - fp->read_cnt > (acl_off_t) length) {
 			if (fp->read_cnt > 0)
@@ -658,7 +658,7 @@ int acl_vstream_unread(ACL_VSTREAM *fp, const void *ptr, size_t length)
 			return (int) length;
 		}
 
-		/* ËµÃ÷Õû¸ö»º³åÇøµÄ¿Õ¼ä¶¼²»¹»ÓÃ, ËùÒÔÐèÒªÀ©³ä»º³åÇø¿Õ¼ä */
+		/* Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Õ¼ä¶¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ä»ºï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ */
 
 		n = min_delta * ((n + min_delta - 1) / min_delta);
 		acl_assert(n > 0);
@@ -782,16 +782,16 @@ int acl_vstream_readtags(ACL_VSTREAM *fp, void *vptr, size_t maxlen,
 			needle = needle_end - 1;
 			matched = 0;
 			while(1) {
-				/* ÒÑ¾­³É¹¦±È½ÏÍê±Ï(Æ¥Åä) */
+				/* ï¿½Ñ¾ï¿½ï¿½É¹ï¿½ï¿½È½ï¿½ï¿½ï¿½ï¿½(Æ¥ï¿½ï¿½) */
 				if (needle < (const unsigned char *) tag) {
 					matched = 1;
 					break;
 				}
 
-				/* Ô­×Ö·û´®ÓÃÍê¶øÆ¥Åä´®»¹Ã»ÓÐ±È½ÏÍê(²»Æ¥Åä) */
+				/* Ô­ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ä´®ï¿½ï¿½Ã»ï¿½Ð±È½ï¿½ï¿½ï¿½(ï¿½ï¿½Æ¥ï¿½ï¿½) */
 				if (haystack < (unsigned char *) vptr)
 					break;
-				/* ²»ÏàµÈ(²»Æ¥Åä) */
+				/* ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½Æ¥ï¿½ï¿½) */
 				if (*haystack != *needle)
 					break;
 				haystack--;
@@ -921,7 +921,7 @@ int acl_vstream_readn(ACL_VSTREAM *fp, void *buf, size_t size)
 
 	ptr = (unsigned char*) buf;
 
-	/* Èç¹û»º³åÇøÖÐÓÐÉÏ´Î¶Á²ÐÁôÊý¾ÝÊ±£¬ÔòÓÅÏÈ½«Æä¿½±´ÖÁÄ¿±ê»º³åÇø */
+	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´Î¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È½ï¿½ï¿½ä¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ê»ºï¿½ï¿½ï¿½ï¿½ */
 
 	if (fp->read_cnt > 0) {
 		n = acl_vstream_bfcp_some(fp, ptr, size);
@@ -931,7 +931,7 @@ int acl_vstream_readn(ACL_VSTREAM *fp, void *buf, size_t size)
 			return (int) size_saved;
 	}
 
-	/* Îª¼õÉÙ read ´ÎÊý£¬µ±ÊäÈë»º³åÇø½ÏÐ¡Ê±£¬Ôò×Ô¶¯ÆôÓÃË«»º³å¶Á·½Ê½ */
+	/* Îªï¿½ï¿½ï¿½ï¿½ read ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë»ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½Ë«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ */
 
 	if (size_saved  < (size_t) fp->read_buf_len / 4) {
 		while (size > 0) {
@@ -943,7 +943,7 @@ int acl_vstream_readn(ACL_VSTREAM *fp, void *buf, size_t size)
 		}
 	}
 
-	/* ·ñÔò£¬ÔòÖ±½Ó½«¶Áµ½µÄÊý¾Ý´æÈë»º³åÇø£¬´Ó¶ø±ÜÃâ´óÊý¾ÝµÄ¶þ´Î¿½±´ */
+	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½Ó½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý´ï¿½ï¿½ë»ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÝµÄ¶ï¿½ï¿½Î¿ï¿½ï¿½ï¿½ */
 	else {
 		while (size > 0) {
 			n = read_to_buffer(fp, ptr, size);
@@ -980,12 +980,12 @@ int acl_vstream_read(ACL_VSTREAM *fp, void *buf, size_t size)
 
 	/* fp->read_cnt == 0 */
 
-	/* µ±»º³åÇø½Ï´óÊ±£¬ÔòÖ±½Ó½«Êý¾Ý¶Áµ½¸Ã»º³åÇø´Ó¶ø±ÜÃâ´óÊý¾Ý¿½±´ */
+	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ö±ï¿½Ó½ï¿½ï¿½ï¿½ï¿½Ý¶ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½ï¿½ï¿½ */
 	if (size >= (size_t) fp->read_buf_len / 4) {
 		int n = read_to_buffer(fp, buf, size);
 		return n <= 0 ? ACL_VSTREAM_EOF : n;
 	}
-	/* ·ñÔò½«Êý¾Ý¶Áµ½Á÷»º³åÇøÖÐ£¬È»ºóÔÙ¿½±´£¬´Ó¶ø¼õÉÙ read ´ÎÊý */
+	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð£ï¿½È»ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¶ï¿½ï¿½ï¿½ï¿½ï¿½ read ï¿½ï¿½ï¿½ï¿½ */
 	else {
 		int   read_cnt = read_buffed(fp);
 		if (read_cnt <= 0)
@@ -1063,9 +1063,9 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 			return (int) LEN(buf) - n;
 	}
 
-	/* XXX: µ÷ÓÃÕßÍ¨¹ý¼ì²é *ready ÖµÀ´ÅÐ¶ÏÊÇ·ñ¶Á¹»Êý¾Ý, ÏµÍ³IO¶Á²Ù×÷³ö´í
-	 * »ò¹Ø±ÕÊ±·µ»Ø½áÊø±ê¼Ç; Èç¹û·µ»Ø ACL_VSTRING_EOF Ôòµ÷ÓÃÕßÓ¦¸ÃÍ¨¹ý
-	 * ¼ì²é»º³åÇø³¤¶ÈÀ´´¦ÀíÎ´±»´¦ÀíµÄÊý¾Ý
+	/* XXX: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ *ready Öµï¿½ï¿½ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ÏµÍ³IOï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * ï¿½ï¿½Ø±ï¿½Ê±ï¿½ï¿½ï¿½Ø½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½; ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ACL_VSTRING_EOF ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Í¨ï¿½ï¿½
+	 * ï¿½ï¿½é»ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 
 	if (fp->read_ready) {
@@ -1137,9 +1137,9 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 			return (int) LEN(buf) - n;
 	}
 
-	/* XXX: µ÷ÓÃÕßÍ¨¹ý¼ì²é *ready ÖµÀ´ÅÐ¶ÏÊÇ·ñ¶Á¹»Êý¾Ý, ÏµÍ³IO¶Á²Ù×÷³ö´í
-	 * »ò¹Ø±ÕÊ±·µ»Ø½áÊø±ê¼Ç; Èç¹û·µ»Ø ACL_VSTRING_EOF Ôòµ÷ÓÃÕßÓ¦¸ÃÍ¨¹ý
-	 * ¼ì²é»º³åÇø³¤¶ÈÀ´´¦ÀíÎ´±»´¦ÀíµÄÊý¾Ý
+	/* XXX: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ *ready Öµï¿½ï¿½ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ÏµÍ³IOï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * ï¿½ï¿½Ø±ï¿½Ê±ï¿½ï¿½ï¿½Ø½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½; ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ACL_VSTRING_EOF ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Í¨ï¿½ï¿½
+	 * ï¿½ï¿½é»ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 
 	if (fp->read_ready) {
@@ -1202,9 +1202,9 @@ int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
 			return cnt_saved - cnt;
 	}
 
-	/* XXX: µ÷ÓÃÕßÍ¨¹ý¼ì²é *ready ÖµÀ´ÅÐ¶ÏÊÇ·ñ¶Á¹»Êý¾Ý, ÏµÍ³IO¶Á²Ù×÷³ö´í
-	 * »ò¹Ø±ÕÊ±·µ»Ø½áÊø±ê¼Ç, Èç¹û·µ»Ø ACL_VSTRING_EOF Ôòµ÷ÓÃÕßÓ¦¸ÃÍ¨¹ý
-	 * ¼ì²é»º³åÇø³¤¶ÈÀ´´¦ÀíÎ´±»´¦ÀíµÄÊý¾Ý
+	/* XXX: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ *ready Öµï¿½ï¿½ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ÏµÍ³IOï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * ï¿½ï¿½Ø±ï¿½Ê±ï¿½ï¿½ï¿½Ø½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ACL_VSTRING_EOF ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Í¨ï¿½ï¿½
+	 * ï¿½ï¿½é»ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 
 	if (fp->read_ready) {
@@ -1256,8 +1256,8 @@ int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 	if (fp->read_cnt > 0)
 		bfread_peek(fp, buf);
 
-	/* ÏµÍ³IO¶Á²Ù×÷³ö´í»ò¹Ø±ÕÊ±·µ»Ø½áÊø±ê¼Ç, Èç¹û·µ»Ø ACL_VSTRING_EOF
-	 * Ôòµ÷ÓÃÕßÓ¦¸ÃÍ¨¹ý¼ì²é»º³åÇø³¤¶ÈÀ´´¦ÀíÎ´±»´¦ÀíµÄÊý¾Ý
+	/* ÏµÍ³IOï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø±ï¿½Ê±ï¿½ï¿½ï¿½Ø½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ACL_VSTRING_EOF
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½é»ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 
 	if (fp->read_ready) {
@@ -1335,7 +1335,7 @@ static int write_once(ACL_VSTREAM *fp, const void *vptr, int dlen)
 
 TAG_AGAIN:
 
-	/* Çå³ýÏµÍ³´íÎóºÅ */
+	/* ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½ï¿½ï¿½ */
 	acl_set_error(0);
 
 	if (fp->type == ACL_VSTREAM_TYPE_FILE) {
@@ -1375,7 +1375,7 @@ TAG_AGAIN:
 			fp->sys_offset += n;
 			fp->offset = fp->sys_offset;
 
-			/* ·ÀÖ¹»º³åÇøÄÚµÄÊý¾ÝÓëÊµ¼Ê²»Ò»ÖÂ, ½ö¶ÔÎÄ¼þIOÓÐÐ§ */
+			/* ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½Ê²ï¿½Ò»ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½IOï¿½ï¿½Ð§ */
 			fp->read_cnt = 0;
 		}
 	} else {
@@ -1491,18 +1491,18 @@ TAG_AGAIN:
 			fp->sys_offset += n;
 			fp->offset = fp->sys_offset;
 
-			/* ·ÀÖ¹»º³åÇøÄÚµÄÊý¾ÝÓëÊµ¼Ê²»Ò»ÖÂ, ½ö¶ÔÎÄ¼þIOÓÐÐ§ */
+			/* ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½Ê²ï¿½Ò»ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½IOï¿½ï¿½Ð§ */
 			fp->read_cnt = 0;
 		}
 	}
 
-	/* µ±Ð´½Ó¿Úº¯ÊýÖ¸ÕëÎªÏµÍ³Ä¬ÈÏµÄ½Ó¿ÚÊ±£¬Ö±½ÓÐ´Èë */
+	/* ï¿½ï¿½Ð´ï¿½Ó¿Úºï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ÎªÏµÍ³Ä¬ï¿½ÏµÄ½Ó¿ï¿½Ê±ï¿½ï¿½Ö±ï¿½ï¿½Ð´ï¿½ï¿½ */
 	else if (fp->write_fn == acl_socket_write) {
 		n = fp->writev_fn(ACL_VSTREAM_SOCK(fp), vec, count,
 			fp->rw_timeout, fp, fp->context);
 	}
 
-	/* ·ñÔò£¬ÔòÄ£Äâ writev µÄµ÷ÓÃ¹ý³Ì */
+	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ writev ï¿½Äµï¿½ï¿½Ã¹ï¿½ï¿½ï¿½ */
 	else {
 		int i, ret;
 
@@ -1759,7 +1759,7 @@ static int loop_writen(ACL_VSTREAM *fp, const void *vptr, size_t size)
 	const char *myname = "loop_writen";
 #endif
 	const unsigned char *ptr = (const unsigned char *) vptr;
-	int   once_dlen = 64 * 1024 * 1024;  /* xxx: ÒÔ 64KB Îªµ¥Î»Ð´ */
+	int   once_dlen = 64 * 1024 * 1024;  /* xxx: ï¿½ï¿½ 64KB Îªï¿½ï¿½Î»Ð´ */
 	int   nleft = (int) size, n, len;
 #if 0
 	time_t begin, end;
@@ -1779,8 +1779,8 @@ static int loop_writen(ACL_VSTREAM *fp, const void *vptr, size_t size)
 		if (n == len || fp->writev_fn == NULL || fp->rw_timeout <= 0)
 			continue;
 
-		/* ¶ÔÓÚÌ×½Ó¿ÚÐ´²Ù×÷£¬Èç¹ûÒ»´ÎÐÔÐ´Ã»ÓÐÐ´Íê£¬¿ÉÄÜÊÇÏµÍ³
-		 * Ð´»º³åÇøÂú£¬ÐèÒª¼ì²â³¬Ê±Ð´
+		/* ï¿½ï¿½ï¿½ï¿½ï¿½×½Ó¿ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ð´Ã»ï¿½ï¿½Ð´ï¿½ê£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³
+		 * Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½â³¬Ê±Ð´
 		 */
 		begin = time(NULL);
 
@@ -2100,7 +2100,7 @@ void acl_socket_close_hook(int (*close_fn)(ACL_SOCKET))
 		acl_socket_close_fn = close_fn;
 }
 
-/* ¶¨ÒåÁ÷µÄ»º³åÇøµÄÄ¬ÈÏ´óÐ¡ */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¬ï¿½Ï´ï¿½Ð¡ */
 
 #define ACL_VSTREAM_DEF_MAXLEN  8192
 
@@ -2120,9 +2120,9 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 			myname, __LINE__, (int) buflen);
 	}
 
-	/* XXX: Ö»ÓÐ·Ç¼àÌýÁ÷²ÅÐèÒªÓÐ¶Á»º³åÇø */
-	/* XXX: Ä¿Ç° UDP ·þÎñ¶Ë¿ÚºÅÔÚ MASTER ¿ò¼ÜÖÐÔÝÊ±µ±¼àÌýÌ×½Ó¿ÚÓÃ£¬ËùÒÔ
-	 * ÐèÒª¸øÆä·ÖÅä¶Á»º³åÇø
+	/* XXX: Ö»ï¿½Ð·Ç¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+	/* XXX: Ä¿Ç° UDP ï¿½ï¿½ï¿½ï¿½Ë¿Úºï¿½ï¿½ï¿½ MASTER ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×½Ó¿ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	if (buflen < ACL_VSTREAM_DEF_MAXLEN)
 		buflen = ACL_VSTREAM_DEF_MAXLEN;
@@ -2173,11 +2173,11 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 		fp->close_fn   = acl_socket_close_fn;
 
 		/**
-		 * bugfix: ²»Ó¦ÔÚ´Ë´¦Ö±½ÓÉèÎª·Ç×èÈû·½Ê½£¬·ñÔò»áÓ°ÏìÉÏ²ãµ÷ÓÃÕß
-		 * µÄÐÐÎª£¬Ó¦¸ÃÔÚÓ¦ÓÃ×Ô¼ºÀ´´¦Àí´ËÊÂ¡£---zsx, 2016.11.18
+		 * bugfix: ï¿½ï¿½Ó¦ï¿½Ú´Ë´ï¿½Ö±ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½ï¿½Ï²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		 * ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¡ï¿½---zsx, 2016.11.18
 		 */
-		/* xxx: ¶ÔÓÚ´øÓÐ¶ÁÐ´³¬Ê±µÄÁ÷£¬ÐèÒªÏÈ½« socket ÉèÎª·Ç×èÈûÄ£Ê½£¬
-		 * ·ñÔòÔÚÐ´´óÊý¾Ý°üÊ±»áÔì³É×èÈû£¬³¬Ê±×÷ÓÃÊ§Ð§
+		/* xxx: ï¿½ï¿½ï¿½Ú´ï¿½ï¿½Ð¶ï¿½Ð´ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½È½ï¿½ socket ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½
+		 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Ý°ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ê§Ð§
 		 */
 		/**
 		 * if (rw_timeout > 0 && acl_getsocktype(fd) >= 0)
@@ -2362,7 +2362,11 @@ char *acl_vstream_loadfile2(const char *path, ssize_t *size)
 #else
 	int   oflags = O_RDONLY;
 #endif
+#ifdef ACL_ARM_LINUX
+    int   mode = 0644;
+#else
 	int   mode = S_IREAD;
+#endif
 	int   ret;
 	ACL_VSTRING *vbuf;
 	unsigned char buf[4096];
@@ -2490,7 +2494,7 @@ acl_off_t acl_vstream_fseek2(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 		goto SYS_SEEK2;
 	}
 
-	/* »ñµÃÕæÕýµÄµ±Ç°ÎÄ¼þÖ¸ÕëÎ»ÖÃ */
+	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½Ç°ï¿½Ä¼ï¿½Ö¸ï¿½ï¿½Î»ï¿½ï¿½ */
 	n = acl_lseek(ACL_VSTREAM_FILE(fp), (acl_off_t) 0, SEEK_CUR);
 	if (n < 0)
 		return -1;
@@ -2498,11 +2502,11 @@ acl_off_t acl_vstream_fseek2(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 	if (whence == SEEK_CUR) {
 		if (fp->read_cnt >= offset) {
 			fp->read_cnt -= (int) offset;
-			n = -fp->read_cnt;  /* ¼ÆËã³öÕæÊµµÄÎÄ¼þÎ»ÖÃ */
+			n = -fp->read_cnt;  /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½Ä¼ï¿½Î»ï¿½ï¿½ */
 			fp->read_cnt = 0;
 		} else if (fp->read_cnt >= 0) {
 			offset -= fp->read_cnt;
-			n = offset;  /* ¼ÆËã³öÕæÊµµÄÎÄ¼þÎ»ÖÃ */
+			n = offset;  /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½Ä¼ï¿½Î»ï¿½ï¿½ */
 			fp->read_cnt = 0;
 		} else { /* fp->read_cnt < 0 ? */
 			acl_msg_error("%s, %s(%d): invalud read_cnt = %d",
@@ -2516,7 +2520,7 @@ acl_off_t acl_vstream_fseek2(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 	}
 
 SYS_SEEK2:
-	/* ¶¨Î»µ½ºÏÊÊµÄÎ»ÖÃ */
+	/* ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½Î»ï¿½ï¿½ */
 	fp->sys_offset = acl_lseek(
 		ACL_VSTREAM_FILE(fp), offset, whence);
 	fp->offset = fp->sys_offset;
@@ -2554,9 +2558,9 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 	}
 
 	if (whence == SEEK_CUR) {
-		/* Ïà¶Ôµ±Ç°Á÷Î»ÖÃ fp->offset ¿ªÊ¼Æ«ÒÆ offset µÄÎ»ÖÃ */
+		/* ï¿½ï¿½Ôµï¿½Ç°ï¿½ï¿½Î»ï¿½ï¿½ fp->offset ï¿½ï¿½Ê¼Æ«ï¿½ï¿½ offset ï¿½ï¿½Î»ï¿½ï¿½ */
 
-		/* ±ØÐëÑÏ¸ñ¼ìÑé */
+		/* ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ */
 		if (fp->offset + fp->read_cnt != fp->sys_offset) {
 			acl_msg_error("%s, %s(%d): offset(" ACL_FMT_I64D
 				") + read_cnt(%d) != sys_offset("
@@ -2567,23 +2571,23 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 			goto SYS_SEEK;
 		}
 
-		/* ÊÇ·ñÔÚ¶Á»º³åÇø¼äÄÚ */
+		/* ï¿½Ç·ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 		if (fp->read_cnt >= offset) {
-			/* ÒòÎªÒª´Ó fp->offset Æ«ÒÆ offset ¸ö×Ö½Úºó, ¶ÁÖ¸Õë
-			 * fp->read_ptr ÒÀÈ»ÔÚ»º³åÇøÄÚ, ËùÒÔÖ»ÐèÒªÒÆ¶¯¶ÁÖ¸Õë
-			 * ÇÒ¼õÉÙ»º³åÇø×Ö½ÚÊý¡¢Ôö¼Ó fp->offset Æ«ÒÆÁ¿¼´¿É.
+			/* ï¿½ï¿½ÎªÒªï¿½ï¿½ fp->offset Æ«ï¿½ï¿½ offset ï¿½ï¿½ï¿½Ö½Úºï¿½, ï¿½ï¿½Ö¸ï¿½ï¿½
+			 * fp->read_ptr ï¿½ï¿½È»ï¿½Ú»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½Òªï¿½Æ¶ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
+			 * ï¿½Ò¼ï¿½ï¿½Ù»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ fp->offset Æ«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
 			 */
 			fp->read_cnt -= (int) offset;
 			fp->read_ptr += (int) offset;
 			fp->offset += offset;
 			return fp->offset;
 		} else if (fp->read_cnt >= 0) {
-			/* ÒòÎªÒª¼ÆËã´Óµ±Ç°Á÷Î»ÖÃ fp->offset ¿ªÊ¼Æ«ÒÆ offset
-			 * µÄÎ»ÖÃ,¶øÇÒÁ÷ÖÐ»¹´æÔÚÒ»¶¨µÄ»º´æÊý¾Ý(fp->read_cnt),
-			 * ËùÒÔÐèÒªÏÈ´Ó fp->offset ¿ªÊ¼ÒÆ¶¯ fp->read_cnt
-			 * ¸ö×Ö½Ú(ÒÆ¶¯³ö¶Á»º³åÇø),È»ºóÔÙÒÆ¶¯Ê£ÓàµÄ×Ö½Ú
-			 * (¼´ offset - fp->read_cnt) ¼´¿É; ÒòÎªÒÑ¾­³Æ³ö¶Á»º
-			 * ³åÇø£¬ËùÒÔÐèÒª½« fp->read_cnt ÖÃ 0.
+			/* ï¿½ï¿½ÎªÒªï¿½ï¿½ï¿½ï¿½Óµï¿½Ç°ï¿½ï¿½Î»ï¿½ï¿½ fp->offset ï¿½ï¿½Ê¼Æ«ï¿½ï¿½ offset
+			 * ï¿½ï¿½Î»ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(fp->read_cnt),
+			 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½È´ï¿½ fp->offset ï¿½ï¿½Ê¼ï¿½Æ¶ï¿½ fp->read_cnt
+			 * ï¿½ï¿½ï¿½Ö½ï¿½(ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½),È»ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½Ê£ï¿½ï¿½ï¿½ï¿½Ö½ï¿½
+			 * (ï¿½ï¿½ offset - fp->read_cnt) ï¿½ï¿½ï¿½ï¿½; ï¿½ï¿½Îªï¿½Ñ¾ï¿½ï¿½Æ³ï¿½ï¿½ï¿½ï¿½ï¿½
+			 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ fp->read_cnt ï¿½ï¿½ 0.
 			 */
 			offset -= fp->read_cnt;
 			fp->read_cnt = 0;
@@ -2595,11 +2599,11 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 		}
 	} else if (whence == SEEK_SET) {
 #if 0
-		/* »ñµÃÕæÕýµÄµ±Ç°ÎÄ¼þÖ¸ÕëÎ»ÖÃ */
+		/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½Ç°ï¿½Ä¼ï¿½Ö¸ï¿½ï¿½Î»ï¿½ï¿½ */
 		fp->sys_offset = acl_lseek(ACL_VSTREAM_FILE(fp),
 			(off_t) 0, SEEK_CUR);
 #endif
-		/* ÀûÓÃ»º´æµÄÆ«ÒÆÎ»ÖÃ */
+		/* ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Æ«ï¿½ï¿½Î»ï¿½ï¿½ */
 
 		if (fp->sys_offset < 0) {
 			acl_msg_error("%s, %s(%d): seek n(" ACL_FMT_I64D
@@ -2609,7 +2613,7 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 			goto SYS_SEEK;
 		}
 
-		/* ±ØÐëÑÏ¸ñ¼ìÑé */
+		/* ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ */
 		if (fp->offset + fp->read_cnt != fp->sys_offset) {
 			acl_msg_error("%s, %s(%d): offset(" ACL_FMT_I64D
 				") + read_cnt(%d) != sys_offset("
@@ -2620,8 +2624,8 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 			goto SYS_SEEK;
 		}
 
-		/* Èç¹û¶ÁÊý¾ÝÖ¸Õë¾­¹ýÒÆ¶¯£¬¿ÉÒÔ½«Æä»ØÒÆ£¬ÒòÎª»º³åÇøÄÚÊý¾Ý
-		 * ²¢Î´ÆÆ»µ£¬¿ÉÒÔ¸´ÓÃ
+		/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ë¾­ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô½ï¿½ï¿½ï¿½ï¿½ï¿½Æ£ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		 * ï¿½ï¿½Î´ï¿½Æ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¸ï¿½ï¿½ï¿½
 		 */
 		if (fp->read_ptr > fp->read_buf) {
 			n = fp->read_ptr - fp->read_buf;
@@ -2630,7 +2634,7 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 			fp->read_cnt += (int) n;
 		}
 
-		/* ÅÐ¶ÏÇëÇóµÄÆ«ÒÆÎ»ÖÃÊÇ·ñÔÚ¶Á»º´æÇø¼äÄÚ */
+		/* ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ«ï¿½ï¿½Î»ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 		if (offset >= fp->offset && offset <= fp->sys_offset) {
 			n = offset - fp->offset;
 			fp->read_cnt -= (int) n;
@@ -2643,7 +2647,7 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 		fp->read_cnt = 0;
 
 SYS_SEEK:
-	/* µ÷ÓÃÏµÍ³µ÷ÓÃ¶¨Î»Î»ÖÃ */
+	/* ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½Ã¶ï¿½Î»Î»ï¿½ï¿½ */
 	fp->sys_offset = acl_lseek(ACL_VSTREAM_FILE(fp), offset, whence);
 	fp->offset = fp->sys_offset;
 
@@ -2658,7 +2662,7 @@ acl_off_t acl_vstream_ftell(ACL_VSTREAM *fp)
 		return -1;
 	}
 
-	/* ÏÈ¶¨Î»µ±Ç°Î»ÖÃ£¬È»ºóÔÙ¼õÈ¥¶Á»º³åÇøÀïµÄÊý¾Ý³¤¶È */
+	/* ï¿½È¶ï¿½Î»ï¿½ï¿½Ç°Î»ï¿½Ã£ï¿½È»ï¿½ï¿½ï¿½Ù¼ï¿½È¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý³ï¿½ï¿½ï¿½ */
 	fp->sys_offset = acl_lseek(ACL_VSTREAM_FILE(fp), 0, SEEK_CUR);
 	fp->offset = fp->sys_offset;
 	return fp->offset - fp->read_cnt;
@@ -2676,15 +2680,15 @@ int acl_file_ftruncate(ACL_VSTREAM *fp, acl_off_t length)
 		return -1;
 	}
 
-	/* ²Î¼û£ºC:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\crt\src
+	/* ï¿½Î¼ï¿½ï¿½ï¿½C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\crt\src
 	 * osfinfo.c
-	 * _open_osfhandle: ½«ACL_WINDOWS APIµÄÎÄ¼þ¾ä±ú×ª»»Îª±ê×¼CµÄÎÄ¼þ¾ä±ú
-	 * _get_osfhandle: ¸ù¾Ý±ê×¼CÎÄ¼þ¾ä±ú²éÑ¯ACL_WINDOWS APIÎÄ¼þ¾ä±ú
-	 * _free_osfhnd: ÊÍ·ÅÓÉ _open_osfhandle ´ò¿ªµÄ±ê×¼CÎÄ¼þ¾ä±úµÄ×ÊÔ´£¬
-	 *               µ«²¢²»Êµ¼Ê¹Ø±Õ¸ÃACL_WINDOWS API¾ä±ú£¬ËùÒÔ»¹µÃÒª¶ÔÆäÕæÊµ
-	 *               ACL_WINDOWS APIÎÄ¼þ¾ä±ú½øÐÐ¹Ø±Õ
+	 * _open_osfhandle: ï¿½ï¿½ACL_WINDOWS APIï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Îªï¿½ï¿½×¼Cï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½
+	 * _get_osfhandle: ï¿½ï¿½ï¿½Ý±ï¿½×¼Cï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¯ACL_WINDOWS APIï¿½Ä¼ï¿½ï¿½ï¿½ï¿½
+	 * _free_osfhnd: ï¿½Í·ï¿½ï¿½ï¿½ _open_osfhandle ï¿½ò¿ªµÄ±ï¿½×¼Cï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½
+	 *               ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½Ê¹Ø±Õ¸ï¿½ACL_WINDOWS APIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô»ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµ
+	 *               ACL_WINDOWS APIï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¹Ø±ï¿½
 	 * close.c
-	 * _close: ¹Ø±Õ²¢ÊÍ·Å±ê×¼CµÄÎÄ¼þ¾ä±ú
+	 * _close: ï¿½Ø±Õ²ï¿½ï¿½Í·Å±ï¿½×¼Cï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½
 	*/
 
 	if (acl_vstream_fseek(fp, length, SEEK_SET) < 0) {
@@ -2809,7 +2813,7 @@ void acl_vstream_free(ACL_VSTREAM *fp)
 	}
 
 	if (fp->nrefer > 0) {
-		/* ÉèÖÃÑÓ³ÙÊÍ·Å±êÖ¾Î» */
+		/* ï¿½ï¿½ï¿½ï¿½ï¿½Ó³ï¿½ï¿½Í·Å±ï¿½Ö¾Î» */
 		fp->flag |= ACL_VSTREAM_FLAG_DEFER_FREE;
 		return;
 	}
@@ -2818,9 +2822,9 @@ void acl_vstream_free(ACL_VSTREAM *fp)
 		ACL_VSTREAM_CLOSE_HANDLE *close_handle;
 		int   i, n = acl_array_size(fp->close_handle_lnk);
 
-		/* ÒòÎªÌí¼ÓÊ±ÊÇÕýÐòµÄ, ËùÒÔÔÚÉ¾³ýÊ±ÊÇµ¹ÐòµÄ,
-		 * ÕâÑù¶Ô¶¯Ì¬Êý×éµÄÊ¹ÓÃµÄÐ§ÂÊ²Å»á±È½Ï¸ß, 
-		 * ±ÜÃâÁË¶¯Ì¬Êý×éÄÚ²¿ÒÆ¶¯µÄÇé¿ö
+		/* ï¿½ï¿½Îªï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½Ê±ï¿½Çµï¿½ï¿½ï¿½ï¿½,
+		 * ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½Ð§ï¿½Ê²Å»ï¿½È½Ï¸ï¿½, 
+		 * ï¿½ï¿½ï¿½ï¿½ï¿½Ë¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ú²ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		 */
 		for (i = n - 1; i >= 0; i++) {
 			close_handle = (ACL_VSTREAM_CLOSE_HANDLE *)
@@ -2829,9 +2833,9 @@ void acl_vstream_free(ACL_VSTREAM *fp)
 				break;
 			if (close_handle->close_fn == NULL)
 				continue;
-			/* Ö»Ëù½«´Ëµ÷ÓÃ·ÅÔÚ close_fn Ç°Ãæ£¬ÊÇÎªÁË·ÀÖ¹ÓÐÈËÎóÔÚ
-			 * close_fn Àïµ÷ÓÃÁËÉ¾³ý»Øµ÷º¯ÊýµÄ²Ù×÷¶øÔì³É¶ÔÍ¬Ò»ÄÚ
-			 * ´æµÄ¶à´ÎÊÍ·Å
+			/* Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½Ã·ï¿½ï¿½ï¿½ close_fn Ç°ï¿½æ£¬ï¿½ï¿½Îªï¿½Ë·ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			 * close_fn ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¶ï¿½Í¬Ò»ï¿½ï¿½
+			 * ï¿½ï¿½Ä¶ï¿½ï¿½ï¿½Í·ï¿½
 			 */
 			acl_array_delete_idx(fp->close_handle_lnk, i, NULL);
 			close_handle->close_fn(fp, close_handle->context);
@@ -2881,7 +2885,7 @@ int acl_vstream_close(ACL_VSTREAM *fp)
 	}
 
 	if (fp->nrefer > 0) {
-		/* ÉèÖÃÑÓ³ÙÊÍ·Å±êÖ¾Î» */
+		/* ï¿½ï¿½ï¿½ï¿½ï¿½Ó³ï¿½ï¿½Í·Å±ï¿½Ö¾Î» */
 		fp->flag |= ACL_VSTREAM_FLAG_DEFER_FREE;
 		return 0;
 	}
@@ -2890,21 +2894,21 @@ int acl_vstream_close(ACL_VSTREAM *fp)
 		if (acl_vstream_fflush(fp) == ACL_VSTREAM_EOF)
 			acl_msg_error("%s: fflush fp error", myname);
 
-	/* ÐëÔÚµ÷ÓÃ¸÷¸ö¹Ø±Õ»Øµ÷º¯ÊýÖ®Ç°½«Á¬½Ó¹Ø±Õ£¬·ñÔò»áÓ°Ïì iocp µÄÊÂ¼þÒýÇæ
-	 * Õý³£¹¤×÷¡£ÔÚÊ¹ÓÃ iocp ÊÂ¼þÒýÇæÊ±£¬µ±Á÷¹Ø±ÕÊ±»áµ÷ÓÃ events_iocp.c ÖÐ
-	 * µÄ stream_on_close£¬¸Ãº¯Êý»áÊÍ·Åµô fdp->event_read/fdp->event_write
-	 * Á½¸ö¶ÔÏó£¬µ«µ±Ì×½Ó¿ÚÎ´¹Ø±ÕÊ±£¬ÕâÁ½¸ö¶ÔÏóÓÐ¿ÉÄÜ»á±» iocp Ê¹ÓÃ£¬µ±Ì×
-	 * ½Ó¿Ú¹Ø±ÕÊ±£¬iocp ²Å²»»áÊ¹ÓÃÕâÁ½¸ö¶ÔÏóÖÐµÄ IOCP_EVENT->overlapped µÈ
-	 * ³ÉÔ±. ---2011.5.18, zsx
+	/* ï¿½ï¿½ï¿½Úµï¿½ï¿½Ã¸ï¿½ï¿½ï¿½ï¿½Ø±Õ»Øµï¿½ï¿½ï¿½ï¿½ï¿½Ö®Ç°ï¿½ï¿½ï¿½ï¿½ï¿½Ó¹Ø±Õ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½ iocp ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ iocp ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø±ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ events_iocp.c ï¿½ï¿½
+	 * ï¿½ï¿½ stream_on_closeï¿½ï¿½ï¿½Ãºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·Åµï¿½ fdp->event_read/fdp->event_write
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ó£¬µï¿½ï¿½ï¿½ï¿½×½Ó¿ï¿½Î´ï¿½Ø±ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¿ï¿½ï¿½Ü»á±» iocp Ê¹ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * ï¿½Ó¿Ú¹Ø±ï¿½Ê±ï¿½ï¿½iocp ï¿½Å²ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ IOCP_EVENT->overlapped ï¿½ï¿½
+	 * ï¿½ï¿½Ô±. ---2011.5.18, zsx
 	 */
 	/*
-	 * 2011.5.18 µÄ¸Ä¶¯Ëä½â¾öÁËÊÂ¼þÒýÇæÎª iocp µÄÎÊÌâ£¬µ«Í¬Ê±Ôì³ÉÁË win32
-	 * ´°¿ÚÏûÏ¢ÒýÇæµÄÎÊÌâ£¬ËäÈ» win32 ÏûÏ¢ÒýÇæµÄ·½Ê½ÔÚ¹Ø±ÕÌ×½Ó¿ÚÖ®Ç°»á»Øµ÷
-	 * stream_on_close£¬¸Ã»Øµ÷ÒªÇóÌ×½Ó¿Ú±ØÐëÊÇ´ò¿ªµÄ£¬¼ÈÈ»¶þÕß³öÏÖÁË³åÍ»£¬
-	 * Ôò iocp µÄÎÊÌâ»¹ÊÇÓÉ iocp ÒýÇæ±¾ÉíÈ¥½â¾ö°É£¬¼´ÔÚ iocp ÒýÇæµÄ
-	 * stream_on_close ÖÐ£¬ÔÚÊÍ·Å fdp->event_read/fdp->event_write Ç°¹Ø±Õ
-	 * Ì×½Ó¿Ú¼´¿É£¬ÔÚ acl_vstream_close ×îºóÐèÒª¹Ø±ÕÌ×½Ó¿ÚÊ±Ö»Òª¸ù¾Ý¾ä±ú
-	 * ÊÇ·ñÓÐÐ§À´ÅÐ¶ÏÊÇ·ñµ÷ÓÃ¹Ø±Õ¹ý³Ì. ---2011.5.19, zsx
+	 * 2011.5.18 ï¿½Ä¸Ä¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Îª iocp ï¿½ï¿½ï¿½ï¿½ï¿½â£¬ï¿½ï¿½Í¬Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ win32
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â£¬ï¿½ï¿½È» win32 ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Ä·ï¿½Ê½ï¿½Ú¹Ø±ï¿½ï¿½×½Ó¿ï¿½Ö®Ç°ï¿½ï¿½Øµï¿½
+	 * stream_on_closeï¿½ï¿½ï¿½Ã»Øµï¿½Òªï¿½ï¿½ï¿½×½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Ç´ò¿ªµÄ£ï¿½ï¿½ï¿½È»ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½ï¿½Ë³ï¿½Í»ï¿½ï¿½
+	 * ï¿½ï¿½ iocp ï¿½ï¿½ï¿½ï¿½ï¿½â»¹ï¿½ï¿½ï¿½ï¿½ iocp ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½È¥ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½ iocp ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * stream_on_close ï¿½Ð£ï¿½ï¿½ï¿½ï¿½Í·ï¿½ fdp->event_read/fdp->event_write Ç°ï¿½Ø±ï¿½
+	 * ï¿½×½Ó¿Ú¼ï¿½ï¿½É£ï¿½ï¿½ï¿½ acl_vstream_close ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ø±ï¿½ï¿½×½Ó¿ï¿½Ê±Ö»Òªï¿½ï¿½ï¿½Ý¾ï¿½ï¿½
+	 * ï¿½Ç·ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ã¹Ø±Õ¹ï¿½ï¿½ï¿½. ---2011.5.19, zsx
 	 */
 	/*
 	if (fp->read_buf != NULL)
@@ -2921,9 +2925,9 @@ int acl_vstream_close(ACL_VSTREAM *fp)
 		ACL_VSTREAM_CLOSE_HANDLE *close_handle;
 		int   i, n = acl_array_size(fp->close_handle_lnk);
 
-		/* ÒòÎªÌí¼ÓÊ±ÊÇÕýÐòµÄ, ËùÒÔÔÚÉ¾³ýÊ±ÊÇµ¹ÐòµÄ,
-		 * ÕâÑù¶Ô¶¯Ì¬Êý×éµÄÊ¹ÓÃµÄÐ§ÂÊ²Å»á±È½Ï¸ß, 
-		 * ±ÜÃâÁË¶¯Ì¬Êý×éÄÚ²¿ÒÆ¶¯µÄÇé¿ö
+		/* ï¿½ï¿½Îªï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½Ê±ï¿½Çµï¿½ï¿½ï¿½ï¿½,
+		 * ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½Ð§ï¿½Ê²Å»ï¿½È½Ï¸ï¿½, 
+		 * ï¿½ï¿½ï¿½ï¿½ï¿½Ë¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ú²ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		 */
 		for (i = n - 1; i >= 0; i--) {
 			close_handle = (ACL_VSTREAM_CLOSE_HANDLE *)
@@ -2932,9 +2936,9 @@ int acl_vstream_close(ACL_VSTREAM *fp)
 				continue;
 			if (close_handle->close_fn == NULL)
 				continue;
-			/* Ö»Ëù½«´Ëµ÷ÓÃ·ÅÔÚ close_fn Ç°Ãæ£¬ÊÇÎªÁË·ÀÖ¹ÓÐÈËÎóÔÚ
-			 * close_fn Àïµ÷ÓÃÁËÉ¾³ý»Øµ÷º¯ÊýµÄ²Ù×÷¶øÔì³É¶ÔÍ¬Ò»ÄÚ´æ
-			 * µÄ¶à´ÎÊÍ·Å
+			/* Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½Ã·ï¿½ï¿½ï¿½ close_fn Ç°ï¿½æ£¬ï¿½ï¿½Îªï¿½Ë·ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			 * close_fn ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¶ï¿½Í¬Ò»ï¿½Ú´ï¿½
+			 * ï¿½Ä¶ï¿½ï¿½ï¿½Í·ï¿½
 			 */
 			acl_array_delete_idx(fp->close_handle_lnk, i, NULL);
 			close_handle->close_fn(fp, close_handle->context);
@@ -3142,9 +3146,9 @@ void acl_vstream_call_close_handles(ACL_VSTREAM *fp)
 		ACL_VSTREAM_CLOSE_HANDLE *close_handle;
 		int   i, n = acl_array_size(fp->close_handle_lnk);
 
-		/* ÒòÎªÌí¼ÓÊ±ÊÇÕýÐòµÄ, ËùÒÔÔÚÉ¾³ýÊ±ÊÇµ¹ÐòµÄ,
-		 * ÕâÑù¶Ô¶¯Ì¬Êý×éµÄÊ¹ÓÃµÄÐ§ÂÊ²Å»á±È½Ï¸ß, 
-		 * ±ÜÃâÁË¶¯Ì¬Êý×éÄÚ²¿ÒÆ¶¯µÄÇé¿ö
+		/* ï¿½ï¿½Îªï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½Ê±ï¿½Çµï¿½ï¿½ï¿½ï¿½,
+		 * ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½Ð§ï¿½Ê²Å»ï¿½È½Ï¸ï¿½, 
+		 * ï¿½ï¿½ï¿½ï¿½ï¿½Ë¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ú²ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		 */
 		for (i = n - 1; i >= 0; i--) {
 			close_handle = (ACL_VSTREAM_CLOSE_HANDLE *)
@@ -3153,9 +3157,9 @@ void acl_vstream_call_close_handles(ACL_VSTREAM *fp)
 				continue;
 			if (close_handle->close_fn == NULL)
 				continue;
-			/* Ö»Ëù½«´Ëµ÷ÓÃ·ÅÔÚ close_fn Ç°Ãæ£¬ÊÇÎªÁË·ÀÖ¹ÓÐÈËÎóÔÚ
-			 * close_fn Àïµ÷ÓÃÁËÉ¾³ý»Øµ÷º¯ÊýµÄ²Ù×÷¶øÔì³É¶ÔÍ¬Ò»ÄÚ´æ
-			 * µÄ¶à´ÎÊÍ·Å
+			/* Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½Ã·ï¿½ï¿½ï¿½ close_fn Ç°ï¿½æ£¬ï¿½ï¿½Îªï¿½Ë·ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			 * close_fn ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¶ï¿½Í¬Ò»ï¿½Ú´ï¿½
+			 * ï¿½Ä¶ï¿½ï¿½ï¿½Í·ï¿½
 			 */
 			acl_array_delete_idx(fp->close_handle_lnk, i, NULL);
 			close_handle->close_fn(fp, close_handle->context);
@@ -3231,9 +3235,9 @@ void acl_vstream_delete_close_handle(ACL_VSTREAM *fp,
 	if (n <= 0)
 		return;
 
-	/* ÒòÎªÌí¼ÓÊ±ÊÇÕýÐòµÄ, ËùÒÔÔÚÉ¾³ýÊ±ÊÇµ¹ÐòµÄ,
-	 * ÕâÑù¶Ô¶¯Ì¬Êý×éµÄÊ¹ÓÃµÄÐ§ÂÊ²Å»á±È½Ï¸ß, 
-	 * ±ÜÃâÁË¶¯Ì¬Êý×éÄÚ²¿ÒÆ¶¯µÄÇé¿ö
+	/* ï¿½ï¿½Îªï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½Ê±ï¿½Çµï¿½ï¿½ï¿½ï¿½,
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½Ð§ï¿½Ê²Å»ï¿½È½Ï¸ï¿½, 
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ë¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ú²ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	for (i = n - 1; i >= 0; i--) {
 		close_handle = (ACL_VSTREAM_CLOSE_HANDLE *)
@@ -3259,9 +3263,9 @@ void acl_vstream_clean_close_handle(ACL_VSTREAM *fp)
 		return;
 
 	n = acl_array_size(fp->close_handle_lnk);
-	/* ÒòÎªÌí¼ÓÊ±ÊÇÕýÐòµÄ, ËùÒÔÔÚÉ¾³ýÊ±ÊÇµ¹ÐòµÄ,
-	 * ÕâÑù¶Ô¶¯Ì¬Êý×éµÄÊ¹ÓÃµÄÐ§ÂÊ²Å»á±È½Ï¸ß, 
-	 * ±ÜÃâÁË¶¯Ì¬Êý×éÄÚ²¿ÒÆ¶¯µÄÇé¿ö
+	/* ï¿½ï¿½Îªï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½Ê±ï¿½Çµï¿½ï¿½ï¿½ï¿½,
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½Ð§ï¿½Ê²Å»ï¿½È½Ï¸ï¿½, 
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ë¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ú²ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	for (i = n - 1; i >= 0; i++) {
 		close_handle = (ACL_VSTREAM_CLOSE_HANDLE *)

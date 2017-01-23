@@ -234,7 +234,11 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 	}
 	
 #ifdef ACL_UNIX
+# ifdef ACL_ARM_LINUX
+	filefd = acl_file_open(pathname, O_RDWR, 0644);
+# else
 	filefd = acl_file_open(pathname, O_RDWR, S_IREAD | S_IWRITE | S_IRGRP);
+# endif
 #elif defined(ACL_WINDOWS)
 	filefd = acl_file_open(pathname, O_RDWR, S_IREAD | S_IWRITE);
 #else
@@ -264,7 +268,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 		/* first, skip all ' ' and '\t' */
 		SKIP(ptr, (*ptr == ' ' || *ptr == '\t'));
 
-		/* ²Ù×÷´æ´¢×¢ÊÍÐÐ */
+		/* ï¿½ï¿½ï¿½ï¿½ï¿½æ´¢×¢ï¿½ï¿½ï¿½ï¿½ */
 		if  (*ptr == '#') {  /* the comment line */
 			SKIP(ptr, *ptr != '\n'); /* find the line's end */
 			if (*ptr) {  /* this must be '\n' */
@@ -284,7 +288,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 			cfg_line->line_number = parser->total_line;
 			continue;
 		} else if (*ptr == '\r' || *ptr == '\n') {
-			/* ²Ù×÷¿ÕÐÐ */
+			/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 			/* SKIP(ptr, (*ptr == '\r' || *ptr == '\n')); */
 			if (*ptr == '\r' && *(ptr + 1) == '\n') {
 				*ptr = 0; /* set '\0' first and go on */
@@ -308,7 +312,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 			continue;
 		}
 
-		/* ²Ù×÷ÓÐÐ§ÐÐ */
+		/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ */
 		pline_begin = ptr;  /* reset the line header */
 
 		/* find the line's end */
@@ -351,7 +355,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 #endif
 }
 
-/* ÊÍ·Å ACL_CFG_LINE ÏîËùÓÃµÄ»Øµ÷º¯Êý */
+/* ï¿½Í·ï¿½ ACL_CFG_LINE ï¿½ï¿½ï¿½ï¿½ï¿½ÃµÄ»Øµï¿½ï¿½ï¿½ï¿½ï¿½ */
 static void _cfg_line_free(void *arg)
 {
 	ACL_CFG_LINE *cfg_line;
@@ -561,9 +565,14 @@ int acl_cfg_parser_dump(const ACL_CFG_PARSER *parser,
 	if (parser == NULL || pathname == NULL || *pathname == 0)
 		return (-1);
 #ifdef ACL_UNIX
+# ifdef ACL_ARM_LINUX
+	filefd = acl_file_open(pathname,
+			O_CREAT | O_TRUNC | O_APPEND | O_WRONLY, 0644);
+# else
 	filefd = acl_file_open(pathname,
 			O_CREAT | O_TRUNC | O_APPEND | O_WRONLY,
 			S_IREAD | S_IWRITE | S_IRGRP);
+# endif
 #elif defined(ACL_WINDOWS)
 	filefd = acl_file_open(pathname,
 		O_CREAT | O_TRUNC | O_APPEND | O_WRONLY,
