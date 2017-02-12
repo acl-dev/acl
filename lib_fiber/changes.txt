@@ -1,3 +1,7 @@
+41) 2017.2.9
+41.1) bugfix: fiber.c 中，fiber_init 函数应该必须保证 __sys_errno 为 NULL 时
+被调用，否则会引起一些静态初始化需要 __sys_errno 的使用
+
 40) 2017.1.23
 40.1) workaround: 协程号统一改成无符号 32 位整数
 

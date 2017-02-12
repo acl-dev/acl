@@ -34,6 +34,8 @@ typedef struct {
 	int            nlocal;
 } FIBER_TLS;
 
+static void fiber_init(void) __attribute__ ((constructor));
+
 static FIBER_TLS *__main_fiber = NULL;
 static __thread FIBER_TLS *__thread_fiber = NULL;
 __thread int acl_var_hook_sys_api = 0;
@@ -79,7 +81,9 @@ static void fiber_schedule_main_free(void)
 
 static void thread_init(void)
 {
-	acl_assert(acl_pthread_key_create(&__fiber_key, thread_free) == 0);
+	if (acl_pthread_key_create(&__fiber_key, thread_free) != 0)
+		acl_msg_fatal("%s(%d), %s: pthread_key_create error %s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
 }
 
 static acl_pthread_once_t __once_control = ACL_PTHREAD_ONCE_INIT;
@@ -89,7 +93,9 @@ static void fiber_check(void)
 	if (__thread_fiber != NULL)
 		return;
 
-	acl_assert(acl_pthread_once(&__once_control, thread_init) == 0);
+	if (acl_pthread_once(&__once_control, thread_init) != 0)
+		acl_msg_fatal("%s(%d), %s: pthread_once error %s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
 
 	__thread_fiber = (FIBER_TLS *) acl_mycalloc(1, sizeof(FIBER_TLS));
 #ifdef	USE_JMP
@@ -119,10 +125,18 @@ static void fiber_check(void)
 }
 
 /* see /usr/include/bits/errno.h for __errno_location */
+#ifdef ACL_ARM_LINUX
+volatile int*   __errno(void)
+#else
 int *__errno_location(void)
+#endif
 {
-	if (!acl_var_hook_sys_api)
+	if (!acl_var_hook_sys_api) {
+		if (__sys_errno == NULL)
+			fiber_init();
+
 		return __sys_errno();
+	}
 
 	if (__thread_fiber == NULL)
 		fiber_check();
@@ -139,6 +153,9 @@ int fcntl(int fd, int cmd, ...)
 	struct flock *lock;
 	va_list ap;
 	int ret;
+
+	if (__sys_fcntl == NULL)
+		fiber_init();
 
 	va_start(ap, cmd);
 
@@ -622,8 +639,6 @@ int acl_fiber_status(const ACL_FIBER *fiber)
 	return fiber ? fiber->status : 0;
 }
 
-static void fiber_init(void) __attribute__ ((constructor));
-
 static void fiber_init(void)
 {
 	static int __called = 0;
@@ -633,7 +648,11 @@ static void fiber_init(void)
 
 	__called++;
 
+#ifdef ACL_ARM_LINUX
+	__sys_errno   = (errno_fn) dlsym(RTLD_NEXT, "__errno");
+#else
 	__sys_errno   = (errno_fn) dlsym(RTLD_NEXT, "__errno_location");
+#endif
 	__sys_fcntl   = (fcntl_fn) dlsym(RTLD_NEXT, "fcntl");
 
 	hook_io();

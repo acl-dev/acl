@@ -159,7 +159,7 @@ static char *__sane_inet_ntoa(unsigned int src, char *dst, size_t size)
 /*	in.s_addr = ntohl(src); */
 	in.s_addr = src;
 	bytes = (unsigned char *) &in;
-#ifdef  LINUX2
+#ifdef  ACL_LINUX
 	snprintf (dst, 18, "%d.%d.%d.%d", bytes[3], bytes[2], bytes[1], bytes[0]);
 #elif defined(SUNOS5)
 	snprintf (dst, 18, "%d.%d.%d.%d", bytes[0], bytes[1], bytes[2], bytes[3]);

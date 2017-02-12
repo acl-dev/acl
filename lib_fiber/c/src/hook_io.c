@@ -875,9 +875,30 @@ ssize_t readv(int fd, const struct iovec *iov, int iovcnt)
 	return fiber_readv(fd, iov, iovcnt);
 }
 
+#ifdef ACL_ARM_LINUX
+
+ssize_t recv(int sockfd, void *buf, size_t len, unsigned int flags)
+{
+	return fiber_recv(sockfd, buf, len, (int) flags);
+}
+
+ssize_t recvfrom(int sockfd, void *buf, size_t len, unsigned int flags,
+	const struct sockaddr *src_addr, socklen_t *addrlen)
+{
+	return fiber_recvfrom(sockfd, buf, len, flags,
+			(const struct sockaddr*) src_addr, addrlen);
+}
+
+ssize_t recvmsg(int sockfd, struct msghdr *msg, unsigned int flags)
+{
+	return fiber_recvmsg(sockfd, msg, flags);
+}
+
+#else
+
 ssize_t recv(int sockfd, void *buf, size_t len, int flags)
 {
-	return fiber_recv(sockfd, buf, len, flags);
+	return fiber_recv(sockfd, buf, len, (int) flags);
 }
 
 ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
@@ -891,6 +912,8 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 	return fiber_recvmsg(sockfd, msg, flags);
 }
 
+#endif
+
 ssize_t write(int fd, const void *buf, size_t count)
 {
 	return fiber_write(fd, buf, count);
@@ -900,6 +923,26 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
 {
 	return fiber_writev(fd, iov, iovcnt);
 }
+
+#ifdef ACL_ARM_LINUX
+
+ssize_t send(int sockfd, const void *buf, size_t len, unsigned int flags)
+{
+	return fiber_send(sockfd, buf, len, (int) flags);
+}
+
+ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+	const struct sockaddr *dest_addr, socklen_t addrlen)
+{
+	return fiber_sendto(sockfd, buf, len, flags, dest_addr, addrlen);
+}
+
+ssize_t sendmsg(int sockfd, const struct msghdr *msg, unsigned int flags)
+{
+	return fiber_sendmsg(sockfd, msg, (int) flags);
+}
+
+#else
 
 ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 {
@@ -917,4 +960,5 @@ ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags)
 	return fiber_sendmsg(sockfd, msg, flags);
 }
 
+#endif
 /****************************************************************************/

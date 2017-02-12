@@ -83,7 +83,8 @@ endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	CFLAGS += -DLINUX2 -fPIC -Werror
+#	CFLAGS += -DLINUX2 -fPIC -Werror
+	CFLAGS += -fPIC -Werror
 	UNIXTYPE = LINUX
 	shared_ldflags = -l_protocol -l_acl -lrt -lpthread -lz -ldl
 endif

@@ -63,7 +63,7 @@ ifeq ($(findstring Linux, $(OSNAME)), Linux)
 	ifeq ($(findstring x86_64, $(OSNAME)), x86_64)
 		RPATH = linux64
 	endif
-	CFLAGS += -DLINUX2
+#	CFLAGS += -DLINUX2
 	SYSLIB += -rdynamic
 endif
 

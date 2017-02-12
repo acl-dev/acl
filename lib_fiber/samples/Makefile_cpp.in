@@ -48,7 +48,8 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	ifeq ($(findstring x86_64, $(OSTYPE)), x86_64)
 		RPATH = linux64
 	endif
-	CFLAGS += -DLINUX2 -D_REENTRANT
+#	CFLAGS += -DLINUX2 -D_REENTRANT
+	CFLAGS += -D_REENTRANT
 	SYSLIB += -lcrypt
 endif
 

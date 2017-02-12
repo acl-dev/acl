@@ -902,11 +902,8 @@ avl_create(avl_tree_t *tree, int (*compar) (const void *, const void *),
  */
 /* ARGSUSED */
 void
-avl_destroy(avl_tree_t *tree)
+avl_destroy(avl_tree_t *tree acl_unused)
 {
-#ifdef ACL_ARM_LINUX
-	(void) tree;
-#endif
 	ASSERT(tree);
 	ASSERT(tree->avl_numnodes == 0);
 	ASSERT(tree->avl_root == NULL);

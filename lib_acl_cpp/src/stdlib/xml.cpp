@@ -11,7 +11,8 @@ namespace acl {
 xml_node::xml_node(xml* xml_ptr)
 	: xml_(xml_ptr)
 {
-	acl_assert(xml_ptr);
+	if (xml_ptr == NULL)
+		abort();
 }
 
 xml_node::~xml_node(void)
@@ -82,7 +83,8 @@ xml_node& xml_node::set_text(acl_int64 number)
 {
 	char buf[32];
 
-	acl_assert(acl_i64toa(number, buf, sizeof(buf)) != NULL);
+	if (acl_i64toa(number, buf, sizeof(buf)) == NULL)
+		abort();
 	return set_text(buf);
 }
 
@@ -164,7 +166,8 @@ const acl::string& xml::getText()
 xml_node& xml::create_node(const char* tag, acl_int64 number)
 {
 	char buf[32];
-	acl_assert(acl_i64toa(number, buf, sizeof(buf)) != NULL);
+	if (acl_i64toa(number, buf, sizeof(buf)) == NULL)
+		abort();
 
 	return create_node(tag, buf);
 }

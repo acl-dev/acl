@@ -234,7 +234,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 	}
 	
 #ifdef ACL_UNIX
-# ifdef ACL_ARM_LINUX
+# ifdef ACL_ANDROID
 	filefd = acl_file_open(pathname, O_RDWR, 0644);
 # else
 	filefd = acl_file_open(pathname, O_RDWR, S_IREAD | S_IWRITE | S_IRGRP);
@@ -565,7 +565,7 @@ int acl_cfg_parser_dump(const ACL_CFG_PARSER *parser,
 	if (parser == NULL || pathname == NULL || *pathname == 0)
 		return (-1);
 #ifdef ACL_UNIX
-# ifdef ACL_ARM_LINUX
+# ifdef ACL_ANDROID
 	filefd = acl_file_open(pathname,
 			O_CREAT | O_TRUNC | O_APPEND | O_WRONLY, 0644);
 # else

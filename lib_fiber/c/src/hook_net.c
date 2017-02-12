@@ -604,7 +604,9 @@ static void main_thread_free(void)
 
 static void thread_init(void)
 {
-	acl_assert(acl_pthread_key_create(&__once_key, thread_free) == 0);
+	if (acl_pthread_key_create(&__once_key, thread_free) != 0)
+		acl_msg_fatal("%s(%d), %s: pthread_key_create error %s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
 }
 
 static EPOLL_EVENT *epoll_event_create(int epfd)
@@ -614,7 +616,9 @@ static EPOLL_EVENT *epoll_event_create(int epfd)
 
 	/* using thread specific to store the epoll handles for each thread*/
 	if (__epfds == NULL) {
-		acl_assert(!acl_pthread_once(&__once_control, thread_init));
+		if (acl_pthread_once(&__once_control, thread_init) != 0)
+			acl_msg_fatal("%s(%d), %s: pthread_once error %s",
+				__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
 
 		__epfds = acl_array_create(5);
 		if ((unsigned long) acl_pthread_self() ==

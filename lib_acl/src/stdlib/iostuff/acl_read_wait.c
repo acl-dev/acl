@@ -22,7 +22,7 @@
 #include "stdlib/acl_iostuff.h"
 #include "../../init/init.h"
 
-#if defined(LINUX2) && !defined(MINGW) && defined(USE_EPOLL)
+#if defined(ACL_LINUX) && !defined(MINGW) && defined(USE_EPOLL)
 
 #include "init/acl_init.h"
 #include "thread/acl_pthread.h"

@@ -92,7 +92,8 @@ endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	CFLAGS += -DLINUX2 -fPIC -Werror
+#	CFLAGS += -DLINUX2 -fPIC -Werror
+	CFLAGS += -fPIC -Werror
 	UNIXTYPE = LINUX
 	ifeq ($(findstring i686, $(OSTYPE)), i686)
 		CFLAGS += -march=i686

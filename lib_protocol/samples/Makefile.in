@@ -60,7 +60,7 @@ endif
 
 #Path for Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	CFLAGS += -DLINUX2
+#	CFLAGS += -DLINUX2
 	SYSLIB += -lcrypt -rdynamic
 endif
 

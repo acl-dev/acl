@@ -2362,7 +2362,7 @@ char *acl_vstream_loadfile2(const char *path, ssize_t *size)
 #else
 	int   oflags = O_RDONLY;
 #endif
-#ifdef ACL_ARM_LINUX
+#ifdef ACL_ANDROID
     int   mode = 0644;
 #else
 	int   mode = S_IREAD;

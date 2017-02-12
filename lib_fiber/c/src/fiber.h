@@ -5,6 +5,13 @@
 #include <setjmp.h>
 #include "event.h"
 
+#ifdef ACL_ARM_LINUX
+extern int getcontext(ucontext_t *ucp);
+extern int setcontext(const ucontext_t *ucp);
+extern int swapcontext(struct ucontext *old_ctx, struct ucontext *new_ctx);
+extern void makecontext(ucontext_t *ucp, void (*func)(), int argc, ...);
+#endif
+
 typedef enum {
 	FIBER_STATUS_READY,
 	FIBER_STATUS_RUNNING,

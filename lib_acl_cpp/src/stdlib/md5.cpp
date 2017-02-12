@@ -342,7 +342,8 @@ const char* md5::hex_encode(const void *in, char* out, size_t size)
 	char *ptr;
 	unsigned char digest[16];
 
-	acl_assert(size >= 33);
+	if (size < 33)
+		abort();
 
 	memcpy(digest, in, 16);
 

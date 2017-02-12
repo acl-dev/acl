@@ -405,7 +405,7 @@ ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error)
 
 #elif	defined(ACL_UNIX)
 	memset(&h_buf, 0, sizeof(h_buf));
-# if	defined(LINUX2) || defined(ACL_FREEBSD)
+# if	defined(ACL_LINUX) || defined(ACL_FREEBSD)
 	n = gethostbyname_r(name, &h_buf, buf, sizeof(buf), &h_addrp, &errnum);
 	if (n) {
 		if (h_error)
@@ -473,7 +473,7 @@ typedef struct ACL_DNS_ERROR {
 } ACL_DNS_ERROR;
 
 static ACL_DNS_ERROR __dns_errlist[] = {
-#ifdef	LINUX2
+#ifdef	ACL_LINUX
 	{ HOST_NOT_FOUND, "The specified host is unknown" },
 	{ TRY_AGAIN, "A temporary error occurred on an authoritative name server.  Try again later." },
 	{ NO_RECOVERY, "A non-recoverable name server error occurred" },

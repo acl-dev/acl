@@ -92,7 +92,7 @@ bool thread::start()
 #if 0
 #ifdef	ACL_WINDOWS
 	thread_id_ = ((acl_pthread_t*) thread_)->id;
-#elif	defined(LINUX2)
+#elif	defined(ACL_LINUX)
 	thread_id_ = (unsigned long int) thread_;
 #endif
 #endif

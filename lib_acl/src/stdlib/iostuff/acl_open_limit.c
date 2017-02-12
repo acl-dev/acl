@@ -34,7 +34,7 @@
 
 #include <stdio.h>
 
-#ifdef ACL_ARM_LINUX
+#ifdef ACL_ANDROID
 int acl_open_limit(int limit)
 {
 	/* xxx: just limit to 1024 */
@@ -99,6 +99,6 @@ int acl_open_limit(int limit)
 #endif
 }
 
-#endif /* !ACL_ARM_LINUX */
+#endif /* !ACL_ANDROID */
 #endif /* !ACL_UNIX */
 

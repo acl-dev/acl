@@ -374,7 +374,7 @@ static void listen_callback(int type acl_unused, ACL_EVENT *event,
 
 	__last_fd = ACL_VSTREAM_SOCK(conn);
 	if (__last_fd > __max_fd)
-		__max_fd = __max_fd;
+		__max_fd = __last_fd;
 
 	client_wakeup(event, conn);
 }

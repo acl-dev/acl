@@ -1,6 +1,6 @@
 #include "acl_stdafx.hpp"
 
-#if !defined(HAVE_H_ICONV) && !defined(ACL_ARM_LINUX)
+#if !defined(HAVE_H_ICONV) && !defined(ANDROID)
 # define HAVE_H_ICONV
 #endif
 
