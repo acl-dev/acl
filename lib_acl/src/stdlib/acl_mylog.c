@@ -71,9 +71,9 @@ struct ACL_LOG {
 	struct sockaddr_in from;
 	struct sockaddr_in dest;
 	int   from_len;
-	acl_uint64   count;		/**< ï¿½Ñ¾ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½ */
-	time_t last_open;		/**< ï¿½Ï´ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½Ê±ï¿½ï¿½ */
-	time_t reopen_inter;		/**< ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½Â´ò¿ªµï¿½ï¿½ï¿½Ð¡Ê±ï¿½ï¿½ï¿½ï¿½ */
+	acl_uint64   count;		/**< ÒÑ¾­¼ÇÂ¼µÄÈÕÖ¾ÌõÊý */
+	time_t last_open;		/**< ÉÏ´ÎÈÕÖ¾´ò¿ªÊ±¼ä */
+	time_t reopen_inter;		/**< ÈÕÖ¾ÖØÐÂ´ò¿ªµÄ×îÐ¡Ê±¼ä¼ä¸ô */
 };
 
 #ifdef ACL_WINDOWS
@@ -427,13 +427,13 @@ static int open_log(const char *recipient, const char *logpre)
 }
 
 /*
- * recipients ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½:
+ * recipients ¿ÉÒÔÊÇÒÔÏÂÈÕÖ¾¸ñÊ½µÄ×éºÏ:
  *  tcp:127.0.0.1:8088
  *  udp:127.0.0.1:8088
  *  unix:/var/log/unix.sock
  *  file:/var/log/unix.log
  *  /var/log/unix.log
- * ï¿½ç£ºtcp:127.0.0.1:8088|/var/log/unix.log
+ * Èç£ºtcp:127.0.0.1:8088|/var/log/unix.log
  */
 int acl_open_log(const char *recipients, const char *logpre)
 {
