@@ -62,7 +62,7 @@ static int event_limit(int fdsize)
 {
 	const char *myname = "event_limit";
 
-#ifdef ACL_UNIX
+#if defined(ACL_UNIX) && !defined(MINGW)
 	if ((fdsize = acl_open_limit(fdsize)) < 0) {
 		acl_msg_fatal("%s: unable to determine open file limit, err=%s",
 			myname, acl_last_serror());

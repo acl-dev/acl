@@ -42,6 +42,20 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	SYSLIB += -lcrypt
 endif
 
+# For MINGW
+ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	SYSLIB = -lpthread-2 -liconv -lz
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	SYSLIB = -lpthread-2 -liconv -lz
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
 #Path for SunOS
 ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring 86, $(UNIXNAME)), 86)

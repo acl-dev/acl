@@ -43,9 +43,11 @@ CFLAGS = -c -g -W \
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
 SYSLIB = -lpthread
 CHECKSYSRES = @echo "Unknow system type!";exit 1
-UNIXNAME = $(shell uname -sm)
+#UNIXNAME = $(shell uname -sm)
+UNIXNAME = $(shell uname -s)
 UNIXTYPE = LINUX
-OSTYPE = $(shell uname -p)
+#OSTYPE = $(shell uname -p)
+OSTYPE = $(shell uname -m)
 RPATH =
 
 ifeq ($(CC),)
@@ -119,6 +121,14 @@ endif
 
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+	SYSLIB = -lpthread-2
+	RPATH = mingw
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
 	SYSLIB = -lpthread-2

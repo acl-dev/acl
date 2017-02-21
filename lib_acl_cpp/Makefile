@@ -95,6 +95,12 @@ ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	UNIXTYPE = LINUX
 endif
 
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
 # For SunOS
 ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring 86, $(UNIXNAME)), 86)

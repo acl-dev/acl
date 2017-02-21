@@ -18,7 +18,7 @@ static void child(int argc acl_unused, char *argv[] acl_unused)
 	const char *ptr;
 	int   ret, i;
 
-	acl_init();
+	acl_lib_init();
 
 	env_list = acl_getenv_list();
 	acl_vstring_sprintf(vbuf, "env_list(%s)", env_list);
@@ -65,7 +65,7 @@ static void child(int argc acl_unused, char *argv[] acl_unused)
 
 	printf("%s(%d): child over\r\n", myname, getpid());
 	fflush(stdout);
-	acl_end();
+	acl_lib_end();
 }
 
 static void pipe_fd_status(ACL_FILE_HANDLE fd)
@@ -99,7 +99,7 @@ static void parent(int argc acl_unused, char *argv[])
 	char  buf[1024];
 	int   ret, i;
 
-	acl_init();
+	acl_lib_init();
 	printf("%s: pid = %d\r\n", myname, getpid());
 	command = argv[0];
 	acl_argv_add(args, command, "-c", NULL);
@@ -146,7 +146,7 @@ error_end:
 
 	acl_argv_free(env);
 	acl_argv_free(args);
-	acl_end();
+	acl_lib_end();
 }
 
 static void usage(const char *procname)

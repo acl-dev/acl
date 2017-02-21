@@ -47,6 +47,13 @@ ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	UNIXTYPE = LINUX
 endif
 
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	SYSLIB = -lpthread-2
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
 #Path for SunOS
 ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring 86, $(UNIXNAME)), 86)

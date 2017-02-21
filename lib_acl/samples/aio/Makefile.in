@@ -44,6 +44,13 @@ ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	UNIXTYPE = LINUX
 endif
 
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	SYSLIB = -lpthread-2
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX

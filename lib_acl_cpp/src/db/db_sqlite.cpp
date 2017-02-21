@@ -1,4 +1,7 @@
 #include "acl_stdafx.hpp"
+#ifdef ACL_WINDOWS
+#include <io.h>
+#endif
 #include "sqlite3.h"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/charset_conv.hpp"
@@ -12,7 +15,8 @@
 
 #ifndef STDCALL
 # ifdef ACL_WINDOWS
-#  define STDCALL __stdcall
+//#  define STDCALL __stdcall
+#  define STDCALL
 # else
 #  define STDCALL
 # endif // ACL_WINDOWS
@@ -264,6 +268,7 @@ const char* db_sqlite::get_error() const
 	else
 		return "sqlite not opened yet!";
 }
+
 bool db_sqlite::dbopen(const char* charset /* = NULL */)
 {
 	// 如果数据库已经打开，则直接返回 true
@@ -290,6 +295,22 @@ bool db_sqlite::dbopen(const char* charset /* = NULL */)
 	}
 	else
 		ptr = buf.c_str();
+
+	string path;
+	string& dir = path.dirname(dbfile_);
+
+#ifdef ACL_WINDOWS
+	if (!dir.empty() && dir != "." &&
+		_access(dir.c_str(), 6) == -1 && errno == ENOENT)
+#else
+	if (!dir.empty() && dir != "." &&
+		access(dir.c_str(), R_OK | W_OK | X_OK) == -1 && errno == ENOENT)
+#endif
+	{
+		if (acl_make_dirs(dir.c_str(), 0755) == -1)
+			logger_error("make dirs error %s, dir: %s",
+				last_serror(), dir.c_str());
+	}
 
 	// 打开 sqlite 数据库
 	int   ret = __sqlite3_open(ptr, &db_);
