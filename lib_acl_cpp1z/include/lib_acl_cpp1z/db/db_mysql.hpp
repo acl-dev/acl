@@ -52,7 +52,8 @@ namespace acl
 			}
 
 			template<typename T, typename... Args>
-			std::enable_if_t<(sizeof...(Args) == 0), std::pair<bool, std::vector<T>>> select(const char *sql)
+			std::enable_if_t<(sizeof...(Args) == 0), std::pair<bool, std::vector<T>>> 
+				select(const char *sql)
 			{
 				std::vector<T> v;
 
@@ -74,7 +75,55 @@ namespace acl
 				}
 				return{ true, v };
 			}
+
+			template<typename T, typename... Args>
+			std::enable_if_t<(sizeof...(Args) == 0), bool>
+				select(const char *sql, std::string &json_str)
+			{
+				if (!sql_select(sql))
+					return false;
+				json_str.push_back('[');
+
+				for (size_t i = 0; i < length(); i++)
+				{
+					T t;
+					json_str.push_back('{');
+					const acl::db_row* row = (*this)[i];
+					for_each(t, [&](auto& item, size_t I, bool is_last)
+					{
+						const char * row_name = get_name<T>(I);
+						const char * value = (*row)[row_name];
+						json_str.append(row_name);
+						json_str.append(":");
+						append_x(item, json_str);
+						if (value)
+							json_str.append(value);
+						append_x(item, json_str);
+						if (!is_last)
+							json_str.push_back(',');
+
+					});
+					json_str.push_back('}');
+					json_str.push_back(',');
+				}
+				if (json_str.back() == ',')
+					json_str.pop_back();
+				json_str.push_back(']');
+				return true;
+			}
 		private:
+			template<typename T>
+			std::enable_if_t<std::is_arithmetic<T>::value>
+			append_x(T &, std::string &str)
+			{
+				return;
+			}
+			template<typename T>
+			std::enable_if_t<!std::is_arithmetic<T>::value>
+			append_x(T &, std::string &str)
+			{
+				str.push_back('"');
+			}
 			void assign(int &item, const char *value)
 			{
 				item = std::strtol(value, 0, 10);
