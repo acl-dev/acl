@@ -67,7 +67,8 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD -fPIC -Werror
+#	CFLAGS += -DFREEBSD -fPIC -Werror
+	CFLAGS += -fPIC -Werror
 	UNIXTYPE = FREEBSD
 	shared_ldflags = -l_protocol -l_acl -L/usr/local/lib -liconv -lz -lpthread
 endif

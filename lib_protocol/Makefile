@@ -63,7 +63,8 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD -fPIC -Werror
+#	CFLAGS += -DFREEBSD -fPIC -Werror
+	CFLAGS += -fPIC -Werror
 	UNIXTYPE = FREEBSD
 endif
 
