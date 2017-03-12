@@ -301,7 +301,7 @@ void rfc822::mkdate_gmt(time_t t, char *buf, size_t size)
 void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 {
 	struct tm *p;
-	int offset = 0;
+	long offset = 0;
 
 #ifdef	ACL_WINDOWS
 # if _MSC_VER >= 1500
@@ -429,7 +429,7 @@ void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 		p->tm_sec,
 		offset);
 #else
-	safe_snprintf(buf, size, "%s, %02d %s %04d %02d:%02d:%02d %+05d (CST)",
+	safe_snprintf(buf, size, "%s, %02d %s %04d %02d:%02d:%02d %+05ld (CST)",
 		wdays[p->tm_wday],
 		p->tm_mday,
 		months[p->tm_mon],

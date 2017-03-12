@@ -1249,7 +1249,7 @@ static void run_loop(const char *procname)
 	}
 
 	/* not reached here */
-	aio_server_exit();
+	/* aio_server_exit(); */
 }
 
 /* acl_aio_server_main - the real main program */

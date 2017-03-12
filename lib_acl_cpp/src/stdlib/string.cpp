@@ -118,7 +118,7 @@ string& string::set_max(int max)
 
 int string::get_max(void) const
 {
-	return vbf_->maxlen;
+	return (int) vbf_->maxlen;
 }
 
 char string::operator [](size_t n) const
@@ -138,9 +138,9 @@ char& string::operator [](size_t n)
 	// 当偏移位置大于所分配空间的最大位置，需要重新分配内存
 	if (n >= (size_t) CAP(vbf_))
 	{
-		int  len = CAP(vbf_);
+		int  len = (int) CAP(vbf_);
 		space(n + 1);
-		int  new_len = CAP(vbf_);
+		int  new_len = (int) CAP(vbf_);
 
 		// 初始化新分配的内存
 		if (new_len > len)

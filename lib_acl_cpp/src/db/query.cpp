@@ -118,7 +118,8 @@ const string& query::to_string()
 		SKIP_WHILE(*ptr != ',' && *ptr != ';'
 			&& *ptr != ' ' && *ptr != '\t'
 			&& *ptr != '(' && *ptr != ')'
-			&& *ptr != '\r' && *ptr != '\n', ptr);
+			&& *ptr != '\r' && *ptr != '\n'
+			&& *ptr != '\'', ptr);
 		if (ptr - key == 1)
 		{
 			logger_warn("only found: ':%c'", *ptr);

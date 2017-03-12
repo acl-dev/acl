@@ -225,7 +225,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 	parser->total_line = 0;
 	parser->valid_line = 0;
 
-	buf_size = stat_buf.st_size + 256;
+	buf_size = (int) stat_buf.st_size + 256;
 	content_buf = (char *) acl_mycalloc(1, buf_size);
 	if (content_buf == NULL) {
 		printf("%s: can't calloc, pathname=%s, errmsg=%s\n",

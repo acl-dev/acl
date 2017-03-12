@@ -647,7 +647,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		acl_event_loop(__event);
 
 	/* not reached here */
-	udp_server_exit();
+	/* udp_server_exit(); */
 }
 
 #endif /* ACL_UNIX */

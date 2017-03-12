@@ -258,7 +258,7 @@ static bool save_as(ifstream& in, fstream& out, MIME_NODE* node)
 		return (true);
 	}
 
-	ssize_t len = node->header_end - node->header_begin;
+	ssize_t len = (ssize_t) node->header_end - (ssize_t) node->header_begin;
 	if (len <= 0)
 	{
 		logger_warn("header_begin(%ld) >= header_end(%ld)",
@@ -273,9 +273,9 @@ static bool save_as(ifstream& in, fstream& out, MIME_NODE* node)
 	// 而对于非 multipart 邮件其 bound_end 应为 0，此时应
 	// 采用 body_end
 	if (node->bound_end > node->body_begin)
-		len = node->bound_end - node->body_begin;
+		len = (ssize_t) node->bound_end - (ssize_t) node->body_begin;
 	else
-		len = node->body_end - node->body_begin;
+		len = (ssize_t) node->body_end - (ssize_t) node->body_begin;
 	if (len <= 0)
 		return (true);
 	return (save_as(in, out, node->body_begin, len));
@@ -817,7 +817,7 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 		return;
 	}
 
-	ssize_t dlen = node->header_end - node->header_begin;
+	ssize_t dlen = (ssize_t) node->header_end - (ssize_t) node->header_begin;
 
 	out.puts(">---------header begin--------<");
 	off_t pos = (off_t) in.fseek(node->header_begin, SEEK_SET);
@@ -838,7 +838,7 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 	out.puts(">---------header end----------<");
 	acl_myfree(pbuf);
 
-	dlen = node->body_end - node->body_begin;
+	dlen = (ssize_t) (node->body_end - node->body_begin);
 	printf(">>>%s: body begin: %ld, end: %ld, len: %ld\r\n",
 		__FUNCTION__, (long int) node->body_begin,
 		(long int) node->body_end, (long int) dlen);
@@ -885,7 +885,7 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 		{
 			n = dlen > 8192 ? 8192 : dlen;
 			//n = dlen;
-			decoder->decode_update(ptr, n, &result);
+			decoder->decode_update(ptr, (int) n, &result);
 			if (result.length() > 0)
 			{
 				out.write(result.c_str(), result.length());

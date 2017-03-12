@@ -1483,5 +1483,5 @@ void acl_threads_server_main(int argc, char * argv[],
 		acl_event_loop(__event);
 
 	/* not reached here */
-	server_exit();
+	/* server_exit(); */
 }

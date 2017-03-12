@@ -2331,7 +2331,6 @@ ACL_VSTREAM *acl_vstream_fopen(const char *path, unsigned int oflags,
 #endif
 
 	fh = acl_file_open(path, oflags, mode);
-
 	if (fh == ACL_FILE_INVALID)
 		return NULL;
 

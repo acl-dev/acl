@@ -40,6 +40,7 @@ int acl_secure_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
 #  include <pthread.h>
 #  include <dlfcn.h>
 #  include <dirent.h>
+#  include <fcntl.h>
 #  include <netinet/in.h>
 #  include <netinet/ip.h>
 #  include <netinet/tcp.h>

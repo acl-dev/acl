@@ -69,7 +69,7 @@ void http_mime_node::load_param(const char* path)
 		return;
 	}
 
-	size_t len = end - begin;
+	size_t len = (size_t) (end - begin);
 	char* buf = (char*) acl_mymalloc(len + 1);
 	if (in.read(buf, len) == -1)
 	{

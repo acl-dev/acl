@@ -251,7 +251,11 @@ void acl_netdb_add_addr(ACL_DNS_DB *dns_db, const char *ip, int hport)
 
 	memset(&phost->saddr, 0, sizeof(phost->saddr));
 	ACL_SAFE_STRNCPY(phost->ip, ip, sizeof(phost->ip));
+#ifdef ACL_WINDOWS
 	phost->saddr.sin_addr.s_addr = (unsigned long) inet_addr(ip);
+#else
+	phost->saddr.sin_addr.s_addr = (in_addr_t) inet_addr(ip);
+#endif
 	phost->hport = hport;
 
 	if (acl_array_append(dns_db->h_db, phost) < 0) {

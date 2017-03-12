@@ -733,7 +733,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 		while (1)
 			service(stream, __service_name, __service_argv);
 		/* not reached here */
-		multi_server_exit();
+		/* multi_server_exit(); */
 	}
 
 	/*

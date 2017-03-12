@@ -58,7 +58,7 @@ int acl_master_flow_get(int len)
 	char  buf[BUFFER_SIZE];
 	struct stat st;
 	int   count;
-	int   n = 0;
+	ssize_t n = 0;
 
 	/*
 	 * Sanity check.
@@ -96,7 +96,7 @@ int acl_master_flow_put(int len)
 	const char *myname = "acl_master_flow_put";
 	char  buf[BUFFER_SIZE];
 	int   count;
-	int   n = 0;
+	ssize_t n = 0;
 
 	/* Sanity check. */
 	if (len <= 0)
@@ -106,8 +106,8 @@ int acl_master_flow_put(int len)
 	memset(buf, 0, len > BUFFER_SIZE ? BUFFER_SIZE : len);
 
 	for (count = len; count > 0; count -= n) {
-		n = write(ACL_MASTER_FLOW_WRITE, buf,
-			count > BUFFER_SIZE ?  BUFFER_SIZE : count);
+		n = write((int) ACL_MASTER_FLOW_WRITE, buf,
+			(size_t) count > BUFFER_SIZE ?  BUFFER_SIZE : (size_t) count);
 		if (n < 0)
 			return -1;
 	}

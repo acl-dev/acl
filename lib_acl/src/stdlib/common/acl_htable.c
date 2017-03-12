@@ -171,7 +171,7 @@ static unsigned __def_hash_fn(const void *buffer, size_t len)
                 }
         }
 
-        return (h);
+        return (unsigned) h;
 }
 /* htable_link - insert element into table */
 

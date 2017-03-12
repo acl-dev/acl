@@ -53,7 +53,7 @@ static int dns_read(ACL_SOCKET fd, void *buf, size_t size,
 
 	dns->addr_from.addr_len = sizeof(dns->addr_from.addr);
 #ifdef ACL_UNIX
-	ret = recvfrom(fd, buf, size, 0,
+	ret = (int) recvfrom(fd, buf, size, 0,
 			(struct sockaddr*) &dns->addr_from.addr,
 			(socklen_t*) &dns->addr_from.addr_len);
 #elif defined(ACL_WINDOWS)
@@ -92,7 +92,7 @@ static int dns_write(ACL_SOCKET fd, const void *buf, size_t size,
 			myname, __LINE__, i);
 
 #ifdef ACL_UNIX 
-	ret = sendto(fd, buf, size, 0,
+	ret = (int) sendto(fd, buf, size, 0,
 			(struct sockaddr*) &addr->addr, addr->addr_len);
 #elif defined(ACL_WINDOWS)
 	ret = sendto(fd, (const char*) buf, (int) size,
@@ -342,7 +342,7 @@ static void dns_stream_open(ACL_DNS *dns)
 		acl_msg_fatal("%s: socket create error", myname);
 
 	/* 创建 ACL_VSTREAM 流并设置读写接口 */
-
+    
 	vstream = acl_vstream_fdopen(fd, O_RDWR, 1024, 0, ACL_VSTREAM_TYPE_SOCK);
 	acl_vstream_ctl(vstream,
 		ACL_VSTREAM_CTL_READ_FN, dns_read,
@@ -368,7 +368,7 @@ static int dns_lookup_send(ACL_DNS *dns, ACL_DNS_REQ *handle, const char *domain
 
 	memset(buf, 0, sizeof(buf));
 	/* 创建DNS查询数据包 */
-	ret = rfc1035BuildAQuery(domain, buf, sizeof(buf), dns->qid, NULL);
+	ret = (int) rfc1035BuildAQuery(domain, buf, sizeof(buf), dns->qid, NULL);
 	if (ret < 0) {
 		acl_msg_error("%s(%d): rfc1035BuildAQuery error for(%s)",
 			myname, __LINE__, domain);

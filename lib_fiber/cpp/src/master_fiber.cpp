@@ -37,8 +37,7 @@ void master_fiber::run_daemon(int argc, char** argv)
 		ACL_MASTER_SERVER_END);
 }
 
-bool master_fiber::run_alone(const char* addrs, const char* path /* = NULL */,
-	unsigned int)
+bool master_fiber::run_alone(const char* addrs, const char* path /* = NULL */)
 {
 	// 每个进程只能有一个实例在运行
 	acl_assert(has_called == false);

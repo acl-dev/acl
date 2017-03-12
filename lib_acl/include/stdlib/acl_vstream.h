@@ -13,6 +13,7 @@ extern "C" {
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/uio.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <netinet/in.h>
 #endif
@@ -24,6 +25,7 @@ extern "C" {
 #define	ACL_VSTREAM_EOF		(-1)		/* no more space or data */
 
 #ifdef	ACL_UNIX
+
 # ifndef	O_RDONLY
 #  define	O_RDONLY	0
 # endif

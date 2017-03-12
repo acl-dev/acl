@@ -265,7 +265,7 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 	if (stream->read_ready)
 		stream->read_ready = 0;
 
-	ret = recvfrom(fd, buf, (int) size, 0, (struct sockaddr*) &sa, &sa_len);
+	ret = (int) recvfrom(fd, buf, (int) size, 0, (struct sockaddr*) &sa, &sa_len);
 
 	if (ret > 0 && memcmp(stream->sa_peer, &sa, sizeof(sa)) != 0)
 		acl_vstream_set_peer_addr(stream, &sa);
@@ -282,9 +282,9 @@ static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
 		acl_msg_fatal("%s, %s(%d): peer addr null",
 			myname, __FILE__, __LINE__);
 
-	ret = sendto(fd, buf, (int) size, 0,
-		(struct sockaddr*) stream->sa_peer,
-		(int) stream->sa_peer_len);
+	ret = (int) sendto(fd, buf, (int) size, 0,
+					(struct sockaddr*) stream->sa_peer,
+					(int) stream->sa_peer_len);
 	return ret;
 }
 

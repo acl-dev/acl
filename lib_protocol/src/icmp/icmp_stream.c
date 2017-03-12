@@ -9,7 +9,7 @@ static int icmp_read(ACL_SOCKET fd, void *buf, size_t size,
 	int   ret;
 
 #ifdef ACL_UNIX
-	ret = recvfrom(fd, buf, size, 0, (struct sockaddr*) &is->from,
+	ret = (int) recvfrom(fd, buf, size, 0, (struct sockaddr*) &is->from,
 			(socklen_t*) &is->from_len);
 #elif defined(ACL_WINDOWS)
 	ret = recvfrom(fd, (char*) buf, (int) size, 0,
@@ -30,7 +30,7 @@ static int icmp_write(ACL_SOCKET fd, const void *buf, size_t size,
 	int   ret;
 
 #ifdef ACL_UNIX
-	ret = sendto(fd, buf, size, 0, (struct sockaddr*) &is->curr_host->dest,
+	ret = (int) sendto(fd, buf, size, 0, (struct sockaddr*) &is->curr_host->dest,
 		sizeof(is->curr_host->dest));
 #elif defined(ACL_WINDOWS)
 	ret = sendto(fd, (const char*) buf, (int) size, 0,

@@ -1,3 +1,9 @@
+
+42) 2017.3.9
+42.1) compile:  当打开 valgrind 编译选项时，有一处编译警告
+42.2) workaround: master_fiber 类中的方法 run_alone 去掉最后一个参数，其原来用
+来控制处理次数，改由从配置文件中读取
+
 41) 2017.2.9
 41.1) bugfix: fiber.c 中，fiber_init 函数应该必须保证 __sys_errno 为 NULL 时
 被调用，否则会引起一些静态初始化需要 __sys_errno 的使用

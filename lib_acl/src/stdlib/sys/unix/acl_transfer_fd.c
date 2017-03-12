@@ -88,7 +88,7 @@ int acl_read_fd(int fd, void *ptr, int nbytes, int *recv_fd)
 	msg.msg_iov = iov;
 	msg.msg_iovlen = 1;
 
-	if ((n = RECVMSG(fd, &msg, 0)) <= 0)
+	if ((n = (int) RECVMSG(fd, &msg, 0)) <= 0)
 		return n;
 
 #if  defined(HAVE_MSGHDR_MSG_CONTROL) && !defined(MINGW)
@@ -164,7 +164,7 @@ int acl_write_fd(int fd, void *ptr, int nbytes, int send_fd)
 	msg.msg_iov = iov;
 	msg.msg_iovlen = 1;
 
-	return SENDMSG(fd, &msg, 0);
+	return (int) SENDMSG(fd, &msg, 0);
 }
 
 # endif /* MINGW */

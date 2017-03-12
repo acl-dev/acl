@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
 		acl::log::stdout_open(true);
 		printf("listen: %s\r\n", addr);
-		ms.run_alone(addr, argc >= 3 ? argv[2] : NULL, 0);
+		ms.run_alone(addr, argc >= 3 ? argv[2] : NULL);
 	}
 	else
 		ms.run_daemon(argc, argv);

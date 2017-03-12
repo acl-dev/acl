@@ -27,24 +27,25 @@ struct HTABLE {
 
 static unsigned __def_hash_fn(const void *buffer, size_t len)
 {
-        unsigned long h = 0;
-        unsigned long g;
-	const unsigned char* s = (const unsigned char *) buffer;
+    unsigned long h = 0;
+    unsigned long g;
+    const unsigned char* s = (const unsigned char *) buffer;
 
-        /*
-         * From the "Dragon" book by Aho, Sethi and Ullman.
-         */
+    /*
+     * From the "Dragon" book by Aho, Sethi and Ullman.
+     */
 
-        while (len-- > 0) {
-                h = (h << 4) + *s++;
-                if ((g = (h & 0xf0000000)) != 0) {
-                        h ^= (g >> 24);
-                        h ^= g;
-                }
-        }
+    while (len-- > 0) {
+            h = (h << 4) + *s++;
+            if ((g = (h & 0xf0000000)) != 0) {
+                h ^= (g >> 24);
+                h ^= g;
+            }
+    }
 
-        return (h);
+    return (unsigned) h;
 }
+
 /* htable_link - insert element into table */
 
 #define htable_link(_table, _element, _n) { \
@@ -305,7 +306,7 @@ int htable_delete(HTABLE *table, const char *key, void (*free_fn) (char *) acl_u
 				if (!(table->flag & KEY_REUSE))
 					acl_myfree(ht->key.key);
 				if (table->slice)
-					acl_slice_free(table->slice, ht);
+					acl_slice_free2(table->slice, ht);
 				else
 					acl_myfree(ht);
 				return(0);
@@ -336,7 +337,7 @@ void htable_free(HTABLE *table, void (*free_fn) (char *) acl_unused)
 				if (!(table->flag & KEY_REUSE))
 					acl_myfree(ht->key.key);
 				if (table->slice)
-					acl_slice_free(table->slice, ht);
+					acl_slice_free2(table->slice, ht);
 				else
 					acl_myfree(ht);
 			}

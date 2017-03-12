@@ -337,7 +337,8 @@ public:
 
 	~db_mysql_rows()
 	{
-		__mysql_free_result(my_res_);
+		if (__mysql_dll)
+			__mysql_free_result(my_res_);
 	}
 
 private:
@@ -417,7 +418,7 @@ db_mysql::~db_mysql()
 		acl_myfree(dbuser_);
 	if (dbpass_)
 		acl_myfree(dbpass_);
-	if (conn_)
+	if (conn_ && __mysql_dll)
 		__mysql_close(conn_);
 }
 
@@ -649,7 +650,7 @@ bool db_mysql::is_opened() const
 
 bool db_mysql::close()
 {
-	if (conn_ != NULL)
+	if (conn_ && __mysql_dll)
 	{
 		__mysql_close(conn_);
 		conn_ = NULL;

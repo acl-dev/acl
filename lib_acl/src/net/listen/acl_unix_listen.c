@@ -33,7 +33,7 @@ ACL_SOCKET acl_unix_listen(const char *addr, int backlog, int block_mode)
 {
 #undef sun
 	struct sockaddr_un sun;
-	int     len = strlen(addr);
+	int     len = (int) strlen(addr);
 	ACL_SOCKET  sock;
 	char  tbuf[256];
 

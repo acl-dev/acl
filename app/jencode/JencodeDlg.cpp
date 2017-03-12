@@ -1,4 +1,4 @@
-// JencodeDlg.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// JencodeDlg.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -18,20 +18,20 @@
 #define WM_USER_TRANS_OVER	WM_USER + 100
 #define WM_USER_TRANS_OVER2	WM_USER + 101
 
-// ÓÃÓÚÓ¦ÓÃ³ÌĞò¡°¹ØÓÚ¡±²Ëµ¥ÏîµÄ CAboutDlg ¶Ô»°¿ò
+// ç”¨äºåº”ç”¨ç¨‹åºâ€œå…³äºâ€èœå•é¡¹çš„ CAboutDlg å¯¹è¯æ¡†
 
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_ABOUTBOX };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
-// ÊµÏÖ
+// å®ç°
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -49,7 +49,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CJencodeDlg ¶Ô»°¿ò
+// CJencodeDlg å¯¹è¯æ¡†
 
 
 
@@ -82,18 +82,19 @@ BEGIN_MESSAGE_MAP(CJencodeDlg, CDialog)
 	ON_BN_CLICKED(IDC_IDX_SELECT, OnBnClickedIdxSelect)
 	ON_BN_CLICKED(IDC_TRANS_IDX, OnBnClickedTransIdx)
 	ON_BN_CLICKED(IDC_DEL_BOM, OnBnClickedDelBom)
+	ON_BN_CLICKED(IDC_BUTTON_GB2UNI, &CJencodeDlg::OnBnClickedButtonGb2uni)
 END_MESSAGE_MAP()
 
 
-// CJencodeDlg ÏûÏ¢´¦Àí³ÌĞò
+// CJencodeDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 BOOL CJencodeDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// ½«\¡°¹ØÓÚ...\¡±²Ëµ¥ÏîÌí¼Óµ½ÏµÍ³²Ëµ¥ÖĞ¡£
+	// å°†\â€œå…³äº...\â€èœå•é¡¹æ·»åŠ åˆ°ç³»ç»Ÿèœå•ä¸­ã€‚
 
-	// IDM_ABOUTBOX ±ØĞëÔÚÏµÍ³ÃüÁî·¶Î§ÄÚ¡£
+	// IDM_ABOUTBOX å¿…é¡»åœ¨ç³»ç»Ÿå‘½ä»¤èŒƒå›´å†…ã€‚
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -109,24 +110,24 @@ BOOL CJencodeDlg::OnInitDialog()
 		}
 	}
 
-	// ÉèÖÃ´Ë¶Ô»°¿òµÄÍ¼±ê¡£µ±Ó¦ÓÃ³ÌĞòÖ÷´°¿Ú²»ÊÇ¶Ô»°¿òÊ±£¬¿ò¼Ü½«×Ô¶¯
-	//  Ö´ĞĞ´Ë²Ù×÷
-	SetIcon(m_hIcon, TRUE);			// ÉèÖÃ´óÍ¼±ê
-	SetIcon(m_hIcon, FALSE);		// ÉèÖÃĞ¡Í¼±ê
+	// è®¾ç½®æ­¤å¯¹è¯æ¡†çš„å›¾æ ‡ã€‚å½“åº”ç”¨ç¨‹åºä¸»çª—å£ä¸æ˜¯å¯¹è¯æ¡†æ—¶ï¼Œæ¡†æ¶å°†è‡ªåŠ¨
+	//  æ‰§è¡Œæ­¤æ“ä½œ
+	SetIcon(m_hIcon, TRUE);			// è®¾ç½®å¤§å›¾æ ‡
+	SetIcon(m_hIcon, FALSE);		// è®¾ç½®å°å›¾æ ‡
 
-	// TODO: ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–ä»£ç 
 
 	acl_msg_open("jencode.log", "jencode");
-
-	// Ìí¼Ó×´Ì¬À¸
+	//freopen("CONOUT$","w+t",stdout);
+	// æ·»åŠ çŠ¶æ€æ 
 	int aWidths[2] = {50, -1};
 	m_wndStatus.Create(WS_CHILD | WS_VISIBLE | WS_BORDER
 		| CCS_BOTTOM | SBARS_SIZEGRIP,
 		CRect(0,0,0,0), this, 0);
 	m_wndStatus.SetParts(2, aWidths);
-	m_wndStatus.SetText("¾ÍĞ÷", 0, 0);
+	m_wndStatus.SetText("å°±ç»ª", 0, 0);
 	m_wndStatus.SetText("", 1, 0);
-	return TRUE;  // ³ı·ÇÉèÖÃÁË¿Ø¼şµÄ½¹µã£¬·ñÔò·µ»Ø TRUE
+	return TRUE;  // é™¤éè®¾ç½®äº†æ§ä»¶çš„ç„¦ç‚¹ï¼Œå¦åˆ™è¿”å› TRUE
 }
 
 void CJencodeDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -142,19 +143,19 @@ void CJencodeDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// Èç¹ûÏò¶Ô»°¿òÌí¼Ó×îĞ¡»¯°´Å¥£¬ÔòĞèÒªÏÂÃæµÄ´úÂë
-//  À´»æÖÆ¸ÃÍ¼±ê¡£¶ÔÓÚÊ¹ÓÃÎÄµµ/ÊÓÍ¼Ä£ĞÍµÄ MFC Ó¦ÓÃ³ÌĞò£¬
-//  Õâ½«ÓÉ¿ò¼Ü×Ô¶¯Íê³É¡£
+// å¦‚æœå‘å¯¹è¯æ¡†æ·»åŠ æœ€å°åŒ–æŒ‰é’®ï¼Œåˆ™éœ€è¦ä¸‹é¢çš„ä»£ç 
+//  æ¥ç»˜åˆ¶è¯¥å›¾æ ‡ã€‚å¯¹äºä½¿ç”¨æ–‡æ¡£/è§†å›¾æ¨¡å‹çš„ MFC åº”ç”¨ç¨‹åºï¼Œ
+//  è¿™å°†ç”±æ¡†æ¶è‡ªåŠ¨å®Œæˆã€‚
 
 void CJencodeDlg::OnPaint() 
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // ÓÃÓÚ»æÖÆµÄÉè±¸ÉÏÏÂÎÄ
+		CPaintDC dc(this); // ç”¨äºç»˜åˆ¶çš„è®¾å¤‡ä¸Šä¸‹æ–‡
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// Ê¹Í¼±êÔÚ¹¤×÷¾ØĞÎÖĞ¾ÓÖĞ
+		// ä½¿å›¾æ ‡åœ¨å·¥ä½œçŸ©å½¢ä¸­å±…ä¸­
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -162,7 +163,7 @@ void CJencodeDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// »æÖÆÍ¼±ê
+		// ç»˜åˆ¶å›¾æ ‡
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -171,7 +172,7 @@ void CJencodeDlg::OnPaint()
 	}
 }
 
-//µ±ÓÃ»§ÍÏ¶¯×îĞ¡»¯´°¿ÚÊ±ÏµÍ³µ÷ÓÃ´Ëº¯ÊıÈ¡µÃ¹â±êÏÔÊ¾¡£
+//å½“ç”¨æˆ·æ‹–åŠ¨æœ€å°åŒ–çª—å£æ—¶ç³»ç»Ÿè°ƒç”¨æ­¤å‡½æ•°å–å¾—å…‰æ ‡æ˜¾ç¤ºã€‚
 HCURSOR CJencodeDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -193,7 +194,7 @@ BOOL CJencodeDlg::CheckPath(void)
 	//MessageBox(m_sPath);
 	if (m_sPath.GetLength() == 0)
 	{
-		MessageBox("ÇëÑ¡ÔñÔ´Ä¿Â¼...");
+		MessageBox("è¯·é€‰æ‹©æºç›®å½•...");
 		return FALSE;
 	}
 
@@ -202,7 +203,7 @@ BOOL CJencodeDlg::CheckPath(void)
 	//GetDlgItem(IDC_EDIT_DPATH)->GetWindowText(m_dPath);
 	//if (m_dPath.GetLength() == 0)
 	//{
-	//	MessageBox("ÇëÑ¡ÔñÄ¿µÄÄ¿Â¼...");
+	//	MessageBox("è¯·é€‰æ‹©ç›®çš„ç›®å½•...");
 	//	return FALSE;
 	//}
 
@@ -220,23 +221,23 @@ void CJencodeDlg::ButtonsDisable(void)
 
 void CJencodeDlg::OnBnClickedButtonGb2utf()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	if (!CheckPath())
 		return;
 
-	static CGb2Utf8 gb2Utf8("gbk", "utf-8");
+	static CGb2Utf8 gb2Utf8("gbk", "UTF-8");
 
 	gb2Utf8.Init(this->GetSafeHwnd(), m_sPath, m_dPath);
 	gb2Utf8.OnTransEnd(WM_USER_TRANS_OVER);
 	gb2Utf8.Run();
-	m_wndStatus.SetText("ÔËĞĞ", 0, 0);
+	m_wndStatus.SetText("è¿è¡Œ", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
 }
 
 void CJencodeDlg::OnBnClickedButtonUtf2gb()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	if (!CheckPath())
 	{
 		MessageBox(m_sPath);
@@ -248,14 +249,35 @@ void CJencodeDlg::OnBnClickedButtonUtf2gb()
 	utf2gb.Init(this->GetSafeHwnd(), m_sPath, m_dPath);
 	utf2gb.OnTransEnd(WM_USER_TRANS_OVER);
 	utf2gb.Run();
-	m_wndStatus.SetText("ÔËĞĞ", 0, 0);
+	m_wndStatus.SetText("è¿è¡Œ", 0, 0);
+	m_nBegin = time(NULL);
+	ButtonsDisable();
+}
+
+void CJencodeDlg::OnBnClickedButtonGb2uni()
+{
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	if (!CheckPath())
+	{
+		MessageBox(m_sPath);
+		return;
+	}
+
+	return;
+
+	static CGb2Utf8 gb2uni("gbk", "UCS2LE");
+
+	gb2uni.Init(this->GetSafeHwnd(), m_sPath, m_dPath);
+	gb2uni.OnTransEnd(WM_USER_TRANS_OVER);
+	gb2uni.Run();
+	m_wndStatus.SetText("è¿è¡Œ", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
 }
 
 void CJencodeDlg::OnBnClickedButton2()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	CString sPath;
 	BROWSEINFO   bi;
 	char name[MAX_PATH];
@@ -278,7 +300,7 @@ void CJencodeDlg::OnBnClickedButton2()
 	}
 
 	GetDlgItem(IDC_EDIT_SPATH)->SetWindowText(sPath);
-//	CFileDialog file(TRUE,"ÎÄ¼ş","result.txt",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
+//	CFileDialog file(TRUE,"æ–‡ä»¶","result.txt",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
 //	if(file.DoModal()==IDOK)
 //	{
 //		CString pathname;
@@ -290,7 +312,7 @@ void CJencodeDlg::OnBnClickedButton2()
 
 void CJencodeDlg::OnBnClickedButton3()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	CString sPath;
 	BROWSEINFO   bi;
 	char name[MAX_PATH];
@@ -320,8 +342,8 @@ afx_msg LRESULT CJencodeDlg::OnTransOver(WPARAM uID, LPARAM lEvent)
 	CString msg;
 
 	ButtonsEnable();
-	msg.Format("ºÄÊ±£º%d Ãë", time(NULL) - m_nBegin);
-	m_wndStatus.SetText("Íê³É", 0, 0);
+	msg.Format("è€—æ—¶ï¼š%d ç§’", time(NULL) - m_nBegin);
+	m_wndStatus.SetText("å®Œæˆ", 0, 0);
 	m_wndStatus.SetText(msg, 1, 0);
 	return (0);
 }
@@ -331,15 +353,15 @@ afx_msg LRESULT CJencodeDlg::OnTransOver2(WPARAM uID, LPARAM lEvent)
 	CString msg;
 
 	GetDlgItem(IDC_TRANS_IDX)->EnableWindow(TRUE);
-	msg.Format("ºÄÊ±£º%d Ãë", time(NULL) - m_nBegin);
-	m_wndStatus.SetText("Íê³É!", 0, 0);
+	msg.Format("è€—æ—¶ï¼š%d ç§’", time(NULL) - m_nBegin);
+	m_wndStatus.SetText("å®Œæˆ!", 0, 0);
 	m_wndStatus.SetText(msg, 1, 0);
 	return (0);
 }
 
 void CJencodeDlg::OnBnClickedAclTrans()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	if (!CheckPath())
 		return;
 
@@ -348,14 +370,14 @@ void CJencodeDlg::OnBnClickedAclTrans()
 	aclTrans.Init(this->GetSafeHwnd(), m_sPath);
 	aclTrans.OnTransEnd(WM_USER_TRANS_OVER);
 	aclTrans.Run();
-	m_wndStatus.SetText("ÔËĞĞ", 0, 0);
+	m_wndStatus.SetText("è¿è¡Œ", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
 }
 
 void CJencodeDlg::OnBnClickedAclRestore()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	if (!CheckPath())
 		return;
 
@@ -364,14 +386,14 @@ void CJencodeDlg::OnBnClickedAclRestore()
 	aclTrans.Init(this->GetSafeHwnd(), m_sPath);
 	aclTrans.OnTransEnd(WM_USER_TRANS_OVER);
 	aclTrans.Run(FALSE);
-	m_wndStatus.SetText("ÔËĞĞ", 0, 0);
+	m_wndStatus.SetText("è¿è¡Œ", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
 }
 
 void CJencodeDlg::OnBnClickedDelBom()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	if (!CheckPath())
 		return;
 
@@ -380,15 +402,15 @@ void CJencodeDlg::OnBnClickedDelBom()
 	delBom.Init(this->GetSafeHwnd(), m_sPath);
 	delBom.OnDeleted(WM_USER_TRANS_OVER);
 	delBom.Run();
-	m_wndStatus.SetText("ÔËĞĞ", 0, 0);
+	m_wndStatus.SetText("è¿è¡Œ", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
 }
 
 void CJencodeDlg::OnBnClickedIdxSelect()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
-	CFileDialog file(TRUE,"ÎÄ¼ş","search.idx",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	CFileDialog file(TRUE,"æ–‡ä»¶","search.idx",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
 	if(file.DoModal()==IDOK)
 	{
 		CString pathname;
@@ -400,14 +422,14 @@ void CJencodeDlg::OnBnClickedIdxSelect()
 
 void CJencodeDlg::OnBnClickedTransIdx()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	static CIdxTrans idxTrans;
 
 	UpdateData(TRUE);
 	GetDlgItem(IDC_IDX_PATH)->GetWindowText(m_fsPath);
 	if (m_fsPath.GetLength() == 0)
 	{
-		MessageBox("ÇëÑ¡ÔñË÷ÒıÎÄ¼ş...");
+		MessageBox("è¯·é€‰æ‹©ç´¢å¼•æ–‡ä»¶...");
 		return;
 	}
 
@@ -415,7 +437,6 @@ void CJencodeDlg::OnBnClickedTransIdx()
 	idxTrans.Init(this->GetSafeHwnd(), m_fsPath);
 	idxTrans.OnTransEnd(WM_USER_TRANS_OVER2);
 	idxTrans.Run();
-	m_wndStatus.SetText("ÔËĞĞ", 0, 0);
+	m_wndStatus.SetText("è¿è¡Œ", 0, 0);
 	m_nBegin = time(NULL);
 }
-

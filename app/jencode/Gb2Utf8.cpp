@@ -39,8 +39,9 @@ void CGb2Utf8::OnTransEnd(int nMsg)
 int CGb2Utf8::TransformPath(CString *path_from, CString *path_to)
 {
 	ACL_SCAN_DIR *scan_src; //, *scan_dst;
+	const char *path = path_from->GetString();
 
-	scan_src = acl_scan_dir_open(path_from->GetString(), 1);
+	scan_src = acl_scan_dir_open(path, 1);
 	if (scan_src == NULL) {
 		CString msg;
 
@@ -97,18 +98,27 @@ int CGb2Utf8::TransformFile(const char *pFrom, const char *pTo)
 	if (conv.convert(m_fromCharset.GetString(), m_toCharset.GetString(),
 		sBuf, iLen, &buf) == false)
 	{
-		logger_error("conver from %s to %s error: %s",
+		logger_error("conver from %s to %s error: %s, file: %s",
 			m_fromCharset.GetString(), m_toCharset.GetString(),
-			conv.serror());
+			conv.serror(), pFrom);
 		RETURN (-1);
 	}
 
 	ACL_VSTREAM *fp;
-	fp = acl_vstream_fopen(pFrom, O_RDWR | O_TRUNC | O_BINARY | O_APPEND, 0600, 1024);
+	fp = acl_vstream_fopen(pFrom, O_RDWR | O_TRUNC | O_BINARY /* | O_APPEND */,
+		0600, 1024);
 	if (fp == NULL)
+	{
+		logger_error("open %s error %s", pFrom, acl::last_serror());
 		RETURN (-1);
+	}
  	int ret = acl_vstream_writen(fp, buf.c_str(), buf.length());
 	acl_vstream_close(fp);
+	if (ret == ACL_VSTREAM_EOF)
+		logger_error("write to %s error %s", pFrom, acl::last_serror());
+	else
+		logger("transer from %s to %s ok, file: %s",
+			m_fromCharset.GetString(), m_toCharset.GetString(), pFrom);
 	RETURN (ret == ACL_VSTREAM_EOF ? -1 : 0);
 }
 

@@ -1080,6 +1080,6 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 		sleep(1);
 
 	/* not reached here */
-	ioctl_server_exit();
+	/* ioctl_server_exit(); */
 }
 #endif /* ACL_UNIX */

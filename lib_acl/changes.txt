@@ -1,5 +1,9 @@
 修改历史列表：
 
+576) 2017.3.11
+576.1) bugfix: acl_scan_dir.c 中函数 acl_scan_dir_push 在 windows 下存在问题，
+会造成死循环
+
 575) 2017.1.31
 575.1) compile: 在 Linux/Android 平台下编译时，由头文件自动识别操作系统类型，
 无需在 Makefile 文件中专门指定

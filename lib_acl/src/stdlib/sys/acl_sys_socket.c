@@ -251,7 +251,7 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	else if (timeout > 0 && acl_read_wait(fd, timeout) < 0)
 		return -1;
 
-	return read(fd, buf, size);
+	return (int) read(fd, buf, size);
 }
 
 #endif
@@ -261,7 +261,7 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 {
 	int ret, error;
 
-	ret = write(fd, buf, size);
+	ret = (int) write(fd, buf, size);
 	if (ret > 0)
 		return ret;
 
@@ -292,7 +292,7 @@ int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
 {
 	int ret, error;
 
-	ret = writev(fd, vec, count);
+	ret = (int) writev(fd, vec, count);
 	if (ret > 0)
 		return ret;
 

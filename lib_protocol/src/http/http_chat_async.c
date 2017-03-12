@@ -106,6 +106,7 @@ static int hdr_ready(HTTP_HDR *hdr, char *line, int dlen)
 
 /* 异步读取一行数据的回调函数  */
 
+#if 0
 static int hdr_gets_ready(ACL_ASTREAM *astream, void *context,
 	char *data, int dlen)
 {
@@ -143,6 +144,7 @@ static int hdr_gets_ready(ACL_ASTREAM *astream, void *context,
 	acl_aio_gets_nonl(astream);
 	return (0);
 }
+#endif
 
 static int hdr_can_read(ACL_ASTREAM *astream, void *context)
 {
@@ -217,17 +219,17 @@ static void hdr_get_async(ctx_type type, HTTP_HDR *hdr, ACL_ASTREAM *astream,
 	ctx->arg = arg;
 	ctx->status = CHAT_S_HDR;
 
-	if (0) {
-		acl_aio_ctl(astream,
-			ACL_AIO_CTL_READ_HOOK_ADD, hdr_gets_ready, ctx,
-			ACL_AIO_CTL_TIMEOUT, timeout,
-			ACL_AIO_CTL_END);
-		acl_aio_gets_nonl(astream);
-	} else {
-		acl_aio_ctl(astream, ACL_AIO_CTL_TIMEOUT, timeout,
-			ACL_AIO_CTL_END);
-		acl_aio_enable_read(astream, hdr_can_read, ctx);
-	}
+#if 0
+    acl_aio_ctl(astream,
+        ACL_AIO_CTL_READ_HOOK_ADD, hdr_gets_ready, ctx,
+        ACL_AIO_CTL_TIMEOUT, timeout,
+        ACL_AIO_CTL_END);
+    acl_aio_gets_nonl(astream);
+#else
+    acl_aio_ctl(astream, ACL_AIO_CTL_TIMEOUT, timeout,
+        ACL_AIO_CTL_END);
+    acl_aio_enable_read(astream, hdr_can_read, ctx);
+#endif
 }
 
 void http_hdr_req_get_async(HTTP_HDR_REQ *hdr_req, ACL_ASTREAM *astream,

@@ -24,7 +24,7 @@ static int __len = 1024;
 static void vstring_extend(ACL_VBUF *bp, int incr)
 {
 	unsigned used = (unsigned int) (bp->ptr - bp->data);
-	int    new_len;
+	long     new_len;
 
 	/*
 	 * Note: vp->vbuf.len is the current buffer size (both on entry and on
@@ -64,7 +64,7 @@ static int vstring_buf_space(ACL_VBUF *bp, ssize_t len)
 	if (len < 0)
 		acl_msg_panic("vstring_buf_space: bad length %ld", (long) len);
 	if ((need = len - bp->cnt) > 0)
-		vstring_extend(bp, need);
+		vstring_extend(bp, (int) need);
 	return (0);
 }
 

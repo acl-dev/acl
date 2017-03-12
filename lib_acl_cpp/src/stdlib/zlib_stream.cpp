@@ -452,7 +452,7 @@ bool zlib_stream::zip_reset()
 
 unsigned zlib_stream::crc32_update(unsigned n, const void* buf, size_t dlen)
 {
-	return __crc32(n, (const Bytef*) buf, (unsigned) dlen);
+	return (unsigned) __crc32(n, (const Bytef*) buf, (unsigned) dlen);
 }
 
 bool zlib_stream::unzip_begin(bool have_zlib_header /* = true */,

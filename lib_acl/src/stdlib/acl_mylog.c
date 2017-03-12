@@ -289,7 +289,7 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 	int timeout acl_unused, ACL_VSTREAM *fp acl_unused, void *arg)
 {
 	ACL_LOG *log = (ACL_LOG*) arg;
-	int   ret;
+	ssize_t  ret;
 
 #ifdef ACL_UNIX
 	ret = recvfrom(fd, buf, size, 0, (struct sockaddr*) &log->from,
@@ -300,14 +300,14 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 #else
 #error "unknown OS"
 #endif
-	return (ret);
+	return (int) ret;
 }
 
 static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
 	int timeout acl_unused, ACL_VSTREAM *fp acl_unused, void *arg)
 {
 	ACL_LOG *log = (ACL_LOG*) arg;
-	int   ret;
+	ssize_t  ret;
 
 #ifdef ACL_UNIX
 	ret = sendto(fd, buf, size, 0, (struct sockaddr*) &log->dest,
@@ -318,7 +318,7 @@ static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
 #else
 #error	"unknown OS"
 #endif
-	return (ret);
+	return (int) ret;
 }
 
 static int open_udp_log(const char *addr, const char *logpre)

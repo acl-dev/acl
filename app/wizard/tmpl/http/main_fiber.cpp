@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 			addr = argv[3];
 		printf("listen: %s\r\n", addr);
 
-		ms.run_alone(addr, argc >= 3 ? argv[2] : NULL, 0);
+		ms.run_alone(addr, argc >= 3 ? argv[2] : NULL);
 	}
 	else
 		ms.run_daemon(argc, argv);

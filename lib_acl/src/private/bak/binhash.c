@@ -186,7 +186,7 @@ void    binhash_delete(BINHASH *table, const char *key, int key_len, void (*free
 				if (!(table->flag & KEY_REUSE))
 					acl_myfree(ht->key.key);
 				if (table->slice)
-					acl_slice_free(table->slice, ht);
+					acl_slice_free(/*table->slice, */ht);
 				else
 					acl_myfree(ht);
 				return;
@@ -214,7 +214,7 @@ void    binhash_free(BINHASH *table, void (*free_fn) (char *))
 				if (free_fn)
 					(*free_fn) (ht->value);
 				if (table->slice)
-					acl_slice_free(table->slice, ht);
+					acl_slice_free2(table->slice, ht);
 				else
 					acl_myfree(ht);
 			}

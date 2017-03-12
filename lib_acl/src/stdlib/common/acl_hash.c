@@ -188,7 +188,7 @@ unsigned acl_hash_crc32(const void *buf, size_t len)
 		do {
 			DO1(ptr);
 		} while (--len > 0);
-	return crc ^ 0xffffffffL;
+	return (unsigned) crc ^ 0xffffffffL;
 }
 #endif
 
@@ -426,7 +426,7 @@ unsigned acl_hash_bin(const void *buf, size_t len)
 		}
 	}
 
-	return h;
+	return (unsigned) h;
 }
 
 unsigned acl_hash_test(const void *buf, size_t len acl_unused)
@@ -439,7 +439,7 @@ unsigned acl_hash_test(const void *buf, size_t len acl_unused)
 	for (i = 1; (c = *ptr++) != 0; i++)
 		result += c * 3 * i;
 
-	return result;
+	return (unsigned) result;
 }
 
 /* the following function(s) were adapted from

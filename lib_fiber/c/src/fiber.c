@@ -590,7 +590,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 #ifdef USE_VALGRIND
 	/* avoding the valgrind's warning */
 	fiber->vid = VALGRIND_STACK_REGISTER(fiber->context->uc_stack.ss_sp,
-			fiber->context->uc_stack.ss_sp
+			(char*) fiber->context->uc_stack.ss_sp
 			+ fiber->context->uc_stack.ss_size);
 #endif
 	makecontext(fiber->context, (void(*)(void)) fiber_start,

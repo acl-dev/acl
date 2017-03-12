@@ -23,10 +23,8 @@ public:
 	 * @param addrs {const char*} 监听的本机服务地址列表，格式：
 	 *  ip:port, ip:port, ...
 	 * @param path {const char*} 非 NULL 指定配置文件路径
-	 * @param count {unsigned int} 运行次数限制
 	 */
-	bool run_alone(const char* addrs, const char* path = NULL,
-		unsigned int count = 0);
+	bool run_alone(const char* addrs, const char* path = NULL);
 
 protected:
 	master_fiber();

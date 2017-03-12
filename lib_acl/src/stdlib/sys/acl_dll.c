@@ -20,10 +20,11 @@ ACL_DLL_HANDLE acl_dlopen(const char *dlname)
 # ifdef MINGW
 	handle = dlopen(dlname, RTLD_LAZY);
 # else
-	if (1)
-		handle = dlopen(dlname, RTLD_LOCAL | RTLD_LAZY);
-	else
-		handle = dlopen(dlname, RTLD_GLOBAL | RTLD_NOW);
+#  if 1
+    handle = dlopen(dlname, RTLD_LOCAL | RTLD_LAZY);
+#  else
+    handle = dlopen(dlname, RTLD_GLOBAL | RTLD_NOW);
+#  endif
 # endif
 	if (handle != NULL)
 		dlerror();  /* clear any existing error */

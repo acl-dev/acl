@@ -33,7 +33,7 @@ void acl_doze(unsigned delay)
 	struct timeval tv;
 
 	tv.tv_sec = delay / 1000;
-	tv.tv_usec = (delay - tv.tv_sec * 1000) * 1000;
+	tv.tv_usec = (suseconds_t) (delay - tv.tv_sec * 1000) * 1000;
 	while (select(0, (fd_set *) 0, (fd_set *) 0, (fd_set *) 0, &tv) < 0)
 		if (acl_last_error() != ACL_EINTR) {
 			char tbuf[256];

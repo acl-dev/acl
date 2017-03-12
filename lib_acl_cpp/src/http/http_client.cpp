@@ -245,7 +245,7 @@ bool http_client::write_gzip(ostream& out, const void* data, size_t len)
 	else
 	{
 		// 检查数据长度有效
-		unsigned total_in = zstream_->get_zstream()->total_in;
+		unsigned total_in = (unsigned) zstream_->get_zstream()->total_in;
 		if (total_in != gzip_total_in_)
 			logger_warn("total_in: %d != gzip_total_in_: %d",
 				total_in, gzip_total_in_);

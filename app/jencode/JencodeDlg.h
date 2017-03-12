@@ -51,4 +51,5 @@ public:
 	afx_msg void OnBnClickedDelBom();
 	afx_msg void OnBnClickedButtonGb2utf();
 	afx_msg void OnBnClickedButtonUtf2gb();
+	afx_msg void OnBnClickedButtonGb2uni();
 };

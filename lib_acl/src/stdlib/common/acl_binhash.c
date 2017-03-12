@@ -170,7 +170,7 @@ static unsigned binhash_hash(const void *key_in, size_t len)
 			h ^= g;
 		}
 	}
-	return (h);
+	return (unsigned) h;
 }
 
 /* binhash_link - insert element into table */

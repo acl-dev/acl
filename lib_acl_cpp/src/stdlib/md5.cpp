@@ -46,7 +46,7 @@ static void byteSwap(uint32_t * buf, unsigned words)
  */
 static void transform(unsigned int buf[4], unsigned int const in[16])
 {
-	register unsigned int a, b, c, d;
+    unsigned int a, b, c, d;
 
 	a = buf[0];
 	b = buf[1];

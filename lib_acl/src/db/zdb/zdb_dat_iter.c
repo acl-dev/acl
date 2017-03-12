@@ -81,29 +81,29 @@ static const void *dat_iter_get_next(ZDB_DAT_STORE *store, ACL_ITER *iter)
 	BLK_CTX_T *ctx = tls_alloc(blk_len);
 	ZDB_BLK *blk = ctx->blk;
 
-	for (; iter->i < store->hdr.size; iter->i++) {
-		blk_off = BLK_HDR_OFF(store, iter->i);
-		ret = ZDB_READ((ZDB_STORE*) store, blk, blk_len, blk_off);
-		if (ret == -1 ) {
-			acl_msg_error("%s(%d): zdb_read %s error, blk_off("
-				ACL_FMT_I64D ")", myname, __LINE__,
+    if (iter->i >= store->hdr.size) {
+        iter->data = iter->ptr = NULL;
+        return NULL;
+    }
+    
+    blk_off = BLK_HDR_OFF(store, iter->i);
+    ret = ZDB_READ((ZDB_STORE*) store, blk, blk_len, blk_off);
+    if (ret == -1 ) {
+        acl_msg_error("%s(%d): zdb_read %s error, blk_off("
+            ACL_FMT_I64D ")", myname, __LINE__,
 				STORE_PATH((ZDB_STORE*) store), blk_off);
-			iter->data = iter->ptr = NULL;
-			return (NULL);
-		}
-		if (blk->hdr.key == -1) {
-			iter->data = iter->ptr = NULL;
-			return (NULL);
-		}
+        iter->data = iter->ptr = NULL;
+        return NULL;
+    }
+    if (blk->hdr.key == -1) {
+        iter->data = iter->ptr = NULL;
+        return NULL;
+    }
 
-		iter->data = iter->ptr = blk;
-		iter->dlen = blk_len;
-		iter->i++;  /* 保留下一个索引位置 */
-		return (iter->ptr);
-	}
-
-	iter->data = iter->ptr = NULL;
-	return (NULL);
+    iter->data = iter->ptr = blk;
+    iter->dlen = blk_len;
+    iter->i++;  /* 保留下一个索引位置 */
+    return iter->ptr;
 }
 
 /**
@@ -127,13 +127,13 @@ static const void *dat_iter_head(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 
 	if (!(((ZDB_STORE*) store)->db->oflags & ZDB_FLAG_LINK_BUSY)) {
 		iter->i = 0;
-		return (dat_iter_get_next(store, iter));
+		return dat_iter_get_next(store, iter);
 	}
 
 #ifdef	ZDB_LINK_BUSY
 	if (store->hdr.ihead_busy < 0) {
 		iter->data = iter->ptr = NULL;
-		return (NULL);
+		return NULL;
 	}
 
 	blk_off = BLK_HDR_OFF(store, store->hdr.ihead_busy);
@@ -143,15 +143,15 @@ static const void *dat_iter_head(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 			ACL_FMT_I64D ")", myname, __LINE__,
 			STORE_PATH((ZDB_STORE*) store), blk_off);
 		iter->data = iter->ptr = NULL;
-		return (NULL);
+		return NULL;
 	}
 	iter->data = iter->ptr = blk;
 	iter->dlen = blk_len;
 	iter->i = (int) blk->hdr.inext_busy;  /* 保留下一个索引位置 */
-	return (iter->ptr);
+	return iter->ptr;
 #else
 	iter->i = 0;
-	return (dat_iter_get_next(store, iter));
+	return dat_iter_get_next(store, iter);
 #endif
 }
 
@@ -172,7 +172,7 @@ static const void *dat_iter_next(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 #endif
 
 	if (!(((ZDB_STORE*) store)->db->oflags & ZDB_FLAG_LINK_BUSY)) {
-		return (dat_iter_get_next(store, iter));
+		return dat_iter_get_next(store, iter);
 	}
 
 #ifdef	ZDB_LINK_BUSY
@@ -189,14 +189,14 @@ static const void *dat_iter_next(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 			ACL_FMT_I64D ")", myname, __LINE__,
 			STORE_PATH((ZDB_STORE*) store), blk_off);
 		iter->data = iter->ptr = NULL;
-		return (NULL);
+		return NULL;
 	}
 	iter->data = iter->ptr = blk;
 	iter->dlen = blk_len;
 	iter->i = (int) blk->hdr.inext_busy;  /* 保留下一个索引位置 */
-	return (iter->ptr);
+	return iter->ptr;
 #else
-	return (dat_iter_get_next(store, iter));
+	return dat_iter_get_next(store, iter);
 #endif
 }
 
@@ -255,29 +255,29 @@ static const void *hdr_iter_get_next(ZDB_DAT_STORE *store, ACL_ITER *iter)
 	int  hdr_len = (int) BLK_HDR_LEN(store);
 	ZDB_BLK_HDR *blk_hdr = get_blk_hdr();
 
-	for (; iter->i < store->hdr.size; iter->i++) {
-		blk_off = BLK_HDR_OFF(store, iter->i);
-		ret = ZDB_READ((ZDB_STORE*) store, blk_hdr, hdr_len, blk_off);
-		if (ret == -1 ) {
-			acl_msg_error("%s(%d): zdb_read %s error, blk_off("
-				ACL_FMT_I64D ")", myname, __LINE__,
-				STORE_PATH((ZDB_STORE*) store), blk_off);
-			iter->data = iter->ptr = NULL;
-			return (NULL);
-		}
-		if (blk_hdr->key == -1) {
-			iter->data = iter->ptr = NULL;
-			return (NULL);
-		}
-
-		iter->data = iter->ptr = blk_hdr;
-		iter->dlen = hdr_len;
-		iter->i++;  /* 保留下一个索引位置 */
-		return (iter->ptr);
-	}
-
-	iter->data = iter->ptr = NULL;
-	return (NULL);
+    if (iter->i >= store->hdr.size) {
+        iter->data = iter->ptr = NULL;
+        return NULL;
+    }
+    
+    blk_off = BLK_HDR_OFF(store, iter->i);
+    ret = ZDB_READ((ZDB_STORE*) store, blk_hdr, hdr_len, blk_off);
+    if (ret == -1 ) {
+        acl_msg_error("%s(%d): zdb_read %s error, blk_off("
+            ACL_FMT_I64D ")", myname, __LINE__,
+            STORE_PATH((ZDB_STORE*) store), blk_off);
+        iter->data = iter->ptr = NULL;
+        return NULL;
+    }
+    if (blk_hdr->key == -1) {
+        iter->data = iter->ptr = NULL;
+        return NULL;
+    }
+    
+    iter->data = iter->ptr = blk_hdr;
+    iter->dlen = hdr_len;
+    iter->i++;  /* 保留下一个索引位置 */
+    return iter->ptr;
 }
 
 /**
@@ -300,13 +300,13 @@ static const void *hdr_iter_head(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 
 	if (!(((ZDB_STORE*) store)->db->oflags & ZDB_FLAG_LINK_BUSY)) {
 		iter->i = 0;
-		return (hdr_iter_get_next(store, iter));
+		return hdr_iter_get_next(store, iter);
 	}
 
 #ifdef	ZDB_LINK_BUSY
 	if (store->hdr.ihead_busy < 0) {
 		iter->data = iter->ptr = NULL;
-		return (NULL);
+		return NULL;
 	}
 
 	blk_off = BLK_HDR_OFF(store, store->hdr.ihead_busy);
@@ -316,15 +316,15 @@ static const void *hdr_iter_head(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 			ACL_FMT_I64D ")", myname, __LINE__,
 			STORE_PATH((ZDB_STORE*) store), blk_off);
 		iter->data = iter->ptr = NULL;
-		return (NULL);
+		return NULL;
 	}
 	iter->data = iter->ptr = blk_hdr;
 	iter->dlen = hdr_len;
 	iter->i = (int) blk_hdr->inext_busy;  /* 保留下一个索引位置 */
-	return (iter->ptr);
+	return iter->ptr;
 #else
 	iter->i = 0;
-	return (hdr_iter_get_next(store, iter));
+	return hdr_iter_get_next(store, iter);
 #endif
 }
 
@@ -344,14 +344,14 @@ static const void *hdr_iter_next(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 #endif
 
 	if (!(((ZDB_STORE*) store)->db->oflags & ZDB_FLAG_LINK_BUSY)) {
-		return (hdr_iter_get_next(store, iter));
+		return hdr_iter_get_next(store, iter);
 	}
 
 #ifdef	ZDB_LINK_BUSY
 
 	if (iter->i < 0) {
 		iter->data = iter->ptr = NULL;
-		return (NULL);
+		return NULL;
 	}
 
 	blk_off = BLK_HDR_OFF(store, iter->i);
@@ -361,14 +361,14 @@ static const void *hdr_iter_next(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 			ACL_FMT_I64D ")", myname, __LINE__,
 			STORE_PATH((ZDB_STORE*) store), blk_off);
 		iter->data = iter->ptr = NULL;
-		return (NULL);
+		return NULL;
 	}
 	iter->data = iter->ptr = blk_hdr;
 	iter->dlen = hdr_len;
 	iter->i = (int) blk_hdr->inext_busy;  /* 保留下一个索引位置 */
-	return (iter->ptr);
+	return iter->ptr;
 #else
-	return (hdr_iter_get_next(store, iter));
+	return hdr_iter_get_next(store, iter);
 #endif
 }
 

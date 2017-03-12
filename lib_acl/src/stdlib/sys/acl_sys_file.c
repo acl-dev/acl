@@ -375,21 +375,21 @@ int acl_file_read(ACL_FILE_HANDLE fh, void *buf, size_t size,
 	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
-	return read(fh, buf, size);
+	return (int) read(fh, buf, size);
 }
 
 int acl_file_write(ACL_FILE_HANDLE fh, const void *buf, size_t size,
 	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
-	return write(fh, buf, size);
+	return (int) write(fh, buf, size);
 }
 
 int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vector, int count,
 	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
-	return writev(fh, vector, count);
+	return (int) writev(fh, vector, count);
 }
 
 int acl_file_fflush(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp acl_unused,
