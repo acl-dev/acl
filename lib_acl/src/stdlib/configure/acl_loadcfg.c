@@ -268,7 +268,6 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 		/* first, skip all ' ' and '\t' */
 		SKIP(ptr, (*ptr == ' ' || *ptr == '\t'));
 
-		/* �����洢ע���� */
 		if  (*ptr == '#') {  /* the comment line */
 			SKIP(ptr, *ptr != '\n'); /* find the line's end */
 			if (*ptr) {  /* this must be '\n' */
@@ -288,7 +287,6 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 			cfg_line->line_number = parser->total_line;
 			continue;
 		} else if (*ptr == '\r' || *ptr == '\n') {
-			/* �������� */
 			/* SKIP(ptr, (*ptr == '\r' || *ptr == '\n')); */
 			if (*ptr == '\r' && *(ptr + 1) == '\n') {
 				*ptr = 0; /* set '\0' first and go on */
@@ -312,7 +310,6 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 			continue;
 		}
 
-		/* ������Ч�� */
 		pline_begin = ptr;  /* reset the line header */
 
 		/* find the line's end */
@@ -355,7 +352,6 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 #endif
 }
 
-/* �ͷ� ACL_CFG_LINE �����õĻص����� */
 static void _cfg_line_free(void *arg)
 {
 	ACL_CFG_LINE *cfg_line;

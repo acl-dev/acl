@@ -123,6 +123,14 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 	if (strstr(from_filepath.c_str(), ".svn") != NULL
 		|| strstr(from_filepath.c_str(), ".git") != NULL
 		|| strstr(from_filepath.c_str(), ".cvs") != NULL
+		|| strstr(from_filepath.c_str(), ".inc") != NULL
+		|| strstr(from_filepath.c_str(), ".exe") != NULL
+		|| strstr(from_filepath.c_str(), ".zip") != NULL
+		|| strstr(from_filepath.c_str(), ".rar") != NULL
+		|| strstr(from_filepath.c_str(), ".tar") != NULL
+		|| strstr(from_filepath.c_str(), ".tar.gz") != NULL
+		|| strstr(from_filepath.c_str(), ".tgz") != NULL
+		|| strstr(from_filepath.c_str(), ".bzip2") != NULL
 		|| strstr(from_filepath.c_str(), ".o") != NULL)
 	{
 		return true;
