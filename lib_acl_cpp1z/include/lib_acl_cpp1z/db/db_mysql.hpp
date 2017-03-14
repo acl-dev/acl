@@ -1,12 +1,19 @@
 #pragma once
+#include <memory>
 #include "acl_cpp/db/db_mysql.hpp"
 #include "lib_acl_cpp1z/reflection/reflection.hpp"
 namespace acl
 {
 	namespace lz
 	{
+		
 		class db_mysql : public acl::db_mysql
 		{
+		public:
+			struct date
+			{
+				time_t value;
+			};
 		public:
 			/**
 			* 构造函数方式一
@@ -111,7 +118,49 @@ namespace acl
 				json_str.push_back(']');
 				return true;
 			}
+			template<typename T>
+			bool insert(T &obj)
+			{
+				std::shared_ptr<acl::query> query = make_insert_query(obj);
+				if (!exec_update(*query.get()))
+				{
+					std::cout << query->to_string().c_str() << std::endl;
+					return false;
+				}
+				return true;
+			}
 		private:
+			template<typename T>
+			std::shared_ptr<acl::query> make_insert_query(T &obj)
+			{
+				std::string sql_template("insert into ");
+				sql_template.append(get_name<T>());
+				sql_template.push_back('(');
+				for_each(obj, [&sql_template](auto &item, size_t I, bool is_last) {
+					sql_template.append(get_name<T>(I));
+					if (!is_last)
+						sql_template.push_back(',');
+				});
+				sql_template.append(")values(");
+
+				for_each(obj, [&sql_template](auto &item, size_t I, bool is_last) {
+
+					sql_template.push_back(':');
+					sql_template.append(get_name<T>(I));
+					if (!is_last)
+						sql_template.push_back(',');
+				});
+				sql_template.push_back(')');
+
+				std::shared_ptr<acl::query> query(new acl::query);
+				query->create_sql(sql_template.c_str());
+
+				for_each(obj, [&](auto &item, size_t I, bool is_last) {
+					query->set_parameter(get_name<T>(I), item);
+				});
+
+				return query;
+			}
 			template<typename T>
 			std::enable_if_t<std::is_arithmetic<T>::value>
 			append_x(T &, std::string &str)
