@@ -72,6 +72,20 @@ int main()
 		getchar();
 		return 1;
 	}
+
+	group_tbl group_tbl_;
+	group_tbl_.access_month_tbl = "access_month_tbl11";
+	group_tbl_.access_tbl = "access_tbl 111";
+	group_tbl_.access_week_tbl = "hello world";
+	group_tbl_.add_by_hand = 1;
+	group_tbl_.class_level = 1;
+	group_tbl_.disable = 0;
+	group_tbl_.group_name = "group_name";
+	group_tbl_.update_date = "2017-03-14 09:55:00";
+	group_tbl_.uvip_tbl = "uvip_tbl 1";
+
+	db.insert(group_tbl_);
+
 	for (size_t i = 0; i < max; i++)
 	{
 		select_as_json(db, i);
