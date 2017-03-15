@@ -553,6 +553,26 @@ again:
 	return result;
 }
 
+bool gsoner::check_using_namespace()
+{
+	//
+	using namespace std;
+	std::string token = codes_.substr(pos_, strlen("using"));
+	if (token == "using")
+	{
+		pos_ += (int)strlen("using");
+		skip_space_comment();
+		token = codes_.substr(pos_, strlen("namespace"));
+		if (token != "namespace")
+			throw syntax_error();
+		pos_ += (int)strlen("namespace");
+		skip_space_comment();
+		token = next_token("; ");
+		std::cout << "find using nameapace " << token << std::endl;
+		return true;
+	}
+	return false;
+}
 bool gsoner::check_include()
 {
 	std::string tmp = codes_.substr(pos_, strlen("#include"));
@@ -1331,6 +1351,9 @@ void gsoner::parse_code()
 				if(check_struct_end())
 					continue;
 				if(check_namespace_end())
+					continue;
+			case 'u':
+				if(check_using_namespace())
 					continue;
 			case 'n':
 				if(check_namespace())
