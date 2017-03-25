@@ -30,7 +30,7 @@ CFLAGS = -c -g -W \
 #just for freebsd's iconv.h
 CFLAGS += -I/usr/local/include
 
-shared_ldflags = -l_protocol -l_acl -lz -lpthread
+shared_ldflags = -lprotocol -lacl -lz -lpthread
 
 ###########################################################
 #Check system:
@@ -70,7 +70,7 @@ endif
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
-	shared_ldflags = -l_protocol -l_acl -L/usr/local/lib -liconv -lz -lpthread
+	shared_ldflags = -lprotocol -lacl -L/usr/local/lib -liconv -lz -lpthread
 endif
 
 # For Darwin
@@ -79,13 +79,13 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 		  -Wno-extended-offsetof \
 		  -Wno-unused-private-field
 	UNIXTYPE = MACOSX
-	shared_ldflags = -l_protocol -l_acl -L/usr/lib -liconv -lz -lpthread
+	shared_ldflags = -lprotocol -lacl -L/usr/lib -liconv -lz -lpthread
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
-	shared_ldflags = -l_protocol -l_acl -lrt -lpthread -lz -ldl
+	shared_ldflags = -lprotocol -lacl -lrt -lpthread -lz -ldl
 endif
 
 # For MINGW
