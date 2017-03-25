@@ -85,7 +85,7 @@ CFLAGS += -I. -I$(ACL_INC)
 COMPILE = $(CC) $(CFLAGS)
 
 EXTLIBS =
-LDFLAGS = -L$(ACL_LIB) -l_acl $(EXTLIBS) $(SYSLIB)
+LDFLAGS = -L$(ACL_LIB) -lacl $(EXTLIBS) $(SYSLIB)
 LINKS   = $(CC) -o $(PROG) $(OBJS) $(LDFLAGS)
 
 OUT_PATH = ./

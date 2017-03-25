@@ -16,7 +16,7 @@ CFLAGS = -c -g -W \
 # -Wcast-align
 #-Waggregate-return
 
-LDFLAGS = -Wl,-rpath,$(BASE_PATH) -L$(BASE_PATH) -l_acl \
+LDFLAGS = -Wl,-rpath,$(BASE_PATH) -L$(BASE_PATH) -lacl \
 	  $(EXTLIBS) $(SYSLIB)
 
 ###########################################################

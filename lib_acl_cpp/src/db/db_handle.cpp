@@ -164,6 +164,8 @@ size_t db_row::length() const
 //////////////////////////////////////////////////////////////////////////
 
 db_rows::db_rows()
+	: result_tmp_(NULL)
+	, result_free(NULL)
 {
 
 }
@@ -173,6 +175,9 @@ db_rows::~db_rows()
 	std::vector<db_row*>::iterator it = rows_.begin();
 	for (; it != rows_.end(); ++it)
 		delete (*it);
+
+	if (result_free && result_tmp_)
+		result_free(result_tmp_);
 }
 
 const std::vector<const db_row*>& db_rows::get_rows(
@@ -260,9 +265,9 @@ bool db_handle::open()
 	return dbopen();
 }
 
-bool db_handle::exec_select(query& query)
+bool db_handle::exec_select(query& query, db_rows* result /* = NULL */)
 {
-	return sql_select(query.to_string().c_str());
+	return sql_select(query.to_string().c_str(), result);
 }
 
 bool db_handle::exec_update(query& query)

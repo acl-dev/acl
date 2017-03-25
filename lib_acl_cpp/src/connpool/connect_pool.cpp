@@ -133,8 +133,10 @@ connect_client* connect_pool::peek()
 	if (conn->open() == false)
 	{
 		delete conn;
+#ifdef AUTO_SET_ALIVE
 		alive_ = false;
 		(void) time(&last_dead_);
+#endif
 		lock_.unlock();
 		return NULL;
 	}
@@ -204,11 +206,11 @@ void connect_pool::set_delay_destroy()
 	lock_.unlock();
 }
 
-void connect_pool::set_alive(bool ok /* true | false */)
+void connect_pool::set_alive(bool yes /* true | false */)
 {
 	lock_.lock();
-	alive_ = ok;
-	if (ok == false)
+	alive_ = yes;
+	if (yes == false)
 		time(&last_dead_);
 	lock_.unlock();
 }

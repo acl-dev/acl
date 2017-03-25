@@ -1,4 +1,8 @@
 
+43) 2017.3.23
+43.1) feature: fiber.c 中 acl_fiber_signal/acl_fiber_kill 中，需要设置 errno
+为 ECANCELED
+
 42) 2017.3.9
 42.1) compile:  当打开 valgrind 编译选项时，有一处编译警告
 42.2) workaround: master_fiber 类中的方法 run_alone 去掉最后一个参数，其原来用

@@ -8,7 +8,9 @@ ARFL    = rv
 RANLIB  = ${ENV_RANLIB}
 
 CFLAGS = -c -g -W \
+-fPIC \
 -Wall \
+-Werror \
 -Wcast-qual \
 -Waggregate-return \
 -Wmissing-prototypes \
@@ -66,21 +68,18 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD -fPIC -Werror
 	UNIXTYPE = FREEBSD
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof -fPIC -Werror
+		  -Wno-extended-offsetof
 	UNIXTYPE = MACOSX
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-#	CFLAGS += -DLINUX2 -fPIC -Werror
-	CFLAGS += -fPIC -Werror
 	UNIXTYPE = LINUX
 endif
 
@@ -104,13 +103,13 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
 		SYSLIB = -lsocket -lnsl -lrt
 	endif
-	CFLAGS += -DSUNOS5 -fPIC -Werror
+	CFLAGS += -DSUNOS5
 	UNIXTYPE = SUNOS5
 endif
 
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
-	CFLAGS += -DHP_UX -DHPUX11 -fPIC -Werror
+	CFLAGS += -DHP_UX -DHPUX11
 	UNIXTYPE = HPUX
 endif
 
@@ -139,8 +138,8 @@ OBJ = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC)))
 LIB_ACL_PATH = ../../lib_acl
 CFLAGS += -I $(LIB_ACL_PATH)/include -I$(LIB_ACL_PATH)/src/master
 
-STATIC_LIBNAME = lib_fiber.a
-SHARED_LIBNAME = lib_fiber.so
+STATIC_LIBNAME = libfiber.a
+SHARED_LIBNAME = libfiber.so
 
 ###########################################################
 

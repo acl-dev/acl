@@ -419,8 +419,11 @@ void acl_fiber_signal(ACL_FIBER *fiber, int signum)
 		return;
 	}
 
-	if (signum == SIGKILL || signum == SIGTERM || signum == SIGQUIT)
+	if (signum == SIGKILL || signum == SIGTERM || signum == SIGQUIT) {
+		fiber->errnum = ECANCELED;
 		fiber->flag |= FIBER_F_KILLED;
+	}
+
 	fiber->signum = signum;
 
 	if (fiber == curr) // just return if kill myself

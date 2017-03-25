@@ -202,7 +202,7 @@ public:
 	 */
 	size_t length() const;
 
-protected:
+public:
 	// 数据表字段名
 	std::vector<const char*> names_;
 
@@ -212,6 +212,12 @@ protected:
 
 	// 临时结果行集合
 	std::vector<const db_row*> rows_tmp_;
+
+	// 存储临时结果集对象
+	void* result_tmp_;
+
+	// 用来释放临时结果集对象
+	void (*result_free)(void* result);
 };
 
 class db_pool;
@@ -289,9 +295,11 @@ public:
 	 * 纯虚接口，子类必须实现此接口用于执行 SELECT SQL 语句
 	 * @param sql {const char*} 标准的 SQL 语句，非空，并且一定得要注意该
 	 *  SQL 语句必须经过转义处理，以防止 SQL 注入攻击
+	 * @param result {db_rows*} 如果非空，则将查询结果填充进该结果对象中，
+	 *  否则，会引用 db_handle 内部的一个临时存储对象
 	 * @return {bool} 执行是否成功
 	 */
-	virtual bool sql_select(const char* sql) = 0;
+	virtual bool sql_select(const char* sql, db_rows* result = NULL) = 0;
 
 	/**
 	 * 纯虚接口，子类必须实现此接口用于执行 INSERT/UPDATE/DELETE SQL 语句
@@ -318,9 +326,11 @@ public:
 	 * 对象 query 构建的 sql 语句是安全的，可以防止 sql 注入，该方法
 	 * 执行 SELECT SQL 语句
 	 * @param query {query&}
+	 * @param result {db_rows*} 如果非空，则将查询结果填充进该结果对象中，
+	 *  否则，会引用 db_handle 内部的一个临时存储对象
 	 * @return {bool} 执行是否成功
 	 */
-	bool exec_select(query& query);
+	bool exec_select(query& query, db_rows* result = NULL);
 
 	/**
 	 * 更安全易用的更新过程，调用此函数功能等同于 sql_update，只是查询

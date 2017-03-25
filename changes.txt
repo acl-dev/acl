@@ -1,5 +1,13 @@
 修改历史列表：
 ------------------------------------------------------------------------
+104) 2017.3.25
+104.1) 库名重命名：
+lib_acl.a       --> libacl.a
+lib_protocol.a  --> libprotocol.a
+lib_acl_cpp.a   --> libacl_cpp.a
+lib_fiber.a     --> libfiber.a
+lib_fiber_cpp.a --> libfiber_acpp.a
+
 103) 2017.3.10
 103.1) compile: 在macosx 上编译时不必再添加预编译选项，会根据编译器的默认
 的预定义宏自动进行识别编译平台

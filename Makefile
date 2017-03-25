@@ -114,7 +114,7 @@ clean:
 	@(cd unit_test; make clean)
 	@(cd lib_acl/samples; make clean)
 	@(cd lib_protocol/samples; make clean)
-	@(rm -f lib_acl.a lib_acl.so)
+	@(rm -f libacl.a libacl.so)
 #	@(cd lib_dict; make clean)
 #	@(cd lib_tls; make clean)
 
@@ -122,11 +122,11 @@ install:
 	@(echo "")
 	@(echo "begin copy file...")
 	cp -f lib_acl/master/acl_master ./dist/master/libexec/$(RPATH)/
-	cp -f lib_acl/lib/lib_acl.a $(ACL_LIB)/$(RPATH)/
+	cp -f lib_acl/lib/libacl.a $(ACL_LIB)/$(RPATH)/
 	cp -Rf lib_acl/include/* $(ACL_INC)/
 	cp -f lib_protocol/lib/lib_protocol.a $(PROTO_LIB)/$(RPATH)/
 	cp -Rf lib_protocol/include/* $(PROTO_INC)/
-	cp -f lib_acl_cpp/lib/lib_acl_cpp.a $(ACL_LIB)/$(RPATH)/
+	cp -f lib_acl_cpp/lib/libacl_cpp.a $(ACL_LIB)/$(RPATH)/
 	cp -Rf lib_acl_cpp/include/acl_cpp/* $(INC_PATH)/acl_cpp/
 #	cp -f lib_dict/lib/lib_dict.a $(DICT_LIB)/$(RPATH)/
 #	cp -Rf lib_dict/include/* $(DICT_INC)/
@@ -136,11 +136,11 @@ uninstall:
 	@(echo "")
 	@(echo "begin remove file...")
 	rm -f ./dist/master/libexec/$(RPATH)/*
-	rm -f $(ACL_LIB)/$(RPATH)/lib_acl.a
+	rm -f $(ACL_LIB)/$(RPATH)/libacl.a
 	rm -Rf $(ACL_INC)/*
 	rm -f $(PROTO_LIB)/$(RPATH)/lib_protocol.a
 	rm -Rf $(PROTO_INC)/*
-	rm -f $(ACL_LIB)/$(RPATH)/lib_acl_cpp.a
+	rm -f $(ACL_LIB)/$(RPATH)/libacl_cpp.a
 	rm -Rf $(INC_PATH)/acl_cpp/*
 	rm -f $(DICT_LIB)/$(RPATH)/lib_dict.a
 	rm -Rf $(DICT_INC)/*
@@ -258,21 +258,21 @@ build_one: all_lib
 	@(mkdir -p $(RELEASE_PATH); mkdir -p $(RELEASE_PATH)/acl; \
 		mkdir -p $(RELEASE_PATH)/protocol; \
 		mkdir -p $(RELEASE_PATH)/acl_cpp)
-	@(cp lib_acl/lib/lib_acl.a $(RELEASE_PATH)/acl/)
+	@(cp lib_acl/lib/libacl.a $(RELEASE_PATH)/acl/)
 	@(cp lib_protocol/lib/lib_protocol.a $(RELEASE_PATH)/protocol/)
-	@(cp lib_acl_cpp/lib/lib_acl_cpp.a $(RELEASE_PATH)/acl_cpp/)
-	@(cd $(RELEASE_PATH)/acl; ar -x lib_acl.a)
+	@(cp lib_acl_cpp/lib/libacl_cpp.a $(RELEASE_PATH)/acl_cpp/)
+	@(cd $(RELEASE_PATH)/acl; ar -x libacl.a)
 	@(cd $(RELEASE_PATH)/protocol; ar -x lib_protocol.a)
-	@(cd $(RELEASE_PATH)/acl_cpp; ar -x lib_acl_cpp.a)
-	$(AR) $(ARFL) ./lib_acl.a $(RELEASE_PATH)/acl/*.o \
+	@(cd $(RELEASE_PATH)/acl_cpp; ar -x libacl_cpp.a)
+	$(AR) $(ARFL) ./libacl.a $(RELEASE_PATH)/acl/*.o \
 		$(RELEASE_PATH)/protocol/*.o $(RELEASE_PATH)/acl_cpp/*.o
-	$(RANLIB) ./lib_acl.a
-	$(CC) $(LDFLAGS) -o ./lib_acl.so $(RELEASE_PATH)/acl_cpp/*.o \
+	$(RANLIB) ./libacl.a
+	$(CC) $(LDFLAGS) -o ./libacl.so $(RELEASE_PATH)/acl_cpp/*.o \
 		$(RELEASE_PATH)/protocol/*.o $(RELEASE_PATH)/acl/*.o \
 		$(SYSLIB)
 	@(rm -rf $(RELEASE_PATH))
 	@echo ""
-	@echo "Over, lib_acl.a and lib_acl.so were built ok!"
+	@echo "Over, libacl.a and libacl.so were built ok!"
 	@echo ""
 
 check:

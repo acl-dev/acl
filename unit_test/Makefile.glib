@@ -75,7 +75,7 @@ ACL_LIB_PATH = $(ACL_HOME)/lib
 
 CFLAGS += -I$(ACL_INC_PATH)
 
-LINK_LIBS = -L$(ACL_LIB_PATH) -l_acl -L/opt/messenger/lib/glib/linux/lib -lglib-2.0 $(SYSLIB)
+LINK_LIBS = -L$(ACL_LIB_PATH) -lacl -L/opt/messenger/lib/glib/linux/lib -lglib-2.0 $(SYSLIB)
 
 ###########################################################
 OUT_PATH = .

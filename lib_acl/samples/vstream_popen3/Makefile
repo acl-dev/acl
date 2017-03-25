@@ -82,7 +82,7 @@ LIB_BASE_PATH = ../../../lib_acl
 LIB_NAME_PATH = -L$(LIB_BASE_PATH)/lib
 LIB_INCL_PATH = $(LIB_BASE_PATH)/include
 
-ALL_LIBS = -l_acl $(SYSLIB)
+ALL_LIBS = -lacl $(SYSLIB)
 
 BASE_PATH  = .
 INCLUDEDIR = $(BASE_PATH)

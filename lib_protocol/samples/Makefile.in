@@ -113,7 +113,7 @@ PROTO_LIB  = $(PROTO_PATH)/lib
 
 EXTLIBS =
 CFLAGS += -I$(ACL_INC) -I$(PROTO_INC)
-LDFLAGS = -L$(ACL_LIB) -L$(PROTO_LIB) -l_protocol -l_acl $(EXTLIBS) $(SYSLIB)
+LDFLAGS = -L$(ACL_LIB) -L$(PROTO_LIB) -lprotocol -lacl $(EXTLIBS) $(SYSLIB)
 
 ###########################################################
 

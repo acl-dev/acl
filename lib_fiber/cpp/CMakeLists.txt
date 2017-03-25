@@ -8,6 +8,7 @@ endif()
 
 add_definitions(
 	"-W"
+	"-fPIC"
 	"-Wall"
 	"-Werror"
 	"-Wshadow"
@@ -40,10 +41,11 @@ else()
 	add_definitions("-g")
 endif()
 
-string(TOUPPER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
-if(CMAKE_SYSTEM_NAME MATCHES "ANDROID")
+#string(TOUPPER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
+if(CMAKE_SYSTEM_NAME MATCHES "Android")
 	add_definitions("-DANDROID")
-elseif(CMAKE_SYSTEM_NAME MATCHES "LINUX")
+elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
+elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 else()
 	message(FATAL_ERROR "unknown CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 endif()
@@ -72,23 +74,23 @@ foreach(iter ${sources})
 	aux_source_directory(${iter} lib_src)
 endforeach()
 
-if(NOT CMAKE_SYSTEM_NAME MATCHES "ANDROID")
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Android")
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
 
 	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
-	add_library(_fiber_cpp_static STATIC ${lib_src})
-	SET_TARGET_PROPERTIES(_fiber_cpp_static PROPERTIES OUTPUT_NAME "_fiber_cpp")
+	add_library(fiber_cpp_static STATIC ${lib_src})
+	SET_TARGET_PROPERTIES(fiber_cpp_static PROPERTIES OUTPUT_NAME "fiber_cpp")
 
 	set(CMAKE_SHARED_LINKER_FLAGS
 		-Wl,-rpath,. -L${lib_output_path}
-		-l_acl_cpp -l_protocol -l_fiber -l_acl)
+		-lacl_cpp -lprotocol -lfiber -lacl)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 	link_directories(${lib_output_path})
 endif()
 
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-	add_library(_fiber_cpp SHARED ${lib_src})
-	target_link_libraries(_fiber_cpp _acl_cpp _protocol _fiber _acl)
+	add_library(fiber_cpp SHARED ${lib_src})
+	target_link_libraries(fiber_cpp acl_cpp protocol fiber acl)
 endif()
 
 ##############################################################################

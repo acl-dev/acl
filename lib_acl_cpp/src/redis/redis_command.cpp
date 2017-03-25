@@ -342,7 +342,9 @@ redis_client* redis_command::redirect(redis_client_cluster* cluster,
 		if (conn != NULL)
 			return conn;
 
+#ifdef AUTO_SET_ALIVE
 		conns->set_alive(false);
+#endif
 		conns = (redis_client_pool*) cluster->peek();
 		if (conns == NULL)
 		{
@@ -385,8 +387,10 @@ redis_client* redis_command::peek_conn(redis_client_cluster* cluster, int slot)
 		// 取消哈希槽的地址映射关系
 		cluster->clear_slot(slot);
 
+#ifdef AUTO_SET_ALIVE
 		// 将连接池对象置为不可用状态
 		conns->set_alive(false);
+#endif
 	}
 
 	logger_warn("too many retry: %d, slot: %d", i, slot);
@@ -439,8 +443,10 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 				return NULL;
 			}
 
+#ifdef AUTO_SET_ALIVE
 			// 将连接池对象置为不可用状态
 			pool->set_alive(false);
+#endif
 
 			// 从连接池集群中顺序取得一个连接对象
 			conn = peek_conn(cluster, slot_);

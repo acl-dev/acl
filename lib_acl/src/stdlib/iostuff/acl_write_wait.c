@@ -34,7 +34,9 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 	fds.events = POLLOUT | POLLHUP | POLLERR;
 	fds.fd = fd;
 
+#if 0
 	acl_set_error(0);
+#endif
 
 	for (;;) {
 		switch (poll(&fds, 1, delay)) {
@@ -105,7 +107,9 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 	} else
 		tp = 0;
 
+#if 0
 	acl_set_error(0);
+#endif
 
 	for (;;) {
 #ifdef ACL_WINDOWS

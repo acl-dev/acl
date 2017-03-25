@@ -112,9 +112,11 @@ public:
 	 * 基类 db_handle 的纯虚接口
 	 * @param sql {const char*} 标准的 SELECT SQL 语句，非空，并且一定
 	 *  得要注意该 SQL 语句必须经过转义处理，以防止 SQL 注入攻击
+	 * @param result {db_rows*} 如果非空，则将查询结果填充进该结果对象中，
+	 *  否则，会引用 db_handle 内部的一个临时存储对象
 	 * @return {bool} 执行是否成功
 	 */
-	bool sql_select(const char* sql);
+	bool sql_select(const char* sql, db_rows* result = NULL);
 
 	/**
 	 * 基类 db_handle 的纯虚接口

@@ -11,6 +11,7 @@ endif()
 
 add_definitions(
 	"-W"
+	"-fPIC"
 	"-Wall"
 	"-Werror"
 	"-Wshadow"
@@ -25,7 +26,6 @@ add_definitions(
 	"-D_POSIX_PTHREAD_SEMANTICS"
 	"-DACL_PREPARE_COMPILE"
 	"-Wno-invalid-source-encoding"
-	"-fPIC"
 	"-Wstrict-prototypes"
 )
 
@@ -41,10 +41,11 @@ else()
 	add_definitions("-g")
 endif()
 
-string(TOUPPER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
-if(CMAKE_SYSTEM_NAME MATCHES "ANDROID")
+#string(TOUPPER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
+if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	add_definitions("-DANDROID")
-elseif(CMAKE_SYSTEM_NAME MATCHES "LINUX")
+elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
+elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin")
 else()
 	message(FATAL_ERROR "unknown CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 endif()
@@ -99,16 +100,18 @@ foreach(iter ${sources})
 	aux_source_directory(${iter} lib_src)
 endforeach()
 
-if(NOT CMAKE_SYSTEM_NAME MATCHES "ANDROID")
+if (CMAKE_SYSTEM_NAME MATCHES "Android")
+	set(CMAKE_SHARED_LINKER_FLAGS "-shared")
+else()
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
 
 	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
-	add_library(_acl_static STATIC ${lib_src})
-	SET_TARGET_PROPERTIES(_acl_static PROPERTIES OUTPUT_NAME "_acl")
+	add_library(acl_static STATIC ${lib_src})
+	SET_TARGET_PROPERTIES(acl_static PROPERTIES OUTPUT_NAME "acl")
 
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 endif()
 
-add_library(_acl SHARED ${lib_src})
+add_library(acl SHARED ${lib_src})
 
 ##############################################################################

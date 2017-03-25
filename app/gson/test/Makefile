@@ -1,4 +1,11 @@
 
+all:
+	@(cd benchmark; make)
+	@(cd test; make)
+	@(cd test0; make)
+	@(cd test1; make)
+	@(cd test2; make)
+	@(cd test3; make)
 clean:
 	@(cd benchmark; make clean)
 	@(cd test; make clean)

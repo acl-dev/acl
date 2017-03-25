@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		07A458351E6FCCB4002C9B3C /* acl_cpp.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 07A458341E6FCCB4002C9B3C /* acl_cpp.h */; };
-		07A458371E6FCCB4002C9B3C /* acl_cpp.m in Sources */ = {isa = PBXBuildFile; fileRef = 07A458361E6FCCB4002C9B3C /* acl_cpp.m */; };
+		07A458351E6FCCB4002C9B3C /* acl_cpp.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 07A458341E6FCCB4002C9B3C /* acl_cpp.h */; };
+		07A458371E6FCCB4002C9B3C /* acl_cpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07A458361E6FCCB4002C9B3C /* acl_cpp.mm */; };
 		07A467C01E6FCCF1002C9B3C /* acl_cpp_init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A466DA1E6FCCF1002C9B3C /* acl_cpp_init.cpp */; };
 		07A467C11E6FCCF1002C9B3C /* acl_cpp_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A466DB1E6FCCF1002C9B3C /* acl_cpp_test.cpp */; };
 		07A467C21E6FCCF1002C9B3C /* acl_stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A466DC1E6FCCF1002C9B3C /* acl_stdafx.cpp */; };
@@ -193,14 +193,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		07A4582F1E6FCCB4002C9B3C /* CopyFiles */ = {
+		07A4582F1E6FCCB4002C9B3C /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				07A458351E6FCCB4002C9B3C /* acl_cpp.h in CopyFiles */,
+				07A458351E6FCCB4002C9B3C /* acl_cpp.h in Copy Files */,
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -208,7 +209,7 @@
 /* Begin PBXFileReference section */
 		07A458311E6FCCB4002C9B3C /* libacl_cpp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libacl_cpp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07A458341E6FCCB4002C9B3C /* acl_cpp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acl_cpp.h; sourceTree = "<group>"; };
-		07A458361E6FCCB4002C9B3C /* acl_cpp.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = acl_cpp.m; sourceTree = "<group>"; };
+		07A458361E6FCCB4002C9B3C /* acl_cpp.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = acl_cpp.mm; sourceTree = "<group>"; };
 		07A466DA1E6FCCF1002C9B3C /* acl_cpp_init.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = acl_cpp_init.cpp; sourceTree = "<group>"; };
 		07A466DB1E6FCCF1002C9B3C /* acl_cpp_test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = acl_cpp_test.cpp; sourceTree = "<group>"; };
 		07A466DC1E6FCCF1002C9B3C /* acl_stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = acl_stdafx.cpp; sourceTree = "<group>"; };
@@ -627,7 +628,7 @@
 			isa = PBXGroup;
 			children = (
 				07A458341E6FCCB4002C9B3C /* acl_cpp.h */,
-				07A458361E6FCCB4002C9B3C /* acl_cpp.m */,
+				07A458361E6FCCB4002C9B3C /* acl_cpp.mm */,
 			);
 			path = acl_cpp;
 			sourceTree = "<group>";
@@ -1408,7 +1409,7 @@
 			buildPhases = (
 				07A4582D1E6FCCB4002C9B3C /* Sources */,
 				07A4582E1E6FCCB4002C9B3C /* Frameworks */,
-				07A4582F1E6FCCB4002C9B3C /* CopyFiles */,
+				07A4582F1E6FCCB4002C9B3C /* Copy Files */,
 			);
 			buildRules = (
 			);
@@ -1600,7 +1601,7 @@
 				07A468381E6FCCF1002C9B3C /* redis_result.cpp in Sources */,
 				07A467F51E6FCCF1002C9B3C /* http_request_pool.cpp in Sources */,
 				07A468691E6FCCF1002C9B3C /* aio_timer_delay_free.cpp in Sources */,
-				07A458371E6FCCB4002C9B3C /* acl_cpp.m in Sources */,
+				07A458371E6FCCB4002C9B3C /* acl_cpp.mm in Sources */,
 				07A468271E6FCCF1002C9B3C /* queue_file.cpp in Sources */,
 				07A4686F1E6FCCF1002C9B3C /* polarssl_conf.cpp in Sources */,
 				07A468461E6FCCF1002C9B3C /* mail_message.cpp in Sources */,
@@ -1728,7 +1729,11 @@
 		07A4583B1E6FCCB4002C9B3C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited) ";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					HAS_MYSQL,
+					HAS_SQLITE,
+				);
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
 					../lib_protocol/include,
@@ -1747,6 +1752,11 @@
 		07A4583C1E6FCCB4002C9B3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					HAS_MYSQL,
+					HAS_SQLITE,
+				);
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
 					../lib_protocol/include,

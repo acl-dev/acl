@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include ".\struct.h"
+#include "struct.h"
 #include "gson.h"
 #include "acl_cpp/serialize/gson_helper.ipp"
 namespace acl

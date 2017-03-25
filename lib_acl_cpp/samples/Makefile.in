@@ -127,7 +127,7 @@ endif
 #endif
 
 CFLAGS += -I. -I$(BASE_PATH)/include -I$(BASE_PATH)/../lib_acl/include -I$(BASE_PATH)/../lib_protocol/include
-LDFLAGS = -L$(BASE_PATH)/lib -l_acl_cpp -L$(BASE_PATH)/../lib_protocol/lib -l_protocol -L$(BASE_PATH)/../lib_acl/lib -l_acl \
+LDFLAGS = -L$(BASE_PATH)/lib -lacl_cpp -L$(BASE_PATH)/../lib_protocol/lib -lprotocol -L$(BASE_PATH)/../lib_acl/lib -lacl \
 	  -L$(BASE_PATH)/../lib/$(RPATH) $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)

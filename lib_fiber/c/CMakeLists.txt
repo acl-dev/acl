@@ -10,6 +10,7 @@ endif()
 
 add_definitions(
 	"-W"
+	"-fPIC"
 	"-Wall"
 	"-Werror"
 	"-Wshadow"
@@ -24,7 +25,6 @@ add_definitions(
 	"-D_POSIX_PTHREAD_SEMANTICS"
 	"-DACL_PREPARE_COMPILE"
 	"-Wno-invalid-source-encoding"
-	"-fPIC"
 	"-Wstrict-prototypes"
 )
 
@@ -40,17 +40,16 @@ else()
 	add_definitions("-g")
 endif()
 
-string(TOUPPER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
-if(CMAKE_SYSTEM_NAME MATCHES "ANDROID")
+#string(TOUPPER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
+if(CMAKE_SYSTEM_NAME MATCHES "Android")
 	add_definitions("-DANDROID")
-elseif(CMAKE_SYSTEM_NAME MATCHES "LINUX")
+	add_definitions("-Wno-incompatible-pointer-types-discards-qualifiers")
+elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
+elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 else()
 	message(FATAL_ERROR "unknown CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 endif()
 
-if(CMAKE_SYSTEM_NAME MATCHES "ANDROID")
-	add_definitions("-Wno-incompatible-pointer-types-discards-qualifiers")
-endif()
 ##############################################################################
 
 set(src ${CMAKE_CURRENT_SOURCE_DIR}/src)
@@ -77,18 +76,18 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "ANDROID")
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
 
 	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
-	add_library(_fiber_static STATIC ${lib_src})
-	SET_TARGET_PROPERTIES(_fiber_static PROPERTIES OUTPUT_NAME "_fiber")
+	add_library(fiber_static STATIC ${lib_src})
+	SET_TARGET_PROPERTIES(fiber_static PROPERTIES OUTPUT_NAME "fiber")
 
 	set(CMAKE_SHARED_LINKER_FLAGS
-		-Wl,-rpath,. -L${lib_output_path} -l_acl)
+		-Wl,-rpath,. -L${lib_output_path} -lacl)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 	link_directories(${lib_output_path})
 endif()
 
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-	add_library(_fiber SHARED ${lib_src})
-	target_link_libraries(_fiber _acl)
+	add_library(fiber SHARED ${lib_src})
+	target_link_libraries(fiber acl)
 endif()
 
 ##############################################################################

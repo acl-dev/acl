@@ -113,7 +113,8 @@ bool json_node::is_string(void) const
 bool json_node::is_number(void) const
 {
 	return (node_me_->type & ACL_JSON_T_A_NUMBER)
-		|| (node_me_->type & ACL_JSON_T_NUMBER);
+		|| (node_me_->type & ACL_JSON_T_NUMBER)
+		|| is_double();
 }
 
 bool json_node::is_double(void) const
@@ -163,6 +164,8 @@ const char* json_node::get_type(void) const
 {
 	if (is_string())
 		return "string";
+	else if (is_double())
+		return "double";
 	else if (is_number())
 		return "number";
 	else if (is_bool())
