@@ -164,7 +164,7 @@ static: $(OBJS_DST)
 		ln -s $(STATIC_LIBNAME) lib_protocol.a)
 	@echo 'build $(LIB_PATH_DST)/$(STATIC_LIBNAME) ok!'
 
-shared_ldflags = -l_acl -lrt -lpthread
+shared_ldflags = -lacl -lrt -lpthread
 shared: $(OBJS_DST)
 	@echo ''
 	@echo 'creating $(SHARED_LIBNAME)'
@@ -181,12 +181,12 @@ shared: $(OBJS_DST)
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "MACOSX"; then \
 		echo "building for Darwin"; \
 		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
-			-R$(rpath) -L$(rpath) -l_acl -lpthread; \
+			-R$(rpath) -L$(rpath) -lacl -lpthread; \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "FREEBSD"; then \
 		echo "building for FreeBSD"; \
 		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
-			-R$(rpath) -L$(rpath) -l_acl -lpthread; \
+			-R$(rpath) -L$(rpath) -lacl -lpthread; \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	else \
 		echo 'skip build $(SHARED_LIBNAME); usage: make shared rpath=xxx'; \
