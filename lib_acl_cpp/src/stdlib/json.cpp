@@ -738,7 +738,8 @@ json_node* json::next_node(void)
 	return n;
 }
 
-const string& json::to_string(string* out /* = NULL */) const
+const string& json::to_string(string* out /* = NULL */,
+	bool add_space /* = false */) const
 {
 	if (out == NULL)
 	{
@@ -749,13 +750,24 @@ const string& json::to_string(string* out /* = NULL */) const
 		out = const_cast<json*>(this)->buf_;
 	}
 
+	if (add_space)
+		const_cast<json*>(this)->json_->flag |= ACL_JSON_FLAG_ADD_SPACE;
+	else
+		const_cast<json*>(this)->json_->flag &= ~ACL_JSON_FLAG_ADD_SPACE;
+
 	ACL_VSTRING* vbuf = out->vstring();
 	(void) acl_json_build(json_, vbuf);
 	return *out;
 }
 
-void json::build_json(string& out) const
+void json::build_json(string& out, bool add_space /* = false */) const
 {
+	if (add_space)
+		const_cast<json*>(this)->json_->flag |= ACL_JSON_FLAG_ADD_SPACE;
+	else
+		const_cast<json*>(this)->json_->flag &= ~ACL_JSON_FLAG_ADD_SPACE;
+
+
 	ACL_VSTRING* buf = out.vstring();
 	(void) acl_json_build(json_, buf);
 }

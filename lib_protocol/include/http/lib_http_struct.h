@@ -8,14 +8,20 @@
 extern "C" {
 #endif
 
-#ifdef HTTP_DLL
-# ifdef HTTP_EXPORTS
-#  define HTTP_API __declspec(dllexport)
-# else
+#ifdef HTTP_LIB
+# ifndef HTTP_API
+#  define HTTP_API
+# endif
+#elif defined(HTTP_DLL) || defined(_WINDLL)
+# if defined(HTTP_EXPORTS) || defined(protocol_EXPORTS)
+#  ifndef HTTP_API
+#   define HTTP_API __declspec(dllexport)
+#  endif
+# elif !defined(HTTP_API)
 #  define HTTP_API __declspec(dllimport)
 # endif
-#else
-#  define HTTP_API
+#elif !defined(HTTP_API)
+# define HTTP_API
 #endif
 
 typedef	acl_int64	http_off_t;

@@ -1,3 +1,4 @@
+#include "StdAfx.h"
 #include "stdlib/acl_define.h"
 
 #ifdef ACL_UNIX

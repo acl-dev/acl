@@ -133,6 +133,7 @@ public:
 	int affect_count() const;
 
 	/**
+	 * @override
 	 * 基类 db_handle 的虚函数，用来表示事务的开始，注意若要使用事务方式，
 	 * 则需要在 db_mysql 的构造函数中传入的参数 auto_commit 为 false
 	 * @return {bool}
@@ -140,10 +141,17 @@ public:
 	bool begin_transaction();
 
 	/**
+	 * @override
 	 * 基类 db_handle 的虚函数，用来表示事务的结束
 	 * @return {bool}
 	 */
 	bool commit();
+
+	/**
+	 * @override
+	 * @return {bool} 事务回滚是否成功
+	 */
+	bool rollback();
 
 private:
 	char* dbaddr_;  // 数据库监听地址

@@ -1472,7 +1472,7 @@ string& string::upper()
 	return *this;
 }
 
-size_t string::substr(string& out, size_t pos /* = 0 */, size_t len /* = 0 */)
+size_t string::substr(string& out, size_t pos /* = 0 */, size_t len /* = 0 */) const
 {
 	size_t n = LEN(vbf_);
 	if (pos >= n)

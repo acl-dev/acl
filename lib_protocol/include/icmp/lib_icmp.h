@@ -8,14 +8,20 @@
 extern "C" {
 #endif
 
-#ifdef ICMP_DLL
-# ifdef ICMP_EXPORTS
-#  define ICMP_API __declspec(dllexport)
-# else
+#ifdef ICMP_LIB
+# ifndef ICMP_API
+#  define ICMP_API
+# endif
+#elif defined(ICMP_DLL) || defined(_WINDLL)
+# if defined(ICMP_EXPORTS) || defined(protocol_EXPORTS)
+#  ifndef ICMP_API
+#   define ICMP_API __declspec(dllexport)
+#  endif
+# elif !defined(ICMP_API)
 #  define ICMP_API __declspec(dllimport)
 # endif
-#else
-#  define ICMP_API
+#elif !defined(ICMP_API)
+# define ICMP_API
 #endif
 
 /* in icmp_chat.c */

@@ -86,6 +86,7 @@ struct ACL_JSON {
 	int   finish;               /**< 是否分析结束 */
 	unsigned flag;              /**< 标志位 */
 #define	ACL_JSON_FLAG_PART_WORD	(1 << 0)  /**< 是否兼容半个汉字 */
+#define ACL_JSON_FLAG_ADD_SPACE	(1 << 1)  /**< 创建 json 时是否添空格 */
 
 	/* public: for acl_iterator, 通过 acl_foreach 可以列出所有子节点 */
 

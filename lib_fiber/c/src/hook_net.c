@@ -273,6 +273,14 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 		return __sys_connect(sockfd, addr, addrlen);
 
 	me = acl_fiber_running();
+
+	if (acl_fiber_killed(me)) {
+		acl_msg_info("%s(%d), %s: fiber-%u was killed, %s",
+			__FILE__, __LINE__, __FUNCTION__,
+			acl_fiber_id(me), acl_last_serror());
+		return -1;
+	}
+
 	acl_non_blocking(sockfd, ACL_NON_BLOCKING);
 
 	int ret = __sys_connect(sockfd, addr, addrlen);
@@ -415,6 +423,20 @@ static void event_poll_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 		ev->timeout = timeout;
 }
 
+static void event_poll_clear(EVENT *ev, POLL_EVENT *pe)
+{
+	int i;
+
+	acl_ring_detach(&pe->me);
+
+	for (i = 0; i < pe->nfds; i++) {
+		if (pe->fds[i].events & POLLIN)
+			event_del(ev, pe->fds[i].fd, EVENT_READABLE);
+		if (pe->fds[i].events & POLLOUT)
+			event_del(ev, pe->fds[i].fd, EVENT_WRITABLE);
+	}
+}
+
 static void poll_callback(EVENT *ev acl_unused, POLL_EVENT *pe)
 {
 	fiber_io_dec();
@@ -450,7 +472,7 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		acl_fiber_switch();
 
 		if (acl_fiber_killed(pe.fiber)) {
-			acl_ring_detach(&pe.me);
+			event_poll_clear(ev, &pe);
 			acl_msg_info("%s(%d), %s: fiber-%u was killed, %s",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(pe.fiber), acl_last_serror());

@@ -413,6 +413,7 @@ int event_process(EVENT *ev, int timeout)
 	int processed = 0, numevents, j;
 	int mask, fd, rfired;
 	FILE_EVENT *fe;
+	ACL_RING *head;
 #ifdef	DEL_DELAY
 	int ndefer;
 #endif
@@ -481,21 +482,18 @@ int event_process(EVENT *ev, int timeout)
 
 #define TO_APPL	acl_ring_to_appl
 
-	acl_ring_foreach(ev->iter, &ev->poll_list) {
-		POLL_EVENT *pe = TO_APPL(ev->iter.ptr, POLL_EVENT, me);
-
+	while ((head = acl_ring_pop_head(&ev->poll_list))) {
+		POLL_EVENT *pe = TO_APPL(head, POLL_EVENT, me);
 		pe->proc(ev, pe);
 		processed++;
 	}
-	acl_ring_init(&ev->poll_list);
 
-	acl_ring_foreach(ev->iter, &ev->epoll_list) {
-		EPOLL_EVENT *ee = TO_APPL(ev->iter.ptr, EPOLL_EVENT, me);
+	while ((head = acl_ring_pop_head(&ev->epoll_list))) {
+		EPOLL_EVENT *ee = TO_APPL(head, EPOLL_EVENT, me);
 
 		ee->proc(ev, ee);
 		processed++;
 	}
-	acl_ring_init(&ev->epoll_list);
 
 	/* return the number of processed file/time events */
 	return processed;

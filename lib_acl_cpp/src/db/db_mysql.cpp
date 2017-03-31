@@ -814,6 +814,17 @@ bool db_mysql::commit()
 	return true;
 }
 
+bool db_mysql::rollback()
+{
+	const char* sql = "rollback";
+	if (sql_update(sql) == false)
+	{
+		logger_error("%s error: %s", sql, get_error());
+		return false;
+	}
+	return true;
+}
+
 }  // namespace acl
 
 #else

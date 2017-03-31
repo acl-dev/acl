@@ -27,12 +27,12 @@
 # else
 #  define EPOCHFILETIME (116444736000000000LL)
 # endif
-
+/*
 #ifndef ACL_DLL
 int _daylight;
 long _timezone;
 #endif
-
+*/
 static void dummy(void *ptr acl_unused)
 {
 

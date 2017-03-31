@@ -738,7 +738,7 @@ static inline std::pair<bool, std::string> gson(acl::json_node &node, char **obj
 	if (node.is_string() == false)
 		return std::make_pair(false, "get char * string failed");
 
-	int len = strlen(node.get_string());
+	int len = (int) strlen(node.get_string());
 	*obj = new char[len + 1];
 	memcpy(*obj, node.get_string(), len);
 	(*obj)[len] = 0;

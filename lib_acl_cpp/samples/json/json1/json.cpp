@@ -145,7 +145,7 @@ static void test(void)
 	printf("-------------------------------------------------\r\n");
 
 	acl::string buf;
-	json.build_json(buf);
+	json.build_json(buf, true);
 
 	printf("-----------------json------------------------\r\n");
 	printf("%s\r\n", buf.c_str());

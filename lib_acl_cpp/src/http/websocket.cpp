@@ -127,7 +127,7 @@ void websocket::make_frame_header(void)
 	{
 		ptr[offset++] |= 126;
 		ptr[offset++] = (unsigned char) (payload_len >> 8) & 0xff;
-		ptr[offset++] = payload_len & 0xff;
+		ptr[offset++] = (unsigned char) payload_len & 0xff;
 	}
 	else
 	{

@@ -303,15 +303,20 @@ void acl_json_building(ACL_JSON *json, size_t length,
 
 		node = (ACL_JSON_NODE*) iter.data;
 		prev = acl_json_node_prev(node);
-		if (prev != NULL)
-			acl_vstring_strcat(buf, ", ");
+		if (prev != NULL) {
+			if ((json->flag & ACL_JSON_FLAG_ADD_SPACE))
+				acl_vstring_strcat(buf, ", ");
+			else
+				acl_vstring_strcat(buf, ",");
+		}
 
 		/* 只有当标签的对应值为 JSON 对象或数组对象时 tag_node 非空 */
 		if (node->tag_node != NULL) {
 			if (LEN(node->ltag) > 0) {
 				json_escape_append(buf, STR(node->ltag));
 				ACL_VSTRING_ADDCH(buf, ':');
-				ACL_VSTRING_ADDCH(buf, ' ');
+				if ((json->flag & ACL_JSON_FLAG_ADD_SPACE))
+					ACL_VSTRING_ADDCH(buf, ' ');
 			}
 
 			/* '{' or '[' */	
@@ -323,7 +328,8 @@ void acl_json_building(ACL_JSON *json, size_t length,
 		else if (LEN(node->ltag) > 0) {
 			json_escape_append(buf, STR(node->ltag));
 			ACL_VSTRING_ADDCH(buf, ':');
-			ACL_VSTRING_ADDCH(buf, ' ');
+			if ((json->flag & ACL_JSON_FLAG_ADD_SPACE))
+				ACL_VSTRING_ADDCH(buf, ' ');
 
 			switch (node->type & ~ACL_JSON_T_LEAF) {
 			case ACL_JSON_T_NULL:
@@ -430,15 +436,20 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 	acl_foreach(iter, json) {
 		node = (ACL_JSON_NODE*) iter.data;
 		prev = acl_json_node_prev(node);
-		if (prev != NULL)
-			acl_vstring_strcat(buf, ", ");
+		if (prev != NULL) {
+			if ((json->flag & ACL_JSON_FLAG_ADD_SPACE))
+				acl_vstring_strcat(buf, ", ");
+			else
+				acl_vstring_strcat(buf, ",");
+		}
 
 		/* 只有当标签的对应值为 JSON 对象或数组对象时 tag_node 非空 */
 		if (node->tag_node != NULL) {
 			if (LEN(node->ltag) > 0) {
 				json_escape_append(buf, STR(node->ltag));
 				ACL_VSTRING_ADDCH(buf, ':');
-				ACL_VSTRING_ADDCH(buf, ' ');
+				if ((json->flag & ACL_JSON_FLAG_ADD_SPACE))
+					ACL_VSTRING_ADDCH(buf, ' ');
 			}
 
 			/* '{' or '[' */	
@@ -450,7 +461,8 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 		else if (LEN(node->ltag) > 0) {
 			json_escape_append(buf, STR(node->ltag));
 			ACL_VSTRING_ADDCH(buf, ':');
-			ACL_VSTRING_ADDCH(buf, ' ');
+			if ((json->flag & ACL_JSON_FLAG_ADD_SPACE))
+				ACL_VSTRING_ADDCH(buf, ' ');
 
 			switch (node->type & ~ACL_JSON_T_LEAF) {
 			case ACL_JSON_T_NULL:

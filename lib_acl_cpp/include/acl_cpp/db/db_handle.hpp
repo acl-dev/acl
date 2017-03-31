@@ -322,6 +322,12 @@ public:
 	virtual bool commit() { return false; }
 
 	/**
+	 * 事务回滚
+	 * @return {bool}
+	 */
+	virtual bool rollback() { return false; }
+
+	/**
 	 * 更安全易用的查询过程，调用此函数功能等同于 sql_select，只是查询
 	 * 对象 query 构建的 sql 语句是安全的，可以防止 sql 注入，该方法
 	 * 执行 SELECT SQL 语句
