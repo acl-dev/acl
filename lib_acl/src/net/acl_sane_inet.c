@@ -62,44 +62,53 @@ const char *acl_inet_ntoa(struct in_addr in, char *dst, size_t size)
 	return (acl_inet_ntop4(src, dst, size));
 }
 
-int acl_is_ip(const char *pstrip)
+int acl_is_ipv4(const char *ip)
 {       
 	const char *ptr;
 	int   count = 0, n = 0;
 	char  ch;
 
-	if (pstrip == NULL || *pstrip == 0)
-		return(-1);
+	if (ip == NULL || *ip == 0)
+		return 0;
 
-	ptr = pstrip;
-	if(*ptr == '.') {        /* the first char should not be '.' */
-		return(-1);
-	}
+	ptr = ip;
+	if(*ptr == '.')         /* the first char should not be '.' */
+		return 0;
+
 	while(*ptr) {
 		if (*ptr == '.') {
 			ch = *(ptr + 1);
-			if (ch < '0' || ch > '9') {
-				return(-1);
-			}
+			if (ch < '0' || ch > '9')
+				return 0;
 			count++;
 		} else {
 			ch = *ptr;
-			if (ch < '0' || ch > '9') {
-				return(-1);
-			}
+			if (ch < '0' || ch > '9')
+				return 0;
 		}
 		ptr++;
 		n++;
 		if (n > 16)
-			return (-1);
+			return 0;
 	}
-	if(*(ptr - 1) == '.') {  /* the last char should not be '.' */
-		return(-1);
-	}
-	if(count != 3) {         /* 192.168.0.1 has the number '.' is 4 */
-		return(-1);
-	}
-	return(0);
+
+	if (*(ptr - 1) == '.')  /* the last char should not be '.' */
+		return 0;
+	if (count != 3)         /* 192.168.0.1 has the number '.' is 4 */
+		return 0;
+
+	return 1;
+}
+
+int acl_is_ipv6(const char *ip)
+{
+	/* xxx: ? */
+	return !acl_is_ipv4(ip);
+}
+
+int acl_is_ip(const char *ip)
+{
+	return (acl_is_ipv4(ip) || acl_is_ipv6(ip)) ? 0 : -1;
 }
 
 int acl_ipv4_valid(const char *addr)
@@ -108,60 +117,60 @@ int acl_ipv4_valid(const char *addr)
 	int   n, k;
 
 	if (addr == NULL || *addr == 0)
-		return (0);
+		return 0;
 	k = 3;
 	while (*ptr && *ptr != '.') {
 		n = *ptr;
 		if (n < '0' || n > '9')
-			return (0);
+			return 0;
 		ptr++;
 		k--;
 		if (k < 0)
-			return (0);
+			return 0;
 	}
 	if (*ptr == 0)
-		return (0);
+		return 0;
 	
 	k = 3;
 	ptr++;
 	while (*ptr && *ptr != '.') {
 		n = *ptr;
 		if (n < '0' || n > '9')
-			return (0);
+			return 0;
 		ptr++;
 		k--;
 		if (k < 0)
-			return (0);
+			return 0;
 	}
 	if (*ptr == 0)
-		return (0);
+		return 0;
 	
 	k = 3;
 	ptr++;
 	while (*ptr && *ptr != '.') {
 		n = *ptr;
 		if (n < '0' || n > '9')
-			return (0);
+			return 0;
 		ptr++;
 		k--;
 		if (k < 0)
-			return (0);
+			return 0;
 	}
 	if (*ptr == 0)
-		return (0);
+		return 0;
 	
 	k = 3;
 	ptr++;
 	while (*ptr) {
 		n = *ptr;
 		if (n < '0' || n > '9')
-			return (0);
+			return 0;
 		ptr++;
 		k--;
 		if (k < 0)
-			return (0);
+			return 0;
 	}
-	return (1);
+	return 1;
 }
 
 int acl_ipv4_addr_valid(const char *addr)

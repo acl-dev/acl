@@ -958,6 +958,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stdlib\mbox.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stdlib\md5.cpp"
 					>
 				</File>
@@ -1681,6 +1685,10 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\malloc.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\mbox.hpp"
 					>
 				</File>
 				<File

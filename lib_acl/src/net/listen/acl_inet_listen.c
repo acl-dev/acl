@@ -33,55 +33,14 @@
 
 #endif
 
-/* acl_inet_listen - create TCP listener */
-
-ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int block_mode)
+static ACL_SOCKET inet_listen(const char *addr, const struct addrinfo *res,
+	int backlog, int blocking)
 {
-	const char *myname = "acl_inet_listen";
+	const char *myname = "inet_listen";
 	ACL_SOCKET sock;
-	int   on, nport;
-	char *buf, *host = NULL, *sport = NULL;
-	const char *ptr;
-	struct sockaddr_in sa;
+	int on;
 
-	/*
-	 * Translate address information to internal form.
-	 */
-	buf = acl_mystrdup(addr);
-	ptr = acl_host_port(buf, &host, "", &sport, (char *) 0);
-	if (ptr) {
-		acl_msg_error("%s(%d): %s, %s invalid", myname, __LINE__, addr, ptr);
-		acl_myfree(buf);
-		return ACL_SOCKET_INVALID;
-	}
-
-	if (host && *host == 0)
-		host = 0;
-	if (host == NULL)
-		host = "0.0.0.0";
-
-	if (sport == NULL) {
-		acl_msg_error("%s(%d): no port given from addr(%s)", myname, __LINE__, addr);
-		acl_myfree(buf);
-		return ACL_SOCKET_INVALID;
-	}
-	nport = atoi(sport);
-	if (nport < 0) {
-		acl_msg_error("%s: port(%d) < 0 invalid from addr(%s)",
-			myname, nport, addr);
-		acl_myfree(buf);
-		return ACL_SOCKET_INVALID;
-	}
-
-	memset(&sa, 0, sizeof(sa));
-	sa.sin_family      = AF_INET;
-	sa.sin_port        = htons((short) nport);
-	sa.sin_addr.s_addr = inet_addr(host);
-
-	acl_myfree(buf);
-
-	/* Create a listener socket. */
-	sock = socket(AF_INET, SOCK_STREAM, 0);
+	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (sock == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s: socket %s", myname, acl_last_serror());
 		return ACL_SOCKET_INVALID;
@@ -91,7 +50,7 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int block_mode)
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
 		(const void *) &on, sizeof(on)) < 0)
 	{
-		acl_msg_error("%s: setsockopt(SO_REUSEADDR): %s",
+		acl_msg_warn("%s: setsockopt(SO_REUSEADDR): %s",
 			myname, acl_last_serror());
 	}
 
@@ -100,7 +59,7 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int block_mode)
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT,
 		(const void *) &on, sizeof(on)) < 0)
 	{
-		acl_msg_error("%s: setsocket(SO_REUSEPORT): %s",
+		acl_msg_warn("%s: setsocket(SO_REUSEPORT): %s",
 			myname, acl_last_serror());
 	}
 #endif
@@ -110,26 +69,100 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int block_mode)
 	if (setsockopt(sock, IPPROTO_TCP, TCP_FASTOPEN,
 		(const void *) &on, sizeof(on)) < 0)
 	{
-		acl_msg_error("%s: setsocket(TCP_FASTOPEN): %s",
+		acl_msg_warn("%s: setsocket(TCP_FASTOPEN): %s",
 			myname, acl_last_serror());
 	}
 #endif
 
-	if (bind(sock, (struct sockaddr *) &sa, sizeof(struct sockaddr)) < 0) {
-		acl_msg_error("%s: bind %s error %s",
-			myname, addr, acl_last_serror());
+	if (bind(sock, res->ai_addr, res->ai_addrlen) < 0) {
+		acl_msg_error("%s: bind %s error %s, addr=%s",
+			myname, addr, acl_last_serror(), addr);
 		acl_socket_close(sock);
 		return ACL_SOCKET_INVALID;
 	}
 
-	acl_non_blocking(sock, block_mode);
+	acl_non_blocking(sock, blocking);
 
 	if (listen(sock, backlog) < 0) {
-		acl_msg_error("%s: listen error: %s, addr(%s)",
+		acl_msg_error("%s: listen error: %s, addr=%s",
 			myname, acl_last_serror(), addr);
 		acl_socket_close(sock);
 		return ACL_SOCKET_INVALID;
 	}
+
+	return sock;
+}
+
+/* acl_inet_listen - create TCP listener */
+
+ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int blocking)
+{
+	const char *myname = "acl_inet_listen";
+	char *buf, *host = NULL, *port = NULL;
+	const char *ptr;
+	struct addrinfo hints, *res0, *res;
+	ACL_SOCKET sock;
+	int err;
+
+	/*
+	 * Translate address information to internal form.
+	 */
+	buf = acl_mystrdup(addr);
+	ptr = acl_host_port(buf, &host, "", &port, (char *) 0);
+	if (ptr) {
+		acl_msg_error("%s(%d): %s, %s invalid",
+			myname, __LINE__, addr, ptr);
+		acl_myfree(buf);
+		return ACL_SOCKET_INVALID;
+	}
+
+	if (host && *host == 0)
+		host = 0;
+	if (host == NULL)
+		host = "0";
+
+	if (port == NULL) {
+		acl_msg_error("%s(%d): no port given from addr(%s)",
+			myname, __LINE__, addr);
+		acl_myfree(buf);
+		return ACL_SOCKET_INVALID;
+	} else if (atoi(port) < 0) {
+		acl_msg_error("%s: port(%s) < 0 invalid from addr(%s)",
+			myname, port, addr);
+		acl_myfree(buf);
+		return ACL_SOCKET_INVALID;
+	}
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family   = PF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+#ifdef	ACL_MACOSX
+	hints.ai_flags    = AI_DEFAULT;
+#elif	defined(ACL_ANDROID)
+	hints.ai_flags    = AI_ADDRCONFIG;
+#else
+	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
+#endif
+
+	if ((err = getaddrinfo(host, port, &hints, &res0))) {
+		acl_msg_error("%s(%d), %s: getaddrinfo error %s, host=%s",
+			__FILE__, __LINE__, myname, gai_strerror(err), host);
+		acl_myfree(buf);
+		return ACL_SOCKET_INVALID;
+	}
+
+	acl_myfree(buf);
+
+	sock = ACL_SOCKET_INVALID;
+
+	for (res = res0; res != NULL; res = res->ai_next) {
+		sock = inet_listen(addr, res, backlog, blocking);
+		if (sock != ACL_SOCKET_INVALID)
+			break;
+	}
+
+	if (res0)
+		freeaddrinfo(res0);
 
 	return sock;
 }
@@ -141,19 +174,19 @@ ACL_SOCKET acl_inet_accept(ACL_SOCKET listen_fd)
 
 ACL_SOCKET acl_inet_accept_ex(ACL_SOCKET listen_fd, char *ipbuf, size_t size)
 {
-	struct sockaddr_in client_addr;
-	socklen_t addr_len;
+	struct sockaddr_storage sa;
+	socklen_t len = sizeof(sa);
 	ACL_SOCKET fd;
 
-	memset(&client_addr, 0, sizeof(client_addr));
-	addr_len = sizeof(client_addr);
+	memset(&sa, 0, sizeof(sa));
 
 	/* when client_addr not null and protocol is AF_INET, acl_sane_accept
 	 * will set nodelay on the accepted socket, 2008.9.4, zsx
 	 */
-	fd = acl_sane_accept(listen_fd, (struct sockaddr *)&client_addr, &addr_len);
+	fd = acl_sane_accept(listen_fd, (struct sockaddr *)&sa, &len);
 	if (fd == ACL_SOCKET_INVALID)
 		return fd;
+
 	if (ipbuf != NULL && size > 0 && acl_getpeername(fd, ipbuf, size) < 0)
 		ipbuf[0] = 0;
 

@@ -34,7 +34,7 @@ int acl_valid_hostname(const char *name, int gripe)
 	if (*name == 0) {
 		if (gripe)
 			acl_msg_warn("%s: empty hostname", myname);
-		return (0);
+		return 0;
 	}
 
 	/*
@@ -50,7 +50,7 @@ int acl_valid_hostname(const char *name, int gripe)
 					acl_msg_warn("%s: hostname label"
 						" too long: %.100s",
 						myname, name);
-				return (0);
+				return 0;
 			}
 			if (!ACL_ISDIGIT(ch))
 				non_numeric = 1;
@@ -59,7 +59,7 @@ int acl_valid_hostname(const char *name, int gripe)
 				if (gripe)
 					acl_msg_warn("%s: misplaced delimiter:"
 						" %.100s", myname, name);
-				return (0);
+				return 0;
 			}
 			label_length = 0;
 		} else if (ch == '-') {
@@ -68,7 +68,7 @@ int acl_valid_hostname(const char *name, int gripe)
 				if (gripe)
 					acl_msg_warn("%s: misplaced hyphen:"
 						" %.100s", myname, name);
-				return (0);
+				return 0;
 			}
 		}
 #ifdef SLOPPY_VALID_HOSTNAME
@@ -81,7 +81,7 @@ int acl_valid_hostname(const char *name, int gripe)
 			if (gripe)
 				acl_msg_warn("%s: invalid character %d(decimal): %.100s",
 						myname, ch, name);
-			return (0);
+			return 0;
 		}
 	}
 
@@ -89,16 +89,16 @@ int acl_valid_hostname(const char *name, int gripe)
 		if (gripe)
 			acl_msg_warn("%s: numeric hostname: %.100s", myname, name);
 #ifndef SLOPPY_VALID_HOSTNAME
-		return (0);
+		return 0;
 #endif
 	}
 	if (cp - name > ACL_VALID_HOSTNAME_LEN) {
 		if (gripe)
 			acl_msg_warn("%s: bad length %d for %.100s...",
 					myname, (int) (cp - name), name);
-		return (0);
+		return 0;
 	}
-	return (1);
+	return 1;
 }
 
 /* acl_valid_hostaddr - verify numerical address syntax */
@@ -113,16 +113,16 @@ int acl_valid_hostaddr(const char *addr, int gripe)
 	if (*addr == 0) {
 		if (gripe)
 			acl_msg_warn("%s: empty address", myname);
-		return (0);
+		return 0;
 	}
 
 	/*
 	 * Protocol-dependent processing next.
 	 */
 	if (strchr(addr, ':') != 0)
-		return (acl_valid_ipv6_hostaddr(addr, gripe));
+		return acl_valid_ipv6_hostaddr(addr, gripe);
 	else
-		return (acl_valid_ipv4_hostaddr(addr, gripe));
+		return acl_valid_ipv4_hostaddr(addr, gripe);
 }
 
 /* acl_valid_ipv4_hostaddr - test dotted quad string for correctness */
@@ -157,14 +157,14 @@ int acl_valid_ipv4_hostaddr(const char *addr, int gripe)
 				if (gripe)
 					acl_msg_warn("%s: invalid octet value:"
 						" %.100s", myname, addr);
-				return (0);
+				return 0;
 			}
 		} else if (ch == '.') {
 			if (in_byte == 0 || cp[1] == 0) {
 				if (gripe)
 					acl_msg_warn("%s: misplaced dot:"
 						" %.100s", myname, addr);
-				return (0);
+				return 0;
 			}
 			/* XXX Allow 0.0.0.0 but not 0.1.2.3 */
 			if (byte_count == 1 && byte_val == 0
@@ -172,24 +172,25 @@ int acl_valid_ipv4_hostaddr(const char *addr, int gripe)
 				if (gripe)
 					acl_msg_warn("%s: bad initial octet"
 						" value: %.100s", myname, addr);
-				return (0);
+				return 0;
 			}
 			in_byte = 0;
 		} else {
 			if (gripe)
 				acl_msg_warn("%s: invalid character %d(decimal): %.100s",
 					myname, ch, addr);
-			return (0);
+			return 0;
 		}
 	}
 
-	if (byte_count != BYTES_NEEDED) {
+	if (byte_count != BYTES_NEEDED && strcmp(addr, "0") != 0) {
 		if (gripe)
 			acl_msg_warn("%s: invalid octet count: %.100s",
 				myname, addr);
-		return (0);
+		return 0;
 	}
-	return (1);
+
+	return 1;
 }
 
 /* acl_valid_ipv6_hostaddr - validate IPv6 address syntax */
@@ -224,15 +225,15 @@ int acl_valid_ipv6_hostaddr(const char *addr, int gripe)
 					acl_msg_warn("%s: too few `:' in IPv6"
 						" address: %.100s",
 						myname, addr);
-				return (0);
+				return 0;
 			} else if (len == 0 && null_field != field - 1) {
 				if (gripe)
 					acl_msg_warn("%s: bad null last field"
 						" in IPv6 address: %.100s",
 						myname, addr);
-				return (0);
+				return 0;
 			} else
-				return (1);
+				return 1;
 		case '.':
 			/* Terminate the loop. */
 			if (field < 2 || field > 6) {
@@ -240,10 +241,10 @@ int acl_valid_ipv6_hostaddr(const char *addr, int gripe)
 					acl_msg_warn("%s: malformed IPv4-in-IPv6"
 						" address: %.100s",
 						myname, addr);
-				return (0);
+				return 0;
 			} 
 			/* NOT: acl_valid_hostaddr(). Avoid recursion. */
-			return (acl_valid_ipv4_hostaddr((const char *) cp - len, gripe));
+			return acl_valid_ipv4_hostaddr((const char *) cp - len, gripe);
 		case ':':
 		/* advance by exactly 1 character position or terminate. */
 			if (field == 0 && len == 0 && ACL_ISALNUM(cp[1])) {
@@ -251,7 +252,7 @@ int acl_valid_ipv6_hostaddr(const char *addr, int gripe)
 					acl_msg_warn("%s: bad null first field"
 						" in IPv6 address: %.100s",
 						myname, addr);
-				return (0);
+				return 0;
 			}
 			field++;
 			if (field > 7) {
@@ -259,7 +260,7 @@ int acl_valid_ipv6_hostaddr(const char *addr, int gripe)
 					acl_msg_warn("%s: too many `:' in"
 						" IPv6 address: %.100s",
 						myname, addr);
-				return (0);
+				return 0;
 			}
 			cp++;
 			len = 0;
@@ -269,7 +270,7 @@ int acl_valid_ipv6_hostaddr(const char *addr, int gripe)
 						acl_msg_warn("%s: too many `::'"
 							" in IPv6 address: %.100s",
 							myname, addr);
-					return (0);
+					return 0;
 				}
 				null_field = field;
 			} 
@@ -281,14 +282,14 @@ int acl_valid_ipv6_hostaddr(const char *addr, int gripe)
 				if (gripe)
 					acl_msg_warn("%s: malformed IPv6 address: %.100s",
 							myname, addr);
-				return (0);
+				return 0;
 			}
 			if (len <= 0) {
 				if (gripe)
 					acl_msg_warn("%s: invalid character"
 						" %d(decimal) in IPv6 address: %.100s",
 						myname, *cp, addr);
-				return (0);
+				return 0;
 			}
 			cp += len;
 			break;

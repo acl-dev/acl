@@ -1,5 +1,5 @@
-#ifndef	ACL_PTHREAD_WIN32_INCLUDE_H
-#define	ACL_PTHREAD_WIN32_INCLUDE_H
+#ifndef	__ACL_PTHREAD_INCLUDE_H__
+#define	__ACL_PTHREAD_INCLUDE_H__
 
 #ifdef	__cplusplus
 extern "C" {
@@ -35,13 +35,11 @@ typedef pthread_once_t acl_pthread_once_t;
 #define acl_pthread_detach              pthread_detach
 #define acl_pthread_once                pthread_once
 #define acl_pthread_join                pthread_join
-#define acl_pthread_mutex_destroy       pthread_mutex_destroy
 #define acl_pthread_mutex_init          pthread_mutex_init
 #define acl_pthread_mutex_lock          pthread_mutex_lock
 #define acl_pthread_mutex_unlock        pthread_mutex_unlock
 #define acl_pthread_mutex_trylock       pthread_mutex_trylock
 #define acl_pthread_cond_init           pthread_cond_init
-/* #define acl_pthread_cond_create         pthread_cond_create */
 #define acl_pthread_cond_destroy        pthread_cond_destroy
 #define acl_pthread_cond_signal         pthread_cond_signal
 #define acl_pthread_cond_broadcast      pthread_cond_broadcast
@@ -147,7 +145,6 @@ ACL_API int acl_pthread_detach(acl_pthread_t thread);
 ACL_API int acl_pthread_join(acl_pthread_t thread, void **thread_return);
 
 /* in acl_pthread_mutex.c */
-ACL_API int acl_pthread_mutex_destroy(acl_pthread_mutex_t *mutex);
 ACL_API int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex,
 		const acl_pthread_mutexattr_t *mattr);
 ACL_API int acl_pthread_mutex_lock(acl_pthread_mutex_t *mutex);
@@ -158,7 +155,11 @@ ACL_API int acl_pthread_mutex_unlock(acl_pthread_mutex_t *mutex);
 /* in acl_pthread_cond.c */
 ACL_API int acl_pthread_cond_init(acl_pthread_cond_t *cond,
 		acl_pthread_condattr_t *cond_attr);
-ACL_API acl_pthread_cond_t * acl_pthread_cond_create(void);
+ACL_API acl_pthread_cond_t *acl_thread_cond_create(void);
+#ifndef acl_pthread_cond_create
+#define acl_pthread_cond_create acl_thread_cond_create
+#endif
+
 ACL_API int acl_pthread_cond_destroy(acl_pthread_cond_t *cond);
 ACL_API int acl_pthread_cond_signal(acl_pthread_cond_t *cond);
 ACL_API int acl_pthread_cond_broadcast(acl_pthread_cond_t *cond);
@@ -177,7 +178,12 @@ ACL_API int acl_thread_mutex_unlock(acl_pthread_mutex_t *mutex);
 ACL_API int acl_thread_mutex_nested(acl_pthread_mutex_t *mutex);
 
 /* in acl_pthread_mutex.c */
-ACL_API acl_pthread_mutex_t *acl_pthread_mutex_create(void);
+ACL_API acl_pthread_mutex_t *acl_thread_mutex_create(void);
+#ifndef acl_pthread_mutex_create
+#define acl_pthread_mutex_create acl_thread_mutex_create
+#endif
+
+ACL_API int acl_pthread_mutex_destroy(acl_pthread_mutex_t *mutex);
 
 /* in acl_pthread.c */
 ACL_API int acl_pthread_atexit_add(void *arg, void (*free_callback)(void*));
@@ -193,9 +199,6 @@ ACL_API void acl_pthread_tls_once_get(acl_pthread_once_t *control_once);
 ACL_API void acl_pthread_tls_once_set(acl_pthread_once_t control_once);
 ACL_API acl_pthread_key_t acl_pthread_tls_key_get(void);
 ACL_API void acl_pthread_tls_key_set(acl_pthread_key_t key);
-
-/* in acl_pthread_cond.c */
-ACL_API acl_pthread_cond_t * acl_pthread_cond_create(void);
 
 #ifdef	__cplusplus
 }

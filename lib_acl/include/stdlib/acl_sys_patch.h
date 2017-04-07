@@ -65,6 +65,25 @@ ACL_API int acl_socket_end(void);
 ACL_API int acl_socket_close(ACL_SOCKET fd);
 
 /**
+ * 禁止套接口的发送与接收
+ * @param fd {ACL_SOCKET} 套接字
+ * @param how {int}
+ * @return {int} 返回 0 表示操作成功，否则表示出错
+ */
+#if defined(_WIN32) || defined(_WIN64)
+# ifndef SHUT_RD
+#  define SHUT_RD SD_RECEIVE
+# endif
+# ifndef SHUT_WR
+#  define SHUT_WR SD_SEND
+# endif
+# ifndef SHUT_RDWR
+#  define SHUT_RDWR SD_BOTH
+# endif
+#endif
+ACL_API int acl_socket_shutdown(ACL_SOCKET fd, int how);
+
+/**
  * 从套接字读数据
  * @param fd {ACL_SOCKET} 网络套接字
  * @param buf {void*} 内存缓冲区地址

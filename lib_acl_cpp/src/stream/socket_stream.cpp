@@ -61,6 +61,36 @@ bool socket_stream::bind_udp(const char* addr, int rw_timeout /* = 0 */)
 	return true;
 }
 
+bool socket_stream::shutdown_read()
+{
+	if (stream_ == NULL)
+	{
+		logger_error("stream_ null");
+		return false;
+	}
+	return acl_socket_shutdown(ACL_VSTREAM_SOCK(stream_), SHUT_RD) == 0;
+}
+
+bool socket_stream::shutdown_write()
+{
+	if (stream_ == NULL)
+	{
+		logger_error("stream_ null");
+		return false;
+	}
+	return acl_socket_shutdown(ACL_VSTREAM_SOCK(stream_), SHUT_WR) == 0;
+}
+
+bool socket_stream::shutdown_readwrite()
+{
+	if (stream_ == NULL)
+	{
+		logger_error("stream_ null");
+		return false;
+	}
+	return acl_socket_shutdown(ACL_VSTREAM_SOCK(stream_), SHUT_RDWR) == 0;
+}
+
 ACL_SOCKET socket_stream::sock_handle() const
 {
 	if (stream_ == NULL)

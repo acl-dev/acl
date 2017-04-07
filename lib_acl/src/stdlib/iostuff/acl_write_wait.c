@@ -52,11 +52,14 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 			return -1;
 		default:
 			if ((fds.revents & (POLLHUP | POLLERR))) {
+				/*
 				acl_msg_error("%s(%d), %s: fd: %d,"
 					"POLLHUP: %s, POLLERR: %s",
 					__FILE__, __LINE__, myname, fd,
 					fds.revents & POLLHUP ? "yes" : "no",
 					fds.revents & POLLERR ? "yes" : "no");
+				*/
+				errno = ECONNREFUSED;
 				return -1;
 			}
 			if (fds.revents & POLLOUT)

@@ -262,11 +262,11 @@ std::string gsoner::get_unpack_code(const std::string &obj_name,
 		{
 			return tab_
 				+ "if(!" + field.name_ + " ||"
-				+ "!(result = gson(*" + field.name_ + ", &$obj."
-				+ field.name_ + "), result.first))\n" + tab_ + tab_
+				+ "!($result = gson(*" + field.name_ + ", &$obj."
+				+ field.name_ + "), $result.first))\n" + tab_ + tab_
 				+ "return std::make_pair(false, \"required ["
 				+ obj_name + "." + field.name_
-				+ "] failed:{\"+result.second+\"}\");";
+				+ "] failed:{\"+$result.second+\"}\");";
 		}
 		else
 			return tab_ +
@@ -277,11 +277,11 @@ std::string gsoner::get_unpack_code(const std::string &obj_name,
 	{
 		return tab_
 			+ "if(!" + field.name_ + " ||" + "!" + field.name_
-			+ "->get_obj()||" + "!(result = gson(*" + field.name_
-			+ "->get_obj(), &$obj." + field.name_ + "), result.first))\n"
+			+ "->get_obj()||" + "!($result = gson(*" + field.name_
+			+ "->get_obj(), &$obj." + field.name_ + "), $result.first))\n"
 			+ tab_ + tab_ + "return std::make_pair(false, \"required ["
 			+ obj_name + "." + field.name_
-			+ "] failed:{\"+result.second+\"}\");";
+			+ "] failed:{\"+$result.second+\"}\");";
 	}
 	return tab_
 		+ "if(" + field.name_ + "&& " + field.name_
@@ -319,7 +319,7 @@ gsoner::function_code_t gsoner::gen_unpack_code(const object_t &obj)
 		code.definition_ += *itr;
 		code.definition_ += "\n";
 	}
-	code.definition_ += tab_ + "std::pair<bool, std::string> result;\n\n";
+	code.definition_ += tab_ + "std::pair<bool, std::string> $result;\n\n";
 	for (std::list<std::string>::iterator itr = unpack_codes.begin();
 			itr != unpack_codes.end(); ++itr)
 	{

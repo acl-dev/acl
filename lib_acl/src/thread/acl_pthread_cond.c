@@ -22,16 +22,13 @@ int acl_pthread_cond_init(acl_pthread_cond_t *cond,
 {
 	const char *myname = "acl_pthread_cond_init";
 
-	if (cond == NULL) {
-		acl_msg_error("%s, %s(%d): input invalid",
+	if (cond == NULL)
+		acl_msg_fatal("%s, %s(%d): input invalid",
 			__FILE__, myname, __LINE__);
-		return -1;
-	}
 
-	cond_attr = cond_attr;
-
+	(void) cond_attr;
 	cond->dynamic = 0;
-	cond->lock      = acl_pthread_mutex_create();
+	cond->lock      = acl_thread_mutex_create();
 	cond->wait_sem  = acl_sem_create(0);
 	cond->wait_done = acl_sem_create(0);
 	cond->waiting   = cond->signals = 0;
@@ -42,9 +39,9 @@ int acl_pthread_cond_init(acl_pthread_cond_t *cond,
 }
 
 /* Create a condition variable */
-acl_pthread_cond_t * acl_pthread_cond_create(void)
+acl_pthread_cond_t * acl_thread_cond_create(void)
 {
-	const char *myname = "acl_pthread_cond_create";
+	const char *myname = "acl_thread_cond_create";
 	acl_pthread_cond_t *cond;
 
 	cond = (acl_pthread_cond_t *)
@@ -75,8 +72,10 @@ int acl_pthread_cond_destroy(acl_pthread_cond_t *cond)
 		acl_sem_destroy(cond->wait_sem);
 	if (cond->wait_done)
 		acl_sem_destroy(cond->wait_done);
-	if ( cond->lock )
+	if (cond->lock) {
 		acl_pthread_mutex_destroy(cond->lock);
+		acl_myfree(cond->lock);
+	}
 
 	if (cond->dynamic)
 		acl_myfree(cond);
@@ -237,4 +236,4 @@ int acl_pthread_cond_wait(acl_pthread_cond_t *cond, acl_pthread_mutex_t *mutex)
 	return acl_pthread_cond_timedwait(cond, mutex, NULL);
 }
 
-#endif /* ACL_HAS_PTHREAD */
+#endif /* !ACL_HAS_PTHREAD */

@@ -37,16 +37,16 @@ int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr * sa,
 	 * Start the connection, and handle all possible results.
 	 */
 	if (acl_sane_connect(sock, sa, len) == 0)
-		return (0);
+		return 0;
 
 	errno = acl_last_error();
 
 #ifdef	ACL_UNIX
 	if (errno != ACL_EINPROGRESS)
-		return (-1);
+		return -1;
 #elif defined(ACL_WINDOWS)
 	if (errno != ACL_EINPROGRESS && errno != ACL_EWOULDBLOCK)
-		return (-1);
+		return -1;
 #endif
 
 	/*
@@ -54,7 +54,7 @@ int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr * sa,
 	 * something to happen. If nothing happens, report an error.
 	 */
 	if (acl_write_wait(sock, timeout) < 0)
-		return (-1);
+		return -1;
 
 	/*
 	 * Something happened. Some Solaris 2 versions have getsockopt() itself
@@ -72,12 +72,12 @@ int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr * sa,
 		if (errno == EPIPE)
 			acl_set_error(ACL_ENOTCONN);
 #endif
-		return (-1);
+		return -1;
 	}
 
 	if (err != 0) {
 		acl_set_error(err);
-		return (-1);
+		return -1;
 	} else
-		return (0);
+		return 0;
 }

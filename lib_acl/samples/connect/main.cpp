@@ -1,11 +1,12 @@
 #include "lib_acl.h"
+#include <netdb.h>
 #include <list>
 
 static void test(const char* addr)
 {
 	std::list<ACL_VSTREAM*> conns;
 
-	for (int i = 0; i < 10000; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		ACL_VSTREAM* client = acl_vstream_connect(addr, ACL_BLOCKING, 10, 10, 4096);
 		if (client == NULL)
@@ -26,9 +27,35 @@ static void test(const char* addr)
 	printf("Exit now ok\r\n");
 }
 
+static void get_name(void)
+{
+	const char *name = "localhost";
+	struct addrinfo hints, *res, *res0;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_ALL;
+
+	int error = getaddrinfo(name, "8089", &hints, &res0);
+	if (error) {
+		printf("getaddrinfo error %s\r\n", acl_last_serror());
+		return;
+	}
+
+	for (res = res0; res; res = res->ai_next) {
+		printf("ai_family: %d, len: %d\r\n",
+			res->ai_family, (int) res->ai_addrlen);
+	}
+
+	freeaddrinfo(res0);
+}
+
 int main(int argc, char *argv[])
 {
-	test(argv[1]);
+	acl_msg_stdout_enable(1);
+	get_name();
+	test(argc >= 2 ? argv[1] : "localhost:8809");
 	return 0;
 
 	ACL_VSTREAM *client;

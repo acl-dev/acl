@@ -321,3 +321,8 @@ int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
 #else
 # error "unknown OS type"
 #endif
+
+int acl_socket_shutdown(ACL_SOCKET fd, int how)
+{
+	return shutdown(fd, how);
+}

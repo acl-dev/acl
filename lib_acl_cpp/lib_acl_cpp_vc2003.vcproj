@@ -397,6 +397,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\stdlib\malloc.cpp">
 				</File>
 				<File
+					RelativePath=".\src\stdlib\mbox.cpp">
+				</File>
+				<File
 					RelativePath=".\src\stdlib\md5.cpp">
 				</File>
 				<File
@@ -1043,6 +1046,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\malloc.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\mbox.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\md5.hpp">

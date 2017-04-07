@@ -92,6 +92,8 @@
 #  include <winsock.h>
 # endif
 
+# include <ws2tcpip.h> /* for getaddrinfo */
+
 # ifdef	ACL_BCB_COMPILER
 #  pragma hdrstop
 # endif

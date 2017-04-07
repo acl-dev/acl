@@ -32,7 +32,7 @@
 const char *acl_host_port(char *buf, char **host, char *def_host,
 	char **port, char *def_service)
 {
-	char   *cp = buf;
+	char *cp = buf;
 
 	/*
 	 * [host]:port, [host]:, [host].
@@ -49,17 +49,17 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 	/*
 	 * host:port, host:, host, :port, port.
 	 */
-	else {
-		if ((cp = acl_split_at_right(buf, ':')) != 0) {
-			*host = *buf ? buf : def_host;
-			*port = *cp ? cp : def_service;
-		} else {
-			*host = def_host ? def_host : (*buf ? buf : 0);
-			*port = def_service ? def_service : (*buf ? buf : 0);
-		}
+	else if ((cp = acl_split_at_right(buf, ':')) != 0) {
+		*host = *buf ? buf : def_host;
+		*port = *cp ? cp : def_service;
+	} else {
+		*host = def_host ? def_host : (*buf ? buf : 0);
+		*port = def_service ? def_service : (*buf ? buf : 0);
 	}
+
 	if (*host == 0)
 		return "missing host information";
+
 	if (*port == 0)
 		return "missing service information";
 
@@ -70,8 +70,12 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 	if (*host != def_host
 	    && !acl_valid_hostname(*host, ACL_DONT_GRIPE)
 	    && !acl_valid_hostaddr(*host, ACL_DONT_GRIPE))
+	{
 		return "valid hostname or network address required";
+	}
+
 	if (*port != def_service && ACL_ISDIGIT(**port) && !acl_alldig(*port))
 		return "garbage after numerical service";
+
 	return NULL;
 }

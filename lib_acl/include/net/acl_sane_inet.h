@@ -34,6 +34,8 @@ ACL_API const char *acl_inet_ntoa(struct in_addr in, char *dst, size_t size);
  * @return {int} 0: 是; -1: 否
  */
 ACL_API int acl_is_ip(const char *ip);
+ACL_API int acl_is_ipv4(const char *ip);
+ACL_API int acl_is_ipv6(const char *ip);
 
 /**
  * 判断所给的 ip 地址是否符合 xxx.xxx.xxx.xxx 格式

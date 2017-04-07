@@ -31,6 +31,7 @@
 #include "acl_cpp/stdlib/thread_queue.hpp"
 #include "acl_cpp/stdlib/scan_dir.hpp"
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
+#include "acl_cpp/stdlib/mbox.hpp"
 
 #include "acl_cpp/serialize/gsoner.hpp"
 

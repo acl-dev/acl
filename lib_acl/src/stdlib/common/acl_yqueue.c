@@ -99,6 +99,7 @@ void acl_yqueue_free(ACL_YQUEUE *self, void(*free_fn)(void*))
 	if (cs)
 		acl_myfree(cs);
 
+	acl_atomic_free(self->spare_chunk);
 	acl_myfree(self);
 }
 

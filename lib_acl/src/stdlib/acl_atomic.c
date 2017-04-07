@@ -38,8 +38,8 @@ void acl_atomic_free(ACL_ATOMIC *self)
 	self->value = NULL;
 #ifndef HAS_ATOMIC
 	acl_pthread_mutex_destroy(&self->lock);
-	acl_myfree(self);
 #endif
+	acl_myfree(self);
 }
 
 void acl_atomic_set(ACL_ATOMIC *self, void *value)

@@ -40,6 +40,7 @@
 
 # include <assert.h>
 # include <sys/types.h>
+# include <netdb.h>
 
 # ifndef acl_assert
 #  define acl_assert assert

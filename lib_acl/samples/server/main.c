@@ -5,6 +5,7 @@
 static void init(void)
 {
 	acl_lib_init();
+	acl_msg_stdout_enable(1);
 }
 
 static void end(void)
@@ -26,13 +27,12 @@ static void thread_run(void *arg)
 	}
 
 	buf[ret] = 0;
-	printf("(%s)\n", buf);
+	(void) acl_vstream_write(client, buf, ret);
 	acl_vstream_close(client);
 }
 	
-static void run(void)
+static void run(const char *addr)
 {
-	const char *addr = "0.0.0.0:8089";
 	ACL_VSTREAM *sstream = acl_vstream_listen(addr, 128);
 	acl_pthread_pool_t *pool;
 
@@ -49,16 +49,21 @@ static void run(void)
 			acl_msg_error("accept error(%s)", acl_last_serror());
 			break;
 		}
+		printf("accept one client\r\n");
 		acl_pthread_pool_add(pool, thread_run, client);
 	}
 
 	acl_vstream_close(sstream);
 }
 
-int main(int argc acl_unused, char *argv[] acl_unused)
+int main(int argc, char *argv[])
 {
+	const char *addr = "0:8809";
+
+	if (argc >= 2)
+		addr = argv[1];
 	init();
-	run();
+	run(addr);
 	end();
 	return (0);
 }

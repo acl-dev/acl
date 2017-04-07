@@ -527,6 +527,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include="src\stdlib\locker.cpp" />
     <ClCompile Include="src\stdlib\log.cpp" />
     <ClCompile Include="src\stdlib\malloc.cpp" />
+    <ClCompile Include="src\stdlib\mbox.cpp" />
     <ClCompile Include="src\stdlib\md5.cpp" />
     <ClCompile Include="src\stdlib\pipe_stream.cpp" />
     <ClCompile Include="src\stdlib\scan_dir.cpp" />
@@ -689,6 +690,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stdlib\locker.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\log.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\malloc.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\mbox.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\md5.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\noncopyable.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\pipe_stream.hpp" />

@@ -16,24 +16,14 @@ extern "C" {
  * @param _size {int} 目的内存区的空间大小
  */
 #ifndef ACL_SAFE_STRNCPY
-#if defined(_WIN32) || defined(_WIN64)
-#define ACL_SAFE_STRNCPY(_obj, _src, _size) do {            \
-    size_t _n = strlen(_src);                               \
-    _n = _n > (size_t ) _size - 1? (size_t) _size - 1 : _n; \
-    memcpy(_obj, _src, _n);                                 \
-    _obj[_n] = 0;                                           \
+#define ACL_SAFE_STRNCPY(_obj, _src, _size) do {                \
+    if (_size > 0) {                                            \
+        size_t _n = strlen(_src);                               \
+        _n = _n > (size_t ) _size - 1? (size_t) _size - 1 : _n; \
+        memcpy(_obj, _src, _n);                                 \
+        _obj[_n] = 0;                                           \
+    }                                                           \
 } while (0)
-#else
-#define ACL_SAFE_STRNCPY(_obj, _src, _size) do {            \
-    if (_size > 0) {  \
-        strncpy(_obj, _src, _size);                         \
-            if ((int)_size > 0)                             \
-                _obj[_size - 1] = 0;                        \
-            else                                            \
-                _obj[_size] = 0;                            \
-    }                                                       \
-} while (0)
-#endif
 #endif
 
 /**

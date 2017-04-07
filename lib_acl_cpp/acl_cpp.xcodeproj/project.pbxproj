@@ -190,6 +190,7 @@
 		07A468731E6FCCF1002C9B3C /* stdin_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467BD1E6FCCF1002C9B3C /* stdin_stream.cpp */; };
 		07A468741E6FCCF1002C9B3C /* stdout_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467BE1E6FCCF1002C9B3C /* stdout_stream.cpp */; };
 		07A468751E6FCCF1002C9B3C /* stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467BF1E6FCCF1002C9B3C /* stream.cpp */; };
+		07A4D1731E94E4BC00790E12 /* mbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4D1721E94E4BC00790E12 /* mbox.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -593,6 +594,8 @@
 		07A4694A1E6FD404002C9B3C /* stdout_stream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = stdout_stream.hpp; sourceTree = "<group>"; };
 		07A4694B1E6FD404002C9B3C /* stream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = stream.hpp; sourceTree = "<group>"; };
 		07A4694C1E6FD404002C9B3C /* stream_hook.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = stream_hook.hpp; sourceTree = "<group>"; };
+		07A4D1711E94E4A000790E12 /* mbox.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mbox.hpp; sourceTree = "<group>"; };
+		07A4D1721E94E4BC00790E12 /* mbox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mbox.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -958,6 +961,7 @@
 		07A4678C1E6FCCF1002C9B3C /* stdlib */ = {
 			isa = PBXGroup;
 			children = (
+				07A4D1721E94E4BC00790E12 /* mbox.cpp */,
 				07A4678D1E6FCCF1002C9B3C /* charset_conv.cpp */,
 				07A4678E1E6FCCF1002C9B3C /* dbuf_pool.cpp */,
 				07A4678F1E6FCCF1002C9B3C /* dns_service.cpp */,
@@ -1339,6 +1343,7 @@
 		07A469191E6FD404002C9B3C /* stdlib */ = {
 			isa = PBXGroup;
 			children = (
+				07A4D1711E94E4A000790E12 /* mbox.hpp */,
 				07A4691A1E6FD404002C9B3C /* charset_conv.hpp */,
 				07A4691B1E6FD404002C9B3C /* dbuf_pool.hpp */,
 				07A4691C1E6FD404002C9B3C /* dns_service.hpp */,
@@ -1497,6 +1502,7 @@
 				07A4684D1E6FCCF1002C9B3C /* json.cpp in Sources */,
 				07A468201E6FCCF1002C9B3C /* mime_image.cpp in Sources */,
 				07A4685A1E6FCCF1002C9B3C /* url_coder.cpp in Sources */,
+				07A4D1731E94E4BC00790E12 /* mbox.cpp in Sources */,
 				07A467DA1E6FCCF1002C9B3C /* db_service_mysql.cpp in Sources */,
 				07A4683D1E6FCCF1002C9B3C /* redis_string.cpp in Sources */,
 				07A468051E6FCCF1002C9B3C /* master_conf.cpp in Sources */,
