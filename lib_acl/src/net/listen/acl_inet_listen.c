@@ -74,7 +74,11 @@ static ACL_SOCKET inet_listen(const char *addr, const struct addrinfo *res,
 	}
 #endif
 
+#ifdef ACL_WINDOWS
+	if (bind(sock, res->ai_addr, (int) res->ai_addrlen) < 0) {
+#else
 	if (bind(sock, res->ai_addr, res->ai_addrlen) < 0) {
+#endif
 		acl_msg_error("%s: bind %s error %s, addr=%s",
 			myname, addr, acl_last_serror(), addr);
 		acl_socket_close(sock);
@@ -140,6 +144,10 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int blocking)
 	hints.ai_flags    = AI_DEFAULT;
 #elif	defined(ACL_ANDROID)
 	hints.ai_flags    = AI_ADDRCONFIG;
+#elif defined(ACL_WINDOWS)
+# if _MSC_VER >= 1500
+	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
+# endif
 #else
 	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
 #endif

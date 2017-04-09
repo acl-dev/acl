@@ -41,7 +41,11 @@ static int bind_local(ACL_SOCKET sock, int family, const struct addrinfo *res0)
 		if (res->ai_family != family)
 			continue;
 
+#ifdef ACL_WINDOWS
+		if (bind(sock, res->ai_addr, (int) res->ai_addrlen) == 0)
+#else
 		if (bind(sock, res->ai_addr, res->ai_addrlen) == 0)
+#endif
 			return 0;
 	}
 
@@ -80,8 +84,13 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 	 */
 	if (timeout > 0) {
 		acl_non_blocking(sock, ACL_NON_BLOCKING);
+#ifdef ACL_WINDOWS
+		if (acl_timed_connect(sock, peer->ai_addr,
+			(socklen_t) peer->ai_addrlen, timeout) < 0)
+#else
 		if (acl_timed_connect(sock, peer->ai_addr,
 			peer->ai_addrlen, timeout) < 0)
+#endif
 		{
 			acl_socket_close(sock);
 			return ACL_SOCKET_INVALID;
@@ -95,7 +104,13 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 	 * Maybe block until connected.
 	 */
 	acl_non_blocking(sock, blocking);
+#ifdef ACL_WINDOWS
+	if (acl_sane_connect(sock, peer->ai_addr,
+		(socklen_t) peer->ai_addrlen) < 0)
+	{
+#else
 	if (acl_sane_connect(sock, peer->ai_addr, peer->ai_addrlen) < 0) {
+#endif
 		int  err, errnum;
 		socklen_t len;
 
@@ -195,6 +210,10 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
 	hints.ai_flags    = AI_DEFAULT;
 #elif	defined(ACL_ANDROID)
 	hints.ai_flags    = AI_ADDRCONFIG;
+#elif defined(ACL_WINDOWS)
+# if _MSC_VER >= 1500
+	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
+# endif
 #else
 	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
 #endif
