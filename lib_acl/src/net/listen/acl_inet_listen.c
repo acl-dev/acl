@@ -94,6 +94,8 @@ static ACL_SOCKET inet_listen(const char *addr, const struct addrinfo *res,
 		return ACL_SOCKET_INVALID;
 	}
 
+	acl_msg_info("%s: listen %s ok", myname, addr);
+
 	return sock;
 }
 

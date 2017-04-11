@@ -123,6 +123,11 @@ void fiber::schedule(void)
 	acl_fiber_schedule();
 }
 
+bool fiber::scheduled(void)
+{
+	return acl_fiber_scheduled() != 0;
+}
+
 void fiber::schedule_stop(void)
 {
 	acl_fiber_schedule_stop();

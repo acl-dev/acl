@@ -36,6 +36,7 @@ static accept_fn     __sys_accept   = NULL;
 static connect_fn    __sys_connect  = NULL;
 
 static poll_fn       __sys_poll     = NULL;
+static poll_fn       __sys_inner_poll = NULL;
 static select_fn     __sys_select   = NULL;
 static gethostbyname_r_fn __sys_gethostbyname_r = NULL;
 
@@ -75,6 +76,9 @@ void hook_net(void)
 
 	__sys_poll       = (poll_fn) dlsym(RTLD_NEXT, "poll");
 	acl_assert(__sys_poll);
+
+	__sys_inner_poll = (poll_fn) dlsym(RTLD_NEXT, "__poll");
+	acl_assert(__sys_inner_poll);
 
 	__sys_select     = (select_fn) dlsym(RTLD_NEXT, "select");
 	acl_assert(__sys_select);
@@ -441,6 +445,18 @@ static void poll_callback(EVENT *ev acl_unused, POLL_EVENT *pe)
 {
 	fiber_io_dec();
 	acl_fiber_ready(pe->fiber);
+}
+
+extern int __poll(struct pollfd fds[], nfds_t nfds, int timeout);
+
+int __poll(struct pollfd fds[], nfds_t nfds, int timeout)
+{
+	if (__sys_inner_poll == NULL)
+		hook_net();
+	if (!acl_var_hook_sys_api)
+		return __sys_inner_poll(fds, nfds, timeout);
+
+	return poll(fds, nfds, timeout);
 }
 
 int poll(struct pollfd *fds, nfds_t nfds, int timeout)
@@ -940,7 +956,9 @@ int epoll_wait(int epfd, struct epoll_event *events,
 
 /****************************************************************************/
 
-struct hostent *gethostbyname(const char *name)
+extern struct hostent *fiber_gethostbyname(const char *name);
+
+struct hostent *fiber_gethostbyname(const char *name)
 {
 	static __thread struct hostent ret, *result;
 #define BUF_LEN	4096
@@ -948,6 +966,11 @@ struct hostent *gethostbyname(const char *name)
 
 	return gethostbyname_r(name, &ret, buf, BUF_LEN, &result, &h_errno)
 		== 0 ? result : NULL;
+}
+
+struct hostent *gethostbyname(const char *name)
+{
+	return fiber_gethostbyname(name);
 }
 
 static char dns_ip[128] = "8.8.8.8";
@@ -959,7 +982,10 @@ void acl_fiber_set_dns(const char* ip, int port)
 	dns_port = port;
 }
 
-int gethostbyname_r(const char *name, struct hostent *ret,
+extern int fiber_gethostbyname_r(const char *name, struct hostent *ret,
+	char *buf, size_t buflen, struct hostent **result, int *h_errnop);
+
+int fiber_gethostbyname_r(const char *name, struct hostent *ret,
 	char *buf, size_t buflen, struct hostent **result, int *h_errnop)
 {
 	ACL_RES *ns = NULL;
@@ -1063,4 +1089,10 @@ int gethostbyname_r(const char *name, struct hostent *ret,
 		*h_errnop = ERANGE;
 
 	RETURN (-1);
+}
+
+int gethostbyname_r(const char *name, struct hostent *ret,
+	char *buf, size_t buflen, struct hostent **result, int *h_errnop)
+{
+	return fiber_gethostbyname_r(name, ret, buf, buflen, result, h_errnop);
 }

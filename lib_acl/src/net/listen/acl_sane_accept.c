@@ -16,6 +16,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #endif
 
 #ifdef ACL_BCB_COMPILER
@@ -27,6 +28,7 @@
 #include "stdlib/acl_msg.h"
 #include "net/acl_tcp_ctl.h"
 #include "net/acl_sane_inet.h"
+#include "net/acl_sane_socket.h"
 #include "net/acl_listen.h"
 
 #endif
@@ -89,7 +91,12 @@ ACL_SOCKET acl_sane_accept(ACL_SOCKET sock, struct sockaddr * sa, socklen_t *len
 	 * socket provided that the kernel's keepalive timer expires before
 	 * the Postfix watchdog timer.
 	 */
-	else if (sa != 0 && sa->sa_family == AF_INET) {
+#ifdef AF_INET6
+	else if (sa && (sa->sa_family == AF_INET || sa->sa_family == AF_INET6))
+#else
+	else if (sa && sa->sa_family == AF_INET)
+#endif
+	{
 		int     on = 1;
 
 		/* default set client to nodelay --- add by zsx, 2008.9.4 */
@@ -106,26 +113,26 @@ ACL_SOCKET acl_sane_accept(ACL_SOCKET sock, struct sockaddr * sa, socklen_t *len
 
 ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size, int* sock_type)
 {
-#ifdef	ACL_WINDOWS
 	struct {
 		union {
+			struct sockaddr_storage ss;
+#ifdef AF_INET6
+			struct sockaddr_in6 in6;
+#endif
 			struct sockaddr_in in;
-		} sa;
-	} addr;
-#else
-	struct {
-		union {
-			struct sockaddr_in in;
+#ifndef	ACL_WINDOWS
 	                struct sockaddr_un un;
+#endif
 			struct sockaddr sa;
 		} sa;
 	} addr;
-#endif
 	socklen_t len = sizeof(addr);
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	ACL_SOCKET fd;
+	size_t n;
 
 	memset(&addr, 0, sizeof(addr));
+
 	fd = acl_sane_accept(sock, sa, &len);
 	if (fd == ACL_SOCKET_INVALID)
 		return fd;
@@ -133,24 +140,44 @@ ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size, int* sock_type)
 	if (sock_type != NULL)
 		*sock_type = sa->sa_family;
 
-	if (buf != NULL && size > 0) {
-		size_t n;
-#ifndef	ACL_WINDOWS
-		if (sa->sa_family == AF_UNIX)
-			snprintf(buf, size, "%s", addr.sa.un.sun_path);
-#endif
-		if (sa->sa_family != AF_INET)
+	if (buf == NULL || size == 0)
+		return fd;
+
+	buf[0] = 0;
+
+	if (sa->sa_family == AF_INET) {
+		if (!inet_ntop(sa->sa_family, &addr.sa.in.sin_addr, buf, size))
 			return fd;
-		if (acl_inet_ntoa(addr.sa.in.sin_addr, buf, size) == NULL)
-			return fd;
+
 		n = strlen(buf);
 		if (n >= size)
 			return fd;
-
 		snprintf(buf + n, size - n, ":%u",
 			(unsigned short) ntohs(addr.sa.in.sin_port));
 		buf[size - 1] = 0;
+		return fd;
 	}
+#ifdef AF_INET6
+	else if (sa->sa_family == AF_INET6) {
+		if (!inet_ntop(sa->sa_family, &addr.sa.in6.sin6_addr, buf, size))
+			return fd;
 
-	return fd;
+		n = strlen(buf);
+		if (n >= size)
+			return fd;
+		snprintf(buf + n, size - n, ":%u",
+			(unsigned short) ntohs(addr.sa.in6.sin6_port));
+		buf[size - 1] = 0;
+		return fd;
+	}
+#endif
+#ifndef	ACL_WINDOWS
+	else if (sa->sa_family == AF_UNIX) {
+		if (acl_getsockname(fd, buf, size) < 0)
+			buf[0] = 0;
+		return fd;
+	}
+#endif
+	else
+		return fd;
 }

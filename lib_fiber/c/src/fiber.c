@@ -38,6 +38,7 @@ static void fiber_init(void) __attribute__ ((constructor));
 
 static FIBER_TLS *__main_fiber = NULL;
 static __thread FIBER_TLS *__thread_fiber = NULL;
+static __thread int __scheduled = 0;
 __thread int acl_var_hook_sys_api = 0;
 
 static acl_pthread_key_t __fiber_key;
@@ -49,6 +50,11 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 void acl_fiber_hook_api(int onoff)
 {
 	acl_var_hook_sys_api = onoff;
+}
+
+int acl_fiber_scheduled(void)
+{
+	return __scheduled;
 }
 
 static void thread_free(void *ctx)
@@ -688,6 +694,7 @@ void acl_fiber_schedule(void)
 	ACL_RING *head;
 
 	acl_fiber_hook_api(1);
+	__scheduled = 1;
 
 	for (;;) {
 		head = acl_ring_pop_head(&__thread_fiber->ready);
@@ -713,6 +720,7 @@ void acl_fiber_schedule(void)
 	}
 
 	acl_fiber_hook_api(0);
+	__scheduled = 0;
 }
 
 void fiber_system(void)

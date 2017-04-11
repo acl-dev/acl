@@ -112,6 +112,7 @@ struct ACL_FIBER_RWLOCK {
 struct ACL_FIBER_SEM {
 	int num;
 	ACL_RING waiting;
+	acl_pthread_t tid;
 };
 
 /* in fiber.c */

@@ -80,6 +80,12 @@ public:
 	static void schedule(void);
 
 	/**
+	 * 判断当前线程是否处于协程调度状态
+	 * @return {bool}
+	 */
+	static bool scheduled(void);
+
+	/**
 	 *  停止协程调度过程
 	 */
 	static void schedule_stop(void);

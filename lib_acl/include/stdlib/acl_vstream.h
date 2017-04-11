@@ -126,8 +126,8 @@ struct ACL_VSTREAM {
 	int   rw_timeout;               /**< read/write timeout */
 	char *addr_local;               /**< the local addr of the fp */
 	char *addr_peer;                /**< the peer addr of the fp */
-	struct sockaddr_in *sa_local;
-	struct sockaddr_in *sa_peer;
+	struct sockaddr *sa_local;      /**< for IPV4/IPV6/UNIX */
+	struct sockaddr *sa_peer;       /**< for IPV4/IPV6/UNIX */
 	size_t sa_local_size;
 	size_t sa_peer_size;
 	size_t sa_local_len;
@@ -816,10 +816,10 @@ ACL_API void acl_vstream_set_peer(ACL_VSTREAM *fp, const char *addr);
 /**
  * 当 ACL_VSTREAM 为网络流时，此函数设置远程连接地址
  * @param fp {ACL_VSTREAM*} 网络流，非空
- * @param sa {const struct sockaddr_in *} 远程连接地址，非空
+ * @param sa {const struct sockaddr *} 远程连接地址，非空
  */
 ACL_API void acl_vstream_set_peer_addr(ACL_VSTREAM *fp,
-	const struct sockaddr_in *sa);
+	const struct sockaddr *sa);
 
 /**
  * 当 ACL_VSTREAM 为网络流时，用此宏取得本地的地址
@@ -836,10 +836,10 @@ ACL_API void acl_vstream_set_local(ACL_VSTREAM *fp, const char *addr);
 /**
  * 当 ACL_VSTREAM 为网络流时，此函数设置本地地址
  * @param fp {ACL_VSTREAM*} 网络流，非空
- * @param sa {const sockaddr_in*} 本地地址，非空
+ * @param sa {const sockaddr*} 本地地址，非空
  */
 ACL_API void acl_vstream_set_local_addr(ACL_VSTREAM *fp,
-	const struct sockaddr_in *sa);
+	const struct sockaddr *sa);
 
 ACL_API int acl_vstream_add_object(ACL_VSTREAM *fp, const char *key, void *obj);
 ACL_API int acl_vstream_del_object(ACL_VSTREAM *fp, const char *key);

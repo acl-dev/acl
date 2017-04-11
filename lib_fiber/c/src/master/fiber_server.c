@@ -680,8 +680,10 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	else if (socket_count <= 0)
 		acl_msg_fatal("%s(%d): invalid socket_count: %d",
 			myname, __LINE__, socket_count);
-	else
+	else {
+		fdtype = ACL_VSTREAM_TYPE_LISTEN;
 		__sstreams = server_daemon_open(socket_count, fdtype);
+	}
 #else
 	else
 		acl_msg_fatal("%s(%d): addrs NULL", myname, __LINE__);
@@ -717,8 +719,8 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	if (post_init)
 		post_init(post_init_ctx);
 
-	acl_msg_info("%s(%d), %s daemon started, log: %s",
-		myname, __LINE__, __argv[0], acl_var_fiber_log_file);
+	acl_msg_info("%s(%d), %s daemon started, log: %s, fdtype: %d",
+		myname, __LINE__, __argv[0], acl_var_fiber_log_file, fdtype);
 }
 
 void acl_fiber_server_main(int argc, char *argv[],

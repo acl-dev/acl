@@ -118,7 +118,7 @@ const char* socket_stream::get_peer(bool full /* = false */) const
 	char* ptr = ACL_VSTREAM_PEER(stream_);
 	if (ptr == NULL || *ptr == 0)
 	{
-		char  buf[64];
+		char  buf[256];
 		if (acl_getpeername(ACL_VSTREAM_SOCK(stream_),
 			buf, sizeof(buf)) == -1)
 		{
@@ -144,7 +144,7 @@ const char* socket_stream::get_peer_ip() const
 	char* ptr = ACL_VSTREAM_PEER(stream_);
 	if (ptr == NULL || *ptr == 0)
 	{
-		char  buf[64];
+		char  buf[256];
 		if (acl_getpeername(ACL_VSTREAM_SOCK(stream_),
 			buf, sizeof(buf)) == -1)
 		{

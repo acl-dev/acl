@@ -15,6 +15,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/un.h>
+#include <arpa/inet.h>
 #endif
 
 #ifdef ACL_BCB_COMPILER
@@ -26,34 +27,35 @@
 
 #endif
 
-#ifdef	ACL_WINDOWS
 struct SOCK_ADDR {
 	union {
+		struct sockaddr_storage ss;
+#ifdef AF_INET6
+		struct sockaddr_in6 in6;
+#endif
 		struct sockaddr_in in;
-	} sa;
-};
-#else
-struct SOCK_ADDR {
-	union {
-		struct sockaddr_in in;
+#ifdef ACL_UNIX
 		struct sockaddr_un un;
+#endif
 		struct sockaddr sa;
 	} sa;
 };
-#endif
+
+#define	LEN	64
 
 int acl_getpeername(ACL_SOCKET fd, char *buf, size_t size)
 {
 	struct SOCK_ADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
-	char  ip[32];
+	char  ip[LEN];
 	int   port;
 
 	if (fd == ACL_SOCKET_INVALID || buf == NULL || size <= 0)
 		return -1;
 
 	memset(&addr, 0, sizeof(addr));
+
 	if (getpeername(fd, sa, &len) == -1)
 		return -1;
 
@@ -69,11 +71,25 @@ int acl_getpeername(ACL_SOCKET fd, char *buf, size_t size)
 		return 0;
 	} else
 #endif
-	if (sa->sa_family != AF_INET)
+	if (inet_ntop(sa->sa_family, sa, ip, sizeof(ip)) == NULL)
 		return -1;
-	if (acl_inet_ntoa(addr.sa.in.sin_addr, ip, sizeof(ip)) == NULL)
+
+	if (sa->sa_family == AF_INET) {
+		if (!inet_ntop(sa->sa_family, &addr.sa.in.sin_addr, ip, LEN))
+			return -1;
+		port = ntohs(addr.sa.in.sin_port);
+	}
+#ifdef AF_INET6
+	else if (sa->sa_family == AF_INET6) {
+		if (!inet_ntop(sa->sa_family, &addr.sa.in6.sin6_addr, ip, LEN))
+			return -1;
+		port = ntohs(addr.sa.in6.sin6_port);
+	} else
 		return -1;
-	port = ntohs(addr.sa.in.sin_port);
+#else
+	else
+		return -1;
+#endif
 	snprintf(buf, size, "%s:%d", ip, port);
 	return 0;
 }
@@ -83,7 +99,7 @@ int acl_getsockname(ACL_SOCKET fd, char *buf, size_t size)
 	struct SOCK_ADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
-	char  ip[32];
+	char  ip[LEN];
 	int   port;
 
 	if (fd == ACL_SOCKET_INVALID || buf == NULL || size <= 0)
@@ -100,11 +116,23 @@ int acl_getsockname(ACL_SOCKET fd, char *buf, size_t size)
 		return 0;
 	} else
 #endif
-	if (sa->sa_family != AF_INET)
+	if (sa->sa_family == AF_INET) {
+		if (!inet_ntop(sa->sa_family, &addr.sa.in.sin_addr, ip, LEN))
+			return -1;
+		port = ntohs(addr.sa.in.sin_port);
+	}
+#ifdef AF_INET6
+	else if (sa->sa_family == AF_INET6) {
+		if (!inet_ntop(sa->sa_family, &addr.sa.in6.sin6_addr, ip, LEN))
+			return -1;
+		port = ntohs(addr.sa.in6.sin6_port);
+	} else
 		return -1;
-	if (acl_inet_ntoa(addr.sa.in.sin_addr, ip, sizeof(ip)) == NULL)
+#else
+	else
 		return -1;
-	port = ntohs(addr.sa.in.sin_port);
+#endif
+
 	snprintf(buf, size, "%s:%d", ip, port);
 	return 0;
 }
@@ -125,8 +153,12 @@ int acl_getsocktype(ACL_SOCKET fd)
 	if (sa->sa_family == AF_UNIX)
 		return AF_UNIX;
 #endif
+#ifdef AF_INET6
+	if (sa->sa_family == AF_INET && sa->sa_family == AF_INET6)
+#else
 	if (sa->sa_family == AF_INET)
-		return AF_INET;
+#endif
+		return sa->sa_family;
 	return -1;
 }
 

@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 	int   ch, can_quit = 0, need_echo = 0, inter = 1000;
 
 	acl_lib_init();
+	acl_msg_stdout_enable(1);
 
 	snprintf(addr, sizeof(addr), "127.0.0.1:8888");
 

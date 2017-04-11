@@ -371,7 +371,7 @@ ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error)
 		return (NULL);
 	}
 
-	if (acl_is_ip(name) == 0) {
+	if (acl_is_ip(name)) {
 		h_host = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
 		if (h_host == NULL) {
 			acl_msg_error("%s, %s(%d): calloc error(%s)",

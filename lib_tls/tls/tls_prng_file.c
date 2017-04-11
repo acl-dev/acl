@@ -124,7 +124,7 @@ ssize_t tls_prng_file_read(TLS_PRNG_SRC *fh, size_t len)
 		count = acl_file_read(fh->fd.file, buffer,
 				to_read > (ssize_t) sizeof(buffer) ?
 				(ssize_t) sizeof(buffer) : to_read,
-				fh->timeout, NULL);
+				fh->timeout, NULL, NULL);
 #endif
 		if (count < 0) {
 			if (acl_msg_verbose)

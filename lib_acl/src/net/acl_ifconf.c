@@ -112,7 +112,12 @@ ACL_IFCONF *acl_get_ifaddrs()
 		acl_mycalloc(ifconf->length, sizeof(ACL_IFADDR));
 
 	for (i = 0, j = 0; i < ifconf->length; i++) {
+#ifdef AF_INET6
+		if (ifaces[i].ifr_addr.sa_family != AF_INET6
+		    && ifaces[i].ifr_addr.sa_family != AF_INET
+#else
 		if (ifaces[i].ifr_addr.sa_family != AF_INET
+#endif
 #ifdef ACL_MACOSX
 		   && ifaces[i].ifr_addr.sa_family != AF_LINK
 #endif
@@ -201,7 +206,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 			continue;
 		if (strcmp(info->IpAddressList.IpAddress.String, "0.0.0.0") == 0)
 			continue;
-		if (acl_is_ip(info->IpAddressList.IpAddress.String) < 0)
+		if (!acl_is_ip(info->IpAddressList.IpAddress.String))
 			continue;
 
 		ifconf->addrs[j].name = acl_mystrdup(info->AdapterName);
@@ -274,7 +279,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 			continue;
 		if (strcmp(info->IpAddressList.IpAddress.String, "0.0.0.0") == 0)
 			continue;
-		if (acl_is_ip(info->IpAddressList.IpAddress.String) < 0)
+		if (!acl_is_ip(info->IpAddressList.IpAddress.String))
 			continue;
 
 		ifconf->addrs[j].name = acl_mystrdup(info->AdapterName);

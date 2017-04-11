@@ -47,9 +47,8 @@ int acl_valid_hostname(const char *name, int gripe)
 			label_length++;
 			if (label_length > ACL_VALID_LABEL_LEN) {
 				if (gripe)
-					acl_msg_warn("%s: hostname label"
-						" too long: %.100s",
-						myname, name);
+					acl_msg_warn("%s: hostname label too "
+						"long: %.100s", myname, name);
 				return 0;
 			}
 			if (!ACL_ISDIGIT(ch))
@@ -79,8 +78,8 @@ int acl_valid_hostname(const char *name, int gripe)
 #endif
 		else {
 			if (gripe)
-				acl_msg_warn("%s: invalid character %d(decimal): %.100s",
-						myname, ch, name);
+				acl_msg_warn("%s: invalid character %d"
+					"(decimal): %.100s", myname, ch, name);
 			return 0;
 		}
 	}
@@ -95,7 +94,7 @@ int acl_valid_hostname(const char *name, int gripe)
 	if (cp - name > ACL_VALID_HOSTNAME_LEN) {
 		if (gripe)
 			acl_msg_warn("%s: bad length %d for %.100s...",
-					myname, (int) (cp - name), name);
+				myname, (int) (cp - name), name);
 		return 0;
 	}
 	return 1;
@@ -129,8 +128,8 @@ int acl_valid_hostaddr(const char *addr, int gripe)
 
 int acl_valid_ipv4_hostaddr(const char *addr, int gripe)
 {
-	const char *cp;
 	char   *myname = "acl_valid_ipv4_hostaddr";
+	const char *cp;
 	int     in_byte = 0;
 	int     byte_count = 0;
 	int     byte_val = 0;
@@ -222,14 +221,13 @@ int acl_valid_ipv6_hostaddr(const char *addr, int gripe)
 			/* Terminate the loop. */
 			if (field < 2) {
 				if (gripe)
-					acl_msg_warn("%s: too few `:' in IPv6"
-						" address: %.100s",
-						myname, addr);
+					acl_msg_warn("%s: too few `:' in IPv6 "
+						"address: %.100s", myname, addr);
 				return 0;
 			} else if (len == 0 && null_field != field - 1) {
 				if (gripe)
-					acl_msg_warn("%s: bad null last field"
-						" in IPv6 address: %.100s",
+					acl_msg_warn("%s: bad null last field "
+						"in IPv6 address: %.100s",
 						myname, addr);
 				return 0;
 			} else
@@ -239,8 +237,7 @@ int acl_valid_ipv6_hostaddr(const char *addr, int gripe)
 			if (field < 2 || field > 6) {
 				if (gripe)
 					acl_msg_warn("%s: malformed IPv4-in-IPv6"
-						" address: %.100s",
-						myname, addr);
+						" address: %.100s", myname, addr);
 				return 0;
 			} 
 			/* NOT: acl_valid_hostaddr(). Avoid recursion. */
@@ -281,7 +278,7 @@ int acl_valid_ipv6_hostaddr(const char *addr, int gripe)
 			if (len /* - strspn((char *) cp, "0") */ > 4) {
 				if (gripe)
 					acl_msg_warn("%s: malformed IPv6 address: %.100s",
-							myname, addr);
+						myname, addr);
 				return 0;
 			}
 			if (len <= 0) {
@@ -296,4 +293,3 @@ int acl_valid_ipv6_hostaddr(const char *addr, int gripe)
 		}
 	}
 }
-

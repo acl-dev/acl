@@ -27,7 +27,6 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <arpa/inet.h>
-
 #else
 # error "unknown OS type"
 #endif
@@ -50,6 +49,17 @@
 #include "../private/private_vstream.h"
 #include "../private/thread.h"
 
+struct SOCK_ADDR {
+	union {
+		struct sockaddr_storage ss;
+#ifdef AF_INET6
+		struct sockaddr_in6 in6;
+#endif
+		struct sockaddr_in in;
+		struct sockaddr sa;
+	} sa;
+};
+
 struct ACL_LOG {
 	ACL_VSTREAM *fp;
 	char *path;
@@ -64,16 +74,17 @@ struct ACL_LOG {
 #define ACL_LOG_T_UDP           3
 #define ACL_LOG_T_UNIX          4
 
-#define	IS_NET_STREAM(x)	((x)->type == ACL_LOG_T_TCP || (x)->type == ACL_LOG_T_UNIX)
+#define	IS_NET_STREAM(x)	((x)->type == ACL_LOG_T_TCP \
+				|| (x)->type == ACL_LOG_T_UNIX)
 
-	char  logpre[256];
 	acl_pthread_mutex_t *lock;
-	struct sockaddr_in from;
-	struct sockaddr_in dest;
-	int   from_len;
-	acl_uint64   count;		/**< 已经记录的日志条数 */
+	char   logpre[256];
+	struct SOCK_ADDR from;
+	struct SOCK_ADDR dest;
+	int    from_len;
 	time_t last_open;		/**< 上次日志打开时间 */
 	time_t reopen_inter;		/**< 日志重新打开的最小时间间隔 */
+	acl_uint64   count;		/**< 已经记录的日志条数 */
 };
 
 #ifdef ACL_WINDOWS
@@ -115,7 +126,8 @@ void acl_log_fp_set(ACL_VSTREAM *fp, const char *logpre)
 	log->fp = fp;
 	log->path = strdup(ACL_VSTREAM_PATH(fp));
 	log->type = ACL_LOG_T_UNKNOWN;
-	log->lock = (acl_pthread_mutex_t*) calloc(1, sizeof(acl_pthread_mutex_t));
+	log->lock = (acl_pthread_mutex_t*)
+		calloc(1, sizeof(acl_pthread_mutex_t));
 	thread_mutex_init(log->lock, NULL);
 	if (logpre && *logpre)
 		snprintf(log->logpre, sizeof(log->logpre), "%s", logpre);
@@ -148,7 +160,7 @@ static int open_file_log(const char *filename, const char *logpre)
 		if (strcmp(log->path, filename) == 0) {
 			acl_msg_warn("%s(%d): log %s has been opened.",
 				myname, __LINE__, filename);
-			return (0);
+			return 0;
 		}
 	}
 
@@ -156,7 +168,7 @@ static int open_file_log(const char *filename, const char *logpre)
 	if (fh == ACL_FILE_INVALID) {
 		printf("%s(%d): open %s error(%s)", myname, __LINE__,
 			filename, acl_last_serror());
-		return (-1);
+		return -1;
 	}
 
 	fp = private_vstream_fhopen(fh, O_RDWR);
@@ -171,7 +183,8 @@ static int open_file_log(const char *filename, const char *logpre)
 	log->fp = fp;
 	log->path = strdup(filename);
 	log->type = ACL_LOG_T_FILE;
-	log->lock = (acl_pthread_mutex_t*) calloc(1, sizeof(acl_pthread_mutex_t));
+	log->lock = (acl_pthread_mutex_t*)
+		calloc(1, sizeof(acl_pthread_mutex_t));
 	thread_mutex_init(log->lock, NULL);
 	if (logpre && *logpre)
 		snprintf(log->logpre, sizeof(log->logpre), "%s", logpre);
@@ -179,7 +192,7 @@ static int open_file_log(const char *filename, const char *logpre)
 		log->logpre[0] = 0;
 
 	private_fifo_push(__loggers, log);
-	return (0);
+	return 0;
 }
 
 static int reopen_log(ACL_LOG *log)
@@ -202,14 +215,14 @@ static int reopen_log(ACL_LOG *log)
 		|| log->fp == NULL
 		|| log->reopen_inter <= 0)
 	{
-		RETURN (-1);
+		RETURN(-1);
 	}
 
 	if (log->count == 0) {
 		if (now - log->last_open < 5 * log->reopen_inter)
-			RETURN (-1);
+			RETURN(-1);
 	} else if (now - log->last_open < log->reopen_inter)
-		RETURN (-1);
+		RETURN(-1);
 
 	if (log->fp->path) {
 		acl_myfree(log->fp->path);
@@ -229,10 +242,10 @@ static int reopen_log(ACL_LOG *log)
 	log->fp = private_vstream_connect(log->path, 60, 60);
 	log->last_open = time(NULL);
 	if (log->fp == NULL)
-		RETURN (-1);
+		RETURN(-1);
 	log->flag &= ~ACL_LOG_F_DEAD;
 	log->last_open = time(NULL);
-	RETURN (0);
+	RETURN(0);
 }
 
 static int open_stream_log(const char *addr, const char *logpre, int type)
@@ -247,7 +260,7 @@ static int open_stream_log(const char *addr, const char *logpre, int type)
 		if (strcmp(log->path, addr) == 0 && log->type == type) {
 			acl_msg_warn("%s(%d): log(%s) has been opened!",
 				myname, __LINE__, addr);
-			return (0);
+			return 0;
 		}
 	}
 
@@ -255,7 +268,7 @@ static int open_stream_log(const char *addr, const char *logpre, int type)
 	if (fp == NULL) {
 		printf("%s(%d): connect %s error(%s)\n",
 			myname, __LINE__, addr, acl_last_serror());
-		return (-1);
+		return -1;
 	}
 
 	log = (ACL_LOG*) calloc(1, sizeof(ACL_LOG));
@@ -263,7 +276,8 @@ static int open_stream_log(const char *addr, const char *logpre, int type)
 	log->reopen_inter = 60;
 	log->fp = fp;
 	log->path = strdup(addr);
-	log->lock = (acl_pthread_mutex_t*) calloc(1, sizeof(acl_pthread_mutex_t));
+	log->lock = (acl_pthread_mutex_t*)
+		calloc(1, sizeof(acl_pthread_mutex_t));
 	thread_mutex_init(log->lock, NULL);
 	log->type = type;
 	if (logpre && *logpre)
@@ -272,53 +286,46 @@ static int open_stream_log(const char *addr, const char *logpre, int type)
 		log->logpre[0] = 0;
 
 	private_fifo_push(__loggers, log);
-	return (0);
+	return 0;
 }
 
 static int open_tcp_log(const char *addr, const char *logpre)
 {
-	return (open_stream_log(addr, logpre, ACL_LOG_T_TCP));
+	return open_stream_log(addr, logpre, ACL_LOG_T_TCP);
 }
 
 static int open_unix_log(const char *addr, const char *logpre)
 {
-	return (open_stream_log(addr, logpre, ACL_LOG_T_UNIX));
+	return open_stream_log(addr, logpre, ACL_LOG_T_UNIX);
 }
+
+#ifdef ACL_WINDOWS
+# define len_t int
+# define ptr_t void
+#elif defined(ACL_UNIX)
+# define len_t socklen_t
+# define ptr_t char
+#else
+# error "unknow os"
+#endif
 
 static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 	int timeout acl_unused, ACL_VSTREAM *fp acl_unused, void *arg)
 {
 	ACL_LOG *log = (ACL_LOG*) arg;
-	ssize_t  ret;
+	struct sockaddr *sa = &log->from.sa.sa;
 
-#ifdef ACL_UNIX
-	ret = recvfrom(fd, buf, size, 0, (struct sockaddr*) &log->from,
-		(socklen_t*) &log->from_len);
-#elif defined(ACL_WINDOWS)
-	ret = recvfrom(fd, (char*) buf, (int) size, 0,
-		(struct sockaddr*) &log->from, &log->from_len);
-#else
-#error "unknown OS"
-#endif
-	return (int) ret;
+	return (int) recvfrom(fd, buf, size, 0, sa, (len_t*) &log->from_len);
 }
 
 static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
 	int timeout acl_unused, ACL_VSTREAM *fp acl_unused, void *arg)
 {
 	ACL_LOG *log = (ACL_LOG*) arg;
-	ssize_t  ret;
+	struct sockaddr *sa = &log->dest.sa.sa;
 
-#ifdef ACL_UNIX
-	ret = sendto(fd, buf, size, 0, (struct sockaddr*) &log->dest,
-		sizeof(log->dest));
-#elif defined(ACL_WINDOWS)
-	ret = sendto(fd, (const char*) buf, (int) size, 0,
-		(struct sockaddr*) &log->dest, sizeof(log->dest));
-#else
-#error	"unknown OS"
-#endif
-	return (int) ret;
+	return (int) sendto(fd, (const ptr_t*) buf, size, 0,
+			sa, (len_t) sizeof(log->dest));
 }
 
 static int open_udp_log(const char *addr, const char *logpre)
@@ -327,53 +334,126 @@ static int open_udp_log(const char *addr, const char *logpre)
 	ACL_LOG *log;
 	ACL_ITER iter;
 	ACL_SOCKET fd;
-	char  ip[64], *ptr;
-	int   port;
+	char  ip[128], *ptr, *sport;
+	int   err, port;
+	struct addrinfo hints, *res0, *res;
 
 	snprintf(ip, sizeof(ip), "%s", addr);
 	ptr = strchr(ip, ':');
-	acl_assert(ptr);
+	if (ptr == NULL || *(ptr + 1) == 0) {
+		printf("invalid addr: %s\r\n", addr);
+		abort();
+	}
+
 	*ptr++ = 0;
-	port = atoi(ptr);
-	acl_assert(port > 0);
+	sport  = ptr;
+	port   = atoi(sport);
+	if (sport == NULL) {
+		printf("invalid addr: %s, port: %d\r\n", addr, port);
+		abort();
+	}
 
 	acl_foreach(iter, __loggers) {
 		log = (ACL_LOG*) iter.data;
-		if (strcmp(log->path, addr) == 0 && log->type == ACL_LOG_T_UDP) {
+		if (!strcmp(log->path, addr) && log->type == ACL_LOG_T_UDP) {
 			acl_msg_warn("%s(%d): log(%s) has been opened!",
 				myname, __LINE__, addr);
-			return (0);
+			return 0;
 		}
+	}
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family   = PF_UNSPEC;
+	hints.ai_socktype = SOCK_DGRAM;
+#ifdef	ACL_MACOSX
+	hints.ai_flags    = AI_DEFAULT;
+#elif	defined(ACL_ANDROID)
+	hints.ai_flags    = AI_ADDRCONFIG;
+#elif defined(ACL_WINDOWS)
+	hints.ai_protocol = IPPROTO_UDP;
+# if _MSC_VER >= 1500
+	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
+# endif
+#else
+	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
+#endif
+
+	if ((err = getaddrinfo(ip, sport, &hints, &res0))) {
+		printf("%s(%d), %s: getaddrinfo error %s, peer=%s",
+			__FILE__, __LINE__, myname, gai_strerror(err), ip);
+		abort();
+	}
+
+	fd = ACL_SOCKET_INVALID;
+
+	for (res = res0; res != NULL; res = res->ai_next) {
+		fd = socket(res->ai_family, res->ai_socktype,
+				res->ai_protocol);
+		if (fd != ACL_SOCKET_INVALID)
+			break;
+
+		printf("%s: socket %s", myname, acl_last_serror());
+		abort();
+	}
+
+	if (fd == ACL_SOCKET_INVALID || res == NULL) {
+		printf("%s(%d), %s: invalid socket, addr: %s\r\n",
+			__FILE__, __LINE__, myname, addr);
+		abort();
 	}
 
 	log = (ACL_LOG*) calloc(1, sizeof(ACL_LOG));
 
-	fd = socket(AF_INET, SOCK_DGRAM, 0);
-	acl_assert(fd != ACL_SOCKET_INVALID);
-	log->fp = private_vstream_fdopen(fd, O_RDWR, 1024, 0, ACL_VSTREAM_TYPE_SOCK);
+	log->fp = private_vstream_fdopen(fd, O_RDWR, 1024, 0,
+			ACL_VSTREAM_TYPE_SOCK);
 	private_vstream_ctl(log->fp,
 			ACL_VSTREAM_CTL_READ_FN, udp_read,
 			ACL_VSTREAM_CTL_WRITE_FN, udp_write,
 			ACL_VSTREAM_CTL_CONTEXT, log,
 			ACL_VSTREAM_CTL_END);
+
 	log->last_open = time(NULL);
-	log->dest.sin_family = AF_INET;
-	log->dest.sin_addr.s_addr = inet_addr(ip);
-	log->dest.sin_port = htons(port);
+	log->dest.sa.sa.sa_family = res->ai_family;
+
+	if (res->ai_family == AF_INET) {
+		log->dest.sa.in.sin_addr.s_addr = inet_addr(ip);
+		log->dest.sa.in.sin_port = htons(port);
+	}
+#ifdef AF_INET6
+	else if (res->ai_family == AF_INET6) {
+		log->dest.sa.in6.sin6_port = htons(port);
+		if (inet_pton(res->ai_family, ip,
+			&log->dest.sa.in6.sin6_addr) != 1)
+		{
+			printf("%s(%d), %s: inet_pton error: %s, ip: %s\r\n",
+				__FILE__, __LINE__, myname,
+				acl_last_serror(), ip);
+			abort();
+		}
+	}
+#endif
+	else {
+		printf("%s(%d), %s: invalid sa_family: %d, ip: %s\r\n",
+			__FILE__, __LINE__, myname, res->ai_family, ip);
+		abort();
+	}
 
 	log->from_len = sizeof(log->from);
-
 	log->path = strdup(addr);
-	log->lock = (acl_pthread_mutex_t*) calloc(1, sizeof(acl_pthread_mutex_t));
-	thread_mutex_init(log->lock, NULL);
 	log->type = ACL_LOG_T_UDP;
+	log->lock = (acl_pthread_mutex_t*)
+		calloc(1, sizeof(acl_pthread_mutex_t));
+	thread_mutex_init(log->lock, NULL);
+
 	if (logpre && *logpre)
 		snprintf(log->logpre, sizeof(log->logpre), "%s", logpre);
 	else
 		log->logpre[0] = 0;
 
 	private_fifo_push(__loggers, log);
-	return (0);
+	freeaddrinfo(res0);
+
+	return 0;
 }
 
 /*
@@ -394,36 +474,35 @@ static int open_log(const char *recipient, const char *logpre)
 		if (acl_ipv4_addr_valid(ptr) == 0) {
 			printf("%s(%d): recipient(%s) invalid",
 				myname, __LINE__, recipient);
-			return (-1);
+			return -1;
 		}
-		return (open_tcp_log(ptr, logpre));
+		return open_tcp_log(ptr, logpre);
 	} else if (strncasecmp(recipient, "udp:", 4) == 0) {
 		ptr = recipient + 4;
 		if (acl_ipv4_addr_valid(ptr) == 0) {
 			printf("%s(%d): recipient(%s) invalid",
 				myname, __LINE__, recipient);
-			return (-1);
+			return -1;
 		}
-		return (open_udp_log(ptr, logpre));
+		return open_udp_log(ptr, logpre);
 	} else if (strncasecmp(recipient, "unix:", 5) == 0) {
 		ptr = recipient + 5;
 		if (*ptr == 0) {
 			printf("%s(%d): recipient(%s) invalid",
 				myname, __LINE__, recipient);
-			return (-1);
+			return -1;
 		}
-		return (open_unix_log(ptr, logpre));
+		return open_unix_log(ptr, logpre);
 	} else if (strncasecmp(recipient, "file:", 5) == 0) {
 		ptr = recipient + 5;
 		if (*ptr == 0) {
 			printf("%s(%d): recipient(%s) invalid",
 				myname, __LINE__, recipient);
-			return (-1);
+			return -1;
 		}
-		return (open_file_log(recipient, logpre));
-	} else {
-		return (open_file_log(recipient, logpre));
-	}
+		return open_file_log(recipient, logpre);
+	} else
+		return open_file_log(recipient, logpre);
 }
 
 /*
@@ -444,10 +523,10 @@ int acl_open_log(const char *recipients, const char *logpre)
 
 	if (recipients == NULL || *recipients == 0) {
 		printf("%s(%d): recipients null\n", myname, __LINE__);
-		return (-1);
+		return -1;
 	} else if (logpre == NULL || *logpre == 0) {
 		printf("%s(%d): logpre null\n", myname, __LINE__);
-		return (-1);
+		return -1;
 	}
 
 	if (__loggers == NULL)
@@ -458,11 +537,11 @@ int acl_open_log(const char *recipients, const char *logpre)
 		ptr = (const char*) iter.data;
 		if (open_log(ptr, logpre) < 0) {
 			acl_argv_free(argv);
-			return (-1);
+			return -1;
 		}
 	}
 	acl_argv_free(argv);
-	return (0);
+	return 0;
 }
 
 void acl_logtime_fmt(char *buf, size_t size)
@@ -521,7 +600,7 @@ static char *get_buf(const char *pre, const char *fmt, va_list ap, size_t *len)
 		acl_assert(ret > 0 && ret < (int) n2);
 	}
 
-	return (buf);
+	return buf;
 }
 
 #else
@@ -544,7 +623,7 @@ static char *get_buf(const char *pre, const char *fmt, va_list ap, size_t *len)
 	ret = vsnprintf(ptr, n2, fmt, ap);
 	if (ret > 0 && ret < (int) n2) {
 		*len = n1 + ret;
-		return (buf);
+		return buf;
 	}
 
 	i = 0;
@@ -560,17 +639,18 @@ static char *get_buf(const char *pre, const char *fmt, va_list ap, size_t *len)
 			break;
 		}
 		if (++i >= 10000)
-			acl_assert(0);
+			abort();
 	}
 
-	return (buf);
+	return buf;
 }
 
 #endif
 
-static void file_vsyslog(ACL_LOG *log, const char *info, const char *fmt, va_list ap)
+static void file_vsyslog(ACL_LOG *log, const char *info,
+	const char *fmt, va_list ap)
 {
-	char  fmtstr[128], tbuf[1024], *buf;
+	char   fmtstr[128], tbuf[1024], *buf;
 	size_t len;
 
 	acl_logtime_fmt(fmtstr, sizeof(fmtstr));
@@ -627,7 +707,8 @@ static void file_vsyslog(ACL_LOG *log, const char *info, const char *fmt, va_lis
 	free(buf);
 }
 
-static void net_vsyslog(ACL_LOG *log, const char *info, const char *fmt, va_list ap)
+static void net_vsyslog(ACL_LOG *log, const char *info,
+	const char *fmt, va_list ap)
 {
 	char  tbuf[1024], *buf;
 	size_t len;
@@ -691,11 +772,11 @@ int acl_write_to_log2(const char *info, const char *fmt, va_list ap)
 	ACL_ITER iter;
 	ACL_LOG *log;
 #ifdef ACL_UNIX
-	va_list tmp;
+	va_list  tmp;
 #endif
 
 	if (__loggers == NULL)
-		return (0);
+		return 0;
 
 #ifdef ACL_UNIX
 	acl_foreach(iter, __loggers) {
@@ -732,7 +813,7 @@ int acl_write_to_log2(const char *info, const char *fmt, va_list ap)
 	}
 #endif
 
-	return (0);
+	return 0;
 }
 
 int acl_write_to_log(const char *fmt, ...)
@@ -743,7 +824,7 @@ int acl_write_to_log(const char *fmt, ...)
 	va_start (ap, fmt);
 	ret = acl_write_to_log2("-", fmt, ap);
 	va_end(ap);
-	return (ret);
+	return ret;
 }
 
 void acl_close_log()
@@ -776,6 +857,7 @@ void acl_close_log()
 			}
 			private_vstream_close(log->fp);
 		}
+
 		if (log->path)
 			free(log->path);
 		if (log->lock)

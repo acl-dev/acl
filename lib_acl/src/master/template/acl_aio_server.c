@@ -760,7 +760,11 @@ static int aio_server_accept_sock2(ACL_ASTREAM *astream, ACL_AIO *aio)
 		fd = acl_accept(listen_fd, NULL, 0, &sock_type);
 		if (fd >= 0) {
 			/* TCP 连接避免发送延迟现象 */
+#ifdef AF_INET6
+			if (sock_type == AF_INET || sock_type == AF_INET6)
+#else
 			if (sock_type == AF_INET)
+#endif
 				acl_tcp_set_nodelay(fd);
 			fds[i] = fd;
 		} else if (errno == EMFILE) {
@@ -906,7 +910,12 @@ static void dispatch_receive(int event_type acl_unused, ACL_EVENT *event,
 		return;
 	}
 
-	if (acl_getsocktype(fd) == AF_INET)
+	ret = acl_getsocktype(fd);
+#ifdef AF_INET6
+	if (ret == AF_INET || ret == AF_INET6)
+#else
+	if (ret == AF_INET)
+#endif
 		acl_tcp_set_nodelay(fd);
 
 	/* begin handle one client connection same as accept */

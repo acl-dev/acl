@@ -31,18 +31,11 @@ ACL_API const char *acl_inet_ntoa(struct in_addr in, char *dst, size_t size);
 /**
  * 判断给定的字符串是否是正确的 ip 地址
  * @param ip {const char *ip}
- * @return {int} 0: 是; -1: 否
+ * @return {int} != 0: 是; == 0: 否
  */
 ACL_API int acl_is_ip(const char *ip);
 ACL_API int acl_is_ipv4(const char *ip);
 ACL_API int acl_is_ipv6(const char *ip);
-
-/**
- * 判断所给的 ip 地址是否符合 xxx.xxx.xxx.xxx 格式
- * @param addr {const char*} IP 地址
- * @return {int} 1: 符合, 0: 不符合
- */
-ACL_API int acl_ipv4_valid(const char *addr);
 
 /**
  * 判断所给的 ip 地址是否符合 xxx.xxx.xxx.xxx:port 格式

@@ -46,7 +46,7 @@ static void run(const char *local_addr, const char *peer_addr,
 		 */
 		ret = acl_vstream_write(stream, data, dlen);
 		if (ret == ACL_VSTREAM_EOF) {
-			printf("acl_vtream_writen error %s\r\n",
+			printf("acl_vtream_write error %s\r\n",
 				acl_last_serror());
 			break;
 		}
@@ -125,6 +125,7 @@ int main(int argc, char *argv[])
 	int   need_read = 0;
 
 	acl_lib_init();
+	acl_msg_stdout_enable(1);
 
 	snprintf(peer, sizeof(peer), "127.0.0.1:8888");
 	snprintf(local, sizeof(local), "127.0.0.1:0");

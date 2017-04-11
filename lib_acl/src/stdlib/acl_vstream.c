@@ -2190,7 +2190,11 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 
 	if ((ret = acl_check_socket(fd)) == 1) {
 		ret = acl_getsocktype(fd);
+#ifdef ACL_INET6
+		if (ret == AF_INET || ret == AF_INET6)
+#else
 		if (ret == AF_INET)
+#endif
 			fp->type |= ACL_VSTREAM_TYPE_LISTEN_INET;
 #ifndef ACL_WINDOWS
 		else if (ret == AF_UNIX)
@@ -2241,16 +2245,18 @@ ACL_VSTREAM *acl_vstream_clone(const ACL_VSTREAM *from)
 		to->addr_local = __empty_string;
 
 	if (from->sa_peer) {
-		to->sa_peer = (struct sockaddr_in*)
-			acl_mymalloc(sizeof(struct sockaddr_in));
-		memcpy(to->sa_peer, from->sa_peer,
-			sizeof(struct sockaddr_in));
+		to->sa_peer = (struct sockaddr*)
+			acl_mymalloc(from->sa_peer_size);
+		memcpy(to->sa_peer, from->sa_peer, from->sa_peer_size);
+		to->sa_peer_size = from->sa_peer_size;
+		to->sa_peer_len  = from->sa_peer_len;
 	}
 	if (from->sa_local) {
-		to->sa_local = (struct sockaddr_in*)
-			acl_mymalloc(sizeof(struct sockaddr_in));
-		memcpy(to->sa_local, from->sa_local,
-			sizeof(struct sockaddr_in));
+		to->sa_local = (struct sockaddr*)
+			acl_mymalloc(from->sa_local_size);
+		memcpy(to->sa_local, from->sa_local, from->sa_local_size);
+		to->sa_local_size = from->sa_local_size;
+		to->sa_local_len = from->sa_local_len;
 	}
 
 	if (from->path && from->path != __empty_string)
@@ -2976,22 +2982,45 @@ int acl_vstream_close(ACL_VSTREAM *fp)
 	return ret;
 }
 
-static void set_sock_addr(struct sockaddr_in *saddr, const char *addr)
+static struct sockaddr *set_sock_addr(const char *addr, size_t *sa_size)
 {
-	char  buf[128], *ptr;
-	int   port;
+	char buf[256], *ptr;
+	int port;
 
-	snprintf(buf, sizeof(buf), "%s", addr);
+	snprintf(buf, sizeof(buf), "%s", (addr));
 	ptr = strchr(buf, ':');
-	if (ptr == NULL)
-		return;
+	if (ptr == NULL) {
+		*sa_size = 0;
+		return NULL;
+	}
 
 	*ptr++ = 0;
 	port = atoi(ptr);
-
-	saddr->sin_family = AF_INET;
-	saddr->sin_port = htons(port);
-	saddr->sin_addr.s_addr = inet_addr(buf);
+	if (acl_is_ipv4(buf)) {
+		struct sockaddr_in *in = (struct sockaddr_in *)
+			acl_mycalloc(1, sizeof(struct sockaddr_in));
+		in->sin_family = AF_INET;
+		in->sin_port = htons(port);
+		in->sin_addr.s_addr = inet_addr(buf);
+		(void) inet_pton(AF_INET, buf, &in->sin_addr);
+		*sa_size = sizeof(struct sockaddr_in);
+		return (struct sockaddr *) in;
+	}
+#ifdef AF_INET6
+	else if (acl_is_ipv6(buf)) {
+		struct sockaddr_in6 *in = (struct sockaddr_in6 *)
+			acl_mycalloc(1, sizeof(struct sockaddr_in6));
+		in->sin6_family = AF_INET6;
+		in->sin6_port = htons(port);
+		(void) inet_pton(AF_INET6, buf, &in->sin6_addr);
+		*sa_size = sizeof(struct sockaddr_in6);
+		return (struct sockaddr *) in;
+	}
+#endif
+	else {
+		*sa_size = 0;
+		return NULL;
+	}
 }
 
 void acl_vstream_set_local(ACL_VSTREAM *fp, const char *addr)
@@ -3010,42 +3039,57 @@ void acl_vstream_set_local(ACL_VSTREAM *fp, const char *addr)
 		fp->addr_local = acl_mystrdup(addr);
 	}
 
-	if (fp->sa_local == NULL) {
-		fp->sa_local_size = sizeof(struct sockaddr_in);
-		fp->sa_local = (struct sockaddr_in*)
-			acl_mycalloc(1, fp->sa_local_size);
-	} else
-		memset(fp->sa_local, 0, fp->sa_local_size);
+	if (fp->sa_local != NULL)
+		acl_myfree(fp->sa_local);
 
-	set_sock_addr(fp->sa_local, addr);
+	fp->sa_local = set_sock_addr(addr, &fp->sa_local_size);
 	fp->sa_local_len = fp->sa_local_size;
 }
 
-void acl_vstream_set_local_addr(ACL_VSTREAM *fp, const struct sockaddr_in *sa)
+void acl_vstream_set_local_addr(ACL_VSTREAM *fp, const struct sockaddr *sa)
 {
-	int   port;
-	char  ip[64], addr[64];
+	char  addr[256];
 
-	if (fp == NULL || sa == NULL) {
-		acl_msg_error("%s(%d), %s: fp %s, sa %s", __FILE__, __LINE__,
-			__FUNCTION__, fp ? "not null" : "null",
-			sa ? "not null" : "null");
-		return;
+	if (fp->sa_local != NULL) {
+		acl_myfree(fp->sa_local);
+		fp->sa_local = NULL;
 	}
 
-	if (fp->sa_local == NULL) {
+	if (sa->sa_family == AF_INET) {
+		char ip[64];
+		int  port;
+		struct sockaddr_in *in = (struct sockaddr_in *) sa;
+
+		if (!inet_ntop(AF_INET, &in->sin_addr, ip, sizeof(ip)))
+			ip[0] = 0;
+		port = ntohs(in->sin_port);
+		snprintf(addr, sizeof(addr), "%s:%d", ip, port);
 		fp->sa_local_size = sizeof(struct sockaddr_in);
-		fp->sa_local = (struct sockaddr_in*)
-			acl_mymalloc(fp->sa_local_size);
 	}
+#ifdef AF_INET6
+	else if (sa->sa_family == AF_INET6) {
+		char ip[64];
+		int  port;
+		struct sockaddr_in6 *in = (struct sockaddr_in6 *) sa;
 
+		if (!inet_ntop(AF_INET, &in->sin6_addr, ip, sizeof(ip)))
+			ip[0] = 0;
+		port = ntohs(in->sin6_port);
+		snprintf(addr, sizeof(addr), "%s:%d", ip, port);
+		fp->sa_local_size = sizeof(struct sockaddr_in6);
+	}
+#endif
+#ifdef ACL_UNIX
+	else if (sa->sa_family == AF_UNIX) {
+		struct sockaddr_un *un = (struct sockaddr_un *) sa;
+		snprintf(addr, sizeof(addr), "%s", un->sun_path);
+		fp->sa_local_size = sizeof(struct sockaddr_un);
+	}
+#endif
+
+	fp->sa_local = (struct sockaddr *) acl_mymalloc(fp->sa_local_size);
 	memcpy(fp->sa_local, sa, fp->sa_local_size);
 	fp->sa_local_len = fp->sa_local_size;
-
-	ip[0] = 0;
-	acl_inet_ntoa(sa->sin_addr, ip, sizeof(ip));
-	port = ntohs(sa->sin_port);
-	snprintf(addr, sizeof(addr), "%s:%d", ip, port);
 
 	if (fp->addr_local == __empty_string || fp->addr_local == NULL)
 		fp->addr_local = acl_mystrdup(addr);
@@ -3071,42 +3115,57 @@ void acl_vstream_set_peer(ACL_VSTREAM *fp, const char *addr)
 		fp->addr_peer = acl_mystrdup(addr);
 	}
 
-	if (fp->sa_peer == NULL) {
-		fp->sa_peer_size = sizeof(struct sockaddr_in);
-		fp->sa_peer = (struct sockaddr_in*)
-			acl_mycalloc(1, fp->sa_peer_size);
-	} else
-		memset(fp->sa_peer, 0, fp->sa_peer_size);
+	if (fp->sa_peer != NULL)
+		acl_myfree(fp->sa_peer);
 
-	set_sock_addr(fp->sa_peer, addr);
+	fp->sa_peer = set_sock_addr(addr, &fp->sa_peer_size);
 	fp->sa_peer_len = fp->sa_peer_size;
 }
 
-void acl_vstream_set_peer_addr(ACL_VSTREAM *fp, const struct sockaddr_in *sa)
+void acl_vstream_set_peer_addr(ACL_VSTREAM *fp, const struct sockaddr *sa)
 {
-	int   port;
-	char  ip[64], addr[64];
+	char  addr[256];
 
-	if (fp == NULL || sa == NULL) {
-		acl_msg_error("%s(%d), %s: fp %s, sa %s", __FILE__, __LINE__,
-			__FUNCTION__, fp ? "not null" : "null",
-			sa ? "not null" : "null");
-		return;
+	if (fp->sa_peer != NULL) {
+		acl_myfree(fp->sa_peer);
+		fp->sa_peer = NULL;
 	}
 
-	if (fp->sa_peer == NULL) {
+	if (sa->sa_family == AF_INET) {
+		char ip[64];
+		int  port;
+		struct sockaddr_in *in = (struct sockaddr_in *) sa;
+
+		if (!inet_ntop(AF_INET, &in->sin_addr, ip, sizeof(ip)))
+			ip[0] = 0;
+		port = ntohs(in->sin_port);
+		snprintf(addr, sizeof(addr), "%s:%d", ip, port);
 		fp->sa_peer_size = sizeof(struct sockaddr_in);
-		fp->sa_peer = (struct sockaddr_in*)
-			acl_mymalloc(fp->sa_peer_size);
 	}
+#ifdef AF_INET6
+	else if (sa->sa_family == AF_INET6) {
+		char ip[64];
+		int  port;
+		struct sockaddr_in6 *in = (struct sockaddr_in6 *) sa;
 
+		if (!inet_ntop(AF_INET, &in->sin6_addr, ip, sizeof(ip)))
+			ip[0] = 0;
+		port = ntohs(in->sin6_port);
+		snprintf(addr, sizeof(addr), "%s:%d", ip, port);
+		fp->sa_peer_size = sizeof(struct sockaddr_in6);
+	}
+#endif
+#ifdef ACL_UNIX
+	else if (sa->sa_family == AF_UNIX) {
+		struct sockaddr_un *un = (struct sockaddr_un *) sa;
+		snprintf(addr, sizeof(addr), "%s", un->sun_path);
+		fp->sa_peer_size = sizeof(struct sockaddr_un);
+	}
+#endif
+
+	fp->sa_peer = (struct sockaddr *) acl_mymalloc(fp->sa_peer_size);
 	memcpy(fp->sa_peer, sa, fp->sa_peer_size);
 	fp->sa_peer_len = fp->sa_peer_size;
-
-	ip[0] = 0;
-	acl_inet_ntoa(sa->sin_addr, ip, sizeof(ip));
-	port = ntohs(sa->sin_port);
-	snprintf(addr, sizeof(addr), "%s:%d", ip, port);
 
 	if (fp->addr_peer == __empty_string || fp->addr_peer == NULL)
 		fp->addr_peer = acl_mystrdup(addr);

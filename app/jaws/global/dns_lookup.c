@@ -251,7 +251,7 @@ void dns_lookup(CLIENT_ENTRY *entry, const char *domain, int port)
 	const char *myname = "dns_lookup";
 	SERVICE *service = entry->service;
 
-	if (acl_ipv4_valid(domain)) {
+	if (acl_is_ip(domain)) {
 		entry->ip_idx = 0;
 		ACL_SAFE_STRNCPY(entry->dns_ctx.ip[0], domain,
 			sizeof(entry->dns_ctx.ip[0]));

@@ -616,7 +616,11 @@ static void ioctl_server_accept_sock(int event_type, ACL_IOCTL *h_ioctl,
 		}
 
 	        /* 如果为 TCP 套接口，则设置 nodelay 选项以避免发送延迟现象 */
+#ifdef AF_INET6
+		if (sock_type == AF_INET || sock_type == AF_INET6)
+#else
 		if (sock_type == AF_INET)
+#endif
 			acl_tcp_set_nodelay(fd);
 		if (acl_getsockname(fd, local, sizeof(local)) < 0)
 			memset(local, 0, sizeof(local));

@@ -122,7 +122,7 @@ ssize_t tls_prng_dev_read(TLS_PRNG_SRC *dev, size_t len)
 		NULL);
 #elif defined(WIN32)
 	count = acl_file_read(dev->fd.file, buffer, (int) rand_bytes,
-		dev->timeout, NULL);
+		dev->timeout, NULL, NULL);
 #endif
     if (count > 0) {
 	if (acl_msg_verbose)

@@ -22,7 +22,8 @@ acl_ioctl_server.c 的模板程序中采用内存池功能
 12) event 模块需要进一步优化 -- 完成大部分
 13) json 解析器需要支持 \u 方式 UNICODE 格式
 14) acl_master 子进程需要支持 UDP 方式 -- 完成
-15) json 解析器可以支持 BOOL, NUMBER, NULL 等类型
+15) json 解析器可以支持 BOOL, NUMBER, NULL 等类型 -- 完成
 16) events_select_thr.c, events_poll.c, events_select.c 需要支持检测时间间隔
 17) acl_master 服务器框架的各个服务模板应该支持进程退出前的回调接口，便于应用的善后工作
 18) acl_master 当子进程的 master_prefork 和空闲退出通知打开时，可能存在冲突
+19) ACL_VSTREAM: sa_local & sa_peer 需要支持 IPV6 -- 完成
