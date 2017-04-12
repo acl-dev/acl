@@ -393,7 +393,6 @@ static int open_udp_log(const char *addr, const char *logpre)
 			break;
 
 		printf("%s: socket %s", myname, acl_last_serror());
-		abort();
 	}
 
 	if (fd == ACL_SOCKET_INVALID || res == NULL) {

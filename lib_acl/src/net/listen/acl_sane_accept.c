@@ -146,7 +146,12 @@ ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size, int* sock_type)
 	buf[0] = 0;
 
 	if (sa->sa_family == AF_INET) {
+#ifdef ACL_WINDOWS
 		if (!inet_ntop(sa->sa_family, &addr.sa.in.sin_addr, buf, size))
+#else
+		if (!inet_ntop(sa->sa_family, &addr.sa.in.sin_addr,
+			buf, (socklen_t)size))
+#endif
 			return fd;
 
 		n = strlen(buf);
@@ -159,7 +164,12 @@ ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size, int* sock_type)
 	}
 #ifdef AF_INET6
 	else if (sa->sa_family == AF_INET6) {
+#ifdef ACL_WINDOWS
 		if (!inet_ntop(sa->sa_family, &addr.sa.in6.sin6_addr, buf, size))
+#else
+		if (!inet_ntop(sa->sa_family, &addr.sa.in6.sin6_addr,
+			buf, (socklen_t)size))
+#endif
 			return fd;
 
 		n = strlen(buf);
