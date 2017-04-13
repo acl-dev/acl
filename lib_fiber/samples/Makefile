@@ -1,6 +1,7 @@
 
 all:
 	@(cd dns; make)
+	@(cd getaddrinfo; make)
 	@(cd fiber; make)
 	@(cd fiber sem; make)
 	@(cd read; make)
@@ -35,6 +36,7 @@ all:
 
 cl clean:
 	@(cd dns; make clean)
+	@(cd getaddrinfo; make clean)
 	@(cd fiber; make clean)
 	@(cd fiber sem; make clean)
 	@(cd read; make clean)

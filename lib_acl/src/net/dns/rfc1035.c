@@ -566,14 +566,24 @@ int rfc1035MessageUnpack(const char *buf, size_t sz, rfc1035_message **answer)
 			return -rfc1035_unpack_error;
 		}
 	}
-	*answer = msg;
 	if (msg->rcode) {
+		int ret = -((int) msg->rcode);
 		RFC1035_UNPACK_DEBUG;
 		rfc1035SetErrno((int) msg->rcode);
-		return -((int) msg->rcode);
+		acl_myfree(msg->query);
+		acl_myfree(msg);
+		*answer = NULL;
+		return ret;
 	}
-	if (msg->ancount == 0)
+
+	if (msg->ancount == 0) {
+		acl_myfree(msg->query);
+		acl_myfree(msg);
+		*answer = NULL;
 		return 0;
+	}
+
+	*answer = msg;
 	recs = msg->answer = (rfc1035_rr*) acl_mycalloc((int) msg->ancount, sizeof(*recs));
 	for (i = 0; i < (int) msg->ancount; i++) {
 		if (off >= (int) sz) {	/* corrupt packet */
@@ -606,6 +616,7 @@ int rfc1035MessageUnpack(const char *buf, size_t sz, rfc1035_message **answer)
 	if (msg->arcount > 0) {
 		/* rfc1035ARUnpack(buf, sz, &off); */
 	}
+
 	return nr;
 }
 

@@ -41,6 +41,13 @@ typedef struct ACL_RES {
 ACL_API ACL_RES *acl_res_new(const char *dns_ip, unsigned short dns_port);
 
 /**
+ * 设置DNS查询的超时时间
+ * @param conn_timeout {int} TCP 传输时的连接超时时间
+ * @param rw_timeout {int} TCP/UDP 传输的IO超时时间
+ */
+ACL_API void acl_res_set_timeout(int conn_timeout, int rw_timeout);
+
+/**
  * 释放一个DNS查询对象
  * @param res {ACL_RES*} DNS查询对象
  */

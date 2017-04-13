@@ -23,6 +23,15 @@
 
 #include "rfc1035.h"
 
+static int __conn_timeout = 10;
+static int __rw_timeout   = 10;
+
+void acl_res_set_timeout(int conn_timeout, int rw_timeout)
+{
+	__conn_timeout = conn_timeout;
+	__rw_timeout   = rw_timeout;
+}
+
 ACL_RES *acl_res_new(const char *dns_ip, unsigned short dns_port)
 {
 	const char *myname = "acl_res_new";
@@ -39,9 +48,9 @@ ACL_RES *acl_res_new(const char *dns_ip, unsigned short dns_port)
 	ACL_SAFE_STRNCPY(res->dns_ip, dns_ip, sizeof(res->dns_ip));
 	res->dns_port = dns_port;
 
-	res->conn_timeout = 10;
-	res->rw_timeout = 10;
-	res->transfer = ACL_RES_USE_UDP;
+	res->conn_timeout = __conn_timeout;
+	res->rw_timeout   = __rw_timeout;
+	res->transfer     = ACL_RES_USE_UDP;
 
 	return (res);
 }
