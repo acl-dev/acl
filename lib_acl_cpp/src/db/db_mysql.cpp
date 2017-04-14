@@ -391,6 +391,15 @@ void db_mysql::sane_mysql_init(const char* dbaddr, const char* dbname,
 	conn_ = NULL;
 }
 
+void db_mysql::load(void)
+{
+#ifdef HAS_MYSQL_DLL
+	acl_pthread_once(&__mysql_once, __mysql_dll_load);
+#else
+	logger_warn("link mysql library in static way!");
+#endif
+}
+
 db_mysql::db_mysql(const char* dbaddr, const char* dbname,
 	const char* dbuser, const char* dbpass,
 	unsigned long dbflags /* = 0 */, bool auto_commit /* = true */,
@@ -831,6 +840,11 @@ bool db_mysql::rollback()
 
 namespace acl
 {
+
+void db_mysql::load(void)
+{
+	logger_fatal("Please #define HAS_MYSQL_DLL first");
+}
 
 void db_mysql::sane_mysql_init(const char*, const char*,
 	const char*, const char*,

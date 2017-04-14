@@ -52,10 +52,15 @@ static epoll_ctl_fn       __sys_epoll_ctl       = NULL;
 
 void hook_net(void)
 {
+	static acl_pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
 	static int __called = 0;
 
-	if (__called)
+	(void) acl_pthread_mutex_lock(&__lock);
+
+	if (__called) {
+		(void) acl_pthread_mutex_unlock(&__lock);
 		return;
+	}
 
 	__called++;
 
@@ -107,6 +112,8 @@ void hook_net(void)
 
 	__sys_epoll_ctl    = (epoll_ctl_fn) dlsym(RTLD_NEXT, "epoll_ctl");
 	acl_assert(__sys_epoll_ctl);
+
+	(void) acl_pthread_mutex_unlock(&__lock);
 }
 
 int socket(int domain, int type, int protocol)
@@ -992,14 +999,13 @@ void acl_fiber_set_dns(const char* ip, int port)
 
 #define SKIP_WHILE(cond, cp) { while (*cp && (cond)) cp++; }
 
-static acl_pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
-
 static void get_dns(char *ip, size_t size)
 {
 	const char *filepath = "/etc/resolv.conf";
 	ACL_VSTREAM *fp;
 	char buf[4096], *ptr;
 	ACL_ARGV *tokens;
+	static acl_pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
 
 	(void) acl_pthread_mutex_lock(&__lock);
 

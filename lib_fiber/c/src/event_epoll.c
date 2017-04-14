@@ -16,10 +16,15 @@ static epoll_ctl_fn    __sys_epoll_ctl    = NULL;
 
 void hook_epoll(void)
 {
+	static acl_pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
 	static int __called = 0;
 
-	if (__called)
+	(void) acl_pthread_mutex_lock(&__lock);
+
+	if (__called) {
+		(void) acl_pthread_mutex_unlock(&__lock);
 		return;
+	}
 
 	__called++;
 
@@ -31,6 +36,8 @@ void hook_epoll(void)
 
 	__sys_epoll_ctl    = (epoll_ctl_fn) dlsym(RTLD_NEXT, "epoll_ctl");
 	acl_assert(__sys_epoll_ctl);
+
+	(void) acl_pthread_mutex_unlock(&__lock);
 }
 
 typedef struct EVENT_EPOLL {

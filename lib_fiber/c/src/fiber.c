@@ -669,10 +669,15 @@ int acl_fiber_status(const ACL_FIBER *fiber)
 
 static void fiber_init(void)
 {
+	static acl_pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
 	static int __called = 0;
 
-	if (__called != 0)
+	(void) acl_pthread_mutex_lock(&__lock);
+
+	if (__called != 0) {
+		(void) pthread_mutex_unlock(&__lock);
 		return;
+	}
 
 	__called++;
 
@@ -682,6 +687,8 @@ static void fiber_init(void)
 	__sys_errno   = (errno_fn) dlsym(RTLD_NEXT, "__errno_location");
 #endif
 	__sys_fcntl   = (fcntl_fn) dlsym(RTLD_NEXT, "fcntl");
+
+	(void) acl_pthread_mutex_unlock(&__lock);
 
 	hook_io();
 	hook_net();

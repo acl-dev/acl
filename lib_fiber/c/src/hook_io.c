@@ -55,10 +55,15 @@ static sendmsg_fn  __sys_sendmsg  = NULL;
 
 void hook_io(void)
 {
+	static acl_pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
 	static int __called = 0;
 
-	if (__called)
+	(void) acl_pthread_mutex_lock(&__lock);
+
+	if (__called) {
+		(void) acl_pthread_mutex_unlock(&__lock);
 		return;
+	}
 
 	__called++;
 
@@ -111,6 +116,8 @@ void hook_io(void)
 
 	__sys_sendmsg  = (sendmsg_fn) dlsym(RTLD_NEXT, "sendmsg");
 	acl_assert(__sys_sendmsg);
+
+	(void) acl_pthread_mutex_unlock(&__lock);
 }
 
 unsigned int sleep(unsigned int seconds)

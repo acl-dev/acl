@@ -1208,6 +1208,8 @@ bool gsoner::check_member()
 		first == "signed" ||
 		first == "int" ||
 		first == "long" ||
+		first == "size_t" ||
+		first == "ssize_t" ||
 		first == "short" ||
 		first == "int16_t"||
 		first == "uint16_t" ||
