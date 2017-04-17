@@ -148,6 +148,7 @@ ACL_API int acl_pthread_join(acl_pthread_t thread, void **thread_return);
 /* in acl_pthread_mutex.c */
 ACL_API int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex,
 		const acl_pthread_mutexattr_t *mattr);
+ACL_API int acl_pthread_mutex_destroy(acl_pthread_mutex_t *mutex);
 ACL_API int acl_pthread_mutex_lock(acl_pthread_mutex_t *mutex);
 ACL_API int acl_pthread_mutex_unlock(acl_pthread_mutex_t *mutex);
 
