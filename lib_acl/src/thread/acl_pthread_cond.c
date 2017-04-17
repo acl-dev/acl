@@ -22,13 +22,17 @@ int acl_pthread_cond_init(acl_pthread_cond_t *cond,
 {
 	const char *myname = "acl_pthread_cond_init";
 
+	(void) cond_attr;
+
 	if (cond == NULL)
 		acl_msg_fatal("%s, %s(%d): input invalid",
 			__FILE__, myname, __LINE__);
 
-	(void) cond_attr;
-	cond->dynamic = 0;
-	cond->lock      = acl_thread_mutex_create();
+	cond->lock      = acl_mycalloc(1, sizeof(acl_pthread_mutex_t));
+	if (acl_pthread_mutex_init(cond->lock, NULL) != 0)
+		acl_msg_fatal("%s, %s(%d): acl_pthread_mutex_init error",
+			__FILE__, myname, __LINE__);
+	cond->dynamic   = 0;
 	cond->wait_sem  = acl_sem_create(0);
 	cond->wait_done = acl_sem_create(0);
 	cond->waiting   = cond->signals = 0;

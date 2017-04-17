@@ -2,6 +2,11 @@
 
 ------------------------------------------------------------------------
 
+582) 2017.4.17
+582.1) bugfix: acl_pthread_cond.c 中在 windows 平台下当释放线程锁时会造成
+内存重复释放的问题，主要还是 acl_pthread_mutex_create 的函数设计不合理所致，
+故去掉了 acl_pthread_mutex_create 以免引起误用
+
 581) 2017.4.13
 581.1) bugfix: rfc1035.c 中的函数 rfc1035MessageUnpack 存在内存泄露
 

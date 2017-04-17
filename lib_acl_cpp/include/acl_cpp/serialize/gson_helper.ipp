@@ -150,6 +150,18 @@ struct _Is_number<unsigned long long> : true_type
 {
 };
 
+#if 0
+template<>
+struct _Is_number<size_t> : true_type
+{
+};
+
+template<>
+struct _Is_number<ssize_t> : true_type
+{
+};
+#endif
+
 template<class T>
 struct is_number : _Is_number<typename remove_cv<T>::type>
 {

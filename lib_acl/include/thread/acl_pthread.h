@@ -36,6 +36,7 @@ typedef pthread_once_t acl_pthread_once_t;
 #define acl_pthread_once                pthread_once
 #define acl_pthread_join                pthread_join
 #define acl_pthread_mutex_init          pthread_mutex_init
+#define acl_pthread_mutex_destroy       pthread_mutex_destroy
 #define acl_pthread_mutex_lock          pthread_mutex_lock
 #define acl_pthread_mutex_unlock        pthread_mutex_unlock
 #define acl_pthread_mutex_trylock       pthread_mutex_trylock
@@ -176,14 +177,6 @@ ACL_API int acl_pthread_cond_wait(acl_pthread_cond_t *cond,
 ACL_API int acl_thread_mutex_lock(acl_pthread_mutex_t *mutex);
 ACL_API int acl_thread_mutex_unlock(acl_pthread_mutex_t *mutex);
 ACL_API int acl_thread_mutex_nested(acl_pthread_mutex_t *mutex);
-
-/* in acl_pthread_mutex.c */
-ACL_API acl_pthread_mutex_t *acl_thread_mutex_create(void);
-#ifndef acl_pthread_mutex_create
-#define acl_pthread_mutex_create acl_thread_mutex_create
-#endif
-
-ACL_API int acl_pthread_mutex_destroy(acl_pthread_mutex_t *mutex);
 
 /* in acl_pthread.c */
 ACL_API int acl_pthread_atexit_add(void *arg, void (*free_callback)(void*));

@@ -45,7 +45,11 @@ ACL_MBOX *acl_mbox_create(void)
 	mbox->nsend = 0;
 	mbox->nread = 0;
 	mbox->ypipe = acl_ypipe_new();
-	mbox->lock  = acl_thread_mutex_create();
+	mbox->lock  = (acl_pthread_mutex_t *)
+		acl_mycalloc(1, sizeof(acl_pthread_mutex_t));
+	if (acl_pthread_mutex_init(mbox->lock, NULL) != 0)
+		acl_msg_fatal("%s(%d), %s: acl_pthread_mutex_init error",
+			__FILE__, __LINE__, __FUNCTION__);
 
 	return mbox;
 }
