@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	acl_msg_stdout_enable(1);
 	get_name();
 	test(argc >= 2 ? argv[1] : "localhost:8809");
-	return 0;
+	//return 0;
 
 	ACL_VSTREAM *client;
 	const char *addr;
@@ -70,18 +70,21 @@ int main(int argc, char *argv[])
 
 	addr = argv[1];
 
+	acl_msg_stdout_enable(1);
 	acl_msg_open("connect.log", argv[0]);
 	printf("connecting %s ...\n", argv[1]);
 
 	//acl_poll_prefered(1);
-	for (int i = 0; i < 10000; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		client = acl_vstream_connect(addr, ACL_BLOCKING, 10, 10, 4096);
 		if (client == NULL) {
 			printf("connect %s error(%s)\n", addr, acl_last_serror());
 			return (1);
 		}
-		printf("connect %s ok, %s\n", addr, acl_last_serror());
+		sleep(1);
+		ret = acl_vstream_probe_status(client);
+		printf("connect %s ok, %s, ret=%d\n", addr, acl_last_serror(), ret);
 	}
 
 	printf(">>>>>>connect all ok\r\n");

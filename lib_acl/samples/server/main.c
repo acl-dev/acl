@@ -50,6 +50,7 @@ static void run(const char *addr)
 			break;
 		}
 		printf("accept one client\r\n");
+		acl_vstream_close(client); continue;
 		acl_pthread_pool_add(pool, thread_run, client);
 	}
 

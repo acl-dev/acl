@@ -358,10 +358,12 @@ const string& query::escape(const char* in, size_t len, string& out)
 			out += '\\';
 			out += '\'';
 			break;
+#if 0
 		case '"':		/* Better safe than sorry */
 			out += '\\';
 			out += '"';
 			break;
+#endif
 		case '\032':		/* This gives problems on Win32 */
 			out += '\\';
 			out += 'Z';

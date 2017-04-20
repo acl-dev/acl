@@ -527,6 +527,9 @@ int acl_vstream_probe_status(ACL_VSTREAM *fp)
 		return -1;
 	}
 
+	if (acl_read_wait(ACL_VSTREAM_SOCK(fp), 0) < 0)
+		return errno == ACL_ETIMEDOUT ? 0 : -1;
+
 #ifdef	ACL_UNIX
 	flags = fcntl(ACL_VSTREAM_SOCK(fp), F_GETFL, 0);
 	if (flags < 0) {
