@@ -314,8 +314,11 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 {
 	ACL_LOG *log = (ACL_LOG*) arg;
 	struct sockaddr *sa = &log->from.sa.sa;
-
+#ifdef ACL_WINDOWS
+	return (int) recvfrom(fd, buf, (int) size, 0, sa, (len_t*) &log->from_len);
+#else
 	return (int) recvfrom(fd, buf, size, 0, sa, (len_t*) &log->from_len);
+#endif
 }
 
 static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
@@ -324,8 +327,13 @@ static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
 	ACL_LOG *log = (ACL_LOG*) arg;
 	struct sockaddr *sa = &log->dest.sa.sa;
 
+#ifdef ACL_WINDOWS
+	return (int)sendto(fd, (const ptr_t*)buf, (int) size, 0,
+		sa, (len_t) sizeof(log->dest));
+#else
 	return (int) sendto(fd, (const ptr_t*) buf, size, 0,
 			sa, (len_t) sizeof(log->dest));
+#endif
 }
 
 static int open_udp_log(const char *addr, const char *logpre)
