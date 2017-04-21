@@ -57,7 +57,7 @@ typedef unsigned int uintptr_t;
 
 #ifndef	SUNOS5
 typedef unsigned int ulong_t;
-typedef char boolean_t;
+typedef char acl_boolean_t;
 #endif
 
 #define B_FALSE		0

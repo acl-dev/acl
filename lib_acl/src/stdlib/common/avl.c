@@ -821,7 +821,7 @@ avl_remove(avl_tree_t *tree, void *data)
 	avl_remove((tree), (obj));	\
 	avl_add((tree), (obj))
 
-boolean_t
+acl_boolean_t
 avl_update_lt(avl_tree_t *t, void *obj)
 {
 	void *neighbor;
@@ -838,7 +838,7 @@ avl_update_lt(avl_tree_t *t, void *obj)
 	return (B_FALSE);
 }
 
-boolean_t
+acl_boolean_t
 avl_update_gt(avl_tree_t *t, void *obj)
 {
 	void *neighbor;
@@ -855,7 +855,7 @@ avl_update_gt(avl_tree_t *t, void *obj)
 	return (B_FALSE);
 }
 
-boolean_t
+acl_boolean_t
 avl_update(avl_tree_t *t, void *obj)
 {
 	void *neighbor;
@@ -920,7 +920,7 @@ avl_numnodes(avl_tree_t *tree)
 	return (tree->avl_numnodes);
 }
 
-boolean_t
+acl_boolean_t
 avl_is_empty(avl_tree_t *tree)
 {
 	ASSERT(tree);
