@@ -36,8 +36,19 @@ void string::init(size_t len)
 	line_state_offset_ = 0;
 }
 
-string::string(size_t len /* = 64 */, bool bin /* = false */)
-: use_bin_(bin)
+string::string(void) : use_bin_(false)
+{
+	init(64);
+	TERM(vbf_);
+}
+
+string::string(size_t len) : use_bin_(false)
+{
+	init(len);
+	TERM(vbf_);
+}
+
+string::string(size_t len, bool bin) : use_bin_(bin)
 {
 	init(len);
 	TERM(vbf_);
