@@ -583,15 +583,16 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	} else
 		size = fiber->size;
 
+	__thread_fiber->idgen++;
+	if (__thread_fiber->idgen == 0)  /* overflow ? */
+		__thread_fiber->idgen++;
+
+	fiber->id     = __thread_fiber->idgen;
 	fiber->errnum = 0;
 	fiber->signum = 0;
 	fiber->fn     = fn;
 	fiber->arg    = arg;
 	fiber->size   = size;
-	__thread_fiber->idgen++;
-	if (__thread_fiber->idgen == 0)  /* overflow ? */
-		__thread_fiber->idgen++;
-	fiber->id     = __thread_fiber->idgen;
 	fiber->flag   = 0;
 	fiber->status = FIBER_STATUS_READY;
 
@@ -804,9 +805,12 @@ int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void *))
 	}
 
 	if (curr->nlocal < __thread_fiber->nlocal) {
+		int i, n = curr->nlocal;
 		curr->nlocal = __thread_fiber->nlocal;
 		curr->locals = (FIBER_LOCAL **) acl_myrealloc(curr->locals,
 			curr->nlocal * sizeof(FIBER_LOCAL*));
+		for (i = n; i < curr->nlocal; i++)
+			curr->locals[i] = NULL;
 	}
 
 	local = (FIBER_LOCAL *) acl_mycalloc(1, sizeof(FIBER_LOCAL));
