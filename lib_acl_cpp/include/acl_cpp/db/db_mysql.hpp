@@ -73,105 +73,83 @@ public:
 	/********************************************************************/
 
 	/**
-	 * 返回数据库的类型描述
-	 * @return {const char*}
+	 * @override
 	 */
-	const char* dbtype() const;
+	const char* dbtype(void) const;
 
 	/**
-	 * 获得上次数据库操作的出错错误号
-	 * @return {int}
+	 * @override
 	 */
-	int get_errno() const;
+	int get_errno(void) const;
 
 	/**
-	 * 获得上次数据库操作的出错错描述
-	 * @return {const char*}
+	 * @override
 	 */
-	const char* get_error() const;
+	const char* get_error(void) const;
 
 	/**
-	 * 基类 db_handle 的纯虚接口
-	 * @param charset {const char*} 打开数据库连接时采用的字符集，当该
-	 *  参数非空时将会覆盖构造函数中传入的字符集
-	 * @return {bool} 打开是否成功
+	 * @override
 	 */
 	bool dbopen(const char* charset = NULL);
 
 	/**
-	 * 基类 db_handle 的纯虚接口，数据库是否已经打开了
-	 * @return {bool} 返回 true 表明数据库已经打开了
+	 * @override
 	 */
-	bool is_opened() const;
+	bool is_opened(void) const;
 
 	/**
-	 * 基类 db_handle 的纯虚接口
-	 * @return {bool} 关闭是否成功
+	 * @override
 	 */
 	bool close(void);
 
 	/**
-	 * 基类 db_handle 的纯虚接口，子类必须实现此接口用于判断数据表是否存在
-	 * @return {bool} 是否存在
+	 * @override
 	 */
 	bool tbl_exists(const char* tbl_name);
 
 	/**
-	 * 基类 db_handle 的纯虚接口
-	 * @param sql {const char*} 标准的 SELECT SQL 语句，非空，并且一定
-	 *  得要注意该 SQL 语句必须经过转义处理，以防止 SQL 注入攻击
-	 * @param result {db_rows*} 如果非空，则将查询结果填充进该结果对象中，
-	 *  否则，会引用 db_handle 内部的一个临时存储对象
-	 * @return {bool} 执行是否成功
+	 * @override
 	 */
 	bool sql_select(const char* sql, db_rows* result = NULL);
 
 	/**
-	 * 基类 db_handle 的纯虚接口
-	 * @param sql {const char*} 标准的 INSERT/UPDATE/DELETE SQL 语句，
-	 *  并且一定得要注意该 SQL 语句必须经过转义处理，以防止 SQL 注入攻击
-	 * @return {bool} 执行是否成功
+	 * @override
 	 */
 	bool sql_update(const char* sql);
 
 	/**
-	 * 基类 db_handle 的纯虚接口：上次 sql 操作影响的记录行数
-	 * @return {int} 影响的行数，-1 表示出错
+	 * @override
 	 */
-	int affect_count() const;
+	int affect_count(void) const;
 
 	/**
 	 * @override
 	 * 基类 db_handle 的虚函数，用来表示事务的开始，注意若要使用事务方式，
 	 * 则需要在 db_mysql 的构造函数中传入的参数 auto_commit 为 false
-	 * @return {bool}
 	 */
-	bool begin_transaction();
+	bool begin_transaction(void);
 
 	/**
 	 * @override
-	 * 基类 db_handle 的虚函数，用来表示事务的结束
-	 * @return {bool}
 	 */
-	bool commit();
+	bool commit(void);
 
 	/**
 	 * @override
-	 * @return {bool} 事务回滚是否成功
 	 */
-	bool rollback();
+	bool rollback(void);
 
 private:
-	char* dbaddr_;  // 数据库监听地址
-	char* dbname_;  // 数据库名
-	char* dbuser_;  // 数据库账号
-	char* dbpass_;  // 数据库账号密码
+	char*  dbaddr_;  // 数据库监听地址
+	char*  dbname_;  // 数据库名
+	char*  dbuser_;  // 数据库账号
+	char*  dbpass_;  // 数据库账号密码
 	string charset_; // 连接数据库采用的字符集
 
 	unsigned long dbflags_;
-	int   conn_timeout_;
-	int   rw_timeout_;
-	bool  auto_commit_;
+	int    conn_timeout_;
+	int    rw_timeout_;
+	bool   auto_commit_;
 	MYSQL* conn_;
 
 	bool sane_mysql_query(const char* sql);

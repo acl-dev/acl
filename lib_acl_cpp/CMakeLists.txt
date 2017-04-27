@@ -28,11 +28,13 @@ set(proto_path ${CMAKE_CURRENT_SOURCE_DIR}/../lib_protocol)
 set(proto_include ${proto_path}/include)
 set(zlib_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/zlib)
 set(mysql_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/mysql)
+set(pgsql_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/ptsql)
 set(sqlite_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/sqlite)
 
 include_directories(
 	${zlib_include}
 	${mysql_include}
+	${pgsql_include}
 	${sqlite_include}
 	${acl_include}
 	${proto_include}

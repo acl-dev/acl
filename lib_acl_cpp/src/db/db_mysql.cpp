@@ -110,8 +110,10 @@ static void __mysql_dll_unload(void)
 static void __mysql_dll_load(void)
 {
 	if (__mysql_dll != NULL)
-		logger_fatal("mysql(%s) to be loaded again!",
-			__mysql_path.c_str());
+	{
+		logger("mysql(%s) has been loaded!", __mysql_path.c_str());
+		return;
+	}
 
 	const char* path;
 	const char* ptr = acl::db_handle::get_loadpath();
@@ -272,7 +274,8 @@ static void __mysql_dll_load(void)
 	logger("%s loaded!", path);
 	atexit(__mysql_dll_unload);
 }
-# else
+
+# else  // if !HAS_MYSQL_DLL
 
 #  define  __mysql_libversion mysql_get_client_version
 #  define  __mysql_client_info mysql_get_client_info
@@ -380,10 +383,10 @@ void db_mysql::sane_mysql_init(const char* dbaddr, const char* dbname,
 	if (charset && *charset)
 		charset_ = charset;
 
-	dbflags_ = dbflags;
-	auto_commit_ = auto_commit;
+	dbflags_      = dbflags;
+	auto_commit_  = auto_commit;
 	conn_timeout_ = conn_timeout;
-	rw_timeout_ = rw_timeout;
+	rw_timeout_   = rw_timeout;
 
 #ifdef HAS_MYSQL_DLL
 	acl_pthread_once(&__mysql_once, __mysql_dll_load);
@@ -701,6 +704,7 @@ bool db_mysql::sane_mysql_query(const char* sql)
 	}
 	if (__mysql_query(conn_, sql) == 0)
 		return true;
+
 	logger_error("db(%s), sql(%s) error(%s)",
 		dbname_, sql, __mysql_error(conn_));
 	return false;

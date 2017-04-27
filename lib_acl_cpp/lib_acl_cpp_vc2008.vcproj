@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_ZLIB_DLL"
+				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include\pgsql;..\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_ZLIB_DLL;HAS_PGSQL_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -110,8 +110,8 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_ZLIB_DLL"
+				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include\pgsql;..\include;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_ZLIB_DLL;HAS_PGSQL_DLL"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -175,8 +175,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_ZLIB_DLL"
+				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include\pgsql;..\include;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_ZLIB_DLL;HAS_PGSQL_DLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -254,8 +254,8 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_ZLIB_DLL"
+				AdditionalIncludeDirectories=".\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include\pgsql;..\include;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_WIN_ICONV;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_ZLIB_DLL;HAS_PGSQL_DLL"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -414,6 +414,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\db\db_pgsql.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\db\db_pool.cpp"
 					>
 				</File>
@@ -443,6 +447,18 @@
 				</File>
 				<File
 					RelativePath=".\src\db\mysql_pool.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\db\pgsql_conf.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\db\pgsql_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\db\pgsql_pool.cpp"
 					>
 				</File>
 				<File
@@ -1240,6 +1256,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\db\db_pgsql.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\db\db_pool.hpp"
 					>
 				</File>
@@ -1269,6 +1289,18 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\db\mysql_pool.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\db\pgsql_conf.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\db\pgsql_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\db\pgsql_pool.hpp"
 					>
 				</File>
 				<File
