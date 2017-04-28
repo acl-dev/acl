@@ -124,7 +124,7 @@ install:
 	cp -f lib_acl/master/acl_master ./dist/master/libexec/$(RPATH)/
 	cp -f lib_acl/lib/libacl.a $(ACL_LIB)/$(RPATH)/
 	cp -Rf lib_acl/include/* $(ACL_INC)/
-	cp -f lib_protocol/lib/lib_protocol.a $(PROTO_LIB)/$(RPATH)/
+	cp -f lib_protocol/lib/libprotocol.a $(PROTO_LIB)/$(RPATH)/
 	cp -Rf lib_protocol/include/* $(PROTO_INC)/
 	cp -f lib_acl_cpp/lib/libacl_cpp.a $(ACL_LIB)/$(RPATH)/
 	cp -Rf lib_acl_cpp/include/acl_cpp/* $(INC_PATH)/acl_cpp/
@@ -138,7 +138,7 @@ uninstall:
 	rm -f ./dist/master/libexec/$(RPATH)/*
 	rm -f $(ACL_LIB)/$(RPATH)/libacl.a
 	rm -Rf $(ACL_INC)/*
-	rm -f $(PROTO_LIB)/$(RPATH)/lib_protocol.a
+	rm -f $(PROTO_LIB)/$(RPATH)/libprotocol.a
 	rm -Rf $(PROTO_INC)/*
 	rm -f $(ACL_LIB)/$(RPATH)/libacl_cpp.a
 	rm -Rf $(INC_PATH)/acl_cpp/*
@@ -259,10 +259,10 @@ build_one: all_lib
 		mkdir -p $(RELEASE_PATH)/protocol; \
 		mkdir -p $(RELEASE_PATH)/acl_cpp)
 	@(cp lib_acl/lib/libacl.a $(RELEASE_PATH)/acl/)
-	@(cp lib_protocol/lib/lib_protocol.a $(RELEASE_PATH)/protocol/)
+	@(cp lib_protocol/lib/libprotocol.a $(RELEASE_PATH)/protocol/)
 	@(cp lib_acl_cpp/lib/libacl_cpp.a $(RELEASE_PATH)/acl_cpp/)
 	@(cd $(RELEASE_PATH)/acl; ar -x libacl.a)
-	@(cd $(RELEASE_PATH)/protocol; ar -x lib_protocol.a)
+	@(cd $(RELEASE_PATH)/protocol; ar -x libprotocol.a)
 	@(cd $(RELEASE_PATH)/acl_cpp; ar -x libacl_cpp.a)
 	$(AR) $(ARFL) ./libacl.a $(RELEASE_PATH)/acl/*.o \
 		$(RELEASE_PATH)/protocol/*.o $(RELEASE_PATH)/acl_cpp/*.o
