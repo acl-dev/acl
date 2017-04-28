@@ -121,6 +121,9 @@ clean:
 install:
 	@(echo "")
 	@(echo "begin copy file...")
+	$(shell mkdir -p $(ACL_INC))
+	$(shell mkdir -p $(PROTO_INC))
+	$(shell mkdir -p $(INC_PATH)/acl_cpp)
 	cp -f lib_acl/master/acl_master ./dist/master/libexec/$(RPATH)/
 	cp -f lib_acl/lib/libacl.a $(ACL_LIB)/$(RPATH)/
 	cp -Rf lib_acl/include/* $(ACL_INC)/
