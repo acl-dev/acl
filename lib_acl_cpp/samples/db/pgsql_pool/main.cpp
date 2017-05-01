@@ -11,7 +11,7 @@ const char* CREATE_TBL =
 	"access_tbl varchar(32) not null default 'access_tbl',\r\n"
 	"access_week_tbl varchar(32) not null default 'access_week_tbl',\r\n"
 	"access_month_tbl varchar(32) not null default 'access_month_tbl',\r\n"
-	"update_date date not null default '1970-1-1',\r\n"
+	"update_date date not null default '1970-01-01',\r\n"
 	"disable integer not null default 0,\r\n"
 	"add_by_hand integer not null default 0,\r\n"
 	"class_level integer not null default 0,\r\n"

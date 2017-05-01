@@ -1,3 +1,5 @@
+49) 2017.5.1
+49.1) samples/pgsql: 添加测试 postgresql 的客户端例子
 
 48) 2017.4.24
 48.1) bugfix: fiber.s 中 acl_fiber_set_specific 在调用 realloc 重新分配内存槽
