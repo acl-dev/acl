@@ -161,16 +161,17 @@ static void __pgsql_dll_load(void)
 
 # else  // if !HAS_PGSQL_DLL
 #  define __dbconnect PQconnectdb
-#  define __dbstatus PQstatus;
-#  define __dbexec PQexec;
-#  define __dbresult_status PQresultStatus;
-#  define __dberror_message PQerrorMessage;
-#  define __dbfinish PQfinish;
-#  define __dbclear PQclear;
-#  define __dbnfields PQnfields;
-#  define __dbfname PQfname;
-#  define __dbntuples PQntuples;
-#  define __dbget_value PQgetvalue;
+#  define __dbstatus PQstatus
+#  define __dbexec PQexec
+#  define __dbresult_status PQresultStatus
+#  define __dberror_message PQerrorMessage
+#  define __dbfinish PQfinish
+#  define __dbclear PQclear
+#  define __dbnfields PQnfields
+#  define __dbfname PQfname
+#  define __dbntuples PQntuples
+#  define __dbget_value PQgetvalue
+#  define __dbcmd_tuples PQcmdTuples
 # endif
 
 //////////////////////////////////////////////////////////////////////////

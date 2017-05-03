@@ -93,6 +93,7 @@ if (${UNIX_OS})
 		"-Wuninitialized"
 		"-D_POSIX_PTHREAD_SEMANTICS"
 		"-DHAS_MYSQL_DLL"
+		"-DHAS_PGSQL_DLL"
 		"-DHAS_SQLITE_DLL"
 		"-Wno-invalid-source-encoding"
 		"-Wno-unused-private-field"

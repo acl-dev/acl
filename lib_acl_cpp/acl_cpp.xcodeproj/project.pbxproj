@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		07384F3F1EB99FFF00084CAD /* pgsql_conf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07384F3C1EB99FFF00084CAD /* pgsql_conf.cpp */; };
+		07384F401EB99FFF00084CAD /* pgsql_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07384F3D1EB99FFF00084CAD /* pgsql_manager.cpp */; };
+		07384F411EB99FFF00084CAD /* pgsql_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07384F3E1EB99FFF00084CAD /* pgsql_pool.cpp */; };
+		07384F461EB9A57D00084CAD /* db_pgsql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07384F451EB9A57D00084CAD /* db_pgsql.cpp */; };
 		07A458351E6FCCB4002C9B3C /* acl_cpp.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 07A458341E6FCCB4002C9B3C /* acl_cpp.h */; };
 		07A458371E6FCCB4002C9B3C /* acl_cpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07A458361E6FCCB4002C9B3C /* acl_cpp.mm */; };
 		07A467C01E6FCCF1002C9B3C /* acl_cpp_init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A466DA1E6FCCF1002C9B3C /* acl_cpp_init.cpp */; };
@@ -208,6 +212,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		07384F391EB99FEB00084CAD /* pgsql_conf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = pgsql_conf.hpp; sourceTree = "<group>"; };
+		07384F3A1EB99FEB00084CAD /* pgsql_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = pgsql_manager.hpp; sourceTree = "<group>"; };
+		07384F3B1EB99FEB00084CAD /* pgsql_pool.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = pgsql_pool.hpp; sourceTree = "<group>"; };
+		07384F3C1EB99FFF00084CAD /* pgsql_conf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pgsql_conf.cpp; sourceTree = "<group>"; };
+		07384F3D1EB99FFF00084CAD /* pgsql_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pgsql_manager.cpp; sourceTree = "<group>"; };
+		07384F3E1EB99FFF00084CAD /* pgsql_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pgsql_pool.cpp; sourceTree = "<group>"; };
+		07384F441EB9A2C100084CAD /* db_pgsql.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = db_pgsql.hpp; sourceTree = "<group>"; };
+		07384F451EB9A57D00084CAD /* db_pgsql.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = db_pgsql.cpp; sourceTree = "<group>"; };
 		07A458311E6FCCB4002C9B3C /* libacl_cpp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libacl_cpp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07A458341E6FCCB4002C9B3C /* acl_cpp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acl_cpp.h; sourceTree = "<group>"; };
 		07A458361E6FCCB4002C9B3C /* acl_cpp.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = acl_cpp.mm; sourceTree = "<group>"; };
@@ -741,6 +753,10 @@
 		07A466FF1E6FCCF1002C9B3C /* db */ = {
 			isa = PBXGroup;
 			children = (
+				07384F451EB9A57D00084CAD /* db_pgsql.cpp */,
+				07384F3C1EB99FFF00084CAD /* pgsql_conf.cpp */,
+				07384F3D1EB99FFF00084CAD /* pgsql_manager.cpp */,
+				07384F3E1EB99FFF00084CAD /* pgsql_pool.cpp */,
 				07A467001E6FCCF1002C9B3C /* db_handle.cpp */,
 				07A467011E6FCCF1002C9B3C /* db_mysql.cpp */,
 				07A467021E6FCCF1002C9B3C /* db_pool.cpp */,
@@ -1141,6 +1157,10 @@
 		07A468A21E6FD404002C9B3C /* db */ = {
 			isa = PBXGroup;
 			children = (
+				07384F441EB9A2C100084CAD /* db_pgsql.hpp */,
+				07384F391EB99FEB00084CAD /* pgsql_conf.hpp */,
+				07384F3A1EB99FEB00084CAD /* pgsql_manager.hpp */,
+				07384F3B1EB99FEB00084CAD /* pgsql_pool.hpp */,
 				07A468A31E6FD404002C9B3C /* db_handle.hpp */,
 				07A468A41E6FD404002C9B3C /* db_mysql.hpp */,
 				07A468A51E6FD404002C9B3C /* db_pool.hpp */,
@@ -1468,6 +1488,7 @@
 				07A468251E6FCCF1002C9B3C /* rfc2047.cpp in Sources */,
 				07A468291E6FCCF1002C9B3C /* redis.cpp in Sources */,
 				07A467C31E6FCCF1002C9B3C /* CORSOperation.cpp in Sources */,
+				07384F461EB9A57D00084CAD /* db_pgsql.cpp in Sources */,
 				07A467F11E6FCCF1002C9B3C /* http_mime.cpp in Sources */,
 				07A468171E6FCCF1002C9B3C /* tok822_parse.cpp in Sources */,
 				07A468541E6FCCF1002C9B3C /* sha1.cpp in Sources */,
@@ -1528,6 +1549,7 @@
 				07A4681F1E6FCCF1002C9B3C /* mime_head.cpp in Sources */,
 				07A468571E6FCCF1002C9B3C /* thread.cpp in Sources */,
 				07A468101E6FCCF1002C9B3C /* mime_state.cpp in Sources */,
+				07384F3F1EB99FFF00084CAD /* pgsql_conf.cpp in Sources */,
 				07A4685D1E6FCCF1002C9B3C /* xml1.cpp in Sources */,
 				07A467E21E6FCCF1002C9B3C /* sqlite_pool.cpp in Sources */,
 				07A467EB1E6FCCF1002C9B3C /* hsrow.cpp in Sources */,
@@ -1559,6 +1581,7 @@
 				07A468591E6FCCF1002C9B3C /* thread_queue.cpp in Sources */,
 				07A4686C1E6FCCF1002C9B3C /* istream.cpp in Sources */,
 				07A467DE1E6FCCF1002C9B3C /* mysql_manager.cpp in Sources */,
+				07384F411EB99FFF00084CAD /* pgsql_pool.cpp in Sources */,
 				07A4682C1E6FCCF1002C9B3C /* redis_client_pool.cpp in Sources */,
 				07A468731E6FCCF1002C9B3C /* stdin_stream.cpp in Sources */,
 				07A468681E6FCCF1002C9B3C /* aio_timer_callback.cpp in Sources */,
@@ -1577,6 +1600,7 @@
 				07A468421E6FCCF1002C9B3C /* redis_session.cpp in Sources */,
 				07A4684E1E6FCCF1002C9B3C /* locker.cpp in Sources */,
 				07A467F91E6FCCF1002C9B3C /* HttpCookie.cpp in Sources */,
+				07384F401EB99FFF00084CAD /* pgsql_manager.cpp in Sources */,
 				07A467D51E6FCCF1002C9B3C /* connect_pool.cpp in Sources */,
 				07A468511E6FCCF1002C9B3C /* md5.cpp in Sources */,
 				07A467CF1E6FCCF1002C9B3C /* beanstalk_pool.cpp in Sources */,
@@ -1673,6 +1697,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1681,6 +1706,9 @@
 					"DEBUG=1",
 					"$(inherited)",
 					ACL_PREPARE_COMPILE,
+					HAS_MYSQL,
+					HAS_PGSQL,
+					HAS_SQLITE,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1688,6 +1716,17 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/zlib,
+					../include/polarssl,
+					../include/sqlite,
+					../include/pgsql,
+					../include/mysql,
+					../lib_acl_cpp/src,
+					../lib_acl_cpp/include,
+					../lib_protocol/include,
+					../lib_acl/include,
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -1718,15 +1757,32 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = ACL_PREPARE_COMPILE;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					ACL_PREPARE_COMPILE,
+					HAS_MYSQL,
+					HAS_PGSQL,
+					HAS_SQLITE,
+				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/zlib,
+					../include/polarssl,
+					../include/sqlite,
+					../include/pgsql,
+					../include/mysql,
+					../lib_acl_cpp/src,
+					../lib_acl_cpp/include,
+					../lib_protocol/include,
+					../lib_acl/include,
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
@@ -1741,6 +1797,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					HAS_MYSQL,
+					HAS_PGSQL,
 					HAS_SQLITE,
 				);
 				HEADER_SEARCH_PATHS = (
@@ -1749,6 +1806,7 @@
 					../lib_acl_cpp/include,
 					../lib_acl_cpp/src,
 					../include/mysql,
+					../include/pgsql,
 					../include/polarssl,
 					../include/zlib,
 				);
@@ -1764,6 +1822,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					HAS_MYSQL,
+					HAS_PGSQL,
 					HAS_SQLITE,
 				);
 				HEADER_SEARCH_PATHS = (
@@ -1772,6 +1831,7 @@
 					../lib_acl_cpp/include,
 					../lib_acl_cpp/src,
 					../include/mysql,
+					../include/pgsql,
 					../include/polarssl,
 					../include/zlib,
 				);
