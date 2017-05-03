@@ -224,18 +224,20 @@ static int reopen_log(ACL_LOG *log)
 	} else if (now - log->last_open < log->reopen_inter)
 		RETURN(-1);
 
+#if 0
 	if (log->fp->path) {
-		acl_myfree(log->fp->path);
+		free(log->fp->path);
 		log->fp->path = NULL;
 	}
 	if (log->fp->addr_local) {
-		acl_myfree(log->fp->addr_local);
+		free(log->fp->addr_local);
 		log->fp->addr_local = NULL;
 	}
 	if (log->fp->addr_peer) {
-		acl_myfree(log->fp->addr_peer);
+		free(log->fp->addr_peer);
 		log->fp->addr_peer = NULL;
 	}
+#endif
 
 	private_vstream_close(log->fp);
 	acl_assert(log->path);
@@ -850,18 +852,20 @@ void acl_close_log()
 			continue;
 
 		if (log->fp) {
+#if 0
 			if (log->fp->path) {
-				acl_myfree(log->fp->path);
+				free(log->fp->path);
 				log->fp->path = NULL;
 			}
 			if (log->fp->addr_local) {
-				acl_myfree(log->fp->addr_local);
+				free(log->fp->addr_local);
 				log->fp->addr_local = NULL;
 			}
 			if (log->fp->addr_peer) {
-				acl_myfree(log->fp->addr_peer);
+				free(log->fp->addr_peer);
 				log->fp->addr_peer = NULL;
 			}
+#endif
 			private_vstream_close(log->fp);
 		}
 

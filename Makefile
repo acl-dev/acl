@@ -87,9 +87,10 @@ help:
 	@(echo "usage: make help|all|all_lib|all_samples|clean|install|uninstall|uninstall_all|build_bin|build_src|build_one")
 all_lib:
 	@if test "$(polarssl)" = "on"; then \
-		export ENV_FLAGS=$(ENV_FLAGS):HAS_POLARSSL; \
+		ENV_FLAGS = $(ENV_FLAGS):HAS_POLARSSL \
+		export ENV_FLAGS; \
 	else \
-		export ENV_FLAGS=$(ENV_FLAGS); \
+		export ENV_FLAGS; \
 	fi
 	@(cd lib_acl; make pch)
 	@(cd lib_acl; make $(MAKE_ARGS))

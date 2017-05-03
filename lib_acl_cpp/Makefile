@@ -14,7 +14,6 @@ CFLAGS = -c -g -W \
 -Wall \
 -Werror \
 -Wpointer-arith \
--Wshadow \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \
 -Wno-long-long \
@@ -71,6 +70,7 @@ endif
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
+	CFLAGS += -Wshadow
 	shared_ldflags = -lprotocol -lacl -L/usr/local/lib -liconv -lz -lpthread
 endif
 
@@ -79,6 +79,7 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -Wno-invalid-source-encoding \
 		  -Wno-extended-offsetof \
 		  -Wno-unused-private-field
+	CFLAGS += -Wshadow
 	UNIXTYPE = MACOSX
 	shared_ldflags = -lprotocol -lacl -L/usr/lib -liconv -lz -lpthread
 endif
@@ -86,18 +87,21 @@ endif
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
+	CFLAGS += -Wshadow
 	shared_ldflags = -lprotocol -lacl -lrt -lpthread -lz -ldl
 endif
 
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	CFLAGS += -DLINUX2 -DMINGW
+	CFLAGS += -Wshadow
 	UNIXTYPE = LINUX
 endif
 
 # For MSYS
 ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
 	CFLAGS += -DLINUX2 -DMINGW
+	CFLAGS += -Wshadow
 	UNIXTYPE = LINUX
 endif
 
@@ -116,6 +120,7 @@ endif
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
 	CFLAGS += -DHP_UX -DHPUX11
+	CFLAGS += -Wshadow
 	UNIXTYPE = HPUX
 endif
 
@@ -241,7 +246,7 @@ shared: depends pch $(OBJS_DST)
 
 depends: $(OBJS_DEF)
 check:
-	@if test -n $(polarssl) && test "$(polarssl)" = "on"; then \
+	@if test "$(polarssl)" = "on"; then \
 		rm -f Debug/polarssl_io.o; \
 		rm -f Debug/polarssl_conf.o; \
 		rm -f Debug/polarssl_io.inc; \

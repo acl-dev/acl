@@ -136,10 +136,10 @@ endif
 
 # For SunOS
 ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
-	ifeq ($(findstring 86, $(UNIXNAME)), 86)
+	ifeq ($(findstring 86, $(OSTYPE)), 86)
 		SYSLIB += -lsocket -lnsl -lrt
 	endif
-	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
+	ifeq ($(findstring sun4u, $(OSTYPE)), sun4u)
 		SYSLIB += -lsocket -lnsl -lrt
 	endif
 	CFLAGS += -DSUNOS5 -fPIC -Werror
