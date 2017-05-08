@@ -371,7 +371,7 @@ bool db_pgsql::dbopen(const char* /* charset = NULL */)
 		db_unix = NULL;
 	} else {
 		db_unix = dbaddr_;
-		db_host = NULL;
+		db_host = db_unix;
 		db_port = 0;
 	}
 
@@ -394,7 +394,9 @@ bool db_pgsql::dbopen(const char* /* charset = NULL */)
 	}
 
 	string info;
-	info.format("host=%s port=%d dbname=%s", db_host, db_port, dbname_);
+	info.format("host=%s dbname=%s", db_host, dbname_);
+	if (db_unix == NULL)
+		info.format_append(" port=%d", db_port);
 	if (dbuser_)
 		info.format_append(" user=%s", dbuser_);
 	if (dbpass_)
@@ -413,8 +415,11 @@ bool db_pgsql::dbopen(const char* /* charset = NULL */)
 			dbpass_ ? dbpass_ : "null");
 
 		if (conn_)
+		{
 			__dbfinish(conn_);
-		conn_ = NULL;
+			conn_ = NULL;
+		}
+
 		return false;
 	}
 

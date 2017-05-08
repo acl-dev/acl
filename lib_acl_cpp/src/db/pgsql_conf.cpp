@@ -20,13 +20,13 @@ pgsql_conf::pgsql_conf(const char* dbaddr, const char* dbname)
 
 	dbaddr_  = acl_mystrdup(ptr);
 	dbname_  = acl_mystrdup(dbname);
-	dblimit_ = 0;
 	dbkey_   = acl_concatenate(dbname, "@", dbaddr, NULL);
 	acl_lowercase(dbkey_);
 	dbuser_  = NULL;
 	dbpass_  = NULL;
 	charset_ = NULL;
 
+	dblimit_      = 0;
 	conn_timeout_ = 60;
 	rw_timeout_   = 60;
 }
@@ -53,9 +53,9 @@ pgsql_conf::pgsql_conf(const pgsql_conf& conf)
 	else
 		charset_ = NULL;
 
+	dblimit_      = conf.get_dblimit();
 	conn_timeout_ = conf.get_conn_timeout();
 	rw_timeout_   = conf.get_rw_timeout();
-	dblimit_      = conf.get_dblimit();
 }
 
 pgsql_conf::~pgsql_conf(void)
@@ -91,6 +91,15 @@ pgsql_conf& pgsql_conf::set_dbpass(const char* dbpass)
 	return *this;
 }
 
+pgsql_conf& pgsql_conf::set_dblimit(size_t dblimit)
+{
+	if (dblimit > 0)
+		dblimit_ = dblimit;
+	else
+		dblimit_ = 0;
+	return *this;
+}
+
 pgsql_conf& pgsql_conf::set_charset(const char* charset)
 {
 	if (charset == NULL || *charset == 0)
@@ -110,12 +119,6 @@ pgsql_conf& pgsql_conf::set_conn_timeout(int timeout)
 pgsql_conf& pgsql_conf::set_rw_timeout(int timeout)
 {
 	rw_timeout_ = timeout;
-	return *this;
-}
-
-pgsql_conf& pgsql_conf::set_dblimit(size_t dblimit)
-{
-	dblimit_ = dblimit;
 	return *this;
 }
 

@@ -557,6 +557,7 @@ acl_master: static $(MASTERD_OBJ)
 		$(CC) -o $(MASTER_OBJ_PATH)/$(MASTER) $(MASTERD_OBJ) \
 			$(LIB_PATH_DST)/$(LIB_NAME) $(SYSLIB); \
 	fi
+	@$(shell mkdir -p ../dist/master/libexec/$(RPATH))
 	cp $(MASTER_OBJ_PATH)/$(MASTER) ../dist/master/libexec/$(RPATH)/
 	@echo 'create acl_master ok!'
 
