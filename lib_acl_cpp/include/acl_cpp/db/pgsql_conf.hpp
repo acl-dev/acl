@@ -7,63 +7,63 @@ class ACL_CPP_API pgsql_conf
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param dbaddr {const char*} æœåŠ¡å™¨åœ°å€ï¼Œåœ°å€æ ¼å¼ä¸ºï¼šip:portï¼Œæˆ–
-	 *  unix_domain_pathï¼Œå½“ä¸º unix åŸŸå¥—æ¥å£æ—¶ï¼Œåº”ä¸º unix åŸŸå¥—æ¥å£æ–‡ä»¶
-	 *  æ‰€åœ¨ç›®å½•ä¸”ä¸åŒ…å«æ–‡ä»¶åï¼Œå‡è®¾ postgresql æ­£åœ¨ç›‘å¬ unix åŸŸå¥—æ¥å£
-	 *  çš„æ–‡ä»¶ä¸ºï¼š/tmp/.s.PGSQL.5432ï¼Œåˆ™ dbaddr åœ°å€åº”è®¾ä¸º /tmp
-	 *  æ³¨æ„ï¼šæ³¨æ„åœ¨è¿æ¥ unix åŸŸå¥—æ¥å£çš„ä¸ mysql çš„ä¸åŒï¼Œmysql çš„åŸŸå¥—æ¥
-	 *  å£ä¸ºå…¨è·¯å¾„
-	 * @param dbname {const char*} æ•°æ®åº“å
+	 * ¹¹Ôìº¯Êı
+	 * @param dbaddr {const char*} ·şÎñÆ÷µØÖ·£¬µØÖ·¸ñÊ½Îª£ºip:port£¬»ò
+	 *  unix_domain_path£¬µ±Îª unix ÓòÌ×½Ó¿ÚÊ±£¬Ó¦Îª unix ÓòÌ×½Ó¿ÚÎÄ¼ş
+	 *  ËùÔÚÄ¿Â¼ÇÒ²»°üº¬ÎÄ¼şÃû£¬¼ÙÉè postgresql ÕıÔÚ¼àÌı unix ÓòÌ×½Ó¿Ú
+	 *  µÄÎÄ¼şÎª£º/tmp/.s.PGSQL.5432£¬Ôò dbaddr µØÖ·Ó¦ÉèÎª /tmp
+	 *  ×¢Òâ£º×¢ÒâÔÚÁ¬½Ó unix ÓòÌ×½Ó¿ÚµÄÓë mysql µÄ²»Í¬£¬mysql µÄÓòÌ×½Ó
+	 *  ¿ÚÎªÈ«Â·¾¶
+	 * @param dbname {const char*} Êı¾İ¿âÃû
 	 */
 	pgsql_conf(const char* dbaddr, const char* dbname);
 
 	/**
-	 * æ‹·è´æ„é€ å‡½æ•°
-	 * @param conf {const pgsql_conf&} å†…éƒ¨å°†ä¼šåˆ›å»ºæ–°é…ç½®å¯¹è±¡å¹¶æ‹·è´è¯¥å‚æ•°
-	 *  é‡Œçš„å†…å®¹é¡¹
+	 * ¿½±´¹¹Ôìº¯Êı
+	 * @param conf {const pgsql_conf&} ÄÚ²¿½«»á´´½¨ĞÂÅäÖÃ¶ÔÏó²¢¿½±´¸Ã²ÎÊı
+	 *  ÀïµÄÄÚÈİÏî
 	 */
 	pgsql_conf(const pgsql_conf& conf);
 
 	~pgsql_conf(void);
 
 	/**
-	 * è®¾ç½®è¿æ¥æ•°æ®åº“æ—¶çš„ç”¨æˆ·è´¦å·ï¼Œå½“ä¸è°ƒç”¨æ­¤æ–¹æ³•æ—¶åˆ™ä¸éœ€è´¦å·
-	 * @param dbuser {const char*} ç”¨æˆ·è´¦å·ï¼Œä¸ºéç©ºå­—ç¬¦ä¸²æ—¶æ‰æœ‰æ•ˆ
+	 * ÉèÖÃÁ¬½ÓÊı¾İ¿âÊ±µÄÓÃ»§ÕËºÅ£¬µ±²»µ÷ÓÃ´Ë·½·¨Ê±Ôò²»ĞèÕËºÅ
+	 * @param dbuser {const char*} ÓÃ»§ÕËºÅ£¬Îª·Ç¿Õ×Ö·û´®Ê±²ÅÓĞĞ§
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_dbuser(const char* dbuser);
 
 	/**
-	 * è®¾ç½®è¿æ¥æ•°æ®åº“æ—¶çš„è´¦å·å¯†ç ï¼Œå½“ä¸è°ƒç”¨æ­¤æ–¹æ³•æ—¶åˆ™ä¸è®¾å¯†ç 
-	 * @param dbpass {const char*} è´¦å·å¯†ç ï¼Œä¸ºéç©ºå­—ç¬¦ä¸²æ—¶æ‰æœ‰æ•ˆ
+	 * ÉèÖÃÁ¬½ÓÊı¾İ¿âÊ±µÄÕËºÅÃÜÂë£¬µ±²»µ÷ÓÃ´Ë·½·¨Ê±Ôò²»ÉèÃÜÂë
+	 * @param dbpass {const char*} ÕËºÅÃÜÂë£¬Îª·Ç¿Õ×Ö·û´®Ê±²ÅÓĞĞ§
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_dbpass(const char* dbpass);
 
 	/**
-	 * è®¾ç½®æ•°æ®åº“è¿æ¥æ± æœ€å¤§è¿æ¥ä¸Šé™
-	 * @param dblimit {size_t} è¿æ¥æ± æœ€å¤§è¿æ¥æ•°é™åˆ¶ï¼Œå½“ä¸º 0 æ—¶åˆ™ä¸é™åˆ¶
+	 * ÉèÖÃÊı¾İ¿âÁ¬½Ó³Ø×î´óÁ¬½ÓÉÏÏŞ
+	 * @param dblimit {size_t} Á¬½Ó³Ø×î´óÁ¬½ÓÊıÏŞÖÆ£¬µ±Îª 0 Ê±Ôò²»ÏŞÖÆ
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_dblimit(size_t dblimit);
 
 	/**
-	 * è®¾ç½®è¿æ¥æ•°æ®åº“çš„è¶…æ—¶æ—¶é—´
+	 * ÉèÖÃÁ¬½ÓÊı¾İ¿âµÄ³¬Ê±Ê±¼ä
 	 * @param timeout {int}
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_conn_timeout(int timeout);
 
 	/**
-	 * è®¾ç½®è¯»å–æ•°æ®åº“ç»“æœçš„è¶…æ—¶æ—¶é—´
+	 * ÉèÖÃ¶ÁÈ¡Êı¾İ¿â½á¹ûµÄ³¬Ê±Ê±¼ä
 	 * @param int {timeout}
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_rw_timeout(int timeout);
 
 	/**
-	 * è®¾ç½®æ•°æ®åº“è¿æ¥çš„å­—ç¬¦é›†
+	 * ÉèÖÃÊı¾İ¿âÁ¬½ÓµÄ×Ö·û¼¯
 	 * @param charset {const char*}
 	 * @return {pgsql_conf&}
 	 */

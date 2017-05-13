@@ -107,5 +107,6 @@ int main(int argc, char* argv[])
 	}
 
 	test();
+	printf("Enter any key to continue ..."); fflush(stdout); getchar();
 	return 0;
 }

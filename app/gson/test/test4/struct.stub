@@ -9,4 +9,11 @@ struct user
 	bool male;
 
 	std::map<std::string, std::vector<std::string> > names;
+	std::map<std::string, std::vector<std::string*> > names2;
+	std::map<std::string, std::string> names3;
+	std::list<acl::string*> values1;
+	std::list<acl::string> values2;
+	std::list<std::string*> values3;
+	std::list<std::string> values4;
+	std::map<std::string, std::string*> names4;
 };
