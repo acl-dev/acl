@@ -1,3 +1,7 @@
+
+50) 2017.5.16
+50.1) feature: fiber_server.c 协程服务器模板增加了平滑退出机制
+
 49) 2017.5.1
 49.1) samples/pgsql: 添加测试 postgresql 的客户端例子
 
