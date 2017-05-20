@@ -361,25 +361,33 @@ int websocket::read_frame_data(char* buf, size_t size)
 	if (header_.payload_len - payload_nread_ < size)
 		size = (size_t) (header_.payload_len - payload_nread_);
 
-	int ret = client_.read(buf, size, false);
-	if (ret == -1)
+	int bytes = 0;
+	while (true)
 	{
-		if (last_error() != ACL_ETIMEDOUT)
-			logger_error("read frame data error: %d, %s",
-				last_error(), last_serror());
-		return -1;
+		int ret = client_.read(buf + bytes, size - bytes, false);
+		if (ret == -1)
+		{
+			if (last_error() != ACL_ETIMEDOUT)
+				logger_error("read frame data error: %d, %s",
+					last_error(), last_serror());
+			return -1;
+		}
+		bytes += ret;
+		if (bytes == size)
+			break;
 	}
+	
 
 	if (header_.mask)
 	{
 		unsigned char* mask = (unsigned char*) &header_.masking_key;
-		for (int i = 0; i < ret; i++)
+		for (int i = 0; i < bytes; i++)
 			buf[i] ^= mask[i % 4];
 	}
 
-	payload_nread_ += ret;
+	payload_nread_ += bytes;
 
-	return ret;
+	return bytes;
 }
 
 } // namespace acl
