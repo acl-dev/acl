@@ -55,13 +55,6 @@ func loopAccept(ln net.Listener) {
 }
 
 func OnAccept(handler AcceptFunc) {
-	//confPath := flag.String("f", "dummy", "service configure file")
-	//	sockCount := flag.Int("s", 0, "socket count")
-
-	//flag.Parse()
-
-	//log.Printf("confPath: %s\r\n", *confPath)
-
 	for _, arg := range os.Args {
 		log.Println("arg=", arg)
 	}
@@ -74,9 +67,13 @@ func OnClose(handler CloseFunc) {
 }
 
 func NetStart(addrs []string) {
+	prepare()
+
 	if preJailHandler != nil {
 		preJailHandler()
 	}
+
+	chroot()
 
 	if initHandler != nil {
 		initHandler()

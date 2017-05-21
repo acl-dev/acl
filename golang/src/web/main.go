@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"master"
-	"os"
 	"net/http"
+	"os"
+
+	"master"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -15,16 +15,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	var logFile = "./log.txt"
-
-	f, err := os.OpenFile(logFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		fmt.Println("open file error", err)
-		return
-	}
-
-	log.SetOutput(f)
-
 	http.HandleFunc("/", handler)
 
 	if len(os.Args) > 1 && os.Args[1] == "alone" {

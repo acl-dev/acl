@@ -23,9 +23,13 @@ func webServ(ln net.Listener, daemon bool) {
 }
 
 func WebStart(addrs []string) {
+	prepare()
+
 	if preJailHandler != nil {
 		preJailHandler()
 	}
+
+	chroot()
 
 	if initHandler != nil {
 		initHandler()

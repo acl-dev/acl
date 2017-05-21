@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
-	"master"
 	"net"
 	"os"
+
+	"master"
 )
 
 func onAccept(conn net.Conn) {
@@ -26,17 +27,6 @@ func onClose(conn net.Conn) {
 }
 
 func main() {
-	var logFile = "./log.txt"
-
-	f, err := os.OpenFile(logFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		fmt.Println("open file error", err)
-		return
-	}
-
-	log.SetOutput(f)
-	//log.SetOutput(io.MultiWriter(os.Stderr, f))
-
 	master.OnClose(onClose)
 	master.OnAccept(onAccept)
 

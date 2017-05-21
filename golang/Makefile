@@ -1,6 +1,6 @@
 GOPATH := $(CURDIR)
 
-all: echo web
+all: echo web test
 
 echo:
 	@go build echo
@@ -8,7 +8,10 @@ echo:
 web:
 	@go build web
 
+test:
+	@go build test
+
 cl clean:
-	@rm -f echo web
+	@rm -f echo web test
 
 rb rebuild: cl all

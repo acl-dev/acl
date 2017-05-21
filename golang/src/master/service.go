@@ -1,17 +1,28 @@
 package master
 
 import (
+	"flag"
 	"log"
 	"net"
 	"os"
+	"os/user"
+	"strconv"
 	"sync"
+	"syscall"
 	"time"
 )
 
 const (
 	stateFd       = 5
 	listenFdStart = 6
-	listenFdCount = 1
+)
+
+var (
+	listenFdCount int = 1
+	confPath      string
+	sockType      string
+	services      string
+	listener      bool
 )
 
 type PreJailFunc func()
@@ -28,6 +39,70 @@ var (
 	stopping       bool = false
 	waitExit       int  = 10
 )
+
+var (
+	logPath    string
+	username   string
+	masterArgs string
+)
+
+func parseArgs() {
+	flag.IntVar(&listenFdCount, "s", 1, "listen fd count")
+	flag.StringVar(&confPath, "f", "", "configure path")
+	flag.StringVar(&sockType, "t", "sock", "socket type")
+	flag.StringVar(&services, "n", "", "master services")
+	flag.BoolVar(&listener, "l", true, "listener")
+	flag.Parse()
+	log.Printf("listenFdCount=%d, sockType=%s, services=%s",
+		listenFdCount, sockType, services)
+}
+
+func prepare() {
+	parseArgs()
+	conf := new(Config)
+	conf.InitConfig(confPath)
+
+	logPath = conf.Get("master_log")
+	if len(logPath) > 0 {
+		f, err := os.OpenFile(logPath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+		if err != nil {
+			log.Println("OpenFile error", err)
+		} else {
+			log.SetOutput(f)
+			//log.SetOutput(io.MultiWriter(os.Stderr, f))
+		}
+	}
+
+	masterArgs = conf.Get("args")
+	username = conf.Get("fiber_owner")
+
+	log.Printf("Args: %s\r\n", masterArgs)
+}
+
+func chroot() {
+	if len(masterArgs) == 0 || len(username) == 0 {
+		return
+	}
+
+	user, err := user.Lookup(username)
+	if err != nil {
+		log.Printf("Lookup %s error %s", username, err)
+		return
+	}
+	gid, err := strconv.Atoi(user.Gid)
+	if err != nil {
+		log.Printf("invalid gid=%s, %s", user.Gid, err)
+	} else if err := syscall.Setgid(gid); err != nil {
+		log.Printf("Setgid error %s", err)
+	}
+
+	uid, err := strconv.Atoi(user.Uid)
+	if err != nil {
+		log.Printf("invalid uid=%s, %s", user.Uid, err)
+	} else if err := syscall.Setuid(uid); err != nil {
+		log.Printf("Setuid error %s", err)
+	}
+}
 
 func getListenersByAddrs(addrs []string) []*net.Listener {
 	listeners := []*net.Listener(nil)
@@ -56,7 +131,8 @@ func getListeners() []*net.Listener {
 	return listeners
 }
 
-func monitorMaster(listeners []*net.Listener, onStopHandler func(), stopHandler func(bool)) {
+func monitorMaster(listeners []*net.Listener,
+	onStopHandler func(), stopHandler func(bool)) {
 
 	file := os.NewFile(uintptr(stateFd), "")
 	conn, err1 := net.FileConn(file)
