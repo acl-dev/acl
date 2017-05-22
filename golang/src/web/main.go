@@ -9,9 +9,10 @@ import (
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("served", r.URL)
-	w.Header().Set("Content-Type", "text/plain")
-	fmt.Fprintf(w, "Hello World!\n")
+	//fmt.Println("served", r.URL)
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Server", "web")
+	fmt.Fprintf(w, "Hello World!\r\n")
 }
 
 func main() {

@@ -574,6 +574,12 @@ static void service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	 */
 	chroot_var = get_bool_ent(xcp, ACL_VAR_MASTER_SERV_CHROOT, "y");
 
+	ptr_const = get_str_ent(xcp, ACL_VAR_MASTER_SERV_OWNER, "");
+	if (ptr_const && *ptr_const)
+		serv->owner = acl_mystrdup(ptr_const);
+	else
+		serv->owner = NULL;
+
 	/*
 	 * Path to command,
 	 */
@@ -608,10 +614,13 @@ static void service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	/* add "-f configure_file_path" flag */
 	acl_argv_add(serv->args, "-f", acl_vstring_str(path), (char *) 0);
 
+	/*
 	if (serv->max_proc == 1)
 		acl_argv_add(serv->args, "-l", (char *) 0);
 	if (serv->max_proc == 0)
 		acl_argv_add(serv->args, "-z", (char *) 0);
+	*/
+
 	if (strcmp(acl_safe_basename(command), name) != 0) {
 		char *tmp = acl_concatenate("\"", name, "\"", 0);
 		acl_argv_add(serv->args, "-n", tmp, (char *) 0);
@@ -696,16 +705,15 @@ ACL_MASTER_SERV *acl_get_master_ent()
 }
 
 	/*
-	 * XXX We cannot change the inet_interfaces setting for a running master
-	 * process. Listening sockets are inherited by child processes so that
-	 * closing and reopening those sockets in the master does not work.
+	 * XXX We cannot change the inet_interfaces setting for a running
+	 * master process. Listening sockets are inherited by child processes
+	 * so that closing and reopening those sockets in the master does not
+	 * work. Another problem is that library routines still cache results
+	 * that are based on the old inet_interfaces setting. It is too much
+	 * trouble to recompute everything.
 	 * 
-	 * Another problem is that library routines still cache results that are
-	 * based on the old inet_interfaces setting. It is too much trouble to
-	 * recompute everything.
-	 * 
-	 * In order to keep our data structures consistent we ignore changes in
-	 * inet_interfaces settings, and issue a warning instead.
+	 * In order to keep our data structures consistent we ignore changes
+	 * in inet_interfaces settings, and issue a warning instead.
 	 */
 	if (saved_interfaces == 0)
 		saved_interfaces = acl_mystrdup(acl_var_master_inet_interfaces);
@@ -810,6 +818,8 @@ void acl_free_master_ent(ACL_MASTER_SERV *serv)
 
 	acl_myfree(serv->name);
 	acl_myfree(serv->path);
+	if (serv->owner)
+		acl_myfree(serv->owner);
 	if (serv->notify_addr)
 		acl_myfree(serv->notify_addr);
 	if (serv->notify_recipients)

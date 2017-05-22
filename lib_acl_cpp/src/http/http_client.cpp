@@ -268,7 +268,7 @@ bool http_client::write_gzip(ostream& out, const void* data, size_t len)
 		return write_chunk(out, data, len);
 
 	// 普通流式方式输出压缩数据
-	if (out.write(data, len) < 0)
+	if (out.write(data, len, true, true) < 0 || !out.fflush())
 	{
 		disconnected_ = true;
 		return false;
@@ -370,7 +370,8 @@ bool http_client::write_head(const http_header& header)
 	ostream& out = get_ostream();
 
 	// 先写 HTTP 头
-	if (out.write(buf.c_str(), buf.length()) < 0)
+	if (out.write(buf.c_str(), buf.length(), true,
+		header.get_content_length() > 0) < 0)
 	{
 		disconnected_ = true;
 		return false;
@@ -400,7 +401,7 @@ bool http_client::write_head(const http_header& header)
 	}
 
 	// 普通流式写数据
-	else if (out.write(gzheader, sizeof(gzheader)) < 0)
+	else if (out.write(gzheader, sizeof(gzheader), true, true) < 0)
 	{
 		disconnected_ = true;
 		return false;
@@ -443,7 +444,7 @@ bool http_client::write_body(const void* data, size_t len)
 		return write_chunk(out, data, len);
 
 	// 普通流式写入数据体
-	else if (out.write(data, len) == -1)
+	else if (out.write(data, len, true, true) == -1 || !out.fflush())
 	{
 		disconnected_ = true;
 		return false;

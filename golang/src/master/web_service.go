@@ -49,7 +49,6 @@ func WebStart(addrs []string) {
 	}
 
 	for _, ln := range listeners {
-		log.Println("create one fiber")
 		go webServ(*ln, daemonMode)
 	}
 

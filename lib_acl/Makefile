@@ -32,6 +32,7 @@ CFLAGS = -c -g -W \
 -D_POSIX_PTHREAD_SEMANTICS \
 -DACL_PREPARE_COMPILE \
 -Winvalid-pch \
+-DUSE_REUSEPORT \
 #-DDEBUG_MEM
 #-DUSE_EPOLL \
 #-Wno-tautological-compare \

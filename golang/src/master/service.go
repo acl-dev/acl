@@ -1,7 +1,6 @@
 package master
 
 import (
-	"flag"
 	"log"
 	"net"
 	"os"
@@ -22,7 +21,9 @@ var (
 	confPath      string
 	sockType      string
 	services      string
-	listener      bool
+	privilege     bool = false
+	verbose       bool = false
+	chrootOn      bool = false
 )
 
 type PreJailFunc func()
@@ -44,27 +45,75 @@ var (
 	logPath    string
 	username   string
 	masterArgs string
+	rootDir    string
 )
 
 func parseArgs() {
-	flag.IntVar(&listenFdCount, "s", 1, "listen fd count")
-	flag.StringVar(&confPath, "f", "", "configure path")
-	flag.StringVar(&sockType, "t", "sock", "socket type")
-	flag.StringVar(&services, "n", "", "master services")
-	flag.BoolVar(&listener, "l", true, "listener")
-	flag.Parse()
+	/*
+		flag.IntVar(&listenFdCount, "s", 1, "listen fd count")
+		flag.StringVar(&confPath, "f", "", "configure path")
+		flag.StringVar(&sockType, "t", "sock", "socket type")
+		flag.StringVar(&services, "n", "", "master services")
+		flag.BoolVar(&privilege, "u", false, "running privilege")
+		flag.BoolVar(&verbose, "v", false, "debug verbose")
+		flag.BoolVar(&chrootOn, "c", false, "chroot dir")
+
+		flag.Parse()
+	*/
+
+	var n = len(os.Args)
+	for i := 0; i < n; i++ {
+		switch os.Args[i] {
+		case "-s":
+			i++
+			if i >= n {
+				break
+			}
+			listenFdCount, _ = strconv.Atoi(os.Args[i])
+			if listenFdCount <= 0 {
+				listenFdCount = 1
+			}
+		case "-f":
+			i++
+			if i >= n {
+				break
+			}
+			confPath = os.Args[i]
+		case "-t":
+			i++
+			if i >= n {
+				break
+			}
+			sockType = os.Args[i]
+		case "-n":
+			i++
+			if i >= n {
+				break
+			}
+			services = os.Args[i]
+		case "-u":
+			privilege = true
+		case "-v":
+			verbose = true
+		case "-c":
+			chrootOn = true
+		}
+	}
+
 	log.Printf("listenFdCount=%d, sockType=%s, services=%s",
 		listenFdCount, sockType, services)
 }
 
 func prepare() {
 	parseArgs()
+
 	conf := new(Config)
 	conf.InitConfig(confPath)
 
 	logPath = conf.Get("master_log")
 	if len(logPath) > 0 {
-		f, err := os.OpenFile(logPath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+		f, err := os.OpenFile(logPath,
+			os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
 			log.Println("OpenFile error", err)
 		} else {
@@ -73,34 +122,54 @@ func prepare() {
 		}
 	}
 
-	masterArgs = conf.Get("args")
+	masterArgs = conf.Get("master_args")
 	username = conf.Get("fiber_owner")
+	rootDir = conf.Get("fiber_queue_dir")
 
 	log.Printf("Args: %s\r\n", masterArgs)
 }
 
 func chroot() {
-	if len(masterArgs) == 0 || len(username) == 0 {
+	if len(masterArgs) == 0 || !privilege || len(username) == 0 {
 		return
 	}
 
 	user, err := user.Lookup(username)
 	if err != nil {
 		log.Printf("Lookup %s error %s", username, err)
-		return
-	}
-	gid, err := strconv.Atoi(user.Gid)
-	if err != nil {
-		log.Printf("invalid gid=%s, %s", user.Gid, err)
-	} else if err := syscall.Setgid(gid); err != nil {
-		log.Printf("Setgid error %s", err)
+	} else {
+		gid, err := strconv.Atoi(user.Gid)
+		if err != nil {
+			log.Printf("invalid gid=%s, %s", user.Gid, err)
+		} else if err := syscall.Setgid(gid); err != nil {
+			log.Printf("Setgid error %s", err)
+		} else {
+			log.Printf("Setgid ok")
+		}
+
+		uid, err := strconv.Atoi(user.Uid)
+		if err != nil {
+			log.Printf("invalid uid=%s, %s", user.Uid, err)
+		} else if err := syscall.Setuid(uid); err != nil {
+			log.Printf("Setuid error %s", err)
+		} else {
+			log.Printf("Setuid ok")
+		}
 	}
 
-	uid, err := strconv.Atoi(user.Uid)
-	if err != nil {
-		log.Printf("invalid uid=%s, %s", user.Uid, err)
-	} else if err := syscall.Setuid(uid); err != nil {
-		log.Printf("Setuid error %s", err)
+	if chrootOn && len(rootDir) > 0 {
+		err := syscall.Chroot(rootDir)
+		if err != nil {
+			log.Printf("Chroot error %s, path %s", err, rootDir)
+		} else {
+			log.Printf("Chroot ok, path %s", rootDir)
+			err := syscall.Chdir("/")
+			if err != nil {
+				log.Printf("Chdir error %s", err)
+			} else {
+				log.Printf("Chdir ok")
+			}
+		}
 	}
 }
 

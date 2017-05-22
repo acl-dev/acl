@@ -35,6 +35,7 @@
 /* Application-specific. */
 
 #include "../master_proto.h"
+#include "../master_params.h"
 #include "master.h"
 
 ACL_BINHASH *acl_var_master_child_table = NULL;
@@ -233,6 +234,14 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 		if (acl_msg_verbose)
 			acl_msg_info("%s(%d)->%s: cmd = %s",
 				__FILE__, __LINE__, myname, serv->path);
+
+		/* help programs written by golang to change runing privilege */
+		if (serv->owner && *serv->owner) {
+			acl_msg_info("%s(%d)->%s: acl_chroot_uid %s",
+				__FILE__, __LINE__, myname, serv->owner);
+			acl_chroot_uid(NULL, serv->owner);
+		}
+
 		execvp(serv->path, serv->args->argv);
 		acl_msg_fatal("%s(%d)->%s: exec %s: %s", __FILE__, __LINE__,
 			myname, serv->path, strerror(errno));

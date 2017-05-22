@@ -94,7 +94,6 @@ func NetStart(addrs []string) {
 	}
 
 	for _, ln := range listeners {
-		log.Println("create one fiber")
 		go loopAccept(*ln)
 	}
 

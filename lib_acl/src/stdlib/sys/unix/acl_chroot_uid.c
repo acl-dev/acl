@@ -63,10 +63,12 @@ void  acl_chroot_uid(const char *root_dir, const char *user_name)
 	/*
 	 * Drop the user privileges.
 	 */
-	if (user_name != 0)
+	if (user_name != 0) {
 		if (setuid(uid) < 0)
 			acl_msg_fatal("setuid(%ld): %s", (long) uid,
 				acl_last_strerror(tbuf, sizeof(tbuf)));
+	}
+		
 
 	/*
 	 * Give the desperate developer a clue of what is happening.
