@@ -210,14 +210,16 @@ static void udp_server_abort(int event_type acl_unused,
 
 /* udp_server_execute - in case (char *) != (struct *) */
 
-static void udp_server_execute(ACL_EVENT *event, ACL_VSTREAM *stream)
+static void udp_server_execute(ACL_EVENT *event acl_unused, ACL_VSTREAM *stream)
 {
+#if 0
 	if (acl_var_udp_master_maxproc > 1
 	    && acl_master_notify(acl_var_udp_pid, udp_server_generation,
 		ACL_MASTER_STAT_TAKEN) < 0)
 	{
 		udp_server_abort(ACL_EVENT_NULL_TYPE, event, stream, event);
 	}
+#endif
 
 	/* 回调用户注册的处理过程 */
 	__service_main(stream, __service_name, __service_argv);
@@ -225,12 +227,14 @@ static void udp_server_execute(ACL_EVENT *event, ACL_VSTREAM *stream)
 	/* 清除发生在 UDP 套接字上的临时性错误，以免事件引擎报错 */
 	stream->flag = 0;
 
+#if 0
 	if (acl_var_udp_master_maxproc > 1
 	    && acl_master_notify(acl_var_udp_pid, udp_server_generation,
 		ACL_MASTER_STAT_AVAIL) < 0)
 	{
 		udp_server_abort(ACL_EVENT_NULL_TYPE, event, stream, event);
 	}
+#endif
 }
 
 static void udp_server_read(int event_type, ACL_EVENT *event,
