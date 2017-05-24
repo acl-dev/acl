@@ -378,6 +378,60 @@ static void usage(int argc, char *argv[])
 
 /* acl_udp_server_main - the real main program */
 
+#ifdef SO_REUSEPORT
+
+struct SOCK_ADDR {
+	union {
+		struct sockaddr_storage ss;
+#ifdef AF_INET6
+		struct sockaddr_in6 in6;
+#endif
+		struct sockaddr_in in;
+#ifdef ACL_UNIX
+		struct sockaddr_un un;
+#endif
+		struct sockaddr sa;
+	} sa;
+};
+
+static int rebind_addr(int fd)
+{
+	struct SOCK_ADDR addr;
+	struct sockaddr *sa = (struct sockaddr*) &addr;
+	socklen_t len = sizeof(addr);
+	int newfd, on = 1;
+
+	if (getsockname(fd, sa, &len) == -1) {
+		acl_msg_warn("%s: getsockname error %s",
+			__FUNCTION__, acl_last_serror());
+		return -1;
+	}
+
+	newfd = socket(sa->sa_family, SOCK_DGRAM, 0);
+
+	if (setsockopt(newfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT,
+		(const void *) &on, sizeof(on)) < 0)
+	{
+		acl_msg_error("%s: setsockopt error %s, fd: %d",
+			__FUNCTION__, acl_last_serror(), newfd);
+		close(newfd);
+		return -1;
+	}
+
+	if (bind(newfd, sa, len) == -1) {
+		acl_msg_warn("%s: bind sock error %s, fd: %d, len: %d",
+			__FUNCTION__, acl_last_serror(), newfd, (int) len);
+		close(newfd);
+		return -1;
+	}
+
+	close(fd);
+
+	return newfd;
+}
+
+#endif
+
 void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 {
 	const char *myname = "acl_udp_server_main";
@@ -394,7 +448,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	int     alone = 0;
 	int     zerolimit = 0;
 	char   *generation;
-	int     fd, i, fdtype = 0;
+	int     fd, newfd, i, fdtype = 0;
 	int     event_mode;
 
 	int     f_flag = 0;
@@ -620,18 +674,25 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	for (; fd < ACL_MASTER_LISTEN_FD + __socket_count; fd++) {
 		char  addr[64];
 
-		stream = acl_vstream_fdopen(fd, O_RDWR, acl_var_udp_buf_size,
+#ifdef SO_REUSEPORT
+		newfd = rebind_addr(fd);
+		if (newfd == -1)
+			newfd = fd;
+#else
+		newfd = fd;
+#endif
+		stream = acl_vstream_fdopen(newfd, O_RDWR, acl_var_udp_buf_size,
 			acl_var_udp_rw_timeout, fdtype);
 		if (stream == NULL)
 			acl_msg_fatal("%s(%d)->%s: stream null, fd = %d",
-				__FILE__, __LINE__, myname, fd);
+				__FILE__, __LINE__, myname, newfd);
 
-		acl_getsockname(fd, addr, sizeof(addr));
+		acl_getsockname(newfd, addr, sizeof(addr));
 		acl_vstream_set_local(stream, addr);
 		acl_vstream_set_udp_io(stream);
-		acl_non_blocking(fd, ACL_NON_BLOCKING);
+		acl_non_blocking(newfd, ACL_NON_BLOCKING);
 		acl_event_enable_read(__event, stream, 0, udp_server_read, stream);
-		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
+		acl_close_on_exec(newfd, ACL_CLOSE_ON_EXEC);
 		__servers[i++] = stream;
 	}
 
