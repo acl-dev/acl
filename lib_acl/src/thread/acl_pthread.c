@@ -426,7 +426,7 @@ int acl_pthread_setspecific(acl_pthread_key_t key, void *value)
 			&& tls_value->tls_key->key == key)
 		{
 			/* 如果相同的键存在则需要先释放旧数据 */
-			if (tls_value->tls_key->destructor || tls_value->value)
+			if (tls_value->tls_key->destructor && tls_value->value)
 				tls_value->tls_key->destructor(tls_value->value);
 			tls_value->tls_key = NULL;
 			tls_value->value = NULL;

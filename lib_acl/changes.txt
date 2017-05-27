@@ -1,6 +1,9 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+587) 2017.5.25
+587.1) bugfix: acl_pthread.c 中 acl_pthread_setspecific 存在 bug
+
 586) 2017.5.24
 586.1) performance: acl_udp_server.c 优化处理性能
 

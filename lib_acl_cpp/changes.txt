@@ -1,6 +1,13 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+478) 2017.5.27
+478.1) bugfix: websocket::make_frame_header 中当 payload_len 为 126 时会遇到
+内存跨界问题 --- found by "lindawei" <672496008@qq.com>
+
+477) 2017.5.25
+477.1) bugfix: connect_manager::remove 中存在一处删除问题
+
 476) 2017.5.22
 476.1) performance: http_client.cpp 支持缓冲方式写数据，从而提升了写的性能
 476.2) feature: ostream::write 支持缓冲式写数据

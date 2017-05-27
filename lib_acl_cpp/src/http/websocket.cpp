@@ -94,7 +94,7 @@ void websocket::make_frame_header(void)
 	header_len_ = 2;
 	if (header_.payload_len > 65535)
 		header_len_ += 8;
-	else if (header_.payload_len > 126)
+	else if (header_.payload_len >= 126)
 		header_len_ += 2;
 	if (header_.mask)
 		header_len_ += 4;

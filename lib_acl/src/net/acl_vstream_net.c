@@ -380,6 +380,7 @@ static ACL_SOCKET acl_bind(const char *addr, char *addr_buf, size_t size)
 			break;
 
 		acl_socket_close(sock);
+		sock = ACL_SOCKET_INVALID;
 	}
 
 	freeaddrinfo(res0);
