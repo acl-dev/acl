@@ -7,6 +7,7 @@
 
 477) 2017.5.25
 477.1) bugfix: connect_manager::remove 中存在一处删除问题
+--- "fuwangqin" <niukey@qq.com>
 
 476) 2017.5.22
 476.1) performance: http_client.cpp 支持缓冲方式写数据，从而提升了写的性能

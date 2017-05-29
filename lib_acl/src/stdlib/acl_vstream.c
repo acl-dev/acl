@@ -3077,7 +3077,7 @@ void acl_vstream_set_local_addr(ACL_VSTREAM *fp, const struct sockaddr *sa)
 		int  port;
 		struct sockaddr_in6 *in = (struct sockaddr_in6 *) sa;
 
-		if (!inet_ntop(AF_INET, &in->sin6_addr, ip, sizeof(ip)))
+		if (!inet_ntop(AF_INET6, &in->sin6_addr, ip, sizeof(ip)))
 			ip[0] = 0;
 		port = ntohs(in->sin6_port);
 		snprintf(addr, sizeof(addr), "%s:%d", ip, port);
