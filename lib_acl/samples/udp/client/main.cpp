@@ -56,7 +56,7 @@ static int sio(SOCK_UDP *sock, const char *data, int dlen, int count,
 static int mio(SOCK_UDP *sock, const char *peer_addr, int dlen,
 	int count, int inter, bool echo)
 {
-#define PKT_CNT	2
+#define PKT_CNT	20
 #define DAT_LEN 100
 
 	char   bufs[PKT_CNT][DAT_LEN];
