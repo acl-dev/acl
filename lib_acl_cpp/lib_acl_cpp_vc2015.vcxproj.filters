@@ -109,6 +109,9 @@
     <ClCompile Include="src\db\db_mysql.cpp">
       <Filter>Source Files\db</Filter>
     </ClCompile>
+    <ClCompile Include="src\db\db_pgsql.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
     <ClCompile Include="src\db\db_pool.cpp">
       <Filter>Source Files\db</Filter>
     </ClCompile>
@@ -286,6 +289,9 @@
     <ClCompile Include="src\stdlib\snprintf.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\mbox.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
     <ClCompile Include="src\stdlib\md5.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
@@ -323,6 +329,9 @@
       <Filter>Source Files\stream</Filter>
     </ClCompile>
     <ClCompile Include="src\db\mysql_pool.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\pgsql_pool.cpp">
       <Filter>Source Files\db</Filter>
     </ClCompile>
     <ClCompile Include="src\db\sqlite_pool.cpp">
@@ -487,10 +496,16 @@
     <ClCompile Include="src\db\mysql_manager.cpp">
       <Filter>Source Files\db</Filter>
     </ClCompile>
+    <ClCompile Include="src\db\pgsql_manager.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
     <ClCompile Include="src\db\sqlite_manager.cpp">
       <Filter>Source Files\db</Filter>
     </ClCompile>
     <ClCompile Include="src\db\mysql_conf.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\pgsql_conf.cpp">
       <Filter>Source Files\db</Filter>
     </ClCompile>
     <ClCompile Include="src\smtp\smtp_client.cpp">
@@ -562,6 +577,9 @@
       <Filter>Header Files\db</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\db\db_mysql.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\db_pgsql.hpp">
       <Filter>Header Files\db</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\db\db_pool.hpp">
@@ -747,6 +765,9 @@
     <ClInclude Include="include\acl_cpp\stdlib\malloc.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\mbox.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\md5.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
@@ -856,6 +877,9 @@
       <Filter>Header Files\stream</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\db\mysql_pool.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\pgsql_pool.hpp">
       <Filter>Header Files\db</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\db\sqlite_pool.hpp">
@@ -1029,10 +1053,16 @@
     <ClInclude Include="include\acl_cpp\db\mysql_manager.hpp">
       <Filter>Header Files\db</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\pgsql_manager.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\db\sqlite_manager.hpp">
       <Filter>Header Files\db</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\db\mysql_conf.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\pgsql_conf.hpp">
       <Filter>Header Files\db</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\smtp\smtp_client.hpp">

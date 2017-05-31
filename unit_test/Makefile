@@ -85,7 +85,7 @@ ACL_LIB_PATH = $(ACL_HOME)/lib
 
 CFLAGS += -I$(ACL_INC_PATH)
 
-LINK_LIBS = -L$(ACL_LIB_PATH) -l_acl $(SYSLIB)
+LINK_LIBS = -L$(ACL_LIB_PATH) -lacl $(SYSLIB)
 
 ###########################################################
 OUT_PATH = .

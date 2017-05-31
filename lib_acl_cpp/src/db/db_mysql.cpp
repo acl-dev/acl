@@ -14,7 +14,7 @@
 
 #if defined(HAS_MYSQL) || defined(HAS_MYSQL_DLL)
 
-# if defined(ACL_CPP_DLL) || defined(HAS_MYSQL_DLL)
+# ifdef HAS_MYSQL_DLL
 
 #  ifndef STDCALL
 #   ifdef ACL_WINDOWS
@@ -110,8 +110,10 @@ static void __mysql_dll_unload(void)
 static void __mysql_dll_load(void)
 {
 	if (__mysql_dll != NULL)
-		logger_fatal("mysql(%s) to be loaded again!",
-			__mysql_path.c_str());
+	{
+		logger("mysql(%s) has been loaded!", __mysql_path.c_str());
+		return;
+	}
 
 	const char* path;
 	const char* ptr = acl::db_handle::get_loadpath();
@@ -272,7 +274,8 @@ static void __mysql_dll_load(void)
 	logger("%s loaded!", path);
 	atexit(__mysql_dll_unload);
 }
-# else
+
+# else  // if !HAS_MYSQL_DLL
 
 #  define  __mysql_libversion mysql_get_client_version
 #  define  __mysql_client_info mysql_get_client_info
@@ -308,41 +311,41 @@ namespace acl
 //////////////////////////////////////////////////////////////////////////
 // mysql 的记录行类型定义
 
-class db_mysql_rows : public db_rows
+static void mysql_rows_free(void* ctx)
 {
-public:
-	db_mysql_rows(MYSQL_RES *my_res)
-	{
-		int   ncolumn = __mysql_num_fields(my_res);
-		MYSQL_FIELD *fields = __mysql_fetch_fields(my_res);
+	MYSQL_RES* my_res = (MYSQL_RES*) ctx;
+#ifdef HAS_MYSQL_DLL
+	if (my_res && __mysql_dll)
+#else
+	if (my_res)
+#endif
+		__mysql_free_result(my_res);
+}
 
-		// 取出变量名
+static void mysql_rows_save(MYSQL_RES* my_res, db_rows& result)
+{
+	int   ncolumn = __mysql_num_fields(my_res);
+	MYSQL_FIELD *fields = __mysql_fetch_fields(my_res);
+
+	// 取出变量名
+	for (int j = 0; j < ncolumn; j++)
+		result.names_.push_back(fields[j].name);
+
+	// 开始取出所有行数据结果，加入动态数组中
+	while (true)
+	{
+		MYSQL_ROW my_row = __mysql_fetch_row(my_res);
+		if (my_row == NULL)
+			break;
+		db_row* row = NEW db_row(result.names_);
 		for (int j = 0; j < ncolumn; j++)
-			names_.push_back(fields[j].name);
-
-		// 开始取出所有行数据结果，加入动态数组中
-		while (true)
-		{
-			MYSQL_ROW my_row = __mysql_fetch_row(my_res);
-			if (my_row == NULL)
-				break;
-			db_row* row = NEW db_row(names_);
-			for (int j = 0; j < ncolumn; j++)
-				row->push_back(my_row[j]);
-			rows_.push_back(row);
-		}
-
-		my_res_ = my_res;
+			row->push_back(my_row[j]);
+		result.rows_.push_back(row);
 	}
 
-	~db_mysql_rows()
-	{
-		__mysql_free_result(my_res_);
-	}
-
-private:
-	MYSQL_RES *my_res_;
-};
+	result.result_free = mysql_rows_free;
+	result.result_tmp_ = my_res;
+}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -380,15 +383,24 @@ void db_mysql::sane_mysql_init(const char* dbaddr, const char* dbname,
 	if (charset && *charset)
 		charset_ = charset;
 
-	dbflags_ = dbflags;
-	auto_commit_ = auto_commit;
+	dbflags_      = dbflags;
+	auto_commit_  = auto_commit;
 	conn_timeout_ = conn_timeout;
-	rw_timeout_ = rw_timeout;
+	rw_timeout_   = rw_timeout;
 
-#if defined(ACL_CPP_DLL) || defined(HAS_MYSQL_DLL)
+#ifdef HAS_MYSQL_DLL
 	acl_pthread_once(&__mysql_once, __mysql_dll_load);
 #endif
 	conn_ = NULL;
+}
+
+void db_mysql::load(void)
+{
+#ifdef HAS_MYSQL_DLL
+	acl_pthread_once(&__mysql_once, __mysql_dll_load);
+#else
+	logger_warn("link mysql library in static way!");
+#endif
 }
 
 db_mysql::db_mysql(const char* dbaddr, const char* dbname,
@@ -417,7 +429,11 @@ db_mysql::~db_mysql()
 		acl_myfree(dbuser_);
 	if (dbpass_)
 		acl_myfree(dbpass_);
+#ifdef HAS_MYSQL_DLL
+	if (conn_ && __mysql_dll)
+#else
 	if (conn_)
+#endif
 		__mysql_close(conn_);
 }
 
@@ -460,7 +476,7 @@ static void thread_free_dummy(void* ctx)
 	if ((unsigned long) acl_pthread_self() != acl_main_thread_self())
 		acl_myfree(ctx);
 
-#if defined(ACL_CPP_DLL) || defined(HAS_MYSQL_DLL)
+#ifdef HAS_MYSQL_DLL
 	if (__mysql_thread_end)
 		__mysql_thread_end();
 #endif
@@ -475,7 +491,7 @@ static void main_free_dummy(void)
 		__main_dummy = NULL;
 	}
 
-#if defined(ACL_CPP_DLL) || defined(HAS_MYSQL_DLL)
+#ifdef HAS_MYSQL_DLL
 	if (__mysql_thread_end)
 		__mysql_thread_end();
 #endif
@@ -485,7 +501,8 @@ static acl_pthread_once_t __thread_once_control = ACL_PTHREAD_ONCE_INIT;
 
 static void thread_once(void)
 {
-	acl_assert(!acl_pthread_key_create(&__thread_key, thread_free_dummy));
+	if (acl_pthread_key_create(&__thread_key, thread_free_dummy) != 0)
+		abort();
 }
 
 bool db_mysql::dbopen(const char* charset /* = NULL */)
@@ -648,7 +665,11 @@ bool db_mysql::is_opened() const
 
 bool db_mysql::close()
 {
-	if (conn_ != NULL)
+#ifdef HAS_MYSQL_DLL
+	if (conn_ && __mysql_dll)
+#else
+	if (conn_)
+#endif
 	{
 		__mysql_close(conn_);
 		conn_ = NULL;
@@ -683,6 +704,7 @@ bool db_mysql::sane_mysql_query(const char* sql)
 	}
 	if (__mysql_query(conn_, sql) == 0)
 		return true;
+
 	logger_error("db(%s), sql(%s) error(%s)",
 		dbname_, sql, __mysql_error(conn_));
 	return false;
@@ -722,7 +744,7 @@ bool db_mysql::tbl_exists(const char* tbl_name)
 	return ret;
 }
 
-bool db_mysql::sql_select(const char* sql)
+bool db_mysql::sql_select(const char* sql, db_rows* result /* = NULL */)
 {
 	// 优先调用基类方法释放上次的查询结果
 	free_result();
@@ -749,7 +771,14 @@ bool db_mysql::sql_select(const char* sql)
 		return true;
 	}
 
-	result_ = NEW db_mysql_rows(my_res);
+	if (result != NULL)
+		mysql_rows_save(my_res, *result);
+	else
+	{
+		result_ = NEW db_rows();
+		mysql_rows_save(my_res, *result_);
+	}
+
 	return true;
 }
 
@@ -798,12 +827,28 @@ bool db_mysql::commit()
 	return true;
 }
 
+bool db_mysql::rollback()
+{
+	const char* sql = "rollback";
+	if (sql_update(sql) == false)
+	{
+		logger_error("%s error: %s", sql, get_error());
+		return false;
+	}
+	return true;
+}
+
 }  // namespace acl
 
 #else
 
 namespace acl
 {
+
+void db_mysql::load(void)
+{
+	logger_fatal("Please #define HAS_MYSQL_DLL first");
+}
 
 void db_mysql::sane_mysql_init(const char*, const char*,
 	const char*, const char*,
@@ -852,7 +897,7 @@ bool db_mysql::tbl_exists(const char*)
 	return false;
 }
 
-bool db_mysql::sql_select(const char*)
+bool db_mysql::sql_select(const char*, db_rows*)
 {
 	return false;
 }
@@ -899,4 +944,4 @@ const char* db_mysql::get_error() const
 
 } // namespace acl
 
-#endif  // HAS_MYSQL
+#endif  // !HAS_MYSQL && !HAS_MYSQL_DLL

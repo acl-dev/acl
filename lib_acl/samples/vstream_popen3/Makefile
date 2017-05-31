@@ -47,6 +47,13 @@ ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	UNIXTYPE = LINUX
 endif
 
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	SYSLIB = -lpthread-2
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
 #Path for SunOS
 ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring 86, $(UNIXNAME)), 86)
@@ -75,7 +82,7 @@ LIB_BASE_PATH = ../../../lib_acl
 LIB_NAME_PATH = -L$(LIB_BASE_PATH)/lib
 LIB_INCL_PATH = $(LIB_BASE_PATH)/include
 
-ALL_LIBS = -l_acl $(SYSLIB)
+ALL_LIBS = -lacl $(SYSLIB)
 
 BASE_PATH  = .
 INCLUDEDIR = $(BASE_PATH)

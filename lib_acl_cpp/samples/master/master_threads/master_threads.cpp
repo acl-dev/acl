@@ -2,8 +2,10 @@
 //
 
 #include "stdafx.h"
+#include "lib_acl.h"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
+#include "acl_cpp/stream/server_socket.hpp"
 #include "acl_cpp/master/master_threads.hpp"
 #include "acl_cpp/event/event_timer.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"

@@ -56,12 +56,20 @@ endif
 
 #Path for Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	CFLAGS += -DLINUX2 -pedantic
+#	CFLAGS += -DLINUX2 -pedantic
+	CFLAGS += -pedantic
 	SYSLIB += -lcrypt -rdynamic
 endif
 
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	SYSLIB = -lpthread-2
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX -rdynamic
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
 	SYSLIB = -lpthread-2
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX -rdynamic
@@ -102,7 +110,7 @@ PROTO_LIB  = $(PROTO_PATH)/lib
 
 EXTLIBS =
 CFLAGS += -I$(ACL_INC) -I$(PROTO_INC)
-LDFLAGS = -L$(ACL_LIB) -L$(PROTO_LIB) -l_protocol -l_acl $(EXTLIBS) $(SYSLIB)
+LDFLAGS = -L$(ACL_LIB) -L$(PROTO_LIB) -lprotocol -lacl $(EXTLIBS) $(SYSLIB)
 
 ###########################################################
 

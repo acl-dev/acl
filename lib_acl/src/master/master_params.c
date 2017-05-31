@@ -49,8 +49,6 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 };
 
 char *acl_var_master_inet_interfaces;
-char *acl_var_master_owner_user;
-char *acl_var_master_owner;
 char *acl_var_master_owner_group;
 char *acl_var_master_daemon_dir;
 char *acl_var_master_queue_dir;
@@ -60,8 +58,6 @@ char *acl_var_master_pid_file;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ ACL_VAR_MASTER_INET_INTERFACES, ACL_DEF_MASTER_INET_INTERFACES, &acl_var_master_inet_interfaces },
-	{ ACL_VAR_MASTER_OWNER_USER, ACL_DEF_MASTER_OWNER_USER, &acl_var_master_owner_user },
-	{ ACL_VAR_MASTER_OWNER, ACL_DEF_MASTER_OWNER, &acl_var_master_owner },
 	{ ACL_VAR_MASTER_OWNER_GROUP, ACL_DEF_MASTER_OWNER_GROUP, &acl_var_master_owner_group },
 	{ ACL_VAR_MASTER_DAEMON_DIR, ACL_DEF_MASTER_DAEMON_DIR, &acl_var_master_daemon_dir },
 	{ ACL_VAR_MASTER_QUEUE_DIR, ACL_DEF_MASTER_QUEUE_DIR, &acl_var_master_queue_dir },

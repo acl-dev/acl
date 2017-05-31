@@ -202,8 +202,8 @@ int acl_scan_dir_push(ACL_SCAN_DIR *scan, const char *path)
 		while (ptr > path && (*ptr == '/' || *ptr == '\\'))
 #else
 		while (ptr > path && *ptr == '/')
-			ptr--;
 #endif
+			ptr--;
 		len = ptr - path + 1;
 		info->path = (char*) acl_mymalloc(len + 1);
 		memcpy(info->path, path, len);

@@ -1,7 +1,7 @@
 #ifndef	__ACL_DEFINE_MACOSX_INCLUDE_H__
 #define	__ACL_DEFINE_MACOSX_INCLUDE_H__
 
-#ifdef MACOSX
+#if defined(MACOSX) || defined(__APPLE__)
 # define ACL_UNIX
 # define ACL_MACOSX
 

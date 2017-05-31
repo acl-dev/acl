@@ -23,6 +23,15 @@
 
 #include "rfc1035.h"
 
+static int __conn_timeout = 10;
+static int __rw_timeout   = 10;
+
+void acl_res_set_timeout(int conn_timeout, int rw_timeout)
+{
+	__conn_timeout = conn_timeout;
+	__rw_timeout   = rw_timeout;
+}
+
 ACL_RES *acl_res_new(const char *dns_ip, unsigned short dns_port)
 {
 	const char *myname = "acl_res_new";
@@ -39,9 +48,9 @@ ACL_RES *acl_res_new(const char *dns_ip, unsigned short dns_port)
 	ACL_SAFE_STRNCPY(res->dns_ip, dns_ip, sizeof(res->dns_ip));
 	res->dns_port = dns_port;
 
-	res->conn_timeout = 10;
-	res->rw_timeout = 10;
-	res->transfer = ACL_RES_USE_UDP;
+	res->conn_timeout = __conn_timeout;
+	res->rw_timeout   = __rw_timeout;
+	res->transfer     = ACL_RES_USE_UDP;
 
 	return (res);
 }
@@ -55,7 +64,7 @@ void acl_res_free(ACL_RES *res)
 static int udp_res_lookup(ACL_RES *res, const char *data, int dlen, char *buf, int size)
 {
 	const char *myname = "udp_res_lookup";
-	int   ret;
+	ssize_t    ret;
 	ACL_SOCKET fd;
 	struct sockaddr_in addr;
 
@@ -68,7 +77,7 @@ static int udp_res_lookup(ACL_RES *res, const char *data, int dlen, char *buf, i
 	addr.sin_port = htons(res->dns_port);
 	addr.sin_addr.s_addr = inet_addr(res->dns_ip);
 
-	ret = sendto(fd, data, dlen, 0, (struct sockaddr *) &addr, (int) sizeof(addr));
+	ret = sendto(fd, data, dlen, 0, (struct sockaddr *) &addr, (socklen_t) sizeof(addr));
 	if (ret < 0) {
 		acl_socket_close(fd);
 		res->errnum = ACL_RES_ERR_SEND;
@@ -90,7 +99,7 @@ static int udp_res_lookup(ACL_RES *res, const char *data, int dlen, char *buf, i
 		return (-1);
 	}
 
-	return (ret);
+	return (int) ret;
 }
 
 static int tcp_res_lookup(ACL_RES *res, const char *data, int dlen, char *buf, int size)
@@ -167,7 +176,7 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 	const char *myname = "acl_res_lookup";
 	ACL_DNS_DB *dns_db;
 	char  buf[1024];
-	int   ret, i;
+	ssize_t ret, i;
 	rfc1035_message *answers;
 	ACL_HOSTNAME *phost;
 	time_t  begin;
@@ -179,7 +188,7 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 	ret = rfc1035BuildAQuery(domain, buf, sizeof(buf), res->cur_qid++, NULL);
 
 	(void) time(&begin);
-	ret = res_lookup(res, buf, ret, buf, sizeof(buf));
+	ret = res_lookup(res, buf, (int) ret, buf, sizeof(buf));
 	res->tm_spent = time(NULL) - begin;
 
 	if (ret <= 0)
@@ -187,7 +196,7 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 
 	ret = rfc1035MessageUnpack(buf, ret, &answers);
 	if (ret < 0) {
-		res->errnum = ret;
+		res->errnum = (int) ret;
 		return (NULL);
 	} else if (ret == 0) {
 		rfc1035MessageDestroy(answers);

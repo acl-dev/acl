@@ -1,17 +1,22 @@
 #pragma once
 
-#ifndef ACL_CPP_API
-# ifdef ACL_CPP_DLL
-#  ifdef ACL_CPP_EXPORTS
-#   define ACL_CPP_API __declspec(dllexport)
-#  else
-#   define ACL_CPP_API __declspec(dllimport)
-#  endif
-# else
+#ifdef ACL_CPP_LIB
+# ifndef ACL_CPP_API
 #  define ACL_CPP_API
 # endif
+#elif defined(ACL_CPP_DLL) || defined(_WINDLL)
+# if defined(ACL_CPP_EXPORTS) || defined(acl_cpp_EXPORTS)
+#  ifndef ACL_CPP_API
+#   define ACL_CPP_API __declspec(dllexport)
+#  endif
+# elif !defined(ACL_CPP_API)
+#  define ACL_CPP_API __declspec(dllimport)
+# endif
+#elif !defined(ACL_CPP_API)
+# define ACL_CPP_API
 #endif
 
+/*
 #ifndef ACL_CPP_TPL
 # ifdef ACL_CPP_DLL
 #  ifdef ACL_CPP_EXPORTS
@@ -23,6 +28,7 @@
 #  define ACL_CPP_TPL
 # endif
 #endif
+*/
 
 #include <stdlib.h>
 #include <stdio.h>

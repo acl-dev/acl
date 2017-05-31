@@ -1,4 +1,7 @@
 #include "acl_stdafx.hpp"
+#ifdef ACL_WINDOWS
+#include <io.h>
+#endif
 #include "sqlite3.h"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/charset_conv.hpp"
@@ -8,15 +11,11 @@
 
 #if defined(HAS_SQLITE) || defined(HAS_SQLITE_DLL)
 
-#if defined(ACL_WINDOWS) || defined(HAS_SQLITE_DLL)
+# ifdef HAS_SQLITE_DLL
 
-#ifndef STDCALL
-# ifdef ACL_WINDOWS
-#  define STDCALL __stdcall
-# else
-#  define STDCALL
-# endif // ACL_WINDOWS
-#endif // STDCALL
+#  ifndef STDCALL
+#   define STDCALL
+#  endif // STDCALL
 
  typedef char* (STDCALL *sqlite3_libversion_fn)(void);
  typedef int   (STDCALL *sqlite3_open_fn)(const char*, sqlite3**);
@@ -147,18 +146,18 @@
 	logger("%s loaded", path);
 	atexit(__sqlite_dll_unload);
  }
-#else
-# define __sqlite3_libversion sqlite3_libversion
-# define __sqlite3_open sqlite3_open
-# define __sqlite3_close sqlite3_close
-# define __sqlite3_get_table sqlite3_get_table
-# define __sqlite3_free_table sqlite3_free_table
-# define __sqlite3_busy_handler sqlite3_busy_handler
-# define __sqlite3_errmsg sqlite3_errmsg
-# define __sqlite3_errcode sqlite3_errcode
-# define __sqlite3_changes sqlite3_changes
-# define __sqlite3_total_changes sqlite3_total_changes
-#endif
+# else
+#  define __sqlite3_libversion sqlite3_libversion
+#  define __sqlite3_open sqlite3_open
+#  define __sqlite3_close sqlite3_close
+#  define __sqlite3_get_table sqlite3_get_table
+#  define __sqlite3_free_table sqlite3_free_table
+#  define __sqlite3_busy_handler sqlite3_busy_handler
+#  define __sqlite3_errmsg sqlite3_errmsg
+#  define __sqlite3_errcode sqlite3_errcode
+#  define __sqlite3_changes sqlite3_changes
+#  define __sqlite3_total_changes sqlite3_total_changes
+# endif // HAS_SQLITE && !HAS_SQLITE_DLL
 
 namespace acl
 {
@@ -166,44 +165,44 @@ namespace acl
 //////////////////////////////////////////////////////////////////////////
 // sqlite 的记录行类型定义
 
-class db_sqlite_rows : public db_rows
+static void sqlite_rows_free(void* ctx)
 {
-public:
-	db_sqlite_rows(char** results, int nrow, int ncolumn)
+	char** results = (char**) ctx;
+#ifdef HAS_SQLITE_DLL
+	if (__sqlite_dll && results)
+#else
+	if (results)
+#endif
+		__sqlite3_free_table(results);
+}
+
+
+static void sqlite_rows_save(char** results, int nrow,
+	int ncolumn, db_rows& result)
+{
+	int   n = 0;
+
+	// 取出变量名
+	for (int j = 0; j < ncolumn; j++)
 	{
-		results_ = results;
+		result.names_.push_back(results[j]);
+		n++;
+	}
 
-		int   n = 0;
-
-		// 取出变量名
+	// 开始取出所有行数据结果，加入动态数组中
+	for (int i = 0; i < nrow; i++)
+	{
+		db_row* row = NEW db_row(result.names_);
 		for (int j = 0; j < ncolumn; j++)
 		{
-			names_.push_back(results[j]);
+			row->push_back(results[n]);
 			n++;
 		}
-
-		// 开始取出所有行数据结果，加入动态数组中
-		for (int i = 0; i < nrow; i++)
-		{
-			db_row* row = NEW db_row(names_);
-			for (int j = 0; j < ncolumn; j++)
-			{
-				row->push_back(results[n]);
-				n++;
-			}
-			rows_.push_back(row);
-		}
+		result.rows_.push_back(row);
 	}
-
-	~db_sqlite_rows()
-	{
-		if (results_)
-			__sqlite3_free_table(results_);
-	}
-
-private:
-	char** results_;
-};
+	result.result_tmp_ = results;
+	result.result_free = sqlite_rows_free;
+}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -220,7 +219,7 @@ db_sqlite::db_sqlite(const char* dbfile, const char* charset /* ="utf-8" */)
 		conv_ = NULL;
 
 	acl_assert(dbfile && *dbfile);
-#if defined(ACL_CPP_DLL) || defined(HAS_SQLITE_DLL)
+#ifdef HAS_SQLITE_DLL
 	acl_pthread_once(&__sqlite_once, __sqlite_dll_load);
 #endif
 }
@@ -264,6 +263,7 @@ const char* db_sqlite::get_error() const
 	else
 		return "sqlite not opened yet!";
 }
+
 bool db_sqlite::dbopen(const char* charset /* = NULL */)
 {
 	// 如果数据库已经打开，则直接返回 true
@@ -290,6 +290,22 @@ bool db_sqlite::dbopen(const char* charset /* = NULL */)
 	}
 	else
 		ptr = buf.c_str();
+
+	string path;
+	string& dir = path.dirname(dbfile_);
+
+#ifdef ACL_WINDOWS
+	if (!dir.empty() && dir != "." &&
+		_access(dir.c_str(), 6) == -1 && errno == ENOENT)
+#else
+	if (!dir.empty() && dir != "." &&
+		access(dir.c_str(), R_OK | W_OK | X_OK) == -1 && errno == ENOENT)
+#endif
+	{
+		if (acl_make_dirs(dir.c_str(), 0755) == -1)
+			logger_error("make dirs error %s, dir: %s",
+				last_serror(), dir.c_str());
+	}
 
 	// 打开 sqlite 数据库
 	int   ret = __sqlite3_open(ptr, &db_);
@@ -458,9 +474,9 @@ bool db_sqlite::tbl_exists(const char* tbl_name)
 	}
 }
 
-bool db_sqlite::sql_select(const char* sql)
+bool db_sqlite::sql_select(const char* sql, db_rows* result /* = NULL */)
 {
-	return exec_sql(sql);
+	return exec_sql(sql, result);
 }
 
 bool db_sqlite::sql_update(const char* sql)
@@ -468,7 +484,7 @@ bool db_sqlite::sql_update(const char* sql)
 	return exec_sql(sql);
 }
 
-bool db_sqlite::exec_sql(const char* sql)
+bool db_sqlite::exec_sql(const char* sql, db_rows* result /* = NULL */)
 {
 	// 必须将上次的查询结果删除
 	free_result();
@@ -485,7 +501,7 @@ bool db_sqlite::exec_sql(const char* sql)
 	}
 
 	char** results = NULL, *err;
-	int   nrow, ncolumn;
+	int    nrow, ncolumn;
 
 	// 执行 sqlite 的查询过程
 	int   ret = __sqlite3_get_table(db_, sql, &results,
@@ -499,12 +515,21 @@ bool db_sqlite::exec_sql(const char* sql)
 	}
 
 	if (nrow > 0)
-		result_ = NEW db_sqlite_rows(results, nrow, ncolumn);
+	{
+		if (result != NULL)
+			sqlite_rows_save(results, nrow, ncolumn, *result);
+		else
+		{
+			result_ = NEW db_rows();
+			sqlite_rows_save(results, nrow, ncolumn, *result_);
+		}
+	}
 	else if (results)
 	{
 		result_ = NULL;
 		__sqlite3_free_table(results);
 	}
+
 	return true;
 }
 
@@ -543,7 +568,7 @@ bool db_sqlite::dbopen(const char*) { return false; }
 bool db_sqlite::is_opened() const { return false; }
 bool db_sqlite::close(void) { return false; }
 bool db_sqlite::tbl_exists(const char*) { return false; }
-bool db_sqlite::sql_select(const char*) { return false; }
+bool db_sqlite::sql_select(const char*, db_rows*) { return false; }
 bool db_sqlite::sql_update(const char*) { return false; }
 int db_sqlite::affect_count() const { return 0; }
 int db_sqlite::get_errno() const { return -1; }
@@ -551,4 +576,4 @@ const char* db_sqlite::get_error() const { return "unknown"; }
 
 }  // namespace acl
 
-#endif  // HAS_SQLITE
+#endif  // !HAS_SQLITE && !HAS_SQLITE_DLL

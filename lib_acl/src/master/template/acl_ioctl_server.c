@@ -149,10 +149,12 @@ static unsigned ioctl_server_generation;
 
 static void ioctl_init(void)
 {
-	acl_assert(pthread_mutex_init(&__closing_time_mutex, NULL) == 0);
-	acl_assert(pthread_mutex_init(&__counter_mutex, NULL) == 0);
-	__last_closing_time = time(NULL);
+	if (pthread_mutex_init(&__closing_time_mutex, NULL) != 0)
+		abort();
+	if (pthread_mutex_init(&__counter_mutex, NULL) != 0)
+		abort();
 
+	__last_closing_time = time(NULL);
 	__use_limit_delay = acl_var_ioctl_delay_sec > 1 ?
 				acl_var_ioctl_delay_sec : 1;
 }
@@ -614,7 +616,11 @@ static void ioctl_server_accept_sock(int event_type, ACL_IOCTL *h_ioctl,
 		}
 
 	        /* 如果为 TCP 套接口，则设置 nodelay 选项以避免发送延迟现象 */
+#ifdef AF_INET6
+		if (sock_type == AF_INET || sock_type == AF_INET6)
+#else
 		if (sock_type == AF_INET)
+#endif
 			acl_tcp_set_nodelay(fd);
 		if (acl_getsockname(fd, local, sizeof(local)) < 0)
 			memset(local, 0, sizeof(local));
@@ -1078,6 +1084,6 @@ void acl_ioctl_server_main(int argc, char **argv, ACL_IOCTL_SERVER_FN service, .
 		sleep(1);
 
 	/* not reached here */
-	ioctl_server_exit();
+	/* ioctl_server_exit(); */
 }
 #endif /* ACL_UNIX */

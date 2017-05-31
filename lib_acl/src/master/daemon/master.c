@@ -127,7 +127,7 @@ int     main(int argc, char **argv)
 	 */
 	for (fd = 1; fd < 3; fd++) {
 		(void) close(fd);
-		if (open("/dev/null", O_RDWR, 0) != fd)
+		if (open("/dev/null", (int) O_RDWR, 0) != fd)
 			acl_msg_fatal("open /dev/null: %s", acl_last_serror());
 	}
 

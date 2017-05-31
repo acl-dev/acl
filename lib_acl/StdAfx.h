@@ -40,6 +40,7 @@ int acl_secure_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
 #  include <pthread.h>
 #  include <dlfcn.h>
 #  include <dirent.h>
+#  include <fcntl.h>
 #  include <netinet/in.h>
 #  include <netinet/ip.h>
 #  include <netinet/tcp.h>
@@ -58,6 +59,14 @@ int acl_secure_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
 # endif  /* ACL_UNIX */
 
 # include "lib_acl.h"
+
+#if defined (_WIN32) || defined(_WIN64)
+/* for vc2003 */
+# if _MSC_VER <= 1310
+int inet_pton(int af, const char *src, void *dst);
+const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
+# endif
+#endif
 
 #endif /* ACL_PREPARE_COMPILE */
 

@@ -30,7 +30,7 @@ ACL_SOCKET acl_unix_connect(const char *addr, int block_mode, int timeout)
 {
 #undef sun
 	struct sockaddr_un sun;
-	int     len = strlen(addr);
+	int     len = (int) strlen(addr);
 	ACL_SOCKET  sock;
 
 	/*

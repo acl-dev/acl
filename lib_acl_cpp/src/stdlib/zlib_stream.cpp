@@ -1,6 +1,6 @@
 #include "acl_stdafx.hpp"
+#include <zlib.h>
 #ifndef ACL_PREPARE_COMPILE
-#include "zlib.h"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/zlib_stream.hpp"
@@ -452,7 +452,7 @@ bool zlib_stream::zip_reset()
 
 unsigned zlib_stream::crc32_update(unsigned n, const void* buf, size_t dlen)
 {
-	return __crc32(n, (const Bytef*) buf, (unsigned) dlen);
+	return (unsigned) __crc32(n, (const Bytef*) buf, (unsigned) dlen);
 }
 
 bool zlib_stream::unzip_begin(bool have_zlib_header /* = true */,

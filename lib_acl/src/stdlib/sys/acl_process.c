@@ -105,7 +105,7 @@ const char *acl_process_path()
 {
 	const char *myname = "acl_process_path";
 	char *buf_ptr = get_tls_buf();
-	int   ret;
+	ssize_t   ret;
 
 	ret = readlink("/proc/curproc/file", buf_ptr, BUF_SIZE);
 	if (ret < 0) {

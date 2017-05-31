@@ -1,7 +1,7 @@
 #ifndef	ACL_DEFINE_BSD_INCLUDE_H
 #define	ACL_DEFINE_BSD_INCLUDE_H
 
-#ifdef FREEBSD
+#if defined(FREEBSD) || defined(__FreeBSD__)
 # define ACL_UNIX
 # define ACL_FREEBSD
 

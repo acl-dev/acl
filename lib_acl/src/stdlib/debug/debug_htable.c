@@ -56,7 +56,7 @@ static unsigned __def_hash_fn(const void *buffer, size_t len)
                 }
         }
 
-        return (h);
+        return (unsigned) h;
 }
 /* debug_htable_link - insert element into table */
 

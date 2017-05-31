@@ -40,7 +40,11 @@
 
 # include <assert.h>
 # include <sys/types.h>
-
+# ifndef _GNU_SOURCE
+#  define _GNU_SOURCE
+#  include <netdb.h>
+#  undef _GNU_SOURCE
+# endif
 # ifndef acl_assert
 #  define acl_assert assert
 # endif

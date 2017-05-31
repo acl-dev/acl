@@ -157,7 +157,7 @@ static void trigger_server_timeout(int type acl_unused,
 static void trigger_server_wakeup(ACL_EVENT *event, int fd)
 {
 	char    buf[ACL_TRIGGER_BUF_SIZE];
-	int     len;
+	ssize_t len;
 
 	/*
 	 * Commit suicide when the master process disconnected from us.
@@ -171,7 +171,7 @@ static void trigger_server_wakeup(ACL_EVENT *event, int fd)
 	if (trigger_server_in_flow_delay && acl_master_flow_get(1) < 0)
 		acl_doze(acl_var_trigger_in_flow_delay * 1000);
 	if ((len = read(fd, buf, sizeof(buf))) >= 0)
-		__service_main(buf, len, __service_ctx, __service_argv);
+		__service_main(buf, (int) len, __service_ctx, __service_argv);
 
 	if (acl_master_notify(acl_var_trigger_pid, trigger_server_generation,
 		ACL_MASTER_STAT_AVAIL) < 0)
@@ -414,7 +414,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	ACL_MASTER_SERVER_LOOP_FN loop = 0;
 	int     key;
 	char    buf[ACL_TRIGGER_BUF_SIZE];
-	int     len;
+	ssize_t len;
 	char   *transport = 0;
 	char   *lock_path;
 	ACL_VSTRING *why;
@@ -667,7 +667,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 		len = read(ACL_VSTREAM_SOCK(stream), buf, sizeof(buf));
 		if (len <= 0)
 			acl_msg_fatal("read: %s", acl_last_serror());
-		service(buf, len, __service_name, __service_argv);
+		service(buf, (int) len, __service_name, __service_argv);
 		trigger_server_exit();
 	}
 

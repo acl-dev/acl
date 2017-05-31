@@ -1,5 +1,60 @@
 修改历史列表：
 
+------------------------------------------------------------------------
+587) 2017.5.25
+587.1) bugfix: acl_pthread.c 中 acl_pthread_setspecific 存在 bug
+
+586) 2017.5.24
+586.1) performance: acl_udp_server.c 优化处理性能
+
+585) 2017.5.22
+585.1) feature: acl_master 服务器框架支持在 fork 子进程后, execvp 应用程序前
+切换子进程运行身份，此功能将帮助使用 go 语言编写的应用服务切换运行身份。
+Linux 平台下，使用 go 语言编写的程序如果在启动时如果为 root 身份，则因为 go
+预启动了几个后台线程以及 setuid 在 Linux 平台下仅切换当前线程的运行环境，则
+会导致其它线程无法切换运行身份的问题，go 作者说这是 Linux 系统的问题 :)
+
+584) 2017.5.3
+584.1) bugfix: acl_mylog.c/private_stream.c 中的内存存在非法释放
+
+583) 2017.4.23
+583.1) feature: add inet_ntop/inet_pton for vc2003
+
+------------------------------------------------------------------------
+
+582) 2017.4.17
+582.1) bugfix: acl_pthread_cond.c 中在 windows 平台下当释放线程锁时会造成
+内存重复释放的问题，主要还是 acl_pthread_mutex_create 的函数设计不合理所致，
+故去掉了 acl_pthread_mutex_create 以免引起误用
+
+581) 2017.4.13
+581.1) bugfix: rfc1035.c 中的函数 rfc1035MessageUnpack 存在内存泄露
+
+580) 2017.4.11
+580.1) feature: 所有网络模块均支持 IPV6
+
+579) 2017.4.7
+579.1) feature: 网络监听及网络连接模块支持 IPV6
+
+578) 2017.4.5
+578.1) bugfix: acl_atomic.c/acl_mbox.c/acl_pthread_mutext.c 存在内存泄露问题
+
+577) 2017.3.30
+577.1) feature: json 类对象在创建 json 字符串时默认不自动添加空格，但允许调用者
+设置参数以便于自动添加空格从而使 json 字符串更可读
+
+576) 2017.3.11
+576.1) bugfix: acl_scan_dir.c 中函数 acl_scan_dir_push 在 windows 下存在问题，
+会造成死循环
+
+575) 2017.1.31
+575.1) compile: 在 Linux/Android 平台下编译时，由头文件自动识别操作系统类型，
+无需在 Makefile 文件中专门指定
+
+574) 2017.1.28--1.29
+574.1) bugfix: acl_dbuf_pool.c 支持 ARM LINUX，内部在分配内存片时，应该是 4
+字节对齐
+
 573) 2016.12.29
 573.1) bugfix: acl_slice.c 中修复了 SLICE1 方式分配内存的一处 BUG
 

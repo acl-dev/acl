@@ -70,8 +70,10 @@ extern "C" {
  * @param _ptr_ {void*} ¶¯Ì¬ÄÚ´æµØÖ·
  */
 #define acl_myfree(_ptr_) do {  \
-	acl_free_glue(__FILE__, __LINE__, (_ptr_));  \
-	(_ptr_) = NULL;  \
+	if (_ptr_) {  \
+		acl_free_glue(__FILE__, __LINE__, (_ptr_));  \
+		(_ptr_) = NULL;  \
+	}  \
 } while (0)
 
 /**
@@ -84,4 +86,3 @@ extern "C" {
 #endif
 
 #endif
-

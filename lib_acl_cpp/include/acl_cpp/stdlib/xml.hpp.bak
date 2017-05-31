@@ -14,8 +14,8 @@ struct ACL_ITER;
 /**
  * ¶Ô ACL ¿âÖĞ XML ½âÎö¿âµÄ·â×°£¬·½±ã C++ ÓÃ»§Ê¹ÓÃ£¬Èç¹û²»Ì«×¢ÖØĞÔÄÜÒòËØ£¬
  * ¿ÉÒÔÖ±½ÓÊ¹ÓÃ¸ÃÀà£¬Èç¹ûÔÚ·şÎñ¶ËÖ´ĞĞÇÒ·Ç³£×¢ÖØĞÔÄÜ£¬½¨ÒéÖ±½ÓÊ¹ÓÃ ACL ¿âµÄ
- * XML ½âÎöÆ÷£¬ÒòÎª¸ÃÀàÒ²ÊÇµ÷ÓÃÁË ACL ¿âÖĞµÄ XML ½âÎö¹ı³Ì£¬²¢ÇÒÓĞ¶ş´Î¿½±´
- * ¹ı³Ì£¬¿ÉÄÜ»áÉÔÎ¢Ó°ÏìÒ»Ğ©ĞÔÄÜ£¬µ«¶ÔÓÚÒ»°ãµÄÓ¦ÓÃÕâµãÓ°ÏìÊÇÎ¢²»×ãµÀµÄ
+ * XML ½âÎöÆ÷£¬ÒòÎª¸ÃÀàÒ²ÊÇµ÷ÓÃÁË ACL ¿âÖ§ÖÄ XML ½âÎö¹ı³Ì£¬²¢ÇÒÓ§Øş´¦Ï½±´
+ * ¹ı³Ì£¬¿ÉÄÜ»áÉÔÎ¢Ó°ÏìÒ»§»ĞÔÄÜ£¬µ«¶ÔÓÚÒ»°ãµÄÓ¦ÓÃÕâµãÓ°ÏìÊÇÎ¢²»×ãµÀµÄ
  */
 
 namespace acl {
@@ -29,14 +29,14 @@ public:
 	/**
 	 * »ñµÃÊôĞÔÃû
 	 * @return {const char*} ÊôĞÔÃû£¬ÓÀÔ¶²»»á·µ»Ø¿ÕÖ¸Õë£¬·µ»ØÖµ
-	 *  ÓĞ¿ÉÄÜÎª "\0"
+	 *  Ó§áÉÄÜÎª "\0"
 	 */
 	virtual const char* get_name(void) const;
 
 	/**
 	 * »ñµÃÊôĞÔÖµ
 	 * @return {const char*} ÊôĞÔÖµ£¬ÓÀÔ¶²»»á·µ»Ø¿ÕÖ¸Õë£¬·µ»ØÖµ
-	 *  ÓĞ¿ÉÄÜÎª "\0"
+	 *  Ó§áÉÄÜÎª "\0"
 	 */
 	virtual const char* get_value(void) const;
 
@@ -58,7 +58,7 @@ public:
 	/**
 	 * È¡µÃ±¾ XML ½ÚµãµÄ±êÇ©Ãû
 	 * @return {const char*} ·µ»Ø XML ½Úµã±êÇ©Ãû£¬Èç¹û·µ»Ø¿Õ£¬ÔòËµÃ÷
-	 *  ²»´æÔÚ±êÇ© xxxx£¬ÒÔ·ÀÍòÒ»£¬µ÷ÓÃÕßĞèÒªÅĞ¶Ï·µ»ØÖµ
+	 *  ²»´æÔÚ±êÇ© xxxx£¬ÒÔ·ÀÍòÒ»£¬µ÷ÓÃÕßĞèÒªÅ§ØÏ·µ»ØÖµ
 	 */
 	virtual const char* tag_name(void) const;
 
@@ -82,7 +82,7 @@ public:
 	virtual const char* attr_value(const char* name) const;
 
 	/**
-	 * ·µ»Ø¸Ã XML ½ÚµãµÄÄ³¸öÊôĞÔÖµµÄ±ã½İĞ´·¨
+	 * ·µ»Ø¸Ã XML ½ÚµãµÄÄ³¸öÊôĞÔÖµµÄ±ã½İ§Õ·¨
 	 * @param name {const char*} ÊôĞÔÃû
 	 * @return {const char*} ÊôĞÔÖµ£¬Èç¹û·µ»Ø¿ÕÔòËµÃ÷¸ÃÊôĞÔ²»´æÔÚ
 	 */
@@ -155,7 +155,7 @@ public:
 
 	/**
 	 * ÉèÖÃ xml ½ÚµãµÄÎÄ±¾ÄÚÈİ
-	 * @param number {long long int} 64 Î»ÕûÊı
+	 * @param number {long long int} 64 ¦ËÕûÊı
 	 * @return {xml_node&}
 	 */
 #if defined(_WIN32) || defined(_WIN64)
@@ -196,7 +196,7 @@ public:
 	/**
 	 * ¸ø±¾ xml ½ÚµãÌí¼Ó xml_node ×Ó½Úµã¶ÔÏó
 	 * @param tag {const char* tag} ×Ó½Úµã¶ÔÏóµÄ±êÇ©Ãû
-	 * @param number {long long int} 64 Î»ÕûÊı
+	 * @param number {long long int} 64 ¦ËÕûÊı
 	 * @param return_child {bool} ÊÇ·ñĞèÒª±¾º¯Êı·µ»ØĞÂ´´½¨µÄ×Ó½ÚµãµÄÒıÓÃ
 	 * @return {xml_node&} return_child Îª true ·µ»Ø×Ó½ÚµãµÄÒıÓÃ£¬
 	 *  ·ñÔò·µ»Ø±¾ xml ½ÚµãÒıÓÃ
@@ -228,7 +228,7 @@ public:
 	virtual xml_node* next_child(void);
 
 	/**
-	 * ·µ»Ø¸Ã XML ½ÚµãÔÚÕû¸ö XML Ê÷ÖĞµÄÉî¶È
+	 * ·µ»Ø¸Ã XML ½ÚµãÔÚÕû¸ö XML Ê÷Ö§ÖÄÉî¶È
 	 * @return {int}
 	 */
 	virtual int depth(void) const;
@@ -240,8 +240,8 @@ public:
 	virtual int children_count(void) const;
 
 	/**
-	 * µ±ÔÚ±éÀú¸Ã xml ½ÚµãÊ±£¬ÄÚ²¿»á¶¯Ì¬²úÉúÒ»Ğ©ÁÙÊ± xml_node ¶ÔÏó£¬µ÷ÓÃ
-	 * ´Ëº¯Êı¿ÉÒÔÇå¿ÕÕâĞ©¶ÔÏó£¬Ò»µ©µ÷ÓÃ´Ëº¯Êı½øĞĞÁËÇå³ı£¬ÔòÓÉ
+	 * µ±ÔÚ±éÀú¸Ã xml ½ÚµãÊ±£¬ÄÚ²¿»á¶¯Ì¬²úÉúÒ»§»ÁÙÊ± xml_node ¶ÔÏó£¬µ÷ÓÃ
+	 * ´Ëº¯Êı¿ÉÒÔÇå¿ÕÕâ§»¶ÔÏó£¬Ò»µ©µ÷ÓÃ´Ëº¯Êı½øĞĞÁËÇå³ı£¬ÔòÓÉ
 	 * first_child/next_child ·µ»ØµÄ xml_node ½Úµã¶ÔÏó½«²»ÔÙ¿ÉÓÃ£¬·ñÔò»á
 	 * ²úÉúÄÚ´æ·Ç·¨·ÃÎÊ
 	 */
@@ -255,7 +255,7 @@ public:
 
 public:
 	/**
-	 * È¡³ö¶ÔÓ¦ÓÚ ACL ¿âÖĞµÄ XML ½Úµã¶ÔÏó
+	 * È¡³ö¶ÔÓ¦ÓÚ ACL ¿âÖ§ÖÄ XML ½Úµã¶ÔÏó
 	 * @return {ACL_XML_NODE*} ·µ»Ø½Úµã¶ÔÏó£¬×¢£º¸Ã½ÚµãÓÃ»§²»ÄÜµ¥¶ÀÊÍ·Å
 	 */
 	ACL_XML_NODE* get_xml_node(void) const;
@@ -302,8 +302,8 @@ public:
 	 * ¹¹Ôìº¯Êı
 	 * @param data {const char*} xml ¸ñÊ½µÄ×Ö·û´®£¬¿ÉÒÔÊÇÍêÕûµÄ
 	 *  xml ×Ö·û´®£¬Ò²¿ÉÒÔÊÇ²¿·ÖµÄ xml ×Ö·û´®£¬Ò²¿ÉÒÔÊÇ¿ÕÖ¸Õë£¬
-	 *  ÎŞÂÛÈçºÎ£¬ÓÃ»§ÒÀÈ»¿ÉÒÔÓÃ²¿·Ö»òÍêÕûµÄ xml ×Ö·û´®µ÷ÓÃ update
-	 *  º¯Êı£¬ÔÚµ÷ÓÃ update ¹ı³ÌÖĞ½âÎö xml£»ÆäÊµ£¬µ±¹¹Ôìº¯ÊıµÄ
+	 *  ÎŞÂÛÈçº¦²¬ÓÃ»§ÒÀÈ»¿ÉÒÔÓ¨°¿·Ö»òÍêÕûµÄ xml ×Ö·û´®µ÷ÓÃ update
+	 *  º¯Êı£¬ÔÚµ÷ÓÃ update ¹ı³ÌÖ§ßâÎö xml£»ÆäÊµ£¬µ±¹¹Ôìº¯ÊıµÄ
 	 *  µÄ data ²ÎÊı·Ç¿ÕÊ±£¬ËüÒ²»áµ÷ÓÃ update
 	 * @param subclass {bool} ÊÇ·ñÎª×ÓÀàÊµÀı£¬¼´Èç¹û¸ÃÀàÊµÏÖÊÇÓÉ
 	 *  ×ÓÀà¹¹Ôì£¬ÔòĞèÒªÌî true£¬·ñÔò¸Ã xml ½âÎöÆ÷Ö±½ÓÓÉ±¾Àà¹¹Ôì
@@ -329,94 +329,94 @@ public:
 	 * ÒÔÁ÷Ê½·½Ê½Ñ­»·µ÷ÓÃ±¾º¯ÊıÌí¼Ó XML Êı¾İ£¬Ò²¿ÉÒÔÒ»´ÎĞÔÌí¼Ó
 	 * ÍêÕûµÄ XML Êı¾İ£¬Èç¹ûÊÇÖØ¸´Ê¹ÓÃ¸Ã XML ½âÎöÆ÷½âÎö¶à¸ö XML
 	 * ¶ÔÏó£¬ÔòÓ¦¸ÃÔÚ½âÎöÏÂÒ»¸ö XML ¶ÔÏóÇ°µ÷ÓÃ reset() ·½·¨À´Çå
-	 * ³ıÉÏÒ»´ÎµÄ½âÎö½á¹û
+	 * ³ıÉÏÒ»´¦ÅÄ½âÎö½á¹û
 	 * @param data {const char*} xml Êı¾İ
 	 */
 	virtual void update(const char* data);
 
 	/**
 	 * ÖØÖÃ XML ½âÎöÆ÷×´Ì¬£¬¸Ã XML ¶ÔÏó¿ÉÒÔÓÃÀ´¶Ô¶à¸ö XML Êı¾İ
-	 * ½øĞĞ½âÎö£¬ÔÚ·´¸´Ê¹ÓÃ±¾ XML ½âÎöÆ÷Ç°£¬ĞèÒªµ÷ÓÃ±¾º¯ÊıÖØÖÃ
-	 * ÄÚ²¿ XML ½âÎöÆ÷×´Ì¬£¬Çå³ıÉÏÒ»´ÎµÄ½âÎö½á¹û
+	 * ½øĞ§ßâÎö£¬ÔÚ·´¸´Ê¹ÓÃ±¾ XML ½âÎöÆ÷Ç°£¬ĞèÒªµ÷ÓÃ±¾º¯ÊıÖØÖÃ
+	 * ÄÚ²¿ XML ½âÎöÆ÷×´Ì¬£¬Çå³ıÉÏÒ»´¦ÅÄ½âÎö½á¹û
 	 */
 	virtual void reset(void);
 
 	/**
-	 * ´Ó½âÎöµÄ XML Ô­Ê¼Êı¾İÖĞ½öÌáÈ¡ÎÄ±¾²¿·Ö
+	 * ´Ó½âÎöµÄ XML Ô­Ê¼Êı¾İÖ§ßöÌáÈ¡ÎÄ±¾²¿·Ö
 	 * @return {const string&} ·µ»Ø½á¹û»º³åÇøµÄÒıÓÃ£¬¸ÃÒıÓÃÊÇÄÚ
 	 *  ²¿±äÁ¿£¬ÓÃ»§²»ĞèÒªÊÍ·Å
 	 */
 	virtual const string& getText(void);
 
 	/**
-	 * ´Ó XML ¶ÔÏóÖĞÈ¡µÃÄ³¸ö±êÇ©ÃûµÄËùÓĞ½Úµã¼¯ºÏ
-	 * @param tag {const char*} ±êÇ©Ãû(²»Çø·Ö´óĞ¡Ğ´)
+	 * ´Ó XML ¶ÔÏóÖĞÈ¡µÃÄ³¸ö±êÇ©ÃûµÄËùÓ§ßÚµã¼¯ºÏ
+	 * @param tag {const char*} ±êÇ©Ãû(²»Çø·Ö´ó§³§Õ)
 	 * @return {const std::vector<xml_node*>&} ·µ»Ø½á¹û¼¯µÄ¶ÔÏóÒıÓÃ£¬
-	 *  Èç¹û²éÑ¯½á¹ûÎª¿Õ£¬Ôò¸Ã¼¯ºÏÎª¿Õ£¬¼´£ºempty() == true
-	 *  ×¢£º·µ»ØµÄÊı×éÖĞµÄ xml_node ½ÚµãÊı¾İ¿ÉÒÔĞŞ¸Ä£¬µ«²»ÄÜÉ¾³ı¸Ã½Úµã£¬
+	 *  Èç¹û²éÑ¯½á¹ûÎª¿Õ£¬Ôò¸¨¹¯ºÏÎª¿Õ£¬¼´£ºempty() == true
+	 *  ×¢£º·µ»ØµÄÊı×éÖ§ÖÄ xml_node ½ÚµãÊı¾İ¿ÉÒÔĞŞ¸Ä£¬µ«²»ÄÜÉ¾³ı¸Ã½Úµã£¬
 	 *  ÒòÎª¸Ã¿âÄÚ²¿ÓĞ×Ô¶¯É¾³ıµÄ»úÖÆ
 	 */
 	virtual const std::vector<xml_node*>&
 		getElementsByTagName(const char* tag) const;
 
 	/**
-	 * ´Ó xml ¶ÔÏóÖĞ»ñµÃ¶ÔÓ¦±êÇ©ÃûµÄµÚÒ»¸ö xml ½Úµã¶ÔÏó
-	 * @param tag {const char*} ±êÇ©Ãû(²»Çø·Ö´óĞ¡Ğ´)
+	 * ´Ó xml ¶ÔÏóÖ§İñµÃ¶ÔÓ¦±êÇ©ÃûµÄµÚÒ»¸ö xml ½Úµã¶ÔÏó
+	 * @param tag {const char*} ±êÇ©Ãû(²»Çø·Ö´ó§³§Õ)
 	 * @return {const xml_node*} ·µ»Ø¿Õ±íÃ÷¸Ã±êÇ©¶ÔÓ¦µÄ xml ½Úµã²»´æÔÚ
 	 */
 	virtual const xml_node* getFirstElementByTag(const char* tag) const;
 
 	/**
-	 * ´Ó xml ¶ÔÏóÖĞ»ñµÃËùÓĞµÄÓë¸ø¶¨¶à¼¶±êÇ©ÃûÏàÍ¬µÄ xml ½ÚµãµÄ¼¯ºÏ
+	 * ´Ó xml ¶ÔÏóÖ§İñµÃËùÓ§ÖÄÓë¸ø¶¨¶à¼¶±êÇ©ÃûÏàÍ¬µÄ xml ½ÚµãµÄ¼¯ºÏ
 	 * @param tags {const char*} ¶à¼¶±êÇ©Ãû£¬ÓÉ '/' ·Ö¸ô¸÷¼¶±êÇ©Ãû£¬ÈçÕë¶Ô xml Êı¾İ£º
 	 *  <root> <first> <second> <third name="test1"> text1 </third> </second> </first> ...
 	 *  <root> <first> <second> <third name="test2"> text2 </third> </second> </first> ...
 	 *  <root> <first> <second> <third name="test3"> text3 </third> </second> </first> ...
-	 *  ¿ÉÒÔÍ¨¹ı¶à¼¶±êÇ©Ãû£ºroot/first/second/third Ò»´ÎĞÔ²é³öËùÓĞ·ûºÏÌõ¼şµÄ½Úµã
+	 *  ¿ÉÒÔÍ¨¹ı¶à¼¶±êÇ©Ãû£ºroot/first/second/third Ò»´ÎĞÔ²é³öËùÓ§ÙûºÏÌõ¼şµÄ½Úµã
 	 * @return {const std::vector<xml_node*>&} ·ûºÏÌõ¼şµÄ xml ½Úµã¼¯ºÏ, 
-	 *  Èç¹û²éÑ¯½á¹ûÎª¿Õ£¬Ôò¸Ã¼¯ºÏÎª¿Õ£¬¼´£ºempty() == true
-	 *  ×¢£º·µ»ØµÄÊı×éÖĞµÄ xml_node ½ÚµãÊı¾İ¿ÉÒÔĞŞ¸Ä£¬µ«²»ÄÜÉ¾³ı¸Ã½Úµã£¬
+	 *  Èç¹û²éÑ¯½á¹ûÎª¿Õ£¬Ôò¸¨¹¯ºÏÎª¿Õ£¬¼´£ºempty() == true
+	 *  ×¢£º·µ»ØµÄÊı×éÖ§ÖÄ xml_node ½ÚµãÊı¾İ¿ÉÒÔĞŞ¸Ä£¬µ«²»ÄÜÉ¾³ı¸Ã½Úµã£¬
 	 *  ÒòÎª¸Ã¿âÄÚ²¿ÓĞ×Ô¶¯É¾³ıµÄ»úÖÆ
 	 */
 	virtual const std::vector<xml_node*>&
 		getElementsByTags(const char* tags) const;
 
 	/**
-	 * ´Ó xml ¶ÔÏóÖĞ»ñµÃÖ¸¶¨¶à¼¶±êÇ©ÃûµÄµÚÒ»¸ö xml ½Úµã
+	 * ´Ó xml ¶ÔÏóÖ§İñµÃÖ¸¶¨¶à¼¶±êÇ©ÃûµÄµÚÒ»¸ö xml ½Úµã
 	 * @param tags {const char*} ¶à¼¶±êÇ©Ãû£¬ÓÉ '/' ·Ö¸ô¸÷¼¶±êÇ©Ãû£¬ÈçÕë¶Ô xml Êı¾İ£º
 	 *  <root> <first> <second> <third name="test1"> text1 </third> </second> </first> ...
 	 *  <root> <first> <second> <third name="test2"> text2 </third> </second> </first> ...
 	 *  <root> <first> <second> <third name="test3"> text3 </third> </second> </first> ...
-	 *  ¿ÉÒÔÍ¨¹ı¶à¼¶±êÇ©Ãû£ºroot/first/second/third Ò»´ÎĞÔ²é³öËùÓĞ·ûºÏÌõ¼şµÄ½Úµã
+	 *  ¿ÉÒÔÍ¨¹ı¶à¼¶±êÇ©Ãû£ºroot/first/second/third Ò»´ÎĞÔ²é³öËùÓ§ÙûºÏÌõ¼şµÄ½Úµã
 	 * @return {const xml_node*} ·µ»Ø¿Õ±íÊ¾²»´æÔÚ
 	 */
 	virtual const xml_node* getFirstElementByTags(const char* tags) const;
 
 	/**
-	 * ´Ó xml ¶ÔÏóÖĞ»ñµÃËùÓĞÓë¸ø¶¨ÊôĞÔÃû name µÄÊôĞÔÖµÏàÍ¬µÄ xml ½Úµã¼¯ºÏ
+	 * ´Ó xml ¶ÔÏóÖ§İñµÃËùÓĞÓë¸ø¶¨ÊôĞÔÃû name µÄÊôĞÔÖµÏàÍ¬µÄ xml ½Úµã¼¯ºÏ
 	 * @param value {const char*} ÊôĞÔÃûÎª name µÄÊôĞÔÖµ
 	 * @return {const std::vector<xml_node*>&} ·µ»Ø½á¹û¼¯µÄ¶ÔÏóÒıÓÃ£¬
-	 *  Èç¹û²éÑ¯½á¹ûÎª¿Õ£¬Ôò¸Ã¼¯ºÏÎª¿Õ£¬¼´£ºempty() == true
-	 *  ×¢£º·µ»ØµÄÊı×éÖĞµÄ xml_node ½ÚµãÊı¾İ¿ÉÒÔĞŞ¸Ä£¬µ«²»ÄÜÉ¾³ı¸Ã½Úµã£¬
+	 *  Èç¹û²éÑ¯½á¹ûÎª¿Õ£¬Ôò¸¨¹¯ºÏÎª¿Õ£¬¼´£ºempty() == true
+	 *  ×¢£º·µ»ØµÄÊı×éÖ§ÖÄ xml_node ½ÚµãÊı¾İ¿ÉÒÔĞŞ¸Ä£¬µ«²»ÄÜÉ¾³ı¸Ã½Úµã£¬
 	 *  ÒòÎª¸Ã¿âÄÚ²¿ÓĞ×Ô¶¯É¾³ıµÄ»úÖÆ
 	 */
 	virtual const std::vector<xml_node*>&
 		getElementsByName(const char* value) const;
 
 	/**
-	 * ´Ó xml ¶ÔÏóÖĞ»ñµÃËùÓĞ¸ø¶¨ÊôĞÔÃû¼°ÊôĞÔÖµµÄ xml ½ÚµãÔªËØ¼¯ºÏ
+	 * ´Ó xml ¶ÔÏóÖ§İñµÃËùÓ§Úø¶¨ÊôĞÔÃû¼°ÊôĞÔÖµµÄ xml ½ÚµãÔªËØ¼¯ºÏ
 	 * @param name {const char*} ÊôĞÔÃû
 	 * @param value {const char*} ÊôĞÔÖµ
 	 * @return {const std::vector<xml_node*>&} ·µ»Ø½á¹û¼¯µÄ¶ÔÏóÒıÓÃ£¬
-	 *  Èç¹û²éÑ¯½á¹ûÎª¿Õ£¬Ôò¸Ã¼¯ºÏÎª¿Õ£¬¼´£ºempty() == true
+	 *  Èç¹û²éÑ¯½á¹ûÎª¿Õ£¬Ôò¸¨¹¯ºÏÎª¿Õ£¬¼´£ºempty() == true
 	 */
 	virtual const std::vector<xml_node*>& getElementsByAttr(
 		const char* name, const char* value) const;
 
 	/**
-	 * ´Ó xml ¶ÔÏóÖĞ»ñµÃÖ¸¶¨ id ÖµµÄ xml ½ÚµãÔªËØ
+	 * ´Ó xml ¶ÔÏóÖ§İñµÃÖ¸¶¨ id ÖµµÄ xml ½ÚµãÔªËØ
 	 * @param id {const char*} id Öµ
-	 * @return {const xml_node*} xml ½ÚµãÔªËØ, Èô·µ»Ø NULL Ôò±íÊ¾Ã»ÓĞ·ûºÏ
+	 * @return {const xml_node*} xml ½ÚµãÔªËØ, Èô·µ»Ø NULL Ôò±íÊ¾Ã»Ó§ÙûºÏ
 	 *  Ìõ¼şµÄ xml ½Úµã, ·µ»ØÖµ²»ĞèÒªÊÍ·Å
 	 */
 	virtual const xml_node* getElementById(const char* id) const;
@@ -426,18 +426,18 @@ public:
 	 * @param tag {const char*} ±êÇ©Ãû
 	 * @param text {const char*} ÎÄ±¾×Ö·û´®
 	 * @return {xml_node*} ĞÂ²úÉúµÄ xml_node ¶ÔÏó²»ĞèÒªÓÃ»§ÊÖ¹¤ÊÍ·Å£¬ÒòÎªÔÚ
-	 *  xml ¶ÔÏó±»ÊÍ·ÅÊ±ÕâĞ©½Úµã»á×Ô¶¯±»ÊÍ·Å£¬µ±È»ÓÃ»§Ò²¿ÉÒÔÔÚ²»ÓÃÊ±µ÷ÓÃ
-	 *  reset À´ÊÍ·ÅÕâĞ© xml_node ½Úµã¶ÔÏó
+	 *  xml ¶ÔÏó±»ÊÍ·ÅÊ±Õâ§»½Úµã»á×Ô¶¯±»ÊÍ·Å£¬µ±È»ÓÃ»§Ò²¿ÉÒÔÔÚ²»ÓÃÊ±µ÷ÓÃ
+	 *  reset À´ÊÍ·ÅÕâ§» xml_node ½Úµã¶ÔÏó
 	 */
 	virtual xml_node& create_node(const char* tag, const char* text = NULL);
 
 	/**
 	 * ´´½¨Ò»¸ö xml_node ½Úµã¶ÔÏó
 	 * @param tag {const char*} ±êÇ©Ãû
-	 * @param number {long long int} 64 Î»ÕûÊı
+	 * @param number {long long int} 64 ¦ËÕûÊı
 	 * @return {xml_node*} ĞÂ²úÉúµÄ xml_node ¶ÔÏó²»ĞèÒªÓÃ»§ÊÖ¹¤ÊÍ·Å£¬ÒòÎªÔÚ
-	 *  xml ¶ÔÏó±»ÊÍ·ÅÊ±ÕâĞ©½Úµã»á×Ô¶¯±»ÊÍ·Å£¬µ±È»ÓÃ»§Ò²¿ÉÒÔÔÚ²»ÓÃÊ±µ÷ÓÃ
-	 *  reset À´ÊÍ·ÅÕâĞ© xml_node ½Úµã¶ÔÏó
+	 *  xml ¶ÔÏó±»ÊÍ·ÅÊ±Õâ§»½Úµã»á×Ô¶¯±»ÊÍ·Å£¬µ±È»ÓÃ»§Ò²¿ÉÒÔÔÚ²»ÓÃÊ±µ÷ÓÃ
+	 *  reset À´ÊÍ·ÅÕâ§» xml_node ½Úµã¶ÔÏó
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	xml_node& create_node(const char* tag, __int64 number);
@@ -446,7 +446,7 @@ public:
 #endif
 
 	/**
-	 * »ñµÃ¸ù½Úµã¶ÔÏó£¬µ«ĞèÒª×¢Òâ£¬¸Ã½ÚµãÎªĞé½Úµã£¬ÀïÃæ²»´æ·ÅÈÎºÎÊı¾İ£¬
+	 * »ñµÃ¸ù½Úµã¶ÔÏó£¬µ«ĞèÒª×¢Òâ£¬¸Ã½ÚµãÎªĞé½Úµã£¬ÀïÃÖÎ´æ·ÅÈ¦ÊÎÊı¾İ£¬
 	 * ËüÊÇËùÓĞ xml ½Úµã¶ÔÏóµÄ×î¶¥²ã¸¸¶ÔÏó
 	 * @return {xml_node&}
 	 */
@@ -470,13 +470,13 @@ public:
 
 	/**
 	 * ½« xml ¶ÔÏóÊ÷×ª³É×Ö·û´®
-	 * @param out {string&} ´æ´¢×ª»»½á¹ûµÄ»º³åÇø
+	 * @param out {string&} ´›¥×ª»»½á¹ûµÄ»º³åÇø
 	 */
 	virtual void build_xml(string& out) const;
 
 public:
 	/**
-	 * È¡µÃ acl ¿âÖĞµÄ ACL_XML ¶ÔÏó
+	 * È¡µÃ acl ¿âÖ§ÖÄ ACL_XML ¶ÔÏó
 	 * @return {ACL_XML*} ¸ÃÖµ²»¿ÉÄÜÎª¿Õ£¬×¢ÒâÓÃ»§¿ÉÒÔĞŞ¸Ä¸Ã¶ÔÏóµÄÖµ£¬
 	 *  µ«²»¿ÉÒÔÊÍ·Å¸Ã¶ÔÏó
 	 */
@@ -486,7 +486,7 @@ public:
 	}
 
 public:
-	// pipe_stream Ğéº¯ÊıÖØÔØ
+	// pipe_stream ĞüDÊıÖØÔØ
 
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max = 0);

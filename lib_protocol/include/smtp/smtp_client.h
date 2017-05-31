@@ -7,14 +7,20 @@
 extern "C" {
 #endif
 
-#ifdef SMTP_DLL
-# ifdef SMTP_EXPORTS
-#  define SMTP_API __declspec(dllexport)
-# else
+#ifdef SMTP_LIB
+# ifndef SMTP_API
+#  define SMTP_API
+# endif
+#elif defined(SMTP_DLL) || defined(_WINDLL)
+# if defined(SMTP_EXPORTS) || defined(protocol_EXPORTS)
+#  ifndef SMTP_API
+#   define SMTP_API __declspec(dllexport)
+#  endif
+# elif !defined(SMTP_API)
 #  define SMTP_API __declspec(dllimport)
 # endif
-#else
-#  define SMTP_API
+#elif !defined(SMTP_API)
+# define SMTP_API
 #endif
 
 typedef struct SMTP_CLIENT {

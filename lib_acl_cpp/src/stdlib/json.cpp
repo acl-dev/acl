@@ -113,7 +113,8 @@ bool json_node::is_string(void) const
 bool json_node::is_number(void) const
 {
 	return (node_me_->type & ACL_JSON_T_A_NUMBER)
-		|| (node_me_->type & ACL_JSON_T_NUMBER);
+		|| (node_me_->type & ACL_JSON_T_NUMBER)
+		|| is_double();
 }
 
 bool json_node::is_double(void) const
@@ -163,6 +164,8 @@ const char* json_node::get_type(void) const
 {
 	if (is_string())
 		return "string";
+	else if (is_double())
+		return "double";
 	else if (is_number())
 		return "number";
 	else if (is_bool())
@@ -735,7 +738,8 @@ json_node* json::next_node(void)
 	return n;
 }
 
-const string& json::to_string(string* out /* = NULL */) const
+const string& json::to_string(string* out /* = NULL */,
+	bool add_space /* = false */) const
 {
 	if (out == NULL)
 	{
@@ -746,13 +750,24 @@ const string& json::to_string(string* out /* = NULL */) const
 		out = const_cast<json*>(this)->buf_;
 	}
 
+	if (add_space)
+		const_cast<json*>(this)->json_->flag |= ACL_JSON_FLAG_ADD_SPACE;
+	else
+		const_cast<json*>(this)->json_->flag &= ~ACL_JSON_FLAG_ADD_SPACE;
+
 	ACL_VSTRING* vbuf = out->vstring();
 	(void) acl_json_build(json_, vbuf);
 	return *out;
 }
 
-void json::build_json(string& out) const
+void json::build_json(string& out, bool add_space /* = false */) const
 {
+	if (add_space)
+		const_cast<json*>(this)->json_->flag |= ACL_JSON_FLAG_ADD_SPACE;
+	else
+		const_cast<json*>(this)->json_->flag &= ~ACL_JSON_FLAG_ADD_SPACE;
+
+
 	ACL_VSTRING* buf = out.vstring();
 	(void) acl_json_build(json_, buf);
 }

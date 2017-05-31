@@ -26,7 +26,9 @@ public:
 	 *  则当调用 += int|int64|short|char 或调用 << int|int64|short|char
 	 *  时，则按二进制方式处理，否则按文本方式处理
 	 */
-	string(size_t n = 64, bool bin = false);
+	string(void);
+	explicit string(size_t n);
+	string(size_t n, bool bin);
 
 	/**
 	 * 构造函数
@@ -1060,7 +1062,7 @@ public:
 	 *  数据长度大于实际要拷贝的长度，则仅拷贝实际存在的数据
 	 * @return {size_t} 返回拷贝的实际数据长度，pos 越界时则该返回值为 0
 	 */
-	size_t substr(string& out, size_t pos = 0, size_t len = 0);
+	size_t substr(string& out, size_t pos = 0, size_t len = 0) const;
 
 	/**
 	 * 将当前对象的数据缓冲区中的数据进行 base64 转码

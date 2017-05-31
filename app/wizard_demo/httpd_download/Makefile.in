@@ -10,8 +10,8 @@ CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
 SYSLIB = -lpthread -lz
 CHECKSYSRES = @echo "Unknow system type!";exit 1
-UNIXNAME = $(shell uname -sm)
-OSTYPE = $(shell uname -p)
+UNIXNAME = $(shell uname -s)
+OSTYPE = $(shell uname -m)
 RPATH = linux64
 
 ifeq ($(CC),)
@@ -49,6 +49,20 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	endif
 	CFLAGS += -DLINUX2 -D_REENTRANT
 	SYSLIB += -lcrypt
+endif
+
+# For MINGW
+ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	SYSLIB = -lpthread-2 -liconv
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	SYSLIB = -lpthread-2 -liconv
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
 endif
 
 #Path for SunOS

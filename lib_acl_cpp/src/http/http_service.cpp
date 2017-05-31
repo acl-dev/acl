@@ -519,7 +519,8 @@ public:
 
 	virtual void on_message(int nMsg, void* data, int dlen)
 	{
-		acl_assert(dlen == sizeof(HTTP_IPC_DAT));
+		if (dlen != sizeof(HTTP_IPC_DAT))
+			abort();
 		HTTP_IPC_DAT* dat = (HTTP_IPC_DAT*) data;
 
 		switch (nMsg)

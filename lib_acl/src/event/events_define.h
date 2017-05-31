@@ -24,12 +24,12 @@ extern "C" {
 # define ACL_EVENTS_STYLE_WMSG		6
 #endif
 
-#if	defined(LINUX2) && !defined(MINGW)
+#if	defined(ACL_LINUX) && !defined(MINGW)
 # define	ACL_EVENTS_KERNEL_STYLE	ACL_EVENTS_STYLE_EPOLL
 #elif	defined(SUNOS5)
 # define	ACL_EVENTS_KERNEL_STYLE	ACL_EVENTS_STYLE_DEVPOLL
 # define	USE_FDMAP
-#elif	defined(FREEBSD) || defined(MACOSX)
+#elif	defined(ACL_FREEBSD) || defined(ACL_MACOSX)
 # define	ACL_EVENTS_KERNEL_STYLE	ACL_EVENTS_STYLE_KQUEUE
 #else
 # undef	ACL_EVENTS_KERNEL_STYLE

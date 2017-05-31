@@ -300,7 +300,11 @@ static void __service_accept_sock(int type acl_unused, ACL_EVENT *event,
 		return;
 	}
 
+#ifdef AF_INET6
+	if (sock_type == AF_INET || sock_type == AF_INET6)
+#else
 	if (sock_type == AF_INET)
+#endif
 		acl_tcp_set_nodelay(fd);
 
 	if (acl_getsockname(fd, local, sizeof(local)) < 0)

@@ -49,9 +49,8 @@ int acl_vbuf_put(ACL_VBUF *bp, int ch)
 
 int acl_vbuf_read(ACL_VBUF *bp, char *buf, int len)
 {
-	int     count;
-	char   *cp;
-	int     n;
+    char   *cp;
+	ssize_t n, count;
 
 #if 0
 	for (count = 0; count < len; count++)
@@ -67,7 +66,7 @@ int acl_vbuf_read(ACL_VBUF *bp, char *buf, int len)
 		bp->ptr += n;
 		bp->cnt += n;
 	}
-	return (len - count);
+	return (int) (len - count);
 #endif
 }
 
@@ -75,9 +74,8 @@ int acl_vbuf_read(ACL_VBUF *bp, char *buf, int len)
 
 int acl_vbuf_write(ACL_VBUF *bp, const char *buf, int len)
 {
-	int     count;
 	const char *cp;
-	int     n;
+	ssize_t n, count;
 
 #if 0
 	for (count = 0; count < len; count++)
@@ -93,6 +91,6 @@ int acl_vbuf_write(ACL_VBUF *bp, const char *buf, int len)
 		bp->ptr += n;
 		bp->cnt -= n;
 	}
-	return (len - count);
+	return (int) (len - count);
 #endif
 }

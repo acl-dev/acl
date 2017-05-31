@@ -35,6 +35,7 @@ typedef struct ACL_MASTER_ADDR {
 typedef struct ACL_MASTER_SERV {
 	int     flags;			/* status, features, etc. */
 	char   *name;			/* service endpoint name */
+	char   *owner;			/* service running privilege if not null*/
 	ACL_ARRAY  *children_env;	/* the env array of the children */
 	int     type;			/* UNIX-domain, INET, etc. */
 	int     wakeup_time;		/* wakeup interval */

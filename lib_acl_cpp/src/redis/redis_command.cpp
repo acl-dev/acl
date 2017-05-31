@@ -342,7 +342,9 @@ redis_client* redis_command::redirect(redis_client_cluster* cluster,
 		if (conn != NULL)
 			return conn;
 
+#ifdef AUTO_SET_ALIVE
 		conns->set_alive(false);
+#endif
 		conns = (redis_client_pool*) cluster->peek();
 		if (conns == NULL)
 		{
@@ -385,8 +387,10 @@ redis_client* redis_command::peek_conn(redis_client_cluster* cluster, int slot)
 		// 取消哈希槽的地址映射关系
 		cluster->clear_slot(slot);
 
+#ifdef AUTO_SET_ALIVE
 		// 将连接池对象置为不可用状态
 		conns->set_alive(false);
+#endif
 	}
 
 	logger_warn("too many retry: %d, slot: %d", i, slot);
@@ -423,21 +427,26 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 		// 如果连接异常断开，则需要进行重试
 		if (conn->eof())
 		{
+			connect_pool* pool = conn->get_pool();
+
 			// 删除哈希槽中的地址映射关系以便下次操作时重新获取
 			cluster->clear_slot(slot_);
 
 			// 将连接对象归还给连接池对象
-			conn->get_pool()->put(conn, false);
+			pool->put(conn, false);
 
 			// 如果连接断开且请求数据为空时，则无须重试
-			if (request_obj_->get_size() == 0 && request_buf_->empty())
+			if ((request_obj_ == NULL || !request_obj_->get_size())
+				&& request_buf_->empty())
 			{
 				logger_error("not retry when no request!");
 				return NULL;
 			}
 
+#ifdef AUTO_SET_ALIVE
 			// 将连接池对象置为不可用状态
-			conn->get_pool()->set_alive(false);
+			pool->set_alive(false);
+#endif
 
 			// 从连接池集群中顺序取得一个连接对象
 			conn = peek_conn(cluster, slot_);
@@ -685,7 +694,7 @@ void redis_command::logger_result(const redis_result* result)
 	string res;
 	result->to_string(res);
 
-	logger_error("result type: %d， error: %s, res: [%s], req: [%s]",
+	logger_error("result type: %d, error: %s, res: [%s], req:[%s]",
 		result->get_type(), result_error(), res.c_str(),
 		request_buf_ ? request_buf_->c_str() : "slice request");
 }

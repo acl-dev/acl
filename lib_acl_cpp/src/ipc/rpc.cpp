@@ -95,7 +95,8 @@ void rpc_request::rpc_signal(void* ctx)
 		return;
 	}
 #endif
-	acl_assert(ipc_ != NULL);
+	if (ipc_ == NULL)
+		abort();
 	/*
 	IPC_DAT data;
 	data.req = this;
@@ -231,9 +232,11 @@ protected:
 	 */
 	virtual void on_message(int nMsg, void* data, int dlen)
 	{
-		acl_assert(data && dlen == sizeof(RPC_DAT));
+		if (!(data && dlen == sizeof(RPC_DAT)))
+			abort();
 		RPC_DAT* dat = (RPC_DAT*) data;
-		acl_assert(dat->req);
+		if (dat->req == NULL)
+			abort();
 
 		if (nMsg == RPC_MSG)
 			dat->req->rpc_onover();
@@ -281,13 +284,15 @@ void rpc_service::win32_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	if (msg == RPC_WIN32_MSG)
 	{
 		rpc_request* req = (rpc_request*) lParam;
-		acl_assert(req);
+		if (req == NULL)
+			abort();
 		req->rpc_onover();
 	}
 	else if (msg == RPC_WIN32_SIG)
 	{
 		rpc_request* req = (rpc_request*) lParam;
-		acl_assert(req);
+		if (req == NULL)
+			abort();
 		void* ctx = (void*) wParam;
 		req->rpc_wakeup(ctx);
 	}

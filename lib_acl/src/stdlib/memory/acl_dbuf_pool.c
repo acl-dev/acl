@@ -233,7 +233,7 @@ void *acl_dbuf_pool_alloc(ACL_DBUF_POOL *pool, size_t length)
 	void *ptr;
 	ACL_DBUF *dbuf;
 
-	length += length % 4;
+	length += 4 - length % 4;
 
 	if (length > pool->block_size)
 		dbuf = acl_dbuf_alloc(pool, length);

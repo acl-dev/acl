@@ -44,6 +44,13 @@ ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	UNIXTYPE = LINUX
 endif
 
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	SYSLIB = -lpthread-2
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX
@@ -87,9 +94,9 @@ ACL_LIB    = $(ACL_PATH)/lib
 
 EXTLIBS =
 #CFLAGS += -I$(ACL_INC) -I$(PROTO_INC)
-#LDFLAGS = -L$(ACL_LIB) -L$(PROTO_LIB) -l_protocol -l_acl $(EXTLIBS) $(SYSLIB)
+#LDFLAGS = -L$(ACL_LIB) -L$(PROTO_LIB) -l_protocol -lacl $(EXTLIBS) $(SYSLIB)
 CFLAGS += -I$(ACL_INC)
-LDFLAGS = -L$(ACL_LIB) -l_acl $(EXTLIBS) $(SYSLIB)
+LDFLAGS = -L$(ACL_LIB) -lacl $(EXTLIBS) $(SYSLIB)
 
 ###########################################################
 

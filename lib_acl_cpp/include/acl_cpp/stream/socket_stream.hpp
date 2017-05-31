@@ -58,6 +58,24 @@ public:
 	bool bind_udp(const char* addr, int rw_timeout = 0);
 
 	/**
+	 * 关闭套接口读操作
+	 * @return {bool}
+	 */
+	bool shutdown_read(void);
+
+	/**
+	 * 关闭套接口写操作
+	 * @return {bool}
+	 */
+	bool shutdown_write(void);
+
+	/**
+	 * 关闭套接口读写操作
+	 * @return {bool}
+	 */
+	bool shutdown_readwrite(void);
+
+	/**
 	 * 获得网络连接流的套接字连接句柄
 	 * @return {ACL_SOCKET} 若出错，则返回 - 1(UNIX 平台)
 	 *  或 INVALID_SOCKET(win32平台)
@@ -213,8 +231,8 @@ public:
 
 private:
 	char  dummy_[1];
-	char  peer_ip_[33];
-	char  local_ip_[33];
+	char  peer_ip_[256];
+	char  local_ip_[256];
 	const char* get_ip(const char* addr, char* buf, size_t size);
 };
 

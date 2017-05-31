@@ -43,7 +43,7 @@ static int __lock(ACL_FIBER_MUTEX *lk, int block)
 		return 1;
 
 	if (acl_fiber_killed(curr))
-		acl_msg_info("%s(%d), %s: lock fiber-%d was killed",
+		acl_msg_info("%s(%d), %s: lock fiber-%u was killed",
 			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(curr));
 	else
 		acl_msg_warn("%s(%d), %s: qlock: owner=%p self=%p oops",

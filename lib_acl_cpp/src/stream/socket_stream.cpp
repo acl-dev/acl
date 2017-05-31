@@ -61,6 +61,36 @@ bool socket_stream::bind_udp(const char* addr, int rw_timeout /* = 0 */)
 	return true;
 }
 
+bool socket_stream::shutdown_read()
+{
+	if (stream_ == NULL)
+	{
+		logger_error("stream_ null");
+		return false;
+	}
+	return acl_socket_shutdown(ACL_VSTREAM_SOCK(stream_), SHUT_RD) == 0;
+}
+
+bool socket_stream::shutdown_write()
+{
+	if (stream_ == NULL)
+	{
+		logger_error("stream_ null");
+		return false;
+	}
+	return acl_socket_shutdown(ACL_VSTREAM_SOCK(stream_), SHUT_WR) == 0;
+}
+
+bool socket_stream::shutdown_readwrite()
+{
+	if (stream_ == NULL)
+	{
+		logger_error("stream_ null");
+		return false;
+	}
+	return acl_socket_shutdown(ACL_VSTREAM_SOCK(stream_), SHUT_RDWR) == 0;
+}
+
 ACL_SOCKET socket_stream::sock_handle() const
 {
 	if (stream_ == NULL)
@@ -88,7 +118,7 @@ const char* socket_stream::get_peer(bool full /* = false */) const
 	char* ptr = ACL_VSTREAM_PEER(stream_);
 	if (ptr == NULL || *ptr == 0)
 	{
-		char  buf[64];
+		char  buf[256];
 		if (acl_getpeername(ACL_VSTREAM_SOCK(stream_),
 			buf, sizeof(buf)) == -1)
 		{
@@ -114,7 +144,7 @@ const char* socket_stream::get_peer_ip() const
 	char* ptr = ACL_VSTREAM_PEER(stream_);
 	if (ptr == NULL || *ptr == 0)
 	{
-		char  buf[64];
+		char  buf[256];
 		if (acl_getpeername(ACL_VSTREAM_SOCK(stream_),
 			buf, sizeof(buf)) == -1)
 		{

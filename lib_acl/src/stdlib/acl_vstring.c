@@ -285,7 +285,7 @@ static void mmap_buf_init(ACL_VSTRING *vp)
 #ifdef ACL_UNIX
 	vp->vbuf.data = (unsigned char*) mmap(NULL, vp->maxlen,
 			PROT_READ | PROT_WRITE, MAP_SHARED, vp->fd, 0);
-	if (vp->vbuf.data == MAP_FAILED)
+	if ((void *) vp->vbuf.data == MAP_FAILED)
 		acl_msg_fatal("mmap error: %s", acl_last_serror());
 #elif defined(_WIN32) || defined(_WIN64)
 	vp->hmap = CreateFileMapping(vp->fd, NULL, PAGE_READWRITE, 0,

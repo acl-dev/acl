@@ -16,7 +16,7 @@ CFLAGS = -c -g -W \
 # -Wcast-align
 #-Waggregate-return
 
-LDFLAGS = -Wl,-rpath,$(BASE_PATH) -L$(BASE_PATH) -l_acl \
+LDFLAGS = -Wl,-rpath,$(BASE_PATH) -L$(BASE_PATH) -lacl \
 	  $(EXTLIBS) $(SYSLIB)
 
 ###########################################################
@@ -41,7 +41,7 @@ endif
 ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD
 	SYSLIB = -lcrypt -lpthread -rdynamic
-	LDFLAGS = -R$(BASE_PATH) -L$(BASE_PATH) -l_acl \
+	LDFLAGS = -R$(BASE_PATH) -L$(BASE_PATH) -lacl \
 		  $(EXTLIBS) $(SYSLIB)
 endif
 
@@ -51,7 +51,7 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 		  -Wno-extended-offsetof
 	SYSLIB +=  -rdynamic
 	UNIXTYPE = MACOSX
-	LDFLAGS = -Wl,-rpath,$(BASE_PATH) -R$(BASE_PATH) -L$(BASE_PATH) -l_acl \
+	LDFLAGS = -Wl,-rpath,$(BASE_PATH) -R$(BASE_PATH) -L$(BASE_PATH) -lacl \
 		  $(EXTLIBS) $(SYSLIB)
 endif
 

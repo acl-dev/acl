@@ -48,7 +48,8 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	ifeq ($(findstring x86_64, $(OSTYPE)), x86_64)
 		RPATH = linux64
 	endif
-	CFLAGS += -DLINUX2 -D_REENTRANT
+#	CFLAGS += -DLINUX2 -D_REENTRANT
+	CFLAGS += -D_REENTRANT
 	SYSLIB += -lcrypt
 endif
 
@@ -85,10 +86,10 @@ endif
 CFLAGS += -I.. -I../../../lib_acl/include -I../../../lib_protocol/include -I../../../lib_acl_cpp/include \
 	  -I../../../lib_fiber/c/include -I../../../lib_fiber/cpp/include
 EXTLIBS =
-LDFLAGS = -L../../../lib_fiber/lib -l_fiber_cpp -l_fiber \
-	  -L../../../lib_acl_cpp/lib -l_acl_cpp \
-	  -L../../../lib_protocol/lib -l_protocol \
-	  -L../../../lib_acl/lib -l_acl \
+LDFLAGS = -L../../../lib_fiber/lib -lfiber_cpp -lfiber \
+	  -L../../../lib_acl_cpp/lib -lacl_cpp \
+	  -L../../../lib_protocol/lib -lprotocol \
+	  -L../../../lib_acl/lib -lacl \
 	  $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)

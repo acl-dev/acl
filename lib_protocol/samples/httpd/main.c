@@ -265,7 +265,7 @@ static void test(void)
 
 int main(int argc, char *argv[])
 {
-	char addr[256] = "0.0.0.0:80", filename[256];
+	char addr[256] = "0.0.0.0:8080", filename[256];
 	int  ch, client_mode = 0;
 
 #if 1

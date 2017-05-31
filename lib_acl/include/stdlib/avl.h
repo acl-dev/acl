@@ -262,9 +262,9 @@ ACL_API void avl_remove(avl_tree_t *tree, void *node);
  * avl_update_gt() only if you know the direction in which the order of the
  * node may change.
  */
-ACL_API boolean_t avl_update(avl_tree_t *, void *);
-ACL_API boolean_t avl_update_lt(avl_tree_t *, void *);
-ACL_API boolean_t avl_update_gt(avl_tree_t *, void *);
+ACL_API acl_boolean_t avl_update(avl_tree_t *, void *);
+ACL_API acl_boolean_t avl_update_lt(avl_tree_t *, void *);
+ACL_API acl_boolean_t avl_update_gt(avl_tree_t *, void *);
 
 /*
  * Return the number of nodes in the tree
@@ -274,7 +274,7 @@ ACL_API ulong_t avl_numnodes(avl_tree_t *tree);
 /*
  * Return B_TRUE if there are zero nodes in the tree, B_FALSE otherwise.
  */
-ACL_API boolean_t avl_is_empty(avl_tree_t *tree);
+ACL_API acl_boolean_t avl_is_empty(avl_tree_t *tree);
 
 /*
  * Used to destroy any remaining nodes in a tree. The cookie argument should

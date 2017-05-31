@@ -36,8 +36,19 @@ void string::init(size_t len)
 	line_state_offset_ = 0;
 }
 
-string::string(size_t len /* = 64 */, bool bin /* = false */)
-: use_bin_(bin)
+string::string(void) : use_bin_(false)
+{
+	init(64);
+	TERM(vbf_);
+}
+
+string::string(size_t len) : use_bin_(false)
+{
+	init(len);
+	TERM(vbf_);
+}
+
+string::string(size_t len, bool bin) : use_bin_(bin)
 {
 	init(len);
 	TERM(vbf_);
@@ -118,7 +129,7 @@ string& string::set_max(int max)
 
 int string::get_max(void) const
 {
-	return vbf_->maxlen;
+	return (int) vbf_->maxlen;
 }
 
 char string::operator [](size_t n) const
@@ -138,9 +149,9 @@ char& string::operator [](size_t n)
 	// 当偏移位置大于所分配空间的最大位置，需要重新分配内存
 	if (n >= (size_t) CAP(vbf_))
 	{
-		int  len = CAP(vbf_);
+		int  len = (int) CAP(vbf_);
 		space(n + 1);
-		int  new_len = CAP(vbf_);
+		int  new_len = (int) CAP(vbf_);
 
 		// 初始化新分配的内存
 		if (new_len > len)
@@ -1472,7 +1483,7 @@ string& string::upper()
 	return *this;
 }
 
-size_t string::substr(string& out, size_t pos /* = 0 */, size_t len /* = 0 */)
+size_t string::substr(string& out, size_t pos /* = 0 */, size_t len /* = 0 */) const
 {
 	size_t n = LEN(vbf_);
 	if (pos >= n)

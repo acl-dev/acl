@@ -33,7 +33,7 @@ static void token_tree_test(const char *tokens, const char *test_tab[])
 	acl_vstring_free(buf);
 }
 
-static const char *test_tab[] = {
+static const char *__test_tab[] = {
 	"中国"
 	"中国人民",
 	"中国人民银行",
@@ -45,7 +45,7 @@ static void test(void)
 {
 	const char *tokens = "中国|p 中国人|p 中国人民|p 中国人民银行|p";
 
-	token_tree_test(tokens, test_tab);
+	token_tree_test(tokens, __test_tab);
 }
 
 static void test2(void)
@@ -93,6 +93,72 @@ static void test2(void)
 	acl_token_tree_destroy(tree);
 }
 
+static void token_word_test(const char *tokens, const char *test_tab[])
+{
+	ACL_TOKEN *token_tree;
+	const char *ptr;
+	int   i;
+
+	token_tree = acl_token_tree_create(tokens);
+	acl_token_tree_print(token_tree);
+
+	for (i = 0; test_tab[i] != NULL; i++) {
+		ptr = test_tab[i];
+		printf("match %s %s\n", ptr,
+			acl_token_tree_word_match(token_tree, ptr) ? "yes" : "no");
+	}
+	acl_token_tree_destroy(token_tree);
+}
+
+static void test3(void)
+{
+	const char *tokens1 = "hello world he is a man he"
+		" 中 中华 中华人 中华人民 中华人民共 中华人民共和 中华人民共和国"
+		" 中华人民共和国万岁 中华人民共和国万岁万万岁"
+		" 法轮功|d 研究法轮功|d 反对法轮功|p 法轮功协会|d";
+	const char *tokens2 = "比利时|d 中国|p 说的|d";
+
+	static const char *test1_tab[] = {
+		"中华",
+		"中华人",
+		"中华人民",
+		"中华人民共",
+		"中华人民共和",
+		"中华人民共和国",
+		"中华人民共和国万岁",
+		"我们中华人民共和国万岁",
+		"我们中华人民共和国万岁万万岁",
+		"法轮功",
+		"反对法轮功",
+		"法轮功协会",
+		"反对法轮功协会",
+		"研究法轮功",
+		NULL
+	};
+
+	static const char *test2_tab[] = {
+		"hello",
+		"shello",
+		"中华人民共和国",
+		"中华人民",
+		NULL
+	};
+
+	static const char *test3_tab[] = {
+		"我爱研法轮功",
+		"中国",
+		"比利时",
+		"中国比利时",
+		"我说的故事",
+		"宜档闹泄",
+		NULL
+	};
+
+	token_tree_test(tokens1, test1_tab);
+	token_word_test(tokens1, test2_tab);
+	token_tree_test(tokens2, test3_tab);
+}
+
 int main(void)
 {
 	test();
@@ -101,6 +167,7 @@ int main(void)
 #endif
 
 	test2();
+	test3();
 #ifdef ACL_MS_WINDOWS
 	printf("enter any key to exit ...\n");
 

@@ -40,15 +40,21 @@
       abort();  \
   } while(0)
 
-# ifdef ACL_DLL
-#  ifdef ACL_EXPORTS
-#   define ACL_API __declspec(dllexport)
-#  else
-#   define ACL_API __declspec(dllimport)
-#  endif
-# else
+#ifdef ACL_LIB
+# ifndef ACL_API
 #  define ACL_API
 # endif
+#elif defined(ACL_DLL) || defined(_WINDLL)
+# if defined(ACL_EXPORTS) || defined(acl_EXPORTS)
+#  ifndef ACL_API
+#   define ACL_API __declspec(dllexport)
+#  endif
+# elif !defined(ACL_API)
+#  define ACL_API __declspec(dllimport)
+# endif
+#elif !defined(ACL_API)
+# define ACL_API
+#endif
 
 /**
  * see WINSOCK2.H, 用户需要预先定义此值，因其默认值为64，此外，该值不能设得太大，
@@ -85,6 +91,8 @@
 # else
 #  include <winsock.h>
 # endif
+
+# include <ws2tcpip.h> /* for getaddrinfo */
 
 # ifdef	ACL_BCB_COMPILER
 #  pragma hdrstop

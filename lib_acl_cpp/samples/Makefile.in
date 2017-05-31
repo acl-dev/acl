@@ -63,12 +63,19 @@ ifeq ($(findstring Linux, $(OSNAME)), Linux)
 	ifeq ($(findstring x86_64, $(OSNAME)), x86_64)
 		RPATH = linux64
 	endif
-	CFLAGS += -DLINUX2
+#	CFLAGS += -DLINUX2
 	SYSLIB += -rdynamic
 endif
 
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	SYSLIB = -lpthread-2 -liconv
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
 	SYSLIB = -lpthread-2 -liconv
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
@@ -120,7 +127,7 @@ endif
 #endif
 
 CFLAGS += -I. -I$(BASE_PATH)/include -I$(BASE_PATH)/../lib_acl/include -I$(BASE_PATH)/../lib_protocol/include
-LDFLAGS = -L$(BASE_PATH)/lib -l_acl_cpp -L$(BASE_PATH)/../lib_protocol/lib -l_protocol -L$(BASE_PATH)/../lib_acl/lib -l_acl \
+LDFLAGS = -L$(BASE_PATH)/lib -lacl_cpp -L$(BASE_PATH)/../lib_protocol/lib -lprotocol -L$(BASE_PATH)/../lib_acl/lib -lacl \
 	  -L$(BASE_PATH)/../lib/$(RPATH) $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)

@@ -225,7 +225,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 	parser->total_line = 0;
 	parser->valid_line = 0;
 
-	buf_size = stat_buf.st_size + 256;
+	buf_size = (int) stat_buf.st_size + 256;
 	content_buf = (char *) acl_mycalloc(1, buf_size);
 	if (content_buf == NULL) {
 		printf("%s: can't calloc, pathname=%s, errmsg=%s\n",
@@ -234,7 +234,11 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 	}
 	
 #ifdef ACL_UNIX
+# ifdef ACL_ANDROID
+	filefd = acl_file_open(pathname, O_RDWR, 0644);
+# else
 	filefd = acl_file_open(pathname, O_RDWR, S_IREAD | S_IWRITE | S_IRGRP);
+# endif
 #elif defined(ACL_WINDOWS)
 	filefd = acl_file_open(pathname, O_RDWR, S_IREAD | S_IWRITE);
 #else
@@ -264,7 +268,6 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 		/* first, skip all ' ' and '\t' */
 		SKIP(ptr, (*ptr == ' ' || *ptr == '\t'));
 
-		/* 操作存储注释行 */
 		if  (*ptr == '#') {  /* the comment line */
 			SKIP(ptr, *ptr != '\n'); /* find the line's end */
 			if (*ptr) {  /* this must be '\n' */
@@ -284,7 +287,6 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 			cfg_line->line_number = parser->total_line;
 			continue;
 		} else if (*ptr == '\r' || *ptr == '\n') {
-			/* 操作空行 */
 			/* SKIP(ptr, (*ptr == '\r' || *ptr == '\n')); */
 			if (*ptr == '\r' && *(ptr + 1) == '\n') {
 				*ptr = 0; /* set '\0' first and go on */
@@ -308,7 +310,6 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 			continue;
 		}
 
-		/* 操作有效行 */
 		pline_begin = ptr;  /* reset the line header */
 
 		/* find the line's end */
@@ -351,7 +352,6 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 #endif
 }
 
-/* 释放 ACL_CFG_LINE 项所用的回调函数 */
 static void _cfg_line_free(void *arg)
 {
 	ACL_CFG_LINE *cfg_line;
@@ -561,9 +561,14 @@ int acl_cfg_parser_dump(const ACL_CFG_PARSER *parser,
 	if (parser == NULL || pathname == NULL || *pathname == 0)
 		return (-1);
 #ifdef ACL_UNIX
+# ifdef ACL_ANDROID
+	filefd = acl_file_open(pathname,
+			O_CREAT | O_TRUNC | O_APPEND | O_WRONLY, 0644);
+# else
 	filefd = acl_file_open(pathname,
 			O_CREAT | O_TRUNC | O_APPEND | O_WRONLY,
 			S_IREAD | S_IWRITE | S_IRGRP);
+# endif
 #elif defined(ACL_WINDOWS)
 	filefd = acl_file_open(pathname,
 		O_CREAT | O_TRUNC | O_APPEND | O_WRONLY,

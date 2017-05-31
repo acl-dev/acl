@@ -8,7 +8,9 @@ ARFL    = rv
 RANLIB  = ${ENV_RANLIB}
 
 CFLAGS = -c -g -W \
+-fPIC \
 -Wall \
+-Werror \
 -Wcast-qual \
 -Waggregate-return \
 -Wmissing-prototypes \
@@ -66,25 +68,29 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD -fPIC -Werror
 	UNIXTYPE = FREEBSD
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof -fPIC -Werror
+		  -Wno-extended-offsetof
 	UNIXTYPE = MACOSX
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	CFLAGS += -DLINUX2 -fPIC -Werror
 	UNIXTYPE = LINUX
 endif
 
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
 endif
@@ -97,13 +103,13 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
 		SYSLIB = -lsocket -lnsl -lrt
 	endif
-	CFLAGS += -DSUNOS5 -fPIC -Werror
+	CFLAGS += -DSUNOS5
 	UNIXTYPE = SUNOS5
 endif
 
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
-	CFLAGS += -DHP_UX -DHPUX11 -fPIC -Werror
+	CFLAGS += -DHP_UX -DHPUX11
 	UNIXTYPE = HPUX
 endif
 
@@ -132,8 +138,10 @@ OBJ = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC)))
 LIB_ACL_PATH = ../../lib_acl
 CFLAGS += -I $(LIB_ACL_PATH)/include -I$(LIB_ACL_PATH)/src/master
 
-STATIC_LIBNAME = lib_fiber.a
-SHARED_LIBNAME = lib_fiber.so
+STATIC_LIBNAME = libfiber.a
+SHARED_LIBNAME = libfiber.so
+STATIC_OLD_LIBNAME = lib_fiber.a
+SHARED_OLD_LIBNAME = lib_fiber.so
 
 ###########################################################
 
@@ -149,9 +157,11 @@ static: $(OBJ)
 	@echo 'creating $(LIB_PATH_DST)/$(STATIC_LIBNAME)'
 	$(AR) $(ARFL) $(LIB_PATH_DST)/$(STATIC_LIBNAME) $(OBJ)
 	$(RANLIB) $(LIB_PATH_DST)/$(STATIC_LIBNAME)
+	@(cd $(LIB_PATH_DST); rm -f ${STATIC_OLD_LIBNAME}; \
+		ln -s $(STATIC_LIBNAME) ${STATIC_OLD_LIBNAME})
 	@echo 'build $(LIB_PATH_DST)/$(STATIC_LIBNAME) ok!'
 
-shared_ldflags = -l_acl -lrt -lpthread
+shared_ldflags = -lacl -lrt -lpthread
 shared: $(OBJ)
 	@echo ''
 	@echo 'creating $(SHARED_LIBNAME)'
@@ -168,12 +178,12 @@ shared: $(OBJ)
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "MACOSX"; then \
 		echo "building for Darwin"; \
 		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJ) \
-			-R$(rpath) -L$(rpath) -l_acl -lpthread; \
+			-R$(rpath) -L$(rpath) -lacl -lpthread; \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "FREEBSD"; then \
 		echo "building for FreeBSD"; \
 		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJ) \
-			-R$(rpath) -L$(rpath) -l_acl -lpthread; \
+			-R$(rpath) -L$(rpath) -lacl -lpthread; \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	else \
 		echo 'skip build $(SHARED_LIBNAME); usage: make shared rpath=xxx'; \
@@ -185,12 +195,14 @@ $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/master/%.c
 	$(COMPILE) $< -o $@
 
 clean cl:
-	rm -f $(LIB_PATH_DST)/lib_fiber.a
-	rm -f $(LIB_PATH_DST)/lib_fiber.so
+	rm -f $(LIB_PATH_DST)/${STATIC_LIBNAME}
+	rm -f $(LIB_PATH_DST)/${SHARED_LIBNAME}
+	rm -f $(LIB_PATH_DST)/${STATIC_OLD_LIBNAME}
+	rm -f $(LIB_PATH_DST)/${SHARED_OLD_LIBNAME}
 	rm -f $(OBJ)
 
 all_lib: $(OBJ)
-	@(cd debug; ar x ../../lib_acl/lib/lib_acl.a)
-	$(AR) $(ARFL) $(LIB_PATH_DST)/lib_fiber.a debug/*.o
-	$(RANLIB) $(LIB_PATH_DST)/lib_fiber.a
-	@(cd debug; rm -f `ar -t ../../lib_acl/lib/lib_acl.a`)
+	@(cd debug; ar x ../../lib_acl/lib/libacl.a)
+	$(AR) $(ARFL) $(LIB_PATH_DST)/libfiber.a debug/*.o
+	$(RANLIB) $(LIB_PATH_DST)/${STATIC_LIBNAME}
+	@(cd debug; rm -f `ar -t ../../lib_acl/lib/libacl.a`)

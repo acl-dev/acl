@@ -60,7 +60,7 @@ endif
 
 #Path for Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	CFLAGS += -DLINUX2
+#	CFLAGS += -DLINUX2
 	SYSLIB += -lcrypt -rdynamic
 endif
 
@@ -110,8 +110,8 @@ FIBER_LIB  = $(FIBER_PATH)/lib
 
 EXTLIBS =
 CFLAGS += -I.. -I$(PRO_INC) -I$(ACL_INC) -I$(FIBER_INC)
-LDFLAGS = -L$(PRO_LIB) -l_protocol -L$(FIBER_LIB) -l_fiber \
-	  -L$(ACL_LIB) -l_acl $(EXTLIBS) $(SYSLIB)
+LDFLAGS = -L$(PRO_LIB) -lprotocol -L$(FIBER_LIB) -lfiber \
+	  -L$(ACL_LIB) -lacl $(EXTLIBS) $(SYSLIB)
 
 ###########################################################
 

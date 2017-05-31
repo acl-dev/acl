@@ -43,15 +43,15 @@ ACL_FIBER *acl_fiber_running(void);
 /**
  * 获得所给协程的协程 ID 号
  * @param fiber {const ACL_FIBER*} acl_fiber_create 创建的协程对象，必须非空
- * @return {int} 协程 ID 号
+ * @return {unsigned int} 协程 ID 号
  */
-int acl_fiber_id(const ACL_FIBER *fiber);
+unsigned int acl_fiber_id(const ACL_FIBER *fiber);
 
 /**
  * 获得当前所运行的协程的 ID 号
- * @return {int} 当前运行协程的 ID 号
+ * @return {unsigned int} 当前运行协程的 ID 号
  */
-int acl_fiber_self(void);
+unsigned int acl_fiber_self(void);
 
 /**
  * 设置所给协程的错误号
@@ -131,6 +131,12 @@ void acl_fiber_switch(void);
  * 调用本函数启动协程的调度过程
  */
 void acl_fiber_schedule(void);
+
+/**
+ * 调用本函数检测当前线程是否处于协程调度状态
+ * @return {int} 0 表示非协程状态，非 0 表示处于协程调度状态
+ */
+int acl_fiber_scheduled(void);
 
 /**
  * 停止协程过程
@@ -298,7 +304,7 @@ void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK *l);
 typedef struct ACL_FIBER_SEM ACL_FIBER_SEM;
 
 /**
- * 创建协程信号量
+ * 创建协程信号量，同时内部会将当前线程与该信号量绑定
  * @param num {int} 信号量初始值（必须 >= 0）
  * @return {ACL_FIBER_SEM *}
  */
@@ -311,25 +317,50 @@ ACL_FIBER_SEM *acl_fiber_sem_create(int num);
 void acl_fiber_sem_free(ACL_FIBER_SEM *sem);
 
 /**
+ * 获得当前协程信号量所绑定的线程 ID
+ * @param sem {ACL_FIBER_SEM*} 协程信号量对象
+ * @return {acl_pthread_t}
+ */
+acl_pthread_t acl_fiber_sem_get_tid(ACL_FIBER_SEM *sem);
+
+/**
+ * 设置指定协程信号量的的线程 ID，当改变本协程信号量所属的线程时如果等待的协程
+ * 数据非 0 则内部自动 fatal，即当协程信号量上等待协程非空时禁止调用本方法
+ * @param sem {ACL_FIBER_SEM*} 协程信号量对象
+ * @param {acl_pthread_t} 线程 ID
+ */
+void acl_fiber_sem_set_tid(ACL_FIBER_SEM *sem, acl_pthread_t tid);
+
+/**
  * 当协程信号量 > 0 时使信号量减 1，否则等待信号量 > 0
  * @param sem {ACL_FIBER_SEM *}
- * @retur {int} 返回信号量当前值
+ * @retur {int} 返回信号量当前值，如果返回 -1 表明当前线程与协程信号量所属线程
+ *  不是同一线程，此时该方法不等待立即返回
  */
 int acl_fiber_sem_wait(ACL_FIBER_SEM *sem);
 
 /**
  * 尝试使协程信号量减 1
  * @param sem {ACL_FIBER_SEM *}
- * @retur {int} 成功减 1 时返回值 >= 0，返回 -1 表示当前信号量不可用
+ * @retur {int} 成功减 1 时返回值 >= 0，返回 -1 表示当前信号量不可用，或当前
+ *  调用者线程与协程信号量所属线程不是同一线程
  */
 int acl_fiber_sem_trywait(ACL_FIBER_SEM *sem);
 
 /**
  * 使协程信号量加 1
  * @param sem {ACL_FIBER_SEM *}
- * @retur {int} 返回信号量当前值
+ * @retur {int} 返回信号量当前值，返回 -1 表示当前调用者线程与协程信号量所属
+ *  线程不是同一线程
  */
 int acl_fiber_sem_post(ACL_FIBER_SEM *sem);
+
+/**
+ * 获得指定协程信号量的当前值，该值反映了目前等待该信号量的数量
+ * @param sem {ACL_FIBER_SEM*}
+ * @retur {int}
+ */
+int acl_fiber_sem_num(ACL_FIBER_SEM *sem);
 
 /* channel communication */
 

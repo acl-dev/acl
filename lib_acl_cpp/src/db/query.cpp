@@ -118,7 +118,8 @@ const string& query::to_string()
 		SKIP_WHILE(*ptr != ',' && *ptr != ';'
 			&& *ptr != ' ' && *ptr != '\t'
 			&& *ptr != '(' && *ptr != ')'
-			&& *ptr != '\r' && *ptr != '\n', ptr);
+			&& *ptr != '\r' && *ptr != '\n'
+			&& *ptr != '\'', ptr);
 		if (ptr - key == 1)
 		{
 			logger_warn("only found: ':%c'", *ptr);
@@ -346,6 +347,7 @@ const string& query::escape(const char* in, size_t len, string& out)
 			out += '\\';
 			out += '0';
 			break;
+#if 0
 		case '\n':		/* Must be escaped for logs */
 			out += '\\';
 			out += 'n';
@@ -354,6 +356,7 @@ const string& query::escape(const char* in, size_t len, string& out)
 			out += '\\';
 			out += 'r';
 			break;
+#endif
 		case '\\':
 			out += '\\';
 			out += '\\';
@@ -362,10 +365,12 @@ const string& query::escape(const char* in, size_t len, string& out)
 			out += '\\';
 			out += '\'';
 			break;
+#if 0
 		case '"':		/* Better safe than sorry */
 			out += '\\';
 			out += '"';
 			break;
+#endif
 		case '\032':		/* This gives problems on Win32 */
 			out += '\\';
 			out += 'Z';

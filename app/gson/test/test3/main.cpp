@@ -136,5 +136,6 @@ int main(void)
 	printf("------------------------test2--------------------------\r\n");
 	test2();
 
+	printf("Enter any key to continue ..."); fflush(stdout); getchar();
 	return 0;
 }

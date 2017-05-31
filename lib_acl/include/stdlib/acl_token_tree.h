@@ -132,7 +132,6 @@ ACL_API ACL_TOKEN *acl_token_tree_create2(const char *s, const char *sep);
 ACL_API void acl_token_tree_destroy(ACL_TOKEN *token_tree);
 ACL_API void acl_token_tree_load_deny(const char *filepath, ACL_TOKEN *token_tree);
 ACL_API void acl_token_tree_load_pass(const char *filepath, ACL_TOKEN *token_tree);
-ACL_API void acl_token_tree_test(void);
 
 #ifdef __cplusplus
 }

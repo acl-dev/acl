@@ -412,7 +412,11 @@ static void __service_accept_sock(int type acl_unused, ACL_EVENT *event,
 				NULL, (acl_int64) time_left * 1000000, 0);
 	} else {
 		/* ±‹√‚∑¢ÀÕ—”≥Ÿœ÷œÛ */
+#ifdef AF_INET6
+		if (sock_type == AF_INET || sock_type == AF_INET6)
+#else
 		if (sock_type == AF_INET)
+#endif
 			acl_tcp_set_nodelay(fd);
 		multi_server_wakeup(event, fd);
 	}
@@ -733,7 +737,7 @@ void acl_multi_server_main(int argc, char **argv, ACL_MULTI_SERVER_FN service,..
 		while (1)
 			service(stream, __service_name, __service_argv);
 		/* not reached here */
-		multi_server_exit();
+		/* multi_server_exit(); */
 	}
 
 	/*

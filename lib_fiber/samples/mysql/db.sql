@@ -1,6 +1,6 @@
 
 create table group_tbl
-(	group_name varchar(128) not null
+(	group_name varchar(128) not null,
 	uvip_tbl varchar(32) not null default 'uvip_tbl',
 	access_tbl varchar(32) not null default 'access_tbl',
 	access_week_tbl varchar(32) not null default 'access_week_tbl',

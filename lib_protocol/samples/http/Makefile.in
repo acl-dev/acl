@@ -42,6 +42,13 @@ ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	UNIXTYPE = LINUX
 endif
 
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	SYSLIB = -lpthread-2
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
 #Path for SunOS
 ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring 86, $(UNIXNAME)), 86)
@@ -78,7 +85,7 @@ CFLAGS += -I. -I$(ACL_INC) -I$(PRO_INC)
 COMPILE = $(CC) $(CFLAGS)
 
 EXTLIBS =
-LDFLAGS = -L$(PRO_LIB) -l_protocol -L$(ACL_LIB) -l_acl $(EXTLIBS) $(SYSLIB)
+LDFLAGS = -L$(PRO_LIB) -lprotocol -L$(ACL_LIB) -lacl $(EXTLIBS) $(SYSLIB)
 LINKS   = $(CC) -o $(PROG) $(OBJS) $(LDFLAGS)
 
 OUT_PATH = ./

@@ -89,5 +89,6 @@ int main(void)
 {
 	serialize();
 	deserialize();
+	printf("Enter any key to continue ..."); fflush(stdout); getchar();
 	return 0;
 }

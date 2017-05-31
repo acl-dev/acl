@@ -1002,7 +1002,7 @@ acl_pthread_pool_t *acl_pthread_pool_create(const acl_pthread_pool_attr_t *attr)
 			__FILE__, __LINE__, myname, acl_last_serror());
 	}
 
-#if	defined(ACL_UNIX) && !defined(__FreeBSD__)
+#if	defined(ACL_UNIX) && !defined(__FreeBSD__) && !defined(MINGW)
 	status = pthread_attr_setscope(&thr_pool->attr, PTHREAD_SCOPE_SYSTEM);
 	if (status != 0) {
 		SET_ERRNO(status);

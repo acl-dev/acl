@@ -83,7 +83,7 @@ endif
 
 CFLAGS += -I../../../lib_acl/include -I../../../lib_protocol/include -I../../../lib_acl_cpp/include
 EXTLIBS =
-LDFLAGS = -L../../../lib_acl_cpp/lib -l_acl_cpp -L../../../lib_protocol/lib -l_protocol -L../../../lib_acl/lib -l_acl \
+LDFLAGS = -L../../../lib_acl_cpp/lib -lacl_cpp -L../../../lib_protocol/lib -lprotocol -L../../../lib_acl/lib -lacl \
 	$(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)

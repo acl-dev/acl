@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 		const char* addr = ":8888";
 
 		printf("listen: %s\r\n", addr);
-		mf.run_alone(addr, argc >= 3 ? argv[2] : NULL, 0);
+		mf.run_alone(addr, argc >= 3 ? argv[2] : NULL);
 	}
 	else
 		mf.run_daemon(argc, argv);

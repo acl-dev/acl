@@ -604,9 +604,9 @@ ACL_VSTREAM *private_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 		stream->close_fn = acl_socket_close;
 	}
 
-	stream->addr_peer = NULL;
+	stream->addr_peer  = NULL;
 	stream->addr_local = NULL;
-	stream->path = NULL;
+	stream->path       = NULL;
 
 	stream->close_handle_lnk = private_array_create(5);
 	if (stream->close_handle_lnk == NULL) {
@@ -728,6 +728,8 @@ ACL_VSTREAM *private_vstream_connect_ex(const char *addr, int block_mode,
 			rw_timeout, ACL_VSTREAM_TYPE_SOCK);
 	acl_assert(stream);
 
+	if (stream->addr_peer == NULL)
+		stream->addr_peer = malloc(MAX_ADDR_SIZE);
 	if (acl_getpeername(ACL_VSTREAM_SOCK(stream), stream->addr_peer,
 		MAX_ADDR_SIZE) < 0)
 	{
@@ -775,8 +777,10 @@ void private_vstream_free(ACL_VSTREAM *stream)
 
 	ACL_VSTREAM_SOCK(stream) = ACL_SOCKET_INVALID;
 	ACL_VSTREAM_FILE(stream) = ACL_FILE_INVALID;
-	free(stream->addr_peer);
-	free(stream->addr_local);
+	if (stream->addr_peer)
+		free(stream->addr_peer);
+	if (stream->addr_local)
+		free(stream->addr_local);
 	free(stream);
 }
 
@@ -808,8 +812,9 @@ int private_vstream_close(ACL_VSTREAM *stream)
 				continue;
 			if (close_handle->close_fn == NULL)
 				continue;
-			/* 只所将此调用放在 close_fn 前面，是为了防止有人误在 close_fn
-			 * 里调用了删除回调函数的操作而造成对同一内存的多次释放
+			/* 只所将此调用放在 close_fn 前面，是为了防止有人误在
+			 * close_fn 里调用了删除回调函数的操作而造成对同一内存
+			 * 的多次释放
 			 */
 			private_array_delete(stream->close_handle_lnk, i, NULL);
 			close_handle->close_fn(stream, close_handle->context);
@@ -826,6 +831,10 @@ int private_vstream_close(ACL_VSTREAM *stream)
 		free(stream->read_buf);
 	if (stream->wbuf != NULL)
 		free(stream->wbuf);
+	if (stream->addr_peer)
+		free(stream->addr_peer);
+	if (stream->addr_local)
+		free(stream->addr_local);
 	free(stream);
 	return (ret);
 }

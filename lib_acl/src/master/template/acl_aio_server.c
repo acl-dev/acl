@@ -173,10 +173,12 @@ static void dispatch_close(ACL_AIO *aio);
 
 static void aio_init(void)
 {
-	acl_assert(pthread_mutex_init(&__closing_time_mutex, NULL) == 0);
-	acl_assert(pthread_mutex_init(&__counter_mutex, NULL) == 0);
-	__last_closing_time = time(NULL);
+	if (pthread_mutex_init(&__closing_time_mutex, NULL) != 0)
+		abort();
+	if (pthread_mutex_init(&__counter_mutex, NULL) != 0)
+		abort();
 
+	__last_closing_time = time(NULL);
 	__use_limit_delay = acl_var_aio_delay_sec > 1 ?
 				acl_var_aio_delay_sec : 1;
 }
@@ -758,7 +760,11 @@ static int aio_server_accept_sock2(ACL_ASTREAM *astream, ACL_AIO *aio)
 		fd = acl_accept(listen_fd, NULL, 0, &sock_type);
 		if (fd >= 0) {
 			/* TCP 连接避免发送延迟现象 */
+#ifdef AF_INET6
+			if (sock_type == AF_INET || sock_type == AF_INET6)
+#else
 			if (sock_type == AF_INET)
+#endif
 				acl_tcp_set_nodelay(fd);
 			fds[i] = fd;
 		} else if (errno == EMFILE) {
@@ -904,7 +910,12 @@ static void dispatch_receive(int event_type acl_unused, ACL_EVENT *event,
 		return;
 	}
 
-	if (acl_getsocktype(fd) == AF_INET)
+	ret = acl_getsocktype(fd);
+#ifdef AF_INET6
+	if (ret == AF_INET || ret == AF_INET6)
+#else
+	if (ret == AF_INET)
+#endif
 		acl_tcp_set_nodelay(fd);
 
 	/* begin handle one client connection same as accept */
@@ -1247,7 +1258,7 @@ static void run_loop(const char *procname)
 	}
 
 	/* not reached here */
-	aio_server_exit();
+	/* aio_server_exit(); */
 }
 
 /* acl_aio_server_main - the real main program */

@@ -46,7 +46,7 @@ static void byteSwap(uint32_t * buf, unsigned words)
  */
 static void transform(unsigned int buf[4], unsigned int const in[16])
 {
-	register unsigned int a, b, c, d;
+    unsigned int a, b, c, d;
 
 	a = buf[0];
 	b = buf[1];
@@ -342,7 +342,8 @@ const char* md5::hex_encode(const void *in, char* out, size_t size)
 	char *ptr;
 	unsigned char digest[16];
 
-	acl_assert(size >= 33);
+	if (size < 33)
+		abort();
 
 	memcpy(digest, in, 16);
 

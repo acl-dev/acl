@@ -742,15 +742,17 @@ public:
 	/**
 	 * 将 json 对象树转成字符串
 	 * @param out {string&} 存储转换结果的缓冲区
+	 * @param add_space {bool} 创建 json 时是否自动在分隔符两边添加空格
 	 */
-	void build_json(string& out) const;
+	void build_json(string& out, bool add_space = false) const;
 
 	/**
 	 * 将 json 对象树转换成 json 字符串
 	 * @param out {string*} 非空时，则使用此缓冲区，否则使用内部缓冲区
+	 * @param add_space {bool} 创建 json 时是否自动在分隔符两边添加空格
 	 * @return {const string&}
 	 */
-	const string& to_string(string* out = NULL) const;
+	const string& to_string(string* out = NULL, bool add_space = false) const;
 
 	// pipe_stream 虚函数重载
 

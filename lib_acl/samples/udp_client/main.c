@@ -39,6 +39,7 @@ static void run(const char *local_addr, const char *peer_addr,
 
 	gettimeofday(&begin, NULL);
 	acl_vstream_set_peer(stream, peer_addr);
+	ACL_VSTREAM_SET_RWTIMO(stream, 1);
 
 	for (i = 0; i < count; i++) {
 		/* 如果服务端的地址是变化的，则应该在写每次前都需要调用
@@ -46,7 +47,7 @@ static void run(const char *local_addr, const char *peer_addr,
 		 */
 		ret = acl_vstream_write(stream, data, dlen);
 		if (ret == ACL_VSTREAM_EOF) {
-			printf("acl_vtream_writen error %s\r\n",
+			printf("acl_vtream_write error %s\r\n",
 				acl_last_serror());
 			break;
 		}
@@ -54,12 +55,16 @@ static void run(const char *local_addr, const char *peer_addr,
 		if (need_read) {
 			ret = acl_vstream_read(stream, buf, sizeof(buf) - 1);
 			if (ret == ACL_VSTREAM_EOF) {
+				if (errno == ETIMEDOUT) {
+					printf("timeout read\r\n");
+					continue;
+				}
 				printf("acl_vstream_read error %s\r\n",
 						acl_last_serror());
 				break;
 			} else
 				buf[ret] = 0;
-			if (i == 0)
+			if (i % inter == 0)
 				printf("result: %s\r\n", buf);
 		}
 
@@ -125,6 +130,7 @@ int main(int argc, char *argv[])
 	int   need_read = 0;
 
 	acl_lib_init();
+	acl_msg_stdout_enable(1);
 
 	snprintf(peer, sizeof(peer), "127.0.0.1:8888");
 	snprintf(local, sizeof(local), "127.0.0.1:0");

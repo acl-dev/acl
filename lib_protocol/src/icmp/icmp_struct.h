@@ -45,7 +45,7 @@ struct ICMP_CHAT {
 	ICMP_STREAM *is;            /**< 与某个客户机相关的流 */
 	ACL_RING host_head;         /**< 当前 ICMP 通信对象中的主机组成的链 */
 	unsigned short pid;         /**< 由当前进程ID表示 */
-	unsigned int tid;           /**< 由线程ID表示 */
+	unsigned long  tid;         /**< 由线程ID表示 */
 	int   check_tid;            /**< 是否检查响应包中的 tid 值 */
 
 	/* 异步IO的成员变量 */
@@ -101,7 +101,7 @@ struct ICMP_PKT {
 	/* 发送的数据包 */
 	ICMP_HDR hdr;                   /**< icmp 头 */
 	union {
-		unsigned int tid;           /**< 线程ID号 */
+		unsigned long tid;           /**< 线程ID号 */
 		char data[MAX_PACKET];      /**< icmp 数据体 */
 	} body;
 

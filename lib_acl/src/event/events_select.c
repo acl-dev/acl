@@ -417,8 +417,13 @@ static void event_loop(ACL_EVENT *eventp)
 		tv.tv_usec = 0;
 		tvp = &tv;
 	} else if (delay >= 0) {
-		tv.tv_sec  = (unsigned long) delay / 1000000;
-		tv.tv_usec = (unsigned long) delay - tv.tv_sec * 1000000;
+#if defined(ACL_WINDOWS)
+		tv.tv_sec  = (long) delay / 1000000;
+		tv.tv_usec = (unsigned long) (delay - tv.tv_sec * 1000000);
+#else
+		tv.tv_sec  = (time_t) delay / 1000000;
+		tv.tv_usec = (suseconds_t) (delay - tv.tv_sec * 1000000);
+#endif
 		tvp = &tv;
 	} else
 		tvp = NULL;

@@ -21,9 +21,6 @@ extern char *acl_var_master_conf_dir;
 
 /* every service's configure entry is different*/
 
-#define	ACL_MASTER_CONF_FILE			"conf"
-#define	ACL_DEF_MASTER_PID_DIR			"pid"
-
 #define	ACL_VAR_MASTER_SERV_DISABLE		"master_disable"
 #define	ACL_VAR_MASTER_SERV_SERVICE		"master_service"
 #define	ACL_VAR_MASTER_SERV_TYPE		"master_type"
@@ -34,6 +31,7 @@ extern char *acl_var_master_conf_dir;
 #define	ACL_VAR_MASTER_SERV_LOG			"master_log"
 #define	ACL_VAR_MASTER_SERV_COMMAND		"master_command"
 #define	ACL_VAR_MASTER_SERV_ARGS		"master_args"
+#define	ACL_VAR_MASTER_SERV_OWNER		"master_owner"
 #define	ACL_VAR_MASTER_SERV_ENV			"master_env"
 #define	ACL_VAR_MASTER_NOTIFY_ADDR		"master_notify_addr"
 #define	ACL_VAR_MASTER_NOTIFY_RECIPIENTS	"master_notify_recipients"
@@ -64,14 +62,7 @@ extern char *acl_var_master_inet_interfaces;
 #define ACL_DEF_MASTER_PROC_LIMIT	100
 extern int acl_var_master_proc_limit;    
 
-#define ACL_VAR_MASTER_OWNER_USER	"owner_user"
-#define ACL_DEF_MASTER_OWNER_USER	"master"
-extern char *acl_var_master_owner_user;
 extern uid_t acl_var_master_owner_uid;	/* zsx test */
-
-#define	ACL_VAR_MASTER_OWNER		"master_owner"
-#define	ACL_DEF_MASTER_OWNER		"master"
-extern char *acl_var_master_owner;
 
 #define	ACL_VAR_MASTER_OWNER_GROUP	"owner_group"
 #define	ACL_DEF_MASTER_OWNER_GROUP	"master"

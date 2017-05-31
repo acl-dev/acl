@@ -5,25 +5,41 @@
 
 namespace acl {
 
-int ostream::write(const void* data, size_t size, bool loop /* = true */)
+int ostream::write(const void* data, size_t size, bool loop /* = true */,
+	bool buffed /* = false */)
 {
 	int   ret;
 	if (loop)
-		ret = acl_vstream_writen(stream_, data, size);
+	{
+		if (buffed)
+			ret = acl_vstream_buffed_writen(stream_, data, size);
+		else
+			ret = acl_vstream_writen(stream_, data, size);
+	}
 	else
 		ret = acl_vstream_write(stream_, data, (int) size);
+
 	if (ret == ACL_VSTREAM_EOF)
 		eof_ = true;
 	return ret;
 }
 
-int ostream::writev(const struct iovec *v, int count, bool loop)
+bool ostream::fflush(void)
+{
+	if (acl_vstream_fflush(stream_) == ACL_VSTREAM_EOF)
+		return false;
+	else
+		return true;
+}
+
+int ostream::writev(const struct iovec *v, int count, bool loop /* = true */)
 {
 	int   ret;
 	if (loop)
 		ret = acl_vstream_writevn(stream_, v, count);
 	else
 		ret = acl_vstream_writev(stream_, v, count);
+
 	if (ret == ACL_VSTREAM_EOF)
 		eof_ = true;
 	return ret;

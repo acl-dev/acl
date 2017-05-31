@@ -24,6 +24,25 @@ public:
 
 	/**
 	 * 写数据至输出流中
+	 * @param data {const void*} 数据指针地址
+	 * @param size {size_t} data 数据长度(字节)
+	 * @param loop {bool} 是否保证数据全部输出才返回，如果为 true,
+	 *  则该函数直至数据全部输出或出错才会返回；否则仅写一次便返回，
+	 *  但并不保证数据全部写完
+	 * @param buffed {bool} 是否先缓存待写的数据
+	 * @return {int} 真实写入的数据量, 返回 -1 表示出错
+	 */
+	int write(const void* data, size_t size, bool loop = true,
+		bool buffed = false);
+
+	/**
+	 * 如果采用写缓冲方式，则最后需要调用本函数刷写缓冲区
+	 * @return {bool} 返回 false 表示写失败，有可能是连接关闭
+	 */
+	bool fflush(void);
+
+	/**
+	 * 写数据至输出流中
 	 * @param v {const struct iovec*}
 	 * @param count {int} 数组 v 的元素个数
 	 * @param loop {bool} 是否保证数据全部输出才返回，如果为 true，
@@ -32,17 +51,6 @@ public:
 	 * @return {int} 真实写入的数据量, 返回 -1 表示出错
 	 */
 	int writev(const struct iovec *v, int count, bool loop = true);
-
-	/**
-	 * 写数据至输出流中
-	 * @param data {const void*} 数据指针地址
-	 * @param size {size_t} data 数据长度(字节)
-	 * @param loop {bool} 是否保证数据全部输出才返回，如果为 true,
-	 *  则该函数直至数据全部输出或出错才会返回；否则仅写一次便返回，
-	 *  但并不保证数据全部写完
-	 * @return {int} 真实写入的数据量, 返回 -1 表示出错
-	 */
-	int write(const void* data, size_t size, bool loop = true);
 
 	/**
 	 * 带格式方式写数据，类似于 vfprintf，保证数据全部写入

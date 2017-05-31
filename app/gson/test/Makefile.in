@@ -2,16 +2,16 @@ CC      = g++
 
 CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 -Wno-long-long \
--Wpointer-arith -Werror -Wshadow -O3 \
+-Wpointer-arith -Wshadow -O3 \
 -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO
-
+#-Werror
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
 SYSLIB = -lpthread -lz
 CHECKSYSRES = @echo "Unknow system type!";exit 1
-UNIXNAME = $(shell uname -sm)
-OSTYPE = $(shell uname -p)
+UNIXNAME = $(shell uname -s)
+OSTYPE = $(shell uname -m)
 RPATH = linux64
 
 ifeq ($(CC),)
@@ -51,6 +51,20 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	SYSLIB += -lcrypt
 endif
 
+# For MINGW
+ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	SYSLIB = -lpthread-2 -liconv
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	SYSLIB = -lpthread-2 -liconv
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
 #Path for SunOS
 ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring 86, $(UNIXNAME)), 86)
@@ -85,9 +99,9 @@ CFLAGS += -I../../../../lib_acl/include \
 	  -I../../../../lib_protocol/include \
 	  -I../../../../lib_acl_cpp/include
 EXTLIBS =
-LDFLAGS = -L../../../../lib_acl_cpp/lib -l_acl_cpp \
-	  -L../../../../lib_protocol/lib -l_protocol \
-	  -L../../../../lib_acl/lib -l_acl \
+LDFLAGS = -L../../../../lib_acl_cpp/lib -lacl_cpp \
+	  -L../../../../lib_protocol/lib -lprotocol \
+	  -L../../../../lib_acl/lib -lacl \
 	  $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
