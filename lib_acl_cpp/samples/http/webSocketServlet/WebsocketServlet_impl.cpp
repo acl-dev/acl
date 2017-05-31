@@ -75,17 +75,17 @@ bool WebsocketServlet_impl::doPost(acl::HttpServletRequest& req,
 	return res.write(buf) && res.write(NULL, 0);
 }
 
-bool WebsocketServlet_impl::on_ping(const char *buf, unsigned long long  len)
+bool WebsocketServlet_impl::on_ping(const char *, unsigned long long)
 {
 	return send_pong();
 }
 
 
-bool WebsocketServlet_impl::on_pong(const char *buf, unsigned long long  len)
+bool WebsocketServlet_impl::on_pong(const char *, unsigned long long)
 {
 	return send_ping();
 }
-bool WebsocketServlet_impl::on_message(char *data, unsigned long long len, bool text)
+bool WebsocketServlet_impl::on_message(char *data, unsigned long long len, bool)
 {
 	switch (step_)
 	{
@@ -99,7 +99,7 @@ bool WebsocketServlet_impl::on_message(char *data, unsigned long long len, bool 
 	case 1:
 	{
 		printf("FileSize:%s\n", data);
-		filesize_ = std::strtol(data, 0, 10);
+		filesize_ = strtol(data, 0, 10);
 		step_++;
 	}
 	break;
