@@ -672,6 +672,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				<File
 					RelativePath=".\src\http\websocket.cpp">
 				</File>
+				<File
+					RelativePath=".\src\http\WebSocketServlet.cpp">
+				</File>
 			</Filter>
 			<Filter
 				Name="hsocket"
@@ -1264,6 +1267,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\http\websocket.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\http\WebSocketServlet.hpp">
 				</File>
 			</Filter>
 			<Filter

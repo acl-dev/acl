@@ -100,7 +100,7 @@ public:
 	 * @return {bool} 返回处理结果，返回 false 表示处理失败或处理成功且不保持
 	 *  长连接，应关闭连接
 	 */
-	bool doRun();
+	bool doRun(void);
 
 	/**
 	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数
