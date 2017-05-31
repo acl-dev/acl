@@ -89,6 +89,7 @@
 #include "acl_cpp/http/http_request_pool.hpp"
 #include "acl_cpp/http/http_request_manager.hpp"
 #include "acl_cpp/http/websocket.hpp"
+#include "acl_cpp/http/WebSocketServlet.hpp"
 
 #include "acl_cpp/db/query.hpp"
 #include "acl_cpp/db/mysql_conf.hpp"
