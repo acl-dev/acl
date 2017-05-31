@@ -46,7 +46,6 @@ static void mio(SOCK_UDP *sock, int inter, bool echo)
 		}
 
 		int ret = udp_mread(sock, pkts, PKT_CNT);
-		printf(">>.ret: %d\r\n", ret);
 		if (ret <= 0) {
 			printf(">>read error ret: %d, errno: %d, %d\r\n",
 				ret, errno, EMSGSIZE);

@@ -1,0 +1,98 @@
+CC      = g++
+
+CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
+-Wno-long-long \
+-Wpointer-arith -Werror -Wshadow -O3 \
+-D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO
+
+#-Waggregate-return
+###########################################################
+#Check system:
+#       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
+SYSLIB = -lpthread -lcrypt
+CHECKSYSRES = @echo "Unknow system type!";exit 1
+UNIXNAME = $(shell uname -sm)
+
+ifeq ($(CC),)
+        CC = gcc
+endif
+
+# For FreeBSD
+ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
+	ifeq ($(findstring gcc, $(CC)), gcc)
+		CFLAGS += -Wstrict-prototypes
+	endif
+	CFLAGS += -DFREEBSD -D_REENTRANT
+	SYSLIB = -lcrypt -lpthread
+endif
+
+#Path for Linux
+ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
+	ifeq ($CC, "gcc")
+		CFLAGS += -Wstrict-prototypes
+	endif
+	CFLAGS += -DLINUX2 -D_REENTRANT
+endif
+
+#Path for SunOS
+ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
+	ifeq ($(findstring 86, $(UNIXNAME)), 86)
+		SYSLIB += -lsocket -lnsl -lrt
+	endif
+	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
+		SYSLIB += -lsocket -lnsl -lrt
+	endif
+	ifeq ($CC, "gcc")
+		CFLAGS += -Wstrict-prototypes
+	endif
+	CFLAGS += -DSUNOS5 -D_REENTRANT
+endif
+
+#Path for HP-UX
+ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
+	ifeq ($CC, "gcc")
+		CFLAGS += -Wstrict-prototypes
+	endif
+	CFLAGS += -DHP_UX -DHPUX11
+	PLAT_NAME=hp-ux
+endif
+
+#Find system type.
+ifneq ($(SYSPATH),)
+	CHECKSYSRES = @echo "System is $(shell uname -sm)"
+endif
+###########################################################
+
+CFLAGS += -I. -I.. -I../.. -I../../../include -I../../../../lib_acl/include -I../../../../lib_protocol/include
+EXTLIBS =
+LDFLAGS = -L../../../lib -l_acl_cpp -L../../../../lib_protocol/lib -l_protocol -L../../../../lib_acl/lib -l_acl \
+	$(EXTLIBS) $(SYSLIB)
+
+COMPILE = $(CC) $(CFLAGS)
+LINK = $(CC) $(OBJ) $(LDFLAGS)
+###########################################################
+OBJ_PATH = .
+
+#Project's objs
+SRC = $(wildcard *.cpp) $(wildcard ../*.cpp) $(wildcard ../../*.cpp)
+OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
+
+$(OBJ_PATH)/%.o: %.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: ../../%.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: ../%.cpp
+	$(COMPILE) $< -o $@
+
+.PHONY = all clean
+all: RM $(OBJ)
+	$(LINK) -o $(PROG)
+	@echo ""
+	@echo "All ok! Output:$(PROG)"
+	@echo ""
+RM:
+	rm -f $(PROG)
+clean:
+	rm -f $(PROG)
+	rm -f $(OBJ)
+###########################################################
