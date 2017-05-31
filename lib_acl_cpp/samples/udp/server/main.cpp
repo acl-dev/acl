@@ -11,7 +11,8 @@
  */
 
 #include "stdafx.h"
-#include "udp.h"
+#include "udp_sock.h"
+#include "udp_pkt.h"
 
 static void mio(udp_sock& sock, int inter, bool echo)
 {
@@ -19,12 +20,11 @@ static void mio(udp_sock& sock, int inter, bool echo)
 #define BUF_LEN 1024
 
 	udp_pkts upkts(PKT_CNT);
-	std::vector<udp_pkt*>& pkts = upkts.get_pkts();
 	int nread = 0, total_read = 0, n = 0, nwrite = 0;
 
 	while (true)
 	{
-		int ret = sock.recv(pkts);
+		int ret = sock.recv(upkts);
 		if (ret <= 0)
 		{
 			printf("read error %s, ret: %d\r\n",
@@ -37,7 +37,7 @@ static void mio(udp_sock& sock, int inter, bool echo)
 
 		if (echo)
 		{
-			ret = sock.send(pkts, ret);
+			ret = sock.send(upkts);
 			if (ret <= 0)
 			{
 				printf("send error %s, ret: %d\r\n",
@@ -48,15 +48,16 @@ static void mio(udp_sock& sock, int inter, bool echo)
 		}
 
 		if (++n % inter == 0) {
-			char buf[256], ip[64];
+			char buf[256];
 
 			snprintf(buf, sizeof(buf),
 				"curr: %d, total: %d, ret: %d, dlen: %lu, "
 				"nread: %d, nwrite: %d, ip: %s, port: %d",
-				n, total_read, ret, pkts[0]->get_dlen(),
+				n, total_read, ret,
+				upkts[0]->get_dlen(),
 				nread, nwrite,
-				pkts[0]->get_ip(ip, sizeof(ip)),
-				pkts[0]->get_port());
+				upkts[0]->get_ip(),
+				upkts[0]->get_port());
 			ACL_METER_TIME(buf);
 		}
 
