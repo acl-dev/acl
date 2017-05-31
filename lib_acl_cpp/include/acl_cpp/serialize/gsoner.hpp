@@ -118,6 +118,7 @@ private:
 
 	bool check_namespace();
 	bool check_namespace_end();
+	bool check_using_namespace();
 	bool check_struct_begin ();
 	bool check_struct_end ();
 	bool check_include();

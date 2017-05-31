@@ -44,6 +44,14 @@ public:
 	query& set_parameter(const char* name, const char *value);
 
 	/**
+	* 设置字符串类型的变量值
+	* @param name {const char*} 变量名
+	* @param value {const char*} 变量值
+	* @return {query&}
+	*/
+	query& set_parameter(const char* name, const std::string &value);
+
+	/**
 	 * 设置字符类型的变量值
 	 * @param name {const char*} 变量名
 	 * @param value {char} 变量值

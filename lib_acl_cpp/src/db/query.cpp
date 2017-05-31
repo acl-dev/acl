@@ -151,6 +151,11 @@ void query::del_param(const string& key)
 	}
 }
 
+query& query::set_parameter(const char* name, const std::string &value)
+{
+	return set_parameter(name, value.c_str());
+}
+
 query& query::set_parameter(const char* name, const char *value)
 {
 	string key(name);

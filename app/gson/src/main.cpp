@@ -2,6 +2,13 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <direct.h>
+
+
+#ifdef _MSC_VER
+#define chdir _chdir
+#define getcwd _getcwd
+#endif // MSVC
 
 static void create_files(const std::vector<std::string>& files)
 {
