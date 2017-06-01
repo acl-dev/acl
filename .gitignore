@@ -20,7 +20,12 @@
 *.lib
 *.a
 *.user
+*.exe
+*.VC.db
 x64/
+Debug/
+Release/
+dist/
 acl_cpp_vc2015.VC.VC.opendb
 acl_cpp_vc2015.VC.db
 app/gson/debug/
