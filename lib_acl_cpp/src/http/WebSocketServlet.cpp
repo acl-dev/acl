@@ -92,7 +92,7 @@ bool WebSocketServlet::doRun(void)
 			recv_buffer_ = NULL;
 			return false;
 		}
-		write_pos_ += len;
+		write_pos_ += (int)len;
 		recv_buffer_[write_pos_] = '\0';
 	}
 

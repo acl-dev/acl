@@ -42,8 +42,12 @@ struct list1
 	std::map<std::string, int> int_map;
 	std::map<std::string, bool > bool_map;
 	std::map<std::string,std::list<base> > base_list_map;
+
+	std::vector<std::string*> vector_string_ptr;
 	std::vector<std::string> vector_string;
 	std::vector<std::list<base> > vector_list_base;
+
+
 };
 
 namespace hello

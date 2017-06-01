@@ -19,6 +19,8 @@
 *.la
 *.lib
 *.a
+*.user
+x64/
 acl_cpp_vc2015.VC.VC.opendb
 acl_cpp_vc2015.VC.db
 app/gson/debug/
