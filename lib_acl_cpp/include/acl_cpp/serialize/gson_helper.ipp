@@ -964,7 +964,7 @@ gson(acl::json_node &node, std::list<T*> *objs)
 	}
 	if (!result.first)
 	{
-		for (std::list<T*>::iterator it = objs->begin();
+		for (typename std::list<T*>::iterator it = objs->begin();
 			it != objs->end();
 			it++)
 		{
@@ -1028,7 +1028,7 @@ static inline gson(acl::json_node &node, std::vector<T*> *objs)
 	}
 	if (!result.first)
 	{
-		for (std::vector<T*>::iterator it = objs->begin();
+		for (typename std::vector<T*>::iterator it = objs->begin();
 			it != objs->end(); 
 			it++)
 		{
@@ -1089,7 +1089,7 @@ gson(acl::json_node &node, std::set<T*> *objs)
 	}
 	if (!result.first)
 	{
-		for (std::set<T*>::iterator it = objs->begin();
+		for (typename std::set<T*>::iterator it = objs->begin();
 			it != objs->end(); ++it)
 		{
 			//delete T
