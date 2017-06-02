@@ -31,7 +31,7 @@
  * This is a private header file.  Applications should not directly include
  * this file.
  */
-#include "stdlib/acl_define.h"
+#include "acl_define.h"
 
 #include <sys/types.h>
 #include <stddef.h>

@@ -3,7 +3,7 @@
 service trigger
 {
 #	进程是否禁止运行
-	master_disable = yes
+	master_disable = no
 #	服务监听为域套接口
 	master_service = trigger.sock
 #	服务类型
@@ -24,14 +24,14 @@ service trigger
 	master_wakeup = 4
 #	最大进程数
 	master_maxproc = 10
-#	需要预先启动的进程数，该值不应大于 master_maxproc
-	master_prefork = 2
 #	进程程序名
 	master_command = trigger
 #	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
 #	master_args = 
 #	进程日志记录文件
-	master_log = {install_path}/var/log/trigger.log
+	master_log = {install_path}/var/log/trigger
+#	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2
+#	master_debug =
 #	传递给服务子进程的环境变量, 可以通过 getenv("SERVICE_ENV") 获得此值
 #	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
 #			sync_action:E_LOG_SEM, sem_name:/tmp/trigger.sem

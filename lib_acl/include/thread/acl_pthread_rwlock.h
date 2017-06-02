@@ -47,8 +47,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef	ACL_PTHREAD_RWLOCK_H
 #define	ACL_PTHREAD_RWLOCK_H
 
-#include "stdlib/acl_define.h"
-#include "thread/acl_pthread.h"
+#include "../stdlib/acl_define.h"
+#include "../thread/acl_pthread.h"
 #if defined(_WIN32) || defined(_WIN64)
 # define ACL_HAVE_NO_RWLOCK
 #endif

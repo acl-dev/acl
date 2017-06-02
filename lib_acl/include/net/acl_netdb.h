@@ -1,13 +1,13 @@
 #ifndef	ACL_NETDB_INCLUDE_H
 #define	ACL_NETDB_INCLUDE_H
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 
 #ifdef	ACL_UNIX
 #include <netinet/in.h>
 #endif
 
-#include "stdlib/acl_array.h"
+#include "../stdlib/acl_array.h"
 
 /**
  * 主机地址结构

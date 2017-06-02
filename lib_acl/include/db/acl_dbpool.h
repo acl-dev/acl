@@ -5,9 +5,9 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 #include <time.h>
-#include "stdlib/acl_stdlib.h"
+#include "../stdlib/acl_stdlib.h"
 
 #define	ACL_DB_DEBUG_MEM	(1<<0)
 

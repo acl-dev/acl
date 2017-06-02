@@ -5,15 +5,15 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 
  /*
   * Utility library.
   */
-#include "stdlib/acl_vstream.h"
-#include "ioctl/acl_ioctl.h"
-#include "aio/acl_aio.h"
-#include "event/acl_events.h"
+#include "../stdlib/acl_vstream.h"
+#include "../ioctl/acl_ioctl.h"
+#include "../aio/acl_aio.h"
+#include "../event/acl_events.h"
 
 #define	ACL_MASTER_SERVER_END			0
 #define ACL_MASTER_SERVER_INT_TABLE		1

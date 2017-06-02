@@ -1,8 +1,8 @@
 #pragma once
 #include <time.h>
-#include "acl_cpp/queue/queue_manager.hpp"
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/stdlib/locker.hpp"
+#include "../stdlib/string.hpp"
+#include "../stdlib/locker.hpp"
+#include "queue_manager.hpp"
 
 #ifndef MAXPATH255
 #define MAXPATH255 255

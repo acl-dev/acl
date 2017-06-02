@@ -1,9 +1,9 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <vector>
-#include "acl_cpp/stream/socket_stream.hpp"
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/connpool/connect_client.hpp"
+#include "../stream/socket_stream.hpp"
+#include "../stdlib/string.hpp"
+#include "../connpool/connect_client.hpp"
 
 namespace acl
 {

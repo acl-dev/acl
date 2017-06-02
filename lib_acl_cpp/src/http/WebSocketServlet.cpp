@@ -85,14 +85,14 @@ bool WebSocketServlet::doRun(void)
 			recv_buffer_ = (char*) acl_myrealloc(recv_buffer_,
 				write_pos_ + (size_t)len + 1);
 
-		if (ws_->read_frame_data(recv_buffer_+ write_pos_, len) < 0)
+		if (ws_->read_frame_data(recv_buffer_+ write_pos_, (size_t) len) < 0)
 		{
 			write_pos_ = 0;
 			acl_myfree(recv_buffer_);
 			recv_buffer_ = NULL;
 			return false;
 		}
-		write_pos_ += (int)len;
+		write_pos_ += (int) len;
 		recv_buffer_[write_pos_] = '\0';
 	}
 

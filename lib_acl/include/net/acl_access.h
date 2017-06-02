@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_stdlib.h"
+#include "../stdlib/acl_stdlib.h"
 
 /**
  * 向访问列表中添加一个允许的 ip 地址段

@@ -1,8 +1,8 @@
 #pragma once
 #include <map>
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/stdlib/locker.hpp"
-#include "acl_cpp/queue/queue_file.hpp"
+#include "../stdlib/string.hpp"
+#include "../stdlib/locker.hpp"
+#include "queue_file.hpp"
 
 typedef struct ACL_SCAN_DIR ACL_SCAN_DIR;
 

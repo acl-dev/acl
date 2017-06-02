@@ -1,8 +1,8 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <vector>
-#include "acl_cpp/http/http_header.hpp"
-#include "acl_cpp/connpool/connect_client.hpp"
+#include "../connpool/connect_client.hpp"
+#include "http_header.hpp"
 
 namespace acl {
 

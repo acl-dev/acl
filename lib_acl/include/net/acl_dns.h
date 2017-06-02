@@ -5,15 +5,15 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
-#include "stdlib/acl_htable.h"
-#include "stdlib/acl_cache2.h"
+#include "../stdlib/acl_define.h"
+#include "../stdlib/acl_htable.h"
+#include "../stdlib/acl_cache2.h"
 #ifdef  ACL_UNIX
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif
-#include "event/acl_events.h"
-#include "aio/acl_aio.h"
+#include "../event/acl_events.h"
+#include "../aio/acl_aio.h"
 #include "acl_netdb.h"
 
 /* DNS 查询时的错误码定义 */

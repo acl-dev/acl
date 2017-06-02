@@ -1,10 +1,10 @@
 #ifndef	ACL_TIMER_INCLUDE_H
 #define	ACL_TIMER_INCLUDE_H
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 #include <time.h>
-#include "stdlib/acl_iterator.h"
-#include "stdlib/acl_ring.h"
+#include "../stdlib/acl_iterator.h"
+#include "../stdlib/acl_ring.h"
 
 #ifdef	__cplusplus
 extern "C" {

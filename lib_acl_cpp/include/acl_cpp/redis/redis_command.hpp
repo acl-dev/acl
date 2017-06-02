@@ -1,9 +1,9 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <map>
 #include <list>
 #include <vector>
-#include "acl_cpp/redis/redis_result.hpp"
+#include "redis_result.hpp"
 
 namespace acl
 {

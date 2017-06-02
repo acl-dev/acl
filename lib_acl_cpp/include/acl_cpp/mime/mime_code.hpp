@@ -1,6 +1,6 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
-#include "acl_cpp/stdlib/pipe_stream.hpp"
+#include "../acl_cpp_define.hpp"
+#include "../stdlib/pipe_stream.hpp"
 
 namespace acl {
 	

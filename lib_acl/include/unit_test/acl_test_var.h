@@ -5,7 +5,7 @@
 extern "C" {
 # endif
 
-#include "stdlib/acl_array.h"
+#include "../stdlib/acl_array.h"
 
 extern int var_aut_log_level;
 extern int var_aut_verbose;

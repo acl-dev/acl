@@ -1,6 +1,6 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
-#include "acl_cpp/stdlib/noncopyable.hpp"
+#include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 
 struct ACL_AIO;
 struct ACL_EVENT;

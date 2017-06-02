@@ -1,9 +1,9 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <time.h>
-#include "acl_cpp/connpool/connect_client.hpp"
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/mime/rfc2047.hpp"
+#include "../connpool/connect_client.hpp"
+#include "../stdlib/string.hpp"
+#include "../mime/rfc2047.hpp"
 
 namespace acl {
 

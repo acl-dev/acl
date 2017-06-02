@@ -4,7 +4,7 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 
 /**
  * 将GBK字符集中的简体转换为GBK字符集中的繁体

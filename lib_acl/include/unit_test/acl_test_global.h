@@ -5,9 +5,9 @@
 extern "C" {
 # endif
 
-#include "stdlib/acl_define.h"
-#include "stdlib/acl_loadcfg.h"
-#include "stdlib/acl_array.h"
+#include "../stdlib/acl_define.h"
+#include "../stdlib/acl_loadcfg.h"
+#include "../stdlib/acl_array.h"
 
 #include "acl_test_struct.h"
 

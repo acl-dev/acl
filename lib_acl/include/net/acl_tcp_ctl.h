@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 
 #define ACL_SOCKET_RBUF_SIZE	204800  /**< 缺省读缓冲区大小 */
 #define ACL_SOCKET_WBUF_SIZE	204800  /**< 缺少写缓冲区大小 */

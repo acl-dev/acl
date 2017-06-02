@@ -1,7 +1,7 @@
 #ifndef ACL_PTHREAD_POOL_INCLUDE_H
 #define ACL_PTHREAD_POOL_INCLUDE_H
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 #include <time.h>
 
 #ifdef	ACL_UNIX

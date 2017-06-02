@@ -5,10 +5,10 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
-#include "stdlib/acl_vstring.h"
-#include "stdlib/acl_ring.h"
-#include "aio/acl_aio.h"
+#include "../stdlib/acl_define.h"
+#include "../stdlib/acl_vstring.h"
+#include "../stdlib/acl_ring.h"
+#include "../aio/acl_aio.h"
 
 typedef struct ACL_MSGIO ACL_MSGIO;
 typedef struct ACL_MSGIO_INFO ACL_MSGIO_INFO;

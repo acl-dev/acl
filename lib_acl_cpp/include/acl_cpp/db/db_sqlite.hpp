@@ -1,7 +1,7 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/db/db_handle.hpp"
+#include "../acl_cpp_define.hpp"
+#include "../stdlib/string.hpp"
+#include "../db/db_handle.hpp"
 
 typedef struct sqlite3 sqlite3;
 

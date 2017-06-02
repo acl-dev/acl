@@ -1,7 +1,7 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <list>
-#include "acl_cpp/stream/aio_delay_free.hpp"
+#include "aio_delay_free.hpp"
 
 namespace acl
 {

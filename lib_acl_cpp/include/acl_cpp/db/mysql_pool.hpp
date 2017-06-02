@@ -1,6 +1,6 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
-#include "acl_cpp/db/db_pool.hpp"
+#include "../acl_cpp_define.hpp"
+#include "../db/db_pool.hpp"
 
 namespace acl {
 

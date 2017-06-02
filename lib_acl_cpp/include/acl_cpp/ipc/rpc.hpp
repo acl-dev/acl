@@ -1,6 +1,6 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
-#include "acl_cpp/ipc/ipc_service.hpp"
+#include "../acl_cpp_define.hpp"
+#include "ipc_service.hpp"
 #if defined(_WIN32) || defined(_WIN64)
  struct acl_pthread_mutex_t;
  struct acl_pthread_cond_t;

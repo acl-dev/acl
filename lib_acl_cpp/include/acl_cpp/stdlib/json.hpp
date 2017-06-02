@@ -1,9 +1,9 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <list>
 #include <vector>
-#include "acl_cpp/stdlib/dbuf_pool.hpp"
-#include "acl_cpp/stdlib/pipe_stream.hpp"
+#include "dbuf_pool.hpp"
+#include "pipe_stream.hpp"
 
 struct ACL_JSON_NODE;
 struct ACL_JSON;
