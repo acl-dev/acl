@@ -134,6 +134,9 @@ static void master_listen_inet(ACL_MASTER_SERV *serv)
 
 static void master_bind_udp(ACL_MASTER_SERV *serv)
 {
+#ifdef SO_REUSEPORT
+	serv->listen_fd_count = 0;
+#else
 	const char *myname = "master_bind_udp";
 	int   i;
 
@@ -164,6 +167,7 @@ static void master_bind_udp(ACL_MASTER_SERV *serv)
 		acl_msg_info("%s(%d), %s: bind on %s ok",
 			__FILE__, __LINE__, myname, addr->addr);
 	}
+#endif
 }
 
 static void master_listen_unix(ACL_MASTER_SERV *serv)
