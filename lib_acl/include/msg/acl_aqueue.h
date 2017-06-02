@@ -4,8 +4,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "stdlib/acl_define.h"
-#include "thread/acl_thread.h"
+#include "../stdlib/acl_define.h"
+#include "../thread/acl_thread.h"
 
 #define	ACL_AQUEUE_ERR_UNKNOWN      -1
 #define	ACL_AQUEUE_OK               0

@@ -1,6 +1,6 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
-#include "acl_cpp/stream/socket_stream.hpp"
+#include "../acl_cpp_define.hpp"
+#include "../stream/socket_stream.hpp"
 #include <vector>
 
 struct SMTP_CLIENT;

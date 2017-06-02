@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 
 typedef struct ACL_IFADDR {
 	char *name;		/* ½Ó¿ÚÃû³Æ */

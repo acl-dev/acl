@@ -35,7 +35,7 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "acl_define.h"
 #include <sys/types.h>
 #include "avl_impl.h"
 

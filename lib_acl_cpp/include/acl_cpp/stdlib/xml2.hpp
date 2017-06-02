@@ -1,9 +1,9 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <vector>
 #include <list>
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/stdlib/xml.hpp"
+#include "string.hpp"
+#include "xml.hpp"
 
 struct ACL_XML2;
 struct ACL_XML2_NODE;

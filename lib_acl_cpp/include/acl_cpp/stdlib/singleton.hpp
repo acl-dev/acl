@@ -1,7 +1,7 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <assert.h>
-#include "acl_cpp/stdlib/noncopyable.hpp"
+#include "noncopyable.hpp"
 
 //  singleton.hpp
 //

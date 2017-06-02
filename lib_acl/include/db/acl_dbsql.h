@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 #include "acl_dbpool.h"
 
 #ifndef	ACL_DB_ATOU

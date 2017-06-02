@@ -1,7 +1,7 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <list>
-#include "acl_cpp/stream/aio_socket_stream.hpp"
+#include "../stream/aio_socket_stream.hpp"
 
 namespace acl {
 

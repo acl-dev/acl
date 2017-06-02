@@ -1,7 +1,7 @@
 #ifndef ACL_PROCTL_INCLUDE_H
 #define ACL_PROCTL_INCLUDE_H
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 #include <stdlib.h>
 
 #ifdef __cplusplus

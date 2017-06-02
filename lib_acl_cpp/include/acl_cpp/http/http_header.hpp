@@ -1,8 +1,8 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <list>
-#include "acl_cpp/stdlib/dbuf_pool.hpp"
-#include "acl_cpp/http/http_type.hpp"
+#include "../stdlib/dbuf_pool.hpp"
+#include "../http/http_type.hpp"
 
 struct HTTP_HDR_RES;
 struct HTTP_HDR_ENTRY;

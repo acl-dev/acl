@@ -1,11 +1,11 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <vector>
 #include <list>
-#include "acl_cpp/stdlib/dbuf_pool.hpp"
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/mime/mime_attach.hpp"
-#include "acl_cpp/http/http_type.hpp"
+#include "../stdlib/dbuf_pool.hpp"
+#include "../stdlib/string.hpp"
+#include "../mime/mime_attach.hpp"
+#include "http_type.hpp"
 
 struct MIME_STATE;
 struct MIME_NODE;

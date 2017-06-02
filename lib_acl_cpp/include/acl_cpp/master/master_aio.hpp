@@ -1,7 +1,7 @@
 #pragma once
-#include "acl_cpp/stream/aio_handle.hpp"
-#include "acl_cpp/stream/aio_listen_stream.hpp"
-#include "acl_cpp/master/master_base.hpp"
+#include "../stream/aio_handle.hpp"
+#include "../stream/aio_listen_stream.hpp"
+#include "master_base.hpp"
 
 struct ACL_VSTREAM;
 

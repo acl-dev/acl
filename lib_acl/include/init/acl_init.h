@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 
 /**
  * 初始化整个ACL库

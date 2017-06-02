@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 
 #define ACL_MUTEX_MAXWAIT	(~(unsigned int)0)
 #ifdef	ACL_HAS_PTHREAD

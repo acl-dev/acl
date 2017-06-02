@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 
 typedef struct ACL_MDT_NOD ACL_MDT_NOD;
 typedef struct ACL_MDT_RES ACL_MDT_RES;

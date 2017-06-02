@@ -5,7 +5,7 @@
 extern "C" {
 # endif
 
-#include "stdlib/acl_array.h"
+#include "../stdlib/acl_array.h"
 
 typedef struct AUT_LINE {
 	char  cmd_name[128];	/* ÃüÁîº¯ÊıÃû³Æ */

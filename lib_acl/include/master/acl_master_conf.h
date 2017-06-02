@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
-#include "master/acl_master_type.h"
+#include "../stdlib/acl_define.h"
+#include "../master/acl_master_type.h"
 
 ACL_API void acl_app_conf_load(const char *pathname);
 ACL_API void acl_app_conf_unload(void);

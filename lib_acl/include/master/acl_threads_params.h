@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 
 extern char *acl_var_threads_procname;
 extern char *acl_var_threads_log_file;

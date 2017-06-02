@@ -5,13 +5,13 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_array.h"
-#include "stdlib/acl_ring.h"
-#include "stdlib/acl_vstream.h"
-#include "stdlib/acl_htable.h"
-#include "stdlib/acl_vstring.h"
-#include "stdlib/acl_iterator.h"
-#include "stdlib/acl_dbuf_pool.h"
+#include "../stdlib/acl_array.h"
+#include "../stdlib/acl_ring.h"
+#include "../stdlib/acl_vstream.h"
+#include "../stdlib/acl_htable.h"
+#include "../stdlib/acl_vstring.h"
+#include "../stdlib/acl_iterator.h"
+#include "../stdlib/acl_dbuf_pool.h"
 
 typedef struct ACL_XML	ACL_XML;
 typedef struct ACL_XML_NODE	ACL_XML_NODE;

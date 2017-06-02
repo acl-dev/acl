@@ -1,7 +1,7 @@
 #pragma once
-#include "acl_cpp/stream/aio_handle.hpp"
-#include "acl_cpp/ipc/ipc_service.hpp"
-#include "acl_cpp/http/http_header.hpp"
+#include "../stream/aio_handle.hpp"
+#include "../ipc/ipc_service.hpp"
+#include "http_header.hpp"
 
 namespace acl {
 

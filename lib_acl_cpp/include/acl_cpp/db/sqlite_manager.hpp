@@ -1,6 +1,6 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
-#include "acl_cpp/connpool/connect_manager.hpp"
+#include "../acl_cpp_define.hpp"
+#include "../connpool/connect_manager.hpp"
 
 namespace acl {
 

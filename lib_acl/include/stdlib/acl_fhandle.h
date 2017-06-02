@@ -9,7 +9,7 @@ extern "C" {
 #include "acl_vstream.h"
 #include "acl_vstring.h"
 #include "acl_ring.h"
-#include "thread/acl_thread.h"
+#include "../thread/acl_thread.h"
 #include <time.h>
 
 /**

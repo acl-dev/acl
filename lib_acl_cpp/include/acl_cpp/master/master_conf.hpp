@@ -1,5 +1,5 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 
 struct ACL_XINETD_CFG_PARSER;
 struct ACL_CFG_INT_TABLE;

@@ -5,12 +5,12 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
-#include "stdlib/acl_dbuf_pool.h"
-#include "stdlib/acl_iterator.h"
-#include "stdlib/acl_vstring.h"
-#include "stdlib/acl_ring.h"
-#include "stdlib/acl_array.h"
+#include "../stdlib/acl_define.h"
+#include "../stdlib/acl_dbuf_pool.h"
+#include "../stdlib/acl_iterator.h"
+#include "../stdlib/acl_vstring.h"
+#include "../stdlib/acl_ring.h"
+#include "../stdlib/acl_array.h"
 
 typedef struct ACL_JSON ACL_JSON;
 typedef struct ACL_JSON_NODE ACL_JSON_NODE;

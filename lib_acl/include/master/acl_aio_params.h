@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 #ifdef ACL_UNIX
 
 extern int   acl_var_aio_pid;

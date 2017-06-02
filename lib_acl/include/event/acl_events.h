@@ -5,9 +5,9 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 #include <time.h>
-#include "stdlib/acl_vstream.h"
+#include "../stdlib/acl_vstream.h"
 #include "acl_timer.h"
 
 /*+++++++++++++++++++++++++++ 全局宏定义 +++++++++++++++++++++++++++++++++++*/

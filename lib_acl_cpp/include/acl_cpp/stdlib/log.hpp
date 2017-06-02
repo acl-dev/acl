@@ -1,5 +1,5 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <stdarg.h>
 
 #define logger_open	acl::log::open

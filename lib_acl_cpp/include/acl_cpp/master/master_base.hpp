@@ -1,6 +1,6 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
-#include "acl_cpp/master/master_conf.hpp"
+#include "../acl_cpp_define.hpp"
+#include "master_conf.hpp"
 #include <vector>
 
 struct ACL_EVENT;

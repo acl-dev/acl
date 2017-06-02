@@ -4,7 +4,7 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 

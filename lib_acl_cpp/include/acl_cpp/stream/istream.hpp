@@ -1,7 +1,7 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <stdlib.h>
-#include "acl_cpp/stream/stream.hpp"
+#include "stream.hpp"
 
 namespace acl {
 

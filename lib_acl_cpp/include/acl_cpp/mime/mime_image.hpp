@@ -1,6 +1,6 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
-#include "acl_cpp/mime/mime_node.hpp"
+#include "../acl_cpp_define.hpp"
+#include "mime_node.hpp"
 
 namespace acl {
 

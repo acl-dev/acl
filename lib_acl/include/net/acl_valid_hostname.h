@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
+#include "../stdlib/acl_define.h"
  /* External interface */
 
 #define ACL_VALID_HOSTNAME_LEN	255	/* RFC 1035 */

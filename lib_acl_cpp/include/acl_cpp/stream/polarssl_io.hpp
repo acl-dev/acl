@@ -1,7 +1,6 @@
 #pragma once
-
-#include "acl_cpp/acl_cpp_define.hpp"
-#include "acl_cpp/stream/stream_hook.hpp"
+#include "../acl_cpp_define.hpp"
+#include "stream_hook.hpp"
 
 struct ACL_VSTREAM;
 

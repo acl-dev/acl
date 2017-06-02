@@ -1,10 +1,10 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <vector>
 #include <list>
 #include <map>
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/redis/redis_command.hpp"
+#include "../stdlib/string.hpp"
+#include "redis_command.hpp"
 
 namespace acl
 {

@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
-#include "stdlib/acl_vstring.h"
+#include "../stdlib/acl_define.h"
+#include "../stdlib/acl_vstring.h"
 
 ACL_API int acl_xml_encode(const char *in, ACL_VSTRING *out);
 ACL_API int acl_xml_decode(const char *in, ACL_VSTRING *out);

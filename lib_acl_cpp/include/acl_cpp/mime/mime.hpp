@@ -1,8 +1,8 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <list>
 #include <string>
-#include "acl_cpp/mime/mime_head.hpp"
+#include "mime_head.hpp"
 
 struct MIME_STATE;
 

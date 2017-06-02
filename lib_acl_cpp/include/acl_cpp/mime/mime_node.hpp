@@ -1,8 +1,8 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <stdlib.h>
 #include <map>
-#include "acl_cpp/stdlib/string.hpp"
+#include "../stdlib/string.hpp"
 
 struct MIME_NODE;
 

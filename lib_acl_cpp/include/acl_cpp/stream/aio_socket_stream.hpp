@@ -1,10 +1,10 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #if defined(_WIN32) || defined(_WIN64)
 # include <WinSock2.h>
 #endif
-#include "acl_cpp/stream/aio_istream.hpp"
-#include "acl_cpp/stream/aio_ostream.hpp"
+#include "aio_istream.hpp"
+#include "aio_ostream.hpp"
 
 namespace acl
 {

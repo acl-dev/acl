@@ -1,5 +1,5 @@
 #pragma once
-#include "acl_cpp/master/master_base.hpp"
+#include "master_base.hpp"
 
 struct ACL_VSTREAM;
 struct ACL_EVENT;

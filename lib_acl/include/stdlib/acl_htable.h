@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #include "acl_define.h"
-#include "thread/acl_thread.h"
+#include "../thread/acl_thread.h"
 #include "acl_hash.h"			/* just for ACL_HASH_FN */
 #include "acl_slice.h"
 #include "acl_iterator.h"

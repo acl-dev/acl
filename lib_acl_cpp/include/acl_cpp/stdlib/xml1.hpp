@@ -1,10 +1,10 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
+#include "../acl_cpp_define.hpp"
 #include <vector>
 #include <list>
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/stdlib/pipe_stream.hpp"
-#include "acl_cpp/stdlib/xml.hpp"
+#include "string.hpp"
+#include "pipe_stream.hpp"
+#include "xml.hpp"
 
 struct ACL_XML;
 struct ACL_XML_NODE;
