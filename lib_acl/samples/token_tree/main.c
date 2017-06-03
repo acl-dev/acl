@@ -7,7 +7,7 @@
 static void token_tree_test(const char *tokens, const char *test_tab[])
 {
 	ACL_TOKEN *token_tree;
-	const ACL_TOKEN *token;
+	ACL_TOKEN *token;
 	const char *ptr, *psaved;
 	ACL_VSTRING *buf = acl_vstring_alloc(256);
 	int   i;
@@ -51,7 +51,7 @@ static void test(void)
 static void test2(void)
 {
 	ACL_TOKEN *tree;
-	const ACL_TOKEN *token;
+	ACL_TOKEN *token;
 	const char *n1 = "名称1", *n2 = "名称2", *n3 = "名称3";
 	const char *v1 = "变量1", *v2 = "变量2", *v3 = "变量3";
 	const char *s = "中国人民名称1，在这个世界上，你在哪儿名称2? "

@@ -449,7 +449,7 @@ const acl::string& xml1::getText()
 	else
 		buf_->clear();
 
-	const ACL_TOKEN *token;
+	ACL_TOKEN *token;
 	const char* ptr = pBuf->c_str(), *pLast;
 	ACL_VSTRING* name = acl_vstring_alloc(8);
 	while (*ptr)
