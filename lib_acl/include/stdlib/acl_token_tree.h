@@ -40,6 +40,23 @@ typedef struct ACL_TOKEN {
 	const void *ctx;
 } ACL_TOKEN;
 
+#define ACL_TOKEN_TREE_WORD_MATCH(acl_token_tree_in, word_in, acl_token_out) \
+{ \
+	const unsigned char *_ptr = (const unsigned char*) word_in; \
+	const ACL_TOKEN *_token_iter = acl_token_tree_in, *_token = NULL; \
+	while (*_ptr) { \
+		_token = _token_iter->tokens[*_ptr]; \
+		if (_token == NULL) \
+			break; \
+		_token_iter = _token; \
+		_ptr++; \
+	} \
+	if (_token && (_token->flag & ACL_TOKEN_F_STOP)) \
+		acl_token_out = _token; \
+	else \
+		acl_token_out = NULL; \
+}
+
 #define ACL_TOKEN_TREE_MATCH(acl_token_tree_in, s_in, delim_in, delim_tab_in, acl_token_out) do  \
 {  \
 	const ACL_TOKEN *acl_token_iter = (acl_token_tree_in), *acl_token_tmp; \
