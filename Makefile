@@ -268,12 +268,16 @@ build_one: all_lib
 	@(cd $(RELEASE_PATH)/acl; ar -x libacl.a)
 	@(cd $(RELEASE_PATH)/protocol; ar -x libprotocol.a)
 	@(cd $(RELEASE_PATH)/acl_cpp; ar -x libacl_cpp.a)
-	$(AR) $(ARFL) ./libacl.a $(RELEASE_PATH)/acl/*.o \
+	$(AR) $(ARFL) ./libacl-all.a $(RELEASE_PATH)/acl/*.o \
 		$(RELEASE_PATH)/protocol/*.o $(RELEASE_PATH)/acl_cpp/*.o
-	$(RANLIB) ./libacl.a
-	$(CC) $(LDFLAGS) -o ./libacl.so $(RELEASE_PATH)/acl_cpp/*.o \
+	$(RANLIB) ./libacl-all.a
+	rm -f libacl.a
+	ln -s libacl-all.a libacl.a
+	$(CC) $(LDFLAGS) -o ./libacl-all.so $(RELEASE_PATH)/acl_cpp/*.o \
 		$(RELEASE_PATH)/protocol/*.o $(RELEASE_PATH)/acl/*.o \
 		$(SYSLIB)
+	rm -f libacl.so
+	ln -s libacl-all.so libacl.so
 	@(rm -rf $(RELEASE_PATH))
 	@echo ""
 	@echo "Over, libacl.a and libacl.so were built ok!"
