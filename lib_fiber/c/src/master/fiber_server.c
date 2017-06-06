@@ -560,7 +560,7 @@ static void usage(int argc, char * argv[])
 static int __first_name;
 static va_list __ap_dest;
 
-static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
+static void fiber_start(void)
 {
 	const char *myname = "fiber_main";
 	const char *service_name = acl_safe_basename(__argv[0]);
@@ -769,6 +769,6 @@ void acl_fiber_server_main(int argc, char *argv[],
 	va_copy(__ap_dest, ap);
 	va_end(ap);
 
-	acl_fiber_create(fiber_main, NULL, STACK_SIZE);
+	fiber_start(void);
 	acl_fiber_schedule();
 }
