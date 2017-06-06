@@ -120,7 +120,14 @@ then
 	exit 1
 fi
 
-INSTALL_PATH=$1
+if [ $# -eq 2 ]
+then
+    PREFIX_PATH=$1
+    INSTALL_PATH=$2
+else
+    INSTALL_PATH=$1
+    PREFIX_PATH=
+fi
 
 case $INSTALL_PATH in
 /*) ;;
@@ -130,13 +137,13 @@ esac
 
 echo Installing to $INSTALL_PATH...
 
-BIN_PATH=$INSTALL_PATH/bin
-SBIN_PATH=$INSTALL_PATH/sbin
-CONF_PATH=$INSTALL_PATH/conf
-SERVICE_PATH=$CONF_PATH/service
-LIBEXEC_PATH=$INSTALL_PATH/libexec
-SH_PATH=$INSTALL_PATH/sh
-VAR_PATH=$INSTALL_PATH/var
+BIN_PATH=$PREFIX_PATH$INSTALL_PATH/bin
+SBIN_PATH=$PREFIX_PATH$INSTALL_PATH/sbin
+CONF_PATH=$PREFIX_PATH$INSTALL_PATH/conf
+SERVICE_PATH=$PREFIX_PATH$INSTALL_PATH/conf/service
+LIBEXEC_PATH=$PREFIX_PATH$INSTALL_PATH/libexec
+SH_PATH=$PREFIX_PATH$INSTALL_PATH/sh
+VAR_PATH=$PREFIX_PATH$INSTALL_PATH/var
 
 ###############################################################################
 create_all_path()
