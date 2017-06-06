@@ -769,6 +769,6 @@ void acl_fiber_server_main(int argc, char *argv[],
 	va_copy(__ap_dest, ap);
 	va_end(ap);
 
-	fiber_start(void);
+	fiber_start();
 	acl_fiber_schedule();
 }
