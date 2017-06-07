@@ -18,7 +18,6 @@ One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IO
 Summary: acl master framework
 License: IBM
 Group: System Environment/Tools
-Requires: acl-libs = %{version}-%{release}
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
