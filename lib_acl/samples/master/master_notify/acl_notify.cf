@@ -87,7 +87,7 @@ service server {
 	mail_bcc = zhengshuxin@51iker.com
 	auth_user = zsx@renwou.cn
 	auth_pass = 111111
-	warn_mail = ${install_path}/conf/warning_letter.tmpl
+	warn_mail = {install_path}/conf/warning_letter.tmpl
 
 #	公司正常工作时间
 	work_week_min = 1

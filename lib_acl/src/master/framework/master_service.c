@@ -29,14 +29,11 @@
 ACL_MASTER_SERV *acl_var_master_head = NULL;
 ACL_EVENT *acl_var_master_global_event = NULL;
 
-/* acl_master_start_service - activate service */
+/* acl_master_service_init - init service after loading the main.cf */
 
-void    acl_master_start_service(ACL_MASTER_SERV *serv)
+void   acl_master_service_init(void)
 {
-	const char *myname = "acl_master_start_service";
-
-	if (serv == NULL)
-		acl_msg_fatal("%s(%d): serv null", myname, __LINE__);
+	const char *myname = "acl_master_service_init";
 
 	if (acl_var_master_global_event == NULL)
 		acl_var_master_global_event = acl_event_new_select(
@@ -44,6 +41,16 @@ void    acl_master_start_service(ACL_MASTER_SERV *serv)
 	if (acl_var_master_global_event == NULL)
 		acl_msg_fatal("%s(%d)->%s: acl_event_new null, serr=%s",
 			__FILE__, __LINE__, myname, strerror(errno));
+}
+
+/* acl_master_service_start - activate service */
+
+void    acl_master_service_start(ACL_MASTER_SERV *serv)
+{
+	const char *myname = "acl_master_service_start";
+
+	if (serv == NULL)
+		acl_msg_fatal("%s(%d): serv null", myname, __LINE__);
 
 	/*
 	 * Enable connection requests, wakeup timers, and status updates from
@@ -63,12 +70,12 @@ void    acl_master_start_service(ACL_MASTER_SERV *serv)
 	acl_msg_info("%s: service started!", myname);
 }
 
-/* acl_master_stop_service - deactivate service */
+/* acl_master_service_stop - deactivate service */
 
-void    acl_master_stop_service(ACL_MASTER_SERV *serv)
+void    acl_master_service_stop(ACL_MASTER_SERV *serv)
 {
 	/*
-	 * Undo the things that master_start_service() did.
+	 * Undo the things that master_service_start() did.
 	 */
 	acl_master_wakeup_cleanup(serv);
 	acl_master_status_cleanup(serv);
@@ -78,18 +85,9 @@ void    acl_master_stop_service(ACL_MASTER_SERV *serv)
 
 /* acl_master_restart_service - restart service after configuration reload */
 
-void    acl_master_restart_service(ACL_MASTER_SERV *serv)
+void    acl_master_service_restart(ACL_MASTER_SERV *serv)
 {
-	const char *myname = "acl_master_restart_service";
-
-	if (acl_var_master_global_event == NULL)
-		acl_var_master_global_event = acl_event_new_select(
-			acl_var_master_delay_sec, acl_var_master_delay_usec);
-	if (acl_var_master_global_event == NULL)
-		acl_msg_fatal("%s(%d)->%s: acl_event_new null, serr=%s",
-			__FILE__, __LINE__, myname, strerror(errno));
-
-	/* Undo some of the things that master_start_service() did. */
+	/* Undo some of the things that master_service_start() did. */
 	acl_master_wakeup_cleanup(serv);
 	acl_master_status_cleanup(serv);
 

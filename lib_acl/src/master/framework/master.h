@@ -131,9 +131,10 @@ extern void acl_master_refresh(void);
   */
 extern ACL_MASTER_SERV *acl_var_master_head;
 extern ACL_EVENT *acl_var_master_global_event;
-extern void acl_master_start_service(ACL_MASTER_SERV *);
-extern void acl_master_stop_service(ACL_MASTER_SERV *);
-extern void acl_master_restart_service(ACL_MASTER_SERV *);
+extern void acl_master_service_init(void);
+extern void acl_master_service_start(ACL_MASTER_SERV *);
+extern void acl_master_service_stop(ACL_MASTER_SERV *);
+extern void acl_master_service_restart(ACL_MASTER_SERV *);
 
  /*
   * acl_master_events.c
