@@ -105,6 +105,7 @@ force_reload() {
 rh_status() {
     # run checks to determine if the service is running or use generic status
     status -p $PID_FILE $prog
+    return 0
 }
 
 rh_status_q() {
