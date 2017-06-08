@@ -178,6 +178,7 @@ extern void acl_master_avail_less(ACL_MASTER_SERV *, ACL_MASTER_PROC *);
   * acl_master_spawn.c
   */
 extern struct ACL_BINHASH *acl_var_master_child_table;
+extern void acl_master_spawn_init(void);
 extern void acl_master_spawn(ACL_MASTER_SERV *);
 extern void acl_master_reap_child(void);
 extern void acl_master_delete_children(ACL_MASTER_SERV *);

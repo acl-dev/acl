@@ -41,6 +41,12 @@
 ACL_BINHASH *acl_var_master_child_table = NULL;
 static void master_unthrottle(ACL_MASTER_SERV *serv);
 
+void  acl_master_spawn_init(void)
+{
+	if (acl_var_master_child_table == 0)
+		acl_var_master_child_table = acl_binhash_create(0, 0);
+}
+
 /* master_unthrottle_wrapper - in case (char *) != (struct *) */
 
 static void master_unthrottle_wrapper(int type acl_unused,
@@ -114,8 +120,6 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 	static unsigned _master_generation = 0;
 	static ACL_VSTRING *env_gen = 0;
 
-	if (acl_var_master_child_table == 0)
-		acl_var_master_child_table = acl_binhash_create(0, 0);
 	if (env_gen == 0)
 		env_gen = acl_vstring_alloc(100);
 
@@ -279,7 +283,7 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 					serv->name);
 		}
 
-		return;
+		break;
 	}
 }
 
@@ -409,6 +413,7 @@ void    acl_master_delete_children(ACL_MASTER_SERV *serv)
 	 * associated timer request, so we might just as well do it at the end.
 	 */
 	master_throttle(serv);
+
 	info = list = acl_binhash_list(acl_var_master_child_table);
 	for (; *info; info++) {
 		proc = (ACL_MASTER_PROC *) info[0]->value;

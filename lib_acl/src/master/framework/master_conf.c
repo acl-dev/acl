@@ -82,12 +82,14 @@ void    acl_master_config(void)
 	acl_master_params_load(pathname);
 	acl_myfree(pathname);
 
-	/* create the global event handle */
+	/* create the global acl_var_master_global_event */
 	acl_master_service_init();
 
-	/* acl_master_vars_init(acl_var_master_buf_size,
-	 *	acl_var_master_rw_timeout);
-	 */
+	/* create the global acl_var_master_child_table */
+	acl_master_spawn_init();
+
+	/* create IPC PIPE */
+	acl_master_vars_init(acl_var_master_buf_size, acl_var_master_rw_timeout);
 
 	acl_set_master_service_path(acl_var_master_service_dir);
 
