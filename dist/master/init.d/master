@@ -105,7 +105,6 @@ force_reload() {
 rh_status() {
     # run checks to determine if the service is running or use generic status
     status -p $PID_FILE $prog
-    return 0
 }
 
 rh_status_q() {
@@ -133,7 +132,7 @@ case "$1" in
         force_reload
         ;;
     status)
-        rh_status
+        rh_status || exit 0
         ;;
     masterrestart|try-restart)
         rh_status_q || exit 0
