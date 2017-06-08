@@ -35,8 +35,26 @@ make build_one -j 32
 %install
 
 make packinstall  DESTDIR=$RPM_BUILD_ROOT
+
 %clean
 rm -rf %{buildroot}
+
+
+%post -n acl-master
+/sbin/chkconfig --add master
+
+%preun -n acl-master
+if [ "$1" = "0" ]; then
+    service master stop >/dev/null 2>&1 ||:
+    /sbin/chkconfig --del master
+fi
+
+%postun -n acl-master
+if [ "$1" -ge "1" ]; then
+    # TODO: upgrade should be support
+    service master masterrestart > /dev/null 2>&1 ||:
+fi
+
 
 %files
 %defattr(-,root,root,-)
@@ -49,3 +67,4 @@ rm -rf %{buildroot}
 %files -n acl-master
 %defattr(-,root,root)
 /opt/soft
+/etc/init.d/master

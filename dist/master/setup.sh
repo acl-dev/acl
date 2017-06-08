@@ -142,6 +142,7 @@ SBIN_PATH=$PREFIX_PATH$INSTALL_PATH/sbin
 CONF_PATH=$PREFIX_PATH$INSTALL_PATH/conf
 SERVICE_PATH=$PREFIX_PATH$INSTALL_PATH/conf/service
 LIBEXEC_PATH=$PREFIX_PATH$INSTALL_PATH/libexec
+INIT_PATH=$PREFIX_PATH/etc/init.d/
 SH_PATH=$PREFIX_PATH$INSTALL_PATH/sh
 VAR_PATH=$PREFIX_PATH$INSTALL_PATH/var
 
@@ -161,6 +162,7 @@ create_all_path()
 	create_path $VAR_PATH/pid
 	create_path $VAR_PATH/private
 	create_path $VAR_PATH/public
+	create_path $INIT_PATH
 
 	chmod 700 $VAR_PATH/private
 	chmod 1777 $VAR_PATH/log
@@ -175,6 +177,7 @@ copy_all_file()
 	install_file a+x,go-wrx conf $CONF_PATH
 	install_file a+x,go-wrx conf/service $SERVICE_PATH
 	install_file a+x,go-wrx conf/service/samples $SERVICE_PATH/samples
+	install_file a+x,go-wrx init.d/ $INIT_PATH
 }
 
 guess_os
