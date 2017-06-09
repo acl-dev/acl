@@ -6,6 +6,7 @@ extern "C" {
 #endif
 #include "acl_define.h"
 #include "acl_vstring.h"
+#include "acl_iterator.h"
 
 #define ACL_PRINT_CHAR(x)  \
 	((((x) >= 'a' && (x) <='z')  \
@@ -25,7 +26,9 @@ extern "C" {
 	|| (x) == '\'' || (x) == '"')  \
 	? (x) : '-')
 
-typedef struct ACL_TOKEN {
+typedef struct ACL_TOKEN ACL_TOKEN;
+
+struct ACL_TOKEN {
 	unsigned char     ch;
 	unsigned int      flag;
 #define ACL_TOKEN_F_NONE	0
@@ -34,11 +37,14 @@ typedef struct ACL_TOKEN {
 #define ACL_TOKEN_F_DENY	(1 << 2)
 #define ACL_TOKEN_F_UTF8	(1 << 3)
 
-#define ACL_TOKEN_WIDTH		255
+#define ACL_TOKEN_WIDTH		256
 	struct ACL_TOKEN *tokens[ACL_TOKEN_WIDTH];
 	struct ACL_TOKEN *parent;
 	void             *ctx;
-} ACL_TOKEN;
+
+	ACL_TOKEN *(*iter_head)(ACL_ITER*, ACL_TOKEN*);
+	ACL_TOKEN *(*iter_next)(ACL_ITER*, ACL_TOKEN*);
+};
 
 #define ACL_TOKEN_TREE_WORD_MATCH(acl_token_tree_in, word_in, acl_token_out) \
 { \

@@ -27,3 +27,4 @@ acl_ioctl_server.c 的模板程序中采用内存池功能
 17) acl_master 服务器框架的各个服务模板应该支持进程退出前的回调接口，便于应用的善后工作
 18) acl_master 当子进程的 master_prefork 和空闲退出通知打开时，可能存在冲突
 19) ACL_VSTREAM: sa_local & sa_peer 需要支持 IPV6 -- 完成
+20) acl_master 当 master_prefork > 0 时无法禁止服务

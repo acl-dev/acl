@@ -113,7 +113,7 @@ struct ACL_XML {
 	unsigned flag;                  /**< 标志位: ACL_XML_FLAG_xxx */ 
 
 	/**< 是否允许一个 xml 文档中有多个根节点，内部缺省为允许 */
-#define	ACL_XML_FLAG_MULTI_ROOT	(1 << 0)
+#define	ACL_XML_FLAG_MULTI_ROOT		(1 << 0)
 
 	/**< 是否兼容单节点中没有 '/' 情况 */
 #define	ACL_XML_FLAG_IGNORE_SLASH	(1 << 1)

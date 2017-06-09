@@ -131,9 +131,10 @@ extern void acl_master_refresh(void);
   */
 extern ACL_MASTER_SERV *acl_var_master_head;
 extern ACL_EVENT *acl_var_master_global_event;
-extern void acl_master_start_service(ACL_MASTER_SERV *);
-extern void acl_master_stop_service(ACL_MASTER_SERV *);
-extern void acl_master_restart_service(ACL_MASTER_SERV *);
+extern void acl_master_service_init(void);
+extern void acl_master_service_start(ACL_MASTER_SERV *);
+extern void acl_master_service_stop(ACL_MASTER_SERV *);
+extern void acl_master_service_restart(ACL_MASTER_SERV *);
 
  /*
   * acl_master_events.c
@@ -177,6 +178,7 @@ extern void acl_master_avail_less(ACL_MASTER_SERV *, ACL_MASTER_PROC *);
   * acl_master_spawn.c
   */
 extern struct ACL_BINHASH *acl_var_master_child_table;
+extern void acl_master_spawn_init(void);
 extern void acl_master_spawn(ACL_MASTER_SERV *);
 extern void acl_master_reap_child(void);
 extern void acl_master_delete_children(ACL_MASTER_SERV *);

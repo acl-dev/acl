@@ -12,14 +12,17 @@ RANLIB  = ${ENV_RANLIB}
 OSNAME = $(shell uname -a)
 OSTYPE = $(shell uname -a)
 
-LIB_PATH = ./dist/lib
+DESTDIR =
+PREFIX = /usr
+BIN_PATH = $(DESTDIR)/usr/bin/
+LIB_PATH = $(DESTDIR)/usr/lib
 ACL_LIB = $(LIB_PATH)
 PROTO_LIB = $(LIB_PATH)
 DICT_LIB = $(LIB_PATH)
 TLS_LIB = $(LIB_PATH)
 
-INC_PATH = ./dist/include
-ACL_INC = $(INC_PATH)/acl
+INC_PATH = $(DESTDIR)/usr/include
+ACL_INC = $(INC_PATH)/acl-lib
 PROTO_INC = $(INC_PATH)/protocol
 DICT_INC = $(INC_PATH)/dict
 TLS_INC = $(INC_PATH)/tls
@@ -78,6 +81,7 @@ ifeq ($(findstring SunOS, $(OSNAME)), SunOS)
 	endif
 	SYSLIB += -liconv
 endif
+
 ##############################################################################
 
 .PHONY = check help all_lib all samples all clean install uninstall uninstall_all build_bin build_src build_one
@@ -115,10 +119,29 @@ clean:
 	@(cd unit_test; make clean)
 	@(cd lib_acl/samples; make clean)
 	@(cd lib_protocol/samples; make clean)
-	@(rm -f libacl.a libacl.so)
+	@(rm -f libacl_all.a libacl.so)
 #	@(cd lib_dict; make clean)
 #	@(cd lib_tls; make clean)
 
+packinstall:
+	@(echo "")
+	@(echo "begin copy file...")
+	$(shell mkdir -p $(ACL_INC)/acl)
+	$(shell mkdir -p $(ACL_INC)/acl_cpp)
+	$(shell mkdir -p $(BIN_PATH)/)
+	$(shell mkdir -p $(LIB_PATH)/)
+	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master/)
+	cp -f lib_acl/master/acl_master ./dist/master/libexec/$(RPATH)/
+	(cd dist/master && ./setup.sh $(DESTDIR) /opt/soft/acl-master)
+	cp -f lib_acl/master/acl_master $(BIN_PATH)
+	cp -Rf lib_acl/include/* $(ACL_INC)/acl/
+	cp -Rf lib_acl_cpp/include/acl_cpp/* $(ACL_INC)/acl_cpp/
+	cp -f libacl_all.a $(ACL_LIB)/libacl_all.a
+	#cp -Rf lib_protocol/include/* $(PROTO_INC)/
+#	cp -f lib_dict/lib/lib_dict.a $(DICT_LIB)/$(RPATH)/
+#	cp -Rf lib_dict/include/* $(DICT_INC)/
+#	cp -f lib_tls/lib/lib_tls.a $(TLS_LIB)/$(RPATH)/
+#	cp -Rf lib_tls/include/* $(TLS_INC)/
 install:
 	@(echo "")
 	@(echo "begin copy file...")
@@ -126,7 +149,7 @@ install:
 	$(shell mkdir -p $(PROTO_INC))
 	$(shell mkdir -p $(INC_PATH)/acl_cpp)
 	cp -f lib_acl/master/acl_master ./dist/master/libexec/$(RPATH)/
-	cp -f lib_acl/lib/libacl.a $(ACL_LIB)/$(RPATH)/
+	cp -f lib_acl/lib/libacl_all.a $(ACL_LIB)/$(RPATH)/
 	cp -Rf lib_acl/include/* $(ACL_INC)/
 	cp -f lib_protocol/lib/libprotocol.a $(PROTO_LIB)/$(RPATH)/
 	cp -Rf lib_protocol/include/* $(PROTO_INC)/
@@ -268,15 +291,19 @@ build_one: all_lib
 	@(cd $(RELEASE_PATH)/acl; ar -x libacl.a)
 	@(cd $(RELEASE_PATH)/protocol; ar -x libprotocol.a)
 	@(cd $(RELEASE_PATH)/acl_cpp; ar -x libacl_cpp.a)
-	$(AR) $(ARFL) ./libacl.a $(RELEASE_PATH)/acl/*.o \
+	$(AR) $(ARFL) ./libacl_all.a $(RELEASE_PATH)/acl/*.o \
 		$(RELEASE_PATH)/protocol/*.o $(RELEASE_PATH)/acl_cpp/*.o
-	$(RANLIB) ./libacl.a
-	$(CC) $(LDFLAGS) -o ./libacl.so $(RELEASE_PATH)/acl_cpp/*.o \
+	$(RANLIB) ./libacl_all.a
+	rm -f libacl.a
+	ln -s libacl_all.a libacl.a
+	$(CC) $(LDFLAGS) -o ./libacl_all.so $(RELEASE_PATH)/acl_cpp/*.o \
 		$(RELEASE_PATH)/protocol/*.o $(RELEASE_PATH)/acl/*.o \
 		$(SYSLIB)
+	rm -f libacl.so
+	ln -s libacl_all.so libacl.so
 	@(rm -rf $(RELEASE_PATH))
 	@echo ""
-	@echo "Over, libacl.a and libacl.so were built ok!"
+	@echo "Over, libacl_all.a and libacl_all.so were built ok!"
 	@echo ""
 
 check:

@@ -56,7 +56,7 @@ void    acl_master_refresh(void)
 	for (servp = &acl_var_master_head; (serv = *servp) != 0; /* void */ ) {
 		if ((serv->flags & ACL_MASTER_FLAG_MARK) != 0) {
 			*servp = serv->next;
-			acl_master_stop_service(serv);
+			acl_master_service_stop(serv);
 			acl_free_master_ent(serv);
 		} else
 			servp = &serv->next;
@@ -82,7 +82,15 @@ void    acl_master_config(void)
 	acl_master_params_load(pathname);
 	acl_myfree(pathname);
 
+	/* create the global acl_var_master_global_event */
+	acl_master_service_init();
+
+	/* create the global acl_var_master_child_table */
+	acl_master_spawn_init();
+
+	/* create IPC PIPE */
 	acl_master_vars_init(acl_var_master_buf_size, acl_var_master_rw_timeout);
+
 	acl_set_master_service_path(acl_var_master_service_dir);
 
 	/*
@@ -110,7 +118,7 @@ void    acl_master_config(void)
 		if (serv == 0) {
 			entry->next = acl_var_master_head;
 			acl_var_master_head = entry;
-			acl_master_start_service(entry);
+			acl_master_service_start(entry);
 			continue;
 		}
 
@@ -133,13 +141,13 @@ void    acl_master_config(void)
 		SWAP(char *, serv->notify_addr, entry->notify_addr);
 		SWAP(char *, serv->notify_recipients, entry->notify_recipients);
 		SWAP(ACL_ARGV *, serv->args, entry->args);
-		acl_master_restart_service(serv);
+		acl_master_service_restart(serv);
 		acl_free_master_ent(entry);
 	}
 	acl_end_master_ent();
 
 	if (service_null)
-		acl_msg_fatal("%s(%d)->%s: no service file in dir %s%s can be used",
+		acl_msg_warn("%s(%d)->%s: no service file in dir %s%s can be used",
 			__FILE__, __LINE__, myname, acl_var_master_service_dir,
 			acl_var_master_scan_subdir ? " and its subdir" : "");
 }

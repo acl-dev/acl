@@ -42,6 +42,76 @@ void acl_token_delim_tab_free(char *delim_tab)
 	acl_myfree(delim_tab);
 }
 
+static ACL_TOKEN *iter_next(ACL_ITER *it, ACL_TOKEN *token);
+static ACL_TOKEN *iter_head(ACL_ITER *it, ACL_TOKEN *token)
+{
+	it->dlen = -1;
+	it->key  = NULL;
+	it->klen = -1;
+
+	it->i    = 0;
+	it->size = 0;
+	it->ptr  = token;
+
+	assert(token->parent == NULL);
+	return iter_next(it, token);
+}
+
+static ACL_TOKEN *next_token(ACL_ITER *it, ACL_TOKEN *token)
+{
+	ACL_TOKEN *parent;
+	unsigned i;
+
+	assert(token);
+
+	/* lookup the first left no null child of the current token */
+
+	for (i = 0; i < ACL_TOKEN_WIDTH; i++) {
+		if (token->tokens[i] != NULL) {
+			it->i    = i;
+			it->ptr  = token->tokens[i];
+			it->data = token->tokens[i];
+			return token->tokens[i];
+		}
+	}
+
+	/* lookup the right no null brother of the current token */
+
+	i      = token->ch + 1;
+	parent = token->parent;
+
+	while (parent != NULL) {
+		for (; i < ACL_TOKEN_WIDTH; i++) {
+			if (parent->tokens[i] != NULL) {
+				it->i    = i;
+				it->ptr  = parent->tokens[i];
+				it->data = parent->tokens[i];
+				return parent->tokens[i];
+			}
+		}
+
+		i      = parent->ch + 1;
+		parent = parent->parent;
+	}
+
+	it->ptr = it->data = NULL;
+	it->i   = 0;
+	return NULL;
+}
+
+static ACL_TOKEN *iter_next(ACL_ITER *it, ACL_TOKEN *token acl_unused)
+{
+	ACL_TOKEN *curr = (ACL_TOKEN *) it->ptr;
+
+	while (1) {
+		curr = next_token(it, curr);
+		if (curr == NULL)
+			return NULL;
+		if (curr->flag & ACL_TOKEN_F_STOP)
+			return curr;
+	}
+}
+
 ACL_TOKEN *acl_token_new(void)
 {
 	ACL_TOKEN *token = (ACL_TOKEN*) acl_mycalloc(1, sizeof(ACL_TOKEN));
@@ -51,6 +121,8 @@ ACL_TOKEN *acl_token_new(void)
 		token->tokens[i] = NULL;
 
 	token->ch = '-';
+	token->iter_head = iter_head;
+	token->iter_next = iter_next;
 	return token;
 }
 
@@ -224,6 +296,7 @@ void acl_token_tree_word_remove(ACL_TOKEN *tree, const char *word)
 	if (token == NULL)
 		return;
 
+	token->ctx = NULL;
 
 	for (i = 0; i < ACL_TOKEN_WIDTH; i++) {
 		if (token->tokens[i] != NULL) {

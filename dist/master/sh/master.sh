@@ -117,6 +117,18 @@ reload()
 	fi
 }
 
+status()
+{
+	check_proc
+	if [ "$RUNNING" = "yes" ]; then
+        PID=`sed 1q $PID_FILE | awk '{print $NF}'`
+        echo "$PROG_NAME running ($PID)"
+	else
+		echo "$PROG_NAME not running!"
+	fi
+}
+
+
 # See how we were called.
 case "$1" in
 	start)
@@ -127,6 +139,9 @@ case "$1" in
 		;;
 	reload)
 		reload
+		;;
+	status)
+	    status	
 		;;
 	*)
 		echo $"Usage: $0 {start|stop|reload}"
