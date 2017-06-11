@@ -77,6 +77,9 @@ void    acl_master_service_start(ACL_MASTER_SERV *serv)
 
 void    acl_master_service_stop(ACL_MASTER_SERV *serv)
 {
+	/* set STOPPING flag to avoid prefork process */
+	serv->flags |= ACL_MASTER_FLAG_STOPPING;
+
 	/*
 	 * Undo the things that master_service_start() did.
 	 */

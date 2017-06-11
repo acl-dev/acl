@@ -56,8 +56,6 @@ void    acl_master_refresh(void)
 	for (servp = &acl_var_master_head; (serv = *servp) != 0;) {
 		if ((serv->flags & ACL_MASTER_FLAG_MARK) != 0) {
 			*servp = serv->next;
-			/* set STOPPING flag avoid prefork process */
-			serv->flags |= ACL_MASTER_FLAG_STOPPING;
 			acl_master_service_stop(serv);
 			acl_master_ent_free(serv);
 		} else
