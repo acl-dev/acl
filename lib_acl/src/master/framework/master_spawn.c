@@ -295,10 +295,9 @@ static void master_delete_child(ACL_MASTER_PROC *proc)
 	ACL_MASTER_SERV *serv;
 
 	/*
-	 * Undo the things that master_spawn did.
-	 * Stop the process if it still exists,
-	 * and remove it from the lookup tables.
-	 * Update the number of available processes.
+	 * Undo the things that master_spawn did. Stop the process if it still
+	 * exists, and remove it from the lookup tables. Update the number of
+	 * available processes.
 	 */
 	serv = proc->serv;
 	serv->total_proc--;
@@ -308,8 +307,7 @@ static void master_delete_child(ACL_MASTER_PROC *proc)
 				__FILE__, __LINE__, myname);
 		acl_master_avail_less(serv, proc);
 	} else if (ACL_MASTER_LIMIT_OK(serv->max_proc, serv->total_proc)
-		&& serv->avail_proc < 1)
-	{
+		&& serv->avail_proc < 1) {
 		if (acl_msg_verbose)
 			acl_msg_info("%s(%d)->%s: listen again",
 				__FILE__, __LINE__, myname);
@@ -420,8 +418,10 @@ void    acl_master_delete_children(ACL_MASTER_SERV *serv)
 		if (proc->serv == serv)
 			(void) kill(proc->pid, SIGTERM);
 	}
+
 	while (serv->total_proc > 0)
 		acl_master_reap_child();
+
 	acl_myfree(list);
 	master_unthrottle(serv);
 }

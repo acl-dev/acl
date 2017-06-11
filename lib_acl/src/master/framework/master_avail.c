@@ -101,7 +101,8 @@ void acl_master_avail_listen(ACL_MASTER_SERV *serv)
 		acl_msg_info("%s: avail %d total %d max %d", myname,
 			serv->avail_proc, serv->total_proc, serv->max_proc);
 
-	if (ACL_MASTER_THROTTLED(serv))
+	/* when service is throttled or stopped, don't fork or listen again */
+	if (ACL_MASTER_THROTTLED(serv) || ACL_MASTER_STOPPING(serv))
 		return;
 
 	/* prefork services */
@@ -179,8 +180,8 @@ void acl_master_avail_less(ACL_MASTER_SERV *serv, ACL_MASTER_PROC *proc)
 
 	/*
 	 * This child is no longer available for servicing connection
-	 * requests. When no child processes are available, start
-	 * monitoring the service's listen socket for new connection requests.
+	 * requests. When no child processes are available, start monitoring
+	 * the service's listen socket for new connection requests.
 	 */
 	if (acl_msg_verbose)
 		acl_msg_info("%s: pid %d (%s)", myname,

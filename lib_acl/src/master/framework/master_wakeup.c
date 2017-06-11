@@ -146,9 +146,10 @@ void    acl_master_wakeup_cleanup(ACL_MASTER_SERV *serv)
 	const char *myname = "acl_master_wakeup_cleanup";
 
 	/*
-	 * Cleanup, even when the wakeup feature has been turned off. There might
-	 * still be a pending timer. Don't depend on the code that reloads the
-	 * config file to reset the wakeup timer when things change.
+	 * Cleanup, even when the wakeup feature has been turned off.
+	 * There might still be a pending timer. Don't depend on the code
+	 * that reloads the config file to reset the wakeup timer when
+	 * things change.
 	 */
 	if (acl_msg_verbose)
 		acl_msg_info("%s: service %s", myname, serv->name);

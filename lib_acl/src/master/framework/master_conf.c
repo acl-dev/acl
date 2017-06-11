@@ -42,7 +42,7 @@ void    acl_master_refresh(void)
 		serv->flags |= ACL_MASTER_FLAG_MARK;
 
 	/*
-	 * Read the master.cf configuration file. The master_conf() routine
+	 * Read each service's configuration file. The master_conf() routine
 	 * unmarks services upon update. New services are born with the mark
 	 * bit off. After this, anything with the mark bit on should be
 	 * removed.
@@ -53,11 +53,13 @@ void    acl_master_refresh(void)
 	 * Delete all services that are still marked - they disappeared from
 	 * the configuration file and are therefore no longer needed.
 	 */
-	for (servp = &acl_var_master_head; (serv = *servp) != 0; /* void */ ) {
+	for (servp = &acl_var_master_head; (serv = *servp) != 0;) {
 		if ((serv->flags & ACL_MASTER_FLAG_MARK) != 0) {
 			*servp = serv->next;
+			/* set STOPPING flag avoid prefork process */
+			serv->flags |= ACL_MASTER_FLAG_STOPPING;
 			acl_master_service_stop(serv);
-			acl_free_master_ent(serv);
+			acl_master_ent_free(serv);
 		} else
 			servp = &serv->next;
 	}
@@ -77,6 +79,7 @@ void    acl_master_config(void)
 #define STR_SAME	!strcmp
 #define SWAP(type,a,b)	{ type temp = a; a = b; b = temp; }
 
+	/* load main.cf configuration of master routine */
 	pathname = acl_concatenate(acl_var_master_conf_dir,
 			"/", "main.cf", (char *) 0);
 	acl_master_params_load(pathname);
@@ -91,6 +94,7 @@ void    acl_master_config(void)
 	/* create IPC PIPE */
 	acl_master_vars_init(acl_var_master_buf_size, acl_var_master_rw_timeout);
 
+	/* set scanning path for services' configuration files */
 	acl_set_master_service_path(acl_var_master_service_dir);
 
 	/*
@@ -98,19 +102,21 @@ void    acl_master_config(void)
 	 * type, not just by its name alone. The name is unique within its
 	 * transport type. XXX Service privacy is encoded in the service name.
 	 */
-	acl_set_master_ent();
-	while ((entry = acl_get_master_ent()) != 0) {
+	acl_master_ent_begin();
+
+	while ((entry = acl_master_ent_get()) != 0) {
 		if (acl_msg_verbose)
-			acl_print_master_ent(entry);
+			acl_master_ent_print(entry);
+
 		for (serv = acl_var_master_head; serv != 0; serv = serv->next) {
 			if (STR_SAME(serv->name, entry->name)
-				&& serv->type == entry->type)
-			{
+				&& serv->type == entry->type) {
 				break;
 			}
 		}
 
 		service_null = 0;
+
 		/*
 		 * Add a new service entry. We do not really care in what
 		 * order the service entries are kept in memory.
@@ -142,13 +148,15 @@ void    acl_master_config(void)
 		SWAP(char *, serv->notify_recipients, entry->notify_recipients);
 		SWAP(ACL_ARGV *, serv->args, entry->args);
 		acl_master_service_restart(serv);
-		acl_free_master_ent(entry);
+		acl_master_ent_free(entry);
 	}
-	acl_end_master_ent();
+
+	acl_master_ent_end();
 
 	if (service_null)
-		acl_msg_warn("%s(%d)->%s: no service file in dir %s%s can be used",
+		acl_msg_warn("%s(%d), %s: no service in dir %s%s",
 			__FILE__, __LINE__, myname, acl_var_master_service_dir,
 			acl_var_master_scan_subdir ? " and its subdir" : "");
 }
+
 #endif /* ACL_UNIX */

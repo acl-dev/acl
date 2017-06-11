@@ -60,10 +60,13 @@ void    acl_master_service_start(ACL_MASTER_SERV *serv)
 
 	acl_master_listen_init(serv);
 	acl_msg_info("%s: service %s listen init ok ...", myname, serv->name);
+
 	acl_master_status_init(serv);
 	acl_msg_info("%s: service %s status init ok ...", myname, serv->name);
+
 	acl_master_avail_listen(serv);
 	acl_msg_info("%s: service %s avail listen ok ...", myname, serv->name);
+
 	acl_master_wakeup_init(serv);
 	acl_msg_info("%s: service %s wakeup init ok ...", myname, serv->name);
 

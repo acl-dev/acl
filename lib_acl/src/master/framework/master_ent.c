@@ -39,7 +39,9 @@
 #include "master_pathname.h"
 #include "master.h"
 
-static char *__master_path = NULL;	/* dir name of config files */
+#define STR acl_vstring_str
+
+static char *__services_path = NULL;	/* dir name of config files */
 static ACL_SCAN_DIR *__scan = NULL;
 
 const char *__config_file_ptr = NULL;
@@ -48,30 +50,30 @@ static const char __master_blanks[] = " \t\r\n";  /* field delimiters */
 
 void acl_set_master_service_path(const char *path)
 {
-	if (__master_path != 0)
-		acl_myfree(__master_path);
-	__master_path = acl_mystrdup(path);
+	if (__services_path != 0)
+		acl_myfree(__services_path);
+	__services_path = acl_mystrdup(path);
 }
 
-void acl_set_master_ent()
+void acl_master_ent_begin()
 {
-	const char *myname = "acl_set_master_ent";
+	const char *myname = "acl_master_ent_begin";
 
-	if (__master_path == NULL)
+	if (__services_path == NULL)
 		acl_msg_fatal("%s(%d), %s: master_path is null",
 			__FILE__, __LINE__, myname);
 
 	if (__scan)
-		acl_end_master_ent();
+		acl_master_ent_end();
 
-	__scan = acl_scan_dir_open(__master_path, acl_var_master_scan_subdir);
+	__scan = acl_scan_dir_open(__services_path, acl_var_master_scan_subdir);
 	if (__scan == NULL)
 		acl_msg_fatal("%s(%d), %s: open dir(%s) err, serr=%s",
 			__FILE__, __LINE__, myname,
-			__master_path, strerror(errno));
+			__services_path, strerror(errno));
 }
 
-void acl_end_master_ent()
+void acl_master_ent_end()
 {
 	if (__scan)
 		acl_scan_dir_close(__scan);
@@ -86,15 +88,14 @@ static void fatal_with_context(const char *format,...)
 	ACL_VSTRING *vp = acl_vstring_alloc(100);
 	va_list ap;
 
-	if (__master_path == 0)
+	if (__services_path == 0)
 		acl_msg_panic("%s: no configuration file specified", myname);
 
 	va_start(ap, format);
 	acl_vstring_vsprintf(vp, format, ap);
 	va_end(ap);
-	acl_msg_fatal("%s: file %s: %s", __master_path,
-		 __config_file_ptr ? __config_file_ptr : "why?",
-		acl_vstring_str(vp));
+	acl_msg_fatal("%s: file %s: %s", __services_path,
+		 __config_file_ptr ? __config_file_ptr : "why?", STR(vp));
 }
 
 /* fatal_invalid_field - report invalid field value */
@@ -180,9 +181,9 @@ static int get_int_ent(ACL_XINETD_CFG_PARSER *xcp, const char *name,
 	return n;
 }
 
-static ACL_XINETD_CFG_PARSER *lookup_service_conf(ACL_VSTRING *path_buf)
+static ACL_XINETD_CFG_PARSER *load_service_conf(ACL_VSTRING *path_buf)
 {
-	const char *myname = "lookup_service_conf";
+	const char *myname = "load_service_conf";
 	const char *config_file;
 	const char *value;
 	ACL_XINETD_CFG_PARSER *xcp;
@@ -192,37 +193,29 @@ static ACL_XINETD_CFG_PARSER *lookup_service_conf(ACL_VSTRING *path_buf)
 		if (config_file == NULL) /* over now */
 			return NULL;
 
-#if 0
-		acl_vstring_sprintf(path_buf, "%s/%s", __master_path, config_file);
-#else
 		acl_vstring_sprintf(path_buf, "%s/%s",
 			acl_scan_dir_path(__scan), config_file);
-#endif
 
-		acl_msg_info("%s(%d)->%s: load service file = %s",
-			__FILE__, __LINE__, myname, acl_vstring_str(path_buf));
+		acl_msg_info("%s(%d), %s: load service file = %s",
+			__FILE__, __LINE__, myname, STR(path_buf));
 
-		xcp = acl_xinetd_cfg_load(acl_vstring_str(path_buf));
+		xcp = acl_xinetd_cfg_load(STR(path_buf));
 		if (xcp == NULL) {
-			acl_msg_warn("%s(%d)->%s: acl_xinetd_cfg_load(%s), serr=%s",
+			acl_msg_warn("%s(%d), %s: load %s error, serr=%s",
 				__FILE__, __LINE__, myname,
-				acl_vstring_str(path_buf), strerror(errno));
+				STR(path_buf), strerror(errno));
 			continue;
 		}
 
 		value = get_str_ent(xcp, ACL_VAR_MASTER_SERV_DISABLE, "yes");
-		if (value == NULL || strcasecmp(value, "yes") == 0) {
-			acl_xinetd_cfg_free(xcp);
-			xcp = NULL;
-			continue;
+		if (value != NULL && strcasecmp(value, "yes") != 0) {
+			__config_file_ptr = config_file;
+			return xcp;
 		}
 
-		break;
+		acl_xinetd_cfg_free(xcp);
 	}
 
-	__config_file_ptr = config_file;
-
-	return xcp;
 }
 
 static void init_listeners(ACL_MASTER_SERV *serv)
@@ -612,7 +605,7 @@ static void service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	name = get_str_ent(xcp, ACL_VAR_MASTER_SERV_SERVICE, (const char *) 0);
 
 	/* add "-f configure_file_path" flag */
-	acl_argv_add(serv->args, "-f", acl_vstring_str(path), (char *) 0);
+	acl_argv_add(serv->args, "-f", STR(path), (char *) 0);
 
 	/*
 	if (serv->max_proc == 1)
@@ -636,7 +629,7 @@ static void service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	if (chroot_var)
 		acl_argv_add(serv->args, "-c", (char *) 0);
 	if (serv->listen_fd_count > 1)
-		acl_argv_add(serv->args, "-s", acl_vstring_str(
+		acl_argv_add(serv->args, "-s", STR(
 			acl_vstring_sprintf(junk, "%d", serv->listen_fd_count)),
 			(char *) 0);
 
@@ -689,7 +682,7 @@ static void service_env(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 	}
 }
 
-ACL_MASTER_SERV *acl_get_master_ent()
+ACL_MASTER_SERV *acl_master_ent_get()
 {
 	ACL_XINETD_CFG_PARSER *xcp = NULL;
 	ACL_VSTRING *path_buf = acl_vstring_alloc(256);
@@ -718,7 +711,7 @@ ACL_MASTER_SERV *acl_get_master_ent()
 	if (saved_interfaces == 0)
 		saved_interfaces = acl_mystrdup(acl_var_master_inet_interfaces);
 
-	xcp = lookup_service_conf(path_buf);
+	xcp = load_service_conf(path_buf);
 
 	if (xcp == NULL)
 		RETURN (NULL);
@@ -748,17 +741,19 @@ ACL_MASTER_SERV *acl_get_master_ent()
 	 */
 	serv->status_fd[0] = serv->status_fd[1] = -1;
 
+#if 0
 	/*
 	 * Child process structures.
 	 */
 	serv->children = 0;
+#endif
 
 	RETURN (serv);
 }
 
 /* acl_print_master_ent - show service entry contents */
 
-void acl_print_master_ent(ACL_MASTER_SERV *serv)
+void acl_master_ent_print(ACL_MASTER_SERV *serv)
 {
 	char  **cpp;
 
@@ -783,7 +778,9 @@ void acl_print_master_ent(ACL_MASTER_SERV *serv)
 	acl_msg_info("total_proc: %d", serv->total_proc);
 	acl_msg_info("throttle_delay: %d", serv->throttle_delay);
 	acl_msg_info("status_fd %d %d", serv->status_fd[0], serv->status_fd[1]);
+#if 0
 	acl_msg_info("children: 0x%lx", (long) serv->children);
+#endif
 	acl_msg_info("next: 0x%lx", (long) serv->next);
 	acl_msg_info("====end service entry");
 }
@@ -800,7 +797,7 @@ static void __free_nv_fn(void *arg)
 	}
 }
 
-void acl_free_master_ent(ACL_MASTER_SERV *serv)
+void acl_master_ent_free(ACL_MASTER_SERV *serv)
 {
 	/*
 	 * Undo what get_master_ent() created.
@@ -830,4 +827,5 @@ void acl_free_master_ent(ACL_MASTER_SERV *serv)
 	acl_myfree(serv->listen_streams);
 	acl_myfree(serv);
 }
+
 #endif /* ACL_UNIX */

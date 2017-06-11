@@ -56,8 +56,10 @@ typedef struct ACL_MASTER_SERV {
 	int     total_proc;		/* number of processes */
 	int     throttle_delay;		/* failure recovery parameter */
 	int     status_fd[2];		/* child status reports */
-	ACL_VSTREAM *status_read_stream;	/* status stream */
+	ACL_VSTREAM *status_read_stream;/* status stream */
+#if 0
 	struct ACL_BINHASH *children;	/* linkage */
+#endif
 	struct ACL_MASTER_SERV *next;	/* linkage */
 } ACL_MASTER_SERV;
 
@@ -70,8 +72,10 @@ typedef struct ACL_MASTER_SERV {
 #define ACL_MASTER_FLAG_MARK		(1<<1)	/* garbage collection support */
 #define ACL_MASTER_FLAG_CONDWAKE	(1<<2)	/* wake up if actually used */
 #define	ACL_MASTER_FLAG_RELOADING	(1<<3)	/* the service is reloading */
+#define ACL_MASTER_FLAG_STOPPING	(1<<4)	/* the service is stopping */
 
 #define ACL_MASTER_THROTTLED(f)		((f)->flags & ACL_MASTER_FLAG_THROTTLE)
+#define ACL_MASTER_STOPPING(f)		((f)->flags & ACL_MASTER_FLAG_STOPPING)
 
 #define ACL_MASTER_LIMIT_OK(limit, count) ((limit) == 0 || ((count) < (limit)))
 
@@ -114,11 +118,11 @@ typedef struct ACL_MASTER_PROC {
   * acl_master_ent.c
   */
 extern void acl_set_master_service_path(const char *);
-extern void acl_set_master_ent(void);
-extern void acl_end_master_ent(void);
-extern void acl_print_master_ent(ACL_MASTER_SERV *);
-extern ACL_MASTER_SERV *acl_get_master_ent(void);
-extern void acl_free_master_ent(ACL_MASTER_SERV *);
+extern void acl_master_ent_begin(void);
+extern void acl_master_ent_end(void);
+extern void acl_master_ent_print(ACL_MASTER_SERV *);
+extern ACL_MASTER_SERV *acl_master_ent_get(void);
+extern void acl_master_ent_free(ACL_MASTER_SERV *);
 
  /*
   * acl_master_conf.c
