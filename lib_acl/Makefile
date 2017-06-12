@@ -212,8 +212,6 @@ DB_SRC       = $(wildcard $(SRC_PATH_SRC)/db/*.c) \
 		$(wildcard $(SRC_PATH_SRC)/db/zdb/*.c)
 CODE_SRC     = $(wildcard $(SRC_PATH_SRC)/code/*.c) 
 MASTER_SRC   = $(wildcard $(SRC_PATH_SRC)/master/*.c) \
-		$(wildcard $(SRC_PATH_SRC)/master/framework/*.c) \
-		$(wildcard $(SRC_PATH_SRC)/master/framework/trigger/*.c) \
 		$(wildcard $(SRC_PATH_SRC)/master/template/*.c)
 PROCTL_SRC   = $(wildcard $(SRC_PATH_SRC)/proctl/*.c)
 XML_SRC      = $(wildcard $(SRC_PATH_SRC)/xml/*.c)
@@ -278,21 +276,21 @@ OBJS_DEF     = $(INIT_DEF) $(PRIV_DEF) $(STDLIB_DEF) \
 		$(JSON_DEF) $(UTEST_DEF)
 
 ###########################################################
-.PHONY = all static shared acl_master clean clean_lib clean_master rebuild
+.PHONY = all static shared clean clean_lib rebuild
 
 STATIC_OLD_LIBNAME = lib_acl.a
 SHARED_OLD_LIBNAME = lib_acl.so
 STATIC_LIBNAME = libacl.a
 SHARED_LIBNAME = libacl.so
 
-all: static shared acl_master
+all: static shared
 
 $(shell mkdir -p $(DEF_PATH_DST))
 ifneq ($(MAKECMDGOALS),clean)
 -include $(OBJS_DEF)
 endif
 
-clean: clean_lib clean_master
+clean: clean_lib
 rebuild: clean all
 
 PCH = StdAfx.h.gch
@@ -488,14 +486,6 @@ $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/master/%.c
 	$(COMPILE_OBJ)
 $(DEF_PATH_DST)/%.inc: $(SRC_PATH_SRC)/master/%.c
 	$(CREATE_DEF)
-$(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/master/framework/%.c
-	$(COMPILE_OBJ)
-$(DEF_PATH_DST)/%.inc: $(SRC_PATH_SRC)/master/framework/%.c
-	$(CREATE_DEF)
-$(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/master/framework/trigger/%.c
-	$(COMPILE_OBJ)
-$(DEF_PATH_DST)/%.inc: $(SRC_PATH_SRC)/master/framework/trigger/%.c
-	$(CREATE_DEF)
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/master/template/%.c
 	$(COMPILE_OBJ)
 $(DEF_PATH_DST)/%.inc: $(SRC_PATH_SRC)/master/template/%.c
@@ -538,35 +528,5 @@ clean_lib:
 	rm -f $(OBJS_DST)
 	rm -f $(OBJS_DEF)
 	rm -f $(PCH)
-
-###########################################################
-
-MASTER = acl_master
-MASTER_OBJ_PATH = $(OUT_PATH)/master
-
-MASTERD_SRC   = $(wildcard $(SRC_PATH_SRC)/master/daemon/*.c)
-MASTERD_OBJ   = $(patsubst %.c, $(MASTER_OBJ_PATH)/%.o, $(notdir $(MASTERD_SRC)))
-
-# master
-acl_master: static $(MASTERD_OBJ)
-	@echo ''
-	@echo 'creating acl_master'
-	@if test -n "$(rpath)"; then \
-		$(CC) -o $(MASTER_OBJ_PATH)/$(MASTER) $(MASTERD_OBJ) \
-			$(LIB_PATH_DST)/$(LIB_NAME) $(SYSLIB) -Wl,-rpath,$(rpath); \
-	else \
-		$(CC) -o $(MASTER_OBJ_PATH)/$(MASTER) $(MASTERD_OBJ) \
-			$(LIB_PATH_DST)/$(LIB_NAME) $(SYSLIB); \
-	fi
-	@$(shell mkdir -p ../dist/master/libexec/$(RPATH))
-	cp $(MASTER_OBJ_PATH)/$(MASTER) ../dist/master/libexec/$(RPATH)/
-	@echo 'create acl_master ok!'
-
-$(MASTER_OBJ_PATH)/%.o: $(SRC_PATH_SRC)/master/daemon/%.c
-	$(COMPILE_OBJ)
-
-clean_master:
-	rm -f $(MASTERD_OBJ)
-	rm -f $(MASTER_OBJ_PATH)/acl_master
 
 ###########################################################
