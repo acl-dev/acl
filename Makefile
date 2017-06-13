@@ -123,6 +123,9 @@ clean:
 #	@(cd lib_dict; make clean)
 #	@(cd lib_tls; make clean)
 
+acl_master:
+	@(cd app/master; make)
+
 packinstall:
 	@(echo "")
 	@(echo "begin copy file...")
@@ -131,13 +134,13 @@ packinstall:
 	$(shell mkdir -p $(BIN_PATH)/)
 	$(shell mkdir -p $(LIB_PATH)/)
 	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master/)
-	cp -f lib_acl/master/acl_master ./dist/master/libexec/$(RPATH)/
+	cp -f app/master/acl_master ./dist/master/libexec/$(RPATH)/
 	(cd dist/master && ./setup.sh $(DESTDIR) /opt/soft/acl-master)
-	cp -f lib_acl/master/acl_master $(BIN_PATH)
+	cp -f app/master/acl_master $(BIN_PATH)
 	cp -Rf lib_acl/include/* $(ACL_INC)/acl/
 	cp -Rf lib_acl_cpp/include/acl_cpp/* $(ACL_INC)/acl_cpp/
 	cp -f libacl_all.a $(ACL_LIB)/libacl_all.a
-	#cp -Rf lib_protocol/include/* $(PROTO_INC)/
+#	cp -Rf lib_protocol/include/* $(PROTO_INC)/
 #	cp -f lib_dict/lib/lib_dict.a $(DICT_LIB)/$(RPATH)/
 #	cp -Rf lib_dict/include/* $(DICT_INC)/
 #	cp -f lib_tls/lib/lib_tls.a $(TLS_LIB)/$(RPATH)/
@@ -148,7 +151,7 @@ install:
 	$(shell mkdir -p $(ACL_INC))
 	$(shell mkdir -p $(PROTO_INC))
 	$(shell mkdir -p $(INC_PATH)/acl_cpp)
-	cp -f lib_acl/master/acl_master ./dist/master/libexec/$(RPATH)/
+	cp -f app/master/acl_master ./dist/master/libexec/$(RPATH)/
 	cp -f lib_acl/lib/libacl_all.a $(ACL_LIB)/$(RPATH)/
 	cp -Rf lib_acl/include/* $(ACL_INC)/
 	cp -f lib_protocol/lib/libprotocol.a $(PROTO_LIB)/$(RPATH)/
@@ -281,7 +284,7 @@ build_src: clean uninstall_all
 #	@(echo "move acl.src.tgz to ../acl$(VERSION).src.tgz")
 #	@(mv acl.src.tgz ../acl$(VERSION).src.tgz)
 RELEASE_PATH = release
-build_one: all_lib
+build_one: all_lib acl_master
 	@(mkdir -p $(RELEASE_PATH); mkdir -p $(RELEASE_PATH)/acl; \
 		mkdir -p $(RELEASE_PATH)/protocol; \
 		mkdir -p $(RELEASE_PATH)/acl_cpp)
