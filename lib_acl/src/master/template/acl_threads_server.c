@@ -1136,7 +1136,7 @@ static ACL_VSTREAM **server_daemon_open(ACL_EVENT *event,
 	}
 
 	stat_stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
-		O_RDWR, 0, 0, ACL_VSTREAM_TYPE_SOCK);
+		O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
 
 	acl_event_enable_read(event, stat_stream, 0, server_abort, threads);
 

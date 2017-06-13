@@ -3,8 +3,6 @@
 #include <poll.h>
 
 /* including the internal headers from lib_acl/src/master */
-#include "master_proto.h"
-#include "master_params.h"
 #include "template/master_log.h"
 
 #include "fiber/lib_fiber.h"
@@ -378,6 +376,8 @@ static ACL_VSTREAM **server_daemon_open(int count, int fdtype)
 {
 	const char *myname = "server_daemon_open";
 	ACL_VSTREAM *sstream, **sstreams;
+	ACL_VSTREAM *stat_stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
+			O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
 	ACL_SOCKET fd;
 	int i;
 
@@ -406,7 +406,7 @@ static ACL_VSTREAM **server_daemon_open(int count, int fdtype)
 		acl_fiber_create(fiber_accept_main, sstream, STACK_SIZE);
 	}
 
-	acl_fiber_create(fiber_monitor_master, ACL_MASTER_STAT_STREAM, STACK_SIZE);
+	acl_fiber_create(fiber_monitor_master, stat_stream, STACK_SIZE);
 
 	acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
@@ -520,10 +520,6 @@ static void server_init(const char *procname)
 	acl_get_app_conf_int_table(__conf_int_tab);
 	acl_get_app_conf_str_table(__conf_str_tab);
 	acl_get_app_conf_bool_table(__conf_bool_tab);
-
-#ifdef ACL_UNIX
-	acl_master_vars_init(acl_var_fiber_buf_size, acl_var_fiber_rw_timeout);
-#endif
 
 	if (__deny_info == NULL)
 		__deny_info = acl_var_fiber_deny_banner;
@@ -695,8 +691,8 @@ static void fiber_start(void)
 
 	/* Run pre-jail initialization. */
 	if (__daemon_mode && *acl_var_fiber_queue_dir
-		&& chdir(acl_var_fiber_queue_dir) < 0)
-	{
+		&& chdir(acl_var_fiber_queue_dir) < 0) {
+
 		acl_msg_fatal("chdir(\"%s\"): %s", acl_var_fiber_queue_dir,
 			acl_last_serror());
 	}
