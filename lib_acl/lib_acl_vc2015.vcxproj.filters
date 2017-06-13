@@ -92,15 +92,6 @@
     <Filter Include="Source Files\master\template">
       <UniqueIdentifier>{01684461-568d-4c09-b1c0-1c4df0e12ae6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\master\framework">
-      <UniqueIdentifier>{9b13391b-9bed-4d58-9e22-bc169844986e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\master\framework\trigger">
-      <UniqueIdentifier>{35b92483-33d0-43ee-b8af-f8f93b8dcd3b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\master\daemon">
-      <UniqueIdentifier>{d249f3dc-3b3d-4453-96fd-87ceced12484}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\proctl">
       <UniqueIdentifier>{f721cf19-6c42-4e35-9e10-e1a681d6daed}</UniqueIdentifier>
     </Filter>
@@ -767,28 +758,19 @@
     <ClCompile Include=".\src\unit_test\acl_test_token.c">
       <Filter>Source Files\unit_test</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\master\master_flow.c">
+    <ClCompile Include=".\src\master\acl_master_flow.c">
       <Filter>Source Files\master</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\master\master_params.c">
+    <ClCompile Include=".\src\master\acl_master_params.c">
       <Filter>Source Files\master</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\master\master_proto.c">
-      <Filter>Source Files\master</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\master_vars.c">
+    <ClCompile Include=".\src\master\acl_master_proto.c">
       <Filter>Source Files\master</Filter>
     </ClCompile>
     <ClCompile Include=".\src\master\template\acl_aio_server.c">
       <Filter>Source Files\master\template</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\master\template\acl_ioctl_server.c">
-      <Filter>Source Files\master\template</Filter>
-    </ClCompile>
     <ClCompile Include=".\src\master\template\master_log.c">
-      <Filter>Source Files\master\template</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\template\acl_multi_server.c">
       <Filter>Source Files\master\template</Filter>
     </ClCompile>
     <ClCompile Include=".\src\master\template\acl_single_server.c">
@@ -799,51 +781,6 @@
     </ClCompile>
     <ClCompile Include=".\src\master\template\acl_trigger_server.c">
       <Filter>Source Files\master\template</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\master_avail.c">
-      <Filter>Source Files\master\framework</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\master_conf.c">
-      <Filter>Source Files\master\framework</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\master_ent.c">
-      <Filter>Source Files\master\framework</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\master_listen.c">
-      <Filter>Source Files\master\framework</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\master_pathname.c">
-      <Filter>Source Files\master\framework</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\master_service.c">
-      <Filter>Source Files\master\framework</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\master_sig.c">
-      <Filter>Source Files\master\framework</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\master_spawn.c">
-      <Filter>Source Files\master\framework</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\master_status.c">
-      <Filter>Source Files\master\framework</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\master_wakeup.c">
-      <Filter>Source Files\master\framework</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\trigger\fifo_trigger.c">
-      <Filter>Source Files\master\framework\trigger</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\trigger\inet_trigger.c">
-      <Filter>Source Files\master\framework\trigger</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\trigger\stream_trigger.c">
-      <Filter>Source Files\master\framework\trigger</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\framework\trigger\unix_trigger.c">
-      <Filter>Source Files\master\framework\trigger</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\master\daemon\master.c">
-      <Filter>Source Files\master\daemon</Filter>
     </ClCompile>
     <ClCompile Include=".\src\proctl\acl_proctl.c">
       <Filter>Source Files\proctl</Filter>
@@ -1047,26 +984,8 @@
     <ClInclude Include=".\src\db\zdb\zdb_private.h">
       <Filter>Source Files\db\zdb</Filter>
     </ClInclude>
-    <ClInclude Include=".\src\master\master_flow.h">
-      <Filter>Source Files\master</Filter>
-    </ClInclude>
-    <ClInclude Include=".\src\master\master_params.h">
-      <Filter>Source Files\master</Filter>
-    </ClInclude>
-    <ClInclude Include=".\src\master\master_proto.h">
-      <Filter>Source Files\master</Filter>
-    </ClInclude>
     <ClInclude Include=".\src\master\template\master_log.h">
       <Filter>Source Files\master\template</Filter>
-    </ClInclude>
-    <ClInclude Include=".\src\master\framework\master.h">
-      <Filter>Source Files\master\framework</Filter>
-    </ClInclude>
-    <ClInclude Include=".\src\master\framework\master_pathname.h">
-      <Filter>Source Files\master\framework</Filter>
-    </ClInclude>
-    <ClInclude Include=".\src\master\framework\trigger\trigger.h">
-      <Filter>Source Files\master\framework\trigger</Filter>
     </ClInclude>
     <ClInclude Include=".\src\proctl\proctl_internal.h">
       <Filter>Source Files\proctl</Filter>
@@ -1491,19 +1410,19 @@
     <ClInclude Include=".\include\master\acl_aio_params.h">
       <Filter>Header Files\master</Filter>
     </ClInclude>
-    <ClInclude Include=".\include\master\acl_ioctl_params.h">
-      <Filter>Header Files\master</Filter>
-    </ClInclude>
     <ClInclude Include=".\include\master\acl_master.h">
       <Filter>Header Files\master</Filter>
     </ClInclude>
     <ClInclude Include=".\include\master\acl_master_conf.h">
       <Filter>Header Files\master</Filter>
     </ClInclude>
-    <ClInclude Include=".\include\master\acl_master_type.h">
+    <ClInclude Include=".\include\master\acl_master_flow.h">
       <Filter>Header Files\master</Filter>
     </ClInclude>
-    <ClInclude Include=".\include\master\acl_multi_params.h">
+    <ClInclude Include=".\include\master\acl_master_proto.h">
+      <Filter>Header Files\master</Filter>
+    </ClInclude>
+    <ClInclude Include=".\include\master\acl_master_type.h">
       <Filter>Header Files\master</Filter>
     </ClInclude>
     <ClInclude Include=".\include\master\acl_server_api.h">

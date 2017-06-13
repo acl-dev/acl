@@ -110,7 +110,7 @@ all_samples: all_lib
 	@(cd lib_acl_cpp/samples; make)
 #	@(cd lib_dict; make $(MAKE_ARGS))
 #	@(cd lib_tls; make $(MAKE_ARGS))
-all: all_lib all_samples
+all: all_lib acl_master all_samples
 clean:
 	@(cd lib_acl; make clean)
 	@(cd lib_protocol; make clean)
@@ -123,7 +123,7 @@ clean:
 #	@(cd lib_dict; make clean)
 #	@(cd lib_tls; make clean)
 
-acl_master:
+acl_master: all_lib
 	@(cd app/master; make)
 
 packinstall:

@@ -1437,31 +1437,15 @@
 				Name="master"
 				>
 				<File
-					RelativePath=".\src\master\master_flow.c"
+					RelativePath=".\src\master\acl_master_flow.c"
 					>
 				</File>
 				<File
-					RelativePath=".\src\master\master_flow.h"
+					RelativePath=".\src\master\acl_master_params.c"
 					>
 				</File>
 				<File
-					RelativePath=".\src\master\master_params.c"
-					>
-				</File>
-				<File
-					RelativePath=".\src\master\master_params.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\master\master_proto.c"
-					>
-				</File>
-				<File
-					RelativePath=".\src\master\master_proto.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\master\master_vars.c"
+					RelativePath=".\src\master\acl_master_proto.c"
 					>
 				</File>
 				<Filter
@@ -1469,14 +1453,6 @@
 					>
 					<File
 						RelativePath=".\src\master\template\acl_aio_server.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\template\acl_ioctl_server.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\template\acl_multi_server.c"
 						>
 					</File>
 					<File
@@ -1501,90 +1477,6 @@
 					</File>
 					<File
 						RelativePath=".\src\master\template\master_log.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="framework"
-					>
-					<File
-						RelativePath=".\src\master\framework\master.h"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_avail.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_conf.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_ent.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_listen.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_pathname.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_pathname.h"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_service.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_sig.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_spawn.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_status.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_wakeup.c"
-						>
-					</File>
-					<Filter
-						Name="trigger"
-						>
-						<File
-							RelativePath=".\src\master\framework\trigger\fifo_trigger.c"
-							>
-						</File>
-						<File
-							RelativePath=".\src\master\framework\trigger\inet_trigger.c"
-							>
-						</File>
-						<File
-							RelativePath=".\src\master\framework\trigger\stream_trigger.c"
-							>
-						</File>
-						<File
-							RelativePath=".\src\master\framework\trigger\trigger.h"
-							>
-						</File>
-						<File
-							RelativePath=".\src\master\framework\trigger\unix_trigger.c"
-							>
-						</File>
-					</Filter>
-				</Filter>
-				<Filter
-					Name="daemon"
-					>
-					<File
-						RelativePath=".\src\master\daemon\master.c"
 						>
 					</File>
 				</Filter>
@@ -2358,10 +2250,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\master\acl_ioctl_params.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\master\acl_master.h"
 					>
 				</File>
@@ -2370,11 +2258,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\master\acl_master_type.h"
+					RelativePath=".\include\master\acl_master_flow.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\master\acl_multi_params.h"
+					RelativePath=".\include\master\acl_master_proto.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\master\acl_master_type.h"
 					>
 				</File>
 				<File
