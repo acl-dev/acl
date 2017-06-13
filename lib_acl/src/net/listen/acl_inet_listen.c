@@ -125,7 +125,11 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int blocking)
 	if (host && *host == 0)
 		host = 0;
 	if (host == NULL)
+#ifdef AF_INET6
 		host = "0";
+#else
+		host = "0.0.0.0";
+#endif
 
 	if (port == NULL) {
 		acl_msg_error("%s(%d): no port given from addr(%s)",

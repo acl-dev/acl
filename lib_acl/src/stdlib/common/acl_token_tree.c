@@ -53,7 +53,7 @@ static ACL_TOKEN *iter_head(ACL_ITER *it, ACL_TOKEN *token)
 	it->size = 0;
 	it->ptr  = token;
 
-	assert(token->parent == NULL);
+	acl_assert(token->parent == NULL);
 	return iter_next(it, token);
 }
 
@@ -62,7 +62,7 @@ static ACL_TOKEN *next_token(ACL_ITER *it, ACL_TOKEN *token)
 	ACL_TOKEN *parent;
 	unsigned i;
 
-	assert(token);
+	acl_assert(token);
 
 	/* lookup the first left no null child of the current token */
 
