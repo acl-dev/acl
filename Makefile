@@ -124,7 +124,7 @@ clean:
 #	@(cd lib_tls; make clean)
 
 acl_master: all_lib
-	@(cd app/master; make)
+	@(cd app/master/daemon; make)
 
 packinstall:
 	@(echo "")
@@ -134,9 +134,9 @@ packinstall:
 	$(shell mkdir -p $(BIN_PATH)/)
 	$(shell mkdir -p $(LIB_PATH)/)
 	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master/)
-	cp -f app/master/acl_master ./dist/master/libexec/$(RPATH)/
+	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
 	(cd dist/master && ./setup.sh $(DESTDIR) /opt/soft/acl-master)
-	cp -f app/master/acl_master $(BIN_PATH)
+	cp -f app/master/daemon/acl_master $(BIN_PATH)
 	cp -Rf lib_acl/include/* $(ACL_INC)/acl/
 	cp -Rf lib_acl_cpp/include/acl_cpp/* $(ACL_INC)/acl_cpp/
 	cp -f libacl_all.a $(ACL_LIB)/libacl_all.a
@@ -151,7 +151,7 @@ install:
 	$(shell mkdir -p $(ACL_INC))
 	$(shell mkdir -p $(PROTO_INC))
 	$(shell mkdir -p $(INC_PATH)/acl_cpp)
-	cp -f app/master/acl_master ./dist/master/libexec/$(RPATH)/
+	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
 	cp -f lib_acl/lib/libacl_all.a $(ACL_LIB)/$(RPATH)/
 	cp -Rf lib_acl/include/* $(ACL_INC)/
 	cp -f lib_protocol/lib/libprotocol.a $(PROTO_LIB)/$(RPATH)/
