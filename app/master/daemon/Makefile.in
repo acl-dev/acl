@@ -85,8 +85,16 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-CFLAGS += -I../../../lib_acl/include -I../../../lib_protocol/include
-LDFLAGS = -L../../../lib_protocol/lib -lprotocol -L../../../lib_acl/lib -lacl $(SYSLIB)
+ACL_PATH = ../../..
+
+CFLAGS += -I. \
+	  -I$(ACL_PATH)/lib_acl/include \
+	  -I$(ACL_PATH)/lib_acl_cpp/include \
+	  -I$(ACL_PATH)/lib_protocol/include
+
+LDFLAGS = -L$(ACL_PATH)/lib_acl_cpp/lib -lacl_cpp \
+	  -L$(ACL_PATH)/lib_protocol/lib -lprotocol \
+	  -L$(ACL_PATH)/lib_acl/lib -lacl $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)
@@ -96,7 +104,7 @@ OBJ_PATH = ./debug
 $(shell mkdir -p $(OBJ_PATH))
 
 #Project's objs
-SRC = $(wildcard *.cpp) $(wildcard master/*.cpp) $(wildcard trigger/*.cpp)
+SRC = $(wildcard *.cpp) $(wildcard master/*.cpp) $(wildcard trigger/*.cpp) $(wildcard manage/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 
 $(OBJ_PATH)/%.o: %.cpp
@@ -104,6 +112,8 @@ $(OBJ_PATH)/%.o: %.cpp
 $(OBJ_PATH)/%.o: master/%.cpp
 	$(COMPILE) $< -o $@
 $(OBJ_PATH)/%.o: trigger/%.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: manage/%.cpp
 	$(COMPILE) $< -o $@
 
 .PHONY = all clean

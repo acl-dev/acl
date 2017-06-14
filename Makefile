@@ -119,7 +119,8 @@ clean:
 	@(cd unit_test; make clean)
 	@(cd lib_acl/samples; make clean)
 	@(cd lib_protocol/samples; make clean)
-	@(rm -f libacl_all.a libacl.so)
+	@(rm -f libacl_all.a libacl.a)
+	@(rm -f libacl_all.so libacl.so)
 #	@(cd lib_dict; make clean)
 #	@(cd lib_tls; make clean)
 
