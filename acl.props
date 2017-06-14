@@ -7,6 +7,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir)lib_acl_cpp\include;$(SolutionDir)lib_acl\include;$(SolutionDir)lib_protocol\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)lib_acl_cpp;$(SolutionDir)lib_acl;$(SolutionDir)lib_protocol;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

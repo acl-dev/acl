@@ -15,7 +15,7 @@
 #include "../stdlib/string.hpp"
 #include "../stdlib/json.hpp"
 #include "../stdlib/string.hpp"
-
+#include <set>
 namespace acl
 {
 
@@ -431,7 +431,7 @@ static inline void add_item(acl::json &, acl::json_node &node, char *value)
 	else
 		node.add_array_text(value);
 }
-
+//list
 template<class T>
 static inline acl::json_node &gson(acl::json &json,
 	const std::list<T> &objects)
@@ -445,7 +445,6 @@ static inline acl::json_node &gson(acl::json &json,
 
 	return node;
 }
-
 template<class T>
 static inline acl::json_node &gson(acl::json &json,
 	const std::list<T> *objects)
@@ -453,6 +452,7 @@ static inline acl::json_node &gson(acl::json &json,
 	return gson(json, *objects);
 }
 
+//vector
 template<class T>
 static inline acl::json_node &gson(acl::json &json,
 	const std::vector<T> &objects)
@@ -472,6 +472,26 @@ static inline acl::json_node &gson(acl::json &json,
 	const std::vector<T> *objects)
 {
 	return gson(json, *objects);
+}
+//set
+template<class T>
+static inline acl::json_node &gson(acl::json &json, const std::set<T> *objects)
+{
+	return gson(json, *objects);
+}
+
+template<class T>
+static inline acl::json_node &gson(acl::json &json,
+	const std::set<T> &objects)
+{
+	acl::json_node &node = json.create_array();
+	for (typename std::set<T>::const_iterator
+		itr = objects.begin(); itr != objects.end(); ++itr)
+	{
+		add_item(json, node, *itr);
+	}
+
+	return node;
 }
 
 //define number map
@@ -860,7 +880,6 @@ static inline std::pair<bool, std::string>
 gson(acl::json_node &node, std::list<T> *objs)
 {
 	std::pair<bool, std::string> result;
-	std::string error_string;
 	acl::json_node *itr = node.first_child();
 
 	while (itr)
@@ -873,16 +892,18 @@ gson(acl::json_node &node, std::list<T> *objs)
 		objs->push_back(obj);
 		typename std::list<T>::iterator it = objs->end();
 		--it;
-		result = gson(*itr, *it);
+		result = gson(*itr, &*it);
 		if (!result.first)
 		{
-			error_string.append(result.second);
-			objs->erase(it);
+			break;
 		}
 		itr = node.next_child();
 	}
-
-	return std::make_pair(!!!objs->empty(), error_string);
+	if (result.first)
+		return result;
+	
+	objs->clear();
+	return result;
 }
 
 // list
@@ -891,28 +912,25 @@ static inline std::pair<bool, std::string>
 gson(acl::json_node &node, std::list<T*> *objs)
 {
 	std::pair<bool, std::string> result;
-	std::string error_string;
 	acl::json_node *itr = node.first_child();
 
 	while (itr)
 	{
-		// for avoiding object's member pointor copy
-		// ---lindawei
-	
 		T* obj = new T;
 		objs->push_back(obj);
-		typename std::list<T*>::iterator it = objs->end();
-		--it;
-		result = gson(*itr, *it);
+		result = gson(*itr, obj);
 		if (!result.first)
 		{
-			error_string.append(result.second);
-			objs->erase(it);
+			break;
 		}
 		itr = node.next_child();
 	}
-
-	return std::make_pair(!!!objs->empty(), error_string);
+	if(objs->size())
+	{
+		delete *objs->begin();
+		objs->pop_front();
+	}
+	return result;
 }
 
 // vector
@@ -922,7 +940,6 @@ static inline gson(acl::json_node &node, std::vector<T> *objs)
 {
 	std::pair<bool, std::string> result;
 	acl::json_node *itr = node.first_child();
-	std::string error_string;
 
 	while (itr)
 	{
@@ -933,16 +950,17 @@ static inline gson(acl::json_node &node, std::vector<T> *objs)
 		objs->push_back(obj);
 		typename std::vector<T>::iterator it = objs->end();
 		--it;
-		result = gson(*itr, *it);
+		result = gson(*itr, &*it);
 		if (!result.first)
 		{
-			error_string.append(result.second);
-			objs->erase(it);
+			break;
 		}
 		itr = node.next_child();
 	}
-
-	return std::make_pair(!!!objs->empty(), error_string);
+	if(result.first)
+		return result;
+	objs->clear();
+	return result;
 }
 
 // vector
@@ -952,7 +970,6 @@ static inline gson(acl::json_node &node, std::vector<T*> *objs)
 {
 	std::pair<bool, std::string> result;
 	acl::json_node *itr = node.first_child();
-	std::string error_string;
 
 	while (itr)
 	{
@@ -963,13 +980,78 @@ static inline gson(acl::json_node &node, std::vector<T*> *objs)
 		result = gson(*itr, *it);
 		if (!result.first)
 		{
-			error_string.append(result.second);
-			objs->erase(it);
+			break;
 		}
 		itr = node.next_child();
 	}
+	if(result.first)
+		return result;
 
-	return std::make_pair(!!!objs->empty(), error_string);
+	while(objs->size())
+	{
+		delete objs[0];
+		objs->pop_back();
+	}
+	return result;
+}
+
+//set
+template<class T>
+std::pair<bool, std::string>
+static inline gson(acl::json_node &node, std::set<T*> *objs)
+{
+	std::pair<bool, std::string> result;
+	acl::json_node *itr = node.first_child();
+
+	while (itr)
+	{
+		T* obj = new T;
+		result = gson(*itr, obj);
+		if (!result.first)
+		{
+			delete obj;
+			break;
+		}
+		objs->insert(obj);
+		itr = node.next_child();
+	}
+	
+	if (result.first)
+		return result;
+
+	while(objs->size())
+	{
+		T* obj = *objs->begin();
+		objs->erase(objs->begin());
+		delete obj;
+	}
+	return result;
+}
+
+template<class T>
+std::pair<bool, std::string>
+static inline gson(acl::json_node &node, std::set<T> *objs)
+{
+	std::pair<bool, std::string> result;
+	acl::json_node *itr = node.first_child();
+
+	while (itr)
+	{
+		T obj;
+		result = gson(*itr, &obj);
+		if (!result.first)
+		{
+			break;
+		}
+		objs->insert(obj);
+		itr = node.next_child();
+	}
+
+	if (result.first)
+		return result;
+
+	objs->clear();
+	return result;
 }
 
 template <class T>
@@ -1108,7 +1190,7 @@ static inline expand(acl::json_node &node, std::map<K, T*> *objs)
 	for (typename std::map<K, T*>::iterator it = objs->begin();
 		it != objs->end(); ++it)
 	{
-		del(it->second);
+		del(&it->second);
 	}
 
 	objs->clear();
@@ -1140,7 +1222,7 @@ static inline expand(acl::json_node &node, std::map<K, T*> *objs)
 	for (typename std::map<K, T*>::iterator itr2 = objs->begin();
 		itr2 != objs->end(); ++itr2)
 	{
-		del(itr2->second);
+		del(&itr2->second);
 	}
 
 	objs->clear();
