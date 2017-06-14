@@ -1480,7 +1480,7 @@ static std::string get_filename_without_ext(std::string filename)
 	std::string result;
 
 	if (filename.empty())
-		return{}; 
+		return std::string(); 
 	
 	std::size_t pos = filename.find_last_of('.');
 	if (pos != filename.npos)
@@ -1494,7 +1494,7 @@ static std::string get_filename_without_ext(std::string filename)
 		result += filename[i];
 	}
 	if (result.empty())
-		return{};
+		return std::string();
 	std::reverse(result.begin(), result.end());
 	return result;
 }

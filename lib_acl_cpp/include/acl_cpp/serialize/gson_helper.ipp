@@ -888,8 +888,7 @@ gson(acl::json_node &node, std::list<T> *objs)
 		// put in list first, when error happened just only erase it.
 		// ---lindawei
 	
-		T obj;
-		objs->push_back(obj);
+		objs->push_back(T());
 		typename std::list<T>::iterator it = objs->end();
 		--it;
 		result = gson(*itr, &*it);
@@ -946,8 +945,7 @@ static inline gson(acl::json_node &node, std::vector<T> *objs)
 		// for avoiding object's member pointor copy
 		// ---lindawei
 	
-		T obj;
-		objs->push_back(obj);
+		objs->push_back(T());
 		typename std::vector<T>::iterator it = objs->end();
 		--it;
 		result = gson(*itr, &*it);
@@ -1037,7 +1035,7 @@ static inline gson(acl::json_node &node, std::set<T> *objs)
 
 	while (itr)
 	{
-		T obj;
+		T obj = T();
 		result = gson(*itr, &obj);
 		if (!result.first)
 		{
