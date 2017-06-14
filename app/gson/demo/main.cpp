@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "struct.h"
-#include "gson.h"
+#include "struct.gson.h"
 
 void test_base()
 {
@@ -51,6 +51,16 @@ void test_base()
 
 	obj.base_list_map.insert( std::make_pair("base", obj.bases_list));
 	obj.vector_list_base.push_back(obj.bases_list);
+
+	//set
+	obj.str_set_.insert("hello1");
+	obj.str_set_.insert("hello2");
+	obj.str_set_.insert("hello3");
+	obj.bool_set_.insert(true);
+	obj.bool_set_.insert(false);
+	obj.int_set_.insert(1);
+	obj.int_set_.insert(11);
+	obj.int_set_.insert(111);
 
 	acl::json json;
 	acl::json_node &node = acl::gson(json, obj);

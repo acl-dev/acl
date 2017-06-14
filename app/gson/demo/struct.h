@@ -1,4 +1,5 @@
 #pragma once
+#include <set>
 
 struct base
 {
@@ -37,13 +38,19 @@ struct list1
 	std::list<base> *bases_list_ptr;
 	//Gson@optional
 	std::list<base*> *bases_ptr_list_ptr;
-	std::map<std::string,base> base_map;
-	std::map<std::string,std::string> string_map;
+	std::vector<std::string> vector_string;
+	std::vector<std::list<base> > vector_list_base; 
+	
+	std::map<std::string, base> base_map;
+	std::map<std::string, std::string> string_map;
 	std::map<std::string, int> int_map;
 	std::map<std::string, bool > bool_map;
-	std::map<std::string,std::list<base> > base_list_map;
-	std::vector<std::string> vector_string;
-	std::vector<std::list<base> > vector_list_base;
+	std::map<std::string, std::list<base> > base_list_map;
+
+	//set 
+	std::set<std::string> str_set_;
+	std::set<int> int_set_;
+	std::set<bool> bool_set_;
 };
 
 namespace hello

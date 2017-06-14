@@ -144,6 +144,7 @@ std::string gsoner::get_node_func(const field_t &field)
 	case gsoner::field_t::e_vector:
 	case gsoner::field_t::e_map:
 	case gsoner::field_t::e_object:
+	case gsoner::field_t::e_set:
 		return "add_child";
 	default:
 		break;
@@ -161,6 +162,7 @@ std::string gsoner::get_gson_func_laber(const field_t &field)
 	case gsoner::field_t::e_list:
 	case gsoner::field_t::e_vector:
 	case gsoner::field_t::e_map:
+	case gsoner::field_t::e_set:
 	case gsoner::field_t::e_object:
 		return "acl::gson($json, ";
 	default:
@@ -248,7 +250,7 @@ gsoner::function_code_t gsoner::gen_pack_code(const object_t &obj)
 }
 
 std::string gsoner::get_unpack_code(const std::string &obj_name,
-	const field_t &field)
+	const field_t &field)const
 {
 	if (field.type_ == field_t::e_bool ||
 		field.type_ == field_t::e_bool_ptr ||
@@ -336,7 +338,40 @@ gsoner::function_code_t gsoner::gen_unpack_code(const object_t &obj)
 	code.definition_ptr_ += prefix + obj.name_ + " *$obj)";
 	code.definition_ptr_ += "\n{\n" + tab_ + "return gson($node, *$obj);\n}\n\n";
 
+	code.declare2_ = "std::pair<bool,std::string> "
+	"gson(const acl::string &str, "+ obj.name_ +" &$obj);";
+	code.definition2_ = " std::pair<bool,std::string> "
+	"gson(const acl::string &$str, " + obj.name_ + " &$obj)\n"
+		"{\n" 
+		+ tab_ + "acl::json _json;\n"
+		+ tab_ + "_json.update($str.c_str());\n"
+		+ tab_ + "if (!_json.finish())\n"
+		+ tab_ + "{\n" 
+		+ tab_ + tab_ + "return std::make_pair(false, \"json not finish error\");\n"
+		+ tab_ + "}\n"
+		+ tab_ + "return gson(_json.get_root(), $obj);\n"
+		"}\n\n";
 	return code;
+}
+
+bool gsoner::check_use_namespace()
+{
+	//using namespace xxx;
+	int pos = pos_;
+	std::string token = codes_.substr(pos_, strlen("using"));
+	if (token == "using")
+	{
+		pos_ += (int)strlen("using");
+		if(next_token(default_delimiters_) == "namespace")
+		{
+			token = next_token(default_delimiters_ + ";");
+			pos_++;//skip ;
+			std::cout << "find:using namespace " << token << std::endl;;
+			return true;
+		}
+	}
+	pos_ = pos;
+	return false;
 }
 
 bool gsoner::check_namespace()
@@ -1183,6 +1218,15 @@ bool gsoner::check_member()
 
 				return true;;
 			}
+			else if(itr->find("set") != std::string::npos)
+			{
+				field_t f;
+				f.name_ = name;
+				f.type_ = field_t::e_set;
+				current_obj_.fields_.push_back(f);
+
+				return true;;
+			}
 		}
 	}
 	else if (first.find("acl") != std::string::npos)
@@ -1347,6 +1391,9 @@ void gsoner::parse_code()
 			case 's':
 				if(check_struct_begin())
 					continue;
+			case 'u':
+				if (check_use_namespace())
+					continue;
 			default:
 				if(check_function())
 					continue;
@@ -1428,12 +1475,40 @@ std::string gsoner::get_include_files()
 
 	return str;
 }
+static std::string get_filename_without_ext(std::string filename)
+{
+	std::string result;
 
+	if (filename.empty())
+		return std::string(); 
+	
+	std::size_t pos = filename.find_last_of('.');
+	if (pos != filename.npos)
+		filename = filename.substr(0, pos);
+	
+	for(int i = (int)filename.size() -1; i >= 0; --i)
+	{
+		char ch = filename[i];
+		if (ch == '/' || ch == '\\')
+			break;
+		result += filename[i];
+	}
+	if (result.empty())
+		return std::string();
+	std::reverse(result.begin(), result.end());
+	return result;
+}
 void gsoner::gen_gson()
 {
 	const char *namespace_start = "namespace acl\n{";
 	const char *namespace_end = "\n}///end of acl.\n";
 
+	if(files_.size() == 1)
+	{
+		std::string filename = get_filename_without_ext(files_.front());
+		gen_header_filename_ = filename + ".gson.h";
+		gen_source_filename_ = filename + ".gson.cpp";
+	}
 	write_source("#include \"stdafx.h\"\n");
 	write_source(get_include_files());
 	write_source("#include \"" + gen_header_filename_ + "\"\n");
@@ -1452,14 +1527,16 @@ void gsoner::gen_gson()
 		write_header(('\n' + tab_ + pack.declare2_));
 		write_header(('\n' + tab_ + pack.declare_));
 		write_header(('\n' + tab_ + pack.declare_ptr_));
-		write_header('\n' + tab_ + unpack.declare_);
-		write_header('\n' + tab_ + unpack.declare_ptr_);
+		write_header('\n'  + tab_ + unpack.declare_);
+		write_header('\n'  + tab_ + unpack.declare_ptr_);
+		write_header('\n'  + tab_ + unpack.declare2_+"\n");
 
 		write_source(add_4space(pack.definition_));
 		write_source(add_4space(pack.definition_ptr_));
 		write_source(add_4space(pack.definition2_));
 		write_source(add_4space(unpack.definition_));
 		write_source(add_4space(unpack.definition_ptr_));
+		write_source(add_4space(unpack.definition2_));
 	}
 
 	write_header(namespace_end);
@@ -1613,3 +1690,4 @@ bool gsoner::check_pragma()
 }
 
 } // namespace acl
+

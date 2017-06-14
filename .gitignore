@@ -23,6 +23,7 @@
 *.exe
 *.VC.db
 x64/
+build/
 Debug/
 Release/
 dist/
