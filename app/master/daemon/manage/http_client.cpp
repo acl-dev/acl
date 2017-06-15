@@ -48,6 +48,7 @@ void http_client::reset(void)
 void http_client::wait(void)
 {
 	reset();
+
 	http_hdr_req_get_async(hdr_req_, conn_, on_head, this, rw_timeout_);
 }
 
@@ -60,16 +61,19 @@ int http_client::on_close(ACL_ASTREAM*, void* ctx)
 
 int http_client::on_head(int status, void* ctx)
 {
+	http_client* hc = (http_client*) ctx;
+
 	if (status != HTTP_CHAT_OK)
 	{
 		logger_error("invalid status=%d", status);
+		acl_aio_iocp_close(hc->conn_);
 		return -1;
 	}
 
-	http_client* hc = (http_client*) ctx;
 	if (http_hdr_req_parse(hc->hdr_req_) < 0)
 	{
 		logger_error("parse http header error");
+		acl_aio_iocp_close(hc->conn_);
 		return -1;
 	}
 
@@ -86,23 +90,27 @@ int http_client::on_head(int status, void* ctx)
 
 int http_client::on_body(int status, char *data, int dlen, void *ctx)
 {
-	if (status == HTTP_CHAT_ERR_MIN)
+	http_client* hc = (http_client*) ctx;
+
+	if (status >= HTTP_CHAT_ERR_MIN)
 	{
 		logger_error("status=%d", status);
+		acl_aio_iocp_close(hc->conn_);
 		return -1;
 	}
 
 	if (dlen <= 0)
 	{
 		logger_error("invalid dlen=%d", dlen);
+		acl_aio_iocp_close(hc->conn_);
 		return -1;
 	}
 
-	http_client* hc = (http_client*) ctx;
+	hc->json_.update(data);
+
 	if (status == HTTP_CHAT_OK)
 		return hc->handle();
 
-	hc->json_.update(data);
 	return 0;
 }
 
@@ -111,24 +119,48 @@ int http_client::handle(void)
 	const char* cmd = http_hdr_req_param(hdr_req_, "cmd");
 	if (cmd == NULL || *cmd == 0)
 	{
-		logger_error("cmd null");
-		acl_aio_iocp_close(conn_);
+		//logger_error("cmd null");
+		acl::string dummy;
+		do_reply(400, dummy);
+		if (hdr_req_->hdr.keep_alive)
+			wait();
+		else
+			acl_aio_iocp_close(conn_);
 		return 0;
 	}
 
 #define EQ !strcasecmp
 
+	bool ret;
+
 	if (EQ(cmd, "list"))
-		return handle_list();
+		ret = handle_list();
 	else if (EQ(cmd, "stat"))
-		return handle_stat();
+		ret = handle_stat();
 	else if (EQ(cmd, "start"))
-		return handle_start();
+		ret = handle_start();
 	else if (EQ(cmd, "stop"))
-		return handle_stop();
+		ret = handle_stop();
 	else {
-		logger_error("invalid cmd=%s", cmd);
-		return -1;
+		logger_warn("invalid cmd=%s", cmd);
+		acl::string dummy;
+		do_reply(400, dummy);
+		if (hdr_req_->hdr.keep_alive)
+			wait();
+		else
+			acl_aio_iocp_close(conn_);
+		return 0;
+	}
+
+	if (ret && hdr_req_->hdr.keep_alive)
+	{
+		wait();
+		return 0;
+	}
+	else
+	{
+		acl_aio_iocp_close(conn_);
+		return 0;
 	}
 }
 
@@ -140,16 +172,12 @@ void http_client::do_reply(int status, const acl::string& body)
 	http_hdr_put_int(&hdr_res->hdr, "Content-Length", (int) body.size());
 
 	acl::string buf(body.size() + 256);
-	http_hdr_build(&hdr_res->hdr, body.vstring());
+	http_hdr_build(&hdr_res->hdr, buf.vstring());
 	http_hdr_res_free(hdr_res);
 	buf.append(body);
 
-	acl_aio_writen(conn_, body.c_str(), (int) body.size());
-
-	if (status == 200 && hdr_res->hdr.keep_alive)
-		wait();
-	else
-		acl_aio_iocp_close(conn_);
+//	logger(">>reply: [%s]\r\n", buf.c_str());
+	acl_aio_writen(conn_, buf.c_str(), (int) buf.size());
 }
 
 int http_client::handle_list(void)
