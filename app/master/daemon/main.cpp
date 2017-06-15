@@ -14,6 +14,7 @@
 
 #include "master/master_params.h"
 #include "master/master.h"
+#include "manage/manager.h"
 
 const char *var_master_version = "version1.0";
 char *var_master_procname;
@@ -36,7 +37,8 @@ int     main(int argc, char **argv)
 	int   n, keep_mask = 0;
 	char *ptr;
 	ACL_WATCHDOG *watchdog;
-	ACL_VSTRING *strbuf;
+	ACL_VSTRING  *strbuf;
+	ACL_AIO      *aio;
 
 	/*
 	 * Strip and save the process name for diagnostics etc.
@@ -136,8 +138,15 @@ int     main(int argc, char **argv)
 			acl_msg_info("dup(0), fd = %d, n = %d", fd, n);
 	}
 
-	acl_master_flow_init();  /* just for prefork service -- zsx, 2012.3.24 */
-	acl_master_config();  /* load configure and start all services processes */
+	/* just for prefork service -- zsx, 2012.3.24 */
+	acl_master_flow_init();
+
+	/* load configure and start all services processes */
+	acl_master_config();
+
+	/* init master manager module */
+	manager::get_instance().init(acl_var_master_global_event,
+		acl_var_master_manage_addr);
 
 	/*
 	 * Finish initialization, last part. We must process configuration
@@ -188,6 +197,10 @@ int     main(int argc, char **argv)
 		acl_watchdog_start(watchdog);  /* same as trigger servers */
 
 		acl_event_loop(acl_var_master_global_event);
+		aio = manager::get_instance().get_aio();
+		if (aio)
+			acl_aio_check(aio);
+
 		if (acl_var_master_gotsighup) {
 			acl_msg_info("reload configuration");
 			acl_var_master_gotsighup = 0;   /* this first */

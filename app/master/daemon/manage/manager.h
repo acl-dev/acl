@@ -18,13 +18,17 @@ class manager : public acl::singleton<manager>
 {
 public:
 	manager(void);
-	~manager(void) {}
+	~manager(void);
 
-	bool init(const char* addr);
-	ACL_EVENT* get_event(void) const;
+	void init(ACL_EVENT* event, const char* addr);
+	ACL_AIO* get_aio(void) const
+	{
+		return aio_;
+	}
 
 private:
-	acl::string     addr_;
-	acl::aio_handle aio_;
-	http_server     server_;
+	ACL_EVENT*       event_;
+	ACL_AIO*         aio_;
+	acl::aio_handle* handle_;
+	http_server*     server_;
 };

@@ -13,61 +13,61 @@ extern char *acl_var_master_conf_dir;
   * master's main configure file
   * Virtual host support. Default is to listen on all machine interfaces.
   */
-#define ACL_VAR_MASTER_INET_INTERFACES	"inet_interfaces"
-#define ACL_INET_INTERFACES_ALL		"all"
-#define ACL_INET_INTERFACES_LOCAL	"loopback-only"
+#define ACL_VAR_MASTER_INET_INTERFACES		"inet_interfaces"
+#define ACL_INET_INTERFACES_ALL			"all"
+#define ACL_INET_INTERFACES_LOCAL		"loopback-only"
 #define ACL_DEF_MASTER_INET_INTERFACES	ACL_INET_INTERFACES_ALL
 extern char *acl_var_master_inet_interfaces;
 
-#define ACL_VAR_MASTER_PROC_LIMIT	"default_process_limit"
-#define ACL_DEF_MASTER_PROC_LIMIT	100
+#define ACL_VAR_MASTER_PROC_LIMIT		"default_process_limit"
+#define ACL_DEF_MASTER_PROC_LIMIT		100
 extern int acl_var_master_proc_limit;    
 
-extern uid_t acl_var_master_owner_uid;	/* zsx test */
+extern uid_t acl_var_master_owner_uid;		/* zsx test */
 
-#define	ACL_VAR_MASTER_OWNER_GROUP	"owner_group"
-#define	ACL_DEF_MASTER_OWNER_GROUP	"master"
+#define	ACL_VAR_MASTER_OWNER_GROUP		"owner_group"
+#define	ACL_DEF_MASTER_OWNER_GROUP		"master"
 extern char *acl_var_master_owner_group;
-extern gid_t acl_var_master_owner_gid;	/* zsx test */
+extern gid_t acl_var_master_owner_gid;		/* zsx test */
 
-#define	ACL_VAR_MASTER_THROTTLE_TIME	"service_throttle_time"
-#define ACL_DEF_MASTER_THROTTLE_TIME	60
+#define	ACL_VAR_MASTER_THROTTLE_TIME		"service_throttle_time"
+#define ACL_DEF_MASTER_THROTTLE_TIME		60
 extern int   acl_var_master_throttle_time; 
 
-#define ACL_VAR_MASTER_DAEMON_DIR	"daemon_directory"
-#define ACL_DEF_MASTER_DAEMON_DIR	"/opt/acl/libexec"
+#define ACL_VAR_MASTER_DAEMON_DIR		"daemon_directory"
+#define ACL_DEF_MASTER_DAEMON_DIR		"/opt/acl/libexec"
 extern char *acl_var_master_daemon_dir;
 
-#define	ACL_VAR_MASTER_SERVICE_DIR	"service_directory"
-#define	ACL_DEF_MASTER_SERVICE_DIR	"/opt/acl/conf/service"
+#define	ACL_VAR_MASTER_SERVICE_DIR		"service_directory"
+#define	ACL_DEF_MASTER_SERVICE_DIR		"/opt/acl/conf/service"
 extern char *acl_var_master_service_dir;
 
-#define	ACL_VAR_MASTER_QUEUE_DIR	"queue_directory"
-#define	ACL_DEF_MASTER_QUEUE_DIR	"/opt/acl/var"
+#define	ACL_VAR_MASTER_QUEUE_DIR		"queue_directory"
+#define	ACL_DEF_MASTER_QUEUE_DIR		"/opt/acl/var"
 extern char *acl_var_master_queue_dir;
 
-#define	ACL_VAR_MASTER_LOG_FILE		"log_file"
-#define	ACL_DEF_MASTER_LOG_FILE		"/opt/acl/var/log/master.log"
+#define	ACL_VAR_MASTER_LOG_FILE			"log_file"
+#define	ACL_DEF_MASTER_LOG_FILE			"/opt/acl/var/log/master.log"
 extern char *acl_var_master_log_file;
 
-#define	ACL_VAR_MASTER_PID_FILE		"pid_file"
-#define	ACL_DEF_MASTER_PID_FILE		"/opt/acl/var/pid/master.pid"
+#define	ACL_VAR_MASTER_PID_FILE			"pid_file"
+#define	ACL_DEF_MASTER_PID_FILE			"/opt/acl/var/pid/master.pid"
 extern char *acl_var_master_pid_file;
 
-#define	ACL_VAR_MASTER_BUF_SIZE		"buf_size"
-#define	ACL_DEF_MASTER_BUF_SIZE		81920
+#define	ACL_VAR_MASTER_BUF_SIZE			"buf_size"
+#define	ACL_DEF_MASTER_BUF_SIZE			81920
 extern int   acl_var_master_buf_size;
 
-#define	ACL_VAR_MASTER_RW_TIMEOUT	"rw_timeout"
-#define	ACL_DEF_MASTER_RW_TIMEOUT	30
+#define	ACL_VAR_MASTER_RW_TIMEOUT		"rw_timeout"
+#define	ACL_DEF_MASTER_RW_TIMEOUT		30
 extern int   acl_var_master_rw_timeout;
 
-#define	ACL_VAR_MASTER_SCAN_SUBDIR	"scan_subdir"
-#define	ACL_DEF_MASTER_SCAN_SUBDIR	0
+#define	ACL_VAR_MASTER_SCAN_SUBDIR		"scan_subdir"
+#define	ACL_DEF_MASTER_SCAN_SUBDIR		0
 extern int   acl_var_master_scan_subdir;
 
-#define	ACL_VAR_MASTER_LIMIT_PRIVILEGE	"limit_privilege"
-#define	ACL_DEF_MASTER_LIMIT_PRIVILEGE	0
+#define	ACL_VAR_MASTER_LIMIT_PRIVILEGE		"limit_privilege"
+#define	ACL_DEF_MASTER_LIMIT_PRIVILEGE		0
 extern int   acl_var_master_limit_privilege;
 
 extern pid_t acl_var_master_pid;
@@ -81,21 +81,25 @@ extern pid_t acl_var_master_pid;
  * deliver) a receiving process pauses for $in_flow_delay seconds so that
  * the sending processes get a chance to access the disk.
  */
-#define ACL_VAR_MASTER_IN_FLOW_DELAY	"in_flow_delay"
+#define ACL_VAR_MASTER_IN_FLOW_DELAY		"in_flow_delay"
 #ifdef ACL_PIPES_CANT_FIONREAD
-#define ACL_DEF_MASTER_IN_FLOW_DELAY	0
+#define ACL_DEF_MASTER_IN_FLOW_DELAY		0
 #else
-#define ACL_DEF_MASTER_IN_FLOW_DELAY	1
+#define ACL_DEF_MASTER_IN_FLOW_DELAY		1
 #endif
 extern int   acl_var_master_in_flow_delay;
 
-#define	ACL_VAR_MASTER_DELAY_SEC	"event_delay_sec"
-#define	ACL_DEF_MASTER_DELAY_SEC	1
+#define	ACL_VAR_MASTER_DELAY_SEC		"event_delay_sec"
+#define	ACL_DEF_MASTER_DELAY_SEC		1
 extern int   acl_var_master_delay_sec;
 
-#define	ACL_VAR_MASTER_DELAY_USEC	"event_delay_usec"
-#define	ACL_DEF_MASTER_DELAY_USEC	5000
+#define	ACL_VAR_MASTER_DELAY_USEC		"event_delay_usec"
+#define	ACL_DEF_MASTER_DELAY_USEC		5000
 extern int   acl_var_master_delay_usec;
+
+#define ACL_VAR_MASTER_MANAGE_ADDR		"manage_addr"
+#define ACL_DEF_MASTER_MANAGE_ADDR		""
+extern char *acl_var_master_manage_addr;
 
 /* every service's configure entry is different*/
 

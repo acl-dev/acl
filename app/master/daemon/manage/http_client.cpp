@@ -113,7 +113,7 @@ int http_client::handle(void)
 	{
 		logger_error("cmd null");
 		acl_aio_iocp_close(conn_);
-		return -1;
+		return 0;
 	}
 
 #define EQ !strcasecmp

@@ -14,19 +14,32 @@
 #include "manager.h"
 
 manager::manager(void)
-	: aio_(acl::ENGINE_KERNEL)
-	, server_(aio_)
+	: event_(NULL)
+	, aio_(NULL)
+	, handle_(NULL)
+	, server_(NULL)
 {
 }
 
-bool manager::init(const char* addr)
+manager::~manager(void)
 {
-	return server_.open(addr);
+	delete server_;
+	delete handle_;
+	if (aio_)
+		acl_aio_free2(aio_, 1);
 }
 
-ACL_EVENT* manager::get_event(void) const
+void manager::init(ACL_EVENT* event, const char* addr)
 {
-	ACL_AIO*   aio = aio_.get_handle();
-	ACL_EVENT* event = acl_aio_event(aio);
-	return event;
+	acl_assert(event);
+
+	if (addr == NULL || *addr == 0)
+		return;
+
+	event_  = event;
+	aio_    = acl_aio_create3(event);
+	handle_ = new acl::aio_handle(aio_);
+	server_ = new http_server(*handle_);
+
+	server_->open(addr);
 }

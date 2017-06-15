@@ -426,6 +426,16 @@ void acl_event_set_delay_usec(ACL_EVENT *eventp, int usec)
 	eventp->delay_usec = usec;
 }
 
+int acl_event_get_delay_sec(ACL_EVENT *eventp)
+{
+	return eventp->delay_sec;
+}
+
+int acl_event_get_delay_usec(ACL_EVENT *eventp)
+{
+	return eventp->delay_usec;
+}
+
 int acl_event_use_thread(ACL_EVENT *eventp)
 {
 	return eventp->use_thread;

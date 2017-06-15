@@ -16,13 +16,21 @@ int   acl_var_master_delay_sec;
 int   acl_var_master_delay_usec;
 
 static ACL_CONFIG_INT_TABLE int_tab[] = {
-	{ ACL_VAR_MASTER_PROC_LIMIT, ACL_DEF_MASTER_PROC_LIMIT, &acl_var_master_proc_limit, 0, 0 },
-	{ ACL_VAR_MASTER_THROTTLE_TIME, ACL_DEF_MASTER_THROTTLE_TIME, &acl_var_master_throttle_time, 0, 0 },
-	{ ACL_VAR_MASTER_BUF_SIZE, ACL_DEF_MASTER_BUF_SIZE, &acl_var_master_buf_size, 0, 0 },
-	{ ACL_VAR_MASTER_RW_TIMEOUT, ACL_DEF_MASTER_RW_TIMEOUT, &acl_var_master_rw_timeout, 0, 0 },
-	{ ACL_VAR_MASTER_IN_FLOW_DELAY, ACL_DEF_MASTER_IN_FLOW_DELAY, &acl_var_master_in_flow_delay, 0, 0 },
-	{ ACL_VAR_MASTER_DELAY_SEC, ACL_DEF_MASTER_DELAY_SEC, &acl_var_master_delay_sec, 0, 0 },
-	{ ACL_VAR_MASTER_DELAY_USEC, ACL_DEF_MASTER_DELAY_USEC, &acl_var_master_delay_usec, 0, 0 },
+	{ ACL_VAR_MASTER_PROC_LIMIT, ACL_DEF_MASTER_PROC_LIMIT,
+		&acl_var_master_proc_limit, 0, 0 },
+	{ ACL_VAR_MASTER_THROTTLE_TIME, ACL_DEF_MASTER_THROTTLE_TIME,
+		&acl_var_master_throttle_time, 0, 0 },
+	{ ACL_VAR_MASTER_BUF_SIZE, ACL_DEF_MASTER_BUF_SIZE,
+		&acl_var_master_buf_size, 0, 0 },
+	{ ACL_VAR_MASTER_RW_TIMEOUT, ACL_DEF_MASTER_RW_TIMEOUT,
+		&acl_var_master_rw_timeout, 0, 0 },
+	{ ACL_VAR_MASTER_IN_FLOW_DELAY, ACL_DEF_MASTER_IN_FLOW_DELAY,
+		&acl_var_master_in_flow_delay, 0, 0 },
+	{ ACL_VAR_MASTER_DELAY_SEC, ACL_DEF_MASTER_DELAY_SEC,
+		&acl_var_master_delay_sec, 0, 0 },
+	{ ACL_VAR_MASTER_DELAY_USEC, ACL_DEF_MASTER_DELAY_USEC,
+		&acl_var_master_delay_usec, 0, 0 },
+
 	{ 0, 0, 0, 0, 0 },
 };
 
@@ -33,15 +41,26 @@ char *acl_var_master_queue_dir;
 char *acl_var_master_service_dir;
 char *acl_var_master_log_file;
 char *acl_var_master_pid_file;
+char *acl_var_master_manage_addr;
 
 static ACL_CONFIG_STR_TABLE str_tab[] = {
-	{ ACL_VAR_MASTER_INET_INTERFACES, ACL_DEF_MASTER_INET_INTERFACES, &acl_var_master_inet_interfaces },
-	{ ACL_VAR_MASTER_OWNER_GROUP, ACL_DEF_MASTER_OWNER_GROUP, &acl_var_master_owner_group },
-	{ ACL_VAR_MASTER_DAEMON_DIR, ACL_DEF_MASTER_DAEMON_DIR, &acl_var_master_daemon_dir },
-	{ ACL_VAR_MASTER_QUEUE_DIR, ACL_DEF_MASTER_QUEUE_DIR, &acl_var_master_queue_dir },
-	{ ACL_VAR_MASTER_SERVICE_DIR, ACL_DEF_MASTER_SERVICE_DIR, &acl_var_master_service_dir },
-	{ ACL_VAR_MASTER_LOG_FILE, ACL_DEF_MASTER_LOG_FILE, &acl_var_master_log_file },
-	{ ACL_VAR_MASTER_PID_FILE, ACL_DEF_MASTER_PID_FILE, &acl_var_master_pid_file },
+	{ ACL_VAR_MASTER_INET_INTERFACES, ACL_DEF_MASTER_INET_INTERFACES,
+		&acl_var_master_inet_interfaces },
+	{ ACL_VAR_MASTER_OWNER_GROUP, ACL_DEF_MASTER_OWNER_GROUP,
+		&acl_var_master_owner_group },
+	{ ACL_VAR_MASTER_DAEMON_DIR, ACL_DEF_MASTER_DAEMON_DIR,
+		&acl_var_master_daemon_dir },
+	{ ACL_VAR_MASTER_QUEUE_DIR, ACL_DEF_MASTER_QUEUE_DIR,
+		&acl_var_master_queue_dir },
+	{ ACL_VAR_MASTER_SERVICE_DIR, ACL_DEF_MASTER_SERVICE_DIR,
+		&acl_var_master_service_dir },
+	{ ACL_VAR_MASTER_LOG_FILE, ACL_DEF_MASTER_LOG_FILE,
+		&acl_var_master_log_file },
+	{ ACL_VAR_MASTER_PID_FILE, ACL_DEF_MASTER_PID_FILE,
+		&acl_var_master_pid_file },
+	{ ACL_VAR_MASTER_MANAGE_ADDR, ACL_DEF_MASTER_MANAGE_ADDR,
+		&acl_var_master_manage_addr },
+
 	{ 0, 0, 0 },
 };
 
@@ -49,8 +68,11 @@ int   acl_var_master_scan_subdir;
 int   acl_var_master_limit_privilege;
 
 static ACL_CONFIG_BOOL_TABLE bool_tab[] = {
-	{ ACL_VAR_MASTER_SCAN_SUBDIR, ACL_DEF_MASTER_SCAN_SUBDIR, &acl_var_master_scan_subdir },
-	{ ACL_VAR_MASTER_LIMIT_PRIVILEGE, ACL_DEF_MASTER_LIMIT_PRIVILEGE, &acl_var_master_limit_privilege },
+	{ ACL_VAR_MASTER_SCAN_SUBDIR, ACL_DEF_MASTER_SCAN_SUBDIR,
+		&acl_var_master_scan_subdir },
+	{ ACL_VAR_MASTER_LIMIT_PRIVILEGE, ACL_DEF_MASTER_LIMIT_PRIVILEGE,
+		&acl_var_master_limit_privilege },
+
 	{ 0, 0, 0 },
 };
 

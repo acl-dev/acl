@@ -38,6 +38,7 @@ bool http_server::open(const char* addr)
 	}
 
 	listener_->add_accept_callback(this);
+	logger("master manager started on %s", addr);
 	return true;
 }
 
