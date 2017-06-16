@@ -5,4 +5,6 @@
 #include "lib_protocol.h"
 #include "acl_cpp/lib_acl.hpp"
 
+#include "json/serialize.h"
+
 #endif

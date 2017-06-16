@@ -35,15 +35,15 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 	 * know what service it came from.
 	 */
 
-	if (serv->status_read_stream->rw_timeout > 0) {
+	if (serv->status_reader->rw_timeout > 0) {
 		acl_msg_warn("%s:%d, pipe(%d)'s rw_timeout(%d) > 0",
 			__FUNCTION__, __LINE__,
-			ACL_VSTREAM_SOCK(serv->status_read_stream),
-			serv->status_read_stream->rw_timeout);
-		serv->status_read_stream->rw_timeout = 0;
+			ACL_VSTREAM_SOCK(serv->status_reader),
+			serv->status_reader->rw_timeout);
+		serv->status_reader->rw_timeout = 0;
 	}
 
-	n = acl_vstream_read(serv->status_read_stream,
+	n = acl_vstream_read(serv->status_reader,
 		(char *) &stat_buf, sizeof(stat_buf));
 
 	switch (n) {
@@ -158,7 +158,7 @@ void    acl_master_status_init(ACL_MASTER_SERV *serv)
 	/* Must set io rw_timeout to 0 to avoiding blocking read which
 	 * will blocking the main event loop.
 	 */
-	serv->status_read_stream = acl_vstream_fdopen(serv->status_fd[0],
+	serv->status_reader = acl_vstream_fdopen(serv->status_fd[0],
 		O_RDWR, acl_var_master_buf_size, 0, ACL_VSTREAM_TYPE_SOCK);
 
 	if (acl_msg_verbose)
@@ -167,7 +167,7 @@ void    acl_master_status_init(ACL_MASTER_SERV *serv)
 			myname, serv->status_fd[0]);
 
 	acl_event_enable_read(acl_var_master_global_event,
-		serv->status_read_stream, 0, master_status_event, serv);
+		serv->status_reader, 0, master_status_event, serv);
 }
 
 /* acl_master_status_cleanup - stop status event processing for this service */
@@ -189,7 +189,7 @@ void    acl_master_status_cleanup(ACL_MASTER_SERV *serv)
 	 */
 
 	acl_event_disable_readwrite(acl_var_master_global_event,
-		serv->status_read_stream);
+		serv->status_reader);
 
 	if (close(serv->status_fd[0]) != 0)
 		acl_msg_warn("%s: close status descriptor (read side): %s",
@@ -198,7 +198,7 @@ void    acl_master_status_cleanup(ACL_MASTER_SERV *serv)
 		acl_msg_warn("%s: close status descriptor (write side): %s",
 			myname, strerror(errno));
 	serv->status_fd[0] = serv->status_fd[1] = -1;
-	if (serv->status_read_stream)
-		acl_vstream_free(serv->status_read_stream);
-	serv->status_read_stream = NULL;
+	if (serv->status_reader)
+		acl_vstream_free(serv->status_reader);
+	serv->status_reader = NULL;
 }

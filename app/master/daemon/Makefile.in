@@ -104,7 +104,9 @@ OBJ_PATH = ./debug
 $(shell mkdir -p $(OBJ_PATH))
 
 #Project's objs
-SRC = $(wildcard *.cpp) $(wildcard master/*.cpp) $(wildcard trigger/*.cpp) $(wildcard manage/*.cpp)
+SRC = $(wildcard *.cpp) $(wildcard master/*.cpp) $(wildcard trigger/*.cpp) \
+      $(wildcard manage/*.cpp) $(wildcard manage/action/*.cpp) \
+      $(wildcard json/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 
 $(OBJ_PATH)/%.o: %.cpp
@@ -113,7 +115,11 @@ $(OBJ_PATH)/%.o: master/%.cpp
 	$(COMPILE) $< -o $@
 $(OBJ_PATH)/%.o: trigger/%.cpp
 	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: json/%.cpp
+	$(COMPILE) $< -o $@
 $(OBJ_PATH)/%.o: manage/%.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: manage/action/%.cpp
 	$(COMPILE) $< -o $@
 
 .PHONY = all clean

@@ -12,7 +12,7 @@
 
 #pragma once
 #include "struct.h"
-#include "gson.h"
+#include "struct.gson.h"
 
 template<typename T>
 bool deserialize(acl::json& json, T& o)

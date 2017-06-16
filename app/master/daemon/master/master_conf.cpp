@@ -13,8 +13,7 @@
 
 void    acl_master_refresh(void)
 {
-	ACL_MASTER_SERV *serv;
-	ACL_MASTER_SERV **servp;
+	ACL_MASTER_SERV *serv, **servp;
 
 	/*
 	 * Mark all existing services.
@@ -59,8 +58,7 @@ void    acl_master_config(void)
 #define SWAP(type,a,b)	{ type temp = a; a = b; b = temp; }
 
 	/* load main.cf configuration of master routine */
-	pathname = acl_concatenate(acl_var_master_conf_dir,
-			"/", "main.cf", (char *) 0);
+	pathname = acl_concatenate(acl_var_master_conf_dir, "/", "main.cf", 0);
 	acl_master_params_load(pathname);
 	acl_myfree(pathname);
 
@@ -87,7 +85,7 @@ void    acl_master_config(void)
 		if (acl_msg_verbose)
 			acl_master_ent_print(entry);
 
-		for (serv = acl_var_master_head; serv != 0; serv = serv->next) {
+		for (serv = acl_var_master_head; serv; serv = serv->next) {
 			if (STR_SAME(serv->name, entry->name)
 				&& serv->type == entry->type) {
 				break;

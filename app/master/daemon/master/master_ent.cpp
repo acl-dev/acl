@@ -6,6 +6,7 @@
 #include "master.h"
 
 #define STR acl_vstring_str
+#define	STR_SAME	!strcasecmp
 
 static char *__services_path = NULL;	/* dir name of config files */
 static ACL_SCAN_DIR *__scan = NULL;
@@ -145,43 +146,6 @@ static int get_int_ent(ACL_XINETD_CFG_PARSER *xcp, const char *name,
 	if (!ACL_ISDIGIT(*value) || (n = atoi(value)) < min_val)
 		fatal_invalid_field(name, value);
 	return n;
-}
-
-static ACL_XINETD_CFG_PARSER *load_service_conf(ACL_VSTRING *path_buf)
-{
-	const char *myname = "load_service_conf";
-	const char *config_file;
-	const char *value;
-	ACL_XINETD_CFG_PARSER *xcp;
-
-	while (1) {
-		config_file = acl_scan_dir_next_file(__scan);
-		if (config_file == NULL) /* over now */
-			return NULL;
-
-		acl_vstring_sprintf(path_buf, "%s/%s",
-			acl_scan_dir_path(__scan), config_file);
-
-		acl_msg_info("%s(%d), %s: load service file = %s",
-			__FILE__, __LINE__, myname, STR(path_buf));
-
-		xcp = acl_xinetd_cfg_load(STR(path_buf));
-		if (xcp == NULL) {
-			acl_msg_warn("%s(%d), %s: load %s error, serr=%s",
-				__FILE__, __LINE__, myname,
-				STR(path_buf), strerror(errno));
-			continue;
-		}
-
-		value = get_str_ent(xcp, ACL_VAR_MASTER_SERV_DISABLE, "yes");
-		if (value != NULL && strcasecmp(value, "yes") != 0) {
-			__config_file_ptr = config_file;
-			return xcp;
-		}
-
-		acl_xinetd_cfg_free(xcp);
-	}
-
 }
 
 static void init_listeners(ACL_MASTER_SERV *serv)
@@ -425,9 +389,6 @@ static void service_transport(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 {
 	const char *transport;
 
-#undef	STR_SAME
-#define	STR_SAME	!strcasecmp
-
 	transport = get_str_ent(xcp, ACL_VAR_MASTER_SERV_TYPE, (const char *) 0);
 	if (transport == NULL || *transport == 0)
 		acl_msg_fatal("master_service no found");
@@ -510,7 +471,7 @@ static void service_proc(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 }
 
 static void service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
-	ACL_VSTRING *path)
+	const char *path)
 {
 	const char *myname = "service_args";
 	const char *command, *name, *transport, *args, *ptr_const;
@@ -525,11 +486,10 @@ static void service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	unprivileged = get_bool_ent(xcp, ACL_VAR_MASTER_SERV_UNPRIV, "y");
 
 	/*
-	 * Chroot. Default is to restrict file system access to the mail
-	 * queue.
-	 * XXX Chroot cannot imply unprivileged service (for example,
-	 * the pickup service runs chrooted but needs privileges to open
-	 * files as the user).
+	 * Chroot. Default is to restrict file system access to the mail queue.
+	 * xxx: Chroot cannot imply unprivileged service (for example, the
+	 * pickup service runs chrooted but needs privileges to open files
+	 * as the user).
 	 */
 	chroot_var = get_bool_ent(xcp, ACL_VAR_MASTER_SERV_CHROOT, "y");
 
@@ -571,7 +531,7 @@ static void service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	name = get_str_ent(xcp, ACL_VAR_MASTER_SERV_SERVICE, (const char *) 0);
 
 	/* add "-f configure_file_path" flag */
-	acl_argv_add(serv->args, "-f", STR(path), (char *) 0);
+	acl_argv_add(serv->args, "-f", path, (char *) 0);
 
 	/*
 	if (serv->max_proc == 1)
@@ -620,7 +580,7 @@ static void service_env(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 
 	serv->children_env = acl_array_create(10);
 
-	/* 如果配置文件中没有服务的日志项, 则继承使用 master 主进程的日志文件 */
+	/* use the master's logfile as default if no log entry in configure */
 	value = get_str_ent(xcp, ACL_VAR_MASTER_SERV_LOG, acl_var_master_log_file);
 
 	nv = (ACL_MASTER_NV *) acl_mycalloc(1, sizeof(ACL_MASTER_NV));
@@ -650,18 +610,10 @@ static void service_env(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 
 ACL_MASTER_SERV *acl_master_ent_get()
 {
-	ACL_XINETD_CFG_PARSER *xcp = NULL;
-	ACL_VSTRING *path_buf = acl_vstring_alloc(256);
-	ACL_MASTER_SERV *serv;
 	static char *saved_interfaces = 0;
-
-#undef	RETURN
-#define	RETURN(x) {  \
-	acl_vstring_free(path_buf); \
-	if (xcp != NULL)  \
-		acl_xinetd_cfg_free(xcp);  \
-	return (x);  \
-}
+	ACL_VSTRING *path_buf = acl_vstring_alloc(256);
+	const char  *filepath;
+	ACL_MASTER_SERV *serv;
 
 	/*
 	 * XXX We cannot change the inet_interfaces setting for a running
@@ -677,34 +629,62 @@ ACL_MASTER_SERV *acl_master_ent_get()
 	if (saved_interfaces == 0)
 		saved_interfaces = acl_mystrdup(acl_var_master_inet_interfaces);
 
-	xcp = load_service_conf(path_buf);
+	while (1) {
+		filepath = acl_scan_dir_next_file(__scan);
+		if (filepath == NULL) {
+			acl_vstring_free(path_buf);
+			return NULL;
+		}
 
-	if (xcp == NULL)
-		RETURN (NULL);
+		acl_vstring_sprintf(path_buf, "%s/%s",
+			acl_scan_dir_path(__scan), filepath);
+
+		acl_msg_info("%s(%d), %s: load service file = %s",
+			__FILE__, __LINE__, __FUNCTION__, STR(path_buf));
+
+		serv = acl_master_ent_load(STR(path_buf));
+		if (serv != NULL) {
+			acl_vstring_free(path_buf);
+			return serv;
+		}
+	}
+}
+
+ACL_MASTER_SERV *acl_master_ent_load(const char *filepath)
+{
+	ACL_XINETD_CFG_PARSER *xcp = acl_xinetd_cfg_load(filepath);
+	ACL_MASTER_SERV *serv;
+	const char *ptr;
+
+	if (xcp == NULL) {
+		acl_msg_error("%s(%d), %s: load %s error %s", __FILE__,
+			__LINE__, __FUNCTION__, filepath, acl_last_serror());
+		return NULL;
+	}
+
+	ptr = get_str_ent(xcp, ACL_VAR_MASTER_SERV_DISABLE, "yes");
+	if (ptr == NULL || strcasecmp(ptr, "yes") == 0) {
+		acl_xinetd_cfg_free(xcp);
+		return NULL;
+	}
 
 	/* Initialize service structure members in order. */
 	serv = (ACL_MASTER_SERV *) acl_mycalloc(1, sizeof(ACL_MASTER_SERV));
 	serv->next = 0;
 
-	/*
-	 * Flags member.
-	 */
+	/* Flags member. */
 	serv->flags = 0;
 
 	service_transport(xcp, serv);
 	service_wakeup_time(xcp, serv);
 	service_proc(xcp, serv);
-	service_args(xcp, serv, path_buf);
+	service_args(xcp, serv, filepath);
 	service_env(xcp, serv);
 
-	/*
-	 * Backoff time in case a service is broken.
-	 */
+	/* Backoff time in case a service is broken. */
 	serv->throttle_delay = acl_var_master_throttle_time;
 
-	/*
-	 * Shared channel for child status updates.
-	 */
+	/* Shared channel for child status updates. */
 	serv->status_fd[0] = serv->status_fd[1] = -1;
 
 #if 0
@@ -714,7 +694,8 @@ ACL_MASTER_SERV *acl_master_ent_get()
 	serv->children = 0;
 #endif
 
-	RETURN (serv);
+	acl_xinetd_cfg_free(xcp);
+	return serv;
 }
 
 /* acl_print_master_ent - show service entry contents */

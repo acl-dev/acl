@@ -11,7 +11,7 @@
  */
 
 #pragma once
-#include "serialize.h"
+#include "json/serialize.h"
 
 class http_client
 {
@@ -33,11 +33,11 @@ private:
 	acl::json               json_;
 
 	void reset(void);
-	int handle(void);
-	int handle_list(void);
-	int handle_stat(void);
-	int handle_stop(void);
-	int handle_start(void);
+	bool handle(void);
+	bool handle_list(void);
+	bool handle_stat(void);
+	bool handle_stop(void);
+	bool handle_start(void);
 
 	void do_reply(int status, const acl::string& buf);
 

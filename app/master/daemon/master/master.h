@@ -27,27 +27,26 @@ typedef struct ACL_MASTER_SERV {
 	int     flags;			/* status, features, etc. */
 	char   *name;			/* service endpoint name */
 	char   *owner;			/* service running privilege if not null*/
-	ACL_ARRAY  *children_env;	/* the env array of the children */
 	int     type;			/* UNIX-domain, INET, etc. */
 	int     wakeup_time;		/* wakeup interval */
-	/* EVENT  *eventp;		 * event pointer */
 	int    *listen_fds;		/* incoming requests */
-	ACL_VSTREAM **listen_streams;	/* multi-listening stream */
 	int     listen_fd_count;	/* nr of descriptors */
 	int     defer_accept;		/* accept timeout if no data from client */
-	ACL_ARRAY *addrs;		/* in which ACL_MASTER_ADDR save */
 	int     max_qlen;		/* max listening qlen */
 	int     max_proc;		/* upper bound on # processes */
 	int     prefork_proc;		/* prefork processes */
 	char   *path;			/* command pathname */
 	char   *notify_addr;		/* warning address when not null */
 	char   *notify_recipients;	/* users warned to */
-	struct ACL_ARGV *args;		/* argument vector */
 	int     avail_proc;		/* idle processes */
 	int     total_proc;		/* number of processes */
 	int     throttle_delay;		/* failure recovery parameter */
 	int     status_fd[2];		/* child status reports */
-	ACL_VSTREAM *status_read_stream;/* status stream */
+	ACL_ARGV     *args;		/* argument vector */
+	ACL_ARRAY    *addrs;		/* in which ACL_MASTER_ADDR save */
+	ACL_ARRAY    *children_env;	/* the env array of the children */
+	ACL_VSTREAM **listen_streams;	/* multi-listening stream */
+	ACL_VSTREAM  *status_reader;	/* status stream */
 #if 0
 	struct ACL_BINHASH *children;	/* linkage */
 #endif
@@ -113,6 +112,7 @@ extern void acl_master_ent_begin(void);
 extern void acl_master_ent_end(void);
 extern void acl_master_ent_print(ACL_MASTER_SERV *);
 extern ACL_MASTER_SERV *acl_master_ent_get(void);
+extern ACL_MASTER_SERV *acl_master_ent_load(const char*);
 extern void acl_master_ent_free(ACL_MASTER_SERV *);
 
  /*

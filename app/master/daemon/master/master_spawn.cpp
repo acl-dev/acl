@@ -173,7 +173,7 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 				acl_var_master_flow_pipe[1], strerror(errno));
 
 		close(serv->status_fd[0]);		/* status channel */
-		acl_vstream_free(serv->status_read_stream);
+		acl_vstream_free(serv->status_reader);
 
 		/* MASTER_STAT_STREAM has been inited in master_vars.c*/
 		if (serv->status_fd[1] <= ACL_MASTER_STATUS_FD)

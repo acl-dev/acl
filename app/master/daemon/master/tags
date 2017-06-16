@@ -1,0 +1,271 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ACL_DEF_MASTER_BUF_SIZE	master_params.h	58;"	d
+ACL_DEF_MASTER_DAEMON_DIR	master_params.h	38;"	d
+ACL_DEF_MASTER_DELAY_SEC	master_params.h	93;"	d
+ACL_DEF_MASTER_DELAY_USEC	master_params.h	97;"	d
+ACL_DEF_MASTER_INET_INTERFACES	master_params.h	19;"	d
+ACL_DEF_MASTER_IN_FLOW_DELAY	master_params.h	86;"	d
+ACL_DEF_MASTER_IN_FLOW_DELAY	master_params.h	88;"	d
+ACL_DEF_MASTER_LIMIT_PRIVILEGE	master_params.h	70;"	d
+ACL_DEF_MASTER_LOG_FILE	master_params.h	50;"	d
+ACL_DEF_MASTER_MANAGE_ADDR	master_params.h	101;"	d
+ACL_DEF_MASTER_OWNER_GROUP	master_params.h	29;"	d
+ACL_DEF_MASTER_PID_FILE	master_params.h	54;"	d
+ACL_DEF_MASTER_PROC_LIMIT	master_params.h	23;"	d
+ACL_DEF_MASTER_QUEUE_DIR	master_params.h	46;"	d
+ACL_DEF_MASTER_RW_TIMEOUT	master_params.h	62;"	d
+ACL_DEF_MASTER_SCAN_SUBDIR	master_params.h	66;"	d
+ACL_DEF_MASTER_SERVICE_DIR	master_params.h	42;"	d
+ACL_DEF_MASTER_SERV_DEFER_ACCEPT	master_params.h	131;"	d
+ACL_DEF_MASTER_SERV_MAX_PROC	master_params.h	124;"	d
+ACL_DEF_MASTER_SERV_MAX_QLEN	master_params.h	121;"	d
+ACL_DEF_MASTER_SERV_PREFORK_PROC	master_params.h	127;"	d
+ACL_DEF_MASTER_THROTTLE_TIME	master_params.h	34;"	d
+ACL_INET_INTERFACES_ALL	master_params.h	17;"	d
+ACL_INET_INTERFACES_LOCAL	master_params.h	18;"	d
+ACL_MASTER_ADDR	master.h	/^typedef struct ACL_MASTER_ADDR {$/;"	s
+ACL_MASTER_ADDR	master.h	/^} ACL_MASTER_ADDR;$/;"	t	typeref:struct:ACL_MASTER_ADDR
+ACL_MASTER_BUF_LEN	master.h	105;"	d
+ACL_MASTER_DEF_MIN_IDLE	master.h	87;"	d
+ACL_MASTER_FLAG_CONDWAKE	master.h	63;"	d
+ACL_MASTER_FLAG_MARK	master.h	62;"	d
+ACL_MASTER_FLAG_RELOADING	master.h	64;"	d
+ACL_MASTER_FLAG_STOPPING	master.h	65;"	d
+ACL_MASTER_FLAG_THROTTLE	master.h	61;"	d
+ACL_MASTER_FLOW_READ_STREAM	master_vars.cpp	/^static ACL_VSTREAM *ACL_MASTER_FLOW_READ_STREAM = NULL;$/;"	v	file:
+ACL_MASTER_FLOW_WRITE_STREAM	master_vars.cpp	/^static ACL_VSTREAM *ACL_MASTER_FLOW_WRITE_STREAM = NULL;$/;"	v	file:
+ACL_MASTER_LIMIT_OK	master.h	70;"	d
+ACL_MASTER_NV	master.h	/^typedef struct ACL_MASTER_NV {$/;"	s
+ACL_MASTER_NV	master.h	/^} ACL_MASTER_NV;$/;"	t	typeref:struct:ACL_MASTER_NV
+ACL_MASTER_PID	master.h	/^typedef int ACL_MASTER_PID;		\/* pid is key into binhash table *\/$/;"	t
+ACL_MASTER_PROC	master.h	/^typedef struct ACL_MASTER_PROC {$/;"	s
+ACL_MASTER_PROC	master.h	/^} ACL_MASTER_PROC;$/;"	t	typeref:struct:ACL_MASTER_PROC
+ACL_MASTER_SERV	master.h	/^typedef struct ACL_MASTER_SERV {$/;"	s
+ACL_MASTER_SERV	master.h	/^} ACL_MASTER_SERV;$/;"	t	typeref:struct:ACL_MASTER_SERV
+ACL_MASTER_SERV_TYPE_FIFO	master.h	78;"	d
+ACL_MASTER_SERV_TYPE_INET	master.h	77;"	d
+ACL_MASTER_SERV_TYPE_NULL	master.h	75;"	d
+ACL_MASTER_SERV_TYPE_SOCK	master.h	79;"	d
+ACL_MASTER_SERV_TYPE_UDP	master.h	80;"	d
+ACL_MASTER_SERV_TYPE_UNIX	master.h	76;"	d
+ACL_MASTER_STOPPING	master.h	68;"	d
+ACL_MASTER_THROTTLED	master.h	67;"	d
+ACL_SIG_PIPE_READ_FD	master_sig.cpp	31;"	d	file:
+ACL_SIG_PIPE_READ_STREAM	master_sig.cpp	/^ACL_VSTREAM *ACL_SIG_PIPE_READ_STREAM = NULL;$/;"	v
+ACL_SIG_PIPE_WRITE_FD	master_sig.cpp	30;"	d	file:
+ACL_VAR_MASTER_BUF_SIZE	master_params.h	57;"	d
+ACL_VAR_MASTER_DAEMON_DIR	master_params.h	37;"	d
+ACL_VAR_MASTER_DELAY_SEC	master_params.h	92;"	d
+ACL_VAR_MASTER_DELAY_USEC	master_params.h	96;"	d
+ACL_VAR_MASTER_INET_INTERFACES	master_params.h	16;"	d
+ACL_VAR_MASTER_IN_FLOW_DELAY	master_params.h	84;"	d
+ACL_VAR_MASTER_LIMIT_PRIVILEGE	master_params.h	69;"	d
+ACL_VAR_MASTER_LOG_FILE	master_params.h	49;"	d
+ACL_VAR_MASTER_MANAGE_ADDR	master_params.h	100;"	d
+ACL_VAR_MASTER_NOTIFY_ADDR	master_params.h	118;"	d
+ACL_VAR_MASTER_NOTIFY_RECIPIENTS	master_params.h	119;"	d
+ACL_VAR_MASTER_OWNER_GROUP	master_params.h	28;"	d
+ACL_VAR_MASTER_PID_FILE	master_params.h	53;"	d
+ACL_VAR_MASTER_PROC_LIMIT	master_params.h	22;"	d
+ACL_VAR_MASTER_QUEUE_DIR	master_params.h	45;"	d
+ACL_VAR_MASTER_RW_TIMEOUT	master_params.h	61;"	d
+ACL_VAR_MASTER_SCAN_SUBDIR	master_params.h	65;"	d
+ACL_VAR_MASTER_SERVICE_DIR	master_params.h	41;"	d
+ACL_VAR_MASTER_SERV_ARGS	master_params.h	115;"	d
+ACL_VAR_MASTER_SERV_CHROOT	master_params.h	111;"	d
+ACL_VAR_MASTER_SERV_COMMAND	master_params.h	114;"	d
+ACL_VAR_MASTER_SERV_DEFER_ACCEPT	master_params.h	130;"	d
+ACL_VAR_MASTER_SERV_DISABLE	master_params.h	106;"	d
+ACL_VAR_MASTER_SERV_ENV	master_params.h	117;"	d
+ACL_VAR_MASTER_SERV_LOG	master_params.h	113;"	d
+ACL_VAR_MASTER_SERV_MAX_PROC	master_params.h	125;"	d
+ACL_VAR_MASTER_SERV_MAX_QLEN	master_params.h	122;"	d
+ACL_VAR_MASTER_SERV_OWNER	master_params.h	116;"	d
+ACL_VAR_MASTER_SERV_PREFORK_PROC	master_params.h	128;"	d
+ACL_VAR_MASTER_SERV_PRIVATE	master_params.h	109;"	d
+ACL_VAR_MASTER_SERV_SERVICE	master_params.h	107;"	d
+ACL_VAR_MASTER_SERV_TYPE	master_params.h	108;"	d
+ACL_VAR_MASTER_SERV_UNPRIV	master_params.h	110;"	d
+ACL_VAR_MASTER_SERV_WAKEUP	master_params.h	112;"	d
+ACL_VAR_MASTER_THROTTLE_TIME	master_params.h	33;"	d
+BRIEFLY	master_wakeup.cpp	46;"	d	file:
+RETURN	master_ent.cpp	254;"	d	file:
+STR	master_ent.cpp	8;"	d	file:
+STR_DIFF	master_conf.cpp	56;"	d	file:
+STR_SAME	master_api.cpp	25;"	d	file:
+STR_SAME	master_conf.cpp	57;"	d	file:
+STR_SAME	master_ent.cpp	9;"	d	file:
+SWAP	master_conf.cpp	58;"	d	file:
+USE_SIG_PIPE	master_sig.cpp	19;"	d	file:
+WARN_INFO	master_warning.cpp	/^typedef struct WARN_INFO {$/;"	s	file:
+WARN_INFO	master_warning.cpp	/^} WARN_INFO;$/;"	t	typeref:struct:WARN_INFO	file:
+__MASTER_API_INCLUDE_H__	master_api.h	14;"	d
+__MASTER_INCLUDE_H__	master.h	2;"	d
+__MASTER_PARAMS_INCLUDE_H__	master_params.h	2;"	d
+__MASTER_PATHNAME_INCLUDE_H__	master_pathname.h	2;"	d
+__MASTER_VARS_INCLUDE_H__	master_vars.h	2;"	d
+__config_file_ptr	master_ent.cpp	/^const char *__config_file_ptr = NULL;$/;"	v
+__free_nv_fn	master_ent.cpp	/^static void __free_nv_fn(void *arg)$/;"	f	file:
+__master_blanks	master_ent.cpp	/^static const char __master_blanks[] = " \\t\\r\\n";  \/* field delimiters *\/$/;"	v	file:
+__scan	master_ent.cpp	/^static ACL_SCAN_DIR *__scan = NULL;$/;"	v	file:
+__services_path	master_ent.cpp	/^static char *__services_path = NULL;	\/* dir name of config files *\/$/;"	v	file:
+acl_master_avail_cleanup	master_avail.cpp	/^void acl_master_avail_cleanup(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_avail_less	master_avail.cpp	/^void acl_master_avail_less(ACL_MASTER_SERV *serv, ACL_MASTER_PROC *proc)$/;"	f
+acl_master_avail_listen	master_avail.cpp	/^void acl_master_avail_listen(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_avail_more	master_avail.cpp	/^void acl_master_avail_more(ACL_MASTER_SERV *serv, ACL_MASTER_PROC *proc)$/;"	f
+acl_master_config	master_conf.cpp	/^void    acl_master_config(void)$/;"	f
+acl_master_delete_children	master_spawn.cpp	/^void    acl_master_delete_children(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_ent_begin	master_ent.cpp	/^void acl_master_ent_begin()$/;"	f
+acl_master_ent_end	master_ent.cpp	/^void acl_master_ent_end()$/;"	f
+acl_master_ent_free	master_ent.cpp	/^void acl_master_ent_free(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_ent_get	master_ent.cpp	/^ACL_MASTER_SERV *acl_master_ent_get()$/;"	f
+acl_master_ent_load	master_ent.cpp	/^ACL_MASTER_SERV *acl_master_ent_load(const char *filepath)$/;"	f
+acl_master_ent_print	master_ent.cpp	/^void acl_master_ent_print(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_listen_cleanup	master_listen.cpp	/^void    acl_master_listen_cleanup(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_listen_init	master_listen.cpp	/^void    acl_master_listen_init(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_lookup	master_api.cpp	/^ACL_MASTER_SERV *acl_master_lookup(const char *name)$/;"	f
+acl_master_params_load	master_params.cpp	/^void acl_master_params_load(const char *pathname)$/;"	f
+acl_master_pathname	master_pathname.cpp	/^char   *acl_master_pathname(const char *queue_path, const char *service_class,$/;"	f
+acl_master_reap_child	master_spawn.cpp	/^void    acl_master_reap_child(void)$/;"	f
+acl_master_refresh	master_conf.cpp	/^void    acl_master_refresh(void)$/;"	f
+acl_master_restart	master_api.cpp	/^int     acl_master_restart(const char *filepath)$/;"	f
+acl_master_service_init	master_service.cpp	/^void   acl_master_service_init(void)$/;"	f
+acl_master_service_restart	master_service.cpp	/^void    acl_master_service_restart(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_service_start	master_service.cpp	/^void    acl_master_service_start(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_service_stop	master_service.cpp	/^void    acl_master_service_stop(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_sig_pipe	master_sig.cpp	/^int   acl_master_sig_pipe[2];$/;"	v
+acl_master_sigsetup	master_sig.cpp	/^void    acl_master_sigsetup(void)$/;"	f
+acl_master_spawn	master_spawn.cpp	/^void    acl_master_spawn(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_spawn_init	master_spawn.cpp	/^void  acl_master_spawn_init(void)$/;"	f
+acl_master_start	master_api.cpp	/^int     acl_master_start(const char *filepath)$/;"	f
+acl_master_status_cleanup	master_status.cpp	/^void    acl_master_status_cleanup(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_status_init	master_status.cpp	/^void    acl_master_status_init(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_stop	master_api.cpp	/^int     acl_master_stop(const char *name)$/;"	f
+acl_master_vars_end	master_vars.cpp	/^void acl_master_vars_end(void)$/;"	f
+acl_master_vars_init	master_vars.cpp	/^void acl_master_vars_init(int buf_size, int rw_timeout)$/;"	f
+acl_master_wakeup_cleanup	master_wakeup.cpp	/^void    acl_master_wakeup_cleanup(ACL_MASTER_SERV *serv)$/;"	f
+acl_master_wakeup_init	master_wakeup.cpp	/^void    acl_master_wakeup_init(ACL_MASTER_SERV *serv)$/;"	f
+acl_set_master_service_path	master_ent.cpp	/^void acl_set_master_service_path(const char *path)$/;"	f
+acl_var_master_buf_size	master_params.cpp	/^int   acl_var_master_buf_size;$/;"	v
+acl_var_master_child_table	master_spawn.cpp	/^ACL_BINHASH *acl_var_master_child_table = NULL;$/;"	v
+acl_var_master_conf_dir	master_params.cpp	/^char *acl_var_master_conf_dir; \/* must be set value in app *\/$/;"	v
+acl_var_master_daemon_dir	master_params.cpp	/^char *acl_var_master_daemon_dir;$/;"	v
+acl_var_master_delay_sec	master_params.cpp	/^int   acl_var_master_delay_sec;$/;"	v
+acl_var_master_delay_usec	master_params.cpp	/^int   acl_var_master_delay_usec;$/;"	v
+acl_var_master_global_event	master_service.cpp	/^ACL_EVENT *acl_var_master_global_event = NULL;$/;"	v
+acl_var_master_gotsigchld	master_sig.cpp	/^int   acl_var_master_gotsigchld = 0;$/;"	v
+acl_var_master_gotsighup	master_sig.cpp	/^int   acl_var_master_gotsighup = 0;$/;"	v
+acl_var_master_head	master_service.cpp	/^ACL_MASTER_SERV *acl_var_master_head = NULL;$/;"	v
+acl_var_master_in_flow_delay	master_params.cpp	/^int   acl_var_master_in_flow_delay;$/;"	v
+acl_var_master_inet_interfaces	master_params.cpp	/^char *acl_var_master_inet_interfaces;$/;"	v
+acl_var_master_limit_privilege	master_params.cpp	/^int   acl_var_master_limit_privilege;$/;"	v
+acl_var_master_log_file	master_params.cpp	/^char *acl_var_master_log_file;$/;"	v
+acl_var_master_manage_addr	master_params.cpp	/^char *acl_var_master_manage_addr;$/;"	v
+acl_var_master_owner_gid	master_params.cpp	/^gid_t acl_var_master_owner_gid;$/;"	v
+acl_var_master_owner_group	master_params.cpp	/^char *acl_var_master_owner_group;$/;"	v
+acl_var_master_owner_uid	master_params.cpp	/^uid_t acl_var_master_owner_uid;$/;"	v
+acl_var_master_pid	master_params.cpp	/^pid_t acl_var_master_pid;$/;"	v
+acl_var_master_pid_file	master_params.cpp	/^char *acl_var_master_pid_file;$/;"	v
+acl_var_master_proc_limit	master_params.cpp	/^int   acl_var_master_proc_limit;$/;"	v
+acl_var_master_queue_dir	master_params.cpp	/^char *acl_var_master_queue_dir;$/;"	v
+acl_var_master_rw_timeout	master_params.cpp	/^int   acl_var_master_rw_timeout;$/;"	v
+acl_var_master_scan_subdir	master_params.cpp	/^int   acl_var_master_scan_subdir;$/;"	v
+acl_var_master_service_dir	master_params.cpp	/^char *acl_var_master_service_dir;$/;"	v
+acl_var_master_thread_pool	master_vars.cpp	/^acl_pthread_pool_t *acl_var_master_thread_pool = NULL;$/;"	v
+acl_var_master_throttle_time	master_params.cpp	/^int   acl_var_master_throttle_time;$/;"	v
+addr	master.h	/^	char *addr;$/;"	m	struct:ACL_MASTER_ADDR
+addr_matched	master_ent.cpp	/^static unsigned addr_matched(const ACL_ARGV *tokens, const char *ip)$/;"	f	file:
+addrs	master.h	/^	ACL_ARRAY    *addrs;		\/* in which ACL_MASTER_ADDR save *\/$/;"	m	struct:ACL_MASTER_SERV
+args	master.h	/^	ACL_ARGV     *args;		\/* argument vector *\/$/;"	m	struct:ACL_MASTER_SERV
+avail	master.h	/^    int              avail;		\/* availability *\/$/;"	m	struct:ACL_MASTER_PROC
+avail_proc	master.h	/^	int     avail_proc;		\/* idle processes *\/$/;"	m	struct:ACL_MASTER_SERV
+bool_tab	master_params.cpp	/^static ACL_CONFIG_BOOL_TABLE bool_tab[] = {$/;"	v	file:
+cfg_parser	master_params.cpp	/^static ACL_CFG_PARSER *cfg_parser = NULL;$/;"	v	file:
+children_env	master.h	/^	ACL_ARRAY    *children_env;	\/* the env array of the children *\/$/;"	m	struct:ACL_MASTER_SERV
+defer_accept	master.h	/^	int     defer_accept;		\/* accept timeout if no data from client *\/$/;"	m	struct:ACL_MASTER_SERV
+desc	master_warning.cpp	/^	char *desc;$/;"	m	struct:WARN_INFO	file:
+fatal_invalid_field	master_ent.cpp	/^static void fatal_invalid_field(const char *name, const char *value)$/;"	f	file:
+fatal_with_context	master_ent.cpp	/^static void fatal_with_context(const char *format,...)$/;"	f	file:
+flags	master.h	/^	int     flags;			\/* status, features, etc. *\/$/;"	m	struct:ACL_MASTER_SERV
+gen	master.h	/^    unsigned         gen;		\/* child generation number *\/$/;"	m	struct:ACL_MASTER_PROC
+get_bool_ent	master_ent.cpp	/^static int get_bool_ent(ACL_XINETD_CFG_PARSER *xcp,$/;"	f	file:
+get_int_ent	master_ent.cpp	/^static int get_int_ent(ACL_XINETD_CFG_PARSER *xcp, const char *name,$/;"	f	file:
+get_str_ent	master_ent.cpp	/^static const char *get_str_ent(ACL_XINETD_CFG_PARSER *xcp,$/;"	f	file:
+init_conf_bool_vars	master_params.cpp	/^static void init_conf_bool_vars(ACL_CONFIG_BOOL_TABLE cbt[])$/;"	f	file:
+init_conf_int_vars	master_params.cpp	/^static void init_conf_int_vars(ACL_CONFIG_INT_TABLE cit[])$/;"	f	file:
+init_conf_str_vars	master_params.cpp	/^static void init_conf_str_vars(ACL_CONFIG_STR_TABLE cst[])$/;"	f	file:
+init_listeners	master_ent.cpp	/^static void init_listeners(ACL_MASTER_SERV *serv)$/;"	f	file:
+init_master_vars	master_params.cpp	/^static void init_master_vars(void)$/;"	f	file:
+int_tab	master_params.cpp	/^static ACL_CONFIG_INT_TABLE int_tab[] = {$/;"	v	file:
+listen_fd_count	master.h	/^	int     listen_fd_count;	\/* nr of descriptors *\/$/;"	m	struct:ACL_MASTER_SERV
+listen_fds	master.h	/^	int    *listen_fds;		\/* incoming requests *\/$/;"	m	struct:ACL_MASTER_SERV
+listen_streams	master.h	/^	ACL_VSTREAM **listen_streams;	\/* multi-listening stream *\/$/;"	m	struct:ACL_MASTER_SERV
+master_avail_event	master_avail.cpp	/^static void master_avail_event(int type, ACL_EVENT *event,$/;"	f	file:
+master_bind_udp	master_listen.cpp	/^static void master_bind_udp(ACL_MASTER_SERV *serv)$/;"	f	file:
+master_delete_child	master_spawn.cpp	/^static void master_delete_child(ACL_MASTER_PROC *proc)$/;"	f	file:
+master_listen_fifo	master_listen.cpp	/^static void master_listen_fifo(ACL_MASTER_SERV *serv)$/;"	f	file:
+master_listen_inet	master_listen.cpp	/^static void master_listen_inet(ACL_MASTER_SERV *serv)$/;"	f	file:
+master_listen_sock	master_listen.cpp	/^static void master_listen_sock(ACL_MASTER_SERV *serv)$/;"	f	file:
+master_listen_unix	master_listen.cpp	/^static void master_listen_unix(ACL_MASTER_SERV *serv)$/;"	f	file:
+master_prefork	master_avail.cpp	/^static int master_prefork(ACL_MASTER_SERV *serv)$/;"	f	file:
+master_sig_event	master_sig.cpp	/^static void master_sig_event(int type acl_unused, ACL_EVENT *event acl_unused,$/;"	f	file:
+master_sigchld	master_sig.cpp	/^static void master_sigchld(int sig acl_unused)$/;"	f	file:
+master_sigchld	master_sig.cpp	/^static void master_sigchld(int sig)$/;"	f	file:
+master_sigchld	master_sig.cpp	/^static void master_sigchld(int sig, int code acl_unused,$/;"	f	file:
+master_sigdeath	master_sig.cpp	/^static void master_sigdeath(int sig)$/;"	f	file:
+master_sighup	master_sig.cpp	/^static void master_sighup(int sig)$/;"	f	file:
+master_status_event	master_status.cpp	/^static void master_status_event(int type, ACL_EVENT *event acl_unused,$/;"	f	file:
+master_throttle	master_spawn.cpp	/^static void master_throttle(ACL_MASTER_SERV *serv)$/;"	f	file:
+master_unthrottle	master_spawn.cpp	/^static void master_unthrottle(ACL_MASTER_SERV *serv)$/;"	f	file:
+master_unthrottle_wrapper	master_spawn.cpp	/^static void master_unthrottle_wrapper(int type acl_unused,$/;"	f	file:
+master_wakeup_timer_event	master_wakeup.cpp	/^static void master_wakeup_timer_event(int type acl_unused,$/;"	f	file:
+master_warning	master_warning.cpp	/^void master_warning(const char *notify_addr, const char *recipients,$/;"	f
+max_proc	master.h	/^	int     max_proc;		\/* upper bound on # processes *\/$/;"	m	struct:ACL_MASTER_SERV
+max_qlen	master.h	/^	int     max_qlen;		\/* max listening qlen *\/$/;"	m	struct:ACL_MASTER_SERV
+name	master.h	/^	char   *name;			\/* service endpoint name *\/$/;"	m	struct:ACL_MASTER_SERV
+name	master.h	/^	char *name;$/;"	m	struct:ACL_MASTER_NV
+next	master.h	/^	struct ACL_MASTER_SERV *next;	\/* linkage *\/$/;"	m	struct:ACL_MASTER_SERV	typeref:struct:ACL_MASTER_SERV::ACL_MASTER_SERV
+notify_addr	master.h	/^	char   *notify_addr;		\/* warning address when not null *\/$/;"	m	struct:ACL_MASTER_SERV
+notify_addr	master_warning.cpp	/^	char *notify_addr;$/;"	m	struct:WARN_INFO	file:
+notify_recipients	master.h	/^	char   *notify_recipients;	\/* users warned to *\/$/;"	m	struct:ACL_MASTER_SERV
+notify_recipients	master_warning.cpp	/^	char *notify_recipients;$/;"	m	struct:WARN_INFO	file:
+notify_thread	master_warning.cpp	/^static void notify_thread(void *arg)$/;"	f	file:
+owner	master.h	/^	char   *owner;			\/* service running privilege if not null*\/$/;"	m	struct:ACL_MASTER_SERV
+path	master.h	/^	char   *path;			\/* command pathname *\/$/;"	m	struct:ACL_MASTER_SERV
+path	master_warning.cpp	/^	char *path;$/;"	m	struct:WARN_INFO	file:
+pid	master.h	/^    ACL_MASTER_PID   pid;		\/* child process id *\/$/;"	m	struct:ACL_MASTER_PROC
+pid	master_warning.cpp	/^	int   pid;$/;"	m	struct:WARN_INFO	file:
+prefork_proc	master.h	/^	int     prefork_proc;		\/* prefork processes *\/$/;"	m	struct:ACL_MASTER_SERV
+serv	master.h	/^    ACL_MASTER_SERV *serv;		\/* parent linkage *\/$/;"	m	struct:ACL_MASTER_PROC
+service_args	master_ent.cpp	/^static void service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,$/;"	f	file:
+service_env	master_ent.cpp	/^static void service_env(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)$/;"	f	file:
+service_fifo	master_ent.cpp	/^static void service_fifo(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)$/;"	f	file:
+service_inet	master_ent.cpp	/^static void service_inet(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)$/;"	f	file:
+service_inet_expand	master_ent.cpp	/^static unsigned service_inet_expand(ACL_MASTER_SERV *serv, const char *path)$/;"	f	file:
+service_proc	master_ent.cpp	/^static void service_proc(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)$/;"	f	file:
+service_sock	master_ent.cpp	/^static void service_sock(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)$/;"	f	file:
+service_transport	master_ent.cpp	/^static void service_transport(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)$/;"	f	file:
+service_udp	master_ent.cpp	/^static void service_udp(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)$/;"	f	file:
+service_unix	master_ent.cpp	/^static void service_unix(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)$/;"	f	file:
+service_wakeup_time	master_ent.cpp	/^static void service_wakeup_time(ACL_XINETD_CFG_PARSER *xcp,$/;"	f	file:
+status_fd	master.h	/^	int     status_fd[2];		\/* child status reports *\/$/;"	m	struct:ACL_MASTER_SERV
+status_reader	master.h	/^	ACL_VSTREAM  *status_reader;	\/* status stream *\/$/;"	m	struct:ACL_MASTER_SERV
+str_tab	master_params.cpp	/^static ACL_CONFIG_STR_TABLE str_tab[] = {$/;"	v	file:
+throttle_delay	master.h	/^	int     throttle_delay;		\/* failure recovery parameter *\/$/;"	m	struct:ACL_MASTER_SERV
+total_proc	master.h	/^	int     total_proc;		\/* number of processes *\/$/;"	m	struct:ACL_MASTER_SERV
+type	master.h	/^	int     type;			\/* UNIX-domain, INET, etc. *\/$/;"	m	struct:ACL_MASTER_SERV
+type	master.h	/^	int   type;$/;"	m	struct:ACL_MASTER_ADDR
+update_bool_vars	master_params.cpp	/^static void update_bool_vars(ACL_CONFIG_BOOL_TABLE cbt[],$/;"	f	file:
+update_int_vars	master_params.cpp	/^static void update_int_vars(ACL_CONFIG_INT_TABLE cit[],$/;"	f	file:
+update_master_conf_vars	master_params.cpp	/^static void update_master_conf_vars(ACL_CFG_PARSER *parser)$/;"	f	file:
+update_str_vars	master_params.cpp	/^static void update_str_vars(ACL_CONFIG_STR_TABLE cst[],$/;"	f	file:
+use_count	master.h	/^    int              use_count;		\/* number of service requests *\/$/;"	m	struct:ACL_MASTER_PROC
+value	master.h	/^	char *value;$/;"	m	struct:ACL_MASTER_NV
+wakeup_time	master.h	/^	int     wakeup_time;		\/* wakeup interval *\/$/;"	m	struct:ACL_MASTER_SERV
+warn_info_free	master_warning.cpp	/^static void warn_info_free(WARN_INFO *info)$/;"	f	file:
+warn_info_new	master_warning.cpp	/^static WARN_INFO *warn_info_new(const char *notify_addr,$/;"	f	file:
