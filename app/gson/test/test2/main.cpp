@@ -6,7 +6,7 @@
 #include <iostream>
 #include <time.h>
 #include "struct.h"
-#include "gson.h"
+#include "struct.gson.h"
 
 static void print_user(const user& u)
 {
