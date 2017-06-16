@@ -987,7 +987,8 @@ static inline gson(acl::json_node &node, std::vector<T*> *objs)
 
 	while(objs->size())
 	{
-		delete objs[0];
+		T *obj = (*objs)[0];
+		delete obj;
 		objs->pop_back();
 	}
 	return result;
