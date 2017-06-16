@@ -1,0 +1,29 @@
+POST /?cmd=list HTTP/1.0
+Content-Length: 25
+
+{ cmd: 'list', data: {}}
+
+POST /?cmd=list HTTP/1.0
+Content-Length: 25
+Connection: keep-alive
+
+{ cmd: 'list', data: {}}
+
+POST /?cmd=stat HTTP/1.0
+Content-Length: 32
+Connection: keep-alive
+
+{ cmd: 'stat', data: ['18888']}
+
+POST /?cmd=stop HTTP/1.0
+Content-Length: 32
+Connection: keep-alive
+
+{ cmd: 'stop', data: ['18888']}
+
+POST /?cmd=start HTTP/1.0
+Content-Length: 67
+Connection: keep-alive
+
+{ cmd: 'start', data: ['/home/zsx/tools/acl/conf/service/web.cf']}
+
