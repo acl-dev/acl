@@ -47,13 +47,10 @@
 #include "net/acl_sane_socket.h"
 #include "event/acl_events.h"
 
-/* Global library. */
-
-#include "../master_flow.h"
-#include "../master_params.h"
-#include "../master_proto.h"
-
 /* Application-specific */
+
+#include "master/acl_master_flow.h"
+#include "master/acl_master_proto.h"
 #include "master/acl_single_params.h"
 #include "master/acl_server_api.h"
 #include "master_log.h"
@@ -74,16 +71,26 @@ int   acl_var_single_enable_core;
 int   acl_var_single_max_debug;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
-	{ ACL_VAR_SINGLE_BUF_SIZE, ACL_DEF_SINGLE_BUF_SIZE, &acl_var_single_buf_size, 0, 0 },
-	{ ACL_VAR_SINGLE_RW_TIMEOUT, ACL_DEF_SINGLE_RW_TIMEOUT, &acl_var_single_rw_timeout, 0, 0 },
-	{ ACL_VAR_SINGLE_IN_FLOW_DELAY, ACL_DEF_SINGLE_IN_FLOW_DELAY, &acl_var_single_in_flow_delay, 0, 0 },
-	{ ACL_VAR_SINGLE_IDLE_LIMIT, ACL_DEF_SINGLE_IDLE_LIMIT, &acl_var_single_idle_limit, 0, 0 },
-	{ ACL_VAR_SINGLE_DELAY_SEC, ACL_DEF_SINGLE_DELAY_SEC, &acl_var_single_delay_sec, 0, 0 },
-	{ ACL_VAR_SINGLE_DELAY_USEC, ACL_DEF_SINGLE_DELAY_USEC, &acl_var_single_delay_usec, 0, 0 },
-	{ ACL_VAR_SINGLE_DAEMON_TIMEOUT, ACL_DEF_SINGLE_DAEMON_TIMEOUT, &acl_var_single_daemon_timeout, 0, 0 },
-	{ ACL_VAR_SINGLE_USE_LIMIT, ACL_DEF_SINGLE_USE_LIMIT, &acl_var_single_use_limit, 0, 0 },
-	{ ACL_VAR_SINGLE_ENABLE_CORE, ACL_DEF_SINGLE_ENABLE_CORE, &acl_var_single_enable_core, 0, 0 },
-	{ ACL_VAR_SINGLE_MAX_DEBUG, ACL_DEF_SINGLE_MAX_DEBUG, &acl_var_single_max_debug, 0, 0 },
+	{ ACL_VAR_SINGLE_BUF_SIZE, ACL_DEF_SINGLE_BUF_SIZE,
+		&acl_var_single_buf_size, 0, 0 },
+	{ ACL_VAR_SINGLE_RW_TIMEOUT, ACL_DEF_SINGLE_RW_TIMEOUT,
+		&acl_var_single_rw_timeout, 0, 0 },
+	{ ACL_VAR_SINGLE_IN_FLOW_DELAY, ACL_DEF_SINGLE_IN_FLOW_DELAY,
+		&acl_var_single_in_flow_delay, 0, 0 },
+	{ ACL_VAR_SINGLE_IDLE_LIMIT, ACL_DEF_SINGLE_IDLE_LIMIT,
+		&acl_var_single_idle_limit, 0, 0 },
+	{ ACL_VAR_SINGLE_DELAY_SEC, ACL_DEF_SINGLE_DELAY_SEC,
+		&acl_var_single_delay_sec, 0, 0 },
+	{ ACL_VAR_SINGLE_DELAY_USEC, ACL_DEF_SINGLE_DELAY_USEC,
+		&acl_var_single_delay_usec, 0, 0 },
+	{ ACL_VAR_SINGLE_DAEMON_TIMEOUT, ACL_DEF_SINGLE_DAEMON_TIMEOUT,
+		&acl_var_single_daemon_timeout, 0, 0 },
+	{ ACL_VAR_SINGLE_USE_LIMIT, ACL_DEF_SINGLE_USE_LIMIT,
+		&acl_var_single_use_limit, 0, 0 },
+	{ ACL_VAR_SINGLE_ENABLE_CORE, ACL_DEF_SINGLE_ENABLE_CORE,
+		&acl_var_single_enable_core, 0, 0 },
+	{ ACL_VAR_SINGLE_MAX_DEBUG, ACL_DEF_SINGLE_MAX_DEBUG,
+		&acl_var_single_max_debug, 0, 0 },
 
 	{ 0, 0, 0, 0, 0 },
 };
@@ -94,10 +101,14 @@ char *acl_var_single_pid_dir;
 char *acl_var_single_log_debug;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
-	{ ACL_VAR_SINGLE_QUEUE_DIR, ACL_DEF_SINGLE_QUEUE_DIR, &acl_var_single_queue_dir },
-	{ ACL_VAR_SINGLE_OWNER, ACL_DEF_SINGLE_OWNER, &acl_var_single_owner },
-	{ ACL_VAR_SINGLE_PID_DIR, ACL_DEF_SINGLE_PID_DIR, &acl_var_single_pid_dir },
-	{ ACL_VAR_SINGLE_LOG_DEBUG, ACL_DEF_SINGLE_LOG_DEBUG, &acl_var_single_log_debug },
+	{ ACL_VAR_SINGLE_QUEUE_DIR, ACL_DEF_SINGLE_QUEUE_DIR,
+		&acl_var_single_queue_dir },
+	{ ACL_VAR_SINGLE_OWNER, ACL_DEF_SINGLE_OWNER,
+		&acl_var_single_owner },
+	{ ACL_VAR_SINGLE_PID_DIR, ACL_DEF_SINGLE_PID_DIR,
+		&acl_var_single_pid_dir },
+	{ ACL_VAR_SINGLE_LOG_DEBUG, ACL_DEF_SINGLE_LOG_DEBUG,
+		&acl_var_single_log_debug },
 
 	{ 0, 0, 0 },
 };
@@ -105,21 +116,23 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
  /*
   * Global state.
   */
-static int use_count;
-static ACL_EVENT *__eventp = NULL;
-static ACL_VSTREAM **__sstreams = NULL;
-
-static ACL_MASTER_SERVER_LISTEN_FN __service_on_listen;
-static ACL_SINGLE_SERVER_FN __service_main;
-static ACL_MASTER_SERVER_EXIT_FN __service_onexit;
-static char *__service_name;
-static char **__service_argv;
-static void *__service_ctx;
+static ACL_MASTER_SERVER_LISTEN_FN __service_listen;
+static ACL_SINGLE_SERVER_FN        __service_main;
+static ACL_MASTER_SERVER_EXIT_FN   __service_exit;
 
 static void (*__service_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
+
+static int           use_count;
+static ACL_EVENT    *__eventp = NULL;
+static ACL_VSTREAM **__sstreams = NULL;
+
+static char         *__service_name;
+static char        **__service_argv;
+static void         *__service_ctx;
+
 static ACL_VSTREAM *__service_lock;
-static int single_server_in_flow_delay;
-static unsigned single_server_generation;
+static int          single_server_in_flow_delay;
+static unsigned     single_server_generation;
 
 ACL_EVENT *acl_single_server_event()
 {
@@ -135,11 +148,12 @@ ACL_VSTREAM **acl_single_server_sstreams()
 
 static void single_server_exit(void)
 {
-	int   i;
+	if (__service_exit)
+		__service_exit(__service_ctx);
 
-	if (__service_onexit)
-		__service_onexit(__service_ctx);
 	if (__sstreams) {
+		int i;
+
 		for (i = 0; __sstreams[i] != NULL; i++)
 			acl_vstream_close(__sstreams[i]);
 	}
@@ -204,8 +218,10 @@ static void single_server_wakeup(ACL_EVENT *event, int fd,
 		single_server_abort(ACL_EVENT_NULL_TYPE, event,
 			stream, ACL_EVENT_NULL_CONTEXT);
 	}
+
 	if (single_server_in_flow_delay && acl_master_flow_get(1) < 0)
 		acl_doze(acl_var_single_in_flow_delay * 1000);
+
 	__service_main(stream, __service_name, __service_argv);
 	(void) acl_vstream_fclose(stream);
 	if (acl_master_notify(acl_var_single_pid, single_server_generation,
@@ -254,7 +270,7 @@ static void __service_accept_pass(int type acl_unused, ACL_EVENT *event,
 	}
 	if (fd < 0) {
 		if (errno != EAGAIN)
-			acl_msg_fatal("accept connection: %s", acl_last_serror());
+			acl_msg_fatal("accept error: %s", acl_last_serror());
 		if (time_left >= 0)
 			acl_event_request_timer(event, single_server_timeout,
 				NULL, (acl_int64) time_left * 1000000, 0);
@@ -293,7 +309,7 @@ static void __service_accept_sock(int type acl_unused, ACL_EVENT *event,
 
 	if (fd < 0) {
 		if (errno != EAGAIN)
-			acl_msg_fatal("accept connection: %s", acl_last_serror());
+			acl_msg_fatal("accept error: %s", acl_last_serror());
 		if (time_left > 0)
 			acl_event_request_timer(event, single_server_timeout,
 				NULL, (acl_int64) time_left * 1000000, 0);
@@ -353,7 +369,7 @@ static void single_server_init(const char *procname)
 	acl_get_app_conf_int_table(__conf_int_tab);
 	acl_get_app_conf_str_table(__conf_str_tab);
 
-	acl_master_vars_init(acl_var_single_buf_size, acl_var_single_rw_timeout);
+	//acl_master_vars_init(acl_var_single_buf_size, acl_var_single_rw_timeout);
 }
 
 static void single_server_open_log(const char *proc)
@@ -375,91 +391,61 @@ static void single_server_open_log(const char *proc)
 
 static void usage(int argc, char *argv[])
 {
-	int   i;
-	char *service_name;
-
 	if (argc <= 0)
-		acl_msg_fatal("%s(%d): argc(%d) invalid", __FILE__, __LINE__, argc);
-
-	service_name = acl_mystrdup(acl_safe_basename(argv[0]));
-
-	for (i = 0; i < argc; i++)
-		acl_msg_info("argv[%d]: %s", i, argv[i]);
+		acl_msg_fatal("%s(%d): argc %d", __FILE__, __LINE__, argc);
 
 	acl_msg_info("usage: %s -h[help]"
 		" -c [use chroot]"
-		" -d [debug]"
-		" -l [run alone]"
 		" -n service_name"
 		" -s socket_count"
-		" -i [use stdin]"
 		" -t transport"
 		" -u [use setgid initgroups setuid]"
 		" -v [on acl_msg_verbose]"
-		" -z [unlimit process count]"
-		" -f conf_file",
-		service_name);
+		" -f conf_file", argv[0]);
 }
 
 /* acl_single_server_main - the real main program */
 
 void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,...)
 {
-	const char *myname = "single_server_main";
-	ACL_VSTREAM *stream = 0;
-	char   *root_dir = 0;
-	char   *user_name = 0;
-	char   *service_name = acl_mystrdup(acl_safe_basename(argv[0]));
-	int     c;
-	int     socket_count = 1;
-	int     fd, fdtype = 0, i;
-	va_list ap;
-	ACL_MASTER_SERVER_INIT_FN pre_init = 0;
+	const char *myname = "acl_single_server_main";
+	ACL_MASTER_SERVER_INIT_FN pre_init  = 0;
 	ACL_MASTER_SERVER_INIT_FN post_init = 0;
-	ACL_MASTER_SERVER_LOOP_FN loop = 0;
-	int     key;
-	char   *transport = 0;
-	char   *lock_path;
-	ACL_VSTRING *why;
-	int     alone = 0;
-	int     zerolimit = 0;
+	ACL_MASTER_SERVER_LOOP_FN loop      = 0;
+	char *service_name = acl_mystrdup(acl_safe_basename(argv[0])), *lock_path; 
+	int   c, socket_count = 1, fd, fdtype = 0, i, key;
+	const char   *root_dir = 0, *user_name = 0, *transport = 0;
+	const char   *generation, *conf_file_ptr = 0;
 	ACL_WATCHDOG *watchdog;
-	char   *generation;
-
-	int     f_flag = 0;
-	char   *conf_file_ptr = 0;
+	ACL_VSTRING  *why;
+	ACL_VSTREAM  *stream;
+	va_list ap;
 
 	/*
-	 * Pick up policy settings from master process. Shut up error messages to
-	 * stderr, because no-one is going to see them.
+	 * Pick up policy settings from master process. Shut up error messages
+	 * to stderr, because no-one is going to see them.
 	 */
 	opterr = 0;
-	while ((c = getopt(argc, argv, "hcdlm:n:s:it:uvzf:")) > 0) {
+
+	while ((c = getopt(argc, argv, "hcn:s:t:uvf:")) > 0) {
 		switch (c) {
 		case 'h':
 			usage(argc, argv);
 			exit (0);
 		case 'f':
 			acl_app_conf_load(optarg);
-			f_flag = 1;
 			conf_file_ptr = optarg;
 			break;
 		case 'c':
 			root_dir = "setme";
 			break;
-		case 'l':
-			alone = 1;
-			break;
 		case 'n':
 			service_name = optarg;
 			break;
 		case 's':
-			if ((socket_count = atoi(optarg)) <= 0)
-				acl_msg_fatal("invalid socket_count: %s", optarg);
-			break;
-		case 'i':
-			stream = ACL_VSTREAM_IN;
-			break;
+			if ((socket_count = atoi(optarg)) > 0)
+				break;
+			acl_msg_fatal("invalid socket_count: %s", optarg);
 		case 'u':
 			user_name = "setme";
 			break;
@@ -469,24 +455,20 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 		case 'v':
 			acl_msg_verbose++;
 			break;
-		case 'z':
-			zerolimit = 1;
-			break;
 		default:
 			break;
 		}
 	}
 
-	if (stream == NULL)
-		single_server_init(argv[0]);
+	single_server_init(argv[0]);
 
-	/* 提前进行模板初始化，以使日志尽早地打开, 开始先使用 acl_master 的日志文件 */
+	/* open log of the current service process */
 	master_log_open(argv[0]);
 
 	acl_msg_info("%s(%d): daemon started, log=%s",
 		acl_var_single_procname, __LINE__, acl_var_single_log_file);
 
-	if (f_flag == 0)
+	if (conf_file_ptr == 0)
 		acl_msg_fatal("%s(%d), %s: need \"-f pathname\"",
 			__FILE__, __LINE__, myname);
 	else if (acl_msg_verbose)
@@ -496,23 +478,29 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	/* Application-specific initialization. */
 
 	va_start(ap, service);
+
 	while ((key = va_arg(ap, int)) != 0) {
 		switch (key) {
 		case ACL_MASTER_SERVER_INT_TABLE:
-			acl_get_app_conf_int_table(va_arg(ap, ACL_CONFIG_INT_TABLE *));
+			acl_get_app_conf_int_table(
+				va_arg(ap, ACL_CONFIG_INT_TABLE *));
 			break;
 		case ACL_MASTER_SERVER_INT64_TABLE:
-			acl_get_app_conf_int64_table(va_arg(ap, ACL_CONFIG_INT64_TABLE *));
+			acl_get_app_conf_int64_table(
+				va_arg(ap, ACL_CONFIG_INT64_TABLE *));
 			break;
 		case ACL_MASTER_SERVER_STR_TABLE:
-			acl_get_app_conf_str_table(va_arg(ap, ACL_CONFIG_STR_TABLE *));
+			acl_get_app_conf_str_table(
+				va_arg(ap, ACL_CONFIG_STR_TABLE *));
 			break;
 		case ACL_MASTER_SERVER_BOOL_TABLE:
-			acl_get_app_conf_bool_table(va_arg(ap, ACL_CONFIG_BOOL_TABLE *));
+			acl_get_app_conf_bool_table(
+				va_arg(ap, ACL_CONFIG_BOOL_TABLE *));
 			break;
 
 		case ACL_MASTER_SERVER_ON_LISTEN:
-			__service_on_listen = va_arg(ap, ACL_MASTER_SERVER_LISTEN_FN);
+			__service_listen =
+				va_arg(ap, ACL_MASTER_SERVER_LISTEN_FN);
 			break;
 		case ACL_MASTER_SERVER_CTX:
 			__service_ctx = va_arg(ap, void *);
@@ -527,24 +515,14 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 			loop = va_arg(ap, ACL_MASTER_SERVER_LOOP_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
-			__service_onexit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
+			__service_exit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
 			break;
 
 		case ACL_MASTER_SERVER_IN_FLOW_DELAY:
 			single_server_in_flow_delay = 1;
 			break;
-		case ACL_MASTER_SERVER_SOLITARY:
-			if (!alone)
-				acl_msg_fatal("service %s requires a process"
-					" limit of 1", service_name);
-			break;
-		case ACL_MASTER_SERVER_UNLIMITED:
-			if (!zerolimit)
-				acl_msg_fatal("service %s requires a process"
-					" limit of 0", service_name);
-			break;
 		default:
-			acl_msg_panic("%s: unknown argument type: %d", myname, key);
+			acl_msg_panic("%s: unknown argument: %d", myname, key);
 		}
 	}
 
@@ -556,65 +534,56 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 		user_name = acl_var_single_owner;
 
 	/* If not connected to stdin, stdin must not be a terminal */
-	if (stream == 0 && isatty(STDIN_FILENO))
+	if (isatty(STDIN_FILENO))
 		acl_msg_fatal("%s(%d), %s: do not run this command by hand",
 			__FILE__, __LINE__, myname);
 
 	/* Can options be required? */
-	if (stream == 0) {
-		if (transport == 0)
-			acl_msg_fatal("no transport type specified");
-		if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_INET) == 0) {
-			__service_accept = __service_accept_sock;
-			fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
-		} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_UNIX) == 0) {
-			__service_accept = __service_accept_sock;
-			fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_UNIX;
-		} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_SOCK) == 0) {
-			__service_accept = __service_accept_sock;
-			fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
+	if (transport == 0)
+		acl_msg_fatal("no transport type specified");
+	if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_INET) == 0) {
+		__service_accept = __service_accept_sock;
+		fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
+	} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_UNIX) == 0) {
+		__service_accept = __service_accept_sock;
+		fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_UNIX;
+	} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_SOCK) == 0) {
+		__service_accept = __service_accept_sock;
+		fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 #ifdef MASTER_XPORT_NAME_PASS
-		} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_PASS) == 0) {
-			__service_accept = __service_accept_pass;
-			fdtype = ACL_VSTREAM_TYPE_LISTEN;
+	} else if (strcasecmp(transport, ACL_MASTER_XPORT_NAME_PASS) == 0) {
+		__service_accept = __service_accept_pass;
+		fdtype = ACL_VSTREAM_TYPE_LISTEN;
 #endif
-		} else
-			acl_msg_fatal("unsupported transport type: %s", transport);
-	}
+	} else
+		acl_msg_fatal("unsupported transport: %s", transport);
 
 	/* Retrieve process generation from environment. */
 	if ((generation = getenv(ACL_MASTER_GEN_NAME)) != 0) {
 		if (!acl_alldig(generation))
 			acl_msg_fatal("bad generation: %s", generation);
 		sscanf(generation, "%o", &single_server_generation);
-		if (acl_msg_verbose)
-			acl_msg_info("process generation: %s (%o)",
-				generation, single_server_generation);
 	}
 
 	/*
-	 * Traditionally, BSD select() can't handle multiple processes selecting
-	 * on the same socket, and wakes up every process in select(). See TCP/IP
-	 * Illustrated volume 2 page 532. We avoid select() collisions with an
-	 * external lock file.
+	 * Traditionally, BSD select() can't handle multiple processes
+	 * selecting on the same socket, and wakes up every process in
+	 * select(). See TCP/IP Illustrated volume 2 page 532. We avoid
+	 * select() collisions with an external lock file.
 	 */
-	if (stream == 0 && !alone) {
-		lock_path = acl_concatenate(acl_var_single_pid_dir, "/",
-				transport, ".", service_name, (char *) 0);
-		why = acl_vstring_alloc(1);
-		if ((__service_lock = acl_safe_open(lock_path,
-			O_CREAT | O_RDWR, 0600, (struct stat *) 0,
-			(uid_t)-1, (uid_t )-1, why)) == 0)
-		{
-			acl_msg_fatal("open lock file %s: %s",
-				lock_path, acl_vstring_str(why));
-		}
+	lock_path = acl_concatenate(acl_var_single_pid_dir, "/",
+			transport, ".", service_name, (char *) 0);
+	why = acl_vstring_alloc(1);
+	__service_lock = acl_safe_open(lock_path, O_CREAT | O_RDWR, 0600,
+		(struct stat *) 0, (uid_t)-1, (uid_t )-1, why);
 
-		acl_close_on_exec(ACL_VSTREAM_FILE(__service_lock),
-			ACL_CLOSE_ON_EXEC);
-		acl_myfree(lock_path);
-		acl_vstring_free(why);
-	}
+	if (__service_lock == 0)
+		acl_msg_fatal("open lock file %s: %s",
+			lock_path, acl_vstring_str(why));
+
+	acl_close_on_exec(ACL_VSTREAM_FILE(__service_lock), ACL_CLOSE_ON_EXEC);
+	acl_myfree(lock_path);
+	acl_vstring_free(why);
 
 	/* Set up call-back info. */
 	__service_main = service;
@@ -646,20 +615,6 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	single_server_open_log(argv[0]);
 
 	/*
-	 * Are we running as a one-shot server with the client connection on
-	 * standard input? If so, make sure the output is written to stdout
-	 * so as to satisfy common expectation.
-	 */
-	if (stream != 0) {
-		/* Run post-jail initialization. */
-		if (post_init)
-			post_init(__service_ctx);
-
-		service(stream, __service_name, __service_argv);
-		single_server_exit();
-	}
-
-	/*
 	 * Running as a semi-resident server. Service connection requests.
 	 * Terminate when we have serviced a sufficient number of clients,
 	 * when no-one has been talking to us for a configurable amount of
@@ -677,8 +632,8 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	for (; fd < ACL_MASTER_LISTEN_FD + socket_count; fd++) {
 		stream = acl_vstream_fdopen(fd, O_RDWR, acl_var_single_buf_size,
 				acl_var_single_rw_timeout, fdtype);
-		if (__service_on_listen)
-			__service_on_listen(stream);
+		if (__service_listen)
+			__service_listen(stream);
 		__sstreams[i++] = stream;
 
 		acl_event_enable_listen(__eventp, stream, 0,
@@ -686,8 +641,10 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 		acl_close_on_exec(ACL_VSTREAM_SOCK(stream), ACL_CLOSE_ON_EXEC);
 	}
 
-	acl_event_enable_read(__eventp, ACL_MASTER_STAT_STREAM, 0,
-		single_server_abort, NULL);
+	stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
+		O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
+	acl_event_enable_read(__eventp, stream, 0, single_server_abort, NULL);
+
 	acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
@@ -700,9 +657,9 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 		post_init(__service_ctx);
 
 	/* The event loop, at last. */
-	while (acl_var_single_use_limit == 0
-		|| use_count < acl_var_single_use_limit)
-	{
+	while (acl_var_single_use_limit == 0 ||
+		use_count < acl_var_single_use_limit) {
+
 		int  delay_sec;
 
 		if (__service_lock != 0) {
@@ -710,19 +667,19 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 			if (acl_myflock(ACL_VSTREAM_FILE(__service_lock),
 				ACL_INTERNAL_LOCK, ACL_FLOCK_OP_EXCLUSIVE) < 0)
 			{
-				acl_msg_fatal("error lock %s", acl_last_serror());
+				acl_msg_fatal("lock %s", acl_last_serror());
 			}
 		}
+
 		acl_watchdog_start(watchdog);
 
 		if (loop != NULL) {
 			delay_sec = loop(__service_ctx);
 			acl_event_set_delay_sec(__eventp, delay_sec);
 		}
+
 		acl_event_loop(__eventp);
 	}
-
-	single_server_exit();
 }
 
 #endif /* ACL_UNIX */

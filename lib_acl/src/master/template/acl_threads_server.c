@@ -28,8 +28,6 @@
 #include <time.h>
 #include <pthread.h>
 
-#endif /* ACL_UNIX */
-
 /* Utility library. */
 
 #include "init/acl_init.h"
@@ -50,17 +48,12 @@
 #include "net/acl_vstream_net.h"
 #include "event/acl_events.h"
 
-/* Global library. */
-
-#ifdef ACL_UNIX
-
-#include "../master_flow.h"
-#include "../master_params.h"
-#include "../master_proto.h"
-
 #endif /* ACL_UNIX */
 
 /* Application-specific */
+
+#include "master/acl_master_flow.h"
+#include "master/acl_master_proto.h"
 #include "master/acl_threads_params.h"
 #include "master/acl_server_api.h"
 #include "master_log.h"
@@ -93,28 +86,50 @@ int   acl_var_threads_schedule_warn;
 int   acl_var_threads_schedule_wait;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
-	{ ACL_VAR_THREADS_BUF_SIZE, ACL_DEF_THREADS_BUF_SIZE, &acl_var_threads_buf_size, 0, 0 },
-	{ ACL_VAR_THREADS_RW_TIMEOUT, ACL_DEF_THREADS_RW_TIMEOUT, &acl_var_threads_rw_timeout, 0, 0 },
-	{ ACL_VAR_THREADS_POOL_LIMIT, ACL_DEF_THREADS_POOL_LIMIT, &acl_var_threads_pool_limit, 0, 0 },
-	{ ACL_VAR_THREADS_THREAD_STACKSIZE, ACL_DEF_THREADS_THREAD_STACKSIZE, &acl_var_threads_thread_stacksize, 0, 0 },
-	{ ACL_VAR_THREADS_THREAD_IDLE, ACL_DEF_THREADS_THREAD_IDLE, &acl_var_threads_thread_idle, 0, 0 },
-	{ ACL_VAR_THREADS_IDLE_LIMIT, ACL_DEF_THREADS_IDLE_LIMIT, &acl_var_threads_idle_limit, 0, 0 },
-	{ ACL_VAR_THREADS_DELAY_SEC, ACL_DEF_THREADS_DELAY_SEC, &acl_var_threads_delay_sec, 0, 0 },
-	{ ACL_VAR_THREADS_DELAY_USEC, ACL_DEF_THREADS_DELAY_USEC, &acl_var_threads_delay_usec, 0, 0 },
-	{ ACL_VAR_THREADS_DAEMON_TIMEOUT, ACL_DEF_THREADS_DAEMON_TIMEOUT, &acl_var_threads_daemon_timeout, 0, 0 },
-	{ ACL_VAR_THREADS_USE_LIMIT, ACL_DEF_THREADS_USE_LIMIT, &acl_var_threads_use_limit, 0, 0 },
-	{ ACL_VAR_THREADS_MASTER_MAXPROC, ACL_DEF_THREADS_MASTER_MAXPROC, &acl_var_threads_master_maxproc, 0, 0},
-	{ ACL_VAR_THREADS_MAX_ACCEPT, ACL_DEF_THREADS_MAX_ACCEPT, &acl_var_threads_max_accept, 0, 0 },
-	{ ACL_VAR_THREADS_ENABLE_DOG, ACL_DEF_THREADS_ENABLE_DOG, &acl_var_threads_enable_dog, 0, 0 },
-	{ ACL_VAR_THREADS_QUICK_ABORT, ACL_DEF_THREADS_QUICK_ABORT, &acl_var_threads_quick_abort, 0, 0 },
-	{ ACL_VAR_THREADS_ENABLE_CORE, ACL_DEF_THREADS_ENABLE_CORE, &acl_var_threads_enable_core, 0, 0 },
-	{ ACL_VAR_THREADS_MAX_DEBUG, ACL_DEF_THREADS_MAX_DEBUG, &acl_var_threads_max_debug, 0, 0 },
-	{ ACL_VAR_THREADS_STATUS_NOTIFY, ACL_DEF_THREADS_STATUS_NOTIFY, &acl_var_threads_status_notify, 0, 0 },
-	{ ACL_VAR_THREADS_BATADD, ACL_DEF_THREADS_BATADD, &acl_var_threads_batadd, 0, 0 },
-	{ ACL_VAR_THREADS_QLEN_WARN, ACL_DEF_THREADS_QLEN_WARN, &acl_var_threads_qlen_warn, 0, 0 },
-	{ ACL_VAR_THREADS_SCHEDULE_WARN, ACL_DEF_THREADS_SCHEDULE_WARN, &acl_var_threads_schedule_warn, 0, 0 },
-	{ ACL_VAR_THREADS_SCHEDULE_WAIT, ACL_DEF_THREADS_SCHEDULE_WAIT, &acl_var_threads_schedule_wait, 0, 0 },
-	{ ACL_VAR_THREADS_CHECK_INTER, ACL_DEF_THREADS_CHECK_INTER, &acl_var_threads_check_inter, 0, 0 },
+	{ ACL_VAR_THREADS_BUF_SIZE, ACL_DEF_THREADS_BUF_SIZE,
+		&acl_var_threads_buf_size, 0, 0 },
+	{ ACL_VAR_THREADS_RW_TIMEOUT, ACL_DEF_THREADS_RW_TIMEOUT,
+		&acl_var_threads_rw_timeout, 0, 0 },
+	{ ACL_VAR_THREADS_POOL_LIMIT, ACL_DEF_THREADS_POOL_LIMIT,
+		&acl_var_threads_pool_limit, 0, 0 },
+	{ ACL_VAR_THREADS_THREAD_STACKSIZE, ACL_DEF_THREADS_THREAD_STACKSIZE,
+		&acl_var_threads_thread_stacksize, 0, 0 },
+	{ ACL_VAR_THREADS_THREAD_IDLE, ACL_DEF_THREADS_THREAD_IDLE,
+		&acl_var_threads_thread_idle, 0, 0 },
+	{ ACL_VAR_THREADS_IDLE_LIMIT, ACL_DEF_THREADS_IDLE_LIMIT,
+		&acl_var_threads_idle_limit, 0, 0 },
+	{ ACL_VAR_THREADS_DELAY_SEC, ACL_DEF_THREADS_DELAY_SEC,
+		&acl_var_threads_delay_sec, 0, 0 },
+	{ ACL_VAR_THREADS_DELAY_USEC, ACL_DEF_THREADS_DELAY_USEC,
+		&acl_var_threads_delay_usec, 0, 0 },
+	{ ACL_VAR_THREADS_DAEMON_TIMEOUT, ACL_DEF_THREADS_DAEMON_TIMEOUT,
+		&acl_var_threads_daemon_timeout, 0, 0 },
+	{ ACL_VAR_THREADS_USE_LIMIT, ACL_DEF_THREADS_USE_LIMIT,
+		&acl_var_threads_use_limit, 0, 0 },
+	{ ACL_VAR_THREADS_MASTER_MAXPROC, ACL_DEF_THREADS_MASTER_MAXPROC,
+		&acl_var_threads_master_maxproc, 0, 0},
+	{ ACL_VAR_THREADS_MAX_ACCEPT, ACL_DEF_THREADS_MAX_ACCEPT,
+		&acl_var_threads_max_accept, 0, 0 },
+	{ ACL_VAR_THREADS_ENABLE_DOG, ACL_DEF_THREADS_ENABLE_DOG,
+		&acl_var_threads_enable_dog, 0, 0 },
+	{ ACL_VAR_THREADS_QUICK_ABORT, ACL_DEF_THREADS_QUICK_ABORT,
+		&acl_var_threads_quick_abort, 0, 0 },
+	{ ACL_VAR_THREADS_ENABLE_CORE, ACL_DEF_THREADS_ENABLE_CORE,
+		&acl_var_threads_enable_core, 0, 0 },
+	{ ACL_VAR_THREADS_MAX_DEBUG, ACL_DEF_THREADS_MAX_DEBUG,
+		&acl_var_threads_max_debug, 0, 0 },
+	{ ACL_VAR_THREADS_STATUS_NOTIFY, ACL_DEF_THREADS_STATUS_NOTIFY,
+		&acl_var_threads_status_notify, 0, 0 },
+	{ ACL_VAR_THREADS_BATADD, ACL_DEF_THREADS_BATADD,
+		&acl_var_threads_batadd, 0, 0 },
+	{ ACL_VAR_THREADS_QLEN_WARN, ACL_DEF_THREADS_QLEN_WARN,
+		&acl_var_threads_qlen_warn, 0, 0 },
+	{ ACL_VAR_THREADS_SCHEDULE_WARN, ACL_DEF_THREADS_SCHEDULE_WARN,
+		&acl_var_threads_schedule_warn, 0, 0 },
+	{ ACL_VAR_THREADS_SCHEDULE_WAIT, ACL_DEF_THREADS_SCHEDULE_WAIT,
+		&acl_var_threads_schedule_wait, 0, 0 },
+	{ ACL_VAR_THREADS_CHECK_INTER, ACL_DEF_THREADS_CHECK_INTER,
+		&acl_var_threads_check_inter, 0, 0 },
 
         { 0, 0, 0, 0, 0 },
 };
@@ -129,14 +144,22 @@ char *acl_var_threads_dispatch_addr;
 char *acl_var_threads_dispatch_type;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
-	{ ACL_VAR_THREADS_QUEUE_DIR, ACL_DEF_THREADS_QUEUE_DIR, &acl_var_threads_queue_dir },
-	{ ACL_VAR_THREADS_OWNER, ACL_DEF_THREADS_OWNER, &acl_var_threads_owner },
-	{ ACL_VAR_THREADS_EVENT_MODE, ACL_DEF_THREADS_EVENT_MODE, &acl_var_threads_event_mode },
-	{ ACL_VAR_THREADS_LOG_DEBUG, ACL_DEF_THREADS_LOG_DEBUG, &acl_var_threads_log_debug },
-	{ ACL_VAR_THREADS_DENY_BANNER, ACL_DEF_THREADS_DENY_BANNER, &acl_var_threads_deny_banner },
-	{ ACL_VAR_THREADS_ACCESS_ALLOW, ACL_DEF_THREADS_ACCESS_ALLOW, &acl_var_threads_access_allow },
-	{ ACL_VAR_THREADS_DISPATCH_ADDR, ACL_DEF_THREADS_DISPATCH_ADDR, &acl_var_threads_dispatch_addr },
-	{ ACL_VAR_THREADS_DISPATCH_TYPE, ACL_DEF_THREADS_DISPATCH_TYPE, &acl_var_threads_dispatch_type },
+	{ ACL_VAR_THREADS_QUEUE_DIR, ACL_DEF_THREADS_QUEUE_DIR,
+		&acl_var_threads_queue_dir },
+	{ ACL_VAR_THREADS_OWNER, ACL_DEF_THREADS_OWNER,
+		&acl_var_threads_owner },
+	{ ACL_VAR_THREADS_EVENT_MODE, ACL_DEF_THREADS_EVENT_MODE,
+		&acl_var_threads_event_mode },
+	{ ACL_VAR_THREADS_LOG_DEBUG, ACL_DEF_THREADS_LOG_DEBUG,
+		&acl_var_threads_log_debug },
+	{ ACL_VAR_THREADS_DENY_BANNER, ACL_DEF_THREADS_DENY_BANNER,
+		&acl_var_threads_deny_banner },
+	{ ACL_VAR_THREADS_ACCESS_ALLOW, ACL_DEF_THREADS_ACCESS_ALLOW,
+		&acl_var_threads_access_allow },
+	{ ACL_VAR_THREADS_DISPATCH_ADDR, ACL_DEF_THREADS_DISPATCH_ADDR,
+		&acl_var_threads_dispatch_addr },
+	{ ACL_VAR_THREADS_DISPATCH_TYPE, ACL_DEF_THREADS_DISPATCH_TYPE,
+		&acl_var_threads_dispatch_type },
 
         { 0, 0, 0 },
 };
@@ -158,8 +181,6 @@ static ACL_VSTREAM **__sstreams;
 static time_t __last_closing_time = 0;
 static acl_pthread_mutex_t __closing_time_mutex;
 static acl_pthread_mutex_t __counter_mutex;
-
-static unsigned __server_generation;
 
 static void *__service_ctx;
 static char  __service_name[256];
@@ -335,9 +356,6 @@ static void server_exit(void)
 			acl_event_free(__event);
 		if (__threads)
 			acl_pthread_pool_destroy(__threads);
-#ifdef ACL_UNIX
-		acl_master_vars_end();
-#endif
 	}
 
 	acl_free_app_conf_str_table(__conf_str_tab);
@@ -372,9 +390,6 @@ static void server_exiting(int type acl_unused, ACL_EVENT *event, void *ctx)
 		listen_cleanup(event);
 
 #ifdef ACL_UNIX
-		/* 通知 acl_master 框架，本进程不再接收新连接 */
-		acl_master_notify(acl_var_threads_pid, __server_generation,
-				ACL_MASTER_STAT_TAKEN);
 		/* 关闭与 TCP 连接派发器 master_dispatch 的通道 */
 		dispatch_close(event);
 #endif /* ACL_UNIX */
@@ -635,16 +650,6 @@ static void client_open(ACL_EVENT *event, acl_pthread_pool_t *threads,
 	 */
 	acl_vstream_add_close_handle(stream, decrease_counter_callback, NULL);
 
-#ifdef ACL_UNIX
-	if (acl_var_threads_status_notify && acl_var_threads_master_maxproc > 1
-	    && acl_master_notify(acl_var_threads_pid, __server_generation,
-		ACL_MASTER_STAT_TAKEN) < 0)
-	{
-		server_abort(ACL_EVENT_NULL_TYPE, event, stream,
-			ACL_EVENT_NULL_CONTEXT);
-	}
-#endif
-
 	/* create one job running in one thread*/
 	ctx = create_job(event, threads, stream);
 	if (ctx->serv_accept != NULL && ctx->serv_accept(stream) < 0) {
@@ -655,16 +660,6 @@ static void client_open(ACL_EVENT *event, acl_pthread_pool_t *threads,
 		ctx->event_type = ACL_EVENT_ACCEPT;
 		acl_pthread_pool_add_job(ctx->threads, ctx->job);
 	}
-
-#ifdef ACL_UNIX
-	if (acl_var_threads_status_notify && acl_var_threads_master_maxproc > 1
-	    && acl_master_notify(acl_var_threads_pid, __server_generation,
-		ACL_MASTER_STAT_AVAIL) < 0)
-	{
-		server_abort(ACL_EVENT_NULL_TYPE, event, stream,
-			ACL_EVENT_NULL_CONTEXT);
-	}
-#endif
 }
 
 void acl_threads_server_enable_read(ACL_EVENT *event,
@@ -824,10 +819,6 @@ static void server_init(const char *procname)
 
 	acl_get_app_conf_int_table(__conf_int_tab);
 	acl_get_app_conf_str_table(__conf_str_tab);
-
-#ifdef ACL_UNIX
-	acl_master_vars_init(acl_var_threads_buf_size, acl_var_threads_rw_timeout);
-#endif
 
 	if (__deny_info == NULL)
 		__deny_info = acl_var_threads_deny_banner;
@@ -1107,11 +1098,13 @@ static acl_pthread_pool_t *threads_create(ACL_MASTER_SERVER_THREAD_INIT_FN init_
 
 #ifdef ACL_UNIX
 
+
 static ACL_VSTREAM **server_daemon_open(ACL_EVENT *event,
 	acl_pthread_pool_t *threads, int count, int fdtype)
 {
 	const char *myname = "server_daemon_open";
 	ACL_VSTREAM *stream, **streams;
+	ACL_VSTREAM *stat_stream;
 	ACL_SOCKET fd;
 	int i;
 
@@ -1142,8 +1135,10 @@ static ACL_VSTREAM **server_daemon_open(ACL_EVENT *event,
 		streams[i++] = stream;
 	}
 
-	acl_event_enable_read(event, ACL_MASTER_STAT_STREAM, 0,
-		server_abort, threads);
+	stat_stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
+		O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
+
+	acl_event_enable_read(event, stat_stream, 0, server_abort, threads);
 
 	acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
@@ -1192,17 +1187,8 @@ static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
 
 static void usage(int argc, char * argv[])
 {
-	int   i;
-	const char *service_name;
-
 	if (argc <= 0)
-		acl_msg_fatal("%s(%d): argc(%d) invalid",
-			__FILE__, __LINE__, argc);
-
-	service_name = acl_safe_basename(argv[0]);
-
-	for (i = 0; i < argc; i++)
-		acl_msg_info("argv[%d]: %s", i, argv[i]);
+		acl_msg_fatal("%s(%d): argc %d", __FILE__, __LINE__, argc);
 
 	acl_msg_info("usage: %s -h[help]"
 		" -c [use chroot]"
@@ -1212,8 +1198,7 @@ static void usage(int argc, char * argv[])
 		" -u [use setgid initgroups setuid]"
 		" -v [on acl_msg_verbose]"
 		" -f conf_file"
-		" -L listen_addrs",
-		service_name);
+		" -L listen_addrs", argv[0]);
 }
 
 /* acl_threads_server_main - the real main program */
@@ -1222,10 +1207,9 @@ void acl_threads_server_main(int argc, char * argv[],
 	ACL_THREADS_SERVER_FN service, void *service_ctx, int name, ...)
 {
 	const char *myname = "acl_threads_server_main";
-	char *root_dir = NULL, *user = NULL, *addrs = NULL;
+	char *root_dir = NULL, *user = NULL, *addrs = NULL, conf_file[1024];
 	const char *service_name = acl_safe_basename(argv[0]);
 	int   c, fdtype = 0, event_mode, socket_count = 1;
-	char *generation, conf_file[1024];
 	void *thread_init_ctx = NULL, *thread_exit_ctx = NULL;
 	ACL_MASTER_SERVER_INIT_FN pre_jail = NULL;
 	ACL_MASTER_SERVER_INIT_FN post_init = NULL;
@@ -1402,21 +1386,6 @@ void acl_threads_server_main(int argc, char * argv[],
 
 	/*******************************************************************/
 
-#ifdef ACL_UNIX
-	/* Retrieve process generation from environment. */
-	if ((generation = getenv(ACL_MASTER_GEN_NAME)) != 0) {
-		if (!acl_alldig(generation))
-			acl_msg_fatal("bad generation: %s", generation);
-		sscanf(generation, "%o", &__server_generation);
-		if (acl_msg_verbose)
-			acl_msg_info("process generation: %s (%o)",
-				generation, __server_generation);
-	}
-#else
-	(void) generation;
-	__server_generation = 0;
-#endif
-
 	/* Set up call-back info. */
 	__service_main = service;
 	__service_ctx = service_ctx;
@@ -1485,7 +1454,4 @@ void acl_threads_server_main(int argc, char * argv[],
 
 	while (1)
 		acl_event_loop(__event);
-
-	/* not reached here */
-	/* server_exit(); */
 }

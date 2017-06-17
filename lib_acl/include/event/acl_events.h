@@ -330,6 +330,20 @@ ACL_API void acl_event_set_delay_sec(ACL_EVENT *eventp, int sec);
 ACL_API void acl_event_set_delay_usec(ACL_EVENT *eventp, int usec);
 
 /**
+ * 获得事件循环的空闲休息时间中的秒级数值
+ * @param eventp {ACL_EVENT*} 事件对象指针, 不为能为空
+ * @return {int} 秒级空闲休息时间值
+ */
+ACL_API int acl_event_get_delay_sec(ACL_EVENT *eventp);
+
+/**
+ * 获得事件循环的空闲休息时间中的微秒级数值
+ * @param eventp {ACL_EVENT*} 事件对象指针, 不为能为空
+ * @return {int} 微秒级空闲休息时间值
+ */
+ACL_API int acl_event_get_delay_usec(ACL_EVENT *eventp);
+
+/**
  * 是否采用线程事件方式
  * @param eventp {ACL_EVENT*} 事件对象指针, 不为能为空
  * @return {int} 0: 否; !=0: 是

@@ -27,7 +27,13 @@ void acl_aio_check(ACL_AIO *aio)
 
 void acl_aio_free(ACL_AIO *aio)
 {
-	acl_event_free(aio->event);
+	acl_aio_free2(aio, 0);
+}
+
+void acl_aio_free2(ACL_AIO *aio, int keep)
+{
+	if (!keep && aio->event)
+		acl_event_free(aio->event);
 	acl_array_free(aio->dead_streams, NULL);
 	acl_myfree(aio);
 }
@@ -40,43 +46,46 @@ ACL_AIO *acl_aio_create(int event_mode)
 ACL_AIO *acl_aio_create2(int event_mode, unsigned int nMsg)
 {
 	const char *myname = "acl_aio_create";
-	char  ebuf[256];
-	ACL_AIO *aio;
-
-	aio = acl_mycalloc(1, sizeof(ACL_AIO));
-	if (aio == NULL)
-		acl_msg_fatal("%s: calloc error(%s)",
-			myname, acl_last_strerror(ebuf, sizeof(ebuf)));
-
-#ifdef ACL_WINDOWS
-	aio->tid = acl_pthread_self();
-#endif
-
-	aio->delay_sec  = 1;
-	aio->delay_usec = 0;
-	aio->keep_read  = 1;
-	aio->rbuf_size  = 8192;
-	aio->event_mode = event_mode;
+	ACL_EVENT *event;
 
 	switch (event_mode) {
 	case ACL_EVENT_KERNEL:
-		aio->event = acl_event_new_kernel(aio->delay_sec, aio->delay_usec);
+		event = acl_event_new_kernel(1, 0);
 		break;
 	case ACL_EVENT_SELECT:
-		aio->event = acl_event_new_select(aio->delay_sec, aio->delay_usec);
+		event = acl_event_new_select(1, 0);
 		break;
 	case ACL_EVENT_POLL:
-		aio->event = acl_event_new_poll(aio->delay_sec, aio->delay_usec);
+		event = acl_event_new_poll(1, 0);
 		break;
 	case ACL_EVENT_WMSG:
-		aio->event = acl_event_new_wmsg(nMsg);
+		event = acl_event_new_wmsg(nMsg);
 		break;
 	default:
 		acl_msg_fatal("%s(%d): event_mode(%d) not support",
 			myname, __LINE__, event_mode);
+		event = NULL; /* avoid compiling warning */
 		break;
 	}
+
+	return acl_aio_create3(event);
+}
+
+ACL_AIO *acl_aio_create3(ACL_EVENT *event)
+{
+	ACL_AIO *aio = acl_mycalloc(1, sizeof(ACL_AIO));
+
+#ifdef ACL_WINDOWS
+	aio->tid          = acl_pthread_self();
+#endif
+	aio->event        = event;
+	aio->delay_sec    = acl_event_get_delay_sec(event);
+	aio->delay_usec   = acl_event_get_delay_usec(event);
+	aio->keep_read    = 1;
+	aio->rbuf_size    = 8192;
+	aio->event_mode   = acl_event_mode(event);
 	aio->dead_streams = acl_array_create(aio->event->fdsize);
+
 	return aio;
 }
 

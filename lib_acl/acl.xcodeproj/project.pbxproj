@@ -66,29 +66,10 @@
 		0779D5051DBE073000449438 /* acl_json.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3AD1DBE070E00449438 /* acl_json.c */; };
 		0779D5061DBE073000449438 /* acl_json_parse.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3AE1DBE070E00449438 /* acl_json_parse.c */; };
 		0779D5071DBE073000449438 /* acl_json_util.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3AF1DBE070E00449438 /* acl_json_util.c */; };
-		0779D5081DBE073000449438 /* master.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3B21DBE070E00449438 /* master.c */; };
-		0779D50A1DBE073000449438 /* master_avail.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3B51DBE070E00449438 /* master_avail.c */; };
-		0779D50B1DBE073000449438 /* master_conf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3B61DBE070E00449438 /* master_conf.c */; };
-		0779D50C1DBE073000449438 /* master_ent.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3B71DBE070E00449438 /* master_ent.c */; };
-		0779D50D1DBE073000449438 /* master_listen.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3B81DBE070E00449438 /* master_listen.c */; };
-		0779D50E1DBE073000449438 /* master_pathname.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3B91DBE070E00449438 /* master_pathname.c */; };
-		0779D5101DBE073000449438 /* master_service.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3BB1DBE070E00449438 /* master_service.c */; };
-		0779D5111DBE073000449438 /* master_sig.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3BC1DBE070E00449438 /* master_sig.c */; };
-		0779D5121DBE073000449438 /* master_spawn.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3BD1DBE070E00449438 /* master_spawn.c */; };
-		0779D5131DBE073000449438 /* master_status.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3BE1DBE070E00449438 /* master_status.c */; };
-		0779D5141DBE073000449438 /* master_wakeup.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3BF1DBE070E00449438 /* master_wakeup.c */; };
-		0779D5151DBE073000449438 /* master_warning.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3C01DBE070E00449438 /* master_warning.c */; };
-		0779D5161DBE073000449438 /* fifo_trigger.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3C21DBE070E00449438 /* fifo_trigger.c */; };
-		0779D5171DBE073000449438 /* inet_trigger.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3C31DBE070E00449438 /* inet_trigger.c */; };
-		0779D5181DBE073000449438 /* stream_trigger.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3C41DBE070E00449438 /* stream_trigger.c */; };
-		0779D51A1DBE073000449438 /* unix_trigger.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3C61DBE070E00449438 /* unix_trigger.c */; };
-		0779D51B1DBE073000449438 /* master_flow.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3C71DBE070E00449438 /* master_flow.c */; };
-		0779D51D1DBE073000449438 /* master_params.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3C91DBE070E00449438 /* master_params.c */; };
-		0779D51F1DBE073000449438 /* master_proto.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3CB1DBE070E00449438 /* master_proto.c */; };
-		0779D5211DBE073000449438 /* master_vars.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3CD1DBE070E00449438 /* master_vars.c */; };
+		0779D51B1DBE073000449438 /* acl_master_flow.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3C71DBE070E00449438 /* acl_master_flow.c */; };
+		0779D51D1DBE073000449438 /* acl_master_params.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3C91DBE070E00449438 /* acl_master_params.c */; };
+		0779D51F1DBE073000449438 /* acl_master_proto.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3CB1DBE070E00449438 /* acl_master_proto.c */; };
 		0779D5221DBE073000449438 /* acl_aio_server.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3CF1DBE070E00449438 /* acl_aio_server.c */; };
-		0779D5231DBE073000449438 /* acl_ioctl_server.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3D01DBE070E00449438 /* acl_ioctl_server.c */; };
-		0779D5241DBE073000449438 /* acl_multi_server.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3D11DBE070E00449438 /* acl_multi_server.c */; };
 		0779D5251DBE073000449438 /* acl_single_server.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3D21DBE070E00449438 /* acl_single_server.c */; };
 		0779D5261DBE073000449438 /* acl_threads_server.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3D31DBE070E00449438 /* acl_threads_server.c */; };
 		0779D5271DBE073000449438 /* acl_trigger_server.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3D41DBE070E00449438 /* acl_trigger_server.c */; };
@@ -339,29 +320,10 @@
 		0779D3AD1DBE070E00449438 /* acl_json.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_json.c; sourceTree = "<group>"; };
 		0779D3AE1DBE070E00449438 /* acl_json_parse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_json_parse.c; sourceTree = "<group>"; };
 		0779D3AF1DBE070E00449438 /* acl_json_util.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_json_util.c; sourceTree = "<group>"; };
-		0779D3B21DBE070E00449438 /* master.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master.c; sourceTree = "<group>"; };
-		0779D3B51DBE070E00449438 /* master_avail.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_avail.c; sourceTree = "<group>"; };
-		0779D3B61DBE070E00449438 /* master_conf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_conf.c; sourceTree = "<group>"; };
-		0779D3B71DBE070E00449438 /* master_ent.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_ent.c; sourceTree = "<group>"; };
-		0779D3B81DBE070E00449438 /* master_listen.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_listen.c; sourceTree = "<group>"; };
-		0779D3B91DBE070E00449438 /* master_pathname.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_pathname.c; sourceTree = "<group>"; };
-		0779D3BB1DBE070E00449438 /* master_service.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_service.c; sourceTree = "<group>"; };
-		0779D3BC1DBE070E00449438 /* master_sig.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_sig.c; sourceTree = "<group>"; };
-		0779D3BD1DBE070E00449438 /* master_spawn.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_spawn.c; sourceTree = "<group>"; };
-		0779D3BE1DBE070E00449438 /* master_status.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_status.c; sourceTree = "<group>"; };
-		0779D3BF1DBE070E00449438 /* master_wakeup.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_wakeup.c; sourceTree = "<group>"; };
-		0779D3C01DBE070E00449438 /* master_warning.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_warning.c; sourceTree = "<group>"; };
-		0779D3C21DBE070E00449438 /* fifo_trigger.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = fifo_trigger.c; sourceTree = "<group>"; };
-		0779D3C31DBE070E00449438 /* inet_trigger.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = inet_trigger.c; sourceTree = "<group>"; };
-		0779D3C41DBE070E00449438 /* stream_trigger.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stream_trigger.c; sourceTree = "<group>"; };
-		0779D3C61DBE070E00449438 /* unix_trigger.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = unix_trigger.c; sourceTree = "<group>"; };
-		0779D3C71DBE070E00449438 /* master_flow.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_flow.c; sourceTree = "<group>"; };
-		0779D3C91DBE070E00449438 /* master_params.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_params.c; sourceTree = "<group>"; };
-		0779D3CB1DBE070E00449438 /* master_proto.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_proto.c; sourceTree = "<group>"; };
-		0779D3CD1DBE070E00449438 /* master_vars.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = master_vars.c; sourceTree = "<group>"; };
+		0779D3C71DBE070E00449438 /* acl_master_flow.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_master_flow.c; sourceTree = "<group>"; };
+		0779D3C91DBE070E00449438 /* acl_master_params.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_master_params.c; sourceTree = "<group>"; };
+		0779D3CB1DBE070E00449438 /* acl_master_proto.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_master_proto.c; sourceTree = "<group>"; };
 		0779D3CF1DBE070E00449438 /* acl_aio_server.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_aio_server.c; sourceTree = "<group>"; };
-		0779D3D01DBE070E00449438 /* acl_ioctl_server.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_ioctl_server.c; sourceTree = "<group>"; };
-		0779D3D11DBE070E00449438 /* acl_multi_server.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_multi_server.c; sourceTree = "<group>"; };
 		0779D3D21DBE070E00449438 /* acl_single_server.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_single_server.c; sourceTree = "<group>"; };
 		0779D3D31DBE070E00449438 /* acl_threads_server.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_threads_server.c; sourceTree = "<group>"; };
 		0779D3D41DBE070E00449438 /* acl_trigger_server.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_trigger_server.c; sourceTree = "<group>"; };
@@ -560,11 +522,11 @@
 		07A4696B1E6FD4FA002C9B3C /* lib_acl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lib_acl.h; sourceTree = "<group>"; };
 		07A4696C1E6FD4FA002C9B3C /* lib_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lib_util.h; sourceTree = "<group>"; };
 		07A4696E1E6FD4FA002C9B3C /* acl_aio_params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_aio_params.h; sourceTree = "<group>"; };
-		07A4696F1E6FD4FA002C9B3C /* acl_ioctl_params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_ioctl_params.h; sourceTree = "<group>"; };
 		07A469701E6FD4FA002C9B3C /* acl_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_master.h; sourceTree = "<group>"; };
 		07A469711E6FD4FA002C9B3C /* acl_master_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_master_conf.h; sourceTree = "<group>"; };
+		07A469711E6FD4FA002C9B3C /* acl_master_flow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_master_flow.h; sourceTree = "<group>"; };
+		07A469711E6FD4FA002C9B3C /* acl_master_proto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_master_proto.h; sourceTree = "<group>"; };
 		07A469721E6FD4FA002C9B3C /* acl_master_type.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_master_type.h; sourceTree = "<group>"; };
-		07A469731E6FD4FA002C9B3C /* acl_multi_params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_multi_params.h; sourceTree = "<group>"; };
 		07A469741E6FD4FA002C9B3C /* acl_server_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_server_api.h; sourceTree = "<group>"; };
 		07A469751E6FD4FA002C9B3C /* acl_single_params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_single_params.h; sourceTree = "<group>"; };
 		07A469761E6FD4FA002C9B3C /* acl_threads_params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_threads_params.h; sourceTree = "<group>"; };
@@ -895,61 +857,18 @@
 		0779D3B01DBE070E00449438 /* master */ = {
 			isa = PBXGroup;
 			children = (
-				0779D3B11DBE070E00449438 /* daemon */,
-				0779D3B31DBE070E00449438 /* framework */,
-				0779D3C71DBE070E00449438 /* master_flow.c */,
-				0779D3C91DBE070E00449438 /* master_params.c */,
-				0779D3CB1DBE070E00449438 /* master_proto.c */,
-				0779D3CD1DBE070E00449438 /* master_vars.c */,
+				0779D3C71DBE070E00449438 /* acl_master_flow.c */,
+				0779D3C91DBE070E00449438 /* acl_master_params.c */,
+				0779D3CB1DBE070E00449438 /* acl_master_proto.c */,
 				0779D3CE1DBE070E00449438 /* template */,
 			);
 			path = master;
-			sourceTree = "<group>";
-		};
-		0779D3B11DBE070E00449438 /* daemon */ = {
-			isa = PBXGroup;
-			children = (
-				0779D3B21DBE070E00449438 /* master.c */,
-			);
-			path = daemon;
-			sourceTree = "<group>";
-		};
-		0779D3B31DBE070E00449438 /* framework */ = {
-			isa = PBXGroup;
-			children = (
-				0779D3B51DBE070E00449438 /* master_avail.c */,
-				0779D3B61DBE070E00449438 /* master_conf.c */,
-				0779D3B71DBE070E00449438 /* master_ent.c */,
-				0779D3B81DBE070E00449438 /* master_listen.c */,
-				0779D3B91DBE070E00449438 /* master_pathname.c */,
-				0779D3BB1DBE070E00449438 /* master_service.c */,
-				0779D3BC1DBE070E00449438 /* master_sig.c */,
-				0779D3BD1DBE070E00449438 /* master_spawn.c */,
-				0779D3BE1DBE070E00449438 /* master_status.c */,
-				0779D3BF1DBE070E00449438 /* master_wakeup.c */,
-				0779D3C01DBE070E00449438 /* master_warning.c */,
-				0779D3C11DBE070E00449438 /* trigger */,
-			);
-			path = framework;
-			sourceTree = "<group>";
-		};
-		0779D3C11DBE070E00449438 /* trigger */ = {
-			isa = PBXGroup;
-			children = (
-				0779D3C21DBE070E00449438 /* fifo_trigger.c */,
-				0779D3C31DBE070E00449438 /* inet_trigger.c */,
-				0779D3C41DBE070E00449438 /* stream_trigger.c */,
-				0779D3C61DBE070E00449438 /* unix_trigger.c */,
-			);
-			path = trigger;
 			sourceTree = "<group>";
 		};
 		0779D3CE1DBE070E00449438 /* template */ = {
 			isa = PBXGroup;
 			children = (
 				0779D3CF1DBE070E00449438 /* acl_aio_server.c */,
-				0779D3D01DBE070E00449438 /* acl_ioctl_server.c */,
-				0779D3D11DBE070E00449438 /* acl_multi_server.c */,
 				0779D3D21DBE070E00449438 /* acl_single_server.c */,
 				0779D3D31DBE070E00449438 /* acl_threads_server.c */,
 				0779D3D41DBE070E00449438 /* acl_trigger_server.c */,
@@ -1388,11 +1307,11 @@
 			isa = PBXGroup;
 			children = (
 				07A4696E1E6FD4FA002C9B3C /* acl_aio_params.h */,
-				07A4696F1E6FD4FA002C9B3C /* acl_ioctl_params.h */,
 				07A469701E6FD4FA002C9B3C /* acl_master.h */,
 				07A469711E6FD4FA002C9B3C /* acl_master_conf.h */,
+				07A469711E6FD4FA002C9B3C /* acl_master_flow.h */,
+				07A469711E6FD4FA002C9B3C /* acl_master_proto.h */,
 				07A469721E6FD4FA002C9B3C /* acl_master_type.h */,
-				07A469731E6FD4FA002C9B3C /* acl_multi_params.h */,
 				07A469741E6FD4FA002C9B3C /* acl_server_api.h */,
 				07A469751E6FD4FA002C9B3C /* acl_single_params.h */,
 				07A469761E6FD4FA002C9B3C /* acl_threads_params.h */,
@@ -1691,29 +1610,10 @@
 				0779D5051DBE073000449438 /* acl_json.c in Sources */,
 				0779D5061DBE073000449438 /* acl_json_parse.c in Sources */,
 				0779D5071DBE073000449438 /* acl_json_util.c in Sources */,
-				0779D5081DBE073000449438 /* master.c in Sources */,
-				0779D50A1DBE073000449438 /* master_avail.c in Sources */,
-				0779D50B1DBE073000449438 /* master_conf.c in Sources */,
-				0779D50C1DBE073000449438 /* master_ent.c in Sources */,
-				0779D50D1DBE073000449438 /* master_listen.c in Sources */,
-				0779D50E1DBE073000449438 /* master_pathname.c in Sources */,
-				0779D5101DBE073000449438 /* master_service.c in Sources */,
-				0779D5111DBE073000449438 /* master_sig.c in Sources */,
-				0779D5121DBE073000449438 /* master_spawn.c in Sources */,
-				0779D5131DBE073000449438 /* master_status.c in Sources */,
-				0779D5141DBE073000449438 /* master_wakeup.c in Sources */,
-				0779D5151DBE073000449438 /* master_warning.c in Sources */,
-				0779D5161DBE073000449438 /* fifo_trigger.c in Sources */,
-				0779D5171DBE073000449438 /* inet_trigger.c in Sources */,
-				0779D5181DBE073000449438 /* stream_trigger.c in Sources */,
-				0779D51A1DBE073000449438 /* unix_trigger.c in Sources */,
-				0779D51B1DBE073000449438 /* master_flow.c in Sources */,
-				0779D51D1DBE073000449438 /* master_params.c in Sources */,
-				0779D51F1DBE073000449438 /* master_proto.c in Sources */,
-				0779D5211DBE073000449438 /* master_vars.c in Sources */,
+				0779D51B1DBE073000449438 /* acl_master_flow.c in Sources */,
+				0779D51D1DBE073000449438 /* acl_master_params.c in Sources */,
+				0779D51F1DBE073000449438 /* acl_master_proto.c in Sources */,
 				0779D5221DBE073000449438 /* acl_aio_server.c in Sources */,
-				0779D5231DBE073000449438 /* acl_ioctl_server.c in Sources */,
-				0779D5241DBE073000449438 /* acl_multi_server.c in Sources */,
 				0779D5251DBE073000449438 /* acl_single_server.c in Sources */,
 				0779D5261DBE073000449438 /* acl_threads_server.c in Sources */,
 				0779D5271DBE073000449438 /* acl_trigger_server.c in Sources */,

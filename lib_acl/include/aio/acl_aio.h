@@ -200,10 +200,24 @@ ACL_API ACL_AIO *acl_aio_create(int event_mode);
 ACL_API ACL_AIO *acl_aio_create2(int event_mode, unsigned int nMsg);
 
 /**
- * 释放一个异步通信异步框架实例句柄
+ * 根据事件引擎句柄创建异步对象句柄
+ * @param event {ACL_EVENT *}
+ * @return {ACL_AIO *}
+ */
+ACL_API ACL_AIO *acl_aio_create3(ACL_EVENT *event);
+
+/**
+ * 释放一个异步通信异步框架实例句柄，同时会释放掉非空的 aio->event 对象
  * @param aio {ACL_AIO*} 异步框架引擎句柄
  */
 ACL_API void acl_aio_free(ACL_AIO *aio);
+
+/**
+ * 释放一个异步通信异步框架实例句柄
+ * @param keep {int} 是否同时释放掉 aio 所绑定的 event 事件句柄
+ * @param aio {ACL_AIO*} 异步框架引擎句柄
+ */
+ACL_API void acl_aio_free2(ACL_AIO *aio, int keep);
 
 /**
  * 异步IO消息循环(仅在单线程模式下调用)

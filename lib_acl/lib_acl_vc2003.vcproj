@@ -1091,37 +1091,19 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Name="master"
 				Filter="">
 				<File
-					RelativePath=".\src\master\master_flow.c">
+					RelativePath=".\src\master\acl_master_flow.c">
 				</File>
 				<File
-					RelativePath=".\src\master\master_flow.h">
+					RelativePath=".\src\master\acl_master_params.c">
 				</File>
 				<File
-					RelativePath=".\src\master\master_params.c">
-				</File>
-				<File
-					RelativePath=".\src\master\master_params.h">
-				</File>
-				<File
-					RelativePath=".\src\master\master_proto.c">
-				</File>
-				<File
-					RelativePath=".\src\master\master_proto.h">
-				</File>
-				<File
-					RelativePath=".\src\master\master_vars.c">
+					RelativePath=".\src\master\acl_master_proto.c">
 				</File>
 				<Filter
 					Name="template"
 					Filter="">
 					<File
 						RelativePath=".\src\master\template\acl_aio_server.c">
-					</File>
-					<File
-						RelativePath=".\src\master\template\acl_ioctl_server.c">
-					</File>
-					<File
-						RelativePath=".\src\master\template\acl_multi_server.c">
 					</File>
 					<File
 						RelativePath=".\src\master\template\acl_single_server.c">
@@ -1140,72 +1122,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					</File>
 					<File
 						RelativePath=".\src\master\template\master_log.h">
-					</File>
-				</Filter>
-				<Filter
-					Name="framework"
-					Filter="">
-					<File
-						RelativePath=".\src\master\framework\master.h">
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_avail.c">
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_conf.c">
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_ent.c">
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_listen.c">
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_pathname.c">
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_pathname.h">
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_service.c">
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_sig.c">
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_spawn.c">
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_status.c">
-					</File>
-					<File
-						RelativePath=".\src\master\framework\master_wakeup.c">
-					</File>
-					<Filter
-						Name="trigger"
-						Filter="">
-						<File
-							RelativePath=".\src\master\framework\trigger\fifo_trigger.c">
-						</File>
-						<File
-							RelativePath=".\src\master\framework\trigger\inet_trigger.c">
-						</File>
-						<File
-							RelativePath=".\src\master\framework\trigger\stream_trigger.c">
-						</File>
-						<File
-							RelativePath=".\src\master\framework\trigger\trigger.h">
-						</File>
-						<File
-							RelativePath=".\src\master\framework\trigger\unix_trigger.c">
-						</File>
-					</Filter>
-				</Filter>
-				<Filter
-					Name="daemon"
-					Filter="">
-					<File
-						RelativePath=".\src\master\daemon\master.c">
 					</File>
 				</Filter>
 			</Filter>
@@ -1808,19 +1724,19 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\master\acl_aio_params.h">
 				</File>
 				<File
-					RelativePath=".\include\master\acl_ioctl_params.h">
-				</File>
-				<File
 					RelativePath=".\include\master\acl_master.h">
 				</File>
 				<File
 					RelativePath=".\include\master\acl_master_conf.h">
 				</File>
 				<File
-					RelativePath=".\include\master\acl_master_type.h">
+					RelativePath=".\include\master\acl_master_flow.h">
 				</File>
 				<File
-					RelativePath=".\include\master\acl_multi_params.h">
+					RelativePath=".\include\master\acl_master_proto.h">
+				</File>
+				<File
+					RelativePath=".\include\master\acl_master_type.h">
 				</File>
 				<File
 					RelativePath=".\include\master\acl_server_api.h">

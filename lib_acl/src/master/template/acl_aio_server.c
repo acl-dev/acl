@@ -50,15 +50,10 @@
 #include "event/acl_events.h"
 #include "aio/acl_aio.h"
 
-/* Global library. */
-
-#include "../master_flow.h"
-
-/* Process manager. */
-#include "../master_proto.h"
-#include "../master_params.h"
-
 /* Application-specific */
+
+#include "master/acl_master_flow.h"
+#include "master/acl_master_proto.h"
 #include "master/acl_aio_params.h"
 #include "master/acl_server_api.h"
 #include "master_log.h"
@@ -85,24 +80,42 @@ int   acl_var_aio_max_debug;
 int   acl_var_aio_status_notify;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
-        { ACL_VAR_AIO_BUF_SIZE, ACL_DEF_AIO_BUF_SIZE, &acl_var_aio_buf_size, 0, 0 },
-        { ACL_VAR_AIO_RW_TIMEOUT, ACL_DEF_AIO_RW_TIMEOUT, &acl_var_aio_rw_timeout, 0, 0 },
-        { ACL_VAR_AIO_IN_FLOW_DELAY, ACL_DEF_AIO_IN_FLOW_DELAY, &acl_var_aio_in_flow_delay, 0, 0 },
-	{ ACL_VAR_AIO_MAX_THREADS, ACL_DEF_AIO_MAX_THREADS, &acl_var_aio_max_threads, 0, 0},
-        { ACL_VAR_AIO_THREAD_IDLE_LIMIT, ACL_DEF_AIO_THREAD_IDLE_LIMIT, &acl_var_aio_thread_idle_limit, 0, 0 },
-        { ACL_VAR_AIO_IDLE_LIMIT, ACL_DEF_AIO_IDLE_LIMIT, &acl_var_aio_idle_limit, 0, 0 },
-        { ACL_VAR_AIO_DELAY_SEC, ACL_DEF_AIO_DELAY_SEC, &acl_var_aio_delay_sec, 0, 0 },
-        { ACL_VAR_AIO_DELAY_USEC, ACL_DEF_AIO_DELAY_USEC, &acl_var_aio_delay_usec, 0, 0 },
-        { ACL_VAR_AIO_DAEMON_TIMEOUT, ACL_DEF_AIO_DAEMON_TIMEOUT, &acl_var_aio_daemon_timeout, 0, 0 },
-        { ACL_VAR_AIO_USE_LIMIT, ACL_DEF_AIO_USE_LIMIT, &acl_var_aio_use_limit, 0, 0 },
-	{ ACL_VAR_AIO_MASTER_MAXPROC, ACL_DEF_AIO_MASTER_MAXPROC, &acl_var_aio_master_maxproc, 0, 0 },
-	{ ACL_VAR_AIO_MAX_ACCEPT, ACL_DEF_AIO_MAX_ACCEPT, &acl_var_aio_max_accept, 0, 0 },
-	{ ACL_VAR_AIO_MIN_NOTIFY, ACL_DEF_AIO_MIN_NOTIFY, &acl_var_aio_min_notify, 0, 0 },
-	{ ACL_VAR_AIO_QUICK_ABORT, ACL_DEF_AIO_QUICK_ABORT, &acl_var_aio_quick_abort, 0, 0 },
-	{ ACL_VAR_AIO_ENABLE_CORE, ACL_DEF_AIO_ENABLE_CORE, &acl_var_aio_enable_core, 0, 0 },
-	{ ACL_VAR_AIO_ACCEPT_TIMER, ACL_DEF_AIO_ACCEPT_TIMER, &acl_var_aio_accept_timer, 0, 0 },
-	{ ACL_VAR_AIO_MAX_DEBUG, ACL_DEF_AIO_MAX_DEBUG, &acl_var_aio_max_debug, 0, 0 },
-	{ ACL_VAR_AIO_STATUS_NOTIFY, ACL_DEF_AIO_STATUS_NOTIFY, &acl_var_aio_status_notify, 0, 0 },
+        { ACL_VAR_AIO_BUF_SIZE, ACL_DEF_AIO_BUF_SIZE,
+		&acl_var_aio_buf_size, 0, 0 },
+        { ACL_VAR_AIO_RW_TIMEOUT, ACL_DEF_AIO_RW_TIMEOUT,
+		&acl_var_aio_rw_timeout, 0, 0 },
+        { ACL_VAR_AIO_IN_FLOW_DELAY, ACL_DEF_AIO_IN_FLOW_DELAY,
+		&acl_var_aio_in_flow_delay, 0, 0 },
+	{ ACL_VAR_AIO_MAX_THREADS, ACL_DEF_AIO_MAX_THREADS,
+		&acl_var_aio_max_threads, 0, 0},
+        { ACL_VAR_AIO_THREAD_IDLE_LIMIT, ACL_DEF_AIO_THREAD_IDLE_LIMIT,
+		&acl_var_aio_thread_idle_limit, 0, 0 },
+        { ACL_VAR_AIO_IDLE_LIMIT, ACL_DEF_AIO_IDLE_LIMIT,
+		&acl_var_aio_idle_limit, 0, 0 },
+        { ACL_VAR_AIO_DELAY_SEC, ACL_DEF_AIO_DELAY_SEC,
+		&acl_var_aio_delay_sec, 0, 0 },
+        { ACL_VAR_AIO_DELAY_USEC, ACL_DEF_AIO_DELAY_USEC,
+		&acl_var_aio_delay_usec, 0, 0 },
+        { ACL_VAR_AIO_DAEMON_TIMEOUT, ACL_DEF_AIO_DAEMON_TIMEOUT,
+		&acl_var_aio_daemon_timeout, 0, 0 },
+        { ACL_VAR_AIO_USE_LIMIT, ACL_DEF_AIO_USE_LIMIT,
+		&acl_var_aio_use_limit, 0, 0 },
+	{ ACL_VAR_AIO_MASTER_MAXPROC, ACL_DEF_AIO_MASTER_MAXPROC,
+		&acl_var_aio_master_maxproc, 0, 0 },
+	{ ACL_VAR_AIO_MAX_ACCEPT, ACL_DEF_AIO_MAX_ACCEPT,
+		&acl_var_aio_max_accept, 0, 0 },
+	{ ACL_VAR_AIO_MIN_NOTIFY, ACL_DEF_AIO_MIN_NOTIFY,
+		&acl_var_aio_min_notify, 0, 0 },
+	{ ACL_VAR_AIO_QUICK_ABORT, ACL_DEF_AIO_QUICK_ABORT,
+		&acl_var_aio_quick_abort, 0, 0 },
+	{ ACL_VAR_AIO_ENABLE_CORE, ACL_DEF_AIO_ENABLE_CORE,
+		&acl_var_aio_enable_core, 0, 0 },
+	{ ACL_VAR_AIO_ACCEPT_TIMER, ACL_DEF_AIO_ACCEPT_TIMER,
+		&acl_var_aio_accept_timer, 0, 0 },
+	{ ACL_VAR_AIO_MAX_DEBUG, ACL_DEF_AIO_MAX_DEBUG,
+		&acl_var_aio_max_debug, 0, 0 },
+	{ ACL_VAR_AIO_STATUS_NOTIFY, ACL_DEF_AIO_STATUS_NOTIFY,
+		&acl_var_aio_status_notify, 0, 0 },
 
         { 0, 0, 0, 0, 0 },
 };
@@ -122,16 +135,26 @@ char *acl_var_aio_dispatch_type;
 char *acl_var_aio_deny_info;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
-        { ACL_VAR_AIO_QUEUE_DIR, ACL_DEF_AIO_QUEUE_DIR, &acl_var_aio_queue_dir },
-        { ACL_VAR_AIO_OWNER, ACL_DEF_AIO_OWNER, &acl_var_aio_owner },
-	{ ACL_VAR_AIO_PID_DIR, ACL_DEF_AIO_PID_DIR, &acl_var_aio_pid_dir },
-	{ ACL_VAR_AIO_ACCESS_ALLOW, ACL_DEF_AIO_ACCESS_ALLOW, &acl_var_aio_access_allow },
-        { ACL_VAR_AIO_EVENT_MODE, ACL_DEF_AIO_EVENT_MODE, &acl_var_aio_event_mode },
-	{ ACL_VAR_AIO_ACCEPT_ALONE, ACL_DEF_AIO_ACCEPT_ALONE, &acl_var_aio_accept_alone },
-	{ ACL_VAR_AIO_LOG_DEBUG, ACL_DEF_AIO_LOG_DEBUG, &acl_var_aio_log_debug },
-	{ ACL_VAR_AIO_DISPATCH_ADDR, ACL_DEF_AIO_DISPATCH_ADDR, &acl_var_aio_dispatch_addr },
-	{ ACL_VAR_AIO_DISPATCH_TYPE, ACL_DEF_AIO_DISPATCH_TYPE, &acl_var_aio_dispatch_type },
-	{ ACL_VAR_AIO_DENY_INFO, ACL_DEF_AIO_DENY_INFO, &acl_var_aio_deny_info },
+        { ACL_VAR_AIO_QUEUE_DIR, ACL_DEF_AIO_QUEUE_DIR,
+		&acl_var_aio_queue_dir },
+        { ACL_VAR_AIO_OWNER, ACL_DEF_AIO_OWNER,
+		&acl_var_aio_owner },
+	{ ACL_VAR_AIO_PID_DIR, ACL_DEF_AIO_PID_DIR,
+		&acl_var_aio_pid_dir },
+	{ ACL_VAR_AIO_ACCESS_ALLOW, ACL_DEF_AIO_ACCESS_ALLOW,
+		&acl_var_aio_access_allow },
+        { ACL_VAR_AIO_EVENT_MODE, ACL_DEF_AIO_EVENT_MODE,
+		&acl_var_aio_event_mode },
+	{ ACL_VAR_AIO_ACCEPT_ALONE, ACL_DEF_AIO_ACCEPT_ALONE,
+		&acl_var_aio_accept_alone },
+	{ ACL_VAR_AIO_LOG_DEBUG, ACL_DEF_AIO_LOG_DEBUG,
+		&acl_var_aio_log_debug },
+	{ ACL_VAR_AIO_DISPATCH_ADDR, ACL_DEF_AIO_DISPATCH_ADDR,
+		&acl_var_aio_dispatch_addr },
+	{ ACL_VAR_AIO_DISPATCH_TYPE, ACL_DEF_AIO_DISPATCH_TYPE,
+		&acl_var_aio_dispatch_type },
+	{ ACL_VAR_AIO_DENY_INFO, ACL_DEF_AIO_DENY_INFO,
+		&acl_var_aio_deny_info },
 
         { 0, 0, 0 },
 };
@@ -165,8 +188,6 @@ static void (*__service_accept) (ACL_ASTREAM *, void *);
 
 static unsigned __aio_server_generation;
 static char *__deny_info = NULL;
-
-static ACL_ASTREAM *ACL_MASTER_STAT_ASTREAM = NULL;
 
 static void dispatch_open(ACL_EVENT *event, ACL_AIO *aio);
 static void dispatch_close(ACL_AIO *aio);
@@ -1015,10 +1036,6 @@ static void aio_server_init(const char *procname)
 
 	acl_get_app_conf_int_table(__conf_int_tab);
 	acl_get_app_conf_str_table(__conf_str_tab);
-
-	/* 初始化IPC通道 */
-
-	acl_master_vars_init(acl_var_aio_buf_size, acl_var_aio_rw_timeout);
 }
 
 static void open_service_log(void)
@@ -1038,31 +1055,17 @@ static void open_service_log(void)
 
 static void usage(int argc, char *argv[])
 {
-	int   i;
-	char *service_name;
-
 	if (argc <= 0)
-		acl_msg_fatal("%s(%d): argc(%d) invalid",
-			__FILE__, __LINE__, argc);
-
-	service_name = acl_mystrdup(acl_safe_basename(argv[0]));
-
-	for (i = 0; i < argc; i++) {
-		acl_msg_info("argv[%d]: %s", i, argv[i]);
-	}
+		acl_msg_fatal("%s(%d): argc: %d", __FILE__, __LINE__, argc);
 
 	acl_msg_info("usage: %s -h[help]"
 		" -c [use chroot]"
-		" -d [debug]"
 		" -n service_name"
 		" -s socket_count"
-		" -i [use stdin]"
 		" -t transport"
 		" -u [use setgid initgroups setuid]"
 		" -v [on acl_msg_verbose]"
-		" -z [unlimit process count]"
-		" -f conf_file",
-		service_name);
+		" -f conf_file", argv[0]);
 }
 
 /* 创建异步IO */
@@ -1205,17 +1208,15 @@ static ACL_ASTREAM **create_listener(ACL_AIO *aio, int event_mode acl_unused,
 
 static void setup_ipc(ACL_AIO *aio)
 {
-	const char *myname = "setup_ipc";
+	ACL_VSTREAM *stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
+			O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
+	ACL_ASTREAM *stat_astream = acl_aio_open(aio, stream);
 
-	ACL_MASTER_STAT_ASTREAM = acl_aio_open(aio, ACL_MASTER_STAT_STREAM);
-	if (ACL_MASTER_STAT_ASTREAM == NULL)
-		acl_msg_fatal("%s(%d): open master stat astream error",
-			myname, __LINE__);
-	acl_aio_ctl(ACL_MASTER_STAT_ASTREAM,
+	acl_aio_ctl(stat_astream,
 		ACL_AIO_CTL_READ_HOOK_ADD, aio_server_read_abort, NULL,
 		ACL_AIO_CTL_CLOSE_HOOK_ADD, aio_server_abort, NULL,
 		ACL_AIO_CTL_END);
-	acl_aio_read(ACL_MASTER_STAT_ASTREAM);
+	acl_aio_read(stat_astream);
 
 	acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
 	acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
@@ -1266,13 +1267,12 @@ static void run_loop(const char *procname)
 static void server_main(int argc, char **argv, va_list ap)
 {
 	const char *myname = "acl_aio_server_main";
-	ACL_VSTREAM *stream = 0;
-	int     key, f_flag = 0;
-	char   *root_dir = 0, *user_name = 0;
-	char   *service_name = acl_mystrdup(acl_safe_basename(argv[0]));
 	ACL_MASTER_SERVER_INIT_FN pre_init = 0;
 	ACL_MASTER_SERVER_INIT_FN post_init = 0;
+	char   *service_name = acl_mystrdup(acl_safe_basename(argv[0]));
+	char   *root_dir = 0, *user_name = 0;
 	char   *transport = 0, *generation, *conf_file_ptr = 0;
+	int     c;
 
 	/*******************************************************************/
 
@@ -1299,14 +1299,13 @@ static void server_main(int argc, char **argv, va_list ap)
 
 	opterr = 0;
 
-	while ((key = getopt(argc, argv, "hcdm:n:o:s:it:uvzf:")) > 0) {
-		switch (key) {
+	while ((c = getopt(argc, argv, "hcn:o:s:t:uvf:")) > 0) {
+		switch (c) {
 		case 'h':
 			usage(argc, argv);
 			exit (0);
 		case 'f':
 			acl_app_conf_load(optarg);
-			f_flag = 1;
 			conf_file_ptr = optarg;
 			break;
 		case 'c':
@@ -1316,13 +1315,9 @@ static void server_main(int argc, char **argv, va_list ap)
 			service_name = optarg;
 			break;
 		case 's':
-			if ((__socket_count = atoi(optarg)) <= 0)
-				acl_msg_fatal("%s: invalid socket_count: %s",
-					myname, optarg);
-			break;
-		case 'i':
-			stream = ACL_VSTREAM_IN;
-			break;
+			if ((__socket_count = atoi(optarg)) > 0)
+				break;
+			acl_msg_fatal("invalid socket_count: %s", optarg);
 		case 'u':
 			user_name = "setme";
 			break;
@@ -1337,36 +1332,32 @@ static void server_main(int argc, char **argv, va_list ap)
 		}
 	}
 
-	if (stream == 0)
-		aio_server_init(argv[0]);
-	if (f_flag == 0)
+	aio_server_init(argv[0]);
+
+	if (conf_file_ptr == 0)
 		acl_msg_fatal("%s(%d), %s: need \"-f pathname\"",
 			__FILE__, __LINE__, myname);
-	if (acl_msg_verbose)
+	else if (acl_msg_verbose)
 		acl_msg_info("%s(%d), %s: configure file = %s", 
 			__FILE__, __LINE__, myname, conf_file_ptr);
 
 	/* Application-specific initialization. */
 
-	while ((key = va_arg(ap, int)) != 0) {
-		switch (key) {
+	while ((c = va_arg(ap, int)) != 0) {
+		switch (c) {
 		case ACL_MASTER_SERVER_INT_TABLE:
-			/* 读取 int 类型的配置文件表 */
 			acl_get_app_conf_int_table(
 				va_arg(ap, ACL_CONFIG_INT_TABLE *));
 			break;
 		case ACL_MASTER_SERVER_INT64_TABLE:
-			/* 读取 int64 类型的配置文件表 */
 			acl_get_app_conf_int64_table(
 				va_arg(ap, ACL_CONFIG_INT64_TABLE *));
 			break;
 		case ACL_MASTER_SERVER_STR_TABLE:
-			/* 读取 string 类型的配置文件表 */
 			acl_get_app_conf_str_table(
 				va_arg(ap, ACL_CONFIG_STR_TABLE *));
 			break;
 		case ACL_MASTER_SERVER_BOOL_TABLE:
-			/* 读取 bool 类型的配置文件表 */
 			acl_get_app_conf_bool_table(
 				va_arg(ap, ACL_CONFIG_BOOL_TABLE *));
 			break;
@@ -1391,21 +1382,17 @@ static void server_main(int argc, char **argv, va_list ap)
 				va_arg(ap, ACL_MASTER_SERVER_LISTEN_FN);
 			break;
 		default:
-			acl_msg_warn("%s: unknown argument type: %d",
-				myname, key);
+			acl_msg_warn("%s: unknown argument: %d", myname, c);
 		}
 	}
 
-	va_end(ap);  /* 将传入的 va_list 参数收尾 */
-
-	/* 读完配置文件后重新设置 */
+	va_end(ap);
 
 	if (root_dir)
 		root_dir = acl_var_aio_queue_dir;
 	if (user_name)
 		user_name = acl_var_aio_owner;
 
-	/* 当没有通过函数参数设置拒绝访问信息时，则使用配置文件中的内容 */
 	if (__deny_info == NULL)
 		__deny_info = acl_var_aio_deny_info;
 
