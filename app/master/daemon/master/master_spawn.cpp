@@ -240,10 +240,8 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 		 */
 	default: /* the parent process */
 		if (acl_msg_verbose)
-			acl_msg_info("spawn command %s; pid %d",
-				serv->path, pid);
-		proc = (ACL_MASTER_PROC *) acl_mycalloc(1,
-			sizeof(ACL_MASTER_PROC));
+			acl_msg_info("spawn command %s; pid %d", serv->path, pid);
+		proc = (ACL_MASTER_PROC *) acl_mycalloc(1, sizeof(ACL_MASTER_PROC));
 		proc->serv = serv;
 		proc->pid = pid;
 		proc->gen = _master_generation;
@@ -402,4 +400,15 @@ void    acl_master_delete_children(ACL_MASTER_SERV *serv)
 
 	acl_myfree(list);
 	master_unthrottle(serv);
+}
+
+void   acl_master_delete_all_children(void)
+{
+	ACL_MASTER_SERV *serv, **servp;
+
+	for (servp = &acl_var_master_head; (serv = *servp) != 0;) {
+		*servp = serv->next;
+		acl_master_service_stop(serv);
+		acl_master_ent_free(serv);
+	}
 }

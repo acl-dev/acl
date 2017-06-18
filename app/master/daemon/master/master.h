@@ -177,6 +177,7 @@ extern void acl_master_spawn_init(void);
 extern void acl_master_spawn(ACL_MASTER_SERV *);
 extern void acl_master_reap_child(void);
 extern void acl_master_delete_children(ACL_MASTER_SERV *);
+extern void acl_master_delete_all_children(void);
 
  /*
   * master_warning.c

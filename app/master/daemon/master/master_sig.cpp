@@ -171,9 +171,10 @@ static void master_sigdeath(int sig)
 	action.sa_handler = SIG_IGN;
 	if (sigaction(SIGTERM, &action, (struct sigaction *) 0) < 0)
 		acl_msg_fatal("%s: sigaction: %s", myname, strerror(errno));
-	if (kill(-pid, SIGTERM) < 0) {
-		acl_msg_error("%s: kill process group: %s",
-			myname, strerror(errno));
+	if (pid <= 1) { /* in docker the master's pid is 1 */
+		acl_master_delete_all_children();
+	} else if (kill(-pid, SIGTERM) < 0) {
+		acl_msg_error("%s: kill process group: %s", myname, strerror(errno));
 		exit (1);
 	}
 
@@ -186,7 +187,9 @@ static void master_sigdeath(int sig)
 	action.sa_handler = SIG_DFL;
 	if (sigaction(sig, &action, (struct sigaction *) 0) < 0)
 		acl_msg_fatal("%s: sigaction: %s", myname, strerror(errno));
-	if (kill(pid, sig) < 0)
+	if (pid <= 1)
+		exit (0);
+	else if (kill(pid, sig) < 0)
 		acl_msg_fatal("%s: kill myself: %s", myname, strerror(errno));
 }
 
