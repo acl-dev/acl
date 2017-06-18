@@ -80,7 +80,7 @@ void redis_commands::set_commands(void)
 	for (size_t i = 0; !__redis_cmds[i].cmd.empty(); i++)
 	{
 		acl::string cmd(__redis_cmds[i].cmd);
-		cmd.lower();
+		cmd.upper();
 
 		std::map<acl::string, REDIS_CMD>::const_iterator cit =
 			redis_cmds_.find(cmd);
