@@ -1,4 +1,7 @@
 
+13) 2017.6.19
+13.1) compile: Makefile 可以自动判断 /lib64 目录下是否有 readline/ncurses 库
+
 12) 2017.6.18
 12.1) bugfix: redis_builder 从 redis_commands.txt 加载命令项时，应先将命令字
 转为大写才能覆盖程序里缺省命令字

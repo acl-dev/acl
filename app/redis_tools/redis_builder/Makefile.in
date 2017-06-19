@@ -18,8 +18,17 @@ ifeq ($(CC),)
         CC = gcc
 endif
 
-EXIST_READLINE = $(shell if [ -f "/usr/lib/libreadline.a" -o -f "/usr/lib/libreadline.so" ]; then echo "exist"; else echo "notexist"; fi;)
-EXIST_CURSOR = $(shell if [ -f "/usr/lib/liblibcurses.a" -o -f "/usr/lib/libcurses.so" ]; then echo "exist"; else echo "notexist"; fi;)
+EXIST_READLINE = $(shell if [ -f "/lib64/libreadline.a" \
+		 -o -f "/lib64/libreadline.so" \
+		 -o -f "/usr/lib/libreadline.a" \
+		 -o -f "/usr/lib/libreadline.so" ]; \
+		 then echo "exist"; else echo "notexist"; fi;)
+
+EXIST_CURSOR = $(shell if [ -f "/lib64/libncurses.a" \
+		-o -f "/lib64/libncurses.so"  \
+		-o -f "/usr/lib/libncurses.a"  \
+		-o -f "/usr/lib/libncurses.so" ]; \
+		then echo "exist"; else echo "notexist"; fi;)
 
 ifeq ($(EXIST_READLINE), exist)
 	ifeq ($(EXIST_CURSOR), exist)
