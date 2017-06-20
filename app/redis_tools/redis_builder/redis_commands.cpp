@@ -291,6 +291,12 @@ bool redis_commands::check(const char* command)
 		perm = cit->second.perm;
 	}
 
+	if (perm == "no")
+	{
+		printf("command %s disabled!\r\n", command);
+		return false;
+	}
+
 	if (all_cmds_perm_ == "warn" || perm == "warn")
 	{
 		acl::string buf;
