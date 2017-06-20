@@ -14,11 +14,11 @@
 
 /* listen on inet/unix socket */
 
-static void master_listen_sock(ACL_MASTER_SERV *serv)
+static int master_listen_sock(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "master_listen_sock";
-	int   i, service_type;
-	int   qlen;
+	int   i, service_type, qlen;
+	ACL_ITER iter;
 
 	qlen = serv->max_qlen > acl_var_master_proc_limit
 		? serv->max_qlen : acl_var_master_proc_limit;
@@ -32,9 +32,9 @@ static void master_listen_sock(ACL_MASTER_SERV *serv)
 		acl_msg_panic("listen_fd_count(%d) != addrs's size(%d)",
 			serv->listen_fd_count, acl_array_size(serv->addrs));
 
-	for (i = 0; i < serv->listen_fd_count; i++) {
-		ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR*)
-			acl_array_index(serv->addrs, i);
+	i = 0;
+	acl_foreach(iter, serv->addrs) {
+		ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR*) iter.data;
 		switch (addr->type) {
 		case ACL_MASTER_SERV_TYPE_INET:
 			serv->listen_fds[i] = acl_inet_listen(
@@ -61,23 +61,34 @@ static void master_listen_sock(ACL_MASTER_SERV *serv)
 			break;
 		}
 
-		if (serv->listen_fds[i] == ACL_SOCKET_INVALID)
-			acl_msg_fatal("%s(%d), %s: listen on %s error %s",
+		if (serv->listen_fds[i] == ACL_SOCKET_INVALID) {
+			acl_msg_error("%s(%d), %s: listen on %s error %s",
 				__FILE__, __LINE__, myname,
 				addr->addr, strerror(errno));
+			continue;
+		}
 
 		acl_close_on_exec(serv->listen_fds[i], ACL_CLOSE_ON_EXEC);
 
-		serv->listen_streams[i] = acl_vstream_fdopen(serv->listen_fds[i],
-			O_RDONLY, acl_var_master_buf_size,
+		serv->listen_streams[i] = acl_vstream_fdopen(
+			serv->listen_fds[i], O_RDONLY, acl_var_master_buf_size,
 			acl_var_master_rw_timeout, service_type);
 
 		acl_msg_info("%s(%d), %s: listen on: %s, qlen: %d",
 			__FILE__, __LINE__, myname, addr->addr, qlen);
+		i++;
 	}
+
+	if (i < serv->listen_fd_count) {
+		acl_msg_warn("%s(%d), %s: not all listeners were ok!",
+			__FILE__, __LINE__, myname);
+		serv->listen_fd_count = i;
+	}
+
+	return serv->listen_fd_count;
 }
 
-static void master_listen_inet(ACL_MASTER_SERV *serv)
+static int master_listen_inet(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "master_listen_inet";
 	int   qlen;
@@ -85,8 +96,8 @@ static void master_listen_inet(ACL_MASTER_SERV *serv)
 	qlen = serv->max_qlen > acl_var_master_proc_limit
 		? serv->max_qlen : acl_var_master_proc_limit;
 	if (qlen < 128) {
-		acl_msg_warn("%s(%d): qlen(%d) too small, use 128 now",
-			myname, __LINE__, qlen);
+		acl_msg_warn("%s(%d), %s: qlen(%d) too small, use 128 now",
+			__FILE__, __LINE__, myname, qlen);
 		qlen = 128;
 	}
 
@@ -101,34 +112,33 @@ static void master_listen_inet(ACL_MASTER_SERV *serv)
 	serv->listen_streams[0] = acl_vstream_fdopen(serv->listen_fds[0],
 		O_RDONLY, acl_var_master_buf_size,
 		acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN_INET);
+
 	acl_close_on_exec(serv->listen_fds[0], ACL_CLOSE_ON_EXEC);
 	acl_msg_info("%s(%d), %s: listen on inet: %s, qlen: %d",
 		__FILE__, __LINE__, myname, serv->name, qlen);
+
+	return 1;
 }
 
-static void master_bind_udp(ACL_MASTER_SERV *serv)
+static int master_bind_udp(ACL_MASTER_SERV *serv)
 {
 #ifdef SO_REUSEPORT
 	serv->listen_fd_count = 0;
 #else
 	const char *myname = "master_bind_udp";
+	ACL_ITER iter;
 	int   i;
 
 	if (serv->listen_fd_count != acl_array_size(serv->addrs))
 		acl_msg_panic("listen_fd_count(%d) != addrs's size(%d)",
 			serv->listen_fd_count, acl_array_size(serv->addrs));
 
-	for (i = 0; i < serv->listen_fd_count; i++) {
-		ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR*)
-			acl_array_index(serv->addrs, i);
+	acl_foreach(iter, serv->addrs) {
+		ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR*) iter.data;
 		switch (addr->type) {
 		case ACL_MASTER_SERV_TYPE_UDP:
 			serv->listen_streams[i] = acl_vstream_bind(addr->addr,
 					acl_var_master_rw_timeout);
-			if (serv->listen_streams[i] == NULL)
-				acl_msg_fatal("%s(%d), %s: bind %s error %s",
-					__FILE__, __LINE__, myname,
-					addr->addr, strerror(errno));
 			break;
 		default:
 			acl_msg_panic("invalid type: %d, addr: %s",
@@ -136,12 +146,27 @@ static void master_bind_udp(ACL_MASTER_SERV *serv)
 			break;
 		}
 
+		if (serv->listen_streams[i] == NULL) {
+			acl_msg_error("%s(%d), %s: bind %s error %s",
+				__FILE__, __LINE__, myname,
+				addr->addr, strerror(errno));
+			continue;
+		}
+
 		serv->listen_fds[i] = ACL_VSTREAM_SOCK(serv->listen_streams[i]);
 		acl_close_on_exec(serv->listen_fds[i], ACL_CLOSE_ON_EXEC);
 		acl_msg_info("%s(%d), %s: bind on %s ok",
 			__FILE__, __LINE__, myname, addr->addr);
+		i++;
+	}
+
+	if (i < serv->listen_fd_count) {
+		acl_msg_warn("%s(%d), %s: not all listeners were ok!",
+			__FILE__, __LINE__, myname);
+		serv->listen_fd_count = i;
 	}
 #endif
+	return serv->listen_fd_count;
 }
 
 static void master_listen_unix(ACL_MASTER_SERV *serv)

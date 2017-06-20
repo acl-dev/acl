@@ -336,3 +336,104 @@ void acl_free_ifaddrs(ACL_IFCONF *ifconf)
 	acl_myfree(ifconf->addrs);
 	acl_myfree(ifconf);
 }
+
+static unsigned match(const ACL_ARGV *tokens, const char *ip)
+{
+	ACL_ARGV *tokens_addr = acl_argv_split(ip, ".");
+	ACL_ITER iter;
+	int   i = 0;
+
+	if (tokens_addr->argc != 4) {
+		acl_msg_warn("%s(%d), %s: invalid ip: %s",
+			__FILE__, __LINE__, __FUNCTION__, ip);
+		acl_argv_free(tokens_addr);
+		return 0;
+	}
+
+	acl_foreach(iter, tokens_addr) {
+		const char* ptr = (const char *) iter.data;
+		const char* arg = tokens->argv[i];
+		if (strcmp(arg, "*") != 0 && strcmp(arg, ptr) != 0) {
+			acl_argv_free(tokens_addr);
+			return 0;
+		}
+		i++;
+	}
+
+	acl_argv_free(tokens_addr);
+	return 1;
+}
+
+static unsigned search(ACL_IFCONF *ifconf, const char *addr, ACL_ARGV *addrs)
+{
+	ACL_ARGV *tokens = NULL;
+	char      buf[256], *colon;
+	int       port;
+	ACL_ITER  iter;
+	unsigned  naddr = 0;
+
+	/* xxx.xxx.xxx.xxx:port, xxx.xxx.xxx.*:port ...*/
+	snprintf(buf, sizeof(buf), "%s", addr);
+	colon = strchr(buf, ':');
+	if (colon) {
+		*colon++ = 0;
+		port = atoi(colon);
+	} else
+		port = -1;
+
+	/* format: xxx.xxx.xxx.*, xxx.xxx.*.*, xxx.*.*.* */
+	tokens = acl_argv_split(buf, ".");
+	if (tokens->argc != 4) {
+		acl_argv_free(tokens);
+		return 0;
+	}
+
+	acl_foreach(iter, ifconf) {
+		const ACL_IFADDR* ifaddr = (const ACL_IFADDR *) iter.data;
+
+		if (!match(tokens, ifaddr->ip))
+			continue;
+
+		if (port >= 0) {
+			snprintf(buf, sizeof(buf), "%s:%d", ifaddr->ip, port);
+			acl_argv_add(addrs, buf, NULL);
+		} else
+			acl_argv_add(addrs, ifaddr->ip, NULL);
+
+		naddr++;
+	}
+
+	acl_argv_free(tokens);
+	return naddr;
+}
+
+ACL_ARGV *acl_ifconf_search(const char *pattern)
+{
+	ACL_IFCONF *ifconf = acl_get_ifaddrs();
+	ACL_ARGV *tokens, *addrs;
+	ACL_ITER  iter;
+
+	if (ifconf == NULL) {
+		acl_msg_error("%s(%d), %s:  acl_get_ifaddrs error %s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
+		return NULL;
+	}
+
+	addrs = acl_argv_alloc(1);
+
+	tokens = acl_argv_split(pattern, "\"',; \t\r\n");
+	acl_foreach(iter, tokens) {
+		const char *addr = (char *) iter.data;
+		if (acl_ipv4_addr_valid(addr) || acl_alldig(addr)
+			|| (*addr == ':' && acl_alldig(addr + 1))) {
+
+			acl_argv_add(addrs, addr, NULL);
+		} else if (search(ifconf, addr, addrs) == 0)
+			acl_argv_add(addrs, addr, NULL);
+	}
+
+	acl_argv_free(tokens);
+	acl_free_ifaddrs(ifconf);
+
+	return addrs;
+}

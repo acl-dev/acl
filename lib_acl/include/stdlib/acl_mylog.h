@@ -49,6 +49,13 @@ ACL_API void acl_log_fp_set(ACL_VSTREAM *fp, const char *plog_pre);
 ACL_API int acl_open_log(const char *recipients, const char *plog_pre);
 
 /**
+ * 在调用 acl_open_log 前，可以调用本函数用来设定针对日志 fd 是否调用
+ * acl_close_on_exec，缺省情况下会自动调用 acl_close_on_exec
+ * @param yes {int} 非 0 表示调用 acl_close_on_exec，否则表示不调用
+ */
+ACL_API void acl_log_close_onexec(int yes);
+
+/**
  * 写日志
  * @param fmt {const char*} 格式参数
  * @param ... 参数序列

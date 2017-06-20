@@ -123,8 +123,7 @@ static void fiber_monitor_master(ACL_FIBER *fiber, void *ctx)
 
 		acl_fiber_sleep(1);
 		n++;
-		if (acl_var_fiber_wait_limit > 0 && n >= acl_var_fiber_wait_limit)
-		{
+		if (acl_var_fiber_wait_limit > 0 && n >= acl_var_fiber_wait_limit) {
 			acl_msg_warn("%s(%d), %s: too long, clients: %d",
 				__FILE__, __LINE__, __FUNCTION__, __nclients);
 			break;

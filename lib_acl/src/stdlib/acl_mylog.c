@@ -94,6 +94,13 @@ struct ACL_LOG {
 static int  __log_thread_id = 0;
 static ACL_FIFO *__loggers = NULL;
 
+static int __log_close_onexec = 1;
+
+void acl_log_close_onexec(int yes)
+{
+	__log_close_onexec = yes;
+}
+
 void acl_log_add_tid(int onoff)
 {
 	__log_thread_id = onoff ? 1 : 0;
@@ -120,7 +127,8 @@ void acl_log_fp_set(ACL_VSTREAM *fp, const char *logpre)
 	}
 
 #ifdef	ACL_UNIX
-	acl_close_on_exec(ACL_VSTREAM_SOCK(fp), ACL_CLOSE_ON_EXEC);
+	if (__log_close_onexec)
+		acl_close_on_exec(ACL_VSTREAM_SOCK(fp), ACL_CLOSE_ON_EXEC);
 #endif
 	log = (ACL_LOG*) calloc(1, sizeof(ACL_LOG));
 	log->fp = fp;
@@ -134,6 +142,10 @@ void acl_log_fp_set(ACL_VSTREAM *fp, const char *logpre)
 	else
 		log->logpre[0] = 0;
 	log->flag |= ACL_LOG_F_FIXED;
+	if (fp->type & ACL_VSTREAM_TYPE_FILE)
+		log->type = ACL_LOG_T_FILE;
+	else if (fp->type & ACL_VSTREAM_TYPE_LISTEN_INET)
+		log->type= ACL_LOG_T_UDP;
 	private_fifo_push(__loggers, log);
 }
 
@@ -175,7 +187,8 @@ static int open_file_log(const char *filename, const char *logpre)
 	acl_vstream_set_path(fp, filename);
 
 #ifdef	ACL_UNIX
-	acl_close_on_exec(fh, ACL_CLOSE_ON_EXEC);
+	if (__log_close_onexec)
+		acl_close_on_exec(fh, ACL_CLOSE_ON_EXEC);
 #endif
 
 	log = (ACL_LOG*) calloc(1, sizeof(ACL_LOG));

@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "../stdlib/acl_define.h"
+#include "../stdlib/acl_argv.h"
 
 typedef struct ACL_IFADDR {
 	char *name;		/* 接口名称 */
@@ -43,6 +44,16 @@ ACL_API ACL_IFCONF *acl_get_ifaddrs(void);
  * @param ifconf {ACL_IFCONF*}
  */
 ACL_API void acl_free_ifaddrs(ACL_IFCONF *ifconf);
+
+/**
+ * 扫描本机所有网卡 IP，将所有匹配指定模式的 IP 地址返回，目前仅支持 IPV4
+ * @param pattern {const char *} 指定的匹配模式，格式为：xxx.xxx.xxx.xxx 或
+ *  xxx.xxx.xxx.xxx:port，如：192.168.*.*, 192.168.*.8:80，10.*.0.*:81
+ * @return {ACL_ARGV *} 返回条件的结果集，如果 pattern 后面带有端口，则自动
+ *  将端口添加在每个 IP 后面，若返回对象非空，调用者用完应调用 acl_argv_free
+ *  释放该对象
+ */
+ACL_API ACL_ARGV *acl_ifconf_search(const char *pattern);
 
 #ifdef	__cplusplus
 }

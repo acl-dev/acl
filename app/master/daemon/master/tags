@@ -119,6 +119,7 @@ acl_master_avail_less	master_avail.cpp	/^void acl_master_avail_less(ACL_MASTER_S
 acl_master_avail_listen	master_avail.cpp	/^void acl_master_avail_listen(ACL_MASTER_SERV *serv)$/;"	f
 acl_master_avail_more	master_avail.cpp	/^void acl_master_avail_more(ACL_MASTER_SERV *serv, ACL_MASTER_PROC *proc)$/;"	f
 acl_master_config	master_conf.cpp	/^void    acl_master_config(void)$/;"	f
+acl_master_delete_all_children	master_spawn.cpp	/^void   acl_master_delete_all_children(void)$/;"	f
 acl_master_delete_children	master_spawn.cpp	/^void    acl_master_delete_children(ACL_MASTER_SERV *serv)$/;"	f
 acl_master_ent_begin	master_ent.cpp	/^void acl_master_ent_begin()$/;"	f
 acl_master_ent_end	master_ent.cpp	/^void acl_master_ent_end()$/;"	f
@@ -133,7 +134,7 @@ acl_master_params_load	master_params.cpp	/^void acl_master_params_load(const cha
 acl_master_pathname	master_pathname.cpp	/^char   *acl_master_pathname(const char *queue_path, const char *service_class,$/;"	f
 acl_master_reap_child	master_spawn.cpp	/^void    acl_master_reap_child(void)$/;"	f
 acl_master_refresh	master_conf.cpp	/^void    acl_master_refresh(void)$/;"	f
-acl_master_restart	master_api.cpp	/^int     acl_master_restart(const char *filepath)$/;"	f
+acl_master_restart	master_api.cpp	/^ACL_MASTER_SERV *acl_master_restart(const char *filepath)$/;"	f
 acl_master_service_init	master_service.cpp	/^void   acl_master_service_init(void)$/;"	f
 acl_master_service_restart	master_service.cpp	/^void    acl_master_service_restart(ACL_MASTER_SERV *serv)$/;"	f
 acl_master_service_start	master_service.cpp	/^void    acl_master_service_start(ACL_MASTER_SERV *serv)$/;"	f
@@ -142,7 +143,7 @@ acl_master_sig_pipe	master_sig.cpp	/^int   acl_master_sig_pipe[2];$/;"	v
 acl_master_sigsetup	master_sig.cpp	/^void    acl_master_sigsetup(void)$/;"	f
 acl_master_spawn	master_spawn.cpp	/^void    acl_master_spawn(ACL_MASTER_SERV *serv)$/;"	f
 acl_master_spawn_init	master_spawn.cpp	/^void  acl_master_spawn_init(void)$/;"	f
-acl_master_start	master_api.cpp	/^int     acl_master_start(const char *filepath)$/;"	f
+acl_master_start	master_api.cpp	/^ACL_MASTER_SERV *acl_master_start(const char *filepath)$/;"	f
 acl_master_status_cleanup	master_status.cpp	/^void    acl_master_status_cleanup(ACL_MASTER_SERV *serv)$/;"	f
 acl_master_status_init	master_status.cpp	/^void    acl_master_status_init(ACL_MASTER_SERV *serv)$/;"	f
 acl_master_stop	master_api.cpp	/^int     acl_master_stop(const char *name)$/;"	f
@@ -206,11 +207,11 @@ listen_fd_count	master.h	/^	int     listen_fd_count;	\/* nr of descriptors *\/$/
 listen_fds	master.h	/^	int    *listen_fds;		\/* incoming requests *\/$/;"	m	struct:ACL_MASTER_SERV
 listen_streams	master.h	/^	ACL_VSTREAM **listen_streams;	\/* multi-listening stream *\/$/;"	m	struct:ACL_MASTER_SERV
 master_avail_event	master_avail.cpp	/^static void master_avail_event(int type, ACL_EVENT *event,$/;"	f	file:
-master_bind_udp	master_listen.cpp	/^static void master_bind_udp(ACL_MASTER_SERV *serv)$/;"	f	file:
+master_bind_udp	master_listen.cpp	/^static int master_bind_udp(ACL_MASTER_SERV *serv)$/;"	f	file:
 master_delete_child	master_spawn.cpp	/^static void master_delete_child(ACL_MASTER_PROC *proc)$/;"	f	file:
 master_listen_fifo	master_listen.cpp	/^static void master_listen_fifo(ACL_MASTER_SERV *serv)$/;"	f	file:
-master_listen_inet	master_listen.cpp	/^static void master_listen_inet(ACL_MASTER_SERV *serv)$/;"	f	file:
-master_listen_sock	master_listen.cpp	/^static void master_listen_sock(ACL_MASTER_SERV *serv)$/;"	f	file:
+master_listen_inet	master_listen.cpp	/^static int master_listen_inet(ACL_MASTER_SERV *serv)$/;"	f	file:
+master_listen_sock	master_listen.cpp	/^static int master_listen_sock(ACL_MASTER_SERV *serv)$/;"	f	file:
 master_listen_unix	master_listen.cpp	/^static void master_listen_unix(ACL_MASTER_SERV *serv)$/;"	f	file:
 master_prefork	master_avail.cpp	/^static int master_prefork(ACL_MASTER_SERV *serv)$/;"	f	file:
 master_sig_event	master_sig.cpp	/^static void master_sig_event(int type acl_unused, ACL_EVENT *event acl_unused,$/;"	f	file:

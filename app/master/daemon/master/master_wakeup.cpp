@@ -60,23 +60,23 @@ static void master_wakeup_timer_event(int type acl_unused,
 			break;
 
 		/*
-		 * If someone compromises the postfix account then this must not
-		 * overwrite files outside the chroot jail. Countermeasures:
+		 * If someone compromises the postfix account then this must
+		 * not overwrite files outside the chroot jail. Countermeasures:
 		 * 
 		 * - Limit the damage by accessing the FIFO as postfix not root.
 		 * 
 		 * - Have fifo_trigger() call safe_open() so we won't follow
 		 * arbitrary hard/symlinks to files in/outside the chroot jail.
 		 * 
-		 * - All non-chroot postfix-related files must be root owned (or
-		 * postfix check complains).
+		 * - All non-chroot postfix-related files must be root owned
+		 *   (or postfix check complains).
 		 * 
-		 * - The postfix user and group ID must not be shared with other
-		 * applications (says the INSTALL documentation).
+		 * - The postfix user and group ID must not be shared with
+		 *   other applications (says the INSTALL documentation).
 		 * 
-		 * Result of a discussion with Michael Tokarev, who received his
-		 * insights from Solar Designer, who tested Postfix with a kernel
-		 * module that is paranoid about open() calls.
+		 * Result of a discussion with Michael Tokarev, who received
+		 * his insights from Solar Designer, who tested Postfix with
+		 * a kernel module that is paranoid about open() calls.
 		 */
 		case ACL_MASTER_SERV_TYPE_FIFO:
 			if (acl_var_master_limit_privilege)
@@ -115,7 +115,7 @@ void    acl_master_wakeup_init(ACL_MASTER_SERV *serv)
 	if (acl_msg_verbose)
 		acl_msg_info("%s: service %s time %d",
 			myname, serv->name, serv->wakeup_time);
-	master_wakeup_timer_event(0, acl_var_master_global_event, (void *) serv);
+	master_wakeup_timer_event(0, acl_var_master_global_event, serv);
 }
 
 /* acl_master_wakeup_cleanup - cancel wakeup timer */
