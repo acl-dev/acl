@@ -95,7 +95,7 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 	ACL_MASTER_NV *nv;
 	ACL_MASTER_PID pid;
 	int     n, i;
-	static unsigned _master_generation = 0;
+	static unsigned master_generation = 0;
 	static ACL_VSTRING *env_gen = 0;
 
 	if (env_gen == 0)
@@ -132,7 +132,7 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 	 * Create a child process and connect parent and
 	 * child via the status pipe.
 	 */
-	_master_generation += 1;
+	master_generation += 1;
 	switch (pid = fork()) {
 
 	/*
@@ -182,7 +182,8 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 		if (dup2(serv->status_fd[1], ACL_MASTER_STATUS_FD) < 0)
 			acl_msg_fatal("%s: dup2 status_fd: %s",
 				myname, strerror(errno));
-		(void) close(serv->status_fd[1]);
+
+		close(serv->status_fd[1]);
 
 		for (n = 0; n < serv->listen_fd_count; n++) {
 			if (serv->listen_fds[n] <= ACL_MASTER_LISTEN_FD + n)
@@ -199,7 +200,7 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 		}
 
 		acl_vstring_sprintf(env_gen, "%s=%o",
-			ACL_MASTER_GEN_NAME, _master_generation);
+			ACL_MASTER_GEN_NAME, master_generation);
 		if (putenv(acl_vstring_str(env_gen)) < 0)
 			acl_msg_fatal("%s: putenv: %s", myname, strerror(errno));
 
@@ -244,7 +245,7 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 		proc = (ACL_MASTER_PROC *) acl_mycalloc(1, sizeof(ACL_MASTER_PROC));
 		proc->serv = serv;
 		proc->pid = pid;
-		proc->gen = _master_generation;
+		proc->gen = master_generation;
 		proc->use_count = 0;
 		proc->avail = 0;
 		acl_binhash_enter(acl_var_master_child_table, (char *) &pid,

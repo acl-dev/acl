@@ -38,6 +38,7 @@
 #include "stdlib/acl_iostuff.h"
 #include "stdlib/acl_stringops.h"
 #include "stdlib/acl_myflock.h"
+#include "stdlib/acl_argv.h"
 #include "net/acl_sane_socket.h"
 #include "net/acl_vstream_net.h"
 #include "event/acl_events.h"
@@ -156,11 +157,11 @@ static void disable_listen(ACL_EVENT *event)
 		acl_event_disable_readwrite(event, __servers[i]);
 		acl_vstream_close(__servers[i]);
 		__servers[i] = NULL;
-		acl_msg_info("All servers closed now!");
 	}
 
 	acl_myfree(__servers);
 	__servers = NULL;
+	acl_msg_info("All servers closed now!");
 }
 
 /* udp_server_exit - normal termination */
@@ -282,10 +283,14 @@ static void udp_server_init(const char *procname)
 	acl_get_app_conf_str_table(__conf_str_tab);
 }
 
+static ACL_VSTREAM *__logfp = NULL;
+
 static void udp_server_open_log(void)
 {
 	/* first, close the master's log */
-	master_log_close();
+	acl_msg_close();
+	if (__logfp)
+		acl_vstream_close(__logfp);
 
 	/* second, open the service's log */
 	acl_msg_open(acl_var_udp_log_file, acl_var_udp_procname);
@@ -395,8 +400,8 @@ static int bind_one(struct addrinfo *res0, struct addrinfo **res)
 
 		on = 1;
 		if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
-			(const void *) &on, sizeof(on)) < 0)
-		{
+			(const void *) &on, sizeof(on)) < 0) {
+
 			acl_msg_warn("%s(%d): setsockopt(SO_REUSEADDR): %s",
 				__FILE__, __LINE__, acl_last_serror());
 		}
@@ -404,8 +409,8 @@ static int bind_one(struct addrinfo *res0, struct addrinfo **res)
 #if defined(SO_REUSEPORT)
 		on = 1;
 		if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT,
-			(const void *) &on, sizeof(on)) < 0)
-		{
+			(const void *) &on, sizeof(on)) < 0) {
+
 			acl_msg_warn("%s(%d): setsocket(SO_REUSEPORT): %s",
 				__FILE__, __LINE__, acl_last_serror());
 		}
@@ -436,16 +441,18 @@ static int bind_addr(const char *addr)
 
 	res0 = host_addrinfo(addr);
 	if (res0 == NULL) {
-		acl_msg_fatal("%s(%d): host_addrinfo NULL, addr=%s",
+		acl_msg_error("%s(%d): host_addrinfo NULL, addr=%s",
 			__FILE__, __LINE__, addr);
+		return -1;
 	}
 
 	fd = bind_one(res0, &res);
 	freeaddrinfo(res0);
 
 	if (fd == ACL_SOCKET_INVALID) {
-		acl_msg_fatal("%s(%d): bind %s error %s",
+		acl_msg_error("%s(%d): bind %s error %s",
 			__FILE__, __LINE__, addr, acl_last_serror());
+		return -1;
 	}
 
 	return fd;
@@ -460,7 +467,7 @@ static int open_server(const char *service_name)
 	int event_mode, i, fd;
 	char addr[64];
 #ifdef SO_REUSEPORT
-	ACL_ARGV *tokens;
+	ACL_ARGV *addrs;
 	ACL_ITER  iter;
 #endif
 
@@ -491,18 +498,26 @@ static int open_server(const char *service_name)
 
 	/* socket count is as same listen_fd_count in parent process */
 
+#ifdef SO_REUSEPORT
+	addrs = acl_ifconf_search(service_name);
+	__socket_count = addrs->argc;
+#endif
 	__servers = (ACL_VSTREAM **)
 		acl_mycalloc(__socket_count + 1, sizeof(ACL_VSTREAM *));
 	for (i = 0; i < __socket_count + 1; i++)
 		__servers[i] = NULL;
 
 #ifdef SO_REUSEPORT
-	tokens = acl_argv_split(service_name, "\"',; \t\r\n");
-	acl_foreach(iter, tokens) {
+	i = 0;
+	acl_foreach(iter, addrs) {
 		ACL_VSTREAM *stream;
 		const char *ptr = (char *) iter.data;
 
 		fd = bind_addr(ptr);
+		if (fd < 0)
+			continue;
+
+		acl_msg_info("bind %s addr ok, fd %d", ptr, fd);
 		stream = acl_vstream_fdopen(fd, O_RDWR, acl_var_udp_buf_size,
 				acl_var_udp_rw_timeout, fdtype);
 
@@ -514,9 +529,14 @@ static int open_server(const char *service_name)
 		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 		__servers[i++] = stream;
 	}
-	acl_argv_free(tokens);
+	acl_argv_free(addrs);
+
+	if (i == 0)
+		acl_msg_fatal("%s(%d), %s: binding all addrs failed!",
+			__FILE__, __LINE__, __FUNCTION__);
 #else
 	(void) service_name;
+
 	fd = ACL_MASTER_LISTEN_FD;
 	for (i = 0; fd < ACL_MASTER_LISTEN_FD + __socket_count; fd++) {
 		ACL_VSTREAM *stream = acl_vstream_fdopen(fd, O_RDWR,
@@ -575,6 +595,9 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	 * to stderr, because no-one is going to see them.
 	 */
 	opterr = 0;
+
+	__logfp = acl_vstream_fdopen(0, 0644, 8192, 0, ACL_VSTREAM_TYPE_FILE);
+	acl_msg_open2(__logfp, argv[0]);
 
 	while ((c = getopt(argc, argv, "hcn:s:t:uvf:")) > 0) {
 		switch (c) {
@@ -707,7 +730,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	if (post_init)
 		post_init(__service_ctx);
 
-	acl_msg_info("%s: daemon started", argv[0]);
+	acl_msg_info("%s -- %s: daemon started", argv[0], myname);
 
 	while (1)
 		acl_event_loop(__event);

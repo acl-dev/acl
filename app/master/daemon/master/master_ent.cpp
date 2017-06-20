@@ -323,8 +323,8 @@ static void service_sock(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 		const char *path = (const char*) iter.data;
 
 		if (acl_ipv4_addr_valid(path) || acl_alldig(path)
-			|| (*path == ':' && acl_alldig(path + 1)))
-		{
+			|| (*path == ':' && acl_alldig(path + 1))) {
+
 			ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR*)
 				acl_mycalloc(1, sizeof(ACL_MASTER_ADDR));
 
@@ -369,8 +369,8 @@ static void service_udp(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 		const char *ptr = (const char*) iter.data;
 
 		if (acl_ipv4_addr_valid(ptr) || acl_alldig(ptr)
-			|| (*ptr == ':' && acl_alldig(ptr + 1)))
-		{
+			|| (*ptr == ':' && acl_alldig(ptr + 1))) {
+
 			ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR*)
 				acl_mycalloc(1, sizeof(ACL_MASTER_ADDR));
 
@@ -379,7 +379,20 @@ static void service_udp(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 
 			acl_array_append(serv->addrs, addr);
 			serv->listen_fd_count++;
+		} else if (service_inet_expand(serv, ptr) == 0) {
+			ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR*)
+				acl_mycalloc(1, sizeof(ACL_MASTER_ADDR));
+
+			addr->type = ACL_MASTER_SERV_TYPE_UNIX;
+			addr->addr = acl_master_pathname(
+				acl_var_master_queue_dir,
+				ACL_MASTER_CLASS_PUBLIC, ptr);
+			acl_array_append(serv->addrs, addr);
+			serv->listen_fd_count++;
+			acl_msg_info("%s(%d), %s: add addr=%s", __FILE__,
+				__LINE__, __FUNCTION__, ptr);
 		}
+
 	}
 }
 
