@@ -109,8 +109,8 @@ int     main(int argc, char **argv)
 	/*
 	 * don't call acl_close_on_exec that the children can use
 	 * master's log in starting status
+	 * acl_log_close_onexec(0);
 	 */
-	acl_log_close_onexec(0);
 
 	/* use 0 as the log's fd */
 	close(0);

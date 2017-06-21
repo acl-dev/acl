@@ -20,6 +20,10 @@ extern int   acl_var_udp_buf_size;
 #define	ACL_DEF_UDP_RW_TIMEOUT		30
 extern int   acl_var_udp_rw_timeout;
 
+#define ACL_VAR_UDP_USE_LIMIT		"udp_use_limit"
+#define ACL_DEF_UDP_USE_LIMIT		0
+extern long long int acl_var_udp_use_limit;
+
 #define	ACL_VAR_UDP_IDLE_LIMIT		"udp_idle_limit"
 #define	ACL_DEF_UDP_IDLE_LIMIT		0
 extern int   acl_var_udp_idle_limit;
@@ -71,6 +75,10 @@ extern char *acl_var_udp_log_debug;
 #define	ACL_VAR_UDP_MAX_DEBUG		"master_debug_max"
 #define	ACL_DEF_UDP_MAX_DEBUG		1000
 extern int   acl_var_udp_max_debug;
+
+#define ACL_VAR_UDP_THREADS		"udp_threads"
+#define ACL_DEF_UDP_THREADS		1
+extern int   acl_var_udp_threads;
 
 #ifdef	__cplusplus
 }

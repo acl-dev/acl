@@ -57,6 +57,8 @@ void master_udp::run_daemon(int argc, char** argv)
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
 		ACL_MASTER_SERVER_EXIT, service_exit,
+		ACL_MASTER_SERVER_THREAD_INIT, thread_init,
+		ACL_MASTER_SERVER_THREAD_EXIT, thread_exit,
 		ACL_MASTER_SERVER_INT_TABLE, conf_.get_int_cfg(),
 		ACL_MASTER_SERVER_STR_TABLE, conf_.get_str_cfg(),
 		ACL_MASTER_SERVER_BOOL_TABLE, conf_.get_bool_cfg(),
@@ -98,6 +100,8 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
 		ACL_MASTER_SERVER_EXIT, service_exit,
+		ACL_MASTER_SERVER_THREAD_INIT, thread_init,
+		ACL_MASTER_SERVER_THREAD_EXIT, thread_exit,
 		ACL_MASTER_SERVER_INT_TABLE, conf_.get_int_cfg(),
 		ACL_MASTER_SERVER_STR_TABLE, conf_.get_str_cfg(),
 		ACL_MASTER_SERVER_BOOL_TABLE, conf_.get_bool_cfg(),
@@ -114,6 +118,7 @@ static void on_close(ACL_VSTREAM* stream, void* ctx)
 	if (ctx && stream->context == ctx)
 	{
 		socket_stream* ss = (socket_stream*) ctx;
+		ss->unbind();
 		delete ss;
 	}
 }
@@ -133,10 +138,12 @@ void master_udp::service_main(ACL_VSTREAM *stream, char*, char**)
 		acl_vstream_add_close_handle(stream, on_close, ss);
 	}
 
+/*
 #ifndef	ACL_WINDOWS
 	if (__mu->daemon_mode_)
 		acl_watchdog_pat();  // 必须通知 acl_master 框架一下
 #endif
+*/
 	__mu->on_read(ss);
 }
 
@@ -156,6 +163,18 @@ void master_udp::service_init(char*, char**)
 {
 	acl_assert(__mu != NULL);
 
+	__mu->proc_inited_ = true;
+	__mu->proc_on_init();
+}
+
+void master_udp::service_exit(char*, char**)
+{
+	acl_assert(__mu != NULL);
+	__mu->proc_on_exit();
+}
+
+void master_udp::thread_init(void *)
+{
 #ifndef	ACL_WINDOWS
 	if (__mu->daemon_mode_)
 	{
@@ -169,15 +188,12 @@ void master_udp::service_init(char*, char**)
 		}
 	}
 #endif
-
-	__mu->proc_inited_ = true;
-	__mu->proc_on_init();
+	__mu->thread_on_init();
 }
 
-void master_udp::service_exit(char*, char**)
+void master_udp::thread_exit(void *)
 {
-	acl_assert(__mu != NULL);
-	__mu->proc_on_exit();
+	__mu->thread_on_exit();
 }
 
 }  // namespace acl

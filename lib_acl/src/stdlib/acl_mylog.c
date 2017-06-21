@@ -184,7 +184,12 @@ static int open_file_log(const char *filename, const char *logpre)
 	}
 
 	fp = private_vstream_fhopen(fh, O_RDWR);
+
+#if 0
 	acl_vstream_set_path(fp, filename);
+#else
+	fp->path = strdup(filename);
+#endif
 
 #ifdef	ACL_UNIX
 	if (__log_close_onexec)
@@ -237,11 +242,11 @@ static int reopen_log(ACL_LOG *log)
 	} else if (now - log->last_open < log->reopen_inter)
 		RETURN(-1);
 
-#if 0
 	if (log->fp->path) {
 		free(log->fp->path);
 		log->fp->path = NULL;
 	}
+#if 0
 	if (log->fp->addr_local) {
 		free(log->fp->addr_local);
 		log->fp->addr_local = NULL;
@@ -865,11 +870,11 @@ void acl_close_log()
 			continue;
 
 		if (log->fp) {
-#if 0
 			if (log->fp->path) {
 				free(log->fp->path);
 				log->fp->path = NULL;
 			}
+#if 0
 			if (log->fp->addr_local) {
 				free(log->fp->addr_local);
 				log->fp->addr_local = NULL;
