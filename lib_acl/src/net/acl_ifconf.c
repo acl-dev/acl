@@ -6,6 +6,8 @@
 #include "stdlib/acl_iterator.h"
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_mystring.h"
+#include "stdlib/acl_stringops.h"
+#include "net/acl_sane_inet.h"
 #include "net/acl_sane_inet.h"
 #include "net/acl_ifconf.h"
 

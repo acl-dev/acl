@@ -26,7 +26,8 @@
 #include <strings.h>
 #endif
 #include <time.h>
-#include <pthread.h>
+
+#endif /* ACL_UNIX */
 
 /* Utility library. */
 
@@ -41,6 +42,8 @@
 #include "stdlib/acl_argv.h"
 #include "net/acl_sane_socket.h"
 #include "net/acl_vstream_net.h"
+#include "net/acl_ifconf.h"
+#include "net/acl_listen.h"
 #include "event/acl_events.h"
 
 /* Application-specific */
@@ -49,6 +52,8 @@
 #include "master/acl_master_proto.h"
 #include "master/acl_udp_params.h"
 #include "master/acl_server_api.h"
+#include "master/acl_master_type.h"
+#include "master/acl_master_conf.h"
 #include "master_log.h"
 
 int   acl_var_udp_pid;
@@ -322,149 +327,12 @@ static void log_event_mode(int event_mode)
 	}
 }
 
-#ifdef SO_REUSEPORT
-
-static int host_port(char *buf, char **host, char **port)
-{
-	const char *ptr = acl_host_port(buf, host, "", port, (char*) NULL);
-
-	if (ptr != NULL) {
-		acl_msg_error("%s(%d): invalid addr %s, %s",
-			__FILE__, __LINE__, buf, ptr);
-		return -1;
-	}
-
-	if (*port == NULL || atoi(*port) < 0) {
-		acl_msg_error("%s(%d): invalid port: %s, addr: %s",
-			__FILE__, __LINE__, *port ? *port : "null", buf);
-		return -1;
-	}
-
-	if (*host && **host == 0)
-		*host = 0;
-	if (*host == NULL)
-		*host = "0";
-
-	return 0;
-}
-
-static struct addrinfo *host_addrinfo(const char *addr)
-{
-	int    err;
-	struct addrinfo hints, *res0;
-	char  *buf = acl_mystrdup(addr), *host = NULL, *port = NULL;
-
-	if (host_port(buf, &host, &port) < 0) {
-		acl_myfree(buf);
-		return NULL;
-	}
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family   = PF_UNSPEC;
-	hints.ai_socktype = SOCK_DGRAM;
-#ifdef  ACL_MACOSX
-	hints.ai_flags    = AI_DEFAULT;
-#elif   defined(ACL_ANDROID)
-	hints.ai_flags    = AI_ADDRCONFIG;
-#elif defined(ACL_WINDOWS)
-	hints.ai_protocol = IPPROTO_UDP;
-# if _MSC_VER >= 1500
-	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
-# endif
-#else
-	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
-#endif
-	if ((err = getaddrinfo(host, port, &hints, &res0))) {
-		acl_msg_error("%s(%d): getaddrinfo error %s, peer=%s",
-			__FILE__, __LINE__, gai_strerror(err), host);
-		acl_myfree(buf);
-		return NULL;
-	}
-
-	acl_myfree(buf);
-	return res0;
-}
-
-static int bind_one(struct addrinfo *res0, struct addrinfo **res)
-{
-	struct addrinfo *it;
-	int   on, fd;
-
-	for (it = res0; it != NULL ; it = it->ai_next) {
-		fd = socket(it->ai_family, it->ai_socktype, it->ai_protocol);
-		if (fd == ACL_SOCKET_INVALID) {
-			acl_msg_error("%s(%d): create socket %s",
-				__FILE__, __LINE__, acl_last_serror());
-			return ACL_SOCKET_INVALID;
-		}
-
-		on = 1;
-		if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
-			(const void *) &on, sizeof(on)) < 0) {
-
-			acl_msg_warn("%s(%d): setsockopt(SO_REUSEADDR): %s",
-				__FILE__, __LINE__, acl_last_serror());
-		}
-
-#if defined(SO_REUSEPORT)
-		on = 1;
-		if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT,
-			(const void *) &on, sizeof(on)) < 0) {
-
-			acl_msg_warn("%s(%d): setsocket(SO_REUSEPORT): %s",
-				__FILE__, __LINE__, acl_last_serror());
-		}
-#endif
-
-#ifdef ACL_WINDOWS
-		if (bind(fd, it->ai_addr, (int) it->ai_addrlen) == 0)
-#else
-		if (bind(fd, it->ai_addr, it->ai_addrlen) == 0)
-#endif
-		{
-			*res = it;
-			return fd;
-		}
-
-		acl_msg_error("%s(%d): bind error %s",
-			__FILE__, __LINE__, acl_last_serror());
-		acl_socket_close(fd);
-	}
-
-	return ACL_SOCKET_INVALID;
-}
-
-static int bind_addr(const char *addr)
-{
-	struct addrinfo *res0, *res;
-	int    fd;
-
-	res0 = host_addrinfo(addr);
-	if (res0 == NULL) {
-		acl_msg_error("%s(%d): host_addrinfo NULL, addr=%s",
-			__FILE__, __LINE__, addr);
-		return -1;
-	}
-
-	fd = bind_one(res0, &res);
-	freeaddrinfo(res0);
-
-	if (fd == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s(%d): bind %s error %s",
-			__FILE__, __LINE__, addr, acl_last_serror());
-		return -1;
-	}
-
-	return fd;
-}
-
-#endif /* SO_REUSEPORT */
-
 static int open_server(const char *service_name)
 {
 	int fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 	ACL_VSTREAM *stat_stream;
-	int event_mode, i, fd;
+	int event_mode, i;
+	ACL_SOCKET fd;
 	char addr[64];
 #ifdef SO_REUSEPORT
 	ACL_ARGV *addrs;
@@ -513,8 +381,8 @@ static int open_server(const char *service_name)
 		ACL_VSTREAM *stream;
 		const char *ptr = (char *) iter.data;
 
-		fd = bind_addr(ptr);
-		if (fd < 0)
+		fd = acl_udp_bind(ptr, ACL_NON_BLOCKING);
+		if (fd == ACL_SOCKET_INVALID)
 			continue;
 
 		acl_msg_info("bind %s addr ok, fd %d", ptr, fd);
@@ -524,7 +392,6 @@ static int open_server(const char *service_name)
 		acl_getsockname(fd, addr, sizeof(addr));
 		acl_vstream_set_local(stream, addr);
 		acl_vstream_set_udp_io(stream);
-		acl_non_blocking(fd, ACL_NON_BLOCKING);
 		acl_event_enable_read(__event, stream, 0, udp_server_read, 0);
 		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 		__servers[i++] = stream;
@@ -735,5 +602,3 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	while (1)
 		acl_event_loop(__event);
 }
-
-#endif /* ACL_UNIX */

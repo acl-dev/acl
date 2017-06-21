@@ -81,6 +81,11 @@ ACL_API ACL_SOCKET acl_unix_accept(ACL_SOCKET fd);
 
 ACL_API int acl_fifo_listen(const char *path, int permissions, int block_mode);
 
+/* in acl_sane_bind.c */
+
+ACL_API ACL_SOCKET acl_sane_bind(const struct addrinfo *res);
+ACL_API ACL_SOCKET acl_udp_bind(const char *addr, int blocking);
+
 #endif
 
 #ifdef __cplusplus

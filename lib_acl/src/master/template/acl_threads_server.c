@@ -56,6 +56,8 @@
 #include "master/acl_master_proto.h"
 #include "master/acl_threads_params.h"
 #include "master/acl_server_api.h"
+#include "master/acl_master_type.h"
+#include "master/acl_master_conf.h"
 #include "master_log.h"
 
 int   acl_var_threads_pid;
