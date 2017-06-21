@@ -100,6 +100,7 @@
 		0779D5451DBE073000449438 /* acl_fifo_listen.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3F71DBE070E00449438 /* acl_fifo_listen.c */; };
 		0779D5461DBE073000449438 /* acl_inet_listen.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3F81DBE070E00449438 /* acl_inet_listen.c */; };
 		0779D5471DBE073000449438 /* acl_sane_accept.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3F91DBE070E00449438 /* acl_sane_accept.c */; };
+		0779D5471DBE073000449438 /* acl_sane_bind.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3F91DBE070E00449438 /* acl_sane_bind.c */; };
 		0779D5481DBE073000449438 /* acl_unix_listen.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3FA1DBE070E00449438 /* acl_unix_listen.c */; };
 		0779D5501DBE073000449438 /* private_array.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4041DBE070E00449438 /* private_array.c */; };
 		0779D5521DBE073000449438 /* private_fifo.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4061DBE070E00449438 /* private_fifo.c */; };
@@ -354,6 +355,7 @@
 		0779D3F71DBE070E00449438 /* acl_fifo_listen.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_fifo_listen.c; sourceTree = "<group>"; };
 		0779D3F81DBE070E00449438 /* acl_inet_listen.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_inet_listen.c; sourceTree = "<group>"; };
 		0779D3F91DBE070E00449438 /* acl_sane_accept.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_sane_accept.c; sourceTree = "<group>"; };
+		0779D3F91DBE070E00449438 /* acl_sane_bind.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_sane_bind.c; sourceTree = "<group>"; };
 		0779D3FA1DBE070E00449438 /* acl_unix_listen.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_unix_listen.c; sourceTree = "<group>"; };
 		0779D4041DBE070E00449438 /* private_array.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = private_array.c; sourceTree = "<group>"; };
 		0779D4061DBE070E00449438 /* private_fifo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = private_fifo.c; sourceTree = "<group>"; };
@@ -937,6 +939,7 @@
 				0779D3F71DBE070E00449438 /* acl_fifo_listen.c */,
 				0779D3F81DBE070E00449438 /* acl_inet_listen.c */,
 				0779D3F91DBE070E00449438 /* acl_sane_accept.c */,
+				0779D3F91DBE070E00449438 /* acl_sane_bind.c */,
 				0779D3FA1DBE070E00449438 /* acl_unix_listen.c */,
 			);
 			path = listen;
@@ -1644,6 +1647,7 @@
 				0779D5451DBE073000449438 /* acl_fifo_listen.c in Sources */,
 				0779D5461DBE073000449438 /* acl_inet_listen.c in Sources */,
 				0779D5471DBE073000449438 /* acl_sane_accept.c in Sources */,
+				0779D5471DBE073000449438 /* acl_sane_bind.c in Sources */,
 				0779D5481DBE073000449438 /* acl_unix_listen.c in Sources */,
 				0779D5501DBE073000449438 /* private_array.c in Sources */,
 				0779D5521DBE073000449438 /* private_fifo.c in Sources */,
