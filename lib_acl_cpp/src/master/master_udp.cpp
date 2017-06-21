@@ -68,7 +68,7 @@ void master_udp::run_daemon(int argc, char** argv)
 //////////////////////////////////////////////////////////////////////////
 
 bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
-	unsigned int count /* = 1 */)
+	unsigned int)
 {
 #ifdef ACL_WINDOWS
 	acl_cpp_init();

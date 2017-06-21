@@ -443,6 +443,7 @@ static int open_server(const char *service_name)
 
 	fd = ACL_MASTER_LISTEN_FD;
 	for (i = 0; fd < ACL_MASTER_LISTEN_FD + __socket_count; fd++) {
+		char addr[64];
 		ACL_VSTREAM *stream = acl_vstream_fdopen(fd, O_RDWR,
 			acl_var_udp_buf_size, acl_var_udp_rw_timeout, fdtype);
 

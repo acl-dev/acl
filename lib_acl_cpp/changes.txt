@@ -1,8 +1,13 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+480) 2017.6.21
+480.1) feature: master_udp.cpp 完全封装了 acl_udp_server.c 中的代码逻辑，之前
+在 alone 运行方式下的逻辑是独立于 acl_udp_server.c 的，不利于使用 valgrind
+查找内存问题
+
 479) 2017.5.31
-479.1) featur: add WebSocketServlet by "fuwangqin" <niukey@qq.com> 
+479.1) feature: add WebSocketServlet by "fuwangqin" <niukey@qq.com> 
 
 478) 2017.5.27
 478.1) bugfix: websocket::make_frame_header 中当 payload_len 为 126 时会遇到

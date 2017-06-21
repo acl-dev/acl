@@ -250,6 +250,7 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 	} sa;
 	socklen_t sa_len = sizeof(sa);
 	int   ret;
+	size_t n;
 
 	if (stream->sa_peer_size == 0)
 		acl_vstream_set_peer(stream, "0.0.0.0:0");
@@ -262,7 +263,9 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 	ret = (int) recvfrom(fd, buf, (int) size, 0,
 			(struct sockaddr*) &sa, &sa_len);
 
-	if (ret > 0 && memcmp(stream->sa_peer, &sa, sizeof(sa)) != 0)
+	n = stream->sa_peer_size > sizeof(sa) ?
+		sizeof(sa) : stream->sa_peer_size;
+	if (ret > 0 && memcmp(stream->sa_peer, &sa, n) != 0)
 		acl_vstream_set_peer_addr(stream, (struct sockaddr *) &sa);
 	return ret;
 }
