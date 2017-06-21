@@ -842,41 +842,41 @@
     <ClCompile Include=".\src\code\uni2utf8.c">
       <Filter>Source Files\code</Filter>
     </ClCompile>
-    <ClCompile Include="src\event\events_epoll_thr.c">
-      <Filter>Source Files\event</Filter>
+    <ClCompile Include=".\src\event\events_epoll_thr.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\stdlib\sys\unix\acl_trace.c">
-      <Filter>Source Files\stdlib\sys\unix</Filter>
+    <ClCompile Include=".\src\stdlib\acl_atomic.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\xml\acl_xml2.c">
-      <Filter>Source Files\xml</Filter>
+    <ClCompile Include=".\src\stdlib\common\acl_ypipe.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\xml\acl_xml2_parse.c">
-      <Filter>Source Files\xml</Filter>
+    <ClCompile Include=".\src\stdlib\common\acl_yqueue.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\xml\acl_xml2_util.c">
-      <Filter>Source Files\xml</Filter>
+    <ClCompile Include=".\src\stdlib\sys\acl_sane_socketpair.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\xml\acl_xml3.c">
-      <Filter>Source Files\xml</Filter>
+    <ClCompile Include=".\src\stdlib\sys\unix\acl_trace.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\xml\acl_xml3_parse.c">
-      <Filter>Source Files\xml</Filter>
+    <ClCompile Include=".\src\xml\acl_xml2.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\xml\acl_xml3_util.c">
-      <Filter>Source Files\xml</Filter>
+    <ClCompile Include=".\src\xml\acl_xml2_parse.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\stdlib\common\acl_ypipe.c">
-      <Filter>Source Files\stdlib\common</Filter>
+    <ClCompile Include=".\src\xml\acl_xml2_util.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\stdlib\common\acl_yqueue.c">
-      <Filter>Source Files\stdlib\common</Filter>
+    <ClCompile Include=".\src\xml\acl_xml3.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\stdlib\acl_atomic.c">
-      <Filter>Source Files\stdlib</Filter>
+    <ClCompile Include=".\src\xml\acl_xml3_parse.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\stdlib\sys\acl_sane_socketpair.c">
-      <Filter>Source Files\stdlib\sys</Filter>
+    <ClCompile Include=".\src\xml\acl_xml3_util.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1481,6 +1481,9 @@
     </ClInclude>
     <ClInclude Include="include\stdlib\acl_sane_socketpair.h">
       <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\master\acl_udp_params.h">
+      <Filter>Header Files\master</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

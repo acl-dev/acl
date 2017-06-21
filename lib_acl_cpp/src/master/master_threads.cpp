@@ -60,6 +60,10 @@ void master_threads::run_daemon(int argc, char** argv)
 bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 	unsigned int, int)
 {
+#ifdef ACL_WINDOWS
+	acl_cpp_init();
+#endif
+
 	// 每个进程只能有一个实例在运行
 	acl_assert(has_called == false);
 	has_called = true;
@@ -67,7 +71,7 @@ bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 	acl_assert(addrs && *addrs);
 
 	int  argc = 0;
-	const char *argv[9];
+	const char *argv[5];
 
 	const char* proc = acl_process_path();
 	argv[argc++] = proc ? proc : "demo";

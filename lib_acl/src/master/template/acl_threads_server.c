@@ -1196,7 +1196,6 @@ static void usage(int argc, char * argv[])
 		" -c [use chroot]"
 		" -n service_name"
 		" -s socket_count"
-		" -t transport"
 		" -u [use setgid initgroups setuid]"
 		" -v [on acl_msg_verbose]"
 		" -f conf_file"

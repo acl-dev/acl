@@ -153,6 +153,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 
 #elif defined(ACL_WINDOWS)
 
+#pragma comment (lib, "Iphlpapi.lib")
 #ifdef	MS_VC6
 
 #include "iptypes.h"
