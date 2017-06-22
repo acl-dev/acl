@@ -141,6 +141,8 @@ install:
 	$(shell mkdir -p $(INC_PATH)/acl)
 	$(shell mkdir -p $(INC_PATH)/protocol)
 	$(shell mkdir -p $(INC_PATH)/acl_cpp)
+	$(shell mkdir -p $(LIB_DIST)/$(RPATH))
+	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
 	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
 	cp -f libacl_all.a $(LIB_DIST)/$(RPATH)/
 	cp -f lib_acl/lib/libacl.a $(LIB_DIST)/$(RPATH)/
