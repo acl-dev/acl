@@ -723,7 +723,7 @@ static void server_accept_sock(int event_type, ACL_EVENT *event,
 
 	while (i++ < acl_var_threads_max_accept) {
 		fd = acl_accept(listen_fd, remote, sizeof(remote), &sock_type);
-		if (fd >= 0 && fd != ACL_SOCKET_INVALID) {
+		if (fd >= 0) {
 			/* set NODELAY for TCP socket */
 #ifdef AF_INET6
 			if (sock_type == AF_INET || sock_type == AF_INET6)
