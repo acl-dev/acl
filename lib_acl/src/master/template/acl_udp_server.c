@@ -488,6 +488,8 @@ static SERVER *servers_binding(const char *service,
 	return servers;
 }
 
+#ifdef ACL_UNIX
+
 static void server_open(SERVER *server, int sock_count)
 {
 	ACL_SOCKET fd;
@@ -526,6 +528,8 @@ static SERVER *servers_open(int event_mode, int nthreads, int sock_count)
 
 	return servers;
 }
+
+#endif /* ACL_UNIX */
 
 static SERVER *servers_create(const char *service, int nthreads)
 {
@@ -597,10 +601,12 @@ static void main_thread_loop(void)
 {
 	__main_event = acl_event_new(__event_mode, 0,
 		acl_var_udp_delay_sec, acl_var_udp_delay_usec);
-	ACL_VSTREAM *stat_stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
-		O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
-
+#ifdef ACL_UNIX
 	if (__daemon_mode) {
+		ACL_VSTREAM *stat_stream = acl_vstream_fdopen(
+			ACL_MASTER_STATUS_FD, O_RDWR, 8192, 0,
+			ACL_VSTREAM_TYPE_SOCK);
+
 		acl_event_enable_read(__main_event, stat_stream, 0,
 			udp_server_abort, __main_event);
 
@@ -608,6 +614,7 @@ static void main_thread_loop(void)
 		acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
 		acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
 	}
+#endif
 
 	if (acl_var_udp_idle_limit > 0)
 		acl_event_request_timer(__main_event,
