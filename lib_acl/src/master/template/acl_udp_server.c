@@ -239,6 +239,7 @@ static void server_stop(SERVER *server)
 	for (i = 0; server->streams[i] != NULL; i++) {
 		acl_event_disable_readwrite(server->event, server->streams[i]);
 		acl_vstream_close(server->streams[i]);
+		acl_myfree(server->streams);
 	}
 
 	acl_event_free(server->event);
@@ -276,7 +277,9 @@ static void udp_server_exit(void)
 	if (acl_var_udp_procname)
 		acl_myfree(acl_var_udp_procname);
 
-	servers_stop();
+	if (0)
+		servers_stop();
+
 	if (__main_event)
 		acl_event_free(__main_event);
 
