@@ -540,6 +540,9 @@ static SERVER *servers_create(const char *service, int nthreads)
 	else
 		__event_mode = ACL_EVENT_SELECT;
 
+	__main_event = acl_event_new(__event_mode, 0,
+		acl_var_udp_delay_sec, acl_var_udp_delay_usec);
+
 	if (!__daemon_mode)
 		return servers_binding(service, __event_mode, nthreads);
 
@@ -599,8 +602,6 @@ static void udp_server_timeout(int type acl_unused,
 
 static void main_thread_loop(void)
 {
-	__main_event = acl_event_new(__event_mode, 0,
-		acl_var_udp_delay_sec, acl_var_udp_delay_usec);
 #ifdef ACL_UNIX
 	if (__daemon_mode) {
 		ACL_VSTREAM *stat_stream = acl_vstream_fdopen(
