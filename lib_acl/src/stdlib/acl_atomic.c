@@ -117,6 +117,26 @@ void *acl_atomic_xchg(ACL_ATOMIC *self, void *value)
 #endif
 }
 
+void acl_atomic_int64_set(ACL_ATOMIC *self, long long n)
+{
+#ifndef HAS_ATOMIC
+	acl_pthread_mutex_lock(&self->lock);
+	*self->value = n;
+	acl_pthread_mutex_unlock(&self->lock);
+#elif	defined(ACL_WINDOWS)
+	InterlockedExchangePointer((volatile PVOID*) self->value, n);
+#elif	defined(ACL_LINUX)
+# if defined(__GNUC__) && (__GNUC__ >= 4)
+	(void) __sync_lock_test_and_set((long long *) self->value, n);
+# else
+	(void) self;
+	(void) value;
+	acl_msg_error("%s(%d), %s: not support!",
+		 __FILE__, __LINE__, __FUNCTION__);
+# endif
+#endif
+}
+
 long long acl_atomic_int64_fetch_add(ACL_ATOMIC *self, long long n)
 {
 #ifndef HAS_ATOMIC
@@ -129,7 +149,7 @@ long long acl_atomic_int64_fetch_add(ACL_ATOMIC *self, long long n)
 	return InterlockedExchangeAdd64((volatile LONGLONG*)&self->value, n);
 #elif	defined(ACL_LINUX)
 # if defined(__GNUC__) && (__GNUC__ >= 4)
-	return __sync_fetch_and_add(&self->value, n);
+	return (long long) __sync_fetch_and_add(&self->value, n);
 # else
 	(void) self;
 	(void) n;
@@ -152,55 +172,7 @@ long long acl_atomic_int64_add_fetch(ACL_ATOMIC *self, long long n)
 	return InterlockedExchangeAdd64((volatile LONGLONG*)&self->value, n);
 #elif	defined(ACL_LINUX)
 # if defined(__GNUC__) && (__GNUC__ >= 4)
-	return __sync_add_and_fetch(&self->value, n);
-# else
-	(void) self;
-	(void) n;
-	acl_msg_error("%s(%d), %s: not support!",
-		__FILE__, __LINE__, __FUNCTION__);
-	return -1;
-# endif
-#endif
-}
-
-int acl_atomic_int32_fetch_add(ACL_ATOMIC *self, int n)
-{
-#ifndef HAS_ATOMIC
-	acl_pthread_mutex_lock(&self->lock);
-	int v = *(int *) self->value;
-	*((int *) self->value) = v + n;
-	acl_pthread_mutex_unlock(&self->lock);
-	return v;
-#elif	defined(ACL_WINDOWS)
-	return InterlockedExchangeAdd(
-		(volatile unsigned long *) &self->value, n);
-#elif	defined(ACL_LINUX)
-# if defined(__GNUC__) && (__GNUC__ >= 4)
-	return __sync_fetch_and_add(&self->value, n);
-# else
-	(void) self;
-	(void) n;
-	acl_msg_error("%s(%d), %s: not support!",
-		__FILE__, __LINE__, __FUNCTION__);
-	return -1;
-# endif
-#endif
-}
-
-int acl_atomic_int32_add_fetch(ACL_ATOMIC *self, int n)
-{
-#ifndef HAS_ATOMIC
-	acl_pthread_mutex_lock(&self->lock);
-	int v = *(int *) self->value + n;
-	*((int *) self->value) = v;
-	acl_pthread_mutex_unlock(&self->lock);
-	return v;
-#elif	defined(ACL_WINDOWS)
-	return InterlockedExchangeAdd(
-		(volatile unsigned long *) &self->value, n);
-#elif	defined(ACL_LINUX)
-# if defined(__GNUC__) && (__GNUC__ >= 4)
-	return __sync_add_and_fetch(&self->value, n);
+	return (long long) __sync_add_and_fetch(&self->value, n);
 # else
 	(void) self;
 	(void) n;

@@ -1,6 +1,6 @@
 #command	broadcast(none/master/slave)	permission(yes/no/warn)
 del		none				warn
-set		none				no
+set		none				yes
 get		none				yes
 incr		none				yes
 
