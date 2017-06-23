@@ -13,7 +13,7 @@ function pack() {
 	git archive --format=tar --prefix=${PKG_NAME}-${PKG_VERSION}/ ${TAG} | tar xpf -
 	#git show ${TAG} --oneline | head -1 > ${PKG_NAME}-${PKG_VERSION}/commit-id
 	tar zcpf ${PKG_NAME}-${PKG_VERSION}.tar.gz ${PKG_NAME}-${PKG_VERSION}
-    cp ${PKG_NAME}-${PKG_VERSION}.tar.gz packaging
+	cp ${PKG_NAME}-${PKG_VERSION}.tar.gz packaging
     cd -
 }
 
