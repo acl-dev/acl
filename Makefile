@@ -12,10 +12,11 @@ RANLIB    = ${ENV_RANLIB}
 OSNAME    = $(shell uname -a)
 OSTYPE    = $(shell uname -a)
 
+DESTDIR   =
 PREFIX    = /usr
-BIN_PATH  = $(PREFIX)/bin/
-LIB_ACL   = $(PREFIX)/lib
-INC_ACL   = $(PREFIX)/include/acl-lib
+BIN_PATH  = $(DESTDIR)/$(PREFIX)/bin/
+LIB_ACL   = $(DESTDIR)/$(PREFIX)/lib
+INC_ACL   = $(DESTDIR)/$(PREFIX)/include/acl-lib
 
 LIB_DIST  = ./dist/lib
 INC_PATH  = ./dist/include
@@ -127,7 +128,7 @@ packinstall:
 	$(shell mkdir -p $(INC_ACL)/acl_cpp)
 	$(shell mkdir -p $(BIN_PATH)/)
 	$(shell mkdir -p $(LIB_ACL)/)
-	$(shell mkdir -p /opt/soft/acl-master/)
+	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master/)
 	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
 	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
 	(cd dist/master && ./setup.sh /opt/soft/acl-master)
