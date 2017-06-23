@@ -127,7 +127,7 @@ static int master_bind_udp(ACL_MASTER_SERV *serv)
 #else
 	const char *myname = "master_bind_udp";
 	ACL_ITER iter;
-	int   i;
+	int   i = 0;
 
 	if (serv->listen_fd_count != acl_array_size(serv->addrs))
 		acl_msg_panic("listen_fd_count(%d) != addrs's size(%d)",
