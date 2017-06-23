@@ -179,6 +179,7 @@ void master_udp::thread_init(void *)
 	if (__mu->daemon_mode_)
 	{
 		ACL_VSTREAM** streams = acl_udp_server_streams();
+		__mu->locker_.lock();
 		if (streams != NULL)
 		{
 			for (int i = 0; streams[i] != NULL; i++)
@@ -189,6 +190,7 @@ void master_udp::thread_init(void *)
 				__mu->sstreams_.push_back(ss);
 			}
 		}
+		__mu->locker_.unlock();
 	}
 #endif
 	__mu->thread_on_init();

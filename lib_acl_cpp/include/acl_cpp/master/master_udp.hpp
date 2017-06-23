@@ -1,5 +1,6 @@
 #pragma once
 #include "master_base.hpp"
+#include "../stdlib/locker.hpp"
 
 namespace acl {
 
@@ -50,6 +51,7 @@ protected:
 
 private:
 	std::vector<socket_stream*> sstreams_;
+	locker locker_;
 
 	void close_sstreams(void);
 
