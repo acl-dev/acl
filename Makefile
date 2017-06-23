@@ -128,6 +128,7 @@ packinstall:
 	$(shell mkdir -p $(BIN_PATH)/)
 	$(shell mkdir -p $(LIB_ACL)/)
 	$(shell mkdir -p /opt/soft/acl-master/)
+	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
 	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
 	(cd dist/master && ./setup.sh /opt/soft/acl-master)
 	cp -f app/master/daemon/acl_master $(BIN_PATH)
