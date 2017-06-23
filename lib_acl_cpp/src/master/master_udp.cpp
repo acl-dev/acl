@@ -179,12 +179,15 @@ void master_udp::thread_init(void *)
 	if (__mu->daemon_mode_)
 	{
 		ACL_VSTREAM** streams = acl_udp_server_streams();
-		for (int i = 0; streams[i] != NULL; i++)
+		if (streams != NULL)
 		{
-			socket_stream* ss = NEW socket_stream();
-			if (ss->open(streams[i]) == false)
-				logger_fatal("open stream error!");
-			__mu->sstreams_.push_back(ss);
+			for (int i = 0; streams[i] != NULL; i++)
+			{
+				socket_stream* ss = NEW socket_stream();
+				if (ss->open(streams[i]) == false)
+					logger_fatal("open stream error!");
+				__mu->sstreams_.push_back(ss);
+			}
 		}
 	}
 #endif
