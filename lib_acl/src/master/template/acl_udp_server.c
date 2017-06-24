@@ -26,7 +26,8 @@
 #include <strings.h>
 #endif
 #include <time.h>
-#include <pthread.h>
+
+#endif /* ACL_UNIX */
 
 /* Utility library. */
 
@@ -38,8 +39,11 @@
 #include "stdlib/acl_iostuff.h"
 #include "stdlib/acl_stringops.h"
 #include "stdlib/acl_myflock.h"
+#include "stdlib/acl_argv.h"
 #include "net/acl_sane_socket.h"
 #include "net/acl_vstream_net.h"
+#include "net/acl_ifconf.h"
+#include "net/acl_listen.h"
 #include "event/acl_events.h"
 
 /* Application-specific */
@@ -48,6 +52,8 @@
 #include "master/acl_master_proto.h"
 #include "master/acl_udp_params.h"
 #include "master/acl_server_api.h"
+#include "master/acl_master_type.h"
+#include "master/acl_master_conf.h"
 #include "master_log.h"
 
 int   acl_var_udp_pid;
@@ -63,6 +69,7 @@ int   acl_var_udp_daemon_timeout;
 int   acl_var_udp_master_maxproc;
 int   acl_var_udp_enable_core;
 int   acl_var_udp_max_debug;
+int   acl_var_udp_threads;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_UDP_BUF_SIZE, ACL_DEF_UDP_BUF_SIZE,
@@ -83,6 +90,17 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 		&acl_var_udp_enable_core, 0, 0 },
 	{ ACL_VAR_UDP_MAX_DEBUG, ACL_DEF_UDP_MAX_DEBUG,
 		&acl_var_udp_max_debug, 0, 0 },
+	{ ACL_VAR_UDP_THREADS, ACL_DEF_UDP_THREADS,
+		&acl_var_udp_threads, 0, 0 },
+
+        { 0, 0, 0, 0, 0 },
+};
+
+long long int acl_var_udp_use_limit;
+
+static ACL_CONFIG_INT64_TABLE __conf_int64_tab[] = {
+	{ ACL_VAR_UDP_USE_LIMIT, ACL_DEF_UDP_USE_LIMIT,
+		&acl_var_udp_use_limit, 0, 0 },
 
         { 0, 0, 0, 0, 0 },
 };
@@ -108,113 +126,186 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
         { 0, 0, 0 },
 };
 
+typedef struct SERVER {
+	acl_pthread_t tid;
+	ACL_EVENT    *event;
+	ACL_VSTREAM **streams;
+	int           socket_count;
+} SERVER;
+
  /*
   * Global state.
   */
-static ACL_UDP_SERVER_FN         __service_main;
-static ACL_MASTER_SERVER_EXIT_FN __service_exit;
+static ACL_UDP_SERVER_FN                __service_main;
+static ACL_MASTER_SERVER_EXIT_FN        __service_exit;
+static ACL_MASTER_SERVER_THREAD_INIT_FN __thread_init;
+static ACL_MASTER_SERVER_THREAD_EXIT_FN __thread_exit;
+static void             *__thread_init_ctx = NULL;
+static void             *__thread_exit_ctx = NULL;
 
-static int                       __socket_count = 1;
-static ACL_EVENT                *__event = NULL;
-static ACL_VSTREAM             **__servers = NULL;
+static int               __event_mode;
+static int               __socket_count = 1;
+static SERVER           *__servers = NULL;
+static __thread SERVER  *__server = NULL;
+static ACL_EVENT        *__main_event = NULL;
 
-static char                     *__service_name;
-static char                    **__service_argv;
-static void                     *__service_ctx;
+static const char        *__service_name;
+static char             **__service_argv;
+static void              *__service_ctx;
+static int                __daemon_mode = 1;
+
+typedef struct {
+	long long   last;
+	long long   used;
+	ACL_ATOMIC *time_atomic;
+	ACL_ATOMIC *used_atomic;
+} RUNNING_STATUS;
+
+static RUNNING_STATUS     *__status = NULL;
+
+static void running_status_init(void)
+{
+	acl_assert(__status == NULL);
+	__status = (RUNNING_STATUS *) acl_mymalloc(sizeof(RUNNING_STATUS));
+
+	__status->last        = (long long) time(NULL);
+	__status->used        = 0;
+	__status->time_atomic = acl_atomic_new();
+	__status->used_atomic = acl_atomic_new();
+	acl_atomic_set(__status->time_atomic, &__status->last);
+	acl_atomic_set(__status->used_atomic, &__status->used);
+}
+
+static void running_status_free(void)
+{
+	acl_assert(__status);
+	acl_atomic_free(__status->time_atomic);
+	acl_atomic_free(__status->used_atomic);
+	acl_myfree(__status);
+	__status = NULL;
+}
+
+static long long status_last(void)
+{
+	acl_assert(__status);
+	return __status->last;
+}
+
+static long long status_increase_used(void)
+{
+	long long n;
+
+	acl_assert(__status);
+	n = acl_atomic_int64_add_fetch(__status->used_atomic, 1);
+	if (n < 0)
+		acl_atomic_int64_set(__status->used_atomic, 0);
+
+	acl_atomic_int64_set(__status->time_atomic, (long long) time(NULL));
+	return n;
+}
+
+ACL_EVENT *acl_udp_server_event(void)
+{
+	if (acl_pthread_self() == acl_main_thread_self()) {
+		acl_assert(__main_event);
+		return __main_event;
+	} else {
+		acl_assert(__server);
+		return __server->event;
+	}
+}
 
 void acl_udp_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
 	void *arg, acl_int64 delay, int keep)
 {
-	acl_event_request_timer(__event, timer_fn, arg, delay, keep);
+	acl_event_request_timer(acl_udp_server_event(), timer_fn,
+		arg, delay, keep);
 }
 
 ACL_VSTREAM **acl_udp_server_streams()
 {
-	if (__servers == NULL)
-		acl_msg_warn("server streams NULL!");
-	return __servers;
+	return __server ? __server->streams : NULL;
 }
 
 void acl_udp_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg)
 {
-	acl_event_cancel_timer(__event, timer_fn, arg);
+	acl_event_cancel_timer(acl_udp_server_event(), timer_fn, arg);
 }
 
-ACL_EVENT *acl_udp_server_event()
+static void server_stop(SERVER *server)
 {
-	return __event;
+	int i;
+
+	for (i = 0; server->streams[i] != NULL; i++) {
+		acl_event_disable_readwrite(server->event, server->streams[i]);
+		acl_vstream_close(server->streams[i]);
+		acl_myfree(server->streams);
+	}
+
+	acl_event_free(server->event);
 }
 
-static void disable_listen(ACL_EVENT *event)
+static void servers_stop(void)
 {
-	int   i;
+	int i;
 
 	if (__servers == NULL)
 		return;
 
-	for (i = 0; __servers[i] != NULL; i++) {
-		acl_event_disable_readwrite(event, __servers[i]);
-		acl_vstream_close(__servers[i]);
-		__servers[i] = NULL;
-		acl_msg_info("All servers closed now!");
-	}
+	for (i = 0; i < acl_var_udp_threads; i++)
+		server_stop(&__servers[i]);
 
 	acl_myfree(__servers);
 	__servers = NULL;
+
+	acl_msg_info("All servers closed now!");
 }
 
 /* udp_server_exit - normal termination */
 
 static void udp_server_exit(void)
 {
+	int i;
+
 	if (__service_exit)
 		__service_exit(__service_ctx);
 
+	for (i = 0; __conf_str_tab[i].name != NULL; i++)
+		acl_myfree(*__conf_str_tab[i].target);
+	acl_app_conf_unload();
+
+	if (acl_var_udp_procname)
+		acl_myfree(acl_var_udp_procname);
+
+	if (0)
+		servers_stop();
+
+	if (__main_event)
+		acl_event_free(__main_event);
+
+	running_status_free();
+
+	acl_msg_close();
+
 	exit(0);
-}
-
-/* udp_server_timeout - idle time exceeded */
-
-static void udp_server_timeout(int type acl_unused,
-	ACL_EVENT *event acl_unused, void *context acl_unused)
-{
-	const char *myname = "udp_server_timeout";
-
-	if (acl_msg_verbose)
-		acl_msg_info("%s: idle timeout -- exiting", myname);
-
-	udp_server_exit();
 }
 
 /* udp_server_abort - terminate after abnormal master exit */
 
 static void udp_server_abort(int event_type acl_unused,
-	ACL_EVENT *event, ACL_VSTREAM *stream acl_unused,
+	ACL_EVENT *event acl_unused, ACL_VSTREAM *stream acl_unused,
 	void *context acl_unused)
 {
 	const char *myname = "udp_server_abort";
 
-	disable_listen(event);
 	acl_msg_info("%s: master disconnect -- exiting", myname);
 	udp_server_exit();
 }
 
-/* udp_server_execute - in case (char *) != (struct *) */
-
-static void udp_server_execute(ACL_EVENT *event acl_unused, ACL_VSTREAM *stream)
-{
-	/* 回调用户注册的处理过程 */
-	__service_main(stream, __service_name, __service_argv);
-
-	/* 清除发生在 UDP 套接字上的临时性错误，以免事件引擎报错 */
-	stream->flag = 0;
-}
-
-static void udp_server_read(int event_type, ACL_EVENT *event,
+static void udp_server_read(int event_type, ACL_EVENT *event acl_unused,
 	ACL_VSTREAM *stream, void *context acl_unused)
 {
 	const char *myname = "udp_server_read";
-	int     time_left = -1;
 
 	if (__servers == NULL) {
 		acl_msg_info("%s, %s(%d): Server stoping ...",
@@ -226,17 +317,13 @@ static void udp_server_read(int event_type, ACL_EVENT *event,
 		acl_msg_fatal("%s, %s(%d): unknown event_type: %d",
 			__FILE__, myname, __LINE__, event_type);
 
-	if (acl_var_udp_idle_limit > 0)
-		time_left = (int) ((acl_event_cancel_timer(event,
-			udp_server_timeout, event) + 999999) / 1000000);
-	else
-		time_left = acl_var_udp_idle_limit;
+	/* 回调用户注册的处理过程 */
+	__service_main(stream, (char *) __service_name, __service_argv);
 
-	udp_server_execute(__event, stream);
+	/* 清除发生在 UDP 套接字上的临时性错误，以免事件引擎报错 */
+	stream->flag = 0;
 
-	if (time_left > 0)
-		acl_event_request_timer(event, udp_server_timeout,
-			event, (acl_int64) time_left * 1000000, 0);
+	status_increase_used();
 }
 
 static void udp_server_init(const char *procname)
@@ -252,6 +339,8 @@ static void udp_server_init(const char *procname)
 	if (procname == NULL || *procname == 0)
 		acl_msg_fatal("%s(%d); procname null", myname, __LINE__);
 
+#ifdef ACL_UNIX
+
 	/*
 	 * Don't die when a process goes away unexpectedly.
 	 */
@@ -264,21 +353,29 @@ static void udp_server_init(const char *procname)
 	signal(SIGXFSZ, SIG_IGN);
 #endif
 
+#endif  /* ACL_UNIX */
+
 	/*
 	 * May need this every now and then.
 	 */
+#ifdef ACL_WINDOWS
+	acl_var_udp_pid = _getpid();
+#else
 	acl_var_udp_pid = getpid();
+#endif
+
 	acl_var_udp_procname = acl_mystrdup(acl_safe_basename(procname));
 
 	acl_var_udp_log_file = getenv("SERVICE_LOG");
 	if (acl_var_udp_log_file == NULL) {
-		acl_var_udp_log_file = acl_mystrdup("acl_master.log");
+		acl_var_udp_log_file = "acl_master.log";
 		acl_msg_warn("%s(%d)->%s: can't get SERVICE_LOG's env value,"
 			"use %s log", __FILE__, __LINE__, myname,
 			acl_var_udp_log_file);
 	}
 
 	acl_get_app_conf_int_table(__conf_int_tab);
+	acl_get_app_conf_int64_table(__conf_int64_tab);
 	acl_get_app_conf_str_table(__conf_str_tab);
 }
 
@@ -317,231 +414,236 @@ static void log_event_mode(int event_mode)
 	}
 }
 
-#ifdef SO_REUSEPORT
-
-static int host_port(char *buf, char **host, char **port)
+static SERVER *servers_alloc(int event_mode, int nthreads, int sock_count)
 {
-	const char *ptr = acl_host_port(buf, host, "", port, (char*) NULL);
+	SERVER *servers = (SERVER *) acl_mycalloc(nthreads, sizeof(SERVER));
+	int i, j;
 
-	if (ptr != NULL) {
-		acl_msg_error("%s(%d): invalid addr %s, %s",
-			__FILE__, __LINE__, buf, ptr);
-		return -1;
+	for (i = 0; i < nthreads; i++) {
+		servers[i].event = acl_event_new(event_mode, 0,
+			acl_var_udp_delay_sec, acl_var_udp_delay_usec);
+
+		servers[i].socket_count = sock_count;
+		servers[i].streams = (ACL_VSTREAM **)
+			acl_mycalloc(sock_count + 1, sizeof(ACL_VSTREAM *));
+		for (j = 0; j < sock_count; j++) {
+			servers[i].streams[j] = NULL;
+		}
 	}
 
-	if (*port == NULL || atoi(*port) < 0) {
-		acl_msg_error("%s(%d): invalid port: %s, addr: %s",
-			__FILE__, __LINE__, *port ? *port : "null", buf);
-		return -1;
-	}
-
-	if (*host && **host == 0)
-		*host = 0;
-	if (*host == NULL)
-		*host = "0";
-
-	return 0;
+	return servers;
 }
 
-static struct addrinfo *host_addrinfo(const char *addr)
+static int __fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
+
+static void server_binding(SERVER *server, ACL_ARGV *addrs)
 {
-	int    err;
-	struct addrinfo hints, *res0;
-	char  *buf = acl_mystrdup(addr), *host = NULL, *port = NULL;
+	ACL_ITER iter;
+	int i = 0;
 
-	if (host_port(buf, &host, &port) < 0) {
-		acl_myfree(buf);
-		return NULL;
-	}
+	acl_foreach(iter, addrs) {
+		char addr[64];
+		ACL_VSTREAM *stream;
+		const char *ptr = (char *) iter.data;
+		ACL_SOCKET fd = acl_udp_bind(ptr, ACL_NON_BLOCKING);
 
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family   = PF_UNSPEC;
-	hints.ai_socktype = SOCK_DGRAM;
-#ifdef  ACL_MACOSX
-	hints.ai_flags    = AI_DEFAULT;
-#elif   defined(ACL_ANDROID)
-	hints.ai_flags    = AI_ADDRCONFIG;
-#elif defined(ACL_WINDOWS)
-	hints.ai_protocol = IPPROTO_UDP;
-# if _MSC_VER >= 1500
-	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
-# endif
-#else
-	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
+		if (fd == ACL_SOCKET_INVALID)
+			continue;
+
+		acl_msg_info("bind %s addr ok, fd %d", ptr, fd);
+		stream = acl_vstream_fdopen(fd, O_RDWR, acl_var_udp_buf_size,
+			acl_var_udp_rw_timeout, __fdtype);
+
+		acl_getsockname(fd, addr, sizeof(addr));
+		acl_vstream_set_local(stream, addr);
+		acl_vstream_set_udp_io(stream);
+		acl_event_enable_read(server->event, stream,
+			0, udp_server_read, server);
+#ifdef ACL_UNIX
+		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 #endif
-	if ((err = getaddrinfo(host, port, &hints, &res0))) {
-		acl_msg_error("%s(%d): getaddrinfo error %s, peer=%s",
-			__FILE__, __LINE__, gai_strerror(err), host);
-		acl_myfree(buf);
-		return NULL;
+		server->streams[i++] = stream;
 	}
 
-	acl_myfree(buf);
-	return res0;
+	if (i == 0)
+		acl_msg_fatal("%s(%d), %s: binding all addrs failed!",
+			__FILE__, __LINE__, __FUNCTION__);
 }
 
-static int bind_one(struct addrinfo *res0, struct addrinfo **res)
+static SERVER *servers_binding(const char *service,
+	int event_mode, int nthreads)
 {
-	struct addrinfo *it;
-	int   on, fd;
+	ACL_ARGV *addrs = acl_ifconf_search(service);
+	SERVER   *servers;
+	int       i = 0;
 
-	for (it = res0; it != NULL ; it = it->ai_next) {
-		fd = socket(it->ai_family, it->ai_socktype, it->ai_protocol);
-		if (fd == ACL_SOCKET_INVALID) {
-			acl_msg_error("%s(%d): create socket %s",
-				__FILE__, __LINE__, acl_last_serror());
-			return ACL_SOCKET_INVALID;
-		}
+	if (addrs == NULL)
+		acl_msg_fatal("%s(%d), %s: no addrs available for %s",
+			__FILE__, __LINE__, __FUNCTION__, service);
 
-		on = 1;
-		if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
-			(const void *) &on, sizeof(on)) < 0)
-		{
-			acl_msg_warn("%s(%d): setsockopt(SO_REUSEADDR): %s",
-				__FILE__, __LINE__, acl_last_serror());
-		}
+	__socket_count = addrs->argc;
+	servers = servers_alloc(event_mode, nthreads, __socket_count);
 
-#if defined(SO_REUSEPORT)
-		on = 1;
-		if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT,
-			(const void *) &on, sizeof(on)) < 0)
-		{
-			acl_msg_warn("%s(%d): setsocket(SO_REUSEPORT): %s",
-				__FILE__, __LINE__, acl_last_serror());
-		}
-#endif
+	for (i = 0; i < nthreads; i++)
+		server_binding(&servers[i], addrs);
 
-#ifdef ACL_WINDOWS
-		if (bind(fd, it->ai_addr, (int) it->ai_addrlen) == 0)
-#else
-		if (bind(fd, it->ai_addr, it->ai_addrlen) == 0)
-#endif
-		{
-			*res = it;
-			return fd;
-		}
-
-		acl_msg_error("%s(%d): bind error %s",
-			__FILE__, __LINE__, acl_last_serror());
-		acl_socket_close(fd);
-	}
-
-	return ACL_SOCKET_INVALID;
+	acl_argv_free(addrs);
+	return servers;
 }
 
-static int bind_addr(const char *addr)
+#ifdef ACL_UNIX
+
+static void server_open(SERVER *server, int sock_count)
 {
-	struct addrinfo *res0, *res;
-	int    fd;
-
-	res0 = host_addrinfo(addr);
-	if (res0 == NULL) {
-		acl_msg_fatal("%s(%d): host_addrinfo NULL, addr=%s",
-			__FILE__, __LINE__, addr);
-	}
-
-	fd = bind_one(res0, &res);
-	freeaddrinfo(res0);
-
-	if (fd == ACL_SOCKET_INVALID) {
-		acl_msg_fatal("%s(%d): bind %s error %s",
-			__FILE__, __LINE__, addr, acl_last_serror());
-	}
-
-	return fd;
-}
-
-#endif /* SO_REUSEPORT */
-
-static int open_server(const char *service_name)
-{
-	int fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
-	ACL_VSTREAM *stat_stream;
-	int event_mode, i, fd;
-	char addr[64];
-#ifdef SO_REUSEPORT
-	ACL_ARGV *tokens;
-	ACL_ITER  iter;
-#endif
-
-	/* 根据配置内容创建对应的事件句柄 */
-	if (strcasecmp(acl_var_udp_event_mode, "poll") == 0) {
-		__event = acl_event_new_poll(acl_var_udp_delay_sec,
-				acl_var_udp_delay_usec);
-		event_mode = ACL_EVENT_POLL;
-	} else if (strcasecmp(acl_var_udp_event_mode, "kernel") == 0) {
-		__event = acl_event_new_kernel(acl_var_udp_delay_sec,
-				acl_var_udp_delay_usec);
-		event_mode = ACL_EVENT_KERNEL;
-	} else {
-		__event = acl_event_new_select(acl_var_udp_delay_sec,
-				acl_var_udp_delay_usec);
-		event_mode = ACL_EVENT_SELECT;
-	}
-
-	/*
-	 * Running as a semi-resident server. Service connection requests.
-	 * Terminate when we have serviced a sufficient number of clients,
-	 * when no-one has been talking to us for a configurable amount of
-	 * time, or when the master process terminated abnormally.
-	 */
-	if (acl_var_udp_idle_limit > 0)
-		acl_event_request_timer(__event, udp_server_timeout, __event,
-			(acl_int64) acl_var_udp_idle_limit * 1000000, 0);
+	ACL_SOCKET fd;
+	int i = 0;
 
 	/* socket count is as same listen_fd_count in parent process */
 
-	__servers = (ACL_VSTREAM **)
-		acl_mycalloc(__socket_count + 1, sizeof(ACL_VSTREAM *));
-	for (i = 0; i < __socket_count + 1; i++)
-		__servers[i] = NULL;
-
-#ifdef SO_REUSEPORT
-	tokens = acl_argv_split(service_name, "\"',; \t\r\n");
-	acl_foreach(iter, tokens) {
-		ACL_VSTREAM *stream;
-		const char *ptr = (char *) iter.data;
-
-		fd = bind_addr(ptr);
-		stream = acl_vstream_fdopen(fd, O_RDWR, acl_var_udp_buf_size,
-				acl_var_udp_rw_timeout, fdtype);
-
-		acl_getsockname(fd, addr, sizeof(addr));
-		acl_vstream_set_local(stream, addr);
-		acl_vstream_set_udp_io(stream);
-		acl_non_blocking(fd, ACL_NON_BLOCKING);
-		acl_event_enable_read(__event, stream, 0, udp_server_read, 0);
-		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
-		__servers[i++] = stream;
-	}
-	acl_argv_free(tokens);
-#else
-	(void) service_name;
 	fd = ACL_MASTER_LISTEN_FD;
-	for (i = 0; fd < ACL_MASTER_LISTEN_FD + __socket_count; fd++) {
+	for (i = 0; fd < ACL_MASTER_LISTEN_FD + sock_count; fd++) {
+		char addr[64];
 		ACL_VSTREAM *stream = acl_vstream_fdopen(fd, O_RDWR,
-			acl_var_udp_buf_size, acl_var_udp_rw_timeout, fdtype);
+			acl_var_udp_buf_size,
+			acl_var_udp_rw_timeout,
+			__fdtype);
 
 		acl_getsockname(fd, addr, sizeof(addr));
 		acl_vstream_set_local(stream, addr);
 		acl_vstream_set_udp_io(stream);
 		acl_non_blocking(fd, ACL_NON_BLOCKING);
-		acl_event_enable_read(__event, stream, 0, udp_server_read, 0);
+		acl_event_enable_read(server->event, stream,
+			0, udp_server_read, server);
 		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
-		__servers[i++] = stream;
+		server->streams[i] = stream;
+	}
+}
+
+static SERVER *servers_open(int event_mode, int nthreads, int sock_count)
+{
+	SERVER *servers;
+	int i;
+
+	servers = servers_alloc(event_mode, nthreads, sock_count);
+
+	for (i = 0; i < nthreads; i++)
+		server_open(&servers[i], sock_count);
+
+	return servers;
+}
+
+#endif /* ACL_UNIX */
+
+static SERVER *servers_create(const char *service, int nthreads)
+{
+	if (strcasecmp(acl_var_udp_event_mode, "poll") == 0)
+		__event_mode = ACL_EVENT_POLL;
+	else if (strcasecmp(acl_var_udp_event_mode, "kernel") == 0)
+		__event_mode = ACL_EVENT_KERNEL;
+	else
+		__event_mode = ACL_EVENT_SELECT;
+
+	__main_event = acl_event_new(__event_mode, 0,
+		acl_var_udp_delay_sec, acl_var_udp_delay_usec);
+
+	if (!__daemon_mode)
+		return servers_binding(service, __event_mode, nthreads);
+
+#ifdef ACL_UNIX
+# ifdef SO_REUSEPORT
+	return servers_binding(service, __event_mode, nthreads);
+# endif
+ 
+	/* __socket_count from command argv */
+	return servers_open(__event_mode, nthreads, __socket_count);
+#else
+	acl_msg_fatal("%s(%d): not support daemon mode!", __FILE__, __LINE__);
+	/* not reached here */
+	return NULL;
+#endif /* ACL_UNIX */
+}
+
+static void *thread_main(void *ctx)
+{
+	/* set thread local storage */
+	__server = (SERVER *) ctx;
+
+	if (__thread_init)
+		__thread_init(__thread_init_ctx);
+
+	while (1)
+		acl_event_loop(__server->event);
+
+	/* not reached here */
+	return NULL;
+}
+
+/* udp_server_timeout - idle time exceeded */
+
+static void udp_server_timeout(int type acl_unused,
+	ACL_EVENT *event acl_unused, void *context acl_unused)
+{
+	const char *myname = "udp_server_timeout";
+	time_t now = time(NULL);
+	long long last = status_last();
+	long long time_left = (long long) ((acl_event_cancel_timer(event,
+		udp_server_timeout, event) + 999999) / 1000000);
+
+	if (time_left <= 0 && last + acl_var_udp_idle_limit > now)
+		time_left = last + acl_var_udp_idle_limit - now;
+
+	if (time_left > 0) {
+		acl_event_request_timer(__main_event,
+			udp_server_timeout,
+			__main_event,
+			(acl_int64) time_left * 1000000, 0);
+	} else {
+		acl_msg_info("%s: idle timeout -- exiting", myname);
+		udp_server_exit();
+	}
+}
+
+static void main_thread_loop(void)
+{
+#ifdef ACL_UNIX
+	if (__daemon_mode) {
+		ACL_VSTREAM *stat_stream = acl_vstream_fdopen(
+			ACL_MASTER_STATUS_FD, O_RDWR, 8192, 0,
+			ACL_VSTREAM_TYPE_SOCK);
+
+		acl_event_enable_read(__main_event, stat_stream, 0,
+			udp_server_abort, __main_event);
+
+		acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
+		acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
+		acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
 	}
 #endif
 
-	stat_stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
-		O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
-	acl_event_enable_read(__event, stat_stream, 0,
-		udp_server_abort, __event);
+	if (acl_var_udp_idle_limit > 0)
+		acl_event_request_timer(__main_event,
+			udp_server_timeout,
+			__main_event,
+			(acl_int64) acl_var_udp_idle_limit * 1000000, 0);
 
-	acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
-	acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
-	acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
+	while (1)
+		acl_event_loop(__main_event);
+}
 
-	return event_mode;
+static void servers_start(SERVER *servers, int nthreads)
+{
+	acl_pthread_attr_t attr;
+	int i;
+
+	running_status_init();
+	acl_pthread_attr_init(&attr);
+	acl_pthread_attr_setdetachstate(&attr, ACL_PTHREAD_CREATE_DETACHED);
+
+	for (i = 0; i < nthreads; i++)
+		acl_pthread_create(&servers[i].tid, &attr,
+			thread_main, &servers[i]);
+
+	main_thread_loop();
 }
 
 static void usage(int argc, char *argv[])
@@ -553,7 +655,6 @@ static void usage(int argc, char *argv[])
 		" -c [use chroot]"
 		" -n service_name"
 		" -s socket_count"
-		" -t transport"
 		" -u [use setgid initgroups setuid]"
 		" -v [on acl_msg_verbose]"
 		" -f conf_file", argv[0]);
@@ -562,21 +663,25 @@ static void usage(int argc, char *argv[])
 void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 {
 	const char *myname = "acl_udp_server_main";
-	char   *service_name = acl_mystrdup(acl_safe_basename(argv[0]));
+	const char *service_name = acl_safe_basename(argv[0]);
 	ACL_MASTER_SERVER_INIT_FN pre_init = 0;
 	ACL_MASTER_SERVER_INIT_FN post_init = 0;
-	char   *root_dir = 0, *user_name = 0, *transport = 0;
-	int     c, key, event_mode;
+	char   *root_dir = 0, *user_name = 0;
 	const char *conf_file_ptr = 0;
+	int     c, key;
 	va_list ap;
 
 	/*
 	 * Pick up policy settings from master process. Shut up error messages
 	 * to stderr, because no-one is going to see them.
 	 */
+#ifdef ACL_UNIX
 	opterr = 0;
+#endif
 
-	while ((c = getopt(argc, argv, "hcn:s:t:uvf:")) > 0) {
+	master_log_open(argv[0]);
+
+	while ((c = getopt(argc, argv, "hcn:s:t:uvf:r")) > 0) {
 		switch (c) {
 		case 'h':
 			usage(argc, argv);
@@ -599,10 +704,13 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 			user_name = "setme";
 			break;
 		case 't':
-			transport = optarg;
+			/* deprecated, just go through */
 			break;
 		case 'v':
 			acl_msg_verbose++;
+			break;
+		case 'r':
+			__daemon_mode = 0;
 			break;
 		default:
 			break;
@@ -611,10 +719,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 
 	udp_server_init(argv[0]);
 
-	if (conf_file_ptr == 0)
-		acl_msg_fatal("%s(%d), %s: need \"-f pathname\"",
-			__FILE__, __LINE__, myname);
-	else if (acl_msg_verbose)
+	if (conf_file_ptr && acl_msg_verbose)
 		acl_msg_info("%s(%d), %s: configure file=%s", 
 			__FILE__, __LINE__, myname, conf_file_ptr);
 
@@ -655,6 +760,20 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		case ACL_MASTER_SERVER_EXIT:
 			__service_exit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
 			break;
+		case ACL_APP_CTL_THREAD_INIT:
+			__thread_init =
+				va_arg(ap, ACL_MASTER_SERVER_THREAD_INIT_FN);
+			break;
+		case ACL_APP_CTL_THREAD_INIT_CTX:
+			__thread_init_ctx = va_arg(ap, void *);
+			break;
+		case ACL_APP_CTL_THREAD_EXIT:
+			__thread_exit =
+				va_arg(ap, ACL_MASTER_SERVER_THREAD_EXIT_FN);
+			break;
+		case ACL_APP_CTL_THREAD_EXIT_CTX:
+			__thread_exit_ctx = va_arg(ap, void *);
+			break;
 		default:
 			acl_msg_panic("%s: unknown type: %d", myname, key);
 		}
@@ -667,14 +786,6 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	if (user_name)
 		user_name = acl_var_udp_owner;
 
-	/* If not connected to stdin, stdin must not be a terminal. */
-	if (isatty(STDIN_FILENO))
-		acl_msg_fatal("%s(%d)->%s: do not run this command by hand",
-			__FILE__, __LINE__, myname);
-
-	if (transport == 0)
-		acl_msg_fatal("no transport type specified");
-
 	/* 设置回回调过程相关参数 */
 	__service_main = service;
 	__service_name = service_name;
@@ -682,35 +793,42 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 
 	/*******************************************************************/
 
-	event_mode = open_server(service_name);
+	if (acl_var_udp_threads <= 0)
+		acl_var_udp_threads = 1;
 
-	/* 在切换用户运行身份前切换程序运行目录 */
-	if (chdir(acl_var_udp_queue_dir) < 0)
-		acl_msg_fatal("chdir(\"%s\"): %s",
-			acl_var_udp_queue_dir, acl_last_serror());
+	__servers = servers_create(service_name, acl_var_udp_threads);
+
+	/* 必须先设置主线程的对象，以便于应用能及时使用 */
+	__server = &__servers[acl_var_udp_threads - 1];
 
 	/* 切换用户运行身份前回调应用设置的回调函数 */
 	if (pre_init)
 		pre_init(__service_ctx);
 
-	if (user_name)
-		acl_chroot_uid(root_dir, user_name);
-
+#ifdef ACL_UNIX
 	/* 设置子进程运行环境，允许产生 core 文件 */
 	if (acl_var_udp_enable_core)
 		acl_set_core_limit(0);
 
+	/* 在切换用户运行身份前切换程序运行目录 */
+	if (__daemon_mode && chdir(acl_var_udp_queue_dir) < 0)
+		acl_msg_fatal("chdir(\"%s\"): %s",
+			acl_var_udp_queue_dir, acl_last_serror());
+#endif
+
+#ifdef ACL_UNIX
+	if (user_name)
+		acl_chroot_uid(root_dir, user_name);
+#endif
+
 	udp_server_open_log();
-	log_event_mode(event_mode);
+	log_event_mode(__event_mode);
 
 	/* 进程初始化完毕后回调此函数，以使用户可以初始化自己的环境 */
 	if (post_init)
 		post_init(__service_ctx);
 
-	acl_msg_info("%s: daemon started", argv[0]);
+	acl_msg_info("%s -- %s: daemon started", argv[0], myname);
 
-	while (1)
-		acl_event_loop(__event);
+	servers_start(__servers, acl_var_udp_threads);
 }
-
-#endif /* ACL_UNIX */

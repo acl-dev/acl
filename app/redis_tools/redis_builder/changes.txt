@@ -1,3 +1,14 @@
+
+14) 2017.6.20
+14.1) bugfix: 当命令配置中指定某命令为 no 时，该功能失效
+
+13) 2017.6.19
+13.1) compile: Makefile 可以自动判断 /lib64 目录下是否有 readline/ncurses 库
+
+12) 2017.6.18
+12.1) bugfix: redis_builder 从 redis_commands.txt 加载命令项时，应先将命令字
+转为大写才能覆盖程序里缺省命令字
+
 11) 2016.8.25
 11.1) feautre: redis_builder 广播消息时支持区分主节点和从节点
 

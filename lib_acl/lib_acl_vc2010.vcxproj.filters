@@ -521,6 +521,9 @@
     <ClCompile Include=".\src\net\listen\acl_sane_accept.c">
       <Filter>Source Files\net\listen</Filter>
     </ClCompile>
+    <ClCompile Include=".\src\net\listen\acl_sane_bind.c">
+      <Filter>Source Files\net\listen</Filter>
+    </ClCompile>
     <ClCompile Include=".\src\net\listen\acl_unix_listen.c">
       <Filter>Source Files\net\listen</Filter>
     </ClCompile>

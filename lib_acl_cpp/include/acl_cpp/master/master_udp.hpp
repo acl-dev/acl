@@ -1,5 +1,6 @@
 #pragma once
 #include "master_base.hpp"
+#include "../stdlib/locker.hpp"
 
 namespace acl {
 
@@ -45,8 +46,12 @@ protected:
 		return sstreams_;
 	}
 
+	virtual void thread_on_init(void) {}
+	virtual void thread_on_exit(void) {}
+
 private:
 	std::vector<socket_stream*> sstreams_;
+	locker locker_;
 
 	void close_sstreams(void);
 
@@ -62,6 +67,9 @@ private:
 
 	// 当进程退出时调用的回调函数
 	static void service_exit(char* service, char** argv);
+
+	static void thread_init(void *);
+	static void thread_exit(void *);
 
 private:
 	// 在单独运行方式下，该函数当监听套接字有新连接到达时被调用

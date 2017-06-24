@@ -107,6 +107,9 @@ void http_request::reset(void)
 	conv_ = NULL;
 	need_retry_ = true;
 	RESET_RANGE();
+	if (client_)
+		client_->reset();
+	header_.reset();
 }
 
 http_request& http_request::set_unzip(bool on)
@@ -138,10 +141,9 @@ bool http_request::try_open(bool* reuse_conn)
 
 	*reuse_conn = false;
 
-	client_ = new http_client();
+	client_ = NEW http_client();
 
-	if (client_->open(addr_, conn_timeout_,
-		rw_timeout_, unzip_) == false)
+	if (client_->open(addr_, conn_timeout_, rw_timeout_, unzip_) == false)
 	{
 		logger_error("connect server(%s) error(%s)",
 			addr_, last_serror());
@@ -152,7 +154,7 @@ bool http_request::try_open(bool* reuse_conn)
 	if (ssl_conf_ == NULL)
 		return true;
 
-	polarssl_io* ssl = new polarssl_io(*ssl_conf_, false);
+	polarssl_io* ssl = NEW polarssl_io(*ssl_conf_, false);
 	if (client_->get_stream().setup_hook(ssl) == ssl)
 	{
 		logger_error("open client ssl error to: %s", addr_);
@@ -203,15 +205,21 @@ bool http_request::write_head()
 		if (!reuse_conn)
 			need_retry_ = false;
 
-		// 如果请求方法非 GET，则需要首先探测一下连接是否正常
-		if (method != HTTP_METHOD_GET && method != HTTP_METHOD_PURGE)
+		// 如果请求方法非 GET/PURGE/HEAD/DELETE/CONNECT，
+		// 则需要首先探测一下连接是否正常
+		if (method != HTTP_METHOD_GET
+			&& method != HTTP_METHOD_PURGE
+			&& method != HTTP_METHOD_HEAD
+			&& method != HTTP_METHOD_DELETE
+			&& method != HTTP_METHOD_OPTION
+			&& method != HTTP_METHOD_CONNECT)
 		{
 			socket_stream& ss = client_->get_stream();
 
 			/* 因为系统 write API 成功并不能保证连接正常，所以只能
 			 * 是调用系统 read API 来探测连接是否正常，该函数内部
 			 * 会将套接口先转非阻塞套接口进行读操作，所以不会阻塞，
-			 * 同时即使有数据读到也会先放到 ACL_VSTREAM 的读缓冲中，
+			 * 同时即使有数据读到也会先放到 ACL_VSTREAM 读缓冲中，
 			 * 所以也不会丢失数据
 			 */
 			if (ss.alive() == false)
@@ -322,25 +330,16 @@ bool http_request::request(const void* data, size_t len)
 {
 	bool  have_retried = false;
 	bool  reuse_conn;
+	http_method_t method = header_.get_method();
 
 	// 构建 HTTP 请求头
-	if (data && len > 0)
+	if (data && len > 0 && method != HTTP_METHOD_POST
+		&& method != HTTP_METHOD_PUT)
 	{
 		header_.set_content_length(len);
 
 		// 在有数据体的条件下，重新设置 HTTP 请求方法
-		switch (header_.get_method())
-		{
-		case HTTP_METHOD_GET:
-		case HTTP_METHOD_CONNECT:
-		case HTTP_METHOD_PURGE:
-		case HTTP_METHOD_DELETE:
-		case HTTP_METHOD_HEAD:
-			header_.set_method(HTTP_METHOD_POST);
-			break;
-		default:
-			break;
-		}
+		header_.set_method(HTTP_METHOD_POST);
 	}
 
 	while (true)

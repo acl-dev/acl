@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        1
+Release:        2
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -9,6 +9,7 @@ Packager:       Zhang Qiang <qiangzhang@qiyi.com>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
 Source:         http://example.com/%{name}-%{version}.tar.gz
 
+%define debug_package %{nil}
 %description
 
 One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IOS http://zsxxsz.iteye.com/.

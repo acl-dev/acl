@@ -91,7 +91,7 @@ void *acl_atomic_cas(ACL_ATOMIC *self, void *cmp, void *value)
 #endif
 }
 
-void * acl_atomic_xchg(ACL_ATOMIC *self, void *value)
+void *acl_atomic_xchg(ACL_ATOMIC *self, void *value)
 {
 #ifndef HAS_ATOMIC
 	void *old;
@@ -113,6 +113,72 @@ void * acl_atomic_xchg(ACL_ATOMIC *self, void *value)
 	acl_msg_error("%s(%d), %s: not support!",
 		 __FILE__, __LINE__, __FUNCTION__);
 	return NULL;
+# endif
+#endif
+}
+
+void acl_atomic_int64_set(ACL_ATOMIC *self, long long n)
+{
+#ifndef HAS_ATOMIC
+	acl_pthread_mutex_lock(&self->lock);
+	*self->value = n;
+	acl_pthread_mutex_unlock(&self->lock);
+#elif	defined(ACL_WINDOWS)
+	InterlockedExchangePointer((volatile PVOID*) self->value, n);
+#elif	defined(ACL_LINUX)
+# if defined(__GNUC__) && (__GNUC__ >= 4)
+	(void) __sync_lock_test_and_set((long long *) self->value, n);
+# else
+	(void) self;
+	(void) value;
+	acl_msg_error("%s(%d), %s: not support!",
+		 __FILE__, __LINE__, __FUNCTION__);
+# endif
+#endif
+}
+
+long long acl_atomic_int64_fetch_add(ACL_ATOMIC *self, long long n)
+{
+#ifndef HAS_ATOMIC
+	acl_pthread_mutex_lock(&self->lock);
+	long long v = *(long long *) self->value;
+	*((long long *) self->value) = v + n;
+	acl_pthread_mutex_unlock(&self->lock);
+	return v;
+#elif	defined(ACL_WINDOWS)
+	return InterlockedExchangeAdd64((volatile LONGLONG*)&self->value, n);
+#elif	defined(ACL_LINUX)
+# if defined(__GNUC__) && (__GNUC__ >= 4)
+	return (long long) __sync_fetch_and_add(&self->value, n);
+# else
+	(void) self;
+	(void) n;
+	acl_msg_error("%s(%d), %s: not support!",
+		__FILE__, __LINE__, __FUNCTION__);
+	return -1;
+# endif
+#endif
+}
+
+long long acl_atomic_int64_add_fetch(ACL_ATOMIC *self, long long n)
+{
+#ifndef HAS_ATOMIC
+	acl_pthread_mutex_lock(&self->lock);
+	long long v = *(long long *) self->value + n;
+	*((long long *) self->value) = v;
+	acl_pthread_mutex_unlock(&self->lock);
+	return v;
+#elif	defined(ACL_WINDOWS)
+	return InterlockedExchangeAdd64((volatile LONGLONG*)&self->value, n);
+#elif	defined(ACL_LINUX)
+# if defined(__GNUC__) && (__GNUC__ >= 4)
+	return (long long) __sync_add_and_fetch(&self->value, n);
+# else
+	(void) self;
+	(void) n;
+	acl_msg_error("%s(%d), %s: not support!",
+		__FILE__, __LINE__, __FUNCTION__);
+	return -1;
 # endif
 #endif
 }

@@ -6,3 +6,5 @@ incr		none				yes
 
 #dbsize		master				yes
 all		none				yes
+flushdb		master				no
+flushall	master				no

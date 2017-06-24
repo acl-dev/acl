@@ -80,7 +80,7 @@ void redis_commands::set_commands(void)
 	for (size_t i = 0; !__redis_cmds[i].cmd.empty(); i++)
 	{
 		acl::string cmd(__redis_cmds[i].cmd);
-		cmd.lower();
+		cmd.upper();
 
 		std::map<acl::string, REDIS_CMD>::const_iterator cit =
 			redis_cmds_.find(cmd);
@@ -289,6 +289,12 @@ bool redis_commands::check(const char* command)
 		if (!info.equal("master", false) && !info.equal("slave", false))
 			info = "SEND";
 		perm = cit->second.perm;
+	}
+
+	if (perm == "no")
+	{
+		printf("command %s disabled!\r\n", command);
+		return false;
 	}
 
 	if (all_cmds_perm_ == "warn" || perm == "warn")

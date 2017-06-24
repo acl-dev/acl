@@ -1,31 +1,25 @@
-SHELL = /bin/sh
-#CC      = g++
-CC	= ${ENV_CC}
-#AR      = ar
-AR      = ${ENV_AR}
-ARFL    = rv
-#RANLIB  = ranlib
-RANLIB  = ${ENV_RANLIB}
+SHELL     = /bin/sh
+#CC       = g++
+CC        = ${ENV_CC}
+#AR       = ar
+AR        = ${ENV_AR}
+ARFL      = rv
+#RANLIB   = ranlib
+RANLIB    = ${ENV_RANLIB}
 
-#OSNAME = $(shell uname -sm)
-#OSTYPE = $(shell uname -p)
-OSNAME = $(shell uname -a)
-OSTYPE = $(shell uname -a)
+#OSNAME   = $(shell uname -sm)
+#OSTYPE   = $(shell uname -p)
+OSNAME    = $(shell uname -a)
+OSTYPE    = $(shell uname -a)
 
-DESTDIR =
-PREFIX = /usr
-BIN_PATH = $(DESTDIR)/usr/bin/
-LIB_PATH = $(DESTDIR)/usr/lib
-ACL_LIB = $(LIB_PATH)
-PROTO_LIB = $(LIB_PATH)
-DICT_LIB = $(LIB_PATH)
-TLS_LIB = $(LIB_PATH)
+DESTDIR   =
+PREFIX    = /usr
+BIN_PATH  = $(DESTDIR)/$(PREFIX)/bin/
+LIB_ACL   = $(DESTDIR)/$(PREFIX)/lib
+INC_ACL   = $(DESTDIR)/$(PREFIX)/include/acl-lib
 
-INC_PATH = $(DESTDIR)/usr/include
-ACL_INC = $(INC_PATH)/acl-lib
-PROTO_INC = $(INC_PATH)/protocol
-DICT_INC = $(INC_PATH)/dict
-TLS_INC = $(INC_PATH)/tls
+LIB_DIST  = ./dist/lib
+INC_PATH  = ./dist/include
 
 RPATH =
 DATE_NOW = 20`date +%y`.`date +%m`.`date +%d`
@@ -84,11 +78,11 @@ endif
 
 ##############################################################################
 
-.PHONY = check help all_lib all samples all clean install uninstall uninstall_all build_bin build_src build_one
+.PHONY = check help all_lib all samples all clean install uninstall uninstall_all build_one
 VERSION = 3.3.0
 
 help:
-	@(echo "usage: make help|all|all_lib|all_samples|clean|install|uninstall|uninstall_all|build_bin|build_src|build_one")
+	@(echo "usage: make help|all|all_lib|all_samples|clean|install|uninstall|uninstall_all|build_one")
 all_lib:
 	@if test "$(polarssl)" = "on"; then \
 		ENV_FLAGS = $(ENV_FLAGS):HAS_POLARSSL \
@@ -130,160 +124,75 @@ acl_master: all_lib
 packinstall:
 	@(echo "")
 	@(echo "begin copy file...")
-	$(shell mkdir -p $(ACL_INC)/acl)
-	$(shell mkdir -p $(ACL_INC)/acl_cpp)
+	$(shell mkdir -p $(INC_ACL)/acl)
+	$(shell mkdir -p $(INC_ACL)/acl_cpp)
 	$(shell mkdir -p $(BIN_PATH)/)
-	$(shell mkdir -p $(LIB_PATH)/)
+	$(shell mkdir -p $(LIB_ACL)/)
 	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master/)
+	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
 	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
 	(cd dist/master && ./setup.sh $(DESTDIR) /opt/soft/acl-master)
 	cp -f app/master/daemon/acl_master $(BIN_PATH)
-	cp -Rf lib_acl/include/* $(ACL_INC)/acl/
-	cp -Rf lib_acl_cpp/include/acl_cpp/* $(ACL_INC)/acl_cpp/
-	cp -f libacl_all.a $(ACL_LIB)/libacl_all.a
-#	cp -Rf lib_protocol/include/* $(PROTO_INC)/
-#	cp -f lib_dict/lib/lib_dict.a $(DICT_LIB)/$(RPATH)/
-#	cp -Rf lib_dict/include/* $(DICT_INC)/
-#	cp -f lib_tls/lib/lib_tls.a $(TLS_LIB)/$(RPATH)/
-#	cp -Rf lib_tls/include/* $(TLS_INC)/
+	cp -Rf lib_acl/include/* $(INC_ACL)/acl/
+	cp -Rf lib_acl_cpp/include/acl_cpp/* $(INC_ACL)/acl_cpp/
+	cp -f libacl_all.a $(LIB_ACL)/libacl_all.a
+
 install:
 	@(echo "")
 	@(echo "begin copy file...")
-	$(shell mkdir -p $(ACL_INC))
-	$(shell mkdir -p $(PROTO_INC))
+	$(shell mkdir -p $(INC_PATH)/acl)
+	$(shell mkdir -p $(INC_PATH)/protocol)
 	$(shell mkdir -p $(INC_PATH)/acl_cpp)
+	$(shell mkdir -p $(LIB_DIST)/$(RPATH))
+	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
 	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
-	cp -f lib_acl/lib/libacl_all.a $(ACL_LIB)/$(RPATH)/
-	cp -Rf lib_acl/include/* $(ACL_INC)/
-	cp -f lib_protocol/lib/libprotocol.a $(PROTO_LIB)/$(RPATH)/
-	cp -Rf lib_protocol/include/* $(PROTO_INC)/
-	cp -f lib_acl_cpp/lib/libacl_cpp.a $(ACL_LIB)/$(RPATH)/
+	cp -f libacl_all.a $(LIB_DIST)/$(RPATH)/
+	cp -f lib_acl/lib/libacl.a $(LIB_DIST)/$(RPATH)/
+	cp -f lib_acl_cpp/lib/libacl_cpp.a $(LIB_DIST)/$(RPATH)/
+	cp -f lib_protocol/lib/libprotocol.a $(LIB_DIST)/$(RPATH)/
+	cp -Rf lib_acl/include/* $(INC_PATH)/acl/
+	cp -Rf lib_protocol/include/* $(INC_PATH)/protocol/
 	cp -Rf lib_acl_cpp/include/acl_cpp/* $(INC_PATH)/acl_cpp/
-#	cp -f lib_dict/lib/lib_dict.a $(DICT_LIB)/$(RPATH)/
-#	cp -Rf lib_dict/include/* $(DICT_INC)/
-#	cp -f lib_tls/lib/lib_tls.a $(TLS_LIB)/$(RPATH)/
-#	cp -Rf lib_tls/include/* $(TLS_INC)/
+
 uninstall:
 	@(echo "")
 	@(echo "begin remove file...")
 	rm -f ./dist/master/libexec/$(RPATH)/*
-	rm -f $(ACL_LIB)/$(RPATH)/libacl.a
-	rm -Rf $(ACL_INC)/*
-	rm -f $(PROTO_LIB)/$(RPATH)/libprotocol.a
-	rm -Rf $(PROTO_INC)/*
-	rm -f $(ACL_LIB)/$(RPATH)/libacl_cpp.a
+	rm -f $(LIB_DIST)/$(RPATH)/libacl_all.a
+	rm -f $(LIB_DIST)/$(RPATH)/libacl.a
+	rm -f $(LIB_DIST)/$(RPATH)/libprotocol.a
+	rm -f $(LIB_DIST)/$(RPATH)/libacl_cpp.a
+	rm -f $(LIB_DIST)/$(RPATH)/lib_dict.a
+	rm -f $(LIB_DIST)/$(RPATH)/lib_tls.a
+	rm -Rf $(INC_PATH)/protocol/*
 	rm -Rf $(INC_PATH)/acl_cpp/*
-	rm -f $(DICT_LIB)/$(RPATH)/lib_dict.a
-	rm -Rf $(DICT_INC)/*
-	rm -f $(TLS_LIB)/$(RPATH)/lib_tls.a
-	rm -Rf $(TLS_INC)/*
+	rm -Rf $(INC_PATH)/acl/*
+	rm -Rf $(INC_PATH)/dict/*
+	rm -Rf $(INC_PATH)/tls/*
+
 uninstall_all:
 	@(echo "")
 	@(echo "begin remove all dist files ...")
-	rm -Rf $(ACL_INC)/*
-	rm -Rf $(PROTO_INC)/*
-	rm -Rf $(DICT_INC)/*
-	rm -Rf $(TLS_INC)/*
+	rm -Rf $(INC_PATH)/acl/*
+	rm -Rf $(INC_PATH)/protocol/*
+	rm -Rf $(INC_PATH)/acl_cpp/*
+	rm -Rf $(INC_PATH)/dist/*
+	rm -Rf $(INC_PATH)/tls/*
 	rm -f ./dist/master/libexec/linux32/*
 	rm -f ./dist/master/libexec/linux64/*
 	rm -f ./dist/master/libexec/sunos_x86/*
 	rm -f ./dist/master/libexec/freebsd/*
-	rm -f $(ACL_LIB)/linux32/*.a
-	rm -f $(ACL_LIB)/linux64/*.a
-	rm -f $(ACL_LIB)/sunos_x86/*.a
-	rm -f $(ACL_LIB)/freebsd/*.a
-	rm -f $(ACL_LIB)/win32/*.lib
-	rm -f $(ACL_LIB)/win32/*.dll
-	rm -f $(PROTO_LIB)/linux32/*.a
-	rm -f $(PROTO_LIB)/linux64/*.a
-	rm -f $(PROTO_LIB)/sunos_x86/*.a
-	rm -f $(PROTO_LIB)/freebsd/*.a
-	rm -f $(PROTO_LIB)/win32/*.lib
-	rm -f $(PROTO_LIB)/win32/*.dll
-	rm -f $(DICT_LIB)/linux32/*.a
-	rm -f $(DICT_LIB)/linux64/*.a
-	rm -f $(DICT_LIB)/sunos_x86/*.a
-	rm -f $(DICT_LIB)/freebsd/*.a
-	rm -f $(DICT_LIB)/win32/*.lib
-	rm -f $(DICT_LIB)/win32/*.dll
-	rm -f $(TLS_LIB)/linux32/*.a
-	rm -f $(TLS_LIB)/linux64/*.a
-	rm -f $(TLS_LIB)/sunos_x86/*.a
-	rm -f $(TLS_LIB)/freebsd/*.a
-	rm -f $(TLS_LIB)/win32/*.lib
-	rm -f $(TLS_LIB)/win32/*.dll
+	rm -f $(LIB_DIST)/linux32/*.a
+	rm -f $(LIB_DIST)/linux64/*.a
+	rm -f $(LIB_DIST)/sunos_x86/*.a
+	rm -f $(LIB_DIST)/freebsd/*.a
+	rm -f $(LIB_DIST)/win32/*.lib
+	rm -f $(LIB_DIST)/win32/*.dll
 	rm -f win32_build/vc/lib_acl/*.map
 	rm -f win32_build/vc/lib_acl/*.ilk
 	rm -f win32_build/vc/lib_protocol/*.map
 	rm -f win32_build/vc/lib_protocol/*.ilk
-build_bin:
-	@(echo "please waiting ...")
-	@(echo "begin building bin release...")
-	@(rm -rf acl.bin)
-	@(echo "copy files ...")
-	@(cp -R dist acl.bin)
-	@(cp lib_acl/changes.txt acl.bin/include/acl/)
-	@(cp lib_protocol/changes.txt acl.bin/include/protocol/)
-	@(cp lib_dict/changes.txt acl.bin/include/dict/)
-	@(cp lib_tls/changes.txt acl.bin/include/tls/)
-	@(cp changes.txt acl.bin/)
-	@(echo "make tar package ...")
-	@(tar -cf acl.bin.tar acl.bin)
-	@(echo "make gzip package ...")
-	@(gzip -c acl.bin.tar > acl.bin.tgz)
-	@(rm acl.bin.tar)
-	@(rm -rf acl.bin)
-	@(echo "move acl.bin.tgz to ../acl$(VERSION).bin.$(DATE_NOW).tgz")
-	@(mv acl.bin.tgz ../acl$(VERSION).bin.$(DATE_NOW).tgz)
-#	@(echo "move acl.bin.tgz to ../acl$(VERSION).bin.tgz")
-#	@(mv acl.bin.tgz ../acl$(VERSION).bin.tgz)
-build_src: clean uninstall_all
-	@(echo "begin building src release...")
-	@(rm -rf acl)
-	@(echo "copy files ...")
-	@(mkdir acl)
-	@(cp -R lib_acl acl/)
-	@(cp -R lib_protocol acl/)
-	@(cp -R lib_acl_cpp acl/)
-	@(cp -R lib_dict acl/)
-	@(cp -R lib_tls acl/)
-	@(cp -R lib_rpc acl/)
-	@(cp -R lib acl/)
-	@(cp -R include acl/)
-	@(cp -R unit_test acl/)
-	@(cp -R res acl/)
-	@(cp -R resource acl/)
-	@(cp -R app acl/)
-	@(cp -R dist acl/)
-	@(cp -R doc acl/)
-	@(cp Makefile acl/)
-	@(cp changes.txt acl/)
-	@(cp readme.txt acl/)
-	@(cp Doxyfile acl/)
-	@(cp Doxyfile_acl_protocol acl/)
-	@(cp license.bsd acl/)
-	@(cp license.ibm acl/)
-	@(cp README_EN.md acl/)
-	@(cp README.md acl/)
-	@(cp SAMPLES.md acl/)
-	@(cp acl_cpp_vc2003.sln acl/)
-	@(cp acl_cpp_vc2008.sln acl/)
-	@(cp acl_cpp_vc2010.sln acl/)
-	@(cp acl_cpp_vc2012.sln acl/)
-	@(cp acl_vc2003.sln acl/)
-	@(cp acl_vc2010.sln acl/)
-	@(cp acl_vc2012.sln acl/)
-	@(cd acl/; find . -name "*.svn" |xargs rm -rf)
-	@(echo "make tar package ...")
-	@(tar -cf acl.src.tar acl)
-	@(echo "make gzip package ...")
-	@(gzip -c acl.src.tar > acl.src.tgz)
-	@(rm acl.src.tar)
-	@(rm -rf acl)
-	@(echo "move acl.src.tgz to ../acl$(VERSION).src.$(DATE_NOW).tgz")
-	@(mv acl.src.tgz ../acl$(VERSION).src.$(DATE_NOW).tgz)
-#	@(echo "move acl.src.tgz to ../acl$(VERSION).src.tgz")
-#	@(mv acl.src.tgz ../acl$(VERSION).src.tgz)
+
 RELEASE_PATH = release
 build_one: all_lib acl_master
 	@(mkdir -p $(RELEASE_PATH); mkdir -p $(RELEASE_PATH)/acl; \

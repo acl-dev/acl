@@ -1,0 +1,5 @@
+1) 2017.6.18
+1.1) feature: In Docker's running time, the master's pid was set to 1; When
+stopping master by sending TERM singal to master's pid, master_sigdeath func
+will be called and which'll send TERM to -pid that's the master's pid group,
+but in docker the pid is 1, so we should stop the children in the other way.

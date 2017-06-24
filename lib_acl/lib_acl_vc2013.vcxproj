@@ -543,6 +543,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include=".\src\net\listen\acl_fifo_listen.c" />
     <ClCompile Include=".\src\net\listen\acl_inet_listen.c" />
     <ClCompile Include=".\src\net\listen\acl_sane_accept.c" />
+    <ClCompile Include=".\src\net\listen\acl_sane_bind.c" />
     <ClCompile Include=".\src\net\listen\acl_unix_listen.c" />
     <ClCompile Include=".\src\net\connect\acl_inet_connect.c" />
     <ClCompile Include=".\src\net\connect\acl_sane_connect.c" />

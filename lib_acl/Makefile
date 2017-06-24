@@ -33,6 +33,7 @@ CFLAGS = -c -g -W \
 -DACL_PREPARE_COMPILE \
 -Winvalid-pch \
 -DUSE_REUSEPORT \
+#-fstack-protector-all \
 #-DDEBUG_MEM
 #-DUSE_EPOLL \
 #-Wno-tautological-compare \

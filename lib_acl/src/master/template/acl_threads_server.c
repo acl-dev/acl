@@ -56,6 +56,8 @@
 #include "master/acl_master_proto.h"
 #include "master/acl_threads_params.h"
 #include "master/acl_server_api.h"
+#include "master/acl_master_type.h"
+#include "master/acl_master_conf.h"
 #include "master_log.h"
 
 int   acl_var_threads_pid;
@@ -721,7 +723,7 @@ static void server_accept_sock(int event_type, ACL_EVENT *event,
 
 	while (i++ < acl_var_threads_max_accept) {
 		fd = acl_accept(listen_fd, remote, sizeof(remote), &sock_type);
-		if (fd >= 0 && fd != ACL_SOCKET_INVALID) {
+		if (fd >= 0) {
 			/* set NODELAY for TCP socket */
 #ifdef AF_INET6
 			if (sock_type == AF_INET || sock_type == AF_INET6)
@@ -1194,7 +1196,6 @@ static void usage(int argc, char * argv[])
 		" -c [use chroot]"
 		" -n service_name"
 		" -s socket_count"
-		" -t transport"
 		" -u [use setgid initgroups setuid]"
 		" -v [on acl_msg_verbose]"
 		" -f conf_file"

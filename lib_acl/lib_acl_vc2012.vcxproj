@@ -543,6 +543,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include=".\src\net\listen\acl_fifo_listen.c" />
     <ClCompile Include=".\src\net\listen\acl_inet_listen.c" />
     <ClCompile Include=".\src\net\listen\acl_sane_accept.c" />
+    <ClCompile Include=".\src\net\listen\acl_sane_bind.c" />
     <ClCompile Include=".\src\net\listen\acl_unix_listen.c" />
     <ClCompile Include=".\src\net\connect\acl_inet_connect.c" />
     <ClCompile Include=".\src\net\connect\acl_sane_connect.c" />
@@ -710,6 +711,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include=".\src\private\thread.h" />
     <ClInclude Include=".\include\lib_acl.h" />
     <ClInclude Include="include\code\acl_xmlcode.h" />
+    <ClInclude Include="include\master\acl_udp_params.h" />
     <ClInclude Include="include\stdlib\acl_atomic.h" />
     <ClInclude Include="include\stdlib\acl_sane_socketpair.h" />
     <ClInclude Include="include\stdlib\acl_ypipe.h" />

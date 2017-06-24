@@ -31,14 +31,12 @@ static void usage(const char *me)
 
 int     main(int argc, char **argv)
 {
-	static ACL_VSTREAM *lock_fp = NULL;
-	int   ch;
-	int   fd;
-	int   n, keep_mask = 0;
-	char *ptr;
+	ACL_VSTREAM  *lock_fp;
+	int           ch, fd, n, keep_mask = 0;
 	ACL_WATCHDOG *watchdog;
 	ACL_VSTRING  *strbuf;
 	ACL_AIO      *aio;
+	char         *ptr;
 
 	/*
 	 * Strip and save the process name for diagnostics etc.
@@ -107,7 +105,14 @@ int     main(int argc, char **argv)
 	acl_closefrom(3); /* 0: stdin; 1: stdout; 2: stderr */
 
 	/* Initialize logging and exit handler. */
-	/* 关闭 0, 以使该描述字供日志文件所用 :) */
+
+	/*
+	 * don't call acl_close_on_exec that the children can use
+	 * master's log in starting status
+	 * acl_log_close_onexec(0);
+	 */
+
+	/* use 0 as the log's fd */
 	close(0);
 	acl_msg_open(acl_var_master_log_file, var_master_procname);
 
@@ -135,7 +140,7 @@ int     main(int argc, char **argv)
 		if (acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC) < 0)
 			acl_msg_fatal("dup(0): %s", acl_last_serror());
 		if (acl_msg_verbose)
-			acl_msg_info("dup(0), fd = %d, n = %d", fd, n);
+			acl_msg_info("dup(0), fd = %d", fd);
 	}
 
 	/* just for prefork service -- zsx, 2012.3.24 */
@@ -162,7 +167,7 @@ int     main(int argc, char **argv)
 
 	lock_fp = acl_open_lock(acl_var_master_pid_file, O_RDWR | O_CREAT,
 			0644, strbuf);
-	if (lock_fp == 0)
+	if (lock_fp == NULL)
 		acl_msg_fatal("%s(%d): open lock file %s: %s", __FILE__,
 			__LINE__, acl_var_master_pid_file,
 			acl_vstring_str(strbuf));

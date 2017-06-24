@@ -24,9 +24,7 @@
 #include "stdlib/acl_sys_patch.h"
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_mymalloc.h"
-#include "stdlib/acl_argv.h"
 #include "stdlib/acl_iostuff.h"
-#include "net/acl_sane_inet.h"
 #include "net/acl_host_port.h"
 #include "net/acl_sane_socket.h"
 #include "net/acl_listen.h"
@@ -36,33 +34,13 @@
 static ACL_SOCKET inet_listen(const char *addr, const struct addrinfo *res,
 	int backlog, int blocking)
 {
-	const char *myname = "inet_listen";
-	ACL_SOCKET sock;
-	int on;
-
-	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-	if (sock == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s: socket %s", myname, acl_last_serror());
-		return ACL_SOCKET_INVALID;
-	}
-
-	on = 1;
-	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
-		(const void *) &on, sizeof(on)) < 0)
-	{
-		acl_msg_warn("%s: setsockopt(SO_REUSEADDR): %s",
-			myname, acl_last_serror());
-	}
-
-#if defined(SO_REUSEPORT) && defined(USE_REUSEPORT)
-	on = 1;
-	if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT,
-		(const void *) &on, sizeof(on)) < 0)
-	{
-		acl_msg_warn("%s: setsocket(SO_REUSEPORT): %s",
-			myname, acl_last_serror());
-	}
+	ACL_SOCKET sock = acl_sane_bind(res);
+#if defined(TCP_FASTOPEN) && defined(USE_FASTOPEN)
+	int        on;
 #endif
+
+	if (sock == ACL_SOCKET_INVALID)
+		return ACL_SOCKET_INVALID;
 
 #if defined(TCP_FASTOPEN) && defined(USE_FASTOPEN)
 	on = 1;
@@ -70,32 +48,20 @@ static ACL_SOCKET inet_listen(const char *addr, const struct addrinfo *res,
 		(const void *) &on, sizeof(on)) < 0)
 	{
 		acl_msg_warn("%s: setsocket(TCP_FASTOPEN): %s",
-			myname, acl_last_serror());
+			__FUNCTION__, acl_last_serror());
 	}
 #endif
-
-#ifdef ACL_WINDOWS
-	if (bind(sock, res->ai_addr, (int) res->ai_addrlen) < 0) {
-#else
-	if (bind(sock, res->ai_addr, res->ai_addrlen) < 0) {
-#endif
-		acl_msg_error("%s: bind %s error %s, addr=%s",
-			myname, addr, acl_last_serror(), addr);
-		acl_socket_close(sock);
-		return ACL_SOCKET_INVALID;
-	}
 
 	acl_non_blocking(sock, blocking);
 
 	if (listen(sock, backlog) < 0) {
-		acl_msg_error("%s: listen error: %s, addr=%s",
-			myname, acl_last_serror(), addr);
 		acl_socket_close(sock);
+		acl_msg_error("%s: listen error: %s, addr=%s",
+			__FUNCTION__, acl_last_serror(), addr);
 		return ACL_SOCKET_INVALID;
 	}
 
-	acl_msg_info("%s: listen %s ok", myname, addr);
-
+	acl_msg_info("%s: listen %s ok", __FUNCTION__, addr);
 	return sock;
 }
 
@@ -103,69 +69,11 @@ static ACL_SOCKET inet_listen(const char *addr, const struct addrinfo *res,
 
 ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int blocking)
 {
-	const char *myname = "acl_inet_listen";
-	char *buf, *host = NULL, *port = NULL;
-	const char *ptr;
-	struct addrinfo hints, *res0, *res;
+	struct addrinfo *res0 = acl_host_addrinfo(addr, SOCK_STREAM), *res;
 	ACL_SOCKET sock;
-	int err;
 
-	/*
-	 * Translate address information to internal form.
-	 */
-	buf = acl_mystrdup(addr);
-	ptr = acl_host_port(buf, &host, "", &port, (char *) 0);
-	if (ptr) {
-		acl_msg_error("%s(%d): %s, %s invalid",
-			myname, __LINE__, addr, ptr);
-		acl_myfree(buf);
+	if (res0 == NULL)
 		return ACL_SOCKET_INVALID;
-	}
-
-	if (host && *host == 0)
-		host = 0;
-	if (host == NULL)
-#ifdef AF_INET6
-		host = "0";
-#else
-		host = "0.0.0.0";
-#endif
-
-	if (port == NULL) {
-		acl_msg_error("%s(%d): no port given from addr(%s)",
-			myname, __LINE__, addr);
-		acl_myfree(buf);
-		return ACL_SOCKET_INVALID;
-	} else if (atoi(port) < 0) {
-		acl_msg_error("%s: port(%s) < 0 invalid from addr(%s)",
-			myname, port, addr);
-		acl_myfree(buf);
-		return ACL_SOCKET_INVALID;
-	}
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family   = PF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-#ifdef	ACL_MACOSX
-	hints.ai_flags    = AI_DEFAULT;
-#elif	defined(ACL_ANDROID)
-	hints.ai_flags    = AI_ADDRCONFIG;
-#elif defined(ACL_WINDOWS)
-# if _MSC_VER >= 1500
-	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
-# endif
-#else
-	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
-#endif
-
-	if ((err = getaddrinfo(host, port, &hints, &res0))) {
-		acl_msg_error("%s(%d), %s: getaddrinfo error %s, host=%s",
-			__FILE__, __LINE__, myname, gai_strerror(err), host);
-		acl_myfree(buf);
-		return ACL_SOCKET_INVALID;
-	}
-
-	acl_myfree(buf);
 
 	sock = ACL_SOCKET_INVALID;
 
@@ -175,9 +83,7 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int blocking)
 			break;
 	}
 
-	if (res0)
-		freeaddrinfo(res0);
-
+	freeaddrinfo(res0);
 	return sock;
 }
 
