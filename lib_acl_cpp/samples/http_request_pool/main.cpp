@@ -37,6 +37,7 @@ static bool http_get(http_request* conn, int n)
 		.set_method(HTTP_METHOD_GET)
 		.accept_gzip(__unzip);
 
+	if (0)
 	printf("%lu--%d: begin send request\r\n",
 		(unsigned long) acl_pthread_self(), n);
 	// 发送 HTTP 请求数据同时接收 HTTP 响应头
@@ -67,6 +68,7 @@ static bool http_get(http_request* conn, int n)
 			printf("%lu--%d: read length: %d, %d\r\n",
 				(unsigned long) acl_pthread_self(), n, length, ret);
 	}
+	if (0)
 	printf("%lu--%d: read body over, length: %d\r\n",
 		(unsigned long) acl_pthread_self(), n, length);
 	return true;

@@ -1,6 +1,10 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+481) 2017.6.24
+481.1) bugfix: http_request.cpp 中的 reset 方法应该增加 header_.reset() 和
+client_->reset()，否则会引起内存泄露
+
 480) 2017.6.21
 480.1) feature: master_udp.cpp 完全封装了 acl_udp_server.c 中的代码逻辑，之前
 在 alone 运行方式下的逻辑是独立于 acl_udp_server.c 的，不利于使用 valgrind
