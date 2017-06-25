@@ -18,7 +18,7 @@ void   acl_master_service_init(void)
 	const char *myname = "acl_master_service_init";
 
 	if (acl_var_master_global_event == NULL)
-		acl_var_master_global_event = acl_event_new_select(
+		acl_var_master_global_event = acl_event_new_kernel(
 			acl_var_master_delay_sec, acl_var_master_delay_usec);
 	if (acl_var_master_global_event == NULL)
 		acl_msg_fatal("%s(%d), %s: acl_event_new null, serr=%s",

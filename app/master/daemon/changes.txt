@@ -1,3 +1,8 @@
+
+
+2) 2017.6.25
+2.1) feature: acl_master uses kernel event mode
+
 1) 2017.6.18
 1.1) feature: In Docker's running time, the master's pid was set to 1; When
 stopping master by sending TERM singal to master's pid, master_sigdeath func
