@@ -17,6 +17,7 @@ struct serv_info_t
 {
 	int status;
 	acl::string name;
+	int type;
 	// Gson@optional
 	acl::string owner;
 	acl::string path;
@@ -46,9 +47,15 @@ struct list_res_t : res_t
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct stat_req_data_t
+{
+	acl::string name;
+	int type;
+};
+
 struct stat_req_t : req_t
 {
-	std::vector<acl::string> data;
+	std::vector<stat_req_data_t> data;
 };
 
 struct stat_res_t : res_t
@@ -78,9 +85,15 @@ struct start_res_t : res_t
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct stop_req_data_t
+{
+	acl::string name;
+	int type;
+};
+
 struct stop_req_t : req_t
 {
-	std::vector<acl::string> data;
+	std::vector<stop_req_data_t> data;
 };
 
 struct stop_res_data_t

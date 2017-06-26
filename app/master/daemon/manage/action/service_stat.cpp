@@ -14,9 +14,9 @@
 #include "master/master_api.h"
 #include "service_stat.h"
 
-bool service_stat::stat_one(const char* name, serv_info_t& info)
+bool service_stat::stat_one(const char* name, int type, serv_info_t& info)
 {
-	ACL_MASTER_SERV *serv = acl_master_lookup(name);
+	ACL_MASTER_SERV *serv = acl_master_lookup(name, type);
 
 	if (serv == NULL)
 	{
@@ -25,6 +25,7 @@ bool service_stat::stat_one(const char* name, serv_info_t& info)
 	}
 
 	info.name            = serv->name;
+	info.type            = serv->type;
 	info.path            = serv->path;
 	info.proc_max        = serv->max_proc;
 	info.proc_prefork    = serv->prefork_proc;
@@ -55,11 +56,11 @@ bool service_stat::run(const stat_req_t& req, stat_res_t& res)
 {
 	size_t n = 0;
 
-	for (std::vector<acl::string>::const_iterator cit = req.data.begin();
-		cit != req.data.end(); ++cit)
+	for (std::vector<stat_req_data_t>::const_iterator
+		cit = req.data.begin(); cit != req.data.end(); ++cit)
 	{
 		serv_info_t info;
-		if (stat_one((*cit).c_str(), info))
+		if (stat_one((*cit).name.c_str(), (*cit).type, info))
 			n++;
 		res.data.push_back(info);
 	}

@@ -14,11 +14,11 @@
 #include "master/master_api.h"
 #include "service_stop.h"
 
-bool service_stop::stop_one(const char* name, stop_res_data_t& data)
+bool service_stop::stop_one(const char* name, int type, stop_res_data_t& data)
 {
-	if (acl_master_stop(name) < 0)
+	if (acl_master_stop(name, type) < 0)
 	{
-		data.status = 500;
+		data.status = 404;
 		return false;
 	}
 
@@ -30,13 +30,13 @@ bool service_stop::run(const stop_req_t& req, stop_res_t& res)
 {
 	size_t n = 0;
 
-	for (std::vector<acl::string>::const_iterator cit = req.data.begin();
-		cit != req.data.end(); ++cit)
+	for (std::vector<stop_req_data_t>::const_iterator
+		cit = req.data.begin(); cit != req.data.end(); ++cit)
 	{
 		stop_res_data_t data;
-		data.name   = *cit;
+		data.name = (*cit).name;
 
-		if (stop_one(*cit, data))
+		if (stop_one((*cit).name.c_str(), (*cit).type, data))
 			n++;
 		res.data.push_back(data);
 	}

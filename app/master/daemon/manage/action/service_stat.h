@@ -25,5 +25,5 @@ public:
 	bool run(const stat_req_t& req, stat_res_t& res);
 
 private:
-	bool stat_one(const char* name, serv_info_t& info);
+	bool stat_one(const char* name, int type, serv_info_t& info);
 };

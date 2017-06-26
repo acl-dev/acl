@@ -273,6 +273,11 @@ namespace acl
         else
             $node.add_text("name", acl::get_value($obj.name));
 
+        if (check_nullptr($obj.type))
+            $node.add_null("type");
+        else
+            $node.add_number("type", acl::get_value($obj.type));
+
         if (check_nullptr($obj.owner))
             $node.add_null("owner");
         else
@@ -350,6 +355,7 @@ namespace acl
     {
         acl::json_node *status = $node["status"];
         acl::json_node *name = $node["name"];
+        acl::json_node *type = $node["type"];
         acl::json_node *owner = $node["owner"];
         acl::json_node *path = $node["path"];
         acl::json_node *proc_max = $node["proc_max"];
@@ -368,6 +374,9 @@ namespace acl
      
         if(!name ||!($result = gson(*name, &$obj.name), $result.first))
             return std::make_pair(false, "required [serv_info_t.name] failed:{"+$result.second+"}");
+     
+        if(!type ||!($result = gson(*type, &$obj.type), $result.first))
+            return std::make_pair(false, "required [serv_info_t.type] failed:{"+$result.second+"}");
      
         if(owner)
             gson(*owner, &$obj.owner);
@@ -640,6 +649,72 @@ namespace acl
     }
 
 
+    acl::json_node& gson(acl::json &$json, const stat_req_data_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.name))
+            $node.add_null("name");
+        else
+            $node.add_text("name", acl::get_value($obj.name));
+
+        if (check_nullptr($obj.type))
+            $node.add_null("type");
+        else
+            $node.add_number("type", acl::get_value($obj.type));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const stat_req_data_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const stat_req_data_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, stat_req_data_t &$obj)
+    {
+        acl::json_node *name = $node["name"];
+        acl::json_node *type = $node["type"];
+        std::pair<bool, std::string> $result;
+
+        if(!name ||!($result = gson(*name, &$obj.name), $result.first))
+            return std::make_pair(false, "required [stat_req_data_t.name] failed:{"+$result.second+"}");
+     
+        if(!type ||!($result = gson(*type, &$obj.type), $result.first))
+            return std::make_pair(false, "required [stat_req_data_t.type] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, stat_req_data_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, stat_req_data_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
     acl::json_node& gson(acl::json &$json, const stat_req_t &$obj)
     {
         acl::json_node &$node = $json.create_node();
@@ -770,6 +845,72 @@ namespace acl
 
 
      std::pair<bool,std::string> gson(const acl::string &$str, stat_res_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
+    acl::json_node& gson(acl::json &$json, const stop_req_data_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.name))
+            $node.add_null("name");
+        else
+            $node.add_text("name", acl::get_value($obj.name));
+
+        if (check_nullptr($obj.type))
+            $node.add_null("type");
+        else
+            $node.add_number("type", acl::get_value($obj.type));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const stop_req_data_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const stop_req_data_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, stop_req_data_t &$obj)
+    {
+        acl::json_node *name = $node["name"];
+        acl::json_node *type = $node["type"];
+        std::pair<bool, std::string> $result;
+
+        if(!name ||!($result = gson(*name, &$obj.name), $result.first))
+            return std::make_pair(false, "required [stop_req_data_t.name] failed:{"+$result.second+"}");
+     
+        if(!type ||!($result = gson(*type, &$obj.type), $result.first))
+            return std::make_pair(false, "required [stop_req_data_t.type] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, stop_req_data_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, stop_req_data_t &$obj)
     {
         acl::json _json;
         _json.update($str.c_str());

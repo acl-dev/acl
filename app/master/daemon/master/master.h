@@ -114,6 +114,8 @@ extern void acl_master_ent_print(ACL_MASTER_SERV *);
 extern ACL_MASTER_SERV *acl_master_ent_get(void);
 extern ACL_MASTER_SERV *acl_master_ent_load(const char*);
 extern void acl_master_ent_free(ACL_MASTER_SERV *);
+extern int  acl_master_same_name(ACL_MASTER_SERV *serv, const char *name);
+extern ACL_MASTER_SERV *acl_master_ent_find(const char *name, int type);
 
  /*
   * master_conf.c

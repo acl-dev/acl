@@ -27,6 +27,7 @@
 #include "stdlib/acl_fifo.h"
 #include "net/acl_sane_socket.h"
 #include "stdlib/acl_meter_time.h"	/* just for performance test */
+#include "stdlib/acl_iostuff.h"
 #include "event/acl_events.h"
 
 #endif
@@ -903,6 +904,7 @@ ACL_EVENT *event_new_kernel(int fdsize acl_unused)
 
 	ev = (EVENT_KERNEL*) eventp;
 	EVENT_REG_INIT_HANDLE(ev->event_fd, fdsize);
+	acl_close_on_exec(ev->event_fd, ACL_CLOSE_ON_EXEC);
 	ev->event_fdslots = __default_max_events;
 	ev->event_buf = (EVENT_BUFFER *)
 		acl_mycalloc(ev->event_fdslots + 1, sizeof(EVENT_BUFFER));

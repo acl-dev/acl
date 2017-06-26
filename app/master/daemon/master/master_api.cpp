@@ -24,16 +24,9 @@
 
 #define STR_SAME	!strcmp
 
-ACL_MASTER_SERV *acl_master_lookup(const char *name)
+ACL_MASTER_SERV *acl_master_lookup(const char *name, int type)
 {
-	ACL_MASTER_SERV *serv;
-
-	for (serv = acl_var_master_head; serv != 0; serv = serv->next) {
-		if (STR_SAME(serv->name, name))
-			return serv;
-	}
-
-	return NULL;
+	return acl_master_ent_find(name, type);
 }
 
 ACL_MASTER_SERV *acl_master_start(const char *filepath)
@@ -46,10 +39,11 @@ ACL_MASTER_SERV *acl_master_start(const char *filepath)
 		return NULL;
 	}
 
-	serv = acl_master_lookup(entry->name);
+	serv = acl_master_lookup(entry->name, entry->type);
 	if (serv != NULL) {
-		acl_msg_error("%s(%d), %s: same service %s running",
-			__FILE__, __LINE__, __FUNCTION__, entry->name);
+		acl_msg_error("%s(%d), %s: same service %s %d running",
+			__FILE__, __LINE__, __FUNCTION__,
+			entry->name, entry->type);
 		acl_master_ent_free(entry);
 		return NULL;
 	}
@@ -70,7 +64,7 @@ ACL_MASTER_SERV *acl_master_restart(const char *filepath)
 		return NULL;
 	}
 
-	(void) acl_master_stop(entry->name);
+	(void) acl_master_stop(entry->name, entry->type);
 	acl_master_ent_free(entry);
 
 	return acl_master_start(filepath);
@@ -78,12 +72,12 @@ ACL_MASTER_SERV *acl_master_restart(const char *filepath)
 
 /* stop one service according the master_service name in configure */
 
-int     acl_master_stop(const char *name)
+int     acl_master_stop(const char *name, int type)
 {
 	ACL_MASTER_SERV *serv, **servp;
 
 	for (servp = &acl_var_master_head; (serv = *servp) != 0;) {
-		if (STR_SAME(serv->name, name)) {
+		if (serv->type == type && STR_SAME(serv->name, name)) {
 			*servp = serv->next;
 			acl_master_service_stop(serv);
 			acl_master_ent_free(serv);
@@ -91,8 +85,7 @@ int     acl_master_stop(const char *name)
 		}
 	}
 
-	acl_msg_warn("%s(%d), %s: service - %s not found",
-		__FILE__, __LINE__, __FUNCTION__, name);
+	acl_msg_warn("%s(%d), %s: service - %s %d not found",
+		__FILE__, __LINE__, __FUNCTION__, name, type);
 	return -1;
 }
-

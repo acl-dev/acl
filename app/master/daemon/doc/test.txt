@@ -10,20 +10,20 @@ Connection: keep-alive
 { cmd: 'list', data: {}}
 
 POST /?cmd=stat HTTP/1.0
-Content-Length: 32
+Content-Length: 49
 Connection: keep-alive
 
-{ cmd: 'stat', data: ['18888']}
+{ cmd: 'stat', data: [{'name':'8084','type':4}]}
 
 POST /?cmd=stop HTTP/1.0
-Content-Length: 32
+Content-Length: 49
 Connection: keep-alive
 
-{ cmd: 'stop', data: ['18888']}
+{ cmd: 'stop', data: [{'name':'8084','type':4}]}
 
 POST /?cmd=start HTTP/1.0
-Content-Length: 67
+Content-Length: 64
 Connection: keep-alive
 
-{ cmd: 'start', data: ['/home/zsx/tools/acl/conf/service/web.cf']}
+{ cmd: 'start', data: ['/opt/soft/master/conf/service/web.cf']}
 
