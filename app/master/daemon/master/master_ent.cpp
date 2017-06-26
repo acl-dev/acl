@@ -694,6 +694,9 @@ ACL_MASTER_SERV *acl_master_ent_load(const char *filepath)
 	service_args(xcp, serv, filepath);
 	service_env(xcp, serv);
 
+	/* linked for children */
+	acl_ring_init(&serv->children);
+
 	/* Backoff time in case a service is broken. */
 	serv->throttle_delay = acl_var_master_throttle_time;
 

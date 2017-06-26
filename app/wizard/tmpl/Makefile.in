@@ -115,7 +115,7 @@ OBJ_PATH = .
 SRC = $(wildcard *.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 
-$(shell mkdir ../../../dist/master/libexec/$(RPATH)/)
+$(shell -p mkdir ../../../dist/master/libexec/$(RPATH)/)
 
 $(OBJ_PATH)/%.o: %.cpp
 	$(COMPILE) $< -o $@

@@ -50,6 +50,7 @@ typedef struct ACL_MASTER_SERV {
 #if 0
 	struct ACL_BINHASH *children;	/* linkage */
 #endif
+	ACL_RING children;		/* linkage children */
 	struct ACL_MASTER_SERV *next;	/* linkage */
 } ACL_MASTER_SERV;
 
@@ -92,11 +93,12 @@ typedef struct ACL_MASTER_SERV {
 typedef int ACL_MASTER_PID;		/* pid is key into binhash table */
 
 typedef struct ACL_MASTER_PROC {
-    ACL_MASTER_PID   pid;		/* child process id */
-    unsigned         gen;		/* child generation number */
-    int              avail;		/* availability */
-    ACL_MASTER_SERV *serv;		/* parent linkage */
-    int              use_count;		/* number of service requests */
+	ACL_RING me;			/* linked in serv's children */
+	unsigned gen;			/* child generation number */
+	int      avail;			/* availability */
+	int      use_count;		/* number of service requests */
+	ACL_MASTER_PID   pid;		/* child process id */
+	ACL_MASTER_SERV *serv;		/* parent linkage */
 } ACL_MASTER_PROC;
 
  /*

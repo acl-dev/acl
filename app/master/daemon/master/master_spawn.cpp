@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <syslog.h>			/* closelog() */
 #include <signal.h>
 #include <stdarg.h>
 #include <syslog.h>
@@ -112,8 +111,8 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 				__FILE__, __LINE__, myname, serv->total_proc);
 
 		if (serv->avail_proc > 0 && (serv->prefork_proc <= 0
-			|| serv->avail_proc > serv->prefork_proc))
-		{
+			|| serv->avail_proc > serv->prefork_proc)) {
+
 			acl_msg_warn("%s(%d)->%s: processes available: %d, "
 				"processes prefork: %d", __FILE__, __LINE__,
 				myname, serv->avail_proc, serv->prefork_proc);
@@ -250,6 +249,7 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 		proc->avail = 0;
 		acl_binhash_enter(acl_var_master_child_table, (char *) &pid,
 			sizeof(pid), (char *) proc);
+		acl_ring_prepend(&serv->children, &proc->me);
 		serv->total_proc++;
 		acl_master_avail_more(serv, proc);
 		if (serv->flags & ACL_MASTER_FLAG_CONDWAKE) {
@@ -297,6 +297,7 @@ static void master_delete_child(ACL_MASTER_PROC *proc)
 
 	acl_binhash_delete(acl_var_master_child_table, (void *) &proc->pid,
 		sizeof(proc->pid), (void (*) (void *)) 0);
+	acl_ring_detach(&proc->me);
 	acl_myfree(proc);
 }
 
@@ -321,18 +322,20 @@ void    acl_master_reap_child(void)
 	while ((pid = waitpid((pid_t) - 1, &status, WNOHANG)) > 0) {
 		if (acl_msg_verbose)
 			acl_msg_info("master_reap_child: pid %d", pid);
+
 		if ((proc = (ACL_MASTER_PROC *)
 			acl_binhash_find(acl_var_master_child_table,
 				(char *) &pid, sizeof(pid))) == 0) {
 			acl_msg_warn("master_reap: unknown pid: %d", pid);
 			continue;
 		}
-		serv = proc->serv;
 
 		if (ACL_NORMAL_EXIT_STATUS(status)) {
 			master_delete_child(proc);
 			continue;
 		}
+
+		serv = proc->serv;
 
 		if (WIFEXITED(status)) {
 			acl_msg_warn("%s(%d), %s: process %s pid %d "
@@ -348,6 +351,7 @@ void    acl_master_reap_child(void)
 					serv->path, pid, buf);
 			}
 		}
+
 		if (WIFSIGNALED(status)) {
 			acl_msg_warn("%s(%d), %s: process %s pid %d killed"
 				" by signal %d", __FILE__, __LINE__, myname,
@@ -362,8 +366,10 @@ void    acl_master_reap_child(void)
 					serv->path, pid, buf);
 			}
 		}
+
 		if (proc->use_count == 0
 		    && (serv->flags & ACL_MASTER_FLAG_THROTTLE) == 0) {
+
 			acl_msg_warn("%s(%d), %s: bad command startup, path=%s"
 				" -- throttling", __FILE__, __LINE__,
 				myname, serv->path);
