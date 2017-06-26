@@ -52,4 +52,5 @@ private:
 	static int on_head(int status, void* ctx);
 	static int on_body(int status, char* data, int dlen, void* ctx);
 	static int on_close(ACL_ASTREAM* conn, void* ctx);
+	static int on_timeo(ACL_ASTREAM* conn, void* ctx);
 };

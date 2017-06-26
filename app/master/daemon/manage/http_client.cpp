@@ -26,6 +26,7 @@ http_client::http_client(acl::aio_socket_stream *client, int rw_timeout)
 	hdr_req_ = NULL;
 	req_     = NULL;
 	acl_aio_add_close_hook(conn_, on_close, this);
+	acl_aio_add_timeo_hook(conn_, on_timeo, this);
 }
 
 http_client::~http_client(void)
@@ -62,6 +63,12 @@ int http_client::on_close(ACL_ASTREAM*, void* ctx)
 	http_client* hc = (http_client*) ctx;
 	delete hc;
 	return 0;
+}
+
+int http_client::on_timeo(ACL_ASTREAM*, void*)
+{
+	// return -1 so the connection can be closed
+	return -1;
 }
 
 int http_client::on_head(int status, void* ctx)

@@ -20,7 +20,7 @@ public:
 	manager(void);
 	~manager(void);
 
-	void init(ACL_EVENT* event, const char* addr);
+	void init(ACL_EVENT* event, const char* addr, int timeout);
 	ACL_AIO* get_aio(void) const
 	{
 		return aio_;
