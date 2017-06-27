@@ -20,14 +20,14 @@ bool service_start::run(const start_req_t& req, start_res_t& res)
 	const ACL_MASTER_SERV* serv;
 	size_t  n = 0;
 
-	for (std::vector<acl::string>::const_iterator cit = req.data.begin();
-		cit != req.data.end(); ++cit)
+	for (std::vector<start_req_data_t>::const_iterator
+		cit = req.data.begin(); cit != req.data.end(); ++cit)
 	{
-		const char* name = (*cit).c_str();
-		if ((serv = acl_master_start(name)) == NULL)
+		const char* path = (*cit).path.c_str();
+		if ((serv = acl_master_start(path)) == NULL)
 		{
 			data.status = 500;
-			data.name   = name;
+			data.path   = path;
 		}
 		else
 		{

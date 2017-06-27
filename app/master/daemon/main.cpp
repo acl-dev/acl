@@ -199,6 +199,7 @@ int     main(int argc, char **argv)
 		}
 #endif
 
+		if (0)
 		acl_watchdog_start(watchdog);  /* same as trigger servers */
 
 		acl_event_loop(acl_var_master_global_event);

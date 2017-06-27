@@ -50,8 +50,8 @@ typedef struct ACL_MASTER_SERV {
 #if 0
 	struct ACL_BINHASH *children;	/* linkage */
 #endif
-	ACL_RING children;		/* linkage children */
-	struct ACL_MASTER_SERV *next;	/* linkage */
+	ACL_RING      children;		/* linkage of children */
+	struct ACL_MASTER_SERV *next;	/* linkage of serv */
 } ACL_MASTER_SERV;
 
  /*
@@ -182,6 +182,10 @@ extern void acl_master_spawn(ACL_MASTER_SERV *);
 extern void acl_master_reap_child(void);
 extern void acl_master_delete_children(ACL_MASTER_SERV *);
 extern void acl_master_delete_all_children(void);
+extern void acl_master_signal_children(ACL_MASTER_SERV *serv, int signum,
+		int *nchildren, int *nsignaled);
+extern void acl_master_sighup_children(ACL_MASTER_SERV *serv,
+		int *nchildren, int *nsignaled);
 
  /*
   * master_warning.c

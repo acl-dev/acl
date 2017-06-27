@@ -14,9 +14,9 @@
 #include "master/master_api.h"
 #include "service_stat.h"
 
-bool service_stat::stat_one(const char* name, int type, serv_info_t& info)
+bool service_stat::stat_one(const char* path, serv_info_t& info)
 {
-	ACL_MASTER_SERV *serv = acl_master_lookup(name, type);
+	ACL_MASTER_SERV *serv = acl_master_lookup(path);
 
 	if (serv == NULL)
 	{
@@ -35,9 +35,9 @@ bool service_stat::stat_one(const char* name, int type, serv_info_t& info)
 	info.listen_fd_count = serv->listen_fd_count;
 
 	if (serv->owner && *serv->owner)
-		info.owner             = serv->owner;
+		info.owner = serv->owner;
 	if (serv->notify_addr && *serv->notify_addr)
-		info.notify_addr       = serv->notify_addr;
+		info.notify_addr = serv->notify_addr;
 	if (serv->notify_recipients && *serv->notify_recipients)
 		info.notify_recipients = serv->notify_recipients;
 
@@ -60,7 +60,7 @@ bool service_stat::run(const stat_req_t& req, stat_res_t& res)
 		cit = req.data.begin(); cit != req.data.end(); ++cit)
 	{
 		serv_info_t info;
-		if (stat_one((*cit).name.c_str(), (*cit).type, info))
+		if (stat_one((*cit).path.c_str(), info))
 			n++;
 		res.data.push_back(info);
 	}

@@ -19,10 +19,11 @@ extern "C" {
 
 #include "master.h"
 
-ACL_MASTER_SERV *acl_master_lookup(const char *name, int type);
+ACL_MASTER_SERV *acl_master_lookup(const char *path);
 ACL_MASTER_SERV *acl_master_start(const char *path);
 ACL_MASTER_SERV *acl_master_restart(const char *path);
-int acl_master_stop(const char *name, int type);
+int acl_master_stop(const char *path);
+int acl_master_reload(const char *path, int *nchildren, int *nsignaled);
 
 
 #ifdef __cplusplus

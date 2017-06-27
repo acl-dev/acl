@@ -15,6 +15,7 @@
 #include "action/service_stat.h"
 #include "action/service_start.h"
 #include "action/service_stop.h"
+#include "action/service_reload.h"
 #include "http_client.h"
 
 http_client::http_client(acl::aio_socket_stream *client, int rw_timeout)
@@ -75,6 +76,8 @@ int http_client::on_head(int status, void* ctx)
 {
 	http_client* hc = (http_client*) ctx;
 
+	acl_aio_disable_readwrite(hc->conn_);
+
 	if (status != HTTP_CHAT_OK)
 	{
 		logger_error("invalid status=%d", status);
@@ -121,7 +124,10 @@ int http_client::on_body(int status, char *data, int dlen, void *ctx)
 	hc->json_.update(data);
 
 	if (status == HTTP_CHAT_OK)
+	{
+		acl_aio_disable_readwrite(hc->conn_);
 		return hc->handle() ? 0 : -1;
+	}
 
 	return 0;
 }
@@ -169,6 +175,8 @@ bool http_client::handle(void)
 		ret = handle_start();
 	else if (EQ(cmd, "stop"))
 		ret = handle_stop();
+	else if (EQ(cmd, "reload"))
+		ret = handle_reload();
 	else {
 		logger_warn("invalid cmd=%s", cmd);
 		acl::string dummy;
@@ -277,6 +285,26 @@ bool http_client::handle_start(void)
 	service_start service;
 	service.run(req, res);
 	reply<start_res_t>(res.status, res);
+
+	return true;
+}
+
+bool http_client::handle_reload(void)
+{
+	reload_req_t req;
+	reload_res_t res;
+
+	if (deserialize<reload_req_t>(json_, req) == false)
+	{
+		res.status = 400;
+		res.msg    = "invalid json";
+		reply<reload_res_t>(res.status, res);
+		return false;
+	}
+
+	service_reload service;
+	service.run(req, res);
+	reply<reload_res_t>(res.status, res);
 
 	return true;
 }

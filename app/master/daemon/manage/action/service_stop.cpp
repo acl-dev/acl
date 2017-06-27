@@ -14,9 +14,9 @@
 #include "master/master_api.h"
 #include "service_stop.h"
 
-bool service_stop::stop_one(const char* name, int type, stop_res_data_t& data)
+bool service_stop::stop_one(const char* path, stop_res_data_t& data)
 {
-	if (acl_master_stop(name, type) < 0)
+	if (acl_master_stop(path) < 0)
 	{
 		data.status = 404;
 		return false;
@@ -34,9 +34,9 @@ bool service_stop::run(const stop_req_t& req, stop_res_t& res)
 		cit = req.data.begin(); cit != req.data.end(); ++cit)
 	{
 		stop_res_data_t data;
-		data.name = (*cit).name;
+		data.path = (*cit).path;
 
-		if (stop_one((*cit).name.c_str(), (*cit).type, data))
+		if (stop_one((*cit).path.c_str(), data))
 			n++;
 		res.data.push_back(data);
 	}
@@ -50,7 +50,7 @@ bool service_stop::run(const stop_req_t& req, stop_res_t& res)
 	{
 		res.status = 500;
 		res.msg    = "error";
-		logger_error("not all service have been started!, n=%d, %d",
+		logger_error("not all services were started!, n=%d, %d",
 			(int) n, (int) req.data.size());
 	}
 
