@@ -427,7 +427,11 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	 * Pick up policy settings from master process. Shut up error messages
 	 * to stderr, because no-one is going to see them.
 	 */
+#ifdef ACL_UNIX
 	opterr = 0;
+	optind = 0;
+	optarg = 0;
+#endif
 
 	while ((c = getopt(argc, argv, "hcn:s:t:uvf:")) > 0) {
 		switch (c) {

@@ -677,6 +677,8 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	 */
 #ifdef ACL_UNIX
 	opterr = 0;
+	optind = 0;
+	optarg = 0;
 #endif
 
 	master_log_open(argv[0]);

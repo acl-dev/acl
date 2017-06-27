@@ -423,7 +423,12 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	 * Pick up policy settings from master process. Shut up error messages to
 	 * stderr, because no-one is going to see them.
 	 */
+#ifdef ACL_UNIX
 	opterr = 0;
+	optind = 0;
+	optarg = 0;
+#endif
+
 	while ((c = getopt(argc, argv, "hcDl:n:s:t:uvf:")) > 0) {
 		switch (c) {
 		case 'h':

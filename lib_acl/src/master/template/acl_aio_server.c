@@ -1299,7 +1299,11 @@ static void server_main(int argc, char **argv, va_list ap)
 	 * messages to stderr, because no-one is going to see them.
 	 */
 
+#ifdef ACL_UNIX
 	opterr = 0;
+	optind = 0;
+	optarg = 0;
+#endif
 
 	while ((c = getopt(argc, argv, "hcn:o:s:t:uvf:")) > 0) {
 		switch (c) {
