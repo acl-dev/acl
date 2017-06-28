@@ -292,13 +292,13 @@ db_pgsql::~db_pgsql(void)
 		__dbfinish(conn_);
 }
 
-const char* db_pgsql::dbtype() const
+const char* db_pgsql::dbtype(void) const
 {
 	static const char* type = "pgsql";
 	return type;
 }
 
-int db_pgsql::get_errno() const
+int db_pgsql::get_errno(void) const
 {
 	if (conn_)
 		return __dbstatus(conn_);
@@ -306,7 +306,7 @@ int db_pgsql::get_errno() const
 		return -1;
 }
 
-const char* db_pgsql::get_error() const
+const char* db_pgsql::get_error(void) const
 {
 	if (conn_)
 		return __dberror_message(conn_);
@@ -426,7 +426,7 @@ bool db_pgsql::dbopen(const char* /* charset = NULL */)
 	return true;
 }
 
-bool db_pgsql::is_opened() const
+bool db_pgsql::is_opened(void) const
 {
 	return conn_ ? true : false;
 }
@@ -558,12 +558,12 @@ bool db_pgsql::sql_update(const char* sql)
 	return true;
 }
 
-int db_pgsql::affect_count() const
+int db_pgsql::affect_count(void) const
 {
 	return affect_count_;
 }
 
-bool db_pgsql::begin_transaction()
+bool db_pgsql::begin_transaction(void)
 {
 	const char* sql = "start transaction";
 	if (sql_update(sql) == false)
@@ -574,7 +574,7 @@ bool db_pgsql::begin_transaction()
 	return true;
 }
 
-bool db_pgsql::commit()
+bool db_pgsql::commit(void)
 {
 	const char* sql = "commit";
 	if (sql_update(sql) == false)
@@ -585,7 +585,7 @@ bool db_pgsql::commit()
 	return true;
 }
 
-bool db_pgsql::rollback()
+bool db_pgsql::rollback(void)
 {
 	const char* sql = "rollback";
 	if (sql_update(sql) == false)

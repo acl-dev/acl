@@ -421,7 +421,7 @@ db_mysql::db_mysql(const mysql_conf& conf)
 		conf.get_rw_timeout(), conf.get_charset());
 }
 
-db_mysql::~db_mysql()
+db_mysql::~db_mysql(void)
 {
 	acl_myfree(dbaddr_);
 	acl_myfree(dbname_);
@@ -437,23 +437,23 @@ db_mysql::~db_mysql()
 		__mysql_close(conn_);
 }
 
-unsigned long db_mysql::mysql_libversion() const
+unsigned long db_mysql::mysql_libversion(void) const
 {
 	return __mysql_libversion();
 }
 
-const char* db_mysql::mysql_client_info() const
+const char* db_mysql::mysql_client_info(void) const
 {
 	return __mysql_client_info();
 }
 
-const char* db_mysql::dbtype() const
+const char* db_mysql::dbtype(void) const
 {
 	static const char* type = "mysql";
 	return type;
 }
 
-int db_mysql::get_errno() const
+int db_mysql::get_errno(void) const
 {
 	if (conn_)
 		return __mysql_errno(conn_);
@@ -461,7 +461,7 @@ int db_mysql::get_errno() const
 		return -1;
 }
 
-const char* db_mysql::get_error() const
+const char* db_mysql::get_error(void) const
 {
 	if (conn_)
 		return __mysql_error(conn_);
@@ -658,12 +658,12 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 	return true;
 }
 
-bool db_mysql::is_opened() const
+bool db_mysql::is_opened(void) const
 {
 	return conn_ ? true : false;
 }
 
-bool db_mysql::close()
+bool db_mysql::close(void)
 {
 #ifdef HAS_MYSQL_DLL
 	if (conn_ && __mysql_dll)
@@ -794,7 +794,7 @@ bool db_mysql::sql_update(const char* sql)
 	return true;
 }
 
-int db_mysql::affect_count() const
+int db_mysql::affect_count(void) const
 {
 	if (!is_opened())
 	{
@@ -805,7 +805,7 @@ int db_mysql::affect_count() const
 	return (int) __mysql_affected_rows(conn_);
 }
 
-bool db_mysql::begin_transaction()
+bool db_mysql::begin_transaction(void)
 {
 	const char* sql = "start transaction";
 	if (sql_update(sql) == false)
@@ -816,7 +816,7 @@ bool db_mysql::begin_transaction()
 	return true;
 }
 
-bool db_mysql::commit()
+bool db_mysql::commit(void)
 {
 	const char* sql = "commit";
 	if (sql_update(sql) == false)
@@ -827,7 +827,7 @@ bool db_mysql::commit()
 	return true;
 }
 
-bool db_mysql::rollback()
+bool db_mysql::rollback(void)
 {
 	const char* sql = "rollback";
 	if (sql_update(sql) == false)
@@ -872,7 +872,7 @@ db_mysql::~db_mysql(void)
 {
 }
 
-const char* db_mysql::dbtype() const
+const char* db_mysql::dbtype(void) const
 {
 	return NULL;
 }
@@ -882,7 +882,7 @@ bool db_mysql::dbopen(const char*)
 	return false;
 }
 
-bool db_mysql::is_opened() const
+bool db_mysql::is_opened(void) const
 {
 	return false;
 }
@@ -907,37 +907,37 @@ bool db_mysql::sql_update(const char*)
 	return false;
 }
 
-bool db_mysql::begin_transaction()
+bool db_mysql::begin_transaction(void)
 {
 	return false;
 }
 
-bool db_mysql::commit()
+bool db_mysql::commit(void)
 {
 	return false;
 }
 
-int db_mysql::affect_count() const
+int db_mysql::affect_count(void) const
 {
 	return 0;
 }
 
-unsigned long db_mysql::mysql_libversion() const
+unsigned long db_mysql::mysql_libversion(void) const
 {
 	return 0;
 }
 
-const char* db_mysql::mysql_client_info() const
+const char* db_mysql::mysql_client_info(void) const
 {
 	return NULL;
 }
 
-int db_mysql::get_errno() const
+int db_mysql::get_errno(void) const
 {
 	return -1;
 }
 
-const char* db_mysql::get_error() const
+const char* db_mysql::get_error(void) const
 {
 	return "mysql not opened yet!";
 }
