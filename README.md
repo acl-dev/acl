@@ -1,4 +1,4 @@
-# acl -- One advanced C/C++ lib for UNIX and WINDOWS
+# acl -- One advanced C/C++ library for Linux/MacOS/FreeBSD/Solaris(x86)/Windows/Android/IOS
 
 <!-- vim-markdown-toc GFM -->
 * [一、描述](#一描述)
