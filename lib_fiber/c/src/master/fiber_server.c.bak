@@ -22,7 +22,6 @@ static int   acl_var_fiber_enable_core;
 static int   acl_var_fiber_use_limit;
 static int   acl_var_fiber_idle_limit;
 static int   acl_var_fiber_wait_limit;
-static int   acl_var_fiber_threads;
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ "fiber_stack_size", STACK_SIZE, &acl_var_fiber_stack_size, 0, 0 },
 	{ "fiber_buf_size", 8192, &acl_var_fiber_buf_size, 0, 0 },
@@ -32,7 +31,6 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ "fiber_use_limit", 0, &acl_var_fiber_use_limit, 0, 0 },
 	{ "fiber_idle_limit", 0, &acl_var_fiber_idle_limit, 0 , 0 },
 	{ "fiber_wait_limit", 0, &acl_var_fiber_wait_limit, 0, 0 },
-	{ "fiber_threads", 2, &acl_var_fiber_threads, 0, 0 },
 
 	{ 0, 0, 0, 0, 0 },
 };
@@ -74,23 +72,17 @@ static char  *__deny_info = NULL;
 static ACL_MASTER_SERVER_LISTEN_FN __server_on_listen = NULL;
 
 static unsigned      __server_generation;
+static ACL_VSTREAM **__sstreams;
 
 static int           __server_stopping = 0;
 static int           __nclients = 0;
 static unsigned      __nused = 0;
 
-typedef struct FIBER_SERVER {
-	acl_pthread_t tid;
-	ACL_VSTREAM **sstreams;
-	int           socket_count;
-	int           fdtype;
-} FIBER_SERVER;
-
 static void server_exit(ACL_FIBER *fiber, int status)
 {
 	acl_msg_info("%s(%d), %s: fiber = %u, service exit now!",
 		__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(fiber));
-	exit(status);
+	exit (status);
 }
 
 static void server_abort(ACL_FIBER *fiber)
@@ -338,7 +330,7 @@ static void fiber_dispatch(ACL_FIBER *fiber, void *ctx acl_unused)
 		__FUNCTION__, acl_fiber_id(fiber));
 }
 
-static void fiber_accept(ACL_FIBER *fiber, void *ctx)
+static void fiber_accept_main(ACL_FIBER *fiber, void *ctx)
 {
 	static int __max_fd = 0, __last_fd = 0;
 	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx, *cstream;
@@ -377,52 +369,67 @@ static void fiber_accept(ACL_FIBER *fiber, void *ctx)
 	acl_vstream_close(sstream);
 }
 
-static FIBER_SERVER *servers_alloc(int nthreads, int socket_count, int fdtype)
+#ifdef ACL_UNIX
+
+static ACL_VSTREAM **server_daemon_open(int count, int fdtype)
 {
-	FIBER_SERVER *servers = (FIBER_SERVER *)
-		acl_mycalloc(nthreads, sizeof(FIBER_SERVER));
+	const char *myname = "server_daemon_open";
+	ACL_VSTREAM *sstream, **sstreams;
+	ACL_VSTREAM *stat_stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
+			O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
+	ACL_SOCKET fd;
 	int i;
 
-	for (i = 0; i < nthreads; i++) {
-		servers[i].socket_count = socket_count;
-		servers[i].sstreams = (ACL_VSTREAM **)
-			acl_mycalloc(socket_count, sizeof(ACL_VSTREAM *));
-		servers[i].fdtype = fdtype;
-	}
+	/* socket count is as same listen_fd_count in parent process */
 
-	return servers;
-}
+	sstreams = (ACL_VSTREAM **)
+		acl_mycalloc(count + 1, sizeof(ACL_VSTREAM *));
 
-static void server_daemon_open(FIBER_SERVER *server)
-{
-	ACL_SOCKET fd = ACL_MASTER_LISTEN_FD;
-	int i;
+	for (i = 0; i < count + 1; i++)
+		sstreams[i] = NULL;
 
-	for (i = 0; fd < ACL_MASTER_LISTEN_FD + server->socket_count; fd++) {
-		server->sstreams[i++] = acl_vstream_fdopen(fd, O_RDWR,
-			acl_var_fiber_buf_size, acl_var_fiber_rw_timeout,
-			server->fdtype);
+	i = 0;
+	fd = ACL_MASTER_LISTEN_FD;
+	for (; fd < ACL_MASTER_LISTEN_FD + count; fd++) {
+		sstream = acl_vstream_fdopen(fd, O_RDWR,
+				acl_var_fiber_buf_size,
+				acl_var_fiber_rw_timeout, fdtype);
+		if (sstream == NULL)
+			acl_msg_fatal("%s(%d)->%s: stream null, fd = %d",
+				__FILE__, __LINE__, myname, fd);
+
 		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
+		if (__server_on_listen)
+			__server_on_listen(sstream);
+		sstreams[i++] = sstream;
+		acl_fiber_create(fiber_accept_main, sstream, STACK_SIZE);
 	}
+
+	acl_fiber_create(fiber_monitor_master, stat_stream, STACK_SIZE);
+
+	acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
+	acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
+	acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
+
+	return sstreams;
 }
 
-static FIBER_SERVER *daemon_open(int count, int fdtype, int nthreads)
+#endif
+
+static ACL_VSTREAM **server_alone_open(const char *addrs)
 {
-	FIBER_SERVER *servers = servers_alloc(nthreads, count, fdtype);
-	int i;
+	const char   *myname = "server_alone_open";
+	ACL_ARGV*     tokens = acl_argv_split(addrs, ";,| \t");
+	ACL_ITER      iter;
+	int           i;
+	ACL_VSTREAM **streams = (ACL_VSTREAM **)
+		acl_mycalloc(tokens->argc + 1, sizeof(ACL_VSTREAM *));
 
-	for (i = 0; i < nthreads; i++)
-		server_daemon_open(&servers[i]);
-	return servers;
-}
+	for (i = 0; i < tokens->argc + 1; i++)
+		streams[i] = NULL;
 
-static void server_alone_open(FIBER_SERVER *server, ACL_ARGV *addrs)
-{
-	const char *myname = "server_alone_open";
-	ACL_ITER iter;
-	int i = 0;
-
-	acl_foreach(iter, addrs) {
+	i = 0;
+	acl_foreach(iter, tokens) {
 		const char* addr = (const char*) iter.data;
 		ACL_VSTREAM* sstream = acl_vstream_listen(addr, 128);
 		if (sstream == NULL) {
@@ -431,91 +438,22 @@ static void server_alone_open(FIBER_SERVER *server, ACL_ARGV *addrs)
 			exit(1);
 		}
 
-		server->sstreams[i++] = sstream;
+		if (__server_on_listen)
+			__server_on_listen(sstream);
+		streams[i++] = sstream;
+		acl_fiber_create(fiber_accept_main, sstream, STACK_SIZE);
 	}
-}
-
-static FIBER_SERVER *alone_open(const char *addrs, int fdtype, int nthreads)
-{
-	ACL_ARGV* tokens = acl_argv_split(addrs, ";,| \t");
-	FIBER_SERVER *servers = servers_alloc(nthreads, tokens->argc, fdtype);
-	int i;
-
-	for (i = 0; i < nthreads; i++)
-		server_alone_open(&servers[i], tokens);
 
 	acl_argv_free(tokens);
-	return servers;
-}
-
-static void *thread_main(void *ctx)
-{
-	FIBER_SERVER *server =(FIBER_SERVER *) ctx;
-	int i;
-
-	for (i = 0; i < server->socket_count; i++) {
-		if (__server_on_listen)
-			__server_on_listen(server->sstreams[i]);
-		acl_fiber_create(fiber_accept, server->sstreams[i], STACK_SIZE);
-	}
-
-	acl_fiber_schedule();
-	return NULL;
-}
-
-static void fiber_sleep(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
-{
-	while (1)
-		sleep(1);
-}
-
-static void main_thread_loop(void)
-{
-	if (__daemon_mode) {
-		ACL_VSTREAM *stat_stream = acl_vstream_fdopen(
-				ACL_MASTER_STATUS_FD, O_RDWR, 8192, 0,
-				ACL_VSTREAM_TYPE_SOCK);
-		acl_fiber_create(fiber_monitor_master, stat_stream, STACK_SIZE);
-
-		acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
-		acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
-		acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
-
-		if (acl_var_fiber_dispatch_addr && *acl_var_fiber_dispatch_addr)
-			acl_fiber_create(fiber_dispatch, NULL, STACK_SIZE);
-	} else
-		acl_fiber_create(fiber_sleep, NULL, STACK_SIZE);
-
-	if (acl_var_fiber_use_limit > 0)
-		acl_fiber_create(fiber_monitor_used, NULL, STACK_SIZE);
-
-	if (acl_var_fiber_idle_limit > 0)
-		acl_fiber_create(fiber_monitor_idle, NULL, STACK_SIZE);
-
-	acl_msg_info("daemon started, log=%s", acl_var_fiber_log_file);
-
-	acl_fiber_schedule();
-}
-
-static void servers_start(FIBER_SERVER *servers, int nthreads)
-{
-	acl_pthread_attr_t attr;
-	int i;
-
-	acl_pthread_attr_init(&attr);
-	acl_pthread_attr_setdetachstate(&attr, ACL_PTHREAD_CREATE_DETACHED);
-
-	for (i = 0; i < nthreads; i++)
-		acl_pthread_create(&servers[i].tid, &attr,
-			thread_main, &servers[i]);
-
-	main_thread_loop();
+	return streams;
 }
 
 static void open_service_log(void)
 {
 	/* first, close the master's log */
+#ifdef ACL_UNIX
 	master_log_close();
+#endif
 
 	/* second, open the service's log */
 	acl_msg_open(acl_var_fiber_log_file, acl_var_fiber_procname);
@@ -539,6 +477,9 @@ static void server_init(const char *procname)
 
 	inited = 1;
 
+	if (procname == NULL || *procname == 0)
+		acl_msg_fatal("%s(%d); procname null", myname, __LINE__);
+
 	/*
 	 * Don't die when a process goes away unexpectedly.
 	 */
@@ -556,7 +497,13 @@ static void server_init(const char *procname)
 	/*
 	 * May need this every now and then.
 	 */
+#ifdef ACL_UNIX
 	acl_var_fiber_pid = getpid();
+#elif defined(ACL_WINDOWS)
+	acl_var_fiber_pid = _getpid();
+#else
+	acl_var_fiber_pid = 0;
+#endif
 	acl_var_fiber_procname = acl_mystrdup(acl_safe_basename(procname));
 
 	ptr = acl_getenv("SERVICE_LOG");
@@ -607,16 +554,79 @@ static void usage(int argc, char * argv[])
 
 static int __first_name;
 static va_list __ap_dest;
-static ACL_MASTER_SERVER_INIT_FN pre_jail = NULL;
-static ACL_MASTER_SERVER_INIT_FN post_init = NULL;
-static void *pre_jail_ctx = NULL;
-static void *post_init_ctx = NULL;
 
-static void parse_args(void)
+static void fiber_start(void)
 {
-	const char *myname = "parse_args";
-	int name = __first_name;
+	const char *myname = "fiber_main";
+	const char *service_name = acl_safe_basename(__argv[0]);
+	char *root_dir = NULL, *user = NULL, *addrs = NULL;
+	int   c, fdtype = 0, socket_count = 1, name = -1000;
+	char *generation, conf_file[1024];
+	void *pre_jail_ctx = NULL, *post_init_ctx = NULL;
+	ACL_MASTER_SERVER_INIT_FN pre_jail = NULL;
+	ACL_MASTER_SERVER_INIT_FN post_init = NULL;
 
+	master_log_open(__argv[0]);
+
+	conf_file[0] = 0;
+
+	while ((c = getopt(__argc, __argv, "hc:n:s:t:uvf:L:")) > 0) {
+		switch (c) {
+		case 'h':
+			usage(__argc, __argv);
+			exit (0);
+		case 'f':
+			acl_app_conf_load(optarg);
+			ACL_SAFE_STRNCPY(conf_file, optarg, sizeof(conf_file));
+			break;
+		case 'c':
+			root_dir = "setme";
+			break;
+		case 'n':
+			service_name = optarg;
+			break;
+		case 's':
+			socket_count = atoi(optarg);
+			break;
+		case 'u':
+			user = "setme";
+			break;
+		case 't':
+			/* deprecated, just go through */
+			break;
+		case 'v':
+			acl_msg_verbose++;
+			break;
+		case 'L':
+			addrs = optarg;
+			break;
+		default:
+			break;
+		}
+	}
+
+	if (conf_file[0] == 0)
+		acl_msg_info("%s(%d)->%s: no configure file",
+			__FILE__, __LINE__, myname);
+	else
+		acl_msg_info("%s(%d)->%s: configure file = %s", 
+			__FILE__, __LINE__, myname, conf_file);
+
+	ACL_SAFE_STRNCPY(__service_name, service_name, sizeof(__service_name));
+
+	if (addrs && *addrs)
+		__daemon_mode = 0;
+	else
+		__daemon_mode = 1;
+
+	/*******************************************************************/
+
+	/* Application-specific initialization. */
+
+	/* load configure, set signal */
+	server_init(__argv[0]);
+
+	name = __first_name;
 	for (; name != ACL_APP_CTL_END; name = va_arg(__ap_dest, int)) {
 		switch (name) {
 		case ACL_MASTER_SERVER_BOOL_TABLE:
@@ -657,97 +667,8 @@ static void parse_args(void)
 			break;
 		}
 	}
-}
-
-void acl_fiber_server_main(int argc, char *argv[],
-	void (*service)(ACL_VSTREAM*, void*), void *ctx, int name, ...)
-{
-	const char *myname = "server_prepare";
-	const char *service_name = acl_safe_basename(argv[0]);
-	char *root_dir = NULL, *user = NULL, *addrs = NULL;
-	int   c, socket_count = 1, fdtype = ACL_VSTREAM_TYPE_LISTEN;
-	char *generation, conf_file[1024];
-	FIBER_SERVER *servers;
-	va_list ap;
-
-	__argc = argc;
-	__argv = argv;
-
-	/* Set up call-back info. */
-	__service     = service;
-	__service_ctx = ctx;
-	__first_name  = name;
-
-	va_start(ap, name);
-	va_copy(__ap_dest, ap);
-	va_end(ap);
-
-	master_log_open(__argv[0]);
-
-	conf_file[0] = 0;
-
-	opterr = 0;
-	optind = 0;
-	optarg = 0;
-
-	while ((c = getopt(__argc, __argv, "hc:n:s:t:uvf:L:")) > 0) {
-		switch (c) {
-		case 'h':
-			usage(__argc, __argv);
-			exit (0);
-		case 'f':
-			acl_app_conf_load(optarg);
-			ACL_SAFE_STRNCPY(conf_file, optarg, sizeof(conf_file));
-			break;
-		case 'c':
-			root_dir = "setme";
-			break;
-		case 'n':
-			service_name = optarg;
-			break;
-		case 's':
-			socket_count = atoi(optarg);
-			break;
-		case 'u':
-			user = "setme";
-			break;
-		case 't':
-			/* deprecated, just go through */
-			break;
-		case 'v':
-			acl_msg_verbose++;
-			break;
-		case 'L':
-			addrs = optarg;
-			break;
-		default:
-			break;
-		}
-	}
-
-	if (conf_file[0] == 0)
-		acl_msg_info("%s(%d), %s: no configure file",
-			__FILE__, __LINE__, myname);
-	else
-		acl_msg_info("%s(%d), %s: configure file=%s", 
-			__FILE__, __LINE__, myname, conf_file);
-
-	ACL_SAFE_STRNCPY(__service_name, service_name, sizeof(__service_name));
-
-	if (addrs && *addrs)
-		__daemon_mode = 0;
-	else
-		__daemon_mode = 1;
 
 	/*******************************************************************/
-
-	/* Application-specific initialization. */
-
-	/* load configure, set signal */
-
-	server_init(__argv[0]);
-
-	parse_args();
 
 	if (root_dir)
 		root_dir = acl_var_fiber_queue_dir;
@@ -775,28 +696,74 @@ void acl_fiber_server_main(int argc, char *argv[],
 			acl_last_serror());
 	}
 
-	if (__daemon_mode)
-		servers = daemon_open(socket_count, fdtype,
-				acl_var_fiber_threads);
+	/* open all listen streams */
+
+	if (__daemon_mode == 0)
+		__sstreams = server_alone_open(addrs);
+#ifdef ACL_UNIX
+	else if (socket_count <= 0)
+		acl_msg_fatal("%s(%d): invalid socket_count: %d",
+			myname, __LINE__, socket_count);
+	else {
+		fdtype = ACL_VSTREAM_TYPE_LISTEN;
+		__sstreams = server_daemon_open(socket_count, fdtype);
+	}
+#else
 	else
-		servers = alone_open(addrs, fdtype, acl_var_fiber_threads);
+		acl_msg_fatal("%s(%d): addrs NULL", myname, __LINE__);
+#endif
+
+	if (acl_var_fiber_dispatch_addr && *acl_var_fiber_dispatch_addr)
+		acl_fiber_create(fiber_dispatch, NULL, STACK_SIZE);
+
+	if (acl_var_fiber_use_limit > 0)
+		acl_fiber_create(fiber_monitor_used, NULL, STACK_SIZE);
+
+	if (acl_var_fiber_idle_limit > 0)
+		acl_fiber_create(fiber_monitor_idle, NULL, STACK_SIZE);
 
 	if (pre_jail)
 		pre_jail(pre_jail_ctx);
 
+#ifdef ACL_UNIX
 	if (user && *user)
 		acl_chroot_uid(root_dir, user);
+#endif
 
 	/* open the server's log */
 	open_service_log();
 
+#ifdef ACL_UNIX
 	/* if enable dump core when program crashed ? */
 	if (acl_var_fiber_enable_core)
 		acl_set_core_limit(0);
+#endif
 
 	/* Run post-jail initialization. */
 	if (post_init)
 		post_init(post_init_ctx);
 
-	servers_start(servers, acl_var_fiber_threads);
+	acl_msg_info("%s(%d), %s daemon started, log: %s, fdtype: %d",
+		myname, __LINE__, __argv[0], acl_var_fiber_log_file, fdtype);
+}
+
+void acl_fiber_server_main(int argc, char *argv[],
+	void (*service)(ACL_VSTREAM*, void*), void *ctx, int name, ...)
+{
+	va_list ap;
+
+	__argc = argc;
+	__argv = argv;
+
+	/* Set up call-back info. */
+	__service     = service;
+	__service_ctx = ctx;
+
+	__first_name = name;
+	va_start(ap, name);
+	va_copy(__ap_dest, ap);
+	va_end(ap);
+
+	fiber_start();
+	acl_fiber_schedule();
 }

@@ -417,7 +417,7 @@ static void log_event_mode(int event_mode)
 static SERVER *servers_alloc(int event_mode, int nthreads, int sock_count)
 {
 	SERVER *servers = (SERVER *) acl_mycalloc(nthreads, sizeof(SERVER));
-	int i, j;
+	int i;
 
 	for (i = 0; i < nthreads; i++) {
 		servers[i].event = acl_event_new(event_mode, 0,
@@ -426,9 +426,6 @@ static SERVER *servers_alloc(int event_mode, int nthreads, int sock_count)
 		servers[i].socket_count = sock_count;
 		servers[i].streams = (ACL_VSTREAM **)
 			acl_mycalloc(sock_count + 1, sizeof(ACL_VSTREAM *));
-		for (j = 0; j < sock_count; j++) {
-			servers[i].streams[j] = NULL;
-		}
 	}
 
 	return servers;
@@ -495,12 +492,11 @@ static SERVER *servers_binding(const char *service,
 
 static void server_open(SERVER *server, int sock_count)
 {
-	ACL_SOCKET fd;
+	ACL_SOCKET fd = ACL_MASTER_LISTEN_FD;
 	int i = 0;
 
 	/* socket count is as same listen_fd_count in parent process */
 
-	fd = ACL_MASTER_LISTEN_FD;
 	for (i = 0; fd < ACL_MASTER_LISTEN_FD + sock_count; fd++) {
 		char addr[64];
 		ACL_VSTREAM *stream = acl_vstream_fdopen(fd, O_RDWR,
