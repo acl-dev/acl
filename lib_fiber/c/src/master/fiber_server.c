@@ -458,11 +458,8 @@ static void *thread_main(void *ctx)
 	FIBER_SERVER *server =(FIBER_SERVER *) ctx;
 	int i;
 
-	for (i = 0; i < server->socket_count; i++) {
-		if (__server_on_listen)
-			__server_on_listen(server->sstreams[i]);
+	for (i = 0; i < server->socket_count; i++)
 		acl_fiber_create(fiber_accept, server->sstreams[i], STACK_SIZE);
-	}
 
 	acl_fiber_schedule();
 	return NULL;
@@ -507,6 +504,22 @@ static void servers_start(FIBER_SERVER *servers, int nthreads)
 	acl_pthread_attr_t attr;
 	int i;
 
+	if (nthreads <= 0)
+		acl_msg_fatal("%s(%d), %s: invalid nthreads %d",
+			__FILE__, __LINE__, __FUNCTION__, nthreads);
+
+	/* this can only be called in the main thread */
+	if (__server_on_listen) {
+		int j;
+
+		for (i = 0; i < nthreads; i++) {
+			FIBER_SERVER *server = &servers[i];
+
+			for (j = 0; j < server->socket_count; j++)
+				__server_on_listen(server->sstreams[j]);
+		}
+	}
+
 	__clock = acl_atomic_clock_alloc();
 	acl_pthread_attr_init(&attr);
 	acl_pthread_attr_setdetachstate(&attr, ACL_PTHREAD_CREATE_DETACHED);
@@ -527,8 +540,8 @@ static void open_service_log(void)
 	acl_msg_open(acl_var_fiber_log_file, acl_var_fiber_procname);
 
 	if (acl_var_fiber_log_debug && *acl_var_fiber_log_debug
-		&& acl_var_fiber_max_debug >= 100)
-	{
+		&& acl_var_fiber_max_debug >= 100) {
+
 		acl_debug_init2(acl_var_fiber_log_debug,
 			acl_var_fiber_max_debug);
 	}
