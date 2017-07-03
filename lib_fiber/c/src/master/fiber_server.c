@@ -157,6 +157,7 @@ static void fiber_monitor_used(ACL_FIBER *fiber, void *ctx acl_unused)
 	}
 
 	while (!__server_stopping) {
+
 		if (acl_atomic_clock_users(__clock) > 0) {
 			acl_fiber_sleep(1);
 			continue;
@@ -188,9 +189,10 @@ static void fiber_monitor_idle(ACL_FIBER *fiber, void *ctx acl_unused)
 		}
 
 		if (time(NULL) - last >= acl_var_fiber_idle_limit) {
-			acl_msg_info("%s(%d), %s: idle_limit reached %d,"
+			acl_msg_info("%s(%d), %s: idle %ld seconds, limit %d,"
 				"users %lld, used %lld", __FILE__, __LINE__,
-				__FUNCTION__, acl_var_fiber_idle_limit,
+				__FUNCTION__, time(NULL) - last,
+				acl_var_fiber_idle_limit,
 				acl_atomic_clock_users(__clock),
 				acl_atomic_clock_count(__clock));
 			server_stop(fiber);

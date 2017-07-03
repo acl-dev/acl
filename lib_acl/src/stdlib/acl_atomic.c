@@ -146,10 +146,10 @@ long long acl_atomic_int64_fetch_add(ACL_ATOMIC *self, long long n)
 	acl_pthread_mutex_unlock(&self->lock);
 	return v;
 #elif	defined(ACL_WINDOWS)
-	return InterlockedExchangeAdd64((volatile LONGLONG*)&self->value, n);
+	return InterlockedExchangeAdd64((volatile LONGLONG*) self->value, n);
 #elif	defined(ACL_LINUX)
 # if defined(__GNUC__) && (__GNUC__ >= 4)
-	return (long long) __sync_fetch_and_add(&self->value, n);
+	return (long long) __sync_fetch_and_add((long long *) self->value, n);
 # else
 	(void) self;
 	(void) n;
@@ -169,10 +169,10 @@ long long acl_atomic_int64_add_fetch(ACL_ATOMIC *self, long long n)
 	acl_pthread_mutex_unlock(&self->lock);
 	return v;
 #elif	defined(ACL_WINDOWS)
-	return InterlockedExchangeAdd64((volatile LONGLONG*)&self->value, n);
+	return InterlockedExchangeAdd64((volatile LONGLONG*) self->value, n);
 #elif	defined(ACL_LINUX)
 # if defined(__GNUC__) && (__GNUC__ >= 4)
-	return (long long) __sync_add_and_fetch(&self->value, n);
+	return (long long) __sync_add_and_fetch((long long *) self->value, n);
 # else
 	(void) self;
 	(void) n;
@@ -208,6 +208,7 @@ ACL_ATOMIC_CLOCK *acl_atomic_clock_alloc(void)
 	clk->atime_atomic = acl_atomic_new();
 	clk->count_atomic = acl_atomic_new();
 	clk->users_atomic = acl_atomic_new();
+
 	acl_atomic_set(clk->atime_atomic, &clk->atime);
 	acl_atomic_set(clk->count_atomic, &clk->count);
 	acl_atomic_set(clk->users_atomic, &clk->users);
