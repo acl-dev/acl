@@ -32,7 +32,7 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ "fiber_use_limit", 0, &acl_var_fiber_use_limit, 0, 0 },
 	{ "fiber_idle_limit", 0, &acl_var_fiber_idle_limit, 0 , 0 },
 	{ "fiber_wait_limit", 0, &acl_var_fiber_wait_limit, 0, 0 },
-	{ "fiber_threads", 2, &acl_var_fiber_threads, 0, 0 },
+	{ "fiber_threads", 1, &acl_var_fiber_threads, 0, 0 },
 
 	{ 0, 0, 0, 0, 0 },
 };
@@ -74,10 +74,9 @@ static char  *__deny_info = NULL;
 static ACL_MASTER_SERVER_LISTEN_FN __server_on_listen = NULL;
 
 static unsigned      __server_generation;
-
 static int           __server_stopping = 0;
-static int           __nclients = 0;
-static unsigned      __nused = 0;
+
+static ACL_ATOMIC_CLOCK *__clock = NULL;
 
 typedef struct FIBER_SERVER {
 	acl_pthread_t tid;
@@ -119,11 +118,12 @@ static void fiber_monitor_master(ACL_FIBER *fiber, void *ctx)
 
 	stat_stream->rw_timeout = 0;
 	ret = acl_vstream_read(stat_stream, buf, sizeof(buf));
-	acl_msg_info("%s(%d), %s: disconnect(%d) from acl_master, clients %d",
-		__FILE__, __LINE__, __FUNCTION__, ret, __nclients);
+	acl_msg_info("%s(%d), %s: disconnect(%d) from acl_master, clients %lld",
+		__FILE__, __LINE__, __FUNCTION__,
+		ret, acl_atomic_clock_users(__clock));
 
 	while (!acl_var_fiber_quick_abort) {
-		if (__nclients <= 0) {
+		if (acl_atomic_clock_users(__clock) <= 0) {
 			acl_msg_warn("%s(%d), %s: all clients closed!",
 				__FILE__, __LINE__, __FUNCTION__);
 			break;
@@ -131,13 +131,17 @@ static void fiber_monitor_master(ACL_FIBER *fiber, void *ctx)
 
 		acl_fiber_sleep(1);
 		n++;
-		if (acl_var_fiber_wait_limit > 0 && n >= acl_var_fiber_wait_limit) {
-			acl_msg_warn("%s(%d), %s: too long, clients: %d",
-				__FILE__, __LINE__, __FUNCTION__, __nclients);
+		if (acl_var_fiber_wait_limit > 0 &&
+			n >= acl_var_fiber_wait_limit) {
+
+			acl_msg_warn("%s(%d), %s: too long, clients: %lld",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_atomic_clock_users(__clock));
 			break;
 		}
-		acl_msg_info("%s(%d), %s: waiting %d, clients %d",
-			__FILE__, __LINE__, __FUNCTION__, n, __nclients);
+		acl_msg_info("%s(%d), %s: waiting %d, clients %lld",
+			__FILE__, __LINE__, __FUNCTION__,
+			n, acl_atomic_clock_users(__clock));
 	}
 
 	server_exit(fiber, 0);
@@ -153,12 +157,14 @@ static void fiber_monitor_used(ACL_FIBER *fiber, void *ctx acl_unused)
 	}
 
 	while (!__server_stopping) {
-		if (__nclients > 0) {
+		if (acl_atomic_clock_users(__clock) > 0) {
 			acl_fiber_sleep(1);
 			continue;
 		}
 
-		if (__nused >= (unsigned) acl_var_fiber_use_limit) {
+		if (acl_atomic_clock_count(__clock) >=
+			(unsigned) acl_var_fiber_use_limit) {
+
 			acl_msg_info("%s(%d), %s: use_limit reached %d",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_var_fiber_use_limit);
@@ -175,16 +181,18 @@ static void fiber_monitor_idle(ACL_FIBER *fiber, void *ctx acl_unused)
 	time_t last = time(NULL);
 
 	while (!__server_stopping) {
-		if (__nclients > 0) {
+		if (acl_atomic_clock_users(__clock) > 0) {
 			acl_fiber_sleep(1);
 			time(&last);
 			continue;
 		}
 
 		if (time(NULL) - last >= acl_var_fiber_idle_limit) {
-			acl_msg_info("%s(%d), %s: idle_limit reached %d",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_var_fiber_idle_limit);
+			acl_msg_info("%s(%d), %s: idle_limit reached %d,"
+				"users %lld, used %lld", __FILE__, __LINE__,
+				__FUNCTION__, acl_var_fiber_idle_limit,
+				acl_atomic_clock_users(__clock),
+				acl_atomic_clock_count(__clock));
 			server_stop(fiber);
 			break;
 		}
@@ -215,13 +223,9 @@ static void fiber_client(ACL_FIBER *fiber acl_unused, void *ctx)
 		return;
 	}
 
-	__nclients++;
-	__nused++;
-
+	acl_atomic_clock_users_count_inc(__clock);
 	__service(cstream, ctx);
-
-	__nclients--;
-
+	acl_atomic_clock_users_add(__clock, -1);
 	acl_vstream_close(cstream);
 }
 
@@ -258,10 +262,11 @@ static int dispatch_report(ACL_VSTREAM *conn)
 {
 	char buf[256];
 
-	snprintf(buf, sizeof(buf), "count=%d&used=%u&pid=%u&type=%s"
+	snprintf(buf, sizeof(buf), "count=%lld&used=%llu&pid=%u&type=%s"
 		"&max_threads=%d&curr_threads=%d&busy_threads=%d&qlen=0\r\n",
-		__nclients, __nused, (unsigned) getpid(),
-		acl_var_fiber_dispatch_type, 1, 1, 1);
+		acl_atomic_clock_users(__clock),
+		(unsigned long long) acl_atomic_clock_count(__clock),
+		(unsigned) getpid(), acl_var_fiber_dispatch_type, 1, 1, 1);
 
 	if (acl_vstream_writen(conn, buf, strlen(buf)) == ACL_VSTREAM_EOF) {
 		acl_msg_warn("%s(%d), %s: write to master_dispatch(%s) failed",
@@ -466,7 +471,7 @@ static void *thread_main(void *ctx)
 static void fiber_sleep(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
 	while (1)
-		sleep(1);
+		acl_fiber_sleep(1);
 }
 
 static void main_thread_loop(void)
@@ -502,6 +507,7 @@ static void servers_start(FIBER_SERVER *servers, int nthreads)
 	acl_pthread_attr_t attr;
 	int i;
 
+	__clock = acl_atomic_clock_alloc();
 	acl_pthread_attr_init(&attr);
 	acl_pthread_attr_setdetachstate(&attr, ACL_PTHREAD_CREATE_DETACHED);
 

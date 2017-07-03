@@ -53,9 +53,9 @@ service master_fiber {
 #	是否允许产生 core 文件
 #	fiber_enable_core = 1
 #	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出
-	fiber_use_limit = 0
+	fiber_use_limit = 1000
 #	每个进程实例的空闲超时时间，超过此值后进程实例主动退出
-	fiber_idle_limit = 0
+	fiber_idle_limit = 10
 #	进程运行时所在的路径
 	fiber_queue_dir = {install_path}/var
 #	读写超时时间, 单位为秒
@@ -64,6 +64,8 @@ service master_fiber {
 	fiber_buf_size = 8192
 #	进程运行时的用户身份
 	fiber_owner = root
+#	同时启动的线程数
+	fiber_threads = 2
 
 #	当启用 master_dispatch 连接分开服务后，该配置指定 master_dispatch 所监听的
 #	域套接口的全路径，这样本子进程就可以从 master_dispatch 获得客户端连接

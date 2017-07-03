@@ -40,6 +40,7 @@
 #include "stdlib/acl_stringops.h"
 #include "stdlib/acl_myflock.h"
 #include "stdlib/acl_argv.h"
+#include "stdlib/acl_atomic.h"
 #include "net/acl_sane_socket.h"
 #include "net/acl_vstream_net.h"
 #include "net/acl_ifconf.h"
@@ -154,55 +155,7 @@ static char             **__service_argv;
 static void              *__service_ctx;
 static int                __daemon_mode = 1;
 
-typedef struct {
-	long long   last;
-	long long   used;
-	ACL_ATOMIC *time_atomic;
-	ACL_ATOMIC *used_atomic;
-} RUNNING_STATUS;
-
-static RUNNING_STATUS     *__status = NULL;
-
-static void running_status_init(void)
-{
-	acl_assert(__status == NULL);
-	__status = (RUNNING_STATUS *) acl_mymalloc(sizeof(RUNNING_STATUS));
-
-	__status->last        = (long long) time(NULL);
-	__status->used        = 0;
-	__status->time_atomic = acl_atomic_new();
-	__status->used_atomic = acl_atomic_new();
-	acl_atomic_set(__status->time_atomic, &__status->last);
-	acl_atomic_set(__status->used_atomic, &__status->used);
-}
-
-static void running_status_free(void)
-{
-	acl_assert(__status);
-	acl_atomic_free(__status->time_atomic);
-	acl_atomic_free(__status->used_atomic);
-	acl_myfree(__status);
-	__status = NULL;
-}
-
-static long long status_last(void)
-{
-	acl_assert(__status);
-	return __status->last;
-}
-
-static long long status_increase_used(void)
-{
-	long long n;
-
-	acl_assert(__status);
-	n = acl_atomic_int64_add_fetch(__status->used_atomic, 1);
-	if (n < 0)
-		acl_atomic_int64_set(__status->used_atomic, 0);
-
-	acl_atomic_int64_set(__status->time_atomic, (long long) time(NULL));
-	return n;
-}
+static ACL_ATOMIC_CLOCK  *__clock = NULL;
 
 ACL_EVENT *acl_udp_server_event(void)
 {
@@ -283,10 +236,10 @@ static void udp_server_exit(void)
 	if (__main_event)
 		acl_event_free(__main_event);
 
-	running_status_free();
+	acl_atomic_clock_free(__clock);
+	__clock = NULL;
 
 	acl_msg_close();
-
 	exit(0);
 }
 
@@ -323,7 +276,7 @@ static void udp_server_read(int event_type, ACL_EVENT *event acl_unused,
 	/* 清除发生在 UDP 套接字上的临时性错误，以免事件引擎报错 */
 	stream->flag = 0;
 
-	status_increase_used();
+	acl_atomic_clock_count_add(__clock, 1);
 }
 
 static void udp_server_init(const char *procname)
@@ -581,7 +534,7 @@ static void udp_server_timeout(int type acl_unused,
 {
 	const char *myname = "udp_server_timeout";
 	time_t now = time(NULL);
-	long long last = status_last();
+	long long last = acl_atomic_clock_atime(__clock) / 1000000;
 	long long time_left = (long long) ((acl_event_cancel_timer(event,
 		udp_server_timeout, event) + 999999) / 1000000);
 
@@ -631,7 +584,7 @@ static void servers_start(SERVER *servers, int nthreads)
 	acl_pthread_attr_t attr;
 	int i;
 
-	running_status_init();
+	__clock = acl_atomic_clock_alloc();
 	acl_pthread_attr_init(&attr);
 	acl_pthread_attr_setdetachstate(&attr, ACL_PTHREAD_CREATE_DETACHED);
 
