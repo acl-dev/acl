@@ -45,6 +45,8 @@ extern "C" {
 #define	ACL_MASTER_SERVER_EXIT_TIMER		26
 #define	ACL_MASTER_SERVER_ON_LISTEN		27
 
+#define ACL_MASTER_SERVER_SIGHUP		28
+
 #define	ACL_APP_CTL_END			ACL_MASTER_SERVER_END
 #define	ACL_APP_CTL_CFG_INT		ACL_MASTER_SERVER_INT_TABLE
 #define	ACL_APP_CTL_CFG_STR		ACL_MASTER_SERVER_STR_TABLE
@@ -61,24 +63,26 @@ extern "C" {
 #define	ACL_APP_CTL_ON_ACCEPT		ACL_MASTER_SERVER_ON_ACCEPT
 #define	ACL_APP_CTL_ON_CLOSE		ACL_MASTER_SERVER_ON_CLOSE
 #define	ACL_APP_CTL_ON_TIMEOUT		ACL_MASTER_SERVER_ON_TIMEOUT
+#define ACL_APP_CTL_ON_SIGHUP		ACL_MASTER_SERVER_SIGHUP
 
 typedef void (*ACL_MASTER_SERVER_INIT_FN) (void *);
 typedef int  (*ACL_MASTER_SERVER_LOOP_FN) (void *);
 typedef void (*ACL_MASTER_SERVER_EXIT_FN) (void *);
-typedef void (*ACL_MASTER_SERVER_LISTEN_FN) (void *);
-typedef int  (*ACL_MASTER_SERVER_ACCEPT_FN) (ACL_VSTREAM *);
-typedef int  (*ACL_MASTER_SERVER_HANDSHAKE_FN) (ACL_VSTREAM *);
-typedef void (*ACL_MASTER_SERVER_DISCONN_FN) (ACL_VSTREAM *, void *);
-typedef int  (*ACL_MASTER_SERVER_TIMEOUT_FN) (ACL_VSTREAM *, void *);
-typedef int  (*ACL_MASTER_SERVER_EXIT_TIMER_FN)(size_t, size_t);
+typedef void (*ACL_MASTER_SERVER_ON_LISTEN_FN) (void *, ACL_VSTREAM *);
+typedef int  (*ACL_MASTER_SERVER_ON_ACCEPT_FN) (void *, ACL_VSTREAM *);
+typedef int  (*ACL_MASTER_SERVER_HANDSHAKE_FN) (void *, ACL_VSTREAM *);
+typedef void (*ACL_MASTER_SERVER_DISCONN_FN) (void *, ACL_VSTREAM *);
+typedef int  (*ACL_MASTER_SERVER_TIMEOUT_FN) (void *, ACL_VSTREAM *);
+typedef int  (*ACL_MASTER_SERVER_EXIT_TIMER_FN)(void *, size_t, size_t);
 
 typedef int  (*ACL_MASTER_SERVER_THREAD_INIT_FN)(void *);
 typedef void (*ACL_MASTER_SERVER_THREAD_EXIT_FN)(void *);
+typedef void (*ACL_MASTER_SERVER_SIGHUP_FN)(void *);
 
  /*
   * acl_single_server.c
   */
-typedef void (*ACL_SINGLE_SERVER_FN) (ACL_VSTREAM *, char *, char **);
+typedef void (*ACL_SINGLE_SERVER_FN) (void*, ACL_VSTREAM *);
 
 ACL_API void acl_single_server_main(int, char **, ACL_SINGLE_SERVER_FN, ...);
 ACL_API ACL_EVENT *acl_single_server_event(void);
@@ -115,7 +119,7 @@ ACL_DEPRECATED void acl_ioctl_server_enable_read(ACL_IOCTL*, ACL_VSTREAM*,
   * acl_threads_server.c
   */
 
-typedef int (*ACL_THREADS_SERVER_FN) (ACL_VSTREAM*, void*);
+typedef int (*ACL_THREADS_SERVER_FN) (void *, ACL_VSTREAM*);
 
 ACL_API void acl_threads_server_main(int argc, char *argv[],
 	ACL_THREADS_SERVER_FN, void *service_ctx, int name, ...);
@@ -178,7 +182,7 @@ ACL_API void acl_aio_server_on_close(ACL_ASTREAM *stream);
   * acl_udp_server.c
   */
 
-typedef void (*ACL_UDP_SERVER_FN) (ACL_VSTREAM *, char *, char **);
+typedef void (*ACL_UDP_SERVER_FN) (void* ctx, ACL_VSTREAM *);
 
 ACL_API void acl_udp_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg,
 	acl_int64 delay, int keep);
@@ -190,11 +194,17 @@ ACL_API ACL_VSTREAM **acl_udp_server_streams(void);
  /*
   * acl_trigger_server.c
   */
-typedef void (*ACL_TRIGGER_SERVER_FN) (char *, int, char *, char **);
+typedef void (*ACL_TRIGGER_SERVER_FN) (void *);
 ACL_API void acl_trigger_server_main(int, char **, ACL_TRIGGER_SERVER_FN, ...);
 ACL_API ACL_EVENT *acl_trigger_server_event(void);
 
 #define ACL_TRIGGER_BUF_SIZE	1024
+
+ /*
+  * acl_server_sig.c
+  */
+extern ACL_API int acl_var_server_gotsighup;
+ACL_API void acl_server_sighup_setup(void);
 
 #ifdef	__cplusplus
 }

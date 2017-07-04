@@ -9,20 +9,12 @@
 
 namespace acl
 {
-static master_proc* __mp = NULL;
 
-master_proc::master_proc()
-{
-	acl_assert(__mp == NULL);
-	__mp = this;
-}
+master_proc::master_proc() : stop_(false), count_limit_(0), count_(0) {}
 
-master_proc::~master_proc()
-{
+master_proc::~master_proc() {}
 
-}
-
-static bool has_called = false;
+static bool __has_called = false;
 
 void master_proc::run_daemon(int argc, char** argv)
 {
@@ -30,11 +22,12 @@ void master_proc::run_daemon(int argc, char** argv)
 	logger_fatal("not support ACL_WINDOWS!");
 #else
 	// 每个进程只能有一个实例在运行
-	acl_assert(has_called == false);
-	has_called = true;
+	acl_assert(__has_called == false);
+	__has_called = true;
 	daemon_mode_ = true;
 
 	acl_single_server_main(argc, argv, service_main,
+		ACL_MASTER_SERVER_CTX, this,
 		ACL_MASTER_SERVER_ON_LISTEN, service_on_listen,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
@@ -49,10 +42,6 @@ void master_proc::run_daemon(int argc, char** argv)
 
 //////////////////////////////////////////////////////////////////////////
 
-static int  __count_limit = 1;
-static int  __count = 0;
-static bool __stop = false;
-
 static void close_all_listener(std::vector<ACL_VSTREAM*>& sstreams)
 {
 	std::vector<ACL_VSTREAM*>::iterator it = sstreams.begin();
@@ -60,22 +49,26 @@ static void close_all_listener(std::vector<ACL_VSTREAM*>& sstreams)
 		acl_vstream_close(*it);
 }
 
-void master_proc::listen_callback(int, ACL_EVENT*, ACL_VSTREAM *sstream, void*)
+void master_proc::listen_callback(int, ACL_EVENT*, ACL_VSTREAM *sstream,
+	void* ctx)
 {
+	master_proc* mp = (master_proc *) ctx;
+	acl_assert(mp);
+
 	ACL_VSTREAM* client = acl_vstream_accept(sstream, NULL, 0);
 	if (client == NULL)
 	{
 		logger_error("accept error %s", last_serror());
-		__stop = true;
+		mp->stop_ = true;
 	}
 	else
 	{
-		service_main(client, NULL, NULL);
+		service_main(ctx, client);
 		acl_vstream_close(client); // 因为在 service_main 里不会关闭连接
 
-		__count++;
-		if (__count_limit > 0 && __count >= __count_limit)
-			__stop = true;
+		mp->count_++;
+		if (mp->count_limit_ > 0 && mp->count_ >= mp->count_limit_)
+			mp->stop_ = true;
 	}
 }
 
@@ -83,10 +76,10 @@ bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 	int   count /* = 1 */)
 {
 	// 每个进程只能有一个实例在运行
-	acl_assert(has_called == false);
-	has_called = true;
+	acl_assert(__has_called == false);
+	__has_called = true;
 	daemon_mode_ = false;
-	__count_limit = count;
+	count_limit_ = count;
 	acl_assert(addrs && *addrs);
 
 #ifdef ACL_WINDOWS
@@ -105,16 +98,15 @@ bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 		ACL_VSTREAM* sstream = acl_vstream_listen(addr, 128);
 		if (sstream == NULL)
 		{
-			logger_error("listen %s error %s",
-				addr, last_serror());
+			logger_error("listen %s error %s", addr, last_serror());
 			close_all_listener(sstreams);
 			acl_argv_free(tokens);
 			return false;
 		}
 
-		service_on_listen(sstream);
+		service_on_listen(this, sstream);
 		acl_event_enable_listen(eventp, sstream, 0,
-			listen_callback, sstream);
+			listen_callback, this);
 		sstreams.push_back(sstream);
 	}
 	acl_argv_free(tokens);
@@ -122,72 +114,89 @@ bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 	// 初始化配置参数
 	conf_.load(path);
 
-	service_pre_jail(NULL, NULL);
-	service_init(NULL, NULL);
+	service_pre_jail(this);
+	service_init(this);
 
-	while (!__stop)
+	while (!stop_)
 		acl_event_loop(eventp);
 
 	close_all_listener(sstreams);
 	acl_event_free(eventp);
-	service_exit(NULL, NULL);
+	service_exit(this);
+
 	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-void master_proc::service_main(ACL_VSTREAM *stream, char*, char**)
+void master_proc::service_main(void* ctx, ACL_VSTREAM *stream)
 {
+	master_proc* mp = (master_proc *) ctx;
+	acl_assert(mp != NULL);
+
 	socket_stream* client = NEW socket_stream();
 	if (client->open(stream) == false)
 		logger_fatal("open stream error!");
 
-	acl_assert(__mp != NULL);
 #ifndef	ACL_WINDOWS
-	if (__mp->daemon_mode_)
+	if (mp->daemon_mode_)
 		acl_watchdog_pat();  // 必须通知 acl_master 框架一下
 #endif
-	__mp->on_accept(client);
+	mp->on_accept(client);
 	client->unbind();
 	delete client;
 }
 
-void master_proc::service_pre_jail(char*, char**)
+void master_proc::service_pre_jail(void* ctx)
 {
-	acl_assert(__mp != NULL);
+	master_proc* mp = (master_proc *) ctx;
+	acl_assert(mp != NULL);
 
 #ifndef ACL_WINDOWS
-	if (__mp->daemon_mode())
+	if (mp->daemon_mode())
 	{
 		ACL_EVENT* eventp = acl_single_server_event();
-		__mp->set_event(eventp);
+		mp->set_event(eventp);
 	}
 #endif
 
-	__mp->proc_pre_jail();
+	mp->proc_pre_jail();
 }
 
-void master_proc::service_init(char*, char**)
+void master_proc::service_init(void* ctx)
 {
-	acl_assert(__mp != NULL);
+	master_proc* mp = (master_proc *) ctx;
+	acl_assert(mp != NULL);
 
-	__mp->proc_inited_ = true;
-	__mp->proc_on_init();
+	mp->proc_inited_ = true;
+	mp->proc_on_init();
 }
 
-void master_proc::service_exit(char*, char**)
+void master_proc::service_exit(void* ctx)
 {
-	acl_assert(__mp != NULL);
-	__mp->proc_on_exit();
+	master_proc* mp = (master_proc *) ctx;
+	acl_assert(mp != NULL);
+
+	mp->proc_on_exit();
 }
 
-void master_proc::service_on_listen(ACL_VSTREAM* sstream)
+void master_proc::service_on_listen(void* ctx, ACL_VSTREAM* sstream)
 {
-	acl_assert(__mp != NULL);
+	master_proc* mp = (master_proc *) ctx;
+	acl_assert(mp != NULL);
+
 	server_socket* ss = new server_socket(sstream);
-	__mp->servers_.push_back(ss);
+	mp->servers_.push_back(ss);
 	server_socket m(sstream);
-	__mp->proc_on_listen(*ss);
+	mp->proc_on_listen(*ss);
+}
+
+void master_proc::service_on_sighup(void* ctx)
+{
+	master_proc* mp = (master_proc *) ctx;
+	acl_assert(mp != NULL);
+
+	mp->proc_on_sighup();
 }
 
 }  // namespace acl

@@ -9,14 +9,7 @@
 namespace acl
 {
 
-static master_udp* __mu = NULL;
-
-master_udp::master_udp(void)
-{
-	// 全局静态变量
-	acl_assert(__mu == NULL);
-	__mu = this;
-}
+master_udp::master_udp(void) {}
 
 master_udp::~master_udp(void)
 {
@@ -40,7 +33,24 @@ void master_udp::close_sstreams(void)
 	sstreams_.clear();
 }
 
-static bool has_called = false;
+static bool __has_called = false;
+
+void master_udp::run(int argc, char** argv)
+{
+	// 调用 acl 服务器框架中 UDP 服务器模板接口
+	acl_udp_server_main(argc, argv, service_main,
+		ACL_MASTER_SERVER_CTX, this,
+		ACL_APP_CTL_THREAD_INIT_CTX, this,
+		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
+		ACL_MASTER_SERVER_POST_INIT, service_init,
+		ACL_MASTER_SERVER_EXIT, service_exit,
+		ACL_MASTER_SERVER_THREAD_INIT, thread_init,
+		ACL_MASTER_SERVER_INT_TABLE, conf_.get_int_cfg(),
+		ACL_MASTER_SERVER_STR_TABLE, conf_.get_str_cfg(),
+		ACL_MASTER_SERVER_BOOL_TABLE, conf_.get_bool_cfg(),
+		ACL_MASTER_SERVER_INT64_TABLE, conf_.get_int64_cfg(),
+		0);
+}
 
 void master_udp::run_daemon(int argc, char** argv)
 {
@@ -48,22 +58,11 @@ void master_udp::run_daemon(int argc, char** argv)
 	logger_fatal("no support win32 yet!");
 #else
 	// 每个进程只能有一个实例在运行
-	acl_assert(has_called == false);
-	has_called = true;
+	acl_assert(__has_called == false);
+	__has_called = true;
 	daemon_mode_ = true;
 
-	// 调用 acl 服务器框架中 UDP 服务器模板接口
-	acl_udp_server_main(argc, argv, service_main,
-		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
-		ACL_MASTER_SERVER_POST_INIT, service_init,
-		ACL_MASTER_SERVER_EXIT, service_exit,
-		ACL_MASTER_SERVER_THREAD_INIT, thread_init,
-		ACL_MASTER_SERVER_THREAD_EXIT, thread_exit,
-		ACL_MASTER_SERVER_INT_TABLE, conf_.get_int_cfg(),
-		ACL_MASTER_SERVER_STR_TABLE, conf_.get_str_cfg(),
-		ACL_MASTER_SERVER_BOOL_TABLE, conf_.get_bool_cfg(),
-		ACL_MASTER_SERVER_INT64_TABLE, conf_.get_int64_cfg(),
-		0);
+	run(argc, argv);
 #endif
 }
 
@@ -77,8 +76,8 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 #endif
 
 	// 每个进程只能有一个实例在运行
-	acl_assert(has_called == false);
-	has_called = true;
+	acl_assert(__has_called == false);
+	__has_called = true;
 	daemon_mode_ = false;
 	acl_assert(addrs && *addrs);
 
@@ -96,18 +95,7 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 	}
 	argv[argc++] = "-r";
 
-	acl_udp_server_main(argc, (char**) argv, service_main,
-		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
-		ACL_MASTER_SERVER_POST_INIT, service_init,
-		ACL_MASTER_SERVER_EXIT, service_exit,
-		ACL_MASTER_SERVER_THREAD_INIT, thread_init,
-		ACL_MASTER_SERVER_THREAD_EXIT, thread_exit,
-		ACL_MASTER_SERVER_INT_TABLE, conf_.get_int_cfg(),
-		ACL_MASTER_SERVER_STR_TABLE, conf_.get_str_cfg(),
-		ACL_MASTER_SERVER_BOOL_TABLE, conf_.get_bool_cfg(),
-		ACL_MASTER_SERVER_INT64_TABLE, conf_.get_int64_cfg(),
-		0);
-
+	run(argc, (char**) argv);
 	return true;
 }
 
@@ -123,9 +111,10 @@ static void on_close(ACL_VSTREAM* stream, void* ctx)
 	}
 }
 
-void master_udp::service_main(ACL_VSTREAM *stream, char*, char**)
+void master_udp::service_main(void* ctx, ACL_VSTREAM *stream)
 {
-	acl_assert(__mu != NULL);
+	master_udp* mu = (master_udp *) ctx;
+	acl_assert(mu != NULL);
 
 	socket_stream* ss = (socket_stream*) stream->context;
 	if (ss == NULL)
@@ -140,46 +129,51 @@ void master_udp::service_main(ACL_VSTREAM *stream, char*, char**)
 
 /*
 #ifndef	ACL_WINDOWS
-	if (__mu->daemon_mode_)
+	if (mu->daemon_mode_)
 		acl_watchdog_pat();  // 必须通知 acl_master 框架一下
 #endif
 */
-	__mu->on_read(ss);
+	mu->on_read(ss);
 }
 
-void master_udp::service_pre_jail(char*, char**)
+void master_udp::service_pre_jail(void* ctx)
 {
-	acl_assert(__mu != NULL);
+	master_udp* mu = (master_udp *) ctx;
+	acl_assert(mu != NULL);
 
 #ifndef ACL_WINDOWS
 	ACL_EVENT* eventp = acl_udp_server_event();
-	__mu->set_event(eventp);
+	mu->set_event(eventp);
 #endif
 
-	__mu->proc_pre_jail();
+	mu->proc_pre_jail();
 }
 
-void master_udp::service_init(char*, char**)
+void master_udp::service_init(void* ctx)
 {
-	acl_assert(__mu != NULL);
+	master_udp* mu = (master_udp *) ctx;
+	acl_assert(mu != NULL);
 
-	__mu->proc_inited_ = true;
-	__mu->proc_on_init();
+	mu->proc_inited_ = true;
+	mu->proc_on_init();
 }
 
-void master_udp::service_exit(char*, char**)
+void master_udp::service_exit(void* ctx)
 {
-	acl_assert(__mu != NULL);
-	__mu->proc_on_exit();
+	master_udp* mu = (master_udp *) ctx;
+	acl_assert(mu != NULL);
+	mu->proc_on_exit();
 }
 
-void master_udp::thread_init(void *)
+void master_udp::thread_init(void* ctx)
 {
+	master_udp* mu = (master_udp *) ctx;
+	acl_assert(mu != NULL);
 #ifndef	ACL_WINDOWS
-	if (__mu->daemon_mode_)
+	if (mu->daemon_mode_)
 	{
 		ACL_VSTREAM** streams = acl_udp_server_streams();
-		__mu->locker_.lock();
+		mu->locker_.lock();
 		if (streams != NULL)
 		{
 			for (int i = 0; streams[i] != NULL; i++)
@@ -187,18 +181,13 @@ void master_udp::thread_init(void *)
 				socket_stream* ss = NEW socket_stream();
 				if (ss->open(streams[i]) == false)
 					logger_fatal("open stream error!");
-				__mu->sstreams_.push_back(ss);
+				mu->sstreams_.push_back(ss);
 			}
 		}
-		__mu->locker_.unlock();
+		mu->locker_.unlock();
 	}
 #endif
-	__mu->thread_on_init();
-}
-
-void master_udp::thread_exit(void *)
-{
-	__mu->thread_on_exit();
+	mu->thread_on_init();
 }
 
 }  // namespace acl

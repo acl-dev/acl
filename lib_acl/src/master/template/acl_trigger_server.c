@@ -116,8 +116,9 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
  /*
   * Global state.
   */
-static ACL_TRIGGER_SERVER_FN     __service_main;
-static ACL_MASTER_SERVER_EXIT_FN __service_exit;
+static ACL_TRIGGER_SERVER_FN       __service_main;
+static ACL_MASTER_SERVER_EXIT_FN   __service_exit;
+static ACL_MASTER_SERVER_SIGHUP_FN __sighup_handler;
 static void (*__service_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
 
 static int           use_count;
@@ -143,6 +144,7 @@ static void trigger_server_exit(void)
 {
 	if (__service_exit)
 		__service_exit(__service_ctx);
+
 	exit(0);
 }
 
@@ -185,7 +187,7 @@ static void trigger_server_wakeup(ACL_EVENT *event, int fd)
 	if (trigger_server_in_flow_delay && acl_master_flow_get(1) < 0)
 		acl_doze(acl_var_trigger_in_flow_delay * 1000);
 	if ((len = read(fd, buf, sizeof(buf))) >= 0)
-		__service_main(buf, (int) len, __service_ctx, __service_argv);
+		__service_main(__service_ctx);
 
 	if (acl_master_notify(acl_var_trigger_pid, trigger_server_generation,
 		ACL_MASTER_STAT_AVAIL) < 0)
@@ -405,7 +407,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	ACL_MASTER_SERVER_INIT_FN post_init = 0;
 	ACL_MASTER_SERVER_LOOP_FN loop      = 0;
 	char   *service_name = acl_mystrdup(acl_safe_basename(argv[0]));
-	int     delay, c, socket_count = 1, key, fd, fdtype = 0;
+	int     c, socket_count = 1, key, fd, fdtype = 0;
 	char   *lock_path;
 	const char *root_dir = 0, *user_name = 0;
 	const char *transport = 0, *conf_file_ptr = 0;
@@ -511,6 +513,10 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 			break;
 		case ACL_MASTER_SERVER_IN_FLOW_DELAY:
 			trigger_server_in_flow_delay = 1;
+			break;
+		case ACL_MASTER_SERVER_SIGHUP:
+			__sighup_handler =
+				va_arg(ap, ACL_MASTER_SERVER_SIGHUP_FN);
 			break;
 		default:
 			acl_msg_panic("%s: unknown argument: %d", myname, key);
@@ -687,9 +693,20 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 		}
 
 		acl_watchdog_start(watchdog);
-		delay = loop ? loop(__service_ctx) : -1;
-		acl_event_set_delay_sec(__eventp, delay);
+		if (loop) {
+			int delay = loop ? loop(__service_ctx) : -1;
+			if (delay <= 0)
+				delay = 1;
+			acl_event_set_delay_sec(__eventp, delay);
+		}
+
 		acl_event_loop(__eventp);
+
+		if (acl_var_server_gotsighup) {
+			acl_var_server_gotsighup = 0;
+			if (__sighup_handler)
+				__sighup_handler(__service_ctx);
+		}
 	}
 
 	trigger_server_exit();

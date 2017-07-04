@@ -66,12 +66,14 @@ static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
 static int    __argc;
 static char **__argv;
 static int    __daemon_mode = 0;
-static void (*__service)(ACL_VSTREAM*, void*) = NULL;
+static void (*__service)(void*, ACL_VSTREAM*) = NULL;
 static int   *__service_ctx = NULL;
 static char   __service_name[256];
 static void (*__service_onexit)(void*) = NULL;
 static char  *__deny_info = NULL;
-static ACL_MASTER_SERVER_LISTEN_FN __server_on_listen = NULL;
+static ACL_MASTER_SERVER_ON_LISTEN_FN __server_on_listen = NULL;
+static ACL_MASTER_SERVER_THREAD_INIT_FN __thread_init;
+static void  *__thread_init_ctx = NULL;
 
 static unsigned      __server_generation;
 static int           __server_stopping = 0;
@@ -87,6 +89,9 @@ typedef struct FIBER_SERVER {
 
 static void server_exit(ACL_FIBER *fiber, int status)
 {
+	if (__service_onexit)
+		__service_onexit(__service_ctx);
+
 	acl_msg_info("%s(%d), %s: fiber = %u, service exit now!",
 		__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(fiber));
 	exit(status);
@@ -226,7 +231,7 @@ static void fiber_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	}
 
 	acl_atomic_clock_users_count_inc(__clock);
-	__service(cstream, ctx);
+	__service(__service_ctx, cstream);
 	acl_atomic_clock_users_add(__clock, -1);
 	acl_vstream_close(cstream);
 }
@@ -460,6 +465,9 @@ static void *thread_main(void *ctx)
 	FIBER_SERVER *server =(FIBER_SERVER *) ctx;
 	int i;
 
+	if (__thread_init)
+		__thread_init(__thread_init_ctx);
+
 	for (i = 0; i < server->socket_count; i++)
 		acl_fiber_create(fiber_accept, server->sstreams[i], STACK_SIZE);
 
@@ -518,7 +526,8 @@ static void servers_start(FIBER_SERVER *servers, int nthreads)
 			FIBER_SERVER *server = &servers[i];
 
 			for (j = 0; j < server->socket_count; j++)
-				__server_on_listen(server->sstreams[j]);
+				__server_on_listen(__service_ctx,
+					server->sstreams[j]);
 		}
 	}
 
@@ -630,8 +639,6 @@ static int __first_name;
 static va_list __ap_dest;
 static ACL_MASTER_SERVER_INIT_FN pre_jail = NULL;
 static ACL_MASTER_SERVER_INIT_FN post_init = NULL;
-static void *pre_jail_ctx = NULL;
-static void *post_init_ctx = NULL;
 
 static void parse_args(void)
 {
@@ -664,14 +671,22 @@ static void parse_args(void)
 			break;
 		case ACL_MASTER_SERVER_ON_LISTEN:
 			__server_on_listen = va_arg(__ap_dest,
-				ACL_MASTER_SERVER_LISTEN_FN);
+				ACL_MASTER_SERVER_ON_LISTEN_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
 			__service_onexit =
 				va_arg(__ap_dest, ACL_MASTER_SERVER_EXIT_FN);
 			break;
+		case ACL_MASTER_SERVER_THREAD_INIT:
+			__thread_init = va_arg(__ap_dest,
+				ACL_MASTER_SERVER_THREAD_INIT_FN);
+			break;
+		case ACL_MASTER_SERVER_THREAD_INIT_CTX:
+			__thread_init_ctx = va_arg(__ap_dest, void *);
+			break;
 		case ACL_MASTER_SERVER_DENY_INFO:
-			__deny_info = acl_mystrdup(va_arg(__ap_dest, const char*));
+			__deny_info =
+				acl_mystrdup(va_arg(__ap_dest, const char*));
 			break;
 		default:
 			acl_msg_fatal("%s: bad name(%d)", myname, name);
@@ -681,7 +696,7 @@ static void parse_args(void)
 }
 
 void acl_fiber_server_main(int argc, char *argv[],
-	void (*service)(ACL_VSTREAM*, void*), void *ctx, int name, ...)
+	void (*service)(void*, ACL_VSTREAM*), void *ctx, int name, ...)
 {
 	const char *myname = "server_prepare";
 	const char *service_name = acl_safe_basename(argv[0]);
@@ -803,7 +818,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 		servers = alone_open(addrs, fdtype, acl_var_fiber_threads);
 
 	if (pre_jail)
-		pre_jail(pre_jail_ctx);
+		pre_jail(__service_ctx);
 
 	if (user && *user)
 		acl_chroot_uid(root_dir, user);
@@ -817,7 +832,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 
 	/* Run post-jail initialization. */
 	if (post_init)
-		post_init(post_init_ctx);
+		post_init(__service_ctx);
 
 	servers_start(servers, acl_var_fiber_threads);
 }

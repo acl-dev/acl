@@ -1,4 +1,8 @@
 
+53) 2017.7.4
+53.1) feature: fiber_server.c/master_fiber.cpp 支持 SIGHUP 信号回调过程
+53.2) 重构 fiber_server.c/master_fiber.cpp 代码
+
 52) 2017.7.2
 52.1) feature: fiber_server.c 支持多线程运行模式
 

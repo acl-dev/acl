@@ -118,9 +118,10 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
  /*
   * Global state.
   */
-static ACL_MASTER_SERVER_LISTEN_FN __service_listen;
-static ACL_SINGLE_SERVER_FN        __service_main;
-static ACL_MASTER_SERVER_EXIT_FN   __service_exit;
+static ACL_MASTER_SERVER_ON_LISTEN_FN __service_listen;
+static ACL_SINGLE_SERVER_FN           __service_main;
+static ACL_MASTER_SERVER_EXIT_FN      __service_exit;
+static ACL_MASTER_SERVER_SIGHUP_FN    __sighup_handler;
 
 static void (*__service_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
 
@@ -224,14 +225,17 @@ static void single_server_wakeup(ACL_EVENT *event, int fd,
 	if (single_server_in_flow_delay && acl_master_flow_get(1) < 0)
 		acl_doze(acl_var_single_in_flow_delay * 1000);
 
-	__service_main(stream, __service_name, __service_argv);
+	__service_main(__service_ctx, stream);
+
 	(void) acl_vstream_fclose(stream);
+
 	if (acl_master_notify(acl_var_single_pid, single_server_generation,
-		ACL_MASTER_STAT_AVAIL) < 0)
-	{
+		ACL_MASTER_STAT_AVAIL) < 0) {
+
 		single_server_abort(ACL_EVENT_NULL_TYPE, event,
 			stream, ACL_EVENT_NULL_CONTEXT);
 	}
+
 	if (acl_msg_verbose)
 		acl_msg_info("%s(%d), %s: connection closed, fd = %d",
 			__FILE__, __LINE__, myname, fd);
@@ -506,7 +510,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 
 		case ACL_MASTER_SERVER_ON_LISTEN:
 			__service_listen =
-				va_arg(ap, ACL_MASTER_SERVER_LISTEN_FN);
+				va_arg(ap, ACL_MASTER_SERVER_ON_LISTEN_FN);
 			break;
 		case ACL_MASTER_SERVER_CTX:
 			__service_ctx = va_arg(ap, void *);
@@ -523,9 +527,12 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 		case ACL_MASTER_SERVER_EXIT:
 			__service_exit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
 			break;
-
 		case ACL_MASTER_SERVER_IN_FLOW_DELAY:
 			single_server_in_flow_delay = 1;
+			break;
+		case ACL_MASTER_SERVER_SIGHUP:
+			__sighup_handler =
+				va_arg(ap, ACL_MASTER_SERVER_SIGHUP_FN);
 			break;
 		default:
 			acl_msg_panic("%s: unknown argument: %d", myname, key);
@@ -639,7 +646,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 		stream = acl_vstream_fdopen(fd, O_RDWR, acl_var_single_buf_size,
 				acl_var_single_rw_timeout, fdtype);
 		if (__service_listen)
-			__service_listen(stream);
+			__service_listen(__service_ctx, stream);
 		__sstreams[i++] = stream;
 
 		acl_event_enable_listen(__eventp, stream, 0,
@@ -666,8 +673,6 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	while (acl_var_single_use_limit == 0 ||
 		use_count < acl_var_single_use_limit) {
 
-		int  delay_sec;
-
 		if (__service_lock != 0) {
 			acl_watchdog_stop(watchdog);
 			if (acl_myflock(ACL_VSTREAM_FILE(__service_lock),
@@ -680,11 +685,17 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 		acl_watchdog_start(watchdog);
 
 		if (loop != NULL) {
-			delay_sec = loop(__service_ctx);
+			int delay_sec = loop(__service_ctx);
 			acl_event_set_delay_sec(__eventp, delay_sec);
 		}
 
 		acl_event_loop(__eventp);
+
+		if (acl_var_server_gotsighup) {
+			acl_var_server_gotsighup = 0;
+			if (__sighup_handler)
+				__sighup_handler(__service_ctx);
+		}
 	}
 }
 

@@ -25,6 +25,7 @@ public:
 	 * @param interval {int} 触发器时间间隔(秒)
 	 */
 	void run_alone(const char* path = NULL, int count = 1, int interval = 1);
+
 protected:
 	master_trigger();
 	virtual ~master_trigger();
@@ -33,18 +34,19 @@ protected:
 	 * 当触发器时间到时调用此函数
 	 */
 	virtual void on_trigger() = 0;
+
 private:
 	// 当触发器时间到时由 acl_master 框架回调此函数
-	static void service_main(char*, int, char*, char**);
+	static void service_main(void*);
 
 	// 当进程切换用户身份后调用的回调函数
-	static void service_pre_jail(char*, char**);
+	static void service_pre_jail(void*);
 
 	// 当进程切换用户身份后调用的回调函数
-	static void service_init(char*, char**);
+	static void service_init(void*);
 
 	// 当进程退出时调用的回调函数
-	static void service_exit(char*, char**);
+	static void service_exit(void*);
 };
 
 }  // namespace acl

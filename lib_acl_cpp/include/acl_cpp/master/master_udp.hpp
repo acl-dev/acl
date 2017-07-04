@@ -46,35 +46,33 @@ protected:
 		return sstreams_;
 	}
 
+	/**
+	 * 当线程初始化时该虚方法将被调用
+	 */
 	virtual void thread_on_init(void) {}
-	virtual void thread_on_exit(void) {}
 
 private:
 	std::vector<socket_stream*> sstreams_;
 	locker locker_;
 
 	void close_sstreams(void);
+	void run(int argc, char** argv);
 
 private:
 	// 当接收到一个客户端连接时回调此函数
-	static void service_main(ACL_VSTREAM *stream, char *service, char **argv);
+	static void service_main(void*, ACL_VSTREAM*);
 
 	// 当进程切换用户身份后调用的回调函数
-	static void service_pre_jail(char* service, char** argv);
+	static void service_pre_jail(void*);
 
 	// 当进程切换用户身份后调用的回调函数
-	static void service_init(char* service, char** argv);
+	static void service_init(void*);
 
 	// 当进程退出时调用的回调函数
-	static void service_exit(char* service, char** argv);
+	static void service_exit(void*);
 
-	static void thread_init(void *);
-	static void thread_exit(void *);
-
-private:
-	// 在单独运行方式下，该函数当监听套接字有新连接到达时被调用
-	static void read_callback(int event_type, ACL_EVENT*,
-		ACL_VSTREAM*, void* context);
+	// 当线程启动时调用的回调函数
+	static void thread_init(void*);
 };
 
 } // namespace acl

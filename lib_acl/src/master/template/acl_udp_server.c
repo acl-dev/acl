@@ -140,9 +140,9 @@ typedef struct SERVER {
 static ACL_UDP_SERVER_FN                __service_main;
 static ACL_MASTER_SERVER_EXIT_FN        __service_exit;
 static ACL_MASTER_SERVER_THREAD_INIT_FN __thread_init;
-static ACL_MASTER_SERVER_THREAD_EXIT_FN __thread_exit;
+static ACL_MASTER_SERVER_SIGHUP_FN      __sighup_handler;
+
 static void             *__thread_init_ctx = NULL;
-static void             *__thread_exit_ctx = NULL;
 
 static int               __event_mode;
 static int               __socket_count = 1;
@@ -271,7 +271,7 @@ static void udp_server_read(int event_type, ACL_EVENT *event acl_unused,
 			__FILE__, myname, __LINE__, event_type);
 
 	/* 回调用户注册的处理过程 */
-	__service_main(stream, (char *) __service_name, __service_argv);
+	__service_main(__service_ctx, stream);
 
 	/* 清除发生在 UDP 套接字上的临时性错误，以免事件引擎报错 */
 	stream->flag = 0;
@@ -575,8 +575,14 @@ static void main_thread_loop(void)
 			__main_event,
 			(acl_int64) acl_var_udp_idle_limit * 1000000, 0);
 
-	while (1)
+	while (1) {
 		acl_event_loop(__main_event);
+		if (acl_var_server_gotsighup) {
+			acl_var_server_gotsighup = 0;
+			if (__sighup_handler)
+				__sighup_handler(__service_ctx);
+		}
+	}
 }
 
 static void servers_start(SERVER *servers, int nthreads)
@@ -718,12 +724,9 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		case ACL_APP_CTL_THREAD_INIT_CTX:
 			__thread_init_ctx = va_arg(ap, void *);
 			break;
-		case ACL_APP_CTL_THREAD_EXIT:
-			__thread_exit =
-				va_arg(ap, ACL_MASTER_SERVER_THREAD_EXIT_FN);
-			break;
-		case ACL_APP_CTL_THREAD_EXIT_CTX:
-			__thread_exit_ctx = va_arg(ap, void *);
+		case ACL_MASTER_SERVER_SIGHUP:
+			__sighup_handler =
+				va_arg(ap, ACL_MASTER_SERVER_SIGHUP_FN);
 			break;
 		default:
 			acl_msg_panic("%s: unknown type: %d", myname, key);
@@ -778,6 +781,9 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	/* 进程初始化完毕后回调此函数，以使用户可以初始化自己的环境 */
 	if (post_init)
 		post_init(__service_ctx);
+
+	/* 设置 SIGHUP 信号 */
+	acl_server_sighup_setup();
 
 	acl_msg_info("%s -- %s: daemon started", argv[0], myname);
 

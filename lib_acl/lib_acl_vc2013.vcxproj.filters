@@ -761,6 +761,9 @@
     <ClCompile Include=".\src\master\acl_master_proto.c">
       <Filter>Source Files\master</Filter>
     </ClCompile>
+    <ClCompile Include=".\src\master\acl_server_sig.c">
+      <Filter>Source Files\master</Filter>
+    </ClCompile>
     <ClCompile Include=".\src\master\template\acl_aio_server.c">
       <Filter>Source Files\master\template</Filter>
     </ClCompile>
