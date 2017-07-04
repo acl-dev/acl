@@ -17,8 +17,7 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ 0, 0, 0 },
 };
 
-static void __service(ACL_VSTREAM *stream, char *service acl_unused,
-	char **argv acl_unused)
+static void __service(void *ctx acl_unused, ACL_VSTREAM *stream)
 {
 	const char *myname = "__service";
 	char  buf[4096];

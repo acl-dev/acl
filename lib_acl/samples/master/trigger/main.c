@@ -17,21 +17,10 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ 0, 0, 0 },
 };
 
-static void __service(char *buf acl_unused, int len acl_unused,
-			           char *service, char **argv acl_unused)
+static void __service(void *ctx acl_unused)
 {
 	const char *myname = "__service";
 
-	/*
-	 * Sanity check. This service takes no command-line arguments.
-	 */
-	if (argv[0])
-		acl_msg_fatal("%s(%d)->%s: unexpected command-line argument: %s",
-			__FILE__, __LINE__, myname, argv[0]);
-
-	acl_msg_info("%s(%d), %s: service name = %s, sleep %d, info: %s seconds now---",
-		__FILE__, __LINE__, myname, service,
-		var_cfg_sleep_time, var_cfg_dummy);
 	sleep(var_cfg_sleep_time);
 	acl_msg_info("%s: wakeup now", myname);
 	if (var_cfg_create_core)

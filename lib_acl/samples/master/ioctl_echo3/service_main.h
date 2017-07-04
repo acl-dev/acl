@@ -25,14 +25,14 @@ extern void service_exit(void *exit_ctx);
  * @param stream {ACL_VSTREAM*} 客户端数据连接流
  * @return {int} 如果返回值 < 0， 则表示服务器希望关闭该连接
  */
-extern int service_on_accept(ACL_VSTREAM *client);
+extern int service_on_accept(void *ctx, ACL_VSTREAM *client);
 
 /**
  * 协议处理函数入口
  * @param stream {ACL_VSTREAM*} 客户端数据连接流
  * @param run_ctx {void*} 用户自定义类型指针
  */
-extern int service_main(ACL_VSTREAM *stream, void *run_ctx);
+extern int service_main(void *run_ctx, ACL_VSTREAM *stream);
 
 #ifdef	__cplusplus
 }

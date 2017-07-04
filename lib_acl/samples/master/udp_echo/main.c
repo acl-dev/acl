@@ -24,21 +24,20 @@ ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ 0, 0, 0 },
 };
 
-static void __pre_jail_init(char *name acl_unused, char **argv acl_unused)
+static void __pre_jail_init(void *ctx acl_unused)
 {
 }
 
-static void __post_jail_init(char *name acl_unused, char **argv acl_unused)
+static void __post_jail_init(void *ctx acl_unused)
 {
 }
 
-static void service_exit(char *service acl_unused, char **argv acl_unused)
+static void service_exit(void *ctx acl_unused)
 {
 }
 
 /* 协议处理函数入口 */
-static void service_main(ACL_VSTREAM *client, char *service acl_unused,
-	char **argv acl_unused)
+static void service_main(void *ctx acl_unused, ACL_VSTREAM *client)
 {
 	char  buf[256];
 	int   ret;

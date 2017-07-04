@@ -63,7 +63,7 @@ void service_exit(void *arg acl_unused)
 }
 
 /* 协议处理函数入口 */
-int service_main(ACL_VSTREAM *client, void *run_ctx acl_unused)
+int service_main(void *run_ctx acl_unused, ACL_VSTREAM *client)
 {
 	char  buf[256];
 	int   ret;
