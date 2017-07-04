@@ -16,6 +16,10 @@
 
 #endif
 
+#ifdef ACL_WINDOWS
+#include <signal.h>
+#endif
+
 /* Local stuff. */
 
 int   acl_var_server_gotsighup = 0;
@@ -38,7 +42,7 @@ static void server_sighup(int sig)
 void acl_server_sighup_setup(void)
 {
 #ifdef ACL_WINDOWS
-	signal(SIGHUP, server_sighup);
+	signal(1, server_sighup);
 #else
 	const char *myname = "acl_server_sighup_setup";
 	struct sigaction action;
