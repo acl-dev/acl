@@ -34,6 +34,7 @@ void master_threads::run(int argc, char** argv)
 		ACL_MASTER_SERVER_THREAD_EXIT, thread_exit,
 		ACL_MASTER_SERVER_THREAD_INIT_CTX, this,
 		ACL_MASTER_SERVER_THREAD_EXIT_CTX, this,
+		ACL_MASTER_SERVER_SIGHUP, service_on_sighup,
 		ACL_MASTER_SERVER_BOOL_TABLE, conf_.get_bool_cfg(),
 		ACL_MASTER_SERVER_INT64_TABLE, conf_.get_int64_cfg(),
 		ACL_MASTER_SERVER_INT_TABLE, conf_.get_int_cfg(),
@@ -305,6 +306,13 @@ void master_threads::service_on_close(void* ctx, ACL_VSTREAM* client)
 	// ¿ò¼Ü×Ô¶¯¹Ø±Õ
 	(void) stream->unbind();
 	delete stream;
+}
+
+void master_threads::service_on_sighup(void* ctx)
+{
+	master_threads* mt = (master_threads *) ctx;
+	acl_assert(mt);
+	mt->proc_on_sighup();
 }
 
 }  // namespace acl

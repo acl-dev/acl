@@ -1460,6 +1460,8 @@ void acl_threads_server_main(int argc, char * argv[],
 		dispatch_open(__event, __threads);
 #endif
 
+	acl_server_sighup_setup();
+
 	acl_msg_info("%s(%d), %s daemon started, log: %s",
 		myname, __LINE__, argv[0], acl_var_threads_log_file);
 

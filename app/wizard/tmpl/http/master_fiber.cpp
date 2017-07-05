@@ -77,3 +77,8 @@ void master_service::proc_on_exit(void)
 {
 	logger(">>>proc_on_exit<<<");
 }
+
+void master_service::proc_on_sighup(void)
+{
+	logger(">>>proc_on_sighup<<<");
+}

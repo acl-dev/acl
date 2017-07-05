@@ -72,6 +72,12 @@ protected:
 	{
 		acl_msg_info(">>>proc_on_exit<<<");
 	}
+
+	// @override
+	void proc_on_sighup(void)
+	{
+		acl_msg_info(">>>proc_on_sighup<<<");
+	}
 };
 
 int main(int argc, char *argv[])

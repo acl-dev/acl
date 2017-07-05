@@ -190,6 +190,9 @@ private:
 
 	// 当线程退出前调用的回调函数
 	static void thread_exit(void*);
+
+	// 当进程收到 SIGHUP 信号后会回调本函数
+	static void service_on_sighup(void*);
 };
 
 } // namespace acl

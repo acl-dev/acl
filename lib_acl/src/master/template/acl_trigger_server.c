@@ -677,6 +677,8 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	watchdog = acl_watchdog_create(acl_var_trigger_daemon_timeout,
 		(ACL_WATCHDOG_FN) 0, (char *) 0);
 
+	acl_server_sighup_setup();
+
 	/*
 	 * The event loop, at last.
 	 */

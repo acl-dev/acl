@@ -98,6 +98,7 @@ void master_service::proc_on_listen(acl::server_socket& ss)
 
 void master_service::proc_on_init()
 {
+	logger(">>>proc_on_init<<<");
 }
 
 bool master_service::proc_exit_timer(size_t nclients, size_t nthreads)
@@ -114,4 +115,10 @@ bool master_service::proc_exit_timer(size_t nclients, size_t nthreads)
 
 void master_service::proc_on_exit()
 {
+	logger(">>>proc_on_exit<<<");
+}
+
+void master_service::proc_on_sighup()
+{
+	logger(">>>proc_on_sighup<<<");
 }

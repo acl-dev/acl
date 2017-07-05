@@ -73,6 +73,9 @@ private:
 
 	// 当线程启动时调用的回调函数
 	static void thread_init(void*);
+
+	// 当进程收到 SIGHUP 信号后会回调本函数
+	static void service_on_sighup(void*);
 };
 
 } // namespace acl

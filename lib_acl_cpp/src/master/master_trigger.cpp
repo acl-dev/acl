@@ -24,9 +24,11 @@ void master_trigger::run_daemon(int argc, char** argv)
 	daemon_mode_ = true;
 
 	acl_trigger_server_main(argc, argv, service_main,
+		ACL_MASTER_SERVER_CTX, this,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
 		ACL_MASTER_SERVER_EXIT, service_exit,
+		ACL_MASTER_SERVER_SIGHUP, service_on_sighup,
 		ACL_MASTER_SERVER_INT_TABLE, conf_.get_int_cfg(),
 		ACL_MASTER_SERVER_STR_TABLE, conf_.get_str_cfg(),
 		ACL_MASTER_SERVER_BOOL_TABLE, conf_.get_bool_cfg(),
@@ -111,6 +113,13 @@ void master_trigger::service_exit(void* ctx)
 	acl_assert(mt != NULL);
 
 	mt->proc_on_exit();
+}
+
+void master_trigger::service_on_sighup(void* ctx)
+{
+	master_trigger* mt = (master_trigger *) ctx;
+	acl_assert(mt);
+	mt->proc_on_sighup();
 }
 
 }  // namespace acl

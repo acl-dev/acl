@@ -1245,6 +1245,8 @@ static void run_loop(const char *procname)
 	 * collisions with an external lock file.
 	 */
 
+	acl_server_sighup_setup();
+
 	while (1) {
 		if (acl_var_aio_max_threads == 0)  /* single thread mode */
 			acl_aio_loop(__h_aio);

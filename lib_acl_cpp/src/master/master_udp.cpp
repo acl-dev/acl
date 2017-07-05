@@ -45,6 +45,7 @@ void master_udp::run(int argc, char** argv)
 		ACL_MASTER_SERVER_POST_INIT, service_init,
 		ACL_MASTER_SERVER_EXIT, service_exit,
 		ACL_MASTER_SERVER_THREAD_INIT, thread_init,
+		ACL_MASTER_SERVER_SIGHUP, service_on_sighup,
 		ACL_MASTER_SERVER_INT_TABLE, conf_.get_int_cfg(),
 		ACL_MASTER_SERVER_STR_TABLE, conf_.get_str_cfg(),
 		ACL_MASTER_SERVER_BOOL_TABLE, conf_.get_bool_cfg(),
@@ -188,6 +189,13 @@ void master_udp::thread_init(void* ctx)
 	}
 #endif
 	mu->thread_on_init();
+}
+
+void master_udp::service_on_sighup(void* ctx)
+{
+	master_udp* mu = (master_udp *) ctx;
+	acl_assert(mu);
+	mu->proc_on_sighup();
 }
 
 }  // namespace acl

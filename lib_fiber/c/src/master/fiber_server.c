@@ -71,8 +71,9 @@ static int   *__service_ctx = NULL;
 static char   __service_name[256];
 static void (*__service_onexit)(void*) = NULL;
 static char  *__deny_info = NULL;
-static ACL_MASTER_SERVER_ON_LISTEN_FN __server_on_listen = NULL;
+static ACL_MASTER_SERVER_ON_LISTEN_FN   __server_on_listen = NULL;
 static ACL_MASTER_SERVER_THREAD_INIT_FN __thread_init;
+static ACL_MASTER_SERVER_SIGHUP_FN      __sighup_handler = NULL;
 static void  *__thread_init_ctx = NULL;
 
 static unsigned      __server_generation;
@@ -477,8 +478,14 @@ static void *thread_main(void *ctx)
 
 static void fiber_sleep(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
-	while (1)
+	while (1) {
 		acl_fiber_sleep(1);
+		if (acl_var_server_gotsighup) {
+			acl_var_server_gotsighup = 0;
+			if (__sighup_handler)
+				__sighup_handler(__service_ctx);
+		}
+	}
 }
 
 static void main_thread_loop(void)
@@ -495,14 +502,17 @@ static void main_thread_loop(void)
 
 		if (acl_var_fiber_dispatch_addr && *acl_var_fiber_dispatch_addr)
 			acl_fiber_create(fiber_dispatch, NULL, STACK_SIZE);
-	} else
-		acl_fiber_create(fiber_sleep, NULL, STACK_SIZE);
+	}
+
+	acl_fiber_create(fiber_sleep, NULL, STACK_SIZE);
 
 	if (acl_var_fiber_use_limit > 0)
 		acl_fiber_create(fiber_monitor_used, NULL, STACK_SIZE);
 
 	if (acl_var_fiber_idle_limit > 0)
 		acl_fiber_create(fiber_monitor_idle, NULL, STACK_SIZE);
+
+	acl_server_sighup_setup();
 
 	acl_msg_info("daemon started, log=%s", acl_var_fiber_log_file);
 
@@ -687,6 +697,10 @@ static void parse_args(void)
 		case ACL_MASTER_SERVER_DENY_INFO:
 			__deny_info =
 				acl_mystrdup(va_arg(__ap_dest, const char*));
+			break;
+		case ACL_MASTER_SERVER_SIGHUP:
+			__sighup_handler =
+				va_arg(__ap_dest, ACL_MASTER_SERVER_SIGHUP_FN);
 			break;
 		default:
 			acl_msg_fatal("%s: bad name(%d)", myname, name);
