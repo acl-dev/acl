@@ -530,10 +530,9 @@ static void servers_start(FIBER_SERVER *servers, int nthreads)
 
 	/* this can only be called in the main thread */
 	if (__server_on_listen) {
-		int j;
-
 		for (i = 0; i < nthreads; i++) {
 			FIBER_SERVER *server = &servers[i];
+			int j;
 
 			for (j = 0; j < server->socket_count; j++)
 				__server_on_listen(__service_ctx,

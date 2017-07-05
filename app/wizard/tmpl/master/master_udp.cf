@@ -47,6 +47,8 @@ service server {
 #	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
 #			sync_action:E_LOG_SEM, sem_name:/tmp/udp_echo.sem
 
+#	启动时创建的固定线程数
+	udp_threads = 1
 #	是否允许产生 core 文件
 #	udp_enable_core = 1
 #	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出

@@ -13,24 +13,12 @@ master_udp::master_udp(void) {}
 
 master_udp::~master_udp(void)
 {
-	close_sstreams();
-}
-
-void master_udp::close_sstreams(void)
-{
-	std::vector<socket_stream*>::iterator it = sstreams_.begin();
-	for (; it != sstreams_.end(); ++it)
+	for (std::vector<socket_stream*>::iterator it = sstreams_.begin();
+		it != sstreams_.end(); ++it)
 	{
-		// 当在 daemon 运行模式，socket_stream 中的 ACL_VSTREAM
-		// 对象将由 lib_acl 库中的 acl_udp_server 内部关闭，所以
-		// 此处需要将 ACL_VSTREAM 对象与 socket_stream 解耦
-		if (daemon_mode_)
-			(*it)->unbind();
+		(*it)->unbind();
 		delete *it;
 	}
-
-	// 必须清空流集合，因为该函数在析构时还将被调用一次
-	sstreams_.clear();
 }
 
 static bool __has_called = false;
@@ -41,6 +29,7 @@ void master_udp::run(int argc, char** argv)
 	acl_udp_server_main(argc, argv, service_main,
 		ACL_MASTER_SERVER_CTX, this,
 		ACL_APP_CTL_THREAD_INIT_CTX, this,
+		ACL_MASTER_SERVER_ON_BIND, service_on_bind,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
 		ACL_MASTER_SERVER_EXIT, service_exit,
@@ -102,31 +91,13 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 
 //////////////////////////////////////////////////////////////////////////
 
-static void on_close(ACL_VSTREAM* stream, void* ctx)
-{
-	if (ctx && stream->context == ctx)
-	{
-		socket_stream* ss = (socket_stream*) ctx;
-		ss->unbind();
-		delete ss;
-	}
-}
-
 void master_udp::service_main(void* ctx, ACL_VSTREAM *stream)
 {
 	master_udp* mu = (master_udp *) ctx;
 	acl_assert(mu != NULL);
 
 	socket_stream* ss = (socket_stream*) stream->context;
-	if (ss == NULL)
-	{
-		// 当本函数第一次被调用时，需要打开 socket_stream 流
-		ss = NEW socket_stream();
-		if (ss->open(stream) == false)
-			logger_fatal("open stream error!");
-		stream->context = ss;
-		acl_vstream_add_close_handle(stream, on_close, ss);
-	}
+	acl_assert(ss);
 
 /*
 #ifndef	ACL_WINDOWS
@@ -170,25 +141,21 @@ void master_udp::thread_init(void* ctx)
 {
 	master_udp* mu = (master_udp *) ctx;
 	acl_assert(mu != NULL);
-#ifndef	ACL_WINDOWS
-	if (mu->daemon_mode_)
-	{
-		ACL_VSTREAM** streams = acl_udp_server_streams();
-		mu->locker_.lock();
-		if (streams != NULL)
-		{
-			for (int i = 0; streams[i] != NULL; i++)
-			{
-				socket_stream* ss = NEW socket_stream();
-				if (ss->open(streams[i]) == false)
-					logger_fatal("open stream error!");
-				mu->sstreams_.push_back(ss);
-			}
-		}
-		mu->locker_.unlock();
-	}
-#endif
 	mu->thread_on_init();
+}
+
+void master_udp::service_on_bind(void* ctx, ACL_VSTREAM* stream)
+{
+	master_udp* mu = (master_udp *) ctx;
+	acl_assert(mu);
+
+	socket_stream* ss = NEW socket_stream();
+	if (ss->open(stream) == false)
+		logger_fatal("open stream error!");
+	stream->context = ss;
+	mu->sstreams_.push_back(ss);
+
+	mu->proc_on_bind(*ss);
 }
 
 void master_udp::service_on_sighup(void* ctx)

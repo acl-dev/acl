@@ -127,12 +127,12 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
         { 0, 0, 0 },
 };
 
-typedef struct SERVER {
+typedef struct UDP_SERVER {
 	acl_pthread_t tid;
 	ACL_EVENT    *event;
 	ACL_VSTREAM **streams;
 	int           socket_count;
-} SERVER;
+} UDP_SERVER;
 
  /*
   * Global state.
@@ -141,21 +141,22 @@ static ACL_UDP_SERVER_FN                __service_main;
 static ACL_MASTER_SERVER_EXIT_FN        __service_exit;
 static ACL_MASTER_SERVER_THREAD_INIT_FN __thread_init;
 static ACL_MASTER_SERVER_SIGHUP_FN      __sighup_handler;
+static ACL_MASTER_SERVER_ON_BIND_FN	__server_on_bind;
 
-static void             *__thread_init_ctx = NULL;
+static void *__thread_init_ctx = NULL;
 
-static int               __event_mode;
-static int               __socket_count = 1;
-static SERVER           *__servers = NULL;
-static __thread SERVER  *__server = NULL;
-static ACL_EVENT        *__main_event = NULL;
+static __thread UDP_SERVER *__server = NULL;
+static int   __event_mode;
+static int   __socket_count = 1;
+static UDP_SERVER *__servers = NULL;
+static ACL_EVENT  *__main_event = NULL;
 
-static const char        *__service_name;
-static char             **__service_argv;
-static void              *__service_ctx;
-static int                __daemon_mode = 1;
+static const char *__service_name;
+static char      **__service_argv;
+static void       *__service_ctx;
+static int         __daemon_mode = 1;
 
-static ACL_ATOMIC_CLOCK  *__clock = NULL;
+static ACL_ATOMIC_CLOCK *__clock = NULL;
 
 ACL_EVENT *acl_udp_server_event(void)
 {
@@ -185,7 +186,7 @@ void acl_udp_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg)
 	acl_event_cancel_timer(acl_udp_server_event(), timer_fn, arg);
 }
 
-static void server_stop(SERVER *server)
+static void server_stop(UDP_SERVER *server)
 {
 	int i;
 
@@ -367,9 +368,10 @@ static void log_event_mode(int event_mode)
 	}
 }
 
-static SERVER *servers_alloc(int event_mode, int nthreads, int sock_count)
+static UDP_SERVER *servers_alloc(int event_mode, int nthreads, int sock_count)
 {
-	SERVER *servers = (SERVER *) acl_mycalloc(nthreads, sizeof(SERVER));
+	UDP_SERVER *servers = (UDP_SERVER *)
+		acl_mycalloc(nthreads, sizeof(UDP_SERVER));
 	int i;
 
 	for (i = 0; i < nthreads; i++) {
@@ -386,7 +388,7 @@ static SERVER *servers_alloc(int event_mode, int nthreads, int sock_count)
 
 static int __fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 
-static void server_binding(SERVER *server, ACL_ARGV *addrs)
+static void server_binding(UDP_SERVER *server, ACL_ARGV *addrs)
 {
 	ACL_ITER iter;
 	int i = 0;
@@ -420,12 +422,12 @@ static void server_binding(SERVER *server, ACL_ARGV *addrs)
 			__FILE__, __LINE__, __FUNCTION__);
 }
 
-static SERVER *servers_binding(const char *service,
+static UDP_SERVER *servers_binding(const char *service,
 	int event_mode, int nthreads)
 {
 	ACL_ARGV *addrs = acl_ifconf_search(service);
-	SERVER   *servers;
-	int       i = 0;
+	UDP_SERVER *servers;
+	int i = 0;
 
 	if (addrs == NULL)
 		acl_msg_fatal("%s(%d), %s: no addrs available for %s",
@@ -443,7 +445,7 @@ static SERVER *servers_binding(const char *service,
 
 #ifdef ACL_UNIX
 
-static void server_open(SERVER *server, int sock_count)
+static void server_open(UDP_SERVER *server, int sock_count)
 {
 	ACL_SOCKET fd = ACL_MASTER_LISTEN_FD;
 	int i = 0;
@@ -468,9 +470,9 @@ static void server_open(SERVER *server, int sock_count)
 	}
 }
 
-static SERVER *servers_open(int event_mode, int nthreads, int sock_count)
+static UDP_SERVER *servers_open(int event_mode, int nthreads, int sock_count)
 {
-	SERVER *servers;
+	UDP_SERVER *servers;
 	int i;
 
 	servers = servers_alloc(event_mode, nthreads, sock_count);
@@ -483,7 +485,7 @@ static SERVER *servers_open(int event_mode, int nthreads, int sock_count)
 
 #endif /* ACL_UNIX */
 
-static SERVER *servers_create(const char *service, int nthreads)
+static UDP_SERVER *servers_create(const char *service, int nthreads)
 {
 	if (strcasecmp(acl_var_udp_event_mode, "poll") == 0)
 		__event_mode = ACL_EVENT_POLL;
@@ -515,7 +517,7 @@ static SERVER *servers_create(const char *service, int nthreads)
 static void *thread_main(void *ctx)
 {
 	/* set thread local storage */
-	__server = (SERVER *) ctx;
+	__server = (UDP_SERVER *) ctx;
 
 	if (__thread_init)
 		__thread_init(__thread_init_ctx);
@@ -585,10 +587,25 @@ static void main_thread_loop(void)
 	}
 }
 
-static void servers_start(SERVER *servers, int nthreads)
+static void servers_start(UDP_SERVER *servers, int nthreads)
 {
 	acl_pthread_attr_t attr;
 	int i;
+
+	if (nthreads <= 0)
+		acl_msg_fatal("%s(%d), %s: invalid nthreads %d",
+			__FILE__, __LINE__, __FUNCTION__, nthreads);
+
+	if (__server_on_bind) {
+		for (i = 0; i < nthreads; i++) {
+			UDP_SERVER *server = &servers[i];
+			int j;
+
+			for (j = 0; j > server->socket_count; j++)
+				__server_on_bind(__service_ctx,
+					server->streams[j]);
+		}
+	}
 
 	__clock = acl_atomic_clock_alloc();
 	acl_pthread_attr_init(&attr);
@@ -727,6 +744,10 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		case ACL_MASTER_SERVER_SIGHUP:
 			__sighup_handler =
 				va_arg(ap, ACL_MASTER_SERVER_SIGHUP_FN);
+			break;
+		case ACL_MASTER_SERVER_ON_BIND:
+			__server_on_bind =
+				va_arg(ap, ACL_MASTER_SERVER_ON_BIND_FN);
 			break;
 		default:
 			acl_msg_panic("%s: unknown type: %d", myname, key);
