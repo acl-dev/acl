@@ -17,8 +17,12 @@ void   acl_master_service_init(void)
 {
 	const char *myname = "acl_master_service_init";
 
+	/* use poll other than select or epoll, because poll can be not
+	 * limited to 1024 like select, and also can generate no problem
+	 * after fork process that poll has no fd handle, but epoll has.
+	 */
 	if (acl_var_master_global_event == NULL)
-		acl_var_master_global_event = acl_event_new_kernel(
+		acl_var_master_global_event = acl_event_new_poll(
 			acl_var_master_delay_sec, acl_var_master_delay_usec);
 	if (acl_var_master_global_event == NULL)
 		acl_msg_fatal("%s(%d), %s: acl_event_new null, serr=%s",
