@@ -601,7 +601,7 @@ static void servers_start(UDP_SERVER *servers, int nthreads)
 			UDP_SERVER *server = &servers[i];
 			int j;
 
-			for (j = 0; j > server->socket_count; j++)
+			for (j = 0; j < server->socket_count; j++)
 				__server_on_bind(__service_ctx,
 					server->streams[j]);
 		}
