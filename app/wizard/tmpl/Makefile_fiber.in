@@ -1,9 +1,17 @@
 CC      = g++
 
-CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
--Waggregate-return -Wno-long-long \
--Wpointer-arith -Werror -Wshadow -O3 \
--D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO
+CFLAGS = -c -g -W \
+-Wall \
+-Wcast-qual \
+-Wcast-align \
+-Wno-long-long \
+-Wpointer-arith \
+-Werror \
+-Wshadow \
+-O3 \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
+-D_USE_FAST_MACRO
 
 ###########################################################
 #Check system:
@@ -117,6 +125,8 @@ OBJ_PATH = .
 #Project's objs
 SRC = $(wildcard *.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
+
+$(shell mkdir -p ../../../dist/master/libexec/$(RPATH)/)
 
 $(OBJ_PATH)/%.o: %.cpp
 	$(COMPILE) $< -o $@
