@@ -579,10 +579,9 @@ static void main_thread_loop(void)
 
 	while (1) {
 		acl_event_loop(__main_event);
-		if (acl_var_server_gotsighup) {
+		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
-			if (__sighup_handler)
-				__sighup_handler(__service_ctx);
+			__sighup_handler(__service_ctx);
 		}
 	}
 }

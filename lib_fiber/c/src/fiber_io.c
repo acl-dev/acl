@@ -4,7 +4,7 @@
 #include "fiber.h"
 
 typedef struct {
-	EVENT     *event;
+	EVENT      *event;
 	size_t      io_count;
 	ACL_FIBER  *ev_fiber;
 	ACL_RING    ev_timer;

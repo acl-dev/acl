@@ -1253,10 +1253,9 @@ static void run_loop(const char *procname)
 		else  /* multi-threads mode */
 			sleep(1);
 
-		if (acl_var_server_gotsighup) {
+		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
-			if (__sighup_handler)
-				__sighup_handler(__service_ctx);
+			__sighup_handler(__service_ctx);
 		}
 
 		if (__listen_disabled == 1) {

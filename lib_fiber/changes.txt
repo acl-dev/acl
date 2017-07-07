@@ -1,3 +1,7 @@
+54) 2017.7.7
+54.1) feature: master/fiber_server.c 中将 fiber_sleep 协程的栈大小允许受配置项
+控制；同时将内部的 STACK_SIZE 缺省值由 64 K 改为 128 K，该值也是用户级所创建
+协程的栈缺省大小
 
 53) 2017.7.4
 53.1) feature: fiber_server.c/master_fiber.cpp 支持 SIGHUP 信号回调过程

@@ -1468,10 +1468,9 @@ void acl_threads_server_main(int argc, char * argv[],
 	while (1) {
 		acl_event_loop(__event);
 
-		if (acl_var_server_gotsighup) {
+		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
-			if (__sighup_handler)
-				__sighup_handler(__service_ctx);
+			__sighup_handler(__service_ctx);
 		}
 	}
 }

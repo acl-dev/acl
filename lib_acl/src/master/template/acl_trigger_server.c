@@ -704,10 +704,9 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 
 		acl_event_loop(__eventp);
 
-		if (acl_var_server_gotsighup) {
+		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
-			if (__sighup_handler)
-				__sighup_handler(__service_ctx);
+			__sighup_handler(__service_ctx);
 		}
 	}
 

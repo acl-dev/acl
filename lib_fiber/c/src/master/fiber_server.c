@@ -8,7 +8,7 @@
 #include "fiber/lib_fiber.h"
 #include "fiber.h"
 
-#define STACK_SIZE	64000
+#define STACK_SIZE	128000
 
 static int   acl_var_fiber_pid;
 static char *acl_var_fiber_procname = NULL;
@@ -480,10 +480,9 @@ static void fiber_sleep(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
 	while (1) {
 		acl_fiber_sleep(1);
-		if (acl_var_server_gotsighup) {
+		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
-			if (__sighup_handler)
-				__sighup_handler(__service_ctx);
+			__sighup_handler(__service_ctx);
 		}
 	}
 }
@@ -504,7 +503,7 @@ static void main_thread_loop(void)
 			acl_fiber_create(fiber_dispatch, NULL, STACK_SIZE);
 	}
 
-	acl_fiber_create(fiber_sleep, NULL, STACK_SIZE);
+	acl_fiber_create(fiber_sleep, NULL, acl_var_fiber_stack_size);
 
 	if (acl_var_fiber_use_limit > 0)
 		acl_fiber_create(fiber_monitor_used, NULL, STACK_SIZE);
