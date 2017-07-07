@@ -54,6 +54,8 @@ typedef struct ACL_MASTER_SERV {
 	struct ACL_MASTER_SERV *next;	/* linkage of serv */
 } ACL_MASTER_SERV;
 
+#define ACL_MASTER_CHILDREN_SIZE(s)     acl_ring_size(&s->children)
+
  /*
   * Per-service flag bits. We assume trouble when a child process terminates
   * before completing its first request: either the program is defective,
@@ -64,9 +66,11 @@ typedef struct ACL_MASTER_SERV {
 #define ACL_MASTER_FLAG_CONDWAKE	(1<<2)	/* wake up if actually used */
 #define	ACL_MASTER_FLAG_RELOADING	(1<<3)	/* the service is reloading */
 #define ACL_MASTER_FLAG_STOPPING	(1<<4)	/* the service is stopping */
+#define ACL_MASTER_FLAG_KILLED          (1<<5)  /* the service is killed */
 
 #define ACL_MASTER_THROTTLED(f)		((f)->flags & ACL_MASTER_FLAG_THROTTLE)
 #define ACL_MASTER_STOPPING(f)		((f)->flags & ACL_MASTER_FLAG_STOPPING)
+#define ACL_MASTER_KILLED(f)		((f)->flags & ACL_MASTER_FLAG_KILLED)
 
 #define ACL_MASTER_LIMIT_OK(limit, count) ((limit) == 0 || ((count) < (limit)))
 
@@ -132,7 +136,8 @@ extern ACL_MASTER_SERV *acl_var_master_head;
 extern ACL_EVENT *acl_var_master_global_event;
 extern void acl_master_service_init(void);
 extern void acl_master_service_start(ACL_MASTER_SERV *);
-extern void acl_master_service_stop(ACL_MASTER_SERV *);
+extern void acl_master_service_kill(ACL_MASTER_SERV *);
+extern void acl_master_service_stop(ACL_MASTER_SERV *serv);
 extern void acl_master_service_restart(ACL_MASTER_SERV *);
 
  /*
@@ -180,7 +185,7 @@ extern struct ACL_BINHASH *acl_var_master_child_table;
 extern void acl_master_spawn_init(void);
 extern void acl_master_spawn(ACL_MASTER_SERV *);
 extern void acl_master_reap_child(void);
-extern void acl_master_delete_children(ACL_MASTER_SERV *);
+extern void acl_master_kill_children(ACL_MASTER_SERV *);
 extern void acl_master_delete_all_children(void);
 extern void acl_master_signal_children(ACL_MASTER_SERV *serv, int signum,
 		int *nchildren, int *nsignaled);

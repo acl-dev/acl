@@ -113,6 +113,29 @@ struct stop_res_t : res_t
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct kill_req_data_t
+{
+	acl::string path;
+};
+
+struct kill_req_t : req_t
+{
+	std::vector<kill_req_data_t> data;
+};
+
+struct kill_res_data_t
+{
+	int status;
+	acl::string path;
+};
+
+struct kill_res_t : res_t
+{
+	std::vector<kill_res_data_t> data;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
 struct reload_req_data_t
 {
 	acl::string path;

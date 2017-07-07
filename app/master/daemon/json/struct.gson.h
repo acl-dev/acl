@@ -1,5 +1,37 @@
 namespace acl
 {
+    //kill_req_data_t
+    acl::string gson(const kill_req_data_t &$obj);
+    acl::json_node& gson(acl::json &$json, const kill_req_data_t &$obj);
+    acl::json_node& gson(acl::json &$json, const kill_req_data_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, kill_req_data_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, kill_req_data_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, kill_req_data_t &$obj);
+
+    //kill_req_t
+    acl::string gson(const kill_req_t &$obj);
+    acl::json_node& gson(acl::json &$json, const kill_req_t &$obj);
+    acl::json_node& gson(acl::json &$json, const kill_req_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, kill_req_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, kill_req_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, kill_req_t &$obj);
+
+    //kill_res_data_t
+    acl::string gson(const kill_res_data_t &$obj);
+    acl::json_node& gson(acl::json &$json, const kill_res_data_t &$obj);
+    acl::json_node& gson(acl::json &$json, const kill_res_data_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, kill_res_data_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, kill_res_data_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, kill_res_data_t &$obj);
+
+    //kill_res_t
+    acl::string gson(const kill_res_t &$obj);
+    acl::json_node& gson(acl::json &$json, const kill_res_t &$obj);
+    acl::json_node& gson(acl::json &$json, const kill_res_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, kill_res_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, kill_res_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, kill_res_t &$obj);
+
     //list_req_t
     acl::string gson(const list_req_t &$obj);
     acl::json_node& gson(acl::json &$json, const list_req_t &$obj);

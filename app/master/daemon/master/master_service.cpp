@@ -59,8 +59,26 @@ void    acl_master_service_start(ACL_MASTER_SERV *serv)
 	acl_msg_info("%s: service started!", myname);
 }
 
-/* acl_master_service_stop - deactivate service */
+/* acl_master_service_kill - deactivate service */
 
+void    acl_master_service_kill(ACL_MASTER_SERV *serv)
+{
+	/* set killed flag to avoid prefork process */
+	serv->flags |= ACL_MASTER_FLAG_KILLED;
+
+	/*
+	 * Undo the things that master_service_start() did.
+	 */
+	acl_master_wakeup_cleanup(serv);
+	acl_master_status_cleanup(serv);
+
+	acl_master_avail_cleanup(serv);
+
+	acl_master_listen_cleanup(serv);
+	acl_master_kill_children(serv);  /* XXX calls master_avail_listen */
+}
+
+/* acl_master_service_stop - close IPC with children only */
 void    acl_master_service_stop(ACL_MASTER_SERV *serv)
 {
 	/* set STOPPING flag to avoid prefork process */

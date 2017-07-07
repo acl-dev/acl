@@ -66,9 +66,41 @@ ACL_MASTER_SERV *acl_master_start(const char *path)
 
 ACL_MASTER_SERV *acl_master_restart(const char *path)
 {
-	(void) acl_master_stop(path);
+        ACL_MASTER_SERV *serv = acl_master_lookup(path);
 
-	return acl_master_start(path);
+        if (serv == NULL)
+	        return acl_master_start(path);
+
+        acl_master_service_restart(serv);
+        return serv;
+}
+
+/* kill processes of service according the master_service name in configure */
+
+int     acl_master_kill(const char *path)
+{
+	ACL_MASTER_SERV *serv = acl_master_lookup(path);
+	ACL_MASTER_SERV *iter, **servp;
+
+	if (serv == NULL) {
+		acl_msg_error("%s(%d), %s: no service, path %s",
+			__FILE__, __LINE__, __FUNCTION__, path);
+		return -1;
+	}
+
+	for (servp = &acl_var_master_head; (iter = *servp) != 0;) {
+		if (iter->type == serv->type && SAME(iter->name, serv->name)) {
+			*servp = iter->next;
+			acl_master_service_kill(iter);
+			return 0;
+		} else
+			servp = &iter->next;
+	}
+
+	acl_msg_warn("%s(%d), %s: not found service - %s %d, path %s",
+		__FILE__, __LINE__, __FUNCTION__, serv->name, serv->type, path);
+
+	return -1;
 }
 
 /* stop one service according the master_service name in configure */
@@ -87,8 +119,9 @@ int     acl_master_stop(const char *path)
 	for (servp = &acl_var_master_head; (iter = *servp) != 0;) {
 		if (iter->type == serv->type && SAME(iter->name, serv->name)) {
 			*servp = iter->next;
+                        // this service object will be freed after all
+                        // children of which exited.
 			acl_master_service_stop(iter);
-			acl_master_ent_free(iter);
 			return 0;
 		} else
 			servp = &iter->next;

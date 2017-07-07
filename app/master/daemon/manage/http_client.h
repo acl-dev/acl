@@ -36,6 +36,7 @@ private:
 	bool handle(void);
 	bool handle_list(void);
 	bool handle_stat(void);
+	bool handle_kill(void);
 	bool handle_stop(void);
 	bool handle_start(void);
 	bool handle_reload(void);

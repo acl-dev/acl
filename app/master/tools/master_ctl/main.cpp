@@ -178,6 +178,42 @@ static bool do_stop(const char* addr, const char* filepath)
 	return true;
 }
 
+static void print_kill_result(const kill_res_data_t& data)
+{
+	printf("status: %d\r\n", data.status);
+	printf("path: %s\r\n", data.path.c_str());
+}
+
+static void print_kill_results(const std::vector<kill_res_data_t>& data)
+{
+	for (std::vector<kill_res_data_t>::const_iterator cit = data.begin();
+		cit != data.end(); ++cit)
+	{
+		print_kill_result(*cit);
+	}
+}
+
+static bool do_kill(const char* addr, const char* filepath)
+{
+	if (*filepath == 0)
+	{
+		printf("filepath null\r\n");
+		return false;
+	}
+
+	kill_req_t req;
+	kill_req_data_t req_data;
+	req_data.path = filepath;
+	req.data.push_back(req_data);
+
+	kill_res_t res;
+	if (!http_request<kill_req_t, kill_res_t>(addr, "kill", req, res))
+		return false;
+
+	print_kill_results(res.data);
+	return true;
+}
+
 static void print_reload(const reload_res_data_t& data)
 {
 	printf("status: %d\r\n", data.status);
@@ -255,6 +291,8 @@ int main(int argc, char* argv[])
 	action.lower();
 	bool ret;
 
+        acl::log::stdout_open(true);
+
 	if (action == "list")
 		ret = do_list(addr, filepath);
 	else if (action == "stat")
@@ -263,6 +301,8 @@ int main(int argc, char* argv[])
 		ret = do_start(addr, filepath);
 	else if (action == "stop")
 		ret = do_stop(addr, filepath);
+	else if (action == "kill")
+		ret = do_kill(addr, filepath);
 	else if (action == "reload")
 		ret = do_reload(addr, filepath);
 	else

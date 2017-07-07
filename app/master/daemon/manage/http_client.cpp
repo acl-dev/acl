@@ -14,6 +14,7 @@
 #include "action/service_list.h"
 #include "action/service_stat.h"
 #include "action/service_start.h"
+#include "action/service_kill.h"
 #include "action/service_stop.h"
 #include "action/service_reload.h"
 #include "http_client.h"
@@ -173,6 +174,8 @@ bool http_client::handle(void)
 		ret = handle_stat();
 	else if (EQ(cmd, "start"))
 		ret = handle_start();
+	else if (EQ(cmd, "kill"))
+		ret = handle_kill();
 	else if (EQ(cmd, "stop"))
 		ret = handle_stop();
 	else if (EQ(cmd, "reload"))
@@ -245,6 +248,26 @@ bool http_client::handle_stat(void)
 	service_stat service;
 	service.run(req, res);
 	reply<stat_res_t>(res.status, res);
+
+	return true;
+}
+
+bool http_client::handle_kill(void)
+{
+	kill_req_t req;
+	kill_res_t res;
+
+	if (deserialize<kill_req_t>(json_, req) == false)
+	{
+		res.status = 400;
+		res.msg    = "invalid json";
+		reply<kill_res_t>(res.status, res);
+		return false;
+	}
+
+	service_kill service;
+	service.run(req, res);
+	reply<kill_res_t>(res.status, res);
 
 	return true;
 }

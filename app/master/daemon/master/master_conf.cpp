@@ -36,8 +36,8 @@ void    acl_master_refresh(void)
 	for (servp = &acl_var_master_head; (serv = *servp) != 0;) {
 		if ((serv->flags & ACL_MASTER_FLAG_MARK) != 0) {
 			*servp = serv->next;
+                        // serv will be freed after all of it children exited.
 			acl_master_service_stop(serv);
-			acl_master_ent_free(serv);
 		} else
 			servp = &serv->next;
 	}

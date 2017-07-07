@@ -293,6 +293,18 @@ static void master_delete_child(ACL_MASTER_PROC *proc)
 		sizeof(proc->pid), (void (*) (void *)) 0);
 	acl_ring_detach(&proc->me);
 	acl_myfree(proc);
+
+        /* in ACL_MASTER_FLAG_STOPPING status, the serv will be freed after
+         * all children exited
+         */
+        if (ACL_MASTER_CHILDREN_SIZE(serv) > 0)
+                return;
+        
+        if (ACL_MASTER_STOPPING(serv) || ACL_MASTER_KILLED(serv)) {
+                acl_msg_info("free service %s which has been %s", serv->path,
+                        ACL_MASTER_STOPPING(serv) ? "stopped" : "killed");
+                acl_master_ent_free(serv);
+        }
 }
 
 /* acl_master_reap_child - reap dead children */
@@ -316,7 +328,6 @@ void    acl_master_reap_child(void)
 	while ((pid = waitpid((pid_t) - 1, &status, WNOHANG)) > 0) {
 		if (acl_msg_verbose)
 			acl_msg_info("%s: pid %d", myname, pid);
-
 		proc = (ACL_MASTER_PROC *) acl_binhash_find(
 			acl_var_master_child_table, &pid, sizeof(pid));
 		if (proc == NULL) {
@@ -376,9 +387,9 @@ void    acl_master_reap_child(void)
 	}
 }
 
-/* acl_master_delete_children - delete all child processes of service */
+/* acl_master_kill_children - kill and delete all child processes of service */
 
-void    acl_master_delete_children(ACL_MASTER_SERV *serv)
+void    acl_master_kill_children(ACL_MASTER_SERV *serv)
 {
 	ACL_BINHASH_INFO **list;
 	ACL_BINHASH_INFO **info;
@@ -411,8 +422,7 @@ void   acl_master_delete_all_children(void)
 
 	for (servp = &acl_var_master_head; (serv = *servp) != 0;) {
 		*servp = serv->next;
-		acl_master_service_stop(serv);
-		acl_master_ent_free(serv);
+		acl_master_service_kill(serv);
 	}
 }
 
