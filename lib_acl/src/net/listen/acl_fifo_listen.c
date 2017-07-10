@@ -64,14 +64,17 @@ int acl_fifo_listen(const char *path, int permissions, int block_mode)
 		if (acl_readable(fd) == 0) {
 			open_mode = O_RDWR | O_NONBLOCK;
 			break;
-		} else {
-			open_mode = O_RDONLY | O_NONBLOCK;
-			if (acl_msg_verbose)
-				acl_msg_info("open O_RDWR makes fifo readable"
-						" - trying O_RDONLY");
-			(void) close(fd);
-			/* FALLTRHOUGH */
 		}
+
+		open_mode = O_RDONLY | O_NONBLOCK;
+		if (acl_msg_verbose)
+			acl_msg_info("open O_RDWR makes fifo readable"
+			" - trying O_RDONLY");
+		(void) close(fd);
+		if ((fd = open(path, open_mode, 0)) < 0)
+			acl_msg_fatal("%s: open %s: %s", myname, path,
+				acl_last_strerror(tbuf, sizeof(tbuf)));
+		break;
 	default:
 		if ((fd = open(path, open_mode, 0)) < 0)
 			acl_msg_fatal("%s: open %s: %s", myname, path,

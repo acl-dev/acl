@@ -141,7 +141,7 @@ char *acl_strline(char **src)
 {
 	char *start = *src;
 	char *end = *src;
-	int   squash = 0, nr = 0;
+	int   backslash = 0, nr = 0;
 
 	if (start == NULL)
 		return (NULL);
@@ -149,17 +149,20 @@ char *acl_strline(char **src)
 	while (*end) {
 		switch (*end) {
 		case '\\':
-			squash = 1;
+			backslash = 1;
 			break;
 		case '\r':
 			nr++;
 			break;
 		case '\n':
-			if (squash == 0)
-				goto TAG_LOOP_END;
-			memmove(end - (squash + nr), end + 1, strlen(end + 1));
+			if (backslash == 0)
+				goto TAG_END;
+			memmove(end - (backslash + nr), end + 1, strlen(end + 1));
+			backslash = 0;
+			nr = 0;
+			break;
 		default:
-			squash = 0;
+			backslash = 0;
 			nr = 0;
 			break;
 		}
@@ -167,7 +170,7 @@ char *acl_strline(char **src)
 		end++;
 	}
 
-TAG_LOOP_END:
+TAG_END:
 
 	if (*end == '\n') {
 		*(end - nr) = 0;

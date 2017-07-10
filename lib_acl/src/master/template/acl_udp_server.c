@@ -686,6 +686,8 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 			if ((__socket_count = atoi(optarg)) > 0)
 				break;
 			acl_msg_fatal("invalid socket_count: %s", optarg);
+			/* NOT REACHED */
+			break;
 		case 'u':
 			user_name = "setme";
 			break;

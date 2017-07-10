@@ -155,9 +155,11 @@ time_t rfc822::parse_date(const char *rfcdt)
 			if (mon)
 				return (0);
 			mon = parsekey(&rfcdt, months);
-			if (!mon)
-				while (*rfcdt && isalpha((int)(unsigned char)*rfcdt))
-					++rfcdt;
+			if (mon)
+				continue;
+
+			while (*rfcdt && isalpha((int)(unsigned char)*rfcdt))
+				++rfcdt;
 			continue;
 		}
 
@@ -219,8 +221,12 @@ time_t rfc822::parse_date(const char *rfcdt)
 		{
 		case '-':
 			sign = -1;
-		case '+':
 			++rfcdt;
+			break;
+		case '+':
+		default:
+			++rfcdt;
+			break;
 		}
 
 		if (isdigit((int)(unsigned char)*rfcdt))
@@ -234,7 +240,7 @@ time_t rfc822::parse_date(const char *rfcdt)
 
 	if (year < 1970)
 	{
-			printf("%s(%d)\n", __FUNCTION__, __LINE__);
+		printf("%s(%d)\n", __FUNCTION__, __LINE__);
 		return (0);
 	}
 

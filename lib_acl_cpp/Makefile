@@ -22,7 +22,8 @@ CFLAGS = -c -g -W \
 -DHAS_PGSQL_DLL \
 -DHAS_SQLITE_DLL \
 -Winvalid-pch \
--DACL_PREPARE_COMPILE
+-DACL_PREPARE_COMPILE \
+-Wno-implicit-fallthrough
 #-DHAS_POLARSSL
 #-DUSE_DYNAMIC
 # -Wcast-align
