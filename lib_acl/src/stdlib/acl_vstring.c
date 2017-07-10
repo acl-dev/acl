@@ -366,6 +366,7 @@ void  acl_vstring_ctl(ACL_VSTRING *vp,...)
 		switch (code) {
 		default:
 			acl_msg_panic("%s: unknown code: %d", myname, code);
+			break;
 		case ACL_VSTRING_CTL_MAXLEN:
 			vp->maxlen = va_arg(ap, int);
 			if (vp->maxlen < 0)
