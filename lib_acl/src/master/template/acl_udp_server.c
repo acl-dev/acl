@@ -106,6 +106,15 @@ static ACL_CONFIG_INT64_TABLE __conf_int64_tab[] = {
         { 0, 0, 0, 0, 0 },
 };
 
+int   acl_var_udp_threads_detached;
+
+static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
+	{ ACL_VAR_UDP_THREADS_DETACHED, ACL_DEF_UDP_THREADS_DETACHED,
+		&acl_var_udp_threads_detached },
+
+	{ 0, 0, 0 },
+};
+
 char *acl_var_udp_queue_dir;
 char *acl_var_udp_owner;
 char *acl_var_udp_pid_dir;
@@ -331,6 +340,7 @@ static void udp_server_init(const char *procname)
 	acl_get_app_conf_int_table(__conf_int_tab);
 	acl_get_app_conf_int64_table(__conf_int64_tab);
 	acl_get_app_conf_str_table(__conf_str_tab);
+	acl_get_app_conf_bool_table(__conf_bool_tab);
 }
 
 static void udp_server_open_log(void)
@@ -607,8 +617,11 @@ static void servers_start(UDP_SERVER *servers, int nthreads)
 	}
 
 	__clock = acl_atomic_clock_alloc();
+
 	acl_pthread_attr_init(&attr);
-	acl_pthread_attr_setdetachstate(&attr, ACL_PTHREAD_CREATE_DETACHED);
+	if (acl_var_udp_threads_detached)
+		acl_pthread_attr_setdetachstate(&attr,
+			ACL_PTHREAD_CREATE_DETACHED);
 
 	for (i = 0; i < nthreads; i++)
 		acl_pthread_create(&servers[i].tid, &attr,

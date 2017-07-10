@@ -80,6 +80,10 @@ extern int   acl_var_udp_max_debug;
 #define ACL_DEF_UDP_THREADS		1
 extern int   acl_var_udp_threads;
 
+#define ACL_VAR_UDP_THREADS_DETACHED	"udp_threads_detached"
+#define ACL_DEF_UDP_THREADS_DETACHED	1
+extern int   acl_var_udp_threads_detached;
+
 #ifdef	__cplusplus
 }
 #endif

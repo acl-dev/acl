@@ -49,6 +49,8 @@ service server {
 
 #	启动时创建的固定线程数
 	udp_threads = 1
+#	创建的线程是否为分离模式
+#	udp_threads_detached = 1
 #	是否允许产生 core 文件
 #	udp_enable_core = 1
 #	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出
