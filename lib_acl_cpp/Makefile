@@ -23,7 +23,6 @@ CFLAGS = -c -g -W \
 -DHAS_SQLITE_DLL \
 -Winvalid-pch \
 -DACL_PREPARE_COMPILE \
--Wno-implicit-fallthrough
 #-DHAS_POLARSSL
 #-DUSE_DYNAMIC
 # -Wcast-align
@@ -44,6 +43,21 @@ polarssl =
 
 ifeq ($(CC),)
         CC = g++
+endif
+
+ifeq ($(findstring g++, $(CC)), g++)
+	GCC_VERSION=$(shell gcc --version | grep ^gcc | sed 's/^.* //g')
+	GCC_MAJOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f1)
+	GCC_MINOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f2)
+	GCC_SUB:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f3)
+	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -gt 4 \) ] && echo true)
+	ifeq ($(GCC_VER), true)
+		CFLAGS += -Wno-implicit-fallthrough
+	endif
+	GCC_VER:=$(shell [ $(GCC_MAJOR) -lt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -ge 1 \) ] && echo true)
+	ifeq ($(GCC_VER), true)
+		CFLAGS += -DGCC_LOW
+	endif
 endif
 
 ifeq ($(AR),)

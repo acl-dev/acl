@@ -70,7 +70,11 @@ int safe_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 
 #else
 
+#ifdef GCC_LOW
+int safe_snprintf(char *buf, size_t size, const char *fmt, ...) throw()
+#else
 int safe_snprintf(char *buf, size_t size, const char *fmt, ...)
+#endif
 {
 	va_list ap;
 
