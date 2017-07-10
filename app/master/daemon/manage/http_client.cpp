@@ -14,7 +14,9 @@
 #include "action/service_list.h"
 #include "action/service_stat.h"
 #include "action/service_start.h"
+#include "action/service_kill.h"
 #include "action/service_stop.h"
+#include "action/service_reload.h"
 #include "http_client.h"
 
 http_client::http_client(acl::aio_socket_stream *client, int rw_timeout)
@@ -26,6 +28,7 @@ http_client::http_client(acl::aio_socket_stream *client, int rw_timeout)
 	hdr_req_ = NULL;
 	req_     = NULL;
 	acl_aio_add_close_hook(conn_, on_close, this);
+	acl_aio_add_timeo_hook(conn_, on_timeo, this);
 }
 
 http_client::~http_client(void)
@@ -64,9 +67,17 @@ int http_client::on_close(ACL_ASTREAM*, void* ctx)
 	return 0;
 }
 
+int http_client::on_timeo(ACL_ASTREAM*, void*)
+{
+	// return -1 so the connection can be closed
+	return -1;
+}
+
 int http_client::on_head(int status, void* ctx)
 {
 	http_client* hc = (http_client*) ctx;
+
+	acl_aio_disable_readwrite(hc->conn_);
 
 	if (status != HTTP_CHAT_OK)
 	{
@@ -114,7 +125,10 @@ int http_client::on_body(int status, char *data, int dlen, void *ctx)
 	hc->json_.update(data);
 
 	if (status == HTTP_CHAT_OK)
+	{
+		acl_aio_disable_readwrite(hc->conn_);
 		return hc->handle() ? 0 : -1;
+	}
 
 	return 0;
 }
@@ -160,8 +174,12 @@ bool http_client::handle(void)
 		ret = handle_stat();
 	else if (EQ(cmd, "start"))
 		ret = handle_start();
+	else if (EQ(cmd, "kill"))
+		ret = handle_kill();
 	else if (EQ(cmd, "stop"))
 		ret = handle_stop();
+	else if (EQ(cmd, "reload"))
+		ret = handle_reload();
 	else {
 		logger_warn("invalid cmd=%s", cmd);
 		acl::string dummy;
@@ -234,6 +252,26 @@ bool http_client::handle_stat(void)
 	return true;
 }
 
+bool http_client::handle_kill(void)
+{
+	kill_req_t req;
+	kill_res_t res;
+
+	if (deserialize<kill_req_t>(json_, req) == false)
+	{
+		res.status = 400;
+		res.msg    = "invalid json";
+		reply<kill_res_t>(res.status, res);
+		return false;
+	}
+
+	service_kill service;
+	service.run(req, res);
+	reply<kill_res_t>(res.status, res);
+
+	return true;
+}
+
 bool http_client::handle_stop(void)
 {
 	stop_req_t req;
@@ -270,6 +308,26 @@ bool http_client::handle_start(void)
 	service_start service;
 	service.run(req, res);
 	reply<start_res_t>(res.status, res);
+
+	return true;
+}
+
+bool http_client::handle_reload(void)
+{
+	reload_req_t req;
+	reload_res_t res;
+
+	if (deserialize<reload_req_t>(json_, req) == false)
+	{
+		res.status = 400;
+		res.msg    = "invalid json";
+		reply<reload_res_t>(res.status, res);
+		return false;
+	}
+
+	service_reload service;
+	service.run(req, res);
+	reply<reload_res_t>(res.status, res);
 
 	return true;
 }

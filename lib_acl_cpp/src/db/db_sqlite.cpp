@@ -29,6 +29,7 @@
  typedef int   (STDCALL *sqlite3_errcode_fn)(sqlite3*);
  typedef int   (STDCALL *sqlite3_changes_fn)(sqlite3*);
  typedef int   (STDCALL *sqlite3_total_changes_fn)(sqlite3*);
+ typedef int   (STDCALL *sqlite3_busy_timeout_fn)(sqlite3*,int);
 
  static sqlite3_libversion_fn __sqlite3_libversion = NULL;
  static sqlite3_open_fn __sqlite3_open = NULL;
@@ -40,6 +41,7 @@
  static sqlite3_errcode_fn __sqlite3_errcode = NULL;
  static sqlite3_changes_fn __sqlite3_changes = NULL;
  static sqlite3_total_changes_fn __sqlite3_total_changes = NULL;
+ static sqlite3_busy_timeout_fn __sqlite3_busy_timeout = NULL;
 
  static acl_pthread_once_t __sqlite_once = ACL_PTHREAD_ONCE_INIT;
  static ACL_DLL_HANDLE __sqlite_dll = NULL;
@@ -143,6 +145,12 @@
 		logger_fatal("load sqlite3_total_changes from %s error: %s",
 			path, acl_last_serror());
 
+	__sqlite3_busy_timeout = (sqlite3_busy_timeout_fn)
+		acl_dlsym(__sqlite_dll, "sqlite3_busy_timeout");
+	if (__sqlite3_busy_timeout == NULL)
+		logger_fatal("load sqlite3_busy_timeout from %s error: %s",
+			path, acl_last_serror());
+
 	logger("%s loaded", path);
 	atexit(__sqlite_dll_unload);
  }
@@ -157,6 +165,7 @@
 #  define __sqlite3_errcode sqlite3_errcode
 #  define __sqlite3_changes sqlite3_changes
 #  define __sqlite3_total_changes sqlite3_total_changes
+#  define __sqlite3_busy_timeout sqlite3_busy_timeout
 # endif // HAS_SQLITE && !HAS_SQLITE_DLL
 
 namespace acl
@@ -231,7 +240,7 @@ db_sqlite::~db_sqlite(void)
 	free_result();
 }
 
-const char* db_sqlite::version() const
+const char* db_sqlite::version(void) const
 {
 	return (__sqlite3_libversion());
 }
@@ -242,13 +251,13 @@ static int sqlite_busy_callback(void *ctx acl_unused, int nretry acl_unused)
 	return (1);
 }
 
-const char* db_sqlite::dbtype() const
+const char* db_sqlite::dbtype(void) const
 {
 	static const char* type = "sqlite";
 	return type;
 }
 
-int db_sqlite::get_errno() const
+int db_sqlite::get_errno(void) const
 {
 	if (db_)
 		return __sqlite3_errcode(db_);
@@ -256,7 +265,7 @@ int db_sqlite::get_errno() const
 		return -1;
 }
 
-const char* db_sqlite::get_error() const
+const char* db_sqlite::get_error(void) const
 {
 	if (db_)
 		return __sqlite3_errmsg(db_);
@@ -327,12 +336,12 @@ bool db_sqlite::dbopen(const char* charset /* = NULL */)
 	return true;
 }
 
-bool db_sqlite::is_opened() const
+bool db_sqlite::is_opened(void) const
 {
 	return db_ != NULL ? true : false;
 }
 
-bool db_sqlite::close()
+bool db_sqlite::close(void)
 {
 	if (db_ == NULL)
 		return false;
@@ -533,7 +542,7 @@ bool db_sqlite::exec_sql(const char* sql, db_rows* result /* = NULL */)
 	return true;
 }
 
-int db_sqlite::affect_count() const
+int db_sqlite::affect_count(void) const
 {
 	if (db_ == NULL)
 	{
@@ -544,9 +553,37 @@ int db_sqlite::affect_count() const
 	return __sqlite3_changes(db_);
 }
 
-int db_sqlite::affect_total_count() const
+int db_sqlite::affect_total_count(void) const
 {
 	return __sqlite3_total_changes(db_);
+}
+
+bool db_sqlite::begin_transaction(void)
+{
+	const char* sql = "begin transaction;";
+	if (sql_update(sql) == false)
+	{
+		logger_error("%s error: %s", sql, get_error());
+		return false;
+	}
+	return true;
+}
+
+bool db_sqlite::commit(void)
+{
+	const char* sql = "commit transaction;";
+	if (sql_update(sql) == false)
+	{
+		logger_error("%s error: %s", sql, get_error());
+		return false;
+	}
+	return true;
+}
+
+bool db_sqlite::set_busy_timeout(int nMillisecs)
+{
+	int   ret = __sqlite3_busy_timeout(db_,nMillisecs);
+	return ret == SQLITE_OK;
 }
 
 } // namespace acl

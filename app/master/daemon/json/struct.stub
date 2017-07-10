@@ -17,6 +17,7 @@ struct serv_info_t
 {
 	int status;
 	acl::string name;
+	int type;
 	// Gson@optional
 	acl::string owner;
 	acl::string path;
@@ -46,9 +47,14 @@ struct list_res_t : res_t
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct stat_req_data_t
+{
+	acl::string path;
+};
+
 struct stat_req_t : req_t
 {
-	std::vector<acl::string> data;
+	std::vector<stat_req_data_t> data;
 };
 
 struct stat_res_t : res_t
@@ -58,9 +64,15 @@ struct stat_res_t : res_t
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct start_req_data_t
+{
+	acl::string path;
+};
+
 struct start_req_t : req_t
 {
-	std::vector<acl::string> data;
+	std::vector<start_req_data_t> data;
+
 };
 
 struct start_res_data_t
@@ -78,18 +90,71 @@ struct start_res_t : res_t
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct stop_req_data_t
+{
+	acl::string path;
+};
+
 struct stop_req_t : req_t
 {
-	std::vector<acl::string> data;
+	std::vector<stop_req_data_t> data;
 };
 
 struct stop_res_data_t
 {
 	int status;
-	acl::string name;
+	acl::string path;
 };
 
 struct stop_res_t : res_t
 {
 	std::vector<stop_res_data_t> data;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
+struct kill_req_data_t
+{
+	acl::string path;
+};
+
+struct kill_req_t : req_t
+{
+	std::vector<kill_req_data_t> data;
+};
+
+struct kill_res_data_t
+{
+	int status;
+	acl::string path;
+};
+
+struct kill_res_t : res_t
+{
+	std::vector<kill_res_data_t> data;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
+struct reload_req_data_t
+{
+	acl::string path;
+};
+
+struct reload_req_t : req_t
+{
+	std::vector<reload_req_data_t> data;
+};
+
+struct reload_res_data_t
+{
+	int status;
+	int proc_count;
+	int proc_signaled;
+	acl::string path;
+};
+
+struct reload_res_t : res_t
+{
+	std::vector<reload_res_data_t> data;
 };

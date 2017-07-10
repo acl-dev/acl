@@ -36,8 +36,10 @@ private:
 	bool handle(void);
 	bool handle_list(void);
 	bool handle_stat(void);
+	bool handle_kill(void);
 	bool handle_stop(void);
 	bool handle_start(void);
+	bool handle_reload(void);
 
 	void do_reply(int status, const acl::string& buf);
 
@@ -52,4 +54,5 @@ private:
 	static int on_head(int status, void* ctx);
 	static int on_body(int status, char* data, int dlen, void* ctx);
 	static int on_close(ACL_ASTREAM* conn, void* ctx);
+	static int on_timeo(ACL_ASTREAM* conn, void* ctx);
 };

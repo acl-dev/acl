@@ -36,8 +36,8 @@ void    acl_master_refresh(void)
 	for (servp = &acl_var_master_head; (serv = *servp) != 0;) {
 		if ((serv->flags & ACL_MASTER_FLAG_MARK) != 0) {
 			*servp = serv->next;
+                        // serv will be freed after all of it children exited.
 			acl_master_service_stop(serv);
-			acl_master_ent_free(serv);
 		} else
 			servp = &serv->next;
 	}
@@ -53,8 +53,6 @@ void    acl_master_config(void)
 	char *pathname;
 	int   service_null = 1;
 
-#define STR_DIFF	strcmp
-#define STR_SAME	!strcmp
 #define SWAP(type,a,b)	{ type temp = a; a = b; b = temp; }
 
 	/* load main.cf configuration of master routine */
@@ -82,17 +80,11 @@ void    acl_master_config(void)
 	acl_master_ent_begin();
 
 	while ((entry = acl_master_ent_get()) != 0) {
+		service_null = 0;
 		if (acl_msg_verbose)
 			acl_master_ent_print(entry);
 
-		for (serv = acl_var_master_head; serv; serv = serv->next) {
-			if (STR_SAME(serv->name, entry->name)
-				&& serv->type == entry->type) {
-				break;
-			}
-		}
-
-		service_null = 0;
+		serv = acl_master_ent_find(entry->name, entry->type);
 
 		/*
 		 * Add a new service entry. We do not really care in what
@@ -131,7 +123,7 @@ void    acl_master_config(void)
 	acl_master_ent_end();
 
 	if (service_null)
-		acl_msg_warn("%s(%d), %s: no service in dir %s%s",
-			__FILE__, __LINE__, myname, acl_var_master_service_dir,
+		acl_msg_warn("%s(%d), %s: no service in dir %s%s", __FILE__,
+			__LINE__, myname, acl_var_master_service_dir,
 			acl_var_master_scan_subdir ? " and its subdir" : "");
 }

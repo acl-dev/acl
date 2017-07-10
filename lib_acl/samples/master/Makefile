@@ -98,14 +98,11 @@ all: $(PROG_NAME)
 all: build
 build:
 	@(cd single_echo; make)
-	@(cd multi_echo; make)
-#	@(cd ioctl_echo; make)
 	@(cd ioctl_echo2; make)
 	@(cd ioctl_echo3; make)
 	@(cd master_threads; make)
 	@(cd trigger; make)
 	@(cd single_proxy; make)
-	@(cd multi_proxy; make)
 	@(cd aio_echo; make)
 	@(cd aio_proxy; make)
 	@(cd udp_echo; make)
@@ -116,14 +113,11 @@ $(OBJ_OUTPATH)%.o: %.c *.h
 
 clean:
 	@(cd single_echo; make clean)
-	@(cd multi_echo; make clean)
-#	@(cd ioctl_echo; make clean)
 	@(cd ioctl_echo2; make clean)
 	@(cd ioctl_echo3; make clean)
 	@(cd master_threads; make clean)
 	@(cd trigger; make clean)
 	@(cd single_proxy; make clean)
-	@(cd multi_proxy; make clean)
 	@(cd aio_proxy; make clean)
 	@(cd aio_echo; make clean)
 	@(cd master_notify; make clean)
@@ -131,11 +125,9 @@ clean:
 
 install:
 	cp single_echo/single_echo ${DIST_PATH}/
-	cp multi_echo/multi_echo ${DIST_PATH}/
 	cp ioctl_echo/ioctl_echo ${DIST_PATH}/
 	cp trigger/trigger ${DIST_PATH}/
 	cp single_proxy/single_proxy ${DIST_PATH}/
-	cp multi_proxy/multi_proxy ${DIST_PATH}/
 	cp aio_proxy/aio_proxy ${DIST_PATH}/
 	cp udp_echo/udp_echo ${DIST_PATH}/
 #	cp master_notify/acl_notify ${DIST_PATH}/
@@ -143,11 +135,9 @@ install:
 
 uninstall:
 	rm -f ${DIST_PATH}/single_echo
-	rm -f ${DIST_PATH}/multi_echo
 	rm -f ${DIST_PATH}/ioctl_echo
 	rm -f ${DIST_PATH}/trigger
 	rm -f ${DIST_PATH}/single_proxy
-	rm -f ${DIST_PATH}/multi_proxy
 #	rm -f ${DIST_PATH}/acl_notify
 #	rm -f ${DIST_PATH}/aio_echo
 

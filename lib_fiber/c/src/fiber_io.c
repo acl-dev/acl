@@ -4,7 +4,7 @@
 #include "fiber.h"
 
 typedef struct {
-	EVENT     *event;
+	EVENT      *event;
 	size_t      io_count;
 	ACL_FIBER  *ev_fiber;
 	ACL_RING    ev_timer;
@@ -185,6 +185,8 @@ static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 	}
 }
 
+#define CHECK_MIN
+
 unsigned int acl_fiber_delay(unsigned int milliseconds)
 {
 	acl_int64 when, now;
@@ -218,9 +220,9 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 #ifdef	CHECK_MIN
 	if ((min >= 0 && min < ev->timeout) || ev->timeout < 0)
 		ev->timeout = (int) min;
+#else
+	ev->timeout = 10;
 #endif
-
-	ev->timeout = 1;
 
 	fiber = acl_fiber_running();
 	fiber->when = when;
@@ -237,6 +239,8 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 
 	if (acl_ring_size(&__thread_fiber->ev_timer) == 0)
 		ev->timeout = -1;
+	else
+		ev->timeout = min;
 
 	SET_TIME(now);
 	if (now < when)

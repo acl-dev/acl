@@ -83,8 +83,11 @@ void acl_master_avail_listen(ACL_MASTER_SERV *serv)
 			serv->avail_proc, serv->total_proc, serv->max_proc);
 
 	/* when service is throttled or stopped, don't fork or listen again */
-	if (ACL_MASTER_THROTTLED(serv) || ACL_MASTER_STOPPING(serv))
-		return;
+	if (ACL_MASTER_THROTTLED(serv) || ACL_MASTER_STOPPING(serv)
+                || ACL_MASTER_KILLED(serv)) {
+
+                return;
+        }
 
 	/* prefork services */
 	if (serv->prefork_proc > 0 && master_prefork(serv) > 0)
@@ -117,7 +120,6 @@ void acl_master_avail_cleanup(ACL_MASTER_SERV *serv)
 {
 	int     n;
 
-	acl_master_delete_children(serv);  /* XXX calls master_avail_listen */
 	for (n = 0; n < serv->listen_fd_count; n++) {
 		/* XXX must be last */
 		acl_event_disable_readwrite(acl_var_master_global_event,

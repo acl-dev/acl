@@ -64,6 +64,8 @@ service master_fiber {
 	fiber_buf_size = 8192
 #	进程运行时的用户身份
 	fiber_owner = root
+#	同时启动的线程数
+	fiber_threads = 3
 
 #	当启用 master_dispatch 连接分开服务后，该配置指定 master_dispatch 所监听的
 #	域套接口的全路径，这样本子进程就可以从 master_dispatch 获得客户端连接

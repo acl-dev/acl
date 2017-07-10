@@ -179,13 +179,14 @@ static time_t __last_closing_time = 0;
 static pthread_mutex_t __closing_time_mutex;
 static pthread_mutex_t __counter_mutex;
 
-static ACL_AIO_SERVER_FN __service_main;
-static ACL_AIO_SERVER2_FN __service2_main;
-static ACL_MASTER_SERVER_EXIT_FN __service_onexit;
-static ACL_MASTER_SERVER_LISTEN_FN __service_on_listen;
-static char *__service_name;
+static ACL_AIO_SERVER_FN              __service_main;
+static ACL_AIO_SERVER2_FN             __service2_main;
+static ACL_MASTER_SERVER_EXIT_FN      __service_onexit;
+static ACL_MASTER_SERVER_ON_LISTEN_FN __service_on_listen;
+static ACL_MASTER_SERVER_SIGHUP_FN    __sighup_handler;
+static char  *__service_name;
 static char **__service_argv;
-static void *__service_ctx;
+static void  *__service_ctx;
 static void (*__service_accept) (ACL_ASTREAM *, void *);
 
 static unsigned __aio_server_generation;
@@ -1191,7 +1192,7 @@ static ACL_ASTREAM **create_listener(ACL_AIO *aio, int event_mode acl_unused,
 		/* …Ë÷√“Ï≤Ωº‡Ã˝ */
 		acl_aio_listen(as);
 		if (__service_on_listen)
-			__service_on_listen(vs);
+			__service_on_listen(__service_ctx, vs);
 		sstreams[i++] = as;
 
 		if (acl_var_aio_accept_timer <= 0)
@@ -1244,11 +1245,19 @@ static void run_loop(const char *procname)
 	 * collisions with an external lock file.
 	 */
 
+	acl_server_sighup_setup();
+
 	while (1) {
 		if (acl_var_aio_max_threads == 0)  /* single thread mode */
 			acl_aio_loop(__h_aio);
 		else  /* multi-threads mode */
 			sleep(1);
+
+		if (acl_var_server_gotsighup && __sighup_handler) {
+			acl_var_server_gotsighup = 0;
+			__sighup_handler(__service_ctx);
+		}
+
 		if (__listen_disabled == 1) {
 			__listen_disabled = 2;
 
@@ -1299,7 +1308,11 @@ static void server_main(int argc, char **argv, va_list ap)
 	 * messages to stderr, because no-one is going to see them.
 	 */
 
+#ifdef ACL_UNIX
 	opterr = 0;
+	optind = 0;
+	optarg = 0;
+#endif
 
 	while ((c = getopt(argc, argv, "hcn:o:s:t:uvf:")) > 0) {
 		switch (c) {
@@ -1381,7 +1394,11 @@ static void server_main(int argc, char **argv, va_list ap)
 			break;
 		case ACL_MASTER_SERVER_ON_LISTEN:
 			__service_on_listen =
-				va_arg(ap, ACL_MASTER_SERVER_LISTEN_FN);
+				va_arg(ap, ACL_MASTER_SERVER_ON_LISTEN_FN);
+			break;
+		case ACL_MASTER_SERVER_SIGHUP:
+			__sighup_handler =
+				va_arg(ap, ACL_MASTER_SERVER_SIGHUP_FN);
 			break;
 		default:
 			acl_msg_warn("%s: unknown argument: %d", myname, c);

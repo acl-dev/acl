@@ -312,12 +312,12 @@ static void service_sock(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 	 */
 	const char *name = get_str_ent(xcp, ACL_VAR_MASTER_SERV_SERVICE, NULL);
 	char private_val = get_bool_ent(xcp, ACL_VAR_MASTER_SERV_PRIVATE, "y");
-	ACL_ARGV *tokens = acl_argv_split(name, ",; \t");
+	ACL_ARGV *tokens = acl_argv_split(name, ",; \t\r\n");
 	ACL_ITER iter;
 
-	serv->type = ACL_MASTER_SERV_TYPE_SOCK;
+	serv->name  = acl_mystrdup(name);
+	serv->type  = ACL_MASTER_SERV_TYPE_SOCK;
 	serv->addrs = acl_array_create(1);
-	serv->name = acl_mystrdup(name);
 
 	acl_foreach(iter, tokens) {
 		const char *path = (const char*) iter.data;
@@ -694,6 +694,9 @@ ACL_MASTER_SERV *acl_master_ent_load(const char *filepath)
 	service_args(xcp, serv, filepath);
 	service_env(xcp, serv);
 
+	/* linked for children */
+	acl_ring_init(&serv->children);
+
 	/* Backoff time in case a service is broken. */
 	serv->throttle_delay = acl_var_master_throttle_time;
 
@@ -786,4 +789,48 @@ void acl_master_ent_free(ACL_MASTER_SERV *serv)
 	acl_myfree(serv->listen_fds);
 	acl_myfree(serv->listen_streams);
 	acl_myfree(serv);
+}
+
+int acl_master_same_name(ACL_MASTER_SERV *serv, const char *name)
+{
+	const char *sep = ",; \t\r\n";
+	ACL_ARGV *tokens_old = acl_argv_split(serv->name, sep);
+	ACL_ARGV *tokens_new = acl_argv_split(name, sep);
+	int       i, ret;
+
+	if (tokens_old->argc != tokens_new->argc) {
+		acl_argv_free(tokens_old);
+		acl_argv_free(tokens_new);
+		return 0;
+	}
+
+	for (i = 0; i < tokens_old->argc; i++) {
+		if (strcmp(tokens_new->argv[i], tokens_old->argv[i]) != 0)
+			break;
+	}
+
+	ret = i == tokens_old->argc ? 1 : 0;
+
+	acl_argv_free(tokens_old);
+	acl_argv_free(tokens_new);
+
+	return ret;
+}
+
+ACL_MASTER_SERV *acl_master_ent_find(const char *name, int type)
+{
+	ACL_MASTER_SERV *serv;
+
+	if (acl_var_master_head == NULL) {
+		acl_msg_error("%s(%d), %s: acl_var_master_head null",
+			__FILE__, __LINE__, __FUNCTION__);
+		return NULL;
+	}
+
+	for (serv = acl_var_master_head; serv; serv = serv->next) {
+		if (serv->type == type && acl_master_same_name(serv, name))
+			return serv;
+	}
+
+	return NULL;
 }

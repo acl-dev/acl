@@ -489,7 +489,7 @@ unsigned long acl_channel_recvul_nb(ACL_CHANNEL *c);
  * @param name {int} 控制参数列表中的第一个控制参数
  */
 void acl_fiber_server_main(int argc, char *argv[],
-	void (*service)(ACL_VSTREAM*, void*), void *ctx, int name, ...);
+	void (*service)(void*, ACL_VSTREAM*), void *ctx, int name, ...);
 void acl_fiber_chat_main(int argc, char *argv[],
 	int (*service)(ACL_VSTREAM*, void*), void *ctx, int name, ...);
 

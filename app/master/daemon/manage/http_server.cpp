@@ -14,9 +14,10 @@
 #include "http_client.h"
 #include "http_server.h"
 
-http_server::http_server(acl::aio_handle& aio)
+http_server::http_server(acl::aio_handle& aio, int rw_timeout)
 	: aio_(aio)
 	, listener_(NULL)
+	, rw_timeout_(rw_timeout)
 {
 }
 
@@ -44,7 +45,7 @@ bool http_server::open(const char* addr)
 
 bool http_server::accept_callback(acl::aio_socket_stream* client)
 {
-	http_client* hc = new http_client(client);
+	http_client* hc = new http_client(client, rw_timeout_);
 	hc->wait();
 	return true;
 }

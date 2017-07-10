@@ -19,6 +19,17 @@ ACL_API void acl_atomic_int64_set(ACL_ATOMIC *self, long long n);
 ACL_API long long acl_atomic_int64_fetch_add(ACL_ATOMIC *self, long long n);
 ACL_API long long acl_atomic_int64_add_fetch(ACL_ATOMIC *self, long long n);
 
+typedef struct ACL_ATOMIC_CLOCK ACL_ATOMIC_CLOCK;
+
+ACL_API ACL_ATOMIC_CLOCK *acl_atomic_clock_alloc(void);
+ACL_API void acl_atomic_clock_free(ACL_ATOMIC_CLOCK *clk);
+ACL_API long long acl_atomic_clock_count_add(ACL_ATOMIC_CLOCK *clk, int n);
+ACL_API long long acl_atomic_clock_users_add(ACL_ATOMIC_CLOCK *clk, int n);
+ACL_API void acl_atomic_clock_users_count_inc(ACL_ATOMIC_CLOCK *clk);
+ACL_API long long acl_atomic_clock_count(ACL_ATOMIC_CLOCK *clk);
+ACL_API long long acl_atomic_clock_atime(ACL_ATOMIC_CLOCK *clk);
+ACL_API long long acl_atomic_clock_users(ACL_ATOMIC_CLOCK *clk);
+
 #ifdef __cplusplus
 }
 #endif

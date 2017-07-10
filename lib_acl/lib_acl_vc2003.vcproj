@@ -1102,6 +1102,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				<File
 					RelativePath=".\src\master\acl_master_proto.c">
 				</File>
+				<File
+					RelativePath=".\src\master\acl_server_sig.c">
+				</File>
 				<Filter
 					Name="template"
 					Filter="">

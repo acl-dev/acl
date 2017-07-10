@@ -11,45 +11,38 @@
 namespace acl
 {
 
-static master_aio* __ma = NULL;
-static aio_handle* __handle = NULL;
-
-master_aio::master_aio()
-{
-	// 全局静态变量
-	acl_assert(__ma == NULL);
-	__ma = this;
-}
+master_aio::master_aio() : handle_(NULL) {}
 
 master_aio::~master_aio()
 {
 	if (daemon_mode_ == false)
-		delete __handle;
-	__handle = NULL;
+		delete handle_;
 }
 
 aio_handle* master_aio::get_handle() const
 {
-	acl_assert(__handle);
-	return __handle;
+	acl_assert(handle_);
+	return handle_;
 }
 
-static bool has_called = false;
+static bool __has_called = false;
 
 void master_aio::run_daemon(int argc, char** argv)
 {
 #ifndef ACL_WINDOWS
 	// 每个进程只能有一个实例在运行
-	acl_assert(has_called == false);
-	has_called = true;
+	acl_assert(__has_called == false);
+	__has_called = true;
 	daemon_mode_ = true;
 
 	// 调用 acl 服务器框架的单线程非阻塞模板
 	acl_aio_server2_main(argc, argv, service_main,
+		ACL_MASTER_SERVER_CTX, this,
 		ACL_MASTER_SERVER_ON_LISTEN, service_on_listen,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
 		ACL_MASTER_SERVER_EXIT, service_exit,
+		ACL_MASTER_SERVER_SIGHUP, service_on_sighup,
 		ACL_MASTER_SERVER_BOOL_TABLE, conf_.get_bool_cfg(),
 		ACL_MASTER_SERVER_INT64_TABLE, conf_.get_int64_cfg(),
 		ACL_MASTER_SERVER_INT_TABLE, conf_.get_int_cfg(),
@@ -72,8 +65,10 @@ static void close_all_listener(std::vector<aio_listen_stream*>& sstreams)
 bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	aio_handle_type ht /* = ENGINE_SELECT */)
 {
-	acl_assert(__handle == NULL);
+	acl_assert(__has_called == false);
+	__has_called = true;
 	daemon_mode_ = false;
+
 #ifdef ACL_WINDOWS
 	acl_cpp_init();
 #endif
@@ -84,9 +79,9 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	// 初始化配置参数
 	conf_.load(path);
 
-	__handle = NEW aio_handle(ht);
+	handle_ = NEW aio_handle(ht);
 
-	ACL_AIO* aio = __handle->get_handle();
+	ACL_AIO* aio = handle_->get_handle();
 	acl_assert(aio);
 	ACL_EVENT* eventp = acl_aio_event(aio);
 	set_event(eventp);  // 设置基类的事件句柄
@@ -94,44 +89,44 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	acl_foreach(iter, tokens)
 	{
 		const char* addr = (const char*) iter.data;
-		aio_listen_stream* sstream = NEW aio_listen_stream(__handle);
+		aio_listen_stream* sstream = NEW aio_listen_stream(handle_);
 		// 监听指定的地址
 		if (sstream->open(addr) == false)
 		{
 			logger_error("listen %s error: %s", addr, last_serror());
 			close_all_listener(sstreams);
 			// XXX: 为了保证能关闭监听流，应在此处再 check 一下
-			__handle->check();
+			handle_->check();
 			acl_argv_free(tokens);
 			return (false);
 		}
 
-		service_on_listen(sstream->get_vstream());
+		service_on_listen(this, sstream->get_vstream());
 		sstream->add_accept_callback(this);
 	}
 	acl_argv_free(tokens);
 
-	service_pre_jail(NULL);
-	service_init(NULL);
+	service_pre_jail(this);
+	service_init(this);
 	while (true)
 	{
 		// 如果返回 false 则表示不再继续，需要退出
-		if (__handle->check() == false)
+		if (handle_->check() == false)
 		{
 			logger("aio_server stop now ...");
 			break;
 		}
 	}
 	close_all_listener(sstreams);
-	__handle->check();
-	service_exit(NULL);
+	handle_->check();
+	service_exit(this);
 	return true;
 }
 
 void master_aio::stop()
 {
-	acl_assert(__handle);
-	__handle->stop();
+	acl_assert(handle_);
+	handle_->stop();
 }
 
 bool master_aio::accept_callback(aio_socket_stream* client)
@@ -168,60 +163,72 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-void master_aio::service_pre_jail(void*)
+void master_aio::service_pre_jail(void* ctx)
 {
-	acl_assert(__ma != NULL);
+	master_aio* ma = (master_aio *) ctx;
+	acl_assert(ma != NULL);
 
 #ifndef ACL_WINDOWS
-	if (__ma->daemon_mode_)
+	if (ma->daemon_mode_)
 	{
-		acl_assert(__handle == NULL);
+		acl_assert(ma->handle_ == NULL);
 
 		ACL_EVENT* eventp = acl_aio_server_event();
-		__ma->set_event(eventp);
+		ma->set_event(eventp);
 
 		ACL_AIO *aio = acl_aio_server_handle();
 		acl_assert(aio);
-		__handle = NEW aio_handle(aio);
+		ma->handle_ = NEW aio_handle(aio);
 	}
 #endif
 
-	__ma->proc_pre_jail();
+	ma->proc_pre_jail();
 }
 
-void master_aio::service_init(void* ctx acl_unused)
+void master_aio::service_init(void* ctx)
 {
-	acl_assert(__ma != NULL);
+	master_aio* ma = (master_aio *) ctx;
+	acl_assert(ma != NULL);
 
-	__ma->proc_inited_ = true;
-	__ma->proc_on_init();
+	ma->proc_inited_ = true;
+	ma->proc_on_init();
 }
 
-void master_aio::service_exit(void* ctx acl_unused)
+void master_aio::service_exit(void* ctx)
 {
-	acl_assert(__ma != NULL);
-	__ma->proc_on_exit();
+	master_aio* ma = (master_aio *) ctx;
+	acl_assert(ma != NULL);
+	ma->proc_on_exit();
 }
 
-void master_aio::service_main(ACL_SOCKET fd, void*)
+void master_aio::service_main(ACL_SOCKET fd, void* ctx)
 {
-	acl_assert(__handle);
-	acl_assert(__ma);
+	master_aio* ma = (master_aio *) ctx;
+	acl_assert(ma->handle_);
+	acl_assert(ma);
 
-	aio_socket_stream* stream = NEW aio_socket_stream(__handle, fd);
+	aio_socket_stream* stream = NEW aio_socket_stream(ma->handle_, fd);
 
 	aio_close_callback* callback = NEW aio_close_callback(stream);
 	stream->add_close_callback(callback);
 
-	__ma->on_accept(stream);
+	ma->on_accept(stream);
 }
 
-void master_aio::service_on_listen(ACL_VSTREAM *sstream)
+void master_aio::service_on_listen(void* ctx, ACL_VSTREAM *sstream)
 {
-	acl_assert(__ma);
+	master_aio* ma = (master_aio *) ctx;
+	acl_assert(ma);
 	server_socket* ss = new server_socket(sstream);
-	__ma->servers_.push_back(ss);
-	__ma->proc_on_listen(*ss);
+	ma->servers_.push_back(ss);
+	ma->proc_on_listen(*ss);
+}
+
+void master_aio::service_on_sighup(void* ctx)
+{
+	master_aio* ma = (master_aio *) ctx;
+	acl_assert(ma);
+	ma->proc_on_sighup();
 }
 
 }  // namespace acl

@@ -21,20 +21,22 @@ public:
 	/**
 	 * 根据套接字打开的一个网络流
 	 * @param fd 套接字
+	 * @param udp_mode {bool} 是否是 UDP 方式
 	 * @return {bool} 连接是否成功
 	 */
 #if defined(_WIN32) || defined(_WIN64)
-	bool open(SOCKET fd);
+	bool open(SOCKET fd, bool udp_mode = false);
 #else
-	bool open(int fd);
+	bool open(int fd, bool udp_mode = false);
 #endif
 
 	/**
 	 * 根据 ACL_VSTREAM 流打开网络流
 	 * @param vstream {ACL_VSTREAM*}
+	 * @param udp_mode {bool} 是否是 UDP 方式
 	 * @return {bool} 连接是否成功
 	 */
-	bool open(ACL_VSTREAM* vstream);
+	bool open(ACL_VSTREAM* vstream, bool udp_mode = false);
 
 	/**
 	 * 连接远程服务器并打开网络连接流

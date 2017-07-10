@@ -151,7 +151,7 @@ int     main(int argc, char **argv)
 
 	/* init master manager module */
 	manager::get_instance().init(acl_var_master_global_event,
-		acl_var_master_manage_addr);
+		acl_var_master_manage_addr, acl_var_master_rw_timeout);
 
 	/*
 	 * Finish initialization, last part. We must process configuration
@@ -199,6 +199,7 @@ int     main(int argc, char **argv)
 		}
 #endif
 
+		if (0)
 		acl_watchdog_start(watchdog);  /* same as trigger servers */
 
 		acl_event_loop(acl_var_master_global_event);

@@ -1,6 +1,5 @@
 #pragma once
 #include "master_base.hpp"
-#include "../stdlib/locker.hpp"
 
 namespace acl {
 
@@ -32,10 +31,20 @@ protected:
 	virtual ~master_udp();
 
 	/**
-	 * 纯虚函数：当 UDP 流有数据可读时回调子类此函数
+	 * 纯虚函数：当 UDP 流有数据可读时回调子类此函数，该方法在子线程中调用
 	 * @param stream {socket_stream*}
 	 */
 	virtual void on_read(socket_stream* stream) = 0;
+
+	/**
+	 * 当绑定 UDP 地址成功后回调此虚方法，该方法在主线程中被调用
+	 */
+	virtual void proc_on_bind(socket_stream&) {}
+
+	/**
+	 * 当线程初始化时该虚方法将被调用
+	 */
+	virtual void thread_on_init(void) {}
 
 	/**
 	 * 获得本地监听的套接口流对象集合
@@ -46,35 +55,32 @@ protected:
 		return sstreams_;
 	}
 
-	virtual void thread_on_init(void) {}
-	virtual void thread_on_exit(void) {}
-
 private:
 	std::vector<socket_stream*> sstreams_;
-	locker locker_;
 
-	void close_sstreams(void);
+	void run(int argc, char** argv);
 
 private:
 	// 当接收到一个客户端连接时回调此函数
-	static void service_main(ACL_VSTREAM *stream, char *service, char **argv);
+	static void service_main(void*, ACL_VSTREAM*);
+
+	// 当绑定地址成功后的回调函数
+	static void service_on_bind(void*, ACL_VSTREAM*);
 
 	// 当进程切换用户身份后调用的回调函数
-	static void service_pre_jail(char* service, char** argv);
+	static void service_pre_jail(void*);
 
 	// 当进程切换用户身份后调用的回调函数
-	static void service_init(char* service, char** argv);
+	static void service_init(void*);
 
 	// 当进程退出时调用的回调函数
-	static void service_exit(char* service, char** argv);
+	static void service_exit(void*);
 
-	static void thread_init(void *);
-	static void thread_exit(void *);
+	// 当线程启动时调用的回调函数
+	static void thread_init(void*);
 
-private:
-	// 在单独运行方式下，该函数当监听套接字有新连接到达时被调用
-	static void read_callback(int event_type, ACL_EVENT*,
-		ACL_VSTREAM*, void* context);
+	// 当进程收到 SIGHUP 信号后会回调本函数
+	static void service_on_sighup(void*);
 };
 
 } // namespace acl

@@ -92,6 +92,11 @@ protected:
 	 */
 	virtual void proc_on_exit() {}
 
+	/**
+	 * 当收到 SIGHUP 信号时的回调虚方法
+	 */
+	virtual void proc_on_sighup(void) {}
+
 	// 配置对象
 	master_conf conf_;
 

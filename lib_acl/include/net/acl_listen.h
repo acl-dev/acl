@@ -8,6 +8,7 @@ extern "C" {
 #include "../stdlib/acl_define.h"
 #ifdef	ACL_UNIX
 #include <sys/socket.h>
+#include <netdb.h>
 #endif
 
 /**

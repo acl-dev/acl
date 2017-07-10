@@ -25,5 +25,5 @@ public:
 	bool run(const stop_req_t& req, stop_res_t& res);
 
 private:
-	bool stop_one(const char* name, stop_res_data_t& data);
+	bool stop_one(const char* path, stop_res_data_t& data);
 };

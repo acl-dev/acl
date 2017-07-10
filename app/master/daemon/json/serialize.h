@@ -40,4 +40,5 @@ void serialize(T& o, acl::string& buf)
 	acl::json json;
 	acl::json_node& node = acl::gson(json, o);
 	buf = node.to_string();
+	buf += "\r\n";
 }

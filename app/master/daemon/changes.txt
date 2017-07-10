@@ -1,3 +1,15 @@
+
+4) 2017.7.7
+4.1) feature: master can stop or kill one service, stopping service is graceful
+by closing the IPC pipe, and killing service is rude by signal SIGTEM children.
+4.2) feature: add graceful stop API in master's web management interface.
+
+3) 2017.6.26
+3.1) protocol: changed the web management protocols.
+
+2) 2017.6.25
+2.1) feature: acl_master uses kernel event mode
+
 1) 2017.6.18
 1.1) feature: In Docker's running time, the master's pid was set to 1; When
 stopping master by sending TERM singal to master's pid, master_sigdeath func

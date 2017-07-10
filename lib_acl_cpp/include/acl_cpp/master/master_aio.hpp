@@ -58,6 +58,7 @@ protected:
 	virtual bool on_accept(aio_socket_stream* stream) = 0;
 
 private:
+	aio_handle* handle_;
 	/**
 	 * 基类 aio_accept_callback 的虚函数实现
 	 * @param client {aio_socket_stream*} 异步客户端流
@@ -74,7 +75,7 @@ private:
 #endif
 
 	// 当监听一个服务地址时回调此函数
-	static void service_on_listen(ACL_VSTREAM*);
+	static void service_on_listen(void*, ACL_VSTREAM*);
 
 	// 当进程切换用户身份后调用的回调函数
 	static void service_pre_jail(void*);
@@ -84,6 +85,9 @@ private:
 
 	// 当进程退出时调用的回调函数
 	static void service_exit(void*);
+
+	// 当进程收到 SIGHUP 信号后会回调本函数
+	static void service_on_sighup(void*);
 };
 
 }  // namespace acl

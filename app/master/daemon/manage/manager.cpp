@@ -29,7 +29,7 @@ manager::~manager(void)
 		acl_aio_free2(aio_, 1);
 }
 
-void manager::init(ACL_EVENT* event, const char* addr)
+void manager::init(ACL_EVENT* event, const char* addr, int rw_timeout)
 {
 	acl_assert(event);
 
@@ -39,7 +39,7 @@ void manager::init(ACL_EVENT* event, const char* addr)
 	event_  = event;
 	aio_    = acl_aio_create3(event);
 	handle_ = new acl::aio_handle(aio_);
-	server_ = new http_server(*handle_);
+	server_ = new http_server(*handle_, rw_timeout);
 
 	server_->open(addr);
 }

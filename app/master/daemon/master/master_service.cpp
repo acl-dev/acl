@@ -17,8 +17,12 @@ void   acl_master_service_init(void)
 {
 	const char *myname = "acl_master_service_init";
 
+	/* use poll other than select or epoll, because poll can be not
+	 * limited to 1024 like select, and also can generate no problem
+	 * after fork process that poll has no fd handle, but epoll has.
+	 */
 	if (acl_var_master_global_event == NULL)
-		acl_var_master_global_event = acl_event_new_select(
+		acl_var_master_global_event = acl_event_new_poll(
 			acl_var_master_delay_sec, acl_var_master_delay_usec);
 	if (acl_var_master_global_event == NULL)
 		acl_msg_fatal("%s(%d), %s: acl_event_new null, serr=%s",
@@ -55,8 +59,26 @@ void    acl_master_service_start(ACL_MASTER_SERV *serv)
 	acl_msg_info("%s: service started!", myname);
 }
 
-/* acl_master_service_stop - deactivate service */
+/* acl_master_service_kill - deactivate service */
 
+void    acl_master_service_kill(ACL_MASTER_SERV *serv)
+{
+	/* set killed flag to avoid prefork process */
+	serv->flags |= ACL_MASTER_FLAG_KILLED;
+
+	/*
+	 * Undo the things that master_service_start() did.
+	 */
+	acl_master_wakeup_cleanup(serv);
+	acl_master_status_cleanup(serv);
+
+	acl_master_avail_cleanup(serv);
+
+	acl_master_listen_cleanup(serv);
+	acl_master_kill_children(serv);  /* XXX calls master_avail_listen */
+}
+
+/* acl_master_service_stop - close IPC with children only */
 void    acl_master_service_stop(ACL_MASTER_SERV *serv)
 {
 	/* set STOPPING flag to avoid prefork process */

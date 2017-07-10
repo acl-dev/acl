@@ -32,7 +32,7 @@ static void on_close(ACL_VSTREAM *client, void *arg)
 	acl_myfree(ctx);
 }
 
-int service_on_accept(ACL_VSTREAM *client)
+int service_on_accept(void *arg acl_unused, ACL_VSTREAM *client)
 {
 	MY_CTX *ctx = (MY_CTX*) client->context;
 
@@ -46,7 +46,7 @@ int service_on_accept(ACL_VSTREAM *client)
 }
 
 /* 协议处理函数入口 */
-int service_main(ACL_VSTREAM *client, void *run_ctx acl_unused)
+int service_main(void *run_ctx acl_unused, ACL_VSTREAM *client)
 {
 	const char *myname = "service_main";
 	int   ret, ready;

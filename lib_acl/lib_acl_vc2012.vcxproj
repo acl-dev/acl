@@ -624,6 +624,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include=".\src\master\acl_master_flow.c" />
     <ClCompile Include=".\src\master\acl_master_params.c" />
     <ClCompile Include=".\src\master\acl_master_proto.c" />
+    <ClCompile Include=".\src\master\acl_server_sig.c" />
     <ClCompile Include=".\src\master\template\acl_aio_server.c" />
     <ClCompile Include=".\src\master\template\acl_single_server.c" />
     <ClCompile Include=".\src\master\template\acl_threads_server.c" />

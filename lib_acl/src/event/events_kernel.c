@@ -27,6 +27,7 @@
 #include "stdlib/acl_fifo.h"
 #include "net/acl_sane_socket.h"
 #include "stdlib/acl_meter_time.h"	/* just for performance test */
+#include "stdlib/acl_iostuff.h"
 #include "event/acl_events.h"
 
 #endif
@@ -110,11 +111,10 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	}
 #endif
 
-	if (err < 0) {
-		acl_msg_fatal("%s: %s: %s, err(%d), fd(%d), ret(%d)",
+	if (err < 0)
+		acl_msg_error("%s: %s: %s, err(%d), fd(%d), ret(%d)",
 			myname, EVENT_REG_DEL_TEXT, acl_last_serror(),
 			err, sockfd, ret);
-	}
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_DELAY_OPER)) {
 		fdp->flag &= ~EVENT_FDTABLE_FLAG_DELAY_OPER;
@@ -467,10 +467,9 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	}
 #endif
 
-	if (err < 0) {
-		acl_msg_fatal("%s: %s: %s", myname, EVENT_REG_DEL_TEXT,
+	if (err < 0)
+		acl_msg_error("%s: %s: %s", myname, EVENT_REG_DEL_TEXT,
 			acl_last_serror());
-	}
 
 #ifdef	USE_FDMAP
 	acl_fdmap_del(ev->fdmap, sockfd);
@@ -505,7 +504,7 @@ static void enable_read(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 		EVENT_REG_ADD_READ(err, ev->event_fd, sockfd, fdp);
 	}
 	if (err < 0) {
-		acl_msg_fatal("%s: %s: %s, err(%d), fd(%d)",
+		acl_msg_error("%s: %s: %s, err(%d), fd(%d)",
 			myname, EVENT_REG_ADD_TEXT,
 			acl_last_serror(), err, sockfd);
 	}
@@ -530,11 +529,10 @@ static void enable_write(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 		EVENT_REG_ADD_WRITE(err, ev->event_fd, sockfd, fdp);
 	}
 
-	if (err < 0) {
-		acl_msg_fatal("%s: %s: %s, err(%d), fd(%d)",
+	if (err < 0)
+		acl_msg_error("%s: %s: %s, err(%d), fd(%d)",
 			myname, EVENT_REG_ADD_TEXT,
 			acl_last_serror(), err, sockfd);
-	}
 }
 
 static int disable_read(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
@@ -565,11 +563,11 @@ static int disable_read(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 #endif
 		ret = 1;
 	}
-	if (err < 0) {
-		acl_msg_fatal("%s: %s: %s, err(%d), fd(%d), ret(%d)",
+
+	if (err < 0)
+		acl_msg_error("%s: %s: %s, err(%d), fd(%d), ret(%d)",
 			myname, EVENT_REG_DEL_TEXT, acl_last_serror(),
 			err, sockfd, ret);
-	}
 	return ret;
 }
 
@@ -601,11 +599,11 @@ static int disable_write(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 #endif
 		ret = 1;
 	}
-	if (err < 0) {
-		acl_msg_fatal("%s: %s: %s, err(%d), fd(%d), ret(%d)",
+
+	if (err < 0)
+		acl_msg_error("%s: %s: %s, err(%d), fd(%d), ret(%d)",
 			myname, EVENT_REG_DEL_TEXT, acl_last_serror(),
 			err, sockfd, ret);
-	}
 	return (ret);
 }
 
@@ -708,10 +706,10 @@ static void event_loop(ACL_EVENT *eventp)
 		acl_msg_fatal("%s(%d): recursive call, nested: %d",
 			myname, __LINE__, eventp->nested);
 	if (nready < 0) {
-		if (acl_last_error() != ACL_EINTR) {
+		if (acl_last_error() != ACL_EINTR)
 			acl_msg_fatal("%s(%d), %s: select: %s", __FILE__,
 				__LINE__, myname, acl_last_serror());
-		}
+
 		goto TAG_DONE;
 	} else if (nready == 0)
 		goto TAG_DONE;
@@ -903,6 +901,7 @@ ACL_EVENT *event_new_kernel(int fdsize acl_unused)
 
 	ev = (EVENT_KERNEL*) eventp;
 	EVENT_REG_INIT_HANDLE(ev->event_fd, fdsize);
+	acl_close_on_exec(ev->event_fd, ACL_CLOSE_ON_EXEC);
 	ev->event_fdslots = __default_max_events;
 	ev->event_buf = (EVENT_BUFFER *)
 		acl_mycalloc(ev->event_fdslots + 1, sizeof(EVENT_BUFFER));

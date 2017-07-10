@@ -761,6 +761,9 @@
     <ClCompile Include=".\src\master\acl_master_proto.c">
       <Filter>Source Files\master</Filter>
     </ClCompile>
+    <ClCompile Include=".\src\master\acl_server_sig.c">
+      <Filter>Source Files\master</Filter>
+    </ClCompile>
     <ClCompile Include=".\src\master\template\acl_aio_server.c">
       <Filter>Source Files\master\template</Filter>
     </ClCompile>
@@ -839,44 +842,44 @@
     <ClCompile Include=".\src\code\uni2utf8.c">
       <Filter>Source Files\code</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\master\template\acl_udp_server.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\event\events_epoll_thr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\src\stdlib\acl_atomic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\stdlib\common\acl_ypipe.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include=".\src\stdlib\common\acl_yqueue.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\stdlib</Filter>
     </ClCompile>
     <ClCompile Include=".\src\stdlib\sys\acl_sane_socketpair.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\stdlib\sys</Filter>
     </ClCompile>
     <ClCompile Include=".\src\stdlib\sys\unix\acl_trace.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\stdlib\sys\unix</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\master\template\acl_udp_server.c">
+      <Filter>Source Files\master\template</Filter>
     </ClCompile>
     <ClCompile Include=".\src\xml\acl_xml2.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\xml</Filter>
     </ClCompile>
     <ClCompile Include=".\src\xml\acl_xml2_parse.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\xml</Filter>
     </ClCompile>
     <ClCompile Include=".\src\xml\acl_xml2_util.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\xml</Filter>
     </ClCompile>
     <ClCompile Include=".\src\xml\acl_xml3.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\xml</Filter>
     </ClCompile>
     <ClCompile Include=".\src\xml\acl_xml3_parse.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\xml</Filter>
     </ClCompile>
     <ClCompile Include=".\src\xml\acl_xml3_util.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\xml</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\stdlib\common\acl_ypipe.c">
+      <Filter>Source Files\stdlib\common</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\stdlib\common\acl_yqueue.c">
+      <Filter>Source Files\stdlib\common</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\event\events_epoll_thr.c">
+      <Filter>Source Files\event</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

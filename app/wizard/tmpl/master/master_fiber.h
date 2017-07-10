@@ -29,5 +29,8 @@ protected:
 	// @override
 	void proc_on_exit(void);
 
+	// @override
+	void proc_on_sighup(void);
+
 private:
 };

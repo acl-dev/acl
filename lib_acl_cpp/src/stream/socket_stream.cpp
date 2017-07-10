@@ -19,12 +19,12 @@ socket_stream::~socket_stream()
 	close();
 }
 
-bool socket_stream::open(ACL_SOCKET fd)
+bool socket_stream::open(ACL_SOCKET fd, bool udp_mode /* = false */)
 {
 	ACL_VSTREAM* conn = acl_vstream_fdopen(fd, O_RDWR,
 		8192, 0, ACL_VSTREAM_TYPE_SOCK);
 	acl_assert(conn);
-	return open(conn);
+	return open(conn, udp_mode);
 }
 
 bool socket_stream::open(const char* addr, int conn_timeout, int rw_timeout)
@@ -37,7 +37,7 @@ bool socket_stream::open(const char* addr, int conn_timeout, int rw_timeout)
 	return open(conn);
 }
 
-bool socket_stream::open(ACL_VSTREAM* vstream)
+bool socket_stream::open(ACL_VSTREAM* vstream, bool udp_mode /* = false */)
 {
 	// 先关闭旧的流对象
 	if (stream_)
@@ -46,6 +46,8 @@ bool socket_stream::open(ACL_VSTREAM* vstream)
 	eof_ = false;
 	opened_ = true;
 	//acl_tcp_set_nodelay(ACL_VSTREAM_SOCK(vstream));
+	if (udp_mode)
+		acl_vstream_set_udp_io(stream_);
 	return true;
 }
 

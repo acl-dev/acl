@@ -28,6 +28,7 @@ public:
 
 protected:
 	master_fiber();
+
 	virtual ~master_fiber();
 
 	/**
@@ -37,12 +38,21 @@ protected:
 	 */
 	virtual void on_accept(socket_stream& stream) = 0;
 
+	/**
+	 * 当线程初始化时该虚方法将被调用
+	 */
+	virtual void thread_on_init(void) {}
+
 private:
-	static void service_on_listen(ACL_VSTREAM*);
-	static void service_on_accept(ACL_VSTREAM*, void*);
+	static void service_on_listen(void*, ACL_VSTREAM*);
+	static void service_on_accept(void*, ACL_VSTREAM*);
 	static void service_pre_jail(void*);
 	static void service_init(void*);
+	static void thread_init(void*); 
 	static void service_exit(void*);
+	static void service_on_sighup(void*);
+
+	void run(int argc, char** argv);
 };
 
 } // namespace acl

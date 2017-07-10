@@ -42,20 +42,20 @@ public:
 	 * 获得 mysql 客户端库的版本号
 	 * @return {unsigned long}
 	 */
-	unsigned long mysql_libversion() const;
+	unsigned long mysql_libversion(void) const;
 
 	/**
 	 * 获得 mysql 客户端库的信息
 	 * @return {const char*}
 	 */
-	const char* mysql_client_info() const;
+	const char* mysql_client_info(void) const;
 
 	/**
 	 * 直接获得 mysql 的连接句柄，如果返回 NULL 则表示 mysql 还没有打开
 	 * 或出错时内部自动关闭了 mysql 连接
 	 * @return {MYSQL*}
 	 */
-	MYSQL* get_conn() const
+	MYSQL* get_conn(void) const
 	{
 		return conn_;
 	}

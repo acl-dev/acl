@@ -107,24 +107,17 @@ static void __proxy_handle_fn(int type acl_unused, ACL_EVENT *event acl_unused,
 	}
 }
 
-static void __service(ACL_VSTREAM *stream, char *service, char **argv)
+static void __service(void *ctx acl_unused, ACL_VSTREAM *stream)
 {
 	const char *myname = "__service";
 	char  buf[64];
 	int   connect_retries = var_proxy_retries;
 
-	/*
-	 * Sanity check. This service takes no command-line arguments.
-	 */
-	if (argv[0])
-		acl_msg_fatal("%s(%d)->%s: unexpected command-line argument: %s",
-				__FILE__, __LINE__, myname, argv[0]);
-
 	__front_stream = stream;
 
 	if (var_proxy_log_level > 3)
-		acl_msg_info("%s(%d)->%s: service name = %s, rw_timeout = %d",
-			__FILE__, __LINE__, myname, service, stream->rw_timeout);
+		acl_msg_info("%s(%d)->%s: rw_timeout = %d",
+			__FILE__, __LINE__, myname, stream->rw_timeout);
 
 	(void) acl_getpeername(ACL_VSTREAM_SOCK(__front_stream),
 			buf, sizeof(buf));

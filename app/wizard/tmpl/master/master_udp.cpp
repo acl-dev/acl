@@ -34,11 +34,11 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 
 //////////////////////////////////////////////////////////////////////////////
 
-master_service::master_service()
+master_service::master_service(void)
 {
 }
 
-master_service::~master_service()
+master_service::~master_service(void)
 {
 }
 
@@ -54,10 +54,27 @@ void master_service::on_read(acl::socket_stream* stream)
 	stream->write(buf, n);
 }
 
-void master_service::proc_on_init()
+void master_service::thread_on_init(void)
 {
+	logger(">>thread_on_init<<<");
 }
 
-void master_service::proc_on_exit()
+void master_service::proc_on_bind(acl::socket_stream&)
 {
+	logger(">>>proc_on_bind<<<");
+}
+
+void master_service::proc_on_init(void)
+{
+	logger(">>>proc_on_init<<<");
+}
+
+void master_service::proc_on_exit(void)
+{
+	logger(">>>proc_on_exit<<<");
+}
+
+void master_service::proc_on_sighup(void)
+{
+	logger(">>>proc_on_sighup<<<");
 }

@@ -1452,6 +1452,10 @@
 					RelativePath=".\src\master\acl_master_proto.c"
 					>
 				</File>
+				<File
+					RelativePath=".\src\master\acl_server_sig.c"
+					>
+				</File>
 				<Filter
 					Name="template"
 					>

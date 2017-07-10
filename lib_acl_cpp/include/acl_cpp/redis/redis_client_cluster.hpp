@@ -57,13 +57,19 @@ public:
 	 * slots range
 	 * @param addr {const char*} 集群中的一个服务结点地址，格式 ip:port
 	 *  on server node's addr of the cluster, addr format is "ip:port"
-	 * @param max_conns {int} 集群中与每个结点所建连接池的最大连接限制
+	 * @param max_conns {size_t} 集群中与每个结点所建连接池的最大连接限制
 	 *  the max connections limit for each connection pool
+	 * @param conn_timeout {int} 连接超时时间
+	 *  set the connection timeout
+	 * @param rw_timeout {int} IO 读写超时时间
+	 *  set the network io timeout
 	 */
-	void set_all_slot(const char* addr, int max_conns);
+	void set_all_slot(const char* addr, size_t max_conns,
+		int conn_timeout = 30, int rw_timeout = 30);
 
 	/**
-	 * 动态清除哈希槽对应的 redis 服务地址，以便于重新计算位置，内部有线程锁保护机制;
+	 * 动态清除哈希槽对应的 redis 服务地址，以便于重新计算位置，
+	 * 内部有线程锁保护机制;
 	 * dynamicly remove one slot and redis-server addr mapping, which is
 	 * protected by thread mutex
 	 * @param slot {int} 哈希槽值;
@@ -155,11 +161,11 @@ protected:
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
 
 private:
-	int   max_slot_;
-	const char**  slot_addrs_;
+	int max_slot_;
+	const char** slot_addrs_;
 	std::vector<char*> addrs_;
-	int   redirect_max_;
-	int   redirect_sleep_;
+	int redirect_max_;
+	int redirect_sleep_;
 	std::map<string, string> passwds_;
 };
 

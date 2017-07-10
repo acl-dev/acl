@@ -37,7 +37,7 @@ service server {
 #	进程程序名
 	master_command = $<PROGRAM>
 #	进程日志记录文件
-	master_log = {install_path}/var/log/udp_echo.log
+	master_log = {install_path}/var/log/$<PROGRAM>
 #	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2
 #	master_debug =
 #	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
@@ -47,12 +47,14 @@ service server {
 #	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
 #			sync_action:E_LOG_SEM, sem_name:/tmp/udp_echo.sem
 
+#	启动时创建的固定线程数
+	udp_threads = 1
 #	是否允许产生 core 文件
 #	udp_enable_core = 1
 #	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出
-	udp_use_limit = 100
+	udp_use_limit = 0
 #	每个进程实例的空闲超时时间，超过此值后进程实例主动退出
-	udp_idle_limit = 120
+	udp_idle_limit = 0
 #	记录进程PID的位置(对于多进程实例来说没有意义)
 	udp_pid_dir =  {install_path}/var/pid
 #	进程运行时所在的路径
