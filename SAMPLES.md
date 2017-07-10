@@ -1,181 +1,181 @@
-# acl Ê¾Àı
-## acl ÏîÄ¿µÄ²âÊÔ¼°Ó¦ÓÃÊ¾Àı£¬Ö÷Òª°üÀ¨Èı¸öÊ¾Àı¼¯ºÏ£¬ÈçÏÂ£º
+# acl ç¤ºä¾‹
+## acl é¡¹ç›®çš„æµ‹è¯•åŠåº”ç”¨ç¤ºä¾‹ï¼Œä¸»è¦åŒ…æ‹¬ä¸‰ä¸ªç¤ºä¾‹é›†åˆï¼Œå¦‚ä¸‹ï¼š
 
-### 1¡¢acl/samples£º¸ÃÄ¿Â¼ÏÂµÄÀı×ÓÖ÷ÒªÊÇ»ùÓÚ lib_acl ¼° lib_protocol Á½¸ö¿âµÄÀı×Ó
--    1.1 acl: ´òÓ¡µ±Ç° acl ¿â°æ±¾ºÅ³ÌĞò
--    1.2 aio/client: ·Ç×èÈû io ¿Í»§¶Ë
--    1.3 aio/server: ·Ç×èÈû io ·şÎñÆ÷
--    1.4 base64: base64 ±à/½âÂë³ÌĞò
--    1.5 btree: ¶ş²æÊ÷³ÌĞò
--    1.6 cache: ¶ÔÏó»º´æ³ÌĞò
--    1.7 cache2: ¶ÔÏó»º´æ³ÌĞò
--    1.8 cgi_env: CGI ³ÌĞòÓÃÀ´»ñµÃ CGI »·¾³±äÁ¿
--    1.9 chunk_chain: ¶ş·Ö¿éÊı¾İ³ÌĞò
--    1.10 configure: ÅäÖÃÎÄ¼ş´¦Àí³ÌĞò
--    1.11 connect: ÍøÂç¿Í»§¶ËÁ¬½Ó³ÌĞò
--    1.12 dbpool: Êı¾İ¿âÁ¬½Ó³Ø³ÌĞò
--    1.13 dlink: ¶ş·Ö¿é²éÕÒËã·¨³ÌĞò
--    1.14 dns: ÓòÃû²éÑ¯³ÌĞò
--    1.15 dns_req: ÓòÃû²éÑ¯³ÌĞò
--    1.16 event: ÊÂ¼şÒıÇæ³ÌĞò
--    1.17 fifo: ÏÈ½øÏÈ³öËã·¨³ÌĞò
--    1.18 file: ÎÄ¼şÁ÷´¦Àí³ÌĞò
--    1.19 file_fmt: ½« UNIX ÏÂµÄ \n ×ªÎª WIN32 ÏÂµÄ \r\n »òÕß·´Ïò×ª»»³ÌĞò
--    1.20 FileDir: win32 ÏÂÄ¿Â¼²Ù×÷³ÌĞò
--    1.21 flock: ÎÄ¼şËø´¦Àí³ÌĞò
--    1.22 gc: ÄÚ´æ×Ô¶¯»ØÊÕ³ÌĞò
--    1.23 htable: ¹şÏ£±í´¦Àí³ÌĞò
--    1.24 http/header: http ¿Í»§¶Ë³ÌĞò
--    1.25 http/url_get1: ÍøÒ³ÏÂÔØ¿Í»§¶Ë³ÌĞò
--    1.26 http/url_get2: ÍøÒ³ÏÂÔØ¿Í»§¶Ë³ÌĞò
--    1.27 http/url_get3: ÍøÒ³ÏÂÔØ¿Í»§¶Ë³ÌĞò
--    1.28 http_aio: ¼òµ¥µÄ HTTP Òì²½ÏÂÔØ³ÌĞò
--    1.29 http_client: WIN32 ÏÂ HTTP ¿Í»§¶Ë³ÌĞò
--    1.30 http_probe: HTTP ¿Í»§¶Ë³ÌĞò
--    1.31 ifconf: »ñÈ¡±¾»úÍø¿¨µÄ³ÌĞò
--    1.32 iplink: IP µØÖ·¶Î¹ÜÀí³ÌĞò
--    1.33 iterator: C ·½Ê½½øĞĞ±éÀúµÄ³ÌĞò
--    1.34 json: json ¶ÔÏó´¦Àí³ÌĞò
--    1.35 json2: json ¶ÔÏó´¦Àí³ÌĞò
--    1.36 json3: json ¶ÔÏó´¦Àí³ÌĞò
--    1.37 jt2ft: ¼òÌå×ª·±Ìå³ÌĞò
--    1.38 log: ÈÕÖ¾´¦Àí³ÌĞò
--    1.39 master/aio_echo: ·Ç×èÈû»ØÏÔ·şÎñÆ÷³ÌĞò
--    1.40 master/aio_proxy: ·Ç×èÈû TCP ´úÀí³ÌĞò
--    1.41 master/ioctl_echo2: ¶àÏß³Ì»ØÏÔÊ¾·şÎñÆ÷³ÌĞò
--    1.42 master/ioctl_echo3: ¶àÏß³Ì»ØÏÔÊ¾·şÎñÆ÷³ÌĞò
--    1.43 master/master_notify: ¶àÏß³Ì·şÎñÆ÷³ÌĞò
--    1.44 master/master_threads: ¶àÏß³Ì·şÎñÆ÷³ÌĞò
--    1.45 master/single_echo: ¶à½ø³Ì»ØÏÔÊ¾·şÎñÆ÷³ÌĞò
--    1.46 master/trigger: ´¥·¢Æ÷·şÎñÆ÷³ÌĞò
--    1.47 master/udp_echo: UDP »ØÏÔ·şÎñÆ÷³ÌĞò
--    1.48 memdb: ¼òµ¥µÄÄÚ´æÊı¾İ¿â³ÌĞò
--    1.49 mempool: ÄÚ´æ³Ø³ÌĞò
--    1.50 mkdir: ´´½¨¶à¼¶Ä¿Â¼³ÌĞò
--    1.51 net: ¼òµ¥ÍøÂç³ÌĞò
--    1.52 ping: ×èÈû/·Ç×èÈû PING ³ÌĞò
--    1.53 pipe: ¹ÜµÀ´¦Àí³ÌĞò
--    1.54 proctl: WIN32 ÏÂ¸¸×Ó½ø³Ì³ÌĞò
--    1.55 resolve: ÓòÃû½âÎö³ÌĞò
--    1.56 server: ¼òµ¥µÄ·şÎñÆ÷³ÌĞò
--    1.57 server1: ¼òµ¥µÄ·şÎñÆ÷³ÌĞò
--    1.58 slice: ÄÚ´æ³ØÇĞÆ¬³ÌĞò
--    1.59 slice_mem: ÄÚ´æ³ØÇĞÆ¬³ÌĞò
--    1.60 smtp_client: smtp ¿Í»§¶Ë·¢ĞÅ³ÌĞò
--    1.61 string: acl ×Ö·û´®´¦Àí³ÌĞò
--    1.62 thread: Ïß³Ì³ÌĞò
--    1.63 token_tree: 256 ²æÊ÷³ÌĞò
--    1.64 udp_clinet: UDP ¿Í»§¶Ë³ÌĞò
--    1.65 udp_server: UDP ·şÎñÆ÷³ÌĞò
--    1.66 urlcode: URL ±àÂë´¦Àí³ÌĞò
--    1.67 vstream: IO ÍøÂçÁ÷´¦Àí³ÌĞò
--    1.68 vstream_client: ÍøÂç¿Í»§¶ËÁ÷³ÌĞò
--    1.69 vstream_fseek: ÎÄ¼şÁ÷´¦Àí³ÌĞò
--    1.70 vstream_fseek2: ÎÄ¼şÁ÷´¦Àí³ÌĞò
--    1.71 vstream_popen: ¹ÜµÀÁ÷´¦Àí³ÌĞò
--    1.71 vstream_popen2: ¹ÜµÀÁ÷´¦Àí³ÌĞò
--    1.71 vstream_popen3: ¹ÜµÀÁ÷´¦Àí³ÌĞò
--    1.72 vstream_server: ÍøÂç·şÎñ¶Ë³ÌĞò
--    1.73 xml: XML ½âÎö³ÌĞò
--    1.74 xml2: XML ½âÎö³ÌĞò
--    1.75 zdb: Êı×ÖKEY/VALUE ÎÄ¼ş´æ´¢ÒıÇæ³ÌĞò
+### 1ã€acl/samplesï¼šè¯¥ç›®å½•ä¸‹çš„ä¾‹å­ä¸»è¦æ˜¯åŸºäº lib_acl åŠ lib_protocol ä¸¤ä¸ªåº“çš„ä¾‹å­
+-    1.1 acl: æ‰“å°å½“å‰ acl åº“ç‰ˆæœ¬å·ç¨‹åº
+-    1.2 aio/client: éé˜»å¡ io å®¢æˆ·ç«¯
+-    1.3 aio/server: éé˜»å¡ io æœåŠ¡å™¨
+-    1.4 base64: base64 ç¼–/è§£ç ç¨‹åº
+-    1.5 btree: äºŒå‰æ ‘ç¨‹åº
+-    1.6 cache: å¯¹è±¡ç¼“å­˜ç¨‹åº
+-    1.7 cache2: å¯¹è±¡ç¼“å­˜ç¨‹åº
+-    1.8 cgi_env: CGI ç¨‹åºç”¨æ¥è·å¾— CGI ç¯å¢ƒå˜é‡
+-    1.9 chunk_chain: äºŒåˆ†å—æ•°æ®ç¨‹åº
+-    1.10 configure: é…ç½®æ–‡ä»¶å¤„ç†ç¨‹åº
+-    1.11 connect: ç½‘ç»œå®¢æˆ·ç«¯è¿æ¥ç¨‹åº
+-    1.12 dbpool: æ•°æ®åº“è¿æ¥æ± ç¨‹åº
+-    1.13 dlink: äºŒåˆ†å—æŸ¥æ‰¾ç®—æ³•ç¨‹åº
+-    1.14 dns: åŸŸåæŸ¥è¯¢ç¨‹åº
+-    1.15 dns_req: åŸŸåæŸ¥è¯¢ç¨‹åº
+-    1.16 event: äº‹ä»¶å¼•æ“ç¨‹åº
+-    1.17 fifo: å…ˆè¿›å…ˆå‡ºç®—æ³•ç¨‹åº
+-    1.18 file: æ–‡ä»¶æµå¤„ç†ç¨‹åº
+-    1.19 file_fmt: å°† UNIX ä¸‹çš„ \n è½¬ä¸º WIN32 ä¸‹çš„ \r\n æˆ–è€…åå‘è½¬æ¢ç¨‹åº
+-    1.20 FileDir: win32 ä¸‹ç›®å½•æ“ä½œç¨‹åº
+-    1.21 flock: æ–‡ä»¶é”å¤„ç†ç¨‹åº
+-    1.22 gc: å†…å­˜è‡ªåŠ¨å›æ”¶ç¨‹åº
+-    1.23 htable: å“ˆå¸Œè¡¨å¤„ç†ç¨‹åº
+-    1.24 http/header: http å®¢æˆ·ç«¯ç¨‹åº
+-    1.25 http/url_get1: ç½‘é¡µä¸‹è½½å®¢æˆ·ç«¯ç¨‹åº
+-    1.26 http/url_get2: ç½‘é¡µä¸‹è½½å®¢æˆ·ç«¯ç¨‹åº
+-    1.27 http/url_get3: ç½‘é¡µä¸‹è½½å®¢æˆ·ç«¯ç¨‹åº
+-    1.28 http_aio: ç®€å•çš„ HTTP å¼‚æ­¥ä¸‹è½½ç¨‹åº
+-    1.29 http_client: WIN32 ä¸‹ HTTP å®¢æˆ·ç«¯ç¨‹åº
+-    1.30 http_probe: HTTP å®¢æˆ·ç«¯ç¨‹åº
+-    1.31 ifconf: è·å–æœ¬æœºç½‘å¡çš„ç¨‹åº
+-    1.32 iplink: IP åœ°å€æ®µç®¡ç†ç¨‹åº
+-    1.33 iterator: C æ–¹å¼è¿›è¡Œéå†çš„ç¨‹åº
+-    1.34 json: json å¯¹è±¡å¤„ç†ç¨‹åº
+-    1.35 json2: json å¯¹è±¡å¤„ç†ç¨‹åº
+-    1.36 json3: json å¯¹è±¡å¤„ç†ç¨‹åº
+-    1.37 jt2ft: ç®€ä½“è½¬ç¹ä½“ç¨‹åº
+-    1.38 log: æ—¥å¿—å¤„ç†ç¨‹åº
+-    1.39 master/aio_echo: éé˜»å¡å›æ˜¾æœåŠ¡å™¨ç¨‹åº
+-    1.40 master/aio_proxy: éé˜»å¡ TCP ä»£ç†ç¨‹åº
+-    1.41 master/ioctl_echo2: å¤šçº¿ç¨‹å›æ˜¾ç¤ºæœåŠ¡å™¨ç¨‹åº
+-    1.42 master/ioctl_echo3: å¤šçº¿ç¨‹å›æ˜¾ç¤ºæœåŠ¡å™¨ç¨‹åº
+-    1.43 master/master_notify: å¤šçº¿ç¨‹æœåŠ¡å™¨ç¨‹åº
+-    1.44 master/master_threads: å¤šçº¿ç¨‹æœåŠ¡å™¨ç¨‹åº
+-    1.45 master/single_echo: å¤šè¿›ç¨‹å›æ˜¾ç¤ºæœåŠ¡å™¨ç¨‹åº
+-    1.46 master/trigger: è§¦å‘å™¨æœåŠ¡å™¨ç¨‹åº
+-    1.47 master/udp_echo: UDP å›æ˜¾æœåŠ¡å™¨ç¨‹åº
+-    1.48 memdb: ç®€å•çš„å†…å­˜æ•°æ®åº“ç¨‹åº
+-    1.49 mempool: å†…å­˜æ± ç¨‹åº
+-    1.50 mkdir: åˆ›å»ºå¤šçº§ç›®å½•ç¨‹åº
+-    1.51 net: ç®€å•ç½‘ç»œç¨‹åº
+-    1.52 ping: é˜»å¡/éé˜»å¡ PING ç¨‹åº
+-    1.53 pipe: ç®¡é“å¤„ç†ç¨‹åº
+-    1.54 proctl: WIN32 ä¸‹çˆ¶å­è¿›ç¨‹ç¨‹åº
+-    1.55 resolve: åŸŸåè§£æç¨‹åº
+-    1.56 server: ç®€å•çš„æœåŠ¡å™¨ç¨‹åº
+-    1.57 server1: ç®€å•çš„æœåŠ¡å™¨ç¨‹åº
+-    1.58 slice: å†…å­˜æ± åˆ‡ç‰‡ç¨‹åº
+-    1.59 slice_mem: å†…å­˜æ± åˆ‡ç‰‡ç¨‹åº
+-    1.60 smtp_client: smtp å®¢æˆ·ç«¯å‘ä¿¡ç¨‹åº
+-    1.61 string: acl å­—ç¬¦ä¸²å¤„ç†ç¨‹åº
+-    1.62 thread: çº¿ç¨‹ç¨‹åº
+-    1.63 token_tree: 256 å‰æ ‘ç¨‹åº
+-    1.64 udp_clinet: UDP å®¢æˆ·ç«¯ç¨‹åº
+-    1.65 udp_server: UDP æœåŠ¡å™¨ç¨‹åº
+-    1.66 urlcode: URL ç¼–ç å¤„ç†ç¨‹åº
+-    1.67 vstream: IO ç½‘ç»œæµå¤„ç†ç¨‹åº
+-    1.68 vstream_client: ç½‘ç»œå®¢æˆ·ç«¯æµç¨‹åº
+-    1.69 vstream_fseek: æ–‡ä»¶æµå¤„ç†ç¨‹åº
+-    1.70 vstream_fseek2: æ–‡ä»¶æµå¤„ç†ç¨‹åº
+-    1.71 vstream_popen: ç®¡é“æµå¤„ç†ç¨‹åº
+-    1.71 vstream_popen2: ç®¡é“æµå¤„ç†ç¨‹åº
+-    1.71 vstream_popen3: ç®¡é“æµå¤„ç†ç¨‹åº
+-    1.72 vstream_server: ç½‘ç»œæœåŠ¡ç«¯ç¨‹åº
+-    1.73 xml: XML è§£æç¨‹åº
+-    1.74 xml2: XML è§£æç¨‹åº
+-    1.75 zdb: æ•°å­—KEY/VALUE æ–‡ä»¶å­˜å‚¨å¼•æ“ç¨‹åº
 
-### 2¡¢acl/lib_acl_cpp/samples£º¸ÃÄ¿Â¼ÏÂµÄÀı×Ó»ù±¾ÊÇ»ùÓÚ lib_acl_cpp ¿âĞ´µÄ C++ Àı×Ó
--    2.1 aio/aio_client: ·Ç×èÈûÍøÂç¿Í»§¶Ë³ÌĞò
--    2.2 aio/aio_dns: ·Ç×èÈûÓòÃû½âÎö¿Í»§¶Ë³ÌĞò
--    2.3 aio/aio_echo: ·Ç×èÈû»ØÏÔ·şÎñÆ÷³ÌĞò
--    2.4 aio/aio_ipc: ×èÈû/·Ç×èÈûÕûºÏµÄÍøÂç³ÌĞò
--    2.5 aio/aio_server: ·Ç×èÈû·şÎñÆ÷³ÌĞò
--    2.6 beanstalk: ¶ÓÁĞÓ¦ÓÃ beanstalkd µÄ¿Í»§¶Ë³ÌĞò
--    2.7 benchmark: ÓëĞÔÄÜ²âÊÔÏà¹ØµÄ³ÌĞò¼¯
--    2.8 cgi: ¼òµ¥µÄ WEB CGI ³ÌĞò
--    2.9 cgi_upload: ½ÓÊÕÉÏ´«ÎÄ¼şµÄ CGI ³ÌĞò
--    2.10 charset: ×Ö·û¼¯×ª»»³ÌĞò
--    2.11 check_trigger: ¼ì²âÔ¶³Ì HTTP ·şÎñÆ÷×´Ì¬µÄ´¥·¢Æ÷³ÌĞò
--    2.12 connect_manager: ¿Í»§¶ËÁ¬½Ó³Ø¼¯Èº¹ÜÀí³ÌĞò
--    2.13 db_service: ÓëÊı¾İ¿âÏà¹ØµÄ³ÌĞò
--    2.14 dbpool: Ê¹ÓÃÊı¾İ¿â¿Í»§¶ËÁ¬½Ó³ØµÄ³ÌĞò
--    2.15 dircopy: Ä¿Â¼ÎÄ¼ş¿½±´³ÌĞò
--    2.16 final_class: ½ûÖ¹¼Ì³ĞÀà³ÌĞò
--    2.17 flock: ÎÄ¼şËø´¦Àí³ÌĞò
--    2.18 fs_benchmark: ÎÄ¼şÏµÍ³Ñ¹Á¦²âÊÔ³ÌĞò
--    2.19 fstream: ÎÄ¼şÁ÷³ÌĞò
--    2.20 gui_rpc: WIN32 ÏÂ×èÈû¹ı³ÌÓë WIN32 ½çÃæµÄÏûÏ¢ÕûºÏµÄÀı×Ó
--    2.21 hsclient: handle-socket ¿Í»§¶Ë³ÌĞò
--    2.22 http_client: HTTP ¿Í»§¶Ë³ÌĞò
--    2.23 http_client2: HTTP ¿Í»§¶Ë³ÌĞò
--    2.24 http_mime: HTTP Ğ­ÒéµÄ MIME ¸ñÊ½´¦Àí³ÌĞò
--    2.25 htttp/http_request: Ê¹ÓÃ http_request ÀàµÄ HTTP ¿Í»§¶Ë³ÌĞò
--    2.26 http_request_manager: HTTP ¿Í»§¶ËÁ¬½Ó³Ø¼¯Èº³ÌĞò
--    2.27 http_request_pool: HTTP ¿Í»§¶ËÁ¬½Ó³Ø³ÌĞò
--    2.28 http_request2: Ê¹ÓÃ http_request ÀàµÄ HTTP ¿Í»§¶Ë³ÌĞò
--    2.29 http/http_response: Ê¹ÓÃ http_reponse ÀàÏìÓ¦ HTTP ¿Í»§¶ËÇëÇóµÄ³ÌĞò
--    2.30 http_server: ¼òµ¥µÄ HTTP ·şÎñÆ÷³ÌĞò
--    2.31 http_servlet: ÀàËÆÓÚ JAVA HttpServlet µÄ³ÌĞò
--    2.32 http_servlet2: ÀàËÆÓÚ JAVA HttpServlet µÄ³ÌĞò
--    2.33 HttpClient: ¼òµ¥µÄ HTTP ¿Í»§¶Ë³ÌĞò
--    2.34 json/json0 - json7: json ×Ö·û´®¶ÔÏó½âÎö³ÌĞò
--    2.35 logger: ÈÕÖ¾³ÌĞò
--    2.36 master/master_aio: ·Ç×èÈû·şÎñÆ÷³ÌĞò
--    2.37 master_aio_proxy: ·Ç×èÈû TCP ´úÀí·şÎñÆ÷³ÌĞò
--    2.38 master/master_http_aio: ¼òµ¥µÄ·Ç×èÈû HTTP ·şÎñÆ÷³ÌĞò
--    2.39 master/master_http_rpc: ×èÈû/·Ç×èÈûÕûºÏµÄ HTTP ·şÎñÆ÷³ÌĞò
--    2.40 master/master_http_threads: ¶àÏß³Ì HTTP ·şÎñÆ÷³ÌĞò
--    2.40 master/master_http_threads2: ¶àÏß³Ì HTTP ·şÎñÆ÷³ÌĞò
--    2.41 master/maser_proc: ½ø³Ì³Ø·şÎñÆ÷³ÌĞò
--    2.42 master/master_threads: ¶àÏß³Ì·şÎñÆ÷³ÌĞò
--    2.43 master/master_trigger: ´¥·¢Æ÷·şÎñÆ÷³ÌĞò
--    2.44 master/master_udp: UDP Í¨ĞÅ·şÎñÆ÷³ÌĞò
--    2.45 master/master_udp_threads: ¶àÏß³Ì UDP Í¨ĞÅ·şÎñÆ÷³ÌĞò
--    2.46 md5: md5 ´¦Àí³ÌĞò
--    2.47 mem_cache: memcached ¿Í»§¶Ë³ÌĞò
--    2.47 memcache_pool: memcached Ö§³ÖÁ¬½Ó³ØµÄ¿Í»§¶Ë³ÌĞò
--    2.48 mime: ÓÊ¼ş MIME ½âÎö´¦Àí³ÌĞò
--    2.49 mime_base64: MIME BASE64 ¸ñÊ½´¦Àí³ÌĞò
--    2.50 mime_qp: MIME QP ¸ñÊ½´¦Àí³ÌĞò
--    2.51 mime_xxcode: MIME XXCODE ¸ñÊ½´¦Àí³ÌĞò
--    2.52 mysql: mysql ¿Í»§¶Ë³ÌĞò
--    2.53 mysql2: mysql ¿Í»§¶Ë³ÌĞò
--    2.54 rfc822: ÓÊ¼şµÄ RFC822 Ğ­Òé´¦Àí³ÌĞò
--    2.55 rfc2047: ÓÊ¼şµÄ RFC2047 Ğ­Òé´¦Àí³ÌĞò
--    2.56 rpc_download: ²ÉÓÃ×èÈû/·Ç×èÈûÕûºÏ·½Ê½½øĞĞ HTTP ÏÂÔØµÄ³ÌĞò
--    2.57 scan_dir: Ä¿Â¼µİ¹éÉ¨Ãè³ÌĞò
--    2.58 singleton: µ¥Àı³ÌĞò
--    2.59 session: »á»°³ÌĞò
--    2.60 socket_client: ÍøÂç¿Í»§¶Ë³ÌĞò
--    2.61 socket_stream: ÍøÂçÁ÷´¦Àí³ÌĞò
--    2.62 sqlite: sqlite Êı¾İ¿â³ÌĞò
--    2.63 ssl_aio_client: SSL ·Ç×èÈûÍøÂç¿Í»§¶Ë³ÌĞò
--    2.64 ssl_clinet: SSL ×èÈûÍøÂç¿Í»§¶Ë³ÌĞò
--    2.65 string: ¶¯Ì¬»º³åÇø´¦Àí³ÌĞò
--    2.66 string2: ¶¯Ì¬»º³åÇø´¦Àí³ÌĞò
--    2.67 thread: ¶àÏß³Ì³ÌĞò
--    2.68 thread_client: ¶àÏß³Ì¿Í»§¶Ë³ÌĞò
--    2.69 thread_pool: Ïß³Ì³Ø³ÌĞò
--    2.70 udp_client: UDP Í¨ĞÅ¿Í»§¶Ë³ÌĞò
--    2.71 url_coder: URL ±à¡¢½âÂë³ÌĞò
--    2.72 win_dbservice: »ùÓÚ WIN32 Í¼ĞÎ½çÃæµÄÊı¾İ¿â´¦Àí³ÌĞò
--    2.73 winaio: »ùÓÚ WIN32 Í¼ĞÎ½çÃæµÄ·Ç×èÈû¿Í»§¶Ë³ÌĞò
--    2.74 xml: XML ¶ÔÏó½âÎö´¦Àí³ÌĞò
--    2.75 zlib: Ñ¹Ëõ¸ñÊ½´¦Àí³ÌĞò
--    2.75 redis/redis_connection: redis Connection ¿Í»§¶Ë³ÌĞò
--    2.76 redis/redis_hash: redis ¹şÏ£±íÀà¿Í»§¶Ë³ÌĞò
--    2.77 redis/redis_hyperloglog: redis hyperloglog ¿Í»§¶Ë³ÌĞò
--    2.78 redis/redis_key: redis ¼üÀà¿Í»§¶Ë³ÌĞò
--    2.79 redis/redis_list: redis ÁĞ±í¿Í»§¶Ë³ÌĞò
--    2.80 redis/redis_manager: redis Á¬½Ó³Ø¼¯Èº¹ÜÀí¿Í»§¶Ë³ÌĞò
--    2.81 redis/redis_pool: redis Á¬½Ó³Ø¿Í»§¶Ë³ÌĞò
--    2.82 redis/redis_pubsub: redis ·¢²¼¶©ÔÄ¿Í»§¶Ë³ÌĞò
--    2.83 redis/redis_server: redis ·şÎñÆ÷¹ÜÀíµÄ¿Í»§¶Ë³ÌĞò
--    2.84 redis/redis_set: redis ¼¯ºÏ¿Í»§¶Ë³ÌĞò
--    2.85 redis/redis_string: redis ×Ö·û´®¿Í»§¶Ë³ÌĞò
--    2.86 redis/redis_trans: redis ÊÂÎñ¿Í»§¶Ë³ÌĞò
--    2.87 redis/redis_zset: redis ÓĞĞò¼¯¿Í»§¶Ë³ÌĞò
--    2.88 redis/redis_zset_pool: redis ÓĞĞò¼¯¿Í»§¶Ë³ÌĞò£¬Ê¹ÓÃÓĞĞò¼¯¶ÔÏó´æ´¢´óÊı¾İ¿é£¬Ö§³ÖÁ¬½Ó³Ø·½Ê½
+### 2ã€acl/lib_acl_cpp/samplesï¼šè¯¥ç›®å½•ä¸‹çš„ä¾‹å­åŸºæœ¬æ˜¯åŸºäº lib_acl_cpp åº“å†™çš„ C++ ä¾‹å­
+-    2.1 aio/aio_client: éé˜»å¡ç½‘ç»œå®¢æˆ·ç«¯ç¨‹åº
+-    2.2 aio/aio_dns: éé˜»å¡åŸŸåè§£æå®¢æˆ·ç«¯ç¨‹åº
+-    2.3 aio/aio_echo: éé˜»å¡å›æ˜¾æœåŠ¡å™¨ç¨‹åº
+-    2.4 aio/aio_ipc: é˜»å¡/éé˜»å¡æ•´åˆçš„ç½‘ç»œç¨‹åº
+-    2.5 aio/aio_server: éé˜»å¡æœåŠ¡å™¨ç¨‹åº
+-    2.6 beanstalk: é˜Ÿåˆ—åº”ç”¨ beanstalkd çš„å®¢æˆ·ç«¯ç¨‹åº
+-    2.7 benchmark: ä¸æ€§èƒ½æµ‹è¯•ç›¸å…³çš„ç¨‹åºé›†
+-    2.8 cgi: ç®€å•çš„ WEB CGI ç¨‹åº
+-    2.9 cgi_upload: æ¥æ”¶ä¸Šä¼ æ–‡ä»¶çš„ CGI ç¨‹åº
+-    2.10 charset: å­—ç¬¦é›†è½¬æ¢ç¨‹åº
+-    2.11 check_trigger: æ£€æµ‹è¿œç¨‹ HTTP æœåŠ¡å™¨çŠ¶æ€çš„è§¦å‘å™¨ç¨‹åº
+-    2.12 connect_manager: å®¢æˆ·ç«¯è¿æ¥æ± é›†ç¾¤ç®¡ç†ç¨‹åº
+-    2.13 db_service: ä¸æ•°æ®åº“ç›¸å…³çš„ç¨‹åº
+-    2.14 dbpool: ä½¿ç”¨æ•°æ®åº“å®¢æˆ·ç«¯è¿æ¥æ± çš„ç¨‹åº
+-    2.15 dircopy: ç›®å½•æ–‡ä»¶æ‹·è´ç¨‹åº
+-    2.16 final_class: ç¦æ­¢ç»§æ‰¿ç±»ç¨‹åº
+-    2.17 flock: æ–‡ä»¶é”å¤„ç†ç¨‹åº
+-    2.18 fs_benchmark: æ–‡ä»¶ç³»ç»Ÿå‹åŠ›æµ‹è¯•ç¨‹åº
+-    2.19 fstream: æ–‡ä»¶æµç¨‹åº
+-    2.20 gui_rpc: WIN32 ä¸‹é˜»å¡è¿‡ç¨‹ä¸ WIN32 ç•Œé¢çš„æ¶ˆæ¯æ•´åˆçš„ä¾‹å­
+-    2.21 hsclient: handle-socket å®¢æˆ·ç«¯ç¨‹åº
+-    2.22 http_client: HTTP å®¢æˆ·ç«¯ç¨‹åº
+-    2.23 http_client2: HTTP å®¢æˆ·ç«¯ç¨‹åº
+-    2.24 http_mime: HTTP åè®®çš„ MIME æ ¼å¼å¤„ç†ç¨‹åº
+-    2.25 htttp/http_request: ä½¿ç”¨ http_request ç±»çš„ HTTP å®¢æˆ·ç«¯ç¨‹åº
+-    2.26 http_request_manager: HTTP å®¢æˆ·ç«¯è¿æ¥æ± é›†ç¾¤ç¨‹åº
+-    2.27 http_request_pool: HTTP å®¢æˆ·ç«¯è¿æ¥æ± ç¨‹åº
+-    2.28 http_request2: ä½¿ç”¨ http_request ç±»çš„ HTTP å®¢æˆ·ç«¯ç¨‹åº
+-    2.29 http/http_response: ä½¿ç”¨ http_reponse ç±»å“åº” HTTP å®¢æˆ·ç«¯è¯·æ±‚çš„ç¨‹åº
+-    2.30 http_server: ç®€å•çš„ HTTP æœåŠ¡å™¨ç¨‹åº
+-    2.31 http_servlet: ç±»ä¼¼äº JAVA HttpServlet çš„ç¨‹åº
+-    2.32 http_servlet2: ç±»ä¼¼äº JAVA HttpServlet çš„ç¨‹åº
+-    2.33 HttpClient: ç®€å•çš„ HTTP å®¢æˆ·ç«¯ç¨‹åº
+-    2.34 json/json0 - json7: json å­—ç¬¦ä¸²å¯¹è±¡è§£æç¨‹åº
+-    2.35 logger: æ—¥å¿—ç¨‹åº
+-    2.36 master/master_aio: éé˜»å¡æœåŠ¡å™¨ç¨‹åº
+-    2.37 master_aio_proxy: éé˜»å¡ TCP ä»£ç†æœåŠ¡å™¨ç¨‹åº
+-    2.38 master/master_http_aio: ç®€å•çš„éé˜»å¡ HTTP æœåŠ¡å™¨ç¨‹åº
+-    2.39 master/master_http_rpc: é˜»å¡/éé˜»å¡æ•´åˆçš„ HTTP æœåŠ¡å™¨ç¨‹åº
+-    2.40 master/master_http_threads: å¤šçº¿ç¨‹ HTTP æœåŠ¡å™¨ç¨‹åº
+-    2.40 master/master_http_threads2: å¤šçº¿ç¨‹ HTTP æœåŠ¡å™¨ç¨‹åº
+-    2.41 master/maser_proc: è¿›ç¨‹æ± æœåŠ¡å™¨ç¨‹åº
+-    2.42 master/master_threads: å¤šçº¿ç¨‹æœåŠ¡å™¨ç¨‹åº
+-    2.43 master/master_trigger: è§¦å‘å™¨æœåŠ¡å™¨ç¨‹åº
+-    2.44 master/master_udp: UDP é€šä¿¡æœåŠ¡å™¨ç¨‹åº
+-    2.45 master/master_udp_threads: å¤šçº¿ç¨‹ UDP é€šä¿¡æœåŠ¡å™¨ç¨‹åº
+-    2.46 md5: md5 å¤„ç†ç¨‹åº
+-    2.47 mem_cache: memcached å®¢æˆ·ç«¯ç¨‹åº
+-    2.47 memcache_pool: memcached æ”¯æŒè¿æ¥æ± çš„å®¢æˆ·ç«¯ç¨‹åº
+-    2.48 mime: é‚®ä»¶ MIME è§£æå¤„ç†ç¨‹åº
+-    2.49 mime_base64: MIME BASE64 æ ¼å¼å¤„ç†ç¨‹åº
+-    2.50 mime_qp: MIME QP æ ¼å¼å¤„ç†ç¨‹åº
+-    2.51 mime_xxcode: MIME XXCODE æ ¼å¼å¤„ç†ç¨‹åº
+-    2.52 mysql: mysql å®¢æˆ·ç«¯ç¨‹åº
+-    2.53 mysql2: mysql å®¢æˆ·ç«¯ç¨‹åº
+-    2.54 rfc822: é‚®ä»¶çš„ RFC822 åè®®å¤„ç†ç¨‹åº
+-    2.55 rfc2047: é‚®ä»¶çš„ RFC2047 åè®®å¤„ç†ç¨‹åº
+-    2.56 rpc_download: é‡‡ç”¨é˜»å¡/éé˜»å¡æ•´åˆæ–¹å¼è¿›è¡Œ HTTP ä¸‹è½½çš„ç¨‹åº
+-    2.57 scan_dir: ç›®å½•é€’å½’æ‰«æç¨‹åº
+-    2.58 singleton: å•ä¾‹ç¨‹åº
+-    2.59 session: ä¼šè¯ç¨‹åº
+-    2.60 socket_client: ç½‘ç»œå®¢æˆ·ç«¯ç¨‹åº
+-    2.61 socket_stream: ç½‘ç»œæµå¤„ç†ç¨‹åº
+-    2.62 sqlite: sqlite æ•°æ®åº“ç¨‹åº
+-    2.63 ssl_aio_client: SSL éé˜»å¡ç½‘ç»œå®¢æˆ·ç«¯ç¨‹åº
+-    2.64 ssl_clinet: SSL é˜»å¡ç½‘ç»œå®¢æˆ·ç«¯ç¨‹åº
+-    2.65 string: åŠ¨æ€ç¼“å†²åŒºå¤„ç†ç¨‹åº
+-    2.66 string2: åŠ¨æ€ç¼“å†²åŒºå¤„ç†ç¨‹åº
+-    2.67 thread: å¤šçº¿ç¨‹ç¨‹åº
+-    2.68 thread_client: å¤šçº¿ç¨‹å®¢æˆ·ç«¯ç¨‹åº
+-    2.69 thread_pool: çº¿ç¨‹æ± ç¨‹åº
+-    2.70 udp_client: UDP é€šä¿¡å®¢æˆ·ç«¯ç¨‹åº
+-    2.71 url_coder: URL ç¼–ã€è§£ç ç¨‹åº
+-    2.72 win_dbservice: åŸºäº WIN32 å›¾å½¢ç•Œé¢çš„æ•°æ®åº“å¤„ç†ç¨‹åº
+-    2.73 winaio: åŸºäº WIN32 å›¾å½¢ç•Œé¢çš„éé˜»å¡å®¢æˆ·ç«¯ç¨‹åº
+-    2.74 xml: XML å¯¹è±¡è§£æå¤„ç†ç¨‹åº
+-    2.75 zlib: å‹ç¼©æ ¼å¼å¤„ç†ç¨‹åº
+-    2.75 redis/redis_connection: redis Connection å®¢æˆ·ç«¯ç¨‹åº
+-    2.76 redis/redis_hash: redis å“ˆå¸Œè¡¨ç±»å®¢æˆ·ç«¯ç¨‹åº
+-    2.77 redis/redis_hyperloglog: redis hyperloglog å®¢æˆ·ç«¯ç¨‹åº
+-    2.78 redis/redis_key: redis é”®ç±»å®¢æˆ·ç«¯ç¨‹åº
+-    2.79 redis/redis_list: redis åˆ—è¡¨å®¢æˆ·ç«¯ç¨‹åº
+-    2.80 redis/redis_manager: redis è¿æ¥æ± é›†ç¾¤ç®¡ç†å®¢æˆ·ç«¯ç¨‹åº
+-    2.81 redis/redis_pool: redis è¿æ¥æ± å®¢æˆ·ç«¯ç¨‹åº
+-    2.82 redis/redis_pubsub: redis å‘å¸ƒè®¢é˜…å®¢æˆ·ç«¯ç¨‹åº
+-    2.83 redis/redis_server: redis æœåŠ¡å™¨ç®¡ç†çš„å®¢æˆ·ç«¯ç¨‹åº
+-    2.84 redis/redis_set: redis é›†åˆå®¢æˆ·ç«¯ç¨‹åº
+-    2.85 redis/redis_string: redis å­—ç¬¦ä¸²å®¢æˆ·ç«¯ç¨‹åº
+-    2.86 redis/redis_trans: redis äº‹åŠ¡å®¢æˆ·ç«¯ç¨‹åº
+-    2.87 redis/redis_zset: redis æœ‰åºé›†å®¢æˆ·ç«¯ç¨‹åº
+-    2.88 redis/redis_zset_pool: redis æœ‰åºé›†å®¢æˆ·ç«¯ç¨‹åºï¼Œä½¿ç”¨æœ‰åºé›†å¯¹è±¡å­˜å‚¨å¤§æ•°æ®å—ï¼Œæ”¯æŒè¿æ¥æ± æ–¹å¼
 
-### 3¡¢acl/app£º¸ÃÄ¿Â¼ÏÂµÄÀı×ÓÖ÷ÒªÊÇÒ»Ğ©±È½ÏÊµÓÃµÄÀı×Ó
--    **3.1 wizard: ÓÃÀ´Éú³É»ùÓÚ acl ·şÎñÆ÷¿ò¼ÜµÄ³ÌĞòÄ£°åµÄ³ÌĞò**
--    3.2 gid: ÓÃÀ´²úÉúÈ«¾ÖÎ¨Ò» ID ºÅµÄ·şÎñ³ÌĞò£¨º¬¿Í»§¶Ë¿â£©
--    3.3 net_tools: ÓÃÀ´²âÊÔÍøÂç×´Ì¬µÄ³ÌĞò
--    3.4 master_dispatch: ¶Ôºó¶Ë·şÎñÆ÷·ÖÅä TCP Á¬½ÓµÄÁ¬½Ó¾ùºâ³ÌĞò
--    3.5 jaws£¨Ä¿Ç°²»¿ÉÓÃ£©£º»ùÓÚ acl µÄ·Ç×èÈûÍ¨ĞÅÄ£¿éºÍ HTTP Ä£¿éĞ´µÄÒ»¸ö¼òÒ×µÄ HTTP ¸ß²¢·¢·şÎñÆ÷³ÌĞò
+### 3ã€acl/appï¼šè¯¥ç›®å½•ä¸‹çš„ä¾‹å­ä¸»è¦æ˜¯ä¸€äº›æ¯”è¾ƒå®ç”¨çš„ä¾‹å­
+-    **3.1 wizard: ç”¨æ¥ç”ŸæˆåŸºäº acl æœåŠ¡å™¨æ¡†æ¶çš„ç¨‹åºæ¨¡æ¿çš„ç¨‹åº**
+-    3.2 gid: ç”¨æ¥äº§ç”Ÿå…¨å±€å”¯ä¸€ ID å·çš„æœåŠ¡ç¨‹åºï¼ˆå«å®¢æˆ·ç«¯åº“ï¼‰
+-    3.3 net_tools: ç”¨æ¥æµ‹è¯•ç½‘ç»œçŠ¶æ€çš„ç¨‹åº
+-    3.4 master_dispatch: å¯¹åç«¯æœåŠ¡å™¨åˆ†é… TCP è¿æ¥çš„è¿æ¥å‡è¡¡ç¨‹åº
+-    3.5 jawsï¼ˆç›®å‰ä¸å¯ç”¨ï¼‰ï¼šåŸºäº acl çš„éé˜»å¡é€šä¿¡æ¨¡å—å’Œ HTTP æ¨¡å—å†™çš„ä¸€ä¸ªç®€æ˜“çš„ HTTP é«˜å¹¶å‘æœåŠ¡å™¨ç¨‹åº
