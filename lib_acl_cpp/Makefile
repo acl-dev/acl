@@ -54,10 +54,6 @@ ifeq ($(findstring g++, $(CC)), g++)
 	ifeq ($(GCC_VER), true)
 		CFLAGS += -Wno-implicit-fallthrough
 	endif
-	GCC_VER:=$(shell [ $(GCC_MAJOR) -lt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -ge 1 \) ] && echo true)
-	ifeq ($(GCC_VER), true)
-		CFLAGS += -DGCC_LOW
-	endif
 endif
 
 ifeq ($(AR),)
