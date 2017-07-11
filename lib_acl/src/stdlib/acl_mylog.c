@@ -119,7 +119,7 @@ static void init_log_mutex(acl_pthread_mutex_t *lock)
 	pthread_mutexattr_t attr;
 
 	n1 = pthread_mutexattr_init(&attr);
-	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
 	thread_mutex_init(lock, !n1 && !n2 ? &attr : NULL);
 #else
 	thread_mutex_init(lock, NULL);
