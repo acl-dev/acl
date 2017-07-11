@@ -12,6 +12,8 @@ if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	set(UNIX_OS true)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
 	set(UNIX_OS true)
+elseif (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+	set(UNIX_OS true)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	set(UNIX_OS true)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
@@ -48,6 +50,7 @@ endforeach()
 if (${UNIX_OS})
 	add_definitions(
 		"-W"
+		"-O2"
 		"-fPIC"
 		"-Wall"
 		"-Werror"
@@ -62,9 +65,12 @@ if (${UNIX_OS})
 		"-Wuninitialized"
 		"-D_POSIX_PTHREAD_SEMANTICS"
 		"-DACL_PREPARE_COMPILE"
-		"-Wno-invalid-source-encoding"
 		"-Wstrict-prototypes"
 		)
+
+	if (!CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+		add_definitions("-Wno-invalid-source-encoding")
+	endif()
 
 	if (CMAKE_BUILD_TYPE STREQUAL "")
 		set(CMAKE_BUILD_TYPE "DEBUG")

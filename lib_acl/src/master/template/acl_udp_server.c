@@ -169,7 +169,7 @@ static ACL_ATOMIC_CLOCK *__clock = NULL;
 
 ACL_EVENT *acl_udp_server_event(void)
 {
-	if (acl_pthread_self() == acl_main_thread_self()) {
+	if ((unsigned long long) acl_pthread_self() == acl_main_thread_self()) {
 		acl_assert(__main_event);
 		return __main_event;
 	} else {

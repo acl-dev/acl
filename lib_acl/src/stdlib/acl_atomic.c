@@ -121,7 +121,7 @@ void acl_atomic_int64_set(ACL_ATOMIC *self, long long n)
 {
 #ifndef HAS_ATOMIC
 	acl_pthread_mutex_lock(&self->lock);
-	*self->value = n;
+	*((long long *) self->value) = n;
 	acl_pthread_mutex_unlock(&self->lock);
 #elif	defined(ACL_WINDOWS)
 	InterlockedExchangePointer((volatile PVOID*) self->value, n);
