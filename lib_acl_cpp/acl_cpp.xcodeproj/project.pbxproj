@@ -20,6 +20,7 @@
 		0778DAE31F1CB70A0011B753 /* atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAE21F1CB70A0011B753 /* atomic.cpp */; };
 		0778DAE61F1CB7150011B753 /* thread_cond.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAE41F1CB7150011B753 /* thread_cond.cpp */; };
 		0778DAE71F1CB7150011B753 /* thread_mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAE51F1CB7150011B753 /* thread_mutex.cpp */; };
+		0778DAEA1F1CB8EB0011B753 /* bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAE91F1CB8EB0011B753 /* bitmap.cpp */; };
 		07A458351E6FCCB4002C9B3C /* acl_cpp.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 07A458341E6FCCB4002C9B3C /* acl_cpp.h */; };
 		07A458371E6FCCB4002C9B3C /* acl_cpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07A458361E6FCCB4002C9B3C /* acl_cpp.mm */; };
 		07A467C01E6FCCF1002C9B3C /* acl_cpp_init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A466DA1E6FCCF1002C9B3C /* acl_cpp_init.cpp */; };
@@ -247,6 +248,8 @@
 		0778DAE21F1CB70A0011B753 /* atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = atomic.cpp; sourceTree = "<group>"; };
 		0778DAE41F1CB7150011B753 /* thread_cond.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_cond.cpp; sourceTree = "<group>"; };
 		0778DAE51F1CB7150011B753 /* thread_mutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_mutex.cpp; sourceTree = "<group>"; };
+		0778DAE81F1CB8C90011B753 /* bitmap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = bitmap.hpp; sourceTree = "<group>"; };
+		0778DAE91F1CB8EB0011B753 /* bitmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap.cpp; sourceTree = "<group>"; };
 		07A458311E6FCCB4002C9B3C /* libacl_cpp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libacl_cpp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07A458341E6FCCB4002C9B3C /* acl_cpp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acl_cpp.h; sourceTree = "<group>"; };
 		07A458361E6FCCB4002C9B3C /* acl_cpp.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = acl_cpp.mm; sourceTree = "<group>"; };
@@ -1010,6 +1013,7 @@
 		07A4678C1E6FCCF1002C9B3C /* stdlib */ = {
 			isa = PBXGroup;
 			children = (
+				0778DAE91F1CB8EB0011B753 /* bitmap.cpp */,
 				0778DAE41F1CB7150011B753 /* thread_cond.cpp */,
 				0778DAE51F1CB7150011B753 /* thread_mutex.cpp */,
 				0778DAE21F1CB70A0011B753 /* atomic.cpp */,
@@ -1405,6 +1409,7 @@
 		07A469191E6FD404002C9B3C /* stdlib */ = {
 			isa = PBXGroup;
 			children = (
+				0778DAE81F1CB8C90011B753 /* bitmap.hpp */,
 				0778DAE11F1CB6D50011B753 /* thread_mutex.hpp */,
 				0778DAE01F1CB6CB0011B753 /* atomic.hpp */,
 				0778DADF1F1CB6BD0011B753 /* thread_cond.hpp */,
@@ -1671,6 +1676,7 @@
 				07A468221E6FCCF1002C9B3C /* mime_quoted_printable.cpp in Sources */,
 				07A468311E6FCCF1002C9B3C /* redis_hash.cpp in Sources */,
 				07A467C61E6FCCF1002C9B3C /* OSSObjectOperation.cpp in Sources */,
+				0778DAEA1F1CB8EB0011B753 /* bitmap.cpp in Sources */,
 				07A467C51E6FCCF1002C9B3C /* OSSMultipartOperation.cpp in Sources */,
 				07A4684C1E6FCCF1002C9B3C /* win_iconv.cpp in Sources */,
 				07A468131E6FCCF1002C9B3C /* quote_822_local.cpp in Sources */,
