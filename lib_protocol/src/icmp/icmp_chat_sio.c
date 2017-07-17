@@ -47,11 +47,11 @@ static void read_pkt(ICMP_HOST *host, ICMP_PKT *pkt_src)
 			continue;
 		if (chat->check_id && pkt.body.gid != chat->gid)
 		{
-			if (0)
-			printf("seq%d,src%d,chat%d,gid%d,chat%d,\r\n",
-				(int) pkt.hdr.seq, (int)pkt_src->hdr.seq,
-				(int) chat->seq,
-				(int) pkt.body.gid, (int) chat->gid);
+			//if (0)
+			//printf("seq%d,src%d,chat%d,gid%d,chat%d,\r\n",
+			//	(int) pkt.hdr.seq, (int)pkt_src->hdr.seq,
+			//	(int) chat->seq,
+			//	(int) pkt.body.gid, (int) chat->gid);
 			continue;
 		}
 		ptr = icmp_pkt_check(host, &pkt);
