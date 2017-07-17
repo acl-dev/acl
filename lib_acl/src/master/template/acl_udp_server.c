@@ -154,7 +154,7 @@ static ACL_MASTER_SERVER_ON_BIND_FN	__server_on_bind;
 
 static void *__thread_init_ctx = NULL;
 
-static __thread UDP_SERVER *__server = NULL;
+static UDP_SERVER *__server = NULL;
 static int   __event_mode;
 static int   __socket_count = 1;
 static UDP_SERVER *__servers = NULL;
@@ -195,6 +195,7 @@ void acl_udp_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg)
 	acl_event_cancel_timer(acl_udp_server_event(), timer_fn, arg);
 }
 
+/*
 static void server_stop(UDP_SERVER *server)
 {
 	int i;
@@ -223,6 +224,7 @@ static void servers_stop(void)
 
 	acl_msg_info("All servers closed now!");
 }
+ */
 
 /* udp_server_exit - normal termination */
 
@@ -240,8 +242,8 @@ static void udp_server_exit(void)
 	if (acl_var_udp_procname)
 		acl_myfree(acl_var_udp_procname);
 
-	if (0)
-		servers_stop();
+	//if (0)
+	//	servers_stop();
 
 	if (__main_event)
 		acl_event_free(__main_event);
