@@ -23,7 +23,7 @@
         * [1.2.6、Redis 客户端库](#126redis-客户端库)
         * [1.2.7、MIME 协议库](#127mime-协议库)
         * [1.2.8、网络协程库](#128网络协程库)
-        * [1.2.9、数据库操作库](129数据库操作库)
+        * [1.2.9、数据库相关](129数据库相关)
         * [1.2.10、数字键的 K-V 磁盘存储模块（zdb）](#1210数字键的-k-v-磁盘存储模块zdb)
         * [1.2.11、其它功能库](#1211其它功能库)
             * [1.2.11.1、常用数据结构模块](#12111常用数据结构模块)
@@ -43,8 +43,9 @@
     * [3.4、lib_fiber---网络协程库](#34lib_fiber)
     * [3.5、图例](#35图例)
     * [3.6、acl 库中有大量示例可供参考，请参考：SAMPLES.md](#36acl-库中有大量示例可供参考请参考samplesmd)
-* [四、使用许可](#四使用许可)
-* [五、其它](#五其它)
+* [四、谁在使用acl](#四谁在使用acl)
+* [五、使用许可](#五使用许可)
+* [六、参考](#六参考)
 
 <!-- vim-markdown-toc -->
 
@@ -116,7 +117,7 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 #### 1.2.8、网络协程库
 直接 hook 系统底层 IO API，与 epoll 配合实现网络 IO 的高并发、高性能编程框架，通过该模块可以使一些原生的常见阻塞式网络库（如 mysql/redis/http 等客户端库）直接支持高并发网络操作；通过使用该模块，编程者采用顺序思维编程方式，在协程库内部将阻塞模式转为非阻塞模式，因而大大提高了网络并发能力及处理性能。
 
-#### 1.2.9、数据库操作库
+#### 1.2.9、数据库相关
 设计了统一的数据库操作接口及连接池处理方式，目前支持 sqlite/mysql/postgresql。
 
 #### 1.2.10、数字键的 K-V 磁盘存储模块（zdb）
@@ -237,10 +238,15 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 
 ### 3.6、acl 库中有大量示例可供参考，请参考：[SAMPLES.md](SAMPLES.md)
 
-## 四、使用许可
-- LGPL-v3 license (see LICENSE.txt in the acl project)
+## 四、谁在使用acl
+[http://www.iqiyi.com/](res/logo/logo_iqiyi.png)
+[http://www.263.net/](res/logo/logo_263.png)
+[http://www.hexun.com/](res/logo/logo_hexun.png)
+[https://www.weibangong.com/](res/logo/logo_weibangong.png)
 
-## 五、其它
+## 五、使用许可
+- LGPL-v3 license (see LICENSE.txt in the acl project)
+## 六、参考
 - WEB 站点: http://www.iteye.com
 - Download: https://sourceforge.net/projects/acl
 - 微 博：http://weibo.com/zsxxsz

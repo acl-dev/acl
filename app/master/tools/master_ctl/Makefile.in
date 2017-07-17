@@ -107,7 +107,6 @@ $(shell mkdir -p $(OBJ_PATH))
 
 #Project's objs
 SRC = $(wildcard *.cpp) $(wildcard $(JSON_PATH)/*.cpp)
-      $(wildcard json/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 
 $(OBJ_PATH)/%.o: %.cpp
