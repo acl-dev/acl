@@ -17,6 +17,9 @@
 		0778DADC1F1CB2AB0011B753 /* tcp_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAD61F1CB2AB0011B753 /* tcp_pool.cpp */; };
 		0778DADD1F1CB2AB0011B753 /* tcp_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAD71F1CB2AB0011B753 /* tcp_reader.cpp */; };
 		0778DADE1F1CB2AB0011B753 /* tcp_sender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAD81F1CB2AB0011B753 /* tcp_sender.cpp */; };
+		0778DAE31F1CB70A0011B753 /* atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAE21F1CB70A0011B753 /* atomic.cpp */; };
+		0778DAE61F1CB7150011B753 /* thread_cond.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAE41F1CB7150011B753 /* thread_cond.cpp */; };
+		0778DAE71F1CB7150011B753 /* thread_mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAE51F1CB7150011B753 /* thread_mutex.cpp */; };
 		07A458351E6FCCB4002C9B3C /* acl_cpp.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 07A458341E6FCCB4002C9B3C /* acl_cpp.h */; };
 		07A458371E6FCCB4002C9B3C /* acl_cpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07A458361E6FCCB4002C9B3C /* acl_cpp.mm */; };
 		07A467C01E6FCCF1002C9B3C /* acl_cpp_init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A466DA1E6FCCF1002C9B3C /* acl_cpp_init.cpp */; };
@@ -238,6 +241,12 @@
 		0778DAD61F1CB2AB0011B753 /* tcp_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcp_pool.cpp; sourceTree = "<group>"; };
 		0778DAD71F1CB2AB0011B753 /* tcp_reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcp_reader.cpp; sourceTree = "<group>"; };
 		0778DAD81F1CB2AB0011B753 /* tcp_sender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcp_sender.cpp; sourceTree = "<group>"; };
+		0778DADF1F1CB6BD0011B753 /* thread_cond.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = thread_cond.hpp; sourceTree = "<group>"; };
+		0778DAE01F1CB6CB0011B753 /* atomic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = atomic.hpp; sourceTree = "<group>"; };
+		0778DAE11F1CB6D50011B753 /* thread_mutex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = thread_mutex.hpp; sourceTree = "<group>"; };
+		0778DAE21F1CB70A0011B753 /* atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = atomic.cpp; sourceTree = "<group>"; };
+		0778DAE41F1CB7150011B753 /* thread_cond.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_cond.cpp; sourceTree = "<group>"; };
+		0778DAE51F1CB7150011B753 /* thread_mutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_mutex.cpp; sourceTree = "<group>"; };
 		07A458311E6FCCB4002C9B3C /* libacl_cpp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libacl_cpp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07A458341E6FCCB4002C9B3C /* acl_cpp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acl_cpp.h; sourceTree = "<group>"; };
 		07A458361E6FCCB4002C9B3C /* acl_cpp.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = acl_cpp.mm; sourceTree = "<group>"; };
@@ -1001,6 +1010,9 @@
 		07A4678C1E6FCCF1002C9B3C /* stdlib */ = {
 			isa = PBXGroup;
 			children = (
+				0778DAE41F1CB7150011B753 /* thread_cond.cpp */,
+				0778DAE51F1CB7150011B753 /* thread_mutex.cpp */,
+				0778DAE21F1CB70A0011B753 /* atomic.cpp */,
 				07A4D1721E94E4BC00790E12 /* mbox.cpp */,
 				07A4678D1E6FCCF1002C9B3C /* charset_conv.cpp */,
 				07A4678E1E6FCCF1002C9B3C /* dbuf_pool.cpp */,
@@ -1393,6 +1405,9 @@
 		07A469191E6FD404002C9B3C /* stdlib */ = {
 			isa = PBXGroup;
 			children = (
+				0778DAE11F1CB6D50011B753 /* thread_mutex.hpp */,
+				0778DAE01F1CB6CB0011B753 /* atomic.hpp */,
+				0778DADF1F1CB6BD0011B753 /* thread_cond.hpp */,
 				07A4D1711E94E4A000790E12 /* mbox.hpp */,
 				07A4691A1E6FD404002C9B3C /* charset_conv.hpp */,
 				07A4691B1E6FD404002C9B3C /* dbuf_pool.hpp */,
@@ -1641,6 +1656,7 @@
 				07A468741E6FCCF1002C9B3C /* stdout_stream.cpp in Sources */,
 				07A468551E6FCCF1002C9B3C /* snprintf.cpp in Sources */,
 				07A4680E1E6FCCF1002C9B3C /* header_token.cpp in Sources */,
+				0778DAE61F1CB7150011B753 /* thread_cond.cpp in Sources */,
 				07A467FD1E6FCCF1002C9B3C /* HttpSession.cpp in Sources */,
 				07A468091E6FCCF1002C9B3C /* master_udp.cpp in Sources */,
 				07A4681A1E6FCCF1002C9B3C /* mime.cpp in Sources */,
@@ -1665,12 +1681,14 @@
 				07A468381E6FCCF1002C9B3C /* redis_result.cpp in Sources */,
 				07A467F51E6FCCF1002C9B3C /* http_request_pool.cpp in Sources */,
 				0778DADD1F1CB2AB0011B753 /* tcp_reader.cpp in Sources */,
+				0778DAE71F1CB7150011B753 /* thread_mutex.cpp in Sources */,
 				07A468691E6FCCF1002C9B3C /* aio_timer_delay_free.cpp in Sources */,
 				07A458371E6FCCB4002C9B3C /* acl_cpp.mm in Sources */,
 				07A468271E6FCCF1002C9B3C /* queue_file.cpp in Sources */,
 				07A4686F1E6FCCF1002C9B3C /* polarssl_conf.cpp in Sources */,
 				07A468461E6FCCF1002C9B3C /* mail_message.cpp in Sources */,
 				07A468431E6FCCF1002C9B3C /* session.cpp in Sources */,
+				0778DAE31F1CB70A0011B753 /* atomic.cpp in Sources */,
 				07A468651E6FCCF1002C9B3C /* aio_ostream.cpp in Sources */,
 				07A468081E6FCCF1002C9B3C /* master_trigger.cpp in Sources */,
 				07A468241E6FCCF1002C9B3C /* mime_xxcode.cpp in Sources */,
