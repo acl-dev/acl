@@ -27,6 +27,7 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 	info.name            = serv->name;
 	info.type            = serv->type;
 	info.path            = serv->path;
+	info.conf            = serv->conf;
 	info.proc_max        = serv->max_proc;
 	info.proc_prefork    = serv->prefork_proc;
 	info.proc_total      = serv->total_proc;

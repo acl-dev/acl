@@ -22,6 +22,7 @@ void service_list::add_one(list_res_t& res, const ACL_MASTER_SERV* serv)
 	info.name            = serv->name;
 	info.type            = serv->type;
 	info.path            = serv->path;
+	info.conf            = serv->conf;
 	info.proc_max        = serv->max_proc;
 	info.proc_prefork    = serv->prefork_proc;
 	info.proc_total      = serv->total_proc;

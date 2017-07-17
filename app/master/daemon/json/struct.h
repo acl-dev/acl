@@ -21,6 +21,7 @@ struct serv_info_t
 	// Gson@optional
 	acl::string owner;
 	acl::string path;
+	acl::string conf;
 	int proc_max;
 	int proc_prefork;
 	int proc_total;

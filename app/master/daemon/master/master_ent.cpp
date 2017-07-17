@@ -546,6 +546,9 @@ static void service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	/* add "-f configure_file_path" flag */
 	acl_argv_add(serv->args, "-f", path, (char *) 0);
 
+	/* copy the configure filepath */
+	serv->conf = acl_mystrdup(path);
+
 	/*
 	if (serv->max_proc == 1)
 		acl_argv_add(serv->args, "-l", (char *) 0);
@@ -778,6 +781,7 @@ void acl_master_ent_free(ACL_MASTER_SERV *serv)
 
 	acl_myfree(serv->name);
 	acl_myfree(serv->path);
+	acl_myfree(serv->conf);
 	if (serv->owner)
 		acl_myfree(serv->owner);
 	if (serv->notify_addr)

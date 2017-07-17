@@ -1,4 +1,7 @@
 #include "stdafx.h"
+#include <readline/readline.h>
+#include <readline/history.h>
+#include "http_request.h"
 
 static void print_server(const serv_info_t& server)
 {
@@ -7,6 +10,7 @@ static void print_server(const serv_info_t& server)
 	printf("type: %d\r\n", server.type);
 	printf("owner: %s\r\n", server.owner.c_str());
 	printf("path: %s\r\n", server.path.c_str());
+	printf("conf: %s\r\n", server.conf.c_str());
 	printf("proc_max: %d\r\n", server.proc_max);
 	printf("proc_prefork: %d\r\n", server.proc_prefork);
 	printf("proc_total: %d\r\n", server.proc_total);
@@ -35,39 +39,6 @@ static void print_servers(const std::vector<serv_info_t>& servers)
 		print_server(*cit);
 		printf("-----------------------------------------------\r\n");
 	}
-}
-
-template<typename TReq, typename TRes>
-bool http_request(const char* addr, const char* cmd, TReq& req, TRes& res)
-{
-	acl::string body;
-	serialize<TReq>(req, body);
-
-	acl::http_request conn(addr, 30, 30);
-	acl::string url;
-	url.format("/?cmd=%s", cmd);
-	conn.request_header().set_url(url).set_keep_alive(false);
-	if (conn.request(body, body.size()) == false)
-	{
-		printf("request error, json=[%s]\r\n", body.c_str());
-		return false;
-	}
-
-	acl::json json;
-	if (conn.get_body(json) == false)
-	{
-		printf("get_body error, json=[%s]\r\n", body.c_str());
-		return false;
-	}
-
-	if (deserialize<TRes>(json, res) == false)
-	{
-		printf("deserialize error, res json=[%s], req json=[%s]\r\n",
-			json.to_string().c_str(), body.c_str());
-		return false;
-	}
-
-	return true;
 }
 
 static bool do_list(const char* addr, const char*)
@@ -252,6 +223,90 @@ static bool do_reload(const char* addr, const char* filepath)
 	return true;
 }
 
+static void getline(acl::string& out)
+{
+	const char* prompt = "master_ctl> ";
+	char* ptr = readline(prompt);
+	if (ptr == NULL)
+	{
+		printf("Bye!\r\n");
+		exit(0);
+	}
+	out = ptr;
+	out.trim_right_line();
+	if (!out.empty() && !out.equal("y", false) && !out.equal("n", false))
+		add_history(out.c_str());
+}
+
+static void help(void)
+{
+}
+
+static struct {
+	const char* cmd;
+	bool (*func)(const char*, const char*);
+} ACTIONS[] = {
+	{ "list",	do_list		},
+	{ "stat",	do_stat		},
+	{ "start",	do_start	},
+	{ "stop",	do_stop		},
+	{ "kill",	do_kill		},
+	{ "reload",	do_reload	},
+
+	{ 0,		0		},
+};
+
+static void run(const char* addr, const char* filepath)
+{
+	acl::string buf, fpath;
+
+	if (filepath && *filepath)
+		fpath = filepath;
+
+	while (true)
+	{
+		getline(buf);
+		if (buf.equal("quit" ,false) || buf.equal("exit", false)
+			|| buf.equal("q", false))
+		{
+			printf("Bye!\r\n");
+			break;
+		}
+		if (buf.empty() || buf.equal("help", false))
+		{
+			help();
+			continue;
+		}
+
+		std::vector<acl::string>& tokens = buf.split2(" \t", true);
+		acl::string cmd = tokens[0];
+		cmd.lower();
+
+		if (cmd == "set" && tokens.size() >= 2)
+		{
+			fpath = tokens[1];
+			printf("set service to %s ok\r\n", fpath.c_str());
+			continue;
+		}
+
+		bool ret = false;
+		int  i;
+		for (i = 0; ACTIONS[i].cmd; i++)
+		{
+			if (cmd == ACTIONS[i].cmd)
+			{
+				ret = ACTIONS[i].func(addr, fpath);
+				break;
+			}
+		}
+
+		if (ACTIONS[i].cmd == NULL)
+			help();
+		else
+			printf("%s: %s\r\n", cmd.c_str(), ret ? "ok" : "err");
+	}
+}
+
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
@@ -263,7 +318,7 @@ static void usage(const char* procname)
 
 int main(int argc, char* argv[])
 {
-	acl::string filepath, action("list"), addr("127.0.0.1:8190");
+	acl::string filepath, action, addr("127.0.0.1:8190");
 	int  ch;
 
 	while ((ch = getopt(argc, argv, "hs:f:a:")) > 0)
@@ -289,30 +344,21 @@ int main(int argc, char* argv[])
 	}
 
 	action.lower();
-	bool ret;
 
         acl::log::stdout_open(true);
 
-	if (action == "list")
-		ret = do_list(addr, filepath);
-	else if (action == "stat")
-		ret = do_stat(addr, filepath);
-	else if (action == "start")
-		ret = do_start(addr, filepath);
-	else if (action == "stop")
-		ret = do_stop(addr, filepath);
-	else if (action == "kill")
-		ret = do_kill(addr, filepath);
-	else if (action == "reload")
-		ret = do_reload(addr, filepath);
-	else
+	int i;
+	for (i = 0; ACTIONS[i].cmd; i++)
 	{
-		printf("unknown action: %s\r\n", action.c_str());
-		usage(argv[0]);
-		return 1;
+		if (action == ACTIONS[i].cmd)
+		{
+			(void) ACTIONS[i].func(addr, filepath);
+			break;
+		}
 	}
 
-	printf("----action: %s, result: %s----\r\n", action.c_str(),
-		ret ? "ok" : "error");
+	if (ACTIONS[i].cmd == NULL)
+		run(addr, filepath);
+
 	return 0;
 }

@@ -36,6 +36,7 @@ typedef struct ACL_MASTER_SERV {
 	int     max_proc;		/* upper bound on # processes */
 	int     prefork_proc;		/* prefork processes */
 	char   *path;			/* command pathname */
+	char   *conf;			/* service configure filepath */
 	char   *notify_addr;		/* warning address when not null */
 	char   *notify_recipients;	/* users warned to */
 	int     avail_proc;		/* idle processes */
@@ -47,9 +48,6 @@ typedef struct ACL_MASTER_SERV {
 	ACL_ARRAY    *children_env;	/* the env array of the children */
 	ACL_VSTREAM **listen_streams;	/* multi-listening stream */
 	ACL_VSTREAM  *status_reader;	/* status stream */
-#if 0
-	struct ACL_BINHASH *children;	/* linkage */
-#endif
 	ACL_RING      children;		/* linkage of children */
 	struct ACL_MASTER_SERV *next;	/* linkage of serv */
 } ACL_MASTER_SERV;

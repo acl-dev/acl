@@ -154,7 +154,8 @@ static ACL_MASTER_SERVER_ON_BIND_FN	__server_on_bind;
 
 static void *__thread_init_ctx = NULL;
 
-static UDP_SERVER *__server = NULL;
+static acl_pthread_key_t __server_key;
+
 static int   __event_mode;
 static int   __socket_count = 1;
 static UDP_SERVER *__servers = NULL;
@@ -173,8 +174,10 @@ ACL_EVENT *acl_udp_server_event(void)
 		acl_assert(__main_event);
 		return __main_event;
 	} else {
-		acl_assert(__server);
-		return __server->event;
+		UDP_SERVER *server = (UDP_SERVER *)
+			acl_pthread_getspecific(__server_key);
+		acl_assert(server);
+		return server->event;
 	}
 }
 
@@ -187,7 +190,10 @@ void acl_udp_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
 
 ACL_VSTREAM **acl_udp_server_streams()
 {
-	return __server ? __server->streams : NULL;
+	UDP_SERVER *server = (UDP_SERVER *)
+		acl_pthread_getspecific(__server_key);
+	acl_assert(server);
+	return server ? server->streams : NULL;
 }
 
 void acl_udp_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg)
@@ -224,7 +230,7 @@ static void servers_stop(void)
 
 	acl_msg_info("All servers closed now!");
 }
- */
+*/
 
 /* udp_server_exit - normal termination */
 
@@ -242,8 +248,8 @@ static void udp_server_exit(void)
 	if (acl_var_udp_procname)
 		acl_myfree(acl_var_udp_procname);
 
-	//if (0)
-	//	servers_stop();
+//	if (0)
+//		servers_stop();
 
 	if (__main_event)
 		acl_event_free(__main_event);
@@ -529,13 +535,14 @@ static UDP_SERVER *servers_create(const char *service, int nthreads)
 static void *thread_main(void *ctx)
 {
 	/* set thread local storage */
-	__server = (UDP_SERVER *) ctx;
+	UDP_SERVER *server = (UDP_SERVER *) ctx;
+	acl_pthread_setspecific(__server_key, server);
 
 	if (__thread_init)
 		__thread_init(__thread_init_ctx);
 
 	while (1)
-		acl_event_loop(__server->event);
+		acl_event_loop(server->event);
 
 	/* not reached here */
 	return NULL;
@@ -632,6 +639,12 @@ static void servers_start(UDP_SERVER *servers, int nthreads)
 	main_thread_loop();
 }
 
+static void thread_server_exit(void *ctx acl_unused)
+{
+	acl_msg_info("--thread-%lu exit now---",
+		(unsigned long) acl_pthread_self());
+}
+
 static void usage(int argc, char *argv[])
 {
 	if (argc <= 0)
@@ -654,6 +667,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	ACL_MASTER_SERVER_INIT_FN post_init = 0;
 	char   *root_dir = 0, *user_name = 0;
 	const char *conf_file_ptr = 0;
+	UDP_SERVER *server;
 	int     c, key;
 	va_list ap;
 
@@ -789,8 +803,12 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 
 	__servers = servers_create(service_name, acl_var_udp_threads);
 
+	/* 创建用于线程局部变量的键对象 */
+	acl_pthread_key_create(&__server_key, thread_server_exit);
+
 	/* 必须先设置主线程的对象，以便于应用能及时使用 */
-	__server = &__servers[acl_var_udp_threads - 1];
+	server = &__servers[acl_var_udp_threads - 1];
+	acl_pthread_setspecific(__server_key, server);
 
 	/* 切换用户运行身份前回调应用设置的回调函数 */
 	if (pre_init)
