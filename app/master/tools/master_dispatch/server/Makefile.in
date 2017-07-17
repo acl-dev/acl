@@ -25,11 +25,13 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	endif
 	CFLAGS += -DFREEBSD -D_REENTRANT
 	SYSLIB = -lcrypt -lpthread -lz -L/usr/local/lib -liconv
+	RPATH = freebsd
 endif
 
 # for MACOS
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	SYSLIB += -liconv
+	RPATH = macos
 endif
 
 #Path for Linux
@@ -51,6 +53,7 @@ ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	SYSLIB = -lpthread-2 -liconv -lz
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
+	RPATH = mingw
 endif
 
 # For MSYS
@@ -58,6 +61,7 @@ ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
 	SYSLIB = -lpthread-2 -liconv -lz
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
+	RPATH = msys
 endif
 
 #Path for SunOS
@@ -72,6 +76,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DSUNOS5 -D_REENTRANT
+	RPATH = sunos5_x86
 endif
 
 #Path for HP-UX
@@ -81,6 +86,7 @@ ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
 	endif
 	CFLAGS += -DHP_UX -DHPUX11
 	PLAT_NAME=hp-ux
+	RPATH =hpux
 endif
 
 #Find system type.

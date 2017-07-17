@@ -635,8 +635,10 @@ static void main_thread_loop(void)
 		}
 #endif
 	}
+    
+    /* not reached here */
 
-	acl_vstring_free(buf);
+	/* acl_vstring_free(buf); */
 }
 
 static void servers_start(UDP_SERVER *servers, int nthreads)

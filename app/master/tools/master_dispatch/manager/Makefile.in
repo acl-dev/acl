@@ -31,6 +31,7 @@ endif
 # for MACOS
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	SYSLIB += -liconv
+	RPATH = macos
 endif
 
 #Path for Linux
@@ -52,6 +53,7 @@ ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	SYSLIB = -lpthread-2 -liconv -lz
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
+	RPATH = mingw
 endif
 
 # For MSYS
@@ -59,6 +61,7 @@ ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
 	SYSLIB = -lpthread-2 -liconv -lz
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
+	RPATH = msys
 endif
 
 #Path for SunOS

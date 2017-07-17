@@ -1289,9 +1289,9 @@ static void run_loop(const char *procname)
 		}
 	}
 
-	acl_vstring_free(buf);
-
-	/* not reached here */
+    /* not reached here */
+    
+	/* acl_vstring_free(buf); */
 	/* aio_server_exit(); */
 }
 

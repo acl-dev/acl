@@ -1507,5 +1507,6 @@ void acl_threads_server_main(int argc, char * argv[],
 #endif
 	}
 
-	acl_vstring_free(buf);
+    /* not reached here */
+	/* acl_vstring_free(buf); */
 }
