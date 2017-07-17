@@ -240,12 +240,20 @@ static void getline(acl::string& out)
 
 static void help(void)
 {
+	printf("\033[1;33;40mset\033[0m: set the service's configure\r\n");
+	printf("\033[1;33;40mclear\033[0m: clear the screan\r\n");
+	printf("\033[1;33;40mlist\033[0m: list all the running services\r\n");
+	printf("\033[1;33;40mstat\033[0m: show one service's running status\r\n");
+	printf("\033[1;33;40mstart\033[0m: start one service\r\n");
+	printf("\033[1;33;40mstop\033[0m: stop one service\r\n");
+	printf("\033[1;33;40mkill\033[0m: kill one service\r\n");
+	printf("\033[1;33;40mreload\033[0m: reload one service\r\n");
 }
 
 static struct {
 	const char* cmd;
 	bool (*func)(const char*, const char*);
-} ACTIONS[] = {
+} __actions[] = {
 	{ "list",	do_list		},
 	{ "stat",	do_stat		},
 	{ "start",	do_start	},
@@ -282,25 +290,42 @@ static void run(const char* addr, const char* filepath)
 		acl::string cmd = tokens[0];
 		cmd.lower();
 
-		if (cmd == "set" && tokens.size() >= 2)
+		if (cmd == "clear")
 		{
+			rl_clear_screen(0, 0);
+			printf("\r\n");
+			continue;
+		}
+
+		if (cmd == "set")
+		{
+			if (tokens.size() == 1)
+			{
+				printf("\033[1;34;40musage\033[0m: "
+				  "\033[1;33;40mset\033[0m configure_path\r\n");
+				continue;
+			}
+
 			fpath = tokens[1];
 			printf("set service to %s ok\r\n", fpath.c_str());
 			continue;
 		}
 
+		if (tokens.size() >= 2)
+			fpath = tokens[1];
+
 		bool ret = false;
 		int  i;
-		for (i = 0; ACTIONS[i].cmd; i++)
+		for (i = 0; __actions[i].cmd; i++)
 		{
-			if (cmd == ACTIONS[i].cmd)
+			if (cmd == __actions[i].cmd)
 			{
-				ret = ACTIONS[i].func(addr, fpath);
+				ret = __actions[i].func(addr, fpath);
 				break;
 			}
 		}
 
-		if (ACTIONS[i].cmd == NULL)
+		if (__actions[i].cmd == NULL)
 			help();
 		else
 			printf("%s: %s\r\n", cmd.c_str(), ret ? "ok" : "err");
@@ -348,16 +373,16 @@ int main(int argc, char* argv[])
         acl::log::stdout_open(true);
 
 	int i;
-	for (i = 0; ACTIONS[i].cmd; i++)
+	for (i = 0; __actions[i].cmd; i++)
 	{
-		if (action == ACTIONS[i].cmd)
+		if (action == __actions[i].cmd)
 		{
-			(void) ACTIONS[i].func(addr, filepath);
+			(void) __actions[i].func(addr, filepath);
 			break;
 		}
 	}
 
-	if (ACTIONS[i].cmd == NULL)
+	if (__actions[i].cmd == NULL)
 		run(addr, filepath);
 
 	return 0;

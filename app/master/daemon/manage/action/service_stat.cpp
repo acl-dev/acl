@@ -21,6 +21,7 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 	if (serv == NULL)
 	{
 		info.status = 404;
+		info.conf   = path;
 		return false;
 	}
 

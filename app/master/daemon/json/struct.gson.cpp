@@ -375,8 +375,8 @@ namespace acl
         if(!msg ||!($result = gson(*msg, &$obj.msg), $result.first))
             return std::make_pair(false, "required [list_res_t.msg] failed:{"+$result.second+"}");
      
-        if(!data ||!data->get_obj()||!($result = gson(*data->get_obj(), &$obj.data), $result.first))
-            return std::make_pair(false, "required [list_res_t.data] failed:{"+$result.second+"}");
+        if(data&& data->get_obj())
+             gson(*data->get_obj(), &$obj.data);
      
         return std::make_pair(true,"");
     }
