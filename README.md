@@ -239,10 +239,10 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 ### 3.6、acl 库中有大量示例可供参考，请参考：[SAMPLES.md](SAMPLES.md)
 
 ## 四、谁在使用acl
-[http://www.iqiyi.com/](res/logo/logo_iqiyi.png)
-[http://www.263.net/](res/logo/logo_263.png)
-[http://www.hexun.com/](res/logo/logo_hexun.png)
-[https://www.weibangong.com/](res/logo/logo_weibangong.png)
+![http://www.iqiyi.com/](res/logo/logo_iqiyi.png)
+![http://www.263.net/](res/logo/logo_263.png)
+![http://www.hexun.com/](res/logo/logo_hexun.png)
+![https://www.weibangong.com/](res/logo/logo_weibangong.png)
 
 ## 五、使用许可
 - LGPL-v3 license (see LICENSE.txt in the acl project)
