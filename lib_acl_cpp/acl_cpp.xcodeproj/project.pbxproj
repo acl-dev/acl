@@ -11,6 +11,12 @@
 		07384F401EB99FFF00084CAD /* pgsql_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07384F3D1EB99FFF00084CAD /* pgsql_manager.cpp */; };
 		07384F411EB99FFF00084CAD /* pgsql_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07384F3E1EB99FFF00084CAD /* pgsql_pool.cpp */; };
 		07384F461EB9A57D00084CAD /* db_pgsql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07384F451EB9A57D00084CAD /* db_pgsql.cpp */; };
+		0778DAD91F1CB2AB0011B753 /* tcp_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAD31F1CB2AB0011B753 /* tcp_client.cpp */; };
+		0778DADA1F1CB2AB0011B753 /* tcp_ipc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAD41F1CB2AB0011B753 /* tcp_ipc.cpp */; };
+		0778DADB1F1CB2AB0011B753 /* tcp_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAD51F1CB2AB0011B753 /* tcp_manager.cpp */; };
+		0778DADC1F1CB2AB0011B753 /* tcp_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAD61F1CB2AB0011B753 /* tcp_pool.cpp */; };
+		0778DADD1F1CB2AB0011B753 /* tcp_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAD71F1CB2AB0011B753 /* tcp_reader.cpp */; };
+		0778DADE1F1CB2AB0011B753 /* tcp_sender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAD81F1CB2AB0011B753 /* tcp_sender.cpp */; };
 		07A458351E6FCCB4002C9B3C /* acl_cpp.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 07A458341E6FCCB4002C9B3C /* acl_cpp.h */; };
 		07A458371E6FCCB4002C9B3C /* acl_cpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07A458361E6FCCB4002C9B3C /* acl_cpp.mm */; };
 		07A467C01E6FCCF1002C9B3C /* acl_cpp_init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A466DA1E6FCCF1002C9B3C /* acl_cpp_init.cpp */; };
@@ -220,6 +226,18 @@
 		07384F3E1EB99FFF00084CAD /* pgsql_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pgsql_pool.cpp; sourceTree = "<group>"; };
 		07384F441EB9A2C100084CAD /* db_pgsql.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = db_pgsql.hpp; sourceTree = "<group>"; };
 		07384F451EB9A57D00084CAD /* db_pgsql.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = db_pgsql.cpp; sourceTree = "<group>"; };
+		0778DACD1F1CB2920011B753 /* tcp_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tcp_client.hpp; sourceTree = "<group>"; };
+		0778DACE1F1CB2920011B753 /* tcp_ipc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tcp_ipc.hpp; sourceTree = "<group>"; };
+		0778DACF1F1CB2920011B753 /* tcp_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tcp_manager.hpp; sourceTree = "<group>"; };
+		0778DAD01F1CB2920011B753 /* tcp_pool.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tcp_pool.hpp; sourceTree = "<group>"; };
+		0778DAD11F1CB2920011B753 /* tcp_reader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tcp_reader.hpp; sourceTree = "<group>"; };
+		0778DAD21F1CB2920011B753 /* tcp_sender.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tcp_sender.hpp; sourceTree = "<group>"; };
+		0778DAD31F1CB2AB0011B753 /* tcp_client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcp_client.cpp; sourceTree = "<group>"; };
+		0778DAD41F1CB2AB0011B753 /* tcp_ipc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcp_ipc.cpp; sourceTree = "<group>"; };
+		0778DAD51F1CB2AB0011B753 /* tcp_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcp_manager.cpp; sourceTree = "<group>"; };
+		0778DAD61F1CB2AB0011B753 /* tcp_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcp_pool.cpp; sourceTree = "<group>"; };
+		0778DAD71F1CB2AB0011B753 /* tcp_reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcp_reader.cpp; sourceTree = "<group>"; };
+		0778DAD81F1CB2AB0011B753 /* tcp_sender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcp_sender.cpp; sourceTree = "<group>"; };
 		07A458311E6FCCB4002C9B3C /* libacl_cpp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libacl_cpp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07A458341E6FCCB4002C9B3C /* acl_cpp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acl_cpp.h; sourceTree = "<group>"; };
 		07A458361E6FCCB4002C9B3C /* acl_cpp.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = acl_cpp.mm; sourceTree = "<group>"; };
@@ -738,6 +756,12 @@
 		07A466F61E6FCCF1002C9B3C /* connpool */ = {
 			isa = PBXGroup;
 			children = (
+				0778DAD31F1CB2AB0011B753 /* tcp_client.cpp */,
+				0778DAD41F1CB2AB0011B753 /* tcp_ipc.cpp */,
+				0778DAD51F1CB2AB0011B753 /* tcp_manager.cpp */,
+				0778DAD61F1CB2AB0011B753 /* tcp_pool.cpp */,
+				0778DAD71F1CB2AB0011B753 /* tcp_reader.cpp */,
+				0778DAD81F1CB2AB0011B753 /* tcp_sender.cpp */,
 				07A466F71E6FCCF1002C9B3C /* check_client.cpp */,
 				07A466F81E6FCCF1002C9B3C /* check_rpc.cpp */,
 				07A466F91E6FCCF1002C9B3C /* check_rpc.hpp */,
@@ -1145,6 +1169,12 @@
 		07A4689C1E6FD404002C9B3C /* connpool */ = {
 			isa = PBXGroup;
 			children = (
+				0778DACD1F1CB2920011B753 /* tcp_client.hpp */,
+				0778DACE1F1CB2920011B753 /* tcp_ipc.hpp */,
+				0778DACF1F1CB2920011B753 /* tcp_manager.hpp */,
+				0778DAD01F1CB2920011B753 /* tcp_pool.hpp */,
+				0778DAD11F1CB2920011B753 /* tcp_reader.hpp */,
+				0778DAD21F1CB2920011B753 /* tcp_sender.hpp */,
 				07A4689D1E6FD404002C9B3C /* check_client.hpp */,
 				07A4689E1E6FD404002C9B3C /* connect_client.hpp */,
 				07A4689F1E6FD404002C9B3C /* connect_manager.hpp */,
@@ -1536,6 +1566,7 @@
 				07A4685C1E6FCCF1002C9B3C /* xml.cpp in Sources */,
 				07A467F81E6FCCF1002C9B3C /* http_utils.cpp in Sources */,
 				07A468411E6FCCF1002C9B3C /* memcache_session.cpp in Sources */,
+				0778DADB1F1CB2AB0011B753 /* tcp_manager.cpp in Sources */,
 				07A4681B1E6FCCF1002C9B3C /* mime_attach.cpp in Sources */,
 				07A468191E6FCCF1002C9B3C /* trimblanks.cpp in Sources */,
 				07A467E11E6FCCF1002C9B3C /* sqlite_manager.cpp in Sources */,
@@ -1580,6 +1611,7 @@
 				07A467FA1E6FCCF1002C9B3C /* HttpServlet.cpp in Sources */,
 				07A468591E6FCCF1002C9B3C /* thread_queue.cpp in Sources */,
 				07A4686C1E6FCCF1002C9B3C /* istream.cpp in Sources */,
+				0778DADE1F1CB2AB0011B753 /* tcp_sender.cpp in Sources */,
 				07A467DE1E6FCCF1002C9B3C /* mysql_manager.cpp in Sources */,
 				07384F411EB99FFF00084CAD /* pgsql_pool.cpp in Sources */,
 				07A4682C1E6FCCF1002C9B3C /* redis_client_pool.cpp in Sources */,
@@ -1591,7 +1623,9 @@
 				07A468721E6FCCF1002C9B3C /* socket_stream.cpp in Sources */,
 				07A467CD1E6FCCF1002C9B3C /* OSSClient.cpp in Sources */,
 				07A468031E6FCCF1002C9B3C /* master_aio.cpp in Sources */,
+				0778DADA1F1CB2AB0011B753 /* tcp_ipc.cpp in Sources */,
 				07A467E61E6FCCF1002C9B3C /* event_timer.cpp in Sources */,
+				0778DADC1F1CB2AB0011B753 /* tcp_pool.cpp in Sources */,
 				07A468371E6FCCF1002C9B3C /* redis_request.cpp in Sources */,
 				07A4682D1E6FCCF1002C9B3C /* redis_cluster.cpp in Sources */,
 				07A4684B1E6FCCF1002C9B3C /* escape.cpp in Sources */,
@@ -1630,6 +1664,7 @@
 				07A468471E6FCCF1002C9B3C /* smtp_client.cpp in Sources */,
 				07A468381E6FCCF1002C9B3C /* redis_result.cpp in Sources */,
 				07A467F51E6FCCF1002C9B3C /* http_request_pool.cpp in Sources */,
+				0778DADD1F1CB2AB0011B753 /* tcp_reader.cpp in Sources */,
 				07A468691E6FCCF1002C9B3C /* aio_timer_delay_free.cpp in Sources */,
 				07A458371E6FCCB4002C9B3C /* acl_cpp.mm in Sources */,
 				07A468271E6FCCF1002C9B3C /* queue_file.cpp in Sources */,
@@ -1649,6 +1684,7 @@
 				07A468521E6FCCF1002C9B3C /* pipe_stream.cpp in Sources */,
 				07A468121E6FCCF1002C9B3C /* quote_821_local.cpp in Sources */,
 				07A468061E6FCCF1002C9B3C /* master_proc.cpp in Sources */,
+				0778DAD91F1CB2AB0011B753 /* tcp_client.cpp in Sources */,
 				07A468491E6FCCF1002C9B3C /* dbuf_pool.cpp in Sources */,
 				07A467C41E6FCCF1002C9B3C /* OSSBucketOperation.cpp in Sources */,
 				07A467D41E6FCCF1002C9B3C /* connect_monitor.cpp in Sources */,
