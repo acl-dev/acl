@@ -292,7 +292,9 @@ static void run(const char* addr, const char* filepath)
 
 		if (cmd == "clear")
 		{
+#if	!defined(__APPLE__)
 			rl_clear_screen(0, 0);
+#endif
 			printf("\r\n");
 			continue;
 		}
