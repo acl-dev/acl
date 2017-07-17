@@ -1308,7 +1308,7 @@ static void server_main(int argc, char **argv, va_list ap)
 	 * messages to stderr, because no-one is going to see them.
 	 */
 
-#ifdef ACL_UNIX
+#ifdef ACL_LINUX
 	opterr = 0;
 	optind = 0;
 	optarg = 0;

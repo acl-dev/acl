@@ -1225,7 +1225,7 @@ void acl_threads_server_main(int argc, char * argv[],
 
 	/*******************************************************************/
 
-#if	defined(ACL_UNIX) && !defined(ACL_FREEBSD)
+#if	defined(ACL_LINUX)
 	opterr = 0;
 	optind = 0;
 	optarg = 0;
