@@ -246,7 +246,7 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 [![lecloud](res/logo/logo_lecloud.png)](http://www.lecloud.com/)
 [![ksyun](res/logo/logo_ksyun.png)](https://www.ksyun.com/)
 [![weibangong](res/logo/logo_weibangong.png)](https://www.weibangong.com/)
-[![xianyou](res/logo/logo_xianyou.logo)](http://www.i3game.com/)
+[![xianyou](res/logo/logo_xianyou.png)](http://www.i3game.com/)
 
 ## 五、使用许可
 - LGPL-v3 license (see LICENSE.txt in the acl project)
