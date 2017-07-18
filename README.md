@@ -244,6 +244,7 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 [![hexun](res/logo/logo_hexun.png)](http://www.hexun.com/)
 [![v1](res/logo/logo_v1.png)](http://www.v1.cn/)
 [![lecloud](res/logo/logo_lecloud.png)](http://www.lecloud.com/)
+[![ksyun](res/logo/logo_ksyun.png)](https://www.ksyun.com/)
 [![weibangong](res/logo/logo_weibangong.png)](https://www.weibangong.com/)
 
 ## 五、使用许可
