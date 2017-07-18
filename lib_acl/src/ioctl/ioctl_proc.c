@@ -85,6 +85,8 @@ void listen_notify_callback(int event_type, ACL_EVENT *event,
 	case ACL_EVENT_RW_TIMEOUT:
 	case ACL_EVENT_XCPT:
 		acl_event_disable_read(event, stream);
+		notify_fn(event_type, ioc, stream, arg);
+		break;
 	case ACL_EVENT_READ:
 		notify_fn(event_type, ioc, stream, arg);
 		break;

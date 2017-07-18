@@ -375,8 +375,8 @@ namespace acl
         if(!msg ||!($result = gson(*msg, &$obj.msg), $result.first))
             return std::make_pair(false, "required [list_res_t.msg] failed:{"+$result.second+"}");
      
-        if(!data ||!data->get_obj()||!($result = gson(*data->get_obj(), &$obj.data), $result.first))
-            return std::make_pair(false, "required [list_res_t.data] failed:{"+$result.second+"}");
+        if(data&& data->get_obj())
+             gson(*data->get_obj(), &$obj.data);
      
         return std::make_pair(true,"");
     }
@@ -834,6 +834,11 @@ namespace acl
         else
             $node.add_text("path", acl::get_value($obj.path));
 
+        if (check_nullptr($obj.conf))
+            $node.add_null("conf");
+        else
+            $node.add_text("conf", acl::get_value($obj.conf));
+
         if (check_nullptr($obj.proc_max))
             $node.add_null("proc_max");
         else
@@ -904,6 +909,7 @@ namespace acl
         acl::json_node *type = $node["type"];
         acl::json_node *owner = $node["owner"];
         acl::json_node *path = $node["path"];
+        acl::json_node *conf = $node["conf"];
         acl::json_node *proc_max = $node["proc_max"];
         acl::json_node *proc_prefork = $node["proc_prefork"];
         acl::json_node *proc_total = $node["proc_total"];
@@ -930,6 +936,9 @@ namespace acl
         if(!path ||!($result = gson(*path, &$obj.path), $result.first))
             return std::make_pair(false, "required [serv_info_t.path] failed:{"+$result.second+"}");
      
+        if(!conf ||!($result = gson(*conf, &$obj.conf), $result.first))
+            return std::make_pair(false, "required [serv_info_t.conf] failed:{"+$result.second+"}");
+     
         if(!proc_max ||!($result = gson(*proc_max, &$obj.proc_max), $result.first))
             return std::make_pair(false, "required [serv_info_t.proc_max] failed:{"+$result.second+"}");
      
@@ -954,8 +963,8 @@ namespace acl
         if(notify_recipients)
             gson(*notify_recipients, &$obj.notify_recipients);
      
-        if(!env ||!env->get_obj()||!($result = gson(*env->get_obj(), &$obj.env), $result.first))
-            return std::make_pair(false, "required [serv_info_t.env] failed:{"+$result.second+"}");
+        if(env&& env->get_obj())
+             gson(*env->get_obj(), &$obj.env);
      
         return std::make_pair(true,"");
     }

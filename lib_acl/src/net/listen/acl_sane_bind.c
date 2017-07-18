@@ -66,7 +66,7 @@ ACL_SOCKET acl_sane_bind(const struct addrinfo *res)
 ACL_SOCKET acl_udp_bind(const char *addr, int blocking)
 {
 	struct addrinfo *res0 = acl_host_addrinfo(addr, SOCK_DGRAM), *res;
-	ACL_SOCKET fd;
+	ACL_SOCKET fd = ACL_SOCKET_INVALID;
 
 	if (res0 == NULL) {
 		acl_msg_error("%s(%d): host_addrinfo NULL, addr=%s",

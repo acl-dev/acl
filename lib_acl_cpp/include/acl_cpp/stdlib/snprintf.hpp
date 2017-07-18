@@ -14,8 +14,12 @@ namespace acl {
  *     >= size；需要注意该返回值的含义与 _WIN32 下的不同
  *  2) _WIN32 平台下返回 -1
  */
+#if defined(__GNUC__) && (__GNUC__ > 4 ||(__GNUC__ == 4 && __GNUC_MINOR__ >= 4))
 ACL_CPP_API int ACL_CPP_PRINTF(3, 4) safe_snprintf(char *buf, size_t size,
 	const char *fmt, ...);
+#else
+ACL_CPP_API int safe_snprintf(char *buf, size_t size, const char *fmt, ...);
+#endif
 
 /**
  * 标准 C snprintf API 封装，可以保证结果缓冲区中的最后一个字节为 '\0'

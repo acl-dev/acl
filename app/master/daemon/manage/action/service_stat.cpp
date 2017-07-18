@@ -21,12 +21,14 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 	if (serv == NULL)
 	{
 		info.status = 404;
+		info.conf   = path;
 		return false;
 	}
 
 	info.name            = serv->name;
 	info.type            = serv->type;
 	info.path            = serv->path;
+	info.conf            = serv->conf;
 	info.proc_max        = serv->max_proc;
 	info.proc_prefork    = serv->prefork_proc;
 	info.proc_total      = serv->total_proc;

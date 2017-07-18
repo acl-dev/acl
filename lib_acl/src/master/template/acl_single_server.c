@@ -431,7 +431,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	 * Pick up policy settings from master process. Shut up error messages
 	 * to stderr, because no-one is going to see them.
 	 */
-#ifdef ACL_UNIX
+#ifdef ACL_LINUX
 	opterr = 0;
 	optind = 0;
 	optarg = 0;
@@ -456,6 +456,8 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 			if ((socket_count = atoi(optarg)) > 0)
 				break;
 			acl_msg_fatal("invalid socket_count: %s", optarg);
+			/* NOT REACHED */
+			break;
 		case 'u':
 			user_name = "setme";
 			break;

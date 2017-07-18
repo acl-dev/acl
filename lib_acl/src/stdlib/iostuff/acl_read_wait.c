@@ -279,16 +279,16 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 			acl_set_error(ACL_ETIMEDOUT);
 			return -1;
 		default:
-			if (fds.revents & (POLLHUP | POLLERR)) {
+			if ((fds.revents & POLLIN))
+				return 0;
+			else if (fds.revents & (POLLHUP | POLLERR)) {
 				acl_msg_warn("%s(%d), %s: poll error: %s, "
 					"fd: %d, delay: %d, spent: %ld",
 					__FILE__, __LINE__, myname,
 					acl_last_serror(), fd, delay,
 					(long) (time(NULL) - begin));
 				return -1;
-			} else if ((fds.revents & POLLIN))
-				return 0;
-			else {
+			} else {
 				acl_msg_warn("%s(%d), %s: poll error: %s, "
 					"fd: %d, delay: %d, spent: %ld",
 					__FILE__, __LINE__, myname,

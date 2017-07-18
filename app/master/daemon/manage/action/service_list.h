@@ -13,8 +13,8 @@
 #pragma once
 
 struct ACL_MASTER_SERV;
-class list_req_t;
-class list_res_t;
+struct list_req_t;
+struct list_res_t;
 
 class service_list
 {

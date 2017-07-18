@@ -223,7 +223,7 @@ static bool cmp_copy(acl::scan_dir& scan, const char* name,
 static bool check_dir(acl::scan_dir& scan, const char* to, int* ncopied)
 {
 	const char* rpath = scan.curr_path();
-	if (rpath == false)
+	if (rpath == NULL)
 	{
 		logger_error("get from's path error: %s, to: %s",
 			acl::last_serror(), to);

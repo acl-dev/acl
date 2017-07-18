@@ -24,7 +24,6 @@ private:
 	~http_client(void);
 
 private:
-	acl::aio_socket_stream* client_;
 	ACL_ASTREAM*            conn_;
 	int                     rw_timeout_;
 	HTTP_HDR_REQ*           hdr_req_;

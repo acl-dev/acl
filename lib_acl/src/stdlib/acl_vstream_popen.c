@@ -204,6 +204,7 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 			acl_exec_command(args.command);
 		}
 		/* NOTREACHED */
+		return NULL;
 	default:					/* parent */
 		if (close(sockfd[0]))
 			acl_msg_warn("close: %s", acl_last_serror());

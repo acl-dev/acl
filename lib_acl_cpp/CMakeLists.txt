@@ -12,6 +12,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android")
 	set(UNIX_OS true)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	set(UNIX_OS true)
+elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+	set(UNIX_OS true)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	set(UNIX_OS true)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
@@ -81,6 +83,7 @@ endforeach()
 if (${UNIX_OS})
 	add_definitions(
 		"-W"
+		"-O2"
 		"-fPIC"
 		"-Wall"
 		"-Werror"
@@ -95,12 +98,16 @@ if (${UNIX_OS})
 		"-DHAS_MYSQL_DLL"
 		"-DHAS_PGSQL_DLL"
 		"-DHAS_SQLITE_DLL"
-		"-Wno-invalid-source-encoding"
-		"-Wno-unused-private-field"
 		"-Wno-unused-parameter"
-		"-Wno-unused-const-variable"
 		"-fexceptions"
 		)
+
+	if (!CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+		add_definitions("-Wno-invalid-source-encoding"
+			"-Wno-unused-private-field"
+			"-Wno-unused-const-variable"
+			)
+	endif()
 
 	if (CMAKE_BUILD_TYPE STREQUAL "")
 		set(CMAKE_BUILD_TYPE "DEBUG")

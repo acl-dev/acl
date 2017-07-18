@@ -624,7 +624,7 @@ ACL_API int acl_vstream_write(ACL_VSTREAM *fp, const void *vptr, int dlen);
  * @param fp {ACL_VSTREAM*}
  * @param vector {const struct iovec*}
  * @param count {int} vector 数组的长度
- * @return {int} 返回成功写入的字节数，如果出错，则返回CL_VSTREAM_EOF
+ * @return {int} 返回成功写入的字节数，如果出错，则返回 ACL_VSTREAM_EOF
  */
 ACL_API int acl_vstream_writev(ACL_VSTREAM *fp, const struct iovec *vector, int count);
 
@@ -633,7 +633,7 @@ ACL_API int acl_vstream_writev(ACL_VSTREAM *fp, const struct iovec *vector, int 
  * @param fp {ACL_VSTREAM*}
  * @param vector {const struct iovec*}
  * @param count {int} vector 数组的长度
- * @return {int} 返回成功写入的字节数，如果出错，则返回CL_VSTREAM_EOF
+ * @return {int} 返回成功写入的字节数，如果出错，则返回 ACL_VSTREAM_EOF
  */
 ACL_API int acl_vstream_writevn(ACL_VSTREAM *fp, const struct iovec *vector, int count);
 

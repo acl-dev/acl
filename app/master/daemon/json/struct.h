@@ -21,6 +21,7 @@ struct serv_info_t
 	// Gson@optional
 	acl::string owner;
 	acl::string path;
+	acl::string conf;
 	int proc_max;
 	int proc_prefork;
 	int proc_total;
@@ -32,6 +33,12 @@ struct serv_info_t
 	// Gson@optional
 	acl::string notify_recipients;
 	std::map<acl::string, acl::string> env;
+
+	serv_info_t()
+	{
+		status = 0;
+		type = 0;
+	}
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -42,6 +49,7 @@ struct list_req_t : req_t
 
 struct list_res_t : res_t
 {
+	// Gson@optional
 	std::list<serv_info_t> data;
 };
 

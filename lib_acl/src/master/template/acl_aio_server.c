@@ -1308,7 +1308,7 @@ static void server_main(int argc, char **argv, va_list ap)
 	 * messages to stderr, because no-one is going to see them.
 	 */
 
-#ifdef ACL_UNIX
+#ifdef ACL_LINUX
 	opterr = 0;
 	optind = 0;
 	optarg = 0;
@@ -1333,6 +1333,8 @@ static void server_main(int argc, char **argv, va_list ap)
 			if ((__socket_count = atoi(optarg)) > 0)
 				break;
 			acl_msg_fatal("invalid socket_count: %s", optarg);
+			/* NOT REACHED */
+			break;
 		case 'u':
 			user_name = "setme";
 			break;

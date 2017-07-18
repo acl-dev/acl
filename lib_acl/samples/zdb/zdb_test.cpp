@@ -10,7 +10,7 @@
 #pragma pack(4)
 typedef struct {
 	int  n;
-	char s[4];
+	char s[11];
 } DUMMY;
 #pragma pack(8)
 
@@ -278,7 +278,7 @@ static int bench_update(ZDB *db, int max, int num)
 
 	dummy = (DUMMY*) acl_mycalloc(num, sizeof(DUMMY));
 	for (i = 0; i < num; i++) {
-		snprintf(dummy[i].s, sizeof(dummy[i].s), "%d", i);
+		snprintf(dummy[i].s, sizeof(dummy[i].s), "%d", (int) i);
 	}
 
 	ACL_METER_TIME("----begin---");

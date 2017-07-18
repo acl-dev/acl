@@ -20,8 +20,7 @@
 #include "http_client.h"
 
 http_client::http_client(acl::aio_socket_stream *client, int rw_timeout)
-	: client_(client)
-	, conn_(client->get_astream())
+	: conn_(client->get_astream())
 	, rw_timeout_(rw_timeout)
 	, content_length_(0)
 {
