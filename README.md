@@ -252,7 +252,7 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 ## 五、使用许可
 - LGPL-v3 license (see LICENSE.txt in the acl project)
 ## 六、参考
-- WEB 站点: http://www.iteye.com
+- WEB 站点: http://zsxxsz.iteye.com
 - Download: https://sourceforge.net/projects/acl
 - 微 博：http://weibo.com/zsxxsz
 - QQ 群: 242722074
