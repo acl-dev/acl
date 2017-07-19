@@ -57,8 +57,6 @@ set(sources
 	${src}/ioctl
 	${src}/json
 	${src}/master
-	${src}/master/framework
-	${src}/master/framework/trigger
 	${src}/master/template
 	${src}/msg
 	${src}/net
