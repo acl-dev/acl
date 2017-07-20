@@ -55,6 +55,13 @@ polarssl_conf::polarssl_conf()
 	cache_ = NULL;
 	pkey_ = NULL;
 	verify_mode_ = POLARSSL_VERIFY_NONE;
+#else
+	(void) entropy_;
+	(void) cacert_;
+	(void) cert_chain_;
+	(void) cache_;
+	(void) pkey_;
+	(void) verify_mode_;
 #endif
 }
 

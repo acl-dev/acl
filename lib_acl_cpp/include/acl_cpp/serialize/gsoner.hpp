@@ -137,7 +137,7 @@ private:
 	bool check_define();
 	bool check_pragma();
 	std::list<std::string> get_initializelist ();
-	char cc;
+	//char cc;
 	int pos_;
 	int max_pos_;
 	std::string comment_begin_;
