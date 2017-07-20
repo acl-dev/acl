@@ -11,7 +11,6 @@ bool http_request(const char* addr, TReq& req, TRes& res)
 	url.format("/?cmd=%s", req.cmd.c_str());
 	conn.request_header().set_url(url).set_keep_alive(false)
 		.set_content_type("text/json");
-
 	if (conn.request(body, body.size()) == false)
 	{
 		printf("request error, json=[%s]\r\n", body.c_str());

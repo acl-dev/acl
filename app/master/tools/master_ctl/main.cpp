@@ -47,7 +47,7 @@ static bool do_list(const char* addr, const char*)
 	req.cmd = "list";
 
 	list_res_t res;
-	if (!http_request<list_req_t, list_res_t>(addr, "list", req, res))
+	if (!http_request<list_req_t, list_res_t>(addr, req, res))
 		return false;
 
 	print_servers(res.data);
@@ -64,12 +64,13 @@ static bool do_stat(const char* addr, const char* filepath)
 
 	stat_req_t req;
 	req.cmd = "stat";
+
 	stat_req_data_t req_data;
 	req_data.path = filepath;
 	req.data.push_back(req_data);
 
 	stat_res_t res;
-	if (!http_request<stat_req_t, stat_res_t>(addr, "stat", req, res))
+	if (!http_request<stat_req_t, stat_res_t>(addr, req, res))
 		return false;
 
 	print_servers(res.data);
@@ -101,12 +102,14 @@ static bool do_start(const char* addr, const char* filepath)
 	}
 
 	start_req_t req;
+	req.cmd = "start";
+
 	start_req_data_t req_data;
 	req_data.path = filepath;
 	req.data.push_back(req_data);
 
 	start_res_t res;
-	if (!http_request<start_req_t, start_res_t>(addr, "start", req, res))
+	if (!http_request<start_req_t, start_res_t>(addr, req, res))
 		return false;
 
 	print_start_results(res.data);
@@ -137,12 +140,14 @@ static bool do_stop(const char* addr, const char* filepath)
 	}
 
 	stop_req_t req;
+	req.cmd = "stop";
+
 	stop_req_data_t req_data;
 	req_data.path = filepath;
 	req.data.push_back(req_data);
 
 	stop_res_t res;
-	if (!http_request<stop_req_t, stop_res_t>(addr, "stop", req, res))
+	if (!http_request<stop_req_t, stop_res_t>(addr, req, res))
 		return false;
 
 	print_stop_results(res.data);
@@ -173,12 +178,14 @@ static bool do_kill(const char* addr, const char* filepath)
 	}
 
 	kill_req_t req;
+	req.cmd = "kill";
+
 	kill_req_data_t req_data;
 	req_data.path = filepath;
 	req.data.push_back(req_data);
 
 	kill_res_t res;
-	if (!http_request<kill_req_t, kill_res_t>(addr, "kill", req, res))
+	if (!http_request<kill_req_t, kill_res_t>(addr, req, res))
 		return false;
 
 	print_kill_results(res.data);
@@ -211,12 +218,14 @@ static bool do_reload(const char* addr, const char* filepath)
 	}
 
 	reload_req_t req;
+	req.cmd = "reload";
+
 	reload_req_data_t req_data;
 	req_data.path = filepath;
 	req.data.push_back(req_data);
 
 	reload_res_t res;
-	if (!http_request<reload_req_t, reload_res_t>(addr, "reload", req, res))
+	if (!http_request<reload_req_t, reload_res_t>(addr, req, res))
 		return false;
 
 	print_reload_results(res.data);
