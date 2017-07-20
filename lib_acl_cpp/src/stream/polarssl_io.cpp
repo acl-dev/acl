@@ -27,6 +27,16 @@ polarssl_io::polarssl_io(polarssl_conf& conf, bool server_side,
 , rnd_(NULL)
 , stream_(NULL)
 {
+#ifndef HAS_POLARSSL
+	(void) conf_;
+	(void) server_side_;
+	(void) non_block_;
+	(void) handshake_ok_;
+	(void) ssl_;
+	(void) ssn_;
+	(void) rnd_;
+	(void) stream_;
+#endif
 }
 
 polarssl_io::~polarssl_io()

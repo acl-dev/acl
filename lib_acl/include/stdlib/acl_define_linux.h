@@ -50,7 +50,7 @@
 # define ACL_PATH_DEFPATH	"/usr/bin"
 # define ACL_PATH_STDPATH	"/usr/bin:/usr/sbin"
 
-# if defined(ACL_HAVE_NO_STAT64) || defined(MINGW)
+# if defined(ACL_HAVE_NO_STAT64) || defined(MINGW) || defined(ANDROID)
 #  define	acl_stat	stat
 #  define	acl_fstat	fstat
 # else

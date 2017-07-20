@@ -49,7 +49,7 @@ protected:
 private:
 	redis_client_cluster& cluster_;
 	redis* command_;
-	size_t max_conns_;
+	// size_t max_conns_;
 	std::map<string, session_string*> buffers_;
 };
 
