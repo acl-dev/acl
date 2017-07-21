@@ -3,22 +3,35 @@
 #include <readline/history.h>
 #include "http_request.h"
 
+static void println(const char* name, const char* value)
+{
+	printf("\033[1;33;40m%-18s\033[0m: %s\r\n", name, value);
+}
+
+static void println(const char* name, int value)
+{
+	char buf[32];
+
+	snprintf(buf, sizeof(buf), "%d", value);
+	println(name, buf);
+}
+
 static void print_server(const serv_info_t& server)
 {
-	printf("status: %d\r\n", server.status);
-	printf("name: %s\r\n", server.name.c_str());
-	printf("type: %d\r\n", server.type);
-	printf("owner: %s\r\n", server.owner.c_str());
-	printf("path: %s\r\n", server.path.c_str());
-	printf("conf: %s\r\n", server.conf.c_str());
-	printf("proc_max: %d\r\n", server.proc_max);
-	printf("proc_prefork: %d\r\n", server.proc_prefork);
-	printf("proc_total: %d\r\n", server.proc_total);
-	printf("proc_avail: %d\r\n", server.proc_avail);
-	printf("throttle_delay: %d\r\n", server.throttle_delay);
-	printf("listen_fd_count: %d\r\n", server.listen_fd_count);
-	printf("notify_addr: %s\r\n", server.notify_addr.c_str());
-	printf("notify_recipients: %s\r\n", server.notify_recipients.c_str());
+	println("status", server.status);
+	println("name", server.name.c_str());
+	println("type", server.type);
+	println("owner", server.owner.c_str());
+	println("path", server.path.c_str());
+	println("conf", server.conf.c_str());
+	println("proc_max", server.proc_max);
+	println("proc_prefork", server.proc_prefork);
+	println("proc_total", server.proc_total);
+	println("proc_avail", server.proc_avail);
+	println("throttle_delay", server.throttle_delay);
+	println("listen_fd_count", server.listen_fd_count);
+	println("notify_addr", server.notify_addr.c_str());
+	println("notify_recipients", server.notify_recipients.c_str());
 }
 
 static void print_servers(const std::list<serv_info_t>& servers)
@@ -27,7 +40,6 @@ static void print_servers(const std::list<serv_info_t>& servers)
 		cit != servers.end(); ++cit)
 	{
 		print_server(*cit);
-		printf("-----------------------------------------------\r\n");
 	}
 }
 
@@ -36,8 +48,9 @@ static void print_servers(const std::vector<serv_info_t>& servers)
 	for (std::vector<serv_info_t>::const_iterator cit = servers.begin();
 		cit != servers.end(); ++cit)
 	{
+		if (cit != servers.begin())
+			printf("-----------------------------------------------\r\n");
 		print_server(*cit);
-		printf("-----------------------------------------------\r\n");
 	}
 }
 
@@ -79,9 +92,9 @@ static bool do_stat(const char* addr, const char* filepath)
 
 static void print_start_result(const start_res_data_t& data)
 {
-	printf("status: %d\r\n", data.status);
-	printf("name: %s\r\n", data.name.c_str());
-	printf("path: %s\r\n", data.path.c_str());
+	println("status", data.status);
+	println("name", data.name.c_str());
+	println("path", data.path.c_str());
 }
 
 static void print_start_results(const std::vector<start_res_data_t>& data)
@@ -118,8 +131,8 @@ static bool do_start(const char* addr, const char* filepath)
 
 static void print_stop_result(const stop_res_data_t& data)
 {
-	printf("status: %d\r\n", data.status);
-	printf("path: %s\r\n", data.path.c_str());
+	println("status", data.status);
+	println("path", data.path.c_str());
 }
 
 static void print_stop_results(const std::vector<stop_res_data_t>& data)
@@ -156,8 +169,8 @@ static bool do_stop(const char* addr, const char* filepath)
 
 static void print_kill_result(const kill_res_data_t& data)
 {
-	printf("status: %d\r\n", data.status);
-	printf("path: %s\r\n", data.path.c_str());
+	println("status", data.status);
+	println("path", data.path.c_str());
 }
 
 static void print_kill_results(const std::vector<kill_res_data_t>& data)
@@ -194,10 +207,10 @@ static bool do_kill(const char* addr, const char* filepath)
 
 static void print_reload(const reload_res_data_t& data)
 {
-	printf("status: %d\r\n", data.status);
-	printf("proc_count: %d\r\n", data.proc_count);
-	printf("proc_signaled: %d\r\n", data.proc_signaled);
-	printf("path: %s\r\n", data.path.c_str());
+	println("status", data.status);
+	println("proc_count", data.proc_count);
+	println("proc_signaled", data.proc_signaled);
+	println("path", data.path.c_str());
 }
 
 static void print_reload_results(const std::vector<reload_res_data_t>& res)
@@ -234,7 +247,7 @@ static bool do_reload(const char* addr, const char* filepath)
 
 static void getline(acl::string& out)
 {
-	const char* prompt = "master_ctl> ";
+	const char* prompt = "\033[1;34;40mmaster_ctl>\033[0m ";
 	char* ptr = readline(prompt);
 	if (ptr == NULL)
 	{
@@ -249,14 +262,15 @@ static void getline(acl::string& out)
 
 static void help(void)
 {
-	printf("\033[1;33;40mset\033[0m: set the service's configure\r\n");
-	printf("\033[1;33;40mclear\033[0m: clear the screan\r\n");
-	printf("\033[1;33;40mlist\033[0m: list all the running services\r\n");
-	printf("\033[1;33;40mstat\033[0m: show one service's running status\r\n");
-	printf("\033[1;33;40mstart\033[0m: start one service\r\n");
-	printf("\033[1;33;40mstop\033[0m: stop one service\r\n");
-	printf("\033[1;33;40mkill\033[0m: kill one service\r\n");
-	printf("\033[1;33;40mreload\033[0m: reload one service\r\n");
+	println("set", "set the service's configure");
+	println("server", "set the service's addr");
+	println("clear", "clear the screan");
+	println("list", "list all the running services");
+	println("stat", "show one service's running status");
+	println("start", "start one service");
+	println("stop", "stop one service");
+	println("kill", "kill one service");
+	println("reload", "reload one service");
 }
 
 static struct {
@@ -273,9 +287,11 @@ static struct {
 	{ 0,		0		},
 };
 
-static void run(const char* addr, const char* filepath)
+static void run(const char* server, const char* filepath)
 {
-	acl::string buf, fpath;
+	acl::string buf, fpath, addr(server);
+
+	printf("server addr is %s\r\n", server);
 
 	if (filepath && *filepath)
 		fpath = filepath;
@@ -321,6 +337,21 @@ static void run(const char* addr, const char* filepath)
 			printf("set service to %s ok\r\n", fpath.c_str());
 			continue;
 		}
+		else if (cmd == "server")
+		{
+			if (tokens.size() > 1)
+			{
+				addr = tokens[1];
+				printf("set server to %s ok\r\n", addr.c_str());
+			}
+			else if (addr.empty())
+				printf("\033[1;34;40musage\033[0m: "
+				  "\033[1;33;40mserver\033[0m addr\r\n");
+			else
+				printf("server addr is %s\r\n", addr.c_str());
+
+			continue;
+		}
 
 		if (tokens.size() >= 2)
 			fpath = tokens[1];
@@ -339,7 +370,11 @@ static void run(const char* addr, const char* filepath)
 		if (__actions[i].cmd == NULL)
 			help();
 		else
-			printf("%s: %s\r\n", cmd.c_str(), ret ? "ok" : "err");
+		{
+			printf("-----------------------------------------------\r\n");
+			printf("\033[1;36;40m%s\033[0m ==> \033[1;32;40m%s\033[0m\r\n",
+				cmd.c_str(), ret ? "ok" : "err");
+		}
 	}
 }
 

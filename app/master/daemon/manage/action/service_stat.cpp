@@ -25,6 +25,7 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 		return false;
 	}
 
+	info.status          = 200;
 	info.name            = serv->name;
 	info.type            = serv->type;
 	info.path            = serv->path;

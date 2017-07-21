@@ -18,7 +18,7 @@ void service_list::add_one(list_res_t& res, const ACL_MASTER_SERV* serv)
 {
 	serv_info_t info;
 
-	info.status          = 0;
+	info.status          = 200;
 	info.name            = serv->name;
 	info.type            = serv->type;
 	info.path            = serv->path;
