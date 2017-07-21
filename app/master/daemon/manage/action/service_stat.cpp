@@ -51,6 +51,20 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 		info.env[v->name] = v->value;
 	}
 
+
+	if (acl_ring_size(&serv->children) > 0)
+	{
+		ACL_RING_ITER iter2;
+		acl_ring_foreach(iter2, &serv->children)
+		{
+			ACL_MASTER_PROC* proc = (ACL_MASTER_PROC *)
+				acl_ring_to_appl(iter2.ptr, ACL_MASTER_PROC, me);
+			info.pids.insert(proc->pid);
+		}
+	}
+	else
+		info.pids.insert(-1);
+
 	info.status = 200;
 	return true;
 }

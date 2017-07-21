@@ -86,6 +86,16 @@ static void println_server(const serv_info_t& server)
 	println("listen_fd_count", server.listen_fd_count);
 	println("notify_addr", server.notify_addr.c_str());
 	println("notify_recipients", server.notify_recipients.c_str());
+
+	acl::string buf;
+	for (std::set<int>::const_iterator cit = server.pids.begin();
+		cit != server.pids.end(); ++cit)
+	{
+		if (cit != server.pids.begin())
+			buf += ", ";
+		buf << *cit;
+	}
+	println("pids", buf);
 }
 
 static void print_servers(const std::vector<serv_info_t>& servers)

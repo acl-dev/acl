@@ -36,7 +36,7 @@ static void serialize(void)
 // 反序列化过程
 static void deserialize(void)
 {
-	const char *s = "{\"shcool\": \"山东工业大学\", \"class_name\": \"热处理专业\", \"province_name\": \"山东省\", \"position\": \"山东省\", \"name\": \"zsxxsz\", \"age\": 11, \"male\": true}";
+	const char *s = "{\"shcool\": \"山东工业大学\", \"class_name\": \"热处理专业\", \"province_name\": \"山东省\", \"position\": \"山东省\", \"name\": \"zsxxsz\", \"age\": 11, \"male\": true, \"ages\": [1, 2, 3, 4, 5] }";
 	printf("deserialize:\r\n");
 
 	acl::json json;
@@ -97,7 +97,7 @@ static void test1(void)
 
 static void test2(void)
 {
-	const char *s = "{\"shcool\": \"山东工业大学\", \"class_name\": \"热处理专业\", \"province_name\": \"山东省\", \"position\": \"山东省\", \"name\": \"zsxxsz\", \"age\": 11, \"male\": true, \"favorite\": \"pingpang\", \"height\": 170}";
+	const char *s = "{\"shcool\": \"山东工业大学\", \"class_name\": \"热处理专业\", \"province_name\": \"山东省\", \"position\": \"山东省\", \"name\": \"zsxxsz\", \"age\": 11, \"male\": true, \"favorite\": \"pingpang\", \"height\": 170, \"ages\": [1, 2, 3, 4, 5]}";
 	printf("deserialize:\r\n");
 
 	acl::json json;
@@ -120,6 +120,16 @@ static void test2(void)
 		printf("shcool: %s, class_name: %s\r\n",
 			u.shcool.c_str(), u.class_name.c_str());
 	}
+
+	printf("ages: ");
+	for (std::vector<int>::const_iterator cit = u.ages.begin();
+		cit != u.ages.end(); ++cit)
+	{
+		if (cit != u.ages.begin())
+			printf(", ");
+		printf("%d", *cit);
+	}
+	printf("\r\n");
 }
 
 int main(void)

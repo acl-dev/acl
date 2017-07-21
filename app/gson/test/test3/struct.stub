@@ -39,6 +39,7 @@ struct user_male : user
 {
 	std::string favorite;
 	int height;
+	std::vector<int> ages;
 
 	const char* get_favorite(void) const
 	{

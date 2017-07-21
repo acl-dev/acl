@@ -32,5 +32,6 @@ bool http_request(const char* addr, TReq& req, TRes& res)
 		return false;
 	}
 
+	//printf(">>>%s\r\n", json.to_string().c_str());
 	return true;
 }

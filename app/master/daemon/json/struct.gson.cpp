@@ -1157,6 +1157,11 @@ namespace acl
         else
             $node.add_child("env", acl::gson($json, $obj.env));
 
+        if (check_nullptr($obj.pids))
+            $node.add_null("pids");
+        else
+            $node.add_child("pids", acl::gson($json, $obj.pids));
+
 
         return $node;
     }
@@ -1192,6 +1197,7 @@ namespace acl
         acl::json_node *notify_addr = $node["notify_addr"];
         acl::json_node *notify_recipients = $node["notify_recipients"];
         acl::json_node *env = $node["env"];
+        acl::json_node *pids = $node["pids"];
         std::pair<bool, std::string> $result;
 
         if(!status ||!($result = gson(*status, &$obj.status), $result.first))
@@ -1238,6 +1244,9 @@ namespace acl
      
         if(!env ||!env->get_obj()||!($result = gson(*env->get_obj(), &$obj.env), $result.first))
             return std::make_pair(false, "required [serv_info_t.env] failed:{"+$result.second+"}");
+     
+        if(!pids ||!pids->get_obj()||!($result = gson(*pids->get_obj(), &$obj.pids), $result.first))
+            return std::make_pair(false, "required [serv_info_t.pids] failed:{"+$result.second+"}");
      
         return std::make_pair(true,"");
     }

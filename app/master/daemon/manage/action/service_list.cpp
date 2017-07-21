@@ -44,6 +44,19 @@ void service_list::add_one(list_res_t& res, const ACL_MASTER_SERV* serv)
 		info.env[v->name] = v->value;
 	}
 
+	if (acl_ring_size(&serv->children) > 0)
+	{
+		ACL_RING_ITER iter2;
+		acl_ring_foreach(iter2, &serv->children)
+		{
+			ACL_MASTER_PROC* proc = (ACL_MASTER_PROC *)
+				acl_ring_to_appl(iter2.ptr, ACL_MASTER_PROC, me);
+			info.pids.insert(proc->pid);
+		}
+	}
+	else
+		info.pids.insert(-1);
+
 	res.data.push_back(info);
 }
 

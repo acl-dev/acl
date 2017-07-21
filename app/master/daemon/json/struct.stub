@@ -33,6 +33,7 @@ struct serv_info_t
 	// Gson@optional
 	acl::string notify_recipients;
 	std::map<acl::string, acl::string> env;
+	std::set<int> pids;
 
 	serv_info_t()
 	{
