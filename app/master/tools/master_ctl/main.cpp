@@ -98,15 +98,15 @@ static void println_server(const serv_info_t& server)
 	println("pids", buf);
 }
 
-static void print_servers(const std::vector<serv_info_t>& servers)
+static void print_servers(const std::vector<serv_info_t>& servers, bool verbose)
 {
-	if (!__verbose)
+	if (!verbose)
 		print_head();
 
 	for (std::vector<serv_info_t>::const_iterator cit = servers.begin();
 		cit != servers.end(); ++cit)
 	{
-		if (!__verbose)
+		if (!verbose)
 		{
 			print_server(*cit);
 			continue;
@@ -127,7 +127,7 @@ static bool do_list(const char* addr, const char*)
 	if (!http_request<list_req_t, list_res_t>(addr, req, res))
 		return false;
 
-	print_servers(res.data);
+	print_servers(res.data, __verbose);
 	return true;
 }
 
@@ -150,7 +150,7 @@ static bool do_stat(const char* addr, const char* filepath)
 	if (!http_request<stat_req_t, stat_res_t>(addr, req, res))
 		return false;
 
-	print_servers(res.data);
+	print_servers(res.data, true);
 	return true;
 }
 
