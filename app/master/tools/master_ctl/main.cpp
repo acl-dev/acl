@@ -39,6 +39,8 @@ static void print_servers(const std::list<serv_info_t>& servers)
 	for (std::list<serv_info_t>::const_iterator cit = servers.begin();
 		cit != servers.end(); ++cit)
 	{
+		if (cit != servers.begin())
+			printf("-----------------------------------------------\r\n");
 		print_server(*cit);
 	}
 }
