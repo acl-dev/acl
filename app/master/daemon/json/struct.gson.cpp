@@ -963,8 +963,8 @@ namespace acl
         if(notify_recipients)
             gson(*notify_recipients, &$obj.notify_recipients);
      
-        if(env&& env->get_obj())
-             gson(*env->get_obj(), &$obj.env);
+        if(!env ||!env->get_obj()||!($result = gson(*env->get_obj(), &$obj.env), $result.first))
+            return std::make_pair(false, "required [serv_info_t.env] failed:{"+$result.second+"}");
      
         return std::make_pair(true,"");
     }

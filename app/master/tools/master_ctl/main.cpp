@@ -3,6 +3,60 @@
 #include <readline/history.h>
 #include "http_request.h"
 
+static bool __verbose = false;
+
+static void print_space(int n)
+{
+	for (int i = 0; i < n; i++)
+		putchar(' ');
+	printf("\r\n");
+}
+
+static void print_name(const char* name, int tabs = 1)
+{
+	printf("\033[1;33;40m%-s\033[0m", name);
+
+	for (int i = 0; i < tabs; i++)
+		printf("\t");
+}
+
+static void print_value(const char* value, int tabs = 1)
+{
+	printf("\033[1;36;40m%-s\033[0m", value);
+
+	for (int i = 0; i < tabs; i++)
+		printf("\t");
+}
+
+static void print_value(int value, int tabs = 1)
+{
+	char buf[32];
+	snprintf(buf, sizeof(buf), "%d", value);
+	print_value(buf, tabs);
+}
+
+static void print_head(void)
+{
+	print_name("status");
+	print_name("service", 2);
+	print_name("type");
+	print_name("proc_count", 1);
+	print_name("owner");
+	print_name("conf");
+	printf("\r\n");
+}
+
+static void print_server(const serv_info_t& server)
+{
+	print_value(server.status);
+	print_value(server.name, 2);
+	print_value(server.type);
+	print_value(server.proc_total, 2);
+	print_value(server.owner);
+	print_value(server.conf);
+	printf("\r\n");
+}
+
 static void println(const char* name, const char* value)
 {
 	printf("\033[1;33;40m%-18s\033[0m: %s\r\n", name, value);
@@ -16,7 +70,7 @@ static void println(const char* name, int value)
 	println(name, buf);
 }
 
-static void print_server(const serv_info_t& server)
+static void println_server(const serv_info_t& server)
 {
 	println("status", server.status);
 	println("name", server.name.c_str());
@@ -34,25 +88,23 @@ static void print_server(const serv_info_t& server)
 	println("notify_recipients", server.notify_recipients.c_str());
 }
 
-static void print_servers(const std::list<serv_info_t>& servers)
-{
-	for (std::list<serv_info_t>::const_iterator cit = servers.begin();
-		cit != servers.end(); ++cit)
-	{
-		if (cit != servers.begin())
-			printf("-----------------------------------------------\r\n");
-		print_server(*cit);
-	}
-}
-
 static void print_servers(const std::vector<serv_info_t>& servers)
 {
+	if (!__verbose)
+		print_head();
+
 	for (std::vector<serv_info_t>::const_iterator cit = servers.begin();
 		cit != servers.end(); ++cit)
 	{
+		if (!__verbose)
+		{
+			print_server(*cit);
+			continue;
+		}
+
 		if (cit != servers.begin())
-			printf("-----------------------------------------------\r\n");
-		print_server(*cit);
+			print_space(100);
+		println_server(*cit);
 	}
 }
 
@@ -266,6 +318,7 @@ static void help(void)
 {
 	println("set", "set the service's configure");
 	println("server", "set the service's addr");
+	println("verbose", "display verbose");
 	println("clear", "clear the screan");
 	println("list", "list all the running services");
 	println("stat", "show one service's running status");
@@ -354,6 +407,22 @@ static void run(const char* server, const char* filepath)
 
 			continue;
 		}
+		else if (cmd == "verbose")
+		{
+			if (tokens.size() > 1)
+			{
+				if (tokens[1].equal("on", false))
+					__verbose = true;
+				else
+					__verbose = false;
+			}
+			else
+				__verbose = true;
+
+			printf("set verbose %s\r\n",
+				__verbose ? "on" : "off");
+			continue;
+		}
 
 		if (tokens.size() >= 2)
 			fpath = tokens[1];
@@ -370,13 +439,16 @@ static void run(const char* server, const char* filepath)
 		}
 
 		if (__actions[i].cmd == NULL)
-			help();
-		else
 		{
-			printf("-----------------------------------------------\r\n");
-			printf("\033[1;36;40m%s\033[0m ==> \033[1;32;40m%s\033[0m\r\n",
-				cmd.c_str(), ret ? "ok" : "err");
+			help();
+			continue;
 		}
+
+		if (!__verbose)
+			print_space(100);
+
+		printf("\033[1;36;40m%s\033[0m ==> \033[1;32;40m%s\033[0m\r\n",
+			cmd.c_str(), ret ? "ok" : "err");
 	}
 }
 

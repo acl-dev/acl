@@ -50,7 +50,7 @@ struct list_req_t : req_t
 struct list_res_t : res_t
 {
 	// Gson@optional
-	std::list<serv_info_t> data;
+	std::vector<serv_info_t> data;
 };
 
 //////////////////////////////////////////////////////////////////////////////
