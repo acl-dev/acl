@@ -119,7 +119,7 @@ elseif (${WIN_OS})
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
-	# set(CMAKE_SHARED_LINKER_FLAGS "-shared")
+	set(CMAKE_SHARED_LINKER_FLAGS "-shared")
 	add_definitions("-Wno-invalid-source-encoding")
 else()
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)

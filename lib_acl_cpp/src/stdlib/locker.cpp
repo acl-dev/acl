@@ -17,8 +17,7 @@ locker::locker(bool use_mutex /* = true */, bool use_spinlock /* = false */)
 		mutex_ = NULL;
 #ifdef	ACL_HAS_SPINLOCK
 		spinlock_ = NULL;
-#else
-		(void) spinlock_;
+		(void) spinlock_; // avoiding for compiling warning
 #endif
 	}
 }

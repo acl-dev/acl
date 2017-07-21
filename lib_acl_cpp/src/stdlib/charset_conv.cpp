@@ -19,7 +19,9 @@
 
 #define SCOPY ACL_SAFE_STRNCPY
 
+#ifdef HAVE_H_ICONV
 static const char UTF8_HEADER[] = { (char) 0xEF, (char) 0xBB, (char) 0xBF, (char) 0x00 };
+#endif
 
 #ifdef HAVE_H_ICONV
 # ifdef USE_WIN_ICONV
@@ -115,6 +117,14 @@ charset_conv::charset_conv()
 	acl_pthread_once(&__iconv_once, __iconv_dll_load);
 #  endif
 # endif
+#else
+	(void) m_addInvalid;
+	(void) m_errmsg;
+	(void) m_pBuf;
+	(void) m_iconv;
+	(void) m_pInBuf;
+	(void) m_pOutBuf;
+	(void) m_pUtf8Pre;
 #endif
 }
 
