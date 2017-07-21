@@ -57,6 +57,7 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 		acl_msg_panic("%s(%d)->%s: fd = %d, read EOF status",
 			__FILE__, __LINE__, myname, serv->status_fd[0]);
 		/* NOTREACHED */
+		return;
 
 	default:
 		acl_msg_warn("%s(%d)->%s: service %s: child (pid %d) "
