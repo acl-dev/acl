@@ -17,6 +17,7 @@
 #include "action/service_kill.h"
 #include "action/service_stop.h"
 #include "action/service_reload.h"
+#include "action/service_restart.h"
 #include "http_client.h"
 
 http_client::http_client(acl::aio_socket_stream *client, int rw_timeout)
@@ -179,6 +180,8 @@ bool http_client::handle(void)
 		ret = handle_stop();
 	else if (EQ(cmd, "reload"))
 		ret = handle_reload();
+	else if (EQ(cmd, "restart"))
+		ret = handle_restart();
 	else {
 		logger_warn("invalid cmd=%s", cmd);
 		acl::string dummy;
@@ -307,6 +310,26 @@ bool http_client::handle_start(void)
 	service_start service;
 	service.run(req, res);
 	reply<start_res_t>(res.status, res);
+
+	return true;
+}
+
+bool http_client::handle_restart(void)
+{
+	restart_req_t req;
+	restart_res_t res;
+
+	if (deserialize<restart_req_t>(json_, req) == false)
+	{
+		res.status = 400;
+		res.msg    = "invalid json";
+		reply<restart_res_t>(res.status, res);
+		return false;
+	}
+
+	service_restart service;
+	service.run(req, res);
+	reply<restart_res_t>(res.status, res);
 
 	return true;
 }

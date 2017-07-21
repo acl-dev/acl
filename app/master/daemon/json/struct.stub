@@ -98,6 +98,32 @@ struct start_res_t : res_t
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct restart_req_data_t
+{
+	acl::string path;
+};
+
+struct restart_req_t : req_t
+{
+	std::vector<restart_req_data_t> data;
+
+};
+
+struct restart_res_data_t
+{
+	int status;
+	acl::string name;
+	// Gson@optional
+	acl::string path;
+};
+
+struct restart_res_t : res_t
+{
+	std::vector<restart_res_data_t> data;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
 struct stop_req_data_t
 {
 	acl::string path;

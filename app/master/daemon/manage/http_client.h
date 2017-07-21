@@ -38,6 +38,7 @@ private:
 	bool handle_kill(void);
 	bool handle_stop(void);
 	bool handle_start(void);
+	bool handle_restart(void);
 	bool handle_reload(void);
 
 	void do_reply(int status, const acl::string& buf);

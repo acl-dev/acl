@@ -96,6 +96,38 @@ namespace acl
     std::pair<bool,std::string> gson(acl::json_node &$node, res_t *$obj);
     std::pair<bool,std::string> gson(const acl::string &str, res_t &$obj);
 
+    //restart_req_data_t
+    acl::string gson(const restart_req_data_t &$obj);
+    acl::json_node& gson(acl::json &$json, const restart_req_data_t &$obj);
+    acl::json_node& gson(acl::json &$json, const restart_req_data_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, restart_req_data_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, restart_req_data_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, restart_req_data_t &$obj);
+
+    //restart_req_t
+    acl::string gson(const restart_req_t &$obj);
+    acl::json_node& gson(acl::json &$json, const restart_req_t &$obj);
+    acl::json_node& gson(acl::json &$json, const restart_req_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, restart_req_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, restart_req_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, restart_req_t &$obj);
+
+    //restart_res_data_t
+    acl::string gson(const restart_res_data_t &$obj);
+    acl::json_node& gson(acl::json &$json, const restart_res_data_t &$obj);
+    acl::json_node& gson(acl::json &$json, const restart_res_data_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, restart_res_data_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, restart_res_data_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, restart_res_data_t &$obj);
+
+    //restart_res_t
+    acl::string gson(const restart_res_t &$obj);
+    acl::json_node& gson(acl::json &$json, const restart_res_t &$obj);
+    acl::json_node& gson(acl::json &$json, const restart_res_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, restart_res_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, restart_res_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, restart_res_t &$obj);
+
     //serv_info_t
     acl::string gson(const serv_info_t &$obj);
     acl::json_node& gson(acl::json &$json, const serv_info_t &$obj);

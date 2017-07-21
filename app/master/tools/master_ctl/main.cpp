@@ -183,6 +183,45 @@ static bool do_start(const char* addr, const char* filepath)
 	return true;
 }
 
+static void print_restart_result(const restart_res_data_t& data)
+{
+	println("status", data.status);
+	println("name", data.name.c_str());
+	println("path", data.path.c_str());
+}
+
+static void print_restart_results(const std::vector<restart_res_data_t>& data)
+{
+	for (std::vector<restart_res_data_t>::const_iterator
+		cit = data.begin(); cit != data.end(); ++cit)
+	{
+		print_restart_result(*cit);
+	}
+}
+
+static bool do_restart(const char* addr, const char* filepath)
+{
+	if (*filepath == 0)
+	{
+		printf("filepath null\r\n");
+		return false;
+	}
+
+	restart_req_t req;
+	req.cmd = "restart";
+
+	restart_req_data_t req_data;
+	req_data.path = filepath;
+	req.data.push_back(req_data);
+
+	restart_res_t res;
+	if (!http_request<restart_req_t, restart_res_t>(addr, req, res))
+		return false;
+
+	print_restart_results(res.data);
+	return true;
+}
+
 static void print_stop_result(const stop_res_data_t& data)
 {
 	println("status", data.status);
@@ -323,6 +362,7 @@ static void help(void)
 	println("list", "list all the running services");
 	println("stat", "show one service's running status");
 	println("start", "start one service");
+	println("restart", "restart one service");
 	println("stop", "stop one service");
 	println("kill", "kill one service");
 	println("reload", "reload one service");
@@ -335,6 +375,7 @@ static struct {
 	{ "list",	do_list		},
 	{ "stat",	do_stat		},
 	{ "start",	do_start	},
+	{ "restart",	do_restart	},
 	{ "stop",	do_stop		},
 	{ "kill",	do_kill		},
 	{ "reload",	do_reload	},
