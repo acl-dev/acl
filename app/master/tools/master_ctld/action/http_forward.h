@@ -1,8 +1,17 @@
 #pragma once
 
 template<typename TReq, typename TRes>
-bool http_request(const char* addr, TReq& req, TRes& res)
+int http_forward(const char* addr, acl::json& in, acl::string& out)
 {
+	TReq req;
+	TRes res;
+
+	if (deserialize<TReq>(in, req) == false)
+	{
+		logger_error("invalid json=%s", in.to_string().c_str());
+		return 400;
+	}
+
 	acl::string body;
 	serialize<TReq>(req, body);
 
@@ -14,22 +23,23 @@ bool http_request(const char* addr, TReq& req, TRes& res)
 	if (conn.request(body, body.size()) == false)
 	{
 		logger_error("request error, json=[%s]", body.c_str());
-		return false;
+		return 503;
 	}
 
 	acl::json json;
 	if (conn.get_body(json) == false)
 	{
 		logger_error("get_body error, json=[%s]", body.c_str());
-		return false;
+		return 503;
 	}
 
 	if (deserialize<TRes>(json, res) == false)
 	{
 		logger_error("deserialize error, res json=[%s], req json=[%s]",
 			json.to_string().c_str(), body.c_str());
-		return false;
+		return 503;
 	}
 
-	return true;
+	serialize<TRes>(res, out);
+	return 200;
 }

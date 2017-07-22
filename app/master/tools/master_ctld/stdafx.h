@@ -20,4 +20,3 @@
 #include <set>
 #include "struct.h"
 #include "serialize.h"
-#include "action/http_request.h"
