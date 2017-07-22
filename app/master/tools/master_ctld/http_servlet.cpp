@@ -110,32 +110,8 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 
 #define EQ	!strcasecmp
 
-	base_action* action;
-
-	if (EQ(cmd, "list"))
-		action = new list_action;
-	else if (EQ(cmd, "stat"))
-		action = new stat_action;
-	else if (EQ(cmd, "start"))
-		action = new start_action;
-	else if (EQ(cmd, "stop"))
-		action = new stop_action;
-	else if (EQ(cmd, "kill"))
-		action = new kill_action;
-	else if (EQ(cmd, "reload"))
-		action = new reload_action;
-	else if (EQ(cmd, "restart"))
-		action = new restart_action;
-	else
-	{
-		logger_error("invalid cmd=%s", cmd);
-		return replyf(req, res, 400, "invalid cmd=%s", cmd);
-	}
-
-	action->prepare(addr_, req, res);
-
 	acl::string buf;
-	int status = action->run(buf);
-	delete action;
+	commands_action action(addr_, req, res, cmd);
+	int status = action.run(buf);
 	return reply_json(req, res, status, buf);
 }

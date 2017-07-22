@@ -13,20 +13,20 @@ bool http_request(const char* addr, TReq& req, TRes& res)
 		.set_content_type("text/json");
 	if (conn.request(body, body.size()) == false)
 	{
-		printf("request error, json=[%s]\r\n", body.c_str());
+		logger_error("request error, json=[%s]", body.c_str());
 		return false;
 	}
 
 	acl::json json;
 	if (conn.get_body(json) == false)
 	{
-		printf("get_body error, json=[%s]\r\n", body.c_str());
+		logger_error("get_body error, json=[%s]", body.c_str());
 		return false;
 	}
 
 	if (deserialize<TRes>(json, res) == false)
 	{
-		printf("deserialize error, res json=[%s], req json=[%s]\r\n",
+		logger_error("deserialize error, res json=[%s], req json=[%s]",
 			json.to_string().c_str(), body.c_str());
 		return false;
 	}
