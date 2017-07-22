@@ -74,7 +74,7 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 		session = new acl::memcache_session("127.0.0.1:11211");
 
 	http_servlet* servlet = new http_servlet(conn, session,
-			var_cfg_manage_addr);
+			var_cfg_manage_addr, this->get_conf_path());
 	conn->set_ctx(servlet);
 
 	return true;

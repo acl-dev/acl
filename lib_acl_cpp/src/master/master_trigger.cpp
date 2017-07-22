@@ -68,6 +68,17 @@ void master_trigger::run_alone(const char* path /* = NULL */,
 	service_exit(this);
 }
 
+const char* master_trigger::get_conf_path(void) const
+{
+	if (daemon_mode_)
+	{
+		const char* ptr = acl_trigger_server_conf();
+		return ptr && *ptr ? ptr : NULL;
+	}
+	else
+		return conf_.get_path();
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 void master_trigger::service_main(void* ctx)

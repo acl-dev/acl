@@ -55,6 +55,12 @@ protected:
 		return sstreams_;
 	}
 
+	/**
+	 * 获得配置文件路径
+	 * @return {const char*} 返回值为 NULL 表示没有设配置文件
+	 */
+	const char* get_conf_path(void) const;
+
 private:
 	std::vector<socket_stream*> sstreams_;
 

@@ -86,43 +86,17 @@ typedef void (*ACL_MASTER_SERVER_SIGHUP_FN)(void *);
   */
 typedef void (*ACL_SINGLE_SERVER_FN) (void*, ACL_VSTREAM *);
 
+ACL_API const char *acl_single_server_conf(void);
 ACL_API void acl_single_server_main(int, char **, ACL_SINGLE_SERVER_FN, ...);
 ACL_API ACL_EVENT *acl_single_server_event(void);
 ACL_API ACL_VSTREAM **acl_single_server_sstreams(void);
 
  /*
-  * acl_multi_server.c
-  */
-typedef void (*ACL_MULTI_SERVER_FN) (ACL_VSTREAM *, char *, char **);
-
-ACL_API void acl_multi_server_main(int, char **, ACL_MULTI_SERVER_FN,...);
-ACL_API void acl_multi_server_disconnect(ACL_VSTREAM *);
-ACL_API int acl_multi_server_drain(void);
-ACL_API ACL_EVENT *acl_multi_server_event(void);
-ACL_API void acl_multi_server_enable_read(ACL_VSTREAM *stream);
-
- /*
-  * acl_ioctl_server.c
-  * @deprecated 请使用 acl_threads_server.c 中的函数
-  */
-typedef void (*ACL_IOCTL_SERVER_FN) (ACL_IOCTL*, ACL_VSTREAM*, char*, char **);
-ACL_DEPRECATED void acl_ioctl_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
-	void *arg, int delay);
-ACL_DEPRECATED void acl_ioctl_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
-	void *arg);
-ACL_DEPRECATED void acl_ioctl_server_main(int, char **, ACL_IOCTL_SERVER_FN,...);
-ACL_DEPRECATED ACL_IOCTL *acl_ioctl_server_handle(void);
-ACL_DEPRECATED ACL_EVENT *acl_ioctl_server_event(void);
-ACL_DEPRECATED ACL_VSTREAM **acl_ioctl_server_streams(void);
-ACL_DEPRECATED void acl_ioctl_server_enable_read(ACL_IOCTL*, ACL_VSTREAM*,
-	int timeout, ACL_IOCTL_NOTIFY_FN notify_fn, void *context);
-
- /*
   * acl_threads_server.c
   */
-
 typedef int (*ACL_THREADS_SERVER_FN) (void *, ACL_VSTREAM*);
 
+ACL_API const char *acl_threads_server_conf(void);
 ACL_API void acl_threads_server_main(int argc, char *argv[],
 	ACL_THREADS_SERVER_FN, void *service_ctx, int name, ...);
 #define	acl_ioctl_app_main	acl_threads_server_main
@@ -139,10 +113,10 @@ ACL_API void acl_threads_server_disable_read(ACL_EVENT *event,
  /*
   * acl_aio_server.c
   */
-
 typedef void (*ACL_AIO_SERVER_FN) (ACL_ASTREAM *, void *);
 typedef void (*ACL_AIO_SERVER2_FN) (ACL_SOCKET, void *);
 
+ACL_API const char *acl_aio_server_conf(void);
 ACL_API void acl_aio_server_main(int, char **, ACL_AIO_SERVER_FN, ...);
 ACL_API void acl_aio_server2_main(int, char **, ACL_AIO_SERVER2_FN, ...);
 
@@ -183,9 +157,9 @@ ACL_API void acl_aio_server_on_close(ACL_ASTREAM *stream);
  /*
   * acl_udp_server.c
   */
-
 typedef void (*ACL_UDP_SERVER_FN) (void* ctx, ACL_VSTREAM *);
 
+ACL_API const char *acl_udp_server_conf(void);
 ACL_API void acl_udp_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg,
 	acl_int64 delay, int keep);
 ACL_API void acl_udp_server_cancel_timer(ACL_EVENT_NOTIFY_TIME timer_fn, void *arg);
@@ -197,6 +171,7 @@ ACL_API ACL_VSTREAM **acl_udp_server_streams(void);
   * acl_trigger_server.c
   */
 typedef void (*ACL_TRIGGER_SERVER_FN) (void *);
+ACL_API const char *acl_trigger_server_conf(void);
 ACL_API void acl_trigger_server_main(int, char **, ACL_TRIGGER_SERVER_FN, ...);
 ACL_API ACL_EVENT *acl_trigger_server_event(void);
 
@@ -213,4 +188,3 @@ ACL_API void acl_server_sighup_setup(void);
 #endif
 
 #endif
-

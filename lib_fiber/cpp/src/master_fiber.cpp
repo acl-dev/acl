@@ -11,6 +11,17 @@ master_fiber::~master_fiber(void) {}
 
 static bool has_called = false;
 
+const char* master_fiber::get_conf_path(void) const
+{
+	if (daemon_mode_)
+	{
+		const char* ptr = acl_fiber_server_conf();
+		return ptr && *ptr ? ptr : NULL;
+	}
+	else
+		return conf_.get_path();
+}
+
 void master_fiber::run(int argc, char** argv)
 {
 	// 每个进程只能有一个实例在运行

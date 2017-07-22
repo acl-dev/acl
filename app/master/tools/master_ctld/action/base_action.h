@@ -9,8 +9,11 @@ public:
 
 	virtual int run(acl::string& json) = 0;
 
+	void set_conf(const char* path);
+
 protected:
 	acl::string addr_;
+	acl::string conf_;
 	acl::HttpServletRequest& req_;
 	acl::HttpServletResponse& res_;
 

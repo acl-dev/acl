@@ -56,6 +56,17 @@ void master_udp::run_daemon(int argc, char** argv)
 #endif
 }
 
+const char* master_udp::get_conf_path(void) const
+{
+	if (daemon_mode_)
+	{
+		const char* ptr = acl_udp_server_conf();
+		return ptr && *ptr ? ptr : NULL;
+	}
+	else
+		return conf_.get_path();
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,

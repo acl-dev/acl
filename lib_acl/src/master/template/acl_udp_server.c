@@ -165,6 +165,12 @@ static const char *__service_name;
 static char      **__service_argv;
 static void       *__service_ctx;
 static int         __daemon_mode = 1;
+static char        __conf_file[1024];
+
+const char *acl_udp_server_conf(void)
+{
+	return __conf_file;
+}
 
 static ACL_ATOMIC_CLOCK *__clock = NULL;
 
@@ -666,7 +672,6 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	ACL_MASTER_SERVER_INIT_FN pre_init = 0;
 	ACL_MASTER_SERVER_INIT_FN post_init = 0;
 	char   *root_dir = 0, *user_name = 0;
-	const char *conf_file_ptr = 0;
 	UDP_SERVER *server;
 	int     c, key;
 	va_list ap;
@@ -681,6 +686,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	optarg = 0;
 #endif
 
+	__conf_file[0] = 0;
 	master_log_open(argv[0]);
 
 	while ((c = getopt(argc, argv, "hcn:s:t:uvf:r")) > 0) {
@@ -690,7 +696,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 			exit (0);
 		case 'f':
 			acl_app_conf_load(optarg);
-			conf_file_ptr = optarg;
+			snprintf(__conf_file, sizeof(__conf_file), "%s", optarg);
 			break;
 		case 'c':
 			root_dir = "setme";
@@ -723,9 +729,9 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 
 	udp_server_init(argv[0]);
 
-	if (conf_file_ptr && acl_msg_verbose)
+	if (__conf_file[0] && acl_msg_verbose)
 		acl_msg_info("%s(%d), %s: configure file=%s", 
-			__FILE__, __LINE__, myname, conf_file_ptr);
+			__FILE__, __LINE__, myname, __conf_file);
 
 	/*******************************************************************/
 

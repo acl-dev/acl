@@ -137,6 +137,13 @@ static ACL_VSTREAM *__service_lock;
 static int          single_server_in_flow_delay;
 static unsigned     single_server_generation;
 
+static char       __conf_file[1024];
+
+const char *acl_single_server_conf(void)
+{
+	return __conf_file;
+}
+
 ACL_EVENT *acl_single_server_event()
 {
 	return __eventp;
@@ -421,7 +428,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	char *service_name = acl_mystrdup(acl_safe_basename(argv[0])), *lock_path; 
 	int   c, socket_count = 1, fd, fdtype = 0, i, key;
 	const char   *root_dir = 0, *user_name = 0, *transport = 0;
-	const char   *generation, *conf_file_ptr = 0;
+	const char   *generation;
 	ACL_WATCHDOG *watchdog;
 	ACL_VSTRING  *why;
 	ACL_VSTREAM  *stream;
@@ -437,6 +444,8 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	optarg = 0;
 #endif
 
+	__conf_file[0] = 0;
+
 	while ((c = getopt(argc, argv, "hcn:s:t:uvf:")) > 0) {
 		switch (c) {
 		case 'h':
@@ -444,7 +453,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 			exit (0);
 		case 'f':
 			acl_app_conf_load(optarg);
-			conf_file_ptr = optarg;
+			snprintf(__conf_file, sizeof(__conf_file), "%s", optarg);
 			break;
 		case 'c':
 			root_dir = "setme";
@@ -480,12 +489,12 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	acl_msg_info("%s(%d): daemon started, log=%s",
 		acl_var_single_procname, __LINE__, acl_var_single_log_file);
 
-	if (conf_file_ptr == 0)
+	if (__conf_file[0] == 0)
 		acl_msg_fatal("%s(%d), %s: need \"-f pathname\"",
 			__FILE__, __LINE__, myname);
 	else if (acl_msg_verbose)
 		acl_msg_info("%s(%d), %s: configure file = %s",
-			__FILE__, __LINE__, myname, conf_file_ptr);
+			__FILE__, __LINE__, myname, __conf_file);
 
 	/* Application-specific initialization. */
 

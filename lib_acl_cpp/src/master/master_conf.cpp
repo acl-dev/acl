@@ -8,18 +8,19 @@ namespace acl
 
 master_conf::master_conf()
 {
+	path_       = NULL;
 	cfg_loaded_ = false;
 
-	bool_tbl_ = NULL;
-	int_tbl_ = NULL;
-	int64_tbl_ = NULL;
-	str_tbl_ = NULL;
+	bool_tbl_   = NULL;
+	int_tbl_    = NULL;
+	int64_tbl_  = NULL;
+	str_tbl_    = NULL;
 
-	cfg_ = NULL;
-	bool_cfg_ = NULL;
-	int_cfg_ = NULL;
-	int64_cfg_ = NULL;
-	str_cfg_ = NULL;
+	cfg_        = NULL;
+	bool_cfg_   = NULL;
+	int_cfg_    = NULL;
+	int64_cfg_  = NULL;
+	str_cfg_    = NULL;
 }
 
 master_conf::~master_conf()
@@ -29,6 +30,8 @@ master_conf::~master_conf()
 
 void master_conf::reset()
 {
+	if (path_)
+		acl_myfree(path_);
 	if (cfg_)
 	{
 		acl_xinetd_cfg_free(cfg_);
@@ -72,14 +75,26 @@ void master_conf::load(const char* path)
 {
 	if (cfg_loaded_)
 		return;
+
 	if (path)
+	{
 		cfg_ = acl_xinetd_cfg_load(path);
+		if (path_)
+			acl_myfree(path_);
+		path_ = acl_mystrdup(path);
+	}
+
 	cfg_loaded_ = true;
 
 	load_bool();
 	load_int();
 	load_int64();
 	load_str();
+}
+
+const char* master_conf::get_path(void) const
+{
+	return path_;
 }
 
 void master_conf::load_bool()

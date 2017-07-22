@@ -490,6 +490,8 @@ unsigned long acl_channel_recvul_nb(ACL_CHANNEL *c);
  */
 void acl_fiber_server_main(int argc, char *argv[],
 	void (*service)(void*, ACL_VSTREAM*), void *ctx, int name, ...);
+const char *acl_fiber_server_conf(void);
+
 void acl_fiber_chat_main(int argc, char *argv[],
 	int (*service)(ACL_VSTREAM*, void*), void *ctx, int name, ...);
 

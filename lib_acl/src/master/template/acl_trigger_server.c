@@ -129,9 +129,15 @@ static char         *__service_name;
 static char        **__service_argv;
 static void         *__service_ctx;
 static ACL_VSTREAM *__service_lock;
+static char         __conf_file[1024];
 
 static int      trigger_server_in_flow_delay;
 static unsigned trigger_server_generation;
+
+const char *acl_trigger_server_conf(void)
+{
+	return __conf_file;
+}
 
 ACL_EVENT *acl_trigger_server_event()
 {
@@ -431,6 +437,8 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	optarg = 0;
 #endif
 
+	__conf_file[0] = 0;
+
 	while ((c = getopt(argc, argv, "hcDl:n:s:t:uvf:")) > 0) {
 		switch (c) {
 		case 'h':
@@ -438,7 +446,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 			exit (0);
 		case 'f':
 			acl_app_conf_load(optarg);
-			conf_file_ptr = optarg;
+			snprintf(__conf_file, sizeof(__conf_file), "%s", optarg);
 			break;
 		case 'c':
 			root_dir = "setme";

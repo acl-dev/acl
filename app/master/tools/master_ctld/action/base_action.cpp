@@ -9,6 +9,11 @@ base_action::base_action(const acl::string& addr,
 {
 }
 
+void base_action::set_conf(const char* path)
+{
+	conf_ = path;
+}
+
 acl::json* base_action::get_json(void)
 {
 	acl::json* json = req_.getJson();

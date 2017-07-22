@@ -51,6 +51,12 @@ public:
 	 */
 	void thread_disable_read(socket_stream* stream);
 
+	/**
+	 * 获得配置文件路径
+	 * @return {const char*} 返回值为 NULL 表示没有设配置文件
+	 */
+	const char* get_conf_path(void) const;
+
 protected:
 	// 该类不能直接被实例化
 	master_threads();

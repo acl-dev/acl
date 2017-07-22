@@ -3,9 +3,10 @@
 #include "http_servlet.h"
 
 http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session,
-	const char* addr)
+	const char* addr, const char* path)
 : acl::HttpServlet(stream, session)
 , addr_(addr)
+, conf_(path)
 {
 }
 
@@ -112,6 +113,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 
 	acl::string buf;
 	commands_action action(addr_, req, res, cmd);
+	action.set_conf(conf_);
 	int status = action.run(buf);
 	return reply_json(req, res, status, buf);
 }

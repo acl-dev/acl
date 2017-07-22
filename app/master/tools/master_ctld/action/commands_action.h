@@ -13,4 +13,7 @@ public:
 
 private:
 	acl::string cmd_;
+
+	template<typename TReq, typename TReqData>
+	bool check_disabled(acl::json& in, acl::string& out);
 };

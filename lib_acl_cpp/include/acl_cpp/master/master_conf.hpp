@@ -87,6 +87,12 @@ public:
 	void load(const char* path);
 
 	/**
+	 * 获得由 load 设置的配置文件路径
+	 * @return {const char*} 返回 NULL 表示没有设置配置文件路径
+	 */
+	const char* get_path(void) const;
+
+	/**
 	 * 重置配置解析器状态，释放之前分配的资源，调用此函数后，
 	 * 之前获得的字符串配置项的内存将会被释放，所以禁止再用；
 	 * 调用该函数后，则该配置解析器对象可以再次使用解析其它
@@ -98,9 +104,10 @@ public:
 	ACL_CFG_INT64_TABLE* get_int64_cfg() const;
 	ACL_CFG_STR_TABLE* get_str_cfg() const;
 	ACL_CFG_BOOL_TABLE* get_bool_cfg() const;
-protected:
+
 private:
-	bool cfg_loaded_;
+	char* path_;
+	bool  cfg_loaded_;
 
 	ACL_XINETD_CFG_PARSER* cfg_;
 	ACL_CFG_INT_TABLE*  int_cfg_;

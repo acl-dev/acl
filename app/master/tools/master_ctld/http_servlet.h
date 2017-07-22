@@ -3,7 +3,8 @@
 class http_servlet : public acl::HttpServlet
 {
 public:
-	http_servlet(acl::socket_stream*, acl::session*, const char*);
+	http_servlet(acl::socket_stream*, acl::session*,
+		const char* addr, const char* path);
 	~http_servlet();
 
 protected:
@@ -22,6 +23,7 @@ protected:
 
 private:
 	acl::string addr_;
+	acl::string conf_;
 
 	bool replyf(acl::HttpServletRequest&,
 		acl::HttpServletResponse&, int status, const char* fmt, ...);

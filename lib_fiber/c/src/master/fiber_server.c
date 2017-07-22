@@ -75,6 +75,7 @@ static ACL_MASTER_SERVER_ON_LISTEN_FN   __server_on_listen = NULL;
 static ACL_MASTER_SERVER_THREAD_INIT_FN __thread_init;
 static ACL_MASTER_SERVER_SIGHUP_FN      __sighup_handler = NULL;
 static void  *__thread_init_ctx = NULL;
+static char  __conf_file[1024];
 
 static unsigned      __server_generation;
 static int           __server_stopping = 0;
@@ -87,6 +88,11 @@ typedef struct FIBER_SERVER {
 	int           socket_count;
 	int           fdtype;
 } FIBER_SERVER;
+
+const char *acl_fiber_server_conf(void)
+{
+	return __conf_file;
+}
 
 static void server_exit(ACL_FIBER *fiber, int status)
 {
@@ -714,7 +720,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 	const char *service_name = acl_safe_basename(argv[0]);
 	char *root_dir = NULL, *user = NULL, *addrs = NULL;
 	int   c, socket_count = 1, fdtype = ACL_VSTREAM_TYPE_LISTEN;
-	char *generation, conf_file[1024];
+	char *generation;
 	FIBER_SERVER *servers;
 	va_list ap;
 
@@ -732,7 +738,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 
 	master_log_open(__argv[0]);
 
-	conf_file[0] = 0;
+	__conf_file[0] = 0;
 
 	opterr = 0;
 	optind = 0;
@@ -745,7 +751,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 			exit (0);
 		case 'f':
 			acl_app_conf_load(optarg);
-			ACL_SAFE_STRNCPY(conf_file, optarg, sizeof(conf_file));
+			snprintf(__conf_file, sizeof(__conf_file), "%s", optarg);
 			break;
 		case 'c':
 			root_dir = "setme";
@@ -773,12 +779,12 @@ void acl_fiber_server_main(int argc, char *argv[],
 		}
 	}
 
-	if (conf_file[0] == 0)
+	if (__conf_file[0] == 0)
 		acl_msg_info("%s(%d), %s: no configure file",
 			__FILE__, __LINE__, myname);
 	else
 		acl_msg_info("%s(%d), %s: configure file=%s", 
-			__FILE__, __LINE__, myname, conf_file);
+			__FILE__, __LINE__, myname, __conf_file);
 
 	ACL_SAFE_STRNCPY(__service_name, service_name, sizeof(__service_name));
 

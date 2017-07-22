@@ -1,6 +1,10 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+599) 2017.7.22
+599.1) feature: acl_udp_server.c/acl_threads_server.c/acl_aio_server.c,
+acl_single_server.c/acl_trigger_server.c，增加方法用于获得当前服务的配置文件路径
+
 598) 2017.7.10
 598.1) feature: master/template/acl_udp_server.c 增加配置项，允许创建的线程为
 非“分离”模式

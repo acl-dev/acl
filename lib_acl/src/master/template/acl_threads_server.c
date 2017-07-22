@@ -198,6 +198,7 @@ static ACL_MASTER_SERVER_EXIT_TIMER_FN	__server_exit_timer;
 static ACL_MASTER_SERVER_SIGHUP_FN      __sighup_handler;
 
 static char *__deny_info = NULL;
+static char  __conf_file[1024];
 
 static void dispatch_close(ACL_EVENT *event);
 static void dispatch_open(ACL_EVENT *event, acl_pthread_pool_t *threads);
@@ -263,6 +264,11 @@ static int get_client_count(void)
 	unlock_counter();
 
 	return n;
+}
+
+const char *acl_threads_server_conf(void)
+{
+	return __conf_file;
 }
 
 ACL_EVENT *acl_threads_server_event(void)
@@ -1213,7 +1219,7 @@ void acl_threads_server_main(int argc, char * argv[],
 	ACL_THREADS_SERVER_FN service, void *service_ctx, int name, ...)
 {
 	const char *myname = "acl_threads_server_main";
-	char *root_dir = NULL, *user = NULL, *addrs = NULL, conf_file[1024];
+	char *root_dir = NULL, *user = NULL, *addrs = NULL;
 	const char *service_name = acl_safe_basename(argv[0]);
 	int   c, fdtype = 0, event_mode, socket_count = 1;
 	void *thread_init_ctx = NULL, *thread_exit_ctx = NULL;
@@ -1241,7 +1247,7 @@ void acl_threads_server_main(int argc, char * argv[],
 	 * messages to stderr, because no-one is going to see them.
 	 */
 
-	conf_file[0] = 0;
+	__conf_file[0] = 0;
 
 	while ((c = getopt(argc, argv, "hc:n:s:t:uvf:L:")) > 0) {
 		switch (c) {
@@ -1250,7 +1256,7 @@ void acl_threads_server_main(int argc, char * argv[],
 			exit (0);
 		case 'f':
 			acl_app_conf_load(optarg);
-			ACL_SAFE_STRNCPY(conf_file, optarg, sizeof(conf_file));
+			snprintf(__conf_file, sizeof(__conf_file), "%s", optarg);
 			break;
 		case 'c':
 			root_dir = "setme";
@@ -1278,12 +1284,12 @@ void acl_threads_server_main(int argc, char * argv[],
 		}
 	}
 
-	if (conf_file[0] == 0)
+	if (__conf_file[0] == 0)
 		acl_msg_info("%s(%d)->%s: no configure file",
 			__FILE__, __LINE__, myname);
 	else
 		acl_msg_info("%s(%d)->%s: configure file = %s", 
-			__FILE__, __LINE__, myname, conf_file);
+			__FILE__, __LINE__, myname, __conf_file);
 
 	if (addrs && *addrs)
 		__daemon_mode = 0;

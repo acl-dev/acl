@@ -191,6 +191,7 @@ static void (*__service_accept) (ACL_ASTREAM *, void *);
 
 static unsigned __aio_server_generation;
 static char *__deny_info = NULL;
+static char  __conf_file[1024];
 
 static void dispatch_open(ACL_EVENT *event, ACL_AIO *aio);
 static void dispatch_close(ACL_AIO *aio);
@@ -278,6 +279,11 @@ static int get_client_count(void)
 		unlock_counter();
 
 	return n;
+}
+
+const char *acl_aio_server_conf(void)
+{
+	return __conf_file;
 }
 
 ACL_EVENT *acl_aio_server_event()
@@ -1282,7 +1288,7 @@ static void server_main(int argc, char **argv, va_list ap)
 	ACL_MASTER_SERVER_INIT_FN post_init = 0;
 	char   *service_name = acl_mystrdup(acl_safe_basename(argv[0]));
 	char   *root_dir = 0, *user_name = 0;
-	char   *transport = 0, *generation, *conf_file_ptr = 0;
+	char   *transport = 0, *generation;
 	int     c;
 
 	/*******************************************************************/
@@ -1314,6 +1320,8 @@ static void server_main(int argc, char **argv, va_list ap)
 	optarg = 0;
 #endif
 
+	__conf_file[0] = 0;
+
 	while ((c = getopt(argc, argv, "hcn:o:s:t:uvf:")) > 0) {
 		switch (c) {
 		case 'h':
@@ -1321,7 +1329,7 @@ static void server_main(int argc, char **argv, va_list ap)
 			exit (0);
 		case 'f':
 			acl_app_conf_load(optarg);
-			conf_file_ptr = optarg;
+			snprintf(__conf_file, sizeof(__conf_file), "%s", optarg);
 			break;
 		case 'c':
 			root_dir = "setme";
@@ -1351,12 +1359,12 @@ static void server_main(int argc, char **argv, va_list ap)
 
 	aio_server_init(argv[0]);
 
-	if (conf_file_ptr == 0)
+	if (__conf_file[0] == 0)
 		acl_msg_fatal("%s(%d), %s: need \"-f pathname\"",
 			__FILE__, __LINE__, myname);
 	else if (acl_msg_verbose)
 		acl_msg_info("%s(%d), %s: configure file = %s", 
-			__FILE__, __LINE__, myname, conf_file_ptr);
+			__FILE__, __LINE__, myname, __conf_file);
 
 	/* Application-specific initialization. */
 

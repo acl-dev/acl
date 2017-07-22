@@ -32,6 +32,12 @@ public:
 	 */
 	bool run_alone(const char* addrs, const char* path = NULL, int count = 1);
 
+	/**
+	 * 获得配置文件路径
+	 * @return {const char*} 返回值为 NULL 表示没有设配置文件
+	 */
+	const char* get_conf_path(void) const;
+
 protected:
 	master_proc();
 	virtual ~master_proc();

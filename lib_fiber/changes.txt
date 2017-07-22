@@ -1,3 +1,8 @@
+
+55) 2017.7.22
+55.1) feature: master_fiber 增加 get_conf_path, acl_fiber_server.cpp 中增加
+acl_fiber_server_conf，此二方法用于获得当前的服务配置文件路径
+
 54) 2017.7.7
 54.1) feature: master/fiber_server.c 中将 fiber_sleep 协程的栈大小允许受配置项
 控制；同时将内部的 STACK_SIZE 缺省值由 64 K 改为 128 K，该值也是用户级所创建

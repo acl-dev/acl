@@ -53,6 +53,17 @@ void master_aio::run_daemon(int argc, char** argv)
 #endif
 }
 
+const char* master_aio::get_conf_path(void) const
+{
+	if (daemon_mode_)
+	{
+		const char* ptr = acl_aio_server_conf();
+		return ptr && *ptr ? ptr : NULL;
+	}
+	else
+		return conf_.get_path();
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 static void close_all_listener(std::vector<aio_listen_stream*>& sstreams)
