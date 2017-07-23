@@ -184,7 +184,7 @@ __线程池模型：__ 将配置项 ioctl_use_limit 和 ioctl_idle_limit 设为 
 __非阻塞模型：__ 将配置项 aio_use_limit 和 aio_idle_limit 设为 0；  
 __协程模型：__ 将配置项 fiber_use_limit 和 fiber_idle_limit 设为 0；  
 __UDP通信模型：__ 将配置项 udp_use_limit 和 udp_idle_limit 设为 0；  
-__触发器模型：__ 将配置项 trigger_use_limit 设为。
+__触发器模型：__ 将配置项 trigger_use_limit 设为 0。
 
 #### 5. acl_master 控制模式下，服务子进程如何预启动多个进程？
 需要修改每个服务子进程的配置文件，将配置项：master_maxproc 及 master_prefork 设置成要启动的进程数（设置值需相同），同时需要将 xxx_use_limit 及 xxx_idle_limit 配置项设成 0 以防止子进程空闲退出，xxx_use_limit 及 xxx_idle_limit  的依每种服务器模型而不同，具体可参考上面（4）中的说明。
