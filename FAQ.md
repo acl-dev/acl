@@ -1,6 +1,6 @@
-# acl库使用FAQ
+## acl库使用FAQ
 
-## 一、基础问题
+### 一、基础问题
 ### 1、acl 库是啥、主要包含哪些功能？
 acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD）的网络通信库及服务器编程框架，同时提供更多的实用功能库。通过该库，用户可以非常容易地编写支持多种模式(多线程、多进程、非阻塞、触发器、UDP方式、协程方式)的服务器程序，WEB 应用程序，数据库应用程序。此外，该库还提供了常见应用的客户端通信库（如：HTTP、SMTP、ICMP、redis、disque、memcache、beanstalk、handler socket），常见流式编解码库：XML/JSON/MIME/BASE64/UUCODE/QPCODE/RFC2047 等。
 ### 2、acl 库支持哪些平台？
@@ -16,7 +16,7 @@ lib_acl/lib_protocol/lib_fiber 仅依赖系统基础库；lib_acl_cpp 库的 db 
 - oschina: https://git.oschina.net/acl-dev/acl/
 - sourceforge：https://sourceforge.net/projects/acl/
  
-## 二、编译&使用问题
+### 二、编译&使用问题
 ### 1、acl 库的编译过程？
 acl 库的编译过程请参考：[acl 的编译与使用](http://zsxxsz.iteye.com/blog/1506554) 博客。
 ### 2、Linux 平台下库的编译顺序问题？
@@ -56,7 +56,7 @@ main.o: main.cpp
 ### 8、Linux 下如何使用 mysql 功能？
 lib_acl_cpp 库是以动态加载方式加载 mysql 动态库的，所以在编译 lib_acl_cpp 时，mysql 功能就已经被编译进去 acl库中了。用户仅需要将 mysql 动态库通过函数 acl::db_handle::set_loadpath 注册进 acl 库中即可；至于 mysql 客户端库，用户可以去 mysql 官方下载或在 acl/resource 目录下编译 mysql-connector-c-6.1.6-src.tar.gz。
  
-## 三、各个功能模块的使用问题
+### 三、各个功能模块的使用问题
 ### （一）、网络通信
 ### （二）、HTTP 模块
 #### 1. acl HTTP 服务器是否支持断点下载功能？
