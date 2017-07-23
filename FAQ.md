@@ -12,39 +12,39 @@
     * [2、Linux 平台下库的编译顺序问题？](#2linux-平台下库的编译顺序问题)
     * [3、Unix/Linux 平台下编译 acl 库时的编译选项是什么](#3unixlinux-平台下编译-acl-库时的编译选项是什么)
     * [4、请给出 Linux 平台下最简单的一个 Makefile？](#4请给出-linux-平台下最简单的一个-makefile)
-    * [5、Linux 平台下找不到 -lz 库怎么办？](#5Linux-平台下找不到-lz-库怎么办)
+    * [5、Linux 平台下找不到 -lz 库怎么办？](#5linux-平台下找不到-lz-库怎么办)
     * [6、Linux 平台下 acl 库能打包成一个库吗？](#6linux-平台下-acl-库能打包成一个库吗)
     * [7、Linux 平台下如何使用 ssl 功能？](#7linux-平台下如何使用-ssl-功能)
     * [8、Linux 下如何使用 mysql 功能？](#8linux-下如何使用-mysql-功能)
 * [三、各个功能模块的使用问题](#三各个功能模块的使用问题)
     * [（一）、网络通信](#（一）网络通信)
-    * [（二）、HTTP 模块](#（二）HTTP 模块)
-        * [1. acl HTTP 服务器是否支持断点下载功能？](#1acl-http-服务器是否支持断点下载功能)
-        * [2. acl HTTP 服务器是否支持文件上传功能？](#2acl-http-服务器是否支持文件上传功能)
-        * [3、acl HTTP 模块是否支持服务器/客户端两种模式？](#3acl-http-模块是否支持服务器/客户端两种模式)
-        * [4、acl HTTP 模块是否支持 websocket 通信协议？](#4acl-http-模块是否支持-websocket-通信协议)
-        * [5、acl HTTP 模块是否支持 session?](#5acl-http-模块是否支持-session)
+    * [（二）、HTTP 模块](#二http-模块)
+        * [1. acl HTTP 服务器是否支持断点下载功能？](#1-acl-http-服务器是否支持断点下载功能)
+        * [2. acl HTTP 服务器是否支持文件上传功能？](#2-acl-http-服务器是否支持文件上传功能)
+        * [3. acl HTTP 模块是否支持服务器/客户端两种模式？](#3-acl-http-模块是否支持服务器/客户端两种模式)
+        * [4. acl HTTP 模块是否支持 websocket 通信协议？](#4-acl-http-模块是否支持-websocket-通信协议)
+        * [5. acl HTTP 模块是否支持 session?](#5-acl-http-模块是否支持-session)
     * [（三）、Redis 模块](#（三）Redis 模块)
-        * [1. acl redis 库是否支持集群功能？](#1acl-redis-库是否支持集群功能)
-        * [2. acl redis 库是如何划分的？](#2acl-redis-库是如何划分的)
-        * [3. acl redis 库中的哪些类对象操作是线程安全的？](#3acl-redis-库中的哪些类对象操作是线程安全的)
-        * [4. acl redis 客户库当连接断开时是否会重连？](#4acl-redis-客户库当连接断开时是否会重连)
-    * [（四）、协程模块](#（四）协程模块)
-        * [1. 协程里面的非阻塞是什么原理的？](#1协程里面的非阻塞是什么原理的)
-        * [2. acl 协程库是否支持多线程？](#2acl-协程库是否支持多线程)
-        * [3. acl 协程库如何支持多核 CPU？](#3acl-协程库如何支持多核-cpu)
-        * [4. acl 协程里针对 mysql 客户端库的协程化是否修改了 mysql 库的源码？](#4acl-协程里针对-mysql-客户端库的协程化是否修改了-mysql-库的源码)
-        * [5. acl 协程库支持域名解析功能吗？](#5acl-协程库支持域名解析功能吗)
-        * [6. acl 协程库的系统 errno 号如何处理？](#6acl-协程库的系统-errno-号如何处理)
-        * [7. 如果启动的协程过多，会不会对于后端例如 mysql 之类服务造成并发压力？如何避免？](#7如果启动的协程过多会不会对于后端例如-mysql-之类服务造成并发压力如何避免)
-    * [（五）、服务器模块](#（五）服务器模块)
-        * [1. 有几种服务器编程模型？均有何特点？](#1有几种服务器编程模型均有何特点)
-        * [2. acl_master 的作用是什么？支持哪些平台？](#2acl_master-的作用是什么支持哪些平台)
-        * [3. 没有 acl_master 控制管理，服务子进程是否可以单独运行？](#3没有-acl_master-控制管理服务子进程是否可以单独运行)
-        * [4. 手工模式下运行时遇到 “idle timeout -- exiting, idle” 怎么办？](#4手工模式下运行时遇到-idle-timeout-exiting-idle-怎么办)
-        * [5、acl_master 控制模式下，服务子进程如何预启动多个进程？](#5acl_master-控制模式下服务子进程如何预启动多个进程)
-        * [6、acl_master 控制模式下，如何只监听内网地址？](#6acl_master 控制模式下如何只监听内网地址)
-    * [（六）、邮件&mime模块](#（六）邮件mime模块)
+        * [1. acl redis 库是否支持集群功能？](#1-acl-redis-库是否支持集群功能)
+        * [2. acl redis 库是如何划分的？](#2-acl-redis-库是如何划分的)
+        * [3. acl redis 库中的哪些类对象操作是线程安全的？](#3-acl-redis-库中的哪些类对象操作是线程安全的)
+        * [4. acl redis 客户库当连接断开时是否会重连？](#4-acl-redis-客户库当连接断开时是否会重连)
+    * [（四）、协程模块](#四协程模块)
+        * [1. 协程里面的非阻塞是什么原理的？](#1-协程里面的非阻塞是什么原理的)
+        * [2. acl 协程库是否支持多线程？](#2-acl-协程库是否支持多线程)
+        * [3. acl 协程库如何支持多核 CPU？](#3-acl-协程库如何支持多核-cpu)
+        * [4. acl 协程里针对 mysql 客户端库的协程化是否修改了 mysql 库的源码？](#4-acl-协程里针对-mysql-客户端库的协程化是否修改了-mysql-库的源码)
+        * [5. acl 协程库支持域名解析功能吗？](#5-acl-协程库支持域名解析功能吗)
+        * [6. acl 协程库的系统 errno 号如何处理？](#6-acl-协程库的系统-errno-号如何处理)
+        * [7. 如果启动的协程过多，会不会对于后端例如 mysql 之类服务造成并发压力？如何避免？](#7-如果启动的协程过多会不会对于后端例如-mysql-之类服务造成并发压力如何避免)
+    * [（五）、服务器模块](#五服务器模块)
+        * [1. 有几种服务器编程模型？均有何特点？](#1-有几种服务器编程模型均有何特点)
+        * [2. acl_master 的作用是什么？支持哪些平台？](#2-acl_master-的作用是什么支持哪些平台)
+        * [3. 没有 acl_master 控制管理，服务子进程是否可以单独运行？](#3-没有-acl_master-控制管理服务子进程是否可以单独运行)
+        * [4. 手工模式下运行时遇到 “idle timeout -- exiting, idle” 怎么办？](#4-手工模式下运行时遇到-idle-timeout-exiting-idle-怎么办)
+        * [5、acl_master 控制模式下，服务子进程如何预启动多个进程？](#5-acl_master-控制模式下服务子进程如何预启动多个进程)
+        * [6、acl_master 控制模式下，如何只监听内网地址？](#6-acl_master 控制模式下如何只监听内网地址)
+    * [（六）、邮件&mime模块](#六邮件mime模块)
 
 ### 一、基础问题
 ### 1、acl 库是啥、主要包含哪些功能？
@@ -111,13 +111,13 @@ lib_acl_cpp 库是以动态加载方式加载 mysql 动态库的，所以在编�
 #### 2. acl HTTP 服务器是否支持文件上传功能？
 支持。参考示例：acl\app\wizard_demo\httpd_upload。
 
-#### 3、acl HTTP 模块是否支持服务器/客户端两种模式？
+#### 3. acl HTTP 模块是否支持服务器/客户端两种模式？
 支持。目前 acl 的 HTTP 协议模块同时支持客户端及服务端模式，即你既可以使用 acl HTTP 编写客户端程序，又可以编写服务器程序，其中 acl 中的 http_request/http_request_pool/http_request_manager 类用来编写客户端程序，http_response/HttpServlet/HttpServletRequest/HttpServeletResponse 用来编写服务器程序。
 
-#### 4、acl HTTP 模块是否支持 websocket 通信协议？
+#### 4. acl HTTP 模块是否支持 websocket 通信协议？
 支持。可以参考示例：lib_acl_cpp\samples\websocket。
 
-#### 5、acl HTTP 模块是否支持 session?
+#### 5. acl HTTP 模块是否支持 session?
 支持。acl HTTP 模块当用在服务器编程时支持 session 存储，目前支持使用 memcached 或 redis 存储 session 数据。
  
 ### （三）、Redis 模块
