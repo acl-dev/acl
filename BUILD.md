@@ -14,7 +14,7 @@
     * [3、编译成单一库](#3编译成单一库)
     * [4、使用 cmake 编译](#4使用-cmake-编译)
 * [二、Windows 平台](#二Windows-平台)
-    * [1 编译（vc2003/vc2008/vc2010/vc2012）](#1-编译（vc2003/vc2008/vc2010/vc2012）)
+    * [1 编译（vc2003/vc2008/vc2010/vc2012）](#1-编译（vc2003vc2008vc2010vc2012）)
     * [2 使用](#2-使用)
 * [三、 注意事项](#三注意事项)
 
@@ -115,7 +115,7 @@ lib_acl/include、lib_protocol/include 以及 lib_acl_cpp/include
 所在的路径，在链接时指定静态库路径及静态库名称。
 - b）在 win32 平台下使用 lib_acl 的动态库时，不仅要做与 a） 中所指定的操作，而且需要在预处理器定义中添加：ACL_DLL；在使用 lib_protocol 的动态库，需要在预处理器定义中添加：HTTP_DLL 和 ICMP_DLL；在使用 lib_acl_cpp 的动态库时，需要在预处理器定义中添加：ACL_CPP_DLL。
  
-### 三、 注意事项
+### 三、注意事项
 因为 lib_acl 是最基础的库，而 lib_protocol 依赖于 lib_acl，lib_acl_cpp 依赖于 lib_protocol 和 lib_acl，所在生成动态库时，需要注意生成顺序，编译顺序为：lib_acl，lib_protocol，lib_acl_cpp。
  
 - 个人微博：http://weibo.com/zsxxsz/
