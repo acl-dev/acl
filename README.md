@@ -44,7 +44,8 @@
     * [3.3、lib_acl_cpp---C++ 功能库](#33lib_acl_cpp)
     * [3.4、lib_fiber---网络协程库](#34lib_fiber)
     * [3.5、图例](#35图例)
-    * [3.6、acl 库中有大量示例可供参考，请参考：SAMPLES.md](#36acl-库中有大量示例可供参考请参考samplesmd)
+    * [3.6、acl 库中有大量示例可供参考，请参考：SAMPLES.md](#36acl-库中有大量示例可供参考请参考samples.md)
+    * [3.7、acl 使用 FAQ](#37acl-使用-FAQ，[FAQ.md](FAQ.md))
 * [四、谁在使用acl](#四谁在使用acl)
 * [五、使用许可](#五使用许可)
 * [六、参考](#六参考)
@@ -186,6 +187,7 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 * 使用 lib_acl_cpp 的动态库时，需要在工程中预定义 ACL_CPP_DLL，如果您使用用 VC2003 编译环境则还需要预定义 VC2003;
 * 使用 lib_dict 的动态库时，需要在工程中预定义 DICT_DLL;
 * 使用 lib_tls 的动态库时，需要在工程中预定义 TLS_DLL。
+* 详细编译过程，参见：[acl 库的编译及使用](BUILD.md)
 
 ## 三、目录结构说明
 
@@ -264,6 +266,7 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
      ![网页下载程序](res/img/http_client.jpg)
 
 ### 3.6、acl 库中有大量示例可供参考，请参考：[SAMPLES.md](SAMPLES.md)
+### 3.7、acl 使用 FAQ，[FAQ.md](FAQ.md)
 
 ## 四、谁在使用acl
 [![iqiyi](res/logo/logo_iqiyi.png)](http://www.iqiyi.com/)
