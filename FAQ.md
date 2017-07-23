@@ -12,7 +12,7 @@
     * [2、Linux 平台下库的编译顺序问题？](#2linux-平台下库的编译顺序问题)
     * [3、Unix/Linux 平台下编译 acl 库时的编译选项是什么](#3unixlinux-平台下编译-acl-库时的编译选项是什么)
     * [4、请给出 Linux 平台下最简单的一个 Makefile？](#4请给出-linux-平台下最简单的一个-makefile)
-    * [5、Linux 平台下找不到 -lz 库怎么办？](#5linux-平台下找不到-lz-库怎么办)
+    * [5、Linux 平台下找不到 -lz 库怎么办？](#5linux-平台下找不到-libz.a-库怎么办)
     * [6、Linux 平台下 acl 库能打包成一个库吗？](#6linux-平台下-acl-库能打包成一个库吗)
     * [7、Linux 平台下如何使用 ssl 功能？](#7linux-平台下如何使用-ssl-功能)
     * [8、Linux 下如何使用 mysql 功能？](#8linux-下如何使用-mysql-功能)
@@ -88,7 +88,7 @@ main.o: main.cpp
 		-I./lib_acl/include \
 		-I./lib_acl_cpp/include
 ~~~
-### 5、Linux 平台下找不到 -lz 库怎么办？
+### 5、Linux 平台下找不到 libz.a 库怎么办？
 一般 Unix/Linux 平台下系统会自带 libz.a 或 libz.so 压缩库，如果找不到该库，则可以在线安装或采用编译安装 zlib 库，针对 Centos 和 Ubuntu 可分别通过以下方式在线安装（均需切换至 root 身份）：
 - Centos：yum install zlib-devel
 - Ubuntu：apt-get install zlib1g.dev
