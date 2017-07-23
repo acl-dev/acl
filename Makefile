@@ -109,6 +109,7 @@ clean:
 	@(cd lib_acl; make clean)
 	@(cd lib_protocol; make clean)
 	@(cd lib_acl_cpp; make clean)
+	@(cd lib_fiber; make clean)
 	@(cd lib_rpc; make clean)
 	@(cd unit_test; make clean)
 	@(cd lib_acl/samples; make clean)
