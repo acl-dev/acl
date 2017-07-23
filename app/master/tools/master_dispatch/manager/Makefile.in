@@ -91,12 +91,13 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-CFLAGS += -I../../../lib_acl/include -I../../../lib_protocol/include \
-	  -I../../../lib_acl_cpp/include -I.
+CFLAGS += -I../../../../../lib_acl/include \
+	  -I../../../../../lib_protocol/include \
+	  -I../../../../../lib_acl_cpp/include -I.
 EXTLIBS =
-LDFLAGS = -L../../../lib_acl_cpp/lib -lacl_cpp \
-	  -L../../../lib_protocol/lib -lprotocol \
-	  -L../../../lib_acl/lib -lacl \
+LDFLAGS = -L../../../../../lib_acl_cpp/lib -lacl_cpp \
+	  -L../../../../../lib_protocol/lib -lprotocol \
+	  -L../../../../../lib_acl/lib -lacl \
 	  $(EXTLIBS) $(SYSLIB) -rdynamic
 
 COMPILE = $(CC) $(CFLAGS)
@@ -124,10 +125,11 @@ all: RM $(OBJ)
 	@echo ""
 RM:
 	rm -f $(PROG)
-clean:
+clean cl:
 	rm -f $(PROG)
 	rm -f $(OBJ)
+rebuild rb: cl all
 install:
-	cp $(PROG) ../../../dist/master/libexec/$(RPATH)/
-	cp $(PROG).cf ../../../dist/master/conf/service/
+	cp $(PROG) ../../../../../dist/master/libexec/$(RPATH)/
+	cp $(PROG).cf ../../../../../dist/master/conf/service/
 ###########################################################
