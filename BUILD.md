@@ -5,16 +5,16 @@
 * acl 库其实包含七个库：lib_acl （基础库）、lib_protocol（http 和 icmp 协议库）、lib_acl_cpp（封装了 lib_acl 和 lib_protocol 两个 C 库的 C++ 版本封装，更是增加了丰富的功能）、lib_fiber（功能强大的网络协程库，使开发者可以象使用 Go 语言一样快速编写基于协程的高并发服务应用）、lib_dict（封装了 bdb, cdb, Tokyo Cabinet 库的用于字典查询的库）、lib_tls（封装了openssl部分功能的库，主要用于 lib_acl 的 ssl 加密传输）以及 lib_rpc（封装了 Google 的 protobuf 的库）。其中，笔者用的最多还是 lib_acl 、lib_protocol 以及 lib_acl_cpp（目前用得最多的库）三个库，所以本文主要介绍这三个库的编译与使用。
 * acl 库目前支持 Linux、Solaris、FreeBSD、MacOS、IOS、Android 和 Windows 平台，欢迎读者将 acl 库移植至其它平台。
  
-* [一、Linux/UNIX 平台上编译](#一Linux/UNIX-平台上编译)
+* [一、Linux/UNIX 平台上编译](#一linux/unix-平台上编译)
     * [1、编译静态库](#1编译静态库)
-        * [1.1、编译 libacl.a 库](#11编译-libacl.a-库)
-        * [1.2、编译 libprotocol.a 库](#12编译-libprotocol.a-库)
-        * [1.3、编译 libacl_cpp.a 库](#13编译-libacl_cpp.a-库)
+        * [1.1、编译 libacl.a 库](#11编译-libacla-库)
+        * [1.2、编译 libprotocol.a 库](#12编译-libprotocola-库)
+        * [1.3、编译 libacl_cpp.a 库](#13编译-libacl_cppa-库)
     * [2、编译动态库](#2编译动态库)
     * [3、编译成单一库](#3编译成单一库)
     * [4、使用 cmake 编译](#4使用-cmake-编译)
-* [二、Windows 平台](#二Windows-平台)
-    * [1 编译（vc2003/vc2008/vc2010/vc2012）](#1-编译（vc2003vc2008vc2010vc2012）)
+* [二、Windows 平台](#二Windows平台)
+    * [1 编译（vc2003/vc2008/vc2010/vc2012）](#1-编译)
     * [2 使用](#2-使用)
 * [三、 注意事项](#三注意事项)
 
@@ -101,8 +101,8 @@ $cd build
 $cmake ..
 $make
 ~~~
-### 二、Windows 平台
-### 1 编译（vc2003/vc2008/vc2010/vc2012）
+### 二、Windows平台
+### 1 编译
  
 在 acl 项目的根目录下，多个 VC 的工程文件，用户可根据自身需要打开工程文件：acl_cpp_vc2003.sln，acl_cpp_vc2008.sln，acl_cpp_vc2010.sln，acl_cpp_vc2012.sln（最早也支持VC6）。用户可以选择编译 lib_acl、lib_protocol、lib_acl_cpp 的静态库调试版、静态库发布版、动态库调试版以及动态库发布版，编译完成后，会在 acl\dist\lib\win32 目录生成的静态库有：  
 lib_acl_vc20xxd.lib、lib_acl_vc20xx.lib、lib_protocol_vc20xxd.lib 和 lib_protocol_vc20xx.lib；  
