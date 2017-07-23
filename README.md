@@ -45,7 +45,7 @@
     * [3.4、lib_fiber---网络协程库](#34lib_fiber)
     * [3.5、图例](#35图例)
     * [3.6、acl 库中有大量示例可供参考，请参考：SAMPLES.md](#36acl-库中有大量示例可供参考请参考samplesmd)
-    * [3.7、acl 使用 FAQ](#37acl-使用-faq，faqmd)
+    * [3.7、acl 使用 FAQ](#37acl-使用-faq-参考-faqmd)
 * [四、谁在使用acl](#四谁在使用acl)
 * [五、使用许可](#五使用许可)
 * [六、参考](#六参考)
@@ -266,7 +266,7 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
      ![网页下载程序](res/img/http_client.jpg)
 
 ### 3.6、acl 库中有大量示例可供参考，请参考：[SAMPLES.md](SAMPLES.md)
-### 3.7、acl 使用 FAQ，[FAQ.md](FAQ.md)
+### 3.7、acl 使用 FAQ 参考 [FAQ.md](FAQ.md)
 
 ## 四、谁在使用acl
 [![iqiyi](res/logo/logo_iqiyi.png)](http://www.iqiyi.com/)
