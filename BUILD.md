@@ -48,6 +48,7 @@ main.o: main.c
 ##### 1.3.2、链接选项：-L
 指定 libacl_cpp.a 所在目录，-L 指定 libprotocol.a 所在目录，-L 指定 libacl.a 目录。如：-L./lib_acl_cpp/lib -lacl_cpp -L./lib_protocol/lib -lprotocol -L./lib_acl/lib -lacl，一定要注意这三个库的依赖关系：libprotocol.a 依赖于 libacl.a，libacl_cpp.a 依赖于 libprotocol.a 及 lib_acl.a，在使用 g++ 进行编译时必须保证库的依赖顺序，被依赖的库总是应放在后面，否则在链接程序时会报函数不存在。
 ##### 1.3.3、用户需要在自己的应用中包含 lib_acl.hpp 头文件，如下：
+
       #include "acl_cpp/lib_acl.hpp"
 
 简单的 Makefile 示例：  
