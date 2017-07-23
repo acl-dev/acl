@@ -137,7 +137,7 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 2. 支持连接池方式;
 3. 按 redis 数据结构类型分成独立的 C++ 类;
 4. 每个命令映射为 1 个至多个函数.
-具体内容参考：[使用 acl 库编写高效的 C++ redis 客户端应用 编辑](http://zsxxsz.iteye.com/blog/2184744)
+具体内容参考：[使用 acl 库编写高效的 C++ redis 客户端应用](http://zsxxsz.iteye.com/blog/2184744)
 #### 1.2.7、MIME 协议库
 1. 支持流式 MIME 数据解析;
 2. 支持 MIME RFC2045，RFC2047，RFC822.
