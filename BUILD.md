@@ -130,12 +130,12 @@ acl_master 为由以上各个服务器编写的服务进程的控制管理程序
 
 #### 4. 手工模式下运行时遇到 “idle timeout -- exiting, idle” 怎么办？
 因为 acl 的服务器编程模型均支持半驻留方式（即运行空闲一段时间或处理连接次数达到设定值后会自动退出，这样的好处是：可以定期通过进程退出释放可能存在的资源泄露，另一方面便于用户在开发时通过 valgrind 进行内存检查），如果让进程不退出，可以在 alone 模式下给服务程序传递启动配置文件，如启动方式为：./xxxx alone xxxx.cf（传递方式可以看 main.cpp 和相关头文件），不同的服务器模型分别采取下面不同的配置项：  
-** 进程池模型：** 将配置项 single_use_limit 和 single_idle_limit 设为 0；  
-** 线程池模型：** 将配置项 ioctl_use_limit 和 ioctl_idle_limit 设为 0；  
-** 非阻塞模型：** 将配置项 aio_use_limit 和 aio_idle_limit 设为 0；  
-** 协程模型：** 将配置项 fiber_use_limit 和 fiber_idle_limit 设为 0；  
-** UDP通信模型：** 将配置项 udp_use_limit 和 udp_idle_limit 设为 0；  
-** 触发器模型：** 将配置项 trigger_use_limit 设为。
+__ 进程池模型：__ 将配置项 single_use_limit 和 single_idle_limit 设为 0；  
+__ 线程池模型：__ 将配置项 ioctl_use_limit 和 ioctl_idle_limit 设为 0；  
+__ 非阻塞模型：__ 将配置项 aio_use_limit 和 aio_idle_limit 设为 0；  
+__ 协程模型：__ 将配置项 fiber_use_limit 和 fiber_idle_limit 设为 0；  
+__ UDP通信模型：__ 将配置项 udp_use_limit 和 udp_idle_limit 设为 0；  
+__ 触发器模型：__ 将配置项 trigger_use_limit 设为。
 
 #### 5、acl_master 控制模式下，服务子进程如何预启动多个进程？
 需要修改每个服务子进程的配置文件，将配置项：master_maxproc 及 master_prefork 设置成要启动的进程数（设置值需相同），同时需要将 xxx_use_limit 及 xxx_idle_limit 配置项设成 0 以防止子进程空闲退出，xxx_use_limit 及 xxx_idle_limit  的依每种服务器模型而不同，具体可参考上面（4）中的说明。
