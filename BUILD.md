@@ -93,7 +93,7 @@ lib_acl/include、lib_protocol/include 以及 lib_acl_cpp/include
 ### 三、 注意事项
 因为 lib_acl 是最基础的库，而 lib_protocol 依赖于 lib_acl，lib_acl_cpp 依赖于 lib_protocol 和 lib_acl，所在生成动态库时，需要注意生成顺序，编译顺序为：lib_acl，lib_protocol，lib_acl_cpp。
  
-- 个人微博：http://weibo.com/zsxxs
+- 个人微博：http://weibo.com/zsxxsz/
 - acl 下载：https://sourceforge.net/p/acl/
 - github 地址：https://github.com/acl-dev/acl/
 - osc git 地址：https://git.oschina.net/acl-dev/acl
