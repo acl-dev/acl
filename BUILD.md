@@ -13,7 +13,7 @@
     * [2、编译动态库](#2编译动态库)
     * [3、编译成单一库](#3编译成单一库)
     * [4、使用 cmake 编译](#4使用-cmake-编译)
-* [二、Windows 平台](#二Windows平台)
+* [二、Windows 平台](#二windows-平台)
     * [1 编译（vc2003/vc2008/vc2010/vc2012）](#1-编译)
     * [2 使用](#2-使用)
 * [三、 注意事项](#三注意事项)
@@ -101,7 +101,7 @@ $cd build
 $cmake ..
 $make
 ~~~
-### 二、Windows平台
+### 二、Windows 平台
 ### 1 编译
  
 在 acl 项目的根目录下，多个 VC 的工程文件，用户可根据自身需要打开工程文件：acl_cpp_vc2003.sln，acl_cpp_vc2008.sln，acl_cpp_vc2010.sln，acl_cpp_vc2012.sln（最早也支持VC6）。用户可以选择编译 lib_acl、lib_protocol、lib_acl_cpp 的静态库调试版、静态库发布版、动态库调试版以及动态库发布版，编译完成后，会在 acl\dist\lib\win32 目录生成的静态库有：  
