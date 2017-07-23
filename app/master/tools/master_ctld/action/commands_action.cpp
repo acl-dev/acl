@@ -12,7 +12,7 @@ commands_action::commands_action(const char* addr,
 }
 
 template<typename TReq, typename TReqData>
-bool commands_action::check_disabled(acl::json& in, acl::string& out)
+bool commands_action::enabled(acl::json& in, acl::string& out)
 {
 	TReq req;
 	if (deserialize<TReq>(in, req) == false)
@@ -57,31 +57,31 @@ int commands_action::run(acl::string& out)
 		return http_forward<stat_req_t, stat_res_t>(addr_, *json, out);
 	else if (cmd_ == "start")
 	{
-		if (!check_disabled<start_req_t, start_req_data_t>(*json, out))
+		if (!enabled<start_req_t, start_req_data_t>(*json, out))
 			return 400;
 		return http_forward<start_req_t, start_res_t>(addr_, *json, out);
 	}
 	else if (cmd_ == "stop")
 	{
-		if (!check_disabled<stop_req_t, stop_req_data_t>(*json, out))
+		if (!enabled<stop_req_t, stop_req_data_t>(*json, out))
 			return 400;
 		return http_forward<stop_req_t, stop_res_t>(addr_, *json, out);
 	}
 	else if (cmd_ == "kill")
 	{
-		if (check_disabled<kill_req_t, kill_req_data_t>(*json, out))
+		if (!enabled<kill_req_t, kill_req_data_t>(*json, out))
 			return 400;
 		return http_forward<kill_req_t, kill_res_t>(addr_, *json, out);
 	}
 	else if (cmd_ == "reload")
 	{
-		if (!check_disabled<reload_req_t, reload_req_data_t>(*json, out))
+		if (!enabled<reload_req_t, reload_req_data_t>(*json, out))
 			return 400;
 		return http_forward<reload_req_t, reload_res_t>(addr_, *json, out);
 	}
 	else if (cmd_ == "restart")
 	{
-		if (!check_disabled<restart_req_t, restart_req_data_t>(*json, out))
+		if (!enabled<restart_req_t, restart_req_data_t>(*json, out))
 			return 400;
 		return http_forward<restart_req_t, restart_res_t>(addr_, *json, out);
 	}
