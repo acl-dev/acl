@@ -41,7 +41,7 @@
         * [1. 有几种服务器编程模型？均有何特点？](#1-有几种服务器编程模型均有何特点)
         * [2. acl_master 的作用是什么？支持哪些平台？](#2-acl_master-的作用是什么支持哪些平台)
         * [3. 没有 acl_master 控制管理，服务子进程是否可以单独运行？](#3-没有-acl_master-控制管理服务子进程是否可以单独运行)
-        * [4. 手工模式下运行时遇到“idle timeout -- exiting, idle”怎么办？](#4-手工模式下运行时遇到idle-timeout--exiting-idle怎么办)
+        * [4. 手工模式下运行时遇到“idle timeout -- exiting, idle”怎么办？](#4-手工模式下运行时遇到“idle-timeout--exiting-idle”怎么办)
         * [5. acl_master 控制模式下，服务子进程如何预启动多个进程？](#5-acl_master-控制模式下服务子进程如何预启动多个进程)
         * [6. acl_master 控制模式下，如何只监听内网地址？](#6-acl_master-控制模式下如何只监听内网地址)
     * [（六）、邮件&mime模块](#六邮件mime模块)
