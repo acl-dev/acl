@@ -21,10 +21,10 @@
     * [（二）、HTTP 模块](#二http-模块)
         * [1. acl HTTP 服务器是否支持断点下载功能？](#1-acl-http-服务器是否支持断点下载功能)
         * [2. acl HTTP 服务器是否支持文件上传功能？](#2-acl-http-服务器是否支持文件上传功能)
-        * [3. acl HTTP 模块是否支持服务器/客户端两种模式？](#3-acl-http-模块是否支持服务器/客户端两种模式)
+        * [3. acl HTTP 模块是否支持服务器/客户端两种模式？](#3-acl-http-模块是否支持服务器客户端两种模式)
         * [4. acl HTTP 模块是否支持 websocket 通信协议？](#4-acl-http-模块是否支持-websocket-通信协议)
         * [5. acl HTTP 模块是否支持 session?](#5-acl-http-模块是否支持-session)
-    * [（三）、Redis 模块](#（三）Redis 模块)
+    * [（三）、Redis 模块](#三Redis 模块)
         * [1. acl redis 库是否支持集群功能？](#1-acl-redis-库是否支持集群功能)
         * [2. acl redis 库是如何划分的？](#2-acl-redis-库是如何划分的)
         * [3. acl redis 库中的哪些类对象操作是线程安全的？](#3-acl-redis-库中的哪些类对象操作是线程安全的)
@@ -41,9 +41,9 @@
         * [1. 有几种服务器编程模型？均有何特点？](#1-有几种服务器编程模型均有何特点)
         * [2. acl_master 的作用是什么？支持哪些平台？](#2-acl_master-的作用是什么支持哪些平台)
         * [3. 没有 acl_master 控制管理，服务子进程是否可以单独运行？](#3-没有-acl_master-控制管理服务子进程是否可以单独运行)
-        * [4. 手工模式下运行时遇到 “idle timeout -- exiting, idle” 怎么办？](#4-手工模式下运行时遇到-idle-timeout-exiting-idle-怎么办)
-        * [5、acl_master 控制模式下，服务子进程如何预启动多个进程？](#5-acl_master-控制模式下服务子进程如何预启动多个进程)
-        * [6、acl_master 控制模式下，如何只监听内网地址？](#6-acl_master 控制模式下如何只监听内网地址)
+        * [4. 手工模式下运行时遇到“idle timeout -- exiting, idle”怎么办？](#4-手工模式下运行时遇到idle--timeout-exiting-idle怎么办)
+        * [5. acl_master 控制模式下，服务子进程如何预启动多个进程？](#5-acl_master-控制模式下服务子进程如何预启动多个进程)
+        * [6. acl_master 控制模式下，如何只监听内网地址？](#6-acl_master-控制模式下如何只监听内网地址)
     * [（六）、邮件&mime模块](#六邮件mime模块)
 
 ### 一、基础问题
@@ -185,10 +185,10 @@ acl_master 为由以上各个服务器编写的服务进程的控制管理程序
 ** UDP通信模型：** 将配置项 udp_use_limit 和 udp_idle_limit 设为 0；  
 ** 触发器模型：** 将配置项 trigger_use_limit 设为。
 
-#### 5、acl_master 控制模式下，服务子进程如何预启动多个进程？
+#### 5. acl_master 控制模式下，服务子进程如何预启动多个进程？
 需要修改每个服务子进程的配置文件，将配置项：master_maxproc 及 master_prefork 设置成要启动的进程数（设置值需相同），同时需要将 xxx_use_limit 及 xxx_idle_limit 配置项设成 0 以防止子进程空闲退出，xxx_use_limit 及 xxx_idle_limit  的依每种服务器模型而不同，具体可参考上面（4）中的说明。
 
-#### 6、acl_master 控制模式下，如何只监听内网地址？
+#### 6. acl_master 控制模式下，如何只监听内网地址？
 在 acl_master 模式下，可以将 master_service 配置项支持模糊匹配方式，即可以将监听地址写成 192.168.*.*:xxx 或 10.0.*.*:xxx 方式，这样 acl_master 会自动扫描服务器所有的网卡地址，但只监听服务匹配条件的内网地址，这样为统一部署提供方便。
  
 ### （六）、邮件&mime模块
