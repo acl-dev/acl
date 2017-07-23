@@ -12,7 +12,7 @@
     * [2、Linux 平台下库的编译顺序问题？](#2linux-平台下库的编译顺序问题)
     * [3、Unix/Linux 平台下编译 acl 库时的编译选项是什么](#3unixlinux-平台下编译-acl-库时的编译选项是什么)
     * [4、请给出 Linux 平台下最简单的一个 Makefile？](#4请给出-linux-平台下最简单的一个-makefile)
-    * [5、Linux 平台下找不到 -lz 库怎么办？](#5linux-平台下找不到-libz.a-库怎么办)
+    * [5、Linux 平台下找不到 libz.a 库怎么办？](#5linux-平台下找不到-libza-库怎么办)
     * [6、Linux 平台下 acl 库能打包成一个库吗？](#6linux-平台下-acl-库能打包成一个库吗)
     * [7、Linux 平台下如何使用 ssl 功能？](#7linux-平台下如何使用-ssl-功能)
     * [8、Linux 下如何使用 mysql 功能？](#8linux-下如何使用-mysql-功能)
