@@ -12,27 +12,35 @@
 ##### 1.1.1、编译选项：-I 指定 libacl.a 头文件所在目录(头文件在 lib_acl/include 目录下）
 ##### 1.1.2、链接选项：-L 指定 libacl.a 所在目录，-lacl 指定需要链接 libacl.a 库
 ##### 1.1.3、用户需要在自己的源程序中包含 lib_acl 的头文件，如下：
+
     #include "lib_acl.h"
+
 简单的 Makefile 示例：  
-~~~
+
+~~~doc
 test: main.o
 	gcc -o test main.o -lacl -lz -lpthread -ldl
 main.o: main.c
 	gcc -O3 -Wall -c main.c -I./lib_acl/include 
 ~~~~
+
 #### 1.2、编译 libprotocol.a 库（使用 gcc 编译器）
 进入 lib_protocol 目录，直接运行 make，正常情况下便可以在 lib 目录下生成 lib_protocol.a 静态库，用户在使用 lib_protocol.a 编写自己的程序时，需要在自己的 Makefile 文件中添加如下选项：
 ##### 1.2.1、编译选项：-I 指定 lib_protocol.a 头文件目录（在 lib_protocol/include 目录下）
 ##### 1.2.2、链接选项：-L 指定 lib_protocol.a 所在目录，-L 指定 lib_acl.a 所在目录，-l_protocol -l_acl
 ##### 1.2.3、用户需要在自己的应用程序中包含 lib_protocol 头文件，如下：
+
     #include "lib_protocol.h"
+
 简单的 Makefile 示例：  
-~~~
+
+~~~doc
 test: main.o
 	gcc -o test main.o -lprotocol -lacl -lz -lpthread -ldl
 main.o: main.c
 	gcc -O3 -Wall -c main.c -I./lib_acl/include -I./lib_protocol/include 
 ~~~
+
 #### 1.3、编译 libacl_cpp.a 库（使用 g++ 编译器）
      
 进入 lib_acl_cpp 目录，运行 make static 编译 libacl_cpp.a 静态库，便可 lib 目录下生成 libacl_cpp.a，用户在使用 libacl_cpp.a 编写程序时，需要在自己的 Makefile 文件中添加如下选项：
