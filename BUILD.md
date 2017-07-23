@@ -1,6 +1,6 @@
 ## acl 库的编译及使用
 
-* acl 库的功能参见文章 acl介绍 及 [acl工程](https://github.com/acl-dev/acl/)，本文主要讲述如何编译和使用 acl 库。
+* acl 库的功能参见文章[acl介绍](http://zsxxsz.iteye.com/blog/576517) 及 [acl工程](https://github.com/acl-dev/acl/)，本文主要讲述如何编译和使用 acl 库。
  
 * acl 库其实包含七个库：lib_acl （基础库）、lib_protocol（http 和 icmp 协议库）、lib_acl_cpp（封装了 lib_acl 和 lib_protocol 两个 C 库的 C++ 版本封装，更是增加了丰富的功能）、lib_fiber（功能强大的网络协程库，使开发者可以象使用 Go 语言一样快速编写基于协程的高并发服务应用）、lib_dict（封装了 bdb, cdb, Tokyo Cabinet 库的用于字典查询的库）、lib_tls（封装了openssl部分功能的库，主要用于 lib_acl 的 ssl 加密传输）以及 lib_rpc（封装了 Google 的 protobuf 的库）。其中，笔者用的最多还是 lib_acl 、lib_protocol 以及 lib_acl_cpp（目前用得最多的库）三个库，所以本文主要介绍这三个库的编译与使用。
 * acl 库目前支持 Linux、Solaris、FreeBSD、MacOS、IOS、Android 和 Windows 平台，欢迎读者将 acl 库移植至其它平台。
