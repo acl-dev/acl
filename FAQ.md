@@ -178,6 +178,7 @@ acl_master 为由以上各个服务器编写的服务进程的控制管理程序
 
 #### 4. 手工模式下运行时遇到"idle timeout -- exiting, idle"怎么办？
 因为 acl 的服务器编程模型均支持半驻留方式（即运行空闲一段时间或处理连接次数达到设定值后会自动退出，这样的好处是：可以定期通过进程退出释放可能存在的资源泄露，另一方面便于用户在开发时通过 valgrind 进行内存检查），如果让进程不退出，可以在 alone 模式下给服务程序传递启动配置文件，如启动方式为：./xxxx alone xxxx.cf（传递方式可以看 main.cpp 和相关头文件），不同的服务器模型分别采取下面不同的配置项：  
+
 ** 程池模型：** 将配置项 single_use_limit 和 single_idle_limit 设为 0；  
 ** 线程池模型：** 将配置项 ioctl_use_limit 和 ioctl_idle_limit 设为 0；  
 ** 非阻塞模型：** 将配置项 aio_use_limit 和 aio_idle_limit 设为 0；  
