@@ -400,6 +400,72 @@ namespace acl
     }
 
 
+    acl::json_node& gson(acl::json &$json, const proc_info_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.pid))
+            $node.add_null("pid");
+        else
+            $node.add_number("pid", acl::get_value($obj.pid));
+
+        if (check_nullptr($obj.start))
+            $node.add_null("start");
+        else
+            $node.add_number("start", acl::get_value($obj.start));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const proc_info_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const proc_info_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, proc_info_t &$obj)
+    {
+        acl::json_node *pid = $node["pid"];
+        acl::json_node *start = $node["start"];
+        std::pair<bool, std::string> $result;
+
+        if(!pid ||!($result = gson(*pid, &$obj.pid), $result.first))
+            return std::make_pair(false, "required [proc_info_t.pid] failed:{"+$result.second+"}");
+     
+        if(!start ||!($result = gson(*start, &$obj.start), $result.first))
+            return std::make_pair(false, "required [proc_info_t.start] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, proc_info_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, proc_info_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
     acl::json_node& gson(acl::json &$json, const reload_req_data_t &$obj)
     {
         acl::json_node &$node = $json.create_node();
@@ -1097,6 +1163,11 @@ namespace acl
         else
             $node.add_number("type", acl::get_value($obj.type));
 
+        if (check_nullptr($obj.start))
+            $node.add_null("start");
+        else
+            $node.add_number("start", acl::get_value($obj.start));
+
         if (check_nullptr($obj.owner))
             $node.add_null("owner");
         else
@@ -1157,10 +1228,10 @@ namespace acl
         else
             $node.add_child("env", acl::gson($json, $obj.env));
 
-        if (check_nullptr($obj.pids))
-            $node.add_null("pids");
+        if (check_nullptr($obj.procs))
+            $node.add_null("procs");
         else
-            $node.add_child("pids", acl::gson($json, $obj.pids));
+            $node.add_child("procs", acl::gson($json, $obj.procs));
 
 
         return $node;
@@ -1185,6 +1256,7 @@ namespace acl
         acl::json_node *status = $node["status"];
         acl::json_node *name = $node["name"];
         acl::json_node *type = $node["type"];
+        acl::json_node *start = $node["start"];
         acl::json_node *owner = $node["owner"];
         acl::json_node *path = $node["path"];
         acl::json_node *conf = $node["conf"];
@@ -1197,7 +1269,7 @@ namespace acl
         acl::json_node *notify_addr = $node["notify_addr"];
         acl::json_node *notify_recipients = $node["notify_recipients"];
         acl::json_node *env = $node["env"];
-        acl::json_node *pids = $node["pids"];
+        acl::json_node *procs = $node["procs"];
         std::pair<bool, std::string> $result;
 
         if(!status ||!($result = gson(*status, &$obj.status), $result.first))
@@ -1208,6 +1280,9 @@ namespace acl
      
         if(!type ||!($result = gson(*type, &$obj.type), $result.first))
             return std::make_pair(false, "required [serv_info_t.type] failed:{"+$result.second+"}");
+     
+        if(!start ||!($result = gson(*start, &$obj.start), $result.first))
+            return std::make_pair(false, "required [serv_info_t.start] failed:{"+$result.second+"}");
      
         if(owner)
             gson(*owner, &$obj.owner);
@@ -1245,8 +1320,8 @@ namespace acl
         if(!env ||!env->get_obj()||!($result = gson(*env->get_obj(), &$obj.env), $result.first))
             return std::make_pair(false, "required [serv_info_t.env] failed:{"+$result.second+"}");
      
-        if(!pids ||!pids->get_obj()||!($result = gson(*pids->get_obj(), &$obj.pids), $result.first))
-            return std::make_pair(false, "required [serv_info_t.pids] failed:{"+$result.second+"}");
+        if(procs&& procs->get_obj())
+             gson(*procs->get_obj(), &$obj.procs);
      
         return std::make_pair(true,"");
     }

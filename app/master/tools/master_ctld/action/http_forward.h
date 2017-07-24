@@ -20,6 +20,7 @@ int http_forward(const char* addr, acl::json& in, acl::string& out)
 	url.format("/?cmd=%s", req.cmd.c_str());
 	conn.request_header().set_url(url).set_keep_alive(false)
 		.set_content_type("text/json");
+
 	if (conn.request(body, body.size()) == false)
 	{
 		logger_error("request error, json=[%s]", body.c_str());
@@ -33,6 +34,11 @@ int http_forward(const char* addr, acl::json& in, acl::string& out)
 		return 503;
 	}
 
+	//logger(">>>res=%s<<<", json.to_string().c_str());
+#if 1
+	out = json.to_string();
+	return 200;
+#else
 	if (deserialize<TRes>(json, res) == false)
 	{
 		logger_error("deserialize error, res json=[%s], req json=[%s]",
@@ -42,4 +48,5 @@ int http_forward(const char* addr, acl::json& in, acl::string& out)
 
 	serialize<TRes>(res, out);
 	return 200;
+#endif
 }

@@ -70,6 +70,14 @@ static void println(const char* name, int value)
 	println(name, buf);
 }
 
+static const char* time_format(time_t t, char* buf, size_t size)
+{
+	struct tm local_time;
+	localtime_r(&t, &local_time);
+	strftime(buf, size, "%Y/%m/%d-%H:%M:%S", &local_time);
+	return buf;
+}
+
 static void println_server(const serv_info_t& server)
 {
 	println("status", server.status);
@@ -88,14 +96,21 @@ static void println_server(const serv_info_t& server)
 	println("notify_recipients", server.notify_recipients.c_str());
 
 	acl::string buf;
-	for (std::set<int>::const_iterator cit = server.pids.begin();
-		cit != server.pids.end(); ++cit)
+	size_t i = 0;
+
+	for (std::list<proc_info_t>::const_iterator cit = server.procs.begin();
+		cit != server.procs.end(); ++cit)
 	{
-		if (cit != server.pids.begin())
-			buf += ", ";
-		buf << *cit;
+		if (i++ > 0)
+			buf << "                    ";
+
+		char tmp[128];
+		buf << "pid=" << (*cit).pid << ", start="
+			<< time_format((time_t) (*cit).start, tmp, sizeof(tmp));
+		buf += ";\r\n";
 	}
-	println("pids", buf);
+
+	println("processes", buf);
 }
 
 static void print_servers(const std::vector<serv_info_t>& servers, bool verbose)
@@ -514,7 +529,7 @@ static void usage(const char* procname)
 
 int main(int argc, char* argv[])
 {
-	acl::string filepath, action, addr("127.0.0.1:8190");
+	acl::string filepath, action, addr("127.0.0.1:8290");
 	int  ch;
 
 	while ((ch = getopt(argc, argv, "hs:f:a:")) > 0)

@@ -237,16 +237,19 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 		if (acl_msg_verbose)
 			acl_msg_info("spawn cmd %s pid %d", serv->path, pid);
 		proc = (ACL_MASTER_PROC *) acl_mycalloc(1, sizeof(ACL_MASTER_PROC));
-		proc->serv = serv;
-		proc->pid = pid;
-		proc->gen = master_generation;
+		proc->serv      = serv;
+		proc->pid       = pid;
+		proc->gen       = master_generation;
+		proc->avail     = 0;
+		proc->start     = (long) time(NULL);
 		proc->use_count = 0;
-		proc->avail = 0;
+
 		acl_binhash_enter(acl_var_master_child_table,
 			(char *) &pid, sizeof(pid), (char *) proc);
 		acl_ring_prepend(&serv->children, &proc->me);
 		serv->total_proc++;
 		acl_master_avail_more(serv, proc);
+
 		if (serv->flags & ACL_MASTER_FLAG_CONDWAKE) {
 			serv->flags &= ~ACL_MASTER_FLAG_CONDWAKE;
 			acl_master_wakeup_init(serv);

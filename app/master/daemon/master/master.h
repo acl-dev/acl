@@ -27,6 +27,7 @@ typedef struct ACL_MASTER_SERV {
 	int     flags;			/* status, features, etc. */
 	char   *name;			/* service endpoint name */
 	char   *owner;			/* service running privilege if not null*/
+	long    start;			/* service start running time */
 	int     type;			/* UNIX-domain, INET, etc. */
 	int     wakeup_time;		/* wakeup interval */
 	int    *listen_fds;		/* incoming requests */
@@ -98,6 +99,7 @@ typedef struct ACL_MASTER_PROC {
 	ACL_RING me;			/* linked in serv's children */
 	unsigned gen;			/* child generation number */
 	int      avail;			/* availability */
+	long     start;			/* start time of the process */
 	int      use_count;		/* number of service requests */
 	ACL_MASTER_PID   pid;		/* child process id */
 	ACL_MASTER_SERV *serv;		/* parent linkage */

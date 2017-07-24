@@ -91,7 +91,8 @@ void    acl_master_config(void)
 		 * order the service entries are kept in memory.
 		 */
 		if (serv == 0) {
-			entry->next = acl_var_master_head;
+			entry->next  = acl_var_master_head;
+			entry->start = (long) time(NULL);
 			acl_var_master_head = entry;
 			acl_master_service_start(entry);
 			continue;

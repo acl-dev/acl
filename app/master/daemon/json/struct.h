@@ -13,32 +13,47 @@ struct res_t
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct proc_info_t
+{
+	int  pid;
+	long start;
+
+	proc_info_t()
+	{
+		pid   = -1;
+		start = 0;
+	}
+};
+
 struct serv_info_t
 {
-	int status;
+	int  status;
 	acl::string name;
-	int type;
+	int  type;
+	long start;
 	// Gson@optional
 	acl::string owner;
 	acl::string path;
 	acl::string conf;
-	int proc_max;
-	int proc_prefork;
-	int proc_total;
-	int proc_avail;
-	int throttle_delay;
-	int listen_fd_count;
+	int  proc_max;
+	int  proc_prefork;
+	int  proc_total;
+	int  proc_avail;
+	int  throttle_delay;
+	int  listen_fd_count;
 	// Gson@optional
 	acl::string notify_addr;
 	// Gson@optional
 	acl::string notify_recipients;
 	std::map<acl::string, acl::string> env;
-	std::set<int> pids;
+	// Gson@optional
+	std::list<proc_info_t> procs;
 
 	serv_info_t()
 	{
 		status = 0;
-		type = 0;
+		type   = 0;
+		start  = 0;
 	}
 };
 
