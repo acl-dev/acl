@@ -416,7 +416,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	int     c, socket_count = 1, key, fd, fdtype = 0;
 	char   *lock_path;
 	const char *root_dir = 0, *user_name = 0;
-	const char *transport = 0, *conf_file_ptr = 0;
+	const char *transport = 0;
 	ACL_VSTREAM *stream;
 	ACL_VSTRING *why;
 	ACL_WATCHDOG *watchdog;
@@ -476,12 +476,12 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 
 	trigger_server_init(argv[0]);
 
-	if (conf_file_ptr == 0)
+	if (__conf_file[9] == 0)
 		acl_msg_fatal("%s(%d), %s: need \"-f pathname\"",
 			__FILE__, __LINE__, myname);
 	else if (acl_msg_verbose)
 		acl_msg_info("%s(%d), %s: configure file = %s",
-			__FILE__, __LINE__, myname, conf_file_ptr);
+			__FILE__, __LINE__, myname, __conf_file);
 
 	/*
 	 * Application-specific initialization.
