@@ -57,6 +57,13 @@ static void print_server(const serv_info_t& server)
 	printf("\r\n");
 }
 
+static void println_underline(const char* name, const char* value)
+{
+	printf("\033[4m\033[1;36;40m%c\033[0m\033[0m", *name);
+	name++;
+	printf("\033[1;33;40m%-18s\033[0m: %s\r\n", name, value);
+}
+
 static void println(const char* name, const char* value)
 {
 	printf("\033[1;33;40m%-18s\033[0m: %s\r\n", name, value);
@@ -143,6 +150,11 @@ static bool do_list(const char* addr, const char*)
 		return false;
 
 	print_servers(res.data, __verbose);
+
+	char buf[32];
+	snprintf(buf, sizeof(buf), "\r\nservers count: %d\r\n",
+		(int) res.data.size());
+	print_name(buf);
 	return true;
 }
 
@@ -382,10 +394,10 @@ static void help(void)
 {
 	println("set", "set the service's configure");
 	println("server", "set the service's addr");
-	println("verbose", "display verbose");
-	println("clear", "clear the screan");
-	println("list", "list all the running services");
-	println("stat", "show one service's running status");
+	println_underline("verbose", "display verbose");
+	println_underline("clear", "clear the screan");
+	println_underline("list", "list all the running services");
+	println_underline("stat", "show one service's running status");
 	println("start", "start one service");
 	println("restart", "restart one service");
 	println("stop", "stop one service");
@@ -395,17 +407,18 @@ static void help(void)
 
 static struct {
 	const char* cmd;
+	const char* shortcut;
 	bool (*func)(const char*, const char*);
 } __actions[] = {
-	{ "list",	do_list		},
-	{ "stat",	do_stat		},
-	{ "start",	do_start	},
-	{ "restart",	do_restart	},
-	{ "stop",	do_stop		},
-	{ "kill",	do_kill		},
-	{ "reload",	do_reload	},
+	{ "list",	"l",	do_list		},
+	{ "stat",	"s",	do_stat		},
+	{ "start",	NULL,	do_start	},
+	{ "restart",	NULL,	do_restart	},
+	{ "stop",	NULL,	do_stop		},
+	{ "kill",	NULL,	do_kill		},
+	{ "reload",	"r",	do_reload	},
 
-	{ 0,		0		},
+	{ 0,		0,	0		},
 };
 
 static void run(const char* server, const char* filepath)
@@ -436,7 +449,7 @@ static void run(const char* server, const char* filepath)
 		acl::string cmd = tokens[0];
 		cmd.lower();
 
-		if (cmd == "clear")
+		if (cmd == "clear" || cmd == "c")
 		{
 #if	!defined(__APPLE__)
 			rl_clear_screen(0, 0);
@@ -473,7 +486,7 @@ static void run(const char* server, const char* filepath)
 
 			continue;
 		}
-		else if (cmd == "verbose")
+		else if (cmd == "verbose" || cmd == "v")
 		{
 			if (tokens.size() > 1)
 			{
@@ -483,7 +496,7 @@ static void run(const char* server, const char* filepath)
 					__verbose = false;
 			}
 			else
-				__verbose = true;
+				__verbose = __verbose ? false : true;
 
 			printf("set verbose %s\r\n",
 				__verbose ? "on" : "off");
@@ -497,7 +510,9 @@ static void run(const char* server, const char* filepath)
 		int  i;
 		for (i = 0; __actions[i].cmd; i++)
 		{
-			if (cmd == __actions[i].cmd)
+			if (cmd == __actions[i].cmd ||
+				(__actions[i].shortcut &&
+				  cmd == __actions[i].shortcut))
 			{
 				ret = __actions[i].func(addr, fpath);
 				break;
@@ -514,7 +529,7 @@ static void run(const char* server, const char* filepath)
 			print_space(100);
 
 		printf("\033[1;36;40m%s\033[0m ==> \033[1;32;40m%s\033[0m\r\n",
-			cmd.c_str(), ret ? "ok" : "err");
+			__actions[i].cmd, ret ? "ok" : "err");
 	}
 }
 
