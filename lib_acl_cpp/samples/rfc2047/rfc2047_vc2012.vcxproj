@@ -165,7 +165,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;vld.lib;lib_acl_vc2012d.lib;lib_acl_cpp_vc2012d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;lib_acl_vc2012d.lib;lib_acl_cpp_vc2012d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)rfc2047.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib\win32;..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -189,7 +189,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;vld.lib;lib_acl_vc2012d.lib;lib_acl_cpp_vc2012d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;lib_acl_vc2012d.lib;lib_acl_cpp_vc2012d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)rfc2047.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\lib\win64;..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -258,7 +258,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>lib_acl_d.lib;lib_acl_cpp_d.lib;ws2_32.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_acl_d.lib;lib_acl_cpp_d.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)rfc2047.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib;..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -280,7 +280,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>lib_acl_d.lib;lib_acl_cpp_d.lib;ws2_32.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_acl_d.lib;lib_acl_cpp_d.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)rfc2047.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib;..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -302,7 +302,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>lib_acl.lib;lib_acl_cpp.lib;ws2_32.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_acl.lib;lib_acl_cpp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)rfc2047.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib;..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -328,7 +328,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>lib_acl.lib;lib_acl_cpp.lib;ws2_32.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_acl.lib;lib_acl_cpp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)rfc2047.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib;..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>

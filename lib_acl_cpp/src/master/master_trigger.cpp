@@ -70,12 +70,14 @@ void master_trigger::run_alone(const char* path /* = NULL */,
 
 const char* master_trigger::get_conf_path(void) const
 {
+#ifndef ACL_WINDOWS
 	if (daemon_mode_)
 	{
 		const char* ptr = acl_trigger_server_conf();
 		return ptr && *ptr ? ptr : NULL;
 	}
 	else
+#endif
 		return conf_.get_path();
 }
 

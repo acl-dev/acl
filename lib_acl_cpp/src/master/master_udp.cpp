@@ -58,12 +58,14 @@ void master_udp::run_daemon(int argc, char** argv)
 
 const char* master_udp::get_conf_path(void) const
 {
+#ifndef ACL_WINDOWS
 	if (daemon_mode_)
 	{
 		const char* ptr = acl_udp_server_conf();
 		return ptr && *ptr ? ptr : NULL;
 	}
 	else
+#endif
 		return conf_.get_path();
 }
 

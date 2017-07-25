@@ -43,12 +43,14 @@ void master_proc::run_daemon(int argc, char** argv)
 
 const char* master_proc::get_conf_path(void) const
 {
+#ifndef ACL_WINDOWS
 	if (daemon_mode_)
 	{
 		const char* ptr = acl_single_server_conf();
 		return ptr && *ptr ? ptr : NULL;
 	}
 	else
+#endif
 		return conf_.get_path();
 }
 

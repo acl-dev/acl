@@ -308,13 +308,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "master_dispatch", "master_d
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{3C74E826-5E72-48A1-9DFD-777F4A7C9E1F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dispatch_manager", "app\master_dispatch\manager\dispatch_manager_vc2012.vcxproj", "{B59C7CB6-5708-4522-B833-CEB160AA4817}"
-	ProjectSection(ProjectDependencies) = postProject
-		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
-		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
-		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xml", "xml", "{C799E376-2F01-4877-AF18-7F3CC8B95792}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xml1", "lib_acl_cpp\samples\xml\xml1\xml1_vc2012.vcxproj", "{2DABFAD1-114B-4F96-9185-DC0C56A3662D}"
@@ -719,6 +712,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlite", "lib_acl_cpp\sampl
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
 		{FE724EF7-3763-4E78-BDF5-BCBC075719FD} = {FE724EF7-3763-4E78-BDF5-BCBC075719FD}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dispatch_manager", "app\master\tools\master_dispatch\manager\dispatch_manager_vc2012.vcxproj", "{B59C7CB6-5708-4522-B833-CEB160AA4817}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1914,31 +1909,6 @@ Global
 		{95F01BE0-DD1D-4671-8C22-BD420917401B}.Template|Win32.ActiveCfg = DebugDll|Win32
 		{95F01BE0-DD1D-4671-8C22-BD420917401B}.Template|Win32.Build.0 = DebugDll|Win32
 		{95F01BE0-DD1D-4671-8C22-BD420917401B}.Template|x64.ActiveCfg = DebugDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Debug|Win32.Build.0 = Debug|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Debug|x64.ActiveCfg = Debug|x64
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.DebugDll|Mixed Platforms.ActiveCfg = DebugDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.DebugDll|Mixed Platforms.Build.0 = DebugDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.DebugDll|Win32.ActiveCfg = DebugDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.DebugDll|Win32.Build.0 = DebugDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.DebugDll|x64.ActiveCfg = DebugDll|x64
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Release|Win32.ActiveCfg = Release|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Release|Win32.Build.0 = Release|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Release|x64.ActiveCfg = Release|x64
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Releasedll|Mixed Platforms.ActiveCfg = ReleaseDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Releasedll|Mixed Platforms.Build.0 = ReleaseDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Releasedll|Win32.ActiveCfg = ReleaseDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Releasedll|Win32.Build.0 = ReleaseDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Releasedll|x64.ActiveCfg = ReleaseDll|x64
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Template|Mixed Platforms.ActiveCfg = ReleaseDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Template|Mixed Platforms.Build.0 = ReleaseDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Template|Win32.ActiveCfg = DebugDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Template|Win32.Build.0 = DebugDll|Win32
-		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Template|x64.ActiveCfg = DebugDll|Win32
 		{2DABFAD1-114B-4F96-9185-DC0C56A3662D}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{2DABFAD1-114B-4F96-9185-DC0C56A3662D}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{2DABFAD1-114B-4F96-9185-DC0C56A3662D}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -3489,6 +3459,36 @@ Global
 		{3A8B6C50-A5ED-4665-A5EF-435A6617BCBB}.Template|Win32.Build.0 = DebugDll|Win32
 		{3A8B6C50-A5ED-4665-A5EF-435A6617BCBB}.Template|x64.ActiveCfg = DebugDll|x64
 		{3A8B6C50-A5ED-4665-A5EF-435A6617BCBB}.Template|x64.Build.0 = DebugDll|x64
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Debug|Win32.Build.0 = Debug|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Debug|x64.ActiveCfg = Debug|x64
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Debug|x64.Build.0 = Debug|x64
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.DebugDll|Mixed Platforms.ActiveCfg = DebugDll|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.DebugDll|Mixed Platforms.Build.0 = DebugDll|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.DebugDll|Win32.ActiveCfg = DebugDll|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.DebugDll|Win32.Build.0 = DebugDll|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.DebugDll|x64.ActiveCfg = DebugDll|x64
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.DebugDll|x64.Build.0 = DebugDll|x64
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Release|Win32.ActiveCfg = Release|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Release|Win32.Build.0 = Release|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Release|x64.ActiveCfg = Release|x64
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Release|x64.Build.0 = Release|x64
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Releasedll|Mixed Platforms.ActiveCfg = ReleaseDll|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Releasedll|Mixed Platforms.Build.0 = ReleaseDll|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Releasedll|Win32.ActiveCfg = ReleaseDll|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Releasedll|Win32.Build.0 = ReleaseDll|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Releasedll|x64.ActiveCfg = ReleaseDll|x64
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Releasedll|x64.Build.0 = ReleaseDll|x64
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Template|Mixed Platforms.ActiveCfg = DebugDll|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Template|Mixed Platforms.Build.0 = DebugDll|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Template|Win32.ActiveCfg = DebugDll|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Template|Win32.Build.0 = DebugDll|Win32
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Template|x64.ActiveCfg = DebugDll|x64
+		{B59C7CB6-5708-4522-B833-CEB160AA4817}.Template|x64.Build.0 = DebugDll|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

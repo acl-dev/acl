@@ -146,7 +146,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\lib_acl_cpp\include;..\..\..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -158,7 +158,7 @@
     <Link>
       <AdditionalDependencies>lib_acl_cpp_vc2012d.lib;lib_acl_vc2012d.lib;lib_protocol_vc2012d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)dispatch_manager.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)dispatch_manager.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -169,7 +169,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\lib_acl_cpp\include;..\..\..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -180,7 +180,7 @@
     <Link>
       <AdditionalDependencies>lib_acl_cpp_vc2012d.lib;lib_acl_vc2012d.lib;lib_protocol_vc2012d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)dispatch_manager.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)dispatch_manager.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -189,7 +189,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\lib_acl_cpp\include;..\..\..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -199,7 +199,7 @@
     <Link>
       <AdditionalDependencies>lib_acl_cpp_vc2012.lib;lib_acl_vc2012.lib;lib_protocol_vc2012.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)dispatch_manager.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -209,7 +209,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\lib_acl_cpp\include;..\..\..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -219,7 +219,7 @@
     <Link>
       <AdditionalDependencies>lib_acl_cpp_vc2012.lib;lib_acl_vc2012.lib;lib_protocol_vc2012.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)dispatch_manager.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -228,7 +228,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\lib_acl_cpp\include;..\..\..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;ACL_CPP_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -238,7 +238,7 @@
     <Link>
       <AdditionalDependencies>lib_acl_cpp.lib;lib_acl.lib;lib_protocol.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)dispatch_manager.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -246,14 +246,14 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
-      <Command>copy ..\..\..\dist\lib\win32\lib_acl.dll $(OutDir) /Y
-copy ..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir) /Y
-copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir) /Y</Command>
+      <Command>copy ..\..\..\..\..\dist\lib\win32\lib_acl.dll $(OutDir) /Y
+copy ..\..\..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir) /Y
+copy ..\..\..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\lib_acl_cpp\include;..\..\..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;ACL_CPP_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -263,22 +263,22 @@ copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir) /Y</Command>
     <Link>
       <AdditionalDependencies>lib_acl_cpp.lib;lib_acl.lib;lib_protocol.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)dispatch_manager.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <PreBuildEvent>
-      <Command>copy ..\..\..\dist\lib\win32\lib_acl.dll $(OutDir) /Y
-copy ..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir) /Y
-copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir) /Y</Command>
+      <Command>copy ..\..\..\..\..\dist\lib\win32\lib_acl.dll $(OutDir) /Y
+copy ..\..\..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir) /Y
+copy ..\..\..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\lib_acl_cpp\include;..\..\..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;ACL_CPP_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -290,22 +290,22 @@ copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir) /Y</Command>
     <Link>
       <AdditionalDependencies>lib_acl_cpp_d.lib;lib_acl_d.lib;lib_protocol_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)dispatch_manager.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)dispatch_manager.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
-      <Command>copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir) /Y
-copy ..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir) /Y
-copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
+      <Command>copy ..\..\..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir) /Y
+copy ..\..\..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir) /Y
+copy ..\..\..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\lib_acl_cpp\include;..\..\..\..\..\lib_acl\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;ACL_CPP_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -316,15 +316,15 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
     <Link>
       <AdditionalDependencies>lib_acl_cpp_d.lib;lib_acl_d.lib;lib_protocol_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)dispatch_manager.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)dispatch_manager.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <PreBuildEvent>
-      <Command>copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir) /Y
-copy ..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir) /Y
-copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
+      <Command>copy ..\..\..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir) /Y
+copy ..\..\..\..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir) /Y
+copy ..\..\..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
