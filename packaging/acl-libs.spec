@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        2
+Release:        3
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -32,11 +32,12 @@ acl master framework
 %build
 
 make build_one -j 32
+make -C lib_fiber
 
 %install
 
 make packinstall  DESTDIR=$RPM_BUILD_ROOT
-
+make -C lib_fiber packinstall  DESTDIR=$RPM_BUILD_ROOT
 %clean
 rm -rf %{buildroot}
 
@@ -63,7 +64,10 @@ fi
 %{_bindir}/acl_master
 %{_includedir}/acl-lib/acl
 %{_includedir}/acl-lib/acl_cpp
+%{_includedir}/acl-lib/fiber
 /usr/lib/libacl_all.a
+/usr/lib/libfiber.a
+/usr/lib/libfiber_cpp.a
 
 %files -n acl-master
 %defattr(-,root,root)
