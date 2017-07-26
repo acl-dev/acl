@@ -1,9 +1,11 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
 #include "acl_cpp/master/master_base.hpp"
-#include "acl_cpp/stream/socket_stream.hpp"
+
+struct ACL_VSTREAM;
 
 namespace acl {
+
+class socket_stream;
 
 /**
  * 基于协程方式的网络服务类
