@@ -8,7 +8,7 @@ extern "C" {
 #include <sys/types.h>
 #include <sys/socket.h>
 
-typedef struct ACL_VSTREAM ACL_VSTREAM;
+//typedef struct ACL_VSTREAM ACL_VSTREAM;
 
 /**
  * 协程结构类型
@@ -28,8 +28,8 @@ void acl_fiber_hook_api(int onoff);
  * @param size {size_t} 所创建协程所占栈空间大小
  * @return {ACL_FIBER*}
  */
-ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
-	void *arg, size_t size);
+ACL_FIBER* acl_fiber_create(void (*fn)(ACL_FIBER*, void*),
+	void* arg, size_t size);
 
 /**
  * 返回当前线程中处于消亡状态的协程数
@@ -41,14 +41,14 @@ int acl_fiber_ndead(void);
  * 返回当前正在运行的协程对象
  * @retur {ACL_FIBER*} 返回 NULL 表示当前没有正在运行的协程
  */
-ACL_FIBER *acl_fiber_running(void);
+ACL_FIBER* acl_fiber_running(void);
 
 /**
  * 获得所给协程的协程 ID 号
  * @param fiber {const ACL_FIBER*} acl_fiber_create 创建的协程对象，必须非空
  * @return {unsigned int} 协程 ID 号
  */
-unsigned int acl_fiber_id(const ACL_FIBER *fiber);
+unsigned int acl_fiber_id(const ACL_FIBER* fiber);
 
 /**
  * 获得当前所运行的协程的 ID 号
@@ -61,14 +61,14 @@ unsigned int acl_fiber_self(void);
  * @param fiber {ACL_FIBER*} 指定的协程对象，为 NULL 则使用当前运行的协程
  * @param errnum {int} 错误号
  */
-void acl_fiber_set_errno(ACL_FIBER *fiber, int errnum);
+void acl_fiber_set_errno(ACL_FIBER* fiber, int errnum);
 
 /**
  * 获得指定协程的错误号
  * @param fiber {ACL_FIBER*} 指定的协程对象，若为 NULL 则使用当前协程对象
  * @return {int} 所给协程错误号
  */
-int acl_fiber_errno(ACL_FIBER *fiber);
+int acl_fiber_errno(ACL_FIBER* fiber);
 
 /**
  * 是否保持所指定协程的错误号，当设置为“保持”后，则该协程仅保持当前状态下的
@@ -76,20 +76,20 @@ int acl_fiber_errno(ACL_FIBER *fiber);
  * @param fiber {ACL_FIBER*} 指定的协程对象，为 NULL 则使用当前运行的协程
  * @param yesno {int} 是否保持
  */
-void acl_fiber_keep_errno(ACL_FIBER *fiber, int yesno);
+void acl_fiber_keep_errno(ACL_FIBER* fiber, int yesno);
 
 /**
  * 获得指定协程的当前状态
  * @param fiber {const ACL_FIBER*} 指定的协程对象，为 NULL 则使用当前协程
  * @return {int} 协程状态
  */
-int acl_fiber_status(const ACL_FIBER *fiber);
+int acl_fiber_status(const ACL_FIBER* fiber);
 
 /**
  * 通知处于休眠状态的协程退出 
  * @param fiber {const ACL_FIBER*} 指定的协程对象，必须非 NULL
  */
-void acl_fiber_kill(ACL_FIBER *fiber);
+void acl_fiber_kill(ACL_FIBER* fiber);
 
 /**
  * 检查本协程是否被其它协程通知退出
@@ -97,21 +97,21 @@ void acl_fiber_kill(ACL_FIBER *fiber);
  *  正在运行的协程
  * @return {int} 返回值为 0 表示没有被通知退出，非 0 表示被通知退出
  */
-int acl_fiber_killed(ACL_FIBER *fiber);
+int acl_fiber_killed(ACL_FIBER* fiber);
 
 /**
  * 唤醒因 IO 等原因处于休眠的协程
  * @param fiber {const ACL_FIBER*} 协程对象，必须非 NULL
  * @param signum {int} SIGINT, SIGKILL, SIGTERM ... 参考系统中 bits/signum.h
  */
-void acl_fiber_signal(ACL_FIBER *fiber, int signum);
+void acl_fiber_signal(ACL_FIBER* fiber, int signum);
 
 /**
  * 获得其它协程发送给指定协程的信号值
  * @param fiber {const ACL_FIBER*} 指定的协程对象，为 NULL 时则使用当前协程
  * @retur {int} 返回指定协程收到的信号值
  */
-int acl_fiber_signum(ACL_FIBER *fiber);
+int acl_fiber_signum(ACL_FIBER* fiber);
 
 /**
  * 将当前运行的协程挂起，由调度器选择下一个需要运行的协程
@@ -123,7 +123,7 @@ int acl_fiber_yield(void);
  * 将指定协程对象置入待运行队列中
  * @param fiber {ACL_FIBER*} 指定协程，必须非 NULL
  */
-void acl_fiber_ready(ACL_FIBER *fiber);
+void acl_fiber_ready(ACL_FIBER* fiber);
 
 /**
  * 将当前运行的协程挂起，同时执行等待队列下一个待运行的协程
@@ -167,15 +167,15 @@ unsigned int acl_fiber_sleep(unsigned int seconds);
  * @param ctx {void*} 回调 fn 函数时的第二个参数
  * @return {ACL_FIBER*} 新创建的定时器协程
  */
-ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds,
-	void (*fn)(ACL_FIBER *, void *), void *ctx);
+ACL_FIBER* acl_fiber_create_timer(unsigned int milliseconds,
+	void (*fn)(ACL_FIBER*, void*), void* ctx);
 
 /**
  * 在定时器协程未被唤醒前，可以通过本函数重置该协程被唤醒的时间
  * @param timer {ACL_FIBER*} 由 acl_fiber_create_timer 创建的定时器协程
  * @param milliseconds {unsigned int} 指定该定时器协程被唤醒的毫秒数
  */
-void acl_fiber_reset_timer(ACL_FIBER *timer, unsigned int milliseconds);
+void acl_fiber_reset_timer(ACL_FIBER* timer, unsigned int milliseconds);
 
 /**
  * 本函数设置 DNS 服务器的地址
@@ -195,14 +195,14 @@ void acl_fiber_set_dns(const char* ip, int port);
  * @param free_fn {void (*)(void*)} 当协程退出时会调用此函数释放协程局部变量
  * @return {int} 返回所设置的协程局部变量的键值，返回 -1 表示当前协程不存在
  */
-int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void *));
+int acl_fiber_set_specific(int* key, void* ctx, void (*free_fn)(void*));
 
 /**
  * 获得当前协程局部变量
  * @param key {int} 由 acl_fiber_set_specific 返回的键值
  * @retur {void*} 返回 NULL 表示不存在
  */
-void *acl_fiber_get_specific(int key);
+void* acl_fiber_get_specific(int key);
 
 /* fiber locking */
 
@@ -220,45 +220,45 @@ typedef struct ACL_FIBER_RWLOCK ACL_FIBER_RWLOCK;
  * 创建协程互斥锁
  * @return {ACL_FIBER_MUTEX*}
  */
-ACL_FIBER_MUTEX *acl_fiber_mutex_create(void);
+ACL_FIBER_MUTEX* acl_fiber_mutex_create(void);
 
 /**
  * 释放协程互斥锁
  * @param l {ACL_FIBER_MUTEX*} 由 acl_fiber_mutex_create 创建的协程互斥锁
  */
-void acl_fiber_mutex_free(ACL_FIBER_MUTEX *l);
+void acl_fiber_mutex_free(ACL_FIBER_MUTEX* l);
 
 /**
  * 对协程互斥锁进行阻塞式加锁，如果加锁成功则返回，否则则阻塞
  * @param l {ACL_FIBER_MUTEX*} 由 acl_fiber_mutex_create 创建的协程互斥锁
  */
-void acl_fiber_mutex_lock(ACL_FIBER_MUTEX *l);
+void acl_fiber_mutex_lock(ACL_FIBER_MUTEX* l);
 
 /**
  * 对协程互斥锁尝试性进行加锁，无论是否成功加锁都会立即返回
  * @param l {ACL_FIBER_MUTEX*} 由 acl_fiber_mutex_create 创建的协程互斥锁
  * @return {int} 如果加锁成功则返回非 0 值，否则返回 0
  */
-int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *l);
+int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX* l);
 
 /**
  * 加锁成功的协程调用本函数进行解锁，调用本函数的协程必须是该锁的属主，否则
  * 内部会产生断言
  * @param l {ACL_FIBER_MUTEX*} 由 acl_fiber_mutex_create 创建的协程互斥锁
  */
-void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *l);
+void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX* l);
 
 /**
  * 创建协程读写锁
  * @return {ACL_FIBER_RWLOCK*}
  */
-ACL_FIBER_RWLOCK *acl_fiber_rwlock_create(void);
+ACL_FIBER_RWLOCK* acl_fiber_rwlock_create(void);
 
 /**
  * 释放协程读写锁
  * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  */
-void acl_fiber_rwlock_free(ACL_FIBER_RWLOCK *l);
+void acl_fiber_rwlock_free(ACL_FIBER_RWLOCK* l);
 
 /**
  * 对协程读写锁加读锁，如果该锁当前正被其它协程加了读锁，则本协程依然可以
@@ -266,41 +266,41 @@ void acl_fiber_rwlock_free(ACL_FIBER_RWLOCK *l);
  * 写锁释放
  * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  */
-void acl_fiber_rwlock_rlock(ACL_FIBER_RWLOCK *l);
+void acl_fiber_rwlock_rlock(ACL_FIBER_RWLOCK* l);
 
 /**
  * 对协程读写锁尝试性加读锁，加锁无论是否成功都会立即返回
  * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  * @retur {int} 返回 1 表示加锁成功，返回 0 表示加锁失败
  */
-int acl_fiber_rwlock_tryrlock(ACL_FIBER_RWLOCK *l);
+int acl_fiber_rwlock_tryrlock(ACL_FIBER_RWLOCK* l);
 
 /**
  * 对协程读写锁加写锁，只有当该锁未被任何协程加读/写锁时才会返回，否则阻塞，
  * 直至该锁可加写锁
  * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  */
-void acl_fiber_rwlock_wlock(ACL_FIBER_RWLOCK *l);
+void acl_fiber_rwlock_wlock(ACL_FIBER_RWLOCK* l);
 
 /**
  * 对协程读写锁尝试性加写锁，无论是否加锁成功都会立即返回
  * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  * @return {int} 返回 1 表示加写锁成功，返回 0 表示加锁失败
  */
-int acl_fiber_rwlock_trywlock(ACL_FIBER_RWLOCK *l);
+int acl_fiber_rwlock_trywlock(ACL_FIBER_RWLOCK* l);
 
 /**
  * 对协程读写锁成功加读锁的协程调用本函数解读锁，调用者必须是之前已成功加读
  * 锁成功的协程
  * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  */
-void acl_fiber_rwlock_runlock(ACL_FIBER_RWLOCK *l);
+void acl_fiber_rwlock_runlock(ACL_FIBER_RWLOCK* l);
 /**
  * 对协程读写锁成功加写锁的协程调用本函数解写锁，调用者必须是之前已成功加写
  * 锁成功的协程
  * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  */
-void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK *l);
+void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK* l);
 
 /* fiber semaphore */
 
@@ -311,20 +311,20 @@ typedef struct ACL_FIBER_SEM ACL_FIBER_SEM;
  * @param num {int} 信号量初始值（必须 >= 0）
  * @return {ACL_FIBER_SEM *}
  */
-ACL_FIBER_SEM *acl_fiber_sem_create(int num);
+ACL_FIBER_SEM* acl_fiber_sem_create(int num);
 
 /**
  * 释放协程信号量
  * @param {ACL_FIBER_SEM *}
  */
-void acl_fiber_sem_free(ACL_FIBER_SEM *sem);
+void acl_fiber_sem_free(ACL_FIBER_SEM* sem);
 
 /**
  * 获得当前协程信号量所绑定的线程 ID
  * @param sem {ACL_FIBER_SEM*} 协程信号量对象
  * @return {acl_pthread_t}
  */
-acl_pthread_t acl_fiber_sem_get_tid(ACL_FIBER_SEM *sem);
+acl_pthread_t acl_fiber_sem_get_tid(ACL_FIBER_SEM* sem);
 
 /**
  * 设置指定协程信号量的的线程 ID，当改变本协程信号量所属的线程时如果等待的协程
@@ -332,7 +332,7 @@ acl_pthread_t acl_fiber_sem_get_tid(ACL_FIBER_SEM *sem);
  * @param sem {ACL_FIBER_SEM*} 协程信号量对象
  * @param {acl_pthread_t} 线程 ID
  */
-void acl_fiber_sem_set_tid(ACL_FIBER_SEM *sem, acl_pthread_t tid);
+void acl_fiber_sem_set_tid(ACL_FIBER_SEM* sem, acl_pthread_t tid);
 
 /**
  * 当协程信号量 > 0 时使信号量减 1，否则等待信号量 > 0
@@ -340,7 +340,7 @@ void acl_fiber_sem_set_tid(ACL_FIBER_SEM *sem, acl_pthread_t tid);
  * @retur {int} 返回信号量当前值，如果返回 -1 表明当前线程与协程信号量所属线程
  *  不是同一线程，此时该方法不等待立即返回
  */
-int acl_fiber_sem_wait(ACL_FIBER_SEM *sem);
+int acl_fiber_sem_wait(ACL_FIBER_SEM* sem);
 
 /**
  * 尝试使协程信号量减 1
@@ -348,7 +348,7 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem);
  * @retur {int} 成功减 1 时返回值 >= 0，返回 -1 表示当前信号量不可用，或当前
  *  调用者线程与协程信号量所属线程不是同一线程
  */
-int acl_fiber_sem_trywait(ACL_FIBER_SEM *sem);
+int acl_fiber_sem_trywait(ACL_FIBER_SEM* sem);
 
 /**
  * 使协程信号量加 1
@@ -356,14 +356,14 @@ int acl_fiber_sem_trywait(ACL_FIBER_SEM *sem);
  * @retur {int} 返回信号量当前值，返回 -1 表示当前调用者线程与协程信号量所属
  *  线程不是同一线程
  */
-int acl_fiber_sem_post(ACL_FIBER_SEM *sem);
+int acl_fiber_sem_post(ACL_FIBER_SEM* sem);
 
 /**
  * 获得指定协程信号量的当前值，该值反映了目前等待该信号量的数量
  * @param sem {ACL_FIBER_SEM*}
  * @retur {int}
  */
-int acl_fiber_sem_num(ACL_FIBER_SEM *sem);
+int acl_fiber_sem_num(ACL_FIBER_SEM* sem);
 
 /* channel communication */
 
@@ -385,7 +385,7 @@ ACL_CHANNEL* acl_channel_create(int elemsize, int bufsize);
  * 释放由 acl_channel_create 创建的协程通信管道对象
  * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
  */
-void acl_channel_free(ACL_CHANNEL *c);
+void acl_channel_free(ACL_CHANNEL* c);
 
 /**
  * 阻塞式向指定 ACL_CHANNEL 中发送指定的对象地址
@@ -393,7 +393,7 @@ void acl_channel_free(ACL_CHANNEL *c);
  * @param v {void*} 被发送的对象地址
  * @return {int} 返回值 >= 0
  */
-int acl_channel_send(ACL_CHANNEL *c, void *v);
+int acl_channel_send(ACL_CHANNEL* c, void* v);
 
 /**
  * 非阻塞式向指定 ACL_CHANNEL 中发送指定的对象，内部会根据 acl_channel_create 中指定
@@ -401,7 +401,7 @@ int acl_channel_send(ACL_CHANNEL *c, void *v);
  * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
  * @param v {void*} 被发送的对象地址
  */
-int acl_channel_send_nb(ACL_CHANNEL *c, void *v);
+int acl_channel_send_nb(ACL_CHANNEL* c, void* v);
 
 /**
  * 从指定的 ACL_CHANNEL 中阻塞式读取对象，
@@ -409,7 +409,7 @@ int acl_channel_send_nb(ACL_CHANNEL *c, void *v);
  * @param v {void*} 存放结果内容
  * @return {int} 返回值 >= 0 表示成功读到数据
  */
-int acl_channel_recv(ACL_CHANNEL *c, void *v);
+int acl_channel_recv(ACL_CHANNEL* c, void* v);
 
 /**
  * 从指定的 ACL_CHANNEL 中非阻塞式读取对象，无论是否读到数据都会立即返回
@@ -417,7 +417,7 @@ int acl_channel_recv(ACL_CHANNEL *c, void *v);
  * @param v {void*} 存放结果内容
  * @return {int} 返回值 >= 0 表示成功读到数据，否则表示未读到数据
  */
-int acl_channel_recv_nb(ACL_CHANNEL *c, void *v);
+int acl_channel_recv_nb(ACL_CHANNEL* c, void* v);
 
 /**
  * 向指定的 ACL_CHANNEL 中阻塞式发送指定对象的地址
@@ -425,14 +425,14 @@ int acl_channel_recv_nb(ACL_CHANNEL *c, void *v);
  * @param v {void*} 被发送对象的地址
  * @return {int} 返回值 >= 0
  */
-int acl_channel_sendp(ACL_CHANNEL *c, void *v);
+int acl_channel_sendp(ACL_CHANNEL* c, void* v);
 
 /**
  * 从指定的 CHANNLE 中阻塞式接收由 acl_channel_sendp 发送的对象的地址
  * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
  * @return {void*} 返回非 NULL，指定接收到的对象的地址
  */
-void *acl_channel_recvp(ACL_CHANNEL *c);
+void* acl_channel_recvp(ACL_CHANNEL* c);
 
 /**
  * 向指定的 ACL_CHANNEL 中非阻塞式发送指定对象的地址
@@ -440,7 +440,7 @@ void *acl_channel_recvp(ACL_CHANNEL *c);
  * @param v {void*} 被发送对象的地址
  * @return {int} 返回值 >= 0
  */
-int acl_channel_sendp_nb(ACL_CHANNEL *c, void *v);
+int acl_channel_sendp_nb(ACL_CHANNEL* c, void* v);
 
 /**
  * 从指定的 CHANNLE 中阻塞式接收由 acl_channel_sendp 发送的对象的地址
@@ -448,7 +448,7 @@ int acl_channel_sendp_nb(ACL_CHANNEL *c, void *v);
  * @return {void*} 返回非 NULL，指定接收到的对象的地址，如果返回 NULL 表示
  *  没有读到任何对象
  */
-void *acl_channel_recvp_nb(ACL_CHANNEL *c);
+void* acl_channel_recvp_nb(ACL_CHANNEL* c);
 
 /**
  * 向指定的 ACL_CHANNEL 中发送无符号长整形数值
@@ -456,14 +456,14 @@ void *acl_channel_recvp_nb(ACL_CHANNEL *c);
  * @param val {unsigned long} 要发送的数值
  * @return {int} 返回值 >= 0
  */
-int acl_channel_sendul(ACL_CHANNEL *c, unsigned long val);
+int acl_channel_sendul(ACL_CHANNEL* c, unsigned long val);
 
 /**
  * 从指定的 ACL_CHANNEL 中接收无符号长整形数值
  * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
  * @return {unsigned long}
  */
-unsigned long acl_channel_recvul(ACL_CHANNEL *c);
+unsigned long acl_channel_recvul(ACL_CHANNEL* c);
 
 /**
  * 向指定的 ACL_CHANNEL 中以非阻塞方式发送无符号长整形数值
@@ -471,14 +471,14 @@ unsigned long acl_channel_recvul(ACL_CHANNEL *c);
  * @param val {unsigned long} 要发送的数值
  * @return {int} 返回值 >= 0
  */
-int acl_channel_sendul_nb(ACL_CHANNEL *c, unsigned long val);
+int acl_channel_sendul_nb(ACL_CHANNEL* c, unsigned long val);
 
 /**
  * 从指定的 ACL_CHANNEL 中以非阻塞方式接收无符号长整形数值
  * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
  * @return {unsigned long}
  */
-unsigned long acl_channel_recvul_nb(ACL_CHANNEL *c);
+unsigned long acl_channel_recvul_nb(ACL_CHANNEL* c);
 
 /* master fibers server */
 
@@ -491,28 +491,28 @@ unsigned long acl_channel_recvul_nb(ACL_CHANNEL *c);
  * @param ctx {void*} service 回调函数的第二个参数
  * @param name {int} 控制参数列表中的第一个控制参数
  */
-void acl_fiber_server_main(int argc, char *argv[],
-	void (*service)(void*, ACL_VSTREAM*), void *ctx, int name, ...);
-const char *acl_fiber_server_conf(void);
+void acl_fiber_server_main(int argc, char* argv[],
+	void (*service)(void*, ACL_VSTREAM*), void* ctx, int name, ...);
+const char* acl_fiber_server_conf(void);
 
-void acl_fiber_chat_main(int argc, char *argv[],
-	int (*service)(ACL_VSTREAM*, void*), void *ctx, int name, ...);
+void acl_fiber_chat_main(int argc, char* argv[],
+	int (*service)(ACL_VSTREAM*, void*), void* ctx, int name, ...);
 
 /**************************** fiber iostuff *********************************/
 
-ssize_t fiber_read(int fd, void *buf, size_t count);
-ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt);
-ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags);
-ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
-	struct sockaddr *src_addr, socklen_t *addrlen);
-ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags);
+ssize_t fiber_read(int fd, void* buf, size_t count);
+ssize_t fiber_readv(int fd, const struct iovec* iov, int iovcnt);
+ssize_t fiber_recv(int sockfd, void* buf, size_t len, int flags);
+ssize_t fiber_recvfrom(int sockfd, void* buf, size_t len, int flags,
+	struct sockaddr* src_addr, socklen_t* addrlen);
+ssize_t fiber_recvmsg(int sockfd, struct msghdr* msg, int flags);
 
-ssize_t fiber_write(int fd, const void *buf, size_t count);
-ssize_t fiber_writev(int fd, const struct iovec *iov, int iovcnt);
-ssize_t fiber_send(int sockfd, const void *buf, size_t len, int flags);
-ssize_t fiber_sendto(int sockfd, const void *buf, size_t len, int flags,
-	const struct sockaddr *dest_addr, socklen_t addrlen);
-ssize_t fiber_sendmsg(int sockfd, const struct msghdr *msg, int flags);
+ssize_t fiber_write(int fd, const void* buf, size_t count);
+ssize_t fiber_writev(int fd, const struct iovec* iov, int iovcnt);
+ssize_t fiber_send(int sockfd, const void* buf, size_t len, int flags);
+ssize_t fiber_sendto(int sockfd, const void* buf, size_t len, int flags,
+	const struct sockaddr* dest_addr, socklen_t addrlen);
+ssize_t fiber_sendmsg(int sockfd, const struct msghdr* msg, int flags);
 
 /****************************************************************************/
 
