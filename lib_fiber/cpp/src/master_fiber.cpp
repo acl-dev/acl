@@ -2,6 +2,7 @@
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/server_socket.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
+#include "acl_cpp/master/master_base.hpp"
 #include "fiber/master_fiber.hpp"
 
 namespace acl {

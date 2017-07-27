@@ -1,4 +1,9 @@
 
+56) 2017.7.27
+56.1) compile: master_fiber.hpp 中去掉了对 master_base.hpp 的包含，要求应用
+需要首先包含该头文件
+56.2) compile: lib_fiber.h 中去年了对 lib_acl.h 的包含
+
 55) 2017.7.22
 55.1) feature: master_fiber 增加 get_conf_path, acl_fiber_server.cpp 中增加
 acl_fiber_server_conf，此二方法用于获得当前的服务配置文件路径

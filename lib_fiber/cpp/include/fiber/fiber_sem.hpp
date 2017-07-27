@@ -1,12 +1,10 @@
 #pragma once
-#include "acl_cpp/acl_cpp_define.hpp"
-#include "acl_cpp/stdlib/noncopyable.hpp"
 
 struct ACL_FIBER_SEM;
 
 namespace acl {
 
-class fiber_sem : public noncopyable
+class fiber_sem
 {
 public:
 	fiber_sem(int max);
@@ -18,6 +16,8 @@ public:
 
 private:
 	ACL_FIBER_SEM* sem_;
+	fiber_sem(const fiber_sem&);
+	const fiber_sem& operator=(const fiber_sem&);
 };
 
 class fiber_sem_guard
