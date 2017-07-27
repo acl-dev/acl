@@ -47,6 +47,43 @@ bool redis_hash::hmset(const char* key, const std::map<string, const char*>& att
 	return check_status();
 }
 
+bool redis_hash::hmset(const char* key, const std::vector<string>& names,
+	const std::vector<string>& values)
+{
+	acl_assert(names.size() == values.size());
+
+	hash_slot(key);
+	build("HMSET", key, names, values);
+	return check_status();
+}
+
+bool redis_hash::hmset(const char* key, const std::vector<const char*>& names,
+	const std::vector<const char*>& values)
+{
+	acl_assert(names.size() == values.size());
+
+	hash_slot(key);
+	build("HMGET", key, names, values);
+	return check_status();
+}
+
+bool redis_hash::hmset(const char* key, const char* names[],
+	const char* values[], size_t argc)
+{
+	hash_slot(key);
+	build("HMSET", key, names, values, argc);
+	return check_status();
+}
+
+bool redis_hash::hmset(const char* key, const char* names[],
+	const size_t names_len[], const char* values[],
+	const size_t values_len[], size_t argc)
+{
+	hash_slot(key);
+	build("HMSET", key, names, names_len, values, values_len, argc);
+	return check_status();
+}
+
 /////////////////////////////////////////////////////////////////////////////
 
 bool redis_hash::hmget(const char* key, const std::vector<string>& names,

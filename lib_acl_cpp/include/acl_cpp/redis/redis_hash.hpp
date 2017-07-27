@@ -50,6 +50,14 @@ public:
 	 */
 	bool hmset(const char* key, const std::map<string, string>& attrs);
 	bool hmset(const char* key, const std::map<string, const char*>& attrs);
+	bool hmset(const char* key, const std::vector<string>& names,
+		const std::vector<string>& values);
+	bool hmset(const char* key, const std::vector<const char*>& names,
+		const std::vector<const char*>& values);
+	bool hmset(const char* key, const char* names[], const char* values[],
+		size_t argc);
+	bool hmset(const char* key, const char* names[], const size_t names_len[],
+		const char* values[], const size_t values_len[], size_t argc);
 
 	/////////////////////////////////////////////////////////////////////
 

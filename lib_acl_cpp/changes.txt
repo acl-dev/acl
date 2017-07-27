@@ -1,6 +1,9 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+486) 2017.7.27
+486.1) feature: redis_hash 类针对 hmset 方法增加几种实现，以方便用户使用
+
 485) 2017.7.22
 485.1) feature: master_proc/master_aio/master_threads/master_udp/master_trigger
 增加 get_conf_path 方法用于获得当前服务器的配置文件路径
