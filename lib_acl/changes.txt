@@ -4,6 +4,8 @@
 600) 2017.7.31
 600.1) bugfix: acl_host_port.c->host_port 在 windows 平台下的解析有误
 600.2) bugfix: acl_aio_server.c/acl_threads_server.c 在 windows 下有误
+600.3) bugfix: acl_threads_server.c 中 thread_callback 在调用回调函数
+serv_timeout 时的参数顺序是错误的。
 
 599) 2017.7.22
 599.1) feature: acl_udp_server.c/acl_threads_server.c/acl_aio_server.c,

@@ -552,7 +552,7 @@ static void thread_callback(void *arg)
 		if (ctx->serv_close != NULL)
 			ctx->serv_close(ctx->serv_arg, ctx->stream);
 		acl_vstream_close(ctx->stream);
-	} else if (ctx->serv_timeout(ctx->stream, ctx->serv_arg) < 0) {
+	} else if (ctx->serv_timeout(ctx->serv_arg, ctx->stream) < 0) {
 		if (ctx->serv_close != NULL)
 			ctx->serv_close(ctx->serv_arg, ctx->stream);
 		acl_vstream_close(ctx->stream);
