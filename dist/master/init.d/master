@@ -54,7 +54,7 @@ start() {
     fi
     [ -x $exec ] || exit 5
     echo -n $"Starting $prog: "
-    daemon $prog -c $CONF_PATH -l $LOG_PATH &
+    daemon $exec -c $CONF_PATH -l $LOG_PATH &
     sleep 1
     rh_status_q && success
     echo
