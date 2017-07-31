@@ -135,12 +135,12 @@ packinstall:
 	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
 	@(cd app/master/daemon; make install)
 	@(cd app/master/tools/master_ctld; make install)
+	cp -f app/master/daemon/acl_master $(BIN_PATH)
 	(cd dist/master && ./setup.sh $(DESTDIR) /opt/soft/acl-master)
 	cp -Rf lib_acl/include/* $(INC_ACL)/acl/
 	cp -Rf lib_acl_cpp/include/acl_cpp/* $(INC_ACL)/acl_cpp/
 	cp -f libacl_all.a $(LIB_ACL)/libacl_all.a
 #	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
-#	cp -f app/master/daemon/acl_master $(BIN_PATH)
 
 install:
 	@(echo "")
