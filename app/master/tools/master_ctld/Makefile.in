@@ -136,6 +136,8 @@ clean:
 	rm -f $(OBJ)
 rebuild rb: clean all
 install:
+	@mkdir -p ../../../../dist/master/libexec/$(RPATH)
+	@mkdir -p ../../../../dist/master/conf/service
 	cp $(PROG) ../../../../dist/master/libexec/$(RPATH)/
 	cp $(PROG).cf ../../../../dist/master/conf/service/
 ###########################################################
