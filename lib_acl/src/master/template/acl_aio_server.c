@@ -788,7 +788,11 @@ static int aio_server_accept_sock2(ACL_ASTREAM *astream, ACL_AIO *aio)
 
 	for (i = 0; i < acl_var_aio_max_accept; i++) {
 		fd = acl_accept(listen_fd, NULL, 0, &sock_type);
+#ifdef ACL_WINDOWS
+		if (fd != ACL_SOCKET_INVALID) {
+#else
 		if (fd >= 0) {
+#endif
 			/* TCP 连接避免发送延迟现象 */
 #ifdef AF_INET6
 			if (sock_type == AF_INET || sock_type == AF_INET6)

@@ -320,7 +320,11 @@ static void __service_accept_sock(int type acl_unused, ACL_EVENT *event,
 		acl_msg_fatal("select unlock: %s", acl_last_serror());
 	}
 
+#ifdef ACL_WINDOWS
+	if (fd == ACL_SOCKET_INVALID) {
+#else
 	if (fd < 0) {
+#endif
 		if (errno != EAGAIN)
 			acl_msg_fatal("accept error: %s", acl_last_serror());
 		if (time_left > 0)

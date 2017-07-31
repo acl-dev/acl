@@ -99,7 +99,7 @@ static int host_port(char *buf, char **host, char **port)
 	if (*host && **host == 0)
 		*host = 0;
 	if (*host == NULL)
-#ifdef AF_INET6
+#if defined(AF_INET6) && !defined(ACL_WINDOWS)
 		*host = "0";
 #else
 		*host = "0.0.0.0";
