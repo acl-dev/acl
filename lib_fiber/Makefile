@@ -1,12 +1,15 @@
+.PHONEY   = all lib_fiber clean cl rebuild rb
 DESTDIR   =
 PREFIX    = /usr
 BIN_PATH  = $(DESTDIR)/$(PREFIX)/bin/
 LIB_ACL   = $(DESTDIR)/$(PREFIX)/lib
 INC_ACL   = $(DESTDIR)/$(PREFIX)/include/acl-lib/
 
-all:
+lib_fiber:
 	@(cd c; make)
 	@(cd cpp; make)
+
+all: lib_fiber
 	@(cd samples; make)
 
 clean cl:
