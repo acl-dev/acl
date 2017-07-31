@@ -121,7 +121,8 @@ clean:
 #	@(cd lib_tls; make clean)
 
 acl_master: all_lib
-	@(cd app/master/daemon; make)
+	@(cd app/master/daemon; make; make install)
+	@(cd app/master/tools/master_ctld; make; make install)
 
 packinstall:
 	@(echo "")
@@ -132,12 +133,14 @@ packinstall:
 	$(shell mkdir -p $(LIB_ACL)/)
 	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master/)
 	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
-	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
+	@(cd app/master/daemon; make install)
+	@(cd app/master/tools/master_ctld; make install)
 	(cd dist/master && ./setup.sh $(DESTDIR) /opt/soft/acl-master)
-	cp -f app/master/daemon/acl_master $(BIN_PATH)
 	cp -Rf lib_acl/include/* $(INC_ACL)/acl/
 	cp -Rf lib_acl_cpp/include/acl_cpp/* $(INC_ACL)/acl_cpp/
 	cp -f libacl_all.a $(LIB_ACL)/libacl_all.a
+#	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
+#	cp -f app/master/daemon/acl_master $(BIN_PATH)
 
 install:
 	@(echo "")

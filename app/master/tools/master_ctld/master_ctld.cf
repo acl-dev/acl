@@ -112,6 +112,6 @@ service master_ctld {
 #	应用自己的配置选项
 
 #	acl_master 监听的管理地
-#	manage_addr = /home/zsx/tools/acl/var/public/master.sock
-	manage_addr = 127.0.0.1:8190
+	manage_addr = {install_path}/var/public/master.sock
+#	manage_addr = 127.0.0.1:8190
 }
