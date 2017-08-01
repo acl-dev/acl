@@ -134,6 +134,7 @@ packinstall:
 	$(shell mkdir -p $(LIB_ACL)/)
 	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master/)
 	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
+	$(shell mkdir -p ./dist/master/bin/$(RPATH))
 	@(cd app/master/daemon; make install)
 	@(cd app/master/tools/master_ctld; make install)
 	@(cd app/master/tools/master_ctl; make install)
