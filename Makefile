@@ -123,6 +123,7 @@ clean:
 acl_master: all_lib
 	@(cd app/master/daemon; make; make install)
 	@(cd app/master/tools/master_ctld; make; make install)
+	@(cd app/master/tools/master_ctl; make; make install)
 
 packinstall:
 	@(echo "")
