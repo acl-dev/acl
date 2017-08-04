@@ -21,9 +21,9 @@ CFLAGS = -c -g -W \
 -DHAS_MYSQL_DLL \
 -DHAS_PGSQL_DLL \
 -DHAS_SQLITE_DLL \
+-DHAS_POLARSSL_DLL \
 -Winvalid-pch \
 -DACL_PREPARE_COMPILE \
-#-DHAS_POLARSSL
 #-DUSE_DYNAMIC
 # -Wcast-align
 #-Wcast-qual

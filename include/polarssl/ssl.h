@@ -546,10 +546,13 @@ extern int (*ssl_hw_record_finish)(ssl_context *ssl);
  * \return              a statically allocated array of ciphersuites, the last
  *                      entry is 0.
  */
+/*
 static inline const int *ssl_list_ciphersuites( void )
 {
     return ssl_default_ciphersuites;
 }
+*/
+const int *ssl_list_ciphersuites( void );
 
 /**
  * \brief               Return the name of the ciphersuite associated with the given

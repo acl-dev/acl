@@ -35,88 +35,226 @@
 
 # ifdef HAS_POLARSSL_DLL
 #  if defined(POLARSSL_1_3_X)
-typedef void (*X509_INIT_FN)(X509_CRT*);
-typedef void (*PK_INIT_FN)(PKEY*);
-typedef void (*RSA_INIT_FN)(PKEY*, RSR_PKCS_V15, 0);
+typedef void (*x509_init_fn)(X509_CRT*);
+typedef void (*pk_init_fn)(PKEY*);
+typedef void (*rsa_init_fn)(PKEY*, RSR_PKCS_V15, 0);
+
+#   define ENTROPY_FREE_NAME		"entropy_free"
+#   define PK_INIT_NAME			"pk_init"
+#   define X509_INIT_NAME		"x509_crt_init"
+#   define X509_FREE_NAME		"x509_crt_free"
+#   define X509_PARSE_CRTPATH_NAME	"x509_crt_parse_path"
+#   define X509_PARSE_CRTFILE_NAME	"x509_crt_parse_file"
+#   define X509_PARSE_KEYFILE_NAME	"pk_parse_keyfile"
+#   define PKEY_FREE_NAME		"pk_free"
 #  else
-typedef void (*RSA_INIT_FN)(PKEY*, int, int);
-#   define x509_init_fn		(void)
-#   define entropy_free_fn	(void)
+typedef void (*rsa_init_fn)(PKEY*, int, int);
+#   define __x509_init			(void)
+#   define __entropy_free		(void)
+
+#   define RSA_INIT_NAME		"rsa_init"
+#   define X509_FREE_NAME		"x509_free"
+#   define X509_PARSE_CRTPATH_NAME	"x509parse_crtpath"
+#   define X509_PARSE_CRTFILE_NAME	"x509parse_crtfile"
+#   define X509_PARSE_KEYFILE_NAME	"x509parse_keyfile"
+#   define PKEY_FREE_NAME		"rsa_free"
 #  endif
-typedef void (*ENTROPY_INIT_FN)(entropy_context*);
-typedef void (*X509_FREE_FN)(X509_CRT*);
-typedef int  (*X509_PARSE_CRTPATH_FN)(X509_CRT*, const char*);
-typedef int  (*X509_PARSE_CRTFILE_FN)(X509_CRT*, const char*);
-typedef int  (*X509_PARSE_KEYFILE_FN)(PKEY*, const char*, const char*);
-typedef void (*PKEY_FREE_FN)(PKEY*);
-typedef void (*SSL_SET_AUTHMODE_FN)(ssl_context*, int);
-typedef void (*SSL_LIST_CIPHERSUITES_FN)(void);
-typedef void (*SSL_SET_CIPHERSUITES_FN)(ssl_context*, const int*);
-typedef void (*SSL_SET_SESSION_CACHE_FN)(ssl_context*,
+
+#  define ENTROPY_INIT_NAME		"entropy_init"
+#  define SSL_LIST_CIPHERSUITES_NAME	"ssl_list_ciphersuites"
+#  define SSL_SET_CIPHERSUITES_NAME	"ssl_set_ciphersuites"
+#  define SSL_SET_SESSION_CACHE_NAME	"ssl_set_session_cache"
+#  define SSL_SET_CA_CHAIN_NAME		"ssl_set_ca_chain"
+#  define SSL_SET_OWN_CERT_NAME		"ssl_set_own_cert"
+#  define SSL_SET_AUTHMODE_NAME		"ssl_set_authmode"
+#  define SSL_CACHE_INIT_NAME		"ssl_cache_init"
+#  define SSL_CACHE_FREE_NAME		"ssl_cache_free"
+#  define SSL_CACHE_SET_NAME		"ssl_cache_set"
+#  define SSL_CACHE_GET_NAME		"ssl_cache_get"
+
+typedef void (*entropy_init_fn)(entropy_context*);
+typedef void (*x509_free_fn)(X509_CRT*);
+typedef int  (*x509_parse_crtpath_fn)(X509_CRT*, const char*);
+typedef int  (*x509_parse_crtfile_fn)(X509_CRT*, const char*);
+typedef int  (*x509_parse_keyfile_fn)(PKEY*, const char*, const char*);
+typedef void (*pkey_free_fn)(PKEY*);
+
+typedef const int* (*ssl_list_ciphersuites_fn)(void);
+typedef void (*ssl_set_ciphersuites_fn)(ssl_context*, const int*);
+typedef void (*ssl_set_session_cache_fn)(ssl_context*,
         int (*f_get_cache)(void*, ssl_session*), void*,
         int (*f_set_cache)(void*, const ssl_session*), void*);
-typedef void (*SSL_SET_CA_CHAIN_FN)(ssl_context*, X509_CRT*,
+typedef void (*ssl_set_ca_chain_fn)(ssl_context*, X509_CRT*,
                        x509_crl*, const char*);
-typedef void (*SSL_SET_OWN_CERT_FN)(ssl_context*, X509_CRT*, PKEY*);
-typedef void (*SSL_CACHE_INIT_FN)(ssl_cache_context*);
-typedef void (*SSL_CACHE_FREE_FN)(ssl_cache_context*);
+typedef void (*ssl_set_own_cert_fn)(ssl_context*, X509_CRT*, PKEY*);
+typedef void (*ssl_set_authmode_fn)(ssl_context*, int);
+typedef void (*ssl_cache_init_fn)(ssl_cache_context*);
+typedef void (*ssl_cache_free_fn)(ssl_cache_context*);
+typedef int (*ssl_cache_set_fn)(void*, const ssl_session*);;
+typedef int (*ssl_cache_get_fn)(void*, ssl_session*);
 
-static RSA_INIT_FN		rsa_init_fn;
-static ENTROPY_INIT_FN		entropy_init_fn;
-static X509_FREE_FN		x509_free_fn;
-static X509_PARSE_CRTPATH_FN	x509_parse_crtpath_fn;
-static X509_PARSE_CRTFILE_FN	x509_parse_crtfile_fn;
-static X509_PARSE_KEYFILE_FN	x509_parse_keyfile_fn;
-static PKEY_FREE_FN		pkey_free_fn;
-static SSL_SET_AUTHMODE_FN	ssl_set_authmode_fn;
-static SSL_LIST_CIPHERSUITES_FN	ssl_list_ciphersuites_fn;
-static SSL_SET_CIPHERSUITES_FN	ssl_set_ciphersuites_fn;
-static SSL_SET_SESSION_CACHE_FN	ssl_set_session_cache_fn;
-static SSL_SET_CA_CHAIN_FN	ssl_set_ca_chain_fn;
-static SSL_SET_OWN_CERT_FN	ssl_set_own_cert_fn;
-static SSL_CACHE_INIT_FN	ssl_cache_init_fn;
-static SSL_CACHE_FREE_FN	ssl_cache_free_fn;
-# elif defined(POLARSSL_1_3_X)
-#  define entropy_init_fn	::entropy_init
-#  define entropy_free_fn	::entropy_free
-#  define pk_init_fn		::pk_init_fn
-#  define x509_init_fn		::x509_crt_init
-#  define x509_free_fn		::x509_crt_free
-#  define x509_parse_crtpath_fn	::x509_crt_parse_path
-#  define x509_parse_crtfile_fn	::x509_crt_parse_file
-#  define x509_parse_keyfile_fn	::pk_parse_keyfile
-#  define pkey_free_fn		::pk_free
-# else
-#  define entropy_init_fn	::entropy_init
-#  define entropy_free_fn	(void)
-#  define rsa_init_fn		::rsa_init
-#  define x509_init_fn		(void)
-#  define x509_free_fn		::x509_free
-#  define x509_parse_crtpath_fn	::x509parse_crtpath
-#  define x509_parse_crtfile_fn	::x509parse_crtfile
-#  define x509_parse_keyfile_fn	::x509parse_keyfile
-#  define pkey_free_fn		::rsa_free
-# endif
+static entropy_init_fn		__entropy_init;
+static rsa_init_fn		__rsa_init;
+static x509_free_fn		__x509_free;
+static x509_parse_crtpath_fn	__x509_parse_crtpath;
+static x509_parse_crtfile_fn	__x509_parse_crtfile;
+static x509_parse_keyfile_fn	__x509_parse_keyfile;
+static pkey_free_fn		__pkey_free;
 
-# define ssl_cache_init_fn	::ssl_cache_init
-# define ssl_cache_free_fn	::ssl_cache_free
-# define ssl_list_ciphersuites_fn ::ssl_list_ciphersuites
-# define ssl_set_ciphersuites_fn  ::ssl_set_ciphersuites
-# define ssl_set_session_cache_fn ::ssl_set_session_cache
-# define ssl_set_ca_chain_fn	::ssl_set_ca_chain
-# define ssl_set_own_cert_fn	::ssl_set_own_cert
-# define ssl_set_authmode_fn	::ssl_set_authmode
+static ssl_list_ciphersuites_fn	__ssl_list_ciphersuites;
 
+static ssl_set_ciphersuites_fn	__ssl_set_ciphersuites;
+static ssl_set_session_cache_fn	__ssl_set_session_cache;
+static ssl_set_ca_chain_fn	__ssl_set_ca_chain;
+static ssl_set_own_cert_fn	__ssl_set_own_cert;
+static ssl_set_authmode_fn	__ssl_set_authmode;
+static ssl_cache_init_fn	__ssl_cache_init;
+static ssl_cache_free_fn	__ssl_cache_free;
+static ssl_cache_set_fn		__ssl_cache_set;
+static ssl_cache_get_fn		__ssl_cache_get;
+
+static acl_pthread_once_t	__polarssl_once = ACL_PTHREAD_ONCE_INIT;
+static acl::string		__polarssl_path;
+ACL_DLL_HANDLE			__polarssl_dll  = NULL;
+
+static void polarssl_dll_unload(void)
+{
+	if (__polarssl_dll)
+	{
+		acl_dlclose(__polarssl_dll);
+		__polarssl_dll = NULL;
+		logger("%s unload ok", __polarssl_path.c_str());
+	}
+}
+
+extern void polarssl_dll_load_io(void); // defined in polarssl_io.cpp
+
+static void polarssl_dll_load_conf(void)
+{
+#define LOAD(name, type, fn) do {					\
+	(fn) = (type) acl_dlsym(__polarssl_dll, (name));		\
+	if ((fn) == NULL)						\
+		logger_fatal("dlsym %s error %s", name, acl_dlerror());	\
+} while (0)
+
+#if defined(POLARSSL_1_3_X)
+	LOAD(X509_INIT_NAME, x509_init_fn, __x509_init);
+	LOAD(PK_INIT_NAME, pk_init_fn, __pk_init);
+#else
+	LOAD(RSA_INIT_NAME, rsa_init_fn, __rsa_init);
 #endif
+	LOAD(ENTROPY_INIT_NAME, entropy_init_fn, __entropy_init);
+	LOAD(X509_FREE_NAME, x509_free_fn, __x509_free);
+	LOAD(X509_PARSE_CRTPATH_NAME, x509_parse_crtpath_fn, __x509_parse_crtpath);
+	LOAD(X509_PARSE_CRTFILE_NAME, x509_parse_crtfile_fn, __x509_parse_crtfile);
+	LOAD(X509_PARSE_KEYFILE_NAME, x509_parse_keyfile_fn, __x509_parse_keyfile);
+	LOAD(PKEY_FREE_NAME, pkey_free_fn, __pkey_free);
+	LOAD(SSL_LIST_CIPHERSUITES_NAME, ssl_list_ciphersuites_fn, __ssl_list_ciphersuites);
+	LOAD(SSL_SET_CIPHERSUITES_NAME, ssl_set_ciphersuites_fn, __ssl_set_ciphersuites);
+	LOAD(SSL_SET_SESSION_CACHE_NAME, ssl_set_session_cache_fn, __ssl_set_session_cache);
+	LOAD(SSL_SET_CA_CHAIN_NAME, ssl_set_ca_chain_fn, __ssl_set_ca_chain);
+	LOAD(SSL_SET_OWN_CERT_NAME, ssl_set_own_cert_fn, __ssl_set_own_cert);
+	LOAD(SSL_SET_AUTHMODE_NAME, ssl_set_authmode_fn, __ssl_set_authmode);
+	LOAD(SSL_CACHE_INIT_NAME, ssl_cache_init_fn, __ssl_cache_init);
+	LOAD(SSL_CACHE_FREE_NAME, ssl_cache_free_fn, __ssl_cache_free);
+	LOAD(SSL_CACHE_SET_NAME, ssl_cache_set_fn, __ssl_cache_set);
+	LOAD(SSL_CACHE_GET_NAME, ssl_cache_get_fn, __ssl_cache_get);
+}
+
+static void polarssl_dll_load(void)
+{
+	if (__polarssl_dll)
+	{
+		logger("polarssl(%s) has been loaded!", __polarssl_path.c_str());
+		return;
+	}
+
+	const char* path = __polarssl_path.c_str();
+	if (__polarssl_path.empty())
+	{
+#ifdef	ACL_WINDOWS
+		path = "libpolarssl.dll";
+#else
+		path = "libpolarssl.so";
+#endif
+	}
+
+	__polarssl_dll = acl_dlopen(path);
+	if (__polarssl_dll == NULL)
+		logger_fatal("load %s error %s", path, acl_dlerror());
+
+	polarssl_dll_load_conf();
+	polarssl_dll_load_io();
+
+	logger("%s loaded!", path);
+	atexit(polarssl_dll_unload);
+}
+
+# else // !HAS_POLARSSL_DLL && HAS_POLARSSL
+
+#  if defined(POLARSSL_1_3_X)
+#   define __entropy_free	::entropy_free
+#   define __pk_init		::pk_init
+#   define __x509_init		::x509_crt_init
+#   define __x509_free		::x509_crt_free
+#   define __x509_parse_crtpath	::x509_crt_parse_path
+#   define __x509_parse_crtfile	::x509_crt_parse_file
+#   define __x509_parse_keyfile	::pk_parse_keyfile
+#   define __pkey_free		::pk_free
+#  else
+#   define __entropy_free	(void)
+#   define __rsa_init		::rsa_init
+#   define __x509_init		(void)
+#   define __x509_free		::x509_free
+#   define __x509_parse_crtpath	::x509parse_crtpath
+#   define __x509_parse_crtfile	::x509parse_crtfile
+#   define __x509_parse_keyfile	::x509parse_keyfile
+#   define __pkey_free		::rsa_free
+#  endif
+
+#  define __entropy_init		::entropy_init
+#  define __ssl_list_ciphersuites ::ssl_list_ciphersuites
+#  define __ssl_set_ciphersuites  ::ssl_set_ciphersuites
+#  define __ssl_set_session_cache ::ssl_set_session_cache
+#  define __ssl_set_ca_chain	::ssl_set_ca_chain
+#  define __ssl_set_own_cert	::ssl_set_own_cert
+#  define __ssl_set_authmode	::ssl_set_authmode
+#  define __ssl_cache_init	::ssl_cache_init
+#  define __ssl_cache_free	::ssl_cache_free
+#  define __ssl_cache_set	::ssl_cache_set
+#  define __ssl_cache_get	::ssl_cache_get
+
+# endif // HAS_POLARSSL_DLL
+#endif  // HAS_POLARSSL
 
 namespace acl
 {
 
+void polarssl_conf::set_libpath(const char* path)
+{
+#ifdef HAS_POLARSSL_DLL
+	__polarssl_path = path;
+#endif
+}
+
+void polarssl_conf::load(void)
+{
+#ifdef HAS_POLARSSL_DLL
+	acl_pthread_once(&__polarssl_once, polarssl_dll_load);
+#else
+	logger_warn("link polarssl library in statis way!");
+#endif
+}
+
 polarssl_conf::polarssl_conf()
 {
 #ifdef HAS_POLARSSL
+# ifdef HAS_POLARSSL_DLL
+	acl_pthread_once(&__polarssl_once, polarssl_dll_load);
+# endif
+
 	entropy_ = acl_mycalloc(1, sizeof(entropy_context));
-	entropy_init_fn((entropy_context*) entropy_);
+	__entropy_init((entropy_context*) entropy_);
 
 	cacert_ = NULL;
 	cert_chain_ = NULL;
@@ -141,22 +279,22 @@ polarssl_conf::~polarssl_conf()
 
 	if (cert_chain_)
 	{
-		x509_free_fn((X509_CRT*) cert_chain_);
+		__x509_free((X509_CRT*) cert_chain_);
 		acl_myfree(cert_chain_);
 	}
 
 	if (pkey_)
 	{
-		pkey_free_fn((PKEY*) pkey_);
+		__pkey_free((PKEY*) pkey_);
 		acl_myfree(pkey_);
 	}
 
-	entropy_free_fn((entropy_context*) entropy_);
+	__entropy_free((entropy_context*) entropy_);
 	acl_myfree(entropy_);
 
 	if (cache_)
 	{
-		ssl_cache_free_fn((ssl_cache_context*) cache_);
+		__ssl_cache_free((ssl_cache_context*) cache_);
 		acl_myfree(cache_);
 	}
 #endif
@@ -166,7 +304,7 @@ void polarssl_conf::free_ca()
 {
 #ifdef HAS_POLARSSL
 	if (cacert_) {
-		x509_free_fn((X509_CRT*) cacert_);
+		__x509_free((X509_CRT*) cacert_);
 		acl_myfree(cacert_);
 		cacert_ = NULL;
 	}
@@ -181,11 +319,11 @@ bool polarssl_conf::load_ca(const char* ca_file, const char* ca_path)
 	int  ret;
 
 	cacert_ = acl_mycalloc(1, sizeof(X509_CRT));
-	x509_init_fn((X509_CRT*) cacert_);
+	__x509_init((X509_CRT*) cacert_);
 
 	if (ca_path && *ca_path)
 	{
-		ret = x509_parse_crtpath_fn((X509_CRT*) cacert_, ca_path);
+		ret = __x509_parse_crtpath((X509_CRT*) cacert_, ca_path);
 		if (ret != 0)
 		{
 			logger_error("x509_crt_parse_path(%s) error: -0x%04x",
@@ -202,7 +340,7 @@ bool polarssl_conf::load_ca(const char* ca_file, const char* ca_path)
 		return false;
 	}
 
-	ret = x509_parse_crtfile_fn((X509_CRT*) cacert_, ca_file);
+	ret = __x509_parse_crtfile((X509_CRT*) cacert_, ca_file);
 	if (ret != 0)
 	{
 		logger_error("x509_crt_parse_path(%s) error: -0x%04x",
@@ -233,16 +371,16 @@ bool polarssl_conf::add_cert(const char* crt_file)
 	if (cert_chain_ == NULL)
 	{
 		cert_chain_ = acl_mycalloc(1, sizeof(X509_CRT));
-		x509_init_fn((X509_CRT*) cert_chain_);
+		__x509_init((X509_CRT*) cert_chain_);
 	}
 
-	int ret = x509_parse_crtfile_fn((X509_CRT*) cert_chain_, crt_file);
+	int ret = __x509_parse_crtfile((X509_CRT*) cert_chain_, crt_file);
 	if (ret != 0)
 	{
 		logger_error("x509_crt_parse_file(%s) error: -0x%04x",
 			crt_file, ret);
 
-		x509_free_fn((X509_CRT*) cert_chain_);
+		__x509_free((X509_CRT*) cert_chain_);
 		acl_myfree(cert_chain_);
 		cert_chain_ = NULL;
 		return false;
@@ -262,26 +400,26 @@ bool polarssl_conf::set_key(const char* key_file,
 #ifdef HAS_POLARSSL
 	if (pkey_ != NULL)
 	{
-		pkey_free_fn((PKEY*) pkey_);
+		__pkey_free((PKEY*) pkey_);
 		acl_myfree(pkey_);
 	}
 
 	pkey_ = acl_mycalloc(1, sizeof(PKEY));
 
 # ifdef POLARSSL_1_3_X
-	pk_init_fn((PKEY*) pkey_);
+	__pk_init((PKEY*) pkey_);
 # else
-	rsa_init_fn((PKEY*) pkey_, RSA_PKCS_V15, 0);
+	__rsa_init((PKEY*) pkey_, RSA_PKCS_V15, 0);
 # endif
 
-	int ret = x509_parse_keyfile_fn((PKEY*) pkey_, key_file,
+	int ret = __x509_parse_keyfile((PKEY*) pkey_, key_file,
 			key_pass ? key_pass : "");
 	if (ret != 0)
 	{
 		logger_error("pk_parse_keyfile(%s) error: -0x%04x",
 			key_file, ret);
 
-		pkey_free_fn((PKEY*) pkey_);
+		__pkey_free((PKEY*) pkey_);
 		acl_myfree(pkey_);
 		pkey_ = NULL;
 		return false;
@@ -310,11 +448,11 @@ void polarssl_conf::enable_cache(bool on)
 		if (cache_ != NULL)
 			return;
 		cache_ = acl_mycalloc(1, sizeof(ssl_cache_context));
-		ssl_cache_init_fn((ssl_cache_context*) cache_);
+		__ssl_cache_init((ssl_cache_context*) cache_);
 	}
 	else if (cache_ != NULL)
 	{
-		ssl_cache_free_fn((ssl_cache_context*) cache_);
+		__ssl_cache_free((ssl_cache_context*) cache_);
 		acl_myfree(cache_);
 		cache_ = NULL;
 	}
@@ -332,27 +470,27 @@ bool polarssl_conf::setup_certs(void* ssl_in, bool server_side)
 	switch (verify_mode_)
 	{
 	case POLARSSL_VERIFY_NONE:
-		ssl_set_authmode_fn((ssl_context*) ssl, SSL_VERIFY_NONE);
+		__ssl_set_authmode((ssl_context*) ssl, SSL_VERIFY_NONE);
 		break;
 	case POLARSSL_VERIFY_OPT:
-		ssl_set_authmode_fn((ssl_context*) ssl, SSL_VERIFY_OPTIONAL);
+		__ssl_set_authmode((ssl_context*) ssl, SSL_VERIFY_OPTIONAL);
 		break;
 	case POLARSSL_VERIFY_REQ:
-		ssl_set_authmode_fn((ssl_context*) ssl, SSL_VERIFY_REQUIRED);
+		__ssl_set_authmode((ssl_context*) ssl, SSL_VERIFY_REQUIRED);
 		break;
 	default:
-		ssl_set_authmode_fn((ssl_context*) ssl, SSL_VERIFY_NONE);
+		__ssl_set_authmode((ssl_context*) ssl, SSL_VERIFY_NONE);
 		break;
 	}
 
 	// Setup cipher_suites
-	const int* cipher_suites = ssl_list_ciphersuites_fn();
+	const int* cipher_suites = __ssl_list_ciphersuites();
 	if (cipher_suites == NULL)
 	{
 		logger_error("ssl_list_ciphersuites null");
 		return false;
 	}
-	ssl_set_ciphersuites_fn((ssl_context*) ssl, cipher_suites);
+	__ssl_set_ciphersuites((ssl_context*) ssl, cipher_suites);
 
 //	::ssl_set_min_version((ssl_context*) ssl, SSL_MAJOR_VERSION_3,
 //		SSL_MINOR_VERSION_0);
@@ -362,20 +500,20 @@ bool polarssl_conf::setup_certs(void* ssl_in, bool server_side)
 
 	// Setup cache only for server-side
 	if (server_side && cache_ != NULL)
-		ssl_set_session_cache_fn(ssl, ssl_cache_get,
-			(ssl_cache_context*) cache_, ssl_cache_set,
+		__ssl_set_session_cache(ssl, __ssl_cache_get,
+			(ssl_cache_context*) cache_, __ssl_cache_set,
 			(ssl_cache_context*) cache_);
 
 	// Setup ca cert
 	if (cacert_)
-		ssl_set_ca_chain_fn(ssl, (X509_CRT*) cacert_, NULL, NULL);
+		__ssl_set_ca_chain(ssl, (X509_CRT*) cacert_, NULL, NULL);
 
 	// Setup own's cert chain and private key
 
 	if (cert_chain_ && pkey_)
 	{
 # ifdef POLARSSL_1_3_X
-		int ret = ssl_set_own_cert_fn(ssl, (X509_CRT*) cert_chain_,
+		int ret = __ssl_set_own_cert(ssl, (X509_CRT*) cert_chain_,
 				(PKEY*) pkey_);
 		if (ret != 0)
 		{
@@ -383,7 +521,7 @@ bool polarssl_conf::setup_certs(void* ssl_in, bool server_side)
 			return false;
 		}
 # else
-		ssl_set_own_cert_fn(ssl, (X509_CRT*) cert_chain_, (PKEY*) pkey_);
+		__ssl_set_own_cert(ssl, (X509_CRT*) cert_chain_, (PKEY*) pkey_);
 # endif
 	}
 

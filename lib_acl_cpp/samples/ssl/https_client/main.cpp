@@ -6,6 +6,7 @@
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
+		"	-f path of libpolarssl.so\r\n"
 		"	-s server_addr [default: 127.0.0.1:8888]\r\n"
 		"	-k [keep alive, default: false]\r\n"
 		"	-L data_length [default: 1024]\r\n"
@@ -19,19 +20,21 @@ int main(int argc, char* argv[])
 	int   ch, cocurrent = 1, count = 10, length = 1024;
 	bool  keep_alive = false, use_ssl = false;
 	acl::string server_addr("127.0.0.1:1443");
-	acl::string domain;
+	acl::string domain, libpath("libpolarssl.so");
 
-	// ³õÊ¼»¯ acl ¿â
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:c:n:kSH:")) > 0)
+	while ((ch = getopt(argc, argv, "hf:s:c:n:kSH:")) > 0)
 	{
 		switch (ch)
 		{
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 'f':
+			libpath = optarg;
+			break;
 		case 'c':
 			cocurrent = atoi(optarg);
 			break;
@@ -55,6 +58,9 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	acl::polarssl_conf::set_libpath(libpath);
+	acl::polarssl_conf::load();
+
 	if (domain.empty())
 		domain = server_addr;
 
@@ -68,28 +74,22 @@ int main(int argc, char* argv[])
 
 	for (int i = 0; i < cocurrent; i++)
 	{
-		// ´´½¨Ïß³Ì
 		https_client* thread = new https_client(server_addr, domain,
 				keep_alive, count, length);
 
 		if (use_ssl)
 			thread->set_ssl_conf(&ssl_conf);
 
-		// ÉèÖÃ´´½¨µÄÏß³ÌÎª·Ç·ÖÀëÄ£Ê½£¬ÒÔ±ãÓÚÏÂÃæ¿ÉÒÔµ÷Ó thread::wait
-		// µÈ´ýÏß³Ì½áÊø
 		thread->set_detachable(false);
 
-		// ½«Ïß³Ì·ÅÔÚ¶ÓÁÐÖÐ
 		threads.push_back(thread);
 
-		// Æô¶¯Ïß³Ì
 		thread->start();
 	}
 
 	std::list<https_client*>::iterator it = threads.begin();
 	for (; it != threads.end(); ++it)
 	{
-		// µÈ´ýÏß³Ì½áÊø
 		if ((*it)->wait(NULL) == false)
 			printf("wait one thread(%lu) error\r\n",
 				(*it)->thread_id());
@@ -98,7 +98,6 @@ int main(int argc, char* argv[])
 			printf("wait one thread(%lu) ok\r\n",
 				(*it)->thread_id());
 		*/
-		// É¾³ý¶¯Ì¬´´½¨µÄÏß³Ì¶ÔÏó
 		delete *it;
 
 	}
@@ -109,18 +108,18 @@ int main(int argc, char* argv[])
 
 	for (int i = 0; i < cocurrent; i++)
 	{
-		// ´´½¨Ïß³Ì
+		// ?????ß³?
 		https_request* thread = new https_request(server_addr,
 				use_ssl ? &ssl_conf : NULL);
 
-		// ÉèÖÃ´´½¨µÄÏß³ÌÎª·Ç·ÖÀëÄ£Ê½£¬ÒÔ±ãÓÚÏÂÃæ¿ÉÒÔµ÷Ó thread::wait
-		// µÈ´ýÏß³Ì½áÊø
+		// ???Ã´??????ß³?Îª?Ç·???Ä£Ê½???Ô±??????????Ôµ?? thread::wait
+		// ?È´??ß³Ì½???
 		thread->set_detachable(false);
 
-		// ½«Ïß³Ì·ÅÔÚ¶ÓÁÐÖÐ
+		// ???ß³Ì·??Ú¶?????
 		threads.push_back(thread);
 
-		// Æô¶¯Ïß³Ì
+		// ?????ß³?
 		thread->start();
 	}
 
@@ -129,14 +128,14 @@ int main(int argc, char* argv[])
 	std::list<https_request*>::iterator it = threads.begin();
 	for (; it != threads.end(); ++it)
 	{
-		// µÈ´ýÏß³Ì½áÊø
+		// ?È´??ß³Ì½???
 		if ((*it)->wait(NULL) == false)
 			printf("wait one thread(%lu) error\r\n",
 				(*it)->thread_id());
 		else
 			printf("wait one thread(%lu) ok\r\n",
 				(*it)->thread_id());
-		// É¾³ý¶¯Ì¬´´½¨µÄÏß³Ì¶ÔÏó
+		// É¾????Ì¬???????ß³Ì¶???
 		delete *it;
 
 	}

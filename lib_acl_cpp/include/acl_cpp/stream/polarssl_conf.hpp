@@ -80,6 +80,17 @@ public:
 	 */
 	bool setup_certs(void* ssl, bool server_side);
 
+	/**
+	 * 必须首先调用此函数设置 libpolarssl.so 的全路径
+	 * @param path {const char*} libpolarssl.so 的全路径
+	 */
+	static void set_libpath(const char* path);
+
+	/**
+	 * 可以显式调用本方法，动态加载 polarssl 动态库
+	 */
+	static void load(void);
+
 private:
 	void* entropy_;
 	void* cacert_;
