@@ -12,7 +12,7 @@
 #include "acl_cpp/stream/polarssl_conf.hpp"
 #include "acl_cpp/http/http_client.hpp"
 
-static acl::polarssl_conf __ssl_conf;
+static acl::polarssl_conf* __ssl_conf;
 
 static bool test(const char* addr, int k, int nloop)
 {
@@ -23,7 +23,7 @@ static bool test(const char* addr, int k, int nloop)
 		return false;
 	}
 
-	acl::polarssl_io* ssl = new acl::polarssl_io(__ssl_conf, false);
+	acl::polarssl_io* ssl = new acl::polarssl_io(*__ssl_conf, false);
 	if (client.setup_hook(ssl) == ssl)
 	{
 		std::cout << "open ssl " << addr << " error!" << std::endl;
@@ -107,6 +107,7 @@ int main(int argc, char* argv[])
 
 	acl::polarssl_conf::set_libpath(libpath);
 	acl::polarssl_conf::load();
+	__ssl_conf = new acl::polarssl_conf;
 
 	if (max_connections <= 0)
 		max_connections = 100;
@@ -119,5 +120,7 @@ int main(int argc, char* argv[])
 
 	printf("Over, enter any key to exit!\n");
 	getchar();
+	delete __ssl_conf;
+
 	return (0);
 }

@@ -5,6 +5,7 @@
 #include "lib_acl.h"
 #include <iostream>
 #include "acl_cpp/acl_cpp_init.hpp"
+#include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
@@ -12,7 +13,7 @@
 #include "acl_cpp/stream/polarssl_conf.hpp"
 #include "acl_cpp/http/http_client.hpp"
 
-static acl::polarssl_conf __ssl_conf;
+static acl::polarssl_conf* __ssl_conf;
 
 static void test0(int i)
 {
@@ -25,7 +26,7 @@ static void test0(int i)
 		return;
 	}
 
-	acl::polarssl_io* ssl = new acl::polarssl_io(__ssl_conf, false);
+	acl::polarssl_io* ssl = new acl::polarssl_io(*__ssl_conf, false);
 	if (client.setup_hook(ssl) == ssl)
 	{
 		std::cout << "open ssl " << addr.c_str()
@@ -74,7 +75,7 @@ static void test1(const char* domain, int port, bool use_gzip, bool use_ssl)
 	// 如果使用 SSL 方式，则进行 SSL 握手过程
 	if (use_ssl)
 	{
-		acl::polarssl_io* ssl = new acl::polarssl_io(__ssl_conf, false);
+		acl::polarssl_io* ssl = new acl::polarssl_io(*__ssl_conf, false);
 		if (client.setup_hook(ssl) == ssl)
 		{
 			std::cout << "open ssl client " << addr.c_str()
@@ -149,7 +150,7 @@ static void test2(const char* domain, int port, bool use_gzip, bool use_ssl)
 	{
 		// 创建 SSL 对象并与网络客户端连接流绑定，当流对象被释放前该 SSL 对象
 		// 将由流对象内部通过调用 stream_hook::destroy() 释放
-		acl::polarssl_io* ssl = new acl::polarssl_io(__ssl_conf, false);
+		acl::polarssl_io* ssl = new acl::polarssl_io(*__ssl_conf, false);
 		if (client.get_stream().setup_hook(ssl) == ssl)
 		{
 			std::cout << "open ssl client " << addr.c_str()
@@ -220,14 +221,17 @@ static void test2(const char* domain, int port, bool use_gzip, bool use_ssl)
 
 int main(int argc, char* argv[])
 {
-	(void) argc; (void) argv;
 	acl::acl_cpp_init();
+	acl::log::stdout_open(true);
+
 #if defined(_WIN32) || defined(_WIN64)
 	acl::polarssl_conf::set_libpath("libpolarssl.dll");
 #else
 	acl::polarssl_conf::set_libpath("../libpolarssl.so");
 #endif
 	acl::polarssl_conf::load();
+
+	__ssl_conf = new acl::polarssl_conf;
 
 	int   n = 1;
 	if (argc >= 2)
@@ -250,5 +254,6 @@ int main(int argc, char* argv[])
 
 	printf("Over, enter any key to exit!\n");
 	getchar();
+	delete __ssl_conf;
 	return (0);
 }
