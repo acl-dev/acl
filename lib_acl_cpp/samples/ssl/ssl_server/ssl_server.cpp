@@ -408,6 +408,9 @@ int main(int argc, char* argv[])
 #endif
 	acl::log::stdout_open(true);
 
+	acl::polarssl_conf::set_libpath("../libpolarssl.so");
+	acl::polarssl_conf::load();
+
 	// 开始运行
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{

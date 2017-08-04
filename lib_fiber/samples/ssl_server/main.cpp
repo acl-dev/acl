@@ -135,6 +135,7 @@ static void fiber_accept(ACL_FIBER *, void *ctx)
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
+		" -l path_to_polarssl\r\n"
 		" -s listen_addr\r\n"
 		" -r rw_timeout\r\n"
 		" -c ssl_crt.pem\r\n"
@@ -144,16 +145,19 @@ static void usage(const char* procname)
 
 int main(int argc, char *argv[])
 {
-	acl::string addr(":9001");
+	acl::string addr(":9001"), libpath("../libpolarssl.so");
 	int  ch;
 
-	while ((ch = getopt(argc, argv, "hs:r:c:k:C")) > 0)
+	while ((ch = getopt(argc, argv, "hl:s:r:c:k:C")) > 0)
 	{
 		switch (ch)
 		{
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 'l':
+			libpath = optarg;
+			break;
 		case 's':
 			addr = optarg;
 			break;
@@ -176,6 +180,9 @@ int main(int argc, char *argv[])
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
+
+	acl::polarssl_conf::set_libpath(libpath);
+	acl::polarssl_conf::load();
 
 	acl_fiber_create(fiber_accept, addr.c_str(), STACK_SIZE);
 

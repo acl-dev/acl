@@ -68,6 +68,7 @@ static bool test(const char* addr, int k, int nloop)
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
+		" -d path_to_polarssl\r\n"
 		"-s server_addr[default: 127.0.0.1:9001]\r\n"
 		"-c max_connections[default: 10]\r\n"
 		"-n max_loop_per_connection[default: 10]\r\n", procname);
@@ -76,17 +77,20 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int   ch, max_loop = 10, max_connections = 10;
-	acl::string addr("127.0.0.1:9001");
+	acl::string addr("127.0.0.1:9001"), libpath("../libpolarssl.so");
 
 	acl::acl_cpp_init();
 
-	while ((ch = getopt(argc, argv, "hs:n:c:")) > 0)
+	while ((ch = getopt(argc, argv, "hd:s:n:c:")) > 0)
 	{
 		switch (ch)
 		{
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 'd':
+			libpath = optarg;
+			break;
 		case 's':
 			addr = optarg;
 			break;
@@ -100,6 +104,9 @@ int main(int argc, char* argv[])
 			break;
 		}
 	}
+
+	acl::polarssl_conf::set_libpath(libpath);
+	acl::polarssl_conf::load();
 
 	if (max_connections <= 0)
 		max_connections = 100;

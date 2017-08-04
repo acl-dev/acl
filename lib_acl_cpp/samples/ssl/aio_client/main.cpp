@@ -298,6 +298,7 @@ static bool connect_server(acl::polarssl_conf* ssl_conf, IO_CTX* ctx, int id)
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help] -l server_addr \r\n"
+		" -d path_to_polarssl\r\n"
 		" -c nconnect\r\n"
 		" -n io_max\r\n"
 		" -k[use kernel event: epoll/kqueue/devpoll\r\n"
@@ -312,6 +313,7 @@ int main(int argc, char* argv[])
 {
 	bool use_kernel = false;
 	IO_CTX ctx;
+	acl::string libpath("../libpolarssl.so");
 	acl::polarssl_conf* ssl_conf = NULL;
 	int   ch;
 	int   check_fds_inter = 10, delay_ms = 100;
@@ -324,7 +326,7 @@ int main(int argc, char* argv[])
 	ctx.dlen = 8193;
 	acl::safe_snprintf(ctx.addr, sizeof(ctx.addr), "127.0.0.1:9800");
 
-	while ((ch = getopt(argc, argv, "hc:n:kl:t:SL:I:M:")) > 0)
+	while ((ch = getopt(argc, argv, "hd:c:n:kl:t:SL:I:M:")) > 0)
 	{
 		switch (ch)
 		{
@@ -332,6 +334,9 @@ int main(int argc, char* argv[])
 			ctx.nopen_limit = atoi(optarg);
 			if (ctx.nopen_limit <= 0)
 				ctx.nopen_limit = 10;
+			break;
+		case 'd':
+			libpath = optarg;
 			break;
 		case 'n':
 			ctx.nwrite_limit = atoi(optarg);
@@ -385,6 +390,12 @@ int main(int argc, char* argv[])
 		delay_sec, delay_usec, check_fds_inter);
 	printf("Enter any key to continue ...\r\n");
 	getchar();
+
+	if (ssl_conf)
+	{
+		acl::polarssl_conf::set_libpath(libpath);
+		acl::polarssl_conf::load();
+	}
 
 	ctx.handle = &handle;
 

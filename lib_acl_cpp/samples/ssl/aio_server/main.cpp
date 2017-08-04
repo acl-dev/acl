@@ -233,6 +233,7 @@ public:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
+		"	-d path_to_polarssl\r\n"
 		"	-l server_addr[ip:port, default: 127.0.0.1:9800]\r\n"
 		"	-L line_max_length\r\n"
 		"	-t timeout\r\n"
@@ -248,17 +249,20 @@ int main(int argc, char* argv[])
 {
 	// 事件引擎是否采用内核中的高效模式
 	bool use_kernel = false;
-	acl::string key_file, cert_file;
+	acl::string key_file, cert_file, libpath("../libpolarssl.so");
 	acl::string addr("127.0.0.1:9800");
 	int  ch, delay_ms = 100, check_fds_inter = 10;
 
-	while ((ch = getopt(argc, argv, "l:hkL:t:K:C:n:M:I:")) > 0)
+	while ((ch = getopt(argc, argv, "ld::hkL:t:K:C:n:M:I:")) > 0)
 	{
 		switch (ch)
 		{
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 'd':
+			libpath = optarg;
+			break;
 		case 'l':
 			addr = optarg;
 			break;
@@ -320,6 +324,12 @@ int main(int argc, char* argv[])
 		}
 		else
 			std::cout << "Load cert&key OK!" << std::endl;
+	}
+
+	if (__ssl_conf)
+	{
+		acl::polarssl_conf::set_libpath(libpath);
+		acl::polarssl_conf::load();
 	}
 
 	// 构建异步引擎类对象

@@ -138,6 +138,7 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
+		" -l path_to_polarssl\r\n"
 		" -s listen_addr\r\n"
 		" -r rw_timeout\r\n"
 		" -c max_fibers\r\n"
@@ -147,17 +148,20 @@ static void usage(const char* procname)
 
 int main(int argc, char *argv[])
 {
-	acl::string addr("127.0.0.1:9001");
+	acl::string addr("127.0.0.1:9001"), libpath("../libpolarssl.so");
 	bool use_ssl = true;
 	int  ch;
 
-	while ((ch = getopt(argc, argv, "hs:r:Pc:n:C")) > 0)
+	while ((ch = getopt(argc, argv, "hl:s:r:Pc:n:C")) > 0)
 	{
 		switch (ch)
 		{
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 'l':
+			libpath = optarg;
+			break;
 		case 's':
 			addr = optarg;
 			break;
@@ -185,7 +189,10 @@ int main(int argc, char *argv[])
 	acl::log::stdout_open(true);
 
 	if (use_ssl)
+	{
+		acl::polarssl_conf::set_libpath(libpath);
 		__ssl_conf = new acl::polarssl_conf;
+	}
 
 	gettimeofday(&__begin, NULL);
 	acl_fiber_create(fiber_main, addr.c_str(), 32768);

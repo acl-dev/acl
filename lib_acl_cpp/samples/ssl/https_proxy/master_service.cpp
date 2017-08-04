@@ -5,11 +5,13 @@
 //////////////////////////////////////////////////////////////////////////////
 // ≈‰÷√ƒ⁄»›œÓ
 
+char *var_cfg_ssl_path;
 char *var_cfg_crt_file;
 char *var_cfg_key_file;
 char *var_cfg_log_file;
 char *var_cfg_addrs_map;
 acl::master_str_tbl var_conf_str_tab[] = {
+	{ "ssl_path", "../libpolarssl.so", &var_cfg_ssl_path },
 	{ "crt_file", "", &var_cfg_crt_file },
 	{ "key_file", "", &var_cfg_key_file },
 	{ "log_file", "./log.txt", &var_cfg_log_file },
@@ -236,6 +238,11 @@ void master_service::proc_on_init()
 			var_cfg_crt_file, var_cfg_key_file);
 		delete server_ssl_conf_;
 		server_ssl_conf_ = NULL;
+	}
+	else
+	{
+		acl::polarssl_conf::set_libpath(var_cfg_ssl_path);
+		acl::polarssl_conf::load();
 	}
 }
 

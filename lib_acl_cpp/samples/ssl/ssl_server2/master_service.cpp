@@ -4,9 +4,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // ≈‰÷√ƒ⁄»›œÓ
 
+char *var_cfg_ssl_path;
 char *var_cfg_crt_file;
 char *var_cfg_key_file;
 acl::master_str_tbl var_conf_str_tab[] = {
+	{ "ssl_path", "../libpolarssl.so", &var_cfg_ssl_path },
 	{ "crt_file", "./ssl_crt.pem", &var_cfg_crt_file },
 	{ "key_file", "./ssl_key.pem", &var_cfg_key_file },
 
@@ -188,6 +190,11 @@ void master_service::proc_on_init()
 		logger_error("set private key error");
 		delete conf_;
 		conf_ = NULL;
+	}
+	else
+	{
+		acl::polarssl_conf::set_libpath(var_cfg_ssl_path);
+		acl::polarssl_conf::load();
 	}
 }
 
