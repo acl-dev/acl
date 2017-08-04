@@ -222,6 +222,12 @@ int main(int argc, char* argv[])
 {
 	(void) argc; (void) argv;
 	acl::acl_cpp_init();
+#if defined(_WIN32) || defined(_WIN64)
+	acl::polarssl_conf::set_libpath("libpolarssl.dll");
+#else
+	acl::polarssl_conf::set_libpath("../libpolarssl.so");
+#endif
+	acl::polarssl_conf::load();
 
 	int   n = 1;
 	if (argc >= 2)
