@@ -19,7 +19,7 @@ CFLAGS = -c -g -W \
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
-SYSLIB = -lpthread
+SYSLIB = -lpthread -ldl
 EXTLIBS =
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 OSNAME = $(shell uname -sm)
