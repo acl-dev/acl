@@ -8,7 +8,7 @@ CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
-SYSLIB = -lpthread -lz
+SYSLIB = -lpthread -lz -ldl
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
 

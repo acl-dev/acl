@@ -23,7 +23,7 @@ ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DFREEBSD -D_REENTRANT
-	SYSLIB = -lcrypt -lpthread
+	SYSLIB = -lcrypt -lpthread -ldl
 endif
 
 # For Darwin
@@ -46,7 +46,7 @@ ifeq ($(findstring Linux, $(OSNAME)), Linux)
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DLINUX2 -D_REENTRANT
-	SYSLIB += -lcrypt
+	SYSLIB += -lcrypt -ldl -lz
 endif
 
 # For MINGW
@@ -58,7 +58,7 @@ endif
 
 # For MSYS
 ifeq ($(findstring MSYS, $(OSNAME)), MSYS)
-	SYSLIB = -lpthread-2 -liconv -lz
+	SYSLIB = -lpthread-2 -liconv -lz -ldl
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
 endif
