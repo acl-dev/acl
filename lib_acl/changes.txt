@@ -1,6 +1,10 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+601) 2017.8.7
+601.1) safety & feature: 当使用 ACL_VSTRING 对象中的 printf 等方法时，如果传入
+了空指针，则内部自动处理成 "(null)" 以免程序崩溃
+
 600) 2017.7.31
 600.1) bugfix: acl_host_port.c->host_port 在 windows 平台下的解析有误
 600.2) bugfix: acl_aio_server.c/acl_threads_server.c 在 windows 下有误

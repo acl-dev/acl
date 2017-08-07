@@ -78,6 +78,7 @@
 
 ACL_VBUF *acl_vbuf_print(ACL_VBUF *bp, const char *format, va_list ap)
 {
+	static const char* null = "(null)";
 	const unsigned char *cp;
 	unsigned width;			/* field width */
 	unsigned prec;			/* numerical precision */
@@ -202,16 +203,18 @@ ACL_VBUF *acl_vbuf_print(ACL_VBUF *bp, const char *format, va_list ap)
 		switch (*cp) {
 		case 's':			/* string-valued argument */
 			s = va_arg(ap, char *);
-			if (prec > 0 || (width > 0 && width > strlen(s))) {
+			if (prec > 0 || (width > 0 &&
+				width > (s ? strlen(s) : strlen(null)))) {
+
 				if (ACL_VBUF_SPACE(bp, (width > prec
-					? width : prec) + INT_SPACE))
-				{
+					? width : prec) + INT_SPACE)) {
 					return bp;
 				}
-				sprintf((char *) bp->ptr, fmt, s);
+
+				sprintf((char *) bp->ptr, fmt, s ? s : null);
 				VBUF_SKIP(bp);
 			} else {
-				VBUF_STRCAT(bp, s);
+				VBUF_STRCAT(bp, s ? s : null);
 			}
 			break;
 		case 'c':			/* integral-valued argument */
@@ -221,8 +224,8 @@ ACL_VBUF *acl_vbuf_print(ACL_VBUF *bp, const char *format, va_list ap)
 		case 'x':
 		case 'X':
 			if (ACL_VBUF_SPACE(bp, (width > prec
-				? width : prec) + INT_SPACE))
-			{
+				? width : prec) + INT_SPACE)) {
+
 				return bp;
 			}
 			if (long_flag == 0)
@@ -241,8 +244,8 @@ ACL_VBUF *acl_vbuf_print(ACL_VBUF *bp, const char *format, va_list ap)
 		case 'f':
 		case 'g':
 			if (ACL_VBUF_SPACE(bp, (width > prec
-				? width : prec) + DBL_SPACE))
-			{
+				? width : prec) + DBL_SPACE)) {
+
 				return bp;
 			}
 			sprintf((char *) bp->ptr, fmt, va_arg(ap, double));
@@ -253,8 +256,8 @@ ACL_VBUF *acl_vbuf_print(ACL_VBUF *bp, const char *format, va_list ap)
 			break;
 		case 'p':
 			if (ACL_VBUF_SPACE(bp, (width > prec
-				? width : prec) + PTR_SPACE))
-			{
+				? width : prec) + PTR_SPACE)) {
+
 				return bp;
 			}
 			sprintf((char *) bp->ptr, fmt, va_arg(ap, char *));
