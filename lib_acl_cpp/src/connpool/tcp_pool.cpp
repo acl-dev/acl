@@ -22,4 +22,25 @@ connect_client* tcp_pool::create_connect(void)
 	return conn;
 }
 
+bool tcp_pool::send(const void* data, unsigned int len,
+	string* out /* = NULL */)
+{
+	tcp_client* conn = (tcp_client*) this->peek();
+	if (conn == NULL)
+	{
+		logger_error("no connection available, addr=%s",
+			this->get_addr());
+		return false;
+	}
+
+	if (conn->send(data, len, out) == false)
+	{
+		this->put(conn, false);
+		return false;
+	}
+
+	this->put(conn);
+	return true;
+}
+
 } // namespace acl

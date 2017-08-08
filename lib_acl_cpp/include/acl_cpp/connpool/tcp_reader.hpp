@@ -18,7 +18,7 @@ namespace acl
 class socket_stream;
 class string;
 
-class tcp_reader
+class ACL_CPP_API tcp_reader
 {
 public:
 	tcp_reader(socket_stream& conn);

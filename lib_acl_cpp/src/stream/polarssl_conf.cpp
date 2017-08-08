@@ -212,7 +212,7 @@ static void polarssl_dll_load(void)
 #   define __pkey_free		::rsa_free
 #  endif
 
-#  define __entropy_init		::entropy_init
+#  define __entropy_init	::entropy_init
 #  define __ssl_list_ciphersuites ::ssl_list_ciphersuites
 #  define __ssl_set_ciphersuites  ::ssl_set_ciphersuites
 #  define __ssl_set_session_cache ::ssl_set_session_cache
