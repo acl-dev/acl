@@ -13,6 +13,8 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 
+struct iovec;
+
 namespace acl
 {
 
@@ -22,13 +24,13 @@ class ACL_CPP_API tcp_sender
 {
 public:
 	tcp_sender(socket_stream& conn);
-	~tcp_sender(void) {}
+	~tcp_sender(void);
 
 	bool send(const void* data, unsigned int len);
 
 private:
 	acl::socket_stream* conn_;
-	struct iovec v_[2];
+	struct iovec* v2_;
 };
 
 } // namespace acl
