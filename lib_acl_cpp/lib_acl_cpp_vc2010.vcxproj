@@ -210,6 +210,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\connpool\connect_manager.cpp" />
     <ClCompile Include="src\connpool\connect_monitor.cpp" />
     <ClCompile Include="src\connpool\connect_pool.cpp" />
+    <ClCompile Include="src\connpool\tcp_reader.cpp" />
+    <ClCompile Include="src\connpool\tcp_sender.cpp" />
+    <ClCompile Include="src\connpool\tcp_client.cpp" />
+    <ClCompile Include="src\connpool\tcp_pool.cpp" />
+    <ClCompile Include="src\connpool\tcp_manager.cpp" />
+    <ClCompile Include="src\connpool\tcp_ipc.cpp" />
     <ClCompile Include="src\db\db_handle.cpp" />
     <ClCompile Include="src\db\db_mysql.cpp" />
     <ClCompile Include="src\db\db_pgsql.cpp" />
@@ -388,6 +394,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\connpool\connect_manager.hpp" />
     <ClInclude Include="include\acl_cpp\connpool\connect_monitor.hpp" />
     <ClInclude Include="include\acl_cpp\connpool\connect_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\tcp_reader.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\tcp_sender.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\tcp_client.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\tcp_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\tcp_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\tcp_ipc.hpp" />
     <ClInclude Include="include\acl_cpp\db\db_handle.hpp" />
     <ClInclude Include="include\acl_cpp\db\db_mysql.hpp" />
     <ClInclude Include="include\acl_cpp\db\db_pgsql.hpp" />

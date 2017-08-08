@@ -343,6 +343,24 @@
     <ClCompile Include="src\connpool\connect_pool.cpp">
       <Filter>src\connpool</Filter>
     </ClCompile>
+    <ClCompile Include="src\connpool\tcp_reader.cpp">
+      <Filter>src\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_sender.cpp">
+      <Filter>src\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_client.cpp">
+      <Filter>src\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_pool.cpp">
+      <Filter>src\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_manager.cpp">
+      <Filter>src\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_ipc.cpp">
+      <Filter>src\connpool</Filter>
+    </ClCompile>
     <ClCompile Include="src\memcache\memcache.cpp">
       <Filter>src\memcache</Filter>
     </ClCompile>
@@ -910,6 +928,24 @@
       <Filter>include\connpool</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\connpool\connect_client.hpp">
+      <Filter>include\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_reader.hpp">
+      <Filter>include\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_sender.hpp">
+      <Filter>include\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_client.hpp">
+      <Filter>include\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_pool.hpp">
+      <Filter>include\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_manager.hpp">
+      <Filter>include\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_ipc.hpp">
       <Filter>include\connpool</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\memcache\memcache_manager.hpp">

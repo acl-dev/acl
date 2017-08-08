@@ -346,6 +346,24 @@
     <ClCompile Include="src\connpool\connect_pool.cpp">
       <Filter>Source Files\connpool</Filter>
     </ClCompile>
+    <ClCompile Include="src\connpool\tcp_reader.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_sender.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_client.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_pool.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_manager.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_ipc.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
     <ClCompile Include="src\http\http_request_pool.cpp">
       <Filter>Source Files\http</Filter>
     </ClCompile>
@@ -898,6 +916,24 @@
       <Filter>Header Files\connpool</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\connpool\connect_pool.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_readder.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_sender.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_client.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_pool.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_manager.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_ipc.hpp">
       <Filter>Header Files\connpool</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\http\http_request_pool.hpp">
