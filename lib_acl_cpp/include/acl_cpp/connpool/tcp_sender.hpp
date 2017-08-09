@@ -21,7 +21,7 @@ namespace acl
 class socket_stream;
 
 /**
- * tcp ipc é€šä¿¡å‘é€ç±»ï¼Œå†…éƒ¨è‡ªåŠ¨ç»„åŒ…
+ * tcp ipc Í¨ĞÅ·¢ËÍÀà£¬ÄÚ²¿×Ô¶¯×é°ü
  */
 class ACL_CPP_API tcp_sender
 {
@@ -30,10 +30,10 @@ public:
 	~tcp_sender(void);
 
 	/**
-	 * å‘é€æ–¹æ³•
-	 * @param data {const void*} è¦å‘é€çš„æ•°æ®åŒ…åœ°å€
-	 * @param len {unsigned int} æ•°æ®åŒ…é•¿åº¦
-	 * @return {bool} å‘é€æ˜¯å¦æˆåŠŸ
+	 * ·¢ËÍ·½·¨
+	 * @param data {const void*} Òª·¢ËÍµÄÊı¾İ°üµØÖ·
+	 * @param len {unsigned int} Êı¾İ°ü³¤¶È
+	 * @return {bool} ·¢ËÍÊÇ·ñ³É¹¦
 	 */
 	bool send(const void* data, unsigned int len);
 
