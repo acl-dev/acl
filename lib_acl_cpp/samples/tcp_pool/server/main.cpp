@@ -72,6 +72,8 @@ int main(int argc, char* argv[])
 		printf("listen on %s error %s\r\n", addr.c_str(), acl::last_serror());
 		return 1;
 	}
+	else
+		printf("listen on %s ok\r\n", addr.c_str());
 
 	__atomic = acl_atomic_new();
 	acl_atomic_set(__atomic, &__count);

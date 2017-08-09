@@ -18,12 +18,19 @@ namespace acl
 class socket_stream;
 class string;
 
+/**
+ * tcp ipc 通信接收类，内部会自动读取完事的数据包
+ */
 class ACL_CPP_API tcp_reader
 {
 public:
 	tcp_reader(socket_stream& conn);
 	~tcp_reader(void) {}
 
+	/**
+	 * 从对端读取数据，每次只读一个数据包
+	 * @param out {string&} 存储数据包，内部采用追加方式往 out 添加数据
+	 */
 	bool read(string& out);
 
 private:

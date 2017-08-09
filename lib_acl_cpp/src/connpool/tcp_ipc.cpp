@@ -61,6 +61,42 @@ tcp_ipc& tcp_ipc::set_rw_timeout(int timeout)
 	return *this;
 }
 
+tcp_manager& tcp_ipc::get_manager(void) const
+{
+	acl_assert(manager_);
+	return *manager_;
+}
+
+tcp_ipc& tcp_ipc::add_addr(const char* addr)
+{
+	manager_->set(addr, max_, conn_timeout_, rw_timeout_);
+	return *this;
+}
+
+tcp_ipc& tcp_ipc::del_addr(const char* addr)
+{
+	manager_->remove(addr);
+	return *this;
+}
+
+bool tcp_ipc::addr_exist(const char* addr)
+{
+	return manager_->get(addr) != NULL;
+}
+
+void tcp_ipc::get_addrs(std::vector<string>& addrs)
+{
+	manager_->lock();
+	std::vector<connect_pool*>& pools = manager_->get_pools();
+	for (std::vector<connect_pool*>::const_iterator cit = pools.begin();
+		cit != pools.end(); ++cit)
+	{
+		addrs.push_back((*cit)->get_addr());
+	}
+
+	manager_->unlock();
+}
+
 bool tcp_ipc::send(const char* addr, const void* data, unsigned int len,
 	string* out /* = NULL */)
 {
@@ -90,6 +126,34 @@ bool tcp_ipc::send(tcp_pool& pool, const void* data, unsigned int len,
 
 	pool.put(conn);
 	return true;
+}
+
+size_t tcp_ipc::broadcast(const void* data, unsigned int len,
+	bool exclusive /* = true */, bool check_result /* = false */,
+	unsigned* nerr /* = NULL */)
+{
+	size_t n = 0;
+
+	if (exclusive)
+		manager_->lock();
+
+	string dummy;
+	std::vector<connect_pool*>& pools = manager_->get_pools();
+	for (std::vector<connect_pool*>::iterator it = pools.begin();
+		it != pools.end(); ++it)
+	{
+		tcp_pool* pool = (tcp_pool*) (*it);
+		if (send(*pool, data, len, check_result ? &dummy : NULL))
+			n++;
+		else if (nerr)
+			(*nerr)++;
+		dummy.clear();
+	}
+
+	if (exclusive)
+		manager_->unlock();
+
+	return n;
 }
 
 } // namespace acl
