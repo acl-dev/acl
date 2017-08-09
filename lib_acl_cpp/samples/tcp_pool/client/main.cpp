@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "lib_acl.h"
 
 class client_thread : public acl::thread
 {
