@@ -33,6 +33,15 @@ public:
 	 */
 	bool read(string& out);
 
+	/**
+	 * 获得连接流对象
+	 * @return {acl::socket_stream&}
+	 */
+	acl::socket_stream& get_conn(void) const
+	{
+		return *conn_;
+	}
+
 private:
 	socket_stream* conn_;
 };

@@ -37,6 +37,15 @@ public:
 	 */
 	bool send(const void* data, unsigned int len);
 
+	/**
+	 * 获得连接流对象
+	 * @return {acl::socket_stream&}
+	 */
+	acl::socket_stream& get_conn(void) const
+	{
+		return *conn_;
+	}
+
 private:
 	acl::socket_stream* conn_;
 	struct iovec* v2_;

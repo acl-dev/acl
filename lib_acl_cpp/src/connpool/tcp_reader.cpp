@@ -32,7 +32,7 @@ bool tcp_reader::read(string& out)
 	int len;
 	if (conn_->read(len) == false)
 	{
-		logger_error("read head error!");
+		//logger_error("read head error!");
 		return false;
 	}
 
