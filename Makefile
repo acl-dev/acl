@@ -123,7 +123,6 @@ clean:
 acl_master: all_lib
 	@(cd app/master/daemon; make; make install)
 	@(cd app/master/tools/master_ctld; make; make install)
-	@(cd app/master/tools/master_ctl; make; make install)
 
 packinstall:
 	@(echo "")
@@ -137,7 +136,6 @@ packinstall:
 	$(shell mkdir -p ./dist/master/bin/$(RPATH))
 	@(cd app/master/daemon; make install)
 	@(cd app/master/tools/master_ctld; make install)
-	@(cd app/master/tools/master_ctl; make install)
 	cp -f app/master/daemon/acl_master $(BIN_PATH)
 	(cd dist/master && ./setup.sh $(DESTDIR) /opt/soft/acl-master)
 	cp -Rf lib_acl/include/* $(INC_ACL)/acl/
