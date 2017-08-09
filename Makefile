@@ -129,6 +129,7 @@ packinstall:
 	@(echo "begin copy file...")
 	$(shell mkdir -p $(INC_ACL)/acl)
 	$(shell mkdir -p $(INC_ACL)/acl_cpp)
+	$(shell mkdir -p $(INC_ACL)/protocol)
 	$(shell mkdir -p $(BIN_PATH)/)
 	$(shell mkdir -p $(LIB_ACL)/)
 	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master/)
@@ -140,6 +141,7 @@ packinstall:
 	(cd dist/master && ./setup.sh $(DESTDIR) /opt/soft/acl-master)
 	cp -Rf lib_acl/include/* $(INC_ACL)/acl/
 	cp -Rf lib_acl_cpp/include/acl_cpp/* $(INC_ACL)/acl_cpp/
+	cp -Rf lib_protocol/include/* $(INC_ACL)/protocol/
 	cp -f libacl_all.a $(LIB_ACL)/libacl_all.a
 #	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
 
