@@ -46,11 +46,11 @@ ifeq ($(CC),)
 endif
 
 ifeq ($(findstring g++, $(CC)), g++)
-	GCC_VERSION=$(shell gcc --version | grep ^gcc | sed 's/^.* //g')
+	GCC_VERSION:=$(shell echo `gcc --version|grep ^gcc|cut -d' ' -f3`)
 	GCC_MAJOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f1)
 	GCC_MINOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f2)
 	GCC_SUB:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f3)
-	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -gt 4 \) ] && echo true)
+	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -ge 4 \) ] && echo true)
 	ifeq ($(GCC_VER), true)
 		CFLAGS += -Wno-implicit-fallthrough
 	endif
