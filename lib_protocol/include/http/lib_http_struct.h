@@ -2,7 +2,7 @@
 #ifndef	__LIB_HTTP_STRUCT_INCLUDE_H__
 #define	__LIB_HTTP_STRUCT_INCLUDE_H__
 
-#include "lib_acl.h"
+/* #include "lib_acl.h" */
 
 #ifdef	__cplusplus
 extern "C" {
