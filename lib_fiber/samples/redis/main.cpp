@@ -35,6 +35,7 @@ static void fiber_redis(ACL_FIBER *fiber, void *ctx)
 
 	gettimeofday(&now, NULL);
 	double spent = stamp_sub(&now, &last);
+
 	printf("---set spent %.2f ms, count %d, speed: %.2f----\r\n",
 		spent, i, (i * 1000) / (spent > 0 ? spent : 1));
 
