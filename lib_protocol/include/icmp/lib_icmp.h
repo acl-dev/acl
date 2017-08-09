@@ -1,7 +1,7 @@
 #ifndef __LIB_ICMP_INCLUDE_H__
 #define __LIB_ICMP_INCLUDE_H__
 
-#include "lib_acl.h"
+/* #include "lib_acl.h" */
 #include "lib_icmp_type.h"
 
 #ifdef __cplusplus
