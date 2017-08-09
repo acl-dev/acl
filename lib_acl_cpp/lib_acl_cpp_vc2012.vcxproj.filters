@@ -921,6 +921,9 @@
     <ClInclude Include="include\acl_cpp\connpool\tcp_readder.hpp">
       <Filter>Header Files\connpool</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_reader.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\connpool\tcp_sender.hpp">
       <Filter>Header Files\connpool</Filter>
     </ClInclude>
