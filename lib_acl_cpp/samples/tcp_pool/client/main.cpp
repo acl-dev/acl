@@ -1,5 +1,9 @@
 #include "stdafx.h"
+#if defined(_WIN32) || defined(_WIN64)
 #include "lib_acl.h"
+#else
+#include <getopt.h>
+#endif
 
 class client_thread : public acl::thread
 {
