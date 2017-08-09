@@ -1,7 +1,7 @@
 #ifndef	__SMTP_CLIENT_INCLUDE_H__
 #define	__SMTP_CLIENT_INCLUDE_H__
 
-#include "lib_acl.h"
+/* #include "lib_acl.h" */
 
 #ifdef __cplusplus
 extern "C" {
