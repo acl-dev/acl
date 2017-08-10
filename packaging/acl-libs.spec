@@ -69,6 +69,7 @@ fi
 /usr/lib/libacl_all.a
 /usr/lib/libfiber.a
 /usr/lib/libfiber_cpp.a
+/usr/lib/libprotocol.a
 
 %files -n acl-master
 %defattr(-,root,root)
