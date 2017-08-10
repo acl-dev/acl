@@ -103,11 +103,13 @@ static int get_bool_ent(ACL_XINETD_CFG_PARSER *xcp,
 {
 	const char *value;
 
+#define EQ	!strcasecmp
+
 	value = acl_xinetd_cfg_get(xcp, name);
 	if (value == 0) {
 		if (def_val == NULL)
 			fatal_with_context("missing \"%s\" field", name);
-		if (strcasecmp("y", def_val) == 0)
+		if (EQ(def_val, "y"))
 			return 1;
 		else if (strcasecmp("n", def_val) == 0)
 			return 0;
@@ -115,13 +117,16 @@ static int get_bool_ent(ACL_XINETD_CFG_PARSER *xcp,
 			fatal_invalid_field(name, value);
 	}
 
-	if (strcasecmp("y", value) == 0) {
+	if (EQ(value, "y") || EQ(value, "yes")
+		|| EQ(value, "on") || EQ(value, "true")) {
+
 		return 1;
 	} else if (strcasecmp("n", value) == 0) {
 		return 0;
 	} else {
 		fatal_invalid_field(name, value);
 	}
+
 	/* NOTREACHED */
 	return 0;
 }
@@ -422,6 +427,11 @@ static void service_transport(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 	else
 		acl_msg_fatal("unknown master_service: %s", transport);
 
+	if (get_bool_ent(xcp, ACL_VAR_MASTER_SERV_REUSEPORT, "n"))
+		serv->inet_flags |= ACL_INET_FLAG_REUSEPORT;
+	if (get_bool_ent(xcp, ACL_VAR_MASTER_SERV_NBLOCK, "y"))
+		serv->inet_flags |= ACL_INET_FLAG_NBLOCK;
+
 	init_listeners(serv);
 }
 
@@ -690,6 +700,7 @@ ACL_MASTER_SERV *acl_master_ent_load(const char *filepath)
 
 	/* Flags member. */
 	serv->flags = 0;
+	serv->inet_flags = 0;
 
 	service_transport(xcp, serv);
 	service_wakeup_time(xcp, serv);

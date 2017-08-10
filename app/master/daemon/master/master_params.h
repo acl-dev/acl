@@ -130,6 +130,9 @@ extern char *acl_var_master_manage_addr;
 #define	ACL_VAR_MASTER_SERV_DEFER_ACCEPT	"master_defer_accept"
 #define	ACL_DEF_MASTER_SERV_DEFER_ACCEPT	"0"
 
+#define ACL_VAR_MASTER_SERV_REUSEPORT		"master_reuseport"
+#define ACL_VAR_MASTER_SERV_NBLOCK		"master_nonblock"
+
 /**
  * master_params.c
  */

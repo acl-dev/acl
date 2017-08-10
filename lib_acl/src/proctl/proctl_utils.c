@@ -97,8 +97,7 @@ ACL_VSTREAM *local_listen()
 		return NULL;
 	}
 
-	sstream = acl_vstream_listen_ex("127.0.0.1:0", 128,
-			ACL_BLOCKING, 1024, 0);
+	sstream = acl_vstream_listen_ex("127.0.0.1:0", 128, 0, 1024, 0);
 	if (sstream == NULL)
 		acl_msg_fatal("%s(%d): listen error(%s)",
 			myname, __LINE__, acl_last_serror());

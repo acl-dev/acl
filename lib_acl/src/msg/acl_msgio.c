@@ -676,7 +676,9 @@ ACL_MSGIO *acl_msgio_listen(ACL_AIO *aio, const char *addr)
 
 	listener = msgio_new();
 	listener->type = ACL_MSGIO_TYPE_ACCEPT;
-	stream = acl_vstream_listen_ex(addr_ptr, 128, ACL_NON_BLOCKING, 1024, 0);
+	stream = acl_vstream_listen_ex(
+			addr_ptr, 128, ACL_INET_FLAG_NBLOCK, 1024, 0);
+
 	if (stream == NULL)
 		acl_msg_fatal("%s: listen(%s) error(%s)",
 			myname, addr_ptr, acl_last_serror());

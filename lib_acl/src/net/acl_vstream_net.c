@@ -32,7 +32,7 @@
 #endif
 
 ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
-	int block_mode, int io_bufsize, int io_timeout)
+	unsigned flag, int io_bufsize, int io_timeout)
 {
 	const char *myname = "acl_vstream_listen_ex";
 	ACL_SOCKET  listenfd;
@@ -51,7 +51,9 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 		listenfd = acl_unix_listen(addr, qlen, 0);
 		if (listenfd == ACL_SOCKET_INVALID)
 			return NULL;
-		acl_non_blocking(listenfd, block_mode);
+
+		acl_non_blocking(listenfd, flag & ACL_INET_FLAG_NBLOCK ?
+			ACL_NON_BLOCKING : ACL_BLOCKING);
 		listen_stream = acl_vstream_fdopen(listenfd,
 			ACL_VSTREAM_FLAG_RW, io_bufsize,
 			io_timeout, ACL_VSTREAM_TYPE_LISTEN_UNIX);
@@ -66,11 +68,11 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 		acl_vstream_set_local(listen_stream, addr);
 
 		sprintf(listen_stream->errbuf, "+OK");
-		return (listen_stream);
+		return listen_stream;
 	}
 #endif
 	/* addr such as '192.168.0.1:80' */
-	listenfd = acl_inet_listen(addr, qlen, block_mode);
+	listenfd = acl_inet_listen(addr, qlen, flag);
 	if (listenfd == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s: listen addr(%s) error(%s)",
 			myname, addr, acl_last_serror());
@@ -79,17 +81,12 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 	listen_stream = acl_vstream_fdopen(listenfd,
 		ACL_VSTREAM_FLAG_RW, io_bufsize,
 		io_timeout, ACL_VSTREAM_TYPE_LISTEN_INET);
-	if (listen_stream == NULL) {
-		acl_socket_close(listenfd);
-		acl_msg_error("%s: open vstream error addr(%s)", myname, addr);
-		return NULL;
-	}
 
 	memset(&local, 0, sizeof(local));
 	len = (int) sizeof(struct sockaddr);
 	if (getsockname(listenfd, (struct sockaddr*) &local,
-		(socklen_t *) &len) < 0)
-	{
+		(socklen_t *) &len) < 0) {
+
 		acl_msg_warn("%s: getsockname error(%s) for sock(%d)",
 			myname, acl_last_serror(), listenfd);
 		acl_vstream_set_local(listen_stream, addr);

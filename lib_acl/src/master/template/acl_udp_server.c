@@ -107,10 +107,16 @@ static ACL_CONFIG_INT64_TABLE __conf_int64_tab[] = {
 };
 
 int   acl_var_udp_threads_detached;
+int   acl_var_udp_non_block;
+int   acl_var_udp_reuse_port;
 
 static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
 	{ ACL_VAR_UDP_THREADS_DETACHED, ACL_DEF_UDP_THREADS_DETACHED,
 		&acl_var_udp_threads_detached },
+	{ ACL_VAR_UDP_NON_BLOCK, ACL_DEF_UDP_NON_BLOCK,
+		&acl_var_udp_non_block },
+	{ ACL_VAR_UDP_REUSEPORT, ACL_DEF_UDP_REUSEPORT,
+		&acl_var_udp_reuse_port},
 
 	{ 0, 0, 0 },
 };
@@ -418,10 +424,18 @@ static void server_binding(UDP_SERVER *server, ACL_ARGV *addrs)
 	int i = 0;
 
 	acl_foreach(iter, addrs) {
+		const char *ptr = (char *) iter.data;
+		unsigned flag   = 0;
 		char addr[64];
 		ACL_VSTREAM *stream;
-		const char *ptr = (char *) iter.data;
-		ACL_SOCKET fd = acl_udp_bind(ptr, ACL_NON_BLOCKING);
+		ACL_SOCKET   fd;
+
+		if (acl_var_udp_non_block)
+			flag |= ACL_INET_FLAG_NBLOCK;
+		if (acl_var_udp_reuse_port)
+			flag |= ACL_INET_FLAG_REUSEPORT;
+
+		fd = acl_udp_bind(ptr, flag);
 
 		if (fd == ACL_SOCKET_INVALID)
 			continue;

@@ -59,12 +59,12 @@ int   main(int argc, char *argv[])
 	}
 #else
 	if (strchr(addr, '/') != NULL || !acl_ipv4_addr_valid(addr)) {
-		n = acl_unix_listen(addr, 128, ACL_BLOCKING);
+		n = acl_unix_listen(addr, 128, 0);
 #if defined(ACL_MACOSX)
 		type = ACL_VSTREAM_TYPE_LISTEN_UNIX;
 #endif
 	} else {
-		n = acl_inet_listen(addr, 127, ACL_BLOCKING);
+		n = acl_inet_listen(addr, 127, 0);
 #if defined(ACL_MACOSX)
 		type = ACL_VSTREAM_TYPE_LISTEN_INET;
 #endif

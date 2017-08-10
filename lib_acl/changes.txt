@@ -1,6 +1,12 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+602) 2017.8.10
+602.1) rename: acl_sane_bind 改名为 acl_inet_bind
+602.2) feature: acl_inet_listen/acl_inet_bind/acl_vstream_listen_ex 增 flag 标志位
+602.3) feature: master 服务器框架及服务器模板增加配置项 master_reuseport 及
+master_nonblock，以允许用户可以通过配置文件来设置监听方式
+
 601) 2017.8.7
 601.1) safety & feature: 当使用 ACL_VSTRING 对象中的 printf 等方法时，如果传入
 了空指针，则内部自动处理成 "(null)" 以免程序崩溃

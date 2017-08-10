@@ -66,7 +66,7 @@ bool server_socket::open(const char* addr)
 	else
 #endif
 		fd_ = acl_inet_listen(addr, backlog_, block_
-			? ACL_BLOCKING : ACL_NON_BLOCKING);
+			? 0 : ACL_INET_FLAG_NBLOCK);
 
 	if (fd_ == ACL_SOCKET_INVALID)
 	{

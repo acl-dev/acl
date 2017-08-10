@@ -38,17 +38,17 @@ static int master_listen_sock(ACL_MASTER_SERV *serv)
 		switch (addr->type) {
 		case ACL_MASTER_SERV_TYPE_INET:
 			serv->listen_fds[i] = acl_inet_listen(
-				addr->addr, qlen, ACL_NON_BLOCKING);
+				addr->addr, qlen, serv->inet_flags);
 			acl_tcp_defer_accept(serv->listen_fds[i],
 				serv->defer_accept);
-			service_type =  ACL_VSTREAM_TYPE_LISTEN_INET;
+			service_type = ACL_VSTREAM_TYPE_LISTEN_INET;
 			break;
 		case ACL_MASTER_SERV_TYPE_UNIX:
 			if (acl_var_master_limit_privilege)
 				acl_set_eugid(acl_var_master_owner_uid,
 					acl_var_master_owner_gid);
 			serv->listen_fds[i] = acl_unix_listen(
-				addr->addr, qlen, ACL_NON_BLOCKING);
+				addr->addr, qlen, serv->inet_flags);
 			if (acl_var_master_limit_privilege)
 				acl_set_ugid(getuid(), getgid());
 
@@ -101,7 +101,7 @@ static int master_listen_inet(ACL_MASTER_SERV *serv)
 		qlen = 128;
 	}
 
-	serv->listen_fds[0] = acl_inet_listen(serv->name, qlen, ACL_NON_BLOCKING);
+	serv->listen_fds[0] = acl_inet_listen(serv->name, qlen, serv->inet_flags);
 	if (serv->listen_fds[0] == ACL_SOCKET_INVALID)
 		acl_msg_fatal("%s(%d)->%s: listen on addr(%s) error(%s)",
 			__FILE__, __LINE__, myname, serv->name, strerror(errno));
@@ -184,7 +184,7 @@ static void master_listen_unix(ACL_MASTER_SERV *serv)
 
 	if (acl_var_master_limit_privilege)
 		acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
-	serv->listen_fds[0] = acl_unix_listen(serv->name, qlen, ACL_NON_BLOCKING);
+	serv->listen_fds[0] = acl_unix_listen(serv->name, qlen, serv->inet_flags);
 	if (serv->listen_fds[0] == ACL_SOCKET_INVALID)
 		acl_msg_fatal("%s(%d)->%s: listen on addr(%s) error(%s)",
 			__FILE__, __LINE__, myname, serv->name, strerror(errno));
@@ -205,8 +205,7 @@ static void master_listen_fifo(ACL_MASTER_SERV *serv)
 
 	if (acl_var_master_limit_privilege)
 		acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
-	serv->listen_fds[0] = acl_fifo_listen(serv->name,
-			0622, ACL_NON_BLOCKING);
+	serv->listen_fds[0] = acl_fifo_listen(serv->name, 0622, ACL_NON_BLOCKING);
 	if (serv->listen_fds[0] == ACL_SOCKET_INVALID)
 		acl_msg_fatal("%s(%d), %s: listen on name(%s) error(%s)",
 			__FILE__, __LINE__, myname, serv->name, strerror(errno));

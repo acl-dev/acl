@@ -24,26 +24,27 @@ typedef struct ACL_MASTER_ADDR {
   * on demand up to a configurable concurrency limit and/or periodically.
   */
 typedef struct ACL_MASTER_SERV {
-	int     flags;			/* status, features, etc. */
-	char   *name;			/* service endpoint name */
-	char   *owner;			/* service running privilege if not null*/
-	long    start;			/* service start running time */
-	int     type;			/* UNIX-domain, INET, etc. */
-	int     wakeup_time;		/* wakeup interval */
-	int    *listen_fds;		/* incoming requests */
-	int     listen_fd_count;	/* nr of descriptors */
-	int     defer_accept;		/* accept timeout if no data from client */
-	int     max_qlen;		/* max listening qlen */
-	int     max_proc;		/* upper bound on # processes */
-	int     prefork_proc;		/* prefork processes */
-	char   *path;			/* command pathname */
-	char   *conf;			/* service configure filepath */
-	char   *notify_addr;		/* warning address when not null */
-	char   *notify_recipients;	/* users warned to */
-	int     avail_proc;		/* idle processes */
-	int     total_proc;		/* number of processes */
-	int     throttle_delay;		/* failure recovery parameter */
-	int     status_fd[2];		/* child status reports */
+	int      flags;			/* status, features, etc. */
+	char    *name;			/* service endpoint name */
+	char    *owner;			/* service running privilege if not null*/
+	long     start;			/* service start running time */
+	int      type;			/* UNIX-domain, INET, etc. */
+	int      wakeup_time;		/* wakeup interval */
+	unsigned inet_flags;		/* listening inet flags */
+	int     *listen_fds;		/* incoming requests */
+	int      listen_fd_count;	/* nr of descriptors */
+	int      defer_accept;		/* accept timeout if no data from client */
+	int      max_qlen;		/* max listening qlen */
+	int      max_proc;		/* upper bound on # processes */
+	int      prefork_proc;		/* prefork processes */
+	char    *path;			/* command pathname */
+	char    *conf;			/* service configure filepath */
+	char    *notify_addr;		/* warning address when not null */
+	char    *notify_recipients;	/* users warned to */
+	int      avail_proc;		/* idle processes */
+	int      total_proc;		/* number of processes */
+	int      throttle_delay;	/* failure recovery parameter */
+	int      status_fd[2];		/* child status reports */
 	ACL_ARGV     *args;		/* argument vector */
 	ACL_ARRAY    *addrs;		/* in which ACL_MASTER_ADDR save */
 	ACL_ARRAY    *children_env;	/* the env array of the children */

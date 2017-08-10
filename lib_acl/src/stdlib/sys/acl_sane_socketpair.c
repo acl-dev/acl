@@ -57,7 +57,7 @@ int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2]
 
 int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2])
 {
-	ACL_SOCKET listener = acl_inet_listen("127.0.0.1:0", 1, ACL_BLOCKING);
+	ACL_SOCKET listener = acl_inet_listen("127.0.0.1:0", 1, 0);
 	char addr[64];
 
 	(void) domain;

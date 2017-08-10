@@ -32,27 +32,26 @@
 #endif
 
 static ACL_SOCKET inet_listen(const char *addr, const struct addrinfo *res,
-	int backlog, int blocking)
+	int backlog, unsigned flag)
 {
-	ACL_SOCKET sock = acl_sane_bind(res);
-#if defined(TCP_FASTOPEN) && defined(USE_FASTOPEN)
-	int        on;
-#endif
+	ACL_SOCKET sock = acl_inet_bind(res, flag);
 
 	if (sock == ACL_SOCKET_INVALID)
 		return ACL_SOCKET_INVALID;
 
-#if defined(TCP_FASTOPEN) && defined(USE_FASTOPEN)
-	on = 1;
-	if (setsockopt(sock, IPPROTO_TCP, TCP_FASTOPEN,
-		(const void *) &on, sizeof(on)) < 0)
-	{
-		acl_msg_warn("%s: setsocket(TCP_FASTOPEN): %s",
-			__FUNCTION__, acl_last_serror());
+#if defined(TCP_FASTOPEN)
+	if (flag & ACL_INET_FLAG_FASTOPEN) {
+		int on = 1;
+		int ret = setsockopt(sock, IPPROTO_TCP, TCP_FASTOPEN,
+			(const void *) &on, sizeof(on));
+		if (ret < 0)
+			acl_msg_warn("%s: setsocket(TCP_FASTOPEN): %s",
+				__FUNCTION__, acl_last_serror());
 	}
 #endif
 
-	acl_non_blocking(sock, blocking);
+	acl_non_blocking(sock, flag & ACL_INET_FLAG_NBLOCK ?
+		ACL_NON_BLOCKING : ACL_BLOCKING);
 
 	if (listen(sock, backlog) < 0) {
 		acl_socket_close(sock);
@@ -67,7 +66,7 @@ static ACL_SOCKET inet_listen(const char *addr, const struct addrinfo *res,
 
 /* acl_inet_listen - create TCP listener */
 
-ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int blocking)
+ACL_SOCKET acl_inet_listen(const char *addr, int backlog, unsigned flag)
 {
 	struct addrinfo *res0 = acl_host_addrinfo(addr, SOCK_STREAM), *res;
 	ACL_SOCKET sock;
@@ -78,7 +77,7 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, int blocking)
 	sock = ACL_SOCKET_INVALID;
 
 	for (res = res0; res != NULL; res = res->ai_next) {
-		sock = inet_listen(addr, res, backlog, blocking);
+		sock = inet_listen(addr, res, backlog, flag);
 		if (sock != ACL_SOCKET_INVALID)
 			break;
 	}

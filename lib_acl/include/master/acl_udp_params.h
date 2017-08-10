@@ -84,6 +84,14 @@ extern int   acl_var_udp_threads;
 #define ACL_DEF_UDP_THREADS_DETACHED	1
 extern int   acl_var_udp_threads_detached;
 
+#define ACL_VAR_UDP_NON_BLOCK		"master_nonblock"
+#define ACL_DEF_UDP_NON_BLOCK		1
+extern int   acl_var_udp_non_block;
+
+#define ACL_VAR_UDP_REUSEPORT		"master_reuseport"
+#define ACL_DEF_UDP_REUSEPORT		1
+extern int   acl_var_udp_reuse_port;
+
 #ifdef	__cplusplus
 }
 #endif

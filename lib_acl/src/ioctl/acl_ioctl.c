@@ -364,8 +364,8 @@ ACL_VSTREAM *acl_ioctl_listen(const char *addr, int qlen)
 ACL_VSTREAM *acl_ioctl_listen_ex(const char *addr, int qlen,
 	int block_mode, int io_bufsize, int io_timeout)
 {
-	return acl_vstream_listen_ex(addr, qlen, block_mode,
-		io_bufsize, io_timeout);
+	return acl_vstream_listen_ex(addr, qlen, block_mode == ACL_BLOCKING
+		? 0 : ACL_INET_FLAG_NBLOCK, io_bufsize, io_timeout);
 }
 
 ACL_VSTREAM *acl_ioctl_accept(ACL_VSTREAM *sstream, char *ipbuf, int size)

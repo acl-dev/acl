@@ -285,7 +285,7 @@ OBJS_DEF     = $(INIT_DEF) $(PRIV_DEF) $(STDLIB_DEF) \
 		$(JSON_DEF) $(UTEST_DEF)
 
 ###########################################################
-.PHONY = all static shared clean clean_lib rebuild
+.PHONY = all static shared clean cl clean_lib rebuild rb
 
 STATIC_OLD_LIBNAME = lib_acl.a
 SHARED_OLD_LIBNAME = lib_acl.so
@@ -299,8 +299,8 @@ ifneq ($(MAKECMDGOALS),clean)
 -include $(OBJS_DEF)
 endif
 
-clean: clean_lib
-rebuild: clean all
+clean cl: clean_lib
+rebuild rb: clean all
 
 PCH = StdAfx.h.gch
 
