@@ -17,10 +17,12 @@ service $<PROGRAM>
 #	master_type = unix
 	master_type = sock
 
-#	当系统运动 SO_REUSEPORT 功能时，本开关决定是否允许该特性
+#	当系统支持 SO_REUSEPORT 时，是否启用该功能
 	master_reuseport = yes
 #	是否针对监听套接口设定为非阻塞方式
 	master_nonblock = yes
+#	当系统支持 TCP_FASTOPEN 时，是否启用该功能
+	master_fastopen = no
 
 #	当子进程异常退出时，如果该值非空，则将子进程异常退出的消息通知该服务
 #	master_notify_addr = 127.0.0.1:5801

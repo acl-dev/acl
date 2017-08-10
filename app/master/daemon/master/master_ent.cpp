@@ -429,6 +429,8 @@ static void service_transport(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 
 	if (get_bool_ent(xcp, ACL_VAR_MASTER_SERV_REUSEPORT, "n"))
 		serv->inet_flags |= ACL_INET_FLAG_REUSEPORT;
+	if (get_bool_ent(xcp, ACL_VAR_MASTER_SERV_FASTOPEN, "n"))
+		serv->inet_flags |= ACL_INET_FLAG_FASTOPEN;
 	if (get_bool_ent(xcp, ACL_VAR_MASTER_SERV_NBLOCK, "y"))
 		serv->inet_flags |= ACL_INET_FLAG_NBLOCK;
 
