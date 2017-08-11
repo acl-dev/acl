@@ -10,7 +10,7 @@ extern "C" {
 
  /* External interface. */
 
-extern void acl_chroot_uid(const char *, const char *);
+extern int acl_chroot_uid(const char *, const char *);
 
 #endif /* ACL_UNIX */
 
