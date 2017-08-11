@@ -48,6 +48,8 @@ ACL_SOCKET acl_inet_bind(const struct addrinfo *res, unsigned flag)
 			acl_msg_warn("%s(%d): setsocket(SO_REUSEPORT): %s",
 				__FILE__, __LINE__, acl_last_serror());
 	}
+#else
+	(void) flag;
 #endif
 
 #ifdef ACL_WINDOWS
