@@ -121,7 +121,9 @@ static int get_bool_ent(ACL_XINETD_CFG_PARSER *xcp,
 		|| EQ(value, "on") || EQ(value, "true")) {
 
 		return 1;
-	} else if (strcasecmp("n", value) == 0) {
+	} else if (EQ(value, "n") || EQ(value, "no")
+		|| EQ(value, "off") || EQ(value, "false")) {
+
 		return 0;
 	} else {
 		fatal_invalid_field(name, value);
