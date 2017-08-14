@@ -1,6 +1,9 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+603) 2017.8.11
+603.1) stable: acl_chroot_uid 内部如果出错则不会自动崩溃，给是返回 -1 通知上层
+
 602) 2017.8.10
 602.1) rename: acl_sane_bind 改名为 acl_inet_bind
 602.2) feature: acl_inet_listen/acl_inet_bind/acl_vstream_listen_ex 增 flag 标志位

@@ -42,13 +42,15 @@ static void run_pool(const char* addr, int length, int count)
 
 static void run_ipc(const char* addr, acl::tcp_ipc& ipc, int length, int count)
 {
+	acl::string buf;
 	char* s = (char*) malloc(length + 1);
 	memset(s, 'x', length);
 	s[length] = 0;
 
 	for (int i = 0; i < count; i++)
 	{
-		if (ipc.send(addr, s, (unsigned) length) == false)
+		if (ipc.send(addr, s, (unsigned) length,
+			__read_echo ? &buf : NULL) == false)
 		{
 			printf("send error\r\n");
 			break;

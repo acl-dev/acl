@@ -97,7 +97,13 @@ main.o: main.cpp
 可以。在 acl 目录下运行：make build_one 则可以将 lib_acl/lib_protocol/lib_acl_cpp 打包成一个完整的库 -- lib_acl.a/lib_acl.so，则应用最终使用时可以仅连接这一个库即可。
 
 ### 7、Linux 平台下如何使用 ssl 功能？
-如果使用上面统一的 acl 库，则可以在 acl 根目录下编译时运行：make build_one polarssl=on；如果使用三个库：lib_acl.a，lib_protocol.a，lib_acl_cpp.a，则在编译前需要先指定环境变量：export ENV_FLAGS=HAS_POLARSSL，然后分别编译这三个库；然后进行 acl/resource 目录，解压 polarssl-1.2.19-gpl.tgz，然后进入 polarssl-1.2.19 目录运行：make 编译后在 resource/polarssl-1.2.19/library 目录得到 libpolarssl.a 库；最后在编译应用时将 libpolarssl.a 连接进你的工程中即可。
+目前 acl 中的 lib_acl_cpp C++ 库通过集成 polarssl 支持 ssl 功能，所支持的 polarssl 源码的下载位置：https://github.com/acl-dev/third_party, 老版本 acl 通过静态连接 libpolarssl.a 实现对 ssl 的支持，当前版本则是通过动态加载 libpolarssl.so 方式实现了对 ssl 的支持，此动态支持方式更加灵活方便，无须特殊编译条件，也更为通用。
+#### 7.1、老版本 acl 对 ssl 的支持方式
+如果使用上面统一的 acl 库，则可以在 acl 根目录下编译时运行：make build_one polarssl=on；如果使用三个库：lib_acl.a，lib_protocol.a，lib_acl_cpp.a，则在编译前需要先指定环境变量：export ENV_FLAGS=HAS_POLARSSL，然后分别编译这三个库；解压 polarssl-1.2.19-gpl.tgz，然后进入 polarssl-1.2.19 目录运行：make 编译后在 polarssl-1.2.19/library 目录得到 libpolarssl.a 库；最后在编译应用时将 libpolarssl.a 连接进你的工程中即可。
+#### 7.2、当前版本 acl 对 ssl 的支持方式
+- 首先下载解压 polarssl 库后进入polarssl-1.2.19 目录，运行 make lib SHARED=yes，在library 目录下会生成 libpolarssl.so 动态库;
+- 在 acl 根目录下运行 make build_one，则会将 acl 的三个基础库：libacl.a, libprotocol.a, libacl_cpp.a 合成 libacl_all.a 一个静态库，将 libacl.so, libprotocol.so, lib_acl_cpp.so 合成 libacl_all.so 一个动态库;
+- 当程序启动时添加代码：acl::polarssl_conf::set_libpath("libpolarssl.so"); 其中的路径根据实际位置而定，这样 acl 模块在需要 ssl 通信时会自动切换至 ssl 方式。
 
 ### 8、Linux 下如何使用 mysql 功能？
 lib_acl_cpp 库是以动态加载方式加载 mysql 动态库的，所以在编译 lib_acl_cpp 时，mysql 功能就已经被编译进去 acl库中了。用户仅需要将 mysql 动态库通过函数 acl::db_handle::set_loadpath 注册进 acl 库中即可；至于 mysql 客户端库，用户可以去 mysql 官方下载或在 acl/resource 目录下编译 mysql-connector-c-6.1.6-src.tar.gz。
