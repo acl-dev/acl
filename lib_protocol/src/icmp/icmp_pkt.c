@@ -43,11 +43,11 @@ static void icmp_hdr_pack(char *icmp_data, unsigned short id)
 
 	icmp_hdr = (struct ICMP_HDR *) icmp_data;
 
-	icmp_hdr->type = ICMP_ECHO;
-	icmp_hdr->code = 0;
-	icmp_hdr->id = id;
+	icmp_hdr->type  = ICMP_ECHO;
+	icmp_hdr->code  = 0;
+	icmp_hdr->id    = id;
 	icmp_hdr->cksum = 0;
-	icmp_hdr->seq = 0;
+	icmp_hdr->seq   = 0;
 }
 
 ICMP_PKT *imcp_pkt_pack(size_t dlen, ICMP_HOST *host)
@@ -64,7 +64,9 @@ ICMP_PKT *imcp_pkt_pack(size_t dlen, ICMP_HOST *host)
 
 	icmp_hdr_pack((char*) pkt, host->chat->pid);
 	/* icmp body data */
-	memset(pkt->body.data, 'E', dlen - sizeof(struct ICMP_HDR));
+	/* in some mobile router the data in body should be set to 0 ---zsx */
+	/* memset(pkt->body.data, 'E', dlen - sizeof(struct ICMP_HDR)); */
+	memset(pkt->body.data, 0, dlen - sizeof(struct ICMP_HDR));
 	pkt->body.tid = host->chat->tid;
 
 	pkt->pkt_status.status = ICMP_STATUS_UNREACH;
@@ -72,7 +74,7 @@ ICMP_PKT *imcp_pkt_pack(size_t dlen, ICMP_HOST *host)
 
 	pkt->icmp_host = host;
 	pkt->write_len = dlen + sizeof(struct ICMP_HDR);
-	pkt->read_len = dlen + sizeof(struct ICMP_HDR) + sizeof(struct IP_HDR) - 4;
+	pkt->read_len  = dlen + sizeof(struct ICMP_HDR) + sizeof(struct IP_HDR) - 4;
 	return (pkt);
 }
 
