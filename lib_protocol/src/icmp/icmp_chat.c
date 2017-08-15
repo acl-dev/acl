@@ -9,9 +9,31 @@
 #include <unistd.h>
 #endif
 
+static unsigned long __unique_id = 0;
+static ACL_ATOMIC *__unique_lock = NULL;
+static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
+
+static void proc_on_exit(void)
+{
+	if (__unique_lock) {
+		acl_atomic_free(__unique_lock);
+		__unique_lock = NULL;
+	}
+}
+
+static void icmp_once(void)
+{
+	__unique_lock = acl_atomic_new();
+	acl_atomic_set(__unique_lock, &__unique_id);
+	atexit(proc_on_exit);
+}
+
 ICMP_CHAT *icmp_chat_create(ACL_AIO* aio, int check_tid)
 {
 	ICMP_CHAT *chat;
+
+	if (acl_pthread_once(&once_control, icmp_once) != 0)
+		acl_msg_fatal("acl_pthread_once failed %s", acl_last_serror());
 
 	chat = (ICMP_CHAT*) acl_mycalloc(1, sizeof(ICMP_CHAT));
 	chat->aio = aio;
@@ -24,7 +46,7 @@ ICMP_CHAT *icmp_chat_create(ACL_AIO* aio, int check_tid)
 #elif defined(ACL_WINDOWS)
 	chat->pid = _getpid();
 #endif
-	chat->tid = (unsigned long) acl_pthread_self();
+	chat->tid = (unsigned long) acl_atomic_int64_fetch_add(__unique_lock, 1);
 	chat->check_tid = check_tid;
 
 	if (aio != NULL)

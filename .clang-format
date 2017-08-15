@@ -1,6 +1,6 @@
 ---
 Language:        Cpp
-DisableFormat:   false
+DisableFormat:   true 
 AccessModifierOffset: -8
 AlignAfterOpenBracket: DontAlign
 AlignConsecutiveAssignments: true

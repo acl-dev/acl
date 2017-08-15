@@ -113,8 +113,7 @@ int icmp_pkt_unpack(const ICMP_CHAT *chat, const char *buf, int bytes, ICMP_PKT 
 	iphdrlen = iphdr->h_len * 4 ; /* number of 32-bit words *4 = bytes */
 
 	if (bytes < iphdrlen + ICMP_MIN) {
-		acl_msg_error("Too few bytes from %s",
-			inet_ntoa(chat->is->from.sin_addr));
+		acl_msg_error("Too few bytes from %s", inet_ntoa(chat->is->from.sin_addr));
 		return (-1);
 	}
 

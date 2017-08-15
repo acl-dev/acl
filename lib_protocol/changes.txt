@@ -1,7 +1,13 @@
 修改历史列表：
 ------------------------------------------------------------------------
+261) 2017.8.15
+261.1) bugfix: icmp_stream.c 中函数 icmp_read 应该设置 read_ready = 0，以清除
+在异步 IO 模式与 event 事件引擎设置的该标志位，否则会造成 IO 死循环
+261.2) feature: icmp_chat.c 中将 ICMP_CHAT::tid 由原来的线程 ID 改为原子加值，
+以支持协程模式下使用
+
 260) 2016.5.10
-260.1) featur: http_hdr_res.c 中的函数 http_hdr_res_parse 取消了对 http_status
+260.1) feature: http_hdr_res.c 中的函数 http_hdr_res_parse 取消了对 http_status
 的检查，以便于应用使用自定义状态码
 
 ------------------------------------------------------------------------
