@@ -430,7 +430,7 @@ int event_process(EVENT *ev, int timeout)
 	 * quickly when no tasks left
 	 */
 	if (timeout > 1000 || timeout <= 0)
-		timeout = 1000;
+		timeout = 100;
 
 #ifdef	DEL_DELAY
 	ndefer = ev->r_ndefer;

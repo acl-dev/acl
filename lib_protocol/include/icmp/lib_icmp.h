@@ -96,8 +96,8 @@ ICMP_API void icmp_stat_host(ICMP_HOST *host, int show_flag);
  * @param ip {const char*} 主机IP地址，不能为空
  * @param npkt {size_t} 对该主机发送的数据包个数
  * @param dlen {size_t} 每个探测数据包的长度
- * @param delay {int} 发送探测数据包的时间间隔(秒)
- * @param timeout {int} 被探测主机的响应包超时时间(秒)
+ * @param delay {int} 发送探测数据包的时间间隔(毫秒)
+ * @param timeout {int} 被探测主机的响应包超时时间(毫秒)
  * @return {ICMP_HOST*} 被探测主机对象, 如果为空则表示出错
  */
 ICMP_API ICMP_HOST* icmp_host_new(ICMP_CHAT *chat, const char *domain,
@@ -131,8 +131,8 @@ ICMP_API void icmp_host_set(ICMP_HOST *host, void *arg,
  * @param domain {const char*} 域名标识字符串，可以为空
  * @param ip {const char*} 主机IP地址，不能为空
  * @param npkt {size_t} 对该主机发送的数据包个数
- * @param delay {int} 发送探测数据包的时间间隔(秒)
- * @param timeout {int} 被探测主机的响应包超时时间(秒)
+ * @param delay {int} 发送探测数据包的时间间隔(毫秒)
+ * @param timeout {int} 被探测主机的响应包超时时间(毫秒)
  */
 ICMP_API void icmp_ping_one(ICMP_CHAT *chat, const char *domain,
 	const char *ip, size_t npkt, int delay, int timeout);

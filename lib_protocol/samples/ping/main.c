@@ -3,8 +3,9 @@
 #include "lib_acl.h"
 #include <signal.h>
 
-static void add_ip_list(ICMP_CHAT *chat, const ACL_ARGV *domain_list,
-	int npkt, int delay)
+static int __delay = 1;
+
+static void add_ip_list(ICMP_CHAT *chat, const ACL_ARGV *domain_list, int npkt)
 {
 	ACL_DNS_DB* dns_db;
 	const char* ptr;
@@ -33,9 +34,9 @@ static void add_ip_list(ICMP_CHAT *chat, const ACL_ARGV *domain_list,
 		pip = ip_list->argv[i++];
 
 		if (strcmp(pdomain, pip) == 0)
-			icmp_ping_one(chat, NULL, pip, npkt, delay, 1);
+			icmp_ping_one(chat, NULL, pip, npkt, __delay, 1);
 		else
-			icmp_ping_one(chat, pdomain, pip, npkt, delay, 1);
+			icmp_ping_one(chat, pdomain, pip, npkt, __delay, 1);
 	}
 }
 
@@ -64,7 +65,6 @@ static void display_res(void)
 /* 单线程异步 PING 多个地址的函数入口 */
 static void ping_main_async(const ACL_ARGV *ip_list, int npkt)
 {
-	int   delay = 1;
 	ACL_AIO *aio;
 
 	/* 创建非阻塞异步通信句柄 */
@@ -75,7 +75,7 @@ static void ping_main_async(const ACL_ARGV *ip_list, int npkt)
 	__chat = icmp_chat_create(aio, 1);
 
 	/* 添加需要 PING 的地址列表 */
-	add_ip_list(__chat, ip_list, npkt, delay);
+	add_ip_list(__chat, ip_list, npkt);
 
 	while (1) {
 		/* 如果 PING 结束，则退出循环 */
@@ -100,7 +100,6 @@ static void ping_main_async(const ACL_ARGV *ip_list, int npkt)
 static void ping_main_sync(const char *dest, int npkt)
 {
 	ACL_DNS_DB* dns_db;
-	int   delay = 1;
 	const char* ip;
 
 	/* 创建 ICMP 对象 */
@@ -119,9 +118,9 @@ static void ping_main_sync(const char *dest, int npkt)
 
 	/* 开始 PING 一个 IP 地址 */
 	if (strcmp(dest, ip) == 0)
-		icmp_ping_one(__chat, NULL, ip, npkt, delay, 1);
+		icmp_ping_one(__chat, NULL, ip, npkt, __delay, 1);
 	else
-		icmp_ping_one(__chat, dest, ip, npkt, delay, 1);
+		icmp_ping_one(__chat, dest, ip, npkt, __delay, 1);
 
 	/* 释放 DNS 查询结果 */
 	acl_netdb_free(dns_db);
@@ -136,7 +135,6 @@ static void *ping_thread(void *arg)
 {
 	const char *ip, *dest = (char *) arg;
 	ACL_DNS_DB* dns_db;
-	int   delay = 1;
 	ICMP_CHAT *chat;
 
 	/* 通过域名解析出IP地址 */
@@ -159,9 +157,9 @@ static void *ping_thread(void *arg)
 
 	/* 开始 PING */
 	if (strcmp(dest, ip) == 0)
-		icmp_ping_one(chat, NULL, ip, __npkt, delay, 1);
+		icmp_ping_one(chat, NULL, ip, __npkt, __delay, 1);
 	else
-		icmp_ping_one(chat, dest, ip, __npkt, delay, 1);
+		icmp_ping_one(chat, dest, ip, __npkt, __delay, 1);
 	acl_netdb_free(dns_db);  /* 释放域名解析对象 */
 	display_res2(chat);  /* 显示 PING 结果 */
 	icmp_chat_free(chat);  /* 释放 ICMP 对象 */
@@ -192,7 +190,7 @@ static void ping_main_threads(const ACL_ARGV *ip_list, int npkt)
 
 static void usage(const char* progname)
 {
-	printf("usage: %s [-h help] -s [sync] -t [use thread mode] [-n npkt] [\"dest1 dest2 dest3...\"]\r\n", progname);
+	printf("usage: %s [-h help] -s [sync] -d delay -t [use thread mode] [-n npkt] [\"dest1 dest2 dest3...\"]\r\n", progname);
 	printf("example: %s -n 10 www.sina.com.cn www.baidu.com www.qq.com\r\n", progname);
 	printf("example: %s -s -n 10 www.sina.com.cn\r\n", progname);
 #ifdef WIN32
@@ -218,7 +216,7 @@ int main(int argc, char* argv[])
 	acl_socket_init();  /* 在 WIN32 下需要初始化全局套接字库 */
 	acl_msg_stdout_enable(1);  /* 允许 acl_msg_xxx 记录的信息输出至屏幕 */
 
-	while ((ch = getopt(argc, argv, "htsl:n:")) > 0) {
+	while ((ch = getopt(argc, argv, "htsl:n:d:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -231,6 +229,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'n':
 			npkt = atoi(optarg);
+			break;
+		case 'd':
+			__delay = atoi(optarg);
 			break;
 		default:
 			usage(argv[0]);

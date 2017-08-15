@@ -9,7 +9,14 @@ static void read_pkt(ACL_VSTREAM *stream, ICMP_PKT *pkt_src)
 	int   ret;
 
 	while (1) {
-		if (acl_read_wait(ACL_VSTREAM_SOCK(stream), pkt_src->icmp_host->timeout) < 0) {
+#ifdef ACL_UNIX
+		if (acl_read_poll_wait(ACL_VSTREAM_SOCK(stream),
+			pkt_src->icmp_host->timeout) < 0) {
+#else
+		if (acl_read_select_wait(ACL_VSTREAM_SOCK(stream),
+			pkt_src->icmp_host->timeout) < 0) {
+#endif
+
 			/* 汇报请求包超时 */
 			icmp_stat_timeout(pkt_src);
 			return;
@@ -17,8 +24,7 @@ static void read_pkt(ACL_VSTREAM *stream, ICMP_PKT *pkt_src)
 
 		ret = acl_vstream_read(stream, buf, sizeof(buf));
 		if (ret == ACL_VSTREAM_EOF) {
-			char tbuf[256];
-			acl_msg_error("read error(%s)", acl_last_strerror(tbuf, sizeof(tbuf)));
+			acl_msg_error("read error(%s)", acl_last_serror());
 			continue;
 		}
 
@@ -62,7 +68,7 @@ void icmp_chat_sio(ICMP_HOST* host)
 	while (pkt != NULL) {
 		send_pkt(stream, pkt);
 		read_pkt(stream, pkt);
-		sleep(host->delay);
+		acl_doze(host->delay);
 		pkt = ICMP_PKT_NEXT(&host->pkt_head, &pkt->pkt_ring);
 	}
 

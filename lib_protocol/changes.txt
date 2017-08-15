@@ -5,6 +5,7 @@
 在异步 IO 模式与 event 事件引擎设置的该标志位，否则会造成 IO 死循环
 261.2) feature: icmp_chat.c 中将 ICMP_CHAT::tid 由原来的线程 ID 改为原子加值，
 以支持协程模式下使用
+261.3) feature: 将 ICMP_HOST::delay 的单位由秒调整为毫秒
 
 260) 2016.5.10
 260.1) feature: http_hdr_res.c 中的函数 http_hdr_res_parse 取消了对 http_status

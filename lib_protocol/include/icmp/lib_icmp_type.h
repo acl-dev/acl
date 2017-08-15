@@ -15,7 +15,7 @@ struct ICMP_STAT {
 	double tave;                    /**< 平均时间 */
 	size_t nsent;                   /**< 已经发送的包个数 */
 	size_t nreceived;               /**< 已经收到的包个数 */
-	double loss;					/**< 丢失的包个数 */
+	double loss;			/**< 丢失的包个数 */
 };
 
 /**< ICMP 所发送的每个 PING 包之后的主机状态应答 */
@@ -40,8 +40,8 @@ struct ICMP_HOST {
 	struct sockaddr_in dest;    /**< 发送包时目的主机地址 */
 	struct sockaddr_in from;    /**< 接收包时源主机地址 */
 	int   from_len;             /**< 接收包时存储在 from 中的地址长度 */
-	int   delay;                /**< 间隔发送PING包的时间，单位为秒 */
-	int   timeout;              /**< 超时时间 */
+	int   delay;                /**< 间隔发送PING包的时间，单位为毫秒 */
+	int   timeout;              /**< 超时时间(毫秒) */
 	size_t dlen;                /**< 每个发送包的大小(字节) */
 	size_t npkt;                /**< 设置的向该目的主机发送包的个数 */
 	size_t nsent;               /**< 已经发送给该目的主机包的个数 */

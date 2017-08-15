@@ -21,25 +21,30 @@ static void check_timer(int event_type acl_unused,
 		pkt = (ICMP_PKT*) chat->timer->popup(chat->timer);
 		if (pkt == NULL)
 			break;
+
 		/* 汇报请求包超时 */
 		icmp_stat_timeout(pkt);
 
 		/* 获得发往该主机的下一个数据包 */
-		pkt_next = ICMP_PKT_NEXT(&pkt->icmp_host->pkt_head, &pkt->pkt_ring);
+		pkt_next = ICMP_PKT_NEXT(
+			&pkt->icmp_host->pkt_head, &pkt->pkt_ring);
+
 		/* 定时发送下一个请求数据包 */
 		if (pkt_next != NULL)
 			delay_send_pkt(pkt_next, 0);
 		else {
 			/* 如果对该主机的包发送完毕，则回调状态汇报函数 */
 			if (pkt->icmp_host->stat_finish)
-				pkt->icmp_host->stat_finish(pkt->icmp_host, pkt->icmp_host->arg);
+				pkt->icmp_host->stat_finish(
+					pkt->icmp_host, pkt->icmp_host->arg);
 			/* 已完成主机检测数加1 */
 			chat->count++;
 		}
 	}
 
 	/* 启动下一次定时器 */
-	acl_aio_request_timer(chat->aio, check_timer, chat, chat->check_inter, 0);
+	acl_aio_request_timer(chat->aio, check_timer,
+		chat, chat->check_inter, 0);
 }
 
 static void send_pkt(ICMP_PKT *pkt)
@@ -52,10 +57,11 @@ static void send_pkt(ICMP_PKT *pkt)
 	/* 组建发送数据包 */
 	icmp_pkt_build(pkt, chat->seq_no++);
 
-	/* 指定当前包的目的主机地址，间接传递给 acl_vstream_writen 中的回调函数 */
+	/* 指定当前包目的主机地址，间接传递给 acl_vstream_writen 的回调函数 */
 	chat->is->curr_host = pkt->icmp_host;
 	/* 采用同步发送的模式 */
-	ret = acl_vstream_writen(vstream, (const char*) pkt, (int) pkt->write_len);
+	ret = acl_vstream_writen(vstream, (const char*) pkt,
+		(int) pkt->write_len);
 	pkt->icmp_host->nsent++;
 
 	if (ret == ACL_VSTREAM_EOF) {
@@ -64,7 +70,8 @@ static void send_pkt(ICMP_PKT *pkt)
 		/* 汇报主机不可达信息 */
 		icmp_stat_unreach(pkt);
 
-		pkt_next = ICMP_PKT_NEXT(&pkt->icmp_host->pkt_head, &pkt->pkt_ring);
+		pkt_next = ICMP_PKT_NEXT(&pkt->icmp_host->pkt_head,
+				&pkt->pkt_ring);
 		if (pkt_next != NULL) {
 			/* 延迟发送下一个数据包 */
 			delay_send_pkt(pkt_next, pkt_next->icmp_host->delay);
@@ -74,7 +81,8 @@ static void send_pkt(ICMP_PKT *pkt)
 
 			/* 汇报该 ICMP_HOST 对象的 ICMP 包可达状态 */
 			if (pkt->icmp_host->stat_finish)
-				pkt->icmp_host->stat_finish(pkt->icmp_host, pkt->icmp_host->arg);
+				pkt->icmp_host->stat_finish(
+					pkt->icmp_host, pkt->icmp_host->arg);
 		}
 	} else {
 		/* 将该包置入超时队列中 */
@@ -112,10 +120,11 @@ static void delay_send_pkt(ICMP_PKT *pkt, int delay)
 	if (pkt == NULL)
 		acl_msg_fatal("%s(%d): pkt null", myname, __LINE__);
 
-	/* 启动写定时器，因为传入的 delay 是秒级，而 acl_aio_request_timer
-	 * 的时间单位是微秒, 所以需要将 dely 由秒转为微秒
+	/* 启动写定时器，因为传入的 delay 是毫秒级，而 acl_aio_request_timer
+	 * 的时间单位是微秒, 所以需要将 dely 由毫秒转为微秒
 	 */
-	acl_aio_request_timer(pkt->pkt_chat->aio, delay_send_timer, pkt, delay * 1000000, 0);
+	acl_aio_request_timer(pkt->pkt_chat->aio, delay_send_timer,
+		pkt, delay * 1000, 0);
 }
 
 static int read_close_fn(ACL_ASTREAM *astream acl_unused, void *arg)
@@ -137,7 +146,8 @@ static int read_close_fn(ACL_ASTREAM *astream acl_unused, void *arg)
 	return (-1);
 }
 
-static int read_ready_fn(ACL_ASTREAM *astream, void *arg, const char *data, int dlen)
+static int read_ready_fn(ACL_ASTREAM *astream, void *arg,
+	const char *data, int dlen)
 {
 	const char *myname = "read_ready_fn";
 	ICMP_CHAT *chat = (ICMP_CHAT*) arg;
@@ -169,10 +179,12 @@ static int read_ready_fn(ACL_ASTREAM *astream, void *arg, const char *data, int 
 	/* 汇报状态 */
 	icmp_stat_report(pkt_src);
 
-	pkt_next = ICMP_PKT_NEXT(&pkt_src->icmp_host->pkt_head, &pkt_src->pkt_ring);
+	pkt_next = ICMP_PKT_NEXT(&pkt_src->icmp_host->pkt_head,
+			&pkt_src->pkt_ring);
 	if (pkt_next == NULL) {
 		if (pkt_src->icmp_host->stat_finish)
-			pkt_src->icmp_host->stat_finish(pkt_src->icmp_host, pkt_src->icmp_host->arg);
+			pkt_src->icmp_host->stat_finish(
+				pkt_src->icmp_host, pkt_src->icmp_host->arg);
 		chat->count++;
 		READ_RETURN(0);
 	}

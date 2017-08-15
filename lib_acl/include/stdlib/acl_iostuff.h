@@ -52,6 +52,34 @@ ACL_API int acl_write_wait(ACL_SOCKET fd, int timeout);
  */
 ACL_API int acl_read_wait(ACL_SOCKET fd, int timeout);
 
+#if defined(ACL_LINUX) && !defined(MINGW)
+/**
+ * 采用 epoll 方式的读等待
+ * @param fd {ACL_SOCKET} 描述符
+ * @param delay {int} 毫秒级等待时间
+ * @return {int} 含义同上
+ */
+ACL_API int acl_read_epoll_wait(ACL_SOCKET fd, int delay);
+#endif
+
+#if defined(ACL_UNIX)
+/**
+ * 采用 poll 方式的读等待
+ * @param fd {ACL_SOCKET} 描述符
+ * @param delay {int} 毫秒级等待时间
+ * @return {int} 含义同上
+ */
+ACL_API int acl_read_poll_wait(ACL_SOCKET fd, int delay);
+#endif
+
+/**
+ * 采用 select 方式的读等待
+ * @param fd {ACL_SOCKET} 描述符
+ * @param delay {int} 毫秒级等待时间
+ * @return {int} 含义同上
+ */
+ACL_API int acl_read_select_wait(ACL_SOCKET fd, int delay);
+
 /**
  * 毫秒级别睡眠
  * @param delay {unsigned} 毫秒值

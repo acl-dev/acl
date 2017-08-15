@@ -47,12 +47,12 @@ ICMP_HOST* icmp_host_new(ICMP_CHAT *chat, const char *domain, const char *ip,
 	host->dest.sin_family = AF_INET;
 	host->dest.sin_addr.s_addr = inet_addr(host->dest_ip);
 	/*	host->dest.sin_port = htons(53); */
-	host->chat = chat;
+	host->chat    = chat;
 	host->timeout = timeout;
-	host->delay = delay;
-	host->dlen = dlen;
-	host->npkt = npkt;
-	host->nsent = 0;
+	host->delay   = delay;
+	host->dlen    = dlen;
+	host->npkt    = npkt;
+	host->nsent   = 0;
 
 	acl_ring_init(&host->pkt_head);
 	for (i = 0; i < npkt; i++) {
@@ -74,6 +74,5 @@ void icmp_host_set(ICMP_HOST *host, void *arg,
 	host->stat_respond = stat_respond;
 	host->stat_unreach = stat_unreach;
 	host->stat_timeout = stat_timeout;
-	host->stat_finish = stat_finish;
+	host->stat_finish  = stat_finish;
 }
-
