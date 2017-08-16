@@ -27,7 +27,7 @@ void icmp_stat_report(ICMP_PKT *pkt)
 	pkt->pkt_status.status = ICMP_STATUS_OK;
 	if (pkt->icmp_host->enable_log)
 		acl_msg_info("Reply from %s: bytes=%d time=%.3fms TTL=%d icmp_seq=%d status=%d",
-			pkt->pkt_status.frome_ip, (int) pkt->pkt_status.reply_len,
+			pkt->pkt_status.from_ip, (int) pkt->pkt_status.reply_len,
 			pkt->pkt_status.rtt, pkt->pkt_status.ttl,
 			pkt->pkt_status.seq, pkt->pkt_status.status);
 

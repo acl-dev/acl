@@ -98,13 +98,14 @@ void icmp_pkt_save(ICMP_PKT* to, const ICMP_PKT* from)
 	to->pkt_status.reply_len = from->pkt_status.reply_len;
 	to->pkt_status.rtt = stamp_sub(&from->stamp, &to->stamp);
 	to->pkt_status.ttl = from->pkt_status.ttl;
-	snprintf(to->pkt_status.frome_ip, sizeof(to->pkt_status.frome_ip),
-		"%s", from->pkt_status.frome_ip);
+	snprintf(to->pkt_status.from_ip, sizeof(to->pkt_status.from_ip),
+		"%s", from->pkt_status.from_ip);
 
 	to->pkt_status.status = ICMP_STATUS_OK;
 }
 
-int icmp_pkt_unpack(const ICMP_CHAT *chat, const char *buf, int bytes, ICMP_PKT *pkt)
+int icmp_pkt_unpack(const ICMP_CHAT *chat, const char *buf,
+	int bytes, ICMP_PKT *pkt)
 {
 	const IP_HDR *iphdr;
 	const ICMP_HDR *icmphdr;
@@ -115,7 +116,8 @@ int icmp_pkt_unpack(const ICMP_CHAT *chat, const char *buf, int bytes, ICMP_PKT 
 	iphdrlen = iphdr->h_len * 4 ; /* number of 32-bit words *4 = bytes */
 
 	if (bytes < iphdrlen + ICMP_MIN) {
-		acl_msg_error("Too few bytes from %s", inet_ntoa(chat->is->from.sin_addr));
+		acl_msg_error("Too few bytes from %s",
+			inet_ntoa(chat->is->from.sin_addr));
 		return (-1);
 	}
 
@@ -145,7 +147,7 @@ int icmp_pkt_unpack(const ICMP_CHAT *chat, const char *buf, int bytes, ICMP_PKT 
 	pkt->pkt_status.status = ICMP_STATUS_OK;
 	pkt->pkt_status.seq = icmphdr->seq;
 	pkt->pkt_status.ttl = iphdr->ttl;
-	snprintf(pkt->pkt_status.frome_ip, sizeof(pkt->pkt_status.frome_ip),
+	snprintf(pkt->pkt_status.from_ip, sizeof(pkt->pkt_status.from_ip),
 		"%s", inet_ntoa(chat->is->from.sin_addr));
 	return (0);
 }

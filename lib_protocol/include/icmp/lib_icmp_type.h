@@ -21,12 +21,12 @@ struct ICMP_STAT {
 /**< ICMP 所发送的每个 PING 包之后的主机状态应答 */
 struct ICMP_PKT_STATUS {
 	size_t reply_len;               /**< 包回复的数据长度 */
-	char  frome_ip[32];             /**< 源地址 */
+	char   from_ip[32];             /**< 源地址 */
 
-	double rtt;                     /**< 往返时间(毫秒)(Round Trip Time) */
+	double         rtt;             /**< 往返时间(毫秒)(Round Trip Time) */
 	unsigned short seq;             /**< 序列号(seq no) */
-	unsigned char ttl;              /**< 生存时间(time to live) */
-	char status;
+	unsigned char  ttl;              /**< 生存时间(time to live) */
+	char           status;
 #define ICMP_STATUS_OK          0
 #define ICMP_STATUS_UNREACH     1
 #define ICMP_STATUS_TIMEOUT     2
@@ -47,8 +47,8 @@ struct ICMP_HOST {
 	size_t nsent;               /**< 已经发送给该目的主机包的个数 */
 
 	char  enable_log;           /**< 是否将响应包的信息记日志 */
-	ACL_RING host_ring;         /**< 由此链入 ICMP_CHAT->host_head 链中 */
-	ACL_RING pkt_head;          /**< 发送给目的主机数据包的链的链头 */
+	ACL_RING   host_ring;       /**< 由此链入 ICMP_CHAT->host_head 链中 */
+	ACL_RING   pkt_head;        /**< 发送给目的主机数据包的链的链头 */
 	ICMP_CHAT *chat;            /**< 所属的通信对象 */
 
 	/**< 汇报发送包的响应包状态 */
