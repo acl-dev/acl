@@ -5,13 +5,10 @@
 
 void icmp_host_free(ICMP_HOST *host)
 {
-	ICMP_PKT *pkt;
-	ACL_RING *ring_ptr;
+	size_t i;
 
-	while ((ring_ptr = acl_ring_pop_head(&host->pkt_head)) != NULL) {
-		pkt = RING_TO_PKT(ring_ptr);
-		imcp_pkt_free(pkt);
-	}
+	for (i = 0; i < host->npkt; i++)
+		imcp_pkt_free(host->pkts[i]);
 
 	acl_myfree(host);
 }
@@ -21,7 +18,6 @@ ICMP_HOST* icmp_host_new(ICMP_CHAT *chat, const char *domain, const char *ip,
 {
 	const char* myname = "icmp_host_new";
 	ICMP_HOST *host;
-	ICMP_PKT *pkt;
 	size_t i;
 	char *ptr;
 
@@ -44,24 +40,28 @@ ICMP_HOST* icmp_host_new(ICMP_CHAT *chat, const char *domain, const char *ip,
 	if (ptr)
 		*ptr = 0; /* È¥µô¶Ë¿Ú×Ö¶Î */
 
-	host->dest.sin_family = AF_INET;
+	host->dest.sin_family      = AF_INET;
 	host->dest.sin_addr.s_addr = inet_addr(host->dest_ip);
+
 	/*	host->dest.sin_port = htons(53); */
 	host->chat    = chat;
 	host->timeout = timeout;
 	host->delay   = delay;
 	host->dlen    = dlen;
 	host->npkt    = npkt;
+	host->pkts = (ICMP_PKT**) acl_mycalloc(host->npkt, sizeof(ICMP_PKT*));
 	host->nsent   = 0;
 
-	acl_ring_init(&host->pkt_head);
 	for (i = 0; i < npkt; i++) {
-		pkt = imcp_pkt_pack(dlen, host);
-		acl_ring_prepend(&host->pkt_head, &pkt->pkt_ring);
+		host->pkts[i] = imcp_pkt_pack(dlen, host, ICMP_ECHO, NULL, 0);
 	}
 
 	acl_ring_prepend(&chat->host_head, &host->host_ring);
-	return (host);
+
+	if (chat->aio != NULL)
+		icmp_chat_aio_add(chat, host);
+
+	return host;
 }
 
 void icmp_host_set(ICMP_HOST *host, void *arg,

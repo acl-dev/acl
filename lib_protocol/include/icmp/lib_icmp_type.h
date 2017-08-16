@@ -1,6 +1,12 @@
 #ifndef __LIB_ICMP_TYPE_INCLUDE_H__
 #define __LIB_ICMP_TYPE_INCLUDE_H__
 
+#define ICMP_ECHOREPLY          0
+#define ICMP_ECHO               8
+
+#define MIN_PACKET     32 
+#define MAX_PACKET     1024 
+
 typedef struct ICMP_CHAT ICMP_CHAT;
 typedef struct ICMP_STAT ICMP_STAT;
 typedef struct ICMP_HOST ICMP_HOST;
@@ -27,9 +33,10 @@ struct ICMP_PKT_STATUS {
 	unsigned short seq;             /**< 序列号(seq no) */
 	unsigned char  ttl;              /**< 生存时间(time to live) */
 	char           status;
-#define ICMP_STATUS_OK          0
-#define ICMP_STATUS_UNREACH     1
-#define ICMP_STATUS_TIMEOUT     2
+#define ICMP_STATUS_INIT	0
+#define ICMP_STATUS_OK          1
+#define ICMP_STATUS_UNREACH     (1<<1) 
+#define ICMP_STATUS_TIMEOUT     (1<<2)
 };
 
 /**< 目的主机信息结构 */
@@ -43,13 +50,15 @@ struct ICMP_HOST {
 	int   delay;                /**< 间隔发送PING包的时间，单位为毫秒 */
 	int   timeout;              /**< 超时时间(毫秒) */
 	size_t dlen;                /**< 每个发送包的大小(字节) */
-	size_t npkt;                /**< 设置的向该目的主机发送包的个数 */
 	size_t nsent;               /**< 已经发送给该目的主机包的个数 */
 
-	char  enable_log;           /**< 是否将响应包的信息记日志 */
+	ICMP_PKT **pkts;            /**< 所有包的数组 */
+	size_t npkt;                /**< 设置的向该目的主机发送包的个数 */
+	size_t ipkt;                /**< 记录下一个要发送的包的下标 */
+
 	ACL_RING   host_ring;       /**< 由此链入 ICMP_CHAT->host_head 链中 */
-	ACL_RING   pkt_head;        /**< 发送给目的主机数据包的链的链头 */
 	ICMP_CHAT *chat;            /**< 所属的通信对象 */
+	char  enable_log;           /**< 是否将响应包的信息记日志 */
 
 	/**< 汇报发送包的响应包状态 */
 	void (*stat_respond)(ICMP_PKT_STATUS*, void*);

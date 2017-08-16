@@ -207,11 +207,13 @@ $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/icmp/%.c
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/smtp/%.c
 	$(COMPILE) $< -o $@
 
-clean:
+clean cl:
 	rm -f $(LIB_PATH_DST)/libprotocol.a
 	rm -f $(LIB_PATH_DST)/lib_protocol.a
 	rm -f $(LIB_PATH_DST)/libprotocol.so
 	rm -f $(OBJS_DST)
+
+rebuild rb: cl all
 
 all_lib: $(OBJS_DST)
 	@(cd debug; ar x ../../lib_acl/lib/lib_acl.a)

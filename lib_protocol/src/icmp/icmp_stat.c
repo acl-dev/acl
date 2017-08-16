@@ -3,47 +3,47 @@
 #include "icmp_private.h"
 #include "icmp/lib_icmp.h"
 
-void icmp_stat_timeout(ICMP_PKT *pkt)
+void icmp_stat_timeout(ICMP_HOST *host, ICMP_PKT *pkt)
 {
 	pkt->pkt_status.status = ICMP_STATUS_TIMEOUT;
-	if (pkt->icmp_host->enable_log)
+	if (host->enable_log)
 		acl_msg_info("%s Ping timeout, icmp_seq %d",
-			pkt->icmp_host->dest_ip, pkt->hdr.seq);
-	if (pkt->icmp_host->stat_timeout != NULL)
-		pkt->icmp_host->stat_timeout(&pkt->pkt_status, pkt->icmp_host->arg);
+			host->dest_ip, pkt->hdr.seq);
+	if (host->stat_timeout != NULL)
+		host->stat_timeout(&pkt->pkt_status, host->arg);
 }
 
-void icmp_stat_unreach(ICMP_PKT *pkt)
+void icmp_stat_unreach(ICMP_HOST *host, ICMP_PKT *pkt)
 {
 	pkt->pkt_status.status = ICMP_STATUS_UNREACH;
-	if (pkt->icmp_host->enable_log)
-		acl_msg_info("%s Destination host unreachable.", pkt->icmp_host->dest_ip);
-	if (pkt->icmp_host->stat_unreach != NULL)
-		pkt->icmp_host->stat_unreach(&pkt->pkt_status, pkt->icmp_host->arg);
+	if (host->enable_log)
+		acl_msg_info("%s Destination host unreachable.", host->dest_ip);
+	if (host->stat_unreach != NULL)
+		host->stat_unreach(&pkt->pkt_status, host->arg);
 }
 
-void icmp_stat_report(ICMP_PKT *pkt)
+void icmp_stat_report(ICMP_HOST *host, ICMP_PKT *pkt)
 {
 	pkt->pkt_status.status = ICMP_STATUS_OK;
-	if (pkt->icmp_host->enable_log)
+	if (host->enable_log)
 		acl_msg_info("Reply from %s: bytes=%d time=%.3fms TTL=%d icmp_seq=%d status=%d",
 			pkt->pkt_status.from_ip, (int) pkt->pkt_status.reply_len,
 			pkt->pkt_status.rtt, pkt->pkt_status.ttl,
 			pkt->pkt_status.seq, pkt->pkt_status.status);
 
-	if (pkt->icmp_host->stat_respond != NULL)
-		pkt->icmp_host->stat_respond(&pkt->pkt_status, pkt->icmp_host->arg);
+	if (host->stat_respond != NULL)
+		host->stat_respond(&pkt->pkt_status, host->arg);
 }
 
 static void icmp_status(ICMP_HOST *host, int flag)
 {
-	int  nok = 0;
+	int    nok = 0;
+	size_t i;
 	double Minimun = 65535, Maximum = 0, Total = 0;
-	ICMP_PKT *pkt;
 
-	pkt = ICMP_PKT_NEXT(&host->pkt_head, &host->pkt_head);
-	while (pkt) {
-		if (pkt->pkt_status.status  == ICMP_STATUS_OK) {
+	for (i = 0; i < host->npkt; i++) {
+		ICMP_PKT *pkt = host->pkts[i];
+		if (pkt->pkt_status.status == ICMP_STATUS_OK) {
 			nok++;
 			if (pkt->pkt_status.rtt < Minimun)
 				Minimun = pkt->pkt_status.rtt;
@@ -51,7 +51,6 @@ static void icmp_status(ICMP_HOST *host, int flag)
 				Maximum = pkt->pkt_status.rtt;
 			Total += pkt->pkt_status.rtt;
 		}
-		pkt = ICMP_PKT_NEXT(&host->pkt_head, &pkt->pkt_ring);
 	}
 	
 	host->icmp_stat.nsent = host->nsent;

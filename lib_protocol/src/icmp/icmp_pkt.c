@@ -4,20 +4,20 @@
 #include "icmp_private.h"
 #include "icmp/lib_icmp.h"
 
-static double stamp_sub(const struct timeval *from, const struct timeval *sub_by)
+static double stamp_sub(const struct timeval *from, const struct timeval *sub)
 {
 	struct timeval res;
 
 	memcpy(&res, from, sizeof(struct timeval));
 
-	res.tv_usec -= sub_by->tv_usec;
+	res.tv_usec -= sub->tv_usec;
 	if (res.tv_usec < 0) {
 		--res.tv_sec;
 		res.tv_usec += 1000000;
 	}
-	res.tv_sec -= sub_by->tv_sec;
+	res.tv_sec -= sub->tv_sec;
 
-	return (res.tv_sec * 1000.0 + res.tv_usec/1000.0);
+	return res.tv_sec * 1000.0 + res.tv_usec/1000.0;
 }
 
 static unsigned short checksum(unsigned short *buffer, size_t size)
@@ -37,20 +37,21 @@ static unsigned short checksum(unsigned short *buffer, size_t size)
 	return (unsigned short) (~cksum);
 }
 
-static void icmp_hdr_pack(char *icmp_data, unsigned short id)
+static void icmp_hdr_pack(char *icmp_data, unsigned short id, int type)
 { 
 	struct ICMP_HDR *icmp_hdr;
 
 	icmp_hdr = (struct ICMP_HDR *) icmp_data;
 
-	icmp_hdr->type  = ICMP_ECHO;
+	icmp_hdr->type  = type;
 	icmp_hdr->code  = 0;
 	icmp_hdr->id    = id;
 	icmp_hdr->cksum = 0;
 	icmp_hdr->seq   = 0;
 }
 
-ICMP_PKT *imcp_pkt_pack(size_t dlen, ICMP_HOST *host)
+ICMP_PKT *imcp_pkt_pack(size_t dlen, ICMP_HOST *host, int type,
+	const void *payload, size_t payload_len)
 {
 	ICMP_PKT *pkt;
 
@@ -62,25 +63,36 @@ ICMP_PKT *imcp_pkt_pack(size_t dlen, ICMP_HOST *host)
 	pkt = (ICMP_PKT*) acl_mycalloc(1, sizeof(ICMP_PKT));
 	pkt->dlen = dlen;
 
-	icmp_hdr_pack((char*) pkt, host->chat->pid);
+	icmp_hdr_pack((char*) pkt, host->chat->pid, type);
+
+	/* just for ICMP_PKT::body.id's size */
+	dlen -= sizeof(pkt->body.id);
+
 	/* icmp body data */
 	/* in some mobile router the data in body should be set to 0 ---zsx */
 	/* memset(pkt->body.data, 'E', dlen - sizeof(struct ICMP_HDR)); */
 	memset(pkt->body.data, 0, dlen - sizeof(struct ICMP_HDR));
-	pkt->body.tid = host->chat->tid;
+
+	if (payload && payload_len > 0) {
+		if (payload_len > dlen - sizeof(struct ICMP_HDR))
+			payload_len = dlen - sizeof(struct ICMP_HDR);
+		memcpy(pkt->body.data, payload, payload_len);
+	}
 
 	pkt->pkt_status.status = ICMP_STATUS_UNREACH;
-	pkt->pkt_status.rtt = 65535; /* large enough ? */
+	pkt->pkt_status.rtt    = 65535; /* large enough ? */
 
-	pkt->icmp_host = host;
-	pkt->write_len = dlen + sizeof(struct ICMP_HDR);
-	pkt->read_len  = dlen + sizeof(struct ICMP_HDR) + sizeof(struct IP_HDR) - 4;
-	return (pkt);
+	pkt->body.id = host->chat->id;
+	pkt->host = host;
+	pkt->wlen = dlen + sizeof(struct ICMP_HDR);
+	pkt->pkt_status.status = ICMP_STATUS_INIT;
+
+	return pkt;
 }
 
 void icmp_pkt_build(ICMP_PKT *pkt, unsigned short seq_no)
 {
-	pkt->hdr.seq = seq_no;
+	pkt->hdr.seq        = seq_no;
 	pkt->pkt_status.seq = pkt->hdr.seq;
 
 	gettimeofday(&pkt->stamp, NULL);
@@ -104,50 +116,60 @@ void icmp_pkt_save(ICMP_PKT* to, const ICMP_PKT* from)
 	to->pkt_status.status = ICMP_STATUS_OK;
 }
 
-int icmp_pkt_unpack(const ICMP_CHAT *chat, const char *buf,
+int icmp_pkt_unpack(struct sockaddr_in from, const char *buf,
 	int bytes, ICMP_PKT *pkt)
 {
-	const IP_HDR *iphdr;
+	const IP_HDR   *iphdr;
 	const ICMP_HDR *icmphdr;
 	const ICMP_PKT *icmppkt;
 	unsigned short iphdrlen;
+	int   n;
 
-	iphdr = (const IP_HDR *) buf;
-	iphdrlen = iphdr->h_len * 4 ; /* number of 32-bit words *4 = bytes */
+	gettimeofday(&pkt->stamp, NULL);
+
+	iphdr    = (const IP_HDR *) buf;
+	iphdrlen = iphdr->h_len * 4 ; /* number of 32-bit words * 4 = bytes */
 
 	if (bytes < iphdrlen + ICMP_MIN) {
 		acl_msg_error("Too few bytes from %s",
-			inet_ntoa(chat->is->from.sin_addr));
-		return (-1);
+			inet_ntoa(from.sin_addr));
+		return -1;
 	}
 
 	icmppkt = (const ICMP_PKT *) (buf + iphdrlen);
 	icmphdr = &icmppkt->hdr;
 
-	if (icmphdr->type != ICMP_ECHOREPLY) {
-		return (-1);
-	}
+	pkt->pkt_status.reply_len =
+		bytes - (iphdrlen + sizeof(struct ICMP_HDR));
+	if (pkt->pkt_status.reply_len < MIN_PACKET)
+		return -1;
 
-	if (icmphdr->id != chat->pid) {
-		return (-1);
-	}
-
-	pkt->pkt_status.reply_len = bytes - (iphdrlen + sizeof(struct ICMP_HDR));
-	if (pkt->pkt_status.reply_len < MIN_PACKET) {
-		return (-1);
-	}
-
-	pkt->body.tid = icmppkt->body.tid;
-	if (chat->check_tid && pkt->body.tid != chat->tid)
-		return (-1);
-
-	pkt->hdr.seq = icmphdr->seq;
-	gettimeofday(&pkt->stamp, NULL);
+	pkt->hdr.type  = icmphdr->type;
+	pkt->hdr.code  = icmphdr->code;
+	pkt->hdr.cksum = icmphdr->cksum;
+	pkt->hdr.id    = icmphdr->id;
+	pkt->hdr.seq   = icmphdr->seq;
+	pkt->body.id   = icmppkt->body.id;
 
 	pkt->pkt_status.status = ICMP_STATUS_OK;
-	pkt->pkt_status.seq = icmphdr->seq;
-	pkt->pkt_status.ttl = iphdr->ttl;
+	pkt->pkt_status.seq    = icmphdr->seq;
+	pkt->pkt_status.ttl    = iphdr->ttl;
+
 	snprintf(pkt->pkt_status.from_ip, sizeof(pkt->pkt_status.from_ip),
-		"%s", inet_ntoa(chat->is->from.sin_addr));
-	return (0);
+		"%s", inet_ntoa(from.sin_addr));
+
+	n = bytes - iphdrlen - sizeof(struct ICMP_HDR) - sizeof(pkt->body.id);
+	memcpy(pkt->body.data, icmppkt->body.data, n);
+	return n;
+}
+
+int icmp_pkt_check(const ICMP_HOST *host, const ICMP_PKT *pkt)
+{
+	int seq = pkt->hdr.seq;
+	if (seq < 0 || (size_t) seq > host->npkt) {
+		acl_msg_warn("invalid seq %d, discard!", seq);
+		return 0;
+	}
+
+	return host->pkts[seq]->pkt_status.status == ICMP_STATUS_INIT;
 }

@@ -41,24 +41,21 @@ struct ICMP_STREAM {
 /**< ICMP 通信句柄 */
 struct ICMP_CHAT {
 	/* 通用的成员变量 */
-	unsigned short seq_no;      /**< 每个 icmp 包的序列号 */
-	ICMP_STREAM *is;            /**< 与某个客户机相关的流 */
 	ACL_RING host_head;         /**< 当前 ICMP 通信对象中的主机组成的链 */
+	unsigned short seq_no;      /**< 每个 icmp 包的序列号 */
+	ICMP_STREAM   *is;          /**< 与某个客户机相关的流 */
 	unsigned short pid;         /**< 由当前进程ID表示 */
-	unsigned long  tid;         /**< 由线程ID表示 */
-	int   check_tid;            /**< 是否检查响应包中的 tid 值 */
+	unsigned long  id;          /**< 由进程内部的原子操作ID表示 */
+	int            check_id;    /**< 是否检查响应包中的 id 值 */
 
 	/* 异步IO的成员变量 */
-	ACL_AIO *aio;               /**< 异步IO句柄 */
-	int   count;                /**< 当前 ICMP 通信对象中已经完成的主机数 */
-	int   check_inter;          /**< 每隔多少秒检查一下定时器里的任务 */
+	ACL_AIO    *aio;            /**< 异步IO句柄 */
 	ICMP_TIMER *timer;          /**< 包发完后等待包应答的定时器 */
+	int   count;                /**< 当前 ICMP 通信对象中已完成的主机数 */
+	int   check_inter;          /**< 每隔多少秒检查一下定时器里的任务 */
 };
 
-#define ICMP_ECHO               8
-#define ICMP_ECHOREPLY          0
-
-#define ICMP_MIN                8  /**< Minimum 8 byte icmp packet (just header) */
+#define ICMP_MIN                8  /**< Minimum 8 bytes packet (just header) */
 
 /**< IP 协议头结构 */
 struct IP_HDR {
@@ -72,48 +69,45 @@ struct IP_HDR {
 # error "unknown __BYTE_ORDER"
 #endif
 
-	unsigned char tos;             /**< Type of service */
+	unsigned char  tos;            /**< Type of service */
 	unsigned short total_len;      /**< total length of the packet */
 	unsigned short ident;          /**< unique identifier */
 	unsigned short frag_and_flags; /**< flags */
 	unsigned char  ttl;            /**< time to live */
-	unsigned char proto;           /**< protocol (TCP, UDP etc) */
+	unsigned char  proto;          /**< protocol (TCP, UDP etc) */
 	unsigned short checksum;       /**< IP checksum */
 
-	unsigned int source_ip;        /**< source IP*/
-	unsigned int dest_ip;          /**< dest IP */
+	unsigned int   source_ip;      /**< source IP*/
+	unsigned int   dest_ip;        /**< dest IP */
 };
 
 /**< ICMP header */
 struct ICMP_HDR {
-	unsigned char type;
-	unsigned char code;          /* type sub code */
+	unsigned char  type;
+	unsigned char  code;           /* type sub code */
 	unsigned short cksum;
 	unsigned short id;
 	unsigned short seq;
 };
 
-#define MIN_PACKET     32 
-#define MAX_PACKET     1024 
-
 /**< ICMP 包数据结构 */
 struct ICMP_PKT {
 	/* 发送的数据包 */
 	ICMP_HDR hdr;                   /**< icmp 头 */
-	union {
-		unsigned long tid;           /**< 线程ID号 */
-		char data[MAX_PACKET];      /**< icmp 数据体 */
+	struct {
+		unsigned long id;       /**< 进程内唯一ID号 */
+		char data[MAX_PACKET];  /**< icmp 数据体 */
 	} body;
 
 	/* 本地存储的数据成员，主要为了解析方便 */
-	ICMP_HOST *icmp_host;           /**< 目的主机 */
-#define pkt_chat icmp_host->chat    /**< ICMP_PKT 中指向 ICMP_CHAT 的快捷方式 */
+	ICMP_HOST *host;               /**< 目的主机 */
 
-	ACL_RING pkt_ring;              /**< 发送数据包的双向链 */
+	/**< ICMP_PKT 中指向 ICMP_CHAT 的快捷方式 */
+#define pkt_chat host->chat
+
 	ACL_RING timer_ring;            /**< 定时器结点 */
 
-	size_t write_len;               /**< 发送的数据长度 */
-	size_t read_len;                /**< 接收的数据长度 */
+	size_t wlen;                    /**< 发送的数据长度 */
 
 	size_t dlen;                    /**< 数据包中数据体长度 */
 	struct timeval stamp;           /**< time stamp */
@@ -122,15 +116,10 @@ struct ICMP_PKT {
 	ICMP_PKT_STATUS pkt_status;
 };
 
-#define RING_TO_PKT(r) \
-	((ICMP_PKT *) ((char *) (r) - offsetof(ICMP_PKT, pkt_ring)))
-#define ICMP_PKT_NEXT(head, curr) \
-	(acl_ring_succ(curr) != (head) ? RING_TO_PKT(acl_ring_succ(curr)) : NULL)
-
 #define RING_TO_HOST(r) \
-	((ICMP_HOST *) ((char *) (r) - offsetof(ICMP_HOST, host_ring)))
+    ((ICMP_HOST *) ((char *) (r) - offsetof(ICMP_HOST, host_ring)))
+
 #define ICMP_HOST_NEXT(head, curr) \
-	(acl_ring_succ(curr) != (head) ? RING_TO_HOST(acl_ring_succ(curr)) : NULL)
+    (acl_ring_succ(curr) != (head) ? RING_TO_HOST(acl_ring_succ(curr)) : NULL)
 
 #endif
-

@@ -28,7 +28,7 @@ static void icmp_once(void)
 	atexit(proc_on_exit);
 }
 
-ICMP_CHAT *icmp_chat_create(ACL_AIO* aio, int check_tid)
+ICMP_CHAT *icmp_chat_create(ACL_AIO* aio, int check_id)
 {
 	ICMP_CHAT *chat;
 
@@ -36,25 +36,23 @@ ICMP_CHAT *icmp_chat_create(ACL_AIO* aio, int check_tid)
 		acl_msg_fatal("acl_pthread_once failed %s", acl_last_serror());
 
 	chat = (ICMP_CHAT*) acl_mycalloc(1, sizeof(ICMP_CHAT));
-	chat->aio = aio;
 	acl_ring_init(&chat->host_head);
-	chat->is = icmp_stream_open(aio);
-	chat->seq_no = 0;
-	chat->count = 0;
+
+	chat->aio      = aio;
+	chat->is       = icmp_stream_open(aio);
+	chat->seq_no   = 0;
+	chat->count    = 0;
 #ifdef ACL_UNIX
-	chat->pid = getpid();
+	chat->pid      = getpid();
 #elif defined(ACL_WINDOWS)
-	chat->pid = _getpid();
+	chat->pid      = _getpid();
 #endif
-	chat->tid = (unsigned long) acl_atomic_int64_fetch_add(__unique_lock, 1);
-	chat->check_tid = check_tid;
+	chat->id       = (unsigned long)
+		acl_atomic_int64_fetch_add(__unique_lock, 1);
 
-	if (aio != NULL)
-		icmp_chat_aio_init(chat, aio);
-	else
-		icmp_chat_sio_init(chat);
+	chat->check_id = check_id;
 
-	return (chat);
+	return chat;
 }
 
 void icmp_chat_free(ICMP_CHAT *chat)
