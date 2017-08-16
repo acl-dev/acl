@@ -49,7 +49,7 @@ ICMP_HOST* icmp_host_new(ICMP_CHAT *chat, const char *domain, const char *ip,
 	host->delay   = delay;
 	host->dlen    = dlen;
 	host->npkt    = npkt;
-	host->pkts = (ICMP_PKT**) acl_mycalloc(host->npkt, sizeof(ICMP_PKT*));
+	host->pkts    = (ICMP_PKT**) acl_mycalloc(host->npkt, sizeof(ICMP_PKT*));
 	host->nsent   = 0;
 
 	for (i = 0; i < npkt; i++) {

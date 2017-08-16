@@ -10,6 +10,7 @@ static void read_pkt(ICMP_HOST *host, ICMP_PKT *pkt_src)
 	char  buf[2048];
 	int   ret;
 
+//	printf(">>>chat id=%ld, chat: %p\r\n", chat->id, chat);
 	while (1) {
 #ifdef ACL_UNIX
 		if (acl_read_poll_wait(ACL_VSTREAM_SOCK(stream),
@@ -34,14 +35,26 @@ static void read_pkt(ICMP_HOST *host, ICMP_PKT *pkt_src)
 			continue;
 
 		if (pkt.hdr.type != ICMP_ECHOREPLY)
+		{
+		//printf("----%s---%d----\r\n", __FUNCTION__, __LINE__);
 			continue;
-		if (pkt.hdr.id != chat->pid)
+		}
+		if (pkt.hdr.id != (chat->pid & 0xffff))
+		{
+		//printf("----%s---%d--pid=%d, %d--\r\n", __FUNCTION__, __LINE__, pkt.hdr.id, chat->pid);
 			continue;
+		}
 		if (chat->check_id && pkt.body.id != chat->id)
+		{
+		//printf("----%s---%d--id: %ld, %ld-chat: %p-\r\n", __FUNCTION__, __LINE__, pkt.body.id, chat->id, chat);
 			continue;
+		}
 
 		if (!icmp_pkt_check(host, &pkt))
+		{
+		//printf("----%s---%d----\r\n", __FUNCTION__, __LINE__);
 			continue;
+		}
 
 		icmp_pkt_save(pkt_src, &pkt);
 		icmp_stat_report(host, pkt_src);
@@ -56,7 +69,6 @@ static void send_pkt(ICMP_HOST *host, ICMP_PKT *pkt)
 	int   ret;
 
 	/* 指定当前包的目的主机，间接传递给 acl_vstream_writen 中的回调函数 */
-	//pkt->pkt_chat->is->curr_host = host;
 	chat->is->curr_host = host;
 
 	/* 组建发送数据包 */

@@ -45,7 +45,7 @@ static void icmp_hdr_pack(char *icmp_data, unsigned short id, int type)
 
 	icmp_hdr->type  = type;
 	icmp_hdr->code  = 0;
-	icmp_hdr->id    = id;
+	icmp_hdr->id    = id & 0xffff;
 	icmp_hdr->cksum = 0;
 	icmp_hdr->seq   = 0;
 }
@@ -159,7 +159,7 @@ int icmp_pkt_unpack(struct sockaddr_in from, const char *buf,
 		"%s", inet_ntoa(from.sin_addr));
 
 	n = bytes - iphdrlen - sizeof(struct ICMP_HDR) - sizeof(pkt->body.id);
-	memcpy(pkt->body.data, icmppkt->body.data, n);
+	//memcpy(pkt->body.data, icmppkt->body.data, n);
 	return n;
 }
 
