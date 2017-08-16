@@ -131,7 +131,8 @@ void master_conf::set_cfg_bool(master_bool_tbl* table)
 		return;
 
 	int  i = 0;
-	for (; table[i].name != NULL; i++);
+	for (; table[i].name != NULL; i++) {}
+
 	bool_cfg_ = (ACL_CFG_BOOL_TABLE*) acl_mycalloc(i + 1,
 		sizeof(ACL_CFG_BOOL_TABLE));
 
@@ -151,7 +152,8 @@ void master_conf::set_cfg_int(master_int_tbl* table)
 		return;
 
 	int  i = 0;
-	for (; table[i].name != NULL; i++);
+	for (; table[i].name != NULL; i++) {}
+
 	int_cfg_ = (ACL_CFG_INT_TABLE*) acl_mycalloc(i + 1,
 		sizeof(ACL_CFG_INT_TABLE));
 
@@ -173,7 +175,8 @@ void master_conf::set_cfg_int64(master_int64_tbl* table)
 		return;
 
 	int  i = 0;
-	for (i = 0; table[i].name != NULL; i++);
+	for (i = 0; table[i].name != NULL; i++) {}
+
 	int64_cfg_ = (ACL_CFG_INT64_TABLE*) acl_mycalloc(i + 1,
 		sizeof(ACL_CFG_INT64_TABLE));
 
@@ -196,7 +199,8 @@ void master_conf::set_cfg_str(master_str_tbl* table)
 		return;
 
 	int  i = 0;
-	for (; table[i].name != NULL; i++);
+	for (; table[i].name != NULL; i++) {}
+
 	str_cfg_ = (ACL_CFG_STR_TABLE*) acl_mycalloc(i + 1,
 		sizeof(ACL_CFG_STR_TABLE));
 
