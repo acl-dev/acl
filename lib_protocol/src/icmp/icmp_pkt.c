@@ -65,27 +65,24 @@ ICMP_PKT *imcp_pkt_pack(size_t dlen, ICMP_HOST *host, int type,
 
 	icmp_hdr_pack((char*) pkt, host->chat->pid, type);
 
-	/* just for ICMP_PKT::body.id's size */
-	dlen -= sizeof(pkt->body.id);
-
 	/* icmp body data */
 	/* in some mobile router the data in body should be set to 0 ---zsx */
-	/* memset(pkt->body.data, 'E', dlen - sizeof(struct ICMP_HDR)); */
-	memset(pkt->body.data, 0, dlen - sizeof(struct ICMP_HDR));
+	/* memset(pkt->body.data, 'E', sizeof(pkt->body.data)); */
+	memset(pkt->body.data, 0, sizeof(pkt->body.data));
 
 	if (payload && payload_len > 0) {
-		if (payload_len > dlen - sizeof(struct ICMP_HDR))
-			payload_len = dlen - sizeof(struct ICMP_HDR);
+		size_t n = dlen - sizeof(pkt->body.id);
+		if (payload_len > n)
+			payload_len = n;
 		memcpy(pkt->body.data, payload, payload_len);
 	}
 
-	pkt->pkt_status.status = ICMP_STATUS_UNREACH;
 	pkt->pkt_status.rtt    = 65535; /* large enough ? */
+	pkt->pkt_status.status = ICMP_STATUS_INIT;
 
 	pkt->body.id = host->chat->id;
-	pkt->host = host;
-	pkt->wlen = dlen + sizeof(struct ICMP_HDR);
-	pkt->pkt_status.status = ICMP_STATUS_INIT;
+	pkt->host    = host;
+	pkt->wlen    = dlen + sizeof(struct ICMP_HDR);
 
 	return pkt;
 }
@@ -123,7 +120,7 @@ int icmp_pkt_unpack(struct sockaddr_in from, const char *buf,
 	const ICMP_HDR *icmphdr;
 	const ICMP_PKT *icmppkt;
 	unsigned short iphdrlen;
-	int   n;
+	int n;
 
 	gettimeofday(&pkt->stamp, NULL);
 
@@ -158,9 +155,16 @@ int icmp_pkt_unpack(struct sockaddr_in from, const char *buf,
 	snprintf(pkt->pkt_status.from_ip, sizeof(pkt->pkt_status.from_ip),
 		"%s", inet_ntoa(from.sin_addr));
 
-	n = bytes - iphdrlen - sizeof(struct ICMP_HDR) - sizeof(pkt->body.id);
-	//memcpy(pkt->body.data, icmppkt->body.data, n);
-	return n;
+	n = bytes - iphdrlen - (int) sizeof(struct ICMP_HDR)
+		- (int) sizeof(pkt->body.id);
+	if (n > 0) {
+		if (n > MAX_PACKET)
+			n = MAX_PACKET;
+		memcpy(pkt->body.data, icmppkt->body.data, n);
+		return n;
+	}
+
+	return 0;
 }
 
 int icmp_pkt_check(const ICMP_HOST *host, const ICMP_PKT *pkt)

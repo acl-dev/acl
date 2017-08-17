@@ -4,9 +4,6 @@
 #define ICMP_ECHOREPLY          0
 #define ICMP_ECHO               8
 
-#define MIN_PACKET     32 
-#define MAX_PACKET     1024 
-
 typedef struct ICMP_CHAT ICMP_CHAT;
 typedef struct ICMP_STAT ICMP_STAT;
 typedef struct ICMP_HOST ICMP_HOST;

@@ -90,12 +90,15 @@ struct ICMP_HDR {
 	unsigned short seq;
 };
 
+#define MIN_PACKET	32 
+#define MAX_PACKET	1024 
+
 /**< ICMP 包数据结构 */
 struct ICMP_PKT {
 	/* 发送的数据包 */
 	ICMP_HDR hdr;                   /**< icmp 头 */
 	struct {
-		unsigned long id;       /**< 进程内唯一ID号 */
+		unsigned int id;       /**< 进程内唯一ID号 */
 		char data[MAX_PACKET];  /**< icmp 数据体 */
 	} body;
 

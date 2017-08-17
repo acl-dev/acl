@@ -38,18 +38,17 @@ ICMP_CHAT *icmp_chat_create(ACL_AIO* aio, int check_id)
 	chat = (ICMP_CHAT*) acl_mycalloc(1, sizeof(ICMP_CHAT));
 	acl_ring_init(&chat->host_head);
 
-	chat->aio      = aio;
-	chat->is       = icmp_stream_open(aio);
-	chat->seq_no   = 0;
-	chat->count    = 0;
+	chat->aio    = aio;
+	chat->is     = icmp_stream_open(aio);
+	chat->seq_no = 0;
+	chat->count  = 0;
 #ifdef ACL_UNIX
-	chat->pid      = getpid();
+	chat->pid    = getpid();
 #elif defined(ACL_WINDOWS)
-	chat->pid      = _getpid();
+	chat->pid    = _getpid();
 #endif
-	chat->id       = (unsigned long)
-		acl_atomic_int64_fetch_add(__unique_lock, 1);
 
+	chat->id = (unsigned) acl_atomic_int64_fetch_add(__unique_lock, 1);
 	chat->check_id = check_id;
 
 	return chat;
@@ -78,17 +77,17 @@ void icmp_chat(ICMP_HOST *host)
 
 int icmp_chat_count(ICMP_CHAT *chat)
 {
-	return (chat->count);
+	return chat->count;
 }
 
 int icmp_chat_size(ICMP_CHAT *chat)
 {
-	return (acl_ring_size(&chat->host_head));
+	return acl_ring_size(&chat->host_head);
 }
 
 int icmp_chat_finish(ICMP_CHAT *chat)
 {
 	if (chat->count == acl_ring_size(&chat->host_head))
-		return (1);
-	return (0);
+		return 1;
+	return 0;
 }
