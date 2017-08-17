@@ -22,51 +22,27 @@ static void display_res(ICMP_CHAT *chat)
 	}
 }
 
-/* PING 线程入口 */
-static void fiber_ping(ACL_FIBER *fiber acl_unused, void *arg)
-{
-	const char *dest = (const char *) arg;
-	ACL_DNS_DB* dns_db;
-	const char *ip;
-	ICMP_CHAT *chat;
-
-	/* 通过域名解析出IP地址 */
-	dns_db = acl_gethostbyname(dest, NULL);
-	if (dns_db == NULL) {
-		acl_msg_warn("Can't find domain %s", dest);
-		return;
-	}
-
-	/* 只取出域名第一个 IP 地址 PING */
-	ip = acl_netdb_index_ip(dns_db, 0);
-	if (ip == NULL || *ip == 0) {
-		acl_msg_error("ip invalid");
-		acl_netdb_free(dns_db);
-		return;
-	}
-
-	/* 创建 ICMP 对象 */
-	chat = icmp_chat_create(NULL, 1);
-
-	/* 开始 PING */
-	if (strcmp(dest, ip) == 0)
-		icmp_ping_one(chat, NULL, ip, __npkt, __delay, __timeout);
-	else
-		icmp_ping_one(chat, dest, ip, __npkt, __delay, __timeout);
-
-	acl_netdb_free(dns_db);  /* 释放域名解析对象 */
-	display_res(chat);  /* 显示 PING 结果 */
-	icmp_chat_free(chat);  /* 释放 ICMP 对象 */
-
-	if (--__nfibers == 0)
-		acl_fiber_schedule_stop();
-}
-
-static void reply_callback(ICMP_PKT_STATUS *status acl_unused, void *arg)
+static void reply_callback(ICMP_PKT_STATUS *status, void *arg)
 {
 	if (__show_reply) {
 		ICMP_HOST *host = (ICMP_HOST *) arg;
-		printf("%s\r\n", host->dest_ip);
+		const ICMP_PKT *pkt_reply = icmp_pkt_peer(status->pkt);
+		const ICMP_PKT_STATUS *status_reply;
+		char       buf[MAX_PACKET];
+		size_t     dlen;
+
+		assert(pkt_reply);
+		status_reply = icmp_pkt_status(pkt_reply);
+		dlen = icmp_pkt_data(pkt_reply, buf, sizeof(buf));
+
+		printf("%d bytes reply from %s: icmp_seq=%d ttl=%d time=%.2f ms dlen=%d data=%s\r\n",
+			(int) status_reply->reply_len,
+			host->dest_ip,
+			status->seq,
+			status->ttl,
+			status->rtt,
+			(int) dlen,
+			buf);
 	}
 }
 
@@ -91,20 +67,57 @@ static void finish_callback(ICMP_HOST *host, void *arg acl_unused)
 	icmp_stat_host(host, 0);
 }
 
-static void fiber_pine_one(ACL_FIBER *fiber acl_unused, void *arg)
+static void ping_one(const char *ip)
 {
-	char *ip = (char*) arg;
-	ICMP_CHAT *chat = icmp_chat_create(NULL, 1);
+	ICMP_CHAT *chat = icmp_chat_create(NULL, 1); /* 创建 ICMP 对象 */
 	ICMP_HOST *host = icmp_host_new(chat, ip, ip, __npkt, 64,
 		__delay, __timeout);
 
 	icmp_host_set(host, host, reply_callback, timeout_callback,
 		unreach_callback, finish_callback);
 
-	icmp_chat(host);
+	icmp_chat(host);	/* 开始 PING */
+	display_res(chat);	/* 显示 PING 结果 */
 
 	icmp_host_free(host);
-	icmp_chat_free(chat);
+	icmp_chat_free(chat);	/* 释放 ICMP 对象 */
+}
+
+/* PING 协程入口 */
+static void fiber_ping(ACL_FIBER *fiber acl_unused, void *arg)
+{
+	const char *dest = (const char *) arg;
+	ACL_DNS_DB* dns_db;
+	const char *ip;
+
+	/* 通过域名解析出IP地址 */
+	dns_db = acl_gethostbyname(dest, NULL);
+	if (dns_db == NULL) {
+		acl_msg_warn("Can't find domain %s", dest);
+		return;
+	}
+
+	/* 只取出域名第一个 IP 地址 PING */
+	ip = acl_netdb_index_ip(dns_db, 0);
+	if (ip == NULL || *ip == 0) {
+		acl_msg_error("ip invalid");
+		acl_netdb_free(dns_db);
+		return;
+	}
+
+	ping_one(ip);
+
+	acl_netdb_free(dns_db);  /* 释放域名解析对象 */
+
+	if (--__nfibers == 0)
+		acl_fiber_schedule_stop();
+}
+
+static void fiber_pine_one(ACL_FIBER *fiber acl_unused, void *arg)
+{
+	char *ip = (char*) arg;
+
+	ping_one(ip);
 
 	acl_myfree(ip);
 

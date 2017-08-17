@@ -6,7 +6,6 @@
 #include "icmp/lib_icmp_type.h"
 
 typedef struct ICMP_TIMER ICMP_TIMER;
-typedef struct ICMP_STREAM ICMP_STREAM;
 typedef struct IP_HDR IP_HDR;
 typedef struct ICMP_HDR ICMP_HDR;
 
@@ -32,26 +31,25 @@ struct ICMP_STREAM {
 	ACL_VSTREAM *vstream;       /**< 同步流指针 */
 	ACL_ASTREAM *astream;       /**< 异步流指针 */
 
-	struct sockaddr_in from;    /**< 接收数据的源地址 */
-	int   from_len;             /**< 存储在 from 中的地址大小 */
-
-	ICMP_HOST *curr_host;       /**< 当前的目的主机对象 */
+	struct sockaddr_in dest;    /**< 目标服务器地址 */
+	struct sockaddr_in from;    /**< 数据源服务器地址 */
+	int    from_len;            /**< 存储在 from 中的地址大小 */
 };
 
 /**< ICMP 通信句柄 */
 struct ICMP_CHAT {
 	/* 通用的成员变量 */
 	ACL_RING host_head;         /**< 当前 ICMP 通信对象中的主机组成的链 */
-	unsigned short seq_no;      /**< 每个 icmp 包的序列号 */
+	unsigned short seq;         /**< 每个 icmp 包的序列号 */
 	ICMP_STREAM   *is;          /**< 与某个客户机相关的流 */
 	unsigned short pid;         /**< 由当前进程ID表示 */
-	unsigned long  id;          /**< 由进程内部的原子操作ID表示 */
+	unsigned long  gid;         /**< 由进程内部的原子操作ID表示 */
 	int            check_id;    /**< 是否检查响应包中的 id 值 */
 
 	/* 异步IO的成员变量 */
 	ACL_AIO    *aio;            /**< 异步IO句柄 */
 	ICMP_TIMER *timer;          /**< 包发完后等待包应答的定时器 */
-	int   count;                /**< 当前 ICMP 通信对象中已完成的主机数 */
+	int   cnt;                  /**< 当前 ICMP 通信对象中已完成的主机数 */
 	int   check_inter;          /**< 每隔多少秒检查一下定时器里的任务 */
 };
 
@@ -90,20 +88,23 @@ struct ICMP_HDR {
 	unsigned short seq;
 };
 
-#define MIN_PACKET	32 
-#define MAX_PACKET	1024 
-
 /**< ICMP 包数据结构 */
 struct ICMP_PKT {
 	/* 发送的数据包 */
+
 	ICMP_HDR hdr;                   /**< icmp 头 */
-	struct {
-		unsigned int id;       /**< 进程内唯一ID号 */
+	union {
+		unsigned int gid;       /**< 进程内唯一ID号 */
 		char data[MAX_PACKET];  /**< icmp 数据体 */
 	} body;
 
+	/********************************************************************/
+
 	/* 本地存储的数据成员，主要为了解析方便 */
-	ICMP_HOST *host;               /**< 目的主机 */
+
+	const ICMP_PKT *peer;           /**< 收到的对端的数据包对象 */
+
+	ICMP_HOST *host;                /**< 目的主机 */
 
 	/**< ICMP_PKT 中指向 ICMP_CHAT 的快捷方式 */
 #define pkt_chat host->chat
@@ -111,7 +112,6 @@ struct ICMP_PKT {
 	ACL_RING timer_ring;            /**< 定时器结点 */
 
 	size_t wlen;                    /**< 发送的数据长度 */
-
 	size_t dlen;                    /**< 数据包中数据体长度 */
 	struct timeval stamp;           /**< time stamp */
 

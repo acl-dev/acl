@@ -4,6 +4,7 @@
 #define ICMP_ECHOREPLY          0
 #define ICMP_ECHO               8
 
+typedef struct ICMP_STREAM ICMP_STREAM;
 typedef struct ICMP_CHAT ICMP_CHAT;
 typedef struct ICMP_STAT ICMP_STAT;
 typedef struct ICMP_HOST ICMP_HOST;
@@ -21,19 +22,27 @@ struct ICMP_STAT {
 	double loss;			/**< 丢失的包个数 */
 };
 
+#define MIN_PACKET	32
+#define MAX_PACKET	1024
+
 /**< ICMP 所发送的每个 PING 包之后的主机状态应答 */
 struct ICMP_PKT_STATUS {
 	size_t reply_len;               /**< 包回复的数据长度 */
-	char   from_ip[32];             /**< 源地址 */
+	char   from_ip[64];             /**< 源地址 */
 
 	double         rtt;             /**< 往返时间(毫秒)(Round Trip Time) */
 	unsigned short seq;             /**< 序列号(seq no) */
 	unsigned char  ttl;              /**< 生存时间(time to live) */
+	unsigned int   gid;
+	char          *data;
+	size_t         dlen;
 	char           status;
 #define ICMP_STATUS_INIT	0
 #define ICMP_STATUS_OK          1
 #define ICMP_STATUS_UNREACH     (1<<1) 
 #define ICMP_STATUS_TIMEOUT     (1<<2)
+
+	ICMP_PKT      *pkt;
 };
 
 /**< 目的主机信息结构 */

@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include "icmp/lib_icmp.h"
 #include "icmp_struct.h"
 #include "icmp_private.h"
 
@@ -11,6 +12,8 @@ static void read_pkt(ICMP_HOST *host, ICMP_PKT *pkt_src)
 	int   ret;
 
 	while (1) {
+		pkt_src->peer = NULL;
+
 #ifdef ACL_UNIX
 		if (acl_read_poll_wait(ACL_VSTREAM_SOCK(stream),
 			host->timeout) < 0) {
@@ -34,14 +37,15 @@ static void read_pkt(ICMP_HOST *host, ICMP_PKT *pkt_src)
 
 		if (pkt.hdr.type != ICMP_ECHOREPLY)
 			continue;
-		if (pkt.hdr.id != (chat->pid & 0xffff))
+		if (pkt.hdr.id != chat->pid)
 			continue;
-		if (chat->check_id && pkt.body.id != chat->id)
+		if (chat->check_id && pkt.body.gid != chat->gid)
 			continue;
 		if (!icmp_pkt_check(host, &pkt))
 			continue;
 
-		icmp_pkt_save(pkt_src, &pkt);
+		icmp_pkt_save_status(pkt_src, &pkt);
+		pkt_src->peer = &pkt;
 		icmp_stat_report(host, pkt_src);
 		break;
 	}
@@ -51,13 +55,13 @@ static void send_pkt(ICMP_HOST *host, ICMP_PKT *pkt)
 {
 	ICMP_CHAT   *chat   = host->chat;
 	ACL_VSTREAM *stream = host->chat->is->vstream;
-	int   ret;
+	int ret;
 
-	/* 指定当前包的目的主机，间接传递给 acl_vstream_writen 中的回调函数 */
-	chat->is->curr_host = host;
+	/* 指定当前包的目的主机 */
+	chat->is->dest = host->dest;
 
 	/* 组建发送数据包 */
-	icmp_pkt_build(pkt, chat->seq_no++);
+	icmp_pkt_build(pkt, chat->seq++);
 
 	/* 采用同步发送的模式 */
 	ret = acl_vstream_writen(stream, (const char*) pkt, (int) pkt->wlen);
@@ -71,16 +75,14 @@ static void send_pkt(ICMP_HOST *host, ICMP_PKT *pkt)
 
 void icmp_chat_sio(ICMP_HOST* host)
 {
-	ICMP_PKT *pkt;
-
 	for (; host->ipkt < host->npkt; host->ipkt++) {
-		pkt = host->pkts[host->ipkt];
+		ICMP_PKT *pkt = host->pkts[host->ipkt];
 		send_pkt(host, pkt);
 		read_pkt(host, pkt);
 		acl_doze(host->delay);
 	}
 
-	host->chat->count++;
+	host->chat->cnt++;
 	if (host->stat_finish)
 		host->stat_finish(host, host->arg);
 }

@@ -137,6 +137,42 @@ ICMP_API void icmp_host_set(ICMP_HOST *host, void *arg,
 ICMP_API void icmp_ping_one(ICMP_CHAT *chat, const char *domain,
 	const char *ip, size_t npkt, int delay, int timeout);
 
+ICMP_API ICMP_STREAM* icmp_stream_open(ACL_AIO *aio);
+ICMP_API void icmp_stream_close(ICMP_STREAM* is);;
+ICMP_API ACL_VSTREAM *icmp_vstream(ICMP_STREAM *is);
+ICMP_API void icmp_stream_from(ICMP_STREAM *is, struct sockaddr_in *addr);
+ICMP_API void icmp_stream_dest(ICMP_STREAM *is, struct sockaddr_in *addr);
+ICMP_API void icmp_stream_set_dest(ICMP_STREAM *is, struct sockaddr_in addr);
+
+ICMP_API ICMP_PKT *icmp_pkt_new(void);
+ICMP_API void icmp_pkt_free(ICMP_PKT *ipkt);
+ICMP_API void icmp_pkt_pack(ICMP_PKT *pkt, int type, unsigned short id,
+		const void *payload, size_t payload_len);
+ICMP_API void icmp_pkt_build(ICMP_PKT *pkt, unsigned short seq);
+ICMP_API void icmp_pkt_save_status(ICMP_PKT* to, const ICMP_PKT* from);
+ICMP_API int  icmp_pkt_unpack(struct sockaddr_in from, const char *buf,
+		int bytes, ICMP_PKT *pkt);
+ICMP_API int  icmp_pkt_check(const ICMP_HOST *host, const ICMP_PKT *pkt);
+
+ICMP_API unsigned char  icmp_pkt_type(const ICMP_PKT *pkt);
+ICMP_API unsigned char  icmp_pkt_code(const ICMP_PKT *pkt);
+ICMP_API unsigned short icmp_pkt_cksum(const ICMP_PKT *pkt);
+ICMP_API unsigned short icmp_pkt_id(const ICMP_PKT *pkt);
+ICMP_API unsigned short icmp_pkt_seq(const ICMP_PKT *pkt);
+ICMP_API unsigned int   icmp_pkt_gid(const ICMP_PKT *pkt);
+ICMP_API const ICMP_PKT *icmp_pkt_peer(const ICMP_PKT *pkt);
+ICMP_API const ICMP_PKT_STATUS *icmp_pkt_status(const ICMP_PKT *pkt);
+ICMP_API size_t icmp_pkt_len(const ICMP_PKT *pkt);
+ICMP_API size_t icmp_pkt_wlen(const ICMP_PKT *pkt);
+ICMP_API size_t icmp_pkt_data(const ICMP_PKT *pkt, char *buf, size_t size);
+
+ICMP_API void icmp_pkt_set_type(ICMP_PKT *pkt, unsigned char type);
+ICMP_API void icmp_pkt_set_code(ICMP_PKT *pkt, unsigned char code);
+ICMP_API void icmp_pkt_set_cksum(ICMP_PKT *pkt, unsigned short cksum);
+ICMP_API void icmp_pkt_set_id(ICMP_PKT *pkt, unsigned short id);
+ICMP_API void icmp_pkt_set_seq(ICMP_PKT *pkt, unsigned short seq);
+ICMP_API void icmp_pkt_set_data(ICMP_PKT *pkt, void *data, size_t size);
+
 #ifdef __cplusplus
 }
 #endif
