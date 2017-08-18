@@ -3,8 +3,33 @@
 #include "icmp_private.h"
 #include "icmp/lib_icmp.h"
 
+static double stamp_sub(const struct timeval *from, const struct timeval *sub)
+{
+	struct timeval res;
+
+	memcpy(&res, from, sizeof(struct timeval));
+
+	res.tv_usec -= sub->tv_usec;
+	if (res.tv_usec < 0) {
+		--res.tv_sec;
+		res.tv_usec += 1000000;
+	}
+	res.tv_sec -= sub->tv_sec;
+
+	return res.tv_sec * 1000.0 + res.tv_usec/1000.0;
+}
+
+static void icmp_rtt_compute(ICMP_PKT *pkt)
+{
+	struct timeval now;
+
+	gettimeofday(&now, NULL);
+	pkt->pkt_status.rtt = stamp_sub(&now, &pkt->stamp);
+}
+
 void icmp_stat_timeout(ICMP_HOST *host, ICMP_PKT *pkt)
 {
+	icmp_rtt_compute(pkt);
 	pkt->pkt_status.status = ICMP_STATUS_TIMEOUT;
 	if (host->enable_log)
 		acl_msg_info("%s Ping timeout, icmp_seq %d",
@@ -15,6 +40,7 @@ void icmp_stat_timeout(ICMP_HOST *host, ICMP_PKT *pkt)
 
 void icmp_stat_unreach(ICMP_HOST *host, ICMP_PKT *pkt)
 {
+	icmp_rtt_compute(pkt);
 	pkt->pkt_status.status = ICMP_STATUS_UNREACH;
 	if (host->enable_log)
 		acl_msg_info("%s Destination host unreachable.", host->dest_ip);
@@ -24,6 +50,7 @@ void icmp_stat_unreach(ICMP_HOST *host, ICMP_PKT *pkt)
 
 void icmp_stat_report(ICMP_HOST *host, ICMP_PKT *pkt)
 {
+	icmp_rtt_compute(pkt);
 	pkt->pkt_status.status = ICMP_STATUS_OK;
 	if (host->enable_log)
 		acl_msg_info("Reply from %s: bytes=%d time=%.3fms TTL=%d icmp_seq=%d status=%d",
@@ -62,19 +89,22 @@ static void icmp_status(ICMP_HOST *host, int flag)
 	host->icmp_stat.tsum = Total;
 	host->icmp_stat.tave = nok > 0 ? host->icmp_stat.tsum/nok : 0;
 
-	if (flag) {
-		acl_msg_info("Ping statistics for %s: %s",
-			host->dest_ip, host->domain[0] != 0 ? host->domain : "");
-		acl_msg_info("\tPackets: Sent = %d, Received = %d, Lost = %d (%.2f%% loss),",
-			(int) host->icmp_stat.nsent, (int) host->icmp_stat.nreceived,
-			(int) (host->icmp_stat.nsent - host->icmp_stat.nreceived),
-			host->icmp_stat.loss);
+	if (!flag)
+		return;
 
-		if (nok > 0) {
-			acl_msg_info("Approximate round trip times in milli-seconds:");
-			acl_msg_info("\tMinimum = %.3f ms, Maximum = %.3f ms, Average = %.3f ms",
-				host->icmp_stat.tmin, host->icmp_stat.tmax, host->icmp_stat.tave);
-		}
+	acl_msg_info("Ping statistics for %s: %s",
+		host->dest_ip, host->domain[0] != 0 ? host->domain : "");
+
+	acl_msg_info("\tPackets: Sent = %d, Received = %d, Lost = %d (%.2f%% loss),",
+		(int) host->icmp_stat.nsent, (int) host->icmp_stat.nreceived,
+		(int) (host->icmp_stat.nsent - host->icmp_stat.nreceived),
+		host->icmp_stat.loss);
+
+	if (nok > 0) {
+		acl_msg_info("Approximate round trip times in milli-seconds:");
+		acl_msg_info("\tMinimum = %.3f ms, Maximum = %.3f ms, Average = %.3f ms",
+			host->icmp_stat.tmin, host->icmp_stat.tmax,
+			host->icmp_stat.tave);
 	}
 }
 

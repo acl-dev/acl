@@ -4,22 +4,6 @@
 #include "icmp_private.h"
 #include "icmp/lib_icmp.h"
 
-static double stamp_sub(const struct timeval *from, const struct timeval *sub)
-{
-	struct timeval res;
-
-	memcpy(&res, from, sizeof(struct timeval));
-
-	res.tv_usec -= sub->tv_usec;
-	if (res.tv_usec < 0) {
-		--res.tv_sec;
-		res.tv_usec += 1000000;
-	}
-	res.tv_sec -= sub->tv_sec;
-
-	return res.tv_sec * 1000.0 + res.tv_usec/1000.0;
-}
-
 static unsigned short checksum(unsigned short *buffer, size_t size)
 {
 	unsigned long cksum = 0;
@@ -102,12 +86,10 @@ void icmp_pkt_client(ICMP_PKT *pkt, ICMP_HOST *host, int type,
 
 void icmp_pkt_build(ICMP_PKT *pkt, unsigned short seq)
 {
-	pkt->hdr.seq        = seq;
+	pkt->hdr.seq   = seq;
+	pkt->hdr.cksum  = checksum((unsigned short *) pkt,
+			pkt->dlen + sizeof(struct ICMP_HDR));
 	pkt->pkt_status.seq = pkt->hdr.seq;
-
-	gettimeofday(&pkt->stamp, NULL);
-	pkt->hdr.cksum = checksum((unsigned short *) pkt,
-		pkt->dlen + sizeof(struct ICMP_HDR));
 	pkt->wlen = pkt->dlen + sizeof(struct ICMP_HDR);
 }
 
@@ -119,8 +101,6 @@ int icmp_pkt_unpack(struct sockaddr_in from, const char *buf,
 	const ICMP_PKT *icmppkt;
 	unsigned short iphdrlen;
 	int n;
-
-	gettimeofday(&pkt->stamp, NULL);
 
 	iphdr    = (const IP_HDR *) buf;
 	iphdrlen = iphdr->h_len * 4 ; /* number of 32-bit words * 4 = bytes */
@@ -173,11 +153,9 @@ int icmp_pkt_unpack(struct sockaddr_in from, const char *buf,
 void icmp_pkt_save_status(ICMP_PKT* to, const ICMP_PKT* from)
 {
 	to->pkt_status.reply_len = from->pkt_status.reply_len;
-	to->pkt_status.rtt = stamp_sub(&from->stamp, &to->stamp);
-	to->pkt_status.ttl = from->pkt_status.ttl;
+	to->pkt_status.ttl       = from->pkt_status.ttl;
+	to->pkt_status.dlen      = from->pkt_status.dlen;
 
-	to->pkt_status.dlen   = from->pkt_status.dlen;
-	to->pkt_status.status = ICMP_STATUS_OK;
 	snprintf(to->pkt_status.from_ip, sizeof(to->pkt_status.from_ip),
 		"%s", from->pkt_status.from_ip);
 }

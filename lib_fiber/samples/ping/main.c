@@ -35,14 +35,12 @@ static void reply_callback(ICMP_PKT_STATUS *status, void *arg)
 		status_reply = icmp_pkt_status(pkt_reply);
 		dlen = icmp_pkt_data(pkt_reply, buf, sizeof(buf));
 
-		printf("%d bytes reply from %s: icmp_seq=%d ttl=%d time=%.2f ms dlen=%d data=%s\r\n",
-			(int) status_reply->reply_len,
-			host->dest_ip,
-			status->seq,
-			status->ttl,
-			status->rtt,
-			(int) dlen,
-			buf);
+		printf("%d bytes reply from %s: seq=%d ttl=%d time=%.2f ms"
+			" code=%d type=%d dlen=%d data=%s\r\n",
+			(int) status_reply->reply_len, host->dest_ip,
+			status->seq, status->ttl, status->rtt,
+			icmp_pkt_code(pkt_reply), icmp_pkt_type(pkt_reply),
+			(int) dlen, buf);
 	}
 }
 

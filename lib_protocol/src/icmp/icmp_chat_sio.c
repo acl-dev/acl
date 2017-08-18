@@ -63,6 +63,8 @@ static void send_pkt(ICMP_HOST *host, ICMP_PKT *pkt)
 	/* 组建发送数据包 */
 	icmp_pkt_build(pkt, chat->seq++);
 
+	gettimeofday(&pkt->stamp, NULL);
+
 	/* 采用同步发送的模式 */
 	ret = acl_vstream_writen(stream, (const char*) pkt, (int) pkt->wlen);
 	host->nsent++;
