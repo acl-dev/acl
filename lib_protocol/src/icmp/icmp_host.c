@@ -8,7 +8,7 @@ void icmp_host_free(ICMP_HOST *host)
 	size_t i;
 
 	for (i = 0; i < host->npkt; i++)
-		imcp_pkt_free(host->pkts[i]);
+		icmp_pkt_free(host->pkts[i]);
 
 	acl_myfree(host);
 }
@@ -53,7 +53,9 @@ ICMP_HOST* icmp_host_new(ICMP_CHAT *chat, const char *domain, const char *ip,
 	host->nsent   = 0;
 
 	for (i = 0; i < npkt; i++) {
-		host->pkts[i] = imcp_pkt_pack(dlen, host, ICMP_ECHO, NULL, 0);
+		ICMP_PKT *pkt = icmp_pkt_new();
+		icmp_pkt_client(pkt, host, ICMP_ECHO, NULL, dlen);
+		host->pkts[i] = pkt;
 	}
 
 	acl_ring_prepend(&chat->host_head, &host->host_ring);

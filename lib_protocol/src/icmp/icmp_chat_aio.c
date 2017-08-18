@@ -31,7 +31,7 @@ static void check_timer(int event_type acl_unused,
 				host->stat_finish(host, host->arg);
 
 			/* 已完成主机检测数加1 */
-			chat->count++;
+			chat->cnt++;
 		}
 
 		/* 定时发送下一个请求数据包 */
@@ -51,10 +51,10 @@ static void send_pkt(ICMP_HOST *host, ICMP_PKT *pkt)
 	int  ret;
 
 	/* 组建发送数据包 */
-	icmp_pkt_build(pkt, chat->seq_no++);
+	icmp_pkt_build(pkt, chat->seq++);
 
-	/* 指定当前包目的主机地址，间接传递给 acl_vstream_writen 的回调函数 */
-	chat->is->curr_host = host;
+	/* 指定当前包目的主机地址 */
+	chat->is->dest = host->dest;
 	/* 采用同步发送的模式 */
 	ret = acl_vstream_writen(vstream, (const char*) pkt, (int) pkt->wlen);
 	host->nsent++;
@@ -65,7 +65,7 @@ static void send_pkt(ICMP_HOST *host, ICMP_PKT *pkt)
 
 		if (host->ipkt >= host->npkt) {
 			/* ICMP_HOST 对象的 ICMP 包已发完, 将 count 值加 1 */
-			chat->count++;
+			chat->cnt++;
 
 			/* 汇报该 ICMP_HOST 对象的 ICMP 包可达状态 */
 			if (host->stat_finish)
@@ -157,7 +157,7 @@ static int read_ready_fn(ACL_ASTREAM *astream, void *arg,
 		READ_RETURN(0);
 	if (pkt.hdr.type != ICMP_ECHOREPLY)
 		READ_RETURN(0);
-	if (chat->check_id && pkt.body.id != chat->id)
+	if (chat->check_id && pkt.body.gid != chat->gid)
 		READ_RETURN(0);
 
 	/* 读到所需数据，取消该发送包的读超时定时器 */
@@ -169,7 +169,7 @@ static int read_ready_fn(ACL_ASTREAM *astream, void *arg,
 		READ_RETURN(0);
 	}
 
-	icmp_pkt_save(pkt_src, &pkt);
+	icmp_pkt_save_status(pkt_src, &pkt);
 
 	/* 汇报状态 */
 	icmp_stat_report(host, pkt_src);
@@ -177,7 +177,7 @@ static int read_ready_fn(ACL_ASTREAM *astream, void *arg,
 	if (host->ipkt >= host->npkt) {
 		if (host->stat_finish)
 			host->stat_finish(host, host->arg);
-		chat->count++;
+		chat->cnt++;
 		READ_RETURN(0);
 	}
 
@@ -237,7 +237,7 @@ static void icmp_rset(ICMP_CHAT *chat)
 		icmp_host_free(host);
 	}
 
-	chat->count = 0;
+	chat->cnt = 0;
 	acl_ring_init(&chat->host_head);
 }
 
