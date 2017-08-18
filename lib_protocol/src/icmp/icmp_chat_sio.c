@@ -35,7 +35,7 @@ static void read_pkt(ICMP_HOST *host, ICMP_PKT *pkt_src)
 		if (icmp_pkt_unpack(chat->is->from, buf, ret, &pkt) < 0)
 			continue;
 
-		if (pkt.hdr.type != ICMP_ECHOREPLY)
+		if (pkt.hdr.type != ICMP_TYPE_ECHOREPLY)
 			continue;
 		if (pkt.hdr.id != chat->pid)
 			continue;

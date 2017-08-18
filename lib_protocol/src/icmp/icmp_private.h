@@ -17,8 +17,8 @@ void icmp_chat_sio_free(ICMP_CHAT *chat);
 void icmp_chat_sio(ICMP_HOST* host);
 
 /* in icmp_pkt.c */
-void icmp_pkt_client(ICMP_PKT *pkt, ICMP_HOST *host, int type,
-	const void *payload, size_t payload_len);
+void icmp_pkt_client(ICMP_HOST *host, ICMP_PKT *pkt, unsigned char type,
+	unsigned char code, const void *payload, size_t payload_len);
 
 /* in icmp_stat.c */
 void icmp_stat_timeout(ICMP_HOST *host, ICMP_PKT *pkt);

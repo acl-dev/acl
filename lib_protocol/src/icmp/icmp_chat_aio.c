@@ -155,7 +155,7 @@ static int read_ready_fn(ACL_ASTREAM *astream, void *arg,
 		READ_RETURN(0);
 	if (pkt.hdr.id != chat->pid)
 		READ_RETURN(0);
-	if (pkt.hdr.type != ICMP_ECHOREPLY)
+	if (pkt.hdr.type != ICMP_TYPE_ECHOREPLY)
 		READ_RETURN(0);
 	if (chat->check_id && pkt.body.gid != chat->gid)
 		READ_RETURN(0);
