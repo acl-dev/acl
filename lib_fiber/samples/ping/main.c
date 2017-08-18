@@ -28,12 +28,12 @@ static void reply_callback(ICMP_PKT_STATUS *status, void *arg)
 		ICMP_HOST *host = (ICMP_HOST *) arg;
 		const ICMP_PKT *pkt_reply = icmp_pkt_peer(status->pkt);
 		const ICMP_PKT_STATUS *status_reply;
-		char       buf[MAX_PACKET];
+		char       buf[ICMP_MAX_PACKET];
 		size_t     dlen;
 
 		assert(pkt_reply);
 		status_reply = icmp_pkt_status(pkt_reply);
-		dlen = icmp_pkt_data(pkt_reply, buf, sizeof(buf));
+		dlen = icmp_pkt_payload(pkt_reply, buf, sizeof(buf));
 
 		printf("%d bytes reply from %s: seq=%d ttl=%d time=%.2f ms"
 			" code=%d type=%d dlen=%d data=%s\r\n",
@@ -68,9 +68,10 @@ static void finish_callback(ICMP_HOST *host, void *arg acl_unused)
 static void ping_one(const char *ip)
 {
 	ICMP_CHAT *chat = icmp_chat_create(NULL, 1); /* 创建 ICMP 对象 */
-	ICMP_HOST *host = icmp_host_new(chat, ip, ip, __npkt, 64,
-		__delay, __timeout);
+	ICMP_HOST *host = icmp_host_alloc(chat, ip, ip);
 
+	icmp_host_init(host, ICMP_TYPE_ECHO, ICMP_CODE_EXTRA, __npkt, 64,
+		__delay, __timeout);
 	icmp_host_set(host, host, reply_callback, timeout_callback,
 		unreach_callback, finish_callback);
 
@@ -130,7 +131,7 @@ static void usage(const char* progname)
 		" -t timout[milliseconds]\r\n"
 		" -z stack_size\r\n"
 		" -f ip_list_file\r\n"
-		" -s show_result_list[timeout,reply,unreach]\r\n"
+		" -s show_result_list[timeout,reply,unreach,all]\r\n"
 		" -b benchmark [if > 0 dest will be ignored]\r\n"
 		" -n npkt dest1 dest2...\r\n", progname);
 
@@ -146,7 +147,12 @@ static void show_list(const char *s)
 
 	acl_foreach(iter, tokens) {
 		const char *ptr = (const char *) iter.data;
-		if (EQ(ptr, "timeout"))
+
+		if (EQ(ptr, "all")) {
+			__show_timeout = 1;
+			__show_reply = 1;
+			__show_unreach = 1;
+		} else if (EQ(ptr, "timeout"))
 			__show_timeout = 1;
 		else if (EQ(ptr, "reply"))
 			__show_reply = 1;

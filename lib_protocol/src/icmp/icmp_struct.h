@@ -95,7 +95,7 @@ struct ICMP_PKT {
 	ICMP_HDR hdr;                   /**< icmp 头 */
 	union {
 		unsigned int gid;       /**< 进程内唯一ID号 */
-		char data[MAX_PACKET];  /**< icmp 数据体 */
+		char data[ICMP_MAX_PACKET];  /**< icmp 数据体 */
 	} body;
 
 	/********************************************************************/
