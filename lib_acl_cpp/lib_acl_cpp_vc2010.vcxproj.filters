@@ -124,6 +124,9 @@
     <ClCompile Include="src\stdlib\zlib_stream.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\atomic.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
     <ClCompile Include="src\stdlib\charset_conv.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
@@ -769,6 +772,9 @@
       <Filter>include\session</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\zlib_stream.hpp">
+      <Filter>include\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\atomic.hpp">
       <Filter>include\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\charset_conv.hpp">

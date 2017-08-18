@@ -970,6 +970,10 @@
 				Name="stdlib"
 				>
 				<File
+					RelativePath=".\src\stdlib\atomic.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stdlib\charset_conv.cpp"
 					>
 				</File>
@@ -1739,6 +1743,10 @@
 			<Filter
 				Name="stdlib"
 				>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\atomic.hpp"
+					>
+				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\charset_conv.hpp"
 					>
