@@ -1,4 +1,8 @@
 
+57) 2017.8.21
+57.1) feature: fiber_server.c 当在独立运行时也可以通过配置文件指定 master_reuseport
+选项
+
 56) 2017.7.27
 56.1) compile: master_fiber.hpp 中去掉了对 master_base.hpp 的包含，要求应用
 需要首先包含该头文件

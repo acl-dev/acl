@@ -44,6 +44,7 @@ static char *acl_var_fiber_access_allow;
 static char *acl_var_fiber_owner;
 static char *acl_var_fiber_dispatch_addr;
 static char *acl_var_fiber_dispatch_type;
+static char *acl_var_fiber_reuseport;     /* just for stand alone */
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ "fiber_queue_dir", "", &acl_var_fiber_queue_dir },
 	{ "fiber_log_debug", "all:1", &acl_var_fiber_log_debug },
@@ -52,6 +53,7 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ "fiber_owner", "", &acl_var_fiber_owner },
 	{ "fiber_dispatch_addr", "", &acl_var_fiber_dispatch_addr },
 	{ "fiber_dispatch_type", "default", &acl_var_fiber_dispatch_type },
+	{ "master_reuseport", "", &acl_var_fiber_reuseport },
 
 	{ 0, 0, 0 },
 };
@@ -439,11 +441,21 @@ static void server_alone_open(FIBER_SERVER *server, ACL_ARGV *addrs)
 {
 	const char *myname = "server_alone_open";
 	ACL_ITER iter;
+	unsigned flag = ACL_INET_FLAG_NONE;
 	int i = 0;
+
+#define EQ !strcasecmp
+	if (EQ(acl_var_fiber_reuseport, "yes") ||
+		EQ(acl_var_fiber_reuseport, "true") ||
+		EQ(acl_var_fiber_reuseport, "on")) {
+
+		flag |= ACL_INET_FLAG_REUSEPORT;
+	}
 
 	acl_foreach(iter, addrs) {
 		const char* addr = (const char*) iter.data;
-		ACL_VSTREAM* sstream = acl_vstream_listen(addr, 128);
+		ACL_VSTREAM* sstream = acl_vstream_listen_ex(
+				addr, 128, flag, 0, 0);
 		if (sstream == NULL) {
 			acl_msg_error("%s(%d): listen %s error(%s)",
 				myname, __LINE__, addr, acl_last_serror());
