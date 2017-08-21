@@ -106,7 +106,7 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 
 ACL_VSTREAM *acl_vstream_listen(const char *addr, int qlen)
 {
-	return acl_vstream_listen_ex(addr, qlen, ACL_BLOCKING, 0, 0);
+	return acl_vstream_listen_ex(addr, qlen, ACL_INET_FLAG_NONE, 0, 0);
 }
 
 ACL_VSTREAM *acl_vstream_accept_ex(ACL_VSTREAM *listen_stream,
