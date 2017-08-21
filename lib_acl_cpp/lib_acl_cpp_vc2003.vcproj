@@ -385,6 +385,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\src\stdlib\atomic.cpp">
+				</File>
+				<File
 					RelativePath=".\src\stdlib\json.cpp">
 				</File>
 				<File
@@ -1054,6 +1057,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 			<Filter
 				Name="stdlib"
 				Filter="">
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\atomic.hpp">
+				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\charset_conv.hpp">
 				</File>

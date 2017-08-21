@@ -238,7 +238,7 @@ size_t icmp_pkt_payload(const ICMP_PKT *pkt, char *buf, size_t size)
 	if (dlen == 0 || size == 0)
 		return 0;
 
-	/* å¦‚æžœæ£€æµ‹ code å€¼æ˜¯ç§æœ‰å€¼ï¼Œåˆ™ä»…å–é™¤ git å¤–çš„æ•°æ® */
+	/* Èç¹û¼ì²â code ÖµÊÇË½ÓÐÖµ£¬Ôò½öÈ¡³ý git ÍâµÄÊý¾Ý */
 	if (pkt->hdr.code == ICMP_CODE_EXTRA) {
 		if (dlen <= sizeof(pkt->body.gid))
 			return 0;
