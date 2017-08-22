@@ -1038,6 +1038,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stdlib\thread_cond.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\stdlib\thread_mutex.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stdlib\thread_pool.cpp"
 					>
 				</File>
@@ -1821,6 +1829,14 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\thread.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\thread_cond.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\thread_mutex.hpp"
 					>
 				</File>
 				<File

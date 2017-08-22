@@ -424,6 +424,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\stdlib\thread.cpp">
 				</File>
 				<File
+					RelativePath=".\src\stdlib\thread_cond.cpp">
+				</File>
+				<File
+					RelativePath=".\src\stdlib\thread_mutex.cpp">
+				</File>
+				<File
 					RelativePath=".\src\stdlib\thread_pool.cpp">
 				</File>
 				<File
@@ -1116,6 +1122,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\thread.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\thread_cond.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\thread_mutex.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\thread_pool.hpp">
