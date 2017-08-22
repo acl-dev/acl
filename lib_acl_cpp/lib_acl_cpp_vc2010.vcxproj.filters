@@ -376,6 +376,12 @@
     <ClCompile Include="src\stdlib\thread.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\thread_cond.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\thread_mutex.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
     <ClCompile Include="src\stdlib\thread_pool.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
@@ -961,6 +967,12 @@
       <Filter>include\http</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\thread.hpp">
+      <Filter>include\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread_cond.hpp">
+      <Filter>include\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread_mutex.hpp">
       <Filter>include\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\thread_pool.hpp">

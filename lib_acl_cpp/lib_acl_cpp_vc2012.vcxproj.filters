@@ -388,6 +388,12 @@
     <ClCompile Include="src\stdlib\thread.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\thread_cond.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\thread_mutex.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
     <ClCompile Include="src\stdlib\thread_pool.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
@@ -964,6 +970,12 @@
       <Filter>Header Files\master</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\thread.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread_cond.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread_mutex.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\thread_pool.hpp">
