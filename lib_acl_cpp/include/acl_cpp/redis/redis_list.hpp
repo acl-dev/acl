@@ -181,10 +181,10 @@ public:
 	 *  the key of one list
 	 * @param buf {string&} 存储弹出的元素值
 	 *  store the element when successful.
-	 * @return {int} 返回值含义：1 -- 表示成功弹出一个元素，-1 -- 表示出错，或该
-	 *  对象非列表对象，或该对象已经为空
+	 * @return {int} 返回值含义：>0 -- 表示成功弹出一个元素且返回值表示元素的长度，
+	 *  -1 -- 表示出错，或该对象非列表对象，或该对象已经为空
 	 *  return value as below:
-	 *   1: get one element successfully
+	 *   >0: get one element successfully and return the length of element
 	 *  -1: error happened, or the oject is not a list specified
 	 *      by the key, or the list specified by key is empty
 	 */
