@@ -68,7 +68,7 @@ void locker::init_mutex(bool use_spinlock acl_unused)
 #else
 	acl_assert(pthread_mutexattr_init(&mutex_attr_) == 0);
 	acl_assert(pthread_mutexattr_settype(&mutex_attr_,
-				PTHREAD_MUTEX_RECURSIVE) == 0);
+			PTHREAD_MUTEX_RECURSIVE) == 0);
 	acl_assert(acl_pthread_mutex_init(mutex_, &mutex_attr_) == 0);
 #endif
 }
