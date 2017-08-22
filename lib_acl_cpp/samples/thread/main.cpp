@@ -57,6 +57,38 @@ static void test_thread2(void)
 		printf("start thread failed\r\n");
 }
 
+class mythread3 : public acl::thread
+{
+public:
+	mythread3(acl::thread_cond& cond) : cond_(cond) {}
+	~mythread3(void) {}
+
+protected:
+	void* run(void)
+	{
+		int i = 0;
+		while (i++ < 5)
+		{
+			printf("sleep one second\r\n");
+			sleep(1);
+		}
+
+		cond_.notify();
+		return NULL;
+	}
+
+private:
+	acl::thread_cond& cond_;
+};
+
+static void test_thread3(void)
+{
+	acl::thread_cond cond;
+	mythread3 thread(cond);
+	thread.start();
+	printf("wait %s\r\n", cond.wait() ? "ok" : "error");
+}
+
 int main(void)
 {
 	// ³õÊ¼»¯ acl ¿â
@@ -67,6 +99,8 @@ int main(void)
 
 	printf("enter any key to exit ...\r\n");
 	getchar();
+
+	test_thread3();
 
 	return 0;
 }
