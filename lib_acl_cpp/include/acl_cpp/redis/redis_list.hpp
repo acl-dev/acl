@@ -355,11 +355,12 @@ public:
 	 *  the key of the list
 	 * @param buf {string&} 存储弹出的元素值
 	 *  store the element pop from list
-	 * @return {int} 返回值含义：1 -- 表示成功弹出一个元素，-1 -- 表示出错，或该
-	 *  对象非列表对象，或该对象已经为空
-	 *  return as below:
-	 *   1: get a element successfully
-	 *  -1: error happened, or not a list, or the list is empty.
+	 * @return {int} 返回值含义：>0 -- 表示成功弹出一个元素且返回值表示元素的长度，
+	 *  -1 -- 表示出错，或该对象非列表对象，或该对象已经为空
+	 *  return value as below:
+	 *   >0: get one element successfully and return the length of element
+	 *  -1: error happened, or the oject is not a list specified
+	 *      by the key, or the list specified by key is empty
 	 */
 	int rpop(const char* key, string& buf);
 

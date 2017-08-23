@@ -2,11 +2,6 @@
 
 namespace acl {
 
-/**
- * @author wanghaibin@qiyi.com
- * @date   2017-08-16
- */
-
 class bitmap
 {
 public:
