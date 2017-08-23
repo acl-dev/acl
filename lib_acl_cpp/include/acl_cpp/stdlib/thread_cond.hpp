@@ -33,6 +33,7 @@ public:
 	~thread_cond(void);
 
 	bool notify(void);
+	bool notify_all(void);
 	bool wait(long long microseconds = 0);
 
 	thread_mutex& get_mutex(void) const;

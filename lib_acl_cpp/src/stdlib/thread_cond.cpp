@@ -51,6 +51,11 @@ bool thread_cond::notify(void)
 	return acl_pthread_cond_signal(cond_) == 0;
 }
 
+bool thread_cond::notify_all(void)
+{
+	return acl_pthread_cond_broadcast(cond_) == 0;
+}
+
 bool thread_cond::wait(long long microseconds /* = 0 */)
 {
 #define	SEC_TO_NS	1000000000	// nanoseconds per second

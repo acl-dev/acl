@@ -974,6 +974,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stdlib\bitmap.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stdlib\charset_conv.cpp"
 					>
 				</File>
@@ -1753,6 +1757,10 @@
 				>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\atomic.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\bitmap.hpp"
 					>
 				</File>
 				<File

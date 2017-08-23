@@ -124,6 +124,9 @@
     <ClCompile Include="src\stdlib\atomic.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\bitmap.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
     <ClCompile Include="src\stdlib\charset_conv.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
@@ -775,6 +778,9 @@
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\atomic.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\bitmap.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\charset_conv.hpp">
