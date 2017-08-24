@@ -21,6 +21,7 @@ void icmp_pkt_client(ICMP_HOST *host, ICMP_PKT *pkt, unsigned char type,
 	unsigned char code, const void *payload, size_t payload_len);
 
 /* in icmp_stat.c */
+double stamp_sub(const struct timeval *from, const struct timeval *sub);
 void icmp_stat_timeout(ICMP_HOST *host, ICMP_PKT *pkt);
 void icmp_stat_unreach(ICMP_HOST *host, ICMP_PKT *pkt);
 void icmp_stat_report(ICMP_HOST *host, ICMP_PKT *pkt);

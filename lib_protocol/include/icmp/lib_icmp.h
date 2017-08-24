@@ -165,7 +165,7 @@ ICMP_API void icmp_pkt_build(ICMP_PKT *pkt, unsigned short seq);
 ICMP_API void icmp_pkt_save_status(ICMP_PKT* to, const ICMP_PKT* from);
 ICMP_API int  icmp_pkt_unpack(struct sockaddr_in from, const char *buf,
 		int bytes, ICMP_PKT *pkt);
-ICMP_API int  icmp_pkt_check(const ICMP_HOST *host, const ICMP_PKT *pkt);
+ICMP_API ICMP_PKT* icmp_pkt_check(const ICMP_HOST *host, const ICMP_PKT *pkt);
 
 ICMP_API unsigned char  icmp_pkt_type(const ICMP_PKT *pkt);
 ICMP_API unsigned char  icmp_pkt_code(const ICMP_PKT *pkt);
