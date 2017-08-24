@@ -170,13 +170,13 @@ void icmp_pkt_save_status(ICMP_PKT* to, const ICMP_PKT* from)
 ICMP_PKT *icmp_pkt_check(const ICMP_HOST *host, const ICMP_PKT *pkt)
 {
 	int seq = pkt->hdr.seq;
-	if (seq < 0 || (size_t) seq > host->npkt) {
+	if (seq < 0 || (size_t) seq >= host->npkt) {
 		acl_msg_warn("invalid seq %d, discard!", seq);
 		return NULL;
 	}
 
 	if (host->pkts[seq]->pkt_status.status == ICMP_STATUS_INIT)
-		return (host->pkts[seq]);
+		return host->pkts[seq];
 	return NULL;
 }
 
