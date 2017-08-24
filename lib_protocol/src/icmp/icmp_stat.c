@@ -3,7 +3,7 @@
 #include "icmp_private.h"
 #include "icmp/lib_icmp.h"
 
-static double stamp_sub(const struct timeval *from, const struct timeval *sub)
+double stamp_sub(const struct timeval *from, const struct timeval *sub)
 {
 	struct timeval res;
 

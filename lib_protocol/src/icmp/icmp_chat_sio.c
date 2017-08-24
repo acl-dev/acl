@@ -7,9 +7,15 @@ static void read_pkt(ICMP_HOST *host, ICMP_PKT *pkt_src)
 {
 	ICMP_CHAT   *chat   = host->chat;
 	ACL_VSTREAM *stream = host->chat->is->vstream;
-	ICMP_PKT pkt;
+	ICMP_PKT pkt, *ptr;
 	char  buf[2048];
 	int   ret;
+	double cost;
+	struct timeval begin, end;
+
+	gettimeofday(&begin, NULL);
+
+	assert(pkt_src->body.gid == chat->gid);
 
 	while (1) {
 		pkt_src->peer = NULL;
@@ -40,14 +46,27 @@ static void read_pkt(ICMP_HOST *host, ICMP_PKT *pkt_src)
 		if (pkt.hdr.id != chat->pid)
 			continue;
 		if (chat->check_id && pkt.body.gid != chat->gid)
+		{
+			printf("seq%d,src%d,chat%d,gid%d,chat%d,\r\n",
+				(int) pkt.hdr.seq, (int)pkt_src->hdr.seq,
+				(int) chat->seq,
+				(int) pkt.body.gid, (int) chat->gid);
 			continue;
-		if (!icmp_pkt_check(host, &pkt))
+		}
+		if (!(ptr = icmp_pkt_check(host, &pkt)))
 			continue;
+		//assert(ptr == pkt_src);
+		break;
+	}
 
+	gettimeofday(&end, NULL);
+	cost = stamp_sub(&end, &begin);
+	if (cost > host->timeout)
+		icmp_stat_timeout(host, pkt_src);
+	else {
 		icmp_pkt_save_status(pkt_src, &pkt);
 		pkt_src->peer = &pkt;
 		icmp_stat_report(host, pkt_src);
-		break;
 	}
 }
 
@@ -60,8 +79,9 @@ static void send_pkt(ICMP_HOST *host, ICMP_PKT *pkt)
 	/* 指定当前包的目的主机 */
 	chat->is->dest = host->dest;
 
+	chat->seq++;
 	/* 组建发送数据包 */
-	icmp_pkt_build(pkt, chat->seq++);
+	icmp_pkt_build(pkt, chat->seq);
 
 	gettimeofday(&pkt->stamp, NULL);
 
