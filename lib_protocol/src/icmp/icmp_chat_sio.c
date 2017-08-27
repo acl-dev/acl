@@ -15,7 +15,7 @@ static void read_pkt(ICMP_HOST *host, ICMP_PKT *pkt_src)
 
 	gettimeofday(&begin, NULL);
 
-	assert(pkt_src->body.gid == chat->gid);
+	acl_assert(pkt_src->body.gid == chat->gid);
 
 	while (1) {
 		pkt_src->peer = NULL;
@@ -56,7 +56,7 @@ static void read_pkt(ICMP_HOST *host, ICMP_PKT *pkt_src)
 		}
 		ptr = icmp_pkt_check(host, &pkt);
 		if (ptr != NULL) {
-			assert(ptr == pkt_src);
+			acl_assert(ptr == pkt_src);
 			break;
 		}
 	}
