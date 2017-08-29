@@ -33,7 +33,7 @@ ACL_API int acl_mbox_send(ACL_MBOX *mbox, void *msg);
 /**
  * 从消息队列中读取消息
  * @param mbox {ACL_MBOX*} 消息队列对象
- * @param timeout {int} 等待超时时间(秒)
+ * @param timeout {int} 等待超时时间(毫秒级别)
  * @param success {int*} 存储操作是否成功的结果， 0 表示出错，非 0 表示成功
  * @return {void*} 返回读到的消息对象，如果返回 NULL 时还需判断 success 的值，以此来
  *  判断读操作是否成功，如果返回非 NULL 表示成功读到一条消息

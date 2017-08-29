@@ -272,7 +272,7 @@ static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
 	fiber_exit(0);
 }
 
-ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds,
+ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds, size_t size,
 	void (*fn)(ACL_FIBER *, void *), void *ctx)
 {
 	acl_int64 when;
@@ -284,7 +284,7 @@ ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds,
 	SET_TIME(when);
 	when += milliseconds;
 
-	fiber           = acl_fiber_create(fiber_timer_callback, ctx, 64000);
+	fiber           = acl_fiber_create(fiber_timer_callback, ctx, size);
 	fiber->when     = when;
 	fiber->timer_fn = fn;
 	return fiber;

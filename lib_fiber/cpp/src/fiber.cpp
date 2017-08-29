@@ -133,6 +133,24 @@ void fiber::schedule_stop(void)
 	acl_fiber_schedule_stop();
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
+fiber_timer::fiber_timer(void)
+{
+}
+
+void fiber_timer::start(unsigned int milliseconds, size_t stack_size)
+{
+	acl_fiber_create_timer(milliseconds, stack_size, timer_callback, this);
+}
+
+void fiber_timer::timer_callback(ACL_FIBER* f, void* ctx)
+{
+	fiber_timer* me = (fiber_timer *) ctx;
+	me->f_ = f;
+	me->run();
+}
+
 } // namespace acl
 
 //////////////////////////////////////////////////////////////////////////////

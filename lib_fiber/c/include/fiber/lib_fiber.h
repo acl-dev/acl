@@ -163,11 +163,12 @@ unsigned int acl_fiber_sleep(unsigned int seconds);
 /**
  * 创建一个协程用作定时器
  * @param milliseconds {unsigned int} 所创建定时器被唤醒的毫秒数
+ * @param size {size_t} 所创建协程的栈空间大小
  * @param fn {void (*)(ACL_FIBER*, void*)} 定时器协程被唤醒时的回调函数
  * @param ctx {void*} 回调 fn 函数时的第二个参数
  * @return {ACL_FIBER*} 新创建的定时器协程
  */
-ACL_FIBER* acl_fiber_create_timer(unsigned int milliseconds,
+ACL_FIBER* acl_fiber_create_timer(unsigned int milliseconds, size_t size,
 	void (*fn)(ACL_FIBER*, void*), void* ctx);
 
 /**

@@ -38,7 +38,8 @@ static void echo_client(ACL_FIBER *fiber, void *ctx)
 	FIBER_TIMER *ft = (FIBER_TIMER *) acl_mymalloc(sizeof(FIBER_TIMER));
 
 	ft->fiber = fiber;
-	ft->timer = acl_fiber_create_timer(__rw_timeout * 1000, io_timer, ft);
+	ft->timer = acl_fiber_create_timer(__rw_timeout * 1000,
+			320000, io_timer, ft);
 	ft->conn  = cstream;
 
 #define	SOCK ACL_VSTREAM_SOCK
@@ -63,7 +64,7 @@ static void echo_client(ACL_FIBER *fiber, void *ctx)
 
 			printf("ntimeout: %d\r\n", ntimeout);
 			ft->timer = acl_fiber_create_timer(__rw_timeout * 1000,
-					io_timer, ft);
+					320000, io_timer, ft);
 		}
 
 		acl_fiber_reset_timer(ft->timer, __rw_timeout * 1000);

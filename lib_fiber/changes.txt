@@ -1,4 +1,8 @@
 
+58) 2017.8.25
+58.1) feature: 添加 C++ 版本的协程定时器类 fiber_timer
+58.2) feature: acl_fiber_create_timer 中增加协程栈大小参数
+
 57) 2017.8.21
 57.1) feature: fiber_server.c 当在独立运行时也可以通过配置文件指定 master_reuseport
 选项

@@ -117,9 +117,9 @@ public:
 public:
 	/**
 	 * 返回本协程对象对应的 C 语言的协程对象
-	 * @return {ACL_FIBER *}
+	 * @return {ACL_FIBER* }
 	 */
-	ACL_FIBER *get_fiber(void) const;
+	ACL_FIBER* get_fiber(void) const;
 
 protected:
 	/**
@@ -130,9 +130,37 @@ protected:
 	virtual void run(void);
 
 private:
-	ACL_FIBER *f_;
+	ACL_FIBER* f_;
 
-	static void fiber_callback(ACL_FIBER *f, void *ctx);
+	static void fiber_callback(ACL_FIBER* f, void* ctx);
+};
+
+/**
+ * 可用作定时器的协程类
+ */
+class fiber_timer
+{
+public:
+	fiber_timer(void);
+	virtual ~fiber_timer(void) {}
+
+	/**
+	 * 启动一个协程定时器
+	 * @param milliseconds {unsigned int} 毫秒级时间
+	 * @param stack_size {size_t} 协程的栈空间大小
+	 */
+	void start(unsigned int milliseconds, size_t stack_size = 320000);
+
+protected:
+	/**
+	 * 子类必须实现该纯虚方法，当定时器启动时会回调该方法
+	 */
+	virtual void run(void) = 0;
+
+private:
+	ACL_FIBER* f_;
+
+	static void timer_callback(ACL_FIBER* f, void* ctx);
 };
 
 } // namespace acl

@@ -99,7 +99,22 @@ void *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success)
 	}
 
 	mbox->nread++;
-	mbox->in->rw_timeout = timeout;
+
+#ifdef ACL_UNIX
+	if (timeout > 0 && acl_read_poll_wait(
+		ACL_VSTREAM_SOCK(mbox->in), timeout) < 0)
+#else
+	if (timeout > 0 && acl_read_select_wait(
+		ACL_VSTREAM_SOCK(mbox->in), timeout) < 0)
+#endif
+	{
+		if (acl_last_error() == ACL_ETIMEDOUT) {
+			if (success)
+				*success = 1;
+		} else if (success)
+			*success = 0;
+		return NULL;
+	}
 
 	ret = acl_vstream_readn(mbox->in, kbuf, sizeof(kbuf) - 1);
 	if (ret == ACL_VSTREAM_EOF) {
