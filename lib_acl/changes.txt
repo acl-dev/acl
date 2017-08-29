@@ -3,6 +3,7 @@
 ------------------------------------------------------------------------
 605) 2017.8.29
 605.1) feature: acl_mbox.c 中的 acl_mbox_read 函数读超时单位由秒级调整为毫秒级
+605.2) bugfix: acl_aqueue.c 中的 acl_aqueue_pop_timedwait 函数计算超时时间方式有误
 
 604) 2017.8.15
 604.1) feature: 开放 acl_read_xxx_wait 接口，以允许毫秒级读超时等待
