@@ -94,7 +94,7 @@ void icmp_pkt_client(ICMP_HOST *host, ICMP_PKT *pkt, unsigned char type,
 	pkt->pkt_status.rtt    = 65535; /* large enough ? */
 	pkt->pkt_status.status = ICMP_STATUS_INIT;
 
-	pkt->body.gid = host->chat->gid;
+	pkt->body.gid = (unsigned int) host->chat->gid;
 	pkt->host     = host;
 }
 
