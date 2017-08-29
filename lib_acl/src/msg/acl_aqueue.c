@@ -144,19 +144,19 @@ void *acl_aqueue_pop(ACL_AQUEUE *queue)
 	return (acl_aqueue_pop_timedwait(queue, -1, -1));
 }
 
-static int aqueue_wait(ACL_AQUEUE *queue, const struct  timespec *ptimeout)
+static int aqueue_wait(ACL_AQUEUE *queue, const struct  timespec *ptimeo)
 {
 	const char *myname = "aqueue_wait";
 	int   status;
 
 	while (queue->first == NULL && queue->quit == 0) {
-		if (ptimeout != NULL)
+		if (ptimeo != NULL)
 			status = acl_pthread_cond_timedwait(&queue->cond,
-					&queue->lock, ptimeout);
+					&queue->lock, ptimeo);
 		else
 			status = acl_pthread_cond_wait(&queue->cond, &queue->lock);
 
-		if (ptimeout && status == ACL_ETIMEDOUT) {
+		if (ptimeo && status == ACL_ETIMEDOUT) {
 			status = acl_pthread_mutex_unlock(&queue->lock);
 			if (status != 0)
 				acl_msg_error("%s(%d): unlock error(%s)",
@@ -186,7 +186,7 @@ void *acl_aqueue_pop_timedwait(ACL_AQUEUE *queue, int tmo_sec, int tmo_usec)
 	const char *myname = "acl_aqueue_pop_timedwait";
 	ACL_AQUEUE_ITEM *qi;
 	struct  timeval   tv;
-	struct	timespec  timeout, *ptimeout;
+	struct	timespec  timeo, *ptimeo;
 	int   status;
 	void *data;
 
@@ -207,15 +207,17 @@ void *acl_aqueue_pop_timedwait(ACL_AQUEUE *queue, int tmo_sec, int tmo_usec)
 
 	while (1) {
 		if (tmo_sec < 0 || tmo_usec < 0)
-			ptimeout = NULL;
+			ptimeo = NULL;
 		else {
 			gettimeofday(&tv, NULL);
-			timeout.tv_sec = tv.tv_sec + tmo_sec;
-			timeout.tv_nsec = tv.tv_usec * 1000 + tmo_usec * 1000;
-			ptimeout = &timeout;
+			timeo.tv_sec   = tv.tv_sec + tmo_sec;
+			timeo.tv_nsec  = tv.tv_usec * 1000 + tmo_usec * 1000;
+			timeo.tv_sec  += timeo.tv_nsec / 1000000000;
+			timeo.tv_nsec %= 1000000000;
+			ptimeo         = &timeo;
 		}
 
-		if (aqueue_wait(queue, ptimeout) < 0)
+		if (aqueue_wait(queue, ptimeo) < 0)
 			return NULL;
 
 		qi = queue->first;
