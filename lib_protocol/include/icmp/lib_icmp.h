@@ -144,7 +144,7 @@ ICMP_API void icmp_ping_one(ICMP_CHAT *chat, const char *domain,
  */
 
 ICMP_API ICMP_STREAM* icmp_stream_open(ACL_AIO *aio);
-ICMP_API void icmp_stream_close(ICMP_STREAM* is);;
+ICMP_API void icmp_stream_close(ICMP_STREAM* is);
 ICMP_API ACL_VSTREAM *icmp_vstream(ICMP_STREAM *is);
 ICMP_API void icmp_stream_from(ICMP_STREAM *is, struct sockaddr_in *addr);
 ICMP_API void icmp_stream_dest(ICMP_STREAM *is, struct sockaddr_in *addr);
