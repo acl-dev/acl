@@ -130,6 +130,7 @@ packinstall:
 	$(shell mkdir -p $(INC_ACL)/acl)
 	$(shell mkdir -p $(INC_ACL)/acl_cpp)
 	$(shell mkdir -p $(INC_ACL)/protocol)
+	$(shell mkdir -p $(INC_ACL)/fiber)
 	$(shell mkdir -p $(BIN_PATH)/)
 	$(shell mkdir -p $(LIB_ACL)/)
 	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master/)
@@ -137,12 +138,17 @@ packinstall:
 	$(shell mkdir -p ./dist/master/bin/$(RPATH))
 	@(cd app/master/daemon; make install)
 	@(cd app/master/tools/master_ctld; make install)
+	@(cd lib_fiber; make)
 	cp -f app/master/daemon/acl_master $(BIN_PATH)
 	(cd dist/master && ./setup.sh $(DESTDIR) /opt/soft/acl-master)
 	cp -Rf lib_acl/include/* $(INC_ACL)/acl/
 	cp -Rf lib_acl_cpp/include/acl_cpp/* $(INC_ACL)/acl_cpp/
 	cp -Rf lib_protocol/include/* $(INC_ACL)/protocol/
+	cp -f lib_fiber/c/include/fiber/* $(INC_ACL)/fiber/
+	cp -f lib_fiber/cpp/include/fiber/* $(INC_ACL)/fiber/
 	cp -f libacl_all.a $(LIB_ACL)/libacl_all.a
+	cp -f lib_fiber/lib/libfiber.a $(LIB_ACL)/libfiber.a
+	cp -f lib_fiber/lib/libfiber_cpp.a $(LIB_ACL)/libfiber_cpp.a
 #	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
 
 install:
