@@ -1,4 +1,9 @@
 
+11) 2017.9.1
+11.1) 当将 acl 以 rpm 包方式安装后，logger 等宏中的编译警告报警不生效，应是
+编译器自动优化了系统中头文件的处理，现将这些宏重新在 stdafx.h 中定义，从而
+帮助开发者在编译期间尽早发现问题
+
 10) 2016.11.18
 10.1) master_proc.cpp/master_threads.cpp: 在 on_accept 中当 var_cfg_rw_timeout > 0
 时，将套接口设为非阻塞模式，以防止写超时

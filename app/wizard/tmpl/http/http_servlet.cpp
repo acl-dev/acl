@@ -4,16 +4,14 @@
 http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session)
 : acl::HttpServlet(stream, session)
 {
-
+	handlers_["/hello"] = &http_servlet::on_hello;
 }
 
 http_servlet::~http_servlet(void)
 {
-
 }
 
-bool http_servlet::doError(acl::HttpServletRequest&,
-	acl::HttpServletResponse& res)
+bool http_servlet::doError(request_t&, response_t& res)
 {
 	res.setStatus(400);
 	res.setContentType("text/xml; charset=utf-8");
@@ -26,8 +24,7 @@ bool http_servlet::doError(acl::HttpServletRequest&,
 	return false;
 }
 
-bool http_servlet::doOther(acl::HttpServletRequest&,
-	acl::HttpServletResponse& res, const char* method)
+bool http_servlet::doOther(request_t&, response_t& res, const char* method)
 {
 	res.setStatus(400);
 	res.setContentType("text/xml; charset=utf-8");
@@ -39,14 +36,12 @@ bool http_servlet::doOther(acl::HttpServletRequest&,
 	return false;
 }
 
-bool http_servlet::doGet(acl::HttpServletRequest& req,
-	acl::HttpServletResponse& res)
+bool http_servlet::doGet(request_t& req, response_t& res)
 {
 	return doPost(req, res);
 }
 
-bool http_servlet::doPost(acl::HttpServletRequest& req,
-	acl::HttpServletResponse& res)
+bool http_servlet::doPost(request_t& req, response_t& res)
 {
 	// 如果需要 http session 控制，请打开下面注释，且需要保证
 	// 在 master_service.cpp 的函数 thread_on_read 中设置的
@@ -63,6 +58,18 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	$<GET_COOKIES>
 	*/
 
+	const char* path = req.getPathInfo();
+	handler_t handler = path && *path ? handlers_[path] : NULL;
+	return handler ? (this->*handler)(req, res) : on_default(req, res);
+}
+
+bool http_servlet::on_default(request_t& req, response_t& res)
+{
+	return on_hello(req, res);
+}
+
+bool http_servlet::on_hello(request_t& req, response_t& res)
+{
 	res.setContentType("text/xml; charset=utf-8")	// 设置响应字符集
 		.setKeepAlive(req.isKeepAlive())	// 设置是否保持长连接
 		.setContentEncoding(true)		// 自动支持压缩传输
