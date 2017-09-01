@@ -8,42 +8,42 @@
 namespace acl
 {
 
-static void free_callback(void *ctx)
-{
-	mbox* o = (mbox*) ctx;
-	delete o;
-}
-
-mbox::mbox(void)
+template<typename T>
+mbox<T>::mbox(void)
 {
 	mbox_ = acl_mbox_create();
 }
 
-mbox::~mbox(void)
+template<typename T>
+mbox<T>::~mbox(void)
 {
-	acl_mbox_free(mbox_, free_callback);
+	acl_mbox_free(mbox_, NULL);
 }
 
-bool mbox::push(mobj* o)
+template<typename T>
+bool mbox<T>::push_one(void* o)
 {
 	return acl_mbox_send(mbox_, o) == 0;
 }
 
-mobj* mbox::pop(int timeout /* = 0 */, bool* success /* = NULL */)
+template<typename T>
+void* mbox<T>::pop_one(int timeout /* = 0 */, bool* success /* = NULL */)
 {
 	int ok;
-	mobj* o = (mobj*) acl_mbox_read(mbox_, timeout, &ok);
+	void* o = (void*) acl_mbox_read(mbox_, timeout, &ok);
 	if (success)
 		*success = ok ? true : false;
 	return o;
 }
 
-size_t mbox::push_count(void) const
+template<typename T>
+size_t mbox<T>::push_count(void) const
 {
 	return acl_mbox_nsend(mbox_);
 }
 
-size_t mbox::pop_count(void) const
+template<typename T>
+size_t mbox<T>::pop_count(void) const
 {
 	return acl_mbox_nread(mbox_);
 }

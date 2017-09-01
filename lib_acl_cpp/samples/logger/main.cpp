@@ -3,7 +3,8 @@
 
 int main(void)
 {
-	logger_open("test.log", "logger", "all:1");
+	acl::log::stdout_open(true);
+	logger_open("test.log", "logger", "101->DEBUG_TEST1:1");
 
 	logger("logger opened!");
 	acl::log::logger_test1();

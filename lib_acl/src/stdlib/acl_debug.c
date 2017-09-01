@@ -4,6 +4,7 @@
 #include "stdlib/acl_define.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #ifdef ACL_BCB_COMPILER
 #pragma hdrstop
@@ -60,6 +61,7 @@ void acl_debug_init2(const char *str, int max_debug_level)
 		__debug_levels[i] = 0;
 
 	for (i = 0; i < tokens->argc; i++) {
+		size_t n;
 		char* ptr = tokens->argv[i];
 		ACL_ARGV* pair = acl_argv_split(ptr, ":");
 		if (pair->argc != 2) {
@@ -72,6 +74,10 @@ void acl_debug_init2(const char *str, int max_debug_level)
 			acl_argv_free(pair);
 			continue;
 		}
+
+		ptr = pair->argv[0];
+		n = strcspn(ptr, "->|,;.@{}[]<>#$%^&()+*!");
+		ptr[n] = 0;
 
 		section = atoi(pair->argv[0]);
 		level = atoi(pair->argv[1]);
