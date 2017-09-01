@@ -91,44 +91,79 @@ private:
 	long long n_;
 };
 
+#include "thread.hpp"
+
 class atomic_long_test
 {
+private:
+	atomic_long count_;
 public:
 	atomic_long_test(void) {}
 	~atomic_long_test(void) {}
 
 	void run(void)
 	{
-		atomic_long count;
-		long long n = count++;
+		
+		long long n = count_++;
 		printf(">>n=%lld\r\n", n);
 
-		n = count;
+		n = count_;
 		printf(">>n=%lld\r\n", n);
 
-		n = ++count;
+		n = ++count_;
 		printf(">>n=%lld\r\n", n);
 
-		n = --count;
+		n = --count_;
 		printf(">>n=%lld\r\n", n);
 
-		n = count--;
+		n = count_--;
 		printf(">>n=%lld\r\n", n);
 
-		n = count;
+		n = count_;
 		printf(">>n=%lld\r\n", n);
 
-		count -= 1;
-		n = count;
+		count_ -= 1;
+		n = count_;
 		printf(">>n=%lld\r\n", n);
 
-		printf(">>count > 1 ? %s\r\n", count >= 1 ? "yes" : "no");
-		printf(">>1 > count ? %s\r\n", 1 > count ? "yes" : "no");
+		printf(">>count > 1 ? %s\r\n", count_ >= 1 ? "yes" : "no");
+		printf(">>1 > count ? %s\r\n", 1 > count_ ? "yes" : "no");
 
 		int i = 1;
-		count = i;
-		n = count;
+		count_ = i;
+		n = count_;
 		printf(">>n=%lld\r\n", n);
+	}
+
+	static void test(void)
+	{
+		class mythread : public thread
+		{
+		public:
+			mythread(atomic_long_test& alt) : alt_(alt) {}
+			~mythread(void) {}
+		protected:
+			void* run(void)
+			{
+				for (size_t i = 0; i < 100; i++)
+					alt_.run();
+				return NULL;
+			}
+		private:
+			atomic_long_test& alt_;
+		};
+
+		atomic_long_test alt;
+		mythread thr1(alt), thr2(alt), thr3(alt);
+		thr1.set_detachable(false);
+		thr2.set_detachable(false);
+		thr3.set_detachable(false);
+		thr1.start();
+		thr2.start();
+		thr3.start();
+		thr1.wait();
+		thr2.wait();
+		thr3.wait();
 	}
 };
 
