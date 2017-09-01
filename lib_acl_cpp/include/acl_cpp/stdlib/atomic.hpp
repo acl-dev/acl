@@ -3,6 +3,14 @@
 
 struct ACL_ATOMIC;
 
+extern "C" {
+extern ACL_ATOMIC *acl_atomic_new(void);
+extern void  acl_atomic_free(ACL_ATOMIC *self);
+extern void  acl_atomic_set(ACL_ATOMIC *self, void *value);
+extern void *acl_atomic_cas(ACL_ATOMIC *self, void *cmp, void *value);
+extern void *acl_atomic_xchg(ACL_ATOMIC *self, void *value);
+}
+
 namespace acl
 {
 
@@ -10,12 +18,26 @@ template<typename T>
 class atomic
 {
 public:
-	atomic(T* t);
+	atomic(T* t)
+	{
+		atomic_ = acl_atomic_new();
+		acl_atomic_set(atomic_, t);
+	}
 
-	virtual ~atomic(void);
+	virtual ~atomic(void)
+	{
+		acl_atomic_free(atomic_);
+	}
 
-	T* cas(T* cmp, T* val);
-	T* xchg(T* val);
+	T* cas(T* cmp, T* val)
+	{
+		return (T*) acl_atomic_cas(atomic_, cmp, val);
+	}
+
+	T* xchg(T* val)
+	{
+		return (T*) acl_atomic_xchg(atomic_, val);
+	}
 
 protected:
 	ACL_ATOMIC* atomic_;

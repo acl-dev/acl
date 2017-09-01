@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 	if (argc == 2 && strcasecmp(argv[1], "test") == 0) {
 		service_test();
 	} else {
-		acl_ioctl_app_main(argc, argv, service_main, NULL,
+		acl_threads_server_main(argc, argv, service_main, NULL,
 				ACL_APP_CTL_INIT_FN, service_init,
 				ACL_APP_CTL_EXIT_FN, service_exit,
 				ACL_APP_CTL_CFG_BOOL, var_conf_bool_tab,

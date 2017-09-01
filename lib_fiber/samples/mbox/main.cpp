@@ -48,6 +48,7 @@ private:
 	myobj& o_;
 };
 
+		acl::atomic_long c;
 class myfiber : public acl::fiber
 {
 public:
@@ -65,7 +66,6 @@ protected:
 		thr.start();
 
 		myobj* o = mb_.pop();
-//		myobj* o = (myobj*) mb_.pop();
 		assert(o == &mo);
 		printf("fiber-%u: result = %d\r\n", get_id(), o->get_result());
 
