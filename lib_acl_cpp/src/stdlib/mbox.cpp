@@ -12,13 +12,12 @@ void* mbox_create(void)
 {
 	return acl_mbox_create();
 }
-/*
-template<typename T>
-void mbox::mbox_free(void* mbox, void (*free_fn)(void*))
+
+void mbox_free(void* mbox, void (*free_fn)(void*))
 {
-	acl_mbox_free(ACL_MBOX*) mbox, free_fn);
+	acl_mbox_free((ACL_MBOX*) mbox, free_fn);
 }
-*/
+
 bool mbox_send(void* mbox, void* o)
 {
 	return acl_mbox_send((ACL_MBOX*) mbox, o) == 0;
