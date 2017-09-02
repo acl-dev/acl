@@ -4,6 +4,13 @@
 namespace acl
 {
 
+// internal functions being used
+void* atomic_new(void);
+void  atomic_free(void*);
+void  atomic_set(void*, void*);
+void* atomic_cas(void*, void*, void*);
+void* atomic_xchg(void*, void*);
+
 template<typename T>
 class atomic
 {
@@ -102,13 +109,6 @@ public:
 private:
 	long long n_;
 };
-
-// internal functions being used
-void* atomic_new(void);
-void  atomic_free(void*);
-void  atomic_set(void*, void*);
-void* atomic_cas(void*, void*, void*);
-void* atomic_xchg(void*, void*);
 
 #include "thread.hpp"
 

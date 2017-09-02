@@ -5,6 +5,14 @@
 namespace acl
 {
 
+// internal functions being used
+void*  mbox_create(void);
+void   mbox_free(void*, void (*free_fn)(void*));
+bool   mbox_send(void*, void*);
+void*  mbox_read(void*, int, bool*);
+size_t mbox_nsend(void*);
+size_t mbox_nread(void*);
+
 template<typename T>
 class mbox
 {
@@ -69,13 +77,5 @@ private:
 		delete t;
 	}
 };
-
-// internal functions being used
-void*  mbox_create(void);
-void   mbox_free(void*, void (*free_fn)(void*));
-bool   mbox_send(void*, void*);
-void*  mbox_read(void*, int, bool*);
-size_t mbox_nsend(void*);
-size_t mbox_nread(void*);
 
 } // namespace acl
