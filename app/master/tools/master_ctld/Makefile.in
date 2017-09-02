@@ -23,7 +23,7 @@ ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DFREEBSD -D_REENTRANT
-	SYSLIB = -lcrypt -lpthread -ldl
+	SYSLIB = -lcrypt -lpthread -lz -L/usr/local/lib -liconv
 endif
 
 # For Darwin
@@ -113,12 +113,17 @@ OBJ_PATH = ./debug
 $(shell mkdir -p $(OBJ_PATH))
 
 #Project's objs
-SRC = $(wildcard *.cpp) $(wildcard $(JSON_PATH)/*.cpp) $(wildcard */*.cpp)
+SRC = $(wildcard *.cpp) \
+	$(wildcard $(JSON_PATH)/*.cpp) \
+	$(wildcard main/*.cpp) \
+	$(wildcard action/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 
 $(OBJ_PATH)/%.o: %.cpp
 	$(COMPILE) $< -o $@
-$(OBJ_PATH)/%.o: */%.cpp
+$(OBJ_PATH)/%.o: main/%.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: action/%.cpp
 	$(COMPILE) $< -o $@
 $(OBJ_PATH)/%.o: $(JSON_PATH)/%.cpp
 	$(COMPILE) $< -o $@
