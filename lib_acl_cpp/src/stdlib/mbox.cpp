@@ -8,44 +8,38 @@
 namespace acl
 {
 
-static void free_callback(void *ctx)
+void* mbox_create(void)
 {
-	mbox* o = (mbox*) ctx;
-	delete o;
+	return acl_mbox_create();
 }
 
-mbox::mbox(void)
+void mbox_free(void* mbox, void (*free_fn)(void*))
 {
-	mbox_ = acl_mbox_create();
+	acl_mbox_free((ACL_MBOX*) mbox, free_fn);
 }
 
-mbox::~mbox(void)
+bool mbox_send(void* mbox, void* o)
 {
-	acl_mbox_free(mbox_, free_callback);
+	return acl_mbox_send((ACL_MBOX*) mbox, o) == 0;
 }
 
-bool mbox::push(mobj* o)
-{
-	return acl_mbox_send(mbox_, o) == 0;
-}
-
-mobj* mbox::pop(int timeout /* = 0 */, bool* success /* = NULL */)
+void* mbox_read(void* mbox, int timeout, bool* success)
 {
 	int ok;
-	mobj* o = (mobj*) acl_mbox_read(mbox_, timeout, &ok);
+	void* o = (void*) acl_mbox_read((ACL_MBOX*) mbox, timeout, &ok);
 	if (success)
 		*success = ok ? true : false;
 	return o;
 }
 
-size_t mbox::push_count(void) const
+size_t mbox_nsend(void* mbox)
 {
-	return acl_mbox_nsend(mbox_);
+	return acl_mbox_nsend((ACL_MBOX*) mbox);
 }
 
-size_t mbox::pop_count(void) const
+size_t mbox_nread(void* mbox)
 {
-	return acl_mbox_nread(mbox_);
+	return acl_mbox_nread((ACL_MBOX*) mbox);
 }
 
-} // namespace acl
+}

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-class myobj : public acl::mobj
+class myobj
 {
 public:
 	myobj(void) : n_(0) {}
@@ -31,7 +31,7 @@ private:
 class mythread : public acl::thread
 {
 public:
-	mythread(acl::mbox& mb, myobj& o) : mb_(mb), o_(o) {}
+	mythread(acl::mbox<myobj>& mb, myobj& o) : mb_(mb), o_(o) {}
 	~mythread(void) {}
 
 protected:
@@ -44,10 +44,11 @@ protected:
 	}
 
 private:
-	acl::mbox& mb_;
+	acl::mbox<myobj>& mb_;
 	myobj& o_;
 };
 
+		acl::atomic_long c;
 class myfiber : public acl::fiber
 {
 public:
@@ -64,7 +65,7 @@ protected:
 		mythread thr(mb_, mo);
 		thr.start();
 
-		myobj* o = (myobj*) mb_.pop();
+		myobj* o = mb_.pop();
 		assert(o == &mo);
 		printf("fiber-%u: result = %d\r\n", get_id(), o->get_result());
 
@@ -73,7 +74,7 @@ protected:
 	}
 
 private:
-	acl::mbox mb_;
+	acl::mbox<myobj> mb_;
 	acl::fiber_sem& sem_;
 };
 

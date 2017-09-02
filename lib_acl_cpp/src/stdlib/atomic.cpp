@@ -6,52 +6,52 @@
 namespace acl
 {
 
-template<typename T>
-atomic<T>::atomic(T* t)
+void* atomic_new(void)
 {
-	atomic_ = acl_atomic_new();
-	acl_atomic_set(atomic_, t);
+	return acl_atomic_new();
 }
 
-template<typename T>
-atomic<T>::~atomic(void)
+void  atomic_free(void* atomic)
 {
-	acl_atomic_free(atomic_);
+	acl_atomic_free((ACL_ATOMIC*) atomic);
 }
 
-template<typename T>
-T* atomic<T>::cas(T* cmp, T* val)
+void  atomic_set(void* atomic, void* value)
 {
-	return (T*) acl_atomic_cas(atomic_, cmp, val);
+	acl_atomic_set((ACL_ATOMIC*) atomic, value);
 }
 
-template<typename T>
-T* atomic<T>::xchg(T* val)
+void* atomic_cas(void* atomic, void* cmp, void* value)
 {
-	return (T*) acl_atomic_xchg(atomic_, val);
+	return acl_atomic_cas((ACL_ATOMIC*) atomic, cmp, value);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+void* atomic_xchg(void* atomic, void* value)
+{
+	return acl_atomic_xchg((ACL_ATOMIC*) atomic, value);
+}
+
+/////////////////////////////////////////////////////////////////////////////
 
 atomic_long::atomic_long(long long n)
 : atomic<long long>(&n_)
 {
-	acl_atomic_int64_set(atomic_, n);
+	acl_atomic_int64_set((ACL_ATOMIC*) atomic_, n);
 }
 
 void atomic_long::set(long long n)
 {
-	acl_atomic_int64_set(atomic_, n);
+	acl_atomic_int64_set((ACL_ATOMIC*) atomic_, n);
 }
 
 long long atomic_long::fetch_add(long long n)
 {
-	return acl_atomic_int64_fetch_add(atomic_, n);
+	return acl_atomic_int64_fetch_add((ACL_ATOMIC*) atomic_, n);
 }
 
 long long atomic_long::add_fetch(long long n)
 {
-	return acl_atomic_int64_add_fetch(atomic_, n);
+	return acl_atomic_int64_add_fetch((ACL_ATOMIC*) atomic_, n);
 }
 
 } // namespace acl
