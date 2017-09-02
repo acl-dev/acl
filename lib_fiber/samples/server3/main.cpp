@@ -55,9 +55,8 @@ protected:
 			printf("accept ok, fd: %d\r\n", conn->sock_handle());
 			// create one fiber for one connection
 			fiber_client* fc = new fiber_client(conn);
-			// start the fiber
+			// start the client fiber
 			fc->start();
-			continue;
 		}
 	}
 
@@ -105,6 +104,5 @@ int main(int argc, char *argv[])
 	fs.start();		// start listen fiber
 
 	acl::fiber::schedule();	// start fiber schedule
-
 	return 0;
 }
