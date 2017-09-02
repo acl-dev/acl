@@ -48,7 +48,6 @@ private:
 	myobj& o_;
 };
 
-		acl::atomic_long c;
 class myfiber : public acl::fiber
 {
 public:
