@@ -13,6 +13,40 @@ void*  mbox_read(void*, int, bool*);
 size_t mbox_nsend(void*);
 size_t mbox_nread(void*);
 
+/**
+ * 可用于在线程之间、协程之间进行通信的类，内部实现采用无锁队列 + IO 通信相
+ * 结合方式实现
+ *
+ * 示例:
+ *
+ * class myobj
+ * {
+ * public:
+ *     myobj(void) {}
+ *     ~myobj(void) {}
+ *     
+ *     void run(void)
+ *     {
+ *         printf("hello world!\r\n");
+ *     }
+ * };
+ * 
+ * acl::mbox<myobj> mbox;
+ *
+ * void thread_producer(void)
+ * {
+ *     myobj* o = new myobj;
+ *     mbox.push(o);
+ * }
+ * 
+ * void thread_consumer(void)
+ * {
+ *     myobj* o = mbox.pop();
+ *     o->run();
+ *     delete o;
+ * }
+ */
+
 template<typename T>
 class mbox
 {

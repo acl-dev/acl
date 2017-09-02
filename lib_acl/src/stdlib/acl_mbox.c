@@ -78,8 +78,7 @@ int acl_mbox_send(ACL_MBOX *mbox, void *msg)
 	mbox->nsend++;
 
 	if (acl_vstream_writen(mbox->out, __key, sizeof(__key) - 1)
-		== ACL_VSTREAM_EOF)
-	{
+		== ACL_VSTREAM_EOF) {
 		return -1;
 	} else
 		return 0;
