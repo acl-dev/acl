@@ -1,16 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 
-struct ACL_ATOMIC;
-
-extern "C" {
-extern ACL_ATOMIC *acl_atomic_new(void);
-extern void  acl_atomic_free(ACL_ATOMIC *self);
-extern void  acl_atomic_set(ACL_ATOMIC *self, void *value);
-extern void *acl_atomic_cas(ACL_ATOMIC *self, void *cmp, void *value);
-extern void *acl_atomic_xchg(ACL_ATOMIC *self, void *value);
-}
-
 namespace acl
 {
 
@@ -20,27 +10,27 @@ class atomic
 public:
 	atomic(T* t)
 	{
-		atomic_ = acl_atomic_new();
-		acl_atomic_set(atomic_, t);
+		atomic_ = atomic_new();
+		atomic_set(atomic_, t);
 	}
 
 	virtual ~atomic(void)
 	{
-		acl_atomic_free(atomic_);
+		atomic_free(atomic_);
 	}
 
 	T* cas(T* cmp, T* val)
 	{
-		return (T*) acl_atomic_cas(atomic_, cmp, val);
+		return (T*) atomic_cas(atomic_, cmp, val);
 	}
 
 	T* xchg(T* val)
 	{
-		return (T*) acl_atomic_xchg(atomic_, val);
+		return (T*) atomic_xchg(atomic_, val);
 	}
 
 protected:
-	ACL_ATOMIC* atomic_;
+	void* atomic_;
 };
 
 class atomic_long : public atomic<long long>
@@ -113,6 +103,13 @@ private:
 	long long n_;
 };
 
+// internal functions being used
+void* atomic_new(void);
+void  atomic_free(void*);
+void  atomic_set(void*, void*);
+void* atomic_cas(void*, void*, void*);
+void* atomic_xchg(void*, void*);
+
 #include "thread.hpp"
 
 class atomic_long_test
@@ -157,26 +154,26 @@ public:
 		printf(">>n=%lld\r\n", n);
 	}
 
+	class mythread : public thread
+	{
+	public:
+		mythread(atomic_long_test& at) : at_(at) {}
+		~mythread(void) {}
+	protected:
+		void* run(void)
+		{
+			for (size_t i = 0; i < 100; i++)
+				at_.run();
+			return NULL;
+		}
+	private:
+		atomic_long_test& at_;
+	};
+
 	static void test(void)
 	{
-		class mythread : public thread
-		{
-		public:
-			mythread(atomic_long_test& alt) : alt_(alt) {}
-			~mythread(void) {}
-		protected:
-			void* run(void)
-			{
-				for (size_t i = 0; i < 100; i++)
-					alt_.run();
-				return NULL;
-			}
-		private:
-			atomic_long_test& alt_;
-		};
-
-		atomic_long_test alt;
-		mythread thr1(alt), thr2(alt), thr3(alt);
+		atomic_long_test at;
+		mythread thr1(at), thr2(at), thr3(at);
 		thr1.set_detachable(false);
 		thr2.set_detachable(false);
 		thr3.set_detachable(false);

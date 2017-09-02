@@ -2,19 +2,6 @@
 #include "../acl_cpp_define.hpp"
 #include "noncopyable.hpp"
 
-// just forward declare functions which are in lib_acl.a
-
-struct ACL_MBOX;
-
-extern "C" {
-extern ACL_MBOX *acl_mbox_create(void);
-extern void   acl_mbox_free(ACL_MBOX *mbox, void (*free_fn)(void*));
-extern int    acl_mbox_send(ACL_MBOX *mbox, void *msg);
-extern void  *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success);
-extern size_t acl_mbox_nsend(ACL_MBOX *mbox);
-extern size_t acl_mbox_nread(ACL_MBOX *mbox);
-}
-
 namespace acl
 {
 
@@ -24,12 +11,12 @@ class mbox
 public:
 	mbox(void)
 	{
-		mbox_ = acl_mbox_create();
+		mbox_ = mbox_create();
 	}
 
 	~mbox(void)
 	{
-		acl_mbox_free(mbox_, mbox_free_fn);
+		mbox_free(mbox_, mbox_free_fn);
 	}
 
 	/**
@@ -39,7 +26,7 @@ public:
 	 */
 	bool push(T* t)
 	{
-		return acl_mbox_send(mbox_, t) == 0;
+		return mbox_send(mbox_, t);
 	}
 
 	/**
@@ -52,11 +39,7 @@ public:
 	 */
 	T* pop(int timeout = 0, bool* success = NULL)
 	{
-		int ok;
-		void* o = (void*) acl_mbox_read(mbox_, timeout, &ok);
-		if (success)
-			*success = ok ? true : false;
-		return (T*) o;
+		return (T*) mbox_read(mbox_, timeout, success);
 	}
 
 	/**
@@ -65,7 +48,7 @@ public:
 	 */
 	size_t push_count(void) const
 	{
-		return acl_mbox_nsend(mbox_);
+		return mbox_nsend(mbox_);
 	}
 
 	/**
@@ -74,11 +57,11 @@ public:
 	 */
 	size_t pop_count(void) const
 	{
-		return acl_mbox_nread(mbox_);
+		return mbox_nread(mbox_);
 	}
 
 private:
-	ACL_MBOX* mbox_;
+	void* mbox_;
 
 	static void mbox_free_fn(void* o)
 	{
@@ -86,5 +69,13 @@ private:
 		delete t;
 	}
 };
+
+// internal functions being used
+void*  mbox_create(void);
+void   mbox_free(void*, void (*free_fn)(void*));
+bool   mbox_send(void*, void*);
+void*  mbox_read(void*, int, bool*);
+size_t mbox_nsend(void*);
+size_t mbox_nread(void*);
 
 } // namespace acl
