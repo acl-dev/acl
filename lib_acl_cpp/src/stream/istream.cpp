@@ -151,7 +151,7 @@ bool istream::gets(string& s, bool nonl /* = true */, size_t max /* = 0 */)
 			if (size == 0)
 				break;
 
-			printf(">>>size: %d\r\n", (int) size);
+//			printf(">>>size: %d\r\n", (int) size);
 			s.append(buf, size);
 		}
 
