@@ -62,7 +62,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libmysql.lib"
 				OutputFile="$(OutDir)/mysql.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\win32;..\..\..\dist\lib\win32"
@@ -93,7 +92,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\..\lib\win32\libmysql.dll $(OutDir)\ /Y&#x0D;&#x0A;"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -297,7 +296,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libmysql.lib"
 				OutputFile="$(OutDir)/mysql.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\win32"
@@ -328,7 +326,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\..\lib\win32\libmysql.dll $(OutDir)\ /Y&#x0D;&#x0A;"
+				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>

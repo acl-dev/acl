@@ -62,7 +62,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sqlite3.lib libmysql.lib"
 				OutputFile="$(OutDir)/db_service.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\win32;..\..\..\dist\lib\win32"
@@ -140,7 +139,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sqlite3.lib"
 				OutputFile="$(OutDir)/db_service.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib\win32;..\..\..\dist\lib\win32"
