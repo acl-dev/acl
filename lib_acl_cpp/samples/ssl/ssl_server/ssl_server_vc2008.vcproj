@@ -62,7 +62,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="polarssl.lib"
 				OutputFile="$(OutDir)/ssl_server.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32"
@@ -140,7 +139,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="polarssl.lib"
 				OutputFile="$(OutDir)/ssl_server.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\lib\win32;..\..\..\..\dist\lib\win32"
@@ -403,4 +401,6 @@
 			>
 		</File>
 	</Files>
+	<Globals>
+	</Globals>
 </VisualStudioProject>

@@ -62,7 +62,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sqlite3.lib"
 				OutputFile="$(OutDir)/sqlite.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\win32;..\..\..\dist\lib\win32"
@@ -93,7 +92,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\..\lib\win32\sqlite3.dll $(OutDir)\ /Y&#x0D;&#x0A;copy ..\..\..\lib\win32\iconv.dll $(OutDir)\ /Y&#x0D;&#x0A;"
+				CommandLine="&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -140,7 +139,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sqlite3.lib"
 				OutputFile="$(OutDir)/sqlite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib\win32;..\..\..\dist\lib\win32"
@@ -172,7 +170,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\..\lib\win32\sqlite3.dll $(OutDir)\ /Y&#x0D;&#x0A;copy ..\..\..\lib\win32\iconv.dll $(OutDir)\ /Y&#x0D;&#x0A;"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -222,7 +220,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sqlite3.lib"
 				OutputFile="$(OutDir)/sqlite.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\win32"
@@ -302,7 +299,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sqlite3.lib"
 				OutputFile="$(OutDir)/sqlite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib\win32"
