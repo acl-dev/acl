@@ -171,10 +171,18 @@ static void master_sigdeath(int sig)
 	action.sa_handler = SIG_IGN;
 	if (sigaction(SIGTERM, &action, (struct sigaction *) 0) < 0)
 		acl_msg_fatal("%s: sigaction: %s", myname, strerror(errno));
-	if (pid <= 1) { /* in docker the master's pid is 1 */
+
+#define	EQ	!strcasecmp
+
+	if (EQ(acl_var_master_waiting_on_stop, "true")
+		|| EQ(acl_var_master_waiting_on_stop, "yes")
+		|| EQ(acl_var_master_waiting_on_stop, "on")
+		|| pid <= 1) { /* in docker the master's pid is 1 */
+
 		acl_master_delete_all_children();
 	} else if (kill(-pid, SIGTERM) < 0) {
-		acl_msg_error("%s: kill process group: %s", myname, strerror(errno));
+		acl_msg_error("%s: kill process group(-%ld): %s",
+			myname, (long) pid, strerror(errno));
 		exit (1);
 	}
 

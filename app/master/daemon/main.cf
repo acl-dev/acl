@@ -5,6 +5,8 @@ default_process_limit = 250
 # 用户属主
 owner_user = root
 master_owner = root
+# 当停止 master 时是否等待所有子进程退出
+waiting_on_stop = true
 # 组主
 owner_group = root
 # 如果子进程服务异常退出，重启该子进程服务的时间间隔(秒)

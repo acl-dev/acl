@@ -1,4 +1,8 @@
 
+6) 2017.9.5
+6.1) feature: master can wait children to exit with sync or async
+6.2) feature: master can kill SIGTERM children when reloading
+
 5) 2017.8.11
 5.1) safety: master can't fatal for some configure error of any app service.
 

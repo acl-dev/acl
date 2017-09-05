@@ -42,6 +42,7 @@ char *acl_var_master_service_dir;
 char *acl_var_master_log_file;
 char *acl_var_master_pid_file;
 char *acl_var_master_manage_addr;
+char *acl_var_master_waiting_on_stop;
 
 static ACL_CONFIG_STR_TABLE str_tab[] = {
 	{ ACL_VAR_MASTER_INET_INTERFACES, ACL_DEF_MASTER_INET_INTERFACES,
@@ -60,6 +61,8 @@ static ACL_CONFIG_STR_TABLE str_tab[] = {
 		&acl_var_master_pid_file },
 	{ ACL_VAR_MASTER_MANAGE_ADDR, ACL_DEF_MASTER_MANAGE_ADDR,
 		&acl_var_master_manage_addr },
+	{ ACL_VAR_MASTER_WAITING_ON_STOP, ACL_DEF_MASTER_WAITING_ON_STOP,
+		&acl_var_master_waiting_on_stop },
 
 	{ 0, 0, 0 },
 };

@@ -70,7 +70,7 @@ static void server_sigterm(int sig acl_unused)
 
 	for (; i < max; i++)
 		close(i);
-	acl_doze(100);
+	acl_doze(100); /* just sleep 100 ms for release fd by OS system ! */
 	exit(0);
 }
 

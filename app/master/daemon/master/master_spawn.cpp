@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <signal.h>
-#include <stdarg.h>
-#include <syslog.h>
 #include <errno.h>
 #include <string.h>
 
@@ -69,11 +67,10 @@ static void master_throttle(ACL_MASTER_SERV *serv)
 	/*
 	 * Perhaps the command to be run is defective,
 	 * perhaps some configuration is wrong, or
-	 * perhaps the system is out of resources. Disable further
-	 * process creation attempts for a while.
+	 * perhaps the system is out of resources.
+	 * Disable further process creation attempts for a while.
 	 */
 	if ((serv->flags & ACL_MASTER_FLAG_THROTTLE) == 0) {
-
 		serv->flags |= ACL_MASTER_FLAG_THROTTLE;
 		acl_event_request_timer(acl_var_master_global_event,
 			master_unthrottle_wrapper, (void *) serv,
@@ -296,18 +293,6 @@ static void master_delete_child(ACL_MASTER_PROC *proc)
 		sizeof(proc->pid), (void (*) (void *)) 0);
 	acl_ring_detach(&proc->me);
 	acl_myfree(proc);
-
-        /* in ACL_MASTER_FLAG_STOPPING status, the serv will be freed after
-         * all children exited
-         */
-        if (ACL_MASTER_CHILDREN_SIZE(serv) > 0)
-                return;
-        
-        if (ACL_MASTER_STOPPING(serv) || ACL_MASTER_KILLED(serv)) {
-                acl_msg_info("free service %s which has been %s", serv->path,
-                        ACL_MASTER_STOPPING(serv) ? "stopped" : "killed");
-                acl_master_ent_free(serv);
-        }
 }
 
 /* acl_master_reap_child - reap dead children */
@@ -378,7 +363,9 @@ void    acl_master_reap_child(void)
 		}
 
 		if (proc->use_count == 0
-		    && (serv->flags & ACL_MASTER_FLAG_THROTTLE) == 0) {
+		    && !ACL_MASTER_THROTTLED(serv)
+		    && !ACL_MASTER_STOPPING(serv)
+		    && !ACL_MASTER_KILLED(serv)) {
 
 			acl_msg_warn("%s(%d), %s: bad command startup, path=%s"
 				" -- throttling", __FILE__, __LINE__,
@@ -390,20 +377,36 @@ void    acl_master_reap_child(void)
 	}
 }
 
+#define WAITING_CHILD	100000
+
+static void waiting_children(int type acl_unused, ACL_EVENT *event, void* ctx)
+{
+	ACL_MASTER_SERV *serv = (ACL_MASTER_SERV *) ctx;
+
+	acl_master_reap_child();
+
+	if (ACL_MASTER_CHILDREN_SIZE(serv) > 0) {
+		acl_msg_info("wait for service %s, total_proc=%d, %d",
+			serv->conf, serv->total_proc,
+			ACL_MASTER_CHILDREN_SIZE(serv));
+		acl_event_request_timer(event, waiting_children,
+			(void *) serv, WAITING_CHILD, 0);
+	} else {
+		acl_msg_info("%s(%d): free service %s been %s, total proc=%d",
+			__FUNCTION__, __LINE__, serv->path,
+			ACL_MASTER_STOPPING(serv) ? "stopped" : "killed",
+			serv->total_proc);
+		acl_master_ent_free(serv);
+        }
+}
+
 /* acl_master_kill_children - kill and delete all child processes of service */
 
 void    acl_master_kill_children(ACL_MASTER_SERV *serv)
 {
 	ACL_BINHASH_INFO **list;
 	ACL_BINHASH_INFO **info;
-	ACL_MASTER_PROC *proc;
-
-	/*
-	 * XXX turn on the throttle so that master_reap_child() doesn't.
-	 * Someone has to turn off the throttle in order to stop the
-	 * associated timer request, so we might just as well do it at the end.
-	 */
-	master_throttle(serv);
+	ACL_MASTER_PROC   *proc;
 
 	info = list = acl_binhash_list(acl_var_master_child_table);
 	for (; *info; info++) {
@@ -411,12 +414,39 @@ void    acl_master_kill_children(ACL_MASTER_SERV *serv)
 		if (proc->serv == serv)
 			(void) kill(proc->pid, SIGTERM);
 	}
+	acl_myfree(list);
 
-	while (serv->total_proc > 0)
+	if ((serv->flags & ACL_MASTER_FLAG_STOP_WAIT) != 0) {
+		while (serv->total_proc > 0) {
+			acl_master_reap_child();
+			if (serv->total_proc > 0)
+				acl_doze(100);
+		}
+
+		acl_msg_info("%s(%d): free service %s been %s, total proc=%d",
+			__FUNCTION__, __LINE__, serv->path,
+			ACL_MASTER_STOPPING(serv) ? "stopped" : "killed",
+			serv->total_proc);
+
+		acl_master_ent_free(serv);
+		return;
+	}
+
+	// try waiting children to exit
+	if (serv->total_proc > 0)
 		acl_master_reap_child();
 
-	acl_myfree(list);
-	master_unthrottle(serv);
+	// if there are some other children existing, create a timer to wait
+	if (serv->total_proc > 0)
+		acl_event_request_timer(acl_var_master_global_event,
+			waiting_children, (void *) serv, WAITING_CHILD, 0);
+	else {
+		acl_msg_info("%s(%d): free service %s been %s, total proc=%d",
+			__FUNCTION__, __LINE__, serv->path,
+			ACL_MASTER_STOPPING(serv) ? "stopped" : "killed",
+			serv->total_proc);
+		acl_master_ent_free(serv);
+	}
 }
 
 void   acl_master_delete_all_children(void)

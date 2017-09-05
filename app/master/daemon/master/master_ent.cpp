@@ -502,13 +502,17 @@ static int service_transport(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 
 static void service_control(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 {
-	const char* ptr = get_str_ent(xcp, ACL_VAR_MASETR_SERV_KILL, "off");
-	if (ptr == NULL || *ptr == 0)
-		serv->flags &=~ ACL_MASTER_FLAG_KILL_ONEXIT;
-	else if (EQ(ptr, "on") || EQ(ptr, "true") || EQ(ptr, "1"))
-		serv->flags |= ACL_MASTER_FLAG_KILL_ONEXIT;
+	const char* ptr = get_str_ent(xcp, ACL_VAR_MASETR_SERV_STOP_KILL, "off");
+	if (EQ(ptr, "on") || EQ(ptr, "true") || atoi(ptr) > 1)
+		serv->flags |= ACL_MASTER_FLAG_STOP_KILL;
 	else
-		serv->flags &=~ ACL_MASTER_FLAG_KILL_ONEXIT;
+		serv->flags &=~ ACL_MASTER_FLAG_STOP_KILL;
+
+	ptr = get_str_ent(xcp, ACL_VAR_MASTER_SERV_STOP_WAIT, "off");
+	if (EQ(ptr, "on") || EQ(ptr, "true") || atoi(ptr) > 0)
+		serv->flags |= ACL_MASTER_FLAG_STOP_WAIT;
+	else
+		serv->flags &= ~ACL_MASTER_FLAG_STOP_WAIT;
 }
 
 static void service_wakeup_time(ACL_XINETD_CFG_PARSER *xcp,

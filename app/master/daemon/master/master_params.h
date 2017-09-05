@@ -19,6 +19,10 @@ extern char *acl_var_master_conf_dir;
 #define ACL_DEF_MASTER_INET_INTERFACES	ACL_INET_INTERFACES_ALL
 extern char *acl_var_master_inet_interfaces;
 
+#define ACL_VAR_MASTER_WAITING_ON_STOP		"waiting_on_stop"
+#define ACL_DEF_MASTER_WAITING_ON_STOP		"true"
+extern char *acl_var_master_waiting_on_stop;
+
 #define ACL_VAR_MASTER_PROC_LIMIT		"default_process_limit"
 #define ACL_DEF_MASTER_PROC_LIMIT		100
 extern int acl_var_master_proc_limit;    
@@ -133,7 +137,8 @@ extern char *acl_var_master_manage_addr;
 #define ACL_VAR_MASTER_SERV_REUSEPORT		"master_reuseport"
 #define ACL_VAR_MASTER_SERV_FASTOPEN		"master_fastopen"
 #define ACL_VAR_MASTER_SERV_NBLOCK		"master_nonblock"
-#define ACL_VAR_MASETR_SERV_KILL		"master_kill"
+#define ACL_VAR_MASETR_SERV_STOP_KILL		"master_stop_kill"
+#define ACL_VAR_MASTER_SERV_STOP_WAIT		"master_stop_wait"
 
 /**
  * master_params.c
