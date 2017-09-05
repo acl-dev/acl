@@ -67,6 +67,7 @@ typedef struct ACL_MASTER_SERV {
 #define	ACL_MASTER_FLAG_RELOADING	(1<<3)	/* the service is reloading */
 #define ACL_MASTER_FLAG_STOPPING	(1<<4)	/* the service is stopping */
 #define ACL_MASTER_FLAG_KILLED          (1<<5)  /* the service is killed */
+#define ACL_MASTER_FLAG_KILL_ONEXIT	(1<<6)  /* the service can be killed on exit */
 
 #define ACL_MASTER_THROTTLED(f)		((f)->flags & ACL_MASTER_FLAG_THROTTLE)
 #define ACL_MASTER_STOPPING(f)		((f)->flags & ACL_MASTER_FLAG_STOPPING)

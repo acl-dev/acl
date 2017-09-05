@@ -685,6 +685,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 		post_init(__service_ctx);
 
 	acl_server_sighup_setup();
+	acl_server_sigterm_setup();
 
 	/* The event loop, at last. */
 	while (acl_var_single_use_limit == 0 ||

@@ -182,6 +182,7 @@ ACL_API ACL_EVENT *acl_trigger_server_event(void);
   */
 extern ACL_API int acl_var_server_gotsighup;
 ACL_API void acl_server_sighup_setup(void);
+ACL_API void acl_server_sigterm_setup(void);
 
 #ifdef	__cplusplus
 }

@@ -1256,6 +1256,7 @@ static void run_loop(const char *procname)
 	 */
 
 	acl_server_sighup_setup();
+	acl_server_sigterm_setup();
 
 	while (1) {
 		if (acl_var_aio_max_threads == 0)  /* single thread mode */

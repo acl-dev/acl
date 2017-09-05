@@ -5,7 +5,8 @@
 #include "master_pathname.h"
 #include "master.h"
 
-#define STR acl_vstring_str
+#define EQ		!strcasecmp
+#define STR		acl_vstring_str
 #define	STR_SAME	!strcasecmp
 
 static char *__services_path = NULL;	/* dir name of config files */
@@ -102,8 +103,6 @@ static int get_bool_ent(ACL_XINETD_CFG_PARSER *xcp,
 	const char *name, const char *def_val)
 {
 	const char *value;
-
-#define EQ	!strcasecmp
 
 	value = acl_xinetd_cfg_get(xcp, name);
 	if (value == 0) {
@@ -501,6 +500,17 @@ static int service_transport(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 	return init_listeners(serv);
 }
 
+static void service_control(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
+{
+	const char* ptr = get_str_ent(xcp, ACL_VAR_MASETR_SERV_KILL, "off");
+	if (ptr == NULL || *ptr == 0)
+		serv->flags &=~ ACL_MASTER_FLAG_KILL_ONEXIT;
+	else if (EQ(ptr, "on") || EQ(ptr, "true") || EQ(ptr, "1"))
+		serv->flags |= ACL_MASTER_FLAG_KILL_ONEXIT;
+	else
+		serv->flags &=~ ACL_MASTER_FLAG_KILL_ONEXIT;
+}
+
 static void service_wakeup_time(ACL_XINETD_CFG_PARSER *xcp,
 	ACL_MASTER_SERV *serv)
 {
@@ -793,8 +803,11 @@ ACL_MASTER_SERV *acl_master_ent_load(const char *filepath)
 		acl_master_ent_free(serv);
 		return NULL;
 	}
+
 	service_wakeup_time(xcp, serv);
 	service_proc(xcp, serv);
+	service_control(xcp, serv);
+
 	if (service_args(xcp, serv, filepath) < 0) {
 		acl_master_ent_free(serv);
 		return NULL;

@@ -36,8 +36,10 @@ static ACL_SOCKET inet_listen(const char *addr, const struct addrinfo *res,
 {
 	ACL_SOCKET sock = acl_inet_bind(res, flag);
 
-	if (sock == ACL_SOCKET_INVALID)
+	if (sock == ACL_SOCKET_INVALID) {
+		acl_msg_error("bind addr=%s error=%s", addr, acl_last_serror());
 		return ACL_SOCKET_INVALID;
+	}
 
 #if defined(TCP_FASTOPEN)
 	if (flag & ACL_INET_FLAG_FASTOPEN) {

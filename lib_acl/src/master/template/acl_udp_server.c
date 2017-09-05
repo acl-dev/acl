@@ -859,6 +859,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 
 	/* …Ë÷√ SIGHUP –≈∫≈ */
 	acl_server_sighup_setup();
+	acl_server_sigterm_setup();
 
 	acl_msg_info("%s -- %s: daemon started", argv[0], myname);
 

@@ -5,6 +5,7 @@
 
 /* Application-specific. */
 
+#include "master_api.h"
 #include "master_params.h"
 #include "master.h"
 
@@ -97,19 +98,28 @@ void    acl_master_service_stop(ACL_MASTER_SERV *serv)
 
 void    acl_master_service_restart(ACL_MASTER_SERV *serv)
 {
-	/* Undo some of the things that master_service_start() did. */
-	acl_master_wakeup_cleanup(serv);
-	acl_master_status_cleanup(serv);
+	if ((serv->flags & ACL_MASTER_FLAG_KILL_ONEXIT) != 0) {
+		char *path = acl_mystrdup(serv->conf);
+		acl_master_kill(path);
+		if (acl_master_start(path) == NULL)
+			acl_msg_error("can't start service=%s", path);
+		else
+			acl_msg_info("start %s ok", path);
+		acl_myfree(path);
+	} else {
+		/* Undo some of the things that master_service_start() did. */
+		acl_master_wakeup_cleanup(serv);
+		acl_master_status_cleanup(serv);
 
-	/* Now undo the undone. */
-	acl_master_status_init(serv);
+		/* Now undo the undone. */
+		acl_master_status_init(serv);
 
-	/* set ACL_MASTER_FLAG_RELOADING flag */
-	serv->flags |= ACL_MASTER_FLAG_RELOADING;
+		/* set ACL_MASTER_FLAG_RELOADING flag */
+		serv->flags |= ACL_MASTER_FLAG_RELOADING;
 
-	acl_master_avail_listen(serv);
+		acl_master_avail_listen(serv);
 
-	/* ACL_MASTER_FLAG_RELOADING will be remove in acl_master_spawn */
-
-	acl_master_wakeup_init(serv);
+		/* ACL_MASTER_FLAG_RELOADING will be remove in acl_master_spawn */
+		acl_master_wakeup_init(serv);
+	}
 }

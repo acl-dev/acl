@@ -688,6 +688,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 		(ACL_WATCHDOG_FN) 0, (char *) 0);
 
 	acl_server_sighup_setup();
+	acl_server_sigterm_setup();
 
 	/*
 	 * The event loop, at last.

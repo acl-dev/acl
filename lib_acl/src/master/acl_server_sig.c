@@ -44,7 +44,6 @@ void acl_server_sighup_setup(void)
 #ifdef ACL_WINDOWS
 	signal(1, server_sighup);
 #else
-	const char *myname = "acl_server_sighup_setup";
 	struct sigaction action;
 
 	sigemptyset(&action.sa_mask);
@@ -57,6 +56,41 @@ void acl_server_sighup_setup(void)
 
 	if (sigaction(SIGHUP, &action, (struct sigaction *) 0) < 0)
 		acl_msg_fatal("%s: sigaction(%d): %s",
-			myname, SIGHUP, strerror(errno));
+			__FUNCTION__, SIGHUP, strerror(errno));
+#endif
+}
+
+#ifdef ACL_UNIX
+static void server_sigterm(int sig acl_unused)
+{
+	int i = 0, max = 1024;
+
+	acl_msg_info("%s(%d), %s: got SIGTERM, close from %d to %d",
+		__FILE__, __LINE__, __FUNCTION__, i, max);
+
+	for (; i < max; i++)
+		close(i);
+	acl_doze(100);
+	exit(0);
+}
+
+#endif
+
+void acl_server_sigterm_setup(void)
+{
+#ifdef ACL_UNIX
+	struct sigaction action;
+
+	sigemptyset(&action.sa_mask);
+	action.sa_flags = 0;
+
+#ifdef SA_RESTART
+	action.sa_flags |= SA_RESTART;
+#endif
+	action.sa_handler = server_sigterm;
+
+	if (sigaction(SIGTERM, &action, (struct sigaction *) 0) < 0)
+		acl_msg_fatal("%s: sigaction(%d): %s",
+			__FUNCTION__, SIGTERM, strerror(errno));
 #endif
 }
