@@ -530,6 +530,7 @@ static void main_thread_loop(void)
 		acl_fiber_create(fiber_monitor_idle, NULL, STACK_SIZE);
 
 	acl_server_sighup_setup();
+	acl_server_sigterm_setup();
 
 	acl_msg_info("daemon started, log=%s", acl_var_fiber_log_file);
 
