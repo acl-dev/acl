@@ -112,6 +112,8 @@ void    acl_master_service_restart(ACL_MASTER_SERV *serv)
 		ACL_BINHASH_INFO **info;
 		ACL_MASTER_PROC   *proc;
 
+		acl_msg_info("kill service %s with SIGTERM", serv->conf);
+
 		info = list = acl_binhash_list(acl_var_master_child_table);
 		for (; *info; info++) {
 			proc = (ACL_MASTER_PROC *) info[0]->value;

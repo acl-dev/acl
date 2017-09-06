@@ -33,7 +33,7 @@ int     main(int argc, char **argv)
 {
 	ACL_VSTREAM  *lock_fp;
 	int           ch, fd, n, keep_mask = 0;
-	ACL_WATCHDOG *watchdog;
+	//ACL_WATCHDOG *watchdog;
 	ACL_VSTRING  *strbuf;
 	ACL_AIO      *aio;
 	char         *ptr;
@@ -188,7 +188,7 @@ int     main(int argc, char **argv)
 	 * multiple things at the same time, it really is all a single thread, so
 	 * that there are no concurrency conflicts within the master process.
 	 */
-	watchdog = acl_watchdog_create(1000, (ACL_WATCHDOG_FN) 0, (char *) 0);
+	//watchdog = acl_watchdog_create(1000, (ACL_WATCHDOG_FN) 0, (char *) 0);
 
 	for (;;) {
 #ifdef HAS_VOLATILE_LOCKS
