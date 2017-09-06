@@ -92,12 +92,13 @@ static void init_conf_int_vars(ACL_CONFIG_INT_TABLE cit[])
 static void init_conf_str_vars(ACL_CONFIG_STR_TABLE cst[])
 {
 	int   i;
+	static int first_call = 1;
 
 	for (i = 0; cst[i].name != 0; i++) {
-		/*
-		if (*(cst[i].target) != 0)
+		if (first_call)
+			first_call = 0;
+		else if (*(cst[i].target) != 0)
 			acl_myfree(*(cst[i].target));
-		*/
 		*(cst[i].target) = acl_mystrdup(cst[i].defval);
 	}
 }

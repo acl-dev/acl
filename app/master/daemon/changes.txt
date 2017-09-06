@@ -2,6 +2,8 @@
 6) 2017.9.5
 6.1) feature: master can wait children to exit with sync or async
 6.2) feature: master can kill SIGTERM children when reloading
+6.3) bugfix: master_params.cpp 中的 init_conf_str_vars 函数在 master reload 时
+有内存泄露
 
 5) 2017.8.11
 5.1) safety: master can't fatal for some configure error of any app service.
