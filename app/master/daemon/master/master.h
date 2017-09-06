@@ -148,6 +148,7 @@ extern void acl_master_service_restart(ACL_MASTER_SERV *);
   */
 extern int acl_var_master_gotsighup;
 extern int acl_var_master_gotsigchld;
+extern int acl_var_master_stopped;
 extern void acl_master_sigsetup(void);
 
  /*
@@ -177,6 +178,7 @@ extern void acl_master_prefork(ACL_MASTER_SERV *);
   * master_avail.c
   */
 extern void acl_master_avail_listen(ACL_MASTER_SERV *);
+extern void acl_master_avail_listen_force(ACL_MASTER_SERV *);
 extern void acl_master_avail_cleanup(ACL_MASTER_SERV *);
 extern void acl_master_avail_more(ACL_MASTER_SERV *, ACL_MASTER_PROC *);
 extern void acl_master_avail_less(ACL_MASTER_SERV *, ACL_MASTER_PROC *);

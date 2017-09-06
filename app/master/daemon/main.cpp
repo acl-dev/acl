@@ -199,8 +199,7 @@ int     main(int argc, char **argv)
 		}
 #endif
 
-		if (0)
-		acl_watchdog_start(watchdog);  /* same as trigger servers */
+		//acl_watchdog_start(watchdog);  /* same as trigger servers */
 
 		acl_event_loop(acl_var_master_global_event);
 		aio = manager::get_instance().get_aio();
@@ -218,5 +217,17 @@ int     main(int argc, char **argv)
 			acl_var_master_gotsigchld = 0;  /* this first */
 			acl_master_reap_child();        /* then this */
 		}
+		if (acl_var_master_stopped)
+			break;
 	}
+
+#define EQ	!strcasecmp
+
+	if (EQ(acl_var_master_stop_kill, "true")
+		|| EQ(acl_var_master_stop_kill, "yes")
+		|| EQ(acl_var_master_stop_kill, "on")) {
+
+		acl_master_delete_all_children();
+	}
+	return 0;
 }

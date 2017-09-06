@@ -34,7 +34,8 @@ int   acl_master_sig_pipe[2];
 ACL_VSTREAM *ACL_SIG_PIPE_READ_STREAM = NULL;
 
 int   acl_var_master_gotsigchld = 0;
-int   acl_var_master_gotsighup = 0;
+int   acl_var_master_gotsighup  = 0;
+int   acl_var_master_stopped    = 0;
 
 /* master_sighup - register arrival of hangup signal */
 
@@ -152,18 +153,19 @@ static void master_sigchld(int sig)
 
 /* master_sigdeath - die, women and children first */
 
-static void master_sigdeath(int sig)
+static void master_sigdeath(int sig acl_unused)
 {
 	const char *myname = "master_sigdeath";
 	struct sigaction action;
-	pid_t   pid = getpid();
+	//pid_t   pid = getpid();
 
 	/*
 	 * XXX We're running from a signal handler, and really should not call
 	 * any msg() routines at all, but it would be even worse to silently
 	 * terminate without informing the sysadmin.
 	 */
-	acl_msg_info("%s: terminating on signal %d", myname, sig);
+	// dont' log info for avoiding dead lock
+	//acl_msg_info("%s: terminating on signal %d", myname, sig);
 
 	/* Terminate all processes in our process group, except ourselves. */
 	sigemptyset(&action.sa_mask);
@@ -172,14 +174,18 @@ static void master_sigdeath(int sig)
 	if (sigaction(SIGTERM, &action, (struct sigaction *) 0) < 0)
 		acl_msg_fatal("%s: sigaction: %s", myname, strerror(errno));
 
+#if 1
+	acl_var_master_stopped = 1;
+#else
 #define	EQ	!strcasecmp
 
-	if (EQ(acl_var_master_waiting_on_stop, "true")
-		|| EQ(acl_var_master_waiting_on_stop, "yes")
-		|| EQ(acl_var_master_waiting_on_stop, "on")
+	if (EQ(acl_var_master_stop_kill, "true")
+		|| EQ(acl_var_master_stop_kill, "yes")
+		|| EQ(acl_var_master_stop_kill, "on")
 		|| pid <= 1) { /* in docker the master's pid is 1 */
 
-		acl_master_delete_all_children();
+		acl_var_master_stopped = 1;
+		return;
 	} else if (kill(-pid, SIGTERM) < 0) {
 		acl_msg_error("%s: kill process group(-%ld): %s",
 			myname, (long) pid, strerror(errno));
@@ -199,6 +205,7 @@ static void master_sigdeath(int sig)
 		exit (0);
 	else if (kill(pid, sig) < 0)
 		acl_msg_fatal("%s: kill myself: %s", myname, strerror(errno));
+#endif
 }
 
 /* acl_master_sigsetup - set up signal handlers */

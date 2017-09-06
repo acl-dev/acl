@@ -65,13 +65,15 @@ static void server_sigterm(int sig acl_unused)
 {
 	int i = 0, max = 1024;
 
+	/*
 	acl_msg_info("%s(%d), %s: got SIGTERM, close from %d to %d",
 		__FILE__, __LINE__, __FUNCTION__, i, max);
+	*/
 
 	for (; i < max; i++)
 		close(i);
 	acl_doze(100); /* just sleep 100 ms for release fd by OS system ! */
-	exit(0);
+	_exit(0);
 }
 
 #endif

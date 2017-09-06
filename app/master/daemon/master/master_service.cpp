@@ -125,7 +125,7 @@ void    acl_master_service_restart(ACL_MASTER_SERV *serv)
 	acl_master_status_init(serv);
 
 	/* re-listen again or prefork children */
-	acl_master_avail_listen(serv);
+	acl_master_avail_listen_force(serv);
 
 	/* ACL_MASTER_FLAG_RELOADING will be remove in acl_master_spawn */
 	acl_master_wakeup_init(serv);

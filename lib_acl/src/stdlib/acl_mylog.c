@@ -106,6 +106,20 @@ void acl_log_add_tid(int onoff)
 	__log_thread_id = onoff ? 1 : 0;
 }
 
+static void init_log_mutex(acl_pthread_mutex_t *lock)
+{
+#ifdef ACL_UNIX
+	int n1, n2;
+	pthread_mutexattr_t attr;
+
+	n1 = pthread_mutexattr_init(&attr);
+	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+	thread_mutex_init(lock, !n1 && !n2 ? &attr : NULL);
+#else
+	thread_mutex_init(lock, NULL);
+#endif
+}
+
 void acl_log_fp_set(ACL_VSTREAM *fp, const char *logpre)
 {
 	const char *myname = "acl_log_fp_set";
@@ -136,7 +150,7 @@ void acl_log_fp_set(ACL_VSTREAM *fp, const char *logpre)
 	log->type = ACL_LOG_T_UNKNOWN;
 	log->lock = (acl_pthread_mutex_t*)
 		calloc(1, sizeof(acl_pthread_mutex_t));
-	thread_mutex_init(log->lock, NULL);
+	init_log_mutex(log->lock);
 	if (logpre && *logpre)
 		snprintf(log->logpre, sizeof(log->logpre), "%s", logpre);
 	else
@@ -203,7 +217,7 @@ static int open_file_log(const char *filename, const char *logpre)
 	log->type = ACL_LOG_T_FILE;
 	log->lock = (acl_pthread_mutex_t*)
 		calloc(1, sizeof(acl_pthread_mutex_t));
-	thread_mutex_init(log->lock, NULL);
+	init_log_mutex(log->lock);
 	if (logpre && *logpre)
 		snprintf(log->logpre, sizeof(log->logpre), "%s", logpre);
 	else

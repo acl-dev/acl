@@ -194,7 +194,7 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 	        serv->flags &= ~ACL_MASTER_FLAG_RELOADING;
 
 	if (serv->flags & ACL_MASTER_FLAG_THROTTLE)
-		acl_msg_panic("%s(%d)-%s: throttled service: %s",
+		acl_msg_warn("%s(%d)-%s: throttled service: %s",
 			__FILE__, __LINE__, myname, serv->path);
 
 	/*
@@ -363,13 +363,14 @@ void    acl_master_reap_child(void)
 		}
 
 		if (proc->use_count == 0
+		    && WTERMSIG(status) != SIGTERM
 		    && !ACL_MASTER_THROTTLED(serv)
 		    && !ACL_MASTER_STOPPING(serv)
 		    && !ACL_MASTER_KILLED(serv)) {
 
 			acl_msg_warn("%s(%d), %s: bad command startup, path=%s"
-				" -- throttling", __FILE__, __LINE__,
-				myname, serv->path);
+				" -- throttling, signale=%d", __FILE__,
+				__LINE__, myname, serv->path, WTERMSIG(status));
 			master_throttle(serv);
 		}
 
