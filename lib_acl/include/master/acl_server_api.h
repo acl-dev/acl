@@ -79,7 +79,7 @@ typedef int  (*ACL_MASTER_SERVER_EXIT_TIMER_FN)(void *, size_t, size_t);
 
 typedef int  (*ACL_MASTER_SERVER_THREAD_INIT_FN)(void *);
 typedef void (*ACL_MASTER_SERVER_THREAD_EXIT_FN)(void *);
-typedef void (*ACL_MASTER_SERVER_SIGHUP_FN)(void *);
+typedef int  (*ACL_MASTER_SERVER_SIGHUP_FN)(void *, ACL_VSTRING *);
 
  /*
   * acl_single_server.c

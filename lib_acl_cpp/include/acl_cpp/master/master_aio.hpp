@@ -4,6 +4,7 @@
 #include "master_base.hpp"
 
 struct ACL_VSTREAM;
+struct ACL_VSTRING;
 
 namespace acl {
 
@@ -93,7 +94,7 @@ private:
 	static void service_exit(void*);
 
 	// 当进程收到 SIGHUP 信号后会回调本函数
-	static void service_on_sighup(void*);
+	static int service_on_sighup(void*, ACL_VSTRING*);
 };
 
 }  // namespace acl

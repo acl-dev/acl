@@ -172,6 +172,7 @@ static char      **__service_argv;
 static void       *__service_ctx;
 static int         __daemon_mode = 1;
 static char        __conf_file[1024];
+static unsigned    __udp_server_generation;
 
 const char *acl_udp_server_conf(void)
 {
@@ -595,6 +596,8 @@ static void udp_server_timeout(int type acl_unused,
 
 static void main_thread_loop(void)
 {
+	ACL_VSTRING *buf = acl_vstring_alloc(128);
+
 #ifdef ACL_UNIX
 	if (__daemon_mode) {
 		ACL_VSTREAM *stat_stream = acl_vstream_fdopen(
@@ -620,9 +623,18 @@ static void main_thread_loop(void)
 		acl_event_loop(__main_event);
 		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
-			__sighup_handler(__service_ctx);
+			if (__sighup_handler(__service_ctx, buf) < 0)
+				acl_master_notify(acl_var_aio_pid,
+					__udp_server_generation,
+					ACL_MASTER_STAT_SIGHUP_ERR);
+			else
+				acl_master_notify(acl_var_aio_pid,
+					__udp_server_generation,
+					ACL_MASTER_STAT_SIGHUP_OK);
 		}
 	}
+
+	acl_vstring_free(buf);
 }
 
 static void servers_start(UDP_SERVER *servers, int nthreads)
@@ -687,6 +699,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	ACL_MASTER_SERVER_INIT_FN post_init = 0;
 	char   *root_dir = 0, *user_name = 0;
 	UDP_SERVER *server;
+	const char *generation;
 	int     c, key;
 	va_list ap;
 
@@ -815,6 +828,13 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	__service_main = service;
 	__service_name = service_name;
 	__service_argv = argv + optind;
+
+	/* Retrieve process generation from environment. */
+	if ((generation = getenv(ACL_MASTER_GEN_NAME)) != 0) {
+		if (!acl_alldig(generation))
+			acl_msg_fatal("bad generation: %s", generation);
+		sscanf(generation, "%o", &__udp_server_generation);
+	}
 
 	/*******************************************************************/
 

@@ -436,6 +436,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	ACL_WATCHDOG *watchdog;
 	ACL_VSTRING  *why;
 	ACL_VSTREAM  *stream;
+	ACL_VSTRING  *buf = acl_vstring_alloc(128);
 	va_list ap;
 
 	/*
@@ -711,9 +712,18 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 
 		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
-			__sighup_handler(__service_ctx);
+			if (__sighup_handler(__service_ctx, buf) < 0)
+				acl_master_notify(acl_var_single_pid,
+					single_server_generation,
+					ACL_MASTER_STAT_SIGHUP_ERR);
+			else
+				acl_master_notify(acl_var_single_pid,
+					single_server_generation,
+					ACL_MASTER_STAT_SIGHUP_OK);
 		}
 	}
+
+	acl_vstring_free(buf);
 }
 
 #endif /* ACL_UNIX */

@@ -1,6 +1,7 @@
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stream/server_socket.hpp"
 #include "acl_cpp/master/master_threads.hpp"
@@ -319,11 +320,15 @@ void master_threads::service_on_close(void* ctx, ACL_VSTREAM* client)
 	delete stream;
 }
 
-void master_threads::service_on_sighup(void* ctx)
+int master_threads::service_on_sighup(void* ctx, ACL_VSTRING* buf)
 {
 	master_threads* mt = (master_threads *) ctx;
 	acl_assert(mt);
-	mt->proc_on_sighup();
+	string s;
+	bool ret = mt->proc_on_sighup(s);
+	if (buf)
+		acl_vstring_strcpy(buf, s.c_str());
+	return ret ? 0 : -1;
 }
 
 }  // namespace acl

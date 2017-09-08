@@ -10,6 +10,7 @@ namespace acl
 
 class server_socket;
 class event_timer;
+class string;
 
 class ACL_CPP_API master_base
 {
@@ -95,7 +96,7 @@ protected:
 	/**
 	 * 当收到 SIGHUP 信号时的回调虚方法
 	 */
-	virtual void proc_on_sighup(void) {}
+	virtual bool proc_on_sighup(string&) { return true; }
 
 	// 配置对象
 	master_conf conf_;

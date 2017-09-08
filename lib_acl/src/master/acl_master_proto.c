@@ -36,9 +36,9 @@ int     acl_master_notify(int pid, unsigned generation, int status)
 	 * so sending a bad PID or a bad status code will only have
 	 * amusement value.
 	 */
-	stat_buf.pid = pid;
-	stat_buf.gen = generation;
-	stat_buf.avail = status;
+	stat_buf.pid    = pid;
+	stat_buf.gen    = generation;
+	stat_buf.status = status;
 
 	if (write(ACL_MASTER_STATUS_FD, (char *) &stat_buf, sizeof(stat_buf))
 	    != sizeof(stat_buf)) {

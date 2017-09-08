@@ -161,7 +161,8 @@ void master_service::proc_on_exit()
 	logger(">>>proc_on_exit<<<");
 }
 
-void master_service::proc_on_sighup()
+bool master_service::proc_on_sighup(acl::string&)
 {
 	logger(">>>proc_on_sighup<<<");
+	return true;
 }

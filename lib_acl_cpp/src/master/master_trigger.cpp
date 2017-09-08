@@ -1,6 +1,7 @@
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/master/master_trigger.hpp"
 #endif
 
@@ -128,11 +129,15 @@ void master_trigger::service_exit(void* ctx)
 	mt->proc_on_exit();
 }
 
-void master_trigger::service_on_sighup(void* ctx)
+int master_trigger::service_on_sighup(void* ctx, ACL_VSTRING* buf)
 {
 	master_trigger* mt = (master_trigger *) ctx;
 	acl_assert(mt);
-	mt->proc_on_sighup();
+	string s;
+	bool ret = mt->proc_on_sighup(s);
+	if (buf)
+		acl_vstring_strcpy(buf, s.c_str());
+	return ret ? 0 : -1;
 }
 
 }  // namespace acl

@@ -180,6 +180,7 @@ static ACL_EVENT *__event = NULL;
 static acl_pthread_pool_t *__threads = NULL;
 static ACL_VSTREAM **__sstreams;
 
+static int    __threads_server_generation;
 static time_t __last_closing_time = 0;
 static acl_pthread_mutex_t __closing_time_mutex;
 static acl_pthread_mutex_t __counter_mutex;
@@ -1231,6 +1232,8 @@ void acl_threads_server_main(int argc, char * argv[],
 	ACL_MASTER_SERVER_INIT_FN post_init = NULL;
 	ACL_MASTER_SERVER_THREAD_INIT_FN thread_init_fn = NULL;
 	ACL_MASTER_SERVER_THREAD_EXIT_FN thread_exit_fn = NULL;
+	ACL_VSTRING *buf = acl_vstring_alloc(128);
+	const char  *generation;
 	va_list ap;
 
 	/*******************************************************************/
@@ -1405,6 +1408,13 @@ void acl_threads_server_main(int argc, char * argv[],
 	else
 		event_mode = ACL_EVENT_SELECT;
 
+	/* Retrieve process generation from environment. */
+	if ((generation = getenv(ACL_MASTER_GEN_NAME)) != 0) {
+		if (!acl_alldig(generation))
+			acl_msg_fatal("bad generation: %s", generation);
+		sscanf(generation, "%o", &__threads_server_generation);
+	}
+
 	/*******************************************************************/
 
 	/* Set up call-back info. */
@@ -1481,7 +1491,16 @@ void acl_threads_server_main(int argc, char * argv[],
 
 		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
-			__sighup_handler(__service_ctx);
+			if (__sighup_handler(__service_ctx, buf) < 0)
+				acl_master_notify(acl_var_threads_pid,
+					__threads_server_generation,
+					ACL_MASTER_STAT_SIGHUP_ERR);
+			else
+				acl_master_notify(acl_var_threads_pid,
+					__threads_server_generation,
+					ACL_MASTER_STAT_SIGHUP_OK);
 		}
 	}
+
+	acl_vstring_free(buf);
 }

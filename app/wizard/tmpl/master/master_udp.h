@@ -42,5 +42,5 @@ protected:
 	void proc_on_exit(void);
 
 	// @override
-	void proc_on_sighup(void);
+	bool proc_on_sighup(acl::string&);
 };

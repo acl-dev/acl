@@ -58,5 +58,5 @@ protected:
 	 * @override
 	 * 当进程收到 SIGHUP 信号后的回调函数
 	 */
-	void proc_on_sighup();
+	bool proc_on_sighup(acl::string&);
 };

@@ -1240,6 +1240,8 @@ static void setup_ipc(ACL_AIO *aio)
 
 static void run_loop(const char *procname)
 {
+	ACL_VSTRING *buf = acl_vstring_alloc(128);
+
 	acl_msg_info("%s: starting...(accept_alone: %s)",
 		procname, acl_var_aio_accept_alone);
 
@@ -1266,7 +1268,14 @@ static void run_loop(const char *procname)
 
 		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
-			__sighup_handler(__service_ctx);
+			if (__sighup_handler(__service_ctx, buf) < 0)
+				acl_master_notify(acl_var_aio_pid,
+					__aio_server_generation,
+					ACL_MASTER_STAT_SIGHUP_ERR);
+			else
+				acl_master_notify(acl_var_aio_pid,
+					__aio_server_generation,
+					ACL_MASTER_STAT_SIGHUP_OK);
 		}
 
 		if (__listen_disabled == 1) {
@@ -1279,6 +1288,8 @@ static void run_loop(const char *procname)
 			dispatch_close(__h_aio);
 		}
 	}
+
+	acl_vstring_free(buf);
 
 	/* not reached here */
 	/* aio_server_exit(); */

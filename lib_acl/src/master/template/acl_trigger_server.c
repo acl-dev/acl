@@ -418,7 +418,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	const char *root_dir = 0, *user_name = 0;
 	const char *transport = 0;
 	ACL_VSTREAM *stream;
-	ACL_VSTRING *why;
+	ACL_VSTRING *why, *buf = acl_vstring_alloc(128);
 	ACL_WATCHDOG *watchdog;
 	char   *generation;
 
@@ -717,10 +717,18 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 
 		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
-			__sighup_handler(__service_ctx);
+			if (__sighup_handler(__service_ctx, buf) < 0)
+				acl_master_notify(acl_var_trigger_pid,
+					trigger_server_generation,
+					ACL_MASTER_STAT_SIGHUP_ERR);
+			else
+				acl_master_notify(acl_var_trigger_pid,
+					trigger_server_generation,
+					ACL_MASTER_STAT_SIGHUP_OK);
 		}
 	}
 
+	acl_vstring_free(buf);
 	trigger_server_exit();
 }
 

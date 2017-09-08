@@ -40,14 +40,15 @@ extern "C" {
 typedef struct ACL_MASTER_STATUS {
 	int      pid;			/* process ID */
 	unsigned gen;			/* child generation number */
-	int      avail;			/* availability */
+	int      status;		/* availability */
 } ACL_MASTER_STATUS;
 
 #define ACL_MASTER_GEN_NAME	"GENERATION"	/* passed via environment */
 
-#define ACL_MASTER_STAT_TAKEN	0	/* this one is occupied */
-#define ACL_MASTER_STAT_AVAIL	1	/* this process is idle */
-
+#define ACL_MASTER_STAT_TAKEN		0	/* this one is occupied */
+#define ACL_MASTER_STAT_AVAIL		1	/* this process is idle */
+#define ACL_MASTER_STAT_SIGHUP_OK	2
+#define ACL_MASTER_STAT_SIGHUP_ERR	3
 int acl_master_notify(int, unsigned, int);	/* encapsulate status msg */
 
  /*
