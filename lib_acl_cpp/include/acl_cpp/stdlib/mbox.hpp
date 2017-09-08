@@ -73,13 +73,13 @@ public:
 
 	/**
 	 * 接收消息对象
-	 * @param timeout {int} 大于 0 时设置读等待超时时间(毫秒级别)，否则
+	 * @param timeout {int} >= 0 时设置读等待超时时间(毫秒级别)，否则
 	 *  永远等待直到读到消息对象或出错
 	 * @param success {bool*} 可以用于辅助确定读操作是否成功
 	 * @return {T*} 非 NULL 表示读到一个消息对象，为 NULL 时，还需通过
 	 *  success 参数的返回值检查操作是否成功
 	 */
-	T* pop(int timeout = 0, bool* success = NULL)
+	T* pop(int timeout = -1, bool* success = NULL)
 	{
 		return (T*) mbox_read(mbox_, timeout, success);
 	}
