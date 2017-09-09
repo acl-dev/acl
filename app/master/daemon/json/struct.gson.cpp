@@ -532,6 +532,11 @@ namespace acl
         else
             $node.add_text("cmd", acl::get_value($obj.cmd));
 
+        if (check_nullptr($obj.timeout))
+            $node.add_null("timeout");
+        else
+            $node.add_number("timeout", acl::get_value($obj.timeout));
+
         if (check_nullptr($obj.data))
             $node.add_null("data");
         else
@@ -558,11 +563,15 @@ namespace acl
     std::pair<bool,std::string> gson(acl::json_node &$node, reload_req_t &$obj)
     {
         acl::json_node *cmd = $node["cmd"];
+        acl::json_node *timeout = $node["timeout"];
         acl::json_node *data = $node["data"];
         std::pair<bool, std::string> $result;
 
         if(!cmd ||!($result = gson(*cmd, &$obj.cmd), $result.first))
             return std::make_pair(false, "required [reload_req_t.cmd] failed:{"+$result.second+"}");
+     
+        if(timeout)
+            gson(*timeout, &$obj.timeout);
      
         if(!data ||!data->get_obj()||!($result = gson(*data->get_obj(), &$obj.data), $result.first))
             return std::make_pair(false, "required [reload_req_t.data] failed:{"+$result.second+"}");
@@ -608,6 +617,16 @@ namespace acl
         else
             $node.add_number("proc_signaled", acl::get_value($obj.proc_signaled));
 
+        if (check_nullptr($obj.proc_ok))
+            $node.add_null("proc_ok");
+        else
+            $node.add_number("proc_ok", acl::get_value($obj.proc_ok));
+
+        if (check_nullptr($obj.proc_err))
+            $node.add_null("proc_err");
+        else
+            $node.add_number("proc_err", acl::get_value($obj.proc_err));
+
         if (check_nullptr($obj.path))
             $node.add_null("path");
         else
@@ -636,6 +655,8 @@ namespace acl
         acl::json_node *status = $node["status"];
         acl::json_node *proc_count = $node["proc_count"];
         acl::json_node *proc_signaled = $node["proc_signaled"];
+        acl::json_node *proc_ok = $node["proc_ok"];
+        acl::json_node *proc_err = $node["proc_err"];
         acl::json_node *path = $node["path"];
         std::pair<bool, std::string> $result;
 
@@ -647,6 +668,12 @@ namespace acl
      
         if(!proc_signaled ||!($result = gson(*proc_signaled, &$obj.proc_signaled), $result.first))
             return std::make_pair(false, "required [reload_res_data_t.proc_signaled] failed:{"+$result.second+"}");
+     
+        if(!proc_ok ||!($result = gson(*proc_ok, &$obj.proc_ok), $result.first))
+            return std::make_pair(false, "required [reload_res_data_t.proc_ok] failed:{"+$result.second+"}");
+     
+        if(!proc_err ||!($result = gson(*proc_err, &$obj.proc_err), $result.first))
+            return std::make_pair(false, "required [reload_res_data_t.proc_err] failed:{"+$result.second+"}");
      
         if(!path ||!($result = gson(*path, &$obj.path), $result.first))
             return std::make_pair(false, "required [reload_res_data_t.path] failed:{"+$result.second+"}");

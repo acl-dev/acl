@@ -4,6 +4,7 @@
 #include "http_request.h"
 
 static bool __verbose = false;
+static long long __timeout = 5000;
 
 static void print_space(int n)
 {
@@ -362,6 +363,7 @@ static bool do_reload(const char* addr, const char* filepath)
 
 	reload_req_t req;
 	req.cmd = "reload";
+	req.timeout = __timeout;
 
 	reload_req_data_t req_data;
 	req_data.path = filepath;
@@ -463,11 +465,18 @@ static void run(const char* server, const char* filepath)
 			if (tokens.size() == 1)
 			{
 				printf("\033[1;34;40musage\033[0m: "
-				  "\033[1;33;40mset\033[0m configure_path\r\n");
+				  "\033[1;33;40mset\033[0m configure_path timeout\r\n");
 				continue;
 			}
 
 			fpath = tokens[1];
+			if (tokens.size() >= 3)
+			{
+				__timeout = atoll(tokens[2]);
+				if (__timeout <= 0)
+					__timeout = 5000;
+			}
+
 			printf("set service to %s ok\r\n", fpath.c_str());
 			continue;
 		}

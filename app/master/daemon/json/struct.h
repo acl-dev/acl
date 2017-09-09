@@ -193,7 +193,11 @@ struct reload_req_data_t
 
 struct reload_req_t : req_t
 {
+	// Gson@optional
+	long long timeout;
 	std::vector<reload_req_data_t> data;
+
+	reload_req_t(void) : timeout(-1) {}
 };
 
 struct reload_res_data_t
@@ -201,6 +205,8 @@ struct reload_res_data_t
 	int status;
 	int proc_count;
 	int proc_signaled;
+	int proc_ok;
+	int proc_err;
 	acl::string path;
 };
 

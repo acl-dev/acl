@@ -240,6 +240,8 @@ void    acl_master_spawn(ACL_MASTER_SERV *serv)
 		proc->avail     = 0;
 		proc->start     = (long) time(NULL);
 		proc->use_count = 0;
+		proc->signal_callback = NULL;
+		proc->signal_ctx      = NULL;
 
 		acl_binhash_enter(acl_var_master_child_table,
 			(char *) &pid, sizeof(pid), (char *) proc);
@@ -461,7 +463,7 @@ void   acl_master_delete_all_children(void)
 }
 
 void    acl_master_signal_children(ACL_MASTER_SERV *serv, int signum,
-		int *nchildren, int *nsignaled)
+	int *nchildren, int *nsignaled, SIGNAL_CALLBACK callback, void *ctx)
 {
 	const char *myname = "acl_master_signal_children";
 	ACL_RING_ITER    iter;
@@ -471,25 +473,32 @@ void    acl_master_signal_children(ACL_MASTER_SERV *serv, int signum,
 	acl_ring_foreach(iter, &serv->children) {
 		proc = acl_ring_to_appl(iter.ptr, ACL_MASTER_PROC, me);
 		acl_assert(proc);
+
+		// setup callback first
+		proc->signal_callback = callback;
+		proc->signal_ctx      = ctx;
+		if (nchildren)
+			(*nchildren)++;
+
 		if (kill(proc->pid, signum) < 0)
 			acl_msg_warn("%s: kill child %d, path %s error %s",
 				myname, proc->pid, serv->path, strerror(errno));
 		else
+		{
+			if (nsignaled)
+				(*nsignaled)++;
 			n++;
+		}
 	}
-
-	if (nchildren)
-		*nchildren = acl_ring_size(&serv->children);
-	if (nsignaled)
-		*nsignaled = n;
 
 	acl_msg_info("%s: service %s, path %s, signal %d, children %d,"
 		" signaled %d", myname, serv->name, serv->path,
 		signum, acl_ring_size(&serv->children), n);
 }
 
-void    acl_master_sighup_children(ACL_MASTER_SERV *serv,
-		int *nchildren, int *nsignaled)
+void    acl_master_sighup_children(ACL_MASTER_SERV *serv, int *nchildren,
+	int *nsignaled, SIGNAL_CALLBACK callback, void *ctx)
 {
-	acl_master_signal_children(serv, SIGHUP, nchildren, nsignaled);
+	acl_master_signal_children(serv, SIGHUP, nchildren, nsignaled,
+		callback, ctx);
 }

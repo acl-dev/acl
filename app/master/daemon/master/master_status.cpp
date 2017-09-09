@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 #include <errno.h>
+#include <signal.h>
 #include <string.h>
 
 /* Application-specific. */
@@ -123,10 +124,13 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 		acl_master_avail_less(serv, proc);
 		break;
 	case ACL_MASTER_STAT_SIGHUP_OK:
-		acl_msg_info("---ACL_MASTER_STAT_SIGHUP_OK, pid: %d-----", (int) pid);
-		break;
 	case ACL_MASTER_STAT_SIGHUP_ERR:
-		acl_msg_info("---ACL_MASTER_STAT_SIGHUP_ERR, pid: %d----", (int) pid);
+		if (proc->signal_callback) {
+			proc->signal_callback(proc, SIGHUP,
+				stat_buf.status, proc->signal_ctx);
+			proc->signal_callback = NULL;
+			proc->signal_ctx      = NULL;
+		}
 		break;
 	default:
 		acl_msg_warn("%s(%d)->%s: ignoring unknown status: %d "

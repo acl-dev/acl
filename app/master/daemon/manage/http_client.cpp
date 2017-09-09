@@ -24,6 +24,7 @@ http_client::http_client(acl::aio_socket_stream *client, int rw_timeout)
 	: conn_(client->get_astream())
 	, rw_timeout_(rw_timeout)
 	, content_length_(0)
+	, reload_(NULL)
 {
 	hdr_req_ = NULL;
 	req_     = NULL;
@@ -179,7 +180,16 @@ bool http_client::handle(void)
 	else if (EQ(cmd, "stop"))
 		ret = handle_stop();
 	else if (EQ(cmd, "reload"))
+	{
 		ret = handle_reload();
+		if (ret == false)
+		{
+			acl_aio_iocp_close(conn_);
+			return false;
+		}
+
+		return true;
+	}
 	else if (EQ(cmd, "restart"))
 		ret = handle_restart();
 	else {
@@ -337,19 +347,34 @@ bool http_client::handle_restart(void)
 bool http_client::handle_reload(void)
 {
 	reload_req_t req;
-	reload_res_t res;
+
+	reload_res_.status = 200;
+	reload_res_.msg    = "ok";
+	reload_res_.data.clear();
 
 	if (deserialize<reload_req_t>(json_, req) == false)
 	{
-		res.status = 400;
-		res.msg    = "invalid json";
-		reply<reload_res_t>(res.status, res);
+		reload_res_.status = 400;
+		reload_res_.msg    = "invalid json";
+		reply<reload_res_t>(reload_res_.status, reload_res_);
 		return false;
 	}
 
-	service_reload service;
-	service.run(req, res);
-	reply<reload_res_t>(res.status, res);
+	reload_ = new service_reload(*this, reload_res_);
+	reload_->run(req);
 
 	return true;
+}
+
+void http_client::on_reload_finish(void)
+{
+	delete reload_;
+	reload_ = NULL;
+
+	reply<reload_res_t>(reload_res_.status, reload_res_);
+
+	if (hdr_req_->hdr.keep_alive)
+		wait();
+	else
+		acl_aio_iocp_close(conn_);
 }

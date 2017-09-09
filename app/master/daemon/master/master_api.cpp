@@ -133,7 +133,8 @@ int     acl_master_stop(const char *path)
 	return -1;
 }
 
-int     acl_master_reload(const char *path, int *nchilden, int *nsignaled)
+int     acl_master_reload(const char *path, int *nchilden, int *nsignaled,
+	SIGNAL_CALLBACK callback, void *ctx)
 {
 	ACL_MASTER_SERV *serv = acl_master_lookup(path);
 
@@ -143,6 +144,22 @@ int     acl_master_reload(const char *path, int *nchilden, int *nsignaled)
 		return -1;
 	}
 
-	acl_master_sighup_children(serv, nchilden, nsignaled);
+	acl_master_sighup_children(serv, nchilden, nsignaled, callback, ctx);
 	return 0;
+}
+
+void    acl_master_reload_clean(const char *path)
+{
+	ACL_MASTER_SERV *serv = acl_master_lookup(path);
+	if (serv == NULL)
+		return;
+
+	ACL_RING_ITER    iter;
+	ACL_MASTER_PROC *proc;
+	acl_ring_foreach(iter, &serv->children) {
+		proc = acl_ring_to_appl(iter.ptr, ACL_MASTER_PROC, me);
+		acl_assert(proc);
+		proc->signal_callback = NULL;
+		proc->signal_ctx      = NULL;
+	}
 }

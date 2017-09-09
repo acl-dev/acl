@@ -13,6 +13,8 @@
 #pragma once
 #include "json/serialize.h"
 
+class service_reload;
+
 class http_client
 {
 public:
@@ -20,16 +22,21 @@ public:
 
 	void wait(void);
 
+	void on_reload_finish(void);
+
 private:
 	~http_client(void);
 
 private:
-	ACL_ASTREAM*            conn_;
-	int                     rw_timeout_;
-	HTTP_HDR_REQ*           hdr_req_;
-	HTTP_REQ               *req_;
-	http_off_t              content_length_;
-	acl::json               json_;
+	ACL_ASTREAM*    conn_;
+	int             rw_timeout_;
+	HTTP_HDR_REQ*   hdr_req_;
+	HTTP_REQ*       req_;
+	http_off_t      content_length_;
+	acl::json       json_;
+
+	reload_res_t    reload_res_;
+	service_reload* reload_;
 
 	void reset(void);
 	bool handle(void);
@@ -49,6 +56,7 @@ private:
 		acl::string buf;
 		serialize<T>(o, buf);
 		do_reply(status, buf);
+		buf.clear();
 	}
 
 	static int on_head(int status, void* ctx);

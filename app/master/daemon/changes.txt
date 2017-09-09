@@ -1,3 +1,5 @@
+7) 2017.9.9
+7.1) feature: master can wait callback from children when reloading the specific children
 
 6) 2017.9.5
 6.1) feature: master can wait children to exit with sync or async
