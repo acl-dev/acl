@@ -496,13 +496,25 @@ static void *thread_main(void *ctx)
 
 static void fiber_sleep(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
+	ACL_VSTRING *buf = acl_vstring_alloc(128);
+
 	while (1) {
 		acl_fiber_sleep(1);
 		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
-			__sighup_handler(__service_ctx);
+			if (__sighup_handler(__service_ctx, buf) < 0)
+				acl_master_notify(acl_var_fiber_pid,
+					__server_generation,
+					ACL_MASTER_STAT_SIGHUP_ERR);
+			else
+				acl_master_notify(acl_var_fiber_pid,
+					__server_generation,
+					ACL_MASTER_STAT_SIGHUP_OK);
 		}
 	}
+
+	/* not reached */
+	acl_vstring_free(buf);
 }
 
 static void main_thread_loop(void)

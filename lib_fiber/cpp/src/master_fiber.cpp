@@ -1,5 +1,6 @@
 #include "stdafx.hpp"
 #include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/server_socket.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/master/master_base.hpp"
@@ -129,11 +130,15 @@ void master_fiber::thread_init(void* ctx)
 	mf->thread_on_init();
 }
 
-void master_fiber::service_on_sighup(void* ctx)
+int master_fiber::service_on_sighup(void* ctx, ACL_VSTRING* buf)
 {
 	master_fiber* mf = (master_fiber *) ctx;
 	acl_assert(mf);
-	mf->proc_on_sighup();
+	string s;
+	bool ret = mf->proc_on_sighup(s);
+	if (buf)
+		acl_vstring_strcpy(buf, s.c_str());
+	return ret ? 0 : -1;
 }
 
 } // namespace acl

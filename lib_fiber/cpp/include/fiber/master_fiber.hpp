@@ -58,7 +58,7 @@ private:
 	static void service_init(void*);
 	static void thread_init(void*); 
 	static void service_exit(void*);
-	static void service_on_sighup(void*);
+	static int  service_on_sighup(void*, ACL_VSTRING*);
 
 	void run(int argc, char** argv);
 };
