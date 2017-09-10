@@ -44,7 +44,7 @@ service $<PROGRAM> {
 #	最大进程数
 	master_maxproc = 1
 #	预启动进程数，该值不得大于 master_maxproc
-#	master_prefork = 0
+	master_prefork = 1
 #	进程程序名
 	master_command = $<PROGRAM>
 #	进程日志记录文件

@@ -41,9 +41,9 @@ service $<PROGRAM> {
 #	每隔多长时间触发一次，单位为秒(仅对 trigger 模式有效)
 	master_wakeup = -
 #	最大进程数
-	master_maxproc = 5
+	master_maxproc = 1
 #	预启动进程数，该值不得大于 master_maxproc
-#	master_prefork = 0
+	master_prefork = 1
 #	进程程序名
 	master_command = $<PROGRAM>
 #	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
