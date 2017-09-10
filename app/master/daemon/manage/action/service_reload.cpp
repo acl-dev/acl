@@ -12,11 +12,22 @@
 
 #include "stdafx.h"
 #include <signal.h>
+#include "master/master_params.h"
 #include "master/master_api.h"
 #include "manage/http_client.h"
 #include "service_reload.h"
 
 #define STATUS_TIMEOUT	503
+
+service_reload::service_reload(http_client& client, reload_res_t& res)
+: client_(client)
+, res_(res)
+, proc_count_(0)
+, proc_signaled_(0)
+, servers_finished_(0)
+{
+	timeout_ = (long long) acl_var_master_reload_timeo * 1000;
+}
 
 bool service_reload::reload_one(const char* path, reload_res_data_t& data)
 {

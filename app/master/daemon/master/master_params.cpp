@@ -14,6 +14,7 @@ pid_t acl_var_master_pid;
 int   acl_var_master_in_flow_delay;
 int   acl_var_master_delay_sec;
 int   acl_var_master_delay_usec;
+int   acl_var_master_reload_timeo;
 
 static ACL_CONFIG_INT_TABLE int_tab[] = {
 	{ ACL_VAR_MASTER_PROC_LIMIT, ACL_DEF_MASTER_PROC_LIMIT,
@@ -30,6 +31,8 @@ static ACL_CONFIG_INT_TABLE int_tab[] = {
 		&acl_var_master_delay_sec, 0, 0 },
 	{ ACL_VAR_MASTER_DELAY_USEC, ACL_DEF_MASTER_DELAY_USEC,
 		&acl_var_master_delay_usec, 0, 0 },
+	{ ACL_VAR_MASTER_RELOAD_TIMEO, ACL_DEF_MASTER_RELOAD_TIMEO,
+		&acl_var_master_reload_timeo, 0, 0 },
 
 	{ 0, 0, 0, 0, 0 },
 };

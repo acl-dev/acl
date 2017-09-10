@@ -21,15 +21,7 @@ struct reload_res_data_t;
 class service_reload
 {
 public:
-	service_reload(http_client& client, reload_res_t& res)
-	: client_(client)
-	, res_(res)
-	, timeout_(5000000)
-	, proc_count_(0)
-	, proc_signaled_(0)
-	, servers_finished_(0)
-	{
-	}
+	service_reload(http_client& client, reload_res_t& res);
 	~service_reload(void) {}
 
 	bool run(const reload_req_t& req);
