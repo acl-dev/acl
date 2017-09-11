@@ -18,6 +18,12 @@
 #elif	defined(ACL_UNIX)
 #include <stdlib.h>
 #include <unistd.h>
+#ifndef _GNU_SOURCE 
+#define _GNU_SOURCE
+#endif
+#ifndef __USE_UNIX98
+# define __USE_UNIX98
+#endif
 #include <pthread.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -113,7 +119,7 @@ static void init_log_mutex(acl_pthread_mutex_t *lock)
 	pthread_mutexattr_t attr;
 
 	n1 = pthread_mutexattr_init(&attr);
-	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
 	thread_mutex_init(lock, !n1 && !n2 ? &attr : NULL);
 #else
 	thread_mutex_init(lock, NULL);

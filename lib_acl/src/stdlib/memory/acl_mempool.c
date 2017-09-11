@@ -20,6 +20,9 @@
 # ifndef  _GNU_SOURCE
 #  define _GNU_SOURCE
 # endif
+# ifndef __USE_UNIX98
+#  define __USE_UNIX98
+# endif
 # include <pthread.h>
 #endif
 
