@@ -17,6 +17,8 @@ process_name = acl_master
 buf_size = 81920
 # 父进程与子进程通信时的读写超时时间(秒)
 rw_timeout = 60
+# 父进程通知子进程重新加载配置时获得子进程反馈的超时时间(毫秒)
+reload_timeout = 5000
 #max_use = 100
 #max_idle = 100
 #in_flow_delay = 1
