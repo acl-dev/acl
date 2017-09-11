@@ -561,6 +561,7 @@ static int open_log(const char *recipient, const char *logpre)
  *  /var/log/unix.log
  * Èç£ºtcp:127.0.0.1:8088|/var/log/unix.log
  */
+
 int acl_open_log(const char *recipients, const char *logpre)
 {
 	const char *myname = "acl_open_log";

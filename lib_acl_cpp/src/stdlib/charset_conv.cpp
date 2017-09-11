@@ -26,6 +26,7 @@ static const char UTF8_HEADER[] = { (char) 0xEF, (char) 0xBB, (char) 0xBF, (char
 #ifdef HAVE_H_ICONV
 # ifdef USE_WIN_ICONV
 #  include "internal/win_iconv.hpp"
+
 #  define __iconv_open    iconv_open
 #  define __iconv_close   iconv_close
 #  define __iconv         iconv
