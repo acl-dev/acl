@@ -17,6 +17,11 @@ service $<PROGRAM> {
 #	master_type = unix
 	master_type = sock
 
+#	停止子进程时是否采用强行停止的方式(即给子进程发送 SIGTERM 信号)
+	master_stop_kill = false
+#	当 master_stop_kill 为 true 时，该配置决定是否要等待子进程退出
+	master_stop_wait = false
+
 #	当系统支持 SO_REUSEPORT 时，是否启用该功能
 	master_reuseport = yes
 #	是否针对监听套接口设定为非阻塞方式

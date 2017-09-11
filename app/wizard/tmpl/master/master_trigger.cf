@@ -9,6 +9,11 @@ service $<PROGRAM>
 #	服务类型
 	master_type = unix
 
+#	停止子进程时是否采用强行停止的方式(即给子进程发送 SIGTERM 信号)
+	master_stop_kill = false
+#	当 master_stop_kill 为 true 时，该配置决定是否要等待子进程退出
+	master_stop_wait = false
+
 #	当子进程异常退出时，如果该值非空，则将子进程异常退出的消息通知该服务
 #	master_notify_addr = 127.0.0.1:5801
 #	邮件通知接收者
