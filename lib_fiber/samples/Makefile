@@ -40,7 +40,7 @@ cl clean:
 	@(cd dns; make clean)
 	@(cd getaddrinfo; make clean)
 	@(cd fiber; make clean)
-	@(cd fiber sem; make clean)
+	@(cd fiber_sem; make clean)
 	@(cd read; make clean)
 	@(cd httpd; make clean)
 	@(cd httpd2; make clean)
