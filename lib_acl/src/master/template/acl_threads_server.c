@@ -1233,7 +1233,9 @@ void acl_threads_server_main(int argc, char * argv[],
 	ACL_MASTER_SERVER_THREAD_INIT_FN thread_init_fn = NULL;
 	ACL_MASTER_SERVER_THREAD_EXIT_FN thread_exit_fn = NULL;
 	ACL_VSTRING *buf = acl_vstring_alloc(128);
+#ifdef ACL_UNIX
 	const char  *generation;
+#endif
 	va_list ap;
 
 	/*******************************************************************/
@@ -1408,12 +1410,14 @@ void acl_threads_server_main(int argc, char * argv[],
 	else
 		event_mode = ACL_EVENT_SELECT;
 
+#ifdef ACL_UNIX
 	/* Retrieve process generation from environment. */
 	if ((generation = getenv(ACL_MASTER_GEN_NAME)) != 0) {
 		if (!acl_alldig(generation))
 			acl_msg_fatal("bad generation: %s", generation);
 		sscanf(generation, "%o", &__threads_server_generation);
 	}
+#endif
 
 	/*******************************************************************/
 
@@ -1488,7 +1492,7 @@ void acl_threads_server_main(int argc, char * argv[],
 
 	while (1) {
 		acl_event_loop(__event);
-
+#ifdef ACL_UNIX
 		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
 			if (__sighup_handler(__service_ctx, buf) < 0)
@@ -1500,6 +1504,7 @@ void acl_threads_server_main(int argc, char * argv[],
 					__threads_server_generation,
 					ACL_MASTER_STAT_SIGHUP_OK);
 		}
+#endif
 	}
 
 	acl_vstring_free(buf);

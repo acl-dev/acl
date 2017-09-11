@@ -621,6 +621,7 @@ static void main_thread_loop(void)
 
 	while (1) {
 		acl_event_loop(__main_event);
+#ifdef ACL_UNIX
 		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
 			if (__sighup_handler(__service_ctx, buf) < 0)
@@ -632,6 +633,7 @@ static void main_thread_loop(void)
 					__udp_server_generation,
 					ACL_MASTER_STAT_SIGHUP_OK);
 		}
+#endif
 	}
 
 	acl_vstring_free(buf);
@@ -699,7 +701,9 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	ACL_MASTER_SERVER_INIT_FN post_init = 0;
 	char   *root_dir = 0, *user_name = 0;
 	UDP_SERVER *server;
+#ifdef ACL_UNIX
 	const char *generation;
+#endif
 	int     c, key;
 	va_list ap;
 
@@ -829,12 +833,14 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	__service_name = service_name;
 	__service_argv = argv + optind;
 
+#ifdef ACL_UNIX
 	/* Retrieve process generation from environment. */
 	if ((generation = getenv(ACL_MASTER_GEN_NAME)) != 0) {
 		if (!acl_alldig(generation))
 			acl_msg_fatal("bad generation: %s", generation);
 		sscanf(generation, "%o", &__udp_server_generation);
 	}
+#endif
 
 	/*******************************************************************/
 
