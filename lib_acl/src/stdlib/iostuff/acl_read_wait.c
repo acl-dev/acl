@@ -87,7 +87,7 @@ static EPOLL_CTX *thread_epoll_init(void)
 		return NULL;
 	}
 
-	if (acl_pthread_self() == acl_main_thread_self()) {
+	if ((unsigned int) acl_pthread_self() == acl_main_thread_self()) {
 		main_epoll_ctx = epoll_ctx;
 		atexit(main_epoll_end);
 		acl_msg_info("%s(%d): %s, create epoll_fd: %d, tid: %lu, %lu",
