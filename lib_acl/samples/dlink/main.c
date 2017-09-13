@@ -5,12 +5,55 @@ static ACL_DLINK *build(void)
 	const char *myname = "build";
 	ACL_DLINK *dlink = acl_dlink_create(100);
 
-	acl_dlink_insert(dlink, 0, 10);
+	printf("add: -10 -- -10\r\n");
+	acl_dlink_insert(dlink, -10, -10);
+	printf("add: -9 -- -9\r\n");
+	acl_dlink_insert(dlink, -9, -9);
+	printf("add: -8 -- -7\r\n");
+	acl_dlink_insert(dlink, -8, -7);
+	printf("\r\n");
+
+	printf("add: -4 -- -4\r\n");
+	acl_dlink_insert(dlink, -4, -4);
+	printf("\r\n");
+
+	printf("add: -2 -- -1\r\n");
+	acl_dlink_insert(dlink, -2, -1);
+	printf("add: 0 -- 7\r\n");
+	acl_dlink_insert(dlink, 0, 7);
+	printf("add: 8 -- 10\r\n");
 	acl_dlink_insert(dlink, 8, 10);
+	printf("add: 11 -- 10\r\n");
+	acl_dlink_insert(dlink, 11, 10);
+	printf("add: 12 -- 14\r\n");
+	acl_dlink_insert(dlink, 12, 12);
+	printf("add: 13 -- 14\r\n");
+	acl_dlink_insert(dlink, 13, 14);
+	printf("add: 15 -- 16\r\n");
+	acl_dlink_insert(dlink, 15, 16);
+	printf("add: 17 -- 18\r\n");
+	acl_dlink_insert(dlink, 17, 18);
+	printf("add: 15 -- 18\r\n");
+	acl_dlink_insert(dlink, 15, 18);
+	printf("\r\n");
+
+	printf("add: 20 -- 21\r\n");
 	acl_dlink_insert(dlink, 20, 21);
+	printf("add: 21 -- 28\r\n");
 	acl_dlink_insert(dlink, 21, 28);
-	acl_dlink_insert(dlink, 31, 38);
+	printf("\r\n");
+
+	printf("add: 31 -- 40\r\n");
+	acl_dlink_insert(dlink, 31, 40);
+	printf("add: 32 -- 40\r\n");
+	acl_dlink_insert(dlink, 32, 40);
+	printf("add: 33 -- 35\r\n");
+	acl_dlink_insert(dlink, 33, 35);
+	printf("add: 41 -- 48\r\n");
 	acl_dlink_insert(dlink, 41, 48);
+	printf("\r\n");
+
+	printf("add: 51 -- 58\r\n");
 	acl_dlink_insert(dlink, 51, 58);
 
 	printf("\r\n%s:\r\n", myname);
@@ -99,6 +142,10 @@ static void test(void)
 }
 int main(int argc acl_unused, char *argv[] acl_unused)
 {
+	acl_dlink_free(build());
+	printf("Enter any key to continue ...\r\n");
+	getchar();
+
 	test();
 	return (0);
 }

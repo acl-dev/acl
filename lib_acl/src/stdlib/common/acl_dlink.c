@@ -49,7 +49,7 @@ static void dlink_free_callback(void *arg)
  * 		if idx > 0 && idx <= a->count - 1 -----> 说明在数组的中间的某一位置
  *		if idx > a->count - 1 -----> 说明在数组的最后一位置添加
  */
-static int scope_pos(const ACL_ARRAY *a, acl_uint64 n)
+static int scope_pos(const ACL_ARRAY *a, acl_int64 n)
 {
 	ACL_DITEM *pitem_left, *pitem_right;
 	int lidx, hidx, midx, ridx, idx;
@@ -108,19 +108,19 @@ static int scope_pos(const ACL_ARRAY *a, acl_uint64 n)
 	return idx;
 }
 
-static int begin_pos(const ACL_ARRAY *a, acl_uint64 n)
+static int begin_pos(const ACL_ARRAY *a, acl_int64 n)
 {
 	return scope_pos(a, n);
 }
 
-static int end_pos(const ACL_ARRAY *a, acl_uint64 n)
+static int end_pos(const ACL_ARRAY *a, acl_int64 n)
 {
 	return scope_pos(a, n);
 }
 
 #ifdef	_USE_PRED_INSERT_
 static ACL_DITEM *dlink_pred_insert(ACL_ARRAY *a, int idx_position,
-	acl_uint64 begin, acl_uint64 end)
+	acl_int64 begin, acl_int64 end)
 {
 	ACL_DITEM *pitem;
 	int ret;
@@ -142,7 +142,7 @@ static ACL_DITEM *dlink_pred_insert(ACL_ARRAY *a, int idx_position,
 #endif
 
 static ACL_DITEM *dlink_succ_insert(ACL_ARRAY *a, int idx_position,
-	acl_uint64 begin, acl_uint64 end)
+	acl_int64 begin, acl_int64 end)
 {
 	ACL_DITEM *pitem;
 	int ret;
@@ -162,7 +162,7 @@ static ACL_DITEM *dlink_succ_insert(ACL_ARRAY *a, int idx_position,
 	return pitem;
 }
 
-static ACL_DITEM *dlink_append(ACL_ARRAY *a, acl_uint64 begin, acl_uint64 end)
+static ACL_DITEM *dlink_append(ACL_ARRAY *a, acl_int64 begin, acl_int64 end)
 {
 	ACL_DITEM *pitem;
 	int ret;
@@ -182,7 +182,7 @@ static ACL_DITEM *dlink_append(ACL_ARRAY *a, acl_uint64 begin, acl_uint64 end)
 	return pitem;
 }
 
-static ACL_DITEM *dlink_prepend(ACL_ARRAY *a, acl_uint64 begin, acl_uint64 end)
+static ACL_DITEM *dlink_prepend(ACL_ARRAY *a, acl_int64 begin, acl_int64 end)
 {
 	ACL_DITEM *pitem;
 	int ret;
@@ -216,7 +216,7 @@ static int dlink_node_merge(ACL_ARRAY *a, int idx_obj_begin, int idx_src_begin)
 	return 0;
 }
 
-static ACL_DITEM *dlink_add(ACL_ARRAY *a, acl_uint64 begin, acl_uint64 end)
+static ACL_DITEM *dlink_add(ACL_ARRAY *a, acl_int64 begin, acl_int64 end)
 {
 	ACL_DITEM *pitem_right, *pitem_left, *pitem;
 	int idx_begin, idx_end;
@@ -228,7 +228,7 @@ static ACL_DITEM *dlink_add(ACL_ARRAY *a, acl_uint64 begin, acl_uint64 end)
 		return NULL;
 
 	idx_begin = begin_pos(a, begin);
-	if(idx_begin < 0 || idx_begin >= acl_array_size(a))	/* an error happened */
+	if(idx_begin < 0 || idx_begin >= acl_array_size(a)) /* an error happened */
 		return NULL;
 
 	idx_end   = end_pos(a, end);
@@ -255,7 +255,7 @@ static ACL_DITEM *dlink_add(ACL_ARRAY *a, acl_uint64 begin, acl_uint64 end)
 		 * this is to say the begin and end is on the same d-link
 		 */
 
-		if (end < pitem_left->begin) {
+		if (end + 1 < pitem_left->begin) {
 			/*
 			 * here idx_begin == idx_end must be equal to 0
 			 * the begin and the end must be less
@@ -266,7 +266,7 @@ static ACL_DITEM *dlink_add(ACL_ARRAY *a, acl_uint64 begin, acl_uint64 end)
 			return pitem;
 		}
 
-		if (begin > pitem_left->end) {
+		if (begin > pitem_left->end + 1) {
 			/*
 			 * this is to say begin and end
 			 * between the current node's end
@@ -321,7 +321,7 @@ static ACL_DITEM *dlink_add(ACL_ARRAY *a, acl_uint64 begin, acl_uint64 end)
 	 *	begin < pitem_right->begin;
 	 */
 
-	if(begin < pitem_left->begin) {
+	if (begin < pitem_left->begin) {
 		/*
 		 * in the first position of the array
 		 * idx_begin == 0 and idx_end >= 1
@@ -339,7 +339,7 @@ static ACL_DITEM *dlink_add(ACL_ARRAY *a, acl_uint64 begin, acl_uint64 end)
 	 * ===>  <= end
 	 */
 
-	if(begin <= pitem_left->end) {
+	if (begin <= pitem_left->end + 1) {
 		/*
 		 * ===>  pitem_left->begin
 		 * ===>  <= begin
@@ -347,17 +347,18 @@ static ACL_DITEM *dlink_add(ACL_ARRAY *a, acl_uint64 begin, acl_uint64 end)
 		 * ===>  <  pitem_right->begin
 		 * ===>  <= end
 		 * ===>  so, just merge the nodes between the
-		 * ===>  pitem_left node and the pitem_right node, and include both of them
+		 * ===>  pitem_left node and the pitem_right node,
+		 * ===>  and include both of them
 		 */
 
 		/*
-		 * merge the pitem_left node, begin ---> end into pitem_right node,
-		 * and merge all nodes into one node which are between 
+		 * merge the pitem_left node, begin ---> end into pitem_right
+		 * node, and merge all nodes into one node which are between 
 		 * the pitem_left node and the pitem_right node,
 		 * include both of pitem_left node and pitem_right node
 		 */
 
-		if(end > pitem_right->end) {
+		if (end > pitem_right->end) {
 			/*
 			 * ===>  pitem_left->begin
 			 * ===>  <= begin
@@ -401,7 +402,7 @@ static ACL_DITEM *dlink_add(ACL_ARRAY *a, acl_uint64 begin, acl_uint64 end)
 	 * include idx_begin + 1 node and pitem_righ node
 	 */
 
-	if(end > pitem_right->end) {
+	if (end > pitem_right->end) {
 		/*
 		 * ===>  pitem_left->begin
 		 * ===>  <= pitem_left->end
@@ -503,12 +504,12 @@ ACL_DITEM *acl_dlink_lookup2_by_item(const ACL_DLINK *plink, ACL_DITEM *pitem, i
 	return NULL;
 }
 
-ACL_DITEM *acl_dlink_lookup(const ACL_DLINK *plink, acl_uint64 n)
+ACL_DITEM *acl_dlink_lookup(const ACL_DLINK *plink, acl_int64 n)
 {
 	return acl_dlink_lookup2(plink, n, NULL);
 }
 
-ACL_DITEM *acl_dlink_lookup2(const ACL_DLINK *plink, acl_uint64 n, int *pidx)
+ACL_DITEM *acl_dlink_lookup2(const ACL_DLINK *plink, acl_int64 n, int *pidx)
 {
 	int lidx, midx, hidx;
 
@@ -535,8 +536,8 @@ ACL_DITEM *acl_dlink_lookup2(const ACL_DLINK *plink, acl_uint64 n, int *pidx)
 	return NULL;	/*not in the d_link scope */
 }
 
-ACL_DITEM *acl_dlink_lookup_range(const ACL_DLINK *plink, acl_uint64 begin,
-	acl_uint64 end, int *pidx)
+ACL_DITEM *acl_dlink_lookup_range(const ACL_DLINK *plink, acl_int64 begin,
+	acl_int64 end, int *pidx)
 {
 	ACL_DITEM *ditem;
 
@@ -551,7 +552,7 @@ ACL_DITEM *acl_dlink_lookup_range(const ACL_DLINK *plink, acl_uint64 begin,
 }
 
 ACL_DITEM *acl_dlink_lookup_larger(const ACL_DLINK *plink,
-	acl_uint64 off, int *pidx)
+	acl_int64 off, int *pidx)
 {
 	int   i, size;
 
@@ -571,7 +572,7 @@ ACL_DITEM *acl_dlink_lookup_larger(const ACL_DLINK *plink,
 }
 
 ACL_DITEM *acl_dlink_lookup_lower(const ACL_DLINK *plink,
-	acl_uint64 off, int *pidx)
+	acl_int64 off, int *pidx)
 {
 	int   i, size;
 
@@ -590,10 +591,10 @@ ACL_DITEM *acl_dlink_lookup_lower(const ACL_DLINK *plink,
 	return NULL;	/*not in the d_link scope */
 }
 
-ACL_DITEM *acl_dlink_insert(ACL_DLINK *plink, acl_uint64 begin, acl_uint64 end)
+ACL_DITEM *acl_dlink_insert(ACL_DLINK *plink, acl_int64 begin, acl_int64 end)
 {
 	if (begin > end) {
-		acl_uint64 tmp;
+		acl_int64 tmp;
 		/* swap the begin and end if end < begin */
 		tmp   = begin;
 		begin = end;
@@ -609,7 +610,7 @@ ACL_DITEM *acl_dlink_insert(ACL_DLINK *plink, acl_uint64 begin, acl_uint64 end)
 	return dlink_add(plink->parray, begin, end);
 }
 
-int acl_dlink_delete(ACL_DLINK *plink, acl_uint64 n)
+int acl_dlink_delete(ACL_DLINK *plink, acl_int64 n)
 {
 	const ACL_DITEM *ditem;
 	int  idx;
@@ -631,7 +632,7 @@ int acl_dlink_delete_by_item(ACL_DLINK *plink, ACL_DITEM *pitem)
 	return 0;
 }
 
-int acl_dlink_delete_range(ACL_DLINK *plink, acl_uint64 begin, acl_uint64 end)
+int acl_dlink_delete_range(ACL_DLINK *plink, acl_int64 begin, acl_int64 end)
 {
 	ACL_ARRAY *parray = plink->parray;
 	ACL_DITEM *pitem, *pitem_low;
@@ -671,7 +672,7 @@ int acl_dlink_delete_range(ACL_DLINK *plink, acl_uint64 begin, acl_uint64 end)
 			return 0;
 		} else if (end < pitem->end) {
 			/* pitem->begin < begin <= end < pitem->end */
-			acl_uint64 tmp_begin, tmp_end;
+			acl_int64 tmp_begin, tmp_end;
 
 			tmp_begin = end + 1;
 			tmp_end = pitem->end;
@@ -746,10 +747,10 @@ int acl_dlink_delete_range(ACL_DLINK *plink, acl_uint64 begin, acl_uint64 end)
 	return acl_array_delete_range(parray, low, high, dlink_free_callback);
 }
 
-ACL_DITEM *acl_dlink_modify(ACL_DLINK *plink, acl_uint64 begin, acl_uint64 end)
+ACL_DITEM *acl_dlink_modify(ACL_DLINK *plink, acl_int64 begin, acl_int64 end)
 {
 	if (begin > end) {
-		acl_uint64 tmp;
+		acl_int64 tmp;
 		/* swap the begin andend if end < begin */
 		tmp   = begin;
 		begin = end;
