@@ -102,4 +102,3 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	test();
 	return (0);
 }
-
