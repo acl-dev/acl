@@ -81,4 +81,17 @@ bool thread_mutex::unlock(void)
 	return true;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+
+thread_mutex_guard::thread_mutex_guard(thread_mutex& mutex)
+: mutex_(mutex)
+{
+	acl_assert(mutex_.lock());
+}
+
+thread_mutex_guard::~thread_mutex_guard(void)
+{
+	acl_assert(mutex_.unlock());
+}
+
 } // namespace acl

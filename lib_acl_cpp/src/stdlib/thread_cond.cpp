@@ -20,20 +20,19 @@
 
 namespace acl {
 
-thread_cond::thread_cond(void)
+thread_cond::thread_cond(thread_mutex* mutex)
 {
-	cond_ = (acl_pthread_cond_t*)
-		acl_mycalloc(1, sizeof(acl_pthread_cond_t));
-	acl_assert(acl_pthread_cond_init(cond_, NULL) == 0);
+	if (mutex)
+	{
+		mutex_internal_ = NULL;
+		mutex_ = mutex;
+	}
+	else
+	{
+		mutex_internal_ = NEW thread_mutex;
+		mutex_  = mutex_internal_;
+	}
 
-	mutex_internal_ = NEW thread_mutex;
-	mutex_ = mutex_internal_;
-}
-
-thread_cond::thread_cond(thread_mutex& mutex)
-: mutex_(&mutex)
-, mutex_internal_(NULL)
-{
 	cond_ = (acl_pthread_cond_t*)
 		acl_mycalloc(1, sizeof(acl_pthread_cond_t));
 	acl_pthread_cond_init(cond_, NULL);
@@ -56,7 +55,7 @@ bool thread_cond::notify_all(void)
 	return acl_pthread_cond_broadcast(cond_) == 0;
 }
 
-bool thread_cond::wait(long long microseconds /* = 0 */)
+bool thread_cond::wait(long long microseconds /* = -1 */)
 {
 #define	SEC_TO_NS	1000000000	// nanoseconds per second
 #define SEC_TO_MIS	1000000		// microseconds per second
@@ -69,7 +68,7 @@ bool thread_cond::wait(long long microseconds /* = 0 */)
 		return false;
 	}
 
-	if (microseconds <= 0)
+	if (microseconds < 0)
 	{
 		int  ret1 = acl_pthread_cond_wait(cond_, mutex) ;
 		if (ret1)
