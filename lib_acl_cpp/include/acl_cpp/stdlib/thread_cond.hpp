@@ -41,7 +41,7 @@ public:
 
 	/**
 	 * 等待线程条件变量就绪
-	 * @param microseconds {long long} 等待条件变量就绪的超时时间(毫秒级)
+	 * @param microseconds {long long} 等待条件变量就绪的超时时间(微秒级)
 	 *   > 0 时表示等待超时的时间
 	 *   == 0，不等待
 	 *   < 0 则一直等待直到条件变量就绪
