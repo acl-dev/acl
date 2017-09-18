@@ -1110,6 +1110,9 @@
     <ClInclude Include="include\acl_cpp\stdlib\thread_queue.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\trigger.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_geo.hpp">
       <Filter>Header Files\redis</Filter>
     </ClInclude>

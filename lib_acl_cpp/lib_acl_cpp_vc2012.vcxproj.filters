@@ -993,6 +993,9 @@
     <ClInclude Include="include\acl_cpp\stdlib\thread_pool.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\trigger.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\stream\aio_delay_free.hpp">
       <Filter>Header Files\stream</Filter>
     </ClInclude>

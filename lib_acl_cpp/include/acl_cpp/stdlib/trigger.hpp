@@ -92,7 +92,6 @@ private:
  *     mytask(void) {}
  *     ~mytask(void) {}
  *
- * private:
  *     // @override
  *     bool on_trigger(void)
  *     {

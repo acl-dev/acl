@@ -194,7 +194,6 @@ public:
 		return timer_;
 	}
 
-private:
 	// @override
 	void run(void)
 	{

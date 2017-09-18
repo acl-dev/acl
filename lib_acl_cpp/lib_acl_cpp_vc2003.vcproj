@@ -1142,6 +1142,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\acl_cpp\stdlib\thread_queue.hpp">
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\stdlib\trigger.hpp">
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\stdlib\url_coder.hpp">
 				</File>
 				<File
