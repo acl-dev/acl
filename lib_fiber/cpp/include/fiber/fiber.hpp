@@ -163,6 +163,66 @@ private:
 	static void timer_callback(ACL_FIBER* f, void* ctx);
 };
 
+/**
+ * 定时器管理协程
+ */
+template <typename T>
+class fiber_trigger : public fiber
+{
+public:
+	fiber_trigger(timer_trigger<T>& timer)
+	: delay_(100)
+	, stop_(false)
+	, timer_(timer)
+	{
+	}
+
+	virtual ~fiber_trigger(void) {}
+
+	void add(T* o)
+	{
+		mbox_.push(o);
+	}
+
+	void del(T* o)
+	{
+		timer_.del(o);
+	}
+
+	timer_trigger<T>& get_trigger(void)
+	{
+		return timer_;
+	}
+
+private:
+	// @override
+	void run(void)
+	{
+		while (!stop_) {
+			T* o = mbox_.pop(delay_);
+			if (o)
+				timer_.add(o);
+
+			long long next = timer_.trigger();
+			long long curr = get_curr_stamp();
+			if (next == -1)
+				delay_ = 100;
+			else {
+				delay_ = next - curr;
+				if (delay_ <= 0)
+					delay_ = 1;
+			}
+		}
+	}
+
+private:
+	long long delay_;
+	bool stop_;
+
+	timer_trigger<T>& timer_;
+	mbox<T> mbox_;
+};
+
 } // namespace acl
 
 #if defined(__GNUC__) && (__GNUC__ > 6 ||(__GNUC__ == 6 && __GNUC_MINOR__ >= 0))

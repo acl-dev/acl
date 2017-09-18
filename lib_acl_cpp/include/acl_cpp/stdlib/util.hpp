@@ -44,5 +44,8 @@ ACL_CPP_API const char* string_error(int errnum, char* buf, size_t size);
 ACL_CPP_API int strncasecmp_(const char *s1, const char *s2, size_t n);
 ACL_CPP_API void assert_(bool n);
 ACL_CPP_API void meter_time(const char *filename, int line, const char *info);
+ACL_CPP_API long long get_curr_stamp(void);
+ACL_CPP_API double stamp_sub(const struct timeval& from,
+		const struct timeval& sub);
 
 } // namespace acl

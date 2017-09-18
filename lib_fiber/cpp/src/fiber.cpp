@@ -1,4 +1,5 @@
 #include "stdafx.hpp"
+#include "acl_cpp/stdlib/trigger.hpp"
 #include "fiber/fiber.hpp"
 
 namespace acl {

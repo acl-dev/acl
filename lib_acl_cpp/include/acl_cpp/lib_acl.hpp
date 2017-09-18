@@ -33,6 +33,7 @@
 #include "stdlib/scan_dir.hpp"
 #include "stdlib/dbuf_pool.hpp"
 #include "stdlib/mbox.hpp"
+#include "stdlib/trigger.hpp"
 #include "stdlib/atomic.hpp"
 #include "stdlib/bitmap.hpp"
 

@@ -1,6 +1,7 @@
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 #include "acl_cpp/connpool/connect_monitor.hpp"
 #include "acl_cpp/connpool/connect_manager.hpp"
@@ -10,22 +11,6 @@
 
 namespace acl
 {
-
-static double stamp_sub(const struct timeval& from, const struct timeval& sub)
-{
-	struct timeval res;
-
-	memcpy(&res, &from, sizeof(struct timeval));
-
-	res.tv_usec -= sub.tv_usec;
-	if (res.tv_usec < 0) {
-		--res.tv_sec;
-		res.tv_usec += 1000000;
-	}
-	res.tv_sec -= sub.tv_sec;
-
-	return res.tv_sec * 1000.0 + res.tv_usec/1000.0;
-}
 
 check_client::check_client(check_timer& timer, const char* addr,
 	aio_socket_stream& conn, struct timeval& begin)

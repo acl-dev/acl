@@ -1,3 +1,7 @@
+
+60) 2017.9.18
+60.1) feature: 增加 fiber_trigger 类用于按时间触发操作
+
 59) 2017.9.10
 59.1) feature: 协程服务器模板在执行完 reload 后可以将执行状态反馈给 master
 

@@ -3,6 +3,8 @@
 #include "acl_cpp/stdlib/util.hpp"
 #endif
 
+#include "acl_cpp/stdlib/trigger.hpp"
+
 namespace acl
 {
 
@@ -45,6 +47,30 @@ void assert_(bool n)
 void meter_time(const char *filename, int line, const char *info)
 {
 	acl_meter_time(filename, line, info);
+}
+
+long long get_curr_stamp(void)
+{
+	struct timeval now;
+	gettimeofday(&now, NULL);
+
+	return (long long) now.tv_sec * 1000 + (long long) now.tv_usec / 1000;
+}
+
+double stamp_sub(const struct timeval& from, const struct timeval& sub)
+{
+	struct timeval res;
+
+	memcpy(&res, &from, sizeof(struct timeval));
+
+	res.tv_usec -= sub.tv_usec;
+	if (res.tv_usec < 0) {
+		--res.tv_sec;
+		res.tv_usec += 1000000;
+	}
+	res.tv_sec -= sub.tv_sec;
+
+	return res.tv_sec * 1000.0 + res.tv_usec / 1000.0;
 }
 
 } // namespace acl
