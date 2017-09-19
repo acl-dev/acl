@@ -57,6 +57,7 @@ variables:
             - packaging/x86_64/*.rpm
 
 stages:
+    - test
     - publish
 
 test:centos:
