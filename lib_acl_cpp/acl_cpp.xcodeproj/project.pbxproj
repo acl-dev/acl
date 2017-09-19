@@ -250,6 +250,7 @@
 		0778DAE51F1CB7150011B753 /* thread_mutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_mutex.cpp; sourceTree = "<group>"; };
 		0778DAE81F1CB8C90011B753 /* bitmap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = bitmap.hpp; sourceTree = "<group>"; };
 		0778DAE91F1CB8EB0011B753 /* bitmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap.cpp; sourceTree = "<group>"; };
+		0778DAEB1F1CC19B0011B753 /* trigger.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = trigger.hpp; sourceTree = "<group>"; };
 		07A458311E6FCCB4002C9B3C /* libacl_cpp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libacl_cpp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07A458341E6FCCB4002C9B3C /* acl_cpp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acl_cpp.h; sourceTree = "<group>"; };
 		07A458361E6FCCB4002C9B3C /* acl_cpp.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = acl_cpp.mm; sourceTree = "<group>"; };
@@ -1409,6 +1410,7 @@
 		07A469191E6FD404002C9B3C /* stdlib */ = {
 			isa = PBXGroup;
 			children = (
+				0778DAEB1F1CC19B0011B753 /* trigger.hpp */,
 				0778DAE81F1CB8C90011B753 /* bitmap.hpp */,
 				0778DAE11F1CB6D50011B753 /* thread_mutex.hpp */,
 				0778DAE01F1CB6CB0011B753 /* atomic.hpp */,
