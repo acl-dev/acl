@@ -625,11 +625,11 @@ static void main_thread_loop(void)
 		if (acl_var_server_gotsighup && __sighup_handler) {
 			acl_var_server_gotsighup = 0;
 			if (__sighup_handler(__service_ctx, buf) < 0)
-				acl_master_notify(acl_var_aio_pid,
+				acl_master_notify(acl_var_udp_pid,
 					__udp_server_generation,
 					ACL_MASTER_STAT_SIGHUP_ERR);
 			else
-				acl_master_notify(acl_var_aio_pid,
+				acl_master_notify(acl_var_udp_pid,
 					__udp_server_generation,
 					ACL_MASTER_STAT_SIGHUP_OK);
 		}
