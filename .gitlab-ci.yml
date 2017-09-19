@@ -39,6 +39,7 @@ variables:
       - /^devel-.*$/
     artifacts:
         paths:
+            - yum install -y zlib-static
             - packaging/x86_64/*.rpm
 
 .basepublishprerelease: &PRERELEASE
@@ -52,14 +53,11 @@ variables:
         - /^release-.*$/
     artifacts:
         paths:
+            - yum install -y zlib-static
             - packaging/x86_64/*.rpm
 
 stages:
-    - test
-    - build
     - publish
-    - page
-
 
 test:centos:
     variables: {
