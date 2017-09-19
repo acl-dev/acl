@@ -396,7 +396,7 @@ static void event_loop(ACL_EVENT *eventp)
 			THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
 			if (eventp->ready_cnt == 0)
-				acl_doze(delay > DELAY_MIN ? delay / 1000 : 1);
+				acl_doze(delay > DELAY_MIN ? (int) delay / 1000 : 1);
 
 			nready = 0;
 			goto TAG_DONE;

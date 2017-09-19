@@ -684,7 +684,7 @@ static void event_loop(ACL_EVENT *eventp)
 
 	if (eventp->fdcnt == 0) {
 		if (eventp->ready_cnt == 0)
-			acl_doze(delay > DELAY_MIN ? delay / 1000 : 10);
+			acl_doze(delay > DELAY_MIN ? (int) delay / 1000 : 10);
 
 		goto TAG_DONE;
 	}
