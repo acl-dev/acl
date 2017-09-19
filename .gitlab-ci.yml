@@ -19,6 +19,7 @@ variables:
     image: ${BUILDIMAGES}
     stage: build
     script:
+        - yum install -y zlib-static
         - cd packaging && make rpm
     artifacts:
         paths:
@@ -32,6 +33,7 @@ variables:
     image: ${BUILDIMAGES}
     stage: publish
     script:
+        - yum install -y zlib-static
         - cd packaging && make
         - cd ${CI_PROJECT_DIR} && /tools/publish.sh
     coverage: '/lines......: \d+\.\d+%/'
@@ -39,13 +41,13 @@ variables:
       - /^devel-.*$/
     artifacts:
         paths:
-            - yum install -y zlib-static
             - packaging/x86_64/*.rpm
 
 .basepublishprerelease: &PRERELEASE
     image: ${BUILDIMAGES}
     stage: publish
     script:
+        - yum install -y zlib-static
         - cd packaging && make
         - cd ${CI_PROJECT_DIR} && /tools/publish.sh -t prerelease
     coverage: '/lines......: \d+\.\d+%/'
@@ -53,7 +55,6 @@ variables:
         - /^release-.*$/
     artifacts:
         paths:
-            - yum install -y zlib-static
             - packaging/x86_64/*.rpm
 
 stages:
@@ -66,34 +67,6 @@ test:centos:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:6.4"
     }
     <<: *TEST
-
-build:centos6.4:
-    variables: {
-        BUILDIMAGES:
-            "docker-registry.qiyi.virtual/portal-process/centos-builder:6.4"
-    }
-    <<: *BUILD
-
-build:centos6.6:
-    variables: {
-        BUILDIMAGES:
-            "docker-registry.qiyi.virtual/portal-process/centos-builder:6.6"
-    }
-    <<: *BUILD
-
-build:centos7.0:
-    variables: {
-        BUILDIMAGES:
-            "docker-registry.qiyi.virtual/portal-process/centos-builder:7.0"
-    }
-    <<: *BUILD
-
-build:centos7.2:
-    variables: {
-        BUILDIMAGES:
-            "docker-registry.qiyi.virtual/portal-process/centos-builder:7.2"
-    }
-    <<: *BUILD
 
 devel:centos6.4:
     variables: {
@@ -150,13 +123,3 @@ prerelease:centos7.2:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:7.2"
     }
     <<: *PRERELEASE
-
-pages:
-    stage: page
-    image: docker-registry.qiyi.virtual/portal-process/gitbook:1.0
-    script:
-      - export PATH=$PATH:/opt/node-v6.9.4-linux-x64/bin
-      - gitbook build . public
-    artifacts:
-      paths:
-      - public
