@@ -76,7 +76,7 @@ fi
 /etc/init.d/master
 
 %changelog
-* Tue Sep 19 2017 zhengshuxin@qiyi.com 3.3.0-13-20170919.17
+* Tue Sep 19 2017 zhengshuxin@qiyi.com 3.3.0-14-20170919.17
 - Fixed one bug in acl_udp_server.c when sending status to acl_master
 
 * Tue Sep 19 2017 zhengshuxin@qiyi.com 3.3.0-13-20170919.13
