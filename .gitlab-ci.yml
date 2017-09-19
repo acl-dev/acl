@@ -1,0 +1,163 @@
+---
+# The image used to start a container to do build jobs, which should has all
+# build depencies installed
+# coverage: '/total:[\t]*statements[\t]*\d+\.\d+%/'
+#  coverage: '/total:[\t]*\(statements\)[\t]*\d+\.\d+%/'
+
+variables:
+    {
+        JOB_NAME: "${CI_PROJECT_NAME}"
+    }
+
+.projecttest: &TEST
+    image: ${BUILDIMAGES}
+    stage: test
+    script:
+        - echo "OK"
+
+.projectbuild: &BUILD
+    image: ${BUILDIMAGES}
+    stage: build
+    script:
+        - cd packaging && make rpm
+    artifacts:
+        paths:
+            - packaging/x86_64/*.rpm
+    only:
+      - /^check-.*$/
+    except:
+        - tags@cdn-cloud/acl
+
+.basepublishdev: &DEVEL
+    image: ${BUILDIMAGES}
+    stage: publish
+    script:
+        - cd packaging && make
+        - cd ${CI_PROJECT_DIR} && /tools/publish.sh
+    coverage: '/lines......: \d+\.\d+%/'
+    only:
+      - /^devel-.*$/
+    artifacts:
+        paths:
+            - packaging/x86_64/*.rpm
+
+.basepublishprerelease: &PRERELEASE
+    image: ${BUILDIMAGES}
+    stage: publish
+    script:
+        - cd packaging && make
+        - cd ${CI_PROJECT_DIR} && /tools/publish.sh -t prerelease
+    coverage: '/lines......: \d+\.\d+%/'
+    only:
+        - /^release-.*$/
+    artifacts:
+        paths:
+            - packaging/x86_64/*.rpm
+
+stages:
+    - test
+    - build
+    - publish
+    - page
+
+
+test:centos:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:6.4"
+    }
+    <<: *TEST
+
+build:centos6.4:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:6.4"
+    }
+    <<: *BUILD
+
+build:centos6.6:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:6.6"
+    }
+    <<: *BUILD
+
+build:centos7.0:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:7.0"
+    }
+    <<: *BUILD
+
+build:centos7.2:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:7.2"
+    }
+    <<: *BUILD
+
+devel:centos6.4:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:6.4"
+    }
+    <<: *DEVEL
+
+devel:centos6.6:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:6.6"
+    }
+    <<: *DEVEL
+
+devel:centos7.0:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:7.0"
+    }
+    <<: *DEVEL
+
+devel:centos7.2:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:7.2"
+    }
+    <<: *DEVEL
+
+prerelease:centos6.4:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:6.4"
+    }
+    <<: *PRERELEASE
+
+prerelease:centos6.6:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:6.6"
+    }
+    <<: *PRERELEASE
+
+prerelease:centos7.0:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:7.0"
+    }
+    <<: *PRERELEASE
+
+prerelease:centos7.2:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:7.2"
+    }
+    <<: *PRERELEASE
+
+pages:
+    stage: page
+    image: docker-registry.qiyi.virtual/portal-process/gitbook:1.0
+    script:
+      - export PATH=$PATH:/opt/node-v6.9.4-linux-x64/bin
+      - gitbook build . public
+    artifacts:
+      paths:
+      - public
