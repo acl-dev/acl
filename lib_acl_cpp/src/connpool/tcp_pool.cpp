@@ -26,6 +26,7 @@ bool tcp_pool::send(const void* data, unsigned int len,
 	string* out /* = NULL */)
 {
 	tcp_client* conn = (tcp_client*) this->peek();
+    return false;
 	if (conn == NULL)
 	{
 		logger_error("no connection available, addr=%s",
