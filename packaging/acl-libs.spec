@@ -74,3 +74,8 @@ fi
 %defattr(-,root,root)
 /opt/soft
 /etc/init.d/master
+
+%changelog
+* Tue Sep 19 2017 zhengshuxin@qiyi.com 3.3.0-13-20170919.13
+- Add ci support for gitlab
+- Add timer trigger
