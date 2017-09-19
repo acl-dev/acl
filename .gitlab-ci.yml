@@ -19,7 +19,7 @@ variables:
     image: ${BUILDIMAGES}
     stage: build
     script:
-        - yum install -y zlib-static
+        - yum install -y zlib-devel
         - cd packaging && make rpm
     artifacts:
         paths:
@@ -33,7 +33,7 @@ variables:
     image: ${BUILDIMAGES}
     stage: publish
     script:
-        - yum install -y zlib-static
+        - yum install -y zlib-devel
         - cd packaging && make
         - cd ${CI_PROJECT_DIR} && /tools/publish.sh
     coverage: '/lines......: \d+\.\d+%/'
@@ -47,7 +47,7 @@ variables:
     image: ${BUILDIMAGES}
     stage: publish
     script:
-        - yum install -y zlib-static
+        - yum install -y zlib-devel
         - cd packaging && make
         - cd ${CI_PROJECT_DIR} && /tools/publish.sh -t prerelease
     coverage: '/lines......: \d+\.\d+%/'
