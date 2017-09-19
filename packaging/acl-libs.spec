@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        13
+Release:        14
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,9 @@ fi
 /etc/init.d/master
 
 %changelog
+* Tue Sep 19 2017 zhengshuxin@qiyi.com 3.3.0-13-20170919.17
+- Fixed one bug in acl_udp_server.c when sending status to acl_master
+
 * Tue Sep 19 2017 zhengshuxin@qiyi.com 3.3.0-13-20170919.13
 - Add ci support for gitlab
 - Add timer trigger
