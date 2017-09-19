@@ -110,6 +110,20 @@ devel:centos7.2:
     }
     <<: *DEVEL
 
+prerelease:centos5.8:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:5.8"
+    }
+    <<: *PRERELEASE
+
+prerelease:centos5.9:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:5.9"
+    }
+    <<: *PRERELEASE
+
 prerelease:centos6.4:
     variables: {
         BUILDIMAGES:
