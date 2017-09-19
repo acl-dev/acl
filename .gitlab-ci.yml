@@ -68,6 +68,20 @@ test:centos:
     }
     <<: *TEST
 
+devel:centos5.8:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:5.8"
+    }
+    <<: *DEVEL
+
+devel:centos5.9:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:5.9"
+    }
+    <<: *DEVEL
+
 devel:centos6.4:
     variables: {
         BUILDIMAGES:
