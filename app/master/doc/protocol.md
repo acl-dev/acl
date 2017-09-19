@@ -11,7 +11,7 @@
 ### 1. 显示当前所有的服务
 
 请求协议：
-```json
+```
 POST /?cmd=list HTTP/1.0
 Content-Length: 25
 Connection: keep-alive
@@ -21,7 +21,7 @@ Content-Type: text/json
 ```
 
 响应协议：
-```json
+```
 HTTP/1.1 200 OK
 Date: Tue, 19 Sep 2017 06:51:50 GMT
 Server: acl
@@ -35,7 +35,7 @@ Connection: Keep-Alive
 ### 2. 显示指定服务的状态**
 
 请求协议
-```json
+```
 POST /?cmd=stat HTTP/1.0
 Content-Length: 81
 Connection: keep-alive
@@ -45,7 +45,7 @@ Content-Type: text/json
 ```
 
 响应协议
-```json
+```
 HTTP/1.1 200 OK
 Date: Tue, 19 Sep 2017 06:59:34 GMT
 Server: acl
@@ -59,7 +59,7 @@ Connection: Keep-Alive
 ### 3. 停止指定的服务进程
 
 请求协议
-```json
+```
 POST /?cmd=stop HTTP/1.0
 Content-Length: 81
 Connection: keep-alive
@@ -69,7 +69,7 @@ Content-Type: text/json
 ```
 
 响应协议
-```json
+```
 HTTP/1.1 200 OK
 Date: Tue, 19 Sep 2017 07:02:58 GMT
 Server: acl
@@ -83,7 +83,7 @@ Connection: Keep-Alive
 ### 4. 启动指定的服务进程
 
 请求协议
-```json
+```
 POST /?cmd=start HTTP/1.0
 Content-Length: 83
 Connection: keep-alive
@@ -93,7 +93,7 @@ Content-Type: text/json
 ```
 
 响应协议
-```json
+```
 HTTP/1.1 200 OK
 Date: Tue, 19 Sep 2017 07:07:27 GMT
 Server: acl
@@ -107,7 +107,7 @@ Connection: Keep-Alive
 ### 5. 使指定服务进程重读配置
 
 请求协议
-```json
+```
 POST /?cmd=reload HTTP/1.0
 Content-Length: 84
 Connection: keep-alive
@@ -117,7 +117,7 @@ Content-Type: text/json
 ```
 
 响应协议
-```json
+```
 HTTP/1.1 200 OK
 Date: Tue, 19 Sep 2017 07:09:13 GMT
 Server: acl
