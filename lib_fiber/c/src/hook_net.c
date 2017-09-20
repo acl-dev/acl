@@ -796,6 +796,16 @@ int epoll_create(int size acl_unused)
 	return ee->epfd;
 }
 
+int epoll_create1(int flags)
+{
+	int epfd = epoll_create(100);
+	if (epfd == -1)
+		return -1;
+	if (flags & EPOLL_CLOEXEC)
+		(void) acl_close_on_exec(epfd, 1);
+	return epfd;
+}
+
 static void epfd_callback(EVENT *ev acl_unused, int fd, void *ctx, int mask)
 {
 	EPOLL_CTX  *epx = (EPOLL_CTX *) ctx;

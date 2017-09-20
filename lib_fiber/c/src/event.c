@@ -89,10 +89,7 @@ static int check_fdtype(int fd)
 		return -1;
 	}
 
-	if (S_ISSOCK(s.st_mode) || S_ISFIFO(s.st_mode) || S_ISCHR(s.st_mode))
-		return 0;
-
-	/*
+#if 0
 	if (S_ISLNK(s.st_mode))
 		acl_msg_info("fd %d S_ISLNK", fd);
 	else if (S_ISREG(s.st_mode))
@@ -108,9 +105,13 @@ static int check_fdtype(int fd)
 	else if (S_ISSOCK(s.st_mode))
 		acl_msg_info("fd %d S_ISSOCK", fd);
 	else
-		acl_msg_info("fd: %d, unknoiwn st_mode: %d", fd, s.st_mode);
-	*/
+		acl_msg_error("fd: %d, unknoiwn st_mode: %d", fd, s.st_mode);
+#endif
 
+	if (S_ISSOCK(s.st_mode) || S_ISFIFO(s.st_mode))
+		return 0;
+	if (S_ISCHR(s.st_mode) && isatty(fd))
+		return 0;
 	return -1;
 }
 
@@ -144,7 +145,8 @@ static int event_defer_r_merge(EVENT *ev, int fd, int mask)
 	}
 
 	if (ev->add(ev, fd, to_mask) == -1) {
-		acl_msg_error("mod fd(%d) error: %s", fd, acl_last_serror());
+		acl_msg_error("%s, %s(%d): mod fd(%d) error=%s",
+			__FILE__, __FUNCTION__, __LINE__, fd, acl_last_serror());
 		return -1;
 	}
 
@@ -179,7 +181,9 @@ static int event_defer_w_merge(EVENT *ev, int fd, int mask)
 	}
 
 	if (ev->add(ev, fd, to_mask) == -1) {
-		acl_msg_error("mod fd(%d) error: %s", fd, acl_last_serror());
+		acl_msg_error("%s, %s(%d): mod fd(%d) error=%s",
+			__FILE__, __FUNCTION__, __LINE__,
+			fd, acl_last_serror());
 		return -1;
 	}
 
@@ -210,7 +214,8 @@ int event_add(EVENT *ev, int fd, int mask, event_proc *proc, void *ctx)
 			fe->type = TYPE_SOCK;
 		else {
 			fe->type = TYPE_NOSOCK;
-			return 0;
+			// return 0;
+			// call epoll_ctl by ev->add to try ADD this fd
 		}
 	}
 
@@ -232,10 +237,15 @@ int event_add(EVENT *ev, int fd, int mask, event_proc *proc, void *ctx)
 
 	if (nmerged == 0) {
 		if (ev->add(ev, fd, mask) == -1) {
-			acl_msg_error("add fd(%d) error: %s",
+#if 0
+			acl_msg_error("%s, %s(%d): add fd(%d) error: %s",
+				__FILE__, __FUNCTION__, __LINE__,
 				fd, acl_last_serror());
-			return -1;
-		}
+#endif
+			fe->type = TYPE_NOSOCK;
+			return 0;
+		} else
+			fe->type = TYPE_SOCK;
 
 		fe->mask |= mask;
 	}

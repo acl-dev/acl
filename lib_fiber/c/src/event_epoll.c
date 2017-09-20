@@ -96,8 +96,11 @@ static int epoll_event_add(EVENT *ev, int fd, int mask)
 
 	if (__sys_epoll_ctl(ep->epfd, op, fd, &ee) == -1) {
 		fiber_save_errno();
-		acl_msg_error("%s, %s(%d): epoll_ctl error %s",
-			__FILE__, __FUNCTION__, __LINE__, acl_last_serror());
+#if 0
+		acl_msg_error("%s, %s(%d): epoll_ctl error %s, epfd=%d, fd=%d",
+			__FILE__, __FUNCTION__, __LINE__, acl_last_serror(),
+			ep->epfd, fd);
+#endif
 		return -1;
 	}
 
