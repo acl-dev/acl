@@ -1,4 +1,7 @@
 
+61) 2017.9.20
+61.1) feature: hook_net.c 支持 epoll_create1 API
+
 60) 2017.9.18
 60.1) feature: 增加 fiber_trigger 类用于按时间触发操作
 

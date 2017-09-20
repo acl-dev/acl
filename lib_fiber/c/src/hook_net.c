@@ -796,6 +796,7 @@ int epoll_create(int size acl_unused)
 	return ee->epfd;
 }
 
+#ifdef EPOLL_CLOEXEC
 int epoll_create1(int flags)
 {
 	int epfd = epoll_create(100);
@@ -805,6 +806,7 @@ int epoll_create1(int flags)
 		(void) acl_close_on_exec(epfd, 1);
 	return epfd;
 }
+#endif
 
 static void epfd_callback(EVENT *ev acl_unused, int fd, void *ctx, int mask)
 {
