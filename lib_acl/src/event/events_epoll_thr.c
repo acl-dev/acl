@@ -22,6 +22,7 @@
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_ring.h"
 #include "stdlib/acl_vstream.h"
+#include "stdlib/acl_iostuff.h"
 #include "net/acl_sane_socket.h"
 #include "event/acl_events.h"
 
@@ -433,19 +434,15 @@ static void event_loop(ACL_EVENT *eventp)
 {
 	const char *myname = "event_loop";
 	EVENT_EPOLL_THR *event_thr = (EVENT_EPOLL_THR *) eventp;
-	ACL_EVENT_NOTIFY_TIME timer_fn;
-	void    *timer_arg;
+	int   nready;
+	acl_int64 delay;
 	ACL_EVENT_TIMER *timer;
-	int   delay, nready;
 	ACL_EVENT_FDTABLE *fdp;
-	ACL_RING timer_ring, *entry_ptr;
 	EVENT_BUFFER *bp;
 
-	acl_ring_init(&timer_ring);
-
-	delay = eventp->delay_sec * 1000 + eventp->delay_usec / 1000;
-	if (delay <= 0)
-		delay = 100; /* 100 milliseconds at least */
+	delay = eventp->delay_sec * 1000000 + eventp->delay_usec;
+	if (delay <= DELAY_MIN)
+		delay = DELAY_MIN;
 
 	SET_TIME(eventp->present);
 
@@ -456,20 +453,11 @@ static void event_loop(ACL_EVENT *eventp)
 	 * sorted. If any timer is scheduled, adjust the delay appropriately.
 	 */
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		acl_int64  n = (timer->when - eventp->present + 1000000 - 1)
-			/ 1000000;
+		acl_int64 n = timer->when - eventp->present;
 		if (n <= 0)
 			delay = 0;
-		else if (n < eventp->delay_sec) {
-			delay = (int) n * 1000 + eventp->delay_usec / 1000;
-			if (delay <= 0) {  /* xxx */
-				acl_msg_warn("%s(%d): interger overflow, "
-					"when: %lld, present: %lld, delay: %d",
-					myname, __LINE__, timer->when,
-					eventp->present, delay);
-				delay = 100;
-			}
-		}
+		else if (n < delay)
+			delay = n;
 	}
 
 	THREAD_UNLOCK(&event_thr->event.tm_mutex);
@@ -489,7 +477,7 @@ static void event_loop(ACL_EVENT *eventp)
 			THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
 			if (eventp->ready_cnt == 0)
-				sleep(1);
+				acl_doze(delay > DELAY_MIN ? delay / 1000 : 1);
 
 			nready = 0;
 			goto TAG_DONE;
@@ -504,7 +492,7 @@ static void event_loop(ACL_EVENT *eventp)
 
 	event_thr->event.blocked = 1;
 	nready = epoll_wait(event_thr->handle, event_thr->ebuf,
-			event_thr->fdslots, delay);
+			event_thr->fdslots, (int) (delay / 1000));
 	event_thr->event.blocked = 0;
 
 	if (nready < 0) {
@@ -543,36 +531,8 @@ static void event_loop(ACL_EVENT *eventp)
 
 TAG_DONE:
 
-	/*
-	 * Deliver timer events. Requests are sorted: we can stop when
-	 * we reach the future or the list end. Allow the application
-	 * to update the timer queue while it is being called back. To
-	 * this end, we repeatedly pop the first request off the timer
-	 * queue before delivering the event to the application.
-	 */
-
-	SET_TIME(eventp->present);
-
-	THREAD_LOCK(&event_thr->event.tm_mutex);
-
-	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != NULL) {
-		if (timer->when > eventp->present)
-			break;
-
-		acl_ring_detach(&timer->ring);  /* first this */
-		acl_ring_prepend(&timer_ring, &timer->ring);
-	}
-
-	THREAD_UNLOCK(&event_thr->event.tm_mutex);
-
-	while ((entry_ptr = acl_ring_pop_head(&timer_ring)) != NULL) {
-		timer     = ACL_RING_TO_TIMER(entry_ptr);
-		timer_fn  = timer->callback;
-		timer_arg = timer->context;
-		acl_myfree(timer);
-
-		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
-	}
+	/* Deliver timer events */
+	event_timer_trigger_thr(&event_thr->event);
 
 	if (eventp->ready_cnt > 0)
 		event_thr_fire(eventp);

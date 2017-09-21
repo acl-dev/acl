@@ -25,6 +25,7 @@
 #include "stdlib/acl_debug.h"
 #include "stdlib/acl_vstream.h"
 #include "stdlib/acl_fifo.h"
+#include "stdlib/acl_iostuff.h"
 #include "net/acl_sane_socket.h"
 #include "stdlib/acl_meter_time.h"	/* just for performance test */
 #include "stdlib/acl_iostuff.h"
@@ -653,16 +654,15 @@ static void event_loop(ACL_EVENT *eventp)
 {
 	const char *myname = "event_loop";
 	EVENT_KERNEL *ev = (EVENT_KERNEL *) eventp;
-	ACL_EVENT_NOTIFY_TIME timer_fn;
-	void    *timer_arg;
 	ACL_EVENT_TIMER *timer;
-	int   delay, nready;
+	int   nready;
+	acl_int64 delay;
 	ACL_EVENT_FDTABLE *fdp;
 	EVENT_BUFFER *bp;
 
-	delay = (int) (eventp->delay_sec * 1000 + eventp->delay_usec / 1000);
-	if (delay < 0)
-		delay = 0; /* 0 milliseconds at least */
+	delay = eventp->delay_sec * 1000000 + eventp->delay_usec;
+	if (delay < DELAY_MIN)
+		delay = DELAY_MIN;
 
 	/* 调整事件引擎的时间截 */
 
@@ -671,15 +671,11 @@ static void event_loop(ACL_EVENT *eventp)
 	/* 根据定时器任务的最近任务计算 epoll/kqueue/devpoll 的检测超时上限 */
 
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		acl_int64 n = (timer->when - eventp->present) / 1000;
-
+		acl_int64 n = timer->when - eventp->present;
 		if (n <= 0)
 			delay = 0;
-		else if ((int) n < delay) {
-			delay = (int) n;
-			if (delay <= 0)  /* xxx */
-				delay = 100;
-		}
+		else if (n < delay)
+			delay = n;
 	}
 
 	/* 设置描述字对象的状态，添加/删除之前设置的描述字对象 */
@@ -688,7 +684,8 @@ static void event_loop(ACL_EVENT *eventp)
 
 	if (eventp->fdcnt == 0) {
 		if (eventp->ready_cnt == 0)
-			sleep(1);
+			acl_doze(delay > DELAY_MIN ? delay / 1000 : 10);
+
 		goto TAG_DONE;
 	}
 
@@ -700,7 +697,7 @@ static void event_loop(ACL_EVENT *eventp)
 	/* 调用 epoll/kquque/devpoll 系统调用检测可用描述字 */
 
 	EVENT_BUFFER_READ(nready, ev->event_fd, ev->event_buf,
-		ev->event_fdslots, delay);
+		ev->event_fdslots, (int) (delay / 1000));
 
 	if (eventp->nested++ > 0)
 		acl_msg_fatal("%s(%d): recursive call, nested: %d",
@@ -796,42 +793,9 @@ static void event_loop(ACL_EVENT *eventp)
 
 TAG_DONE:
 
-	/*
-	 * Deliver timer events. Requests are sorted: we can stop when we
-	 * reach the future or the list end. Allow the application to update
-	 * the timer queue while it is being called back. To this end, we
-	 * repeatedly pop the first request off the timer queue before
-	 * delivering the event to the application.
-	 */
-
-	/* 调整事件引擎的时间截 */
-
-	SET_TIME(eventp->present);
-
-	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		if (timer->when > eventp->present)
-			break;
-		timer_fn  = timer->callback;
-		timer_arg = timer->context;
-
-		/* 定时器时间间隔 > 0 且允许定时器被循环调用，则重设定时器 */
-		if (timer->delay > 0 && timer->keep) {
-			timer->ncount++;
-			eventp->timer_request(eventp, timer->callback,
-				timer->context, timer->delay, timer->keep);
-		} else {
-			acl_ring_detach(&timer->ring);	/* first this */
-			timer->nrefer--;
-			if (timer->nrefer != 0)
-				acl_msg_fatal("%s(%d): nrefer(%d) != 0",
-					myname, __LINE__, timer->nrefer);
-			acl_myfree(timer);
-		}
-		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
-	}
+	event_timer_trigger(eventp);
 
 	/* 处理准备好的描述字事件 */
-
 	if (eventp->ready_cnt > 0)
 		event_fire(eventp);
 

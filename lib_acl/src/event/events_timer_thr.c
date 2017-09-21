@@ -63,6 +63,7 @@ acl_int64 event_timer_request_thr(ACL_EVENT *eventp,
 		if (timer == NULL)
 			acl_msg_panic("%s: can't mymalloc for timer", myname);
 		timer->when = eventp->present + delay;
+		timer->delay = delay;
 		timer->callback = callback;
 		timer->context = context;
 		timer->event_type = ACL_EVENT_TIME;
@@ -152,4 +153,50 @@ int  event_timer_ifkeep_thr(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	}
 	THREAD_UNLOCK(&event_thr->tm_mutex);
 	return 0;
+}
+
+/*
+ * Deliver timer events. Requests are sorted: we can stop when we
+ * reach the future or the list end. Allow the application to update
+ * the timer queue while it is being called back. To this end, we
+ * repeatedly pop the first request off the timer queue before
+ * delivering the event to the application.
+ */
+void event_timer_trigger_thr(EVENT_THR *event)
+{
+	ACL_EVENT *eventp = &event->event;
+	ACL_EVENT_TIMER *timer;
+	ACL_RING_ITER iter;
+	ACL_EVENT_NOTIFY_TIME timer_fn;
+	void *timer_arg;
+
+	SET_TIME(eventp->present);
+
+	THREAD_LOCK(&event->tm_mutex);
+
+	acl_ring_foreach(iter, &eventp->timer_head) {
+		timer = ACL_RING_TO_TIMER(iter.ptr);
+		if (timer->when > eventp->present)
+			break;
+
+		acl_fifo_push(eventp->timers, timer);
+	}
+
+	THREAD_UNLOCK(&event->tm_mutex);
+
+	while ((timer = (ACL_EVENT_TIMER* ) acl_fifo_pop(eventp->timers))) {
+		timer_fn  = timer->callback;
+		timer_arg = timer->context;
+
+		if (timer->delay > 0 && timer->keep) {
+			timer->ncount++;
+			eventp->timer_request(eventp, timer->callback,
+				timer->context, timer->delay, timer->keep);
+		} else {
+			acl_ring_detach(&timer->ring);  /* first this */
+			acl_myfree(timer);
+		}
+
+		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
+	}
 }

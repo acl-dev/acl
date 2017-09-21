@@ -28,6 +28,10 @@ extern "C" {
 typedef struct IOCP_EVENT IOCP_EVENT;
 #endif
 
+#ifndef DELAY_MIN
+#define DELAY_MIN	1000
+#endif
+
 struct ACL_EVENT_FDTABLE {
 	ACL_VSTREAM *stream;
 	ACL_EVENT_NOTIFY_RDWR r_callback;
@@ -91,6 +95,8 @@ struct	ACL_EVENT {
 	int   read_ready;
 	/* 定时器任务列表头 */
 	ACL_RING timer_head;
+	/* 需要被触发的定时器容器 */
+	ACL_FIFO *timers;
 
 	/* 套接字最大个数 */
 	int   fdsize;
@@ -329,6 +335,7 @@ void event_timer_keep(ACL_EVENT *ev, ACL_EVENT_NOTIFY_TIME callback,
 	void *context, int keep);
 int  event_timer_ifkeep(ACL_EVENT *ev, ACL_EVENT_NOTIFY_TIME callback,
 	void *context);
+void event_timer_trigger(ACL_EVENT *ev);
 
 /* in events_timer_thr.c */
 acl_int64 event_timer_request_thr(ACL_EVENT *ev,
@@ -341,6 +348,8 @@ void event_timer_keep_thr(ACL_EVENT *ev, ACL_EVENT_NOTIFY_TIME callback,
 	void *context, int keep);
 int  event_timer_ifkeep_thr(ACL_EVENT *ev, ACL_EVENT_NOTIFY_TIME callback,
 	void *context);
+
+void event_timer_trigger_thr(EVENT_THR *event);
 
 #ifdef	__cplusplus
 }

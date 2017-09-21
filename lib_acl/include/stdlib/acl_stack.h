@@ -123,6 +123,7 @@ ACL_API int acl_stack_size(const ACL_STACK *s);
  * @return {void*} 对象地址, == NULL 表示当前对象为空
  */
 ACL_API void *acl_stack_pop(ACL_STACK *s);
+#define acl_stack_pop_tail acl_stack_pop
 
 /**
  * 返回栈中最后添加的对象地址, 但不将该对象从栈中移除

@@ -23,6 +23,7 @@
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_ring.h"
 #include "stdlib/acl_vstream.h"
+#include "stdlib/acl_iostuff.h"
 #include "event/acl_events.h"
 
 #endif
@@ -331,19 +332,19 @@ static void event_loop(ACL_EVENT *eventp)
 {
 	const char *myname = "event_loop";
 	EVENT_SELECT_THR *event_thr = (EVENT_SELECT_THR *) eventp;
-	ACL_EVENT_NOTIFY_TIME timer_fn;
-	void    *timer_arg;
+	int   nready, i;
+	acl_int64 delay;
 	ACL_SOCKET sockfd;
 	ACL_EVENT_TIMER *timer;
-	int   select_delay, nready, i;
 	ACL_EVENT_FDTABLE *fdp;
-	ACL_RING timer_ring, *entry_ptr;
 	struct timeval tv, *tvp;
 	fd_set rmask;  /* enabled read events */
 	fd_set wmask;  /* enabled write events */
 	fd_set xmask;  /* for bad news mostly */
 
-	acl_ring_init(&timer_ring);
+	delay = eventp->delay_sec * 1000000 + eventp->delay_usec;
+	if (delay <= DELAY_MIN)
+		delay = DELAY_MIN;
 
 	SET_TIME(eventp->present);
 	THREAD_LOCK(&event_thr->event.tm_mutex);
@@ -353,14 +354,12 @@ static void event_loop(ACL_EVENT *eventp)
 	 * If any timer is scheduled, adjust the delay appropriately.
 	 */
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		select_delay = (int) ((timer->when - eventp->present + 1000000 - 1)
-			/ 1000000);
-		if (select_delay < 0)
-			select_delay = 0;
-		else if (eventp->delay_sec >= 0 && select_delay > eventp->delay_sec)
-			select_delay = eventp->delay_sec;
-	} else
-		select_delay = eventp->delay_sec;
+		acl_int64 n = timer->when - eventp->present;
+		if (n <= 0)
+			delay = 0;
+		else if (n < delay)
+			delay = n;
+	}
 
 	THREAD_UNLOCK(&event_thr->event.tm_mutex);
 
@@ -371,12 +370,8 @@ static void event_loop(ACL_EVENT *eventp)
 	if (event_thr_prepare(eventp) == 0) {
 		THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
-		if (eventp->ready_cnt == 0) {
-			select_delay /= 1000000;
-			if (select_delay <= 0)
-				select_delay = 1;
-			sleep((int) select_delay);
-		}
+		if (eventp->ready_cnt == 0)
+			acl_doze(delay > DELAY_MIN ? delay / 1000 : 1);
 
 		nready = 0;
 		goto TAG_DONE;
@@ -386,13 +381,17 @@ static void event_loop(ACL_EVENT *eventp)
 		tv.tv_sec  = 0;
 		tv.tv_usec = 0;
 		tvp = &tv;
-	} else if (select_delay < 0) {
-		tvp = NULL;
-	} else {
-		tv.tv_sec  = select_delay;
-		tv.tv_usec = eventp->delay_usec;
+	} else if (delay >= 0) {
+#if defined(ACL_WINDOWS)
+		tv.tv_sec  = (long) delay / 1000000;
+		tv.tv_usec = (unsigned long) (delay % 1000000);
+#else
+		tv.tv_sec  = (time_t) delay / 1000000;
+		tv.tv_usec = (suseconds_t) (delay % 1000000);
+#endif
 		tvp = &tv;
-	}
+	} else
+		tvp = NULL;
 
 	rmask = event_thr->rmask;
 	wmask = event_thr->wmask;
@@ -452,41 +451,8 @@ static void event_loop(ACL_EVENT *eventp)
 
 TAG_DONE:
 
-	/*
-	 * Deliver timer events. Requests are sorted: we can stop when we reach
-	 * the future or the list end. Allow the application to update the timer
-	 * queue while it is being called back. To this end, we repeatedly pop
-	 * the first request off the timer queue before delivering the event to
-	 * the application.
-	 */
-
-	SET_TIME(eventp->present);
-
-	THREAD_LOCK(&event_thr->event.tm_mutex);
-
-	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		if (timer->when > eventp->present)
-			break;
-
-		acl_ring_detach(&timer->ring);          /* first this */
-		acl_ring_prepend(&timer_ring, &timer->ring);
-	}
-
-	THREAD_UNLOCK(&event_thr->event.tm_mutex);
-
-	while (1) {
-		entry_ptr = acl_ring_pop_head(&timer_ring);
-		if (entry_ptr == NULL)
-			break;
-
-		timer     = ACL_RING_TO_TIMER(entry_ptr);
-		timer_fn  = timer->callback;
-		timer_arg = timer->context;
-
-		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
-
-		acl_myfree(timer);
-	}
+	/* Deliver timer events */
+	event_timer_trigger_thr(&event_thr->event);
 
 	if (eventp->ready_cnt > 0)
 		event_thr_fire(eventp);

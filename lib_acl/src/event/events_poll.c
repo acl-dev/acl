@@ -19,6 +19,7 @@
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_debug.h"
 #include "stdlib/acl_vstream.h"
+#include "stdlib/acl_iostuff.h"
 #include "net/acl_sane_socket.h"
 #include "event/acl_events.h"
 
@@ -365,15 +366,14 @@ static void event_loop(ACL_EVENT *eventp)
 {
 	const char *myname = "event_loop";
 	EVENT_POLL *ev = (EVENT_POLL *) eventp;
-	ACL_EVENT_NOTIFY_TIME timer_fn;
-	void    *timer_arg;
 	ACL_EVENT_TIMER *timer;
-	int   delay, nready, i, revents;
+	int   nready, i, revents;
+	acl_int64 delay;
 	ACL_EVENT_FDTABLE *fdp;
 
-	delay = eventp->delay_sec * 1000 + eventp->delay_usec / 1000;
-	if (delay < 0)
-		delay = 0; /* 0 milliseconds at least */
+	delay = eventp->delay_sec * 1000000 + eventp->delay_usec;
+	if (delay < DELAY_MIN)
+		delay = DELAY_MIN;
 
 	/* 调整事件引擎的时间截 */
 
@@ -385,23 +385,19 @@ static void event_loop(ACL_EVENT *eventp)
 		acl_int64 n = timer->when - eventp->present;
 		if (n <= 0)
 			delay = 0;
-		else if ((int) n < delay) {
-			delay = (int) n;
-			if (delay <= 0)  /* xxx */
-				delay = 100;
-		}
+		else if (n < delay)
+			delay = n;
 	}
 
 	/* 调用 event_prepare 检查有多少个描述字需要通过 poll 进行检测 */
 
 	if (event_prepare(eventp) == 0) {
-
 		/* 说明无须 poll 检测 */
 
-		if (eventp->ready_cnt == 0) {
+		if (eventp->ready_cnt == 0)
 			/* 为避免循环过快，休眠一下 */
-			sleep(1);
-		}
+			acl_doze(delay > DELAY_MIN ? delay / 1000 : 1);
+
 		goto TAG_DONE;
 	}
 
@@ -412,7 +408,7 @@ static void event_loop(ACL_EVENT *eventp)
 
 	/* 调用 poll 系统调用检测可用描述字 */
 
-	nready = poll(ev->fds, eventp->fdcnt, delay);
+	nready = poll(ev->fds, eventp->fdcnt, (int) (delay / 1000));
 
 	if (eventp->nested++ > 0)
 		acl_msg_fatal("%s(%d): recursive call", myname, __LINE__);
@@ -492,38 +488,9 @@ static void event_loop(ACL_EVENT *eventp)
 
 TAG_DONE:
 
-	/* 调整事件引擎的时间截 */
-
-	SET_TIME(eventp->present);
-
-	/* 优先处理定时器中的任务 */
-
-	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		if (timer->when > eventp->present)
-			break;
-		timer_fn  = timer->callback;
-		timer_arg = timer->context;
-
-		/* 如果定时器的时间间隔 > 0 且允许定时器被循环调用，
-		 * 则再重设定时器
-		 */
-		if (timer->delay > 0 && timer->keep) {
-			timer->ncount++;
-			eventp->timer_request(eventp, timer->callback,
-				timer->context, timer->delay, timer->keep);
-		} else {
-			acl_ring_detach(&timer->ring);  /* first this */
-			timer->nrefer--;
-			if (timer->nrefer != 0)
-				acl_msg_fatal("%s(%d): nrefer(%d) != 0",
-					myname, __LINE__, timer->nrefer);
-			acl_myfree(timer);
-		}
-		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
-	}
+	event_timer_trigger(eventp);
 
 	/* 处理准备好的描述字事件 */
-
 	if (eventp->ready_cnt > 0)
 		event_fire(eventp);
 

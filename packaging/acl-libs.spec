@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        17
+Release:        18
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,9 @@ fi
 /etc/init.d/master
 
 %changelog
+* Thu Sep 21 2018 zhengshuxin@qiyi.com 3.3.0-18-20170921.15
+- event: fixed bug in events timer
+
 * Wed Sep 20 2018 zhengshuxin@qiyi.com 3.3.0-17-20170920.17
 - fiber: hook_net.c supports epoll_create1 API
 

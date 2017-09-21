@@ -152,3 +152,42 @@ int  event_timer_ifkeep(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 
 	return 0;
 }
+
+void event_timer_trigger(ACL_EVENT *eventp)
+{
+	ACL_EVENT_TIMER *timer;
+	ACL_RING_ITER iter;
+	ACL_EVENT_NOTIFY_TIME timer_fn;
+	void *timer_arg;
+
+	/* 调整事件引擎的时间截 */
+
+	SET_TIME(eventp->present);
+
+	/* 优先处理定时器中的任务 */
+
+	acl_ring_foreach(iter, &eventp->timer_head) {
+		timer = ACL_RING_TO_TIMER(iter.ptr);
+		if (timer->when > eventp->present)
+			break;
+
+		acl_fifo_push(eventp->timers, timer);
+	}
+
+	while ((timer = (ACL_EVENT_TIMER* ) acl_fifo_pop(eventp->timers))) {
+		timer_fn  = timer->callback;
+		timer_arg = timer->context;
+
+		if (timer->delay > 0 && timer->keep) {
+			timer->ncount++;
+			eventp->timer_request(eventp, timer->callback,
+				timer->context, timer->delay, timer->keep);
+		} else {
+			acl_ring_detach(&timer->ring);  /* first this */
+			timer->nrefer--;
+			acl_myfree(timer);
+		}
+
+		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
+	}
+}

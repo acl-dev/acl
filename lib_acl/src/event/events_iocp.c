@@ -723,12 +723,12 @@ static void event_loop(ACL_EVENT *eventp)
 	ACL_EVENT_NOTIFY_TIME timer_fn;
 	void    *timer_arg;
 	ACL_EVENT_TIMER *timer;
-	int   delay;
+	acl_int64  delay;
 	ACL_EVENT_FDTABLE *fdp;
 
-	delay = (int) (eventp->delay_sec * 1000 + eventp->delay_usec / 1000);
-	if (delay < 0)
-		delay = 0; /* 0 milliseconds at least */
+	delay = eventp->delay_sec * 1000000 + eventp->delay_usec;
+	if (delay < DELAY_MIN)
+		delay = DELAY_MIN;
 
 	SET_TIME(eventp->present);
 
@@ -737,12 +737,11 @@ static void event_loop(ACL_EVENT *eventp)
 	 * If any timer is scheduled, adjust the delay appropriately.
 	 */
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		acl_int64 n = (timer->when - eventp->present) / 1000;
-
+		acl_int64 n = timer->when - eventp->present;
 		if (n <= 0)
-			delay = 0;
-		else if ((int) n < delay)
-			delay = (int) n;
+			delay = 1;
+		else if (n < delay)
+			delay = n;
 	}
 
 	eventp->nested++;
@@ -751,7 +750,7 @@ static void event_loop(ACL_EVENT *eventp)
 
 	if (eventp->fdcnt == 0) {
 		if (eventp->ready_cnt == 0)
-			sleep(1);
+			acl_doze(delay > DELAY_MIN ? delay / 1000 : 1);
 		goto TAG_DONE;
 	}
 
@@ -760,37 +759,7 @@ static void event_loop(ACL_EVENT *eventp)
 
 TAG_DONE:
 
-	/*
-	* Deliver timer events. Requests are sorted: we can stop when we reach
-	* the future or the list end. Allow the application to update the timer
-	* queue while it is being called back. To this end, we repeatedly pop
-	* the first request off the timer queue before delivering the event to
-	* the application.
-	*/
-	SET_TIME(eventp->present);
-	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		if (timer->when > eventp->present)
-			break;
-		timer_fn  = timer->callback;
-		timer_arg = timer->context;
-
-		/* 如果定时器的时间间隔 > 0 且允许定时器被循环调用，
-		 * 则再重设定时器
-		 */
-		if (timer->delay > 0 && timer->keep) {
-			timer->ncount++;
-			eventp->timer_request(eventp, timer->callback,
-				timer->context, timer->delay, timer->keep);
-		} else {
-			acl_ring_detach(&timer->ring);  /* first this */
-			timer->nrefer--;
-			if (timer->nrefer != 0)
-				acl_msg_fatal("%s(%d): nrefer(%d) != 0",
-					myname, __LINE__, timer->nrefer);
-			acl_myfree(timer);
-		}
-		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
-	}
+	event_timer_trigger(eventp);
 
 	for (;;) {
 		BOOL isSuccess = FALSE;
@@ -801,7 +770,7 @@ TAG_DONE:
 
 		isSuccess = GetQueuedCompletionStatus(ev->h_iocp,
 			&bytesTransferred, (PULONG_PTR) &fdp,
-			(OVERLAPPED**) &iocp_event, delay);
+			(OVERLAPPED**) &iocp_event, (int) (delay / 1000));
 
 		if (!isSuccess) {
 
