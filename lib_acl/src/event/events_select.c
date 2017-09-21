@@ -402,7 +402,7 @@ static void event_loop(ACL_EVENT *eventp)
 	if (event_prepare(eventp) == 0) {
 		if (eventp->ready_cnt == 0)
 			/* 为避免循环过快，休眠一下 */
-			acl_doze(delay > DELAY_MIN ? delay / 1000 : 1);
+			acl_doze(delay > DELAY_MIN ? (int) delay / 1000 : 1);
 
 		goto TAG_DONE;
 	}

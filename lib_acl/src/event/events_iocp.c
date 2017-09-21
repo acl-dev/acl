@@ -720,8 +720,6 @@ static void event_loop(ACL_EVENT *eventp)
 {
 	const char *myname = "event_loop";
 	EVENT_KERNEL *ev = (EVENT_KERNEL *) eventp;
-	ACL_EVENT_NOTIFY_TIME timer_fn;
-	void    *timer_arg;
 	ACL_EVENT_TIMER *timer;
 	acl_int64  delay;
 	ACL_EVENT_FDTABLE *fdp;
@@ -750,7 +748,7 @@ static void event_loop(ACL_EVENT *eventp)
 
 	if (eventp->fdcnt == 0) {
 		if (eventp->ready_cnt == 0)
-			acl_doze(delay > DELAY_MIN ? delay / 1000 : 1);
+			acl_doze(delay > DELAY_MIN ? (int) delay / 1000 : 1);
 		goto TAG_DONE;
 	}
 
