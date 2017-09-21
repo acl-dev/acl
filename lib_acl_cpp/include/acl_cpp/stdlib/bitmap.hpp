@@ -25,21 +25,21 @@ public:
 	 * @param n {size_t}
 	 * @return {bool} 返回 true 表示添加成功，否则表示该值越界或已经存在
 	 */
-	bool set(size_t n);
+	bool bit_set(size_t n);
 
 	/**
 	 * 判断所给数据是否已经被设置在位映射中
 	 * @param n {size_t}
 	 * @return {bool} 判断指定数值是否存在于位映射集合中
 	 */
-	bool isset(size_t n);
+	bool bit_isset(size_t n);
 
 	/**
 	 * 将指定数值从位集合中去除
 	 * @param n {size_t}
 	 * @return {bool} 返回 false 表示该值越界或不存在于位集合中
 	 */
-	bool unset(size_t n);
+	bool bit_unset(size_t n);
 
 	/**
 	 * 将bitmap信息拷贝到buf中

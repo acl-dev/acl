@@ -36,7 +36,7 @@ bitmap::~bitmap(void)
 	delete[] bmp_;
 }
 
-bool bitmap::isset(size_t n)
+bool bitmap::bit_isset(size_t n)
 {
 	if (n < size_)
 		return (bmp_[n / 8] >> n % 8) & 1;
@@ -44,9 +44,9 @@ bool bitmap::isset(size_t n)
 		return false;
 }
 
-bool bitmap::set(size_t n)
+bool bitmap::bit_set(size_t n)
 {
-	if (n < size_ && !isset(n)) {
+	if (n < size_ && !bit_isset(n)) {
 		unsigned char t = 1 << n % 8;
 		bmp_[n / 8] |= t;
 		count_++;
@@ -55,9 +55,9 @@ bool bitmap::set(size_t n)
 		return false;
 }
 
-bool bitmap::unset(size_t n)
+bool bitmap::bit_unset(size_t n)
 {
-	if (isset(n)) {
+	if (bit_isset(n)) {
 		unsigned char t = 1 << n % 8;
 		bmp_[n / 8] &= ~t;
 		count_--;
