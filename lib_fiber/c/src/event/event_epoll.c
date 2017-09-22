@@ -185,7 +185,7 @@ static int epoll_event_del_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	return -1;
 }
 
-static int epoll_event_loop(EVENT *ev, int timeout)
+static int epoll_event_wait(EVENT *ev, int timeout)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 	struct epoll_event *ee;
@@ -238,13 +238,13 @@ EVENT *event_epoll_create(int size)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) malloc(sizeof(EVENT_EPOLL));
 
-	ep->events = (struct epoll_event *)
-		malloc(sizeof(struct epoll_event) * size);
-	ep->size   = size;
-
 	if (__sys_epoll_create == NULL) {
 		hook_init();
 	}
+
+	ep->events = (struct epoll_event *)
+		malloc(sizeof(struct epoll_event) * size);
+	ep->size   = size;
 
 	ep->epfd = __sys_epoll_create(1024);
 	assert(ep->epfd >= 0);
@@ -253,7 +253,7 @@ EVENT *event_epoll_create(int size)
 	ep->event.handle = epoll_event_handle;
 	ep->event.free   = epoll_event_free;
 
-	ep->event.event_loop = epoll_event_loop;
+	ep->event.event_wait = epoll_event_wait;
 	ep->event.add_read   = (event_oper *) epoll_event_add_read;
 	ep->event.add_write  = (event_oper *) epoll_event_add_write;
 	ep->event.del_read   = (event_oper *) epoll_event_del_read;

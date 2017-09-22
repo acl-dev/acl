@@ -3,6 +3,10 @@
 
 #include "event.h"
 
+#ifdef HAS_EPOLL
+
 EVENT *event_epoll_create(int setsize);
+
+#endif
 
 #endif

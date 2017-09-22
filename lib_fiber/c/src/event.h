@@ -110,7 +110,7 @@ struct EVENT {
 	int  (*handle)(EVENT *);
 	void (*free)(EVENT *);
 
-	int  (*event_loop)(EVENT *, int);
+	int  (*event_wait)(EVENT *, int);
 
 	event_oper *add_read;
 	event_oper *add_write;

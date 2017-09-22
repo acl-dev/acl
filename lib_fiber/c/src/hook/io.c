@@ -131,9 +131,12 @@ int close(int fd)
 	 * must be a epoll fd which was created by epoll_create function
 	 * hooked in hook_net.c
 	 */
+#ifdef	HAS_EPOLL
 	if (epoll_event_close(fd) == 0) {
 		return 0;
 	}
+#elif	defined(HAS_KQUEUE)
+#endif
 
 	fiber_file_close(fd);
 	ret = __sys_close(fd);

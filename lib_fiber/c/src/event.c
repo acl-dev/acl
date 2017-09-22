@@ -2,11 +2,16 @@
 #include "common.h"
 
 #include "event/event_epoll.h"
+#include "event/event_kqueue.h"
 #include "event.h"
 
 EVENT *event_create(int size)
 {
+#ifdef	HAS_EPOLL
 	EVENT *ev = event_epoll_create(size);
+#elif	defined(HAS_KQUEUE)
+	EVENT *ev = event_kqueue_create(size);
+#endif
 
 	ring_init(&ev->events);
 	ev->timeout = -1;
@@ -308,7 +313,7 @@ int event_process(EVENT *ev, int timeout)
 	}
 
 	event_prepare(ev);
-	ret = ev->event_loop(ev, timeout);
+	ret = ev->event_wait(ev, timeout);
 	event_process_poll(ev);
 #ifdef	HAS_EPOLL
 	event_process_epoll(ev);

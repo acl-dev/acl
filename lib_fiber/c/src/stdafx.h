@@ -3,7 +3,11 @@
 
 
 #ifdef	LINUX
-#define	HAS_EPOLL
+# define	HAS_EPOLL
+#elif	defined(FREEBSD)
+# define	HAS_KQUEUE
+#else
+# error		"unknown OS"
 #endif
 
 #if 1
@@ -31,6 +35,7 @@
 #if	defined(LINUX)
 #include <sys/sendfile.h>
 #elif	defined(FREEBSD)
+#include <sys/uio.h>
 #endif
 #include <sys/stat.h>
 #include <sys/select.h>
