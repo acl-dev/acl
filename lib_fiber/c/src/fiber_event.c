@@ -16,18 +16,18 @@
 //#define	USE_THREAD_MUTEX
 
 struct ACL_FIBER_EVENT {
-	RING      me;
-	pthread_t tid;
+	RING me;
 	FIBER_BASE *owner;
 	ATOMIC     *atomic;
 	long long   value;
 #ifdef	USE_THREAD_MUTEX
 	pthread_mutex_t lock;
 #else
-	ATOMIC     *lock;
-	long long   lock_value;
+	ATOMIC    *lock;
+	long long  lock_value;
 #endif
-	RING    waiters;
+	RING waiters;
+	unsigned long tid;
 };
 
 ACL_FIBER_EVENT *acl_fiber_event_create(void)
@@ -170,7 +170,7 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 
 	if (LIKELY(atomic_int64_cas(event->atomic, 0, 1) == 0)) {
 		event->owner = fiber ? &fiber->base : NULL;
-		event->tid   = pthread_self();
+		event->tid   = __pthread_self();
 		return 0;
 	}
 
@@ -190,7 +190,7 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 			__ll_unlock(event);
 
 			event->owner = fbase;
-			event->tid   = pthread_self();
+			event->tid   = __pthread_self();
 			break;
 		}
 
@@ -218,7 +218,7 @@ int acl_fiber_event_trywait(ACL_FIBER_EVENT *event)
 	if (atomic_int64_cas(event->atomic, 0, 1) == 0) {
 		ACL_FIBER *fiber = acl_fiber_running();
 		event->owner     = fiber ? &fiber->base : NULL;
-		event->tid       = pthread_self();
+		event->tid       = __pthread_self();
 		return 0;
 	}
 	return -1;
@@ -240,11 +240,11 @@ int acl_fiber_event_notify(ACL_FIBER_EVENT *event)
 			__FILE__, __LINE__, __FUNCTION__, owner, event->owner);
 		return -1;
 	} else if (UNLIKELY(event->owner == NULL
-		&& event->tid != pthread_self())) {
+		&& event->tid != __pthread_self())) {
 
-		msg_error("%s(%d), %s: tid(%ld) is not the owner(%ld)",
+		msg_error("%s(%d), %s: tid(%lu) is not the owner(%lu)",
 			__FILE__, __LINE__, __FUNCTION__,
-			(long) event->tid, (long) pthread_self());
+			event->tid, __pthread_self());
 		return -1;
 	}
 

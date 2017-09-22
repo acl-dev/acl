@@ -15,10 +15,10 @@ void lib_init(void)
 	if (__have_inited)
 		return;
 	__have_inited = 1;
-	var_main_tid = pthread_self();
+	var_main_tid = __pthread_self();
 }
 
 unsigned long main_thread_self(void)
 {
-	return ((unsigned long) var_main_tid);
+	return var_main_tid;
 }

@@ -7,7 +7,7 @@
 struct ACL_FIBER_SEM {
 	int num;
 	RING waiting;
-	pthread_t tid;
+	unsigned long tid;
 };
 
 ACL_FIBER_SEM *acl_fiber_sem_create(int num)
@@ -16,7 +16,7 @@ ACL_FIBER_SEM *acl_fiber_sem_create(int num)
 
 	sem->num = num;
 	ring_init(&sem->waiting);
-	sem->tid = pthread_self();
+	sem->tid = __pthread_self();
 	return sem;
 }
 
@@ -25,14 +25,14 @@ void acl_fiber_sem_free(ACL_FIBER_SEM *sem)
 	free(sem);
 }
 
-pthread_t acl_fiber_sem_get_tid(ACL_FIBER_SEM *sem)
+unsigned long acl_fiber_sem_get_tid(ACL_FIBER_SEM *sem)
 {
 	return sem->tid;
 }
 
 void acl_fiber_sem_set_tid(ACL_FIBER_SEM *sem, unsigned long tid)
 {
-	if ((unsigned long) sem->tid != tid && ring_size(&sem->waiting) > 0) {
+	if (sem->tid != tid && ring_size(&sem->waiting) > 0) {
 		msg_fatal("%s(%d), %s: curr sem waiting=%d not empty",
 			__FILE__, __LINE__, __FUNCTION__,
 			(int) ring_size(&sem->waiting));
@@ -50,7 +50,7 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 {
 	ACL_FIBER *curr;
 
-	if (sem->tid != pthread_self())
+	if (sem->tid != __pthread_self())
 		return -1;
 
 	if (sem->num > 0) {
@@ -76,7 +76,7 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 
 int acl_fiber_sem_trywait(ACL_FIBER_SEM *sem)
 {
-	if (sem->tid != pthread_self())
+	if (sem->tid != __pthread_self())
 		return -1;
 
 	if (sem->num > 0) {
@@ -97,7 +97,7 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 {
 	ACL_FIBER *ready;
 
-	if (sem->tid != pthread_self())
+	if (sem->tid != __pthread_self())
 		return -1;
 
 	if ((ready = FIRST_FIBER(&sem->waiting)) == NULL) {

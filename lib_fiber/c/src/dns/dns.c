@@ -147,7 +147,8 @@
 #pragma clang diagnostic ignored "-Wmissing-field-initializers"
 //#elif DNS_GNUC_PREREQ(4,6,0)
 #elif __GNUC__
-#pragma GCC diagnostic push
+//#pragma GCC diagnostic push
+DNS_PRAGMA_PUSH
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #pragma GCC diagnostic ignored "-Wstrict-prototypes"
@@ -10079,7 +10080,8 @@ int main(int argc, char **argv) {
 #pragma clang diagnostic pop
 //#elif DNS_GNUC_PREREQ(4,6,0)
 #elif __GNUC__
-#pragma GCC diagnostic pop
+//#pragma GCC diagnostic pop
+DNS_PRAGMA_POP
 #endif
 
 #endif

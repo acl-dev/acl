@@ -125,7 +125,7 @@ static void fiber_check(void)
 	ring_init(&__thread_fiber->ready);
 	ring_init(&__thread_fiber->dead);
 
-	if ((unsigned long) pthread_self() == main_thread_self()) {
+	if (__pthread_self() == main_thread_self()) {
 		__main_fiber = __thread_fiber;
 		atexit(fiber_schedule_main_free);
 	} else if (pthread_setspecific(__fiber_key, __thread_fiber) != 0) {
@@ -671,11 +671,7 @@ void acl_fiber_schedule(void)
 	for (;;) {
 		head = ring_pop_head(&__thread_fiber->ready);
 		if (head == NULL) {
-#ifdef	FREEBSD
-			msg_info("thread-%lu: NO FIBER NOW", (long) pthread_self());
-#else
-			msg_info("thread-%lu: NO FIBER NOW", pthread_self());
-#endif
+			msg_info("thread-%lu: NO FIBER NOW", __pthread_self());
 			break;
 		}
 
@@ -728,11 +724,7 @@ void acl_fiber_switch(void)
 
 	head = ring_pop_head(&__thread_fiber->ready);
 	if (head == NULL) {
-#ifdef	FREEBSD
-		msg_info("thread-%lu: NO FIBER in ready", (long) pthread_self());
-#else
-		msg_info("thread-%lu: NO FIBER in ready", pthread_self());
-#endif
+		msg_info("thread-%lu: NO FIBER in ready", __pthread_self());
 		fiber_swap(current, __thread_fiber->original);
 		return;
 	}

@@ -42,7 +42,7 @@ static void main_free_tls(void)
 static pthread_key_t  once_key;
 static void once_init(void)
 {
-	if ((unsigned long) pthread_self() == main_thread_self()) {
+	if (__pthread_self() == main_thread_self()) {
 		pthread_key_create(&once_key, dummy);
 		atexit(main_free_tls);
 	} else
@@ -59,7 +59,7 @@ static void *tls_calloc(size_t len)
 	if (ptr == NULL) {
 		ptr = calloc(1, len);
 		pthread_setspecific(once_key, ptr);
-		if ((unsigned long) pthread_self() == main_thread_self())
+		if (__pthread_self() == main_thread_self())
 			__tls = ptr;
 	}
 	return ptr;

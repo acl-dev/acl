@@ -152,11 +152,6 @@ int pthread_once(pthread_once_t *once_control, void (*init_routine)(void))
 	return 1;  /* 不可达代码，避免编译器报警告 */
 }
 
-unsigned long pthread_self(void)
-{
-	return GetCurrentThreadId();
-}
-
 int pthread_key_create(pthread_key_t *key_ptr, void (*destructor)(void*))
 {
 	const char *myname = "pthread_key_create";
@@ -302,4 +297,21 @@ int pthread_mutex_unlock(pthread_mutex_t *mutex)
 	return 0;
 }
 
-#endif /* SYS_WIN */
+unsigned long __pthread_self(void)
+{
+	return GetCurrentThreadId();
+}
+
+#elif	defined(__linux__)
+unsigned long __pthread_self(void)
+{
+	return (unsigned long) pthread_self();
+}
+#elif	defined(__FreeBSD__)
+unsigned long __pthread_self(void)
+{
+	return (unsigned long) pthread_getthreadid_np();
+}
+#else
+#error	"unknown OS"
+#endif

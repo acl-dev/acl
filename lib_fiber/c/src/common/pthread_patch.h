@@ -29,7 +29,6 @@ struct pthread_mutexattr_t {
 	SECURITY_ATTRIBUTES attr;
 };
 
-unsigned long pthread_self(void);
 int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
 int pthread_key_create(pthread_key_t *key_ptr, void (*destructor)(void*));
 
@@ -42,6 +41,8 @@ int pthread_mutex_lock(pthread_mutex_t *mutex);
 int pthread_mutex_unlock(pthread_mutex_t *mutex);
 
 #endif // _WIN32 || _WIN64
+
+unsigned long __pthread_self(void);
 
 #ifdef	__cplusplus
 }

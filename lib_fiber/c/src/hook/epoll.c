@@ -135,7 +135,7 @@ static EPOLL_EVENT *epoll_event_create(int epfd)
 		}
 
 		__epfds = array_create(5);
-		if ((unsigned long) pthread_self() == main_thread_self()) {
+		if (__pthread_self() == main_thread_self()) {
 			__main_epfds = __epfds;
 			atexit(main_thread_free);
 		} else if (pthread_setspecific(__once_key, __epfds) != 0) {

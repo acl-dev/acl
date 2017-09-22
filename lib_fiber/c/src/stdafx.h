@@ -69,6 +69,7 @@
 # include <sys/epoll.h>
 #elif defined(__FreeBSD__)
 # include <sys/uio.h>
+# include <pthread_np.h>
 #endif
 
 struct SOCK_ADDR {

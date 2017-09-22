@@ -390,10 +390,10 @@ void acl_fiber_sem_free(ACL_FIBER_SEM* sem);
 /**
  * 获得当前协程信号量所绑定的线程 ID
  * @param sem {ACL_FIBER_SEM*} 协程信号量对象
- * @return {pthread_t}
+ * @return {unsigned long}
  */
 #if !defined(_WIN32) && !defined(_WIN64)
-pthread_t acl_fiber_sem_get_tid(ACL_FIBER_SEM* sem);
+unsigned long acl_fiber_sem_get_tid(ACL_FIBER_SEM* sem);
 #endif
 
 /**

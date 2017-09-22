@@ -110,7 +110,7 @@ void fiber_io_check(void)
 	__thread_fiber->events = (FILE_EVENT **)
 		calloc(var_maxfd, sizeof(FILE_EVENT*));
 
-	if ((unsigned long) pthread_self() == main_thread_self()) {
+	if (__pthread_self() == main_thread_self()) {
 		__main_fiber = __thread_fiber;
 		atexit(fiber_io_main_free);
 	} else if (pthread_setspecific(__fiber_key, __thread_fiber) != 0) {

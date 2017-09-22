@@ -180,7 +180,6 @@ DNS_PUBLIC int *dns_debug_p(void);
 
 #if defined __GNUC__
 #define DNS_PRAGMA_EXTENSION __extension__
-#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-prototypes"
 #else
 #define DNS_PRAGMA_EXTENSION
@@ -1259,7 +1258,8 @@ int get_read_timeout(void);
 #define DNS_PP_DEC(N) DNS_PP_XPASTE(DNS_PP_D, N)
 
 #if __GNUC__
-#pragma GCC diagnostic pop	// add by zsx, 2017-12-20
+//#pragma GCC diagnostic pop // add by zsx, 2017-12-20
+DNS_PRAGMA_POP  // add by zsx, 2017.12.30
 #endif
 
 #endif /* DNS_H */

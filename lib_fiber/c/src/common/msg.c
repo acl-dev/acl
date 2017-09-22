@@ -163,7 +163,7 @@ static char *__main_buf = NULL;
 
 static void thread_free_buf(void *buf)
 {
-	if ((unsigned long) pthread_self() != main_thread_self())
+	if (__pthread_self() != main_thread_self())
 		free(buf);
 }
 
@@ -194,9 +194,7 @@ const char *last_serror(void)
 	if (buf == NULL) {
 		buf = malloc(__buf_size);
 		assert(pthread_setspecific(__errbuf_key, buf) == 0);
-		if ((unsigned long) pthread_self()
-			== main_thread_self())
-		{
+		if (__pthread_self() == main_thread_self()) {
 			__main_buf = buf;
 			atexit(main_free_buf);
 		}
