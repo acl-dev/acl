@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        20
+Release:        21
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,9 @@ fi
 /etc/init.d/master
 
 %changelog
+* Thu Sep 22 2018 zhengshuxin@qiyi.com 3.3.0-21-20170922.18
+- acl_master: restructure web managing module.
+
 * Thu Sep 21 2018 zhengshuxin@qiyi.com 3.3.0-20-20170921.16
 - rpm: add version to 3.3.0-20
 
