@@ -62,31 +62,32 @@ static int check_read(int fd, int timeout)
 static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	SOCKET  *cfd = (SOCKET *) ctx;
+	SOCKET   fd  = *cfd;
 	char  buf[8192];
 	int   ret;
 
 	__socket_count++;
-	printf("client fiber-%d: fd: %d\r\n", acl_fiber_self(), *cfd);
+	printf("client fiber-%d: fd: %d, %p\r\n", acl_fiber_self(), *cfd, cfd);
 
 	while (1) {
 		if (__rw_timeout > 0) {
-			ret = check_read(*cfd, __rw_timeout * 1000);
+			ret = check_read(fd, __rw_timeout * 1000);
 			if (ret < 0)
 				break;
 			if (ret == 0) {
-				printf("read timeout fd=%u\r\n", *cfd);
+				printf("read timeout fd=%u\r\n", fd);
 				break;
 			}
 		}
 
 #if defined(_WIN32) || defined(_WIN64)
-		ret = acl_fiber_recv(*cfd, buf, sizeof(buf), 0);
+		ret = acl_fiber_recv(fd, buf, sizeof(buf), 0);
 #else
-		ret = read(*cfd, buf, sizeof(buf));
+		ret = read(fd, buf, sizeof(buf));
 #endif
 		if (ret == 0) {
 			printf("read close by peer fd: %d, %s\r\n",
-				*cfd, acl_last_serror());
+				fd, acl_last_serror());
 			break;
 		} else if (ret < 0) {
 			if (acl_last_error() == EINTR) {
@@ -94,7 +95,8 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 				continue;
 			}
 
-			printf("read error %s, fd: %u\n", acl_last_serror(), *cfd);
+			printf("read error %s, fd: %u, %p\n",
+				acl_last_serror(), fd, cfd);
 			break;
 		}
 		buf[ret] = 0;
@@ -105,22 +107,25 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 			continue;
 
 #if defined(_WIN32) || defined(_WIN64)
-		if (acl_fiber_send(*cfd, buf, ret, 0) < 0) {
+		if (acl_fiber_send(fd, buf, ret, 0) < 0) {
 #else
-		if (write(*cfd, buf, ret) < 0) {
+		if (write(fd, buf, ret) < 0) {
 #endif
 			if (errno == EINTR)
 				continue;
-			printf("write error, fd: %d\r\n", *cfd);
+			printf("write error, fd: %d, %p\r\n", fd, cfd);
 			break;
 		}
+		//break;
 	}
 
 	__socket_count--;
-	printf("%s: close %d, socket_count=%d\r\n",
-		__FUNCTION__, *cfd, __socket_count);
-	CLOSE(*cfd);
+	printf("%s: close %d, %p, socket_count=%d\r\n",
+		__FUNCTION__, fd, cfd, __socket_count);
+	CLOSE(fd);
+	//printf(">>>>>free cfd=%p\r\n", cfd);
 	free(cfd);
+	//printf(">>>>>free cfd=%p ok\r\n", cfd);
 
 	if (--__nconnect == 0) {
 		printf("\r\n----total read/write: %d----\r\n", __count);
@@ -179,7 +184,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 		*fd = cfd;
 
 		__nconnect++;
-		printf("accept one, fd: %u\r\n", cfd);
+		printf("accept one, fd: %u, %p\r\n", cfd, fd);
 		acl_fiber_create(echo_client, fd, __stack_size);
 	}
 

@@ -791,8 +791,8 @@ static void *thread_main(void *ctx)
 	while (!__service_exiting)
 		acl_event_loop(server->event);
 
-	acl_msg_info("%s(%d), %s: thread-%lu exit",
-		__FILE__, __LINE__, __FUNCTION__, acl_pthread_self());
+	acl_msg_info("%s(%d), %s: thread-%lu exit", __FILE__, __LINE__,
+		__FUNCTION__, (unsigned long) acl_pthread_self());
 
 	if (__servers_count_atomic && __servers_count > 0)
 		acl_atomic_int64_add_fetch(__servers_count_atomic, -1);
@@ -870,7 +870,7 @@ static void main_thread_loop(void)
 
 	acl_vstring_free(buf);
 	acl_msg_info("%s(%d): main thread-%lu exit",
-		__FUNCTION__, __LINE__, acl_pthread_self());
+		__FUNCTION__, __LINE__, (unsigned long) acl_pthread_self());
 }
 
 static void servers_start(UDP_SERVER *servers, int nthreads)

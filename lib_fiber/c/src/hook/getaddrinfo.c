@@ -39,13 +39,14 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 	int socktype, int flags)
 {
 	struct addrinfo *res;
-	size_t addrlen = sizeof(struct SOCK_ADDR);
+	size_t addrlen;
 	struct SOCK_ADDR sa;
 
 	if (is_ipv4(ip)) {
 		sa.sa.in.sin_family      = AF_INET;
 		sa.sa.in.sin_addr.s_addr = inet_addr(ip);
 		sa.sa.in.sin_port        = htons(port);
+		addrlen                  = sizeof(struct sockaddr_in);
 	}
 #ifdef AF_INET6
 	else if (is_ipv6(ip)) {
@@ -54,6 +55,7 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 		if (inet_pton(AF_INET6, ip, &sa.sa.in6.sin6_addr) <= 0) {
 			return NULL;
 		}
+		addrlen = sizeof(struct sockaddr_in6);
 	}
 #endif
 	else {
@@ -99,6 +101,8 @@ static void saveaddrinfo(struct dns_addrinfo *ai, struct addrinfo **res)
 int getaddrinfo(const char *node, const char *service,
 	const struct addrinfo* hints, struct addrinfo **res)
 {
+	struct dns_addrinfo *dai;
+	struct dns_resolver *resolver;
 	int err;
 
 	if (__sys_getaddrinfo == NULL) {
@@ -135,9 +139,6 @@ int getaddrinfo(const char *node, const char *service,
 			return EAI_NODATA;
 		}
 	}
-
-	struct dns_addrinfo *dai;
-	struct dns_resolver *resolver;
 
 	if (!(resolver = dns_res_open(var_dns_conf, var_dns_hosts,
 		var_dns_hints, NULL, dns_opts(), &err))) {

@@ -220,7 +220,10 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family   = PF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
-#ifdef	ACL_MACOSX
+
+#if	defined(ACL_FREEBSD)
+	hints.ai_flags    = 0;
+#elif	defined(ACL_MACOSX)
 	hints.ai_flags    = AI_DEFAULT;
 #elif	defined(ACL_ANDROID)
 	hints.ai_flags    = AI_ADDRCONFIG;

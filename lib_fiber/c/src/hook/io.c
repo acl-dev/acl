@@ -206,6 +206,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 	}
 
 	fe = fiber_file_open(fd);
+
 	while (1) {
 		ssize_t ret;
 		int err;

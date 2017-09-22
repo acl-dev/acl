@@ -89,7 +89,7 @@ static int kqueue_add_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 
 	kev = &ek->changes[ek->nchanges++];
 	EV_SET(kev, fe->fd, EVFILT_READ, EV_ADD, 0, 0, fe);
-	if (fe->mask & EVENT_WRITE) {
+	if (!(fe->mask & EVENT_WRITE)) {
 		ek->event.fdcount++;
 	}
 	fe->mask |= EVENT_READ;
@@ -110,7 +110,7 @@ static int kqueue_add_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 
 	kev = &ek->changes[ek->nchanges++];
 	EV_SET(kev, fe->fd, EVFILT_WRITE, EV_ADD, 0, 0, fe);
-	if (fe->mask & EVENT_READ) {
+	if (!(fe->mask & EVENT_READ)) {
 		ek->event.fdcount++;
 	}
 	fe->mask |= EVENT_WRITE;
