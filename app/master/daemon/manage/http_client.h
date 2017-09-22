@@ -22,7 +22,17 @@ public:
 
 	void wait(void);
 
-	void on_reload_finish(void);
+public:
+	template<typename T>
+	void reply(int status, T& o)
+	{
+		acl::string buf;
+		serialize<T>(o, buf);
+		do_reply(status, buf);
+		buf.clear();
+	}
+
+	void on_finish(void);
 
 private:
 	~http_client(void);
@@ -35,11 +45,7 @@ private:
 	http_off_t      content_length_;
 	acl::json       json_;
 
-	reload_res_t    reload_res_;
-	service_reload* reload_;
-
-	void reset(void);
-	bool handle(void);
+public:
 	bool handle_list(void);
 	bool handle_stat(void);
 	bool handle_kill(void);
@@ -48,16 +54,10 @@ private:
 	bool handle_restart(void);
 	bool handle_reload(void);
 
+private:
+	void reset(void);
+	bool handle(void);
 	void do_reply(int status, const acl::string& buf);
-
-	template<typename T>
-	void reply(int status, T& o)
-	{
-		acl::string buf;
-		serialize<T>(o, buf);
-		do_reply(status, buf);
-		buf.clear();
-	}
 
 	static int on_head(int status, void* ctx);
 	static int on_body(int status, char* data, int dlen, void* ctx);

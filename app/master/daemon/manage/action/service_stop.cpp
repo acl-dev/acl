@@ -12,6 +12,7 @@
 
 #include "stdafx.h"
 #include "master/master_api.h"
+#include "manage/http_client.h"
 #include "service_stop.h"
 
 bool service_stop::stop_one(const char* path, stop_res_data_t& data)
@@ -26,7 +27,23 @@ bool service_stop::stop_one(const char* path, stop_res_data_t& data)
 	return true;
 }
 
-bool service_stop::run(const stop_req_t& req, stop_res_t& res)
+bool service_stop::run(acl::json& json)
+{
+	stop_req_t req;
+	stop_res_t res;
+
+	if (deserialize<stop_req_t>(json, req) == false)
+	{
+		res.status = 400;
+		res.msg    = "invalid json";
+		client_.reply<stop_res_t>(res.status, res);
+		return false;
+	}
+
+	return handle(req, res);
+}
+
+bool service_stop::handle(const stop_req_t& req, stop_res_t& res)
 {
 	size_t n = 0;
 
@@ -53,6 +70,9 @@ bool service_stop::run(const stop_req_t& req, stop_res_t& res)
 		logger_error("not all services were started!, n=%d, %d",
 			(int) n, (int) req.data.size());
 	}
+
+	client_.reply<stop_res_t>(res.status, res);
+	client_.on_finish();
 
 	return true;
 }

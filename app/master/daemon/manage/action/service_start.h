@@ -14,12 +14,18 @@
 
 struct start_req_t;
 struct start_res_t;
+class http_client;
 
 class service_start
 {
 public:
-	service_start(void) {}
+	service_start(http_client& client) : client_(client) {}
 	~service_start(void) {}
 
-	bool run(const start_req_t& req, start_res_t& res);
+	bool run(acl::json& json);
+
+private:
+	http_client& client_;
+
+	bool handle(const start_req_t& req, start_res_t& res);
 };

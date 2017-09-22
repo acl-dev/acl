@@ -24,7 +24,6 @@ http_client::http_client(acl::aio_socket_stream *client, int rw_timeout)
 	: conn_(client->get_astream())
 	, rw_timeout_(rw_timeout)
 	, content_length_(0)
-	, reload_(NULL)
 {
 	hdr_req_ = NULL;
 	req_     = NULL;
@@ -150,6 +149,21 @@ void http_client::do_reply(int status, const acl::string& body)
 	acl_aio_writen(conn_, buf.c_str(), (int) buf.size());
 }
 
+static struct {
+	const char* cmd;
+	bool (http_client::*handler)(void);
+} handlers[] = {
+	{ "list", &http_client::handle_list },
+	{ "stat", &http_client::handle_stat },
+	{ "start", &http_client::handle_start },
+	{ "kill", &http_client::handle_kill },
+	{ "stop", &http_client::handle_stop },
+	{ "restart", &http_client::handle_restart },
+	{ "reload", &http_client::handle_reload },
+
+	{ 0, 0 }
+};
+
 bool http_client::handle(void)
 {
 	const char* cmd = http_hdr_req_param(hdr_req_, "cmd");
@@ -167,32 +181,16 @@ bool http_client::handle(void)
 
 #define EQ !strcasecmp
 
-	bool ret;
+	int i;
 
-	if (EQ(cmd, "list"))
-		ret = handle_list();
-	else if (EQ(cmd, "stat"))
-		ret = handle_stat();
-	else if (EQ(cmd, "start"))
-		ret = handle_start();
-	else if (EQ(cmd, "kill"))
-		ret = handle_kill();
-	else if (EQ(cmd, "stop"))
-		ret = handle_stop();
-	else if (EQ(cmd, "reload"))
+	for (i = 0; handlers[i].cmd != NULL; i++)
 	{
-		ret = handle_reload();
-		if (ret == false)
-		{
-			acl_aio_iocp_close(conn_);
-			return false;
-		}
-
-		return true;
+		if (EQ(cmd, handlers[i].cmd))
+			break;
 	}
-	else if (EQ(cmd, "restart"))
-		ret = handle_restart();
-	else {
+
+	if (handlers[i].handler == NULL)
+	{
 		logger_warn("invalid cmd=%s", cmd);
 		acl::string dummy;
 		do_reply(400, dummy);
@@ -203,176 +201,58 @@ bool http_client::handle(void)
 		return true;
 	}
 
-	if (ret && hdr_req_->hdr.keep_alive)
-	{
-		wait();
+	if ((this->*handlers[i].handler)())
 		return true;
-	}
-	else
-	{
-		acl_aio_iocp_close(conn_);
-		return false;
-	}
+
+	acl_aio_iocp_close(conn_);
+	return false;
 }
 
 bool http_client::handle_list(void)
 {
-	list_req_t req;
-	list_res_t res;
-
-	if (deserialize<list_req_t>(json_, req) == false)
-	{
-		res.status = 400;
-		res.msg    = "invalid json";
-		reply<list_res_t>(res.status, res);
-		return false;
-	}
-
-	service_list service;
-	if (service.run(req, res))
-	{
-		res.status = 200;
-		res.msg    = "ok";
-	}
-	else
-	{
-		res.status = 500;
-		res.msg    = "error";
-	}
-
-	reply<list_res_t>(res.status, res);
-	return true;
+	service_list service(*this);
+	return service.run(json_);
 }
 
 bool http_client::handle_stat(void)
 {
-	stat_req_t req;
-	stat_res_t res;
-
-	if (deserialize<stat_req_t>(json_, req) == false)
-	{
-		res.status = 400;
-		res.msg    = "invalid json";
-		reply<stat_res_t>(res.status, res);
-		return false;
-	}
-
-	service_stat service;
-	service.run(req, res);
-	reply<stat_res_t>(res.status, res);
-
-	return true;
+	service_stat service(*this);
+	return service.run(json_);
 }
 
 bool http_client::handle_kill(void)
 {
-	kill_req_t req;
-	kill_res_t res;
-
-	if (deserialize<kill_req_t>(json_, req) == false)
-	{
-		res.status = 400;
-		res.msg    = "invalid json";
-		reply<kill_res_t>(res.status, res);
-		return false;
-	}
-
-	service_kill service;
-	service.run(req, res);
-	reply<kill_res_t>(res.status, res);
-
-	return true;
+	service_kill service(*this);
+	return service.run(json_);
 }
 
 bool http_client::handle_stop(void)
 {
-	stop_req_t req;
-	stop_res_t res;
-
-	if (deserialize<stop_req_t>(json_, req) == false)
-	{
-		res.status = 400;
-		res.msg    = "invalid json";
-		reply<stop_res_t>(res.status, res);
-		return false;
-	}
-
-	service_stop service;
-	service.run(req, res);
-	reply<stop_res_t>(res.status, res);
-
-	return true;
+	service_stop service(*this);
+	return service.run(json_);
 }
 
 bool http_client::handle_start(void)
 {
-	start_req_t req;
-	start_res_t res;
-
-	if (deserialize<start_req_t>(json_, req) == false)
-	{
-		res.status = 400;
-		res.msg    = "invalid json";
-		reply<start_res_t>(res.status, res);
-		return false;
-	}
-
-	service_start service;
-	service.run(req, res);
-	reply<start_res_t>(res.status, res);
-
-	return true;
+	service_start service(*this);
+	return service.run(json_);
 }
 
 bool http_client::handle_restart(void)
 {
-	restart_req_t req;
-	restart_res_t res;
-
-	if (deserialize<restart_req_t>(json_, req) == false)
-	{
-		res.status = 400;
-		res.msg    = "invalid json";
-		reply<restart_res_t>(res.status, res);
-		return false;
-	}
-
-	service_restart service;
-	service.run(req, res);
-	reply<restart_res_t>(res.status, res);
-
-	return true;
+	service_restart service(*this);
+	return service.run(json_);
 }
 
 bool http_client::handle_reload(void)
 {
-	reload_req_t req;
-
-	reload_res_.status = 200;
-	reload_res_.msg    = "ok";
-	reload_res_.data.clear();
-
-	if (deserialize<reload_req_t>(json_, req) == false)
-	{
-		reload_res_.status = 400;
-		reload_res_.msg    = "invalid json";
-		reply<reload_res_t>(reload_res_.status, reload_res_);
-		return false;
-	}
-
-	reload_ = new service_reload(*this, reload_res_);
-	reload_->run(req);
-
+	service_reload* service = new service_reload(*this);
+	service->run(json_);
 	return true;
 }
 
-void http_client::on_reload_finish(void)
+void http_client::on_finish(void)
 {
-	delete reload_;
-	reload_ = NULL;
-
-	reply<reload_res_t>(reload_res_.status, reload_res_);
-
 	if (hdr_req_->hdr.keep_alive)
 		wait();
 	else

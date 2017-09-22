@@ -4,7 +4,7 @@
 #include "http_request.h"
 
 static bool __verbose = false;
-static long long __timeout = 5000;
+static long long __timeout = 0;
 
 static void print_space(int n)
 {
@@ -141,7 +141,8 @@ static void print_servers(const std::vector<serv_info_t>& servers, bool verbose)
 	}
 }
 
-static bool do_list(const char* addr, const char*)
+static bool do_list(const std::vector<acl::string>&,
+	const char* addr, const char*)
 {
 	list_req_t req;
 	req.cmd = "list";
@@ -159,9 +160,10 @@ static bool do_list(const char* addr, const char*)
 	return true;
 }
 
-static bool do_stat(const char* addr, const char* filepath)
+static bool do_stat(const std::vector<acl::string>&,
+	const char* addr, const char* fpath)
 {
-	if (*filepath == 0)
+	if (*fpath == 0)
 	{
 		printf("filepath null\r\n");
 		return false;
@@ -171,7 +173,7 @@ static bool do_stat(const char* addr, const char* filepath)
 	req.cmd = "stat";
 
 	stat_req_data_t req_data;
-	req_data.path = filepath;
+	req_data.path = fpath;
 	req.data.push_back(req_data);
 
 	stat_res_t res;
@@ -198,9 +200,10 @@ static void print_start_results(const std::vector<start_res_data_t>& data)
 	}
 }
 
-static bool do_start(const char* addr, const char* filepath)
+static bool do_start(const std::vector<acl::string>&,
+	const char* addr, const char* fpath)
 {
-	if (*filepath == 0)
+	if (*fpath == 0)
 	{
 		printf("filepath null\r\n");
 		return false;
@@ -210,7 +213,7 @@ static bool do_start(const char* addr, const char* filepath)
 	req.cmd = "start";
 
 	start_req_data_t req_data;
-	req_data.path = filepath;
+	req_data.path = fpath;
 	req.data.push_back(req_data);
 
 	start_res_t res;
@@ -237,9 +240,10 @@ static void print_restart_results(const std::vector<restart_res_data_t>& data)
 	}
 }
 
-static bool do_restart(const char* addr, const char* filepath)
+static bool do_restart(const std::vector<acl::string>&,
+	const char* addr, const char* fpath)
 {
-	if (*filepath == 0)
+	if (*fpath == 0)
 	{
 		printf("filepath null\r\n");
 		return false;
@@ -249,7 +253,7 @@ static bool do_restart(const char* addr, const char* filepath)
 	req.cmd = "restart";
 
 	restart_req_data_t req_data;
-	req_data.path = filepath;
+	req_data.path = fpath;
 	req.data.push_back(req_data);
 
 	restart_res_t res;
@@ -275,9 +279,10 @@ static void print_stop_results(const std::vector<stop_res_data_t>& data)
 	}
 }
 
-static bool do_stop(const char* addr, const char* filepath)
+static bool do_stop(const std::vector<acl::string>&,
+	const char* addr, const char* fpath)
 {
-	if (*filepath == 0)
+	if (*fpath == 0)
 	{
 		printf("filepath null\r\n");
 		return false;
@@ -287,7 +292,7 @@ static bool do_stop(const char* addr, const char* filepath)
 	req.cmd = "stop";
 
 	stop_req_data_t req_data;
-	req_data.path = filepath;
+	req_data.path = fpath;
 	req.data.push_back(req_data);
 
 	stop_res_t res;
@@ -313,9 +318,10 @@ static void print_kill_results(const std::vector<kill_res_data_t>& data)
 	}
 }
 
-static bool do_kill(const char* addr, const char* filepath)
+static bool do_kill(const std::vector<acl::string>&,
+	const char* addr, const char* fpath)
 {
-	if (*filepath == 0)
+	if (*fpath == 0)
 	{
 		printf("filepath null\r\n");
 		return false;
@@ -325,7 +331,7 @@ static bool do_kill(const char* addr, const char* filepath)
 	req.cmd = "kill";
 
 	kill_req_data_t req_data;
-	req_data.path = filepath;
+	req_data.path = fpath;
 	req.data.push_back(req_data);
 
 	kill_res_t res;
@@ -341,6 +347,7 @@ static void print_reload(const reload_res_data_t& data)
 	println("status", data.status);
 	println("proc_count", data.proc_count);
 	println("proc_signaled", data.proc_signaled);
+	println("proc_ok", data.proc_ok);
 	println("path", data.path.c_str());
 }
 
@@ -353,20 +360,25 @@ static void print_reload_results(const std::vector<reload_res_data_t>& res)
 	}
 }
 
-static bool do_reload(const char* addr, const char* filepath)
+static bool do_reload(const std::vector<acl::string>& tokens,
+	const char* addr, const char* fpath)
 {
-	if (*filepath == 0)
+	if (*fpath == 0)
 	{
-		printf("filepath null\r\n");
+		printf("\033[1;34;40musage\033[0m: "
+			"\033[1;33;40mreload\033[0m configure_path timeout\r\n");
 		return false;
 	}
+
+	if (tokens.size() >= 3)
+		__timeout = atoll(tokens[2]);
 
 	reload_req_t req;
 	req.cmd = "reload";
 	req.timeout = __timeout;
 
 	reload_req_data_t req_data;
-	req_data.path = filepath;
+	req_data.path = fpath;
 	req.data.push_back(req_data);
 
 	reload_res_t res;
@@ -374,6 +386,82 @@ static bool do_reload(const char* addr, const char* filepath)
 		return false;
 
 	print_reload_results(res.data);
+	return true;
+}
+
+static bool do_set(const std::vector<acl::string>& tokens,
+	const char*, const char* fpath)
+{
+	if (*fpath == 0)
+	{
+		printf("\033[1;34;40musage\033[0m: "
+			"\033[1;33;40mset\033[0m configure_path timeout\r\n");
+		return true;
+	}
+
+	if (tokens.size() >= 3)
+		__timeout = atoll(tokens[2]);
+
+	printf("set service to %s ok, timeout=%lld\r\n", fpath, __timeout);
+	return true;
+}
+
+static bool do_server(const std::vector<acl::string>& tokens,
+	const char* addr, const char*)
+{
+	if (tokens.size() > 1)
+	{
+		addr = tokens[1].c_str();
+		printf("set server to %s ok\r\n", addr);
+	}
+	else if (*addr == 0)
+		printf("\033[1;34;40musage\033[0m: "
+			"\033[1;33;40mserver\033[0m addr\r\n");
+	else
+		printf("server addr is %s\r\n", addr);
+	return true;
+}
+
+static bool do_verbose(const std::vector<acl::string>&,
+	const char*, const char*)
+{
+	__verbose = __verbose ? false : true;
+	printf("set verbose %s\r\n", __verbose ? "on" : "off");
+	return true;
+}
+
+static bool do_help(const std::vector<acl::string>&, const char*, const char*)
+{
+	println("set", "set the service's configure");
+	println("server", "set the service's addr");
+	println_underline("verbose", "display verbose");
+	println_underline("clear", "clear the screan");
+	println_underline("list", "list all the running services");
+	println_underline("stat", "show one service's running status");
+	println("start", "start one service");
+	println("restart", "restart one service");
+	println("stop", "stop one service");
+	println("kill", "kill one service");
+	println("reload", "reload one service");
+
+	return true;
+}
+
+static bool do_quit(const std::vector<acl::string>&, const char*, const char*)
+{
+	printf("Bye!\r\n");
+	exit(0);
+
+	// not reached here
+	return false;
+}
+
+static bool do_clear(const std::vector<acl::string>&, const char*, const char*)
+{
+#if	!defined(__APPLE__)
+	rl_clear_screen(0, 0);
+#endif
+	printf("\r\n");
 	return true;
 }
 
@@ -392,35 +480,29 @@ static void getline(acl::string& out)
 		add_history(out.c_str());
 }
 
-static void help(void)
-{
-	println("set", "set the service's configure");
-	println("server", "set the service's addr");
-	println_underline("verbose", "display verbose");
-	println_underline("clear", "clear the screan");
-	println_underline("list", "list all the running services");
-	println_underline("stat", "show one service's running status");
-	println("start", "start one service");
-	println("restart", "restart one service");
-	println("stop", "stop one service");
-	println("kill", "kill one service");
-	println("reload", "reload one service");
-}
-
 static struct {
 	const char* cmd;
-	const char* shortcut;
-	bool (*func)(const char*, const char*);
+	char  shortcut;
+	bool  has_path;
+	bool (*fn)(const std::vector<acl::string>&, const char*, const char*);
 } __actions[] = {
-	{ "list",	"l",	do_list		},
-	{ "stat",	"s",	do_stat		},
-	{ "start",	NULL,	do_start	},
-	{ "restart",	NULL,	do_restart	},
-	{ "stop",	NULL,	do_stop		},
-	{ "kill",	NULL,	do_kill		},
-	{ "reload",	"r",	do_reload	},
+	{ "list",	'l',	false,	do_list		},
+	{ "stat",	's',	true,	do_stat		},
+	{ "start",	'\0',	true,	do_start	},
+	{ "restart",	'\0',	true,	do_restart	},
+	{ "stop",	'\0',	true,	do_stop		},
+	{ "kill",	'\0',	true,	do_kill		},
+	{ "reload",	'r',	true,	do_reload	},
 
-	{ 0,		0,	0		},
+	{ "help",	'h',	false,	do_help		},
+	{ "clear",	'c',	false,	do_clear	},
+	{ "quit",	'q',	false,	do_quit		},
+	{ "exit",	'e',	false,	do_quit		},
+	{ "set",	'\0',	true,	do_set		},
+	{ "server",	'\0',	false,	do_server	},
+	{ "verbose",	'v',	false,	do_verbose	},
+
+	{ 0,		0,	false,	0		},
 };
 
 static void run(const char* server, const char* filepath)
@@ -435,85 +517,12 @@ static void run(const char* server, const char* filepath)
 	while (true)
 	{
 		getline(buf);
-		if (buf.equal("quit" ,false) || buf.equal("exit", false)
-			|| buf.equal("q", false))
-		{
-			printf("Bye!\r\n");
-			break;
-		}
-		if (buf.empty() || buf.equal("help", false))
-		{
-			help();
+		if (buf.empty())
 			continue;
-		}
 
 		std::vector<acl::string>& tokens = buf.split2(" \t", true);
 		acl::string cmd = tokens[0];
 		cmd.lower();
-
-		if (cmd == "clear" || cmd == "c")
-		{
-#if	!defined(__APPLE__)
-			rl_clear_screen(0, 0);
-#endif
-			printf("\r\n");
-			continue;
-		}
-
-		if (cmd == "set")
-		{
-			if (tokens.size() == 1)
-			{
-				printf("\033[1;34;40musage\033[0m: "
-				  "\033[1;33;40mset\033[0m configure_path timeout\r\n");
-				continue;
-			}
-
-			fpath = tokens[1];
-			if (tokens.size() >= 3)
-			{
-				__timeout = atoll(tokens[2]);
-				if (__timeout <= 0)
-					__timeout = 5000;
-			}
-
-			printf("set service to %s ok\r\n", fpath.c_str());
-			continue;
-		}
-		else if (cmd == "server")
-		{
-			if (tokens.size() > 1)
-			{
-				addr = tokens[1];
-				printf("set server to %s ok\r\n", addr.c_str());
-			}
-			else if (addr.empty())
-				printf("\033[1;34;40musage\033[0m: "
-				  "\033[1;33;40mserver\033[0m addr\r\n");
-			else
-				printf("server addr is %s\r\n", addr.c_str());
-
-			continue;
-		}
-		else if (cmd == "verbose" || cmd == "v")
-		{
-			if (tokens.size() > 1)
-			{
-				if (tokens[1].equal("on", false))
-					__verbose = true;
-				else
-					__verbose = false;
-			}
-			else
-				__verbose = __verbose ? false : true;
-
-			printf("set verbose %s\r\n",
-				__verbose ? "on" : "off");
-			continue;
-		}
-
-		if (tokens.size() >= 2)
-			fpath = tokens[1];
 
 		bool ret = false;
 		int  i;
@@ -521,19 +530,23 @@ static void run(const char* server, const char* filepath)
 		{
 			if (cmd == __actions[i].cmd ||
 				(__actions[i].shortcut &&
-				  cmd == __actions[i].shortcut))
+				  cmd.size() == 1 &&
+				  cmd[0] == __actions[i].shortcut))
 			{
-				ret = __actions[i].func(addr, fpath);
 				break;
 			}
 		}
 
 		if (__actions[i].cmd == NULL)
 		{
-			help();
+			do_help(tokens, addr, fpath);
 			continue;
 		}
 
+		if (__actions[i].has_path && tokens.size() >= 2)
+			fpath = tokens[1];
+
+		ret = __actions[i].fn(tokens, addr, fpath);
 		if (!__verbose)
 			print_space(100);
 
@@ -582,12 +595,14 @@ int main(int argc, char* argv[])
 
         acl::log::stdout_open(true);
 
+	std::vector<acl::string> tokens;
+
 	int i;
 	for (i = 0; __actions[i].cmd; i++)
 	{
 		if (action == __actions[i].cmd)
 		{
-			(void) __actions[i].func(addr, filepath);
+			(void) __actions[i].fn(tokens, addr, filepath);
 			break;
 		}
 	}

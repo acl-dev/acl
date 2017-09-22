@@ -202,6 +202,15 @@ struct reload_req_t : req_t
 
 struct reload_res_data_t
 {
+	reload_res_data_t(void)
+	{
+		status        = 0;
+		proc_count    = 0;
+		proc_signaled = 0;
+		proc_ok       = 0;
+		proc_err      = 0;
+	}
+
 	int status;
 	int proc_count;
 	int proc_signaled;

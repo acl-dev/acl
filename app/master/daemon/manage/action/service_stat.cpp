@@ -12,6 +12,7 @@
 
 #include "stdafx.h"
 #include "master/master_api.h"
+#include "manage/http_client.h"
 #include "service_stat.h"
 
 bool service_stat::stat_one(const char* path, serv_info_t& info)
@@ -67,7 +68,23 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 	return true;
 }
 
-bool service_stat::run(const stat_req_t& req, stat_res_t& res)
+bool service_stat::run(acl::json& json)
+{
+	stat_req_t req;
+	stat_res_t res;
+
+	if (deserialize<stat_req_t>(json, req) == false)
+	{
+		res.status = 400;
+		res.msg    = "invalid json";
+		client_.reply<stat_res_t>(res.status, res);
+		return false;
+	}
+
+	return handle(req, res);
+}
+
+bool service_stat::handle(const stat_req_t& req, stat_res_t& res)
 {
 	size_t n = 0;
 
@@ -92,6 +109,9 @@ bool service_stat::run(const stat_req_t& req, stat_res_t& res)
 		logger_error("not all service have been started!, n=%d, %d",
 			(int) n, (int) req.data.size());
 	}
+
+	client_.reply<stat_res_t>(res.status, res);
+	client_.on_finish();
 
 	return true;
 }

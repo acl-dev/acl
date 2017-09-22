@@ -12,9 +12,26 @@
 
 #include "stdafx.h"
 #include "master/master_api.h"
+#include "manage/http_client.h"
 #include "service_restart.h"
 
-bool service_restart::run(const restart_req_t& req, restart_res_t& res)
+bool service_restart::run(acl::json& json)
+{
+	restart_req_t req;
+	restart_res_t res;
+
+	if (deserialize<restart_req_t>(json, req) == false)
+	{
+		res.status = 400;
+		res.msg    = "invalid json";
+		client_.reply<restart_res_t>(res.status, res);
+		return false;
+	}
+
+	return handle(req, res);
+}
+
+bool service_restart::handle(const restart_req_t& req, restart_res_t& res)
 {
 	restart_res_data_t data;
 	const ACL_MASTER_SERV* serv;
@@ -52,6 +69,9 @@ bool service_restart::run(const restart_req_t& req, restart_res_t& res)
 		logger_error("not all service have been restarted!, n=%d, %d",
 			(int) n, (int) req.data.size());
 	}
+
+	client_.reply<restart_res_t>(res.status, res);
+	client_.on_finish();
 
 	return true;
 }

@@ -12,6 +12,7 @@
 
 #include "stdafx.h"
 #include "master/master_api.h"
+#include "manage/http_client.h"
 #include "service_kill.h"
 
 bool service_kill::kill_one(const char* path, kill_res_data_t& data)
@@ -26,7 +27,23 @@ bool service_kill::kill_one(const char* path, kill_res_data_t& data)
 	return true;
 }
 
-bool service_kill::run(const kill_req_t& req, kill_res_t& res)
+bool service_kill::run(acl::json& json)
+{
+	kill_req_t req;
+	kill_res_t res;
+
+	if (deserialize<kill_req_t>(json, req) == false)
+	{
+		res.status = 400;
+		res.msg    = "invalid json";
+		client_.reply<kill_res_t>(res.status, res);
+		return false;
+	}
+
+	return handle(req, res);
+}
+
+bool service_kill::handle(const kill_req_t& req, kill_res_t& res)
 {
 	size_t n = 0;
 
@@ -50,9 +67,12 @@ bool service_kill::run(const kill_req_t& req, kill_res_t& res)
 	{
 		res.status = 500;
 		res.msg    = "error";
-		logger_error("not all services were started!, n=%d, %d",
+		logger_error("not all services were killed!, n=%d, %d",
 			(int) n, (int) req.data.size());
 	}
+
+	client_.reply<kill_res_t>(res.status, res);
+	client_.on_finish();
 
 	return true;
 }

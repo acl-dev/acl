@@ -12,6 +12,7 @@
 
 #include "stdafx.h"
 #include "master/master_api.h"
+#include "manage/http_client.h"
 #include "service_list.h"
 
 void service_list::add_one(list_res_t& res, const ACL_MASTER_SERV* serv)
@@ -58,7 +59,23 @@ void service_list::add_one(list_res_t& res, const ACL_MASTER_SERV* serv)
 	res.data.push_back(info);
 }
 
-bool service_list::run(const list_req_t&, list_res_t& res)
+bool service_list::run(acl::json& json)
+{
+	list_req_t req;
+	list_res_t res;
+
+	if (deserialize<list_req_t>(json, req) == false)
+	{
+		res.status = 400;
+		res.msg    = "invalid json";
+		client_.reply<list_res_t>(res.status, res);
+		return false;
+	}
+
+	return handle(req, res);
+}
+
+bool service_list::handle(const list_req_t&, list_res_t& res)
 {
 	ACL_MASTER_SERV *serv;
 
@@ -67,6 +84,9 @@ bool service_list::run(const list_req_t&, list_res_t& res)
 
 	res.status = 200;
 	res.msg    = "ok";
+
+	client_.reply<list_res_t>(res.status, res);
+	client_.on_finish();
 
 	return true;
 }

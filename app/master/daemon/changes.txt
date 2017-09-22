@@ -1,3 +1,7 @@
+
+8) 2017.9.22
+8.1) workaround: restructure the manage module of acl_master.
+
 7) 2017.9.9
 7.1) feature: master can wait callback from children when reloading the specific children
 

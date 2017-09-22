@@ -34,7 +34,8 @@ int http_forward(const char* addr, acl::json& in, acl::string& out)
 		return 503;
 	}
 
-	//logger(">>>res=%s<<<", json.to_string().c_str());
+	logger(">>>url=%s, req=|%s|, res=|%s|<<<",
+		url.c_str(), body.c_str(), json.to_string().c_str());
 #if 1
 	out = json.to_string();
 	return 200;

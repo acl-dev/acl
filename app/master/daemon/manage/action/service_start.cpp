@@ -12,9 +12,26 @@
 
 #include "stdafx.h"
 #include "master/master_api.h"
+#include "manage/http_client.h"
 #include "service_start.h"
 
-bool service_start::run(const start_req_t& req, start_res_t& res)
+bool service_start::run(acl::json& json)
+{
+	start_req_t req;
+	start_res_t res;
+
+	if (deserialize<start_req_t>(json, req) == false)
+	{
+		res.status = 400;
+		res.msg    = "invalid json";
+		client_.reply<start_res_t>(res.status, res);
+		return false;
+	}
+
+	return handle(req, res);
+}
+
+bool service_start::handle(const start_req_t& req, start_res_t& res)
 {
 	start_res_data_t data;
 	const ACL_MASTER_SERV* serv;
@@ -52,6 +69,9 @@ bool service_start::run(const start_req_t& req, start_res_t& res)
 		logger_error("not all service have been started!, n=%d, %d",
 			(int) n, (int) req.data.size());
 	}
+
+	client_.reply<start_res_t>(res.status, res);
+	client_.on_finish();
 
 	return true;
 }
