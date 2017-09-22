@@ -1,4 +1,7 @@
 
+62) 2017.9.22
+62.1) feature: hook_io.c 支持 hook stat/fstat/lstat
+
 61) 2017.9.20
 61.1) feature: hook_net.c 支持 epoll_create1 API
 

@@ -20,6 +20,9 @@ typedef int     (*pipe2_fn)(int pipefd[2], int flags);
 typedef FILE   *(*popen_fn)(const char *, const char *);
 typedef int     (*pclose_fn)(FILE *);
 typedef int     (*close_fn)(int);
+typedef int     (*stat_fn)(int, const char*, struct stat*);
+typedef int     (*lstat_fn)(int, const char*, struct stat*);
+typedef int     (*fstat_fn)(int, int, struct stat*);
 typedef ssize_t (*read_fn)(int, void *, size_t);
 typedef ssize_t (*readv_fn)(int, const struct iovec *, int);
 typedef ssize_t (*recv_fn)(int, void *, size_t, int);
@@ -41,6 +44,9 @@ static pipe2_fn    __sys_pipe2    = NULL;
 static popen_fn    __sys_popen    = NULL;
 static pclose_fn   __sys_pclose   = NULL;
 static close_fn    __sys_close    = NULL;
+static stat_fn     __sys_stat     = NULL;
+static lstat_fn    __sys_lstat    = NULL;
+static fstat_fn    __sys_fstat    = NULL;
 static read_fn     __sys_read     = NULL;
 static readv_fn    __sys_readv    = NULL;
 static recv_fn     __sys_recv     = NULL;
@@ -86,6 +92,12 @@ void hook_io(void)
 
 	__sys_close    = (close_fn) dlsym(RTLD_NEXT, "close");
 	acl_assert(__sys_close);
+
+	__sys_stat     = (stat_fn) dlsym(RTLD_NEXT, "__xstat");
+	acl_assert(__sys_stat);
+
+	__sys_fstat    = (fstat_fn) dlsym(RTLD_NEXT, "__fxstat");
+	acl_assert(__sys_fstat);
 
 	__sys_read     = (read_fn) dlsym(RTLD_NEXT, "read");
 	acl_assert(__sys_read);
@@ -183,6 +195,48 @@ FILE *popen(const char *command, const char *type)
 	if (fp == NULL)
 		fiber_save_errno();
 	return fp;
+}
+
+int __xstat(int ver, const char *path, struct stat *buf)
+{
+	if (__sys_stat == NULL)
+		hook_io();
+
+	if (!acl_var_hook_sys_api)
+		return __sys_stat ? __sys_stat(ver, path, buf) : -1;
+
+	if (__sys_stat(ver, path, buf) == 0)
+		return 0;
+	fiber_save_errno();
+	return -1;
+}
+
+int __lxstat(int ver, const char *path, struct stat *buf)
+{
+	if (__sys_lstat == NULL)
+		hook_io();
+
+	if (!acl_var_hook_sys_api)
+		return __sys_lstat ? __sys_lstat(ver, path, buf) : -1;
+
+	if (__sys_lstat(ver, path, buf) == 0)
+		return 0;
+	fiber_save_errno();
+	return -1;
+}
+
+int __fxstat(int ver, int fd, struct stat *buf)
+{
+	if (__sys_fstat == NULL)
+		hook_io();
+
+	if (!acl_var_hook_sys_api)
+		return __sys_fstat ? __sys_fstat(ver, fd, buf) : -1;
+
+	if (__sys_fstat(ver, fd, buf) == 0)
+		return 0;
+	fiber_save_errno();
+	return -1;
 }
 
 int close(int fd)
