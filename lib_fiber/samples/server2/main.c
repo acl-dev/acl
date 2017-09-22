@@ -61,13 +61,13 @@ static int check_read(int fd, int timeout)
 
 static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 {
-	SOCKET  *cfd = (SOCKET *) ctx;
-	SOCKET   fd  = *cfd;
+	SOCKET  *pfd = (SOCKET *) ctx;
+	SOCKET   fd  = *pfd;
 	char  buf[8192];
 	int   ret;
 
 	__socket_count++;
-	printf("client fiber-%d: fd: %d, %p\r\n", acl_fiber_self(), *cfd, cfd);
+	printf("client fiber-%d: fd: %d\r\n", acl_fiber_self(), fd);
 
 	while (1) {
 		if (__rw_timeout > 0) {
@@ -81,9 +81,9 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 		}
 
 #if defined(_WIN32) || defined(_WIN64)
-		ret = acl_fiber_recv(fd, buf, sizeof(buf), 0);
+		ret = acl_fiber_recv(fd, buf, sizeof(buf) - 1, 0);
 #else
-		ret = read(fd, buf, sizeof(buf));
+		ret = read(fd, buf, sizeof(buf) - 1);
 #endif
 		if (ret == 0) {
 			printf("read close by peer fd: %d, %s\r\n",
@@ -95,12 +95,11 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 				continue;
 			}
 
-			printf("read error %s, fd: %u, %p\n",
-				acl_last_serror(), fd, cfd);
+			printf("read error %s, fd: %u\n", acl_last_serror(), fd);
 			break;
 		}
-		buf[ret] = 0;
-		//printf("buf=%s\r\n", buf);
+
+		// buf[ret] = 0; printf("buf=%s\r\n", buf);
 		__count++;
 
 		if (!__echo_data)
@@ -113,19 +112,16 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 #endif
 			if (errno == EINTR)
 				continue;
-			printf("write error, fd: %d, %p\r\n", fd, cfd);
+			printf("write error, fd: %d\r\n", fd);
 			break;
 		}
-		//break;
 	}
 
 	__socket_count--;
-	printf("%s: close %d, %p, socket_count=%d\r\n",
-		__FUNCTION__, fd, cfd, __socket_count);
+	printf("%s: close %d, socket_count=%d\r\n",
+		__FUNCTION__, fd, __socket_count);
 	CLOSE(fd);
-	//printf(">>>>>free cfd=%p\r\n", cfd);
-	free(cfd);
-	//printf(">>>>>free cfd=%p ok\r\n", cfd);
+	free(pfd);
 
 	if (--__nconnect == 0) {
 		printf("\r\n----total read/write: %d----\r\n", __count);
@@ -172,20 +168,20 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 
 	for (;;) {
 		int len = sizeof(sa);
-		SOCKET *fd;
+		SOCKET *pfd;
 		SOCKET cfd = ACCEPT(lfd, (struct sockaddr *)& sa, (socklen_t *) &len);
 		if (cfd == INVALID_SOCKET) {
 			printf("accept error %s\r\n", acl_last_serror());
 			break;
 		}
 
-		fd = malloc(sizeof(SOCKET));
-		assert(fd != NULL);
-		*fd = cfd;
+		pfd = malloc(sizeof(SOCKET));
+		assert(pfd != NULL);
+		*pfd = cfd;
 
 		__nconnect++;
-		printf("accept one, fd: %u, %p\r\n", cfd, fd);
-		acl_fiber_create(echo_client, fd, __stack_size);
+		printf("accept one, fd: %u, %p\r\n", cfd, pfd);
+		acl_fiber_create(echo_client, pfd, __stack_size);
 	}
 
 	CLOSE(lfd);

@@ -41,6 +41,7 @@ typedef struct EVENT_POLL {
 	int    size;
 	int    count;
 	struct pollfd *pfds;
+	ARRAY *ready;
 } EVENT_POLL;
 
 static void poll_free(EVENT *ev)
@@ -49,6 +50,7 @@ static void poll_free(EVENT *ev)
 
 	free(ep->files);
 	free(ep->pfds);
+	array_free(ep->ready, NULL);
 	free(ep);
 }
 
@@ -162,6 +164,7 @@ static int poll_del_write(EVENT_POLL *ep, FILE_EVENT *fe)
 static int poll_wait(EVENT *ev, int timeout)
 {
 	EVENT_POLL *ep = (EVENT_POLL *) ev;
+	ITER  iter;
 	int n, i;
 
 #ifdef SYS_WIN
@@ -186,6 +189,11 @@ static int poll_wait(EVENT *ev, int timeout)
 
 	for (i = 0; i < ep->count; i++) {
 		FILE_EVENT *fe     = ep->files[i];
+		array_append(ep->ready, fe);
+	}
+
+	foreach(iter, ep->ready) {
+		FILE_EVENT *fe = (FILE_EVENT *) iter.data;
 		struct pollfd *pfd = &ep->pfds[fe->id];
 
 #define EVENT_ERR	(POLLERR | POLLHUP | POLLNVAL)
@@ -199,6 +207,7 @@ static int poll_wait(EVENT *ev, int timeout)
 		}
 	}
 
+	array_clean(ep->ready, NULL);
 	return n;
 }
 
@@ -231,6 +240,7 @@ EVENT *event_poll_create(int size)
 	ep->size  = size;
 	ep->pfds  = (struct pollfd *) calloc(size, sizeof(struct pollfd));
 	ep->files = (FILE_EVENT**) calloc(size, sizeof(FILE_EVENT*));
+	ep->ready = array_create(100);
 	ep->count = 0;
 
 	ep->event.name   = poll_name;

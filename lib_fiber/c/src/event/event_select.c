@@ -46,12 +46,14 @@ typedef struct EVENT_SELECT {
 	int    count;
 	socket_t maxfd;
 	int    dirty;
+	ARRAY *ready;
 } EVENT_SELECT;
 
 static void select_free(EVENT *ev)
 {
 	EVENT_SELECT *es = (EVENT_SELECT *) ev;
 	free(es->files);
+	array_free(es->ready, NULL);
 	free(es);
 }
 
@@ -146,6 +148,7 @@ static int select_event_wait(EVENT *ev, int timeout)
 	EVENT_SELECT *es = (EVENT_SELECT *) ev;
 	fd_set rset = es->rset, wset = es->wset, xset = es->xset;
 	struct timeval tv, *tp;
+	ITER   iter;
 	int n, i;
 
 	if (timeout >= 0) {
@@ -185,6 +188,11 @@ static int select_event_wait(EVENT *ev, int timeout)
 
 	for (i = 0; i < es->count; i++) {
 		FILE_EVENT *fe = es->files[i];
+		array_append(es->ready, fe);
+	}
+
+	foreach(iter, es->ready) {
+		FILE_EVENT *fe = (FILE_EVENT *) iter.data;
 
 		if (FD_ISSET(fe->fd, &xset)) {
 			if (FD_ISSET(fe->fd, &es->rset) && fe->r_proc) {
@@ -202,6 +210,8 @@ static int select_event_wait(EVENT *ev, int timeout)
 			}
 		}
 	}
+
+	array_clean(es->ready, NULL);
 
 	return n;
 }
@@ -236,6 +246,7 @@ EVENT *event_select_create(int size)
 	es->dirty = 0;
 	es->files = (FILE_EVENT**) calloc(size, sizeof(FILE_EVENT*));
 	es->size  = size;
+	es->ready = array_create(100);
 	es->count = 0;
 	FD_ZERO(&es->rset);
 	FD_ZERO(&es->wset);

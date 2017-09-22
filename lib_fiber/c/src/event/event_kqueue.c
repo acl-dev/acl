@@ -43,7 +43,6 @@ typedef struct EVENT_KQUEUE {
 	int    nchanges;
 	struct kevent *events;
 	int    nevents;
-
 } EVENT_KQUEUE;
 
 static void kqueue_free(EVENT *ev)
@@ -184,11 +183,11 @@ static int kqueue_wait(EVENT *ev, int timeout)
 		kev = &ek->events[i];
 		fe  = (FILE_EVENT *) kev->udata;
 
-		if (kev->filter == EVFILT_READ && fe && fe->r_proc) {
+		if (kev && kev->filter == EVFILT_READ && fe && fe->r_proc) {
 			fe->r_proc(ev, fe);
 		}
 
-		if (kev->filter == EVFILT_WRITE && fe && fe->w_proc) {
+		if (kev && kev->filter == EVFILT_WRITE && fe && fe->w_proc) {
 			fe->w_proc(ev, fe);
 		}
 	}
@@ -228,7 +227,7 @@ EVENT *event_kqueue_create(int size)
 	ek->nchanges = 0;
 
 	ek->nevents  = 100;
-	ek->events   = (struct kevent *) malloc(sizeof(struct kevent) * size);
+	ek->events   = (struct kevent *) malloc(sizeof(struct kevent) * ek->nevents);
 
 	ek->kqfd     = __sys_kqueue();
 	assert(ek->kqfd >= 0);
