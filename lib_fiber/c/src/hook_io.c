@@ -23,6 +23,7 @@ typedef int     (*close_fn)(int);
 typedef int     (*stat_fn)(int, const char*, struct stat*);
 typedef int     (*lstat_fn)(int, const char*, struct stat*);
 typedef int     (*fstat_fn)(int, int, struct stat*);
+typedef int     (*mkdir_fn)(const char*, mode_t);
 typedef ssize_t (*read_fn)(int, void *, size_t);
 typedef ssize_t (*readv_fn)(int, const struct iovec *, int);
 typedef ssize_t (*recv_fn)(int, void *, size_t, int);
@@ -47,6 +48,7 @@ static close_fn    __sys_close    = NULL;
 static stat_fn     __sys_stat     = NULL;
 static lstat_fn    __sys_lstat    = NULL;
 static fstat_fn    __sys_fstat    = NULL;
+static mkdir_fn    __sys_mkdir    = NULL;
 static read_fn     __sys_read     = NULL;
 static readv_fn    __sys_readv    = NULL;
 static recv_fn     __sys_recv     = NULL;
@@ -92,6 +94,9 @@ void hook_io(void)
 
 	__sys_close    = (close_fn) dlsym(RTLD_NEXT, "close");
 	acl_assert(__sys_close);
+
+	__sys_mkdir     = (mkdir_fn) dlsym(RTLD_NEXT, "mkdir");
+	acl_assert(__sys_mkdir);
 
 	__sys_stat     = (stat_fn) dlsym(RTLD_NEXT, "__xstat");
 	acl_assert(__sys_stat);
@@ -195,6 +200,20 @@ FILE *popen(const char *command, const char *type)
 	if (fp == NULL)
 		fiber_save_errno();
 	return fp;
+}
+
+int mkdir(const char *pathname, mode_t mode)
+{
+	if (__sys_mkdir == NULL)
+		hook_io();
+
+	if (!acl_var_hook_sys_api)
+		return __sys_mkdir ? __sys_mkdir(pathname, mode) : -1;
+
+	if (__sys_mkdir(pathname, mode) == 0)
+		return 0;
+	fiber_save_errno();
+	return -1;
 }
 
 int __xstat(int ver, const char *path, struct stat *buf)
