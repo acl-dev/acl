@@ -58,6 +58,7 @@ static void kqueue_free(EVENT *ev)
 static int kqueue_fflush(EVENT_KQUEUE *ek)
 {
 	struct timespec ts;
+	int nchanges;
 
 	if (ek->changes == 0) {
 		return 0;
@@ -71,7 +72,9 @@ static int kqueue_fflush(EVENT_KQUEUE *ek)
 		return -1;
 	}
 
-	return ek->nchanges;
+	nchanges = ek->nchanges;
+	ek->nchanges = 0;
+	return nchanges;
 }
 
 static int kqueue_add_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
@@ -82,8 +85,6 @@ static int kqueue_add_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 		if (kqueue_fflush(ek) == -1) {
 			return -1;
 		}
-
-		ek->nchanges = 0;
 	}
 
 	kev = &ek->changes[ek->nchanges++];
@@ -103,8 +104,6 @@ static int kqueue_add_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 		if (kqueue_fflush(ek) == -1) {
 			return -1;
 		}
-
-		ek->nchanges = 0;
 	}
 
 	kev = &ek->changes[ek->nchanges++];
@@ -124,8 +123,6 @@ static int kqueue_del_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 		if (kqueue_fflush(ek) == -1) {
 			return -1;
 		}
-
-		ek->nchanges = 0;
 	}
 
 	kev = &ek->changes[ek->nchanges++];
@@ -145,8 +142,6 @@ static int kqueue_del_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 		if (kqueue_fflush(ek) == -1) {
 			return -1;
 		}
-
-		ek->nchanges = 0;
 	}
 
 	kev = &ek->changes[ek->nchanges++];
@@ -236,12 +231,13 @@ EVENT *event_kqueue_create(int size)
 	ek->event.handle = kqueue_handle;
 	ek->event.free   = kqueue_free;
 
-	ek->event.event_wait = kqueue_wait;
-	ek->event.checkfd    = (event_oper *) kqueue_checkfd;
-	ek->event.add_read   = (event_oper *) kqueue_add_read;
-	ek->event.add_write  = (event_oper *) kqueue_add_write;
-	ek->event.del_read   = (event_oper *) kqueue_del_read;
-	ek->event.del_write  = (event_oper *) kqueue_del_write;
+	ek->event.event_fflush = (int (*)(EVENT*)) kqueue_fflush;
+	ek->event.event_wait   = kqueue_wait;
+	ek->event.checkfd      = (event_oper *) kqueue_checkfd;
+	ek->event.add_read     = (event_oper *) kqueue_add_read;
+	ek->event.add_write    = (event_oper *) kqueue_add_write;
+	ek->event.del_read     = (event_oper *) kqueue_del_read;
+	ek->event.del_write    = (event_oper *) kqueue_del_write;
 
 	return (EVENT *) ek;
 }

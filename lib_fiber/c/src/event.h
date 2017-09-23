@@ -168,6 +168,7 @@ struct EVENT {
 	long (*handle)(EVENT *);
 	void (*free)(EVENT *);
 
+	int  (*event_fflush)(EVENT *);
 	int  (*event_wait)(EVENT *, int);
 
 	event_oper *checkfd;

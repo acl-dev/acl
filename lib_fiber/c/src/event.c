@@ -303,6 +303,10 @@ void event_close(EVENT *ev, FILE_EVENT *fe)
 	if (fe->me.parent != &fe->me) {
 		ring_detach(&fe->me);
 	}
+
+	if (ev->event_fflush) {
+		ev->event_fflush(ev);
+	}
 }
 
 static void event_prepare(EVENT *ev)
