@@ -14,10 +14,10 @@
 #include "manager.h"
 
 manager::manager(void)
-	: event_(NULL)
-	, aio_(NULL)
-	, handle_(NULL)
-	, server_(NULL)
+: event_(NULL)
+, aio_(NULL)
+, handle_(NULL)
+, server_(NULL)
 {
 }
 

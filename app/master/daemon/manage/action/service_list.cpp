@@ -39,15 +39,13 @@ void service_list::add_one(list_res_t& res, const ACL_MASTER_SERV* serv)
 		info.notify_recipients = serv->notify_recipients;
 
 	ACL_ITER iter;
-	acl_foreach(iter, serv->children_env)
-	{
+	acl_foreach(iter, serv->children_env) {
 		ACL_MASTER_NV* v = (ACL_MASTER_NV *) iter.data;
 		info.env[v->name] = v->value;
 	}
 
 	ACL_RING_ITER iter2;
-	acl_ring_foreach(iter2, &serv->children)
-	{
+	acl_ring_foreach(iter2, &serv->children) {
 		ACL_MASTER_PROC* proc = (ACL_MASTER_PROC *)
 			acl_ring_to_appl(iter2.ptr, ACL_MASTER_PROC, me);
 		proc_info_t pi;
@@ -64,8 +62,7 @@ bool service_list::run(acl::json& json)
 	list_req_t req;
 	list_res_t res;
 
-	if (deserialize<list_req_t>(json, req) == false)
-	{
+	if (deserialize<list_req_t>(json, req) == false) {
 		res.status = 400;
 		res.msg    = "invalid json";
 		client_.reply<list_res_t>(res.status, res);

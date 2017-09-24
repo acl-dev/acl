@@ -15,9 +15,9 @@
 #include "http_server.h"
 
 http_server::http_server(acl::aio_handle& aio, int rw_timeout)
-	: aio_(aio)
-	, listener_(NULL)
-	, rw_timeout_(rw_timeout)
+: aio_(aio)
+, listener_(NULL)
+, rw_timeout_(rw_timeout)
 {
 }
 
@@ -30,8 +30,7 @@ http_server::~http_server(void)
 bool http_server::open(const char* addr)
 {
 	listener_ = new acl::aio_listen_stream(&aio_);
-	if (listener_->open(addr) == false)
-	{
+	if (listener_->open(addr) == false) {
 		logger_error("open %s error %s", addr, acl::last_serror());
 		listener_->destroy();
 		listener_ = NULL;

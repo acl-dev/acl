@@ -20,8 +20,7 @@ bool service_start::run(acl::json& json)
 	start_req_t req;
 	start_res_t res;
 
-	if (deserialize<start_req_t>(json, req) == false)
-	{
+	if (deserialize<start_req_t>(json, req) == false) {
 		res.status = 400;
 		res.msg    = "invalid json";
 		client_.reply<start_res_t>(res.status, res);
@@ -38,16 +37,13 @@ bool service_start::handle(const start_req_t& req, start_res_t& res)
 	size_t  n = 0;
 
 	for (std::vector<start_req_data_t>::const_iterator
-		cit = req.data.begin(); cit != req.data.end(); ++cit)
-	{
+		cit = req.data.begin(); cit != req.data.end(); ++cit) {
+
 		const char* path = (*cit).path.c_str();
-		if ((serv = acl_master_start(path)) == NULL)
-		{
+		if ((serv = acl_master_start(path)) == NULL) {
 			data.status = 500;
 			data.path   = path;
-		}
-		else
-		{
+		} else {
 			data.status = 200;
 			data.name   = serv->name;
 			data.path   = serv->path;
@@ -57,13 +53,10 @@ bool service_start::handle(const start_req_t& req, start_res_t& res)
 		res.data.push_back(data);
 	}
 
-	if (n == req.data.size())
-	{
+	if (n == req.data.size()) {
 		res.status = 200;
 		res.msg    = "ok";
-	}
-	else
-	{
+	} else {
 		res.status = 500;
 		res.msg    = "error";
 		logger_error("not all service have been started!, n=%d, %d",

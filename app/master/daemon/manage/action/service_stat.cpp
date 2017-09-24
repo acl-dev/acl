@@ -19,8 +19,7 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 {
 	ACL_MASTER_SERV *serv = acl_master_lookup(path);
 
-	if (serv == NULL)
-	{
+	if (serv == NULL) {
 		info.status = 404;
 		info.conf   = path;
 		return false;
@@ -46,16 +45,14 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 		info.notify_recipients = serv->notify_recipients;
 
 	ACL_ITER iter;
-	acl_foreach(iter, serv->children_env)
-	{
+	acl_foreach(iter, serv->children_env) {
 		ACL_MASTER_NV* v = (ACL_MASTER_NV *) iter.data;
 		info.env[v->name] = v->value;
 	}
 
 
 	ACL_RING_ITER iter2;
-	acl_ring_foreach(iter2, &serv->children)
-	{
+	acl_ring_foreach(iter2, &serv->children) {
 		ACL_MASTER_PROC* proc = (ACL_MASTER_PROC *)
 			acl_ring_to_appl(iter2.ptr, ACL_MASTER_PROC, me);
 		proc_info_t pi;
@@ -73,8 +70,7 @@ bool service_stat::run(acl::json& json)
 	stat_req_t req;
 	stat_res_t res;
 
-	if (deserialize<stat_req_t>(json, req) == false)
-	{
+	if (deserialize<stat_req_t>(json, req) == false) {
 		res.status = 400;
 		res.msg    = "invalid json";
 		client_.reply<stat_res_t>(res.status, res);
@@ -89,21 +85,18 @@ bool service_stat::handle(const stat_req_t& req, stat_res_t& res)
 	size_t n = 0;
 
 	for (std::vector<stat_req_data_t>::const_iterator
-		cit = req.data.begin(); cit != req.data.end(); ++cit)
-	{
+		cit = req.data.begin(); cit != req.data.end(); ++cit) {
+
 		serv_info_t info;
 		if (stat_one((*cit).path.c_str(), info))
 			n++;
 		res.data.push_back(info);
 	}
 
-	if (n == req.data.size())
-	{
+	if (n == req.data.size()) {
 		res.status = 200;
 		res.msg    = "ok";
-	}
-	else
-	{
+	} else {
 		res.status = 500;
 		res.msg    = "error";
 		logger_error("not all service have been started!, n=%d, %d",

@@ -21,9 +21,9 @@
 #include "http_client.h"
 
 http_client::http_client(acl::aio_socket_stream *client, int rw_timeout)
-	: conn_(client->get_astream())
-	, rw_timeout_(rw_timeout)
-	, content_length_(0)
+: conn_(client->get_astream())
+, rw_timeout_(rw_timeout)
+, content_length_(0)
 {
 	hdr_req_ = NULL;
 	req_     = NULL;
@@ -41,12 +41,10 @@ http_client::~http_client(void)
 
 void http_client::reset(void)
 {
-	if (req_)
-	{
+	if (req_) {
 		http_req_free(req_);
 		req_ = NULL;
-	}
-	else if (hdr_req_)
+	} else if (hdr_req_)
 		http_hdr_req_free(hdr_req_);
 
 	hdr_req_ = http_hdr_req_new();
@@ -79,15 +77,13 @@ int http_client::on_head(int status, void* ctx)
 
 	acl_aio_disable_readwrite(hc->conn_);
 
-	if (status != HTTP_CHAT_OK)
-	{
+	if (status != HTTP_CHAT_OK) {
 		logger_error("invalid status=%d", status);
 		acl_aio_iocp_close(hc->conn_);
 		return -1;
 	}
 
-	if (http_hdr_req_parse(hc->hdr_req_) < 0)
-	{
+	if (http_hdr_req_parse(hc->hdr_req_) < 0) {
 		logger_error("parse http header error");
 		acl_aio_iocp_close(hc->conn_);
 		return -1;
@@ -108,15 +104,13 @@ int http_client::on_body(int status, char *data, int dlen, void *ctx)
 {
 	http_client* hc = (http_client*) ctx;
 
-	if (status >= HTTP_CHAT_ERR_MIN)
-	{
+	if (status >= HTTP_CHAT_ERR_MIN) {
 		logger_error("status=%d", status);
 		acl_aio_iocp_close(hc->conn_);
 		return -1;
 	}
 
-	if (dlen <= 0)
-	{
+	if (dlen <= 0) {
 		logger_error("invalid dlen=%d", dlen);
 		acl_aio_iocp_close(hc->conn_);
 		return -1;
@@ -124,8 +118,7 @@ int http_client::on_body(int status, char *data, int dlen, void *ctx)
 
 	hc->json_.update(data);
 
-	if (status == HTTP_CHAT_OK)
-	{
+	if (status == HTTP_CHAT_OK) {
 		acl_aio_disable_readwrite(hc->conn_);
 		return hc->handle() ? 0 : -1;
 	}
@@ -153,22 +146,21 @@ static struct {
 	const char* cmd;
 	bool (http_client::*handler)(void);
 } handlers[] = {
-	{ "list", &http_client::handle_list },
-	{ "stat", &http_client::handle_stat },
-	{ "start", &http_client::handle_start },
-	{ "kill", &http_client::handle_kill },
-	{ "stop", &http_client::handle_stop },
-	{ "restart", &http_client::handle_restart },
-	{ "reload", &http_client::handle_reload },
+	{ "list",	&http_client::handle_list	},
+	{ "stat",	&http_client::handle_stat	},
+	{ "start",	&http_client::handle_start	},
+	{ "kill",	&http_client::handle_kill	},
+	{ "stop",	&http_client::handle_stop	},
+	{ "restart",	&http_client::handle_restart	},
+	{ "reload",	&http_client::handle_reload	},
 
-	{ 0, 0 }
+	{ 0,		0				}
 };
 
 bool http_client::handle(void)
 {
 	const char* cmd = http_hdr_req_param(hdr_req_, "cmd");
-	if (cmd == NULL || *cmd == 0)
-	{
+	if (cmd == NULL || *cmd == 0) {
 		//logger_error("cmd null");
 		acl::string dummy;
 		do_reply(400, dummy);
@@ -183,14 +175,12 @@ bool http_client::handle(void)
 
 	int i;
 
-	for (i = 0; handlers[i].cmd != NULL; i++)
-	{
+	for (i = 0; handlers[i].cmd != NULL; i++) {
 		if (EQ(cmd, handlers[i].cmd))
 			break;
 	}
 
-	if (handlers[i].handler == NULL)
-	{
+	if (handlers[i].handler == NULL) {
 		logger_warn("invalid cmd=%s", cmd);
 		acl::string dummy;
 		do_reply(400, dummy);
