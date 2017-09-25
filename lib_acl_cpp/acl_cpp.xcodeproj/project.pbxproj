@@ -21,6 +21,7 @@
 		0778DAE61F1CB7150011B753 /* thread_cond.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAE41F1CB7150011B753 /* thread_cond.cpp */; };
 		0778DAE71F1CB7150011B753 /* thread_mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAE51F1CB7150011B753 /* thread_mutex.cpp */; };
 		0778DAEA1F1CB8EB0011B753 /* bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAE91F1CB8EB0011B753 /* bitmap.cpp */; };
+		0778DAEE1F78D3FC0011B753 /* event_mutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0778DAED1F78D3FC0011B753 /* event_mutex.cpp */; };
 		07A458351E6FCCB4002C9B3C /* acl_cpp.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 07A458341E6FCCB4002C9B3C /* acl_cpp.h */; };
 		07A458371E6FCCB4002C9B3C /* acl_cpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07A458361E6FCCB4002C9B3C /* acl_cpp.mm */; };
 		07A467C01E6FCCF1002C9B3C /* acl_cpp_init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A466DA1E6FCCF1002C9B3C /* acl_cpp_init.cpp */; };
@@ -251,6 +252,8 @@
 		0778DAE81F1CB8C90011B753 /* bitmap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = bitmap.hpp; sourceTree = "<group>"; };
 		0778DAE91F1CB8EB0011B753 /* bitmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap.cpp; sourceTree = "<group>"; };
 		0778DAEB1F1CC19B0011B753 /* trigger.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = trigger.hpp; sourceTree = "<group>"; };
+		0778DAEC1F78D3EC0011B753 /* event_mutex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = event_mutex.hpp; sourceTree = "<group>"; };
+		0778DAED1F78D3FC0011B753 /* event_mutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_mutex.cpp; sourceTree = "<group>"; };
 		07A458311E6FCCB4002C9B3C /* libacl_cpp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libacl_cpp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07A458341E6FCCB4002C9B3C /* acl_cpp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = acl_cpp.h; sourceTree = "<group>"; };
 		07A458361E6FCCB4002C9B3C /* acl_cpp.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = acl_cpp.mm; sourceTree = "<group>"; };
@@ -824,6 +827,7 @@
 		07A467111E6FCCF1002C9B3C /* event */ = {
 			isa = PBXGroup;
 			children = (
+				0778DAED1F78D3FC0011B753 /* event_mutex.cpp */,
 				07A467121E6FCCF1002C9B3C /* event_timer.cpp */,
 			);
 			path = event;
@@ -1239,6 +1243,7 @@
 		07A468B51E6FD404002C9B3C /* event */ = {
 			isa = PBXGroup;
 			children = (
+				0778DAEC1F78D3EC0011B753 /* event_mutex.hpp */,
 				07A468B61E6FD404002C9B3C /* event_timer.hpp */,
 			);
 			path = event;
@@ -1579,6 +1584,7 @@
 				07A467DA1E6FCCF1002C9B3C /* db_service_mysql.cpp in Sources */,
 				07A4683D1E6FCCF1002C9B3C /* redis_string.cpp in Sources */,
 				07A468051E6FCCF1002C9B3C /* master_conf.cpp in Sources */,
+				0778DAEE1F78D3FC0011B753 /* event_mutex.cpp in Sources */,
 				07A4683E1E6FCCF1002C9B3C /* redis_transaction.cpp in Sources */,
 				07A467DD1E6FCCF1002C9B3C /* mysql_conf.cpp in Sources */,
 				07A4683A1E6FCCF1002C9B3C /* redis_server.cpp in Sources */,
