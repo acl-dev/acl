@@ -28,51 +28,51 @@ template <typename T>
 class trigger_item
 {
 public:
-    typedef std::map<long long, trigger_item<T>*> trigger_items_t;
+	typedef std::map<long long, trigger_item<T>*> trigger_items_t;
 
-    trigger_item(trigger_items_t& items) : items_(items) {}
-    ~trigger_item(void) {}
+	trigger_item(trigger_items_t& items) : items_(items) {}
+	~trigger_item(void) {}
 
-    /**
-     * 添加一个定时任务
-     * @pararm o {T*}
-     */
-    void add(T* o)
-    {
-        objs_.push_back(o);
-    }
+	/**
+	 * 添加一个定时任务
+	 * @pararm o {T*}
+	 */
+	void add(T* o)
+	{
+		objs_.push_back(o);
+	}
 
-    /**
-     * 删除一个具有相同时间截的定时任务
-     * @pararm o {T*}
-     * @return {int} 返回值 >= 0 表示剩余的具有相同时间截的定时任务数，
-     *  返回 -1 表示该定时任务不存在
-     */
-    int del(T* o)
-    {
-        for (typename std::vector<T*>::iterator it = objs_.begin();
-             it != objs_.end(); ++it) {
+	/**
+	 * 删除一个具有相同时间截的定时任务
+	 * @pararm o {T*}
+	 * @return {int} 返回值 >= 0 表示剩余的具有相同时间截的定时任务数，
+	 *  返回 -1 表示该定时任务不存在
+	 */
+	int del(T* o)
+	{
+		for (typename std::vector<T*>::iterator it = objs_.begin();
+			it != objs_.end(); ++it) {
 
-            if (*it == o) {
-                objs_.erase(it);
-                return (int) objs_.size();
-            }
-        }
-        return -1;
-    }
+			if (*it == o) {
+				objs_.erase(it);
+				return (int) objs_.size();
+			}
+		}
+		return -1;
+	}
 
-    /**
-     * 获取具有相同时间截的所有定时任务集合
-     * @return {std::vector<T*>&}
-     */
-    std::vector<T*>& get_objs(void)
-    {
-        return objs_;
-    }
+	/**
+	 * 获取具有相同时间截的所有定时任务集合
+	 * @return {std::vector<T*>&}
+	 */
+	std::vector<T*>& get_objs(void)
+	{
+		return objs_;
+	}
 
 private:
-    std::vector<T*> objs_;
-    trigger_items_t& items_;
+	std::vector<T*> objs_;
+	trigger_items_t& items_;
 };
 
 /**
@@ -124,105 +124,112 @@ template <typename T>
 class timer_trigger
 {
 public:
-    typedef std::map<long long, trigger_item<T>*> trigger_items_t;
+	typedef std::map<long long, trigger_item<T>*> trigger_items_t;
+	typedef typename trigger_items_t::iterator trigger_iter_t;
 
-    timer_trigger(void) {}
-    ~timer_trigger(void) {}
+	timer_trigger(void) {}
+	~timer_trigger(void) {}
 
-    /**
-     * 添加一个任务对象
-     * @pararm o {T*}
-     */
-    void add(T* o)
-    {
-        int ttl             = o->get_ttl();
-        long long key       = get_curr_stamp() + ttl;
-        trigger_item<T>* item = items_[key];
-        if (item == NULL) {
-            item        = new trigger_item<T>(items_);
-            items_[key] = item;
-        }
-        item->add(o);
-        o->set_key(key);
-    }
+	/**
+	 * 添加一个任务对象
+	 * @pararm o {T*}
+	 */
+	void add(T* o)
+	{
+		int ttl       = o->get_ttl();
+		long long key = get_curr_stamp() + ttl;
 
-    /**
-     * 删除一个任务对象，内部调用 o->get_key() 方法获得该任务对象的键
-     * @pararm o {T*} 指定将被删除的任务对象
-     * @return {int} >= 0 时表示剩余的任务对象，-1 表示该任务对象不存在
-     */
-    int del(T* o)
-    {
-        long long key                       = o->get_key();
-        typename trigger_items_t::iterator it = items_.find(key);
+		trigger_item<T>* item;
+		trigger_iter_t it = items_.find(key);
+		if (it == items_.end()) {
+			item        = new trigger_item<T>(items_);
+			items_[key] = item;
+		} else
+			item = it->second;
+		item->add(o);
+		o->set_key(key);
+	}
 
-        if (it == items_.end())
-            return -1;
-        if (it->second->del(o) == 0) {
-            delete it->second;
-            items_.erase(it);
-        }
-        return (int) items_.size();
-    }
+	/**
+	 * 删除一个任务对象，内部调用 o->get_key() 方法获得该任务对象的键
+	 * @pararm o {T*} 指定将被删除的任务对象
+	 * @return {int} >= 0 时表示剩余的任务对象，-1 表示该任务对象不存在
+	 */
+	int del(T* o)
+	{
+		long long key     = o->get_key();
+		trigger_iter_t it = items_.find(key);
 
-    /**
-     * 触发所有到期的定时任务
-     * @return {long long} 返回下一个将被触发的定时任务的时间截，返回 -1
-     *  表示没有定时任务
-     */
-    long long trigger(void)
-    {
-        long long key = get_curr_stamp();
-        std::vector<trigger_item<T>*> items;
-        typename trigger_items_t::iterator iter;
-        for (iter = items_.begin(); iter != items_.end();) {
-            if (iter->first > key)
-                break;
+		if (it == items_.end())
+			return -1;
+		if (it->second->del(o) == 0) {
+			delete it->second;
+			items_.erase(it);
+		}
+		return (int) items_.size();
+	}
 
-            items.push_back(iter->second);
-            items_.erase(iter++);
-        }
+	/**
+	 * 触发所有到期的定时任务
+	 * @return {long long} 返回下一个将被触发的定时任务的时间截，返回 -1
+	 *  表示没有定时任务
+	 */
+	long long trigger(void)
+	{
+		long long key = get_curr_stamp();
+		std::vector<trigger_item<T>*> items;
+		trigger_iter_t iter;
+		for (iter = items_.begin(); iter != items_.end();) {
+			if (iter->first > key)
+				break;
 
-        for (typename std::vector<trigger_item<T>*>::iterator it = items.begin();
-             it != items.end(); ++it) {
+			items.push_back(iter->second);
+			items_.erase(iter++);
+		}
 
-            trigger(*it);
-            delete *it;
-        }
+		for (typename std::vector<trigger_item<T>*>::iterator
+			it = items.begin(); it != items.end(); ++it) {
 
-        iter = items_.begin();
-        if (iter == items_.end())
-            return -1;
-        return iter->first;
-    }
+			trigger(*it);
+			delete *it;
+		}
+
+		iter = items_.begin();
+		if (iter == items_.end())
+			return -1;
+		return iter->first;
+	}
 
 private:
-    trigger_items_t items_;
+	trigger_items_t items_;
 
-    /**
-     * 触发具有相同定时时间截的所有任务
-     * @pararm item {trigger_item<T>*}
-     */
-    void trigger(trigger_item<T>* item)
-    {
-        std::vector<T*>& objs = item->get_objs();
-        for (typename std::vector<T*>::iterator it = objs.begin();
-             it != objs.end(); ++it) {
+	/**
+	 * 触发具有相同定时时间截的所有任务
+	 * @pararm item {trigger_item<T>*}
+	 */
+	void trigger(trigger_item<T>* item)
+	{
+		std::vector<T*>& objs = item->get_objs();
+		for (typename std::vector<T*>::iterator it = objs.begin();
+			it != objs.end(); ++it) {
 
-            if ((*it)->on_trigger()) {
-                int ttl       = (*it)->get_ttl();
-                long long key = get_curr_stamp() + ttl;
+			if (!(*it)->on_trigger())
+				continue;
 
-                item = items_[key];
-                if (item == NULL) {
-                    item        = new trigger_item<T>(items_);
-                    items_[key] = item;
-                }
-                item->add(*it);
-                (*it)->set_key(key);
-            }
-        }
-    }
+			int ttl       = (*it)->get_ttl();
+			long long key = get_curr_stamp() + ttl;
+
+			trigger_iter_t iter = items_.find(key);
+			if (iter == items_.end()) {
+				item        = new trigger_item<T>(items_);
+				items_[key] = item;
+			} else
+				item = iter->second;
+
+			item->add(*it);
+			(*it)->set_key(key);
+		}
+	}
 };
 
 /**
@@ -233,79 +240,80 @@ template <typename T>
 class thread_trigger : public thread
 {
 public:
-    thread_trigger(void)
-    : delay_(100)  // 初始化时的超时等待时间（毫秒）
-    , stop_(false) // 是否停止线程
-    {
-    }
+	thread_trigger(void)
+	: delay_(100)  // 初始化时的超时等待时间（毫秒）
+	, stop_(false) // 是否停止线程
+	{
+	}
 
-    virtual ~thread_trigger(void) {}
+	virtual ~thread_trigger(void) {}
 
-    /**
-     * 添加一个定时任务对象
-     * @pararm o {T*}
-     */
-    void add(T* o)
-    {
-        mbox_.push(o);
-    }
+	/**
+	 * 添加一个定时任务对象
+	 * @pararm o {T*}
+	 */
+	void add(T* o)
+	{
+		mbox_.push(o);
+	}
 
-    /**
-     * 添加要删除的定时任务对象到临时队列中，然后从定时器中删除之
-     * @pararm o {T*}
-     */
-    void del(T* o)
-    {
-        lock_.lock();
-        timer_del_.push_back(o);
-        lock_.unlock();
-    }
+	/**
+	 * 添加要删除的定时任务对象到临时队列中，然后从定时器中删除之
+	 * @pararm o {T*}
+	 */
+	void del(T* o)
+	{
+		lock_.lock();
+		timer_del_.push_back(o);
+		lock_.unlock();
+	}
 
-    timer_trigger<T>& get_trigger(void)
-    {
-        return timer_;
-    }
-
-private:
-    // @override
-    void* run(void)
-    {
-        while (!stop_) {
-            T* o = mbox_.pop(delay_);
-            if (o)
-                timer_.add(o);
-
-            long long next = timer_.trigger();
-            long long curr = get_curr_stamp();
-            if (next == -1)
-                delay_ = 100;
-            else {
-                delay_ = next - curr;
-                if (delay_ < 0)
-                    delay_ = 1;
-            }
-
-            lock_.lock();
-            for (typename std::vector<T*>::iterator it = timer_del_.begin();
-                 it != timer_del_.end(); ++it) {
-
-                timer_.del(*it);
-            }
-            timer_del_.clear();
-            lock_.unlock();
-        }
-        return NULL;
-    }
+	timer_trigger<T>& get_trigger(void)
+	{
+		return timer_;
+	}
 
 private:
-    long long delay_;
-    bool stop_;
+	// @override
+	void* run(void)
+	{
+		while (!stop_) {
+			T* o = mbox_.pop(delay_);
+			if (o)
+				timer_.add(o);
 
-    timer_trigger<T> timer_;
-    mbox<T> mbox_;
+			long long next = timer_.trigger();
+			long long curr = get_curr_stamp();
+			if (next == -1)
+				delay_ = 100;
+			else {
+				delay_ = next - curr;
+				if (delay_ < 0)
+					delay_ = 1;
+			}
 
-    std::vector<T*> timer_del_;
-    thread_mutex lock_;
+			lock_.lock();
+			typename std::vector<T*>::iterator it;
+			for (it = timer_del_.begin();
+				it != timer_del_.end(); ++it) {
+
+				timer_.del(*it);
+			}
+			timer_del_.clear();
+			lock_.unlock();
+		}
+		return NULL;
+	}
+
+private:
+	long long delay_;
+	bool stop_;
+
+	timer_trigger<T> timer_;
+	mbox<T> mbox_;
+
+	std::vector<T*> timer_del_;
+	thread_mutex lock_;
 };
 
 } // namespace acl
