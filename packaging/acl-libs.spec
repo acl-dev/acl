@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        22
+Release:        23
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,9 @@ fi
 /etc/init.d/master
 
 %changelog
+* Sat Sep 28 2018 zhengshuxin@qiyi.com 3.3.0-23-20170928.12
+- valgrind: free global objects so valgrind no reporting error when process exiting
+
 * Sat Sep 23 2018 zhengshuxin@qiyi.com 3.3.0-22-20170923.19
 - fiber: hook mkdir/stat/lstat/fstat 
 
