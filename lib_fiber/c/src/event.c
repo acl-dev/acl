@@ -145,8 +145,8 @@ static int event_defer_r_merge(EVENT *ev, int fd, int mask)
 	}
 
 	if (ev->add(ev, fd, to_mask) == -1) {
-		acl_msg_error("%s, %s(%d): mod fd(%d) error=%s",
-			__FILE__, __FUNCTION__, __LINE__, fd, acl_last_serror());
+		acl_msg_error("%s, %s(%d): mod fd(%d) error=%s", __FILE__,
+			__FUNCTION__, __LINE__, fd, acl_last_serror());
 		return -1;
 	}
 
@@ -410,13 +410,18 @@ void event_del(EVENT *ev, int fd, int mask)
 
 void event_del(EVENT *ev, int fd, int mask)
 {
+	event_del_nodelay(ev, fd, mask);
+}
+
+#endif /* !DEL_DELAY */
+
+void event_del_nodelay(EVENT *ev, int fd, int mask)
+{
 	if (ev->events[fd].type == TYPE_NOSOCK)
 		ev->events[fd].type = TYPE_NONE;
 	else
 		__event_del(ev, fd, mask);
 }
-
-#endif /* !DEL_DELAY */
 
 int event_process(EVENT *ev, int timeout)
 {

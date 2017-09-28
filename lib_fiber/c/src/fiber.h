@@ -134,6 +134,7 @@ void fiber_wait_write(int fd);
 void fiber_io_dec(void);
 void fiber_io_inc(void);
 EVENT *fiber_io_event(void);
+void fiber_io_fibers_free(void);
 
 /* in hook_io.c */
 void hook_io(void);
@@ -141,5 +142,7 @@ void hook_io(void);
 /* in fiber_net.c */
 void hook_net(void);
 int  epoll_event_close(int epfd);
+void poll_fibers_free(void);
+void epoll_fibers_free(void);
 
 #endif

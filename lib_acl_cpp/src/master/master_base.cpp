@@ -23,6 +23,12 @@ master_base::~master_base()
 	{
 		delete *it;
 	}
+
+	// free the global resource for avoiding valgrind to report warning
+	conf_.reset();
+	acl_app_conf_unload();
+	acl_debug_end();
+	acl_msg_close();
 }
 
 void master_base::set_cfg_bool(master_bool_tbl* table)

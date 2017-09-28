@@ -93,7 +93,7 @@ struct EVENT {
 	DEFER_DELETE *w_defers;
 	ACL_RING poll_list;
 	ACL_RING epoll_list;
-	ACL_RING_ITER iter;
+//	ACL_RING_ITER iter;
 
 	const char *(*name)(void);
 	int  (*handle)(EVENT *);
@@ -110,6 +110,7 @@ int  event_size(EVENT *ev);
 void event_free(EVENT *ev);
 int  event_add(EVENT *ev, int fd, int mask, event_proc *proc, void *ctx);
 void event_del(EVENT *ev, int fd, int mask);
+void event_del_nodelay(EVENT *ev, int fd, int mask);
 int  event_process(EVENT *ev, int left);
 int  event_readable(EVENT *ev, int fd);
 int  event_writeable(EVENT *ev, int fd);

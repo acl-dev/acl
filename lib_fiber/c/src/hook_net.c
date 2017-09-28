@@ -396,7 +396,38 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     (x) = ((acl_int64) tv.tv_sec) * 1000 + ((acl_int64) tv.tv_usec)/ 1000; \
 } while (0)
 
+#define TO_APPL acl_ring_to_appl
+
 /****************************************************************************/
+
+static void poll_events_del(EVENT *ev, POLL_EVENT *pe)
+{
+	int i;
+
+	for (i = 0; i < pe->nfds; i++) {
+		if (pe->fds[i].events & POLLIN) {
+			event_del_nodelay(ev, pe->fds[i].fd, EVENT_READABLE);
+			ev->events[pe->fds[i].fd].pe = NULL;
+		}
+
+		if (pe->fds[i].events & POLLOUT) {
+			event_del_nodelay(ev, pe->fds[i].fd, EVENT_WRITABLE);
+			ev->events[pe->fds[i].fd].pe = NULL;
+		}
+	}
+}
+
+void poll_fibers_free(void)
+{
+	ACL_RING *head;
+	EVENT *ev = fiber_io_event();
+
+	while ((head = acl_ring_pop_head(&ev->poll_list))) {
+		POLL_EVENT *pe = TO_APPL(head, POLL_EVENT, me);
+		poll_events_del(ev, pe);
+		fiber_free(pe->fiber);
+	}
+}
 
 static void pollfd_callback(EVENT *ev, int fd, void *ctx, int mask)
 {
@@ -495,8 +526,6 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 
 	if (!acl_var_hook_sys_api)
 		return __sys_poll ? __sys_poll(fds, nfds, timeout) : -1;
-
-	fiber_io_check();
 
 	ev        = fiber_io_event();
 	pe.fds    = fds;
@@ -608,6 +637,37 @@ int select(int nfds, fd_set *readfds, fd_set *writefds,
 }
 
 /****************************************************************************/
+
+static void epoll_events_del(EVENT *ev, EPOLL_EVENT *ee)
+{
+	size_t i;
+	int mask;
+
+	for (i = 0; i < ee->nfds; i++) {
+		if (ee->fds[i] == NULL)
+			continue;
+
+		mask = ee->fds[i]->mask;
+		if (mask & EVENT_READABLE)
+			event_del_nodelay(ev, ee->fds[i]->fd, EVENT_READABLE);
+		if (mask & EVENT_WRITABLE)
+			event_del_nodelay(ev, ee->fds[i]->fd, EVENT_WRITABLE);
+		acl_myfree(ee->fds[i]);
+		ee->fds[i] = NULL;
+	}
+}
+
+void epoll_fibers_free(void)
+{
+	ACL_RING *head;
+	EVENT *ev = fiber_io_event();
+
+	while ((head = acl_ring_pop_head(&ev->epoll_list))) {
+		EPOLL_EVENT *ee = TO_APPL(head, EPOLL_EVENT, me);
+		epoll_events_del(ev, ee);
+		fiber_free(ee->fiber);
+	}
+}
 
 static EPOLL_EVENT *epfd_alloc(void)
 {
@@ -776,7 +836,6 @@ int epoll_create(int size acl_unused)
 	if (!acl_var_hook_sys_api)
 		return __sys_epoll_create ? __sys_epoll_create(size) : -1;
 
-	fiber_io_check();
 	ev = fiber_io_event();
 	if (ev == NULL) {
 		acl_msg_error("%s(%d), %s: create_event failed %s",
