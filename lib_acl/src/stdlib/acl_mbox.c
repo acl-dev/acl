@@ -111,7 +111,7 @@ void *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success)
 		return NULL;
 	}
 
-	ret = acl_socket_read(mbox->in, kbuf, sizeof(kbuf) - 1, 0, NULL, NULL);
+	ret = acl_socket_read(mbox->in, kbuf, sizeof(kbuf), 0, NULL, NULL);
 	if (ret == -1) {
 		if (success)
 			*success = 0;
@@ -119,8 +119,9 @@ void *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success)
 	}
 
 	if (kbuf[0] != __key[0]) {
-		acl_msg_error("%s(%d), %s: read invalid: %c",
-			__FILE__, __LINE__, __FUNCTION__, kbuf[0]);
+		acl_msg_error("%s(%d), %s: read invalid, ch=%c, ascii=%d, "
+			"key=%c, ret=%d", __FILE__, __LINE__, __FUNCTION__,
+			kbuf[0], kbuf[0], __key[0], ret);
 		if (success)
 			*success = 0;
 		return NULL;
