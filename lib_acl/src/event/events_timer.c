@@ -160,11 +160,11 @@ void event_timer_trigger(ACL_EVENT *eventp)
 	ACL_EVENT_NOTIFY_TIME timer_fn;
 	void *timer_arg;
 
-	/* è°ƒæ•´äº‹ä»¶å¼•æ“Žçš„æ—¶é—´æˆª */
+	/* µ÷ÕûÊÂ¼þÒýÇæµÄÊ±¼ä½Ø */
 
 	SET_TIME(eventp->present);
 
-	/* ä¼˜å…ˆå¤„ç†å®šæ—¶å™¨ä¸­çš„ä»»åŠ¡ */
+	/* ÓÅÏÈ´¦Àí¶¨Ê±Æ÷ÖÐµÄÈÎÎñ */
 
 	acl_ring_foreach(iter, &eventp->timer_head) {
 		timer = ACL_RING_TO_TIMER(iter.ptr);
