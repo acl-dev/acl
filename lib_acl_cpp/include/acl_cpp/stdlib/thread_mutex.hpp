@@ -30,7 +30,11 @@ namespace acl {
 class ACL_CPP_API thread_mutex
 {
 public:
-	thread_mutex(void);
+	/**
+	 * 构造方法
+	 * @param recursive {bool} 是否启用递归锁方式
+	 */
+	thread_mutex(bool recursive = true);
 	~thread_mutex(void);
 
 	/**

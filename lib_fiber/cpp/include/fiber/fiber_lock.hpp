@@ -5,17 +5,20 @@ struct ACL_FIBER_RWLOCK;
 
 namespace acl {
 
+class thread_mutex;
+
 class fiber_mutex
 {
 public:
-	fiber_mutex(void);
+	fiber_mutex(bool thread_safe = false);
 	~fiber_mutex(void);
 
-	void lock(void);
+	bool lock(void);
 	bool trylock(void);
-	void unlock(void);
+	bool unlock(void);
 
 private:
+	thread_mutex* thread_lock_;
 	ACL_FIBER_MUTEX* lock_;
 };
 

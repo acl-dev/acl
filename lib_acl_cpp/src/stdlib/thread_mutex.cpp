@@ -17,20 +17,49 @@
 #include "acl_cpp/stdlib/thread_mutex.hpp"
 #endif
 
+#undef	SET_ERRNO
+#ifdef	ACL_WINDOWS
+# define	SET_ERRNO(_x_) (void) 0
+#elif	defined(ACL_UNIX)
+# define	SET_ERRNO(_x_) (acl_set_error(_x_))
+#else
+# error "unknown OS type"
+#endif
+
 namespace acl {
 
-thread_mutex::thread_mutex(void)
+thread_mutex::thread_mutex(bool recursive /* = true */)
 {
 	mutex_ = (acl_pthread_mutex_t*)
 		acl_mycalloc(1, sizeof(acl_pthread_mutex_t));
 
 #ifdef	ACL_UNIX
-	acl_assert(pthread_mutexattr_init(&mutex_attr_) == 0);
-	acl_assert(pthread_mutexattr_settype(&mutex_attr_,
-			PTHREAD_MUTEX_RECURSIVE) == 0);
-	acl_assert(acl_pthread_mutex_init(mutex_, &mutex_attr_) == 0);
+	int ret = pthread_mutexattr_init(&mutex_attr_);
+	if (ret)
+	{
+		SET_ERRNO(ret);
+		logger_fatal("pthread_mutexattr_init error=%s", last_serror());
+	}
+	if (recursive && (ret = pthread_mutexattr_settype(&mutex_attr_,
+					PTHREAD_MUTEX_RECURSIVE)))
+	{
+		SET_ERRNO(ret);
+		logger_fatal("pthread_mutexattr_settype error=%s", last_serror());
+	}
+	ret = acl_pthread_mutex_init(mutex_, &mutex_attr_);
+	if (ret)
+	{
+		SET_ERRNO(ret);
+		logger_fatal("pthread_mutex_init error=%s", last_serror());
+	}
 #else
-	acl_assert(acl_pthread_mutex_init(mutex_, NULL) == 0);
+	(void) recursive;
+	int ret = acl_pthread_mutex_init(mutex_, NULL);
+	if (ret)
+	{
+		SET_ERRNO(ret);
+		logger_fatal("pthread_mutex_init error=%s", last_serror());
+	}
 #endif
 }
 

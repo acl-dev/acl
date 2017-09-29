@@ -1,31 +1,45 @@
 #include "stdafx.hpp"
+#include "acl_cpp/stdlib/thread_mutex.hpp"
 #include "fiber/fiber_lock.hpp"
 
 namespace acl {
 
-fiber_mutex::fiber_mutex(void)
+fiber_mutex::fiber_mutex(bool thread_safe /* = false */)
 {
+	if (thread_safe)
+		thread_lock_ = new thread_mutex;
+	else
+		thread_lock_ = NULL;
 	lock_ = acl_fiber_mutex_create();
 }
 
 fiber_mutex::~fiber_mutex(void)
 {
 	acl_fiber_mutex_free(lock_);
+	delete thread_lock_;
 }
 
-void fiber_mutex::lock(void)
+bool fiber_mutex::lock(void)
 {
+	if (thread_lock_ && thread_lock_->lock() == false)
+		return false;
 	acl_fiber_mutex_lock(lock_);
+	return true;
 }
 
 bool fiber_mutex::trylock(void)
 {
+	if (thread_lock_ && thread_lock_->try_lock() == false)
+		return false;
 	return acl_fiber_mutex_trylock(lock_) == 0 ? false : true;
 }
 
-void fiber_mutex::unlock(void)
+bool fiber_mutex::unlock(void)
 {
 	acl_fiber_mutex_unlock(lock_);
+	if (thread_lock_ && thread_lock_->unlock() == false)
+		return false;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////
