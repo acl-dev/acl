@@ -7,7 +7,10 @@
 
 namespace acl {
 
-fiber_mutex::fiber_mutex(bool thread_safe /* = false */)
+fiber_mutex::fiber_mutex(bool thread_safe /* = false */,
+	unsigned int delay /* = 100 */, int max_retry /* = 0 */)
+: delay_(delay)
+, max_retry_(max_retry)
 {
 	if (thread_safe)
 		thread_lock_ = new thread_mutex;
@@ -24,8 +27,17 @@ fiber_mutex::~fiber_mutex(void)
 
 bool fiber_mutex::lock(void)
 {
-	if (thread_lock_ && !thread_lock_->lock())
-		return false;
+	if (thread_lock_)
+	{
+		int i = 0;
+		while (thread_lock_->try_lock() == false)
+		{
+			(void) fiber::delay(delay_);
+			if (max_retry_ > 0 && i++ >= max_retry_)
+				return false;
+		}
+	}
+
 	if (fiber::scheduled())
 		acl_fiber_mutex_lock(lock_);
 	return true;

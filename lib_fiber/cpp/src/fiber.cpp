@@ -60,6 +60,11 @@ void fiber::ready(fiber& f)
 		acl_fiber_ready(f.get_fiber());
 }
 
+unsigned int fiber::delay(unsigned int milliseconds)
+{
+	return acl_fiber_delay(milliseconds);
+}
+
 void fiber::hook_api(bool on)
 {
 	acl_fiber_hook_api(on ? 1 : 0);

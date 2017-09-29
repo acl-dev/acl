@@ -10,7 +10,8 @@ class thread_mutex;
 class fiber_mutex
 {
 public:
-	fiber_mutex(bool thread_safe = false);
+	fiber_mutex(bool thread_safe = false, unsigned int delay = 100,
+		int max_retry = 0);
 	~fiber_mutex(void);
 
 	bool lock(void);
@@ -20,6 +21,8 @@ public:
 private:
 	thread_mutex* thread_lock_;
 	ACL_FIBER_MUTEX* lock_;
+	unsigned int delay_;
+	int max_retry_;
 };
 
 class fiber_rwlock

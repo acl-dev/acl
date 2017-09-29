@@ -200,6 +200,11 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	acl_int64 min = -1;
 #endif
 
+	if (!acl_var_hook_sys_api) {
+		acl_doze(milliseconds);
+		return 0;
+	}
+
 	fiber_io_check();
 
 	ev = fiber_io_event();

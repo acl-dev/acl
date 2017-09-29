@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        26
+Release:        27
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,9 @@ fi
 /etc/init.d/master
 
 %changelog
+* Sat Sep 29 2018 zhengshuxin@qiyi.com 3.3.0-27-20170929.23
+- fiber_mutex: when blocked by thread mutex, the current fiber will be swapout
+
 * Sat Sep 29 2018 zhengshuxin@qiyi.com 3.3.0-26-20170929.18
 - version: upgrade version to 3.3.0-26
 

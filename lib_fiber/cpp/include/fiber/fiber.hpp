@@ -108,6 +108,13 @@ public:
 	static void ready(fiber& f);
 
 	/**
+	 * 使当前运行的协程休眠指定毫秒数
+	 * @param milliseconds {unsigned int} 指定要休眠的毫秒数
+	 * @return {unsigned int} 本协程休眠后再次被唤醒后剩余的毫秒数
+	 */
+	static unsigned int delay(unsigned int milliseconds);
+
+	/**
 	 * 线程启动后调用此函数设置当前线程是否需要 hook 系统 API，内部缺省
 	 * 会 hook 系统 API
 	 * @param on {bool}
