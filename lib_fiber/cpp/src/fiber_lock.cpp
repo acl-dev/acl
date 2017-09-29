@@ -1,5 +1,8 @@
 #include "stdafx.hpp"
 #include "acl_cpp/stdlib/thread_mutex.hpp"
+#include "acl_cpp/stdlib/mbox.hpp"
+#include "acl_cpp/stdlib/trigger.hpp"
+#include "fiber/fiber.hpp"
 #include "fiber/fiber_lock.hpp"
 
 namespace acl {
@@ -21,23 +24,28 @@ fiber_mutex::~fiber_mutex(void)
 
 bool fiber_mutex::lock(void)
 {
-	if (thread_lock_ && thread_lock_->lock() == false)
+	if (thread_lock_ && !thread_lock_->lock())
 		return false;
-	acl_fiber_mutex_lock(lock_);
+	if (fiber::scheduled())
+		acl_fiber_mutex_lock(lock_);
 	return true;
 }
 
 bool fiber_mutex::trylock(void)
 {
-	if (thread_lock_ && thread_lock_->try_lock() == false)
+	if (thread_lock_ && !thread_lock_->try_lock())
 		return false;
-	return acl_fiber_mutex_trylock(lock_) == 0 ? false : true;
+	if (fiber::scheduled())
+		return acl_fiber_mutex_trylock(lock_) == 0 ? false : true;
+	else
+		return true;
 }
 
 bool fiber_mutex::unlock(void)
 {
-	acl_fiber_mutex_unlock(lock_);
-	if (thread_lock_ && thread_lock_->unlock() == false)
+	if (fiber::scheduled())
+		acl_fiber_mutex_unlock(lock_);
+	if (thread_lock_ && !thread_lock_->unlock())
 		return false;
 	return true;
 }
