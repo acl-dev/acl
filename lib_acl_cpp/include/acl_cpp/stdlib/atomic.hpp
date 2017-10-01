@@ -48,6 +48,7 @@ public:
 	~atomic_long(void) {}
 
 	void set(long long n);
+	long long cas(long long cmp, long long n);
 	long long fetch_add(long long n);
 	long long add_fetch(long long n);
 

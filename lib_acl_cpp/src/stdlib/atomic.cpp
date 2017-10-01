@@ -44,6 +44,11 @@ void atomic_long::set(long long n)
 	acl_atomic_int64_set((ACL_ATOMIC*) atomic_, n);
 }
 
+long long atomic_long::cas(long long cmp, long long n)
+{
+	return acl_atomic_int64_cas((ACL_ATOMIC*) atomic_, cmp, n);
+}
+
 long long atomic_long::fetch_add(long long n)
 {
 	return acl_atomic_int64_fetch_add((ACL_ATOMIC*) atomic_, n);

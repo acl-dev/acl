@@ -71,6 +71,16 @@ ACL_API long long acl_atomic_int64_fetch_add(ACL_ATOMIC *self, long long n);
  */
 ACL_API long long acl_atomic_int64_add_fetch(ACL_ATOMIC *self, long long n);
 
+/**
+ * 比较并交换整数值，当原子对象存储的整数值与给定比较整数值相同时才设置新整数
+ * 值且返回之前存储的整数值
+ * @param self {ACL_ATOMIC*} 原子对象
+ * @param cmp {long long} 待比较整数值
+ * @param n {long long} 当原子对象与待比较整数值相同时会将原子对象设置为此值
+ * @return {long long} 返回原子对象之前存储的整数值
+ */
+ACL_API long long acl_atomic_int64_cas(ACL_ATOMIC *self, long long cmp, long long n);
+
 /****************************************************************************/
 
 typedef struct ACL_ATOMIC_CLOCK ACL_ATOMIC_CLOCK;

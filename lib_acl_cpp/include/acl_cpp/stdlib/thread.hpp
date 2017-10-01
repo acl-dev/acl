@@ -1,4 +1,5 @@
 #pragma once
+#include "../acl_cpp_define.hpp"
 
 namespace acl
 {

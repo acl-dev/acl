@@ -707,7 +707,8 @@ void acl_fiber_schedule(void)
 	for (;;) {
 		head = acl_ring_pop_head(&__thread_fiber->ready);
 		if (head == NULL) {
-			acl_msg_info("------- NO ACL_FIBER NOW --------");
+			acl_msg_info("thread-%lu: NO ACL_FIBER NOW",
+				acl_pthread_self());
 			break;
 		}
 

@@ -11,21 +11,23 @@ static void poll_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
 	int  in = 0, fd = dup(in), n;
 	struct pollfd pfd;
 
+	//fd = in;
 	memset(&pfd, 0, sizeof(pfd));
 	acl_non_blocking(fd, ACL_NON_BLOCKING);
 	pfd.fd = fd;
 	pfd.events = POLLIN;
 
 	while (1) {
-		n = poll(&pfd, 1, 1000);
+		n = poll(&pfd, 1, 10000);
 		if (n < 0) {
 			printf("poll error: %s\r\n", acl_last_serror());
 			break;
 		}
 
-		if (n == 0)
-			printf("fiber-%d: poll wakeup\r\n", acl_fiber_id(fiber));
-		else
+		if (n == 0) {
+			printf("fiber-%d: fd=%d, poll wakeup\r\n",
+				acl_fiber_id(fiber), fd);
+		} else
 			printf("fiber-%d: fd = %d read ready %s\r\n",
 				acl_fiber_id(fiber), pfd.fd,
 				pfd.revents & POLLIN ? "yes" : "no");
