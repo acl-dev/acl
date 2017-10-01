@@ -26,7 +26,6 @@ fiber_mutex::fiber_mutex(bool thread_safe /* = false */,
 , readers_(0)
 , written_(0)
 {
-
 	if (thread_safe)
        	{
 		thread_lock_ = new thread_mutex;
@@ -36,7 +35,11 @@ fiber_mutex::fiber_mutex(bool thread_safe /* = false */,
 		if (in_ >= 0)
 			out_ = in_;
 		else
+		{
+			logger_error("eventfd error %s", last_serror());
 			out_ = -1;
+		}
+
 #elif	defined(USE_PIPE)
 		int fds[2];
 		if (acl_duplex_pipe(fds))
@@ -55,6 +58,11 @@ fiber_mutex::fiber_mutex(bool thread_safe /* = false */,
 	}
 	else
 		thread_lock_ = NULL;
+
+	// sanity check, reset delay_ to 100 ms when in_ less 0
+	if ((in_ < 0 || out_ < 0) && delay_ > 100)
+		delay_ = 100;
+
 	lock_ = acl_fiber_mutex_create();
 }
 
