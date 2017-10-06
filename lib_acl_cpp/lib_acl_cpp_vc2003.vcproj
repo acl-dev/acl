@@ -937,6 +937,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Name="event"
 				Filter="">
 				<File
+					RelativePath=".\src\event\event_mutex.cpp">
+				</File>
+				<File
 					RelativePath=".\src\event\event_timer.cpp">
 				</File>
 			</Filter>
@@ -1550,6 +1553,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 			<Filter
 				Name="event"
 				Filter="">
+				<File
+					RelativePath=".\include\acl_cpp\event\event_mutex.hpp">
+				</File>
 				<File
 					RelativePath=".\include\acl_cpp\event\event_timer.hpp">
 				</File>

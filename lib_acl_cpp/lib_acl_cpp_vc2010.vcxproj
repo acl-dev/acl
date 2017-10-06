@@ -236,6 +236,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\disque\disque.cpp" />
     <ClCompile Include="src\disque\disque_cond.cpp" />
     <ClCompile Include="src\disque\disque_job.cpp" />
+    <ClCompile Include="src\event\event_mutex.cpp" />
     <ClCompile Include="src\event\event_timer.cpp" />
     <ClCompile Include="src\hsocket\hsclient.cpp" />
     <ClCompile Include="src\hsocket\hserror.cpp" />
@@ -426,6 +427,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\disque\disque_cond.hpp" />
     <ClInclude Include="include\acl_cpp\disque\disque_job.hpp" />
     <ClInclude Include="include\acl_cpp\disque\disque_node.hpp" />
+    <ClInclude Include="include\acl_cpp\event\event_mutex.hpp" />
     <ClInclude Include="include\acl_cpp\event\event_timer.hpp" />
     <ClInclude Include="include\acl_cpp\hsocket\hsclient.hpp" />
     <ClInclude Include="include\acl_cpp\hsocket\hserror.hpp" />

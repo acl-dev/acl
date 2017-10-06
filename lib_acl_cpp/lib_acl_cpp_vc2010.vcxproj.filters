@@ -394,6 +394,9 @@
     <ClCompile Include="src\stream\aio_timer_delay_free.cpp">
       <Filter>src\stream</Filter>
     </ClCompile>
+    <ClCompile Include="src\event\event_mutex.cpp">
+      <Filter>src\event</Filter>
+    </ClCompile>
     <ClCompile Include="src\event\event_timer.cpp">
       <Filter>src\event</Filter>
     </ClCompile>
@@ -989,6 +992,9 @@
     </ClInclude>
     <ClInclude Include="src\stream\aio_timer_delay_free.hpp">
       <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\event\event_mutex.hpp">
+      <Filter>include\event</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\event\event_timer.hpp">
       <Filter>include\event</Filter>
