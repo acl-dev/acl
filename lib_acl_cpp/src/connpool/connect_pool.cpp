@@ -114,6 +114,7 @@ connect_client* connect_pool::peek()
 		pool_.erase(it);
 		total_used_++;
 		current_used_++;
+
 		lock_.unlock();
 		return conn;
 	}
@@ -125,6 +126,13 @@ connect_client* connect_pool::peek()
 		return NULL;
 	}
 
+	// 将以下三个值预 +1
+	count_++;
+	total_used_++;
+	current_used_++;
+
+	lock_.unlock();
+
 	// 调用虚函数的子类实现方法，创建新连接对象，并打开连接
 	conn = create_connect();
 	// 在调用 open 之前先设置超时时间
@@ -132,21 +140,21 @@ connect_client* connect_pool::peek()
 	// 调用子类方法打开连接
 	if (conn->open() == false)
 	{
-		delete conn;
+		lock_.lock();
+
+		// 因为打开连接失败，所以还需将上面预 +1 的三个成员再 -1
+		count_--;
+		total_used_--;
+		current_used_--;
 #ifdef AUTO_SET_ALIVE
 		alive_ = false;
 		(void) time(&last_dead_);
 #endif
+
 		lock_.unlock();
+		delete conn;
 		return NULL;
 	}
-
-	count_++;
-
-	total_used_++;
-	current_used_++;
-
-	lock_.unlock();
 
 	conn->set_pool(this);
 
