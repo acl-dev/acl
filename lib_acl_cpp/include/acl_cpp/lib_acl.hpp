@@ -143,6 +143,7 @@
 #include "smtp/smtp_client.hpp"
 
 #include "event/event_timer.hpp"
+#include "event/event_mutex.hpp"
 
 #include "master/master_base.hpp"
 #include "master/master_threads.hpp"
