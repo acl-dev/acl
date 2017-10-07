@@ -11,7 +11,7 @@ public:
 	event_mutex(bool recursive = true);
 	~event_mutex(void);
 
-	bool lock(int timeout = -1);
+	bool lock(void);
 	bool unlock(void);
 
 private:

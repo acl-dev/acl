@@ -16,10 +16,14 @@ event_mutex::event_mutex(bool recursive /* = true */)
 , tid_(0)
 {
 	ACL_SOCKET fds[2];
+
 	if (acl_sane_socketpair(AF_UNIX, SOCK_STREAM, 0, fds) < 0)
 		logger_fatal("socketpair error=%s", last_serror());
+
 	in_  = fds[0];
 	out_ = fds[1];
+//	acl_tcp_nodelay(in_, 1);
+//	acl_tcp_nodelay(out_, 1);
 }
 
 event_mutex::~event_mutex(void)
@@ -30,7 +34,7 @@ event_mutex::~event_mutex(void)
 
 #define	DUMMY	1
 
-bool event_mutex::lock(int timeout /* = 0 */)
+bool event_mutex::lock(void)
 {
 	if (++count_ == 1)
 	{
@@ -45,19 +49,24 @@ bool event_mutex::lock(int timeout /* = 0 */)
 		return true;
 	}
 
-	int n;
+	int n, timeout = -1;
 
 	while (true)
 	{
 #ifdef ACL_UNIX
-		if (timeout >= 0 && acl_read_poll_wait(in_, timeout) < 0)
+		if (acl_read_poll_wait(in_, timeout) < 0)
 #else
-		if (timeout >= 0 && acl_read_select_wait(in_, timeout) < 0)
+		if (acl_read_select_wait(in_, timeout) < 0)
 #endif
 		{
+			if (errno == ACL_ETIMEDOUT)
+				continue;
+
 			--count_;
+			logger_error("read wait error=%s", last_serror());
 			return false;
 		}
+
 		if (acl_socket_read(in_, &n, sizeof(n), 0, NULL, NULL) > 0)
 			break;
 
@@ -87,8 +96,8 @@ bool event_mutex::unlock(void)
 {
 	if (tid_ != thread::self())
 	{
-		logger_error("not current thread=%lu",
-			(unsigned long) thread::self());
+		logger_error("current thread=%lu, mutex's owner=%lu",
+			(unsigned long) thread::self(), tid_);
 		return false;
 	}
 
@@ -98,14 +107,16 @@ bool event_mutex::unlock(void)
 		return true;
 	}
 
+	tid_ = 0;
+
 	if (--count_ == 0)
 		return true;
 
 	acl_assert(count_.value() > 0);
 
+	static int n = DUMMY;
 	while (true)
 	{
-		int n = DUMMY;
 		if (acl_socket_write(out_, &n, sizeof(n), 0, NULL, NULL) > 0)
 			break;
 
