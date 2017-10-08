@@ -83,8 +83,6 @@ bool fiber_mutex::thread_mutex_lock(void)
 
 	while (thread_lock_->try_lock() == false)
 	{
-		long long n;
-
 		if (in_ < 0)
 		{
 			(void) fiber::delay(delay_);
@@ -106,6 +104,7 @@ bool fiber_mutex::thread_mutex_lock(void)
 
 		written_--;
 
+		long long n;
 		if (read(in_, &n, sizeof(n)) <= 0)
 			logger_error("thread-%lu, read error %s",
 				acl::thread::thread_self(), last_serror());
@@ -151,7 +150,7 @@ bool fiber_mutex::trylock(void)
 
 bool fiber_mutex::unlock(void)
 {
-	long long n = 100;
+	static const long long n = 100;
 
 	if (fiber::scheduled())
 	{

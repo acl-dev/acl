@@ -7,7 +7,7 @@ static bool __show    = false;
 static int __nthreads = 2;
 static int __nfibers  = 2;
 static int __nloop    = 2;
-static int __delay    = 100;
+static int __delay    = 0;
 
 static acl::atomic_long __counter = 0;
 
@@ -62,7 +62,7 @@ protected:
 		}
 
 		--nfibers_;
-		printf("----nfibers: %d---\r\n", nfibers_);
+		printf("thread-%lu, nfibers: %d\r\n", acl::thread::self(), nfibers_);
 		if (nfibers_ == 0)
 			acl::fiber::schedule_stop();
 
