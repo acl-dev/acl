@@ -111,17 +111,19 @@ static void usage(const char* procname)
 		" -n nloop[default: 2]\r\n"
 		" -d delay[default: 100 ms]\r\n"
 		" -S [show info]\r\n"
+		" -m [use thread_mutex]\r\n"
 		" -s read_wait[default: 100 ms]\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
 	int  ch, read_wait = 100;
+	bool use_thread_mutex = false;
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hc:t:n:d:s:S")) > 0)
+	while ((ch = getopt(argc, argv, "hc:t:n:d:s:Sm")) > 0)
 	{
 		switch (ch)
 		{
@@ -146,13 +148,16 @@ int main(int argc, char *argv[])
 		case 'S':
 			__show = true;
 			break;
+		case 'm':
+			use_thread_mutex = true;
+			break;
 		default:
 			break;
 		}
 	}
 
 
-	acl::fiber_mutex lock(true, read_wait);
+	acl::fiber_mutex lock(true, read_wait, use_thread_mutex);
 
 	std::vector<acl::thread*> threads;
 	for (int i = 0; i < __nthreads; i++)
