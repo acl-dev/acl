@@ -69,6 +69,7 @@ fiber_mutex::fiber_mutex(bool thread_safe /* = false */,
 	{
 		atomic_lock_ = NULL;
 		thread_lock_ = NULL;
+		in_ = out_ = -1;
 	}
 
 	// sanity check, reset delay_ to 100 ms when in_ less 0
