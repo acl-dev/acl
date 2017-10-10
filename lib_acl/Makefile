@@ -295,9 +295,9 @@ SHARED_LIBNAME = libacl.so
 all: static shared
 
 $(shell mkdir -p $(DEF_PATH_DST))
-ifneq ($(MAKECMDGOALS),clean)
--include $(OBJS_DEF)
-endif
+#ifneq ($(MAKECMDGOALS),clean)
+#-include $(OBJS_DEF)
+#endif
 
 clean cl: clean_lib
 rebuild rb: clean all
@@ -313,7 +313,8 @@ CREATE_DEF = @(echo 'creating $@'; rm -f $@; \
 	sed 's,.*.o\( \)*:,$(patsubst %.inc,%.o,$@) $@ :,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$)
 
-static: depends $(OBJS_DST)
+#static: depends $(OBJS_DST)
+static: $(OBJS_DST)
 	@echo 'creating $(LIB_PATH_DST)/$(STATIC_LIBNAME)'
 	@$(AR) $(ARFL) $(LIB_PATH_DST)/$(STATIC_LIBNAME) $(OBJS_DST)
 	@$(RANLIB) $(LIB_PATH_DST)/$(STATIC_LIBNAME)
@@ -323,7 +324,8 @@ static: depends $(OBJS_DST)
 
 #shared_ldflags = -lmysqlclient -lrt -lpthread -ldl
 shared_ldflags = -lrt -lpthread -ldl
-shared: depends $(OBJS_DST)
+#shared: depends $(OBJS_DST)
+shared: $(OBJS_DST)
 	@echo ''
 	@echo 'creating $(SHARED_LIBNAME)'
 	@if test -n "$(rpath)" && test "$(UNIXTYPE)" = "LINUX"; then \

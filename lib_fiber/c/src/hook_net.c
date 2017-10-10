@@ -450,6 +450,7 @@ static void pollfd_callback(EVENT *ev, int fd, void *ctx, int mask)
 		n |= 1 << 1;
 	}
 
+	assert(acl_ring_size(&ev->poll_list) > 0);
 	if (n > 0) {
 		acl_assert(pe);
 		pe->nready++;

@@ -205,9 +205,9 @@ lib: static
 all: static shared sample
 
 $(shell mkdir -p $(DEF_PATH_DST))
-ifneq ($(MAKECMDGOALS),clean)
--include $(OBJS_DEF)
-endif
+#ifneq ($(MAKECMDGOALS),clean)
+#-include $(OBJS_DEF)
+#endif
 
 COMPILE = $(CC) $(CFLAGS)
 COMPILE_OBJ = @(echo 'building $<'; $(COMPILE) $< -o $@)
@@ -221,7 +221,8 @@ CREATE_DEF = @(echo 'creating $@'; rm -f $@; \
 sample: static
 	@(cd samples; make)
 
-static: depends $(OBJS_DST)
+#static: depends $(OBJS_DST)
+static: $(OBJS_DST)
 	@echo 'creating $(LIB_PATH_DST)/$(STATIC_LIBNAME)'
 	@$(AR) $(ARFL) $(LIB_PATH_DST)/$(STATIC_LIBNAME) $(OBJS_DST)
 	@$(RANLIB) $(LIB_PATH_DST)/$(STATIC_LIBNAME)
@@ -229,7 +230,8 @@ static: depends $(OBJS_DST)
 		ln -s $(STATIC_LIBNAME) lib_acl_cpp.a)
 	@echo 'create $(LIB_PATH_DST)/$(STATIC_LIBNAME) ok!'
 
-shared: depends pch $(OBJS_DST)
+#shared: depends pch $(OBJS_DST)
+shared: $(OBJS_DST)
 	@echo 'creating $(SHARED_LIBNAME)'
 	@if test -n "$(rpath)" && test "$(UNIXTYPE)" = "LINUX"; then \
 		echo "building for linux"; \
@@ -354,7 +356,7 @@ $(DEF_PATH_DST)/%.inc: ./src/disque/%.cpp
 $(DEF_PATH_DST)/%.inc: ./src/serialize/%.cpp
 	$(CREATE_DEF)
 
-clean:
+clean cl:
 	rm -f $(LIB_PATH_DST)/libacl_cpp.a
 	rm -f $(LIB_PATH_DST)/lib_acl_cpp.a
 	rm -f $(LIB_PATH_DST)/libacl_cpp.so

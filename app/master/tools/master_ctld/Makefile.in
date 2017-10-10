@@ -142,7 +142,7 @@ all: RM $(OBJ)
 	@echo ""
 RM:
 	rm -f $(PROG)
-clean:
+clean cl:
 	rm -f $(PROG)
 	rm -f $(OBJ)
 rebuild rb: clean all

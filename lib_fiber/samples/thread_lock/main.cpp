@@ -33,7 +33,7 @@ protected:
 			if (lock_.lock() == false)
 			{
 				printf("lock error %s\r\n", acl::last_serror());
-				break;
+				abort();
 			}
 
 			if (__show)

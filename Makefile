@@ -81,7 +81,8 @@ endif
 .PHONY = check help all_lib all samples all clean install uninstall uninstall_all build_one
 VERSION = 3.3.0
 
-help:
+default: build_one
+help h:
 	@(echo "usage: make help|all|all_lib|all_samples|clean|install|uninstall|uninstall_all|build_one")
 all_lib:
 	@if test "$(polarssl)" = "on"; then \
@@ -90,11 +91,11 @@ all_lib:
 	else \
 		export ENV_FLAGS; \
 	fi
-	@(cd lib_acl; make pch)
+#	@(cd lib_acl; make pch)
 	@(cd lib_acl; make $(MAKE_ARGS))
 	@(cd lib_protocol; make $(MAKE_ARGS))
 	@(cd lib_acl_cpp; make check)
-	@(cd lib_acl_cpp; make pch)
+#	@(cd lib_acl_cpp; make pch)
 	@(cd lib_acl_cpp; make $(MAKE_ARGS))
 	@(cd lib_rpc; make $(MAKE_ARGS))
 all_samples: all_lib
@@ -105,7 +106,7 @@ all_samples: all_lib
 #	@(cd lib_dict; make $(MAKE_ARGS))
 #	@(cd lib_tls; make $(MAKE_ARGS))
 all: all_lib acl_master all_samples
-clean:
+clean cl:
 	@(cd lib_acl; make clean)
 	@(cd lib_protocol; make clean)
 	@(cd lib_acl_cpp; make clean)
@@ -121,8 +122,8 @@ clean:
 #	@(cd lib_tls; make clean)
 
 acl_master: all_lib
-	@(cd app/master/daemon; make; make install)
-	@(cd app/master/tools/master_ctld; make; make install)
+	@(cd app/master/daemon; make $(MAKE_ARGS); make install)
+	@(cd app/master/tools/master_ctld; make $(MAKE_ARGS); make install)
 
 packinstall:
 	@(echo "")
