@@ -11,7 +11,7 @@ class fiber_mutex
 {
 public:
 	fiber_mutex(bool thread_safe = false, unsigned int delay = 1000,
-		bool use_atomic_lock = false);
+		bool use_atomic_lock = true);
 	~fiber_mutex(void);
 
 	bool lock(void);
@@ -29,7 +29,7 @@ private:
 	int out_;
 	int in_;
 
-	bool lock_wait(void);
+	bool lock_wait(int in);
 };
 
 class fiber_rwlock

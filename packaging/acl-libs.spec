@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        28
+Release:        29
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,9 @@ fi
 /etc/init.d/master
 
 %changelog
+* Sat Oct 10 2018 zhengshuxin@qiyi.com 3.3.0-29-20171010.11
+- fiber_mutex: fixed one bug when thread_safe is true
+
 * Sat Oct 07 2018 zhengshuxin@qiyi.com 3.3.0-28-20171007.23
 - add event_mutex in lib_acl_cpp
 

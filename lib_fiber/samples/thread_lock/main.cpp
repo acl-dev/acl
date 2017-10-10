@@ -156,8 +156,8 @@ int main(int argc, char *argv[])
 		}
 	}
 
-
-	acl::fiber_mutex lock(true, read_wait, use_thread_mutex);
+	printf("use_thread_mutex: %s\r\n", use_thread_mutex ? "yes" : "no");
+	acl::fiber_mutex lock(true, read_wait, use_thread_mutex ? false : true);
 
 	std::vector<acl::thread*> threads;
 	for (int i = 0; i < __nthreads; i++)

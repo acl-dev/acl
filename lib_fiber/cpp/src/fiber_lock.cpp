@@ -7,6 +7,9 @@
 # define USE_PIPE
 #endif
 
+//#undef   USE_EVENT
+//#undef   USE_PIPE
+
 #include "acl_cpp/stdlib/thread.hpp"
 #include "acl_cpp/stdlib/thread_mutex.hpp"
 #include "acl_cpp/stdlib/log.hpp"
@@ -20,7 +23,7 @@
 namespace acl {
 
 fiber_mutex::fiber_mutex(bool thread_safe /* = false */,
-	unsigned int delay /* = 1000 */, bool use_atomic_lock /* = false */)
+	unsigned int delay /* = 1000 */, bool use_atomic_lock /* = true */)
 : delay_(delay)
 , waiters_(0)
 , readers_(0)
@@ -91,15 +94,15 @@ fiber_mutex::~fiber_mutex(void)
 		close(out_);
 }
 
-bool fiber_mutex::lock_wait(void)
+bool fiber_mutex::lock_wait(int in)
 {
-	if (in_ < 0)
+	if (in < 0)
 	{
 		(void) fiber::delay(delay_);
 		return true;
 	}
 
-	if (acl_read_poll_wait(in_, delay_) == -1)
+	if (acl_read_poll_wait(in, delay_) == -1)
 	{
 		if (errno == ACL_ETIMEDOUT)
 			return true;
@@ -115,7 +118,7 @@ bool fiber_mutex::lock_wait(void)
 	written_--;
 
 	long long n;
-	if (read(in_, &n, sizeof(n)) <= 0)
+	if (read(in, &n, sizeof(n)) <= 0)
 		logger_error("thread-%lu, read error %s",
 			acl::thread::thread_self(), last_serror());
 
@@ -135,8 +138,15 @@ bool fiber_mutex::lock(void)
 
 		while (atomic_lock_->cas(0, 1) == 1)
 		{
-			if (lock_wait() == false)
+			int in = in_ >= 0 ? dup(in_) : -1;
+			if (lock_wait(in) == false)
+			{
+				if (in >= 0)
+					close(in);
 				return false;
+			}
+			if (in >= 0)
+				close(in);
 		}
 	}
 	else if (thread_lock_)
@@ -145,8 +155,15 @@ bool fiber_mutex::lock(void)
 
 		while (thread_lock_->try_lock() == false)
 		{
-			if (lock_wait() == false)
+			int in = in_ >= 0 ? dup(in_) : -1;
+			if (lock_wait(in) == false)
+			{
+				if (in >= 0)
+					close(in);
 				return false;
+			}
+			if (in >= 0)
+				close(in);
 		}
 	}
 
@@ -185,8 +202,6 @@ bool fiber_mutex::trylock(void)
 
 bool fiber_mutex::unlock(void)
 {
-	static const long long n = 100;
-
 	if (fiber::scheduled())
 	{
 		__nfibers--;
@@ -216,6 +231,7 @@ bool fiber_mutex::unlock(void)
 
 	written_++;
 
+	static const long long n = 100;
 	if (write(out_, &n, sizeof(n)) <= 0)
 		logger_warn("write error=%s", last_serror());
 
