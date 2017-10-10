@@ -107,12 +107,11 @@ bool fiber_mutex::lock_wait(int in)
 		if (errno == ACL_ETIMEDOUT)
 			return true;
 
-		waiters_--;
 		logger_error("read wait error %s", last_serror());
 		return false;
 	}
 
-	if (written_ == 0 || readers_.cas(0, 1) == 1)
+	if (written_ == 0 || readers_.cas(0, 1) != 0)
 		return true;
 
 	written_--;
@@ -120,11 +119,11 @@ bool fiber_mutex::lock_wait(int in)
 	long long n;
 	if (read(in, &n, sizeof(n)) <= 0)
 		logger_error("thread-%lu, read error %s",
-			acl::thread::thread_self(), last_serror());
+			acl::thread::self(), last_serror());
 
-	(void) readers_.cas(1, 0);
+	if (readers_.cas(1, 0) != 1)
+		logger_fatal("thread-%lu, cas invalid", acl::thread::self());
 
-	waiters_--;
 	return true;
 }
 
@@ -136,11 +135,12 @@ bool fiber_mutex::lock(void)
 	{
 		waiters_++;
 
-		while (atomic_lock_->cas(0, 1) == 1)
+		while (atomic_lock_->cas(0, 1) != 0)
 		{
 			int in = in_ >= 0 ? dup(in_) : -1;
 			if (lock_wait(in) == false)
 			{
+				waiters_--;
 				if (in >= 0)
 					close(in);
 				return false;
@@ -148,6 +148,8 @@ bool fiber_mutex::lock(void)
 			if (in >= 0)
 				close(in);
 		}
+
+		waiters_--;
 	}
 	else if (thread_lock_)
 	{
@@ -158,6 +160,7 @@ bool fiber_mutex::lock(void)
 			int in = in_ >= 0 ? dup(in_) : -1;
 			if (lock_wait(in) == false)
 			{
+				waiters_--;
 				if (in >= 0)
 					close(in);
 				return false;
@@ -165,6 +168,8 @@ bool fiber_mutex::lock(void)
 			if (in >= 0)
 				close(in);
 		}
+
+		waiters_--;
 	}
 
 	if (fiber::scheduled())
@@ -210,13 +215,19 @@ bool fiber_mutex::unlock(void)
 
 	if (atomic_lock_)
 	{
-		if (atomic_lock_->cas(1, 0) != 0)
+		if (atomic_lock_->cas(1, 0) != 1)
+		{
+			logger_error("cas invalid");
 			return false;
+		}
 	}
 	else if (thread_lock_)
 	{
 		if (!thread_lock_->unlock())
+		{
+			logger_error("unlock error");
 			return false;
+		}
 	}
 
 	if (out_ < 0 || __nfibers > 0)
@@ -231,7 +242,8 @@ bool fiber_mutex::unlock(void)
 
 	written_++;
 
-	static const long long n = 100;
+	static const long long n = 1;
+
 	if (write(out_, &n, sizeof(n)) <= 0)
 		logger_warn("write error=%s", last_serror());
 

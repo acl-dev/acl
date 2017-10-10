@@ -30,11 +30,7 @@ protected:
 				printf("thread-%lu, fiber-%u begin lock\r\n",
 					acl::thread::thread_self(),
 					acl::fiber::self());
-			if (lock_.lock() == false)
-			{
-				printf("lock error %s\r\n", acl::last_serror());
-				abort();
-			}
+			assert(lock_.lock());
 
 			if (__show)
 				printf("thread-%lu, fiber-%u lock ok\r\n",
@@ -49,7 +45,7 @@ protected:
 					acl::thread::thread_self(),
 					acl::fiber::self());
 
-			lock_.unlock();
+			assert(lock_.unlock());
 			__counter++;
 
 			if (__show)
