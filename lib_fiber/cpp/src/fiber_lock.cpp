@@ -89,10 +89,8 @@ fiber_mutex::~fiber_mutex(void)
 bool fiber_mutex::event_wait(int in)
 {
 	if (acl_read_poll_wait(in, delay_) == -1) {
-		if (errno == ACL_ETIMEDOUT) {
-			printf("thread-%lu, fiber-%u timeout\r\n", thread::self(), fiber::self());
+		if (errno == ACL_ETIMEDOUT)
 			return true;
-		}
 
 		logger_error("read wait error %s", last_serror());
 		return false;
@@ -101,8 +99,8 @@ bool fiber_mutex::event_wait(int in)
 	if (written_ == 0 || readers_.cas(0, 1) != 0)
 		return true;
 
-	printf("2---thread-%lu, fiber-%u, fd =%d, write: %lld, readers=%lld\n",
-		thread::self(), fiber::self(), in, written_.value(), readers_.value());
+	//printf("2---thread-%lu, fiber-%u, fd =%d, write: %lld, readers=%lld\n",
+	//	thread::self(), fiber::self(), in, written_.value(), readers_.value());
 
 #ifdef	USE_EVENT
 	written_ = 0;
@@ -195,7 +193,6 @@ bool fiber_mutex::lock(void)
 			return false;
 	}
 
-//	printf("thread-%lu, fiber-%u locked\r\n", thread::self(), fiber::self());
 	tid_ = thread::self();
 
 	if (fiber::scheduled()) {

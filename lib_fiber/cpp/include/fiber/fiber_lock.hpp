@@ -10,7 +10,7 @@ class thread_mutex;
 class fiber_mutex
 {
 public:
-	fiber_mutex(bool thread_safe = false, unsigned int delay = 1,
+	fiber_mutex(bool thread_safe = false, unsigned int delay = 100,
 		bool use_atomic_lock = true);
 	~fiber_mutex(void);
 
