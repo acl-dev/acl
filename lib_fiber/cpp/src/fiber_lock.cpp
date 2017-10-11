@@ -23,21 +23,18 @@
 namespace acl {
 
 fiber_mutex::fiber_mutex(bool thread_safe /* = false */,
-	unsigned int delay /* = 1000 */, bool use_atomic_lock /* = true */)
-: delay_(delay)
+	unsigned int delay /* = 100 */, bool use_atomic_lock /* = true */)
+: tid_(0)
+, delay_(delay)
 , waiters_(0)
 , readers_(0)
 , written_(0)
 {
-	if (thread_safe)
-       	{
-		if (use_atomic_lock)
-		{
+	if (thread_safe) {
+		if (use_atomic_lock) {
 			atomic_lock_ = new atomic_long(0);
 			thread_lock_ = NULL;
-		}
-		else
-		{
+		} else {
 			thread_lock_ = new thread_mutex;
 			atomic_lock_ = NULL;
 		}
@@ -46,30 +43,24 @@ fiber_mutex::fiber_mutex(bool thread_safe /* = false */,
 		in_ = eventfd(0, 0);
 		if (in_ >= 0)
 			out_ = in_;
-		else
-		{
+		else {
 			logger_error("eventfd error %s", last_serror());
 			out_ = -1;
 		}
 
 #elif	defined(USE_PIPE)
 		int fds[2];
-		if (acl_duplex_pipe(fds))
-		{
+		if (acl_duplex_pipe(fds)) {
 			logger_error("duplex pipe error %s", last_serror());
 			in_ = out_ = -1;
-		}
-		else
-		{
+		} else {
 			in_  = fds[0];
 			out_ = fds[1];
 		}
 #else
 		in_ = out_ = -1;
 #endif
-	}
-	else
-	{
+	} else {
 		atomic_lock_ = NULL;
 		thread_lock_ = NULL;
 		in_ = out_ = -1;
@@ -90,22 +81,18 @@ fiber_mutex::~fiber_mutex(void)
 
 	if (in_ >= 0)
 		close(in_);
+
 	if (out_ >= 0 && out_ != in_)
 		close(out_);
 }
 
-bool fiber_mutex::lock_wait(int in)
+bool fiber_mutex::event_wait(int in)
 {
-	if (in < 0)
-	{
-		(void) fiber::delay(delay_);
-		return true;
-	}
-
-	if (acl_read_poll_wait(in, delay_) == -1)
-	{
-		if (errno == ACL_ETIMEDOUT)
+	if (acl_read_poll_wait(in, delay_) == -1) {
+		if (errno == ACL_ETIMEDOUT) {
+			printf("thread-%lu, fiber-%u timeout\r\n", thread::self(), fiber::self());
 			return true;
+		}
 
 		logger_error("read wait error %s", last_serror());
 		return false;
@@ -114,7 +101,14 @@ bool fiber_mutex::lock_wait(int in)
 	if (written_ == 0 || readers_.cas(0, 1) != 0)
 		return true;
 
+	printf("2---thread-%lu, fiber-%u, fd =%d, write: %lld, readers=%lld\n",
+		thread::self(), fiber::self(), in, written_.value(), readers_.value());
+
+#ifdef	USE_EVENT
+	written_ = 0;
+#elif	defined(USE_PIPE)
 	written_--;
+#endif
 
 	long long n;
 	if (read(in, &n, sizeof(n)) <= 0)
@@ -127,53 +121,84 @@ bool fiber_mutex::lock_wait(int in)
 	return true;
 }
 
+bool fiber_mutex::event_wait(void)
+{
+	if (in_ < 0) {
+		(void) fiber::delay(delay_);
+		return true;
+	}
+
+	int in = dup(in_);
+	if (in < 0) {
+		(void) fiber::delay(delay_);
+		return true;
+	}
+
+	bool ret = event_wait(in);
+	close(in);
+	return ret;
+}
+
+bool fiber_mutex::atomic_lock_wait(void)
+{
+	unsigned long tid = thread::self();
+
+	if (in_ < 0) {
+		while (atomic_lock_->cas(0, 1) != 0 && tid != tid_)
+			(void) fiber::delay(delay_);
+		return true;
+	}
+
+	waiters_++;
+
+	while (atomic_lock_->cas(0, 1) != 0 && tid != tid_) {
+		if (event_wait() == false) {
+			waiters_--;
+			return false;
+		}
+	}
+
+	waiters_--;
+	return true;
+}
+
+bool fiber_mutex::thread_lock_wait(void)
+{
+	if (in_ < 0) {
+		while (thread_lock_->try_lock() == false)
+			(void) fiber::delay(delay_);
+		return true;
+	}
+
+	waiters_++;
+
+	while (thread_lock_->try_lock() == false) {
+		if (event_wait() == false) {
+			waiters_--;
+			return false;
+		}
+	}
+
+	waiters_--;
+	return true;
+}
+
 static __thread int __nfibers = 0;
 
 bool fiber_mutex::lock(void)
 {
-	if (atomic_lock_)
-	{
-		waiters_++;
-
-		while (atomic_lock_->cas(0, 1) != 0)
-		{
-			int in = in_ >= 0 ? dup(in_) : -1;
-			if (lock_wait(in) == false)
-			{
-				waiters_--;
-				if (in >= 0)
-					close(in);
-				return false;
-			}
-			if (in >= 0)
-				close(in);
-		}
-
-		waiters_--;
-	}
-	else if (thread_lock_)
-	{
-		waiters_++;
-
-		while (thread_lock_->try_lock() == false)
-		{
-			int in = in_ >= 0 ? dup(in_) : -1;
-			if (lock_wait(in) == false)
-			{
-				waiters_--;
-				if (in >= 0)
-					close(in);
-				return false;
-			}
-			if (in >= 0)
-				close(in);
-		}
-
-		waiters_--;
+	if (atomic_lock_) {
+		if (atomic_lock_wait() == false)
+			return false;
+	} else if (thread_lock_) {
+		if (thread_lock_wait() == false)
+			return false;
 	}
 
-	if (fiber::scheduled())
-	{
+//	printf("thread-%lu, fiber-%u locked\r\n", thread::self(), fiber::self());
+	tid_ = thread::self();
+
+	if (fiber::scheduled()) {
 		__nfibers++;
 		acl_fiber_mutex_lock(lock_);
 	}
@@ -183,48 +208,39 @@ bool fiber_mutex::lock(void)
 
 bool fiber_mutex::trylock(void)
 {
-	if (atomic_lock_)
-	{
-		if (atomic_lock_->cas(0, 1) != 1)
+	if (atomic_lock_) {
+		if (atomic_lock_->cas(0, 1) != 0)
 			return false;
-	}
-	else if (thread_lock_)
-	{
-		if (!thread_lock_->try_lock())
+	} else if (thread_lock_) {
+		if (thread_lock_->try_lock() == false)
 			return false;
 	}
 
-	if (!fiber::scheduled())
+	if (fiber::scheduled() == false)
 		return true;
-	else if (acl_fiber_mutex_trylock(lock_) == 0)
-	{
+	else if (acl_fiber_mutex_trylock(lock_) == 0) {
 		__nfibers++;
 		return true;
-	}
-	else
+	} else
 		return false;
 }
 
 bool fiber_mutex::unlock(void)
 {
-	if (fiber::scheduled())
-	{
+	if (fiber::scheduled()) {
 		__nfibers--;
 		acl_fiber_mutex_unlock(lock_);
 	}
 
-	if (atomic_lock_)
-	{
-		if (atomic_lock_->cas(1, 0) != 1)
-		{
+	tid_ = 0;
+
+	if (atomic_lock_) {
+		if (atomic_lock_->cas(1, 0) != 1) {
 			logger_error("cas invalid");
 			return false;
 		}
-	}
-	else if (thread_lock_)
-	{
-		if (!thread_lock_->unlock())
-		{
+	} else if (thread_lock_) {
+		if (!thread_lock_->unlock()) {
 			logger_error("unlock error");
 			return false;
 		}
