@@ -37,6 +37,8 @@ ACL_FIBER* acl_fiber_create(void (*fn)(ACL_FIBER*, void*),
  */
 int acl_fiber_ndead(void);
 
+void acl_fiber_check_timer(size_t max);
+
 /**
  * 返回当前正在运行的协程对象
  * @retur {ACL_FIBER*} 返回 NULL 表示当前没有正在运行的协程

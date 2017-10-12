@@ -150,6 +150,14 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	exit(0);
 }
 
+static void fiber_memcheck(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
+{
+	while (1) {
+		sleep(1);
+		acl_default_meminfo();
+	}
+}
+
 static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
@@ -198,6 +206,7 @@ int main(int argc, char *argv[])
 	signal(SIGPIPE, SIG_IGN);
 	acl_msg_stdout_enable(1);
 
+	acl_fiber_create(fiber_memcheck, NULL, 64000);
 	printf("%s: call fiber_creater\r\n", __FUNCTION__);
 	acl_fiber_create(fiber_accept, NULL, 32768);
 

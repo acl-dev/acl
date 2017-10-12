@@ -391,6 +391,26 @@ static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 #endif
 }
 
+static void check_timer(ACL_FIBER *fiber acl_unused, void *ctx)
+{
+	size_t *intptr = (size_t *) ctx;
+	size_t  max = *intptr;
+
+	acl_myfree(intptr);
+	while (1) {
+		sleep(1);
+		fiber_kick((int) max);
+	}
+}
+
+void acl_fiber_check_timer(size_t max)
+{
+	size_t *intptr = (size_t *) acl_mymalloc(sizeof(int));
+
+	*intptr = max;
+	acl_fiber_create(check_timer, intptr, 64000);
+}
+
 ACL_FIBER *acl_fiber_running(void)
 {
 	fiber_check();

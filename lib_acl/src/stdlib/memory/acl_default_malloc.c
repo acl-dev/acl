@@ -126,6 +126,7 @@ static char empty_string[] = "";
 } while (0)
 #endif  /* ACL_WINDOWS */
 
+#define DEBUG_MEM
 #ifdef	DEBUG_MEM
 static __thread int __nmalloc   = 0;
 static __thread int __ncalloc   = 0;
@@ -215,7 +216,7 @@ void *acl_default_malloc(const char *filename, int line, size_t len)
 
 #ifdef 	DEBUG_MEM
 	__nmalloc++;
-	__nsize += new_len;
+	__nsize += len;
 #endif
 
 #ifdef	_USE_GLIB
@@ -296,7 +297,8 @@ void *acl_default_realloc(const char *filename, int line,
 
 #ifdef 	DEBUG_MEM
 	__nrealloc++;
-	__nsize += new_len - old_len;
+	__nsize += len;
+	__nsize -= old_len;
 #endif
 
 #ifdef	_USE_GLIB
