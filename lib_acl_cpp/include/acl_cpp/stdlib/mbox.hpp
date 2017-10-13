@@ -48,7 +48,7 @@ size_t mbox_nread(void*);
  */
 
 template<typename T>
-class mbox
+class mbox : public noncopyable
 {
 public:
 	mbox(void)
