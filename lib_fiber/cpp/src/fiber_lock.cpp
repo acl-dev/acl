@@ -7,8 +7,8 @@
 # define USE_PIPE
 #endif
 
-//#undef   USE_EVENT
-//#undef   USE_PIPE
+#undef   USE_EVENT
+#undef   USE_PIPE
 
 #include "acl_cpp/stdlib/thread.hpp"
 #include "acl_cpp/stdlib/thread_mutex.hpp"
