@@ -23,7 +23,7 @@
 namespace acl {
 
 fiber_mutex::fiber_mutex(bool thread_safe /* = false */,
-	unsigned int delay /* = 100 */, bool use_atomic_lock /* = true */)
+	unsigned int delay /* = 100 */, bool use_atomic_lock /* = false */)
 : tid_(0)
 , delay_(delay)
 , waiters_(0)
@@ -139,17 +139,23 @@ bool fiber_mutex::event_wait(void)
 
 bool fiber_mutex::atomic_lock_wait(void)
 {
-	unsigned long tid = thread::self();
+	if (atomic_lock_->cas(0, 1) == 0)
+		return true;
+
+	if (thread::self() == tid_) {
+		xx_.cas(1, 0);
+		return true;
+	}
 
 	if (in_ < 0) {
-		while (atomic_lock_->cas(0, 1) != 0 && tid != tid_)
+		while (atomic_lock_->cas(0, 1) != 0)
 			(void) fiber::delay(delay_);
 		return true;
 	}
 
 	waiters_++;
 
-	while (atomic_lock_->cas(0, 1) != 0 && tid != tid_) {
+	while (atomic_lock_->cas(0, 1) != 0) {
 		if (event_wait() == false) {
 			waiters_--;
 			return false;

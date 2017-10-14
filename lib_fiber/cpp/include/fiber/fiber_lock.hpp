@@ -11,7 +11,7 @@ class fiber_mutex
 {
 public:
 	fiber_mutex(bool thread_safe = false, unsigned int delay = 100,
-		bool use_atomic_lock = true);
+		bool use_atomic_lock = false);
 	~fiber_mutex(void);
 
 	bool lock(void);
@@ -21,6 +21,7 @@ public:
 private:
 	unsigned long tid_;
 	atomic_long*  atomic_lock_;
+	atomic_long   xx_;
 	thread_mutex* thread_lock_;
 	ACL_FIBER_MUTEX* lock_;
 	unsigned int delay_;
