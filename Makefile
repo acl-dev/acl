@@ -8,12 +8,11 @@ ARFL      = rv
 RANLIB    = ${ENV_RANLIB}
 
 #OSNAME   = $(shell uname -sm)
-#OSTYPE   = $(shell uname -p)
-OSNAME    = $(shell uname -a)
-OSTYPE    = $(shell uname -a)
+OSNAME    = $(shell uname -s)
+OSTYPE    = $(shell uname -m)
 
 DESTDIR   =
-PREFIX    = /usr
+PREFIX    = usr
 BIN_PATH  = $(DESTDIR)/$(PREFIX)/bin/
 LIB_ACL   = $(DESTDIR)/$(PREFIX)/lib
 INC_ACL   = $(DESTDIR)/$(PREFIX)/include/acl-lib
@@ -79,7 +78,7 @@ endif
 ##############################################################################
 
 .PHONY = check help all_lib all samples all clean install uninstall uninstall_all build_one
-VERSION = 3.3.0
+VERSION = 3.3.1.rc1
 
 default: build_one
 help h:
@@ -98,6 +97,7 @@ all_lib:
 #	@(cd lib_acl_cpp; make pch)
 	@(cd lib_acl_cpp; make $(MAKE_ARGS))
 	@(cd lib_rpc; make $(MAKE_ARGS))
+	@if test "$(OSNAME)" = "Linux"; then cd lib_fiber; make; fi
 all_samples: all_lib
 	@(cd unit_test; make $(MAKE_ARGS))
 	@(cd lib_acl/samples; make)
@@ -131,26 +131,36 @@ packinstall:
 	$(shell mkdir -p $(INC_ACL)/acl)
 	$(shell mkdir -p $(INC_ACL)/acl_cpp)
 	$(shell mkdir -p $(INC_ACL)/protocol)
-	$(shell mkdir -p $(INC_ACL)/fiber)
-	$(shell mkdir -p $(BIN_PATH)/)
-	$(shell mkdir -p $(LIB_ACL)/)
-	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master/)
+	$(shell mkdir -p $(BIN_PATH))
+	$(shell mkdir -p $(LIB_ACL))
+	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master)
 	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
 	$(shell mkdir -p ./dist/master/bin/$(RPATH))
 	@(cd app/master/daemon; make install)
 	@(cd app/master/tools/master_ctld; make install)
 	@(cd lib_fiber; make)
-	cp -f app/master/daemon/acl_master $(BIN_PATH)
+	@echo "copying app/master/daemon/acl_master $(BIN_PATH)"
+	@cp -f app/master/daemon/acl_master $(BIN_PATH)
 	(cd dist/master && ./setup.sh $(DESTDIR) /opt/soft/acl-master)
-	cp -Rf lib_acl/include/* $(INC_ACL)/acl/
-	cp -Rf lib_acl_cpp/include/acl_cpp/* $(INC_ACL)/acl_cpp/
-	cp -Rf lib_protocol/include/* $(INC_ACL)/protocol/
-	cp -f lib_fiber/c/include/fiber/* $(INC_ACL)/fiber/
-	cp -f lib_fiber/cpp/include/fiber/* $(INC_ACL)/fiber/
-	cp -f libacl_all.a $(LIB_ACL)/libacl_all.a
-	cp -f lib_fiber/lib/libfiber.a $(LIB_ACL)/libfiber.a
-	cp -f lib_fiber/lib/libfiber_cpp.a $(LIB_ACL)/libfiber_cpp.a
-#	cp -f app/master/daemon/acl_master ./dist/master/libexec/$(RPATH)/
+	@echo "copying lib_acl/include/* $(INC_ACL)/acl/"
+	@cp -Rf lib_acl/include/* $(INC_ACL)/acl/
+	@echo "copying lib_acl_cpp/include/acl_cpp/* $(INC_ACL)/acl_cpp/"
+	@cp -Rf lib_acl_cpp/include/acl_cpp/* $(INC_ACL)/acl_cpp/
+	@echo "copying lib_protocol/include/* $(INC_ACL)/protocol/"
+	@cp -Rf lib_protocol/include/* $(INC_ACL)/protocol/
+	@echo "copying libacl_all.a $(LIB_ACL)/libacl_all.a";
+	@cp -f libacl_all.a $(LIB_ACL)/libacl_all.a;
+	@if test "$(OSNAME)" = "Linux"; then \
+		$(shell mkdir -p $(INC_ACL)/fiber) \
+		echo "copying lib_fiber/c/include/fiber/* $(INC_ACL)/fiber/"; \
+		cp -f lib_fiber/c/include/fiber/* $(INC_ACL)/fiber/; \
+		echo "copying lib_fiber/cpp/include/fiber/* $(INC_ACL)/fiber/"; \
+		cp -f lib_fiber/cpp/include/fiber/* $(INC_ACL)/fiber/; \
+		echo "copying lib_fiber/lib/libfiber.a $(LIB_ACL)/libfiber.a"; \
+		cp -f lib_fiber/lib/libfiber.a $(LIB_ACL)/libfiber.a; \
+		echo "copying lib_fiber/lib/libfiber_cpp.a $(LIB_ACL)/libfiber_cpp.a"; \
+		cp -f lib_fiber/lib/libfiber_cpp.a $(LIB_ACL)/libfiber_cpp.a; \
+	fi
 
 install:
 	@(echo "")

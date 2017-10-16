@@ -170,9 +170,15 @@ create_all_path()
 
 copy_all_file()
 {
-	copy_file a+x,go+rx bin/$RPATH $BIN_PATH
-	copy_file a+x,go+rx sbin/$RPATH $SBIN_PATH
-	copy_file a+x,go+rx libexec/$RPATH $LIBEXEC_PATH
+	test -d bin/$RPATH && {
+		copy_file a+x,go+rx bin/$RPATH $BIN_PATH
+	}
+	test -d sbin/$RPATH && {
+		copy_file a+x,go+rx sbin/$RPATH $SBIN_PATH
+	}
+	test -d libexec/$RPATH && {
+		copy_file a+x,go+rx libexec/$RPATH $LIBEXEC_PATH
+	}
 	install_file a+x,go-wrx sh $SH_PATH
 	install_file a+x,go-wrx conf $CONF_PATH
 	install_file a+x,go-wrx conf/service $SERVICE_PATH

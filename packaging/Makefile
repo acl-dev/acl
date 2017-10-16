@@ -14,7 +14,7 @@ rpm: tar
 	@rpmbuild --define "_topdir ${PWD}" --define "_sourcedir ${PWD}" --define "_rpmdir ${PWD}" -bb $(PKG_NAME).spec
 	@echo Binary PRM for $(PKG_NAME) has been created under ${PWD}/`rpm --eval '%{_arch}'`
 
-clean:
+clean cl:
 	@rm -rf $(PKG_NAME)-$(PKG_VERSION)
 	@rm -rf $(PKG_NAME)-$(PKG_VERSION).tar.gz
 	@rm -rf BUILD BUILDROOT SRPMS SPECS `rpm --eval '%{_arch}'`
