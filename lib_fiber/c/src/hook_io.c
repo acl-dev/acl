@@ -6,6 +6,7 @@
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/sendfile.h>
 
 #define __USE_GNU
 #include <dlfcn.h>
@@ -36,6 +37,7 @@ typedef ssize_t (*send_fn)(int, const void *, size_t, int);
 typedef ssize_t (*sendto_fn)(int, const void *, size_t, int,
 	const struct sockaddr *, socklen_t);
 typedef ssize_t (*sendmsg_fn)(int, const struct msghdr *, int);
+typedef ssize_t (*sendfile_fn)(int, int, off_t*, size_t);
 
 static sleep_fn    __sys_sleep    = NULL;
 static pipe_fn     __sys_pipe     = NULL;
@@ -60,6 +62,8 @@ static writev_fn   __sys_writev   = NULL;
 static send_fn     __sys_send     = NULL;
 static sendto_fn   __sys_sendto   = NULL;
 static sendmsg_fn  __sys_sendmsg  = NULL;
+
+static sendfile_fn __sys_sendfile = NULL;
 
 void hook_io(void)
 {
@@ -133,6 +137,9 @@ void hook_io(void)
 
 	__sys_sendmsg  = (sendmsg_fn) dlsym(RTLD_NEXT, "sendmsg");
 	acl_assert(__sys_sendmsg);
+
+	__sys_sendfile = (sendfile_fn) dlsym(RTLD_NEXT, "sendfile");
+	acl_assert(__sys_sendfile);
 
 	(void) acl_pthread_mutex_unlock(&__lock);
 }
@@ -1042,3 +1049,17 @@ ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags)
 
 #endif
 /****************************************************************************/
+
+ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
+{
+	int ret;
+
+	if (__sys_sendfile == NULL)
+		hook_io();
+	if (!acl_var_hook_sys_api) 
+		return __sys_sendfile(out_fd, in_fd, offset, count);
+	ret = __sys_sendfile(out_fd, in_fd, offset, count);
+	if (ret < 0)
+		fiber_save_errno();
+	return ret;
+}
