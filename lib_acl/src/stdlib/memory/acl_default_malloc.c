@@ -126,7 +126,7 @@ static char empty_string[] = "";
 } while (0)
 #endif  /* ACL_WINDOWS */
 
-#define DEBUG_MEM
+/* #define DEBUG_MEM */
 #ifdef	DEBUG_MEM
 static __thread int __nmalloc   = 0;
 static __thread int __ncalloc   = 0;
