@@ -153,6 +153,20 @@ int *__errno_location(void)
 		return &__thread_fiber->original.errnum;
 }
 
+int acl_fiber_sys_errno(void)
+{
+	if (__sys_errno == NULL)
+		fiber_init();
+	return *__sys_errno();
+}
+
+void acl_fiber_sys_errno_set(int errnum)
+{
+	if (__sys_errno == NULL)
+		fiber_init();
+	*__sys_errno() = errnum;
+}
+
 int fcntl(int fd, int cmd, ...)
 {
 	long arg;

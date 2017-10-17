@@ -73,6 +73,18 @@ void acl_fiber_set_errno(ACL_FIBER* fiber, int errnum);
 int acl_fiber_errno(ACL_FIBER* fiber);
 
 /**
+ * 获得当前系统级的 errno 号
+ * @return {int}
+ */
+int acl_fiber_sys_errno(void);
+
+/**
+ * 设置当前系统的 errno 号
+ * @param errnum {int}
+ */
+void acl_fiber_sys_errno_set(int errnum);
+
+/**
  * 是否保持所指定协程的错误号，当设置为“保持”后，则该协程仅保持当前状态下的
  * 错误号，之后该协程的错误号 errno 将不再改变，走到再次调用本函数取消保持
  * @param fiber {ACL_FIBER*} 指定的协程对象，为 NULL 则使用当前运行的协程

@@ -1,4 +1,9 @@
 
+69) 2017.10.17
+69.1) feature: 增加 acl_fiber_sys_errno/acl_fiber_sys_errno_set/
+acl::fiber::get_sys_errno/acl::fiber_set_sys_errno API 可用于获得/设置当前线程
+的系统的 errno
+
 68) 2017.10.16
 68.1) feature: hook sendfile API
 

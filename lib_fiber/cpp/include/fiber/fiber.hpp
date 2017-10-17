@@ -121,6 +121,18 @@ public:
 	 */
 	static void hook_api(bool on);
 
+	/**
+	 * 获得当前系统级错误号
+	 * @return {int}
+	 */
+	static int  get_sys_errno(void);
+
+	/**
+	 * 设置当前系统级错误号
+	 * @param errnum {int}
+	 */
+	static void set_sys_errno(int errnum);
+
 public:
 	/**
 	 * 返回本协程对象对应的 C 语言的协程对象

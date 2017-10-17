@@ -139,6 +139,16 @@ void fiber::schedule_stop(void)
 	acl_fiber_schedule_stop();
 }
 
+int fiber::get_sys_errno(void)
+{
+	return acl_fiber_sys_errno();
+}
+
+void fiber::set_sys_errno(int errnum)
+{
+	acl_fiber_sys_errno_set(errnum);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 fiber_timer::fiber_timer(void)
