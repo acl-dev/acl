@@ -91,9 +91,17 @@ struct EVENT {
 	FIRED_EVENT  *fired;
 	DEFER_DELETE *r_defers;
 	DEFER_DELETE *w_defers;
-	ACL_RING poll_list;
-	ACL_RING epoll_list;
-//	ACL_RING_ITER iter;
+
+#ifdef	USE_RING		// xxx: some bugs ?
+	ACL_RING   poll_list;
+	ACL_RING   epoll_list;
+#elif	defined(USE_STACK)
+	ACL_STACK *poll_list;
+	ACL_STACK *epoll_list;
+#else
+	ACL_FIFO  *poll_list;
+	ACL_FIFO  *epoll_list;
+#endif
 
 	const char *(*name)(void);
 	int  (*handle)(EVENT *);

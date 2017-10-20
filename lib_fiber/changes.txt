@@ -1,4 +1,7 @@
 
+70) 2017.10.20
+70.1) feature: EVENT::poll_list, epoll_list 可以采用 FIFO 或 STACK
+
 69) 2017.10.17
 69.1) feature: 增加 acl_fiber_sys_errno/acl_fiber_sys_errno_set/
 acl::fiber::get_sys_errno/acl::fiber_set_sys_errno API 可用于获得/设置当前线程

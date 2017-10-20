@@ -32,8 +32,17 @@ EVENT *event_create(int size)
 	ev->maxfd    = -1;
 	ev->r_ndefer = 0;
 	ev->w_ndefer = 0;
+
+#ifdef	USE_RING
 	acl_ring_init(&ev->poll_list);
 	acl_ring_init(&ev->epoll_list);
+#elif	defined(USE_STACK)
+	ev->poll_list  = acl_stack_create(100);
+	ev->epoll_list = acl_stack_create(100);
+#else
+	ev->poll_list  = acl_fifo_new();
+	ev->epoll_list = acl_fifo_new();
+#endif
 
 	/* Events with mask == AE_NONE are not set. So let's initialize the
 	 * vector with it.
@@ -70,6 +79,14 @@ void event_free(EVENT *ev)
 	FIRED_EVENT  *fired    = ev->fired;
 	DEFER_DELETE *r_defers = ev->r_defers;
 	DEFER_DELETE *w_defers = ev->w_defers;
+
+#if	defined(USE_STACK)
+	acl_stack_destroy(ev->poll_list, NULL);
+	acl_stack_destroy(ev->epoll_list, NULL);
+#elif	!defined(USE_RING)
+	acl_fifo_free(ev->poll_list, NULL);
+	acl_fifo_free(ev->epoll_list, NULL);
+#endif
 
 	ev->free(ev);
 
@@ -278,7 +295,7 @@ static void __event_del(EVENT *ev, int fd, int mask)
 
 	fe = &ev->events[fd];
 
-	if (fe->mask == EVENT_NONE) {
+	if (fe->mask == EVENT_NONE || mask == EVENT_ERROR) {
 		fe->mask_fired = EVENT_NONE;
 		fe->r_defer    = NULL;
 		fe->w_defer    = NULL;
@@ -428,7 +445,6 @@ int event_process(EVENT *ev, int timeout)
 	int processed = 0, numevents, j;
 	int mask, fd, rfired;
 	FILE_EVENT *fe;
-	ACL_RING *head;
 #ifdef	DEL_DELAY
 	int ndefer;
 #endif
@@ -495,20 +511,68 @@ int event_process(EVENT *ev, int timeout)
 		processed++;
 	}
 
+#ifdef	USE_RING
+
 #define TO_APPL	acl_ring_to_appl
 
-	while ((head = acl_ring_pop_head(&ev->poll_list))) {
-		POLL_EVENT *pe = TO_APPL(head, POLL_EVENT, me);
+	while (1) {
+		POLL_EVENT *pe;
+		ACL_RING *head = acl_ring_pop_head(&ev->poll_list);
+		if (head == NULL)
+			break;
+
+		pe = TO_APPL(head, POLL_EVENT, me);
 		pe->proc(ev, pe);
 		processed++;
 	}
 
-	while ((head = acl_ring_pop_head(&ev->epoll_list))) {
-		EPOLL_EVENT *ee = TO_APPL(head, EPOLL_EVENT, me);
+	while (1) {
+		EPOLL_EVENT *ee;
+		ACL_RING *head = acl_ring_pop_head(&ev->epoll_list);
+		if (head == NULL)
+			break;
+
+		ee = TO_APPL(head, EPOLL_EVENT, me);
+		ee->proc(ev, ee);
+		processed++;
+	}
+#elif	defined(USE_STACK)
+	while (1) {
+		POLL_EVENT *pe = acl_stack_pop(ev->poll_list);
+		if (pe == NULL)
+			break;
+
+		pe->proc(ev, pe);
+		processed++;
+	}
+
+	while (1) {
+		EPOLL_EVENT *ee = acl_stack_pop(ev->epoll_list);
+		if (ee == NULL)
+			break;
 
 		ee->proc(ev, ee);
 		processed++;
 	}
+#else
+	while (1) {
+		POLL_EVENT *pe = acl_fifo_pop(ev->poll_list);
+		if (pe == NULL)
+			break;
+
+		pe->proc(ev, pe);
+		processed++;
+	}
+
+	while (1) {
+		EPOLL_EVENT *ee = acl_fifo_pop(ev->epoll_list);
+		if (ee == NULL)
+			break;
+
+		ee->proc(ev, ee);
+		processed++;
+	}
+#endif
 
 	/* return the number of processed file/time events */
 	return processed;

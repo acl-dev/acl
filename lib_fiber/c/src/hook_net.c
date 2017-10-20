@@ -419,11 +419,24 @@ static void poll_events_del(EVENT *ev, POLL_EVENT *pe)
 
 void poll_fibers_free(void)
 {
-	ACL_RING *head;
 	EVENT *ev = fiber_io_event();
+
+#ifdef	USE_RING
+	ACL_RING *head;
 
 	while ((head = acl_ring_pop_head(&ev->poll_list))) {
 		POLL_EVENT *pe = TO_APPL(head, POLL_EVENT, me);
+#elif	defined(USE_STACK)
+	while (1) {
+		POLL_EVENT *pe = acl_stack_pop(ev->poll_list);
+		if (pe == NULL)
+			break;
+#else
+	while (1) {
+		POLL_EVENT *pe = acl_fifo_pop(ev->poll_list);
+		if (pe == NULL)
+			break;
+#endif
 		poll_events_del(ev, pe);
 		fiber_free(pe->fiber);
 	}
@@ -450,7 +463,10 @@ static void pollfd_callback(EVENT *ev, int fd, void *ctx, int mask)
 		n |= 1 << 1;
 	}
 
+#ifdef	USE_RING
 	assert(acl_ring_size(&ev->poll_list) > 0);
+#endif
+
 	if (n > 0) {
 		acl_assert(pe);
 		pe->nready++;
@@ -461,7 +477,14 @@ static void event_poll_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 {
 	int i;
 
+#ifdef	USE_RING
 	acl_ring_prepend(&ev->poll_list, &pe->me);
+#elif	defined(USE_STACK)
+	acl_stack_append(ev->poll_list, pe);
+#else
+	acl_fifo_push_back(ev->poll_list, pe);
+#endif
+
 	pe->nready = 0;
 
 	for (i = 0; i < pe->nfds; i++) {
@@ -551,7 +574,13 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 			break;
 		}
 
+#ifdef	USE_RING
 		if (acl_ring_size(&ev->poll_list) == 0)
+#elif	defined(USE_STACK)
+		if (acl_stack_size(ev->poll_list) == 0)
+#else
+		if (acl_fifo_size(ev->poll_list) == 0)
+#endif
 			ev->timeout = -1;
 
 		if (pe.nready != 0 || timeout == 0)
@@ -660,11 +689,24 @@ static void epoll_events_del(EVENT *ev, EPOLL_EVENT *ee)
 
 void epoll_fibers_free(void)
 {
-	ACL_RING *head;
 	EVENT *ev = fiber_io_event();
+
+#ifdef	USE_RING
+	ACL_RING *head;
 
 	while ((head = acl_ring_pop_head(&ev->epoll_list))) {
 		EPOLL_EVENT *ee = TO_APPL(head, EPOLL_EVENT, me);
+#elif	defined(USE_STACK)
+	while (1) {
+		EPOLL_EVENT *ee = acl_stack_pop(ev->epoll_list);
+		if (ee == NULL)
+			break;
+#else
+	while (1) {
+		EPOLL_EVENT *ee = acl_fifo_pop(ev->epoll_list);
+		if (ee == NULL)
+			break;
+#endif
 		epoll_events_del(ev, ee);
 		fiber_free(ee->fiber);
 	}
@@ -984,7 +1026,14 @@ static void epoll_callback(EVENT *ev acl_unused, EPOLL_EVENT *ee)
 
 static void event_epoll_set(EVENT *ev, EPOLL_EVENT *ee, int timeout)
 {
+#ifdef	USE_RING
 	acl_ring_prepend(&ev->epoll_list, &ee->me);
+#elif	defined(USE_STACK)
+	acl_stack_append(ev->epoll_list, ee);
+#else
+	acl_fifo_push_back(ev->epoll_list, ee);
+#endif
+
 	ee->nready = 0;
 
 	if (timeout >= 0 && (ev->timeout < 0 || timeout < ev->timeout))
