@@ -1088,6 +1088,7 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
 #ifdef  __USE_LARGEFILE64
 ssize_t sendfile64(int out_fd, int in_fd, off64_t *offset, size_t count)
 {
+#if 0
 	int ret;
 
 	if (__sys_sendfile64 == NULL)
@@ -1098,5 +1099,36 @@ ssize_t sendfile64(int out_fd, int in_fd, off64_t *offset, size_t count)
 	if (ret < 0)
 		fiber_save_errno();
 	return ret;
+#else
+	ACL_FIBER *me;
+
+	if (__sys_sendfile64 == NULL)
+		hook_io();
+
+	while (1) {
+		ssize_t n = __sys_sendfile64(out_fd, in_fd, offset, count);
+		if (!acl_var_hook_sys_api || n >= 0)
+			return n;
+
+		fiber_save_errno();
+
+#if EAGAIN == EWOULDBLOCK
+		if (errno != EAGAIN)
+#else
+		if (errno != EAGAIN && errno != EWOULDBLOCK)
+#endif
+			return -1;
+
+		fiber_wait_write(out_fd);
+
+		me = acl_fiber_running();
+		if (acl_fiber_killed(me)) {
+			acl_msg_info("%s(%d), %s: fiber-%u is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(me));
+			return -1;
+		}
+	}
+#endif
 }
 #endif
