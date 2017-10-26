@@ -125,11 +125,18 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 		break;
 	case ACL_MASTER_STAT_SIGHUP_OK:
 	case ACL_MASTER_STAT_SIGHUP_ERR:
-		if (proc->signal_callback) {
-			proc->signal_callback(proc, SIGHUP,
-				stat_buf.status, proc->signal_ctx);
-			proc->signal_callback = NULL;
-			proc->signal_ctx      = NULL;
+		if (proc->callback) {
+			proc->callback(proc, stat_buf.status, proc->ctx);
+			proc->callback = NULL;
+			proc->ctx      = NULL;
+		}
+		break;
+	case ACL_MASTER_STAT_START_OK:
+	case ACL_MASTER_STAT_START_ERR:
+		if (proc->callback) {
+			proc->callback(proc, stat_buf.status, proc->ctx);
+			proc->callback = NULL;
+			proc->ctx      = NULL;
 		}
 		break;
 	default:

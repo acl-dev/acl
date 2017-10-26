@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+typedef struct ACL_MASTER_PROC ACL_MASTER_PROC;
+typedef void (*STATUS_CALLBACK)(ACL_MASTER_PROC*, int, void*);
+
 typedef struct ACL_MASTER_NV {
 	char *name;
 	char *value;
@@ -52,6 +55,9 @@ typedef struct ACL_MASTER_SERV {
 	ACL_VSTREAM  *status_reader;	/* status stream */
 	ACL_RING      children;		/* linkage of children */
 	struct ACL_MASTER_SERV *next;	/* linkage of serv */
+
+	STATUS_CALLBACK  callback;
+	void            *ctx;
 } ACL_MASTER_SERV;
 
 #define ACL_MASTER_CHILDREN_SIZE(s)     acl_ring_size(&s->children)
@@ -97,8 +103,6 @@ typedef struct ACL_MASTER_SERV {
   * Structure of child process.
   */
 typedef int ACL_MASTER_PID;		/* pid is key into binhash table */
-typedef struct ACL_MASTER_PROC ACL_MASTER_PROC;
-typedef void (*SIGNAL_CALLBACK)(ACL_MASTER_PROC*, int, int, void*);
 
 typedef struct ACL_MASTER_PROC {
 	ACL_RING me;			/* linked in serv's children */
@@ -108,8 +112,8 @@ typedef struct ACL_MASTER_PROC {
 	int      use_count;		/* number of service requests */
 	ACL_MASTER_PID   pid;		/* child process id */
 	ACL_MASTER_SERV *serv;		/* parent linkage */
-	SIGNAL_CALLBACK  signal_callback;
-	void            *signal_ctx;
+	STATUS_CALLBACK  callback;
+	void            *ctx;
 } ACL_MASTER_PROC;
 
  /*
@@ -197,9 +201,9 @@ extern void acl_master_reap_child(void);
 extern void acl_master_kill_children(ACL_MASTER_SERV *);
 extern void acl_master_delete_all_children(void);
 extern void acl_master_signal_children(ACL_MASTER_SERV *serv, int signum,
-		int *nchildren, int *nsignaled, SIGNAL_CALLBACK, void*);
+		int *nchildren, int *nsignaled);
 extern void acl_master_sighup_children(ACL_MASTER_SERV *serv, int *nchildren,
-		int *nsignaled, SIGNAL_CALLBACK callback, void *ctx);
+		int *nsignaled);
 
  /*
   * master_warning.c

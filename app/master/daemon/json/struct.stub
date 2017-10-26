@@ -95,13 +95,30 @@ struct start_req_data_t
 
 struct start_req_t : req_t
 {
+	// Gson@optional
+	long long timeout;
 	std::vector<start_req_data_t> data;
 
+	start_req_t(void) : timeout(-1) {}
 };
 
 struct start_res_data_t
 {
+	start_res_data_t(void)
+	{
+		status = 0;
+		proc_count    = 0;
+		proc_signaled = 0;
+		proc_ok       = 0;
+		proc_err      = 0;
+	}
+
 	int status;
+	int proc_count;
+	int proc_signaled;
+	int proc_ok;
+	int proc_err;
+
 	acl::string name;
 	// Gson@optional
 	acl::string path;
@@ -216,6 +233,7 @@ struct reload_res_data_t
 	int proc_signaled;
 	int proc_ok;
 	int proc_err;
+
 	acl::string path;
 };
 

@@ -49,6 +49,9 @@ typedef struct ACL_MASTER_STATUS {
 #define ACL_MASTER_STAT_AVAIL		1	/* this process is idle */
 #define ACL_MASTER_STAT_SIGHUP_OK	2
 #define ACL_MASTER_STAT_SIGHUP_ERR	3
+#define ACL_MASTER_STAT_START_OK	4
+#define ACL_MASTER_STAT_START_ERR	5
+
 int acl_master_notify(int, unsigned, int);	/* encapsulate status msg */
 
  /*

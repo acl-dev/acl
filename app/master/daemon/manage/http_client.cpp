@@ -224,8 +224,8 @@ bool http_client::handle_stop(void)
 
 bool http_client::handle_start(void)
 {
-	service_start service(*this);
-	return service.run(json_);
+	service_start* service = new service_start(*this);
+	return service->run(json_);
 }
 
 bool http_client::handle_restart(void)
@@ -237,8 +237,7 @@ bool http_client::handle_restart(void)
 bool http_client::handle_reload(void)
 {
 	service_reload* service = new service_reload(*this);
-	service->run(json_);
-	return true;
+	return service->run(json_);
 }
 
 void http_client::on_finish(void)

@@ -20,13 +20,15 @@ extern "C" {
 #include "master.h"
 
 extern ACL_MASTER_SERV *acl_master_lookup(const char *path);
-extern ACL_MASTER_SERV *acl_master_start(const char *path);
-extern ACL_MASTER_SERV *acl_master_restart(const char *path);
+extern ACL_MASTER_SERV *acl_master_start(const char *path, int *nchilden,
+		int *nsignaled, STATUS_CALLBACK callback, void *ctx);
+extern ACL_MASTER_SERV *acl_master_restart(const char *path, int *nchilden,
+		int *nsignaled, STATUS_CALLBACK callback, void *ctx);
 extern int acl_master_kill(const char *path);
 extern int acl_master_stop(const char *path);
 extern int acl_master_reload(const char *path, int *nchildren, int *nsignaled,
-		SIGNAL_CALLBACK callback, void *ctx);
-extern void acl_master_reload_clean(const char *path);
+		STATUS_CALLBACK callback, void *ctx);
+extern void acl_master_callback_clean(const char *path);
 
 
 #ifdef __cplusplus

@@ -24,6 +24,17 @@
 
 #define SAME	!strcmp
 
+static void setup_callback(const char *service, ACL_MASTER_SERV *serv,
+	STATUS_CALLBACK callback, void *ctx)
+{
+	if (serv->callback == NULL) {
+		serv->callback = callback;
+		serv->ctx      = ctx;
+	} else if (callback != NULL)
+		acl_msg_warn("%s(%d), %s: another callback is set!",
+			__FILE__, __LINE__, service);
+}
+
 ACL_MASTER_SERV *acl_master_lookup(const char *path)
 {
 	ACL_MASTER_SERV *entry = acl_master_ent_load(path), *serv;
@@ -39,7 +50,8 @@ ACL_MASTER_SERV *acl_master_lookup(const char *path)
 	return serv;
 }
 
-ACL_MASTER_SERV *acl_master_start(const char *path)
+ACL_MASTER_SERV *acl_master_start(const char *path, int *nchilden,
+	int *nsignaled, STATUS_CALLBACK callback, void *ctx)
 {
 	ACL_MASTER_SERV *entry = acl_master_ent_load(path), *serv;
 
@@ -58,21 +70,31 @@ ACL_MASTER_SERV *acl_master_start(const char *path)
 		return NULL;
 	}
 	
+	if (nchilden)
+		*nchilden = entry->prefork_proc;
+	if (nsignaled)
+		*nsignaled = entry->prefork_proc;
+
+	setup_callback(__FUNCTION__, serv, callback, ctx);
 	entry->next = acl_var_master_head;
 	acl_var_master_head = entry;
+
 	acl_master_service_start(entry);
+
 	return entry;
 }
 
-ACL_MASTER_SERV *acl_master_restart(const char *path)
+ACL_MASTER_SERV *acl_master_restart(const char *path, int *nchilden,
+	int *nsignaled, STATUS_CALLBACK callback, void *ctx)
 {
         ACL_MASTER_SERV *serv = acl_master_lookup(path);
 
-        if (serv == NULL)
-	        return acl_master_start(path);
+        if (serv != NULL) {
+		acl_master_service_restart(serv);
+		return serv;
+	}
 
-        acl_master_service_restart(serv);
-        return serv;
+        return acl_master_start(path, nchilden, nsignaled, callback, ctx);
 }
 
 /* kill processes of service according the master_service name in configure */
@@ -134,7 +156,7 @@ int     acl_master_stop(const char *path)
 }
 
 int     acl_master_reload(const char *path, int *nchilden, int *nsignaled,
-	SIGNAL_CALLBACK callback, void *ctx)
+	STATUS_CALLBACK callback, void *ctx)
 {
 	ACL_MASTER_SERV *serv = acl_master_lookup(path);
 
@@ -144,11 +166,13 @@ int     acl_master_reload(const char *path, int *nchilden, int *nsignaled,
 		return -1;
 	}
 
-	acl_master_sighup_children(serv, nchilden, nsignaled, callback, ctx);
+	setup_callback(__FUNCTION__, serv, callback, ctx);
+	acl_master_sighup_children(serv, nchilden, nsignaled);
+
 	return 0;
 }
 
-void    acl_master_reload_clean(const char *path)
+void    acl_master_callback_clean(const char *path)
 {
 	ACL_MASTER_SERV *serv = acl_master_lookup(path);
 	if (serv == NULL)
@@ -159,7 +183,10 @@ void    acl_master_reload_clean(const char *path)
 	acl_ring_foreach(iter, &serv->children) {
 		proc = acl_ring_to_appl(iter.ptr, ACL_MASTER_PROC, me);
 		acl_assert(proc);
-		proc->signal_callback = NULL;
-		proc->signal_ctx      = NULL;
+		proc->callback = NULL;
+		proc->ctx      = NULL;
 	}
+
+	serv->callback = NULL;
+	serv->ctx      = NULL;
 }

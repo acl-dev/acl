@@ -42,12 +42,11 @@ private:
 	bool reload_one(const char* path, reload_res_data_t& data,
 		bool sync_wait);
 
-	void timeout_callback(void);
 	void reload_callback(ACL_MASTER_PROC* proc, int status);
+	void timeout_callback(void);
 	void reload_finish(void);
-	void clean_all(void);
 
 	static void service_reload_timer(int, ACL_EVENT* event, void* ctx);
-	static void service_reload_callback(ACL_MASTER_PROC* proc, int sig,
+	static void service_reload_callback(ACL_MASTER_PROC* proc,
 		int status, void* ctx);
 };

@@ -15,9 +15,8 @@
 #include "master/master_params.h"
 #include "master/master_api.h"
 #include "manage/http_client.h"
+#include "type_defs.h"
 #include "service_reload.h"
-
-#define STATUS_TIMEOUT	503
 
 service_reload::service_reload(http_client& client)
 : client_(client)
@@ -27,6 +26,65 @@ service_reload::service_reload(http_client& client)
 {
 	res_.status = 200;
 	timeout_ = (long long) acl_var_master_reload_timeo * 1000;
+}
+
+bool service_reload::run(acl::json& json)
+{
+	reload_req_t req;
+
+	//logger(">>>%s<<<", json_.to_string().c_str());
+	if (deserialize<reload_req_t>(json, req) == false) {
+		reload_res_t res;
+		res.status = 400;
+		res.msg    = "invalid json";
+		client_.reply<reload_res_t>(res.status, res);
+
+		delete this;
+		return false;
+	}
+
+	return handle(req);
+}
+
+bool service_reload::handle(const reload_req_t& req)
+{
+	bool waiting;
+
+	if (req.timeout > 0) {
+		timeout_ = req.timeout * 1000;
+		waiting  = true;
+	} else {
+		timeout_ = 0;
+		waiting  = false;
+	}
+
+	// logger(">>>>timeout_: %lld, %lld<<<", timeout_, req.timeout);
+
+	if (waiting)
+		acl_event_request_timer(acl_var_master_global_event,
+			service_reload_timer, this, timeout_, 0);
+
+	for (std::vector<reload_req_data_t>::const_iterator
+		cit = req.data.begin(); cit != req.data.end(); ++cit) {
+
+		reload_res_data_t data;
+
+		if (reload_one((*cit).path.c_str(), data, waiting)) {
+			proc_count_    += data.proc_count;
+			proc_signaled_ += data.proc_signaled;
+			servers_[data.path] = data;
+			if (!waiting) {
+				data.status = 200;
+				res_.data.push_back(data);
+			}
+		} else
+			res_.data.push_back(data);
+	}
+
+	if (!waiting)
+		reload_finish();
+
+	return true;
 }
 
 bool service_reload::reload_one(const char* path, reload_res_data_t& data,
@@ -51,82 +109,17 @@ bool service_reload::reload_one(const char* path, reload_res_data_t& data,
 	return true;
 }
 
-bool service_reload::run(acl::json& json)
-{
-	reload_req_t req;
-
-	reload_res_t res;
-	res.status = 200;
-	res.msg    = "ok";
-
-	//logger(">>>%s<<<", json_.to_string().c_str());
-	if (deserialize<reload_req_t>(json, req) == false) {
-		res.status = 400;
-		res.msg    = "invalid json";
-		client_.reply<reload_res_t>(res.status, res);
-		return false;
-	}
-
-	return handle(req);
-}
-
-bool service_reload::handle(const reload_req_t& req)
-{
-	size_t n = 0;
-
-	bool waiting;
-
-	if (req.timeout > 0) {
-		timeout_ = req.timeout * 1000;
-		waiting  = true;
-	} else {
-		timeout_ = 0;
-		waiting  = false;
-	}
-
-	// logger(">>>>timeout_: %lld, %lld<<<", timeout_, req.timeout);
-
-	if (waiting)
-		acl_event_request_timer(acl_var_master_global_event,
-			service_reload_timer, this, timeout_, 0);
-
-	for (std::vector<reload_req_data_t>::const_iterator
-		cit = req.data.begin(); cit != req.data.end(); ++cit) {
-
-		reload_res_data_t data;
-		if (reload_one((*cit).path.c_str(), data, waiting)) {
-			proc_count_    += data.proc_count;
-			proc_signaled_ += data.proc_signaled;
-			servers_[data.path] = data;
-			if (!waiting) {
-				data.status = 200;
-				res_.data.push_back(data);
-			}
-			n++;
-		} else
-			res_.data.push_back(data);
-	}
-
-	if (!waiting)
-		reload_finish();
-
-	return true;
-}
-
 void service_reload::service_reload_timer(int, ACL_EVENT*, void* ctx)
 {
 	service_reload* reload = (service_reload *) ctx;
 	reload->timeout_callback();
 }
 
-void service_reload::service_reload_callback(ACL_MASTER_PROC* proc, int sig,
+void service_reload::service_reload_callback(ACL_MASTER_PROC* proc,
 	int status, void* ctx)
 {
-	service_reload* reload = (service_reload *) ctx;
-	if (sig != SIGHUP)
-		logger_error("not SIGHUP, invalid signum=%d", sig);
-	else
-		reload->reload_callback(proc, status);
+	service_reload* service = (service_reload *) ctx;
+	service->reload_callback(proc, status);
 }
 
 void service_reload::reload_callback(ACL_MASTER_PROC* proc, int status)
@@ -176,21 +169,17 @@ void service_reload::timeout_callback(void)
 
 void service_reload::reload_finish(void)
 {
-	clean_all();
-	client_.reply<reload_res_t>(res_.status, res_);
-	client_.on_finish();
-
-	delete this;
-}
-
-void service_reload::clean_all(void)
-{
 	acl_event_cancel_timer(acl_var_master_global_event,
 		service_reload_timer, this);
 
 	for (std::map<acl::string, reload_res_data_t>::iterator
 		it = servers_.begin(); it != servers_.end(); ++it) {
 
-		acl_master_reload_clean(it->first.c_str());
+		acl_master_callback_clean(it->first.c_str());
 	}
+
+	client_.reply<reload_res_t>(res_.status, res_);
+	client_.on_finish();
+
+	delete this;
 }

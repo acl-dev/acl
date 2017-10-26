@@ -109,6 +109,10 @@ extern char *acl_var_master_manage_addr;
 #define ACL_DEF_MASTER_RELOAD_TIMEO		5000
 extern int   acl_var_master_reload_timeo;
 
+#define ACL_VAR_MASTER_START_TIMEO		"start_timeout"
+#define ACL_DEF_MASTER_START_TIMEO		5000
+extern int   acl_var_master_start_timeo;
+
 /* every service's configure entry is different*/
 
 #define	ACL_VAR_MASTER_SERV_DISABLE		"master_disable"
