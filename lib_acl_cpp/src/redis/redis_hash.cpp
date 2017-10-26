@@ -63,7 +63,7 @@ bool redis_hash::hmset(const char* key, const std::vector<const char*>& names,
 	acl_assert(names.size() == values.size());
 
 	hash_slot(key);
-	build("HMGET", key, names, values);
+	build("HMSET", key, names, values);
 	return check_status();
 }
 
