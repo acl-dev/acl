@@ -278,7 +278,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 	fdp->flag = EVENT_FDTABLE_FLAG_WRITE | EVENT_FDTABLE_FLAG_EXPT;
 	fp->nrefer++;
 
-	ev.events = EPOLLIN | EPOLLHUP | EPOLLERR;
+	ev.events = EPOLLOUT | EPOLLHUP | EPOLLERR;
 	ev.data.u64 = 0;  /* avoid valgrind warning */
 	ev.data.ptr = fdp;
 
