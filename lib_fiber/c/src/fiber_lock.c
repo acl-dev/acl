@@ -8,6 +8,7 @@ ACL_FIBER_MUTEX *acl_fiber_mutex_create(void)
 		acl_mymalloc(sizeof(ACL_FIBER_MUTEX));
 
 	lk->owner = NULL;
+	acl_ring_init(&lk->me);
 	acl_ring_init(&lk->waiting);
 	return lk;
 }
@@ -19,18 +20,23 @@ void acl_fiber_mutex_free(ACL_FIBER_MUTEX *lk)
 
 static int __lock(ACL_FIBER_MUTEX *lk, int block)
 {
-	ACL_FIBER *curr;
+	ACL_FIBER *curr = acl_fiber_running();
 
 	if (lk->owner == NULL) {
 		lk->owner = acl_fiber_running();
+		acl_ring_prepend(&curr->holding, &lk->me);
 		return 1;
 	}
+
+	// xxx: no support recursion lock
+	assert(lk->owner != curr);
 
 	if (!block)
 		return 0;
 
-	curr = acl_fiber_running();
 	acl_ring_prepend(&lk->waiting, &curr->me);
+	curr->waiting = lk;
+
 	acl_fiber_switch();
 
 	/* if switch to me because other killed me, I should detach myself;
@@ -70,12 +76,16 @@ int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *lk)
 
 void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *lk)
 {
-	ACL_FIBER *ready;
+	ACL_FIBER *ready, *curr = acl_fiber_running();
 	
 	if (lk->owner == NULL)
 		acl_msg_fatal("%s(%d), %s: qunlock: owner NULL",
 			__FILE__, __LINE__, __FUNCTION__);
+	if (lk->owner != curr)
+		acl_msg_fatal("%s(%d), %s: invalid owner=%p, %p",
+			__FILE__, __LINE__, __FUNCTION__, lk->owner, curr);
 
+	acl_ring_detach(&lk->me);
 	ready = FIRST_FIBER(&lk->waiting);
 
 	if ((lk->owner = ready) != NULL) {

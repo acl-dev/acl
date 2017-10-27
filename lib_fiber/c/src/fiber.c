@@ -633,6 +633,9 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	fiber->flag   = 0;
 	fiber->status = FIBER_STATUS_READY;
 
+	fiber->waiting = NULL;
+	acl_ring_init(&fiber->holding);
+
 	carg.p = fiber;
 
 	if (fiber->context == NULL)
@@ -791,6 +794,14 @@ void acl_fiber_switch(void)
 {
 	ACL_FIBER *fiber, *current = __thread_fiber->running;
 	ACL_RING *head;
+	ssize_t left = (char *) &fiber - (char *) current->buff;
+
+	// xxx: sanity checking, just for stack size checking
+	if (left < 1024)
+		acl_msg_fatal("%s(%d), %s: left=%ld, no space to save current"
+			" fiber's stack, current stack=%p, start stack=%p",
+			__FILE__, __LINE__, __FUNCTION__, (long) left,
+			(void *) &fiber, (void *) current->buff);
 
 #ifdef _DEBUG
 	acl_assert(current);

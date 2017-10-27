@@ -36,6 +36,10 @@ struct ACL_FIBER {
 	int            sys;
 	int            signum;
 	unsigned int   flag;
+
+	ACL_RING         holding;
+	ACL_FIBER_MUTEX *waiting;
+
 #define FIBER_F_SAVE_ERRNO	(unsigned) 1 << 0
 #define	FIBER_F_KILLED		(unsigned) 1 << 1
 
@@ -98,6 +102,7 @@ struct ACL_CHANNEL {
 };
 
 struct ACL_FIBER_MUTEX {
+	ACL_RING   me;
 	ACL_FIBER *owner;
 	ACL_RING   waiting;
 };
