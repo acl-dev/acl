@@ -210,7 +210,7 @@ static void master_sigdeath(int sig acl_unused)
 
 /* acl_master_sigsetup - set up signal handlers */
 
-void    acl_master_sigsetup(void)
+void acl_master_sigsetup(void)
 {
 	const char *myname = "acl_master_sigsetup";
 	struct sigaction action;

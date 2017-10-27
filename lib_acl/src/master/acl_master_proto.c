@@ -24,7 +24,7 @@
 
 #include "master/acl_master_proto.h"
 
-int     acl_master_notify(int pid, unsigned generation, int status)
+int acl_master_notify(int pid, unsigned generation, int status)
 {
 	char   *myname = "acl_master_notify";
 	ACL_MASTER_STATUS stat_buf;

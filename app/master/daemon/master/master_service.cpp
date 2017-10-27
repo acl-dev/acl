@@ -15,7 +15,7 @@ ACL_EVENT *acl_var_master_global_event = NULL;
 
 /* acl_master_service_init - init service after loading the main.cf */
 
-void   acl_master_service_init(void)
+void acl_master_service_init(void)
 {
 	const char *myname = "acl_master_service_init";
 
@@ -33,7 +33,7 @@ void   acl_master_service_init(void)
 
 /* acl_master_service_start - activate service */
 
-void    acl_master_service_start(ACL_MASTER_SERV *serv)
+void acl_master_service_start(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "acl_master_service_start";
 
@@ -63,7 +63,7 @@ void    acl_master_service_start(ACL_MASTER_SERV *serv)
 
 /* acl_master_service_kill - deactivate service */
 
-void    acl_master_service_kill(ACL_MASTER_SERV *serv)
+void acl_master_service_kill(ACL_MASTER_SERV *serv)
 {
 	/* set killed flag to avoid prefork process */
 	serv->flags |= ACL_MASTER_FLAG_KILLED;
@@ -81,7 +81,7 @@ void    acl_master_service_kill(ACL_MASTER_SERV *serv)
 }
 
 /* acl_master_service_stop - close IPC with children only */
-void    acl_master_service_stop(ACL_MASTER_SERV *serv)
+void acl_master_service_stop(ACL_MASTER_SERV *serv)
 {
 	/* set STOPPING flag to avoid prefork process */
 	serv->flags |= ACL_MASTER_FLAG_STOPPING;
@@ -97,7 +97,7 @@ void    acl_master_service_stop(ACL_MASTER_SERV *serv)
 
 /* acl_master_restart_service - restart service after configuration reload */
 
-void    acl_master_service_restart(ACL_MASTER_SERV *serv)
+void acl_master_service_restart(ACL_MASTER_SERV *serv)
 {
 	/* Undo some of the things that master_service_start() did. */
 	acl_master_wakeup_cleanup(serv);

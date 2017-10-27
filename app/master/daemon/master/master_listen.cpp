@@ -222,7 +222,7 @@ static void master_listen_fifo(ACL_MASTER_SERV *serv)
 
 /* acl_master_listen_init - enable connection requests */
 
-void    acl_master_listen_init(ACL_MASTER_SERV *serv)
+void acl_master_listen_init(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "acl_master_listen_init";
 
@@ -280,7 +280,7 @@ void    acl_master_listen_init(ACL_MASTER_SERV *serv)
 
 /* acl_master_listen_cleanup - disable connection requests */
 
-void    acl_master_listen_cleanup(ACL_MASTER_SERV *serv)
+void acl_master_listen_cleanup(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "acl_master_listen_cleanup";
 	int     i;

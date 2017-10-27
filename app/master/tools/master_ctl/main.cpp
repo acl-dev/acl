@@ -211,6 +211,7 @@ static bool do_start(const std::vector<acl::string>&,
 
 	start_req_t req;
 	req.cmd = "start";
+	req.timeout = __timeout;
 
 	start_req_data_t req_data;
 	req_data.path = fpath;
@@ -422,6 +423,17 @@ static bool do_server(const std::vector<acl::string>& tokens,
 	return true;
 }
 
+static bool do_timeout(const std::vector<acl::string>& tokens,
+	const char*, const char*)
+{
+	if (tokens.size() >= 2)
+		__timeout = atoll(tokens[1]);
+	else
+		printf("\033[1;34;40musage\033[0m: "
+			"\033[1;33;40mtimeout\033[0m timeout\r\n");
+	return true;
+}
+
 static bool do_verbose(const std::vector<acl::string>&,
 	const char*, const char*)
 {
@@ -443,6 +455,7 @@ static bool do_help(const std::vector<acl::string>&, const char*, const char*)
 	println("stop", "stop one service");
 	println("kill", "kill one service");
 	println("reload", "reload one service");
+	println_underline("timeout", "show one service's running status");
 
 	return true;
 }
@@ -500,6 +513,7 @@ static struct {
 	{ "exit",	'e',	false,	do_quit		},
 	{ "set",	'\0',	true,	do_set		},
 	{ "server",	'\0',	false,	do_server	},
+	{ "timeout",	't',	false,	do_timeout	},
 	{ "verbose",	'v',	false,	do_verbose	},
 
 	{ 0,		0,	false,	0		},

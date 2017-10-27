@@ -112,8 +112,6 @@ typedef struct ACL_MASTER_PROC {
 	int      use_count;		/* number of service requests */
 	ACL_MASTER_PID   pid;		/* child process id */
 	ACL_MASTER_SERV *serv;		/* parent linkage */
-	STATUS_CALLBACK  callback;
-	void            *ctx;
 } ACL_MASTER_PROC;
 
  /*
@@ -201,9 +199,8 @@ extern void acl_master_reap_child(void);
 extern void acl_master_kill_children(ACL_MASTER_SERV *);
 extern void acl_master_delete_all_children(void);
 extern void acl_master_signal_children(ACL_MASTER_SERV *serv, int signum,
-		int *nchildren, int *nsignaled);
-extern void acl_master_sighup_children(ACL_MASTER_SERV *serv, int *nchildren,
 		int *nsignaled);
+extern void acl_master_sighup_children(ACL_MASTER_SERV *serv, int *nsignaled);
 
  /*
   * master_warning.c

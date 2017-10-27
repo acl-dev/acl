@@ -106,7 +106,7 @@ static void master_wakeup_timer_event(int type acl_unused,
 
 /* acl_master_wakeup_init - start automatic service wakeup */
 
-void    acl_master_wakeup_init(ACL_MASTER_SERV *serv)
+void acl_master_wakeup_init(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "acl_master_wakeup_init";
 
@@ -120,7 +120,7 @@ void    acl_master_wakeup_init(ACL_MASTER_SERV *serv)
 
 /* acl_master_wakeup_cleanup - cancel wakeup timer */
 
-void    acl_master_wakeup_cleanup(ACL_MASTER_SERV *serv)
+void acl_master_wakeup_cleanup(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "acl_master_wakeup_cleanup";
 

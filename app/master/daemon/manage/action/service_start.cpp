@@ -170,6 +170,7 @@ void service_start::start_finish(void)
 {
 	acl_event_cancel_timer(acl_var_master_global_event,
 		service_start_timer, this);
+
 	for (std::map<acl::string, start_res_data_t>::iterator
 		it = servers_.begin(); it != servers_.end(); ++it) {
 

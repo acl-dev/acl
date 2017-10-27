@@ -10,6 +10,50 @@
 #include "master_params.h"
 #include "master.h"
 
+typedef struct SERVER_STATUS {
+	int status;
+	int ok;
+	const char *name;
+	const char *info;
+} SERVER_STATUS;
+
+static SERVER_STATUS __server_status[] = {
+	{ ACL_MASTER_STAT_SIGHUP_OK,	1,	"sighup",	"ok"	},
+	{ ACL_MASTER_STAT_SIGHUP_ERR,	0,	"sighup",	"error"	},
+	{ ACL_MASTER_STAT_START_OK,	1,	"start",	"ok"	},
+	{ ACL_MASTER_STAT_START_ERR,	0,	"start",	"error"	},
+	{ -1,				0,	NULL,		NULL	},
+};
+
+static void service_status(ACL_MASTER_PROC *proc, int status)
+{
+	const char *path = proc->serv->path;
+	ACL_MASTER_SERV *serv = proc->serv;
+	SERVER_STATUS *ss = NULL;
+
+	for (int i = 0; __server_status[i].name != NULL; i++) {
+		if (__server_status[i].status == status) {
+			ss = &__server_status[i];
+			break;
+		}
+	}
+
+	if (ss) {
+		acl_msg_info("%s(%d), service=%s, pid=%d, status=%d, %s %s",
+			__FUNCTION__, __LINE__, path, (int) proc->pid,
+			status, ss->name, ss->info);
+
+		if (serv->callback)
+			serv->callback(proc, status, serv->ctx);
+		else
+			acl_msg_info("%s(%d): callback null, service=%s",
+				__FUNCTION__, __LINE__, path);
+	} else
+		acl_msg_warn("%s(%d), service=%s, pid=%d, status=%d, %s, %s",
+			__FUNCTION__, __LINE__, path, (int) proc->pid, status,
+			"unknown", "unknown");
+}
+
 /* master_status_event - status read event handler */
 
 static void master_status_event(int type, ACL_EVENT *event acl_unused,
@@ -123,33 +167,15 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 	case ACL_MASTER_STAT_TAKEN:
 		acl_master_avail_less(serv, proc);
 		break;
-	case ACL_MASTER_STAT_SIGHUP_OK:
-	case ACL_MASTER_STAT_SIGHUP_ERR:
-		if (proc->callback) {
-			proc->callback(proc, stat_buf.status, proc->ctx);
-			proc->callback = NULL;
-			proc->ctx      = NULL;
-		}
-		break;
-	case ACL_MASTER_STAT_START_OK:
-	case ACL_MASTER_STAT_START_ERR:
-		if (proc->callback) {
-			proc->callback(proc, stat_buf.status, proc->ctx);
-			proc->callback = NULL;
-			proc->ctx      = NULL;
-		}
-		break;
 	default:
-		acl_msg_warn("%s(%d)->%s: ignoring unknown status: %d "
-			"allegedly from pid: %d", __FILE__, __LINE__,
-			myname, stat_buf.pid, stat_buf.status);
+		service_status(proc, stat_buf.status);
 		break;
 	}
 }
 
 /* acl_master_status_init - start status event processing for this service */
 
-void    acl_master_status_init(ACL_MASTER_SERV *serv)
+void acl_master_status_init(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "acl_master_status_init";
 
@@ -190,7 +216,7 @@ void    acl_master_status_init(ACL_MASTER_SERV *serv)
 
 /* acl_master_status_cleanup - stop status event processing for this service */
 
-void    acl_master_status_cleanup(ACL_MASTER_SERV *serv)
+void acl_master_status_cleanup(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "acl_master_status_cleanup";
 

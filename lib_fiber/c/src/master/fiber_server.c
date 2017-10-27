@@ -979,5 +979,8 @@ void acl_fiber_server_main(int argc, char *argv[],
 	if (post_init)
 		post_init(__service_ctx);
 
+	/* notify master that child started ok */
+	acl_master_notify(acl_var_fiber_pid, __server_generation,
+		ACL_MASTER_STAT_START_OK);
 	servers_start(__servers, acl_var_fiber_threads);
 }

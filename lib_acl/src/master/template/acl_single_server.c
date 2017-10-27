@@ -685,6 +685,10 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	if (post_init)
 		post_init(__service_ctx);
 
+	/* notify master that child started ok */
+	acl_master_notify(acl_var_single_pid, single_server_generation,
+		ACL_MASTER_STAT_START_OK);
+
 	acl_server_sighup_setup();
 	acl_server_sigterm_setup();
 

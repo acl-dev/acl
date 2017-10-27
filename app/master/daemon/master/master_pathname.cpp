@@ -4,7 +4,7 @@
 
 /* acl_master_pathname - map service class and service name to pathname */
 
-char   *acl_master_pathname(const char *queue_path, const char *service_class,
+char *acl_master_pathname(const char *queue_path, const char *service_class,
 	const char *service_name)
 {
 	return (acl_concatenate(queue_path, "/", service_class, "/",

@@ -1478,6 +1478,10 @@ void acl_threads_server_main(int argc, char * argv[],
 	if (post_init)
 		post_init(__service_ctx);
 
+	/* notify master that child started ok */
+	acl_master_notify(acl_var_threads_pid, __threads_server_generation,
+		ACL_MASTER_STAT_START_OK);
+
 #ifdef ACL_UNIX
 	/* connect the dispatch server */
 	if (acl_var_threads_dispatch_addr && *acl_var_threads_dispatch_addr)

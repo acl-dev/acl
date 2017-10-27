@@ -11,7 +11,7 @@
 
 /* acl_master_refresh - re-read configuration table */
 
-void    acl_master_refresh(void)
+void acl_master_refresh(void)
 {
 	ACL_MASTER_SERV *serv, **servp;
 
@@ -45,7 +45,7 @@ void    acl_master_refresh(void)
 
 /* acl_master_config - read config file */
 
-void    acl_master_config(void)
+void acl_master_config(void)
 {
 	const char *myname = "acl_master_config";
 	ACL_MASTER_SERV *entry;

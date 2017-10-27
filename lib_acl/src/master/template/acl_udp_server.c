@@ -885,6 +885,10 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	if (post_init)
 		post_init(__service_ctx);
 
+	/* notify master that child started ok */
+	acl_master_notify(acl_var_udp_pid, __udp_server_generation,
+		ACL_MASTER_STAT_START_OK);
+
 	/* …Ë÷√ SIGHUP –≈∫≈ */
 	acl_server_sighup_setup();
 	acl_server_sigterm_setup();
