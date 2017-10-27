@@ -30,7 +30,7 @@ typedef struct {
 	int            errnum;
 	unsigned       idgen;
 	int            count;
-	int            switched;
+	size_t         switched;
 	int            nlocal;
 } FIBER_TLS;
 
@@ -514,7 +514,7 @@ void acl_fiber_ready(ACL_FIBER *fiber)
 
 int acl_fiber_yield(void)
 {
-	int  n;
+	size_t  n;
 
 	if (acl_ring_size(&__thread_fiber->ready) == 0)
 		return 0;
@@ -523,7 +523,10 @@ int acl_fiber_yield(void)
 	acl_fiber_ready(__thread_fiber->running);
 	acl_fiber_switch();
 
-	return __thread_fiber->switched - n - 1;
+	// when switched overflows, it will be set to 0, then n saved last
+	// switched's value will larger than switched, so we need to use
+	// abs function to avoiding this problem
+	return abs(__thread_fiber->switched - n - 1);
 }
 
 union cc_arg
@@ -796,6 +799,8 @@ void acl_fiber_switch(void)
 	head = acl_ring_pop_head(&__thread_fiber->ready);
 
 	if (head == NULL) {
+		acl_msg_info("thread-%lu: NO FIBER in ready",
+			acl_pthread_self());
 		fiber_swap(current, &__thread_fiber->original);
 		return;
 	}
@@ -805,6 +810,7 @@ void acl_fiber_switch(void)
 
 	__thread_fiber->running = fiber;
 	__thread_fiber->switched++;
+
 	fiber_swap(current, __thread_fiber->running);
 }
 
