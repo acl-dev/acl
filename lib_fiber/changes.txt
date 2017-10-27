@@ -1,4 +1,8 @@
 
+71) 2017.10.27
+71.1) bugfix: fiber.c，__thread_fiber->switched 原来为有符号 int 型，有可能会
+因溢出问题造成协程调度出问题
+
 70) 2017.10.20
 70.1) feature: EVENT::poll_list, epoll_list 可以采用 FIFO 或 STACK
 70.2) feature: hook sendfile/sendfile64
