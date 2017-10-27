@@ -240,8 +240,6 @@ void acl_master_spawn(ACL_MASTER_SERV *serv)
 		proc->avail     = 0;
 		proc->start     = (long) time(NULL);
 		proc->use_count = 0;
-		proc->callback  = NULL;
-		proc->ctx       = NULL;
 
 		acl_binhash_enter(acl_var_master_child_table,
 			(char *) &pid, sizeof(pid), (char *) proc);
