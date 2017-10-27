@@ -650,9 +650,11 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	if (post_init)
 		post_init(__service_ctx);
 
+#ifdef ACL_LINUX
 	/* notify master that child started ok */
 	acl_master_notify(acl_var_trigger_pid, trigger_server_generation,
 		ACL_MASTER_STAT_START_OK);
+#endif
 
 	/*
 	 * Running as a semi-resident server. Service connection requests.

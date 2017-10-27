@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include <assert.h>
 #include "noncopyable.hpp"
 
 namespace acl
@@ -54,6 +55,7 @@ public:
 	mbox(void)
 	{
 		mbox_ = mbox_create();
+		assert(mbox_);
 	}
 
 	~mbox(void)

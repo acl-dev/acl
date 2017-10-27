@@ -1491,9 +1491,11 @@ static void server_main(int argc, char **argv, va_list ap)
 	if (post_init)
 		post_init(__service_ctx);
 
+#ifdef ACL_LINUX
 	/* notify master that child started ok */
 	acl_master_notify(acl_var_aio_pid, __aio_server_generation,
 		ACL_MASTER_STAT_START_OK);
+#endif
 
 	if (acl_var_aio_dispatch_addr && *acl_var_aio_dispatch_addr)
 		dispatch_open(acl_aio_server_event(), __h_aio);
