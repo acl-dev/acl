@@ -43,6 +43,10 @@ typedef ssize_t (*sendfile_fn)(int, int, off_t*, size_t);
 #ifdef  __USE_LARGEFILE64
 typedef ssize_t (*sendfile64_fn)(int, int, off64_t*, size_t);
 #endif
+typedef ssize_t (*pread_fn)(int, void *, size_t, off_t);
+typedef ssize_t (*pwrite_fn)(int, const void *, size_t, off_t);
+typedef ssize_t (*pread64_fn)(int, void *, size_t, off64_t);
+typedef ssize_t (*pwrite64_fn)(int, const void *, size_t, off64_t);
 
 static sleep_fn    __sys_sleep    = NULL;
 static pipe_fn     __sys_pipe     = NULL;
@@ -74,6 +78,11 @@ static sendfile_fn   __sys_sendfile   = NULL;
 #ifdef __USE_LARGEFILE64
 static sendfile64_fn __sys_sendfile64 = NULL;
 #endif
+
+static pread_fn      __sys_pread    = NULL;
+static pwrite_fn     __sys_pwrite   = NULL;
+static pread64_fn    __sys_pread64  = NULL;
+static pwrite64_fn   __sys_pwrite64 = NULL;
 
 void hook_io(void)
 {
@@ -157,6 +166,16 @@ void hook_io(void)
 	__sys_sendfile64 = (sendfile64_fn) dlsym(RTLD_NEXT, "sendfile64");
 	acl_assert(__sys_sendfile64);
 #endif
+
+	__sys_pread = (pread_fn) dlsym(RTLD_NEXT, "pread");
+	acl_assert(__sys_pread);
+	__sys_pwrite = (pwrite_fn) dlsym(RTLD_NEXT, "pwrite");
+	acl_assert(__sys_pwrite);
+
+	__sys_pread64 = (pread64_fn) dlsym(RTLD_NEXT, "pread64");
+	acl_assert(__sys_pread64);
+	__sys_pwrite64 = (pwrite64_fn) dlsym(RTLD_NEXT, "pwrite64");
+	acl_assert(__sys_pwrite64);
 
 	(void) acl_pthread_mutex_unlock(&__lock);
 }
@@ -1088,18 +1107,6 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
 #ifdef  __USE_LARGEFILE64
 ssize_t sendfile64(int out_fd, int in_fd, off64_t *offset, size_t count)
 {
-#if 0
-	int ret;
-
-	if (__sys_sendfile64 == NULL)
-		hook_io();
-	if (!acl_var_hook_sys_api) 
-		return __sys_sendfile64(out_fd, in_fd, offset, count);
-	ret = __sys_sendfile64(out_fd, in_fd, offset, count);
-	if (ret < 0)
-		fiber_save_errno();
-	return ret;
-#else
 	ACL_FIBER *me;
 
 	if (__sys_sendfile64 == NULL)
@@ -1129,6 +1136,63 @@ ssize_t sendfile64(int out_fd, int in_fd, off64_t *offset, size_t count)
 			return -1;
 		}
 	}
-#endif
 }
+#endif
+
+#if defined __USE_UNIX98 || defined __USE_XOPEN2K8
+# ifndef __USE_FILE_OFFSET64
+ssize_t pread(int fd, void *buf, size_t count, off_t offset)
+{
+	ssize_t ret;
+
+	if (__sys_pread == NULL)
+		hook_io();
+
+	ret =  __sys_pread(fd, buf, count, offset);
+	if (acl_var_hook_sys_api && ret < 0) 
+		fiber_save_errno();
+	return ret;
+}
+
+ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
+{
+	ssize_t ret;
+
+	if (__sys_pwrite == NULL)
+		hook_io();
+
+	ret = __sys_pwrite(fd, buf, count, offset);
+	if (acl_var_hook_sys_api && ret < 0) 
+		fiber_save_errno();
+	return ret;
+}
+# endif
+
+# ifdef __USE_LARGEFILE64
+ssize_t pread64(int fd, void *buf, size_t count, off64_t offset)
+{
+	ssize_t ret;
+
+	if (__sys_pread64 == NULL)
+		hook_io();
+
+	ret =  __sys_pread64(fd, buf, count, offset);
+	if (acl_var_hook_sys_api && ret < 0) 
+		fiber_save_errno();
+	return ret;
+}
+
+ssize_t pwrite64(int fd, const void *buf, size_t count, off64_t offset)
+{
+	ssize_t ret;
+
+	if (__sys_pwrite == NULL)
+		hook_io();
+
+	ret = __sys_pwrite64(fd, buf, count, offset);
+	if (acl_var_hook_sys_api && ret < 0) 
+		fiber_save_errno();
+	return ret;
+}
+# endif
 #endif
