@@ -640,7 +640,12 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 
 	if (fiber->context == NULL)
 		fiber->context = (ucontext_t *) acl_mymalloc(sizeof(ucontext_t));
+	memset(fiber->context, 0, sizeof(ucontext_t));
+
 	sigemptyset(&zero);
+	sigaddset(&zero, SIGPIPE);
+	sigaddset(&zero, SIGINT);
+	sigaddset(&zero, SIGHUP);
 	sigprocmask(SIG_BLOCK, &zero, &fiber->context->uc_sigmask);
 
 	if (getcontext(fiber->context) < 0)

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <limits.h>
 #include "fiber/lib_fiber.h"
 #include "event.h"
 #include "fiber.h"
@@ -134,9 +135,8 @@ void fiber_io_close(int fd)
 static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 {
 	EVENT *ev = (EVENT *) ctx;
-	int left;
 	ACL_FIBER *timer;
-	int now, last = 0;
+	acl_int64 now, last = 0, left;
 	struct timeval tv;
 
 	fiber_system();
@@ -156,8 +156,10 @@ static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 				left = timer->when - now;
 		}
 
+		assert(left < INT_MAX);
+
 		/* add 1 just for the deviation of epoll_wait */
-		event_process(ev, left > 0 ? left + 1 : left);
+		event_process(ev, left > 0 ? left + 1 : (int) left);
 
 		if (__thread_fiber->io_stop)
 			break;

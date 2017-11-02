@@ -1,4 +1,9 @@
 
+72) 2017.11.2
+72.1) feature: fiber.c, fiber_alloc 中需要增加针对信号的处理过程
+72.2) bugfix: fiber_io.c, fiber_io_loop 中容易产生 32 位整数溢出问题，会导致
+定时器无法触发
+
 71) 2017.10.27
 71.1) bugfix: fiber.c，__thread_fiber->switched 原来为有符号 int 型，有可能会
 因溢出问题造成协程调度出问题
