@@ -394,13 +394,12 @@ static void usage(int argc, char *argv[])
 	if (argc <= 0)
 		acl_msg_fatal("%s(%d): argc: %d", __FILE__, __LINE__, argc);
 
-	acl_msg_info("usage: %s -h[help]"
+	acl_msg_info("usage: %s -H[help]"
 		" -c [use chroot]"
 		" -n service_name"
 		" -s socket_count"
 		" -t transport"
 		" -u [use setgid initgroups setuid]"
-		" -v [on acl_msg_verbose]"
 		" -f conf_file", argv[0]);
 }
 
@@ -439,9 +438,9 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 
 	__conf_file[0] = 0;
 
-	while ((c = getopt(argc, argv, "hcDl:n:s:t:uvf:")) > 0) {
+	while ((c = getopt(argc, argv, "HcDl:n:s:t:uf:")) > 0) {
 		switch (c) {
-		case 'h':
+		case 'H':
 			usage(argc, argv);
 			exit (0);
 		case 'f':
@@ -465,9 +464,6 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 			break;
 		case 'u':
 			user_name = "setme";
-			break;
-		case 'v':
-			acl_msg_verbose++;
 			break;
 		default:
 			break;

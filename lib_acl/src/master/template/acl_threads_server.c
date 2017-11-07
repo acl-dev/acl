@@ -1208,12 +1208,11 @@ static void usage(int argc, char * argv[])
 	if (argc <= 0)
 		acl_msg_fatal("%s(%d): argc %d", __FILE__, __LINE__, argc);
 
-	acl_msg_info("usage: %s -h[help]"
+	acl_msg_info("usage: %s -H[help]"
 		" -c [use chroot]"
 		" -n service_name"
 		" -s socket_count"
 		" -u [use setgid initgroups setuid]"
-		" -v [on acl_msg_verbose]"
 		" -f conf_file"
 		" -L listen_addrs", argv[0]);
 }
@@ -1258,9 +1257,9 @@ void acl_threads_server_main(int argc, char * argv[],
 
 	__conf_file[0] = 0;
 
-	while ((c = getopt(argc, argv, "hc:n:s:t:uvf:L:")) > 0) {
+	while ((c = getopt(argc, argv, "Hc:n:s:t:uf:L:")) > 0) {
 		switch (c) {
-		case 'h':
+		case 'H':
 			usage(argc, argv);
 			exit (0);
 		case 'f':
@@ -1281,9 +1280,6 @@ void acl_threads_server_main(int argc, char * argv[],
 			break;
 		case 't':
 			/* deprecated, just go through */
-			break;
-		case 'v':
-			acl_msg_verbose++;
 			break;
 		case 'L':
 			addrs = optarg;

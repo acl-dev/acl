@@ -1071,13 +1071,12 @@ static void usage(int argc, char *argv[])
 	if (argc <= 0)
 		acl_msg_fatal("%s(%d): argc: %d", __FILE__, __LINE__, argc);
 
-	acl_msg_info("usage: %s -h[help]"
+	acl_msg_info("usage: %s -H[help]"
 		" -c [use chroot]"
 		" -n service_name"
 		" -s socket_count"
 		" -t transport"
 		" -u [use setgid initgroups setuid]"
-		" -v [on acl_msg_verbose]"
 		" -f conf_file", argv[0]);
 }
 
@@ -1338,9 +1337,9 @@ static void server_main(int argc, char **argv, va_list ap)
 
 	__conf_file[0] = 0;
 
-	while ((c = getopt(argc, argv, "hcn:o:s:t:uvf:")) > 0) {
+	while ((c = getopt(argc, argv, "Hcn:o:s:t:uf:")) > 0) {
 		switch (c) {
-		case 'h':
+		case 'H':
 			usage(argc, argv);
 			exit (0);
 		case 'f':
@@ -1364,9 +1363,6 @@ static void server_main(int argc, char **argv, va_list ap)
 			break;
 		case 't':
 			transport = optarg;
-			break;
-		case 'v':
-			acl_msg_verbose++;
 			break;
 		default:
 			break;

@@ -762,13 +762,12 @@ static void usage(int argc, char * argv[])
 	for (i = 0; i < argc; i++)
 		acl_msg_info("argv[%d]: %s", i, argv[i]);
 
-	acl_msg_info("usage: %s -h[help]"
+	acl_msg_info("usage: %s -H[help]"
 		" -c [use chroot]"
 		" -n service_name"
 		" -s socket_count"
 		" -t transport"
 		" -u [use setgid initgroups setuid]"
-		" -v [on acl_msg_verbose]"
 		" -f conf_file"
 		" -L listen_addrs",
 		service_name);
@@ -868,9 +867,9 @@ void acl_fiber_server_main(int argc, char *argv[],
 	optind = 0;
 	optarg = 0;
 
-	while ((c = getopt(__argc, __argv, "hc:n:s:t:uvf:L:")) > 0) {
+	while ((c = getopt(__argc, __argv, "Hc:n:s:t:uf:L:")) > 0) {
 		switch (c) {
-		case 'h':
+		case 'H':
 			usage(__argc, __argv);
 			exit (0);
 		case 'f':
@@ -891,9 +890,6 @@ void acl_fiber_server_main(int argc, char *argv[],
 			break;
 		case 't':
 			/* deprecated, just go through */
-			break;
-		case 'v':
-			acl_msg_verbose++;
 			break;
 		case 'L':
 			addrs = optarg;
