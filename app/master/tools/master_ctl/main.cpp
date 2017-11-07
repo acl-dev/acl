@@ -630,6 +630,7 @@ static void usage(const char* procname)
 	printf("usage: %s -h[help]\r\n"
 		" -s master_manage_addr[default: 127.0.0.1:8290]\r\n"
 		" -f servicde_path\r\n"
+		" -t timeout[waiting the result from master, default: 0]\r\n"
 		" -a cmd[list|stat|start|stop|reload]\r\n",
 		procname);
 }
@@ -639,7 +640,7 @@ int main(int argc, char* argv[])
 	acl::string filepath, action, addr("127.0.0.1:8290");
 	int  ch;
 
-	while ((ch = getopt(argc, argv, "hs:f:a:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:f:a:t:")) > 0)
 	{
 		switch (ch)
 		{
@@ -654,6 +655,11 @@ int main(int argc, char* argv[])
 			break;
 		case 'a':
 			action = optarg;
+			break;
+		case 't':
+			__timeout = atoi(optarg);
+			if (__timeout < 0)
+				__timeout = 0;
 			break;
 		default:
 			usage(argv[0]);
