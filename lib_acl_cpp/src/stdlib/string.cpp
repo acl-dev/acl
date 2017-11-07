@@ -765,7 +765,7 @@ bool string::operator <(const string& s) const
 {
 	size_t nLeft = LEN(vbf_);
 	size_t nRight = LEN(s.vbf_);
-	size_t n = nLeft > nRight ? nLeft : nRight;
+	size_t n = nLeft > nRight ? nRight : nLeft;
 	int   ret = memcmp(STR(vbf_), STR(s.vbf_), n);
 	if (ret < 0)
 		return true;
@@ -780,7 +780,7 @@ bool string::operator >(const string& s) const
 {
 	size_t nLeft = LEN(vbf_);
 	size_t nRight = LEN(s.vbf_);
-	size_t n = nLeft > nRight ? nLeft : nRight;
+	size_t n = nLeft > nRight ? nRight : nLeft;
 	int   ret = memcmp(STR(vbf_), STR(s.vbf_), n);
 	if (ret > 0)
 		return true;
