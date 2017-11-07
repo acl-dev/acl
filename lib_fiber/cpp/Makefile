@@ -9,7 +9,7 @@ RANLIB  = ${ENV_RANLIB}
 FLAGS   = ${ENV_FLAGS}
 
 CFLAGS = -c -g -W \
--O3 \
+-O \
 -fPIC \
 -Wall \
 -Werror \

@@ -578,7 +578,7 @@ static int service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 {
 	const char *myname = "service_args";
 	const char *command, *name, *transport, *args, *ptr_const;
-	char   *args_buf, *ptr, *cp;
+	char *args_buf, *ptr, *cp;
 	char  unprivileged, chroot_var; 
 	ACL_VSTRING *junk = acl_vstring_alloc(100);
 
@@ -611,12 +611,26 @@ static int service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 		return -1;
 	}
 
-	serv->path = acl_concatenate(acl_var_master_daemon_dir, "/",
-			command, (char *) 0);
-
-	/*
-	 * Notify Address
+	/* if command is a absolute path starting with '/', just use it,
+	 * else the relative path added with default path will be used.
 	 */
+	if (*command == '/' && access(command, F_OK) == 0)
+		ptr = acl_mystrdup(command);
+	else
+		ptr = acl_concatenate(acl_var_master_daemon_dir, "/",
+				command, (char *) 0);
+
+	if (access(ptr, F_OK | X_OK) == -1) {
+		acl_msg_error("%s(%d), %s: command %s can't be executed %s",
+			__FILE__, __LINE__, __FUNCTION__, ptr,
+			acl_last_serror());
+		acl_myfree(ptr);
+		return -1;
+	}
+
+	serv->path = ptr;
+
+	/* Notify Address */
 	ptr_const = get_str_ent(xcp, ACL_VAR_MASTER_NOTIFY_ADDR, "no");
 	if (ptr_const == NULL || strcasecmp(ptr_const, "no") == 0)
 		serv->notify_addr = NULL;

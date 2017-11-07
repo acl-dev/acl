@@ -15,7 +15,11 @@ static void print_space(int n)
 
 static void print_name(const char* name, int tabs = 1)
 {
+#ifdef	HAS_READLINE
 	printf("\033[1;33;40m%-s\033[0m", name);
+#else
+	printf("%-s", name);
+#endif
 
 	for (int i = 0; i < tabs; i++)
 		printf("\t");
@@ -23,7 +27,11 @@ static void print_name(const char* name, int tabs = 1)
 
 static void print_value(const char* value, int tabs = 1)
 {
+#ifdef	HAS_READLINE
 	printf("\033[1;36;40m%-s\033[0m", value);
+#else
+	printf("%-s", value);
+#endif
 
 	for (int i = 0; i < tabs; i++)
 		printf("\t");
@@ -60,14 +68,26 @@ static void print_server(const serv_info_t& server)
 
 static void println_underline(const char* name, const char* value)
 {
+#ifdef	HAS_READLINE
 	printf("\033[4m\033[1;36;40m%c\033[0m\033[0m", *name);
+#else
+	printf("%c", *name);
+#endif
 	name++;
+#ifdef	HAS_READLINE
 	printf("\033[1;33;40m%-18s\033[0m: %s\r\n", name, value);
+#else
+	printf("%-18s: %s\r\n", name, value);
+#endif
 }
 
 static void println(const char* name, const char* value)
 {
+#ifdef	HAS_READLINE
 	printf("\033[1;33;40m%-18s\033[0m: %s\r\n", name, value);
+#else
+	printf("%-18s: %s\r\n", name, value);
+#endif
 }
 
 static void println(const char* name, int value)
@@ -366,8 +386,12 @@ static bool do_reload(const std::vector<acl::string>& tokens,
 {
 	if (*fpath == 0)
 	{
+#ifdef	HAS_READLINE
 		printf("\033[1;34;40musage\033[0m: "
 			"\033[1;33;40mreload\033[0m configure_path timeout\r\n");
+#else
+		printf("usage: reload configure_path timeout\r\n");
+#endif
 		return false;
 	}
 
@@ -395,8 +419,12 @@ static bool do_set(const std::vector<acl::string>& tokens,
 {
 	if (*fpath == 0)
 	{
+#ifdef	HAS_READLINE
 		printf("\033[1;34;40musage\033[0m: "
 			"\033[1;33;40mset\033[0m configure_path timeout\r\n");
+#else
+		printf("usage: set configure_path timeout\r\n");
+#endif
 		return true;
 	}
 
@@ -416,8 +444,12 @@ static bool do_server(const std::vector<acl::string>& tokens,
 		printf("set server to %s ok\r\n", addr);
 	}
 	else if (*addr == 0)
+#ifdef	HAS_READLINE
 		printf("\033[1;34;40musage\033[0m: "
 			"\033[1;33;40mserver\033[0m addr\r\n");
+#else
+		printf("usage: server addr\r\n");
+#endif
 	else
 		printf("server addr is %s\r\n", addr);
 	return true;
@@ -429,8 +461,12 @@ static bool do_timeout(const std::vector<acl::string>& tokens,
 	if (tokens.size() >= 2)
 		__timeout = atoll(tokens[1]);
 	else
+#ifdef	HAS_READLINE
 		printf("\033[1;34;40musage\033[0m: "
 			"\033[1;33;40mtimeout\033[0m timeout\r\n");
+#else
+		printf("usage: timeout timeout\r\n");
+#endif
 	return true;
 }
 
@@ -564,15 +600,19 @@ static void run(const char* server, const char* filepath)
 		if (!__verbose)
 			print_space(100);
 
+#ifdef	HAS_READLINE
 		printf("\033[1;36;40m%s\033[0m ==> \033[1;32;40m%s\033[0m\r\n",
 			__actions[i].cmd, ret ? "ok" : "err");
+#else
+		printf("%s ==> %s\r\n", __actions[i].cmd, ret ? "ok" : "err");
+#endif
 	}
 }
 
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		" -s master_manage_addr[default: 127.0.0.1:8190]\r\n"
+		" -s master_manage_addr[default: 127.0.0.1:8290]\r\n"
 		" -f servicde_path\r\n"
 		" -a cmd[list|stat|start|stop|reload]\r\n",
 		procname);

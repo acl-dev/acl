@@ -92,6 +92,7 @@ struct EVENT {
 	DEFER_DELETE *r_defers;
 	DEFER_DELETE *w_defers;
 
+#define	USE_RING
 #ifdef	USE_RING		// xxx: some bugs ?
 	ACL_RING   poll_list;
 	ACL_RING   epoll_list;

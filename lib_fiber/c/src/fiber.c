@@ -6,6 +6,12 @@
 #include <valgrind/valgrind.h>
 #endif
 
+#define FIBER_STACK_GUARDS
+#ifdef	FIBER_STACK_GUARDS
+#include <dlfcn.h>
+#include <sys/mman.h>
+#endif
+
 #include "fiber/lib_fiber.h"
 #include "event_epoll.h"  /* just for hook_epoll */
 #include "fiber.h"
@@ -42,6 +48,78 @@ static __thread int __scheduled = 0;
 __thread int acl_var_hook_sys_api = 0;
 
 static acl_pthread_key_t __fiber_key;
+
+#ifdef	FIBER_STACK_GUARDS
+
+static size_t page_size(void)
+{
+    static __thread long pgsz = 0;
+
+    if (pgsz == 0) {
+        pgsz = sysconf(_SC_PAGE_SIZE);
+        assert(pgsz > 0);
+    }
+
+    return (size_t) pgsz;
+}
+
+static size_t stack_size(size_t size)
+{
+    size_t pgsz = page_size();
+    if (size < pgsz)
+        size = pgsz;
+    size_t sz = (size + pgsz - 1) & ~(pgsz - 1);
+    return sz;
+}
+
+static void *stack_alloc(size_t size)
+{
+    size_t pgsz = page_size();
+    size = stack_size(size);
+
+    size += pgsz + pgsz;
+
+    char *ptr;
+    int ret = posix_memalign((void *) &ptr, pgsz, size);
+    assert(ret == 0);
+
+    ret = mprotect(ptr, pgsz, PROT_NONE);
+    assert(ret == 0);
+
+//    ret = mprotect(ptr + size - pgsz, pgsz, PROT_NONE);
+//    assert(ret == 0);
+
+    ptr += pgsz;
+
+    return ptr;
+}
+
+static void stack_free(void *ptr)
+{
+    size_t pgsz = page_size();
+    ptr = (char *) ptr - pgsz;
+    int ret = mprotect(ptr, page_size(), PROT_READ|PROT_WRITE);
+    assert(ret == 0);
+//    ret = mprotect(ptr + size - pgsz, page_size(), PROT_READ|PROT_WRITE);
+//    assert(ret == 0);
+    free(ptr);
+}
+
+#else
+
+static void *stack_alloc(size_t size)
+{
+	return acl_mymalloc(size);
+}
+
+static void stack_free(void *ptr)
+{
+	acl_myfree(ptr);
+}
+
+#endif
+
+/****************************************************************************/
 
 /* forward declare */
 static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
@@ -111,7 +189,7 @@ static void fiber_check(void)
 	__thread_fiber->original.context = NULL;
 #else
 	__thread_fiber->original.context = (ucontext_t *)
-		acl_mycalloc(1, sizeof(ucontext_t));
+		stack_calloc(sizeof(ucontext_t));
 #endif
 	__thread_fiber->fibers = NULL;
 	__thread_fiber->size   = 0;
@@ -129,6 +207,8 @@ static void fiber_check(void)
 	} else if (acl_pthread_setspecific(__fiber_key, __thread_fiber) != 0)
 		acl_msg_fatal("acl_pthread_setspecific error!");
 }
+
+#ifdef	HOOK_ERRNO
 
 /* see /usr/include/bits/errno.h for __errno_location */
 #ifdef ACL_ARM_LINUX
@@ -152,6 +232,8 @@ int *__errno_location(void)
 	else
 		return &__thread_fiber->original.errnum;
 }
+
+#endif
 
 int acl_fiber_sys_errno(void)
 {
@@ -270,7 +352,8 @@ void fiber_save_errno(void)
 
 # define SETJMP(ctx) ({\
     int ret;\
-    asm("lea     LJMPRET%=(%%rip), %%rcx\n\t"\
+    asm(".cfi_undefined rip;\r\n"\
+	"lea     LJMPRET%=(%%rip), %%rcx\n\t"\
         "xor     %%rax, %%rax\n\t"\
         "mov     %%rbx, (%%rdx)\n\t"\
         "mov     %%rbp, 8(%%rdx)\n\t"\
@@ -549,7 +632,7 @@ static void fiber_start(unsigned int x, unsigned int y)
 #ifdef	USE_JMP
 	/* when using setjmp/longjmp, the context just be used only once */
 	if (fiber->context != NULL) {
-		acl_myfree(fiber->context);
+		stack_free(fiber->context);
 		fiber->context = NULL;
 	}
 #endif
@@ -586,8 +669,8 @@ void fiber_free(ACL_FIBER *fiber)
 	VALGRIND_STACK_DEREGISTER(fiber->vid);
 #endif
 	if (fiber->context)
-		acl_myfree(fiber->context);
-	acl_myfree(fiber->buff);
+		stack_free(fiber->context);
+	stack_free(fiber->buff);
 	acl_myfree(fiber);
 }
 
@@ -608,15 +691,14 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	if (head == NULL) {
 		fiber = (ACL_FIBER *) acl_mycalloc(1, sizeof(ACL_FIBER));
 		/* no using calloc just avoiding using real memory */
-		fiber->buff = (char *) acl_mymalloc(size);
+		fiber->buff = (char *) stack_alloc(size);
 	} else if ((fiber = APPL(head, ACL_FIBER, me))->size < size) {
 		/* if using realloc, real memory will be used, when we first
 		 * free and malloc again, then we'll just use virtual memory,
 		 * because memcpy will be called in realloc.
 		 */
-		/* fiber->buff = (char *) acl_myrealloc(fiber->buff, size); */
-		acl_myfree(fiber->buff);
-		fiber->buff = (char *) acl_mymalloc(size);
+		stack_free(fiber->buff);
+		fiber->buff = (char *) stack_alloc(size);
 	} else
 		size = fiber->size;
 
@@ -639,13 +721,17 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	carg.p = fiber;
 
 	if (fiber->context == NULL)
-		fiber->context = (ucontext_t *) acl_mymalloc(sizeof(ucontext_t));
+		fiber->context = (ucontext_t *) stack_alloc(sizeof(ucontext_t));
 	memset(fiber->context, 0, sizeof(ucontext_t));
 
 	sigemptyset(&zero);
 	sigaddset(&zero, SIGPIPE);
-	sigaddset(&zero, SIGINT);
-	sigaddset(&zero, SIGHUP);
+	sigaddset(&zero, SIGSYS);
+	sigaddset(&zero, SIGALRM);
+	sigaddset(&zero, SIGURG);
+	sigaddset(&zero, SIGWINCH);
+//	sigaddset(&zero, SIGINT);
+//	sigaddset(&zero, SIGHUP);
 	sigprocmask(SIG_BLOCK, &zero, &fiber->context->uc_sigmask);
 
 	if (getcontext(fiber->context) < 0)
