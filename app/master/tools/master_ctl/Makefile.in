@@ -9,7 +9,7 @@ CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
-SYSLIB = -lreadline -lcurses -lpthread -lz
+SYSLIB = -lpthread -lz
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 OSNAME = $(shell uname -s)
 OSTYPE = $(shell uname -m)
@@ -20,20 +20,28 @@ endif
 
 ifeq ($(findstring on, $(HAS_READLINE)), on)
 	CFLAGS += -DHAS_READLINE
+	SYSLIB += -lreadline -lcurses 
 else ifeq ($(findstring ON, $(HAS_READLINE)), ON)
 	CFLAGS += -DHAS_READLINE
+	SYSLIB += -lreadline -lcurses 
 else ifeq ($(findstring yes, $(HAS_READLINE)), yes)
 	CFLAGS += -DHAS_READLINE
+	SYSLIB += -lreadline -lcurses 
 else ifeq ($(findstring YES, $(HAS_READLINE)), YES)
 	CFLAGS += -DHAS_READLINE
+	SYSLIB += -lreadline -lcurses 
 else ifeq ($(findstring on, $(has_readline)), on)
 	CFLAGS += -DHAS_READLINE
+	SYSLIB += -lreadline -lcurses 
 else ifeq ($(findstring ON, $(has_readline)), ON)
 	CFLAGS += -DHAS_READLINE
+	SYSLIB += -lreadline -lcurses 
 else ifeq ($(findstring yes, $(has_readline)), yes)
 	CFLAGS += -DHAS_READLINE
+	SYSLIB += -lreadline -lcurses 
 else ifeq ($(findstring YES, $(has_readline)), YES)
 	CFLAGS += -DHAS_READLINE
+	SYSLIB += -lreadline -lcurses 
 endif
 
 # For FreeBSD
@@ -148,7 +156,7 @@ all: RM $(OBJ)
 	@echo ""
 RM:
 	rm -f $(PROG)
-clean:
+clean cl:
 	rm -f $(PROG)
 	rm -f $(OBJ)
 rebuild rb: clean all

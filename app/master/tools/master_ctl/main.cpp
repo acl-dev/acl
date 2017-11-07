@@ -1,6 +1,10 @@
 #include "stdafx.h"
+
+#ifdef	HAS_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
+#endif
+
 #include "http_request.h"
 
 static bool __verbose = false;
@@ -508,7 +512,9 @@ static bool do_quit(const std::vector<acl::string>&, const char*, const char*)
 static bool do_clear(const std::vector<acl::string>&, const char*, const char*)
 {
 #if	!defined(__APPLE__)
+#ifdef	HAS_READLINE
 	rl_clear_screen(0, 0);
+#endif
 #endif
 	printf("\r\n");
 	return true;
@@ -516,17 +522,27 @@ static bool do_clear(const std::vector<acl::string>&, const char*, const char*)
 
 static void getline(acl::string& out)
 {
+#ifdef	HAS_READLINE
 	const char* prompt = "\033[1;34;40mmaster_ctl>\033[0m ";
 	char* ptr = readline(prompt);
-	if (ptr == NULL)
+#else
+	printf("master_ctl> ");
+	fflush(stdout);
+	char buf[1024];
+	char* ptr = fgets(buf, (int) sizeof(buf), stdin);
+#endif
+	if (ptr == NULL || *ptr == 0)
 	{
 		printf("Bye!\r\n");
 		exit(0);
 	}
 	out = ptr;
 	out.trim_right_line();
+
+#ifdef	HAS_READLINE
 	if (!out.empty() && !out.equal("y", false) && !out.equal("n", false))
 		add_history(out.c_str());
+#endif
 }
 
 static struct {
