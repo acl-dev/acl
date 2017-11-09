@@ -350,10 +350,11 @@ void fiber_save_errno(void)
 #  define CLOBBER
 # endif
 
+//	asm(".cfi_undefined rip;\r\n")
+
 # define SETJMP(ctx) ({\
     int ret;\
-    asm(".cfi_undefined rip;\r\n"\
-	"lea     LJMPRET%=(%%rip), %%rcx\n\t"\
+	asm("lea     LJMPRET%=(%%rip), %%rcx\n\t"\
         "xor     %%rax, %%rax\n\t"\
         "mov     %%rbx, (%%rdx)\n\t"\
         "mov     %%rbp, 8(%%rdx)\n\t"\
