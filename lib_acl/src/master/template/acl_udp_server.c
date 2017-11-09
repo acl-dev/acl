@@ -146,8 +146,19 @@ typedef struct UDP_SERVER {
 	acl_pthread_t tid;
 	ACL_EVENT    *event;
 	ACL_VSTREAM **streams;
-	int           socket_count;
+	int           count;
+	int           size;
+
+	ACL_VSTREAM  *ipc_in;
+	ACL_VSTREAM  *ipc_out;
+	acl_pthread_mutex_t *lock;
 } UDP_SERVER;
+
+typedef struct UDP_CTX {
+	ACL_VSTREAM **streams;
+	int           count;
+	ACL_ARGV     *addrs;
+} UDP_CTX;
 
  /*
   * Global state.
@@ -165,6 +176,7 @@ static acl_pthread_key_t __server_key;
 static int   __event_mode;
 static int   __socket_count = 1;
 static UDP_SERVER *__servers = NULL;
+static int         __nservers = 0;
 static ACL_EVENT  *__main_event = NULL;
 
 static const char *__service_name;
@@ -173,6 +185,438 @@ static void       *__service_ctx;
 static int         __daemon_mode = 1;
 static char        __conf_file[1024];
 static unsigned    __udp_server_generation;
+
+/* forward functions */
+
+static ACL_VSTREAM *server_bind_one(const char *addr);
+static void udp_server_read(int event_type, ACL_EVENT *event,
+	ACL_VSTREAM *stream, void *context);
+
+#ifdef ACL_UNIX
+# ifdef SO_REUSEPORT
+
+#include <linux/netlink.h>
+#include <linux/route.h>
+#include <linux/rtnetlink.h>
+
+#define	IPC_TYPE_ADD	1
+#define	IPC_TYPE_DEL	2
+
+#define SOCK	ACL_VSTREAM_SOCK
+
+typedef struct IPC_DAT {
+	int      type;
+	UDP_CTX *ctx;
+} IPC_DAT;
+
+static ACL_VSTREAM *__if_monitor;
+
+static UDP_CTX *new_ctx(int n)
+{
+	UDP_CTX *ctx = (UDP_CTX *) acl_mycalloc(1, sizeof(UDP_CTX));
+	ctx->count   = 0;
+	ctx->streams = (ACL_VSTREAM **) acl_mycalloc(n, sizeof(ACL_VSTREAM*));
+
+	return ctx;
+}
+
+static void free_ctx(UDP_CTX *ctx)
+{
+	int  i;
+	for (i = 0; i < ctx->count; i++) {
+		if (ctx->streams[i])
+			acl_vstream_close(ctx->streams[i]);
+	}
+
+	if (ctx->addrs)
+		acl_argv_free(ctx->addrs);
+	acl_myfree(ctx->streams);
+	acl_myfree(ctx);
+}
+
+static void server_lock(UDP_SERVER *server)
+{
+	acl_pthread_mutex_lock(server->lock);
+}
+
+static void server_unlock(UDP_SERVER *server)
+{
+	acl_pthread_mutex_unlock(server->lock);
+}
+
+static void server_ipc_add(UDP_SERVER *server, UDP_CTX *ctx)
+{
+	int     ret;
+	IPC_DAT dat;
+
+	dat.type = IPC_TYPE_ADD;
+	dat.ctx  = ctx;
+	ret = acl_vstream_writen(server->ipc_out, &dat, sizeof(dat));
+	if (ret == ACL_VSTREAM_EOF) {
+		acl_msg_error("ipc send error %s", acl_last_serror());
+		free_ctx(ctx);
+	}
+}
+
+static void server_ipc_del(UDP_SERVER *server, UDP_CTX *ctx)
+{
+	int     ret;
+	IPC_DAT dat;
+
+	dat.type = IPC_TYPE_DEL;
+	dat.ctx  = ctx;
+	ret = acl_vstream_writen(server->ipc_out, &dat, sizeof(dat));
+	if (ret == ACL_VSTREAM_EOF) {
+		acl_msg_error("ipc send error %s", acl_last_serror());
+		free_ctx(ctx);
+	}
+}
+
+static void server_add(UDP_SERVER *server, UDP_CTX *ctx)
+{
+	int i;
+
+	server->size   += ctx->count;
+	server->streams = (ACL_VSTREAM **) acl_myrealloc(server->streams,
+		server->size * sizeof(ACL_VSTREAM *));
+
+	for (i = 0; i < ctx->count; i++) {
+		server->streams[server->count++] = ctx->streams[i];
+		acl_event_enable_read(server->event, ctx->streams[i],
+			0, udp_server_read, server);
+	}
+
+	ctx->count = 0;
+}
+
+static void remove_matched_stream(UDP_SERVER *server, const char *addr)
+{
+	int i;
+
+	server_lock(server);
+
+	for (i = 0; i < server->count; i++) {
+		char local[256];
+		ACL_VSTREAM *stream = server->streams[i];
+
+		if (acl_getsockname(SOCK(stream), local, sizeof(local)) == -1)
+			continue;
+
+		if (strcmp(local, addr) != 0)
+			continue;
+
+		acl_event_disable_readwrite(server->event, stream);
+		acl_vstream_close(stream);
+		--server->count;
+		if (server->count == 0)
+			server->streams[0] = NULL;
+		else
+			server->streams[i] = server->streams[server->count];
+		acl_msg_info("remove one stream ok, addr=%s", addr);
+		break;
+	}
+
+	server_unlock(server);
+}
+
+static void server_del(UDP_SERVER *server, UDP_CTX *ctx)
+{
+	ACL_ITER iter;
+
+	acl_foreach(iter, ctx->addrs) {
+		const char *addr = (const char *) iter.data;
+		remove_matched_stream(server, addr);
+	}
+
+}
+
+static void server_ipc_read(int event_type, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream, void *context)
+{
+	UDP_SERVER *server = (UDP_SERVER *) context;
+	IPC_DAT  dat;
+	int ret;
+
+	if (event_type != ACL_EVENT_READ)
+		acl_msg_fatal("%s(%d): unknown event_type: %d",
+			__FUNCTION__, __LINE__, event_type);
+
+	ret = acl_vstream_readn(stream, &dat, sizeof(dat));
+	if (ret == ACL_VSTREAM_EOF) {
+		acl_msg_error("%s(%d): ipc read error %s",
+			__FUNCTION__, __LINE__, acl_last_serror());
+		return;
+	}
+
+	switch (dat.type) {
+	case IPC_TYPE_ADD:
+		server_add(server, dat.ctx);
+		break;
+	case IPC_TYPE_DEL:
+		server_del(server, dat.ctx);
+		break;
+	default:
+		acl_msg_error("unknown ipc type=%d", dat.type);
+		break;
+	}
+
+	free_ctx(dat.ctx);
+}
+
+static void server_ipc_setup(UDP_SERVER *server)
+{
+	int i;
+	for (i = 0; i < server->count; i++) {
+		ACL_SOCKET fds[2];
+		int ret = acl_sane_socketpair(AF_UNIX, SOCK_STREAM, 0, fds);
+		if (ret < 0) {
+			acl_msg_error("socketpair error %s", acl_last_serror());
+			continue;
+		}
+
+		server->lock    = (acl_pthread_mutex_t *)
+			acl_mycalloc(1, sizeof(acl_pthread_mutex_t));
+		acl_pthread_mutex_init(server->lock, NULL);
+
+		server->ipc_in  = acl_vstream_fdopen(fds[0], O_RDONLY,
+			4096, 0, ACL_VSTREAM_TYPE_SOCK);
+		server->ipc_out = acl_vstream_fdopen(fds[1], O_WRONLY,
+			4096, 0, ACL_VSTREAM_TYPE_SOCK);
+		acl_event_enable_read(server->event, server->ipc_in,
+			0, server_ipc_read, server);
+	}
+}
+
+static void servers_ipc_setup(UDP_SERVER *servers, int count)
+{
+	int i;
+
+	for (i = 0; i < count; i++)
+		server_ipc_setup(&servers[i]);
+}
+
+static ACL_ARGV *server_get_addrs(UDP_SERVER *server, const char *ip)
+{
+	int i;
+	ACL_ARGV *addrs = acl_argv_alloc(1);
+
+	server_lock(server);
+
+	for (i = 0; i < server->count; i++) {
+		ACL_VSTREAM *stream = server->streams[i];
+		char buf[128], *ptr;
+		int  port;
+
+		if (acl_getsockname(SOCK(stream), buf, sizeof(buf)) == -1)
+			continue;
+		if ((ptr = strchr(buf, ':')) == NULL)
+			continue;
+		*ptr++ = 0;
+		port = atoi(ptr);
+		if (port < 0)
+			continue;
+
+		snprintf(buf, sizeof(buf), "%s:%d", ip, port);
+		acl_argv_add(addrs, buf, 0);
+	}
+
+	server_unlock(server);
+
+	return addrs;
+}
+
+static void server_add_addr(UDP_SERVER *server, const char *ip)
+{
+	ACL_ARGV *addrs = server_get_addrs(server, ip);
+	UDP_CTX  *ctx;
+	ACL_ITER  iter;
+
+	if (addrs->argc == 0) {
+		acl_argv_free(addrs);
+		return;
+	}
+
+	ctx = new_ctx(addrs->argc);
+
+	acl_foreach(iter, addrs) {
+		ACL_VSTREAM *stream = server_bind_one((char *) iter.data);
+		if (stream == NULL)
+			continue;
+
+		ctx->streams[ctx->count++] = stream;
+		if (__server_on_bind)
+			__server_on_bind(__service_ctx, stream);
+	}
+
+	acl_argv_free(addrs);
+
+	if (ctx->count > 0)
+		server_ipc_add(server, ctx);
+	else
+		free_ctx(ctx);
+}
+
+static void server_del_addr(UDP_SERVER *server, const char *ip)
+{
+	ACL_ARGV *addrs = server_get_addrs(server, ip);
+	UDP_CTX  *ctx;
+
+	if (addrs->argc == 0) {
+		acl_argv_free(addrs);
+		return;
+	}
+
+	ctx = new_ctx(addrs->argc);
+	ctx->addrs = addrs;
+
+	server_ipc_del(server, ctx);
+}
+
+static ACL_VSTREAM *netlink_open(void)
+{
+	struct sockaddr_nl sa;
+	int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
+	ACL_VSTREAM *stream;
+
+	if (fd < 0) {
+		acl_msg_error("%s(%d), %s: create raw socket error %s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
+		return NULL;
+	}
+
+	acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
+
+	memset(&sa, 0, sizeof(sa));
+	sa.nl_family = AF_NETLINK;
+	sa.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR | RTMGRP_IPV4_ROUTE |
+		RTMGRP_IPV6_IFADDR | RTMGRP_IPV6_ROUTE;
+	if (bind(fd, (struct sockaddr *)&sa, sizeof(sa)) != 0) {
+		acl_msg_error("%s(%d), %s: bind raw socket error %s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
+		close(fd);
+		return NULL;
+	}
+
+	stream = acl_vstream_fdopen(fd, O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
+	return stream;
+}
+
+static void parse_rtattr(struct rtattr **tb, int max,
+	struct rtattr *attr, int len)
+{
+	for (; RTA_OK(attr, len); attr = RTA_NEXT(attr, len)) {
+		if (attr->rta_type <= max)
+			tb[attr->rta_type] = attr;
+	}
+}
+
+static int netlink_addr(struct nlmsghdr *nh, char *ip, size_t size)
+{
+	int    len;
+	struct rtattr *tb[IFA_MAX + 1];
+	struct ifaddrmsg *addr;
+
+	memset(&tb, 0, sizeof(tb));
+	addr = NLMSG_DATA(nh);
+	len  = nh->nlmsg_len - NLMSG_SPACE(sizeof(*addr));
+	parse_rtattr(tb, IFA_MAX, IFA_RTA(addr), len);
+
+	if (tb[IFA_ADDRESS] == NULL)
+		return -1;
+
+	if (!inet_ntop(addr->ifa_family, RTA_DATA(tb[IFA_ADDRESS]), ip, size))
+		return -1;
+	return 0;
+}
+
+static int netlink_check(const char *ip)
+{
+	ACL_ARGV *addrs = acl_ifconf_search(ip);
+
+	if (addrs == NULL)
+		return -1;
+
+	if (addrs->argc != 1) {
+		acl_msg_error("%s(%d), %s: too many matched addrs=%d, ip=%s",
+			__FILE__, __LINE__, __FUNCTION__, addrs->argc, ip);
+		acl_argv_free(addrs);
+		return -1;
+	} else if (strcmp(addrs->argv[0], ip) != 0) {
+		acl_msg_error("%s(%d), %s: invalid addr=%s, %s",
+			__FILE__, __LINE__, __FUNCTION__, addrs->argv[0], ip);
+		acl_argv_free(addrs);
+		return -1;
+	}
+
+	acl_argv_free(addrs);
+	return 0;
+}
+
+static void netlink_handle_add(struct nlmsghdr *nh)
+{
+	char ip[64];
+	int  i;
+
+	if (netlink_addr(nh, ip, sizeof(ip)) == -1 || netlink_check(ip) == -1)
+		return;
+
+	for (i = 0; i < __nservers; i++)
+		server_add_addr(&__servers[i], ip);
+}
+
+static void netlink_handle_del(struct nlmsghdr *nh)
+{
+	int  i;
+	char ip[64];
+
+	if (netlink_addr(nh, ip, sizeof(ip)) == -1 || netlink_check(ip) == -1)
+		return;
+
+	for (i = 0; i < __nservers; i++)
+		server_del_addr(&__servers[i], ip);
+}
+
+static void netlink_handle(struct nlmsghdr *nh, int dlen)
+{
+	for (; NLMSG_OK(nh, dlen); nh = NLMSG_NEXT(nh, dlen)) {
+		switch (nh->nlmsg_type) {
+		case RTM_NEWADDR:
+			netlink_handle_add(nh);
+			break;
+		case RTM_DELADDR:
+			netlink_handle_del(nh);
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+static void netlink_callback(int event_type, ACL_EVENT *event acl_unused,
+	ACL_VSTREAM *stream, void *context acl_unused)
+{
+	int  ret;
+	char buf[4096];
+
+	if (event_type != ACL_EVENT_READ)
+		acl_msg_fatal("%s, %s(%d): unknown event_type: %d",
+			__FILE__, __FUNCTION__, __LINE__, event_type);
+
+	ret = acl_vstream_read(stream, buf, sizeof(buf));
+	if (ret == ACL_VSTREAM_EOF) {
+		acl_msg_error("%s, %s(%d): read error %s",
+			__FILE__, __FUNCTION__, __LINE__, acl_last_serror());
+	} else if (ret < (int) sizeof(struct nlmsghdr)) {
+		acl_msg_error("%s, %s(%d): invalid read length=%d",
+			__FILE__, __FUNCTION__, __LINE__, ret);
+	} else {
+		struct nlmsghdr *nh = (struct nlmsghdr *) buf;
+		netlink_handle(nh, ret);
+	}
+}
+
+# endif	// SO_REUSEPORT
+#endif	// ACL_UNIX
 
 const char *acl_udp_server_conf(void)
 {
@@ -222,6 +666,14 @@ static void server_stop(UDP_SERVER *server)
 	for (i = 0; server->streams[i] != NULL; i++) {
 		acl_event_disable_readwrite(server->event, server->streams[i]);
 		acl_vstream_close(server->streams[i]);
+		if (server->ipc_in)
+			acl_vstream_close(server->ipc_in);
+		if (server->ipc_out)
+			acl_vstream_close(server->ipc_out);
+		if (server->lock) {
+			acl_pthread_mutex_destroy(server->lock);
+			acl_myfree(server->lock);
+		}
 		acl_myfree(server->streams);
 	}
 
@@ -409,7 +861,8 @@ static UDP_SERVER *servers_alloc(int event_mode, int nthreads, int sock_count)
 		servers[i].event = acl_event_new(event_mode, 0,
 			acl_var_udp_delay_sec, acl_var_udp_delay_usec);
 
-		servers[i].socket_count = sock_count;
+		servers[i].count   = sock_count;
+		servers[i].size    = sock_count;
 		servers[i].streams = (ACL_VSTREAM **)
 			acl_mycalloc(sock_count + 1, sizeof(ACL_VSTREAM *));
 	}
@@ -419,40 +872,50 @@ static UDP_SERVER *servers_alloc(int event_mode, int nthreads, int sock_count)
 
 static int __fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 
+static ACL_VSTREAM *server_bind_one(const char *addr)
+{
+	ACL_VSTREAM *stream;
+	ACL_SOCKET   fd;
+	unsigned flag = 0;
+	char     local[64];
+
+	if (acl_var_udp_non_block)
+		flag |= ACL_INET_FLAG_NBLOCK;
+	if (acl_var_udp_reuse_port)
+		flag |= ACL_INET_FLAG_REUSEPORT;
+
+	fd = acl_udp_bind(addr, flag);
+
+	if (fd == ACL_SOCKET_INVALID) {
+		acl_msg_warn("bind %s error %s", addr, acl_last_serror());
+		return NULL;
+	}
+
+#ifdef ACL_UNIX
+	acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
+#endif
+
+	acl_msg_info("bind %s addr ok, fd %d", addr, fd);
+
+	stream = acl_vstream_fdopen(fd, O_RDWR, acl_var_udp_buf_size,
+			acl_var_udp_rw_timeout, __fdtype);
+
+	acl_getsockname(fd, local, sizeof(local));
+	acl_vstream_set_local(stream, local);
+	acl_vstream_set_udp_io(stream);
+
+	return stream;
+}
+
 static void server_binding(UDP_SERVER *server, ACL_ARGV *addrs)
 {
 	ACL_ITER iter;
 	int i = 0;
 
 	acl_foreach(iter, addrs) {
-		const char *ptr = (char *) iter.data;
-		unsigned flag   = 0;
-		char addr[64];
-		ACL_VSTREAM *stream;
-		ACL_SOCKET   fd;
-
-		if (acl_var_udp_non_block)
-			flag |= ACL_INET_FLAG_NBLOCK;
-		if (acl_var_udp_reuse_port)
-			flag |= ACL_INET_FLAG_REUSEPORT;
-
-		fd = acl_udp_bind(ptr, flag);
-
-		if (fd == ACL_SOCKET_INVALID)
-			continue;
-
-		acl_msg_info("bind %s addr ok, fd %d", ptr, fd);
-		stream = acl_vstream_fdopen(fd, O_RDWR, acl_var_udp_buf_size,
-			acl_var_udp_rw_timeout, __fdtype);
-
-		acl_getsockname(fd, addr, sizeof(addr));
-		acl_vstream_set_local(stream, addr);
-		acl_vstream_set_udp_io(stream);
+		ACL_VSTREAM *stream = server_bind_one((char *) iter.data);
 		acl_event_enable_read(server->event, stream,
 			0, udp_server_read, server);
-#ifdef ACL_UNIX
-		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
-#endif
 		server->streams[i++] = stream;
 	}
 
@@ -526,6 +989,8 @@ static UDP_SERVER *servers_open(int event_mode, int nthreads, int sock_count)
 
 static UDP_SERVER *servers_create(const char *service, int nthreads)
 {
+	UDP_SERVER *servers = NULL;
+
 	if (strcasecmp(acl_var_udp_event_mode, "poll") == 0)
 		__event_mode = ACL_EVENT_POLL;
 	else if (strcasecmp(acl_var_udp_event_mode, "kernel") == 0)
@@ -537,20 +1002,33 @@ static UDP_SERVER *servers_create(const char *service, int nthreads)
 		acl_var_udp_delay_sec, acl_var_udp_delay_usec);
 
 	if (!__daemon_mode)
-		return servers_binding(service, __event_mode, nthreads);
+		servers = servers_binding(service, __event_mode, nthreads);
+#ifdef ACL_UNIX
+# ifdef SO_REUSEPORT
+	else
+		servers = servers_binding(service, __event_mode, nthreads);
+# endif
+	if (servers == NULL)
+		/* __socket_count from command argv */
+		servers = servers_open(__event_mode, nthreads, __socket_count);
+#endif /* ACL_UNIX */
+
+	if (servers == NULL)
+		acl_msg_fatal("%s(%d): not support daemon mode!",
+			__FILE__, __LINE__);
 
 #ifdef ACL_UNIX
 # ifdef SO_REUSEPORT
-	return servers_binding(service, __event_mode, nthreads);
+	__if_monitor = netlink_open();
+	if (__if_monitor) {
+		acl_event_enable_read(__main_event, __if_monitor, 0,
+			netlink_callback, servers);
+		servers_ipc_setup(servers, nthreads);
+	}
 # endif
- 
-	/* __socket_count from command argv */
-	return servers_open(__event_mode, nthreads, __socket_count);
-#else
-	acl_msg_fatal("%s(%d): not support daemon mode!", __FILE__, __LINE__);
-	/* not reached here */
-	return NULL;
-#endif /* ACL_UNIX */
+#endif
+
+	return servers;
 }
 
 static void *thread_main(void *ctx)
@@ -622,21 +1100,22 @@ static void main_thread_loop(void)
 	while (1) {
 		acl_event_loop(__main_event);
 #ifdef ACL_UNIX
-		if (acl_var_server_gotsighup && __sighup_handler) {
-			acl_var_server_gotsighup = 0;
-			if (__sighup_handler(__service_ctx, buf) < 0)
-				acl_master_notify(acl_var_udp_pid,
-					__udp_server_generation,
-					ACL_MASTER_STAT_SIGHUP_ERR);
-			else
-				acl_master_notify(acl_var_udp_pid,
-					__udp_server_generation,
-					ACL_MASTER_STAT_SIGHUP_OK);
-		}
+		if (!acl_var_server_gotsighup || !__sighup_handler)
+			continue;
+
+		acl_var_server_gotsighup = 0;
+		if (__sighup_handler(__service_ctx, buf) < 0)
+			acl_master_notify(acl_var_udp_pid,
+				__udp_server_generation,
+				ACL_MASTER_STAT_SIGHUP_ERR);
+		else
+			acl_master_notify(acl_var_udp_pid,
+				__udp_server_generation,
+				ACL_MASTER_STAT_SIGHUP_OK);
 #endif
 	}
     
-    /* not reached here */
+	/* not reached here */
 
 	/* acl_vstring_free(buf); */
 }
@@ -655,7 +1134,7 @@ static void servers_start(UDP_SERVER *servers, int nthreads)
 			UDP_SERVER *server = &servers[i];
 			int j;
 
-			for (j = 0; j < server->socket_count; j++)
+			for (j = 0; j < server->count; j++)
 				__server_on_bind(__service_ctx,
 					server->streams[j]);
 		}
@@ -846,6 +1325,8 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		acl_var_udp_threads = 1;
 
 	__servers = servers_create(service_name, acl_var_udp_threads);
+	if (__servers)
+		__nservers = acl_var_udp_threads;
 
 	/* 创建用于线程局部变量的键对象 */
 	acl_pthread_key_create(&__server_key, thread_server_exit);
