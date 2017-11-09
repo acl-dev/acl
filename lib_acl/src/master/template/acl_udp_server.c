@@ -192,7 +192,7 @@ static ACL_VSTREAM *server_bind_one(const char *addr);
 static void udp_server_read(int event_type, ACL_EVENT *event,
 	ACL_VSTREAM *stream, void *context);
 
-#ifdef ACL_UNIX
+#ifdef ACL_LINUX
 # ifdef SO_REUSEPORT
 
 #include <linux/netlink.h>
@@ -616,7 +616,7 @@ static void netlink_callback(int event_type, ACL_EVENT *event acl_unused,
 }
 
 # endif	// SO_REUSEPORT
-#endif	// ACL_UNIX
+#endif	// ACL_LINUX
 
 const char *acl_udp_server_conf(void)
 {
@@ -1017,7 +1017,7 @@ static UDP_SERVER *servers_create(const char *service, int nthreads)
 		acl_msg_fatal("%s(%d): not support daemon mode!",
 			__FILE__, __LINE__);
 
-#ifdef ACL_UNIX
+#ifdef ACL_LINUX
 # ifdef SO_REUSEPORT
 	__if_monitor = netlink_open();
 	if (__if_monitor) {
