@@ -244,34 +244,6 @@ static void server_unlock(UDP_SERVER *server)
 	acl_pthread_mutex_unlock(server->lock);
 }
 
-static void server_ipc_add(UDP_SERVER *server, UDP_CTX *ctx)
-{
-	int     ret;
-	IPC_DAT dat;
-
-	dat.type = IPC_TYPE_ADD;
-	dat.ctx  = ctx;
-	ret = acl_vstream_writen(server->ipc_out, &dat, sizeof(dat));
-	if (ret == ACL_VSTREAM_EOF) {
-		acl_msg_error("ipc send error %s", acl_last_serror());
-		free_ctx(ctx);
-	}
-}
-
-static void server_ipc_del(UDP_SERVER *server, UDP_CTX *ctx)
-{
-	int     ret;
-	IPC_DAT dat;
-
-	dat.type = IPC_TYPE_DEL;
-	dat.ctx  = ctx;
-	ret = acl_vstream_writen(server->ipc_out, &dat, sizeof(dat));
-	if (ret == ACL_VSTREAM_EOF) {
-		acl_msg_error("ipc send error %s", acl_last_serror());
-		free_ctx(ctx);
-	}
-}
-
 static void server_add(UDP_SERVER *server, UDP_CTX *ctx)
 {
 	int i;
@@ -307,7 +279,10 @@ static void remove_matched_stream(UDP_SERVER *server, const char *addr)
 
 		acl_event_disable_readwrite(server->event, stream);
 		acl_vstream_close(stream);
+
 		--server->count;
+		assert(server->count >= 0);
+
 		if (server->count == 0)
 			server->streams[0] = NULL;
 		else
@@ -327,15 +302,14 @@ static void server_del(UDP_SERVER *server, UDP_CTX *ctx)
 		const char *addr = (const char *) iter.data;
 		remove_matched_stream(server, addr);
 	}
-
 }
 
 static void server_ipc_read(int event_type, ACL_EVENT *event acl_unused,
 	ACL_VSTREAM *stream, void *context)
 {
 	UDP_SERVER *server = (UDP_SERVER *) context;
-	IPC_DAT  dat;
-	int ret;
+	IPC_DAT     dat;
+	int         ret;
 
 	if (event_type != ACL_EVENT_READ)
 		acl_msg_fatal("%s(%d): unknown event_type: %d",
@@ -363,9 +337,38 @@ static void server_ipc_read(int event_type, ACL_EVENT *event acl_unused,
 	free_ctx(dat.ctx);
 }
 
+static void server_ipc_add(UDP_SERVER *server, UDP_CTX *ctx)
+{
+	int     ret;
+	IPC_DAT dat;
+
+	dat.type = IPC_TYPE_ADD;
+	dat.ctx  = ctx;
+	ret = acl_vstream_writen(server->ipc_out, &dat, sizeof(dat));
+	if (ret == ACL_VSTREAM_EOF) {
+		acl_msg_error("ipc send error %s", acl_last_serror());
+		free_ctx(ctx);
+	}
+}
+
+static void server_ipc_del(UDP_SERVER *server, UDP_CTX *ctx)
+{
+	int     ret;
+	IPC_DAT dat;
+
+	dat.type = IPC_TYPE_DEL;
+	dat.ctx  = ctx;
+	ret = acl_vstream_writen(server->ipc_out, &dat, sizeof(dat));
+	if (ret == ACL_VSTREAM_EOF) {
+		acl_msg_error("ipc send error %s", acl_last_serror());
+		free_ctx(ctx);
+	}
+}
+
 static void server_ipc_setup(UDP_SERVER *server)
 {
 	int i;
+
 	for (i = 0; i < server->count; i++) {
 		ACL_SOCKET fds[2];
 		int ret = acl_sane_socketpair(AF_UNIX, SOCK_STREAM, 0, fds);
@@ -777,23 +780,17 @@ static void udp_server_init(const char *procname)
 
 #ifdef ACL_UNIX
 
-	/*
-	 * Don't die when a process goes away unexpectedly.
-	 */
+	/* Don't die when a process goes away unexpectedly. */
 	signal(SIGPIPE, SIG_IGN);
 
-	/*
-	 * Don't die for frivolous reasons.
-	 */
+	/* Don't die for frivolous reasons. */
 #ifdef SIGXFSZ
 	signal(SIGXFSZ, SIG_IGN);
 #endif
 
 #endif  /* ACL_UNIX */
 
-	/*
-	 * May need this every now and then.
-	 */
+	/* May need this every now and then. */
 #ifdef ACL_WINDOWS
 	acl_var_udp_pid = _getpid();
 #else
@@ -946,7 +943,7 @@ static UDP_SERVER *servers_binding(const char *service,
 }
 
 #ifdef ACL_UNIX
-
+# ifndef SO_REUSEPORT
 static void server_open(UDP_SERVER *server, int sock_count)
 {
 	ACL_SOCKET fd = ACL_MASTER_LISTEN_FD;
@@ -984,7 +981,7 @@ static UDP_SERVER *servers_open(int event_mode, int nthreads, int sock_count)
 
 	return servers;
 }
-
+# endif
 #endif /* ACL_UNIX */
 
 static UDP_SERVER *servers_create(const char *service, int nthreads)
@@ -1001,32 +998,35 @@ static UDP_SERVER *servers_create(const char *service, int nthreads)
 	__main_event = acl_event_new(__event_mode, 0,
 		acl_var_udp_delay_sec, acl_var_udp_delay_usec);
 
-	if (!__daemon_mode)
-		servers = servers_binding(service, __event_mode, nthreads);
 #ifdef ACL_UNIX
+	if (__daemon_mode) {
 # ifdef SO_REUSEPORT
-	else
 		servers = servers_binding(service, __event_mode, nthreads);
-# endif
-	if (servers == NULL)
+# else
 		/* __socket_count from command argv */
 		servers = servers_open(__event_mode, nthreads, __socket_count);
-#endif /* ACL_UNIX */
+# endif
+	} else
+		servers = servers_binding(service, __event_mode, nthreads);
 
-	if (servers == NULL)
-		acl_msg_fatal("%s(%d): not support daemon mode!",
-			__FILE__, __LINE__);
-
-#ifdef ACL_LINUX
 # ifdef SO_REUSEPORT
+	/* create monitor watching the network's changing status */
 	__if_monitor = netlink_open();
 	if (__if_monitor) {
 		acl_event_enable_read(__main_event, __if_monitor, 0,
-			netlink_callback, servers);
+				netlink_callback, servers);
 		servers_ipc_setup(servers, nthreads);
+		acl_msg_info("--- monitoring ifaddr status ---");
 	}
 # endif
-#endif
+
+#else	/* !ACL_UNIX */
+	if (__daemon_mode) {
+		acl_msg_fatal("%s(%d): not support daemon mode!",
+			__FILE__, __LINE__);
+	} else
+		servers = servers_binding(service, __event_mode, nthreads);
+#endif /* ACL_UNIX */
 
 	return servers;
 }
@@ -1364,8 +1364,9 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 
 #ifdef ACL_LINUX
 	/* notify master that child started ok */
-	acl_master_notify(acl_var_udp_pid, __udp_server_generation,
-		ACL_MASTER_STAT_START_OK);
+	if (__daemon_mode)
+		acl_master_notify(acl_var_udp_pid, __udp_server_generation,
+			ACL_MASTER_STAT_START_OK);
 #endif
 
 	/* …Ë÷√ SIGHUP –≈∫≈ */
