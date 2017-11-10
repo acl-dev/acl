@@ -400,8 +400,10 @@ static void servers_ipc_setup(UDP_SERVER *servers, int count)
 
 static ACL_ARGV *server_get_addrs(UDP_SERVER *server, const char *ip)
 {
-	int i;
-	ACL_ARGV *addrs = acl_argv_alloc(1);
+	int         i;
+	ACL_ARGV   *addrs = acl_argv_alloc(1);
+	ACL_HTABLE *table = acl_htable_create(10, 0);
+	ACL_ITER    iter;
 
 	server_lock(server);
 
@@ -419,11 +421,20 @@ static ACL_ARGV *server_get_addrs(UDP_SERVER *server, const char *ip)
 		if (port < 0)
 			continue;
 
-		snprintf(buf, sizeof(buf), "%s:%d", ip, port);
+		snprintf(buf, sizeof(buf), "%d", port);
+		if (acl_htable_locate(table, buf) != NULL)
+			continue;
+		acl_htable_enter(table, buf, NULL);
+	}
+
+	acl_foreach(iter, table) {
+		char buf[128];
+		snprintf(buf, sizeof(buf), "%s:%s", ip, iter.key);
 		acl_argv_add(addrs, buf, 0);
 	}
 
 	server_unlock(server);
+	acl_htable_free(table, NULL);
 
 	return addrs;
 }
