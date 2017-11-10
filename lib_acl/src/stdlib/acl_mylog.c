@@ -553,7 +553,7 @@ static int open_log(const char *recipient, const char *logpre)
 }
 
 #ifdef	ACL_UNIX
-static void lock_all(void)
+static void fork_prepare(void)
 {
 	if (__loggers != NULL) {
 		ACL_ITER iter;
@@ -565,7 +565,7 @@ static void lock_all(void)
 	}
 }
 
-static void unlock_all(void)
+static void fork_in_parent(void)
 {
 	if (__loggers != NULL) {
 		ACL_ITER iter;
@@ -577,19 +577,16 @@ static void unlock_all(void)
 	}
 }
 
-static void fork_prepare(void)
-{
-	lock_all();
-}
-
-static void fork_in_parent(void)
-{
-	unlock_all();
-}
-
 static void fork_in_child(void)
 {
-	unlock_all();
+	if (__loggers != NULL) {
+		ACL_ITER iter;
+		acl_foreach(iter, __loggers) {
+			ACL_LOG *log = (ACL_LOG *) iter.data;
+			if (log->lock)
+				init_log_mutex(log->lock);
+		}
+	}
 }
 #endif
 
