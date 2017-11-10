@@ -552,6 +552,47 @@ static int open_log(const char *recipient, const char *logpre)
 		return open_file_log(recipient, logpre);
 }
 
+#ifdef	ACL_UNIX
+static void lock_all(void)
+{
+	if (__loggers != NULL) {
+		ACL_ITER iter;
+		acl_foreach(iter, __loggers) {
+			ACL_LOG *log = (ACL_LOG *) iter.data;
+			if (log->lock)
+				thread_mutex_lock(log->lock);
+		}
+	}
+}
+
+static void unlock_all(void)
+{
+	if (__loggers != NULL) {
+		ACL_ITER iter;
+		acl_foreach(iter, __loggers) {
+			ACL_LOG *log = (ACL_LOG *) iter.data;
+			if (log->lock)
+				thread_mutex_unlock(log->lock);
+		}
+	}
+}
+
+static void fork_prepare(void)
+{
+	lock_all();
+}
+
+static void fork_in_parent(void)
+{
+	unlock_all();
+}
+
+static void fork_in_child(void)
+{
+	unlock_all();
+}
+#endif
+
 /*
  * recipients 可以是以下日志格式的组合:
  *  tcp:127.0.0.1:8088
@@ -561,7 +602,6 @@ static int open_log(const char *recipient, const char *logpre)
  *  /var/log/unix.log
  * 如：tcp:127.0.0.1:8088|/var/log/unix.log
  */
-
 int acl_open_log(const char *recipients, const char *logpre)
 {
 	const char *myname = "acl_open_log";
@@ -588,7 +628,12 @@ int acl_open_log(const char *recipients, const char *logpre)
 			return -1;
 		}
 	}
+
 	acl_argv_free(argv);
+
+#ifdef	ACL_UNIX
+	pthread_atfork(fork_prepare, fork_in_parent, fork_in_child);
+#endif
 	return 0;
 }
 
@@ -701,6 +746,9 @@ static void file_vsyslog(ACL_LOG *log, const char *info,
 	char   fmtstr[128], tbuf[1024], *buf;
 	size_t len;
 
+	if (log->lock)
+		thread_mutex_lock(log->lock);
+
 	acl_logtime_fmt(fmtstr, sizeof(fmtstr));
 
 	if (__log_thread_id) {
@@ -738,9 +786,6 @@ static void file_vsyslog(ACL_LOG *log, const char *info,
 	}
 
 	buf = get_buf(tbuf, fmt, ap, &len);
-
-	if (log->lock)
-		thread_mutex_lock(log->lock);
 
 	if (private_vstream_writen(log->fp, buf, len) == ACL_VSTREAM_EOF
 		|| private_vstream_writen(log->fp, "\r\n", 2) == ACL_VSTREAM_EOF)
