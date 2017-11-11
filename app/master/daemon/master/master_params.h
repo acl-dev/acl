@@ -46,6 +46,14 @@ extern char *acl_var_master_daemon_dir;
 #define	ACL_DEF_MASTER_SERVICE_DIR		"/opt/acl/conf/service"
 extern char *acl_var_master_service_dir;
 
+#define ACL_VAR_MASTER_FILE_EXTS		"file_exts"
+#define ACL_DEF_MASTER_FILE_EXTS		"cf, conf"
+extern char *acl_var_master_file_exts;
+
+#define ACL_VAR_MASTER_SERVICE_FILE		"service_file"
+#define ACL_DEF_MASTER_SERVICE_FILE		"/opt/acl/conf/services.cf"
+extern char *acl_var_master_service_file;
+
 #define	ACL_VAR_MASTER_QUEUE_DIR		"queue_directory"
 #define	ACL_DEF_MASTER_QUEUE_DIR		"/opt/acl/var"
 extern char *acl_var_master_queue_dir;

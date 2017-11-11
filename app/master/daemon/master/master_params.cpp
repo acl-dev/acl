@@ -49,6 +49,8 @@ char *acl_var_master_log_file;
 char *acl_var_master_pid_file;
 char *acl_var_master_manage_addr;
 char *acl_var_master_stop_kill;
+char *acl_var_master_file_exts;
+char *acl_var_master_service_file;
 
 static ACL_CONFIG_STR_TABLE str_tab[] = {
 	{ ACL_VAR_MASTER_INET_INTERFACES, ACL_DEF_MASTER_INET_INTERFACES,
@@ -69,6 +71,10 @@ static ACL_CONFIG_STR_TABLE str_tab[] = {
 		&acl_var_master_manage_addr },
 	{ ACL_VAR_MASTER_STOP_KILL, ACL_DEF_MASTER_STOP_KILL,
 		&acl_var_master_stop_kill },
+	{ ACL_VAR_MASTER_FILE_EXTS, ACL_DEF_MASTER_FILE_EXTS,
+		&acl_var_master_file_exts },
+	{ ACL_VAR_MASTER_SERVICE_FILE, ACL_DEF_MASTER_SERVICE_FILE,
+		&acl_var_master_service_file },
 
 	{ 0, 0, 0 },
 };
@@ -133,14 +139,23 @@ static void update_int_vars(ACL_CONFIG_INT_TABLE cit[],
 }
 
 static void update_str_vars(ACL_CONFIG_STR_TABLE cst[],
-	const char *name, const char *value)
+	const char *name, const ACL_CFG_LINE *item)
 {
 	int   i;
+	ACL_VSTRING *buf;
+
+	if (item->ncount <= 1)
+		return;
+
+	buf = acl_vstring_alloc(128);
+
+	for (i = 1; i < item->ncount; i++)
+		acl_vstring_strcat(buf, item->value[i]);
 
 	for (i = 0; cst[i].name != 0; i++) {
 		if (strcasecmp(cst[i].name, name) == 0) {
 			acl_myfree(*(cst[i].target));
-			*(cst[i].target) = acl_mystrdup(value);
+			*(cst[i].target) = acl_vstring_export(buf);
 		}
 	}
 }
@@ -192,7 +207,7 @@ static void update_master_conf_vars(ACL_CFG_PARSER *parser)
 		if (item->ncount < 2)
 			continue;
 
-		update_str_vars(str_tab, item->value[0], item->value[1]);
+		update_str_vars(str_tab, item->value[0], item);
 	}
 
 	for (i = 0; i < n; i++) {
@@ -218,7 +233,7 @@ void acl_master_params_load(const char *pathname)
 
 	init_master_vars();
 
-	cfg_parser = acl_cfg_parser_load(pathname, " =");
+	cfg_parser = acl_cfg_parser_load(pathname, "=\t ");
 	if (cfg_parser == NULL)
 		acl_msg_fatal("%s(%d), %s: load file(%s) error(%s)",
 			__FILE__, __LINE__, myname, pathname, strerror(errno));

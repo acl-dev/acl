@@ -1,4 +1,7 @@
 
+11) 2017.11.11
+11.1) feature: master can start services which are specified in file.
+
 10) 2017.11.7
 10.1) feature: master can start one service with the specified path
 

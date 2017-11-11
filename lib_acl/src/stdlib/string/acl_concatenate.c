@@ -47,5 +47,3 @@ char   *acl_concatenate(const char *arg0,...)
 	va_end(ap);
 	return (result);
 }
-
-

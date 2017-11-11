@@ -43,17 +43,57 @@ void acl_master_refresh(void)
 	}
 }
 
-/* acl_master_config - read config file */
+#define SWAP(type,a,b)	{ type temp = a; a = b; b = temp; }
 
-void acl_master_config(void)
+static void master_add_service(ACL_MASTER_SERV *entry)
 {
-	const char *myname = "acl_master_config";
-	ACL_MASTER_SERV *entry;
 	ACL_MASTER_SERV *serv;
+
+	serv = acl_master_ent_find(entry->name, entry->type);
+
+	/*
+	 * Add a new service entry. We do not really care in what
+	 * order the service entries are kept in memory.
+	 */
+	if (serv == 0) {
+		entry->next  = acl_var_master_head;
+		entry->start = (long) time(NULL);
+		acl_var_master_head = entry;
+		acl_master_service_start(entry);
+		return;
+	}
+
+	/*
+	 * Update an existing service entry. Make the current
+	 * generation of child processes commit suicide whenever
+	 * it is convenient. The next generation of child processes
+	 * will run with the new configuration settings.
+	 */
+	serv->flags &= ~ACL_MASTER_FLAG_MARK;
+	if (entry->flags & ACL_MASTER_FLAG_CONDWAKE)
+		serv->flags |= ACL_MASTER_FLAG_CONDWAKE;
+	else
+		serv->flags &= ~ACL_MASTER_FLAG_CONDWAKE;
+	serv->wakeup_time = entry->wakeup_time;
+	serv->max_proc = entry->max_proc;
+	serv->prefork_proc = entry->prefork_proc;
+	serv->throttle_delay = entry->throttle_delay;
+	SWAP(char *, serv->path, entry->path);
+	SWAP(char *, serv->notify_addr, entry->notify_addr);
+	SWAP(char *, serv->notify_recipients, entry->notify_recipients);
+	SWAP(ACL_ARGV *, serv->args, entry->args);
+	acl_master_service_restart(serv);
+	acl_master_ent_free(entry);
+}
+
+/* master_scan_services - scan all service files and add services */
+
+static void master_scan_services(void)
+{
+	const char *myname = "master_scan_services";
+	ACL_MASTER_SERV *entry;
 	char *pathname;
 	int   service_null = 1;
-
-#define SWAP(type,a,b)	{ type temp = a; a = b; b = temp; }
 
 	/* load main.cf configuration of master routine */
 	pathname = acl_concatenate(acl_var_master_conf_dir, "/", "main.cf", 0);
@@ -84,41 +124,7 @@ void acl_master_config(void)
 		if (acl_msg_verbose)
 			acl_master_ent_print(entry);
 
-		serv = acl_master_ent_find(entry->name, entry->type);
-
-		/*
-		 * Add a new service entry. We do not really care in what
-		 * order the service entries are kept in memory.
-		 */
-		if (serv == 0) {
-			entry->next  = acl_var_master_head;
-			entry->start = (long) time(NULL);
-			acl_var_master_head = entry;
-			acl_master_service_start(entry);
-			continue;
-		}
-
-		/*
-		 * Update an existing service entry. Make the current
-		 * generation of child processes commit suicide whenever
-		 * it is convenient. The next generation of child processes
-		 * will run with the new configuration settings.
-		 */
-		serv->flags &= ~ACL_MASTER_FLAG_MARK;
-		if (entry->flags & ACL_MASTER_FLAG_CONDWAKE)
-			serv->flags |= ACL_MASTER_FLAG_CONDWAKE;
-		else
-			serv->flags &= ~ACL_MASTER_FLAG_CONDWAKE;
-		serv->wakeup_time = entry->wakeup_time;
-		serv->max_proc = entry->max_proc;
-		serv->prefork_proc = entry->prefork_proc;
-		serv->throttle_delay = entry->throttle_delay;
-		SWAP(char *, serv->path, entry->path);
-		SWAP(char *, serv->notify_addr, entry->notify_addr);
-		SWAP(char *, serv->notify_recipients, entry->notify_recipients);
-		SWAP(ACL_ARGV *, serv->args, entry->args);
-		acl_master_service_restart(serv);
-		acl_master_ent_free(entry);
+		master_add_service(entry);
 	}
 
 	acl_master_ent_end();
@@ -127,4 +133,45 @@ void acl_master_config(void)
 		acl_msg_warn("%s(%d), %s: no service in dir %s%s", __FILE__,
 			__LINE__, myname, acl_var_master_service_dir,
 			acl_var_master_scan_subdir ? " and its subdir" : "");
+}
+
+static void master_load_services(void)
+{
+	ACL_FILE *fp;
+	char buf[1024], *ptr, *filepath;
+	ACL_MASTER_SERV *entry;
+	ACL_ARGV        *tokens;
+
+	if (*acl_var_master_service_file == 0)
+		return;
+	fp = acl_fopen(acl_var_master_service_file, "r");
+	if (fp == NULL)
+		return;
+
+#define SKIP_WHILE(cond, ptr) { while(*ptr && (cond)) ptr++; }
+
+	while (!acl_feof(fp)) {
+		ptr = acl_fgets_nonl(buf, sizeof(buf), fp);
+		if (ptr == NULL)
+			continue;
+
+		SKIP_WHILE(*ptr == ' ' || *ptr == '\t', ptr);
+		if (*ptr == 0 || *ptr == '#')
+			continue;
+
+		tokens = acl_argv_split(ptr, "|");
+		filepath = tokens->argv[0];
+		entry = acl_master_ent_load(filepath);
+		if (entry != NULL)
+			master_add_service(entry);
+		acl_argv_free(tokens);
+	}
+
+	acl_fclose(fp);
+}
+
+void acl_master_config(void)
+{
+	master_scan_services();
+	master_load_services();
 }

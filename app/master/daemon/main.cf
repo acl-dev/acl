@@ -1,4 +1,3 @@
-
 #inet_interfaces = all
 # 默认的每个服务的最大进程数
 default_process_limit = 250
@@ -26,17 +25,22 @@ reload_timeout = 5000
 event_delay_sec = 1
 # 调用 select 循环时的等待微秒级值
 event_delay_usec = 5000
-# 所有服务进程程序所在的目录
+# 所有服务进程程序所在的默认目录
 daemon_directory = {install_path}/libexec
 # acl_master 进程运行时的日志记录文件
 log_file = {install_path}/var/log/acl_master
 # 所有服务进程的服务配置文件所在的目录
 service_directory = {install_path}/conf/service
-queue_directory = {install_path}/var
-# 记录 acl_master 运行时的进程号
-pid_file = {install_path}/var/pid/acl_master.pid
 # 是否扫描并行 {install_path}/conf/service/ 目录下的子目录服务配置文件，0 -- 否，1 -- 是
 scan_subdir = 0
+# 扫描 service_directory 下的配置文件时，指定的文件扩展名
+file_exts = .cf, .conf
+# 指定了单独要启动的服务的配置文件列表
+service_file = {install_path}/conf/services.cf
+# master 程序运行目录
+ueue_directory = {install_path}/var
+# 记录 acl_master 运行时的进程号
+pid_file = {install_path}/var/pid/acl_master.pid
 # 是否允许自动切换用户运行身份
 # limit_privilege = 0
 # acl_master 对外 WEB 管理接口地址

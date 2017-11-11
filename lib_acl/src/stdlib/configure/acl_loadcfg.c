@@ -68,9 +68,8 @@ static int _cfg_file_load(ACL_FILE_HANDLE filefd, char *buf, int bsize)
 
 static ACL_CFG_LINE *_backup_junk_line(const char *ptr)
 {
-	char  myname[] = "_backup_junk_line";
+	const char myname[] = "_backup_junk_line";
 	ACL_CFG_LINE *cfg_line;
-	char  tbuf[256];
 
 	if (ptr == NULL)
 		return (NULL);
@@ -78,7 +77,7 @@ static ACL_CFG_LINE *_backup_junk_line(const char *ptr)
 	cfg_line = (ACL_CFG_LINE *) acl_mycalloc(1, sizeof(ACL_CFG_LINE));
 	if (cfg_line == NULL) {
 		printf("%s: calloc ACL_CFG_LINE, errmsg=%s",
-				myname, acl_last_strerror(tbuf, sizeof(tbuf)));
+				myname, acl_last_serror());
 		return (NULL);
 	}
 
@@ -87,7 +86,7 @@ static ACL_CFG_LINE *_backup_junk_line(const char *ptr)
 	cfg_line->pdata = acl_mystrdup(ptr);
 	if (cfg_line->pdata == NULL) {
 		printf("%s: strdup pdata, errmsg=%s",
-				myname, acl_last_strerror(tbuf, sizeof(tbuf)));
+				myname, acl_last_serror());
 		return (NULL);
 	}
 
@@ -107,8 +106,8 @@ static ACL_CFG_LINE *_create_cfg_line(char *data, const char *delimiter)
 		acl_array_destroy(a, acl_myfree_fn);                         \
 	if (cfg_line) {                                                      \
 		if (cfg_line->value)                                         \
-			acl_myfree(cfg_line);                                    \
-		acl_myfree(cfg_line);                                            \
+			acl_myfree(cfg_line);                                \
+		acl_myfree(cfg_line);                                        \
 	}                                                                    \
 	return (x);                                                          \
 } while (0);
@@ -166,7 +165,7 @@ static ACL_CFG_LINE *_create_cfg_line(char *data, const char *delimiter)
 
 ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 {
-	char  myname[] = "acl_cfg_parse_load";
+	const char myname[] = "acl_cfg_parse_load";
 	ACL_CFG_PARSER *parser = NULL;
 	ACL_CFG_LINE *cfg_line;
 	struct stat stat_buf;
@@ -174,7 +173,6 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 	char *content_buf = NULL, *ptr;
 	char *pline_begin;
 	ACL_FILE_HANDLE   filefd = ACL_FILE_INVALID;
-	char  tbuf[256];
 	
 #undef	ERETURN
 #define	ERETURN(x) do { \
@@ -205,21 +203,21 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 
 	if (stat(pathname, &stat_buf) < 0) {
 		printf("%s: can't stat, pathname=%s, errmsg=%s\n",
-			myname, pathname, acl_last_strerror(tbuf, sizeof(tbuf)));
+			myname, pathname, acl_last_serror());
 		ERETURN (NULL);
 	}
 
 	parser = (ACL_CFG_PARSER *) acl_mycalloc(1, sizeof(*parser));
 	if (parser == NULL) {
 		printf("%s: can't calloc ACL_CFG_PARSER, pathname=%s, errmsg=%s",
-			myname, pathname, acl_last_strerror(tbuf, sizeof(tbuf)));
+			myname, pathname, acl_last_serror());
 		ERETURN (NULL);
 	}
 
 	parser->_cfg_array = acl_array_create(10);
 	if (parser->_cfg_array == NULL) {
 		printf("%s: can't create array, pathname=%s, errmsg=%s",
-			myname, pathname, acl_last_strerror(tbuf, sizeof(tbuf)));
+			myname, pathname, acl_last_serror());
 		ERETURN (NULL);
 	}
 	parser->total_line = 0;
@@ -229,7 +227,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 	content_buf = (char *) acl_mycalloc(1, buf_size);
 	if (content_buf == NULL) {
 		printf("%s: can't calloc, pathname=%s, errmsg=%s\n",
-			myname, pathname, acl_last_strerror(tbuf, sizeof(tbuf)));
+			myname, pathname, acl_last_serror());
 		ERETURN (NULL);
 	}
 	
@@ -247,14 +245,14 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 
 	if (filefd == ACL_FILE_INVALID) {
 		printf("%s: can't open, pathname=%s, errmsg=%s\n",
-			myname, pathname, acl_last_strerror(tbuf, sizeof(tbuf)));
+			myname, pathname, acl_last_serror());
 
 		ERETURN (NULL);
 	}
 
 	if (_cfg_file_load(filefd, content_buf, buf_size) < 0) {
 		printf("%s: can't read, pathname=%s, errmsg=%s\n",
-			myname, pathname, acl_last_strerror(tbuf, sizeof(tbuf)));
+			myname, pathname, acl_last_serror());
 		ERETURN (NULL);
 	}
 
@@ -280,7 +278,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 			if (acl_array_append(parser->_cfg_array,
 					(void *) cfg_line) < 0) {
 				printf("%s: can't add ACL_CFG_LINE to array, "
-					"errmsg=%s", myname, acl_last_strerror(tbuf, sizeof(tbuf)));
+					"errmsg=%s", myname, acl_last_serror());
 				ERETURN (NULL);
 			}
 			parser->total_line++;
@@ -302,7 +300,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 			if (acl_array_append(parser->_cfg_array,
 					(void *) cfg_line) < 0) {
 				printf("%s: can't add ACL_CFG_LINE to array, "
-					"errmsg=%s", myname, acl_last_strerror(tbuf, sizeof(tbuf)));
+					"errmsg=%s", myname, acl_last_serror());
 				ERETURN (NULL);
 			}
 			parser->total_line++;
@@ -332,7 +330,7 @@ ACL_CFG_PARSER *acl_cfg_parser_load(const char *pathname, const char *delimiter)
 			ERETURN (NULL);
 		if (acl_array_append(parser->_cfg_array, (void *) cfg_line) < 0) {
 			printf("%s: can't add ACL_CFG_LINE to array, errmsg=%s",
-				myname, acl_last_strerror(tbuf, sizeof(tbuf)));
+				myname, acl_last_serror());
 			ERETURN (NULL);
 		}
 		parser->total_line++;
@@ -402,11 +400,11 @@ void acl_cfg_parser_walk(ACL_CFG_PARSER *parser, ACL_CFG_WALK_FN walk_fn)
 	}
 }
 
-int acl_cfg_line_replace(ACL_CFG_LINE *cfg_line, const char **value, int from, int to)
+int acl_cfg_line_replace(ACL_CFG_LINE *cfg_line, const char **value,
+	int from, int to)
 {
-	char  myname[] = "acl_cfg_line_replace";
+	const char myname[] = "acl_cfg_line_replace";
 	int   i, n, j;
-	char  tbuf[256];
 
 	if (cfg_line == NULL)
 	       return (-1);	
@@ -438,7 +436,7 @@ int acl_cfg_line_replace(ACL_CFG_LINE *cfg_line, const char **value, int from, i
 			cfg_line->value[i] = acl_mystrdup(value[j]);
 			if (cfg_line->value[i] == NULL) {
 				printf("%s: can't strdup, errmsg=%s\n",
-					myname, acl_last_strerror(tbuf, sizeof(tbuf)));
+					myname, acl_last_serror());
 				exit (1);
 			}
 			j++;
@@ -457,7 +455,7 @@ int acl_cfg_line_replace(ACL_CFG_LINE *cfg_line, const char **value, int from, i
 			cfg_line->value[i] = acl_mystrdup(value[j]);
 			if (cfg_line->value[i] == NULL) {
 				printf("%s: can't strdup, errmsg=%s\n",
-					myname, acl_last_strerror(tbuf, sizeof(tbuf)));
+					myname, acl_last_serror());
 				exit (1);
 			}
 			j++;
@@ -487,12 +485,12 @@ int acl_cfg_parser_size(const ACL_CFG_PARSER *parser)
 	return (parser->total_line);
 }
 
-static int _cfg_line_dump(ACL_FILE_HANDLE filefd, const ACL_CFG_LINE *cfg_line, const char *delimiter)
+static int _cfg_line_dump(ACL_FILE_HANDLE filefd, const ACL_CFG_LINE *cfg_line,
+	const char *delimiter)
 {
-	char  myname[] = "_cfg_line_dump";
+	const char myname[] = "_cfg_line_dump";
 	char *pbuf, *ptr;
 	int   dlen = 0, i, j,  n;
-	char  tbuf[256];
 
 	n = cfg_line->ncount;
 	if (delimiter != NULL)
@@ -523,7 +521,7 @@ static int _cfg_line_dump(ACL_FILE_HANDLE filefd, const ACL_CFG_LINE *cfg_line, 
 		i = acl_file_write(filefd, pbuf, strlen(pbuf), 0, NULL, NULL);
 		if (i <= 0) {
 			printf("%s: can't write pbuf, error=%s\n",
-				myname, acl_last_strerror(tbuf, sizeof(tbuf)));
+				myname, acl_last_serror());
 			acl_myfree(pbuf);
 			return (-1);
 		}
@@ -545,11 +543,10 @@ int acl_cfg_parser_dump(const ACL_CFG_PARSER *parser,
 			const char *pathname,
 			const char *delimiter)
 {
-	char  myname[] = "acl_cfg_parser_dump";
+	const char myname[] = "acl_cfg_parser_dump";
 	ACL_CFG_LINE *cfg_line;
 	ACL_FILE_HANDLE filefd = ACL_FILE_INVALID;
 	int   i, n, ret;
-	char  tbuf[256];
 
 #undef	RETURN
 #define	RETURN(x) do { \
@@ -578,7 +575,7 @@ int acl_cfg_parser_dump(const ACL_CFG_PARSER *parser,
 #endif
 	if (filefd == ACL_FILE_INVALID) {
 		printf("%s: can't open, pathname=%s, errmsg=%s\n",
-			myname, pathname, acl_last_strerror(tbuf, sizeof(tbuf)));
+			myname, pathname, acl_last_serror());
 		RETURN(-1);
 	}
 
@@ -602,8 +599,7 @@ int acl_cfg_parser_dump(const ACL_CFG_PARSER *parser,
 
 int acl_cfg_parser_append(ACL_CFG_PARSER *parser, ACL_CFG_LINE *cfg_line)
 {
-	char  myname[] = "acl_cfg_parser_append";
-	char  tbuf[256];
+	const char myname[] = "acl_cfg_parser_append";
 
 	if (parser == NULL || cfg_line == NULL) {
 		printf("%s: input error\n", myname);
@@ -614,7 +610,7 @@ int acl_cfg_parser_append(ACL_CFG_PARSER *parser, ACL_CFG_LINE *cfg_line)
 		parser->_cfg_array = acl_array_create(10);
 		if (parser->_cfg_array == NULL) {
 			printf("%s: can't create array, errmsg=%s",
-					myname, acl_last_strerror(tbuf, sizeof(tbuf)));
+					myname, acl_last_serror());
 			return (-1);
 		}
 		parser->total_line = 0;
@@ -623,7 +619,7 @@ int acl_cfg_parser_append(ACL_CFG_PARSER *parser, ACL_CFG_LINE *cfg_line)
 
 	if (acl_array_append(parser->_cfg_array, (void *) cfg_line) < 0) {
 		printf("%s: can't add ACL_CFG_LINE to array, errmsg=%s",
-			myname, acl_last_strerror(tbuf, sizeof(tbuf)));
+			myname, acl_last_serror());
 		return (-1);
 	}
 	parser->total_line++;
@@ -636,7 +632,7 @@ int acl_cfg_parser_append(ACL_CFG_PARSER *parser, ACL_CFG_LINE *cfg_line)
 
 int acl_cfg_parser_delete(ACL_CFG_PARSER *parser, const char *name)
 {
-	char  myname[] = "acl_cfg_parser_delete";
+	const char myname[] = "acl_cfg_parser_delete";
 	ACL_CFG_LINE *cfg_line = NULL;
 	int   i, n, ok = 0, j;
 

@@ -9,9 +9,9 @@
 #define STR		acl_vstring_str
 #define	STR_SAME	!strcasecmp
 
-static char *__services_path = NULL;	/* dir name of config files */
-static ACL_SCAN_DIR *__scan = NULL;
-
+static char *__services_path  = NULL;	/* dir name of config files */
+static ACL_SCAN_DIR *__scan   = NULL;
+static ACL_ARGV     *__exts   = NULL;
 const char *__config_file_ptr = NULL;
 
 static const char __master_blanks[] = " \t\r\n";  /* field delimiters */
@@ -26,6 +26,8 @@ void acl_set_master_service_path(const char *path)
 void acl_master_ent_begin()
 {
 	const char *myname = "acl_master_ent_begin";
+	ACL_ARGV   *tokens;
+	ACL_ITER    iter;
 
 	if (__services_path == NULL)
 		acl_msg_fatal("%s(%d), %s: master_path is null",
@@ -39,6 +41,19 @@ void acl_master_ent_begin()
 		acl_msg_fatal("%s(%d), %s: open dir(%s) err, serr=%s",
 			__FILE__, __LINE__, myname,
 			__services_path, strerror(errno));
+
+	if (__exts)
+		acl_argv_free(__exts);
+	__exts = acl_argv_alloc(10);
+
+	tokens = acl_argv_split(acl_var_master_file_exts, ",;\t ");
+	acl_foreach(iter, tokens) {
+		const char *ptr = (const char *) iter.data;
+		if (*ptr == '.')
+			ptr++;
+		if (*ptr != 0)
+			acl_argv_add(__exts, ptr, NULL);
+	}
 }
 
 void acl_master_ent_end()
@@ -749,6 +764,35 @@ static int service_env(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 	return 0;
 }
 
+static int valid_extname(const char *filename)
+{
+	ACL_ITER    iter;
+	const char *ext;
+
+	/* skip implicit files */
+	if (*filename == '.')
+		return 0;
+
+	if (EQ(acl_var_master_file_exts, "*")
+		|| EQ(acl_var_master_file_exts, "*.*")) {
+
+		return 1;
+	}
+
+	ext = strchr(filename, '.');
+	if (ext == NULL)
+		ext = filename;
+	else
+		ext++;
+
+	acl_foreach(iter, __exts) {
+		if (EQ(ext, (char *) iter.data))
+			return 1;
+	}
+
+	return 0;
+}
+
 ACL_MASTER_SERV *acl_master_ent_get()
 {
 	static char *saved_interfaces = 0;
@@ -776,6 +820,9 @@ ACL_MASTER_SERV *acl_master_ent_get()
 			acl_vstring_free(path_buf);
 			return NULL;
 		}
+
+		if (!valid_extname(filepath))
+			continue;
 
 		acl_vstring_sprintf(path_buf, "%s/%s",
 			acl_scan_dir_path(__scan), filepath);
@@ -819,6 +866,7 @@ ACL_MASTER_SERV *acl_master_ent_load(const char *filepath)
 
 	if (service_transport(xcp, serv) < 0) {
 		acl_master_ent_free(serv);
+		acl_xinetd_cfg_free(xcp);
 		return NULL;
 	}
 
@@ -828,10 +876,12 @@ ACL_MASTER_SERV *acl_master_ent_load(const char *filepath)
 
 	if (service_args(xcp, serv, filepath) < 0) {
 		acl_master_ent_free(serv);
+		acl_xinetd_cfg_free(xcp);
 		return NULL;
 	}
 	if (service_env(xcp, serv) < 0) {
 		acl_master_ent_free(serv);
+		acl_xinetd_cfg_free(xcp);
 		return NULL;
 	}
 
