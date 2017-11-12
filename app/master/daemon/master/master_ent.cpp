@@ -1017,7 +1017,7 @@ ACL_MASTER_SERV *acl_master_ent_find(const char *path)
 	}
 
 	for (serv = acl_var_master_head; serv; serv = serv->next) {
-		if (strcmp(serv->path, path) == 0)
+		if (strcmp(serv->conf, path) == 0)
 			return serv;
 	}
 

@@ -108,7 +108,7 @@ int acl_master_kill(const char *path)
 	}
 
 	for (servp = &acl_var_master_head; (iter = *servp) != 0;) {
-		if (iter->type == serv->type && SAME(iter->name, serv->name)) {
+		if (SAME(iter->conf, path)) {
 			*servp = iter->next;
 			acl_master_service_kill(iter);
 			return 0;
@@ -136,7 +136,7 @@ int acl_master_stop(const char *path)
 	}
 
 	for (servp = &acl_var_master_head; (iter = *servp) != 0;) {
-		if (iter->type == serv->type && SAME(iter->name, serv->name)) {
+		if (SAME(iter->conf, path)) {
 			*servp = iter->next;
 			// this service object will be freed after all
 			// children of which exited.
