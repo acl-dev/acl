@@ -33,7 +33,7 @@ void acl_master_service_init(void)
 
 /* acl_master_service_start - activate service */
 
-void acl_master_service_start(ACL_MASTER_SERV *serv)
+int acl_master_service_start(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "acl_master_service_start";
 
@@ -46,7 +46,11 @@ void acl_master_service_start(ACL_MASTER_SERV *serv)
 	 */
 	acl_msg_info("%s: starting service %s ...", myname, serv->name);
 
-	acl_master_listen_init(serv);
+	if (acl_master_listen_init(serv) == -1) {
+		acl_msg_error("%s: service %s start error", myname, serv->name);
+		return -1;
+	}
+
 	acl_msg_info("%s: service %s listen init ok ...", myname, serv->name);
 
 	acl_master_status_init(serv);
@@ -59,6 +63,7 @@ void acl_master_service_start(ACL_MASTER_SERV *serv)
 	acl_msg_info("%s: service %s wakeup init ok ...", myname, serv->name);
 
 	acl_msg_info("%s: service started!", myname);
+	return 0;
 }
 
 /* acl_master_service_kill - deactivate service */

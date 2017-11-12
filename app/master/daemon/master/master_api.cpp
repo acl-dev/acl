@@ -41,50 +41,42 @@ static bool setup_callback(const char *service, ACL_MASTER_SERV *serv,
 
 ACL_MASTER_SERV *acl_master_lookup(const char *path)
 {
-	ACL_MASTER_SERV *entry = acl_master_ent_load(path), *serv;
-
-	if (entry == NULL) {
-		acl_msg_error("%s(%d), %s: load %s error %s", __FILE__,
-			__LINE__, __FUNCTION__, path, acl_last_serror());
-		return NULL;
-	}
-
-	serv = acl_master_ent_find(entry->name, entry->type);
-	acl_master_ent_free(entry);
-	return serv;
+	return acl_master_ent_find(path);
 }
 
 ACL_MASTER_SERV *acl_master_start(const char *path, int *nchilden,
 	int *nsignaled, STATUS_CALLBACK callback, void *ctx)
 {
-	ACL_MASTER_SERV *entry = acl_master_ent_load(path), *serv;
+	ACL_MASTER_SERV *entry = acl_master_ent_find(path);
 
+	if (entry != NULL) {
+		acl_msg_error("%s(%d), %s: same service %s running",
+			__FILE__, __LINE__, __FUNCTION__, path);
+		return NULL;
+	}
+
+	entry = acl_master_ent_load(path);
 	if (entry == NULL) {
 		acl_msg_error("%s(%d), %s: load %s error %s", __FILE__,
 			__LINE__, __FUNCTION__, path, acl_last_serror());
 		return NULL;
 	}
 
-	serv = acl_master_ent_find(entry->name, entry->type);
-	if (serv != NULL) {
-		acl_msg_error("%s(%d), %s: same service %s %d running",
-			__FILE__, __LINE__, __FUNCTION__,
-			entry->name, entry->type);
-		acl_master_ent_free(entry);
-		return NULL;
-	}
-	
 	if (nchilden)
 		*nchilden = entry->prefork_proc;
 	if (nsignaled)
 		*nsignaled = entry->prefork_proc;
 
-	(void) setup_callback(__FUNCTION__, entry, callback, ctx);
+	if (acl_master_service_start(entry) < 0) {
+		acl_msg_error("%s(%d), %s: start %s error",
+			__FILE__, __LINE__, __FUNCTION__, path);
+		acl_master_ent_free(entry);
+		return NULL;
+	}
 
+	(void) setup_callback(__FUNCTION__, entry, callback, ctx);
 	entry->next = acl_var_master_head;
 	acl_var_master_head = entry;
-
-	acl_master_service_start(entry);
 
 	return entry;
 }

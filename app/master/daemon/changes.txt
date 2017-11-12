@@ -1,4 +1,7 @@
 
+12) 2017.11.12
+12.1) bugfix: master should not fork child process after starting service failed.
+
 11) 2017.11.11
 11.1) feature: master can start services which are specified in file.
 

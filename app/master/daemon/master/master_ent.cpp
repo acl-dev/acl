@@ -1006,7 +1006,7 @@ int acl_master_same_name(ACL_MASTER_SERV *serv, const char *name)
 	return ret;
 }
 
-ACL_MASTER_SERV *acl_master_ent_find(const char *name, int type)
+ACL_MASTER_SERV *acl_master_ent_find(const char *path)
 {
 	ACL_MASTER_SERV *serv;
 
@@ -1017,7 +1017,7 @@ ACL_MASTER_SERV *acl_master_ent_find(const char *name, int type)
 	}
 
 	for (serv = acl_var_master_head; serv; serv = serv->next) {
-		if (serv->type == type && acl_master_same_name(serv, name))
+		if (strcmp(serv->path, path) == 0)
 			return serv;
 	}
 

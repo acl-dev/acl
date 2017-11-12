@@ -130,7 +130,7 @@ extern ACL_MASTER_SERV *acl_master_ent_get(void);
 extern ACL_MASTER_SERV *acl_master_ent_load(const char*);
 extern void acl_master_ent_free(ACL_MASTER_SERV *);
 extern int  acl_master_same_name(ACL_MASTER_SERV *serv, const char *name);
-extern ACL_MASTER_SERV *acl_master_ent_find(const char *name, int type);
+extern ACL_MASTER_SERV *acl_master_ent_find(const char *path);
 
  /*
   * master_conf.c
@@ -144,7 +144,7 @@ extern void acl_master_refresh(void);
 extern ACL_MASTER_SERV *acl_var_master_head;
 extern ACL_EVENT *acl_var_master_global_event;
 extern void acl_master_service_init(void);
-extern void acl_master_service_start(ACL_MASTER_SERV *);
+extern int  acl_master_service_start(ACL_MASTER_SERV *);
 extern void acl_master_service_kill(ACL_MASTER_SERV *);
 extern void acl_master_service_stop(ACL_MASTER_SERV *serv);
 extern void acl_master_service_restart(ACL_MASTER_SERV *);
@@ -172,7 +172,7 @@ extern void acl_master_wakeup_cleanup(ACL_MASTER_SERV *);
  /*
   * master_listen.c
   */
-extern void acl_master_listen_init(ACL_MASTER_SERV *);
+extern int  acl_master_listen_init(ACL_MASTER_SERV *);
 extern void acl_master_listen_cleanup(ACL_MASTER_SERV *);
 
 /*

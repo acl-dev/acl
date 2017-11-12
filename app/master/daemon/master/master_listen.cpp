@@ -39,8 +39,9 @@ static int master_listen_sock(ACL_MASTER_SERV *serv)
 		case ACL_MASTER_SERV_TYPE_INET:
 			serv->listen_fds[i] = acl_inet_listen(
 				addr->addr, qlen, serv->inet_flags);
-			acl_tcp_defer_accept(serv->listen_fds[i],
-				serv->defer_accept);
+			if (serv->listen_fds[i] != ACL_SOCKET_INVALID)
+				acl_tcp_defer_accept(serv->listen_fds[i],
+					serv->defer_accept);
 			service_type = ACL_VSTREAM_TYPE_LISTEN_INET;
 			break;
 		case ACL_MASTER_SERV_TYPE_UNIX:
@@ -102,9 +103,11 @@ static int master_listen_inet(ACL_MASTER_SERV *serv)
 	}
 
 	serv->listen_fds[0] = acl_inet_listen(serv->name, qlen, serv->inet_flags);
-	if (serv->listen_fds[0] == ACL_SOCKET_INVALID)
-		acl_msg_fatal("%s(%d)->%s: listen on addr(%s) error(%s)",
+	if (serv->listen_fds[0] == ACL_SOCKET_INVALID) {
+		acl_msg_error("%s(%d)->%s: listen on addr(%s) error(%s)",
 			__FILE__, __LINE__, myname, serv->name, strerror(errno));
+		return 0;
+	}
 
 	if (serv->defer_accept > 0)
 		acl_tcp_defer_accept(serv->listen_fds[0], serv->defer_accept);
@@ -169,7 +172,7 @@ static int master_bind_udp(ACL_MASTER_SERV *serv)
 	return serv->listen_fd_count;
 }
 
-static void master_listen_unix(ACL_MASTER_SERV *serv)
+static int master_listen_unix(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "master_listen_unix";
 	int   qlen;
@@ -185,9 +188,11 @@ static void master_listen_unix(ACL_MASTER_SERV *serv)
 	if (acl_var_master_limit_privilege)
 		acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
 	serv->listen_fds[0] = acl_unix_listen(serv->name, qlen, serv->inet_flags);
-	if (serv->listen_fds[0] == ACL_SOCKET_INVALID)
-		acl_msg_fatal("%s(%d)->%s: listen on addr(%s) error(%s)",
+	if (serv->listen_fds[0] == ACL_SOCKET_INVALID) {
+		acl_msg_error("%s(%d)->%s: listen on addr(%s) error(%s)",
 			__FILE__, __LINE__, myname, serv->name, strerror(errno));
+		return 0;
+	}
 
 	serv->listen_streams[0] = acl_vstream_fdopen(serv->listen_fds[0],
 		O_RDONLY, acl_var_master_buf_size,
@@ -197,18 +202,22 @@ static void master_listen_unix(ACL_MASTER_SERV *serv)
 		acl_set_ugid(getuid(), getgid());
 	acl_msg_info("%s(%d), %s: listen on domain socket: %s, qlen: %d",
 		__FILE__, __LINE__, myname, serv->name, qlen);
+
+	return 1;
 }
 
-static void master_listen_fifo(ACL_MASTER_SERV *serv)
+static int master_listen_fifo(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "master_listen_fifo";
 
 	if (acl_var_master_limit_privilege)
 		acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
 	serv->listen_fds[0] = acl_fifo_listen(serv->name, 0622, ACL_NON_BLOCKING);
-	if (serv->listen_fds[0] == ACL_SOCKET_INVALID)
-		acl_msg_fatal("%s(%d), %s: listen on name(%s) error(%s)",
+	if (serv->listen_fds[0] == ACL_SOCKET_INVALID) {
+		acl_msg_error("%s(%d), %s: listen on name(%s) error(%s)",
 			__FILE__, __LINE__, myname, serv->name, strerror(errno));
+		return 0;
+	}
 
 	serv->listen_streams[0] = acl_vstream_fdopen(serv->listen_fds[0],
 		O_RDONLY, acl_var_master_buf_size,
@@ -218,11 +227,12 @@ static void master_listen_fifo(ACL_MASTER_SERV *serv)
 		acl_set_ugid(getuid(), getgid());
 	acl_msg_info("%s(%d), %s: listen on fifo socket: %s",
 		__FILE__, __LINE__, myname, serv->name);
+	return 1;
 }
 
 /* acl_master_listen_init - enable connection requests */
 
-void acl_master_listen_init(ACL_MASTER_SERV *serv)
+int acl_master_listen_init(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "acl_master_listen_init";
 
@@ -240,41 +250,37 @@ void acl_master_listen_init(ACL_MASTER_SERV *serv)
 	 * SOCK: INET/UNIX domain or stream listener endpoints
 	 */
 	case ACL_MASTER_SERV_TYPE_SOCK:
-		master_listen_sock(serv);
-		break;
+		return master_listen_sock(serv) > 0 ? 0 : -1;
 
 	/*      
 	 * INET-domain listener endpoints can be wildcarded (the default) or
 	 * bound to specific interface addresses.
 	 */
 	case ACL_MASTER_SERV_TYPE_INET:
-		master_listen_inet(serv);
-		break;
+		return master_listen_inet(serv) > 0 ? 0 : -1;
 
 	/*
 	 * UDP socket endponts
 	 */
 	case ACL_MASTER_SERV_TYPE_UDP:
-		master_bind_udp(serv);
-		break;
+		return master_bind_udp(serv) >= 0 ? 0 : -1;
 
 	/*
 	 * UNIX-domain or stream listener endpoints always come as singlets.
 	 */
 	case ACL_MASTER_SERV_TYPE_UNIX:
-		master_listen_unix(serv);
-		break;
+		return master_listen_unix(serv) > 0 ? 0 : -1;
 
 	/*
 	 * FIFO listener endpoints always come as singlets.
 	 */
 	case ACL_MASTER_SERV_TYPE_FIFO:
-		master_listen_fifo(serv);
-		break;
+		return master_listen_fifo(serv) > 0 ? 0 : -1;
 
 	default:
 		acl_msg_panic("%s: unknown service type: %d",
 			myname, serv->type);
+		return -1; /* dummy */
 	}
 }
 
