@@ -62,17 +62,17 @@ ACL_MASTER_SERV *acl_master_start(const char *path, int *nchilden,
 		return NULL;
 	}
 
-	if (nchilden)
-		*nchilden = entry->prefork_proc;
-	if (nsignaled)
-		*nsignaled = entry->prefork_proc;
-
 	if (acl_master_service_start(entry) < 0) {
 		acl_msg_error("%s(%d), %s: start %s error",
 			__FILE__, __LINE__, __FUNCTION__, path);
 		acl_master_ent_free(entry);
 		return NULL;
 	}
+
+	if (nchilden)
+		*nchilden = entry->prefork_proc;
+	if (nsignaled)
+		*nsignaled = entry->prefork_proc;
 
 	(void) setup_callback(__FUNCTION__, entry, callback, ctx);
 	entry->next = acl_var_master_head;
@@ -138,8 +138,8 @@ int acl_master_stop(const char *path)
 	for (servp = &acl_var_master_head; (iter = *servp) != 0;) {
 		if (iter->type == serv->type && SAME(iter->name, serv->name)) {
 			*servp = iter->next;
-                        // this service object will be freed after all
-                        // children of which exited.
+			// this service object will be freed after all
+			// children of which exited.
 			acl_master_service_stop(iter);
 			return 0;
 		} else
