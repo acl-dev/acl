@@ -683,8 +683,9 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 
 #ifdef ACL_LINUX
 	/* notify master that child started ok */
-	acl_master_notify(acl_var_single_pid, single_server_generation,
-		ACL_MASTER_STAT_START_OK);
+	if (generation)
+		acl_master_notify(acl_var_single_pid, single_server_generation,
+			ACL_MASTER_STAT_START_OK);
 #endif
 
 	acl_server_sighup_setup();
