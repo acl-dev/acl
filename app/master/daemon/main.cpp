@@ -16,7 +16,7 @@
 #include "master/master.h"
 #include "manage/manager.h"
 
-const char *var_master_version = "version2.0";
+const char *var_master_version = "master version 2.0 20171112 (acl)";
 char *var_master_procname;
 
 /* usage - show hint and terminate */
@@ -36,8 +36,8 @@ static void usage(const char *me)
 int     main(int argc, char **argv)
 {
 	int           ch, fd, n, keep_mask = 0;
-	ACL_VSTREAM  *lock_fp;
 	//ACL_WATCHDOG *watchdog;
+	ACL_VSTREAM  *lock_fp;
 	ACL_VSTRING  *strbuf;
 	ACL_AIO      *aio;
 	char         *ptr;
@@ -57,7 +57,7 @@ int     main(int argc, char **argv)
 			acl_msg_verbose++;
 			break;
 		case 'v':
-			printf("version: %s\r\n", var_master_version);
+			printf("%s\r\n", var_master_version);
 			return 0;
 		case 'h':
 			usage(argv[0]);
