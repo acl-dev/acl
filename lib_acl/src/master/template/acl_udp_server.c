@@ -987,7 +987,8 @@ static UDP_SERVER *servers_create(const char *service, int nthreads)
 	} else
 		servers = servers_binding(service, __event_mode, nthreads);
 
-# ifdef SO_REUSEPORT
+# ifdef ACL_LINUX
+#  ifdef SO_REUSEPORT
 	/* create monitor watching the network's changing status */
 	__if_monitor = netlink_open();
 	if (__if_monitor) {
@@ -996,6 +997,7 @@ static UDP_SERVER *servers_create(const char *service, int nthreads)
 		servers_ipc_setup(servers, nthreads);
 		acl_msg_info("--- monitoring ifaddr status ---");
 	}
+#  endif
 # endif
 
 #else	/* !ACL_UNIX */
