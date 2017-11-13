@@ -16,23 +16,27 @@
 #include "master/master.h"
 #include "manage/manager.h"
 
-const char *var_master_version = "version1.0";
+const char *var_master_version = "version2.0";
 char *var_master_procname;
 
 /* usage - show hint and terminate */
 
 static void usage(const char *me)
 {
-	acl_msg_fatal("usage: %s [-c root_dir] [-l log_file] [-e exit_time]"
-		" [-D (debug)] [-t (test)] [-v] [-k (keep_mask)]", me);
+	printf("usage: %s -c root_dir\r\n"
+		" -l log_file\r\n"
+		" -v [version]\r\n"
+		" -V [verbose]\r\n"
+		" -h [help]\r\n"
+		" -k (keep_mask)\r\n", me);
 }
 
 /* main - main program */
 
 int     main(int argc, char **argv)
 {
-	ACL_VSTREAM  *lock_fp;
 	int           ch, fd, n, keep_mask = 0;
+	ACL_VSTREAM  *lock_fp;
 	//ACL_WATCHDOG *watchdog;
 	ACL_VSTRING  *strbuf;
 	ACL_AIO      *aio;
@@ -47,11 +51,17 @@ int     main(int argc, char **argv)
 	acl_var_master_conf_dir = NULL;
 	acl_var_master_log_file = NULL;
 
-	while ((ch = getopt(argc, argv, "vc:l:k")) > 0) {
+	while ((ch = getopt(argc, argv, "Vhvc:l:k")) > 0) {
 		switch (ch) {
-		case 'v':
+		case 'V':
 			acl_msg_verbose++;
 			break;
+		case 'v':
+			printf("version: %s\r\n", var_master_version);
+			return 0;
+		case 'h':
+			usage(argv[0]);
+			return 0;
 		case 'c':
 			acl_var_master_conf_dir = acl_mystrdup(optarg);
 			break;
@@ -63,6 +73,7 @@ int     main(int argc, char **argv)
 			break;
 		default:
 			usage(argv[0]);
+			return 0;
 			/* NOTREACHED */
 		}
 	}
