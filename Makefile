@@ -139,6 +139,7 @@ packinstall:
 	$(shell mkdir -p ./dist/master/bin/$(RPATH))
 	@(cd app/master/daemon; make install)
 	@(cd app/master/tools/master_ctld; make install)
+	@(cd app/master/tools/master_ctl; make install)
 	@(cd lib_fiber; make)
 	@echo "copying app/master/daemon/acl_master $(BIN_PATH)"
 	@cp -f app/master/daemon/acl_master $(BIN_PATH)
