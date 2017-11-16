@@ -38,7 +38,7 @@ file_exts = .cf, .conf
 # 指定了单独要启动的服务的配置文件列表
 service_file = {install_path}/conf/services.cf
 # master 程序运行目录
-ueue_directory = {install_path}/var
+queue_directory = {install_path}/var
 # 记录 acl_master 运行时的进程号
 pid_file = {install_path}/var/pid/acl_master.pid
 # 是否允许自动切换用户运行身份

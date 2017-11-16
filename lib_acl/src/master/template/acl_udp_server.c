@@ -552,7 +552,7 @@ static void servers_rebinding(void)
 	acl_argv_free(addrs);
 }
 
-static void netlink_handle(struct nlmsghdr *nh, int dlen)
+static void netlink_handle(struct nlmsghdr *nh, unsigned int dlen)
 {
 	int  changed = 0;
 
@@ -592,7 +592,7 @@ static void netlink_callback(int event_type, ACL_EVENT *event acl_unused,
 			__FILE__, __FUNCTION__, __LINE__, ret);
 	} else {
 		struct nlmsghdr *nh = (struct nlmsghdr *) buf;
-		netlink_handle(nh, ret);
+		netlink_handle(nh, (unsigned int) ret);
 	}
 }
 
