@@ -124,7 +124,7 @@ void acl_atomic_int64_set(ACL_ATOMIC *self, long long n)
 	*((long long *) self->value) = n;
 	acl_pthread_mutex_unlock(&self->lock);
 #elif	defined(ACL_WINDOWS)
-	InterlockedExchangePointer((volatile PVOID*) self->value, n);
+	InterlockedExchangePointer((volatile PVOID*) self->value, (PVOID) n);
 #elif	defined(ACL_LINUX)
 # if defined(__GNUC__) && (__GNUC__ >= 4)
 	(void) __sync_lock_test_and_set((long long *) self->value, n);
