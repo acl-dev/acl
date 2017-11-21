@@ -1008,9 +1008,6 @@
     <ClInclude Include=".\src\private\private_fifo.h">
       <Filter>Source Files\private</Filter>
     </ClInclude>
-    <ClInclude Include=".\src\private\private_global.h">
-      <Filter>Source Files\private</Filter>
-    </ClInclude>
     <ClInclude Include=".\src\private\private_vstream.h">
       <Filter>Source Files\private</Filter>
     </ClInclude>
@@ -1069,6 +1066,9 @@
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_define_linux.h">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include=".\include\stdlib\acl_define_macosx.h">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\acl_define_sunx86.h">

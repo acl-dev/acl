@@ -499,7 +499,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\src\private\private.h" />
     <ClInclude Include=".\src\private\private_array.h" />
     <ClInclude Include=".\src\private\private_fifo.h" />
-    <ClInclude Include=".\src\private\private_global.h" />
     <ClInclude Include=".\src\private\private_vstream.h" />
     <ClInclude Include=".\src\private\sem.h" />
     <ClInclude Include=".\src\private\thread.h" />
@@ -527,6 +526,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\include\stdlib\acl_define.h" />
     <ClInclude Include=".\include\stdlib\acl_define_bsd.h" />
     <ClInclude Include=".\include\stdlib\acl_define_linux.h" />
+    <ClInclude Include=".\include\stdlib\acl_define_maxosx.h" />
     <ClInclude Include=".\include\stdlib\acl_define_sunx86.h" />
     <ClInclude Include=".\include\stdlib\acl_define_unix.h" />
     <ClInclude Include=".\include\stdlib\acl_define_win32.h" />

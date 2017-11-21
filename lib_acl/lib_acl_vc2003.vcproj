@@ -1186,9 +1186,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\private\private_fifo.h">
 				</File>
 				<File
-					RelativePath=".\src\private\private_global.h">
-				</File>
-				<File
 					RelativePath=".\src\private\private_vstream.c">
 				</File>
 				<File

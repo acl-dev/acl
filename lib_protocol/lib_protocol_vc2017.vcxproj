@@ -150,11 +150,11 @@
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_vc2015d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_vc2017d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)_vc2015d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">$(ProjectName)_d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)_vc2015</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)_vc2017</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)_vc2015</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -183,14 +183,14 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ProgramDataBaseFileName>$(ProjectName)_vc2015d.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(ProjectName)_vc2017d.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
       <AdditionalOptions>/MACHINE:X86 %(AdditionalOptions)</AdditionalOptions>
-      <OutputFile>$(ProjectName)_vc2015d.lib</OutputFile>
+      <OutputFile>$(ProjectName)_vc2017d.lib</OutputFile>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
     <PostBuildEvent>
@@ -231,13 +231,13 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y</Command>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <ProgramDataBaseFileName>$(ProjectName)_vc2015.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(ProjectName)_vc2017.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
       <AdditionalOptions>/MACHINE:X86 %(AdditionalOptions)</AdditionalOptions>
-      <OutputFile>$(ProjectName)_vc2015.lib</OutputFile>
+      <OutputFile>$(ProjectName)_vc2017.lib</OutputFile>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
     <PostBuildEvent>

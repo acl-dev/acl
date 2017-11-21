@@ -157,9 +157,9 @@
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)_vc2015</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)_vc2017</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)_vc2015</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_vc2015d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_vc2017d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)_vc2015d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">$(ProjectName)_d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">$(ProjectName)_d</TargetName>
@@ -194,13 +194,13 @@
       <PrecompiledHeaderOutputFile>.\Release/acl_lib.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\Release/</AssemblerListingLocation>
       <ObjectFileName>.\Release/</ObjectFileName>
-      <ProgramDataBaseFileName>$(ProjectName)_vc2015.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(ProjectName)_vc2017.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib>
-      <OutputFile>$(ProjectName)_vc2015.lib</OutputFile>
+      <OutputFile>$(ProjectName)_vc2017.lib</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
@@ -258,14 +258,14 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y</Command>
       <PrecompiledHeaderOutputFile>$(TargetName).pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
       <ObjectFileName>.\Debug/</ObjectFileName>
-      <ProgramDataBaseFileName>$(ProjectName)_vc2015d.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(ProjectName)_vc2017d.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>$(ProjectName)_vc2015d.lib</OutputFile>
+      <OutputFile>$(ProjectName)_vc2017d.lib</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
@@ -704,13 +704,13 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include=".\src\private\private.h" />
     <ClInclude Include=".\src\private\private_array.h" />
     <ClInclude Include=".\src\private\private_fifo.h" />
-    <ClInclude Include=".\src\private\private_global.h" />
     <ClInclude Include=".\src\private\private_vstream.h" />
     <ClInclude Include=".\src\private\sem.h" />
     <ClInclude Include=".\src\private\thread.h" />
     <ClInclude Include=".\include\lib_acl.h" />
     <ClInclude Include="include\code\acl_xmlcode.h" />
     <ClInclude Include="include\stdlib\acl_atomic.h" />
+    <ClInclude Include="include\stdlib\acl_define_macosx.h" />
     <ClInclude Include="include\stdlib\unix\acl_trace.h" />
     <ClInclude Include="include\xml\acl_xml2.h" />
     <ClInclude Include="include\xml\acl_xml3.h" />

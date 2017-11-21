@@ -706,7 +706,6 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include=".\src\private\private.h" />
     <ClInclude Include=".\src\private\private_array.h" />
     <ClInclude Include=".\src\private\private_fifo.h" />
-    <ClInclude Include=".\src\private\private_global.h" />
     <ClInclude Include=".\src\private\private_vstream.h" />
     <ClInclude Include=".\src\private\sem.h" />
     <ClInclude Include=".\src\private\thread.h" />
@@ -714,6 +713,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\code\acl_xmlcode.h" />
     <ClInclude Include="include\master\acl_udp_params.h" />
     <ClInclude Include="include\stdlib\acl_atomic.h" />
+    <ClInclude Include="include\stdlib\acl_define_macosx.h" />
     <ClInclude Include="include\stdlib\acl_sane_socketpair.h" />
     <ClInclude Include="include\stdlib\acl_ypipe.h" />
     <ClInclude Include="include\stdlib\acl_yqueue.h" />
