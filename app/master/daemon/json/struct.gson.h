@@ -48,6 +48,22 @@ namespace acl
     std::pair<bool,std::string> gson(acl::json_node &$node, list_res_t *$obj);
     std::pair<bool,std::string> gson(const acl::string &str, list_res_t &$obj);
 
+    //master_config_req_t
+    acl::string gson(const master_config_req_t &$obj);
+    acl::json_node& gson(acl::json &$json, const master_config_req_t &$obj);
+    acl::json_node& gson(acl::json &$json, const master_config_req_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, master_config_req_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, master_config_req_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, master_config_req_t &$obj);
+
+    //master_config_res_t
+    acl::string gson(const master_config_res_t &$obj);
+    acl::json_node& gson(acl::json &$json, const master_config_res_t &$obj);
+    acl::json_node& gson(acl::json &$json, const master_config_res_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, master_config_res_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, master_config_res_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, master_config_res_t &$obj);
+
     //proc_info_t
     acl::string gson(const proc_info_t &$obj);
     acl::json_node& gson(acl::json &$json, const proc_info_t &$obj);

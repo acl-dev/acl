@@ -51,11 +51,7 @@ int commands_action::run(acl::string& out)
 		return 400;
 	}
 
-	if (cmd_ == "list")
-		return http_forward<list_req_t, list_res_t>(addr_, *json, out);
-	else if (cmd_ == "stat")
-		return http_forward<stat_req_t, stat_res_t>(addr_, *json, out);
-	else if (cmd_ == "start")
+	if (cmd_ == "start")
 	{
 		if (!enabled<start_req_t, start_req_data_t>(*json, out))
 			return 400;
@@ -85,9 +81,8 @@ int commands_action::run(acl::string& out)
 			return 400;
 		return http_forward<restart_req_t, restart_res_t>(addr_, *json, out);
 	}
+
+	// the other commands maybe be safety for master_ctld
 	else
-	{
-		logger_error("unknown cmd=%s", cmd_.c_str());
-		return 400;
-	}
+		return http_forward(addr_, cmd_, json->to_string(), out);
 }

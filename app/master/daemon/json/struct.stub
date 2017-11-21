@@ -241,3 +241,14 @@ struct reload_res_t : res_t
 {
 	std::vector<reload_res_data_t> data;
 };
+
+//////////////////////////////////////////////////////////////////////////////
+
+struct master_config_req_t : req_t
+{
+};
+
+struct master_config_res_t : res_t
+{
+	std::map<acl::string, acl::string> data;
+};

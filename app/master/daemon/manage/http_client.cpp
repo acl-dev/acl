@@ -18,6 +18,7 @@
 #include "action/service_stop.h"
 #include "action/service_reload.h"
 #include "action/service_restart.h"
+#include "action/service_master_config.h"
 #include "http_client.h"
 
 http_client::http_client(acl::aio_socket_stream *client, int rw_timeout)
@@ -146,15 +147,17 @@ static struct {
 	const char* cmd;
 	bool (http_client::*handler)(void);
 } handlers[] = {
-	{ "list",	&http_client::handle_list	},
-	{ "stat",	&http_client::handle_stat	},
-	{ "start",	&http_client::handle_start	},
-	{ "kill",	&http_client::handle_kill	},
-	{ "stop",	&http_client::handle_stop	},
-	{ "restart",	&http_client::handle_restart	},
-	{ "reload",	&http_client::handle_reload	},
+	{ "list",		&http_client::handle_list		},
+	{ "stat",		&http_client::handle_stat		},
+	{ "start",		&http_client::handle_start		},
+	{ "kill",		&http_client::handle_kill		},
+	{ "stop",		&http_client::handle_stop		},
+	{ "restart",		&http_client::handle_restart		},
+	{ "reload",		&http_client::handle_reload		},
 
-	{ 0,		0				}
+	{ "master_config",	&http_client::handle_master_config	},
+
+	{ 0,			0					}
 };
 
 bool http_client::handle(void)
@@ -238,6 +241,12 @@ bool http_client::handle_reload(void)
 {
 	service_reload* service = new service_reload(*this);
 	return service->run(json_);
+}
+
+bool http_client::handle_master_config(void)
+{
+	service_master_config service(*this);
+	return service.run(json_);
 }
 
 void http_client::on_finish(void)

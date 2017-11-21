@@ -53,6 +53,7 @@ public:
 	bool handle_start(void);
 	bool handle_restart(void);
 	bool handle_reload(void);
+	bool handle_master_config(void);
 
 private:
 	void reset(void);

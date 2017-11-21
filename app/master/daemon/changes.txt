@@ -1,4 +1,7 @@
 
+13) 2017.11.21
+13.1) feature: add master_config command for getting the configure of master
+
 12) 2017.11.12
 12.1) bugfix: master should not fork child process after starting service failed.
 

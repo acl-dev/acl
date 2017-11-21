@@ -9,6 +9,7 @@
 
 static bool __verbose = false;
 static long long __timeout = 0;
+static acl::string __server_addr;
 
 static void print_space(int n)
 {
@@ -418,6 +419,28 @@ static bool do_reload(const std::vector<acl::string>& tokens,
 	return true;
 }
 
+static bool do_master_config(const std::vector<acl::string>&,
+	const char* addr, const char*)
+{
+	master_config_req_t req;
+	req.cmd = "master_config";
+
+	master_config_res_t res;
+	if (!http_request<master_config_req_t, master_config_res_t>
+		(addr, req, res)) {
+
+		return false;
+	}
+
+	for (std::map<acl::string, acl::string>::const_iterator cit =
+		res.data.begin(); cit != res.data.end(); ++cit) {
+
+		println(cit->first.c_str(), cit->second.c_str());
+	}
+
+	return true;
+}
+
 static bool do_set(const std::vector<acl::string>& tokens,
 	const char*, const char* fpath)
 {
@@ -445,7 +468,11 @@ static bool do_server(const std::vector<acl::string>& tokens,
 	if (tokens.size() > 1)
 	{
 		addr = tokens[1].c_str();
-		printf("set server to %s ok\r\n", addr);
+		__server_addr = addr;
+		const char* ptr = strchr(addr, ':');
+		if (ptr == NULL || *++ptr == 0 || atoi(ptr) <= 0)
+			__server_addr += ":8290";
+		printf("set server to %s ok\r\n", __server_addr.c_str());
 	}
 	else if (*addr == 0)
 #ifdef	HAS_READLINE
@@ -495,6 +522,7 @@ static bool do_help(const std::vector<acl::string>&, const char*, const char*)
 	println("stop", "stop one service");
 	println("kill", "kill one service");
 	println("reload", "reload one service");
+	println("master_config", "get master's configure entries");
 	println_underline("timeout", "show one service's running status");
 
 	return true;
@@ -551,30 +579,32 @@ static struct {
 	bool  has_path;
 	bool (*fn)(const std::vector<acl::string>&, const char*, const char*);
 } __actions[] = {
-	{ "list",	'l',	false,	do_list		},
-	{ "stat",	's',	true,	do_stat		},
-	{ "start",	'\0',	true,	do_start	},
-	{ "restart",	'\0',	true,	do_restart	},
-	{ "stop",	'\0',	true,	do_stop		},
-	{ "kill",	'\0',	true,	do_kill		},
-	{ "reload",	'r',	true,	do_reload	},
+	{ "list",		'l',	false,	do_list			},
+	{ "stat",		's',	true,	do_stat			},
+	{ "start",		'\0',	true,	do_start		},
+	{ "restart",		'\0',	true,	do_restart		},
+	{ "stop",		'\0',	true,	do_stop			},
+	{ "kill",		'\0',	true,	do_kill			},
+	{ "reload",		'r',	true,	do_reload		},
+	{ "master_config",	'\0',	false,	do_master_config	},
 
-	{ "help",	'h',	false,	do_help		},
-	{ "clear",	'c',	false,	do_clear	},
-	{ "quit",	'q',	false,	do_quit		},
-	{ "exit",	'e',	false,	do_quit		},
-	{ "set",	'\0',	true,	do_set		},
-	{ "server",	'\0',	false,	do_server	},
-	{ "timeout",	't',	false,	do_timeout	},
-	{ "verbose",	'v',	false,	do_verbose	},
+	{ "help",		'h',	false,	do_help			},
+	{ "clear",		'c',	false,	do_clear		},
+	{ "quit",		'q',	false,	do_quit			},
+	{ "exit",		'e',	false,	do_quit			},
+	{ "set",		'\0',	true,	do_set			},
+	{ "server",		'\0',	false,	do_server		},
+	{ "timeout",		't',	false,	do_timeout		},
+	{ "verbose",		'v',	false,	do_verbose		},
 
-	{ 0,		0,	false,	0		},
+	{ 0,			0,	false,	0			},
 };
 
 static void run(const char* server, const char* filepath)
 {
-	acl::string buf, fpath, addr(server);
+	acl::string buf, fpath;
 
+	__server_addr = server;
 	printf("server addr is %s\r\n", server);
 
 	if (filepath && *filepath)
@@ -605,14 +635,14 @@ static void run(const char* server, const char* filepath)
 
 		if (__actions[i].cmd == NULL)
 		{
-			do_help(tokens, addr, fpath);
+			do_help(tokens, __server_addr, fpath);
 			continue;
 		}
 
 		if (__actions[i].has_path && tokens.size() >= 2)
 			fpath = tokens[1];
 
-		ret = __actions[i].fn(tokens, addr, fpath);
+		ret = __actions[i].fn(tokens, __server_addr, fpath);
 		if (!__verbose)
 			print_space(100);
 

@@ -400,6 +400,138 @@ namespace acl
     }
 
 
+    acl::json_node& gson(acl::json &$json, const master_config_req_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.cmd))
+            $node.add_null("cmd");
+        else
+            $node.add_text("cmd", acl::get_value($obj.cmd));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const master_config_req_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const master_config_req_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, master_config_req_t &$obj)
+    {
+        acl::json_node *cmd = $node["cmd"];
+        std::pair<bool, std::string> $result;
+
+        if(!cmd ||!($result = gson(*cmd, &$obj.cmd), $result.first))
+            return std::make_pair(false, "required [master_config_req_t.cmd] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, master_config_req_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, master_config_req_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
+    acl::json_node& gson(acl::json &$json, const master_config_res_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.status))
+            $node.add_null("status");
+        else
+            $node.add_number("status", acl::get_value($obj.status));
+
+        if (check_nullptr($obj.msg))
+            $node.add_null("msg");
+        else
+            $node.add_text("msg", acl::get_value($obj.msg));
+
+        if (check_nullptr($obj.data))
+            $node.add_null("data");
+        else
+            $node.add_child("data", acl::gson($json, $obj.data));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const master_config_res_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const master_config_res_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, master_config_res_t &$obj)
+    {
+        acl::json_node *status = $node["status"];
+        acl::json_node *msg = $node["msg"];
+        acl::json_node *data = $node["data"];
+        std::pair<bool, std::string> $result;
+
+        if(!status ||!($result = gson(*status, &$obj.status), $result.first))
+            return std::make_pair(false, "required [master_config_res_t.status] failed:{"+$result.second+"}");
+     
+        if(!msg ||!($result = gson(*msg, &$obj.msg), $result.first))
+            return std::make_pair(false, "required [master_config_res_t.msg] failed:{"+$result.second+"}");
+     
+        if(!data ||!data->get_obj()||!($result = gson(*data->get_obj(), &$obj.data), $result.first))
+            return std::make_pair(false, "required [master_config_res_t.data] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, master_config_res_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, master_config_res_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
     acl::json_node& gson(acl::json &$json, const proc_info_t &$obj)
     {
         acl::json_node &$node = $json.create_node();
