@@ -303,11 +303,27 @@ void    acl_argv_addnv(ACL_ARGV *argvp, va_list ap)
 	argvp->argv[argvp->argc] = 0;
 }
 
+int     acl_argv_set(ACL_ARGV *argvp, int idx, const char *value)
+{
+	if (idx < 0 || idx >= argvp->argc)
+		return -1;
+	if (value == NULL)
+		return -1;
+
+	if (argvp->dbuf)
+		argvp->argv[idx] = acl_dbuf_pool_strdup(argvp->dbuf, value);
+	else {
+		acl_myfree(argvp->argv[idx]);
+		argvp->argv[idx] = acl_mystrdup(value);
+	}
+
+	return 0;
+}
+
 /* acl_argv_terminate - terminate string array */
 
 void    acl_argv_terminate(ACL_ARGV *argvp)
 {
-
 	/* Trust that argvp->argc < argvp->len. */
 	argvp->argv[argvp->argc] = 0;
 }

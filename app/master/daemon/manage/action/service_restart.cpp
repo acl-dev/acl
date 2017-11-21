@@ -40,7 +40,8 @@ bool service_restart::handle(const restart_req_t& req, restart_res_t& res)
 		cit = req.data.begin(); cit != req.data.end(); ++cit) {
 
 		const char* path = (*cit).path.c_str();
-		serv = acl_master_restart(path, NULL, NULL, NULL, NULL);
+		serv = acl_master_restart(path, NULL, NULL, NULL, NULL,
+			(*cit).ext.c_str());
 		if (serv == NULL) {
 			data.status = 500;
 			data.path   = path;

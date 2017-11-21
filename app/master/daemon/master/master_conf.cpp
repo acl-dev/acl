@@ -76,6 +76,7 @@ static int master_add_service(ACL_MASTER_SERV *entry)
 	serv->prefork_proc = entry->prefork_proc;
 	serv->throttle_delay = entry->throttle_delay;
 	SWAP(char *, serv->path, entry->path);
+	SWAP(char *, serv->command, entry->command);
 	SWAP(char *, serv->notify_addr, entry->notify_addr);
 	SWAP(char *, serv->notify_recipients, entry->notify_recipients);
 	SWAP(ACL_ARGV *, serv->args, entry->args);

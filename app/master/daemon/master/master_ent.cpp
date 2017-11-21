@@ -629,21 +629,14 @@ static int service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	/* if command is a absolute path starting with '/', just use it,
 	 * else the relative path added with default path will be used.
 	 */
-	if (*command == '/' && access(command, F_OK) == 0)
+	if (*command == '/')
 		ptr = acl_mystrdup(command);
 	else
 		ptr = acl_concatenate(acl_var_master_daemon_dir, "/",
-				command, (char *) 0);
-
-	if (access(ptr, F_OK | X_OK) == -1) {
-		acl_msg_error("%s(%d), %s: command %s can't be executed %s",
-			__FILE__, __LINE__, __FUNCTION__, ptr,
-			acl_last_serror());
-		acl_myfree(ptr);
-		return -1;
-	}
+				command, NULL);
 
 	serv->path = ptr;
+	serv->command = acl_mystrdup(ptr);
 
 	/* Notify Address */
 	ptr_const = get_str_ent(xcp, ACL_VAR_MASTER_NOTIFY_ADDR, "no");
@@ -961,6 +954,8 @@ void acl_master_ent_free(ACL_MASTER_SERV *serv)
 		acl_myfree(serv->name);
 	if (serv->path)
 		acl_myfree(serv->path);
+	if (serv->command)
+		acl_myfree(serv->command);
 	if (serv->conf)
 		acl_myfree(serv->conf);
 	if (serv->owner)

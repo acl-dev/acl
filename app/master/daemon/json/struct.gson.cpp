@@ -1039,6 +1039,11 @@ namespace acl
         else
             $node.add_text("path", acl::get_value($obj.path));
 
+        if (check_nullptr($obj.ext))
+            $node.add_null("ext");
+        else
+            $node.add_text("ext", acl::get_value($obj.ext));
+
 
         return $node;
     }
@@ -1060,10 +1065,14 @@ namespace acl
     std::pair<bool,std::string> gson(acl::json_node &$node, restart_req_data_t &$obj)
     {
         acl::json_node *path = $node["path"];
+        acl::json_node *ext = $node["ext"];
         std::pair<bool, std::string> $result;
 
         if(!path ||!($result = gson(*path, &$obj.path), $result.first))
             return std::make_pair(false, "required [restart_req_data_t.path] failed:{"+$result.second+"}");
+     
+        if(ext)
+            gson(*ext, &$obj.ext);
      
         return std::make_pair(true,"");
     }
@@ -1513,6 +1522,11 @@ namespace acl
         else
             $node.add_text("path", acl::get_value($obj.path));
 
+        if (check_nullptr($obj.ext))
+            $node.add_null("ext");
+        else
+            $node.add_text("ext", acl::get_value($obj.ext));
+
 
         return $node;
     }
@@ -1534,10 +1548,14 @@ namespace acl
     std::pair<bool,std::string> gson(acl::json_node &$node, start_req_data_t &$obj)
     {
         acl::json_node *path = $node["path"];
+        acl::json_node *ext = $node["ext"];
         std::pair<bool, std::string> $result;
 
         if(!path ||!($result = gson(*path, &$obj.path), $result.first))
             return std::make_pair(false, "required [start_req_data_t.path] failed:{"+$result.second+"}");
+     
+        if(ext)
+            gson(*ext, &$obj.ext);
      
         return std::make_pair(true,"");
     }

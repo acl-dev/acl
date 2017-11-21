@@ -65,7 +65,8 @@ bool service_start::handle(const start_req_t& req)
 
 		start_res_data_t data;
 
-		if (start_one((*cit).path.c_str(), data, waiting)) {
+		if (start_one((*cit).path.c_str(), data, waiting, (*cit).ext)) {
+
 			proc_count_    += data.proc_count;
 			proc_signaled_ += data.proc_signaled;
 			servers_[data.path] = data;
@@ -84,7 +85,7 @@ bool service_start::handle(const start_req_t& req)
 }
 
 bool service_start::start_one(const char* path, start_res_data_t& data,
-	bool waiting)
+	bool waiting, const char* ext)
 {
 	data.status        = STATUS_TIMEOUT;
 	data.path          = path;
@@ -96,7 +97,7 @@ bool service_start::start_one(const char* path, start_res_data_t& data,
 	const ACL_MASTER_SERV* serv = acl_master_start(path,
 			&data.proc_count, &data.proc_signaled,
 			waiting ? service_start_callback : NULL,
-			waiting ? this : NULL);
+			waiting ? this : NULL, ext);
 	if (serv == NULL) {
 		data.status = 500;
 		data.proc_err++;

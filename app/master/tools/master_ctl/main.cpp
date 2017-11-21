@@ -7,9 +7,10 @@
 
 #include "http_request.h"
 
-static bool __verbose = false;
-static long long __timeout = 0;
+static bool        __verbose = false;
+static long long   __timeout = 0;
 static acl::string __server_addr;
+static acl::string __extname;
 
 static void print_space(int n)
 {
@@ -240,6 +241,9 @@ static bool do_start(const std::vector<acl::string>&,
 
 	start_req_data_t req_data;
 	req_data.path = fpath;
+	if (!__extname.empty())
+		req_data.ext = __extname.c_str();
+
 	req.data.push_back(req_data);
 
 	start_res_t res;
@@ -280,6 +284,9 @@ static bool do_restart(const std::vector<acl::string>&,
 
 	restart_req_data_t req_data;
 	req_data.path = fpath;
+	if (!__extname.empty())
+		req_data.ext = __extname.c_str();
+
 	req.data.push_back(req_data);
 
 	restart_res_t res;
@@ -661,7 +668,8 @@ static void usage(const char* procname)
 		" -s master_manage_addr[default: 127.0.0.1:8290]\r\n"
 		" -f servicde_path\r\n"
 		" -t timeout[waiting the result from master, default: 0]\r\n"
-		" -a cmd[list|stat|start|stop|reload]\r\n",
+		" -a cmd[list|stat|start|stop|reload|restart]\r\n"
+		" -e extname[specified the extname of service's path, just for start and restart]\r\n",
 		procname);
 }
 
@@ -670,7 +678,7 @@ int main(int argc, char* argv[])
 	acl::string filepath, action, addr("127.0.0.1:8290");
 	int  ch;
 
-	while ((ch = getopt(argc, argv, "hs:f:a:t:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:f:a:t:e:")) > 0)
 	{
 		switch (ch)
 		{
@@ -690,6 +698,9 @@ int main(int argc, char* argv[])
 			__timeout = atoi(optarg);
 			if (__timeout < 0)
 				__timeout = 0;
+			break;
+		case 'e':
+			__extname = optarg;
 			break;
 		default:
 			usage(argv[0]);

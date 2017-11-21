@@ -38,7 +38,8 @@ private:
 	size_t servers_finished_;
 	std::map<acl::string, start_res_data_t> servers_;
 
-	bool start_one(const char* path, start_res_data_t& data, bool status);
+	bool start_one(const char* path, start_res_data_t& data,
+		bool status, const char* ext);
 
 	void start_callback(ACL_MASTER_PROC* proc, int status);
 	void timeout_callback(void);

@@ -44,8 +44,34 @@ ACL_MASTER_SERV *acl_master_lookup(const char *path)
 	return acl_master_ent_find(path);
 }
 
+static int check_command(ACL_MASTER_SERV *entry, const char *ext)
+{
+	char *path;
+
+	/* if ext name not NULL, then add it as the extern name of command */
+	if (ext && *ext)
+		path = acl_concatenate(entry->command, ext, NULL);
+	else
+		path = acl_mystrdup(entry->command);
+
+	if (access(path, F_OK) != 0) {
+		acl_msg_error("%s(%d), %s: command %s can't be executed, %s",
+			__FILE__, __LINE__, __FUNCTION__, path,
+			acl_last_serror());
+		return -1;
+	}
+
+	acl_myfree(entry->path);
+	entry->path = path;
+
+	/* reset argv be used to transfer execvp */
+	acl_argv_set(entry->args, 0, path);
+
+	return 0;
+}
+
 ACL_MASTER_SERV *acl_master_start(const char *path, int *nchilden,
-	int *nsignaled, STATUS_CALLBACK callback, void *ctx)
+	int *nsignaled, STATUS_CALLBACK callback, void *ctx, const char *ext)
 {
 	ACL_MASTER_SERV *entry = acl_master_ent_find(path);
 
@@ -59,6 +85,13 @@ ACL_MASTER_SERV *acl_master_start(const char *path, int *nchilden,
 	if (entry == NULL) {
 		acl_msg_error("%s(%d), %s: load %s error %s", __FILE__,
 			__LINE__, __FUNCTION__, path, acl_last_serror());
+		return NULL;
+	}
+
+	if (check_command(entry, ext) < 0) {
+		acl_msg_error("%s(%d), %s: can't start service %s, %s",
+			__FILE__, __LINE__, __FUNCTION__, entry->path, path);
+		acl_master_ent_free(entry);
 		return NULL;
 	}
 
@@ -82,16 +115,22 @@ ACL_MASTER_SERV *acl_master_start(const char *path, int *nchilden,
 }
 
 ACL_MASTER_SERV *acl_master_restart(const char *path, int *nchilden,
-	int *nsignaled, STATUS_CALLBACK callback, void *ctx)
+	int *nsignaled, STATUS_CALLBACK callback, void *ctx, const char *ext)
 {
         ACL_MASTER_SERV *serv = acl_master_lookup(path);
 
-        if (serv != NULL) {
-		acl_master_service_restart(serv);
-		return serv;
+        if (serv == NULL)
+		return acl_master_start(path, nchilden, nsignaled,
+				callback, ctx, ext);
+
+	if (check_command(serv, ext) < 0) {
+		acl_msg_error("%s(%d), %s: can't restart service %s, %s",
+			__FILE__, __LINE__, __FUNCTION__, serv->path, path);
+		return NULL;
 	}
 
-        return acl_master_start(path, nchilden, nsignaled, callback, ctx);
+	acl_master_service_restart(serv);
+	return serv;
 }
 
 /* kill processes of service according the master_service name in configure */

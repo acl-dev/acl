@@ -61,6 +61,15 @@ ACL_API ACL_ARGV *acl_argv_alloc2(int size, ACL_DBUF_POOL *dbuf);
 ACL_API void acl_argv_add(ACL_ARGV *argvp,...);
 
 /**
+ * 在指定位置设置指定的字符串，同时释放旧的字符串
+ * @param argvp {ACL_ARGV *} 字符串动态数组
+ * @param idx {int} 指定下标位置，不应越界
+ * @param value {const char *} 非 NULL 字符串
+ * @return {int} 返回 -1 表示下标越界或 value 为 NULL，0 表示成功
+ */
+ACL_API int acl_argv_set(ACL_ARGV *argvp, int idx, const char *value);
+
+/**
  * 向字符串动态数组中添加字符串列表
  * @param argvp {ACL_ARGV*} 字符串动态数组指针
  * @param ap {va_list} 由多个字符串组成的变参列表

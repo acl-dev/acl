@@ -91,6 +91,8 @@ struct stat_res_t : res_t
 struct start_req_data_t
 {
 	acl::string path;
+	// Gson@optional
+	acl::string ext;
 };
 
 struct start_req_t : req_t
@@ -134,6 +136,8 @@ struct start_res_t : res_t
 struct restart_req_data_t
 {
 	acl::string path;
+	// Gson@optional
+	acl::string ext;
 };
 
 struct restart_req_t : req_t
