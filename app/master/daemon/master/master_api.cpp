@@ -52,7 +52,7 @@ static int check_command(ACL_MASTER_SERV *entry, const char *ext)
 	if (ext && *ext)
 		path = acl_concatenate(entry->command, ext, NULL);
 	else
-		path = acl_mystrdup(entry->command);
+		path = acl_concatenate(entry->command, entry->cmdext, NULL);
 
 	if (access(path, F_OK) != 0) {
 		acl_msg_error("%s(%d), %s: command %s can't be executed, %s",
@@ -63,6 +63,8 @@ static int check_command(ACL_MASTER_SERV *entry, const char *ext)
 
 	acl_myfree(entry->path);
 	entry->path = path;
+
+	acl_msg_info("service command path=%s", path);
 
 	/* reset argv be used to transfer execvp */
 	acl_argv_set(entry->args, 0, path);

@@ -41,6 +41,7 @@ typedef struct ACL_MASTER_SERV {
 	int      max_proc;		/* upper bound on # processes */
 	int      prefork_proc;		/* prefork processes */
 	char    *command;		/* command in configure */
+	char    *cmdext;		/* extname of the command */
 	char    *path;			/* command pathname */
 	char    *conf;			/* service configure filepath */
 	char    *notify_addr;		/* warning address when not null */

@@ -617,26 +617,30 @@ static int service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	else
 		serv->owner = NULL;
 
-	/*
-	 * Path to command,
-	 */
-	command = get_str_ent(xcp, ACL_VAR_MASTER_SERV_COMMAND, (char *) 0);
+	/* Path to command */
+	command = get_str_ent(xcp, ACL_VAR_MASTER_SERV_COMMAND, "");
 	if (command == NULL || *command == 0) {
 		acl_msg_error("no %s found", ACL_VAR_MASTER_SERV_COMMAND);
 		return -1;
 	}
 
+	ptr_const = get_str_ent(xcp, ACL_VAR_MASTER_SERV_CMDEXT, "");
+	if (ptr_const && *ptr_const)
+		serv->cmdext = acl_mystrdup(ptr_const);
+	else
+		serv->cmdext = NULL;
+
 	/* if command is a absolute path starting with '/', just use it,
 	 * else the relative path added with default path will be used.
 	 */
 	if (*command == '/')
-		ptr = acl_mystrdup(command);
+		ptr = acl_concatenate(command, serv->cmdext, NULL);
 	else
 		ptr = acl_concatenate(acl_var_master_daemon_dir, "/",
-				command, NULL);
+				command, serv->cmdext, NULL);
 
-	serv->path = ptr;
-	serv->command = acl_mystrdup(ptr);
+	serv->path    = ptr;
+	serv->command = acl_mystrdup(command);
 
 	/* Notify Address */
 	ptr_const = get_str_ent(xcp, ACL_VAR_MASTER_NOTIFY_ADDR, "no");
@@ -956,6 +960,8 @@ void acl_master_ent_free(ACL_MASTER_SERV *serv)
 		acl_myfree(serv->path);
 	if (serv->command)
 		acl_myfree(serv->command);
+	if (serv->cmdext)
+		acl_myfree(serv->cmdext);
 	if (serv->conf)
 		acl_myfree(serv->conf);
 	if (serv->owner)

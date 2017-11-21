@@ -132,6 +132,7 @@ extern int   acl_var_master_start_timeo;
 #define	ACL_VAR_MASTER_SERV_WAKEUP		"master_wakeup"
 #define	ACL_VAR_MASTER_SERV_LOG			"master_log"
 #define	ACL_VAR_MASTER_SERV_COMMAND		"master_command"
+#define ACL_VAR_MASTER_SERV_CMDEXT		"master_cmdext"
 #define	ACL_VAR_MASTER_SERV_ARGS		"master_args"
 #define	ACL_VAR_MASTER_SERV_OWNER		"master_owner"
 #define	ACL_VAR_MASTER_SERV_ENV			"master_env"
