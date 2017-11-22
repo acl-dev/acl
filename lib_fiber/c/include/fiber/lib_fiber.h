@@ -317,6 +317,15 @@ void acl_fiber_rwlock_runlock(ACL_FIBER_RWLOCK* l);
  */
 void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK* l);
 
+/* 线程安全的协程锁*/
+/* fiber_lock_r.c */
+typedef struct ACL_FIBER_MUTEX_R ACL_FIBER_MUTEX_R;
+
+ACL_FIBER_MUTEX_R *acl_fiber_mutex_r_create(void);
+void acl_fiber_mutex_r_free(ACL_FIBER_MUTEX_R *mutex);
+int acl_fiber_mutex_r_lock(ACL_FIBER_MUTEX_R *mutex);
+int acl_fiber_mutex_r_unlock(ACL_FIBER_MUTEX_R *mutex);
+
 /* fiber semaphore */
 
 typedef struct ACL_FIBER_SEM ACL_FIBER_SEM;

@@ -5,6 +5,8 @@
 #include <setjmp.h>
 #include "event.h"
 
+typedef struct THREAD THREAD;
+
 #ifdef ACL_ARM_LINUX
 extern int getcontext(ucontext_t *ucp);
 extern int setcontext(const ucontext_t *ucp);
@@ -30,6 +32,7 @@ struct ACL_FIBER {
 	fiber_status_t status;
 	ACL_RING       me;
 	unsigned       id;
+	int            evfd;
 	unsigned       slot;
 	acl_int64      when;
 	int            errnum;
@@ -39,6 +42,8 @@ struct ACL_FIBER {
 
 	ACL_RING         holding;
 	ACL_FIBER_MUTEX *waiting;
+
+	ACL_RING         mutex_waiter;
 
 #define FIBER_F_SAVE_ERRNO	(unsigned) 1 << 0
 #define	FIBER_F_KILLED		(unsigned) 1 << 1
@@ -112,6 +117,15 @@ struct ACL_FIBER_RWLOCK {
 	ACL_FIBER *writer;
 	ACL_RING   rwaiting;
 	ACL_RING   wwaiting;
+};
+
+struct ACL_FIBER_MUTEX_R {
+	ACL_RING    me;
+	ACL_FIBER  *owner;
+	ACL_ATOMIC *atomic;
+	long long   value;
+	acl_pthread_mutex_t *mutex;
+	ACL_RING    waiters;
 };
 
 struct ACL_FIBER_SEM {

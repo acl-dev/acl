@@ -6,8 +6,8 @@
 #include <valgrind/valgrind.h>
 #endif
 
-#define FIBER_STACK_GUARDS
-#ifdef	FIBER_STACK_GUARDS
+#define FIBER_STACK_GUARD
+#ifdef	FIBER_STACK_GUARD
 #include <dlfcn.h>
 #include <sys/mman.h>
 #endif
@@ -24,7 +24,7 @@ typedef int   (*fcntl_fn)(int, int, ...);
 static errno_fn __sys_errno     = NULL;
 static fcntl_fn __sys_fcntl     = NULL;
 
-typedef struct {
+struct THREAD {
 	ACL_RING       ready;		/* ready fiber queue */
 	ACL_RING       dead;		/* dead fiber queue */
 	ACL_FIBER    **fibers;
@@ -38,71 +38,75 @@ typedef struct {
 	int            count;
 	size_t         switched;
 	int            nlocal;
-} FIBER_TLS;
+};
 
 static void fiber_init(void) __attribute__ ((constructor));
 
-static FIBER_TLS *__main_fiber = NULL;
-static __thread FIBER_TLS *__thread_fiber = NULL;
+static THREAD *__main_fiber = NULL;
+static __thread THREAD *__thread_fiber = NULL;
 static __thread int __scheduled = 0;
 __thread int acl_var_hook_sys_api = 0;
 
 static acl_pthread_key_t __fiber_key;
 
-#ifdef	FIBER_STACK_GUARDS
+#ifdef	FIBER_STACK_GUARD
 
 static size_t page_size(void)
 {
-    static __thread long pgsz = 0;
+	static __thread long pgsz = 0;
 
-    if (pgsz == 0) {
-        pgsz = sysconf(_SC_PAGE_SIZE);
-        assert(pgsz > 0);
-    }
+	if (pgsz == 0) {
+		pgsz = sysconf(_SC_PAGE_SIZE);
+		assert(pgsz > 0);
+	}
 
-    return (size_t) pgsz;
+	return (size_t) pgsz;
 }
 
 static size_t stack_size(size_t size)
 {
-    size_t pgsz = page_size();
-    if (size < pgsz)
-        size = pgsz;
-    size_t sz = (size + pgsz - 1) & ~(pgsz - 1);
-    return sz;
+	size_t pgsz = page_size(), sz;
+	if (size < pgsz)
+		size = pgsz;
+	sz = (size + pgsz - 1) & ~(pgsz - 1);
+	return sz;
 }
 
 static void *stack_alloc(size_t size)
 {
-    size_t pgsz = page_size();
-    size = stack_size(size);
+	char  *ptr;
+	int    ret;
+	size_t pgsz = page_size();
 
-    size += pgsz + pgsz;
+	size = stack_size(size);
+	size += pgsz;
 
-    char *ptr;
-    int ret = posix_memalign((void *) &ptr, pgsz, size);
-    assert(ret == 0);
+	ret = posix_memalign((void *) &ptr, pgsz, size);
+	if (ret != 0)
+		acl_msg_fatal("%s(%d), %s: posix_memalign error %s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
 
-    ret = mprotect(ptr, pgsz, PROT_NONE);
-    assert(ret == 0);
+	ret = mprotect(ptr, pgsz, PROT_NONE);
+	if (ret != 0)
+		acl_msg_fatal("%s(%d), %s: mprotect error=%s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
 
-//    ret = mprotect(ptr + size - pgsz, pgsz, PROT_NONE);
-//    assert(ret == 0);
+	ptr += pgsz;
 
-    ptr += pgsz;
-
-    return ptr;
+	return ptr;
 }
 
 static void stack_free(void *ptr)
 {
-    size_t pgsz = page_size();
-    ptr = (char *) ptr - pgsz;
-    int ret = mprotect(ptr, page_size(), PROT_READ|PROT_WRITE);
-    assert(ret == 0);
-//    ret = mprotect(ptr + size - pgsz, page_size(), PROT_READ|PROT_WRITE);
-//    assert(ret == 0);
-    free(ptr);
+	int ret;
+	size_t pgsz = page_size();
+
+	ptr = (char *) ptr - pgsz;
+	ret = mprotect(ptr, page_size(), PROT_READ|PROT_WRITE);
+	if (ret != 0)
+		acl_msg_fatal("%s(%d), %s: mprotect error=%s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
+	free(ptr);
 }
 
 #else
@@ -137,7 +141,7 @@ int acl_fiber_scheduled(void)
 
 static void thread_free(void *ctx)
 {
-	FIBER_TLS *tf = (FIBER_TLS *) ctx;
+	THREAD *tf = (THREAD *) ctx;
 
 	if (__thread_fiber == NULL)
 		return;
@@ -181,7 +185,7 @@ static void fiber_check(void)
 		acl_msg_fatal("%s(%d), %s: pthread_once error %s",
 			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
 
-	__thread_fiber = (FIBER_TLS *) acl_mycalloc(1, sizeof(FIBER_TLS));
+	__thread_fiber = (THREAD *) acl_mycalloc(1, sizeof(THREAD));
 #ifdef	USE_JMP
 	/* set context NULL when using setjmp that setcontext will not be
 	 * called in fiber_swap.
@@ -559,6 +563,7 @@ void acl_fiber_signal(ACL_FIBER *fiber, int signum)
 	/* add the current fiber and signed fiber in the head of the ready */
 #if 0
 	acl_fiber_ready(fiber);
+	printf("----%s-%d---\n", __FUNCTION__, __LINE__);
 	acl_fiber_yield();
 #else
 	curr->status = FIBER_STATUS_READY;
@@ -669,6 +674,8 @@ void fiber_free(ACL_FIBER *fiber)
 #ifdef USE_VALGRIND
 	VALGRIND_STACK_DEREGISTER(fiber->vid);
 #endif
+	if (fiber->evfd >= 0)
+		close(fiber->evfd);
 	if (fiber->context)
 		stack_free(fiber->context);
 	stack_free(fiber->buff);
@@ -708,6 +715,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 		__thread_fiber->idgen++;
 
 	fiber->id     = __thread_fiber->idgen;
+	fiber->evfd   = -1;
 	fiber->errnum = 0;
 	fiber->signum = 0;
 	fiber->fn     = fn;
@@ -718,6 +726,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 
 	fiber->waiting = NULL;
 	acl_ring_init(&fiber->holding);
+	acl_ring_init(&fiber->mutex_waiter);
 
 	carg.p = fiber;
 
@@ -900,7 +909,6 @@ void acl_fiber_switch(void)
 #endif
 
 	head = acl_ring_pop_head(&__thread_fiber->ready);
-
 	if (head == NULL) {
 		acl_msg_info("thread-%lu: NO FIBER in ready",
 			acl_pthread_self());
