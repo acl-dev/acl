@@ -1,4 +1,7 @@
 
+73) 2017.11.23
+73.1) feature: fiber_event.c 新增同时支持协程/线程互斥的锁，性能可达千万级别 QPS
+
 72) 2017.11.2
 72.1) feature: fiber.c, fiber_alloc 中需要增加针对信号的处理过程
 72.2) bugfix: fiber_io.c, fiber_io_loop 中容易产生 32 位整数溢出问题，会导致

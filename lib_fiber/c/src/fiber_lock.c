@@ -2,6 +2,19 @@
 #include "fiber/lib_fiber.h"
 #include "fiber.h"
 
+struct ACL_FIBER_MUTEX {
+	ACL_RING   me;
+	ACL_FIBER *owner;
+	ACL_RING   waiting;
+};
+
+struct ACL_FIBER_RWLOCK {
+	int        readers;
+	ACL_FIBER *writer;
+	ACL_RING   rwaiting;
+	ACL_RING   wwaiting;
+};
+
 ACL_FIBER_MUTEX *acl_fiber_mutex_create(void)
 {
 	ACL_FIBER_MUTEX *lk = (ACL_FIBER_MUTEX *)

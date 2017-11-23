@@ -5,8 +5,6 @@
 #include <setjmp.h>
 #include "event.h"
 
-typedef struct THREAD THREAD;
-
 #ifdef ACL_ARM_LINUX
 extern int getcontext(ucontext_t *ucp);
 extern int setcontext(const ucontext_t *ucp);
@@ -25,14 +23,26 @@ typedef struct {
 	void (*free_fn)(void *);
 } FIBER_LOCAL;
 
+typedef struct FIBER_BASE {
+#define	FBASE_F_BASE	(1 << 0)
+#define FBASE_F_FIBER	(1 << 1)
+	unsigned flag;
+
+	ACL_ATOMIC *atomic;
+	long long   atomic_value;
+	int      mutex_in;
+	int      mutex_out;
+	ACL_RING mutex_waiter;
+} FIBER_BASE;
+
 struct ACL_FIBER {
+	FIBER_BASE     base;
 #ifdef USE_VALGRIND
 	unsigned int   vid;
 #endif
 	fiber_status_t status;
 	ACL_RING       me;
 	unsigned       id;
-	int            evfd;
 	unsigned       slot;
 	acl_int64      when;
 	int            errnum;
@@ -42,8 +52,6 @@ struct ACL_FIBER {
 
 	ACL_RING         holding;
 	ACL_FIBER_MUTEX *waiting;
-
-	ACL_RING         mutex_waiter;
 
 #define FIBER_F_SAVE_ERRNO	(unsigned) 1 << 0
 #define	FIBER_F_KILLED		(unsigned) 1 << 1
@@ -66,77 +74,16 @@ struct ACL_FIBER {
 	char          *buff;
 };
 
-/*
- * channel communication
- */
-enum
-{
-	CHANEND,
-	CHANSND,
-	CHANRCV,
-	CHANNOP,
-	CHANNOBLK,
-};
-
-typedef struct FIBER_ALT FIBER_ALT;
-typedef struct FIBER_ALT_ARRAY FIBER_ALT_ARRAY;
-
-struct FIBER_ALT {
-	ACL_CHANNEL   *c;
-	void          *v;
-	unsigned int   op;
-	ACL_FIBER     *fiber;
-	FIBER_ALT     *xalt;
-};
-
-struct FIBER_ALT_ARRAY {
-	FIBER_ALT  **a;
-	unsigned int n;
-	unsigned int m;
-};
-
-struct ACL_CHANNEL {
-	unsigned int    bufsize;
-	unsigned int    elemsize;
-	unsigned char  *buf;
-	unsigned int    nbuf;
-	unsigned int    off;
-	FIBER_ALT_ARRAY asend;
-	FIBER_ALT_ARRAY arecv;
-	char           *name;
-};
-
-struct ACL_FIBER_MUTEX {
-	ACL_RING   me;
-	ACL_FIBER *owner;
-	ACL_RING   waiting;
-};
-
-struct ACL_FIBER_RWLOCK {
-	int        readers;
-	ACL_FIBER *writer;
-	ACL_RING   rwaiting;
-	ACL_RING   wwaiting;
-};
-
-struct ACL_FIBER_MUTEX_R {
-	ACL_RING    me;
-	ACL_FIBER  *owner;
-	ACL_ATOMIC *atomic;
-	long long   value;
-	acl_pthread_mutex_t *mutex;
-	ACL_RING    waiters;
-};
-
-struct ACL_FIBER_SEM {
-	int num;
-	ACL_RING waiting;
-	acl_pthread_t tid;
-};
-
 /* in fiber.c */
 extern __thread int acl_var_hook_sys_api;
+FIBER_BASE *fbase_alloc(void);
+void fbase_free(FIBER_BASE *fbase);
 void fiber_free(ACL_FIBER *fiber);
+
+/* in fiber_event.c */
+int fbase_event_wait(FIBER_BASE *fbase);
+int fbase_event_wakeup(FIBER_BASE *fbase);
+void fbase_event_close(FIBER_BASE *fbase);
 
 /* in fiber_schedule.c */
 void fiber_save_errno(void);

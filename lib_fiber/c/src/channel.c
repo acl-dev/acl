@@ -3,6 +3,43 @@
 #include "stdafx.h"
 #include "fiber.h"
 
+enum
+{
+	CHANEND,
+	CHANSND,
+	CHANRCV,
+	CHANNOP,
+	CHANNOBLK,
+};
+
+typedef struct FIBER_ALT FIBER_ALT;
+typedef struct FIBER_ALT_ARRAY FIBER_ALT_ARRAY;
+
+struct FIBER_ALT {
+	ACL_CHANNEL   *c;
+	void          *v;
+	unsigned int   op;
+	ACL_FIBER     *fiber;
+	FIBER_ALT     *xalt;
+};
+
+struct FIBER_ALT_ARRAY {
+	FIBER_ALT  **a;
+	unsigned int n;
+	unsigned int m;
+};
+
+struct ACL_CHANNEL {
+	unsigned int    bufsize;
+	unsigned int    elemsize;
+	unsigned char  *buf;
+	unsigned int    nbuf;
+	unsigned int    off;
+	FIBER_ALT_ARRAY asend;
+	FIBER_ALT_ARRAY arecv;
+	char           *name;
+};
+
 ACL_CHANNEL* acl_channel_create(int elemsize, int bufsize)
 {
 	ACL_CHANNEL *c;

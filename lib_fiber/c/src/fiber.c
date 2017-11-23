@@ -24,7 +24,7 @@ typedef int   (*fcntl_fn)(int, int, ...);
 static errno_fn __sys_errno     = NULL;
 static fcntl_fn __sys_fcntl     = NULL;
 
-struct THREAD {
+typedef struct THREAD {
 	ACL_RING       ready;		/* ready fiber queue */
 	ACL_RING       dead;		/* dead fiber queue */
 	ACL_FIBER    **fibers;
@@ -38,7 +38,7 @@ struct THREAD {
 	int            count;
 	size_t         switched;
 	int            nlocal;
-};
+} THREAD;
 
 static void fiber_init(void) __attribute__ ((constructor));
 
@@ -669,13 +669,46 @@ int acl_fiber_ndead(void)
 	return acl_ring_size(&__thread_fiber->dead);
 }
 
+static void fbase_init(FIBER_BASE *fbase, int flag)
+{
+	fbase->flag      = flag;
+	fbase->mutex_in  = -1;
+	fbase->mutex_out = -1;
+	fbase->atomic    = NULL;
+	acl_ring_init(&fbase->mutex_waiter);
+
+	fbase->atomic = acl_atomic_new();
+	acl_atomic_set(fbase->atomic, &fbase->atomic_value);
+	acl_atomic_int64_set(fbase->atomic, 0);
+}
+
+static void fbase_finish(FIBER_BASE *fbase)
+{
+	fbase_event_close(fbase);
+	acl_atomic_free(fbase->atomic);
+}
+
+FIBER_BASE *fbase_alloc(void)
+{
+	FIBER_BASE *fbase = (FIBER_BASE *) acl_mymalloc(sizeof(FIBER_BASE));
+
+	fbase_init(fbase, FBASE_F_BASE);
+	return fbase;
+}
+
+void fbase_free(FIBER_BASE *fbase)
+{
+	fbase_finish(fbase);
+	acl_myfree(fbase);
+}
+
 void fiber_free(ACL_FIBER *fiber)
 {
 #ifdef USE_VALGRIND
 	VALGRIND_STACK_DEREGISTER(fiber->vid);
 #endif
-	if (fiber->evfd >= 0)
-		close(fiber->evfd);
+	fbase_finish(&fiber->base);
+
 	if (fiber->context)
 		stack_free(fiber->context);
 	stack_free(fiber->buff);
@@ -714,8 +747,9 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	if (__thread_fiber->idgen == 0)  /* overflow ? */
 		__thread_fiber->idgen++;
 
+	fbase_init(&fiber->base, FBASE_F_FIBER);
+
 	fiber->id     = __thread_fiber->idgen;
-	fiber->evfd   = -1;
 	fiber->errnum = 0;
 	fiber->signum = 0;
 	fiber->fn     = fn;
@@ -726,7 +760,6 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 
 	fiber->waiting = NULL;
 	acl_ring_init(&fiber->holding);
-	acl_ring_init(&fiber->mutex_waiter);
 
 	carg.p = fiber;
 

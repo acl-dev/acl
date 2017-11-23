@@ -2,6 +2,12 @@
 #include "fiber/lib_fiber.h"
 #include "fiber.h"
 
+struct ACL_FIBER_SEM {
+	int num;
+	ACL_RING waiting;
+	acl_pthread_t tid;
+};
+
 ACL_FIBER_SEM *acl_fiber_sem_create(int num)
 {
 	ACL_FIBER_SEM *sem = (ACL_FIBER_SEM *)
