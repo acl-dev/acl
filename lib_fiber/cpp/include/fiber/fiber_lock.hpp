@@ -1,6 +1,6 @@
 #pragma once
 
-struct ACL_FIBER_MUTEX;
+struct ACL_FIBER_EVENT;
 struct ACL_FIBER_RWLOCK;
 
 namespace acl {
@@ -10,31 +10,15 @@ class thread_mutex;
 class fiber_mutex
 {
 public:
-	fiber_mutex(bool thread_safe = false, unsigned int delay = 100,
-		bool use_atomic_lock = false);
+	fiber_mutex(void);
 	~fiber_mutex(void);
 
 	bool lock(void);
-	bool trylock(void);
 	bool unlock(void);
 
 private:
 	unsigned long tid_;
-	atomic_long*  atomic_lock_;
-	atomic_long   xx_;
-	thread_mutex* thread_lock_;
-	ACL_FIBER_MUTEX* lock_;
-	unsigned int delay_;
-	atomic_long waiters_;
-	atomic_long readers_;
-	atomic_long written_;
-	int out_;
-	int in_;
-
-	bool event_wait(int in);
-	bool event_wait(void);
-	bool atomic_lock_wait(void);
-	bool thread_lock_wait(void);
+	ACL_FIBER_EVENT* lock_;
 };
 
 class fiber_rwlock
