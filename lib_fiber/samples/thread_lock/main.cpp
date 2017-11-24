@@ -14,7 +14,7 @@ static acl::atomic_long __counter = 0;
 class myfiber : public acl::fiber
 {
 public:
-	myfiber(acl::fiber_mutex& lock, int& nfibers)
+	myfiber(acl::fiber_event& lock, int& nfibers)
 	: lock_(lock)
 	, nfibers_(nfibers)
 	{
@@ -30,7 +30,7 @@ protected:
 				printf("thread-%lu, fiber-%u begin lock\r\n",
 					acl::thread::thread_self(),
 					acl::fiber::self());
-			assert(lock_.lock());
+			assert(lock_.wait());
 
 			if (__show)
 				printf("thread-%lu, fiber-%u lock ok\r\n",
@@ -45,7 +45,7 @@ protected:
 					acl::thread::thread_self(),
 					acl::fiber::self());
 
-			assert(lock_.unlock());
+			assert(lock_.notify());
 			__counter++;
 
 			if (__show)
@@ -63,7 +63,7 @@ protected:
 	}
 
 private:
-	acl::fiber_mutex& lock_;
+	acl::fiber_event& lock_;
 	int& nfibers_;
 
 	~myfiber(void) {}
@@ -72,14 +72,14 @@ private:
 class mythread : public acl::thread
 {
 public:
-	mythread(acl::fiber_mutex& lock) : lock_(lock)
+	mythread(acl::fiber_event& lock) : lock_(lock)
 	{
 		this->set_detachable(false);
 	}
 	~mythread(void) {}
 
 private:
-	acl::fiber_mutex& lock_;
+	acl::fiber_event& lock_;
 
 	// @override
 	void* run(void)
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	acl::fiber_mutex lock;
+	acl::fiber_event lock;
 
 	std::vector<acl::thread*> threads;
 	for (int i = 0; i < __nthreads; i++)

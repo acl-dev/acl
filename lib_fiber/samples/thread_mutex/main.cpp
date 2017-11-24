@@ -46,7 +46,7 @@ protected:
 					acl::thread::thread_self(),
 					acl::fiber::self());
 
-			acl_fiber_event_signal(event_);
+			acl_fiber_event_notify(event_);
 
 			__counter++;
 
