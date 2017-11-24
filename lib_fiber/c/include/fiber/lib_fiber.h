@@ -222,17 +222,17 @@ void* acl_fiber_get_specific(int key);
 /* fiber locking */
 
 /**
- * 协程互斥锁
+ * 协程互斥锁，线程非安全，只能用在同一线程内
  */
 typedef struct ACL_FIBER_MUTEX ACL_FIBER_MUTEX;
 
 /**
- * 协程读写锁
+ * 协程读写锁，线程非安全，只能用在同一线程内
  */
 typedef struct ACL_FIBER_RWLOCK ACL_FIBER_RWLOCK;
 
 /**
- * 创建协程互斥锁
+ * 创建协程互斥锁，线程非安全，只能用在同一线程内
  * @return {ACL_FIBER_MUTEX*}
  */
 ACL_FIBER_MUTEX* acl_fiber_mutex_create(void);
@@ -252,7 +252,7 @@ void acl_fiber_mutex_lock(ACL_FIBER_MUTEX* l);
 /**
  * 对协程互斥锁尝试性进行加锁，无论是否成功加锁都会立即返回
  * @param l {ACL_FIBER_MUTEX*} 由 acl_fiber_mutex_create 创建的协程互斥锁
- * @return {int} 如果加锁成功则返回非 0 值，否则返回 0
+ * @return {int} 如果加锁成功则返回 0 值，否则返回 -1
  */
 int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX* l);
 
@@ -264,7 +264,7 @@ int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX* l);
 void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX* l);
 
 /**
- * 创建协程读写锁
+ * 创建协程读写锁，线程非安全，只能用在同一线程内
  * @return {ACL_FIBER_RWLOCK*}
  */
 ACL_FIBER_RWLOCK* acl_fiber_rwlock_create(void);
@@ -317,13 +317,42 @@ void acl_fiber_rwlock_runlock(ACL_FIBER_RWLOCK* l);
  */
 void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK* l);
 
-/* 线程安全的协程锁*/
 /* fiber_event.c */
+
+/* 线程安全的协程锁，可以用在不同线程的协程之间及不同线程之间的互斥 */
 typedef struct ACL_FIBER_EVENT ACL_FIBER_EVENT;
 
+/**
+ * 创建基于事件的协程/线程混合锁
+ * @return {ACL_FIBER_EVENT *}
+ */
 ACL_FIBER_EVENT *acl_fiber_event_create(void);
+
+/**
+ * 释放事件锁
+ * @param {ACL_FIBER_EVENT *}
+ */
 void acl_fiber_event_free(ACL_FIBER_EVENT *event);
+
+/**
+ * 等待事件锁可用
+ * @param {ACL_FIBER_EVENT *}
+ * @return {int} 返回 0 表示成功，-1 表示出错
+ */
 int acl_fiber_event_wait(ACL_FIBER_EVENT *event);
+
+/**
+ * 尝试等待事件锁可用
+ * @param {ACL_FIBER_EVENT *}
+ * @return {int} 返回 0 表示成功，-1 表示锁被占用
+ */
+int acl_fiber_event_trywait(ACL_FIBER_EVENT *event);
+
+/**
+ * 事件锁拥有者通知等待者事件锁可用，则等待者收到通知后则可获得事件锁
+ * @param {ACL_FIBER_EVENT *}
+ * @return {int} 返回 0 表示成功，-1 表示出错
+ */
 int acl_fiber_event_notify(ACL_FIBER_EVENT *event);
 
 /* fiber semaphore */

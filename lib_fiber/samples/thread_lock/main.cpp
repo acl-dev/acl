@@ -105,6 +105,7 @@ static void usage(const char* procname)
 		" -t nthreads[default: 2]\r\n"
 		" -c nfibers[default: 2]\r\n"
 		" -n nloop[default: 2]\r\n"
+		" -d delay[default: 0 ms]\r\n"
 		" -S [show info]\r\n",
 		procname);
 }
@@ -116,7 +117,7 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hc:t:n:S")) > 0)
+	while ((ch = getopt(argc, argv, "hc:t:n:Sd:")) > 0)
 	{
 		switch (ch)
 		{
@@ -134,6 +135,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'S':
 			__show = true;
+			break;
+		case 'd':
+			__delay = atoi(optarg);
 			break;
 		default:
 			break;

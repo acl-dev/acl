@@ -1,44 +1,31 @@
 #include "stdafx.hpp"
-#include "acl_cpp/stdlib/thread.hpp"
-#include "acl_cpp/stdlib/thread_mutex.hpp"
-#include "acl_cpp/stdlib/log.hpp"
-#include "acl_cpp/stdlib/util.hpp"
-#include "acl_cpp/stdlib/atomic.hpp"
-#include "acl_cpp/stdlib/mbox.hpp"
-#include "acl_cpp/stdlib/trigger.hpp"
-#include "fiber/fiber.hpp"
 #include "fiber/fiber_lock.hpp"
 
 namespace acl {
 
 fiber_mutex::fiber_mutex(void)
-: tid_(0)
 {
-	lock_ = acl_fiber_event_create();
+	lock_ = acl_fiber_mutex_create();
 }
 
 fiber_mutex::~fiber_mutex(void)
 {
-	acl_fiber_event_free(lock_);
+	acl_fiber_mutex_free(lock_);
 }
 
 bool fiber_mutex::lock(void)
 {
-	if (acl_fiber_event_wait(lock_) == -1)
-		return false;
-
-	tid_ = thread::self();
+	acl_fiber_mutex_lock(lock_);
 	return true;
 }
 
+bool fiber_mutex::trylock(void)
+{
+	return acl_fiber_mutex_trylock(lock_) ? true : false;
+}
 bool fiber_mutex::unlock(void)
 {
-	unsigned long tid = tid_;
-	tid_ = 0;
-	if (acl_fiber_event_signal(lock_) == 0)
-		return true;
-	// xxx
-	tid_ = tid;
+	acl_fiber_mutex_unlock(lock_);
 	return false;
 }
 

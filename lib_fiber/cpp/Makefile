@@ -207,7 +207,7 @@ $(OBJ_PATH_DST)/%.o: ./src/%.cpp
 $(DEF_PATH_DST)/%.inc: ./src/%.cpp
 	$(CREATE_DEF)
 
-clean:
+clean cl:
 	rm -f $(LIB_PATH_DST)/${STATIC_LIBNAME}
 	rm -f $(LIB_PATH_DST)/${SHARED_LIBNAME}
 	rm -f $(LIB_PATH_DST)/${STATIC_OLD_LIBNAME}

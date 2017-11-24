@@ -1,6 +1,6 @@
 #pragma once
 
-struct ACL_FIBER_EVENT;
+struct ACL_FIBER_MUTEX;
 struct ACL_FIBER_RWLOCK;
 
 namespace acl {
@@ -14,11 +14,11 @@ public:
 	~fiber_mutex(void);
 
 	bool lock(void);
+	bool trylock(void);
 	bool unlock(void);
 
 private:
-	unsigned long tid_;
-	ACL_FIBER_EVENT* lock_;
+	ACL_FIBER_MUTEX* lock_;
 };
 
 class fiber_rwlock

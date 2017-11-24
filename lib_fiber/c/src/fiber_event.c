@@ -181,6 +181,9 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 			fbase_event_close(fbase);
 			if (fbase->flag & FBASE_F_BASE)
 				fbase_free(fbase);
+			acl_msg_error("%s(%d), %s: event wait error %s",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_last_serror());
 			return -1;
 		}
 	}
@@ -189,6 +192,17 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 	if (fbase->flag & FBASE_F_BASE)
 		fbase_free(fbase);
 	return 0;
+}
+
+int acl_fiber_event_trywait(ACL_FIBER_EVENT *event)
+{
+	if (acl_atomic_int64_cas(event->atomic, 0, 1) == 0) {
+		ACL_FIBER  *fiber = acl_fiber_running();
+		FIBER_BASE *fbase = fiber ? &fiber->base : fbase_alloc();
+		event->owner = fbase;
+		return 0;
+	}
+	return -1;
 }
 
 #define RING_TO_FIBER(r) \

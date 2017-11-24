@@ -38,14 +38,14 @@ static int __lock(ACL_FIBER_MUTEX *lk, int block)
 	if (lk->owner == NULL) {
 		lk->owner = acl_fiber_running();
 		acl_ring_prepend(&curr->holding, &lk->me);
-		return 1;
+		return 0;
 	}
 
 	// xxx: no support recursion lock
 	assert(lk->owner != curr);
 
 	if (!block)
-		return 0;
+		return -1;
 
 	acl_ring_prepend(&lk->waiting, &curr->me);
 	curr->waiting = lk;
@@ -59,7 +59,7 @@ static int __lock(ACL_FIBER_MUTEX *lk, int block)
 	acl_ring_detach(&curr->me);
 
 	if (lk->owner == curr)
-		return 1;
+		return 0;
 
 	if (acl_fiber_killed(curr))
 		acl_msg_info("%s(%d), %s: lock fiber-%u was killed",
@@ -68,7 +68,7 @@ static int __lock(ACL_FIBER_MUTEX *lk, int block)
 		acl_msg_warn("%s(%d), %s: qlock: owner=%p self=%p oops",
 			__FILE__, __LINE__, __FUNCTION__, lk->owner, curr);
 
-	return 1;
+	return 0;
 }
 
 void acl_fiber_mutex_lock(ACL_FIBER_MUTEX *lk)
@@ -78,7 +78,7 @@ void acl_fiber_mutex_lock(ACL_FIBER_MUTEX *lk)
 
 int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *lk)
 {
-	return __lock(lk, 0);
+	return __lock(lk, 0) ? 0 : -1;
 }
 
 #define RING_TO_FIBER(r) \
