@@ -324,7 +324,7 @@ typedef struct ACL_FIBER_EVENT ACL_FIBER_EVENT;
 ACL_FIBER_EVENT *acl_fiber_event_create(void);
 void acl_fiber_event_free(ACL_FIBER_EVENT *event);
 int acl_fiber_event_wait(ACL_FIBER_EVENT *event);
-int acl_fiber_event_signal(ACL_FIBER_EVENT *event);
+int acl_fiber_event_notify(ACL_FIBER_EVENT *event);
 
 /* fiber semaphore */
 

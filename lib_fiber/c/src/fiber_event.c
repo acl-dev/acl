@@ -197,7 +197,7 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 #define FIRST_FIBER(head) \
     (acl_ring_succ(head) != (head) ? RING_TO_FIBER(acl_ring_succ(head)) : 0)
 
-int acl_fiber_event_signal(ACL_FIBER_EVENT *event)
+int acl_fiber_event_notify(ACL_FIBER_EVENT *event)
 {
 	ACL_FIBER  *curr  = acl_fiber_running();
 	FIBER_BASE *owner = curr ? &curr->base : NULL, *waiter;
