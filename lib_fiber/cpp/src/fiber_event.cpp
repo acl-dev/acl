@@ -21,6 +21,11 @@ bool fiber_event::wait(void)
 	return true;
 }
 
+bool fiber_event::trywait(void)
+{
+	return acl_fiber_event_trywait(event_) == 0 ? true : false;
+}
+
 bool fiber_event::notify(void)
 {
 	if (acl_fiber_event_notify(event_) == 0)

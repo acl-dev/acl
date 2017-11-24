@@ -21,7 +21,7 @@ bool fiber_mutex::lock(void)
 
 bool fiber_mutex::trylock(void)
 {
-	return acl_fiber_mutex_trylock(lock_) ? true : false;
+	return acl_fiber_mutex_trylock(lock_) == 0 ? true : false;
 }
 bool fiber_mutex::unlock(void)
 {
