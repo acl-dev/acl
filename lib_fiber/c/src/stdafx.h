@@ -19,4 +19,13 @@ int proto_securev_snprintf(char *buf, size_t size, const char *fmt, va_list ap);
 #  endif
 # endif  /* WIN2/WIN64 */
 #include "lib_acl.h"
+
+#if 1
+#define LIKELY(x)	__builtin_expect(!!(x), 1)
+#define UNLIKELY(x)	__builtin_expect(!!(x), 0)
+#else
+#define	LIKELY
+#define	UNLIKELY
+#endif
+
 #endif

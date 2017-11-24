@@ -563,7 +563,6 @@ void acl_fiber_signal(ACL_FIBER *fiber, int signum)
 	/* add the current fiber and signed fiber in the head of the ready */
 #if 0
 	acl_fiber_ready(fiber);
-	printf("----%s-%d---\n", __FUNCTION__, __LINE__);
 	acl_fiber_yield();
 #else
 	curr->status = FIBER_STATUS_READY;
@@ -677,6 +676,8 @@ static void fbase_init(FIBER_BASE *fbase, int flag)
 	fbase->atomic    = NULL;
 	acl_ring_init(&fbase->mutex_waiter);
 
+	assert(fbase->atomic == NULL);
+
 	fbase->atomic = acl_atomic_new();
 	acl_atomic_set(fbase->atomic, &fbase->atomic_value);
 	acl_atomic_int64_set(fbase->atomic, 0);
@@ -690,7 +691,7 @@ static void fbase_finish(FIBER_BASE *fbase)
 
 FIBER_BASE *fbase_alloc(void)
 {
-	FIBER_BASE *fbase = (FIBER_BASE *) acl_mymalloc(sizeof(FIBER_BASE));
+	FIBER_BASE *fbase = (FIBER_BASE *) acl_mycalloc(1, sizeof(FIBER_BASE));
 
 	fbase_init(fbase, FBASE_F_BASE);
 	return fbase;
@@ -733,6 +734,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 		fiber = (ACL_FIBER *) acl_mycalloc(1, sizeof(ACL_FIBER));
 		/* no using calloc just avoiding using real memory */
 		fiber->buff = (char *) stack_alloc(size);
+		fbase_init(&fiber->base, FBASE_F_FIBER);
 	} else if ((fiber = APPL(head, ACL_FIBER, me))->size < size) {
 		/* if using realloc, real memory will be used, when we first
 		 * free and malloc again, then we'll just use virtual memory,
@@ -746,8 +748,6 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	__thread_fiber->idgen++;
 	if (__thread_fiber->idgen == 0)  /* overflow ? */
 		__thread_fiber->idgen++;
-
-	fbase_init(&fiber->base, FBASE_F_FIBER);
 
 	fiber->id     = __thread_fiber->idgen;
 	fiber->errnum = 0;

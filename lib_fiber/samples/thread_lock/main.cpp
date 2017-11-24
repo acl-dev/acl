@@ -10,6 +10,7 @@ static int __nloop    = 2;
 static int __delay    = 0;
 
 static acl::atomic_long __counter = 0;
+static long long __counter2 = 0;
 
 class myfiber : public acl::fiber
 {
@@ -45,6 +46,7 @@ protected:
 					acl::thread::thread_self(),
 					acl::fiber::self());
 
+			__counter2++;
 			assert(lock_.notify());
 			__counter++;
 
@@ -161,7 +163,7 @@ int main(int argc, char *argv[])
 		delete *it;
 	}
 
-	printf("all over, thread=%d, fibers=%d, nloop=%d, counter=%lld\r\n",
-		__nthreads, __nfibers, __nloop, __counter.value());
+	printf("all over, thread=%d, fibers=%d, nloop=%d, counter=%lld, %lld\n",
+		__nthreads, __nfibers, __nloop, __counter.value(), __counter2);
 	return 0;
 }
