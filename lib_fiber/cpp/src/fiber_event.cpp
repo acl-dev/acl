@@ -15,10 +15,7 @@ fiber_event::~fiber_event(void)
 
 bool fiber_event::wait(void)
 {
-	if (acl_fiber_event_wait(event_) == -1)
-		return false;
-
-	return true;
+	return acl_fiber_event_wait(event_) == 0 ? true : false;
 }
 
 bool fiber_event::trywait(void)
@@ -28,9 +25,7 @@ bool fiber_event::trywait(void)
 
 bool fiber_event::notify(void)
 {
-	if (acl_fiber_event_notify(event_) == 0)
-		return true;
-	return false;
+	return acl_fiber_event_notify(event_) == 0 ? true : false;
 }
 
 } // namespace acl
