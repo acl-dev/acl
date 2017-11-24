@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include <pthread.h>
-#include <sys/eventfd.h>
 #include <linux/version.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
+#include <sys/eventfd.h>
+#endif
 #include "fiber/lib_fiber.h"
 #include "fiber.h"
 
