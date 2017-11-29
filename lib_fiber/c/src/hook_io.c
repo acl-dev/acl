@@ -8,7 +8,9 @@
 #include <unistd.h>
 #include <sys/sendfile.h>
 
+#ifndef __USE_GNU
 #define __USE_GNU
+#endif
 #include <dlfcn.h>
 #include <sys/stat.h>
 #include "fiber.h"

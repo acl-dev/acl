@@ -1,5 +1,7 @@
 #include "stdafx.h"
+#ifndef __USE_GNU
 #define __USE_GNU
+#endif
 #include <dlfcn.h>
 #include <sys/epoll.h>
 #include "fiber.h"

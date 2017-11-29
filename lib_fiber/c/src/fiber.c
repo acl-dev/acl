@@ -1,6 +1,9 @@
 #include "stdafx.h"
+#ifndef __USE_GNU
 #define __USE_GNU
+#endif
 #include <dlfcn.h>
+#include <signal.h>
 
 #ifdef USE_VALGRIND
 #include <valgrind/valgrind.h>
@@ -74,8 +77,8 @@ static size_t stack_size(size_t size)
 
 static void *stack_alloc(size_t size)
 {
-	char  *ptr;
 	int    ret;
+	char  *ptr = NULL;
 	size_t pgsz = page_size();
 
 	size = stack_size(size);
@@ -122,6 +125,14 @@ static void stack_free(void *ptr)
 }
 
 #endif
+
+static void *stack_calloc(size_t size)
+{
+	void* ptr = stack_alloc(size);
+    if (ptr)
+        memset(ptr, 0, size);
+    return ptr;
+}
 
 /****************************************************************************/
 
