@@ -9,7 +9,7 @@
 #include <valgrind/valgrind.h>
 #endif
 
-#define FIBER_STACK_GUARD
+//#define FIBER_STACK_GUARD
 #ifdef	FIBER_STACK_GUARD
 #include <dlfcn.h>
 #include <sys/mman.h>
@@ -126,13 +126,15 @@ static void stack_free(void *ptr)
 
 #endif
 
+#ifndef	USE_JMP
 static void *stack_calloc(size_t size)
 {
 	void* ptr = stack_alloc(size);
-    if (ptr)
-        memset(ptr, 0, size);
-    return ptr;
+	if (ptr)
+		memset(ptr, 0, size);
+	return ptr;
 }
+#endif
 
 /****************************************************************************/
 
