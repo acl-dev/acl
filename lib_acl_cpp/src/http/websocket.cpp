@@ -281,6 +281,7 @@ static bool is_big_endian(void)
 		return true;
 }
 
+#ifndef swap64
 #define swap64(val) (((val) >> 56) | \
 	(((val) & 0x00ff000000000000ll) >> 40) | \
 	(((val) & 0x0000ff0000000000ll) >> 24) | \
@@ -289,6 +290,7 @@ static bool is_big_endian(void)
 	(((val) & 0x0000000000ff0000ll) << 24) | \
 	(((val) & 0x000000000000ff00ll) << 40) | \
 	(((val) << 56)))
+#endif
 
 #define	hton64(val) is_big_endian() ? val : swap64(val)
 #define	ntoh64(val) hton64(val)
