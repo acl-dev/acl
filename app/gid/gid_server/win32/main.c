@@ -16,7 +16,7 @@ static void client_thread(int event_type acl_unused, void* arg)
 	
 	while (1) {
 		last = time(NULL);
-		if (service_main(client, NULL) < 0)
+		if (service_main(NULL, client) < 0)
 			break;
 		cost = time(NULL) - last;
 		if (cost >= 1)
