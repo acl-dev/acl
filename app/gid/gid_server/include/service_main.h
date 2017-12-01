@@ -20,7 +20,7 @@ extern void service_exit(void *ctx);
  * @param stream {ACL_VSTREAM*} 客户端数据连接流
  * @param ctx {void*} 用户自定义类型指针
  */
-extern int service_main(ACL_VSTREAM *stream, void *ctx);
+extern int service_main(void* ctx, ACL_VSTREAM *stream);
 
 #ifdef	__cplusplus
 }

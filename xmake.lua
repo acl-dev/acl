@@ -124,6 +124,10 @@ end
 --
 -- $ xmake f -k shared -m debug; xmake
 --
+-- Build and run app example
+--
+-- $ xmake run [gson|iconv|wizard|master_ctl|master_daemon|...]
+--
 -- Configuration 
 --
 -- $ xmake f -p [windows|linux|iphoneos|android|macosx|freebsd|sunos5|cross] -m [debug|release] -a [x86|x64|x86_64|armv7|arm64|armv8-a] -k [static|shared]
