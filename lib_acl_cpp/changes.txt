@@ -1,6 +1,12 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+500) 2017.12.2
+500.1) bugfix: polarssl_conf.cpp 在动态加载 polarssl 库时，如果应用定义了全局
+的 acl::polarssl_conf 对象，则会因 polarssl_conf 类内部的 __polarssl_path 也是
+静态全局的，编译器在构建此两个对象时的顺序是先构造应用的 polarssl_conf 对象而
+后构造 __polarssl_path，从而导致 polarssl_conf 在构造时会引起崩溃
+
 499) 2017.11.14
 499.1) feature: 增加 tbox 类，用于在多线程环境中传递消息对象
 

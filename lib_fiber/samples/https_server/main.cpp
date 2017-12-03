@@ -157,4 +157,6 @@ int main(int argc, char *argv[])
 	acl_fiber_create(fiber_accept, addr.c_str(), STACK_SIZE);
 
 	acl_fiber_schedule();
+
+	return 0;
 }

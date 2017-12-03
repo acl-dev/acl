@@ -114,7 +114,7 @@ static ssl_cache_set_fn		__ssl_cache_set;
 static ssl_cache_get_fn		__ssl_cache_get;
 
 static acl_pthread_once_t	__polarssl_once = ACL_PTHREAD_ONCE_INIT;
-static acl::string		__polarssl_path;
+static string*			__polarssl_path = NULL;
 ACL_DLL_HANDLE			__polarssl_dll  = NULL;
 
 static void polarssl_dll_unload(void)
@@ -123,8 +123,10 @@ static void polarssl_dll_unload(void)
 	{
 		acl_dlclose(__polarssl_dll);
 		__polarssl_dll = NULL;
-		logger("%s unload ok", __polarssl_path.c_str());
+		logger("%s unload ok", __polarssl_path->c_str());
 	}
+	delete __polarssl_path;
+	__polarssl_path = NULL;
 }
 
 extern void polarssl_dll_load_io(void); // defined in polarssl_io.cpp
@@ -165,19 +167,22 @@ static void polarssl_dll_load(void)
 {
 	if (__polarssl_dll)
 	{
-		logger("polarssl(%s) has been loaded!", __polarssl_path.c_str());
+		logger("polarssl(%s) has been loaded!", __polarssl_path->c_str());
 		return;
 	}
 
-	const char* path = __polarssl_path.c_str();
-	if (__polarssl_path.empty())
+	const char* path;
+
+	if (__polarssl_path == NULL || __polarssl_path->empty())
 	{
 #ifdef	ACL_WINDOWS
 		path = "libpolarssl.dll";
 #else
-		path = "libpolarssl.so";
+		path = "./libpolarssl.so";
 #endif
 	}
+	else
+		path = __polarssl_path->c_str();
 
 	__polarssl_dll = acl_dlopen(path);
 	if (__polarssl_dll == NULL)
@@ -233,7 +238,9 @@ namespace acl
 void polarssl_conf::set_libpath(const char* path)
 {
 #ifdef HAS_POLARSSL_DLL
-	__polarssl_path = path;
+	if (__polarssl_path == NULL)
+		__polarssl_path = NEW string;
+	*__polarssl_path = path;
 #endif
 }
 
