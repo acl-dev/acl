@@ -114,7 +114,7 @@ static ssl_cache_set_fn		__ssl_cache_set;
 static ssl_cache_get_fn		__ssl_cache_get;
 
 static acl_pthread_once_t	__polarssl_once = ACL_PTHREAD_ONCE_INIT;
-static string*			__polarssl_path = NULL;
+static acl::string*		__polarssl_path = NULL;
 ACL_DLL_HANDLE			__polarssl_dll  = NULL;
 
 static void polarssl_dll_unload(void)
