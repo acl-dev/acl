@@ -18,7 +18,7 @@ static void app_run(void *arg)
 	ACL_VSTREAM *client = (ACL_VSTREAM*) arg;
 
 	while (1) {
-		if (service_main(client, NULL) < 0)
+		if (service_main(NULL, client) < 0)
 			break;
 		if (__run_once)
 			break;
@@ -42,7 +42,7 @@ static ACL_VSTREAM *init(const char *filepath)
 	char  addr[] = ":7072";
 	ACL_XINETD_CFG_PARSER *cfg = NULL;
 
-	acl_init();
+	acl_lib_init();
 	/*
 	acl_debug_malloc_init(NULL, "log.txt");
 	*/
@@ -70,7 +70,7 @@ static void end(void)
 {
 	service_exit(NULL);
 	acl_myfree(var_cfg_gid_path);
-	acl_end();
+	acl_lib_end();
 }
 
 static void app_test_thrpool(const char *filepath)

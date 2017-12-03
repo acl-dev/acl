@@ -134,7 +134,7 @@ void service_exit(void *ctx acl_unused)
 	gid_finish();
 }
 
-int service_main(ACL_VSTREAM *client, void *ctx acl_unused)
+int service_main(void *ctx acl_unused, ACL_VSTREAM *client)
 {
 	int   (*service)(ACL_VSTREAM*) = NULL;
 	int   ret;
