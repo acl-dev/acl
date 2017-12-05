@@ -397,7 +397,7 @@ bool redis_list::bpop(const char* cmd, const std::vector<string>& keys,
 	for (; cit != keys.end(); ++cit)
 	{
 		args[i] = (*cit).c_str();
-		lens[i] = strlen(args[i]);
+		lens[i] = (*cit).length();
 		i++;
 	}
 

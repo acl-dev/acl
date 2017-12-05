@@ -58,7 +58,7 @@ int redis_zset::zadd(const char* key, const std::map<string, double>& members)
 		i++;
 
 		argv[i] = cit->first.c_str();
-		lens[i] = strlen(argv[i]);
+		lens[i] = cit->first.length();
 		i++;
 	}
 
@@ -168,7 +168,7 @@ int redis_zset::zadd(const char* key, const std::vector<string>& members,
 		j++;
 
 		argv[j] = members[i].c_str();
-		lens[j] = strlen(argv[j]);
+		lens[j] = members[i].length();
 		j++;
 	}
 
@@ -870,7 +870,7 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 	for (; cit != keys.end(); ++cit, i++)
 	{
 		argv[i] = cit->first.c_str();
-		lens[i] = strlen(argv[i]);
+		lens[i] = cit->first.length();
 		i++;
 	}
 
@@ -951,7 +951,7 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 	for (; cit != keys.end(); ++cit)
 	{
 		argv[i] = (*cit).c_str();
-		lens[i] = strlen(argv[i]);
+		lens[i] = (*cit).length();
 		i++;
 	}
 
