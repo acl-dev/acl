@@ -9,7 +9,7 @@ waiting_on_stop = true
 # 组主
 owner_group = root
 # 如果子进程服务异常退出，重启该子进程服务的时间间隔(秒)
-service_throttle_time = 60
+service_throttle_time = 10
 # 父进程进程名
 process_name = acl_master
 #daemon_timeout = 18000
