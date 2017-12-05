@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        37
+Release:        38
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,67 +76,71 @@ fi
 /etc/init.d/master
 
 %changelog
-* Wed Nov 28 2018 zhengshuxin@qiyi.com 3.3.0-37-20171128.12
+* Wed Dec 05 2017 zhengshuxin@qiyi.com 3.3.0-38-20171205.12
+- master_ctld's configure was updated
+- fixed some bugs in redis module for supporting binary data
+
+* Wed Nov 28 2017 zhengshuxin@qiyi.com 3.3.0-37-20171128.12
 - update package version
 
-* Sat Nov 16 2018 zhengshuxin@qiyi.com 3.3.0-36-20171116.12
+* Sat Nov 16 2017 zhengshuxin@qiyi.com 3.3.0-36-20171116.12
 - compiling error on Centos6.x
 
-* Sat Nov 16 2018 zhengshuxin@qiyi.com 3.3.0-35-20171116.11
+* Sat Nov 16 2017 zhengshuxin@qiyi.com 3.3.0-35-20171116.11
 - add master_ctl into rpm package
 
-* Sat Nov 13 2018 zhengshuxin@qiyi.com 3.3.0-34-20171113.09
+* Sat Nov 13 2017 zhengshuxin@qiyi.com 3.3.0-34-20171113.09
 - acl_udp_server & master upgrade
 
-* Sat Oct 27 2018 zhengshuxin@qiyi.com 3.3.0-33-20171027.14
+* Sat Oct 27 2017 zhengshuxin@qiyi.com 3.3.0-33-20171027.14
 - fixed one compiling error
 
-* Sat Oct 27 2018 zhengshuxin@qiyi.com 3.3.0-32-20171027.13
+* Sat Oct 27 2017 zhengshuxin@qiyi.com 3.3.0-32-20171027.13
 - fixed one bug in fiber that int maybe overflow
 
-* Sat Oct 16 2018 zhengshuxin@qiyi.com 3.3.0-31-20171016.10
+* Sat Oct 16 2017 zhengshuxin@qiyi.com 3.3.0-31-20171016.10
 - auto compiling fiber module for Linux
 
-* Sat Oct 10 2018 zhengshuxin@qiyi.com 3.3.0-30-20171010.14
+* Sat Oct 10 2017 zhengshuxin@qiyi.com 3.3.0-30-20171010.14
 - fiber_mutex: fixed bugs
 
-* Sat Oct 10 2018 zhengshuxin@qiyi.com 3.3.0-29-20171010.11
+* Sat Oct 10 2017 zhengshuxin@qiyi.com 3.3.0-29-20171010.11
 - fiber_mutex: fixed one bug when thread_safe is true
 
-* Sat Oct 07 2018 zhengshuxin@qiyi.com 3.3.0-28-20171007.23
+* Sat Oct 07 2017 zhengshuxin@qiyi.com 3.3.0-28-20171007.23
 - add event_mutex in lib_acl_cpp
 
-* Sat Sep 29 2018 zhengshuxin@qiyi.com 3.3.0-27-20170929.23
+* Sat Sep 29 2017 zhengshuxin@qiyi.com 3.3.0-27-20170929.23
 - fiber_mutex: when blocked by thread mutex, the current fiber will be swapout
 
-* Sat Sep 29 2018 zhengshuxin@qiyi.com 3.3.0-26-20170929.18
+* Sat Sep 29 2017 zhengshuxin@qiyi.com 3.3.0-26-20170929.18
 - version: upgrade version to 3.3.0-26
 
-* Sat Sep 29 2018 zhengshuxin@qiyi.com 3.3.0-25-20170929.17
+* Sat Sep 29 2017 zhengshuxin@qiyi.com 3.3.0-25-20170929.17
 - version: upgrade version to 3.3.0-25
 
-* Sat Sep 28 2018 zhengshuxin@qiyi.com 3.3.0-23-20170928.12
+* Sat Sep 28 2017 zhengshuxin@qiyi.com 3.3.0-23-20170928.12
 - valgrind: free global objects so valgrind no reporting error when process exiting
 
-* Sat Sep 23 2018 zhengshuxin@qiyi.com 3.3.0-22-20170923.19
+* Sat Sep 23 2017 zhengshuxin@qiyi.com 3.3.0-22-20170923.19
 - fiber: hook mkdir/stat/lstat/fstat 
 
-* Fri Sep 22 2018 zhengshuxin@qiyi.com 3.3.0-21-20170922.18
+* Fri Sep 22 2017 zhengshuxin@qiyi.com 3.3.0-21-20170922.18
 - acl_master: restructure web managing module.
 
-* Thu Sep 21 2018 zhengshuxin@qiyi.com 3.3.0-20-20170921.16
+* Thu Sep 21 2017 zhengshuxin@qiyi.com 3.3.0-20-20170921.16
 - rpm: add version to 3.3.0-20
 
-* Thu Sep 21 2018 zhengshuxin@qiyi.com 3.3.0-19-20170921.16
+* Thu Sep 21 2017 zhengshuxin@qiyi.com 3.3.0-19-20170921.16
 - bitmap: some method maybe collision with some macro on some OS
 
-* Thu Sep 21 2018 zhengshuxin@qiyi.com 3.3.0-18-20170921.15
+* Thu Sep 21 2017 zhengshuxin@qiyi.com 3.3.0-18-20170921.15
 - event: fixed bug in events timer
 
-* Wed Sep 20 2018 zhengshuxin@qiyi.com 3.3.0-17-20170920.17
+* Wed Sep 20 2017 zhengshuxin@qiyi.com 3.3.0-17-20170920.17
 - fiber: hook_net.c supports epoll_create1 API
 
-* Wed Sep 20 2018 zhengshuxin@qiyi.com 3.3.0-16-20170920.17
+* Wed Sep 20 2017 zhengshuxin@qiyi.com 3.3.0-16-20170920.17
 - add one trying for checking fd's type
 
 - Just increase version
