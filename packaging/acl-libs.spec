@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        38
+Release:        39
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,9 @@ fi
 /etc/init.d/master
 
 %changelog
+* Wed Dec 05 2017 zhengshuxin@qiyi.com 3.3.0-39-20171205.15
+- master's configure main.cf: changed service_throttle_time from 60s to 10s
+
 * Wed Dec 05 2017 zhengshuxin@qiyi.com 3.3.0-38-20171205.12
 - master_ctld's configure was updated
 - fixed some bugs in redis module for supporting binary data
