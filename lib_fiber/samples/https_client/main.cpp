@@ -15,7 +15,6 @@ static int __rw_timeout   = 0;
 static int __max_loop     = 10000;
 static int __max_fibers   = 100;
 static int __left_fibers  = 100;
-static int __read_data    = 0;
 static struct timeval __begin;
 
 static void http_client(ACL_FIBER *fiber, const char* addr)
@@ -24,11 +23,12 @@ static void http_client(ACL_FIBER *fiber, const char* addr)
 	acl::http_request req(addr, 0, 0);
 	acl::http_header& hdr = req.request_header();
 
-	hdr.set_url("/").set_content_type("text/plain").set_keep_alive(true);
 	req.set_ssl(&__ssl_conf);
 
 	for (int i = 0; i < __max_loop; i++)
 	{
+		hdr.set_url("/").set_content_type("text/plain").set_keep_alive(true);
+
 		if (req.request(NULL, 0) == false)
 		{
 			printf("send request error\r\n");
@@ -42,8 +42,7 @@ static void http_client(ACL_FIBER *fiber, const char* addr)
 		}
 
 		if (i < 1)
-			printf(">>>fiber-%d: body: %s\r\n",
-				acl_fiber_id(fiber), body.c_str());
+			printf(">>>fiber-%d: body: %s\r\n", acl_fiber_id(fiber), body.c_str());
 
 		__total_count++;
 		body.clear();
@@ -89,11 +88,11 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
+		" -l polarssl_libpath[default: libpolarssl.so]\r\n"
 		" -s addr\r\n"
 		" -t connt_timeout\r\n"
 		" -r rw_timeout\r\n"
 		" -c max_fibers\r\n"
-		" -w [if wait for echo data from server, dafault: no]\r\n"
 		" -n max_loop\r\n", procname);
 }
 
@@ -101,12 +100,13 @@ int main(int argc, char *argv[])
 {
 	int   ch;
 	char  addr[256];
+	acl::string polarssl_libpath("libpolarssl.so");
        
 	acl_msg_stdout_enable(1);
 
 	snprintf(addr, sizeof(addr), "%s", "0.0.0.0:9001");
 
-	while ((ch = getopt(argc, argv, "hc:n:s:t:r:w")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:n:s:t:r:l:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -127,8 +127,8 @@ int main(int argc, char *argv[])
 		case 's':
 			snprintf(addr, sizeof(addr), "%s", optarg);
 			break;
-		case 'w':
-			__read_data = 1;
+		case 'l':
+			polarssl_libpath = optarg;
 			break;
 		default:
 			break;
@@ -137,6 +137,7 @@ int main(int argc, char *argv[])
 
 	gettimeofday(&__begin, NULL);
 
+	acl::polarssl_conf::set_libpath(polarssl_libpath);
 	acl_fiber_create(fiber_main, addr, 32768);
 
 	printf("call fiber_schedule\r\n");

@@ -888,6 +888,7 @@ void acl_fiber_schedule(void)
 	ACL_FIBER *fiber;
 	ACL_RING *head;
 
+	fiber_check();
 	acl_fiber_hook_api(1);
 	__scheduled = 1;
 

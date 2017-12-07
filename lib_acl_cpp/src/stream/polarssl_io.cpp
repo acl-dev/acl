@@ -218,7 +218,9 @@ polarssl_io::polarssl_io(polarssl_conf& conf, bool server_side,
 , rnd_(NULL)
 , stream_(NULL)
 {
-#ifndef HAS_POLARSSL
+#ifdef HAS_POLARSSL
+	conf.init_once();
+#else
 	(void) conf_;
 	(void) server_side_;
 	(void) non_block_;

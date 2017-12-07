@@ -113,8 +113,14 @@ static ssl_cache_free_fn	__ssl_cache_free;
 static ssl_cache_set_fn		__ssl_cache_set;
 static ssl_cache_get_fn		__ssl_cache_get;
 
-static acl_pthread_once_t	__polarssl_once = ACL_PTHREAD_ONCE_INIT;
-static acl::string*		__polarssl_path = NULL;
+static acl_pthread_once_t	__polarssl_once     = ACL_PTHREAD_ONCE_INIT;
+static acl::string*		__polarssl_path_buf = NULL;
+#ifdef	ACL_WINDOWS
+static const char* __polarssl_path = "libpolarssl.dll";
+#else
+static const char* __polarssl_path = "./libpolarssl.so";
+#endif
+
 ACL_DLL_HANDLE			__polarssl_dll  = NULL;
 
 static void polarssl_dll_unload(void)
@@ -123,10 +129,11 @@ static void polarssl_dll_unload(void)
 	{
 		acl_dlclose(__polarssl_dll);
 		__polarssl_dll = NULL;
-		logger("%s unload ok", __polarssl_path->c_str());
+		logger("%s unload ok", __polarssl_path);
 	}
-	delete __polarssl_path;
-	__polarssl_path = NULL;
+
+	delete __polarssl_path_buf;
+	__polarssl_path_buf = NULL;
 }
 
 extern void polarssl_dll_load_io(void); // defined in polarssl_io.cpp
@@ -167,31 +174,21 @@ static void polarssl_dll_load(void)
 {
 	if (__polarssl_dll)
 	{
-		logger("polarssl(%s) has been loaded!", __polarssl_path->c_str());
+		logger("polarssl(%s) has been loaded!", __polarssl_path);
 		return;
 	}
 
-	const char* path;
+	if (__polarssl_path_buf != NULL && !__polarssl_path_buf->empty())
+		__polarssl_path = __polarssl_path_buf->c_str();
 
-	if (__polarssl_path == NULL || __polarssl_path->empty())
-	{
-#ifdef	ACL_WINDOWS
-		path = "libpolarssl.dll";
-#else
-		path = "./libpolarssl.so";
-#endif
-	}
-	else
-		path = __polarssl_path->c_str();
-
-	__polarssl_dll = acl_dlopen(path);
+	__polarssl_dll = acl_dlopen(__polarssl_path);
 	if (__polarssl_dll == NULL)
-		logger_fatal("load %s error %s", path, acl_dlerror());
+		logger_fatal("load %s error %s", __polarssl_path, acl_dlerror());
 
 	polarssl_dll_load_conf();
 	polarssl_dll_load_io();
 
-	logger("%s loaded!", path);
+	logger("%s loaded!", __polarssl_path);
 	atexit(polarssl_dll_unload);
 }
 
@@ -238,9 +235,9 @@ namespace acl
 void polarssl_conf::set_libpath(const char* path)
 {
 #ifdef HAS_POLARSSL_DLL
-	if (__polarssl_path == NULL)
-		__polarssl_path = NEW string;
-	*__polarssl_path = path;
+	if (__polarssl_path_buf == NULL)
+		__polarssl_path_buf = NEW string;
+	*__polarssl_path_buf = path;
 #endif
 }
 
@@ -253,21 +250,31 @@ void polarssl_conf::load(void)
 #endif
 }
 
+void polarssl_conf::init_once(void)
+{
+	load();
+
+	lock_.lock();
+	if (has_inited_)
+	{
+		lock_.unlock();
+		return;
+	}
+	__entropy_init((entropy_context*) entropy_);
+	has_inited_ = true;
+	lock_.unlock();
+}
+
 polarssl_conf::polarssl_conf()
 {
 #ifdef HAS_POLARSSL
-# ifdef HAS_POLARSSL_DLL
-	acl_pthread_once(&__polarssl_once, polarssl_dll_load);
-# endif
-
-	entropy_ = acl_mycalloc(1, sizeof(entropy_context));
-	__entropy_init((entropy_context*) entropy_);
-
-	cacert_ = NULL;
-	cert_chain_ = NULL;
+	has_inited_  = false;
+	entropy_     = acl_mycalloc(1, sizeof(entropy_context));
+	cacert_      = NULL;
+	cert_chain_  = NULL;
 	
-	cache_ = NULL;
-	pkey_ = NULL;
+	cache_       = NULL;
+	pkey_        = NULL;
 	verify_mode_ = POLARSSL_VERIFY_NONE;
 #else
 	(void) entropy_;
@@ -296,7 +303,8 @@ polarssl_conf::~polarssl_conf()
 		acl_myfree(pkey_);
 	}
 
-	__entropy_free((entropy_context*) entropy_);
+	if (has_inited_)
+		__entropy_free((entropy_context*) entropy_);
 	acl_myfree(entropy_);
 
 	if (cache_)
@@ -321,6 +329,8 @@ void polarssl_conf::free_ca()
 bool polarssl_conf::load_ca(const char* ca_file, const char* ca_path)
 {
 #ifdef HAS_POLARSSL
+	init_once();
+
 	free_ca();
 
 	int  ret;
@@ -375,6 +385,8 @@ bool polarssl_conf::add_cert(const char* crt_file)
 	}
 
 #ifdef HAS_POLARSSL
+	init_once();
+
 	if (cert_chain_ == NULL)
 	{
 		cert_chain_ = acl_mycalloc(1, sizeof(X509_CRT));
@@ -405,6 +417,8 @@ bool polarssl_conf::set_key(const char* key_file,
 	const char* key_pass /* = NULL */)
 {
 #ifdef HAS_POLARSSL
+	init_once();
+
 	if (pkey_ != NULL)
 	{
 		__pkey_free((PKEY*) pkey_);
@@ -450,6 +464,8 @@ void polarssl_conf::set_authmode(polarssl_verify_t verify_mode)
 void polarssl_conf::enable_cache(bool on)
 {
 #ifdef HAS_POLARSSL
+	init_once();
+
 	if (on)
 	{
 		if (cache_ != NULL)
@@ -472,6 +488,8 @@ void polarssl_conf::enable_cache(bool on)
 bool polarssl_conf::setup_certs(void* ssl_in, bool server_side)
 {
 #ifdef HAS_POLARSSL
+	init_once();
+
 	ssl_context* ssl = (ssl_context*) ssl_in;
 
 	switch (verify_mode_)

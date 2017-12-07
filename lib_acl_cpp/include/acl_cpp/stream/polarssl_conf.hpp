@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/thread_mutex.hpp"
 #include <vector>
 
 namespace acl
@@ -14,6 +15,8 @@ typedef enum
 	POLARSSL_VERIFY_OPT,	// 选择性校验，可以在握手时或握手后校验
 	POLARSSL_VERIFY_REQ	// 要求在握手时校验
 } polarssl_verify_t;
+
+class polarssl_io;
 
 /**
  * SSL 连接对象的配置类，该类对象一般可以声明为全局对象，用来对每一个 SSL
@@ -92,6 +95,11 @@ public:
 	static void load(void);
 
 private:
+	friend class polarssl_io;
+
+	bool has_inited_;
+	thread_mutex lock_;
+
 	void* entropy_;
 	void* cacert_;
 	void* pkey_;
@@ -99,6 +107,7 @@ private:
 	void* cache_;
 	polarssl_verify_t verify_mode_;
 
+	void init_once(void);
 	void free_ca();
 };
 
