@@ -1,5 +1,6 @@
 
 service $<PROGRAM>
+{
 #	进程是否禁止运行
 	master_disable = no
 #	服务地址及端口号
