@@ -181,8 +181,12 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 	ACL_HOSTNAME *phost;
 	time_t  begin;
 
-	if (res == NULL || domain == NULL || *domain == 0)
-		acl_msg_fatal("%s: input invalid", myname);
+	if (res == NULL)
+		acl_msg_fatal("%s: res NULL");
+	if (domain == NULL || *domain == 0) {
+		acl_msg_error("%s: domain %s", myname, domain ? "empty" : "null");
+		return NULL;
+	}
 
 	memset(buf, 0, sizeof(buf));
 	ret = rfc1035BuildAQuery(domain, buf, sizeof(buf), res->cur_qid++, NULL);
