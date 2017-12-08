@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        40
+Release:        41
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,9 @@ fi
 /etc/init.d/master
 
 %changelog
+* Wed Dec 08 2017 zhengshuxin@qiyi.com 3.3.0-41-20171208.10
+- fixed one compile error
+
 * Wed Dec 08 2017 zhengshuxin@qiyi.com 3.3.0-40-20171208.09
 - changed charset from gbk to utf-8 for all service's configure files
 

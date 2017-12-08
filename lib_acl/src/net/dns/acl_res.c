@@ -182,7 +182,7 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 	time_t  begin;
 
 	if (res == NULL)
-		acl_msg_fatal("%s: res NULL");
+		acl_msg_fatal("%s: res NULL", myname);
 	if (domain == NULL || *domain == 0) {
 		acl_msg_error("%s: domain %s", myname, domain ? "empty" : "null");
 		return NULL;
