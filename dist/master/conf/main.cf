@@ -1,48 +1,48 @@
 #inet_interfaces = all
-# Ä¬ÈÏµÄÃ¿¸ö·şÎñµÄ×î´ó½ø³ÌÊı
+# é»˜è®¤çš„æ¯ä¸ªæœåŠ¡çš„æœ€å¤§è¿›ç¨‹æ•°
 default_process_limit = 250
-# ÓÃ»§ÊôÖ÷
+# ç”¨æˆ·å±ä¸»
 owner_user = root
 master_owner = root
-# µ±Í£Ö¹ master Ê±ÊÇ·ñµÈ´ıËùÓĞ×Ó½ø³ÌÍË³ö
+# å½“åœæ­¢ master æ—¶æ˜¯å¦ç­‰å¾…æ‰€æœ‰å­è¿›ç¨‹é€€å‡º
 waiting_on_stop = true
-# ×éÖ÷
+# ç»„ä¸»
 owner_group = root
-# Èç¹û×Ó½ø³Ì·şÎñÒì³£ÍË³ö£¬ÖØÆô¸Ã×Ó½ø³Ì·şÎñµÄÊ±¼ä¼ä¸ô(Ãë)
-service_throttle_time = 60
-# ¸¸½ø³Ì½ø³ÌÃû
+# å¦‚æœå­è¿›ç¨‹æœåŠ¡å¼‚å¸¸é€€å‡ºï¼Œé‡å¯è¯¥å­è¿›ç¨‹æœåŠ¡çš„æ—¶é—´é—´éš”(ç§’)
+service_throttle_time = 10
+# çˆ¶è¿›ç¨‹è¿›ç¨‹å
 process_name = acl_master
 #daemon_timeout = 18000
 buf_size = 81920
-# ¸¸½ø³ÌÓë×Ó½ø³ÌÍ¨ĞÅÊ±µÄ¶ÁĞ´³¬Ê±Ê±¼ä(Ãë)
+# çˆ¶è¿›ç¨‹ä¸å­è¿›ç¨‹é€šä¿¡æ—¶çš„è¯»å†™è¶…æ—¶æ—¶é—´(ç§’)
 rw_timeout = 60
-# ¸¸½ø³ÌÍ¨Öª×Ó½ø³ÌÖØĞÂ¼ÓÔØÅäÖÃÊ±»ñµÃ×Ó½ø³Ì·´À¡µÄ³¬Ê±Ê±¼ä(ºÁÃë)
+# çˆ¶è¿›ç¨‹é€šçŸ¥å­è¿›ç¨‹é‡æ–°åŠ è½½é…ç½®æ—¶è·å¾—å­è¿›ç¨‹åé¦ˆçš„è¶…æ—¶æ—¶é—´(æ¯«ç§’)
 reload_timeout = 5000
 #max_use = 100
 #max_idle = 100
 #in_flow_delay = 1
-# µ÷ÓÃ select Ñ­»·Ê±µÄµÈ´ıÃë¼¶Öµ
+# è°ƒç”¨ select å¾ªç¯æ—¶çš„ç­‰å¾…ç§’çº§å€¼
 event_delay_sec = 1
-# µ÷ÓÃ select Ñ­»·Ê±µÄµÈ´ıÎ¢Ãë¼¶Öµ
+# è°ƒç”¨ select å¾ªç¯æ—¶çš„ç­‰å¾…å¾®ç§’çº§å€¼
 event_delay_usec = 5000
-# ËùÓĞ·şÎñ½ø³Ì³ÌĞòËùÔÚµÄÄ¬ÈÏÄ¿Â¼
+# æ‰€æœ‰æœåŠ¡è¿›ç¨‹ç¨‹åºæ‰€åœ¨çš„é»˜è®¤ç›®å½•
 daemon_directory = {install_path}/libexec
-# acl_master ½ø³ÌÔËĞĞÊ±µÄÈÕÖ¾¼ÇÂ¼ÎÄ¼ş
+# acl_master è¿›ç¨‹è¿è¡Œæ—¶çš„æ—¥å¿—è®°å½•æ–‡ä»¶
 log_file = {install_path}/var/log/acl_master
-# ËùÓĞ·şÎñ½ø³ÌµÄ·şÎñÅäÖÃÎÄ¼şËùÔÚµÄÄ¿Â¼
+# æ‰€æœ‰æœåŠ¡è¿›ç¨‹çš„æœåŠ¡é…ç½®æ–‡ä»¶æ‰€åœ¨çš„ç›®å½•
 service_directory = {install_path}/conf/service
-# ÊÇ·ñÉ¨Ãè²¢ĞĞ {install_path}/conf/service/ Ä¿Â¼ÏÂµÄ×ÓÄ¿Â¼·şÎñÅäÖÃÎÄ¼ş£¬0 -- ·ñ£¬1 -- ÊÇ
+# æ˜¯å¦æ‰«æå¹¶è¡Œ {install_path}/conf/service/ ç›®å½•ä¸‹çš„å­ç›®å½•æœåŠ¡é…ç½®æ–‡ä»¶ï¼Œ0 -- å¦ï¼Œ1 -- æ˜¯
 scan_subdir = 0
-# É¨Ãè service_directory ÏÂµÄÅäÖÃÎÄ¼şÊ±£¬Ö¸¶¨µÄÎÄ¼şÀ©Õ¹Ãû
+# æ‰«æ service_directory ä¸‹çš„é…ç½®æ–‡ä»¶æ—¶ï¼ŒæŒ‡å®šçš„æ–‡ä»¶æ‰©å±•å
 file_exts = .cf, .conf
-# Ö¸¶¨ÁËµ¥¶ÀÒªÆô¶¯µÄ·şÎñµÄÅäÖÃÎÄ¼şÁĞ±í
+# æŒ‡å®šäº†å•ç‹¬è¦å¯åŠ¨çš„æœåŠ¡çš„é…ç½®æ–‡ä»¶åˆ—è¡¨
 service_file = {install_path}/conf/services.cf
-# master ³ÌĞòÔËĞĞÄ¿Â¼
+# master ç¨‹åºè¿è¡Œç›®å½•
 queue_directory = {install_path}/var
-# ¼ÇÂ¼ acl_master ÔËĞĞÊ±µÄ½ø³ÌºÅ
+# è®°å½• acl_master è¿è¡Œæ—¶çš„è¿›ç¨‹å·
 pid_file = {install_path}/var/pid/acl_master.pid
-# ÊÇ·ñÔÊĞí×Ô¶¯ÇĞ»»ÓÃ»§ÔËĞĞÉí·İ
+# æ˜¯å¦å…è®¸è‡ªåŠ¨åˆ‡æ¢ç”¨æˆ·è¿è¡Œèº«ä»½
 # limit_privilege = 0
-# acl_master ¶ÔÍâ WEB ¹ÜÀí½Ó¿ÚµØÖ·
+# acl_master å¯¹å¤– WEB ç®¡ç†æ¥å£åœ°å€
 #manage_addr = 127.0.0.1:8190
 manage_addr = {install_path}/var/public/master.sock

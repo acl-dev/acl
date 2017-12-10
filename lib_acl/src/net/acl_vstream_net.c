@@ -191,10 +191,9 @@ ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
 		acl_msg_fatal("%s: addr null", myname);
 
 	ptr = strchr(addr, ':');
-	if (ptr != NULL) {
+	if (ptr != NULL)
 		connfd = acl_inet_connect_ex(addr, block_mode,
 			connect_timeout, he_errorp);
-	}
 #ifdef ACL_WINDOWS
 	else {
 		acl_msg_error("%s(%d): addr(%s) invalid",
@@ -202,13 +201,11 @@ ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
 		return NULL;
 	}
 #elif defined(ACL_UNIX)
-	else {
+	else
 		connfd = acl_unix_connect(addr, block_mode, connect_timeout);
-	}
 #else
-	else {
+	else
 		connfd = ACL_SOCKET_INVALID;
-	}
 #endif
 
 	if (connfd == ACL_SOCKET_INVALID)
@@ -234,6 +231,8 @@ ACL_VSTREAM *acl_vstream_connect(const char *addr, int block_mode,
 	return acl_vstream_connect_ex(addr, block_mode, connect_timeout,
 			rw_timeout, rw_bufsize, NULL);
 }
+
+/****************************************************************************/
 
 static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 	int timeout acl_unused, ACL_VSTREAM *stream, void *arg acl_unused)
@@ -283,6 +282,7 @@ static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
 	return ret;
 }
 
+#if 0
 static ACL_SOCKET acl_bind(const char *addr, char *addr_buf, size_t size)
 {
 	const char *myname = "acl_bind";
@@ -401,12 +401,14 @@ static ACL_SOCKET acl_bind(const char *addr, char *addr_buf, size_t size)
 
 	return sock;
 }
+#endif
 
-ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout)
+ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout, unsigned flag)
 {
 	ACL_VSTREAM *stream;
-	char addr_buf[256];
-	ACL_SOCKET sock = acl_bind(addr, addr_buf, sizeof(addr_buf));
+//	char addr_buf[256];
+//	ACL_SOCKET sock = acl_bind(addr, addr_buf, sizeof(addr_buf));
+	ACL_SOCKET sock = acl_udp_bind(addr, flag);
 	
 	if (sock == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s: bind addr %s error %s",
@@ -418,7 +420,8 @@ ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout)
 	stream->rw_timeout = rw_timeout;
 
 	/* 设置本地绑定地址 */
-	acl_vstream_set_local(stream, addr_buf);
+//	acl_vstream_set_local(stream, addr_buf);
+	acl_vstream_set_local(stream, addr);
 
 	/* 注册流读写回调函数 */
 	acl_vstream_ctl(stream,

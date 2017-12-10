@@ -100,6 +100,7 @@ int main(int argc, char* argv[])
 #ifdef	WIN32
 	acl::acl_cpp_init();
 #endif
+	acl::log::stdout_open(true);
 
 	snprintf(__server_addr, sizeof(__server_addr), "127.0.0.1:8888");
 	snprintf(__local_addr, sizeof(__local_addr), "127.0.0.1:18888");

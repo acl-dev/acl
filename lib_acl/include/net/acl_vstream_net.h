@@ -89,9 +89,10 @@ ACL_API ACL_VSTREAM *acl_vstream_connect(const char *addr, int block_mode,
  * @param addr {const char*} 本地 UDP 地址，格式：ip:port，可以输入地址 ip:0 来让
  *  操作系统自动分配本地端口号
  * @param rw_timeout {int} 读写超时时间(秒)
+ * @param flag {unsigned} 标志位
  * @return {ACL_VSTREAM*} 返回 NULL 表示绑定失败
  */
-ACL_API ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout);
+ACL_API ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout, unsigned flag);
 
 /**
  * 将网络流对象设置为 UDP IO 模式

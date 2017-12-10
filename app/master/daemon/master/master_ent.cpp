@@ -358,7 +358,7 @@ static int service_udp(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 		acl_array_append(serv->addrs, addr);
 		serv->listen_fd_count++;
 		acl_msg_info("%s(%d), %s: add addr=%s", __FILE__,
-			__LINE__, __FUNCTION__, ptr);
+			__LINE__, __FUNCTION__, addr->addr);
 	}
 
 	acl_argv_free(addrs);
@@ -495,6 +495,13 @@ static int service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	ACL_VSTRING *junk = acl_vstring_alloc(100);
 
 	/*
+	if (serv->max_proc == 1)
+		acl_argv_add(serv->args, "-l", (char *) 0);
+	if (serv->max_proc == 0)
+		acl_argv_add(serv->args, "-z", (char *) 0);
+	*/
+
+	/*
 	 * Privilege level. Default is to restrict process privileges
 	 * to those of the mail owner.
 	 */
@@ -559,27 +566,28 @@ static int service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	serv->args = acl_argv_alloc(0);
 	acl_argv_add(serv->args, command, (char *) 0);
 
-	name = get_str_ent(xcp, ACL_VAR_MASTER_SERV_SERVICE, (const char *) 0);
-	if (name == NULL || *name == 0) {
-		acl_msg_error("no %s found", ACL_VAR_MASTER_SERV_SERVICE);
-		return -1;
-	}
-
 	/* add "-f configure_file_path" flag */
 	acl_argv_add(serv->args, "-f", path, (char *) 0);
 
 	/* copy the configure filepath */
 	serv->conf = acl_mystrdup(path);
 
-	/*
-	if (serv->max_proc == 1)
-		acl_argv_add(serv->args, "-l", (char *) 0);
-	if (serv->max_proc == 0)
-		acl_argv_add(serv->args, "-z", (char *) 0);
-	*/
+	name = get_str_ent(xcp, ACL_VAR_MASTER_SERV_SERVICE, (const char *) 0);
+	if (name == NULL || *name == 0) {
+		acl_msg_error("no %s found", ACL_VAR_MASTER_SERV_SERVICE);
+		return -1;
+	}
 
 	if (strcmp(acl_safe_basename(command), name) != 0) {
-		char *tmp = acl_concatenate("\"", name, "\"", 0);
+		const char udp[] = "@udp";
+		char *tmp;
+
+		if (acl_strrncasecmp(name, udp, sizeof(udp) - 1) == 0)
+			tmp = acl_concatenate("\"", acl_var_master_queue_dir,
+				"/", ACL_MASTER_CLASS_PUBLIC, "/",
+				name, "\"", 0);
+		else
+			tmp = acl_concatenate("\"", name, "\"", 0);
 		acl_argv_add(serv->args, "-n", tmp, (char *) 0);
 		acl_myfree(tmp);
 	}
@@ -909,7 +917,7 @@ ACL_MASTER_SERV *acl_master_ent_find(const char *path)
 	ACL_MASTER_SERV *serv;
 
 	if (acl_var_master_head == NULL) {
-		acl_msg_error("%s(%d), %s: acl_var_master_head null",
+		acl_msg_info("%s(%d), %s: acl_var_master_head null",
 			__FILE__, __LINE__, __FUNCTION__);
 		return NULL;
 	}

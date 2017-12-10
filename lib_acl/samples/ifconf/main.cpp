@@ -5,6 +5,8 @@ int main(void)
         ACL_IFCONF *ifconf;	/* 网卡查询结果对象 */
         ACL_IFADDR *ifaddr;	/* 每个网卡信息对象 */
         ACL_ITER iter;		/* 遍历对象 */
+	const char *pattern = "127.*.*.*:8290, 192.168.*.*:8290";
+	ACL_ARGV   *addrs;
 
 	/* 查询本机所有网卡信息 */
 	ifconf = acl_get_ifaddrs();
@@ -22,6 +24,20 @@ int main(void)
 
 	/* 释放查询结果 */
 	acl_free_ifaddrs(ifconf);
+
+	printf("\r\n----------------------------------------------\r\n");
+
+	addrs = acl_ifconf_search(pattern);
+	if (addrs == NULL) {
+		printf("acl_ifconf_search error\r\n");
+		return 1;
+	}
+	acl_foreach(iter, addrs) {
+		const char *addr = (const char *)iter.data;
+		printf(">>>ip: %s\r\n", addr);
+	}
+	acl_argv_free(addrs);
+
 
 	return 0;
 }

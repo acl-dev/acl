@@ -55,9 +55,10 @@ public:
 	 * 绑定本地 UDP 地址，创建 UDP 网络流对象
 	 * @param addr {const char*} 本机地址，格式：ip:port
 	 * @param rw_timeout {int} 读写超时时间(秒)
+	 * @param flag {unsigned}
 	 * @return {bool} 绑定是否成功
 	 */
-	bool bind_udp(const char* addr, int rw_timeout = 0);
+	bool bind_udp(const char* addr, int rw_timeout = 0, unsigned flag = 0);
 
 	/**
 	 * 关闭套接口读操作

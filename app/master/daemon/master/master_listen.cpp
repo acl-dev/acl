@@ -141,7 +141,7 @@ static int master_bind_udp(ACL_MASTER_SERV *serv)
 		switch (addr->type) {
 		case ACL_MASTER_SERV_TYPE_UDP:
 			serv->listen_streams[i] = acl_vstream_bind(addr->addr,
-					acl_var_master_rw_timeout);
+				acl_var_master_rw_timeout, serv->inet_flags);
 			break;
 		default:
 			acl_msg_panic("invalid type: %d, addr: %s",

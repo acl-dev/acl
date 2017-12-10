@@ -51,11 +51,12 @@ bool socket_stream::open(ACL_VSTREAM* vstream, bool udp_mode /* = false */)
 	return true;
 }
 
-bool socket_stream::bind_udp(const char* addr, int rw_timeout /* = 0 */)
+bool socket_stream::bind_udp(const char* addr, int rw_timeout /* = 0 */,
+	unsigned flag /* = 0 */)
 {
 	if (stream_)
 		acl_vstream_close(stream_);
-	stream_ = acl_vstream_bind(addr, rw_timeout);
+	stream_ = acl_vstream_bind(addr, rw_timeout, flag);
 	if (stream_ == NULL)
 		return false;
 	eof_ = false;
@@ -140,8 +141,8 @@ const char* socket_stream::get_peer_ip() const
 	if (stream_ == NULL)
 		return dummy_;
 
-	if (peer_ip_[0] != 0)
-		return peer_ip_;
+	//if (peer_ip_[0] != 0)
+	//	return peer_ip_;
 
 	char* ptr = ACL_VSTREAM_PEER(stream_);
 	if (ptr == NULL || *ptr == 0)
@@ -203,8 +204,8 @@ const char* socket_stream::get_local_ip() const
 		return dummy_;
 
 	// xxx: acl_vstream 中没有对此地址赋值
-	if (local_ip_[0] != 0)
-		return local_ip_;
+	//if (local_ip_[0] != 0)
+	//	return local_ip_;
 
 	char* ptr = ACL_VSTREAM_LOCAL(stream_);
 	if (ptr == NULL || *ptr == 0)
