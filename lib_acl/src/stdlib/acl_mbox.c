@@ -15,6 +15,18 @@
 
 #endif
 
+#if defined(ACL_LINUX)
+# include <linux/version.h>
+# if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
+#  include <sys/eventfd.h>
+#  define HAS_EVENTFD
+# else
+#  undef  HAS_EVENTFD
+# endif
+#else
+#  undef  HAS_EVENTFD
+#endif
+
 struct ACL_MBOX {
 	ACL_SOCKET in;
 	ACL_SOCKET out;
@@ -24,18 +36,26 @@ struct ACL_MBOX {
 	acl_pthread_mutex_t *lock;
 };
 
-static const char __key[] = "k";
-
 ACL_MBOX *acl_mbox_create(void)
 {
 	ACL_MBOX *mbox;
 	ACL_SOCKET fds[2];
 
+#if defined(HAS_EVENTFD)
+# if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+	int flags = FD_CLOEXEC;
+# else
+	int flags = 0;
+# endif
+	fds[0] = eventfd(0, flags);
+	fds[1] = fds[0];
+#else
 	if (acl_sane_socketpair(AF_UNIX, SOCK_STREAM, 0, fds) < 0) {
 		acl_msg_error("%s(%d), %s: acl_duplex_pipe error %s",
 			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
 		return NULL;
 	}
+#endif
 
 	mbox        = (ACL_MBOX *) acl_mymalloc(sizeof(ACL_MBOX));
 	mbox->in    = fds[0];
@@ -56,7 +76,8 @@ ACL_MBOX *acl_mbox_create(void)
 void acl_mbox_free(ACL_MBOX *mbox, void (*free_fn)(void*))
 {
 	acl_socket_close(mbox->in);
-	acl_socket_close(mbox->out);
+	if (mbox->out != mbox->in)
+		acl_socket_close(mbox->out);
 	acl_ypipe_free(mbox->ypipe, free_fn);
 	acl_pthread_mutex_destroy(mbox->lock);
 	acl_myfree(mbox->lock);
@@ -66,27 +87,41 @@ void acl_mbox_free(ACL_MBOX *mbox, void (*free_fn)(void*))
 int acl_mbox_send(ACL_MBOX *mbox, void *msg)
 {
 	int ret;
+	long long n = 1;
 
 	acl_pthread_mutex_lock(mbox->lock);
 	acl_ypipe_write(mbox->ypipe, msg);
 	ret = acl_ypipe_flush(mbox->ypipe);
+#if defined(HAS_EVENTFD)
 	acl_pthread_mutex_unlock(mbox->lock);
-	if (ret == 0)
+#endif
+	if (ret == 0) {
+#if !defined(HAS_EVENTFD)
+		acl_pthread_mutex_unlock(mbox->lock);
+#endif
 		return 0;
+	}
 
 	mbox->nsend++;
 
-	ret = acl_socket_write(mbox->out, __key, sizeof(__key), 0, NULL, NULL);
-	if (ret == -1)
+	ret = acl_socket_write(mbox->out, &n, sizeof(n), 0, NULL, NULL);
+#if !defined(HAS_EVENTFD)
+	acl_pthread_mutex_unlock(mbox->lock);
+#endif
+
+	if (ret == -1) {
+		acl_msg_error("%s(%d), %s: mbox write %d error %s", __FILE__,
+			__LINE__, __FUNCTION__, mbox->out, acl_last_serror());
 		return -1;
-	else
-		return 0;
+	}
+
+	return 0;
 }
 
 void *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success)
 {
-	int   ret;
-	char  kbuf[sizeof(__key)];
+	int  ret;
+	long long n;
 	void *msg = acl_ypipe_read(mbox->ypipe);
 
 	if (msg != NULL) {
@@ -111,17 +146,8 @@ void *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success)
 		return NULL;
 	}
 
-	ret = acl_socket_read(mbox->in, kbuf, sizeof(kbuf), 0, NULL, NULL);
+	ret = acl_socket_read(mbox->in, &n, sizeof(n), 0, NULL, NULL);
 	if (ret == -1) {
-		if (success)
-			*success = 0;
-		return NULL;
-	}
-
-	if (kbuf[0] != __key[0]) {
-		acl_msg_error("%s(%d), %s: read invalid, ch=%c, ascii=%d, "
-			"key=%c, ret=%d", __FILE__, __LINE__, __FUNCTION__,
-			kbuf[0], kbuf[0], __key[0], ret);
 		if (success)
 			*success = 0;
 		return NULL;

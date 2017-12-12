@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	acl_msg_stdout_enable(1);
 	memset(__dummy, 'x', sizeof(__dummy));
 	__dummy[sizeof(__dummy) - 1] = 0;
 

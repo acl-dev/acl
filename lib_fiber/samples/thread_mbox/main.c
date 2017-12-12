@@ -6,11 +6,11 @@
 #include "fiber/lib_fiber.h"
 #include "stamp.h"
 
+static char          __dummy[256];
 static long long int __oper_count = 2;
-static int __fibers_max = 2;
-static int __fibers_cur = 2;
-static char __dummy[256];
-static int  __use_dummy = 0;
+static int           __fibers_max = 2;
+static int           __fibers_cur = 2;
+static int           __use_dummy  = 0;
 
 static void *thread_main(void *ctx)
 {
@@ -27,7 +27,7 @@ static void *thread_main(void *ctx)
 			ptr = acl_mystrdup("hello world!");
 
 		if (acl_mbox_send(mbox, ptr) < 0) {
-			printf("send error!\r\n");
+			printf("send error %s!\r\n", acl_last_serror());
 			break;
 		}
 	}
@@ -59,9 +59,11 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 	gettimeofday(&begin, NULL);
 
 	for (i = 0; i < __oper_count; i++) {
-		char *ptr = (char *) acl_mbox_read(mbox, 0, NULL);
-		if (ptr == NULL)
+		char *ptr = (char *) acl_mbox_read(mbox, -1, NULL);
+		if (ptr == NULL) {
+			printf("read null\r\n");
 			break;
+		}
 		if (i < 10)
 			printf("--- read in: %s ---\r\n", ptr);
 		if (ptr != __dummy)
@@ -75,8 +77,8 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 		(double) (__oper_count - acl_mbox_nsend(mbox)) * 100 / __oper_count,
 		(int) acl_mbox_nsend(mbox), __oper_count,
 		(int) acl_mbox_nread(mbox), __oper_count);
-	printf("total: %lld, spend: %.2f, speed: %.2f\r\n", __oper_count,
-		spent, (__oper_count * 1000) / (spent > 0 ? spent : 1));
+	printf("total: %lld, spend: %.2f, speed: %.2f\r\n",
+		__oper_count, spent, (__oper_count * 1000) / (spent > 0 ? spent : 1));
 
 	acl_mbox_free(mbox, free_msg);
 
