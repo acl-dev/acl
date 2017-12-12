@@ -367,13 +367,13 @@ static unsigned match(const ACL_ARGV *tokens, const char *ip)
 	return 1;
 }
 
-static unsigned search(ACL_IFCONF *ifconf, const char *addr, ACL_ARGV *addrs)
+static int search(ACL_IFCONF *ifconf, const char *addr, ACL_ARGV *addrs)
 {
 	ACL_ARGV *tokens = NULL;
 	char      buf[256], *colon;
 	int       port;
 	ACL_ITER  iter;
-	unsigned  naddr = 0;
+	int       naddr = 0;
 
 	/* xxx.xxx.xxx.xxx:port, xxx.xxx.xxx.*:port ...*/
 	snprintf(buf, sizeof(buf), "%s", addr);
@@ -388,7 +388,7 @@ static unsigned search(ACL_IFCONF *ifconf, const char *addr, ACL_ARGV *addrs)
 	tokens = acl_argv_split(buf, ".");
 	if (tokens->argc != 4) {
 		acl_argv_free(tokens);
-		return 0;
+		return -1;  /* not a valid IPV4 addr */
 	}
 
 	acl_foreach(iter, ifconf) {
@@ -431,7 +431,7 @@ ACL_ARGV *acl_ifconf_search(const char *pattern)
 			|| (*addr == ':' && acl_alldig(addr + 1))) {
 
 			acl_argv_add(addrs, addr, NULL);
-		} else if (search(ifconf, addr, addrs) == 0)
+		} else if (search(ifconf, addr, addrs) == -1)
 			acl_argv_add(addrs, addr, NULL);
 	}
 
