@@ -5,7 +5,7 @@ service $<PROGRAM>
 #	进程是否禁止运行
 	master_disable = no
 #	服务监听为域套接口
-	master_service = $<PROGRAM>.sock
+	master_service = $<PROGRAM>.sock@unix
 #	服务类型
 	master_type = unix
 

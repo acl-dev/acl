@@ -5,7 +5,7 @@ int main(void)
         ACL_IFCONF *ifconf;	/* 网卡查询结果对象 */
         ACL_IFADDR *ifaddr;	/* 每个网卡信息对象 */
         ACL_ITER iter;		/* 遍历对象 */
-	const char *pattern = "127.*.*.*:8290, 192.168.*.*:8290, 172.16.*.*.:8290, 172.17.*.*.:8290";
+	const char *pattern = "127.*.*.*:8290, 192.168.*.*:8290, 172.16.*.*.:8290, 172.17.*.*.:8290, /unix_server@unix";
 	ACL_ARGV   *addrs;
 
 	/* 查询本机所有网卡信息 */

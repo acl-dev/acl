@@ -60,8 +60,8 @@ void check_timer::timer_callback(unsigned int id)
 
 	manager.unlock();
 
-	if (addrs_.empty())
-		logger_warn(">>>no addr been set!<<<");
+	//if (addrs_.empty())
+	//	logger_warn(">>>no addr been set!<<<");
 
 	// 连接所有服务器地址
 
