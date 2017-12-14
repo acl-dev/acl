@@ -32,12 +32,14 @@ set(zlib_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/zlib)
 set(mysql_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/mysql)
 set(pgsql_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/pgsql)
 set(sqlite_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/sqlite)
+set(polarssl_include ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
 include_directories(
 	${zlib_include}
 	${mysql_include}
 	${pgsql_include}
 	${sqlite_include}
+	${polarssl_include}
 	${acl_include}
 	${proto_include}
 	${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -98,6 +100,7 @@ if (${UNIX_OS})
 		"-DHAS_MYSQL_DLL"
 		"-DHAS_PGSQL_DLL"
 		"-DHAS_SQLITE_DLL"
+		"-DHAS_POLARSSL_DLL"
 		"-Wno-unused-parameter"
 		"-fexceptions"
 		)

@@ -260,7 +260,9 @@ void polarssl_conf::init_once(void)
 		lock_.unlock();
 		return;
 	}
+#ifdef HAS_POLARSSL
 	__entropy_init((entropy_context*) entropy_);
+#endif
 	has_inited_ = true;
 	lock_.unlock();
 }
