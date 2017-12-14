@@ -237,7 +237,7 @@ connect_pool* connect_manager::get(const char* addr,
 	if (exclusive)
 		lock_.unlock();
 
-	logger_error("no connect pool for addr %s", addr);
+	logger("no connect pool for addr %s", addr);
 	return NULL;
 }
 
