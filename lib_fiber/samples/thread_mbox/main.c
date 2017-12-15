@@ -8,6 +8,7 @@
 
 static char          __dummy[256];
 static long long int __oper_count = 2;
+static int           __writers    = 2;
 static int           __fibers_max = 2;
 static int           __fibers_cur = 2;
 static int           __use_dummy  = 0;
@@ -47,18 +48,21 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_MBOX *mbox = (ACL_MBOX *) ctx;
 	acl_pthread_attr_t attr;
-	acl_pthread_t tid;
-	int  i;
+	long long int  i;
 	struct timeval begin, end;
 	double spent;
 
 	acl_pthread_attr_init(&attr);
 	acl_pthread_attr_setdetachstate(&attr, ACL_PTHREAD_CREATE_DETACHED);
-	acl_pthread_create(&tid, &attr, thread_main, mbox);
+
+	for (i = 0; i < __writers; i++) {
+		acl_pthread_t tid;
+		acl_pthread_create(&tid, &attr, thread_main, mbox);
+	}
 
 	gettimeofday(&begin, NULL);
 
-	for (i = 0; i < __oper_count; i++) {
+	for (i = 0; i < __oper_count * __writers; i++) {
 		char *ptr = (char *) acl_mbox_read(mbox, -1, NULL);
 		if (ptr == NULL) {
 			printf("read null\r\n");
@@ -78,7 +82,7 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 		(int) acl_mbox_nsend(mbox), __oper_count,
 		(int) acl_mbox_nread(mbox), __oper_count);
 	printf("total: %lld, spend: %.2f, speed: %.2f\r\n",
-		__oper_count, spent, (__oper_count * 1000) / (spent > 0 ? spent : 1));
+		i, spent, (i * 1000) / (spent > 0 ? spent : 1));
 
 	acl_mbox_free(mbox, free_msg);
 
@@ -94,20 +98,27 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -c nfibers -n count -s [use static buffer]\r\n", procname);
+	printf("usage: %s -h [help]\r\n"
+		" -c nfibers\r\n"
+		" -w write_threads_per_mbox\r\n"
+		" -n count\r\n"
+		" -s [use static buffer]\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
 	int   ch, i;
 
-	while ((ch = getopt(argc, argv, "hc:n:s")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:w:n:s")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
 		case 'c':
 			__fibers_max = atoi(optarg);
+			break;
+		case 'w':
+			__writers = atoi(optarg);
 			break;
 		case 'n':
 			__oper_count = atoi(optarg);
