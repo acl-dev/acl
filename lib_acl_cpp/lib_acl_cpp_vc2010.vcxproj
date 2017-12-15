@@ -359,7 +359,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include="src\stdlib\thread_mutex.cpp" />
     <ClCompile Include="src\stdlib\thread_pool.cpp" />
     <ClCompile Include="src\stdlib\thread_queue.cpp" />
-    <ClCompile Include="src\stdlib\trigger.cpp" />
     <ClCompile Include="src\stdlib\url_coder.cpp" />
     <ClCompile Include="src\stdlib\util.cpp" />
     <ClCompile Include="src\stdlib\xml.cpp" />
