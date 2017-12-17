@@ -87,7 +87,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 		}
 	}
 
-	printf("close %d\r\n", *cfd);
+	printf("%s: close %d\r\n", __FUNCTION__, *cfd);
 	close(*cfd);
 	free(cfd);
 
