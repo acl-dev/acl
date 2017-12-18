@@ -20,6 +20,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 #define	SOCK ACL_VSTREAM_SOCK
 
 	while (1) {
+		printf("--begin gets-timeout=%d--\n", cstream->rw_timeout);
 		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
 		if (ret == ACL_VSTREAM_EOF) {
 			printf("gets error: %s, fd: %d, count: %d\r\n",
@@ -27,7 +28,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 			break;
 		}
 		buf[ret] = 0;
-		//printf("gets line: %s", buf);
+		printf("gets line: %s", buf);
 
 		if (!__echo_data) {
 			count++;
@@ -59,6 +60,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 
 		printf("accept one, fd: %d\r\n", ACL_VSTREAM_SOCK(cstream));
 		acl_fiber_create(echo_client, cstream, __stack_size);
+		printf("continue to accept\r\n");
 	}
 
 	acl_vstream_close(sstream);

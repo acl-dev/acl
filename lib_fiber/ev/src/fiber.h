@@ -108,13 +108,7 @@ int fiber_io_close(int fd);
 
 FILE_EVENT *fiber_file_event(int fd);
 
-/* in hook_io.c */
-void hook_io(void);
-
-/* in fiber_net.c */
-void hook_net(void);
+/* in epoll.c */
 int  epoll_event_close(int epfd);
-void poll_fibers_free(void);
-void epoll_fibers_free(void);
 
 #endif

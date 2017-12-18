@@ -1,9 +1,5 @@
 #include "stdafx.h"
 
-#ifdef HAS_PIPE2
-#define _GNU_SOURCE
-#endif
-
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/sendfile.h>

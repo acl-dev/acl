@@ -15,7 +15,7 @@ static epoll_create_fn __sys_epoll_create = NULL;
 static epoll_wait_fn   __sys_epoll_wait   = NULL;
 static epoll_ctl_fn    __sys_epoll_ctl    = NULL;
 
-void hook_epoll(void)
+static void hook_init(void)
 {
 	static acl_pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
 	static int __called = 0;
@@ -57,61 +57,6 @@ static void epoll_event_free(EVENT *ev)
 	close(ep->epfd);
 	acl_myfree(ep->events);
 	acl_myfree(ep);
-}
-
-static void epoll_enable_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
-{
-	assert((fe->oper & EVENT_ADD_READ) == 0);
-	if (fe->oper & EVENT_DEL_READ) {
-		fe->oper &= ~EVENT_DEL_READ;
-	} else if (fe->oper == 0) {
-		acl_ring_prepend(&ev->events, &fe->me);
-	}
-
-	if (!(fe->mask & EVENT_READ)) {
-		fe->oper |= EVENT_ADD_READ;
-	}
-	fe->r_proc = proc;
-}
-
-static void epoll_enable_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
-{
-	if (fe->oper & EVENT_DEL_WRITE) {
-		fe->oper &= ~EVENT_DEL_WRITE;
-	} else if (fe->oper == 0) {
-		acl_ring_prepend(&ev->events, &fe->me);
-	}
-
-	if (!(fe->mask & EVENT_WRITE))
-		fe->oper |= EVENT_ADD_WRITE;
-	fe->w_proc = proc;
-}
-
-static void epoll_disable_read(EVENT *ev, FILE_EVENT *fe)
-{
-	if (fe->oper & EVENT_ADD_READ) {
-		fe->oper &=~EVENT_ADD_READ;
-	} else if (fe->oper == 0) {
-		acl_ring_prepend(&ev->events, &fe->me);
-	}
-
-	if (fe->mask & EVENT_READ) {
-		fe->oper |= EVENT_DEL_READ;
-	}
-	fe->r_proc  = NULL;
-}
-
-static void epoll_disable_write(EVENT *ev, FILE_EVENT *fe)
-{
-	if (fe->oper & EVENT_ADD_WRITE) {
-		fe->oper &= ~EVENT_ADD_WRITE;
-	} else if (fe->oper == 0) {
-		acl_ring_prepend(&ev->events, &fe->me);
-	}
-
-	if (fe->mask & EVENT_WRITE)
-		fe->oper |= EVENT_DEL_WRITE;
-	fe->w_proc = NULL;
 }
 
 static int epoll_event_add_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
@@ -237,36 +182,6 @@ static int epoll_event_del_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	return 0;
 }
 
-static void epoll_event_prepare(EVENT *ev)
-{
-	ACL_RING   *r;
-	FILE_EVENT *fe;
-
-	while ((r = acl_ring_pop_head(&ev->events)) != NULL) {
-		int n = 0;
-		fe = acl_ring_to_appl(r, FILE_EVENT, me);
-
-		if (fe->oper & EVENT_ADD_READ) {
-			epoll_event_add_read((EVENT_EPOLL *) ev, fe);
-			n++;
-		}
-		if (fe->oper & EVENT_ADD_WRITE) {
-			epoll_event_add_write((EVENT_EPOLL *) ev, fe);
-			n++;
-		}
-		if (fe->oper & EVENT_DEL_READ) {
-			epoll_event_del_read((EVENT_EPOLL *) ev, fe);
-			n++;
-		}
-		if (fe->oper & EVENT_DEL_WRITE) {
-			epoll_event_del_write((EVENT_EPOLL *) ev, fe);
-			n++;
-		}
-
-		fe->oper = 0;
-	}
-}
-
 static int epoll_event_loop(EVENT *ev, int timeout)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
@@ -275,10 +190,8 @@ static int epoll_event_loop(EVENT *ev, int timeout)
 	int n, i;
 
 	if (__sys_epoll_wait == NULL) {
-		hook_epoll();
+		hook_init();
 	}
-
-	epoll_event_prepare(ev);
 
 	n = __sys_epoll_wait(ep->epfd, ep->events, ep->size, timeout);
 
@@ -327,7 +240,7 @@ EVENT *event_epoll_create(int size)
 	ep->size   = size;
 
 	if (__sys_epoll_create == NULL) {
-		hook_epoll();
+		hook_init();
 	}
 
 	ep->epfd = __sys_epoll_create(1024);
@@ -337,11 +250,11 @@ EVENT *event_epoll_create(int size)
 	ep->event.handle = epoll_event_handle;
 	ep->event.free   = epoll_event_free;
 
-	ep->event.event_loop    = epoll_event_loop;
-	ep->event.enable_read   = epoll_enable_read;
-	ep->event.enable_write  = epoll_enable_write;
-	ep->event.disable_read  = epoll_disable_read;
-	ep->event.disable_write = epoll_disable_write;
+	ep->event.event_loop = epoll_event_loop;
+	ep->event.add_read   = (event_proc *) epoll_event_add_read;
+	ep->event.add_write  = (event_proc *) epoll_event_add_write;
+	ep->event.del_read   = (event_proc *) epoll_event_del_read;
+	ep->event.del_write  = (event_proc *) epoll_event_del_write;
 
 	return (EVENT*) ep;
 }

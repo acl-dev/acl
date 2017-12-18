@@ -15,7 +15,7 @@ typedef int (*select_fn)(int, fd_set *, fd_set *, fd_set *, struct timeval *);
 
 static select_fn __sys_select = NULL;
 
-static void hook_select(void)
+static void hook_init(void)
 {
 	static acl_pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
 	static int __called = 0;
@@ -44,7 +44,7 @@ int select(int nfds, fd_set *readfds, fd_set *writefds,
 	int fd, timo, n, nready = 0;
 
 	if (__sys_select == NULL)
-		hook_select();
+		hook_init();
 
 	if (!acl_var_hook_sys_api)
 		return __sys_select ? __sys_select

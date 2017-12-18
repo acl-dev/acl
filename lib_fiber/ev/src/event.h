@@ -4,7 +4,13 @@
 #include <sys/epoll.h>
 #include "fiber/lib_fiber.h"
 
+#define SET_TIME(x) do { \
+    struct timeval _tv; \
+    gettimeofday(&_tv, NULL); \
+    (x) = ((acl_int64) _tv.tv_sec) * 1000 + ((acl_int64) _tv.tv_usec)/ 1000; \
+} while (0)
 
+typedef struct POLLFD       POLLFD;
 typedef struct FILE_EVENT   FILE_EVENT;
 typedef struct POLL_CTX     POLL_CTX;
 typedef struct POLL_EVENT   POLL_EVENT;
@@ -42,13 +48,15 @@ struct FILE_EVENT {
 
 	event_proc   *r_proc;
 	event_proc   *w_proc;
+	POLLFD       *pfd;
+	EPOLL_CTX    *epx;
 };
 
-typedef struct POLLFD {
-	FILE_EVENT  fe;
+struct POLLFD {
+	FILE_EVENT *fe;
 	POLL_EVENT *pe;
 	struct pollfd *pfd;
-} POLLFD;
+};
 
 struct POLL_EVENT {
 	ACL_RING   me;
@@ -64,6 +72,7 @@ struct EPOLL_CTX {
 	int  op;
 	int  mask;
 	int  rmask;
+	FILE_EVENT  *fe;
 	EPOLL_EVENT *ee;
 	epoll_data_t data;
 };
@@ -104,16 +113,19 @@ struct EVENT {
 	void (*free)(EVENT *);
 
 	int  (*event_loop)(EVENT *, int);
-	void (*enable_read)(EVENT *, FILE_EVENT *, event_proc *);
-	void (*enable_write)(EVENT *, FILE_EVENT *, event_proc *);
-	void (*disable_read)(EVENT *, FILE_EVENT *);
-	void (*disable_write)(EVENT *, FILE_EVENT *);
+
+	event_proc *add_read;
+	event_proc *add_write;
+	event_proc *del_read;
+	event_proc *del_write;
 };
 
+/* file_event.c */
 void file_event_init(FILE_EVENT *fe, int fd);
 FILE_EVENT *file_event_alloc(int fd);
 void file_event_free(FILE_EVENT *fe);
 
+/* event.c */
 EVENT *event_create(int size);
 const char *event_name(EVENT *ev);
 int  event_handle(EVENT *ev);

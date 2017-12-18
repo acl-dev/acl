@@ -55,7 +55,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 				break;
 			if (ret == 0) {
 				printf("read timeout fd=%d\r\n", *cfd);
-				continue;
+				break;
 			}
 		}
 

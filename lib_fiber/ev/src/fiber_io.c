@@ -35,11 +35,6 @@ void acl_fiber_schedule_stop(void)
 #define FIRST_FIBER(head) \
 	(acl_ring_succ(head) != (head) ? RING_TO_FIBER(acl_ring_succ(head)) : 0)
 
-#define SET_TIME(x) {  \
-	gettimeofday(&tv, NULL);  \
-	(x) = tv.tv_sec * 1000 + tv.tv_usec / 1000; \
-}
-
 static acl_pthread_key_t __fiber_key;
 
 static void thread_free(void *ctx)
@@ -144,7 +139,6 @@ static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 	EVENT *ev = (EVENT *) ctx;
 	ACL_FIBER *timer;
 	acl_int64 now, last = 0, left;
-	struct timeval tv;
 
 	fiber_system();
 
@@ -206,7 +200,6 @@ static void fiber_io_loop(ACL_FIBER *self acl_unused, void *ctx)
 unsigned int acl_fiber_delay(unsigned int milliseconds)
 {
 	acl_int64 when, now;
-	struct timeval tv;
 	ACL_FIBER *fiber;
 	ACL_RING_ITER iter;
 	EVENT *ev;
@@ -276,7 +269,6 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 
 static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
 {
-	struct timeval tv;
 	acl_int64 now, left;
 
 	SET_TIME(now);
@@ -303,7 +295,6 @@ ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds, size_t size,
 	void (*fn)(ACL_FIBER *, void *), void *ctx)
 {
 	acl_int64 when;
-	struct timeval tv;
 	ACL_FIBER *fiber;
 
 	fiber_io_check();
@@ -320,7 +311,6 @@ ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds, size_t size,
 void acl_fiber_reset_timer(ACL_FIBER *fiber, unsigned int milliseconds)
 {
 	acl_int64 when;
-	struct timeval tv;
 
 	fiber_io_check();
 

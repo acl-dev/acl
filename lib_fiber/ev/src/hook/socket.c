@@ -63,6 +63,7 @@ int socket(int domain, int type, int protocol)
 {
 	int sockfd;
 
+	assert(0);
 	if (__sys_socket == NULL) {
 		hook_init();
 	} 
@@ -88,6 +89,7 @@ int socket(int domain, int type, int protocol)
 
 int listen(int sockfd, int backlog)
 {
+	assert(0);
 	if (__sys_listen == NULL) {
 		hook_init();
 	}

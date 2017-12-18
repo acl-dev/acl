@@ -14,6 +14,7 @@ void file_event_init(FILE_EVENT *fe, int fd)
 	fe->mask   = 0;
 	fe->r_proc = NULL;
 	fe->w_proc = NULL;
+	fe->pfd    = NULL;
 }
 
 FILE_EVENT *file_event_alloc(int fd)

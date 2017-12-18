@@ -9,9 +9,9 @@
 #define	TYPE_NOSOCK	2
 
 #define	EVENT_NONE	0
-#define	EVENT_READABLE	(unsigned) 1 << 0
-#define	EVENT_WRITABLE	(unsigned) 1 << 1
-#define	EVENT_ERROR	(unsigned) 1 << 2
+#define	EVENT_READABLE	(unsigned) (1 << 0)
+#define	EVENT_WRITABLE	(unsigned) (1 << 1)
+#define	EVENT_ERROR	(unsigned) (1 << 2)
 
 typedef struct FILE_EVENT   FILE_EVENT;
 typedef struct POLL_CTX     POLL_CTX;
