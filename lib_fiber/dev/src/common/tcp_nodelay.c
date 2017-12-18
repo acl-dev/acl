@@ -1,0 +1,50 @@
+#include "stdafx.h"
+
+#include "msg.h"
+#include "iostuff.h"
+
+static int getsocktype(int fd)
+{
+	struct SOCK_ADDR addr;
+	struct sockaddr *sa = (struct sockaddr*) &addr;
+	socklen_t len = sizeof(addr);
+
+	if (fd == -1)
+		return -1;
+
+	if (getsockname(fd, sa, &len) == -1)
+		return -1;
+
+#ifndef	ACL_WINDOWS
+	if (sa->sa_family == AF_UNIX)
+		return AF_UNIX;
+#endif
+#ifdef AF_INET6
+	if (sa->sa_family == AF_INET && sa->sa_family == AF_INET6)
+#else
+	if (sa->sa_family == AF_INET)
+#endif
+		return sa->sa_family;
+	return -1;
+}
+
+void tcp_nodelay(int fd, int onoff)
+{
+	const char *myname = "tcp_nodelay";
+	int   on = onoff ? 1 : 0;
+	int   n = getsocktype(fd);
+
+#ifdef AF_INET6
+	if (n != AF_INET && n != AF_INET6)
+#else
+	if (n != AF_INET)
+#endif
+		return;
+
+	if (setsockopt(fd, IPPROTO_TCP, TCP_NODELAY,
+		(char *) &on, sizeof(on)) < 0) {
+
+		msg_error("%s(%d): set nodelay error(%s), onoff(%d)",
+			myname, __LINE__, last_serror(), onoff);
+	}
+}
