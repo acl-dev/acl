@@ -452,17 +452,17 @@ static void pollfd_callback(EVENT *ev, int fd, void *ctx, int mask)
 	int n = 0;
 
 	if (mask & EVENT_READABLE) {
-		if (pfd->events & POLLIN)
-			event_del(ev, fd, EVENT_READABLE);
+		//if (pfd->events & POLLIN)
+		//	event_del(ev, fd, EVENT_READABLE);
 		pfd->revents |= POLLIN;
 		n = 1;
 	}
 
 	if (mask & EVENT_WRITABLE) {
-		if (pfd->events & POLLOUT)
-			event_del(ev, fd, EVENT_WRITABLE);
+		//if (pfd->events & POLLOUT)
+		//	event_del(ev, fd, EVENT_WRITABLE);
 		pfd->revents |= POLLOUT;
-		n |= 1 << 1;
+		n |= (1 << 1);
 	}
 
 #ifdef	USE_RING
@@ -568,7 +568,6 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		acl_fiber_switch();
 
 		if (acl_fiber_killed(pe.fiber)) {
-			event_poll_clear(ev, &pe);
 			acl_msg_info("%s(%d), %s: fiber-%u was killed, %s",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(pe.fiber), acl_last_serror());
@@ -594,6 +593,7 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 			break;
 	}
 
+	event_poll_clear(ev, &pe);
 	return pe.nready;
 }
 

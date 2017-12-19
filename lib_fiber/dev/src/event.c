@@ -64,6 +64,8 @@ static int check_fdtype(int fd)
 
 void event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
+	assert(fe);
+
 	if (fe->fd >= ev->setsize) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
 		errno = ERANGE;
@@ -81,6 +83,8 @@ void event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 
 void event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
+	assert(fe);
+
 	if (fe->fd >= ev->setsize) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
 		errno = ERANGE;
@@ -97,6 +101,8 @@ void event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 
 void event_del_read(EVENT *ev, FILE_EVENT *fe)
 {
+	assert(fe);
+
 	if (fe->oper & EVENT_ADD_READ) {
 		fe->oper &=~EVENT_ADD_READ;
 	} else if (fe->oper == 0) {
@@ -111,6 +117,8 @@ void event_del_read(EVENT *ev, FILE_EVENT *fe)
 
 void event_del_write(EVENT *ev, FILE_EVENT *fe)
 {
+	assert(fe);
+
 	if (fe->oper & EVENT_ADD_WRITE) {
 		fe->oper &= ~EVENT_ADD_WRITE;
 	} else if (fe->oper == 0) {
@@ -162,6 +170,8 @@ static inline void event_process_poll(EVENT *ev)
 		pe = TO_APPL(head, POLL_EVENT, me);
 		pe->proc(ev, pe);
 	}
+
+	ring_init(&ev->poll_list);
 }
 
 static void event_process_epoll(EVENT *ev)

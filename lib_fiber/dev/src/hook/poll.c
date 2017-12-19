@@ -42,8 +42,10 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	event_del_read(ev, fe);
 	pfd->pfd->revents |= POLLIN;
 
-	if (!(pfd->pfd->events & POLLOUT))
+	if (!(pfd->pfd->events & POLLOUT)) {
 		fe->pfd = NULL;
+		pfd->fe = NULL;
+	}
 
 	assert(ring_size(&ev->poll_list) > 0);
 	pfd->pe->nready++;
@@ -58,8 +60,10 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	event_del_write(ev, fe);
 	pfd->pfd->revents |= POLLOUT;
 
-	if (!(pfd->pfd->events & POLLIN))
+	if (!(pfd->pfd->events & POLLIN)) {
 		fe->pfd = NULL;
+		pfd->fe = NULL;
+	}
 
 	assert(ring_size(&ev->poll_list) > 0);
 	pfd->pe->nready++;
@@ -95,6 +99,10 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 	for (i = 0; i < pe->nfds; i++) {
 		POLLFD *pfd = &pe->fds[i];
 
+		// maybe has been cleaned in read_callback/write_callback
+		if (pfd->fe == NULL)
+			continue;
+
 		if (pfd->pfd->events & POLLIN) {
 			event_del_read(ev, pfd->fe);
 		}
@@ -102,6 +110,7 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 			event_del_write(ev, pfd->fe);
 		}
 		pfd->fe->pfd = NULL;
+		pfd->fe      = NULL;
 	}
 }
 
@@ -162,7 +171,6 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		acl_fiber_switch();
 
 		if (acl_fiber_killed(pe.fiber)) {
-			poll_event_clean(ev, &pe);
 			ring_detach(&pe.me);
 			msg_info("%s(%d), %s: fiber-%u was killed, %s",
 				__FILE__, __LINE__, __FUNCTION__,
@@ -183,6 +191,7 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		}
 	}
 
+	poll_event_clean(ev, &pe);
 	pollfd_free(pe.fds);
 	return pe.nready;
 }

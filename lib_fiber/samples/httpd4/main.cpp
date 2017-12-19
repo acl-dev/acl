@@ -115,7 +115,7 @@ static void listen_callback(int type acl_unused, ACL_EVENT *event,
 static void fiber_event(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx;
-	ACL_EVENT *event;
+	ACL_EVENT   *event;
 
 	if (__use_kernel)
 		event = acl_event_new(ACL_EVENT_KERNEL, 0, 1, 0);

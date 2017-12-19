@@ -8,12 +8,11 @@ ARFL    = rv
 RANLIB  = ${ENV_RANLIB}
 
 CFLAGS = -c -g -W \
+-std=gnu99 \
 -fPIC \
 -Wall \
 -Werror \
--Wcast-qual \
 -Waggregate-return \
--Wmissing-prototypes \
 -Wpointer-arith \
 -Wshadow \
 -D_REENTRANT \
@@ -21,7 +20,9 @@ CFLAGS = -c -g -W \
 -D_USE_FAST_MACRO \
 -Wno-long-long \
 -DUSE_JMP \
-#-DUSE_VALGRIND
+-DUSE_VALGRIND \
+#-Wcast-qual \
+#-Wmissing-prototypes \
 #-Wno-clobbered
 #-O3
 
@@ -51,9 +52,9 @@ ifeq ($(RANLIB),)
 	RANLIB = ranlib
 endif
 
-ifeq ($(findstring gcc, $(CC)), gcc)
-	CFLAGS += -Wstrict-prototypes
-endif
+#ifeq ($(findstring gcc, $(CC)), gcc)
+#	CFLAGS += -Wstrict-prototypes
+#endif
 
 ifeq ($(findstring clang, $(CC)), clang)
 	CFLAGS += -Wstrict-prototypes \
