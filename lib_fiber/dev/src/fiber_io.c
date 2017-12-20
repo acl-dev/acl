@@ -2,7 +2,6 @@
 #include "common.h"
 
 #include "fiber/lib_fiber.h"
-#include "iostuff.h"
 #include "event.h"
 #include "fiber.h"
 

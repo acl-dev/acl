@@ -10,6 +10,7 @@ endif()
 
 add_definitions(
 	"-W"
+	"-std=gnu99"
 	"-fPIC"
 	"-Wall"
 	"-Werror"
@@ -65,7 +66,10 @@ include_directories(
 
 set(sources
 	${src}
-	${src}/master
+	${src}/common
+	${src}/event
+	${src}/hook
+	${src}/dns
 )
 
 foreach(iter ${sources})
