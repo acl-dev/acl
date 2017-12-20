@@ -1,11 +1,11 @@
 #ifndef	__DEFINE_INCLUDE_H__
 #define	__DEFINE_INCLUDE_H__
 
-#ifndef unused
+#ifndef fiber_unused
 # ifdef	__GNUC__
-#  define	unused	__attribute__ ((__unused__))
+#  define fiber_unused	__attribute__ ((__unused__))
 # else
-#  define  unused  /* Ignore */
+#  define fiber_unused  /* Ignore */
 # endif
 #endif
 
@@ -38,5 +38,19 @@
 #else
 #define	DEPRECATED_FOR(f)	DEPRECATED
 #endif	/* __GNUC__ */
+
+struct SOCK_ADDR {
+	union {
+		struct sockaddr_storage ss;
+#ifdef AF_INET6
+		struct sockaddr_in6 in6;
+#endif
+		struct sockaddr_in in;
+#ifdef ACL_UNIX
+		struct sockaddr_un un;
+#endif
+		struct sockaddr sa;
+	} sa;
+};
 
 #endif /* __DEFINE_INCLUDE_H__ */

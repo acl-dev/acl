@@ -19,11 +19,7 @@ static int getsocktype(int fd)
 	if (sa->sa_family == AF_UNIX)
 		return AF_UNIX;
 #endif
-#ifdef AF_INET6
 	if (sa->sa_family == AF_INET && sa->sa_family == AF_INET6)
-#else
-	if (sa->sa_family == AF_INET)
-#endif
 		return sa->sa_family;
 	return -1;
 }
@@ -34,11 +30,7 @@ void tcp_nodelay(int fd, int onoff)
 	int   on = onoff ? 1 : 0;
 	int   n = getsocktype(fd);
 
-#ifdef AF_INET6
 	if (n != AF_INET && n != AF_INET6)
-#else
-	if (n != AF_INET)
-#endif
 		return;
 
 	if (setsockopt(fd, IPPROTO_TCP, TCP_NODELAY,

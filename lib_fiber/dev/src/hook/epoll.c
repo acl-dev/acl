@@ -68,7 +68,7 @@ static __thread ARRAY *__epfds = NULL;
 static pthread_key_t  __once_key;
 static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
 
-static void thread_free(void *ctx unused)
+static void thread_free(void *ctx fiber_unused)
 {
 	size_t j;
 	ITER iter;
@@ -215,7 +215,7 @@ int epoll_event_close(int epfd)
 
 /****************************************************************************/
 
-int epoll_create(int size unused)
+int epoll_create(int size fiber_unused)
 {
 	EPOLL_EVENT *ee;
 	EVENT *ev;
@@ -259,7 +259,7 @@ int epoll_create1(int flags)
 }
 #endif
 
-static void read_callback(EVENT *ev unused, FILE_EVENT *fe)
+static void read_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 {
 	EPOLL_CTX  *epx = fe->epx;
 	EPOLL_EVENT *ee = epx->ee;
@@ -275,7 +275,7 @@ static void read_callback(EVENT *ev unused, FILE_EVENT *fe)
 		ee->nready++;
 }
 
-static void write_callback(EVENT *ev unused, FILE_EVENT *fe)
+static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 {
 	EPOLL_CTX  *epx = fe->epx;
 	EPOLL_EVENT *ee = epx->ee;
@@ -378,7 +378,7 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 	return 0;
 }
 
-static void epoll_callback(EVENT *ev unused, EPOLL_EVENT *ee)
+static void epoll_callback(EVENT *ev fiber_unused, EPOLL_EVENT *ee)
 {
 	fiber_io_dec();
 	acl_fiber_ready(ee->fiber);

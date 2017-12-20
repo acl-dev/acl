@@ -21,8 +21,8 @@ CFLAGS = -c -g -W \
 -Wno-long-long \
 -DUSE_JMP \
 -DUSE_VALGRIND \
-#-Wcast-qual \
-#-Wmissing-prototypes \
+-Wmissing-prototypes \
+-Wcast-qual \
 #-Wno-clobbered
 #-O3
 
@@ -52,9 +52,9 @@ ifeq ($(RANLIB),)
 	RANLIB = ranlib
 endif
 
-#ifeq ($(findstring gcc, $(CC)), gcc)
-#	CFLAGS += -Wstrict-prototypes
-#endif
+ifeq ($(findstring gcc, $(CC)), gcc)
+	CFLAGS += -Wstrict-prototypes
+endif
 
 ifeq ($(findstring clang, $(CC)), clang)
 	CFLAGS += -Wstrict-prototypes \

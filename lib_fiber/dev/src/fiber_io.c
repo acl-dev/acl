@@ -136,7 +136,7 @@ EVENT *fiber_io_event(void)
 	return __thread_fiber->event;
 }
 
-static void fiber_io_loop(ACL_FIBER *self unused, void *ctx)
+static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 {
 	EVENT *ev = (EVENT *) ctx;
 	ACL_FIBER *timer;

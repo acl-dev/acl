@@ -1,6 +1,8 @@
 #!/bin/sh
 
-./dns  -n "m.mo.mm,aaa.aaa.aaa,abc.abc.a,www.ccc.ccc,www.263.net,www.baidu.com"  -a 10.202.72.118 -p 53
+./dns -n "www.qiyi.com"
+
+./dns  -n "m.mo.mm,aaa.aaa.aaa,abc.abc.a,www.ccc.ccc,www.263.net,www.baidu.com"  -a 8.8.8.8 -p 53
 
 echo ""
 echo ""

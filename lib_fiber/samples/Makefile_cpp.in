@@ -96,11 +96,11 @@ endif
 CFLAGS += -I.. -I../../../lib_acl/include -I../../../lib_protocol/include -I../../../lib_acl_cpp/include \
 	  -I../../../lib_fiber/c/include -I../../../lib_fiber/cpp/include
 EXTLIBS =
-LDFLAGS = -L../../../lib_fiber/lib -lfiber_cpp -lfiber \
+LDFLAGS = -L../../../lib_fiber/lib -lfiber_cpp \
 	  -L../../../lib_acl_cpp/lib -lacl_cpp \
 	  -L../../../lib_protocol/lib -lprotocol \
 	  -L../../../lib_acl/lib -lacl \
-	  $(EXTLIBS) $(SYSLIB)
+	  -lfiber $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)

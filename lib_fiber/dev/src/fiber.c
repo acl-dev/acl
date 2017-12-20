@@ -531,7 +531,7 @@ static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 #endif
 }
 
-static void check_timer(ACL_FIBER *fiber unused, void *ctx)
+static void check_timer(ACL_FIBER *fiber fiber_unused, void *ctx)
 {
 	size_t *intptr = (size_t *) ctx;
 	size_t  max = *intptr;
