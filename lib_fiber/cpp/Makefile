@@ -26,7 +26,7 @@ CFLAGS = -c -g -W \
 # -Wcast-align
 #-Wcast-qual
 #just for freebsd's iconv.h
-CFLAGS += -I/usr/local/include
+CFLAGS += -I/usr/local/include -I../../lib_acl/src/master
 
 shared_ldflags = -lacl_cpp -lprotocol -lacl -lz -lpthread
 

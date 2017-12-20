@@ -28,11 +28,11 @@ typedef struct FIBER_BASE {
 #define FBASE_F_FIBER	(1 << 1)
 	unsigned flag;
 
-	ACL_ATOMIC *atomic;
-	long long   atomic_value;
+	ATOMIC  *atomic;
+	long long atomic_value;
 	int      mutex_in;
 	int      mutex_out;
-	ACL_RING mutex_waiter;
+	RING     mutex_waiter;
 } FIBER_BASE;
 
 struct ACL_FIBER {
@@ -41,16 +41,16 @@ struct ACL_FIBER {
 	unsigned int   vid;
 #endif
 	fiber_status_t status;
-	ACL_RING       me;
+	RING           me;
 	unsigned       id;
 	unsigned       slot;
-	acl_int64      when;
+	long long      when;
 	int            errnum;
 	int            sys;
 	int            signum;
 	unsigned int   flag;
 
-	ACL_RING         holding;
+	RING           holding;
 	ACL_FIBER_MUTEX *waiting;
 
 #define FIBER_F_SAVE_ERRNO	(unsigned) 1 << 0
@@ -75,7 +75,7 @@ struct ACL_FIBER {
 };
 
 /* in fiber.c */
-extern __thread int acl_var_hook_sys_api;
+extern __thread int var_hook_sys_api;
 FIBER_BASE *fbase_alloc(void);
 void fbase_free(FIBER_BASE *fbase);
 void fiber_free(ACL_FIBER *fiber);
@@ -93,22 +93,22 @@ void fiber_count_inc(void);
 void fiber_count_dec(void);
 
 /* in fiber_io.c */
+extern int var_maxfd;
+
 void fiber_io_check(void);
-void fiber_io_close(int fd);
-void fiber_wait_read(int fd);
-void fiber_wait_write(int fd);
+void fiber_wait_read(FILE_EVENT *fe);
+void fiber_wait_write(FILE_EVENT *fe);
 void fiber_io_dec(void);
 void fiber_io_inc(void);
 EVENT *fiber_io_event(void);
-void fiber_io_fibers_free(void);
+FILE_EVENT *fiber_io_get(int fd);
+int fiber_io_set(FILE_EVENT *fe);
+int fiber_io_del(FILE_EVENT *fe);
+int fiber_io_close(int fd);
 
-/* in hook_io.c */
-void hook_io(void);
+FILE_EVENT *fiber_file_event(int fd);
 
-/* in fiber_net.c */
-void hook_net(void);
+/* in epoll.c */
 int  epoll_event_close(int epfd);
-void poll_fibers_free(void);
-void epoll_fibers_free(void);
 
 #endif

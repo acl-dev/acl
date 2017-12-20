@@ -375,17 +375,17 @@ void acl_fiber_sem_free(ACL_FIBER_SEM* sem);
 /**
  * 获得当前协程信号量所绑定的线程 ID
  * @param sem {ACL_FIBER_SEM*} 协程信号量对象
- * @return {pthread_t}
+ * @return {acl_pthread_t}
  */
-pthread_t acl_fiber_sem_get_tid(ACL_FIBER_SEM* sem);
+acl_pthread_t acl_fiber_sem_get_tid(ACL_FIBER_SEM* sem);
 
 /**
  * 设置指定协程信号量的的线程 ID，当改变本协程信号量所属的线程时如果等待的协程
  * 数据非 0 则内部自动 fatal，即当协程信号量上等待协程非空时禁止调用本方法
  * @param sem {ACL_FIBER_SEM*} 协程信号量对象
- * @param {pthread_t} 线程 ID
+ * @param {acl_pthread_t} 线程 ID
  */
-void acl_fiber_sem_set_tid(ACL_FIBER_SEM* sem, pthread_t tid);
+void acl_fiber_sem_set_tid(ACL_FIBER_SEM* sem, acl_pthread_t tid);
 
 /**
  * 当协程信号量 > 0 时使信号量减 1，否则等待信号量 > 0
@@ -532,6 +532,24 @@ int acl_channel_sendul_nb(ACL_CHANNEL* c, unsigned long val);
  * @return {unsigned long}
  */
 unsigned long acl_channel_recvul_nb(ACL_CHANNEL* c);
+
+/* master fibers server */
+
+/**
+ * 基于协程的服务器主函数入口，该模块可以在 acl_master 服务器控制框架下运行
+ * @param argc {int} 使用者传入的参数数组 argv 的大小
+ * @param argv {char*[]} 参数数组大小
+ * @param service {void (*)(ACL_VSTREAM*, void*)} 接收到一个新客户端连接请求
+ *  后创建一个协程回调本函数
+ * @param ctx {void*} service 回调函数的第二个参数
+ * @param name {int} 控制参数列表中的第一个控制参数
+ */
+void acl_fiber_server_main(int argc, char* argv[],
+	void (*service)(void*, ACL_VSTREAM*), void* ctx, int name, ...);
+const char* acl_fiber_server_conf(void);
+
+void acl_fiber_chat_main(int argc, char* argv[],
+	int (*service)(ACL_VSTREAM*, void*), void* ctx, int name, ...);
 
 /**************************** fiber iostuff *********************************/
 

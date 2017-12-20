@@ -4,48 +4,67 @@
 #include <sys/epoll.h>
 #include "fiber/lib_fiber.h"
 
-#define	TYPE_NONE	0
-#define	TYPE_SOCK	1
-#define	TYPE_NOSOCK	2
+#define SET_TIME(x) do { \
+    struct timeval _tv; \
+    gettimeofday(&_tv, NULL); \
+    (x) = ((long long) _tv.tv_sec) * 1000 + ((long long) _tv.tv_usec)/ 1000; \
+} while (0)
 
-#define	EVENT_NONE	0
-#define	EVENT_READABLE	(unsigned) (1 << 0)
-#define	EVENT_WRITABLE	(unsigned) (1 << 1)
-#define	EVENT_ERROR	(unsigned) (1 << 2)
-
+typedef struct POLLFD       POLLFD;
 typedef struct FILE_EVENT   FILE_EVENT;
 typedef struct POLL_CTX     POLL_CTX;
 typedef struct POLL_EVENT   POLL_EVENT;
 typedef struct EPOLL_CTX    EPOLL_CTX;
 typedef struct EPOLL_EVENT  EPOLL_EVENT;
-typedef struct FIRED_EVENT  FIRED_EVENT;
-typedef struct DEFER_DELETE DEFER_DELETE;
 typedef struct EVENT        EVENT;
 
-typedef void event_proc(EVENT *ev, int fd, void *ctx, int mask);
+typedef void event_proc(EVENT *ev, FILE_EVENT *fe);
 typedef void poll_proc(EVENT *ev, POLL_EVENT *pe);
 typedef void epoll_proc(EVENT *ev, EPOLL_EVENT *ee);
 
+/**
+ * for each connection fd
+ */
 struct FILE_EVENT {
+	RING       me;
+	ACL_FIBER *fiber;
+	int fd;
 	int type;
-	int mask;
-	int mask_fired;
+#define	TYPE_NONE	0
+#define	TYPE_SOCK	1
+#define	TYPE_NOSOCK	2
+
+	unsigned oper;
+#define	EVENT_ADD_READ	(unsigned) (1 << 0)
+#define	EVENT_ADD_WRITE	(unsigned) (1 << 1)
+#define	EVENT_DEL_READ	(unsigned) (1 << 2)
+#define	EVENT_DEL_WRITE	(unsigned) (1 << 3)
+
+	unsigned mask;
+#define	EVENT_NONE	0
+#define	EVENT_READ	(unsigned) (1 << 0)
+#define	EVENT_WRITE	(unsigned) (1 << 1)
+#define	EVENT_ERROR	(unsigned) (1 << 2)
+
 	event_proc   *r_proc;
 	event_proc   *w_proc;
-	void         *r_ctx;
-	void         *w_ctx;
-	POLL_EVENT   *pe;
-	DEFER_DELETE *r_defer;
-	DEFER_DELETE *w_defer;
+	POLLFD       *pfd;
+	EPOLL_CTX    *epx;
+};
+
+struct POLLFD {
+	FILE_EVENT *fe;
+	POLL_EVENT *pe;
+	struct pollfd *pfd;
 };
 
 struct POLL_EVENT {
-	ACL_RING   me;
+	RING       me;
 	ACL_FIBER *fiber;
 	poll_proc *proc;
 	int        nready;
 	int        nfds;
-	struct pollfd *fds;
+	POLLFD    *fds;
 };
 
 struct EPOLL_CTX {
@@ -53,12 +72,13 @@ struct EPOLL_CTX {
 	int  op;
 	int  mask;
 	int  rmask;
+	FILE_EVENT  *fe;
 	EPOLL_EVENT *ee;
 	epoll_data_t data;
 };
 
 struct EPOLL_EVENT {
-	ACL_RING    me;
+	RING        me;
 	ACL_FIBER  *fiber;
 	epoll_proc *proc;
 	size_t      nfds;
@@ -70,61 +90,43 @@ struct EPOLL_EVENT {
 	int nready;
 };
 
-struct FIRED_EVENT {
-	int fd;
-	int mask;
-};
-
-struct DEFER_DELETE {
-	int fd;
-	int mask;
-	int pos;
-};
-
 struct EVENT {
-	int   timeout;
-	int   setsize;
-	int   maxfd;
-	int   r_ndefer;
-	int   w_ndefer;
-	FILE_EVENT   *events;
-	FIRED_EVENT  *fired;
-	DEFER_DELETE *r_defers;
-	DEFER_DELETE *w_defers;
+	RING events;
+	int  timeout;
+	int  setsize;
+	int  maxfd;
 
-#define	USE_RING
-#ifdef	USE_RING		// xxx: some bugs ?
-	ACL_RING   poll_list;
-	ACL_RING   epoll_list;
-#elif	defined(USE_STACK)
-	ACL_STACK *poll_list;
-	ACL_STACK *epoll_list;
-#else
-	ACL_FIFO  *poll_list;
-	ACL_FIFO  *epoll_list;
-#endif
+	RING   poll_list;
+	RING   epoll_list;
 
 	const char *(*name)(void);
 	int  (*handle)(EVENT *);
-	int  (*loop)(EVENT *, int);
-	int  (*add)(EVENT *, int, int);
-	int  (*del)(EVENT *, int, int);
 	void (*free)(EVENT *);
+
+	int  (*event_loop)(EVENT *, int);
+
+	event_proc *add_read;
+	event_proc *add_write;
+	event_proc *del_read;
+	event_proc *del_write;
 };
 
+/* file_event.c */
+void file_event_init(FILE_EVENT *fe, int fd);
+FILE_EVENT *file_event_alloc(int fd);
+void file_event_free(FILE_EVENT *fe);
+
+/* event.c */
 EVENT *event_create(int size);
 const char *event_name(EVENT *ev);
 int  event_handle(EVENT *ev);
 int  event_size(EVENT *ev);
 void event_free(EVENT *ev);
-int  event_add(EVENT *ev, int fd, int mask, event_proc *proc, void *ctx);
-void event_del(EVENT *ev, int fd, int mask);
-void event_del_nodelay(EVENT *ev, int fd, int mask);
+
+void event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
+void event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
+void event_del_read(EVENT *ev, FILE_EVENT *fe);
+void event_del_write(EVENT *ev, FILE_EVENT *fe);
 int  event_process(EVENT *ev, int left);
-int  event_readable(EVENT *ev, int fd);
-int  event_writeable(EVENT *ev, int fd);
-void event_clear_readable(EVENT *ev, int fd);
-void event_clear_writeable(EVENT *ev, int fd);
-void event_clear(EVENT *ev, int fd);
 
 #endif

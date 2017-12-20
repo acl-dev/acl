@@ -1,25 +1,6 @@
 #ifndef __STD_AFX_INCLUDE_H__
 #define __STD_AFX_INCLUDE_H__
 
-# if defined(_WIN32) || defined(_WIN64)
-#  include <stdio.h>
-#  include <stdarg.h>
-#  ifdef __STDC_WANT_SECURE_LIB__
-int proto_secure_snprintf(char *buf, size_t size, const char *fmt, ...);
-int proto_securev_snprintf(char *buf, size_t size, const char *fmt, va_list ap);
-#   define snprintf proto_secure_snprintf
-#   define vsnprintf proto_securev_snprintf
-#  else
-#  ifndef snprintf
-#   define snprintf _snprintf
-#  endif
-#  ifndef vsnprintf
-#   define vsnprintf _vsnprintf
-#  endif
-#  endif
-# endif  /* WIN2/WIN64 */
-#include "lib_acl.h"
-
 #if 1
 #define LIKELY(x)	__builtin_expect(!!(x), 1)
 #define UNLIKELY(x)	__builtin_expect(!!(x), 0)
@@ -27,5 +8,38 @@ int proto_securev_snprintf(char *buf, size_t size, const char *fmt, va_list ap);
 #define	LIKELY
 #define	UNLIKELY
 #endif
+
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <unistd.h>
+#include <dlfcn.h>
+#include <time.h>
+#include <ctype.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/sendfile.h>
+#include <sys/stat.h>
+#include <sys/select.h>
+#include <sys/epoll.h>
+#include <poll.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <signal.h>
+#include <limits.h>
+#include <pthread.h>
+#include <assert.h>
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+
+#include "define.h"
 
 #endif
