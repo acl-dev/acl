@@ -9,9 +9,9 @@ EVENT *event_create(int size)
 	EVENT *ev = event_epoll_create(size);
 
 	ring_init(&ev->events);
-	ev->timeout  = -1;
-	ev->setsize  = size;
-	ev->maxfd    = -1;
+	ev->timeout = -1;
+	ev->setsize = size;
+	ev->maxfd   = -1;
 
 	ring_init(&ev->poll_list);
 	ring_init(&ev->epoll_list);
@@ -66,7 +66,7 @@ void event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
 	assert(fe);
 
-	if (fe->fd >= ev->setsize) {
+	if (UNLIKELY (fe->fd >= ev->setsize)) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
 		errno = ERANGE;
 		return;
@@ -91,7 +91,7 @@ void event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
 	assert(fe);
 
-	if (fe->fd >= ev->setsize) {
+	if (UNLIKELY (fe->fd >= ev->setsize)) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
 		errno = ERANGE;
 		return;
