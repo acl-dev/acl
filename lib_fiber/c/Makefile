@@ -22,7 +22,7 @@ CFLAGS = -c -g -W \
 -DUSE_JMP \
 -Wmissing-prototypes \
 -Wcast-qual \
--DUSE_VALGRIND \
+#-DUSE_VALGRIND \
 #-DUSE_PRINTF_MACRO
 #-Wno-clobbered
 #-O3
