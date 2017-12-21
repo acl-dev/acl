@@ -15,6 +15,7 @@ target("fiber_cpp")
 
     -- add headers
     add_headers("include/(**.h)", "include/(**.hpp)")
+    add_includedirs("src", "include", "../../lib_acl/src/master")
     set_headerdir("$(buildir)/include/fiber_cpp")
 
 
