@@ -440,5 +440,6 @@ int fiber_io_close(int fd)
 	fiber_io_del(fe);
 	if (fe->mask)
 		ring_detach(&fe->me);
+	file_event_free(fe);
 	return 1;
 }

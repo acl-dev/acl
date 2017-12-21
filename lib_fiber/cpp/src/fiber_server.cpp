@@ -616,7 +616,8 @@ static void server_alone_open(FIBER_SERVER *server, ACL_ARGV *addrs)
 #define EQ !strcasecmp
 	if (EQ(acl_var_fiber_reuseport, "yes") ||
 		EQ(acl_var_fiber_reuseport, "true") ||
-		EQ(acl_var_fiber_reuseport, "on")) {
+		EQ(acl_var_fiber_reuseport, "on") ||
+		acl_var_fiber_threads > 1) {
 
 		flag |= ACL_INET_FLAG_REUSEPORT;
 	}

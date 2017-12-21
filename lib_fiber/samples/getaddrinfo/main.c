@@ -40,7 +40,7 @@ static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
 
 	printf(">>> nslookup: %s\r\n", addr);
 
-	if ((err = getaddrinfo(addr, "finger", &hints, &res0))) {
+	if ((err = getaddrinfo(addr, "80", &hints, &res0))) {
 		printf(">>> result: getaddrinfo error=%s, name=%s\r\n",
 			gai_strerror(err), addr);
 	} else {

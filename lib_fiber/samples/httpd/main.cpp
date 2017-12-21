@@ -10,7 +10,7 @@ static void http_server(ACL_FIBER *, void *ctx)
 {
 	acl::socket_stream *conn = (acl::socket_stream *) ctx;
 
-	printf("start one http_server\r\n");
+	//printf("start one http_server\r\n");
 
 	acl::memcache_session session("127.0.0.1:11211");
 	http_servlet servlet(conn, &session);

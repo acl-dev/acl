@@ -131,11 +131,9 @@ int close(int fd)
 	 * must be a epoll fd which was created by epoll_create function
 	 * hooked in hook_net.c
 	 */
-	/*
 	if (epoll_event_close(fd) == 0) {
 		return 0;
 	}
-	*/
 
 	fiber_io_close(fd);
 	ret = __sys_close(fd);
