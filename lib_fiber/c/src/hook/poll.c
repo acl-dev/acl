@@ -126,7 +126,7 @@ static POLLFD *pollfd_alloc(POLL_EVENT *pe, struct pollfd *fds, nfds_t nfds)
 	nfds_t  i;
 
 	for (i = 0; i < nfds; i++) {
-		pfds[i].fe  = fiber_file_event(fds[i].fd);
+		pfds[i].fe  = fiber_file_open(fds[i].fd);
 		pfds[i].pe  = pe;
 		pfds[i].pfd = &fds[i];
 	}

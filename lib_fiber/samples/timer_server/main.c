@@ -22,9 +22,9 @@ static void io_timer(ACL_FIBER *fiber, void *ctx)
 	acl_fiber_set_errno(ft->fiber, ETIMEDOUT);
 	acl_fiber_keep_errno(ft->fiber, 1);
 
-//	printf("timer-%d wakeup, set fiber-%d, errno: %d, %d\r\n",
-//		acl_fiber_id(fiber), acl_fiber_id(ft->fiber),
-//		ETIMEDOUT, acl_fiber_errno(ft->fiber));
+	printf("timer-%d wakeup, set fiber-%d, errno: %d, %d\r\n",
+		acl_fiber_id(fiber), acl_fiber_id(ft->fiber),
+		ETIMEDOUT, acl_fiber_errno(ft->fiber));
 
 	acl_fiber_ready(ft->fiber);
 }
@@ -45,6 +45,7 @@ static void echo_client(ACL_FIBER *fiber, void *ctx)
 #define	SOCK ACL_VSTREAM_SOCK
 
 	while (1) {
+		printf("begin read\n");
 		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
 
 		if (ret == ACL_VSTREAM_EOF) {

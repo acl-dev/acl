@@ -59,7 +59,9 @@ static void poll_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
 		}
 	}
 
-	printf(">>>fiber-%d exit\r\n", acl_fiber_id(fiber));
+	close(fd);
+	printf(">>>fiber-%d close %d exit\r\n", acl_fiber_id(fiber), fd);
+
 	if (--__nfibers == 0)
 		acl_fiber_schedule_stop();
 }

@@ -135,7 +135,7 @@ int close(int fd)
 		return 0;
 	}
 
-	fiber_io_close(fd);
+	fiber_file_close(fd);
 	ret = __sys_close(fd);
 	if (ret == 0) {
 		return ret;
@@ -169,7 +169,7 @@ inline ssize_t fiber_read(int fd, void *buf, size_t count)
 		return __sys_read(fd, buf, count);
 	}
 
-	fe = fiber_file_event(fd);
+	fe = fiber_file_open(fd);
 	fiber_wait_read(fe);
 
 	ret = __sys_read(fd, buf, count);
@@ -205,7 +205,7 @@ inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 		return __sys_readv(fd, iov, iovcnt);
 	}
 
-	fe = fiber_file_event(fd);
+	fe = fiber_file_open(fd);
 	fiber_wait_read(fe);
 
 	ret = __sys_readv(fd, iov, iovcnt);
@@ -241,7 +241,7 @@ inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 		return __sys_recv(sockfd, buf, len, flags);
 	}
 
-	fe = fiber_file_event(sockfd);
+	fe = fiber_file_open(sockfd);
 	fiber_wait_read(fe);
 
 	ret = __sys_recv(sockfd, buf, len, flags);
@@ -279,7 +279,7 @@ inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 				flags, src_addr, addrlen);
 	}
 
-	fe = fiber_file_event(sockfd);
+	fe = fiber_file_open(sockfd);
 	fiber_wait_read(fe);
 
 	ret = __sys_recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
@@ -315,7 +315,7 @@ inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 		return __sys_recvmsg(sockfd, msg, flags);
 	}
 
-	fe = fiber_file_event(sockfd);
+	fe = fiber_file_open(sockfd);
 	fiber_wait_read(fe);
 
 	ret = __sys_recvmsg(sockfd, msg, flags);
@@ -364,7 +364,7 @@ inline ssize_t fiber_read(int fd, void *buf, size_t count)
 			return -1;
 		}
 
-		fe = fiber_file_event(fd);
+		fe = fiber_file_open(fd);
 		fiber_wait_read(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
@@ -404,7 +404,7 @@ inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 			return -1;
 		}
 
-		fe = fiber_file_event(fd);
+		fe = fiber_file_open(fd);
 		fiber_wait_read(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
@@ -444,7 +444,7 @@ inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 			return -1;
 		}
 
-		fe = fiber_file_event(sockfd);
+		fe = fiber_file_open(sockfd);
 		fiber_wait_read(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
@@ -486,7 +486,7 @@ inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 			return -1;
 		}
 
-		fe = fiber_file_event(sockfd);
+		fe = fiber_file_open(sockfd);
 		fiber_wait_read(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
@@ -526,7 +526,7 @@ inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 			return -1;
 		}
 
-		fe = fiber_file_event(sockfd);
+		fe = fiber_file_open(sockfd);
 		fiber_wait_read(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
@@ -570,7 +570,7 @@ inline ssize_t fiber_write(int fd, const void *buf, size_t count)
 			return -1;
 		}
 
-		fe = fiber_file_event(fd);
+		fe = fiber_file_open(fd);
 		fiber_wait_write(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
@@ -611,7 +611,7 @@ inline ssize_t fiber_writev(int fd, const struct iovec *iov, int iovcnt)
 			return -1;
 		}
 
-		fe = fiber_file_event(fd);
+		fe = fiber_file_open(fd);
 		fiber_wait_write(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
@@ -652,7 +652,7 @@ inline ssize_t fiber_send(int sockfd, const void *buf, size_t len, int flags)
 			return -1;
 		}
 
-		fe = fiber_file_event(sockfd);
+		fe = fiber_file_open(sockfd);
 		fiber_wait_write(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
@@ -695,7 +695,7 @@ inline ssize_t fiber_sendto(int sockfd, const void *buf, size_t len, int flags,
 			return -1;
 		}
 
-		fe = fiber_file_event(sockfd);
+		fe = fiber_file_open(sockfd);
 		fiber_wait_write(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
@@ -736,7 +736,7 @@ inline ssize_t fiber_sendmsg(int sockfd, const struct msghdr *msg, int flags)
 			return -1;
 		}
 
-		fe = fiber_file_event(sockfd);
+		fe = fiber_file_open(sockfd);
 		fiber_wait_write(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
@@ -874,7 +874,7 @@ ssize_t sendfile64(int out_fd, int in_fd, off64_t *offset, size_t count)
 			return -1;
 		}
 
-		fe = fiber_file_event(out_fd);
+		fe = fiber_file_open(out_fd);
 		fiber_wait_write(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {

@@ -30,21 +30,21 @@ struct FILE_EVENT {
 	ACL_FIBER *fiber;
 	int fd;
 	int type;
-#define	TYPE_NONE	0
-#define	TYPE_SOCK	1
-#define	TYPE_NOSOCK	2
+#define	TYPE_NONE		0
+#define	TYPE_SOCK		1
+#define	TYPE_NOSOCK		2
 
 	unsigned oper;
-#define	EVENT_ADD_READ	(unsigned) (1 << 0)
-#define	EVENT_ADD_WRITE	(unsigned) (1 << 1)
-#define	EVENT_DEL_READ	(unsigned) (1 << 2)
-#define	EVENT_DEL_WRITE	(unsigned) (1 << 3)
+#define	EVENT_ADD_READ		(unsigned) (1 << 0)
+#define	EVENT_ADD_WRITE		(unsigned) (1 << 1)
+#define	EVENT_DEL_READ		(unsigned) (1 << 2)
+#define	EVENT_DEL_WRITE		(unsigned) (1 << 3)
 
 	unsigned mask;
-#define	EVENT_NONE	0
-#define	EVENT_READ	(unsigned) (1 << 0)
-#define	EVENT_WRITE	(unsigned) (1 << 1)
-#define	EVENT_ERROR	(unsigned) (1 << 2)
+#define	EVENT_NONE		0
+#define	EVENT_READ		(unsigned) (1 << 0)
+#define	EVENT_WRITE		(unsigned) (1 << 1)
+#define	EVENT_ERROR		(unsigned) (1 << 2)
 
 	event_proc   *r_proc;
 	event_proc   *w_proc;
@@ -122,6 +122,7 @@ const char *event_name(EVENT *ev);
 int  event_handle(EVENT *ev);
 int  event_size(EVENT *ev);
 void event_free(EVENT *ev);
+void event_close(EVENT *ev, FILE_EVENT *fe);
 
 void event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
 void event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc);

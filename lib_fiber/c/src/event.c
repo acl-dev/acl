@@ -69,15 +69,21 @@ void event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	if (fe->fd >= ev->setsize) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
 		errno = ERANGE;
-	} else if (fe->oper & EVENT_DEL_READ) {
+		return;
+	}
+
+	if (fe->oper & EVENT_DEL_READ) {
 		fe->oper &= ~EVENT_DEL_READ;
-	} else if (fe->oper == 0) {
-		ring_prepend(&ev->events, &fe->me);
 	}
 
 	if (!(fe->mask & EVENT_READ)) {
+		if (fe->oper == 0) {
+			ring_prepend(&ev->events, &fe->me);
+		}
+
 		fe->oper |= EVENT_ADD_READ;
 	}
+
 	fe->r_proc = proc;
 }
 
@@ -88,14 +94,21 @@ void event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	if (fe->fd >= ev->setsize) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
 		errno = ERANGE;
-	} else if (fe->oper & EVENT_DEL_WRITE) {
-		fe->oper &= ~EVENT_DEL_WRITE;
-	} else if (fe->oper == 0) {
-		ring_prepend(&ev->events, &fe->me);
+		return;
 	}
 
-	if (!(fe->mask & EVENT_WRITE))
+	if (fe->oper & EVENT_DEL_WRITE) {
+		fe->oper &= ~EVENT_DEL_WRITE;
+	}
+
+	if (!(fe->mask & EVENT_WRITE)) {
+		if (fe->oper == 0) {
+			ring_prepend(&ev->events, &fe->me);
+		}
+
 		fe->oper |= EVENT_ADD_WRITE;
+	}
+
 	fe->w_proc = proc;
 }
 
@@ -105,13 +118,16 @@ void event_del_read(EVENT *ev, FILE_EVENT *fe)
 
 	if (fe->oper & EVENT_ADD_READ) {
 		fe->oper &=~EVENT_ADD_READ;
-	} else if (fe->oper == 0) {
-		ring_prepend(&ev->events, &fe->me);
 	}
 
 	if (fe->mask & EVENT_READ) {
+		if (fe->oper == 0) {
+			ring_prepend(&ev->events, &fe->me);
+		}
+
 		fe->oper |= EVENT_DEL_READ;
 	}
+
 	fe->r_proc  = NULL;
 }
 
@@ -121,13 +137,36 @@ void event_del_write(EVENT *ev, FILE_EVENT *fe)
 
 	if (fe->oper & EVENT_ADD_WRITE) {
 		fe->oper &= ~EVENT_ADD_WRITE;
-	} else if (fe->oper == 0) {
-		ring_prepend(&ev->events, &fe->me);
 	}
 
-	if (fe->mask & EVENT_WRITE)
+	if (fe->mask & EVENT_WRITE) {
+		if (fe->oper == 0) {
+			ring_prepend(&ev->events, &fe->me);
+		}
+
 		fe->oper |= EVENT_DEL_WRITE;
+	}
+
 	fe->w_proc = NULL;
+}
+
+void event_close(EVENT *ev, FILE_EVENT *fe)
+{
+	if (fe->mask & EVENT_READ) {
+		ev->del_read(ev, fe);
+	}
+
+	if (fe->mask & EVENT_WRITE) {
+		ev->del_write(ev, fe);
+	}
+
+	/* when one fiber add read/write and del read/write by another fiber
+	 * in one loop, the fe->mask maybe be 0 and the fiber's fe maybe been
+	 * added into events task list
+	 */
+	if (fe->me.parent != &fe->me) {
+		ring_detach(&fe->me);
+	}
 }
 
 static void event_prepare(EVENT *ev)
@@ -164,9 +203,11 @@ static inline void event_process_poll(EVENT *ev)
 	while (1) {
 		POLL_EVENT *pe;
 		RING *head = ring_pop_head(&ev->poll_list);
+
 		if (head == NULL) {
 			break;
 		}
+
 		pe = TO_APPL(head, POLL_EVENT, me);
 		pe->proc(ev, pe);
 	}

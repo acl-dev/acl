@@ -101,12 +101,9 @@ void fiber_wait_write(FILE_EVENT *fe);
 void fiber_io_dec(void);
 void fiber_io_inc(void);
 EVENT *fiber_io_event(void);
-FILE_EVENT *fiber_io_get(int fd);
-int fiber_io_set(FILE_EVENT *fe);
-int fiber_io_del(FILE_EVENT *fe);
-int fiber_io_close(int fd);
 
-FILE_EVENT *fiber_file_event(int fd);
+FILE_EVENT *fiber_file_open(int fd);
+int fiber_file_close(int fd);
 
 /* in epoll.c */
 int  epoll_event_close(int epfd);

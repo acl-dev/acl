@@ -140,7 +140,7 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 		return -1;
 	}
 
-	fe = fiber_file_event(sockfd);
+	fe = fiber_file_open(sockfd);
 	fiber_wait_read(fe);
 
 	if (acl_fiber_killed(fe->fiber)) {
@@ -241,7 +241,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 		return -1;
 	}
 
-	fe = fiber_file_event(sockfd);
+	fe = fiber_file_open(sockfd);
 	fiber_wait_write(fe);
 
 	if (acl_fiber_killed(fe->fiber)) {

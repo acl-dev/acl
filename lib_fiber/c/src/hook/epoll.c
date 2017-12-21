@@ -304,7 +304,7 @@ static void epoll_ctl_add(EVENT *ev, EPOLL_EVENT *ee,
 	ee->fds[fd]->mask    = EVENT_NONE;
 	ee->fds[fd]->rmask   = EVENT_NONE;
 	ee->fds[fd]->ee      = ee;
-	ee->fds[fd]->fe      = fiber_file_event(fd);
+	ee->fds[fd]->fe      = fiber_file_open(fd);
 	ee->fds[fd]->fe->epx = ee->fds[fd];
 
 	memcpy(&ee->fds[fd]->data, &event->data, sizeof(event->data));

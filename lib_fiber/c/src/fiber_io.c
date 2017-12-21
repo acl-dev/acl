@@ -360,7 +360,9 @@ void fiber_wait_write(FILE_EVENT *fe)
 	acl_fiber_switch();
 }
 
-FILE_EVENT *fiber_io_get(int fd)
+/****************************************************************************/
+
+static FILE_EVENT *fiber_file_get(int fd)
 {
 	fiber_io_check();
 	if (fd < 0 || fd >= var_maxfd) {
@@ -372,28 +374,34 @@ FILE_EVENT *fiber_io_get(int fd)
 	return __thread_fiber->events[fd];
 }
 
-int fiber_io_set(FILE_EVENT *fe)
+static void fiber_file_set(FILE_EVENT *fe)
 {
-	fiber_io_check();
 	if (fe->fd < 0 || fe->fd >= var_maxfd) {
-		msg_error("%s(%d): invalid fd=%d",
+		msg_fatal("%s(%d): invalid fd=%d",
 			__FUNCTION__, __LINE__, fe->fd);
-		return -1;
 	}
 
 	if (__thread_fiber->events[fe->fd] != NULL) {
-		msg_error("%s(%d): exist fd=%d",
+		msg_fatal("%s(%d): exist fd=%d",
 			__FUNCTION__, __LINE__, fe->fd);
-		return -1;
 	}
 
 	__thread_fiber->events[fe->fd] = fe;
-	return 0;
 }
 
-int fiber_io_del(FILE_EVENT *fe)
+FILE_EVENT *fiber_file_open(int fd)
 {
-	fiber_io_check();
+	FILE_EVENT *fe = fiber_file_get(fd);
+
+	if (fe == NULL) {
+		fe = file_event_alloc(fd);
+		fiber_file_set(fe);
+	}
+	return fe;
+}
+
+static int fiber_file_del(FILE_EVENT *fe)
+{
 	if (fe->fd < 0 || fe->fd >= var_maxfd) {
 		msg_error("%s(%d): invalid fd=%d",
 			__FUNCTION__, __LINE__, fe->fd);
@@ -411,18 +419,7 @@ int fiber_io_del(FILE_EVENT *fe)
 	return 0;
 }
 
-FILE_EVENT *fiber_file_event(int fd)
-{
-	FILE_EVENT *fe = fiber_io_get(fd);
-
-	if (fe == NULL) {
-		fe = file_event_alloc(fd);
-		fiber_io_set(fe);
-	}
-	return fe;
-}
-
-int fiber_io_close(int fd)
+int fiber_file_close(int fd)
 {
 	FILE_EVENT *fe;
 
@@ -432,14 +429,14 @@ int fiber_io_close(int fd)
 		return -1;
 	}
 
-	fe = fiber_io_get(fd);
+	fe = fiber_file_get(fd);
 	if (fe == NULL) {
 		return 0;
 	}
 
-	fiber_io_del(fe);
-	if (fe->mask)
-		ring_detach(&fe->me);
+	event_close(__thread_fiber->event, fe);
+	fiber_file_del(fe);
 	file_event_free(fe);
+
 	return 1;
 }
