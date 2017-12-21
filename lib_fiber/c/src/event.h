@@ -18,6 +18,7 @@ typedef struct EPOLL_CTX    EPOLL_CTX;
 typedef struct EPOLL_EVENT  EPOLL_EVENT;
 typedef struct EVENT        EVENT;
 
+typedef int  event_oper(EVENT *ev, FILE_EVENT *fe);
 typedef void event_proc(EVENT *ev, FILE_EVENT *fe);
 typedef void poll_proc(EVENT *ev, POLL_EVENT *pe);
 typedef void epoll_proc(EVENT *ev, EPOLL_EVENT *ee);
@@ -105,10 +106,10 @@ struct EVENT {
 
 	int  (*event_loop)(EVENT *, int);
 
-	event_proc *add_read;
-	event_proc *add_write;
-	event_proc *del_read;
-	event_proc *del_write;
+	event_oper *add_read;
+	event_oper *add_write;
+	event_oper *del_read;
+	event_oper *del_write;
 };
 
 /* file_event.c */
@@ -124,8 +125,8 @@ int  event_size(EVENT *ev);
 void event_free(EVENT *ev);
 void event_close(EVENT *ev, FILE_EVENT *fe);
 
-void event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
-void event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
+int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
+int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
 void event_del_read(EVENT *ev, FILE_EVENT *fe);
 void event_del_write(EVENT *ev, FILE_EVENT *fe);
 int  event_process(EVENT *ev, int left);

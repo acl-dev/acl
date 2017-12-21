@@ -39,7 +39,7 @@ void event_free(EVENT *ev)
 	ev->free(ev);
 }
 
-/*
+#if 0
 static int check_fdtype(int fd)
 {
 	struct stat s;
@@ -50,26 +50,72 @@ static int check_fdtype(int fd)
 		return -1;
 	}
 
-	if (S_ISSOCK(s.st_mode) || S_ISFIFO(s.st_mode)) {
+	if (S_ISSOCK(s.st_mode)) {
+		return 0;
+	}
+	if (S_ISFIFO(s.st_mode)) {
 		return 0;
 	}
 
-	if (S_ISCHR(s.st_mode) && isatty(fd)) {
+	if (S_ISCHR(s.st_mode)) {
+		return 0;
+	}
+	if (isatty(fd)) {
 		return 0;
 	}
 
 	return -1;
 }
-*/
+#else
+static int check_read_wait(EVENT *ev, FILE_EVENT *fe)
+{
+	if (ev->add_read(ev, fe) == -1) {
+		fe->type = TYPE_NOSOCK;
+		return -1;
+	}
 
-void event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
+	if (ev->del_read(ev, fe) == -1) {
+		fe->type = TYPE_NOSOCK;
+		msg_error("%s(%d): del_read failed, fd=%d",
+			__FUNCTION__, __LINE__, fe->fd);
+		return -1;
+	}
+
+	fe->type = TYPE_SOCK;
+	return 0;
+}
+
+static int check_write_wait(EVENT *ev, FILE_EVENT *fe)
+{
+	if (ev->add_write(ev, fe) == -1) {
+		fe->type = TYPE_NOSOCK;
+		return -1;
+	}
+
+	if (ev->del_write(ev, fe) == -1) {
+		fe->type = TYPE_NOSOCK;
+		msg_error("%s(%d): del_write failed, fd=%d",
+			__FUNCTION__, __LINE__, fe->fd);
+		return -1;
+	}
+
+	fe->type = TYPE_SOCK;
+	return 0;
+}
+#endif
+
+int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
 	assert(fe);
+
+	if (UNLIKELY (fe->type == TYPE_NOSOCK)) {
+		return 0;
+	}
 
 	if (UNLIKELY (fe->fd >= ev->setsize)) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
 		errno = ERANGE;
-		return;
+		return 0;
 	}
 
 	if (fe->oper & EVENT_DEL_READ) {
@@ -77,6 +123,9 @@ void event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	if (!(fe->mask & EVENT_READ)) {
+		if (fe->type == TYPE_NONE && check_read_wait(ev, fe) == -1) {
+			return 0;
+		}
 		if (fe->oper == 0) {
 			ring_prepend(&ev->events, &fe->me);
 		}
@@ -85,16 +134,17 @@ void event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	fe->r_proc = proc;
+	return 1;
 }
 
-void event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
+int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
 	assert(fe);
 
 	if (UNLIKELY (fe->fd >= ev->setsize)) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
 		errno = ERANGE;
-		return;
+		return 0;
 	}
 
 	if (fe->oper & EVENT_DEL_WRITE) {
@@ -102,6 +152,9 @@ void event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	if (!(fe->mask & EVENT_WRITE)) {
+		if (fe->type == TYPE_NONE && check_write_wait(ev, fe) == -1) {
+			return 0;
+		}
 		if (fe->oper == 0) {
 			ring_prepend(&ev->events, &fe->me);
 		}
@@ -110,6 +163,7 @@ void event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	fe->w_proc = proc;
+	return 1;
 }
 
 void event_del_read(EVENT *ev, FILE_EVENT *fe)

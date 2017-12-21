@@ -147,7 +147,7 @@ private:
 static int __fibers_count = 2;
 static int __fibers_max   = 2;
 static int __oper_count = 100;
-static struct timeval __begin, __end;
+static struct timeval __tm_begin, __tm_end;
 
 class fiber_redis : public acl::fiber
 {
@@ -177,8 +177,8 @@ protected:
 		__total += oper.nset() + oper.nget() + oper.ndel();
 
 		if (--__fibers_count == 0) {
-			gettimeofday(&__end, NULL);
-			double spent = stamp_sub(&__end, &__begin);
+			gettimeofday(&__tm_end, NULL);
+			double spent = stamp_sub(&__tm_end, &__tm_begin);
 			printf("-------- All fibers over now --------\r\n");
 			printf("fibers: %d, count: %lld, spent: %.2f, speed: %.2f\r\n",
 				__fibers_max, __total, spent,
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
 
 	std::vector<fiber_redis*> fibers;
 
-	gettimeofday(&__begin, NULL);
+	gettimeofday(&__tm_begin, NULL);
 
 	for (i = 0; i < __fibers_count; i++)
 	{

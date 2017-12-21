@@ -338,7 +338,9 @@ void fiber_wait_read(FILE_EVENT *fe)
 	fiber_io_check();
 
 	fe->fiber = acl_fiber_running();
-	event_add_read(__thread_fiber->event, fe, read_callback);
+	// when return 0 just let it go continue
+	if (!event_add_read(__thread_fiber->event, fe, read_callback))
+		return;
 	__thread_fiber->io_count++;
 	acl_fiber_switch();
 }
@@ -355,7 +357,8 @@ void fiber_wait_write(FILE_EVENT *fe)
 	fiber_io_check();
 
 	fe->fiber = acl_fiber_running();
-	event_add_write(__thread_fiber->event, fe, write_callback);
+	if (!event_add_write(__thread_fiber->event, fe, write_callback))
+		return;
 	__thread_fiber->io_count++;
 	acl_fiber_switch();
 }

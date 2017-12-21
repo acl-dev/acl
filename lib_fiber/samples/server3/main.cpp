@@ -33,6 +33,19 @@ private:
 	~fiber_client(void) {}
 };
 
+static void test_file(void)
+{
+	const char* path = "./Makefile";
+	acl::string buf;
+	acl::ifstream in;
+	if (in.open_read(path) == false)
+		printf("open file %s error %s\r\n", path, acl::last_serror());
+	else if (in.gets(buf) == false)
+		printf("gets from %s error %s", path, acl::last_serror());
+	else
+		printf("gets ok: %s\r\n", buf.c_str());
+}
+
 class fiber_server : public acl::fiber
 {
 public:
@@ -43,6 +56,8 @@ protected:
 	// @override
 	void run(void)
 	{
+		test_file();
+
 		while (true)
 		{
 			acl::socket_stream* conn = ss_.accept();

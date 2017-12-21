@@ -82,15 +82,16 @@ static int epoll_event_add_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 		op = EPOLL_CTL_ADD;
 	}
 
-	if (__sys_epoll_ctl(ep->epfd, op, fe->fd, &ee) == -1) {
-		msg_error("%s(%d): epoll_ctl error %s, epfd=%d, fd=%d",
-			__FUNCTION__, __LINE__, last_serror(),
-			ep->epfd, fe->fd);
-		return -1;
+	if (__sys_epoll_ctl(ep->epfd, op, fe->fd, &ee) == 0) {
+		fe->mask |= EVENT_READ;
+		return 0;
 	}
 
-	fe->mask |= EVENT_READ;
-	return 0;
+	if (errno != EPERM) {
+		msg_error("%s(%d): epoll_ctl error %s, epfd=%d, fd=%d\n",
+			__FUNCTION__, __LINE__, last_serror(), ep->epfd, fe->fd);
+	}
+	return -1;
 }
 
 static int epoll_event_add_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
@@ -104,6 +105,7 @@ static int epoll_event_add_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	ee.data.ptr = fe;
 
 	ee.events |= EPOLLOUT;
+
 	if (fe->mask & EVENT_READ) {
 		ee.events |= EPOLLIN;
 		op = EPOLL_CTL_MOD;
@@ -111,15 +113,16 @@ static int epoll_event_add_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 		op = EPOLL_CTL_ADD;
 	}
 
-	if (__sys_epoll_ctl(ep->epfd, op, fe->fd, &ee) == -1) {
-		msg_error("%s(%d): epoll_ctl error %s, epfd=%d, fd=%d",
-			__FUNCTION__, __LINE__, last_serror(),
-			ep->epfd, fe->fd);
-		return -1;
+	if (__sys_epoll_ctl(ep->epfd, op, fe->fd, &ee) == 0) {
+		fe->mask |= EVENT_WRITE;
+		return 0;
 	}
 
-	fe->mask |= EVENT_WRITE;
-	return 0;
+	if (errno != EPERM) {
+		msg_error("%s(%d): epoll_ctl error %s, epfd=%d, fd=%d",
+			__FUNCTION__, __LINE__, last_serror(), ep->epfd, fe->fd);
+	}
+	return -1;
 }
 
 static int epoll_event_del_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
@@ -139,18 +142,16 @@ static int epoll_event_del_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 		op = EPOLL_CTL_DEL;
 	}
 
-	if (__sys_epoll_ctl(ep->epfd, op, fe->fd, &ee) < 0) {
-		if (errno == EEXIST)
-			return 0;
-
-		msg_error("%s(%d), epoll_ctl error: %s, epfd=%d, fd=%d",
-			__FUNCTION__, __LINE__, last_serror(),
-			ep->epfd, fe->fd);
-		return -1;
+	if (__sys_epoll_ctl(ep->epfd, op, fe->fd, &ee) == 0) {
+		fe->mask &= ~EVENT_READ;
+		return 0;
 	}
 
-	fe->mask &= ~EVENT_READ;
-	return 0;
+	if (errno != EEXIST) {
+		msg_error("%s(%d), epoll_ctl error: %s, epfd=%d, fd=%d",
+			__FUNCTION__, __LINE__, last_serror(), ep->epfd, fe->fd);
+	}
+	return -1;
 }
 
 static int epoll_event_del_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
@@ -170,18 +171,16 @@ static int epoll_event_del_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 		op = EPOLL_CTL_DEL;
 	}
 
-	if (__sys_epoll_ctl(ep->epfd, op, fe->fd, &ee) < 0) {
-		if (errno == EEXIST)
-			return 0;
-
-		msg_error("%s(%d), epoll_ctl error: %s, efd=%d, fd=%d",
-			__FUNCTION__, __LINE__, last_serror(),
-			ep->epfd, fe->fd);
-		return -1;
+	if (__sys_epoll_ctl(ep->epfd, op, fe->fd, &ee) == 0) {
+		fe->mask &= ~EVENT_WRITE;
+		return 0;
 	}
 
-	fe->mask &= ~EVENT_WRITE;
-	return 0;
+	if (errno != EEXIST) {
+		msg_error("%s(%d), epoll_ctl error: %s, efd=%d, fd=%d",
+			__FUNCTION__, __LINE__, last_serror(), ep->epfd, fe->fd);
+	}
+	return -1;
 }
 
 static int epoll_event_loop(EVENT *ev, int timeout)
@@ -253,10 +252,10 @@ EVENT *event_epoll_create(int size)
 	ep->event.free   = epoll_event_free;
 
 	ep->event.event_loop = epoll_event_loop;
-	ep->event.add_read   = (event_proc *) epoll_event_add_read;
-	ep->event.add_write  = (event_proc *) epoll_event_add_write;
-	ep->event.del_read   = (event_proc *) epoll_event_del_read;
-	ep->event.del_write  = (event_proc *) epoll_event_del_write;
+	ep->event.add_read   = (event_oper *) epoll_event_add_read;
+	ep->event.add_write  = (event_oper *) epoll_event_add_write;
+	ep->event.del_read   = (event_oper *) epoll_event_del_read;
+	ep->event.del_write  = (event_oper *) epoll_event_del_write;
 
 	return (EVENT*) ep;
 }
