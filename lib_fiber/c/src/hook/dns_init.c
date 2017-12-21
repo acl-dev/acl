@@ -11,6 +11,24 @@ void dns_set_read_wait(int timeout)
 	set_read_timeout(timeout);
 }
 
+static void dns_on_exit(void)
+{
+	if (var_dns_conf) {
+		dns_resconf_close(var_dns_conf);
+		var_dns_conf = NULL;
+	}
+
+	if (var_dns_hosts) {
+		dns_hosts_close(var_dns_hosts);
+		var_dns_hosts = NULL;
+	}
+
+	if (var_dns_hints) {
+		dns_hints_close(var_dns_hints);
+		var_dns_hints = NULL;
+	}
+}
+
 void dns_init(void)
 {
 	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
@@ -35,6 +53,8 @@ void dns_init(void)
 
 	var_dns_hints = dns_hints_local(var_dns_conf, &err);
 	assert(var_dns_hints && err == 0);
+
+	atexit(dns_on_exit);
 
 	(void) pthread_mutex_unlock(&__lock);
 }

@@ -54,14 +54,10 @@ endif()
 ##############################################################################
 
 set(src ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(acl_path ${CMAKE_CURRENT_SOURCE_DIR}/../../lib_acl)
-set(acl_include ${acl_path}/include)
 
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/src
 	${CMAKE_CURRENT_SOURCE_DIR}/include
-	${acl_include}
-	${acl_path}/src/master
 )
 
 set(sources
@@ -83,15 +79,13 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "ANDROID")
 	add_library(fiber_static STATIC ${lib_src})
 	SET_TARGET_PROPERTIES(fiber_static PROPERTIES OUTPUT_NAME "fiber")
 
-	set(CMAKE_SHARED_LINKER_FLAGS
-		-Wl,-rpath,. -L${lib_output_path} -lacl)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 	link_directories(${lib_output_path})
 endif()
 
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 	add_library(fiber SHARED ${lib_src})
-	target_link_libraries(fiber acl)
+#	target_link_libraries(fiber acl)
 endif()
 
 ##############################################################################
