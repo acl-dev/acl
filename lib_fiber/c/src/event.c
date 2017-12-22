@@ -108,11 +108,11 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
 	assert(fe);
 
-	if (UNLIKELY (fe->type == TYPE_NOSOCK)) {
+	if (fe->type == TYPE_NOSOCK) {
 		return 0;
 	}
 
-	if (UNLIKELY (fe->fd >= ev->setsize)) {
+	if (fe->fd >= ev->setsize) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
 		errno = ERANGE;
 		return 0;
@@ -126,7 +126,8 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		if (fe->type == TYPE_NONE && check_read_wait(ev, fe) == -1) {
 			return 0;
 		}
-		if (fe->oper == 0) {
+
+		if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 		}
 
@@ -141,7 +142,7 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
 	assert(fe);
 
-	if (UNLIKELY (fe->fd >= ev->setsize)) {
+	if (fe->fd >= ev->setsize) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
 		errno = ERANGE;
 		return 0;
@@ -155,7 +156,8 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		if (fe->type == TYPE_NONE && check_write_wait(ev, fe) == -1) {
 			return 0;
 		}
-		if (fe->oper == 0) {
+
+		if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 		}
 
@@ -175,7 +177,7 @@ void event_del_read(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	if (fe->mask & EVENT_READ) {
-		if (fe->oper == 0) {
+		if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 		}
 
@@ -194,7 +196,7 @@ void event_del_write(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	if (fe->mask & EVENT_WRITE) {
-		if (fe->oper == 0) {
+		if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 		}
 
@@ -226,11 +228,10 @@ void event_close(EVENT *ev, FILE_EVENT *fe)
 static void event_prepare(EVENT *ev)
 {
 	FILE_EVENT *fe;
-	RING_ITER iter;
+	RING *next;
 
-	ring_foreach(iter, &ev->events) {
-		fe = ring_to_appl(iter.ptr, FILE_EVENT, me);
-
+	while ((next = ring_first(&ev->events))) {
+		fe = ring_to_appl(next, FILE_EVENT, me);
 		if (fe->oper & EVENT_ADD_READ) {
 			ev->add_read(ev, fe);
 		}
@@ -244,6 +245,7 @@ static void event_prepare(EVENT *ev)
 			ev->del_write(ev, fe);
 		}
 
+		ring_detach(next);
 		fe->oper = 0;
 	}
 
