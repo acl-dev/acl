@@ -2,6 +2,8 @@
 14) 2017.12.22
 14.1) bugfix: master_conf.cpp 中 master_add_service 在调用 acl_master_ent_find
 时，应该使用 entry->conf (配置文件路径) 而不是 entry->path 程序路径
+14.2) bugfix: master_api.cpp 远程调用 restart 命令时，没有重新读取配置文件，
+所以造成无法启动服务程序改名后的服务
 
 13) 2017.11.21
 13.1) feature: add master_config command for getting the configure of master

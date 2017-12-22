@@ -75,7 +75,7 @@ static int check_command(ACL_MASTER_SERV *entry, const char *ext)
 ACL_MASTER_SERV *acl_master_start(const char *path, int *nchilden,
 	int *nsignaled, STATUS_CALLBACK callback, void *ctx, const char *ext)
 {
-	ACL_MASTER_SERV *entry = acl_master_ent_find(path);
+	ACL_MASTER_SERV *entry = acl_master_lookup(path);
 
 	if (entry != NULL) {
 		acl_msg_error("%s(%d), %s: same service %s running",
@@ -125,13 +125,20 @@ ACL_MASTER_SERV *acl_master_restart(const char *path, int *nchilden,
 		return acl_master_start(path, nchilden, nsignaled,
 				callback, ctx, ext);
 
-	if (check_command(serv, ext) < 0) {
+	ACL_MASTER_SERV *entry = acl_master_ent_load(path);
+	if (entry == NULL) {
+		acl_msg_error("%s(%d), %s: service load %s error %s", __FILE__,
+			__LINE__, __FUNCTION__, path, acl_last_serror());
+		return NULL;
+	}
+
+	if (check_command(entry, ext) < 0) {
 		acl_msg_error("%s(%d), %s: can't restart service %s, %s",
 			__FILE__, __LINE__, __FUNCTION__, serv->path, path);
 		return NULL;
 	}
 
-	acl_master_service_restart(serv);
+	acl_master_refresh_service(entry);
 	return serv;
 }
 

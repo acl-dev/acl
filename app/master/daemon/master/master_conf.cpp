@@ -45,7 +45,7 @@ void acl_master_refresh(void)
 
 #define SWAP(type,a,b)	{ type temp = a; a = b; b = temp; }
 
-static int master_add_service(ACL_MASTER_SERV *entry)
+int acl_master_refresh_service(ACL_MASTER_SERV *entry)
 {
 	ACL_MASTER_SERV *serv = acl_master_ent_find(entry->conf);
 
@@ -81,6 +81,7 @@ static int master_add_service(ACL_MASTER_SERV *entry)
 	SWAP(char *, serv->notify_addr, entry->notify_addr);
 	SWAP(char *, serv->notify_recipients, entry->notify_recipients);
 	SWAP(ACL_ARGV *, serv->args, entry->args);
+
 	acl_master_service_restart(serv);
 	acl_master_ent_free(entry);
 
@@ -125,7 +126,7 @@ static void master_scan_services(void)
 		if (acl_msg_verbose)
 			acl_master_ent_print(entry);
 
-		if (master_add_service(entry) < 0) {
+		if (acl_master_refresh_service(entry) < 0) {
 			acl_msg_error("%s(%d), %s: start %s error",
 				__FILE__, __LINE__, __FUNCTION__, entry->path);
 			acl_master_ent_free(entry);
@@ -167,7 +168,7 @@ static void master_load_services(void)
 		tokens = acl_argv_split(ptr, "|");
 		filepath = tokens->argv[0];
 		entry = acl_master_ent_load(filepath);
-		if (entry != NULL && master_add_service(entry) < 0) {
+		if (entry != NULL && acl_master_refresh_service(entry) < 0) {
 			acl_msg_error("%s(%d), %s: start %s error",
 				__FILE__, __LINE__, __FUNCTION__, filepath);
 			acl_master_ent_free(entry);
