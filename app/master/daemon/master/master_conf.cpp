@@ -47,7 +47,7 @@ void acl_master_refresh(void)
 
 static int master_add_service(ACL_MASTER_SERV *entry)
 {
-	ACL_MASTER_SERV *serv = acl_master_ent_find(entry->path);
+	ACL_MASTER_SERV *serv = acl_master_ent_find(entry->conf);
 
 	/*
 	 * Add a new service entry. We do not really care in what
