@@ -11,7 +11,6 @@ CFLAGS = -c -g -W \
 -std=gnu99 \
 -fPIC \
 -Wall \
--Werror \
 -Waggregate-return \
 -Wpointer-arith \
 -Wshadow \
