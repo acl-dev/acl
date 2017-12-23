@@ -133,8 +133,9 @@ static void fiber_event(ACL_FIBER *fiber acl_unused, void *ctx)
 	printf(">>>enable read fd: %d\r\n", ACL_VSTREAM_SOCK(sstream));
 	acl_event_enable_listen(event, sstream, 0, listen_callback, NULL);
 
-	while (!__stop)
+	while (!__stop) {
 		acl_event_loop(event);
+	}
 
 	acl_vstream_close(sstream);
 	acl_event_free(event);

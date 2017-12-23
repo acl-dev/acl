@@ -458,8 +458,5 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 		}
 	}
 
-	ee->events    = NULL;
-	ee->maxevents = 0;
-	ee->nready    = 0;
 	return ee->nready;
 }
