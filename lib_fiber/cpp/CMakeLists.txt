@@ -55,6 +55,7 @@ endif()
 set(src ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(acl_path ${CMAKE_CURRENT_SOURCE_DIR}/../../lib_acl)
 set(acl_include ${acl_path}/include)
+set(master_include ${acl_path}/src/master)
 set(acl_cpp_path ${CMAKE_CURRENT_SOURCE_DIR}/../../lib_acl_cpp)
 set(acl_cpp_include ${acl_cpp_path}/include)
 set(fiber_path ${CMAKE_CURRENT_SOURCE_DIR}/../c)
@@ -64,6 +65,7 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/src
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	${acl_include}
+	${master_include}
 	${acl_cpp_include}
 	${fiber_include}
 )
