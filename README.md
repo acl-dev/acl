@@ -64,6 +64,9 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 5. lib_dict: 该库主要实现了 KEY-VALUE 的字典式存储库，该库另外还依赖于 BDB, CDB 以及 tokyocabinet 库。
 6. lib_tls: 该库封装了 openssl 库，使 lib_acl 的通信模式可以支持 ssl。
 
+* 整体架构图
+    ![整体架构图](res/img/architecture.png)
+
 ### 1.2、功能模块组成
 #### 1.2.1、网络通信库
 ##### 1.2.1.1、流处理模块
