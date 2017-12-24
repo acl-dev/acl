@@ -551,6 +551,55 @@ ssize_t fiber_sendmsg(int sockfd, const struct msghdr* msg, int flags);
 
 /****************************************************************************/
 
+/**
+ * 在将写日志至日志文件前回调用户自定义的函数，且将日志信息传递给该函数，
+ * 只有当用户通过 msg_pre_write 进行设置后才生效
+ * @param ctx {void*} 用户的自定义参数
+ * @param fmt {const char*} 格式参数
+ * @param ap {va_list} 格式参数列表
+ */
+typedef void (*MSG_PRE_WRITE_FN)(void *ctx, const char *fmt, va_list ap);
+
+/**
+ * 应用通过此函数类型可以自定义日志记录函数，当应用在打开日志前调用
+ * msg_register 注册了自定义记录函数，则当应用写日志时便用此自定义
+ * 函数记录日志，否则用缺省的日志记录函数
+ * @param ctx {void*} 应用传递进去的参数
+ * @param fmt {const char*} 格式参数
+ * @param ap {va_list} 参数列表
+ */
+typedef void (*MSG_WRITE_FN) (void *ctx, const char *fmt, va_list ap);
+
+/**
+ * 在打开日志前调用此函数注册应用自己的日志记录函数
+ * @param write_fn {MSG_WRITE_FN} 自定义日志记录函数
+ * @param ctx {void*} 自定义参数
+ */
+void msg_register(MSG_WRITE_FN write_fn, void *ctx);
+
+/**
+ * 将 msg_register 注册自定义函数清除，采用缺省的日志函数集
+ */
+void msg_unregister(void);
+
+/**
+ * 在打开日志前调用此函数注册应用的私有函数，在记录日志前会先记录信息通过
+ * 此注册的函数传递给应用
+ * @param pre_write {MSG_PRE_WRITE_FN} 日志记录前调用的函数
+ * @param ctx {void*} 自定义参数
+ */
+void msg_pre_write(MSG_PRE_WRITE_FN pre_write, void *ctx);
+
+/**
+ * 当未调用 msg_open 方式打开日志时，调用了 msg_info/error/fatal/warn
+ * 的操作，是否允许信息输出至标准输出屏幕上，通过此函数来设置该开关，该开关
+ * 仅影响是否需要将信息输出至终端屏幕而不影响是否输出至文件中
+ * @param onoff {int} 非 0 表示允许输出至屏幕
+ */
+void msg_stdout_enable(int onoff);
+
+/****************************************************************************/
+
 #ifdef __cplusplus
 }
 #endif
