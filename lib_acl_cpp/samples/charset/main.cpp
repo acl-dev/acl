@@ -235,8 +235,8 @@ static void test_unicode(void)
 {
 	acl::charset_conv conv;
 	acl::string in, out;
-	char  i8;
-	short i16;
+	unsigned char  i8;
+	unsigned short i16;
 	int   i32, k = 0;
 	bool  ret;
 
