@@ -138,6 +138,8 @@ SHARED_OLD_LIBNAME = lib_fiber_cpp.so
 lib: static
 all: static shared sample
 
+$(shell mkdir -p $(OBJ_PATH_DST))
+
 COMPILE = $(CC) $(CFLAGS)
 COMPILE_OBJ = @(echo 'building $<'; $(COMPILE) $< -o $@)
 CREATE_DEF = @(echo 'creating $@'; rm -f $@; \
