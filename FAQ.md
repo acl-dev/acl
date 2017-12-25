@@ -75,18 +75,22 @@ lib_acl 库是 acl 库中的基础库，其它库均依赖于该库，库的依�
 - Solaris(x86) 平台：-DSUNOS5  
 
 ### 4、请给出 Linux 平台下最简单的一个 Makefile？
-下面是使用 acl 的三个库的最简单的编译选项（因为排版问题，当拷贝下面内容至 Makefile 时，需要注意将每行前空格手工转成 TAB 键）：
+下面是使用 acl 库的最简单的编译选项（因为排版问题，当拷贝下面内容至 Makefile 时，需要注意将每行前空格手工转成 TAB 键）：
 ~~~
 fiber: main.o
 	g++ -o fiber main.o \
+		-L./lib_fiber/lib -lfiber_cpp \
 		-L./lib_acl_cpp/lib -l_acl_cpp \
 		-L./lib_protocol/lib -l_protocol \
 		-L./lib_acl/lib -l_acl \
+		-L./lib_fiber/lib -lfiber \
 		-lz -lpthread -ldl
 main.o: main.cpp
 	g++ -O3 -Wall -c main.cpp -DLINUX2 \
 		-I./lib_acl/include \
-		-I./lib_acl_cpp/include
+		-I./lib_acl_cpp/include \
+		-I./lib_fiber/cpp/include \
+		-I./lib_fiber/c/include
 ~~~
 ### 5、Linux 平台下找不到 libz.a 库怎么办？
 一般 Unix/Linux 平台下系统会自带 libz.a 或 libz.so 压缩库，如果找不到该库，则可以在线安装或采用编译安装 zlib 库，针对 Centos 和 Ubuntu 可分别通过以下方式在线安装（均需切换至 root 身份）：

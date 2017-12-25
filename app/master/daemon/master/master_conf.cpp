@@ -54,10 +54,13 @@ int acl_master_refresh_service(ACL_MASTER_SERV *entry)
 	 * order the service entries are kept in memory.
 	 */
 	if (serv == 0) {
+		if (acl_master_service_start(entry) < 0)
+			return -1;
+
 		entry->next  = acl_var_master_head;
 		entry->start = (long) time(NULL);
 		acl_var_master_head = entry;
-		return acl_master_service_start(entry);
+		return 0;
 	}
 
 	/*
