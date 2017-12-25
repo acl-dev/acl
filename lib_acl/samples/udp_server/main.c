@@ -12,7 +12,7 @@ static void run(const char *addr, int can_quit, int need_echo, int inter)
 {
 	char  buf[4096];
 	int   ret, i = 0;
-	ACL_VSTREAM *stream = acl_vstream_bind(addr, 0);  /* 绑定 UDP 套接口 */
+	ACL_VSTREAM *stream = acl_vstream_bind(addr, 0, 0);  /* 绑定 UDP 套接口 */
 
 	if (stream == NULL) {
 		printf("acl_vstream_bind %s error %s\r\n",

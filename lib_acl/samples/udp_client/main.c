@@ -23,7 +23,7 @@ static void run(const char *local_addr, const char *peer_addr,
 	int   ret, i;
 	char  buf[4096], data[4096];
 	struct timeval begin, end;
-	ACL_VSTREAM *stream = acl_vstream_bind(local_addr, 2);  /* 绑定 UDP 套接口 */
+	ACL_VSTREAM *stream = acl_vstream_bind(local_addr, 2, 0);  /* 绑定 UDP 套接口 */
 
 	if (stream == NULL) {
 		printf("acl_vstream_bind %s error %s\r\n",
