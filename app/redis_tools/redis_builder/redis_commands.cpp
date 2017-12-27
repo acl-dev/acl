@@ -474,8 +474,7 @@ int redis_commands::get_keys(const char* addr, const char* pattern, int max)
 	}
 
 	acl::redis_client conn(addr, conn_timeout_, rw_timeout_);
-	if (!passwd_.empty())
-		conn.set_password(passwd_);
+	conn.set_password(passwd_);
 
 	std::vector<acl::string> res;
 	acl::redis_key redis(&conn);
@@ -559,8 +558,7 @@ int redis_commands::scan(const char* addr, const char* pattern,
 	size_t display_count)
 {
 	acl::redis_client conn(addr, conn_timeout_, rw_timeout_);
-	if (!passwd_.empty())
-		conn.set_password(passwd_);
+	conn.set_password(passwd_);
 	acl::redis redis(&conn);
 
 	size_t count = 10000;
@@ -1115,8 +1113,7 @@ void redis_commands::get_dbsize(const std::vector<acl::string>&)
 			}
 
 			acl::redis_client conn(addr, conn_timeout_, rw_timeout_);
-			if (!passwd_.empty())
-				conn.set_password(passwd_);
+			conn.set_password(passwd_);
 			acl::redis cmd(&conn);
 			int n = cmd.dbsize();
 			printf("----- ADDR: %s, DBSIZE: %d -----\r\n", addr, n);
@@ -1127,8 +1124,7 @@ void redis_commands::get_dbsize(const std::vector<acl::string>&)
 	else
 	{
 		acl::redis_client conn(addr_, conn_timeout_, rw_timeout_);
-		if (!passwd_.empty())
-			conn.set_password(passwd_);
+		conn.set_password(passwd_);
 		acl::redis cmd(&conn);
 		int n = cmd.dbsize();
 		printf("----- ADDR: %s, DBSIZE: %d -----\r\n", addr_.c_str(), n);

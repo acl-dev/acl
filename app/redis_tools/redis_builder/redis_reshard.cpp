@@ -139,6 +139,7 @@ void redis_reshard::run()
 bool redis_reshard::get_masters_info()
 {
 	acl::redis_client client(addr_, 30, 30);
+	client.set_password(passwd_);
 	acl::redis redis(&client);
 
 	const std::map<acl::string, acl::redis_node*>* masters;

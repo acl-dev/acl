@@ -20,6 +20,7 @@ redis_monitor::~redis_monitor(void)
 void redis_monitor::status(void)
 {
 	acl::redis_client client(addr_, conn_timeout_, rw_timeout_);
+	client.set_password(passwd_);
 	acl::redis redis(&client);
 
 	std::vector<acl::redis_node*> nodes;
@@ -44,6 +45,7 @@ void redis_monitor::status(void)
 
 		acl::redis_client* conn = new acl::redis_client(
 			addr, conn_timeout_, rw_timeout_);
+		conn->set_password(passwd_);
 		conns.push_back(conn);
 	}
 

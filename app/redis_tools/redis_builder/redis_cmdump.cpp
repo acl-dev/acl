@@ -35,13 +35,16 @@ private:
 class dump_thread : public acl::thread
 {
 public:
-	dump_thread(const acl::string& addr, acl::thread_queue& queue)
+	dump_thread(const acl::string& addr, const char* passwd,
+			acl::thread_queue& queue)
 		: stopped_(false)
 		, addr_(addr)
 		, queue_(queue)
 		, conn_timeout_(0)
 		, rw_timeout_(0)
 	{
+		if (passwd && *passwd)
+			passwd_ = passwd;
 	}
 
 	~dump_thread(void)
@@ -51,6 +54,7 @@ public:
 	void* run(void)
 	{
 		acl::redis_client client(addr_, conn_timeout_, rw_timeout_);
+		client.set_password(passwd_);
 		acl::redis redis(&client);
 		if (redis.monitor() == false)
 		{
@@ -87,6 +91,7 @@ public:
 private:
 	bool stopped_;
 	acl::string addr_;
+	acl::string passwd_;
 	acl::thread_queue& queue_;
 	int conn_timeout_;
 	int rw_timeout_;
@@ -112,6 +117,7 @@ redis_cmdump::~redis_cmdump(void)
 void redis_cmdump::get_nodes(std::vector<acl::string>& addrs)
 {
 	acl::redis_client client(addr_, conn_timeout_, rw_timeout_);
+	client.set_password(passwd_);
 	acl::redis redis(&client);
 
 	std::vector<acl::redis_node*> nodes;
@@ -171,7 +177,7 @@ void redis_cmdump::saveto(const char* filepath, bool dump_all)
 	for (std::vector<acl::string>::const_iterator cit = addrs.begin();
 		cit != addrs.end(); ++cit)
 	{
-		dump_thread* thread = new dump_thread((*cit), queue);
+		dump_thread* thread = new dump_thread((*cit), passwd_, queue);
 		threads.push_back(thread);
 		thread->set_detachable(false);
 		thread->start();
