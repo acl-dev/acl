@@ -122,18 +122,22 @@ http_header& http_header::set_request_mode(bool onoff)
 	return *this;
 }
 
-http_header& http_header::add_entry(const char* name, const char* value)
+http_header& http_header::add_entry(const char* name, const char* value,
+	bool replace /* = true */)
 {
 	if (name == NULL || *name == 0 || value == NULL || *value == 0)
 		return *this;
 
-	std::list<HTTP_HDR_ENTRY*>::iterator it = entries_.begin();
-	for (; it != entries_.end(); ++it)
+	if (replace)
 	{
-		if (strcasecmp((*it)->name, name) == 0)
+		std::list<HTTP_HDR_ENTRY*>::iterator it = entries_.begin();
+		for (; it != entries_.end(); ++it)
 		{
-			(*it)->value = dbuf_->dbuf_strdup(value);
-			return *this;
+			if (strcasecmp((*it)->name, name) == 0)
+			{
+				(*it)->value = dbuf_->dbuf_strdup(value);
+				return *this;
+			}
 		}
 	}
 

@@ -70,9 +70,11 @@ public:
 	 * 向 HTTP 头中添加字段
 	 * @param name {const char*} 字段名，非空指针
 	 * @param value {const char*} 字段值，非空指针
+	 * @param replace {bool} 如果存在重复项时是否自动覆盖旧数据
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
 	 */
-	http_header& add_entry(const char* name, const char* value);
+	http_header& add_entry(const char* name, const char* value,
+			bool replace = true);
 	
 	/**
 	 * 设置 HTTP 头中的 Content-Length 字段
