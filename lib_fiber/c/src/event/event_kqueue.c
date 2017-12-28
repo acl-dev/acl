@@ -161,9 +161,8 @@ static int kqueue_event_wait(EVENT *ev, int timeout)
 
 	n = __sys_kevent(ek->kqfd, ek->changes, ek->nchanges, ek->events,
 		ek->nevents, &ts);
-	if (n < 0)
-		exit (0);
 	ek->nchanges = 0;
+
 	if (n == -1) {
 		msg_error("%s(%d): kqueue error %s", __FUNCTION__, __LINE__,
 			last_serror());
