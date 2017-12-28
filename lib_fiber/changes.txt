@@ -1,4 +1,7 @@
 
+75) 2017.12.28
+75.1) feature: 增加 kqueue 事件引擎以支持 FreeBSD，从而使 acl 协程支持 FreeBSD
+
 74) 2017.12.19
 74.1) bugfix: 解决了 hook poll 时的一个关键性问题
 
