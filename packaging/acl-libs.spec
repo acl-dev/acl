@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        48
+Release:        49
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,10 @@ fi
 /etc/init.d/master
 
 %changelog
+* Thu Dec 28 2017 zhengshuxin@qiyi.com 3.3.0-49-20171228.17
+- fiber can support FreeBSD
+- add replace param in http_header::add_entry
+
 * Mon Dec 25 2017 zhengshuxin@qiyi.com 3.3.0-48-20171226.16
 - master: fixed one urgent bug in master which will make master crashed
 
