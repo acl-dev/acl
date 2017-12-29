@@ -2,12 +2,12 @@
 #define __STD_AFX_INCLUDE_H__
 
 
-#ifdef	LINUX
-# define	HAS_EPOLL
-#elif	defined(FREEBSD)
-# define	HAS_KQUEUE
+#if defined(__linux__)
+# define HAS_EPOLL
+#elif defined(__FreeBSD__)
+# define HAS_KQUEUE
 #else
-# error		"unknown OS"
+# error "unknown OS"
 #endif
 
 #if 1
@@ -32,17 +32,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#if	defined(LINUX)
-#include <sys/sendfile.h>
-#elif	defined(FREEBSD)
-#include <sys/uio.h>
-#endif
 #include <sys/stat.h>
 #include <sys/select.h>
 #include <poll.h>
-#ifdef	LINUX
-#include <sys/epoll.h>
-#endif
 #include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -54,6 +46,15 @@
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
+
+#if defined(__linux__)
+# include <sys/sendfile.h>
+# include <sys/epoll.h>
+#elif defined(__FreeBSD__)
+# include <sys/uio.h>
+#else
+# error "unknown OS"
+#endif
 
 #include "define.h"
 

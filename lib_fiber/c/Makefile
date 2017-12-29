@@ -70,32 +70,27 @@ endif
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
-	CFLAGS += -DFREEBSD
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-extended-offsetof
-	UNIXTYPE = MACOSX
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
-	CFLAGS  += -DLINUX
 endif
 
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	CFLAGS += -DLINUX2 -DMINGW
-	UNIXTYPE = LINUX
 endif
 
 # For MSYS
 ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
 	CFLAGS += -DLINUX2 -DMINGW
-	UNIXTYPE = LINUX
 endif
 
 # For SunOS
