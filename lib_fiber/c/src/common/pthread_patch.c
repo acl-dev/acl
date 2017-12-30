@@ -2,7 +2,7 @@
 #include "fifo.h"
 #include "msg.h"
 #include "iterator.h"
-#include "pthread.h"
+#include "pthread_patch.h"
 
 #ifdef SYS_WIN
 

@@ -129,8 +129,8 @@ CFLAGS += $(INC_COMPILE)
 SRC = $(wildcard $(SRC_PATH_SRC)/*.c) \
       $(wildcard $(SRC_PATH_SRC)/common/*.c) \
       $(wildcard $(SRC_PATH_SRC)/dns/*.c) \
-      $(wildcard $(SRC_PATH_SRC)/event/*.c) \
       $(wildcard $(SRC_PATH_SRC)/fiber/*.c) \
+      $(wildcard $(SRC_PATH_SRC)/event/*.c) \
       $(wildcard $(SRC_PATH_SRC)/hook/*.c)
 
 OBJ = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC)))
@@ -193,6 +193,8 @@ $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/%.c
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/common/%.c
 	$(COMPILE) $< -o $@
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/dns/%.c
+	$(COMPILE) $< -o $@
+$(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/fiber/%.c
 	$(COMPILE) $< -o $@
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/event/%.c
 	$(COMPILE) $< -o $@

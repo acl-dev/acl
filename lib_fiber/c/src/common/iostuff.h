@@ -47,7 +47,7 @@ int open_limit(int limit);
  */
 int issock(int fd);
 
-int read_wait(int fd, int timeout);
+//int read_wait(int fd, int timeout);
 void tcp_nodelay(int fd, int onoff);
 
 #ifdef SYS_UNIX

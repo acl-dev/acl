@@ -4,22 +4,22 @@
 
 #ifdef SYS_UNIX
 
-typedef struct ucontext_t { int dummy; } ucontext_t;
-
 typedef struct FIBER_UNIX {
 	ACL_FIBER fiber;
 #ifdef USE_VALGRIND
-	unsigned int   vid;
+	unsigned int vid;
 #endif
 
 #ifdef	USE_JMP
 # if defined(__x86_64__)
 	unsigned long long env[10];
 # else
-	sigjmp_buf     env;
+	sigjmp_buf env;
 # endif
 #endif
-	ucontext_t    *context;
+	ucontext_t *context;
+	size_t size;
+	char  *buff;
 } FIBER_UNIX;
 
 #if defined(__x86_64__)
@@ -109,7 +109,7 @@ typedef struct FIBER_UNIX {
 	siglongjmp(ctx, 1)
 #endif
 
-static void fiber_unix_swap(ACL_FIBER *from, ACL_FIBER *to)
+static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 {
 #ifdef	USE_JMP
 	/* use setcontext() for the initial jump, as it allows us to set up
@@ -145,24 +145,8 @@ static void fiber_unix_free(ACL_FIBER *fiber)
 	if (fb->context) {
 		free(fb->context);
 	}
-	stack_free(fiber->buff);
+	stack_free(fb->buff);
 	free(fb);
-}
-
-ACL_FIBER *fiber_unix_origin(void)
-{
-	FIBER_UNIX *fb = (FIBER_UNIX *)calloc(1, sizeof(*fb));
-
-#ifdef	USE_JMP
-	/* set context NULL when using setjmp that setcontext will not be
-	 * called in fiber_swap.
-	 */
-	fb->context = NULL;
-#else
-	fb->context = (ucontext_t *) stack_calloc(sizeof(ucontext_t));
-#endif
-	fb->fiber.free_fn = fiber_unix_free;
-	return fb;
 }
 
 union cc_arg
@@ -191,31 +175,26 @@ static void fiber_unix_start(unsigned int x, unsigned int y)
 	fb->fiber.start_fn(&fb->fiber);
 }
 
-ACL_FIBER *fiber_unix_alloc(void(*start_fn)(ACL_FIBER *))
-{
-	FIBER_UNIX *fb = (FIBER_UNIX *)calloc(1, sizeof(*fb));
-
-	fbase_init(&fb->fiber.base, FBASE_F_FIBER);
-
-	/* no using calloc just avoiding using real memory */
-	fb->fiber.buff     = (char *) stack_alloc(size);
-	fb->fiber.free_fn  = fiber_unix_free;
-	fb->fiber.swap_fn  = fiber_unix_swap;
-	fb->fiber.start_fn = start_fn;
-
-	return (ACL_FIBER *) fb;
-}
-
-void fiber_unix_init(ACL_FIBER *fiber)
+static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 {
 	FIBER_UNIX *fb = (FIBER_UNIX *) fiber;
 	union cc_arg carg;
 	sigset_t zero;
 	
+	if (fb->size < size) {
+		/* if using realloc, real memory will be used, when we first
+		 * free and malloc again, then we'll just use virtual memory,
+		 * because memcpy will be called in realloc.
+		 */
+		stack_free(fb->buff);
+		fb->buff = (char *) stack_alloc(size);
+		fb->size = size;
+	}
+
 	carg.p = fiber;
 
 	if (fb->context == NULL) {
-		fiber->context = (ucontext_t *) stack_alloc(sizeof(ucontext_t));
+		fb->context = (ucontext_t *) stack_alloc(sizeof(ucontext_t));
 	}
 	memset(fb->context, 0, sizeof(ucontext_t));
 
@@ -247,8 +226,41 @@ void fiber_unix_init(ACL_FIBER *fiber)
 		(char*)fb->context->uc_stack.ss_sp
 		+ fb->context->uc_stack.ss_size);
 #endif
-	makecontext(fb->context, (void(*)(void)) unix_fiber_start,
+	makecontext(fb->context, (void(*)(void)) fiber_unix_start,
 		2, carg.i[0], carg.i[1]);
+}
+
+ACL_FIBER *fiber_unix_alloc(void(*start_fn)(ACL_FIBER *), size_t size)
+{
+	FIBER_UNIX *fb = (FIBER_UNIX *) calloc(1, sizeof(*fb));
+
+	/* no using calloc just avoiding using real memory */
+	fb->buff           = (char *) stack_alloc(size);
+	fb->size           = size;
+	fb->fiber.init_fn  = fiber_unix_init;
+	fb->fiber.free_fn  = fiber_unix_free;
+	fb->fiber.swap_fn  = (void (*)(ACL_FIBER*, ACL_FIBER*))fiber_unix_swap;
+	fb->fiber.start_fn = start_fn;
+
+	return (ACL_FIBER *) fb;
+}
+
+ACL_FIBER *fiber_unix_origin(void)
+{
+	FIBER_UNIX *fb = (FIBER_UNIX *)calloc(1, sizeof(*fb));
+
+#ifdef	USE_JMP
+	/* set context NULL when using setjmp that setcontext will not be
+	 * called in fiber_swap.
+	 */
+	fb->context = NULL;
+#else
+	fb->context = (ucontext_t *) stack_calloc(sizeof(ucontext_t));
+#endif
+	fb->fiber.free_fn = fiber_unix_free;
+	fb->fiber.free_fn = fiber_unix_free;
+	fb->fiber.swap_fn = (void (*)(ACL_FIBER*, ACL_FIBER*))fiber_unix_swap;
+	return &fb->fiber;
 }
 
 #endif

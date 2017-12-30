@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <pthread.h>
+#include "fiber/lib_fiber.h"
 #include "common.h"
 
 #ifdef USE_VALGRIND
@@ -11,7 +11,6 @@
 #include <sys/mman.h>
 #endif
 
-#include "fiber/lib_fiber.h"
 #include "fiber.h"
 
 #define	MAX_CACHE	1000
@@ -551,17 +550,11 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	head = ring_pop_head(&__thread_fiber->dead);
 	if (head == NULL) {
 #ifdef SYS_UNIX
-		fiber = fiber_unix_alloc(fiber_start);
+		fiber = fiber_unix_alloc(fiber_start, size);
+		fbase_init(&fiber->base, FBASE_F_FIBER);
 #endif
-	} else if ((fiber = APPL(head, ACL_FIBER, me))->size < size) {
-		/* if using realloc, real memory will be used, when we first
-		 * free and malloc again, then we'll just use virtual memory,
-		 * because memcpy will be called in realloc.
-		 */
-		stack_free(fiber->buff);
-		fiber->buff = (char *) stack_alloc(size);
 	} else {
-		size = fiber->size;
+		fiber = APPL(head, ACL_FIBER, me);
 	}
 
 	__thread_fiber->idgen++;
@@ -574,16 +567,13 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	fiber->signum = 0;
 	fiber->fn     = fn;
 	fiber->arg    = arg;
-	fiber->size   = size;
 	fiber->flag   = 0;
 	fiber->status = FIBER_STATUS_READY;
 
 	fiber->waiting = NULL;
 	ring_init(&fiber->holding);
+	fiber->init_fn(fiber, size);
 
-#ifdef SYS_UNIX
-	fiber_unit_init(fiber);
-#endif
 	return fiber;
 }
 
@@ -717,15 +707,6 @@ void acl_fiber_switch(void)
 {
 	ACL_FIBER *fiber, *current = __thread_fiber->running;
 	RING *head;
-	ssize_t left = (char *) &fiber - (char *) current->buff;
-
-	// xxx: sanity checking, just for stack size checking
-	if (left < 1024) {
-		msg_fatal("%s(%d), %s: left=%ld, no space to save current"
-			" fiber's stack, current stack=%p, start stack=%p",
-			__FILE__, __LINE__, __FUNCTION__, (long) left,
-			(void *) &fiber, (void *) current->buff);
-	}
 
 #ifdef _DEBUG
 	assert(current);

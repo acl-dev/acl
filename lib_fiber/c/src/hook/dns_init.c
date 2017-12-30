@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "dns/dns.h"
-#include "common/pthread.h"
+#include "common/pthread_patch.h"
 #include "hook.h"
 
 #ifdef SYS_UNIX

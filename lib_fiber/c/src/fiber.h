@@ -54,6 +54,7 @@ struct ACL_FIBER {
 	FIBER_LOCAL  **locals;
 	int            nlocal;
 
+	void (*init_fn)(ACL_FIBER *, size_t);
 	void (*free_fn)(ACL_FIBER *);
 	void (*swap_fn)(ACL_FIBER *, ACL_FIBER *);
 	void (*start_fn)(ACL_FIBER *);
@@ -61,8 +62,6 @@ struct ACL_FIBER {
 	void (*fn)(ACL_FIBER *, void *);
 	void  *arg;
 	void (*timer_fn)(ACL_FIBER *, void *);
-	size_t size;
-	char  *buff;
 };
 
 /* in fiber.c */
@@ -96,7 +95,13 @@ EVENT *fiber_io_event(void);
 FILE_EVENT *fiber_file_open(int fd);
 int fiber_file_close(int fd);
 
-/* in epoll.c */
+/* in hook/epoll.c */
 int  epoll_event_close(int epfd);
+
+/* in fiber/fiber_unix.c */
+#ifdef SYS_UNIX
+ACL_FIBER *fiber_unix_origin(void);
+ACL_FIBER *fiber_unix_alloc(void(*start_fn)(ACL_FIBER *), size_t size);
+#endif
 
 #endif

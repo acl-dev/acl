@@ -83,7 +83,7 @@ static FIFO_INFO *iter_info(ITER *iter, struct FIFO *fifo fiber_unused)
 	return iter->ptr ? (FIFO_INFO*) iter->ptr : NULL;
 }
 
-void acl_fifo_init(FIFO *fifo)
+void fifo_init(FIFO *fifo)
 {
 	fifo->head = NULL;
 	fifo->tail = NULL;
@@ -100,7 +100,7 @@ void acl_fifo_init(FIFO *fifo)
 	fifo->iter_info  = iter_info;
 }
 
-FIFO *fifo_new1(void)
+FIFO *fifo_new(void)
 {
 	FIFO *fifo;
 
@@ -132,7 +132,7 @@ void fifo_free(FIFO *fifo, void (*free_fn)(void *))
 	free(fifo);
 }
 
-FIFO_INFO *fifo_push_back2(FIFO *fifo, void *data)
+FIFO_INFO *fifo_push_back(FIFO *fifo, void *data)
 {
 	FIFO_INFO *info;
 
@@ -282,7 +282,7 @@ void fifo_push_info_back(FIFO *fifo, FIFO_INFO *info)
 	fifo->cnt++;
 }
 
-FIFO_INFO *acl_fifo_pop_info(FIFO *fifo)
+FIFO_INFO *fifo_pop_info(FIFO *fifo)
 {
 	FIFO_INFO *info;
 
