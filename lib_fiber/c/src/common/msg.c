@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "fiber/lib_fiber.h"
 #include "init.h"
-#include "pthread.h"
+#include "pthread_patch.h"
 #include "msg.h"
 
 #ifndef	USE_PRINTF_MACRO

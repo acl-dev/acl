@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "pthread.h"
+#include "pthread_patch.h"
 #include "msg.h"
 #include "init.h"
 #include "gettimeofday.h"

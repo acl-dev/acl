@@ -87,7 +87,7 @@
     <ClInclude Include="src\common\iterator.h" />
     <ClInclude Include="src\common\memory.h" />
     <ClInclude Include="src\common\msg.h" />
-    <ClInclude Include="src\common\pthread.h" />
+    <ClInclude Include="src\common\pthread_patch.h" />
     <ClInclude Include="src\common\ring.h" />
     <ClInclude Include="src\common\strops.h" />
     <ClInclude Include="src\define.h" />
@@ -116,7 +116,7 @@
     <ClCompile Include="src\common\msg.c" />
     <ClCompile Include="src\common\non_blocking.c" />
     <ClCompile Include="src\common\open_limit.c" />
-    <ClCompile Include="src\common\pthread.c" />
+    <ClCompile Include="src\common\pthread_patch.c" />
     <ClCompile Include="src\common\ring.c" />
     <ClCompile Include="src\common\socketpair.c" />
     <ClCompile Include="src\common\strops.c" />

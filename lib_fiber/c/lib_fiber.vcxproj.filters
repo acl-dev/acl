@@ -102,13 +102,13 @@
     <ClInclude Include="src\common\fifo.h">
       <Filter>源文件\common</Filter>
     </ClInclude>
-    <ClInclude Include="src\common\pthread.h">
-      <Filter>源文件\common</Filter>
-    </ClInclude>
     <ClInclude Include="src\common\gettimeofday.h">
       <Filter>源文件\common</Filter>
     </ClInclude>
     <ClInclude Include="src\common\memory.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\pthread_patch.h">
       <Filter>源文件\common</Filter>
     </ClInclude>
   </ItemGroup>
@@ -218,9 +218,6 @@
     <ClCompile Include="src\file_event.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\common\pthread.c">
-      <Filter>源文件\common</Filter>
-    </ClCompile>
     <ClCompile Include="src\common\fifo.c">
       <Filter>源文件\common</Filter>
     </ClCompile>
@@ -234,6 +231,9 @@
       <Filter>源文件\fiber</Filter>
     </ClCompile>
     <ClCompile Include="src\common\memory.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\pthread_patch.c">
       <Filter>源文件\common</Filter>
     </ClCompile>
   </ItemGroup>

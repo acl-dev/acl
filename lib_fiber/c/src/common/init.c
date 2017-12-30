@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "pthread.h"
+#include "pthread_patch.h"
 #include "init.h"
 
 static unsigned long var_main_tid = (unsigned long) -1;
