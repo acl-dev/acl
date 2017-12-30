@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <pthread.h>
 #include "common.h"
 
 #ifdef USE_VALGRIND
@@ -581,7 +582,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	ring_init(&fiber->holding);
 
 #ifdef SYS_UNIX
-	fiber_unit_init(fiber)
+	fiber_unit_init(fiber);
 #endif
 	return fiber;
 }
