@@ -1,6 +1,23 @@
 #ifndef	__DEFINE_INCLUDE_H__
 #define	__DEFINE_INCLUDE_H__
 
+#if defined(__linux__)
+# define SYS_UNIX
+# define HAS_POLL
+# define HAS_EPOLL
+#elif defined(__FreeBSD__)
+# define SYS_UNIX
+# define HAS_POLL
+# define HAS_KQUEUE
+#elif defined(_WIN32) || defined(_WIN64)
+# define SYS_WIN
+# define HAS_WMSG
+# define HAS_IOCP
+# define __thread __declspec(thread)
+#else
+# error "unknown OS"
+#endif
+
 #ifndef fiber_unused
 # ifdef	__GNUC__
 #  define fiber_unused	__attribute__ ((__unused__))
@@ -38,19 +55,5 @@
 #else
 #define	DEPRECATED_FOR(f)	DEPRECATED
 #endif	/* __GNUC__ */
-
-struct SOCK_ADDR {
-	union {
-		struct sockaddr_storage ss;
-#ifdef AF_INET6
-		struct sockaddr_in6 in6;
-#endif
-		struct sockaddr_in in;
-#ifdef ACL_UNIX
-		struct sockaddr_un un;
-#endif
-		struct sockaddr sa;
-	} sa;
-};
 
 #endif /* __DEFINE_INCLUDE_H__ */

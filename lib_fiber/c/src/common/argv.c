@@ -34,7 +34,7 @@ static void argv_push_front(struct ARGV *argvp, const char *s)
 		argvp->argv[i] = argvp->argv[i - 1];
 	}
 
-	argvp->argv[0] = strdup(s);
+	argvp->argv[0] = STRDUP(s);
 	argvp->argc++;
 }
 
@@ -181,7 +181,7 @@ void    argv_add(ARGV *argvp,...)
 		if (SPACE_LEFT(argvp) <= 0) {
 			argv_extend(argvp);
 		}
-		argvp->argv[argvp->argc++] = strdup(arg);
+		argvp->argv[argvp->argc++] = STRDUP(arg);
 	}
 	va_end(ap);
 	argvp->argv[argvp->argc] = 0;
@@ -197,7 +197,7 @@ void    argv_addv(ARGV *argvp, va_list ap)
 		if (SPACE_LEFT(argvp) <= 0) {
 			argv_extend(argvp);
 		}
-		argvp->argv[argvp->argc++] = strdup(arg);
+		argvp->argv[argvp->argc++] = STRDUP(arg);
 	}
 	argvp->argv[argvp->argc] = 0;
 }
@@ -223,7 +223,7 @@ int   argv_size(ARGV *argvp)
 ARGV *argv_split(const char *str, const char *delim)
 {
 	ARGV   *argvp = argv_alloc(1);
-	char   *saved_string = strdup(str);
+	char   *saved_string = STRDUP(str);
 	char   *bp = saved_string;
 	char   *arg;
 

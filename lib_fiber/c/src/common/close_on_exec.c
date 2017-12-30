@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <fcntl.h>
 #include <string.h>
 
 /* Utility library. */
@@ -13,6 +12,7 @@
 
 int close_on_exec(int fd, int on)
 {
+#ifdef SYS_UNIX
 	int flags;
 
 	if ((flags = fcntl(fd, F_GETFD, 0)) < 0) {
@@ -24,4 +24,9 @@ int close_on_exec(int fd, int on)
 	}
 
 	return ((flags & PATTERN) != 0);
+#else
+	(void) fd;
+	(void) on;
+	return 0;
+#endif
 }

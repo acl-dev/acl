@@ -5,6 +5,8 @@
 #include "event.h"
 #include "fiber.h"
 
+#ifdef HAS_POLL
+
 typedef int (*poll_fn)(struct pollfd *, nfds_t, int);
 
 static poll_fn __sys_poll = NULL;
@@ -195,3 +197,4 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	pollfd_free(pe.fds);
 	return pe.nready;
 }
+#endif

@@ -1,11 +1,12 @@
 #include "stdafx.h"
-#include <pthread.h>
-
+#include "pthread.h"
 #include "init.h"
 
-static pthread_t var_main_tid = (pthread_t) -1;
+static unsigned long var_main_tid = (unsigned long) -1;
 
+#ifdef __GNUC__
 void lib_init(void) __attribute__ ((constructor));
+#endif
 
 void lib_init(void)
 {

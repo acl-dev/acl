@@ -1,8 +1,6 @@
 #ifndef FIBER_INCLUDE_H
 #define FIBER_INCLUDE_H
 
-#include <ucontext.h>
-#include <setjmp.h>
 #include "event.h"
 
 #ifdef ACL_ARM_LINUX
@@ -37,9 +35,6 @@ typedef struct FIBER_BASE {
 
 struct ACL_FIBER {
 	FIBER_BASE     base;
-#ifdef USE_VALGRIND
-	unsigned int   vid;
-#endif
 	fiber_status_t status;
 	RING           me;
 	unsigned       id;
@@ -59,19 +54,15 @@ struct ACL_FIBER {
 	FIBER_LOCAL  **locals;
 	int            nlocal;
 
-#ifdef	USE_JMP
-# if defined(__x86_64__)
-	unsigned long long env[10];
-# else
-	sigjmp_buf     env;
-# endif
-#endif
-	ucontext_t    *context;
-	void         (*fn)(ACL_FIBER *, void *);
-	void          *arg;
-	void         (*timer_fn)(ACL_FIBER *, void *);
-	size_t         size;
-	char          *buff;
+	void (*free_fn)(ACL_FIBER *);
+	void (*swap_fn)(ACL_FIBER *, ACL_FIBER *);
+	void (*start_fn)(ACL_FIBER *);
+
+	void (*fn)(ACL_FIBER *, void *);
+	void  *arg;
+	void (*timer_fn)(ACL_FIBER *, void *);
+	size_t size;
+	char  *buff;
 };
 
 /* in fiber.c */

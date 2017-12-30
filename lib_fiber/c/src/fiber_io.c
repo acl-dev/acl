@@ -2,6 +2,7 @@
 #include "common.h"
 
 #include "fiber/lib_fiber.h"
+#include "common/gettimeofday.h"
 #include "event.h"
 #include "fiber.h"
 
@@ -161,7 +162,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		assert(left < INT_MAX);
 
 		/* add 1 just for the deviation of epoll_wait */
-		event_process(ev, left > 0 ? left + 1 : (int) left);
+		event_process(ev, left > 0 ? (int) left + 1 : (int) left);
 
 		if (__thread_fiber->io_stop) {
 			break;
@@ -258,7 +259,7 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	if (ring_size(&__thread_fiber->ev_timer) == 0) {
 		ev->timeout = -1;
 	} else {
-		ev->timeout = min;
+		ev->timeout = (int) min;
 	}
 
 	SET_TIME(now);
@@ -280,7 +281,7 @@ static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
 			break;
 		}
 
-		acl_fiber_delay(left);
+		acl_fiber_delay((unsigned int) left);
 
 		SET_TIME(now);
 		if (fiber->when <= now) {

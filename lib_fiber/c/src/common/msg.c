@@ -1,18 +1,8 @@
 #include "stdafx.h"
-
-#include <errno.h>
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <pthread.h>
-#include <unistd.h>
-
 #include "fiber/lib_fiber.h"
 #include "init.h"
+#include "pthread.h"
 #include "msg.h"
-
 
 #ifndef	USE_PRINTF_MACRO
 
@@ -65,7 +55,7 @@ void msg_info(const char *fmt,...)
 	}
 
 	if (__stdout_enable) {
-		printf("msg_info->pid(%d), ", getpid());
+		printf("msg_info->pid(%d), ", GETPID());
 		vprintf(fmt, ap);
 		printf("\r\n");
 	}
@@ -88,7 +78,7 @@ void msg_warn(const char *fmt,...)
 	}
 	
 	if (__stdout_enable) {
-		printf("msg_warn->pid(%d), ", getpid());
+		printf("msg_warn->pid(%d), ", GETPID());
 		vprintf(fmt, ap);
 		printf("\r\n");
 	}
@@ -111,7 +101,7 @@ void msg_error(const char *fmt,...)
 	}
 	
 	if (__stdout_enable) {
-		printf("msg_error->pid(%d), ", getpid());
+		printf("msg_error->pid(%d), ", GETPID());
 		vprintf(fmt, ap);
 		printf("\r\n");
 	}
@@ -134,7 +124,7 @@ void msg_fatal(const char *fmt,...)
 	}
 	
 	if (__stdout_enable) {
-		printf("msg_fatal->pid(%d), ", getpid());
+		printf("msg_fatal->pid(%d), ", GETPID());
 		printf("fatal:");
 		vprintf(fmt, ap);
 		printf("\r\n");
@@ -154,7 +144,11 @@ const char *msg_strerror(int errnum, char *buffer, size_t size)
 		return NULL;
 	}
 
+#ifdef SYS_WIN
+	_snprintf(buffer, size, "%s", strerror(errnum));
+#else
 	snprintf(buffer, size, "%s", strerror(errnum));
+#endif
 
 	return buffer;
 }

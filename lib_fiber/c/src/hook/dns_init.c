@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "dns/dns.h"
+#include "common/pthread.h"
 #include "hook.h"
+
+#ifdef SYS_UNIX
 
 struct dns_resolv_conf *var_dns_conf = NULL;
 struct dns_hosts *var_dns_hosts      = NULL;
@@ -31,8 +34,13 @@ static void dns_on_exit(void)
 
 void dns_init(void)
 {
+#ifdef SYS_WIN
+	static pthread_mutex_t __lock;
+#elif defined(SYS_UNIX)
 	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
+#endif
 	static int __called = 0;
+	int err;
 
 	(void) pthread_mutex_lock(&__lock);
 
@@ -43,7 +51,7 @@ void dns_init(void)
 
 	__called++;
 
-	int err = 0;
+	err = 0;
 	var_dns_conf  = dns_resconf_local(&err);
 	assert(var_dns_conf && err == 0);
 	var_dns_conf->options.timeout = 1000;
@@ -58,3 +66,5 @@ void dns_init(void)
 
 	(void) pthread_mutex_unlock(&__lock);
 }
+
+#endif

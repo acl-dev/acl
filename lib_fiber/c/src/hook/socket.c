@@ -19,6 +19,8 @@ static listen_fn          __sys_listen          = NULL;
 static accept_fn          __sys_accept          = NULL;
 static connect_fn         __sys_connect         = NULL;
 
+#ifdef SYS_UNIX
+
 static void hook_init(void)
 {
 	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
@@ -275,3 +277,5 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 
 	return -1;
 }
+
+#endif

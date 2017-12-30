@@ -10,5 +10,7 @@
 #include "common/array.h"
 #include "common/argv.h"
 #include "common/strops.h"
+#include "common/pthread.h"
+#include "common/memory.h"
 
 #endif

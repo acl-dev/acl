@@ -1,14 +1,7 @@
 #ifndef __STD_AFX_INCLUDE_H__
 #define __STD_AFX_INCLUDE_H__
 
-
-#if defined(__linux__)
-# define HAS_EPOLL
-#elif defined(__FreeBSD__)
-# define HAS_KQUEUE
-#else
-# error "unknown OS"
-#endif
+#include "define.h"
 
 #if 1
 #define LIKELY(x)	__builtin_expect(!!(x), 1)
@@ -25,37 +18,71 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <unistd.h>
-#include <dlfcn.h>
 #include <time.h>
 #include <ctype.h>
+#include <assert.h>
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 #include <sys/types.h>
+#include <setjmp.h>
+#include <signal.h>
+
+#if defined(SYS_UNIX)
+#include <unistd.h>
+#include <dlfcn.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#include <sys/stat.h>
 #include <sys/select.h>
 #include <poll.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-#include <signal.h>
 #include <limits.h>
 #include <pthread.h>
-#include <assert.h>
-#include <string.h>
-#include <errno.h>
-#include <fcntl.h>
+#include <sys/resource.h>
+#include <ucontext.h>
+
+#define STRDUP strdup
+#define GETPID getpid
+
+#elif defined(SYS_WIN)
+# if(_MSC_VER >= 1300)
+#  include <winsock2.h>
+#  include <mswsock.h>
+# else
+#  include <winsock.h>
+# endif
+# include <ws2tcpip.h> /* for getaddrinfo */
+# include <process.h>
+# include <stdint.h>
+
+#define STRDUP _strdup
+#define GETPID _getpid
+#define ssize_t long int
+#endif
 
 #if defined(__linux__)
 # include <sys/sendfile.h>
 # include <sys/epoll.h>
 #elif defined(__FreeBSD__)
 # include <sys/uio.h>
-#else
-# error "unknown OS"
 #endif
 
-#include "define.h"
+struct SOCK_ADDR {
+	union {
+		struct sockaddr_storage ss;
+#ifdef AF_INET6
+		struct sockaddr_in6 in6;
+#endif
+		struct sockaddr_in in;
+#ifdef ACL_UNIX
+		struct sockaddr_un un;
+#endif
+		struct sockaddr sa;
+	} sa;
+};
 
 #endif

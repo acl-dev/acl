@@ -1,14 +1,15 @@
 #include "stdafx.h"
-#include <errno.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-
-/* Application-specific. */
-
 #include "msg.h"
 #include "iostuff.h"
 
+#ifdef SYS_WIN
+int open_limit(int limit)
+{
+	if (limit <= 0)
+		limit = 1024;
+	return limit;
+}
+#else
  /*
   * 44BSD compatibility.
   */
@@ -19,8 +20,6 @@
 #endif
 
 /* open_limit - set/query file descriptor limit */
-
-#include <stdio.h>
 
 int open_limit(int limit)
 {
@@ -80,3 +79,4 @@ int open_limit(int limit)
 	return rlim_cur;
 #endif
 }
+#endif // !SYS_WIN

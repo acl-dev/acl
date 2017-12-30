@@ -11,6 +11,8 @@ EVENT *event_create(int size)
 	EVENT *ev = event_epoll_create(size);
 #elif	defined(HAS_KQUEUE)
 	EVENT *ev = event_kqueue_create(size);
+#elif	defined(SYS_WIN)
+	EVENT *ev = NULL;
 #endif
 
 	ring_init(&ev->events);
@@ -18,9 +20,13 @@ EVENT *event_create(int size)
 	ev->setsize = size;
 	ev->maxfd   = -1;
 
+#ifdef HAS_POLL
 	ring_init(&ev->poll_list);
-	ring_init(&ev->epoll_list);
+#endif
 
+#ifdef HAS_EPOLL
+	ring_init(&ev->epoll_list);
+#endif
 	return ev;
 }
 
@@ -259,6 +265,7 @@ static void event_prepare(EVENT *ev)
 
 #define TO_APPL	ring_to_appl
 
+#ifdef HAS_POLL
 static inline void event_process_poll(EVENT *ev)
 {
 	while (1) {
@@ -275,6 +282,7 @@ static inline void event_process_poll(EVENT *ev)
 
 	ring_init(&ev->poll_list);
 }
+#endif
 
 #ifdef	HAS_EPOLL
 static void event_process_epoll(EVENT *ev)
@@ -314,7 +322,11 @@ int event_process(EVENT *ev, int timeout)
 
 	event_prepare(ev);
 	ret = ev->event_wait(ev, timeout);
+
+#ifdef HAS_POLL
 	event_process_poll(ev);
+#endif
+
 #ifdef	HAS_EPOLL
 	event_process_epoll(ev);
 #endif

@@ -26,6 +26,10 @@
 #ifndef DNS_H
 #define DNS_H
 
+#include "define.h"
+
+#ifdef SYS_UNIX
+
 #include <stddef.h>		/* size_t offsetof() */
 #include <stdio.h>		/* FILE */
 
@@ -48,6 +52,9 @@
 #include <netdb.h>		/* struct addrinfo */
 #endif
 
+#ifdef SYS_WIN
+//typedef int _Bool;
+#endif
 
 /*
  * V I S I B I L I T Y
@@ -1256,3 +1263,5 @@ int get_read_timeout(void);
 #endif
 
 #endif /* DNS_H */
+
+#endif

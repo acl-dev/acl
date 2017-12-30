@@ -17,6 +17,8 @@ struct ACL_FIBER_RWLOCK {
 	RING       wwaiting;
 };
 
+#ifdef SYS_UNIX
+
 ACL_FIBER_MUTEX *acl_fiber_mutex_create(void)
 {
 	ACL_FIBER_MUTEX *lk = (ACL_FIBER_MUTEX *) malloc(sizeof(ACL_FIBER_MUTEX));
@@ -229,3 +231,5 @@ void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK *lk)
 		acl_fiber_ready(fiber);
 	}
 }
+
+#endif

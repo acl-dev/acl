@@ -1,9 +1,4 @@
 #include "stdafx.h"
-#include <errno.h>
-#include <string.h>
-#include <sys/time.h>
-#include <sys/select.h>
-
 #include "msg.h"
 #include "iostuff.h"
 
@@ -14,7 +9,11 @@ void doze(unsigned delay)
 	struct timeval tv;
 
 	tv.tv_sec = delay / 1000;
+#if defined(SYS_WIN)
+	tv.tv_usec = (long) (delay - tv.tv_sec * 1000) * 1000;
+#else
 	tv.tv_usec = (suseconds_t) (delay - tv.tv_sec * 1000) * 1000;
+#endif
 
 	while (select(0, (fd_set *) 0, (fd_set *) 0, (fd_set *) 0, &tv) < 0) {
 		if (last_error() != EINTR) {

@@ -49,7 +49,10 @@ int issock(int fd);
 
 int read_wait(int fd, int timeout);
 void tcp_nodelay(int fd, int onoff);
+
+#ifdef SYS_UNIX
 int sane_socketpair(int domain, int type, int protocol, int result[2]);
+#endif
 
 #ifdef	__cplusplus
 }

@@ -8,6 +8,8 @@ typedef int (*gethostbyname_r_fn)(const char *, struct hostent *, char *,
 
 static gethostbyname_r_fn __sys_gethostbyname_r = NULL;
 
+#ifdef SYS_UNIX
+
 static void hook_init(void)
 {
 	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
@@ -79,10 +81,10 @@ static int save_result(struct hostent *ent, struct addrinfo *res,
 
 		if (ai->ai_family == AF_INET) {
 			len = sizeof(struct in_addr);
-			memcpy(buf, &sa->sa.in.sin_addr, len);
+			memcpy((void *) buf, &sa->sa.in.sin_addr, len);
 		} else if (ai->ai_family == AF_INET6) {
 			len = sizeof(struct in6_addr);
-			memcpy(buf, &sa->sa.in6.sin6_addr, len);
+			memcpy((void *) buf, &sa->sa.in6.sin6_addr, len);
 		} else {
 			continue;
 		}
@@ -184,3 +186,5 @@ int gethostbyname_r(const char *name, struct hostent *ent,
 
 	return -1;
 }
+
+#endif

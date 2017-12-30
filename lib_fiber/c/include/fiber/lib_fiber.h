@@ -5,34 +5,38 @@
 extern "C" {
 #endif
 
+#if defined(_WIN32) || defined (_WIN64)
+typedef long ssize;
+#else
 #include <sys/types.h>
 #include <sys/socket.h>
+#endif
 
 //typedef struct ACL_VSTREAM ACL_VSTREAM;
 
 /**
- * åç¨‹ç»“æ„ç±»å‹
+ * Ğ­³Ì½á¹¹ÀàĞÍ
  */
 typedef struct ACL_FIBER ACL_FIBER;
 
 /**
- * è®¾ç½®æ˜¯å¦éœ€è¦ hook ç³»ç»Ÿä¸­çš„ IO ç›¸å…³çš„ APIï¼Œå†…éƒ¨ç¼ºçœå€¼ä¸º 1
- * @param onoff {int} æ˜¯å¦éœ€è¦ hook
+ * ÉèÖÃÊÇ·ñĞèÒª hook ÏµÍ³ÖĞµÄ IO Ïà¹ØµÄ API£¬ÄÚ²¿È±Ê¡ÖµÎª 1
+ * @param onoff {int} ÊÇ·ñĞèÒª hook
  */
 void acl_fiber_hook_api(int onoff);
 
 /**
- * åˆ›å»ºä¸€ä¸ªåç¨‹
- * @param fn {void (*)(ACL_FIBER*, void*)} åç¨‹è¿è¡Œæ—¶çš„å›è°ƒå‡½æ•°åœ°å€
- * @param arg {void*} å›è°ƒ fn å‡½æ•°æ—¶çš„ç¬¬äºŒä¸ªå‚æ•°
- * @param size {size_t} æ‰€åˆ›å»ºåç¨‹æ‰€å æ ˆç©ºé—´å¤§å°
+ * ´´½¨Ò»¸öĞ­³Ì
+ * @param fn {void (*)(ACL_FIBER*, void*)} Ğ­³ÌÔËĞĞÊ±µÄ»Øµ÷º¯ÊıµØÖ·
+ * @param arg {void*} »Øµ÷ fn º¯ÊıÊ±µÄµÚ¶ş¸ö²ÎÊı
+ * @param size {size_t} Ëù´´½¨Ğ­³ÌËùÕ¼Õ»¿Õ¼ä´óĞ¡
  * @return {ACL_FIBER*}
  */
 ACL_FIBER* acl_fiber_create(void (*fn)(ACL_FIBER*, void*),
 	void* arg, size_t size);
 
 /**
- * è¿”å›å½“å‰çº¿ç¨‹ä¸­å¤„äºæ¶ˆäº¡çŠ¶æ€çš„åç¨‹æ•°
+ * ·µ»Øµ±Ç°Ïß³ÌÖĞ´¦ÓÚÏûÍö×´Ì¬µÄĞ­³ÌÊı
  * @retur {int}
  */
 int acl_fiber_ndead(void);
@@ -40,318 +44,318 @@ int acl_fiber_ndead(void);
 void acl_fiber_check_timer(size_t max);
 
 /**
- * è¿”å›å½“å‰æ­£åœ¨è¿è¡Œçš„åç¨‹å¯¹è±¡
- * @retur {ACL_FIBER*} è¿”å› NULL è¡¨ç¤ºå½“å‰æ²¡æœ‰æ­£åœ¨è¿è¡Œçš„åç¨‹
+ * ·µ»Øµ±Ç°ÕıÔÚÔËĞĞµÄĞ­³Ì¶ÔÏó
+ * @retur {ACL_FIBER*} ·µ»Ø NULL ±íÊ¾µ±Ç°Ã»ÓĞÕıÔÚÔËĞĞµÄĞ­³Ì
  */
 ACL_FIBER* acl_fiber_running(void);
 
 /**
- * è·å¾—æ‰€ç»™åç¨‹çš„åç¨‹ ID å·
- * @param fiber {const ACL_FIBER*} acl_fiber_create åˆ›å»ºçš„åç¨‹å¯¹è±¡ï¼Œå¿…é¡»éç©º
- * @return {unsigned int} åç¨‹ ID å·
+ * »ñµÃËù¸øĞ­³ÌµÄĞ­³Ì ID ºÅ
+ * @param fiber {const ACL_FIBER*} acl_fiber_create ´´½¨µÄĞ­³Ì¶ÔÏó£¬±ØĞë·Ç¿Õ
+ * @return {unsigned int} Ğ­³Ì ID ºÅ
  */
 unsigned int acl_fiber_id(const ACL_FIBER* fiber);
 
 /**
- * è·å¾—å½“å‰æ‰€è¿è¡Œçš„åç¨‹çš„ ID å·
- * @return {unsigned int} å½“å‰è¿è¡Œåç¨‹çš„ ID å·
+ * »ñµÃµ±Ç°ËùÔËĞĞµÄĞ­³ÌµÄ ID ºÅ
+ * @return {unsigned int} µ±Ç°ÔËĞĞĞ­³ÌµÄ ID ºÅ
  */
 unsigned int acl_fiber_self(void);
 
 /**
- * è®¾ç½®æ‰€ç»™åç¨‹çš„é”™è¯¯å·
- * @param fiber {ACL_FIBER*} æŒ‡å®šçš„åç¨‹å¯¹è±¡ï¼Œä¸º NULL åˆ™ä½¿ç”¨å½“å‰è¿è¡Œçš„åç¨‹
- * @param errnum {int} é”™è¯¯å·
+ * ÉèÖÃËù¸øĞ­³ÌµÄ´íÎóºÅ
+ * @param fiber {ACL_FIBER*} Ö¸¶¨µÄĞ­³Ì¶ÔÏó£¬Îª NULL ÔòÊ¹ÓÃµ±Ç°ÔËĞĞµÄĞ­³Ì
+ * @param errnum {int} ´íÎóºÅ
  */
 void acl_fiber_set_errno(ACL_FIBER* fiber, int errnum);
 
 /**
- * è·å¾—æŒ‡å®šåç¨‹çš„é”™è¯¯å·
- * @param fiber {ACL_FIBER*} æŒ‡å®šçš„åç¨‹å¯¹è±¡ï¼Œè‹¥ä¸º NULL åˆ™ä½¿ç”¨å½“å‰åç¨‹å¯¹è±¡
- * @return {int} æ‰€ç»™åç¨‹é”™è¯¯å·
+ * »ñµÃÖ¸¶¨Ğ­³ÌµÄ´íÎóºÅ
+ * @param fiber {ACL_FIBER*} Ö¸¶¨µÄĞ­³Ì¶ÔÏó£¬ÈôÎª NULL ÔòÊ¹ÓÃµ±Ç°Ğ­³Ì¶ÔÏó
+ * @return {int} Ëù¸øĞ­³Ì´íÎóºÅ
  */
 int acl_fiber_errno(ACL_FIBER* fiber);
 
 /**
- * è·å¾—å½“å‰ç³»ç»Ÿçº§çš„ errno å·
+ * »ñµÃµ±Ç°ÏµÍ³¼¶µÄ errno ºÅ
  * @return {int}
  */
 int acl_fiber_sys_errno(void);
 
 /**
- * è®¾ç½®å½“å‰ç³»ç»Ÿçš„ errno å·
+ * ÉèÖÃµ±Ç°ÏµÍ³µÄ errno ºÅ
  * @param errnum {int}
  */
 void acl_fiber_sys_errno_set(int errnum);
 
 /**
- * æ˜¯å¦ä¿æŒæ‰€æŒ‡å®šåç¨‹çš„é”™è¯¯å·ï¼Œå½“è®¾ç½®ä¸ºâ€œä¿æŒâ€åï¼Œåˆ™è¯¥åç¨‹ä»…ä¿æŒå½“å‰çŠ¶æ€ä¸‹çš„
- * é”™è¯¯å·ï¼Œä¹‹åè¯¥åç¨‹çš„é”™è¯¯å· errno å°†ä¸å†æ”¹å˜ï¼Œèµ°åˆ°å†æ¬¡è°ƒç”¨æœ¬å‡½æ•°å–æ¶ˆä¿æŒ
- * @param fiber {ACL_FIBER*} æŒ‡å®šçš„åç¨‹å¯¹è±¡ï¼Œä¸º NULL åˆ™ä½¿ç”¨å½“å‰è¿è¡Œçš„åç¨‹
- * @param yesno {int} æ˜¯å¦ä¿æŒ
+ * ÊÇ·ñ±£³ÖËùÖ¸¶¨Ğ­³ÌµÄ´íÎóºÅ£¬µ±ÉèÖÃÎª¡°±£³Ö¡±ºó£¬Ôò¸ÃĞ­³Ì½ö±£³Öµ±Ç°×´Ì¬ÏÂµÄ
+ * ´íÎóºÅ£¬Ö®ºó¸ÃĞ­³ÌµÄ´íÎóºÅ errno ½«²»ÔÙ¸Ä±ä£¬×ßµ½ÔÙ´Îµ÷ÓÃ±¾º¯ÊıÈ¡Ïû±£³Ö
+ * @param fiber {ACL_FIBER*} Ö¸¶¨µÄĞ­³Ì¶ÔÏó£¬Îª NULL ÔòÊ¹ÓÃµ±Ç°ÔËĞĞµÄĞ­³Ì
+ * @param yesno {int} ÊÇ·ñ±£³Ö
  */
 void acl_fiber_keep_errno(ACL_FIBER* fiber, int yesno);
 
 /**
- * è·å¾—æŒ‡å®šåç¨‹çš„å½“å‰çŠ¶æ€
- * @param fiber {const ACL_FIBER*} æŒ‡å®šçš„åç¨‹å¯¹è±¡ï¼Œä¸º NULL åˆ™ä½¿ç”¨å½“å‰åç¨‹
- * @return {int} åç¨‹çŠ¶æ€
+ * »ñµÃÖ¸¶¨Ğ­³ÌµÄµ±Ç°×´Ì¬
+ * @param fiber {const ACL_FIBER*} Ö¸¶¨µÄĞ­³Ì¶ÔÏó£¬Îª NULL ÔòÊ¹ÓÃµ±Ç°Ğ­³Ì
+ * @return {int} Ğ­³Ì×´Ì¬
  */
 int acl_fiber_status(const ACL_FIBER* fiber);
 
 /**
- * é€šçŸ¥å¤„äºä¼‘çœ çŠ¶æ€çš„åç¨‹é€€å‡º 
- * @param fiber {const ACL_FIBER*} æŒ‡å®šçš„åç¨‹å¯¹è±¡ï¼Œå¿…é¡»é NULL
+ * Í¨Öª´¦ÓÚĞİÃß×´Ì¬µÄĞ­³ÌÍË³ö 
+ * @param fiber {const ACL_FIBER*} Ö¸¶¨µÄĞ­³Ì¶ÔÏó£¬±ØĞë·Ç NULL
  */
 void acl_fiber_kill(ACL_FIBER* fiber);
 
 /**
- * æ£€æŸ¥æœ¬åç¨‹æ˜¯å¦è¢«å…¶å®ƒåç¨‹é€šçŸ¥é€€å‡º
- * @param fiber {const ACL_FIBER*} æŒ‡å®šçš„åç¨‹å¯¹è±¡ï¼Œè‹¥ä¸º NULL åˆ™è‡ªåŠ¨ä½¿ç”¨å½“å‰
- *  æ­£åœ¨è¿è¡Œçš„åç¨‹
- * @return {int} è¿”å›å€¼ä¸º 0 è¡¨ç¤ºæ²¡æœ‰è¢«é€šçŸ¥é€€å‡ºï¼Œé 0 è¡¨ç¤ºè¢«é€šçŸ¥é€€å‡º
+ * ¼ì²é±¾Ğ­³ÌÊÇ·ñ±»ÆäËüĞ­³ÌÍ¨ÖªÍË³ö
+ * @param fiber {const ACL_FIBER*} Ö¸¶¨µÄĞ­³Ì¶ÔÏó£¬ÈôÎª NULL Ôò×Ô¶¯Ê¹ÓÃµ±Ç°
+ *  ÕıÔÚÔËĞĞµÄĞ­³Ì
+ * @return {int} ·µ»ØÖµÎª 0 ±íÊ¾Ã»ÓĞ±»Í¨ÖªÍË³ö£¬·Ç 0 ±íÊ¾±»Í¨ÖªÍË³ö
  */
 int acl_fiber_killed(ACL_FIBER* fiber);
 
 /**
- * å”¤é†’å›  IO ç­‰åŸå› å¤„äºä¼‘çœ çš„åç¨‹
- * @param fiber {const ACL_FIBER*} åç¨‹å¯¹è±¡ï¼Œå¿…é¡»é NULL
- * @param signum {int} SIGINT, SIGKILL, SIGTERM ... å‚è€ƒç³»ç»Ÿä¸­ bits/signum.h
+ * »½ĞÑÒò IO µÈÔ­Òò´¦ÓÚĞİÃßµÄĞ­³Ì
+ * @param fiber {const ACL_FIBER*} Ğ­³Ì¶ÔÏó£¬±ØĞë·Ç NULL
+ * @param signum {int} SIGINT, SIGKILL, SIGTERM ... ²Î¿¼ÏµÍ³ÖĞ bits/signum.h
  */
 void acl_fiber_signal(ACL_FIBER* fiber, int signum);
 
 /**
- * è·å¾—å…¶å®ƒåç¨‹å‘é€ç»™æŒ‡å®šåç¨‹çš„ä¿¡å·å€¼
- * @param fiber {const ACL_FIBER*} æŒ‡å®šçš„åç¨‹å¯¹è±¡ï¼Œä¸º NULL æ—¶åˆ™ä½¿ç”¨å½“å‰åç¨‹
- * @retur {int} è¿”å›æŒ‡å®šåç¨‹æ”¶åˆ°çš„ä¿¡å·å€¼
+ * »ñµÃÆäËüĞ­³Ì·¢ËÍ¸øÖ¸¶¨Ğ­³ÌµÄĞÅºÅÖµ
+ * @param fiber {const ACL_FIBER*} Ö¸¶¨µÄĞ­³Ì¶ÔÏó£¬Îª NULL Ê±ÔòÊ¹ÓÃµ±Ç°Ğ­³Ì
+ * @retur {int} ·µ»ØÖ¸¶¨Ğ­³ÌÊÕµ½µÄĞÅºÅÖµ
  */
 int acl_fiber_signum(ACL_FIBER* fiber);
 
 /**
- * å°†å½“å‰è¿è¡Œçš„åç¨‹æŒ‚èµ·ï¼Œç”±è°ƒåº¦å™¨é€‰æ‹©ä¸‹ä¸€ä¸ªéœ€è¦è¿è¡Œçš„åç¨‹
+ * ½«µ±Ç°ÔËĞĞµÄĞ­³Ì¹ÒÆğ£¬ÓÉµ÷¶ÈÆ÷Ñ¡ÔñÏÂÒ»¸öĞèÒªÔËĞĞµÄĞ­³Ì
  * @return {int}
  */
 int acl_fiber_yield(void);
 
 /**
- * å°†æŒ‡å®šåç¨‹å¯¹è±¡ç½®å…¥å¾…è¿è¡Œé˜Ÿåˆ—ä¸­
- * @param fiber {ACL_FIBER*} æŒ‡å®šåç¨‹ï¼Œå¿…é¡»é NULL
+ * ½«Ö¸¶¨Ğ­³Ì¶ÔÏóÖÃÈë´ıÔËĞĞ¶ÓÁĞÖĞ
+ * @param fiber {ACL_FIBER*} Ö¸¶¨Ğ­³Ì£¬±ØĞë·Ç NULL
  */
 void acl_fiber_ready(ACL_FIBER* fiber);
 
 /**
- * å°†å½“å‰è¿è¡Œçš„åç¨‹æŒ‚èµ·ï¼ŒåŒæ—¶æ‰§è¡Œç­‰å¾…é˜Ÿåˆ—ä¸‹ä¸€ä¸ªå¾…è¿è¡Œçš„åç¨‹
+ * ½«µ±Ç°ÔËĞĞµÄĞ­³Ì¹ÒÆğ£¬Í¬Ê±Ö´ĞĞµÈ´ı¶ÓÁĞÏÂÒ»¸ö´ıÔËĞĞµÄĞ­³Ì
  */
 void acl_fiber_switch(void);
 
 /**
- * è°ƒç”¨æœ¬å‡½æ•°å¯åŠ¨åç¨‹çš„è°ƒåº¦è¿‡ç¨‹
+ * µ÷ÓÃ±¾º¯ÊıÆô¶¯Ğ­³ÌµÄµ÷¶È¹ı³Ì
  */
 void acl_fiber_schedule(void);
 
 /**
- * è°ƒç”¨æœ¬å‡½æ•°æ£€æµ‹å½“å‰çº¿ç¨‹æ˜¯å¦å¤„äºåç¨‹è°ƒåº¦çŠ¶æ€
- * @return {int} 0 è¡¨ç¤ºéåç¨‹çŠ¶æ€ï¼Œé 0 è¡¨ç¤ºå¤„äºåç¨‹è°ƒåº¦çŠ¶æ€
+ * µ÷ÓÃ±¾º¯Êı¼ì²âµ±Ç°Ïß³ÌÊÇ·ñ´¦ÓÚĞ­³Ìµ÷¶È×´Ì¬
+ * @return {int} 0 ±íÊ¾·ÇĞ­³Ì×´Ì¬£¬·Ç 0 ±íÊ¾´¦ÓÚĞ­³Ìµ÷¶È×´Ì¬
  */
 int acl_fiber_scheduled(void);
 
 /**
- * åœæ­¢åç¨‹è¿‡ç¨‹
+ * Í£Ö¹Ğ­³Ì¹ı³Ì
  */
 void acl_fiber_schedule_stop(void);
 
 /**
- * ä½¿å½“å‰è¿è¡Œçš„åç¨‹ä¼‘çœ æŒ‡å®šæ¯«ç§’æ•°
- * @param milliseconds {unsigned int} æŒ‡å®šè¦ä¼‘çœ çš„æ¯«ç§’æ•°
- * @return {unsigned int} æœ¬åç¨‹ä¼‘çœ åå†æ¬¡è¢«å”¤é†’åå‰©ä½™çš„æ¯«ç§’æ•°
+ * Ê¹µ±Ç°ÔËĞĞµÄĞ­³ÌĞİÃßÖ¸¶¨ºÁÃëÊı
+ * @param milliseconds {unsigned int} Ö¸¶¨ÒªĞİÃßµÄºÁÃëÊı
+ * @return {unsigned int} ±¾Ğ­³ÌĞİÃßºóÔÙ´Î±»»½ĞÑºóÊ£ÓàµÄºÁÃëÊı
  */
 unsigned int acl_fiber_delay(unsigned int milliseconds);
 
 /**
- * ä½¿å½“å‰è¿è¡Œçš„åç¨‹ä¼‘çœ æŒ‡å®šç§’æ•°
- * @param seconds {unsigned int} æŒ‡å®šè¦ä¼‘çœ çš„ç§’æ•°
- * @return {unsigned int} æœ¬åç¨‹ä¼‘çœ åå†æ¬¡è¢«å”¤é†’åå‰©ä½™çš„ç§’æ•°
+ * Ê¹µ±Ç°ÔËĞĞµÄĞ­³ÌĞİÃßÖ¸¶¨ÃëÊı
+ * @param seconds {unsigned int} Ö¸¶¨ÒªĞİÃßµÄÃëÊı
+ * @return {unsigned int} ±¾Ğ­³ÌĞİÃßºóÔÙ´Î±»»½ĞÑºóÊ£ÓàµÄÃëÊı
  */
 unsigned int acl_fiber_sleep(unsigned int seconds);
 
 /**
- * åˆ›å»ºä¸€ä¸ªåç¨‹ç”¨ä½œå®šæ—¶å™¨
- * @param milliseconds {unsigned int} æ‰€åˆ›å»ºå®šæ—¶å™¨è¢«å”¤é†’çš„æ¯«ç§’æ•°
- * @param size {size_t} æ‰€åˆ›å»ºåç¨‹çš„æ ˆç©ºé—´å¤§å°
- * @param fn {void (*)(ACL_FIBER*, void*)} å®šæ—¶å™¨åç¨‹è¢«å”¤é†’æ—¶çš„å›è°ƒå‡½æ•°
- * @param ctx {void*} å›è°ƒ fn å‡½æ•°æ—¶çš„ç¬¬äºŒä¸ªå‚æ•°
- * @return {ACL_FIBER*} æ–°åˆ›å»ºçš„å®šæ—¶å™¨åç¨‹
+ * ´´½¨Ò»¸öĞ­³ÌÓÃ×÷¶¨Ê±Æ÷
+ * @param milliseconds {unsigned int} Ëù´´½¨¶¨Ê±Æ÷±»»½ĞÑµÄºÁÃëÊı
+ * @param size {size_t} Ëù´´½¨Ğ­³ÌµÄÕ»¿Õ¼ä´óĞ¡
+ * @param fn {void (*)(ACL_FIBER*, void*)} ¶¨Ê±Æ÷Ğ­³Ì±»»½ĞÑÊ±µÄ»Øµ÷º¯Êı
+ * @param ctx {void*} »Øµ÷ fn º¯ÊıÊ±µÄµÚ¶ş¸ö²ÎÊı
+ * @return {ACL_FIBER*} ĞÂ´´½¨µÄ¶¨Ê±Æ÷Ğ­³Ì
  */
 ACL_FIBER* acl_fiber_create_timer(unsigned int milliseconds, size_t size,
 	void (*fn)(ACL_FIBER*, void*), void* ctx);
 
 /**
- * åœ¨å®šæ—¶å™¨åç¨‹æœªè¢«å”¤é†’å‰ï¼Œå¯ä»¥é€šè¿‡æœ¬å‡½æ•°é‡ç½®è¯¥åç¨‹è¢«å”¤é†’çš„æ—¶é—´
- * @param timer {ACL_FIBER*} ç”± acl_fiber_create_timer åˆ›å»ºçš„å®šæ—¶å™¨åç¨‹
- * @param milliseconds {unsigned int} æŒ‡å®šè¯¥å®šæ—¶å™¨åç¨‹è¢«å”¤é†’çš„æ¯«ç§’æ•°
+ * ÔÚ¶¨Ê±Æ÷Ğ­³ÌÎ´±»»½ĞÑÇ°£¬¿ÉÒÔÍ¨¹ı±¾º¯ÊıÖØÖÃ¸ÃĞ­³Ì±»»½ĞÑµÄÊ±¼ä
+ * @param timer {ACL_FIBER*} ÓÉ acl_fiber_create_timer ´´½¨µÄ¶¨Ê±Æ÷Ğ­³Ì
+ * @param milliseconds {unsigned int} Ö¸¶¨¸Ã¶¨Ê±Æ÷Ğ­³Ì±»»½ĞÑµÄºÁÃëÊı
  */
 void acl_fiber_reset_timer(ACL_FIBER* timer, unsigned int milliseconds);
 
 /**
- * æœ¬å‡½æ•°è®¾ç½® DNS æœåŠ¡å™¨çš„åœ°å€
- * @param ip {const char*} DNS æœåŠ¡å™¨ IP åœ°å€
- * @param port {int} DNS æœåŠ¡å™¨çš„ç«¯å£
+ * ±¾º¯ÊıÉèÖÃ DNS ·şÎñÆ÷µÄµØÖ·
+ * @param ip {const char*} DNS ·şÎñÆ÷ IP µØÖ·
+ * @param port {int} DNS ·şÎñÆ÷µÄ¶Ë¿Ú
  */
 void acl_fiber_set_dns(const char* ip, int port);
 
 /* for fiber specific */
 
 /**
- * è®¾å®šå½“å‰åç¨‹çš„å±€éƒ¨å˜é‡
- * @param key {int*} åç¨‹å±€éƒ¨å˜é‡çš„ç´¢å¼•é”®çš„åœ°å€ï¼Œåˆå§‹æ—¶è¯¥å€¼åº” <= 0ï¼Œå†…éƒ¨ä¼šè‡ªåŠ¨
- *  åˆ†é…ä¸€ä¸ª > 0 çš„ç´¢å¼•é”®ï¼Œå¹¶ç»™è¯¥åœ°å€èµ‹å€¼ï¼Œåé¢çš„åç¨‹å¯ä»¥å¤ç”¨è¯¥å€¼è®¾ç½®å„è‡ªçš„
- *  å±€éƒ¨å˜é‡ï¼Œè¯¥æŒ‡é’ˆå¿…é¡»é NULL
- * @param ctx {void *} åç¨‹å±€éƒ¨å˜é‡
- * @param free_fn {void (*)(void*)} å½“åç¨‹é€€å‡ºæ—¶ä¼šè°ƒç”¨æ­¤å‡½æ•°é‡Šæ”¾åç¨‹å±€éƒ¨å˜é‡
- * @return {int} è¿”å›æ‰€è®¾ç½®çš„åç¨‹å±€éƒ¨å˜é‡çš„é”®å€¼ï¼Œè¿”å› -1 è¡¨ç¤ºå½“å‰åç¨‹ä¸å­˜åœ¨
+ * Éè¶¨µ±Ç°Ğ­³ÌµÄ¾Ö²¿±äÁ¿
+ * @param key {int*} Ğ­³Ì¾Ö²¿±äÁ¿µÄË÷Òı¼üµÄµØÖ·£¬³õÊ¼Ê±¸ÃÖµÓ¦ <= 0£¬ÄÚ²¿»á×Ô¶¯
+ *  ·ÖÅäÒ»¸ö > 0 µÄË÷Òı¼ü£¬²¢¸ø¸ÃµØÖ·¸³Öµ£¬ºóÃæµÄĞ­³Ì¿ÉÒÔ¸´ÓÃ¸ÃÖµÉèÖÃ¸÷×ÔµÄ
+ *  ¾Ö²¿±äÁ¿£¬¸ÃÖ¸Õë±ØĞë·Ç NULL
+ * @param ctx {void *} Ğ­³Ì¾Ö²¿±äÁ¿
+ * @param free_fn {void (*)(void*)} µ±Ğ­³ÌÍË³öÊ±»áµ÷ÓÃ´Ëº¯ÊıÊÍ·ÅĞ­³Ì¾Ö²¿±äÁ¿
+ * @return {int} ·µ»ØËùÉèÖÃµÄĞ­³Ì¾Ö²¿±äÁ¿µÄ¼üÖµ£¬·µ»Ø -1 ±íÊ¾µ±Ç°Ğ­³Ì²»´æÔÚ
  */
 int acl_fiber_set_specific(int* key, void* ctx, void (*free_fn)(void*));
 
 /**
- * è·å¾—å½“å‰åç¨‹å±€éƒ¨å˜é‡
- * @param key {int} ç”± acl_fiber_set_specific è¿”å›çš„é”®å€¼
- * @retur {void*} è¿”å› NULL è¡¨ç¤ºä¸å­˜åœ¨
+ * »ñµÃµ±Ç°Ğ­³Ì¾Ö²¿±äÁ¿
+ * @param key {int} ÓÉ acl_fiber_set_specific ·µ»ØµÄ¼üÖµ
+ * @retur {void*} ·µ»Ø NULL ±íÊ¾²»´æÔÚ
  */
 void* acl_fiber_get_specific(int key);
 
 /* fiber locking */
 
 /**
- * åç¨‹äº’æ–¥é”ï¼Œçº¿ç¨‹éå®‰å…¨ï¼Œåªèƒ½ç”¨åœ¨åŒä¸€çº¿ç¨‹å†…
+ * Ğ­³Ì»¥³âËø£¬Ïß³Ì·Ç°²È«£¬Ö»ÄÜÓÃÔÚÍ¬Ò»Ïß³ÌÄÚ
  */
 typedef struct ACL_FIBER_MUTEX ACL_FIBER_MUTEX;
 
 /**
- * åç¨‹è¯»å†™é”ï¼Œçº¿ç¨‹éå®‰å…¨ï¼Œåªèƒ½ç”¨åœ¨åŒä¸€çº¿ç¨‹å†…
+ * Ğ­³Ì¶ÁĞ´Ëø£¬Ïß³Ì·Ç°²È«£¬Ö»ÄÜÓÃÔÚÍ¬Ò»Ïß³ÌÄÚ
  */
 typedef struct ACL_FIBER_RWLOCK ACL_FIBER_RWLOCK;
 
 /**
- * åˆ›å»ºåç¨‹äº’æ–¥é”ï¼Œçº¿ç¨‹éå®‰å…¨ï¼Œåªèƒ½ç”¨åœ¨åŒä¸€çº¿ç¨‹å†…
+ * ´´½¨Ğ­³Ì»¥³âËø£¬Ïß³Ì·Ç°²È«£¬Ö»ÄÜÓÃÔÚÍ¬Ò»Ïß³ÌÄÚ
  * @return {ACL_FIBER_MUTEX*}
  */
 ACL_FIBER_MUTEX* acl_fiber_mutex_create(void);
 
 /**
- * é‡Šæ”¾åç¨‹äº’æ–¥é”
- * @param l {ACL_FIBER_MUTEX*} ç”± acl_fiber_mutex_create åˆ›å»ºçš„åç¨‹äº’æ–¥é”
+ * ÊÍ·ÅĞ­³Ì»¥³âËø
+ * @param l {ACL_FIBER_MUTEX*} ÓÉ acl_fiber_mutex_create ´´½¨µÄĞ­³Ì»¥³âËø
  */
 void acl_fiber_mutex_free(ACL_FIBER_MUTEX* l);
 
 /**
- * å¯¹åç¨‹äº’æ–¥é”è¿›è¡Œé˜»å¡å¼åŠ é”ï¼Œå¦‚æœåŠ é”æˆåŠŸåˆ™è¿”å›ï¼Œå¦åˆ™åˆ™é˜»å¡
- * @param l {ACL_FIBER_MUTEX*} ç”± acl_fiber_mutex_create åˆ›å»ºçš„åç¨‹äº’æ–¥é”
+ * ¶ÔĞ­³Ì»¥³âËø½øĞĞ×èÈûÊ½¼ÓËø£¬Èç¹û¼ÓËø³É¹¦Ôò·µ»Ø£¬·ñÔòÔò×èÈû
+ * @param l {ACL_FIBER_MUTEX*} ÓÉ acl_fiber_mutex_create ´´½¨µÄĞ­³Ì»¥³âËø
  */
 void acl_fiber_mutex_lock(ACL_FIBER_MUTEX* l);
 
 /**
- * å¯¹åç¨‹äº’æ–¥é”å°è¯•æ€§è¿›è¡ŒåŠ é”ï¼Œæ— è®ºæ˜¯å¦æˆåŠŸåŠ é”éƒ½ä¼šç«‹å³è¿”å›
- * @param l {ACL_FIBER_MUTEX*} ç”± acl_fiber_mutex_create åˆ›å»ºçš„åç¨‹äº’æ–¥é”
- * @return {int} å¦‚æœåŠ é”æˆåŠŸåˆ™è¿”å› 0 å€¼ï¼Œå¦åˆ™è¿”å› -1
+ * ¶ÔĞ­³Ì»¥³âËø³¢ÊÔĞÔ½øĞĞ¼ÓËø£¬ÎŞÂÛÊÇ·ñ³É¹¦¼ÓËø¶¼»áÁ¢¼´·µ»Ø
+ * @param l {ACL_FIBER_MUTEX*} ÓÉ acl_fiber_mutex_create ´´½¨µÄĞ­³Ì»¥³âËø
+ * @return {int} Èç¹û¼ÓËø³É¹¦Ôò·µ»Ø 0 Öµ£¬·ñÔò·µ»Ø -1
  */
 int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX* l);
 
 /**
- * åŠ é”æˆåŠŸçš„åç¨‹è°ƒç”¨æœ¬å‡½æ•°è¿›è¡Œè§£é”ï¼Œè°ƒç”¨æœ¬å‡½æ•°çš„åç¨‹å¿…é¡»æ˜¯è¯¥é”çš„å±ä¸»ï¼Œå¦åˆ™
- * å†…éƒ¨ä¼šäº§ç”Ÿæ–­è¨€
- * @param l {ACL_FIBER_MUTEX*} ç”± acl_fiber_mutex_create åˆ›å»ºçš„åç¨‹äº’æ–¥é”
+ * ¼ÓËø³É¹¦µÄĞ­³Ìµ÷ÓÃ±¾º¯Êı½øĞĞ½âËø£¬µ÷ÓÃ±¾º¯ÊıµÄĞ­³Ì±ØĞëÊÇ¸ÃËøµÄÊôÖ÷£¬·ñÔò
+ * ÄÚ²¿»á²úÉú¶ÏÑÔ
+ * @param l {ACL_FIBER_MUTEX*} ÓÉ acl_fiber_mutex_create ´´½¨µÄĞ­³Ì»¥³âËø
  */
 void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX* l);
 
 /**
- * åˆ›å»ºåç¨‹è¯»å†™é”ï¼Œçº¿ç¨‹éå®‰å…¨ï¼Œåªèƒ½ç”¨åœ¨åŒä¸€çº¿ç¨‹å†…
+ * ´´½¨Ğ­³Ì¶ÁĞ´Ëø£¬Ïß³Ì·Ç°²È«£¬Ö»ÄÜÓÃÔÚÍ¬Ò»Ïß³ÌÄÚ
  * @return {ACL_FIBER_RWLOCK*}
  */
 ACL_FIBER_RWLOCK* acl_fiber_rwlock_create(void);
 
 /**
- * é‡Šæ”¾åç¨‹è¯»å†™é”
- * @param l {ACL_FIBER_RWLOCK*} ç”± acl_fiber_rwlock_create åˆ›å»ºçš„è¯»å†™é”
+ * ÊÍ·ÅĞ­³Ì¶ÁĞ´Ëø
+ * @param l {ACL_FIBER_RWLOCK*} ÓÉ acl_fiber_rwlock_create ´´½¨µÄ¶ÁĞ´Ëø
  */
 void acl_fiber_rwlock_free(ACL_FIBER_RWLOCK* l);
 
 /**
- * å¯¹åç¨‹è¯»å†™é”åŠ è¯»é”ï¼Œå¦‚æœè¯¥é”å½“å‰æ­£è¢«å…¶å®ƒåç¨‹åŠ äº†è¯»é”ï¼Œåˆ™æœ¬åç¨‹ä¾ç„¶å¯ä»¥
- * æ­£å¸¸åŠ è¯»é”ï¼Œå¦‚æœè¯¥é”å½“å‰æ­£è¢«å…¶å®ƒåç¨‹åŠ äº†å†™é”ï¼Œåˆ™æœ¬åç¨‹è¿›å…¥é˜»å¡çŠ¶æ€ï¼Œç›´è‡³
- * å†™é”é‡Šæ”¾
- * @param l {ACL_FIBER_RWLOCK*} ç”± acl_fiber_rwlock_create åˆ›å»ºçš„è¯»å†™é”
+ * ¶ÔĞ­³Ì¶ÁĞ´Ëø¼Ó¶ÁËø£¬Èç¹û¸ÃËøµ±Ç°Õı±»ÆäËüĞ­³Ì¼ÓÁË¶ÁËø£¬Ôò±¾Ğ­³ÌÒÀÈ»¿ÉÒÔ
+ * Õı³£¼Ó¶ÁËø£¬Èç¹û¸ÃËøµ±Ç°Õı±»ÆäËüĞ­³Ì¼ÓÁËĞ´Ëø£¬Ôò±¾Ğ­³Ì½øÈë×èÈû×´Ì¬£¬Ö±ÖÁ
+ * Ğ´ËøÊÍ·Å
+ * @param l {ACL_FIBER_RWLOCK*} ÓÉ acl_fiber_rwlock_create ´´½¨µÄ¶ÁĞ´Ëø
  */
 void acl_fiber_rwlock_rlock(ACL_FIBER_RWLOCK* l);
 
 /**
- * å¯¹åç¨‹è¯»å†™é”å°è¯•æ€§åŠ è¯»é”ï¼ŒåŠ é”æ— è®ºæ˜¯å¦æˆåŠŸéƒ½ä¼šç«‹å³è¿”å›
- * @param l {ACL_FIBER_RWLOCK*} ç”± acl_fiber_rwlock_create åˆ›å»ºçš„è¯»å†™é”
- * @retur {int} è¿”å› 1 è¡¨ç¤ºåŠ é”æˆåŠŸï¼Œè¿”å› 0 è¡¨ç¤ºåŠ é”å¤±è´¥
+ * ¶ÔĞ­³Ì¶ÁĞ´Ëø³¢ÊÔĞÔ¼Ó¶ÁËø£¬¼ÓËøÎŞÂÛÊÇ·ñ³É¹¦¶¼»áÁ¢¼´·µ»Ø
+ * @param l {ACL_FIBER_RWLOCK*} ÓÉ acl_fiber_rwlock_create ´´½¨µÄ¶ÁĞ´Ëø
+ * @retur {int} ·µ»Ø 1 ±íÊ¾¼ÓËø³É¹¦£¬·µ»Ø 0 ±íÊ¾¼ÓËøÊ§°Ü
  */
 int acl_fiber_rwlock_tryrlock(ACL_FIBER_RWLOCK* l);
 
 /**
- * å¯¹åç¨‹è¯»å†™é”åŠ å†™é”ï¼Œåªæœ‰å½“è¯¥é”æœªè¢«ä»»ä½•åç¨‹åŠ è¯»/å†™é”æ—¶æ‰ä¼šè¿”å›ï¼Œå¦åˆ™é˜»å¡ï¼Œ
- * ç›´è‡³è¯¥é”å¯åŠ å†™é”
- * @param l {ACL_FIBER_RWLOCK*} ç”± acl_fiber_rwlock_create åˆ›å»ºçš„è¯»å†™é”
+ * ¶ÔĞ­³Ì¶ÁĞ´Ëø¼ÓĞ´Ëø£¬Ö»ÓĞµ±¸ÃËøÎ´±»ÈÎºÎĞ­³Ì¼Ó¶Á/Ğ´ËøÊ±²Å»á·µ»Ø£¬·ñÔò×èÈû£¬
+ * Ö±ÖÁ¸ÃËø¿É¼ÓĞ´Ëø
+ * @param l {ACL_FIBER_RWLOCK*} ÓÉ acl_fiber_rwlock_create ´´½¨µÄ¶ÁĞ´Ëø
  */
 void acl_fiber_rwlock_wlock(ACL_FIBER_RWLOCK* l);
 
 /**
- * å¯¹åç¨‹è¯»å†™é”å°è¯•æ€§åŠ å†™é”ï¼Œæ— è®ºæ˜¯å¦åŠ é”æˆåŠŸéƒ½ä¼šç«‹å³è¿”å›
- * @param l {ACL_FIBER_RWLOCK*} ç”± acl_fiber_rwlock_create åˆ›å»ºçš„è¯»å†™é”
- * @return {int} è¿”å› 1 è¡¨ç¤ºåŠ å†™é”æˆåŠŸï¼Œè¿”å› 0 è¡¨ç¤ºåŠ é”å¤±è´¥
+ * ¶ÔĞ­³Ì¶ÁĞ´Ëø³¢ÊÔĞÔ¼ÓĞ´Ëø£¬ÎŞÂÛÊÇ·ñ¼ÓËø³É¹¦¶¼»áÁ¢¼´·µ»Ø
+ * @param l {ACL_FIBER_RWLOCK*} ÓÉ acl_fiber_rwlock_create ´´½¨µÄ¶ÁĞ´Ëø
+ * @return {int} ·µ»Ø 1 ±íÊ¾¼ÓĞ´Ëø³É¹¦£¬·µ»Ø 0 ±íÊ¾¼ÓËøÊ§°Ü
  */
 int acl_fiber_rwlock_trywlock(ACL_FIBER_RWLOCK* l);
 
 /**
- * å¯¹åç¨‹è¯»å†™é”æˆåŠŸåŠ è¯»é”çš„åç¨‹è°ƒç”¨æœ¬å‡½æ•°è§£è¯»é”ï¼Œè°ƒç”¨è€…å¿…é¡»æ˜¯ä¹‹å‰å·²æˆåŠŸåŠ è¯»
- * é”æˆåŠŸçš„åç¨‹
- * @param l {ACL_FIBER_RWLOCK*} ç”± acl_fiber_rwlock_create åˆ›å»ºçš„è¯»å†™é”
+ * ¶ÔĞ­³Ì¶ÁĞ´Ëø³É¹¦¼Ó¶ÁËøµÄĞ­³Ìµ÷ÓÃ±¾º¯Êı½â¶ÁËø£¬µ÷ÓÃÕß±ØĞëÊÇÖ®Ç°ÒÑ³É¹¦¼Ó¶Á
+ * Ëø³É¹¦µÄĞ­³Ì
+ * @param l {ACL_FIBER_RWLOCK*} ÓÉ acl_fiber_rwlock_create ´´½¨µÄ¶ÁĞ´Ëø
  */
 void acl_fiber_rwlock_runlock(ACL_FIBER_RWLOCK* l);
 /**
- * å¯¹åç¨‹è¯»å†™é”æˆåŠŸåŠ å†™é”çš„åç¨‹è°ƒç”¨æœ¬å‡½æ•°è§£å†™é”ï¼Œè°ƒç”¨è€…å¿…é¡»æ˜¯ä¹‹å‰å·²æˆåŠŸåŠ å†™
- * é”æˆåŠŸçš„åç¨‹
- * @param l {ACL_FIBER_RWLOCK*} ç”± acl_fiber_rwlock_create åˆ›å»ºçš„è¯»å†™é”
+ * ¶ÔĞ­³Ì¶ÁĞ´Ëø³É¹¦¼ÓĞ´ËøµÄĞ­³Ìµ÷ÓÃ±¾º¯Êı½âĞ´Ëø£¬µ÷ÓÃÕß±ØĞëÊÇÖ®Ç°ÒÑ³É¹¦¼ÓĞ´
+ * Ëø³É¹¦µÄĞ­³Ì
+ * @param l {ACL_FIBER_RWLOCK*} ÓÉ acl_fiber_rwlock_create ´´½¨µÄ¶ÁĞ´Ëø
  */
 void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK* l);
 
 /* fiber_event.c */
 
-/* çº¿ç¨‹å®‰å…¨çš„åç¨‹é”ï¼Œå¯ä»¥ç”¨åœ¨ä¸åŒçº¿ç¨‹çš„åç¨‹ä¹‹é—´åŠä¸åŒçº¿ç¨‹ä¹‹é—´çš„äº’æ–¥ */
+/* Ïß³Ì°²È«µÄĞ­³ÌËø£¬¿ÉÒÔÓÃÔÚ²»Í¬Ïß³ÌµÄĞ­³ÌÖ®¼ä¼°²»Í¬Ïß³ÌÖ®¼äµÄ»¥³â */
 typedef struct ACL_FIBER_EVENT ACL_FIBER_EVENT;
 
 /**
- * åˆ›å»ºåŸºäºäº‹ä»¶çš„åç¨‹/çº¿ç¨‹æ··åˆé”
+ * ´´½¨»ùÓÚÊÂ¼şµÄĞ­³Ì/Ïß³Ì»ìºÏËø
  * @return {ACL_FIBER_EVENT *}
  */
 ACL_FIBER_EVENT *acl_fiber_event_create(void);
 
 /**
- * é‡Šæ”¾äº‹ä»¶é”
+ * ÊÍ·ÅÊÂ¼şËø
  * @param {ACL_FIBER_EVENT *}
  */
 void acl_fiber_event_free(ACL_FIBER_EVENT *event);
 
 /**
- * ç­‰å¾…äº‹ä»¶é”å¯ç”¨
+ * µÈ´ıÊÂ¼şËø¿ÉÓÃ
  * @param {ACL_FIBER_EVENT *}
- * @return {int} è¿”å› 0 è¡¨ç¤ºæˆåŠŸï¼Œ-1 è¡¨ç¤ºå‡ºé”™
+ * @return {int} ·µ»Ø 0 ±íÊ¾³É¹¦£¬-1 ±íÊ¾³ö´í
  */
 int acl_fiber_event_wait(ACL_FIBER_EVENT *event);
 
 /**
- * å°è¯•ç­‰å¾…äº‹ä»¶é”å¯ç”¨
+ * ³¢ÊÔµÈ´ıÊÂ¼şËø¿ÉÓÃ
  * @param {ACL_FIBER_EVENT *}
- * @return {int} è¿”å› 0 è¡¨ç¤ºæˆåŠŸï¼Œ-1 è¡¨ç¤ºé”è¢«å ç”¨
+ * @return {int} ·µ»Ø 0 ±íÊ¾³É¹¦£¬-1 ±íÊ¾Ëø±»Õ¼ÓÃ
  */
 int acl_fiber_event_trywait(ACL_FIBER_EVENT *event);
 
 /**
- * äº‹ä»¶é”æ‹¥æœ‰è€…é€šçŸ¥ç­‰å¾…è€…äº‹ä»¶é”å¯ç”¨ï¼Œåˆ™ç­‰å¾…è€…æ”¶åˆ°é€šçŸ¥ååˆ™å¯è·å¾—äº‹ä»¶é”
+ * ÊÂ¼şËøÓµÓĞÕßÍ¨ÖªµÈ´ıÕßÊÂ¼şËø¿ÉÓÃ£¬ÔòµÈ´ıÕßÊÕµ½Í¨ÖªºóÔò¿É»ñµÃÊÂ¼şËø
  * @param {ACL_FIBER_EVENT *}
- * @return {int} è¿”å› 0 è¡¨ç¤ºæˆåŠŸï¼Œ-1 è¡¨ç¤ºå‡ºé”™
+ * @return {int} ·µ»Ø 0 ±íÊ¾³É¹¦£¬-1 ±íÊ¾³ö´í
  */
 int acl_fiber_event_notify(ACL_FIBER_EVENT *event);
 
@@ -360,59 +364,61 @@ int acl_fiber_event_notify(ACL_FIBER_EVENT *event);
 typedef struct ACL_FIBER_SEM ACL_FIBER_SEM;
 
 /**
- * åˆ›å»ºåç¨‹ä¿¡å·é‡ï¼ŒåŒæ—¶å†…éƒ¨ä¼šå°†å½“å‰çº¿ç¨‹ä¸è¯¥ä¿¡å·é‡ç»‘å®š
- * @param num {int} ä¿¡å·é‡åˆå§‹å€¼ï¼ˆå¿…é¡» >= 0ï¼‰
+ * ´´½¨Ğ­³ÌĞÅºÅÁ¿£¬Í¬Ê±ÄÚ²¿»á½«µ±Ç°Ïß³ÌÓë¸ÃĞÅºÅÁ¿°ó¶¨
+ * @param num {int} ĞÅºÅÁ¿³õÊ¼Öµ£¨±ØĞë >= 0£©
  * @return {ACL_FIBER_SEM *}
  */
 ACL_FIBER_SEM* acl_fiber_sem_create(int num);
 
 /**
- * é‡Šæ”¾åç¨‹ä¿¡å·é‡
+ * ÊÍ·ÅĞ­³ÌĞÅºÅÁ¿
  * @param {ACL_FIBER_SEM *}
  */
 void acl_fiber_sem_free(ACL_FIBER_SEM* sem);
 
 /**
- * è·å¾—å½“å‰åç¨‹ä¿¡å·é‡æ‰€ç»‘å®šçš„çº¿ç¨‹ ID
- * @param sem {ACL_FIBER_SEM*} åç¨‹ä¿¡å·é‡å¯¹è±¡
+ * »ñµÃµ±Ç°Ğ­³ÌĞÅºÅÁ¿Ëù°ó¶¨µÄÏß³Ì ID
+ * @param sem {ACL_FIBER_SEM*} Ğ­³ÌĞÅºÅÁ¿¶ÔÏó
  * @return {pthread_t}
  */
+#if !defined(_WIN32) && !defined(_WIN64)
 pthread_t acl_fiber_sem_get_tid(ACL_FIBER_SEM* sem);
+#endif
 
 /**
- * è®¾ç½®æŒ‡å®šåç¨‹ä¿¡å·é‡çš„çš„çº¿ç¨‹ IDï¼Œå½“æ”¹å˜æœ¬åç¨‹ä¿¡å·é‡æ‰€å±çš„çº¿ç¨‹æ—¶å¦‚æœç­‰å¾…çš„åç¨‹
- * æ•°æ®é 0 åˆ™å†…éƒ¨è‡ªåŠ¨ fatalï¼Œå³å½“åç¨‹ä¿¡å·é‡ä¸Šç­‰å¾…åç¨‹éç©ºæ—¶ç¦æ­¢è°ƒç”¨æœ¬æ–¹æ³•
- * @param sem {ACL_FIBER_SEM*} åç¨‹ä¿¡å·é‡å¯¹è±¡
- * @param {pthread_t} çº¿ç¨‹ ID
+ * ÉèÖÃÖ¸¶¨Ğ­³ÌĞÅºÅÁ¿µÄµÄÏß³Ì ID£¬µ±¸Ä±ä±¾Ğ­³ÌĞÅºÅÁ¿ËùÊôµÄÏß³ÌÊ±Èç¹ûµÈ´ıµÄĞ­³Ì
+ * Êı¾İ·Ç 0 ÔòÄÚ²¿×Ô¶¯ fatal£¬¼´µ±Ğ­³ÌĞÅºÅÁ¿ÉÏµÈ´ıĞ­³Ì·Ç¿ÕÊ±½ûÖ¹µ÷ÓÃ±¾·½·¨
+ * @param sem {ACL_FIBER_SEM*} Ğ­³ÌĞÅºÅÁ¿¶ÔÏó
+ * @param {unsigned long} Ïß³Ì ID
  */
-void acl_fiber_sem_set_tid(ACL_FIBER_SEM* sem, pthread_t tid);
+void acl_fiber_sem_set_tid(ACL_FIBER_SEM* sem, unsigned long tid);
 
 /**
- * å½“åç¨‹ä¿¡å·é‡ > 0 æ—¶ä½¿ä¿¡å·é‡å‡ 1ï¼Œå¦åˆ™ç­‰å¾…ä¿¡å·é‡ > 0
+ * µ±Ğ­³ÌĞÅºÅÁ¿ > 0 Ê±Ê¹ĞÅºÅÁ¿¼õ 1£¬·ñÔòµÈ´ıĞÅºÅÁ¿ > 0
  * @param sem {ACL_FIBER_SEM *}
- * @retur {int} è¿”å›ä¿¡å·é‡å½“å‰å€¼ï¼Œå¦‚æœè¿”å› -1 è¡¨æ˜å½“å‰çº¿ç¨‹ä¸åç¨‹ä¿¡å·é‡æ‰€å±çº¿ç¨‹
- *  ä¸æ˜¯åŒä¸€çº¿ç¨‹ï¼Œæ­¤æ—¶è¯¥æ–¹æ³•ä¸ç­‰å¾…ç«‹å³è¿”å›
+ * @retur {int} ·µ»ØĞÅºÅÁ¿µ±Ç°Öµ£¬Èç¹û·µ»Ø -1 ±íÃ÷µ±Ç°Ïß³ÌÓëĞ­³ÌĞÅºÅÁ¿ËùÊôÏß³Ì
+ *  ²»ÊÇÍ¬Ò»Ïß³Ì£¬´ËÊ±¸Ã·½·¨²»µÈ´ıÁ¢¼´·µ»Ø
  */
 int acl_fiber_sem_wait(ACL_FIBER_SEM* sem);
 
 /**
- * å°è¯•ä½¿åç¨‹ä¿¡å·é‡å‡ 1
+ * ³¢ÊÔÊ¹Ğ­³ÌĞÅºÅÁ¿¼õ 1
  * @param sem {ACL_FIBER_SEM *}
- * @retur {int} æˆåŠŸå‡ 1 æ—¶è¿”å›å€¼ >= 0ï¼Œè¿”å› -1 è¡¨ç¤ºå½“å‰ä¿¡å·é‡ä¸å¯ç”¨ï¼Œæˆ–å½“å‰
- *  è°ƒç”¨è€…çº¿ç¨‹ä¸åç¨‹ä¿¡å·é‡æ‰€å±çº¿ç¨‹ä¸æ˜¯åŒä¸€çº¿ç¨‹
+ * @retur {int} ³É¹¦¼õ 1 Ê±·µ»ØÖµ >= 0£¬·µ»Ø -1 ±íÊ¾µ±Ç°ĞÅºÅÁ¿²»¿ÉÓÃ£¬»òµ±Ç°
+ *  µ÷ÓÃÕßÏß³ÌÓëĞ­³ÌĞÅºÅÁ¿ËùÊôÏß³Ì²»ÊÇÍ¬Ò»Ïß³Ì
  */
 int acl_fiber_sem_trywait(ACL_FIBER_SEM* sem);
 
 /**
- * ä½¿åç¨‹ä¿¡å·é‡åŠ  1
+ * Ê¹Ğ­³ÌĞÅºÅÁ¿¼Ó 1
  * @param sem {ACL_FIBER_SEM *}
- * @retur {int} è¿”å›ä¿¡å·é‡å½“å‰å€¼ï¼Œè¿”å› -1 è¡¨ç¤ºå½“å‰è°ƒç”¨è€…çº¿ç¨‹ä¸åç¨‹ä¿¡å·é‡æ‰€å±
- *  çº¿ç¨‹ä¸æ˜¯åŒä¸€çº¿ç¨‹
+ * @retur {int} ·µ»ØĞÅºÅÁ¿µ±Ç°Öµ£¬·µ»Ø -1 ±íÊ¾µ±Ç°µ÷ÓÃÕßÏß³ÌÓëĞ­³ÌĞÅºÅÁ¿ËùÊô
+ *  Ïß³Ì²»ÊÇÍ¬Ò»Ïß³Ì
  */
 int acl_fiber_sem_post(ACL_FIBER_SEM* sem);
 
 /**
- * è·å¾—æŒ‡å®šåç¨‹ä¿¡å·é‡çš„å½“å‰å€¼ï¼Œè¯¥å€¼åæ˜ äº†ç›®å‰ç­‰å¾…è¯¥ä¿¡å·é‡çš„æ•°é‡
+ * »ñµÃÖ¸¶¨Ğ­³ÌĞÅºÅÁ¿µÄµ±Ç°Öµ£¬¸ÃÖµ·´Ó³ÁËÄ¿Ç°µÈ´ı¸ÃĞÅºÅÁ¿µÄÊıÁ¿
  * @param sem {ACL_FIBER_SEM*}
  * @retur {int}
  */
@@ -421,114 +427,114 @@ int acl_fiber_sem_num(ACL_FIBER_SEM* sem);
 /* channel communication */
 
 /**
- * åç¨‹é—´é€šä¿¡çš„ç®¡é“
+ * Ğ­³Ì¼äÍ¨ĞÅµÄ¹ÜµÀ
  */
 typedef struct ACL_CHANNEL ACL_CHANNEL;
 
 /**
- * åˆ›å»ºåç¨‹é€šä¿¡ç®¡é“
- * @param elemsize {int} åœ¨ ACL_CHANNEL è¿›è¡Œä¼ è¾“çš„å¯¹è±¡çš„å›ºå®šå°ºå¯¸å¤§å°ï¼ˆå­—èŠ‚ï¼‰
- * @param bufsize {int} ACL_CHANNEL å†…éƒ¨ç¼“å†²åŒºå¤§å°ï¼Œå³å¯ä»¥ç¼“å­˜ elemsize å°ºå¯¸å¤§å°
- *  å¯¹è±¡çš„ä¸ªæ•°
+ * ´´½¨Ğ­³ÌÍ¨ĞÅ¹ÜµÀ
+ * @param elemsize {int} ÔÚ ACL_CHANNEL ½øĞĞ´«ÊäµÄ¶ÔÏóµÄ¹Ì¶¨³ß´ç´óĞ¡£¨×Ö½Ú£©
+ * @param bufsize {int} ACL_CHANNEL ÄÚ²¿»º³åÇø´óĞ¡£¬¼´¿ÉÒÔ»º´æ elemsize ³ß´ç´óĞ¡
+ *  ¶ÔÏóµÄ¸öÊı
  * @return {CHANNNEL*}
  */
 ACL_CHANNEL* acl_channel_create(int elemsize, int bufsize);
 
 /**
- * é‡Šæ”¾ç”± acl_channel_create åˆ›å»ºçš„åç¨‹é€šä¿¡ç®¡é“å¯¹è±¡
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
+ * ÊÍ·ÅÓÉ acl_channel_create ´´½¨µÄĞ­³ÌÍ¨ĞÅ¹ÜµÀ¶ÔÏó
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
  */
 void acl_channel_free(ACL_CHANNEL* c);
 
 /**
- * é˜»å¡å¼å‘æŒ‡å®š ACL_CHANNEL ä¸­å‘é€æŒ‡å®šçš„å¯¹è±¡åœ°å€
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
- * @param v {void*} è¢«å‘é€çš„å¯¹è±¡åœ°å€
- * @return {int} è¿”å›å€¼ >= 0
+ * ×èÈûÊ½ÏòÖ¸¶¨ ACL_CHANNEL ÖĞ·¢ËÍÖ¸¶¨µÄ¶ÔÏóµØÖ·
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
+ * @param v {void*} ±»·¢ËÍµÄ¶ÔÏóµØÖ·
+ * @return {int} ·µ»ØÖµ >= 0
  */
 int acl_channel_send(ACL_CHANNEL* c, void* v);
 
 /**
- * éé˜»å¡å¼å‘æŒ‡å®š ACL_CHANNEL ä¸­å‘é€æŒ‡å®šçš„å¯¹è±¡ï¼Œå†…éƒ¨ä¼šæ ¹æ® acl_channel_create ä¸­æŒ‡å®š
- * çš„ elemsize å¯¹è±¡å¤§å°è¿›è¡Œæ•°æ®æ‹·è´
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
- * @param v {void*} è¢«å‘é€çš„å¯¹è±¡åœ°å€
+ * ·Ç×èÈûÊ½ÏòÖ¸¶¨ ACL_CHANNEL ÖĞ·¢ËÍÖ¸¶¨µÄ¶ÔÏó£¬ÄÚ²¿»á¸ù¾İ acl_channel_create ÖĞÖ¸¶¨
+ * µÄ elemsize ¶ÔÏó´óĞ¡½øĞĞÊı¾İ¿½±´
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
+ * @param v {void*} ±»·¢ËÍµÄ¶ÔÏóµØÖ·
  */
 int acl_channel_send_nb(ACL_CHANNEL* c, void* v);
 
 /**
- * ä»æŒ‡å®šçš„ ACL_CHANNEL ä¸­é˜»å¡å¼è¯»å–å¯¹è±¡ï¼Œ
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
- * @param v {void*} å­˜æ”¾ç»“æœå†…å®¹
- * @return {int} è¿”å›å€¼ >= 0 è¡¨ç¤ºæˆåŠŸè¯»åˆ°æ•°æ®
+ * ´ÓÖ¸¶¨µÄ ACL_CHANNEL ÖĞ×èÈûÊ½¶ÁÈ¡¶ÔÏó£¬
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
+ * @param v {void*} ´æ·Å½á¹ûÄÚÈİ
+ * @return {int} ·µ»ØÖµ >= 0 ±íÊ¾³É¹¦¶Áµ½Êı¾İ
  */
 int acl_channel_recv(ACL_CHANNEL* c, void* v);
 
 /**
- * ä»æŒ‡å®šçš„ ACL_CHANNEL ä¸­éé˜»å¡å¼è¯»å–å¯¹è±¡ï¼Œæ— è®ºæ˜¯å¦è¯»åˆ°æ•°æ®éƒ½ä¼šç«‹å³è¿”å›
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
- * @param v {void*} å­˜æ”¾ç»“æœå†…å®¹
- * @return {int} è¿”å›å€¼ >= 0 è¡¨ç¤ºæˆåŠŸè¯»åˆ°æ•°æ®ï¼Œå¦åˆ™è¡¨ç¤ºæœªè¯»åˆ°æ•°æ®
+ * ´ÓÖ¸¶¨µÄ ACL_CHANNEL ÖĞ·Ç×èÈûÊ½¶ÁÈ¡¶ÔÏó£¬ÎŞÂÛÊÇ·ñ¶Áµ½Êı¾İ¶¼»áÁ¢¼´·µ»Ø
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
+ * @param v {void*} ´æ·Å½á¹ûÄÚÈİ
+ * @return {int} ·µ»ØÖµ >= 0 ±íÊ¾³É¹¦¶Áµ½Êı¾İ£¬·ñÔò±íÊ¾Î´¶Áµ½Êı¾İ
  */
 int acl_channel_recv_nb(ACL_CHANNEL* c, void* v);
 
 /**
- * å‘æŒ‡å®šçš„ ACL_CHANNEL ä¸­é˜»å¡å¼å‘é€æŒ‡å®šå¯¹è±¡çš„åœ°å€
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
- * @param v {void*} è¢«å‘é€å¯¹è±¡çš„åœ°å€
- * @return {int} è¿”å›å€¼ >= 0
+ * ÏòÖ¸¶¨µÄ ACL_CHANNEL ÖĞ×èÈûÊ½·¢ËÍÖ¸¶¨¶ÔÏóµÄµØÖ·
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
+ * @param v {void*} ±»·¢ËÍ¶ÔÏóµÄµØÖ·
+ * @return {int} ·µ»ØÖµ >= 0
  */
 int acl_channel_sendp(ACL_CHANNEL* c, void* v);
 
 /**
- * ä»æŒ‡å®šçš„ CHANNLE ä¸­é˜»å¡å¼æ¥æ”¶ç”± acl_channel_sendp å‘é€çš„å¯¹è±¡çš„åœ°å€
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
- * @return {void*} è¿”å›é NULLï¼ŒæŒ‡å®šæ¥æ”¶åˆ°çš„å¯¹è±¡çš„åœ°å€
+ * ´ÓÖ¸¶¨µÄ CHANNLE ÖĞ×èÈûÊ½½ÓÊÕÓÉ acl_channel_sendp ·¢ËÍµÄ¶ÔÏóµÄµØÖ·
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
+ * @return {void*} ·µ»Ø·Ç NULL£¬Ö¸¶¨½ÓÊÕµ½µÄ¶ÔÏóµÄµØÖ·
  */
 void* acl_channel_recvp(ACL_CHANNEL* c);
 
 /**
- * å‘æŒ‡å®šçš„ ACL_CHANNEL ä¸­éé˜»å¡å¼å‘é€æŒ‡å®šå¯¹è±¡çš„åœ°å€
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
- * @param v {void*} è¢«å‘é€å¯¹è±¡çš„åœ°å€
- * @return {int} è¿”å›å€¼ >= 0
+ * ÏòÖ¸¶¨µÄ ACL_CHANNEL ÖĞ·Ç×èÈûÊ½·¢ËÍÖ¸¶¨¶ÔÏóµÄµØÖ·
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
+ * @param v {void*} ±»·¢ËÍ¶ÔÏóµÄµØÖ·
+ * @return {int} ·µ»ØÖµ >= 0
  */
 int acl_channel_sendp_nb(ACL_CHANNEL* c, void* v);
 
 /**
- * ä»æŒ‡å®šçš„ CHANNLE ä¸­é˜»å¡å¼æ¥æ”¶ç”± acl_channel_sendp å‘é€çš„å¯¹è±¡çš„åœ°å€
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
- * @return {void*} è¿”å›é NULLï¼ŒæŒ‡å®šæ¥æ”¶åˆ°çš„å¯¹è±¡çš„åœ°å€ï¼Œå¦‚æœè¿”å› NULL è¡¨ç¤º
- *  æ²¡æœ‰è¯»åˆ°ä»»ä½•å¯¹è±¡
+ * ´ÓÖ¸¶¨µÄ CHANNLE ÖĞ×èÈûÊ½½ÓÊÕÓÉ acl_channel_sendp ·¢ËÍµÄ¶ÔÏóµÄµØÖ·
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
+ * @return {void*} ·µ»Ø·Ç NULL£¬Ö¸¶¨½ÓÊÕµ½µÄ¶ÔÏóµÄµØÖ·£¬Èç¹û·µ»Ø NULL ±íÊ¾
+ *  Ã»ÓĞ¶Áµ½ÈÎºÎ¶ÔÏó
  */
 void* acl_channel_recvp_nb(ACL_CHANNEL* c);
 
 /**
- * å‘æŒ‡å®šçš„ ACL_CHANNEL ä¸­å‘é€æ— ç¬¦å·é•¿æ•´å½¢æ•°å€¼
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
- * @param val {unsigned long} è¦å‘é€çš„æ•°å€¼
- * @return {int} è¿”å›å€¼ >= 0
+ * ÏòÖ¸¶¨µÄ ACL_CHANNEL ÖĞ·¢ËÍÎŞ·ûºÅ³¤ÕûĞÎÊıÖµ
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
+ * @param val {unsigned long} Òª·¢ËÍµÄÊıÖµ
+ * @return {int} ·µ»ØÖµ >= 0
  */
 int acl_channel_sendul(ACL_CHANNEL* c, unsigned long val);
 
 /**
- * ä»æŒ‡å®šçš„ ACL_CHANNEL ä¸­æ¥æ”¶æ— ç¬¦å·é•¿æ•´å½¢æ•°å€¼
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
+ * ´ÓÖ¸¶¨µÄ ACL_CHANNEL ÖĞ½ÓÊÕÎŞ·ûºÅ³¤ÕûĞÎÊıÖµ
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
  * @return {unsigned long}
  */
 unsigned long acl_channel_recvul(ACL_CHANNEL* c);
 
 /**
- * å‘æŒ‡å®šçš„ ACL_CHANNEL ä¸­ä»¥éé˜»å¡æ–¹å¼å‘é€æ— ç¬¦å·é•¿æ•´å½¢æ•°å€¼
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
- * @param val {unsigned long} è¦å‘é€çš„æ•°å€¼
- * @return {int} è¿”å›å€¼ >= 0
+ * ÏòÖ¸¶¨µÄ ACL_CHANNEL ÖĞÒÔ·Ç×èÈû·½Ê½·¢ËÍÎŞ·ûºÅ³¤ÕûĞÎÊıÖµ
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
+ * @param val {unsigned long} Òª·¢ËÍµÄÊıÖµ
+ * @return {int} ·µ»ØÖµ >= 0
  */
 int acl_channel_sendul_nb(ACL_CHANNEL* c, unsigned long val);
 
 /**
- * ä»æŒ‡å®šçš„ ACL_CHANNEL ä¸­ä»¥éé˜»å¡æ–¹å¼æ¥æ”¶æ— ç¬¦å·é•¿æ•´å½¢æ•°å€¼
- * @param c {ACL_CHANNEL*} ç”± acl_channel_create åˆ›å»ºçš„ç®¡é“å¯¹è±¡
+ * ´ÓÖ¸¶¨µÄ ACL_CHANNEL ÖĞÒÔ·Ç×èÈû·½Ê½½ÓÊÕÎŞ·ûºÅ³¤ÕûĞÎÊıÖµ
+ * @param c {ACL_CHANNEL*} ÓÉ acl_channel_create ´´½¨µÄ¹ÜµÀ¶ÔÏó
  * @return {unsigned long}
  */
 unsigned long acl_channel_recvul_nb(ACL_CHANNEL* c);
@@ -552,49 +558,49 @@ ssize_t fiber_sendmsg(int sockfd, const struct msghdr* msg, int flags);
 /****************************************************************************/
 
 /**
- * åœ¨å°†å†™æ—¥å¿—è‡³æ—¥å¿—æ–‡ä»¶å‰å›è°ƒç”¨æˆ·è‡ªå®šä¹‰çš„å‡½æ•°ï¼Œä¸”å°†æ—¥å¿—ä¿¡æ¯ä¼ é€’ç»™è¯¥å‡½æ•°ï¼Œ
- * åªæœ‰å½“ç”¨æˆ·é€šè¿‡ msg_pre_write è¿›è¡Œè®¾ç½®åæ‰ç”Ÿæ•ˆ
- * @param ctx {void*} ç”¨æˆ·çš„è‡ªå®šä¹‰å‚æ•°
- * @param fmt {const char*} æ ¼å¼å‚æ•°
- * @param ap {va_list} æ ¼å¼å‚æ•°åˆ—è¡¨
+ * ÔÚ½«Ğ´ÈÕÖ¾ÖÁÈÕÖ¾ÎÄ¼şÇ°»Øµ÷ÓÃ»§×Ô¶¨ÒåµÄº¯Êı£¬ÇÒ½«ÈÕÖ¾ĞÅÏ¢´«µİ¸ø¸Ãº¯Êı£¬
+ * Ö»ÓĞµ±ÓÃ»§Í¨¹ı msg_pre_write ½øĞĞÉèÖÃºó²ÅÉúĞ§
+ * @param ctx {void*} ÓÃ»§µÄ×Ô¶¨Òå²ÎÊı
+ * @param fmt {const char*} ¸ñÊ½²ÎÊı
+ * @param ap {va_list} ¸ñÊ½²ÎÊıÁĞ±í
  */
 typedef void (*MSG_PRE_WRITE_FN)(void *ctx, const char *fmt, va_list ap);
 
 /**
- * åº”ç”¨é€šè¿‡æ­¤å‡½æ•°ç±»å‹å¯ä»¥è‡ªå®šä¹‰æ—¥å¿—è®°å½•å‡½æ•°ï¼Œå½“åº”ç”¨åœ¨æ‰“å¼€æ—¥å¿—å‰è°ƒç”¨
- * msg_register æ³¨å†Œäº†è‡ªå®šä¹‰è®°å½•å‡½æ•°ï¼Œåˆ™å½“åº”ç”¨å†™æ—¥å¿—æ—¶ä¾¿ç”¨æ­¤è‡ªå®šä¹‰
- * å‡½æ•°è®°å½•æ—¥å¿—ï¼Œå¦åˆ™ç”¨ç¼ºçœçš„æ—¥å¿—è®°å½•å‡½æ•°
- * @param ctx {void*} åº”ç”¨ä¼ é€’è¿›å»çš„å‚æ•°
- * @param fmt {const char*} æ ¼å¼å‚æ•°
- * @param ap {va_list} å‚æ•°åˆ—è¡¨
+ * Ó¦ÓÃÍ¨¹ı´Ëº¯ÊıÀàĞÍ¿ÉÒÔ×Ô¶¨ÒåÈÕÖ¾¼ÇÂ¼º¯Êı£¬µ±Ó¦ÓÃÔÚ´ò¿ªÈÕÖ¾Ç°µ÷ÓÃ
+ * msg_register ×¢²áÁË×Ô¶¨Òå¼ÇÂ¼º¯Êı£¬Ôòµ±Ó¦ÓÃĞ´ÈÕÖ¾Ê±±ãÓÃ´Ë×Ô¶¨Òå
+ * º¯Êı¼ÇÂ¼ÈÕÖ¾£¬·ñÔòÓÃÈ±Ê¡µÄÈÕÖ¾¼ÇÂ¼º¯Êı
+ * @param ctx {void*} Ó¦ÓÃ´«µİ½øÈ¥µÄ²ÎÊı
+ * @param fmt {const char*} ¸ñÊ½²ÎÊı
+ * @param ap {va_list} ²ÎÊıÁĞ±í
  */
 typedef void (*MSG_WRITE_FN) (void *ctx, const char *fmt, va_list ap);
 
 /**
- * åœ¨æ‰“å¼€æ—¥å¿—å‰è°ƒç”¨æ­¤å‡½æ•°æ³¨å†Œåº”ç”¨è‡ªå·±çš„æ—¥å¿—è®°å½•å‡½æ•°
- * @param write_fn {MSG_WRITE_FN} è‡ªå®šä¹‰æ—¥å¿—è®°å½•å‡½æ•°
- * @param ctx {void*} è‡ªå®šä¹‰å‚æ•°
+ * ÔÚ´ò¿ªÈÕÖ¾Ç°µ÷ÓÃ´Ëº¯Êı×¢²áÓ¦ÓÃ×Ô¼ºµÄÈÕÖ¾¼ÇÂ¼º¯Êı
+ * @param write_fn {MSG_WRITE_FN} ×Ô¶¨ÒåÈÕÖ¾¼ÇÂ¼º¯Êı
+ * @param ctx {void*} ×Ô¶¨Òå²ÎÊı
  */
 void msg_register(MSG_WRITE_FN write_fn, void *ctx);
 
 /**
- * å°† msg_register æ³¨å†Œè‡ªå®šä¹‰å‡½æ•°æ¸…é™¤ï¼Œé‡‡ç”¨ç¼ºçœçš„æ—¥å¿—å‡½æ•°é›†
+ * ½« msg_register ×¢²á×Ô¶¨Òåº¯ÊıÇå³ı£¬²ÉÓÃÈ±Ê¡µÄÈÕÖ¾º¯Êı¼¯
  */
 void msg_unregister(void);
 
 /**
- * åœ¨æ‰“å¼€æ—¥å¿—å‰è°ƒç”¨æ­¤å‡½æ•°æ³¨å†Œåº”ç”¨çš„ç§æœ‰å‡½æ•°ï¼Œåœ¨è®°å½•æ—¥å¿—å‰ä¼šå…ˆè®°å½•ä¿¡æ¯é€šè¿‡
- * æ­¤æ³¨å†Œçš„å‡½æ•°ä¼ é€’ç»™åº”ç”¨
- * @param pre_write {MSG_PRE_WRITE_FN} æ—¥å¿—è®°å½•å‰è°ƒç”¨çš„å‡½æ•°
- * @param ctx {void*} è‡ªå®šä¹‰å‚æ•°
+ * ÔÚ´ò¿ªÈÕÖ¾Ç°µ÷ÓÃ´Ëº¯Êı×¢²áÓ¦ÓÃµÄË½ÓĞº¯Êı£¬ÔÚ¼ÇÂ¼ÈÕÖ¾Ç°»áÏÈ¼ÇÂ¼ĞÅÏ¢Í¨¹ı
+ * ´Ë×¢²áµÄº¯Êı´«µİ¸øÓ¦ÓÃ
+ * @param pre_write {MSG_PRE_WRITE_FN} ÈÕÖ¾¼ÇÂ¼Ç°µ÷ÓÃµÄº¯Êı
+ * @param ctx {void*} ×Ô¶¨Òå²ÎÊı
  */
 void msg_pre_write(MSG_PRE_WRITE_FN pre_write, void *ctx);
 
 /**
- * å½“æœªè°ƒç”¨ msg_open æ–¹å¼æ‰“å¼€æ—¥å¿—æ—¶ï¼Œè°ƒç”¨äº† msg_info/error/fatal/warn
- * çš„æ“ä½œï¼Œæ˜¯å¦å…è®¸ä¿¡æ¯è¾“å‡ºè‡³æ ‡å‡†è¾“å‡ºå±å¹•ä¸Šï¼Œé€šè¿‡æ­¤å‡½æ•°æ¥è®¾ç½®è¯¥å¼€å…³ï¼Œè¯¥å¼€å…³
- * ä»…å½±å“æ˜¯å¦éœ€è¦å°†ä¿¡æ¯è¾“å‡ºè‡³ç»ˆç«¯å±å¹•è€Œä¸å½±å“æ˜¯å¦è¾“å‡ºè‡³æ–‡ä»¶ä¸­
- * @param onoff {int} é 0 è¡¨ç¤ºå…è®¸è¾“å‡ºè‡³å±å¹•
+ * µ±Î´µ÷ÓÃ msg_open ·½Ê½´ò¿ªÈÕÖ¾Ê±£¬µ÷ÓÃÁË msg_info/error/fatal/warn
+ * µÄ²Ù×÷£¬ÊÇ·ñÔÊĞíĞÅÏ¢Êä³öÖÁ±ê×¼Êä³öÆÁÄ»ÉÏ£¬Í¨¹ı´Ëº¯ÊıÀ´ÉèÖÃ¸Ã¿ª¹Ø£¬¸Ã¿ª¹Ø
+ * ½öÓ°ÏìÊÇ·ñĞèÒª½«ĞÅÏ¢Êä³öÖÁÖÕ¶ËÆÁÄ»¶ø²»Ó°ÏìÊÇ·ñÊä³öÖÁÎÄ¼şÖĞ
+ * @param onoff {int} ·Ç 0 ±íÊ¾ÔÊĞíÊä³öÖÁÆÁÄ»
  */
 void msg_stdout_enable(int onoff);
 

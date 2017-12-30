@@ -1,10 +1,20 @@
 #include "stdafx.h"
-#include <fcntl.h>
-
 #include "msg.h"
 #include "iostuff.h"
 
-/* Backwards compatibility */
+#ifdef SYS_WIN
+int non_blocking(int fd, int on)
+{
+	unsigned long n = on;
+	int flags = 0;
+
+	if (ioctlsocket(fd, FIONBIO, &n) < 0) {
+		msg_error("ioctlsocket(fd,FIONBIO) failed");
+		return -1;
+	}
+	return flags;
+}
+#elif defined(SYS_UNIX)
 # ifndef O_NONBLOCK
 #  define PATTERN	FNDELAY
 # else
@@ -44,3 +54,4 @@ int non_blocking(int fd, int on)
 
 	return flags;
 }
+#endif

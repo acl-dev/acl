@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include <netdb.h>
 #include "dns/dns.h"
 #include "dns/sane_inet.h"
 #include "common.h"
@@ -12,6 +11,8 @@ typedef void (*freeaddrinfo_fn)(struct addrinfo *res);
 
 static getaddrinfo_fn  __sys_getaddrinfo  = NULL;
 static freeaddrinfo_fn __sys_freeaddrinfo = NULL;
+
+#ifdef SYS_UNIX
 
 static void hook_init(void)
 {
@@ -190,3 +191,5 @@ void freeaddrinfo(struct addrinfo *res)
 		free(tmp);
 	}
 }
+
+#endif

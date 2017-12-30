@@ -1,6 +1,9 @@
 #ifndef EVENT_INCLUDE_H
 #define EVENT_INCLUDE_H
 
+#include "define.h"
+#include "common/gettimeofday.h"
+
 #ifdef	HAS_EPOLL
 #include <sys/epoll.h>
 #endif
@@ -12,18 +15,30 @@
     (x) = ((long long) _tv.tv_sec) * 1000 + ((long long) _tv.tv_usec)/ 1000; \
 } while (0)
 
-typedef struct POLLFD       POLLFD;
 typedef struct FILE_EVENT   FILE_EVENT;
+typedef struct EVENT        EVENT;
+
+#ifdef HAS_POLL
+typedef struct POLLFD       POLLFD;
 typedef struct POLL_CTX     POLL_CTX;
 typedef struct POLL_EVENT   POLL_EVENT;
+#endif
+
+#ifdef HAS_EPOLL
 typedef struct EPOLL_CTX    EPOLL_CTX;
 typedef struct EPOLL_EVENT  EPOLL_EVENT;
-typedef struct EVENT        EVENT;
+#endif
 
 typedef int  event_oper(EVENT *ev, FILE_EVENT *fe);
 typedef void event_proc(EVENT *ev, FILE_EVENT *fe);
+
+#ifdef HAS_POLL
 typedef void poll_proc(EVENT *ev, POLL_EVENT *pe);
+#endif
+
+#ifdef HAS_EPOLL
 typedef void epoll_proc(EVENT *ev, EPOLL_EVENT *ee);
+#endif
 
 /**
  * for each connection fd
@@ -51,12 +66,15 @@ struct FILE_EVENT {
 
 	event_proc   *r_proc;
 	event_proc   *w_proc;
+#ifdef HAS_POLL
 	POLLFD       *pfd;
-#ifdef	HAS_EPOLL
+#endif
+#ifdef HAS_EPOLL
 	EPOLL_CTX    *epx;
 #endif
 };
 
+#ifdef HAS_POLL
 struct POLLFD {
 	FILE_EVENT *fe;
 	POLL_EVENT *pe;
@@ -71,6 +89,7 @@ struct POLL_EVENT {
 	int        nfds;
 	POLLFD    *fds;
 };
+#endif
 
 #ifdef	HAS_EPOLL
 struct EPOLL_CTX {
@@ -103,8 +122,12 @@ struct EVENT {
 	int  setsize;
 	int  maxfd;
 
+#ifdef HAS_POLL
 	RING   poll_list;
+#endif
+#ifdef HAS_EPOLL
 	RING   epoll_list;
+#endif
 
 	const char *(*name)(void);
 	int  (*handle)(EVENT *);
@@ -131,8 +154,8 @@ int  event_size(EVENT *ev);
 void event_free(EVENT *ev);
 void event_close(EVENT *ev, FILE_EVENT *fe);
 
-int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
-int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
+int  event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
+int  event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
 void event_del_read(EVENT *ev, FILE_EVENT *fe);
 void event_del_write(EVENT *ev, FILE_EVENT *fe);
 int  event_process(EVENT *ev, int left);

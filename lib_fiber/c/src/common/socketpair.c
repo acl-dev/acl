@@ -2,6 +2,8 @@
 #include "msg.h"
 #include "iostuff.h"
 
+#ifdef SYS_UNIX
+
 /* sane_socketpair - sanitize socketpair() error returns */
 
 int sane_socketpair(int domain, int type, int protocol, int result[2])
@@ -31,3 +33,5 @@ int sane_socketpair(int domain, int type, int protocol, int result[2])
 	}
 	return ret;
 }
+
+#endif

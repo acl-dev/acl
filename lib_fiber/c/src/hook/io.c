@@ -41,6 +41,7 @@ static sendfile64_fn __sys_sendfile64 = NULL;
 
 static void hook_init(void)
 {
+#ifdef SYS_UNIX
 	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
 	static int __called = 0;
 
@@ -95,6 +96,7 @@ static void hook_init(void)
 #endif
 
 	(void) pthread_mutex_unlock(&__lock);
+#endif
 }
 
 unsigned int sleep(unsigned int seconds)
@@ -154,7 +156,7 @@ int close(int fd)
 
 #ifdef READ_WAIT_FIRST
 
-inline ssize_t fiber_read(int fd, void *buf, size_t count)
+ssize_t fiber_read(int fd, void *buf, size_t count)
 {
 	ssize_t ret;
 	FILE_EVENT* fe;
@@ -190,7 +192,7 @@ inline ssize_t fiber_read(int fd, void *buf, size_t count)
 	return ret;
 }
 
-inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
+ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 {
 	ssize_t ret;
 	FILE_EVENT *fe;
@@ -226,7 +228,7 @@ inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 	return ret;
 }
 
-inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
+ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 {
 	ssize_t ret;
 	FILE_EVENT *fe;
@@ -262,7 +264,7 @@ inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 	return ret;
 }
 
-inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
+ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 	struct sockaddr *src_addr, socklen_t *addrlen)
 {
 	ssize_t ret;
@@ -300,7 +302,7 @@ inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 	return ret;
 }
 
-inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
+ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 {
 	ssize_t ret;
 	FILE_EVENT *fe;
@@ -338,7 +340,7 @@ inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 
 #else
 
-inline ssize_t fiber_read(int fd, void *buf, size_t count)
+ssize_t fiber_read(int fd, void *buf, size_t count)
 {
 	FILE_EVENT *fe;
 
@@ -378,7 +380,7 @@ inline ssize_t fiber_read(int fd, void *buf, size_t count)
 	}
 }
 
-inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
+ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 {
 	FILE_EVENT *fe;
 
@@ -418,7 +420,7 @@ inline ssize_t fiber_readv(int fd, const struct iovec *iov, int iovcnt)
 	}
 }
 
-inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
+ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 {
 	FILE_EVENT *fe;
 
@@ -458,7 +460,7 @@ inline ssize_t fiber_recv(int sockfd, void *buf, size_t len, int flags)
 	}
 }
 
-inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
+ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 	struct sockaddr *src_addr, socklen_t *addrlen)
 {
 	FILE_EVENT *fe;
@@ -500,7 +502,7 @@ inline ssize_t fiber_recvfrom(int sockfd, void *buf, size_t len, int flags,
 	}
 }
 
-inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
+ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 {
 	FILE_EVENT *fe;
 
@@ -544,7 +546,7 @@ inline ssize_t fiber_recvmsg(int sockfd, struct msghdr *msg, int flags)
 
 /****************************************************************************/
 
-inline ssize_t fiber_write(int fd, const void *buf, size_t count)
+ssize_t fiber_write(int fd, const void *buf, size_t count)
 {
 	FILE_EVENT *fe;
 
@@ -585,7 +587,7 @@ inline ssize_t fiber_write(int fd, const void *buf, size_t count)
 	}
 }
 
-inline ssize_t fiber_writev(int fd, const struct iovec *iov, int iovcnt)
+ssize_t fiber_writev(int fd, const struct iovec *iov, int iovcnt)
 {
 	FILE_EVENT *fe;
 
@@ -626,7 +628,7 @@ inline ssize_t fiber_writev(int fd, const struct iovec *iov, int iovcnt)
 	}
 }
 
-inline ssize_t fiber_send(int sockfd, const void *buf, size_t len, int flags)
+ssize_t fiber_send(int sockfd, const void *buf, size_t len, int flags)
 {
 	FILE_EVENT *fe;
 
@@ -667,7 +669,7 @@ inline ssize_t fiber_send(int sockfd, const void *buf, size_t len, int flags)
 	}
 }
 
-inline ssize_t fiber_sendto(int sockfd, const void *buf, size_t len, int flags,
+ssize_t fiber_sendto(int sockfd, const void *buf, size_t len, int flags,
 	const struct sockaddr *dest_addr, socklen_t addrlen)
 {
 	FILE_EVENT *fe;
@@ -710,7 +712,7 @@ inline ssize_t fiber_sendto(int sockfd, const void *buf, size_t len, int flags,
 	}
 }
 
-inline ssize_t fiber_sendmsg(int sockfd, const struct msghdr *msg, int flags)
+ssize_t fiber_sendmsg(int sockfd, const struct msghdr *msg, int flags)
 {
 	FILE_EVENT *fe;
 
@@ -782,7 +784,7 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, unsigned int flags)
 	return fiber_recvmsg(sockfd, msg, flags);
 }
 
-#else
+#elif defined(SYS_UNIX)
 
 ssize_t recv(int sockfd, void *buf, size_t len, int flags)
 {
@@ -800,8 +802,9 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 	return fiber_recvmsg(sockfd, msg, flags);
 }
 
-#endif
+#endif // SYS_UNIX
 
+#ifdef SYS_UNIX
 ssize_t write(int fd, const void *buf, size_t count)
 {
 	return fiber_write(fd, buf, count);
@@ -811,6 +814,7 @@ ssize_t writev(int fd, const struct iovec *iov, int iovcnt)
 {
 	return fiber_writev(fd, iov, iovcnt);
 }
+#endif
 
 #ifdef ACL_ARM_LINUX
 
@@ -830,7 +834,7 @@ ssize_t sendmsg(int sockfd, const struct msghdr *msg, unsigned int flags)
 	return fiber_sendmsg(sockfd, msg, (int) flags);
 }
 
-#else
+#elif defined(SYS_UNIX)
 
 ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 {

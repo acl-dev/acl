@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "common.h"
 
+#ifdef SYS_UNIX
+
 #ifdef	LINUX
 # include <linux/version.h>
 # if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
@@ -70,7 +72,7 @@ void acl_fiber_event_free(ACL_FIBER_EVENT *event)
 	free(event);
 }
 
-static inline void channel_open(FIBER_BASE *fbase)
+static void channel_open(FIBER_BASE *fbase)
 {
 #if defined(HAS_EVENTFD)
 	int flags = 0;
@@ -260,3 +262,5 @@ int acl_fiber_event_notify(ACL_FIBER_EVENT *event)
 
 	return 0;
 }
+
+#endif // SYS_UNIX

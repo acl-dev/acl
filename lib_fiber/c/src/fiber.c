@@ -24,121 +24,26 @@ static fcntl_fn __sys_fcntl     = NULL;
 typedef struct THREAD {
 	RING       ready;		/* ready fiber queue */
 	RING       dead;		/* dead fiber queue */
-	ACL_FIBER    **fibers;
-	unsigned       size;
-	unsigned       slot;
-	int            exitcode;
-	ACL_FIBER     *running;
-	ACL_FIBER      original;
-	int            errnum;
-	unsigned       idgen;
-	int            count;
-	size_t         switched;
-	int            nlocal;
+	ACL_FIBER **fibers;
+	unsigned   size;
+	unsigned   slot;
+	int        exitcode;
+	ACL_FIBER *running;
+	ACL_FIBER *original;
+	int        errnum;
+	unsigned   idgen;
+	int        count;
+	size_t     switched;
+	int        nlocal;
 } THREAD;
 
-static void fiber_init(void) __attribute__ ((constructor));
-
-static THREAD *__main_fiber = NULL;
+static THREAD          *__main_fiber   = NULL;
 static __thread THREAD *__thread_fiber = NULL;
 static __thread int __scheduled = 0;
-__thread int var_hook_sys_api = 0;
+__thread int var_hook_sys_api   = 0;
 
 static pthread_key_t __fiber_key;
-
-#ifdef	FIBER_STACK_GUARD
-
-static size_t page_size(void)
-{
-	static __thread long pgsz = 0;
-
-	if (pgsz == 0) {
-		pgsz = sysconf(_SC_PAGE_SIZE);
-		assert(pgsz > 0);
-	}
-
-	return (size_t) pgsz;
-}
-
-static size_t stack_size(size_t size)
-{
-	size_t pgsz = page_size(), sz;
-	if (size < pgsz) {
-		size = pgsz;
-	}
-	sz = (size + pgsz - 1) & ~(pgsz - 1);
-	return sz;
-}
-
-static void *stack_alloc(size_t size)
-{
-	int    ret;
-	char  *ptr = NULL;
-	size_t pgsz = page_size();
-
-	size = stack_size(size);
-	size += pgsz;
-
-	ret = posix_memalign((void *) &ptr, pgsz, size);
-	if (ret != 0) {
-		msg_fatal("%s(%d), %s: posix_memalign error %s",
-			__FILE__, __LINE__, __FUNCTION__, last_serror());
-	}
-
-	ret = mprotect(ptr, pgsz, PROT_NONE);
-	if (ret != 0) {
-		msg_fatal("%s(%d), %s: mprotect error=%s",
-			__FILE__, __LINE__, __FUNCTION__, last_serror());
-	}
-
-	ptr += pgsz;
-	return ptr;
-}
-
-static void stack_free(void *ptr)
-{
-	int ret;
-	size_t pgsz = page_size();
-
-	ptr = (char *) ptr - pgsz;
-	ret = mprotect(ptr, page_size(), PROT_READ|PROT_WRITE);
-	if (ret != 0) {
-		msg_fatal("%s(%d), %s: mprotect error=%s",
-			__FILE__, __LINE__, __FUNCTION__, last_serror());
-	}
-	free(ptr);
-}
-
-#else
-
-static void *stack_alloc(size_t size)
-{
-	return malloc(size);
-}
-
-static void stack_free(void *ptr)
-{
-	free(ptr);
-}
-
-#endif
-
-#ifndef	USE_JMP
-static void *stack_calloc(size_t size)
-{
-	void* ptr = stack_alloc(size);
-	if (ptr) {
-		memset(ptr, 0, size);
-	}
-	return ptr;
-}
-#endif
-
-/****************************************************************************/
-
-/* forward declare */
-static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
-	void *arg, size_t size);
+static void fiber_init(void);
 
 void acl_fiber_hook_api(int onoff)
 {
@@ -161,9 +66,8 @@ static void thread_free(void *ctx)
 	if (tf->fibers) {
 		free(tf->fibers);
 	}
-	if (tf->original.context) {
-		free(tf->original.context);
-	}
+
+	tf->original->free_fn(tf->original);
 	free(tf);
 
 	if (__main_fiber == __thread_fiber) {
@@ -205,21 +109,16 @@ static void fiber_check(void)
 	}
 
 	__thread_fiber = (THREAD *) calloc(1, sizeof(THREAD));
-#ifdef	USE_JMP
-	/* set context NULL when using setjmp that setcontext will not be
-	 * called in fiber_swap.
-	 */
-	__thread_fiber->original.context = NULL;
-#else
-	__thread_fiber->original.context = (ucontext_t *)
-		stack_calloc(sizeof(ucontext_t));
+
+#ifdef SYS_UNIX
+	__thread_fiber->original = fiber_unix_origin();
 #endif
-	__thread_fiber->fibers = NULL;
-	__thread_fiber->size   = 0;
-	__thread_fiber->slot   = 0;
-	__thread_fiber->idgen  = 0;
-	__thread_fiber->count  = 0;
-	__thread_fiber->nlocal = 0;
+	__thread_fiber->fibers   = NULL;
+	__thread_fiber->size     = 0;
+	__thread_fiber->slot     = 0;
+	__thread_fiber->idgen    = 0;
+	__thread_fiber->count    = 0;
+	__thread_fiber->nlocal   = 0;
 
 	ring_init(&__thread_fiber->ready);
 	ring_init(&__thread_fiber->dead);
@@ -278,6 +177,8 @@ void acl_fiber_sys_errno_set(int errnum)
 	*__sys_errno() = errnum;
 }
 
+#ifdef SYS_UNIX
+
 int fcntl(int fd, int cmd, ...)
 {
 	long arg;
@@ -323,6 +224,8 @@ int fcntl(int fd, int cmd, ...)
 	return ret;
 }
 
+#endif
+
 void acl_fiber_set_errno(ACL_FIBER *fiber, int errnum)
 {
 	if (fiber == NULL) {
@@ -364,7 +267,7 @@ void fiber_save_errno(void)
 	}
 
 	if ((curr = __thread_fiber->running) == NULL) {
-		curr = &__thread_fiber->original;
+		curr = __thread_fiber->original;
 	}
 
 	if (curr->flag & FIBER_F_SAVE_ERRNO) {
@@ -378,95 +281,6 @@ void fiber_save_errno(void)
 		acl_fiber_set_errno(curr, errno);
 	}
 }
-
-#if defined(__x86_64__)
-
-# if defined(__AVX__)
-#  define CLOBBER \
-        , "ymm0", "ymm1", "ymm2", "ymm3", "ymm4", "ymm5", "ymm6", "ymm7",\
-        "ymm8", "ymm9", "ymm10", "ymm11", "ymm12", "ymm13", "ymm14", "ymm15"
-# else
-#  define CLOBBER
-# endif
-
-//	asm(".cfi_undefined rip;\r\n")
-
-# define SETJMP(ctx) ({\
-    int ret;\
-	asm("lea     LJMPRET%=(%%rip), %%rcx\n\t"\
-        "xor     %%rax, %%rax\n\t"\
-        "mov     %%rbx, (%%rdx)\n\t"\
-        "mov     %%rbp, 8(%%rdx)\n\t"\
-        "mov     %%r12, 16(%%rdx)\n\t"\
-        "mov     %%rsp, 24(%%rdx)\n\t"\
-        "mov     %%r13, 32(%%rdx)\n\t"\
-        "mov     %%r14, 40(%%rdx)\n\t"\
-        "mov     %%r15, 48(%%rdx)\n\t"\
-        "mov     %%rcx, 56(%%rdx)\n\t"\
-        "mov     %%rdi, 64(%%rdx)\n\t"\
-        "mov     %%rsi, 72(%%rdx)\n\t"\
-        "LJMPRET%=:\n\t"\
-        : "=a" (ret)\
-        : "d" (ctx)\
-        : "memory", "rcx", "r8", "r9", "r10", "r11",\
-          "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7",\
-          "xmm8", "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14", "xmm15"\
-          CLOBBER\
-          );\
-    ret;\
-})
-
-# define LONGJMP(ctx) \
-    asm("movq   (%%rax), %%rbx\n\t"\
-	"movq   8(%%rax), %%rbp\n\t"\
-	"movq   16(%%rax), %%r12\n\t"\
-	"movq   24(%%rax), %%rdx\n\t"\
-	"movq   32(%%rax), %%r13\n\t"\
-	"movq   40(%%rax), %%r14\n\t"\
-	"mov    %%rdx, %%rsp\n\t"\
-	"movq   48(%%rax), %%r15\n\t"\
-	"movq   56(%%rax), %%rdx\n\t"\
-	"movq   64(%%rax), %%rdi\n\t"\
-	"movq   72(%%rax), %%rsi\n\t"\
-	"jmp    *%%rdx\n\t"\
-        : : "a" (ctx) : "rdx" \
-    )
-
-#elif defined(__i386__)
-
-# define SETJMP(ctx) ({\
-    int ret;\
-    asm("movl   $LJMPRET%=, %%eax\n\t"\
-	"movl   %%eax, (%%edx)\n\t"\
-	"movl   %%ebx, 4(%%edx)\n\t"\
-	"movl   %%esi, 8(%%edx)\n\t"\
-	"movl   %%edi, 12(%%edx)\n\t"\
-	"movl   %%ebp, 16(%%edx)\n\t"\
-	"movl   %%esp, 20(%%edx)\n\t"\
-	"xorl   %%eax, %%eax\n\t"\
-	"LJMPRET%=:\n\t"\
-	: "=a" (ret) : "d" (ctx) : "memory");\
-	ret;\
-    })
-
-# define LONGJMP(ctx) \
-    asm("movl   (%%eax), %%edx\n\t"\
-	"movl   4(%%eax), %%ebx\n\t"\
-	"movl   8(%%eax), %%esi\n\t"\
-	"movl   12(%%eax), %%edi\n\t"\
-	"movl   16(%%eax), %%ebp\n\t"\
-	"movl   20(%%eax), %%esp\n\t"\
-	"jmp    *%%edx\n\t"\
-	: : "a" (ctx) : "edx" \
-   )
-
-#else
-
-# define SETJMP(ctx) \
-    sigsetjmp(ctx, 0)
-# define LONGJMP(ctx) \
-    siglongjmp(ctx, 1)
-#endif
 
 static void fiber_kick(int max)
 {
@@ -509,26 +323,7 @@ static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 		ring_prepend(&__thread_fiber->dead, &from->me);
 	}
 
-#ifdef	USE_JMP
-	/* use setcontext() for the initial jump, as it allows us to set up
-	 * a stack, but continue with longjmp() as it's much faster.
-	 */
-	if (SETJMP(from->env) == 0) {
-		/* context just be used once for set up a stack, which will
-		 * be freed in fiber_start. The context in __thread_fiber
-		 * was set NULL.
-		 */
-		if (to->context != NULL) {
-			setcontext(to->context);
-		} else {
-			LONGJMP(to->env);
-		}
-	}
-#else
-	if (swapcontext(from->context, to->context) < 0)
-		msg_fatal("%s(%d), %s: swapcontext error %s",
-			__FILE__, __LINE__, __FUNCTION__, last_serror());
-#endif
+	from->swap_fn(from, to);
 }
 
 static void check_timer(ACL_FIBER *fiber fiber_unused, void *ctx)
@@ -538,7 +333,11 @@ static void check_timer(ACL_FIBER *fiber fiber_unused, void *ctx)
 
 	free(intptr);
 	while (1) {
+#ifdef SYS_WIN
+		Sleep(1000);
+#else
 		sleep(1);
+#endif
 		fiber_kick((int) max);
 	}
 }
@@ -559,7 +358,7 @@ ACL_FIBER *acl_fiber_running(void)
 
 void acl_fiber_kill(ACL_FIBER *fiber)
 {
-	acl_fiber_signal(fiber, SIGKILL);
+	acl_fiber_signal(fiber, SIGTERM);
 }
 
 int acl_fiber_killed(ACL_FIBER *fiber)
@@ -586,7 +385,11 @@ void acl_fiber_signal(ACL_FIBER *fiber, int signum)
 		return;
 	}
 
+#ifdef SYS_WIN
+	if (signum == SIGTERM) {
+#else
 	if (signum == SIGKILL || signum == SIGTERM || signum == SIGQUIT) {
+#endif
 		fiber->errnum = ECANCELED;
 		fiber->flag |= FIBER_F_KILLED;
 	}
@@ -659,52 +462,6 @@ int acl_fiber_yield(void)
 	return abs(__thread_fiber->switched - n - 1);
 }
 
-union cc_arg
-{
-	void *p;
-	int   i[2];
-};
-
-static void fiber_start(unsigned int x, unsigned int y)
-{
-	union  cc_arg arg;
-	ACL_FIBER *fiber;
-	int i;
-
-	arg.i[0] = x;
-	arg.i[1] = y;
-	
-	fiber = (ACL_FIBER *) arg.p;
-
-#ifdef	USE_JMP
-	/* when using setjmp/longjmp, the context just be used only once */
-	if (fiber->context != NULL) {
-		stack_free(fiber->context);
-		fiber->context = NULL;
-	}
-#endif
-
-	fiber->fn(fiber, fiber->arg);
-
-	for (i = 0; i < fiber->nlocal; i++) {
-		if (fiber->locals[i] == NULL) {
-			continue;
-		}
-		if (fiber->locals[i]->free_fn) {
-			fiber->locals[i]->free_fn(fiber->locals[i]->ctx);
-		}
-		free(fiber->locals[i]);
-	}
-
-	if (fiber->locals) {
-		free(fiber->locals);
-		fiber->locals = NULL;
-		fiber->nlocal = 0;
-	}
-
-	fiber_exit(0);
-}
-
 int acl_fiber_ndead(void)
 {
 	if (__thread_fiber == NULL) {
@@ -750,24 +507,39 @@ void fbase_free(FIBER_BASE *fbase)
 
 void fiber_free(ACL_FIBER *fiber)
 {
-#ifdef USE_VALGRIND
-	VALGRIND_STACK_DEREGISTER(fiber->vid);
-#endif
 	fbase_finish(&fiber->base);
+	fiber->free_fn(fiber);
+}
 
-	if (fiber->context) {
-		stack_free(fiber->context);
+static void fiber_start(ACL_FIBER *fiber)
+{
+	int i;
+
+	fiber->fn(fiber, fiber->arg);
+
+	for (i = 0; i < fiber->nlocal; i++) {
+		if (fiber->locals[i] == NULL) {
+			continue;
+		}
+		if (fiber->locals[i]->free_fn) {
+			fiber->locals[i]->free_fn(fiber->locals[i]->ctx);
+		}
+		free(fiber->locals[i]);
 	}
-	stack_free(fiber->buff);
-	free(fiber);
+
+	if (fiber->locals) {
+		free(fiber->locals);
+		fiber->locals = NULL;
+		fiber->nlocal = 0;
+	}
+
+	fiber_exit(0);
 }
 
 static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	void *arg, size_t size)
 {
-	ACL_FIBER *fiber;
-	sigset_t zero;
-	union cc_arg carg;
+	ACL_FIBER *fiber = NULL;
 	RING *head;
 
 	fiber_check();
@@ -777,10 +549,9 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	/* try to reuse the fiber memory in dead queue */
 	head = ring_pop_head(&__thread_fiber->dead);
 	if (head == NULL) {
-		fiber = (ACL_FIBER *) calloc(1, sizeof(ACL_FIBER));
-		/* no using calloc just avoiding using real memory */
-		fiber->buff = (char *) stack_alloc(size);
-		fbase_init(&fiber->base, FBASE_F_FIBER);
+#ifdef SYS_UNIX
+		fiber = fiber_unix_alloc(fiber_start);
+#endif
 	} else if ((fiber = APPL(head, ACL_FIBER, me))->size < size) {
 		/* if using realloc, real memory will be used, when we first
 		 * free and malloc again, then we'll just use virtual memory,
@@ -788,8 +559,9 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 		 */
 		stack_free(fiber->buff);
 		fiber->buff = (char *) stack_alloc(size);
-	} else
+	} else {
 		size = fiber->size;
+	}
 
 	__thread_fiber->idgen++;
 	if (__thread_fiber->idgen == 0) { /* overflow ? */
@@ -808,46 +580,9 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	fiber->waiting = NULL;
 	ring_init(&fiber->holding);
 
-	carg.p = fiber;
-
-	if (fiber->context == NULL) {
-		fiber->context = (ucontext_t *) stack_alloc(sizeof(ucontext_t));
-	}
-	memset(fiber->context, 0, sizeof(ucontext_t));
-
-	sigemptyset(&zero);
-	sigaddset(&zero, SIGPIPE);
-	sigaddset(&zero, SIGSYS);
-	sigaddset(&zero, SIGALRM);
-	sigaddset(&zero, SIGURG);
-	sigaddset(&zero, SIGWINCH);
-//	sigaddset(&zero, SIGINT);
-//	sigaddset(&zero, SIGHUP);
-	sigprocmask(SIG_BLOCK, &zero, &fiber->context->uc_sigmask);
-
-	if (getcontext(fiber->context) < 0) {
-		msg_fatal("%s(%d), %s: getcontext error: %s",
-			__FILE__, __LINE__, __FUNCTION__, last_serror());
-	}
-
-	fiber->context->uc_stack.ss_sp   = fiber->buff + 8;
-	fiber->context->uc_stack.ss_size = fiber->size - 64;
-
-#ifdef	USE_JMP
-	fiber->context->uc_link = NULL;
-#else
-	fiber->context->uc_link = __thread_fiber->original.context;
+#ifdef SYS_UNIX
+	fiber_unit_init(fiber)
 #endif
-
-#ifdef USE_VALGRIND
-	/* avoding the valgrind's warning */
-	fiber->vid = VALGRIND_STACK_REGISTER(fiber->context->uc_stack.ss_sp,
-			(char*) fiber->context->uc_stack.ss_sp
-			+ fiber->context->uc_stack.ss_size);
-#endif
-	makecontext(fiber->context, (void(*)(void)) fiber_start,
-		2, carg.i[0], carg.i[1]);
-
 	return fiber;
 }
 
@@ -859,7 +594,7 @@ ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
 	__thread_fiber->count++;
 
 	if (__thread_fiber->slot >= __thread_fiber->size) {
-		__thread_fiber->size += 128;
+		__thread_fiber->size  += 128;
 		__thread_fiber->fibers = (ACL_FIBER **) realloc(
 			__thread_fiber->fibers, 
 			__thread_fiber->size * sizeof(ACL_FIBER *));
@@ -894,6 +629,8 @@ int acl_fiber_status(const ACL_FIBER *fiber)
 
 static void fiber_init(void)
 {
+#ifdef SYS_UNIX
+
 	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
 	static int __called = 0;
 
@@ -914,6 +651,7 @@ static void fiber_init(void)
 	__sys_fcntl   = (fcntl_fn) dlsym(RTLD_NEXT, "fcntl");
 
 	(void) pthread_mutex_unlock(&__lock);
+#endif
 }
 
 void acl_fiber_schedule(void)
@@ -942,7 +680,7 @@ void acl_fiber_schedule(void)
 		__thread_fiber->running = fiber;
 		__thread_fiber->switched++;
 
-		fiber_swap(&__thread_fiber->original, fiber);
+		fiber_swap(__thread_fiber->original, fiber);
 		__thread_fiber->running = NULL;
 	}
 
@@ -999,7 +737,7 @@ void acl_fiber_switch(void)
 #else
 		msg_info("thread-%lu: NO FIBER in ready", pthread_self());
 #endif
-		fiber_swap(current, &__thread_fiber->original);
+		fiber_swap(current, __thread_fiber->original);
 		return;
 	}
 

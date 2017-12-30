@@ -9,6 +9,8 @@ typedef int (*select_fn)(int, fd_set *, fd_set *, fd_set *, struct timeval *);
 
 static select_fn __sys_select = NULL;
 
+#ifdef SYS_UNIX
+
 static void hook_init(void)
 {
 	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
@@ -100,3 +102,5 @@ int select(int nfds, fd_set *readfds, fd_set *writefds,
 	free(fds);
 	return nready;
 }
+
+#endif

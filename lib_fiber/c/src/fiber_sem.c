@@ -30,9 +30,9 @@ pthread_t acl_fiber_sem_get_tid(ACL_FIBER_SEM *sem)
 	return sem->tid;
 }
 
-void acl_fiber_sem_set_tid(ACL_FIBER_SEM *sem, pthread_t tid)
+void acl_fiber_sem_set_tid(ACL_FIBER_SEM *sem, unsigned long tid)
 {
-	if (sem->tid != tid && ring_size(&sem->waiting) > 0) {
+	if ((unsigned long) sem->tid != tid && ring_size(&sem->waiting) > 0) {
 		msg_fatal("%s(%d), %s: curr sem waiting=%d not empty",
 			__FILE__, __LINE__, __FUNCTION__,
 			(int) ring_size(&sem->waiting));
