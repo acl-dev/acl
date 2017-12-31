@@ -143,7 +143,7 @@ static void fiber_unix_free(ACL_FIBER *fiber)
 	VALGRIND_STACK_DEREGISTER(fiber->vid);
 #endif
 	if (fb->context) {
-		free(fb->context);
+		stack_free(fb->context);
 	}
 	stack_free(fb->buff);
 	free(fb);
@@ -258,8 +258,7 @@ ACL_FIBER *fiber_unix_origin(void)
 	fb->context = (ucontext_t *) stack_calloc(sizeof(ucontext_t));
 #endif
 	fb->fiber.free_fn = fiber_unix_free;
-	fb->fiber.free_fn = fiber_unix_free;
-	fb->fiber.swap_fn = (void (*)(ACL_FIBER*, ACL_FIBER*))fiber_unix_swap;
+	fb->fiber.swap_fn = (void (*)(ACL_FIBER*, ACL_FIBER*)) fiber_unix_swap;
 	return &fb->fiber;
 }
 

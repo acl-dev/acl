@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if !defined(_WIN32) && !defined(_WIN64)
 #include <unistd.h>
+#endif
 #include "fiber/lib_fiber.h"
 #include "stamp.h"
 
@@ -123,5 +125,9 @@ int main(int argc, char *argv[])
 
 	acl_myfree(tids);
 
+#if defined(_WIN32) || defined(_WIN64)
+	printf("enter any key to exit ..."); fflush(stdout);
+	getchar();
+#endif
 	return 0;
 }

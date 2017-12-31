@@ -112,6 +112,8 @@ static void fiber_check(void)
 
 #ifdef SYS_UNIX
 	__thread_fiber->original = fiber_unix_origin();
+#elif defined(SYS_WIN)
+	__thread_fiber->original = fiber_win_origin();
 #endif
 	__thread_fiber->fibers   = NULL;
 	__thread_fiber->size     = 0;
@@ -487,7 +489,9 @@ static void fbase_init(FIBER_BASE *fbase, int flag)
 
 static void fbase_finish(FIBER_BASE *fbase)
 {
+#ifdef SYS_UNIX
 	fbase_event_close(fbase);
+#endif
 	atomic_free(fbase->atomic);
 }
 
@@ -551,8 +555,12 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	if (head == NULL) {
 #ifdef SYS_UNIX
 		fiber = fiber_unix_alloc(fiber_start, size);
-		fbase_init(&fiber->base, FBASE_F_FIBER);
+#elif defined(SYS_WIN)
+		fiber = fiber_win_alloc(fiber_start, size);
+#else
+#error "unknown OS"
 #endif
+		fbase_init(&fiber->base, FBASE_F_FIBER);
 	} else {
 		fiber = APPL(head, ACL_FIBER, me);
 	}
