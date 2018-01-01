@@ -720,12 +720,22 @@ const std::map<string, redis_node*>* redis_cluster::cluster_nodes()
 	return &masters_;
 }
 
+// for redis.3.x.x
 // d52ea3cb4cdf7294ac1fb61c696ae6483377bcfc 127.0.0.1:16385 master - 0 1428410625374 73 connected 5461-10922
 // 94e5d32cbcc9539cc1539078ca372094c14f9f49 127.0.0.1:16380 myself,master - 0 0 1 connected 0-9 11-5460
 // e7b21f65e8d0d6e82dee026de29e499bb518db36 127.0.0.1:16381 slave d52ea3cb4cdf7294ac1fb61c696ae6483377bcfc 0 1428410625373 73 connected
 // 6a78b47b2e150693fc2bed8578a7ca88b8f1e04c 127.0.0.1:16383 myself,slave 94e5d32cbcc9539cc1539078ca372094c14f9f49 0 0 4 connected
 
 // 70a2cd8936a3d28d94b4915afd94ea69a596376a :16381 myself,master - 0 0 0 connected
+
+// for redis.4.x.x
+// d52ea3cb4cdf7294ac1fb61c696ae6483377bcfc 127.0.0.1:16385@116385 master - 0 1428410625374 73 connected 5461-10922
+// 94e5d32cbcc9539cc1539078ca372094c14f9f49 127.0.0.1:16380@116380 myself,master - 0 0 1 connected 0-9 11-5460
+// e7b21f65e8d0d6e82dee026de29e499bb518db36 127.0.0.1:16381@116381 slave d52ea3cb4cdf7294ac1fb61c696ae6483377bcfc 0 1428410625373 73 connected
+// 6a78b47b2e150693fc2bed8578a7ca88b8f1e04c 127.0.0.1:16383@116383 myself,slave 94e5d32cbcc9539cc1539078ca372094c14f9f49 0 0 4 connected
+
+// 70a2cd8936a3d28d94b4915afd94ea69a596376a :16381 myself,master - 0 0 0 connected
+
 
 redis_node* redis_cluster::get_node(string& line)
 {
@@ -750,7 +760,13 @@ redis_node* redis_cluster::get_node(string& line)
 
 	redis_node* node = NEW redis_node;
 	node->set_id(tokens[0].c_str());
-	node->set_addr(tokens[1].c_str());
+	char *addr = tokens[1].c_str();
+	char *at = strchr(addr, '@');
+	if (at)
+		*at++ = 0;
+	node->set_addr(addr);
+	if (at && *at)
+		node->set_at_addr(at);
 	node->set_myself(myself);
 	node->set_connected(strcasecmp(tokens[7].c_str(), "connected") == 0);
 	node->set_master_id(tokens[3].c_str());
