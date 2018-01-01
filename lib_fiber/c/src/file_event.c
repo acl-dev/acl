@@ -9,6 +9,7 @@ void file_event_init(FILE_EVENT *fe, int fd)
 	ring_init(&fe->me);
 	fe->fiber  = acl_fiber_running();
 	fe->fd     = fd;
+	fe->id     = -1;
 	fe->type   = TYPE_NONE;
 	fe->oper   = 0;
 	fe->mask   = 0;

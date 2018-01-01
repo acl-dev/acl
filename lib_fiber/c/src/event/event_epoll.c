@@ -54,7 +54,7 @@ typedef struct EVENT_EPOLL {
 	int   size;
 } EVENT_EPOLL;
 
-static void epoll_event_free(EVENT *ev)
+static void epoll_free(EVENT *ev)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 
@@ -63,7 +63,7 @@ static void epoll_event_free(EVENT *ev)
 	free(ep);
 }
 
-static int epoll_event_add_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
+static int epoll_add_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 {
 	struct epoll_event ee;
 	int op;
@@ -96,7 +96,7 @@ static int epoll_event_add_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	return -1;
 }
 
-static int epoll_event_add_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
+static int epoll_add_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 {
 	struct epoll_event ee;
 	int op;
@@ -127,7 +127,7 @@ static int epoll_event_add_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	return -1;
 }
 
-static int epoll_event_del_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
+static int epoll_del_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 {
 	struct epoll_event ee;
 	int op;
@@ -156,7 +156,7 @@ static int epoll_event_del_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	return -1;
 }
 
-static int epoll_event_del_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
+static int epoll_del_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 {
 	struct epoll_event ee;
 	int op;
@@ -222,14 +222,14 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 	return n;
 }
 
-static int epoll_event_handle(EVENT *ev)
+static int epoll_handle(EVENT *ev)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 
 	return ep->epfd;
 }
 
-static const char *epoll_event_name(void)
+static const char *epoll_name(void)
 {
 	return "epoll";
 }
@@ -249,15 +249,15 @@ EVENT *event_epoll_create(int size)
 	ep->epfd = __sys_epoll_create(1024);
 	assert(ep->epfd >= 0);
 
-	ep->event.name   = epoll_event_name;
-	ep->event.handle = epoll_event_handle;
-	ep->event.free   = epoll_event_free;
+	ep->event.name   = epoll_name;
+	ep->event.handle = epoll_handle;
+	ep->event.free   = epoll_free;
 
 	ep->event.event_wait = epoll_event_wait;
-	ep->event.add_read   = (event_oper *) epoll_event_add_read;
-	ep->event.add_write  = (event_oper *) epoll_event_add_write;
-	ep->event.del_read   = (event_oper *) epoll_event_del_read;
-	ep->event.del_write  = (event_oper *) epoll_event_del_write;
+	ep->event.add_read   = (event_oper *) epoll_add_read;
+	ep->event.add_write  = (event_oper *) epoll_add_write;
+	ep->event.del_read   = (event_oper *) epoll_del_read;
+	ep->event.del_write  = (event_oper *) epoll_del_write;
 
 	return (EVENT*) ep;
 }

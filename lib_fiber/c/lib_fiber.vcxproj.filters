@@ -111,6 +111,9 @@
     <ClInclude Include="src\common\pthread_patch.h">
       <Filter>源文件\common</Filter>
     </ClInclude>
+    <ClInclude Include="src\event\event_select.h">
+      <Filter>源文件\event</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.c">
@@ -235,6 +238,9 @@
     </ClCompile>
     <ClCompile Include="src\common\pthread_patch.c">
       <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\event_select.c">
+      <Filter>源文件\event</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

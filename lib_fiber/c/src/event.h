@@ -47,6 +47,7 @@ struct FILE_EVENT {
 	RING       me;
 	ACL_FIBER *fiber;
 	int fd;
+	int id;
 	int type;
 #define	TYPE_NONE		0
 #define	TYPE_SOCK		1

@@ -3,14 +3,17 @@
 
 #if defined(__linux__)
 # define SYS_UNIX
+# define HAS_SELECT
 # define HAS_POLL
 # define HAS_EPOLL
 #elif defined(__FreeBSD__)
 # define SYS_UNIX
+# define HAS_SELECT
 # define HAS_POLL
 # define HAS_KQUEUE
 #elif defined(_WIN32) || defined(_WIN64)
 # define SYS_WIN
+# define HAS_SELECT
 # define HAS_WMSG
 # define HAS_IOCP
 # define __thread __declspec(thread)

@@ -100,6 +100,7 @@
     <ClInclude Include="src\event.h" />
     <ClInclude Include="src\event\event_epoll.h" />
     <ClInclude Include="src\event\event_kqueue.h" />
+    <ClInclude Include="src\event\event_select.h" />
     <ClInclude Include="src\fiber.h" />
     <ClInclude Include="src\hook\hook.h" />
     <ClInclude Include="src\stdafx.h" />
@@ -130,6 +131,7 @@
     <ClCompile Include="src\event.c" />
     <ClCompile Include="src\event\event_epoll.c" />
     <ClCompile Include="src\event\event_kqueue.c" />
+    <ClCompile Include="src\event\event_select.c" />
     <ClCompile Include="src\fiber.c" />
     <ClCompile Include="src\fiber\fiber_unix.c" />
     <ClCompile Include="src\fiber\fiber_win.c" />

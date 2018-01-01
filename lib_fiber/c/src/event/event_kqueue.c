@@ -51,7 +51,7 @@ typedef struct EVENT_KQUEUE {
 
 } EVENT_KQUEUE;
 
-static void kqueue_event_free(EVENT *ev)
+static void kqueue_free(EVENT *ev)
 {
 	EVENT_KQUEUE *ek = (EVENT_KQUEUE *) ev;
 
@@ -61,7 +61,7 @@ static void kqueue_event_free(EVENT *ev)
 	free(ek);
 }
 
-static int kqueue_events_fflush(EVENT_KQUEUE *ek)
+static int kqueue_fflush(EVENT_KQUEUE *ek)
 {
 	struct timespec ts;
 
@@ -80,7 +80,7 @@ static int kqueue_events_fflush(EVENT_KQUEUE *ek)
 	return ek->nchanges;
 }
 
-static int kqueue_event_add_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
+static int kqueue_add_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 {
 	struct kevent *kev;
 
@@ -97,7 +97,7 @@ static int kqueue_event_add_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 	return 0;
 }
 
-static int kqueue_event_add_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
+static int kqueue_add_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 {
 	struct kevent *kev;
 
@@ -114,7 +114,7 @@ static int kqueue_event_add_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 	return 0;
 }
 
-static int kqueue_event_del_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
+static int kqueue_del_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 {
 	struct kevent *kev;
 
@@ -131,7 +131,7 @@ static int kqueue_event_del_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 	return 0;
 }
 
-static int kqueue_event_del_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
+static int kqueue_del_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 {
 	struct kevent *kev;
 
@@ -148,7 +148,7 @@ static int kqueue_event_del_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 	return 0;
 }
 
-static int kqueue_event_wait(EVENT *ev, int timeout)
+static int kqueue_wait(EVENT *ev, int timeout)
 {
 	EVENT_KQUEUE *ek = (EVENT_KQUEUE *) ev;
 	struct timespec ts;
@@ -185,14 +185,14 @@ static int kqueue_event_wait(EVENT *ev, int timeout)
 	return n;
 }
 
-static int kqueue_event_handle(EVENT *ev)
+static int kqueue_handle(EVENT *ev)
 {
 	EVENT_KQUEUE *ek = (EVENT_KQUEUE *) ev;
 
 	return ek->kqfd;
 }
 
-static const char *kqueue_event_name(void)
+static const char *kqueue_name(void)
 {
 	return "kqueue";
 }
@@ -217,15 +217,15 @@ EVENT *event_kqueue_create(int size)
 	ek->kqfd     = __sys_kqueue();
 	assert(ek->kqfd >= 0);
 
-	ek->event.name   = kqueue_event_name;
-	ek->event.handle = kqueue_event_handle;
-	ek->event.free   = kqueue_event_free;
+	ek->event.name   = kqueue_name;
+	ek->event.handle = kqueue_handle;
+	ek->event.free   = kqueue_free;
 
 	ek->event.event_wait = kqueue_event_wait;
-	ek->event.add_read   = (event_oper *) kqueue_event_add_read;
-	ek->event.add_write  = (event_oper *) kqueue_event_add_write;
-	ek->event.del_read   = (event_oper *) kqueue_event_del_read;
-	ek->event.del_write  = (event_oper *) kqueue_event_del_write;
+	ek->event.add_read   = (event_oper *) kqueue_add_read;
+	ek->event.add_write  = (event_oper *) kqueue_add_write;
+	ek->event.del_read   = (event_oper *) kqueue_del_read;
+	ek->event.del_write  = (event_oper *) kqueue_del_write;
 
 	return (EVENT *) ek;
 }
