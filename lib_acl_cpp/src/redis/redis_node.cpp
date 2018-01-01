@@ -32,6 +32,13 @@ redis_node& redis_node::set_addr(const char* addr)
 	return *this;
 }
 
+redis_node& redis_node::set_at_addr(const char* addr)
+{
+	if (addr && *addr)
+		at_addr_ = addr;
+	return *this;
+}
+
 redis_node& redis_node::set_type(const char* type)
 {
 	type_ = type;
