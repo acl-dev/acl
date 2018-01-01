@@ -1,19 +1,53 @@
 #include "stdafx.h"
+#include "fiber/lib_fiber.h"
 #include "common.h"
 
 #include "event/event_epoll.h"
 #include "event/event_kqueue.h"
+#include "event/event_select.h"
 #include "event.h"
+
+static __thread int __event_mode = FIBER_EVENT_KERNEL;
+
+void event_set(int event_mode)
+{
+	switch (__event_mode) {
+	case FIBER_EVENT_KERNEL:
+	case FIBER_EVENT_POLL:
+	case FIBER_EVENT_SELECT:
+		__event_mode = event_mode;
+		break;
+	default:
+		break;
+	}
+}
 
 EVENT *event_create(int size)
 {
+	EVENT *ev;
+
+	switch (__event_mode) {
+	case FIBER_EVENT_POLL:
+		ev = NULL;
+		break;
+	case FIBER_EVENT_SELECT:
+		ev = event_select_create(size);
+		break;
+	case FIBER_EVENT_WMSG:
+		ev = NULL;
+		break;
+	default:
 #ifdef	HAS_EPOLL
-	EVENT *ev = event_epoll_create(size);
+		ev = event_epoll_create(size);
 #elif	defined(HAS_KQUEUE)
-	EVENT *ev = event_kqueue_create(size);
-#elif	defined(SYS_WIN)
-	EVENT *ev = NULL;
+		ev = event_kqueue_create(size);
+#elif	defined(HAS_IOCP)
+		ev = NULL;
+#else
+#error	"unknown OS"
 #endif
+		break;
+	}
 
 	ring_init(&ev->events);
 	ev->timeout = -1;

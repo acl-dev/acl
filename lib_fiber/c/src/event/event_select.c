@@ -12,6 +12,24 @@ static select_fn __sys_select = NULL;
 
 static void hook_init(void)
 {
+#ifdef SYS_UNIX
+	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
+	static int __called = 0;
+
+	(void) pthread_mutex_lock(&__lock);
+
+	if (__called) {
+		(void) pthread_mutex_unlock(&__lock);
+		return;
+	}
+
+	__called++;
+
+	__sys_select = (select_fn) dlsym(RTLD_NEXT, "select");
+	assert(__sys_select);
+
+	(void) pthread_mutex_unlock(&__lock);
+#endif
 }
 
 /****************************************************************************/
@@ -24,6 +42,8 @@ typedef struct EVENT_SELECT {
 	FILE_EVENT **files;
 	int    size;
 	int    count;
+	int    maxfd;
+	int    dirty;
 } EVENT_SELECT;
 
 static void select_free(EVENT *ev)
@@ -35,7 +55,7 @@ static void select_free(EVENT *ev)
 
 static int select_add_read(EVENT_SELECT *es, FILE_EVENT *fe)
 {
-	if (FD_ISSET(fe->fd, &es->wset)) {
+	if (FD_ISSET(fe->fd, &es->wset) || FD_ISSET(fe->fd, &es->rset)) {
 		assert(fe->id >= 0 && fe->id < es->count);
 		assert(es->files[fe->id] == fe);
 	} else {
@@ -43,15 +63,19 @@ static int select_add_read(EVENT_SELECT *es, FILE_EVENT *fe)
 		es->files[es->count] = fe;
 		fe->id = es->count++;
 		FD_SET(fe->fd, &es->xset);
+		if (fe->fd > es->maxfd) {
+			es->maxfd = fe->fd;
+		}
 	}
 
+	fe->mask |= EVENT_READ;
 	FD_SET(fe->fd, &es->rset);
 	return 0;
 }
 
 static int select_add_write(EVENT_SELECT *es, FILE_EVENT *fe)
 {
-	if (FD_ISSET(fe->fd, &es->rset)) {
+	if (FD_ISSET(fe->fd, &es->rset) || FD_ISSET(fe->fd, &es->wset)) {
 		assert(fe->id >= 0 && fe->id < es->count);
 		assert(es->files[fe->id] == fe);
 	} else {
@@ -59,8 +83,12 @@ static int select_add_write(EVENT_SELECT *es, FILE_EVENT *fe)
 		es->files[es->count] = fe;
 		fe->id = es->count++;
 		FD_SET(fe->fd, &es->xset);
+		if (fe->fd > es->maxfd) {
+			es->maxfd = fe->fd;
+		}
 	}
 
+	fe->mask |= EVENT_WRITE;
 	FD_SET(fe->fd, &es->wset);
 	return 0;
 }
@@ -78,7 +106,11 @@ static int select_del_read(EVENT_SELECT *es, FILE_EVENT *fe)
 			es->files[fe->id]->id = fe->id;
 		}
 		fe->id = -1;
+		if (fe->fd == es->maxfd) {
+			es->dirty = 1;
+		}
 	}
+	fe->mask &= ~EVENT_READ;
 	return 0;
 }
 
@@ -95,7 +127,11 @@ static int select_del_write(EVENT_SELECT *es, FILE_EVENT *fe)
 			es->files[fe->id]->id = fe->id;
 		}
 		fe->id = -1;
+		if (fe->fd == es->maxfd) {
+			es->dirty = 1;
+		}
 	}
+	fe->mask &= ~EVENT_WRITE;
 	return 0;
 }
 
@@ -117,7 +153,16 @@ static int select_event_wait(EVENT *ev, int timeout)
 #ifdef SYS_WIN
 	n = select(0, &rset, &wset, &xset, tp);
 #else
-	n = select(eventp->maxfd + 1, &rset, &wset, &xset, tp);
+	if (es->dirty) {
+		es->maxfd = -1;
+		for (i = 0; i < es->count; i++) {
+			FILE_EVENT *fe = es->files[i];
+			if (fe->fd > es->maxfd) {
+				es->maxfd = fe->fd;
+			}
+		}
+	}
+	n = __sys_select(es->maxfd + 1, &rset, 0, &xset, tp);
 #endif
 	if (n < 0) {
 		if (errno == EINTR) {
@@ -168,6 +213,10 @@ EVENT *event_select_create(int size)
 		hook_init();
 	}
 
+	// override size with system open limit setting
+	size      = open_limit(0);
+	es->maxfd = -1;
+	es->dirty = 0;
 	es->files = (FILE_EVENT**) calloc(size, sizeof(FILE_EVENT*));
 	es->size  = size;
 	es->count = 0;

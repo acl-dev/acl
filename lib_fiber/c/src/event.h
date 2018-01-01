@@ -148,6 +148,7 @@ FILE_EVENT *file_event_alloc(int fd);
 void file_event_free(FILE_EVENT *fe);
 
 /* event.c */
+void event_set(int event_mode);
 EVENT *event_create(int size);
 const char *event_name(EVENT *ev);
 int  event_handle(EVENT *ev);

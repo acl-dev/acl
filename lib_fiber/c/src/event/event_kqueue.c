@@ -94,6 +94,7 @@ static int kqueue_add_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 
 	kev = &ek->changes[ek->nchanges++];
 	EV_SET(kev, fe->fd, EVFILT_READ, EV_ADD, 0, 0, fe);
+	fe->mask |= EVENT_READ;
 	return 0;
 }
 
@@ -111,6 +112,7 @@ static int kqueue_add_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 
 	kev = &ek->changes[ek->nchanges++];
 	EV_SET(kev, fe->fd, EVFILT_WRITE, EV_ADD, 0, 0, fe);
+	fe->mask |= EVENT_WRITE;
 	return 0;
 }
 
@@ -128,6 +130,7 @@ static int kqueue_del_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 
 	kev = &ek->changes[ek->nchanges++];
 	EV_SET(kev, fe->fd, EVFILT_READ, EV_DELETE, 0, 0, fe);
+	fe->mask &= ~EVENT_READ;
 	return 0;
 }
 
@@ -145,6 +148,7 @@ static int kqueue_del_write(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 
 	kev = &ek->changes[ek->nchanges++];
 	EV_SET(kev, fe->fd, EVFILT_WRITE, EV_DELETE, 0, 0, fe);
+	fe->mask &= ~EVENT_WRITE;
 	return 0;
 }
 

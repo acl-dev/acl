@@ -653,6 +653,12 @@ static void fiber_init(void)
 #endif
 }
 
+void acl_fiber_schedule_with(int event_mode)
+{
+	event_set(event_mode);
+	acl_fiber_schedule();
+}
+
 void acl_fiber_schedule(void)
 {
 	ACL_FIBER *fiber;

@@ -154,6 +154,17 @@ void acl_fiber_switch(void);
 void acl_fiber_schedule(void);
 
 /**
+ * 采用指定的事件引擎启动协程调度器，内部缺省的事件引擎为 FIBER_EVENT_KERNEL
+ * @param event_mode {int} 事件引擎类型，参见：FIBER_EVENT_XXX
+ */
+#define FIBER_EVENT_KERNEL	0	/* epoll/kqueue	*/
+#define FIBER_EVENT_POLL	1	/* poll		*/
+#define FIBER_EVENT_SELECT	2	/* select	*/
+#define FIBER_EVENT_IOCP	3	/* iocp		*/
+#define FIBER_EVENT_WMSG	4	/* win message	*/
+void acl_fiber_schedule_with(int event_mode);
+
+/**
  * 调用本函数检测当前线程是否处于协程调度状态
  * @return {int} 0 表示非协程状态，非 0 表示处于协程调度状态
  */

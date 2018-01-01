@@ -123,6 +123,7 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
+		" -e event_mode [kernel|select|poll]\r\n"
 		" -s server_ip\r\n"
 		" -p server_port\r\n"
 		" -t connt_timeout\r\n"
@@ -136,14 +137,14 @@ static void usage(const char *procname)
 
 int main(int argc, char *argv[])
 {
-	int   ch;
+	int   ch, event_mode = FIBER_EVENT_KERNEL;
        
 	acl_msg_stdout_enable(1);
 	signal(SIGPIPE, SIG_IGN);
 
 	snprintf(__server_ip, sizeof(__server_ip), "%s", "127.0.0.1");
 
-	while ((ch = getopt(argc, argv, "hc:n:s:p:t:r:Sd:z:")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:n:s:p:t:r:Sd:z:e:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -176,6 +177,12 @@ int main(int argc, char *argv[])
 		case 'z':
 			__stack_size = atoi(optarg);
 			break;
+		case 'e':
+			if (strcasecmp(optarg, "select") == 0)
+				event_mode = FIBER_EVENT_SELECT;
+			else if (strcasecmp(optarg, "poll") == 0)
+				event_mode = FIBER_EVENT_POLL;
+			break;
 		default:
 			break;
 		}
@@ -185,9 +192,9 @@ int main(int argc, char *argv[])
 
 	acl_fiber_create(fiber_main, NULL, 32768);
 
-	printf("call fiber_schedule\r\n");
+	printf("call fiber_schedule with=%d\r\n", event_mode);
 
-	acl_fiber_schedule();
+	acl_fiber_schedule_with(event_mode);
 
 	return 0;
 }
