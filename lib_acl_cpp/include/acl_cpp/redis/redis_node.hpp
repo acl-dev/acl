@@ -41,14 +41,6 @@ public:
 	redis_node& set_addr(const char* addr);
 
 	/**
-	 * 对于 redis.4.x.x，通过 CLUSTER NODES 返回的地址中会带有 @xxx
-	 * for redis.4.x.x, the return addr of CLUSTER NODES has @xxx
-	 * @param addr {const char*}
-	 * @return {redis_node&}
-	 */
-	redis_node& set_at_addr(const char* addr);
-
-	/**
 	 * 设置当前结点的类型
 	 * set the current node's type
 	 * @param type {const char*}
@@ -245,19 +237,19 @@ public:
 	}
 
 	/**
-	 * for redis.4.x.x:
+	 * result of CLUSTER NODES for redis.4.x.x:
 	 * d52ea3cb4cdf7294ac1fb61c696ae6483377bcfc 127.0.0.1:16385@116385 master - 0 1428410625374 73 connected 5461-10922
-	 * @return return @116385 for redis.4.x.x
+	 * @return return 127.0.0.1:16385@116385 for redis.4.x.x
 	 */
-	const char* get_at_addr() const
+	const char* get_addr_info() const
 	{
-		return at_addr_.c_str();
+		return addr_info_.c_str();
 	}
 
 private:
 	string id_;
 	string addr_;
-	string at_addr_;
+	string addr_info_;
 	string type_;
 	bool myself_;
 	bool handshaking_;

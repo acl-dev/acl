@@ -760,13 +760,7 @@ redis_node* redis_cluster::get_node(string& line)
 
 	redis_node* node = NEW redis_node;
 	node->set_id(tokens[0].c_str());
-	char *addr = tokens[1].c_str();
-	char *at = strchr(addr, '@');
-	if (at)
-		*at++ = 0;
-	node->set_addr(addr);
-	if (at && *at)
-		node->set_at_addr(at);
+	node->set_addr(tokens[1].c_str());
 	node->set_myself(myself);
 	node->set_connected(strcasecmp(tokens[7].c_str(), "connected") == 0);
 	node->set_master_id(tokens[3].c_str());
