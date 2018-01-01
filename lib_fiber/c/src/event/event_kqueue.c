@@ -85,7 +85,7 @@ static int kqueue_add_read(EVENT_KQUEUE *ek, FILE_EVENT *fe)
 	struct kevent *kev;
 
 	if (ek->nchanges >= ek->setsize) {
-		if (kqueue_events_fflush(ek) == -1) {
+		if (kqueue_fflush(ek) == -1) {
 			return -1;
 		}
 
