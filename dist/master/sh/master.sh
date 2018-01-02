@@ -61,8 +61,8 @@ check_proc()
 start()
 {
 	trap '' 1
-#	ulimit -c unlimited
-#	ulimit -n 20480
+	ulimit -c unlimited
+	ulimit -n 204800
 
 	check_proc
 	if [ "$RUNNING" = "yes" ]; then
