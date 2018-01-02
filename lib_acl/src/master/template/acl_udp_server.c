@@ -185,6 +185,7 @@ static void       *__service_ctx;
 static int         __daemon_mode = 1;
 static char        __conf_file[1024];
 static unsigned    __udp_server_generation;
+static int         __service_exiting = 0;
 
 #define SOCK	ACL_VSTREAM_SOCK
 
@@ -684,6 +685,11 @@ static void udp_server_exit(void)
 {
 	int i;
 
+	if (__service_exiting)
+		return;
+
+	__service_exiting = 1;
+
 	if (__service_exit)
 		__service_exit(__service_ctx);
 
@@ -1020,10 +1026,9 @@ static void *thread_main(void *ctx)
 	if (__thread_init)
 		__thread_init(__thread_init_ctx);
 
-	while (1)
+	while (!__service_exiting)
 		acl_event_loop(server->event);
 
-	/* not reached here */
 	return NULL;
 }
 
@@ -1077,13 +1082,14 @@ static void main_thread_loop(void)
 			__main_event,
 			(acl_int64) acl_var_udp_idle_limit * 1000000, 0);
 
-	while (1) {
+	while (!__service_exiting) {
 		acl_event_loop(__main_event);
 #ifdef ACL_UNIX
 		if (!acl_var_server_gotsighup || !__sighup_handler)
 			continue;
 
 		acl_var_server_gotsighup = 0;
+		ACL_VSTRING_RESET(buf);
 		if (__sighup_handler(__service_ctx, buf) < 0)
 			acl_master_notify(acl_var_udp_pid,
 				__udp_server_generation,
@@ -1094,10 +1100,8 @@ static void main_thread_loop(void)
 				ACL_MASTER_STAT_SIGHUP_OK);
 #endif
 	}
-    
-	/* not reached here */
 
-	/* acl_vstring_free(buf); */
+	acl_vstring_free(buf);
 }
 
 static void servers_start(UDP_SERVER *servers, int nthreads)
