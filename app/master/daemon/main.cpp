@@ -50,6 +50,7 @@ int     main(int argc, char **argv)
 
 	acl_var_master_conf_dir = NULL;
 	acl_var_master_log_file = NULL;
+	acl_open_limit(0);
 
 	while ((ch = getopt(argc, argv, "Vhvc:l:k")) > 0) {
 		switch (ch) {

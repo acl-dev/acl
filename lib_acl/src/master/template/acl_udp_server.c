@@ -186,6 +186,8 @@ static int         __daemon_mode = 1;
 static char        __conf_file[1024];
 static unsigned    __udp_server_generation;
 static int         __service_exiting = 0;
+static long long   __servers_count = 0;
+static ACL_ATOMIC *__servers_count_atomic = NULL;
 
 #define SOCK	ACL_VSTREAM_SOCK
 
@@ -684,6 +686,7 @@ static void servers_stop(void)
 static void udp_server_exit(void)
 {
 	int i;
+	long long n = 0;
 
 	if (__service_exiting)
 		return;
@@ -693,8 +696,22 @@ static void udp_server_exit(void)
 	if (__service_exit)
 		__service_exit(__service_ctx);
 
+	for (i = 0; i < 10; i++) {
+		n = acl_atomic_int64_fetch_add(__servers_count_atomic, 0);
+		if (n <= 0)
+			break;
+		acl_msg_info("%s(%d): waiting running threads=%lld, %lld",
+			__FUNCTION__, __LINE__, n, __servers_count);
+		sleep(1);
+	}
+
+	acl_msg_info("%s(%d): all threads exit -- %s, left=%lld, %lld",
+		__FUNCTION__, __LINE__, __servers_count > 0 ? "no" : "yes",
+		n, __servers_count);
+
 	for (i = 0; __conf_str_tab[i].name != NULL; i++)
 		acl_myfree(*__conf_str_tab[i].target);
+
 	acl_app_conf_unload();
 
 	if (acl_var_udp_procname)
@@ -705,6 +722,9 @@ static void udp_server_exit(void)
 
 	if (__main_event)
 		acl_event_free(__main_event);
+
+	acl_atomic_free(__servers_count_atomic);
+	__servers_count_atomic = NULL;
 
 	acl_atomic_clock_free(__clock);
 	__clock = NULL;
@@ -1026,9 +1046,18 @@ static void *thread_main(void *ctx)
 	if (__thread_init)
 		__thread_init(__thread_init_ctx);
 
+	acl_atomic_int64_add_fetch(__servers_count_atomic, 1);
+	acl_msg_info("%s(%d), %s: current threads count=%lld",
+		__FILE__, __LINE__, __FUNCTION__, __servers_count);
+
 	while (!__service_exiting)
 		acl_event_loop(server->event);
 
+	acl_msg_info("%s(%d), %s: thread-%lu exit",
+		__FILE__, __LINE__, __FUNCTION__, acl_pthread_self());
+
+	if (__servers_count_atomic && __servers_count > 0)
+		acl_atomic_int64_add_fetch(__servers_count_atomic, -1);
 	return NULL;
 }
 
@@ -1102,6 +1131,8 @@ static void main_thread_loop(void)
 	}
 
 	acl_vstring_free(buf);
+	acl_msg_info("%s(%d): main thread-%lu exit",
+		__FUNCTION__, __LINE__, acl_pthread_self());
 }
 
 static void servers_start(UDP_SERVER *servers, int nthreads)
@@ -1124,6 +1155,10 @@ static void servers_start(UDP_SERVER *servers, int nthreads)
 		}
 	}
 
+	__servers_count_atomic = acl_atomic_new();
+	acl_atomic_set(__servers_count_atomic, &__servers_count);
+	acl_atomic_int64_set(__servers_count_atomic, 0);
+
 	__clock = acl_atomic_clock_alloc();
 
 	acl_pthread_attr_init(&attr);
@@ -1140,8 +1175,10 @@ static void servers_start(UDP_SERVER *servers, int nthreads)
 
 static void thread_server_exit(void *ctx acl_unused)
 {
-	acl_msg_info("--thread-%lu exit now---",
-		(unsigned long) acl_pthread_self());
+	acl_msg_info("%s(%d), %s: thread-%lu exit now", __FILE__, __LINE__,
+		__FUNCTION__, (unsigned long) acl_pthread_self());
+	if (__servers_count_atomic && __servers_count > 0)
+		acl_atomic_int64_add_fetch(__servers_count_atomic, -1);
 }
 
 static void usage(int argc, char *argv[])
