@@ -114,6 +114,9 @@
     <ClInclude Include="src\event\event_select.h">
       <Filter>源文件\event</Filter>
     </ClInclude>
+    <ClInclude Include="src\event\event_poll.h">
+      <Filter>源文件\event</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.c">
@@ -240,6 +243,9 @@
       <Filter>源文件\common</Filter>
     </ClCompile>
     <ClCompile Include="src\event\event_select.c">
+      <Filter>源文件\event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\event_poll.c">
       <Filter>源文件\event</Filter>
     </ClCompile>
   </ItemGroup>

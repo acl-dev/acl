@@ -29,7 +29,11 @@ EVENT *event_create(int size)
 
 	switch (__event_mode) {
 	case FIBER_EVENT_POLL:
+#ifdef	HAS_POLL
 		ev = event_poll_create(size);
+#else
+		ev = NULL;
+#endif
 		break;
 	case FIBER_EVENT_SELECT:
 		ev = event_select_create(size);
