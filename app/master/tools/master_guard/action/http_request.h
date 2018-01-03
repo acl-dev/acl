@@ -2,7 +2,7 @@
 #include "serialize.h"
 
 template<typename TReq, typename TRes>
-bool http_request(const char* addr, TReq& req, TRes& res)
+bool http_request_run(const char* addr, TReq& req, TRes& res)
 {
 	acl::string body;
 	serialize<TReq>(req, body);

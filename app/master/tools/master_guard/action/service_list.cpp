@@ -19,7 +19,7 @@ bool service_list::run(void)
 	req.cmd = "list";
 
 	list_res_t res;
-	if (!http_request<list_req_t, list_res_t>(master_ctld_, req, res))
+	if (!http_request_run<list_req_t, list_res_t>(master_ctld_, req, res))
 		return false;
 
 	service_list_res_t list_res;
