@@ -5,6 +5,7 @@
 #include "event/event_epoll.h"
 #include "event/event_kqueue.h"
 #include "event/event_select.h"
+#include "event/event_poll.h"
 #include "event.h"
 
 static __thread int __event_mode = FIBER_EVENT_KERNEL;
@@ -28,7 +29,7 @@ EVENT *event_create(int size)
 
 	switch (__event_mode) {
 	case FIBER_EVENT_POLL:
-		ev = NULL;
+		ev = event_poll_create(size);
 		break;
 	case FIBER_EVENT_SELECT:
 		ev = event_select_create(size);
