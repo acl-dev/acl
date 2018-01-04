@@ -1,7 +1,8 @@
 #include "stdafx.h"
-#include "http_request.h"
 #include "json/service_struct.h"
 #include "json/service_struct.gson.h"
+#include "daemon/json/serialize.h"
+#include "http_request.h"
 #include "service_list.h"
 
 service_list::service_list(const char* master_ctld, const char* guard_manager,
@@ -38,9 +39,7 @@ bool service_list::run(void)
 	}
 
 	acl::string body;
-	acl::json json;
-	acl::json_node& node = acl::gson(json, list_res);
-	body = node.to_string();
+	serialize<service_list_res_t>(list_res, body);
 //	logger("|%s|, len=%d", body.c_str(), (int) body.size());
 
 	return report(body);
