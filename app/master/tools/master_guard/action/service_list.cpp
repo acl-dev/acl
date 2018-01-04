@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "json/service_struct.h"
-#include "json/service_struct.gson.h"
+#include "tools/service_guard/json/service_struct.h"
+#include "tools/service_guard/json/service_struct.gson.h"
 #include "daemon/json/serialize.h"
 #include "http_request.h"
 #include "service_list.h"
