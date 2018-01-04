@@ -16,10 +16,11 @@
 bool service_node::save(const char* ip, const service_list_res_t& res)
 {
 	std::map<acl::string, double> members;
+	time_t now = time(NULL);
 
 	for (std::vector<service_info_t>::const_iterator cit = res.data.begin();
 		cit != res.data.end(); ++cit) {
-		members[(*cit).conf] = (*cit).start;
+		members[(*cit).conf] = now;
 	}
 
 	acl::redis cmd(&redis_);
