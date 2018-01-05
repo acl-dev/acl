@@ -580,7 +580,7 @@ static int service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 				command, serv->cmdext, NULL);
 
 	serv->path    = ptr;
-	serv->command = acl_mystrdup(command);
+//	serv->command = acl_mystrdup(command);
 
 	/* Notify Address */
 	ptr_const = get_str_ent(xcp, ACL_VAR_MASTER_NOTIFY_ADDR, "no");
@@ -922,8 +922,8 @@ void acl_master_ent_free(ACL_MASTER_SERV *serv)
 		acl_myfree(serv->name);
 	if (serv->path)
 		acl_myfree(serv->path);
-	if (serv->command)
-		acl_myfree(serv->command);
+	//if (serv->command)
+	//	acl_myfree(serv->command);
 	if (serv->cmdext)
 		acl_myfree(serv->cmdext);
 	if (serv->conf)

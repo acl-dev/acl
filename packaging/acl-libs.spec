@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        53
+Release:        54
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,10 @@ fi
 /etc/init.d/master
 
 %changelog
+* Fri Jan 05 2018 zhengshuxin@qiyi.com 3.3.0-54-20180105.13
+- acl_master: fixed one bug in masetr_api.cpp for checking command path, so
+just using ACL_MASETR_SERV::path, and ACL_MASETR_SERV::command was removed.
+
 * Thu Jan 04 2018 zhengshuxin@qiyi.com 3.3.0-53-20180104.13
 - add service_guard tool for master
 

@@ -50,9 +50,9 @@ static int check_command(ACL_MASTER_SERV *entry, const char *ext)
 
 	/* if ext name not NULL, then add it as the extern name of command */
 	if (ext && *ext)
-		path = acl_concatenate(entry->command, ext, NULL);
+		path = acl_concatenate(entry->path, ext, NULL);
 	else
-		path = acl_concatenate(entry->command, entry->cmdext, NULL);
+		path = acl_concatenate(entry->path, entry->cmdext, NULL);
 
 	if (access(path, F_OK) != 0) {
 		acl_msg_error("%s(%d), %s: command %s can't be executed, %s",

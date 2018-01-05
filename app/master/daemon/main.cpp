@@ -16,7 +16,7 @@
 #include "master/master.h"
 #include "manage/manager.h"
 
-const char *var_master_version = "master version 2.0 20171112 (acl)";
+const char *var_master_version = "acl_master version 2.1.0 20180105 (acl)";
 char *var_master_procname;
 
 /* usage - show hint and terminate */
