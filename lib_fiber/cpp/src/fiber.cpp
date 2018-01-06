@@ -121,7 +121,7 @@ bool fiber::self_killed(void)
 	ACL_FIBER* curr = acl_fiber_running();
 	if (curr == NULL)
 		return false;
-	return acl_fiber_killed(curr);
+	return acl_fiber_killed(curr) ? true : false;
 }
 
 void fiber::schedule(void)

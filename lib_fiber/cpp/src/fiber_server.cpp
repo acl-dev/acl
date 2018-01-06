@@ -1,6 +1,10 @@
 #include "stdafx.hpp"
 #include <stdarg.h>
+#if defined(_WIN32) || defined(_WIN64)
+#include <process.h>
+#else
 #include <poll.h>
+#endif
 
 /* including the internal headers from lib_acl/src/master */
 #include "template/master_log.h"
@@ -242,7 +246,7 @@ static void main_server_stop(void)
 	for (i = 0; __servers[i] != NULL; i++) {
 		(void) acl_mbox_send(__servers[i]->in, &dummy);
 		ptr = acl_mbox_read(__servers[i]->out, -1, NULL);
-		assert(ptr);
+		acl_assert(ptr);
 		server_free(__servers[i]);
 	}
 
@@ -258,6 +262,8 @@ static void main_server_stop(void)
 	__servers = NULL;
 	acl_free_app_conf_str_table(__conf_str_tab);
 }
+
+#if !defined(_WIN32) && !defined(_WIN64)
 
 static void main_fiber_monitor_master(ACL_FIBER *fiber, void *ctx)
 {
@@ -410,6 +416,8 @@ static void main_fiber_dispatch(ACL_FIBER *fiber, void *ctx acl_unused)
 		__FUNCTION__, acl_fiber_id(fiber));
 }
 
+#endif
+
 static void main_fiber_sighup(ACL_FIBER *fiber, void *ctx acl_unused)
 {
 	ACL_VSTRING *buf;
@@ -427,6 +435,7 @@ static void main_fiber_sighup(ACL_FIBER *fiber, void *ctx acl_unused)
 
 		buf = acl_vstring_alloc(128);
 
+#if !defined(_WIN32) && !defined(_WIN64)
 		if (__sighup_handler(__service_ctx, buf) < 0)
 			acl_master_notify(acl_var_fiber_pid,
 				__server_generation,
@@ -435,6 +444,7 @@ static void main_fiber_sighup(ACL_FIBER *fiber, void *ctx acl_unused)
 			acl_master_notify(acl_var_fiber_pid,
 				__server_generation,
 				ACL_MASTER_STAT_SIGHUP_OK);
+#endif
 
 		acl_vstring_free(buf);
 	}
@@ -501,6 +511,7 @@ static void main_fiber_monitor_idle(ACL_FIBER *fiber, void *ctx acl_unused)
 
 static void main_thread_loop(void)
 {
+#if !defined(_WIN32) && !defined(_WIN64)
 	if (__daemon_mode) {
 		ACL_VSTREAM *stat_stream = acl_vstream_fdopen(
 				ACL_MASTER_STATUS_FD, O_RDWR, 8192, 0,
@@ -508,14 +519,13 @@ static void main_thread_loop(void)
 
 		acl_fiber_create(main_fiber_monitor_master,
 			stat_stream, STACK_SIZE);
-
 		acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
 		acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
 		acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
-
 		if (acl_var_fiber_dispatch_addr && *acl_var_fiber_dispatch_addr)
 			acl_fiber_create(main_fiber_dispatch, NULL, STACK_SIZE);
 	}
+#endif
 
 	__sighup_fiber = acl_fiber_create(main_fiber_sighup, NULL,
 		acl_var_fiber_stack_size);
@@ -583,6 +593,7 @@ static FIBER_SERVER **servers_alloc(int nthreads, int socket_count, int fdtype)
 	return servers;
 }
 
+#if !defined(_WIN32) && !defined(_WIN64)
 static void server_daemon_open(FIBER_SERVER *server)
 {
 	ACL_SOCKET fd = ACL_MASTER_LISTEN_FD;
@@ -605,6 +616,7 @@ static void servers_daemon(int count, int fdtype, int nthreads)
 	for (i = 0; i < nthreads; i++)
 		server_daemon_open(__servers[i]);
 }
+#endif
 
 static void server_alone_open(FIBER_SERVER *server, ACL_ARGV *addrs)
 {
@@ -725,7 +737,11 @@ static void server_init(const char *procname)
 	/*
 	 * May need this every now and then.
 	 */
+#if defined(_WIN32) || defined(_WIN64)
+	acl_var_fiber_pid = _getpid();
+#else
 	acl_var_fiber_pid = getpid();
+#endif
 	acl_var_fiber_procname = acl_mystrdup(acl_safe_basename(procname));
 
 	ptr = acl_getenv("SERVICE_LOG");
@@ -844,7 +860,9 @@ void acl_fiber_server_main(int argc, char *argv[],
 	const char *service_name = acl_safe_basename(argv[0]);
 	const char *root_dir = NULL, *user = NULL, *addrs = NULL;
 	int   c, socket_count = 1, fdtype = ACL_VSTREAM_TYPE_LISTEN;
+#if !defined(_WIN32) && !defined(_WIN64)
 	char *generation;
+#endif
 	va_list ap;
 
 	__argc = argc;
@@ -856,14 +874,18 @@ void acl_fiber_server_main(int argc, char *argv[],
 	__first_name  = name;
 
 	va_start(ap, name);
+#if !defined(_WIN32) && !defined(_WIN64)
 	va_copy(__ap_dest, ap);
+#endif
 	va_end(ap);
 
 	master_log_open(__argv[0]);
 
 	__conf_file[0] = 0;
 
+#if !defined(_WIN32) && !defined(_WIN64)
 	opterr = 0;
+#endif
 	optind = 0;
 	optarg = 0;
 
@@ -874,7 +896,11 @@ void acl_fiber_server_main(int argc, char *argv[],
 			exit (0);
 		case 'f':
 			acl_app_conf_load(optarg);
+#if defined(_WIN32) || defined(_WIN64)
+			_snprintf(__conf_file, sizeof(__conf_file), "%s", optarg);
+#else
 			snprintf(__conf_file, sizeof(__conf_file), "%s", optarg);
+#endif
 			break;
 		case 'c':
 			root_dir = "setme";
@@ -908,9 +934,11 @@ void acl_fiber_server_main(int argc, char *argv[],
 
 	ACL_SAFE_STRNCPY(__service_name, service_name, sizeof(__service_name));
 
+#if !defined(_WIN32) && !defined(_WIN64)
 	if (addrs && *addrs)
 		__daemon_mode = 0;
 	else
+#endif
 		__daemon_mode = 1;
 
 	/*******************************************************************/
@@ -923,6 +951,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 
 	parse_args();
 
+#if !defined(_WIN32) && !defined(_WIN64)
 	if (root_dir)
 		root_dir = acl_var_fiber_queue_dir;
 
@@ -954,6 +983,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 	if (__daemon_mode)
 		servers_daemon(socket_count, fdtype, acl_var_fiber_threads);
 	else
+#endif
 		servers_alone(addrs, fdtype, acl_var_fiber_threads);
 
 	acl_assert(__servers);
@@ -961,23 +991,29 @@ void acl_fiber_server_main(int argc, char *argv[],
 	if (pre_jail)
 		pre_jail(__service_ctx);
 
+#if !defined(_WIN32) && !defined(_WIN64)
 	if (user && *user)
 		acl_chroot_uid(root_dir, user);
+#endif
 
 	/* open the server's log */
 	open_service_log();
 
+#if !defined(_WIN32) && !defined(_WIN64)
 	/* if enable dump core when program crashed ? */
 	if (acl_var_fiber_enable_core)
 		acl_set_core_limit(0);
+#endif
 
 	/* Run post-jail initialization. */
 	if (post_init)
 		post_init(__service_ctx);
 
+#if !defined(_WIN32) && !defined(_WIN64)
 	/* notify master that child started ok */
 	if (__daemon_mode)
 		acl_master_notify(acl_var_fiber_pid, __server_generation,
 			ACL_MASTER_STAT_START_OK);
+#endif
 	servers_start(__servers, acl_var_fiber_threads);
 }
