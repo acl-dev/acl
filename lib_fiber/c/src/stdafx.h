@@ -61,7 +61,6 @@
 
 #define STRDUP _strdup
 #define GETPID _getpid
-#define ssize_t long int
 #endif
 
 #if defined(__linux__)

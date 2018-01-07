@@ -5,24 +5,26 @@
 #include "event.h"
 #include "fiber.h"
 
-typedef int (*socket_fn)(int, int, int);
-typedef int (*socketpair_fn)(int, int, int, int sv[2]);
-typedef int (*bind_fn)(int, const struct sockaddr *, socklen_t);
-typedef int (*listen_fn)(int, int);
-typedef int (*accept_fn)(int, struct sockaddr *, socklen_t *);
-typedef int (*connect_fn)(int, const struct sockaddr *, socklen_t);
+#ifdef SYS_WIN
+typedef socket_t (__stdcall *socket_fn)(int, int, int);
+typedef int (__stdcall *listen_fn)(socket_t, int);
+typedef socket_t (__stdcall *accept_fn)(socket_t, struct sockaddr *, socklen_t *);
+typedef int (__stdcall *connect_fn)(socket_t, const struct sockaddr *, socklen_t);
+#else
+typedef socket_t (*socket_fn)(int, int, int);
+typedef int (*listen_fn)(socket_t, int);
+typedef socket_t (*accept_fn)(socket_t, struct sockaddr *, socklen_t *);
+typedef int (*connect_fn)(socket_t, const struct sockaddr *, socklen_t);
+#endif
 
 static socket_fn          __sys_socket          = NULL;
-static socketpair_fn      __sys_socketpair      = NULL;
-static bind_fn            __sys_bind            = NULL;
 static listen_fn          __sys_listen          = NULL;
 static accept_fn          __sys_accept          = NULL;
 static connect_fn         __sys_connect         = NULL;
 
-#ifdef SYS_UNIX
-
 static void hook_init(void)
 {
+#ifdef SYS_UNIX
 	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
 	static int __called = 0;
 
@@ -38,12 +40,6 @@ static void hook_init(void)
 	__sys_socket     = (socket_fn) dlsym(RTLD_NEXT, "socket");
 	assert(__sys_socket);
 
-	__sys_socketpair = (socketpair_fn) dlsym(RTLD_NEXT, "socketpair");
-	assert(__sys_socketpair);
-
-	__sys_bind       = (bind_fn) dlsym(RTLD_NEXT, "bind");
-	assert(__sys_bind);
-
 	__sys_listen     = (listen_fn) dlsym(RTLD_NEXT, "listen");
 	assert(__sys_listen);
 
@@ -54,11 +50,17 @@ static void hook_init(void)
 	assert(__sys_connect);
 
 	(void) pthread_mutex_unlock(&__lock);
+#elif defined(SYS_WIN)
+	__sys_socket  = socket;
+	__sys_listen  = listen;
+	__sys_accept  = accept;
+	__sys_connect = connect;
+#endif
 }
 
-int socket(int domain, int type, int protocol)
+socket_t fiber_socket(int domain, int type, int protocol)
 {
-	int sockfd;
+	socket_t sockfd;
 
 	if (__sys_socket == NULL) {
 		hook_init();
@@ -74,7 +76,7 @@ int socket(int domain, int type, int protocol)
 		return sockfd;
 	}
 
-	if (sockfd >= 0) {
+	if (sockfd != INVALID_SOCKET) {
 		non_blocking(sockfd, NON_BLOCKING);
 	} else {
 		fiber_save_errno();
@@ -83,7 +85,7 @@ int socket(int domain, int type, int protocol)
 	return sockfd;
 }
 
-int listen(int sockfd, int backlog)
+int fiber_listen(socket_t sockfd, int backlog)
 {
 	if (__sys_listen == NULL) {
 		hook_init();
@@ -104,12 +106,12 @@ int listen(int sockfd, int backlog)
 
 #define FAST_ACCEPT
 
-int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+socket_t fiber_accept(socket_t sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
 	FILE_EVENT *fe;
-	int clifd;
+	socket_t clifd;
 
-	if (sockfd < 0) {
+	if (sockfd == INVALID_SOCKET) {
 		msg_error("%s: invalid sockfd %d", __FUNCTION__, sockfd);
 		return -1;
 	}
@@ -119,7 +121,8 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 	}
 
 	if (!var_hook_sys_api) {
-		return __sys_accept ? __sys_accept(sockfd, addr, addrlen) : -1;
+		return __sys_accept ?
+			__sys_accept(sockfd, addr, addrlen) : INVALID_SOCKET;
 	}
 
 #ifdef	FAST_ACCEPT
@@ -127,7 +130,7 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 	non_blocking(sockfd, NON_BLOCKING);
 
 	clifd = __sys_accept(sockfd, addr, addrlen);
-	if (clifd >= 0) {
+	if (clifd != INVALID_SOCKET) {
 		non_blocking(clifd, NON_BLOCKING);
 		tcp_nodelay(clifd, 1);
 		return clifd;
@@ -139,7 +142,7 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 #else
 	if (errno != EAGAIN && errno != EWOULDBLOCK) {
 #endif
-		return -1;
+		return INVALID_SOCKET;
 	}
 
 	fe = fiber_file_open(sockfd);
@@ -153,7 +156,7 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 
 	clifd = __sys_accept(sockfd, addr, addrlen);
 
-	if (clifd >= 0) {
+	if (clifd != INVALID_SOCKET) {
 		non_blocking(clifd, NON_BLOCKING);
 		tcp_nodelay(clifd, 1);
 		return clifd;
@@ -173,7 +176,7 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 
 	clifd = __sys_accept(sockfd, addr, addrlen);
 
-	if (clifd >= 0) {
+	if (clifd != INVALID_SOCKET) {
 		non_blocking(clifd, NON_BLOCKING);
 		tcp_nodelay(clifd, 1);
 		return clifd;
@@ -184,9 +187,9 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 #endif
 }
 
-int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+int fiber_connect(socket_t sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
-	int err;
+	int err, ret;
 	socklen_t len;
 	FILE_EVENT *fe;
 
@@ -199,7 +202,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 
 	non_blocking(sockfd, NON_BLOCKING);
 
-	int ret = __sys_connect(sockfd, addr, addrlen);
+	ret = __sys_connect(sockfd, addr, addrlen);
 	if (ret >= 0) {
 		tcp_nodelay(sockfd, 1);
 		return ret;
@@ -220,9 +223,11 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 		} else if (errno == ENETUNREACH) {
 			msg_error("%s(%d), %s: connect ENETUNREACH",
 				__FILE__, __LINE__, __FUNCTION__);
+#ifdef SYS_UNIX
 		} else if (errno == EHOSTDOWN) {
 			msg_error("%s(%d), %s: connect EHOSTDOWN",
 				__FILE__, __LINE__, __FUNCTION__);
+#endif
 		} else if (errno == EHOSTUNREACH) {
 			msg_error("%s(%d), %s: connect EHOSTUNREACH",
 				__FILE__, __LINE__, __FUNCTION__);
@@ -276,6 +281,28 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 		__FUNCTION__, __LINE__, last_serror(), ret, err);
 
 	return -1;
+}
+
+#ifdef SYS_UNIX
+
+int socket(int domain, int type, int protocol)
+{
+	return fiber_socket(domain, type, protocol);
+}
+
+int listen(int sockfd, int backlog)
+{
+	return fiber_listen(sockfd, backlog);
+}
+
+int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+{
+	return fiber_accept(sockfd, addr, addrlen);
+}
+
+int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+{
+	return fiber_connect(sockfd, addr, addrlen);
 }
 
 #endif
