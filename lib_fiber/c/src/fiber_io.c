@@ -23,7 +23,8 @@ static void fiber_io_loop(ACL_FIBER *fiber, void *ctx);
 
 #define MAXFD		1024
 #define STACK_SIZE	819200
-int var_maxfd = 1024;
+
+socket_t var_maxfd = 1024;
 
 void acl_fiber_schedule_stop(void)
 {
@@ -366,7 +367,7 @@ void fiber_wait_write(FILE_EVENT *fe)
 
 /****************************************************************************/
 
-static FILE_EVENT *fiber_file_get(int fd)
+static FILE_EVENT *fiber_file_get(socket_t fd)
 {
 	fiber_io_check();
 	if (fd < 0 || fd >= var_maxfd) {
@@ -380,7 +381,7 @@ static FILE_EVENT *fiber_file_get(int fd)
 
 static void fiber_file_set(FILE_EVENT *fe)
 {
-	if (fe->fd < 0 || fe->fd >= var_maxfd) {
+	if (fe->fd == INVALID_SOCKET || fe->fd >= (socket_t) var_maxfd) {
 		msg_fatal("%s(%d): invalid fd=%d",
 			__FUNCTION__, __LINE__, fe->fd);
 	}
@@ -393,7 +394,7 @@ static void fiber_file_set(FILE_EVENT *fe)
 	__thread_fiber->events[fe->fd] = fe;
 }
 
-FILE_EVENT *fiber_file_open(int fd)
+FILE_EVENT *fiber_file_open(socket_t fd)
 {
 	FILE_EVENT *fe = fiber_file_get(fd);
 
@@ -406,7 +407,7 @@ FILE_EVENT *fiber_file_open(int fd)
 
 static int fiber_file_del(FILE_EVENT *fe)
 {
-	if (fe->fd < 0 || fe->fd >= var_maxfd) {
+	if (fe->fd == INVALID_SOCKET || fe->fd >= var_maxfd) {
 		msg_error("%s(%d): invalid fd=%d",
 			__FUNCTION__, __LINE__, fe->fd);
 		return -1;
@@ -423,7 +424,7 @@ static int fiber_file_del(FILE_EVENT *fe)
 	return 0;
 }
 
-int fiber_file_close(int fd)
+int fiber_file_close(socket_t fd)
 {
 	FILE_EVENT *fe;
 

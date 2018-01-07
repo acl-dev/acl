@@ -3,6 +3,7 @@
 
 #ifdef HAS_WMSG
 
+#include "fiber/lib_fiber.h"
 #include "common/sane_socket.h"
 #include "event.h"
 #include "event_wmsg.h"

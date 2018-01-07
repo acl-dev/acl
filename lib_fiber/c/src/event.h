@@ -46,7 +46,7 @@ typedef void epoll_proc(EVENT *ev, EPOLL_EVENT *ee);
 struct FILE_EVENT {
 	RING       me;
 	ACL_FIBER *fiber;
-	int fd;
+	socket_t   fd;
 	int id;
 	int type;
 #define	TYPE_NONE		0
@@ -120,8 +120,8 @@ struct EPOLL_EVENT {
 struct EVENT {
 	RING events;
 	int  timeout;
-	int  setsize;
-	int  maxfd;
+	socket_t setsize;
+	socket_t maxfd;
 
 #ifdef HAS_POLL
 	RING   poll_list;

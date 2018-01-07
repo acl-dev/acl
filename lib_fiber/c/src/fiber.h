@@ -83,7 +83,7 @@ void fiber_count_inc(void);
 void fiber_count_dec(void);
 
 /* in fiber_io.c */
-extern int var_maxfd;
+extern socket_t var_maxfd;
 
 void fiber_io_check(void);
 void fiber_wait_read(FILE_EVENT *fe);
@@ -92,8 +92,8 @@ void fiber_io_dec(void);
 void fiber_io_inc(void);
 EVENT *fiber_io_event(void);
 
-FILE_EVENT *fiber_file_open(int fd);
-int fiber_file_close(int fd);
+FILE_EVENT *fiber_file_open(socket_t fd);
+int fiber_file_close(socket_t fd);
 
 /* in hook/epoll.c */
 int  epoll_event_close(int epfd);

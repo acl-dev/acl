@@ -3,6 +3,7 @@
 
 #ifdef HAS_SELECT
 
+#include "fiber/lib_fiber.h"
 #include "event.h"
 #include "event_select.h"
 
@@ -42,7 +43,7 @@ typedef struct EVENT_SELECT {
 	FILE_EVENT **files;
 	int    size;
 	int    count;
-	int    maxfd;
+	socket_t maxfd;
 	int    dirty;
 } EVENT_SELECT;
 
