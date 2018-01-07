@@ -162,6 +162,15 @@
     <ClCompile Include="src\file_event.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\event\event_wmsg.c">
+      <Filter>源文件\event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\htable.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\sane_socket.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\stdafx.h">
@@ -241,6 +250,18 @@
     </ClInclude>
     <ClInclude Include="src\fiber.h">
       <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\lib_fiber.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\event_wmsg.h">
+      <Filter>源文件\event</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\htable.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\sane_socket.h">
+      <Filter>源文件\common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

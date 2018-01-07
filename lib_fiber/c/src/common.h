@@ -9,8 +9,10 @@
 #include "common/iterator.h"
 #include "common/array.h"
 #include "common/argv.h"
+#include "common/htable.h"
 #include "common/strops.h"
 #include "common/pthread_patch.h"
 #include "common/memory.h"
+#include "common/sane_socket.h"
 
 #endif
