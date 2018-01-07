@@ -3,6 +3,7 @@
 
 #ifdef HAS_WMSG
 
+#include "common/sane_socket.h"
 #include "event.h"
 #include "event_wmsg.h"
 

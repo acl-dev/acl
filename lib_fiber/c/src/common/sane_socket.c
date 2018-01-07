@@ -1,7 +1,8 @@
 #include "stdafx.h"
+#include "fiber/lib_fiber.h"
 #include "sane_socket.h"
 
-int is_listen_socket(SOCKET fd)
+int is_listen_socket(socket_t fd)
 {
 	int val, ret;
 #ifdef SYS_WIN
