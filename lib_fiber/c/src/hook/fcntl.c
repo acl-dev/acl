@@ -4,11 +4,11 @@
 #include "fiber.h"
 #include "hook.h"
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__FreeBSD__)
 
 int fcntl(int fd, int cmd, ...)
 {
-	int     arg_int, ret;
+	int     arg_int, ret = 0;
 #if	defined(F_GETOWN_EX) || defined(F_SETOWN_EX)
 	struct  f_owner_ex * arg_owner;
 #endif
@@ -23,26 +23,46 @@ int fcntl(int fd, int cmd, ...)
 
 	switch (cmd) {
 	case F_DUPFD:
+#ifdef	__linux__
 		if (!var_hook_sys_api || (ret = epoll_try_register(fd)) == -1) {
 			arg_int = va_arg(ap, int);
 			ret = (*sys_fcntl)(fd, cmd, arg_int);
 		}
+#else
+		if (!var_hook_sys_api) {
+			arg_int = va_arg(ap, int);
+			ret = (*sys_fcntl)(fd, cmd, arg_int);
+		}
+#endif
 		break;
 #ifdef	F_DUPFD_CLOEXEC
 	case F_DUPFD_CLOEXEC:
+#ifdef	__linux__
 		if (!var_hook_sys_api || (ret = epoll_try_register(fd)) == -1) {
 			arg_int = va_arg(ap, int);
 			ret = (*sys_fcntl)(fd, cmd, arg_int);
 		} else {
 			close_on_exec(fd, 1);
 		}
+#else
+		if (!var_hook_sys_api) {
+			arg_int = va_arg(ap, int);
+			ret = (*sys_fcntl)(fd, cmd, arg_int);
+		} else {
+			close_on_exec(fd, 1);
+		}
+#endif
 		break;
 #endif
 	case F_GETFD:
 	case F_GETFL:
 	case F_GETOWN:
+#ifdef	F_GETSIG
 	case F_GETSIG:
+#endif
+#ifdef	F_GETLEASE
 	case F_GETLEASE:
+#endif
 #ifdef	F_GETPIPE_SZ
 	case F_GETPIPE_SZ:
 #endif
@@ -51,9 +71,15 @@ int fcntl(int fd, int cmd, ...)
 	case F_SETFD:
 	case F_SETFL:
 	case F_SETOWN:
+#ifdef	F_SETSIG
 	case F_SETSIG:
+#endif
+#ifdef	F_SETLEASE
 	case F_SETLEASE:
+#endif
+#ifdef	F_NOTIFY
 	case F_NOTIFY:
+#endif
 #ifdef	F_GET_RW_HINT
 	case F_GET_RW_HINT:
 #endif

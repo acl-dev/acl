@@ -249,7 +249,7 @@ OBJ = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC))) $(ASM_OBJ)
 ###########################################################
 
 .PHONY = static shared clean
-COMPILE = $(CC) $(CFLAGS) -O3
+COMPILE = $(CC) $(CFLAGS)
 COMPILE_FIBER = $(CC) $(CFLAGS) 
 
 all: static shared
