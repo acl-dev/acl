@@ -88,6 +88,7 @@ bool bitmap::frombuf(const void* buf, size_t len)
 void bitmap::reset(void)
 {
 	memset(bmp_, 0, (size_ + 7) / 8);
+	count_ = 0;
 }
 
 size_t bitmap::size(void)

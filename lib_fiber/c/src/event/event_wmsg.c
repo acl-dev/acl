@@ -57,6 +57,7 @@ static void wmsg_free(EVENT *ev)
 			UnregisterClass(ew->class_name, ew->hInstance);
 		}
 	}
+	htable_free(ew->tbl, NULL);
 	free(ew->files);
 	free(ew);
 }
@@ -391,6 +392,7 @@ EVENT *event_wmsg_create(int size)
 	ew->hWnd         = hWnd;
 	ew->hInstance    = hInstance;
 	ew->class_name   = __class_name;
+	ew->tbl          = htable_create(10);
 
 	ew->event.name   = wmsg_name;
 	ew->event.handle = wmsg_handle;
