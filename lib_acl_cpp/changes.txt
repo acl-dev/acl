@@ -1,6 +1,9 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+505) 2018.1.9
+505.1) feature: aio_handle 类增加方法 last_nready 用来获得本次事件循环触发的事件数
+
 504) 2018.1.1
 504.1) feature: redis_cluster class can support redis.4.x.x for command:
 "CLUSTER NODES" as show below:

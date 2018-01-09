@@ -225,6 +225,11 @@ bool aio_handle::check()
 	return true;
 }
 
+int aio_handle::last_nready() const
+{
+	return acl_aio_last_nready(aio_);
+}
+
 void aio_handle::stop()
 {
 	stop_ = true;

@@ -138,6 +138,12 @@ public:
 	bool check();
 
 	/**
+	 * 获得本次事件循环被触发的事件次数
+	 * @return {int}
+	 */
+	int last_nready() const;
+
+	/**
 	 * 通知异步流引擎中止
 	 */
 	void stop();
