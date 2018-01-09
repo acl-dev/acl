@@ -447,3 +447,8 @@ int acl_event_mode(ACL_EVENT *eventp)
 {
 	return eventp->event_mode;
 }
+
+int acl_event_last_nready(ACL_EVENT *eventp)
+{
+	return eventp->ready_cnt;
+}

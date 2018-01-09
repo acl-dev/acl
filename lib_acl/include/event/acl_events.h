@@ -357,6 +357,13 @@ ACL_API int acl_event_use_thread(ACL_EVENT *eventp);
  */
 ACL_API int acl_event_mode(ACL_EVENT *eventp);
 
+/**
+ * 获得本次事件循环后被触发的 IO 事件的次数
+ * @param eventp {ACL_EVENT*} 事件对象指针, 不为能为空
+ * @return {int} 该值为本次循环被触发的事件次数
+ */
+ACL_API int acl_event_last_nready(ACL_EVENT *eventp);
+
 #ifdef	__cplusplus
 }
 #endif

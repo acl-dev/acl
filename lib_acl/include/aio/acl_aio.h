@@ -226,6 +226,13 @@ ACL_API void acl_aio_free2(ACL_AIO *aio, int keep);
 ACL_API void acl_aio_loop(ACL_AIO *aio);
 
 /**
+ * 获得本次事件循环被触发的事件次数
+ * @param aio {ACL_AIO*} 异步框架引擎句柄
+ * @return {int} -1 表示输入参数有误，否则返回值 >= 0
+ */
+ACL_API int acl_aio_last_nready(ACL_AIO *aio);
+
+/**
  * 主动检查 ACL_AIO 引擎中待关闭的异步流是否应该关闭，调用此函数后，一些需要
  * 延迟关闭的异步流会被主动关闭
  * @param aio {ACL_AIO*} 异步框架引擎句柄

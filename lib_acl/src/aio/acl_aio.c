@@ -152,6 +152,15 @@ void acl_aio_loop(ACL_AIO *aio)
 	aio_delay_check(aio);
 }
 
+int acl_aio_last_nready(ACL_AIO *aio)
+{
+	if (aio == NULL || aio->event == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
+	return acl_event_last_nready(aio->event);
+}
+
 ACL_EVENT *acl_aio_event(ACL_AIO *aio)
 {
 	if (aio)
