@@ -35,4 +35,6 @@ public:
 	afx_msg void OnBnClickedOpenDos();
 private:
 	FILE* m_dosFp;
+	UINT m_listenPort;
+	CString m_listenIP;
 };
