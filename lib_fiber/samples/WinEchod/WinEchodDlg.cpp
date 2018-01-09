@@ -50,6 +50,8 @@ END_MESSAGE_MAP()
 CWinEchodDlg::CWinEchodDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CWinEchodDlg::IDD, pParent)
 	, m_dosFp(NULL)
+	, m_listenPort(0)
+	, m_listenIP(_T("127.0.0.1"))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -62,6 +64,10 @@ CWinEchodDlg::~CWinEchodDlg()
 void CWinEchodDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_LISTEN_PORT, m_listenPort);
+	DDV_MinMaxUInt(pDX, m_listenPort, 0, 65535);
+	DDX_Text(pDX, IDC_LISTEN_IP, m_listenIP);
+	DDV_MaxChars(pDX, m_listenIP, 64);
 }
 
 BEGIN_MESSAGE_MAP(CWinEchodDlg, CDialogEx)
@@ -165,18 +171,21 @@ HCURSOR CWinEchodDlg::OnQueryDragIcon()
 void CWinEchodDlg::OnBnClickedAbort()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	UpdateData();
 }
 
 
 void CWinEchodDlg::OnBnClickedOpenDos()
 {
 	// TODO: 在此添加控件通知处理程序代码
-		if (m_dosFp == NULL)
+	if (m_dosFp == NULL)
 	{
 		//GetDlgItem(IDC_OPEN_DOS)->EnableWindow(FALSE);
+		UpdateData();
 		AllocConsole();
 		m_dosFp = freopen("CONOUT$","w+t",stdout);
-		printf("DOS opened now!\r\n");
+		printf("DOS opened now, listen=%s:%d\r\n",
+			m_listenIP.GetString(), m_listenPort);
 		GetDlgItem(IDC_OPEN_DOS)->SetWindowText("关闭 DOS 窗口");
 	}
 	else
