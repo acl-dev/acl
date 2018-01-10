@@ -31,10 +31,12 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedAbort();
 	afx_msg void OnBnClickedOpenDos();
 private:
 	FILE* m_dosFp;
 	UINT m_listenPort;
 	CString m_listenIP;
+	acl::server_socket m_listen;
+public:
+	afx_msg void OnBnClickedListen();
 };

@@ -3,6 +3,7 @@
 //
 
 #include "stdafx.h"
+#include "Listener.h"
 #include "WinEchod.h"
 #include "WinEchodDlg.h"
 #include "afxdialogex.h"
@@ -58,7 +59,12 @@ CWinEchodDlg::CWinEchodDlg(CWnd* pParent /*=NULL*/)
 
 CWinEchodDlg::~CWinEchodDlg()
 {
-	delete m_dosFp;
+	if (m_dosFp)
+	{
+		fclose(m_dosFp);
+		FreeConsole();
+		m_dosFp = NULL;
+	}
 }
 
 void CWinEchodDlg::DoDataExchange(CDataExchange* pDX)
@@ -74,8 +80,8 @@ BEGIN_MESSAGE_MAP(CWinEchodDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDABORT, &CWinEchodDlg::OnBnClickedAbort)
 	ON_BN_CLICKED(IDC_OPEN_DOS, &CWinEchodDlg::OnBnClickedOpenDos)
+	ON_BN_CLICKED(IDC_LISTEN, &CWinEchodDlg::OnBnClickedListen)
 END_MESSAGE_MAP()
 
 
@@ -166,15 +172,6 @@ HCURSOR CWinEchodDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
-
-void CWinEchodDlg::OnBnClickedAbort()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	UpdateData();
-}
-
-
 void CWinEchodDlg::OnBnClickedOpenDos()
 {
 	// TODO: 在此添加控件通知处理程序代码
@@ -195,4 +192,21 @@ void CWinEchodDlg::OnBnClickedOpenDos()
 		FreeConsole();
 		GetDlgItem(IDC_OPEN_DOS)->SetWindowText("打开 DOS 窗口");
 	}
+}
+
+
+void CWinEchodDlg::OnBnClickedListen()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString addr;
+	addr.Format("%s:%d", m_listenIP.GetString(), m_listenPort);
+	if (m_listen.open(addr) == false)
+	{
+		printf("listen %s error %s\r\n", addr.GetString());
+		return;
+	}
+	printf("listen %s ok\r\n", addr.GetString());
+	acl::fiber* fb = new CListener(m_listen);
+	fb->start();
+	acl::fiber::schedule(acl::FIBER_EVENT_T_WMSG);
 }
