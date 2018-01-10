@@ -7,9 +7,47 @@ extern "C" {
 
 #if defined(_WIN32) || defined (_WIN64)
 typedef long ssize_t;
+
+# define	FIBER_ETIMEDOUT		WSAETIMEDOUT
+# define	FIBER_ENOMEM		WSAENOBUFS
+# define	FIBER_EINVAL		WSAEINVAL
+# define	FIBER_ECONNREFUSED	WSAECONNREFUSED
+# define	FIBER_ECONNRESET	WSAECONNRESET
+# define	FIBER_EHOSTDOWN		WSAEHOSTDOWN
+# define	FIBER_EHOSTUNREACH	WSAEHOSTUNREACH
+# define	FIBER_EINTR		WSAEINTR
+# define	FIBER_ENETDOWN		WSAENETDOWN
+# define	FIBER_ENETUNREACH	WSAENETUNREACH
+# define	FIBER_ENOTCONN		WSAENOTCONN
+# define	FIBER_EISCONN		WSAEISCONN
+# define	FIBER_EWOULDBLOCK	WSAEWOULDBLOCK
+# define	FIBER_EAGAIN		FIBER_EWOULDBLOCK	/* xxx */
+# define	FIBER_ENOBUFS		WSAENOBUFS
+# define	FIBER_ECONNABORTED	WSAECONNABORTED
+# define	FIBER_EINPROGRESS	WSAEINPROGRESS
+
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
+
+# define	FIBER_ETIMEDOUT		ETIMEDOUT
+# define	FIBER_ENOMEM		ENOMEM
+# define	FIBER_EINVAL		EINVAL
+# define	FIBER_ECONNREFUSED	ECONNREFUSED
+# define	FIBER_ECONNRESET	ECONNRESET
+# define	FIBER_EHOSTDOWN		EHOSTDOWN
+# define	FIBER_EHOSTUNREACH	EHOSTUNREACH
+# define	FIBER_EINTR		EINTR
+# define	FIBER_EAGAIN		EAGAIN
+# define	FIBER_ENETDOWN		ENETDOWN
+# define	FIBER_ENETUNREACH	ENETUNREACH
+# define	FIBER_ENOTCONN		ENOTCONN
+# define	FIBER_EISCONN		EISCONN
+# define	FIBER_EWOULDBLOCK	EWOULDBLOCK
+# define	FIBER_ENOBUFS		ENOBUFS
+# define	FIBER_ECONNABORTED	ECONNABORTED
+# define	FIBER_EINPROGRESS	EINPROGRESS
+
 #endif
 
 #ifdef FIBER_LIB
@@ -646,6 +684,18 @@ FIBER_API void msg_pre_write(MSG_PRE_WRITE_FN pre_write, void *ctx);
  * @param onoff {int} 非 0 表示允许输出至屏幕
  */
 FIBER_API void msg_stdout_enable(int onoff);
+
+/**
+ * 获得上次系统调用出错时的错误号
+ * @return {int} 错误号
+ */
+FIBER_API int acl_fiber_last_error(void);
+
+/**
+ * 手工设置错误号
+ * @param errnum {int} 错误号
+ */
+void acl_fiber_set_error(int errnum);
 
 /****************************************************************************/
 

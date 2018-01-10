@@ -15,7 +15,7 @@ static int getsocktype(int fd)
 	if (getsockname(fd, sa, &len) == -1)
 		return -1;
 
-#ifndef	ACL_WINDOWS
+#ifndef	SYS_WIN
 	if (sa->sa_family == AF_UNIX)
 		return AF_UNIX;
 #endif

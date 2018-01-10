@@ -184,14 +184,16 @@ static int wmsg_del_write(EVENT_WMSG *ev, FILE_EVENT *fe)
 static int wmsg_wait(EVENT *ev, int timeout)
 {
 	MSG msg;
+	int n = 0;
 
 	(void) ev;
-	(void) timeout;
-
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+		n++;
 	}
+	if (n == 0)
+		Sleep(timeout);
 	return 0;
 }
 
@@ -341,8 +343,8 @@ static BOOL InitApplication(const char *class_name, HINSTANCE hInstance)
 
 	/* Register the window class. */
 	if (RegisterClassEx(&wcx) == 0) {
-		msg_error("%s(%d): RegisterClassEx error(%d, %s)",
-			__FUNCTION__, __LINE__, last_error(), last_serror());
+		msg_error("%s(%d): RegisterClassEx error(%d, %s)", __FUNCTION__,
+			__LINE__, acl_fiber_last_error(), last_serror());
 		return FALSE;
 	} else {
 		return TRUE;

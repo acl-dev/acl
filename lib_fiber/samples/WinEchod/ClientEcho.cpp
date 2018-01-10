@@ -13,6 +13,28 @@ CClientEcho::~CClientEcho(void)
 
 void CClientEcho::run(void)
 {
+	socket_t sock = m_conn->sock_handle();
+	while (true)
+	{
+		char buf[1024];
+		int ret = fiber_recv(sock, buf, sizeof(buf) - 1, 0);
+		if (ret == -1)
+		{
+			printf("recv error\r\n");
+			break;
+		}
+		buf[ret] = 0;
+		printf("recv=%d, [%s]\r\n", ret, buf);
+		if (fiber_send(sock, buf, ret, 0) == -1)
+		{
+			printf("write error %s\r\n", acl::last_serror());
+			break;
+		}
+	}
+	delete m_conn;
+	delete this;
+	return;
+
 	acl::string buf;
 	while (true)
 	{

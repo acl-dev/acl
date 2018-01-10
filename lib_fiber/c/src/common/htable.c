@@ -23,7 +23,7 @@ static void *htable_iter_head(ITER *iter, HTABLE *table)
 
 	if (ptr) {
 		iter->data = ptr->value;
-		iter->key = ptr->key.c_key;
+		iter->key = ptr->key;
 	} else {
 		iter->data = NULL;
 		iter->key = NULL;
@@ -42,7 +42,7 @@ static void *htable_iter_next(ITER *iter, HTABLE *table)
 		iter->ptr = ptr = ptr->next;
 		if (ptr != NULL) {
 			iter->data = ptr->value;
-			iter->key = ptr->key.c_key;
+			iter->key = ptr->key;
 			return (iter->ptr);
 		}
 	}
@@ -56,7 +56,7 @@ static void *htable_iter_next(ITER *iter, HTABLE *table)
 
 	if (ptr) {
 		iter->data = ptr->value;
-		iter->key = ptr->key.c_key;
+		iter->key = ptr->key;
 	} else {
 		iter->data = NULL;
 		iter->key = NULL;
@@ -85,7 +85,7 @@ static void *htable_iter_tail(ITER *iter, HTABLE *table)
 
 	if (ptr) {
 		iter->data = ptr->value;
-		iter->key = ptr->key.c_key;
+		iter->key = ptr->key;
 	} else {
 		iter->data = NULL;
 		iter->key = NULL;
@@ -104,7 +104,7 @@ static void *htable_iter_prev(ITER *iter, HTABLE *table)
 		iter->ptr = ptr = ptr->next;
 		if (ptr != NULL) {
 			iter->data = ptr->value;
-			iter->key = ptr->key.c_key;
+			iter->key = ptr->key;
 			return (iter->ptr);
 		}
 	}
@@ -118,7 +118,7 @@ static void *htable_iter_prev(ITER *iter, HTABLE *table)
 
 	if (ptr) {
 		iter->data = ptr->value;
-		iter->key = ptr->key.c_key;
+		iter->key = ptr->key;
 	} else {
 		iter->data = NULL;
 		iter->key = NULL;
@@ -210,8 +210,7 @@ static int htable_grow(HTABLE *table)
 	while (old_size-- > 0) {
 		for (ht = *h0++; ht; ht = next) {
 			next = ht->next;
-			n = __def_hash_fn(ht->key.c_key,
-				strlen(ht->key.c_key)) % table->size;
+			n = __def_hash_fn(ht->key, strlen(ht->key)) % table->size;
 			htable_link(table, ht, n);
 		}
 	}
@@ -284,7 +283,7 @@ HTABLE_INFO *htable_enter(HTABLE *table, const char *key, void *value)
 	n = hash % table->size;
 
 	for (ht = table->data[n]; ht; ht = ht->next) {
-		if (STREQ(key, ht->key.c_key)) {
+		if (STREQ(key, ht->key)) {
 			table->status = HTABLE_STAT_DUPLEX_KEY;
 			msg_info("%s(%d): duplex key(%s) exist",
 				__FUNCTION__, __LINE__, key);
@@ -299,18 +298,19 @@ HTABLE_INFO *htable_enter(HTABLE *table, const char *key, void *value)
 	}
 
 #if defined(_WIN32) || defined(_WIN64)
-	ht->key.key = _strdup(key);
+	ht->key = _strdup(key);
 #else
-	ht->key.key = strdup(key);
+	ht->key = strdup(key);
 #endif
-	if (ht->key.key == NULL) {
+	if (ht->key == NULL) {
 		msg_error("%s(%d): alloc error", __FUNCTION__, __LINE__);
 		free(ht);
 		return NULL;
 	}
-
+	ht->hash  = hash;
 	ht->value = value;
 	htable_link(table, ht, n);
+
 	return ht;
 }
 
@@ -334,7 +334,7 @@ HTABLE_INFO *htable_locate(HTABLE *table, const char *key)
 	n = n % table->size;
 
 	for (ht = table->data[n]; ht; ht = ht->next) {
-		if (STREQ(key, ht->key.c_key)) {
+		if (STREQ(key, ht->key)) {
 			return ht;
 		}
 	}
@@ -345,7 +345,8 @@ HTABLE_INFO *htable_locate(HTABLE *table, const char *key)
 void htable_delete_entry(HTABLE *table, HTABLE_INFO *ht,
 	void (*free_fn) (void *))
 {
-	HTABLE_INFO **h = table->data + ht->hash % table->size;
+	unsigned n = ht->hash % table->size;
+	HTABLE_INFO **h = table->data + n;
 
 	if (ht->next)
 		ht->next->prev = ht->prev;
@@ -353,7 +354,8 @@ void htable_delete_entry(HTABLE *table, HTABLE_INFO *ht,
 		ht->prev->next = ht->next;
 	else
 		*h = ht->next;
-	free(ht->key.key);
+
+	free(ht->key);
 	if (free_fn && ht->value)
 		(*free_fn) (ht->value);
 	free(ht);
@@ -373,7 +375,7 @@ int htable_delete(HTABLE *table, const char *key, void (*free_fn) (void *))
 
 	h = table->data + n;
 	for (ht = *h; ht; ht = ht->next) {
-		if (STREQ(key, ht->key.c_key)) {
+		if (STREQ(key, ht->key)) {
 			htable_delete_entry(table, ht, free_fn);
 			return 0;
 		}
@@ -393,7 +395,7 @@ void htable_free(HTABLE *table, void (*free_fn) (void *))
 	while (i-- > 0) {
 		for (ht = *h++; ht; ht = next) {
 			next = ht->next;
-			free(ht->key.key);
+			free(ht->key);
 			if (free_fn && ht->value)
 				(*free_fn) (ht->value);
 			free(ht);
@@ -418,7 +420,7 @@ int htable_reset(HTABLE *table, void (*free_fn) (void *))
 	while (i-- > 0) {
 		for (ht = *h++; ht; ht = next) {
 			next = ht->next;
-			free(ht->key.key);
+			free(ht->key);
 			if (free_fn && ht->value) {
 				(*free_fn) (ht->value);
 			}
@@ -515,7 +517,7 @@ void htable_stat(const HTABLE *table)
 		if(member) {
 			printf("chains[%d]: ", i);
 			for(; member != 0; member = member->next)
-				printf("[%s]", member->key.c_key);
+				printf("[%s]", member->key);
 			printf("\n");
 		}
 	}

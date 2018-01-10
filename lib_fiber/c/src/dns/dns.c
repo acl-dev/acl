@@ -24,6 +24,7 @@
  * ==========================================================================
  */
 #include "stdafx.h"
+#include "fiber/lib_fiber.h"
 #include "common.h"
 
 #ifdef SYS_UNIX
@@ -1152,7 +1153,7 @@ static int dns_poll(int fd, short events, int timeout) {
 	struct pollfd fds;
 
 	if (!events) {
-		errno = EINVAL;
+		acl_fiber_set_error(EINVAL);
 		return EINVAL;
 	}
 
@@ -1165,7 +1166,7 @@ static int dns_poll(int fd, short events, int timeout) {
 	for (;;) {
 		switch (poll(&fds, 1, timeout)) {
 		case -1:
-			if (errno == EINTR)
+			if (acl_fiber_last_error() == EINTR)
 				continue;
 			return EEXIST;
 		case 0:
@@ -1203,7 +1204,7 @@ static int read_wait(int fd, int timeout) {
 TAG_AGAIN:
 	switch (select(1, &rset, (fd_set *) 0, &xset, tp)) {
 	case -1:
-		err = last_error();
+		err = acl_fiber_last_error();
 		if (err == EINTR || err == WSAEINPROGRESS
 			|| err == WSAEWOULDBLOCK) {
 
@@ -1211,7 +1212,7 @@ TAG_AGAIN:
 		}
 		return -1;
 	case 0:
-		set_error(ETIMEDOUT);
+		acl_fiber_set_error(ETIMEDOUT);
 		return 0;
 	default:
 		return 1;
@@ -1220,6 +1221,7 @@ TAG_AGAIN:
 #else
 static int read_wait(int fd, int timeout) {
 	struct pollfd fds;
+	int err;
 
 	fds.fd = fd;
 	fds.events = POLLHUP | POLLERR;
@@ -1228,17 +1230,18 @@ static int read_wait(int fd, int timeout) {
 	for (;;) {
 		switch (poll(&fds, 1, timeout)) {
 		case -1:
-			if (errno == EINTR)
+			err = acl_fiber_last_error();
+			if (err == EINTR)
 				continue;
-			errno = EEXIST;
+			acl_fiber_set_error(EEXIST);
 			return -1;
 		case 0:
-			errno = ETIMEDOUT;
+			acl_fiber_set_error(ETIMEDOUT);
 			return 0;
 		default:
 			if ((fds.revents & POLLIN))
 				return 1;
-			errno = EEXIST;
+			acl_fiber_set_error(EEXIST);
 			return -1;
 		}
 	}
@@ -1267,7 +1270,7 @@ DNS_NOTUSED static int dns_sigmask(int how, const sigset_t *set, sigset_t *oset)
 #if DNS_THREAD_SAFE
 	return pthread_sigmask(how, set, oset);
 #else
-	return (0 == sigprocmask(how, set, oset))? 0 : errno;
+	return (0 == sigprocmask(how, set, oset))? 0 : acl_fiber_last_error();
 #endif
 } /* dns_sigmask() */
 #endif
@@ -1302,22 +1305,23 @@ static long dns_send(int fd, const void *src, size_t lim, int flags) {
 	count = send(fd, src, lim, flags);
 
 	if (!sigismember(&pending, SIGPIPE)) {
-		saved = errno;
+		int err = acl_fiber_last_error();
+		saved = err;
 
-		if (count == -1 && errno == EPIPE) {
-			while (-1 == sigtimedwait(&piped, NULL, &(struct timespec){ 0, 0 }) && errno == EINTR)
+		if (count == -1 && err == EPIPE) {
+			while (-1 == sigtimedwait(&piped, NULL, &(struct timespec){ 0, 0 }) && err == EINTR)
 				;;
 		}
 
 		if ((error = dns_sigmask(SIG_SETMASK, &blocked, NULL)))
 			goto error;
 
-		errno = saved;
+		acl_fiber_set_error(saved);
 	}
 
 	return count;
 error:
-	errno = error;
+	acl_fiber_set_error(error);
 
 	return -1;
 #else
@@ -1373,7 +1377,7 @@ static FILE *dns_fopen(const char *path, const char *mode, dns_error_t *_error) 
 	if ((error = dns_fopen_addflag(mode_cloexec, mode, sizeof mode_cloexec, 'e')))
 		goto error;
 	if (!(fp = fopen(path, mode_cloexec))) {
-		if (errno != EINVAL)
+		if (acl_fiber_last_error() != EINVAL)
 			goto syerr;
 		if (!(fp = fopen(path, mode)))
 			goto syerr;
@@ -9047,7 +9051,8 @@ static void *grow(unsigned char *p, size_t size) {
 	void *tmp;
 
 	if (!(tmp = realloc(p, size)))
-		panic("realloc(%"PRIuZ"): %s", size, dns_strerror(errno));
+		panic("realloc(%"PRIuZ"): %s", size,
+			dns_strerror(acl_fiber_last_error()));
 
 	return tmp;
 } /* grow() */
@@ -9080,7 +9085,7 @@ static size_t slurp(unsigned char **dst, size_t osize, FILE *fp, const char *pat
 		size = append(dst, size, buf, count);
 
 	if (ferror(fp))
-		panic("%s: %s", path, dns_strerror(errno));
+		panic("%s: %s", path, dns_strerror(acl_fiber_last_error()));
 
 	return size;
 } /* slurp() */
@@ -9766,10 +9771,10 @@ static int echo_port(int argc DNS_NOTUSED, char *argv[] DNS_NOTUSED) {
 	port.sin.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 	if (-1 == (fd = socket(PF_INET, SOCK_DGRAM, 0)))
-		panic("socket: %s", strerror(errno));
+		panic("socket: %s", strerror(acl_fiber_last_error()));
 
 	if (0 != bind(fd, &port.sa, sizeof port.sa))
-		panic("127.0.0.1:5353: %s", dns_strerror(errno));
+		panic("127.0.0.1:5353: %s", dns_strerror(acl_fiber_last_error()));
 
 	for (;;) {
 		struct dns_packet *pkt = dns_p_new(512);
@@ -9785,7 +9790,7 @@ static int echo_port(int argc DNS_NOTUSED, char *argv[] DNS_NOTUSED) {
 		count = recvfrom(fd, (char *)pkt->data, pkt->size, rflags, (struct sockaddr *)&ss, &slen);
 
 		if (!count || count < 0)
-			panic("recvfrom: %s", strerror(errno));
+			panic("recvfrom: %s", strerror(acl_fiber_last_error()));
 
 		pkt->end = count;
 

@@ -280,7 +280,7 @@ void fiber_save_errno(void)
 	if (__sys_errno != NULL) {
 		acl_fiber_set_errno(curr, *__sys_errno());
 	} else {
-		acl_fiber_set_errno(curr, errno);
+		acl_fiber_set_errno(curr, acl_fiber_last_error());
 	}
 }
 
@@ -813,4 +813,26 @@ void *acl_fiber_get_specific(int key)
 	local = curr->locals[key - 1];
 
 	return local ? local->ctx : NULL;
+}
+
+int acl_fiber_last_error(void)
+{
+#ifdef	SYS_WIN
+	int   error;
+
+	error = WSAGetLastError();
+	WSASetLastError(error);
+	printf("errno=%d, %d\r\n", errno, error);
+	return error;
+#else
+	return errno;
+#endif
+}
+
+void acl_fiber_set_error(int errnum)
+{
+#ifdef	SYS_WIN
+	WSASetLastError(errnum);
+#endif
+	errno = errnum;
 }

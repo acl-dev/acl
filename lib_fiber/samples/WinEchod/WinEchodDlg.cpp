@@ -47,11 +47,10 @@ END_MESSAGE_MAP()
 // CWinEchodDlg ¶Ô»°¿ò
 
 
-
 CWinEchodDlg::CWinEchodDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CWinEchodDlg::IDD, pParent)
 	, m_dosFp(NULL)
-	, m_listenPort(0)
+	, m_listenPort(9001)
 	, m_listenIP(_T("127.0.0.1"))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);

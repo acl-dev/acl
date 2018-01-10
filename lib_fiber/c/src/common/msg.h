@@ -83,18 +83,6 @@ const char *last_strerror(char *buffer, size_t size);
 const char *last_serror(void);
 
 /**
- * 获得上次系统调用出错时的错误号
- * @return {int} 错误号
- */
-int last_error(void);
-
-/**
- * 手工设置错误号
- * @param errnum {int} 错误号
- */
-void set_error(int errnum);
-
-/**
  * 输出信息至标准输出
  * @param fmt {const char*} 格式参数
  * @param ... 变参序列

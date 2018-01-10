@@ -155,7 +155,7 @@ const char *msg_strerror(int errnum, char *buffer, size_t size)
 
 const char *last_strerror(char *buffer, size_t size)
 {
-	return msg_strerror(last_error(), buffer, size);
+	return msg_strerror(acl_fiber_last_error(), buffer, size);
 }
 
 static pthread_key_t __errbuf_key;
@@ -184,7 +184,7 @@ static pthread_once_t once_control = PTHREAD_ONCE_INIT;
 const char *last_serror(void)
 {
 	char *buf;
-	int   error = last_error();
+	int   error = acl_fiber_last_error();
 	static size_t __buf_size = 4096;
 
 	if (pthread_once(&once_control, thread_buf_init) != 0)
@@ -200,16 +200,6 @@ const char *last_serror(void)
 		}
 	}
 	return msg_strerror(error, buf, __buf_size);
-}
-
-int last_error(void)
-{
-	return errno;
-}
-
-void set_error(int errnum)
-{
-	errno = errnum;
 }
 
 void msg_printf(const char *fmt,...)

@@ -15,6 +15,22 @@ void CListener::run(void)
 {
 	printf("listener fiber run ...\r\n");
 
+	socket_t lfd = m_listener.sock_handle();
+	while (true)
+	{
+		socket_t sock = fiber_accept(lfd, NULL, NULL);
+		if (sock == INVALID_SOCKET)
+		{
+			printf("accept error %s\r\n", acl::last_serror());
+			break;
+		}
+		printf("accept one connection\r\n");
+		acl::socket_stream* conn = new acl::socket_stream;
+		conn->open(sock);
+		acl::fiber* fb = new CClientEcho(conn);
+		fb->start();
+	}
+
 	while (true)
 	{
 		acl_fiber_delay(1000);

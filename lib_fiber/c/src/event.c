@@ -165,7 +165,7 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 
 	if (fe->fd >= ev->setsize) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
-		errno = ERANGE;
+		acl_fiber_set_error(ERANGE);
 		return 0;
 	}
 
@@ -195,7 +195,7 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 
 	if (fe->fd >= ev->setsize) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
-		errno = ERANGE;
+		acl_fiber_set_error(ERANGE);
 		return 0;
 	}
 

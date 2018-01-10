@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "fiber/lib_fiber.h"
 #include "msg.h"
 #include "iostuff.h"
 
@@ -23,7 +24,7 @@ int sane_socketpair(int domain, int type, int protocol, int result[2])
 		for (count = 0; /* void */ ; count++) {
 			if ((err = socketpair_ok_errors[count]) == 0)
 				return ret;
-			if (errno == err) {
+			if (acl_fiber_last_error() == err) {
 				msg_warn("socketpair: %s (trying again)",
 					last_serror());
 				sleep(1);

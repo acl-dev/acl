@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "fiber/lib_fiber.h"
 #include "msg.h"
 #include "iostuff.h"
 
@@ -16,7 +17,7 @@ void doze(unsigned delay)
 #endif
 
 	while (select(0, (fd_set *) 0, (fd_set *) 0, (fd_set *) 0, &tv) < 0) {
-		if (last_error() != EINTR) {
+		if (acl_fiber_last_error() != EINTR) {
 			msg_fatal("doze: select: %s", last_serror());
 		}
 	}

@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="头文件\fiber">
-      <UniqueIdentifier>{8ead8385-4aed-4619-81b7-e820bf5f2bbe}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -28,28 +25,28 @@
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="include\fiber\channel.hpp">
-      <Filter>头文件\fiber</Filter>
+      <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\fiber\fiber.hpp">
-      <Filter>头文件\fiber</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fiber\fiber_event.hpp">
-      <Filter>头文件\fiber</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fiber\fiber_lock.hpp">
-      <Filter>头文件\fiber</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fiber\fiber_sem.hpp">
-      <Filter>头文件\fiber</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fiber\lib_fiber.hpp">
-      <Filter>头文件\fiber</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fiber\master_fiber.hpp">
-      <Filter>头文件\fiber</Filter>
+      <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\fiber\fiber_cpp_define.hpp">
-      <Filter>头文件\fiber</Filter>
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_event.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_lock.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_sem.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\lib_fiber.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\master_fiber.hpp">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

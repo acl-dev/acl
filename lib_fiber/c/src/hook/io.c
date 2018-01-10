@@ -374,6 +374,7 @@ ssize_t fiber_read(socket_t fd, void *buf, size_t count)
 
 	while (1) {
 		ssize_t n = __sys_read(fd, buf, count);
+		int err;
 
 		if (!var_hook_sys_api) {
 			return n;
@@ -384,11 +385,12 @@ ssize_t fiber_read(socket_t fd, void *buf, size_t count)
 		}
 
 		fiber_save_errno();
+		err = acl_fiber_last_error();
 
-#if EAGAIN == EWOULDBLOCK
-		if (errno != EAGAIN) {
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+		if (err != FIBER_EAGAIN) {
 #else
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
 #endif
 			return -1;
 		}
@@ -414,6 +416,7 @@ ssize_t fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 
 	while (1) {
 		ssize_t n = __sys_readv(fd, iov, iovcnt);
+		int err;
 
 		if (!var_hook_sys_api) {
 			return n;
@@ -424,11 +427,12 @@ ssize_t fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 		}
 
 		fiber_save_errno();
+		err = acl_fiber_last_error();
 
-#if EAGAIN == EWOULDBLOCK
-		if (errno != EAGAIN) {
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+		if (err != FIBER_EAGAIN) {
 #else
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
 #endif
 			return -1;
 		}
@@ -455,6 +459,7 @@ ssize_t fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 
 	while (1) {
 		ssize_t n = __sys_recv(sockfd, buf, len, flags);
+		int err;
 
 		if (!var_hook_sys_api) {
 			return n;
@@ -465,11 +470,12 @@ ssize_t fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 		}
 
 		fiber_save_errno();
+		err = acl_fiber_last_error();
 
-#if EAGAIN == EWOULDBLOCK
-		if (errno != EAGAIN) {
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+		if (err != FIBER_EAGAIN) {
 #else
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
 #endif
 			return -1;
 		}
@@ -497,6 +503,7 @@ ssize_t fiber_recvfrom(socket_t sockfd, void *buf, size_t len, int flags,
 	while (1) {
 		ssize_t n = __sys_recvfrom(sockfd, buf, len, flags,
 				src_addr, addrlen);
+		int err;
 
 		if (!var_hook_sys_api) {
 			return n;
@@ -507,11 +514,12 @@ ssize_t fiber_recvfrom(socket_t sockfd, void *buf, size_t len, int flags,
 		}
 
 		fiber_save_errno();
+		err = acl_fiber_last_error();
 
-#if EAGAIN == EWOULDBLOCK
-		if (errno != EAGAIN) {
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+		if (err != FIBER_EAGAIN) {
 #else
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
 #endif
 			return -1;
 		}
@@ -538,6 +546,7 @@ ssize_t fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 
 	while (1) {
 		ssize_t n = __sys_recvmsg(sockfd, msg, flags);
+		int err;
 
 		if (!var_hook_sys_api) {
 			return n;
@@ -548,11 +557,12 @@ ssize_t fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 		}
 
 		fiber_save_errno();
+		err = acl_fiber_last_error();
 
-#if EAGAIN == EWOULDBLOCK
-		if (errno != EAGAIN) {
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+		if (err != FIBER_EAGAIN) {
 #else
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
 #endif
 			return -1;
 		}
@@ -583,6 +593,7 @@ ssize_t fiber_write(socket_t fd, const void *buf, size_t count)
 
 	while (1) {
 		ssize_t n = __sys_write(fd, buf, count);
+		int err;
 
 		if (!var_hook_sys_api) {
 			return n;
@@ -593,11 +604,12 @@ ssize_t fiber_write(socket_t fd, const void *buf, size_t count)
 		}
 
 		fiber_save_errno();
+		err = acl_fiber_last_error();
 
-#if EAGAIN == EWOULDBLOCK
-		if (errno != EAGAIN) {
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+		if (err != FIBER_EAGAIN) {
 #else
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
 #endif
 			return -1;
 		}
@@ -624,6 +636,7 @@ ssize_t fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 
 	while (1) {
 		ssize_t n = __sys_writev(fd, iov, iovcnt);
+		int err;
 
 		if (!var_hook_sys_api) {
 			return n;
@@ -634,11 +647,12 @@ ssize_t fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 		}
 
 		fiber_save_errno();
+		err = acl_fiber_last_error();
 
-#if EAGAIN == EWOULDBLOCK
-		if (errno != EAGAIN) {
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+		if (err != FIBER_EAGAIN) {
 #else
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
 #endif
 			return -1;
 		}
@@ -666,6 +680,7 @@ ssize_t fiber_send(socket_t sockfd, const void *buf, size_t len, int flags)
 
 	while (1) {
 		ssize_t n = __sys_send(sockfd, buf, len, flags);
+		int err;
 
 		if (!var_hook_sys_api) {
 			return n;
@@ -676,11 +691,12 @@ ssize_t fiber_send(socket_t sockfd, const void *buf, size_t len, int flags)
 		}
 
 		fiber_save_errno();
+		err = acl_fiber_last_error();
 
-#if EAGAIN == EWOULDBLOCK
-		if (errno != EAGAIN) {
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+		if (err != FIBER_EAGAIN) {
 #else
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
 #endif
 			return -1;
 		}
@@ -709,6 +725,7 @@ ssize_t fiber_sendto(socket_t sockfd, const void *buf, size_t len, int flags,
 	while (1) {
 		ssize_t n = __sys_sendto(sockfd, buf, len, flags,
 				dest_addr, addrlen);
+		int err;
 
 		if (!var_hook_sys_api) {
 			return n;
@@ -719,11 +736,12 @@ ssize_t fiber_sendto(socket_t sockfd, const void *buf, size_t len, int flags,
 		}
 
 		fiber_save_errno();
+		err = acl_fiber_last_error();
 
-#if EAGAIN == EWOULDBLOCK
-		if (errno != EAGAIN) {
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+		if (err != FIBER_EAGAIN) {
 #else
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
 #endif
 			return -1;
 		}
@@ -751,6 +769,7 @@ ssize_t fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 
 	while (1) {
 		ssize_t n = __sys_sendmsg(sockfd, msg, flags);
+		int err;
 
 		if (!var_hook_sys_api) {
 			return n;
@@ -761,11 +780,12 @@ ssize_t fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 		}
 
 		fiber_save_errno();
+		err = acl_fiber_last_error();
 
-#if EAGAIN == EWOULDBLOCK
-		if (errno != EAGAIN) {
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+		if (err != FIBER_EAGAIN) {
 #else
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
 #endif
 			return -1;
 		}
@@ -899,16 +919,19 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 
 	while (1) {
 		ssize_t n = __sys_sendfile64(out_fd, in_fd, offset, count);
+		int err;
+
 		if (!var_hook_sys_api || n >= 0) {
 			return n;
 		}
 
 		fiber_save_errno();
+		err = acl_fiber_last_error();
 
-#if EAGAIN == EWOULDBLOCK
-		if (errno != EAGAIN) {
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+		if (err != FIBER_EAGAIN) {
 #else
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
 #endif
 			return -1;
 		}

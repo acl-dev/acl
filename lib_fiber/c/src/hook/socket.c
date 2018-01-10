@@ -110,6 +110,7 @@ socket_t fiber_accept(socket_t sockfd, struct sockaddr *addr, socklen_t *addrlen
 {
 	FILE_EVENT *fe;
 	socket_t clifd;
+	int  err;
 
 	if (sockfd == INVALID_SOCKET) {
 		msg_error("%s: invalid sockfd %d", __FUNCTION__, sockfd);
@@ -136,11 +137,12 @@ socket_t fiber_accept(socket_t sockfd, struct sockaddr *addr, socklen_t *addrlen
 		return clifd;
 	}
 
-	fiber_save_errno();
-#if EAGAIN == EWOULDBLOCK
-	if (errno != EAGAIN) {
+	//fiber_save_errno();
+	err = acl_fiber_last_error();
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+	if (err != FIBER_EAGAIN) {
 #else
-	if (errno != EAGAIN && errno != EWOULDBLOCK) {
+	if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
 #endif
 		return INVALID_SOCKET;
 	}
@@ -209,39 +211,40 @@ int fiber_connect(socket_t sockfd, const struct sockaddr *addr, socklen_t addrle
 	}
 
 	fiber_save_errno();
+	err = acl_fiber_last_error();
 
-	if (errno != EINPROGRESS) {
-		if (errno == ECONNREFUSED) {
+	if (err != FIBER_EINPROGRESS) {
+		if (err == FIBER_ECONNREFUSED) {
 			msg_error("%s(%d), %s: connect ECONNREFUSED",
 				__FILE__, __LINE__, __FUNCTION__);
-		} else if (errno == ECONNRESET) {
+		} else if (err == FIBER_ECONNRESET) {
 			msg_error("%s(%d), %s: connect ECONNRESET",
 				__FILE__, __LINE__, __FUNCTION__);
-		} else if (errno == ENETDOWN) {
+		} else if (err == FIBER_ENETDOWN) {
 			msg_error("%s(%d), %s: connect ENETDOWN",
 				__FILE__, __LINE__, __FUNCTION__);
-		} else if (errno == ENETUNREACH) {
+		} else if (err == FIBER_ENETUNREACH) {
 			msg_error("%s(%d), %s: connect ENETUNREACH",
 				__FILE__, __LINE__, __FUNCTION__);
 #ifdef SYS_UNIX
-		} else if (errno == EHOSTDOWN) {
+		} else if (err == FIBER_EHOSTDOWN) {
 			msg_error("%s(%d), %s: connect EHOSTDOWN",
 				__FILE__, __LINE__, __FUNCTION__);
 #endif
-		} else if (errno == EHOSTUNREACH) {
+		} else if (err == FIBER_EHOSTUNREACH) {
 			msg_error("%s(%d), %s: connect EHOSTUNREACH",
 				__FILE__, __LINE__, __FUNCTION__);
 #ifdef	ACL_LINUX
 		/* Linux returns EAGAIN instead of ECONNREFUSED
 		 * for unix sockets if listen queue is full -- see nginx
 		 */
-		} else if (errno == EAGAIN) {
+		} else if (err == FIBER_EAGAIN) {
 			msg_error("%s(%d), %s: connect EAGAIN",
 				__FILE__, __LINE__, __FUNCTION__);
 #endif
 		} else {
 			msg_error("%s(%d), %s: connect errno=%d, %s",
-				__FILE__, __LINE__, __FUNCTION__, errno,
+				__FILE__, __LINE__, __FUNCTION__, err,
 				last_serror());
 		}
 
@@ -276,7 +279,7 @@ int fiber_connect(socket_t sockfd, const struct sockaddr *addr, socklen_t addrle
 		return -1;
 	}
 
-	set_error(err);
+	acl_fiber_set_error(err);
 	msg_error("%s(%d): getsockopt error: %s, ret: %d, err: %d",
 		__FUNCTION__, __LINE__, last_serror(), ret, err);
 

@@ -39,32 +39,12 @@ struct HTABLE {
  * 哈希表中每一个哈希项的存储信息类型
  */
 struct HTABLE_INFO {
-	/**
-	 * 哈希键, 只所以如此声明，是因为当创建哈希表的标志位为
-	 * BINHASH_FLAG_KEY_REUSE 时需要复用输入的键空间
-	 */
-	union {
-		char *key;
-		const char *c_key;
-	} key;
-	void    *value;			/**< associated value */
+	char *key;
+	void *value;			/**< associated value */
 	unsigned hash;			/**< store the key's hash value */
 	struct HTABLE_INFO *next;	/**< colliding entry */
 	struct HTABLE_INFO *prev;	/**< colliding entry */
 };
-
-/**
- * HTABLE 遍历用类型
- */
-typedef struct HTABLE_ITER {
-	/* public */
-	HTABLE_INFO *ptr;
-
-	/* private */
-	int  i;
-	int  size;
-	HTABLE_INFO **h;
-} HTABLE_ITER;
 
 /**
  * 建立哈希表

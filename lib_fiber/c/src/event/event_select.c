@@ -166,7 +166,7 @@ static int select_event_wait(EVENT *ev, int timeout)
 	n = __sys_select(es->maxfd + 1, &rset, 0, &xset, tp);
 #endif
 	if (n < 0) {
-		if (errno == EINTR) {
+		if (acl_fiber_last_error() == FIBER_EINTR) {
 			return 0;
 		}
 		msg_fatal("%s: select error %s", __FUNCTION__, last_serror());
