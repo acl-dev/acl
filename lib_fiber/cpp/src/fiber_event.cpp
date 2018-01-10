@@ -1,6 +1,8 @@
 #include "stdafx.hpp"
 #include "fiber/fiber_event.hpp"
 
+#if !defined(_WIN32) && !defined(_WIN64)
+
 namespace acl {
 
 fiber_event::fiber_event(void)
@@ -29,3 +31,5 @@ bool fiber_event::notify(void)
 }
 
 } // namespace acl
+
+#endif

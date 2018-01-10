@@ -1,14 +1,24 @@
 #pragma once
 #include <stddef.h>
+#include "fiber_cpp_define.hpp"
 
 struct ACL_FIBER;
 
 namespace acl {
 
+typedef enum 
+{
+	FIBER_EVENT_T_KERNEL,
+	FIBER_EVENT_T_POLL,
+	FIBER_EVENT_T_SELECT,
+	FIBER_EVENT_T_IOCP,
+	FIBER_EVENT_T_WMSG,
+} fiber_event_t;
+
 /**
  * 协程类定义，纯虚类，需要子类继承并实现纯虚方法
  */
-class fiber
+class FIBER_CPP_API fiber
 {
 public:
 	/**
@@ -77,7 +87,7 @@ public:
 	/**
 	 * 启动协程运行的调度过程
 	 */
-	static void schedule(void);
+	static void schedule(fiber_event_t type = FIBER_EVENT_T_KERNEL);
 
 	/**
 	 * 判断当前线程是否处于协程调度状态
@@ -157,7 +167,7 @@ private:
 /**
  * 可用作定时器的协程类
  */
-class fiber_timer
+class FIBER_CPP_API fiber_timer
 {
 public:
 	fiber_timer(void);
@@ -256,7 +266,7 @@ private:
 namespace acl
 {
 
-class go_fiber
+class FIBER_CPP_API go_fiber
 {
 public:
 	go_fiber(void) {}

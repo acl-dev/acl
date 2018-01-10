@@ -52,12 +52,15 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;ACL_DLL;ACL_CPP_DLL;FIBER_DLL;FIBER_CPP_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;..\..\..\lib_fiber\c\include;..\..\..\lib_fiber\cpp\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\..\..\lib_acl;..\..\..\lib_acl_cpp;..\..\..\lib_protocol\;..\..\..\lib_fiber\c;..\..\..\lib_fiber\cpp;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lib_fiber.lib;lib_fiber_cpp.lib;lib_acl_d.lib;lib_protocol_d.lib;lib_acl_cpp_d.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -69,6 +72,13 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>copy ..\..\..\lib_acl\lib_acl_d.dll .\ /Y
+copy ..\..\..\lib_acl_cpp\lib_acl_cpp_d.dll .\ /Y
+copy ..\..\..\lib_protocol\lib_protocol_d.dll .\ /Y
+copy ..\..\..\lib_fiber\c\lib_fiber.dll .\ /Y
+copy ..\..\..\lib_fiber\cpp\lib_fiber_cpp.dll .\ /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -101,6 +111,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ClientEcho.h" />
+    <ClInclude Include="Listener.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -108,6 +120,8 @@
     <ClInclude Include="WinEchodDlg.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ClientEcho.cpp" />
+    <ClCompile Include="Listener.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

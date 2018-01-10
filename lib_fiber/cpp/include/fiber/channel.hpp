@@ -1,11 +1,13 @@
 #pragma once
 
+#include "fiber_cpp_define.hpp"
+
 struct ACL_CHANNEL;
 extern "C" {
-	extern ACL_CHANNEL *acl_channel_create(int elemsize, int bufsize);
-	extern void acl_channel_free(ACL_CHANNEL *c);
-	extern int acl_channel_send(ACL_CHANNEL *c, void *v);
-	extern int acl_channel_recv(ACL_CHANNEL *c, void *v);
+	extern FIBER_API ACL_CHANNEL *acl_channel_create(int elemsize, int bufsize);
+	extern FIBER_API void acl_channel_free(ACL_CHANNEL *c);
+	extern FIBER_API int acl_channel_send(ACL_CHANNEL *c, void *v);
+	extern FIBER_API int acl_channel_recv(ACL_CHANNEL *c, void *v);
 }
 
 namespace acl {

@@ -3,6 +3,7 @@
 
 #ifdef HAS_WMSG
 
+#include <winuser.h>
 #include "fiber/lib_fiber.h"
 #include "common/sane_socket.h"
 #include "event.h"
@@ -182,8 +183,15 @@ static int wmsg_del_write(EVENT_WMSG *ev, FILE_EVENT *fe)
 
 static int wmsg_wait(EVENT *ev, int timeout)
 {
+	MSG msg;
+
 	(void) ev;
 	(void) timeout;
+
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 	return 0;
 }
 

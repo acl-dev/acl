@@ -124,9 +124,31 @@ bool fiber::self_killed(void)
 	return acl_fiber_killed(curr) ? true : false;
 }
 
-void fiber::schedule(void)
+void fiber::schedule(fiber_event_t type /* = FIBER_EVENT_T_KERNEL */)
 {
-	acl_fiber_schedule();
+	int etype;
+
+	switch (type)
+	{
+	case FIBER_EVENT_T_POLL:
+		etype = FIBER_EVENT_POLL;
+		break;
+	case FIBER_EVENT_T_SELECT:
+		etype = FIBER_EVENT_SELECT;
+		break;
+	case FIBER_EVENT_T_IOCP:
+		etype = FIBER_EVENT_IOCP;
+		break;
+	case FIBER_EVENT_T_WMSG:
+		etype = FIBER_EVENT_WMSG;
+		break;
+	case FIBER_EVENT_T_KERNEL:
+	default:
+		etype = FIBER_EVENT_KERNEL;
+		break;
+	}
+
+	acl_fiber_schedule_with(etype);
 }
 
 bool fiber::scheduled(void)

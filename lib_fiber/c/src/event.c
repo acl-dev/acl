@@ -6,6 +6,7 @@
 #include "event/event_kqueue.h"
 #include "event/event_select.h"
 #include "event/event_poll.h"
+#include "event/event_wmsg.h"
 #include "event.h"
 
 static __thread int __event_mode = FIBER_EVENT_KERNEL;
@@ -39,7 +40,7 @@ EVENT *event_create(int size)
 		ev = event_select_create(size);
 		break;
 	case FIBER_EVENT_WMSG:
-		ev = NULL;
+		ev = event_wmsg_create(1024);
 		break;
 	default:
 #ifdef	HAS_EPOLL

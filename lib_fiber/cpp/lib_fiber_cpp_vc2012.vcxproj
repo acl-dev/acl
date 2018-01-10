@@ -32,7 +32,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -94,15 +94,17 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_MT;FIBER_CPP_DLL;FIBER_CPP_EXPORTS;ACL_DLL;ACL_CPP_DLL;FIBER_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AdditionalIncludeDirectories>..\..\lib_acl\include;..\..\lib_acl_cpp\include;..\c\include;.\src;.\include;..\..\lib_acl\src\master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>stdafx.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>lib_protocol_d.lib;lib_acl_d.lib;lib_acl_cpp_d.lib;lib_fiber.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\lib_acl;..\..\lib_protocol;..\..\lib_acl_cpp;..\..\lib_fiber\c</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -145,6 +147,7 @@
   <ItemGroup>
     <ClInclude Include="include\fiber\channel.hpp" />
     <ClInclude Include="include\fiber\fiber.hpp" />
+    <ClInclude Include="include\fiber\fiber_cpp_define.hpp" />
     <ClInclude Include="include\fiber\fiber_event.hpp" />
     <ClInclude Include="include\fiber\fiber_lock.hpp" />
     <ClInclude Include="include\fiber\fiber_sem.hpp" />

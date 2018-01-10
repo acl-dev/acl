@@ -695,8 +695,10 @@ static void servers_start(FIBER_SERVER **servers, int nthreads)
 
 static void open_service_log(void)
 {
+#if !defined(_WIN32) && !defined(_WIN64)
 	/* first, close the master's log */
 	master_log_close();
+#endif
 
 	/* second, open the service's log */
 	acl_msg_open(acl_var_fiber_log_file, acl_var_fiber_procname);
@@ -862,8 +864,8 @@ void acl_fiber_server_main(int argc, char *argv[],
 	int   c, socket_count = 1, fdtype = ACL_VSTREAM_TYPE_LISTEN;
 #if !defined(_WIN32) && !defined(_WIN64)
 	char *generation;
-#endif
 	va_list ap;
+#endif
 
 	__argc = argc;
 	__argv = argv;
@@ -873,13 +875,12 @@ void acl_fiber_server_main(int argc, char *argv[],
 	__service_ctx = ctx;
 	__first_name  = name;
 
-	va_start(ap, name);
 #if !defined(_WIN32) && !defined(_WIN64)
+	va_start(ap, name);
 	va_copy(__ap_dest, ap);
-#endif
-	va_end(ap);
-
 	master_log_open(__argv[0]);
+	va_end(ap);
+#endif
 
 	__conf_file[0] = 0;
 

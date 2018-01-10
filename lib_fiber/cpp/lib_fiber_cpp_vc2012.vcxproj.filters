@@ -48,6 +48,9 @@
     <ClInclude Include="include\fiber\master_fiber.hpp">
       <Filter>头文件\fiber</Filter>
     </ClInclude>
+    <ClInclude Include="include\fiber\fiber_cpp_define.hpp">
+      <Filter>头文件\fiber</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp">

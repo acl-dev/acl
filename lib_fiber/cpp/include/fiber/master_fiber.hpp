@@ -1,4 +1,5 @@
 #pragma once
+#include "fiber_cpp_define.hpp"
 //#include "acl_cpp/master/master_base.hpp"
 
 struct ACL_VSTREAM;
@@ -10,7 +11,7 @@ class socket_stream;
 /**
  * 基于协程方式的网络服务类
  */
-class master_fiber : public master_base
+class FIBER_CPP_API master_fiber : public master_base
 {
 public:
 	/**

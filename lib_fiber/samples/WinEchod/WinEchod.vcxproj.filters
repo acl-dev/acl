@@ -33,6 +33,12 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Listener.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientEcho.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinEchod.cpp">
@@ -42,6 +48,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Listener.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientEcho.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
