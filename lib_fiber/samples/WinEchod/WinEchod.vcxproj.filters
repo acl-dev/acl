@@ -33,10 +33,13 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Listener.h">
+    <ClInclude Include="FiberClient.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ClientEcho.h">
+    <ClInclude Include="FiberListener.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FiberSleep.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,10 +53,13 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Listener.cpp">
+    <ClCompile Include="FiberClient.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ClientEcho.cpp">
+    <ClCompile Include="FiberListener.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FiberSleep.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

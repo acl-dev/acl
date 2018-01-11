@@ -24,7 +24,7 @@ void CFiberListener::run(void)
 			printf("accept error %s\r\n", acl::last_serror());
 			break;
 		}
-		printf("accept one connection\r\n");
+		printf("accept one connection, sock=%d\r\n", sock);
 		acl::socket_stream* conn = new acl::socket_stream;
 		conn->open(sock);
 		acl::fiber* fb = new CFiberClient(conn);

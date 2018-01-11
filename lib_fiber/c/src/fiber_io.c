@@ -238,7 +238,7 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 
 #ifdef	CHECK_MIN
 	if ((min >= 0 && min < ev->timeout) || ev->timeout < 0) {
-		ev->timeout = (int) min;
+		ev->timeout = (int) milliseconds;
 	}
 #else
 	ev->timeout = 10;

@@ -18,9 +18,9 @@ void CFiberClient::run(void)
 	{
 		char buf[1024];
 		int ret = fiber_recv(sock, buf, sizeof(buf) - 1, 0);
-		if (ret == -1)
+		if (ret <= 0)
 		{
-			printf("recv error\r\n");
+			printf("recv error: %s\r\n", acl::last_serror());
 			break;
 		}
 		buf[ret] = 0;
@@ -31,6 +31,11 @@ void CFiberClient::run(void)
 			break;
 		}
 	}
+
+	fiber_close(sock);
+	m_conn->unbind();
+	delete m_conn;
+	delete this;
 #if 0
 	acl::string buf;
 	while (true)
@@ -46,7 +51,7 @@ void CFiberClient::run(void)
 			break;
 		}
 	}
-#endif
 	delete m_conn;
 	delete this;
+#endif
 }

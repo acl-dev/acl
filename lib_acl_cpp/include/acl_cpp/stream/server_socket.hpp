@@ -51,10 +51,26 @@ public:
 	bool open(const char* addr);
 
 	/**
+	 * 判断当前监听套接口是否打开着
+	 * @return {bool}
+	 */
+	bool opened(void) const;
+
+	/**
 	 * 关闭已经打开的监听套接口
 	 * @return {bool} 是否正常关闭
 	 */
 	bool close();
+
+	/**
+	 * 将监听套接口从服务监听对象中解绑
+	 * @return {SOCKET} 返回被解绑的句柄
+	 */
+#if defined(_WIN32) || defined(_WIN64)
+	SOCKET unbind();
+#else
+	int unbind();
+#endif
 
 	/**
 	 * 接收客户端连接并创建客户端连接流

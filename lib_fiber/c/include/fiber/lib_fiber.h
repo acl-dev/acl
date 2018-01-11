@@ -613,6 +613,8 @@ typedef int socket_t;
 #define INVALID_SOCKET	-1
 #endif
 
+FIBER_API int fiber_close(socket_t fd);
+
 FIBER_API socket_t fiber_socket(int domain, int type, int protocol);
 FIBER_API int fiber_listen(socket_t, int backlog);
 FIBER_API socket_t fiber_accept(socket_t , struct sockaddr *, socklen_t *);

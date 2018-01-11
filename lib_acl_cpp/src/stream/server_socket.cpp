@@ -47,6 +47,11 @@ server_socket::~server_socket()
 		acl_socket_close(fd_local_);
 }
 
+bool server_socket::opened(void) const
+{
+	return fd_ != ACL_SOCKET_INVALID;
+}
+
 bool server_socket::open(const char* addr)
 {
 	if (fd_ != ACL_SOCKET_INVALID)
@@ -91,6 +96,14 @@ bool server_socket::open(const char* addr)
 		SAFE_COPY(addr_, addr, sizeof(addr_));
 	}
 	return true;
+}
+
+ACL_SOCKET server_socket::unbind()
+{
+	ACL_SOCKET sock = fd_local_;
+	fd_local_ = ACL_SOCKET_INVALID;
+	fd_ = ACL_SOCKET_INVALID;
+	return sock;
 }
 
 bool server_socket::close()

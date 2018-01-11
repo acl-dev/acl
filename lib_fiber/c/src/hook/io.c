@@ -4,6 +4,7 @@
 #include "fiber.h"
 
 #ifdef SYS_WIN
+typedef int (__stdcall *close_fn)(socket_t);
 typedef ssize_t (__stdcall *recv_fn)(socket_t, char *, int, int);
 typedef ssize_t (__stdcall *recvfrom_fn)(socket_t, char *, int, int,
 	struct sockaddr *, socklen_t *);
@@ -41,6 +42,7 @@ static write_fn    __sys_write    = NULL;
 static writev_fn   __sys_writev   = NULL;
 static sendmsg_fn  __sys_sendmsg  = NULL;
 #endif
+static close_fn    __sys_close    = NULL;
 static recv_fn     __sys_recv     = NULL;
 static recvfrom_fn __sys_recvfrom = NULL;
 
@@ -95,6 +97,7 @@ static void hook_api(void)
 	assert(__sys_sendfile64);
 #endif
 #else
+	__sys_close    = closesocket;
 	__sys_recv     = recv;
 	__sys_recvfrom = recvfrom;
 	__sys_send     = send;
@@ -126,6 +129,12 @@ unsigned int sleep(unsigned int seconds)
 }
 
 int close(socket_t fd)
+{
+	fiber_close(fd);
+}
+#endif
+
+int fiber_close(socket_t fd)
 {
 	int ret;
 
@@ -162,7 +171,6 @@ int close(socket_t fd)
 	fiber_save_errno();
 	return ret;
 }
-#endif
 
 /****************************************************************************/
 
