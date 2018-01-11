@@ -17,26 +17,14 @@ typedef socket_t (*accept_fn)(socket_t, struct sockaddr *, socklen_t *);
 typedef int (*connect_fn)(socket_t, const struct sockaddr *, socklen_t);
 #endif
 
-static socket_fn          __sys_socket          = NULL;
-static listen_fn          __sys_listen          = NULL;
-static accept_fn          __sys_accept          = NULL;
-static connect_fn         __sys_connect         = NULL;
+static socket_fn  __sys_socket  = NULL;
+static listen_fn  __sys_listen  = NULL;
+static accept_fn  __sys_accept  = NULL;
+static connect_fn __sys_connect = NULL;
 
-static void hook_init(void)
+static void hook_api(void)
 {
 #ifdef SYS_UNIX
-	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
-	static int __called = 0;
-
-	(void) pthread_mutex_lock(&__lock);
-
-	if (__called) {
-		(void) pthread_mutex_unlock(&__lock);
-		return;
-	}
-
-	__called++;
-
 	__sys_socket     = (socket_fn) dlsym(RTLD_NEXT, "socket");
 	assert(__sys_socket);
 
@@ -48,8 +36,6 @@ static void hook_init(void)
 
 	__sys_connect    = (connect_fn) dlsym(RTLD_NEXT, "connect");
 	assert(__sys_connect);
-
-	(void) pthread_mutex_unlock(&__lock);
 #elif defined(SYS_WIN)
 	__sys_socket  = socket;
 	__sys_listen  = listen;
@@ -57,6 +43,17 @@ static void hook_init(void)
 	__sys_connect = connect;
 #endif
 }
+
+static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
+
+static void hook_init(void)
+{
+	if (pthread_once(&__once_control, hook_api) != 0) {
+		abort();
+	}
+}
+
+/***************************************************************************/
 
 socket_t fiber_socket(int domain, int type, int protocol)
 {

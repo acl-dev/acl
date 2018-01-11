@@ -179,7 +179,7 @@ void acl_fiber_sys_errno_set(int errnum)
 	*__sys_errno() = errnum;
 }
 
-#ifdef SYS_UNIX
+#if 0
 
 int fcntl(int fd, int cmd, ...)
 {

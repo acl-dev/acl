@@ -163,20 +163,23 @@ static char *__main_buf = NULL;
 
 static void thread_free_buf(void *buf)
 {
-	if (__pthread_self() != main_thread_self())
+	if (__pthread_self() != main_thread_self()) {
 		free(buf);
+	}
 }
 
 static void main_free_buf(void)
 {
-	if (__main_buf)
+	if (__main_buf) {
 		free(__main_buf);
+	}
 }
 
 static void thread_buf_init(void)
 {
-	if (pthread_key_create(&__errbuf_key, thread_free_buf) != 0)
+	if (pthread_key_create(&__errbuf_key, thread_free_buf) != 0) {
 		abort();
+	}
 }
 
 static pthread_once_t once_control = PTHREAD_ONCE_INIT;
@@ -187,8 +190,9 @@ const char *last_serror(void)
 	int   error = acl_fiber_last_error();
 	static size_t __buf_size = 4096;
 
-	if (pthread_once(&once_control, thread_buf_init) != 0)
+	if (pthread_once(&once_control, thread_buf_init) != 0) {
 		abort();
+	}
 
 	buf = pthread_getspecific(__errbuf_key);
 	if (buf == NULL) {
@@ -210,6 +214,5 @@ void msg_printf(const char *fmt,...)
 	va_start (ap, fmt);
 	vsnprintf(buf, sizeof(buf), fmt, ap);
 	printf("%s\r\n", buf);
-
 	va_end (ap);
 }

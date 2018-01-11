@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+    <Text Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\fiber\lib_fiber.h" />

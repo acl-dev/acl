@@ -11,24 +11,19 @@ typedef int (*poll_fn)(struct pollfd *, nfds_t, int);
 
 static poll_fn __sys_poll = NULL;
 
-static void hook_init(void)
+static void hook_api(void)
 {
-	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
-	static int __called = 0;
-
-	(void) pthread_mutex_lock(&__lock);
-
-	if (__called) {
-		(void) pthread_mutex_unlock(&__lock);
-		return;
-	}
-
-	__called++;
-
 	__sys_poll = (poll_fn) dlsym(RTLD_NEXT, "poll");
 	assert(__sys_poll);
+}
 
-	(void) pthread_mutex_unlock(&__lock);
+static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
+
+static void hook_init(void)
+{
+	if (pthread_once(&__once_control, hook_api) != 0) {
+		abort();
+	}
 }
 
 /****************************************************************************/

@@ -154,10 +154,11 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		} else {
 			SET_TIME(now);
 			last = now;
-			if (now >= timer->when)
+			if (now >= timer->when) {
 				left = 0;
-			else
+			} else {
 				left = timer->when - now;
+			}
 		}
 
 		assert(left < INT_MAX);
@@ -264,8 +265,9 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	}
 
 	SET_TIME(now);
-	if (now < when)
+	if (now < when) {
 		return 0;
+	}
 
 	return (unsigned int) (now - when);
 }

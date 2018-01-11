@@ -36,6 +36,7 @@ void CListener::run(void)
 		acl_fiber_delay(1000);
 		printf("wakeup now\r\n");
 	}
+
 	while (true)
 	{
 		acl::socket_stream* conn = m_listener.accept();

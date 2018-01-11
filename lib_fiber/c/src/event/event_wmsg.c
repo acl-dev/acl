@@ -184,16 +184,19 @@ static int wmsg_del_write(EVENT_WMSG *ev, FILE_EVENT *fe)
 static int wmsg_wait(EVENT *ev, int timeout)
 {
 	MSG msg;
-	int n = 0;
+	UINT_PTR id = SetTimer(NULL, 0, timeout, NULL);
+	BOOL res = GetMessage(&msg, NULL, 0, 0);
 
-	(void) ev;
-	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+	KillTimer(NULL, id);
+	if (!res) {
+		return 0;
+	}
+
+	do {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-		n++;
-	}
-	if (n == 0)
-		Sleep(timeout);
+	} while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE));
+
 	return 0;
 }
 

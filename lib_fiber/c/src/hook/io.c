@@ -51,21 +51,9 @@ static sendto_fn   __sys_sendto   = NULL;
 static sendfile64_fn __sys_sendfile64 = NULL;
 #endif
 
-static void hook_init(void)
+static void hook_api(void)
 {
 #ifdef SYS_UNIX
-	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
-	static int __called = 0;
-
-	(void) pthread_mutex_lock(&__lock);
-
-	if (__called) {
-		(void) pthread_mutex_unlock(&__lock);
-		return;
-	}
-
-	__called++;
-
 	__sys_sleep      = (sleep_fn) dlsym(RTLD_NEXT, "sleep");
 	assert(__sys_sleep);
 
@@ -106,14 +94,21 @@ static void hook_init(void)
 	__sys_sendfile64 = (sendfile64_fn) dlsym(RTLD_NEXT, "sendfile64");
 	assert(__sys_sendfile64);
 #endif
-
-	(void) pthread_mutex_unlock(&__lock);
 #else
 	__sys_recv     = recv;
 	__sys_recvfrom = recvfrom;
 	__sys_send     = send;
 	__sys_sendto   = sendto;
 #endif
+}
+
+static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
+
+static void hook_init(void)
+{
+	if (pthread_once(&__once_control, hook_api) != 0) {
+		abort();
+	}
 }
 
 #ifdef SYS_UNIX

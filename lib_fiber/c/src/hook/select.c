@@ -11,24 +11,19 @@ static select_fn __sys_select = NULL;
 
 #ifdef SYS_UNIX
 
-static void hook_init(void)
+static void hook_api(void)
 {
-	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
-	static int __called = 0;
-
-	(void) pthread_mutex_lock(&__lock);
-
-	if (__called) {
-		(void) pthread_mutex_unlock(&__lock);
-		return;
-	}
-
-	__called++;
-
 	__sys_select = (select_fn) dlsym(RTLD_NEXT, "select");
 	assert(__sys_select);
+}
 
-	(void) pthread_mutex_unlock(&__lock);
+static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
+
+static void hook_init(void)
+{
+	if (pthread_once(&__once_control, hook_api) != 0) {
+		abort();
+	}
 }
 
 /****************************************************************************/

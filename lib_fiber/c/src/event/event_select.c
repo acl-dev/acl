@@ -7,30 +7,31 @@
 #include "event.h"
 #include "event_select.h"
 
+#ifdef SYS_WIN
+typedef int(__stdcall *select_fn)(int, fd_set *, fd_set *, fd_set *, struct timeval *);
+#else
 typedef int(*select_fn)(int, fd_set *, fd_set *, fd_set *, struct timeval *);
+#endif
 
 static select_fn __sys_select = NULL;
 
-static void hook_init(void)
+static void hook_api(void)
 {
 #ifdef SYS_UNIX
-	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
-	static int __called = 0;
-
-	(void) pthread_mutex_lock(&__lock);
-
-	if (__called) {
-		(void) pthread_mutex_unlock(&__lock);
-		return;
-	}
-
-	__called++;
-
 	__sys_select = (select_fn) dlsym(RTLD_NEXT, "select");
 	assert(__sys_select);
-
-	(void) pthread_mutex_unlock(&__lock);
+#elif defined(SYS_WIN)
+	__sys_select = select;
 #endif
+}
+
+static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
+
+static void hook_init(void)
+{
+	if (pthread_once(&__once_control, hook_api) != 0) {
+		abort();
+	}
 }
 
 /****************************************************************************/
@@ -152,7 +153,7 @@ static int select_event_wait(EVENT *ev, int timeout)
 	}
 
 #ifdef SYS_WIN
-	n = select(0, &rset, &wset, &xset, tp);
+	n = __sys_select(0, &rset, &wset, &xset, tp);
 #else
 	if (es->dirty) {
 		es->maxfd = -1;

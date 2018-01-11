@@ -17,20 +17,8 @@ static epoll_create_fn __sys_epoll_create = NULL;
 static epoll_wait_fn   __sys_epoll_wait   = NULL;
 static epoll_ctl_fn    __sys_epoll_ctl    = NULL;
 
-static void hook_init(void)
+static void hook_api(void)
 {
-	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
-	static int __called = 0;
-
-	(void) pthread_mutex_lock(&__lock);
-
-	if (__called) {
-		(void) pthread_mutex_unlock(&__lock);
-		return;
-	}
-
-	__called++;
-
 	__sys_close = (close_fn) dlsym(RTLD_NEXT, "close");
 	assert(__sys_close);
 
@@ -42,8 +30,15 @@ static void hook_init(void)
 
 	__sys_epoll_ctl    = (epoll_ctl_fn) dlsym(RTLD_NEXT, "epoll_ctl");
 	assert(__sys_epoll_ctl);
+}
 
-	(void) pthread_mutex_unlock(&__lock);
+static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
+
+static void hook_init(void)
+{
+	if (pthread_once(&__once_control, hook_api) != 0) {
+		abort();
+	}
 }
 
 /****************************************************************************/

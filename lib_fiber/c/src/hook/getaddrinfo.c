@@ -14,28 +14,23 @@ static freeaddrinfo_fn __sys_freeaddrinfo = NULL;
 
 #ifdef SYS_UNIX
 
-static void hook_init(void)
+static void hook_api(void)
 {
-	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
-	static int __called = 0;
-
-	(void) pthread_mutex_lock(&__lock);
-
-	if (__called) {
-		(void) pthread_mutex_unlock(&__lock);
-		return;
-	}
-
-	__called++;
-
 	__sys_getaddrinfo = (getaddrinfo_fn) dlsym(RTLD_NEXT, "getaddrinfo");
 	assert(__sys_getaddrinfo);
 
 	__sys_freeaddrinfo = (freeaddrinfo_fn) dlsym(RTLD_NEXT,
 			"freeaddrinfo");
 	assert(__sys_freeaddrinfo);
+}
 
-	(void) pthread_mutex_unlock(&__lock);
+static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
+
+static void hook_init(void)
+{
+	if (pthread_once(&__once_control, hook_api) != 0) {
+		abort();
+	}
 }
 
 /****************************************************************************/

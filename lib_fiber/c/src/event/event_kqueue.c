@@ -15,27 +15,22 @@ typedef int (*kevent_fn)(int, const struct kevent *, int, struct kevent *,
 static kqueue_fn __sys_kqueue = NULL;
 static kevent_fn __sys_kevent = NULL;
 
-static void hook_init(void)
+static void hook_api(void)
 {
-	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
-	static int __called = 0;
-
-	(void) pthread_mutex_lock(&__lock);
-
-	if (__called) {
-		(void) pthread_mutex_unlock(&__lock);
-		return;
-	}
-
-	__called++;
-
 	__sys_kqueue = (kqueue_fn) dlsym(RTLD_NEXT, "kqueue");
 	assert(__sys_kqueue);
 
 	__sys_kevent = (kevent_fn) dlsym(RTLD_NEXT, "kevent");
 	assert(__sys_kevent);
+}
 
-	(void) pthread_mutex_unlock(&__lock);
+static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
+
+static void hook_init(void)
+{
+	if (pthread_once(&__once_control, hook_api) != 0) {
+		abort();
+	}
 }
 
 /****************************************************************************/

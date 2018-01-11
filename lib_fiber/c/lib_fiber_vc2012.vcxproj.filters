@@ -28,9 +28,15 @@
     <Filter Include="源文件\fiber">
       <UniqueIdentifier>{99c2d3cb-b0ab-4d18-bfe1-ce369f26202a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="doc">
+      <UniqueIdentifier>{755948d5-bfb6-427f-a8f4-b7eff99e3491}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+    <Text Include="todo.txt">
+      <Filter>doc</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.c">
