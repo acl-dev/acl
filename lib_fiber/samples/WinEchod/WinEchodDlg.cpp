@@ -3,7 +3,8 @@
 //
 
 #include "stdafx.h"
-#include "Listener.h"
+#include "FiberListener.h"
+#include "FiberSleep.h"
 #include "WinEchod.h"
 #include "WinEchodDlg.h"
 #include "afxdialogex.h"
@@ -52,6 +53,7 @@ CWinEchodDlg::CWinEchodDlg(CWnd* pParent /*=NULL*/)
 	, m_dosFp(NULL)
 	, m_listenPort(9001)
 	, m_listenIP(_T("127.0.0.1"))
+	, m_fiberListen(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -81,6 +83,8 @@ BEGIN_MESSAGE_MAP(CWinEchodDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_OPEN_DOS, &CWinEchodDlg::OnBnClickedOpenDos)
 	ON_BN_CLICKED(IDC_LISTEN, &CWinEchodDlg::OnBnClickedListen)
+	ON_BN_CLICKED(IDC_START_SCHEDULE, &CWinEchodDlg::OnBnClickedStartSchedule)
+	ON_BN_CLICKED(IDC_CREATE_TIMER, &CWinEchodDlg::OnBnClickedCreateTimer)
 END_MESSAGE_MAP()
 
 
@@ -197,15 +201,48 @@ void CWinEchodDlg::OnBnClickedOpenDos()
 void CWinEchodDlg::OnBnClickedListen()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	CString addr;
-	addr.Format("%s:%d", m_listenIP.GetString(), m_listenPort);
-	if (m_listen.open(addr) == false)
+	if (m_fiberListen)
 	{
-		printf("listen %s error %s\r\n", addr.GetString());
-		return;
+		GetDlgItem(IDC_LISTEN)->EnableWindow(FALSE);
+		m_fiberListen->kill();
+		printf("listening fiber was killed\r\n");
+		m_listen.unbind();
+		printf("listening socket was closed\r\n");
+		m_fiberListen = NULL;
+		printf("fiber schedule stopped!\r\n");
+		GetDlgItem(IDC_LISTEN)->SetWindowText("监听");
+		GetDlgItem(IDC_LISTEN)->EnableWindow(TRUE);
 	}
-	printf("listen %s ok\r\n", addr.GetString());
-	acl::fiber* fb = new CListener(m_listen);
-	fb->start();
+	else
+	{
+		CString addr;
+		addr.Format("%s:%d", m_listenIP.GetString(), m_listenPort);
+		if (m_listen.open(addr) == false)
+		{
+			printf("listen %s error %s\r\n", addr.GetString());
+			return;
+		}
+		GetDlgItem(IDC_LISTEN)->SetWindowText("停止");
+
+		printf("listen %s ok\r\n", addr.GetString());
+		m_fiberListen = new CFiberListener(m_listen);
+		m_fiberListen->start();
+	}
+}
+
+
+void CWinEchodDlg::OnBnClickedStartSchedule()
+{
+	// TODO: 在此添加控件通知处理程序代码
+
+	OnBnClickedCreateTimer();
 	acl::fiber::schedule(acl::FIBER_EVENT_T_WMSG);
+}
+
+
+void CWinEchodDlg::OnBnClickedCreateTimer()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	acl::fiber* fb = new CFiberSleep;
+	fb->start();
 }

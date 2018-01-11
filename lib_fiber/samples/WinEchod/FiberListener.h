@@ -1,17 +1,17 @@
 #pragma once
 #include "fiber/lib_fiber.hpp"
 
-class CListener : public acl::fiber
+class CFiberListener : public acl::fiber
 {
 public:
-	CListener(acl::server_socket& listener);
+	CFiberListener(acl::server_socket& listener);
 
 protected:
 	// @override
 	void run(void);
 
 private:
-	~CListener(void);
+	~CFiberListener(void);
 
 	acl::server_socket& m_listener;
 };

@@ -4,7 +4,6 @@
 
 #pragma once
 
-
 // CWinEchodDlg 对话框
 class CWinEchodDlg : public CDialogEx
 {
@@ -18,7 +17,6 @@ public:
 
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
-
 
 // 实现
 protected:
@@ -37,6 +35,9 @@ private:
 	UINT m_listenPort;
 	CString m_listenIP;
 	acl::server_socket m_listen;
+	acl::fiber* m_fiberListen;
 public:
 	afx_msg void OnBnClickedListen();
+	afx_msg void OnBnClickedStartSchedule();
+	afx_msg void OnBnClickedCreateTimer();
 };

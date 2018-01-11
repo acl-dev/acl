@@ -1,17 +1,17 @@
 #include "stdafx.h"
-#include "ClientEcho.h"
-#include "Listener.h"
+#include "FiberClient.h"
+#include "FiberListener.h"
 
-CListener::CListener(acl::server_socket& listener)
+CFiberListener::CFiberListener(acl::server_socket& listener)
 	: m_listener(listener)
 {
 }
 
-CListener::~CListener(void)
+CFiberListener::~CFiberListener(void)
 {
 }
 
-void CListener::run(void)
+void CFiberListener::run(void)
 {
 	printf("listener fiber run ...\r\n");
 
@@ -27,10 +27,14 @@ void CListener::run(void)
 		printf("accept one connection\r\n");
 		acl::socket_stream* conn = new acl::socket_stream;
 		conn->open(sock);
-		acl::fiber* fb = new CClientEcho(conn);
+		acl::fiber* fb = new CFiberClient(conn);
 		fb->start();
 	}
 
+	fiber_close(lfd);
+
+	printf("listening stopped!\r\n");
+#if 0
 	while (true)
 	{
 		acl_fiber_delay(1000);
@@ -43,10 +47,11 @@ void CListener::run(void)
 		if (conn)
 		{
 			printf("accept one\r\n");
-			acl::fiber* fb = new CClientEcho(conn);
+			acl::fiber* fb = new CFiberClient(conn);
 			fb->start();
 		}
 	}
+#endif
 
 	delete this;
 }

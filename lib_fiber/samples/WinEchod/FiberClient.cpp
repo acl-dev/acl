@@ -1,17 +1,17 @@
 #include "stdafx.h"
-#include "ClientEcho.h"
+#include "FiberClient.h"
 
 
-CClientEcho::CClientEcho(acl::socket_stream* conn)
+CFiberClient::CFiberClient(acl::socket_stream* conn)
 	: m_conn(conn)
 {
 }
 
-CClientEcho::~CClientEcho(void)
+CFiberClient::~CFiberClient(void)
 {
 }
 
-void CClientEcho::run(void)
+void CFiberClient::run(void)
 {
 	socket_t sock = m_conn->sock_handle();
 	while (true)
@@ -31,10 +31,7 @@ void CClientEcho::run(void)
 			break;
 		}
 	}
-	delete m_conn;
-	delete this;
-	return;
-
+#if 0
 	acl::string buf;
 	while (true)
 	{
@@ -49,6 +46,7 @@ void CClientEcho::run(void)
 			break;
 		}
 	}
+#endif
 	delete m_conn;
 	delete this;
 }

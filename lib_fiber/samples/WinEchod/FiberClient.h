@@ -1,12 +1,12 @@
 #pragma once
 
-class CClientEcho : public acl::fiber
+class CFiberClient : public acl::fiber
 {
 public:
-	CClientEcho(acl::socket_stream* conn);
+	CFiberClient(acl::socket_stream* conn);
 
 private:
-	~CClientEcho(void);
+	~CFiberClient(void);
 
 	// @override
 	void run(void);
