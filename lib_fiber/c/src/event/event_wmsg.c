@@ -12,10 +12,10 @@
 #define WM_SOCKET_NOTIFY	(WM_USER + 8192)
 
 typedef struct EVENT_WMSG {
-	EVENT  event;
-	UINT nMsg;
-	HWND hWnd;
-	HINSTANCE hInstance;
+	EVENT event;
+	UINT  nMsg;
+	HWND  hWnd;
+	HINSTANCE   hInstance;
 	const char *class_name;
 	FILE_EVENT **files;
 	int  size;
@@ -141,7 +141,7 @@ static int wmsg_del_read(EVENT_WMSG *ev, FILE_EVENT *fe)
 	if (fe->mask & EVENT_WRITE) {
 		lEvent = FD_CLOSE | FD_WRITE;
 	} else {
-		lEvent = 0;
+		lEvent = FD_CLOSE;
 	}
 
 	fe->mask &= ~EVENT_READ;
@@ -191,46 +191,23 @@ static int wmsg_wait(EVENT *ev, int timeout)
 	if (!res) {
 		return 0;
 	}
-
-	do {
+	//if (msg.message != WM_TIMER || msg.hwnd != NULL || msg.wParam != id) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-	} while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE));
+	//}
+	return 0;
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 
 	return 0;
-}
-
-static int wmsg_handle(EVENT *ev)
-{
-	(void) ev;
-	return -1;
-}
-
-static const char *wmsg_name(void)
-{
-	return "wmsg";
-}
-
-static void onClose(EVENT_WMSG *ev, SOCKET fd)
-{
-	FILE_EVENT *fe = wmsg_fdmap_get(ev, fd);
-	if (fe == NULL) {
-		/* don nothing */
-	} else if (fe->mask & EVENT_READ) {
-		if (fe->r_proc) {
-			fe->r_proc(&ev->event, fe);
-		}
-	} else if (fe->mask & EVENT_WRITE) {
-		if (fe->w_proc) {
-			fe->w_proc(&ev->event, fe);
-		}
-	}
 }
 
 static void onRead(EVENT_WMSG *ev, SOCKET fd)
 {
 	FILE_EVENT *fe = wmsg_fdmap_get(ev, fd);
-	if (fe == NULL) {
+	if (fe == NULL || fe->oper & EVENT_DEL_READ) {
 		msg_error("%s(%d): no FILE_EVENT, fd=%d",
 			__FUNCTION__, __LINE__, fd);
 	} else if (fe->r_proc == NULL) {
@@ -259,7 +236,7 @@ static void onAccept(EVENT_WMSG *ev, SOCKET fd)
 {
 	FILE_EVENT *fe = wmsg_fdmap_get(ev, fd);
 	if (fe == NULL) {
-		msg_fatal("%s(%d): no FILE_EVENT, fd=%d",
+		msg_error("%s(%d): no FILE_EVENT, fd=%d",
 			__FUNCTION__, __LINE__, fd);
 	} else if (fe->r_proc == NULL) {
 		msg_fatal("%s(%d): r_proc NULL, fd=%d",
@@ -272,6 +249,22 @@ static void onAccept(EVENT_WMSG *ev, SOCKET fd)
 static void onConnect(EVENT_WMSG *ev, SOCKET fd)
 {
 	onWrite(ev, fd);
+}
+
+static void onClose(EVENT_WMSG *ev, SOCKET fd)
+{
+	FILE_EVENT *fe = wmsg_fdmap_get(ev, fd);
+	if (fe == NULL) {
+		/* don nothing */
+	} else if (fe->mask & EVENT_READ) {
+		if (fe->r_proc) {
+			fe->r_proc(&ev->event, fe);
+		}
+	} else if (fe->mask & EVENT_WRITE) {
+		if (fe->w_proc) {
+			fe->w_proc(&ev->event, fe);
+		}
+	}
 }
 
 static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -390,7 +383,19 @@ static HWND CreateSockWindow(const char *class_name, HINSTANCE hInstance)
 	return InitInstance(class_name, hInstance);
 }
 
+static int wmsg_handle(EVENT *ev)
+{
+	(void) ev;
+	return -1;
+}
+
+static const char *wmsg_name(void)
+{
+	return "wmsg";
+}
+
 static const char *__class_name = "__AclFiberEventsMainWClass";
+
 EVENT *event_wmsg_create(int size)
 {
 	EVENT_WMSG *ew = (EVENT_WMSG *) calloc(1, sizeof(EVENT_WMSG));

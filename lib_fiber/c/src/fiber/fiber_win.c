@@ -16,11 +16,6 @@ static void fiber_win_free(ACL_FIBER *fiber)
 	stack_free(fb);
 }
 
-static void fiber_win_init(ACL_FIBER *fiber, size_t size)
-{
-
-}
-
 static void fiber_win_swap(ACL_FIBER *from, ACL_FIBER *to)
 {
 	FIBER_WIN *fb_to = (FIBER_WIN *) to;
@@ -33,17 +28,25 @@ static void __stdcall fiber_win_start(LPVOID ctx)
 	fb->fiber.start_fn(&fb->fiber);
 }
 
+static void fiber_win_init(FIBER_WIN *fb, size_t size)
+{
+	if (fb->context) {
+		DeleteFiber(fb->context);
+	}
+	fb->context = CreateFiberEx(size, 0, FIBER_FLAG_FLOAT_SWITCH,
+		fiber_win_start, fb);
+}
+
 ACL_FIBER *fiber_win_alloc(void(*start_fn)(ACL_FIBER *), size_t size)
 {
 	FIBER_WIN *fb = (FIBER_WIN *) calloc(1, sizeof(*fb));
 
-	fb->fiber.init_fn = fiber_win_init;
-	fb->fiber.free_fn = fiber_win_free;
-	fb->fiber.swap_fn = (void(*)(ACL_FIBER*, ACL_FIBER*)) fiber_win_swap;
+	fb->fiber.init_fn  = (void (*)(ACL_FIBER*, size_t)) fiber_win_init;
+	fb->fiber.free_fn  = fiber_win_free;
+	fb->fiber.swap_fn  = (void (*)(ACL_FIBER*, ACL_FIBER*)) fiber_win_swap;
 	fb->fiber.start_fn = start_fn;
+	fb->context        = NULL;
 
-	fb->context = CreateFiberEx(size, 0, FIBER_FLAG_FLOAT_SWITCH,
-		fiber_win_start, fb);
 	return (ACL_FIBER *) fb;
 }
 

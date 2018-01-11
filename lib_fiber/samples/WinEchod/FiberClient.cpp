@@ -24,7 +24,7 @@ void CFiberClient::run(void)
 			break;
 		}
 		buf[ret] = 0;
-		printf("recv=%d, [%s]\r\n", ret, buf);
+		//printf("recv=%d, [%s]\r\n", ret, buf);
 		if (fiber_send(sock, buf, ret, 0) == -1)
 		{
 			printf("write error %s\r\n", acl::last_serror());
