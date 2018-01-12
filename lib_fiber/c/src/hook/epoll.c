@@ -32,11 +32,11 @@ static void hook_api(void)
 	assert(__sys_epoll_ctl);
 }
 
-static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
+static pthread_once_t __hook_once_control = PTHREAD_ONCE_INIT;
 
 static void hook_init(void)
 {
-	if (pthread_once(&__once_control, hook_api) != 0) {
+	if (pthread_once(&__hook_once_control, hook_api) != 0) {
 		abort();
 	}
 }

@@ -40,7 +40,11 @@ EVENT *event_create(int size)
 		ev = event_select_create(size);
 		break;
 	case FIBER_EVENT_WMSG:
+#ifdef	HAS_WMSG
 		ev = event_wmsg_create(1024);
+#else
+		ev = NULL;
+#endif
 		break;
 	default:
 #ifdef	HAS_EPOLL

@@ -261,7 +261,8 @@ void CWinEchodDlg::OnBnClickedConnect()
 	UpdateData();
 	for (UINT i = 0; i < m_cocurrent; i++)
 	{
-		acl::fiber* fb = new CFiberConnect(m_count);
+		acl::fiber* fb = new CFiberConnect(m_listenIP.GetString(),
+			m_listenPort, m_count);
 		fb->start();
 	}
 }

@@ -19,7 +19,7 @@ void CFiberListener::run(void)
 	int n = 0;
 	while (true)
 	{
-		socket_t sock = fiber_accept(lfd, NULL, NULL);
+		socket_t sock = acl_fiber_accept(lfd, NULL, NULL);
 		if (sock == INVALID_SOCKET)
 		{
 			printf("accept error %s\r\n", acl::last_serror());
@@ -32,7 +32,7 @@ void CFiberListener::run(void)
 		fb->start();
 	}
 
-	fiber_close(lfd);
+	acl_fiber_close(lfd);
 
 	printf("listening stopped!\r\n");
 #if 0

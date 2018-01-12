@@ -16,7 +16,7 @@ void CFiberClient::run(void)
 	while (true)
 	{
 		char buf[1024];
-		int ret = fiber_recv(sock, buf, sizeof(buf) - 1, 0);
+		int ret = acl_fiber_recv(sock, buf, sizeof(buf) - 1, 0);
 		if (ret <= 0)
 		{
 			int err0 = acl_fiber_last_error();
@@ -27,14 +27,14 @@ void CFiberClient::run(void)
 		}
 		buf[ret] = 0;
 		//printf("recv=%d, [%s]\r\n", ret, buf);
-		if (fiber_send(sock, buf, ret, 0) == -1)
+		if (acl_fiber_send(sock, buf, ret, 0) == -1)
 		{
 			printf("write error %s\r\n", acl::last_serror());
 			break;
 		}
 	}
 
-	fiber_close(sock);
+	acl_fiber_close(sock);
 	m_conn->unbind();
 	delete m_conn;
 	delete this;

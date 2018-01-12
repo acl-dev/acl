@@ -613,29 +613,29 @@ typedef int socket_t;
 #define INVALID_SOCKET	-1
 #endif
 
-FIBER_API int fiber_close(socket_t fd);
+FIBER_API int acl_fiber_close(socket_t fd);
 
-FIBER_API socket_t fiber_socket(int domain, int type, int protocol);
-FIBER_API int fiber_listen(socket_t, int backlog);
-FIBER_API socket_t fiber_accept(socket_t , struct sockaddr *, socklen_t *);
-FIBER_API int fiber_connect(socket_t , const struct sockaddr *, socklen_t );
+FIBER_API socket_t acl_fiber_socket(int domain, int type, int protocol);
+FIBER_API int acl_fiber_listen(socket_t, int backlog);
+FIBER_API socket_t acl_fiber_accept(socket_t , struct sockaddr *, socklen_t *);
+FIBER_API int acl_fiber_connect(socket_t , const struct sockaddr *, socklen_t );
 
 #if !defined(_WIN32) && !defined(_WIN64)
-FIBER_API ssize_t fiber_read(socket_t, void* buf, size_t count);
-FIBER_API ssize_t fiber_readv(socket_t, const struct iovec* iov, int iovcnt);
-FIBER_API ssize_t fiber_recvmsg(socket_t, struct msghdr* msg, int flags);
+FIBER_API ssize_t acl_fiber_read(socket_t, void* buf, size_t count);
+FIBER_API ssize_t acl_fiber_readv(socket_t, const struct iovec* iov, int iovcnt);
+FIBER_API ssize_t acl_fiber_recvmsg(socket_t, struct msghdr* msg, int flags);
 
-FIBER_API ssize_t fiber_write(socket_t, const void* buf, size_t count);
-FIBER_API ssize_t fiber_writev(socket_t, const struct iovec* iov, int iovcnt);
-FIBER_API ssize_t fiber_sendmsg(socket_t, const struct msghdr* msg, int flags);
+FIBER_API ssize_t acl_fiber_write(socket_t, const void* buf, size_t count);
+FIBER_API ssize_t acl_fiber_writev(socket_t, const struct iovec* iov, int iovcnt);
+FIBER_API ssize_t acl_fiber_sendmsg(socket_t, const struct msghdr* msg, int flags);
 #endif
 
-FIBER_API ssize_t fiber_recv(socket_t, void* buf, size_t len, int flags);
-FIBER_API ssize_t fiber_recvfrom(socket_t, void* buf, size_t len, int flags,
+FIBER_API ssize_t acl_fiber_recv(socket_t, void* buf, size_t len, int flags);
+FIBER_API ssize_t acl_fiber_recvfrom(socket_t, void* buf, size_t len, int flags,
 	struct sockaddr* src_addr, socklen_t* addrlen);
 
-FIBER_API ssize_t fiber_send(socket_t, const void* buf, size_t len, int flags);
-FIBER_API ssize_t fiber_sendto(socket_t, const void* buf, size_t len, int flags,
+FIBER_API ssize_t acl_fiber_send(socket_t, const void* buf, size_t len, int flags);
+FIBER_API ssize_t acl_fiber_sendto(socket_t, const void* buf, size_t len, int flags,
 	const struct sockaddr* dest_addr, socklen_t addrlen);
 
 /****************************************************************************/
@@ -647,7 +647,7 @@ FIBER_API ssize_t fiber_sendto(socket_t, const void* buf, size_t len, int flags,
  * @param fmt {const char*} 格式参数
  * @param ap {va_list} 格式参数列表
  */
-typedef void (*MSG_PRE_WRITE_FN)(void *ctx, const char *fmt, va_list ap);
+typedef void (*FIBER_MSG_PRE_WRITE_FN)(void *ctx, const char *fmt, va_list ap);
 
 /**
  * 应用通过此函数类型可以自定义日志记录函数，当应用在打开日志前调用
@@ -657,19 +657,19 @@ typedef void (*MSG_PRE_WRITE_FN)(void *ctx, const char *fmt, va_list ap);
  * @param fmt {const char*} 格式参数
  * @param ap {va_list} 参数列表
  */
-typedef void (*MSG_WRITE_FN) (void *ctx, const char *fmt, va_list ap);
+typedef void (*FIBER_MSG_WRITE_FN) (void *ctx, const char *fmt, va_list ap);
 
 /**
  * 在打开日志前调用此函数注册应用自己的日志记录函数
  * @param write_fn {MSG_WRITE_FN} 自定义日志记录函数
  * @param ctx {void*} 自定义参数
  */
-FIBER_API void msg_register(MSG_WRITE_FN write_fn, void *ctx);
+FIBER_API void acl_fiber_msg_register(FIBER_MSG_WRITE_FN write_fn, void *ctx);
 
 /**
  * 将 msg_register 注册自定义函数清除，采用缺省的日志函数集
  */
-FIBER_API void msg_unregister(void);
+FIBER_API void acl_fiber_msg_unregister(void);
 
 /**
  * 在打开日志前调用此函数注册应用的私有函数，在记录日志前会先记录信息通过
@@ -677,7 +677,7 @@ FIBER_API void msg_unregister(void);
  * @param pre_write {MSG_PRE_WRITE_FN} 日志记录前调用的函数
  * @param ctx {void*} 自定义参数
  */
-FIBER_API void msg_pre_write(MSG_PRE_WRITE_FN pre_write, void *ctx);
+FIBER_API void acl_fiber_msg_pre_write(FIBER_MSG_PRE_WRITE_FN pre_write, void *ctx);
 
 /**
  * 当未调用 msg_open 方式打开日志时，调用了 msg_info/error/fatal/warn
@@ -685,7 +685,7 @@ FIBER_API void msg_pre_write(MSG_PRE_WRITE_FN pre_write, void *ctx);
  * 仅影响是否需要将信息输出至终端屏幕而不影响是否输出至文件中
  * @param onoff {int} 非 0 表示允许输出至屏幕
  */
-FIBER_API void msg_stdout_enable(int onoff);
+FIBER_API void acl_fiber_msg_stdout_enable(int onoff);
 
 /**
  * 获得上次系统调用出错时的错误号

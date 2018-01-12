@@ -55,7 +55,7 @@ static void hook_init(void)
 
 /***************************************************************************/
 
-socket_t fiber_socket(int domain, int type, int protocol)
+socket_t acl_fiber_socket(int domain, int type, int protocol)
 {
 	socket_t sockfd;
 
@@ -82,7 +82,7 @@ socket_t fiber_socket(int domain, int type, int protocol)
 	return sockfd;
 }
 
-int fiber_listen(socket_t sockfd, int backlog)
+int acl_fiber_listen(socket_t sockfd, int backlog)
 {
 	if (__sys_listen == NULL) {
 		hook_init();
@@ -103,7 +103,7 @@ int fiber_listen(socket_t sockfd, int backlog)
 
 //#define FAST_ACCEPT
 
-socket_t fiber_accept(socket_t sockfd, struct sockaddr *addr, socklen_t *addrlen)
+socket_t acl_fiber_accept(socket_t sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
 	FILE_EVENT *fe;
 	socket_t clifd;
@@ -188,7 +188,7 @@ socket_t fiber_accept(socket_t sockfd, struct sockaddr *addr, socklen_t *addrlen
 #endif
 }
 
-int fiber_connect(socket_t sockfd, const struct sockaddr *addr, socklen_t addrlen)
+int acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
 	int err, ret;
 	socklen_t len;
@@ -292,22 +292,22 @@ int fiber_connect(socket_t sockfd, const struct sockaddr *addr, socklen_t addrle
 
 int socket(int domain, int type, int protocol)
 {
-	return fiber_socket(domain, type, protocol);
+	return acl_fiber_socket(domain, type, protocol);
 }
 
 int listen(int sockfd, int backlog)
 {
-	return fiber_listen(sockfd, backlog);
+	return acl_fiber_listen(sockfd, backlog);
 }
 
 int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
-	return fiber_accept(sockfd, addr, addrlen);
+	return acl_fiber_accept(sockfd, addr, addrlen);
 }
 
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
-	return fiber_connect(sockfd, addr, addrlen);
+	return acl_fiber_connect(sockfd, addr, addrlen);
 }
 
 #endif

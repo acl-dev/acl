@@ -465,10 +465,12 @@ int htable_used(const HTABLE *table)
 	}
 }
 
+/*
 HTABLE_INFO **htable_data(HTABLE *table)
 {
 	return (HTABLE_INFO**) table->data;
 }
+*/
 
 /* htable_list - list all table members */
 

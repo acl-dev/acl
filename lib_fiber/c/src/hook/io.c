@@ -26,14 +26,20 @@ typedef ssize_t  (*send_fn)(socket_t, const void *, size_t, int);
 typedef ssize_t  (*sendto_fn)(socket_t, const void *, size_t, int,
 	const struct sockaddr *, socklen_t);
 typedef ssize_t  (*sendmsg_fn)(socket_t, const struct msghdr *, int);
-#ifdef  __USE_LARGEFILE64
+# ifdef  __USE_LARGEFILE64
 typedef ssize_t  (*sendfile64_fn)(socket_t, int, off64_t*, size_t);
+# endif
 #endif
-#endif
+
+static close_fn    __sys_close    = NULL;
+static recv_fn     __sys_recv     = NULL;
+static recvfrom_fn __sys_recvfrom = NULL;
+
+static send_fn     __sys_send     = NULL;
+static sendto_fn   __sys_sendto   = NULL;
 
 #ifdef SYS_UNIX
 static sleep_fn    __sys_sleep    = NULL;
-static close_fn    __sys_close    = NULL;
 static read_fn     __sys_read     = NULL;
 static readv_fn    __sys_readv    = NULL;
 static recvmsg_fn  __sys_recvmsg  = NULL;
@@ -42,12 +48,6 @@ static write_fn    __sys_write    = NULL;
 static writev_fn   __sys_writev   = NULL;
 static sendmsg_fn  __sys_sendmsg  = NULL;
 #endif
-static close_fn    __sys_close    = NULL;
-static recv_fn     __sys_recv     = NULL;
-static recvfrom_fn __sys_recvfrom = NULL;
-
-static send_fn     __sys_send     = NULL;
-static sendto_fn   __sys_sendto   = NULL;
 
 #ifdef __USE_LARGEFILE64
 static sendfile64_fn __sys_sendfile64 = NULL;
@@ -130,11 +130,11 @@ unsigned int sleep(unsigned int seconds)
 
 int close(socket_t fd)
 {
-	fiber_close(fd);
+	return acl_fiber_close(fd);
 }
 #endif
 
-int fiber_close(socket_t fd)
+int acl_fiber_close(socket_t fd)
 {
 	int ret;
 	if (fd == INVALID_SOCKET) {
@@ -150,15 +150,14 @@ int fiber_close(socket_t fd)
 		return __sys_close(fd);
 	}
 
+#ifdef	HAS_EPOLL
 	/* when the fd was closed by epoll_event_close normally, the fd
 	 * must be a epoll fd which was created by epoll_create function
 	 * hooked in hook_net.c
 	 */
-#ifdef	HAS_EPOLL
 	if (epoll_event_close(fd) == 0) {
 		return 0;
 	}
-#elif	defined(HAS_KQUEUE)
 #endif
 
 	fiber_file_close(fd);
@@ -179,12 +178,8 @@ int fiber_close(socket_t fd)
 # define error_again(x) ((x) == FIBER_EAGAIN || (x) == FIBER_EWOULDBLOCK)
 #endif
 
-#define READ_WAIT_FIRST
-
-#ifdef READ_WAIT_FIRST
-
-# ifdef SYS_UNIX
-ssize_t fiber_read(socket_t fd, void *buf, size_t count)
+#ifdef SYS_UNIX
+ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 {
 	FILE_EVENT* fe;
 
@@ -228,7 +223,7 @@ ssize_t fiber_read(socket_t fd, void *buf, size_t count)
 	}
 }
 
-ssize_t fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
+ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 {
 	FILE_EVENT *fe;
 
@@ -271,9 +266,9 @@ ssize_t fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 		}
 	}
 }
-# endif
+#endif
 
-ssize_t fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
+ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 {
 	FILE_EVENT *fe;
 
@@ -317,7 +312,7 @@ ssize_t fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 	}
 }
 
-ssize_t fiber_recvfrom(socket_t sockfd, void *buf, size_t len, int flags,
+ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len, int flags,
 	struct sockaddr *src_addr, socklen_t *addrlen)
 {
 	FILE_EVENT *fe;
@@ -364,9 +359,11 @@ ssize_t fiber_recvfrom(socket_t sockfd, void *buf, size_t len, int flags,
 	}
 }
 
-# ifdef SYS_UNIX
-ssize_t fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
+#ifdef SYS_UNIX
+ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 {
+	FILE_EVENT *fe;
+
 	if (sockfd == INVALID_SOCKET) {
 		msg_error("%s: invalid sockfd: %d", __FUNCTION__, sockfd);
 		return -1;
@@ -383,7 +380,6 @@ ssize_t fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 	fe = fiber_file_open(sockfd);
 
 	while (1) {
-		FILE_EVENT *fe;
 		ssize_t ret;
 		int err;
 
@@ -407,211 +403,13 @@ ssize_t fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 			return -1;
 		}
 	}
-# endif
-
-#else
-
-# ifdef SYS_UNIX
-ssize_t fiber_read(socket_t fd, void *buf, size_t count)
-{
-	if (__sys_read == NULL) {
-		hook_init();
-	}
-
-	while (1) {
-		ssize_t n = __sys_read(fd, buf, count);
-		FILE_EVENT *fe;
-		int err;
-
-		if (!var_hook_sys_api) {
-			return n;
-		}
-
-		if (n >= 0) {
-			return n;
-		}
-
-		err = acl_fiber_last_error();
-		fiber_save_errno(err);
-
-		if (!error_again(err)) {
-			return -1;
-		}
-
-		fe = fiber_file_open(fd);
-		fiber_wait_read(fe);
-
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
-			return -1;
-		}
-	}
 }
-
-ssize_t fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
-{
-	if (__sys_readv == NULL) {
-		hook_init();
-	}
-
-	while (1) {
-		ssize_t n = __sys_readv(fd, iov, iovcnt);
-		FILE_EVENT *fe;
-		int err;
-
-		if (!var_hook_sys_api) {
-			return n;
-		}
-
-		if (n >= 0) {
-			return n;
-		}
-
-		err = acl_fiber_last_error();
-		fiber_save_errno(err);
-
-		if (!error_again(err)) {
-			return -1;
-		}
-
-		fe = fiber_file_open(fd);
-		fiber_wait_read(fe);
-
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
-			return -1;
-		}
-	}
-}
-# endif
-
-ssize_t fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
-{
-	if (__sys_recv == NULL) {
-		hook_init();
-	}
-
-	while (1) {
-		ssize_t n = __sys_recv(sockfd, buf, len, flags);
-		FILE_EVENT *fe;
-		int err;
-
-		if (!var_hook_sys_api) {
-			return n;
-		}
-
-		if (n >= 0) {
-			return n;
-		}
-
-		err = acl_fiber_last_error();
-		fiber_save_errno(err);
-
-		if (!error_again(err)) {
-			return -1;
-		}
-
-		fe = fiber_file_open(sockfd);
-		fiber_wait_read(fe);
-
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
-			return -1;
-		}
-	}
-}
-
-ssize_t fiber_recvfrom(socket_t sockfd, void *buf, size_t len, int flags,
-	struct sockaddr *src_addr, socklen_t *addrlen)
-{
-	if (__sys_recvfrom == NULL) {
-		hook_init();
-	}
-
-	while (1) {
-		ssize_t n = __sys_recvfrom(sockfd, buf, len, flags,
-				src_addr, addrlen);
-		FILE_EVENT *fe;
-		int err;
-
-		if (!var_hook_sys_api) {
-			return n;
-		}
-
-		if (n >= 0) {
-			return n;
-		}
-
-		err = acl_fiber_last_error();
-		fiber_save_errno(err);
-
-		if (!error_again(err)) {
-			return -1;
-		}
-
-		fe = fiber_file_open(sockfd);
-		fiber_wait_read(fe);
-
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
-			return -1;
-		}
-	}
-}
-
-# ifdef SYS_UNIX
-ssize_t fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
-{
-	if (__sys_recvmsg == NULL) {
-		hook_init();
-	}
-
-	while (1) {
-		ssize_t n = __sys_recvmsg(sockfd, msg, flags);
-		FILE_EVENT *fe;
-		int err;
-
-		if (!var_hook_sys_api) {
-			return n;
-		}
-
-		if (n >= 0) {
-			return n;
-		}
-
-		err = acl_fiber_last_error();
-		fiber_save_errno(err);
-
-		if (!error_again(err)) {
-			return -1;
-		}
-
-		fe = fiber_file_open(sockfd);
-		fiber_wait_read(fe);
-
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
-			return -1;
-		}
-	}
-}
-# endif
-#endif  /* READ_WAIT_FIRST */
+#endif
 
 /****************************************************************************/
 
 #ifdef SYS_UNIX
-ssize_t fiber_write(socket_t fd, const void *buf, size_t count)
+ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 {
 	if (__sys_write == NULL) {
 		hook_init();
@@ -649,7 +447,7 @@ ssize_t fiber_write(socket_t fd, const void *buf, size_t count)
 	}
 }
 
-ssize_t fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
+ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 {
 	if (__sys_writev == NULL) {
 		hook_init();
@@ -688,7 +486,7 @@ ssize_t fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 }
 #endif
 
-ssize_t fiber_send(socket_t sockfd, const void *buf, size_t len, int flags)
+ssize_t acl_fiber_send(socket_t sockfd, const void *buf, size_t len, int flags)
 {
 	if (__sys_send == NULL) {
 		hook_init();
@@ -726,7 +524,7 @@ ssize_t fiber_send(socket_t sockfd, const void *buf, size_t len, int flags)
 	}
 }
 
-ssize_t fiber_sendto(socket_t sockfd, const void *buf, size_t len, int flags,
+ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len, int flags,
 	const struct sockaddr *dest_addr, socklen_t addrlen)
 {
 	if (__sys_sendto == NULL) {
@@ -767,7 +565,7 @@ ssize_t fiber_sendto(socket_t sockfd, const void *buf, size_t len, int flags,
 }
 
 #ifdef SYS_UNIX
-ssize_t fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
+ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 {
 	if (__sys_sendmsg == NULL) {
 		hook_init();
@@ -811,12 +609,12 @@ ssize_t fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 #ifdef SYS_UNIX
 ssize_t read(socket_t fd, void *buf, size_t count)
 {
-	return fiber_read(fd, buf, count);
+	return acl_fiber_read(fd, buf, count);
 }
 
 ssize_t readv(socket_t fd, const struct iovec *iov, int iovcnt)
 {
-	return fiber_readv(fd, iov, iovcnt);
+	return acl_fiber_readv(fd, iov, iovcnt);
 }
 #endif
 
@@ -824,37 +622,37 @@ ssize_t readv(socket_t fd, const struct iovec *iov, int iovcnt)
 
 ssize_t recv(socket_t sockfd, void *buf, size_t len, unsigned int flags)
 {
-	return fiber_recv(sockfd, buf, len, (int) flags);
+	return acl_fiber_recv(sockfd, buf, len, (int) flags);
 }
 
 ssize_t recvfrom(socket_t sockfd, void *buf, size_t len, unsigned int flags,
 	const struct sockaddr *src_addr, socklen_t *addrlen)
 {
-	return fiber_recvfrom(sockfd, buf, len, flags,
+	return acl_fiber_recvfrom(sockfd, buf, len, flags,
 			(const struct sockaddr*) src_addr, addrlen);
 }
 
 ssize_t recvmsg(socket_t sockfd, struct msghdr *msg, unsigned int flags)
 {
-	return fiber_recvmsg(sockfd, msg, flags);
+	return acl_fiber_recvmsg(sockfd, msg, flags);
 }
 
 #elif defined(SYS_UNIX)
 
 ssize_t recv(socket_t sockfd, void *buf, size_t len, int flags)
 {
-	return fiber_recv(sockfd, buf, len, (int) flags);
+	return acl_fiber_recv(sockfd, buf, len, (int) flags);
 }
 
 ssize_t recvfrom(socket_t sockfd, void *buf, size_t len, int flags,
 	struct sockaddr *src_addr, socklen_t *addrlen)
 {
-	return fiber_recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
+	return acl_fiber_recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
 }
 
 ssize_t recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 {
-	return fiber_recvmsg(sockfd, msg, flags);
+	return acl_fiber_recvmsg(sockfd, msg, flags);
 }
 
 #endif // SYS_UNIX
@@ -862,12 +660,12 @@ ssize_t recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 #ifdef SYS_UNIX
 ssize_t write(socket_t fd, const void *buf, size_t count)
 {
-	return fiber_write(fd, buf, count);
+	return acl_fiber_write(fd, buf, count);
 }
 
 ssize_t writev(socket_t fd, const struct iovec *iov, int iovcnt)
 {
-	return fiber_writev(fd, iov, iovcnt);
+	return acl_fiber_writev(fd, iov, iovcnt);
 }
 #endif
 
@@ -875,36 +673,36 @@ ssize_t writev(socket_t fd, const struct iovec *iov, int iovcnt)
 
 ssize_t send(socket_t sockfd, const void *buf, size_t len, unsigned int flags)
 {
-	return fiber_send(sockfd, buf, len, (int) flags);
+	return acl_fiber_send(sockfd, buf, len, (int) flags);
 }
 
 ssize_t sendto(socket_t sockfd, const void *buf, size_t len, int flags,
 	const struct sockaddr *dest_addr, socklen_t addrlen)
 {
-	return fiber_sendto(sockfd, buf, len, flags, dest_addr, addrlen);
+	return acl_fiber_sendto(sockfd, buf, len, flags, dest_addr, addrlen);
 }
 
 ssize_t sendmsg(socket_t sockfd, const struct msghdr *msg, unsigned int flags)
 {
-	return fiber_sendmsg(sockfd, msg, (int) flags);
+	return acl_fiber_sendmsg(sockfd, msg, (int) flags);
 }
 
 #elif defined(SYS_UNIX)
 
 ssize_t send(socket_t sockfd, const void *buf, size_t len, int flags)
 {
-	return fiber_send(sockfd, buf, len, flags);
+	return acl_fiber_send(sockfd, buf, len, flags);
 }
 
 ssize_t sendto(socket_t sockfd, const void *buf, size_t len, int flags,
 	const struct sockaddr *dest_addr, socklen_t addrlen)
 {
-	return fiber_sendto(sockfd, buf, len, flags, dest_addr, addrlen);
+	return acl_fiber_sendto(sockfd, buf, len, flags, dest_addr, addrlen);
 }
 
 ssize_t sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 {
-	return fiber_sendmsg(sockfd, msg, flags);
+	return acl_fiber_sendmsg(sockfd, msg, flags);
 }
 
 #endif

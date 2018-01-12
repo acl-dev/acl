@@ -8,12 +8,12 @@
 
 static int __stdout_enable = 0;
 
-static MSG_WRITE_FN __write_fn         = NULL;
-static MSG_PRE_WRITE_FN __pre_write_fn = NULL;
+static FIBER_MSG_WRITE_FN __write_fn         = NULL;
+static FIBER_MSG_PRE_WRITE_FN __pre_write_fn = NULL;
 static void *__pre_write_ctx           = NULL;
 static void *__msg_ctx                 = NULL;
 
-void msg_register(MSG_WRITE_FN write_fn, void *ctx)
+void acl_fiber_msg_register(FIBER_MSG_WRITE_FN write_fn, void *ctx)
 {
 	if (write_fn != NULL) {
 		__write_fn = write_fn;
@@ -21,7 +21,7 @@ void msg_register(MSG_WRITE_FN write_fn, void *ctx)
 	}
 }
 
-void msg_unregister(void)
+void acl_fiber_msg_unregister(void)
 {
 	__write_fn      = NULL;
 	__msg_ctx       = NULL;
@@ -29,13 +29,13 @@ void msg_unregister(void)
 	__pre_write_ctx = NULL;
 }
 
-void msg_pre_write(MSG_PRE_WRITE_FN pre_write, void *ctx)
+void acl_fiber_msg_pre_write(FIBER_MSG_PRE_WRITE_FN pre_write, void *ctx)
 {
 	__pre_write_fn  = pre_write;
 	__pre_write_ctx = ctx;
 }
 
-void msg_stdout_enable(int onoff)
+void acl_fiber_msg_stdout_enable(int onoff)
 {
 	__stdout_enable = onoff;
 }
