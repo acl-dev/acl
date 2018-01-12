@@ -16,15 +16,16 @@ void CFiberListener::run(void)
 	printf("listener fiber run ...\r\n");
 
 	socket_t lfd = m_listener.sock_handle();
+	int n = 0;
 	while (true)
 	{
 		socket_t sock = fiber_accept(lfd, NULL, NULL);
 		if (sock == INVALID_SOCKET)
 		{
 			printf("accept error %s\r\n", acl::last_serror());
-			break;
+			continue;
 		}
-		printf("accept one connection, sock=%d\r\n", sock);
+		//printf("accept one connection, sock=%d, n=%d\r\n", sock, ++n);
 		acl::socket_stream* conn = new acl::socket_stream;
 		conn->open(sock);
 		acl::fiber* fb = new CFiberClient(conn);

@@ -39,7 +39,9 @@ static FILE_EVENT *file_event_find(EVENT_WMSG *ev, SOCKET fd)
 {
 	char key[64];
 
-	_snprintf(key, sizeof(key), "%d", fd);
+	//_snprintf(key, sizeof(key), "%u", fd);
+	_itoa(fd, key, 10);
+
 	return (FILE_EVENT *) htable_find(ev->tbl, key);
 }
 
@@ -68,7 +70,9 @@ static void wmsg_fdmap_set(EVENT_WMSG *ev, FILE_EVENT *fe)
 	FILE_EVENT *pfe;
 	char key[64];
 
-	_snprintf(key, sizeof(key), "%d", fe->fd);
+	//_snprintf(key, sizeof(key), "%u", fe->fd);
+	_itoa(fe->fd, key, 10);
+
 	pfe = (FILE_EVENT *) htable_find(ev->tbl, key);
 	if (pfe == NULL) {
 		htable_enter(ev->tbl, key, fe);
@@ -82,7 +86,9 @@ static FILE_EVENT *wmsg_fdmap_get(EVENT_WMSG *ev, SOCKET fd)
 {
 	char key[64];
 
-	_snprintf(key, sizeof(key), "%d", fd);
+	//_snprintf(key, sizeof(key), "%u", fd);
+	_itoa(fd, key, 10);
+
 	return (FILE_EVENT *) htable_find(ev->tbl, key);
 }
 
@@ -90,7 +96,9 @@ static void wmsg_fdmap_del(EVENT_WMSG *ev, FILE_EVENT *fe)
 {
 	char key[64];
 
-	_snprintf(key, sizeof(key), "%d", fe->fd);
+	//_snprintf(key, sizeof(key), "%u", fe->fd);
+	_itoa(fe->fd, key, 10);
+
 	htable_delete(ev->tbl, key, NULL);
 }
 
@@ -122,6 +130,13 @@ static int wmsg_add_write(EVENT_WMSG *ev, FILE_EVENT *fe)
 	if (fe->mask & EVENT_READ) {
 		lEvent |= FD_READ;
 	}
+
+#ifdef SYS_WIN
+	if (fe->oper & EVENT_ADD_CONNECT) {
+		lEvent   |= FD_CONNECT;
+		fe->oper &= ~EVENT_ADD_CONNECT;
+	}
+#endif
 
 	if (WSAAsyncSelect(fe->fd, ev->hWnd, ev->nMsg, lEvent) != 0) {
 		msg_error("%s(%d): set read error: %s",
@@ -191,23 +206,22 @@ static int wmsg_wait(EVENT *ev, int timeout)
 	if (!res) {
 		return 0;
 	}
-	//if (msg.message != WM_TIMER || msg.hwnd != NULL || msg.wParam != id) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	//}
-	return 0;
+#if 1
+	TranslateMessage(&msg);
+	DispatchMessage(&msg);
+#else
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-
+#endif
 	return 0;
 }
 
 static void onRead(EVENT_WMSG *ev, SOCKET fd)
 {
 	FILE_EVENT *fe = wmsg_fdmap_get(ev, fd);
-	if (fe == NULL || fe->oper & EVENT_DEL_READ) {
+	if (fe == NULL) {
 		msg_error("%s(%d): no FILE_EVENT, fd=%d",
 			__FUNCTION__, __LINE__, fd);
 	} else if (fe->r_proc == NULL) {

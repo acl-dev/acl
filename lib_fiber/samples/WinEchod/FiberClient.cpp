@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FiberClient.h"
 
-
 CFiberClient::CFiberClient(acl::socket_stream* conn)
 	: m_conn(conn)
 {
@@ -20,7 +19,10 @@ void CFiberClient::run(void)
 		int ret = fiber_recv(sock, buf, sizeof(buf) - 1, 0);
 		if (ret <= 0)
 		{
-			printf("recv error: %s\r\n", acl::last_serror());
+			int err0 = acl_fiber_last_error();
+			int err1 = acl::last_error();
+			printf("recv error: %s, %d, %d\r\n",
+				acl::last_serror(), err0, err1);
 			break;
 		}
 		buf[ret] = 0;

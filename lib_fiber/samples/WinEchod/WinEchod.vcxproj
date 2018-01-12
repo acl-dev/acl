@@ -113,6 +113,7 @@ copy ..\..\..\lib_fiber\cpp\lib_fiber_cpp.dll .\ /Y</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FiberClient.h" />
+    <ClInclude Include="FiberConnect.h" />
     <ClInclude Include="FiberListener.h" />
     <ClInclude Include="FiberSleep.h" />
     <ClInclude Include="Resource.h" />
@@ -123,6 +124,7 @@ copy ..\..\..\lib_fiber\cpp\lib_fiber_cpp.dll .\ /Y</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FiberClient.cpp" />
+    <ClCompile Include="FiberConnect.cpp" />
     <ClCompile Include="FiberListener.cpp" />
     <ClCompile Include="FiberSleep.cpp" />
     <ClCompile Include="stdafx.cpp">

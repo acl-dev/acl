@@ -89,7 +89,7 @@ static void thread_free(void *ctx fiber_unused)
 		}
 
 		if (ee->epfd >= 0 && __sys_close(ee->epfd) < 0) {
-			fiber_save_errno();
+			fiber_save_errno(acl_fiber_last_error());
 		}
 
 		free(ee->fds);

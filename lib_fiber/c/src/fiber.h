@@ -76,7 +76,7 @@ int fbase_event_wakeup(FIBER_BASE *fbase);
 void fbase_event_close(FIBER_BASE *fbase);
 
 /* in fiber_schedule.c */
-void fiber_save_errno(void);
+void fiber_save_errno(int errnum);
 void fiber_exit(int exit_code);
 void fiber_system(void);
 void fiber_count_inc(void);

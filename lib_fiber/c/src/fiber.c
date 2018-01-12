@@ -220,7 +220,7 @@ int fcntl(int fd, int cmd, ...)
 	va_end(ap);
 
 	if (ret < 0) {
-		fiber_save_errno();
+		fiber_save_errno(acl_fiber_last_error());
 	}
 
 	return ret;
@@ -260,7 +260,7 @@ void acl_fiber_keep_errno(ACL_FIBER *fiber, int yesno)
 	}
 }
 
-void fiber_save_errno(void)
+void fiber_save_errno(int errnum)
 {
 	ACL_FIBER *curr;
 
@@ -278,9 +278,9 @@ void fiber_save_errno(void)
 	}
 
 	if (__sys_errno != NULL) {
-		acl_fiber_set_errno(curr, *__sys_errno());
+		acl_fiber_set_errno(curr, errnum);
 	} else {
-		acl_fiber_set_errno(curr, acl_fiber_last_error());
+		acl_fiber_set_errno(curr, errnum);
 	}
 }
 
@@ -822,7 +822,6 @@ int acl_fiber_last_error(void)
 
 	error = WSAGetLastError();
 	WSASetLastError(error);
-	printf("errno=%d, %d\r\n", errno, error);
 	return error;
 #else
 	return errno;

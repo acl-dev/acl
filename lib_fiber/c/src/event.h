@@ -55,9 +55,11 @@ struct FILE_EVENT {
 
 	unsigned oper;
 #define	EVENT_ADD_READ		(unsigned) (1 << 0)
-#define	EVENT_ADD_WRITE		(unsigned) (1 << 1)
-#define	EVENT_DEL_READ		(unsigned) (1 << 2)
+#define	EVENT_DEL_READ		(unsigned) (1 << 1)
+#define	EVENT_ADD_WRITE		(unsigned) (1 << 2)
 #define	EVENT_DEL_WRITE		(unsigned) (1 << 3)
+#define EVENT_ADD_CONNECT	(unsigned) (1 << 4)
+#define EVENT_DEL_CONNECT	(unsigned) (1 << 5)  // not used yet!
 
 	unsigned mask;
 #define	EVENT_NONE		0

@@ -15,6 +15,6 @@ void CFiberSleep::run(void)
 	while (true)
 	{
 		acl::fiber::delay(1000);
-		printf("fiber-%d wakeup\r\n", acl::fiber::self());
+		//printf("fiber-%d wakeup\r\n", acl::fiber::self());
 	}
 }

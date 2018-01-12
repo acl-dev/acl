@@ -76,7 +76,7 @@ socket_t fiber_socket(int domain, int type, int protocol)
 	if (sockfd != INVALID_SOCKET) {
 		non_blocking(sockfd, NON_BLOCKING);
 	} else {
-		fiber_save_errno();
+		fiber_save_errno(acl_fiber_last_error());
 	}
 
 	return sockfd;
@@ -97,17 +97,19 @@ int fiber_listen(socket_t sockfd, int backlog)
 		return 0;
 	}
 
-	fiber_save_errno();
+	fiber_save_errno(acl_fiber_last_error());
 	return -1;
 }
 
-#define FAST_ACCEPT
+//#define FAST_ACCEPT
 
 socket_t fiber_accept(socket_t sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
 	FILE_EVENT *fe;
 	socket_t clifd;
+#ifdef	FAST_ACCEPT
 	int  err;
+#endif
 
 	if (sockfd == INVALID_SOCKET) {
 		msg_error("%s: invalid sockfd %d", __FUNCTION__, sockfd);
@@ -161,15 +163,15 @@ socket_t fiber_accept(socket_t sockfd, struct sockaddr *addr, socklen_t *addrlen
 		return clifd;
 	}
 
-	fiber_save_errno();
+	fiber_save_errno(err);
 	return clifd;
 #else
-	file_event_init(&fe, sockfd);
-	fiber_wait_read(&fe);
+	fe = fiber_file_open(sockfd);
+	fiber_wait_read(fe);
 
-	if (acl_fiber_killed(fe.fiber)) {
+	if (acl_fiber_killed(fe->fiber)) {
 		msg_info("%s(%d), %s: fiber-%u was killed", __FILE__,
-			__LINE__, __FUNCTION__, acl_fiber_id(fe.fiber));
+			__LINE__, __FUNCTION__, acl_fiber_id(fe->fiber));
 		return -1;
 	}
 
@@ -181,7 +183,7 @@ socket_t fiber_accept(socket_t sockfd, struct sockaddr *addr, socklen_t *addrlen
 		return clifd;
 	}
 
-	fiber_save_errno();
+	fiber_save_errno(acl_fiber_last_error());
 	return clifd;
 #endif
 }
@@ -207,8 +209,8 @@ int fiber_connect(socket_t sockfd, const struct sockaddr *addr, socklen_t addrle
 		return ret;
 	}
 
-	fiber_save_errno();
 	err = acl_fiber_last_error();
+	fiber_save_errno(err);
 
 	if (err != FIBER_EINPROGRESS) {
 		if (err == FIBER_ECONNREFUSED) {
@@ -249,6 +251,9 @@ int fiber_connect(socket_t sockfd, const struct sockaddr *addr, socklen_t addrle
 	}
 
 	fe = fiber_file_open(sockfd);
+#ifdef SYS_WIN
+	fe->oper |= EVENT_ADD_CONNECT;
+#endif
 	fiber_wait_write(fe);
 
 	if (acl_fiber_killed(fe->fiber)) {
@@ -269,7 +274,7 @@ int fiber_connect(socket_t sockfd, const struct sockaddr *addr, socklen_t addrle
 			return 0;
 		}
 
-		fiber_save_errno();
+		fiber_save_errno(acl_fiber_last_error());
 		msg_error("%s(%d), %s: getpeername error %s, fd: %d",
 			__FILE__, __LINE__, __FUNCTION__,
 			last_serror(), sockfd);

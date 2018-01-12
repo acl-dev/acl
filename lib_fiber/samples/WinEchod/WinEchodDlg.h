@@ -40,4 +40,8 @@ public:
 	afx_msg void OnBnClickedListen();
 	afx_msg void OnBnClickedStartSchedule();
 	afx_msg void OnBnClickedCreateTimer();
+	afx_msg void OnBnClickedConnect();
+private:
+	UINT m_cocurrent;
+	UINT m_count;
 };

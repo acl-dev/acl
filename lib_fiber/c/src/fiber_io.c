@@ -13,7 +13,11 @@ typedef struct {
 	RING       ev_timer;
 	int        nsleeping;
 	int        io_stop;
+#ifdef SYS_WIN
+	HTABLE      *events;
+#else
 	FILE_EVENT **events;
+#endif
 } FIBER_TLS;
 
 static FIBER_TLS *__main_fiber = NULL;
@@ -24,7 +28,7 @@ static void fiber_io_loop(ACL_FIBER *fiber, void *ctx);
 #define MAXFD		1024
 #define STACK_SIZE	819200
 
-socket_t var_maxfd = 1024;
+socket_t var_maxfd = MAXFD;
 
 void acl_fiber_schedule_stop(void)
 {
@@ -53,7 +57,12 @@ static void thread_free(void *ctx)
 		tf->event = NULL;
 	}
 
+#ifdef SYS_WIN
+	htable_free(tf->events, NULL);
+#else
 	free(tf->events);
+#endif
+
 	free(tf);
 
 	if (__main_fiber == __thread_fiber) {
@@ -108,8 +117,12 @@ void fiber_io_check(void)
 	__thread_fiber->io_stop = 0;
 	ring_init(&__thread_fiber->ev_timer);
 
+#ifdef SYS_WIN
+	__thread_fiber->events = htable_create(var_maxfd);
+#else
 	__thread_fiber->events = (FILE_EVENT **)
 		calloc(var_maxfd, sizeof(FILE_EVENT*));
+#endif
 
 	if (__pthread_self() == main_thread_self()) {
 		__main_fiber = __thread_fiber;
@@ -371,18 +384,36 @@ void fiber_wait_write(FILE_EVENT *fe)
 
 static FILE_EVENT *fiber_file_get(socket_t fd)
 {
+#ifdef SYS_WIN
+	char key[64];
+
 	fiber_io_check();
-	if (fd < 0 || fd >= var_maxfd) {
+	//_snprintf(key, sizeof(key), "%u", fd);
+	_itoa(fd, key, 10); // key's space large enougth
+
+	return (FILE_EVENT *) htable_find(__thread_fiber->events, key);
+#else
+	fiber_io_check();
+	if (fd == INVALID_SOCKET || fd >= var_maxfd) {
 		msg_error("%s(%d): invalid fd=%d",
 			__FUNCTION__, __LINE__, fd);
 		return NULL;
 	}
 
 	return __thread_fiber->events[fd];
+#endif
 }
 
 static void fiber_file_set(FILE_EVENT *fe)
 {
+#ifdef SYS_WIN
+	char key[64];
+
+	//_snprintf(key, sizeof(key), "%u", fe->fd);
+	_itoa(fe->fd, key, 10);
+
+	htable_enter(__thread_fiber->events, key, fe);
+#else
 	if (fe->fd == INVALID_SOCKET || fe->fd >= (socket_t) var_maxfd) {
 		msg_fatal("%s(%d): invalid fd=%d",
 			__FUNCTION__, __LINE__, fe->fd);
@@ -394,6 +425,7 @@ static void fiber_file_set(FILE_EVENT *fe)
 	}
 
 	__thread_fiber->events[fe->fd] = fe;
+#endif
 }
 
 FILE_EVENT *fiber_file_open(socket_t fd)
@@ -409,6 +441,21 @@ FILE_EVENT *fiber_file_open(socket_t fd)
 
 static int fiber_file_del(FILE_EVENT *fe)
 {
+#ifdef SYS_WIN
+	char key[64];
+
+	if (fe->fd == INVALID_SOCKET || fe->fd >= var_maxfd) {
+		msg_error("%s(%d): invalid fd=%d",
+			__FUNCTION__, __LINE__, fe->fd);
+		return -1;
+	}
+
+	//_snprintf(key, sizeof(key), "%u", fe->fd);
+	_itoa(fe->fd, key, 10);
+
+	htable_delete(__thread_fiber->events, key, NULL);
+	return 0;
+#else
 	if (fe->fd == INVALID_SOCKET || fe->fd >= var_maxfd) {
 		msg_error("%s(%d): invalid fd=%d",
 			__FUNCTION__, __LINE__, fe->fd);
@@ -424,6 +471,7 @@ static int fiber_file_del(FILE_EVENT *fe)
 
 	__thread_fiber->events[fe->fd] = NULL;
 	return 0;
+#endif
 }
 
 int fiber_file_close(socket_t fd)
@@ -431,8 +479,8 @@ int fiber_file_close(socket_t fd)
 	FILE_EVENT *fe;
 
 	fiber_io_check();
-	if (fd < 0 || fd >= var_maxfd) {
-		msg_error("%s(%d): invalid fd=%d", __FUNCTION__, __LINE__, fd);
+	if (fd == INVALID_SOCKET || fd >= var_maxfd) {
+		msg_error("%s(%d): invalid fd=%u", __FUNCTION__, __LINE__, fd);
 		return -1;
 	}
 

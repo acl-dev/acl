@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "FiberListener.h"
 #include "FiberSleep.h"
+#include "FiberConnect.h"
 #include "WinEchod.h"
 #include "WinEchodDlg.h"
 #include "afxdialogex.h"
@@ -53,6 +54,8 @@ CWinEchodDlg::CWinEchodDlg(CWnd* pParent /*=NULL*/)
 	, m_listenPort(9001)
 	, m_listenIP(_T("127.0.0.1"))
 	, m_fiberListen(NULL)
+	, m_cocurrent(1)
+	, m_count(100)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -74,6 +77,10 @@ void CWinEchodDlg::DoDataExchange(CDataExchange* pDX)
 	DDV_MinMaxUInt(pDX, m_listenPort, 0, 65535);
 	DDX_Text(pDX, IDC_LISTEN_IP, m_listenIP);
 	DDV_MaxChars(pDX, m_listenIP, 64);
+	DDX_Text(pDX, IDC_COCURRENT, m_cocurrent);
+	DDV_MinMaxUInt(pDX, m_cocurrent, 1, 1000);
+	DDX_Text(pDX, IDC_COUNT, m_count);
+	DDV_MinMaxUInt(pDX, m_count, 100, 1000);
 }
 
 BEGIN_MESSAGE_MAP(CWinEchodDlg, CDialogEx)
@@ -84,6 +91,7 @@ BEGIN_MESSAGE_MAP(CWinEchodDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_LISTEN, &CWinEchodDlg::OnBnClickedListen)
 	ON_BN_CLICKED(IDC_START_SCHEDULE, &CWinEchodDlg::OnBnClickedStartSchedule)
 	ON_BN_CLICKED(IDC_CREATE_TIMER, &CWinEchodDlg::OnBnClickedCreateTimer)
+	ON_BN_CLICKED(IDC_CONNECT, &CWinEchodDlg::OnBnClickedConnect)
 END_MESSAGE_MAP()
 
 
@@ -244,4 +252,16 @@ void CWinEchodDlg::OnBnClickedCreateTimer()
 	// TODO: 在此添加控件通知处理程序代码
 	acl::fiber* fb = new CFiberSleep;
 	fb->start();
+}
+
+
+void CWinEchodDlg::OnBnClickedConnect()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData();
+	for (UINT i = 0; i < m_cocurrent; i++)
+	{
+		acl::fiber* fb = new CFiberConnect(m_count);
+		fb->start();
+	}
 }
