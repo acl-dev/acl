@@ -13,6 +13,6 @@
 #include "common/strops.h"
 #include "common/pthread_patch.h"
 #include "common/memory.h"
-//#include "common/sane_socket.h"
+#include "common/sane_socket.h"
 
 #endif

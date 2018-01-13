@@ -10,6 +10,7 @@ void file_event_init(FILE_EVENT *fe, int fd)
 	fe->fiber  = acl_fiber_running();
 	fe->fd     = fd;
 	fe->id     = -1;
+	fe->status = STATUS_NONE;
 	fe->type   = TYPE_NONE;
 	fe->oper   = 0;
 	fe->mask   = 0;
@@ -22,7 +23,7 @@ void file_event_init(FILE_EVENT *fe, int fd)
 
 FILE_EVENT *file_event_alloc(int fd)
 {
-	FILE_EVENT *fe = (FILE_EVENT *) malloc(sizeof(FILE_EVENT));
+	FILE_EVENT *fe = (FILE_EVENT *) calloc(1, sizeof(FILE_EVENT));
 	file_event_init(fe, fd);
 	return fe;
 }

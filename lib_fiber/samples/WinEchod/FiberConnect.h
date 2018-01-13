@@ -16,6 +16,6 @@ private:
 	UINT     m_count;
 	socket_t m_sock;
 
-	void doEchoe(void);
+	void doEcho(void);
 };
 

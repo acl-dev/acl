@@ -4,8 +4,6 @@
 #ifdef HAS_WMSG
 
 #include <winuser.h>
-#include "fiber/lib_fiber.h"
-#include "common/sane_socket.h"
 #include "event.h"
 #include "event_wmsg.h"
 
@@ -125,18 +123,15 @@ static int wmsg_add_read(EVENT_WMSG *ev, FILE_EVENT *fe)
 
 static int wmsg_add_write(EVENT_WMSG *ev, FILE_EVENT *fe)
 {
-	long lEvent = FD_WRITE | FD_CLOSE;
+	long lEvent =  FD_WRITE | FD_CLOSE;
 
 	if (fe->mask & EVENT_READ) {
 		lEvent |= FD_READ;
 	}
 
-#ifdef SYS_WIN
-	if (fe->oper & EVENT_ADD_CONNECT) {
-		lEvent   |= FD_CONNECT;
-		fe->oper &= ~EVENT_ADD_CONNECT;
+	if (fe->status & STATUS_CONNECTING) {
+		lEvent |= FD_CONNECT;
 	}
-#endif
 
 	if (WSAAsyncSelect(fe->fd, ev->hWnd, ev->nMsg, lEvent) != 0) {
 		msg_error("%s(%d): set read error: %s",
@@ -196,6 +191,12 @@ static int wmsg_del_write(EVENT_WMSG *ev, FILE_EVENT *fe)
 	return 0;
 }
 
+static int wmsg_check(EVENT_WMSG *ev, FILE_EVENT *fe)
+{
+	(void) ev;
+	return getsocktype(fe->fd) == -1 ? -1 : 0;
+}
+
 static int wmsg_wait(EVENT *ev, int timeout)
 {
 	MSG msg;
@@ -225,7 +226,7 @@ static void onRead(EVENT_WMSG *ev, SOCKET fd)
 		msg_error("%s(%d): no FILE_EVENT, fd=%d",
 			__FUNCTION__, __LINE__, fd);
 	} else if (fe->r_proc == NULL) {
-		msg_fatal("%s(%d): r_proc NULL, fd=%d",
+		msg_error("%s(%d): r_proc NULL, fd=%d",
 			__FUNCTION__, __LINE__, fd);
 	} else {
 		fe->r_proc(&ev->event, fe);
@@ -239,7 +240,7 @@ static void onWrite(EVENT_WMSG *ev, SOCKET fd)
 		msg_error("%s(%d): no FILE_EVENT, fd=%d",
 			__FUNCTION__, __LINE__, fd);
 	} else if (fe->w_proc == NULL) {
-		msg_fatal("%s(%d): w_proc NULL, fd=%d",
+		msg_error("%s(%d): w_proc NULL, fd=%d",
 			__FUNCTION__, __LINE__, fd);
 	} else {
 		fe->w_proc(&ev->event, fe);
@@ -253,7 +254,7 @@ static void onAccept(EVENT_WMSG *ev, SOCKET fd)
 		msg_error("%s(%d): no FILE_EVENT, fd=%d",
 			__FUNCTION__, __LINE__, fd);
 	} else if (fe->r_proc == NULL) {
-		msg_fatal("%s(%d): r_proc NULL, fd=%d",
+		msg_error("%s(%d): r_proc NULL, fd=%d",
 			__FUNCTION__, __LINE__, fd);
 	} else {
 		fe->r_proc(&ev->event, fe);
@@ -430,6 +431,7 @@ EVENT *event_wmsg_create(int size)
 	ew->event.handle = wmsg_handle;
 	ew->event.free   = wmsg_free;
 	ew->event.event_wait = wmsg_wait;
+	ew->event.check      = (event_oper *) wmsg_check;
 	ew->event.add_read   = (event_oper *) wmsg_add_read;
 	ew->event.add_write  = (event_oper *) wmsg_add_write;
 	ew->event.del_read   = (event_oper *) wmsg_del_read;

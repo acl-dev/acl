@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "fiber/lib_fiber.h"
 #include "common.h"
 
 #include "event/event_epoll.h"
@@ -94,14 +93,22 @@ void event_free(EVENT *ev)
 	ev->free(ev);
 }
 
-#if 0
-static int check_fdtype(int fd)
+#ifdef SYS_WIN
+static int check(EVENT *ev, FILE_EVENT *fe)
+{
+	if (getsocktype(fe->fd) >= 0) {
+		return 0;
+	}
+	return ev->check(ev, fe);
+}
+#else
+static int check(EVENT *ev, FILE_EVENT *fe)
 {
 	struct stat s;
 
-	if (fstat(fd, &s) < 0) {
+	if (fstat(fe->fd, &s) < 0) {
 		msg_info("%s(%d), %s: fd: %d fstat error %s", __FILE__,
-			__LINE__, __FUNCTION__, fd, last_serror());
+			__LINE__, __FUNCTION__, fe->fd, last_serror());
 		return -1;
 	}
 
@@ -119,9 +126,11 @@ static int check_fdtype(int fd)
 		return 0;
 	}
 
-	return -1;
+	return ev->check(ev, fe);
 }
-#else
+#endif
+
+#if 0
 static int check_read_wait(EVENT *ev, FILE_EVENT *fe)
 {
 	if (ev->add_read(ev, fe) == -1) {
@@ -178,7 +187,8 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	if (!(fe->mask & EVENT_READ)) {
-		if (fe->type == TYPE_NONE && check_read_wait(ev, fe) == -1) {
+		if (fe->type == TYPE_NONE && check(ev, fe) == -1) {
+			fe->type = TYPE_NOSOCK;
 			return 0;
 		}
 
@@ -197,6 +207,10 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
 	assert(fe);
 
+	if (fe->type == TYPE_NOSOCK) {
+		return 0;
+	}
+
 	if (fe->fd >= ev->setsize) {
 		msg_error("fd: %d >= setsize: %d", fe->fd, ev->setsize);
 		acl_fiber_set_error(ERANGE);
@@ -208,7 +222,8 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	if (!(fe->mask & EVENT_WRITE)) {
-		if (fe->type == TYPE_NONE && check_write_wait(ev, fe) == -1) {
+		if (fe->type == TYPE_NONE && check(ev, fe) == -1) {
+			fe->type = TYPE_NOSOCK;
 			return 0;
 		}
 
@@ -287,17 +302,18 @@ static void event_prepare(EVENT *ev)
 
 	while ((next = ring_first(&ev->events))) {
 		fe = ring_to_appl(next, FILE_EVENT, me);
-		if (fe->oper & EVENT_ADD_READ) {
-			ev->add_read(ev, fe);
-		}
-		if (fe->oper & EVENT_ADD_WRITE) {
-			ev->add_write(ev, fe);
-		}
+
 		if (fe->oper & EVENT_DEL_READ) {
 			ev->del_read(ev, fe);
 		}
 		if (fe->oper & EVENT_DEL_WRITE) {
 			ev->del_write(ev, fe);
+		}
+		if (fe->oper & EVENT_ADD_READ) {
+			ev->add_read(ev, fe);
+		}
+		if (fe->oper & EVENT_ADD_WRITE) {
+			ev->add_write(ev, fe);
 		}
 
 		ring_detach(next);
@@ -377,3 +393,4 @@ int event_process(EVENT *ev, int timeout)
 
 	return ret;
 }
+

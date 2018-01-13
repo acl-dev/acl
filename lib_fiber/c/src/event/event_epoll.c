@@ -217,6 +217,11 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 	return n;
 }
 
+static int epoll_check(EVENT *ev, FILE_EVENT *fe)
+{
+	return -1;
+}
+
 static int epoll_handle(EVENT *ev)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
@@ -249,6 +254,7 @@ EVENT *event_epoll_create(int size)
 	ep->event.free   = epoll_free;
 
 	ep->event.event_wait = epoll_event_wait;
+	ep->event.check      = (event_oper *) epoll_check;
 	ep->event.add_read   = (event_oper *) epoll_add_read;
 	ep->event.add_write  = (event_oper *) epoll_add_write;
 	ep->event.del_read   = (event_oper *) epoll_del_read;

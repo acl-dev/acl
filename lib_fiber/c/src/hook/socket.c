@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "common.h"
 
-#include "fiber/lib_fiber.h"
 #include "event.h"
 #include "fiber.h"
 
@@ -212,7 +211,12 @@ int acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr, socklen_t ad
 	err = acl_fiber_last_error();
 	fiber_save_errno(err);
 
-	if (err != FIBER_EINPROGRESS) {
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+	if (err != FIBER_EINPROGRESS && err != FIBER_EAGAIN) {
+#else
+	if (err != FIBER_EINPROGRESS && err != FIBER_EAGAIN
+		&& err != FIBER_EWOULDBLOCK) {
+#endif
 		if (err == FIBER_ECONNREFUSED) {
 			msg_error("%s(%d), %s: connect ECONNREFUSED",
 				__FILE__, __LINE__, __FUNCTION__);
@@ -252,9 +256,12 @@ int acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr, socklen_t ad
 
 	fe = fiber_file_open(sockfd);
 #ifdef SYS_WIN
-	fe->oper |= EVENT_ADD_CONNECT;
+	fe->status |= STATUS_CONNECTING;
 #endif
 	fiber_wait_write(fe);
+#ifdef SYS_WIN
+	fe->status &= ~STATUS_CONNECTING;
+#endif
 
 	if (acl_fiber_killed(fe->fiber)) {
 		msg_info("%s(%d), %s: fiber-%u was killed, %s",

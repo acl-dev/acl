@@ -80,7 +80,7 @@ void CWinEchodDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_COCURRENT, m_cocurrent);
 	DDV_MinMaxUInt(pDX, m_cocurrent, 1, 1000);
 	DDX_Text(pDX, IDC_COUNT, m_count);
-	DDV_MinMaxUInt(pDX, m_count, 100, 1000);
+	DDV_MinMaxUInt(pDX, m_count, 1, 1000);
 }
 
 BEGIN_MESSAGE_MAP(CWinEchodDlg, CDialogEx)
@@ -92,6 +92,7 @@ BEGIN_MESSAGE_MAP(CWinEchodDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_START_SCHEDULE, &CWinEchodDlg::OnBnClickedStartSchedule)
 	ON_BN_CLICKED(IDC_CREATE_TIMER, &CWinEchodDlg::OnBnClickedCreateTimer)
 	ON_BN_CLICKED(IDC_CONNECT, &CWinEchodDlg::OnBnClickedConnect)
+	ON_BN_CLICKED(IDC_STOP_SCHEDULE, &CWinEchodDlg::OnBnClickedStopSchedule)
 END_MESSAGE_MAP()
 
 
@@ -129,7 +130,8 @@ BOOL CWinEchodDlg::OnInitDialog()
 	//ShowWindow(SW_MAXIMIZE);
 
 	// TODO: 在此添加额外的初始化代码
-
+	GetDlgItem(IDC_START_SCHEDULE)->EnableWindow(TRUE);
+	GetDlgItem(IDC_STOP_SCHEDULE)->EnableWindow(FALSE);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -242,8 +244,21 @@ void CWinEchodDlg::OnBnClickedStartSchedule()
 {
 	// TODO: 在此添加控件通知处理程序代码
 
-	OnBnClickedCreateTimer();
+	GetDlgItem(IDC_START_SCHEDULE)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STOP_SCHEDULE)->EnableWindow(TRUE);
+	//OnBnClickedCreateTimer();
+
 	acl::fiber::schedule(acl::FIBER_EVENT_T_WMSG);
+	
+	GetDlgItem(IDC_START_SCHEDULE)->EnableWindow(TRUE);
+	GetDlgItem(IDC_STOP_SCHEDULE)->EnableWindow(FALSE);
+}
+
+
+void CWinEchodDlg::OnBnClickedStopSchedule()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	acl::fiber::schedule_stop();
 }
 
 

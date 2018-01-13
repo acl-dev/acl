@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "FiberConnect.h"
 
-CFiberConnect::CFiberConnect(UINT count)
-	: m_count(count)
+CFiberConnect::CFiberConnect(const char* serverIP, int serverPort, UINT count)
+	: m_serverIP(serverIP)
+	, m_serverPort(serverPort)
+	, m_count(count)
 	, m_sock(INVALID_SOCKET)
 {
 }
@@ -49,5 +51,8 @@ void CFiberConnect::doEcho(void)
 			printf("read error %s\r\n", acl::last_serror());
 			break;
 		}
+		buf[n];
 	}
+	printf("Echo over, fd=%u\r\n", m_sock);
 }
+

@@ -44,4 +44,6 @@ public:
 private:
 	UINT m_cocurrent;
 	UINT m_count;
+public:
+	afx_msg void OnBnClickedStopSchedule();
 };

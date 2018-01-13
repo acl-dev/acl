@@ -48,7 +48,11 @@ struct FILE_EVENT {
 	ACL_FIBER *fiber;
 	socket_t   fd;
 	int id;
-	int type;
+	unsigned status;
+#define	STATUS_NONE		0
+#define	STATUS_CONNECTING	1
+
+	unsigned type;
 #define	TYPE_NONE		0
 #define	TYPE_SOCK		1
 #define	TYPE_NOSOCK		2
@@ -58,8 +62,6 @@ struct FILE_EVENT {
 #define	EVENT_DEL_READ		(unsigned) (1 << 1)
 #define	EVENT_ADD_WRITE		(unsigned) (1 << 2)
 #define	EVENT_DEL_WRITE		(unsigned) (1 << 3)
-#define EVENT_ADD_CONNECT	(unsigned) (1 << 4)
-#define EVENT_DEL_CONNECT	(unsigned) (1 << 5)  // not used yet!
 
 	unsigned mask;
 #define	EVENT_NONE		0
@@ -138,6 +140,7 @@ struct EVENT {
 
 	int  (*event_wait)(EVENT *, int);
 
+	event_oper *check;
 	event_oper *add_read;
 	event_oper *add_write;
 	event_oper *del_read;

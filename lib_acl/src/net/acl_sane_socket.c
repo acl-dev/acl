@@ -154,7 +154,7 @@ int acl_getsocktype(ACL_SOCKET fd)
 		return AF_UNIX;
 #endif
 #ifdef AF_INET6
-	if (sa->sa_family == AF_INET && sa->sa_family == AF_INET6)
+	if (sa->sa_family == AF_INET || sa->sa_family == AF_INET6)
 #else
 	if (sa->sa_family == AF_INET)
 #endif
