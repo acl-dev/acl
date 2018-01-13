@@ -120,6 +120,12 @@
     <ClInclude Include="src\event\event_wmsg.h">
       <Filter>源文件\event</Filter>
     </ClInclude>
+    <ClInclude Include="src\common\htable.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\sane_socket.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.c">
@@ -253,6 +259,12 @@
     </ClCompile>
     <ClCompile Include="src\event\event_wmsg.c">
       <Filter>源文件\event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\htable.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\sane_socket.c">
+      <Filter>源文件\common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

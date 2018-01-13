@@ -34,6 +34,7 @@ private:
 	FILE* m_dosFp;
 	UINT m_listenPort;
 	CString m_listenIP;
+	acl::string m_listenAddr;
 	acl::server_socket m_listen;
 	acl::fiber* m_fiberListen;
 public:

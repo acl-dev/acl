@@ -2,7 +2,7 @@
 class CFiberConnect : public acl::fiber
 {
 public:
-	CFiberConnect(const char* serverIP, int serverPort, UINT count);
+	CFiberConnect(const char* serverAddr, int count);
 
 private:
 	~CFiberConnect(void);
@@ -11,10 +11,9 @@ private:
 	void run(void);
 
 private:
-	CString  m_serverIP;
-	int      m_serverPort;
-	UINT     m_count;
-	socket_t m_sock;
+	acl::string m_serverAddr;
+	int         m_count;
+	socket_t    m_sock;
 
 	void doEcho(void);
 };
