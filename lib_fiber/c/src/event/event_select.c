@@ -196,6 +196,11 @@ static int select_event_wait(EVENT *ev, int timeout)
 	return n;
 }
 
+static int select_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe UNUSED)
+{
+	return -1;
+}
+
 static int select_handle(EVENT *ev)
 {
 	(void) ev;
@@ -209,7 +214,7 @@ static const char *select_name(void)
 
 EVENT *event_select_create(int size)
 {
-	EVENT_SELECT *es = (EVENT_SELECT *) malloc(sizeof(EVENT_SELECT));
+	EVENT_SELECT *es = (EVENT_SELECT *) calloc(1, sizeof(EVENT_SELECT));
 
 	if (__sys_select == NULL) {
 		hook_init();
@@ -231,6 +236,7 @@ EVENT *event_select_create(int size)
 	es->event.free   = select_free;
 
 	es->event.event_wait = select_event_wait;
+	es->event.checkfd    = (event_oper *) select_checkfd;
 	es->event.add_read   = (event_oper *) select_add_read;
 	es->event.add_write  = (event_oper *) select_add_write;
 	es->event.del_read   = (event_oper *) select_del_read;

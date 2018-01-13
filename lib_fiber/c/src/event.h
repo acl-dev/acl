@@ -124,6 +124,7 @@ struct EPOLL_EVENT {
 struct EVENT {
 	RING events;
 	int  timeout;
+	int  fdcount;
 	socket_t setsize;
 	socket_t maxfd;
 
@@ -140,7 +141,7 @@ struct EVENT {
 
 	int  (*event_wait)(EVENT *, int);
 
-	event_oper *check;
+	event_oper *checkfd;
 	event_oper *add_read;
 	event_oper *add_write;
 	event_oper *del_read;

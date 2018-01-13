@@ -61,6 +61,7 @@ EVENT *event_create(int size)
 	ring_init(&ev->events);
 	ev->timeout = -1;
 	ev->setsize = size;
+	ev->fdcount = 0;
 	ev->maxfd   = -1;
 
 #ifdef HAS_POLL
@@ -99,10 +100,10 @@ static int check(EVENT *ev, FILE_EVENT *fe)
 	if (getsocktype(fe->fd) >= 0) {
 		return 0;
 	}
-	return ev->check(ev, fe);
+	return ev->checkfd(ev, fe);
 }
 #else
-static int check(EVENT *ev, FILE_EVENT *fe)
+static int checkfd(EVENT *ev, FILE_EVENT *fe)
 {
 	struct stat s;
 
@@ -122,11 +123,11 @@ static int check(EVENT *ev, FILE_EVENT *fe)
 	if (S_ISCHR(s.st_mode)) {
 		return 0;
 	}
-	if (isatty(fd)) {
+	if (isatty(fe->fd)) {
 		return 0;
 	}
 
-	return ev->check(ev, fe);
+	return ev->checkfd(ev, fe);
 }
 #endif
 
@@ -187,9 +188,13 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	if (!(fe->mask & EVENT_READ)) {
-		if (fe->type == TYPE_NONE && check(ev, fe) == -1) {
-			fe->type = TYPE_NOSOCK;
-			return 0;
+		if (fe->type == TYPE_NONE) {
+			if (checkfd(ev, fe) == -1) {
+				fe->type = TYPE_NOSOCK;
+				return 0;
+			} else {
+				fe->type = TYPE_SOCK;
+			}
 		}
 
 		if (fe->me.parent == &fe->me) {
@@ -222,9 +227,13 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	if (!(fe->mask & EVENT_WRITE)) {
-		if (fe->type == TYPE_NONE && check(ev, fe) == -1) {
-			fe->type = TYPE_NOSOCK;
-			return 0;
+		if (fe->type == TYPE_NONE) {
+			if (checkfd(ev, fe) == -1) {
+				fe->type = TYPE_NOSOCK;
+				return 0;
+			} else {
+				fe->type = TYPE_SOCK;
+			}
 		}
 
 		if (fe->me.parent == &fe->me) {

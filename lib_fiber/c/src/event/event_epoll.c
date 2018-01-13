@@ -61,7 +61,7 @@ static void epoll_free(EVENT *ev)
 static int epoll_add_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 {
 	struct epoll_event ee;
-	int op;
+	int op, n;
 
 	if ((fe->mask & EVENT_READ))
 		return 0;
@@ -75,12 +75,15 @@ static int epoll_add_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	if (fe->mask & EVENT_WRITE) {
 		ee.events |= EPOLLOUT;
 		op = EPOLL_CTL_MOD;
+		n  = 0;
 	} else {
 		op = EPOLL_CTL_ADD;
+		n  = 1;
 	}
 
 	if (__sys_epoll_ctl(ep->epfd, op, fe->fd, &ee) == 0) {
 		fe->mask |= EVENT_READ;
+		ep->event.fdcount += n;
 		return 0;
 	}
 
@@ -94,7 +97,7 @@ static int epoll_add_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 static int epoll_add_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 {
 	struct epoll_event ee;
-	int op;
+	int op, n;
 
 	ee.events   = 0;
 	ee.data.u32 = 0;
@@ -106,12 +109,15 @@ static int epoll_add_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	if (fe->mask & EVENT_READ) {
 		ee.events |= EPOLLIN;
 		op = EPOLL_CTL_MOD;
+		n  = 0;
 	} else {
 		op = EPOLL_CTL_ADD;
+		n  = 1;
 	}
 
 	if (__sys_epoll_ctl(ep->epfd, op, fe->fd, &ee) == 0) {
 		fe->mask |= EVENT_WRITE;
+		ep->event.fdcount += n;
 		return 0;
 	}
 
@@ -125,7 +131,7 @@ static int epoll_add_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 static int epoll_del_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 {
 	struct epoll_event ee;
-	int op;
+	int op, n = 0;
 
 	ee.events   = 0;
 	ee.data.u64 = 0;
@@ -135,12 +141,15 @@ static int epoll_del_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	if (fe->mask & EVENT_WRITE) {
 		ee.events = EPOLLOUT;
 		op = EPOLL_CTL_MOD;
+		n  = 0;
 	} else {
 		op = EPOLL_CTL_DEL;
+		n  = -1;
 	}
 
 	if (__sys_epoll_ctl(ep->epfd, op, fe->fd, &ee) == 0) {
 		fe->mask &= ~EVENT_READ;
+		ep->event.fdcount += n;
 		return 0;
 	}
 
@@ -154,7 +163,7 @@ static int epoll_del_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 static int epoll_del_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 {
 	struct epoll_event ee;
-	int op;
+	int op, n;
 
 	ee.events   = 0;
 	ee.data.u64 = 0;
@@ -164,12 +173,15 @@ static int epoll_del_write(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	if (fe->mask & EVENT_READ) {
 		ee.events = EPOLLIN;
 		op = EPOLL_CTL_MOD;
+		n  = 0;
 	} else {
 		op = EPOLL_CTL_DEL;
+		n  = -1;
 	}
 
 	if (__sys_epoll_ctl(ep->epfd, op, fe->fd, &ee) == 0) {
 		fe->mask &= ~EVENT_WRITE;
+		ep->event.fdcount += n;
 		return 0;
 	}
 
@@ -217,9 +229,17 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 	return n;
 }
 
-static int epoll_check(EVENT *ev, FILE_EVENT *fe)
+static int epoll_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe UNUSED)
 {
-	return -1;
+	if (ev->add_read(ev, fe) == -1) {
+		return -1;
+	}
+	if (ev->del_read(ev, fe) == -1) {
+		msg_error("%s(%d): del_read failed, fd=%d",
+			__FUNCTION__, __LINE__, fe->fd);
+		return -1;
+	}
+	return 0;
 }
 
 static int epoll_handle(EVENT *ev)
@@ -236,7 +256,7 @@ static const char *epoll_name(void)
 
 EVENT *event_epoll_create(int size)
 {
-	EVENT_EPOLL *ep = (EVENT_EPOLL *) malloc(sizeof(EVENT_EPOLL));
+	EVENT_EPOLL *ep = (EVENT_EPOLL *) calloc(1, sizeof(EVENT_EPOLL));
 
 	if (__sys_epoll_create == NULL) {
 		hook_init();
@@ -254,7 +274,7 @@ EVENT *event_epoll_create(int size)
 	ep->event.free   = epoll_free;
 
 	ep->event.event_wait = epoll_event_wait;
-	ep->event.check      = (event_oper *) epoll_check;
+	ep->event.checkfd    = (event_oper *) epoll_checkfd;
 	ep->event.add_read   = (event_oper *) epoll_add_read;
 	ep->event.add_write  = (event_oper *) epoll_add_write;
 	ep->event.del_read   = (event_oper *) epoll_del_read;

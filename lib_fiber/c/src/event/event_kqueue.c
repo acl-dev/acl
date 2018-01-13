@@ -184,6 +184,11 @@ static int kqueue_wait(EVENT *ev, int timeout)
 	return n;
 }
 
+static int kqueue_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe UNUSED)
+{
+	return -1;
+}
+
 static int kqueue_handle(EVENT *ev)
 {
 	EVENT_KQUEUE *ek = (EVENT_KQUEUE *) ev;
@@ -198,7 +203,7 @@ static const char *kqueue_name(void)
 
 EVENT *event_kqueue_create(int size)
 {
-	EVENT_KQUEUE *ek = (EVENT_KQUEUE *) malloc(sizeof(EVENT_KQUEUE));
+	EVENT_KQUEUE *ek = (EVENT_KQUEUE *) calloc(1, sizeof(EVENT_KQUEUE));
 
 	if (__sys_kqueue == NULL) {
 		hook_init();
@@ -221,6 +226,7 @@ EVENT *event_kqueue_create(int size)
 	ek->event.free   = kqueue_free;
 
 	ek->event.event_wait = kqueue_wait;
+	ek->event.checkfd    = (event_oper *) kqueue_checkfd;
 	ek->event.add_read   = (event_oper *) kqueue_add_read;
 	ek->event.add_write  = (event_oper *) kqueue_add_write;
 	ek->event.del_read   = (event_oper *) kqueue_del_read;

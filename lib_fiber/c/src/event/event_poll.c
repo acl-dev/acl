@@ -177,6 +177,11 @@ static int poll_wait(EVENT *ev, int timeout)
 	return n;
 }
 
+static int poll_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe UNUSED)
+{
+	return -1;
+}
+
 static int poll_handle(EVENT *ev)
 {
 	(void) ev;
@@ -190,7 +195,7 @@ static const char *poll_name(void)
 
 EVENT *event_poll_create(int size)
 {
-	EVENT_POLL *ep = (EVENT_POLL *) malloc(sizeof(EVENT_POLL));
+	EVENT_POLL *ep = (EVENT_POLL *) calloc(1, sizeof(EVENT_POLL));
 
 	if (__sys_poll == NULL) {
 		hook_init();
@@ -208,6 +213,7 @@ EVENT *event_poll_create(int size)
 	ep->event.free   = poll_free;
 
 	ep->event.event_wait = poll_wait;
+	ep->event.checkfd    = (event_oper *) poll_checkfd;
 	ep->event.add_read   = (event_oper *) poll_add_read;
 	ep->event.add_write  = (event_oper *) poll_add_write;
 	ep->event.del_read   = (event_oper *) poll_del_read;

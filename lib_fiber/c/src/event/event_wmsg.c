@@ -191,7 +191,7 @@ static int wmsg_del_write(EVENT_WMSG *ev, FILE_EVENT *fe)
 	return 0;
 }
 
-static int wmsg_check(EVENT_WMSG *ev, FILE_EVENT *fe)
+static int wmsg_checkfd(EVENT_WMSG *ev, FILE_EVENT *fe)
 {
 	(void) ev;
 	return getsocktype(fe->fd) == -1 ? -1 : 0;
@@ -431,7 +431,7 @@ EVENT *event_wmsg_create(int size)
 	ew->event.handle = wmsg_handle;
 	ew->event.free   = wmsg_free;
 	ew->event.event_wait = wmsg_wait;
-	ew->event.check      = (event_oper *) wmsg_check;
+	ew->event.checkfd    = (event_oper *) wmsg_checkfd;
 	ew->event.add_read   = (event_oper *) wmsg_add_read;
 	ew->event.add_write  = (event_oper *) wmsg_add_write;
 	ew->event.del_read   = (event_oper *) wmsg_del_read;
