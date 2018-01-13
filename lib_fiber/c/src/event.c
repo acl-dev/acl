@@ -95,7 +95,7 @@ void event_free(EVENT *ev)
 }
 
 #ifdef SYS_WIN
-static int check(EVENT *ev, FILE_EVENT *fe)
+static int checkfd(EVENT *ev, FILE_EVENT *fe)
 {
 	if (getsocktype(fe->fd) >= 0) {
 		return 0;
