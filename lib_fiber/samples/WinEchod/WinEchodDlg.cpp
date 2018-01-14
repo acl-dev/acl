@@ -251,8 +251,24 @@ void CWinEchodDlg::OnBnClickedStartSchedule()
 	GetDlgItem(IDC_STOP_SCHEDULE)->EnableWindow(TRUE);
 	//OnBnClickedCreateTimer();
 
+	// setup IO read/write for acl' IO operation
+	acl_set_accept(acl_fiber_accept);
+	acl_set_connect(acl_fiber_connect);
+	acl_set_recv(acl_fiber_recv);
+	acl_set_send(acl_fiber_send);
+
+	acl_set_select(acl_fiber_select);
+
 	acl::fiber::schedule(acl::FIBER_EVENT_T_WMSG);
 	
+	// restore to system IO read/write in acl
+	acl_set_accept(accept);
+	acl_set_connect(connect);
+	acl_set_recv(recv);
+	acl_set_send(send);
+
+	acl_set_select(select);
+
 	GetDlgItem(IDC_START_SCHEDULE)->EnableWindow(TRUE);
 	GetDlgItem(IDC_STOP_SCHEDULE)->EnableWindow(FALSE);
 }

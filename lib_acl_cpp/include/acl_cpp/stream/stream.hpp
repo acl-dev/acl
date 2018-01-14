@@ -81,7 +81,8 @@ public:
 
 	/**
 	 * 设置流的读写超时时间
-	 * @param n {int} 超时时间(单位: 秒)
+	 * @param n {int} 超时时间(单位: 秒)，该值 > 0 则启用超时检测过程，否则将会
+	 *  一直阻塞直到可读或出错
 	 */
 	void set_rw_timeout(int n);
 

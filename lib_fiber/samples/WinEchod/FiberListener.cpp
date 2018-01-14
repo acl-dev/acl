@@ -14,7 +14,10 @@ CFiberListener::~CFiberListener(void)
 void CFiberListener::run(void)
 {
 	printf("listener fiber run ...\r\n");
+	acl_fiber_delay(1000);
+	printf("wakeup now\r\n");
 
+#if 0
 	socket_t lfd = m_listener.sock_handle();
 	int n = 0;
 	while (true)
@@ -35,19 +38,13 @@ void CFiberListener::run(void)
 	acl_fiber_close(lfd);
 
 	printf("listening stopped!\r\n");
-#if 0
-	while (true)
-	{
-		acl_fiber_delay(1000);
-		printf("wakeup now\r\n");
-	}
-
+#else
 	while (true)
 	{
 		acl::socket_stream* conn = m_listener.accept();
 		if (conn)
 		{
-			printf("accept one\r\n");
+			printf("accept one, fd=%u\r\n", conn->sock_handle());
 			acl::fiber* fb = new CFiberClient(conn);
 			fb->start();
 		}

@@ -25,14 +25,14 @@ void event_set(int event_mode)
 
 EVENT *event_create(int size)
 {
-	EVENT *ev;
+	EVENT *ev = NULL;
 
 	switch (__event_mode) {
 	case FIBER_EVENT_POLL:
 #ifdef	HAS_POLL
 		ev = event_poll_create(size);
 #else
-		ev = NULL;
+		msg_fatal("%s(%d): not support!", __FUNCTION__, __LINE__);
 #endif
 		break;
 	case FIBER_EVENT_SELECT:
@@ -42,16 +42,16 @@ EVENT *event_create(int size)
 #ifdef	HAS_WMSG
 		ev = event_wmsg_create(1024);
 #else
-		ev = NULL;
+		msg_fatal("%s(%d): not support!", __FUNCTION__, __LINE__);
 #endif
 		break;
 	default:
-#ifdef	HAS_EPOLL
+#if	defined(HAS_EPOLL)
 		ev = event_epoll_create(size);
 #elif	defined(HAS_KQUEUE)
 		ev = event_kqueue_create(size);
 #elif	defined(HAS_IOCP)
-		ev = NULL;
+		msg_fatal("%s(%d): not support!", __FUNCTION__, __LINE__);
 #else
 #error	"unknown OS"
 #endif
@@ -335,7 +335,7 @@ static void event_prepare(EVENT *ev)
 #define TO_APPL	ring_to_appl
 
 #ifdef HAS_POLL
-static inline void event_process_poll(EVENT *ev)
+static void event_process_poll(EVENT *ev)
 {
 	while (1) {
 		POLL_EVENT *pe;

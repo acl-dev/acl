@@ -13,8 +13,8 @@ private:
 private:
 	acl::string m_serverAddr;
 	int         m_count;
-	socket_t    m_sock;
 
-	void doEcho(void);
+	void doEcho(socket_t sock);
+	void doEcho(acl::socket_stream& conn);
 };
 

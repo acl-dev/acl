@@ -4,18 +4,16 @@
 CFiberConnect::CFiberConnect(const char* serverAddr, int count)
 	: m_serverAddr(serverAddr)
 	, m_count(count)
-	, m_sock(INVALID_SOCKET)
 {
 }
 
 CFiberConnect::~CFiberConnect(void)
 {
-	if (m_sock != INVALID_SOCKET)
-		acl_fiber_close(m_sock);
 }
 
 void CFiberConnect::run(void)
 {
+#if 0
 	acl::string serverAddr(m_serverAddr);
 	char *addr = serverAddr.c_str();
 	char *port_s = strchr(addr, ':');
@@ -30,28 +28,39 @@ void CFiberConnect::run(void)
 	sa.sin_port   = htons(atoi(port_s));
 	sa.sin_addr.s_addr = inet_addr(addr);
 
-	m_sock = acl_fiber_socket(AF_INET, SOCK_STREAM, 0);
-	if (acl_fiber_connect(m_sock, (const struct sockaddr*) &sa, len) < 0)
+	socket_t sock = acl_fiber_socket(AF_INET, SOCK_STREAM, 0);
+
+	if (acl_fiber_connect(sock, (const struct sockaddr*) &sa, len) < 0)
 		printf("connect %s error %s\r\n", m_serverAddr.c_str(),
 			acl::last_serror());
 	else
-		doEcho();
+		doEcho(sock);
+
+	acl_fiber_close(m_sock);
+#else
+	acl::socket_stream conn;
+	if (conn.open(m_serverAddr, 0, 0) == false)
+		printf("connect %s error %s\r\n", m_serverAddr.c_str(),
+			acl::last_serror());
+	else
+		doEcho(conn);
+#endif
 	delete this;
 }
 
-void CFiberConnect::doEcho(void)
+void CFiberConnect::doEcho(socket_t sock)
 {
 	char buf[1024];
 	const char* s = "hello world\r\n";
 
 	for (int i = 0; i < m_count; i++)
 	{
-		if (acl_fiber_send(m_sock, s, strlen(s), 0) < 0)
+		if (acl_fiber_send(sock, s, strlen(s), 0) < 0)
 		{
 			printf("send error %s\r\n", acl::last_serror());
 			break;
 		}
-		int n = acl_fiber_recv(m_sock, buf, sizeof(buf) - 1, 0);
+		int n = acl_fiber_recv(sock, buf, sizeof(buf) - 1, 0);
 		if (n <= 0)
 		{
 			printf("read error %s\r\n", acl::last_serror());
@@ -59,6 +68,29 @@ void CFiberConnect::doEcho(void)
 		}
 		buf[n];
 	}
-	printf("Echo over, fd=%u\r\n", m_sock);
+	printf("Echo over, fd=%u\r\n", sock);
 }
 
+void CFiberConnect::doEcho(acl::socket_stream& conn)
+{
+	char buf[1024];
+	const char* s = "hello world\r\n";
+
+	for (int i = 0; i < m_count; i++)
+	{
+		if (conn.write(s, strlen(s)) == -1)
+		{
+			printf("write error %s\r\n", acl::last_serror());
+			break;
+		}
+		int n = conn.read(buf, sizeof(buf) - 1, false);
+		if (n == -1)
+		{
+			printf("read error %s\r\n", acl::last_serror());
+			break;
+		}
+		buf[n] = 0;
+	}
+
+	printf("Echo over, fd=%u\r\n", conn.sock_handle());
+}

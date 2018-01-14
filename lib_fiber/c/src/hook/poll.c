@@ -1,20 +1,25 @@
 #include "stdafx.h"
 #include "common.h"
 
-#include "fiber/lib_fiber.h"
 #include "event.h"
 #include "fiber.h"
 
-#ifdef HAS_POLL
-
+#ifdef SYS_WIN
+typedef int (__stdcall *poll_fn)(struct pollfd *, nfds_t, int);
+#else
 typedef int (*poll_fn)(struct pollfd *, nfds_t, int);
+#endif
 
 static poll_fn __sys_poll = NULL;
 
 static void hook_api(void)
 {
+#ifdef SYS_WIN
+	__sys_poll = WSAPoll;
+#else
 	__sys_poll = (poll_fn) dlsym(RTLD_NEXT, "poll");
 	assert(__sys_poll);
+#endif
 }
 
 static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
@@ -136,7 +141,7 @@ static void pollfd_free(POLLFD *pfds)
 	free(pfds);
 }
 
-int poll(struct pollfd *fds, nfds_t nfds, int timeout)
+int __stdcall acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	long long begin, now;
 	POLL_EVENT pe;
@@ -191,5 +196,11 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	poll_event_clean(ev, &pe);
 	pollfd_free(pe.fds);
 	return pe.nready;
+}
+
+#ifdef SYS_UNIX
+int poll(struct pollfd *fds, nfds_t nfds, int timeout)
+{
+	return acl_fiber_poll(fds, nfds, timeout);
 }
 #endif

@@ -1,4 +1,8 @@
 
+76) 2018.1.14
+76.1) feature: 协程模块可以支持 WIN32 窗口消息引擎，从而可以与界面编程无缝整合
+76.2) feature: acl_fiber_poll/acl_fiber_select 支持 win32 平台
+
 75) 2017.12.28
 75.1) feature: 增加 kqueue 事件引擎以支持 FreeBSD，从而使 acl 协程支持 FreeBSD
 

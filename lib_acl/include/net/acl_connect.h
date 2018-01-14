@@ -8,6 +8,7 @@ extern "C" {
 #include "../stdlib/acl_define.h"
 
 #ifdef  ACL_UNIX
+#include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -82,6 +83,14 @@ ACL_API int acl_stream_connect(const char *path, int blocking, int timeout);
 #endif
 
 #endif
+
+#if defined(_WIN32) || defined(_WIN64)
+typedef int (__stdcall *acl_connect_fn)(SOCKET, const struct sockaddr*, socklen_t);
+#else
+typedef int (*acl_connect_fn)(int, const struct sockaddr*, socklen_t);
+#endif
+
+ACL_API void acl_set_connect(acl_connect_fn fn);
 
 #ifdef	__cplusplus
 }

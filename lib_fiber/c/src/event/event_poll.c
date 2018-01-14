@@ -6,13 +6,19 @@
 #include "event.h"
 #include "event_poll.h"
 
+#ifdef SYS_WIN
+typedef int(_stdcall *poll_fn)(struct pollfd *, unsigned long, int);
+#else
 typedef int(*poll_fn)(struct pollfd *, nfds_t, int);
+#endif
 
 static poll_fn __sys_poll = NULL;
 
 static void hook_api(void)
 {
-#ifdef SYS_UNIX
+#ifdef SYS_WIN
+	__sys_poll = WSAPoll;
+#else
 	__sys_poll = (poll_fn) dlsym(RTLD_NEXT, "poll");
 	assert(__sys_poll);
 #endif

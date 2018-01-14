@@ -175,7 +175,7 @@ static int wmsg_del_write(EVENT_WMSG *ev, FILE_EVENT *fe)
 	if (fe->mask & EVENT_READ) {
 		lEvent = FD_CLOSE | FD_READ;
 	} else {
-		lEvent = 0;
+		lEvent = FD_CLOSE;
 	}
 
 	fe->mask &= ~EVENT_WRITE;
@@ -229,6 +229,7 @@ static void onRead(EVENT_WMSG *ev, SOCKET fd)
 		msg_error("%s(%d): r_proc NULL, fd=%d",
 			__FUNCTION__, __LINE__, fd);
 	} else {
+		fe->mask &= ~EVENT_READ;
 		fe->r_proc(&ev->event, fe);
 	}
 }
@@ -243,6 +244,7 @@ static void onWrite(EVENT_WMSG *ev, SOCKET fd)
 		msg_error("%s(%d): w_proc NULL, fd=%d",
 			__FUNCTION__, __LINE__, fd);
 	} else {
+		fe->mask &= ~EVENT_WRITE;
 		fe->w_proc(&ev->event, fe);
 	}
 }
@@ -257,6 +259,7 @@ static void onAccept(EVENT_WMSG *ev, SOCKET fd)
 		msg_error("%s(%d): r_proc NULL, fd=%d",
 			__FUNCTION__, __LINE__, fd);
 	} else {
+		fe->mask &= ~EVENT_READ;
 		fe->r_proc(&ev->event, fe);
 	}
 }
@@ -273,10 +276,12 @@ static void onClose(EVENT_WMSG *ev, SOCKET fd)
 		/* don nothing */
 	} else if (fe->mask & EVENT_READ) {
 		if (fe->r_proc) {
+			fe->mask &= ~EVENT_READ;
 			fe->r_proc(&ev->event, fe);
 		}
 	} else if (fe->mask & EVENT_WRITE) {
 		if (fe->w_proc) {
+			fe->mask &= ~EVENT_WRITE;
 			fe->w_proc(&ev->event, fe);
 		}
 	}

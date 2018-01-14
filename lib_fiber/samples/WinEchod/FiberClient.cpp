@@ -12,6 +12,7 @@ CFiberClient::~CFiberClient(void)
 
 void CFiberClient::run(void)
 {
+#if 0
 	socket_t sock = m_conn->sock_handle();
 	while (true)
 	{
@@ -38,22 +39,28 @@ void CFiberClient::run(void)
 	m_conn->unbind();
 	delete m_conn;
 	delete this;
-#if 0
+#else
 	acl::string buf;
+	int n = 0;
+	m_conn->set_rw_timeout(0);
 	while (true)
 	{
-		if (m_conn->gets(buf) == false)
+		if (m_conn->read(buf, false) == false)
 		{
-			printf("gets error\r\n");
+			printf("read error %s, count=%d\r\n",
+				acl::last_serror(), n);
 			break;
 		}
+		//printf("read: %s\r\n", buf.c_str());
 		if (m_conn->write(buf) == -1)
 		{
-			printf("write error\r\n");
+			printf("write error %s\r\n", acl::last_serror());
 			break;
 		}
+		n++;
 	}
 	delete m_conn;
 	delete this;
 #endif
 }
+

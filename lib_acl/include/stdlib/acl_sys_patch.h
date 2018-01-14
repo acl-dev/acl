@@ -223,6 +223,28 @@ ACL_API acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp, void *arg)
 ACL_API int acl_sane_socketpair(int domain, int type, int protocol,
 		ACL_SOCKET result[2]);
 
+/* in acl_sys_socket.c */
+
+#if defined(_WIN32) || defined(_WIN64)
+typedef int (__stdcall *acl_recv_fn)(ACL_SOCKET, char *, int, int);
+typedef int (__stdcall *acl_send_fn)(ACL_SOCKET, const char *, int, int);
+#else
+typedef ssize_t  (*acl_read_fn)(ACL_SOCKET, void *, size_t);
+typedef ssize_t  (*acl_recv_fn)(ACL_SOCKET, void *, size_t, int);
+typedef ssize_t  (*acl_write_fn)(ACL_SOCKET, const void *, size_t);
+typedef ssize_t  (*acl_writev_fn)(ACL_SOCKET, const struct iovec *, int);
+typedef ssize_t  (*acl_send_fn)(ACL_SOCKET, const void *, size_t, int);
+#endif
+
+#if !defined(_WIN32) && !defined(_WIN64)
+ACL_API void acl_set_read(acl_read_fn fn);
+ACL_API void acl_set_write(acl_write_fn fn);
+ACL_API void acl_set_writev(acl_writev_fn fn);
+#endif
+
+ACL_API void acl_set_recv(acl_recv_fn fn);
+ACL_API void acl_set_send(acl_send_fn fn);
+
 # ifdef	__cplusplus
 }
 # endif

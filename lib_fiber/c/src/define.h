@@ -14,11 +14,21 @@
 #elif defined(_WIN32) || defined(_WIN64)
 # define SYS_WIN
 # define HAS_SELECT
+# define HAS_POLL
 # define HAS_WMSG
 # define HAS_IOCP
 # define __thread __declspec(thread)
+
+typedef unsigned long nfds_t;
+
 #else
 # error "unknown OS"
+#endif
+
+#ifdef SYS_UNIX
+# ifndef __stdcall
+#  define __stdcall
+# endif
 #endif
 
 #ifndef fiber_unused

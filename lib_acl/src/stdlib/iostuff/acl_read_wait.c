@@ -247,6 +247,13 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 
 #if defined(ACL_UNIX)
 
+static acl_poll_fn __sys_poll = poll;
+
+void acl_set_poll(acl_poll_fn fn)
+{
+	__sys_poll == fn;
+}
+
 int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 {
 	const char *myname = "acl_read_poll_wait";
@@ -261,7 +268,7 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 	for (;;) {
 		time(&begin);
 
-		switch (poll(&fds, 1, delay)) {
+		switch (__sys_poll(&fds, 1, delay)) {
 		case -1:
 			if (acl_last_error() == ACL_EINTR)
 				continue;
@@ -373,6 +380,13 @@ int acl_read_iocp_wait(ACL_SOCKET fd, int timeout)
 
 #endif
 
+static acl_select_fn __sys_select = select;
+
+void acl_set_select(acl_select_fn fn)
+{
+	__sys_select = fn;
+}
+
 int acl_read_select_wait(ACL_SOCKET fd, int delay)
 {
 	const char *myname = "acl_read_select_wait";
@@ -416,9 +430,9 @@ int acl_read_select_wait(ACL_SOCKET fd, int delay)
 		time(&begin);
 
 #ifdef ACL_WINDOWS
-		switch (select(1, &rfds, (fd_set *) 0, &xfds, tp)) {
+		switch (__sys_select(1, &rfds, (fd_set *) 0, &xfds, tp)) {
 #else
-		switch (select(fd + 1, &rfds, (fd_set *) 0, &xfds, tp)) {
+		switch (__sys_select(fd + 1, &rfds, (fd_set *) 0, &xfds, tp)) {
 #endif
 		case -1:
 			errnum = acl_last_error();

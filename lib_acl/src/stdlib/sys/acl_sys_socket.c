@@ -35,10 +35,45 @@
 
 #endif
 
+#ifdef ACL_UNIX
+static acl_read_fn   __sys_read   = read;
+static acl_write_fn  __sys_write  = write;
+static acl_writev_fn __sys_writev = writev;
+
+void acl_set_read(acl_read_fn fn)
+{
+	__sys_read = fn;
+}
+
+void acl_set_write(acl_write_fn fn)
+{
+	__sys_write = fn;
+}
+
+void acl_set_writev(acl_writev_fn fn)
+{
+	__sys_writev = fn;
+}
+
+#endif
+
+static acl_recv_fn   __sys_recv   = recv;
+static acl_send_fn   __sys_send   = send;
+
+void acl_set_recv(acl_recv_fn fn)
+{
+	__sys_recv = fn;
+}
+
+void acl_set_send(acl_send_fn fn)
+{
+	__sys_send = fn;
+}
+
 #ifdef ACL_WINDOWS
 
 static int __socket_inited = 0;
-static int __socket_ended = 0;
+static int __socket_ended  = 0;
 
 int acl_socket_init(void)
 {
@@ -122,7 +157,7 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	else if (timeout > 0 && acl_read_wait(fd, timeout) < 0)
 		return -1;
 
-	return recv(fd, buf, (int) size, 0);
+	return __sys_recv(fd, buf, (int) size, 0);
 #endif
 }
 
@@ -153,7 +188,7 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 	(void) timeout;
 #endif
 
-	ret = send(fd, buf, (int) size, 0);
+	ret = __sys_send(fd, buf, (int) size, 0);
 	if (ret <= 0)
 		errno = acl_last_error();
 	return ret;
@@ -176,7 +211,7 @@ int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
 
 	n = 0;
 	for (i = 0; i < count; i++)	{
-		ret = send(fd, vec[i].iov_base, (int) vec[i].iov_len, 0);
+		ret = __sys_send(fd, vec[i].iov_base, (int) vec[i].iov_len, 0);
 		if (ret == SOCKET_ERROR) {
 			errno = acl_last_error();
 			return -1;
@@ -305,7 +340,7 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	else if (timeout > 0 && acl_read_wait(fd, timeout) < 0)
 		return -1;
 
-	return (int) read(fd, buf, size);
+	return (int) __sys_read(fd, buf, size);
 }
 
 #endif
@@ -315,7 +350,7 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 {
 	int ret, error;
 
-	ret = (int) write(fd, buf, size);
+	ret = (int) __sys_write(fd, buf, size);
 	if (ret > 0)
 		return ret;
 
@@ -335,7 +370,7 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 	if (acl_write_wait(fd, timeout) < 0)
 		return -1;
 
-	ret = write(fd, buf, size);
+	ret = __sys_write(fd, buf, size);
 #endif
 
 	return ret;
@@ -346,7 +381,7 @@ int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
 {
 	int ret, error;
 
-	ret = (int) writev(fd, vec, count);
+	ret = (int) __sys_writev(fd, vec, count);
 	if (ret > 0)
 		return ret;
 
@@ -366,7 +401,7 @@ int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
 	if (acl_write_wait(fd, timeout) < 0)
 		return -1;
 
-	ret = writev(fd, vec, count);
+	ret = __sys_writev(fd, vec, count);
 #endif
 
 	return ret;

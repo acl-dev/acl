@@ -102,7 +102,8 @@ int acl_fiber_listen(socket_t sockfd, int backlog)
 
 //#define FAST_ACCEPT
 
-socket_t acl_fiber_accept(socket_t sockfd, struct sockaddr *addr, socklen_t *addrlen)
+socket_t __stdcall acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
+	socklen_t *addrlen)
 {
 	FILE_EVENT *fe;
 	socket_t clifd;
@@ -187,7 +188,8 @@ socket_t acl_fiber_accept(socket_t sockfd, struct sockaddr *addr, socklen_t *add
 #endif
 }
 
-int acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr, socklen_t addrlen)
+int __stdcall acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
+	socklen_t addrlen)
 {
 	int err, ret;
 	socklen_t len;
