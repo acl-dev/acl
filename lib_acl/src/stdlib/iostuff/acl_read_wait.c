@@ -251,7 +251,7 @@ static acl_poll_fn __sys_poll = poll;
 
 void acl_set_poll(acl_poll_fn fn)
 {
-	__sys_poll == fn;
+	__sys_poll = fn;
 }
 
 int acl_read_poll_wait(ACL_SOCKET fd, int delay)

@@ -116,7 +116,7 @@ static struct pollfd *pfds_create(int *nfds, fd_set *readfds,
 	int fd;
 	struct pollfd *fds;
 
-	fds = (struct pollfd *) calloc(*nfds + , sizeof(struct pollfd));
+	fds = (struct pollfd *) calloc(*nfds + 1, sizeof(struct pollfd));
 
 	for (fd = 0; fd < *nfds; fd++) {
 		if (readfds && FD_ISSET(fd, readfds)) {
