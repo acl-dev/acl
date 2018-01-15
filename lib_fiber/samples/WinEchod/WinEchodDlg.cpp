@@ -196,7 +196,7 @@ void CWinEchodDlg::OnBnClickedOpenDos()
 		m_dosFp = freopen("CONOUT$","w+t",stdout);
 		printf("DOS opened now, listen=%s:%d\r\n",
 			m_listenIP.GetString(), m_listenPort);
-		CString info("关闭 DOS 窗口 ");
+		CString info(_T("关闭 DOS 窗口 "));
 		GetDlgItem(IDC_OPEN_DOS)->SetWindowText(info);
 	}
 	else
@@ -204,11 +204,21 @@ void CWinEchodDlg::OnBnClickedOpenDos()
 		fclose(m_dosFp);
 		m_dosFp = NULL;
 		FreeConsole();
-		CString info("打开 DOS 窗口");
+		CString info(_T("打开 DOS 窗口"));
 		GetDlgItem(IDC_OPEN_DOS)->SetWindowText(info);
 	}
 }
 
+void CWinEchodDlg::Uni2Str(const CString& in, acl::string& out)
+{
+	int len = WideCharToMultiByte(CP_ACP, 0, in, in.GetLength(),
+		NULL, 0, NULL, NULL);
+	char *buf = new char[len + 1];
+	WideCharToMultiByte(CP_ACP, 0, in, in.GetLength(), buf, len, NULL, NULL);
+	buf[len] = 0;
+	out = buf;
+	delete buf;
+}
 
 void CWinEchodDlg::OnBnClickedListen()
 {
@@ -222,18 +232,21 @@ void CWinEchodDlg::OnBnClickedListen()
 		printf("listening socket was closed\r\n");
 		m_fiberListen = NULL;
 		printf("fiber schedule stopped!\r\n");
-		CString info("开始监听");
+		CString info(_T("开始监听"));
 		GetDlgItem(IDC_LISTEN)->SetWindowText(info);
 		GetDlgItem(IDC_LISTEN)->EnableWindow(TRUE);
 	}
 	else
 	{
+		UpdateData();
+		Uni2Str(m_listenIP, m_listenAddr);
+		m_listenAddr.format_append(":%d", m_listenPort);
 		if (m_listen.open(m_listenAddr) == false)
 		{
 			printf("listen %s error %s\r\n", m_listenAddr.c_str());
 			return;
 		}
-		CString info("停止监听");
+		CString info(_T("停止监听"));
 		GetDlgItem(IDC_LISTEN)->SetWindowText(info);
 
 		printf("listen %s ok\r\n", m_listenAddr.c_str());
