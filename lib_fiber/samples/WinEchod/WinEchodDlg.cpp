@@ -211,10 +211,11 @@ void CWinEchodDlg::OnBnClickedOpenDos()
 
 void CWinEchodDlg::Uni2Str(const CString& in, acl::string& out)
 {
-	int len = WideCharToMultiByte(CP_ACP, 0, in, in.GetLength(),
+	int len = WideCharToMultiByte(CP_ACP, 0, in.GetString(), in.GetLength(),
 		NULL, 0, NULL, NULL);
 	char *buf = new char[len + 1];
-	WideCharToMultiByte(CP_ACP, 0, in, in.GetLength(), buf, len, NULL, NULL);
+	WideCharToMultiByte(CP_ACP, 0, in.GetString(), in.GetLength(),
+		buf, len, NULL, NULL);
 	buf[len] = 0;
 	out = buf;
 	delete buf;
