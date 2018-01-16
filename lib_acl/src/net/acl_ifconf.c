@@ -340,14 +340,14 @@ void acl_free_ifaddrs(ACL_IFCONF *ifconf)
 	acl_myfree(ifconf);
 }
 
-#define MAX_PATH	1024
+#define MAX	1024
 
 static int match_wildcard(const char *pattern, ACL_ARGV *addrs)
 {
 	const char any[]    = "0.0.0.0:";
 	const char domain[] = "@unix";
 	const char udp[]    = "@udp";
-	char       addr[MAX_PATH];
+	char       addr[MAX];
 	ACL_ARGV  *tokens;
 
 #define PREFIX_EQ(x, y) !acl_strncasecmp((x), (y), strlen(y))
@@ -441,7 +441,7 @@ static void match_addrs_add(const char *pattern, ACL_IFCONF *ifconf,
 	acl_foreach(iter, ifconf) {
 		ACL_IFADDR *ifaddr =  (ACL_IFADDR*) iter.data;
 		const char *ip = (const char *) ifaddr->ip;
-		char tmp[MAX_PATH], *colon, addr[MAX_PATH];
+		char tmp[MAX], *colon, addr[MAX];
 		int  port;
 
 		/* xxx.xxx.xxx.xxx:port or xxx.xxx.xxx.*:port ...*/

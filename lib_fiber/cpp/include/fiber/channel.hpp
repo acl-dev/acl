@@ -3,14 +3,13 @@
 #include "fiber_cpp_define.hpp"
 
 struct ACL_CHANNEL;
-extern "C" {
-	extern FIBER_API ACL_CHANNEL *acl_channel_create(int elemsize, int bufsize);
-	extern FIBER_API void acl_channel_free(ACL_CHANNEL *c);
-	extern FIBER_API int acl_channel_send(ACL_CHANNEL *c, void *v);
-	extern FIBER_API int acl_channel_recv(ACL_CHANNEL *c, void *v);
-}
 
 namespace acl {
+
+ACL_CHANNEL *channel_create(int elemsize, int bufsize);
+void channel_free(ACL_CHANNEL *c);
+int channel_send(ACL_CHANNEL *c, void *v);
+int channel_recv(ACL_CHANNEL *c, void *v);
 
 template <typename T>
 class channel
@@ -18,12 +17,12 @@ class channel
 public:
 	channel(void)
 	{
-		chan_ = acl_channel_create(sizeof(T), 100);
+		chan_ = channel_create(sizeof(T), 100);
 	}
 
 	~channel(void)
 	{
-		acl_channel_free(chan_);
+		channel_free(chan_);
 	}
 
 	channel& operator << (T& t)
@@ -33,13 +32,13 @@ public:
 
 	channel& put(T& t)
 	{
-		acl_channel_send(chan_, &t);
+		channel_send(chan_, &t);
 		return *this;
 	}
 
 	void pop(T& t)
 	{
-		acl_channel_recv(chan_, &t);
+		channel_recv(chan_, &t);
 	}
 
 private:

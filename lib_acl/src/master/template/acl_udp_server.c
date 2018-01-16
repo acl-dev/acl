@@ -184,7 +184,7 @@ static long long   __servers_count = 0;
 static ACL_ATOMIC *__servers_count_atomic = NULL;
 
 #define SOCK		ACL_VSTREAM_SOCK
-#define MAX_PATH	1024
+#define MAX	1024
 
 /* forward functions */
 
@@ -194,6 +194,9 @@ static void udp_server_read(int event_type, ACL_EVENT *event,
 
 static void get_addr(const char *addr, char *buf, size_t size)
 {
+#ifdef ACL_WINDOWS
+	snprintf(buf, size, "%s", addr);
+#else
 	if (strchr(addr, ':') != NULL || acl_alldig(addr))
 		snprintf(buf, size, "%s", addr);
 	else
@@ -201,7 +204,7 @@ static void get_addr(const char *addr, char *buf, size_t size)
 			strcasecmp(acl_var_udp_private, "n") == 0 ?
 			  ACL_MASTER_CLASS_PUBLIC : ACL_MASTER_CLASS_PRIVATE,
 			 addr);
-
+#endif
 }
 
 #ifdef ACL_LINUX
@@ -322,7 +325,7 @@ static void netlink_on_changed(void *ctx)
 	ACL_ARGV   *addrs = acl_ifconf_search(__service_name);
 	ACL_HTABLE *table = acl_htable_create(10, 0);
 	ACL_ITER    iter;
-	char        addr[MAX_PATH];
+	char        addr[MAX];
 
 	if (addrs == NULL) {
 		acl_msg_error("%s(%d): acl_ifconf_search null, service=%s",
@@ -618,7 +621,7 @@ static ACL_VSTREAM *server_bind_one(const char *addr)
 	ACL_VSTREAM *stream;
 	ACL_SOCKET   fd;
 	unsigned flag = 0;
-	char     local[MAX_PATH];
+	char     local[MAX];
 
 	if (acl_var_udp_non_block)
 		flag |= ACL_INET_FLAG_NBLOCK;
@@ -647,7 +650,7 @@ static ACL_VSTREAM *server_bind_one(const char *addr)
 
 static void server_binding(UDP_SERVER *server, ACL_ARGV *addrs)
 {
-	char addr[MAX_PATH];
+	char addr[MAX];
 	ACL_ITER iter;
 	int i = 0;
 
