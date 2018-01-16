@@ -209,6 +209,7 @@ void CWinEchodDlg::OnBnClickedOpenDos()
 	}
 }
 
+// UNICODE 转宽字符
 void CWinEchodDlg::Uni2Str(const CString& in, acl::string& out)
 {
 	int len = WideCharToMultiByte(CP_ACP, 0, in.GetString(), in.GetLength(),
@@ -224,20 +225,7 @@ void CWinEchodDlg::Uni2Str(const CString& in, acl::string& out)
 void CWinEchodDlg::OnBnClickedListen()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	if (m_fiberListen)
-	{
-		GetDlgItem(IDC_LISTEN)->EnableWindow(FALSE);
-		m_fiberListen->kill();
-		printf("listening fiber was killed\r\n");
-		m_listen.unbind();
-		printf("listening socket was closed\r\n");
-		m_fiberListen = NULL;
-		printf("fiber schedule stopped!\r\n");
-		CString info(_T("开始监听"));
-		GetDlgItem(IDC_LISTEN)->SetWindowText(info);
-		GetDlgItem(IDC_LISTEN)->EnableWindow(TRUE);
-	}
-	else
+	if (m_fiberListen == NULL)
 	{
 		UpdateData();
 		Uni2Str(m_listenIP, m_listenAddr);
@@ -253,6 +241,29 @@ void CWinEchodDlg::OnBnClickedListen()
 		printf("listen %s ok\r\n", m_listenAddr.c_str());
 		m_fiberListen = new CFiberListener(m_listen);
 		m_fiberListen->start();
+	}
+	else if (acl::fiber::scheduled())
+	{
+		GetDlgItem(IDC_LISTEN)->EnableWindow(FALSE);
+		m_fiberListen->kill();
+		printf("listening fiber was killed\r\n");
+		m_listen.close();
+		printf("listening socket was closed\r\n");
+		m_fiberListen = NULL;
+		printf("fiber schedule stopped!\r\n");
+		CString info(_T("开始监听"));
+		GetDlgItem(IDC_LISTEN)->SetWindowText(info);
+		GetDlgItem(IDC_LISTEN)->EnableWindow(TRUE);
+	}
+	else
+	{
+		GetDlgItem(IDC_LISTEN)->EnableWindow(FALSE);
+		m_listen.close();
+		printf("listening socket was closed\r\n");
+		m_fiberListen = NULL;
+		CString info(_T("开始监听"));
+		GetDlgItem(IDC_LISTEN)->SetWindowText(info);
+		GetDlgItem(IDC_LISTEN)->EnableWindow(TRUE);
 	}
 }
 

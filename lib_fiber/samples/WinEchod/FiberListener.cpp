@@ -26,7 +26,7 @@ void CFiberListener::run(void)
 		if (sock == INVALID_SOCKET)
 		{
 			printf("accept error %s\r\n", acl::last_serror());
-			continue;
+			break;
 		}
 		//printf("accept one connection, sock=%d, n=%d\r\n", sock, ++n);
 		acl::socket_stream* conn = new acl::socket_stream;
@@ -47,6 +47,11 @@ void CFiberListener::run(void)
 			printf("accept one, fd=%u\r\n", conn->sock_handle());
 			acl::fiber* fb = new CFiberClient(conn);
 			fb->start();
+		}
+		else
+		{
+			printf("accept error=%s\r\n", acl::last_serror());
+			break;
 		}
 	}
 #endif

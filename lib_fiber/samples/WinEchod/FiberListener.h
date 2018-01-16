@@ -11,8 +11,7 @@ protected:
 	void run(void);
 
 private:
-	~CFiberListener(void);
-
 	acl::server_socket& m_listener;
+	~CFiberListener(void);
 };
 

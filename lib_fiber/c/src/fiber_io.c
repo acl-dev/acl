@@ -95,6 +95,15 @@ static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
 void fiber_io_check(void)
 {
 	if (__thread_fiber != NULL) {
+		if (__thread_fiber->ev_fiber == NULL) {
+			__thread_fiber->ev_fiber = acl_fiber_create(
+				fiber_io_loop, __thread_fiber->event,
+				STACK_SIZE);
+			__thread_fiber->io_count = 0;
+			__thread_fiber->nsleeping = 0;
+			__thread_fiber->io_stop = 0;
+			ring_init(&__thread_fiber->ev_timer);
+		}
 		return;
 	}
 
@@ -210,6 +219,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		msg_info("%s(%d), %s: waiting io: %d", __FILE__, __LINE__,
 			__FUNCTION__, (int) __thread_fiber->io_count);
 	}
+	__thread_fiber->ev_fiber = NULL;
 }
 
 #define CHECK_MIN
