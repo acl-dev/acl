@@ -139,17 +139,7 @@ ACL_SOCKET acl_udp_bind(const char *addr, unsigned flag)
 	const char udp_suffix[] = "@udp";
 
 	if (acl_strrncasecmp(addr, udp_suffix, sizeof(udp_suffix) - 1) == 0) {
-		char *buf = acl_mystrdup(addr), *at = strchr(buf, '@');
-		*at = 0;
-		if (*buf == 0) {
-			acl_msg_error("%s(%d): invalid addr=%s",
-				__FILE__, __LINE__, addr);
-			acl_myfree(buf);
-			return ACL_SOCKET_INVALID;
-		}
-		fd = acl_unix_dgram_bind(buf, flag);
-		//printf("bind fd=%d, buf=%s\r\n", fd, buf);
-		acl_myfree(buf);
+		fd = acl_unix_dgram_bind(addr, flag);
 		return fd;
 	}
 #endif

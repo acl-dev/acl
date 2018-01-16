@@ -340,7 +340,56 @@ void acl_free_ifaddrs(ACL_IFCONF *ifconf)
 	acl_myfree(ifconf);
 }
 
-static int match_ip(const char *pattern, const char *ip)
+#define MAX_PATH	1024
+
+static int match_wildcard(const char *pattern, ACL_ARGV *addrs)
+{
+	const char any[]    = "0.0.0.0:";
+	const char domain[] = "@unix";
+	const char udp[]    = "@udp";
+	char       addr[MAX_PATH];
+	ACL_ARGV  *tokens;
+
+#define PREFIX_EQ(x, y) !acl_strncasecmp((x), (y), strlen(y))
+	if (PREFIX_EQ(pattern, any)) {
+		acl_argv_add(addrs, pattern, NULL);
+		return 1;
+	}
+
+#define SUFFIX_EQ(x, y) !acl_strrncasecmp((x), (y), strlen((y)))
+	/* for unix domain socket path */
+	if (SUFFIX_EQ(pattern, udp) || SUFFIX_EQ(pattern, domain)) {
+		acl_argv_add(addrs, pattern, NULL);
+		return 1;
+	}
+
+	/* for "port" */
+	if (acl_alldig(pattern)) {
+		snprintf(addr, sizeof(addr), "0.0.0.0:%s", pattern);
+		acl_argv_add(addrs, addr, NULL);
+		return 1;
+	}
+
+	/* for ":port" */
+	if (*pattern == ':' && acl_alldig(++pattern)) {
+		snprintf(addr, sizeof(addr), "0.0.0.0:%s", pattern);
+		acl_argv_add(addrs, addr, NULL);
+		return 1;
+	}
+
+	/* for unix domain socket path */
+	tokens = acl_argv_split(pattern, ".");
+	if (tokens->argc != 4) {
+		acl_argv_add(addrs, pattern, NULL);
+		acl_argv_free(tokens);
+		return 1;
+	}
+
+	acl_argv_free(tokens);
+	return 0;
+}
+
+static int match_ipv4(const char *pattern, const char *ip)
 {
 	/* format: xxx.xxx.xxx.* or xxx.xxx.*.* or xxx.*.*.* */
 	ACL_ARGV *pattern_tokens;
@@ -351,9 +400,18 @@ static int match_ip(const char *pattern, const char *ip)
 	pattern_tokens = acl_argv_split(pattern, ".");
 	ip_tokens      = acl_argv_split(ip, ".");
 
-	if (pattern_tokens->argc != 4 || ip_tokens->argc != 4) {
-		acl_msg_warn("%s(%d), %s: invalid, pattern=%s, ip: %s",
-			__FILE__, __LINE__, __FUNCTION__, pattern, ip);
+	if (pattern_tokens->argc != 4) {
+		acl_msg_warn("%s(%d), %s: invalid pattern: %s",
+			__FILE__, __LINE__, __FUNCTION__, pattern);
+		acl_argv_free(pattern_tokens);
+		acl_argv_free(ip_tokens);
+
+		return 0;
+	}
+
+	if (ip_tokens->argc != 4) {
+		acl_msg_warn("%s(%d), %s: invalid ip: %s",
+			__FILE__, __LINE__, __FUNCTION__, ip);
 		acl_argv_free(pattern_tokens);
 		acl_argv_free(ip_tokens);
 		return 0;
@@ -375,8 +433,6 @@ static int match_ip(const char *pattern, const char *ip)
 	return 1;
 }
 
-#define MAX_PATH	1024
-
 static void match_addrs_add(const char *pattern, ACL_IFCONF *ifconf,
 	ACL_ARGV *addrs)
 {
@@ -397,7 +453,7 @@ static void match_addrs_add(const char *pattern, ACL_IFCONF *ifconf,
 		} else
 			port = -1;
 
-		if (!match_ip(tmp, ip))
+		if (!match_ipv4(tmp, ip))
 			continue;
 
 		if (port >= 0)
@@ -406,40 +462,6 @@ static void match_addrs_add(const char *pattern, ACL_IFCONF *ifconf,
 			snprintf(addr, sizeof(addr), "%s", ip);
 		acl_argv_add(addrs, addr, NULL);
 	}
-}
-
-static int match_wildcard(const char *pattern, char *buf, size_t size)
-{
-	const char any[]    = "0.0.0.0:";
-	const char domain[] = "@unix";
-	const char udp[]    = "@udp";
-
-#define PREFIX_EQ(x, y) !acl_strncasecmp((x), (y), strlen(y))
-	if (PREFIX_EQ(pattern, any)) {
-		snprintf(buf, size, "%s", pattern);
-		return 1;
-	}
-
-#define SUFFIX_EQ(x, y) !acl_strrncasecmp((x), (y), strlen((y)))
-	/* for unix domain socket path */
-	if (SUFFIX_EQ(pattern, udp) || SUFFIX_EQ(pattern, domain)) {
-		snprintf(buf, size, "%s", pattern);
-		return 1;
-	}
-
-	/* for "port" */
-	if (acl_alldig(pattern)) {
-		snprintf(buf, size, "0.0.0.0:%s", pattern);
-		return 1;
-	}
-
-	/* for ":port" */
-	if (*pattern == ':' && acl_alldig(++pattern)) {
-		snprintf(buf, size, "0.0.0.0:%s", pattern);
-		return 1;
-	}
-
-	return 0;
 }
 
 ACL_ARGV *acl_ifconf_search(const char *patterns)
@@ -459,11 +481,8 @@ ACL_ARGV *acl_ifconf_search(const char *patterns)
 	patterns_tokens = acl_argv_split(patterns, "\"',; \t\r\n");
 	acl_foreach(iter, patterns_tokens) {
 		const char *pattern = (const char *) iter.data;
-		char addr[MAX_PATH];
 
-		if (match_wildcard(pattern, addr, sizeof(addr)))
-			acl_argv_add(addrs, addr, NULL);
-		else
+		if (match_wildcard(pattern, addrs) == 0)
 			match_addrs_add(pattern, ifconf, addrs);
 	}
 

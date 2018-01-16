@@ -281,8 +281,6 @@ static ACL_MASTER_ADDR *master_stream_addr(const char *addr, char private_val)
 	char *at  = strcasestr(buf, "@unix");
 	if (at == NULL)
 		acl_msg_warn("%s: @unix should after %s", __FUNCTION__, addr);
-	else
-		*at = 0;
 
 	if (*buf == 0) {
 		acl_msg_warn("%s: skip invalid addr=%s", __FUNCTION__, addr);

@@ -183,13 +183,26 @@ static int         __service_exiting = 0;
 static long long   __servers_count = 0;
 static ACL_ATOMIC *__servers_count_atomic = NULL;
 
-#define SOCK	ACL_VSTREAM_SOCK
+#define SOCK		ACL_VSTREAM_SOCK
+#define MAX_PATH	1024
 
 /* forward functions */
 
 static ACL_VSTREAM *server_bind_one(const char *addr);
 static void udp_server_read(int event_type, ACL_EVENT *event,
 	ACL_VSTREAM *stream, void *context);
+
+static void get_addr(const char *addr, char *buf, size_t size)
+{
+	if (strchr(addr, ':') != NULL || acl_alldig(addr))
+		snprintf(buf, size, "%s", addr);
+	else
+		snprintf(buf, size, "%s/%s/%s", acl_var_udp_queue_dir,
+			strcasecmp(acl_var_udp_private, "n") == 0 ?
+			  ACL_MASTER_CLASS_PUBLIC : ACL_MASTER_CLASS_PRIVATE,
+			 addr);
+
+}
 
 #ifdef ACL_LINUX
 
@@ -240,7 +253,7 @@ static void server_del_addrs(UDP_SERVER *server, ACL_ARGV *addrs)
 
 static void server_add_addrs(UDP_SERVER *server, ACL_HTABLE *addrs)
 {
-	ACL_ITER  iter;
+	ACL_ITER iter;
 	int  size = acl_htable_used(addrs);
 
 	acl_assert(size > 0);
@@ -252,7 +265,9 @@ static void server_add_addrs(UDP_SERVER *server, ACL_HTABLE *addrs)
 	}
 
 	acl_foreach(iter, addrs) {
-		ACL_VSTREAM *stream = server_bind_one(iter.key);
+		const char *ptr = (const char *) iter.key;
+		ACL_VSTREAM *stream = server_bind_one(ptr);
+
 		if (stream == NULL) {
 			acl_msg_error("%s(%d): bind %s error %s", __FUNCTION__,
 				__LINE__, iter.key, acl_last_serror());
@@ -294,6 +309,7 @@ static void server_rebinding(UDP_SERVER *server, ACL_HTABLE *table)
 
 	if (acl_argv_size(addrs2del) > 0)
 		server_del_addrs(server, addrs2del);
+
 	if (acl_htable_used(table) > 0)
 		server_add_addrs(server, table);
 
@@ -306,6 +322,7 @@ static void netlink_on_changed(void *ctx)
 	ACL_ARGV   *addrs = acl_ifconf_search(__service_name);
 	ACL_HTABLE *table = acl_htable_create(10, 0);
 	ACL_ITER    iter;
+	char        addr[MAX_PATH];
 
 	if (addrs == NULL) {
 		acl_msg_error("%s(%d): acl_ifconf_search null, service=%s",
@@ -314,9 +331,8 @@ static void netlink_on_changed(void *ctx)
 	}
 
 	acl_foreach(iter, addrs) {
-		acl_htable_enter(table, (const char *) iter.data, NULL);
-		acl_msg_info("%s(%d): get one addr=[%s]",
-			__FUNCTION__, __LINE__, (const char*) iter.data);
+		get_addr((const char *) iter.data, addr, sizeof(addr));
+		acl_htable_enter(table, addr, addr);
 	}
 
 	server_rebinding(server, table);
@@ -597,33 +613,21 @@ static UDP_SERVER *servers_alloc(int event_mode, int nthreads, int sock_count)
 
 static int __fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 
-#define MAX_PATH	1024
-
 static ACL_VSTREAM *server_bind_one(const char *addr)
 {
 	ACL_VSTREAM *stream;
 	ACL_SOCKET   fd;
 	unsigned flag = 0;
-	char     local[MAX_PATH], buf[MAX_PATH];
+	char     local[MAX_PATH];
 
 	if (acl_var_udp_non_block)
 		flag |= ACL_INET_FLAG_NBLOCK;
 	if (acl_var_udp_reuse_port)
 		flag |= ACL_INET_FLAG_REUSEPORT;
 
-	if (strchr(addr, ':') != NULL || acl_alldig(addr))
-		snprintf(buf, sizeof(buf), "%s", addr);
-	else
-		snprintf(buf, sizeof(buf), "%s/%s/%s",
-			acl_var_udp_queue_dir,
-			strcasecmp(acl_var_udp_private, "n") == 0 ?
-			  ACL_MASTER_CLASS_PUBLIC : ACL_MASTER_CLASS_PRIVATE,
-			 addr);
-
-	fd = acl_udp_bind(buf, flag);
-
+	fd = acl_udp_bind(addr, flag);
 	if (fd == ACL_SOCKET_INVALID) {
-		acl_msg_warn("bind %s error %s", buf, acl_last_serror());
+		acl_msg_warn("bind %s error %s", addr, acl_last_serror());
 		return NULL;
 	}
 
@@ -643,11 +647,16 @@ static ACL_VSTREAM *server_bind_one(const char *addr)
 
 static void server_binding(UDP_SERVER *server, ACL_ARGV *addrs)
 {
+	char addr[MAX_PATH];
 	ACL_ITER iter;
 	int i = 0;
 
 	acl_foreach(iter, addrs) {
-		ACL_VSTREAM *stream = server_bind_one((char *) iter.data);
+		ACL_VSTREAM *stream;
+
+		get_addr((const char *) iter.data, addr, sizeof(addr));
+		stream = server_bind_one(addr);
+
 		acl_event_enable_read(server->event, stream,
 			0, udp_server_read, server);
 		server->streams[i++] = stream;
