@@ -4,6 +4,8 @@
 #include "event.h"
 #include "fiber.h"
 
+#ifdef HAS_POLL
+
 #ifdef SYS_WIN
 typedef int (__stdcall *poll_fn)(struct pollfd *, nfds_t, int);
 #else
@@ -50,6 +52,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	assert(ring_size(&ev->poll_list) > 0);
+	SET_READABLE(fe);
 	pfd->pe->nready++;
 }
 
@@ -68,6 +71,8 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	assert(ring_size(&ev->poll_list) > 0);
+	fe->status |= STATUS_WRITABLE;
+	SET_WRITABLE(fe);
 	pfd->pe->nready++;
 }
 
@@ -204,3 +209,5 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	return acl_fiber_poll(fds, nfds, timeout);
 }
 #endif
+
+#endif // HAS_POLL

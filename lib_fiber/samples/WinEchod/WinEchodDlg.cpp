@@ -270,7 +270,7 @@ void CWinEchodDlg::OnBnClickedStartSchedule()
 	acl_set_connect(acl_fiber_connect);
 	acl_set_recv(acl_fiber_recv);
 	acl_set_send(acl_fiber_send);
-
+	acl_set_poll(acl_fiber_poll);
 	acl_set_select(acl_fiber_select);
 
 	acl::fiber::schedule(acl::FIBER_EVENT_T_WMSG);

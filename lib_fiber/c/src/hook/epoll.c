@@ -271,6 +271,7 @@ static void read_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 		sizeof(ee->fds[epx->fd]->data));
 	if (!(ee->events[ee->nready].events & EPOLLOUT))
 		ee->nready++;
+	SET_READABLE(fe);
 }
 
 static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
@@ -287,6 +288,7 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 		sizeof(ee->fds[epx->fd]->data));
 	if (!(ee->events[ee->nready].events & EPOLLIN))
 		ee->nready++;
+	SET_WRITABLE(fe);
 }
 
 static void epoll_ctl_add(EVENT *ev, EPOLL_EVENT *ee,

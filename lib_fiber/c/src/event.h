@@ -50,7 +50,16 @@ struct FILE_EVENT {
 	int id;
 	unsigned status;
 #define	STATUS_NONE		0
-#define	STATUS_CONNECTING	1
+#define	STATUS_CONNECTING	(unsigned) (1 << 0)
+#define	STATUS_READABLE		(unsigned) (1 << 1)
+#define	STATUS_WRITABLE		(unsigned) (1 << 2)
+
+#define	SET_READABLE(x) ((x)->status |= STATUS_READABLE)
+#define	SET_WRITABLE(x)	((x)->status |= STATUS_WRITABLE)
+#define	CLR_READABLE(x)	((x)->status &= ~STATUS_READABLE)
+#define	CLR_WRITABLE(x)	((x)->status &= ~STATUS_WRITABLE)
+#define	IS_READABLE(x)	((x)->status & STATUS_READABLE)
+#define	IS_WRITABLE(x)	((x)->status & STATUS_WRITABLE)
 
 	unsigned type;
 #define	TYPE_NONE		0

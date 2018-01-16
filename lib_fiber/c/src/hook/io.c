@@ -201,7 +201,12 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		ssize_t ret;
 		int err;
 
-		fiber_wait_read(fe);
+		if (SET_READABLE(fe)) {
+			CLR_READABLE(fe);
+		} else {
+			fiber_wait_read(fe);
+		}
+
 		ret = __sys_read(fd, buf, count);
 		if (ret >= 0) {
 			return ret;
@@ -245,7 +250,12 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 		ssize_t ret;
 		int err;
 
-		fiber_wait_read(fe);
+		if (SET_READABLE(fe)) {
+			CLR_READABLE(fe);
+		} else {
+			fiber_wait_read(fe);
+		}
+
 		ret = __sys_readv(fd, iov, iovcnt);
 		if (ret >= 0) {
 			return ret;
@@ -294,7 +304,12 @@ ssize_t __stdcall acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int fla
 		ssize_t ret;
 		int err;
 
-		fiber_wait_read(fe);
+		if (SET_READABLE(fe)) {
+			CLR_READABLE(fe);
+		} else {
+			fiber_wait_read(fe);
+		}
+
 		ret = __sys_recv(sockfd, buf, len, flags);
 		if (ret >= 0) {
 			return ret;
@@ -345,7 +360,12 @@ ssize_t __stdcall acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 		ssize_t ret;
 		int err;
 
-		fiber_wait_read(fe);
+		if (SET_READABLE(fe)) {
+			CLR_READABLE(fe);
+		} else {
+			fiber_wait_read(fe);
+		}
+
 		ret = __sys_recvfrom(sockfd, buf, len, flags,
 				src_addr, addrlen);
 		if (ret >= 0) {
@@ -392,7 +412,12 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 		ssize_t ret;
 		int err;
 
-		fiber_wait_read(fe);
+		if (SET_READABLE(fe)) {
+			CLR_READABLE(fe);
+		} else {
+			fiber_wait_read(fe);
+		}
+
 		ret = __sys_recvmsg(sockfd, msg, flags);
 		if (ret >= 0) {
 			return ret;

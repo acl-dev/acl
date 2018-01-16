@@ -245,9 +245,13 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 
 #endif
 
-#if defined(ACL_UNIX)
+#if defined(ACL_HAS_POLL)
 
+# if defined(ACL_WINDOWS)
+static acl_poll_fn __sys_poll = WSAPoll;
+# else
 static acl_poll_fn __sys_poll = poll;
+# endif
 
 void acl_set_poll(acl_poll_fn fn)
 {
@@ -470,7 +474,7 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 {
 #if defined(ACL_LINUX) && !defined(MINGW) && defined(USE_EPOLL)
 	return acl_read_epoll_wait(fd, timeout * 1000);
-#elif defined(ACL_UNIX)
+#elif defined(ACL_HAS_POLL)
 	return acl_read_poll_wait(fd, timeout * 1000);
 #else
 	return acl_read_select_wait(fd, timeout * 1000);

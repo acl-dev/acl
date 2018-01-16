@@ -12,9 +12,17 @@
 # define HAS_POLL
 # define HAS_KQUEUE
 #elif defined(_WIN32) || defined(_WIN64)
+# if(_MSC_VER >= 1300)
+#  include <winsock2.h>
+#  include <mswsock.h>
+# else
+#  include <winsock.h>
+# endif
 # define SYS_WIN
 # define HAS_SELECT
-# define HAS_POLL
+# if(_WIN32_WINNT >= 0x0600)
+#  define HAS_POLL
+# endif
 # define HAS_WMSG
 # define HAS_IOCP
 # define __thread __declspec(thread)
