@@ -87,7 +87,9 @@ ACL_API ACL_VSTREAM *acl_vstream_connect(const char *addr, int block_mode,
  * 针对 UDP 通信，该函数用来绑定本地 UDP 地址，如果绑定成功，则创建
  * ACL_VSTREAM 对象, 用户可以象调用 ACL_VSTREAM 对象的读写接口
  * @param addr {const char*} 本地 UDP 地址，格式：ip:port，可以输入地址 ip:0 来让
- *  操作系统自动分配本地端口号
+ *  操作系统自动分配本地端口号，此外还支持在 UNIX 平台下绑定 UNIX 域套接口，
+ *  UNIX 域套接口的地址格式为：{path}@udp，其中 {path} 为域套接口路径，@udp 为
+ *  UDP 后缀
  * @param rw_timeout {int} 读写超时时间(秒)
  * @param flag {unsigned} 标志位
  * @return {ACL_VSTREAM*} 返回 NULL 表示绑定失败

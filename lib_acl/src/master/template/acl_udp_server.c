@@ -127,6 +127,7 @@ char *acl_var_udp_owner;
 char *acl_var_udp_pid_dir;
 char *acl_var_udp_event_mode;
 char *acl_var_udp_log_debug;
+char *acl_var_udp_private;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ ACL_VAR_UDP_QUEUE_DIR, ACL_DEF_UDP_QUEUE_DIR,
@@ -139,6 +140,8 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 		&acl_var_udp_event_mode },
 	{ ACL_VAR_UDP_LOG_DEBUG, ACL_DEF_UDP_LOG_DEBUG,
 		&acl_var_udp_log_debug },
+	{ ACL_VAR_UDP_PRIVATE, ACL_DEF_UDP_PRIVATE,
+		&acl_var_udp_private },
 
         { 0, 0, 0 },
 };
@@ -289,11 +292,10 @@ static void server_rebinding(UDP_SERVER *server, ACL_HTABLE *table)
 			acl_argv_add(addrs2del, buf, NULL);
 	}
 
-	if (acl_htable_used(table) > 0)
-		server_add_addrs(server, table);
-
 	if (acl_argv_size(addrs2del) > 0)
 		server_del_addrs(server, addrs2del);
+	if (acl_htable_used(table) > 0)
+		server_add_addrs(server, table);
 
 	acl_argv_free(addrs2del);
 }
@@ -313,6 +315,8 @@ static void netlink_on_changed(void *ctx)
 
 	acl_foreach(iter, addrs) {
 		acl_htable_enter(table, (const char *) iter.data, NULL);
+		acl_msg_info("%s(%d): get one addr=[%s]",
+			__FUNCTION__, __LINE__, (const char*) iter.data);
 	}
 
 	server_rebinding(server, table);
@@ -593,22 +597,33 @@ static UDP_SERVER *servers_alloc(int event_mode, int nthreads, int sock_count)
 
 static int __fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 
+#define MAX_PATH	1024
+
 static ACL_VSTREAM *server_bind_one(const char *addr)
 {
 	ACL_VSTREAM *stream;
 	ACL_SOCKET   fd;
 	unsigned flag = 0;
-	char     local[64];
+	char     local[MAX_PATH], buf[MAX_PATH];
 
 	if (acl_var_udp_non_block)
 		flag |= ACL_INET_FLAG_NBLOCK;
 	if (acl_var_udp_reuse_port)
 		flag |= ACL_INET_FLAG_REUSEPORT;
 
-	fd = acl_udp_bind(addr, flag);
+	if (strchr(addr, ':') != NULL || acl_alldig(addr))
+		snprintf(buf, sizeof(buf), "%s", addr);
+	else
+		snprintf(buf, sizeof(buf), "%s/%s/%s",
+			acl_var_udp_queue_dir,
+			strcasecmp(acl_var_udp_private, "n") == 0 ?
+			  ACL_MASTER_CLASS_PUBLIC : ACL_MASTER_CLASS_PRIVATE,
+			 addr);
+
+	fd = acl_udp_bind(buf, flag);
 
 	if (fd == ACL_SOCKET_INVALID) {
-		acl_msg_warn("bind %s error %s", addr, acl_last_serror());
+		acl_msg_warn("bind %s error %s", buf, acl_last_serror());
 		return NULL;
 	}
 

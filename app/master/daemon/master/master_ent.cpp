@@ -608,47 +608,17 @@ static int service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	/* copy the configure filepath */
 	serv->conf = acl_mystrdup(path);
 
-#if 0
-	name = get_str_ent(xcp, ACL_VAR_MASTER_SERV_SERVICE, (const char *) 0);
-	if (name == NULL || *name == 0) {
+	ptr_const = get_str_ent(xcp, ACL_VAR_MASTER_SERV_SERVICE, NULL);
+	if (ptr_const == NULL || *ptr_const == 0) {
 		acl_msg_error("no %s found", ACL_VAR_MASTER_SERV_SERVICE);
 		return -1;
 	}
 
-	if (strcmp(acl_safe_basename(command), name) != 0) {
-		const char udp[] = "@udp";
-		char *tmp;
-
-		if (acl_strrncasecmp(name, udp, sizeof(udp) - 1) == 0)
-			tmp = acl_concatenate("\"", acl_var_master_queue_dir,
-				"/", ACL_MASTER_CLASS_PUBLIC, "/",
-				name, "\"", 0);
-		else
-			tmp = acl_concatenate("\"", name, "\"", 0);
-		acl_argv_add(serv->args, "-n", tmp, (char *) 0);
+	if (strcmp(acl_safe_basename(command), ptr_const) != 0) {
+		char *tmp = acl_concatenate("\"", ptr_const, "\"", NULL);
+		acl_argv_add(serv->args, "-n", tmp, NULL);
 		acl_myfree(tmp);
 	}
-#else
-
-#define STR acl_vstring_str
-#define LEN ACL_VSTRING_LEN
-
-	if (serv->addrs) {
-		ACL_ITER     iter;
-		ACL_VSTRING *buf = acl_vstring_alloc(128);
-
-		acl_foreach(iter, serv->addrs) {
-			ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR *) iter.data;
-			if (LEN(buf) > 0)
-				acl_vstring_strcat(buf, ", ");
-			acl_vstring_strcat(buf, addr->addr);
-		}
-
-		if (LEN(buf) > 0)
-			acl_argv_add(serv->args, "-n", STR(buf), (char *) 0);
-		acl_vstring_free(buf);
-	}
-#endif
 
 	transport = get_str_ent(xcp, ACL_VAR_MASTER_SERV_TYPE, (const char *) 0);
 	if (transport == NULL || *transport == 0) {

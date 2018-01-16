@@ -67,7 +67,7 @@ ACL_SOCKET acl_inet_bind(const struct addrinfo *res, unsigned flag)
 }
 
 #ifdef ACL_UNIX
-static ACL_SOCKET acl_unix_bind(const char *addr, unsigned flag)
+ACL_SOCKET acl_unix_dgram_bind(const char *addr, unsigned flag)
 {
 #undef sun
 	struct sockaddr_un sun;
@@ -147,8 +147,8 @@ ACL_SOCKET acl_udp_bind(const char *addr, unsigned flag)
 			acl_myfree(buf);
 			return ACL_SOCKET_INVALID;
 		}
-		fd = acl_unix_bind(buf, flag);
-		printf("bind fd=%d, buf=%s\r\n", fd, buf);
+		fd = acl_unix_dgram_bind(buf, flag);
+		//printf("bind fd=%d, buf=%s\r\n", fd, buf);
 		acl_myfree(buf);
 		return fd;
 	}

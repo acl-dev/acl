@@ -92,6 +92,10 @@ extern int   acl_var_udp_non_block;
 #define ACL_DEF_UDP_REUSEPORT		1
 extern int   acl_var_udp_reuse_port;
 
+#define ACL_VAR_UDP_PRIVATE		"master_private"
+#define ACL_DEF_UDP_PRIVATE		"n"
+extern char *acl_var_udp_private;
+
 #ifdef	__cplusplus
 }
 #endif

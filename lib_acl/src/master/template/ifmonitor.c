@@ -27,9 +27,13 @@ static int netlink_changed(struct nlmsghdr *nh, unsigned int dlen)
 	for (; NLMSG_OK(nh, dlen); nh = NLMSG_NEXT(nh, dlen)) {
 		switch (nh->nlmsg_type) {
 		case RTM_NEWADDR:
+			//acl_msg_info("%s: RTM_NEWADDR", __FUNCTION__);
 		case RTM_DELADDR:
+			//acl_msg_info("%s: RTM_DELADDR", __FUNCTION__);
 		case RTM_NEWROUTE:
+			//acl_msg_info("%s: RTM_NEWROUTE", __FUNCTION__);
 		case RTM_DELROUTE:
+			//acl_msg_info("%s: RTM_DELROUTE", __FUNCTION__);
 			changed++;
 			break;
 		default:
@@ -37,6 +41,8 @@ static int netlink_changed(struct nlmsghdr *nh, unsigned int dlen)
 		}
 	}
 
+//	if (changed > 0)
+//		acl_msg_info("%s: changed=%d", __FUNCTION__, changed);
 	return changed;
 }
 
