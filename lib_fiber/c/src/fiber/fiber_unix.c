@@ -4,6 +4,10 @@
 
 #ifdef SYS_UNIX
 
+#ifdef USE_VALGRIND
+#include <valgrind/valgrind.h>
+#endif
+
 typedef struct FIBER_UNIX {
 	ACL_FIBER fiber;
 #ifdef USE_VALGRIND
@@ -140,7 +144,7 @@ static void fiber_unix_free(ACL_FIBER *fiber)
 	FIBER_UNIX *fb = (FIBER_UNIX *) fiber;
 
 #ifdef USE_VALGRIND
-	VALGRIND_STACK_DEREGISTER(fiber->vid);
+	VALGRIND_STACK_DEREGISTER(fb->vid);
 #endif
 	if (fb->context) {
 		stack_free(fb->context);
