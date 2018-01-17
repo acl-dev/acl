@@ -207,10 +207,9 @@ static int wmsg_wait(EVENT *ev, int timeout)
 	if (!res) {
 		return 0;
 	}
-#if 1
 	TranslateMessage(&msg);
 	DispatchMessage(&msg);
-#else
+#if 1
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
