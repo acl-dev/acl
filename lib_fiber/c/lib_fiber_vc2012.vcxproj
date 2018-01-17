@@ -162,6 +162,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Text Include="..\changes.txt" />
     <Text Include="ReadMe.txt" />
     <Text Include="todo.txt" />
   </ItemGroup>

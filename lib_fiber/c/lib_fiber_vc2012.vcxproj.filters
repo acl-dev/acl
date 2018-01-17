@@ -37,6 +37,9 @@
     <Text Include="todo.txt">
       <Filter>doc</Filter>
     </Text>
+    <Text Include="..\changes.txt">
+      <Filter>doc</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.c">
