@@ -127,7 +127,7 @@ int http_client::on_body(int status, char *data, int dlen, void *ctx)
 	return 0;
 }
 
-void http_client::do_reply(int status, const acl::string& body)
+void http_client::do_reply(int status, const acl::string& body, bool save)
 {
 	HTTP_HDR_RES* hdr_res = http_hdr_res_static(status);
 	http_hdr_set_keepalive(hdr_req_, hdr_res);
@@ -139,7 +139,8 @@ void http_client::do_reply(int status, const acl::string& body)
 	http_hdr_res_free(hdr_res);
 	buf.append(body);
 
-	logger(">>reply: [%s]\r\n", buf.c_str());
+	if (save)
+		logger(">>reply: [%s]\r\n", buf.c_str());
 	acl_aio_writen(conn_, buf.c_str(), (int) buf.size());
 }
 
@@ -147,17 +148,17 @@ static struct {
 	const char* cmd;
 	bool (http_client::*handler)(void);
 } handlers[] = {
-	{ "list",		&http_client::handle_list		},
-	{ "stat",		&http_client::handle_stat		},
-	{ "start",		&http_client::handle_start		},
-	{ "kill",		&http_client::handle_kill		},
-	{ "stop",		&http_client::handle_stop		},
-	{ "restart",		&http_client::handle_restart		},
-	{ "reload",		&http_client::handle_reload		},
+	{ "list",	&http_client::handle_list		 },
+	{ "stat",	&http_client::handle_stat		 },
+	{ "start",	&http_client::handle_start		 },
+	{ "kill",	&http_client::handle_kill		 },
+	{ "stop",	&http_client::handle_stop		 },
+	{ "restart",	&http_client::handle_restart		 },
+	{ "reload",	&http_client::handle_reload		 },
 
-	{ "master_config",	&http_client::handle_master_config	},
+	{ "master_config",&http_client::handle_master_config	 },
 
-	{ 0,			0					}
+	{ 0,		0					 }
 };
 
 bool http_client::handle(void)
@@ -166,7 +167,7 @@ bool http_client::handle(void)
 	if (cmd == NULL || *cmd == 0) {
 		//logger_error("cmd null");
 		acl::string dummy;
-		do_reply(400, dummy);
+		do_reply(400, dummy, false);
 		if (hdr_req_->hdr.keep_alive)
 			wait();
 		else
@@ -186,7 +187,7 @@ bool http_client::handle(void)
 	if (handlers[i].handler == NULL) {
 		logger_warn("invalid cmd=%s", cmd);
 		acl::string dummy;
-		do_reply(400, dummy);
+		do_reply(400, dummy, false);
 		if (hdr_req_->hdr.keep_alive)
 			wait();
 		else

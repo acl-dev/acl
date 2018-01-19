@@ -83,7 +83,7 @@ bool service_list::handle(const list_req_t&, list_res_t& res)
 	res.status = 200;
 	res.msg    = "ok";
 
-	client_.reply<list_res_t>(res.status, res);
+	client_.reply<list_res_t>(res.status, res, false);
 	client_.on_finish();
 
 	return true;

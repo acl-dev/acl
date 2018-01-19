@@ -24,11 +24,11 @@ public:
 
 public:
 	template<typename T>
-	void reply(int status, T& o)
+	void reply(int status, T& o, bool save = true)
 	{
 		acl::string buf;
 		serialize<T>(o, buf);
-		do_reply(status, buf);
+		do_reply(status, buf, save);
 		buf.clear();
 	}
 
@@ -58,7 +58,7 @@ public:
 private:
 	void reset(void);
 	bool handle(void);
-	void do_reply(int status, const acl::string& buf);
+	void do_reply(int status, const acl::string& buf, bool save);
 
 	static int on_head(int status, void* ctx);
 	static int on_body(int status, char* data, int dlen, void* ctx);

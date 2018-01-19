@@ -103,7 +103,7 @@ bool service_stat::handle(const stat_req_t& req, stat_res_t& res)
 			(int) n, (int) req.data.size());
 	}
 
-	client_.reply<stat_res_t>(res.status, res);
+	client_.reply<stat_res_t>(res.status, res, false);
 	client_.on_finish();
 
 	return true;

@@ -1,4 +1,7 @@
 
+17) 2018.1.19
+17.1) log: don't save some command reply information
+
 16) 2018.1.5
 16.1) bugfix: remove command in ACL_MASTER_SERV struct, which maybe be misused
 
