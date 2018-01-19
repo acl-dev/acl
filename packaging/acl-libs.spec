@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        58
+Release:        59
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,9 @@ fi
 /etc/init.d/master
 
 %changelog
+* Fri Jan 19 2018 zhengshuxin@qiyi.com 3.3.0-59-20180119.10
+- fiber: remove valgrind debug by default in Makefile of fiber
+
 * Fri Jan 19 2018 zhengshuxin@qiyi.com 3.3.0-58-20180119.10
 - rpm shell: don't use systemd
 
