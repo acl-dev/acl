@@ -5,12 +5,18 @@
 static bool echo(acl::socket_stream& conn)
 {
 	char buf[8192];
-	int ret = conn.read(buf, sizeof(buf), false);
+	int ret = conn.read(buf, sizeof(buf) - 1, false);
 	if (ret == -1) {
 		printf("read error %s\r\n", acl::last_serror());
 		return false;
 	} else if (conn.write(buf, ret) == -1) {
 		printf("write error %s\r\n", acl::last_serror());
+		return false;
+	}
+
+	buf[ret] = 0;
+	if (strncmp(buf, "quit", 4) == 0) {
+		printf("client wants to quit now\r\n");
 		return false;
 	}
 	return true;
@@ -19,7 +25,7 @@ static bool echo(acl::socket_stream& conn)
 static void fiber_client_echo(acl::socket_stream* conn,
 	acl::fiber_sem& sem, bool& finished, unsigned n)
 {
-	printf("echo fiber-%d running\r\n", acl::fiber::self());
+//	printf("echo fiber-%d running\r\n", acl::fiber::self());
 
 	finished = false;
 	for (int i = 0; i < 10; i++) {
@@ -42,48 +48,56 @@ static void readable_callback(int type acl_unused, ACL_EVENT *event,
 	unsigned int n = 0;
 	acl::fiber_sem sem(0);
 
-	go[&] {
+	go_stack(64000) [&] {
 		fiber_client_echo(conn, sem, finished, n);
 	};
 
 	sem.wait();
-	printf("wait over, finished=%s, %p, n=%u\r\n",
-		finished ? "yes" : "no", &finished, n);
+//	printf("wait over, finished=%s, %p, n=%u\r\n",
+//		finished ? "yes" : "no", &finished, n);
 
 	if (!finished) {
 		acl_event_enable_read(event, cstream, 120, readable_callback, NULL);
+	} else {
+		bool* stop = (bool *) conn->get_ctx();
+		*stop = true;
+
+		printf("closing client\r\n");
 	}
 }
 
 static void fiber_client(acl::socket_stream* conn)
 {
 	printf("fiber-%d running\r\n", acl::fiber::self());
+
+	bool stop = false;
 	ACL_EVENT *event = acl_event_new(ACL_EVENT_POLL, 0, 1, 0);
 	ACL_VSTREAM *cstream = conn->get_vstream();
 	cstream->context = conn;
+	conn->set_ctx(&stop);
 	acl_event_enable_read(event, cstream, 120, readable_callback, NULL);
 
-	while (true)
+	while (!stop) {
 		acl_event_loop(event);
+	}
 
 	acl_event_free(event);
 	delete conn;
+	printf("delete client ok, fiber-%u will exit\r\n", acl::fiber::self());
 }
 
 static void fiber_server(acl::server_socket& ss)
 {
-	while (true)
-	{
+	while (true) {
 		acl::socket_stream* conn = ss.accept();
-		if (conn == NULL)
-		{
+		if (conn == NULL) {
 			printf("accept error %s\r\n", acl::last_serror());
 			break;
 		}
 
 		printf("accept ok, fd: %d\r\n", conn->sock_handle());
 
-		go[=] {
+		go_stack(32000) [=] {
 			fiber_client(conn);
 		};
 	}
@@ -102,10 +116,8 @@ int main(int argc, char *argv[])
 	acl::string addr("127.0.0.1:9006");
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "hs:")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
@@ -118,8 +130,7 @@ int main(int argc, char *argv[])
 	}
 
 	acl::server_socket ss;
-	if (ss.open(addr) == false)
-	{
+	if (ss.open(addr) == false) {
 		printf("listen %s error %s\r\n", addr.c_str(), acl::last_serror());
 		return 1;
 	}
