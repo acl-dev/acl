@@ -1,6 +1,15 @@
 #include "stdafx.h"
 #include "http_forward.h"
 
+static bool save_info(const char* cmd)
+{
+#define NE(x, y) strcasecmp((x), (y))
+
+	if (NE(cmd, "list") && NE(cmd, "stat") && NE(cmd, "master_config"))
+		return true;
+	return false;
+}
+
 int http_forward(const char* addr, const char* cmd,
 	const acl::string& body, acl::string& out)
 {
@@ -23,8 +32,11 @@ int http_forward(const char* addr, const char* cmd,
 		return 503;
 	}
 
-	logger(">>>url=%s, req=|%s|, res=|%s|<<<",
-		url.c_str(), body.c_str(), json.to_string().c_str());
+	if (var_cfg_save_all || save_info(cmd))
+	{
+		logger(">>>url=%s, req=|%s|, res=|%s|<<<",
+			url.c_str(), body.c_str(), json.to_string().c_str());
+	}
 #if 1
 	out = json.to_string();
 	return 200;

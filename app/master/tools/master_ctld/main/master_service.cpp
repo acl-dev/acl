@@ -15,8 +15,10 @@ acl::master_str_tbl var_conf_str_tab[] = {
 };
 
 int   var_cfg_use_redis_session;
+int   var_cfg_save_all;
 acl::master_bool_tbl var_conf_bool_tab[] = {
 	{ "use_redis_session", 1, &var_cfg_use_redis_session },
+	{ "save_all", 0, &var_cfg_save_all },
 
 	{ 0, 0, 0 }
 };

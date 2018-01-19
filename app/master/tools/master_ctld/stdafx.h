@@ -20,3 +20,6 @@
 #include <set>
 #include "struct.h"
 #include "serialize.h"
+
+extern char *var_cfg_manage_addr;
+extern int   var_cfg_save_all;
