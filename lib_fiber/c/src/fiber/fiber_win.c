@@ -35,6 +35,10 @@ static void fiber_win_init(FIBER_WIN *fb, size_t size)
 	}
 	fb->context = CreateFiberEx(size, 0, FIBER_FLAG_FLOAT_SWITCH,
 		fiber_win_start, fb);
+	if (fb->context == NULL) {
+		int e = acl_fiber_last_error();
+		msg_fatal("%s: CreateFiberEx error=%s, %d", last_serror(), e);
+	}
 }
 
 ACL_FIBER *fiber_win_alloc(void(*start_fn)(ACL_FIBER *), size_t size)
