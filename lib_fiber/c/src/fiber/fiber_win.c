@@ -22,7 +22,7 @@ static void fiber_win_swap(ACL_FIBER *from, ACL_FIBER *to)
 	SwitchToFiber(fb_to->context);
 }
 
-static void __stdcall fiber_win_start(LPVOID ctx)
+static void WINAPI fiber_win_start(LPVOID ctx)
 {
 	FIBER_WIN *fb = (FIBER_WIN *) ctx;
 	fb->fiber.start_fn(&fb->fiber);
@@ -33,7 +33,7 @@ static void fiber_win_init(FIBER_WIN *fb, size_t size)
 	if (fb->context) {
 		DeleteFiber(fb->context);
 	}
-	fb->context = CreateFiberEx(size, 0, FIBER_FLAG_FLOAT_SWITCH,
+	fb->context = CreateFiberEx(0, size, FIBER_FLAG_FLOAT_SWITCH,
 		fiber_win_start, fb);
 	if (fb->context == NULL) {
 		int e = acl_fiber_last_error();

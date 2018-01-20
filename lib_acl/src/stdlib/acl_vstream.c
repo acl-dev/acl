@@ -326,6 +326,7 @@ AGAIN:
 	} else if (in->errnum == ACL_ETIMEDOUT) {
 		in->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
 		SAFE_COPY(in->errbuf, "read timeout");
+		acl_set_error(ACL_ETIMEDOUT);
 	}
 #if ACL_EWOULDBLOCK == ACL_EAGAIN
 	else if (in->errnum != ACL_EWOULDBLOCK)

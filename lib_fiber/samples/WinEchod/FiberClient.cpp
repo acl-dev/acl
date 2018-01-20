@@ -42,7 +42,7 @@ void CFiberClient::run(void)
 #else
 	acl::string buf;
 	int n = 0;
-	m_conn->set_rw_timeout(20);
+	m_conn->set_rw_timeout(10);
 	while (true)
 	{
 		if (m_conn->read(buf, false) == false)

@@ -194,6 +194,7 @@ int __stdcall acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		}
 		SET_TIME(now);
 		if (timeout > 0 && (now - begin >= timeout)) {
+			acl_fiber_set_error(FIBER_ETIMEDOUT);
 			break;
 		}
 	}

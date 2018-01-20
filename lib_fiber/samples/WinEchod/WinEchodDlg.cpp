@@ -306,11 +306,29 @@ void CWinEchodDlg::OnBnClickedStopSchedule()
 }
 
 
+static void WINAPI  start_proc(LPVOID ctx)
+{
+}
+
 void CWinEchodDlg::OnBnClickedCreateTimer()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	acl::fiber* fb = new CFiberSleep;
 	fb->start();
+
+	/*
+	int i;
+	for (i = 0; i < 100000; i++) {
+		LPVOID p = CreateFiberEx(0, 32000, FIBER_FLAG_FLOAT_SWITCH,
+			start_proc, NULL);
+		if (p == NULL) {
+			printf("p null=%d, %s, i=%d\r\n", acl::last_error(),
+				acl::last_serror(), i);
+			assert(p);
+		}
+	}
+	printf("i=%d\r\n", i);
+	*/
 }
 
 
