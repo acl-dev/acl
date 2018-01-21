@@ -20,7 +20,7 @@
 #else
 # define SOCKET	int
 # define INVALID_SOCKET -1
-# define POLL poll
+# define POLL	poll
 # define CLOSE	close
 # define LISTEN	listen
 # define ACCEPT accept

@@ -13,6 +13,8 @@
 # define HAS_KQUEUE
 #elif defined(_WIN32) || defined(_WIN64)
 # if(_MSC_VER >= 1300)
+#  undef FD_SETSIZE
+#  define FD_SETSIZE 10240
 #  include <winsock2.h>
 #  include <mswsock.h>
 # else
