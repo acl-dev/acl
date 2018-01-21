@@ -166,16 +166,20 @@ static int poll_wait(EVENT *ev, int timeout)
 			return 0;
 		}
 		msg_fatal("%s: poll error %s", __FUNCTION__, last_serror());
+	} else if (n == 0) {
+		return n;
 	}
 
 	for (i = 0; i < ep->count; i++) {
 		FILE_EVENT *fe     = ep->files[i];
 		struct pollfd *pfd = &ep->pfds[fe->id];
 
-		if (pfd->revents & POLLIN && fe->r_proc) {
+#define POLL_ANY_ERR	(POLLERR | POLLHUP | POLLNVAL)
+
+		if (pfd->revents & (POLLIN | POLL_ANY_ERR) && fe->r_proc) {
 			fe->r_proc(ev, fe);
 		}
-		if (pfd->revents & POLLOUT && fe->w_proc) {
+		if (pfd->revents & (POLLOUT | POLL_ANY_ERR ) && fe->w_proc) {
 			fe->w_proc(ev, fe);
 		}
 	}

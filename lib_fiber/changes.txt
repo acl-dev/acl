@@ -1,4 +1,7 @@
 
+79) 2018.1.21
+79.1) bugfix: event_poll.c 中应该处理异常情况（POLLERR | POLLHUP | POLLNVAL）
+
 78) 2018.1.17
 78.1) performance: win32 窗口消息引擎处理性能优化，每次调度循环过程可以尽量多的提取消息，
 从而提升消息处理能力
