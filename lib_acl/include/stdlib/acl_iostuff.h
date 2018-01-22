@@ -191,11 +191,11 @@ ACL_API int acl_issock(int fd);
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-typedef int (__stdcall *acl_select_fn)(int, fd_set*, fd_set*,
+typedef int (WINAPI *acl_select_fn)(int, fd_set*, fd_set*,
 	fd_set*, const struct timeval*);
 # if(_WIN32_WINNT >= 0x0600)
 #  define ACL_HAS_POLL
-typedef int (__stdcall *acl_poll_fn)(struct pollfd*, unsigned long, int);
+typedef int (WINAPI *acl_poll_fn)(struct pollfd*, unsigned long, int);
 ACL_API void acl_set_poll(acl_poll_fn fn);
 # endif
 

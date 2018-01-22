@@ -615,32 +615,32 @@ typedef int socket_t;
 #define INVALID_SOCKET	-1
 #endif
 
-FIBER_API int acl_fiber_close(socket_t fd);
-
 FIBER_API socket_t acl_fiber_socket(int domain, int type, int protocol);
 FIBER_API int acl_fiber_listen(socket_t, int backlog);
 
 #if defined(_WIN32) || defined(_WIN64)
-FIBER_API socket_t __stdcall acl_fiber_accept(
+FIBER_API int WINAPI acl_fiber_close(socket_t fd);
+FIBER_API socket_t WINAPI acl_fiber_accept(
 	socket_t, struct sockaddr *, socklen_t *);
-FIBER_API int __stdcall acl_fiber_connect(
+FIBER_API int WINAPI acl_fiber_connect(
 	socket_t , const struct sockaddr *, socklen_t );
 
-FIBER_API int __stdcall acl_fiber_recv(
+FIBER_API int WINAPI acl_fiber_recv(
 	socket_t, char* buf, int len, int flags);
-FIBER_API int __stdcall acl_fiber_recvfrom(socket_t, char* buf, size_t len,
+FIBER_API int WINAPI acl_fiber_recvfrom(socket_t, char* buf, size_t len,
 	int flags, struct sockaddr* src_addr, socklen_t* addrlen);
 
-FIBER_API int __stdcall acl_fiber_send(socket_t, const char* buf,
+FIBER_API int WINAPI acl_fiber_send(socket_t, const char* buf,
 	int len, int flags);
-FIBER_API int __stdcall acl_fiber_sendto(socket_t, const char* buf, size_t len,
+FIBER_API int WINAPI acl_fiber_sendto(socket_t, const char* buf, size_t len,
 	int flags, const struct sockaddr* dest_addr, socklen_t addrlen);
 
-FIBER_API int __stdcall acl_fiber_select(int nfds, fd_set *readfds,
+FIBER_API int WINAPI acl_fiber_select(int nfds, fd_set *readfds,
 	fd_set *writefds, fd_set *exceptfds, const struct timeval *timeout);
-FIBER_API int __stdcall acl_fiber_poll(struct pollfd *fds,
+FIBER_API int WINAPI acl_fiber_poll(struct pollfd *fds,
 	unsigned long nfds, int timeout);
 #else
+FIBER_API int acl_fiber_close(socket_t fd);
 FIBER_API socket_t acl_fiber_accept(socket_t , struct sockaddr *, socklen_t *);
 FIBER_API int acl_fiber_connect(socket_t , const struct sockaddr *, socklen_t );
 FIBER_API ssize_t acl_fiber_read(socket_t, void* buf, size_t count);

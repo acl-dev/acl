@@ -7,7 +7,7 @@
 #ifdef HAS_POLL
 
 #ifdef SYS_WIN
-typedef int (__stdcall *poll_fn)(struct pollfd *, nfds_t, int);
+typedef int (WINAPI *poll_fn)(struct pollfd *, nfds_t, int);
 #else
 typedef int (*poll_fn)(struct pollfd *, nfds_t, int);
 #endif
@@ -146,7 +146,7 @@ static void pollfd_free(POLLFD *pfds)
 	free(pfds);
 }
 
-int __stdcall acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
+int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	long long begin, now;
 	POLL_EVENT pe;

@@ -283,6 +283,7 @@ void CWinEchodDlg::OnBnClickedStartSchedule()
 	acl_set_send(acl_fiber_send);
 	acl_set_poll(acl_fiber_poll);
 	acl_set_select(acl_fiber_select);
+	acl_set_close_socket(acl_fiber_close);
 
 	acl::fiber::schedule(acl::FIBER_EVENT_T_WMSG);
 	
@@ -291,8 +292,8 @@ void CWinEchodDlg::OnBnClickedStartSchedule()
 	acl_set_connect(connect);
 	acl_set_recv(recv);
 	acl_set_send(send);
-
 	acl_set_select(select);
+	acl_set_close_socket(closesocket);
 
 	GetDlgItem(IDC_START_SCHEDULE)->EnableWindow(TRUE);
 	GetDlgItem(IDC_STOP_SCHEDULE)->EnableWindow(FALSE);

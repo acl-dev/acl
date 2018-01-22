@@ -36,8 +36,8 @@ typedef unsigned long nfds_t;
 #endif
 
 #ifdef SYS_UNIX
-# ifndef __stdcall
-#  define __stdcall
+# ifndef WINAPI
+#  define WINAPI
 # endif
 #endif
 

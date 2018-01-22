@@ -55,10 +55,18 @@ void acl_set_writev(acl_writev_fn fn)
 	__sys_writev = fn;
 }
 
+static acl_close_socket_fn  __sys_close = close;
+#elif defined(ACL_WINDOWS)
+static acl_close_socket_fn  __sys_close = closesocket;
 #endif
 
 static acl_recv_fn   __sys_recv   = recv;
 static acl_send_fn   __sys_send   = send;
+
+void acl_set_close_socket(acl_close_socket_fn fn)
+{
+	__sys_close = fn;
+}
 
 void acl_set_recv(acl_recv_fn fn)
 {
@@ -131,7 +139,7 @@ int acl_socket_end(void)
 
 int acl_socket_close(ACL_SOCKET fd)
 {
-	return closesocket(fd);
+	return __sys_close(fd);
 }
 
 int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
@@ -272,8 +280,8 @@ const char *inet_ntop(int af, const void *src, char *dst, socklen_t size)
 		return NULL;
 	}
 	/* cannot direclty use &size because of strict aliasing rules */
-	return (WSAAddressToString((struct sockaddr *)&ss, sizeof(ss), NULL, dst, &s) == 0)?
-		dst : NULL;
+	return (WSAAddressToString((struct sockaddr *)&ss, sizeof(ss),
+		NULL, dst, &s) == 0) ? dst : NULL;
 }
 
 #endif
@@ -293,7 +301,7 @@ int acl_socket_end(void)
 
 int acl_socket_close(ACL_SOCKET fd)
 {
-	return close(fd);
+	return __sys_close(fd);
 }
 
 #if 0

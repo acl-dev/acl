@@ -17,7 +17,7 @@
 
 #  ifndef STDCALL
 #   ifdef ACL_WINDOWS
-#    define STDCALL __stdcall
+#    define STDCALL WINAPI
 #   else
 #    define STDCALL
 #   endif // ACL_WINDOWS

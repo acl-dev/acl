@@ -5,10 +5,10 @@
 #include "fiber.h"
 
 #ifdef SYS_WIN
-typedef socket_t (__stdcall *socket_fn)(int, int, int);
-typedef int (__stdcall *listen_fn)(socket_t, int);
-typedef socket_t (__stdcall *accept_fn)(socket_t, struct sockaddr *, socklen_t *);
-typedef int (__stdcall *connect_fn)(socket_t, const struct sockaddr *, socklen_t);
+typedef socket_t (WINAPI *socket_fn)(int, int, int);
+typedef int (WINAPI *listen_fn)(socket_t, int);
+typedef socket_t (WINAPI *accept_fn)(socket_t, struct sockaddr *, socklen_t *);
+typedef int (WINAPI *connect_fn)(socket_t, const struct sockaddr *, socklen_t);
 #else
 typedef socket_t (*socket_fn)(int, int, int);
 typedef int (*listen_fn)(socket_t, int);
@@ -108,7 +108,7 @@ int acl_fiber_listen(socket_t sockfd, int backlog)
 
 //#define FAST_ACCEPT
 
-socket_t __stdcall acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
+socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 	socklen_t *addrlen)
 {
 	FILE_EVENT *fe;
@@ -203,7 +203,7 @@ socket_t __stdcall acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 #endif
 }
 
-int __stdcall acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
+int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	socklen_t addrlen)
 {
 	int err, ret;

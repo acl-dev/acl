@@ -4,12 +4,12 @@
 #include "fiber.h"
 
 #ifdef SYS_WIN
-typedef int      (__stdcall *close_fn)(socket_t);
-typedef ssize_t  (__stdcall *recv_fn)(socket_t, char *, int, int);
-typedef ssize_t  (__stdcall *recvfrom_fn)(socket_t, char *, int, int,
+typedef int      (WINAPI *close_fn)(socket_t);
+typedef ssize_t  (WINAPI *recv_fn)(socket_t, char *, int, int);
+typedef ssize_t  (WINAPI *recvfrom_fn)(socket_t, char *, int, int,
 	struct sockaddr *, socklen_t *);
-typedef ssize_t  (__stdcall *send_fn)(socket_t, const char *, int, int);
-typedef ssize_t  (__stdcall *sendto_fn)(socket_t, const char *, int, int,
+typedef ssize_t  (WINAPI *send_fn)(socket_t, const char *, int, int);
+typedef ssize_t  (WINAPI *sendto_fn)(socket_t, const char *, int, int,
 	const struct sockaddr *, socklen_t);
 #else
 typedef unsigned (*sleep_fn)(unsigned int seconds);
@@ -134,7 +134,11 @@ int close(socket_t fd)
 }
 #endif
 
+#if defined(SYS_WIN)
+int WINAPI acl_fiber_close(socket_t fd)
+#else
 int acl_fiber_close(socket_t fd)
+#endif
 {
 	int ret;
 	if (fd == INVALID_SOCKET) {
@@ -279,9 +283,9 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 #endif
 
 #ifdef SYS_WIN
-int __stdcall acl_fiber_recv(socket_t sockfd, char *buf, int len, int flags)
+int WINAPI acl_fiber_recv(socket_t sockfd, char *buf, int len, int flags)
 #else
-ssize_t __stdcall acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
+ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 #endif
 {
 	FILE_EVENT *fe;
@@ -332,10 +336,10 @@ ssize_t __stdcall acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int fla
 }
 
 #ifdef SYS_WIN
-int __stdcall acl_fiber_recvfrom(socket_t sockfd, char *buf, size_t len,
+int WINAPI acl_fiber_recvfrom(socket_t sockfd, char *buf, size_t len,
 	int flags, struct sockaddr *src_addr, socklen_t *addrlen)
 #else
-ssize_t __stdcall acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
+ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 	int flags, struct sockaddr *src_addr, socklen_t *addrlen)
 #endif
 {
@@ -521,10 +525,10 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 #endif
 
 #ifdef SYS_WIN
-int __stdcall acl_fiber_send(socket_t sockfd, const char *buf,
+int WINAPI acl_fiber_send(socket_t sockfd, const char *buf,
 	int len, int flags)
 #else
-ssize_t __stdcall acl_fiber_send(socket_t sockfd, const void *buf,
+ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 	size_t len, int flags)
 #endif
 {
@@ -565,10 +569,10 @@ ssize_t __stdcall acl_fiber_send(socket_t sockfd, const void *buf,
 }
 
 #ifdef SYS_WIN
-int __stdcall acl_fiber_sendto(socket_t sockfd, const char *buf, size_t len,
+int WINAPI acl_fiber_sendto(socket_t sockfd, const char *buf, size_t len,
 	int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
 #else
-ssize_t __stdcall acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
+ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 	int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
 #endif
 {

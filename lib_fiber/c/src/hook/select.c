@@ -8,7 +8,7 @@
 #include "fiber.h"
 
 #ifdef SYS_WIN
-typedef int (__stdcall *select_fn)(int, fd_set *, fd_set *,
+typedef int (WINAPI *select_fn)(int, fd_set *, fd_set *,
 	fd_set *, const struct timeval *);
 #else
 typedef int (*select_fn)(int, fd_set *, fd_set *, fd_set *, struct timeval *);
@@ -140,10 +140,10 @@ static struct pollfd *pfds_create(int *nfds, fd_set *readfds,
 #endif
 
 #ifdef SYS_WIN
-int __stdcall acl_fiber_select(int nfds, fd_set *readfds, fd_set *writefds,
+int WINAPI acl_fiber_select(int nfds, fd_set *readfds, fd_set *writefds,
 	fd_set *exceptfds, const struct timeval *timeout)
 #else
-int __stdcall acl_fiber_select(int nfds, fd_set *readfds, fd_set *writefds,
+int acl_fiber_select(int nfds, fd_set *readfds, fd_set *writefds,
 	fd_set *exceptfds, struct timeval *timeout)
 #endif
 {

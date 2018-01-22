@@ -8,7 +8,7 @@
 #include "event_select.h"
 
 #ifdef SYS_WIN
-typedef int(__stdcall *select_fn)(int, fd_set *, fd_set *, fd_set *, struct timeval *);
+typedef int(WINAPI *select_fn)(int, fd_set *, fd_set *, fd_set *, struct timeval *);
 #else
 typedef int(*select_fn)(int, fd_set *, fd_set *, fd_set *, struct timeval *);
 #endif

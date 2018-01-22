@@ -85,7 +85,7 @@ ACL_API int acl_stream_connect(const char *path, int blocking, int timeout);
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-typedef int (__stdcall *acl_connect_fn)(SOCKET, const struct sockaddr*, socklen_t);
+typedef int (WINAPI *acl_connect_fn)(SOCKET, const struct sockaddr*, socklen_t);
 #else
 typedef int (*acl_connect_fn)(int, const struct sockaddr*, socklen_t);
 #endif

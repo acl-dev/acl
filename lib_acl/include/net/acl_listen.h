@@ -129,7 +129,7 @@ ACL_API int acl_fifo_listen(const char *path, int permissions, int mode);
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-typedef SOCKET (__stdcall *acl_accept_fn)(SOCKET, struct sockaddr*, socklen_t*);
+typedef SOCKET (WINAPI *acl_accept_fn)(SOCKET, struct sockaddr*, socklen_t*);
 #else
 typedef int (*acl_accept_fn)(int, struct sockaddr*, socklen_t*);
 #endif
