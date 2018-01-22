@@ -70,6 +70,7 @@ static int poll_add_read(EVENT_POLL *ep, FILE_EVENT *fe)
 		pfd->fd           = fe->fd;
 		pfd->revents      = 0;
 		ep->files[fe->id] = fe;
+		ep->event.fdcount++;
 	}
 
 	fe->mask    |= EVENT_READ;
@@ -96,6 +97,7 @@ static int poll_add_write(EVENT_POLL *ep, FILE_EVENT *fe)
 		pfd->fd           = fe->fd;
 		pfd->revents      = 0;
 		ep->files[fe->id] = fe;
+		ep->event.fdcount++;
 	}
 
 	fe->mask    |= EVENT_WRITE;
@@ -124,6 +126,7 @@ static int poll_del_read(EVENT_POLL *ep, FILE_EVENT *fe)
 		ep->pfds[ep->count].events  = 0;
 		ep->pfds[ep->count].revents = 0;
 		fe->id = -1;
+		ep->event.fdcount--;
 	}
 	fe->mask &= ~EVENT_READ;
 	return 0;
@@ -150,6 +153,7 @@ static int poll_del_write(EVENT_POLL *ep, FILE_EVENT *fe)
 		ep->pfds[ep->count].events  = 0;
 		ep->pfds[ep->count].revents = 0;
 		fe->id = -1;
+		ep->event.fdcount--;
 	}
 	fe->mask &= ~EVENT_WRITE;
 	return 0;

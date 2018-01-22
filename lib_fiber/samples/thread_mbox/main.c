@@ -92,7 +92,7 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 		fflush(stdout);
 		getchar();
 
-		acl_fiber_schedule_stop();
+		//acl_fiber_schedule_stop();
 	}
 }
 

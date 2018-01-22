@@ -209,6 +209,7 @@ int __stdcall acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	int err, ret;
 	socklen_t len;
 	FILE_EVENT *fe;
+	time_t begin, end;
 
 	if (__sys_connect == NULL)
 		hook_init();
@@ -275,15 +276,20 @@ int __stdcall acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 #ifdef SYS_WIN
 	fe->status |= STATUS_CONNECTING;
 #endif
+
+	time(&begin);
 	fiber_wait_write(fe);
+	time(&end);
+
 #ifdef SYS_WIN
 	fe->status &= ~STATUS_CONNECTING;
 #endif
 
 	if (acl_fiber_killed(fe->fiber)) {
-		msg_info("%s(%d), %s: fiber-%u was killed, %s",
+		msg_info("%s(%d), %s: fiber-%u was killed, %s, spend %ld",
 			__FILE__, __LINE__, __FUNCTION__,
-			acl_fiber_id(fe->fiber), last_serror());
+			acl_fiber_id(fe->fiber), last_serror(),
+			(long) (end - begin));
 		return -1;
 	}
 
@@ -299,15 +305,16 @@ int __stdcall acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 		}
 
 		fiber_save_errno(acl_fiber_last_error());
-		msg_error("%s(%d), %s: getpeername error %s, fd: %d",
-			__FILE__, __LINE__, __FUNCTION__,
-			last_serror(), sockfd);
+		msg_error("%s(%d), %s: getpeername error %s, fd: %d, spend %ld",
+			__FILE__, __LINE__, __FUNCTION__, last_serror(),
+			sockfd, (long)(end - begin));
 		return -1;
 	}
 
 	acl_fiber_set_error(err);
-	msg_error("%s(%d): getsockopt error: %s, ret: %d, err: %d",
-		__FUNCTION__, __LINE__, last_serror(), ret, err);
+	msg_error("%s(%d): getsockopt error: %s, ret: %d, err: %d, spend %ld",
+		__FUNCTION__, __LINE__, last_serror(), ret, err,
+		(long) (end - begin));
 
 	return -1;
 }

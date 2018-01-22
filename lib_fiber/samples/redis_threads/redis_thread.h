@@ -1,8 +1,8 @@
 class redis_thread : public acl::thread
 {
 public:
-	redis_thread(const char* addr, int conn_timeout, int rw_timeout,
-		int fibers_max, int stack_size, int oper_count);
+	redis_thread(const char* addr, const char* passwd, int conn_timeout,
+		int rw_timeout, int fibers_max, int stack_size, int oper_count);
 
 	~redis_thread(void) {}
 
@@ -37,6 +37,7 @@ protected:
 
 private:
 	acl::string addr_;
+	acl::string passwd_;
 	int conn_timeout_;
 	int rw_timeout_;
 	int fibers_max_;

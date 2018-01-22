@@ -106,9 +106,11 @@ void redis_thread::fiber_redis(ACL_FIBER *fiber, void *ctx)
 	thread->fiber_dec(i);
 }
 
-redis_thread::redis_thread(const char* addr, int conn_timeout, int rw_timeout,
-	int fibers_max, int stack_size, int oper_count)
+redis_thread::redis_thread(const char* addr, const char* passwd,
+	int conn_timeout, int rw_timeout, int fibers_max, int stack_size,
+	int oper_count)
 	: addr_(addr)
+	, passwd_(passwd)
 	, conn_timeout_(conn_timeout)
 	, rw_timeout_(rw_timeout)
 	, fibers_max_(fibers_max)
@@ -122,6 +124,7 @@ void* redis_thread::run(void)
 {
 	printf("addr: %s\r\n", addr_.c_str());
 	cluster_.set(addr_.c_str(), 0, conn_timeout_, rw_timeout_);
+	cluster_.set_password("default", passwd_);
 
 	gettimeofday(&begin_, NULL);
 
@@ -147,5 +150,5 @@ void redis_thread::fiber_dec(int cnt)
 		fibers_max_, total, spent,
 		(total * 1000) / (spent > 0 ? spent : 1));
 		
-	acl_fiber_schedule_stop();
+//	acl_fiber_schedule_stop();
 }

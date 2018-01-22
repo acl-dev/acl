@@ -68,8 +68,10 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 	printf(">>>fiber-%d exit\r\n", acl_fiber_id(fiber));
 
 	/* 当所有协程都执行完时停止协程调度过程 */
-	if (--__nfibers == 0)
-		acl_fiber_schedule_stop();
+	if (--__nfibers == 0) {
+		printf("All are over!\r\n");
+		//acl_fiber_schedule_stop();
+	}
 }
 
 static void usage(const char *procname)
@@ -95,6 +97,8 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
+
+	acl_fiber_msg_stdout_enable(1);
 
 	/* 循环创建指定数量的协程 */
 	for (i = 0; i < __nfibers; i++)

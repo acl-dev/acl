@@ -82,7 +82,7 @@ static void fiber_redis(ACL_FIBER *fiber, void *ctx)
 		printf("fibers: %d, count: %lld, spent: %.2f, speed: %.2f\r\n",
 			__fibers_max, total, spent,
 			(total * 1000) / (spent > 0 ? spent : 1));
-		acl_fiber_schedule_stop();
+		//acl_fiber_schedule_stop();
 	}
 }
 
@@ -90,6 +90,7 @@ static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		" -s redis_addr\r\n"
+		" -p passwd\r\n"
 		" -n operation_count\r\n"
 		" -c fibers count\r\n"
 		" -t conn_timeout\r\n"
@@ -99,9 +100,9 @@ static void usage(const char *procname)
 int main(int argc, char *argv[])
 {
 	int   ch, i, conn_timeout = 2, rw_timeout = 2;
-	acl::string addr("127.0.0.1:6379");
+	acl::string addr("127.0.0.1:6379"), passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:c:r:t:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:c:r:t:p:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -122,6 +123,9 @@ int main(int argc, char *argv[])
 		case 't':
 			conn_timeout = atoi(optarg);
 			break;
+		case 'p':
+			passwd = optarg;
+			break;
 		default:
 			break;
 		}
@@ -129,7 +133,9 @@ int main(int argc, char *argv[])
 
 	acl::acl_cpp_init();
 
+	acl_fiber_msg_stdout_enable(1);
 	acl::redis_client_cluster cluster;
+	cluster.set_password("default", passwd);
 	cluster.set(addr.c_str(), 0, conn_timeout, rw_timeout);
 
 	gettimeofday(&__begin, NULL);

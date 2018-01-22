@@ -8,10 +8,11 @@
 
 static int __stdout_enable = 0;
 
-static FIBER_MSG_WRITE_FN __write_fn         = NULL;
+static FIBER_MSG_WRITE_FN     __write_fn     = NULL;
 static FIBER_MSG_PRE_WRITE_FN __pre_write_fn = NULL;
-static void *__pre_write_ctx           = NULL;
-static void *__msg_ctx                 = NULL;
+
+static void *__pre_write_ctx = NULL;
+static void *__msg_ctx       = NULL;
 
 void acl_fiber_msg_register(FIBER_MSG_WRITE_FN write_fn, void *ctx)
 {

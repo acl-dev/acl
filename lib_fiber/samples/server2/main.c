@@ -255,6 +255,7 @@ int main(int argc, char *argv[])
 #endif
 	acl_lib_init();
 	acl_msg_stdout_enable(1);
+	acl_fiber_msg_stdout_enable(1);
 
 	acl_fiber_create(fiber_memcheck, NULL, 64000);
 	printf("%s: call fiber_creater\r\n", __FUNCTION__);

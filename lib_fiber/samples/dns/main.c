@@ -44,8 +44,10 @@ static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
 	--__count;
 	printf("__count: %d\r\n", __count);
 
-	if (__count == 0)
-		acl_fiber_schedule_stop();
+	if (__count == 0) {
+		printf("All are over!\r\n");
+		//acl_fiber_schedule_stop();
+	}
 }
 
 static void usage(const char *procname)
@@ -86,6 +88,8 @@ int main(int argc, char *argv[])
 		usage(argv[0]);
 		return 0;
 	}
+
+	acl_fiber_msg_stdout_enable(1);
 
 	tokens = acl_argv_split(buf, ";, \t");
 	__count = tokens->argc;

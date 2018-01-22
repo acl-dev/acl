@@ -145,7 +145,8 @@ SHARED_OLD_LIBNAME = lib_fiber.so
 ###########################################################
 
 .PHONY = static shared clean
-COMPILE = $(CC) $(CFLAGS)
+COMPILE = $(CC) $(CFLAGS) -O3
+COMPILE_FIBER = $(CC) $(CFLAGS) 
 
 all: static shared
 rebuild rb: clean all

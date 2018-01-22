@@ -23,8 +23,10 @@ static void timer_main(ACL_FIBER *fiber, void *ctx acl_unused)
 	printf("thread-%lu, timer-%d wakeup, spend: %.2f ms\r\n",
 		(unsigned long) acl_pthread_self(), acl_fiber_id(fiber), spent);
 
-	if (--__left_fiber == 0)
-		acl_fiber_schedule_stop();
+	if (--__left_fiber == 0) {
+		printf("All are over!\r\n");
+		//acl_fiber_schedule_stop();
+	}
 }
 
 static void *thread_main(void *ctx acl_unused)
@@ -80,6 +82,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	acl_fiber_msg_stdout_enable(1);
 	acl_pthread_attr_init(&attr);
 	tids = (acl_pthread_t *) acl_mycalloc(nthreads, sizeof(acl_pthread_t));
 

@@ -62,8 +62,10 @@ static void poll_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
 	close(fd);
 	printf(">>>fiber-%d close %d exit\r\n", acl_fiber_id(fiber), fd);
 
-	if (--__nfibers == 0)
-		acl_fiber_schedule_stop();
+	if (--__nfibers == 0) {
+		printf("All are over!\r\n");
+		//acl_fiber_schedule_stop();
+	}
 }
 
 static void usage(const char *procname)
@@ -84,6 +86,8 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
+
+	acl_fiber_msg_stdout_enable(1);
 
 	__nfibers++;
 	acl_fiber_create(poll_sleep, &n, 32768);

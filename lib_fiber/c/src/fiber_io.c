@@ -193,7 +193,13 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		}
 
 		if (timer == NULL) {
-			continue;
+			if (ev->fdcount > 0) {
+				continue;
+			}
+
+			msg_info("%s(%d), tid=%lu: fdcount=0", __FUNCTION__,
+				__LINE__, __pthread_self());
+			break;
 		}
 
 		SET_TIME(now);
@@ -219,6 +225,9 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		msg_info("%s(%d), %s: waiting io: %d", __FILE__, __LINE__,
 			__FUNCTION__, (int) __thread_fiber->io_count);
 	}
+
+	msg_info("%s(%d), tid=%lu: IO fiber exit now",
+		__FUNCTION__, __LINE__, __pthread_self());
 	__thread_fiber->ev_fiber = NULL;
 }
 

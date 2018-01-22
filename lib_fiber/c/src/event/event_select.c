@@ -68,6 +68,7 @@ static int select_add_read(EVENT_SELECT *es, FILE_EVENT *fe)
 		if (fe->fd > es->maxfd) {
 			es->maxfd = fe->fd;
 		}
+		es->event.fdcount++;
 	}
 
 	fe->mask |= EVENT_READ;
@@ -88,6 +89,7 @@ static int select_add_write(EVENT_SELECT *es, FILE_EVENT *fe)
 		if (fe->fd > es->maxfd) {
 			es->maxfd = fe->fd;
 		}
+		es->event.fdcount++;
 	}
 
 	fe->mask |= EVENT_WRITE;
@@ -111,6 +113,7 @@ static int select_del_read(EVENT_SELECT *es, FILE_EVENT *fe)
 		if (fe->fd == es->maxfd) {
 			es->dirty = 1;
 		}
+		es->event.fdcount--;
 	}
 	fe->mask &= ~EVENT_READ;
 	return 0;
@@ -132,6 +135,7 @@ static int select_del_write(EVENT_SELECT *es, FILE_EVENT *fe)
 		if (fe->fd == es->maxfd) {
 			es->dirty = 1;
 		}
+		es->event.fdcount--;
 	}
 	fe->mask &= ~EVENT_WRITE;
 	return 0;

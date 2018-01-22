@@ -74,6 +74,7 @@ static void wmsg_fdmap_set(EVENT_WMSG *ev, FILE_EVENT *fe)
 	pfe = (FILE_EVENT *) htable_find(ev->tbl, key);
 	if (pfe == NULL) {
 		htable_enter(ev->tbl, key, fe);
+		ev->event.fdcount++;
 	} else if (pfe != fe) {
 		msg_error("%s(%d): old fe(%p) exist, fd=%d",
 			__FUNCTION__, __LINE__, pfe, (int) fe->fd);
@@ -97,7 +98,9 @@ static void wmsg_fdmap_del(EVENT_WMSG *ev, FILE_EVENT *fe)
 	//_snprintf(key, sizeof(key), "%u", fe->fd);
 	_itoa(fe->fd, key, 10);
 
-	htable_delete(ev->tbl, key, NULL);
+	if (htable_delete(ev->tbl, key, NULL) == 0) {
+		ev->event.fdcount--;
+	}
 }
 
 static int wmsg_add_read(EVENT_WMSG *ev, FILE_EVENT *fe)
