@@ -24,7 +24,7 @@ static void sleep_main(ACL_FIBER *fiber, void *ctx)
 
 	if (--__fibers_count == 0) {
 		printf("All are over!\r\n");
-		acl_fiber_schedule_stop();
+		//acl_fiber_schedule_stop();
 	}
 }
 
