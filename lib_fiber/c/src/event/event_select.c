@@ -157,8 +157,8 @@ static int select_event_wait(EVENT *ev, int timeout)
 	}
 
 #ifdef SYS_WIN
-	acl_fiber_set_error(0);
 	if (ev->fdcount == 0) {
+		Sleep(timeout);
 		return 0;
 	}
 

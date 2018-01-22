@@ -139,15 +139,35 @@ void msg_fatal(const char *fmt,...)
 
 const char *msg_strerror(int errnum, char *buffer, size_t size)
 {
+#ifdef SYS_WIN
+	int   L;
+
 	if (buffer == NULL || size <= 0) {
 		msg_error("%s, %s(%d): input error",
 			__FILE__, __FUNCTION__, __LINE__);
 		return NULL;
 	}
 
-#ifdef SYS_WIN
-	_snprintf(buffer, size, "%s", strerror(errnum));
+	L = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM
+			| FORMAT_MESSAGE_ARGUMENT_ARRAY,
+			NULL,
+			errnum,
+			0,
+			buffer,
+			size,
+			NULL);
+	while ((L > 0) && ((buffer[L - 1] >= 0 && buffer[L - 1] <= 32) || 
+		 (buffer[L - 1] == '.')))
+	{
+		buffer[L - 1] = '\0';
+		L--;
+	}
 #else
+	if (buffer == NULL || size <= 0) {
+		msg_error("%s, %s(%d): input error",
+			__FILE__, __FUNCTION__, __LINE__);
+		return NULL;
+	}
 	snprintf(buffer, size, "%s", strerror(errnum));
 #endif
 

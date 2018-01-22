@@ -2,6 +2,8 @@
 80) 2018.1.22
 80.1) feature: fiber_io.c 当没有监控网络句柄并且没有定时器任务时，该 IO 协程
 会自动退出
+80.2) bugfix: event_select.c/event_poll.c 当没有网络句柄被监控时，应调用 Sleep，因为
+Windows 下的 select/WSAPoll 不允许输入的句柄为空
 
 79) 2018.1.21
 79.1) bugfix: event_poll.c 中应该处理异常情况（POLLERR | POLLHUP | POLLNVAL）
