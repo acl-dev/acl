@@ -164,6 +164,10 @@ static int poll_wait(EVENT *ev, int timeout)
 	EVENT_POLL *ep = (EVENT_POLL *) ev;
 	int n, i;
 
+	if (ev->fdcount == 0) {
+		return 0;
+	}
+
 	n = __sys_poll(ep->pfds, ep->count, timeout);
 	if (n < 0) {
 		if (errno == EINTR) {

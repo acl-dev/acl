@@ -96,7 +96,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\c;..\..\..\lib_acl;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_fiber.lib;lib_acl_vc2012d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_fiber.lib;lib_acl_vc2012d.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>
@@ -147,7 +147,7 @@ copy ..\..\c\lib_fiber.dll .\ /Y</Command>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\c;..\..\..\lib_acl;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_acl.lib;lib_fiber.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_acl.lib;lib_fiber.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>
@@ -176,7 +176,7 @@ copy ..\..\c\lib_fiber.dll .\ /Y</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\c;..\..\..\lib_acl;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_fiber.lib;lib_acl_vc2012.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_fiber.lib;lib_acl_vc2012.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

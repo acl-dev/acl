@@ -27,6 +27,8 @@ void atomic_set(ATOMIC *self, void *value)
 {
 #if defined(__GNUC__) && (__GNUC__ >= 4)
 	(void) __sync_lock_test_and_set(&self->value, value);
+#elif defined(SYS_WIN)
+	InterlockedExchangePointer((volatile PVOID*) &self->value, value);
 #else
 	(void) self;
 	(void) value;
@@ -38,6 +40,9 @@ void *atomic_cas(ATOMIC *self, void *cmp, void *value)
 {
 #if defined(__GNUC__) && (__GNUC__ >= 4)
 	return __sync_val_compare_and_swap(&self->value, cmp, value);
+#elif defined(SYS_WIN)
+	return InterlockedCompareExchangePointer(
+		(volatile PVOID*)&self->value, value, cmp);
 #else
 	(void) self;
 	(void) cmp;
@@ -52,6 +57,8 @@ void *atomic_xchg(ATOMIC *self, void *value)
 {
 #if defined(__GNUC__) && (__GNUC__ >= 4)
 	return __sync_lock_test_and_set(&self->value, value);
+#elif defined(SYS_WIN)
+	return InterlockedExchangePointer((volatile PVOID*)&self->value, value);
 #else
 	(void) self;
 	(void) value;
@@ -65,6 +72,8 @@ void atomic_int64_set(ATOMIC *self, long long n)
 {
 #if defined(__GNUC__) && (__GNUC__ >= 4)
 	(void) __sync_lock_test_and_set((long long *) self->value, n);
+#elif defined(SYS_WIN)
+	InterlockedExchangePointer((volatile PVOID*) self->value, (PVOID) n);
 #else
 	(void) self;
 	(void) n;
@@ -77,6 +86,10 @@ long long atomic_int64_fetch_add(ATOMIC *self, long long n)
 {
 #if defined(__GNUC__) && (__GNUC__ >= 4)
 	return (long long) __sync_fetch_and_add((long long *) self->value, n);
+#elif defined(SYS_WIN)
+	long long k = InterlockedExchangeAdd64(
+		(volatile LONGLONG*) self->value, n);
+	return k - n;
 #else
 	(void) self;
 	(void) n;
@@ -90,6 +103,8 @@ long long atomic_int64_add_fetch(ATOMIC *self, long long n)
 {
 #if defined(__GNUC__) && (__GNUC__ >= 4)
 	return (long long) __sync_add_and_fetch((long long *) self->value, n);
+#elif defined(SYS_WIN)
+	return InterlockedExchangeAdd64((volatile LONGLONG*) self->value, n);
 #else
 	(void) self;
 	(void) n;
@@ -104,6 +119,9 @@ long long atomic_int64_cas(ATOMIC *self, long long cmp, long long n)
 #if defined(__GNUC__) && (__GNUC__ >= 4)
 	return (long long) __sync_val_compare_and_swap(
 			(long long*) self->value, cmp, n);
+#elif defined(SYS_WIN)
+	return InterlockedCompareExchange64(
+		(volatile LONGLONG*)&self->value, n, cmp);
 #else
 	(void) self;
 	(void) cmp;

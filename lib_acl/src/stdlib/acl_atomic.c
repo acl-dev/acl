@@ -195,8 +195,8 @@ long long acl_atomic_int64_cas(ACL_ATOMIC *self, long long cmp, long long n)
 	acl_pthread_mutex_unlock(&self->lock);
 	return old;
 #elif	defined(ACL_WINDOWS)
-	return InterlockedCompareExchange64((volatile LONGLONG*)&self->value,
-			n, cmp);
+	return InterlockedCompareExchange64(
+		(volatile LONGLONG*)&self->value, n, cmp);
 #else
 	return (long long) __sync_val_compare_and_swap(
 			(long long*) self->value, cmp, n);

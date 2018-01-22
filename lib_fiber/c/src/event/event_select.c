@@ -157,6 +157,11 @@ static int select_event_wait(EVENT *ev, int timeout)
 	}
 
 #ifdef SYS_WIN
+	acl_fiber_set_error(0);
+	if (ev->fdcount == 0) {
+		return 0;
+	}
+
 	n = __sys_select(0, &rset, &wset, &xset, tp);
 #else
 	if (es->dirty) {
@@ -171,6 +176,7 @@ static int select_event_wait(EVENT *ev, int timeout)
 	n = __sys_select(es->maxfd + 1, &rset, 0, &xset, tp);
 #endif
 	if (n < 0) {
+		printf("select error %s\r\n", last_serror());
 		if (acl_fiber_last_error() == FIBER_EINTR) {
 			return 0;
 		}
