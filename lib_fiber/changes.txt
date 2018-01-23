@@ -1,4 +1,8 @@
 
+81) 2018.1.23
+81.1) bugfix: event_epoll.c 的 函数 epoll_event_wait 中没有处理 EPOLLERR|EPOLLHUP
+的错误情况，会导致程序进入死循环
+
 80) 2018.1.22
 80.1) feature: fiber_io.c 当没有监控网络句柄并且没有定时器任务时，该 IO 协程
 会自动退出

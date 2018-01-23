@@ -184,12 +184,13 @@ static int poll_wait(EVENT *ev, int timeout)
 		FILE_EVENT *fe     = ep->files[i];
 		struct pollfd *pfd = &ep->pfds[fe->id];
 
-#define POLL_ANY_ERR	(POLLERR | POLLHUP | POLLNVAL)
+#define POLL_ERR	(POLLERR | POLLHUP | POLLNVAL)
 
-		if (pfd->revents & (POLLIN | POLL_ANY_ERR) && fe->r_proc) {
+		if (pfd->revents & (POLLIN | POLL_ERR) && fe->r_proc) {
 			fe->r_proc(ev, fe);
 		}
-		if (pfd->revents & (POLLOUT | POLL_ANY_ERR ) && fe->w_proc) {
+
+		if (pfd->revents & (POLLOUT | POLL_ERR ) && fe->w_proc) {
 			fe->w_proc(ev, fe);
 		}
 	}

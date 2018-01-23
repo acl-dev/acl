@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        60
+Release:        61
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,7 +76,10 @@ fi
 /etc/init.d/master
 
 %changelog
-* Fri Jan 19 2018 zhengshuxin@qiyi.com 3.3.0-60-20180119.10
+* Fri Jan 23 2018 zhengshuxin@qiyi.com 3.3.0-61-20180123.19
+- epoll_event.c should handle EPOLLERR|EPOLLHUP events.
+
+* Fri Jan 23 2018 zhengshuxin@qiyi.com 3.3.0-60-20180123.16
 - master & master tools: support version manager
 
 * Fri Jan 19 2018 zhengshuxin@qiyi.com 3.3.0-59-20180119.10
