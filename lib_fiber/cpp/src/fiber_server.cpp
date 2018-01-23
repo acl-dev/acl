@@ -49,8 +49,8 @@ static char *acl_var_fiber_dispatch_addr;
 static char *acl_var_fiber_dispatch_type;
 static char *acl_var_fiber_reuseport;     /* just for stand alone */
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
+	{ "master_debug", "all:1", &acl_var_fiber_log_debug },
 	{ "fiber_queue_dir", "", &acl_var_fiber_queue_dir },
-	{ "fiber_log_debug", "all:1", &acl_var_fiber_log_debug },
 	{ "fiber_deny_banner", "Denied!\r\n", &acl_var_fiber_deny_banner },
 	{ "fiber_access_allow", "all", &acl_var_fiber_access_allow },
 	{ "fiber_owner", "", &acl_var_fiber_owner },
