@@ -217,11 +217,13 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 		ee = &ep->events[i];
 		fe = (FILE_EVENT *) ee->data.ptr;
 
-		if (ee->events & EPOLLIN && fe && fe->r_proc) {
+#define EPOLL_ERR	(EPOLLERR | EPOLLHUP)
+
+		if (ee->events & (EPOLLIN | EPOLL_ERR) && fe && fe->r_proc) {
 			fe->r_proc(ev, fe);
 		}
 
-		if (ee->events & EPOLLOUT && fe && fe->w_proc) {
+		if (ee->events & (EPOLLOUT | EPOLL_ERR) && fe && fe->w_proc) {
 			fe->w_proc(ev, fe);
 		}
 	}

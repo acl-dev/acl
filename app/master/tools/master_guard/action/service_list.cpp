@@ -22,11 +22,7 @@ void service_list::get_version(ACL_VSTREAM* fp, acl::string& out)
 	if (ret == ACL_VSTREAM_EOF)
 		logger_error("read error %s", acl::last_serror());
 	else
-	{
-		ACL_ARGV* tokens = acl_argv_split(buf, " \t");
-		out = tokens->argv[0];
-		acl_argv_free(tokens);
-	}
+		out = buf;
 }
 
 void service_list::get_version(const char* path, acl::string& out)
