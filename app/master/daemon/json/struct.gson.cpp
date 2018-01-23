@@ -1391,6 +1391,11 @@ namespace acl
         else
             $node.add_text("notify_recipients", acl::get_value($obj.notify_recipients));
 
+        if (check_nullptr($obj.version))
+            $node.add_null("version");
+        else
+            $node.add_text("version", acl::get_value($obj.version));
+
         if (check_nullptr($obj.env))
             $node.add_null("env");
         else
@@ -1436,6 +1441,7 @@ namespace acl
         acl::json_node *listen_fd_count = $node["listen_fd_count"];
         acl::json_node *notify_addr = $node["notify_addr"];
         acl::json_node *notify_recipients = $node["notify_recipients"];
+        acl::json_node *version = $node["version"];
         acl::json_node *env = $node["env"];
         acl::json_node *procs = $node["procs"];
         std::pair<bool, std::string> $result;
@@ -1484,6 +1490,9 @@ namespace acl
      
         if(notify_recipients)
             gson(*notify_recipients, &$obj.notify_recipients);
+     
+        if(version)
+            gson(*version, &$obj.version);
      
         if(!env ||!env->get_obj()||!($result = gson(*env->get_obj(), &$obj.env), $result.first))
             return std::make_pair(false, "required [serv_info_t.env] failed:{"+$result.second+"}");

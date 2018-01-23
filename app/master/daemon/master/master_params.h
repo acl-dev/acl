@@ -157,6 +157,8 @@ extern int   acl_var_master_start_timeo;
 #define ACL_VAR_MASETR_SERV_STOP_KILL		"master_stop_kill"
 #define ACL_VAR_MASTER_SERV_STOP_WAIT		"master_stop_wait"
 
+#define ACL_VAR_MASTER_SERV_VERSION		"master_version"
+
 /**
  * master_params.c
  */

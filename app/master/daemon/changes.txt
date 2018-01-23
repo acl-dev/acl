@@ -1,4 +1,7 @@
 
+18) 2018.1.23
+18.1) feature: web interface adds version info for every services.
+
 17) 2018.1.19
 17.1) log: don't save some command reply information
 

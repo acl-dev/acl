@@ -83,6 +83,7 @@ int acl_master_refresh_service(ACL_MASTER_SERV *entry)
 	SWAP(char *, serv->cmdext, entry->cmdext);
 	SWAP(char *, serv->notify_addr, entry->notify_addr);
 	SWAP(char *, serv->notify_recipients, entry->notify_recipients);
+	SWAP(char *, serv->version, entry->version);
 	SWAP(ACL_ARGV *, serv->args, entry->args);
 
 	acl_master_service_restart(serv);

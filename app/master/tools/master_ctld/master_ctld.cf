@@ -47,6 +47,7 @@ service master_ctld {
 	master_prefork = 1
 #	进程程序名
 	master_command = master_ctld
+	master_version = 1.0.0-0
 #	进程日志记录文件
 	master_log = {install_path}/var/log/master_ctld
 #	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2

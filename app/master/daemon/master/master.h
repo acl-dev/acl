@@ -46,6 +46,7 @@ typedef struct ACL_MASTER_SERV {
 	char    *conf;			/* service configure filepath */
 	char    *notify_addr;		/* warning address when not null */
 	char    *notify_recipients;	/* users warned to */
+	char    *version;		/* the service's version */
 	int      avail_proc;		/* idle processes */
 	int      total_proc;		/* number of processes */
 	int      throttle_delay;	/* failure recovery parameter */

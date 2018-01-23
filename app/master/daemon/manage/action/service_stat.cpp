@@ -44,6 +44,8 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 	if (serv->notify_recipients && *serv->notify_recipients)
 		info.notify_recipients = serv->notify_recipients;
 
+	info.version = serv->version;
+
 	ACL_ITER iter;
 	acl_foreach(iter, serv->children_env) {
 		ACL_MASTER_NV* v = (ACL_MASTER_NV *) iter.data;

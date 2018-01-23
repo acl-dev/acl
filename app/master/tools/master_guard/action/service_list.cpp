@@ -14,6 +14,42 @@ service_list::service_list(const char* master_ctld, const char* guard_manager,
 {
 }
 
+void service_list::get_version(ACL_VSTREAM* fp, acl::string& out)
+{
+	char buf[8192];
+
+	int ret = acl_vstream_gets_nonl(fp, buf, sizeof(buf));
+	if (ret == ACL_VSTREAM_EOF)
+		logger_error("read error %s", acl::last_serror());
+	else
+	{
+		ACL_ARGV* tokens = acl_argv_split(buf, " \t");
+		out = tokens->argv[0];
+		acl_argv_free(tokens);
+	}
+}
+
+void service_list::get_version(const char* path, acl::string& out)
+{
+	out = "unknown";
+
+	ACL_ARGV* args = acl_argv_alloc(1);
+	acl_argv_add(args, path, "-v", NULL);
+
+	ACL_VSTREAM* fp = acl_vstream_popen(O_RDWR,
+		ACL_VSTREAM_POPEN_ARGV, args->argv, ACL_VSTREAM_POPEN_END);
+	if (fp == NULL)
+		logger_error("popen error=%s, comd=%s",
+			acl::last_serror(), path);
+	else
+	{
+		get_version(fp, out);
+		acl_vstream_pclose(fp);
+	}
+
+	acl_argv_free(args);
+}
+
 bool service_list::run(void)
 {
 	list_req_t req;
@@ -35,6 +71,13 @@ bool service_list::run(void)
 		info.start  = (*cit).start;
 		info.name   = (*cit).name;
 		info.conf   = (*cit).conf;
+		info.path   = (*cit).path;
+		if ((*cit).version.empty())
+			info.version = "none";
+		else if ((*cit).version.equal("-v", false))
+			get_version((*cit).path, info.version);
+		else
+			info.version = (*cit).version;
 		list_res.data.push_back(info);
 	}
 
@@ -108,12 +151,14 @@ bool service_list::udp_report(const acl::string& body)
 	const char* local_addr = "0.0.0.0:0";
 	acl::socket_stream stream;
 	if (stream.bind_udp(local_addr) == false) {
-		logger_error("bind_udp %s error %s", local_addr, acl::last_serror());
+		logger_error("bind_udp %s error %s",
+			local_addr, acl::last_serror());
 		return false;
 	}
 	stream.set_peer(ip);
 	if (stream.write(body) == false) {
-		logger_error("write %s error %s", body.c_str(), acl::last_serror());
+		logger_error("write %s error %s",
+			body.c_str(), acl::last_serror());
 		return false;
 	}
 

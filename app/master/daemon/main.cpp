@@ -16,7 +16,7 @@
 #include "master/master.h"
 #include "manage/manager.h"
 
-const char *var_master_version = "acl_master version 2.1.0-1 20180119 (acl)";
+const char *var_master_version = "3.3.0-60 20180123";
 char *var_master_procname;
 
 /* usage - show hint and terminate */
@@ -58,7 +58,8 @@ int     main(int argc, char **argv)
 			acl_msg_verbose++;
 			break;
 		case 'v':
-			printf("%s\r\n", var_master_version);
+			printf("%s (acl_master, acl-%s)\r\n",
+				var_master_version, acl_version());
 			return 0;
 		case 'h':
 			usage(argv[0]);

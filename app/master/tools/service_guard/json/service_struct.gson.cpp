@@ -28,6 +28,16 @@ namespace acl
         else
             $node.add_text("conf", acl::get_value($obj.conf));
 
+        if (check_nullptr($obj.path))
+            $node.add_null("path");
+        else
+            $node.add_text("path", acl::get_value($obj.path));
+
+        if (check_nullptr($obj.version))
+            $node.add_null("version");
+        else
+            $node.add_text("version", acl::get_value($obj.version));
+
 
         return $node;
     }
@@ -52,6 +62,8 @@ namespace acl
         acl::json_node *start = $node["start"];
         acl::json_node *name = $node["name"];
         acl::json_node *conf = $node["conf"];
+        acl::json_node *path = $node["path"];
+        acl::json_node *version = $node["version"];
         std::pair<bool, std::string> $result;
 
         if(!status ||!($result = gson(*status, &$obj.status), $result.first))
@@ -65,6 +77,12 @@ namespace acl
      
         if(!conf ||!($result = gson(*conf, &$obj.conf), $result.first))
             return std::make_pair(false, "required [service_info_t.conf] failed:{"+$result.second+"}");
+     
+        if(path)
+            gson(*path, &$obj.path);
+     
+        if(version)
+            gson(*version, &$obj.version);
      
         return std::make_pair(true,"");
     }

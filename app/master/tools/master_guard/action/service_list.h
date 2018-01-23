@@ -27,6 +27,8 @@ private:
 	int  conn_timeout_;
 	int  rw_timeout_;
 
+	void get_version(ACL_VSTREAM* fp, acl::string& out);
+	void get_version(const char* path, acl::string& out);
 	bool report(const acl::string& body);
 	bool tcp_report(const acl::string& body);
 	bool udp_report(const acl::string& body);

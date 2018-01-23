@@ -18,6 +18,10 @@ struct service_info_t
 	long start;
 	acl::string name;
 	acl::string conf;
+	// Gson@optional
+	acl::string path;
+	// Gson@optional
+	acl::string version;
 };
 
 struct service_list_res_t

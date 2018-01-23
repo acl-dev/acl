@@ -2194,7 +2194,9 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	if (fd == ACL_SOCKET_INVALID)
 		return fp;
 
-	if ((ret = acl_check_socket(fd)) == 1) {
+	if (fdtype & ACL_VSTREAM_TYPE_FILE) {
+		/* nothing */
+	} else if ((ret = acl_check_socket(fd)) == 1) {
 		ret = acl_getsocktype(fd);
 #ifdef ACL_INET6
 		if (ret == AF_INET || ret == AF_INET6)
@@ -3058,7 +3060,6 @@ static struct sockaddr *set_sock_addr(const char *addr, size_t *sa_size)
 #endif
 		memcpy(un->sun_path, buf, len + 1);
 		*sa_size = sizeof(struct sockaddr_un);
-		printf("set sock addr=%s\r\n", buf);
 		return (struct sockaddr *) un;
 	}
 #endif

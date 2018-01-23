@@ -451,6 +451,7 @@ static int service_transport(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 static void service_control(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 {
 	const char* ptr = get_str_ent(xcp, ACL_VAR_MASETR_SERV_STOP_KILL, "off");
+
 	if (EQ(ptr, "on") || EQ(ptr, "true") || atoi(ptr) > 1)
 		serv->flags |= ACL_MASTER_FLAG_STOP_KILL;
 	else
@@ -461,6 +462,13 @@ static void service_control(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 		serv->flags |= ACL_MASTER_FLAG_STOP_WAIT;
 	else
 		serv->flags &= ~ACL_MASTER_FLAG_STOP_WAIT;
+}
+
+static void service_version(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
+{
+	const char *ptr = get_str_ent(xcp, ACL_VAR_MASTER_SERV_VERSION, "none");
+
+	serv->version = acl_mystrdup(ptr);
 }
 
 static void service_wakeup_time(ACL_XINETD_CFG_PARSER *xcp,
@@ -802,6 +810,7 @@ ACL_MASTER_SERV *acl_master_ent_load(const char *filepath)
 	service_wakeup_time(xcp, serv);
 	service_proc(xcp, serv);
 	service_control(xcp, serv);
+	service_version(xcp, serv);
 
 	if (service_args(xcp, serv, filepath) < 0) {
 		acl_master_ent_free(serv);
@@ -902,6 +911,8 @@ void acl_master_ent_free(ACL_MASTER_SERV *serv)
 		acl_myfree(serv->notify_addr);
 	if (serv->notify_recipients)
 		acl_myfree(serv->notify_recipients);
+	if (serv->version)
+		acl_myfree(serv->version);
 	if (serv->args)
 		acl_argv_free(serv->args);
 	if (serv->children_env)

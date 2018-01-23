@@ -37,6 +37,7 @@ bool service_app::save(const char* ip, const service_list_res_t& res)
 #define APP_START	"start"
 #define APP_STATUS	"status"
 #define APP_DATE	"date"
+#define APP_VER		"version"
 
 bool service_app::save_one(const char* ip, const service_info_t& info)
 {
@@ -45,6 +46,7 @@ bool service_app::save_one(const char* ip, const service_info_t& info)
 	attrs[APP_CONF]   = info.conf;
 	attrs[APP_NAME]   = info.name;
 	attrs[APP_STATUS] = acl::string::parse_int(info.status);
+	attrs[APP_VER]    = info.version;
 
 	acl::rfc822 rfc;
 	char buf[128];

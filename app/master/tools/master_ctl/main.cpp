@@ -128,6 +128,7 @@ static void println_server(const serv_info_t& server)
 	println("listen_fd_count", server.listen_fd_count);
 	println("notify_addr", server.notify_addr.c_str());
 	println("notify_recipients", server.notify_recipients.c_str());
+	println("version", server.version.c_str());
 
 	acl::string buf;
 	size_t i = 0;
