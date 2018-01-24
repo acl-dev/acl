@@ -75,6 +75,7 @@ static void notify_thread(void *arg)
 	add_num(buf, "pid", info->pid);
 	add_str(buf, "rcpt", info->notify_recipients);
 	add_str(buf, "info", info->desc);
+	acl_vstring_strcat(buf, "\r\n");
 
 	client = acl_vstream_connect(info->notify_addr,
 		ACL_BLOCKING, 60, 60, 1024);
@@ -95,7 +96,8 @@ static void notify_thread(void *arg)
 		acl_msg_error("%s(%d): write to notify server error, info(%s)",
 			myname, __LINE__, acl_vstring_str(buf));
 	else
-		acl_msg_info("%s(%d): notify ok!", myname, __LINE__);
+		acl_msg_info("%s(%d): notify %s ok!",
+			myname, __LINE__, info->notify_addr);
 
 	acl_vstream_close(client);
 	acl_vstring_free(buf);

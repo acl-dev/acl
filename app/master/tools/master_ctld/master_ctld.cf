@@ -25,9 +25,9 @@ service master_ctld {
 	master_type = sock
 
 #	当子进程异常退出时，如果该值非空，则将子进程异常退出的消息通知该服务
-#	master_notify_addr = 127.0.0.1:5801
+	master_notify_addr = {install_path}/var/public/monitor.sock
 #	邮件通知接收者
-#	master_notify_recipients = zhengshuxin@hotmail.com
+	master_notify_recipients = zhengshuxin@hotmail.com
 
 #	是否允许延迟接受客户端连接，如果为0则表示关闭该功能，如果大于0则表示打开此功能
 #	并且此值代表延迟接受连接的超时值，超过此值时如果客户端依然没有发来数据，则操作

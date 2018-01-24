@@ -82,7 +82,7 @@ void master_service::handle(const acl::string& data)
 	serialize<service_dead_res_t>(res, body);
 	guard_report report(var_cfg_guard_manager, 10, 10);
 	report.report(body);
-	printf("body=|%s|\r\n", body.c_str());
+	logger("report=|%s|", body.c_str());
 }
 
 void master_service::on_accept(acl::socket_stream& conn)
