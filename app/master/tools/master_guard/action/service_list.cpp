@@ -7,6 +7,20 @@
 #include "http_request.h"
 #include "service_list.h"
 
+static int get_fds(const std::list<proc_info_t>& procs)
+{
+	int n = 0;
+	for (std::list<proc_info_t>::const_iterator cit = procs.begin();
+		cit != procs.end(); ++cit)
+	{
+		int ret = tools::get_fds((*cit).pid);
+		if (ret > 0)
+			n += ret;
+	}
+
+	return n;
+}
+
 service_list::service_list(const char* master_ctld, const char* guard_manager,
 	int conn_timeout, int rw_timeout)
 : master_ctld_(master_ctld)
@@ -44,12 +58,15 @@ bool service_list::run(void)
 			tools::get_version((*cit).path, info.version);
 		else
 			info.version = (*cit).version;
+
+		if ((*cit).check_fds)
+			info.fds = get_fds((*cit).procs);
 		list_res.data.push_back(info);
 	}
 
 	acl::string body;
 	serialize<service_list_res_t>(list_res, body);
-//	logger("|%s|, len=%d", body.c_str(), (int) body.size());
+	//logger("|%s|, len=%d", body.c_str(), (int) body.size());
 
 	guard_report report(guard_manager_, conn_timeout_, rw_timeout_);
 	return report.report(body);

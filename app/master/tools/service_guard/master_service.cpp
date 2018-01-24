@@ -58,7 +58,7 @@ void master_service::on_read(acl::socket_stream* stream)
 		return;
 
 	buf[n] = 0;
-//	logger("read from %s, %d bytes", stream->get_peer(), n);
+	logger("read from %s, %d bytes, buf=|%s|", stream->get_peer(), n, buf);
 
 	const char* peer_ip = stream->get_peer();
 	if (peer_ip == NULL || *peer_ip == 0) {

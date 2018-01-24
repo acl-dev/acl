@@ -28,6 +28,15 @@ struct service_info_t
 	acl::string path;
 	// Gson@optional
 	acl::string version;
+	// Gson@optional
+	int  fds;
+
+	service_info_t(void)
+	{
+		status = -1;
+		start  = -1;
+		fds    = -1;
+	}
 };
 
 struct service_list_res_t : service_base

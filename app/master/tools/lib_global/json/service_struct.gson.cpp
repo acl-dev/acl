@@ -215,6 +215,11 @@ namespace acl
         else
             $node.add_text("version", acl::get_value($obj.version));
 
+        if (check_nullptr($obj.fds))
+            $node.add_null("fds");
+        else
+            $node.add_number("fds", acl::get_value($obj.fds));
+
 
         return $node;
     }
@@ -241,6 +246,7 @@ namespace acl
         acl::json_node *conf = $node["conf"];
         acl::json_node *path = $node["path"];
         acl::json_node *version = $node["version"];
+        acl::json_node *fds = $node["fds"];
         std::pair<bool, std::string> $result;
 
         if(!status ||!($result = gson(*status, &$obj.status), $result.first))
@@ -260,6 +266,9 @@ namespace acl
      
         if(version)
             gson(*version, &$obj.version);
+     
+        if(fds)
+            gson(*fds, &$obj.fds);
      
         return std::make_pair(true,"");
     }

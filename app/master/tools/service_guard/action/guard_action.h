@@ -28,4 +28,7 @@ private:
 	acl::string data_;
 
 	bool do_run(void);
+
+	bool on_service_list(acl::json& json);
+	bool on_service_dead(acl::json& json);
 };

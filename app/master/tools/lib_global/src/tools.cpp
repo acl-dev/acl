@@ -46,34 +46,29 @@ int tools::get_fds(pid_t pid)
 	buf.format("/proc/%d/fd", (int) pid);
 
 	ACL_ARGV* args = acl_argv_alloc(1);
-	acl_argv_add(args, "ls", buf.c_str(), "|", "wc", "-l", NULL);
+	acl_argv_add(args, "ls", "-l", buf.c_str(), NULL);
 
 	ACL_VSTREAM* fp = acl_vstream_popen(O_RDWR,
 		ACL_VSTREAM_POPEN_ARGV, args->argv, ACL_VSTREAM_POPEN_END);
 	if (fp == NULL)
 	{
-		logger_error("popen error=%s, cmd=ls /proc/%d/fd|wc -l",
+		logger_error("popen error=%s, cmd=ls /proc/%d/fd",
 			acl::last_serror(), (int) pid);
 		return -1;
 	}
 
+	int n = -1; // first line is invalid
 	char line[1024];
-	int ret = acl_vstream_gets_nonl(fp, line, sizeof(line));
-	if (ret == ACL_VSTREAM_EOF)
+	while (true)
 	{
-		logger_error("gets line error=%s, cmd=ls /proc/%d/fd|wc -l",
-				acl::last_serror(), (int) pid);
-		acl_argv_free(args);
-		acl_vstream_pclose(fp);
-		return -1;
+		int ret = acl_vstream_gets_nonl(fp, line, sizeof(line));
+		if (ret == ACL_VSTREAM_EOF)
+			break;
+		n++;
 	}
 
-	ret = atoi(line);
-	if (ret < 0)
-		logger_error("invalid fdcount=%d, cmd=ls /proc/%d/fd|wc -l",
-			ret, (int) pid);
 	acl_argv_free(args);
 	acl_vstream_pclose(fp);
 
-	return ret;
+	return n;
 }
