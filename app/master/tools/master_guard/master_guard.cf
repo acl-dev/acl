@@ -64,6 +64,6 @@ service master_guard
 #	trigger_daemon_timeout = 1800
 
 	master_ctld = 127.0.0.1:8290
-#	guard_manager = master.qiyi.domain:8390
-	guard_manager = 127.0.0.1:8390
+	guard_manager = master.qiyi.domain:8390
+#	guard_manager = 127.0.0.1:8390
 }
