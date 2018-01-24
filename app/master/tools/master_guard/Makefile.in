@@ -123,7 +123,6 @@ $(shell mkdir -p $(OBJ_PATH))
 #Project's objs
 SRC = $(wildcard *.cpp) \
 	$(wildcard $(MASTER_PATH)/daemon/json/*.cpp) \
-	$(wildcard $(MASTER_PATH)/tools/service_guard/json/*.cpp) \
 	$(wildcard main/*.cpp) \
 	$(wildcard action/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
@@ -135,8 +134,6 @@ $(OBJ_PATH)/%.o: main/%.cpp
 $(OBJ_PATH)/%.o: action/%.cpp
 	$(COMPILE) $< -o $@
 $(OBJ_PATH)/%.o: $(MASTER_PATH)/daemon/json/%.cpp
-	$(COMPILE) $< -o $@
-$(OBJ_PATH)/%.o: $(MASTER_PATH)/tools/service_guard/json/%.cpp
 	$(COMPILE) $< -o $@
 
 .PHONY = all clean

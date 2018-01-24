@@ -126,7 +126,6 @@ $(shell mkdir -p $(OBJ_PATH))
 SRC = $(wildcard *.cpp) \
 	$(wildcard $(MASTER_PATH)/daemon/json/*.cpp) \
 	$(wildcard main/*.cpp) \
-	$(wildcard json/*.cpp) \
 	$(wildcard dao/*.cpp) \
 	$(wildcard action/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
@@ -134,8 +133,6 @@ OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 $(OBJ_PATH)/%.o: %.cpp
 	$(COMPILE) $< -o $@
 $(OBJ_PATH)/%.o: main/%.cpp
-	$(COMPILE) $< -o $@
-$(OBJ_PATH)/%.o: json/%.cpp
 	$(COMPILE) $< -o $@
 $(OBJ_PATH)/%.o: dao/%.cpp
 	$(COMPILE) $< -o $@

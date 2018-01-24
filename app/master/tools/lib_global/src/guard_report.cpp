@@ -83,5 +83,6 @@ bool guard_report::udp_report(const acl::string& body)
 		return false;
 	}
 
+	//printf("write ok, body=[%s]\r\n", body.c_str());
 	return true;
 }

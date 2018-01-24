@@ -34,3 +34,16 @@ struct service_list_res_t : service_base
 {
 	std::vector<service_info_t> data;
 };
+
+struct service_dead_res_t : service_base
+{
+	service_dead_res_t(void)
+	{
+		pid = -1;
+	}
+	acl::string path;
+	acl::string version;
+	int  pid;
+	acl::string rcpt;
+	acl::string info;
+};
