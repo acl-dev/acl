@@ -127,6 +127,7 @@ acl_master: all_lib
 	@(cd app/master/tools/master_ctld; make $(MAKE_ARGS); make install)
 	@(cd app/master/tools/master_ctl; make $(MAKE_ARGS); make install)
 	@(cd app/master/tools/master_guard; make $(MAKE_ARGS); make install)
+	@(cd app/master/tools/master_monitor; make $(MAKE_ARGS); make install)
 
 packinstall:
 	@(echo "")
@@ -143,6 +144,7 @@ packinstall:
 	@(cd app/master/tools/master_ctld; make install)
 	@(cd app/master/tools/master_ctl; make install)
 	@(cd app/master/tools/master_guard; make install)
+	@(cd app/master/tools/master_monitor; make install)
 	@(cd lib_fiber; make)
 	@echo "copying app/master/daemon/acl_master $(BIN_PATH)"
 	@cp -f app/master/daemon/acl_master $(BIN_PATH)
