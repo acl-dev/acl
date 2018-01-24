@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "tools/service_guard/json/service_struct.h"
-#include "tools/service_guard/json/service_struct.gson.h"
+#include "tools/lib_global/json/service_struct.h"
+#include "tools/lib_global/json/service_struct.gson.h"
 #include "daemon/json/serialize.h"
 #include "tools.h"
 #include "guard_report.h"
@@ -27,7 +27,7 @@ bool service_list::run(void)
 
 	service_list_res_t list_res;
 	list_res.status = 200;
-	list_res.msg    = "+ok";
+	list_res.cmd    = "service_list";
 
 	for (std::vector<serv_info_t>::const_iterator cit = res.data.begin();
 		cit != res.data.end(); ++cit)

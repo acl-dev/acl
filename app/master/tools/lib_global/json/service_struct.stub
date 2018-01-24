@@ -12,6 +12,12 @@
 
 #pragma once
 
+struct service_base
+{
+	int  status;
+	acl::string cmd;
+};
+
 struct service_info_t
 {
 	int  status;
@@ -24,9 +30,7 @@ struct service_info_t
 	acl::string version;
 };
 
-struct service_list_res_t
+struct service_list_res_t : service_base
 {
-	int  status;
-	acl::string msg;
 	std::vector<service_info_t> data;
 };
