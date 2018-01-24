@@ -7,6 +7,7 @@ all:
 	@(cd master_dispatch; make)
 	@(cd master_guard; make)
 	@(cd service_guard; make)
+	@(cd master_monitor; make)
 
 cl clean:
 	@(cd lib_global; make clean)
@@ -15,5 +16,6 @@ cl clean:
 	@(cd master_dispatch; make clean)
 	@(cd master_guard; make clean)
 	@(cd service_guard; make clean)
+	@(cd master_monitor; make clean)
 
 rb rebuild: cl all
