@@ -36,6 +36,12 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 	info.proc_avail      = serv->avail_proc;
 	info.throttle_delay  = serv->throttle_delay;
 	info.listen_fd_count = serv->listen_fd_count;
+	info.check_fds       = serv->check_fds ? true : false;
+	info.check_mem       = serv->check_mem ? true : false;
+	info.check_cpu       = serv->check_cpu ? true : false;
+	info.check_io        = serv->check_io ? true : false;
+	info.check_net       = serv->check_net ? true : false;
+	info.check_limits    = serv->check_limits ? true : false;
 
 	if (serv->owner && *serv->owner)
 		info.owner = serv->owner;
@@ -51,7 +57,6 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 		ACL_MASTER_NV* v = (ACL_MASTER_NV *) iter.data;
 		info.env[v->name] = v->value;
 	}
-
 
 	ACL_RING_ITER iter2;
 	acl_ring_foreach(iter2, &serv->children) {

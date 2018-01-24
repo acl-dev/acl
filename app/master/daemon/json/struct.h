@@ -50,12 +50,31 @@ struct serv_info_t
 	std::map<acl::string, acl::string> env;
 	// Gson@optional
 	std::list<proc_info_t> procs;
+	// Gson@optional
+	bool check_fds;
+	// Gson@optional
+	bool check_mem;
+	// Gson@optional
+	bool check_cpu;
+	// Gson@optional
+	bool check_io;
+	// Gson@optional
+	bool check_limits;
+	// Gson@optional
+	bool check_net;
 
 	serv_info_t()
 	{
 		status = 0;
 		type   = 0;
 		start  = 0;
+
+		check_fds    = false;
+		check_mem    = false;
+		check_cpu    = false;
+		check_io     = false;
+		check_limits = false;
+		check_net    = false;
 	}
 };
 

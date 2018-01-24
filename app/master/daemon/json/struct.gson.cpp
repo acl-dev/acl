@@ -1406,6 +1406,36 @@ namespace acl
         else
             $node.add_child("procs", acl::gson($json, $obj.procs));
 
+        if (check_nullptr($obj.check_fds))
+            $node.add_null("check_fds");
+        else
+            $node.add_bool("check_fds", acl::get_value($obj.check_fds));
+
+        if (check_nullptr($obj.check_mem))
+            $node.add_null("check_mem");
+        else
+            $node.add_bool("check_mem", acl::get_value($obj.check_mem));
+
+        if (check_nullptr($obj.check_cpu))
+            $node.add_null("check_cpu");
+        else
+            $node.add_bool("check_cpu", acl::get_value($obj.check_cpu));
+
+        if (check_nullptr($obj.check_io))
+            $node.add_null("check_io");
+        else
+            $node.add_bool("check_io", acl::get_value($obj.check_io));
+
+        if (check_nullptr($obj.check_limits))
+            $node.add_null("check_limits");
+        else
+            $node.add_bool("check_limits", acl::get_value($obj.check_limits));
+
+        if (check_nullptr($obj.check_net))
+            $node.add_null("check_net");
+        else
+            $node.add_bool("check_net", acl::get_value($obj.check_net));
+
 
         return $node;
     }
@@ -1444,6 +1474,12 @@ namespace acl
         acl::json_node *version = $node["version"];
         acl::json_node *env = $node["env"];
         acl::json_node *procs = $node["procs"];
+        acl::json_node *check_fds = $node["check_fds"];
+        acl::json_node *check_mem = $node["check_mem"];
+        acl::json_node *check_cpu = $node["check_cpu"];
+        acl::json_node *check_io = $node["check_io"];
+        acl::json_node *check_limits = $node["check_limits"];
+        acl::json_node *check_net = $node["check_net"];
         std::pair<bool, std::string> $result;
 
         if(!status ||!($result = gson(*status, &$obj.status), $result.first))
@@ -1499,6 +1535,24 @@ namespace acl
      
         if(procs&& procs->get_obj())
              gson(*procs->get_obj(), &$obj.procs);
+     
+        if(check_fds)
+            gson(*check_fds, &$obj.check_fds);
+     
+        if(check_mem)
+            gson(*check_mem, &$obj.check_mem);
+     
+        if(check_cpu)
+            gson(*check_cpu, &$obj.check_cpu);
+     
+        if(check_io)
+            gson(*check_io, &$obj.check_io);
+     
+        if(check_limits)
+            gson(*check_limits, &$obj.check_limits);
+     
+        if(check_net)
+            gson(*check_net, &$obj.check_net);
      
         return std::make_pair(true,"");
     }

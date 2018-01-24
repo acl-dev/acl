@@ -32,6 +32,12 @@ void service_list::add_one(list_res_t& res, const ACL_MASTER_SERV* serv)
 	info.proc_avail      = serv->avail_proc;
 	info.throttle_delay  = serv->throttle_delay;
 	info.listen_fd_count = serv->listen_fd_count;
+	info.check_fds       = serv->check_fds ? true : false;
+	info.check_mem       = serv->check_mem ? true : false;
+	info.check_cpu       = serv->check_cpu ? true : false;
+	info.check_io        = serv->check_io ? true : false;
+	info.check_net       = serv->check_net ? true : false;
+	info.check_limits    = serv->check_limits ? true : false;
 
 	if (serv->owner && *serv->owner)
 		info.owner             = serv->owner;

@@ -59,6 +59,13 @@ typedef struct ACL_MASTER_SERV {
 	ACL_RING      children;		/* linkage of children */
 	struct ACL_MASTER_SERV *next;	/* linkage of serv */
 
+	char check_fds;
+	char check_mem;
+	char check_cpu;
+	char check_io;
+	char check_limits;
+	char check_net;
+
 	STATUS_CALLBACK  callback;
 	void            *ctx;
 } ACL_MASTER_SERV;

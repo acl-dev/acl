@@ -464,11 +464,17 @@ static void service_control(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 		serv->flags &= ~ACL_MASTER_FLAG_STOP_WAIT;
 }
 
-static void service_version(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
+static void service_check(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 {
 	const char *ptr = get_str_ent(xcp, ACL_VAR_MASTER_SERV_VERSION, "none");
 
 	serv->version = acl_mystrdup(ptr);
+	serv->check_fds = get_bool_ent(xcp, ACL_VAR_MASTER_SERV_CHECK_FDS, "n");
+	serv->check_mem = get_bool_ent(xcp, ACL_VAR_MASTER_SERV_CHECK_MEM, "n");
+	serv->check_io  = get_bool_ent(xcp, ACL_VAR_MASTER_SERV_CHECK_IO, "n");
+	serv->check_cpu = get_bool_ent(xcp, ACL_VAR_MASTER_SERV_CHECK_CPU, "n");
+	serv->check_limits = get_bool_ent(xcp, ACL_VAR_MASTER_SERV_CHECK_LIMITS, "n");
+	serv->check_net = get_bool_ent(xcp, ACL_VAR_MASTER_SERV_CHECK_NET, "n");
 }
 
 static void service_wakeup_time(ACL_XINETD_CFG_PARSER *xcp,
@@ -810,7 +816,7 @@ ACL_MASTER_SERV *acl_master_ent_load(const char *filepath)
 	service_wakeup_time(xcp, serv);
 	service_proc(xcp, serv);
 	service_control(xcp, serv);
-	service_version(xcp, serv);
+	service_check(xcp, serv);
 
 	if (service_args(xcp, serv, filepath) < 0) {
 		acl_master_ent_free(serv);

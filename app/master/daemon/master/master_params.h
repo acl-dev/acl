@@ -158,6 +158,12 @@ extern int   acl_var_master_start_timeo;
 #define ACL_VAR_MASTER_SERV_STOP_WAIT		"master_stop_wait"
 
 #define ACL_VAR_MASTER_SERV_VERSION		"master_version"
+#define ACL_VAR_MASTER_SERV_CHECK_FDS		"master_check_fds"
+#define ACL_VAR_MASTER_SERV_CHECK_MEM		"master_check_mem"
+#define ACL_VAR_MASTER_SERV_CHECK_CPU		"master_check_cpu"
+#define ACL_VAR_MASTER_SERV_CHECK_IO		"master_check_io"
+#define ACL_VAR_MASTER_SERV_CHECK_LIMITS	"master_check_limits"
+#define ACL_VAR_MASTER_SERV_CHECK_NET		"master_check_net"
 
 /**
  * master_params.c
