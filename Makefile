@@ -123,6 +123,7 @@ clean cl:
 
 acl_master: all_lib
 	@(cd app/master/daemon; make $(MAKE_ARGS); make install)
+	@(cd app/master/tools/lib_global; make $(MAKE_ARGS);)
 	@(cd app/master/tools/master_ctld; make $(MAKE_ARGS); make install)
 	@(cd app/master/tools/master_ctl; make $(MAKE_ARGS); make install)
 	@(cd app/master/tools/master_guard; make $(MAKE_ARGS); make install)
