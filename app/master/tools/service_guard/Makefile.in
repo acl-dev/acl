@@ -98,16 +98,20 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-ACL_PATH = ../../../..
+ACL_PATH    = ../../../..
 MASTER_PATH = ../..
+GLOBAL_PATH = ../lib_global
 
 CFLAGS += -I. \
+	  -I$(GLOBAL_PATH) \
+	  -I$(GLOBAL_PATH)/include \
 	  -I$(MASTER_PATH) \
 	  -I$(ACL_PATH)/lib_acl/include \
 	  -I$(ACL_PATH)/lib_acl_cpp/include \
 	  -I$(ACL_PATH)/lib_protocol/include
 
-LDFLAGS = -L$(ACL_PATH)/lib_acl_cpp/lib -lacl_cpp \
+LDFLAGS = -L$(GLOBAL_PATH) -lglobal \
+	  -L$(ACL_PATH)/lib_acl_cpp/lib -lacl_cpp \
 	  -L$(ACL_PATH)/lib_protocol/lib -lprotocol \
 	  -L$(ACL_PATH)/lib_acl/lib -lacl $(SYSLIB)
 
