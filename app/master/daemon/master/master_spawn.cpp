@@ -343,7 +343,7 @@ void acl_master_reap_child(void)
 					WEXITSTATUS(status));
 				master_warning(serv->notify_addr,
 					serv->notify_recipients,
-					serv->path, pid, buf);
+					serv->path, serv->version, pid, buf);
 			}
 		}
 
@@ -358,7 +358,7 @@ void acl_master_reap_child(void)
 					WTERMSIG(status));
 				master_warning(serv->notify_addr,
 					serv->notify_recipients,
-					serv->path, pid, buf);
+					serv->path, serv->version, pid, buf);
 			}
 		}
 

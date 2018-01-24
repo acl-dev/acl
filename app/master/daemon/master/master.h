@@ -210,7 +210,7 @@ extern void acl_master_sighup_children(ACL_MASTER_SERV *serv, int *nsignaled);
   * master_warning.c
   */
 extern void master_warning(const char *notify_addr, const char *recipients,
-	const char *path, int pid, const char *info);
+	const char *path, const char *ver, int pid, const char *info);
 
 #ifdef  __cplusplus
 }

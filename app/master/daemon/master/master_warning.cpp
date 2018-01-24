@@ -7,18 +7,23 @@ typedef struct WARN_INFO {
 	char *notify_addr;
 	char *notify_recipients;
 	char *path;
+	char *ver;
 	int   pid;
 	char *desc;
 } WARN_INFO;
 
-static WARN_INFO *warn_info_new(const char *notify_addr,
-	const char *recipients, const char *path, int pid, const char *desc)
+static WARN_INFO *warn_info_new(const char *notify_addr, const char *recipients,
+	const char *path, const char *ver, int pid, const char *desc)
 {
 	WARN_INFO *info = (WARN_INFO*) acl_mycalloc(1, sizeof(WARN_INFO));
 
 	info->notify_addr = acl_mystrdup(notify_addr);
 	info->notify_recipients = acl_mystrdup(recipients);
 	info->path = acl_mystrdup(path);
+	if (ver && *ver)
+		info->ver = acl_mystrdup(ver);
+	else
+		info->ver = acl_mystrdup("none");
 	info->pid = pid;
 	info->desc = acl_mystrdup(desc);
 	return (info);
@@ -29,8 +34,31 @@ static void warn_info_free(WARN_INFO *info)
 	acl_myfree(info->notify_addr);
 	acl_myfree(info->notify_recipients);
 	acl_myfree(info->path);
+	acl_myfree(info->ver);
 	acl_myfree(info->desc);
 	acl_myfree(info);
+}
+
+static void add_str(ACL_VSTRING *buf, const char *name, const char *value)
+{
+	if (ACL_VSTRING_LEN(buf) > 0)
+		acl_vstring_strcat(buf, "&");
+	acl_vstring_strcat(buf, name);
+	acl_vstring_strcat(buf, "=");
+
+	if (value && *value) {
+		char *tmp = acl_url_encode(value, NULL);
+		acl_vstring_strcat(buf, tmp);
+		acl_myfree(tmp);
+	}
+}
+
+static void add_num(ACL_VSTRING *buf, const char *name, int value)
+{
+	char tmp[32];
+
+	snprintf(tmp, sizeof(tmp), "%d", value);
+	add_str(buf, name, tmp);
 }
 
 static void notify_thread(void *arg)
@@ -42,8 +70,11 @@ static void notify_thread(void *arg)
 	int   ret;
 
 	buf = acl_vstring_alloc(256);
-	acl_vstring_sprintf(buf, "PROC=%s|PID=%d|RCPT=%s|info=%s\r\n",
-		info->path, info->pid, info->notify_recipients, info->desc);
+	add_str(buf, "proc", info->path);
+	add_str(buf, "ver", info->ver);
+	add_num(buf, "pid", info->pid);
+	add_str(buf, "rcpt", info->notify_recipients);
+	add_str(buf, "info", info->desc);
 
 	client = acl_vstream_connect(info->notify_addr,
 		ACL_BLOCKING, 60, 60, 1024);
@@ -72,7 +103,7 @@ static void notify_thread(void *arg)
 }
 
 void master_warning(const char *notify_addr, const char *recipients,
-	const char *path, int pid, const char *desc)
+	const char *path, const char *ver, int pid, const char *desc)
 {
 	const char *myname = "master_warning";
 	WARN_INFO *info;
@@ -90,6 +121,6 @@ void master_warning(const char *notify_addr, const char *recipients,
 		return;
 	}
 
-	info = warn_info_new(notify_addr, recipients, path, pid, desc);
+	info = warn_info_new(notify_addr, recipients, path, ver, pid, desc);
 	acl_pthread_pool_add(acl_var_master_thread_pool, notify_thread, info);
 }

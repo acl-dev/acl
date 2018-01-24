@@ -1,6 +1,7 @@
 .PHONEY = all cl clean rb rebuild
 
 all:
+	@(cd lib_global; make)
 	@(cd master_ctl; make)
 	@(cd master_ctld; make)
 	@(cd master_dispatch; make)
@@ -8,6 +9,7 @@ all:
 	@(cd service_guard; make)
 
 cl clean:
+	@(cd lib_global; make clean)
 	@(cd master_ctl; make clean)
 	@(cd master_ctld; make clean)
 	@(cd master_dispatch; make clean)
