@@ -23,6 +23,11 @@ service master_ctld {
 #	master_type = inet
 #	master_type = unix
 	master_type = sock
+	master_check_fds = true
+	master_check_mem = true
+	master_check_cpu = true
+	master_check_io  = true
+	master_check_limit = true
 
 #	当子进程异常退出时，如果该值非空，则将子进程异常退出的消息通知该服务
 	master_notify_addr = {install_path}/var/public/monitor.sock
