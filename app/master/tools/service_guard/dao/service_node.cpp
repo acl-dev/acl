@@ -13,6 +13,8 @@
 #include "stdafx.h"
 #include "service_node.h"
 
+#define SERVICES	"services"
+
 bool service_node::save(const char* ip, const service_list_res_t& res)
 {
 	std::map<acl::string, double> members;
@@ -23,10 +25,27 @@ bool service_node::save(const char* ip, const service_list_res_t& res)
 		members[(*cit).conf] = now;
 	}
 
+	bool ret = true;
+
 	acl::redis cmd(&redis_);
 	if (cmd.zadd(ip, members) < 0) {
-		logger_error("hmset error=%s, ip=%s", cmd.result_error(), ip);
-		return false;
+		logger_error("zadd error=%s, ip=%s", cmd.result_error(), ip);
+		ret = false;
 	}
-	return true;
+
+	acl::string key;
+	members.clear();
+	for (std::vector<service_info_t>::const_iterator cit = res.data.begin();
+		cit != res.data.end(); ++cit) {
+
+		key.format("%s|%s", ip, (*cit).conf.c_str());
+		members[key] = now;
+	}
+
+	if (cmd.zadd(SERVICES, members) == false) {
+		logger_error("zadd error=%s, ip=%s", cmd.result_error(), ip);
+		ret = false;
+	}
+
+	return ret;
 }
