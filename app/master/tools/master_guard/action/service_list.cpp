@@ -21,6 +21,20 @@ static int get_fds(const std::list<proc_info_t>& procs)
 	return n;
 }
 
+static long get_mem(const std::list<proc_info_t>& procs)
+{
+	long n = 0;
+	for (std::list<proc_info_t>::const_iterator cit = procs.begin();
+		cit != procs.end(); ++cit)
+	{
+		long ret = tools::get_mem((*cit).pid);
+		if (ret > 0)
+			n += ret;
+	}
+
+	return n;
+}
+
 service_list::service_list(const char* master_ctld, const char* guard_manager,
 	int conn_timeout, int rw_timeout)
 : master_ctld_(master_ctld)
@@ -61,6 +75,9 @@ bool service_list::run(void)
 
 		if ((*cit).check_fds)
 			info.fds = get_fds((*cit).procs);
+		if ((*cit).check_mem)
+			info.mem = get_mem((*cit).procs);
+
 		list_res.data.push_back(info);
 	}
 

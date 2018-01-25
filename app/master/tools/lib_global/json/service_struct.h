@@ -30,12 +30,21 @@ struct service_info_t
 	acl::string version;
 	// Gson@optional
 	int  fds;
+	// Gson@optional
+	long mem;
+	// Gson@optional
+	double cpu;
+	// Gson@optional
+	long io;
 
 	service_info_t(void)
 	{
 		status = -1;
 		start  = -1;
 		fds    = -1;
+		mem    = -1;
+		cpu    = -1;
+		io     = -1;
 	}
 };
 

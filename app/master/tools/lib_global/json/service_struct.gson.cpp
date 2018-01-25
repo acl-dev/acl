@@ -220,6 +220,21 @@ namespace acl
         else
             $node.add_number("fds", acl::get_value($obj.fds));
 
+        if (check_nullptr($obj.mem))
+            $node.add_null("mem");
+        else
+            $node.add_number("mem", acl::get_value($obj.mem));
+
+        if (check_nullptr($obj.cpu))
+            $node.add_null("cpu");
+        else
+            $node.add_double("cpu", acl::get_value($obj.cpu));
+
+        if (check_nullptr($obj.io))
+            $node.add_null("io");
+        else
+            $node.add_number("io", acl::get_value($obj.io));
+
 
         return $node;
     }
@@ -247,6 +262,9 @@ namespace acl
         acl::json_node *path = $node["path"];
         acl::json_node *version = $node["version"];
         acl::json_node *fds = $node["fds"];
+        acl::json_node *mem = $node["mem"];
+        acl::json_node *cpu = $node["cpu"];
+        acl::json_node *io = $node["io"];
         std::pair<bool, std::string> $result;
 
         if(!status ||!($result = gson(*status, &$obj.status), $result.first))
@@ -269,6 +287,15 @@ namespace acl
      
         if(fds)
             gson(*fds, &$obj.fds);
+     
+        if(mem)
+            gson(*mem, &$obj.mem);
+     
+        if(cpu)
+            gson(*cpu, &$obj.cpu);
+     
+        if(io)
+            gson(*io, &$obj.io);
      
         return std::make_pair(true,"");
     }
