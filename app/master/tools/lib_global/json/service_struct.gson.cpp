@@ -45,8 +45,8 @@ namespace acl
         if(!status ||!($result = gson(*status, &$obj.status), $result.first))
             return std::make_pair(false, "required [service_base.status] failed:{"+$result.second+"}");
      
-        if(!cmd ||!($result = gson(*cmd, &$obj.cmd), $result.first))
-            return std::make_pair(false, "required [service_base.cmd] failed:{"+$result.second+"}");
+        if(cmd)
+            gson(*cmd, &$obj.cmd);
      
         return std::make_pair(true,"");
     }
@@ -141,8 +141,8 @@ namespace acl
         if(!status ||!($result = gson(*status, &$obj.status), $result.first))
             return std::make_pair(false, "required [service_dead_res_t.status] failed:{"+$result.second+"}");
      
-        if(!cmd ||!($result = gson(*cmd, &$obj.cmd), $result.first))
-            return std::make_pair(false, "required [service_dead_res_t.cmd] failed:{"+$result.second+"}");
+        if(cmd)
+            gson(*cmd, &$obj.cmd);
      
         if(!path ||!($result = gson(*path, &$obj.path), $result.first))
             return std::make_pair(false, "required [service_dead_res_t.path] failed:{"+$result.second+"}");
@@ -366,8 +366,8 @@ namespace acl
         if(!status ||!($result = gson(*status, &$obj.status), $result.first))
             return std::make_pair(false, "required [service_list_res_t.status] failed:{"+$result.second+"}");
      
-        if(!cmd ||!($result = gson(*cmd, &$obj.cmd), $result.first))
-            return std::make_pair(false, "required [service_list_res_t.cmd] failed:{"+$result.second+"}");
+        if(cmd)
+            gson(*cmd, &$obj.cmd);
      
         if(!data ||!data->get_obj()||!($result = gson(*data->get_obj(), &$obj.data), $result.first))
             return std::make_pair(false, "required [service_list_res_t.data] failed:{"+$result.second+"}");

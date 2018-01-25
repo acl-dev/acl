@@ -59,6 +59,8 @@ bool guard_action::on_service_list(acl::json& json)
 {
 	service_list_res_t res;
 	if (deserialize<service_list_res_t>(json, res) == false) {
+		logger_error("deserialize error, json=%s",
+			json.to_string().c_str());
 		return false;
 	}
 

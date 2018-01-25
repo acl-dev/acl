@@ -15,6 +15,7 @@
 struct service_base
 {
 	int  status;
+	// Gson@optional
 	acl::string cmd;
 };
 
