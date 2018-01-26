@@ -7,9 +7,11 @@
 
 char *var_cfg_redis_addrs;
 char *var_cfg_redis_passwd;
+char *var_cfg_main_service_list;
 acl::master_str_tbl var_conf_str_tab[] = {
 	{ "redis_addrs", "127.0.0.1:6379", &var_cfg_redis_addrs },
 	{ "redis_passwd", "", &var_cfg_redis_passwd },
+	{ "main_service_list", "", &var_cfg_main_service_list },
 
 	{ 0, 0, 0 }
 };
@@ -38,6 +40,7 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 };
 
 acl::redis_client_cluster var_redis;
+std::map<acl::string, bool> var_main_service_list;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -90,6 +93,19 @@ void master_service::proc_on_init(void)
 	var_redis.init(NULL, var_cfg_redis_addrs, var_cfg_threads_max,
 		var_cfg_redis_conn_timeout, var_cfg_redis_rw_timeout);
 	var_redis.set_password("default", var_cfg_redis_passwd);
+
+	if (var_cfg_main_service_list && *var_cfg_main_service_list)
+	{
+		ACL_ARGV *tokens  = acl_argv_split(
+			var_cfg_main_service_list, ",; \t\r\n");
+		ACL_ITER iter;
+		acl_foreach(iter, tokens)
+		{
+			const char* ptr = (const char*) iter.data;
+			var_main_service_list[ptr] = true;
+		}
+		acl_argv_free(tokens);
+	}
 
 	logger(">>>proc_on_init<<<");
 }

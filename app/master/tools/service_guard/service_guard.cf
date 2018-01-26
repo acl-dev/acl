@@ -104,4 +104,6 @@ service server
 #	redis_passwd = 12345@$%&^*
 	redis_conn_timeout = 10
 	redis_rw_timeout = 10
+#	main_service_list = /opt/soft/acl-master/conf/service/service_guard.cf
+	main_service_list =
 }

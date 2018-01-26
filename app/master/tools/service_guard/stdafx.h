@@ -61,3 +61,5 @@
 #include "daemon/json/serialize.h"
 
 extern acl::redis_client_cluster var_redis;
+extern std::map<acl::string, bool> var_main_service_list;
+extern char* var_cfg_main_service_list;
