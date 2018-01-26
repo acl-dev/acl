@@ -64,19 +64,21 @@ bool guard_action::on_service_list(acl::json& json)
 		return false;
 	}
 
+	bool ret = true;
+
 	service_node node(var_redis);
 	if (node.save(ip_, res) == false) {
 		logger_error("save error, ip=%s", ip_.c_str());
-		return false;
+		ret = false;
 	}
 
 	service_app app(var_redis);
 	if (app.save(ip_, res) == false) {
 		logger_error("save app info error, ip=%s", ip_.c_str());
-		return false;
+		ret = false;
 	}
 
-	return true;
+	return ret;
 }
 
 bool guard_action::on_service_dead(acl::json& json)

@@ -28,10 +28,13 @@ bool service_node::save(const char* ip, const service_list_res_t& res)
 	bool ret = true;
 
 	acl::redis cmd(&redis_);
-	if (cmd.zadd(ip, members) < 0) {
-		logger_error("zadd error=%s, ip=%s", cmd.result_error(), ip);
+	if (cmd.zadd(ip, members) == -1) {
+		logger_error("zadd error=%s, ip=%s, members=%d",
+			cmd.result_error(), ip, (int) members.size());
 		ret = false;
 	}
+
+	cmd.clear();
 
 	acl::string key;
 	members.clear();
@@ -42,8 +45,9 @@ bool service_node::save(const char* ip, const service_list_res_t& res)
 		members[key] = now;
 	}
 
-	if (cmd.zadd(SERVICES, members) == false) {
-		logger_error("zadd error=%s, ip=%s", cmd.result_error(), ip);
+	if (cmd.zadd(SERVICES, members) == -1) {
+		logger_error("zadd error=%s, ip=%s, members=%d",
+			cmd.result_error(), ip, (int) members.size());
 		ret = false;
 	}
 
