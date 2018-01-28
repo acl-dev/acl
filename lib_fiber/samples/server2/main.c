@@ -186,6 +186,9 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	exit(0);
 }
 
+#define SCHEDULE_AUTO
+
+#ifndef	SCHEDULE_AUTO
 static void fiber_memcheck(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
 	while (1) {
@@ -197,6 +200,7 @@ static void fiber_memcheck(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 		acl_default_meminfo();
 	}
 }
+#endif
 
 static void usage(const char *procname)
 {
@@ -257,12 +261,20 @@ int main(int argc, char *argv[])
 	acl_msg_stdout_enable(1);
 	acl_fiber_msg_stdout_enable(1);
 
-	acl_fiber_create(fiber_memcheck, NULL, 64000);
+#ifdef	SCHEDULE_AUTO
+	acl_fiber_schedule_init(1);
+	acl_fiber_schedule_set_event(event_mode);
+#endif
+
 	printf("%s: call fiber_creater\r\n", __FUNCTION__);
 	acl_fiber_create(fiber_accept, NULL, 32768);
 
+#ifndef	SCHEDULE_AUTO
+	acl_fiber_create(fiber_memcheck, NULL, 64000);
+
 	printf("call fiber_schedule\r\n");
 	acl_fiber_schedule_with(event_mode);
+#endif
 
 	return 0;
 }
