@@ -1,8 +1,12 @@
 #include "stdafx.h"
+#include "Resource.h"
+#include "WinEchodDlg.h"
+#include "afxdialogex.h"
 #include "FiberConnect.h"
 
-CFiberConnect::CFiberConnect(const char* serverAddr, int count)
-	: m_serverAddr(serverAddr)
+CFiberConnect::CFiberConnect(CWinEchodDlg& hWin, const char* serverAddr, int count)
+	: m_hWin(hWin)
+	, m_serverAddr(serverAddr)
 	, m_count(count)
 {
 }
@@ -45,6 +49,7 @@ void CFiberConnect::run(void)
 	else
 		doEcho(conn);
 #endif
+	m_hWin.OnFiberConnectExit();
 	delete this;
 }
 

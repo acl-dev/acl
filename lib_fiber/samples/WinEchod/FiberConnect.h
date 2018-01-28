@@ -1,8 +1,11 @@
 #pragma once
+
+class CWinEchodDlg;
+
 class CFiberConnect : public acl::fiber
 {
 public:
-	CFiberConnect(const char* serverAddr, int count);
+	CFiberConnect(CWinEchodDlg& hWin, const char* serverAddr, int count);
 
 private:
 	~CFiberConnect(void);
@@ -11,6 +14,7 @@ private:
 	void run(void);
 
 private:
+	CWinEchodDlg& m_hWin;
 	acl::string m_serverAddr;
 	int         m_count;
 

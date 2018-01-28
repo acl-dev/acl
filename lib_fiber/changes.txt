@@ -1,4 +1,8 @@
 
+82) 2018.1.28
+82.1) feature: 增加 API acl_fiber_schedule_init() 可以设置协程调度器为自启动模式
+82.2) feature: 增加 API acl_fiber_schedule_set_event() 可以显式地设置协程事件引擎
+
 81) 2018.1.23
 81.1) bugfix: event_epoll.c 的 函数 epoll_event_wait 中没有处理 EPOLLERR|EPOLLHUP
 的错误情况，会导致程序进入死循环

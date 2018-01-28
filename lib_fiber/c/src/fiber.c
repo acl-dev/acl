@@ -40,6 +40,7 @@ typedef struct THREAD {
 static THREAD          *__main_fiber   = NULL;
 static __thread THREAD *__thread_fiber = NULL;
 static __thread int __scheduled = 0;
+static __thread int __schedule_auto = 0;
 __thread int var_hook_sys_api   = 0;
 
 static pthread_key_t __fiber_key;
@@ -585,6 +586,11 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	return fiber;
 }
 
+void acl_fiber_schedule_init(int on)
+{
+	__schedule_auto = on;
+}
+
 ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
 	void *arg, size_t size)
 {
@@ -603,7 +609,9 @@ ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
 	__thread_fiber->fibers[__thread_fiber->slot++] = fiber;
 
 	acl_fiber_ready(fiber);
-
+	if (__schedule_auto && !acl_fiber_scheduled()) {
+		acl_fiber_schedule();
+	}
 	return fiber;
 }
 
@@ -653,9 +661,14 @@ static void fiber_init(void)
 #endif
 }
 
-void acl_fiber_schedule_with(int event_mode)
+void acl_fiber_schedule_set_event(int event_mode)
 {
 	event_set(event_mode);
+}
+
+void acl_fiber_schedule_with(int event_mode)
+{
+	acl_fiber_schedule_set_event(event_mode);
 	acl_fiber_schedule();
 }
 
@@ -663,6 +676,10 @@ void acl_fiber_schedule(void)
 {
 	ACL_FIBER *fiber;
 	RING *head;
+
+	if (__scheduled) {
+		return;
+	}
 
 	fiber_check();
 	acl_fiber_hook_api(1);

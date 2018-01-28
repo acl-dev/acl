@@ -205,6 +205,13 @@ FIBER_API void acl_fiber_ready(ACL_FIBER* fiber);
 FIBER_API void acl_fiber_switch(void);
 
 /**
+ * 设置当前线程的协程调度器是否为自启动模式，自启动模式即当创建协程后会检查是否处于协程
+ * 调度状态，如果非协程调度状态，则自动启动调度器调度协程过程（如不调用本函数，则内部缺省
+ * 为非自动启动模式）
+ */
+FIBER_API void acl_fiber_schedule_init(int on);
+
+/**
  * 调用本函数启动协程的调度过程
  */
 FIBER_API void acl_fiber_schedule(void);
@@ -219,6 +226,12 @@ FIBER_API void acl_fiber_schedule(void);
 #define FIBER_EVENT_IOCP	3	/* iocp		*/
 #define FIBER_EVENT_WMSG	4	/* win message	*/
 FIBER_API void acl_fiber_schedule_with(int event_mode);
+
+/**
+ * 设置协程调度时的事件引擎类型
+ * @param event_mode {int} 事件引擎类型，参见：FIBER_EVENT_XXX
+ */
+FIBER_API void acl_fiber_schedule_set_event(int event_mode);
 
 /**
  * 调用本函数检测当前线程是否处于协程调度状态

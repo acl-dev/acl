@@ -85,9 +85,27 @@ public:
 	void set_errno(int errnum);
 
 	/**
+	 * 显式设置协程调度事件引擎类型，同时设置协程调度器为自启动模式，即当创建协程后不必
+	 * 显式调用 schedule 或 schedule_with 来启动协程调度器
+	 * @param type {fiber_event_t} 事件引擎类型，参见：FIBER_EVENT_T_XXX
+	 * @param schedule_auto {bool} 如果为 true，则创建协程对象后并运行该协程
+	 *  对象后不必显式调用 schedule/schedule_with 来启动所有的协程过程，内部会
+	 *  自动启动协程调度器；否则，在创建并启动协程后，必须显式地调用 schedule 或
+	 *  schedule_with 方式来启动协程调度器以运行所的协程过程；内部缺省状态为 false
+	 */
+	static void init(fiber_event_t type, bool schedule_auto = false);
+
+	/**
 	 * 启动协程运行的调度过程
 	 */
-	static void schedule(fiber_event_t type = FIBER_EVENT_T_KERNEL);
+	static void schedule(void);
+
+	/**
+	 * 启动协程调度时指定事件引擎类型，调用本方法等于同时调用了 schedule_init
+	 * 及 schedule 两个方法
+	 * @param type {fiber_event_t} 事件引擎类型，参见：FIBER_EVENT_T_XXX
+	 */
+	static void schedule_with(fiber_event_t type);
 
 	/**
 	 * 判断当前线程是否处于协程调度状态

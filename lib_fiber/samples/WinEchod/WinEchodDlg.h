@@ -39,13 +39,17 @@ private:
 	acl::fiber* m_fiberListen;
 public:
 	afx_msg void OnBnClickedListen();
-	afx_msg void OnBnClickedStartSchedule();
 	afx_msg void OnBnClickedCreateTimer();
 	afx_msg void OnBnClickedConnect();
 private:
 	UINT m_cocurrent;
 	UINT m_count;
 	void Uni2Str(const CString& in, acl::string& out);
+	void HookAclIO(void);
+	void UnHookAclIO(void);
+	void InitFiber();
+
 public:
-	afx_msg void OnBnClickedStopSchedule();
+	void OnFiberConnectExit(void);
+	afx_msg void OnBnClickedOk();
 };

@@ -47,7 +47,6 @@ END_MESSAGE_MAP()
 
 // CWinEchodDlg 对话框
 
-
 CWinEchodDlg::CWinEchodDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CWinEchodDlg::IDD, pParent)
 	, m_dosFp(NULL)
@@ -90,10 +89,9 @@ BEGIN_MESSAGE_MAP(CWinEchodDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_OPEN_DOS, &CWinEchodDlg::OnBnClickedOpenDos)
 	ON_BN_CLICKED(IDC_LISTEN, &CWinEchodDlg::OnBnClickedListen)
-	ON_BN_CLICKED(IDC_START_SCHEDULE, &CWinEchodDlg::OnBnClickedStartSchedule)
 	ON_BN_CLICKED(IDC_CREATE_TIMER, &CWinEchodDlg::OnBnClickedCreateTimer)
 	ON_BN_CLICKED(IDC_CONNECT, &CWinEchodDlg::OnBnClickedConnect)
-	ON_BN_CLICKED(IDC_STOP_SCHEDULE, &CWinEchodDlg::OnBnClickedStopSchedule)
+	ON_BN_CLICKED(IDOK, &CWinEchodDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
@@ -131,8 +129,7 @@ BOOL CWinEchodDlg::OnInitDialog()
 	//ShowWindow(SW_MAXIMIZE);
 
 	// TODO: 在此添加额外的初始化代码
-	GetDlgItem(IDC_START_SCHEDULE)->EnableWindow(TRUE);
-	GetDlgItem(IDC_STOP_SCHEDULE)->EnableWindow(FALSE);
+	InitFiber();  // 初始化协程环境
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -222,6 +219,35 @@ void CWinEchodDlg::Uni2Str(const CString& in, acl::string& out)
 	delete buf;
 }
 
+void CWinEchodDlg::InitFiber(void)
+{
+	// 设置协程调度的事件引擎，同时将协程调度设为自动启动模式
+	acl::fiber::init(acl::FIBER_EVENT_T_WMSG, true);
+	// HOOK ACL 库中的网络 IO 过程
+	HookAclIO();
+}
+
+void CWinEchodDlg::HookAclIO(void)
+{
+	acl_set_accept(acl_fiber_accept);
+	acl_set_connect(acl_fiber_connect);
+	acl_set_recv(acl_fiber_recv);
+	acl_set_send(acl_fiber_send);
+	acl_set_poll(acl_fiber_poll);
+	acl_set_select(acl_fiber_select);
+	acl_set_close_socket(acl_fiber_close);
+}
+
+void CWinEchodDlg::UnHookAclIO(void)
+{
+	acl_set_accept(accept);
+	acl_set_connect(connect);
+	acl_set_recv(recv);
+	acl_set_send(send);
+	acl_set_select(select);
+	acl_set_close_socket(closesocket);
+}
+
 void CWinEchodDlg::OnBnClickedListen()
 {
 	// TODO: 在此添加控件通知处理程序代码
@@ -267,79 +293,49 @@ void CWinEchodDlg::OnBnClickedListen()
 	}
 }
 
-
-void CWinEchodDlg::OnBnClickedStartSchedule()
-{
-	// TODO: 在此添加控件通知处理程序代码
-
-	GetDlgItem(IDC_START_SCHEDULE)->EnableWindow(FALSE);
-	GetDlgItem(IDC_STOP_SCHEDULE)->EnableWindow(TRUE);
-	//OnBnClickedCreateTimer();
-
-	// setup IO read/write for acl' IO operation
-	acl_set_accept(acl_fiber_accept);
-	acl_set_connect(acl_fiber_connect);
-	acl_set_recv(acl_fiber_recv);
-	acl_set_send(acl_fiber_send);
-	acl_set_poll(acl_fiber_poll);
-	acl_set_select(acl_fiber_select);
-	acl_set_close_socket(acl_fiber_close);
-
-	acl::fiber::schedule(acl::FIBER_EVENT_T_WMSG);
-	
-	// restore to system IO read/write in acl
-	acl_set_accept(accept);
-	acl_set_connect(connect);
-	acl_set_recv(recv);
-	acl_set_send(send);
-	acl_set_select(select);
-	acl_set_close_socket(closesocket);
-
-	GetDlgItem(IDC_START_SCHEDULE)->EnableWindow(TRUE);
-	GetDlgItem(IDC_STOP_SCHEDULE)->EnableWindow(FALSE);
-}
-
-
-void CWinEchodDlg::OnBnClickedStopSchedule()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	acl::fiber::schedule_stop();
-}
-
-
-static void WINAPI  start_proc(LPVOID ctx)
-{
-}
-
 void CWinEchodDlg::OnBnClickedCreateTimer()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	acl::fiber* fb = new CFiberSleep;
 	fb->start();
-
-	/*
-	int i;
-	for (i = 0; i < 100000; i++) {
-		LPVOID p = CreateFiberEx(0, 32000, FIBER_FLAG_FLOAT_SWITCH,
-			start_proc, NULL);
-		if (p == NULL) {
-			printf("p null=%d, %s, i=%d\r\n", acl::last_error(),
-				acl::last_serror(), i);
-			assert(p);
-		}
-	}
-	printf("i=%d\r\n", i);
-	*/
 }
-
 
 void CWinEchodDlg::OnBnClickedConnect()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	UpdateData();
-	for (UINT i = 0; i < m_cocurrent; i++)
+	GetDlgItem(IDC_CONNECT)->EnableWindow(FALSE);
+
+	UINT n = m_cocurrent;
+	for (UINT i = 0; i < n; i++)
 	{
-		acl::fiber* fb = new CFiberConnect(m_listenAddr.c_str(), m_count);
+		acl::fiber* fb = new CFiberConnect(
+			*this, m_listenAddr.c_str(), m_count);
 		fb->start();
 	}
+}
+
+void CWinEchodDlg::OnFiberConnectExit(void)
+{
+	if (--m_cocurrent == 0)
+	{
+		GetDlgItem(IDC_CONNECT)->EnableWindow(TRUE);
+		printf("All connect fibers finished now!\r\n");
+	}
+}
+
+
+void CWinEchodDlg::OnBnClickedOk()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (acl::fiber::scheduled())
+	{
+		acl::fiber::schedule_stop();
+	}
+	if (m_cocurrent > 0)
+	{
+		printf("there %d fibers connected\r\n", m_cocurrent);
+	}
+
+	CDialogEx::OnOK();
 }
