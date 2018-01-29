@@ -101,7 +101,7 @@ service server
 	threads_idle = 60
 
 	redis_addrs = 127.0.0.1:6379
-#	redis_passwd = 12345@$%&^*
+#	redis_passwd = 111111
 	redis_conn_timeout = 10
 	redis_rw_timeout = 10
 #	main_service_list = /opt/soft/acl-master/conf/service/service_guard.cf
