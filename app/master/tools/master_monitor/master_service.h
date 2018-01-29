@@ -33,5 +33,9 @@ protected:
 	bool proc_on_sighup(acl::string&);
 
 private:
+	bool service_exit_;
+	acl::thread* monitor_;
+	acl::tcp_ipc ipc_;
+
 	void handle(const acl::string& data);
 };
