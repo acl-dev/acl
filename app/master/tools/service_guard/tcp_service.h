@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // ≈‰÷√ƒ⁄»›œÓ
 
-class tcp_service : public acl::master_thread
+class tcp_service : public acl::master_threads
 {
 public:
 	tcp_service(void);
@@ -11,13 +11,16 @@ public:
 
 protected:
 	// @override
-	bool thread_on_read(acl::socket_stream* stream);
+	bool thread_on_read(acl::socket_stream* conn);
 
 	// @override
-	bool thread_on_accept(acl::socket_stream* stream);
+	bool thread_on_accept(acl::socket_stream* conn);
 
 	// @override
-	void thread_on_close(acl::socket_stream* stream);
+	void thread_on_close(acl::socket_stream* conn);
+
+	// @override
+	bool thread_on_timeout(acl::socket_stream* conn);
 
 	// @override
 	void thread_on_init(void);
@@ -35,5 +38,4 @@ protected:
 	bool proc_on_sighup(acl::string&);
 
 private:
-	acl::thread_pool* threads_;
 };

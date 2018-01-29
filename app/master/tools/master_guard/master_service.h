@@ -48,4 +48,9 @@ protected:
 	 * 当进程收到 SIGHUP 信号后的回调函数
 	 */
 	bool proc_on_sighup(acl::string&);
+
+private:
+	acl::tcp_ipc ipc_;
+	bool service_exit_;
+	acl::thread* monitor_;
 };

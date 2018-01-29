@@ -36,9 +36,10 @@ static long get_mem(const std::list<proc_info_t>& procs)
 }
 
 service_list::service_list(const char* master_ctld, const char* guard_manager,
-	int conn_timeout, int rw_timeout)
+	acl::tcp_ipc& ipc, int conn_timeout, int rw_timeout)
 : master_ctld_(master_ctld)
 , guard_manager_(guard_manager)
+, ipc_(ipc)
 , conn_timeout_(conn_timeout)
 , rw_timeout_(rw_timeout)
 {
@@ -85,6 +86,6 @@ bool service_list::run(void)
 	serialize<service_list_res_t>(list_res, body);
 	//logger("|%s|, len=%d", body.c_str(), (int) body.size());
 
-	guard_report report(guard_manager_, conn_timeout_, rw_timeout_);
+	guard_report report(guard_manager_, ipc_, conn_timeout_, rw_timeout_);
 	return report.report(body);
 }

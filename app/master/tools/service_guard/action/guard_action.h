@@ -17,11 +17,11 @@ class guard_action : public acl::thread_job
 public:
 	guard_action(const char* ip, const char* data);
 
-private:
-	~guard_action(void);
-
 	// @override
 	void* run(void);
+
+private:
+	~guard_action(void);
 
 private:
 	acl::string ip_;

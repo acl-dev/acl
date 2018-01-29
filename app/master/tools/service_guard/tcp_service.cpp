@@ -11,26 +11,45 @@ tcp_service::~tcp_service(void)
 {
 }
 
-bool tcp_service::thread_on_read(acl::socket_stream* stream)
+bool tcp_service::thread_on_read(acl::socket_stream* conn)
 {
-	int   n;
-	char  buf[1500];
+	acl::tcp_reader reader(*conn);
 
-	if ((n = stream->read(buf, sizeof(buf) - 1, false)) == -1)
+	acl::string buf;
+	if (reader.read(buf) == false) {
+		logger("read over from %s", conn->get_peer());
 		return false;
+	}
+	logger("read from %s, %d bytes, buf=|%s|",
+		conn->get_peer(), (int) buf.size(), buf.c_str());
 
-	buf[n] = 0;
-	logger("read from %s, %d bytes, buf=|%s|", stream->get_peer(), n, buf);
-
-	const char* peer_ip = stream->get_peer();
+	const char* peer_ip = conn->get_peer();
 	if (peer_ip == NULL || *peer_ip == 0) {
 		logger_error("can't get peer ip");
 		return false;
 	}
 
 	guard_action* job = new guard_action(peer_ip, buf);
-	threads_->execute(job);
+	job->run();
 	return true;
+}
+
+bool tcp_service::thread_on_accept(acl::socket_stream*)
+{
+	return true;
+}
+
+bool tcp_service::thread_on_timeout(acl::socket_stream* conn)
+{
+	logger_debug(DBG_NET, 2, "read timeout from %s, fd: %d",
+		conn->get_peer(), conn->sock_handle());
+	return false;
+}
+
+void tcp_service::thread_on_close(acl::socket_stream* conn)
+{
+	logger_debug(DBG_NET, 2, "disconnect from %s, fd: %d",
+		conn->get_peer(), conn->sock_handle());
 }
 
 void tcp_service::thread_on_init(void)
@@ -43,11 +62,6 @@ void tcp_service::thread_on_exit(void)
 
 void tcp_service::proc_on_init(void)
 {
-	threads_ = new acl::thread_pool;
-	threads_->set_limit(var_cfg_threads_max);
-	threads_->set_idle(var_cfg_threads_idle);
-	threads_->start();
-
 	var_redis.init(NULL, var_cfg_redis_addrs, var_cfg_threads_max,
 		var_cfg_redis_conn_timeout, var_cfg_redis_rw_timeout);
 	var_redis.set_password("default", var_cfg_redis_passwd);
@@ -70,7 +84,6 @@ void tcp_service::proc_on_init(void)
 
 void tcp_service::proc_on_exit(void)
 {
-	delete threads_;
 	logger(">>>proc_on_exit<<<");
 }
 

@@ -63,3 +63,6 @@
 extern acl::redis_client_cluster var_redis;
 extern std::map<acl::string, bool> var_main_service_list;
 extern char* var_cfg_main_service_list;
+
+#define DBG_BASE	100
+#define DBG_NET		(DBG_BASE + 1)
