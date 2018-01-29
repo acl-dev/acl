@@ -13,12 +13,28 @@ namespace acl {
 
 server_socket::server_socket(int backlog /* = 128 */, bool block /* = true */)
 : backlog_(backlog)
-, block_(block)
 , unix_sock_(false)
 , fd_(ACL_SOCKET_INVALID)
 , fd_local_(ACL_SOCKET_INVALID)
 {
 	addr_[0] = 0;
+	open_flag_ = block ? ACL_BLOCKING : ACL_NON_BLOCKING;
+}
+
+server_socket::server_socket(open_flag_t flag, int backlog /* = 128 */)
+: backlog_(backlog)
+, unix_sock_(false)
+, fd_(ACL_SOCKET_INVALID)
+, fd_local_(ACL_SOCKET_INVALID)
+{
+	open_flag_ = 0;
+	if (flag & OPEN_FLAG_NONBLOCK)
+		open_flag_ |= ACL_NON_BLOCKING;
+	else
+		open_flag_ |= ACL_BLOCKING;
+
+	if (flag & OPEN_FLAG_REUSEPORT)
+		open_flag_ |= ACL_INET_FLAG_REUSEPORT;
 }
 
 server_socket::server_socket(ACL_VSTREAM* sstream)
@@ -63,15 +79,13 @@ bool server_socket::open(const char* addr)
 #ifndef ACL_WINDOWS
 	if (strchr(addr, '/') != NULL)
 	{
-		fd_ = acl_unix_listen(addr, backlog_, block_
-			? ACL_BLOCKING : ACL_NON_BLOCKING);
+		fd_ = acl_unix_listen(addr, backlog_, open_flag_);
 		unix_sock_ = true;
 		SAFE_COPY(addr_, addr, sizeof(addr_));
 	}
 	else
 #endif
-		fd_ = acl_inet_listen(addr, backlog_, block_
-			? 0 : ACL_INET_FLAG_NBLOCK);
+		fd_ = acl_inet_listen(addr, backlog_, open_flag_);
 
 	if (fd_ == ACL_SOCKET_INVALID)
 	{
@@ -125,7 +139,7 @@ socket_stream* server_socket::accept(int timeout /* = 0 */)
 		return NULL;
 	}
 
-	if (block_ && timeout > 0)
+	if ((open_flag_ & ACL_NON_BLOCKING) && timeout > 0)
 	{
 		if (acl_read_wait(fd_, timeout) == -1)
 			return NULL;
@@ -134,7 +148,7 @@ socket_stream* server_socket::accept(int timeout /* = 0 */)
 	ACL_SOCKET fd = acl_accept(fd_, NULL, 0, NULL);
 	if (fd == ACL_SOCKET_INVALID)
 	{
-		if (block_)
+		if (open_flag_ & ACL_NON_BLOCKING)
 			logger_error("accept error %s", last_serror());
 		else if (last_error() != ACL_EAGAIN
 			&& last_error() != ACL_EWOULDBLOCK)

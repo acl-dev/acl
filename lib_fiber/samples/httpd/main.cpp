@@ -29,20 +29,10 @@ static void http_server(ACL_FIBER *, void *ctx)
 
 static void fiber_accept(ACL_FIBER *, void *ctx)
 {
-	const char* addr = (const char* ) ctx;
-	acl::server_socket server;
-
-	if (server.open(addr) == false)
-	{
-		printf("open %s error\r\n", addr);
-		exit (1);
-	}
-	else
-		printf("open %s ok\r\n", addr);
-
+	acl::server_socket* server = (acl::server_socket *) ctx;
 	while (true)
 	{
-		acl::socket_stream* client = server.accept();
+		acl::socket_stream* client = server->accept();
 		if (client == NULL)
 		{
 			printf("accept failed: %s\r\n", acl::last_serror());
@@ -54,20 +44,61 @@ static void fiber_accept(ACL_FIBER *, void *ctx)
 		acl_fiber_create(http_server, client, STACK_SIZE);
 	}
 
-	exit (0);
+	exit (1);
 }
+
+class thread_server : public acl::thread
+{
+public:
+	thread_server(acl::server_socket& server)
+	: server_inner_(NULL)
+	, server_(&server)
+	{
+	}
+
+	thread_server(const char* addr)
+	{
+		server_inner_ = new acl::server_socket(acl::OPEN_FLAG_REUSEPORT);
+		if (server_inner_->open(addr) == false)
+		{
+			printf("open %s error %s\r\n",
+				addr, acl::last_serror());
+			exit (1);
+		}
+
+		server_ = server_inner_;
+	}
+
+	~thread_server(void) { delete server_inner_; }
+
+private:
+	acl::server_socket* server_inner_;
+	acl::server_socket* server_;
+
+	void* run(void)
+	{
+		acl_fiber_create(fiber_accept, server_, STACK_SIZE);
+		acl_fiber_schedule();
+		return NULL;
+	}
+};
 
 static void usage(const char* procname)
 {
-	printf("usage: %s -h [help] -s listen_addr -r rw_timeout\r\n", procname);
+	printf("usage: %s -h [help]\r\n"
+		" -s listen_addr\r\n"
+		" -R reuse_port\r\n"
+		" -t threads\r\n"
+		" -r rw_timeout\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
 	acl::string addr("127.0.0.1:9001");
-	int  ch;
+	int  ch, nthreads = 2;
+	bool reuse_port = false;
 
-	while ((ch = getopt(argc, argv, "hs:r:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:r:t:R")) > 0)
 	{
 		switch (ch)
 		{
@@ -80,6 +111,12 @@ int main(int argc, char *argv[])
 		case 'r':
 			__rw_timeout = atoi(optarg);
 			break;
+		case 't':
+			nthreads = atoi(optarg);
+			break;
+		case 'R':
+			reuse_port = true;
+			break;
 		default:
 			break;
 		}
@@ -88,8 +125,40 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	acl_fiber_create(fiber_accept, addr.c_str(), STACK_SIZE);
+	acl::server_socket server;
 
-	acl_fiber_schedule();
+	if (!reuse_port)
+	{
+		if (server.open(addr) == false)
+		{
+			printf("open %s error\r\n", addr.c_str());
+			exit (1);
+		}
+		else
+			printf("open %s ok\r\n", addr.c_str());
+	}
+
+	std::vector<acl::thread*> threads;
+
+	for (int i = 0; i < nthreads; i++)
+	{
+		acl::thread* thr;
+		if (reuse_port)
+			thr = new thread_server(addr);
+		else
+			thr = new thread_server(server);
+		threads.push_back(thr);
+		thr->set_detachable(false);
+		thr->start();
+
+	}
+
+	for (std::vector<acl::thread*>::iterator it = threads.begin();
+		it != threads.end(); ++it)
+	{
+		(*it)->wait();
+		delete *it;
+	}
+
 	return 0;
 }

@@ -106,7 +106,7 @@ int acl_fiber_listen(socket_t sockfd, int backlog)
 # define error_again(x) ((x) == FIBER_EAGAIN || (x) == FIBER_EWOULDBLOCK)
 #endif
 
-//#define FAST_ACCEPT
+#define FAST_ACCEPT
 
 socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 	socklen_t *addrlen)
@@ -151,32 +151,14 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 	}
 
 	fe = fiber_file_open(sockfd);
-	fiber_wait_read(fe);
 
-	if (acl_fiber_killed(fe->fiber)) {
-		msg_info("%s(%d), %s: fiber-%u was killed", __FILE__,
-			__LINE__, __FUNCTION__, acl_fiber_id(fe->fiber));
-		return -1;
-	}
+	while (1) {
+		fiber_wait_read(fe);
 
-	clifd = __sys_accept(sockfd, addr, addrlen);
-
-	if (clifd != INVALID_SOCKET) {
-		non_blocking(clifd, NON_BLOCKING);
-		tcp_nodelay(clifd, 1);
-		return clifd;
-	}
-
-	fiber_save_errno(err);
-	return clifd;
-#else
-	fe = fiber_file_open(sockfd);
-
-	while(1) {
-		if (IS_READABLE(fe)) {
-			CLR_READABLE(fe);
-		} else {
-			fiber_wait_read(fe);
+		if (acl_fiber_killed(fe->fiber)) {
+			msg_info("%s(%d), %s: fiber-%u was killed", __FILE__,
+				__LINE__, __FUNCTION__, acl_fiber_id(fe->fiber));
+			return -1;
 		}
 
 		clifd = __sys_accept(sockfd, addr, addrlen);
@@ -190,11 +172,39 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
 
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u was killed", __FILE__,
-				__LINE__, __FUNCTION__, acl_fiber_id(fe->fiber));
-			return -1;
+		if (!error_again(err)) {
+			return clifd;
 		}
+	}
+#else
+	fe = fiber_file_open(sockfd);
+
+	while(1) {
+		if (IS_READABLE(fe)) {
+			CLR_READABLE(fe);
+		} else {
+			fiber_wait_read(fe);
+
+			if (acl_fiber_killed(fe->fiber)) {
+				msg_info("%s(%d), %s: fiber-%u was killed",
+					__FILE__, __LINE__, __FUNCTION__,
+					acl_fiber_id(fe->fiber));
+				return -1;
+			}
+
+		}
+
+		clifd = __sys_accept(sockfd, addr, addrlen);
+
+		if (clifd != INVALID_SOCKET) {
+			non_blocking(clifd, NON_BLOCKING);
+			tcp_nodelay(clifd, 1);
+			return clifd;
+		}
+
+		err = acl_fiber_last_error();
+		fiber_save_errno(err);
+
 
 		if (!error_again(err)) {
 			return clifd;

@@ -8,6 +8,12 @@ namespace acl {
 
 class socket_stream;
 
+typedef enum {
+	OPEN_FLAG_NONE      = 0,
+	OPEN_FLAG_NONBLOCK  = 1,	// 非阻塞模式
+	OPEN_FLAG_REUSEPORT = 1 << 1,	// 端口复用，要求 Linux3.0 以上
+} open_flag_t;
+
 /**
  * 服务端监听套接口类，接收客户端连接，并创建客户端流连接对象
  */
@@ -19,7 +25,14 @@ public:
 	 * @param backlog {int} 监听套接口队列长度
 	 * @param block {bool} 是阻塞模式还是非阻塞模式
 	 */
-	server_socket(int backlog = 128, bool block = true);
+	explicit server_socket(int backlog = 128, bool block = true);
+
+	/**
+	 * 构造函数
+	 * @param flag {unsigned} 定义参见 OPEN_FLAG_XXX
+	 * @param backlog {int} 监听套接口队列长度
+	 */
+	explicit server_socket(open_flag_t flag, int backlog = 128);
 
 	/**
 	 * 构造函数，调用本构造函数后禁止再调用 open 方法
@@ -111,10 +124,10 @@ public:
 	void set_tcp_defer_accept(int timeout);
 
 private:
-	int   backlog_;
-	bool  block_;
-	bool  unix_sock_;
-	char  addr_[64];
+	int      backlog_;
+	unsigned open_flag_;
+	bool     unix_sock_;
+	char     addr_[64];
 
 #if defined(_WIN32) || defined(_WIN64)
 	SOCKET fd_;
