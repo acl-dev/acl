@@ -43,7 +43,7 @@ service server
 #	进程程序名
 	master_command = {install_path}/libexec/service_guard
 #	进程日志记录文件
-	master_log = {install_path}/var/log/service_guard
+	master_log = {install_path}/var/log/service_guard_udp
 #	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2
 #	master_debug =
 #	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
