@@ -122,6 +122,8 @@ void master_warning(const char *notify_addr, const char *recipients,
 		acl_msg_warn("%s(%d): desc invalid", myname, __LINE__);
 		return;
 	}
+	if (recipients == NULL || *recipients == 0)
+		recipients = "admin@root.domain";
 
 	info = warn_info_new(notify_addr, recipients, path, ver, pid, desc);
 	acl_pthread_pool_add(acl_var_master_thread_pool, notify_thread, info);

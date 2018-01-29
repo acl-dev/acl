@@ -336,9 +336,7 @@ void acl_master_reap_child(void)
 				"exit status %d", __FILE__, __LINE__,
 				myname, serv->path, pid, WEXITSTATUS(status));
 
-			if (serv->notify_addr != NULL
-				&& serv->notify_recipients != NULL) {
-
+			if (serv->notify_addr != NULL) {
 				snprintf(buf, sizeof(buf), "exit status %d",
 					WEXITSTATUS(status));
 				master_warning(serv->notify_addr,
@@ -353,7 +351,7 @@ void acl_master_reap_child(void)
 				" by signal %d", __FILE__, __LINE__, myname,
 				serv->path, pid, WTERMSIG(status));
 
-			if (serv->notify_addr && serv->notify_recipients) {
+			if (serv->notify_addr) {
 				snprintf(buf, sizeof(buf), "killed by %d",
 					WTERMSIG(status));
 				master_warning(serv->notify_addr,
@@ -372,6 +370,14 @@ void acl_master_reap_child(void)
 				" -- throttling, signale=%d", __FILE__,
 				__LINE__, myname, serv->path, WTERMSIG(status));
 			master_throttle(serv);
+
+			if (serv->notify_addr) {
+				snprintf(buf, sizeof(buf), "exit status %d",
+					WEXITSTATUS(status));
+				master_warning(serv->notify_addr,
+					serv->notify_recipients,
+					serv->path, serv->version, pid, buf);
+			}
 		}
 
 		master_delete_child(proc);

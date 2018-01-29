@@ -533,6 +533,8 @@ static void service_proc(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 	serv->total_proc = 0;
 }
 
+#define MONITOR_SOCK	"/opt/soft/acl-master/var/public/monitor.sock"
+
 static int service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	const char *path)
 {
@@ -597,7 +599,7 @@ static int service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 	/* Notify Address */
 	ptr_const = get_str_ent(xcp, ACL_VAR_MASTER_NOTIFY_ADDR, "no");
 	if (ptr_const == NULL || strcasecmp(ptr_const, "no") == 0)
-		serv->notify_addr = NULL;
+		serv->notify_addr = acl_mystrdup(MONITOR_SOCK);
 	else
 		serv->notify_addr = acl_mystrdup(ptr_const);
 
