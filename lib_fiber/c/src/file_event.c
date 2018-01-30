@@ -19,6 +19,14 @@ void file_event_init(FILE_EVENT *fe, int fd)
 #ifdef HAS_POLL
 	fe->pfd    = NULL;
 #endif
+
+#ifdef HAS_IOCP
+	fe->h_iocp = NULL;
+	fe->reader = NULL;
+	fe->writer = NULL;
+	fe->iocp_sock    = INVALID_SOCKET;
+	memset(&fe->peer_addr, 0, sizeof(fe->peer_addr));
+#endif
 }
 
 FILE_EVENT *file_event_alloc(int fd)

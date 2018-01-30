@@ -493,9 +493,10 @@ static int fiber_file_del(FILE_EVENT *fe)
 #endif
 }
 
-int fiber_file_close(socket_t fd)
+int fiber_file_close(socket_t fd, int *closed)
 {
 	FILE_EVENT *fe;
+	EVENT *event;
 
 	fiber_io_check();
 	if (fd == INVALID_SOCKET || fd >= var_maxfd) {
@@ -508,9 +509,14 @@ int fiber_file_close(socket_t fd)
 		return 0;
 	}
 
-	event_close(__thread_fiber->event, fe);
+	event = __thread_fiber->event;
+	event_close(event, fe);
 	fiber_file_del(fe);
-	file_event_free(fe);
 
+	if (event->close_sock) {
+		*closed = event->close_sock(event, fe);
+	}
+
+	file_event_free(fe);
 	return 1;
 }

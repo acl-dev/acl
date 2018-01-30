@@ -40,6 +40,10 @@ typedef void poll_proc(EVENT *ev, POLL_EVENT *pe);
 typedef void epoll_proc(EVENT *ev, EPOLL_EVENT *ee);
 #endif
 
+#ifdef HAS_IOCP
+typedef struct IOCP_EVENT IOCP_EVENT;
+#endif
+
 /**
  * for each connection fd
  */
@@ -85,6 +89,14 @@ struct FILE_EVENT {
 #endif
 #ifdef HAS_EPOLL
 	EPOLL_CTX    *epx;
+#endif
+
+#ifdef HAS_IOCP
+	HANDLE        h_iocp;
+	IOCP_EVENT   *reader;
+	IOCP_EVENT   *writer;
+	socket_t      iocp_sock;
+	struct sockaddr_in peer_addr;
 #endif
 };
 
@@ -155,6 +167,7 @@ struct EVENT {
 	event_oper *add_write;
 	event_oper *del_read;
 	event_oper *del_write;
+	event_oper *close_sock;
 };
 
 /* file_event.c */

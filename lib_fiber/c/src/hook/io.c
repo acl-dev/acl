@@ -140,7 +140,7 @@ int WINAPI acl_fiber_close(socket_t fd)
 int acl_fiber_close(socket_t fd)
 #endif
 {
-	int ret;
+	int ret, closed;
 	if (fd == INVALID_SOCKET) {
 		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
 		return -1;
@@ -164,7 +164,12 @@ int acl_fiber_close(socket_t fd)
 	}
 #endif
 
-	fiber_file_close(fd);
+	(void) fiber_file_close(fd, &closed);
+	if (closed) {
+		/* return if the socket has been closed in fiber_file_close */
+		return 0;
+	}
+
 	ret = __sys_close(fd);
 	if (ret == 0) {
 		return ret;

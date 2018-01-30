@@ -762,8 +762,6 @@ TAG_DONE:
 	for (;;) {
 		BOOL isSuccess = FALSE;
 		DWORD bytesTransferred = 0;
-		DWORD iocpKey = 0;
-		DWORD lastError = 0;
 		IOCP_EVENT *iocp_event = NULL;
 
 		isSuccess = GetQueuedCompletionStatus(ev->h_iocp,

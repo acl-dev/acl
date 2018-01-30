@@ -6,6 +6,7 @@
 #include "event/event_select.h"
 #include "event/event_poll.h"
 #include "event/event_wmsg.h"
+#include "event/event_iocp.h"
 #include "event.h"
 
 static __thread int __event_mode = FIBER_EVENT_KERNEL;
@@ -51,7 +52,7 @@ EVENT *event_create(int size)
 #elif	defined(HAS_KQUEUE)
 		ev = event_kqueue_create(size);
 #elif	defined(HAS_IOCP)
-		msg_fatal("%s(%d): not support!", __FUNCTION__, __LINE__);
+		ev = event_iocp_create(size);
 #else
 #error	"unknown OS"
 #endif

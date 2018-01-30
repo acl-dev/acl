@@ -161,6 +161,15 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 			return -1;
 		}
 
+#ifdef HAS_IOCP
+		clifd = fe->iocp_sock;
+		if (clifd != INVALID_SOCKET) {
+			non_blocking(clifd, NON_BLOCKING);
+			tcp_nodelay(clifd, 1);
+			fe->iocp_sock = INVALID_SOCKET;
+			return clifd;
+		}
+#endif
 		clifd = __sys_accept(sockfd, addr, addrlen);
 
 		if (clifd != INVALID_SOCKET) {
@@ -194,6 +203,15 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 
 		}
 
+#ifdef HAS_IOCP
+		clifd = fe->iocp_sock;
+		if (clifd != INVALID_SOCKET) {
+			non_blocking(clifd, NON_BLOCKING);
+			tcp_nodelay(clifd, 1);
+			fe->iocp_sock = INVALID_SOCKET;
+			return clifd;
+		}
+#endif
 		clifd = __sys_accept(sockfd, addr, addrlen);
 
 		if (clifd != INVALID_SOCKET) {
@@ -204,7 +222,6 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
-
 
 		if (!error_again(err)) {
 			return clifd;
@@ -283,8 +300,12 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	}
 
 	fe = fiber_file_open(sockfd);
+
 #ifdef SYS_WIN
 	fe->status |= STATUS_CONNECTING;
+# ifdef HAS_IOCP
+	memcpy(&fe->peer_addr, addr, addrlen);
+# endif
 #endif
 
 	time(&begin);

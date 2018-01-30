@@ -93,7 +93,7 @@ void fiber_io_inc(void);
 EVENT *fiber_io_event(void);
 
 FILE_EVENT *fiber_file_open(socket_t fd);
-int fiber_file_close(socket_t fd);
+int fiber_file_close(socket_t fd, int *closed);
 
 /* in hook/epoll.c */
 int  epoll_event_close(int epfd);
