@@ -150,6 +150,17 @@ public:
 	static void hook_api(bool on);
 
 	/**
+	 * 显式调用本函数使 acl 基础库的 IO 过程协程化，在 UNIX 平台下不必显式调用
+	 * 本函数，因为内部会自动 HOOK IO API
+	 */
+	static void acl_io_hook(void);
+
+	/**
+	 * 调用本函数取消 acl基础库中的 IO 协程化
+	 */
+	static void acl_io_unlock(void);
+
+	/**
 	 * 获得当前系统级错误号
 	 * @return {int}
 	 */

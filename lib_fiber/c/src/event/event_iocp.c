@@ -272,6 +272,9 @@ static int iocp_del_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 static int iocp_wait(EVENT *ev, int timeout)
 {
 	EVENT_IOCP *ei = (EVENT_IOCP *) ev;
+	ARRAY *readers = array_create(100);
+	ARRAY *writers = array_create(100);
+	ITER   iter;
 
 	for (;;) {
 		DWORD bytesTransferred;
@@ -305,16 +308,30 @@ static int iocp_wait(EVENT *ev, int timeout)
 		if (event->type == IOCP_EVENT_READ && fe->r_proc) {
 			assert(fe->reader == event);
 			event->type &= ~IOCP_EVENT_READ;
-			fe->r_proc(ev, fe);
+			array_append(readers, fe);
 		}
 
 		if (event->type == IOCP_EVENT_WRITE && fe->w_proc) {
 			assert(fe->writer == event);
-			fe->w_proc(ev, fe);
+			event->type &= ~IOCP_EVENT_WRITE;
+			array_append(writers, fe);
 		}
 
 		timeout = 0;
 	}
+
+	foreach(iter, readers) {
+		FILE_EVENT *fe = (FILE_EVENT *) iter.data;
+		fe->r_proc(ev, fe);
+	}
+
+	foreach(iter, writers) {
+		FILE_EVENT *fe = (FILE_EVENT *) iter.data;
+		fe->w_proc(ev, fe);
+	}
+
+	array_free(readers, NULL);
+	array_free(writers, NULL);
 
 	return 0;
 }

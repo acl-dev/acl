@@ -75,6 +75,36 @@ ACL_FIBER *fiber::get_fiber(void) const
 	return f_;
 }
 
+void fiber::acl_io_hook(void)
+{
+	acl_set_accept(acl_fiber_accept);
+	acl_set_connect(acl_fiber_connect);
+	acl_set_recv(acl_fiber_recv);
+	acl_set_send(acl_fiber_send);
+	acl_set_poll(acl_fiber_poll);
+	acl_set_select(acl_fiber_select);
+	acl_set_close_socket(acl_fiber_close);
+}
+
+#if !defined(_WIN32) && !defined(_WIN64)
+#include <poll.h>
+#endif
+
+void fiber::acl_io_unlock(void)
+{
+	acl_set_accept(accept);
+	acl_set_connect(connect);
+	acl_set_recv(recv);
+	acl_set_send(send);
+#if defined(_WIN32) || defined(_WIN64)
+	acl_set_poll(WSAPoll);
+#else
+	acl_set_poll(poll);
+#endif
+	acl_set_select(select);
+	acl_set_close_socket(closesocket);
+}
+
 void fiber::run(void)
 {
 	acl_msg_fatal("%s(%d), %s: base function be called",

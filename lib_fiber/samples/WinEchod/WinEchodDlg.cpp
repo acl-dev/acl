@@ -224,28 +224,7 @@ void CWinEchodDlg::InitFiber(void)
 	// 设置协程调度的事件引擎，同时将协程调度设为自动启动模式
 	acl::fiber::init(acl::FIBER_EVENT_T_WMSG, true);
 	// HOOK ACL 库中的网络 IO 过程
-	HookAclIO();
-}
-
-void CWinEchodDlg::HookAclIO(void)
-{
-	acl_set_accept(acl_fiber_accept);
-	acl_set_connect(acl_fiber_connect);
-	acl_set_recv(acl_fiber_recv);
-	acl_set_send(acl_fiber_send);
-	acl_set_poll(acl_fiber_poll);
-	acl_set_select(acl_fiber_select);
-	acl_set_close_socket(acl_fiber_close);
-}
-
-void CWinEchodDlg::UnHookAclIO(void)
-{
-	acl_set_accept(accept);
-	acl_set_connect(connect);
-	acl_set_recv(recv);
-	acl_set_send(send);
-	acl_set_select(select);
-	acl_set_close_socket(closesocket);
+	acl::fiber::acl_io_hook();
 }
 
 void CWinEchodDlg::OnBnClickedListen()

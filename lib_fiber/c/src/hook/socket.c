@@ -158,15 +158,26 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 		if (acl_fiber_killed(fe->fiber)) {
 			msg_info("%s(%d), %s: fiber-%u was killed", __FILE__,
 				__LINE__, __FUNCTION__, acl_fiber_id(fe->fiber));
-			return -1;
+			return INVALID_SOCKET;
 		}
 
 #ifdef HAS_IOCP
 		clifd = fe->iocp_sock;
 		if (clifd != INVALID_SOCKET) {
+			int ret;
 			non_blocking(clifd, NON_BLOCKING);
 			tcp_nodelay(clifd, 1);
 			fe->iocp_sock = INVALID_SOCKET;
+			/* iocp 方式下，需调用下面过程以允许调用
+			 * getpeername/getsockname
+			 */
+			ret = setsockopt(clifd, SOL_SOCKET,
+				SO_UPDATE_ACCEPT_CONTEXT,
+				(char *)&fe->fd, sizeof(fe->fd));
+			if (ret == SOCKET_ERROR) {
+				closesocket(clifd);
+				continue;
+			}
 			return clifd;
 		}
 #endif
@@ -182,7 +193,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			return clifd;
+			return INVALID_SOCKET;
 		}
 	}
 #else
@@ -198,7 +209,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 				msg_info("%s(%d), %s: fiber-%u was killed",
 					__FILE__, __LINE__, __FUNCTION__,
 					acl_fiber_id(fe->fiber));
-				return -1;
+				return INVALID_SOCKET;
 			}
 
 		}
@@ -224,7 +235,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			return clifd;
+			return INVALID_SOCKET;
 		}
 	}
 #endif

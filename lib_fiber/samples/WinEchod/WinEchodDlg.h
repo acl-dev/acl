@@ -45,8 +45,6 @@ private:
 	UINT m_cocurrent;
 	UINT m_count;
 	void Uni2Str(const CString& in, acl::string& out);
-	void HookAclIO(void);
-	void UnHookAclIO(void);
 	void InitFiber();
 
 public:
