@@ -13,7 +13,7 @@
 class ipc_monitor : public acl::thread
 {
 public:
-	ipc_monitor(acl::tcp_ipc& ipc, int ttl, bool service_exit);
+	ipc_monitor(acl::tcp_ipc& ipc, int ttl, bool& service_exit);
 	~ipc_monitor(void) {}
 
 private:
@@ -25,5 +25,5 @@ private:
 private:
 	acl::tcp_ipc& ipc_;
 	int ttl_;
-	bool service_exit_;
+	bool& service_exit_;
 };

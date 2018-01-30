@@ -57,8 +57,6 @@ void master_service::on_trigger()
 
 void master_service::proc_on_init()
 {
-	logger(">>>proc_on_init<<<");
-
 	ipc_.set_limit(0)
 		.set_idle(30)
 		.set_conn_timeout(var_cfg_conn_timeout)
@@ -76,7 +74,6 @@ static void wait_timeout(int)
 
 void master_service::proc_on_exit()
 {
-	logger(">>>proc_on_exit<<<");
 	service_exit_ = true;
 	signal(SIGALRM, wait_timeout);
 	alarm(10);

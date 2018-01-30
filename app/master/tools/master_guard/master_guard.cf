@@ -44,7 +44,7 @@ service master_guard
 #	是否允许产生 core 文件
 #	trigger_enable_core = 1
 #	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出
-	trigger_use_limit = 250
+	trigger_use_limit = 0
 #	记录进程PID的位置(对于多进程实例来说没有意义)
 	trigger_pid_dir = {install_path}/var/pid
 #	进程运行时所在的路径

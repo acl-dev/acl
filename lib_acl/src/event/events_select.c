@@ -435,13 +435,16 @@ static void event_loop(ACL_EVENT *eventp)
 	nready = select(eventp->maxfd + 1, &rmask, &wmask, &xmask, tvp);
 #endif
 
-	if (eventp->nested++ > 0)
-		acl_msg_fatal("%s(%d): recursive call(%d)",
+	if (eventp->nested++ > 0) {
+		acl_msg_error("%s(%d): recursive call(%d)",
 			myname, __LINE__, eventp->nested);
+		exit (1);
+	}
 	if (nready < 0) {
 		if (acl_last_error() != ACL_EINTR) {
-			acl_msg_fatal("%s(%d), %s: select: %s", __FILE__,
+			acl_msg_error("%s(%d), %s: select: %s", __FILE__,
 				__LINE__, myname, acl_last_serror());
+			exit (1);
 		}
 		goto TAG_DONE;
 	} else if (nready == 0)

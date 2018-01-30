@@ -111,17 +111,17 @@ void master_service::on_accept(acl::socket_stream& conn)
 
 void master_service::proc_pre_jail(void)
 {
-	logger(">>>proc_pre_jail<<<");
+	//logger(">>>proc_pre_jail<<<");
 }
 
-void master_service::proc_on_listen(acl::server_socket& ss)
+void master_service::proc_on_listen(acl::server_socket&)
 {
-	logger(">>>listen %s ok<<<", ss.get_addr());
+	//logger(">>>listen %s ok<<<", ss.get_addr());
 }
 
 void master_service::proc_on_init(void)
 {
-	logger(">>>proc_on_init<<<");
+	//logger(">>>proc_on_init<<<");
 
 	ipc_.set_limit(0)
 		.set_idle(30)
@@ -140,7 +140,7 @@ static void wait_timeout(int)
 
 void master_service::proc_on_exit(void)
 {
-	logger(">>>proc_on_exit<<<");
+	//logger(">>>proc_on_exit<<<");
 	service_exit_ = true;
 	signal(SIGALRM, wait_timeout);
 	alarm(10);

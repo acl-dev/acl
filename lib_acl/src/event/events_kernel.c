@@ -699,13 +699,17 @@ static void event_loop(ACL_EVENT *eventp)
 	EVENT_BUFFER_READ(nready, ev->event_fd, ev->event_buf,
 		ev->event_fdslots, (int) (delay / 1000));
 
-	if (eventp->nested++ > 0)
-		acl_msg_fatal("%s(%d): recursive call, nested: %d",
+	if (eventp->nested++ > 0) {
+		acl_msg_error("%s(%d): recursive call, nested: %d",
 			myname, __LINE__, eventp->nested);
+		exit (1);
+	}
 	if (nready < 0) {
-		if (acl_last_error() != ACL_EINTR)
-			acl_msg_fatal("%s(%d), %s: select: %s", __FILE__,
+		if (acl_last_error() != ACL_EINTR) {
+			acl_msg_error("%s(%d), %s: select: %s", __FILE__,
 				__LINE__, myname, acl_last_serror());
+			exit (1);
+		}
 
 		goto TAG_DONE;
 	} else if (nready == 0)
@@ -721,9 +725,11 @@ static void event_loop(ACL_EVENT *eventp)
 		fdp = acl_fdmap_ctx(ev->fdmap, sockfd);
 		if (fdp == NULL || fdp->stream == NULL)
 			continue;
-		if (sockfd != ACL_VSTREAM_SOCK(fdp->stream))
-			acl_msg_fatal("%s(%d): sockfd(%d) != %d", myname,
+		if (sockfd != ACL_VSTREAM_SOCK(fdp->stream)) {
+			acl_msg_error("%s(%d): sockfd(%d) != %d", myname,
 				__LINE__, sockfd, ACL_VSTREAM_SOCK(fdp->stream));
+			exit (1);
+		}
 #else
 		fdp = (ACL_EVENT_FDTABLE *) EVENT_GET_CTX(bp);
 		if (fdp == NULL || fdp->stream == NULL)
