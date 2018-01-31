@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        68
+Release:        69
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,11 @@ fi
 /etc/init.d/master
 
 %changelog
+
+* Wed Jan 31 2018 zhengshuxin@qiyi.com 3.3.0-69-20180131.12
+- master_guard: can't count fds on Cendos5.x
+- master_monitor: can't get real version for "-v"
+- acl_master: should override check_xxx when reloading service configure
 
 * Tue Jan 30 2018 zhengshuxin@qiyi.com 3.3.0-68-20180130.09
 - master_guard: invalid exiting status

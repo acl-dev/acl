@@ -89,7 +89,7 @@ bool tools::exec_shell(const char* cmd, acl::string& buf)
 int tools::get_fds(pid_t pid)
 {
 	acl::string cmd;
-	cmd.format("ls -l /proc/%d/fd|wc -l", (int) pid);
+	cmd.format("/bin/ls -l /proc/%d/fd|wc -l", (int) pid);
 
 	int n;
 	acl::string buf;
@@ -109,7 +109,7 @@ int tools::get_fds(pid_t pid)
 	buf.format("/proc/%d/fd", (int) pid);
 
 	ACL_ARGV* args = acl_argv_alloc(1);
-	acl_argv_add(args, "ls", "-l", buf.c_str(), NULL);
+	acl_argv_add(args, "/bin/ls", "-l", buf.c_str(), NULL);
 
 	ACL_VSTREAM* fp = acl_vstream_popen(O_RDWR,
 		ACL_VSTREAM_POPEN_ARGV, args->argv, ACL_VSTREAM_POPEN_END);

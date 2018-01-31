@@ -14,7 +14,7 @@ static void sio(SOCK_UDP *sock, int inter, bool echo)
 		} else
 			buf[ret] = 0;
 
-		if (++i % inter == 0)
+//		if (++i % inter == 0)
 			printf("result: %s\r\n", buf);
 
 		if (echo && (ret = udp_send(sock, buf, ret)) == -1) {

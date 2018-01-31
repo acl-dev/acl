@@ -60,19 +60,28 @@ void master_service::handle(const acl::string& data)
 
 	acl::url_coder coder;
 	coder.decode(data);
-	const char* ptr = coder.get("proc");
+	const char* ptr = coder.get("path");
+	if (ptr == NULL || *ptr == 0)
+		ptr = coder.get("proc");
 	if (ptr && *ptr)
 		res.path = ptr;
-
-	ptr = coder.get("ver");
-	if (ptr && *ptr)
-		res.version = ptr;
 
 	ptr = coder.get("pid");
 	if (ptr && *ptr)
 	{
 		int pid = atoi(ptr);
 		res.pid = pid;
+	}
+	else
+		res.pid = -1;
+
+	ptr = coder.get("ver");
+	if (ptr && *ptr)
+	{
+		if (strcasecmp(ptr, "-v") == 0 && !res.path.empty())
+			tools::get_version(res.path, res.version);
+		else
+			res.version = ptr;
 	}
 
 	ptr = coder.get("rcpt");
