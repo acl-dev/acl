@@ -70,7 +70,7 @@ static void notify_thread(void *arg)
 	int   ret;
 
 	buf = acl_vstring_alloc(256);
-	add_str(buf, "proc", info->path);
+	add_str(buf, "path", info->path);
 	add_str(buf, "ver", info->ver);
 	add_num(buf, "pid", info->pid);
 	add_str(buf, "rcpt", info->notify_recipients);
