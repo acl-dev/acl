@@ -98,11 +98,12 @@ void fiber::acl_io_unlock(void)
 	acl_set_send(send);
 #if defined(_WIN32) || defined(_WIN64)
 	acl_set_poll(WSAPoll);
+	acl_set_close_socket(closesocket);
 #else
 	acl_set_poll(poll);
+	acl_set_close_socket(close);
 #endif
 	acl_set_select(select);
-	acl_set_close_socket(closesocket);
 }
 
 void fiber::run(void)
