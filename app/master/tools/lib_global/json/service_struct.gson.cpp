@@ -89,6 +89,11 @@ namespace acl
         else
             $node.add_text("path", acl::get_value($obj.path));
 
+        if (check_nullptr($obj.conf))
+            $node.add_null("conf");
+        else
+            $node.add_text("conf", acl::get_value($obj.conf));
+
         if (check_nullptr($obj.version))
             $node.add_null("version");
         else
@@ -132,6 +137,7 @@ namespace acl
         acl::json_node *status = $node["status"];
         acl::json_node *cmd = $node["cmd"];
         acl::json_node *path = $node["path"];
+        acl::json_node *conf = $node["conf"];
         acl::json_node *version = $node["version"];
         acl::json_node *pid = $node["pid"];
         acl::json_node *rcpt = $node["rcpt"];
@@ -146,6 +152,9 @@ namespace acl
      
         if(!path ||!($result = gson(*path, &$obj.path), $result.first))
             return std::make_pair(false, "required [service_dead_res_t.path] failed:{"+$result.second+"}");
+     
+        if(!conf ||!($result = gson(*conf, &$obj.conf), $result.first))
+            return std::make_pair(false, "required [service_dead_res_t.conf] failed:{"+$result.second+"}");
      
         if(!version ||!($result = gson(*version, &$obj.version), $result.first))
             return std::make_pair(false, "required [service_dead_res_t.version] failed:{"+$result.second+"}");

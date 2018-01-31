@@ -61,10 +61,12 @@ void master_service::handle(const acl::string& data)
 	acl::url_coder coder;
 	coder.decode(data);
 	const char* ptr = coder.get("path");
-	if (ptr == NULL || *ptr == 0)
-		ptr = coder.get("proc");
 	if (ptr && *ptr)
 		res.path = ptr;
+
+	ptr = coder.get("conf");
+	if (ptr && *ptr)
+		res.conf = ptr;
 
 	ptr = coder.get("pid");
 	if (ptr && *ptr)

@@ -61,6 +61,8 @@ struct service_dead_res_t : service_base
 		pid = -1;
 	}
 	acl::string path;
+	// Gson@optional
+	acl::string conf;
 	acl::string version;
 	int  pid;
 	acl::string rcpt;
