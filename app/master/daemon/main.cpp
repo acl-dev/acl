@@ -16,7 +16,7 @@
 #include "master/master.h"
 #include "manage/manager.h"
 
-const char *var_master_version = "3.3.0-68 20180130";
+const char *var_master_version = "3.3.0-69 20180131";
 char *var_master_procname;
 
 /* usage - show hint and terminate */

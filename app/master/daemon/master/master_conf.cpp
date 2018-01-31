@@ -78,6 +78,12 @@ int acl_master_refresh_service(ACL_MASTER_SERV *entry)
 	serv->max_proc = entry->max_proc;
 	serv->prefork_proc = entry->prefork_proc;
 	serv->throttle_delay = entry->throttle_delay;
+	serv->check_fds    = entry->check_fds;
+	serv->check_mem    = entry->check_mem;
+	serv->check_cpu    = entry->check_cpu;
+	serv->check_io     = entry->check_io;
+	serv->check_net    = entry->check_net;
+	serv->check_limits = entry->check_limits;
 	SWAP(char *, serv->path, entry->path);
 	//SWAP(char *, serv->command, entry->command);
 	SWAP(char *, serv->cmdext, entry->cmdext);
