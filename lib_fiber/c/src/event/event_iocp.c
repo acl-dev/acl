@@ -90,6 +90,28 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 	return 1;
 }
 
+static void iocp_check(EVENT_IOCP *ev, FILE_EVENT *fe)
+{
+	if (fe->id == -1) {
+		assert(ev->count < ev->size);
+		fe->id = ev->count++;
+		ev->files[fe->id] = fe;
+		ev->event.fdcount++;
+	} else {
+		assert(fe->id >= 0 && fe->id < ev->count);
+		assert(ev->files[fe->id] = fe);
+	}
+
+	if (fe->h_iocp == NULL) {
+		fe->h_iocp = CreateIoCompletionPort((HANDLE) fe->fd,
+			ev->h_iocp, (ULONG_PTR) fe, 0);
+		if (fe->h_iocp != ev->h_iocp) {
+			msg_fatal("%s(%d): CreateIoCompletionPort error(%s)",
+				__FUNCTION__, __LINE__, last_serror());
+		}
+	}
+}
+
 static int iocp_add_listen(EVENT_IOCP *ev, FILE_EVENT *fe)
 {
 	DWORD    ReceiveLen = 0;
@@ -114,7 +136,7 @@ static int iocp_add_listen(EVENT_IOCP *ev, FILE_EVENT *fe)
 		return -1;
 	} else {
 		fe->mask |= EVENT_READ;
-		ev->event.fdcount++;
+		iocp_check(ev, fe);
 		return 0;
 	}
 }
@@ -124,21 +146,12 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 	DWORD recvBytes;
 	BOOL  ret;
 
-	if (fe->h_iocp == NULL) {
-		fe->h_iocp = CreateIoCompletionPort((HANDLE) fe->fd,
-			ev->h_iocp, (ULONG_PTR) fe, 0);
-		if (fe->h_iocp != ev->h_iocp) {
-			msg_fatal("%s(%d): CreateIoCompletionPort error(%s)",
-				__FUNCTION__, __LINE__, last_serror());
-		}
-	}
-
 	if (fe->reader == NULL) {
 		fe->reader       = (IOCP_EVENT*) malloc(sizeof(IOCP_EVENT));
 		fe->reader->fe   = fe;
-		fe->reader->type = IOCP_EVENT_READ;
 	}
 
+	fe->reader->type = IOCP_EVENT_READ;
 	memset(&fe->reader->overlapped, 0, sizeof(fe->reader->overlapped));
 
 	if (is_listen_socket(fe->fd)) {
@@ -153,7 +166,7 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 		return -1;
 	} else {
 		fe->mask |= EVENT_READ;
-		ev->event.fdcount++;
+		iocp_check(ev, fe);
 		return 0;
 	}
 }
@@ -207,7 +220,7 @@ static int iocp_add_connect(EVENT_IOCP *ev, FILE_EVENT *fe)
 		return -1;
 	} else {
 		fe->mask |= EVENT_WRITE;
-		ev->event.fdcount++;
+		iocp_check(ev, fe);
 		return 0;
 	}
 }
@@ -217,21 +230,14 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 	DWORD sendBytes;
 	BOOL  ret;
 
-	if (fe->h_iocp == NULL) {
-		fe->h_iocp = CreateIoCompletionPort((HANDLE) fe->fd,
-			ev->h_iocp, (ULONG_PTR) fe, 0);
-		if (fe->h_iocp != ev->h_iocp) {
-			msg_fatal("%s(%d): CreateIoCompletionPort error(%s)",
-				__FUNCTION__, __LINE__, last_serror());
-		}
-	}
+	iocp_check(ev, fe);
 
 	if (fe->writer == NULL) {
 		fe->writer     = (IOCP_EVENT*) malloc(sizeof(IOCP_EVENT));
 		fe->writer->fe = fe;
-		fe->writer->type = IOCP_EVENT_WRITE;
 	}
 
+	fe->writer->type = IOCP_EVENT_WRITE;
 	memset(&fe->writer->overlapped, 0, sizeof(fe->writer->overlapped));
 
 	if (fe->status & STATUS_CONNECTING) {
@@ -246,27 +252,62 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 		return -1;
 	} else {
 		fe->mask |= EVENT_WRITE;
-		ev->event.fdcount++;
+		iocp_check(ev, fe);
 		return 0;
 	}
 }
 
+static void iocp_remove(EVENT_IOCP *ev, FILE_EVENT *fe)
+{
+	if (fe->id < --ev->count) {
+		ev->files[fe->id]     = ev->files[ev->count];
+		ev->files[fe->id]->id = fe->id;
+	}
+
+	fe->id = -1;
+	ev->event.fdcount--;
+}
+
 static int iocp_del_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 {
+	assert(fe->id >= 0 && fe->id < ev->count);
 	fe->mask &= ~EVENT_READ;
+	fe->type &= ~IOCP_EVENT_READ;
+
 	if (fe->mask == 0) {
-		ev->event.fdcount--;
+		iocp_remove(ev, fe);
 	}
 	return 0;
 }
 
 static int iocp_del_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 {
+	assert(fe->id >= 0 && fe->id < ev->count);
 	fe->mask &= ~EVENT_WRITE;
+	fe->type &= ~IOCP_EVENT_WRITE;
+
 	if (fe->mask == 0) {
-		ev->event.fdcount--;
+		iocp_remove(ev, fe);
 	}
 	return 0;
+}
+
+static void iocp_set_all(EVENT_IOCP *ev)
+{
+	int i, n = 0;
+
+	for (i = 0; i < ev->count; i++) {
+		FILE_EVENT *fe = ev->files[i];
+		if (fe->reader) { // && !(fe->reader->type & IOCP_EVENT_READ)) {
+			iocp_add_read(ev, fe);
+			n++;
+		}
+		if (fe->writer && !(fe->writer->type & IOCP_EVENT_WRITE)) {
+			iocp_add_write(ev, fe);
+			n++;
+		}
+	}
+	printf("n=%d\r\n", n);
 }
 
 static int iocp_wait(EVENT *ev, int timeout)
@@ -275,6 +316,8 @@ static int iocp_wait(EVENT *ev, int timeout)
 	ARRAY *readers = array_create(100);
 	ARRAY *writers = array_create(100);
 	ITER   iter;
+
+	iocp_set_all(ei);
 
 	for (;;) {
 		DWORD bytesTransferred;
@@ -305,15 +348,17 @@ static int iocp_wait(EVENT *ev, int timeout)
 
 		assert(fe == event->fe);
 
-		if (event->type == IOCP_EVENT_READ && fe->r_proc) {
+		if ((event->type & IOCP_EVENT_READ) && fe->r_proc) {
 			assert(fe->reader == event);
 			event->type &= ~IOCP_EVENT_READ;
+			//fe->mask &= ~EVENT_READ;
 			array_append(readers, fe);
 		}
 
-		if (event->type == IOCP_EVENT_WRITE && fe->w_proc) {
+		if ((event->type & IOCP_EVENT_WRITE) && fe->w_proc) {
 			assert(fe->writer == event);
 			event->type &= ~IOCP_EVENT_WRITE;
+			//fe->mask &= ~EVENT_WRITE;
 			array_append(writers, fe);
 		}
 
