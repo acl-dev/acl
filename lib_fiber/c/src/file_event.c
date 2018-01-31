@@ -24,7 +24,7 @@ void file_event_init(FILE_EVENT *fe, int fd)
 	fe->h_iocp = NULL;
 	fe->reader = NULL;
 	fe->writer = NULL;
-	fe->iocp_sock    = INVALID_SOCKET;
+	fe->iocp_sock = INVALID_SOCKET;
 	memset(&fe->peer_addr, 0, sizeof(fe->peer_addr));
 #endif
 }

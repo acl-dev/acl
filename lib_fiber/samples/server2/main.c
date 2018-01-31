@@ -97,7 +97,8 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 			printf("read error %s, fd: %u\n", acl_last_serror(), *cfd);
 			break;
 		}
-
+		buf[ret] = 0;
+		printf("buf=%s\r\n", buf);
 		__count++;
 
 		if (!__echo_data)

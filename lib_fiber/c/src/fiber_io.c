@@ -196,7 +196,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			if (ev->fdcount > 0) {
 				continue;
 			}
-
+			continue;
 			msg_info("%s(%d), tid=%lu: fdcount=0", __FUNCTION__,
 				__LINE__, __pthread_self());
 			break;

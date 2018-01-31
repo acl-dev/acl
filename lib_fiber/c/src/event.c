@@ -192,7 +192,6 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		if (fe->type == TYPE_NONE) {
 			if (checkfd(ev, fe) == -1) {
 				fe->type = TYPE_NOSOCK;
-				printf("invalid socket=%d, %s\r\n", fe->fd, last_serror());
 				return 0;
 			} else {
 				fe->type = TYPE_SOCK;

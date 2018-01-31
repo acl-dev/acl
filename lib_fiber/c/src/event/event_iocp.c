@@ -136,7 +136,6 @@ static int iocp_add_listen(EVENT_IOCP *ev, FILE_EVENT *fe)
 		return -1;
 	} else {
 		fe->mask |= EVENT_READ;
-		iocp_check(ev, fe);
 		return 0;
 	}
 }
@@ -145,6 +144,8 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 {
 	DWORD recvBytes;
 	BOOL  ret;
+
+	iocp_check(ev, fe);
 
 	if (fe->reader == NULL) {
 		fe->reader       = (IOCP_EVENT*) malloc(sizeof(IOCP_EVENT));
@@ -165,8 +166,8 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 			__FUNCTION__, __LINE__, last_serror());
 		return -1;
 	} else {
+		printf("read info %s\r\n", last_serror());
 		fe->mask |= EVENT_READ;
-		iocp_check(ev, fe);
 		return 0;
 	}
 }
@@ -220,7 +221,6 @@ static int iocp_add_connect(EVENT_IOCP *ev, FILE_EVENT *fe)
 		return -1;
 	} else {
 		fe->mask |= EVENT_WRITE;
-		iocp_check(ev, fe);
 		return 0;
 	}
 }
@@ -252,7 +252,6 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 		return -1;
 	} else {
 		fe->mask |= EVENT_WRITE;
-		iocp_check(ev, fe);
 		return 0;
 	}
 }
@@ -270,9 +269,13 @@ static void iocp_remove(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 static int iocp_del_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 {
+	if (!(fe->mask & EVENT_READ)) {
+		return 0;
+	}
+
 	assert(fe->id >= 0 && fe->id < ev->count);
 	fe->mask &= ~EVENT_READ;
-	fe->type &= ~IOCP_EVENT_READ;
+	fe->reader->type &= ~IOCP_EVENT_READ;
 
 	if (fe->mask == 0) {
 		iocp_remove(ev, fe);
@@ -282,9 +285,13 @@ static int iocp_del_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 static int iocp_del_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 {
+	if (!(fe->mask & EVENT_WRITE)) {
+		return 0;
+	}
+
 	assert(fe->id >= 0 && fe->id < ev->count);
 	fe->mask &= ~EVENT_WRITE;
-	fe->type &= ~IOCP_EVENT_WRITE;
+	fe->writer->type &= ~IOCP_EVENT_WRITE;
 
 	if (fe->mask == 0) {
 		iocp_remove(ev, fe);
@@ -298,7 +305,7 @@ static void iocp_set_all(EVENT_IOCP *ev)
 
 	for (i = 0; i < ev->count; i++) {
 		FILE_EVENT *fe = ev->files[i];
-		if (fe->reader) { // && !(fe->reader->type & IOCP_EVENT_READ)) {
+		if (fe->reader && !(fe->reader->type & IOCP_EVENT_READ)) {
 			iocp_add_read(ev, fe);
 			n++;
 		}
@@ -307,7 +314,6 @@ static void iocp_set_all(EVENT_IOCP *ev)
 			n++;
 		}
 	}
-	printf("n=%d\r\n", n);
 }
 
 static int iocp_wait(EVENT *ev, int timeout)
@@ -350,15 +356,13 @@ static int iocp_wait(EVENT *ev, int timeout)
 
 		if ((event->type & IOCP_EVENT_READ) && fe->r_proc) {
 			assert(fe->reader == event);
-			event->type &= ~IOCP_EVENT_READ;
-			//fe->mask &= ~EVENT_READ;
+			iocp_del_read(ei, fe);
 			array_append(readers, fe);
 		}
 
 		if ((event->type & IOCP_EVENT_WRITE) && fe->w_proc) {
 			assert(fe->writer == event);
-			event->type &= ~IOCP_EVENT_WRITE;
-			//fe->mask &= ~EVENT_WRITE;
+			iocp_del_write(ei, fe);
 			array_append(writers, fe);
 		}
 
