@@ -305,11 +305,11 @@ static void iocp_set_all(EVENT_IOCP *ev)
 
 	for (i = 0; i < ev->count; i++) {
 		FILE_EVENT *fe = ev->files[i];
-		if (fe->reader && !(fe->reader->type & IOCP_EVENT_READ)) {
+		if (!fe->reader || !(fe->reader->type & IOCP_EVENT_READ)) {
 			iocp_add_read(ev, fe);
 			n++;
 		}
-		if (fe->writer && !(fe->writer->type & IOCP_EVENT_WRITE)) {
+		if (!fe->writer || !(fe->writer->type & IOCP_EVENT_WRITE)) {
 			iocp_add_write(ev, fe);
 			n++;
 		}
@@ -356,13 +356,13 @@ static int iocp_wait(EVENT *ev, int timeout)
 
 		if ((event->type & IOCP_EVENT_READ) && fe->r_proc) {
 			assert(fe->reader == event);
-			iocp_del_read(ei, fe);
+			//iocp_del_read(ei, fe);
 			array_append(readers, fe);
 		}
 
 		if ((event->type & IOCP_EVENT_WRITE) && fe->w_proc) {
 			assert(fe->writer == event);
-			iocp_del_write(ei, fe);
+			//iocp_del_write(ei, fe);
 			array_append(writers, fe);
 		}
 
