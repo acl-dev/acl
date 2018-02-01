@@ -244,7 +244,7 @@ static int epoll_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe UNUSED)
 	return 0;
 }
 
-static int epoll_handle(EVENT *ev)
+static long epoll_handle(EVENT *ev)
 {
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 

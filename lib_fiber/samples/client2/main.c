@@ -97,10 +97,11 @@ static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	if (__fiber_delay > 0)
 		acl_fiber_delay(__fiber_delay);
 
-	if (connect(fd, (const struct sockaddr *) &sa, len) < 0) {
 #if defined(_WIN32) || defined(_WIN64)
+	if (acl_fiber_connect(fd, (const struct sockaddr *) &sa, len) < 0) {
 		acl_fiber_close(fd);
 #else
+	if (connect(fd, (const struct sockaddr *) &sa, len) < 0) {
 		close(fd);
 #endif
 
@@ -212,6 +213,8 @@ int main(int argc, char *argv[])
 				event_mode = FIBER_EVENT_SELECT;
 			else if (strcasecmp(optarg, "poll") == 0)
 				event_mode = FIBER_EVENT_POLL;
+			else if (strcasecmp(optarg, "kernel") == 0)
+				event_mode = FIBER_EVENT_KERNEL;
 			break;
 		default:
 			break;

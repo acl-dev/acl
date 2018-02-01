@@ -5,8 +5,6 @@
 
 #ifdef HAS_IOCP
 
-#define MAX_WAIT_OBJECTS	64
-
 EVENT *event_iocp_create(int setsize);
 
 #endif

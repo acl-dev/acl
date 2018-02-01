@@ -91,12 +91,16 @@ struct FILE_EVENT {
 	EPOLL_CTX    *epx;
 #endif
 
+	char *buf;
+	int   size;
+	int   len;
 #ifdef HAS_IOCP
 	HANDLE        h_iocp;
 	IOCP_EVENT   *reader;
 	IOCP_EVENT   *writer;
 	socket_t      iocp_sock;
 	struct sockaddr_in peer_addr;
+
 #endif
 };
 
@@ -149,6 +153,10 @@ struct EVENT {
 	socket_t setsize;
 	socket_t maxfd;
 
+	unsigned flag;
+#define EVENT_F_IOCP (1 << 0)
+#define EVENT_IS_IOCP(x) ((x)->flag & EVENT_F_IOCP)
+
 #ifdef HAS_POLL
 	RING   poll_list;
 #endif
@@ -157,7 +165,7 @@ struct EVENT {
 #endif
 
 	const char *(*name)(void);
-	int  (*handle)(EVENT *);
+	long (*handle)(EVENT *);
 	void (*free)(EVENT *);
 
 	int  (*event_wait)(EVENT *, int);

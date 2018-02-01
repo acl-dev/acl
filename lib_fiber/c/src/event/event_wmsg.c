@@ -405,10 +405,10 @@ static HWND CreateSockWindow(const char *class_name, HINSTANCE hInstance)
 	return InitInstance(class_name, hInstance);
 }
 
-static int wmsg_handle(EVENT *ev)
+static long wmsg_handle(EVENT *ev)
 {
-	(void) ev;
-	return -1;
+	EVENT_WMSG *ew = (EVENT_WMSG *) ev;
+	return (long) ew->hInstance;
 }
 
 static const char *wmsg_name(void)

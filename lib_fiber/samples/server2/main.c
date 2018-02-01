@@ -98,7 +98,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 			break;
 		}
 		buf[ret] = 0;
-		printf("buf=%s\r\n", buf);
+		//printf("buf=%s\r\n", buf);
 		__count++;
 
 		if (!__echo_data)

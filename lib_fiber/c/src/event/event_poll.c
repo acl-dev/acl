@@ -203,7 +203,7 @@ static int poll_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe UNUSED)
 	return -1;
 }
 
-static int poll_handle(EVENT *ev)
+static long poll_handle(EVENT *ev)
 {
 	(void) ev;
 	return -1;

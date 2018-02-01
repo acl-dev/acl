@@ -127,6 +127,16 @@ void redis_client_cluster::set_all_slot(const char* addr, size_t max_conns,
 	int conn_timeout, int rw_timeout)
 {
 	redis_client client(addr, 30, 60, false);
+
+	string key(addr);
+	key.lower();
+	std::map<string, string>::const_iterator cit0;
+	if ((cit0 = passwds_.find(key)) != passwds_.end()
+		|| (cit0 = passwds_.find("default")) != passwds_.end())
+	{
+		client.set_password(cit0->second.c_str());
+	}
+
 	redis_cluster cluster(&client);
 
 	const std::vector<redis_slot*>* slots = cluster.cluster_slots();

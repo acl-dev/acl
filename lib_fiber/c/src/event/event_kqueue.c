@@ -201,7 +201,7 @@ static int kqueue_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe UNUSED)
 	return -1;
 }
 
-static int kqueue_handle(EVENT *ev)
+static long kqueue_handle(EVENT *ev)
 {
 	EVENT_KQUEUE *ek = (EVENT_KQUEUE *) ev;
 

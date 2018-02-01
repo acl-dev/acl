@@ -211,7 +211,7 @@ static int select_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe UNUSED)
 	return -1;
 }
 
-static int select_handle(EVENT *ev)
+static long select_handle(EVENT *ev)
 {
 	(void) ev;
 	return -1;

@@ -287,6 +287,34 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 }
 #endif
 
+static ssize_t fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
+{
+	fe->buf  = buf;
+	fe->size = (int) len;
+	fe->len  = 0;
+
+	while (1) {
+		int err;
+
+		fiber_wait_read(fe);
+		if (fe->mask & EVENT_ERROR) {
+			return -1;
+		}
+
+		err = acl_fiber_last_error();
+		fiber_save_errno(err);
+
+		if (acl_fiber_killed(fe->fiber)) {
+			msg_info("%s(%d), %s: fiber-%u is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(fe->fiber));
+			return -1;
+		}
+
+		return fe->len;
+	}
+}
+
 #ifdef SYS_WIN
 int WINAPI acl_fiber_recv(socket_t sockfd, char *buf, int len, int flags)
 #else
@@ -309,6 +337,11 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 	}
 
 	fe = fiber_file_open(sockfd);
+
+	if (EVENT_IS_IOCP(fiber_io_event())) {
+		return fiber_iocp_read(fe, buf, len);
+	}
+
 	while (1) {
 		ssize_t ret;
 		int err;
@@ -365,6 +398,11 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 	}
 
 	fe = fiber_file_open(sockfd);
+
+	if (EVENT_IS_IOCP(fiber_io_event())) {
+		return fiber_iocp_read(fe, buf, len);
+	}
+
 	while (1) {
 		ssize_t ret;
 		int err;

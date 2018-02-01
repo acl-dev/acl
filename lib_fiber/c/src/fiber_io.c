@@ -196,7 +196,6 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			if (ev->fdcount > 0) {
 				continue;
 			}
-			continue;
 			msg_info("%s(%d), tid=%lu: fdcount=0", __FUNCTION__,
 				__LINE__, __pthread_self());
 			break;
@@ -497,6 +496,8 @@ int fiber_file_close(socket_t fd, int *closed)
 {
 	FILE_EVENT *fe;
 	EVENT *event;
+
+	*closed = 0;
 
 	fiber_io_check();
 	if (fd == INVALID_SOCKET || fd >= var_maxfd) {
