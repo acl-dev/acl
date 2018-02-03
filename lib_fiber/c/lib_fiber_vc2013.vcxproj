@@ -175,6 +175,7 @@
     <ClInclude Include="src\dns\valid_hostname.h" />
     <ClInclude Include="src\event.h" />
     <ClInclude Include="src\event\event_epoll.h" />
+    <ClInclude Include="src\event\event_iocp.h" />
     <ClInclude Include="src\event\event_kqueue.h" />
     <ClInclude Include="src\event\event_poll.h" />
     <ClInclude Include="src\event\event_select.h" />
@@ -210,6 +211,7 @@
     <ClCompile Include="src\dns\valid_hostname.c" />
     <ClCompile Include="src\event.c" />
     <ClCompile Include="src\event\event_epoll.c" />
+    <ClCompile Include="src\event\event_iocp.c" />
     <ClCompile Include="src\event\event_kqueue.c" />
     <ClCompile Include="src\event\event_poll.c" />
     <ClCompile Include="src\event\event_select.c" />

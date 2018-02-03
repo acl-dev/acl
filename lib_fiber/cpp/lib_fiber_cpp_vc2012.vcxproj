@@ -109,7 +109,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>lib_protocol_d.lib;lib_acl_d.lib;lib_acl_cpp_d.lib;lib_fiber.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_protocol_d.lib;lib_acl_d.lib;lib_acl_cpp_d.lib;lib_fiber.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\lib_acl;..\..\lib_protocol;..\..\lib_acl_cpp;..\..\lib_fiber\c</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -151,7 +151,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\lib_acl;..\..\lib_protocol;..\..\lib_acl_cpp;..\..\lib_fiber\c</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_protocol_d.lib;lib_acl_d.lib;lib_acl_cpp_d.lib;lib_fiber.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_protocol.lib;lib_acl.lib;lib_acl_cpp.lib;lib_fiber.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

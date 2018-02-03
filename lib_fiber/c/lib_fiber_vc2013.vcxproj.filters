@@ -126,6 +126,9 @@
     <ClInclude Include="src\common\sane_socket.h">
       <Filter>源文件\common</Filter>
     </ClInclude>
+    <ClInclude Include="src\event\event_iocp.h">
+      <Filter>源文件\event</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.c">
@@ -265,6 +268,9 @@
     </ClCompile>
     <ClCompile Include="src\common\sane_socket.c">
       <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\event_iocp.c">
+      <Filter>源文件\event</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
