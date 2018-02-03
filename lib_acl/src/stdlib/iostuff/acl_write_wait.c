@@ -23,7 +23,20 @@
 #include "stdlib/acl_iostuff.h"
 #include "../../init/init.h"
 
-#ifdef ACL_UNIX
+#if defined(ACL_HAS_POLL)
+
+# if defined(ACL_WINDOWS)
+static acl_poll_fn __sys_poll = WSAPoll;
+# else
+static acl_poll_fn __sys_poll = poll;
+# endif
+
+extern void set_poll4write(acl_poll_fn fn);
+
+void set_poll4write(acl_poll_fn fn)
+{
+	__sys_poll = fn;
+}
 
 int acl_write_wait(ACL_SOCKET fd, int timeout)
 {
@@ -31,16 +44,16 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 	struct pollfd fds;
 	int   delay = timeout * 1000;
 
-	fds.events = POLLOUT | POLLHUP | POLLERR;
+	fds.events = POLLOUT /* | POLLHUP | POLLERR; */;
 	fds.fd = fd;
 
-#if 0
-	acl_set_error(0);
-#endif
-
 	for (;;) {
-		switch (poll(&fds, 1, delay)) {
+		switch (__sys_poll(&fds, 1, delay)) {
+#ifdef ACL_WINDOWS
+		case SOCKET_ERROR:
+#else
 		case -1:
+#endif
 			if (acl_last_error() == ACL_EINTR)
 				continue;
 			acl_msg_error("%s(%d), %s: poll error(%s), fd: %d",
@@ -51,7 +64,7 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 			acl_set_error(ACL_ETIMEDOUT);
 			return -1;
 		default:
-			if ((fds.revents & (POLLHUP | POLLERR))) {
+			if ((fds.revents & (POLLHUP | POLLERR | POLLNVAL))) {
 				/*
 				acl_msg_error("%s(%d), %s: fd: %d,"
 					"POLLHUP: %s, POLLERR: %s",
@@ -109,10 +122,6 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 		tp = &tv;
 	} else
 		tp = 0;
-
-#if 0
-	acl_set_error(0);
-#endif
 
 	for (;;) {
 #ifdef ACL_WINDOWS

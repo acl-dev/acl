@@ -253,9 +253,17 @@ static acl_poll_fn __sys_poll = WSAPoll;
 static acl_poll_fn __sys_poll = poll;
 # endif
 
-void acl_set_poll(acl_poll_fn fn)
+/* xxx: defined in acl_write_wait.c */
+extern void set_poll4write(acl_poll_fn fn);
+
+static void set_poll4read(acl_poll_fn fn)
 {
 	__sys_poll = fn;
+}
+
+void acl_set_poll(acl_poll_fn fn)
+{
+	set_poll4read(fn);
 }
 
 int acl_read_poll_wait(ACL_SOCKET fd, int delay)
@@ -264,7 +272,7 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 	struct pollfd fds;
 	time_t begin;
 
-	fds.events = POLLIN | POLLHUP | POLLERR;
+	fds.events = POLLIN;
 	fds.fd = fd;
 
 	acl_set_error(0);
@@ -273,7 +281,11 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 		time(&begin);
 
 		switch (__sys_poll(&fds, 1, delay)) {
+#ifdef ACL_WINDOWS
+		case SOCKET_ERROR:
+#else
 		case -1:
+#endif
 			if (acl_last_error() == ACL_EINTR)
 				continue;
 
@@ -293,14 +305,7 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 		default:
 			if ((fds.revents & POLLIN))
 				return 0;
-			else if (fds.revents & (POLLHUP | POLLERR)) {
-				acl_msg_warn("%s(%d), %s: poll error: %s, "
-					"fd: %d, delay: %d, spent: %ld",
-					__FILE__, __LINE__, myname,
-					acl_last_serror(), fd, delay,
-					(long) (time(NULL) - begin));
-				return -1;
-			} else {
+			if (fds.revents & (POLLHUP | POLLERR | POLLNVAL)) {
 				acl_msg_warn("%s(%d), %s: poll error: %s, "
 					"fd: %d, delay: %d, spent: %ld",
 					__FILE__, __LINE__, myname,
@@ -308,6 +313,11 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 					(long) (time(NULL) - begin));
 				return -1;
 			}
+			acl_msg_warn("%s(%d), %s: poll error: %s, fd: %d, "
+				"delay: %d, spent: %ld", __FILE__, __LINE__,
+				myname, acl_last_serror(), fd, delay,
+				(long) (time(NULL) - begin));
+			return -1;
 		}
 	}
 }

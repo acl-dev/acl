@@ -171,7 +171,11 @@ static int poll_wait(EVENT *ev, int timeout)
 	}
 #endif
 	n = __sys_poll(ep->pfds, ep->count, timeout);
-	if (n < 0) {
+#ifdef SYS_WIN
+	if (n == SOCKET_ERROR) {
+#else
+	if (n == -1) {
+#endif
 		if (errno == EINTR) {
 			return 0;
 		}
