@@ -1,6 +1,12 @@
 修改历史列表：
 
 ------------------------------------------------------------------------
+624) 2018.2.5
+624.1) bugfix: acl_read_wait.c 在调用 epoll 前无需设置 EPOLLHUP | EPOLLERR 标志，
+该标志属于返回值
+624.2) bugfix: acl_inet_connect.c 当连接失败时因为调用了 acl_socket_close 在 WIN
+平台上会重置系统错误号
+
 623) 2018.2.3
 623.1) bugfix: acl_read_wait.c/acl_write_wait.c 调用 poll API 时，
 POLLHUP | POLLERR 不应做为输入参数

@@ -135,7 +135,7 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 		}
 	}
 
-	ee.events = EPOLLIN | EPOLLHUP | EPOLLERR;
+	ee.events = EPOLLIN /* | EPOLLHUP | EPOLLERR */;
 	ee.data.u64 = 0;
 	ee.data.fd = fd;
 

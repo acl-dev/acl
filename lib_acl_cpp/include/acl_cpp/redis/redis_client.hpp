@@ -145,6 +145,7 @@ private:
 	char* addr_;
 	char* pass_;
 	bool  retry_;
+	bool  authing_;
 	string  buf_;
 	bool slice_req_;
 	bool slice_res_;

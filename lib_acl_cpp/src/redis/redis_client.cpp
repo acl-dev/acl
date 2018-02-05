@@ -20,6 +20,7 @@ redis_client::redis_client(const char* addr, int conn_timeout /* = 60 */,
 	int rw_timeout /* = 30 */, bool retry /* = true */)
 : check_addr_(false)
 , retry_(retry)
+, authing_(false)
 , slice_req_(false)
 , slice_res_(false)
 {
@@ -97,18 +98,19 @@ bool redis_client::open()
 	}
 
 	// 如果连接密码非空，则尝试用该密码向 redis-server 认证合法性
-	if (pass_ && *pass_)
+	if (pass_ && *pass_ && !authing_)
 	{
+		// 设置当前连接的状态为认证状态，以避免进入死循环
+		authing_ = true;
 		redis_connection connection(this);
 		if (connection.auth(pass_) == false)
 		{
+			authing_ = false;
 			logger_error("auth error, addr: %s, passwd: %s",
 				addr_, pass_);
-			// 此处返回 true，以便于上层使用该连接访问时
-			// 由 redis-server 直接给命令报未认证的错训，
-			// 从而免得在 redis_command 类中不断地重试连接
-			return true;
+			return false;
 		}
+		authing_ = false;
 	}
 
 	return true;
@@ -380,21 +382,23 @@ const redis_result* redis_client::run(dbuf_pool* pool, const string& req,
 				addr_, last_serror(), req.c_str());
 			return NULL;
 		}
-
 		if (nchildren >= 1)
 			result = get_redis_objects(pool, nchildren);
 		else
 			result = get_redis_object(pool);
-
 		if (result != NULL)
 		{
 			if (rw_timeout != NULL)
 				conn_.set_rw_timeout(rw_timeout_);
 			return result;
 		}
-
+#if defined(_WIN32) || defined(_WIN64)
+		int error = last_error();
+#endif
 		close();
-
+#if defined(_WIN32) || defined(_WIN64)
+		set_error(error);
+#endif
 		if (req.empty())
 		{
 			logger_error("no retry for request is empty");

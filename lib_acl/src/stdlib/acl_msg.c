@@ -515,6 +515,9 @@ const char *acl_strerror(unsigned int errnum, char *buffer, int size)
 		buffer[L - 1] = '\0';
 		L--;
 	}
+
+	/* resave the error of WIN SYS */
+	WSASetLastError(errnum);
 #elif	defined(ACL_UNIX)
 	if (buffer == NULL || size <= 0) {
 		acl_msg_error("%s, %s(%d): input error",

@@ -264,7 +264,10 @@ const char* redis_command::result_status() const
 
 const char* redis_command::result_error() const
 {
-	return result_ ? result_->get_error() : "";
+	const char* ptr = result_ ? result_->get_error() : "";
+	if (ptr && *ptr)
+		return ptr;
+	return last_serror();
 }
 
 const redis_result* redis_command::result_child(size_t i) const
