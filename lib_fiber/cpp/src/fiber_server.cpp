@@ -48,15 +48,17 @@ static char *acl_var_fiber_owner;
 static char *acl_var_fiber_dispatch_addr;
 static char *acl_var_fiber_dispatch_type;
 static char *acl_var_fiber_reuseport;     /* just for stand alone */
+static char *acl_var_fiber_schedule_event;
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ "master_debug", "all:1", &acl_var_fiber_log_debug },
+	{ "master_reuseport", "", &acl_var_fiber_reuseport },
 	{ "fiber_queue_dir", "", &acl_var_fiber_queue_dir },
 	{ "fiber_deny_banner", "Denied!\r\n", &acl_var_fiber_deny_banner },
 	{ "fiber_access_allow", "all", &acl_var_fiber_access_allow },
 	{ "fiber_owner", "", &acl_var_fiber_owner },
 	{ "fiber_dispatch_addr", "", &acl_var_fiber_dispatch_addr },
 	{ "fiber_dispatch_type", "default", &acl_var_fiber_dispatch_type },
-	{ "master_reuseport", "", &acl_var_fiber_reuseport },
+	{ "fiber_schedule_event", "kernel", &acl_var_fiber_schedule_event },
 
 	{ 0, 0, 0 },
 };
@@ -82,8 +84,9 @@ static ACL_MASTER_SERVER_SIGHUP_FN      __sighup_handler = NULL;
 static void  *__thread_init_ctx = NULL;
 static char  __conf_file[1024];
 
-static unsigned      __server_generation;
-static int           __server_stopping = 0;
+static int      __fiber_schedule_event = FIBER_EVENT_KERNEL;
+static unsigned __server_generation;
+static int      __server_stopping = 0;
 
 static ACL_ATOMIC_CLOCK *__clock = NULL;
 
@@ -200,7 +203,7 @@ static void *thread_main(void *ctx)
 	acl_fiber_create(thread_fiber_monitor, server, STACK_SIZE);
 
 	// schedule the current thread fibers
-	acl_fiber_schedule();
+	acl_fiber_schedule_with(__fiber_schedule_event);
 
 	// got STOPPING from main thread and notify main thread
 	(void) acl_mbox_send(server->out, &dummy);
@@ -540,7 +543,7 @@ static void main_thread_loop(void)
 	acl_server_sigterm_setup();
 
 	acl_msg_info("daemon started, log=%s", acl_var_fiber_log_file);
-	acl_fiber_schedule();
+	acl_fiber_schedule_with(__fiber_schedule_event);
 	acl_msg_info("deamon stopped now, exit status=%d", __exit_status);
 	exit(__exit_status);
 }
@@ -1009,6 +1012,19 @@ void acl_fiber_server_main(int argc, char *argv[],
 	/* Run post-jail initialization. */
 	if (post_init)
 		post_init(__service_ctx);
+
+	if (strcasecmp(acl_var_fiber_schedule_event, "kernel") == 0)
+		__fiber_schedule_event = FIBER_EVENT_KERNEL;
+	else if (strcasecmp(acl_var_fiber_schedule_event, "poll") == 0)
+		__fiber_schedule_event = FIBER_EVENT_POLL;
+	else if (strcasecmp(acl_var_fiber_schedule_event, "select") == 0)
+		__fiber_schedule_event = FIBER_EVENT_SELECT;
+	else if (strcasecmp(acl_var_fiber_schedule_event, "wmsg") == 0)
+		__fiber_schedule_event = FIBER_EVENT_WMSG;
+	else
+		__fiber_schedule_event = FIBER_EVENT_KERNEL;
+
+	acl_msg_info("schedule event type - %s", acl_var_fiber_schedule_event);
 
 #if !defined(_WIN32) && !defined(_WIN64)
 	/* notify master that child started ok */

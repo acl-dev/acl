@@ -62,8 +62,8 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 		iocp_remove(ev, fe);
 	}
 
-	/* windows xp 环境下，必须在关闭套接字之前调用此宏判断重叠 IO
-	 * 是否处于 STATUS_PENDING 状态
+	/* On Windows XP, must check if the OVERLAPPED IO is in STATUS_PENDING
+	 * status before the socket being closed.
 	 */
 	if (fe->reader != NULL) {
 		ok = HasOverlappedIoCompleted(&fe->reader->overlapped);
@@ -71,15 +71,17 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 		ok = FALSE;
 	}
 
-	/* 必须在释放 fe->reader/fe->writer 前关闭套接口句柄 */
+	/* must close socket before releasing fe->reader/fe->writer */
 	closesocket(fe->fd);
 
-	/* 将 fd 置为无效值，以便通知调用者该句柄已经关闭 */
+	/* set fd INVALID_SOCKET notifying the caller the socket be closed*/
 	fe->fd = INVALID_SOCKET;
 
 	if (fe->reader) {
-		/* 如果完成端口处于未决状态，则不能释放重叠结构，需在主循环的
-		 * GetQueuedCompletionStatus 调用后来释放
+		/*
+		 * If the IOCP Port isn't in completed status, the OVERLAPPED
+		 * object should not be released, which should be released in
+		 * the GetQueuedCompletionStatus process.
 		 */
 		if (ok) {
 			free(fe->reader);
@@ -91,8 +93,9 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 	}
 
 	if (fe->writer) {
-		/* 如果完成端口处于未决状态，则不能释放重叠结构，需在主循环的
-		 * GetQueuedCompletionStatus 调用后来释放
+		/* If the IOCP Port is in incompleted status, the OVERLAPPED
+		 * object shouldn't be released, which should be released in
+		 * the GetQueuedCompletionStatus process.
 		 */
 		if (HasOverlappedIoCompleted(&fe->writer->overlapped)) {
 			free(fe->writer);

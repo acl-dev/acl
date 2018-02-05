@@ -5,6 +5,7 @@
 
 #define	 STACK_SIZE	32000
 static int __rw_timeout = 0;
+static int __schedule_event = FIBER_EVENT_KERNEL;
 
 static void http_server(ACL_FIBER *, void *ctx)
 {
@@ -78,7 +79,7 @@ private:
 	void* run(void)
 	{
 		acl_fiber_create(fiber_accept, server_, STACK_SIZE);
-		acl_fiber_schedule();
+		acl_fiber_schedule_with(__schedule_event);
 		return NULL;
 	}
 };
@@ -87,6 +88,7 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		" -s listen_addr\r\n"
+		" -e event\r\n"
 		" -R reuse_port\r\n"
 		" -t threads\r\n"
 		" -r rw_timeout\r\n", procname);
@@ -98,7 +100,7 @@ int main(int argc, char *argv[])
 	int  ch, nthreads = 2;
 	bool reuse_port = false;
 
-	while ((ch = getopt(argc, argv, "hs:r:t:R")) > 0)
+	while ((ch = getopt(argc, argv, "hs:r:t:Re:")) > 0)
 	{
 		switch (ch)
 		{
@@ -117,6 +119,13 @@ int main(int argc, char *argv[])
 		case 'R':
 			reuse_port = true;
 			break;
+		case 'e':
+			if (strcasecmp(optarg, "kernel") == 0)
+				__schedule_event = FIBER_EVENT_KERNEL;
+			else if (strcasecmp(optarg, "poll") == 0)
+				__schedule_event = FIBER_EVENT_SELECT;
+			else if (strcasecmp(optarg, "select") == 0)
+				__schedule_event = FIBER_EVENT_POLL;
 		default:
 			break;
 		}

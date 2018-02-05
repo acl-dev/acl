@@ -167,9 +167,6 @@ void fiber::init(fiber_event_t type, bool schedule_auto /* = false */)
 	case FIBER_EVENT_T_SELECT:
 		etype = FIBER_EVENT_SELECT;
 		break;
-	case FIBER_EVENT_T_IOCP:
-		etype = FIBER_EVENT_IOCP;
-		break;
 	case FIBER_EVENT_T_WMSG:
 		etype = FIBER_EVENT_WMSG;
 		break;
@@ -199,9 +196,6 @@ void fiber::schedule_with(fiber_event_t type)
 		break;
 	case FIBER_EVENT_T_SELECT:
 		etype = FIBER_EVENT_SELECT;
-		break;
-	case FIBER_EVENT_T_IOCP:
-		etype = FIBER_EVENT_IOCP;
 		break;
 	case FIBER_EVENT_T_WMSG:
 		etype = FIBER_EVENT_WMSG;

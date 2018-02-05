@@ -1,3 +1,5 @@
+84) 2018.2.5
+84.1) feature: fiber_server.cpp 支持协程调度时选择不同的事件引擎
 
 83) 2018.2.1
 83.1) feature: 协程事件引擎增加针对 Winsock IOCP 的支持

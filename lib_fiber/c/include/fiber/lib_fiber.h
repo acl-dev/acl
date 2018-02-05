@@ -223,8 +223,7 @@ FIBER_API void acl_fiber_schedule(void);
 #define FIBER_EVENT_KERNEL	0	/* epoll/kqueue	*/
 #define FIBER_EVENT_POLL	1	/* poll		*/
 #define FIBER_EVENT_SELECT	2	/* select	*/
-#define FIBER_EVENT_IOCP	3	/* iocp		*/
-#define FIBER_EVENT_WMSG	4	/* win message	*/
+#define FIBER_EVENT_WMSG	3	/* win message	*/
 FIBER_API void acl_fiber_schedule_with(int event_mode);
 
 /**
