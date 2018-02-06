@@ -1,3 +1,7 @@
+
+85) 2018.2.6
+85.1) bugfix: 修复了 FreeBSd kqueue 的问题
+
 84) 2018.2.5
 84.1) feature: fiber_server.cpp 支持协程调度时选择不同的事件引擎
 
