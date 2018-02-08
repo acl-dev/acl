@@ -295,6 +295,56 @@ static void master_delete_child(ACL_MASTER_PROC *proc)
 	acl_myfree(proc);
 }
 
+static void service_status_exit(ACL_MASTER_SERV *serv, ACL_MASTER_PID pid,
+	ACL_WAIT_STATUS_T status)
+{
+	acl_msg_warn("%s(%d), %s: process %s pid %d exit status %d",
+		__FILE__, __LINE__, __FUNCTION__,
+		serv->path, pid, WEXITSTATUS(status));
+
+	if (serv->notify_addr != NULL) {
+		char buf[256];
+
+		snprintf(buf, sizeof(buf), "exit status %d",
+			WEXITSTATUS(status));
+		master_warning(serv->notify_addr, serv->notify_recipients,
+			serv->path, serv->conf, serv->version, pid, buf);
+	}
+}
+
+static void service_status_killed(ACL_MASTER_SERV *serv, ACL_MASTER_PID pid,
+	ACL_WAIT_STATUS_T status)
+{
+	acl_msg_warn("%s(%d), %s: process %s pid %d killed by signal %d",
+		__FILE__, __LINE__, __FUNCTION__,
+		serv->path, pid, WTERMSIG(status));
+
+	if (serv->notify_addr) {
+		char buf[256];
+
+		snprintf(buf, sizeof(buf), "killed by %d", WTERMSIG(status));
+		master_warning(serv->notify_addr, serv->notify_recipients,
+			serv->path, serv->conf, serv->version, pid, buf);
+	}
+}
+
+static void service_status_throttle(ACL_MASTER_SERV *serv, ACL_MASTER_PID pid,
+	ACL_WAIT_STATUS_T status)
+{
+	acl_msg_warn("%s(%d), %s: bad command startup, path=%s -- throttling,"
+		" signal=%d", __FILE__, __LINE__, __FUNCTION__,
+		serv->path, WTERMSIG(status));
+
+	if (serv->notify_addr) {
+		char buf[256];
+
+		snprintf(buf, sizeof(buf), "signal=%d, exit status %d",
+			WTERMSIG(status), WEXITSTATUS(status));
+		master_warning(serv->notify_addr, serv->notify_recipients,
+			serv->path, serv->conf, serv->version, pid, buf);
+	}
+}
+
 /* acl_master_reap_child - reap dead children */
 
 void acl_master_reap_child(void)
@@ -304,7 +354,6 @@ void acl_master_reap_child(void)
 	ACL_MASTER_PROC  *proc;
 	ACL_MASTER_PID    pid;
 	ACL_WAIT_STATUS_T status;
-	char buf[256];
 
 	/*
 	 * Pick up termination status of all dead children.
@@ -316,6 +365,7 @@ void acl_master_reap_child(void)
 	while ((pid = waitpid((pid_t) - 1, &status, WNOHANG)) > 0) {
 		if (acl_msg_verbose)
 			acl_msg_info("%s: pid %d", myname, pid);
+
 		proc = (ACL_MASTER_PROC *) acl_binhash_find(
 			acl_var_master_child_table, &pid, sizeof(pid));
 		if (proc == NULL) {
@@ -331,35 +381,11 @@ void acl_master_reap_child(void)
 		serv = proc->serv;
 
 		if (WIFEXITED(status)) {
-
-			acl_msg_warn("%s(%d), %s: process %s pid %d "
-				"exit status %d", __FILE__, __LINE__,
-				myname, serv->path, pid, WEXITSTATUS(status));
-
-			if (serv->notify_addr != NULL) {
-				snprintf(buf, sizeof(buf), "exit status %d",
-					WEXITSTATUS(status));
-				master_warning(serv->notify_addr,
-					serv->notify_recipients,
-					serv->path, serv->conf,
-					serv->version, pid, buf);
-			}
+			service_status_exit(serv, pid, status);
 		}
 
 		if (WIFSIGNALED(status)) {
-
-			acl_msg_warn("%s(%d), %s: process %s pid %d killed"
-				" by signal %d", __FILE__, __LINE__, myname,
-				serv->path, pid, WTERMSIG(status));
-
-			if (serv->notify_addr) {
-				snprintf(buf, sizeof(buf), "killed by %d",
-					WTERMSIG(status));
-				master_warning(serv->notify_addr,
-					serv->notify_recipients,
-					serv->path, serv->conf,
-					serv->version, pid, buf);
-			}
+			service_status_killed(serv, pid, status);
 		}
 
 		if (proc->use_count == 0
@@ -368,19 +394,8 @@ void acl_master_reap_child(void)
 		    && !ACL_MASTER_STOPPING(serv)
 		    && !ACL_MASTER_KILLED(serv)) {
 
-			acl_msg_warn("%s(%d), %s: bad command startup, path=%s"
-				" -- throttling, signale=%d", __FILE__,
-				__LINE__, myname, serv->path, WTERMSIG(status));
 			master_throttle(serv);
-
-			if (serv->notify_addr) {
-				snprintf(buf, sizeof(buf), "exit status %d",
-					WEXITSTATUS(status));
-				master_warning(serv->notify_addr,
-					serv->notify_recipients,
-					serv->path, serv->conf,
-					serv->version, pid, buf);
-			}
+			service_status_throttle(serv, pid, status);
 		}
 
 		master_delete_child(proc);
