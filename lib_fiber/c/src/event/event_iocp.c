@@ -3,6 +3,10 @@
 
 #ifdef HAS_IOCP
 
+#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "Kernel32.lib")
+#pragma comment(lib, "Mswsock.lib")
+
 #include "event.h"
 #include "event_iocp.h"
 
