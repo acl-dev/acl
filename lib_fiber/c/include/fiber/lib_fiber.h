@@ -6,6 +6,8 @@ extern "C" {
 #endif
 
 #if defined(_WIN32) || defined (_WIN64)
+# include <winsock2.h>
+
 typedef long ssize_t;
 
 # define	FIBER_ETIMEDOUT		WSAETIMEDOUT
