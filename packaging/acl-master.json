@@ -1,0 +1,14 @@
+{
+    "name": "acl-master",
+    "id": "acl-master",
+    "port": 8290,
+    "checks": [
+        {
+            "name": "http-available-checker",
+            "http": "http://127.0.0.1:8290",
+            "method": "GET",
+            "interval": "180s",
+            "timeout": "3s"
+        }
+    ]
+}
