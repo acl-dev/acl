@@ -6,7 +6,7 @@ Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
 Packager:       Zhang Qiang <qiangzhang@qiyi.com>
-SOURCE0:        acl-master.json
+SOURCE2:        acl-master.json
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
 Source:         http://example.com/%{name}-%{version}.tar.gz
 
@@ -42,7 +42,7 @@ make -C lib_fiber packinstall  DESTDIR=$RPM_BUILD_ROOT
 
 mkdir -p $RPM_BUILD_ROOT/opt/soft/services/
 
-install -m 644 %{SOURCE1} $RPM_BUILD_ROOT/opt/soft/services/
+install -m 644 %{SOURCE2} $RPM_BUILD_ROOT/opt/soft/services/
 
 %clean
 rm -rf %{buildroot}
