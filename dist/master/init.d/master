@@ -57,7 +57,9 @@ start() {
     echo -n $"Starting $prog: "
     ulimit -c unlimited
     ulimit -n 204800
-    daemon $exec -c $CONF_PATH -l $LOG_PATH &
+    #trap '' 1
+    #daemon --pidfile=${PID_FILE} 
+    $exec -c $CONF_PATH -l $LOG_PATH &
     sleep 1
     rh_status_q && success
     echo
