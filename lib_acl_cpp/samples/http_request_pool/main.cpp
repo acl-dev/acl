@@ -7,32 +7,33 @@ static connect_pool* __conn_pool = NULL;
 static acl_pthread_pool_t* __thr_pool = NULL;
 static bool __unzip = false;
 
-// ³õÊ¼»¯¹ı³Ì
+// åˆå§‹åŒ–è¿‡ç¨‹
 static void init(const char* addr, int count)
 {
-	// ´´½¨ HTTP ÇëÇóÁ¬½Ó³Ø¶ÔÏó
+	// åˆ›å»º HTTP è¯·æ±‚è¿æ¥æ± å¯¹è±¡
 	__conn_pool = new http_request_pool(addr, count);
 
-	// ´´½¨Ïß³Ì³Ø
+	// åˆ›å»ºçº¿ç¨‹æ± 
 	__thr_pool = acl_thread_pool_create(count, 60);
 }
 
-// ½ø³ÌÍË³öÇ°ÇåÀí×ÊÔ´
+// è¿›ç¨‹é€€å‡ºå‰æ¸…ç†èµ„æº
 static void end(void)
 {
-	// Ïú»ÙÏß³Ì³Ø
+	// é”€æ¯çº¿ç¨‹æ± 
 	acl_pthread_pool_destroy(__thr_pool);
 
-	// Ïú»ÙÁ¬½Ó³Ø
+	// é”€æ¯è¿æ¥æ± 
 	delete __conn_pool;
 }
 
-// HTTP ÇëÇó¹ı³Ì£¬Ïò·şÎñÆ÷·¢ËÍÇëÇóºó´Ó·şÎñÆ÷¶ÁÈ¡ÏìÓ¦Êı¾İ
+// HTTP è¯·æ±‚è¿‡ç¨‹ï¼Œå‘æœåŠ¡å™¨å‘é€è¯·æ±‚åä»æœåŠ¡å™¨è¯»å–å“åº”æ•°æ®
 static bool http_get(http_request* conn, int n)
 {
-	// ´´½¨ HTTP ÇëÇóÍ·Êı¾İ
+	// åˆ›å»º HTTP è¯·æ±‚å¤´æ•°æ®
 	http_header& header = conn->request_header();
-	header.set_url("/")
+	header.set_host("www.sina.com.cn")
+		.set_url("/")
 		.set_keep_alive(true)
 		.set_method(HTTP_METHOD_GET)
 		.accept_gzip(__unzip);
@@ -40,7 +41,7 @@ static bool http_get(http_request* conn, int n)
 	if (0)
 	printf("%lu--%d: begin send request\r\n",
 		(unsigned long) acl_pthread_self(), n);
-	// ·¢ËÍ HTTP ÇëÇóÊı¾İÍ¬Ê±½ÓÊÕ HTTP ÏìÓ¦Í·
+	// å‘é€ HTTP è¯·æ±‚æ•°æ®åŒæ—¶æ¥æ”¶ HTTP å“åº”å¤´
 	if (conn->request(NULL, 0) == false)
 	{
 		printf("%lu--%d: send GET request error\r\n",
@@ -51,7 +52,7 @@ static bool http_get(http_request* conn, int n)
 	char  buf[8192];
 	int   ret, length = 0;
 
-	// ½ÓÊÕ HTTP ÏìÓ¦ÌåÊı¾İ
+	// æ¥æ”¶ HTTP å“åº”ä½“æ•°æ®
 	while (true)
 	{
 		ret = conn->read_body(buf, sizeof(buf));
@@ -74,12 +75,12 @@ static bool http_get(http_request* conn, int n)
 	return true;
 }
 
-// Ïß³Ì´¦Àí¹ı³Ì
+// çº¿ç¨‹å¤„ç†è¿‡ç¨‹
 static void thread_main(void*)
 {
 	for (int i = 0; i < __loop_count; i++)
 	{
-		// ´ÓÁ¬½Ó³ØÖĞ»ñÈ¡Ò»¸ö HTTP Á¬½Ó
+		// ä»è¿æ¥æ± ä¸­è·å–ä¸€ä¸ª HTTP è¿æ¥
 		http_request* conn = (http_request*) __conn_pool->peek();
 		if (conn == NULL)
 		{
@@ -87,14 +88,14 @@ static void thread_main(void*)
 			break;
 		}
 
-		// ĞèÒª¶Ô»ñµÃµÄÁ¬½ÓÖØÖÃ×´Ì¬£¬ÒÔÇå³ıÉÏ´ÎÇëÇó¹ı³ÌµÄÁÙÊ±Êı¾İ
+		// éœ€è¦å¯¹è·å¾—çš„è¿æ¥é‡ç½®çŠ¶æ€ï¼Œä»¥æ¸…é™¤ä¸Šæ¬¡è¯·æ±‚è¿‡ç¨‹çš„ä¸´æ—¶æ•°æ®
 		else
 			conn->reset();
-		// ¿ªÊ¼ĞÂµÄ HTTP ÇëÇó¹ı³Ì
+		// å¼€å§‹æ–°çš„ HTTP è¯·æ±‚è¿‡ç¨‹
 		if (http_get(conn, i) == false)
 		{
 			printf("one request failed, close connection\r\n");
-			// ´íÎóÁ¬½ÓĞèÒª¹Ø±Õ
+			// é”™è¯¯è¿æ¥éœ€è¦å…³é—­
 			__conn_pool->put(conn, false);
 		}
 		else
@@ -104,7 +105,7 @@ static void thread_main(void*)
 
 static void run(int cocurrent)
 {
-	// ÏòÏß³Ì³ØÖĞÌí¼ÓÈÎÎñ
+	// å‘çº¿ç¨‹æ± ä¸­æ·»åŠ ä»»åŠ¡
 	for (int i = 0; i < cocurrent; i++)
 		acl_pthread_pool_add(__thr_pool, thread_main, NULL);
 }
@@ -123,7 +124,7 @@ int main(int argc, char* argv[])
 	int   ch, cocurrent = 10;
 	string addr("www.sina.com.cn:80");
 
-	// ³õÊ¼»¯ acl ¿â
+	// åˆå§‹åŒ– acl åº“
 	acl::acl_cpp_init();
 
 	while ((ch = getopt(argc, argv, "hs:n:c:z")) > 0)
