@@ -1,11 +1,12 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        72
+Release:        73
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
 Packager:       Zhang Qiang <qiangzhang@qiyi.com>
+SOURCE0:        acl-master.json
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
 Source:         http://example.com/%{name}-%{version}.tar.gz
 
@@ -38,6 +39,11 @@ make -C lib_fiber
 
 make packinstall  DESTDIR=$RPM_BUILD_ROOT
 make -C lib_fiber packinstall  DESTDIR=$RPM_BUILD_ROOT
+
+mkdir -p $RPM_BUILD_ROOT/opt/soft/services/
+
+install -m 644 %{SOURCE1} $RPM_BUILD_ROOT/opt/soft/services/
+
 %clean
 rm -rf %{buildroot}
 
@@ -77,7 +83,7 @@ fi
 
 %changelog
 
-* Mon Feb 12 2018 zhengshuxin@qiyi.com 3.3.0-72-20180212.15
+* Mon Feb 12 2018 zhengshuxin@qiyi.com 3.3.0-73-20180212.15
 - master_ctld: support GET for checking port if service is aliving
 
 * Mon Feb 12 2018 zhengshuxin@qiyi.com 3.3.0-71-20180212.14
