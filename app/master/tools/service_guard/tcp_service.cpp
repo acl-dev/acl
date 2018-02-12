@@ -20,7 +20,7 @@ bool tcp_service::thread_on_read(acl::socket_stream* conn)
 		logger("read over from %s", conn->get_peer());
 		return false;
 	}
-	logger("read from %s, %d bytes, buf=|%s|",
+	logger_debug(DBG_NET, 1, "read from %s, %d bytes, buf=|%s|",
 		conn->get_peer(), (int) buf.size(), buf.c_str());
 
 	const char* peer_ip = conn->get_peer();

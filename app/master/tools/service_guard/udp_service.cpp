@@ -20,7 +20,8 @@ void udp_service::on_read(acl::socket_stream* stream)
 		return;
 
 	buf[n] = 0;
-	logger("read from %s, %d bytes, buf=|%s|", stream->get_peer(), n, buf);
+	logger_debug(DBG_NET, 1, "read from %s, %d bytes, buf=|%s|",
+		stream->get_peer(), n, buf);
 
 	const char* peer_ip = stream->get_peer();
 	if (peer_ip == NULL || *peer_ip == 0) {
