@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        71
+Release:        72
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -76,6 +76,9 @@ fi
 /etc/init.d/master
 
 %changelog
+
+* Mon Feb 12 2018 zhengshuxin@qiyi.com 3.3.0-72-20180212.15
+- master_ctld: support GET for checking port if service is aliving
 
 * Mon Feb 12 2018 zhengshuxin@qiyi.com 3.3.0-71-20180212.14
 - remove daemon from master's service

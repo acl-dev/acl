@@ -76,7 +76,11 @@ bool http_servlet::doOther(acl::HttpServletRequest&,
 bool http_servlet::doGet(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
-	return doPost(req, res);
+	res.setContentType("text/plain")
+		.setKeepAlive(req.isKeepAlive());
+
+	acl::string body("ok\r\n");
+	return reply(req, res, 200, body);
 }
 
 bool http_servlet::doPost(acl::HttpServletRequest& req,
