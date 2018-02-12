@@ -6,7 +6,7 @@ Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
 Packager:       Zhang Qiang <qiangzhang@qiyi.com>
-SOURCE2:        acl-master.json
+Source2:        acl-master.json
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
 Source:         http://example.com/%{name}-%{version}.tar.gz
 
