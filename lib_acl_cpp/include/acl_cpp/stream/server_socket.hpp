@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/string.hpp"
 #if defined(_WIN32) || defined(_WIN64)
 #include <WinSock2.h>
 #endif
@@ -99,7 +100,7 @@ public:
 	 */
 	const char* get_addr() const
 	{
-		return addr_;
+		return addr_.c_str();
 	}
 
 	/**
@@ -127,7 +128,7 @@ private:
 	int      backlog_;
 	unsigned open_flag_;
 	bool     unix_sock_;
-	char     addr_[64];
+	string   addr_;
 
 #if defined(_WIN32) || defined(_WIN64)
 	SOCKET fd_;

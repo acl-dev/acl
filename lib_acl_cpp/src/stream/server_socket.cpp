@@ -17,7 +17,6 @@ server_socket::server_socket(int backlog /* = 128 */, bool block /* = true */)
 , fd_(ACL_SOCKET_INVALID)
 , fd_local_(ACL_SOCKET_INVALID)
 {
-	addr_[0] = 0;
 	open_flag_ = block ? ACL_BLOCKING : ACL_NON_BLOCKING;
 }
 
@@ -42,19 +41,18 @@ server_socket::server_socket(ACL_VSTREAM* sstream)
 , fd_local_(ACL_SOCKET_INVALID)
 {
 	if (fd_ != ACL_SOCKET_INVALID)
-		SAFE_COPY(addr_, ACL_VSTREAM_LOCAL(sstream), sizeof(addr_));
-	else
-		addr_[0] = 0;
+		addr_ = ACL_VSTREAM_LOCAL(sstream);
 }
 
 server_socket::server_socket(ACL_SOCKET fd)
 : fd_(fd)
 , fd_local_(ACL_SOCKET_INVALID)
 {
-	if (fd_ != ACL_SOCKET_INVALID)
-		acl_getsockname(fd_, addr_, sizeof(addr_));
-	else
-		addr_[0] = 0;
+	char buf[512];
+	if (fd_ != ACL_SOCKET_INVALID) {
+		if (acl_getsockname(fd_, buf, sizeof(buf)) == 0)
+			addr_ = buf;
+	}
 }
 
 server_socket::~server_socket()
@@ -81,7 +79,7 @@ bool server_socket::open(const char* addr)
 	{
 		fd_ = acl_unix_listen(addr, backlog_, open_flag_);
 		unix_sock_ = true;
-		SAFE_COPY(addr_, addr, sizeof(addr_));
+		addr_ = addr;
 	}
 	else
 #endif
@@ -91,7 +89,7 @@ bool server_socket::open(const char* addr)
 	{
 		logger_error("listen %s error %s", addr, last_serror());
 		unix_sock_ = false;
-		SAFE_COPY(addr_, addr, sizeof(addr_));
+		addr_ = addr;
 		return false;
 	}
 
@@ -104,11 +102,14 @@ bool server_socket::open(const char* addr)
 	// 之所以再用 getsockname 重新获得一些监听地址，主要是为了应对当输入
 	// 的 addr 为 ip:0 的情形，即当给定的地址中的端口为 0 时要求操作系统
 	// 自动分配一个端口号
-	if (acl_getsockname(fd_, addr_, sizeof(addr_)) < 0)
+	char buf[512];
+	if (acl_getsockname(fd_, buf, sizeof(buf)) < 0)
 	{
 		logger_error("getsockname error: %s", acl_last_serror());
-		SAFE_COPY(addr_, addr, sizeof(addr_));
+		addr_ = addr;
 	}
+	else
+		addr_ = buf;
 	return true;
 }
 
@@ -127,7 +128,7 @@ bool server_socket::close()
 	bool ret = acl_socket_close(fd_local_) == 0 ? true : false;
 	fd_ = ACL_SOCKET_INVALID;
 	fd_local_ = ACL_SOCKET_INVALID;
-	addr_[0] = 0;
+	addr_.clear();
 	return ret;
 }
 
