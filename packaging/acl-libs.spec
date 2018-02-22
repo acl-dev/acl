@@ -52,16 +52,16 @@ rm -rf %{buildroot}
 /sbin/chkconfig --add master
 
 %preun -n acl-master
-if [ "$1" = "0" ]; then
+#if [ "$1" = "0" ]; then
     service master stop >/dev/null 2>&1 ||:
     /sbin/chkconfig --del master
-fi
+#fi
 
 %postun -n acl-master
-if [ "$1" -ge "1" ]; then
+#if [ "$1" -ge "1" ]; then
     # TODO: upgrade should be support
     service master masterrestart > /dev/null 2>&1 ||:
-fi
+#fi
 
 
 %files
@@ -85,6 +85,7 @@ fi
 
 * Thu Feb 22 2018 zhengshuxin@qiyi.com 3.3.0-74-20180222.10
 - master_ctld: add UNIX domain listening avoiding be blocked by iptables.
+- gson: std::map object can also be optional in json serialization.
 
 * Mon Feb 12 2018 zhengshuxin@qiyi.com 3.3.0-73-20180212.15
 - master_ctld: support GET for checking port if service is aliving
