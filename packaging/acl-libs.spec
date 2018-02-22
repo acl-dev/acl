@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        74
+Release:        75
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -52,16 +52,16 @@ rm -rf %{buildroot}
 /sbin/chkconfig --add master
 
 %preun -n acl-master
-#if [ "$1" = "0" ]; then
+if [ "$1" = "0" ]; then
     service master stop >/dev/null 2>&1 ||:
     /sbin/chkconfig --del master
-#fi
+fi
 
 %postun -n acl-master
-#if [ "$1" -ge "1" ]; then
+if [ "$1" -ge "1" ]; then
     # TODO: upgrade should be support
     service master masterrestart > /dev/null 2>&1 ||:
-#fi
+fi
 
 
 %files
@@ -83,7 +83,7 @@ rm -rf %{buildroot}
 
 %changelog
 
-* Thu Feb 22 2018 zhengshuxin@qiyi.com 3.3.0-74-20180222.10
+* Thu Feb 22 2018 zhengshuxin@qiyi.com 3.3.0-75-20180222.10
 - master_ctld: add UNIX domain listening avoiding be blocked by iptables.
 - gson: std::map object can also be optional in json serialization.
 
