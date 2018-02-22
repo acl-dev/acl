@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        75
+Release:        74
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -83,7 +83,7 @@ fi
 
 %changelog
 
-* Thu Feb 22 2018 zhengshuxin@qiyi.com 3.3.0-75-20180222.10
+* Thu Feb 22 2018 zhengshuxin@qiyi.com 3.3.0-74-20180222.10
 - master_ctld: add UNIX domain listening avoiding be blocked by iptables.
 - gson: std::map object can also be optional in json serialization.
 
