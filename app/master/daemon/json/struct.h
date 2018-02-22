@@ -47,6 +47,7 @@ struct serv_info_t
 	acl::string notify_recipients;
 	// Gson@optional
 	acl::string version;
+	// Gson@optional
 	std::map<acl::string, acl::string> env;
 	// Gson@optional
 	std::list<proc_info_t> procs;
