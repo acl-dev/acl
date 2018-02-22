@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        74
+Release:        75
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -60,6 +60,7 @@ fi
 %postun -n acl-master
 if [ "$1" -ge "1" ]; then
     # TODO: upgrade should be support
+    echo "prepare restarting acl_master ..."
     service master masterrestart > /dev/null 2>&1 ||:
 fi
 
