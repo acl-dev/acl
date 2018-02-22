@@ -27,8 +27,7 @@ bool http_request(const char* addr, TReq& req, TRes& res)
 
 	if (deserialize<TRes>(json, res) == false)
 	{
-		printf("deserialize error, res json=[%s], req json=[%s]\r\n",
-			json.to_string().c_str(), body.c_str());
+		printf("deserialize error, req json=[%s]\r\n", body.c_str());
 		return false;
 	}
 
