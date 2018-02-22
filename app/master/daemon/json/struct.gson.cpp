@@ -1530,8 +1530,8 @@ namespace acl
         if(version)
             gson(*version, &$obj.version);
      
-        if(!env ||!env->get_obj()||!($result = gson(*env->get_obj(), &$obj.env), $result.first))
-            return std::make_pair(false, "required [serv_info_t.env] failed:{"+$result.second+"}");
+        if(env&& env->get_obj())
+             gson(*env->get_obj(), &$obj.env);
      
         if(procs&& procs->get_obj())
              gson(*procs->get_obj(), &$obj.procs);

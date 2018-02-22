@@ -153,8 +153,8 @@ namespace acl
         if(!path ||!($result = gson(*path, &$obj.path), $result.first))
             return std::make_pair(false, "required [service_dead_res_t.path] failed:{"+$result.second+"}");
      
-        if(!conf ||!($result = gson(*conf, &$obj.conf), $result.first))
-            return std::make_pair(false, "required [service_dead_res_t.conf] failed:{"+$result.second+"}");
+        if(conf)
+            gson(*conf, &$obj.conf);
      
         if(!version ||!($result = gson(*version, &$obj.version), $result.first))
             return std::make_pair(false, "required [service_dead_res_t.version] failed:{"+$result.second+"}");

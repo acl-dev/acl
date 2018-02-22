@@ -1213,6 +1213,7 @@ bool gsoner::check_member()
 			{
 				field_t f;
 				f.name_ = name;
+				f.required_ = required_;
 				f.type_ = field_t::e_map;
 				current_obj_.fields_.push_back(f);
 
@@ -1222,6 +1223,7 @@ bool gsoner::check_member()
 			{
 				field_t f;
 				f.name_ = name;
+				f.required_ = required_;
 				f.type_ = field_t::e_set;
 				current_obj_.fields_.push_back(f);
 
