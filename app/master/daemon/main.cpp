@@ -204,11 +204,17 @@ int     main(int argc, char **argv)
 			acl_msg_info("dup(0), fd = %d", fd);
 	}
 
+	/* load main.cf of acl_master */
+	acl_master_main_config();
+
+	/* For the unique master service be started, first to lock file */
+	lock_service();
+
 	/* just for prefork service -- zsx, 2012.3.24 */
 	acl_master_flow_init();
 
-	/* load configure and start all services processes */
-	acl_master_config();
+	/* start all services processes */
+	acl_master_start_services();
 
 	/* init master manager module */
 	manager::get_instance().init(acl_var_master_global_event,
@@ -221,9 +227,6 @@ int     main(int argc, char **argv)
 	 * configuration files.
 	 */
 	acl_master_sigsetup();
-
-	/* For the unique master service be started, first to lock file */
-	lock_service();
 
 	/* Save pid to local file and lock it */
 	lock_pidfile();

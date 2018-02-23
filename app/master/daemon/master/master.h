@@ -145,7 +145,8 @@ extern ACL_MASTER_SERV *acl_master_ent_find(const char *path);
  /*
   * master_conf.c
   */
-extern void acl_master_config(void);
+extern void acl_master_start_services(void);
+extern void acl_master_main_config(void);
 extern void acl_master_refresh(void);
 extern int  acl_master_refresh_service(ACL_MASTER_SERV *entry);
 

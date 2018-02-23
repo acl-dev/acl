@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        75
+Release:        76
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -83,6 +83,9 @@ fi
 /etc/init.d/master
 
 %changelog
+
+* Fri Feb 23 2018 zhengshuxin@qiyi.com 3.3.0-76-20180224.00
+- acl_master: lock file should be before starting services
 
 * Fri Feb 23 2018 zhengshuxin@qiyi.com 3.3.0-75-20180223.23
 - acl_master: when starting, lock the specified file avoiding starting more than once

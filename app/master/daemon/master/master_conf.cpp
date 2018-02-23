@@ -21,13 +21,16 @@ void acl_master_refresh(void)
 	for (serv = acl_var_master_head; serv != 0; serv = serv->next)
 		serv->flags |= ACL_MASTER_FLAG_MARK;
 
+	/* load the main.cf of acl_master */
+	acl_master_main_config();
+
 	/*
 	 * Read each service's configuration file. The master_conf() routine
 	 * unmarks services upon update. New services are born with the mark
 	 * bit off. After this, anything with the mark bit on should be
 	 * removed.
 	 */
-	acl_master_config();
+	acl_master_start_services();
 
 	/*
 	 * Delete all services that are still marked - they disappeared from
@@ -104,13 +107,7 @@ static void master_scan_services(void)
 {
 	const char *myname = "master_scan_services";
 	ACL_MASTER_SERV *entry;
-	char *pathname;
 	int   service_null = 1;
-
-	/* load main.cf configuration of master routine */
-	pathname = acl_concatenate(acl_var_master_conf_dir, "/", "main.cf", 0);
-	acl_master_params_load(pathname);
-	acl_myfree(pathname);
 
 	/* create the global acl_var_master_global_event */
 	acl_master_service_init();
@@ -189,8 +186,18 @@ static void master_load_services(void)
 	acl_fclose(fp);
 }
 
-void acl_master_config(void)
+void acl_master_start_services(void)
 {
 	master_scan_services();
 	master_load_services();
+}
+
+void acl_master_main_config(void)
+{
+	char *pathname;
+
+	/* load main.cf configuration of master routine */
+	pathname = acl_concatenate(acl_var_master_conf_dir, "/", "main.cf", 0);
+	acl_master_params_load(pathname);
+	acl_myfree(pathname);
 }
