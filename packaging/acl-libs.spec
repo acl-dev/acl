@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        74
+Release:        75
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -83,6 +83,11 @@ fi
 /etc/init.d/master
 
 %changelog
+
+* Fri Feb 23 2018 zhengshuxin@qiyi.com 3.3.0-75-20180223.23
+- acl_master: when starting, lock the specified file avoiding starting more than once
+- master_guard: listening master_guard.sock other master_guard.sock@unix
+- master_ctld: listening master_ctld.sock
 
 * Thu Feb 22 2018 zhengshuxin@qiyi.com 3.3.0-74-20180222.10
 - master_ctld: add UNIX domain listening avoiding be blocked by iptables.

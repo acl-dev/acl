@@ -46,3 +46,5 @@ pid_file = {install_path}/var/pid/acl_master.pid
 # acl_master 对外 WEB 管理接口地址
 #manage_addr = 127.0.0.1:8190
 manage_addr = {install_path}/var/public/master.sock
+# the montitor listen addr for acl_master reports the children's exception
+master_notify_addr = {install_path}/var/public/monitor.sock

@@ -19,6 +19,53 @@
 const char *var_master_version = "3.3.0-70 20180212";
 char *var_master_procname;
 
+#define STR	acl_vstring_str
+#define LEN	ACL_VSTRING_LEN
+
+static void lock_service(void)
+{
+	ACL_VSTRING *buf = acl_vstring_alloc(128);
+	ACL_VSTRING *tmp = acl_vstring_alloc(128);
+	ACL_VSTREAM *fp;
+
+	/* create lock file make sure acl_master can only start once */
+	acl_vstring_sprintf(buf, "%s/.master.lock", acl_var_master_queue_dir);
+	fp = acl_open_lock(STR(buf), O_RDWR | O_CREAT, 0644, tmp);
+	if (fp == NULL) {
+		acl_msg_fatal("%s(%d): open lock file %s: %s", __FUNCTION__,
+			__LINE__, STR(buf), STR(tmp));
+	}
+
+	acl_vstring_sprintf(buf, "%lu\n", (long) time(NULL));
+	acl_vstream_writen(fp, STR(buf), LEN(buf));
+
+	acl_close_on_exec(ACL_VSTREAM_FILE(fp), ACL_CLOSE_ON_EXEC);
+	acl_vstring_free(buf);
+	acl_vstring_free(tmp);
+}
+
+static void lock_pidfile(void)
+{
+	ACL_VSTREAM *fp;
+	ACL_VSTRING *buf;
+
+	/* open pid file, lock it and write the master's pid value into it */
+
+	buf = acl_vstring_alloc(10);
+
+	fp = acl_open_lock(acl_var_master_pid_file, O_RDWR | O_CREAT, 0644, buf);
+	if (fp == NULL) {
+		acl_msg_fatal("%s(%d): open lock file %s: %s", __FUNCTION__,
+			__LINE__, acl_var_master_pid_file, STR(buf));
+	}
+	acl_vstring_sprintf(buf, "%*lu\n", (int) sizeof(unsigned long) * 4,
+		(unsigned long) acl_var_master_pid);
+	acl_vstream_writen(fp, STR(buf), LEN(buf));
+	acl_close_on_exec(ACL_VSTREAM_FILE(fp), ACL_CLOSE_ON_EXEC);
+
+	acl_vstring_free(buf);
+}
+
 /* usage - show hint and terminate */
 
 static void usage(const char *me)
@@ -35,12 +82,10 @@ static void usage(const char *me)
 
 int     main(int argc, char **argv)
 {
-	int           ch, fd, n, keep_mask = 0;
 	//ACL_WATCHDOG *watchdog;
-	ACL_VSTREAM  *lock_fp;
-	ACL_VSTRING  *strbuf;
-	ACL_AIO      *aio;
-	char         *ptr;
+	int ch, fd, n, keep_mask = 0;
+	ACL_AIO *aio;
+	char *ptr;
 
 	/*
 	 * Strip and save the process name for diagnostics etc.
@@ -177,22 +222,11 @@ int     main(int argc, char **argv)
 	 */
 	acl_master_sigsetup();
 
-	/* open pid file, lock it and write the master's pid value into it */
+	/* For the unique master service be started, first to lock file */
+	lock_service();
 
-	strbuf = acl_vstring_alloc(10);
-
-	lock_fp = acl_open_lock(acl_var_master_pid_file, O_RDWR | O_CREAT,
-			0644, strbuf);
-	if (lock_fp == NULL)
-		acl_msg_fatal("%s(%d): open lock file %s: %s", __FILE__,
-			__LINE__, acl_var_master_pid_file,
-			acl_vstring_str(strbuf));
-	acl_vstring_sprintf(strbuf, "%*lu\n", (int) sizeof(unsigned long) * 4,
-		(unsigned long) acl_var_master_pid);
-	acl_vstream_writen(lock_fp, acl_vstring_str(strbuf),
-		ACL_VSTRING_LEN(strbuf));
-	acl_close_on_exec(ACL_VSTREAM_FILE(lock_fp), ACL_CLOSE_ON_EXEC);
-	acl_vstring_free(strbuf);
+	/* Save pid to local file and lock it */
+	lock_pidfile();
 
 	acl_msg_info("daemon started -- version %s, configuration %s",
 		var_master_version, acl_var_master_conf_dir);
