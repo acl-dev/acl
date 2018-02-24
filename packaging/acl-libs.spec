@@ -31,6 +31,7 @@ acl master framework
 Summary: acl tools
 Release: 78
 License: IBM
+Group:   System Environment/Tools
 Requires: acl-master
 
 %description -n acl-tools
