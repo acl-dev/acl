@@ -17,7 +17,10 @@ One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IO
 
 
 %package -n acl-master
-Summary: acl master framework
+Summary:        acl master framework
+Name:           acl-master
+Version:        3.3.0
+Release:        78
 License: IBM
 Group: System Environment/Tools
 Requires(post): /sbin/ldconfig
