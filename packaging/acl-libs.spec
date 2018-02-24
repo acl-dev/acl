@@ -193,62 +193,62 @@ just using ACL_MASETR_SERV::path, and ACL_MASETR_SERV::command was removed.
 * Fri Dec 22 2017 zhengshuxin@qiyi.com 3.3.0-43-20171222.14
 - fixed master's bug when reload services
 
-* Thu Dec 15 2017 zhengshuxin@qiyi.com 3.3.0-42-20171215.11
+* Fri Dec 15 2017 zhengshuxin@qiyi.com 3.3.0-42-20171215.11
 - test multithreads writing to mbox
 
-* Wed Dec 08 2017 zhengshuxin@qiyi.com 3.3.0-41-20171208.10
+* Fri Dec 08 2017 zhengshuxin@qiyi.com 3.3.0-41-20171208.10
 - fixed one compile error
 
-* Wed Dec 08 2017 zhengshuxin@qiyi.com 3.3.0-40-20171208.09
+* Fri Dec 08 2017 zhengshuxin@qiyi.com 3.3.0-40-20171208.09
 - changed charset from gbk to utf-8 for all service's configure files
 
-* Wed Dec 05 2017 zhengshuxin@qiyi.com 3.3.0-39-20171205.15
+* Tue Dec 05 2017 zhengshuxin@qiyi.com 3.3.0-39-20171205.15
 - master's configure main.cf: changed service_throttle_time from 60s to 10s
 
-* Wed Dec 05 2017 zhengshuxin@qiyi.com 3.3.0-38-20171205.12
+* Tue Dec 05 2017 zhengshuxin@qiyi.com 3.3.0-38-20171205.12
 - master_ctld's configure was updated
 - fixed some bugs in redis module for supporting binary data
 
-* Wed Nov 28 2017 zhengshuxin@qiyi.com 3.3.0-37-20171128.12
+* Tue Nov 28 2017 zhengshuxin@qiyi.com 3.3.0-37-20171128.12
 - update package version
 
-* Sat Nov 16 2017 zhengshuxin@qiyi.com 3.3.0-36-20171116.12
+* Thu Nov 16 2017 zhengshuxin@qiyi.com 3.3.0-36-20171116.12
 - compiling error on Centos6.x
 
-* Sat Nov 16 2017 zhengshuxin@qiyi.com 3.3.0-35-20171116.11
+* Thu Nov 16 2017 zhengshuxin@qiyi.com 3.3.0-35-20171116.11
 - add master_ctl into rpm package
 
-* Sat Nov 13 2017 zhengshuxin@qiyi.com 3.3.0-34-20171113.09
+* Wed Nov 13 2017 zhengshuxin@qiyi.com 3.3.0-34-20171113.09
 - acl_udp_server & master upgrade
 
-* Sat Oct 27 2017 zhengshuxin@qiyi.com 3.3.0-33-20171027.14
+* Fri Oct 27 2017 zhengshuxin@qiyi.com 3.3.0-33-20171027.14
 - fixed one compiling error
 
-* Sat Oct 27 2017 zhengshuxin@qiyi.com 3.3.0-32-20171027.13
+* Fri Oct 27 2017 zhengshuxin@qiyi.com 3.3.0-32-20171027.13
 - fixed one bug in fiber that int maybe overflow
 
-* Sat Oct 16 2017 zhengshuxin@qiyi.com 3.3.0-31-20171016.10
+* Mon Oct 16 2017 zhengshuxin@qiyi.com 3.3.0-31-20171016.10
 - auto compiling fiber module for Linux
 
-* Sat Oct 10 2017 zhengshuxin@qiyi.com 3.3.0-30-20171010.14
+* Tue Oct 10 2017 zhengshuxin@qiyi.com 3.3.0-30-20171010.14
 - fiber_mutex: fixed bugs
 
-* Sat Oct 10 2017 zhengshuxin@qiyi.com 3.3.0-29-20171010.11
+* Tue Oct 10 2017 zhengshuxin@qiyi.com 3.3.0-29-20171010.11
 - fiber_mutex: fixed one bug when thread_safe is true
 
 * Sat Oct 07 2017 zhengshuxin@qiyi.com 3.3.0-28-20171007.23
 - add event_mutex in lib_acl_cpp
 
-* Sat Sep 29 2017 zhengshuxin@qiyi.com 3.3.0-27-20170929.23
+* Fri Sep 29 2017 zhengshuxin@qiyi.com 3.3.0-27-20170929.23
 - fiber_mutex: when blocked by thread mutex, the current fiber will be swapout
 
-* Sat Sep 29 2017 zhengshuxin@qiyi.com 3.3.0-26-20170929.18
+* Fri Sep 29 2017 zhengshuxin@qiyi.com 3.3.0-26-20170929.18
 - version: upgrade version to 3.3.0-26
 
-* Sat Sep 29 2017 zhengshuxin@qiyi.com 3.3.0-25-20170929.17
+* Fri Sep 29 2017 zhengshuxin@qiyi.com 3.3.0-25-20170929.17
 - version: upgrade version to 3.3.0-25
 
-* Sat Sep 28 2017 zhengshuxin@qiyi.com 3.3.0-23-20170928.12
+* Thu Sep 28 2017 zhengshuxin@qiyi.com 3.3.0-23-20170928.12
 - valgrind: free global objects so valgrind no reporting error when process exiting
 
 * Sat Sep 23 2017 zhengshuxin@qiyi.com 3.3.0-22-20170923.19
