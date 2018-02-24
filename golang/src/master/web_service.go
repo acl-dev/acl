@@ -23,7 +23,7 @@ func webServ(ln net.Listener, daemon bool) {
 }
 
 func WebStart(addrs []string) {
-	prepare()
+	Prepare()
 
 	if preJailHandler != nil {
 		preJailHandler()

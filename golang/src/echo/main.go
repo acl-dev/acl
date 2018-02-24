@@ -1,10 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net"
-	"os"
+	"runtime"
 
 	"master"
 )
@@ -26,17 +27,33 @@ func onClose(conn net.Conn) {
 	log.Println("---client onClose---")
 }
 
+var (
+	filePath   string
+	listenAddr string
+)
+
 func main() {
+	runtime.GOMAXPROCS(1)
+
+	flag.StringVar(&filePath, "c", "dummy.cf", "configure filePath")
+	flag.StringVar(&listenAddr, "listen", "127.0.0.1:8880", "listen addr in alone running")
+
+	flag.Parse()
+
+	master.Prepare()
+
+	fmt.Printf("filePath=%s, MasterServiceType=%s\r\n", filePath, master.MasterServiceType)
+
 	master.OnClose(onClose)
 	master.OnAccept(onAccept)
 
-	if len(os.Args) > 1 && os.Args[1] == "alone" {
+	if master.Alone {
 		addrs := make([]string, 1)
-		if len(os.Args) > 2 {
-			addrs = append(addrs, os.Args[2])
-		} else {
-			addrs = append(addrs, "127.0.0.1:8880")
+		if len(listenAddr) == 0 {
+			panic("listenAddr null")
 		}
+
+		addrs = append(addrs, listenAddr)
 
 		fmt.Printf("listen:")
 		for _, addr := range addrs {

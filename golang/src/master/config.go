@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -66,10 +67,36 @@ func (c *Config) InitConfig(path string) {
 	}
 }
 
-func (c Config) Get(name string) string {
+func (c Config) GetString(name string) string {
 	val, found := c.Entries[name]
 	if !found {
 		return ""
 	}
 	return val
+}
+
+func (c Config) GetInt(name string) int {
+	val, found := c.Entries[name]
+	if !found {
+		return 0
+	}
+	n, err := strconv.Atoi(val)
+	if err != nil {
+		return 0
+	} else {
+		return n
+	}
+}
+
+func (c Config) GetBool(name string) bool {
+	val, found := c.Entries[name]
+	if !found {
+		return false
+	}
+	n, err := strconv.Atoi(val)
+	if err != nil {
+		return false
+	} else {
+		return n != 0
+	}
 }

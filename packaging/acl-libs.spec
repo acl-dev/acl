@@ -17,8 +17,7 @@ One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IO
 
 
 %package -n acl-master
-Summary:        acl master framework
-Release:        78
+Summary: acl master framework
 License: IBM
 Group: System Environment/Tools
 Requires(post): /sbin/ldconfig
@@ -27,6 +26,14 @@ Requires(postun): /sbin/ldconfig
 %description -n acl-master
 acl master framework
 
+%package -n acl-tools
+Summary: acl tools
+Release:        78
+License: IBM
+Requires: acl-master
+
+%description -n acl-tools
+acl tools
 
 %prep
 %setup -q
@@ -80,8 +87,21 @@ fi
 
 %files -n acl-master
 %defattr(-,root,root)
-/opt/soft
+/opt/soft/acl-master/conf/main.cf
+/opt/soft/acl-master/conf/service/samples
+/opt/soft/acl-master/libexec/acl_master
+/opt/soft/acl-master/sbin
+/opt/soft/acl-master/sh
+/opt/soft/acl-master/var
+/opt/soft/services/acl-master.json
 /etc/init.d/master
+%exclude /opt/soft/acl-master/conf/service/master_*
+
+%files -n acl-tools
+%defattr(-,root,root)
+/opt/soft/acl-master/bin/master_ctl
+/opt/soft/acl-master/conf/service/master_*
+/opt/soft/acl-master/libexec/master_*
 
 %changelog
 

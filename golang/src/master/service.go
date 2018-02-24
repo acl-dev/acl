@@ -1,6 +1,8 @@
 package master
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -38,59 +40,100 @@ var (
 	connCount      int         = 0
 	connMutex      sync.RWMutex
 	stopping       bool = false
-	waitExit       int  = 10
+	prepareCalled  bool = false
 )
 
+// from configure file of the app
 var (
-	logPath    string
-	username   string
-	masterArgs string
-	rootDir    string
+	MasterService  string
+	MasterLogPath  string
+	MasterOwner    string
+	MasterArgs     string
+	AppRootDir     string
+	AppUseLimit    int    = 0
+	AppIdleLimit   int    = 0
+	AppQuickAbort  bool   = false
+	AppWaitLimit   int    = 10
+	AppAccessAllow string = "all"
 )
+
+// from command args
+var (
+	MasterConfigure    string
+	MasterServiceName  string
+	MasterServiceType  string
+	MasterVerbose      bool
+	MasterUnprivileged bool
+	//	MasterChroot       bool
+	MasterSocketCount int = 1
+	Alone             bool
+)
+
+// set the max opened file handles for current process which let
+// the process can handle more connections.
+func setOpenMax() {
+	var rlim syscall.Rlimit
+	err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rlim)
+	if err != nil {
+		fmt.Println("get rlimit error: " + err.Error())
+		return
+	}
+	if rlim.Max <= 0 {
+		rlim.Max = 100000
+	}
+	rlim.Cur = rlim.Max
+
+	err = syscall.Setrlimit(syscall.RLIMIT_NOFILE, &rlim)
+	if err != nil {
+		fmt.Println("set rlimit error: " + err.Error())
+	}
+}
+
+// init the command args come from acl_master; the application should call
+// flag.Parse() in its main function!
+func initFlags() {
+	flag.StringVar(&MasterConfigure, "f", "", "app configure file")
+	flag.StringVar(&MasterServiceName, "n", "", "app service name")
+	flag.StringVar(&MasterServiceType, "t", "sock", "app service type")
+	flag.BoolVar(&Alone, "alone", false, "stand alone running")
+	flag.BoolVar(&MasterVerbose, "v", false, "app verbose")
+	flag.BoolVar(&MasterUnprivileged, "u", false, "app unprivileged")
+	//	flag.BoolVar(&MasterChroot, "c", false, "app chroot")
+	flag.IntVar(&MasterSocketCount, "s", 1, "listen fd count")
+}
+
+func init() {
+	initFlags()
+	setOpenMax()
+}
 
 func parseArgs() {
-	/*
-		flag.IntVar(&listenFdCount, "s", 1, "listen fd count")
-		flag.StringVar(&confPath, "f", "", "configure path")
-		flag.StringVar(&sockType, "t", "sock", "socket type")
-		flag.StringVar(&services, "n", "", "master services")
-		flag.BoolVar(&privilege, "u", false, "running privilege")
-		flag.BoolVar(&verbose, "v", false, "debug verbose")
-		flag.BoolVar(&chrootOn, "c", false, "chroot dir")
-
-		flag.Parse()
-	*/
-
 	var n = len(os.Args)
 	for i := 0; i < n; i++ {
 		switch os.Args[i] {
 		case "-s":
 			i++
-			if i >= n {
-				break
-			}
-			listenFdCount, _ = strconv.Atoi(os.Args[i])
-			if listenFdCount <= 0 {
-				listenFdCount = 1
+			if i < n {
+				listenFdCount, _ = strconv.Atoi(os.Args[i])
+				if listenFdCount <= 0 {
+					listenFdCount = 1
+				}
 			}
 		case "-f":
 			i++
-			if i >= n {
-				break
+			if i < n {
+				confPath = os.Args[i]
 			}
-			confPath = os.Args[i]
 		case "-t":
 			i++
-			if i >= n {
-				break
+			if i < n {
+				sockType = os.Args[i]
 			}
-			sockType = os.Args[i]
 		case "-n":
 			i++
-			if i >= n {
-				break
+			if i < n {
+				services = os.Args[i]
 			}
-			services = os.Args[i]
 		case "-u":
 			privilege = true
 		case "-v":
@@ -104,39 +147,54 @@ func parseArgs() {
 		listenFdCount, sockType, services)
 }
 
-func prepare() {
+// this function can be called automatically in net_service.go or
+// web_service.go to load configure, and it can also be canned in appliction's
+// main function
+func Prepare() {
+	if prepareCalled {
+		return
+	} else {
+		prepareCalled = true
+	}
+
 	parseArgs()
 
 	conf := new(Config)
 	conf.InitConfig(confPath)
 
-	logPath = conf.Get("master_log")
-	if len(logPath) > 0 {
-		f, err := os.OpenFile(logPath,
-			os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	MasterLogPath = conf.GetString("master_log")
+	if len(MasterLogPath) > 0 {
+		f, err := os.OpenFile(MasterLogPath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
-			log.Println("OpenFile error", err)
+			fmt.Printf("OpenFile %s error %s", MasterLogPath, err)
 		} else {
 			log.SetOutput(f)
 			//log.SetOutput(io.MultiWriter(os.Stderr, f))
 		}
 	}
 
-	masterArgs = conf.Get("master_args")
-	username = conf.Get("fiber_owner")
-	rootDir = conf.Get("fiber_queue_dir")
+	MasterService = conf.GetString("master_service")
+	MasterOwner = conf.GetString("master_owner")
+	MasterArgs = conf.GetString("master_args")
 
-	log.Printf("Args: %s\r\n", masterArgs)
+	AppRootDir = conf.GetString("app_queue_dir")
+	AppUseLimit = conf.GetInt("app_use_limit")
+	AppIdleLimit = conf.GetInt("app_idle_limit")
+	AppQuickAbort = conf.GetBool("app_quick_abort")
+	AppWaitLimit = conf.GetInt("app_wait_limit")
+	AppAccessAllow = conf.GetString("app_access_allow")
+
+	log.Printf("Args: %s, AppAccessAllow: %s\r\n", MasterArgs, AppAccessAllow)
 }
 
 func chroot() {
-	if len(masterArgs) == 0 || !privilege || len(username) == 0 {
+	if len(MasterArgs) == 0 || !privilege || len(MasterOwner) == 0 {
 		return
 	}
 
-	user, err := user.Lookup(username)
+	user, err := user.Lookup(MasterOwner)
 	if err != nil {
-		log.Printf("Lookup %s error %s", username, err)
+		log.Printf("Lookup %s error %s", MasterOwner, err)
 	} else {
 		gid, err := strconv.Atoi(user.Gid)
 		if err != nil {
@@ -157,12 +215,12 @@ func chroot() {
 		}
 	}
 
-	if chrootOn && len(rootDir) > 0 {
-		err := syscall.Chroot(rootDir)
+	if chrootOn && len(AppRootDir) > 0 {
+		err := syscall.Chroot(AppRootDir)
 		if err != nil {
-			log.Printf("Chroot error %s, path %s", err, rootDir)
+			log.Printf("Chroot error %s, path %s", err, AppRootDir)
 		} else {
-			log.Printf("Chroot ok, path %s", rootDir)
+			log.Printf("Chroot ok, path %s", AppRootDir)
 			err := syscall.Chdir("/")
 			if err != nil {
 				log.Printf("Chdir error %s", err)
@@ -173,48 +231,56 @@ func chroot() {
 	}
 }
 
+// In run alone mode, the application should give the listening addrs and call
+// this function to listen the given addrs
 func getListenersByAddrs(addrs []string) []*net.Listener {
 	listeners := []*net.Listener(nil)
 	for _, addr := range addrs {
 		ln, err := net.Listen("tcp", addr)
 		if err != nil {
-			panic("listen error")
+			panic(fmt.Sprintf("listen error=\"%s\", addr=%s", err, addr))
 		}
 		listeners = append(listeners, &ln)
 	}
 	return listeners
 }
 
+// In acl_master daemon running mode, this function will be called for init
+// the listener handles.
 func getListeners() []*net.Listener {
 	listeners := []*net.Listener(nil)
 	for fd := listenFdStart; fd < listenFdStart+listenFdCount; fd++ {
-		file := os.NewFile(uintptr(fd), "one listenfd")
+		file := os.NewFile(uintptr(fd), "open one listenfd")
 		ln, err := net.FileListener(file)
-		if err != nil {
-			log.Println("create FileListener error", err)
+		if err == nil {
+			listeners = append(listeners, &ln)
+			log.Printf("add fd: %d", fd)
 			continue
 		}
-		listeners = append(listeners, &ln)
-		log.Printf("add fd: %d", fd)
+		file.Close()
+		log.Println(fmt.Sprintf("create FileListener error=\"%s\", fd=%d", err, fd))
 	}
 	return listeners
 }
 
+// monitor the PIPE IPC between the current process and acl_master,
+// when acl_master close thePIPE, the current process should exit after
+// which has handled all its tasks
 func monitorMaster(listeners []*net.Listener,
 	onStopHandler func(), stopHandler func(bool)) {
 
 	file := os.NewFile(uintptr(stateFd), "")
-	conn, err1 := net.FileConn(file)
-	if err1 != nil {
-		log.Println("FileConn error", err1)
+	conn, err := net.FileConn(file)
+	if err != nil {
+		log.Println("FileConn error", err)
 	}
 
 	log.Println("waiting master exiting ...")
 
 	buf := make([]byte, 1024)
-	_, err2 := conn.Read(buf)
-	if err2 != nil {
-		log.Println("disconnected from master", err2)
+	_, err = conn.Read(buf)
+	if err != nil {
+		log.Println("disconnected from master", err)
 	}
 
 	var n, i int
@@ -239,13 +305,14 @@ func monitorMaster(listeners []*net.Listener,
 			connMutex.RUnlock()
 			break
 		}
+
 		n = connCount
 		connMutex.RUnlock()
 		time.Sleep(time.Second) // sleep 1 second
 		i++
 		log.Printf("exiting, clients=%d, sleep=%d seconds", n, i)
-		if waitExit > 0 && i >= waitExit {
-			log.Printf("waiting too long >= %d", waitExit)
+		if AppWaitLimit > 0 && i >= AppWaitLimit {
+			log.Printf("waiting too long >= %d", AppWaitLimit)
 			break
 		}
 	}

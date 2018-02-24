@@ -67,7 +67,7 @@ func OnClose(handler CloseFunc) {
 }
 
 func NetStart(addrs []string) {
-	prepare()
+	Prepare()
 
 	if preJailHandler != nil {
 		preJailHandler()
