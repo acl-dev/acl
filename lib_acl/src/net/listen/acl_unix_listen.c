@@ -34,13 +34,17 @@ ACL_SOCKET acl_unix_listen(const char *addr, int backlog, unsigned flag)
 #undef sun
 	struct sockaddr_un sun;
 	int    len = (int) strlen(addr);
-	ACL_SOCKET  sock;
+	ACL_SOCKET sock;
 
 	/*
 	 * Translate address information to internal form.
 	 */
-	if (len >= (int) sizeof(sun.sun_path))
-		acl_msg_fatal("unix-domain name too long: %s", addr);
+	if (len >= (int) sizeof(sun.sun_path)) {
+		acl_msg_error("%s(%d), %s: unix-domain name too long: %s",
+			__FILE__, __LINE__, __FUNCTION__, addr);
+		return ACL_SOCKET_INVALID;
+	}
+
 	memset((char *) &sun, 0, sizeof(sun));
 	sun.sun_family = AF_UNIX;
 #ifdef HAS_SUN_LEN
@@ -52,24 +56,37 @@ ACL_SOCKET acl_unix_listen(const char *addr, int backlog, unsigned flag)
 	 * Create a listener socket. Do whatever we can so we don't run into
 	 * trouble when this process is restarted after crash.
 	 */
-	if ((sock = socket(AF_UNIX, SOCK_STREAM, 0)) == ACL_SOCKET_INVALID)
-		acl_msg_fatal("socket: %s", acl_last_serror());
+	if ((sock = socket(AF_UNIX, SOCK_STREAM, 0)) == ACL_SOCKET_INVALID) {
+		acl_msg_error("%s(%d), %s: socket: %s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
+		return ACL_SOCKET_INVALID;
+	}
+
 	(void) unlink(addr);
 
-	if (bind(sock, (struct sockaddr *) & sun, sizeof(sun)) < 0)
-		acl_msg_fatal("bind: %s: %s", addr, acl_last_serror());
+	if (bind(sock, (struct sockaddr *) & sun, sizeof(sun)) < 0) {
+		acl_msg_error("%s(%d), %s: bind: %s: %s", __FILE__, __LINE__,
+			__FUNCTION__, addr, acl_last_serror());
+		return ACL_SOCKET_INVALID;
+	}
 #ifdef FCHMOD_UNIX_SOCKETS
 	if (fchmod(sock, 0666) < 0)
-		acl_msg_fatal("fchmod socket %s: %s", addr, acl_last_serror());
+		acl_msg_warn("%s(%d), %s: fchmod socket %s: %s", __FILE__,
+			__LINE__, __FUNCTION__, addr, acl_last_serror());
 #else
 	if (chmod(addr, 0666) < 0)
-		acl_msg_fatal("chmod socket %s: %s", addr, acl_last_serror());
+		acl_msg_warn("%s(%d), %s: chmod socket %s: %s", __FILE__,
+			__LINE__, __FUNCTION__, addr, acl_last_serror());
 #endif
 	acl_non_blocking(sock, flag & ACL_INET_FLAG_NBLOCK ?
 		ACL_NON_BLOCKING : ACL_BLOCKING);
 
-	if (listen(sock, backlog) < 0)
-		acl_msg_fatal("listen: %s", acl_last_serror());
+	if (listen(sock, backlog) < 0) {
+		acl_msg_error("%s(%d), %s: listen %s error %s", __FILE__,
+			__LINE__, __FUNCTION__, addr, acl_last_serror());
+		acl_socket_close(sock);
+		return ACL_SOCKET_INVALID;
+	}
 
 	return sock;
 }

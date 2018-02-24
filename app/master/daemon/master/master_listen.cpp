@@ -144,7 +144,8 @@ static int master_bind_udp(ACL_MASTER_SERV *serv)
 				acl_var_master_rw_timeout, serv->inet_flags);
 			break;
 		default:
-			acl_msg_panic("invalid type: %d, addr: %s",
+			acl_msg_panic("%s(%d), %s: invalid type: %d, addr: %s",
+				__FILE__, __LINE__, myname,
 				addr->type, addr->addr);
 			break;
 		}
@@ -189,7 +190,7 @@ static int master_listen_unix(ACL_MASTER_SERV *serv)
 		acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
 	serv->listen_fds[0] = acl_unix_listen(serv->name, qlen, serv->inet_flags);
 	if (serv->listen_fds[0] == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s(%d)->%s: listen on addr(%s) error(%s)",
+		acl_msg_error("%s(%d), %s: listen on addr(%s) error(%s)",
 			__FILE__, __LINE__, myname, serv->name, strerror(errno));
 		return 0;
 	}

@@ -84,7 +84,10 @@ fi
 
 %changelog
 
-* Fri Feb 23 2018 zhengshuxin@qiyi.com 3.3.0-76-20180224.00
+* Sat Feb 24 2018 zhengshuxin@qiyi.com 3.3.0-77-20180224.90
+- acl_unix_listen.c: won't fatal when binding UNIX addr error
+
+* Sat Feb 24 2018 zhengshuxin@qiyi.com 3.3.0-76-20180224.00
 - acl_master: lock file should be before starting services
 
 * Fri Feb 23 2018 zhengshuxin@qiyi.com 3.3.0-75-20180223.23
