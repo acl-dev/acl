@@ -1,11 +1,11 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        77
+Release:        78
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
-Packager:       Zhang Qiang <qiangzhang@qiyi.com>
+Packager:       Zhang Qiang <qiangzhang@qiyi.com>, Wang Haibin <wanghaibin@qiyi.com>
 Source2:        acl-master.json
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
 Source:         http://example.com/%{name}-%{version}.tar.gz
@@ -18,9 +18,10 @@ One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IO
 
 %package -n acl-master
 Summary: acl master framework
+Release: 78
 License: IBM
-Group: System Environment/Tools
-Requires(post): /sbin/ldconfig
+Group:   System Environment/Tools
+Requires(post):   /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
 %description -n acl-master
@@ -28,7 +29,7 @@ acl master framework
 
 %package -n acl-tools
 Summary: acl tools
-Release:        78
+Release: 78
 License: IBM
 Requires: acl-master
 
@@ -105,7 +106,10 @@ fi
 
 %changelog
 
-* Sat Feb 24 2018 zhengshuxin@qiyi.com 3.3.0-77-20180224.90
+* Sat Feb 24 2018 zhengshuxin@qiyi.com 3.3.0-78-20180224.09
+- build rpm with three packages: acl-libs, acl-master, acl-tools, by wanghaibin
+
+* Sat Feb 24 2018 zhengshuxin@qiyi.com 3.3.0-77-20180224.09
 - acl_unix_listen.c: won't fatal when binding UNIX addr error
 
 * Sat Feb 24 2018 zhengshuxin@qiyi.com 3.3.0-76-20180224.00
