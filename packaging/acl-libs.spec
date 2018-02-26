@@ -42,7 +42,7 @@ acl tools
 
 %build
 
-make build_one -j 32
+make build_one -j 4
 make -C lib_fiber
 
 %install
