@@ -16,7 +16,7 @@
 #include "master/master.h"
 #include "manage/manager.h"
 
-const char *var_master_version = "3.3.0-70 20180212";
+const char *var_master_version = "3.3.0-80 20180212";
 char *var_master_procname;
 
 #define STR	acl_vstring_str
