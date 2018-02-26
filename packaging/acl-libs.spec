@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        78
+Release:        79
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -29,7 +29,7 @@ acl master framework
 
 %package -n acl-tools
 Summary: acl tools
-Release: 78
+Release: 79
 License: IBM
 Group:   System Environment/Tools
 Requires: acl-master
@@ -60,9 +60,13 @@ rm -rf %{buildroot}
 
 %post -n acl-master
 /sbin/chkconfig --add master
+if [ "$1" == "1" ]; then
+    echo "starting acl_master ..."
+    service master start > /dev/null 2>&1 ||:
+fi
 
 %preun -n acl-master
-if [ "$1" = "0" ]; then
+if [ "$1" == "0" ]; then
     service master stop >/dev/null 2>&1 ||:
     /sbin/chkconfig --del master
 fi
@@ -74,6 +78,20 @@ if [ "$1" -ge "1" ]; then
     service master masterrestart > /dev/null 2>&1 ||:
 fi
 
+%post -n acl-tools
+if [ "$1" == "1" ]; then
+    /opt/soft/acl-master/sh/tools-ctl start
+fi
+
+%preun -n acl-tools
+if [ "$1" == "0" ]; then
+    /opt/soft/acl-master/sh/tools-ctl stop
+fi
+
+%postun -n acl-tools
+if [ "$1" -ge "1" ]; then
+    /opt/soft/acl-master/sh/tools-ctl restart
+fi
 
 %files
 %defattr(-,root,root,-)
@@ -106,6 +124,9 @@ fi
 /opt/soft/acl-master/libexec/master_*
 
 %changelog
+
+* Mon Feb 26 2018 zhengshuxin@qiyi.com 3.3.0-79-20180226.11
+- create tools-ctl for controling the master's tools
 
 * Sat Feb 24 2018 zhengshuxin@qiyi.com 3.3.0-78-20180224.09
 - build rpm with three packages: acl-libs, acl-master, acl-tools, by wanghaibin
