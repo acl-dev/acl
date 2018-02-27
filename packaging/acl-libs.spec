@@ -7,6 +7,7 @@ License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
 Packager:       Zhang Qiang <qiangzhang@qiyi.com>, Wang Haibin <wanghaibin@qiyi.com>
 Source2:        acl-master.json
+Source3:        acl-tools.json
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
 Source:         http://example.com/%{name}-%{version}.tar.gz
 

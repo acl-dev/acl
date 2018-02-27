@@ -1,9 +1,6 @@
 #include "stdafx.h"
+#include "master_ctld_version.h"
 #include "master_service.h"
-
-static const char *version = "1.0.0-0";
-static const char *date    = "20180123";
-static const char *cmd     = "master_ctld";
 
 static void help(const char* procname)
 {
@@ -24,8 +21,11 @@ static void check_version(int argc, char* argv[])
 			help(argv[0]);
 			exit (0);
 		case 'v':
-			printf("%s %s (%s, acl-%s)\r\n", version, date,
-				cmd, acl_version());
+			printf("%s %s (%s, acl-%s)\r\n", 
+				MASTER_CTLD_VERSION,
+				MASTER_CTLD_DATE,
+				MASTER_CTLD_CMD,
+				acl_version());
 			exit (0);
 		default:
 			break;
