@@ -122,6 +122,7 @@ fi
 /opt/soft/acl-master/bin/master_ctl
 /opt/soft/acl-master/conf/service/master_*
 /opt/soft/acl-master/libexec/master_*
+/opt/soft/services/acl-tools.json
 
 %changelog
 
