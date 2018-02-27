@@ -99,10 +99,11 @@ endif
 ###########################################################
 
 ACL_PATH = ../../../..
-JSON_PATH = ../../daemon/json
+MASTER_PATH = ../..
+MASTER_JSON = $(MASTER_PATH)/daemon/json
 
 CFLAGS += -I. \
-	  -I$(JSON_PATH) \
+	  -I$(MASTER_PATH) \
 	  -I$(ACL_PATH)/lib_acl/include \
 	  -I$(ACL_PATH)/lib_acl_cpp/include \
 	  -I$(ACL_PATH)/lib_protocol/include
@@ -120,7 +121,7 @@ $(shell mkdir -p $(OBJ_PATH))
 
 #Project's objs
 SRC = $(wildcard *.cpp) \
-	$(wildcard $(JSON_PATH)/*.cpp) \
+	$(wildcard $(MASTER_JSON)/*.cpp) \
 	$(wildcard main/*.cpp) \
 	$(wildcard action/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
@@ -131,7 +132,7 @@ $(OBJ_PATH)/%.o: main/%.cpp
 	$(COMPILE) $< -o $@
 $(OBJ_PATH)/%.o: action/%.cpp
 	$(COMPILE) $< -o $@
-$(OBJ_PATH)/%.o: $(JSON_PATH)/%.cpp
+$(OBJ_PATH)/%.o: $(MASTER_JSON)/%.cpp
 	$(COMPILE) $< -o $@
 
 .PHONY = all clean

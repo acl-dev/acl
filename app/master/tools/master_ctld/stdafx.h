@@ -18,8 +18,8 @@
 #endif
 
 #include <set>
-#include "struct.h"
-#include "serialize.h"
+#include "daemon/json/struct.h"
+#include "daemon/json/serialize.h"
 
 extern char *var_cfg_manage_addr;
 extern int   var_cfg_save_all;

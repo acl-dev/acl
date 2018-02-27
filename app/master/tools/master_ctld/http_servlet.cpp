@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "daemon/version.h"
 #include "action/action.h"
 #include "http_servlet.h"
 
@@ -79,7 +80,8 @@ bool http_servlet::doGet(acl::HttpServletRequest& req,
 	res.setContentType("text/plain")
 		.setKeepAlive(req.isKeepAlive());
 
-	acl::string body("ok\r\n");
+	acl::string body;
+	body.format("%s version: %s\r\n", MASTER_NAME, MASTER_VERSION);
 	return reply(req, res, 200, body);
 }
 

@@ -103,8 +103,8 @@ int     main(int argc, char **argv)
 			acl_msg_verbose++;
 			break;
 		case 'v':
-			printf("%s (acl_master, acl-%s)\r\n",
-				MASTER_VERSION, acl_version());
+			printf("%s %s %s(acl-%s)\r\n", MASTER_NAME,
+				MASTER_VERSION, MASTER_DATE, acl_version());
 			return 0;
 		case 'h':
 			usage(argv[0]);
