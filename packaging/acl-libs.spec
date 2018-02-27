@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        81
+Release:        82
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -19,7 +19,7 @@ One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IO
 
 %package -n acl-master
 Summary: acl master framework
-Release: 81
+Release: 82
 License: IBM
 Group:   System Environment/Tools
 Requires(post):   /sbin/ldconfig
@@ -30,7 +30,7 @@ acl master framework
 
 %package -n acl-tools
 Summary: acl tools
-Release: 81
+Release: 82
 License: IBM
 Group:   System Environment/Tools
 Requires: acl-master
@@ -113,7 +113,11 @@ fi
 /opt/soft/acl-master/conf/service/samples
 /opt/soft/acl-master/libexec/acl_master
 /opt/soft/acl-master/sbin
-/opt/soft/acl-master/sh
+# just including master.sh  reload.sh  start.sh  stop.sh
+/opt/soft/acl-master/sh/master.sh
+/opt/soft/acl-master/sh/reload.sh
+/opt/soft/acl-master/sh/start.sh
+/opt/soft/acl-master/sh/stop.sh
 /opt/soft/acl-master/var
 /opt/soft/services/acl-master.json
 /etc/init.d/master
@@ -122,11 +126,15 @@ fi
 %files -n acl-tools
 %defattr(-,root,root)
 /opt/soft/acl-master/bin/master_ctl
+/opt/soft/acl-master/sh/tools-ctl
 /opt/soft/acl-master/conf/service/master_*
 /opt/soft/acl-master/libexec/master_*
 /opt/soft/services/acl-tools.json
 
 %changelog
+
+* Tue Feb 27 2018 zhengshuxin@qiyi.com 3.3.0-82-20180227.14
+- move tools-ctl from acl-master to acl-tools
 
 * Tue Feb 27 2018 zhengshuxin@qiyi.com 3.3.0-81-20180227.11
 - master: version info can be get by web service
