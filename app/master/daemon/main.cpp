@@ -12,11 +12,11 @@
 #include <fcntl.h>
 #include <limits.h>
 
+#include "version.h"
 #include "master/master_params.h"
 #include "master/master.h"
 #include "manage/manager.h"
 
-const char *var_master_version = "3.3.0-80 20180212";
 char *var_master_procname;
 
 #define STR	acl_vstring_str
@@ -104,7 +104,7 @@ int     main(int argc, char **argv)
 			break;
 		case 'v':
 			printf("%s (acl_master, acl-%s)\r\n",
-				var_master_version, acl_version());
+				MASTER_VERSION, acl_version());
 			return 0;
 		case 'h':
 			usage(argv[0]);
@@ -232,7 +232,7 @@ int     main(int argc, char **argv)
 	lock_pidfile();
 
 	acl_msg_info("daemon started -- version %s, configuration %s",
-		var_master_version, acl_var_master_conf_dir);
+		MASTER_VERSION, acl_var_master_conf_dir);
 
 	/*
 	 * Process events. The event handler will execute the read/write/timer
