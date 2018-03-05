@@ -78,7 +78,7 @@ endif
 ##############################################################################
 
 .PHONY = check help all_lib all samples all clean install uninstall uninstall_all build_one
-VERSION = 3.3.1.rc1
+VERSION = 3.4.0.rc3
 
 default: build_one
 help h:
