@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        82
+Release:        83
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -19,7 +19,7 @@ One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IO
 
 %package -n acl-master
 Summary: acl master framework
-Release: 82
+Release: 83
 License: IBM
 Group:   System Environment/Tools
 Requires(post):   /sbin/ldconfig
@@ -30,7 +30,7 @@ acl master framework
 
 %package -n acl-tools
 Summary: acl tools
-Release: 82
+Release: 83
 License: IBM
 Group:   System Environment/Tools
 Requires: acl-master
@@ -132,6 +132,9 @@ fi
 /opt/soft/services/acl-tools.json
 
 %changelog
+
+* Mon Mar 05 2018 zhengshuxin@qiyi.com 3.3.0-83-20180305.14
+- lib_fiber: merge codes from libfiber
 
 * Tue Feb 27 2018 zhengshuxin@qiyi.com 3.3.0-82-20180227.14
 - move tools-ctl from acl-master to acl-tools
