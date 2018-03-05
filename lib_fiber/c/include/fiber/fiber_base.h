@@ -297,7 +297,7 @@ FIBER_API const char *acl_fiber_last_serror(void);
  * set the system error number
  * @param errnum {int} ´íÎóºÅ
  */
-void acl_fiber_set_error(int errnum);
+FIBER_API void acl_fiber_set_error(int errnum);
 
 /****************************************************************************/
 

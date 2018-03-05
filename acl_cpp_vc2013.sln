@@ -25,7 +25,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfiber_cpp", "lib_fiber\c
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfiber", "lib_fiber\c\libfiber_vc2013.vcxproj", "{AD99B75A-40BF-46DC-844B-23417FDC8690}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinEchod_vc2013", "lib_fiber\samples\WinEchod\WinEchod_vc2013.vcxproj", "{F74A61AD-A309-47A5-A7C6-BAC888660BBC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinEchod", "lib_fiber\samples\WinEchod\WinEchod_vc2013.vcxproj", "{F74A61AD-A309-47A5-A7C6-BAC888660BBC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -128,8 +128,8 @@ Global
 		{6265F6E1-CF6D-4C22-8F91-95921659C146}.Debug|x64.ActiveCfg = Debug|Win32
 		{6265F6E1-CF6D-4C22-8F91-95921659C146}.DebugDll|Mixed Platforms.ActiveCfg = DebugDll|Win32
 		{6265F6E1-CF6D-4C22-8F91-95921659C146}.DebugDll|Mixed Platforms.Build.0 = DebugDll|Win32
-		{6265F6E1-CF6D-4C22-8F91-95921659C146}.DebugDll|Win32.ActiveCfg = Debug|Win32
-		{6265F6E1-CF6D-4C22-8F91-95921659C146}.DebugDll|Win32.Build.0 = Debug|Win32
+		{6265F6E1-CF6D-4C22-8F91-95921659C146}.DebugDll|Win32.ActiveCfg = DebugDll|Win32
+		{6265F6E1-CF6D-4C22-8F91-95921659C146}.DebugDll|Win32.Build.0 = DebugDll|Win32
 		{6265F6E1-CF6D-4C22-8F91-95921659C146}.DebugDll|x64.ActiveCfg = Debug|Win32
 		{6265F6E1-CF6D-4C22-8F91-95921659C146}.Release|Mixed Platforms.ActiveCfg = Release|Win32
 		{6265F6E1-CF6D-4C22-8F91-95921659C146}.Release|Mixed Platforms.Build.0 = Release|Win32
@@ -138,8 +138,8 @@ Global
 		{6265F6E1-CF6D-4C22-8F91-95921659C146}.Release|x64.ActiveCfg = Release|Win32
 		{6265F6E1-CF6D-4C22-8F91-95921659C146}.ReleaseDll|Mixed Platforms.ActiveCfg = ReleaseDll|Win32
 		{6265F6E1-CF6D-4C22-8F91-95921659C146}.ReleaseDll|Mixed Platforms.Build.0 = ReleaseDll|Win32
-		{6265F6E1-CF6D-4C22-8F91-95921659C146}.ReleaseDll|Win32.ActiveCfg = Release|Win32
-		{6265F6E1-CF6D-4C22-8F91-95921659C146}.ReleaseDll|Win32.Build.0 = Release|Win32
+		{6265F6E1-CF6D-4C22-8F91-95921659C146}.ReleaseDll|Win32.ActiveCfg = ReleaseDll|Win32
+		{6265F6E1-CF6D-4C22-8F91-95921659C146}.ReleaseDll|Win32.Build.0 = ReleaseDll|Win32
 		{6265F6E1-CF6D-4C22-8F91-95921659C146}.ReleaseDll|x64.ActiveCfg = Release|Win32
 		{6265F6E1-CF6D-4C22-8F91-95921659C146}.Template|Mixed Platforms.ActiveCfg = Release|Win32
 		{6265F6E1-CF6D-4C22-8F91-95921659C146}.Template|Mixed Platforms.Build.0 = Release|Win32
@@ -153,8 +153,8 @@ Global
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.Debug|x64.ActiveCfg = Debug|Win32
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.DebugDll|Mixed Platforms.ActiveCfg = DebugDll|Win32
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.DebugDll|Mixed Platforms.Build.0 = DebugDll|Win32
-		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.DebugDll|Win32.ActiveCfg = Debug|Win32
-		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.DebugDll|Win32.Build.0 = Debug|Win32
+		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.DebugDll|Win32.ActiveCfg = DebugDll|Win32
+		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.DebugDll|Win32.Build.0 = DebugDll|Win32
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.DebugDll|x64.ActiveCfg = Debug|Win32
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.Release|Mixed Platforms.ActiveCfg = Release|Win32
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.Release|Mixed Platforms.Build.0 = Release|Win32
@@ -163,8 +163,8 @@ Global
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.Release|x64.ActiveCfg = Release|Win32
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.ReleaseDll|Mixed Platforms.ActiveCfg = ReleaseDll|Win32
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.ReleaseDll|Mixed Platforms.Build.0 = ReleaseDll|Win32
-		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.ReleaseDll|Win32.ActiveCfg = Release|Win32
-		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.ReleaseDll|Win32.Build.0 = Release|Win32
+		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.ReleaseDll|Win32.ActiveCfg = ReleaseDll|Win32
+		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.ReleaseDll|Win32.Build.0 = ReleaseDll|Win32
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.ReleaseDll|x64.ActiveCfg = Release|Win32
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.Template|Mixed Platforms.ActiveCfg = Release|Win32
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30}.Template|Mixed Platforms.Build.0 = Release|Win32
