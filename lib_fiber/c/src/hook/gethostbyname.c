@@ -35,25 +35,36 @@ static void free_fn(void *ctx)
 
 struct hostent *acl_fiber_gethostbyname(const char *name)
 {
-	static __thread struct hostent ret, *result;
+	struct hostent *result;
+	static __thread struct hostent res;
 #define BUF_LEN	4096
 	static __thread char buf[BUF_LEN];
-	static __thread int  __local_key;
-	char  *local;
+
+	char  *fiber_buf;
+	static struct hostent *fiber_res;
+	static __thread int  __fiber_buf_key;
+	static __thread int  __fiber_res_key;
 
 	if (!var_hook_sys_api) {
-		return acl_fiber_gethostbyname_r(name, &ret, buf, BUF_LEN,
+		return acl_fiber_gethostbyname_r(name, &res, buf, BUF_LEN,
 				&result, &h_errno) == 0 ? result : NULL;
 	}
 
-	local = (char *) acl_fiber_get_specific(__local_key);
-	if (local == NULL) {
-		local = (char *) malloc(BUF_LEN);
-		acl_fiber_set_specific(&__local_key, local, free_fn);
+	fiber_buf = (char *) acl_fiber_get_specific(__fiber_buf_key);
+	if (fiber_buf == NULL) {
+		fiber_buf = (char *) malloc(BUF_LEN);
+		acl_fiber_set_specific(&__fiber_buf_key, fiber_buf, free_fn);
 	}
+	assert(fiber_buf);
 
-	assert(local);
-	return acl_fiber_gethostbyname_r(name, &ret, local, BUF_LEN,
+	fiber_res = (struct hostent *) acl_fiber_get_specific(__fiber_res_key);
+	if (fiber_res == NULL) {
+		fiber_res = (struct hostent *) malloc(sizeof(struct hostent));
+		acl_fiber_set_specific(&__fiber_res_key, fiber_res, free_fn);
+	}
+	assert(fiber_res);
+
+	return acl_fiber_gethostbyname_r(name, fiber_res, fiber_buf, BUF_LEN,
 			&result, &h_errno) == 0 ? result : NULL;
 }
 
