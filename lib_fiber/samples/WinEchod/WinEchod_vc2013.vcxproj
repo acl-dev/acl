@@ -100,7 +100,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\lib_acl;..\..\..\lib_acl_cpp;..\..\..\lib_protocol\;..\..\..\lib_fiber\c;..\..\..\lib_fiber\cpp;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_fiber.lib;lib_fiber_cpp.lib;lib_acl_d.lib;lib_protocol_d.lib;lib_acl_cpp_d.lib</AdditionalDependencies>
+      <AdditionalDependencies>libfiber.lib;libfiber_cpp.lib;lib_acl_d.lib;lib_protocol_d.lib;lib_acl_cpp_d.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -116,8 +116,8 @@
       <Command>copy ..\..\..\lib_acl\lib_acl_d.dll .\ /Y
 copy ..\..\..\lib_acl_cpp\lib_acl_cpp_d.dll .\ /Y
 copy ..\..\..\lib_protocol\lib_protocol_d.dll .\ /Y
-copy ..\..\..\lib_fiber\c\lib_fiber.dll .\ /Y
-copy ..\..\..\lib_fiber\cpp\lib_fiber_cpp.dll .\ /Y</Command>
+copy ..\..\..\lib_fiber\c\libfiber.dll .\ /Y
+copy ..\..\..\lib_fiber\cpp\libfiber_cpp.dll .\ /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -134,7 +134,7 @@ copy ..\..\..\lib_fiber\cpp\lib_fiber_cpp.dll .\ /Y</Command>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\lib_acl;..\..\..\lib_acl_cpp;..\..\..\lib_protocol\;..\..\..\lib_fiber\c;..\..\..\lib_fiber\cpp;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_fiber.lib;lib_fiber_cpp.lib;lib_acl_vc2013d.lib;lib_protocol_vc2013d.lib;lib_acl_cpp_vc2013d.lib</AdditionalDependencies>
+      <AdditionalDependencies>libfiber.lib;libfiber_cpp.lib;lib_acl_vc2013d.lib;lib_protocol_vc2013d.lib;lib_acl_cpp_vc2013d.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -168,7 +168,7 @@ copy ..\..\..\lib_fiber\cpp\lib_fiber_cpp.dll .\ /Y</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\..\lib_acl;..\..\..\lib_acl_cpp;..\..\..\lib_protocol\;..\..\..\lib_fiber\c;..\..\..\lib_fiber\cpp;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_fiber.lib;lib_fiber_cpp.lib;lib_acl.lib;lib_protocol.lib;lib_acl_cpp.lib</AdditionalDependencies>
+      <AdditionalDependencies>libfiber.lib;libfiber_cpp.lib;lib_acl.lib;lib_protocol.lib;lib_acl_cpp.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -184,8 +184,8 @@ copy ..\..\..\lib_fiber\cpp\lib_fiber_cpp.dll .\ /Y</Command>
       <Command>copy ..\..\..\lib_acl\lib_acl.dll .\ /Y
 copy ..\..\..\lib_acl_cpp\lib_acl_cpp.dll .\ /Y
 copy ..\..\..\lib_protocol\lib_protocol.dll .\ /Y
-copy ..\..\..\lib_fiber\c\lib_fiber.dll .\ /Y
-copy ..\..\..\lib_fiber\cpp\lib_fiber_cpp.dll .\ /Y</Command>
+copy ..\..\..\lib_fiber\c\libfiber.dll .\ /Y
+copy ..\..\..\lib_fiber\cpp\libfiber_cpp.dll .\ /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -206,7 +206,7 @@ copy ..\..\..\lib_fiber\cpp\lib_fiber_cpp.dll .\ /Y</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\..\lib_acl;..\..\..\lib_acl_cpp;..\..\..\lib_protocol\;..\..\..\lib_fiber\c;..\..\..\lib_fiber\cpp;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_fiber.lib;lib_fiber_cpp.lib;lib_acl_vc2013.lib;lib_protocol_vc2013.lib;lib_acl_cpp_vc2013.lib</AdditionalDependencies>
+      <AdditionalDependencies>libfiber.lib;libfiber_cpp.lib;lib_acl_vc2013.lib;lib_protocol_vc2013.lib;lib_acl_cpp_vc2013.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
