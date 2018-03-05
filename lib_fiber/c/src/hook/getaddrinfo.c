@@ -5,14 +5,14 @@
 #include "hook.h"
 #include "fiber.h"
 
+#ifdef SYS_UNIX
+
 typedef int (*getaddrinfo_fn)(const char *node, const char *service,
 	const struct addrinfo* hints, struct addrinfo **res);
 typedef void (*freeaddrinfo_fn)(struct addrinfo *res);
 
 static getaddrinfo_fn  __sys_getaddrinfo  = NULL;
 static freeaddrinfo_fn __sys_freeaddrinfo = NULL;
-
-#ifdef SYS_UNIX
 
 static void hook_api(void)
 {
@@ -98,7 +98,7 @@ static void saveaddrinfo(struct dns_addrinfo *ai, struct addrinfo **res)
 	}
 }
 
-int getaddrinfo(const char *node, const char *service,
+int acl_fiber_getaddrinfo(const char *node, const char *service,
 	const struct addrinfo* hints, struct addrinfo **res)
 {
 	struct dns_addrinfo *dai;
@@ -168,7 +168,7 @@ int getaddrinfo(const char *node, const char *service,
 	return 0;
 }
 
-void freeaddrinfo(struct addrinfo *res)
+void acl_fiber_freeaddrinfo(struct addrinfo *res)
 {
 	if (__sys_freeaddrinfo == NULL) {
 		hook_init();
@@ -186,6 +186,17 @@ void freeaddrinfo(struct addrinfo *res)
 		res = res->ai_next;
 		free(tmp);
 	}
+}
+
+int getaddrinfo(const char *node, const char *service,
+	const struct addrinfo* hints, struct addrinfo **res)
+{
+	return acl_fiber_getaddrinfo(node, service, hints, res);
+}
+
+void freeaddrinfo(struct addrinfo *res)
+{
+	acl_fiber_freeaddrinfo(res);
 }
 
 #endif

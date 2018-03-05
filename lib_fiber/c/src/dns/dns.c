@@ -24,7 +24,7 @@
  * ==========================================================================
  */
 #include "stdafx.h"
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 #include "common.h"
 
 #ifdef SYS_UNIX

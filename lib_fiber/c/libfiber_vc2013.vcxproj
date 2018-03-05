@@ -19,35 +19,35 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A456325D-93BC-4656-8F07-A75F5526DF53}</ProjectGuid>
+    <ProjectGuid>{AD99B75A-40BF-46DC-844B-23417FDC8690}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>lib_fiber_cpp_vc2012</RootNamespace>
-    <ProjectName>lib_fiber_cpp</ProjectName>
+    <RootNamespace>libfiber</RootNamespace>
+    <ProjectName>libfiber</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -84,11 +84,10 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\src;.\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\..\lib_acl\include;..\..\lib_acl_cpp\include;..\c\include;.\src;.\include;..\..\lib_acl\src\master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>stdafx.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -100,17 +99,15 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_MT;FIBER_CPP_DLL;FIBER_CPP_EXPORTS;ACL_DLL;ACL_CPP_DLL;FIBER_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;FIBER_DLL;FIBER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\src;.\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\..\lib_acl\include;..\..\lib_acl_cpp\include;..\c\include;.\src;.\include;..\..\lib_acl\src\master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>stdafx.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>lib_protocol_d.lib;lib_acl_d.lib;lib_acl_cpp_d.lib;lib_fiber.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\lib_acl;..\..\lib_protocol;..\..\lib_acl_cpp;..\..\lib_fiber\c</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wsock32.lib;ws2_32.lib;IPHlpApi.Lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -120,11 +117,10 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\src;.\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\..\lib_acl\include;..\..\lib_acl_cpp\include;..\c\include;.\src;.\include;..\..\lib_acl\src\master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>stdafx.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,44 +136,110 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_MT;FIBER_CPP_DLL;FIBER_CPP_EXPORTS;ACL_DLL;ACL_CPP_DLL;FIBER_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;FIBER_DLL;FIBER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\..\lib_acl\include;..\..\lib_acl_cpp\include;..\c\include;.\src;.\include;..\..\lib_acl\src\master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>stdafx.hpp</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>.\src;.\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\lib_acl;..\..\lib_protocol;..\..\lib_acl_cpp;..\..\lib_fiber\c</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_protocol.lib;lib_acl.lib;lib_acl_cpp.lib;lib_fiber.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;ws2_32.lib;IPHlpApi.Lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\fiber\channel.hpp" />
-    <ClInclude Include="include\fiber\fiber.hpp" />
-    <ClInclude Include="include\fiber\fiber_cpp_define.hpp" />
-    <ClInclude Include="include\fiber\fiber_event.hpp" />
-    <ClInclude Include="include\fiber\fiber_lock.hpp" />
-    <ClInclude Include="include\fiber\fiber_sem.hpp" />
-    <ClInclude Include="include\fiber\lib_fiber.hpp" />
-    <ClInclude Include="include\fiber\master_fiber.hpp" />
-    <ClInclude Include="src\fiber_server.hpp" />
-    <ClInclude Include="src\stdafx.hpp" />
+    <ClInclude Include="include\fiber\fiber_base.h" />
+    <ClInclude Include="include\fiber\fiber_channel.h" />
+    <ClInclude Include="include\fiber\fiber_define.h" />
+    <ClInclude Include="include\fiber\fiber_event.h" />
+    <ClInclude Include="include\fiber\fiber_hook.h" />
+    <ClInclude Include="include\fiber\fiber_lock.h" />
+    <ClInclude Include="include\fiber\fiber_sem.h" />
+    <ClInclude Include="include\fiber\libfiber.h" />
+    <ClInclude Include="src\common.h" />
+    <ClInclude Include="src\common\argv.h" />
+    <ClInclude Include="src\common\array.h" />
+    <ClInclude Include="src\common\atomic.h" />
+    <ClInclude Include="src\common\fifo.h" />
+    <ClInclude Include="src\common\gettimeofday.h" />
+    <ClInclude Include="src\common\htable.h" />
+    <ClInclude Include="src\common\init.h" />
+    <ClInclude Include="src\common\iostuff.h" />
+    <ClInclude Include="src\common\iterator.h" />
+    <ClInclude Include="src\common\memory.h" />
+    <ClInclude Include="src\common\msg.h" />
+    <ClInclude Include="src\common\pthread_patch.h" />
+    <ClInclude Include="src\common\ring.h" />
+    <ClInclude Include="src\common\sane_socket.h" />
+    <ClInclude Include="src\common\strops.h" />
+    <ClInclude Include="src\define.h" />
+    <ClInclude Include="src\dns\dns.h" />
+    <ClInclude Include="src\dns\sane_inet.h" />
+    <ClInclude Include="src\dns\valid_hostname.h" />
+    <ClInclude Include="src\event.h" />
+    <ClInclude Include="src\event\event_epoll.h" />
+    <ClInclude Include="src\event\event_iocp.h" />
+    <ClInclude Include="src\event\event_kqueue.h" />
+    <ClInclude Include="src\event\event_poll.h" />
+    <ClInclude Include="src\event\event_select.h" />
+    <ClInclude Include="src\event\event_wmsg.h" />
+    <ClInclude Include="src\fiber.h" />
+    <ClInclude Include="src\hook\hook.h" />
+    <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\channel.cpp" />
-    <ClCompile Include="src\fiber.cpp" />
-    <ClCompile Include="src\fiber_event.cpp" />
-    <ClCompile Include="src\fiber_lock.cpp" />
-    <ClCompile Include="src\fiber_sem.cpp" />
-    <ClCompile Include="src\fiber_server.cpp" />
-    <ClCompile Include="src\master_fiber.cpp" />
-    <ClCompile Include="src\stdafx.cpp">
+    <ClCompile Include="src\channel.c" />
+    <ClCompile Include="src\common\argv.c" />
+    <ClCompile Include="src\common\array.c" />
+    <ClCompile Include="src\common\atomic.c" />
+    <ClCompile Include="src\common\close_on_exec.c" />
+    <ClCompile Include="src\common\doze.c" />
+    <ClCompile Include="src\common\fifo.c" />
+    <ClCompile Include="src\common\gettimeofday.c" />
+    <ClCompile Include="src\common\htable.c" />
+    <ClCompile Include="src\common\init.c" />
+    <ClCompile Include="src\common\memory.c" />
+    <ClCompile Include="src\common\msg.c" />
+    <ClCompile Include="src\common\non_blocking.c" />
+    <ClCompile Include="src\common\open_limit.c" />
+    <ClCompile Include="src\common\pthread_patch.c" />
+    <ClCompile Include="src\common\ring.c" />
+    <ClCompile Include="src\common\sane_socket.c" />
+    <ClCompile Include="src\common\socketpair.c" />
+    <ClCompile Include="src\common\strops.c" />
+    <ClCompile Include="src\common\tcp_nodelay.c" />
+    <ClCompile Include="src\dns\dns.c" />
+    <ClCompile Include="src\dns\sane_inet.c" />
+    <ClCompile Include="src\dns\valid_hostname.c" />
+    <ClCompile Include="src\event.c" />
+    <ClCompile Include="src\event\event_epoll.c" />
+    <ClCompile Include="src\event\event_iocp.c" />
+    <ClCompile Include="src\event\event_kqueue.c" />
+    <ClCompile Include="src\event\event_poll.c" />
+    <ClCompile Include="src\event\event_select.c" />
+    <ClCompile Include="src\event\event_wmsg.c" />
+    <ClCompile Include="src\fiber.c" />
+    <ClCompile Include="src\fiber\fiber_unix.c" />
+    <ClCompile Include="src\fiber\fiber_win.c" />
+    <ClCompile Include="src\fiber_event.c" />
+    <ClCompile Include="src\fiber_io.c" />
+    <ClCompile Include="src\fiber_lock.c" />
+    <ClCompile Include="src\fiber_sem.c" />
+    <ClCompile Include="src\file_event.c" />
+    <ClCompile Include="src\hook\dns_init.c" />
+    <ClCompile Include="src\hook\epoll.c" />
+    <ClCompile Include="src\hook\getaddrinfo.c" />
+    <ClCompile Include="src\hook\gethostbyname.c" />
+    <ClCompile Include="src\hook\io.c" />
+    <ClCompile Include="src\hook\poll.c" />
+    <ClCompile Include="src\hook\select.c" />
+    <ClCompile Include="src\hook\socket.c" />
+    <ClCompile Include="src\stdafx.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

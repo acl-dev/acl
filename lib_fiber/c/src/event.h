@@ -7,7 +7,7 @@
 #ifdef	HAS_EPOLL
 #include <sys/epoll.h>
 #endif
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 
 #define SET_TIME(x) do { \
     struct timeval _tv; \

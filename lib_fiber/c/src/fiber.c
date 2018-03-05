@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 #include "common.h"
 
 #ifdef USE_VALGRIND
@@ -15,11 +15,13 @@
 
 #define	MAX_CACHE	1000
 
+#ifdef	HOOK_ERRNO
 typedef int  *(*errno_fn)(void);
 typedef int   (*fcntl_fn)(int, int, ...);
 
 static errno_fn __sys_errno     = NULL;
 static fcntl_fn __sys_fcntl     = NULL;
+#endif
 
 typedef struct THREAD {
 	RING       ready;		/* ready fiber queue */
@@ -44,7 +46,6 @@ static __thread int __schedule_auto = 0;
 __thread int var_hook_sys_api   = 0;
 
 static pthread_key_t __fiber_key;
-static void fiber_init(void);
 
 void acl_fiber_hook_api(int onoff)
 {
@@ -136,6 +137,33 @@ static void fiber_check(void)
 
 #ifdef	HOOK_ERRNO
 
+static void fiber_init(void)
+{
+#ifdef SYS_UNIX
+
+	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
+	static int __called = 0;
+
+	(void) pthread_mutex_lock(&__lock);
+
+	if (__called != 0) {
+		(void) pthread_mutex_unlock(&__lock);
+		return;
+	}
+
+	__called++;
+
+#ifdef ACL_ARM_LINUX
+	__sys_errno   = (errno_fn) dlsym(RTLD_NEXT, "__errno");
+#else
+	__sys_errno   = (errno_fn) dlsym(RTLD_NEXT, "__errno_location");
+#endif
+	__sys_fcntl   = (fcntl_fn) dlsym(RTLD_NEXT, "fcntl");
+
+	(void) pthread_mutex_unlock(&__lock);
+#endif
+}
+
 /* see /usr/include/bits/errno.h for __errno_location */
 #ifdef ACL_ARM_LINUX
 volatile int*   __errno(void)
@@ -163,22 +191,6 @@ int *__errno_location(void)
 }
 
 #endif
-
-int acl_fiber_sys_errno(void)
-{
-	if (__sys_errno == NULL) {
-		fiber_init();
-	}
-	return *__sys_errno();
-}
-
-void acl_fiber_sys_errno_set(int errnum)
-{
-	if (__sys_errno == NULL) {
-		fiber_init();
-	}
-	*__sys_errno() = errnum;
-}
 
 #if 0
 
@@ -278,11 +290,7 @@ void fiber_save_errno(int errnum)
 		return;
 	}
 
-	if (__sys_errno != NULL) {
-		acl_fiber_set_errno(curr, errnum);
-	} else {
-		acl_fiber_set_errno(curr, errnum);
-	}
+	acl_fiber_set_errno(curr, errnum);
 }
 
 static void fiber_kick(int max)
@@ -632,33 +640,6 @@ int acl_fiber_status(const ACL_FIBER *fiber)
 		fiber = acl_fiber_running();
 	}
 	return fiber ? fiber->status : 0;
-}
-
-static void fiber_init(void)
-{
-#ifdef SYS_UNIX
-
-	static pthread_mutex_t __lock = PTHREAD_MUTEX_INITIALIZER;
-	static int __called = 0;
-
-	(void) pthread_mutex_lock(&__lock);
-
-	if (__called != 0) {
-		(void) pthread_mutex_unlock(&__lock);
-		return;
-	}
-
-	__called++;
-
-#ifdef ACL_ARM_LINUX
-	__sys_errno   = (errno_fn) dlsym(RTLD_NEXT, "__errno");
-#else
-	__sys_errno   = (errno_fn) dlsym(RTLD_NEXT, "__errno_location");
-#endif
-	__sys_fcntl   = (fcntl_fn) dlsym(RTLD_NEXT, "fcntl");
-
-	(void) pthread_mutex_unlock(&__lock);
-#endif
 }
 
 void acl_fiber_schedule_set_event(int event_mode)

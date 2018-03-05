@@ -96,7 +96,28 @@
     <ClInclude Include="targetver.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\fiber\lib_fiber.h">
+    <ClInclude Include="include\fiber\fiber_base.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_channel.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_define.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_event.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_hook.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_lock.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_sem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\libfiber.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\common\fifo.h">

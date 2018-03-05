@@ -3,7 +3,7 @@
 #ifdef	HAS_EPOLL
 
 #include "common.h"
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 #include "event.h"
 #include "fiber.h"
 

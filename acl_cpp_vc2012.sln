@@ -717,9 +717,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dispatch_manager", "app\mas
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{53F31C86-0F18-49EB-B7F9-6E00D92DF39F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_fiber_cpp", "lib_fiber\cpp\lib_fiber_cpp_vc2012.vcxproj", "{A456325D-93BC-4656-8F07-A75F5526DF53}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfiber_cpp", "lib_fiber\cpp\libfiber_cpp_vc2012.vcxproj", "{A456325D-93BC-4656-8F07-A75F5526DF53}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_fiber", "lib_fiber\c\lib_fiber_vc2012.vcxproj", "{34506C5D-E131-43BB-9656-BA39F0B56485}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfiber", "lib_fiber\c\libfiber_vc2012.vcxproj", "{34506C5D-E131-43BB-9656-BA39F0B56485}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fiber", "fiber", "{D75ACD1D-AD2A-4A16-B761-6EA5202D5EA5}"
 EndProject

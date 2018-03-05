@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "common.h"
 
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 #include "event.h"
 
 void file_event_init(FILE_EVENT *fe, int fd)

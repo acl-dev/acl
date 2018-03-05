@@ -10,7 +10,7 @@
 # include <sys/eventfd.h>
 # endif
 #endif
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 #include "fiber.h"
 
 //#define	USE_THREAD_MUTEX

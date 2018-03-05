@@ -221,12 +221,12 @@ void fiber::schedule_stop(void)
 
 int fiber::get_sys_errno(void)
 {
-	return acl_fiber_sys_errno();
+	return acl_fiber_last_error();
 }
 
 void fiber::set_sys_errno(int errnum)
 {
-	acl_fiber_sys_errno_set(errnum);
+	acl_fiber_set_error(errnum);
 }
 
 //////////////////////////////////////////////////////////////////////////////

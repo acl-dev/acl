@@ -3,7 +3,7 @@
 
 #ifdef HAS_SELECT
 
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 #include "event.h"
 #include "event_select.h"
 
