@@ -24,7 +24,7 @@ variables:
     artifacts:
         paths:
             - packaging/x86_64/acl-libs-*.rpm
-	    - packaging/x86_64/acl-master-*.rpm
+            - packaging/x86_64/acl-master-*.rpm
     only:
       - /^check-.*$/
     except:
@@ -43,7 +43,7 @@ variables:
     artifacts:
         paths:
             - packaging/x86_64/acl-libs-*.rpm
-	    - packaging/x86_64/acl-master-*.rpm
+            - packaging/x86_64/acl-master-*.rpm
 
 .basepublishprerelease: &PRERELEASE
     image: ${BUILDIMAGES}
@@ -58,7 +58,7 @@ variables:
     artifacts:
         paths:
             - packaging/x86_64/acl-libs-*.rpm
-	    - packaging/x86_64/acl-master-*.rpm
+            - packaging/x86_64/acl-master-*.rpm
 
 stages:
     - test
