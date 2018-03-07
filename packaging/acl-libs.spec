@@ -1,7 +1,7 @@
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
 Version:        3.3.0
-Release:        83
+Release:        84
 Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
@@ -132,6 +132,9 @@ fi
 /opt/soft/services/acl-tools.json
 
 %changelog
+
+* Wed Mar 07 2018 zhengshuxin@qiyi.com 3.3.0-84-20180307.11
+- acl-tools rpm was removed from CI
 
 * Mon Mar 05 2018 zhengshuxin@qiyi.com 3.3.0-83-20180305.14
 - lib_fiber: merge codes from libfiber

@@ -23,7 +23,8 @@ variables:
         - cd packaging && make rpm
     artifacts:
         paths:
-            - packaging/x86_64/*.rpm
+            - packaging/x86_64/acl-libs-*.rpm
+	    - packaging/x86_64/acl-master-*.rpm
     only:
       - /^check-.*$/
     except:
@@ -41,7 +42,8 @@ variables:
       - /^devel-.*$/
     artifacts:
         paths:
-            - packaging/x86_64/*.rpm
+            - packaging/x86_64/acl-libs-*.rpm
+	    - packaging/x86_64/acl-master-*.rpm
 
 .basepublishprerelease: &PRERELEASE
     image: ${BUILDIMAGES}
@@ -55,7 +57,8 @@ variables:
         - /^release-.*$/
     artifacts:
         paths:
-            - packaging/x86_64/*.rpm
+            - packaging/x86_64/acl-libs-*.rpm
+	    - packaging/x86_64/acl-master-*.rpm
 
 stages:
     - test
