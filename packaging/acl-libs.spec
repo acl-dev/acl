@@ -1,4 +1,4 @@
-%define release_id 85
+%define release_id 86
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -134,6 +134,9 @@ fi
 /opt/soft/services/acl-tools.json
 
 %changelog
+
+* Wed Mar 07 2018 zhengshuxin@qiyi.com 3.3.0-86-20180307.13
+- rm acl-tools from CI
 
 * Wed Mar 07 2018 zhengshuxin@qiyi.com 3.3.0-85-20180307.11
 - rpm version
