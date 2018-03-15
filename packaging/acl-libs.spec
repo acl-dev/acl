@@ -55,8 +55,8 @@ make -C lib_fiber packinstall  DESTDIR=$RPM_BUILD_ROOT
 
 mkdir -p $RPM_BUILD_ROOT/opt/soft/services/
 
-#install -m 644 %{Source2} $RPM_BUILD_ROOT/opt/soft/services/
-#install -m 644 %{Source3} $RPM_BUILD_ROOT/opt/soft/services/
+#install -m 644 %{SOURCE2} $RPM_BUILD_ROOT/opt/soft/services/
+#install -m 644 %{SOURCE3} $RPM_BUILD_ROOT/opt/soft/services/
 
 %clean
 rm -rf %{buildroot}
