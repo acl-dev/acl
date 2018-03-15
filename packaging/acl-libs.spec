@@ -121,7 +121,7 @@ fi
 /opt/soft/acl-master/sh/start.sh
 /opt/soft/acl-master/sh/stop.sh
 /opt/soft/acl-master/var
-/opt/soft/services/acl-master.json
+#/opt/soft/services/acl-master.json
 /etc/init.d/master
 %exclude /opt/soft/acl-master/conf/service/master_*
 
