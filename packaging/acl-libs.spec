@@ -1,4 +1,4 @@
-%define release_id 86
+%define release_id 87
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -8,8 +8,8 @@ Group:          System/Libs
 License:        IBM
 URL:            http://cdnlog-web.qiyi.domain
 Packager:       Zhang Qiang <qiangzhang@qiyi.com>, Wang Haibin <wanghaibin@qiyi.com>
-Source2:        acl-master.json
-Source3:        acl-tools.json
+#Source2:        acl-master.json
+#Source3:        acl-tools.json
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
 Source:         http://example.com/%{name}-%{version}.tar.gz
 
@@ -55,8 +55,8 @@ make -C lib_fiber packinstall  DESTDIR=$RPM_BUILD_ROOT
 
 mkdir -p $RPM_BUILD_ROOT/opt/soft/services/
 
-install -m 644 %{SOURCE2} $RPM_BUILD_ROOT/opt/soft/services/
-install -m 644 %{SOURCE3} $RPM_BUILD_ROOT/opt/soft/services/
+#install -m 644 %{Source2} $RPM_BUILD_ROOT/opt/soft/services/
+#install -m 644 %{Source3} $RPM_BUILD_ROOT/opt/soft/services/
 
 %clean
 rm -rf %{buildroot}
@@ -134,6 +134,9 @@ fi
 /opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Mar 15 2018 zhengshuxin@qiyi.com 3.3.0-87-20180315.14
+- move acl-master.json from acl-master to acl-tools
 
 * Wed Mar 07 2018 zhengshuxin@qiyi.com 3.3.0-86-20180307.13
 - rm acl-tools from CI
