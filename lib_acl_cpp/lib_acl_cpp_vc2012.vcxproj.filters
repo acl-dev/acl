@@ -568,6 +568,15 @@
     <ClCompile Include="src\serialize\gsoner.cpp">
       <Filter>Source Files\serialize</Filter>
     </ClCompile>
+    <ClCompile Include="src\redis\redis_sentinel.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_slave.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_master.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -945,9 +954,6 @@
     <ClInclude Include="include\acl_cpp\connpool\connect_pool.hpp">
       <Filter>Header Files\connpool</Filter>
     </ClInclude>
-    <ClInclude Include="include\acl_cpp\connpool\tcp_readder.hpp">
-      <Filter>Header Files\connpool</Filter>
-    </ClInclude>
     <ClInclude Include="include\acl_cpp\connpool\tcp_reader.hpp">
       <Filter>Header Files\connpool</Filter>
     </ClInclude>
@@ -1172,6 +1178,15 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\serialize\gsoner.hpp">
       <Filter>Header Files\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_sentinel.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_slave.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_master.hpp">
+      <Filter>Header Files\redis</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

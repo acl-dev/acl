@@ -1,6 +1,9 @@
 修改历史列表：
 
 -----------------------------------------------------------------------
+511) 2018.3.19
+511.1) feature: add redis_sentinel class
+
 510) 2018.2.22
 510.1) bugfix: serialize/gsoner.cpp 针对 std::map 类型的数据对象不支持 optional
 

@@ -9,7 +9,6 @@ namespace acl
 {
 
 class redis_client;
-class redis_result;
 
 /**
  * redis Hash(哈希表) 类，本类的实现的主要命令：
