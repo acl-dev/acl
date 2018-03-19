@@ -1,4 +1,4 @@
-%define release_id 87
+%define release_id 88
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -134,6 +134,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Mon Mar 20 2018 zhengshuxin@qiyi.com 3.3.0-88-20180320.10
+- fixed one bug in thread_cond::wait there was one problem when computing timeout
 
 * Thu Mar 15 2018 zhengshuxin@qiyi.com 3.3.0-87-20180315.14
 - move acl-master.json from acl-master to acl-tools
