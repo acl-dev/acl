@@ -67,8 +67,18 @@ private:
 	int  max_;
 };
 
+static void test(void)
+{
+	acl::atomic_long n1(10), n2;
+
+	printf("n1=%lld, n2=%lld\r\n", n1.value(), n2.value());
+	n2 = n1;
+	printf("n1=%lld, n2=%lld\r\n", n1.value(), n2.value());
+}
+
 int main(void)
 {
+	test();
 	acl::atomic_long_test test;
 	test.run();
 

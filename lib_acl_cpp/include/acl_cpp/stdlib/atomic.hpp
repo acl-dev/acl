@@ -38,6 +38,9 @@ public:
 
 protected:
 	void* atomic_;
+
+private:
+	atomic(const atomic&);
 };
 
 class atomic_long : public atomic<long long>
@@ -65,6 +68,11 @@ public:
 	void operator=(long long n)
 	{
 		set(n);
+	}
+
+	void operator=(const atomic_long& n)
+	{
+		set(n.n_);
 	}
 
 	long long operator++()
@@ -109,6 +117,8 @@ public:
 
 private:
 	long long n_;
+
+	atomic_long(const atomic_long& n);
 };
 
 #include "thread.hpp"
