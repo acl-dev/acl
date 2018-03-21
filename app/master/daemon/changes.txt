@@ -1,4 +1,8 @@
 
+
+21) 2017.3.21
+21.1) feature: http_client.cpp 里需要记录客户端发来的命令字
+
 20) 2017.1.31
 20.1) bugfix: master_conf.cpp check_xxx should be override after reloading services' configures.
 

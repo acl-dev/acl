@@ -17,6 +17,8 @@
 #include "type_defs.h"
 #include "service_start.h"
 
+#define CMD	"start"
+
 service_start::service_start(http_client& client)
 : client_(client)
 , proc_count_(0)
@@ -35,7 +37,7 @@ bool service_start::run(acl::json& json)
 		start_res_t res;
 		res.status = 400;
 		res.msg    = "invalid json";
-		client_.reply<start_res_t>(res.status, res);
+		client_.reply<start_res_t>(res.status, CMD, res);
 
 		delete this;
 		return false;
@@ -178,7 +180,7 @@ void service_start::start_finish(void)
 		acl_master_callback_clean(it->first.c_str());
 	}
 
-	client_.reply<start_res_t>(res_.status, res_);
+	client_.reply<start_res_t>(res_.status, CMD, res_);
 	client_.on_finish();
 
 	delete this;

@@ -15,6 +15,8 @@
 #include "manage/http_client.h"
 #include "service_master_config.h"
 
+#define	CMD	"master_config"
+
 bool service_master_config::run(acl::json& json)
 {
 	master_config_req_t req;
@@ -23,7 +25,7 @@ bool service_master_config::run(acl::json& json)
 	if (deserialize<master_config_req_t>(json, req) == false) {
 		res.status = 400;
 		res.msg    = "invalid json";
-		client_.reply<master_config_res_t>(res.status, res);
+		client_.reply<master_config_res_t>(res.status, CMD, res);
 		return false;
 	}
 
@@ -48,7 +50,7 @@ bool service_master_config::run(acl::json& json)
 	res.data[ACL_VAR_MASTER_START_TIMEO] =
 		acl::string::parse_int(acl_var_master_start_timeo);
 
-	client_.reply<master_config_res_t>(res.status, res, false);
+	client_.reply<master_config_res_t>(res.status, CMD, res, false);
 	client_.on_finish();
 
 	return true;

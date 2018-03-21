@@ -15,6 +15,8 @@
 #include "manage/http_client.h"
 #include "service_stat.h"
 
+#define	CMD	"stat"
+
 bool service_stat::stat_one(const char* path, serv_info_t& info)
 {
 	ACL_MASTER_SERV *serv = acl_master_lookup(path);
@@ -80,7 +82,7 @@ bool service_stat::run(acl::json& json)
 	if (deserialize<stat_req_t>(json, req) == false) {
 		res.status = 400;
 		res.msg    = "invalid json";
-		client_.reply<stat_res_t>(res.status, res);
+		client_.reply<stat_res_t>(res.status, CMD, res);
 		return false;
 	}
 
@@ -110,7 +112,7 @@ bool service_stat::handle(const stat_req_t& req, stat_res_t& res)
 			(int) n, (int) req.data.size());
 	}
 
-	client_.reply<stat_res_t>(res.status, res, false);
+	client_.reply<stat_res_t>(res.status, CMD, res, false);
 	client_.on_finish();
 
 	return true;

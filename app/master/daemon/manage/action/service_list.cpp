@@ -15,6 +15,8 @@
 #include "manage/http_client.h"
 #include "service_list.h"
 
+#define CMD	"list"
+
 void service_list::add_one(list_res_t& res, const ACL_MASTER_SERV* serv)
 {
 	serv_info_t info;
@@ -73,7 +75,7 @@ bool service_list::run(acl::json& json)
 	if (deserialize<list_req_t>(json, req) == false) {
 		res.status = 400;
 		res.msg    = "invalid json";
-		client_.reply<list_res_t>(res.status, res);
+		client_.reply<list_res_t>(res.status, CMD, res);
 		return false;
 	}
 
@@ -90,7 +92,7 @@ bool service_list::handle(const list_req_t&, list_res_t& res)
 	res.status = 200;
 	res.msg    = "ok";
 
-	client_.reply<list_res_t>(res.status, res, false);
+	client_.reply<list_res_t>(res.status, CMD, res, false);
 	client_.on_finish();
 
 	return true;

@@ -15,6 +15,8 @@
 #include "manage/http_client.h"
 #include "service_kill.h"
 
+#define CMD	"kill"
+
 bool service_kill::kill_one(const char* path, kill_res_data_t& data)
 {
 	if (acl_master_kill(path) < 0) {
@@ -34,7 +36,7 @@ bool service_kill::run(acl::json& json)
 	if (deserialize<kill_req_t>(json, req) == false) {
 		res.status = 400;
 		res.msg    = "invalid json";
-		client_.reply<kill_res_t>(res.status, res);
+		client_.reply<kill_res_t>(res.status, CMD, res);
 		return false;
 	}
 
@@ -66,7 +68,7 @@ bool service_kill::handle(const kill_req_t& req, kill_res_t& res)
 			(int) n, (int) req.data.size());
 	}
 
-	client_.reply<kill_res_t>(res.status, res);
+	client_.reply<kill_res_t>(res.status, CMD, res);
 	client_.on_finish();
 
 	return true;

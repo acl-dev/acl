@@ -127,7 +127,8 @@ int http_client::on_body(int status, char *data, int dlen, void *ctx)
 	return 0;
 }
 
-void http_client::do_reply(int status, const acl::string& body, bool save)
+void http_client::do_reply(int status, const char* cmd,
+	const acl::string& body, bool save)
 {
 	HTTP_HDR_RES* hdr_res = http_hdr_res_static(status);
 	http_hdr_set_keepalive(hdr_req_, hdr_res);
@@ -140,7 +141,7 @@ void http_client::do_reply(int status, const acl::string& body, bool save)
 	buf.append(body);
 
 	if (save)
-		logger(">>reply: [%s]\r\n", buf.c_str());
+		logger("cmd=[%s], reply: [%s]", cmd, buf.c_str());
 	acl_aio_writen(conn_, buf.c_str(), (int) buf.size());
 }
 
@@ -167,7 +168,7 @@ bool http_client::handle(void)
 	if (cmd == NULL || *cmd == 0) {
 		//logger_error("cmd null");
 		acl::string dummy;
-		do_reply(400, dummy, false);
+		do_reply(400, "none", dummy, false);
 		if (hdr_req_->hdr.keep_alive)
 			wait();
 		else
@@ -187,7 +188,7 @@ bool http_client::handle(void)
 	if (handlers[i].handler == NULL) {
 		logger_warn("invalid cmd=%s", cmd);
 		acl::string dummy;
-		do_reply(400, dummy, false);
+		do_reply(400, "unknown", dummy, false);
 		if (hdr_req_->hdr.keep_alive)
 			wait();
 		else
