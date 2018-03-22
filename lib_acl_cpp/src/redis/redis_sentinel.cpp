@@ -4,10 +4,10 @@
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
 #include "acl_cpp/redis/redis_result.hpp"
-#endif
-#include "acl_cpp/redis/redis_result.hpp"
+#include "acl_cpp/redis/redis_slave.hpp"
 #include "acl_cpp/redis/redis_master.hpp"
 #include "acl_cpp/redis/redis_sentinel.hpp"
+#endif
 
 namespace acl
 {

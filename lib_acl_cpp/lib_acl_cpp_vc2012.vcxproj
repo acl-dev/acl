@@ -516,6 +516,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include="src\redis\redis_pubsub.cpp" />
     <ClCompile Include="src\redis\redis_request.cpp" />
     <ClCompile Include="src\redis\redis_result.cpp" />
+    <ClCompile Include="src\redis\redis_role.cpp" />
     <ClCompile Include="src\redis\redis_script.cpp" />
     <ClCompile Include="src\redis\redis_sentinel.cpp" />
     <ClCompile Include="src\redis\redis_server.cpp" />
@@ -698,6 +699,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\redis\redis_node.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_pubsub.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_result.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_role.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_script.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_sentinel.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis_server.hpp" />

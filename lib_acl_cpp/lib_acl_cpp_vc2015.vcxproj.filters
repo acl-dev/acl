@@ -436,6 +436,12 @@
     <ClCompile Include="src\redis\redis_result.cpp">
       <Filter>Source Files\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\redis\redis_role.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_sentinel.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
     <ClCompile Include="src\redis\redis_client.cpp">
       <Filter>Source Files\redis</Filter>
     </ClCompile>
@@ -446,6 +452,12 @@
       <Filter>Source Files\redis</Filter>
     </ClCompile>
     <ClCompile Include="src\redis\redis_list.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_master.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_slave.cpp">
       <Filter>Source Files\redis</Filter>
     </ClCompile>
     <ClCompile Include="src\redis\redis_string.cpp">
@@ -1029,6 +1041,12 @@
     <ClInclude Include="include\acl_cpp\redis\redis_result.hpp">
       <Filter>Header Files\redis</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_role.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_sentinel.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_hash.hpp">
       <Filter>Header Files\redis</Filter>
     </ClInclude>
@@ -1036,6 +1054,12 @@
       <Filter>Header Files\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_list.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_master.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_slave.hpp">
       <Filter>Header Files\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_string.hpp">

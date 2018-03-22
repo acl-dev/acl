@@ -188,6 +188,10 @@
 #include "redis/redis_slot.hpp"
 #include "redis/redis_node.hpp"
 #include "redis/redis_geo.hpp"
+#include "redis/redis_slave.hpp"
+#include "redis/redis_master.hpp"
+#include "redis/redis_sentinel.hpp"
+#include "redis/redis_role.hpp"
 #include "redis/redis.hpp"
 
 #include "disque/disque.hpp"

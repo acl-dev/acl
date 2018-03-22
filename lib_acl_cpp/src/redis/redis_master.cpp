@@ -2,7 +2,6 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/redis/redis_master.hpp"
 #endif
-#include "acl_cpp/redis/redis_master.hpp"
 
 namespace acl
 {

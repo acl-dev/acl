@@ -906,6 +906,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_master.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_node.cpp"
 					>
 				</File>
@@ -926,6 +930,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_role.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_sentinel.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_script.cpp"
 					>
 				</File>
@@ -935,6 +947,10 @@
 				</File>
 				<File
 					RelativePath=".\src\redis\redis_set.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_slave.cpp"
 					>
 				</File>
 				<File
@@ -1704,6 +1720,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\redis\redis_master.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\redis\redis_node.hpp"
 					>
 				</File>
@@ -1716,6 +1736,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\redis\redis_role.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_sentinel.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\redis\redis_script.hpp"
 					>
 				</File>
@@ -1725,6 +1753,10 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_set.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_slave.hpp"
 					>
 				</File>
 				<File

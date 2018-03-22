@@ -818,6 +818,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\redis\redis_list.cpp">
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_master.cpp">
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_node.cpp">
 				</File>
 				<File
@@ -833,6 +836,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\redis\redis_result.cpp">
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_role.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_sentinel.cpp">
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_script.cpp">
 				</File>
 				<File
@@ -840,6 +849,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\src\redis\redis_set.cpp">
+				</File>
+				<File
+					RelativePath=".\src\redis\redis_slave.cpp">
 				</File>
 				<File
 					RelativePath=".\src\redis\redis_slot.cpp">
@@ -1450,6 +1462,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\acl_cpp\redis\redis_list.hpp">
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\redis\redis_master.hpp">
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\redis\redis_node.hpp">
 				</File>
 				<File
@@ -1459,6 +1474,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\acl_cpp\redis\redis_result.hpp">
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\redis\redis_role.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_sentinel.hpp">
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\redis\redis_script.hpp">
 				</File>
 				<File
@@ -1466,6 +1487,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_set.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_slave.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_slot.hpp">

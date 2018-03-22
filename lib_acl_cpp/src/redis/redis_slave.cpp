@@ -2,7 +2,6 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/redis/redis_slave.hpp"
 #endif
-#include "acl_cpp/redis/redis_slave.hpp"
 
 namespace acl
 {

@@ -442,6 +442,12 @@
     <ClCompile Include="src\redis\redis_list.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\redis\redis_master.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_slave.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
     <ClCompile Include="src\redis\redis_cluster.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
@@ -467,6 +473,12 @@
       <Filter>src\redis</Filter>
     </ClCompile>
     <ClCompile Include="src\redis\redis_request.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_role.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_sentinel.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
     <ClCompile Include="src\redis\redis_script.cpp">
@@ -1029,6 +1041,12 @@
     <ClInclude Include="include\acl_cpp\redis\redis_list.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_master.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_slave.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_cluster.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
@@ -1051,6 +1069,12 @@
       <Filter>include\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_pubsub.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_role.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_sentinel.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_script.hpp">
