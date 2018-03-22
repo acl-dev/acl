@@ -90,7 +90,7 @@ class ACL_CPP_API redis_role : virtual public redis_command
 public:
 	redis_role(void);
 	redis_role(redis_client* conn);
-	virtual ~redis_role(void);
+	virtual ~redis_role(void) {}
 
 	bool role(void);
 	const redis_role4master& get_role4master(void) const
