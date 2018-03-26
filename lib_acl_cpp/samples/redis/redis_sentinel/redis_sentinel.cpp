@@ -42,7 +42,7 @@ static void usage(const char* procname)
 	       "-s sentinel_addr[127.0.0.1:6379]\r\n"
 	       "-C connect_timeout[default: 10]\r\n"
 	       "-T rw_timeout[default: 10]\r\n"
-	       "-a cmd[master]\r\n",
+	       "-a cmd[master|masters]\r\n",
 		procname);
 }
 
