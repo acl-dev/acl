@@ -114,6 +114,7 @@ if (${UNIX_OS})
 elseif (${WIN_OS})
 	add_definitions(
 		"-Yc"
+		"-D_WINSOCK_DEPRECATED_NO_WARNINGS"
 		"-DACL_WRITEABLE_CHECK"
 		"-DACL_PREPARE_COMPILE")
 endif()

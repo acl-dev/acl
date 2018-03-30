@@ -129,6 +129,10 @@ elseif (${WIN_OS})
 		"-DACL_WRITEABLE_CHECK"
 		"-DACL_PREPARE_COMPILE"
 		"-DHAS_ZLIB_DLL"
+		"-DHAS_MYSQL_DLL"
+		"-DHAS_SQLITE_DLL"
+		"-DHAS_PGSQL_DLL"
+		"-DHAS_POLARSSL_DLL"
 		"-DUSE_WIN_ICONV")
 	aux_source_directory(${src}/stdlib/internal lib_src)
 endif()
