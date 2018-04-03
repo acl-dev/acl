@@ -38,6 +38,7 @@
 #include "stdlib/bitmap.hpp"
 
 #include "serialize/gsoner.hpp"
+#include "serialize/gson_helper.ipp"
 
 #include "memcache/memcache.hpp"
 #include "memcache/memcache_pool.hpp"
