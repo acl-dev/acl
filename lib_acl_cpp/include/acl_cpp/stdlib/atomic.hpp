@@ -61,7 +61,7 @@ public:
 		return n_;
 	}
 
-	long long value(void)
+	long long value(void) const
 	{
 		return n_;
 	}
