@@ -47,6 +47,7 @@ class atomic_long : public atomic<long long>
 {
 public:
 	atomic_long(long long n = 0);
+	atomic_long(const atomic_long& n);
 
 	~atomic_long(void) {}
 
@@ -117,8 +118,6 @@ public:
 
 private:
 	long long n_;
-
-	atomic_long(const atomic_long& n);
 };
 
 #include "thread.hpp"

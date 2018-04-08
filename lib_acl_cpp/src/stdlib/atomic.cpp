@@ -39,6 +39,12 @@ atomic_long::atomic_long(long long n)
 	acl_atomic_int64_set((ACL_ATOMIC*) atomic_, n);
 }
 
+atomic_long::atomic_long(const atomic_long& n)
+: atomic<long long>(&n_)
+{
+	acl_atomic_int64_set((ACL_ATOMIC*) atomic_, n.value());
+}
+
 void atomic_long::set(long long n)
 {
 	acl_atomic_int64_set((ACL_ATOMIC*) atomic_, n);
