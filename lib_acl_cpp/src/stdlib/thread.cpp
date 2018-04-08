@@ -72,6 +72,11 @@ bool thread::start()
 	acl_pthread_attr_t attr;
 	acl_pthread_attr_init(&attr);
 
+	// 当一个线程对象被重复使用时，为了防止 wait(void** out /* = NULL */)
+	// 执行时 logger_warn("pthread_josin's arg invalid?") 报错
+	// --- by 562351190@qq.com 
+	thread_id_ = 0;
+
 	if (detachable_)
 		acl_pthread_attr_setdetachstate(&attr, 1);
 	if (stack_size_ > 0)
