@@ -180,7 +180,7 @@ static const char *xml_parse_cdata(ACL_XML *xml, const char *data)
 	&& (*(x + 2) == 'D' || *(x + 2) == 'd') \
 	&& (*(x + 3) == 'A' || *(x + 3) == 'a') \
 	&& (*(x + 4) == 'T' || *(x + 4) == 't') \
-	&& (*(x + 5) == 'A' || *(x + 5) == 't') \
+	&& (*(x + 5) == 'A' || *(x + 5) == 'a') \
 	&& *(x + 6) == '[')
 
 #define CDATA_S sizeof("[CDATA[") - 1
