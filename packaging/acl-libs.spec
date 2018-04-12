@@ -13,7 +13,6 @@ Packager:       Zhang Qiang <qiangzhang@qiyi.com>, Wang Haibin <wanghaibin@qiyi.
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
 Source:         http://example.com/%{name}-%{version}.tar.gz
 
-#%define debug_package %{nil}
 %description
 
 One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IOS http://zsxxsz.iteye.com/.
