@@ -6,7 +6,7 @@ Version:        3.3.0
 Release:        %{release_id}
 Group:          System/Libs
 License:        IBM
-URL:            http://cdnlog-web.qiyi.domain
+URL:            https://github.com/acl-dev/
 Packager:       Zhang Qiang <qiangzhang@qiyi.com>, Wang Haibin <wanghaibin@qiyi.com>
 #Source2:        acl-master.json
 #Source3:        acl-tools.json
@@ -16,7 +16,6 @@ Source:         http://example.com/%{name}-%{version}.tar.gz
 %description
 
 One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IOS http://zsxxsz.iteye.com/.
-
 
 %package -n acl-master
 Summary: acl master framework
