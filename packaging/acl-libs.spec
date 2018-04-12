@@ -1,4 +1,4 @@
-%define release_id 88
+%define release_id 89
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -13,7 +13,7 @@ Packager:       Zhang Qiang <qiangzhang@qiyi.com>, Wang Haibin <wanghaibin@qiyi.
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
 Source:         http://example.com/%{name}-%{version}.tar.gz
 
-%define debug_package %{nil}
+#%define debug_package %{nil}
 %description
 
 One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IOS http://zsxxsz.iteye.com/.
@@ -134,6 +134,10 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Tue Apr 12 2018 zhengshuxin@qiyi.com 3.3.0-89-20180412.20
+- thread_cond::wait: don't save log when waiting timedout
+- atomic: override constructur of atomic(const atomic&)
 
 * Mon Mar 20 2018 zhengshuxin@qiyi.com 3.3.0-88-20180320.10
 - fixed one bug in thread_cond::wait there was one problem when computing timeout
