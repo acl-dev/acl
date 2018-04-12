@@ -101,7 +101,9 @@ bool thread_cond::wait(long long microseconds /* = -1 */)
 #ifdef ACL_UNIX
 		acl_set_error(ret1);
 #endif
-		logger_error("pthread_cond_timedwait error %s", last_serror());
+		if (ret1 != ACL_ETIMEDOUT)
+			logger_error("pthread_cond_timedwait error %s",
+				last_serror());
 	}
 
 	bool ret2 = mutex_->unlock();
