@@ -22,6 +22,7 @@
 
 /* Utility library. */
 
+#include "stdlib/acl_sys_patch.h"
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_iostuff.h"
 #include "net/acl_sane_inet.h"

@@ -30,8 +30,8 @@ CFLAGS = -c -g -W \
 -Wno-long-long \
 -Wuninitialized \
 -D_POSIX_PTHREAD_SEMANTICS \
--DACL_PREPARE_COMPILE \
 -Winvalid-pch \
+-DACL_PREPARE_COMPILE \
 -DUSE_REUSEPORT \
 #-fstack-protector-all \
 #-DDEBUG_MEM
@@ -81,12 +81,12 @@ endif
 ifeq ($(findstring clang, $(CC)), clang)
 	CFLAGS += -Wstrict-prototypes \
 		  -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof
+		  -Wno-invalid-offsetof
 endif
 
 ifeq ($(findstring clang++, $(CC)), clang)
 	CFLAGS += -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof
+		  -Wno-invalid-offsetof
 endif
 
 # For FreeBSD
@@ -98,7 +98,7 @@ endif
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof
+		  -Wno-invalid-offsetof
 	UNIXTYPE = MACOSX
 	RPATH = macos
 endif

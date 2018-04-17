@@ -18,6 +18,7 @@
 #endif
 
 #include "stdlib/acl_sys_patch.h"
+#include "stdlib/acl_iostuff.h"
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_mystring.h"
 #include "stdlib/acl_msg.h"

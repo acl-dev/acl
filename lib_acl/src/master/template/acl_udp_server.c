@@ -31,6 +31,7 @@
 
 /* Utility library. */
 
+#include "init/acl_init.h"
 #include "stdlib/acl_msg.h"
 #include "stdlib/unix/acl_chroot_uid.h"
 #include "stdlib/unix/acl_core_limit.h"

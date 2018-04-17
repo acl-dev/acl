@@ -2,7 +2,11 @@
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
+#include "stdlib/acl_define.h"
+
 #ifdef	ACL_UNIX
+#include <sys/stat.h>
+#include <sys/un.h>
 #include <sys/socket.h>
 #include <netinet/tcp.h>
 #include <netinet/in.h>
@@ -10,9 +14,9 @@
 #include <string.h>
 #endif
 
-#include "stdlib/acl_define.h"
 #include "stdlib/acl_sys_patch.h"
 #include "stdlib/acl_msg.h"
+#include "stdlib/acl_mystring.h"
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_iostuff.h"
 #include "net/acl_host_port.h"
@@ -69,7 +73,6 @@ ACL_SOCKET acl_inet_bind(const struct addrinfo *res, unsigned flag)
 #ifdef ACL_UNIX
 ACL_SOCKET acl_unix_dgram_bind(const char *addr, unsigned flag)
 {
-#undef sun
 	struct sockaddr_un sun;
 	int len = (int) strlen(addr);
 	ACL_SOCKET sock;

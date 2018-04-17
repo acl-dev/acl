@@ -75,7 +75,7 @@ endif
 
 ifeq ($(findstring clang++, $(CC)), clang++)
 	CFLAGS += -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof
+		  -Wno-invalid-offsetof
 endif
 
 # For FreeBSD
@@ -88,7 +88,7 @@ endif
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof \
+		  -Wno-invalid-offsetof \
 		  -Wno-unused-private-field
 	CFLAGS += -Wshadow
 	UNIXTYPE = MACOSX

@@ -12,7 +12,9 @@
 #include <linux/rtnetlink.h>
 
 #include "stdlib/acl_msg.h"
+#include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_vstream.h"
+#include "stdlib/acl_iostuff.h"
 #include "ifmonitor.h"
 
 typedef struct NETLINK_CTX {

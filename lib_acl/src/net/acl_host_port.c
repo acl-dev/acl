@@ -17,6 +17,7 @@
 
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_split_at.h"
+#include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_stringops.h"
 
 #include "net/acl_valid_hostname.h"
