@@ -60,9 +60,23 @@ int acl_fiber_scheduled(void)
 static void thread_free(void *ctx)
 {
 	THREAD *tf = (THREAD *) ctx;
+	RING *head;
+	ACL_FIBER *fiber;
+	unsigned int i;
 
 	if (__thread_fiber == NULL) {
 		return;
+	}
+
+	/* free fiber object in the dead fibers link */
+	while ((head = ring_pop_head(&__thread_fiber->dead))) {
+		fiber = RING_TO_APPL(head, ACL_FIBER, me);
+		fiber_free(fiber);
+	}
+
+	/* free all possible aliving fiber object */
+	for (i = 0; i < __thread_fiber->slot; i++) {
+		fiber_free(__thread_fiber->fibers[i]);
 	}
 
 	if (tf->fibers) {
@@ -75,6 +89,7 @@ static void thread_free(void *ctx)
 	if (__main_fiber == __thread_fiber) {
 		__main_fiber = NULL;
 	}
+
 	__thread_fiber = NULL;
 }
 
@@ -303,7 +318,7 @@ static void fiber_kick(int max)
 		if (head == NULL) {
 			break;
 		}
-		fiber = RING_TO_APPL(head, ACL_FIBER,me);
+		fiber = RING_TO_APPL(head, ACL_FIBER, me);
 		fiber_free(fiber);
 		max--;
 	}
