@@ -540,6 +540,9 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include="src\stdlib\charset_conv.cpp" />
     <ClCompile Include="src\stdlib\dbuf_pool.cpp" />
     <ClCompile Include="src\stdlib\dns_service.cpp" />
+    <ClCompile Include="src\stdlib\diff_manager.cpp" />
+    <ClCompile Include="src\stdlib\diff_object.cpp" />
+    <ClCompile Include="src\stdlib\diff_string.cpp" />
     <ClCompile Include="src\stdlib\escape.cpp" />
     <ClCompile Include="src\stdlib\internal\win_iconv.cpp" />
     <ClCompile Include="src\stdlib\json.cpp" />
@@ -723,6 +726,9 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stdlib\charset_conv.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\dbuf_pool.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\dns_service.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\diff_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\diff_object.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\diff_string.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\escape.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\final_tpl.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\json.hpp" />

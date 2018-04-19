@@ -358,6 +358,15 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\stdlib\dns_service.cpp">
 				</File>
 				<File
+					RelativePath=".\src\stdlib\diff_manager.cpp">
+				</File>
+				<File
+					RelativePath=".\src\stdlib\diff_object.cpp">
+				</File>
+				<File
+					RelativePath=".\src\stdlib\diff_string.cpp">
+				</File>
+				<File
 					RelativePath=".\src\stdlib\escape.cpp">
 					<FileConfiguration
 						Name="Debug|Win32">
@@ -1095,6 +1104,15 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\dns_service.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\diff_manager.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\diff_object.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\diff_string.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\escape.hpp">

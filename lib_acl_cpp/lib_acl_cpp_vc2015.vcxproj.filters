@@ -133,6 +133,15 @@
     <ClCompile Include="src\stdlib\dns_service.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\diff_manager.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\diff_object.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\diff_string.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
     <ClCompile Include="src\stdlib\locker.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
@@ -802,6 +811,15 @@
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\dns_service.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\diff_manager.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\diff_object.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\diff_string.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\escape.hpp">

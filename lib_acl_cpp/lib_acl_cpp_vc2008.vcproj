@@ -1010,6 +1010,18 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stdlib\diff_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\stdlib\diff_object.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\stdlib\diff_string.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stdlib\escape.cpp"
 					>
 				</File>
@@ -1813,6 +1825,18 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\dns_service.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\diff_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\diff_object.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\diff_string.hpp"
 					>
 				</File>
 				<File
