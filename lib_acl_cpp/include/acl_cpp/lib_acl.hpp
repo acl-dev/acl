@@ -36,6 +36,9 @@
 #include "stdlib/trigger.hpp"
 #include "stdlib/atomic.hpp"
 #include "stdlib/bitmap.hpp"
+#include "stdlib/diff_object.hpp"
+#include "stdlib/diff_string.hpp"
+#include "stdlib/diff_manager.hpp"
 
 #include "serialize/gsoner.hpp"
 #include "serialize/gson_helper.ipp"
