@@ -43,11 +43,11 @@ public:
 
 	/**
 	 * 是否是不在给定区间范围（闭区间）的多余数据
-	 * @param from {long long} 起始位置（1970.1.1 以来的秒数）
-	 * @param to {long long} 结束位置（1970.1.1 以来的秒数）
+	 * @param range_from {long long} 起始位置
+	 * @param range_to {long long} 结束位置
 	 * @return {bool} 是否是超过给定区间范围的多余数据对象
 	 */
-	virtual bool check_range(long long range_from, time_t range_to) const
+	virtual bool check_range(long long range_from, long long range_to) const
 	{
 		(void) range_from;
 		(void) range_to;
