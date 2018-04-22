@@ -45,6 +45,11 @@
 #include <sys/resource.h>
 #include <ucontext.h>
 
+#if defined(__APPLE__)
+# include <sys/types.h>
+# include <sys/uio.h>
+#endif
+
 #define STRDUP strdup
 #define GETPID getpid
 

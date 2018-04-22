@@ -11,6 +11,12 @@
 # define HAS_SELECT
 # define HAS_POLL
 # define HAS_KQUEUE
+#elif defined(__APPLE__)
+# define SYS_UNIX
+# define HAS_SELECT
+# define HAS_POLL
+# define HAS_KQUEUE
+# define _XOPEN_SOURCE
 #elif defined(_WIN32) || defined(_WIN64)
 # if(_MSC_VER >= 1300)
 #  undef FD_SETSIZE

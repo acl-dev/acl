@@ -76,7 +76,8 @@ endif
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof
+		  -Wno-extended-offsetof \
+		  -Wno-deprecated-declarations
 endif
 
 # For Linux

@@ -302,7 +302,7 @@ unsigned long __pthread_self(void)
 	return GetCurrentThreadId();
 }
 
-#elif	defined(__linux__)
+#elif	defined(__linux__) || defined(__APPLE__)
 unsigned long __pthread_self(void)
 {
 	return (unsigned long) pthread_self();
