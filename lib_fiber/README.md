@@ -2,14 +2,15 @@
 本网络协程库的协程部分是基于 Russ Cox (golang 的协程作者) 在 2005 年实现的 libtask，libtask 实现了协程编程的基本原型，lib_fiber 一方面使协程编程接口更加简单易用(用户可以直接调用 acl_fiber_create 创建协程)，另一方面 lib_fiber 实现了线程安全的协程库，通过给每个线程一个独立的协程调度器，从而方便用户使用多核，此外，lib_fiber 还增加了基于协程的信号量、协程局部变量等功能。
 
 本协程库支持的平台有：Linux/FreeBSD/MacOS/Windows，支持的事件引擎如下：  
-Event|Linux|BSD|Mac|Windows
------|----|------|---|---
-<b>select</b>|yes|yes|yes|yes
-<b>poll</b>|yes|yes|yes|yes
-<b>epoll</b>|yes|no|no|no
-<b>kqueue</b>|no|yes|yes|no
-<b>iocp</b>|no|no|no|yes
-<b>Win GUI message</b>|no|no|no|yes
+
+|Event|Linux|BSD|Mac|Windows|
+|-----|----|------|---|---|
+|<b>select</b>|yes|yes|yes|yes|
+|<b>poll</b>|yes|yes|yes|yes|
+|<b>epoll</b>|yes|no|no|no|
+|<b>kqueue</b>|no|yes|yes|no|
+|<b>iocp</b>|no|no|no|yes|
+|<b>Win GUI message</b>|no|no|no|yes|
 
 ### 示例一  
 下面是一个简单使用网络协程库编写的一个**简单的高并发服务器**：  
