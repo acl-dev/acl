@@ -97,7 +97,7 @@ all_lib:
 #	@(cd lib_acl_cpp; make pch)
 	@(cd lib_acl_cpp; make $(MAKE_ARGS))
 	@(cd lib_rpc; make $(MAKE_ARGS))
-	@if test "$(OSNAME)" = "Linux" -o "$(OSNAME)" = "FreeBSD"; then cd lib_fiber; make; fi
+	@if test "$(OSNAME)" = "Linux" -o "$(OSNAME)" = "FreeBSD" -o "$(OSNAME)" = "Darwin"; then cd lib_fiber; make; fi
 all_samples: all_lib
 	@(cd unit_test; make $(MAKE_ARGS))
 	@(cd lib_acl/samples; make)
