@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
 }
 ```
 
-###示例二  
+### 示例二  
 上面的例子中因为使用了系统原生的网络 API，所以感觉代码有些臃肿，下面的例子使用 acl 库中提供的网络 API，显得更为简单些：
 ```c++
 #include "stdafx.h"
@@ -343,7 +343,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 ```
-###示例三  
+### 示例三  
 如果使用C++11的特性，则示例二会更为简单，如下：
 ```c++
 #include "stdafx.h"
@@ -431,7 +431,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 ```
-###参考  
+### 参考  
 
  - 网络协程编程：http://zsxxsz.iteye.com/blog/2312043     
  - 用协程编写高并发网络服务：http://zsxxsz.iteye.com/blog/2309654    
