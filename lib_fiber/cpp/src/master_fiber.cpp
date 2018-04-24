@@ -61,8 +61,9 @@ bool master_fiber::run_alone(const char* addrs, const char* path /* = NULL */)
 
 	int  argc = 0;
 	const char *argv[9];
+	const char *file_path = acl_process_path();
 
-	argv[argc++] = acl_process_path();
+	argv[argc++] = file_path ? file_path : "unknown";
 	argv[argc++] = "-L";
 	argv[argc++] = addrs;
 	if (path && *path)

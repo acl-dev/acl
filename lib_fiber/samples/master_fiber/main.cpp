@@ -74,9 +74,10 @@ protected:
 	}
 
 	// @override
-	void proc_on_sighup(void)
+	bool proc_on_sighup(acl::string&)
 	{
 		acl_msg_info(">>>proc_on_sighup<<<");
+		return true;
 	}
 };
 
@@ -96,7 +97,7 @@ int main(int argc, char *argv[])
 
 	if (argc >= 2 && strcasecmp(argv[1], "alone") == 0)
 	{
-		const char* addr = ":9001";
+		const char* addr = "0.0.0.0:9001";
 
 		printf("listen: %s\r\n", addr);
 		mf.run_alone(addr, argc >= 3 ? argv[2] : NULL);

@@ -107,7 +107,7 @@ static void fiber_server(ACL_FIBER *fiber, void *ctx acl_unused)
 		else
 			printf("----accept one client ----\r\n");
 
-		acl_fiber_create(fiber_client, conn, 32000);
+		acl_fiber_create(fiber_client, conn, 320000);
 	}
 
 	acl_vstream_close(server);
@@ -177,15 +177,15 @@ int main(int argc, char *argv[])
 	sem = acl_fiber_sem_create(0);
 	lock = acl_fiber_mutex_create();
 
-	__fiber_wait1  = acl_fiber_create(fiber_wait, sem, 32000);
-	__fiber_wait2  = acl_fiber_create(fiber_wait, sem, 32000);
-	__fiber_sleep  = acl_fiber_create(fiber_sleep, sem, 32000);
-	__fiber_server = acl_fiber_create(fiber_server, NULL, 32000);
-	__fiber_lock1  = acl_fiber_create(fiber_lock, lock, 32000);
-	__fiber_lock2  = acl_fiber_create(fiber_lock, lock, 32000);
+	__fiber_wait1  = acl_fiber_create(fiber_wait, sem, 320000);
+	__fiber_wait2  = acl_fiber_create(fiber_wait, sem, 320000);
+	__fiber_sleep  = acl_fiber_create(fiber_sleep, sem, 320000);
+	__fiber_server = acl_fiber_create(fiber_server, NULL, 320000);
+	__fiber_lock1  = acl_fiber_create(fiber_lock, lock, 320000);
+	__fiber_lock2  = acl_fiber_create(fiber_lock, lock, 320000);
 
-	__fiber_sleep2 = acl_fiber_create(fiber_sleep2, NULL, 32000);
-	acl_fiber_create(fiber_killer, NULL, 32000);
+	__fiber_sleep2 = acl_fiber_create(fiber_sleep2, NULL, 320000);
+	acl_fiber_create(fiber_killer, NULL, 320000);
 
 	acl_fiber_schedule();
 	acl_fiber_sem_free(sem);

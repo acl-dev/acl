@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 	sem = acl_fiber_sem_create(sem_max);
 
 	for (i = 0; i < nfibers; i++)
-		acl_fiber_create(fiber_main, sem, 32000);
+		acl_fiber_create(fiber_main, sem, 320000);
 
 	acl_fiber_schedule();
 	acl_fiber_sem_free(sem);

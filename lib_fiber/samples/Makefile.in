@@ -8,7 +8,6 @@ CFLAGS = -c -g -W \
 -Wno-long-long \
 -Wmissing-prototypes \
 -Wpointer-arith \
--Werror \
 -Wshadow \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \

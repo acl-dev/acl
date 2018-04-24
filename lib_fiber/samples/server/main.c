@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include "fiber/lib_fiber.h"
 
-static int __stack_size = 32000;
+static int __stack_size = 320000;
 static int __rw_timeout = 0;
 static int __echo_data  = 0;
 
@@ -147,11 +147,11 @@ int main(int argc, char *argv[])
 	printf("listen %s ok\r\n", addr);
 
 	printf("%s: call fiber_creater\r\n", __FUNCTION__);
-	acl_fiber_create(fiber_accept, sstream, 32768);
+	acl_fiber_create(fiber_accept, sstream, 327680);
 
 	if (enable_sleep) {
-		acl_fiber_create(fiber_sleep_main, NULL, 32768);
-		acl_fiber_create(fiber_sleep2_main, NULL, 32768);
+		acl_fiber_create(fiber_sleep_main, NULL, 327680);
+		acl_fiber_create(fiber_sleep2_main, NULL, 327680);
 	}
 
 	printf("call fiber_schedule\r\n");

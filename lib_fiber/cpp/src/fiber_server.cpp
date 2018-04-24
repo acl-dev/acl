@@ -162,9 +162,10 @@ static void thread_fiber_accept(ACL_FIBER *fiber, void *ctx)
 			continue;
 
 		acl_msg_error("%s(%d), %s: accept error: %s(%d, %d), maxfd: %d"
-			", lastfd: %d, stoping ...", __FILE__, __LINE__,
-			__FUNCTION__, acl_last_serror(), errno, ACL_EAGAIN,
-			__max_fd, __last_fd);
+			", lastfd: %d, listenfd: %d, stoping ...",
+			__FILE__, __LINE__, __FUNCTION__,
+			acl_last_serror(), errno, ACL_EAGAIN,
+			__max_fd, __last_fd, ACL_VSTREAM_SOCK(sstream));
 
 		acl_fiber_sleep(1);
 	}
@@ -887,11 +888,15 @@ void acl_fiber_server_main(int argc, char *argv[],
 
 	__conf_file[0] = 0;
 
+#ifndef __APPLE__
+
 #if !defined(_WIN32) && !defined(_WIN64)
 	opterr = 0;
 #endif
 	optind = 0;
 	optarg = 0;
+
+#endif
 
 	while ((c = getopt(__argc, __argv, "Hc:n:s:t:uf:L:")) > 0) {
 		switch (c) {

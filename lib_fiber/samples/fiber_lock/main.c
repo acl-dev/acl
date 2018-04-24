@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	__fibers_count = n;
 
 	for (i = 0; i < n; i++)
-		acl_fiber_create(fiber_main, l, 32000);
+		acl_fiber_create(fiber_main, l, 320000);
 
 	acl_fiber_schedule();
 	acl_fiber_mutex_free(l);

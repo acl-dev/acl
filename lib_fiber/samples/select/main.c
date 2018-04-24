@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
 	/* 循环创建指定数量的协程 */
 	for (i = 0; i < __nfibers; i++)
-		acl_fiber_create(fiber_main, &n, 32768);
+		acl_fiber_create(fiber_main, &n, 327680);
 
 	/* 开始调度协程过程 */
 	acl_fiber_schedule();

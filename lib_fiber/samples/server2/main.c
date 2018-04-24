@@ -34,7 +34,7 @@ static int  __listen_port = 9001;
 static int  __listen_qlen = 64;
 static int  __rw_timeout = 0;
 static int  __echo_data  = 1;
-static int  __stack_size = 32000;
+static int  __stack_size = 320000;
 
 static int check_read(int fd, int timeout)
 {
@@ -269,10 +269,10 @@ int main(int argc, char *argv[])
 #endif
 
 	printf("%s: call fiber_creater\r\n", __FUNCTION__);
-	acl_fiber_create(fiber_accept, NULL, 32768);
+	acl_fiber_create(fiber_accept, NULL, 327680);
 
 #ifndef	SCHEDULE_AUTO
-	acl_fiber_create(fiber_memcheck, NULL, 64000);
+	acl_fiber_create(fiber_memcheck, NULL, 640000);
 
 	printf("call fiber_schedule\r\n");
 	acl_fiber_schedule_with(event_mode);

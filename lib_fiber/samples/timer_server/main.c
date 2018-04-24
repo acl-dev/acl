@@ -97,7 +97,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 		}
 
 		printf("accept one, fd: %d\r\n", ACL_VSTREAM_SOCK(cstream));
-		acl_fiber_create(echo_client, cstream, 32768);
+		acl_fiber_create(echo_client, cstream, 327680);
 	}
 
 	acl_vstream_close(sstream);
@@ -179,11 +179,11 @@ int main(int argc, char *argv[])
 	acl_non_blocking(ACL_VSTREAM_SOCK(sstream), ACL_NON_BLOCKING);
 
 	printf("%s: call fiber_creater\r\n", __FUNCTION__);
-	acl_fiber_create(fiber_accept, sstream, 32768);
+	acl_fiber_create(fiber_accept, sstream, 327680);
 
 	if (enable_sleep) {
-		acl_fiber_create(fiber_sleep_main, NULL, 32768);
-		acl_fiber_create(fiber_sleep2_main, NULL, 32768);
+		acl_fiber_create(fiber_sleep_main, NULL, 327680);
+		acl_fiber_create(fiber_sleep2_main, NULL, 327680);
 	}
 
 	printf("call fiber_schedule\r\n");

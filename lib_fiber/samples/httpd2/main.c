@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include "fiber/lib_fiber.h"
 
-#define	STACK_SIZE	16000
+#define	STACK_SIZE	160000
 
 static int __rw_timeout = 0;
 

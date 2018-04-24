@@ -5,16 +5,28 @@
 
 #ifdef SYS_UNIX
 
+typedef struct hostent *(*gethostbyname_fn)(const char *);
+static gethostbyname_fn __sys_gethostbyname = NULL;
+
+#ifndef __APPLE__
 typedef int (*gethostbyname_r_fn)(const char *, struct hostent *, char *,
 	size_t, struct hostent **, int *);
 
 static gethostbyname_r_fn __sys_gethostbyname_r = NULL;
+#endif
+
 
 static void hook_api(void)
 {
+	__sys_gethostbyname = (gethostbyname_fn) dlsym(RTLD_NEXT,
+			"gethostbyname");
+	assert(__sys_gethostbyname);
+
+#ifndef __APPLE__
 	__sys_gethostbyname_r = (gethostbyname_r_fn) dlsym(RTLD_NEXT,
 			"gethostbyname_r");
 	assert(__sys_gethostbyname_r);
+#endif
 }
 
 static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
@@ -133,13 +145,28 @@ int acl_fiber_gethostbyname_r(const char *name, struct hostent *ent,
 	size_t ncopied = 0, len, n;
 	struct addrinfo *res;
 
+#ifdef __APPLE__
+	if (__sys_gethostbyname == NULL) {
+#else
 	if (__sys_gethostbyname_r == NULL) {
+#endif
 		hook_init();
 	}
 
 	if (!var_hook_sys_api) {
+#ifdef __APPLE__
+		*result = __sys_gethostbyname(name);
+		if (result == NULL) {
+			if (h_errnop) {
+				*h_errnop = h_errno;
+			}
+			return -1;
+		}
+		return 0;
+#else
 		return __sys_gethostbyname_r ? __sys_gethostbyname_r
 			(name, ent, buf, buflen, result, h_errnop) : -1;
+#endif
 	}
 
 	if (var_dns_conf == NULL || var_dns_hosts == NULL) {
@@ -218,13 +245,16 @@ struct hostent *gethostbyname(const char *name)
 	return acl_fiber_gethostbyname(name);
 }
 
-#ifndef __APPLE__
+#ifdef __APPLE__
+extern int gethostbyname_r(const char *name, struct hostent *ent,
+	char *buf, size_t buflen, struct hostent **result, int *h_errnop);
+#endif
+
 int gethostbyname_r(const char *name, struct hostent *ent,
 	char *buf, size_t buflen, struct hostent **result, int *h_errnop)
 {
 	return acl_fiber_gethostbyname_r(name, ent, buf, buflen,
 			result, h_errnop);
 }
-#endif
 
 #endif /* SYS_UNIX */

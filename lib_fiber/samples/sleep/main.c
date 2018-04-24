@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 	for (i = 1; i <= __fibers_count; i++) {
 		int *n = (int *) acl_mymalloc(sizeof(int));
 		*n = i;
-		acl_fiber_create(sleep_main, n, 32768);
+		acl_fiber_create(sleep_main, n, 327680);
 	}
 
 	acl_fiber_schedule();

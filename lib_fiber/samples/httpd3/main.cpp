@@ -6,7 +6,7 @@
 #include "fiber/lib_fiber.h"
 #include "http_servlet.h"
 
-#define	STACK_SIZE	64000
+#define	STACK_SIZE	320000
 
 static void client_callback(int type, ACL_EVENT *event,
 	ACL_VSTREAM *cstream, void *ctx);
@@ -99,9 +99,9 @@ static void client_callback(int type acl_unused, ACL_EVENT *event,
 	acl_event_disable_readwrite(event, cstream);
 
 	if (__real_http)
-		acl_fiber_create(http_server, cstream, 32000);
+		acl_fiber_create(http_server, cstream, 320000);
 	else
-		acl_fiber_create(echo_client, cstream, 16000);
+		acl_fiber_create(echo_client, cstream, 160000);
 }
 
 static void listen_callback(int type acl_unused, ACL_EVENT *event,

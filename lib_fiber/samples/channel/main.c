@@ -86,10 +86,10 @@ int main(int argc, char *argv[])
 	chan = acl_channel_create(sizeof(unsigned long), nbuf);
 
 	for (i = 0; i < nsenders; i++)
-		acl_fiber_create(fiber_producer, chan, 32000);
+		acl_fiber_create(fiber_producer, chan, 320000);
 
 	for (i = 0; i < nreceivers; i++)
-		acl_fiber_create(fiber_consumer, chan, 32000);
+		acl_fiber_create(fiber_consumer, chan, 320000);
 
 	acl_fiber_schedule();
 

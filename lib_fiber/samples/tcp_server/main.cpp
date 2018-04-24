@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define	 STACK_SIZE	32000
+#define	 STACK_SIZE	320000
 static int __rw_timeout = 0;
 static bool __echo = false;
 

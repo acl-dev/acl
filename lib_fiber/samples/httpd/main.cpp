@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "http_servlet.h"
 
-#define	 STACK_SIZE	32000
+#define	 STACK_SIZE	320000
 static int __rw_timeout = 0;
 static int __schedule_event = FIBER_EVENT_KERNEL;
 
