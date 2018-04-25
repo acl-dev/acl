@@ -136,7 +136,7 @@ static int save_result(struct hostent *ent, struct addrinfo *res,
 		i++;
 	}
 
-	return i;
+	return (int) i;
 }
 
 int acl_fiber_gethostbyname_r(const char *name, struct hostent *ent,

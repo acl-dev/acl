@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:lib_fiber/fiber_cpp.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:lib_fiber/fiber.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:lib_acl/acl.xcodeproj">
    </FileRef>
    <FileRef

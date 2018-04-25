@@ -62,7 +62,7 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 
 	// 创建哈希表，将旧数组中的元素添加进哈希表中
 
-	ACL_HTABLE *htable = acl_htable_create(size * 2 + 1,
+	ACL_HTABLE *htable = acl_htable_create((int) size * 2 + 1,
 			ACL_HTABLE_FLAG_KEY_REUSE);
 
 	for (std::vector<diff_object*>::const_iterator cit = old_objs.begin();

@@ -342,7 +342,7 @@ static int channel_alt(FIBER_ALT a[])
 	 * the guy who ran the op took care of dequeueing us
 	 * and then set a[0].alt to the one that was executed.
 	 */
-	return a[0].xalt - a;
+	return (int) (a[0].xalt - a);
 }
 
 static int channel_op(ACL_CHANNEL *c, int op, void *p, int canblock)

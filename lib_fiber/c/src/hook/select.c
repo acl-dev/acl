@@ -165,7 +165,7 @@ int acl_fiber_select(int nfds, fd_set *readfds, fd_set *writefds,
 	}
 
 	if (timeout != NULL)
-		timo = timeout->tv_sec * 1000 + timeout->tv_usec / 1000;
+		timo = (int) (timeout->tv_sec * 1000 + timeout->tv_usec / 1000);
 	else
 		timo = -1;
 

@@ -340,7 +340,7 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 	fe = fiber_file_open(sockfd);
 
 	if (EVENT_IS_IOCP(fiber_io_event())) {
-		return fiber_iocp_read(fe, buf, len);
+		return fiber_iocp_read(fe, buf, (int) len);
 	}
 
 	while (1) {
@@ -401,7 +401,7 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 	fe = fiber_file_open(sockfd);
 
 	if (EVENT_IS_IOCP(fiber_io_event())) {
-		return fiber_iocp_read(fe, buf, len);
+		return fiber_iocp_read(fe, buf, (int) len);
 	}
 
 	while (1) {

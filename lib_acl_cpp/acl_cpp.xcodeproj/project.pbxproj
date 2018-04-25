@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		070F351420901EE100672EDC /* diff_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 070F351120901EE100672EDC /* diff_manager.cpp */; };
+		070F351520901EE100672EDC /* diff_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 070F351220901EE100672EDC /* diff_object.cpp */; };
+		070F351620901EE100672EDC /* diff_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 070F351320901EE100672EDC /* diff_string.cpp */; };
 		07384F3F1EB99FFF00084CAD /* pgsql_conf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07384F3C1EB99FFF00084CAD /* pgsql_conf.cpp */; };
 		07384F401EB99FFF00084CAD /* pgsql_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07384F3D1EB99FFF00084CAD /* pgsql_manager.cpp */; };
 		07384F411EB99FFF00084CAD /* pgsql_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07384F3E1EB99FFF00084CAD /* pgsql_pool.cpp */; };
@@ -223,6 +226,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		070F350E20901E6B00672EDC /* diff_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = diff_manager.hpp; sourceTree = "<group>"; };
+		070F350F20901E6B00672EDC /* diff_object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = diff_object.hpp; sourceTree = "<group>"; };
+		070F351020901E6B00672EDC /* diff_string.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = diff_string.hpp; sourceTree = "<group>"; };
+		070F351120901EE100672EDC /* diff_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = diff_manager.cpp; sourceTree = "<group>"; };
+		070F351220901EE100672EDC /* diff_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = diff_object.cpp; sourceTree = "<group>"; };
+		070F351320901EE100672EDC /* diff_string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = diff_string.cpp; sourceTree = "<group>"; };
 		07384F391EB99FEB00084CAD /* pgsql_conf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = pgsql_conf.hpp; sourceTree = "<group>"; };
 		07384F3A1EB99FEB00084CAD /* pgsql_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = pgsql_manager.hpp; sourceTree = "<group>"; };
 		07384F3B1EB99FEB00084CAD /* pgsql_pool.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = pgsql_pool.hpp; sourceTree = "<group>"; };
@@ -1018,6 +1027,9 @@
 		07A4678C1E6FCCF1002C9B3C /* stdlib */ = {
 			isa = PBXGroup;
 			children = (
+				070F351120901EE100672EDC /* diff_manager.cpp */,
+				070F351220901EE100672EDC /* diff_object.cpp */,
+				070F351320901EE100672EDC /* diff_string.cpp */,
 				0778DAE91F1CB8EB0011B753 /* bitmap.cpp */,
 				0778DAE41F1CB7150011B753 /* thread_cond.cpp */,
 				0778DAE51F1CB7150011B753 /* thread_mutex.cpp */,
@@ -1415,6 +1427,9 @@
 		07A469191E6FD404002C9B3C /* stdlib */ = {
 			isa = PBXGroup;
 			children = (
+				070F350E20901E6B00672EDC /* diff_manager.hpp */,
+				070F350F20901E6B00672EDC /* diff_object.hpp */,
+				070F351020901E6B00672EDC /* diff_string.hpp */,
 				0778DAEB1F1CC19B0011B753 /* trigger.hpp */,
 				0778DAE81F1CB8C90011B753 /* bitmap.hpp */,
 				0778DAE11F1CB6D50011B753 /* thread_mutex.hpp */,
@@ -1549,6 +1564,7 @@
 				07A467F11E6FCCF1002C9B3C /* http_mime.cpp in Sources */,
 				07A468171E6FCCF1002C9B3C /* tok822_parse.cpp in Sources */,
 				07A468541E6FCCF1002C9B3C /* sha1.cpp in Sources */,
+				070F351420901EE100672EDC /* diff_manager.cpp in Sources */,
 				07A468011E6FCCF1002C9B3C /* ipc_service.cpp in Sources */,
 				07A468631E6FCCF1002C9B3C /* aio_istream.cpp in Sources */,
 				07A467E71E6FCCF1002C9B3C /* hsclient.cpp in Sources */,
@@ -1615,6 +1631,7 @@
 				07A467CA1E6FCCF1002C9B3C /* OptionsRequest.cpp in Sources */,
 				07A467C01E6FCCF1002C9B3C /* acl_cpp_init.cpp in Sources */,
 				07A468021E6FCCF1002C9B3C /* rpc.cpp in Sources */,
+				070F351620901EE100672EDC /* diff_string.cpp in Sources */,
 				07A468071E6FCCF1002C9B3C /* master_threads.cpp in Sources */,
 				07A468211E6FCCF1002C9B3C /* mime_node.cpp in Sources */,
 				07A467FB1E6FCCF1002C9B3C /* HttpServletRequest.cpp in Sources */,
@@ -1736,6 +1753,7 @@
 				07A468351E6FCCF1002C9B3C /* redis_node.cpp in Sources */,
 				07A468611E6FCCF1002C9B3C /* aio_fstream.cpp in Sources */,
 				07A467C71E6FCCF1002C9B3C /* Bucket.cpp in Sources */,
+				070F351520901EE100672EDC /* diff_object.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

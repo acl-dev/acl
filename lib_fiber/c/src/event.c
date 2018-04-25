@@ -82,7 +82,7 @@ const char *event_name(EVENT *ev)
 
 int event_handle(EVENT *ev)
 {
-	return ev->handle(ev);
+	return (int) ev->handle(ev);
 }
 
 int event_size(EVENT *ev)

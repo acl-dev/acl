@@ -344,7 +344,7 @@ static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 
 		__thread_fiber->fibers[slot] =
 			__thread_fiber->fibers[--__thread_fiber->slot];
-		__thread_fiber->fibers[slot]->slot = slot;
+		__thread_fiber->fibers[slot]->slot = (unsigned) slot;
 
 		ring_prepend(&__thread_fiber->dead, &from->me);
 	}
@@ -486,7 +486,7 @@ int acl_fiber_yield(void)
 	// switched's value will larger than switched, so we need to use
 	// abs function to avoiding this problem
 #if defined(__APPLE__)
-	return __thread_fiber->switched - n - 1;
+	return (int) (__thread_fiber->switched - n - 1);
 #else
 	return abs(__thread_fiber->switched - n - 1);
 #endif
