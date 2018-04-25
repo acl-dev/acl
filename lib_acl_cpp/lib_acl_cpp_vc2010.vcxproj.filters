@@ -451,12 +451,6 @@
     <ClCompile Include="src\redis\redis_list.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
-    <ClCompile Include="src\redis\redis_master.cpp">
-      <Filter>src\redis</Filter>
-    </ClCompile>
-    <ClCompile Include="src\redis\redis_slave.cpp">
-      <Filter>src\redis</Filter>
-    </ClCompile>
     <ClCompile Include="src\redis\redis_cluster.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
@@ -585,6 +579,12 @@
     </ClCompile>
     <ClCompile Include="src\serialize\gsoner.cpp">
       <Filter>src\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_master.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_slave.cpp">
+      <Filter>src\redis</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1015,9 +1015,6 @@
       <Filter>include\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\thread_pool.hpp">
-      <Filter>include\stdlib</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\stdlib\trigger.hpp">
       <Filter>include\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="src\stream\aio_timer_delay_free.hpp">

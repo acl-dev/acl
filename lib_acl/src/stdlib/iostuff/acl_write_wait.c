@@ -72,7 +72,9 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 					fds.revents & POLLHUP ? "yes" : "no",
 					fds.revents & POLLERR ? "yes" : "no");
 				*/
+#ifdef ACL_UNIX
 				errno = ECONNREFUSED;
+#endif
 				return -1;
 			}
 			if (fds.revents & POLLOUT)
