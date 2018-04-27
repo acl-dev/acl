@@ -150,6 +150,12 @@ HTTP_API void http_hdr_sprint(ACL_VSTRING *bf, const HTTP_HDR *hh, const char *m
 /* in http_hdr_req.c */
 
 /**
+ * 设置标志位，针对 HTTP 请求的 URI 中的 ? 问号被转义(即被转成 %3F)的请求是否做兼容性处理
+ * @param onoff {int} 为非 0 值时表示做兼容性处理，内部缺省值为 1
+ */
+HTTP_API void http_uri_correct(int onoff);
+
+/**
  * 分配一个请求的HTTP协议头对象
  * @return {HTTP_HDR_REQ*} HTTP请求头对象
  */

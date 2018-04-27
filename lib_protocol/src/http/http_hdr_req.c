@@ -7,6 +7,7 @@
 #include "http.h"
 #include "http/lib_http.h"
 
+static int __http_uri_unsafe_correct = 1;
 static int __http_hdr_max_request = 30;
 static int __http_hdr_max_cookies = 30;
 static void __get_host_from_url(char *buf, size_t size, const char *url);
@@ -607,7 +608,7 @@ static void __parse_url_and_port(HTTP_HDR_REQ *hh, const char *url)
 	const char *myname = "__parse_url_and_port";
 	int   i;
 	ACL_ARGV *url_argv;
-	const char *ptr;
+	const char *ptr, *url_params = NULL;
 
 	hh->port = 80;  /* set the default server port */
 	ptr = strchr(hh->host, ':');
@@ -649,15 +650,33 @@ static void __parse_url_and_port(HTTP_HDR_REQ *hh, const char *url)
 	}
 
 	/* get url_path and url_params */
-	ptr = strchr(url, '?');
-	if (ptr == NULL)
+	ptr = url;
+	while (*ptr) {
+		/* http://xx.xxx.xxx?xxx=xxx&xxx=xxx */
+		if (*ptr == '?') {
+			url_params = ptr + 1;
+			break;
+		}
+
+		if (!__http_uri_unsafe_correct) {
+			ptr++;
+			continue;
+		}
+		/* http://xx.xxx.xxx%3Fxxx=xxx&xxx=xxx */
+		if (*ptr == '%' && *(ptr + 1) == '3' && *(ptr + 2) == 'F') {
+			url_params = ptr + 3;
+			break;
+		}
+		ptr++;
+	}
+
+	if (url_params == NULL)
 		__strip_url_path(hh->url_path, url);
 	else {
 		acl_vstring_strncpy(hh->url_path, url, ptr - url);
 		__strip_url_path(hh->url_path, acl_vstring_str(hh->url_path));
-		ptr++;  /* skip '?' */
-		if (*ptr)
-			acl_vstring_strcpy(hh->url_params, ptr);
+		if (*url_params)
+			acl_vstring_strcpy(hh->url_params, url_params);
 	}
 
 	if ((hh->flag & HTTP_HDR_REQ_FLAG_PARSE_PARAMS) == 0)
@@ -677,6 +696,11 @@ static void __parse_url_and_port(HTTP_HDR_REQ *hh, const char *url)
 		__add_request_item(hh->params_table, ptr);
 	}
 	acl_argv_free(url_argv);
+}
+
+void http_uri_correct(int onoff)
+{
+	__http_uri_unsafe_correct = onoff;
 }
 
 int http_hdr_req_line_parse(HTTP_HDR_REQ *hh)

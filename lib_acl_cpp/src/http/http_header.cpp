@@ -216,6 +216,11 @@ bool http_header::is_request() const
 	return is_request_;
 }
 
+void http_header::uri_unsafe_correct(bool on)
+{
+	http_uri_correct(on ? 1 : 0);
+}
+
 void http_header::build_common(string& buf) const
 {
 	if (!entries_.empty())
