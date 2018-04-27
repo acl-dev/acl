@@ -1,4 +1,4 @@
-%define release_id 89
+%define release_id 90
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Fri Apr 27 2018 zhengshuxin@qiyi.com 3.3.0-90-20180427.27
+- http: unsafe uri can be corrected
 
 * Tue Apr 12 2018 zhengshuxin@qiyi.com 3.3.0-89-20180412.20
 - thread_cond::wait: don't save log when waiting timedout
