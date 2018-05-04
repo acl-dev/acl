@@ -22,7 +22,6 @@ redis_command::redis_command()
 , conn_(NULL)
 , cluster_(NULL)
 , max_conns_(0)
-, used_(0)
 , slot_(-1)
 , redirect_max_(15)
 , redirect_sleep_(100)
@@ -45,7 +44,6 @@ redis_command::redis_command(redis_client* conn)
 , conn_(conn)
 , cluster_(NULL)
 , max_conns_(0)
-, used_(0)
 , slot_(-1)
 , redirect_max_(15)
 , redirect_sleep_(1)
@@ -70,7 +68,6 @@ redis_command::redis_command(redis_client_cluster* cluster, size_t max_conns)
 , conn_(NULL)
 , cluster_(cluster)
 , max_conns_(max_conns)
-, used_(0)
 , slot_(-1)
 , slice_req_(false)
 , request_buf_(NULL)
@@ -121,12 +118,9 @@ void redis_command::reset(bool save_slot /* = false */)
 
 void redis_command::clear(bool save_slot /* = false */)
 {
-	if (used_ > 0)
-	{
-		dbuf_->dbuf_reset();
-		result_ = NULL;
-		used_ = 0;
-	}
+	dbuf_->dbuf_reset();
+	result_ = NULL;
+
 	if (!save_slot)
 		slot_ = -1;
 }
@@ -661,12 +655,6 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 const redis_result* redis_command::run(size_t nchild /* = 0 */,
 	int* timeout /* = NULL */)
 {
-	// 如果上次操作时产生的内存分配没有被释放，在此处强制进行释放，以免用户
-	// 在反复使用一个命令对象时忘记了 clear 清理临时内存
-	if (used_ > 0)
-		clear(false);
-	used_++;
-
 	if (cluster_ != NULL)
 		return run(cluster_, nchild, timeout);
 	if (conn_ == NULL)

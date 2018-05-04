@@ -399,7 +399,6 @@ private:
 	redis_client* conn_;
 	redis_client_cluster* cluster_;
 	size_t max_conns_;
-	unsigned long long used_;
 	int  slot_;
 	int  redirect_max_;
 	int  redirect_sleep_;
