@@ -143,6 +143,44 @@ int redis_pubsub::punsubscribe(const std::vector<string>& patterns)
 	return subop("PUNSUBSCRIBE", patterns);
 }
 
+int redis_pubsub::subop_result(const char* cmd,
+	const std::vector<const char*>& channels)
+{
+	int nchannels = 0, ret;
+	size_t i = 0;
+	do
+	{
+		const redis_result* res = run();
+		if (res == NULL || res->get_type() != REDIS_RESULT_ARRAY)
+			return -1;
+
+		// clear request, so in next loop we just read the data from
+		// redis-server that the data maybe the message to be skipped
+		clear_request();
+
+		const redis_result* o = res->get_child(0);
+		if (o == NULL || o->get_type() != REDIS_RESULT_STRING)
+			return -1;
+
+		string tmp;
+		o->argv_to_string(tmp);
+		// just skip message in subscribe process
+		if (tmp.equal("message", false) || tmp.equal("pmessage", false))
+			continue;
+
+		if ((ret = check_channel(res, cmd, channels[i])) < 0)
+			return -1;
+
+		if (ret > nchannels)
+			nchannels = ret;
+
+		i++;
+
+	} while (i < channels.size());
+
+	return nchannels;
+}
+
 int redis_pubsub::subop(const char* cmd, const std::vector<const char*>& channels)
 {
 	size_t argc = 1 + channels.size();
@@ -163,23 +201,42 @@ int redis_pubsub::subop(const char* cmd, const std::vector<const char*>& channel
 		hash_slot(channels[0]);
 
 	build_request(argc, argv, lens);
-	const redis_result* result = run(channels.size());
-	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
-		return -1;
 
-	size_t size = channels.size();
+	return subop_result(cmd, channels);
+}
+
+int redis_pubsub::subop_result(const char* cmd,
+	const std::vector<string>& channels)
+{
 	int nchannels = 0, ret;
-
-	for (size_t i = 0; i < size; i++)
+	size_t i = 0;
+	do
 	{
-		const redis_result* obj = result->get_child(i);
-		if (obj == NULL)
+		const redis_result* res = run();
+		if (res == NULL || res->get_type() != REDIS_RESULT_ARRAY)
 			return -1;
-		if (( ret = check_channel(obj, argv[0], channels[i])) < 0)
+
+		clear_request();
+
+		const redis_result* o = res->get_child(0);
+		if (o == NULL || o->get_type() != REDIS_RESULT_STRING)
 			return -1;
+
+		string tmp;
+		o->argv_to_string(tmp);
+		if (tmp.equal("message", false) || tmp.equal("pmessage", false))
+			continue;
+
+		if ((ret = check_channel(res, cmd, channels[i])) < 0)
+			return -1;
+
 		if (ret > nchannels)
 			nchannels = ret;
-	}
+
+		i++;
+
+	} while (i < channels.size());
+
 	return nchannels;
 }
 
@@ -203,28 +260,11 @@ int redis_pubsub::subop(const char* cmd, const std::vector<string>& channels)
 		hash_slot(channels[0].c_str());
 
 	build_request(argc, argv, lens);
-	const redis_result* result = run(channels.size());
-	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
-		return -1;
-
-	size_t size = channels.size();
-	int nchannels = 0, ret;
-
-	for (size_t i = 0; i < size; i++)
-	{
-		const redis_result* obj = result->get_child(i);
-		if (obj == NULL)
-			return -1;
-		if (( ret = check_channel(obj, argv[0], channels[i])) < 0)
-			return -1;
-		if (ret > nchannels)
-			nchannels = ret;
-	}
-	return nchannels;
+	return subop_result(cmd, channels);
 }
 
 int redis_pubsub::check_channel(const redis_result* obj, const char* cmd,
-	const string& channel)
+	const char* channel)
 {
 	if (obj->get_type() != REDIS_RESULT_ARRAY)
 		return -1;
@@ -236,7 +276,13 @@ int redis_pubsub::check_channel(const redis_result* obj, const char* cmd,
 	string buf;
 	rr->argv_to_string(buf);
 	if (strcasecmp(buf.c_str(), cmd) != 0)
+	{
+		acl::string tmp;
+		obj->to_string(tmp);
+		logger_warn("invalid cmd=%s, %s, result=%s",
+			buf.c_str(), cmd, tmp.c_str());
 		return -1;
+	}
 
 	rr = obj->get_child(1);
 	if (rr == NULL || rr->get_type() != REDIS_RESULT_STRING)
@@ -244,8 +290,14 @@ int redis_pubsub::check_channel(const redis_result* obj, const char* cmd,
 
 	buf.clear();
 	rr->argv_to_string(buf);
-	if (strcasecmp(buf.c_str(), channel.c_str()) != 0)
+	if (strcasecmp(buf.c_str(), channel) != 0)
+	{
+		acl::string tmp;
+		obj->to_string(tmp);
+		logger_warn("invalid channel=%s, %s, result=%s",
+			buf.c_str(), channel, tmp.c_str());
 		return -1;
+	}
 
 	rr = obj->get_child(2);
 	if (rr == NULL || rr->get_type() != REDIS_RESULT_INTEGER)

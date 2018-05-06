@@ -29,3 +29,5 @@ http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=270070
 22) db_pool: 支持更为简洁的数据库操作接口
 23) 流数据传输支持 tlv 格式
 24) http 模块支持 HTTP 认证
+25) redis_pubsub.cpp: 当在同一连接订阅多个频道时可能会收到已订阅频道的消息，目前采取的方式
+是先忽略该消息，将来需要缓冲收到消息
