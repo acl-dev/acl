@@ -2,7 +2,7 @@
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
-Version:        3.4.0
+Version:        3.4.1
 Release:        %{release_id}
 Group:          System/Libs
 License:        IBM
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Mon May 07 2018 zhengshuxin@qiyi.com 3.4.1-0-20180507.14
+- acl 3.4.1 released!
 
 * Sun Apr 29 2018 zhengshuxin@qiyi.com 3.4.0-0-20180429.20
 - acl 3.4.0 released!
