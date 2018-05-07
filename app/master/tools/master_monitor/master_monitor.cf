@@ -123,5 +123,5 @@ service master_monitor
 #	debug_mem = 1
 #	是否在一个线程中连接读
 #	loop_read = 1
-	guard_manager = master.qiyi.domain:8390
+	guard_manager = master.domain:8390
 }

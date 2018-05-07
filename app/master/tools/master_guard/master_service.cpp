@@ -10,7 +10,7 @@
 char *var_cfg_guard_manager;
 char *var_cfg_master_ctld;
 acl::master_str_tbl var_conf_str_tab[] = {
-	{ "guard_manager", "master.qiyi.domain:8390", &var_cfg_guard_manager },
+	{ "guard_manager", "master.domain:8390", &var_cfg_guard_manager },
 	{ "master_ctld", "127.0.0.1:8290", &var_cfg_master_ctld },
 
 	{ 0, 0, 0 }

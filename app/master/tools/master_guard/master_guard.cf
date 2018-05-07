@@ -65,6 +65,6 @@ service master_guard
 
 #	master_ctld = 127.0.0.1:8290
 	master_ctld = {install_path}/var/public/master_ctld.sock
-	guard_manager = master.qiyi.domain:8390
+	guard_manager = master.domain:8390
 #	guard_manager = 127.0.0.1:8390
 }
