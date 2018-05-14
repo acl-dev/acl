@@ -178,6 +178,8 @@ redis_client_cluster& redis_client_cluster::set_password(
 	if (addr == NULL || *addr == 0 || pass == NULL || *pass == 0)
 		return *this;
 
+	lock_guard guard(lock_);
+
 	string key(addr);
 	key.lower();
 	passwds_[key] = pass;
@@ -196,6 +198,23 @@ redis_client_cluster& redis_client_cluster::set_password(
 	}
 
 	return *this;
+}
+
+const char* redis_client_cluster::get_password(const char* addr) const
+{
+	if (addr == NULL || *addr == 0)
+		return NULL;
+
+	lock_guard guard((const_cast<redis_client_cluster*>(this))->lock_);
+
+	std::map<string, string>::const_iterator cit = passwds_.find(addr);
+	if (cit != passwds_.end())
+		return cit->second.c_str();
+
+	cit = passwds_.find("default");
+	if (cit != passwds_.end())
+		return cit->second.c_str();
+	return NULL;
 }
 
 } // namespace acl

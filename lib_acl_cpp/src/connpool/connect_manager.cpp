@@ -18,6 +18,7 @@ connect_manager::connect_manager()
 , retry_inter_(1)
 , idle_ttl_(-1)
 , check_inter_(-1)
+, check_pos_(0)
 , monitor_(NULL)
 {
 }
@@ -242,6 +243,34 @@ connect_pool* connect_manager::get(const char* addr,
 }
 
 //////////////////////////////////////////////////////////////////////////
+
+size_t connect_manager::check_idle(size_t step, size_t* left /* = NULL */)
+{
+	if (step == 0)
+		step = 1;
+
+	size_t nleft = 0, nfreed = 0, pools_size, check_max;
+
+	lock();
+
+	pools_size = pools_.size();
+	check_max = check_pos_ + step;
+
+	while (check_pos_ < pools_size && check_pos_ < check_max)
+	{
+		connect_pool* pool = pools_[check_pos_++];
+		int ret = pool->check_idle(idle_ttl_);
+		if (ret > 0)
+			nfreed += ret;
+		nleft += pool->get_count();
+	}
+
+	unlock();
+
+	if (left)
+		*left = nleft;
+	return nfreed;
+}
 
 connect_pool* connect_manager::peek()
 {

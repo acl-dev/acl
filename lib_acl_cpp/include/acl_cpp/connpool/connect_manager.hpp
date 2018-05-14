@@ -131,6 +131,14 @@ public:
 	}
 
 	/**
+	 * 检测连接池中的空闲连接，将过期的连接释放掉
+	 * @param step {size_t} 每次检测连接池的个数
+	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
+	 * @return {size_t} 被释放的空闲连接数
+	 */
+	size_t check_idle(size_t step, size_t* left = NULL);
+
+	/**
 	 * 获得连接池集合中连接池对象的个数
 	 * @return {size_t}
 	 */
@@ -201,6 +209,7 @@ protected:
 	int  retry_inter_;			// 连接池失败后重试的时间间隔
 	time_t idle_ttl_;			// 空闲连接的生命周期
 	int  check_inter_;			// 检查空闲连接的时间间隔
+	size_t check_pos_;			// 上次检测连接池的下标
 	connect_monitor* monitor_;		// 后台检测线程句柄
 
 	// 设置除缺省服务之外的服务器集群

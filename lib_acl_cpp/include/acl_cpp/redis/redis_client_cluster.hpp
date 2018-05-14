@@ -145,6 +145,26 @@ public:
 	 */
 	redis_client_cluster& set_password(const char* addr, const char* pass);
 
+	/**
+	 * 获得 redis 集群中服务节点与连接密码的对照表
+	 * get all passwords of the redis cluster
+	 * @return {const std::map<string, string>&}
+	 */
+	const std::map<string, string>& get_passwords(void) const
+	{
+		return passwds_;
+	}
+
+	/**
+	 * 获得给定地址的 redis 节点的连接密码，返回 NULL 表示未设置
+	 * get the connection password of the specified addr for one redis,
+	 * NULL will be returned if password wasn't set
+	 * @param addr {const char*}
+	 * @return {const char*} return the specified node's connection password,
+	 *  NULL returned if no password been set
+	 */
+	const char* get_password(const char* addr) const;
+
 protected:
 	/**
 	 * 基类纯虚函数，用来创建连接池对象，该函数返回后由基类设置网络连接及IO 超时时间
