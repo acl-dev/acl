@@ -37,7 +37,7 @@ int acl_readable(ACL_SOCKET fd)
 	struct pollfd fds;
 	int   delay = 0;
 
-	fds.events = POLLIN | POLLHUP | POLLERR;
+	fds.events = POLLIN;
 	fds.fd = fd;
 
 	acl_set_error(0);
@@ -55,12 +55,13 @@ int acl_readable(ACL_SOCKET fd)
 		case 0:
 			return 0;
 		default:
-			if (fds.revents & (POLLHUP | POLLERR))
-				return -1;
-			else if ((fds.revents & POLLIN))
+			if ((fds.revents & POLLIN)) {
 				return 1;
-			else
+			} else if (fds.revents & (POLLHUP | POLLERR)) {
+				return 1;
+			} else {
 				return 0;
+			}
 		}
 	}
 }

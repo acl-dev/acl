@@ -1,4 +1,4 @@
-%define release_id 1
+%define release_id 2
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Tue May 17 2018 zhengshuxin@qiyi.com 3.4.1-2-20180517.16
+- fixed bugs in acl_write_wait.c
 
 * Mon May 14 2018 zhengshuxin@qiyi.com 3.4.1-1-20180514.15
 - add new method in redis_client_cluster

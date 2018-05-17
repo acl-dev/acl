@@ -135,7 +135,7 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 		}
 	}
 
-	ee.events = EPOLLIN /* | EPOLLHUP | EPOLLERR */;
+	ee.events = EPOLLIN;
 	ee.data.u64 = 0;
 	ee.data.fd = fd;
 
@@ -211,21 +211,17 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 			acl_set_error(ACL_ETIMEDOUT);
 			ret = -1;
 			break;
-		} else if ((events[0].events & (EPOLLERR | EPOLLHUP)) != 0) {
-			acl_msg_warn("%s(%d), %s: poll error: %s, fd: %d, "
-				"delay: %d, spent: %ld", __FILE__, __LINE__,
-				myname, acl_last_serror(), fd, delay,
-				(long) (time(NULL) - begin));
-			ret = -1;
-		} else if ((events[0].events & EPOLLIN) == 0) {
-			acl_msg_warn("%s(%d), %s: poll error: %s, fd: %d, "
-				"delay: %d, spent: %ld", __FILE__, __LINE__,
-				myname, acl_last_serror(), fd, delay,
-				(long) (time(NULL) - begin));
-			acl_set_error(ACL_ETIMEDOUT);
-			ret = -1;
-		} else
+		} else if ((events[0].events & EPOLLIN) != 0) {
 			ret = 0;
+		} else if ((events[0].events & (EPOLLERR | EPOLLHUP)) != 0) {
+			ret = 0;
+		} else {
+			acl_msg_warn("%s(%d), %s: poll error: %s, fd: %d, "
+				"delay: %d, spent: %ld", __FILE__, __LINE__,
+				myname, acl_last_serror(), fd, delay,
+				(long) (time(NULL) - begin));
+			ret = -1;
+		}
 		break;
 	}
 
@@ -303,16 +299,18 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 			acl_set_error(ACL_ETIMEDOUT);
 			return -1;
 		default:
-			if ((fds.revents & POLLIN))
+			if ((fds.revents & POLLIN)) {
 				return 0;
+			}
 			if (fds.revents & (POLLHUP | POLLERR | POLLNVAL)) {
 				acl_msg_warn("%s(%d), %s: poll error: %s, "
 					"fd: %d, delay: %d, spent: %ld",
 					__FILE__, __LINE__, myname,
 					acl_last_serror(), fd, delay,
 					(long) (time(NULL) - begin));
-				return -1;
+				return 0;
 			}
+
 			acl_msg_warn("%s(%d), %s: poll error: %s, fd: %d, "
 				"delay: %d, spent: %ld", __FILE__, __LINE__,
 				myname, acl_last_serror(), fd, delay,

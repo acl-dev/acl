@@ -44,7 +44,8 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 	struct pollfd fds;
 	int   delay = timeout * 1000;
 
-	fds.events = POLLOUT /* | POLLHUP | POLLERR; */;
+	fds.events = POLLOUT;
+	fds.revents = 0;
 	fds.fd = fd;
 
 	for (;;) {
@@ -62,27 +63,30 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 			return -1;
 		case 0:
 			acl_set_error(ACL_ETIMEDOUT);
+			acl_msg_error("%s(%d), %s: poll return 0",
+				__FILE__, __LINE__, myname);
 			return -1;
 		default:
-			if ((fds.revents & (POLLHUP | POLLERR | POLLNVAL))) {
-				/*
-				acl_msg_error("%s(%d), %s: fd: %d,"
-					"POLLHUP: %s, POLLERR: %s",
-					__FILE__, __LINE__, myname, fd,
-					fds.revents & POLLHUP ? "yes" : "no",
-					fds.revents & POLLERR ? "yes" : "no");
-				*/
-#ifdef ACL_UNIX
-				errno = ECONNREFUSED;
-#endif
+			if (fds.revents & POLLOUT) {
+				return 0;
+			}
+
+			if (!(fds.revents & (POLLHUP | POLLERR | POLLNVAL))) {
+				acl_msg_error("%s(%d), %s: error: %s, fd: %d",
+					__FILE__, __LINE__, myname,
+					acl_last_serror(), fd);
 				return -1;
 			}
-			if (fds.revents & POLLOUT)
-				return 0;
-			acl_msg_error("%s(%d), %s: poll error: %s, fd: %d",
+
+#ifdef ACL_UNIX
+			acl_msg_warn("%s(%d), %s: %s, revents=%d, %d, %d, %d",
 				__FILE__, __LINE__, myname,
-				acl_last_serror(), fd);
-			return -1;
+				acl_last_serror(), fds.revents,
+				fds.revents & POLLHUP,
+				fds.revents& POLLERR,
+				fds.revents& POLLNVAL);
+#endif
+			return 0;
 		}
 	}
 }

@@ -129,10 +129,12 @@ static struct pollfd *pfds_create(int *nfds, fd_set *readfds,
 			fds[fd].events |= POLLOUT;
 		}
 
+#if 0
 		if (exceptfds && FD_ISSET(fd, exceptfds)) {
 			fds[fd].fd = fd;
 			fds[fd].events |= POLLERR | POLLHUP;
 		}
+#endif
 	}
 	return fds;
 }

@@ -1,5 +1,9 @@
 修改历史列表：
 
+627) 2018.5.17
+627.1) bugfix: acl_write_wait.c 中使用 poll 方法时，针对 POLLHUP, POLLERR 应
+直接返回正常，让 write 函数触发异常行为
+
 ------------------------------------------------------------------------
 626) 2018.4.8
 626.1) bugfix: acl_xml_parse.c 宏 IS_CDATA 判断有误，--- by https://gitee.com/ghostshy

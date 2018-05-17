@@ -1158,7 +1158,7 @@ static int dns_poll(int fd, short events, int timeout) {
 	}
 
 	fds.fd = fd;
-	fds.events = POLLHUP | POLLERR;
+	fds.events = 0; /* POLLHUP | POLLERR */
 	if (events & DNS_POLLIN)
 		fds.events |= POLLIN;
 	if (events & DNS_POLLOUT)
@@ -1224,8 +1224,8 @@ static int read_wait(int fd, int timeout) {
 	int err;
 
 	fds.fd = fd;
-	fds.events = POLLHUP | POLLERR;
-	fds.events |= POLLIN;
+	//fds.events = POLLHUP | POLLERR;
+	fds.events = POLLIN;
 
 	for (;;) {
 		switch (poll(&fds, 1, timeout)) {
