@@ -351,19 +351,13 @@ int redis_key::renamenx(const char* key, const char* newkey)
 
 	if (result->get_type() == REDIS_RESULT_INTEGER)
 		return result->get_integer();
-	else if (result->get_type() != REDIS_RESULT_STATUS)
-		return -3;
-	const char* status = result->get_status();
-	if (status == NULL)
-	{
-		logger_error("status=NULL, key=%s, newkey=%s", key, newkey);
-		return -4;
-	} else if (strcasecmp(status, "ERR") == 0)
+	else if (result->get_type() == REDIS_RESULT_ERROR)
 		return -1;
 	else
 	{
-		logger_error("status=%s, key=%s, newkey=%s", status, key, newkey);
-		return -5;
+		logger_error("invalid type=%d, key=%s, newkey=%s",
+			result->get_type(), key, newkey);
+		return -3;
 	}
 }
 
