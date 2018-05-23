@@ -362,7 +362,7 @@ int redis_key::renamenx(const char* key, const char* newkey)
 		return -1;
 	else
 	{
-		logger_error("status=%s, key=%s, newkey=%s", key, newkey);
+		logger_error("status=%s, key=%s, newkey=%s", status, key, newkey);
 		return -5;
 	}
 }
