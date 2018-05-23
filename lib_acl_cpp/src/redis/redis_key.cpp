@@ -327,7 +327,7 @@ bool redis_key::rename_key(const char* key, const char* newkey)
 	return check_status();
 }
 
-bool redis_key::renamenx(const char* key, const char* newkey)
+int redis_key::renamenx(const char* key, const char* newkey)
 {
 	const char* argv[3];
 	size_t lens[3];
@@ -342,7 +342,29 @@ bool redis_key::renamenx(const char* key, const char* newkey)
 	lens[2] = strlen(newkey);
 
 	build_request(3, argv, lens);
-	return check_status();
+	const redis_result* result = run();
+	if (result == NULL)
+	{
+		logger_error("result NULL, key=%s, newkey=%s", key, newkey);
+		return -2;
+	}
+
+	if (result->get_type() == REDIS_RESULT_INTEGER)
+		return result->get_integer();
+	else if (result->get_type() != REDIS_RESULT_STATUS)
+		return -3;
+	const char* status = result->get_status();
+	if (status == NULL)
+	{
+		logger_error("status=NULL, key=%s, newkey=%s", key, newkey);
+		return -4;
+	} else if (strcasecmp(status, "ERR") == 0)
+		return -1;
+	else
+	{
+		logger_error("status=%s, key=%s, newkey=%s", key, newkey);
+		return -5;
+	}
 }
 
 bool redis_key::restore(const char* key, const char* value, size_t len,

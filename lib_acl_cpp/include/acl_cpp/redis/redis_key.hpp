@@ -321,10 +321,10 @@ public:
 	 * rename a key only if the new key does not exist
 	 * @param key {const char*} 旧 key
 	 * @param newkey {const char*} 新 key
-	 * @return {bool} 是否成功
-	 *  true on success, false if the newkey already existed or error
+	 * @return {int} 返回值 > 0: 成功，0： 目标 key 存在，< 0：失败
+	 *  return value > 0 on success, < 0 on error, == 0 when newkey exists
 	 */
-	bool renamenx(const char* key, const char* newkey);
+	int renamenx(const char* key, const char* newkey);
 
 	/**
 	 * 反序列化给定的序列化值，并将它和给定的 key 关联
