@@ -256,7 +256,7 @@ int main(void)
 	acl::db_handle::set_loadpath(path);
 
 	//acl::string dbfile("测试数据库.db");
-	acl::string dbfile("./数据库路径/二级路径/数据库.db");
+	acl::string dbfile("./path1/path2/mydb.db");
 
 	// db_sqlite 类对象的声明需在 set_loadpath 之后，因为在 db_sqlite 的
 	// 构造函数中需要运行加载 libsqlite3.so
