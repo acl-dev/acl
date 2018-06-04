@@ -1,5 +1,9 @@
 修改历史列表：
 
+524) 2018.6.4
+524.1) feature: connect_monitor 类增加三个虚方法：on_connected, on_refused,
+on_timeout
+
 523) 2018.5.31
 523.1) sqlite: sqlite 库升级到 3.23.1 版本
 

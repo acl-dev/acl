@@ -95,6 +95,36 @@ public:
 	 */
 	virtual void sio_check(check_client& checker, socket_stream& conn);
 
+	/**
+	 * 当连接成功时的回调方法，子类可以实现本方法
+	 * @param checker {check_client&}
+	 * @param cost {double} 从发起连接请求到超时的时间间隔（秒）
+	 */
+	virtual void on_connected(const check_client& /* checker */,
+		double /* cost */)
+	{
+	}
+
+	/**
+	 * 当连接超时时的回调方法，子类可以实现本方法
+	 * @param checker {check_client&}
+	 * @param cost {double} 从发起连接请求到超时的时间间隔（秒）
+	 */
+	virtual void on_timeout(const check_client& /* checker */,
+		double /* cost */)
+	{
+	}
+
+	/**
+	 * 当连接服务器时被拒绝时的回调方法，子类可实现本方法
+	 * @param checker {check_client&}
+	 * @param cost {double} 从发起连接请求到被断开的时间间隔（秒）
+	 */
+	virtual void on_refuse(const check_client& /* checker */,
+		double /* cost */)
+	{
+	}
+
 public:
 	// 虽然下面的函数是 public 的，但只供内部使用
 	/**

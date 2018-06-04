@@ -41,6 +41,11 @@ void check_client::close()
 bool check_client::open_callback()
 {
 	set_alive(true);
+	struct timeval end;
+	gettimeofday(&end, NULL);
+	double cost = stamp_sub(end, begin_);
+
+	timer_.get_monitor().on_connected(*this, cost);
 	timer_.get_monitor().on_open(*this);
 	return true;
 }
@@ -49,11 +54,13 @@ void check_client::close_callback()
 {
 	struct timeval end;
 	gettimeofday(&end, NULL);
-	double spent = stamp_sub(end, begin_);
+	double cost = stamp_sub(end, begin_);
 
-	if (!aliving_)
+	if (!aliving_) {
 		logger_warn("server: %s dead, spent: %.2f ms",
-			addr_.c_str(), spent);
+			addr_.c_str(), cost);
+		timer_.get_monitor().on_refuse(*this, cost);
+	}
 	//else
 	//	logger("server: %s alive, spent: %.2f ms",
 	//		addr_.c_str(), spent);
@@ -70,10 +77,11 @@ bool check_client::timeout_callback()
 {
 	struct timeval end;
 	gettimeofday(&end, NULL);
-	double spent = stamp_sub(end, begin_);
+	double cost = stamp_sub(end, begin_);
 
 	logger_warn("server: %s dead, timeout, spent: %.2f ms",
-		addr_.c_str(), spent);
+		addr_.c_str(), cost);
+	timer_.get_monitor().on_timeout(*this, cost);
 
 	// 连接超时，则直接返回失败
 	return false;
