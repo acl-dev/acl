@@ -1,4 +1,4 @@
-%define release_id 2
+%define release_id 3
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Mon Jun 04 2018 zhengshuxin@qiyi.com 3.4.1-3-20180604.18
+- connect_monitor: add three callback for application to handle
 
 * Tue May 17 2018 zhengshuxin@qiyi.com 3.4.1-2-20180517.16
 - fixed bugs in acl_write_wait.c
