@@ -1,4 +1,4 @@
-%define release_id 4
+%define release_id 5
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Tue Jun 04 2018 zhengshuxin@qiyi.com 3.4.1-5-20180605.14
+- check_client: just choose one from on_refused and on_timeout to report connection status
 
 * Tue Jun 04 2018 zhengshuxin@qiyi.com 3.4.1-4-20180605.14
 - connect_monitor: change params for on_refused and on_timeout methods

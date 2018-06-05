@@ -82,6 +82,7 @@ private:
 private:
 	bool blocked_;
 	bool aliving_;
+	bool timedout_;
 	struct timeval begin_;
 	check_timer& timer_;
 	aio_socket_stream& conn_;

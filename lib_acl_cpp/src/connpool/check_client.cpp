@@ -16,6 +16,7 @@ check_client::check_client(check_timer& timer, const char* addr,
 	aio_socket_stream& conn, struct timeval& begin)
 : blocked_(true)
 , aliving_(false)
+, timedout_(false)
 , timer_(timer)
 , conn_(conn)
 , addr_(addr)
@@ -56,7 +57,11 @@ void check_client::close_callback()
 	gettimeofday(&end, NULL);
 	double cost = stamp_sub(end, begin_);
 
-	if (!aliving_) {
+	if (timedout_) {
+		logger_warn("server: %s dead, timeout, spent: %.2f ms",
+			addr_.c_str(), cost);
+		timer_.get_monitor().on_timeout(addr_.c_str(), cost);
+	} else if (!aliving_) {
 		logger_warn("server: %s dead, spent: %.2f ms",
 			addr_.c_str(), cost);
 		timer_.get_monitor().on_refused(addr_.c_str(), cost);
@@ -75,15 +80,8 @@ void check_client::close_callback()
 
 bool check_client::timeout_callback()
 {
-	struct timeval end;
-	gettimeofday(&end, NULL);
-	double cost = stamp_sub(end, begin_);
-
-	logger_warn("server: %s dead, timeout, spent: %.2f ms",
-		addr_.c_str(), cost);
-	timer_.get_monitor().on_timeout(addr_.c_str(), cost);
-
 	// 连接超时，则直接返回失败
+	timedout_ = true;
 	return false;
 }
 
