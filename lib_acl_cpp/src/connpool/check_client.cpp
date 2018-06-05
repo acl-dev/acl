@@ -59,7 +59,7 @@ void check_client::close_callback()
 	if (!aliving_) {
 		logger_warn("server: %s dead, spent: %.2f ms",
 			addr_.c_str(), cost);
-		timer_.get_monitor().on_refuse(addr_.c_str(), cost);
+		timer_.get_monitor().on_refused(addr_.c_str(), cost);
 	}
 	//else
 	//	logger("server: %s alive, spent: %.2f ms",
