@@ -109,21 +109,19 @@ public:
 
 	/**
 	 * 当连接超时时的回调方法，子类可以实现本方法
-	 * @param checker {check_client&}
+	 * @param addr {const char*} 被检测的服务器地址，格式: ip:port
 	 * @param cost {double} 从发起连接请求到超时的时间间隔（秒）
 	 */
-	virtual void on_timeout(const check_client& /* checker */,
-		double /* cost */)
+	virtual void on_timeout(const char* /* addr */, double /* cost */)
 	{
 	}
 
 	/**
 	 * 当连接服务器时被拒绝时的回调方法，子类可实现本方法
-	 * @param checker {check_client&}
+	 * @param addr {const char*} 被检测的服务器地址，格式: ip:port
 	 * @param cost {double} 从发起连接请求到被断开的时间间隔（秒）
 	 */
-	virtual void on_refuse(const check_client& /* checker */,
-		double /* cost */)
+	virtual void on_refused(const char* /* addr */, double /* cost */)
 	{
 	}
 

@@ -59,7 +59,7 @@ void check_client::close_callback()
 	if (!aliving_) {
 		logger_warn("server: %s dead, spent: %.2f ms",
 			addr_.c_str(), cost);
-		timer_.get_monitor().on_refuse(*this, cost);
+		timer_.get_monitor().on_refuse(addr_.c_str(), cost);
 	}
 	//else
 	//	logger("server: %s alive, spent: %.2f ms",
@@ -81,7 +81,7 @@ bool check_client::timeout_callback()
 
 	logger_warn("server: %s dead, timeout, spent: %.2f ms",
 		addr_.c_str(), cost);
-	timer_.get_monitor().on_timeout(*this, cost);
+	timer_.get_monitor().on_timeout(addr_.c_str(), cost);
 
 	// 连接超时，则直接返回失败
 	return false;

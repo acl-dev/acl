@@ -1,4 +1,4 @@
-%define release_id 3
+%define release_id 4
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -133,10 +133,13 @@ fi
 
 %changelog
 
+* Tue Jun 04 2018 zhengshuxin@qiyi.com 3.4.1-4-20180605.14
+- connect_monitor: change params for on_refused and on_timeout methods
+
 * Mon Jun 04 2018 zhengshuxin@qiyi.com 3.4.1-3-20180604.18
 - connect_monitor: add three callback for application to handle
 
-* Tue May 17 2018 zhengshuxin@qiyi.com 3.4.1-2-20180517.16
+* Thu May 17 2018 zhengshuxin@qiyi.com 3.4.1-2-20180517.16
 - fixed bugs in acl_write_wait.c
 
 * Mon May 14 2018 zhengshuxin@qiyi.com 3.4.1-1-20180514.15
@@ -152,11 +155,11 @@ fi
 * Fri Apr 27 2018 zhengshuxin@qiyi.com 3.3.0-90-20180427.27
 - http: unsafe uri can be corrected
 
-* Tue Apr 12 2018 zhengshuxin@qiyi.com 3.3.0-89-20180412.20
+* Thu Apr 12 2018 zhengshuxin@qiyi.com 3.3.0-89-20180412.20
 - thread_cond::wait: don't save log when waiting timedout
 - atomic: override constructur of atomic(const atomic&)
 
-* Mon Mar 20 2018 zhengshuxin@qiyi.com 3.3.0-88-20180320.10
+* Tue Mar 20 2018 zhengshuxin@qiyi.com 3.3.0-88-20180320.10
 - fixed one bug in thread_cond::wait there was one problem when computing timeout
 
 * Thu Mar 15 2018 zhengshuxin@qiyi.com 3.3.0-87-20180315.14
