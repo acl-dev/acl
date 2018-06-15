@@ -133,7 +133,7 @@ fi
 
 %changelog
 
-* Fri Jun 15 2018 zhengshuxin@qiyi.com 3.4.1-5-20180615.15
+* Fri Jun 15 2018 zhengshuxin@qiyi.com 3.4.1-6-20180615.15
 - thread_cond::wait add locked parameter for one locking condition
 
 * Tue Jun 04 2018 zhengshuxin@qiyi.com 3.4.1-5-20180605.14
