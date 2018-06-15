@@ -72,8 +72,8 @@ bool thread_cond::wait(bool locked)
 {
 	bool locked_internal;
 
-	// å¦‚æžœä½¿ç”¨äº†å†…éƒ¨é”ï¼Œåˆ™éœ€è¦åŠ é”ï¼Œå¦åˆ™å†åˆ¤æ–­æ‰€ç”¨çš„å¤–éƒ¨é”æ˜¯å¦å·²ç»åŠ é”ï¼Œ
-	// å¦‚æžœä½¿ç”¨äº†å¤–éƒ¨é”ä¸”å¤–éƒ¨æœªåŠ é”ï¼Œåˆ™ä¹Ÿéœ€è¦åŠ é”ã€‚
+	// Èç¹ûÊ¹ÓÃÁËÄÚ²¿Ëø£¬ÔòÐèÒª¼ÓËø£¬·ñÔòÔÙÅÐ¶ÏËùÓÃµÄÍâ²¿ËøÊÇ·ñÒÑ¾­¼ÓËø£¬
+	// Èç¹ûÊ¹ÓÃÁËÍâ²¿ËøÇÒÍâ²¿Î´¼ÓËø£¬ÔòÒ²ÐèÒª¼ÓËø¡£
 	if (mutex_internal_ || !locked)
 	{
 		if (!mutex_->lock())
@@ -95,7 +95,7 @@ bool thread_cond::wait(bool locked)
 		logger_error("pthread_cond_wait error %s", last_serror());
 	}
 
-	// å¦‚æžœæœ¬æ–¹æ³•å†…éƒ¨å‰é¢åŠ äº†é”ï¼Œåˆ™æ­¤å¤„éœ€è¦è§£é”
+	// Èç¹û±¾·½·¨ÄÚ²¿Ç°Ãæ¼ÓÁËËø£¬Ôò´Ë´¦ÐèÒª½âËø
 	if (locked_internal && !mutex_->unlock())
 	{
 		logger_error("mutex unlock error=%s", last_serror());
