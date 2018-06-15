@@ -1,4 +1,4 @@
-%define release_id 5
+%define release_id 6
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Fri Jun 15 2018 zhengshuxin@qiyi.com 3.4.1-5-20180615.15
+- thread_cond::wait add locked parameter for one locking condition
 
 * Tue Jun 04 2018 zhengshuxin@qiyi.com 3.4.1-5-20180605.14
 - check_client: just choose one from on_refused and on_timeout to report connection status

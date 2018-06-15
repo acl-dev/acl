@@ -45,9 +45,14 @@ public:
 	 *   > 0 时表示等待超时的时间
 	 *   == 0，不等待
 	 *   < 0 则一直等待直到条件变量就绪
+	 * @param locked {bool} 当构造参数传入的线程锁非空时，该参数表示外部
+	 *  传入的线程锁是否已经被外部调用者锁住，如果已经被锁住，则内部将不
+	 *  再对构造中传入的外部锁加锁，否则，内部将会加锁外部锁，函数返回前
+	 *  再解外部锁；此外，如果构造参数传入线程锁为空时，内部会自动先加内
+	 *  部锁，函数返回前再解内部锁
 	 * @return {bool} 返回 true 表示条件变量就绪，否则表示超时或没被通知
 	 */
-	bool wait(long long microseconds = -1);
+	bool wait(long long microseconds = -1, bool locked = false);
 
 	/**
 	 * 通知一个或几个等待在线程条件变量上的线程，表示条件变量就结
@@ -76,7 +81,10 @@ public:
 private:
 	thread_mutex* mutex_;
 	thread_mutex* mutex_internal_;
-	acl_pthread_cond_t*  cond_;
+	acl_pthread_cond_t* cond_;
+
+	bool wait(bool locked);
+	bool timed_wait(long long microseconds, bool locked);
 };
 
 } // namespace acl
