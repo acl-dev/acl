@@ -83,7 +83,7 @@ private:
 	thread_mutex* mutex_internal_;
 	acl_pthread_cond_t* cond_;
 
-	bool wait(bool locked);
+	bool block_wait(bool locked);
 	bool timed_wait(long long microseconds, bool locked);
 };
 

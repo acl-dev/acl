@@ -65,10 +65,10 @@ bool thread_cond::wait(long long microseconds /* = -1 */,
 	if (microseconds >= 0)
 		return timed_wait(microseconds, locked);
 	else
-		return wait(locked);
+		return block_wait(locked);
 }
 
-bool thread_cond::wait(bool locked)
+bool thread_cond::block_wait(bool locked)
 {
 	bool locked_internal;
 

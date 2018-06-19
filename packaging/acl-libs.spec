@@ -1,4 +1,4 @@
-%define release_id 6
+%define release_id 7
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Tue Jun 19 2018 zhengshuxin@qiyi.com 3.4.1-7-20180619.18
+- thread_cond: compiling error for wait overriding
 
 * Fri Jun 15 2018 zhengshuxin@qiyi.com 3.4.1-6-20180615.15
 - thread_cond::wait add locked parameter for one locking condition
