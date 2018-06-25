@@ -8,21 +8,21 @@ namespace acl
 {
 
 template<typename T>
-bool deserialize(json& json, T& o, string* err = NULL)
+bool deserialize(json& j, T& o, string* err = NULL)
 {
-	if (!json.finish())
+	if (!j.finish())
 	{
 		if (err)
 			err->append("json not complete yet!");
 		return false;
 	}
 
-	std::pair<bool, std::string> r = acl::gson(json.get_root(), o);
+	std::pair<bool, std::string> r = gson(j.get_root(), o);
 	if (r.first == false)
 	{
 		if (err)
 			err->format_append("deserialize error=%s, json=[%s]",
-				r.second.c_str(), json.to_string().c_str());
+				r.second.c_str(), j.to_string().c_str());
 		return false;
 	}
 
@@ -32,9 +32,9 @@ bool deserialize(json& json, T& o, string* err = NULL)
 template<typename T>
 void serialize(T& o, string& buf)
 {
-	json json;
-	json_node& node = json(json, o);
-	(void) node.to_string(&buf);
+	json j;
+	json_node& n = gson(j, o);
+	(void) n.to_string(&buf);
 	buf += "\r\n";
 }
 
