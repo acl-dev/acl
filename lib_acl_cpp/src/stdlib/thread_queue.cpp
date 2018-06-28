@@ -42,6 +42,8 @@ int thread_queue::qlen() const
 
 //////////////////////////////////////////////////////////////////////////////
 
+#if 0
+
 void* tbox_create(void)
 {
 	return acl_aqueue_new();
@@ -69,5 +71,7 @@ size_t tbox_size(void* tbox)
 {
 	return (size_t) acl_aqueue_qlen((ACL_AQUEUE*) tbox);
 }
+
+#endif
 
 } // namespace acl

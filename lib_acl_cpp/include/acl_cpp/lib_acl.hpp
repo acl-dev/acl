@@ -28,6 +28,7 @@
 #include "stdlib/thread.hpp"
 #include "stdlib/thread_pool.hpp"
 #include "stdlib/thread_queue.hpp"
+#include "stdlib/tbox.hpp"
 #include "stdlib/thread_mutex.hpp"
 #include "stdlib/thread_cond.hpp"
 #include "stdlib/scan_dir.hpp"

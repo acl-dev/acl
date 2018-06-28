@@ -30,6 +30,8 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////
 
+#if 0
+
 // internal functions being used
 void*  tbox_create(void);
 void   tbox_free(void*, void (*free_fn)(void*));
@@ -120,5 +122,7 @@ private:
 		delete t;
 	}
 };
+
+#endif
 
 } // namespace acl

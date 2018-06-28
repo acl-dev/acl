@@ -1,4 +1,4 @@
-%define release_id 7
+%define release_id 8
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Jun 28 2018 zhengshuxin@qiyi.com 3.4.1-8-20180628.21
+- tbox: rewrite tbox with C++ template class
 
 * Tue Jun 19 2018 zhengshuxin@qiyi.com 3.4.1-7-20180619.18
 - thread_cond: compiling error for wait overriding
