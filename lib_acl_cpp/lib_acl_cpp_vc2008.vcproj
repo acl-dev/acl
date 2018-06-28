@@ -1900,6 +1900,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\stdlib\tbox.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\stdlib\thread.hpp"
 					>
 				</File>

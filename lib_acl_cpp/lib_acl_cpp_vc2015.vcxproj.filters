@@ -1005,6 +1005,9 @@
     <ClInclude Include="include\acl_cpp\master\master_udp.hpp">
       <Filter>Header Files\master</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\tbox.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\thread.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>

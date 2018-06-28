@@ -1160,6 +1160,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\acl_cpp\stdlib\string.hpp">
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\stdlib\tbox.hpp">
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\stdlib\thread.hpp">
 				</File>
 				<File

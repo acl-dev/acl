@@ -744,6 +744,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stdlib\sha1.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\snprintf.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\string.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\tbox.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\thread.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\thread_cond.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\thread_mutex.hpp" />
