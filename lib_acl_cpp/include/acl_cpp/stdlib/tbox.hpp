@@ -99,11 +99,18 @@ public:
 	 */
 	size_t size(void) const
 	{
-		size_t n;
+		return size_;
+	}
+
+public:
+	void lock(void)
+	{
 		lock_.lock();
-		n = size_;
+	}
+
+	void unlock(void)
+	{
 		lock_.unlock();
-		return n;
 	}
 
 private:
