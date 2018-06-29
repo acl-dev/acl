@@ -13,7 +13,7 @@ namespace acl
 {
 
 thread::thread()
-: detachable_(true)
+: detachable_(false)
 , stack_size_(0)
 , thread_id_(0)
 {
