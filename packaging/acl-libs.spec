@@ -1,4 +1,4 @@
-%define release_id 8
+%define release_id 9
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Jul 05 2018 zhengshuxin@qiyi.com 3.4.1-9-20180705.14
+- acl::fstream: add filelock methods
 
 * Thu Jun 28 2018 zhengshuxin@qiyi.com 3.4.1-8-20180628.21
 - tbox: rewrite tbox with C++ template class
