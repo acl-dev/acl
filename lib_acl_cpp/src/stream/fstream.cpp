@@ -214,7 +214,7 @@ bool fstream::try_lock(bool exclude /* = true */)
 		oper |= ACL_FLOCK_OP_EXCLUSIVE;
 	else
 		oper |= ACL_FLOCK_OP_SHARED;
-	return acl_myflock(fd, ACL_FLOCK_STYLE_FCNTL, oper);
+	return acl_myflock(fd, ACL_FLOCK_STYLE_FCNTL, oper) == 0;
 }
 
 bool fstream::unlock(void)
