@@ -116,6 +116,31 @@ public:
 	 * @return {const char*} 若返回空则表示文件还未打开或出错
 	 */
 	const char* file_path() const;
+
+	/**
+	 * 当文件打开后，该方法用来对文件加锁
+	 * @param exclude {bool} 加锁方式是否是独占锁，默认是独占锁，如果该值
+	 * 为 false, 则为共享锁
+	 * @return {bool} 返回 false 表示加锁失败，可通过 acl::last_serror 查看
+	 *  出错原因
+	 */
+	bool lock(bool exclude = true);
+
+	/**
+	 * 当文件打开后，该方法用来尝试对文件加锁，如果加锁成功则返回 true，如
+	 * 果该文件已经被其它进程加锁，则返回 false
+	 * @param exclude {bool} 加锁方式是否是独占锁，默认是独占锁，如果该值
+	 * 为 false, 则为共享锁
+	 * @return {bool} 返回 false 表示加锁失败，可通过 acl::last_serror 查看
+	 *  出错原因
+	 */
+	bool try_lock(bool exclude = true);
+
+	/**
+	 * 当调用 lock 或 try_lock 成功后可以调用本方法对文件解锁
+	 * @return {bool} 解锁是否成功
+	 */
+	bool unlock(void);
 };
 
 } // namespace acl

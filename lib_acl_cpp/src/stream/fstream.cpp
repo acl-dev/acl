@@ -180,4 +180,56 @@ ACL_FILE_HANDLE fstream::file_handle() const
 	return ACL_VSTREAM_FILE(stream_);
 }
 
+bool fstream::lock(bool exclude /* = true */)
+{
+	ACL_FILE_HANDLE fd = file_handle();
+	if (fd == ACL_FILE_INVALID)
+	{
+		logger_error("invalid file handle");
+#ifndef ACL_WINDOWS
+		errno = EBADF;
+#endif
+		return false;
+	}
+
+	int ret = acl_myflock(fd, ACL_FLOCK_STYLE_FCNTL,
+		exclude ? ACL_FLOCK_OP_EXCLUSIVE : ACL_FLOCK_OP_SHARED);
+	return ret == 0;
+}
+
+bool fstream::try_lock(bool exclude /* = true */)
+{
+	ACL_FILE_HANDLE fd = file_handle();
+	if (fd == ACL_FILE_INVALID)
+	{
+		logger_error("invalid file handle");
+#ifndef ACL_WINDOWS
+		errno = EBADF;
+#endif
+		return false;
+	}
+
+	int oper =ACL_FLOCK_OP_NOWAIT;
+	if (exclude)
+		oper |= ACL_FLOCK_OP_EXCLUSIVE;
+	else
+		oper |= ACL_FLOCK_OP_SHARED;
+	return acl_myflock(fd, ACL_FLOCK_STYLE_FCNTL, oper);
+}
+
+bool fstream::unlock(void)
+{
+	ACL_FILE_HANDLE fd = file_handle();
+	if (fd == ACL_FILE_INVALID)
+	{
+		logger_error("invalid file handle");
+#ifndef ACL_WINDOWS
+		errno = EBADF;
+#endif
+		return false;
+	}
+
+	return acl_myflock(fd, ACL_FLOCK_STYLE_FCNTL, ACL_FLOCK_OP_NONE) == 0;
+}
+
 } // namespace acl
