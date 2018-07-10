@@ -69,6 +69,7 @@ HttpServlet::~HttpServlet(void)
 {
 	delete req_;
 	delete res_;
+	delete session_ptr_;
 }
 
 #define COPY(x, y) ACL_SAFE_STRNCPY((x), (y), sizeof((x)))
