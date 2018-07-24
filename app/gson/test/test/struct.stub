@@ -7,4 +7,9 @@ struct user
 	std::string domain;
 	int  age;
 	bool male;
+	unsigned n0;
+	double n1;
+	double n2;
+	double n3;
+	double n4;
 };

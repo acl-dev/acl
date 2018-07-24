@@ -31,7 +31,7 @@ static void serialize(void)
 // 反序列化过程
 static void deserialize(void)
 {
-	const char *s = "{\"name\": \"zsxxsz\", \"domain\": \"263.net\", \"age\": 11, \"male\": true}";
+	const char *s = "{\"name\": \"zsxxsz\", \"domain\": \"263.net\", \"age\": 11, \"male\": true, \"n0\": 10, \"n1\": 0, \"n2\": 1, \"n3\": 1.1, \"n4\": 0.0 }";
 	printf("deserialize:\r\n");
 
 	acl::json json;
@@ -45,13 +45,37 @@ static void deserialize(void)
 	if (ret.first == false)
 		printf("error: %s\r\n", ret.second.c_str());
 	else
-		printf("name: %s, domain: %s, age: %d, male: %s\r\n",
+		printf("ok, name: %s, domain: %s, age: %d, male: %s, n0=%d, n1=%.2f, n2=%.2f, n3=%.2f, n4=%.2f\r\n",
 			u.name.c_str(), u.domain.c_str(), u.age,
-			u.male ? "yes" : "no");
+			u.male ? "yes" : "no", u.n0, u.n1, u.n2, u.n3, u.n4);
 }
 
 int main(void)
 {
+	acl::string buf;
+	std::string sbuf("hello world");
+	buf << sbuf << "\r\n" << &sbuf << "\r\n";
+	buf += sbuf;
+	buf += "\r\n";
+	buf += &sbuf;
+	printf("buf=[%s]\r\n", buf.c_str());
+
+	sbuf += "\r\n";
+	sbuf += buf;
+	printf("sbuf=[%s]\r\n", sbuf.c_str());
+
+	buf = sbuf;
+	printf("buf=[%s]\r\n", buf.c_str());
+
+	sbuf.clear();
+	buf >> sbuf;
+	printf("sbuf=[%s]\r\n", sbuf.c_str());
+
+	buf = sbuf;
+	sbuf.clear();
+	buf >> &sbuf;
+	printf("sbuf=[%s]\r\n", sbuf.c_str());
+
 	serialize();
 	deserialize();
 	printf("Enter any key to continue ..."); fflush(stdout); getchar();

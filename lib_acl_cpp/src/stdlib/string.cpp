@@ -234,6 +234,24 @@ string& string::operator =(const string* s)
 	return *this;
 }
 
+string& string::operator =(const std::string& s)
+{
+	MCP(vbf_, s.c_str(), s.size());
+	TERM(vbf_);
+
+	return *this;
+}
+
+string& string::operator =(const std::string* s)
+{
+	if (s == NULL)
+		return *this;
+
+	MCP(vbf_, s->c_str(), s->size());
+	TERM(vbf_);
+	return *this;
+}
+
 string& string::operator =(acl_int64 n)
 {
 	if (use_bin_)
@@ -370,6 +388,23 @@ string& string::operator +=(const string* s)
 	return *this;
 }
 
+string& string::operator +=(const std::string& s)
+{
+	MCAT(vbf_, s.c_str(), s.size());
+	TERM(vbf_);
+	return *this;
+}
+
+string& string::operator +=(const std::string* s)
+{
+	if (s == NULL)
+		return *this;
+
+	MCAT(vbf_, s->c_str(), s->size());
+	TERM(vbf_);
+	return *this;
+}
+
 string& string::operator +=(acl_int64 n)
 {
 	if (use_bin_)
@@ -482,6 +517,21 @@ string& string::operator <<(const string& s)
 }
 
 string& string::operator <<(const string* s)
+{
+	if (s == NULL )
+		return *this;
+
+	*this += s;
+	return *this;
+}
+
+string& string::operator <<(const std::string& s)
+{
+	*this += s;
+	return *this;
+}
+
+string& string::operator <<(const std::string* s)
 {
 	if (s == NULL )
 		return *this;
@@ -679,7 +729,6 @@ size_t string::scan_move()
 
 	return len;
 }
-
 size_t string::operator >>(string* s)
 {
 	if (s == NULL)
@@ -687,6 +736,33 @@ size_t string::operator >>(string* s)
 
 	size_t len = this->length();
 	*s = this;
+	clear();
+	return len;
+}
+
+size_t string::operator >>(string& s)
+{
+	size_t len = this->length();
+	s = this;
+	clear();
+	return len;
+}
+
+size_t string::operator >>(std::string* s)
+{
+	if (s == NULL)
+		return 0;
+
+	size_t len = this->length();
+	*s = this->c_str();
+	clear();
+	return len;
+}
+
+size_t string::operator >>(std::string& s)
+{
+	size_t len = this->length();
+	s = this->c_str();
 	clear();
 	return len;
 }
@@ -815,6 +891,26 @@ bool string::equal(const string& s, bool case_sensitive /* = true */) const
 	return acl_strcasecmp(STR(vbf_), STR(s.vbf_)) == 0 ? true : false;
 }
 
+bool string::begin_with(const char* s, bool case_sensitive /* = true */) const
+{
+	return compare(s, case_sensitive) == 0 ? true : false;
+}
+
+bool string::begin_with(const void* v, size_t n) const
+{
+	return compare(v, n) == 0 ? true : false;
+}
+
+bool string::begin_with(const char* s, size_t len, bool case_sensitive /* = true */) const
+{
+	return ncompare(s, len, case_sensitive) == 0 ? true : false;
+}
+
+bool string::begin_with(const string& s, bool case_sensitive /* = true */) const
+{
+	return begin_with(s.c_str(), s.size(), case_sensitive);
+}
+
 int string::compare(const string& s) const
 {
 	size_t n = LEN(vbf_) > LEN(s.vbf_) ? LEN(s.vbf_) : LEN(vbf_);
@@ -865,7 +961,7 @@ int string::compare(const void* ptr, size_t len) const
 	return (int) (LEN(vbf_) - len);
 }
 
-int string::ncompare(const char* s, size_t len, bool case_sensitive/* =true */) const
+int string::ncompare(const char* s, size_t len, bool case_sensitive/* = true */) const
 {
 	if (s == NULL)
 		return 1;

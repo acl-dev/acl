@@ -182,7 +182,7 @@ public:
 	 */
 	virtual bool doDelete(HttpServletRequest&, HttpServletResponse&)
 	{
-		logger_error("child not implement doPurge yet!");
+		logger_error("child not implement doDelete yet!");
 		return false;
 	}
 
@@ -191,7 +191,7 @@ public:
 	 */
 	virtual bool doHead(HttpServletRequest&, HttpServletResponse&)
 	{
-		logger_error("child not implement doPurge yet!");
+		logger_error("child not implement doHead yet!");
 		return false;
 	}
 
@@ -200,7 +200,7 @@ public:
 	 */
 	virtual bool doOptions(HttpServletRequest&, HttpServletResponse&)
 	{
-		logger_error("child not implement doPurge yet!");
+		logger_error("child not implement doOptions yet!");
 		return false;
 	}
 
@@ -209,7 +209,7 @@ public:
 	 */
 	virtual bool doPropfind(HttpServletRequest&, HttpServletResponse&)
 	{
-		logger_error("child not implement doPurge yet!");
+		logger_error("child not implement doPropfind yet!");
 		return false;
 	}
 

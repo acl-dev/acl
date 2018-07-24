@@ -1,5 +1,12 @@
 修改历史列表：
 
+
+530) 2018.7.24
+530.1) bugfix: json 序列化工具对 double/float 类型且值不带小数部分时的支持不够
+完善，通过在 acl::json_node::is_double 增加针对整数的支持得以解决
+
+530.2) feature: acl::string 支持更多与 std::string 之间的互相操作
+
 529) 2018.7.10
 529.1) bugfix: acl::HttpServlet 当 session 对象内部创建时，需在析构函数里将其
 释放，否则会造成内存泄露。

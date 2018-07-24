@@ -112,15 +112,15 @@ bool json_node::is_string(void) const
 
 bool json_node::is_number(void) const
 {
-	return (node_me_->type & ACL_JSON_T_A_NUMBER)
-		|| (node_me_->type & ACL_JSON_T_NUMBER)
-		|| is_double();
+	return is_double();
 }
 
 bool json_node::is_double(void) const
 {
-	return (node_me_->type & ACL_JSON_T_A_DOUBLE)
-		|| (node_me_->type & ACL_JSON_T_DOUBLE);
+	return  (node_me_->type & ACL_JSON_T_A_DOUBLE) ||
+		(node_me_->type & ACL_JSON_T_DOUBLE) ||
+		(node_me_->type & ACL_JSON_T_A_NUMBER) ||
+		(node_me_->type & ACL_JSON_T_NUMBER);
 }
 
 bool json_node::is_bool(void) const
