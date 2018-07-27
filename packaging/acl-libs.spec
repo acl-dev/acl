@@ -1,4 +1,4 @@
-%define release_id 10
+%define release_id 11
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Fri Jul 27 2018 zhengshuxin@qiyi.com 3.4.1-11-20180727.16
+- tbox: fixed one bug
 
 * Fri Jul 27 2018 zhengshuxin@qiyi.com 3.4.1-10-20180727.13
 - tbox: support transfering NULL message
