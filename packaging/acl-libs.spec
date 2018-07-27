@@ -1,4 +1,4 @@
-%define release_id 9
+%define release_id 10
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Fri Jul 27 2018 zhengshuxin@qiyi.com 3.4.1-10-20180727.13
+- tbox: support transfering NULL message
 
 * Thu Jul 05 2018 zhengshuxin@qiyi.com 3.4.1-9-20180705.14
 - acl::fstream: add filelock methods
