@@ -42,15 +42,33 @@ template<typename T>
 class tbox : public noncopyable
 {
 public:
-	tbox(void) : size_(0) , cond_(&lock_) {}
+	/**
+	 * 构造方法
+	 * @param free_obj {bool} 当 tbox 销毁时，是否自动检查并释放
+	 *  未被消费的动态对象
+	 */
+	tbox(bool free_obj = false)
+	: size_(0), free_obj_(free_obj), cond_(&lock_) {}
 
 	~tbox(void)
 	{
-		for (typename std::list<T*>::iterator it = tbox_.begin();
-			it != tbox_.end(); ++it)
-		{
-			delete *it;
+		clear(free_obj_);
+	}
+
+	/**
+	 * 清理消息队列中未被消费的消息对象
+	 * @param free_obj {bool} 释放调用 delete 方法删除消息对象
+	 */
+	void clear(bool free_obj = false)
+	{
+		if (free_obj) {
+			for (typename std::list<T*>::iterator it =
+				tbox_.begin(); it != tbox_.end(); ++it) {
+
+				delete *it;
+			}
 		}
+		tbox_.clear();
 	}
 
 	/**
@@ -95,7 +113,8 @@ public:
 				return t;
 			}
 
-			if (wait_ms >= 0 && !cond_.wait(n, true)) {
+			// 注意调用顺序，必须先调用 wait 再判断 wait_ms
+			if (!cond_.wait(n, true) && wait_ms >= 0) {
 				lock_.unlock();
 				if (found) {
 					*found = false;
@@ -126,8 +145,9 @@ public:
 	}
 
 private:
-	std::list<T*>     tbox_;
-	size_t            size_;
+	std::list<T*> tbox_;
+	size_t        size_;
+	bool          free_obj_;
 	thread_mutex lock_;
 	thread_cond  cond_;
 
