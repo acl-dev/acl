@@ -102,8 +102,7 @@ public:
 		long long n = ((long long) wait_ms) * 1000;
 		bool found_flag;
 		lock_.lock();
-		while (true)
-		{
+		while (true) {
 			T* t = peek(found_flag);
 			if (found_flag) {
 				lock_.unlock();
