@@ -59,8 +59,20 @@ bool http_servlet::doPost(request_t& req, response_t& res)
 	*/
 
 	const char* path = req.getPathInfo();
-	handler_t handler = path && *path ? handlers_[path] : NULL;
-	return handler ? (this->*handler)(req, res) : on_default(req, res);
+	if (path == NULL || *path == 0) {
+		logger_error("path null");
+		return false;
+	}
+
+	// 根据 uri path 查找对应的处理句柄，从而实现 HTTP 路由功能
+
+	std::map<std::string, handler_t>::iterator it = handlers_.find(path);
+	if (it == handlers_.end()) {
+		logger_warn("not support, path=%s", path);
+		return false;
+	}
+
+	return (this->*it->second)(req, res);
 }
 
 bool http_servlet::on_default(request_t& req, response_t& res)
