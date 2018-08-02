@@ -132,6 +132,19 @@ static void test2(void)
 	printf("\r\n");
 }
 
+static void test3(void)
+{
+	const char* s = "{\"status\":200,\"msg\":\"ok\",\"disk\":\"/data\",\"files\":[]}";
+
+	acl::json json(s);
+	files_outdate files;
+	if (acl::deserialize<files_outdate>(json, files)) {
+		printf("ok, files size=%lu\r\n", (unsigned long) files.files.size());
+	} else {
+		printf("parse error\r\n");
+	}
+}
+
 int main(void)
 {
 	printf("------------------------serialize----------------------\r\n");
@@ -145,6 +158,9 @@ int main(void)
 
 	printf("------------------------test2--------------------------\r\n");
 	test2();
+
+	printf("------------------------test3--------------------------\r\n");
+	test3();
 
 	printf("Enter any key to continue ..."); fflush(stdout); getchar();
 	return 0;

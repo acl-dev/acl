@@ -315,6 +315,12 @@ static const char *json_array(ACL_JSON *json, const char *data)
 	json->curr_node = array;
 	json->status = ACL_JSON_S_ELEMENT;
 
+	/* 如果该数组为空，则直接查询其兄弟节点 */
+	if (*data == ']') {
+		json->status = ACL_JSON_S_NEXT;
+		data++;
+	}
+
 	return data;
 }
 
