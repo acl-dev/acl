@@ -387,8 +387,7 @@ static const char *json_value(ACL_JSON *json, const char *data)
 	else if (IS_QUOTE(*data)) { /* && json->curr_node->quote == 0) { */
 		json->curr_node->quote = *data++;
 		json->status = ACL_JSON_S_STRING;
-	}
-	else
+	} else
 		json->status = ACL_JSON_S_STRING;
 
 	json->curr_node->type = ACL_JSON_T_LEAF;
@@ -400,14 +399,17 @@ static const char *json_string(ACL_JSON *json, const char *data)
 	ACL_JSON_NODE *node = json->curr_node;
 	int   ch;
 
+	/* Bugfix: 这防止字符串开始部分为空格时被忽略需注掉下面过滤逻辑 */
+#if 0
 	/* 当文本长度为 0 时，可以认为还未遇到有效的字符 */
 
 	if (LEN(node->text) == 0) {
 		/* 先过滤开头没用的空格 */
-		SKIP_SPACE(data);
+		//SKIP_SPACE(data);
 		if (*data == 0)
 			return data;
 	}
+#endif
 
 	/* 说明本节点是叶节点 */
 

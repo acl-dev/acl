@@ -1,4 +1,4 @@
-%define release_id 12
+%define release_id 13
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Fri Aug 03 2018 zhengshuxin@qiyi.com 3.4.1-13-20180803.11
+- bugfix: json parse should not ignore string value begin with space
 
 * Thu Aug 02 2018 zhengshuxin@qiyi.com 3.4.1-12-20180802.22
 - bugfix: json parser can't handle empty array object
