@@ -19,7 +19,9 @@ struct ACL_JSON_NODE {
 	ACL_VSTRING *ltag;          /**< 标签名 */
 	ACL_VSTRING *text;          /**< 当节点为叶节点时该文本内容非空 */
 	ACL_JSON_NODE *tag_node;    /**< 当标签值为 json 节点时此项非空 */
-	int   type;                 /**< 节点类型 */
+	ACL_JSON_NODE *parent;      /**< 父节点 */
+	ACL_RING children;          /**< 子节点集合 */
+	unsigned short type;        /**< 节点类型 */
 #define	ACL_JSON_T_A_STRING      (1 << 0)
 #define	ACL_JSON_T_A_NUMBER      (1 << 1)
 #define	ACL_JSON_T_A_BOOL        (1 << 2)
@@ -39,18 +41,16 @@ struct ACL_JSON_NODE {
 #define ACL_JSON_T_PAIR          (1 << 14)
 #define	ACL_JSON_T_ELEMENT       (1 << 15)
 
-	ACL_JSON_NODE *parent;      /**< 父节点 */
-	ACL_RING children;          /**< 子节点集合 */
-	int  depth;                 /**< 当前节点的深度 */
+	unsigned short depth;       /**< 当前节点的深度 */
 
 	/* private */
+	unsigned char quote;        /**< 非 0 表示 ' 或 " */
+	unsigned char left_ch;      /**< 本节点的第一个字符: { or [ */
+	unsigned char right_ch;     /**< 本节点的最后一个字符: } or ] */
+	unsigned backslash:1;       /**< 转义字符 \ */
+	unsigned part_word:1;       /**< 半个汉字的情况处理标志位 */
 	ACL_JSON *json;             /**< json 对象 */
-	ACL_RING node;              /**< 当前节点 */
-	int   quote;                /**< 非 0 表示 ' 或 " */
-	int   left_ch;              /**< 本节点的第一个字符: { or [ */
-	int   right_ch;             /**< 本节点的最后一个字符: } or ] */
-	int   backslash;            /**< 转义字符 \ */
-	int   part_word;            /**< 半个汉字的情况处理标志位 */
+	ACL_RING  node;             /**< 当前节点 */
 
 	/* public: for acl_iterator, 通过 acl_foreach 列出该节点的一级子节点 */
 
@@ -171,13 +171,6 @@ ACL_API ACL_JSON_NODE *acl_json_node_next(ACL_JSON_NODE *node);
  * @return {ACL_JSON_NODE*} 给定 json 节点的前一个兄弟节点, 若为NULL则表示不存在
  */
 ACL_API ACL_JSON_NODE *acl_json_node_prev(ACL_JSON_NODE *node);
-
-/**
- * 输出当前 json 节点的类型字符串
- * @param node {ACL_JSON_NODE*} json 节点对象
- * @return {const char*} json 节点对象类型的描述字符串
- */
-ACL_API const char *acl_json_node_type(const ACL_JSON_NODE *node);
 
 /**
  * 创建一个 json 对象

@@ -1,5 +1,8 @@
 修改历史列表：
 
+630) 2018.8.6
+630.1) optimize: 优化 ACL_VSTRING, ACL_VBUF, ACL_JSON_NODE 对象的存储空间大小
+
 629) 2018.8.3
 629.1) bugfix: acl_json_parse.c 在分析 Json 数据时，针对字符串对象，如果字符串
 值的开始部分为空格，则会被过滤掉，此问题已修复

@@ -457,9 +457,9 @@ ACL_XML2 *acl_xml2_mmap_fd(ACL_FILE_HANDLE fd, size_t max_len,
 ACL_XML2 *acl_xml2_alloc(ACL_VSTRING *buf)
 {
 #ifdef ACL_WINDOWS
-	if (buf->fd == ACL_FILE_INVALID)
+	if (buf->vbuf.fd == ACL_FILE_INVALID)
 #else
-	if (buf->fd < 0)
+	if (buf->vbuf.fd < 0)
 #endif
 		buf->vbuf.flags |= ACL_VBUF_FLAG_FIXED;
 

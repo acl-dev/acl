@@ -16,13 +16,9 @@ extern "C" {
  */
 typedef struct ACL_VSTRING {
     ACL_VBUF        vbuf;
-    ssize_t         maxlen;
     ACL_SLICE_POOL *slice;
     ACL_DBUF_POOL  *dbuf;
-    ACL_FILE_HANDLE fd;
-#if defined(_WIN32) || defined(_WIN64)
-    ACL_FILE_HANDLE hmap;
-#endif
+    ssize_t         maxlen;
 } ACL_VSTRING;
 
 /**

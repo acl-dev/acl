@@ -95,8 +95,8 @@ ACL_JSON_NODE *acl_json_node_alloc(ACL_JSON *json)
 	acl_ring_init(&node->node);
 
 	node->json = json;
-	node->ltag = acl_vstring_dbuf_alloc(json->dbuf, 64);
-	node->text = acl_vstring_dbuf_alloc(json->dbuf, 64);
+	node->ltag = acl_vstring_dbuf_alloc(json->dbuf, 16);
+	node->text = acl_vstring_dbuf_alloc(json->dbuf, 16);
 	node->part_word = 0;
 	json->node_cnt++;
 
@@ -168,17 +168,6 @@ ACL_JSON_NODE *acl_json_node_prev(ACL_JSON_NODE *node)
 		return NULL;
 
 	return acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
-}
-
-const char *acl_json_node_type(const ACL_JSON_NODE *node)
-{
-	static const char *types_tab[] =
-		{ "leaf node", "node object", "array object" };
-	static char *unknown = "unknown";
-
-	if (node->type >= 0 && node->type <= 2)
-		return types_tab[node->type];
-	return unknown;
 }
 
 /************************************************************************/

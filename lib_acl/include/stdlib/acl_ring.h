@@ -14,11 +14,11 @@ typedef struct ACL_RING ACL_RING;
  * 数据环结构类型定义
  */
 struct ACL_RING {
-	ACL_RING   *succ;           /**< successor */
-	ACL_RING   *pred;           /**< predecessor */
+	ACL_RING *succ;           /**< successor */
+	ACL_RING *pred;           /**< predecessor */
 
-	ACL_RING   *parent;         /**< the header of all the rings */
-	int   len;                  /**< the count in the ring */
+	ACL_RING *parent;         /**< the header of all the rings */
+	int len;                  /**< the count in the ring */
 };
 
 typedef struct ACL_RING_ITER {
