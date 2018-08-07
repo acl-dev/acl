@@ -679,9 +679,9 @@ bool db_mysql::close(void)
 
 bool db_mysql::sane_mysql_query(const char* sql)
 {
-	if (conn_ == NULL)
+	if (conn_ == NULL && dbopen() == false)
 	{
-		logger_error("db(%s) not opened yet!", dbname_);
+		logger_error("open mysql error, db=%s", dbname_);
 		return false;
 	}
 	if (__mysql_query(conn_, sql) == 0)

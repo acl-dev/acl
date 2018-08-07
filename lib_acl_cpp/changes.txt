@@ -1,6 +1,12 @@
 修改历史列表：
 
 
+533) 2018.8.7
+533.1) bugfix: db_mysql.cpp, 如果在执行操作的时候，发现跟mysql已经断开链接了，
+就会重连，万一在连接时间内都没有重连成功，就会释放掉MYSQL*指针，造成这个连接对象
+永不可用了。因为dbmysql::sane_mysql_query函数判断conn_为null就直接返回了
+--- young_hb
+
 532) 2018.8.2
 532.1) bugfix: gson_helper.ipp 在处理空数组时有误
 
