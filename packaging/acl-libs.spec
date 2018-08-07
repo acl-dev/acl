@@ -1,4 +1,4 @@
-%define release_id 13
+%define release_id 14
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Tue Aug 07 2018 zhengshuxin@qiyi.com 3.4.1-14-20180807.10
+- optimize the storage size of ACL_VSTRING, ACL_VBUF and ACL_JSON_NODE
 
 * Fri Aug 03 2018 zhengshuxin@qiyi.com 3.4.1-13-20180803.11
 - bugfix: json parse should not ignore string value begin with space
