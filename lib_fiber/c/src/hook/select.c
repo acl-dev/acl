@@ -111,7 +111,7 @@ static struct pollfd *pfds_create(int *nfds, fd_set *readfds,
 }
 #else
 static struct pollfd *pfds_create(int *nfds, fd_set *readfds,
-	fd_set *writefds, fd_set *exceptfds)
+	fd_set *writefds, fd_set *exceptfds fiber_unused)
 {
 	int fd;
 	struct pollfd *fds;

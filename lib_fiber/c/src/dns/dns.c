@@ -220,7 +220,7 @@ DNS_PRAGMA_PUSH
 #endif
 #endif
 
-#if HAVE_STATIC_ASSERT
+#ifdef HAVE_STATIC_ASSERT
 #define dns_static_assert(cond, msg) static_assert(cond, msg)
 #elif HAVE__STATIC_ASSERT
 #define dns_static_assert(cond, msg) _Static_assert(cond, msg)

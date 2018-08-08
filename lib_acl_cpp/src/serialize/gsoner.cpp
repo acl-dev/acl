@@ -1367,48 +1367,57 @@ void gsoner::parse_code()
 				break;
 
 			char ch = codes_[pos_];
-			switch(ch)
+			if (ch == ';')
 			{
-			case ';':
 				pos_++;
 				continue;
-			case '/':
-				if(check_comment())
+			}
+			if (ch == '/')
+			{
+				if (check_comment())
 					continue;
-			case '}':
+			}
+			if (ch == '}')
+			{
 				if(check_struct_end())
 					continue;
 				if(check_namespace_end())
 					continue;
-			case 'n':
+			}
+			if (ch == 'n')
+			{
 				if(check_namespace())
 					continue;
-			case '#':
+			}
+			if (ch == '#')
+			{
 				if(check_include())
 					continue;
 				if(check_define())
 					continue;
 				if(check_pragma())
 					continue;
-			case 's':
+			}
+			if (ch == 's')
+			{
 				if(check_struct_begin())
 					continue;
-			case 'u':
+			}
+			if (ch == 'u')
+			{
 				if (check_use_namespace())
 					continue;
-			default:
-				if(check_function())
-					continue;
-				if(check_member())
-				{
-					required_ = default_;
-					continue;
-				}
-
-				printf("%c", codes_[pos_]);
-				pos_++;
+			}
+			if(check_function())
+				continue;
+			if(check_member())
+			{
+				required_ = default_;
+				continue;
 			}
 
+			printf("%c", codes_[pos_]);
+			pos_++;
 		} while (pos_ < max_pos_);
 	}
 	catch (syntax_error &e)

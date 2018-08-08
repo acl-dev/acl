@@ -12,4 +12,15 @@ struct user
 	double n2;
 	double n3;
 	double n4;
+
+	user(void)
+	{
+		age  = 0;
+		male = false;
+		n0   = 0;
+		n1   = 2;
+		n2   = 0;
+		n3   = 0;
+		n4   = 0;
+	}
 };

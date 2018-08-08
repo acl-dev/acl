@@ -684,6 +684,7 @@ bool db_mysql::sane_mysql_query(const char* sql)
 		logger_error("open mysql error, db=%s", dbname_);
 		return false;
 	}
+
 	if (__mysql_query(conn_, sql) == 0)
 		return true;
 
@@ -712,12 +713,6 @@ bool db_mysql::sane_mysql_query(const char* sql)
 
 bool db_mysql::tbl_exists(const char* tbl_name)
 {
-	if (conn_ == NULL)
-	{
-		logger_error("db(%s) not opened yet", dbname_);
-		return false;
-	}
-
 	char sql[256];
 
 	safe_snprintf(sql, sizeof(sql), "show tables like '%s'", tbl_name);
