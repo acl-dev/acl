@@ -545,7 +545,7 @@ static void main_thread_loop(void)
 
 	acl_msg_info("daemon started, log=%s", acl_var_fiber_log_file);
 	acl_fiber_schedule_with(__fiber_schedule_event);
-	acl_msg_info("deamon stopped now, exit status=%d", __exit_status);
+	acl_msg_info("daemon stopped now, exit status=%d", __exit_status);
 	exit(__exit_status);
 }
 
