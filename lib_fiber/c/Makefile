@@ -55,6 +55,14 @@ endif
 
 ifeq ($(findstring gcc, $(CC)), gcc)
 	CFLAGS += -Wstrict-prototypes
+	GCC_VERSION=$(shell gcc --version | grep ^gcc | sed 's/^.* //g')
+	GCC_MAJOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f1)
+	GCC_MINOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f2)
+	GCC_SUB:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f3)
+	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -gt 4 \) ] && echo true)
+	ifeq ($(GCC_VER), true)
+		CFLAGS += -Wno-implicit-fallthrough
+	endif
 endif
 
 ifeq ($(findstring clang, $(CC)), clang)

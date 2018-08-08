@@ -399,7 +399,7 @@ const char *dns_strerror(int error) {
 #endif
 
 #ifndef DNS_ATOMIC_FETCH_ADD
-#if HAVE___ATOMIC_FETCH_ADD && __GCC_ATOMIC_LONG_LOCK_FREE == 2
+#if defined(HAVE___ATOMIC_FETCH_ADD) && __GCC_ATOMIC_LONG_LOCK_FREE == 2
 #define DNS_ATOMIC_FETCH_ADD(i) __atomic_fetch_add((i), 1, __ATOMIC_RELAXED)
 #else
 #pragma message("no atomic_fetch_add available")
@@ -408,7 +408,7 @@ const char *dns_strerror(int error) {
 #endif
 
 #ifndef DNS_ATOMIC_FETCH_SUB
-#if HAVE___ATOMIC_FETCH_SUB && __GCC_ATOMIC_LONG_LOCK_FREE == 2
+#if defined(HAVE___ATOMIC_FETCH_SUB) && __GCC_ATOMIC_LONG_LOCK_FREE == 2
 #define DNS_ATOMIC_FETCH_SUB(i) __atomic_fetch_sub((i), 1, __ATOMIC_RELAXED)
 #else
 #pragma message("no atomic_fetch_sub available")
@@ -815,7 +815,7 @@ static size_t dns_af_len(int af) {
 	static const size_t table[AF_MAX]	= {
 		[AF_INET6]	= sizeof (struct sockaddr_in6),
 		[AF_INET]	= sizeof (struct sockaddr_in),
-#if DNS_HAVE_SOCKADDR_UN
+#if defined(DNS_HAVE_SOCKADDR_UN)
 		[AF_UNIX]	= sizeof (struct sockaddr_un),
 #endif
 	};
@@ -870,13 +870,13 @@ static void *dns_sa_addr(int af, const void *sa, socklen_t *size) {
 } /* dns_sa_addr() */
 
 
-#if DNS_HAVE_SOCKADDR_UN
+#if defined(DNS_HAVE_SOCKADDR_UN)
 #define DNS_SUNPATHMAX (sizeof ((struct sockaddr_un *)0)->sun_path)
 #endif
 
 DNS_NOTUSED static void *dns_sa_path(void *sa, socklen_t *size) {
 	switch (dns_sa_family(sa)) {
-#if DNS_HAVE_SOCKADDR_UN
+#if defined(DNS_HAVE_SOCKADDR_UN)
 	case AF_UNIX: {
 		char *path = ((struct sockaddr_un *)sa)->sun_path;
 
@@ -936,7 +936,7 @@ static int dns_sa_cmp(void *a, void *b) {
 
 		return 0;
 	}
-#if DNS_HAVE_SOCKADDR_UN
+#if defined(DNS_HAVE_SOCKADDR_UN)
 	case AF_UNIX: {
 		char a_path[DNS_SUNPATHMAX + 1], b_path[sizeof a_path];
 
@@ -952,7 +952,7 @@ static int dns_sa_cmp(void *a, void *b) {
 } /* dns_sa_cmp() */
 
 
-#if _WIN32
+#if defined(_WIN32)
 static int dns_inet_pton(int af, const void *src, void *dst) {
 	union { struct sockaddr_in sin; struct sockaddr_in6 sin6; } u;
 	int len = (int) sizeof(u);
@@ -6280,26 +6280,26 @@ static int dns_socket(struct sockaddr *local, int type, int *error_) {
 #endif
 
 	flags = 0;
-#if HAVE_SOCK_CLOEXEC
+#if defined(HAVE_SOCK_CLOEXEC) && defined(SOCK_CLOEXEC)
 	flags |= SOCK_CLOEXEC;
 #endif
-#if HAVE_SOCK_NONBLOCK
+#if defined(HAVE_SOCK_NONBLOCK) && defined(SOCK_NONBLOCK)
 	flags |= SOCK_NONBLOCK;
 #endif
 	if (-1 == (fd = socket(local->sa_family, type|flags, 0)))
 		goto soerr;
 
-#if defined F_SETFD && !HAVE_SOCK_CLOEXEC
+#if defined(F_SETFD) && !defined(HAVE_SOCK_CLOEXEC)
 	if (-1 == fcntl(fd, F_SETFD, 1))
 		goto syerr;
 #endif
 
-#if defined O_NONBLOCK && !HAVE_SOCK_NONBLOCK
+#if defined(O_NONBLOCK) && !defined(HAVE_SOCK_NONBLOCK)
 	if (-1 == (flags = fcntl(fd, F_GETFL)))
 		goto syerr;
 	if (-1 == fcntl(fd, F_SETFL, flags | O_NONBLOCK))
 		goto syerr;
-#elif defined FIONBIO && HAVE_IOCTLSOCKET
+#elif defined(FIONBIO) && defined(HAVE_IOCTLSOCKET)
 	opt = 1;
 	if (0 != ioctlsocket(fd, FIONBIO, &opt))
 		goto soerr;
@@ -6352,7 +6352,7 @@ soerr:
 	error = dns_soerr();
 
 	goto error;
-#if (defined F_SETFD && !HAVE_SOCK_CLOEXEC) || (defined O_NONBLOCK && !HAVE_SOCK_NONBLOCK)
+#if (defined(F_SETFD) && !defined(HAVE_SOCK_CLOEXEC)) || (defined(O_NONBLOCK) && !defined(HAVE_SOCK_NONBLOCK))
 syerr:
 	error = dns_syerr();
 
