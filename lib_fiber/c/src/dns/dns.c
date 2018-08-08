@@ -214,9 +214,9 @@ DNS_PRAGMA_PUSH
 
 #ifndef HAVE_STATIC_ASSERT
 #if DNS_GNUC_PREREQ(0,0,0) && !DNS_GNUC_PREREQ(4,6,0)
-#define HAVE_STATIC_ASSERT 0 /* glibc doesn't check GCC version */
-#else
-#define HAVE_STATIC_ASSERT (defined static_assert)
+//#define HAVE_STATIC_ASSERT 0 /* glibc doesn't check GCC version */
+#elif defined(static_assert)
+#define HAVE_STATIC_ASSERT 1
 #endif
 #endif
 
