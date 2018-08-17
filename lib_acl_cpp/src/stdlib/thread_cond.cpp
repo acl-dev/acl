@@ -72,9 +72,7 @@ bool thread_cond::block_wait(bool locked)
 {
 	bool locked_internal;
 
-	// 如果使用了内部锁，则需要加锁，否则再判断所用的外部锁是否已经加锁，
-	// 如果使用了外部锁且外部未加锁，则也需要加锁。
-	if (mutex_internal_ || !locked)
+	if (!locked)
 	{
 		if (!mutex_->lock())
 		{

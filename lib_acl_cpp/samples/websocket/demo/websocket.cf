@@ -8,7 +8,7 @@ service http_server {
 #	for master_type = unix
 #	master_service = echo.sock
 #	for master_type = sock
-	master_service = 127.0.0.1:5001, 5002, :5003, echo.sock, echo2.sock
+	master_service = 9004
 
 #	服务监听为域套接口
 #	master_service = aio_echo.sock

@@ -132,18 +132,27 @@ bool server_socket::close()
 	return ret;
 }
 
-socket_stream* server_socket::accept(int timeout /* = 0 */)
+socket_stream* server_socket::accept(int timeout /* = 0 */,
+	bool* etimed /* = NULL */)
 {
+	if (etimed)
+		*etimed = false;
+
 	if (fd_ == ACL_SOCKET_INVALID)
 	{
 		logger_error("server socket not opened!");
 		return NULL;
 	}
 
-	if ((open_flag_ & ACL_NON_BLOCKING) && timeout > 0)
+	// if ((open_flag_ & ACL_NON_BLOCKING) && timeout > 0)
+	if (timeout > 0)
 	{
 		if (acl_read_wait(fd_, timeout) == -1)
+		{
+			if (etimed)
+				*etimed = true;
 			return NULL;
+		}
 	}
 
 	ACL_SOCKET fd = acl_accept(fd_, NULL, 0, NULL);

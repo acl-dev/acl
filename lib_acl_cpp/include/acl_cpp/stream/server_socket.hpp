@@ -88,11 +88,13 @@ public:
 
 	/**
 	 * 接收客户端连接并创建客户端连接流
-	 * @param timeout {int} 在阻塞模式下，当该值 > 0 时，采用超时
-	 *  方式接收客户端连接，若在指定时间内未获得客户端连接，则返回 NULL
-	 * @return {socket_stream*} 返回空表示接收失败
+	 * @param timeout {int} 当该值 > 0 时，采用超时方式接收客户端连接，
+	 *  若在指定时间内未获得客户端连接，则返回 NULL
+	 * @param etimed {bool*} 当此指针非 NULL 时，如果因超时导致该函数返回
+	 *  NULL，则此值被置为 true
+	 * @return {socket_stream*} 返回空表示接收失败或超时
 	 */
-	socket_stream* accept(int timeout = 0);
+	socket_stream* accept(int timeout = 0, bool* etimed = NULL);
 
 	/**
 	 * 获得监听的地址

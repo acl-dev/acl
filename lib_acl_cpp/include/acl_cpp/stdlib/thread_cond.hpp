@@ -33,8 +33,8 @@ class ACL_CPP_API thread_cond
 public:
 	/**
 	 * 构造方法
-	 * @param mutex {thread_mutex*} 当该参数非 NULL 时，内部自动引用该线程锁，
-	 *  否则，内部创建线程锁
+	 * @param mutex {thread_mutex*} 当该参数非 NULL 时，内部自动引用
+	 *  该线程锁，否则，内部创建线程锁
 	 */
 	thread_cond(thread_mutex* mutex = NULL);
 	~thread_cond(void);
@@ -45,11 +45,9 @@ public:
 	 *   > 0 时表示等待超时的时间
 	 *   == 0，不等待
 	 *   < 0 则一直等待直到条件变量就绪
-	 * @param locked {bool} 当构造参数传入的线程锁非空时，该参数表示外部
-	 *  传入的线程锁是否已经被外部调用者锁住，如果已经被锁住，则内部将不
-	 *  再对构造中传入的外部锁加锁，否则，内部将会加锁外部锁，函数返回前
-	 *  再解外部锁；此外，如果构造参数传入线程锁为空时，内部会自动先加内
-	 *  部锁，函数返回前再解内部锁
+	 * @param locked {bool} 该参数表明是否已经将锁加锁，如果还未加锁，则
+	 *  内部会先自动加锁，方法返回前再解锁；如果外部已经加锁，则内部不对
+	 *  互斥锁做加锁/解锁处理
 	 * @return {bool} 返回 true 表示条件变量就绪，否则表示超时或没被通知
 	 */
 	bool wait(long long microseconds = -1, bool locked = false);

@@ -1,6 +1,9 @@
 修改历史列表：
 
 
+534) 2018.8.17
+534.1) workaround: thread_cond::wait, server_socket::accept 参数含义发生改变
+
 533) 2018.8.7
 533.1) bugfix: db_mysql.cpp, 如果在执行操作的时候，发现跟mysql已经断开链接了，
 就会重连，万一在连接时间内都没有重连成功，就会释放掉MYSQL*指针，造成这个连接对象
