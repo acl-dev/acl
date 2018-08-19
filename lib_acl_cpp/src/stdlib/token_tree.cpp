@@ -82,6 +82,16 @@ const token_node* token_tree::match(const char** text, const char* delimiters,
 	return &node_;
 }
 
+char* token_tree::create_delimiters_tab(const char* delimiters)
+{
+	return acl_token_delim_tab_new(delimiters);
+}
+
+void token_tree::free_delimiters_tab(char* delimiters_tab)
+{
+	acl_token_delim_tab_free(delimiters_tab);
+}
+
 const token_node* token_tree::first_node(void)
 {
 	if (iter_ == NULL) {

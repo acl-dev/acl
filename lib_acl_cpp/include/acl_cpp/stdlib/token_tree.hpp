@@ -103,7 +103,8 @@ public:
 	 * @param delimiters {const char*} 非 NULL 时指定的截止符字符串，即查
 	 *  找过程中只要遇到的字符在该截止字符串中，则返回本次查找的结果
 	 * @param delimiters_tab {const char*} 非 NULL 时指定的截止符字符数组，
-	 *  即查找过程中只要遇到的字符在该截止字符数组中，则返回本次查找的结果
+	 *  即查找过程中只要遇到的字符在该截止字符数组中，则返回本次查找的结果，该数组
+	 *  必须由 create_delimiters_tab 创建，由 free_delimiters_tab 释放
 	 * @return {token_node*} 返回 NULL 表示本次查找未找到匹配项，通过检查
 	 *  *text 是否为 '\0' 表示是否匹配完毕目标文本字符串
 	 *  注：当 delimiters 非空时优先使用 delimiters 做为截止符，否则再检查
@@ -111,6 +112,19 @@ public:
 	 */
 	const token_node* match(const char** text, const char* delimiters = NULL,
 		const char* delimiters_tab = NULL);
+
+	/**
+	 * 创建截止符数组
+	 * @param delimiters {const char*} 截止符字符串
+	 * @return {char*} 根据截止符字符串创建的截止符数组
+	 */
+	static char* create_delimiters_tab(const char* delimiters);
+
+	/**
+	 * 释放由 create_delimiters_tab 创建的截止符数组
+	 * @param delimiters_tab {char*}
+	 */
+	static void free_delimiters_tab(char* delimiters_tab);
 
 	/**
 	 * 遍历 256 匹配树时需先调用本方法获得第一个节点对象
