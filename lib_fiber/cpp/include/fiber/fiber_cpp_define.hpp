@@ -1,7 +1,7 @@
 #pragma once
 
 #if defined(_WIN32) || defined (_WIN64)
-typedef long ssize_t;
+typedef intptr_t ssize_t;
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
