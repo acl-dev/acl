@@ -175,7 +175,7 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 {
 	int ret;
 	WSABUF wsaData;
-	DWORD  flags = 0;
+	DWORD  flags = 0, len = 0;
 
 	iocp_check(ev, fe);
 
@@ -194,8 +194,9 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 	wsaData.buf = fe->buf;
 	wsaData.len = fe->size;
 
-	ret = WSARecv(fe->fd, &wsaData, 1, &fe->len, &flags,
+	ret = WSARecv(fe->fd, &wsaData, 1, &len, &flags,
 		(OVERLAPPED*) &fe->reader->overlapped, NULL);
+	fe->len = (int) len;
 
 	if (ret != SOCKET_ERROR) {
 		fe->mask |= EVENT_READ;
@@ -396,13 +397,13 @@ static int iocp_wait(EVENT *ev, int timeout)
 		timeout = 0;
 	}
 
-	while ((fe = ei->readers->pop_back(ei->readers)) != NULL) {
+	while ((fe = (FILE_EVENT*) ei->readers->pop_back(ei->readers)) != NULL) {
 		if (fe->r_proc) {
 			fe->r_proc(ev, fe);
 		}
 	}
 
-	while ((fe = ei->writers->pop_back(ei->writers)) != NULL) {
+	while ((fe = (FILE_EVENT*) ei->writers->pop_back(ei->writers)) != NULL) {
 		if (fe->w_proc) {
 			fe->w_proc(ev, fe);
 		}
@@ -430,10 +431,10 @@ static int iocp_checkfd(EVENT_IOCP *ev, FILE_EVENT *fe)
 	return getsocktype(fe->fd) == -1 ? -1 : 0;
 }
 
-static long iocp_handle(EVENT *ev)
+static acl_handle_t iocp_handle(EVENT *ev)
 {
 	EVENT_IOCP *ei = (EVENT_IOCP *) ev;
-	return (long) ei->h_iocp;
+	return (acl_handle_t) ei->h_iocp;
 }
 
 static const char *iocp_name(void)

@@ -80,12 +80,12 @@ const char *event_name(EVENT *ev)
 	return ev->name();
 }
 
-int event_handle(EVENT *ev)
+acl_handle_t event_handle(EVENT *ev)
 {
-	return (int) ev->handle(ev);
+	return ev->handle(ev);
 }
 
-int event_size(EVENT *ev)
+ssize_t event_size(EVENT *ev)
 {
 	return ev->setsize;
 }

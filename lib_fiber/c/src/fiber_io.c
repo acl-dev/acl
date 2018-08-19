@@ -28,7 +28,7 @@ static void fiber_io_loop(ACL_FIBER *fiber, void *ctx);
 #define MAXFD		1024
 #define STACK_SIZE	819200
 
-socket_t var_maxfd = MAXFD;
+int var_maxfd = MAXFD;
 
 void acl_fiber_schedule_stop(void)
 {
@@ -409,7 +409,7 @@ static FILE_EVENT *fiber_file_get(socket_t fd)
 
 	fiber_io_check();
 	//_snprintf(key, sizeof(key), "%u", fd);
-	_itoa(fd, key, 10); // key's space large enougth
+	_i64toa(fd, key, 10); // key's space large enougth
 
 	return (FILE_EVENT *) htable_find(__thread_fiber->events, key);
 #else
@@ -430,7 +430,7 @@ static void fiber_file_set(FILE_EVENT *fe)
 	char key[64];
 
 	//_snprintf(key, sizeof(key), "%u", fe->fd);
-	_itoa(fe->fd, key, 10);
+	_i64toa(fe->fd, key, 10);
 
 	htable_enter(__thread_fiber->events, key, fe);
 #else
@@ -464,14 +464,14 @@ static int fiber_file_del(FILE_EVENT *fe)
 #ifdef SYS_WIN
 	char key[64];
 
-	if (fe->fd == INVALID_SOCKET || fe->fd >= var_maxfd) {
+	if (fe->fd == INVALID_SOCKET || fe->fd >= (socket_t) var_maxfd) {
 		msg_error("%s(%d): invalid fd=%d",
 			__FUNCTION__, __LINE__, fe->fd);
 		return -1;
 	}
 
 	//_snprintf(key, sizeof(key), "%u", fe->fd);
-	_itoa(fe->fd, key, 10);
+	_i64toa(fe->fd, key, 10);
 
 	htable_delete(__thread_fiber->events, key, NULL);
 	return 0;
@@ -502,7 +502,7 @@ int fiber_file_close(socket_t fd, int *closed)
 	*closed = 0;
 
 	fiber_io_check();
-	if (fd == INVALID_SOCKET || fd >= var_maxfd) {
+	if (fd == INVALID_SOCKET || fd >= (socket_t) var_maxfd) {
 		msg_error("%s(%d): invalid fd=%u", __FUNCTION__, __LINE__, fd);
 		return -1;
 	}

@@ -295,9 +295,16 @@ FIBER_API const char *acl_fiber_last_serror(void);
 
 /**
  * set the system error number
- * @param errnum {int} ´íÎóºÅ
+ * @param errnum {int} the error number
  */
 FIBER_API void acl_fiber_set_error(int errnum);
+
+/**
+ * set the fd limit for the current process
+ * @param limit {int} the fd limit to be set
+ * @return {int} the real fd limit will be returned
+ */
+FIBER_API int acl_fiber_set_fdlimit(int limit);
 
 /****************************************************************************/
 

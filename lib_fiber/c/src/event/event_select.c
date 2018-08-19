@@ -21,7 +21,7 @@ static void hook_api(void)
 	__sys_select = (select_fn) dlsym(RTLD_NEXT, "select");
 	assert(__sys_select);
 #elif defined(SYS_WIN)
-	__sys_select = select;
+	__sys_select = (select_fn) select;
 #endif
 }
 
@@ -179,7 +179,7 @@ static int select_event_wait(EVENT *ev, int timeout)
 	n = __sys_select(es->maxfd + 1, &rset, 0, &xset, tp);
 #endif
 	if (n < 0) {
-		printf("select error %s\r\n", last_serror());
+		//printf("select error %s\r\n", last_serror());
 		if (acl_fiber_last_error() == FIBER_EINTR) {
 			return 0;
 		}
@@ -221,10 +221,10 @@ static int select_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe UNUSED)
 	return -1;
 }
 
-static long select_handle(EVENT *ev)
+static acl_handle_t select_handle(EVENT *ev)
 {
 	(void) ev;
-	return -1;
+	return (acl_handle_t)-1;
 }
 
 static const char *select_name(void)

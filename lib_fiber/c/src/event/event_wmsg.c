@@ -38,7 +38,7 @@ static FILE_EVENT *file_event_find(EVENT_WMSG *ev, SOCKET fd)
 	char key[64];
 
 	//_snprintf(key, sizeof(key), "%u", fd);
-	_itoa(fd, key, 10);
+	_i64toa(fd, key, 10);
 
 	return (FILE_EVENT *) htable_find(ev->tbl, key);
 }
@@ -69,7 +69,7 @@ static void wmsg_fdmap_set(EVENT_WMSG *ev, FILE_EVENT *fe)
 	char key[64];
 
 	//_snprintf(key, sizeof(key), "%u", fe->fd);
-	_itoa(fe->fd, key, 10);
+	_i64toa(fe->fd, key, 10);
 
 	pfe = (FILE_EVENT *) htable_find(ev->tbl, key);
 	if (pfe == NULL) {
@@ -86,7 +86,7 @@ static FILE_EVENT *wmsg_fdmap_get(EVENT_WMSG *ev, SOCKET fd)
 	char key[64];
 
 	//_snprintf(key, sizeof(key), "%u", fd);
-	_itoa(fd, key, 10);
+	_i64toa(fd, key, 10);
 
 	return (FILE_EVENT *) htable_find(ev->tbl, key);
 }
@@ -96,7 +96,7 @@ static void wmsg_fdmap_del(EVENT_WMSG *ev, FILE_EVENT *fe)
 	char key[64];
 
 	//_snprintf(key, sizeof(key), "%u", fe->fd);
-	_itoa(fe->fd, key, 10);
+	_i64toa(fe->fd, key, 10);
 
 	if (htable_delete(ev->tbl, key, NULL) == 0) {
 		ev->event.fdcount--;
@@ -349,10 +349,10 @@ static BOOL InitApplication(const char *class_name, HINSTANCE hInstance)
 
 	wcx.hIcon = LoadIcon(NULL, IDI_APPLICATION);     /* predefined app. icon */
 	wcx.hCursor = LoadCursor(NULL, IDC_ARROW);       /* predefined arrow */
-	wcx.hbrBackground = GetStockObject(WHITE_BRUSH); /* white background brush */
+	wcx.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH); /* white background brush */
 	wcx.lpszMenuName  =  NULL;          /* name of menu resource */
 	wcx.lpszClassName = class_name;     /* name of window class */
-	wcx.hIconSm = LoadImage(hInstance,  /* small class icon */
+	wcx.hIconSm = (HICON) LoadImage(hInstance,  /* small class icon */
 		MAKEINTRESOURCE(5),
 		IMAGE_ICON,
 		GetSystemMetrics(SM_CXSMICON),
@@ -405,10 +405,10 @@ static HWND CreateSockWindow(const char *class_name, HINSTANCE hInstance)
 	return InitInstance(class_name, hInstance);
 }
 
-static long wmsg_handle(EVENT *ev)
+static acl_handle_t wmsg_handle(EVENT *ev)
 {
 	EVENT_WMSG *ew = (EVENT_WMSG *) ev;
-	return (long) ew->hInstance;
+	return (acl_handle_t) ew->hInstance;
 }
 
 static const char *wmsg_name(void)

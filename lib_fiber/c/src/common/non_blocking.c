@@ -3,7 +3,7 @@
 #include "iostuff.h"
 
 #ifdef SYS_WIN
-int non_blocking(int fd, int on)
+int non_blocking(socket_t fd, int on)
 {
 	unsigned long n = on;
 	int flags = 0;
@@ -21,7 +21,7 @@ int non_blocking(int fd, int on)
 #  define PATTERN	O_NONBLOCK
 # endif
 
-int non_blocking(int fd, int on)
+int non_blocking(socket_t fd, int on)
 {
 	int   flags;
 	int   nonb = PATTERN;

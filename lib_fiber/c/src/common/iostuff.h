@@ -1,5 +1,6 @@
 #ifndef	IOSTUFF_INCLUDE_H
 #define	IOSTUFF_INCLUDE_H
+#include <fiber/fiber_define.h>
 
 #ifdef	__cplusplus
 extern "C" {
@@ -17,7 +18,7 @@ extern "C" {
  * @param on {int} 是否设置该套接字为非阻塞, BLOCKING 或 NON_BLOCKING
  * @return {int} >= 0: 成功, 返回值 > 0 表示设置之前的标志位; -1: 失败
  */
-int non_blocking(int fd, int on);
+int non_blocking(socket_t fd, int on);
 
 /**
  * 毫秒级别睡眠
@@ -48,7 +49,7 @@ int open_limit(int limit);
 int issock(int fd);
 
 //int read_wait(int fd, int timeout);
-void tcp_nodelay(int fd, int onoff);
+void tcp_nodelay(socket_t fd, int onoff);
 
 #ifdef SYS_UNIX
 int sane_socketpair(int domain, int type, int protocol, int result[2]);

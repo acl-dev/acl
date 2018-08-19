@@ -11,7 +11,7 @@ int is_listen_socket(socket_t fd)
 	socklen_t len = sizeof(val);
 #endif
 
-	ret = getsockopt(fd, SOL_SOCKET, SO_ACCEPTCONN, (void*) &val, &len);
+	ret = getsockopt(fd, SOL_SOCKET, SO_ACCEPTCONN, (char*) &val, &len);
 	if (ret == -1) {
 		return 0;
 	} else if (val) {

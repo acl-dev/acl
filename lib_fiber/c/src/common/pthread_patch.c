@@ -85,7 +85,7 @@ static FIFO *tls_value_list_get(void)
 {
 	FIFO *tls_value_list_ptr;
 
-	tls_value_list_ptr = TlsGetValue(__tls_value_list_key);
+	tls_value_list_ptr = (FIFO*) TlsGetValue(__tls_value_list_key);
 	if (tls_value_list_ptr == NULL) {
 		tls_value_list_ptr = fifo_new();
 		TlsSetValue(__tls_value_list_key, tls_value_list_ptr);
@@ -102,7 +102,7 @@ static void tls_value_list_free(void)
 {
 	FIFO *tls_value_list_ptr;
 
-	tls_value_list_ptr = TlsGetValue(__tls_value_list_key);
+	tls_value_list_ptr = (FIFO*) TlsGetValue(__tls_value_list_key);
 	if (tls_value_list_ptr != NULL) {
 		TlsSetValue(__tls_value_list_key, NULL);
 		fifo_free(tls_value_list_ptr, tls_value_list_on_free);
@@ -131,7 +131,7 @@ int pthread_once(pthread_once_t *once_control, void (*init_routine)(void))
 	 */
 	while (1) {
 		LONG prev = InterlockedCompareExchange(
-			once_control, 1, PTHREAD_ONCE_INIT);
+			(LONG*) once_control, 1L, PTHREAD_ONCE_INIT);
 		if (prev == 2)
 			return 0;
 		else if (prev == 0) {
@@ -140,7 +140,7 @@ int pthread_once(pthread_once_t *once_control, void (*init_routine)(void))
 			/* 将 *conce_control 重新赋值以使后续线程不进入 while
 			 * 循环或从 while 循环中跳出
 			 */
-			InterlockedExchange(once_control, 2);
+			InterlockedExchange((LONG*) once_control, 2);
 			return 0;
 		} else {
 			assert(prev == 1);

@@ -3,7 +3,7 @@
 #include "msg.h"
 #include "iostuff.h"
 
-static int getsocktype(int fd)
+static int getsocktype(socket_t fd)
 {
 	struct SOCK_ADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
@@ -24,7 +24,7 @@ static int getsocktype(int fd)
 	return -1;
 }
 
-void tcp_nodelay(int fd, int onoff)
+void tcp_nodelay(socket_t fd, int onoff)
 {
 	const char *myname = "tcp_nodelay";
 	int   on = onoff ? 1 : 0;

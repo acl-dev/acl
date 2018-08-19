@@ -79,9 +79,9 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 	LARGE_INTEGER   li;
 	__int64         t;
 	int             nnested = 0;
-	LARGE_INTEGER stamp;
+	LARGE_INTEGER   stamp;
 	time_t now;
-	TIME_CTX_T *ctx = tls_calloc(sizeof(TIME_CTX_T));
+	TIME_CTX_T *ctx = (TIME_CTX_T*) tls_calloc(sizeof(TIME_CTX_T));
 
 	/* 每个线程调用此函数时都需要进行初始化，但为了防止开机时间太长
 	 * 而造成时钟计数归零溢出，所以每隔 1 天校对一次基准时间

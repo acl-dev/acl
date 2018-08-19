@@ -165,7 +165,7 @@ struct EVENT {
 #endif
 
 	const char *(*name)(void);
-	long (*handle)(EVENT *);
+	acl_handle_t (*handle)(EVENT *);
 	void (*free)(EVENT *);
 
 	int  (*event_fflush)(EVENT *);
@@ -180,16 +180,16 @@ struct EVENT {
 };
 
 /* file_event.c */
-void file_event_init(FILE_EVENT *fe, int fd);
-FILE_EVENT *file_event_alloc(int fd);
+void file_event_init(FILE_EVENT *fe, socket_t fd);
+FILE_EVENT *file_event_alloc(socket_t fd);
 void file_event_free(FILE_EVENT *fe);
 
 /* event.c */
 void event_set(int event_mode);
 EVENT *event_create(int size);
 const char *event_name(EVENT *ev);
-int  event_handle(EVENT *ev);
-int  event_size(EVENT *ev);
+acl_handle_t event_handle(EVENT *ev);
+ssize_t event_size(EVENT *ev);
 void event_free(EVENT *ev);
 void event_close(EVENT *ev, FILE_EVENT *fe);
 

@@ -1,14 +1,28 @@
 #include "stdafx.h"
+#include "fiber/fiber_base.h"
 #include "msg.h"
 #include "iostuff.h"
 
 #ifdef SYS_WIN
+
+static int __default_limit = 10240;
+
 int open_limit(int limit)
 {
-	if (limit <= 0)
-		limit = 10240;
+	if (limit <= 0) {
+		limit = __default_limit;
+	}
 	return limit;
 }
+
+int acl_fiber_set_fdlimit(int limit)
+{
+	if (limit > 0) {
+		__default_limit = limit;
+	}
+	return __default_limit;
+}
+
 #else
  /*
   * 44BSD compatibility.
@@ -79,4 +93,10 @@ int open_limit(int limit)
 	return rlim_cur;
 #endif
 }
+
+int acl_fiber_set_fdlimit(int limit)
+{
+	return open_limit(limit);
+}
+
 #endif // !SYS_WIN

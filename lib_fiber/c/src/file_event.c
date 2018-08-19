@@ -4,7 +4,7 @@
 #include "fiber/libfiber.h"
 #include "event.h"
 
-void file_event_init(FILE_EVENT *fe, int fd)
+void file_event_init(FILE_EVENT *fe, socket_t fd)
 {
 	ring_init(&fe->me);
 	fe->fiber  = acl_fiber_running();
@@ -29,7 +29,7 @@ void file_event_init(FILE_EVENT *fe, int fd)
 #endif
 }
 
-FILE_EVENT *file_event_alloc(int fd)
+FILE_EVENT *file_event_alloc(socket_t fd)
 {
 	FILE_EVENT *fe = (FILE_EVENT *) calloc(1, sizeof(FILE_EVENT));
 	file_event_init(fe, fd);

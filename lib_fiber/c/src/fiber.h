@@ -83,7 +83,7 @@ void fiber_count_inc(void);
 void fiber_count_dec(void);
 
 /* in fiber_io.c */
-extern socket_t var_maxfd;
+extern int var_maxfd;
 
 void fiber_io_check(void);
 void fiber_wait_read(FILE_EVENT *fe);

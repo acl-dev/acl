@@ -71,7 +71,7 @@ static void array_add(FIBER_ALT_ARRAY *a, FIBER_ALT *alt)
 {
 	if (a->n == a->m) {
 		a->m += 16;
-		a->a = realloc(a->a, a->m * sizeof(a->a[0]));
+		a->a = (FIBER_ALT**) realloc(a->a, a->m * sizeof(a->a[0]));
 	}
 
 	a->a[a->n++] = alt;

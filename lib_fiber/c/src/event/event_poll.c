@@ -216,10 +216,10 @@ static int poll_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe UNUSED)
 	return -1;
 }
 
-static long poll_handle(EVENT *ev)
+static acl_handle_t poll_handle(EVENT *ev)
 {
 	(void) ev;
-	return -1;
+	return (acl_handle_t)-1;
 }
 
 static const char *poll_name(void)
