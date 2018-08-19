@@ -535,6 +535,9 @@
     <ClCompile Include="src\stdlib\thread_queue.cpp">
       <Filter>Source Files\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\token_tree.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
     <ClCompile Include="src\redis\redis_geo.cpp">
       <Filter>Source Files\redis</Filter>
     </ClCompile>
@@ -1162,6 +1165,9 @@
       <Filter>Header Files\disque</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\thread_queue.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\token_tree.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_geo.hpp">

@@ -561,6 +561,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include="src\stdlib\thread_mutex.cpp" />
     <ClCompile Include="src\stdlib\thread_pool.cpp" />
     <ClCompile Include="src\stdlib\thread_queue.cpp" />
+    <ClCompile Include="src\stdlib\token_tree.cpp" />
     <ClCompile Include="src\stdlib\url_coder.cpp" />
     <ClCompile Include="src\stdlib\util.cpp" />
     <ClCompile Include="src\stdlib\xml.cpp" />
@@ -750,6 +751,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stdlib\thread_mutex.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\thread_pool.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\thread_queue.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\token_tree.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\trigger.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\url_coder.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\util.hpp" />

@@ -559,6 +559,9 @@
     <ClCompile Include="src\stdlib\thread_queue.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\stdlib\token_tree.cpp">
+      <Filter>src\stdlib</Filter>
+    </ClCompile>
     <ClCompile Include="src\smtp\smtp_client.cpp">
       <Filter>src\smtp</Filter>
     </ClCompile>
@@ -1183,6 +1186,9 @@
       <Filter>include\db</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\thread_queue.hpp">
+      <Filter>include\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\token_tree.hpp">
       <Filter>include\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\smtp\smtp_client.hpp">

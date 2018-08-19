@@ -180,6 +180,7 @@
 		07A468571E6FCCF1002C9B3C /* thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4679E1E6FCCF1002C9B3C /* thread.cpp */; };
 		07A468581E6FCCF1002C9B3C /* thread_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4679F1E6FCCF1002C9B3C /* thread_pool.cpp */; };
 		07A468591E6FCCF1002C9B3C /* thread_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467A01E6FCCF1002C9B3C /* thread_queue.cpp */; };
+		07A468591E6FCCF1002C9B3C /* token_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467A01E6FCCF1002C9B3C /* token_tree.cpp */; };
 		07A4685A1E6FCCF1002C9B3C /* url_coder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467A11E6FCCF1002C9B3C /* url_coder.cpp */; };
 		07A4685B1E6FCCF1002C9B3C /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467A21E6FCCF1002C9B3C /* util.cpp */; };
 		07A4685C1E6FCCF1002C9B3C /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467A31E6FCCF1002C9B3C /* xml.cpp */; };
@@ -428,6 +429,7 @@
 		07A4679E1E6FCCF1002C9B3C /* thread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread.cpp; sourceTree = "<group>"; };
 		07A4679F1E6FCCF1002C9B3C /* thread_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_pool.cpp; sourceTree = "<group>"; };
 		07A467A01E6FCCF1002C9B3C /* thread_queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_queue.cpp; sourceTree = "<group>"; };
+		07A467A01E6FCCF1002C9B3C /* token_tree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = token_tree.cpp; sourceTree = "<group>"; };
 		07A467A11E6FCCF1002C9B3C /* url_coder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url_coder.cpp; sourceTree = "<group>"; };
 		07A467A21E6FCCF1002C9B3C /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = util.cpp; sourceTree = "<group>"; };
 		07A467A31E6FCCF1002C9B3C /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
@@ -616,9 +618,11 @@
 		07A469281E6FD404002C9B3C /* singleton.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = singleton.hpp; sourceTree = "<group>"; };
 		07A469291E6FD404002C9B3C /* snprintf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = snprintf.hpp; sourceTree = "<group>"; };
 		07A4692A1E6FD404002C9B3C /* string.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = string.hpp; sourceTree = "<group>"; };
+		07A4692B1E6FD404002C9B3C /* tbox.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tbox.hpp; sourceTree = "<group>"; };
 		07A4692B1E6FD404002C9B3C /* thread.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = thread.hpp; sourceTree = "<group>"; };
 		07A4692C1E6FD404002C9B3C /* thread_pool.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = thread_pool.hpp; sourceTree = "<group>"; };
 		07A4692D1E6FD404002C9B3C /* thread_queue.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = thread_queue.hpp; sourceTree = "<group>"; };
+		07A4692D1E6FD404002C9B3C /* token_tree.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = token_tree.hpp; sourceTree = "<group>"; };
 		07A4692E1E6FD404002C9B3C /* url_coder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = url_coder.hpp; sourceTree = "<group>"; };
 		07A4692F1E6FD404002C9B3C /* util.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = util.hpp; sourceTree = "<group>"; };
 		07A469301E6FD404002C9B3C /* vld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vld.h; sourceTree = "<group>"; };
@@ -1053,6 +1057,7 @@
 				07A4679E1E6FCCF1002C9B3C /* thread.cpp */,
 				07A4679F1E6FCCF1002C9B3C /* thread_pool.cpp */,
 				07A467A01E6FCCF1002C9B3C /* thread_queue.cpp */,
+				07A467A01E6FCCF1002C9B3C /* token_tree.cpp */,
 				07A467A11E6FCCF1002C9B3C /* url_coder.cpp */,
 				07A467A21E6FCCF1002C9B3C /* util.cpp */,
 				07A467A31E6FCCF1002C9B3C /* xml.cpp */,
@@ -1453,9 +1458,11 @@
 				07A469281E6FD404002C9B3C /* singleton.hpp */,
 				07A469291E6FD404002C9B3C /* snprintf.hpp */,
 				07A4692A1E6FD404002C9B3C /* string.hpp */,
+				07A4692B1E6FD404002C9B3C /* tbox.hpp */,
 				07A4692B1E6FD404002C9B3C /* thread.hpp */,
 				07A4692C1E6FD404002C9B3C /* thread_pool.hpp */,
 				07A4692D1E6FD404002C9B3C /* thread_queue.hpp */,
+				07A4692D1E6FD404002C9B3C /* token_tree.hpp */,
 				07A4692E1E6FD404002C9B3C /* url_coder.hpp */,
 				07A4692F1E6FD404002C9B3C /* util.hpp */,
 				07A469301E6FD404002C9B3C /* vld.h */,
@@ -1655,6 +1662,7 @@
 				07A468621E6FCCF1002C9B3C /* aio_handle.cpp in Sources */,
 				07A467FA1E6FCCF1002C9B3C /* HttpServlet.cpp in Sources */,
 				07A468591E6FCCF1002C9B3C /* thread_queue.cpp in Sources */,
+				07A468591E6FCCF1002C9B3C /* token_tree.cpp in Sources */,
 				07A4686C1E6FCCF1002C9B3C /* istream.cpp in Sources */,
 				0778DADE1F1CB2AB0011B753 /* tcp_sender.cpp in Sources */,
 				07A467DE1E6FCCF1002C9B3C /* mysql_manager.cpp in Sources */,
