@@ -26,7 +26,7 @@
 
 char *acl_token_delim_tab_new(const char *delim)
 {
-	char *delim_tab = (char*) acl_mycalloc(255, sizeof(char));
+	char *delim_tab = (char*) acl_mycalloc(256, sizeof(char));
 	const unsigned char *ptr = (const unsigned char*) delim;
 
 	while (*ptr) {
@@ -288,25 +288,28 @@ ACL_TOKEN *acl_token_tree_word_match(ACL_TOKEN *tree, const char *word)
 		return NULL;
 }
 
-void acl_token_tree_word_remove(ACL_TOKEN *tree, const char *word)
+void *acl_token_tree_word_remove(ACL_TOKEN *tree, const char *word)
 {
 	ACL_TOKEN *token = acl_token_tree_word_match(tree, word);
+	void *ctx;
 	int   i;
 
 	if (token == NULL)
-		return;
+		return NULL;
 
 	token->ctx = NULL;
 
 	for (i = 0; i < ACL_TOKEN_WIDTH; i++) {
 		if (token->tokens[i] != NULL) {
 			token->flag = 0;
-			return;
+			return NULL;
 		}
 	}
 
 	token->parent->tokens[token->ch] = NULL;
+	ctx = token->ctx;
 	acl_token_free(token);
+	return ctx;
 }
 
 static ACL_TOKEN *search_stop_at_delim(

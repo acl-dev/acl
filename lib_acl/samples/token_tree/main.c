@@ -34,7 +34,7 @@ static void token_tree_test(const char *tokens, const char *test_tab[])
 }
 
 static const char *__test_tab[] = {
-	"中国"
+	"中国",
 	"中国人民",
 	"中国人民银行",
 	"中国人民解放军",

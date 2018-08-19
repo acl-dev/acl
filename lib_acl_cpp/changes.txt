@@ -1,6 +1,9 @@
 修改历史列表：
 
 
+535) 2018.8.19
+535.1) feature: 添加 token_tree 类，该类封装了 C 版的 256 叉匹配树算法
+
 534) 2018.8.17
 534.1) workaround: thread_cond::wait, server_socket::accept 参数含义发生改变
 
