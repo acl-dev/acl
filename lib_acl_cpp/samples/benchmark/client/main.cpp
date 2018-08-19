@@ -2,13 +2,13 @@
 #include "util.h"
 
 static int __max = 10;
-static int __len = 100;
+static int __dlen = 100;
 
 static void handle_connection(acl::socket_stream& conn)
 {
 	acl::string rbuf, wbuf;
 
-	for (int i = 0; i < __len; i++)
+	for (int i = 0; i < __dlen; i++)
 		wbuf += 'X';
 	wbuf += "\r\n";
 
@@ -83,7 +83,7 @@ static void* thread_write(void* ctx)
 	acl::string buf;
 
 	int   i;
-	for (i = 0; i < __len; i++)
+	for (i = 0; i < __dlen; i++)
 		buf += 'X';
 	buf += "\r\n";
 
@@ -142,9 +142,9 @@ int main(int argc, char* argv[])
 				__max = 1;
 			break;
 		case 'l':
-			__len = atoi(optarg);
-			if (__len <= 0)
-				__len = 10;
+			__dlen = atoi(optarg);
+			if (__dlen <= 0)
+				__dlen = 10;
 			break;
 		case 'p':
 			separate = true;

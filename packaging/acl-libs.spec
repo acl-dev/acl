@@ -1,4 +1,4 @@
-%define release_id 14
+%define release_id 15
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Sun Aug 19 2018 zhengshuxin@qiyi.com 3.4.1-15-20180819.15
+- lib_acl_cpp: add token_tree class
 
 * Tue Aug 07 2018 zhengshuxin@qiyi.com 3.4.1-14-20180807.10
 - optimize the storage size of ACL_VSTRING, ACL_VBUF and ACL_JSON_NODE

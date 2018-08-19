@@ -35,11 +35,11 @@ static void print_json_node(const ACL_JSON* json, const ACL_JSON_NODE* node)
 {
 	for (int i = 1; i < node->depth; i++)
 		printf("\t");
-	printf("tag> %s, parent %s, text: %s, child: %s, type: %s\n",
+	printf("tag> %s, parent %s, text: %s, child: %s, type: %u\n",
 		STR(node->ltag), node->parent == json->root
 		? "root" : STR(node->parent->ltag),
 		STR(node->text), node->tag_node ? "yes" : "no",
-		acl_json_node_type(node));
+		node->type);
 }
 
 static void test_json_foreach1(ACL_JSON* json)
