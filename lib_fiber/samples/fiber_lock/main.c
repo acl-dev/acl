@@ -1,7 +1,7 @@
 #include "lib_acl.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 
 static int __fibers_count = 10;
 

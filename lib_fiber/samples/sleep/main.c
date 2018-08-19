@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 
 static int __fibers_count = 2;
 

@@ -5,7 +5,7 @@
 #if !defined(_WIN32) && !defined(_WIN64)
 #include <unistd.h>
 #endif
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 #include "stamp.h"
 
 static int __max_loop = 1000;

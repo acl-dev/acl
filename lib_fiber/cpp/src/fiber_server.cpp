@@ -9,8 +9,6 @@
 /* including the internal headers from lib_acl/src/master */
 #include "template/master_log.h"
 
-#include "fiber/lib_fiber.h"
-
 #define STACK_SIZE	128000
 
 static int   acl_var_fiber_pid;

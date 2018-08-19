@@ -1,5 +1,5 @@
-#ifndef LIB_FIBER_INCLUDE_H
-#define LIB_FIBER_INCLUDE_H
+#ifndef LIBFIBER_INCLUDE_H
+#define LIBFIBER_INCLUDE_H
 
 #include "fiber_base.h"
 #include "fiber_lock.h"

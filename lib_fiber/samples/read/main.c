@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 
 static void fiber_io(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {

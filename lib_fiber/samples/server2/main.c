@@ -9,7 +9,7 @@
 #include <poll.h>
 #endif
 #include "lib_acl.h"
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 # define POLL	WSAPoll

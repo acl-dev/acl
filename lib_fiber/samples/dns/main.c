@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 
 static char  __dns_ip[256];
 static int   __dns_port = 53;

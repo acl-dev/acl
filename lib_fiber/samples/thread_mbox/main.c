@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 #include "stamp.h"
 
 static char          __dummy[256];

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <poll.h>
-#include "fiber/lib_fiber.h"
+#include "fiber/libfiber.h"
 
 static  int  __nfibers = 0;
 
