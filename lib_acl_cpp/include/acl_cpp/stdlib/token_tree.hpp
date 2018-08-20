@@ -20,10 +20,7 @@ public:
 	 * 获得该节点对应的键值
 	 * @return {const char*}
 	 */
-	const char* get_key(void) const
-	{
-		return key_.c_str();
-	}
+	const char* get_key(void) const;
 
 	/**
 	 * 获得该节点所绑定的对象地址
@@ -61,6 +58,7 @@ private:
 	ACL_TOKEN*  me_;
 	token_tree* tree_;
 	string      key_;
+	bool        dirty_;
 };
 
 /**

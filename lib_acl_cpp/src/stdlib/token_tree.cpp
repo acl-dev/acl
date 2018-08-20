@@ -9,6 +9,7 @@ namespace acl
 token_node::token_node(void)
 : me_(NULL)
 , tree_(NULL)
+, dirty_(false)
 {
 }
 
@@ -18,9 +19,21 @@ token_node::~token_node(void)
 
 void token_node::set_node(ACL_TOKEN* token, token_tree* tree)
 {
-	me_   = token;
-	tree_ = tree;
-	acl_token_name(token, key_.vstring());
+	me_    = token;
+	tree_  = tree;
+	dirty_ = true;
+}
+
+const char* token_node::get_key(void) const
+{
+	if (me_ == NULL) {
+		return "";
+	}
+	if (dirty_) {
+		acl_token_name(me_, key_.vstring());
+		const_cast<token_node*>(this)->dirty_ = false;
+	}
+	return key_.c_str();
 }
 
 void* token_node::get_ctx(void) const
