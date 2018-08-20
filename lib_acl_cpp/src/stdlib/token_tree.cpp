@@ -39,7 +39,9 @@ token_tree::token_tree(void)
 token_tree::~token_tree(void)
 {
 	acl_token_tree_destroy(tree_);
-	delete iter_;
+	if (iter_) {
+		acl_myfree(iter_);
+	}
 }
 
 bool token_tree::insert(const char* key, void* ctx)
