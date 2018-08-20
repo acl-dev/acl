@@ -61,9 +61,9 @@ void* token_tree::remove(const char* key)
 	return acl_token_tree_word_remove(tree_, key);
 }
 
-const token_node* token_tree::search(const char* haystack)
+const token_node* token_tree::find(const char* key)
 {
-	ACL_TOKEN* token = acl_token_tree_word_match(tree_, haystack);
+	ACL_TOKEN* token = acl_token_tree_word_match(tree_, key);
 	if (token == NULL) {
 		return NULL;
 	}
@@ -72,7 +72,7 @@ const token_node* token_tree::search(const char* haystack)
 	return &node_;
 }
 
-const token_node* token_tree::match(const char** text, const char* delimiters,
+const token_node* token_tree::search(const char** text, const char* delimiters,
 	const char* delimiters_tab)
 {
 	ACL_TOKEN* token = acl_token_tree_match(tree_, text,

@@ -89,11 +89,11 @@ public:
 	void* remove(const char* key);
 
 	/**
-	 * 查找匹配树中的键集合中与 haystack 最大匹配的节点
-	 * @param haystack {const char*} 目标查找字符串
+	 * 根据键值精确查找匹配的节点
+	 * @param key {const char*} 键值
 	 * @return {const token_node*} 返回 NULL 表示未找到匹配项
 	 */
-	const token_node* search(const char* haystack);
+	const token_node* find(const char* key);
 
 	/**
 	 * 按字符串最大匹配模式从匹配中查找与所给文本字符串相匹配的节点，同时
@@ -110,7 +110,7 @@ public:
 	 *  注：当 delimiters 非空时优先使用 delimiters 做为截止符，否则再检查
 	 *  delimiters_tab 是否非空，如果非空则使用其做为截止符
 	 */
-	const token_node* match(const char** text, const char* delimiters = NULL,
+	const token_node* search(const char** text, const char* delimiters = NULL,
 		const char* delimiters_tab = NULL);
 
 	/**

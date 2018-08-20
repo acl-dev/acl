@@ -1,4 +1,4 @@
-%define release_id 16
+%define release_id 17
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Mon Aug 20 2018 zhengshuxin@qiyi.com 3.4.1-17-20180820.11
+- there's some comments error in token_tree
 
 * Mon Aug 20 2018 zhengshuxin@qiyi.com 3.4.1-16-20180820.10
 - fixed one bug in token_tree's destructor
