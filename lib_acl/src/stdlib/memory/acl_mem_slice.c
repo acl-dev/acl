@@ -137,7 +137,7 @@ typedef struct {
 
 #define SPACE_FOR(_len)  (offsetof(MBLOCK, u.payload[0]) + _len)
 
-static acl_pthread_key_t __mem_slice_key = (acl_pthread_key_t) -1;
+static acl_pthread_key_t __mem_slice_key; // = (acl_pthread_key_t) -1;
 static int __mem_base = 8;
 static int __mem_nslice = 1024;
 static int __mem_nalloc_gc = 100;
@@ -311,6 +311,12 @@ static void *tls_mem_alloc(const char *filename, int line, size_t len)
 			thread_mutex_unlock(__mem_slice_list_lock);
 	}
 
+	{
+		int i;
+		for (i = 0; i < mem_slice->slice_pool->nslice; i++) {
+			printf("slice=%p\r\n", mem_slice->slice_pool->slices[i]);
+		}
+	}
 	real_ptr = (MBLOCK *) acl_slice_pool_alloc(filename, line,
 			mem_slice->slice_pool, SPACE_FOR(len));
 	if (real_ptr == 0) {
