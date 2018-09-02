@@ -118,6 +118,8 @@
 #include "db/db_service.hpp"
 #include "db/db_service_mysql.hpp"
 #include "db/db_service_sqlite.hpp"
+#include "db/db_cursor.hpp"
+#include "db/sqlite_cursor.hpp"
 
 #include "hsocket/hspool.hpp"
 #include "hsocket/hsclient.hpp"

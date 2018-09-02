@@ -494,6 +494,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\db\sqlite_cursor.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\db\sqlite_pool.cpp"
 					>
 				</File>
@@ -1356,6 +1360,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\db\db_cursor.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\db\db_mysql.hpp"
 					>
 				</File>
@@ -1413,6 +1421,10 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\db\sqlite_manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\db\sqlite_cursor.hpp"
 					>
 				</File>
 				<File

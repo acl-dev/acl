@@ -421,6 +421,9 @@
     <ClCompile Include="src\db\pgsql_pool.cpp">
       <Filter>src\db</Filter>
     </ClCompile>
+    <ClCompile Include="src\db\sqlite_cursor.cpp">
+      <Filter>src\db</Filter>
+    </ClCompile>
     <ClCompile Include="src\db\sqlite_pool.cpp">
       <Filter>src\db</Filter>
     </ClCompile>
@@ -1161,6 +1164,9 @@
     <ClInclude Include="include\acl_cpp\stream\stdout_stream.hpp">
       <Filter>include\stream</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\db_cursor.hpp">
+      <Filter>include\db</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\db\mysql_manager.hpp">
       <Filter>include\db</Filter>
     </ClInclude>
@@ -1174,6 +1180,9 @@
       <Filter>include\db</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\db\sqlite_manager.hpp">
+      <Filter>include\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\sqlite_cursor.hpp">
       <Filter>include\db</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\db\sqlite_pool.hpp">

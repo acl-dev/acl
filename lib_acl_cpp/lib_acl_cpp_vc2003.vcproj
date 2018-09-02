@@ -774,6 +774,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\db\sqlite_manager.cpp">
 				</File>
 				<File
+					RelativePath=".\src\db\sqlite_cursor.cpp">
+				</File>
+				<File
 					RelativePath=".\src\db\sqlite_pool.cpp">
 				</File>
 			</Filter>
@@ -1388,6 +1391,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\acl_cpp\db\db_handle.hpp">
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\db\db_cursor.hpp">
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\db\db_mysql.hpp">
 				</File>
 				<File
@@ -1431,6 +1437,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\db\sqlite_manager.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\db\sqlite_cursor.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\db\sqlite_pool.hpp">

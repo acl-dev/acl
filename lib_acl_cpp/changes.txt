@@ -1,5 +1,7 @@
 修改历史列表：
 
+536) 2018.9.2
+536.1) feature: 添加 sqlite_cursor 类，从而使 db_sqlite 支持 Sqlite 游标功能
 
 535) 2018.8.19
 535.1) feature: 添加 token_tree 类，该类封装了 C 版的 256 叉匹配树算法

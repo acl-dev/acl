@@ -17,7 +17,7 @@ public:
 	 * @param names {const std::vector<const char*>&} 数据库表中字段名列表
 	 */
 	db_row(const std::vector<const char*>& names);
-	~db_row();
+	~db_row(void);
 
 	/**
 	 * 取得数据表中的某个对应下标值的字段名
@@ -146,7 +146,12 @@ public:
 	 * 行记录中字段值的个数
 	 * @return {size_t}
 	 */
-	size_t length() const;
+	size_t length(void) const;
+
+	/**
+	 * 清除结果值（即 values_）
+	 */
+	void clear(void);
 
 private:
 	// 数据表的字段名集合的引用

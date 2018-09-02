@@ -595,6 +595,9 @@
     <ClCompile Include="src\redis\redis_master.cpp">
       <Filter>Source Files\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\db\sqlite_cursor.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -1226,6 +1229,12 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_master.hpp">
       <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\db_cursor.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\sqlite_cursor.hpp">
+      <Filter>Header Files\db</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

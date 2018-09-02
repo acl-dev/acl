@@ -18,15 +18,19 @@ db_row::db_row(const std::vector<const char*>& names)
 
 }
 
-db_row::~db_row()
+db_row::~db_row(void)
 {
 
 }
 
+void db_row::clear(void)
+{
+	values_.clear();
+}
+
 const char* db_row::field_name(size_t ifield) const
 {
-	if (ifield >= names_.size())
-	{
+	if (ifield >= names_.size()) {
 		logger_error("ifield: %d > names_.size: %d",
 			(int) ifield, (int) names_.size());
 		return NULL;
@@ -42,15 +46,13 @@ const char* db_row::field_value(const char* name) const
 	acl_assert(names_.size() == values_.size());
 
 	// 通过扫描字段名找出字段值的下标位置
-	for (i = 0; i < n; i++)
-	{
+	for (i = 0; i < n; i++) {
 		if (strcasecmp(name, names_[i]) == 0)
 			break;
 	}
-	if (i == n)
-	{
+	if (i == n) {
 		logger_error("cloumn not exist, name: %s", name);
-		return (NULL);
+		return NULL;
 	}
 
 	// 直接返回相应下标的字段值
@@ -64,8 +66,7 @@ const char* db_row::operator [](const char* name) const
 
 const char* db_row::field_value(size_t ifield) const
 {
-	if (ifield >= values_.size())
-	{
+	if (ifield >= values_.size()) {
 		logger_error("ifield(%d) invalid, values_.size: %d",
 			(int) ifield, (int) values_.size());
 		return NULL;
@@ -156,7 +157,7 @@ void db_row::push_back(const char* value)
 	values_.push_back(value);
 }
 
-size_t db_row::length() const
+size_t db_row::length(void) const
 {
 	return values_.size();
 }
@@ -164,8 +165,8 @@ size_t db_row::length() const
 //////////////////////////////////////////////////////////////////////////
 
 db_rows::db_rows()
-	: result_tmp_(NULL)
-	, result_free(NULL)
+: result_tmp_(NULL)
+, result_free(NULL)
 {
 
 }
@@ -173,8 +174,9 @@ db_rows::db_rows()
 db_rows::~db_rows()
 {
 	std::vector<db_row*>::iterator it = rows_.begin();
-	for (; it != rows_.end(); ++it)
+	for (; it != rows_.end(); ++it) {
 		delete (*it);
+	}
 
 	if (result_free && result_tmp_)
 		result_free(result_tmp_);
@@ -192,8 +194,7 @@ const std::vector<const db_row*>& db_rows::get_rows(
 	size_t icolumn, ncolumn = names_.size();
 
 	// 通过扫描字段名找出字段值的下标位置
-	for (icolumn = 0; icolumn < ncolumn; icolumn++)
-	{
+	for (icolumn = 0; icolumn < ncolumn; icolumn++) {
 		if (strcasecmp(name, names_[icolumn]) == 0)
 			break;
 	}
@@ -203,8 +204,7 @@ const std::vector<const db_row*>& db_rows::get_rows(
 
 	// 比较对应下标相同的字段值的行记录
 	size_t nrow = rows_.size();
-	for (size_t irow = 0; irow < nrow; irow++)
-	{
+	for (size_t irow = 0; irow < nrow; irow++) {
 		row = rows_[irow];
 		acl_assert(row->length() == ncolumn);
 		ptr = (*row)[icolumn];
@@ -222,8 +222,7 @@ const std::vector<db_row*>& db_rows::get_rows() const
 
 const db_row* db_rows::operator [](size_t idx) const
 {
-	if (idx >= rows_.size())
-	{
+	if (idx >= rows_.size()) {
 		logger_error("idx(%d) >= rows_.size %d",
 			(int) idx, (int) rows_.size());
 		return NULL;
@@ -277,8 +276,7 @@ bool db_handle::exec_update(query& query)
 
 string& db_handle::escape_string(const char* in, size_t len, string& out)
 {
-	for (size_t i = 0; i < len; i++, in++)
-	{
+	for (size_t i = 0; i < len; i++, in++) {
 		switch (*in) {
 		case 0:			/* Must be escaped for 'mysql' */
 			out += '\\';
@@ -320,8 +318,7 @@ string& db_handle::escape_string(const char* in, size_t len, string& out)
 void db_handle::print_out(size_t max /* = 0 */) const
 {
 	// 列出查询结果方法二
-	for (size_t i = 0; i < length(); i++)
-	{
+	for (size_t i = 0; i < length(); i++) {
 		if (max > 0 && i >= max)
 			continue;
 
@@ -371,8 +368,7 @@ const db_row* db_handle::get_first_row() const
 
 void db_handle::free_result()
 {
-	if (result_)
-	{
+	if (result_) {
 		delete result_;
 		result_ = NULL;
 	}
