@@ -60,6 +60,7 @@
 		07A467DE1E6FCCF1002C9B3C /* mysql_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467081E6FCCF1002C9B3C /* mysql_manager.cpp */; };
 		07A467DF1E6FCCF1002C9B3C /* mysql_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467091E6FCCF1002C9B3C /* mysql_pool.cpp */; };
 		07A467E01E6FCCF1002C9B3C /* query.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670A1E6FCCF1002C9B3C /* query.cpp */; };
+		07A467E11E6FCCF1002C9B3C /* sqlite_cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670B1E6FCCF1002C9B3C /* sqlite_cursor.cpp */; };
 		07A467E11E6FCCF1002C9B3C /* sqlite_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670B1E6FCCF1002C9B3C /* sqlite_manager.cpp */; };
 		07A467E21E6FCCF1002C9B3C /* sqlite_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670C1E6FCCF1002C9B3C /* sqlite_pool.cpp */; };
 		07A467E31E6FCCF1002C9B3C /* disque.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670E1E6FCCF1002C9B3C /* disque.cpp */; };
@@ -308,6 +309,7 @@
 		07A467081E6FCCF1002C9B3C /* mysql_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mysql_manager.cpp; sourceTree = "<group>"; };
 		07A467091E6FCCF1002C9B3C /* mysql_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mysql_pool.cpp; sourceTree = "<group>"; };
 		07A4670A1E6FCCF1002C9B3C /* query.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = query.cpp; sourceTree = "<group>"; };
+		07A4670B1E6FCCF1002C9B3C /* sqlite_cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sqlite_cursor.cpp; sourceTree = "<group>"; };
 		07A4670B1E6FCCF1002C9B3C /* sqlite_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sqlite_manager.cpp; sourceTree = "<group>"; };
 		07A4670C1E6FCCF1002C9B3C /* sqlite_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sqlite_pool.cpp; sourceTree = "<group>"; };
 		07A4670E1E6FCCF1002C9B3C /* disque.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = disque.cpp; sourceTree = "<group>"; };
@@ -497,6 +499,7 @@
 		07A468A01E6FD404002C9B3C /* connect_monitor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = connect_monitor.hpp; sourceTree = "<group>"; };
 		07A468A11E6FD404002C9B3C /* connect_pool.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = connect_pool.hpp; sourceTree = "<group>"; };
 		07A468A31E6FD404002C9B3C /* db_handle.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = db_handle.hpp; sourceTree = "<group>"; };
+		07A468A31E6FD404002C9B3C /* db_cursor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = db_cursor.hpp; sourceTree = "<group>"; };
 		07A468A41E6FD404002C9B3C /* db_mysql.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = db_mysql.hpp; sourceTree = "<group>"; };
 		07A468A51E6FD404002C9B3C /* db_pool.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = db_pool.hpp; sourceTree = "<group>"; };
 		07A468A61E6FD404002C9B3C /* db_service.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = db_service.hpp; sourceTree = "<group>"; };
@@ -507,6 +510,7 @@
 		07A468AB1E6FD404002C9B3C /* mysql_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mysql_manager.hpp; sourceTree = "<group>"; };
 		07A468AC1E6FD404002C9B3C /* mysql_pool.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mysql_pool.hpp; sourceTree = "<group>"; };
 		07A468AD1E6FD404002C9B3C /* query.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = query.hpp; sourceTree = "<group>"; };
+		07A468AE1E6FD404002C9B3C /* sqlite_cursor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sqlite_cursor.hpp; sourceTree = "<group>"; };
 		07A468AE1E6FD404002C9B3C /* sqlite_manager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sqlite_manager.hpp; sourceTree = "<group>"; };
 		07A468AF1E6FD404002C9B3C /* sqlite_pool.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sqlite_pool.hpp; sourceTree = "<group>"; };
 		07A468B11E6FD404002C9B3C /* disque.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = disque.hpp; sourceTree = "<group>"; };
@@ -821,6 +825,7 @@
 				07A467081E6FCCF1002C9B3C /* mysql_manager.cpp */,
 				07A467091E6FCCF1002C9B3C /* mysql_pool.cpp */,
 				07A4670A1E6FCCF1002C9B3C /* query.cpp */,
+				07A4670B1E6FCCF1002C9B3C /* sqlite_cursor.cpp */,
 				07A4670B1E6FCCF1002C9B3C /* sqlite_manager.cpp */,
 				07A4670C1E6FCCF1002C9B3C /* sqlite_pool.cpp */,
 			);
@@ -1230,6 +1235,7 @@
 				07384F3A1EB99FEB00084CAD /* pgsql_manager.hpp */,
 				07384F3B1EB99FEB00084CAD /* pgsql_pool.hpp */,
 				07A468A31E6FD404002C9B3C /* db_handle.hpp */,
+				07A468A31E6FD404002C9B3C /* db_cursor.hpp */,
 				07A468A41E6FD404002C9B3C /* db_mysql.hpp */,
 				07A468A51E6FD404002C9B3C /* db_pool.hpp */,
 				07A468A61E6FD404002C9B3C /* db_service.hpp */,
@@ -1240,6 +1246,7 @@
 				07A468AB1E6FD404002C9B3C /* mysql_manager.hpp */,
 				07A468AC1E6FD404002C9B3C /* mysql_pool.hpp */,
 				07A468AD1E6FD404002C9B3C /* query.hpp */,
+				07A468AE1E6FD404002C9B3C /* sqlite_cursor.hpp */,
 				07A468AE1E6FD404002C9B3C /* sqlite_manager.hpp */,
 				07A468AF1E6FD404002C9B3C /* sqlite_pool.hpp */,
 			);
@@ -1620,6 +1627,7 @@
 				0778DADB1F1CB2AB0011B753 /* tcp_manager.cpp in Sources */,
 				07A4681B1E6FCCF1002C9B3C /* mime_attach.cpp in Sources */,
 				07A468191E6FCCF1002C9B3C /* trimblanks.cpp in Sources */,
+				07A467E11E6FCCF1002C9B3C /* sqlite_cursor.cpp in Sources */,
 				07A467E11E6FCCF1002C9B3C /* sqlite_manager.cpp in Sources */,
 				07A467D61E6FCCF1002C9B3C /* db_handle.cpp in Sources */,
 				07A467EF1E6FCCF1002C9B3C /* http_download.cpp in Sources */,
