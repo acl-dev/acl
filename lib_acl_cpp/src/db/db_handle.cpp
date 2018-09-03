@@ -43,7 +43,11 @@ const char* db_row::field_value(const char* name) const
 	size_t   i, n = names_.size();
 
 	// 必须保证表中字段名的个数与行记录的值的个数相等
-	acl_assert(names_.size() == values_.size());
+	if (values_.size() != n) {
+		logger_error("invalid result, names=%d, values=%d",
+			(int) values_.size(), (int) n);
+		return NULL;
+	}
 
 	// 通过扫描字段名找出字段值的下标位置
 	for (i = 0; i < n; i++) {
