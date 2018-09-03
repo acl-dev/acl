@@ -45,7 +45,7 @@ const char* db_row::field_value(const char* name) const
 	// 必须保证表中字段名的个数与行记录的值的个数相等
 	if (values_.size() != n) {
 		logger_error("invalid result, names=%d, values=%d",
-			(int) values_.size(), (int) n);
+			(int) n, (int) values_.size());
 		return NULL;
 	}
 
