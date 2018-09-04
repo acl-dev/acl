@@ -693,10 +693,12 @@ static inline gson(acl::json &json, const std::map<T, V*> *objects)
 
 //////////////////////////////////////////////////////////////////////////////
 
+#if 0
 template <class T>
 typename enable_if<is_object<T>::value,
 	std::pair<bool, std::string> >::type
 static inline gson(acl::json_node &node, T **obj);
+#endif
 
 template<class T>
 static inline void del(T **obj)
