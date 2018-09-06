@@ -1,4 +1,4 @@
-%define release_id 17
+%define release_id 18
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Sep 06 2018 zhengshuxin@qiyi.com 3.4.1-18-20180906.19
+- release 3.4.1-18, prepare for adding IPV6 feature.
 
 * Mon Aug 20 2018 zhengshuxin@qiyi.com 3.4.1-17-20180820.11
 - there's some comments error in token_tree
