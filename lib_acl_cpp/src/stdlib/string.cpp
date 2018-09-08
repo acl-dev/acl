@@ -893,12 +893,19 @@ bool string::equal(const string& s, bool case_sensitive /* = true */) const
 
 bool string::begin_with(const char* s, bool case_sensitive /* = true */) const
 {
-	return compare(s, case_sensitive) == 0 ? true : false;
+	return ncompare(s, case_sensitive) == 0 ? true : false;
 }
 
 bool string::begin_with(const void* v, size_t n) const
 {
-	return compare(v, n) == 0 ? true : false;
+	if (LEN(vbf_) == 0) {
+		if (n == 0)
+			return true;
+		return false;
+	}
+	if (n > LEN(vbf_))
+		n = LEN(vbf_);
+	return memcmp(STR(vbf_), v, n) == 0 ? true : false;
 }
 
 bool string::begin_with(const char* s, size_t len, bool case_sensitive /* = true */) const

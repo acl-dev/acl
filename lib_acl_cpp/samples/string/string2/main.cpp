@@ -49,6 +49,17 @@ static void test_main(bool move)
 	}
 }
 
+static void test(void)
+{
+	acl::string path("/data1/www/video/test/test.ts");
+	const char* disk = "/data1/www";
+	if (path.begin_with(disk)) {
+		printf("ok\r\n");
+	} else {
+		printf("error\r\n");
+	}
+}
+
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help] -m [move buf after scan]\r\n", procname);
@@ -74,6 +85,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	test();
 	test_main(move);
 
 #ifdef WIN32

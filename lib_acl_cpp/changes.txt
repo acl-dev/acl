@@ -1,5 +1,8 @@
 修改历史列表：
 
+537) 2018.9.8
+537.1) bugfix: acl::string::begin_with 判断方法有误
+
 536) 2018.9.2
 536.1) feature: 添加 sqlite_cursor 类，从而使 db_sqlite 支持 Sqlite 游标功能
 
