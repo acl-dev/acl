@@ -58,6 +58,13 @@ static void test(void)
 	} else {
 		printf("error\r\n");
 	}
+
+	disk = "/data2/www";
+	if (path.begin_with(disk)) {
+		printf("error\r\n");
+	} else {
+		printf("ok\r\n");
+	}
 }
 
 static void usage(const char* procname)
