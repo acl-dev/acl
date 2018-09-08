@@ -1,4 +1,4 @@
-%define release_id 19
+%define release_id 20
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Sat Sep 06 2018 zhengshuxin@qiyi.com 3.4.1-20-20180908.21
+- fixed bugs in acl::string::begin_with API
 
 * Sat Sep 06 2018 zhengshuxin@qiyi.com 3.4.1-19-20180908.13
 - fixed bugs in acl::string::begin_with API
