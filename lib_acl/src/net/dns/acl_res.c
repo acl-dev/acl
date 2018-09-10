@@ -77,18 +77,19 @@ static int udp_res_lookup(ACL_RES *res, const char *data, int dlen, char *buf, i
 	addr.sin_port = htons(res->dns_port);
 	addr.sin_addr.s_addr = inet_addr(res->dns_ip);
 
-	ret = sendto(fd, data, dlen, 0, (struct sockaddr *) &addr, (socklen_t) sizeof(addr));
+	ret = sendto(fd, data, dlen, 0, (struct sockaddr *) &addr,
+			(socklen_t) sizeof(addr));
 	if (ret < 0) {
 		acl_socket_close(fd);
 		res->errnum = ACL_RES_ERR_SEND;
-		return (-1);
+		return -1;
 	}
 
 	ret = acl_read_wait(fd, res->rw_timeout);
 	if (ret < 0) {
 		acl_socket_close(fd);
 		res->errnum = ACL_RES_ERR_RTMO;
-		return (-1);
+		return -1;
 	}
 
 	ret = recv(fd, buf, size, 0);
@@ -96,13 +97,14 @@ static int udp_res_lookup(ACL_RES *res, const char *data, int dlen, char *buf, i
 
 	if (ret <= 0) {
 		res->errnum = ACL_RES_ERR_SEND;
-		return (-1);
+		return -1;
 	}
 
 	return (int) ret;
 }
 
-static int tcp_res_lookup(ACL_RES *res, const char *data, int dlen, char *buf, int size)
+static int tcp_res_lookup(ACL_RES *res, const char *data,
+	int dlen, char *buf, int size)
 {
 	ACL_VSTREAM *stream = NULL;
 	char  addr[256], *pbuf = NULL, *ptr, tbuf[3];
@@ -158,17 +160,17 @@ static int tcp_res_lookup(ACL_RES *res, const char *data, int dlen, char *buf, i
 
 	RETURN (ret);
 #ifdef	ACL_BCB_COMPILER
-	return (-1);
+	return -1;
 #endif
 }
 
 static int res_lookup(ACL_RES *res, const char *data, int dlen,
-					  char *buf, int size)
+	char *buf, int size)
 {
 	if (res->transfer == ACL_RES_USE_TCP)
-		return (tcp_res_lookup(res, data, dlen, buf, size));
+		return tcp_res_lookup(res, data, dlen, buf, size);
 	else
-		return (udp_res_lookup(res, data, dlen, buf, size));
+		return udp_res_lookup(res, data, dlen, buf, size);
 }
 
 ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
@@ -196,64 +198,41 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 	res->tm_spent = time(NULL) - begin;
 
 	if (ret <= 0)
-		return (NULL);
+		return NULL;
 
 	ret = rfc1035MessageUnpack(buf, ret, &answers);
 	if (ret < 0) {
 		res->errnum = (int) ret;
-		return (NULL);
+		return NULL;
 	} else if (ret == 0) {
 		rfc1035MessageDestroy(answers);
 		res->errnum = ACL_RES_ERR_NULL;
-		return (NULL);
+		return NULL;
 	}
 
 	dns_db = acl_netdb_new(domain);
-	if (dns_db == NULL) {
-		rfc1035MessageDestroy(answers);
-		acl_msg_error("%s: acl_netdb_new error", myname);
-		return (NULL);
-	}
 
 	for (i = 0; i < ret; i++) {
 		if (answers->answer[i].type == RFC1035_TYPE_A) {
 			phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
-			if (phost == NULL) {
-				acl_msg_error("%s: calloc error(%s)",
-					myname, acl_last_strerror(buf, sizeof(buf)));
-				acl_netdb_free(dns_db);
-				rfc1035MessageDestroy(answers);
-				return (NULL);
-			}
 
-			memcpy(&phost->saddr.sin_addr, answers->answer[i].rdata, 4);
-			/* bugfix: 2009.12.8
-			 *  ACL_SAFE_STRNCPY(phost->ip, inet_ntoa(phost->saddr.sin_addr),
-			 *  	sizeof(phost->ip));
-			 */
-			acl_inet_ntoa(phost->saddr.sin_addr, phost->ip, sizeof(phost->ip));
+			memcpy(&phost->saddr.sa.in.sin_addr,
+				answers->answer[i].rdata, 4);
+			inet_ntop(AF_INET, &phost->saddr.sa.in.sin_addr,
+				phost->ip, sizeof(phost->ip));
+
 			phost->ttl = answers->answer[i].ttl;
 
-			if (acl_array_append(dns_db->h_db, phost) < 0) {
-				acl_msg_error("%s, %s(%d): array append error(%s)",
-					__FILE__, myname, __LINE__,
-					acl_last_strerror(buf, sizeof(buf)));
-				acl_netdb_free(dns_db);
-				rfc1035MessageDestroy(answers);
-				return (NULL);
-			}       
-
+			(void) acl_array_append(dns_db->h_db, phost);
 			dns_db->size++;
-		} else {
-			if (acl_msg_verbose)
-				acl_msg_error("%s: can't print answer type %d, domain %s",
-					myname, (int) answers->answer[i].type, domain);
+		} else if (acl_msg_verbose) {
+			acl_msg_error("%s: can't print answer type %d, domain %s",
+				myname, (int) answers->answer[i].type, domain);
 		}
 	}
 
 	rfc1035MessageDestroy(answers);
-	
-	return (dns_db);
+	return dns_db;
 }
 
 const char *acl_res_strerror(int errnum)
@@ -274,10 +253,10 @@ const char *acl_res_strerror(int errnum)
 
 	for (i = 0; errmsg[i].errnum != 0; i++) {
 		if (errmsg[i].errnum == errnum)
-			return (errmsg[i].msg);
+			return errmsg[i].msg;
 	}
 
-	return (rfc1035Strerror(errnum));
+	return rfc1035Strerror(errnum);
 }
 
 const char *acl_res_errmsg(const ACL_RES *res)
@@ -287,5 +266,5 @@ const char *acl_res_errmsg(const ACL_RES *res)
 	if (res == NULL)
 		acl_msg_fatal("%s: res null", myname);
 
-	return (acl_res_strerror(res->errnum));
+	return acl_res_strerror(res->errnum);
 }

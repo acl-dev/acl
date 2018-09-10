@@ -38,10 +38,10 @@ static void test(const char *name, int use_acl)
 			h_host = (ACL_HOSTNAME*) acl_mycalloc(1, sizeof(ACL_HOSTNAME));
 
 			memset(&h_host->saddr, 0, sizeof(h_host->saddr));
-			n = (int) sizeof(h_host->saddr.sin_addr) > h_addrp->h_length
-				? h_addrp->h_length : (int) sizeof(h_host->saddr.sin_addr);
-			memcpy(&h_host->saddr.sin_addr, *pptr, n);
-			acl_inet_ntoa(h_host->saddr.sin_addr, h_host->ip, sizeof(h_host->ip));
+			n = (int) sizeof(h_host->saddr.sa.in.sin_addr) > h_addrp->h_length
+				? h_addrp->h_length : (int) sizeof(h_host->saddr.sa.in.sin_addr);
+			memcpy(&h_host->saddr.sa.in.sin_addr, *pptr, n);
+			acl_inet_ntoa(h_host->saddr.sa.in.sin_addr, h_host->ip, sizeof(h_host->ip));
 
 			(void) acl_array_append(res->h_db, h_host);
 
@@ -74,10 +74,10 @@ static void test(const char *name, int use_acl)
 			h_host = (ACL_HOSTNAME*) acl_mycalloc(1, sizeof(ACL_HOSTNAME));
 
 			memset(&h_host->saddr, 0, sizeof(h_host->saddr));
-			n = (int) sizeof(h_host->saddr.sin_addr) > h_addrp->h_length
-				? h_addrp->h_length : (int) sizeof(h_host->saddr.sin_addr);
-			memcpy(&h_host->saddr.sin_addr, *pptr, n);
-			acl_inet_ntoa(h_host->saddr.sin_addr, h_host->ip, sizeof(h_host->ip));
+			n = (int) sizeof(h_host->saddr.sa.in.sin_addr) > h_addrp->h_length
+				? h_addrp->h_length : (int) sizeof(h_host->saddr.sa.in.sin_addr);
+			memcpy(&h_host->saddr.sa.in.sin_addr, *pptr, n);
+			acl_inet_ntoa(h_host->saddr.sa.in.sin_addr, h_host->ip, sizeof(h_host->ip));
 
 			(void) acl_array_append(res->h_db, h_host);
 

@@ -14,6 +14,7 @@ extern "C" {
 #endif
 #include "../event/acl_events.h"
 #include "../aio/acl_aio.h"
+#include "acl_sane_socket.h"
 #include "acl_netdb.h"
 
 /* DNS 查询时的错误码定义 */
@@ -38,7 +39,7 @@ extern "C" {
 typedef struct ACL_DNS_ADDR {
 	char  ip[64];			/* DNS 服务器地址 */
 	unsigned short port;		/* DNS 服务器端口 */
-	struct sockaddr_in addr;	/* DNS 地址 */
+	struct ACL_SOCKADDR addr;	/* DNS 地址 */
 	int   addr_len;			/* addr 大小 */
 	int   mask_length;		/* DNS 服务器所在网络的掩码长度(> 0 && < 32) */
 	struct in_addr in;		/* addr 的网段地址 */

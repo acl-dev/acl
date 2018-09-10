@@ -11,12 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef	ACL_UNIX
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/un.h>
-#include <arpa/inet.h>
-#endif
 
 #ifdef ACL_BCB_COMPILER
 #pragma hdrstop
@@ -27,25 +21,11 @@
 
 #endif
 
-struct SOCK_ADDR {
-	union {
-		struct sockaddr_storage ss;
-#ifdef AF_INET6
-		struct sockaddr_in6 in6;
-#endif
-		struct sockaddr_in in;
-#ifdef ACL_UNIX
-		struct sockaddr_un un;
-#endif
-		struct sockaddr sa;
-	} sa;
-};
-
 #define	LEN	64
 
 int acl_getpeername(ACL_SOCKET fd, char *buf, size_t size)
 {
-	struct SOCK_ADDR addr;
+	struct ACL_SOCKADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
 	char  ip[LEN];
@@ -71,9 +51,6 @@ int acl_getpeername(ACL_SOCKET fd, char *buf, size_t size)
 		return 0;
 	} else
 #endif
-	if (inet_ntop(sa->sa_family, sa, ip, sizeof(ip)) == NULL)
-		return -1;
-
 	if (sa->sa_family == AF_INET) {
 		if (!inet_ntop(sa->sa_family, &addr.sa.in.sin_addr, ip, LEN))
 			return -1;
@@ -96,7 +73,7 @@ int acl_getpeername(ACL_SOCKET fd, char *buf, size_t size)
 
 int acl_getsockname(ACL_SOCKET fd, char *buf, size_t size)
 {
-	struct SOCK_ADDR addr;
+	struct ACL_SOCKADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
 	char  ip[LEN];
@@ -139,7 +116,7 @@ int acl_getsockname(ACL_SOCKET fd, char *buf, size_t size)
 
 int acl_getsocktype(ACL_SOCKET fd)
 {
-	struct SOCK_ADDR addr;
+	struct ACL_SOCKADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
 

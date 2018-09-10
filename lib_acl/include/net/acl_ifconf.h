@@ -7,14 +7,15 @@ extern "C" {
 
 #include "../stdlib/acl_define.h"
 #include "../stdlib/acl_argv.h"
+#include "acl_sane_socket.h"
 
 typedef struct ACL_IFADDR {
 	char *name;		/* 接口名称 */
 #if defined(_WIN32) || defined(_WIN64)
 	char *desc;		/* 接口描述 */
 #endif
-	char  ip[32];		/* 以字符串表示的IP地址 */
-	unsigned int addr;	/* 网络字节序的 32 位 IP 地址 */
+	char  ip[64];		/* 以字符串表示的IP地址 */
+	ACL_SOCKADDR saddr;	/* 兼容 IPV4 & IPV6 的地址 */
 } ACL_IFADDR;
 
 typedef struct ACL_IFCONF {

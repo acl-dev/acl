@@ -25,11 +25,8 @@ ACL_ARGV *res_a_create(const rfc1035_rr *answer, int n)
 	for (i = 0; i < n; i++) {
 		if (answer[i].type == RFC1035_TYPE_A) {
 			memcpy(&sin_addr, answer[i].rdata, 4);
-			/* bugfix: 2009.12.8
-			 * ACL_SAFE_STRNCPY(ip, inet_ntoa(sin_addr), sizeof(ip));
-			 */
-			acl_inet_ntoa(sin_addr, ip, sizeof(ip));
-			acl_argv_add(a, ip, NULL);
+			if (inet_ntop(AF_INET, &sin_addr, ip, sizeof(ip)))
+				acl_argv_add(a, ip, NULL);
 		}
 	}
 

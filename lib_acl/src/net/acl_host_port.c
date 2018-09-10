@@ -61,8 +61,10 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 	if (*host == 0)
 		return "missing host information";
 
-	if (*port == 0)
-		return "missing service information";
+	/*
+	 * if (*port == 0)
+	 *	return "missing service information";
+	 */
 
 	/*
 	 * Final sanity checks. We're still sloppy, allowing bare numerical
@@ -70,10 +72,13 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 	 */
 	if (*host != def_host
 	    && !acl_valid_hostname(*host, ACL_DONT_GRIPE)
-	    && !acl_valid_hostaddr(*host, ACL_DONT_GRIPE))
-	{
+	    && !acl_valid_hostaddr(*host, ACL_DONT_GRIPE)) {
+
 		return "valid hostname or network address required";
 	}
+
+	if (*port == 0)
+		return NULL;
 
 	if (*port != def_service && ACL_ISDIGIT(**port) && !acl_alldig(*port))
 		return "garbage after numerical service";
@@ -91,7 +96,7 @@ static int host_port(char *buf, char **host, char **port)
 		return -1;
 	}
 
-	if (*port == NULL || atoi(*port) < 0) {
+	if (*port != NULL && atoi(*port) < 0) {
 		acl_msg_error("%s(%d): invalid port: %s, addr: %s",
 			__FILE__, __LINE__, *port ? *port : "null", buf);
 		return -1;

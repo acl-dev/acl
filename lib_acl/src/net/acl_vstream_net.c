@@ -34,14 +34,12 @@
 ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 	unsigned flag, int io_bufsize, int io_timeout)
 {
-	const char *myname = "acl_vstream_listen_ex";
-	ACL_SOCKET  listenfd;
-	struct sockaddr_in local;
+	ACL_SOCKET   listenfd;
 	ACL_VSTREAM *listen_stream;
-	int   len;
+	char         buf[256];
 
 	if (addr == 0 || *addr == 0 || qlen <= 0) {
-		acl_msg_error("%s: input invalid", myname);
+		acl_msg_error("%s: input invalid", __FUNCTION__);
 		return NULL;
 	}
 
@@ -61,7 +59,7 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 		if (listen_stream == NULL) {
 			acl_socket_close(listenfd);
 			acl_msg_error("%s: open vstream error, addr(%s)",
-				myname, addr);
+				__FUNCTION__, addr);
 			return NULL;
 		}
 
@@ -75,28 +73,17 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 	listenfd = acl_inet_listen(addr, qlen, flag);
 	if (listenfd == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s: listen addr(%s) error(%s)",
-			myname, addr, acl_last_serror());
+			__FUNCTION__, addr, acl_last_serror());
 		return NULL;
 	}
-	listen_stream = acl_vstream_fdopen(listenfd,
-		ACL_VSTREAM_FLAG_RW, io_bufsize,
-		io_timeout, ACL_VSTREAM_TYPE_LISTEN_INET);
+	listen_stream = acl_vstream_fdopen(listenfd, ACL_VSTREAM_FLAG_RW,
+		io_bufsize, io_timeout, ACL_VSTREAM_TYPE_LISTEN_INET);
 
-	memset(&local, 0, sizeof(local));
-	len = (int) sizeof(struct sockaddr);
-	if (getsockname(listenfd, (struct sockaddr*) &local,
-		(socklen_t *) &len) < 0) {
-
+	if (acl_getsockname(listenfd, buf, sizeof(buf)) == -1) {
 		acl_msg_warn("%s: getsockname error(%s) for sock(%d)",
-			myname, acl_last_serror(), listenfd);
+			__FUNCTION__, acl_last_serror(), listenfd);
 		acl_vstream_set_local(listen_stream, addr);
-	} else {
-		char  ip[32], buf[64];
-		int   port;
-
-		acl_inet_ntoa(local.sin_addr, ip, sizeof(ip));
-		port = ntohs(local.sin_port);
-		snprintf(buf, sizeof(buf), "%s:%d", ip, port);
+	} else  {
 		acl_vstream_set_local(listen_stream, buf);
 	}
 

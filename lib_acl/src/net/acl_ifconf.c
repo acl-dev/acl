@@ -8,7 +8,7 @@
 #include "stdlib/acl_mystring.h"
 #include "stdlib/acl_stringops.h"
 #include "net/acl_sane_inet.h"
-#include "net/acl_sane_inet.h"
+#include "net/acl_sane_socket.h"
 #include "net/acl_ifconf.h"
 
 #endif
@@ -114,22 +114,32 @@ ACL_IFCONF *acl_get_ifaddrs()
 		acl_mycalloc(ifconf->length, sizeof(ACL_IFADDR));
 
 	for (i = 0, j = 0; i < ifconf->length; i++) {
+		ACL_SOCKADDR *saddr = (ACL_SOCKADDR *) &ifaces[i].ifr_addr;
+		ACL_IFADDR *ifa     = (ACL_IFADDR *) &ifconf->addrs[j];
+		size_t size;
+
+		if (saddr->sa.sa.sa_family == AF_INET) {
+			if (inet_ntop(AF_INET, &saddr->sa.in.sin_addr,
+				ifa->ip, sizeof(ifa->ip)) == NULL) {
+
+				continue;
+			}
+			size = sizeof(struct sockaddr_in);
 #ifdef AF_INET6
-		if (ifaces[i].ifr_addr.sa_family != AF_INET6
-		    && ifaces[i].ifr_addr.sa_family != AF_INET
-#else
-		if (ifaces[i].ifr_addr.sa_family != AF_INET
+		} else if (saddr->sa.sa.sa_family == AF_INET6) {
+			if (inet_ntop(AF_INET6, &saddr->sa.in6.sin6_addr,
+				ifa->ip, sizeof(ifa->ip)) == NULL) {
+				continue;
+			}
+			size = sizeof(struct sockaddr_in6);
 #endif
-#ifdef ACL_MACOSX
-		   && ifaces[i].ifr_addr.sa_family != AF_LINK
-#endif
-		)
+		} else {
 			continue;
+		}
+
 		ifconf->addrs[j].name = acl_mystrdup(ifaces[i].ifr_name);
-		ifconf->addrs[j].addr = ((struct sockaddr_in *)
-				&(ifaces[i].ifr_addr))->sin_addr.s_addr;
-		acl_inet_ntoa(((struct sockaddr_in *) &ifaces[i].ifr_addr)->sin_addr,
-				ifconf->addrs[j].ip, sizeof(ifconf->addrs[j].ip));
+		memcpy(&ifconf->addrs[j].saddr, saddr, size);
+
 		j++;
 	}
 
@@ -216,7 +226,8 @@ ACL_IFCONF *acl_get_ifaddrs()
 		ifconf->addrs[j].desc = acl_mystrdup(info->Description);
 		snprintf(ifconf->addrs[j].ip, sizeof(ifconf->addrs[j].ip),
 				"%s", info->IpAddressList.IpAddress.String);
-		ifconf->addrs[j].addr = inet_addr(ifconf->addrs[j].ip);
+		ifconf->addrs[j].saddr.sa.in.sin_addr.s_addr
+			= inet_addr(ifconf->addrs[j].ip);
 		j++;
 		if (j == ifconf->length) {
 			ifconf->length *= 2;
@@ -261,7 +272,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 	if (GetAdaptersInfo(&info_temp, &len) != ERROR_BUFFER_OVERFLOW) {
 		acl_msg_error("%s(%d): GetAdaptersInfo eror(%s)",
 			myname, __LINE__, acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 
 	infos = (IP_ADAPTER_INFO *) acl_mymalloc(len);
@@ -269,7 +280,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 		acl_msg_error("%s(%d): GetAdaptersInfo eror(%s)",
 			myname, __LINE__, acl_last_serror());
 		acl_myfree(infos);
-		return (NULL);
+		return NULL;
 	}
 
 	ifconf = (ACL_IFCONF*) acl_mymalloc(sizeof(ACL_IFCONF));
@@ -289,12 +300,13 @@ ACL_IFCONF *acl_get_ifaddrs()
 		ifconf->addrs[j].desc = acl_mystrdup(info->Description);
 		snprintf(ifconf->addrs[j].ip, sizeof(ifconf->addrs[j].ip),
 				"%s", info->IpAddressList.IpAddress.String);
-		ifconf->addrs[j].addr = inet_addr(ifconf->addrs[j].ip);
+		ifconf->addrs[j].saddr.sa.in.sin_addr.s_addr
+			= inet_addr(ifconf->addrs[j].ip);
 		j++;
 		if (j == ifconf->length) {
 			ifconf->length *= 2;
-			ifconf->addrs = (ACL_IFADDR*) acl_myrealloc(ifconf->addrs,
-					ifconf->length * sizeof(ACL_IFADDR));
+			ifconf->addrs = (ACL_IFADDR*) acl_myrealloc(
+				ifconf->addrs, ifconf->length * sizeof(ACL_IFADDR));
 		}
 	}
 
