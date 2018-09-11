@@ -71,8 +71,7 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 	acl_tcp_set_rcvbuf(sock, ACL_SOCKET_RBUF_SIZE);
 	acl_tcp_set_sndbuf(sock, ACL_SOCKET_WBUF_SIZE);
 
-	if (local0 != NULL && bind_local(sock, peer->ai_family, local0) < 0)
-	{
+	if (local0 != NULL && bind_local(sock, peer->ai_family, local0) < 0) {
 		acl_msg_error("%s(%d): bind local error %s, fd=%d",
 			myname, __LINE__, acl_last_serror(), sock);
 		acl_socket_close(sock);
@@ -112,8 +111,7 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 	acl_non_blocking(sock, blocking);
 #ifdef ACL_WINDOWS
 	if (acl_sane_connect(sock, peer->ai_addr,
-		(socklen_t) peer->ai_addrlen) < 0)
-	{
+		(socklen_t) peer->ai_addrlen) < 0) {
 #else
 	if (acl_sane_connect(sock, peer->ai_addr, peer->ai_addrlen) < 0) {
 #endif
@@ -123,8 +121,7 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 		errnum = acl_last_error();
 		len = sizeof(err);
 		if (getsockopt(sock, SOL_SOCKET, SO_ERROR,
-			(char *) &err, &len) < 0)
-		{
+			(char *) &err, &len) < 0) {
 #ifdef  SUNOS5
 			/*
 			 * Solaris 2.4's socket emulation doesn't allow you

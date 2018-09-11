@@ -105,7 +105,7 @@ ACL_SOCKET acl_inet_accept_ex(ACL_SOCKET listen_fd, char *ipbuf, size_t size)
 	/* when client_addr not null and protocol is AF_INET, acl_sane_accept
 	 * will set nodelay on the accepted socket, 2008.9.4, zsx
 	 */
-	fd = acl_sane_accept(listen_fd, (struct sockaddr *)&sa, &len);
+	fd = acl_sane_accept(listen_fd, (struct sockaddr*) &sa, &len);
 	if (fd == ACL_SOCKET_INVALID)
 		return fd;
 

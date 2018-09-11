@@ -118,17 +118,18 @@ ACL_IFCONF *acl_get_ifaddrs()
 		ACL_IFADDR *ifa     = (ACL_IFADDR *) &ifconf->addrs[j];
 		size_t size;
 
-		if (saddr->sa.sa.sa_family == AF_INET) {
-			if (inet_ntop(AF_INET, &saddr->sa.in.sin_addr,
+		if (saddr->sa.sa_family == AF_INET) {
+			if (inet_ntop(AF_INET, &saddr->in.sin_addr,
 				ifa->ip, sizeof(ifa->ip)) == NULL) {
 
 				continue;
 			}
 			size = sizeof(struct sockaddr_in);
 #ifdef AF_INET6
-		} else if (saddr->sa.sa.sa_family == AF_INET6) {
-			if (inet_ntop(AF_INET6, &saddr->sa.in6.sin6_addr,
+		} else if (saddr->sa.sa_family == AF_INET6) {
+			if (inet_ntop(AF_INET6, &saddr->in6.sin6_addr,
 				ifa->ip, sizeof(ifa->ip)) == NULL) {
+
 				continue;
 			}
 			size = sizeof(struct sockaddr_in6);
@@ -171,7 +172,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 
 typedef HRESULT STDAPICALLTYPE PGAINFO(PIP_ADAPTER_INFO pAdapterInfo, PULONG pOutBufLen);
 
-ACL_IFCONF *acl_get_ifaddrs()
+ACL_IFCONF *acl_get_ifaddrs(void)
 {
 	const char *myname = "acl_get_ifaddrs";
 	IP_ADAPTER_INFO info_temp, *infos, *info;
@@ -226,7 +227,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 		ifconf->addrs[j].desc = acl_mystrdup(info->Description);
 		snprintf(ifconf->addrs[j].ip, sizeof(ifconf->addrs[j].ip),
 				"%s", info->IpAddressList.IpAddress.String);
-		ifconf->addrs[j].saddr.sa.in.sin_addr.s_addr
+		ifconf->addrs[j].saddr.in.sin_addr.s_addr
 			= inet_addr(ifconf->addrs[j].ip);
 		j++;
 		if (j == ifconf->length) {
@@ -300,7 +301,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 		ifconf->addrs[j].desc = acl_mystrdup(info->Description);
 		snprintf(ifconf->addrs[j].ip, sizeof(ifconf->addrs[j].ip),
 				"%s", info->IpAddressList.IpAddress.String);
-		ifconf->addrs[j].saddr.sa.in.sin_addr.s_addr
+		ifconf->addrs[j].saddr.in.sin_addr.s_addr
 			= inet_addr(ifconf->addrs[j].ip);
 		j++;
 		if (j == ifconf->length) {

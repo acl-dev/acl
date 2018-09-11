@@ -738,38 +738,32 @@ static UDP_SERVER *servers_open(int event_mode, int nthreads, int sock_count)
 
 static UDP_SERVER *servers_create(const char *service, int nthreads)
 {
-	UDP_SERVER *servers = NULL;
-
-	if (strcasecmp(acl_var_udp_event_mode, "poll") == 0)
+	if (strcasecmp(acl_var_udp_event_mode, "poll") == 0) {
 		__event_mode = ACL_EVENT_POLL;
-	else if (strcasecmp(acl_var_udp_event_mode, "kernel") == 0)
+	} else if (strcasecmp(acl_var_udp_event_mode, "kernel") == 0) {
 		__event_mode = ACL_EVENT_KERNEL;
-	else
+	} else {
 		__event_mode = ACL_EVENT_SELECT;
+	}
 
 	__main_event = acl_event_new(__event_mode, 0,
 		acl_var_udp_delay_sec, acl_var_udp_delay_usec);
 
-#ifdef ACL_UNIX
-	if (__daemon_mode) {
+	if (!__daemon_mode) {
+		return servers_binding(service, __event_mode, nthreads);
+	}
+
+#ifdef	ACL_UNIX
 # ifdef SO_REUSEPORT
-		servers = servers_binding(service, __event_mode, nthreads);
+	return servers_binding(service, __event_mode, nthreads);
 # else
-		/* __socket_count from command argv */
-		servers = servers_open(__event_mode, nthreads, __socket_count);
+	/* __socket_count from command argv */
+	return servers_open(__event_mode, nthreads, __socket_count);
 # endif
-	} else
-		servers = servers_binding(service, __event_mode, nthreads);
-
-#else	/* !ACL_UNIX */
-	if (__daemon_mode) {
-		acl_msg_fatal("%s(%d): not support daemon mode!",
-			__FILE__, __LINE__);
-	} else
-		servers = servers_binding(service, __event_mode, nthreads);
-#endif /* ACL_UNIX */
-
-	return servers;
+#else
+	acl_msg_fatal("%s(%d): not support daemon mode!", __FILE__, __LINE__);
+	return NULL;  /* just avoid compiling warning */
+#endif
 }
 
 static void *thread_main(void *ctx)

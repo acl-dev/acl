@@ -53,7 +53,7 @@ const ACL_HOSTNAME *acl_netdb_index(const ACL_DNS_DB *db, int n)
 	return h_hostname;
 }
 
-const struct ACL_SOCKADDR *acl_netdb_index_saddr(ACL_DNS_DB *db, int n)
+const ACL_SOCKADDR *acl_netdb_index_saddr(ACL_DNS_DB *db, int n)
 {
 	ACL_HOSTNAME *h_hostname;
 
@@ -211,13 +211,13 @@ void acl_netdb_addip(ACL_DNS_DB *db, const char *ip)
 
 static int ip2addr(const char *ip, unsigned short port, ACL_SOCKADDR *saddr)
 {
-	memset(saddr, 0, sizeof(struct ACL_SOCKADDR));
+	memset(saddr, 0, sizeof(ACL_SOCKADDR));
 
 	if (acl_valid_ipv4_hostaddr(ip, 0)) {
-		saddr->sa.sa.sa_family = AF_INET;
-		saddr->sa.in.sin_port  = htons(port);
+		saddr->sa.sa_family = AF_INET;
+		saddr->in.sin_port  = htons(port);
 
-		if (inet_pton(AF_INET, ip, &saddr->sa.in.sin_addr) == 1) {
+		if (inet_pton(AF_INET, ip, &saddr->in.sin_addr) == 1) {
 			return 1;
 		}
 		acl_msg_error("%s(%d): invalid ip=%s",
@@ -225,9 +225,9 @@ static int ip2addr(const char *ip, unsigned short port, ACL_SOCKADDR *saddr)
 	}
 #ifdef AF_INET6
 	else if (acl_valid_ipv6_hostaddr(ip, 0)) {
-		saddr->sa.sa.sa_family  = AF_INET6;
-		saddr->sa.in6.sin6_port = htons(port);
-		if (inet_pton(AF_INET6, ip, &saddr->sa.in6.sin6_addr) == 1) {
+		saddr->sa.sa_family  = AF_INET6;
+		saddr->in6.sin6_port = htons(port);
+		if (inet_pton(AF_INET6, ip, &saddr->in6.sin6_addr) == 1) {
 			return 1;
 		}
 		acl_msg_error("%s(%d): invalid ip=%s",
@@ -313,11 +313,6 @@ ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error)
 	if (db)
 		return db;
 
-	res0 = acl_host_addrinfo(name, SOCK_DGRAM);
-	if (res0 == NULL) {
-		return NULL;
-	}
-
 	db = acl_netdb_new(name);
 
 	if (ip2addr(name, 0, &saddr)) {
@@ -330,30 +325,34 @@ ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error)
 		return db;
 	}
 
+	res0 = acl_host_addrinfo(name, SOCK_DGRAM);
+	if (res0 == NULL)
+		return NULL;
+
 	for (res = res0; res != NULL; res = res->ai_next) {
-		struct ACL_SOCKADDR *sa = (struct ACL_SOCKADDR *) res->ai_addr;
+		ACL_SOCKADDR *sa = (ACL_SOCKADDR *) res->ai_addr;
 		ACL_HOSTNAME *h_host;
 		char ip[64];
 
 		memset(&saddr, 0, sizeof(saddr));
-		saddr.sa.sa.sa_family = res->ai_family;
+		saddr.sa.sa_family = res->ai_family;
 		if (res->ai_family == AF_INET) {
-			if (inet_ntop(res->ai_family, &sa->sa.in.sin_addr,
+			if (inet_ntop(res->ai_family, &sa->in.sin_addr,
 				ip, sizeof(ip)) == NULL) {
 
 				continue;
 			}
-			memcpy(&saddr.sa.in.sin_addr, &sa->sa.in.sin_addr,
-				sizeof(saddr.sa.in.sin_addr));
+			memcpy(&saddr.in.sin_addr, &sa->in.sin_addr,
+				sizeof(saddr.in.sin_addr));
 #ifdef AF_INET6
 		} else if (res->ai_family == AF_INET6) {
-			if (inet_ntop(res->ai_family, &sa->sa.in6.sin6_addr,
+			if (inet_ntop(res->ai_family, &sa->in6.sin6_addr,
 				ip, sizeof(ip)) == NULL) {
 
 				continue;
 			}
-			memcpy(&saddr.sa.in6.sin6_addr, &sa->sa.in6.sin6_addr,
-				sizeof(saddr.sa.in6.sin6_addr));
+			memcpy(&saddr.in6.sin6_addr, &sa->in6.sin6_addr,
+				sizeof(saddr.in6.sin6_addr));
 #endif
 		} else {
 			continue;
@@ -370,9 +369,8 @@ ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error)
 
 	freeaddrinfo(res0);
 
-	if (acl_netdb_size(db) > 0) {
+	if (acl_netdb_size(db) > 0)
 		return db;
-	}
 
 	acl_netdb_free(db);
 	return NULL;

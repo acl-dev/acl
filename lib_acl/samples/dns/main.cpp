@@ -30,7 +30,7 @@ static int dns_lookup(const char *domain, const char *dns_ip,
 		char  buf[32];
 
 		info = (ACL_HOST_INFO*) iter.data;
-		in.s_addr = info->saddr.sa.in.sin_addr.s_addr;
+		in.s_addr = info->saddr.in.sin_addr.s_addr;
 		acl_mask_addr((unsigned char*) &in.s_addr, sizeof(in.s_addr), 24);
 		acl_inet_ntoa(in, buf, sizeof(buf));
 

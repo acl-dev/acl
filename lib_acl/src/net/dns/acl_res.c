@@ -216,9 +216,9 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 		if (answers->answer[i].type == RFC1035_TYPE_A) {
 			phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
 
-			memcpy(&phost->saddr.sa.in.sin_addr,
+			memcpy(&phost->saddr.in.sin_addr,
 				answers->answer[i].rdata, 4);
-			inet_ntop(AF_INET, &phost->saddr.sa.in.sin_addr,
+			inet_ntop(AF_INET, &phost->saddr.in.sin_addr,
 				phost->ip, sizeof(phost->ip));
 
 			phost->ttl = answers->answer[i].ttl;

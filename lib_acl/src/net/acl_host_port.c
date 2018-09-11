@@ -54,8 +54,8 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 		*host = *buf ? buf : def_host;
 		*port = *cp ? cp : def_service;
 	} else {
-		*host = def_host ? def_host : (*buf ? buf : 0);
-		*port = def_service ? def_service : (*buf ? buf : 0);
+		*host = *buf ? buf : (def_host ? def_host : NULL);
+		*port = def_service ? def_service : NULL;
 	}
 
 	if (*host == 0)
@@ -141,8 +141,8 @@ struct addrinfo *acl_host_addrinfo(const char *addr, int type)
 	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
 #endif
 	if ((err = getaddrinfo(host, port, &hints, &res0))) {
-		acl_msg_error("%s(%d): getaddrinfo error %s, peer=%s",
-			__FILE__, __LINE__, gai_strerror(err), host);
+		acl_msg_error("%s(%d): getaddrinfo error %s, host=%s, addr=%s",
+			__FILE__, __LINE__, gai_strerror(err), host, addr);
 		acl_myfree(buf);
 		return NULL;
 	}

@@ -125,20 +125,20 @@ static ACL_DNS_DB *build_dns_db(const rfc1035_message *res, int count,
 #if defined(ACL_UNIX)
 			/* 这样直接赋值要比用 memcpy 快些 */
 # ifdef MINGW
-			saddr->sa.in.sin_addr.s_addr =
+			saddr->in.sin_addr.s_addr =
 				*((unsigned int*) res->answer[i].rdata);
 # else
-			saddr->sa.in.sin_addr.s_addr =
+			saddr->in.sin_addr.s_addr =
 				*((in_addr_t*) res->answer[i].rdata);
 # endif
 #elif defined(ACL_WINDOWS)
-			saddr->sa.in.sin_addr.s_addr =
+			saddr->in.sin_addr.s_addr =
 				*((unsigned int*) res->answer[i].rdata);
 #endif
 			/* 目前该模块仅支持 IPV4 */
-			saddr->sa.sa.sa_family = AF_INET;
+			saddr->sa.sa_family = AF_INET;
 
-			if (inet_ntop(AF_INET, &saddr->sa.in.sin_addr,
+			if (inet_ntop(AF_INET, &saddr->in.sin_addr,
 				phost->ip, sizeof(phost->ip))) {
 
 				continue;
@@ -211,14 +211,14 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 			acl_msg_fatal("%s(%d): addr null for %d",
 				myname, __LINE__, i);
 
-		if (dns->addr_from.addr.sa.in.sin_addr.s_addr
-			!= addr->addr.sa.in.sin_addr.s_addr) {
+		if (dns->addr_from.addr.in.sin_addr.s_addr
+			!= addr->addr.in.sin_addr.s_addr) {
 
 			char  from[64], to[64];
 
-			inet_ntop(AF_INET, &dns->addr_from.addr.sa.in.sin_addr,
+			inet_ntop(AF_INET, &dns->addr_from.addr.in.sin_addr,
 				from, sizeof(from));
-			inet_ntop(AF_INET, &addr->addr.sa.in.sin_addr,
+			inet_ntop(AF_INET, &addr->addr.in.sin_addr,
 				to, sizeof(to));
 			acl_msg_warn("%s(%d): from(%s) != to(%s)",
 				myname, __LINE__, from, to);
@@ -241,15 +241,15 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 			acl_msg_fatal("%s(%d): addr null for %d",
 				myname, __LINE__, i);
 
-		in.s_addr = dns->addr_from.addr.sa.in.sin_addr.s_addr;
+		in.s_addr = dns->addr_from.addr.in.sin_addr.s_addr;
 		acl_mask_addr((unsigned char*) &in.s_addr,
 			sizeof(in.s_addr), addr->mask_length);
 		if (in.s_addr != addr->in.s_addr) {
 			char  from[64], to[64];
 
-			inet_ntop(AF_INET, &dns->addr_from.addr.sa.in.sin_addr,
+			inet_ntop(AF_INET, &dns->addr_from.addr.in.sin_addr,
 				from, sizeof(from));
-			inet_ntop(AF_INET, &addr->addr.sa.in.sin_addr,
+			inet_ntop(AF_INET, &addr->addr.in.sin_addr,
 				to, sizeof(to));
 			acl_msg_warn("%s(%d): from(%s) != to(%s)",
 				myname, __LINE__, from, to);
@@ -527,14 +527,14 @@ void acl_dns_add_dns(ACL_DNS *dns, const char *dns_ip,
 	addr->port = dns_port;
 
 	memset(&addr->addr, 0, sizeof(addr->addr));
-	addr->addr.sa.in.sin_port        = htons(dns_port);
-	addr->addr.sa.in.sin_addr.s_addr = inet_addr(dns_ip);
-	addr->addr.sa.sa.sa_family       = AF_INET;
-	addr->addr_len                   = sizeof(struct sockaddr_in);
+	addr->addr.in.sin_port        = htons(dns_port);
+	addr->addr.in.sin_addr.s_addr = inet_addr(dns_ip);
+	addr->addr.sa.sa_family       = AF_INET;
+	addr->addr_len                = sizeof(struct sockaddr_in);
 
-	addr->in.s_addr                  = addr->addr.sa.in.sin_addr.s_addr;
-	acl_mask_addr((unsigned char*) &addr->addr.sa.in.sin_addr.s_addr,
-		sizeof(addr->addr.sa.in.sin_addr.s_addr), mask_length);
+	addr->in.s_addr               = addr->addr.in.sin_addr.s_addr;
+	acl_mask_addr((unsigned char*) &addr->addr.in.sin_addr.s_addr,
+		sizeof(addr->addr.in.sin_addr.s_addr), mask_length);
 
 	/* 将该DNS地址添加进数组中 */
 
@@ -560,8 +560,8 @@ void acl_dns_add_host(ACL_DNS *dns, const char *domain, const char *ip_list)
 		ACL_HOSTNAME *phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
 
 		ACL_SAFE_STRNCPY(phost->ip, ip, sizeof(phost->ip));
-		phost->saddr.sa.sa.sa_family = AF_INET;
-		phost->saddr.sa.in.sin_addr.s_addr = inet_addr(ip);
+		phost->saddr.sa.sa_family = AF_INET;
+		phost->saddr.in.sin_addr.s_addr = inet_addr(ip);
 		(void) acl_array_append(dns_db->h_db, phost);
 	}
 

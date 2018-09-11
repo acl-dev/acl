@@ -25,7 +25,7 @@
 
 int acl_getpeername(ACL_SOCKET fd, char *buf, size_t size)
 {
-	struct ACL_SOCKADDR addr;
+	ACL_SOCKADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
 	char  ip[LEN];
@@ -47,20 +47,20 @@ int acl_getpeername(ACL_SOCKET fd, char *buf, size_t size)
 		if (getsockname(fd, sa, &len) == -1)
 			return -1;
 
-		snprintf(buf, size, "%s", addr.sa.un.sun_path);
+		snprintf(buf, size, "%s", addr.un.sun_path);
 		return 0;
 	} else
 #endif
 	if (sa->sa_family == AF_INET) {
-		if (!inet_ntop(sa->sa_family, &addr.sa.in.sin_addr, ip, LEN))
+		if (!inet_ntop(sa->sa_family, &addr.in.sin_addr, ip, LEN))
 			return -1;
-		port = ntohs(addr.sa.in.sin_port);
+		port = ntohs(addr.in.sin_port);
 	}
 #ifdef AF_INET6
 	else if (sa->sa_family == AF_INET6) {
-		if (!inet_ntop(sa->sa_family, &addr.sa.in6.sin6_addr, ip, LEN))
+		if (!inet_ntop(sa->sa_family, &addr.in6.sin6_addr, ip, LEN))
 			return -1;
-		port = ntohs(addr.sa.in6.sin6_port);
+		port = ntohs(addr.in6.sin6_port);
 	} else
 		return -1;
 #else
@@ -73,7 +73,7 @@ int acl_getpeername(ACL_SOCKET fd, char *buf, size_t size)
 
 int acl_getsockname(ACL_SOCKET fd, char *buf, size_t size)
 {
-	struct ACL_SOCKADDR addr;
+	ACL_SOCKADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
 	char  ip[LEN];
@@ -89,20 +89,20 @@ int acl_getsockname(ACL_SOCKET fd, char *buf, size_t size)
 
 #ifndef	ACL_WINDOWS
 	if (sa->sa_family == AF_UNIX) {
-		snprintf(buf, size, "%s", addr.sa.un.sun_path);
+		snprintf(buf, size, "%s", addr.un.sun_path);
 		return 0;
 	} else
 #endif
 	if (sa->sa_family == AF_INET) {
-		if (!inet_ntop(sa->sa_family, &addr.sa.in.sin_addr, ip, LEN))
+		if (!inet_ntop(sa->sa_family, &addr.in.sin_addr, ip, LEN))
 			return -1;
-		port = ntohs(addr.sa.in.sin_port);
+		port = ntohs(addr.in.sin_port);
 	}
 #ifdef AF_INET6
 	else if (sa->sa_family == AF_INET6) {
-		if (!inet_ntop(sa->sa_family, &addr.sa.in6.sin6_addr, ip, LEN))
+		if (!inet_ntop(sa->sa_family, &addr.in6.sin6_addr, ip, LEN))
 			return -1;
-		port = ntohs(addr.sa.in6.sin6_port);
+		port = ntohs(addr.in6.sin6_port);
 	} else
 		return -1;
 #else
@@ -116,7 +116,7 @@ int acl_getsockname(ACL_SOCKET fd, char *buf, size_t size)
 
 int acl_getsocktype(ACL_SOCKET fd)
 {
-	struct ACL_SOCKADDR addr;
+	ACL_SOCKADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
 

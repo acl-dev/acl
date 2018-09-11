@@ -16,7 +16,7 @@
 typedef struct ACL_HOSTNAME ACL_HOST_INFO;
 typedef struct ACL_HOSTNAME {
 	char   ip[64];                  /**< the ip addr of the HOST */
-	struct ACL_SOCKADDR saddr;	/**< ip addr in ACL_SOCKADDR */
+	ACL_SOCKADDR saddr;		/**< ip addr in ACL_SOCKADDR */
 	unsigned int ttl;               /**< the HOST's ip timeout(second) */
 	int   hport;
 	unsigned int nrefer;            /**< refer number to this HOST */
@@ -58,9 +58,9 @@ ACL_API const ACL_HOSTNAME *acl_netdb_index(const ACL_DNS_DB *h_dns_db, int i);
  * 从结果集中取得某个下标位置的主机IP地址
  * @param h_dns_db {const ACL_DNS_DB*} DNS结果集
  * @param i {int} 下标位置
- * @return {const struct ACL_SOCKADDR*} IP地址结构, NULL表示失败
+ * @return {const ACL_SOCKADDR*} IP地址结构, NULL表示失败
  */
-ACL_API const struct ACL_SOCKADDR *acl_netdb_index_saddr(ACL_DNS_DB *h_dns_db, int i);
+ACL_API const ACL_SOCKADDR *acl_netdb_index_saddr(ACL_DNS_DB *h_dns_db, int i);
 
 /**
  * 将结果集中的对应某个下标的主机地址引用增加

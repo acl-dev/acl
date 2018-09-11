@@ -2997,13 +2997,11 @@ static struct sockaddr *set_sock_addr(const char *addr, size_t *sa_size)
 
 	snprintf(buf, sizeof(buf), "%s", (addr));
 
-	ptr = strchr(buf, ':');
-	if (ptr == NULL)
-		port = -1;
-	else {
+	if ((ptr = strrchr(buf, '#')) || (ptr = strrchr(buf, ':'))) {
 		*ptr++ = 0;
 		port   = atoi(ptr);
-	}
+	} else
+		port = -1;
 
 	if (acl_is_ipv4(buf)) {
 		struct sockaddr_in *in;
@@ -3014,8 +3012,7 @@ static struct sockaddr *set_sock_addr(const char *addr, size_t *sa_size)
 		in = (struct sockaddr_in *)
 			acl_mycalloc(1, sizeof(struct sockaddr_in));
 		in->sin_family = AF_INET;
-		in->sin_port = htons(port);
-		in->sin_addr.s_addr = inet_addr(buf);
+		in->sin_port   = htons(port);
 		(void) inet_pton(AF_INET, buf, &in->sin_addr);
 		*sa_size = sizeof(struct sockaddr_in);
 		return (struct sockaddr *) in;
@@ -3030,7 +3027,7 @@ static struct sockaddr *set_sock_addr(const char *addr, size_t *sa_size)
 		in = (struct sockaddr_in6 *)
 			acl_mycalloc(1, sizeof(struct sockaddr_in6));
 		in->sin6_family = AF_INET6;
-		in->sin6_port = htons(port);
+		in->sin6_port   = htons(port);
 		(void) inet_pton(AF_INET6, buf, &in->sin6_addr);
 		*sa_size = sizeof(struct sockaddr_in6);
 		return (struct sockaddr *) in;
@@ -3087,7 +3084,7 @@ void acl_vstream_set_local(ACL_VSTREAM *fp, const char *addr)
 	if (fp->sa_local != NULL)
 		acl_myfree(fp->sa_local);
 
-	fp->sa_local = set_sock_addr(addr, &fp->sa_local_size);
+	fp->sa_local     = set_sock_addr(addr, &fp->sa_local_size);
 	fp->sa_local_len = fp->sa_local_size;
 }
 
