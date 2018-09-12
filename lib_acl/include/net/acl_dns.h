@@ -14,7 +14,7 @@ extern "C" {
 #endif
 #include "../event/acl_events.h"
 #include "../aio/acl_aio.h"
-#include "acl_sane_socket.h"
+#include "acl_sane_inet.h"
 #include "acl_netdb.h"
 
 /* DNS 查询时的错误码定义 */

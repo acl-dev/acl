@@ -7,7 +7,7 @@ extern "C" {
 
 #include "../stdlib/acl_define.h"
 #include "../stdlib/acl_argv.h"
-#include "acl_sane_socket.h"
+#include "acl_sane_inet.h"
 
 typedef struct ACL_IFADDR {
 	char *name;		/* ½Ó¿ÚÃû³Æ */

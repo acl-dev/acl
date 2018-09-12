@@ -130,9 +130,9 @@ int acl_valid_ipv4_hostaddr(const char *addr_in, int gripe)
 #define BYTES_NEEDED	4
 
 	ACL_SAFE_STRNCPY(addr, addr_in, sizeof(addr));
-	if ((ptr = strrchr(addr, ':')) != NULL) {
+	if ((ptr = strrchr(addr, ACL_ADDR_SEP)) != NULL) {
 		*ptr = 0;
-	} else if ((ptr = strrchr(addr, '#')) != NULL) {
+	} else if ((ptr = strrchr(addr, ':')) != NULL) {
 		*ptr = 0;
 	}
 
@@ -201,7 +201,7 @@ int acl_valid_ipv6_hostaddr(const char *addr_in, int gripe)
 	const unsigned char *cp;
 
 	ACL_SAFE_STRNCPY(addr, addr_in, sizeof(addr));
-	if ((ptr = strrchr(addr, '#')) != NULL) {
+	if ((ptr = strrchr(addr, ACL_ADDR_SEP)) != NULL) {
 		*ptr = 0;
 	}
 	cp = (const unsigned char *) addr;

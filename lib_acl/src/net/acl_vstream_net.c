@@ -45,7 +45,7 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 
 #ifdef	ACL_UNIX
 	/* this maybe unix addr, such as '/home/test/listen.sock' */
-	if (strchr(addr, '/') != NULL) {
+	if (*addr == '/' || (*addr == '.' && *(addr + 1) == '/')) {
 		listenfd = acl_unix_listen(addr, qlen, 0);
 		if (listenfd == ACL_SOCKET_INVALID)
 			return NULL;
@@ -172,31 +172,22 @@ ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
 	const char *myname = "acl_vstream_connect_ex";
 	ACL_VSTREAM *client;
 	ACL_SOCKET connfd;
-	char *ptr, buf[256];
+	char buf[256];
 
 	if (addr == NULL || *addr == 0)
 		acl_msg_fatal("%s: addr null", myname);
 
-	ptr = strchr(addr, ':');
-	if (ptr != NULL)
+#if defined(ACL_UNIX)
+	if (*addr == '/' || (*addr == '.' && *(addr + 1) == '/'))
+		connfd = acl_unix_connect(addr, block_mode, connect_timeout);
+	else
+#endif
 		connfd = acl_inet_connect_ex(addr, block_mode,
 			connect_timeout, he_errorp);
-#ifdef ACL_WINDOWS
-	else {
-		acl_msg_error("%s(%d): addr(%s) invalid",
-			myname, __LINE__, addr);
-		return NULL;
-	}
-#elif defined(ACL_UNIX)
-	else
-		connfd = acl_unix_connect(addr, block_mode, connect_timeout);
-#else
-	else
-		connfd = ACL_SOCKET_INVALID;
-#endif
 
 	if (connfd == ACL_SOCKET_INVALID)
 		return NULL;
+
 	client = acl_vstream_fdopen(connfd, ACL_VSTREAM_FLAG_RW,
 			rw_bufsize, rw_timeout, ACL_VSTREAM_TYPE_SOCK);
 	if (client == NULL) {

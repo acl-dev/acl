@@ -8,7 +8,7 @@
 #endif
 
 #include "../stdlib/acl_array.h"
-#include "acl_sane_socket.h"
+#include "acl_sane_inet.h"
 
 /**
  * 主机地址结构

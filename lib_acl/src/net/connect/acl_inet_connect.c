@@ -78,9 +78,7 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 		return ACL_SOCKET_INVALID;
 	}
 
-	/*
-	 * Timed connect.
-	 */
+	/* Timed connect. */
 	if (timeout > 0) {
 		acl_non_blocking(sock, ACL_NON_BLOCKING);
 #ifdef ACL_WINDOWS
@@ -105,9 +103,7 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 		return sock;
 	}
 
-	/*
-	 * Maybe block until connected.
-	 */
+	/* Maybe block until connected. */
 	acl_non_blocking(sock, blocking);
 #ifdef ACL_WINDOWS
 	if (acl_sane_connect(sock, peer->ai_addr,
@@ -175,7 +171,7 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
 	const char *myname = "acl_inet_connect_ex";
 	int err;
 	ACL_SOCKET  sock;
-	char  buf[256], *ptr;
+	char  buf[256], *ptr = NULL;
 	const char *peer, *local, *port;
 	struct addrinfo hints, *peer_res0, *res, *local_res0;
 
@@ -183,7 +179,15 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
 		*h_error = 0;
 
 	snprintf(buf, sizeof(buf) - 1, "%s", addr);
-	ptr = strrchr(buf, ':');
+
+	if (acl_valid_ipv6_hostaddr(buf, 0)) {
+		ptr = strrchr(buf, ACL_ADDR_SEP);
+	} else if (acl_valid_ipv4_hostaddr(buf, 0)) {
+		ptr = strrchr(buf, ACL_ADDR_SEP);
+		if (ptr == NULL)
+			ptr = strrchr(buf, '.');
+	}
+
 	if (ptr == NULL) {
 		acl_msg_error("%s, %s(%d): invalid addr(%s)",
 			__FILE__, myname, __LINE__, addr);
@@ -191,7 +195,8 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
 	}
 
 	*ptr++ = 0;
-	port = ptr;
+	port   = ptr;
+
 	if (atoi(port) <= 0) {
 		acl_msg_error("%s, %s(%d): invalid port(%s)",
 			__FILE__, myname, __LINE__, port);

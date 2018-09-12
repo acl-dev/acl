@@ -124,7 +124,6 @@ ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size, int* sock_type)
 	socklen_t len = sizeof(addr);
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	ACL_SOCKET fd;
-	size_t n;
 
 	memset(&addr, 0, sizeof(addr));
 
@@ -140,58 +139,19 @@ ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size, int* sock_type)
 
 	buf[0] = 0;
 
-	if (sa->sa_family == AF_INET) {
-#ifdef ACL_WINDOWS
-		if (!inet_ntop(sa->sa_family, &addr.in.sin_addr, buf, size))
-#else
-		if (!inet_ntop(sa->sa_family, &addr.in.sin_addr,
-			buf, (socklen_t) size))
-#endif
-		{
-			acl_msg_error("%s(%d): inet_ntop error=%s",
-				__FUNCTION__, __LINE__, acl_last_serror());
-			return fd;
-		}
-
-		n = strlen(buf);
-		if (n >= size)
-			return fd;
-		snprintf(buf + n, size - n, ":%u",
-			(unsigned short) ntohs(addr.in.sin_port));
-		buf[size - 1] = 0;
-		return fd;
-	}
-#ifdef AF_INET6
-	else if (sa->sa_family == AF_INET6) {
-#ifdef ACL_WINDOWS
-		if (!inet_ntop(sa->sa_family, &addr.in6.sin6_addr, buf, size))
-#else
-		if (!inet_ntop(sa->sa_family, &addr.in6.sin6_addr,
-			buf, (socklen_t) size))
-#endif
-		{
-			acl_msg_error("%s(%d): inet_ntop error=%s",
-				__FUNCTION__, __LINE__, acl_last_serror());
-			return fd;
-		}
-
-		n = strlen(buf);
-		if (n >= size)
-			return fd;
-		snprintf(buf + n, size - n, ":%u",
-			(unsigned short) ntohs(addr.in6.sin6_port));
-		buf[size - 1] = 0;
-		return fd;
-	}
-#endif
 #ifdef	ACL_UNIX
-	else if (sa->sa_family == AF_UNIX) {
-		if (acl_getsockname(fd, buf, size) < 0)
+	if (sa->sa_family == AF_UNIX) {
+		if (acl_getsockname(fd, buf, size) < 0) {
 			buf[0] = 0;
+			acl_msg_error("%s(%d): getsockname error=%s",
+				__FUNCTION__, __LINE__, acl_last_serror());
+		}
 		return fd;
 	}
 #endif
-	else {
-		return fd;
+	if (acl_inet_ntop(sa, buf, size) == 0) {
+		acl_msg_error("%s(%d): inet_ntop error=%s",
+			__FUNCTION__, __LINE__, acl_last_serror());
 	}
+	return fd;
 }

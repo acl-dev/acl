@@ -14,18 +14,6 @@ extern "C" {
 #include <arpa/inet.h>
 #endif
 
-typedef union {
-	struct sockaddr_storage ss;
-#ifdef AF_INET6
-	struct sockaddr_in6 in6;
-#endif
-	struct sockaddr_in in;
-#ifdef ACL_UNIX
-	struct sockaddr_un un;
-#endif
-	struct sockaddr sa;
-} ACL_SOCKADDR;
-
 /**
  * 取得套接字连接对方的网络地址, 地址格式为: IP:PORT
  * @param fd {ACL_SOCKET} 网络套接字

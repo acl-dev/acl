@@ -96,7 +96,7 @@ ACL_SOCKET acl_inet_accept(ACL_SOCKET listen_fd)
 
 ACL_SOCKET acl_inet_accept_ex(ACL_SOCKET listen_fd, char *ipbuf, size_t size)
 {
-	struct sockaddr_storage sa;
+	ACL_SOCKADDR sa;
 	socklen_t len = sizeof(sa);
 	ACL_SOCKET fd;
 
@@ -109,7 +109,7 @@ ACL_SOCKET acl_inet_accept_ex(ACL_SOCKET listen_fd, char *ipbuf, size_t size)
 	if (fd == ACL_SOCKET_INVALID)
 		return fd;
 
-	if (ipbuf != NULL && size > 0 && acl_getpeername(fd, ipbuf, size) < 0)
+	if (ipbuf == NULL && size == 0 && !acl_inet_ntop(&sa.sa, ipbuf, size))
 		ipbuf[0] = 0;
 
 	return fd;

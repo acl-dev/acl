@@ -93,5 +93,9 @@ typedef struct acl_stat acl_stat_t;
 #define	ACL_DEPRECATED_FOR(f)	ACL_DEPRECATED
 #endif	/* __GNUC__ */
 
+#ifndef ACL_ADDR_SEP
+#define ACL_ADDR_SEP	'#'
+#endif
+
 #endif /* __ACL_DEFINE_INCLUDE_H__ */
 

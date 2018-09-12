@@ -33,9 +33,7 @@ ACL_SOCKET acl_unix_connect(const char *addr, int block_mode, int timeout)
 	int     len = (int) strlen(addr);
 	ACL_SOCKET  sock;
 
-	/*
-	 * Translate address information to internal form.
-	 */
+	/* Translate address information to internal form. */
 	if (len >= (int) sizeof(sun.sun_path))
 		acl_msg_fatal("unix-domain name too long: %s", addr);
 	memset((char *) &sun, 0, sizeof(sun));
@@ -45,17 +43,13 @@ ACL_SOCKET acl_unix_connect(const char *addr, int block_mode, int timeout)
 #endif
 	memcpy(sun.sun_path, addr, len + 1);
 
-	/*
-	 * Create a client socket.
-	 */
+	/* Create a client socket. */
 	if ((sock = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-		char tbuf[256];
-		acl_msg_fatal("socket: %s", acl_last_strerror(tbuf, sizeof(tbuf)));
+		acl_msg_fatal("%s(%d): socket: %s",
+			__FUNCTION__, __LINE__, acl_last_serror());
 	}
 
-	/*
-	 * Timed connect.
-	 */
+	/* Timed connect. */
 	if (timeout > 0) {
 		acl_non_blocking(sock, ACL_NON_BLOCKING);
 		if (acl_timed_connect(sock, (struct sockaddr *) & sun,
@@ -68,19 +62,14 @@ ACL_SOCKET acl_unix_connect(const char *addr, int block_mode, int timeout)
 		return (sock);
 	}
 
-	/*
-	 * Maybe block until connected.
-	 */
-	else {
-		acl_non_blocking(sock, block_mode);
-		if (acl_sane_connect(sock, (struct sockaddr *) & sun, sizeof(sun)) < 0
-			&& acl_last_error() != EINPROGRESS) {
+	/* Maybe block until connected. */
+	acl_non_blocking(sock, block_mode);
+	if (acl_sane_connect(sock, (struct sockaddr *) & sun, sizeof(sun)) < 0
+		&& acl_last_error() != EINPROGRESS) {
 
-			close(sock);
-			return (-1);
-		}
-		return (sock);
+		close(sock);
+		return (-1);
 	}
+	return (sock);
 }
 #endif
-

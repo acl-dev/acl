@@ -39,8 +39,8 @@ void acl_tcp_set_rcvbuf(ACL_SOCKET fd, int size)
 		return;
 
 	if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF,
-		(char *) &size, sizeof(size)) < 0)
-	{
+		(char *) &size, sizeof(size)) < 0) {
+
 		acl_msg_error("%s(%d): size(%d), setsockopt error(%s)",
 			myname, __LINE__, size, acl_last_serror());
 	}
@@ -59,8 +59,8 @@ void acl_tcp_set_sndbuf(ACL_SOCKET fd, int size)
 		return;
 
 	if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF,
-		(char *) &size, sizeof(size)) < 0)
-	{
+		(char *) &size, sizeof(size)) < 0) {
+
 		acl_msg_error("%s: FD %d, SIZE %d: %s\n",
 			myname, fd, size, acl_last_serror());
 	}
@@ -86,10 +86,10 @@ int acl_tcp_get_rcvbuf(ACL_SOCKET fd)
 	{
 		acl_msg_error("%s(%d): size(%d), getsockopt error(%s)",
 			myname, __LINE__, size, acl_last_serror());
-		return (-1);
+		return -1;
 	}
 
-	return (size);
+	return size;
 }
 
 int acl_tcp_get_sndbuf(ACL_SOCKET fd)
@@ -110,10 +110,10 @@ int acl_tcp_get_sndbuf(ACL_SOCKET fd)
 	if (getsockopt(fd, SOL_SOCKET, SO_SNDBUF, (char *) &size, &len) < 0) {
 		acl_msg_error("%s(%d): size(%d), getsockopt error(%s)",
 			myname, __LINE__, size, acl_last_serror());
-		return (-1);
+		return -1;
 	}
 
-	return (size);
+	return size;
 }
 
 void acl_tcp_set_nodelay(ACL_SOCKET fd)
@@ -135,8 +135,8 @@ void acl_tcp_nodelay(ACL_SOCKET fd, int onoff)
 		return;
 
 	if (setsockopt(fd, IPPROTO_TCP, TCP_NODELAY,
-		(char *) &on, sizeof(on)) < 0)
-	{
+		(char *) &on, sizeof(on)) < 0) {
+
 		acl_msg_error("%s(%d): set nodelay error(%s), onoff(%d)",
 			myname, __LINE__, acl_last_serror(), onoff);
 	}
@@ -145,8 +145,8 @@ void acl_tcp_nodelay(ACL_SOCKET fd, int onoff)
 int acl_get_tcp_nodelay(ACL_SOCKET fd)
 {
 	const char *myname = "acl_get_tcp_nodelay";
-	int  on = 0;
 	socklen_t len;
+	int   on = 0;
 	int   n = acl_getsocktype(fd);
 
 #ifdef AF_INET6
@@ -182,9 +182,7 @@ void acl_tcp_so_linger(ACL_SOCKET fd, int onoff, int timeout)
 
 	l.l_onoff = onoff ? 1 : 0;
 	l.l_linger = timeout >= 0 ? timeout : 0;
-	if (setsockopt(fd, SOL_SOCKET, SO_LINGER,
-		(char *) &l, sizeof(l)) < 0)
-	{
+	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, (char *) &l, sizeof(l)) < 0) {
 		acl_msg_error("%s(%d): setsockopt(SO_LINGER) error(%s),"
 			" onoff(%d), timeout(%d)", myname, __LINE__,
 			acl_last_serror(), onoff, timeout);
@@ -242,8 +240,8 @@ void acl_tcp_fastopen(ACL_SOCKET fd, int on)
 	if (on)
 		on = 1;
 	if (setsockopt(fd, IPPROTO_TCP, TCP_FASTOPEN,
-		(const void *) &on, sizeof(on)) < 0)
-	{
+		(const void *) &on, sizeof(on)) < 0) {
+
 		acl_msg_error("%s: setsocket(TCP_FASTOPEN): %s",
 			myname, acl_last_serror());
 	}
