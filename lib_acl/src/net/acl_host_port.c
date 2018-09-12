@@ -35,9 +35,7 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 {
 	char *cp = buf;
 
-	/*
-	 * [host]:port, [host]:, [host].
-	 */
+	/* [host]:port, [host]:, [host]. */
 	if (*cp == '[') {
 		*host = ++cp;
 		if ((cp = acl_split_at(cp, ']')) == 0)
@@ -46,10 +44,12 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 			return "garbage after \"]\"";
 		*port = *cp ? cp : def_service;
 	}
-
-	/*
-	 * host:port, host:, host, :port, port.
-	 */
+	/* host#port, host#, host, #port, port. */
+	else if ((cp = acl_split_at_right(buf, ACL_ADDR_SEP)) != 0) {
+		*host = *buf ? buf : def_host;
+		*port = *cp ? cp : def_service;
+	}
+	/* host:port, host:, host, :port, port. */
 	else if ((cp = acl_split_at_right(buf, ':')) != 0) {
 		*host = *buf ? buf : def_host;
 		*port = *cp ? cp : def_service;
