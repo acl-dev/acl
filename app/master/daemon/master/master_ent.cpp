@@ -269,7 +269,9 @@ static int service_unix(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 
 static ACL_MASTER_ADDR *master_stream_addr(const char *addr, char private_val)
 {
-	if (strchr(addr, ':') != NULL || acl_alldig(addr)) {
+	if (strrchr(addr, ':') || strrchr(addr, ACL_ADDR_SEP)
+		|| acl_alldig(addr)) {
+
 		ACL_MASTER_ADDR *ma = (ACL_MASTER_ADDR*)
 			acl_mycalloc(1, sizeof(ACL_MASTER_ADDR));
 		ma->type = ACL_MASTER_SERV_TYPE_INET;
@@ -329,8 +331,8 @@ static int service_sock(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 	/* Service name. Syntax is transport-specific. */
 	const char *name = get_str_ent(xcp, ACL_VAR_MASTER_SERV_SERVICE, NULL);
 	char private_val = get_bool_ent(xcp, ACL_VAR_MASTER_SERV_PRIVATE, "y");
-	ACL_ARGV *addrs;
-	ACL_ITER  iter;
+	ACL_IFCONF *ifconf;
+	ACL_ITER    iter;
 
 	if (name == NULL || *name == 0) {
 		acl_msg_error("%s(%d), %s: no %s found", __FILE__, __LINE__,
@@ -338,29 +340,30 @@ static int service_sock(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 		return -1;
 	}
 
-	addrs       = acl_ifconf_search(name);
+	ifconf      = acl_ifconf_search(name);
 	serv->name  = acl_mystrdup(name);
 	serv->type  = ACL_MASTER_SERV_TYPE_SOCK;
 	serv->addrs = acl_array_create(1);
 
-	acl_foreach(iter, addrs) {
-		const char *ptr = (const char*) iter.data;
-		ACL_MASTER_ADDR *addr = master_stream_addr(ptr, private_val);
+	acl_foreach(iter, ifconf) {
+		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
+		ACL_MASTER_ADDR *addr =
+			master_stream_addr(ifaddr->addr, private_val);
 		if (addr == NULL)
 			continue;
 
 		acl_array_append(serv->addrs, addr);
 		serv->listen_fd_count++;
 		acl_msg_info("%s(%d), %s: add addr=%s", __FILE__,
-			__LINE__, __FUNCTION__, ptr);
+			__LINE__, __FUNCTION__, ifaddr->addr);
 	}
 
-	acl_argv_free(addrs);
+	acl_free_ifaddrs(ifconf);
+
 	if (serv->listen_fd_count == 0) {
 		acl_msg_warn("no invalid addr found in %s", name);
 		return -1;
 	}
-
 	return 0;
 }
 
@@ -369,8 +372,8 @@ static int service_sock(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 static int service_udp(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 {
 	const char *name = get_str_ent(xcp, ACL_VAR_MASTER_SERV_SERVICE, NULL);
-	ACL_ARGV *addrs;
-	ACL_ITER  iter;
+	ACL_IFCONF *ifconf;
+	ACL_ITER    iter;
 
 	if (name == NULL || *name == 0) {
 		acl_msg_error("%s(%d), %s: no %s found", __FILE__, __LINE__,
@@ -378,13 +381,14 @@ static int service_udp(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 		return -1;
 	}
 
-	addrs       = acl_ifconf_search(name);
+	ifconf      = acl_ifconf_search(name);
 	serv->name  = acl_mystrdup(name);
 	serv->type  = ACL_MASTER_SERV_TYPE_UDP;
 	serv->addrs = acl_array_create(1);
 
-	acl_foreach(iter, addrs) {
-		const char *ptr = (const char*) iter.data;
+	acl_foreach(iter, ifconf) {
+		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
+		const char *ptr = (const char*) ifaddr->addr;
 		ACL_MASTER_ADDR *addr = master_dgram_addr(ptr);
 		if (addr == NULL)
 			continue;
@@ -395,7 +399,8 @@ static int service_udp(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 			__LINE__, __FUNCTION__, addr->addr);
 	}
 
-	acl_argv_free(addrs);
+	acl_free_ifaddrs(ifconf);
+
 	if (serv->listen_fd_count == 0) {
 		acl_msg_warn("no invalid addr found in %s", name);
 		return -1;

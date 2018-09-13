@@ -14,6 +14,8 @@
 
 #endif
 
+#define SAFE_COPY(x, y) ACL_SAFE_STRNCPY((x), (y), sizeof(x))
+
 static const ACL_IFADDR *iter_head(ACL_ITER *iter, struct ACL_IFCONF *ifconf)
 {
 	iter->dlen = -1;
@@ -61,6 +63,63 @@ static const ACL_IFADDR *iter_prev(ACL_ITER *iter, struct ACL_IFCONF *ifconf)
 	return (iter->ptr);
 }
 
+static ACL_IFADDR *ifaddr_clone(const ACL_IFADDR *ifaddr, int port)
+{
+	ACL_IFADDR *addr = (ACL_IFADDR *) acl_mycalloc(1, sizeof(ACL_IFADDR));
+
+	SAFE_COPY(addr->name, ifaddr->name);
+#ifdef ACL_WINDOWS
+	SAFE_COPY(addr->desc, ifaddr->desc);
+#endif
+	if (port >= 0) {
+		char sep;
+		if (ifaddr->saddr.sa.sa_family == AF_INET) {
+			addr->saddr.in.sin_port = htons(port);
+			sep = ':';
+#ifdef AF_INET6
+		} else if (ifaddr->saddr.sa.sa_family == AF_INET6) {
+			addr->saddr.in6.sin6_port = htons(port);
+			sep = ACL_ADDR_SEP;
+#endif
+		} else {
+			sep = ':';  /* xxx */
+		}
+		snprintf(addr->addr, sizeof(addr->addr), "%s%c%d",
+			ifaddr->addr, sep, port);
+	} else {
+		SAFE_COPY(addr->addr, ifaddr->addr);
+	}
+	memcpy(&addr->saddr, &ifaddr->saddr, sizeof(ACL_SOCKADDR));
+
+	return addr;
+}
+
+static void ifaddr_copy(ACL_IFADDR *to, const ACL_IFADDR *from)
+{
+	SAFE_COPY(to->name, from->name);
+#ifdef ACL_WINDOWS
+	SAFE_COPY(to->desc, from->desc);
+#endif
+	SAFE_COPY(to->addr, from->addr);
+	memcpy(&to->saddr, &from->saddr, sizeof(ACL_SOCKADDR));
+}
+
+static ACL_IFCONF *ifconf_create(int length)
+{
+	ACL_IFCONF *ifconf = (ACL_IFCONF*) acl_mymalloc(sizeof(ACL_IFCONF));
+	ifconf->length = length;
+	ifconf->addrs = (ACL_IFADDR*)
+		acl_mycalloc(ifconf->length, sizeof(ACL_IFADDR));
+
+	/* set the iterator callback */
+	ifconf->iter_head = iter_head;
+	ifconf->iter_next = iter_next;
+	ifconf->iter_tail = iter_tail;
+	ifconf->iter_prev = iter_prev;
+
+	return ifconf;
+}
+
 #ifdef	ACL_UNIX
 
 #include <sys/socket.h>
@@ -72,7 +131,99 @@ static const ACL_IFADDR *iter_prev(ACL_ITER *iter, struct ACL_IFCONF *ifconf)
 #include <sys/sockio.h>
 #endif
 
-ACL_IFCONF *acl_get_ifaddrs()
+# ifdef ACL_LINUX
+#include <ifaddrs.h>
+
+ACL_IFCONF *acl_get_ifaddrs(void)
+{
+	struct ifaddrs* ifaddrs, *ifa;
+	char host[NI_MAXHOST];
+	ACL_IFCONF *ifconf;
+	ACL_ARRAY  *addrs;
+	ACL_ITER    iter;
+	char *ptr;
+	int   i;
+
+	if (getifaddrs(&ifaddrs) == -1) {
+		acl_msg_error("%s(%d): getifaddrs error=%s",
+			__FUNCTION__, __LINE__, acl_last_serror());
+		return NULL;
+	}
+
+	addrs = acl_array_create(10);
+
+	for (ifa = ifaddrs; ifa != NULL; ifa = ifa->ifa_next) {
+		ACL_IFADDR *addr;
+		int    family, n;
+		size_t len;
+
+		if (ifa->ifa_addr == NULL) {
+			continue;
+		}
+
+		if (!(ifa->ifa_flags & IFF_UP)
+			&& !(ifa->ifa_flags & IFF_RUNNING)) {
+			continue;
+		}
+
+		family = ifa->ifa_addr->sa_family;
+
+		if (family == AF_INET) {
+			len = sizeof(struct sockaddr_in);
+#ifdef AF_INET6
+		} else if (family == AF_INET6) {
+			len = sizeof(struct sockaddr_in6);
+#endif
+		} else {
+			continue;
+		}
+
+		n = getnameinfo(ifa->ifa_addr, len, host, NI_MAXHOST,
+				NULL, 0, NI_NUMERICHOST);
+		if (n != 0) {
+			acl_msg_error("%s(%d): getnameinfo error=%s, "
+				"ifa_name=%s", __FUNCTION__, __LINE__,
+				gai_strerror(n), ifa->ifa_name);
+			continue;
+		}
+
+		addr = (ACL_IFADDR *) acl_mycalloc(1, sizeof(ACL_IFADDR));
+		SAFE_COPY(addr->name, ifa->ifa_name);
+		SAFE_COPY(addr->addr, host);
+#ifdef AF_INET6
+		ptr = strrchr(addr->addr, '%');
+		if (ptr)
+			*ptr = 0;
+#endif
+		memcpy(&addr->saddr, ifa->ifa_addr, len);
+
+		acl_array_append(addrs, addr);
+	}
+
+	freeifaddrs(ifaddrs);
+
+	if (acl_array_size(addrs) <= 0) {
+		acl_array_free(addrs, NULL);
+		return NULL;
+	}
+
+	ifconf = ifconf_create(acl_array_size(addrs));
+	i = 0;
+	acl_foreach(iter, addrs) {
+		ACL_IFADDR *ifaddr = (ACL_IFADDR *) iter.data;
+
+		ifaddr_copy(&ifconf->addrs[i], ifaddr);
+		acl_myfree(ifaddr);
+		i++;
+	}
+
+	acl_array_free(addrs, NULL);
+	return ifconf;
+}
+
+# else
+
+ACL_IFCONF *acl_get_ifaddrs(void)
 {
 	ACL_IFCONF *ifconf;
 	struct ifreq *ifaces;
@@ -107,21 +258,17 @@ ACL_IFCONF *acl_get_ifaddrs()
 
 	close(sock);
 
-	ifconf = (ACL_IFCONF*) acl_mymalloc(sizeof(ACL_IFCONF));
-	ifconf->length = param.ifc_len / sizeof(struct ifreq);
-	ifconf->addrs = (ACL_IFADDR*)
-		acl_mycalloc(ifconf->length, sizeof(ACL_IFADDR));
-
+	ifconf = ifconf_create((int) (param.ifc_len / sizeof(struct ifreq)));
 	for (i = 0, j = 0; i < ifconf->length; i++) {
 		ACL_SOCKADDR *saddr = (ACL_SOCKADDR *) &ifaces[i].ifr_addr;
 		ACL_IFADDR   *ifa   = (ACL_IFADDR *) &ifconf->addrs[j];
 		size_t size;
 
-		size = acl_inet_ntop(&saddr->sa, ifa->ip, sizeof(ifa->ip));
+		size = acl_inet_ntop(&saddr->sa, ifa->addr, sizeof(ifa->addr));
 		if (size == 0)
 			continue;
 
-		ifconf->addrs[j].name = acl_mystrdup(ifaces[i].ifr_name);
+		SAFE_COPY(ifconf->addrs[j].name, ifaces[i].ifr_name);
 		memcpy(&ifconf->addrs[j].saddr, saddr, size);
 
 		j++;
@@ -134,16 +281,10 @@ ACL_IFCONF *acl_get_ifaddrs()
 	}
 
 	ifconf->length = j;  /* reset the ifconf->length */
-
-	/* set the iterator callback */
-	ifconf->iter_head = iter_head;
-	ifconf->iter_next = iter_next;
-	ifconf->iter_tail = iter_tail;
-	ifconf->iter_prev = iter_prev;
-
 	acl_myfree(ifaces);
 	return ifconf;
 }
+# endif
 
 #elif defined(ACL_WINDOWS)
 
@@ -190,10 +331,7 @@ ACL_IFCONF *acl_get_ifaddrs(void)
 		return NULL;
 	}
 
-	ifconf = (ACL_IFCONF*) acl_mymalloc(sizeof(ACL_IFCONF));
-	ifconf->length = len / sizeof(IP_ADAPTER_INFO) + 1;
-	ifconf->addrs = (ACL_IFADDR*)
-		acl_mycalloc(ifconf->length, sizeof(ACL_IFADDR));
+	ifconf = ifconf_create((int) (len / sizeof(IP_ADAPTER_INFO) + 1));
 
 	for (info = infos, j = 0; info != NULL; info = info->Next) {
 		if (info->Type == MIB_IF_TYPE_LOOPBACK)
@@ -203,12 +341,13 @@ ACL_IFCONF *acl_get_ifaddrs(void)
 		if (!acl_is_ip(info->IpAddressList.IpAddress.String))
 			continue;
 
-		ifconf->addrs[j].name = acl_mystrdup(info->AdapterName);
-		ifconf->addrs[j].desc = acl_mystrdup(info->Description);
-		snprintf(ifconf->addrs[j].ip, sizeof(ifconf->addrs[j].ip),
-				"%s", info->IpAddressList.IpAddress.String);
+		SAFE_COPY(ifconf->addrs[j].name, info->AdapterName);
+		SAFE_COPY(ifconf->addrs[j].desc, info->Description);
+		SAFE_COPY(ifconf->addrs[j].addr,
+			info->IpAddressList.IpAddress.String);
+
 		ifconf->addrs[j].saddr.in.sin_addr.s_addr
-			= inet_addr(ifconf->addrs[j].ip);
+			= inet_addr(ifconf->addrs[j].addr);
 		j++;
 		if (j == ifconf->length) {
 			ifconf->length *= 2;
@@ -227,13 +366,6 @@ ACL_IFCONF *acl_get_ifaddrs(void)
 	}
 
 	ifconf->length = j;  /* reset the ifconf->length */
-
-	/* set the iterator callback */
-	ifconf->iter_head = iter_head;
-	ifconf->iter_next = iter_next;
-	ifconf->iter_tail = iter_tail;
-	ifconf->iter_prev = iter_prev;
-
 	FreeLibrary(hInst);
 	return (ifconf);
 }
@@ -263,10 +395,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 		return NULL;
 	}
 
-	ifconf = (ACL_IFCONF*) acl_mymalloc(sizeof(ACL_IFCONF));
-	ifconf->length = len / sizeof(IP_ADAPTER_INFO) + 1;
-	ifconf->addrs = (ACL_IFADDR*)
-		acl_mycalloc(ifconf->length, sizeof(ACL_IFADDR));
+	ifconf = ifconf_create((int) (len / sizeof(IP_ADAPTER_INFO) + 1));
 
 	for (info = infos, j = 0; info != NULL; info = info->Next) {
 		if (info->Type == MIB_IF_TYPE_LOOPBACK)
@@ -276,12 +405,13 @@ ACL_IFCONF *acl_get_ifaddrs()
 		if (!acl_is_ip(info->IpAddressList.IpAddress.String))
 			continue;
 
-		ifconf->addrs[j].name = acl_mystrdup(info->AdapterName);
-		ifconf->addrs[j].desc = acl_mystrdup(info->Description);
-		snprintf(ifconf->addrs[j].ip, sizeof(ifconf->addrs[j].ip),
-			"%s", info->IpAddressList.IpAddress.String);
+		SAFE_COPY(ifconf->addrs[j].name, info->AdapterName);
+		SAFE_COPY(ifconf->addrs[j].desc, info->Description);
+		SAFE_COPY(ifconf->addrs[j].addr,
+			info->IpAddressList.IpAddress.String);
+
 		ifconf->addrs[j].saddr.in.sin_addr.s_addr
-			= inet_addr(ifconf->addrs[j].ip);
+			= inet_addr(ifconf->addrs[j].addr);
 		j++;
 		if (j == ifconf->length) {
 			ifconf->length *= 2;
@@ -299,14 +429,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 	}
 
 	ifconf->length = j;  /* reset the ifconf->length */
-
-	/* set the iterator callback */
-	ifconf->iter_head = iter_head;
-	ifconf->iter_next = iter_next;
-	ifconf->iter_tail = iter_tail;
-	ifconf->iter_prev = iter_prev;
-
-	return (ifconf);
+	return ifconf;
 }
 #endif  /* !MS_VC6 */
 #else
@@ -315,18 +438,8 @@ ACL_IFCONF *acl_get_ifaddrs()
 
 void acl_free_ifaddrs(ACL_IFCONF *ifconf)
 {
-	int   i;
-
 	if (ifconf == NULL)
 		return;
-	for (i = 0; i < ifconf->length; i++) {
-#ifdef ACL_WINDOWS
-		if (ifconf->addrs[i].desc != NULL)
-			acl_myfree(ifconf->addrs[i].desc);
-#endif
-		if (ifconf->addrs[i].name != NULL)
-			acl_myfree(ifconf->addrs[i].name);
-	}
 
 	acl_myfree(ifconf->addrs);
 	acl_myfree(ifconf);
@@ -395,16 +508,19 @@ static int match_ipv4(const char *pattern, const char *ip)
  *   *#port, *:port, #port, :port, *.*.*.*:port, 0.0.0.0:port, xxx.xxx.xxx.xxx:port,
  *   *, *.*.*.*, 0.0.0.0, xxx.xxx.xxx.xxx
  */
-static int ipv4_pattern_match_add(const char *pattern,
-	const ACL_IFADDR *ifaddr, ACL_ARGV *addrs)
+static ACL_IFADDR *ipv4_clone(const char *pattern, const ACL_IFADDR *ifaddr)
 {
-	char  buf[256], *ptr, addr[256];
+	char  buf[256], *ptr;
+	ACL_IFADDR *addr;
+	int   port = -1;
 
 	/* for "port" */
 	if (acl_alldig(pattern)) {
-		snprintf(addr, sizeof(addr), "%s:%s", ifaddr->ip, pattern);
-		acl_argv_add(addrs, addr, NULL);
-		return 1;
+		if ((port = atoi(pattern)) < 0)
+			return NULL;
+
+		addr = ifaddr_clone(ifaddr, port);
+		return addr;
 	}
 
 	ACL_SAFE_STRNCPY(buf, pattern, sizeof(buf));
@@ -414,24 +530,19 @@ static int ipv4_pattern_match_add(const char *pattern,
 		ptr = NULL;
 
 	if (MATCH1(pattern) || MATCH2(pattern)) {
-		if (ptr && *ptr && acl_alldig(ptr))
-			snprintf(addr, sizeof(addr), "%s:%s", ifaddr->ip, ptr);
-		else
-			snprintf(addr, sizeof(addr), "%s", ifaddr->ip);
-		acl_argv_add(addrs, addr, NULL);
-		return 1;
+		if (ptr && acl_alldig(ptr))
+			port = atoi(ptr);
+		addr = ifaddr_clone(ifaddr, port);
+		return addr;
 	}
 
-	if (!match_ipv4(buf, ifaddr->ip))
-		return 0;
+	if (!match_ipv4(buf, ifaddr->addr))
+		return NULL;
 
-	if (ptr && *ptr) {
-		snprintf(addr, sizeof(addr), "%s:%s", ifaddr->ip, ptr);
-		acl_argv_add(addrs, addr, NULL);
-	} else
-		acl_argv_add(addrs, ifaddr->ip, NULL);
-
-	return 1;
+	if (ptr && acl_alldig(ptr))
+		port = atoi(ptr);
+	addr = ifaddr_clone(ifaddr, port);
+	return addr;
 }
 
 /**
@@ -439,22 +550,19 @@ static int ipv4_pattern_match_add(const char *pattern,
  *   *#port, #port, *, port
  */
 #ifdef AF_INET6
-static int ipv6_pattern_match_add(const char *pattern,
-	const ACL_IFADDR *ifaddr, ACL_ARGV *addrs)
+static ACL_IFADDR *ipv6_clone(const char *pattern, const ACL_IFADDR *ifaddr)
 {
-	char  buf[256], *ptr, addr[256];
+	char  buf[256], *ptr;
+	ACL_IFADDR *addr;
+	int   port = -1;
 
 	/* for "port" */
 	if (acl_alldig(pattern)) {
-		snprintf(addr, sizeof(addr), "%s:%s", ifaddr->ip, pattern);
-		acl_argv_add(addrs, addr, NULL);
-		return 1;
-	}
+		if ((port = atoi(pattern)) <= 0)
+			return NULL;
 
-	if (MATCH1(pattern) || MATCH2(pattern)) {
-		snprintf(addr, sizeof(addr), "%s%s", ifaddr->ip, pattern);
-		acl_argv_add(addrs, addr, NULL);
-		return 1;
+		addr = ifaddr_clone(ifaddr, port);
+		return addr;
 	}
 
 	ACL_SAFE_STRNCPY(buf, pattern, sizeof(buf));
@@ -463,44 +571,55 @@ static int ipv6_pattern_match_add(const char *pattern,
 	else
 		ptr = NULL;
 
+	if (MATCH1(pattern) || MATCH2(pattern)) {
+		if (ptr && acl_alldig(ptr))
+			port = atoi(ptr);
+		addr = ifaddr_clone(ifaddr, port);
+		return addr;
+	}
+
 	if (!acl_valid_ipv6_hostaddr(buf, 0))
-		return 0;
+		return NULL;
 
-	if (ptr && *ptr) {
-		snprintf(addr, sizeof(addr), "%s:%s", ifaddr->ip, pattern);
-		acl_argv_add(addrs, addr, NULL);
-	} else
-		acl_argv_add(addrs, ifaddr->ip, NULL);
-
-	return 1;
+	if (ptr && acl_alldig(ptr))
+		port = atoi(ptr);
+	addr = ifaddr_clone(ifaddr, port);
+	return addr;
 }
 #endif
 
 static void patterns_match_add(ACL_ARGV *patterns,
-	const ACL_IFADDR *ifaddr, ACL_ARGV *addrs)
+	const ACL_IFADDR *ifaddr, ACL_ARRAY *addrs)
 {
 	ACL_ITER iter;
+	ACL_IFADDR *addr;
 
 	acl_foreach(iter, patterns) {
 		const char  *pattern      = (const char *) iter.data;
 		const struct sockaddr *sa = &ifaddr->saddr.sa;
 
 		if (sa->sa_family == AF_INET) {
-			ipv4_pattern_match_add(pattern, ifaddr, addrs);
+			addr = ipv4_clone(pattern, ifaddr);
+			if (addr)
+				acl_array_append(addrs, addr);
 		}
 #ifdef AF_INET6
 		else if (sa->sa_family == AF_INET6) {
-			ipv6_pattern_match_add(pattern, ifaddr, addrs);
+			addr = ipv6_clone(pattern, ifaddr);
+			if (addr)
+				acl_array_append(addrs, addr);
 		}
 #endif
 	}
 }
 
-ACL_ARGV *acl_ifconf_search(const char *patterns)
+ACL_IFCONF *acl_ifconf_search(const char *patterns)
 {
-	ACL_IFCONF *ifconf = acl_get_ifaddrs();
-	ACL_ARGV *patterns_tokens, *addrs;
-	ACL_ITER  iter;
+	ACL_IFCONF *ifconf = acl_get_ifaddrs(), *ifconf2;
+	ACL_ARGV   *patterns_tokens;
+	ACL_ARRAY  *addrs;
+	ACL_ITER    iter;
+	int         i;
 
 	if (ifconf == NULL) {
 		acl_msg_error("%s(%d), %s:  acl_get_ifaddrs error %s",
@@ -508,7 +627,7 @@ ACL_ARGV *acl_ifconf_search(const char *patterns)
 		return NULL;
 	}
 
-	addrs = acl_argv_alloc(1);
+	addrs = acl_array_create(10);
 
 	patterns_tokens = acl_argv_split(patterns, "\"',; \t\r\n");
 
@@ -521,13 +640,35 @@ ACL_ARGV *acl_ifconf_search(const char *patterns)
 	/* just for all unix domain path */
 	acl_foreach(iter, patterns_tokens) {
 		const char *pattern = (const char *) iter.data;
-		if (*pattern == '/' || (*pattern == '.' && *pattern == '/'))
-			acl_argv_add(addrs, pattern, NULL);
+		if (*pattern == '/' || (*pattern == '.' && *pattern == '/')) {
+			ACL_IFADDR *ifaddr = (ACL_IFADDR *)
+				acl_mycalloc(1, sizeof(ACL_IFADDR));
+
+			SAFE_COPY(ifaddr->name, pattern);
+			SAFE_COPY(ifaddr->addr, pattern);
+			ifaddr->saddr.sa.sa_family = AF_UNIX;
+			SAFE_COPY(ifaddr->saddr.un.sun_path, pattern);
+			acl_array_append(addrs, ifaddr);
+		}
 	}
 #endif
 
 	acl_argv_free(patterns_tokens);
 	acl_free_ifaddrs(ifconf);
 
-	return addrs;
+	if (acl_array_size(addrs) <= 0) {
+		acl_array_free(addrs, acl_myfree_fn);
+		return NULL;
+	}
+
+	ifconf2 = ifconf_create(acl_array_size(addrs));
+	i = 0;
+	acl_foreach(iter, addrs) {
+		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
+		ifaddr_copy(&ifconf2->addrs[i], ifaddr);
+		i++;
+	}
+
+	acl_array_free(addrs, acl_myfree_fn);
+	return ifconf2;
 }

@@ -19,7 +19,11 @@ static void test1(void)
 	/* 遍历所有网卡的信息 */
 	acl_foreach(iter, ifconf) {
 		ifaddr = (ACL_IFADDR*) iter.data;
-		printf(">>>ip: %s, name: %s\r\n", ifaddr->ip, ifaddr->name);
+		printf(">>>name=%s, addr=%s, type=%s\r\n",
+			ifaddr->name, ifaddr->addr,
+			ifaddr->saddr.sa.sa_family == AF_INET ?
+			 "AF_INET" : (ifaddr->saddr.sa.sa_family == AF_INET6 ?
+				 "AF_INET6" : "unknown"));
 	}
 
 	/* 释放查询结果 */
@@ -28,22 +32,30 @@ static void test1(void)
 
 static void test2(const char *pattern)
 {
-        ACL_ITER iter;		/* 遍历对象 */
-	ACL_ARGV   *addrs;
+        ACL_ITER    iter;		/* 遍历对象 */
+	ACL_IFCONF *ifconf;
 
-	addrs = acl_ifconf_search(pattern);
-	if (addrs == NULL) {
+	ifconf = acl_ifconf_search(pattern);
+	if (ifconf == NULL) {
 		printf("acl_ifconf_search error\r\n");
 		return;
 	}
 
 	printf("pattern=%s\r\n", pattern);
-	acl_foreach(iter, addrs) {
-		const char *addr = (const char *)iter.data;
-		printf(">>>ip: %s\r\n", addr);
+	acl_foreach(iter, ifconf) {
+		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
+		const char *type;
+		if (ifaddr->saddr.sa.sa_family == AF_INET)
+			type = "AF_INET";
+		else if (ifaddr->saddr.sa.sa_family == AF_INET6)
+			type = "AF_INET6";
+		else
+			type = "unknown";
+		printf(">>>name=%s, addr=%s, type=%s\r\n",
+			ifaddr->name, ifaddr->addr, type);
 	}
 
-	acl_argv_free(addrs);
+	acl_free_ifaddrs(ifconf);
 }
 
 int main(void)

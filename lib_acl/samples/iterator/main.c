@@ -505,9 +505,9 @@ static void ifconf_iter(void)
 			ifaddr = (ACL_IFADDR*) iter.data;
 #ifdef ACL_MS_WINDOWS
 			printf("\tname: %s, desc: %s, addr: %s\n",
-				ifaddr->name, ifaddr->desc, ifaddr->ip);
+				ifaddr->name, ifaddr->desc, ifaddr->addr);
 #else
-			printf("\tname: %s, addr: %s\n", ifaddr->name, ifaddr->ip);
+			printf("\tname: %s, addr: %s\n", ifaddr->name, ifaddr->addr);
 #endif
 		}
 	}
@@ -517,9 +517,9 @@ static void ifconf_iter(void)
 		ifaddr = (ACL_IFADDR*) iter.data;
 #ifdef ACL_MS_WINDOWS
 		printf("\tname: %s, desc: %s, addr: %s\n",
-			ifaddr->name, ifaddr->desc, ifaddr->ip);
+			ifaddr->name, ifaddr->desc, ifaddr->addr);
 #else
-		printf("\tname: %s, addr: %s\n", ifaddr->name, ifaddr->ip);
+		printf("\tname: %s, addr: %s\n", ifaddr->name, ifaddr->addr);
 #endif
 	}
 

@@ -177,9 +177,9 @@ void master_service::find_addr_include(acl::string& name, acl::string& addr,
 		for (std::vector<acl::string>::const_iterator cit
 			= addrs.begin(); cit != addrs.end(); ++cit)
 		{
-			if (strstr(ifaddr->ip, (*cit).c_str()) != NULL)
+			if (strstr(ifaddr->addr, (*cit).c_str()) != NULL)
 			{
-				addr = ifaddr->ip;
+				addr = ifaddr->addr;
 				break;
 			}
 		}
