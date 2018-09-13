@@ -159,7 +159,10 @@ size_t acl_inet_ntop(const struct sockaddr *sa, char *buf, size_t size)
 		if (!inet_ntop(sa->sa_family, &in->sin_addr, ip, IPLEN))
 			return 0;
 		port = ntohs(in->sin_port);
-		snprintf(buf, size, "%s%c%d", ip, ACL_ADDR_SEP, port);
+		if (port > 0)
+			snprintf(buf, size, "%s%c%d", ip, ACL_ADDR_SEP, port);
+		else
+			snprintf(buf, size, "%s", ip);
 		return sizeof(struct sockaddr_in);
 #ifdef AF_INET6
 	} else if (sa->sa_family == AF_INET6) {
@@ -170,7 +173,10 @@ size_t acl_inet_ntop(const struct sockaddr *sa, char *buf, size_t size)
 		if (!inet_ntop(sa->sa_family, &in6->sin6_addr, ip, IPLEN))
 			return 0;
 		port = ntohs(in6->sin6_port);
-		snprintf(buf, size, "%s%c%d", ip, ACL_ADDR_SEP, port);
+		if (port > 0)
+			snprintf(buf, size, "%s%c%d", ip, ACL_ADDR_SEP, port);
+		else
+			snprintf(buf, size, "%s", ip);
 		return sizeof(struct sockaddr_in6);
 #endif
 #ifdef ACL_UNIX
@@ -180,8 +186,9 @@ size_t acl_inet_ntop(const struct sockaddr *sa, char *buf, size_t size)
 		ACL_SAFE_STRNCPY(buf, un->sun_path, size);
 		return sizeof(struct sockaddr_un);
 #endif
-	} else
+	} else {
 		return 0;
+	}
 }
 
 size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst)
