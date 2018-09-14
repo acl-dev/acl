@@ -72,7 +72,8 @@ static ACL_IFADDR *ifaddr_clone(const ACL_IFADDR *ifaddr, int port)
 	SAFE_COPY(addr->desc, ifaddr->desc);
 #endif
 	if (port >= 0) {
-		char sep;
+		char  sep;
+		char  buf[sizeof(ifaddr->addr) + 11];
 		if (ifaddr->saddr.sa.sa_family == AF_INET) {
 			addr->saddr.in.sin_port = htons(port);
 			sep = ':';
@@ -84,8 +85,12 @@ static ACL_IFADDR *ifaddr_clone(const ACL_IFADDR *ifaddr, int port)
 		} else {
 			sep = ':';  /* xxx */
 		}
-		snprintf(addr->addr, sizeof(addr->addr), "%s%c%d",
-			ifaddr->addr, sep, port);
+
+		/* in order to avoid the gcc7.x warning, we should copy the
+		 * data into buf and copy to the addr from buf.
+		 */
+		snprintf(buf, sizeof(buf), "%s%c%d", ifaddr->addr, sep, port);
+		SAFE_COPY(addr->addr, buf);
 	} else {
 		SAFE_COPY(addr->addr, ifaddr->addr);
 	}
