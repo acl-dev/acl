@@ -146,7 +146,6 @@ ACL_IFCONF *acl_get_ifaddrs(void)
 	ACL_IFCONF *ifconf;
 	ACL_ARRAY  *addrs;
 	ACL_ITER    iter;
-	char *ptr;
 	int   i;
 
 	if (getifaddrs(&ifaddrs) == -1) {
@@ -195,11 +194,6 @@ ACL_IFCONF *acl_get_ifaddrs(void)
 		addr = (ACL_IFADDR *) acl_mycalloc(1, sizeof(ACL_IFADDR));
 		SAFE_COPY(addr->name, ifa->ifa_name);
 		SAFE_COPY(addr->addr, host);
-#ifdef AF_INET6
-		ptr = strrchr(addr->addr, '%');
-		if (ptr)
-			*ptr = 0;
-#endif
 		memcpy(&addr->saddr, ifa->ifa_addr, len);
 
 		acl_array_append(addrs, addr);
@@ -470,8 +464,6 @@ static int match_ipv4(const char *pattern, const char *ip)
 	ip_tokens      = acl_argv_split(ip, ".");
 
 	if (pattern_tokens->argc != 4) {
-		acl_msg_warn("%s(%d), %s: invalid pattern: %s",
-			__FILE__, __LINE__, __FUNCTION__, pattern);
 		acl_argv_free(pattern_tokens);
 		acl_argv_free(ip_tokens);
 
@@ -479,8 +471,6 @@ static int match_ipv4(const char *pattern, const char *ip)
 	}
 
 	if (ip_tokens->argc != 4) {
-		acl_msg_warn("%s(%d), %s: invalid ip: %s",
-			__FILE__, __LINE__, __FUNCTION__, ip);
 		acl_argv_free(pattern_tokens);
 		acl_argv_free(ip_tokens);
 		return 0;
@@ -585,6 +575,8 @@ static ACL_IFADDR *ipv6_clone(const char *pattern, const ACL_IFADDR *ifaddr)
 
 	if (!acl_valid_ipv6_hostaddr(buf, 0))
 		return NULL;
+	if (!EQ(buf, ifaddr->addr))
+		return NULL;
 
 	if (ptr && acl_alldig(ptr))
 		port = atoi(ptr);
@@ -658,6 +650,12 @@ ACL_IFCONF *acl_ifconf_search(const char *patterns)
 	}
 #endif
 
+	/*
+	acl_foreach(iter, patterns_tokens) {
+		printf(">>>pattern=%s\r\n", (const char*) iter.data);
+	}
+	*/
+
 	acl_argv_free(patterns_tokens);
 	acl_free_ifaddrs(ifconf);
 
@@ -675,5 +673,14 @@ ACL_IFCONF *acl_ifconf_search(const char *patterns)
 	}
 
 	acl_array_free(addrs, acl_myfree_fn);
+
+	/*
+	acl_foreach(iter, ifconf2) {
+		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
+		printf(">>> name=%s, type=%d, addr=%s\r\n",
+			ifaddr->name, ifaddr->saddr.sa.sa_family, ifaddr->addr);
+	}
+	*/
+
 	return ifconf2;
 }

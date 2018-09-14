@@ -26,6 +26,7 @@
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_iostuff.h"
 #include "net/acl_host_port.h"
+#include "net/acl_sane_inet.h"
 #include "net/acl_sane_socket.h"
 #include "net/acl_listen.h"
 

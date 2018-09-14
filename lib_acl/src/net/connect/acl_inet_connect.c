@@ -29,6 +29,7 @@
 #include "stdlib/acl_iostuff.h"
 #include "net/acl_tcp_ctl.h"
 #include "net/acl_netdb.h"
+#include "net/acl_valid_hostname.h"
 #include "net/acl_connect.h"
 
 #endif

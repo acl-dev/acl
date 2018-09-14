@@ -22,6 +22,7 @@
 
 #include "stdlib/acl_sys_patch.h"
 #include "stdlib/acl_msg.h"
+#include "stdlib/acl_mystring.h"
 #include "net/acl_sane_inet.h"
 #include "net/acl_valid_hostname.h"
 
@@ -210,26 +211,50 @@ size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst)
 		in = (struct sockaddr_in *) dst;
 		if (inet_pton(af, buf, &in->sin_addr) == 0)
 			return 0;
-		in->sin_port = htons(port);
+		in->sin_port   = htons(port);
+		dst->sa_family = AF_INET;
 		return sizeof(struct sockaddr_in);
 #ifdef AF_INET6
 	} else if (af == AF_INET6) {
-		char   buf[1024], *ptr;
+
+# ifdef ACL_LINUX
+#  define IPV6_INET_PTON_HAS_BUG
+# endif
+
+# ifdef IPV6_INET_PTON_HAS_BUG
+		struct addrinfo *res = acl_host_addrinfo(src, 0);
+		if (res == NULL)
+			return 0;
+		memcpy(dst, res->ai_addr, res->ai_addrlen);
+		freeaddrinfo(res);
+
+		return res->ai_addrlen;
+# else
+		char   buf[256], *ptr;
 		int    port = 0;
 		struct sockaddr_in6 *in6;
 
 		ACL_SAFE_STRNCPY(buf, src, sizeof(buf));
 
-		if((ptr = strrchr(buf, ACL_ADDR_SEP))) {
+		if ((ptr = strrchr(buf, ACL_ADDR_SEP))) {
 			*ptr++ = 0;
 			port   = atoi(ptr);
 		}
 
+		/* xxx: On Linux '%' will be appended to the IPV6's addr */
+		if ((ptr = strrchr(buf, '%'))) {
+			*ptr++ = 0;
+		}
+
 		in6 = (struct sockaddr_in6 *) dst;
+		memset(in6, 0, sizeof(struct sockaddr_in6));
+
 		if (inet_pton(af, buf, &in6->sin6_addr) == 0)
 			return 0;
 		in6->sin6_port = htons(port);
+		dst->sa_family = AF_INET6;
 		return sizeof(struct sockaddr_in6);
+# endif  /* !IPV6_INET_PTON_HAS_BUG */
 #endif
 #ifdef ACL_UNIX
 	} else if (af == AF_UNIX) {

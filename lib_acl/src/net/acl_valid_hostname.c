@@ -13,6 +13,7 @@
 /* Utility library. */
 
 #include "stdlib/acl_msg.h"
+#include "stdlib/acl_mystring.h"
 #include "net/acl_valid_hostname.h"
 
 #endif
@@ -204,6 +205,13 @@ int acl_valid_ipv6_hostaddr(const char *addr_in, int gripe)
 	if ((ptr = strrchr(addr, ACL_ADDR_SEP)) != NULL) {
 		*ptr = 0;
 	}
+
+#ifdef ACL_LINUX
+	if ((ptr = strrchr(addr, '%')) != NULL) {
+		*ptr = 0;
+	}
+#endif
+
 	cp = (const unsigned char *) addr;
 
 	/*

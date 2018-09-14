@@ -24,6 +24,8 @@
 #include "stdlib/acl_array.h"
 #include "net/acl_sane_inet.h"
 #include "net/acl_sane_socket.h"
+#include "net/acl_valid_hostname.h"
+#include "net/acl_host_port.h"
 #include "net/acl_netdb.h"
 
 #endif

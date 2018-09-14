@@ -241,7 +241,7 @@ const char* socket_stream::get_ip(const char* addr, char* buf, size_t size)
 {
 	safe_snprintf(buf, size, "%s", addr);
 	char* ptr = strchr(buf, ':');
-	if (ptr)
+	if ((ptr = strrchr(buf, ACL_ADDR_SEP)) || (ptr = strrchr(buf, ':')))
 		*ptr = 0;
 	return buf;
 }

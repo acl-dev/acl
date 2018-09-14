@@ -669,7 +669,8 @@ static void server_binding(UDP_SERVER *server, ACL_IFCONF *ifconf)
 		acl_event_enable_read(server->event, stream,
 			0, udp_server_read, server);
 		server->streams[i++] = stream;
-		acl_msg_info("bind %s addr ok, fd %d",
+		acl_msg_info("%s(%d), %s: bind %s addr ok, fd %d",
+			__FILE__, __LINE__, __FUNCTION__,
 			(char *) iter.data, SOCK(stream));
 	}
 
