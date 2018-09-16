@@ -186,7 +186,7 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
 	} else if (acl_valid_ipv4_hostaddr(buf, 0)) {
 		ptr = strrchr(buf, ACL_ADDR_SEP);
 		if (ptr == NULL)
-			ptr = strrchr(buf, '.');
+			ptr = strrchr(buf, ':');
 	}
 
 	if (ptr == NULL) {
@@ -261,9 +261,8 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
 	}
 
 	if (sock == ACL_SOCKET_INVALID)
-		acl_msg_error("%s(%d) %s: connect error %s, addr=%s:%s",
-			__FILE__, __LINE__, myname,
-			acl_last_serror(), peer, port);
+		acl_msg_error("%s(%d) %s: connect error %s, addr=%s",
+			__FILE__, __LINE__, myname, acl_last_serror(), addr);
 
 	if (peer_res0)
 		freeaddrinfo(peer_res0);

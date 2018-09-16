@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 	}
 
 	printf(">>>>>>connect all ok\r\n");
-	sleep(100);
+	sleep(1);
 	acl_vstream_fprintf(client, "%s", "line1\nline2\nline3\nline4\nline5\nline6\nline7\n");
 
 	while (1) {
