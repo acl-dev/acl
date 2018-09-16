@@ -15,8 +15,8 @@ class ACL_CPP_API socket_stream
 	, public ostream
 {
 public:
-	socket_stream();
-	virtual ~socket_stream();
+	socket_stream(void);
+	virtual ~socket_stream(void);
 
 	/**
 	 * 根据套接字打开的一个网络流
@@ -84,9 +84,9 @@ public:
 	 *  或 INVALID_SOCKET(win32平台)
 	 */
 #if defined(_WIN32) || defined(_WIN64)
-	SOCKET sock_handle() const;
+	SOCKET sock_handle(void) const;
 #else
-	int   sock_handle() const;
+	int   sock_handle(void) const;
 #endif
 
 	/**
@@ -99,10 +99,16 @@ public:
 	 *  已经将套接字解绑
 	 */
 #if defined(_WIN32) || defined(_WIN64)
-	SOCKET unbind_sock();
+	SOCKET unbind_sock(void);
 #else
-	int    unbind_sock();
+	int    unbind_sock(void);
 #endif
+
+	/**
+	 * 获得 socket 的类型
+	 * @return {int} 返回值有：AF_INET, AF_INT6, AF_UNIX，出错时返回 -1
+	 */
+	int sock_type(void) const;
 
 	/**
 	 * 获得远程连接的地址
@@ -118,7 +124,7 @@ public:
 	 * @return {const char*} 远程连接地址，若返回值 == '\0' 则表示
 	 *  无法获得远程连接地址
 	 */
-	const char* get_peer_ip() const;
+	const char* get_peer_ip(void) const;
 
 	/**
 	 * 设置远程连接对象的地址，对于 TCP 传输方式，不需要显示调用此函数
@@ -143,7 +149,7 @@ public:
 	 * @return {const char*} 该连接的本地地址，若返回值 == "" 则表示
 	 *  无法获得本地地址
 	 */
-	const char* get_local_ip() const;
+	const char* get_local_ip(void) const;
 
 	/**
 	 * 设置本地地址
@@ -157,7 +163,7 @@ public:
 	 * @return {bool} 当网络连接未打开或已经关闭时该函数返回 false，如果
 	 *  连接正常则返回 true
 	 */
-	bool alive() const;
+	bool alive(void) const;
 
 	/**
 	 * 设置 TCP 套接字的 nodelay 功能
@@ -200,7 +206,7 @@ public:
 	 * 获得 TCP 套接字是否设置了 nodelay 选项
 	 * @return {bool} true 表示打开，false 表示关闭
 	 */
-	bool get_tcp_nodelay();
+	bool get_tcp_nodelay(void);
 
 	/**
 	 * 获得 TCP 套接字的 linger 值
@@ -209,28 +215,28 @@ public:
 	 *  表示设置了 linger 选项且该值表示套接字关闭后该 TCP 连接在内核中
 	 *  维持 TIME_WAIT 状态的逗留时间(秒)
 	 */
-	int get_tcp_solinger();
+	int get_tcp_solinger(void);
 
 	/**
 	 * 获取 TCP 套接字的写缓冲区大小
 	 * @param fd {ACL_SOCKET} 套接字
 	 * @return {int} 缓冲区大小
 	 */
-	int get_tcp_sendbuf();
+	int get_tcp_sendbuf(void);
 
 	/**
 	 * 获取 TCP 套接字的读缓冲区大小
 	 * @param fd {ACL_SOCKET} 套接字
 	 * @return {int} 缓冲区大小
 	 */
-	int get_tcp_recvbuf();
+	int get_tcp_recvbuf(void);
 
 	/**
 	 * 判断当前套接字是否被设置了非阻塞模式
 	 * @return {bool}
 	 * 注：该方法目前仅支持 UNIX 平台
 	 */
-	bool get_tcp_non_blocking();
+	bool get_tcp_non_blocking(void);
 
 private:
 	char  dummy_[1];

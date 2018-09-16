@@ -99,9 +99,12 @@ ACL_API ACL_SOCKET acl_unix_dgram_bind(const char *addr, unsigned flag);
  *  UNIX 域套接口时的格式为：{domain_path}@udp，其中 @udp 表示为 UDP 域套接口
  *  后缀；内部自动区别网络套接口和 UNIX 域套接口，域套接口仅支持 UNIX 平台
  * @param flag {unsigned int} 标志位
+ * @param family {int*} 如果绑定成功且该地址非空则存放地址类型，类型有：
+ *  AF_INET, AF_INET6, AF_UNIX
  * @return {ACL_SOCKET} 返回 ACL_SOCKET_INVALID 表示绑定失败
  */
 ACL_API ACL_SOCKET acl_udp_bind(const char *addr, unsigned flag);
+ACL_API ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family);
 
 #ifdef ACL_UNIX
 

@@ -77,6 +77,9 @@ struct ACL_VSTREAM {
 #define	ACL_VSTREAM_TYPE_LISTEN_INET    (1 << 3)
 #define	ACL_VSTREAM_TYPE_LISTEN_UNIX    (1 << 4)
 #define ACL_VSTREAM_TYPE_LISTEN_IOCP    (1 << 5)
+#define ACL_VSTREAM_TYPE_INET4		(1 << 6)
+#define ACL_VSTREAM_TYPE_INET6		(1 << 7)
+#define ACL_VSTREAM_TYPE_UNIX		(1 << 8)
 
 	acl_off_t offset;               /**< cached seek info */
 	acl_off_t sys_offset;           /**< cached seek info */
@@ -136,10 +139,10 @@ struct ACL_VSTREAM {
 	void *context;                  /**< the application's special data */
 
 	ACL_ARRAY *close_handle_lnk;    /**< before this fp is free,
-	                                 * function in close_handle_lnk
-	                                 * will be called.
-	                                 * add by zsx, 2006.6.20
-	                                 */
+					 * function in close_handle_lnk
+					 * will be called.
+					 * add by zsx, 2006.6.20
+					 */
 	int (*sys_getc)(ACL_VSTREAM*);  /**< called by ACL_VSTREAM_GETC()/1 */
 	ACL_VSTREAM_RD_FN read_fn;      /**< system socket read API */
 	ACL_VSTREAM_WR_FN write_fn;     /**< system socket write API */
@@ -927,4 +930,3 @@ ACL_API void acl_socket_close_hook(int (*close_fn)(ACL_SOCKET));
         ((stream_ptr)->flag & ACL_VSTREAM_FLAG_TIMEOUT)
 
 #endif
-

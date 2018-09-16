@@ -218,17 +218,19 @@ size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst)
 	} else if (af == AF_INET6) {
 
 # ifdef ACL_LINUX
-#  define IPV6_INET_PTON_HAS_BUG
+#  define IPV6_INET_PTON_FIX
 # endif
 
-# ifdef IPV6_INET_PTON_HAS_BUG
+# ifdef IPV6_INET_PTON_FIX
 		struct addrinfo *res = acl_host_addrinfo(src, 0);
+		size_t addrlen;
 		if (res == NULL)
 			return 0;
+		addrlen = (size_t) res->ai_addrlen;
 		memcpy(dst, res->ai_addr, res->ai_addrlen);
 		freeaddrinfo(res);
 
-		return res->ai_addrlen;
+		return addrlen;
 # else
 		char   buf[256], *ptr;
 		int    port = 0;

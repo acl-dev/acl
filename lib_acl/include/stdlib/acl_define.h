@@ -94,7 +94,7 @@ typedef struct acl_stat acl_stat_t;
 #endif	/* __GNUC__ */
 
 #ifndef ACL_ADDR_SEP
-#define ACL_ADDR_SEP	'#'
+#define ACL_ADDR_SEP	'|'
 #endif
 
 #endif /* __ACL_DEFINE_INCLUDE_H__ */

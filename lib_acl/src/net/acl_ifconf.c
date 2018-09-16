@@ -492,15 +492,15 @@ static int match_ipv4(const char *pattern, const char *ip)
 	return 1;
 }
 
-/* for ":port" or "#port" */
-#define MATCH1(p) ((*(p) == ':' || *(p) == '#'))
+/* for ":port" or "|port" */
+#define MATCH1(p) ((*(p) == ':' || *(p) == ACL_ADDR_SEP))
 
 /* for "*:port" or "*#port" */
-#define MATCH2(p) (*(p) == '*' && (*((p) + 1) == ':' || *((p) + 1) == '#'))
+#define MATCH2(p) (*(p) == '*' && (*((p) + 1) == ':' || *((p) + 1) == ACL_ADDR_SEP))
 
 /**
  * pattern for ipv4:
- *   *#port, *:port, #port, :port, *.*.*.*:port, 0.0.0.0:port, xxx.xxx.xxx.xxx:port,
+ *   *|port, *:port, |port, :port, *.*.*.*:port, 0.0.0.0:port, xxx.xxx.xxx.xxx:port,
  *   *, *.*.*.*, 0.0.0.0, xxx.xxx.xxx.xxx
  */
 static ACL_IFADDR *ipv4_clone(const char *pattern, const ACL_IFADDR *ifaddr)
@@ -542,7 +542,7 @@ static ACL_IFADDR *ipv4_clone(const char *pattern, const ACL_IFADDR *ifaddr)
 
 /**
  * pattern for ipv6:
- *   *#port, #port, *, port
+ *   *|port, |port, *, port
  */
 #ifdef AF_INET6
 static ACL_IFADDR *ipv6_clone(const char *pattern, const ACL_IFADDR *ifaddr)

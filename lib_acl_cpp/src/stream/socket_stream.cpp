@@ -112,6 +112,25 @@ ACL_SOCKET socket_stream::unbind_sock()
 	return sock;
 }
 
+int socket_stream::sock_type(void) const
+{
+	if (stream_ == NULL)
+		return -1;
+
+	if ((stream_->type & ACL_VSTREAM_TYPE_INET4))
+		return AF_INET;
+#ifdef AF_INET6
+	else if ((stream_->type & ACL_VSTREAM_TYPE_INET6))
+		return AF_INET6;
+#endif
+#ifdef AF_UNIX
+	else if ((stream_->type & ACL_VSTREAM_TYPE_UNIX))
+		return AF_UNIX;
+#endif
+	else
+		return -1;
+}
+
 const char* socket_stream::get_peer(bool full /* = false */) const
 {
 	if (stream_ == NULL)

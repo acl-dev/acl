@@ -1171,7 +1171,7 @@ static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
 	acl_pthread_pool_t *threads, const char *addrs)
 {
 	const char   *myname = "server_alone_open";
-	ACL_ARGV*     tokens = acl_argv_split(addrs, ";,| \t");
+	ACL_ARGV*     tokens = acl_argv_split(addrs, ";, \t");
 	ACL_ITER      iter;
 	int           i;
 	ACL_VSTREAM **streams = (ACL_VSTREAM **)

@@ -135,14 +135,24 @@ ACL_SOCKET acl_unix_dgram_bind(const char *addr, unsigned flag)
 
 ACL_SOCKET acl_udp_bind(const char *addr, unsigned flag)
 {
+	return acl_udp_bind3(addr, flag, NULL);
+}
+
+ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family)
+{
 	struct addrinfo *res0, *res;
 	ACL_SOCKET fd;
+
+	if (family)
+		*family = 0;
 
 #ifdef ACL_UNIX
 	const char udp_suffix[] = "@udp";
 
 	if (acl_strrncasecmp(addr, udp_suffix, sizeof(udp_suffix) - 1) == 0) {
 		fd = acl_unix_dgram_bind(addr, flag);
+		if (fd >= 0 && family)
+			*family = AF_UNIX;
 		return fd;
 	}
 #endif
@@ -158,8 +168,11 @@ ACL_SOCKET acl_udp_bind(const char *addr, unsigned flag)
 
 	for (res = res0; res != NULL; res = res->ai_next) {
 		fd = acl_inet_bind(res, flag);
-		if (fd != ACL_SOCKET_INVALID)
+		if (fd != ACL_SOCKET_INVALID) {
+			if (family)
+				*family = res->ai_family;
 			break;
+		}
 	}
 
 	freeaddrinfo(res0);

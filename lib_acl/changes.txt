@@ -1,5 +1,8 @@
 修改历史列表：
 
+631) 2018.9.10 -- 9.16
+631.1) feature: 网络通信及域名解析全面支持 IPV6!
+
 630) 2018.8.6
 630.1) optimize: 优化 ACL_VSTRING, ACL_VBUF, ACL_JSON_NODE 对象的存储空间大小
 

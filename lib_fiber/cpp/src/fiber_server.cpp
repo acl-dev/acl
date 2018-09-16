@@ -652,7 +652,7 @@ static void server_alone_open(FIBER_SERVER *server, ACL_ARGV *addrs)
 
 static void servers_alone(const char *addrs, int fdtype, int nthreads)
 {
-	ACL_ARGV* tokens = acl_argv_split(addrs, ";,| \t");
+	ACL_ARGV* tokens = acl_argv_split(addrs, ";, \t");
 	int i;
 
 	__servers = servers_alloc(nthreads, tokens->argc, fdtype);

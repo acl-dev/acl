@@ -3024,6 +3024,18 @@ void acl_vstream_set_local(ACL_VSTREAM *fp, const char *addr)
 		acl_myfree(fp->sa_local);
 
 	fp->sa_local     = set_sock_addr(addr, &fp->sa_local_size);
+	if (fp->sa_local) {
+		if (fp->sa_local->sa_family == AF_INET)
+			fp->type |= ACL_VSTREAM_TYPE_INET4;
+#ifdef AF_INET6
+		else if (fp->sa_local->sa_family == AF_INET6)
+			fp->type |= ACL_VSTREAM_TYPE_INET6;
+#endif
+#ifdef AF_UNIX
+		else if (fp->sa_local->sa_family == AF_UNIX)
+			fp->type |= ACL_VSTREAM_TYPE_UNIX;
+#endif
+	}
 	fp->sa_local_len = fp->sa_local_size;
 }
 
@@ -3052,6 +3064,17 @@ int acl_vstream_set_local_addr(ACL_VSTREAM *fp, const struct sockaddr *sa)
 		acl_myfree(fp->addr_local);
 		fp->addr_local = acl_mystrdup(addr);
 	}
+
+	if (sa->sa_family == AF_INET)
+		fp->type |= ACL_VSTREAM_TYPE_INET4;
+#ifdef AF_INET6
+	else if (sa->sa_family == AF_INET6)
+		fp->type |= ACL_VSTREAM_TYPE_INET6;
+#endif
+#ifdef AF_UNIX
+	else if (sa->sa_family == AF_UNIX)
+		fp->type |= ACL_VSTREAM_TYPE_UNIX;
+#endif
 
 	return 0;
 }

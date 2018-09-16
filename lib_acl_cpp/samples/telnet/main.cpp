@@ -54,8 +54,8 @@ static void run(ACL_EVENT* event)
 	}
 
 	// 设置远程服务地址
-	else
-		udp.set_peer(__server_addr);
+	udp.set_peer(__server_addr);
+	printf("set peer addr: %s\r\n", __server_addr);
 
 	udp.set_rw_timeout(100);
 	ACL_VSTREAM* udp_stream = udp.get_vstream();
@@ -94,6 +94,7 @@ int main(int argc, char* argv[])
 	int   ch;
 
 	acl::acl_cpp_init();
+	acl::log::stdout_open(true);
 
 	snprintf(__server_addr, sizeof(__server_addr), "127.0.0.1:8088");
 	snprintf(__local_addr, sizeof(__local_addr), "0.0.0.0:18088");
