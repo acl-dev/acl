@@ -276,7 +276,9 @@ static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
 ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout, unsigned flag)
 {
 	ACL_VSTREAM *stream;
-	ACL_SOCKET sock = acl_udp_bind(addr, flag);
+	ACL_SOCKET   sock = acl_udp_bind(addr, flag);
+	ACL_SOCKADDR saddr;
+	socklen_t    len = sizeof(saddr);
 	
 	if (sock == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s: bind addr %s error %s",
@@ -288,7 +290,8 @@ ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout, unsigned flag)
 	stream->rw_timeout = rw_timeout;
 
 	/* 设置本地绑定地址 */
-	acl_vstream_set_local(stream, addr);
+	if (getsockname(sock, &saddr.sa, &len) == 0)
+		acl_vstream_set_local_addr(stream, &saddr.sa);
 
 	/* 注册流读写回调函数 */
 	acl_vstream_ctl(stream,

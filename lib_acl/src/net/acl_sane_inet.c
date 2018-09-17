@@ -15,6 +15,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <net/if.h>
 #include <pthread.h>
 #include <string.h>
 #include <signal.h>
@@ -169,15 +170,20 @@ size_t acl_inet_ntop(const struct sockaddr *sa, char *buf, size_t size)
 	} else if (sa->sa_family == AF_INET6) {
 		int    port;
 		char   ip[IPLEN];
+		char   ifname[IF_NAMESIZE], *ptr;
 		struct sockaddr_in6 *in6 = (struct sockaddr_in6*) sa;
 
 		if (!inet_ntop(sa->sa_family, &in6->sin6_addr, ip, IPLEN))
 			return 0;
+		ptr = if_indextoname(in6->sin6_scope_id, ifname);
+		if (ptr == NULL)
+			ifname[0] = 0;
 		port = ntohs(in6->sin6_port);
 		if (port > 0)
-			snprintf(buf, size, "%s%c%d", ip, ACL_ADDR_SEP, port);
+			snprintf(buf, size, "%s%%%s%c%d", ip, ifname,
+				ACL_ADDR_SEP, port);
 		else
-			snprintf(buf, size, "%s", ip);
+			snprintf(buf, size, "%s%%%s", ip, ifname);
 		return sizeof(struct sockaddr_in6);
 #endif
 #ifdef ACL_UNIX
@@ -216,12 +222,7 @@ size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst)
 		return sizeof(struct sockaddr_in);
 #ifdef AF_INET6
 	} else if (af == AF_INET6) {
-
-# ifdef ACL_LINUX
-#  define IPV6_INET_PTON_FIX
-# endif
-
-# ifdef IPV6_INET_PTON_FIX
+# ifdef INET_PTON_USE_GETADDRINFO
 		struct addrinfo *res = acl_host_addrinfo(src, 0);
 		size_t addrlen;
 		if (res == NULL)
@@ -243,18 +244,22 @@ size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst)
 			port   = atoi(ptr);
 		}
 
-		/* xxx: On Linux '%' will be appended to the IPV6's addr */
-		if ((ptr = strrchr(buf, '%'))) {
+		/* when '%' was appended to the IPV6's addr */
+		if ((ptr = strrchr(buf, '%')))
 			*ptr++ = 0;
-		}
 
 		in6 = (struct sockaddr_in6 *) dst;
 		memset(in6, 0, sizeof(struct sockaddr_in6));
 
+		in6->sin6_family = AF_INET6;
+		in6->sin6_port = htons(port);
+		if (ptr && *ptr && !(in6->sin6_scope_id = if_nametoindex(ptr))) {
+			acl_msg_error("%s(%d): if_nametoindex error %s",
+				__FUNCTION__, __LINE__, acl_last_serror());
+			return 0;
+		}
 		if (inet_pton(af, buf, &in6->sin6_addr) == 0)
 			return 0;
-		in6->sin6_port = htons(port);
-		dst->sa_family = AF_INET6;
 		return sizeof(struct sockaddr_in6);
 # endif  /* !IPV6_INET_PTON_HAS_BUG */
 #endif
@@ -263,9 +268,8 @@ size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst)
 		struct sockaddr_un *un = (struct sockaddr_un *) dst;
 		size_t len = strlen(src) + 1;
 
-		if (sizeof(un->sun_path) < len) {
+		if (sizeof(un->sun_path) < len)
 			len = sizeof(un->sun_path);
-		}
 
 		dst->sa_family = AF_UNIX;
 # ifdef HAS_SUN_LEN
