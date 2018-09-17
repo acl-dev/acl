@@ -251,6 +251,9 @@
 #  define __sqlite3_column_type sqlite3_column_type
 #  define __sqlite3_column_name sqlite3_column_name
 #  define __sqlite3_data_count sqlite3_data_count
+#  define __sqlite3_column_int64 sqlite3_column_int64
+#  define __sqlite3_column_double sqlite3_column_double
+#  define __sqlite3_column_text sqlite3_column_text
 #  define __sqlite3_finalize sqlite3_finalize
 # endif // HAS_SQLITE && !HAS_SQLITE_DLL
 
