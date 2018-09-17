@@ -35,7 +35,8 @@ static void walk_fn(ACL_CACHE2_INFO *info, void *arg acl_unused)
 {
 	MYOBJ *o = (MYOBJ*) info->value;
 
-	printf("%s: size: %d; when_timeout: %ld\n", info->key, o->len, (long) info->when_timeout);
+	printf("%s: size: %d; when_timeout: %ld\n",
+		info->key, o->len, (long) info->when_timeout);
 }
 
 static void test1(int n, int timeout)
@@ -58,9 +59,11 @@ static void test1(int n, int timeout)
 
 	printf("\nfirst walk cache, cache size: %d\n", acl_cache2_size(cache));
 	acl_cache2_walk(cache, walk_fn, NULL);
-	printf("\nfirst call acl_cache2_timeout, size: %d\n", acl_cache2_size(cache));
+	printf("\nfirst call acl_cache2_timeout, size: %d\n",
+		acl_cache2_size(cache));
 	acl_cache2_timeout(cache);
-	printf(">>>after first acl_cache2_timeout, second walk cache, cache's size: %d\n", acl_cache2_size(cache));
+	printf(">>>after first acl_cache2_timeout, second walk cache, "
+		"cache's size: %d\n", acl_cache2_size(cache));
 	acl_cache2_walk(cache, walk_fn, NULL);
 
 	printf("\n");
@@ -70,9 +73,11 @@ static void test1(int n, int timeout)
 		sleep(1);
 	}
 
-	printf("\nsecond call acl_cache_timeout, size: %d\n", acl_cache2_size(cache));
+	printf("\nsecond call acl_cache_timeout, size: %d\n",
+		acl_cache2_size(cache));
 	acl_cache2_timeout(cache);
-	printf(">>>after second acl_cache_timeout, third walk_cache, cache's size: %d\n", acl_cache2_size(cache));
+	printf(">>>after second acl_cache_timeout, third walk_cache, cache's "
+		"size: %d\n", acl_cache2_size(cache));
 	acl_cache2_walk(cache, walk_fn, NULL);
 
 	o = (MYOBJ*) acl_cache2_find(cache, "key(5)");
@@ -85,7 +90,8 @@ static void test1(int n, int timeout)
 		printf("\n>>>key(11) not exist\n");
 	else {
 		o = (MYOBJ*) info->value;
-		printf("\n>>>key(11): len: %d, when_timeout: %ld\n", o->len, (long) info->when_timeout);
+		printf("\n>>>key(11): len: %d, when_timeout: %ld\n",
+			o->len, (long) info->when_timeout);
 	}
 
 	printf("\nfree cache, size: %d\n", acl_cache2_size(cache));
@@ -126,46 +132,68 @@ static void test3(int n, int timeout)
 	int   i;
 	ACL_ITER iter;
 
-	printf(">>> total add: %d\n", n * 2);
+	printf(">>>total add: %d\r\n", n * 2);
 	cache = acl_cache2_create(n * 2, free_fn);
 
 	for (i = 0; i < n; i++) {
-		o = myobj_new(2 * i + 1);
-		snprintf(key, sizeof(key), "key(%d)", 2 * i + 1);
+		snprintf(key, sizeof(key), "key-%d", 2 * i + 1);
 		info = (ACL_CACHE2_INFO*) acl_cache2_find(cache, key);
-		if (info != NULL)
-			printf("the key: %s exist\n", key);
-		printf("add one: %s, timeout: %d\n", key, timeout);
-		assert(acl_cache2_enter(cache, key, o, timeout));
+		if (info != NULL) {
+			printf("ALREADY EXIST, key=%s\r\n", key);
+			exit (1);
+		}
+
+		o = myobj_new(2 * i + 1);
+		if (acl_cache2_enter(cache, key, o, timeout) == NULL) {
+			printf("ADD ERROR, key=%s\r\n", key);
+			exit (1);
+		} else {
+			printf("add ok, key=%s, timeout=%d\r\n", key, timeout);
+		}
+
+		info = (ACL_CACHE2_INFO *) acl_cache2_find(cache, key);
+		if (info == NULL) {
+			printf("NOT FOUND, key=%s\r\n", key);
+			exit (1);
+		}
 
 		o = myobj_new(2 * i + 2);
-		snprintf(key, sizeof(key), "key(%d)", 2 * i + 2);
+		snprintf(key, sizeof(key), "key-%d", 2 * i + 2);
 		info = (ACL_CACHE2_INFO*) acl_cache2_find(cache, key);
-		if (info != NULL)
-			printf("the key: %s exist\n", key);
-		printf("add one: %s, timeout: %d\n", key, timeout);
-		assert(acl_cache2_enter(cache, key, o, timeout));
+		if (info != NULL) {
+			printf("ALREADY EXIST, the key: %s exist\r\n", key);
+			exit (1);
+		}
+
+		if (acl_cache2_enter(cache, key, o, timeout) == NULL) {
+			printf("ADD ERROR, key=%s\r\n", key);
+			exit (1);
+		}
+		printf("add ok, key=%s, timeout: %d\r\n", key, timeout);
 	}
 
-	printf(">>>>acl_foreach\n");
+	printf("\r\n>>>>acl_foreach\r\n");
 	acl_foreach(iter, cache) {
 		o = (MYOBJ*) iter.data;
 		info = (ACL_CACHE2_INFO*) acl_iter_info(iter, cache);
-		printf(">>>len=%d, key=%s\n", o->len, info->key);
+		printf(">>>len=%d, key=%s\r\n", o->len, info->key);
 	}
 
+	printf("\r\n>>>>free all cache nodes\r\n"); 
 	acl_cache2_free(cache);
 }
 
-
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -n max_size -t timeout -c cmd[test1|test2|test3]\n", procname);
+	printf("usage: %s -h [help]\r\n"
+		" -n max_size\r\n"
+		" -t timeout\r\n"
+		" -c cmd[test1|test2|test3, default: test3]\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
-	int   n = 100, ch, timeout = 1;
+	int   n = 10, ch, timeout = 1;
 	char  cmd[256];
 
 	ACL_SAFE_STRNCPY(cmd, "test3", sizeof(cmd));

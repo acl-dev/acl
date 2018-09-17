@@ -1,4 +1,4 @@
-%define release_id 21
+%define release_id 22
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,10 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Sun Sep 16 2018 zhengshuxin@qiyi.com 3.4.1-22-20180916.18
+- bugfix: acl_ifconf.c and some modules can't justify some UNIX path that
+  acl_master can't handle UNIX path like "master.sock" which hasn't '/' in it.
 
 * Sun Sep 16 2018 zhengshuxin@qiyi.com 3.4.1-21-20180916.21
 - feature: support IPV6 OK!

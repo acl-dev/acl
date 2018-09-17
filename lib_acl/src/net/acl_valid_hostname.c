@@ -101,6 +101,11 @@ int acl_valid_hostname(const char *name, int gripe)
 	return 1;
 }
 
+int acl_valid_unix(const char *addr)
+{
+	return !acl_valid_hostaddr(addr, 0);
+}
+
 /* acl_valid_hostaddr - verify numerical address syntax */
 
 int acl_valid_hostaddr(const char *addr, int gripe)

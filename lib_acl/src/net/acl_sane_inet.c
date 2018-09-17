@@ -297,7 +297,7 @@ size_t acl_sane_pton(const char *src, struct sockaddr *dst)
 		af = AF_INET;
 	else if (acl_valid_ipv6_hostaddr(src, 0))
 		af = AF_INET6;
-	else if (*src == '/')
+	else if (acl_valid_unix(src))
 		af = AF_UNIX;
 	else
 		return 0;

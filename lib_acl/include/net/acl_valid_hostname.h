@@ -18,6 +18,7 @@ ACL_API int acl_valid_hostname(const char *, int);
 ACL_API int acl_valid_hostaddr(const char *, int);
 ACL_API int acl_valid_ipv4_hostaddr(const char *, int);
 ACL_API int acl_valid_ipv6_hostaddr(const char *, int);
+ACL_API int acl_valid_unix(const char *);
 
 #ifdef  __cplusplus
 }

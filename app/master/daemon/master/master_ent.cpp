@@ -340,7 +340,12 @@ static int service_sock(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 		return -1;
 	}
 
-	ifconf      = acl_ifconf_search(name);
+	ifconf = acl_ifconf_search(name);
+	if (ifconf == NULL) {
+		acl_msg_error("%s(%d), %s: ifconf NULL, no match for name=%s",
+			__FILE__, __LINE__, __FUNCTION__, name);
+		return -1;
+	}
 	serv->name  = acl_mystrdup(name);
 	serv->type  = ACL_MASTER_SERV_TYPE_SOCK;
 	serv->addrs = acl_array_create(1);

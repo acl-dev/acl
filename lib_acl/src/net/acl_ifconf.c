@@ -633,11 +633,11 @@ ACL_IFCONF *acl_ifconf_search(const char *patterns)
 		patterns_match_add(patterns_tokens, ifaddr, addrs);
 	}
 
-#ifdef ACL_UNIX
+#ifdef AF_UNIX
 	/* just for all unix domain path */
 	acl_foreach(iter, patterns_tokens) {
 		const char *pattern = (const char *) iter.data;
-		if (*pattern == '/' || (*pattern == '.' && *pattern == '/')) {
+		if (acl_valid_unix(pattern)) {
 			ACL_IFADDR *ifaddr = (ACL_IFADDR *)
 				acl_mycalloc(1, sizeof(ACL_IFADDR));
 
