@@ -103,6 +103,9 @@ int acl_valid_hostname(const char *name, int gripe)
 
 int acl_valid_unix(const char *addr)
 {
+	if (strchr(addr, '/') != NULL)
+		return 1;
+
 	return !acl_valid_hostaddr(addr, 0);
 }
 
