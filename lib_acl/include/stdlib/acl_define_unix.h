@@ -40,7 +40,6 @@
 
 # include <assert.h>
 # include <sys/types.h>
-# include <net/if.h>
 # ifndef _GNU_SOURCE
 #  define _GNU_SOURCE
 #  include <netdb.h>

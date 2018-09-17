@@ -1,4 +1,9 @@
 #include "StdAfx.h"
+
+#ifdef ACL_UNIX
+#include <net/if.h>
+#endif
+
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -15,7 +20,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <net/if.h>
 #include <pthread.h>
 #include <string.h>
 #include <signal.h>
