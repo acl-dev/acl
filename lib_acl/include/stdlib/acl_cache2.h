@@ -11,9 +11,9 @@ extern "C" {
  * 缓存池中存储的缓存对象
  */
 typedef struct ACL_CACHE2_INFO {
-	char *key;		/**< 健值 */
-	void *value;		/**< 用户动态对象 */
-	int   nrefer;		/**< 引用计数 */
+	char  *key;		/**< 健值 */
+	void  *value;		/**< 用户动态对象 */
+	int    nrefer;		/**< 引用计数 */
 	time_t when_timeout;	/**< 过期时间截 */
 } ACL_CACHE2_INFO;
 
@@ -62,10 +62,10 @@ ACL_API void acl_cache2_free(ACL_CACHE2 *cache2);
  * @param key {const char*} 缓存对象的健值
  * @param value {void*} 动态缓存对象
  * @param timeout {int} 每个缓存对象的缓存时长
- * @return {ACL_CACHE2_INFO*} 缓存对象所依附的结构对象，其中的 value 与用户的对象相同,
- *   如果返回 NULL 则表示添加失败，失败原因为：缓存池太大溢出或相同健值的对象存在
- *   且引用计数非0; 如果返回非 NULL 则表示添加成功，如果对同一健值的重复添加，会用
- *   新的数据替换旧的数据，且旧数据调用释放函数进行释放
+ * @return {ACL_CACHE2_INFO*} 缓存对象所依附的结构对象，其中的 value 与用户的
+ *  对象相同, 如果返回 NULL 则表示添加失败，失败原因为：缓存池太大溢出或相同
+ *  健值的对象存在且引用计数非0; 如果返回非 NULL 则表示添加成功，如果对同一健
+ *  值的重复添加，会用新的数据替换旧的数据，且旧数据调用释放函数进行释放
  */
 ACL_API ACL_CACHE2_INFO *acl_cache2_enter(ACL_CACHE2 *cache2,
 	const char *key, void *value, int timeout);
@@ -114,16 +114,47 @@ ACL_API int acl_cache2_timeout(ACL_CACHE2 *cache2);
  * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
  * @param info {ACL_CACHE2_INFO*} 缓存对象
  * @param timeout {int} 缓存时长(秒)
+ * @return {ACL_CACHE2_INFO*} 返回非 NULL 表示正常，为 NULL 表示出错
  */
-ACL_API void acl_cache2_update2(ACL_CACHE2 *cache2, ACL_CACHE2_INFO *info, int timeout);
+ACL_API ACL_CACHE2_INFO *acl_cache2_update2(ACL_CACHE2 *cache2,
+	ACL_CACHE2_INFO *info, int timeout);
 
 /**
  * 使某个缓存对象的缓存时间加长
  * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
  * @param key {const char*} 健值
  * @param timeout {int} 缓存时长(秒)
+ * @return {ACL_CACHE2_INFO*} 返回非 NULL 表示正常，为 NULL 表示出错
  */
-ACL_API void acl_cache2_update(ACL_CACHE2 *cache2, const char *key, int timeout);
+ACL_API ACL_CACHE2_INFO *acl_cache2_update(ACL_CACHE2 *cache2,
+	const char *key, int timeout);
+
+/**
+ * 添加或更新缓存中的对象
+ * @param key {const char*} 缓存对象的健值
+ * @param value {void*} 动态缓存对象
+ * @param timeout {int} 每个缓存对象的缓存时长
+ * @param exist {int*} 非 NULL 时，如果新 key 存在则被置 1，否则置 0
+ * @return {ACL_CACHE2_INFO*} 缓存对象所依附的结构对象，其中的 value 与用户的
+ *  对象相同；如果该 key 不存在则添加新对象，如果存在则更新旧对象；返回 NULL
+ * 表示更新添加失败；如果是更新方式，则调用者应注意释放临时创建的动态对象
+ */
+ACL_API ACL_CACHE2_INFO *acl_cache2_upsert(ACL_CACHE2 *cache2,
+	const char *key, void *value, int timeout, int *exist);
+	
+/**
+ * 获取按时间排序后的头部对象
+ * @param cache2 {ACL_CACHE2*}
+ * @return {ACL_CACHE2_INFO*} 返回 NULL 表示缓存对象为空
+ */
+ACL_API ACL_CACHE2_INFO *acl_cache2_head(ACL_CACHE2 *cache2);
+
+/**
+ * 获取按时间排序后的尾部对象
+ * @param cache2 {ACL_CACHE2*}
+ * @return {ACL_CACHE2_INFO*} 返回 NULL 表示缓存对象为空
+ */
+ACL_API ACL_CACHE2_INFO *acl_cache2_tail(ACL_CACHE2 *cache2);
 
 /**
  * 增加某缓存对象的引用计数，防止被提前删除

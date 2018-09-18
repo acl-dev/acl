@@ -12,14 +12,25 @@ typedef struct {
 	int   len;
 } MYOBJ;
 
+static int __debug = 1;
+
+static void myobj_free(MYOBJ *o)
+{
+	acl_myfree(o->buf);
+	acl_myfree(o);
+}
+
 static void free_fn(const ACL_CACHE2_INFO *info, void *arg)
 {
 	MYOBJ *o = (MYOBJ*) arg;
 
-	printf("%s: when_timeout: %ld, now: %ld, len: %d, deleted\n",
-		info->key, (long) info->when_timeout, (long) time(NULL), o->len);
-	acl_myfree(o->buf);
-	acl_myfree(o);
+	if (__debug) {
+		printf("%s: when_timeout: %ld, now: %ld, len: %d, deleted\n",
+			info->key, (long) info->when_timeout,
+			(long) time(NULL), o->len);
+	}
+
+	myobj_free(o);
 }
 
 static MYOBJ *myobj_new(int len)
@@ -183,12 +194,88 @@ static void test3(int n, int timeout)
 	acl_cache2_free(cache);
 }
 
+static void test4_upsert(ACL_CACHE2 *cache, int timeout)
+{
+	char   key[32];
+	MYOBJ *o;
+	int i, exist;
+	for (i = 0; i < 10; i++) {
+		snprintf(key, sizeof(key), "upsert-%d", i);
+		o = myobj_new(4096);
+		if (!acl_cache2_upsert(cache, key, o, timeout, &exist)) {
+			printf("ADD ERROR, key=%s\r\n", key);
+			break;
+		}
+		if (exist)
+			myobj_free(o);
+	}
+}
+
+static void test4(int n, int timeout)
+{
+	ACL_CACHE2_INFO *info;
+	ACL_CACHE2 *cache = acl_cache2_create(n, free_fn);
+	char   key[32];
+	MYOBJ *o;
+	int    i;
+
+	__debug = 0;
+
+	test4_upsert(cache, timeout);
+	printf(">> first current size=%d\r\n", acl_cache2_size(cache));
+	test4_upsert(cache, timeout);
+	printf(">> second current size=%d\r\n", acl_cache2_size(cache));
+
+	acl_cache2_walk(cache, walk_fn, NULL);
+
+	printf("Enter any key to continue ...");
+	fflush(stdout);
+	getchar();
+
+	for (i = 0; i < n; i++) {
+		snprintf(key, sizeof(key), "key-%d", i);
+		info = (ACL_CACHE2_INFO*) acl_cache2_find(cache, key);
+		if (info != NULL) {
+			printf("ALREADY EXIST, key=%s\r\n", key);
+			break;
+		}
+
+		o = myobj_new(4096);
+		if (acl_cache2_enter(cache, key, o, timeout) == NULL) {
+			printf("ADD ERROR, key=%s\r\n", key);
+			break;
+		}
+
+		info = (ACL_CACHE2_INFO*) acl_cache2_find(cache, key);
+		if (info == NULL) {
+			printf("NOT FOUND, key=%s\r\n", key);
+			break;
+		}
+
+		if (i % 1000 == 0) {
+			int k = acl_cache2_timeout(cache);
+			int size = acl_cache2_size(cache);
+			ACL_CACHE2_INFO *head = acl_cache2_head(cache);
+			ACL_CACHE2_INFO *tail = acl_cache2_tail(cache);
+			printf("del %d, left=%d, head=%s, %ld, tail=%s, %ld\r\n",
+				k, size, head ? head->key : "null",
+				head->when_timeout, tail ? tail->key : "null",
+				tail->when_timeout);
+			sleep(1);
+		}
+	}
+
+	printf("\r\n>>>>free all cache nodes\r\n"); 
+	acl_cache2_free(cache);
+}
+
 static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		" -n max_size\r\n"
 		" -t timeout\r\n"
-		" -c cmd[test1|test2|test3, default: test3]\n", procname);
+		" -c cmd[test1|test2|test3|test4, default: test3]\n",
+		procname);
 }
 
 int main(int argc, char *argv[])
@@ -197,7 +284,7 @@ int main(int argc, char *argv[])
 	char  cmd[256];
 
 	ACL_SAFE_STRNCPY(cmd, "test3", sizeof(cmd));
-	while ((ch = getopt(argc, argv, "hn:t:c:")) > 0) {
+	while ((ch = getopt(argc, argv, "hn:t:a:")) > 0) {
 		switch (ch) {
 			case 'h':
 				usage(argv[0]);
@@ -208,7 +295,7 @@ int main(int argc, char *argv[])
 			case 't':
 				timeout = atoi(optarg);
 				break;
-			case 'c':
+			case 'a':
 				ACL_SAFE_STRNCPY(cmd, optarg, sizeof(cmd));
 				break;
 			default:
@@ -221,8 +308,13 @@ int main(int argc, char *argv[])
 		test1(n, timeout);
 	else if (strcasecmp(cmd, "test2") == 0)
 		test2(n, timeout);
-	else
+	else if (strcasecmp(cmd, "test3") == 0)
 		test3(n, timeout);
+	else if (strcasecmp(cmd, "test4") == 0)
+		test4(n, timeout);
+	else
+		usage(argv[0]);
+
 	acl_mem_slice_destroy();
 #ifdef ACL_MS_WINDOWS
 	printf("Enter any key to exit...\n");
