@@ -103,6 +103,7 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 {
 	struct dns_addrinfo *dai;
 	struct dns_resolver *resolver;
+	struct addrinfo hints_tmp;
 	int err;
 
 	if (__sys_getaddrinfo == NULL) {
@@ -146,6 +147,25 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 		msg_error("%s(%d): dns_res_open error=%s",
 			__FUNCTION__, __LINE__, dns_strerror(err));
 		return EAI_SYSTEM;
+	}
+
+	memset(&hints_tmp, 0, sizeof(hints_tmp));
+	hints_tmp.ai_family   = PF_UNSPEC;
+	hints_tmp.ai_socktype = 0;
+#ifdef	__APPLE__
+	hints_tmp.ai_flags    = AI_DEFAULT;
+#elif	defined(ANDROID)
+	hints_tmp.ai_flags    = AI_ADDRCONFIG;
+#elif	defined(SYS_WIN)
+	hints_tmp.ai_protocol = type == SOCK_DGRAM ? IPPROTO_UDP : IPPROTO_TCP;
+# if _MSC_VER >= 1500
+	hints_tmp.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
+# endif
+#elif	!defined(__FreeBSD__)
+	hints_tmp.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
+#endif
+	if (hints == NULL) {
+		hints = &hints_tmp;
 	}
 
 	dai = dns_ai_open(node, service, DNS_T_A, hints, resolver, &err);

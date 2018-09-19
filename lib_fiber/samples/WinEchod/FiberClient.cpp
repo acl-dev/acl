@@ -60,6 +60,7 @@ void CFiberClient::run(void)
 		n++;
 	}
 	delete m_conn;
+	printf("curr id=%u, %u\r\n", get_id(), acl::fiber::self());
 	delete this;
 #endif
 }
