@@ -1,4 +1,4 @@
-%define release_id 22
+%define release_id 23
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Wed Sep 19 2018 zhengshuxin@qiyi.com 3.4.1-23-20180919.15
+- bugfix: acl_ifconf_search in acl_ifconf.c can't handle some addrs patterns
 
 * Sun Sep 16 2018 zhengshuxin@qiyi.com 3.4.1-22-20180916.18
 - bugfix: acl_ifconf.c and some modules can't justify some UNIX path that

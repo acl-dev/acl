@@ -363,7 +363,7 @@ ACL_CACHE2_INFO *acl_cache2_locate(ACL_CACHE2 *cache2, const char *key)
 
 	info = (ACL_CACHE2_INFO*) acl_htable_find(cache->table, key);
 	if (info != NULL)
-		return (info);
+		return info;
 	else
 		return NULL;
 }

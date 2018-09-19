@@ -143,14 +143,14 @@ ACL_API ACL_CACHE2_INFO *acl_cache2_upsert(ACL_CACHE2 *cache2,
 	const char *key, void *value, int timeout, int *exist);
 	
 /**
- * 获取按时间排序后的头部对象
+ * 获取按时间排序后的头部对象，调用者可从 ACL_CACHE2_INFO::value 获得应用对象
  * @param cache2 {ACL_CACHE2*}
  * @return {ACL_CACHE2_INFO*} 返回 NULL 表示缓存对象为空
  */
 ACL_API ACL_CACHE2_INFO *acl_cache2_head(ACL_CACHE2 *cache2);
 
 /**
- * 获取按时间排序后的尾部对象
+ * 获取按时间排序后的尾部对象，调用者可从 ACL_CACHE2_INFO::value 获得应用对象
  * @param cache2 {ACL_CACHE2*}
  * @return {ACL_CACHE2_INFO*} 返回 NULL 表示缓存对象为空
  */

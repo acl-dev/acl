@@ -23,9 +23,14 @@ static const ACL_IFADDR *iter_head(ACL_ITER *iter, struct ACL_IFCONF *ifconf)
 	iter->klen = -1;
 
 	iter->i = 0;
+	if (iter->i >= ifconf->length) {
+		iter->data = iter->ptr = NULL;
+		return iter->ptr;
+	}
+
 	iter->size = ifconf->length;
 	iter->ptr  = iter->data = &ifconf->addrs[0];
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 static const ACL_IFADDR *iter_next(ACL_ITER *iter, struct ACL_IFCONF *ifconf)
@@ -35,7 +40,7 @@ static const ACL_IFADDR *iter_next(ACL_ITER *iter, struct ACL_IFCONF *ifconf)
 		iter->data = iter->ptr = NULL;
 	else
 		iter->data = iter->ptr = &ifconf->addrs[iter->i];
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 static const ACL_IFADDR *iter_tail(ACL_ITER *iter, struct ACL_IFCONF *ifconf)
@@ -50,7 +55,7 @@ static const ACL_IFADDR *iter_tail(ACL_ITER *iter, struct ACL_IFCONF *ifconf)
 		iter->data = iter->ptr = NULL;
 	else
 		iter->ptr = iter->data = &ifconf->addrs[iter->i];
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 static const ACL_IFADDR *iter_prev(ACL_ITER *iter, struct ACL_IFCONF *ifconf)
@@ -60,7 +65,7 @@ static const ACL_IFADDR *iter_prev(ACL_ITER *iter, struct ACL_IFCONF *ifconf)
 		iter->data = iter->ptr = NULL;
 	else
 		iter->data = iter->ptr = &ifconf->addrs[iter->i];
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 static ACL_IFADDR *ifaddr_clone(const ACL_IFADDR *ifaddr, int port)
@@ -109,12 +114,11 @@ static void ifaddr_copy(ACL_IFADDR *to, const ACL_IFADDR *from)
 	memcpy(&to->saddr, &from->saddr, sizeof(ACL_SOCKADDR));
 }
 
-static ACL_IFCONF *ifconf_create(int length)
+static ACL_IFCONF *ifconf_create(int max)
 {
 	ACL_IFCONF *ifconf = (ACL_IFCONF*) acl_mymalloc(sizeof(ACL_IFCONF));
-	ifconf->length = length;
-	ifconf->addrs = (ACL_IFADDR*)
-		acl_mycalloc(ifconf->length, sizeof(ACL_IFADDR));
+	ifconf->length = max;
+	ifconf->addrs  = (ACL_IFADDR*) acl_mycalloc(max, sizeof(ACL_IFADDR));
 
 	/* set the iterator callback */
 	ifconf->iter_head = iter_head;
@@ -234,7 +238,7 @@ ACL_IFCONF *acl_get_ifaddrs(void)
 	if (sock <= 0) {
 		acl_msg_error("%s(%d): create socket error(%s)",
 			__FUNCTION__, __LINE__, acl_last_serror());
-		return (NULL);
+		return NULL;
 	}
 
 	ifaces = acl_mymalloc(ifaces_size);
@@ -246,7 +250,7 @@ ACL_IFCONF *acl_get_ifaddrs(void)
 				__FUNCTION__, __LINE__, acl_last_serror());
 			close(sock);
 			acl_myfree(ifaces);
-			return (NULL);
+			return NULL;
 		}
 		if (param.ifc_len < ifaces_size)
 			break;
@@ -361,12 +365,12 @@ ACL_IFCONF *acl_get_ifaddrs(void)
 		acl_myfree(ifconf->addrs);
 		acl_myfree(ifconf);
 		FreeLibrary(hInst);
-		return (NULL);
+		return NULL;
 	}
 
 	ifconf->length = j;  /* reset the ifconf->length */
 	FreeLibrary(hInst);
-	return (ifconf);
+	return ifconf;
 }
 
 #else  /* MS_VC6  */
@@ -424,7 +428,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 	if (j == 0) {
 		acl_myfree(ifconf->addrs);
 		acl_myfree(ifconf);
-		return (NULL);
+		return NULL;
 	}
 
 	ifconf->length = j;  /* reset the ifconf->length */
@@ -585,7 +589,7 @@ static ACL_IFADDR *ipv6_clone(const char *pattern, const ACL_IFADDR *ifaddr)
 }
 #endif
 
-static void patterns_match_add(ACL_ARGV *patterns,
+static void patterns_addrs_add(ACL_ARGV *patterns,
 	const ACL_IFADDR *ifaddr, ACL_ARRAY *addrs)
 {
 	ACL_ITER iter;
@@ -614,9 +618,9 @@ ACL_IFCONF *acl_ifconf_search(const char *patterns)
 {
 	ACL_IFCONF *ifconf = acl_get_ifaddrs(), *ifconf2;
 	ACL_ARGV   *patterns_tokens;
+	ACL_HTABLE *table;
 	ACL_ARRAY  *addrs;
 	ACL_ITER    iter;
-	int         i;
 
 	if (ifconf == NULL) {
 		acl_msg_error("%s(%d), %s:  acl_get_ifaddrs error %s",
@@ -630,31 +634,28 @@ ACL_IFCONF *acl_ifconf_search(const char *patterns)
 
 	acl_foreach(iter, ifconf) {
 		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
-		patterns_match_add(patterns_tokens, ifaddr, addrs);
+		patterns_addrs_add(patterns_tokens, ifaddr, addrs);
 	}
 
 #ifdef AF_UNIX
 	/* just for all unix domain path */
 	acl_foreach(iter, patterns_tokens) {
 		const char *pattern = (const char *) iter.data;
-		if (acl_valid_unix(pattern)) {
-			ACL_IFADDR *ifaddr = (ACL_IFADDR *)
-				acl_mycalloc(1, sizeof(ACL_IFADDR));
+		ACL_IFADDR *ifaddr;
 
-			SAFE_COPY(ifaddr->name, pattern);
-			SAFE_COPY(ifaddr->addr, pattern);
-			ifaddr->saddr.sa.sa_family = AF_UNIX;
-			SAFE_COPY(ifaddr->saddr.un.sun_path, pattern);
-			acl_array_append(addrs, ifaddr);
-		}
+		if (acl_valid_hostaddr(pattern, 0))
+			continue;
+
+		/* the left are used as UNIX doamin except for IP addr */
+		ifaddr = (ACL_IFADDR *) acl_mycalloc(1, sizeof(ACL_IFADDR));
+
+		SAFE_COPY(ifaddr->name, pattern);
+		SAFE_COPY(ifaddr->addr, pattern);
+		ifaddr->saddr.sa.sa_family = AF_UNIX;
+		SAFE_COPY(ifaddr->saddr.un.sun_path, pattern);
+		acl_array_append(addrs, ifaddr);
 	}
 #endif
-
-	/*
-	acl_foreach(iter, patterns_tokens) {
-		printf(">>>pattern=%s\r\n", (const char*) iter.data);
-	}
-	*/
 
 	acl_argv_free(patterns_tokens);
 	acl_free_ifaddrs(ifconf);
@@ -664,23 +665,22 @@ ACL_IFCONF *acl_ifconf_search(const char *patterns)
 		return NULL;
 	}
 
+	table   = acl_htable_create(10, 0);
 	ifconf2 = ifconf_create(acl_array_size(addrs));
-	i = 0;
+
+	/* reset the length to 0 for adding unique real addr */
+	ifconf2->length = 0;
+
 	acl_foreach(iter, addrs) {
 		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
-		ifaddr_copy(&ifconf2->addrs[i], ifaddr);
-		i++;
+		if (acl_htable_find(table, ifaddr->addr) == NULL) {
+			ifaddr_copy(&ifconf2->addrs[ifconf2->length], ifaddr);
+			ifconf2->length++;
+			acl_htable_enter(table, ifaddr->addr, NULL);
+		}
 	}
 
+	acl_htable_free(table, NULL);
 	acl_array_free(addrs, acl_myfree_fn);
-
-	/*
-	acl_foreach(iter, ifconf2) {
-		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
-		printf(">>> name=%s, type=%d, addr=%s\r\n",
-			ifaddr->name, ifaddr->saddr.sa.sa_family, ifaddr->addr);
-	}
-	*/
-
 	return ifconf2;
 }

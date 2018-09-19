@@ -35,13 +35,14 @@ static void test2(const char *pattern)
         ACL_ITER    iter;		/* ±éÀú¶ÔÏó */
 	ACL_IFCONF *ifconf;
 
+	printf("pattern=%s\r\n", pattern);
+
 	ifconf = acl_ifconf_search(pattern);
 	if (ifconf == NULL) {
 		printf("acl_ifconf_search error\r\n");
 		return;
 	}
 
-	printf("pattern=%s\r\n", pattern);
 	acl_foreach(iter, ifconf) {
 		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
 		const char *type;
@@ -49,6 +50,10 @@ static void test2(const char *pattern)
 			type = "AF_INET";
 		else if (ifaddr->saddr.sa.sa_family == AF_INET6)
 			type = "AF_INET6";
+#ifdef AF_UNIX
+		else if (ifaddr->saddr.sa.sa_family == AF_UNIX)
+			type = "AF_UNIX";
+#endif
 		else
 			type = "unknown";
 		printf(">>>name=%s, addr=%s, type=%s\r\n",
@@ -61,27 +66,56 @@ static void test2(const char *pattern)
 int main(void)
 {
 	const char *patterns[] = {
-		"8190",
-		"#8190",
-		":8190",
-		"*#8190",
-		"*.*.*.*:8190",
-		"0.0.0.0:8190",
-		"127.*.*.*:8290, 192.168.*.*:8291, 172.16.*.*.:8292, 172.17.*.*.:8293, /unix_server@unix",
-		"127.*.*.*:8290, 0.0.0.0:8191, *.*.*.*:8292",
-		":8191, #8192, *:8193, *#8194",
+		/* 0 */ "127.0.0.1",
+		/* 1 */ "127.0.0.1:8190",
+		/* 2 */ "127.*.*.1:8190",
+		/* 3 */ "8190",
+		/* 4 */ "|8190",
+		/* 5 */ ":8190",
+		/* 6 */ "*|8190",
+		/* 7 */ "*.*.*.*:8190",
+		/* 8 */ "0.0.0.0:8190",
+		/* 9 */ "aio.sock",
+		/* 10 */ "/aio.sock",
+		/* 11 */ "127.*.*.*:8290, 192.168.*.*:8291, 172.16.*.*:8292, 172.17.*.*:8293, /unix_server@unix",
+		/* 12 */ "127.*.*.*:8290, 0.0.0.0:8191, *.*.*.*:8292",
+		/* 13 */ ":8191, |8192, *:8193, *|8194",
 		NULL,
 	};
-	int i;
 
 	test1();
 
-	for (i = 0; patterns[i]; i++) {
+	for (int i = 0; patterns[i]; i++) {
 		if (i >= 0) {
 			printf("\r\n-----------------------------------\r\n");
 			test2(patterns[i]);
 		}
 	}
 
+	ACL_ARGV *tokens = acl_argv_alloc(10);
+	for (int i = 0; patterns[i]; i++) {
+		ACL_ARGV *fields = acl_argv_split(patterns[i], ",; \t\r\n");
+		ACL_ITER  iter;
+
+		acl_foreach(iter, fields) {
+			acl_argv_add(tokens, (const char*) iter.data, NULL);
+		}
+
+		acl_argv_free(fields);
+	}
+
+	printf("\r\n-----------------------------------\r\n");
+
+	ACL_ITER iter;
+	acl_foreach(iter, tokens) {
+		const char *ptr = (const char *) iter.data;
+		if (!acl_valid_hostaddr(ptr, 0)) {
+			printf(">>not valid host addr for: %s\r\n", ptr);
+		}
+	}
+
+	acl_argv_free(tokens);
+
+	printf("All over!\r\n");
 	return 0;
 }

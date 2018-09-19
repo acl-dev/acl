@@ -1,5 +1,8 @@
 修改历史列表：
 
+633) 2018.9.19
+633.1) bugfix: acl_ifconf.c 中的 acl_ifconf_search 修正几处地址匹配模式问题
+
 632) 2018.9.18
 632.1) feature: acl_cache2 中新增一些方便使用的接口
 

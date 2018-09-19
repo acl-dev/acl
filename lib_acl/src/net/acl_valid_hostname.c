@@ -106,10 +106,75 @@ int acl_valid_unix(const char *addr)
 	if (strchr(addr, '/') != NULL)
 		return 1;
 
-	return !acl_valid_hostaddr(addr, 0);
+	return 0;
 }
 
 /* acl_valid_hostaddr - verify numerical address syntax */
+
+static int valid_ipv4_field(const char *ptr)
+{
+	int n;
+
+	if (*ptr == '*' && *(ptr + 1) == 0)
+		return 1;
+	if (!acl_alldig(ptr))
+		return 0;
+	n = atoi(ptr);
+	if (n < 0 || n > 255)
+		return 0;
+
+	return 1;
+}
+
+static int valid_port(const char *ptr)
+{
+	int n;
+
+	if (!acl_alldig(ptr))
+		return 0;
+
+	n = atoi(ptr);
+	return n >= 0 && n <= 65535;
+}
+
+static int valid_ipv4_wildcard(const char *addr)
+{
+	ACL_ARGV *tokens = acl_argv_split(addr, ".");
+	char     *ptr, *s4;
+	int       i;
+
+	if (tokens->argc != 4) {
+		acl_argv_free(tokens);
+		return 0;
+	}
+
+	for (i = 0; i < 3; i++) {
+		ptr = tokens->argv[i];
+		if (!valid_ipv4_field(ptr)) {
+			acl_argv_free(tokens);
+			return 0;
+		}
+	}
+
+	s4 = tokens->argv[3];
+	ptr = strchr(s4, ACL_ADDR_SEP);
+	if (ptr == NULL)
+		ptr = strchr(s4, ':');
+	if (ptr)
+		*ptr++ = 0;
+
+	if (!valid_ipv4_field(s4)) {
+		acl_argv_free(tokens);
+		return 0;
+	}
+
+	if (ptr)
+		i = valid_port(ptr);
+	else
+		i = 1;
+	acl_argv_free(tokens);
+	return i;
+}
 
 int acl_valid_hostaddr(const char *addr, int gripe)
 {
@@ -121,6 +186,21 @@ int acl_valid_hostaddr(const char *addr, int gripe)
 			acl_msg_warn("%s: empty address", myname);
 		return 0;
 	}
+
+#define VALID_PORT(x) (acl_alldig((x)) && atoi((x)) > 0)
+#define VALID_SEP(x)  ((x) == ACL_ADDR_SEP || (x) == ':')
+
+	/* port */
+	if (VALID_PORT(addr))
+		return 1;
+	/* |port, :port */
+	if (VALID_SEP(*addr) && VALID_PORT(addr + 1))
+		return 1;
+	/* *|port, *:port */
+	if (*addr == '*' && VALID_SEP(*(addr + 1)) && VALID_PORT(addr + 2))
+		return 1;
+	if (valid_ipv4_wildcard(addr))
+		return 1;
 
 	/* Protocol-dependent processing next. */
 	return acl_valid_ipv4_hostaddr(addr, gripe)
