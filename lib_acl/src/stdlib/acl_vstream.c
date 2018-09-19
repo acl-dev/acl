@@ -3031,7 +3031,7 @@ void acl_vstream_set_local(ACL_VSTREAM *fp, const char *addr)
 		else if (fp->sa_local->sa_family == AF_INET6)
 			fp->type |= ACL_VSTREAM_TYPE_INET6;
 #endif
-#ifdef AF_UNIX
+#ifdef ACL_UNIX
 		else if (fp->sa_local->sa_family == AF_UNIX)
 			fp->type |= ACL_VSTREAM_TYPE_UNIX;
 #endif
@@ -3071,7 +3071,7 @@ int acl_vstream_set_local_addr(ACL_VSTREAM *fp, const struct sockaddr *sa)
 	else if (sa->sa_family == AF_INET6)
 		fp->type |= ACL_VSTREAM_TYPE_INET6;
 #endif
-#ifdef AF_UNIX
+#ifdef ACL_UNIX
 	else if (sa->sa_family == AF_UNIX)
 		fp->type |= ACL_VSTREAM_TYPE_UNIX;
 #endif

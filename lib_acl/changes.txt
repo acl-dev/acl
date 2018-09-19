@@ -2,6 +2,8 @@
 
 633) 2018.9.19
 633.1) bugfix: acl_ifconf.c 中的 acl_ifconf_search 修正几处地址匹配模式问题
+633.2) compiling: AF_UNIX 在 VC 中虽然有定义，但对应的域套接地址结构却不存在，
+MS 太坑人
 
 632) 2018.9.18
 632.1) feature: acl_cache2 中新增一些方便使用的接口
