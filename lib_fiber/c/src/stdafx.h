@@ -30,6 +30,7 @@
 #include <signal.h>
 
 #if defined(SYS_UNIX)
+#include <net/if.h>
 #include <unistd.h>
 #include <dlfcn.h>
 #include <sys/socket.h>

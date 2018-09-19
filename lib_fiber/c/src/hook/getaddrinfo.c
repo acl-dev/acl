@@ -50,9 +50,30 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 	}
 #ifdef AF_INET6
 	else if (is_ipv6(ip)) {
+		char   buf[256], *ptr;
+		struct sockaddr_in6 *in6;
+
+		SAFE_STRNCPY(buf, ip, sizeof(buf));
+
+		if ((ptr = strrchr(buf, '|'))) {
+			*ptr++ = 0;
+			port   = atoi(ptr);
+		}
+
+		/* when '%' was appended to the IPV6's addr */
+		if ((ptr = strrchr(buf, '%'))) {
+			*ptr++ = 0;
+		}
+
+		in6 = (struct sockaddr_in6 *) &sa;
+		memset(in6, 0, sizeof(struct sockaddr_in6));
 		sa.sa.in6.sin6_family = AF_INET6;
 		sa.sa.in6.sin6_port   = htons(port);
-		if (inet_pton(AF_INET6, ip, &sa.sa.in6.sin6_addr) <= 0) {
+
+		if (ptr && *ptr && !(in6->sin6_scope_id = if_nametoindex(ptr))) {
+			return NULL;
+		}
+		if (inet_pton(AF_INET6, buf, &sa.sa.in6.sin6_addr) <= 0) {
 			return NULL;
 		}
 		addrlen = sizeof(struct sockaddr_in6);
