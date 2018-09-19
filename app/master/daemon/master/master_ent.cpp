@@ -350,10 +350,12 @@ static int service_sock(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 	serv->type  = ACL_MASTER_SERV_TYPE_SOCK;
 	serv->addrs = acl_array_create(1);
 
+	/*
 	acl_foreach(iter, ifconf) {
 		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
 		acl_msg_info(">>name=%s, addr=%s<<<", name, ifaddr->addr);
 	}
+	*/
 
 	acl_foreach(iter, ifconf) {
 		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
