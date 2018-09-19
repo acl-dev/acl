@@ -91,14 +91,15 @@ static int host_port(char *buf, char **host, char **port)
 	const char *ptr = acl_host_port(buf, host, "", port, (char*) NULL);
 
 	if (ptr != NULL) {
-		acl_msg_error("%s(%d): invalid addr %s, %s",
-			__FILE__, __LINE__, buf, ptr);
+		acl_msg_error("%s(%d), %s: invalid addr %s, %s",
+			__FILE__, __LINE__, __FUNCTION__, buf, ptr);
 		return -1;
 	}
 
 	if (*port != NULL && atoi(*port) < 0) {
-		acl_msg_error("%s(%d): invalid port: %s, addr: %s",
-			__FILE__, __LINE__, *port ? *port : "null", buf);
+		acl_msg_error("%s(%d), %s: invalid port: %s, addr: %s",
+			__FILE__, __LINE__, __FUNCTION__,
+			*port ? *port : "null", buf);
 		return -1;
 	}
 
