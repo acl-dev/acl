@@ -114,14 +114,14 @@ static int save_result(struct hostent *ent, struct addrinfo *res,
 			break;
 		}
 
-		struct SOCK_ADDR *sa = (struct SOCK_ADDR *) ai->ai_addr;
+		SOCKADDR *sa = (SOCKADDR *) ai->ai_addr;
 
 		if (ai->ai_family == AF_INET) {
 			len = sizeof(struct in_addr);
-			memcpy((void *) buf, &sa->sa.in.sin_addr, len);
+			memcpy((void *) buf, &sa->in.sin_addr, len);
 		} else if (ai->ai_family == AF_INET6) {
 			len = sizeof(struct in6_addr);
-			memcpy((void *) buf, &sa->sa.in6.sin6_addr, len);
+			memcpy((void *) buf, &sa->in6.sin6_addr, len);
 		} else {
 			continue;
 		}

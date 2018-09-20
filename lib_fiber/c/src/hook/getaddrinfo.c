@@ -19,8 +19,7 @@ static void hook_api(void)
 	__sys_getaddrinfo = (getaddrinfo_fn) dlsym(RTLD_NEXT, "getaddrinfo");
 	assert(__sys_getaddrinfo);
 
-	__sys_freeaddrinfo = (freeaddrinfo_fn) dlsym(RTLD_NEXT,
-			"freeaddrinfo");
+	__sys_freeaddrinfo = (freeaddrinfo_fn) dlsym(RTLD_NEXT, "freeaddrinfo");
 	assert(__sys_freeaddrinfo);
 }
 
@@ -40,13 +39,13 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 {
 	struct addrinfo *res;
 	size_t addrlen;
-	struct SOCK_ADDR sa;
+	SOCKADDR sa;
 
 	if (is_ipv4(ip)) {
-		sa.sa.in.sin_family      = AF_INET;
-		sa.sa.in.sin_addr.s_addr = inet_addr(ip);
-		sa.sa.in.sin_port        = htons(port);
-		addrlen                  = sizeof(struct sockaddr_in);
+		sa.in.sin_family      = AF_INET;
+		sa.in.sin_addr.s_addr = inet_addr(ip);
+		sa.in.sin_port        = htons(port);
+		addrlen               = sizeof(struct sockaddr_in);
 	}
 #ifdef AF_INET6
 	else if (is_ipv6(ip)) {
@@ -67,13 +66,15 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 
 		in6 = (struct sockaddr_in6 *) &sa;
 		memset(in6, 0, sizeof(struct sockaddr_in6));
-		sa.sa.in6.sin6_family = AF_INET6;
-		sa.sa.in6.sin6_port   = htons(port);
+		sa.in6.sin6_family = AF_INET6;
+		sa.in6.sin6_port   = htons(port);
 
-		if (ptr && *ptr && !(in6->sin6_scope_id = if_nametoindex(ptr))) {
-			return NULL;
+		if (ptr && *ptr) {
+			if (!(in6->sin6_scope_id = if_nametoindex(ptr))) {
+				return NULL;
+			}
 		}
-		if (inet_pton(AF_INET6, buf, &sa.sa.in6.sin6_addr) <= 0) {
+		if (inet_pton(AF_INET6, buf, &sa.in6.sin6_addr) <= 0) {
 			return NULL;
 		}
 		addrlen = sizeof(struct sockaddr_in6);
@@ -84,7 +85,7 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 	}
 
 	res = (struct addrinfo *) calloc(1, sizeof(*res) + addrlen);
-	res->ai_family   = sa.sa.sa.sa_family;
+	res->ai_family   = sa.sa.sa_family;
 	res->ai_socktype = socktype;
 	res->ai_flags    = flags;
 	res->ai_addrlen  = (socklen_t) addrlen;
@@ -104,7 +105,11 @@ static void saveaddrinfo(struct dns_addrinfo *ai, struct addrinfo **res)
 			break;
 		}
 
-		if (ent->ai_family != AF_INET && ent->ai_family != AF_INET6) {
+		if (ent->ai_family != AF_INET
+#ifdef AF_INET6
+			&& ent->ai_family != AF_INET6)
+#endif
+		{
 			free(ent);
 			continue;
 		}

@@ -77,18 +77,16 @@
 # include <pthread_np.h>
 #endif
 
-struct SOCK_ADDR {
-	union {
-		struct sockaddr_storage ss;
+typedef union {
+	struct sockaddr_storage ss;
 #ifdef AF_INET6
-		struct sockaddr_in6 in6;
+	struct sockaddr_in6 in6;
 #endif
-		struct sockaddr_in in;
+	struct sockaddr_in in;
 #ifdef ACL_UNIX
-		struct sockaddr_un un;
+	struct sockaddr_un un;
 #endif
-		struct sockaddr sa;
-	} sa;
-};
+	struct sockaddr sa;
+} SOCKADDR;
 
 #endif

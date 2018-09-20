@@ -23,7 +23,7 @@ int is_listen_socket(socket_t fd)
 
 int getsocktype(socket_t fd)
 {
-	struct SOCK_ADDR addr;
+	SOCKADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
 
