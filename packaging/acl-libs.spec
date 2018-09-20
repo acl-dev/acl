@@ -1,4 +1,4 @@
-%define release_id 23
+%define release_id 24
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Sep 20 2018 zhengshuxin@qiyi.com 3.4.1-24-20180920.09
+- bugfix: fixed bugs in lib_fiber for IPV6 supporting
 
 * Wed Sep 19 2018 zhengshuxin@qiyi.com 3.4.1-23-20180919.15
 - bugfix: acl_ifconf_search in acl_ifconf.c can't handle some addrs patterns
