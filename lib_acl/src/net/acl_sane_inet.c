@@ -183,11 +183,18 @@ size_t acl_inet_ntop(const struct sockaddr *sa, char *buf, size_t size)
 		if (ptr == NULL)
 			ifname[0] = 0;
 		port = ntohs(in6->sin6_port);
-		if (port > 0)
-			snprintf(buf, size, "%s%%%s%c%d", ip, ifname,
-				ACL_ADDR_SEP, port);
-		else
-			snprintf(buf, size, "%s%%%s", ip, ifname);
+		if (port <= 0) {
+			if (strcmp(ip, "::1") == 0) {
+				snprintf(buf, size, "%s", ip);
+			} else {
+				snprintf(buf, size, "%s%%%s", ip, ifname);
+			}
+		} else if (strcmp(ip, "::1") == 0) {  /* for local IPV6 */
+			snprintf(buf, size, "%s%c%d", ip, ACL_ADDR_SEP, port);
+		} else {
+			snprintf(buf, size, "%s%%%s%c%d",
+				ip, ifname, ACL_ADDR_SEP, port);
+		}
 		return sizeof(struct sockaddr_in6);
 #endif
 #ifdef ACL_UNIX
