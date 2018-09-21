@@ -103,6 +103,12 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 	return true;
 }
 
+void master_udp::push_back(socket_stream* ss)
+{
+	thread_mutex_guard guard(lock_);
+	sstreams_.push_back(ss);
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 void master_udp::service_main(void* ctx, ACL_VSTREAM *stream)
@@ -167,7 +173,7 @@ void master_udp::service_on_bind(void* ctx, ACL_VSTREAM* stream)
 	if (ss->open(stream) == false)
 		logger_fatal("open stream error!");
 	stream->context = ss;
-	mu->sstreams_.push_back(ss);
+	mu->push_back(ss);
 
 	mu->proc_on_bind(*ss);
 }

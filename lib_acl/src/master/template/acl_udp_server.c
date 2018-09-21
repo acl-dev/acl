@@ -308,6 +308,13 @@ static void server_rebinding(UDP_SERVER *server, ACL_HTABLE *table)
 			continue;
 		}
 
+		/**
+		 * The table holds all the NICS's addrs from searching, if the
+		 * current stream's addr is in the table, just delete it from
+		 * the table which the addrs left in table will be as the new
+		 * addrs to be bound; If the stream's addr isn't in the table,
+		 * then the stream with the addr will be closed.
+		 */
 		if (acl_htable_locate(table, buf) != NULL)
 			acl_htable_delete(table, buf, NULL);
 		else

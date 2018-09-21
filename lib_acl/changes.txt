@@ -1,5 +1,9 @@
 修改历史列表：
 
+634) 2018.9.21
+634.1) bugfix: acl_inet_ntop should use ':' as the seperate for IPV4, or the
+acl_udp_server.c will mismatch the changed IPV4 addrs.
+
 633) 2018.9.19
 633.1) bugfix: acl_ifconf.c 中的 acl_ifconf_search 修正几处地址匹配模式问题
 633.2) compiling: AF_UNIX 在 VC 中虽然有定义，但对应的域套接地址结构却不存在，

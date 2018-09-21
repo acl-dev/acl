@@ -1,5 +1,7 @@
 #pragma once
+#include "../acl_cpp_define.hpp"
 #include "master_base.hpp"
+#include "../stdlib/thread_mutex.hpp"
 
 struct ACL_VSTRING;
 
@@ -65,7 +67,9 @@ protected:
 
 private:
 	std::vector<socket_stream*> sstreams_;
+	thread_mutex lock_;
 
+	void push_back(socket_stream* ss);
 	void run(int argc, char** argv);
 
 private:

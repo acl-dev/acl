@@ -166,7 +166,7 @@ size_t acl_inet_ntop(const struct sockaddr *sa, char *buf, size_t size)
 			return 0;
 		port = ntohs(in->sin_port);
 		if (port > 0)
-			snprintf(buf, size, "%s%c%d", ip, ACL_ADDR_SEP, port);
+			snprintf(buf, size, "%s:%d", ip, port);
 		else
 			snprintf(buf, size, "%s", ip);
 		return sizeof(struct sockaddr_in);
