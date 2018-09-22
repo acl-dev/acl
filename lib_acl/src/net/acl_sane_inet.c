@@ -1,5 +1,9 @@
 #include "StdAfx.h"
 
+#ifdef ACL_WINDOWS
+#pragma comment(lib, "Iphlpapi.lib")
+#endif
+
 #ifdef ACL_UNIX
 #include <net/if.h>
 #endif

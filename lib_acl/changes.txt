@@ -1,5 +1,9 @@
 修改历史列表：
 
+635) 2018.9.22
+635.1) feature: 当创建监听套接口时通过新增标志位 ACL_INET_FLAG_EXCLUSIVE 来
+控制是否禁止地址复用，默认是允许地址复用
+
 634) 2018.9.21
 634.1) bugfix: acl_inet_ntop should use ':' as the seperate for IPV4, or the
 acl_udp_server.c will mismatch the changed IPV4 addrs.

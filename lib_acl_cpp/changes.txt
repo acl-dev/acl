@@ -1,5 +1,9 @@
 修改历史列表：
 
+540) 2018.9.22
+540.1) feature: server_socket 类的构造函数中新增标志位 OPEN_FLAG_EXCLUSIVE 用
+来控制创建监听套接口是否禁止地址复用，缺省是允许地址复用
+
 539) 2018.9.21
 539.1) bugfix: master_udp::service_on_bind 被多线程同时调用时，需要对成员变量
 sstream_ 加锁保护

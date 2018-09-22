@@ -34,6 +34,8 @@ server_socket::server_socket(open_flag_t flag, int backlog /* = 128 */)
 
 	if (flag & OPEN_FLAG_REUSEPORT)
 		open_flag_ |= ACL_INET_FLAG_REUSEPORT;
+	if (flag & OPEN_FLAG_EXCLUSIVE)
+		open_flag_ |= ACL_INET_FLAG_EXCLUSIVE;
 }
 
 server_socket::server_socket(ACL_VSTREAM* sstream)
