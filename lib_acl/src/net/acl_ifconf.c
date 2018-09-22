@@ -565,7 +565,7 @@ static ACL_IFADDR *ipv6_clone(const char *pattern, const ACL_IFADDR *ifaddr)
 	}
 
 	ACL_SAFE_STRNCPY(buf, pattern, sizeof(buf));
-	if ((ptr = strrchr(buf, ACL_ADDR_SEP)) || (ptr = strrchr(buf, ':')))
+	if ((ptr = strrchr(buf, ACL_ADDR_SEP)))
 		*ptr++ = 0;
 	else
 		ptr = NULL;
