@@ -481,7 +481,7 @@ ACL_CACHE2_INFO *acl_cache2_update2(ACL_CACHE2 *cache2,
 		acl_myfree(pnode);
 	}
 
-	node.when_timeout = timeout > 0 ? timeout : 0;
+	node.when_timeout = timeout > 0 ? (time(NULL) + timeout) : 0;
 	pnode = (TREE_NODE*) avl_find(&cache->avl, &node, NULL);
 	if (pnode == NULL) {
 		pnode = (TREE_NODE*) acl_mycalloc(1, sizeof(TREE_NODE));

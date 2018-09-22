@@ -133,9 +133,10 @@ fi
 
 %changelog
 
-* Sat Sep 22 2018 zhengshuxin@qiyi.com 3.4.1-25-20180922.10
+* Sat Sep 22 2018 zhengshuxin@qiyi.com 3.4.1-25-20180922.13
 - feature: The elements will be removed according LRU in acl_cache2.c
 - feature: add flag to control is using SO_REUSEADDR when binding local addr
+- bugfix: fixed one bug in acl_cache2_update of acl_cache2.c
 
 * Thu Sep 20 2018 zhengshuxin@qiyi.com 3.4.1-24-20180920.09
 - bugfix: fixed bugs in lib_fiber for IPV6 supporting
