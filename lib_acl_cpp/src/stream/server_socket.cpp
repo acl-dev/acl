@@ -20,7 +20,7 @@ server_socket::server_socket(int backlog /* = 128 */, bool block /* = true */)
 	open_flag_ = block ? ACL_BLOCKING : ACL_NON_BLOCKING;
 }
 
-server_socket::server_socket(open_flag_t flag, int backlog /* = 128 */)
+server_socket::server_socket(unsigned flag, int backlog /* = 128 */)
 : backlog_(backlog)
 , unix_sock_(false)
 , fd_(ACL_SOCKET_INVALID)
