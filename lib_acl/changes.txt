@@ -3,6 +3,8 @@
 635) 2018.9.22
 635.1) feature: 当创建监听套接口时通过新增标志位 ACL_INET_FLAG_EXCLUSIVE 来
 控制是否禁止地址复用，默认是允许地址复用
+635.2) feature: acl_cache2.c 中 acl_cache2_enter 在添加新元素时，如果缓冲区满
+则按 LRU 算法将最老的元素删除，以保证缓冲区空间大小
 
 634) 2018.9.21
 634.1) bugfix: acl_inet_ntop should use ':' as the seperate for IPV4, or the
