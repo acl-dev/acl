@@ -1,6 +1,7 @@
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
+#include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 #include "acl_cpp/stream/aio_listen_stream.hpp"
@@ -38,9 +39,14 @@ void aio_listen_stream::add_accept_callback(aio_accept_callback* callback)
 	accept_callbacks_.push_back(callback);
 }
 
-bool aio_listen_stream::open(const char* addr)
+bool aio_listen_stream::open(const char* addr, unsigned flag /* = 0 */)
 {
-	ACL_VSTREAM *sstream = acl_vstream_listen(addr, 128);
+	unsigned oflag = 0;
+	if (flag & OPEN_FLAG_REUSEPORT)
+		oflag |= ACL_INET_FLAG_REUSEPORT;
+	if (flag & OPEN_FLAG_EXCLUSIVE)
+		oflag |= ACL_INET_FLAG_EXCLUSIVE;
+	ACL_VSTREAM *sstream = acl_vstream_listen_ex(addr, 128, oflag, 0, 0);
 	if (sstream == NULL)
 		return false;
 

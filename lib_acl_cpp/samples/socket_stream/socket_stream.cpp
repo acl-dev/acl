@@ -13,6 +13,15 @@ int main(int argc, char* argv[])
 	(void) argc;
 	(void) argv;
 
+	acl::acl_cpp_init();
+	const char* local_addr = "127.0.0.1:8088";
+	acl::server_socket server(acl::OPEN_FLAG_EXCLUSIVE);
+	if (server.open(local_addr) == false) {
+		printf("listen %s error %s\r\n", local_addr, acl::last_serror());
+		return 1;
+	}
+	printf("listen %s ok\r\n", local_addr);
+
 	acl::socket_stream client;
 	acl::string addr = "mail.51iker.com:80";
 	acl::string request = "GET / HTTP/1.1\r\n"

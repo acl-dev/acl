@@ -33,7 +33,7 @@ static void vstring_extend(ACL_VBUF *bp, int incr)
 	 * strings we might want to abandon the length doubling strategy,
 	 * and go to fixed increments.
 	 */
-	new_len = bp->len + (bp->len > incr ? bp->len : incr);
+	new_len = (long) (bp->len + (bp->len > incr ? bp->len : incr));
 	/*
 	 * bp->data = (unsigned char *) acl_myrealloc((char *) bp->data,
 	 * 	new_len);

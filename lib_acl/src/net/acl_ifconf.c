@@ -565,7 +565,7 @@ static ACL_IFADDR *ipv6_clone(const char *pattern, const ACL_IFADDR *ifaddr)
 	}
 
 	ACL_SAFE_STRNCPY(buf, pattern, sizeof(buf));
-	if ((ptr = strrchr(buf, ACL_ADDR_SEP)) || (ptr = strrchr(buf, ':')))
+	if ((ptr = strrchr(buf, ACL_ADDR_SEP)))
 		*ptr++ = 0;
 	else
 		ptr = NULL;
@@ -637,7 +637,7 @@ ACL_IFCONF *acl_ifconf_search(const char *patterns)
 		patterns_addrs_add(patterns_tokens, ifaddr, addrs);
 	}
 
-#ifdef AF_UNIX
+#ifdef ACL_UNIX
 	/* just for all unix domain path */
 	acl_foreach(iter, patterns_tokens) {
 		const char *pattern = (const char *) iter.data;

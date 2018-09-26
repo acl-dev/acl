@@ -294,11 +294,9 @@ int acl_valid_ipv6_hostaddr(const char *addr_in, int gripe)
 		*ptr = 0;
 	}
 
-#ifdef ACL_LINUX
 	if ((ptr = strrchr(addr, '%')) != NULL) {
 		*ptr = 0;
 	}
-#endif
 
 	cp = (const unsigned char *) addr;
 

@@ -19,8 +19,7 @@ static void hook_api(void)
 	__sys_getaddrinfo = (getaddrinfo_fn) dlsym(RTLD_NEXT, "getaddrinfo");
 	assert(__sys_getaddrinfo);
 
-	__sys_freeaddrinfo = (freeaddrinfo_fn) dlsym(RTLD_NEXT,
-			"freeaddrinfo");
+	__sys_freeaddrinfo = (freeaddrinfo_fn) dlsym(RTLD_NEXT, "freeaddrinfo");
 	assert(__sys_freeaddrinfo);
 }
 
@@ -40,19 +39,42 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 {
 	struct addrinfo *res;
 	size_t addrlen;
-	struct SOCK_ADDR sa;
+	SOCKADDR sa;
 
 	if (is_ipv4(ip)) {
-		sa.sa.in.sin_family      = AF_INET;
-		sa.sa.in.sin_addr.s_addr = inet_addr(ip);
-		sa.sa.in.sin_port        = htons(port);
-		addrlen                  = sizeof(struct sockaddr_in);
+		sa.in.sin_family      = AF_INET;
+		sa.in.sin_addr.s_addr = inet_addr(ip);
+		sa.in.sin_port        = htons(port);
+		addrlen               = sizeof(struct sockaddr_in);
 	}
 #ifdef AF_INET6
 	else if (is_ipv6(ip)) {
-		sa.sa.in6.sin6_family = AF_INET6;
-		sa.sa.in6.sin6_port   = htons(port);
-		if (inet_pton(AF_INET6, ip, &sa.sa.in6.sin6_addr) <= 0) {
+		char   buf[256], *ptr;
+		struct sockaddr_in6 *in6;
+
+		SAFE_STRNCPY(buf, ip, sizeof(buf));
+
+		if ((ptr = strrchr(buf, '|'))) {
+			*ptr++ = 0;
+			port   = atoi(ptr);
+		}
+
+		/* when '%' was appended to the IPV6's addr */
+		if ((ptr = strrchr(buf, '%'))) {
+			*ptr++ = 0;
+		}
+
+		in6 = (struct sockaddr_in6 *) &sa;
+		memset(in6, 0, sizeof(struct sockaddr_in6));
+		sa.in6.sin6_family = AF_INET6;
+		sa.in6.sin6_port   = htons(port);
+
+		if (ptr && *ptr) {
+			if (!(in6->sin6_scope_id = if_nametoindex(ptr))) {
+				return NULL;
+			}
+		}
+		if (inet_pton(AF_INET6, buf, &sa.in6.sin6_addr) <= 0) {
 			return NULL;
 		}
 		addrlen = sizeof(struct sockaddr_in6);
@@ -63,7 +85,7 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 	}
 
 	res = (struct addrinfo *) calloc(1, sizeof(*res) + addrlen);
-	res->ai_family   = sa.sa.sa.sa_family;
+	res->ai_family   = sa.sa.sa_family;
 	res->ai_socktype = socktype;
 	res->ai_flags    = flags;
 	res->ai_addrlen  = (socklen_t) addrlen;
@@ -83,7 +105,11 @@ static void saveaddrinfo(struct dns_addrinfo *ai, struct addrinfo **res)
 			break;
 		}
 
-		if (ent->ai_family != AF_INET && ent->ai_family != AF_INET6) {
+		if (ent->ai_family != AF_INET
+#ifdef AF_INET6
+			&& ent->ai_family != AF_INET6)
+#endif
+		{
 			free(ent);
 			continue;
 		}
@@ -103,6 +129,7 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 {
 	struct dns_addrinfo *dai;
 	struct dns_resolver *resolver;
+	struct addrinfo hints_tmp;
 	int err;
 
 	if (__sys_getaddrinfo == NULL) {
@@ -146,6 +173,25 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 		msg_error("%s(%d): dns_res_open error=%s",
 			__FUNCTION__, __LINE__, dns_strerror(err));
 		return EAI_SYSTEM;
+	}
+
+	memset(&hints_tmp, 0, sizeof(hints_tmp));
+	hints_tmp.ai_family   = PF_UNSPEC;
+	hints_tmp.ai_socktype = 0;
+#ifdef	__APPLE__
+	hints_tmp.ai_flags    = AI_DEFAULT;
+#elif	defined(ANDROID)
+	hints_tmp.ai_flags    = AI_ADDRCONFIG;
+#elif	defined(SYS_WIN)
+	hints_tmp.ai_protocol = type == SOCK_DGRAM ? IPPROTO_UDP : IPPROTO_TCP;
+# if _MSC_VER >= 1500
+	hints_tmp.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
+# endif
+#elif	!defined(__FreeBSD__)
+	hints_tmp.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
+#endif
+	if (hints == NULL) {
+		hints = &hints_tmp;
 	}
 
 	dai = dns_ai_open(node, service, DNS_T_A, hints, resolver, &err);

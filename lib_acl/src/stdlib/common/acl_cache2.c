@@ -273,25 +273,24 @@ ACL_CACHE2_INFO *acl_cache2_enter(ACL_CACHE2 *cache2,
 	/* 如果依然发现缓存池溢出，则采用删除最旧的数据策略 */
 	if (cache2->size >= cache2->max_size) {
 		pnode = (TREE_NODE*) avl_first(&cache->avl);
-		while (pnode) {
-			ACL_CACHE2_INFO *tmp = NULL;
+		while (pnode && cache2->size >= cache2->max_size) {
 			if (pnode->when_timeout == 0) {
 				pnode = AVL_NEXT(&cache->avl, pnode);
 				continue;
 			}
+
 			info  = pnode->head;
 			pnode = AVL_NEXT(&cache->avl, pnode);
-			while (info) {
+
+			while (info && cache2->size >= cache2->max_size) {
 				info2 = (ACL_CACHE2_INFO*) info;
 				info  = info->next;
-				if (info2->nrefer == 0) {
-					tmp = info2;
-					break;
+
+				if (info2->nrefer > 0) {
+					continue;
 				}
-			}
-			if (tmp != NULL) {
-				(void) acl_cache2_delete(cache2, tmp);
-				break;
+
+				(void) acl_cache2_delete(cache2, info2);
 			}
 		}
 	}
@@ -482,7 +481,7 @@ ACL_CACHE2_INFO *acl_cache2_update2(ACL_CACHE2 *cache2,
 		acl_myfree(pnode);
 	}
 
-	node.when_timeout = timeout > 0 ? timeout : 0;
+	node.when_timeout = timeout > 0 ? (time(NULL) + timeout) : 0;
 	pnode = (TREE_NODE*) avl_find(&cache->avl, &node, NULL);
 	if (pnode == NULL) {
 		pnode = (TREE_NODE*) acl_mycalloc(1, sizeof(TREE_NODE));

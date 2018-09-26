@@ -35,12 +35,24 @@ ACL_SOCKET acl_inet_bind(const struct addrinfo *res, unsigned flag)
 		return ACL_SOCKET_INVALID;
 	}
 
-	on = 1;
-	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
-		(const void *) &on, sizeof(on)) < 0) {
+	if (flag & ACL_INET_FLAG_EXCLUSIVE) {
+#if defined(SO_EXCLUSIVEADDRUSE)
+		on = 1;
+		if (setsockopt(fd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
+			(const void *) &on, sizeof(on)) < 0) {
 
-		acl_msg_warn("%s(%d): setsockopt(SO_REUSEADDR): %s",
-			__FILE__, __LINE__, acl_last_serror());
+			acl_msg_warn("%s(%d): setsockopt(SO_EXCLUSIVEADDRUSE)"
+				": %s", __FILE__, __LINE__, acl_last_serror());
+		}
+#endif
+	} else {
+		on = 1;
+		if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
+			(const void *) &on, sizeof(on)) < 0) {
+
+			acl_msg_warn("%s(%d): setsockopt(SO_REUSEADDR): %s",
+				__FILE__, __LINE__, acl_last_serror());
+		}
 	}
 
 #if defined(SO_REUSEPORT)

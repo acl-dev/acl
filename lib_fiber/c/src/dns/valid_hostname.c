@@ -112,9 +112,10 @@ int valid_hostaddr(const char *addr, int gripe)
 
 /* valid_ipv4_hostaddr - test dotted quad string for correctness */
 
-int valid_ipv4_hostaddr(const char *addr, int gripe)
+int valid_ipv4_hostaddr(const char *addr_in, int gripe)
 {
 	char   *myname = "valid_ipv4_hostaddr";
+	char    addr[128], *ptr;
 	const char *cp;
 	int     in_byte = 0;
 	int     byte_count = 0;
@@ -122,6 +123,13 @@ int valid_ipv4_hostaddr(const char *addr, int gripe)
 	int     ch;
 
 #define BYTES_NEEDED	4
+
+	SAFE_STRNCPY(addr, addr_in, sizeof(addr));
+	if ((ptr = strrchr(addr, '|')) != NULL) {
+		*ptr = 0;
+	} else if ((ptr = strrchr(addr, ':')) != NULL) {
+		*ptr = 0;
+	}
 
 	/*
 	 * Scary code to avoid sscanf() overflow nasties.
@@ -180,13 +188,25 @@ int valid_ipv4_hostaddr(const char *addr, int gripe)
 
 /* valid_ipv6_hostaddr - validate IPv6 address syntax */
 
-int valid_ipv6_hostaddr(const char *addr, int gripe)
+int valid_ipv6_hostaddr(const char *addr_in, int gripe)
 {
 	const char *myname = "valid_ipv6_hostaddr";
-	int     null_field = 0;
-	int     field = 0;
+	int   null_field = 0;
+	int   field = 0;
+	char  addr[128], *ptr;
 	const unsigned char *cp = (const unsigned char *) addr;
-	int     len = 0;
+	int   len = 0;
+
+	SAFE_STRNCPY(addr, addr_in, sizeof(addr));
+	if ((ptr = strrchr(addr, '|')) != NULL) {
+		*ptr = 0;
+	}
+
+	if ((ptr = strrchr(addr, '%')) != NULL) {
+		*ptr = 0;
+	}
+
+	cp = (const unsigned char *) addr;
 
 	/*
 	 * FIX 200501 The IPv6 patch validated syntax with getaddrinfo(), but I

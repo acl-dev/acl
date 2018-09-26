@@ -56,9 +56,10 @@ public:
 	 * 格式：
 	 *      针对TCP连接：IP:PORT，如：127.0.0.1:9001
 	 *      针对域套接口：{path}，如：/tmp/my.sock
+	 * @param flag {unsigned} 创建监听套接口时的打开标志位，见 server_socket.hpp
 	 * @return {bool} 监听是否成功
 	 */
-	bool open(const char* addr);
+	bool open(const char* addr, unsigned flag = 0);
 
 	/**
 	 * 获得服务器监听地址

@@ -43,7 +43,7 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 		return NULL;
 	}
 
-#ifdef	AF_UNIX
+#ifdef ACL_UNIX
 	/* this maybe unix addr, such as '/home/test/listen.sock' */
 	if (acl_valid_unix(addr)) {
 		listenfd = acl_unix_listen(addr, qlen, 0);
@@ -177,7 +177,7 @@ ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
 	if (addr == NULL || *addr == 0)
 		acl_msg_fatal("%s: addr null", myname);
 
-#if defined(AF_UNIX)
+#if defined(ACL_UNIX)
 	if (acl_valid_unix(addr))
 		connfd = acl_unix_connect(addr, block_mode, connect_timeout);
 	else
@@ -198,7 +198,7 @@ ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
 	family = acl_getsocktype(connfd);
 
 	switch (family) {
-#ifdef AF_UNIX
+#ifdef ACL_UNIX
 	case AF_UNIX:
 		client->type |= ACL_VSTREAM_TYPE_UNIX;
 		break;

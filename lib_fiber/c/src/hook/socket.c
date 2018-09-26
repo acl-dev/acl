@@ -338,7 +338,7 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	len = sizeof(err);
 	ret = getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (char *) &err, &len);
 	if (ret == 0 && err == 0) {
-		struct SOCK_ADDR saddr;
+		SOCKADDR saddr;
 		struct sockaddr *sa = (struct sockaddr*) &saddr;
 		socklen_t n = sizeof(saddr);
 

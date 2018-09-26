@@ -1,3 +1,7 @@
+
+90) 2018.9.20
+90.1) bugfix: getaddrinfo.c 修复一处 IPV6 相关问题
+
 89) 2018.5.17
 89.1) bugfix: 使用 poll 方法时，在初始化参数时不需要设置 POLLERR, POLLHUP
 
