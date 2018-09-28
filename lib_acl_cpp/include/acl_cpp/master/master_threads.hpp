@@ -1,5 +1,6 @@
 #pragma once
 #include "master_base.hpp"
+#include "../stdlib/thread_mutex.hpp"
 
 struct ACL_VSTREAM;
 struct ACL_EVENT;
@@ -160,6 +161,9 @@ protected:
 	}
 
 private:
+	thread_mutex lock_;
+
+	void push_back(server_socket* ss);
 	void run(int argc, char** argv);
 
 	// 当接收到一个客户端连接时回调此函数

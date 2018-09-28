@@ -127,6 +127,12 @@ void master_threads::thread_enable_read(socket_stream* stream)
 		logger_error("threads NULL!");
 }
 
+void master_threads::push_back(server_socket* ss)
+{
+	thread_mutex_guard guard(lock_);
+	servers_.push_back(ss);
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 void master_threads::service_pre_jail(void* ctx)
@@ -283,7 +289,7 @@ void master_threads::service_on_listen(void* ctx, ACL_VSTREAM* sstream)
 	master_threads* mt = (master_threads *) ctx;
 	acl_assert(mt != NULL);
 	server_socket* ss = new server_socket(sstream);
-	mt->servers_.push_back(ss);
+	mt->push_back(ss);
 	mt->proc_on_listen(*ss);
 }
 

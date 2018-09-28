@@ -30,13 +30,18 @@
 
 /* host_port - parse string into host and port, destroy string */
 
-const char *acl_host_port(char *buf, char **host, char *def_host,
-	char **port, char *def_service)
+const char *acl_host_port(char *buf, const char **host, const char *def_host,
+	const char **port, const char *def_service)
 {
 	char *cp = buf;
 
-	/* [host]:port, [host]:, [host]. */
-	if (*cp == '[') {
+	/* port */
+	if (acl_alldig(buf)) {
+		*port = buf;
+		*host = def_host;
+	}
+	/* [host]:port, [host]:, [host] */
+	else if (*cp == '[') {
 		*host = ++cp;
 		if ((cp = acl_split_at(cp, ']')) == 0)
 			return "missing \"]\"";
@@ -44,12 +49,12 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 			return "garbage after \"]\"";
 		*port = *cp ? cp : def_service;
 	}
-	/* host#port, host#, host, #port, port. */
+	/* host#port, host#, host, #port */
 	else if ((cp = acl_split_at_right(buf, ACL_ADDR_SEP)) != 0) {
 		*host = *buf ? buf : def_host;
 		*port = *cp ? cp : def_service;
 	}
-	/* host:port, host:, host, :port, port. */
+	/* host:port, host:, host, :port */
 	else if ((cp = acl_split_at_right(buf, ':')) != 0) {
 		*host = *buf ? buf : def_host;
 		*port = *cp ? cp : def_service;
@@ -86,9 +91,10 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 	return NULL;
 }
 
-static int host_port(char *buf, char **host, char **port)
+static int host_port(char *buf, const char **host, const char **port)
 {
-	const char *ptr = acl_host_port(buf, host, "", port, (char*) NULL);
+	const char *def_host = "";
+	const char *ptr = acl_host_port(buf, host, def_host, port, NULL);
 
 	if (ptr != NULL) {
 		acl_msg_error("%s(%d): invalid addr %s, %s",
@@ -118,7 +124,8 @@ struct addrinfo *acl_host_addrinfo(const char *addr, int type)
 {
 	int    err;
 	struct addrinfo hints, *res0;
-	char  *buf = acl_mystrdup(addr), *host = NULL, *port = NULL;
+	char  *buf = acl_mystrdup(addr);
+	const char *host = NULL, *port = NULL;
 
 	if (host_port(buf, &host, &port) < 0) {
 		acl_myfree(buf);

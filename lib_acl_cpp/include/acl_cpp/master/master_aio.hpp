@@ -1,4 +1,5 @@
 #pragma once
+#include "../stdlib/thread_mutex.hpp"
 #include "../stream/aio_handle.hpp"
 #include "../stream/aio_listen_stream.hpp"
 #include "master_base.hpp"
@@ -72,6 +73,10 @@ private:
 	 * @return {bool} 返回 true 以通知监听流继续监听
 	 */
 	virtual bool accept_callback(aio_socket_stream* client);
+
+private:
+	thread_mutex lock_;
+	void push_back(server_socket* ss);
 
 private:
 #if defined(_WIN32) || defined(_WIN64)
