@@ -269,10 +269,7 @@ bool socket_stream::alive(void) const
 {
 	if (stream_ == NULL)
 		return false;
-	if (acl_vstream_probe_status(stream_) == -1)
-		return false;
-	else
-		return true;
+	return acl_socket_alive(ACL_VSTREAM_SOCK(stream_)) ? true : false;
 }
 
 socket_stream& socket_stream::set_tcp_nodelay(bool on)

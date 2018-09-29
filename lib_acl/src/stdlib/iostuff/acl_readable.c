@@ -29,7 +29,13 @@
 
 /* acl_readable - see if file descriptor is readable */
 
-#ifdef ACL_UNIX
+#if defined(ACL_HAS_POLL)
+
+# if defined(ACL_WINDOWS)
+static acl_poll_fn __sys_poll = WSAPoll;
+# else
+static acl_poll_fn __sys_poll = poll;
+# endif
 
 int acl_readable(ACL_SOCKET fd)
 {
@@ -37,14 +43,18 @@ int acl_readable(ACL_SOCKET fd)
 	struct pollfd fds;
 	int   delay = 0;
 
-	fds.events = POLLIN;
+	fds.events = POLLIN | POLLPRI;
 	fds.fd = fd;
 
 	acl_set_error(0);
 
 	for (;;) {
-		switch (poll(&fds, 1, delay)) {
+		switch (__sys_poll(&fds, 1, delay)) {
+#ifdef ACL_WINDOWS
+		case SOCKET_ERROR:
+#else
 		case -1:
+#endif
 			if (acl_last_error() == ACL_EINTR)
 				continue;
 

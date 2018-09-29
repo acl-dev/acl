@@ -123,6 +123,13 @@ ACL_API int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec,
 	int count, int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
+ * 判断套接字是否正常
+ * @param fd {ACL_SOCKET}
+ * @return {int} 返回值 1 表示正常，返回 0 表示异常
+ */
+ACL_API	int acl_socket_alive(ACL_SOCKET fd);
+
+/**
  * 打开文件句柄
  * @param filepath {cosnt char*} 文件路径
  * @param flags {int} 打开标志位, O_RDONLY | O_WRONLY | O_RDWR, 
