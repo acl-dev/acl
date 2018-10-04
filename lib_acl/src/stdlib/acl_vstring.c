@@ -36,7 +36,7 @@
 static int vstring_extend(ACL_VBUF *bp, ssize_t incr)
 {
 	const char *myname = "vstring_extend";
-	ssize_t used = (unsigned) (bp->ptr - bp->data), new_len;
+	ssize_t used = (ssize_t) (bp->ptr - bp->data), new_len;
 	ACL_VSTRING *vp = (ACL_VSTRING *) bp;
 
 	if (vp->maxlen > 0 && (ssize_t) ACL_VSTRING_LEN(vp) >= vp->maxlen) {
@@ -289,7 +289,7 @@ static void mmap_buf_init(ACL_VSTRING *vp)
 		acl_msg_fatal("mmap error: %s", acl_last_serror());
 #elif defined(_WIN32) || defined(_WIN64)
 	vp->vbuf.hmap = CreateFileMapping(vp->vbuf.fd, NULL, PAGE_READWRITE, 0,
-		vp->maxlen, NULL);
+		(DWORD) vp->maxlen, NULL);
 	if (vp->vbuf.hmap == NULL)
 		acl_msg_fatal("CreateFileMapping: %s", acl_last_serror());
 	vp->vbuf.data = (unsigned char *) MapViewOfFile(vp->vbuf.hmap,
