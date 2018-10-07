@@ -686,6 +686,17 @@ public:
 	bool begin_with(const void* v, size_t len) const;
 
 	/**
+	 * 检查当前 string 对象是否以指定的字符串结束
+	 * @param s {const char*}
+	 * @param case_sensitive {bool} 是否区分大小写
+	 * @return {bool}
+	 */
+	bool end_with(const char* s, bool case_sensitive = true) const;
+	bool end_with(const char* s, size_t len, bool case_sensitive = true) const;
+	bool end_with(const string& s, bool case_sensitive = true) const;
+	bool end_with(const void* v, size_t len) const;
+
+	/**
 	 * 比较两个字符串对象的内容是否相同（区分大小写）
 	 * @param s {const string&} 输入的字符串对象的引用
 	 * @return {int} 0：表示二者相同； > 0：当前字符串内容大于输入的内容；

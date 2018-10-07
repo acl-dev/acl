@@ -898,7 +898,7 @@ bool string::begin_with(const char* s, bool case_sensitive /* = true */) const
 
 bool string::begin_with(const void* v, size_t n) const
 {
-	if (n == 0)
+	if (v == NULL || n == 0)
 		return false;
 	if (n > LEN(vbf_))
 		return false;
@@ -985,6 +985,31 @@ int string::rncompare(const char* s, size_t len, bool case_sensitive/* =true */)
 		return acl_strrncmp(STR(vbf_), s, len);		
 	else
 		return acl_strrncasecmp(STR(vbf_), s, len);
+}
+
+bool string::end_with(const char* s, bool case_sensitive /* = true */) const
+{
+	return rncompare(s, strlen(s), case_sensitive) == 0 ? true : false;
+}
+
+bool string::end_with(const char* s, size_t len, bool case_sensitive /* = true */) const
+{
+	return rncompare(s, len, case_sensitive) == 0 ? true : false;
+}
+
+bool string::end_with(const string& s, bool case_sensitive /* = true */) const
+{
+	return end_with(s.c_str(), s.size(), case_sensitive);
+}
+
+bool string::end_with(const void* v, size_t n) const
+{
+	if (v == NULL || n == 0)
+		return false;
+	if (n > LEN(vbf_))
+		return false;
+	size_t skip = LEN(vbf_) - n;
+	return memcpy(STR(vbf_) + skip, v, n) == 0 ? true : false;
 }
 
 char* string::c_str() const
