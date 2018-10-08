@@ -27,14 +27,14 @@ public:
 	 * @param backlog {int} 监听套接口队列长度
 	 * @param block {bool} 是阻塞模式还是非阻塞模式
 	 */
-	explicit server_socket(int backlog = 128, bool block = true);
+	server_socket(int backlog, bool block);
 
 	/**
 	 * 构造函数
 	 * @param flag {unsigned} 定义参见 OPEN_FLAG_XXX
 	 * @param backlog {int} 监听套接口队列长度
 	 */
-	explicit server_socket(unsigned flag, int backlog = 128);
+	server_socket(unsigned flag, int backlog);
 
 	/**
 	 * 构造函数，调用本构造函数后禁止再调用 open 方法
@@ -54,7 +54,8 @@ public:
 	server_socket(int fd);
 #endif
 
-	~server_socket();
+	server_socket(void);
+	~server_socket(void);
 
 	/**
 	 * 开始监听给定服务端地址
@@ -75,16 +76,16 @@ public:
 	 * 关闭已经打开的监听套接口
 	 * @return {bool} 是否正常关闭
 	 */
-	bool close();
+	bool close(void);
 
 	/**
 	 * 将监听套接口从服务监听对象中解绑
 	 * @return {SOCKET} 返回被解绑的句柄
 	 */
 #if defined(_WIN32) || defined(_WIN64)
-	SOCKET unbind();
+	SOCKET unbind(void);
 #else
-	int unbind();
+	int unbind(void);
 #endif
 
 	/**
@@ -101,7 +102,7 @@ public:
 	 * 获得监听的地址
 	 * @return {const char*} 返回值非空指针
 	 */
-	const char* get_addr() const
+	const char* get_addr(void) const
 	{
 		return addr_.c_str();
 	}
@@ -111,9 +112,9 @@ public:
 	 * @return {int}
 	 */
 #if defined(_WIN32) || defined(_WIN64)
-	SOCKET sock_handle() const
+	SOCKET sock_handle(void) const
 #else
-	int sock_handle() const
+	int sock_handle(void) const
 #endif
 	{
 		return fd_;
