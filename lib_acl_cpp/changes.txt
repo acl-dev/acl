@@ -2,6 +2,7 @@
 
 543) 2018.10.8
 543.1) feature: server_socket 构造方法分开多个，避免使用时产生歧义
+543.2) feature: master_udp 增加 proc_on_unbind 虚方法，用于当套接口关闭前的回调
 
 542) 2018.10.7
 542.1) feature: acl::string 添加 end_with 方法
