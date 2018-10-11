@@ -30,8 +30,8 @@
 
 /* host_port - parse string into host and port, destroy string */
 
-const char *acl_host_port(char *buf, const char **host, const char *def_host,
-	const char **port, const char *def_service)
+const char *acl_host_port(char *buf, char **host, char *def_host,
+	char **port, char *def_service)
 {
 	char *cp = buf;
 
@@ -91,9 +91,9 @@ const char *acl_host_port(char *buf, const char **host, const char *def_host,
 	return NULL;
 }
 
-static int host_port(char *buf, const char **host, const char **port)
+static int host_port(char *buf, char **host, char **port)
 {
-	const char *def_host = "";
+	char *def_host = "";
 	const char *ptr = acl_host_port(buf, host, def_host, port, NULL);
 
 	if (ptr != NULL) {
@@ -125,7 +125,7 @@ struct addrinfo *acl_host_addrinfo(const char *addr, int type)
 	int    err;
 	struct addrinfo hints, *res0;
 	char  *buf = acl_mystrdup(addr);
-	const char *host = NULL, *port = NULL;
+	char *host = NULL, *port = NULL;
 
 	if (host_port(buf, &host, &port) < 0) {
 		acl_myfree(buf);

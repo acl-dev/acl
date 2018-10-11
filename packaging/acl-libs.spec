@@ -1,4 +1,4 @@
-%define release_id 26
+%define release_id 27
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Oct 11 2018 zhengshuxin@qiyi.com 3.4.1-27-20181011.11
+- release 3.4.1-27
 
 * Fri Sep 28 2018 zhengshuxin@qiyi.com 3.4.1-26-20180928.17
 - bugfix: acl_inet_connect_ex of acl_inet_connect.c should support domain:port format
