@@ -14,8 +14,8 @@ extern "C" {
  * or
  * host:port, host:, host, :port, port.
  */
-ACL_API const char *acl_host_port(char *buf, char **host, char *def_host,
-		char **port, char *def_service);
+ACL_API const char *acl_host_port(char *buf, char **host,
+	char *def_host, char **port, char *def_service);
 
 ACL_API struct addrinfo *acl_host_addrinfo(const char *addr, int type);
 

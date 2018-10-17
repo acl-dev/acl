@@ -41,9 +41,14 @@ protected:
 	virtual void on_read(socket_stream* stream) = 0;
 
 	/**
-	 * 当绑定 UDP 地址成功后回调此虚方法，该方法在主线程中被调用
+	 * 当绑定 UDP 地址成功后回调此虚方法，该方法在子线程中被调用
 	 */
 	virtual void proc_on_bind(socket_stream&) {}
+
+	/**
+	 * 当解绑 UDP 地址时回调此虚方法，该方法在子线程中被调用
+	 */
+	virtual void proc_on_unbind(socket_stream&) {}
 
 	/**
 	 * 当线程初始化时该虚方法将被调用
@@ -65,12 +70,17 @@ protected:
 	 */
 	const char* get_conf_path(void) const;
 
+public:
+	void lock(void);
+	void unlock(void);
+
 private:
 	std::vector<socket_stream*> sstreams_;
 	thread_mutex lock_;
 
-	void push_back(socket_stream* ss);
 	void run(int argc, char** argv);
+	void push_back(socket_stream* ss);
+	void remove(socket_stream* ss);
 
 private:
 	// 当接收到一个客户端连接时回调此函数
@@ -78,6 +88,9 @@ private:
 
 	// 当绑定地址成功后的回调函数
 	static void service_on_bind(void*, ACL_VSTREAM*);
+
+	// 当解绑地址时的回调函数
+	static void service_on_unbind(void*, ACL_VSTREAM*);
 
 	// 当进程切换用户身份后调用的回调函数
 	static void service_pre_jail(void*);

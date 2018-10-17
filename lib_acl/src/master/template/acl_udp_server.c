@@ -163,6 +163,7 @@ static ACL_MASTER_SERVER_EXIT_FN        __service_exit;
 static ACL_MASTER_SERVER_THREAD_INIT_FN __thread_init;
 static ACL_MASTER_SERVER_SIGHUP_FN      __sighup_handler;
 static ACL_MASTER_SERVER_ON_BIND_FN	__server_on_bind;
+static ACL_MASTER_SERVER_ON_UNBIND_FN	__server_on_unbind;
 
 static void *__thread_init_ctx = NULL;
 
@@ -198,9 +199,7 @@ static void get_addr(const char *addr, char *buf, size_t size)
 #ifdef ACL_WINDOWS
 	snprintf(buf, size, "%s", addr);
 #else
-	if (strrchr(addr, ':') || strrchr(addr, ACL_ADDR_SEP)
-		|| acl_alldig(addr)) {
-
+	if (strrchr(addr, ':') || strrchr(addr, ACL_ADDR_SEP) || acl_alldig(addr)) {
 		snprintf(buf, size, "%s", addr);
 	} else {
 		snprintf(buf, size, "%s/%s/%s", acl_var_udp_queue_dir,
@@ -227,8 +226,13 @@ static void remove_stream(UDP_SERVER *server, const char *addr)
 			continue;
 		}
 
-		if (strcmp(local, addr) != 0)
+		if (strcmp(local, addr) != 0) {
 			continue;
+		}
+
+		if (__server_on_unbind) {
+			__server_on_unbind(__service_ctx, stream);
+		}
 
 		acl_event_disable_readwrite(server->event, stream);
 		acl_vstream_close(stream);
@@ -236,10 +240,11 @@ static void remove_stream(UDP_SERVER *server, const char *addr)
 		--server->count;
 		assert(server->count >= 0);
 
-		if (server->count == 0)
+		if (server->count == 0) {
 			server->streams[0] = NULL;
-		else
+		} else {
 			server->streams[i] = server->streams[server->count];
+		}
 
 		acl_msg_info("remove one stream ok, addr=%s", addr);
 		break;
@@ -277,12 +282,13 @@ static void server_add_addrs(UDP_SERVER *server, ACL_HTABLE *addrs)
 
 		if (stream == NULL) {
 			acl_msg_error("%s(%d): bind %s error %s", __FUNCTION__,
-				__LINE__, iter.key, acl_last_serror());
+				__LINE__, ptr, acl_last_serror());
 			continue;
 		}
 
-		if (__server_on_bind)
+		if (__server_on_bind) {
 			__server_on_bind(__service_ctx, stream);
+		}
 
 		server->streams[server->count++] = stream;
 		acl_event_enable_read(server->event, stream, 0,
@@ -293,16 +299,16 @@ static void server_add_addrs(UDP_SERVER *server, ACL_HTABLE *addrs)
 	}
 }
 
-static void server_rebinding(UDP_SERVER *server, ACL_HTABLE *table)
+static void server_rebinding(UDP_SERVER *server, ACL_HTABLE *addrs2add)
 {
 	ACL_ARGV *addrs2del = acl_argv_alloc(10);
 	int i;
 
 	for (i = 0; i < server->count; i++) {
-		char buf[128];
+		char addr[MAX];
 		ACL_VSTREAM *stream = server->streams[i];
 
-		if (acl_getsockname(SOCK(stream), buf, sizeof(buf)) == -1) {
+		if (acl_getsockname(SOCK(stream), addr, sizeof(addr)) == -1) {
 			acl_msg_error("%s(%d): getsockname error %s",
 				__FUNCTION__, __LINE__, acl_last_serror());
 			continue;
@@ -315,43 +321,47 @@ static void server_rebinding(UDP_SERVER *server, ACL_HTABLE *table)
 		 * addrs to be bound; If the stream's addr isn't in the table,
 		 * then the stream with the addr will be closed.
 		 */
-		if (acl_htable_locate(table, buf) != NULL)
-			acl_htable_delete(table, buf, NULL);
-		else
-			acl_argv_add(addrs2del, buf, NULL);
+		if (acl_htable_locate(addrs2add, addr) != NULL) {
+			acl_htable_delete(addrs2add, addr, NULL);
+		} else {
+			acl_argv_add(addrs2del, addr, NULL);
+		}
 	}
 
-	if (acl_argv_size(addrs2del) > 0)
+	if (acl_argv_size(addrs2del) > 0) {
 		server_del_addrs(server, addrs2del);
+	}
 
-	if (acl_htable_used(table) > 0)
-		server_add_addrs(server, table);
+	if (acl_htable_used(addrs2add) > 0) {
+		server_add_addrs(server, addrs2add);
+	}
 
 	acl_argv_free(addrs2del);
 }
 
 static void netlink_on_changed(void *ctx)
 {
-	UDP_SERVER *server = (UDP_SERVER *) ctx;
-	ACL_IFCONF *ifconf = acl_ifconf_search(__service_name);
-	ACL_HTABLE *table  = acl_htable_create(10, 0);
+	UDP_SERVER *server    = (UDP_SERVER *) ctx;
+	ACL_IFCONF *ifconf    = acl_ifconf_search(__service_name);
+	ACL_HTABLE *addrs2add = acl_htable_create(10, 0);
 	ACL_ITER    iter;
 	char        addr[MAX];
 
 	if (ifconf == NULL) {
 		acl_msg_error("%s(%d): acl_ifconf_search null, service=%s",
 			__FUNCTION__, __LINE__, __service_name);
+		acl_htable_free(addrs2add, NULL);
 		return;
 	}
 
 	acl_foreach(iter, ifconf) {
 		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
 		get_addr(ifaddr->addr, addr, sizeof(addr));
-		acl_htable_enter(table, addr, addr);
+		acl_htable_enter(addrs2add, addr, addr);
 	}
 
-	server_rebinding(server, table);
-	acl_htable_free(table, NULL);
+	server_rebinding(server, addrs2add);
+	acl_htable_free(addrs2add, NULL);
 	acl_free_ifaddrs(ifconf);
 }
 
@@ -1059,6 +1069,10 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		case ACL_MASTER_SERVER_ON_BIND:
 			__server_on_bind =
 				va_arg(ap, ACL_MASTER_SERVER_ON_BIND_FN);
+			break;
+		case ACL_MASTER_SERVER_ON_UNBIND:
+			__server_on_unbind =
+				va_arg(ap, ACL_MASTER_SERVER_ON_UNBIND_FN);
 			break;
 		default:
 			acl_msg_panic("%s: unknown type: %d", myname, key);

@@ -31,6 +31,7 @@ void master_udp::run(int argc, char** argv)
 		ACL_MASTER_SERVER_CTX, this,
 		ACL_APP_CTL_THREAD_INIT_CTX, this,
 		ACL_MASTER_SERVER_ON_BIND, service_on_bind,
+		ACL_MASTER_SERVER_ON_UNBIND, service_on_unbind,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
 		ACL_MASTER_SERVER_EXIT, service_exit,
@@ -109,6 +110,31 @@ void master_udp::push_back(socket_stream* ss)
 	sstreams_.push_back(ss);
 }
 
+void master_udp::remove(socket_stream* ss)
+{
+	thread_mutex_guard guard(lock_);
+
+	for (std::vector<socket_stream*>::iterator it = sstreams_.begin();
+		it != sstreams_.end(); ++it) {
+		if (*it == ss) {
+			sstreams_.erase(it);
+			return;
+		}
+	}
+
+	logger_error("not found ss=%p", ss);
+}
+
+void master_udp::lock(void)
+{
+	lock_.lock();
+}
+
+void master_udp::unlock(void)
+{
+	lock_.unlock();
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 void master_udp::service_main(void* ctx, ACL_VSTREAM *stream)
@@ -176,6 +202,27 @@ void master_udp::service_on_bind(void* ctx, ACL_VSTREAM* stream)
 	mu->push_back(ss);
 
 	mu->proc_on_bind(*ss);
+}
+
+void master_udp::service_on_unbind(void* ctx, ACL_VSTREAM* stream)
+{
+	master_udp* mu = (master_udp *) ctx;
+	acl_assert(mu);
+
+	socket_stream* ss = (socket_stream *) stream->context;
+	if (ss == NULL) {
+		logger_error("stream->context null, stream=%p", stream);
+		return;
+	} else if (ss->get_vstream() != stream) {
+		logger_error("invalid stream=%p, ss->get_vstream()=%p",
+			stream, ss->get_vstream());
+		return;
+	}
+
+	mu->proc_on_unbind(*ss);
+	mu->remove(ss);
+	ss->unbind();
+	delete ss;
 }
 
 int master_udp::service_on_sighup(void* ctx, ACL_VSTRING* buf)

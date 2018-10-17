@@ -148,6 +148,12 @@ bool master_aio::accept_callback(aio_socket_stream* client)
 	return on_accept(client);
 }
 
+void master_aio::push_back(server_socket* ss)
+{
+	thread_mutex_guard guard(lock_);
+	servers_.push_back(ss);
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 class aio_close_callback : public aio_callback
@@ -234,7 +240,7 @@ void master_aio::service_on_listen(void* ctx, ACL_VSTREAM *sstream)
 	master_aio* ma = (master_aio *) ctx;
 	acl_assert(ma);
 	server_socket* ss = new server_socket(sstream);
-	ma->servers_.push_back(ss);
+	ma->push_back(ss);
 	ma->proc_on_listen(*ss);
 }
 

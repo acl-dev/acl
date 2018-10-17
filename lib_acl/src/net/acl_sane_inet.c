@@ -166,39 +166,49 @@ size_t acl_inet_ntop(const struct sockaddr *sa, char *buf, size_t size)
 		char   ip[IPLEN];
 		struct sockaddr_in *in = (struct sockaddr_in*) sa;
 
-		if (!inet_ntop(sa->sa_family, &in->sin_addr, ip, IPLEN))
+		if (!inet_ntop(sa->sa_family, &in->sin_addr, ip, IPLEN)) {
 			return 0;
+		}
+
 		port = ntohs(in->sin_port);
-		if (port > 0)
+		if (port > 0) {
 			snprintf(buf, size, "%s:%d", ip, port);
-		else
+		} else {
 			snprintf(buf, size, "%s", ip);
+		}
 		return sizeof(struct sockaddr_in);
 #ifdef AF_INET6
 	} else if (sa->sa_family == AF_INET6) {
 		int    port;
-		char   ip[IPLEN];
-		char   ifname[IF_NAMESIZE], *ptr;
+		char   ip[IPLEN], ifname[IF_NAMESIZE], *ptr;
 		struct sockaddr_in6 *in6 = (struct sockaddr_in6*) sa;
 
-		if (!inet_ntop(sa->sa_family, &in6->sin6_addr, ip, IPLEN))
+		if (!inet_ntop(sa->sa_family, &in6->sin6_addr, ip, IPLEN)) {
 			return 0;
+		}
+
 		ptr = if_indextoname(in6->sin6_scope_id, ifname);
-		if (ptr == NULL)
+		if (ptr == NULL) {
 			ifname[0] = 0;
+		}
 		port = ntohs(in6->sin6_port);
 		if (port <= 0) {
 			if (strcmp(ip, "::1") == 0) {
 				snprintf(buf, size, "%s", ip);
-			} else {
+			} else if (ifname[0] != 0) {
 				snprintf(buf, size, "%s%%%s", ip, ifname);
+			} else {
+				snprintf(buf, size, "%s", ip);
 			}
 		} else if (strcmp(ip, "::1") == 0) {  /* for local IPV6 */
 			snprintf(buf, size, "%s%c%d", ip, ACL_ADDR_SEP, port);
-		} else {
+		} else if (ifname[0] != 0) {
 			snprintf(buf, size, "%s%%%s%c%d",
 				ip, ifname, ACL_ADDR_SEP, port);
+		} else {
+			snprintf(buf, size, "%s%c%d", ip, ACL_ADDR_SEP, port);
 		}
+
 		return sizeof(struct sockaddr_in6);
 #endif
 #ifdef ACL_UNIX
@@ -216,7 +226,7 @@ size_t acl_inet_ntop(const struct sockaddr *sa, char *buf, size_t size)
 size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst)
 {
 	if (af == AF_INET) {
-		char   buf[1024], *ptr;
+		char   buf[256], *ptr;
 		int    port = 0;
 		struct sockaddr_in *in;
 
@@ -230,8 +240,10 @@ size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst)
 		}
 
 		in = (struct sockaddr_in *) dst;
-		if (inet_pton(af, buf, &in->sin_addr) == 0)
+		if (inet_pton(af, buf, &in->sin_addr) == 0) {
 			return 0;
+		}
+
 		in->sin_port   = htons(port);
 		dst->sa_family = AF_INET;
 		return sizeof(struct sockaddr_in);
@@ -240,16 +252,17 @@ size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst)
 # ifdef INET_PTON_USE_GETADDRINFO
 		struct addrinfo *res = acl_host_addrinfo(src, 0);
 		size_t addrlen;
-		if (res == NULL)
+		if (res == NULL) {
 			return 0;
+		}
 		addrlen = (size_t) res->ai_addrlen;
 		memcpy(dst, res->ai_addr, res->ai_addrlen);
 		freeaddrinfo(res);
 
 		return addrlen;
 # else
-		char   buf[256], *ptr;
 		int    port = 0;
+		char   buf[256], *ptr;
 		struct sockaddr_in6 *in6;
 
 		ACL_SAFE_STRNCPY(buf, src, sizeof(buf));
@@ -260,21 +273,24 @@ size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst)
 		}
 
 		/* when '%' was appended to the IPV6's addr */
-		if ((ptr = strrchr(buf, '%')))
+		if ((ptr = strrchr(buf, '%'))) {
 			*ptr++ = 0;
+		}
 
 		in6 = (struct sockaddr_in6 *) dst;
 		memset(in6, 0, sizeof(struct sockaddr_in6));
 
 		in6->sin6_family = AF_INET6;
-		in6->sin6_port = htons(port);
+		in6->sin6_port   = htons(port);
 		if (ptr && *ptr && !(in6->sin6_scope_id = if_nametoindex(ptr))) {
 			acl_msg_error("%s(%d): if_nametoindex error %s",
 				__FUNCTION__, __LINE__, acl_last_serror());
 			return 0;
 		}
-		if (inet_pton(af, buf, &in6->sin6_addr) == 0)
+
+		if (inet_pton(af, buf, &in6->sin6_addr) == 0) {
 			return 0;
+		}
 		return sizeof(struct sockaddr_in6);
 # endif  /* !IPV6_INET_PTON_HAS_BUG */
 #endif
@@ -283,8 +299,9 @@ size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst)
 		struct sockaddr_un *un = (struct sockaddr_un *) dst;
 		size_t len = strlen(src) + 1;
 
-		if (sizeof(un->sun_path) < len)
+		if (sizeof(un->sun_path) < len) {
 			len = sizeof(un->sun_path);
+		}
 
 		dst->sa_family = AF_UNIX;
 # ifdef HAS_SUN_LEN
@@ -294,8 +311,7 @@ size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst)
 		return sizeof(struct sockaddr_un);
 #endif
 	} else {
-		acl_msg_error("%s(%d): invalid af=%d",
-			__FUNCTION__, __LINE__, af);
+		acl_msg_error("%s(%d): invalid af=%d", __FUNCTION__, __LINE__, af);
 		return 0;
 	}
 }
@@ -304,14 +320,15 @@ size_t acl_sane_pton(const char *src, struct sockaddr *dst)
 {
 	int af;
 
-	if (acl_valid_ipv4_hostaddr(src, 0))
+	if (acl_valid_ipv4_hostaddr(src, 0)) {
 		af = AF_INET;
-	else if (acl_valid_ipv6_hostaddr(src, 0))
+	} else if (acl_valid_ipv6_hostaddr(src, 0)) {
 		af = AF_INET6;
-	else if (acl_valid_unix(src))
+	} else if (acl_valid_unix(src)) {
 		af = AF_UNIX;
-	else
+	} else {
 		return 0;
+	}
 
 	return acl_inet_pton(af, src, dst);
 }

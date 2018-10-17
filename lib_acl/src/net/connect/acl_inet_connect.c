@@ -187,6 +187,8 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
 		ptr = strrchr(buf, ACL_ADDR_SEP);
 		if (ptr == NULL)
 			ptr = strrchr(buf, ':');
+	} else if (!(ptr = strrchr(buf, ACL_ADDR_SEP))) {
+		ptr = strrchr(buf, ':');
 	}
 
 	if (ptr == NULL) {
