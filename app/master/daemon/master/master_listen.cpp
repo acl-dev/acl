@@ -29,8 +29,9 @@ static int master_listen_sock(ACL_MASTER_SERV *serv)
 	}
 
 	if (serv->listen_fd_count != acl_array_size(serv->addrs))
-		acl_msg_panic("listen_fd_count(%d) != addrs's size(%d)",
-			serv->listen_fd_count, acl_array_size(serv->addrs));
+		acl_msg_panic("%s(%d): listen_fd_count(%d) != addrs's size(%d)",
+			myname, __LINE__, serv->listen_fd_count,
+			acl_array_size(serv->addrs));
 
 	i = 0;
 	acl_foreach(iter, serv->addrs) {
@@ -57,7 +58,8 @@ static int master_listen_sock(ACL_MASTER_SERV *serv)
 			break;
 		default:
 			service_type = 0; /* avoid compile warning */
-			acl_msg_panic("invalid type: %d, addr: %s",
+			serv->listen_fds[i] = ACL_SOCKET_INVALID;
+			acl_msg_error("invalid type: %d, addr: %s",
 				addr->type, addr->addr);
 			break;
 		}
@@ -140,13 +142,17 @@ static int master_bind_udp(ACL_MASTER_SERV *serv)
 		ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR*) iter.data;
 		switch (addr->type) {
 		case ACL_MASTER_SERV_TYPE_UDP:
+		case ACL_MASTER_SERV_TYPE_INET:
+		case ACL_MASTER_SERV_TYPE_UNIX:
+		case ACL_MASTER_SERV_TYPE_SOCK:
 			serv->listen_streams[i] = acl_vstream_bind(addr->addr,
 				acl_var_master_rw_timeout, serv->inet_flags);
 			break;
 		default:
-			acl_msg_panic("%s(%d), %s: invalid type: %d, addr: %s",
+			acl_msg_error("%s(%d), %s: invalid type: %d, addr: %s",
 				__FILE__, __LINE__, myname,
 				addr->type, addr->addr);
+			serv->listen_streams[i] = NULL;
 			break;
 		}
 
