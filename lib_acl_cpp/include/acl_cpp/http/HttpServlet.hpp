@@ -100,7 +100,7 @@ public:
 	 * @return {bool} 返回处理结果，返回 false 表示处理失败或处理成功且不保持
 	 *  长连接，应关闭连接
 	 */
-	bool doRun(void);
+	virtual bool doRun(void);
 
 	/**
 	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数
@@ -111,7 +111,7 @@ public:
 	 *  的关闭情况，这样可以方便与 acl_master 架构结合
 	 * @return {bool} 返回处理结果
 	 */
-	bool doRun(session& session, socket_stream* stream = NULL);
+	virtual bool doRun(session& session, socket_stream* stream = NULL);
 
 	/**
 	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数，
@@ -120,7 +120,7 @@ public:
 	 * @param stream {socket_stream*} 含义同上
 	 * @return {bool} 返回处理结果
 	 */
-	bool doRun(const char* memcached_addr, socket_stream* stream);
+	virtual bool doRun(const char* memcached_addr, socket_stream* stream);
 
 	/**
 	 * 当 HTTP 请求为 GET 方式时调用的虚函数

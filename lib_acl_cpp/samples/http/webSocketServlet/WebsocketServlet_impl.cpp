@@ -75,41 +75,40 @@ bool WebsocketServlet_impl::doPost(acl::HttpServletRequest& req,
 	return res.write(buf) && res.write(NULL, 0);
 }
 
-bool WebsocketServlet_impl::on_ping(const char *buf, unsigned long long  len)
+bool WebsocketServlet_impl::onPing(const char*, unsigned long long)
 {
-	return send_pong();
+	return sendPong();
 }
 
 
-bool WebsocketServlet_impl::on_pong(const char *buf, unsigned long long  len)
+bool WebsocketServlet_impl::onPong(const char*, unsigned long long)
 {
-	return send_ping();
+	return sendPing();
 }
-bool WebsocketServlet_impl::on_message(char *data, unsigned long long len, bool text)
+
+bool WebsocketServlet_impl::onMessage(char *data, unsigned long long len, bool text)
 {
+	(void) text;
+
 	switch (step_)
 	{
 	case 0:
-	{
-		printf("FileName:%s\n",data);
+		printf("FileName:%s\n", data);
 		filename_.append(data, len);
 		step_++;
-	}
-	break;
+		break;
 	case 1:
-	{
 		printf("FileSize:%s\n", data);
-		filesize_ = std::strtol(data, 0, 10);
+		filesize_ = strtol(data, 0, 10);
 		step_++;
-	}
-	break;
+		break;
 	case 2:
-	{
 		if (!file_)
 		{
 			file_ = new acl::ofstream();
 			file_->open_trunc(filename_);
 		}
+
 		file_->write(data, len);
 		current_filesize_ += len;
 		if (current_filesize_ == filesize_)
@@ -124,8 +123,7 @@ bool WebsocketServlet_impl::on_message(char *data, unsigned long long len, bool 
 			current_filesize_ = 0;
 			step_ = 0;
 		}
-	}
-	break;
+		break;
 	default:
 		break;
 	}

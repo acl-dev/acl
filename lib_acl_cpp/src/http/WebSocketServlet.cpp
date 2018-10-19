@@ -23,34 +23,50 @@ namespace acl
 {
 
 WebSocketServlet::WebSocketServlet(socket_stream* stream, session* session)
-	: HttpServlet(stream, session)
-	, max_msg_len_(100 * 1024*1024)
-	, ws_(NULL)
+: HttpServlet(stream, session)
+, max_msg_len_(100 * 1024*1024)
+, ws_(NULL)
+, buffer_(NULL)
+, wpos_(0)
+, opcode_(0)
 {
-
 }
 
 WebSocketServlet::WebSocketServlet(socket_stream* stream, 
 	const char* memcache_addr)
-	:HttpServlet(stream, memcache_addr)
-	, max_msg_len_(100 * 1024 * 1024)
-	, ws_(NULL)
+: HttpServlet(stream, memcache_addr)
+, max_msg_len_(100 * 1024 * 1024)
+, ws_(NULL)
+, buffer_(NULL)
+, wpos_(0)
+, opcode_(0)
 {
-
 }
 
 WebSocketServlet::WebSocketServlet(void)
-	:max_msg_len_(100 * 1024 * 1024),
-	ws_(NULL)
+: max_msg_len_(100 * 1024 * 1024)
+, ws_(NULL)
+, buffer_(NULL)
+, wpos_(0)
+, opcode_(0)
 {
-
 }
 
 WebSocketServlet::~WebSocketServlet(void)
 {
-	if (ws_)
-		delete ws_;
-	ws_ = NULL;
+	delete ws_;
+	if (buffer_)
+		acl_myfree(buffer_);
+}
+
+bool WebSocketServlet::doRun(session& session, socket_stream* stream /* = NULL */)
+{
+	return HttpServlet::doRun(session, stream);
+}
+
+bool WebSocketServlet::doRun(const char* memcached_addr, socket_stream* stream)
+{
+	return HttpServlet::doRun(memcached_addr, stream);
 }
 
 bool WebSocketServlet::doRun(void)
@@ -58,9 +74,9 @@ bool WebSocketServlet::doRun(void)
 	if (!ws_)
 	{
 		bool ret = HttpServlet::doRun();
-		//websocket upgrade ok.
-		//maybe http without keepalive ,
-		//return false,framework will close this connection.
+		// websocket upgrade ok.
+		// maybe http without keepalive ,
+		// return false, framework will close this connection.
 		if (ws_)
 			return true;
 		return ret;
@@ -78,26 +94,26 @@ bool WebSocketServlet::doRun(void)
 
 	if (len > 0)
 	{
-		if (!recv_buffer_)
-			recv_buffer_ = (char*) acl_mymalloc((size_t)len + 1);
+		if (!buffer_)
+			buffer_ = (char*) acl_mymalloc((size_t) len + 1);
 		else
 			//frame not finish.
-			recv_buffer_ = (char*) acl_myrealloc(recv_buffer_,
-				write_pos_ + (size_t)len + 1);
+			buffer_ = (char*) acl_myrealloc(buffer_,
+				wpos_ + (size_t) len + 1);
 
-		if (ws_->read_frame_data(recv_buffer_+ write_pos_, (size_t) len) < 0)
+		if (ws_->read_frame_data(buffer_ + wpos_, (size_t) len) < 0)
 		{
-			write_pos_ = 0;
-			acl_myfree(recv_buffer_);
-			recv_buffer_ = NULL;
+			acl_myfree(buffer_);
+			buffer_ = NULL;
+			wpos_   = 0;
 			return false;
 		}
-		write_pos_ += (int) len;
-		recv_buffer_[write_pos_] = '\0';
+		wpos_ += (int) len;
+		buffer_[wpos_] = '\0';
 	}
 
-	int opcode = ws_->get_frame_opcode();
-	bool ret = false;
+	int  opcode = ws_->get_frame_opcode();
+	bool ret    = false;
 
 	if (ws_->get_frame_fin() == false)
 	{
@@ -114,17 +130,17 @@ bool WebSocketServlet::doRun(void)
 	switch (opcode)
 	{
 	case FRAME_PING:
-		ret = on_ping(recv_buffer_, write_pos_);
+		ret = onPing(buffer_, wpos_);
 		break;
 	case FRAME_PONG:
-		ret = on_pong(recv_buffer_, write_pos_);
+		ret = onPong(buffer_, wpos_);
 		break;
 	case FRAME_CLOSE:
-		on_close();
+		onClose();
 		break;
 	case FRAME_TEXT:
 	case FRAME_BINARY:
-		ret = on_message(recv_buffer_, write_pos_,
+		ret = onMessage(buffer_, wpos_,
 			ws_->get_frame_opcode() == FRAME_TEXT);
 		break;
 	default:
@@ -133,17 +149,17 @@ bool WebSocketServlet::doRun(void)
 		break;
 	}
 
-	if (recv_buffer_)
+	if (buffer_)
 	{
-		acl_myfree(recv_buffer_);
-		recv_buffer_ = NULL;
-		write_pos_ = 0;
+		acl_myfree(buffer_);
+		buffer_ = NULL;
+		wpos_   = 0;
 	}
 
 	return ret;
 }
 
-bool WebSocketServlet::send_binary(const char *buffer, int len)
+bool WebSocketServlet::sendBinary(const char *buffer, int len)
 {
 	ws_->set_frame_opcode(FRAME_BINARY);
 	ws_->set_frame_fin(true);
@@ -151,7 +167,7 @@ bool WebSocketServlet::send_binary(const char *buffer, int len)
 	return ws_->send_frame_data(buffer, len);
 }
 
-bool WebSocketServlet::send_text(const char *buffer)
+bool WebSocketServlet::sendText(const char *buffer)
 {
 	ws_->set_frame_opcode(FRAME_TEXT);
 	ws_->set_frame_fin(true);
@@ -159,7 +175,7 @@ bool WebSocketServlet::send_text(const char *buffer)
 	return ws_->send_frame_data(buffer, strlen(buffer));
 }
 
-bool WebSocketServlet::send_pong(const char *text)
+bool WebSocketServlet::sendPong(const char *text)
 {
 	size_t len = !text ? 0 : strlen(text);
 	ws_->set_frame_opcode(FRAME_PONG);
@@ -168,7 +184,7 @@ bool WebSocketServlet::send_pong(const char *text)
 	return ws_->send_frame_data(text, len);
 }
 
-bool WebSocketServlet::send_ping(const char *text)
+bool WebSocketServlet::sendPing(const char *text)
 {
 	size_t len = !text ? 0 : strlen(text);
 	ws_->set_frame_opcode(FRAME_PING);
@@ -180,11 +196,11 @@ bool WebSocketServlet::send_ping(const char *text)
 bool WebSocketServlet::doWebsocket(HttpServletRequest&, HttpServletResponse&)
 {
 	acl_assert(!ws_);
-	ws_ = new websocket(*getStream());
+	ws_ = NEW websocket(*getStream());
 	return true;
 }
 
-void WebSocketServlet::on_close(void)
+void WebSocketServlet::onClose(void)
 {
 }
 
