@@ -161,6 +161,7 @@ static void usage(const char* procname)
 	printf("usage: %s -h[help]\r\n"
 		"-s redis_addr[127.0.0.1:6379]\r\n"
 		"-p password[default: \"\"]\r\n"
+		"-d dbnum[default: 0]\r\n"
 		"-n count\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-T rw_timeout[default: 10]\r\n"
@@ -170,10 +171,10 @@ static void usage(const char* procname)
 
 int main(int argc, char* argv[])
 {
-	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
+	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10, dbnum = 0;
 	acl::string addr("127.0.0.1:6379"), command, passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:T:a:p:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:T:a:p:d:")) > 0)
 	{
 		switch (ch)
 		{
@@ -198,6 +199,9 @@ int main(int argc, char* argv[])
 		case 'p':
 			passwd = optarg;
 			break;
+		case 'd':
+			dbnum = atoi(optarg);
+			break;
 		default:
 			break;
 		}
@@ -205,8 +209,12 @@ int main(int argc, char* argv[])
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
+
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	client.set_password(passwd);
+	if (dbnum > 0)
+		client.set_db(dbnum);
+
 	acl::redis cmd(&client);
 
 	bool ret;

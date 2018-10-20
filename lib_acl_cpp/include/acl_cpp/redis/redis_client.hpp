@@ -13,9 +13,9 @@ class redis_result;
 class redis_request;
 
 /**
- * redis 客户端对象网络通信类，通过此类将组织好的 redis 请求命令发给 redis 服务端，
- * 同时接收 redis 服务端响应结果；该类继承于 connect_client 类，主要为了使用连接池
- * 功能。
+ * redis 客户端对象网络通信类，通过此类将组织好的 redis 请求命令发给 redis
+ * 服务端，同时接收 redis 服务端响应结果；该类继承于 connect_client 类，主要
+ * 为了使用连接池功能。
  * redis client network IO class. The redis request is sent to server
  * and the server's respond is handled in this class. The class inherits
  * connect_client, which can use the connection pool function.
@@ -45,6 +45,25 @@ public:
 	void set_password(const char* pass);
 
 	/**
+	 * 设置本连接所对应的 db，当连接建立后如果指定的 db 值大于 0，则内部自动
+	 * 选择对应的 db，注意：该功能仅针对非集群模式
+	 * if db > 0 in no cluster mode, select the db when the connection
+	 * is created.
+	 * @param dbnum {int}
+	 */
+	void set_db(int dbnum);
+
+	/**
+	 * 获得本连接所选择的 db
+	 * get db for the connection
+	 * @return {int}
+	 */
+	int get_db(void) const
+	{
+		return dbnum_;
+	}
+
+	/**
 	 * 获得当前连接的服务器地址，即由 redis_client 构造时传入的地址
 	 * @return {const char*}
 	 */
@@ -66,13 +85,13 @@ public:
 	 * check if the connection has been finish
 	 * @return {bool}
 	 */
-	bool eof() const;
+	bool eof(void) const;
 
 	/**
 	 * 关闭网络连接
 	 * close the connection to the redis-server
 	 */
-	void close();
+	void close(void);
 
 	/**
 	 * 获得网络连接流
@@ -80,7 +99,7 @@ public:
 	 * @return {acl::socket_stream*} 如果连接已经关闭则返回 NULL
 	 *  NULL will be returned if the connectioin has been closed
 	 */
-	socket_stream* get_stream();
+	socket_stream* get_stream(void);
 
 	/**
 	 * 对于请求数据包，此函数设置在组装请求数据包的时候合成一个数据包发送
@@ -137,18 +156,20 @@ public:
 
 protected:
 	// 基类虚函数
-	virtual bool open();
+	// @override
+	virtual bool open(void);
 
 private:
 	socket_stream conn_;
-	bool  check_addr_;
-	char* addr_;
-	char* pass_;
-	bool  retry_;
-	bool  authing_;
-	string  buf_;
-	bool slice_req_;
-	bool slice_res_;
+	bool   check_addr_;
+	char*  addr_;
+	char*  pass_;
+	bool   retry_;
+	bool   authing_;
+	string buf_;
+	bool   slice_req_;
+	bool   slice_res_;
+	int    dbnum_;
 
 	redis_result* get_redis_objects(dbuf_pool* pool, size_t nobjs);
 	redis_result* get_redis_object(dbuf_pool* pool);

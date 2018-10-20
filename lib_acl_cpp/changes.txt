@@ -1,5 +1,8 @@
 修改历史列表：
 
+545) 2018.10.21
+545.1) feature: redis_client, redis_client_pool 在非集群模式下创建连接时自动选择db
+
 544) 2018.10.20
 544.1) bugfix: websocket::read_frame_data 被循环调用时，掩码使用方式有误
 544.2) bugfix: WebSocketServlet.cpp 中有多个成员变量未初始化

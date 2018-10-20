@@ -37,16 +37,36 @@ public:
 	 */
 	redis_client_pool& set_password(const char* pass);
 
+	/**
+	 * 在非集群模式下，本方法用来设置连接建立后所选择的db
+	 * in no-cluster mode, the method is used to select the db after
+	 * the connection is created
+	 * @param dbnum {int}
+	 * @return {redis_client_pool&}
+	 */
+	redis_client_pool& set_db(int dbnum);
+
+	/**
+	 * 获得本连接池所对应的db
+	 * get the current db of the connections pool
+	 * @return {int}
+	 */
+	int get_db(void) const
+	{
+		return dbnum_;
+	}
+
 protected:
 	/**
 	 * 基类纯虚函数: 调用此函数用来创建一个新的连接
 	 * virtual function in class connect_pool to create a new connection
 	 * @return {connect_client*}
 	 */
-	connect_client* create_connect();
+	connect_client* create_connect(void);
 
 private:
 	char* pass_;
+	int   dbnum_;
 };
 
 } // namespace acl

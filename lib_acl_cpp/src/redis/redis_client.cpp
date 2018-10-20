@@ -23,13 +23,14 @@ redis_client::redis_client(const char* addr, int conn_timeout /* = 60 */,
 , authing_(false)
 , slice_req_(false)
 , slice_res_(false)
+, dbnum_(0)
 {
 	addr_ = acl_mystrdup(addr);
 	pass_ = NULL;
 	set_timeout(conn_timeout, rw_timeout);
 }
 
-redis_client::~redis_client()
+redis_client::~redis_client(void)
 {
 	acl_myfree(addr_);
 	if (pass_)
@@ -54,7 +55,13 @@ void redis_client::set_password(const char* pass)
 		pass_ = NULL;
 }
 
-socket_stream* redis_client::get_stream()
+void redis_client::set_db(int dbnum)
+{
+	if (dbnum > 0)
+		dbnum_ = dbnum;
+}
+
+socket_stream* redis_client::get_stream(void)
 {
 	if (conn_.opened())
 		return (socket_stream*) &conn_;
@@ -86,7 +93,7 @@ bool redis_client::check_connection(socket_stream& conn)
 	return true;
 }
 
-bool redis_client::open()
+bool redis_client::open(void)
 {
 	if (conn_.opened())
 		return true;
@@ -98,7 +105,7 @@ bool redis_client::open()
 	}
 
 	// 如果连接密码非空，则尝试用该密码向 redis-server 认证合法性
-	if (pass_ && *pass_ && !authing_)
+	if (pass_ && *pass_) // && !authing_)
 	{
 		// 设置当前连接的状态为认证状态，以避免进入死循环
 		authing_ = true;
@@ -106,6 +113,7 @@ bool redis_client::open()
 		if (connection.auth(pass_) == false)
 		{
 			authing_ = false;
+			conn_.close();
 			logger_error("auth error, addr: %s, passwd: %s",
 				addr_, pass_);
 			return false;
@@ -113,16 +121,26 @@ bool redis_client::open()
 		authing_ = false;
 	}
 
+	if (dbnum_ > 0)
+	{
+		redis_connection connection(this);
+		if (connection.select(dbnum_) == false)
+		{
+			conn_.close();
+			logger_error("select db error, db=%d", dbnum_);
+			return false;
+		}
+	}
 	return true;
 }
 
-void redis_client::close()
+void redis_client::close(void)
 {
 	if (conn_.opened())
 		conn_.close();
 }
 
-bool redis_client::eof() const
+bool redis_client::eof(void) const
 {
 	return conn_.eof();
 }

@@ -2,6 +2,24 @@
 
 static acl::string __keypre("test_key");
 
+static bool test_set(acl::redis_client* conn, int i)
+{
+	acl::redis_string cmd(conn);
+	acl::string key, val;
+
+	key.format("%s_%d", __keypre.c_str(), i);
+	val.format("val_%d", i);
+	if (cmd.set(key, val) == false)
+	{
+		printf("set key: %s val: %s error: %s\r\n", key.c_str(),
+			val.c_str(), cmd.result_error());
+		return false;
+	}
+	else if (i < 10)
+		printf("set ok, key=%s, value=%s\r\n", key.c_str(), val.c_str());
+	return true;
+}
+
 static bool test_del(acl::redis_key& redis, int i)
 {
 	acl::string key;
@@ -115,7 +133,9 @@ protected:
 
 			redis.set_client(conn);
 
-			if (cmd_ == "del")
+			if (cmd_ == "set")
+				ret = test_set(conn, i);
+			else if (cmd_ == "del")
 				ret = test_del(redis, i);
 			else if (cmd_ == "expire")
 				ret = test_expire(redis, i);
@@ -161,6 +181,8 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		"-s redis_addr[127.0.0.1:6379]\r\n"
+		"-p password[default: '']\r\n"
+		"-d dbnum[default: 0]\r\n"
 		"-n count[default: 10]\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
@@ -171,11 +193,11 @@ static void usage(const char* procname)
 
 int main(int argc, char* argv[])
 {
-	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
+	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10, dbnum = 0;
 	int  max_threads = 10;
-	acl::string addr("127.0.0.1:6379"), cmd;
+	acl::string addr("127.0.0.1:6379"), cmd, passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:p:d:")) > 0)
 	{
 		switch (ch)
 		{
@@ -184,6 +206,12 @@ int main(int argc, char* argv[])
 			return 0;
 		case 's':
 			addr = optarg;
+			break;
+		case 'p':
+			passwd = optarg;
+			break;
+		case 'd':
+			dbnum = atoi(optarg);
 			break;
 		case 'n':
 			n = atoi(optarg);
@@ -209,6 +237,10 @@ int main(int argc, char* argv[])
 
 	acl::redis_client_pool pool(addr.c_str(), max_threads);
 	pool.set_timeout(conn_timeout, rw_timeout);
+	if (!passwd.empty())
+		pool.set_password(passwd);
+	if (dbnum > 0)
+		pool.set_db(dbnum);
 
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++)
