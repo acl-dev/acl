@@ -104,7 +104,7 @@ protected:
 	 * websocket 关闭消息回调
 	 * @return {void}
 	 */
-	virtual void onClose(void);
+	virtual void onClose(void) {}
 
 	/**
 	 * websocket ping 消息回调.

@@ -37,15 +37,15 @@ public:
 	HttpServlet(socket_stream* stream,
 		const char* memcache_addr = "127.0.0.1:11211");
 
-	HttpServlet();
+	HttpServlet(void);
 	virtual ~HttpServlet(void) = 0;
 
-	session& getSession() const
+	session& getSession(void) const
 	{
 		return *session_;
 	}
 
-	socket_stream* getStream() const
+	socket_stream* getStream(void) const
 	{
 		return stream_;
 	}
