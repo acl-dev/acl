@@ -18,6 +18,7 @@ websocket::websocket(socket_stream& client)
 , header_size_(0)
 , header_len_(0)
 , payload_nread_(0)
+, payload_nsent_(0)
 , header_sent_(false)
 {
 	reset();
@@ -42,6 +43,7 @@ websocket& websocket::reset(void)
 	header_.masking_key = 0;
 
 	payload_nread_ = 0;
+	payload_nsent_ = 0;
 	header_sent_   = false;
 
 	return *this;
@@ -194,10 +196,18 @@ bool websocket::send_frame_data(void* data, size_t len)
 		return true;
 	}
 
+	// senity check
+	if (payload_nsent_ + len > header_.payload_len) {
+		logger_error("data len overflow=%llu > %llu, %llu, %lu",
+			payload_nsent_ + len, header_.payload_len,
+			payload_nsent_, (unsigned long) len);
+		return false;
+	}
+
 	if (header_.mask) {
 		unsigned char* mask = (unsigned char*) &header_.masking_key;
 		for (size_t i = 0; i < len; i++) {
-			((char*) data)[i] ^= mask[i % 4];
+			((char*) data)[i] ^= mask[(payload_nsent_ + i) % 4];
 		}
 	}
 
@@ -206,6 +216,7 @@ bool websocket::send_frame_data(void* data, size_t len)
 		return false;
 	}
 
+	payload_nsent_ += len;
 	return true;
 }
 

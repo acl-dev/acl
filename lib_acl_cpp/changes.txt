@@ -2,6 +2,8 @@
 
 545) 2018.10.21
 545.1) feature: redis_client, redis_client_pool 在非集群模式下创建连接时自动选择db
+545.2) feature: websocket::send_frame_data 在被循环调用时需检查长度是否一致，
+且需要根据实际写入的帧长度设置掩码
 
 544) 2018.10.20
 544.1) bugfix: websocket::read_frame_data 被循环调用时，掩码使用方式有误

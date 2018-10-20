@@ -145,6 +145,7 @@ private:
 	size_t header_size_;
 	size_t header_len_;
 	unsigned long long payload_nread_;
+	unsigned long long payload_nsent_;
 	bool header_sent_;
 
 	void make_frame_header(void);
