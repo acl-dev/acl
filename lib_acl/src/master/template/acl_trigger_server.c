@@ -68,6 +68,7 @@ int   acl_var_trigger_delay_usec;
 int   acl_var_trigger_daemon_timeout;
 int   acl_var_trigger_use_limit;
 int   acl_var_trigger_enable_core;
+int   acl_var_trigger_disable_core_onexit;
 int   acl_var_trigger_max_debug;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
@@ -89,10 +90,20 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 		&acl_var_trigger_use_limit, 0, 0 },
 	{ ACL_VAR_TRIGGER_ENABLE_CORE, ACL_DEF_TRIGGER_ENABLE_CORE,
 		&acl_var_trigger_enable_core, 0, 0 },
+	{ ACL_VAR_TRIGGER_DISABLE_CORE_ONEXIT, ACL_DEF_TRIGGER_DISABLE_CORE_ONEXIT,
+		&acl_var_trigger_disable_core_onexit, 0, 0 },
 	{ ACL_VAR_TRIGGER_MAX_DEBUG, ACL_DEF_TRIGGER_MAX_DEBUG,
 		&acl_var_trigger_max_debug, 0, 0 },
 
 	{ 0, 0, 0, 0, 0 },
+};
+
+long long int acl_var_trigger_core_limit;
+
+static ACL_CONFIG_INT64_TABLE __conf_int64_tab[] = {
+	{ ACL_VAR_TRIGGER_CORE_LIMIT, ACL_DEF_TRIGGER_CORE_LIMIT,
+		&acl_var_trigger_core_limit, 0, 0 },
+        { 0, 0, 0, 0, 0 },
 };
 
 char *acl_var_trigger_queue_dir;
@@ -148,6 +159,9 @@ ACL_EVENT *acl_trigger_server_event()
 
 static void trigger_server_exit(void)
 {
+	if (acl_var_trigger_disable_core_onexit)
+		acl_set_core_limit(0);
+
 	if (__service_exit)
 		__service_exit(__service_ctx);
 
@@ -370,6 +384,7 @@ static void trigger_server_init(const char *procname)
 	}
 
 	acl_get_app_conf_int_table(__conf_int_tab);
+	acl_get_app_conf_int64_table(__conf_int64_tab);
 	acl_get_app_conf_str_table(__conf_str_tab);
 }
 
@@ -637,8 +652,9 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	trigger_server_open_log();
 
 	/* 设置子进程运行环境，允许产生 core 文件 */
-	if (acl_var_trigger_enable_core)
-		acl_set_core_limit(0);
+	if (acl_var_trigger_enable_core && acl_var_trigger_core_limit != 0) {
+		acl_set_core_limit(acl_var_trigger_core_limit);
+	}
 
 	/*
 	 * Run post-jail initialization.

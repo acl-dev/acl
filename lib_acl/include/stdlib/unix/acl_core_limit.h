@@ -10,10 +10,12 @@ extern "C" {
 
 /**
  * 调用此函数设置程序崩溃时产生的 core 文件的最大值
- * @param max {unsigned long long int} 当该值 == 0 时，
- *  则使用系统规定的最大值，否则将使用该值
+ * @param max {long long int} 根据 max 的值范围不同，生成 core 规则有所不同：
+ *  1)   0：禁止生成 core 文件
+ *  2) < 0：生成 core 文件，且不限制 core 文件生成大小
+ *  3) > 0：生成 core 文件，且 core 文件大小由 max 决定
  */
-void acl_set_core_limit(unsigned long long int max);
+void acl_set_core_limit(long long int max);
 
 #endif  /* ACL_UNIX */
 

@@ -79,6 +79,7 @@ int   acl_var_threads_max_accept;
 int   acl_var_threads_enable_dog;
 int   acl_var_threads_quick_abort;
 int   acl_var_threads_enable_core;
+int   acl_var_threads_disable_core_onexit;
 int   acl_var_threads_max_debug;
 int   acl_var_threads_status_notify;
 int   acl_var_threads_batadd;
@@ -118,6 +119,8 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 		&acl_var_threads_quick_abort, 0, 0 },
 	{ ACL_VAR_THREADS_ENABLE_CORE, ACL_DEF_THREADS_ENABLE_CORE,
 		&acl_var_threads_enable_core, 0, 0 },
+	{ ACL_VAR_THREADS_DISABLE_CORE_ONEXIT, ACL_DEF_THREADS_DISABLE_CORE_ONEXIT,
+		&acl_var_threads_disable_core_onexit, 0, 0 },
 	{ ACL_VAR_THREADS_MAX_DEBUG, ACL_DEF_THREADS_MAX_DEBUG,
 		&acl_var_threads_max_debug, 0, 0 },
 	{ ACL_VAR_THREADS_STATUS_NOTIFY, ACL_DEF_THREADS_STATUS_NOTIFY,
@@ -133,6 +136,14 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ ACL_VAR_THREADS_CHECK_INTER, ACL_DEF_THREADS_CHECK_INTER,
 		&acl_var_threads_check_inter, 0, 0 },
 
+        { 0, 0, 0, 0, 0 },
+};
+
+long long int acl_var_threads_core_limit;
+
+static ACL_CONFIG_INT64_TABLE __conf_int64_tab[] = {
+	{ ACL_VAR_THREADS_CORE_LIMIT, ACL_DEF_THREADS_CORE_LIMIT,
+		&acl_var_threads_core_limit, 0, 0 },
         { 0, 0, 0, 0, 0 },
 };
 
@@ -349,6 +360,9 @@ static void listen_cleanup(ACL_EVENT *event)
 
 static void server_exit(void)
 {
+	if (acl_var_threads_disable_core_onexit)
+		acl_set_core_limit(0);
+
 	if (__server_onexit)
 		__server_onexit(__service_ctx);
 
@@ -836,6 +850,7 @@ static void server_init(const char *procname)
 	}
 
 	acl_get_app_conf_int_table(__conf_int_tab);
+	acl_get_app_conf_int64_table(__conf_int64_tab);
 	acl_get_app_conf_str_table(__conf_str_tab);
 
 	if (__deny_info == NULL)
@@ -1466,8 +1481,9 @@ void acl_threads_server_main(int argc, char * argv[],
 
 #ifdef ACL_UNIX
 	/* if enable dump core when program crashed ? */
-	if (acl_var_threads_enable_core)
-		acl_set_core_limit(0);
+	if (acl_var_threads_enable_core && acl_var_threads_core_limit != 0) {
+		acl_set_core_limit(acl_var_threads_core_limit);
+	}
 #endif
 
 	/* Run post-jail initialization. */

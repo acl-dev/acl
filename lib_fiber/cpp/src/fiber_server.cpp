@@ -20,6 +20,8 @@ static int   acl_var_fiber_buf_size;
 static int   acl_var_fiber_rw_timeout;
 static int   acl_var_fiber_max_debug;
 static int   acl_var_fiber_enable_core;
+static int   acl_var_fiber_core_limit;
+static int   acl_var_fiber_disable_core_onexit;
 static int   acl_var_fiber_use_limit;
 static int   acl_var_fiber_idle_limit;
 static int   acl_var_fiber_wait_limit;
@@ -30,6 +32,8 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ "fiber_rw_timeout", 120, &acl_var_fiber_rw_timeout, 0, 0 },
 	{ "fiber_max_debug", 1000, &acl_var_fiber_max_debug, 0, 0 },
 	{ "fiber_enable_core", 1, &acl_var_fiber_enable_core, 0, 0 },
+	{ "fiber_core_limit", -1, &acl_var_fiber_core_limit, 0, 0 },
+	{ "fiber_disable_core_onexit", 1, &acl_var_fiber_disable_core_onexit, 0, 0 },
 	{ "fiber_use_limit", 0, &acl_var_fiber_use_limit, 0, 0 },
 	{ "fiber_idle_limit", 0, &acl_var_fiber_idle_limit, 0 , 0 },
 	{ "fiber_wait_limit", 0, &acl_var_fiber_wait_limit, 0, 0 },
@@ -220,6 +224,8 @@ static int __exit_status = 0;
 
 static void main_server_exit(ACL_FIBER *fiber, int status)
 {
+	if (acl_var_fiber_disable_core_onexit)
+		acl_set_core_limit(0);
 	if (__service_onexit)
 		__service_onexit(__service_ctx);
 
@@ -1008,8 +1014,8 @@ void acl_fiber_server_main(int argc, char *argv[],
 
 #if !defined(_WIN32) && !defined(_WIN64)
 	/* if enable dump core when program crashed ? */
-	if (acl_var_fiber_enable_core)
-		acl_set_core_limit(0);
+	if (acl_var_fiber_enable_core && acl_var_fiber_core_limit != 0)
+		acl_set_core_limit(acl_var_fiber_core_limit);
 #endif
 
 	/* Run post-jail initialization. */

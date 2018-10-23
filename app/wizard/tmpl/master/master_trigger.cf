@@ -43,6 +43,10 @@ service $<PROGRAM>
 
 #	是否允许产生 core 文件
 #	trigger_enable_core = 1
+#	core 文件大小限制，-1 表示不限制 core 文件大小，0 表示禁止产生 core，> 0 表示 core 文件最大大小
+#	trigger_core_limit = -1
+#	进程退出时是否禁止产生 core 文件
+#	trigger_disable_core_onexit = 1
 #	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出
 	trigger_use_limit = 250
 #	记录进程PID的位置(对于多进程实例来说没有意义)

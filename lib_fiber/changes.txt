@@ -1,4 +1,7 @@
 
+91) 2018.10.23
+91.1) feature: fiber_server.c 支持所生成 core 文件的大小及进程退出时不产生 core
+
 90) 2018.9.20
 90.1) bugfix: getaddrinfo.c 修复一处 IPV6 相关问题
 

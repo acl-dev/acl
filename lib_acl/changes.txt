@@ -1,5 +1,10 @@
 修改历史列表：
 
+640) 2018.10.23
+640.1) feature: acl_aio_server.c, acl_single_server.c, acl_threads_server.c,
+acl_trigger_server.c, acl_udp_server.c 支持进程崩溃时所产生 core 文件的大小，
+以及进程退出前可禁止产生 core 文件
+
 639) 2018.10.4
 639.1) bugfix: ssize_t redefined to long to avoid error on vc in x64
 

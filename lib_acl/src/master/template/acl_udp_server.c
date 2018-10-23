@@ -71,6 +71,7 @@ int   acl_var_udp_delay_usec;
 int   acl_var_udp_daemon_timeout;
 int   acl_var_udp_master_maxproc;
 int   acl_var_udp_enable_core;
+int   acl_var_udp_disable_core_onexit;
 int   acl_var_udp_max_debug;
 int   acl_var_udp_threads;
 
@@ -91,6 +92,8 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 		&acl_var_udp_master_maxproc, 0, 0},
 	{ ACL_VAR_UDP_ENABLE_CORE, ACL_DEF_UDP_ENABLE_CORE,
 		&acl_var_udp_enable_core, 0, 0 },
+	{ ACL_VAR_UDP_DISABLE_CORE_ONEXIT, ACL_DEF_UDP_DISABLE_CORE_ONEXIT,
+		&acl_var_udp_disable_core_onexit, 0, 0 },
 	{ ACL_VAR_UDP_MAX_DEBUG, ACL_DEF_UDP_MAX_DEBUG,
 		&acl_var_udp_max_debug, 0, 0 },
 	{ ACL_VAR_UDP_THREADS, ACL_DEF_UDP_THREADS,
@@ -100,10 +103,13 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 };
 
 long long int acl_var_udp_use_limit;
+long long int acl_var_udp_core_limit;
 
 static ACL_CONFIG_INT64_TABLE __conf_int64_tab[] = {
 	{ ACL_VAR_UDP_USE_LIMIT, ACL_DEF_UDP_USE_LIMIT,
 		&acl_var_udp_use_limit, 0, 0 },
+	{ ACL_VAR_UDP_CORE_LIMIT, ACL_DEF_UDP_CORE_LIMIT,
+		&acl_var_udp_core_limit, 0, 0 },
 
         { 0, 0, 0, 0, 0 },
 };
@@ -455,6 +461,9 @@ static void udp_server_exit(void)
 
 	if (__service_exiting)
 		return;
+
+	if (acl_var_udp_disable_core_onexit)
+		acl_set_core_limit(0);
 
 	__service_exiting = 1;
 
@@ -1122,8 +1131,9 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 
 #ifdef ACL_UNIX
 	/* 设置子进程运行环境，允许产生 core 文件 */
-	if (acl_var_udp_enable_core)
-		acl_set_core_limit(0);
+	if (acl_var_udp_enable_core && acl_var_udp_core_limit != 0) {
+		acl_set_core_limit(acl_var_udp_core_limit);
+	}
 
 	/* 在切换用户运行身份前切换程序运行目录 */
 	if (__daemon_mode && chdir(acl_var_udp_queue_dir) < 0)
