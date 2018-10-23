@@ -23,7 +23,7 @@ service $<PROGRAM>
 #	当 master_stop_kill 为 true 时，该配置决定是否要等待子进程退出
 	master_stop_wait = false
 
-#	当系统运动 SO_REUSEPORT 功能时，本开关决定是否允许该特性
+#	当系统支持 SO_REUSEPORT 功能时，本开关决定是否允许该特性
 	master_reuseport = yes
 #	是否针对监听套接口设定为非阻塞方式
 	master_nonblock = yes

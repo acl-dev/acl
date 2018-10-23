@@ -33,7 +33,7 @@ typedef struct ACL_MASTER_SERV {
 	long     start;			/* service start running time */
 	int      type;			/* UNIX-domain, INET, etc. */
 	int      wakeup_time;		/* wakeup interval */
-	unsigned inet_flags;		/* listening inet flags */
+	unsigned inet_flags;		/* listen/bind inet flags */
 	int     *listen_fds;		/* incoming requests */
 	int      listen_fd_count;	/* nr of descriptors */
 	int      defer_accept;		/* accept timeout if no data from client */
