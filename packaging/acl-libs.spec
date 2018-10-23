@@ -1,4 +1,4 @@
-%define release_id 28
+%define release_id 29
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,11 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Tue Oct 23 2018 zhengshuxin@qiyi.com 3.4.1-29-20181023.22
+- bugfix: acl_udp_server.c can't bind multiple addrs
+- feature: disable core when process exiting
+- feature: core file size can be configured
 
 * Thu Oct 17 2018 zhengshuxin@qiyi.com 3.4.1-28-20181017.17
 - bugfix: acl_master can't support UDP service on Centos whose version is below 7.x
