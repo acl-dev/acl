@@ -159,9 +159,9 @@ ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family)
 		*family = 0;
 
 #ifdef ACL_UNIX
-	const char udp_suffix[] = "@udp";
+	if (!acl_valid_ipv4_hostaddr(addr, 0)
+		&& !acl_valid_ipv6_hostaddr(addr, 0)) {
 
-	if (acl_strrncasecmp(addr, udp_suffix, sizeof(udp_suffix) - 1) == 0) {
 		fd = acl_unix_dgram_bind(addr, flag);
 		if (fd >= 0 && family)
 			*family = AF_UNIX;

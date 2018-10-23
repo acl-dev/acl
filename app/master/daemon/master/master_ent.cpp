@@ -311,9 +311,6 @@ static ACL_MASTER_ADDR *master_dgram_addr(const char *addr)
 		return ma;
 	}
 
-	if (strcasestr(addr, "@udp") == NULL)
-		acl_msg_warn("%s: @udp should after %s", __FUNCTION__, addr);
-
 	ACL_MASTER_ADDR *ma = (ACL_MASTER_ADDR*)
 		acl_mycalloc(1, sizeof(ACL_MASTER_ADDR));
 

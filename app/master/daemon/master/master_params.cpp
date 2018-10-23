@@ -234,9 +234,11 @@ void acl_master_params_load(const char *pathname)
 	init_master_vars();
 
 	cfg_parser = acl_cfg_parser_load(pathname, "=\t ");
-	if (cfg_parser == NULL)
-		acl_msg_fatal("%s(%d), %s: load file(%s) error(%s)",
+	if (cfg_parser == NULL) {
+		acl_msg_error("%s(%d), %s: load file(%s) error(%s)",
 			__FILE__, __LINE__, myname, pathname, strerror(errno));
+		return;
+	}
 
 	update_master_conf_vars(cfg_parser);
 }

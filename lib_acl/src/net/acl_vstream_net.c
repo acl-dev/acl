@@ -281,8 +281,8 @@ ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout, unsigned flag)
 	socklen_t    len = sizeof(saddr);
 	
 	if (sock == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s: bind addr %s error %s",
-			__FUNCTION__, addr, acl_last_serror());
+		acl_msg_error("%s(%d), %s: bind addr %s error %s", __FILE__,
+			__LINE__, __FUNCTION__, addr, acl_last_serror());
 		return NULL;
 	}
 

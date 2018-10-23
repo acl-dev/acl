@@ -28,10 +28,12 @@ static int master_listen_sock(ACL_MASTER_SERV *serv)
 		qlen = 128;
 	}
 
-	if (serv->listen_fd_count != acl_array_size(serv->addrs))
-		acl_msg_panic("%s(%d): listen_fd_count(%d) != addrs's size(%d)",
+	if (serv->listen_fd_count != acl_array_size(serv->addrs)) {
+		acl_msg_error("%s(%d): listen_fd_count(%d) != addrs's size(%d)",
 			myname, __LINE__, serv->listen_fd_count,
 			acl_array_size(serv->addrs));
+		return -1;
+	}
 
 	i = 0;
 	acl_foreach(iter, serv->addrs) {
@@ -141,9 +143,12 @@ static int master_bind_udp(ACL_MASTER_SERV *serv)
 	}
 #endif
 
-	if (serv->listen_fd_count != acl_array_size(serv->addrs))
-		acl_msg_panic("listen_fd_count(%d) != addrs's size(%d)",
-			serv->listen_fd_count, acl_array_size(serv->addrs));
+	if (serv->listen_fd_count != acl_array_size(serv->addrs)) {
+		acl_msg_error("%s(%d): listen_fd_count(%d) != addrs's size(%d)",
+			myname, __LINE__, serv->listen_fd_count,
+			acl_array_size(serv->addrs));
+		return -1;
+	}
 
 	acl_foreach(iter, serv->addrs) {
 		ACL_MASTER_ADDR *addr = (ACL_MASTER_ADDR*) iter.data;
@@ -175,6 +180,12 @@ static int master_bind_udp(ACL_MASTER_SERV *serv)
 		acl_msg_info("%s(%d), %s: bind on %s ok",
 			__FILE__, __LINE__, myname, addr->addr);
 		i++;
+	}
+
+	if (i == 0) {
+		acl_msg_error("%s(%d), %s: bind failed for all interface",
+			__FILE__, __LINE__, myname);
+		return -1;
 	}
 
 	if (i < serv->listen_fd_count) {
@@ -292,8 +303,8 @@ int acl_master_listen_init(ACL_MASTER_SERV *serv)
 		return master_listen_fifo(serv) > 0 ? 0 : -1;
 
 	default:
-		acl_msg_panic("%s: unknown service type: %d",
-			myname, serv->type);
+		acl_msg_error("%s(%d): unknown service type: %d",
+			myname, __LINE__, serv->type);
 		return -1; /* dummy */
 	}
 }
