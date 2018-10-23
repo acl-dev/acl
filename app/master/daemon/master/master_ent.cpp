@@ -455,7 +455,7 @@ static int service_transport(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 		return -1;
 	}
 
-	if (get_bool_ent(xcp, ACL_VAR_MASTER_SERV_REUSEPORT, "n"))
+	if (get_bool_ent(xcp, ACL_VAR_MASTER_SERV_REUSEPORT, "y"))
 		serv->inet_flags |= ACL_INET_FLAG_REUSEPORT;
 	if (get_bool_ent(xcp, ACL_VAR_MASTER_SERV_FASTOPEN, "n"))
 		serv->inet_flags |= ACL_INET_FLAG_FASTOPEN;

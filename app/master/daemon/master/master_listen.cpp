@@ -129,12 +129,17 @@ static int master_listen_inet(ACL_MASTER_SERV *serv)
 
 static int master_bind_udp(ACL_MASTER_SERV *serv)
 {
-#ifdef SO_REUSEPORT
-	serv->listen_fd_count = 0;
-#else
 	const char *myname = "master_bind_udp";
 	ACL_ITER iter;
 	int   i = 0;
+
+#ifdef SO_REUSEPORT
+	if ((serv->inet_flags & ACL_INET_FLAG_REUSEPORT) != 0) {
+		serv->listen_fd_count = 0;
+		acl_msg_info("%s(%d): master_reuseport set", myname, __LINE__);
+		return 0;
+	}
+#endif
 
 	if (serv->listen_fd_count != acl_array_size(serv->addrs))
 		acl_msg_panic("listen_fd_count(%d) != addrs's size(%d)",
@@ -177,7 +182,7 @@ static int master_bind_udp(ACL_MASTER_SERV *serv)
 			__FILE__, __LINE__, myname);
 		serv->listen_fd_count = i;
 	}
-#endif
+
 	return serv->listen_fd_count;
 }
 
