@@ -756,7 +756,7 @@ static void server_open(UDP_SERVER *server, int sock_count)
 
 	/* socket count is as same listen_fd_count in parent process */
 
-	for (i = 0; fd < ACL_MASTER_LISTEN_FD + sock_count; fd++) {
+	for (; fd < ACL_MASTER_LISTEN_FD + sock_count; fd++) {
 		char addr[64];
 		ACL_VSTREAM *stream = acl_vstream_fdopen(fd, O_RDWR,
 			acl_var_udp_buf_size,
@@ -769,7 +769,7 @@ static void server_open(UDP_SERVER *server, int sock_count)
 
 		acl_msg_info("%s(%d), %s: addr=%s, fd=%d, sock_count=%d",
 			__FILE__, __LINE__, __FUNCTION__, addr, fd, sock_count);
-		server->streams[i] = stream;
+		server->streams[i++] = stream;
 		acl_non_blocking(fd, ACL_NON_BLOCKING);
 		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 

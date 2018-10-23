@@ -7,6 +7,8 @@ acl_trigger_server.c, acl_udp_server.c 支持进程崩溃时所产生 core 文件的大小，
 640.2) feature: acl_udp_server.c 可以通过配置项 master_reuseport 决定是否需要绑定地址
 640.3) feature: acl_bind_udp() 在绑定 UNIX 域套接口时不再需要有 @udp 后缀，内部
 会自动进行判断是否是 UNIX 域套接口
+640.4) bugfix: acl_udp_server.c, server_open() 在打开多个流对象时未将数组索引
+递增，导致无法绑定多个地址
 
 639) 2018.10.4
 639.1) bugfix: ssize_t redefined to long to avoid error on vc in x64
