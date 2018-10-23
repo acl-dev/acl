@@ -40,9 +40,11 @@ static int master_listen_sock(ACL_MASTER_SERV *serv)
 		case ACL_MASTER_SERV_TYPE_INET:
 			serv->listen_fds[i] = acl_inet_listen(
 				addr->addr, qlen, serv->inet_flags);
-			if (serv->listen_fds[i] != ACL_SOCKET_INVALID)
+			if (serv->listen_fds[i] != ACL_SOCKET_INVALID
+				&& serv->defer_accept > 0) {
 				acl_tcp_defer_accept(serv->listen_fds[i],
 					serv->defer_accept);
+			}
 			service_type = ACL_VSTREAM_TYPE_LISTEN_INET;
 			break;
 		case ACL_MASTER_SERV_TYPE_UNIX:
