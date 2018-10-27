@@ -13,7 +13,7 @@ add_definitions(
 	"-std=gnu99"
 	"-fPIC"
 	"-Wall"
-	"-Werror"
+#	"-Werror"
 	"-Wshadow"
 	"-Wpointer-arith"
 	"-Waggregate-return"
@@ -25,7 +25,7 @@ add_definitions(
 	"-Wuninitialized"
 	"-D_POSIX_PTHREAD_SEMANTICS"
 	"-DACL_PREPARE_COMPILE"
-	"-Wno-invalid-source-encoding"
+#	"-Wno-invalid-source-encoding"
 	"-Wstrict-prototypes"
 )
 
