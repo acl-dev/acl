@@ -87,6 +87,6 @@ typedef union {
 	struct sockaddr_un un;
 #endif
 	struct sockaddr sa;
-} SOCKADDR;
+} SOCK_ADDR;
 
 #endif

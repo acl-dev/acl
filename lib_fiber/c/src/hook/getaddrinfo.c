@@ -39,7 +39,7 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 {
 	struct addrinfo *res;
 	size_t addrlen;
-	SOCKADDR sa;
+	SOCK_ADDR sa;
 
 	if (is_ipv4(ip)) {
 		sa.in.sin_family      = AF_INET;

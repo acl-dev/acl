@@ -114,7 +114,7 @@ static int save_result(struct hostent *ent, struct addrinfo *res,
 			break;
 		}
 
-		SOCKADDR *sa = (SOCKADDR *) ai->ai_addr;
+		SOCK_ADDR *sa = (SOCK_ADDR *) ai->ai_addr;
 
 		if (ai->ai_family == AF_INET) {
 			len = sizeof(struct in_addr);

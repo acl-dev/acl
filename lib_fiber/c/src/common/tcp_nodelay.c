@@ -5,7 +5,7 @@
 
 static int getsocktype(socket_t fd)
 {
-	SOCKADDR addr;
+	SOCK_ADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
 

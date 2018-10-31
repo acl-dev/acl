@@ -11,7 +11,8 @@ typedef intptr_t acl_handle_t;
 #if defined(_WIN32) || defined (_WIN64)
 # include <winsock2.h>
 
-typedef intptr_t ssize_t;
+/* typedef intptr_t ssize_t; */
+typedef long ssize_t;
 typedef SOCKET socket_t;
 typedef int socklen_t;
 
