@@ -751,6 +751,8 @@ static UDP_SERVER *servers_binding(const char *service,
 	return servers;
 }
 
+#ifdef ACL_UNIX
+
 static void server_open(UDP_SERVER *server, int sock_count)
 {
 	ACL_SOCKET fd = ACL_MASTER_LISTEN_FD;
@@ -793,6 +795,8 @@ static UDP_SERVER *servers_open(int event_mode, int nthreads, int sock_count)
 
 	return servers;
 }
+
+#endif
 
 static UDP_SERVER *servers_create(const char *service, int nthreads)
 {
