@@ -224,8 +224,10 @@ static int __exit_status = 0;
 
 static void main_server_exit(ACL_FIBER *fiber, int status)
 {
+#if !defined(_WIN32) && !defined(_WIN64)
 	if (acl_var_fiber_disable_core_onexit)
 		acl_set_core_limit(0);
+#endif
 	if (__service_onexit)
 		__service_onexit(__service_ctx);
 

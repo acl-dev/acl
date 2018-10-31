@@ -159,8 +159,10 @@ ACL_EVENT *acl_trigger_server_event()
 
 static void trigger_server_exit(void)
 {
+#ifdef ACL_UNIX
 	if (acl_var_trigger_disable_core_onexit)
 		acl_set_core_limit(0);
+#endif
 
 	if (__service_exit)
 		__service_exit(__service_ctx);
@@ -651,10 +653,12 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 
 	trigger_server_open_log();
 
+#ifdef ACL_UNIX
 	/* 设置子进程运行环境，允许产生 core 文件 */
 	if (acl_var_trigger_enable_core && acl_var_trigger_core_limit != 0) {
 		acl_set_core_limit(acl_var_trigger_core_limit);
 	}
+#endif
 
 	/*
 	 * Run post-jail initialization.

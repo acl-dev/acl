@@ -169,8 +169,10 @@ ACL_VSTREAM **acl_single_server_sstreams()
 
 static void single_server_exit(void)
 {
+#ifdef ACL_UNIX
 	if (acl_var_single_disable_core_onexit)
 		acl_set_core_limit(0);
+#endif
 
 	if (__service_exit)
 		__service_exit(__service_ctx);
@@ -648,10 +650,12 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 #endif
 	acl_chroot_uid(root_dir, user_name);
 
+#ifdef ACL_UNIX
 	/* 设置子进程运行环境，允许产生 core 文件 */
 	if (acl_var_single_enable_core && acl_var_single_core_limit != 0) {
 		acl_set_core_limit(acl_var_single_core_limit);
 	}
+#endif
 
 	single_server_open_log(argv[0]);
 

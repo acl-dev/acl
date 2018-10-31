@@ -1,4 +1,7 @@
 
+92) 2018.10.31
+92.1) compile: acl_set_core_limit 仅可用在 UNIX-like 平台
+
 91) 2018.10.23
 91.1) feature: fiber_server.c 支持所生成 core 文件的大小及进程退出时不产生 core
 

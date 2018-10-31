@@ -465,9 +465,11 @@ static void udp_server_exit(void)
 		return;
 	}
 
+#ifdef ACL_UNIX
 	if (acl_var_udp_disable_core_onexit) {
 		acl_set_core_limit(0);
 	}
+#endif
 
 	__service_exiting = 1;
 

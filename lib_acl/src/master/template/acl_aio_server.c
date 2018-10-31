@@ -356,8 +356,10 @@ static void disable_listen(void)
 
 static void aio_server_exit(void)
 {
+#ifdef ACL_UNIX
 	if (acl_var_aio_disable_core_onexit)
 		acl_set_core_limit(0);
+#endif
 	if (__service_onexit)
 		__service_onexit(__service_ctx);
 	exit(0);
@@ -1486,10 +1488,12 @@ static void server_main(int argc, char **argv, va_list ap)
 	acl_chroot_uid(root_dir, user_name);  /* 切换用户身份 */
 	open_service_log();  /* 打开本进程自己的日志 */
 
+#ifdef ACL_UNIX
 	/* 设置子进程运行环境，允许产生 core 文件 */
 	if (acl_var_aio_enable_core && acl_var_aio_core_limit != 0) {
 		acl_set_core_limit(acl_var_aio_core_limit);
 	}
+#endif
 
 	log_event_mode(__event_mode);  /* 将事件模式记入日志中 */
 

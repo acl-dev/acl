@@ -360,8 +360,10 @@ static void listen_cleanup(ACL_EVENT *event)
 
 static void server_exit(void)
 {
+#ifdef ACL_UNIX
 	if (acl_var_threads_disable_core_onexit)
 		acl_set_core_limit(0);
+#endif
 
 	if (__server_onexit)
 		__server_onexit(__service_ctx);
