@@ -362,6 +362,8 @@ protected:
 	void build(const char* cmd, const char* key,
 		const int names[], size_t argc);
 
+	/*******************************************************************/
+
 protected:
 	int get_number(bool* success = NULL);
 	long long int get_number64(bool* success = NULL);
@@ -393,7 +395,7 @@ protected:
 	void hash_slot(const char* key);
 	void hash_slot(const char* key, size_t len);
 
-private:
+protected:
 	bool check_addr_;
 	char addr_[32];
 	redis_client* conn_;
@@ -409,7 +411,7 @@ private:
 	void set_client_addr(const char* addr);
 	void set_client_addr(redis_client& conn);
 
-private:
+protected:
 	/************************** request ********************************/
 	bool slice_req_;
 	string* request_buf_;
@@ -423,7 +425,7 @@ private:
 	void build_request1(size_t argc, const char* argv[], size_t lens[]);
 	void build_request2(size_t argc, const char* argv[], size_t lens[]);
 
-private:
+protected:
 	/************************** respond ********************************/
 	bool slice_res_;
 	const redis_result* result_;
