@@ -107,17 +107,11 @@ bool redis_stream::xadd(const char* key, const char* names[],
 	return get_string(result) >= 0 ? true : false;
 }
 
-void redis_stream::xread_build(const std::map<string, string>& streams,
-	size_t count, size_t block)
+//////////////////////////////////////////////////////////////////////////////
+
+void redis_stream::build(const std::map<string, string>& streams,
+	size_t count, size_t block, size_t i)
 {
-	argc_ = 6 + streams.size();
-	argv_space(argc_);
-
-	size_t i = 0;
-	argv_[i] = "XREAD";
-	argv_lens_[i] = sizeof("XREAD") - 1;
-	i++;
-
 	char count_s[LONG_LEN];
 	if (count > 0) {
 		argv_[i] = "COUNT";
@@ -163,12 +157,61 @@ void redis_stream::xread_build(const std::map<string, string>& streams,
 	build_request(i, argv_, argv_lens_);
 }
 
+void redis_stream::xread_build(const std::map<string, string>& streams,
+	size_t count, size_t block)
+{
+	argc_ = 6 + streams.size() * 2;
+	argv_space(argc_);
+
+	size_t i = 0;
+	argv_[i] = "XREAD";
+	argv_lens_[i] = sizeof("XREAD") - 1;
+	i++;
+
+	build(streams, count, block, i);
+}
+
+void redis_stream::xreadgroup_build(const char* group, const char* consumer,
+	const std::map<string, string>& streams, size_t count, size_t block)
+{
+	argc_ = 9 + streams.size() * 2;
+	argv_space(argc_);
+
+	size_t i = 0;
+	argv_[i] = "XREADGROUP";
+	argv_lens_[i] = sizeof("XREADGROUP") - 1;
+	i++;
+
+	argv_[i] = group;
+	argv_lens_[i] = strlen(group);
+	i++;
+
+	argv_[i] = consumer;
+	argv_lens_[i] = strlen(consumer);
+	i++;
+
+	build(streams, count, block, i);
+}
+
 bool redis_stream::xread(const std::map<string, string>& streams,
 	redis_stream_messages& messages, size_t count /* = 0 */,
 	size_t block /* = 0 */)
 {
 	xread_build(streams, count, block);
+	return get_results(messages);
+}
 
+bool redis_stream::xreadgroup(const char* group, const char* consumer,
+	const std::map<string, string>& streams,
+	redis_stream_messages& messages, size_t count /* = 0 */,
+	size_t block /* = 0 */)
+{
+	xreadgroup_build(group, consumer, streams, count, block);
+	return get_results(messages);
+}
+
+bool redis_stream::get_results(redis_stream_messages& messages)
+{
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY) {
 		return false;
@@ -185,85 +228,81 @@ bool redis_stream::xread(const std::map<string, string>& streams,
 		if (child->get_type() != REDIS_RESULT_ARRAY) {
 			continue;
 		}
-		xread_streams_results(*child, messages);
+		get_streams_results(*child, messages);
 	}
 
 	return true;
 }
 
-void redis_stream::xread_streams_results(const redis_result& res,
+bool redis_stream::get_streams_results(const redis_result& rr,
 	redis_stream_messages& messages)
 {
-	if (res.get_type() != REDIS_RESULT_ARRAY) {
-		return;
-	}
-
 	size_t size;
-	const redis_result** children = res.get_children(&size);
+	const redis_result** children = rr.get_children(&size);
 	if (size != 2) {
-		return;
+		return false;
 	}
 
-	const redis_result* rr = children[0];
-	if (rr->get_type() != REDIS_RESULT_STRING) {
-		return;
+	const redis_result* child = children[0];
+	if (child->get_type() != REDIS_RESULT_STRING) {
+		return false;
 	}
-	rr->argv_to_string(messages.key);
+	child->argv_to_string(messages.key);
 
-	rr = children[1];
-	if (rr->get_type() != REDIS_RESULT_ARRAY) {
-		return;
+	child = children[1];
+	if (child->get_type() != REDIS_RESULT_ARRAY) {
+		return false;
 	}
 
-	children = rr->get_children(&size);
+	children = child->get_children(&size);
 	if (size == 0 || children == NULL) {
-		return;
+		return false;
 	}
 
 	for (size_t i = 0; i < size; i++) {
-		rr = children[i];
-		xread_stream_messages(*rr, messages);
+		child = children[i];
+		if (child->get_type() != REDIS_RESULT_ARRAY) {
+			continue;
+		}
+		get_stream_messages(*child, messages);
 	}
+	return true;
 }
 
-void redis_stream::xread_stream_messages(const redis_result& child,
+bool redis_stream::get_stream_messages(const redis_result& rr,
 	redis_stream_messages& messages)
 {
-	if (child.get_type() != REDIS_RESULT_ARRAY) {
-		return;
-	}
-
 	size_t size;
-	const redis_result** children = child.get_children(&size);
+	const redis_result** children = rr.get_children(&size);
 	if (size == 0 || children == NULL) {
-		return;
+		return false;
 	}
 	if (size != 2) {
-		return;
+		return false;
 	}
 
-	const redis_result* rr = children[0];
-	if (rr->get_type() != REDIS_RESULT_STRING) {
-		return;
+	const redis_result* child = children[0];
+	if (child->get_type() != REDIS_RESULT_STRING) {
+		return false;
 	}
 	string id;
-	rr->argv_to_string(id);
+	child->argv_to_string(id);
 
-	rr = children[1];
-	children = rr->get_children(&size);
+	child = children[1];
+	children = child->get_children(&size);
 	if (size == 0 || children == NULL) {
-		return;
+		return false;
 	}
 
 	std::vector<redis_stream_message> msgs;
 	for (size_t i = 0; i < size; i++) {
-		rr = children[i];
-		if (rr->get_type() != REDIS_RESULT_ARRAY) {
+		child = children[i];
+		if (child->get_type() != REDIS_RESULT_ARRAY) {
 			continue;
 		}
 
 		redis_stream_message msg;
-		if (!xread_stream_message(*rr, msg.name, msg.value)) {
+		if (!get_stream_message(*child, msg.name, msg.value)) {
 			continue;
 		}
 
@@ -273,26 +312,27 @@ void redis_stream::xread_stream_messages(const redis_result& child,
 	if (!msgs.empty()) {
 		messages.messages[id] = msgs;
 	}
+
+	return true;
 }
 
-bool redis_stream::xread_stream_message(const redis_result& res,
+bool redis_stream::get_stream_message(const redis_result& rr,
 	string& name, string& value)
 {
-	if (res.get_type() != REDIS_RESULT_ARRAY) {
-		return false;
-	}
 	size_t size;
-	const redis_result** children = res.get_children(&size);
+	const redis_result** children = rr.get_children(&size);
 	if (children == NULL || size != 0) {
 		return false;
 	}
 
-	const redis_result* rr = children[0];
-	rr->argv_to_string(name);
-	rr = children[1];
-	rr->argv_to_string(value);
+	const redis_result* child = children[0];
+	child->argv_to_string(name);
+	child = children[1];
+	child->argv_to_string(value);
 	return true;
 }
+
+//////////////////////////////////////////////////////////////////////////////
 
 bool redis_stream::xgroup_create(const char* key, const char* group,
 	const char* id /* = "$" */)
@@ -393,8 +433,8 @@ void redis_stream::build(const char* cmd, const char* key, const char* id,
 	i++;
 
 	for (std::map<string, string>::const_iterator cit = fields.begin();
-		cit != fields.end(); ++cit)
-	{
+		cit != fields.end(); ++cit) {
+
 		argv_[i] = cit->first.c_str();
 		argv_lens_[i] = cit->first.size();
 		i++;
@@ -410,8 +450,7 @@ void redis_stream::build(const char* cmd, const char* key, const char* id,
 void redis_stream::build(const char* cmd, const char* key, const char* id,
 	const std::vector<string>& names, const std::vector<string>& values)
 {
-	if (names.size() != values.size())
-	{
+	if (names.size() != values.size()) {
 		logger_fatal("names's size: %lu, values's size: %lu",
 			(unsigned long) names.size(),
 			(unsigned long) values.size());
@@ -434,8 +473,7 @@ void redis_stream::build(const char* cmd, const char* key, const char* id,
 	i++;
 
 	size_t size = names.size();
-	for (size_t j = 0; j < size; j++)
-	{
+	for (size_t j = 0; j < size; j++) {
 		argv_[i] = names[j].c_str();
 		argv_lens_[i] = names[j].size();
 		i++;
@@ -452,8 +490,7 @@ void redis_stream::build(const char* cmd, const char* key, const char* id,
 	const std::vector<const char*>& names,
 	const std::vector<const char*>& values)
 {
-	if (names.size() != values.size())
-	{
+	if (names.size() != values.size()) {
 		logger_fatal("names's size: %lu, values's size: %lu",
 			(unsigned long) names.size(),
 			(unsigned long) values.size());
@@ -476,8 +513,7 @@ void redis_stream::build(const char* cmd, const char* key, const char* id,
 	i++;
 
 	size_t size = names.size();
-	for (size_t j = 0; j < size; j++)
-	{
+	for (size_t j = 0; j < size; j++) {
 		argv_[i] = names[j];
 		argv_lens_[i] = strlen(argv_[i]);
 		i++;
@@ -494,8 +530,9 @@ void redis_stream::build(const char* cmd, const char* key, const char* id,
 	const char* names[], const size_t names_len[],
 	const char* values[], const size_t values_len[], size_t argc)
 {
-	if (argc == 0)
+	if (argc == 0) {
 		logger_fatal("argc = 0");
+	}
 
 	argc_ = argc * 2 + 3;
 	argv_space(argc_);
@@ -513,8 +550,7 @@ void redis_stream::build(const char* cmd, const char* key, const char* id,
 	argv_lens_[i] = strlen(id);
 	i++;
 
-	for (size_t j = 0; j < argc; j++)
-	{
+	for (size_t j = 0; j < argc; j++) {
 		argv_[i] = names[j];
 		argv_lens_[i] = names_len[j];
 		i++;

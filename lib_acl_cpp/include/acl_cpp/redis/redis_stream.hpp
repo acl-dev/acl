@@ -49,6 +49,10 @@ public:
 	bool xread(const std::map<string, string>& streams,
 		redis_stream_messages& messages,
 		size_t count = 0, size_t block = 0);
+	bool xreadgroup(const char* group, const char* consumer,
+		const std::map<string, string>& streams,
+		redis_stream_messages& messsages,
+		size_t count = 0, size_t block = 0);
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -74,13 +78,19 @@ private:
 	void build(const char* cmd, const char* key, const char* id,
 		const char* names[], const size_t names_len[],
 		const char* values[], const size_t values_len[], size_t argc);
+	void build(const std::map<string, string>& streams, size_t count,
+		size_t block, size_t i);
 	void xread_build(const std::map<string, string>& streams,
 		size_t count, size_t block);
-	void xread_streams_results(const redis_result& res,
+	void xreadgroup_build(const char* group, const char* consumer,
+		const std::map<string, string>& streams,
+		size_t count, size_t block);
+	bool get_results(redis_stream_messages& messages);
+	bool get_streams_results(const redis_result& rr,
 		redis_stream_messages& messages);
-	void xread_stream_messages(const redis_result& child,
+	bool get_stream_messages(const redis_result& rr,
 		redis_stream_messages& messages);
-	bool xread_stream_message(const redis_result& res,
+	bool get_stream_message(const redis_result& rr,
 		string& name, string& value);
 };
 
