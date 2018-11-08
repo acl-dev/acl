@@ -107,6 +107,20 @@ bool redis_stream::xadd(const char* key, const char* names[],
 	return get_string(result) >= 0 ? true : false;
 }
 
+int redis_stream::xlen(const char* key)
+{
+	const char* argv[2];
+	size_t lens[2];
+
+	argv[0] = "XLEN";
+	lens[0] = sizeof("XLEN") - 1;
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	build_request(2, argv, lens);
+	return get_number();
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 void redis_stream::build(const std::map<string, string>& streams,
@@ -193,21 +207,94 @@ void redis_stream::xreadgroup_build(const char* group, const char* consumer,
 	build(streams, count, block, i);
 }
 
-bool redis_stream::xread(const std::map<string, string>& streams,
-	redis_stream_messages& messages, size_t count /* = 0 */,
-	size_t block /* = 0 */)
+bool redis_stream::xread(redis_stream_messages& messages,
+	const std::map<string, string>& streams,
+	size_t count /* = 0 */, size_t block /* = 0 */)
 {
 	xread_build(streams, count, block);
 	return get_results(messages);
 }
 
-bool redis_stream::xreadgroup(const char* group, const char* consumer,
+bool redis_stream::xreadgroup(redis_stream_messages& messages,
+	const char* group, const char* consumer,
 	const std::map<string, string>& streams,
-	redis_stream_messages& messages, size_t count /* = 0 */,
-	size_t block /* = 0 */)
+	size_t count /* = 0 */, size_t block /* = 0 */)
 {
 	xreadgroup_build(group, consumer, streams, count, block);
 	return get_results(messages);
+}
+
+bool redis_stream::xrange(redis_stream_messages& messages, const char* key,
+	const char* start, const char* end, size_t count /* = 0 */)
+{
+	return range(messages, "XRANGE", key, start, end, count);
+}
+
+bool redis_stream::xrevrange(redis_stream_messages& messages, const char* key,
+	const char* start, const char* end, size_t count /* = 0 */)
+{
+	return range(messages, "XREVRANGE", key, start, end, count);
+}
+
+bool redis_stream::range(redis_stream_messages& messages, const char* cmd,
+	const char* key, const char* start, const char* end, size_t count)
+{
+	const char* argv[6];
+	size_t lens[6];
+	size_t i = 0;
+
+	argv[i] = cmd;
+	lens[i] = strlen(cmd);
+	i++;
+
+	argv[i] = key;
+	lens[i] = strlen(key);
+	i++;
+
+	argv[i] = start;
+	lens[i] = strlen(start);
+	i++;
+
+	argv[i] = end;
+	lens[i] = strlen(end);
+	i++;
+
+	char count_s[LONG_LEN];
+	if (count > 0) {
+		argv[i] = "COUNT";
+		lens[i] = sizeof("COUNT") - 1;
+		i++;
+
+		safe_snprintf(count_s, sizeof(count_s), "%lu",
+			(unsigned long) count);
+		argv[i] = count_s;
+		lens[i] = strlen(count_s);
+		i++;
+	}
+
+	build_request(i, argv, lens);
+
+	const redis_result* result = run();
+	if (result == NULL || result_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	messages.key = key;
+
+	size_t size;
+	const redis_result** children = result->get_children(&size);
+	if (children == NULL || size == 0) {
+		return true;
+	}
+
+	for (i = 0; i < size; i++) {
+		const redis_result* child = children[i];
+		if (child->get_type() != REDIS_RESULT_ARRAY) {
+			continue;
+		}
+		get_stream_messages(*child, messages);
+	}
+	return true;
 }
 
 bool redis_stream::get_results(redis_stream_messages& messages)
@@ -330,6 +417,213 @@ bool redis_stream::get_stream_message(const redis_result& rr,
 	child = children[1];
 	child->argv_to_string(value);
 	return true;
+}
+
+int redis_stream::xack(const char* key, const char* group, const char* id)
+{
+	const char* argv[4];
+	size_t lens[4];
+
+	argv[0] = "XACK";
+	lens[0] = sizeof("XACK") - 1;
+	argv[1] = group;
+	lens[1] = strlen(group);
+	argv[2] = key;
+	lens[2] = strlen(key);
+	argv[3] = id;
+	lens[3] = strlen(id);
+	build_request(4, argv, lens);
+	return get_number();
+}
+
+int redis_stream::xack(const char* key, const char* group,
+	const std::vector<string>& ids)
+{
+	if (ids.empty()) {
+		logger_error("ids empty");
+		return -1;
+	}
+
+	argc_ = 3 + ids.size();
+	argv_space(argc_);
+
+	size_t i = 0;
+	argv_[i] = "XACK";
+	argv_lens_[i] = sizeof("XACK") - 1;
+	i++;
+
+	argv_[i] = key;
+	argv_lens_[i] = strlen(key);
+	i++;
+
+	argv_[i] = group;
+	argv_lens_[i] = strlen(group);
+	i++;
+
+	for (std::vector<string>::const_iterator cit = ids.begin();
+		cit != ids.end(); ++cit) {
+
+		argv_[i] = (*cit).c_str();
+		argv_lens_[i] = (*cit).size();
+		i++;
+	}
+
+	build_request(i, argv_, argv_lens_);
+	return get_number();
+}
+
+int redis_stream::xack(const char* key, const char* group,
+	const std::vector<const char*>& ids)
+{
+	if (ids.empty()) {
+		logger_error("ids empty");
+		return -1;
+	}
+
+	argc_ = 3 + ids.size();
+	argv_space(argc_);
+
+	size_t i = 0;
+	argv_[i] = "XACK";
+	argv_lens_[i] = sizeof("XACK") - 1;
+	i++;
+
+	argv_[i] = key;
+	argv_lens_[i] = strlen(key);
+	i++;
+
+	argv_[i] = group;
+	argv_lens_[i] = strlen(group);
+	i++;
+
+	for (std::vector<const char*>::const_iterator cit = ids.begin();
+		cit != ids.end(); ++cit) {
+
+		argv_[i] = *cit;
+		argv_lens_[i] = strlen(argv_[i]);
+		i++;
+	}
+
+	build_request(i, argv_, argv_lens_);
+	return get_number();
+}
+
+int redis_stream::xack(const char* key, const char* group,
+	const std::list<string>& ids, size_t size)
+{
+	if (ids.empty() || size == 0) {
+		logger_error("ids empty or size 0");
+		return -1;
+	}
+
+	argc_ = 3 + size;
+	argv_space(argc_);
+
+	size_t i = 0;
+	argv_[i] = "XACK";
+	argv_lens_[i] = sizeof("XACK") - 1;
+	i++;
+
+	argv_[i] = key;
+	argv_lens_[i] = strlen(key);
+	i++;
+
+	argv_[i] = group;
+	argv_lens_[i] = strlen(group);
+	i++;
+
+	for (std::list<string>::const_iterator cit = ids.begin();
+		cit != ids.end(); ++cit) {
+
+		argv_[i] = (*cit).c_str();
+		argv_lens_[i] = (*cit).size();
+		i++;
+	}
+
+	build_request(i, argv_, argv_lens_);
+	return get_number();
+}
+
+int redis_stream::xack(const char* key, const char* group,
+	const std::list<const char*>& ids, size_t size)
+{
+	if (ids.empty() || size == 0) {
+		logger_error("ids empty or size 0");
+		return -1;
+	}
+
+	argc_ = 3 + size;
+	argv_space(argc_);
+
+	size_t i = 0;
+	argv_[i] = "XACK";
+	argv_lens_[i] = sizeof("XACK") - 1;
+	i++;
+
+	argv_[i] = key;
+	argv_lens_[i] = strlen(key);
+	i++;
+
+	argv_[i] = group;
+	argv_lens_[i] = strlen(group);
+	i++;
+
+	for (std::list<const char*>::const_iterator cit = ids.begin();
+		cit != ids.end(); ++cit) {
+
+		argv_[i] = *cit;
+		argv_lens_[i] = strlen(argv_[i]);
+		i++;
+	}
+
+	build_request(i, argv_, argv_lens_);
+	return get_number();
+}
+
+int redis_stream::xdel(const char* key, const std::vector<string>& ids)
+{
+	redis_command::build("XDEL", key, ids);
+	return get_number();
+}
+
+int redis_stream::xdel(const char* key, const std::vector<const char*>& ids)
+{
+	redis_command::build("XDEL", key, ids);
+	return get_number();
+}
+
+int redis_stream::xtrim(const char* key, size_t maxlen, bool tilde)
+{
+	const char* argv[5];
+	size_t lens[5];
+	size_t i = 0;
+
+	argv[i] = "XTRIM";
+	lens[i] = sizeof("XTRIM") - 1;
+	i++;
+
+	argv[i] = key;
+	lens[i] = strlen(key);
+	i++;
+
+	argv[i] = "MAXLEN";
+	lens[i] = sizeof("MAXLEN") - 1;
+	i++;
+
+	if (tilde) {
+		argv[i] = "~";
+		lens[i] = 1;
+		i++;
+	}
+
+	char buf[LONG_LEN];
+	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) maxlen);
+	argv[i] = buf;
+	lens[i] = strlen(buf);
+	i++;
+
+	build_request(i, argv, lens);
+	return get_number();
 }
 
 //////////////////////////////////////////////////////////////////////////////

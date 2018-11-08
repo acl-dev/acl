@@ -44,15 +44,36 @@ public:
 		const char* values[], const size_t values_len[], size_t argc,
 		string& result, const char* id = "*");
 
+	int  xlen(const char* key);
+	int  xdel(const char* key, const std::vector<string>& ids);
+	int  xdel(const char* key, const std::vector<const char*>& ids);
+	int  xtrim(const char* key, size_t maxlen, bool tilde = false);
+
 	/////////////////////////////////////////////////////////////////////
 
-	bool xread(const std::map<string, string>& streams,
-		redis_stream_messages& messages,
-		size_t count = 0, size_t block = 0);
-	bool xreadgroup(const char* group, const char* consumer,
+	bool xread(redis_stream_messages& messages,
 		const std::map<string, string>& streams,
-		redis_stream_messages& messsages,
 		size_t count = 0, size_t block = 0);
+	bool xreadgroup(redis_stream_messages& messsages,
+		const char* group, const char* consumer,
+		const std::map<string, string>& streams,
+		size_t count = 0, size_t block = 0);
+	bool xrange(redis_stream_messages& messages, const char* key,
+		const char* start = "-", const char* end = "+", size_t count = 0);
+	bool xrevrange(redis_stream_messages& messages, const char* key,
+		const char* start = "+", const char* end = "-", size_t count = 0);
+
+	/////////////////////////////////////////////////////////////////////
+
+	int  xack(const char* key, const char* group, const char* id);
+	int  xack(const char* key, const char* group,
+		const std::vector<string>& ids);
+	int  xack(const char* key, const char* group,
+		const std::vector<const char*>& ids);
+	int  xack(const char* key, const char* group,
+		const std::list<string>& ids, size_t size);
+	int  xack(const char* key, const char* group,
+		const std::list<const char*>& ids, size_t size);
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -92,6 +113,9 @@ private:
 		redis_stream_messages& messages);
 	bool get_stream_message(const redis_result& rr,
 		string& name, string& value);
+	bool range(redis_stream_messages& messages, const char* cmd,
+	     	const char* key, const char* start, const char* end,
+		size_t count);
 };
 
 }
