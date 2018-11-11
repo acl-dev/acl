@@ -27,6 +27,33 @@ struct redis_stream_messages
 	std::map<string, redis_stream_message> messages;
 };
 
+struct redis_xinfo_consumer
+{
+	string name;
+	size_t pending;
+	size_t idle;
+
+	redis_xinfo_consumer(void)
+	{
+		pending = 0;
+		idle = 0;
+	}
+};
+
+struct redis_xinfo_group
+{
+	string name;
+	string last_delivered_id;
+	size_t consumers;
+	size_t pending;
+
+	redis_xinfo_group(void)
+	{
+		consumers = 0;
+		pending = 0;
+	}
+};
+
 struct redis_stream_info
 {
 	size_t length;
@@ -105,6 +132,10 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	bool xinfo_help(std::vector<string>& result);
+	bool xinfo_consumers(const char* key, const char* group,
+		std::map<string, redis_xinfo_consumer>& result);
+	bool xinfo_groups(const char* key,
+		std::map<string, redis_xinfo_group>& result);
 	bool xinfo_stream(const char* key, redis_stream_info& result);
 
 	/////////////////////////////////////////////////////////////////////
@@ -134,6 +165,9 @@ private:
 	bool get_one_field(const redis_result& rr, redis_stream_field& field);
 	bool range(redis_stream_messages& messages, const char* cmd,
 	     	const char* key, const char* start, const char* end, size_t count);
+
+	bool get_one_consumer(const redis_result& rr, redis_xinfo_consumer& consumer);
+	bool get_one_group(const redis_result& rr, redis_xinfo_group& group);
 };
 
 }

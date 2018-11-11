@@ -878,6 +878,200 @@ bool redis_stream::xinfo_help(std::vector<string>& result)
 	return get_strings(result) >= 0 ? true : false;
 }
 
+#define IS_INTEGER(x)	((x) == REDIS_RESULT_INTEGER)
+#define IS_STRING(x)	((x) == REDIS_RESULT_STRING)
+#define IS_ARRAY(x)	((x) == REDIS_RESULT_ARRAY)
+
+#define EQ(x, y) ((x).equal((y), false))
+
+bool redis_stream::xinfo_consumers(const char* key, const char* group,
+	std::map<string, redis_xinfo_consumer>& result)
+{
+	const char* argv[4];
+	size_t lens[4];
+
+	argv[0] = "XINFO";
+	lens[0] = sizeof("XINFO") - 1;
+	argv[1] = "CONSUMERS";
+	lens[1] = sizeof("CONSUMERS") - 1;
+	argv[2] = key;
+	lens[2] = strlen(key);
+	argv[3] = group;
+	lens[3] = strlen(group);
+
+	build_request(4, argv, lens);
+	const redis_result* rr = run();
+	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr->get_children(&size);
+	if (children == NULL || size == 0) {
+		return true;
+	}
+
+	for (size_t i = 0; i < size; i++) {
+		const redis_result* child = children[i];
+
+		redis_xinfo_consumer consumer;
+		if (get_one_consumer(*child, consumer)) {
+			result[consumer.name] = consumer;
+		}
+	}
+
+	return true;
+}
+
+bool redis_stream::get_one_consumer(const redis_result& rr,
+	redis_xinfo_consumer& consumer)
+{
+	if (rr.get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr.get_children(&size);
+	if (children == NULL || size == 0 || size % 2 != 0) {
+		return false;
+	}
+
+	for (size_t i = 0; i < size;) {
+		const redis_result* first = children[i++];
+		if (first->get_type() != REDIS_RESULT_STRING) {
+			i++;
+			continue;
+		}
+
+		string value;
+		size_t n = 0;
+
+		const redis_result* second = children[i++];
+		redis_result_t type = second->get_type();
+		if (type == REDIS_RESULT_STRING) {
+			second->argv_to_string(value);
+			if (value.empty()) {
+				continue;
+			}
+		} else if (type == REDIS_RESULT_INTEGER) {
+			bool ok;
+			n = (size_t) second->get_integer(&ok);
+			if (!ok) {
+				continue;
+			}
+		} else {
+			continue;
+		}
+
+		string name;
+		first->argv_to_string(name);
+
+		if (IS_STRING(type) && EQ(name, "name")) {
+			consumer.name = value;
+		} else if (IS_INTEGER(type) && EQ(name, "pending")) {
+			consumer.pending = n;
+		} else if (IS_INTEGER(type) && EQ(name, "idle")) {
+			consumer.idle = n;
+		}
+	}
+
+	return !consumer.name.empty();
+}
+
+bool redis_stream::xinfo_groups(const char* key,
+	std::map<string, redis_xinfo_group>& result)
+{
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "XINFO";
+	lens[0] = sizeof("XINFO") - 1;
+	argv[1] = "GROUPS";
+	lens[1] = sizeof("GROUPS") - 1;
+	argv[2] = key;
+	lens[2] = strlen(key);
+
+	build_request(3, argv, lens);
+	const redis_result* rr = run();
+	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr->get_children(&size);
+	if (children == NULL || size == 0) {
+		return true;
+	}
+
+	for (size_t i = 0; i < size; i++) {
+		const redis_result* child = children[i];
+
+		redis_xinfo_group group;
+		if (get_one_group(*child, group)) {
+			result[group.name] = group;
+		}
+	}
+
+	return true;
+}
+
+bool redis_stream::get_one_group(const redis_result& rr,
+	redis_xinfo_group& group)
+{
+	if (rr.get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr.get_children(&size);
+	if (children == NULL || size == 0 || size % 2 != 0) {
+		return false;
+	}
+
+	for (size_t i = 0; i < size;) {
+		const redis_result* first = children[i++];
+		if (first->get_type() != REDIS_RESULT_STRING) {
+			i++;
+			continue;
+		}
+
+		string value;
+		size_t n = 0;
+
+		const redis_result* second = children[i++];
+		redis_result_t type = second->get_type();
+		if (type == REDIS_RESULT_STRING) {
+			second->argv_to_string(value);
+			if (value.empty()) {
+				continue;
+			}
+		} else if (type == REDIS_RESULT_INTEGER) {
+			bool ok;
+			n = (size_t) second->get_integer(&ok);
+			if (!ok) {
+				continue;
+			}
+		} else {
+			continue;
+		}
+
+		string name;
+		first->argv_to_string(name);
+
+		if (IS_STRING(type) && EQ(name, "name")) {
+			group.name = value;
+		} else if (IS_INTEGER(type) && EQ(name, "consumers")) {
+			group.consumers = n;
+		} else if (IS_INTEGER(type) && EQ(name, "pending")) {
+			group.pending = n;
+		} else if (IS_STRING(type) && EQ(name, "last-delivered-id")) {
+			group.last_delivered_id = value;
+		}
+	}
+
+	return !group.name.empty();
+}
+
 bool redis_stream::xinfo_stream(const char* key, redis_stream_info& info)
 {
 	const char* argv[3];
@@ -934,12 +1128,6 @@ bool redis_stream::xinfo_stream(const char* key, redis_stream_info& info)
 		}
 
 		first->argv_to_string(name);
-
-#define IS_INTEGER(x)	((x) == REDIS_RESULT_INTEGER)
-#define IS_STRING(x)	((x) == REDIS_RESULT_STRING)
-#define IS_ARRAY(x)	((x) == REDIS_RESULT_ARRAY)
-
-#define EQ(x, y) ((x).equal((y), false))
 
 		if (IS_INTEGER(type) && EQ(name, "length")) {
 			info.length = n;
