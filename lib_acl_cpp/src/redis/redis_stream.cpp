@@ -585,6 +585,107 @@ int redis_stream::xack(const char* key, const char* group,
 	return get_number();
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
+#if 0
+
+bool redis_stream::xpending(std::map<string, redis_pending_message>& result,
+	const char* key, const char* group, const char* start_id /* = "-" */,
+	const char* end_id /* = "+" */, size_t count /* = 1 */,
+	const char* consumer /* = NULL */)
+{
+	const char* argv[7];
+	size_t lens[7];
+	size_t i = 0;
+
+	argv[i] = "XPENDING";
+	lens[i] = sizeof("XPENDING") - 1;
+	i++;
+
+	argv[i] = key;
+	lens[i] = strlen(key);
+	i++;
+
+	argv[i] = group;
+	lens[i] = strlen(group);
+	i++;
+
+	char count_s[LONG_LEN];
+
+	if (start_id && *start_id) {
+		argv[i] = start_id;
+		lens[i] = strlen(start_id);
+		i++;
+
+		if (end_id == NULL || *end_id == 0) {
+			logger_error("end_id null");
+			return false;
+		}
+		argv[i] = end_id;
+		lens[i] = strlen(end_id);
+		i++;
+
+		safe_snprintf(count_s, sizeof(count_s), "%lu",
+			(unsigned long) count);
+		argv[i] = count_s;
+		lens[i] = strlen(count_s);
+		i++;
+
+		if (consumer && *consumer) {
+			argv[i] = consumer;
+			lens[i] = strlen(consumer);
+			i++;
+		}
+	} else if (end_id || consumer) {
+		logger_error("start_id null");
+		return false;
+	}
+
+	build_request(i, argv, lens);
+
+	const redis_result* rr = run();
+	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr->get_children(&size);
+	if (children == NULL || size == 0) {
+		return true;
+	}
+
+	for (size_t i = 0; i < size; i++) {
+		const redis_result* child = children[i];
+
+		redis_pending_message message;
+		if (get_pending_messsage(*child, message)) {
+			result[message.id] = message;
+		}
+	}
+
+	return true;
+}
+
+bool redis_stream::get_pending_message(const redis_result& rr,
+	redis_pending_message& message)
+{
+	if (rr.get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr.get_children(&size);
+	if (children == NULL || size == 0) {
+		return false;
+	}
+
+	return true;
+}
+
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
+
 int redis_stream::xdel(const char* key, const std::vector<string>& ids)
 {
 	redis_command::build("XDEL", key, ids);

@@ -121,6 +121,12 @@ public:
 
 	/////////////////////////////////////////////////////////////////////
 
+	bool xpending(const char* key, const char* group,
+		const char* start_id = "-", const char* end_id = "+",
+		size_t count = 1, const char* consumer = NULL);
+
+	/////////////////////////////////////////////////////////////////////
+
 	bool xgroup_create(const char* key, const char* group,
 		const char* id = "$");
 	int  xgroup_destroy(const char* key, const char* group);
