@@ -4,7 +4,7 @@
 549.1) feature: 增加 redis_stream::xinfo 命令
 
 548) 2018.11.8
-548.1) feature: 增加 redis_stream 中的 xtrim, xdel, xrange, xrevrange 等命令
+548.1) feature: 增加 redis_stream 中的 xtrim, xdel, xrange, xrevrange, xlen, xack 命令
 
 547) 2018.11.7
 547.1) feature: 增加 redis_stream::xreadgroup 命令
