@@ -9,16 +9,33 @@ namespace acl
 class redis_client;
 class redis_client_cluster;
 
-struct redis_stream_message
+struct redis_stream_field
 {
 	string name;
 	string value;
 };
 
+struct redis_stream_message
+{
+	string id;
+	std::vector<redis_stream_field> fields;
+};
+
 struct redis_stream_messages
 {
 	string key;
-	std::map<string, std::vector<redis_stream_message> > messages;
+	std::map<string, redis_stream_message> messages;
+};
+
+struct redis_stream_info
+{
+	size_t length;
+	size_t radix_tree_keys;
+	size_t radix_tree_nodes;
+	size_t groups;
+	string last_generated_id;
+	redis_stream_message first_entry;
+	redis_stream_message last_entry;
 };
 
 class ACL_CPP_API redis_stream : virtual public redis_command
@@ -87,6 +104,11 @@ public:
 
 	/////////////////////////////////////////////////////////////////////
 
+	bool xinfo_help(std::vector<string>& result);
+	bool xinfo_stream(const char* key, redis_stream_info& result);
+
+	/////////////////////////////////////////////////////////////////////
+
 private:
 	void build(const char* cmd, const char* key, const char* id,
 		const std::map<string, string>& fields);
@@ -107,15 +129,11 @@ private:
 		const std::map<string, string>& streams,
 		size_t count, size_t block);
 	bool get_results(redis_stream_messages& messages);
-	bool get_streams_results(const redis_result& rr,
-		redis_stream_messages& messages);
-	bool get_stream_messages(const redis_result& rr,
-		redis_stream_messages& messages);
-	bool get_stream_message(const redis_result& rr,
-		string& name, string& value);
+	bool get_messages(const redis_result& rr, redis_stream_messages& messages);
+	bool get_one_message(const redis_result& rr, redis_stream_message& message);
+	bool get_one_field(const redis_result& rr, redis_stream_field& field);
 	bool range(redis_stream_messages& messages, const char* cmd,
-	     	const char* key, const char* start, const char* end,
-		size_t count);
+	     	const char* key, const char* start, const char* end, size_t count);
 };
 
 }

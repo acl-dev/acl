@@ -275,7 +275,7 @@ bool redis_stream::range(redis_stream_messages& messages, const char* cmd,
 	build_request(i, argv, lens);
 
 	const redis_result* result = run();
-	if (result == NULL || result_type() != REDIS_RESULT_ARRAY) {
+	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY) {
 		return false;
 	}
 
@@ -292,7 +292,12 @@ bool redis_stream::range(redis_stream_messages& messages, const char* cmd,
 		if (child->get_type() != REDIS_RESULT_ARRAY) {
 			continue;
 		}
-		get_stream_messages(*child, messages);
+
+		redis_stream_message message;
+		bool ret = get_one_message(*child, message);
+		if (ret && !message.fields.empty()) {
+			messages.messages[message.id] = message;
+		}
 	}
 	return true;
 }
@@ -315,13 +320,13 @@ bool redis_stream::get_results(redis_stream_messages& messages)
 		if (child->get_type() != REDIS_RESULT_ARRAY) {
 			continue;
 		}
-		get_streams_results(*child, messages);
+		get_messages(*child, messages);
 	}
 
 	return true;
 }
 
-bool redis_stream::get_streams_results(const redis_result& rr,
+bool redis_stream::get_messages(const redis_result& rr,
 	redis_stream_messages& messages)
 {
 	size_t size;
@@ -351,13 +356,18 @@ bool redis_stream::get_streams_results(const redis_result& rr,
 		if (child->get_type() != REDIS_RESULT_ARRAY) {
 			continue;
 		}
-		get_stream_messages(*child, messages);
+
+		redis_stream_message message;
+		bool ret = get_one_message(*child, message);
+		if (ret && !message.fields.empty()) {
+			messages.messages[message.id] = message;
+		}
 	}
 	return true;
 }
 
-bool redis_stream::get_stream_messages(const redis_result& rr,
-	redis_stream_messages& messages)
+bool redis_stream::get_one_message(const redis_result& rr,
+	redis_stream_message& message)
 {
 	size_t size;
 	const redis_result** children = rr.get_children(&size);
@@ -372,8 +382,8 @@ bool redis_stream::get_stream_messages(const redis_result& rr,
 	if (child->get_type() != REDIS_RESULT_STRING) {
 		return false;
 	}
-	string id;
-	child->argv_to_string(id);
+
+	child->argv_to_string(message.id);
 
 	child = children[1];
 	children = child->get_children(&size);
@@ -381,30 +391,25 @@ bool redis_stream::get_stream_messages(const redis_result& rr,
 		return false;
 	}
 
-	std::vector<redis_stream_message> msgs;
 	for (size_t i = 0; i < size; i++) {
 		child = children[i];
 		if (child->get_type() != REDIS_RESULT_ARRAY) {
 			continue;
 		}
 
-		redis_stream_message msg;
-		if (!get_stream_message(*child, msg.name, msg.value)) {
+		redis_stream_field field;
+		if (!get_one_field(*child, field)) {
 			continue;
 		}
 
-		msgs.push_back(msg);
-	}
-
-	if (!msgs.empty()) {
-		messages.messages[id] = msgs;
+		message.fields.push_back(field);
 	}
 
 	return true;
 }
 
-bool redis_stream::get_stream_message(const redis_result& rr,
-	string& name, string& value)
+bool redis_stream::get_one_field(const redis_result& rr,
+	redis_stream_field& field)
 {
 	size_t size;
 	const redis_result** children = rr.get_children(&size);
@@ -413,9 +418,9 @@ bool redis_stream::get_stream_message(const redis_result& rr,
 	}
 
 	const redis_result* child = children[0];
-	child->argv_to_string(name);
+	child->argv_to_string(field.name);
 	child = children[1];
-	child->argv_to_string(value);
+	child->argv_to_string(field.value);
 	return true;
 }
 
@@ -855,6 +860,105 @@ void redis_stream::build(const char* cmd, const char* key, const char* id,
 	}
 
 	build_request(argc_, argv_, argv_lens_);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+bool redis_stream::xinfo_help(std::vector<string>& result)
+{
+	const char* argv[2];
+	size_t lens[2];
+
+	argv[0] = "XINFO";
+	lens[0] = sizeof("XINFO") - 1;
+	argv[1] = "HELP";
+	lens[1] = sizeof("HELP") - 1;
+
+	build_request(2, argv, lens);
+	return get_strings(result) >= 0 ? true : false;
+}
+
+bool redis_stream::xinfo_stream(const char* key, redis_stream_info& info)
+{
+	const char* argv[3];
+	size_t lens[3];
+
+	argv[0] = "XINFO";
+	lens[0] = sizeof("XINFO") - 1;
+	argv[1] = "STREAM";
+	lens[1] = sizeof("STREAM") - 1;
+	argv[2] = key;
+	lens[2] = strlen(key);
+
+	build_request(3, argv, lens);
+	const redis_result* rr = run();
+	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr->get_children(&size);
+	if (children == NULL || size == 0) {
+		return false;
+	}
+
+	if (size % 2 != 0) {
+		return false;
+	}
+
+	for (size_t i = 0; i < size;) {
+		const redis_result* first = children[i++];
+		if (first->get_type() != REDIS_RESULT_STRING) {
+			i++;
+			continue;
+		}
+
+		string name, value;
+		size_t n = 0;
+
+		const redis_result* second = children[i++];
+		redis_result_t type = second->get_type();
+		if (type == REDIS_RESULT_STRING) {
+			second->argv_to_string(value);
+			if (value.empty()) {
+				continue;
+			}
+		} else if (type == REDIS_RESULT_INTEGER) {
+			bool ok;
+			n = (size_t) second->get_integer(&ok);
+			if (!ok) {
+				continue;
+			}
+		} else if (type != REDIS_RESULT_ARRAY) {
+			continue;
+		}
+
+		first->argv_to_string(name);
+
+#define IS_INTEGER(x)	((x) == REDIS_RESULT_INTEGER)
+#define IS_STRING(x)	((x) == REDIS_RESULT_STRING)
+#define IS_ARRAY(x)	((x) == REDIS_RESULT_ARRAY)
+
+#define EQ(x, y) ((x).equal((y), false))
+
+		if (IS_INTEGER(type) && EQ(name, "length")) {
+			info.length = n;
+		} else if (IS_INTEGER(type) && EQ(name, "radix-tree-keys")) {
+			info.radix_tree_keys = n;
+		} else if (IS_INTEGER(type) && EQ(name, "radix-tree-nodes")) {
+			info.radix_tree_nodes = n;
+		} else if (IS_INTEGER(type) && EQ(name, "groups")) {
+			info.groups = n;
+		} else if (IS_STRING(type) && EQ(name, "last-generated-id")) {
+			info.last_generated_id = value;
+		} else if (IS_ARRAY(type) && EQ(name, "first-entry")) {
+			(void) get_one_message(*second, info.first_entry);
+		} else if (IS_ARRAY(type) && EQ(name, "last-entry")) {
+			(void) get_one_message(*second, info.last_entry);
+		}
+	}
+
+	return true;
 }
 
 } // namespace acl
