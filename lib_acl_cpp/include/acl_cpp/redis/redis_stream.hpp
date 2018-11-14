@@ -153,8 +153,17 @@ public:
 
 	/////////////////////////////////////////////////////////////////////
 
-	bool xclaim(const char* key, const char* group, const char* consumer,
-		long min_idle_time, const std::vector<string>& ids);
+	bool xclaim(std::vector<redis_stream_message>& messages,
+		const char* key, const char* group, const char* consumer,
+		long min_idle_time, const std::vector<string>& ids,
+		size_t idle = 0, long long time_ms = -1,
+		int retry_count = -1, bool force = false);
+
+	bool xclaim_with_justid(std::vector<string>& messages_ids,
+		const char* key, const char* group, const char* consumer,
+		long min_idle_time, const std::vector<string>& ids,
+		size_t idle = 0, long long time_ms = -1,
+		int retry_count = -1, bool force = false);
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -230,6 +239,12 @@ private:
 		redis_pending_consumer& consumer);
 	bool get_pending_message(const redis_result& rr,
 		redis_pending_message& message);
+
+	void xclaim_build(const char* key, const char* group,
+		const char* consumer, long min_idle_time,
+		const std::vector<string>& ids, size_t idle, long long time_ms,
+		int retry_count, bool force, bool justid);
+
 };
 
 }

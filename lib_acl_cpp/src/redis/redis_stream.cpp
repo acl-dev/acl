@@ -433,10 +433,141 @@ bool redis_stream::get_one_field(const redis_result& rr,
 
 //////////////////////////////////////////////////////////////////////////////
 
-bool redis_stream::xclaim(const char* key, const char* group,
-	const char* consumer, long min_idle_time, const std::vector<string>& ids)
+void redis_stream::xclaim_build(const char* key, const char* group,
+	const char* consumer, long min_idle_time, const std::vector<string>& ids,
+	size_t idle, long long time_ms, int retry_count, bool force,
+	bool justid)
 {
+	argc_ = 9 + ids.size();
+	argv_space(argc_);
 
+	size_t i = 0;
+	argv_[i] = "XCLAIM";
+	argv_lens_[i] = sizeof("XCLAIM") - 1;
+	i++;
+
+	argv_[i] = key;
+	argv_lens_[i] = strlen(key);
+	i++;
+
+	argv_[i] = group;
+	argv_lens_[i] = strlen(group);
+	i++;
+
+	argv_[i] = consumer;
+	argv_lens_[i] = strlen(consumer);
+	i++;
+
+	char min_idle_s[LONG_LEN];
+	safe_snprintf(min_idle_s, sizeof(min_idle_s), "%lu", min_idle_time);
+	argv_[i] = min_idle_s;
+	argv_lens_[i] = strlen(min_idle_s);
+	i++;
+
+	for (std::vector<string>::const_iterator cit = ids.begin();
+		cit != ids.end(); ++cit) {
+
+		argv_[i] = (*cit).c_str();
+		argv_lens_[i] = (*cit).size();
+		i++;
+	}
+
+	char tbuf[LONG_LEN];
+	if (idle > 0) {
+		safe_snprintf(tbuf, sizeof(tbuf), "%lu", (unsigned long) idle);
+		argv_[i] = tbuf;
+		argv_lens_[i] = strlen(tbuf);
+		i++;
+	} else if (time_ms > 0) {
+		safe_snprintf(tbuf, sizeof(tbuf), "%lld", time_ms);
+		argv_[i] = tbuf;
+		argv_lens_[i] = strlen(tbuf);
+		i++;
+	}
+
+	char retry_buf[INT_LEN];
+	if (retry_count > 0) {
+		safe_snprintf(retry_buf, sizeof(retry_buf), "%d", retry_count);
+		argv_[i] = retry_buf;
+		argv_lens_[i] = strlen(retry_buf);
+		i++;
+	}
+
+	if (force) {
+		argv_[i] = "FORCE";
+		argv_lens_[i] = sizeof("FORCE") - 1;
+		i++;
+	}
+
+	if (justid) {
+		argv_[i] = "JUSTID";
+		argv_lens_[i] = sizeof("JUSTID") - 1;
+		i++;
+	}
+
+	build_request(i, argv_, argv_lens_);
+}
+
+bool redis_stream::xclaim(std::vector<redis_stream_message>& messages,
+	const char* key, const char* group, const char* consumer,
+	long min_idle_time, const std::vector<string>& ids,
+	size_t idle /* = 0 */, long long time_ms /* = -1 */,
+	int retry_count /* = -1 */, bool force /* = false */)
+{
+	xclaim_build(key, group, consumer, min_idle_time, ids,
+		idle, time_ms, retry_count, force, false);
+
+	const redis_result* rr = run();
+	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr->get_children(&size);
+	for (size_t i = 0; i < size; i++) {
+		const redis_result* child = children[i];
+		if (child->get_type() != REDIS_RESULT_ARRAY) {
+			continue;
+		}
+		redis_stream_message message;
+		if (get_one_message(*child, message)) {
+			messages.push_back(message);
+		}
+	}
+
+	return true;
+}
+
+bool redis_stream::xclaim_with_justid(std::vector<string>& messages_ids,
+	const char* key, const char* group, const char* consumer,
+	long min_idle_time, const std::vector<string>& ids,
+	size_t idle /* = 0 */, long long time_ms /* = -1 */,
+	int retry_count /* = -1 */, bool force /* = false */)
+{
+	xclaim_build(key, group, consumer, min_idle_time, ids,
+		idle, time_ms, retry_count, force, false);
+
+	const redis_result* rr = run();
+	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr->get_children(&size);
+	for (size_t i = 0; i < size; i++) {
+		const redis_result* child = children[i];
+		if (child->get_type() != REDIS_RESULT_STRING) {
+			continue;
+		}
+
+		string id;
+		child->argv_to_string(id);
+		if (!id.empty()) {
+			messages_ids.push_back(id);
+		}
+	}
+
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////
