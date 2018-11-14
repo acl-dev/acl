@@ -1,5 +1,8 @@
 修改历史列表：
 
+550) 2018.11.12
+550.1) feature: 增加 redis_stream::xpending_xxx 方法用来支持 XPENDING 命令
+
 549) 2018.11.11
 549.1) feature: 增加 redis_stream::xinfo 命令
 

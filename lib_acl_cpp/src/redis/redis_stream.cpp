@@ -123,8 +123,8 @@ int redis_stream::xlen(const char* key)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void redis_stream::build(const std::map<string, string>& streams,
-	size_t count, size_t block, size_t i)
+void redis_stream::build(const std::map<string, string>& streams, size_t i,
+	size_t count, size_t block, bool noack /* = false */)
 {
 	char count_s[LONG_LEN];
 	if (count > 0) {
@@ -149,6 +149,12 @@ void redis_stream::build(const std::map<string, string>& streams,
 			(unsigned long) block);
 		argv_[i] = block_s;
 		argv_lens_[i] = strlen(block_s);
+		i++;
+	}
+
+	if (noack) {
+		argv_[i] = "NOACK";
+		argv_lens_[i] = sizeof("NOACK") - 1;
 		i++;
 	}
 
@@ -182,13 +188,14 @@ void redis_stream::xread_build(const std::map<string, string>& streams,
 	argv_lens_[i] = sizeof("XREAD") - 1;
 	i++;
 
-	build(streams, count, block, i);
+	build(streams, i, count, block, false);
 }
 
 void redis_stream::xreadgroup_build(const char* group, const char* consumer,
-	const std::map<string, string>& streams, size_t count, size_t block)
+	const std::map<string, string>& streams, size_t count, size_t block,
+	bool noack)
 {
-	argc_ = 9 + streams.size() * 2;
+	argc_ = 10 + streams.size() * 2;
 	argv_space(argc_);
 
 	size_t i = 0;
@@ -204,7 +211,7 @@ void redis_stream::xreadgroup_build(const char* group, const char* consumer,
 	argv_lens_[i] = strlen(consumer);
 	i++;
 
-	build(streams, count, block, i);
+	build(streams, i, count, block, noack);
 }
 
 bool redis_stream::xread(redis_stream_messages& messages,
@@ -217,10 +224,10 @@ bool redis_stream::xread(redis_stream_messages& messages,
 
 bool redis_stream::xreadgroup(redis_stream_messages& messages,
 	const char* group, const char* consumer,
-	const std::map<string, string>& streams,
-	size_t count /* = 0 */, size_t block /* = 0 */)
+	const std::map<string, string>& streams, size_t count /* = 0 */,
+	size_t block /* = 0 */, bool noack /* = false */)
 {
-	xreadgroup_build(group, consumer, streams, count, block);
+	xreadgroup_build(group, consumer, streams, count, block, noack);
 	return get_results(messages);
 }
 
@@ -424,6 +431,16 @@ bool redis_stream::get_one_field(const redis_result& rr,
 	return true;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
+bool redis_stream::xclaim(const char* key, const char* group,
+	const char* consumer, long min_idle_time, const std::vector<string>& ids)
+{
+
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 int redis_stream::xack(const char* key, const char* group, const char* id)
 {
 	const char* argv[4];
@@ -587,13 +604,119 @@ int redis_stream::xack(const char* key, const char* group,
 
 //////////////////////////////////////////////////////////////////////////////
 
-#if 0
+bool redis_stream::xpending_summary(const char* key, const char* group,
+	redis_pending_summary& result)
+{
+	const char* argv[3];
+	size_t lens[3];
 
-bool redis_stream::xpending(std::map<string, redis_pending_message>& result,
+	argv[0] = "XPENDING";
+	lens[0] = sizeof("XPENDING") - 1;
+	argv[1] = key;
+	lens[1] = strlen(key);
+	argv[2] = group;
+	lens[2] = strlen(group);
+
+	build_request(3, argv, lens);
+	const redis_result* rr = run();
+	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr->get_children(&size);
+	if (size < 4) {
+		return false;
+	}
+
+	rr = children[0];
+	if (rr->get_type() != REDIS_RESULT_INTEGER) {
+		return false;
+	}
+	
+	int n = rr->get_integer();
+	if (n < 0) {
+		return false;
+	} else if (n == 0) {
+		return true;
+	}
+
+	rr = children[1];
+	if (rr->get_type() == REDIS_RESULT_STRING) {
+		rr->argv_to_string(result.smallest_id);
+	}
+
+	rr = children[2];
+	if (rr->get_type() == REDIS_RESULT_STRING) {
+		rr->argv_to_string(result.greatest_id);
+	}
+
+	rr = children[3];
+	if (rr->get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	children = rr->get_children(&size);
+	if (children == NULL || size == 0) {
+		return false;
+	}
+
+	for (size_t i = 0; i < size; i++) {
+		const redis_result* child = children[i];
+
+		redis_pending_consumer consumer;
+		if (get_pending_consumer(*child, consumer)) {
+			result.consumers.push_back(consumer);
+		}
+	}
+
+	return !result.consumers.empty();
+}
+
+bool redis_stream::get_pending_consumer(const redis_result& rr,
+	redis_pending_consumer& consumer)
+{
+	if (rr.get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr.get_children(&size);
+	if (children == NULL || size < 2) {
+		return false;
+	}
+
+	const redis_result* child = children[0];
+	if (child->get_type() != REDIS_RESULT_STRING) {
+		return false;
+	}
+	child->argv_to_string(consumer.name);
+
+	child = children[1];
+	if (child->get_type() != REDIS_RESULT_STRING) {
+		return false;
+	}
+	string buf;
+	child->argv_to_string(buf);
+	int n = atoi(buf.c_str());
+	if (n < 0) {
+		return false;
+	}
+
+	consumer.pending_number = (size_t) n;
+	return true;
+}
+
+bool redis_stream::xpending_detail(redis_pending_detail& result,
 	const char* key, const char* group, const char* start_id /* = "-" */,
 	const char* end_id /* = "+" */, size_t count /* = 1 */,
 	const char* consumer /* = NULL */)
 {
+	if (!start_id || !*start_id || !end_id || !*end_id) {
+		logger_error("start_id and end_id should not null");
+		return false;
+	}
+
 	const char* argv[7];
 	size_t lens[7];
 	size_t i = 0;
@@ -610,35 +733,24 @@ bool redis_stream::xpending(std::map<string, redis_pending_message>& result,
 	lens[i] = strlen(group);
 	i++;
 
+	argv[i] = start_id;
+	lens[i] = strlen(start_id);
+	i++;
+
+	argv[i] = end_id;
+	lens[i] = strlen(end_id);
+	i++;
+
 	char count_s[LONG_LEN];
+	safe_snprintf(count_s, sizeof(count_s), "%lu", (unsigned long) count);
+	argv[i] = count_s;
+	lens[i] = strlen(count_s);
+	i++;
 
-	if (start_id && *start_id) {
-		argv[i] = start_id;
-		lens[i] = strlen(start_id);
+	if (consumer && *consumer) {
+		argv[i] = consumer;
+		lens[i] = strlen(consumer);
 		i++;
-
-		if (end_id == NULL || *end_id == 0) {
-			logger_error("end_id null");
-			return false;
-		}
-		argv[i] = end_id;
-		lens[i] = strlen(end_id);
-		i++;
-
-		safe_snprintf(count_s, sizeof(count_s), "%lu",
-			(unsigned long) count);
-		argv[i] = count_s;
-		lens[i] = strlen(count_s);
-		i++;
-
-		if (consumer && *consumer) {
-			argv[i] = consumer;
-			lens[i] = strlen(consumer);
-			i++;
-		}
-	} else if (end_id || consumer) {
-		logger_error("start_id null");
-		return false;
 	}
 
 	build_request(i, argv, lens);
@@ -654,12 +766,12 @@ bool redis_stream::xpending(std::map<string, redis_pending_message>& result,
 		return true;
 	}
 
-	for (size_t i = 0; i < size; i++) {
+	for (i = 0; i < size; i++) {
 		const redis_result* child = children[i];
 
 		redis_pending_message message;
-		if (get_pending_messsage(*child, message)) {
-			result[message.id] = message;
+		if (get_pending_message(*child, message)) {
+			result.messages[message.id] = message;
 		}
 	}
 
@@ -675,14 +787,41 @@ bool redis_stream::get_pending_message(const redis_result& rr,
 
 	size_t size;
 	const redis_result** children = rr.get_children(&size);
-	if (children == NULL || size == 0) {
+	if (children == NULL || size < 4) {
 		return false;
 	}
 
+	const redis_result* child = children[0];
+	if (child->get_type() != REDIS_RESULT_STRING) {
+		return false;
+	}
+	child->argv_to_string(message.id);
+
+	child = children[1];
+	if (child->get_type() != REDIS_RESULT_STRING) {
+		return false;
+	}
+	child->argv_to_string(message.consumer);
+
+	child = children[2];
+	if (child->get_type() != REDIS_RESULT_INTEGER) {
+		return false;
+	}
+	bool success;
+	long long n = child->get_integer64(&success);
+	if (n < 0 || !success) {
+		return false;
+	}
+	message.elapsed = (unsigned long long) n;
+
+	n = child->get_integer(&success);
+	if (n < 0 || !success) {
+		return false;
+	}
+	message.delivered = (size_t) n;
+
 	return true;
 }
-
-#endif
 
 //////////////////////////////////////////////////////////////////////////////
 
