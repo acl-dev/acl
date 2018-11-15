@@ -62,7 +62,8 @@ static void deserialize(void)
 		printf("shcool: %s, class_name: %s\r\n",
 			u.shcool.c_str(), u.class_name.c_str());
 		for (std::vector<std::string>::const_iterator cit = u.nicks.begin();
-			cit != u.nicks.end(); ++cit) {
+			cit != u.nicks.end(); ++cit)
+		{
 
 			printf("nick: %s\r\n", (*cit).c_str());
 		}
@@ -79,9 +80,11 @@ static void test1(void)
 	} obj;
 
 	struct user_male* m = new struct user_male;
-	(*m).favorite = "pingpang";
+	(*m).favorite = "";
 	(*m).height = 170;
-	(*m).name = "zsxxsz";
+	(*m).name = "";
+	(*m).nicks.push_back("");
+	(*m).nicks.push_back("大仙");
 	(*m).age = 11;
 	(*m).male = true;
 
@@ -156,6 +159,7 @@ static void test3(void)
 
 int main(void)
 {
+	test1(); exit(0);
 	printf("------------------------serialize----------------------\r\n");
 	serialize();
 

@@ -133,7 +133,7 @@ fi
 
 %changelog
 
-* Thu Nov 15 2018 zhengshuxin@qiyi.com 3.4.1-29-20181115.15
+* Thu Nov 15 2018 zhengshuxin@qiyi.com 3.4.1-30-20181115.15
 - acl_master: add log info for remote control commands
 
 * Tue Oct 23 2018 zhengshuxin@qiyi.com 3.4.1-29-20181023.22

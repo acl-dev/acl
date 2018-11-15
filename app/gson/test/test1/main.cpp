@@ -129,19 +129,23 @@ static void test1(void)
 	json1.update(node.to_string());
 
 	printf("------------------------------------------------------\r\n");
-	printf("json  to_string: %s\r\n", json.to_string().c_str());
+	printf("%s(%d): json  to_string: %s\r\n",
+		__FUNCTION__, __LINE__, json.to_string().c_str());
 	printf("------------------------------------------------------\r\n");
-	printf("node  to_string: %s\r\n", node.to_string().c_str());
+	printf("%s(%d): node  to_string: %s\r\n",
+		__FUNCTION__, __LINE__, node.to_string().c_str());
 	printf("------------------------------------------------------\r\n");
-	printf("json1 to_string: %s\r\n", json1.to_string().c_str());
+	printf("%s(%d): json1 to_string: %s\r\n",
+		__FUNCTION__, __LINE__, json1.to_string().c_str());
 	printf("------------------------------------------------------\r\n");
 
 	std::pair<bool, std::string> ret = acl::gson(json1.get_root(), msg1);
 	if (ret.first == false)
-		printf("error: %s\r\n", ret.second.c_str());
+		printf("%s(%d): error: %s\r\n",
+			__FUNCTION__, __LINE__, ret.second.c_str());
 	else
 	{
-		printf("==================== All OK ===================\r\n");
+		printf("============%s All OK ============\r\n", __FUNCTION__);
 		print_msg(msg);
 	}
 }

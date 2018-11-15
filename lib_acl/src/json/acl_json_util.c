@@ -480,11 +480,16 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 		}
 
 		/* 当节点为数组的成员时 */
+#if 0
 		else if (LEN(node->text) > 0 && node->parent
 			/* 应该依据父节点类型来确定当前节点是否为数组节点
 			 * && node->parent->left_ch != 0)
 			 */
 			&& node->parent->type == ACL_JSON_T_ARRAY)
+#else
+		else if (node->parent && node->parent->type == ACL_JSON_T_ARRAY
+			&& (LEN(node->text) > 0 || (node->type & ACL_JSON_T_A_STRING)))
+#endif
 		{
 			switch (node->type & ~ACL_JSON_T_LEAF) {
 			case ACL_JSON_T_A_NULL:
