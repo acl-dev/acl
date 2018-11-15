@@ -36,7 +36,7 @@ static void serialize(void)
 // 反序列化过程
 static void deserialize(void)
 {
-	const char *s = "{\"shcool\": \"山东工业大学\", \"class_name\": \"热处理专业\", \"province_name\": \"山东省\", \"position\": \"山东省\", \"name\": \"zsxxsz\", \"age\": 11, \"male\": true, \"ages\": [1, 2, 3, 4, 5] }";
+	const char *s = "{\"shcool\": \"山东工业大学\", \"class_name\": \"热处理专业\", \"province_name\": \"山东省\", \"position\": \"山东省\", \"name\": \"zsxxsz\", \"nicks\": [\"\", \"大仙\"], \"age\": 11, \"male\": true, \"ages\": [1, 2, 3, 4, 5] }";
 	printf("deserialize:\r\n");
 
 	acl::json json;
@@ -48,15 +48,24 @@ static void deserialize(void)
 
 	// 如果转换失败，则打印转换失败原因
 	if (ret.first == false)
+	{
 		printf("error: %s\r\n", ret.second.c_str());
+		exit (1);
+	}
 	else
 	{
+		printf(">>> %s:\r\n", __FUNCTION__);
 		printf("name: %s, age: %d, male: %s\r\n",
 			u.name.c_str(), u.age, u.male ? "yes" : "no");
 		printf("province_name: %s, position: %s\r\n",
 			u.province_name.c_str(), u.position.c_str());
 		printf("shcool: %s, class_name: %s\r\n",
 			u.shcool.c_str(), u.class_name.c_str());
+		for (std::vector<std::string>::const_iterator cit = u.nicks.begin();
+			cit != u.nicks.end(); ++cit) {
+
+			printf("nick: %s\r\n", (*cit).c_str());
+		}
 	}
 }
 

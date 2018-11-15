@@ -1,4 +1,4 @@
-%define release_id 29
+%define release_id 30
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Nov 15 2018 zhengshuxin@qiyi.com 3.4.1-29-20181115.15
+- acl_master: add log info for remote control commands
 
 * Tue Oct 23 2018 zhengshuxin@qiyi.com 3.4.1-29-20181023.22
 - bugfix: acl_udp_server.c can't bind multiple addrs

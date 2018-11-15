@@ -28,6 +28,7 @@ struct province
 struct user : student, province
 {
 	std::string name;
+	std::vector<std::string> nicks;
 	int  age;
 	bool male;
 
