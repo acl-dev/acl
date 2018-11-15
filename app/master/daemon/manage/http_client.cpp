@@ -140,8 +140,14 @@ void http_client::do_reply(int status, const char* cmd,
 	http_hdr_res_free(hdr_res);
 	buf.append(body);
 
-	if (save)
-		logger("cmd=[%s], reply: [%s]", cmd, buf.c_str());
+	if (save) {
+		// logger the important command's information
+		acl::string reqhdr;
+		http_hdr_sprint(reqhdr.vstring(), &hdr_req_->hdr, cmd);
+		logger("cmd=[%s]:\r\n[%s\r\n%s]\r\n\r\n[%s]\r\n", cmd,
+			reqhdr.c_str(), json_.to_string().c_str(), buf.c_str());
+	}
+
 	acl_aio_writen(conn_, buf.c_str(), (int) buf.size());
 }
 

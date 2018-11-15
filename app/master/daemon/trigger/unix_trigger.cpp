@@ -67,9 +67,8 @@ int acl_unix_trigger(ACL_EVENT *event, const char *service,
 	 * Connect...
 	 */
 	if ((fd = acl_unix_connect(service, ACL_BLOCKING, timeout)) < 0) {
-		if (acl_msg_verbose)
-			acl_msg_warn("%s: connect to %s: %s",
-				myname, service, strerror(errno));
+		acl_msg_warn("%s: connect to %s: %s, timeout=%d",
+			myname, service, strerror(errno), timeout);
 		return -1;
 	}
 	acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);

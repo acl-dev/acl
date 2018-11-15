@@ -1,4 +1,7 @@
 
+24) 2018.11.15
+24.1) feature: http_client::do_reply 记录请求信息，以便于排查问题
+
 23) 2018.10.23
 23.1) feature: master_listen.cpp, master_listen_sock() 中的 defer_accept
 可以控制是否采用延迟接收方式
