@@ -4,8 +4,8 @@ int main()
 {
 	const char* sss =
 		"["
-		"{\"DataKey\": \"BindRule\", \"DataValue\": {\"waittime\": \"7\"}, \"null_key\": null}, "
-		"{\"DataKey\": \"BindRule\", \"DataValue\": {\"waittime\": \"7\"}, \"null_key\": null}"
+		"{\"DataKey\":\"BindRule\",\"DataValue\":{\"waittime\":\"7\"},\"null_key\":null},"
+		"{\"DataKey\":\"BindRule\",\"DataValue\":{\"waittime\":\"7\"},\"null_key\":null}"
 		"]";
 
 	acl::json json3(sss);

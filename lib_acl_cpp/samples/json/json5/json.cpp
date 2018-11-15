@@ -10,7 +10,7 @@
 using namespace std;
 
 #if 1
-static const char* default_data = "{\"DataValue\": {\"RemoteLoginRemind\": [{\"value\": \"New\", \"onclick\": \"CreateNewDoc()\"}, {\"value\": \"Open\", \"onclick\": \"OpenDoc()\"}, {\"value\": \"Close\", \"onclick\": \"CloseDoc()\"}, [{\"value\": \"Save\", \"onclick\": \"SaveDoc()\"}]]}}";
+static const char* default_data = "{\"DataValue\":{\"RemoteLoginRemind\":[{\"value\":\"New\",\"onclick\":\"CreateNewDoc()\"},{\"value\":\"Open\",\"onclick\":\"OpenDoc()\"},{\"value\":\"Close\",\"onclick\":\"CloseDoc()\"},[{\"value\":\"Save\",\"onclick\":\"SaveDoc()\"}]]}}";
 #else
 static const char* default_data = "{\"DataValue\": {\"RemoteLoginRemind\": \"true1\", \"ModifyPasswdRemind\": \"true2\", \"MailForwardRemind\": \"true3\", \"SecureLoginVerification\": \"remote\"}}";
 #endif

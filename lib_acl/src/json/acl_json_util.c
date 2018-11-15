@@ -486,9 +486,14 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 			 * && node->parent->left_ch != 0)
 			 */
 			&& node->parent->type == ACL_JSON_T_ARRAY)
-#else
+#elif 0
 		else if (node->parent && node->parent->type == ACL_JSON_T_ARRAY
 			&& (LEN(node->text) > 0 || (node->type & ACL_JSON_T_A_STRING)))
+#else
+		else if (node->parent && node->parent->type == ACL_JSON_T_ARRAY
+			&& (node->type & (ACL_JSON_T_A_NULL
+			    | ACL_JSON_T_A_BOOL | ACL_JSON_T_A_NUMBER
+			    | ACL_JSON_T_A_DOUBLE | ACL_JSON_T_A_STRING)))
 #endif
 		{
 			switch (node->type & ~ACL_JSON_T_LEAF) {
@@ -500,8 +505,10 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 			case ACL_JSON_T_A_DOUBLE:
 				acl_vstring_strcat(buf, STR(node->text));
 				break;
-			default:
+			case ACL_JSON_T_A_STRING:
 				json_escape_append(buf, STR(node->text));
+				break;
+			default:
 				break;
 			}
 		}
