@@ -1,6 +1,7 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 
 static void ls_file(acl::scan_dir& scan, const char* path, bool recursive,
