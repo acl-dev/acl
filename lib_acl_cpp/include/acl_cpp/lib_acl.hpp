@@ -200,6 +200,7 @@
 #include "redis/redis_master.hpp"
 #include "redis/redis_sentinel.hpp"
 #include "redis/redis_role.hpp"
+#include "redis/redis_stream.hpp"
 #include "redis/redis.hpp"
 
 #include "disque/disque.hpp"

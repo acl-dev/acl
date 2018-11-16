@@ -463,6 +463,9 @@
     <ClCompile Include="src\redis\redis_string.cpp">
       <Filter>src\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\redis\redis_stream.cpp">
+      <Filter>src\redis</Filter>
+    </ClCompile>
     <ClCompile Include="src\stdlib\dbuf_pool.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
@@ -1078,6 +1081,9 @@
       <Filter>include\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_string.hpp">
+      <Filter>include\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_stream.hpp">
       <Filter>include\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\dbuf_pool.hpp">

@@ -152,6 +152,7 @@
 		07A4683B1E6FCCF1002C9B3C /* redis_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677C1E6FCCF1002C9B3C /* redis_set.cpp */; };
 		07A4683C1E6FCCF1002C9B3C /* redis_slot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677D1E6FCCF1002C9B3C /* redis_slot.cpp */; };
 		07A4683D1E6FCCF1002C9B3C /* redis_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677E1E6FCCF1002C9B3C /* redis_string.cpp */; };
+		07A4683D1E6FCCF1002C9B3C /* redis_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677E1E6FCCF1002C9B3C /* redis_stream.cpp */; };
 		07A4683E1E6FCCF1002C9B3C /* redis_transaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677F1E6FCCF1002C9B3C /* redis_transaction.cpp */; };
 		07A4683F1E6FCCF1002C9B3C /* redis_zset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467801E6FCCF1002C9B3C /* redis_zset.cpp */; };
 		07A468401E6FCCF1002C9B3C /* gsoner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467821E6FCCF1002C9B3C /* gsoner.cpp */; };
@@ -400,6 +401,7 @@
 		07A4677C1E6FCCF1002C9B3C /* redis_set.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_set.cpp; sourceTree = "<group>"; };
 		07A4677D1E6FCCF1002C9B3C /* redis_slot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_slot.cpp; sourceTree = "<group>"; };
 		07A4677E1E6FCCF1002C9B3C /* redis_string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_string.cpp; sourceTree = "<group>"; };
+		07A4677E1E6FCCF1002C9B3C /* redis_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_stream.cpp; sourceTree = "<group>"; };
 		07A4677F1E6FCCF1002C9B3C /* redis_transaction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_transaction.cpp; sourceTree = "<group>"; };
 		07A467801E6FCCF1002C9B3C /* redis_zset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_zset.cpp; sourceTree = "<group>"; };
 		07A467821E6FCCF1002C9B3C /* gsoner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gsoner.cpp; sourceTree = "<group>"; };
@@ -588,6 +590,7 @@
 		07A469081E6FD404002C9B3C /* redis_set.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_set.hpp; sourceTree = "<group>"; };
 		07A469091E6FD404002C9B3C /* redis_slot.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_slot.hpp; sourceTree = "<group>"; };
 		07A4690A1E6FD404002C9B3C /* redis_string.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_string.hpp; sourceTree = "<group>"; };
+		07A4690A1E6FD404002C9B3C /* redis_stream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_stream.hpp; sourceTree = "<group>"; };
 		07A4690B1E6FD404002C9B3C /* redis_transaction.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_transaction.hpp; sourceTree = "<group>"; };
 		07A4690C1E6FD404002C9B3C /* redis_zset.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_zset.hpp; sourceTree = "<group>"; };
 		07A4690E1E6FD404002C9B3C /* gson_helper.ipp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gson_helper.ipp; sourceTree = "<group>"; };
@@ -997,6 +1000,7 @@
 				07A4677C1E6FCCF1002C9B3C /* redis_set.cpp */,
 				07A4677D1E6FCCF1002C9B3C /* redis_slot.cpp */,
 				07A4677E1E6FCCF1002C9B3C /* redis_string.cpp */,
+				07A4677E1E6FCCF1002C9B3C /* redis_stream.cpp */,
 				07A4677F1E6FCCF1002C9B3C /* redis_transaction.cpp */,
 				07A467801E6FCCF1002C9B3C /* redis_zset.cpp */,
 			);
@@ -1403,6 +1407,7 @@
 				07A469081E6FD404002C9B3C /* redis_set.hpp */,
 				07A469091E6FD404002C9B3C /* redis_slot.hpp */,
 				07A4690A1E6FD404002C9B3C /* redis_string.hpp */,
+				07A4690A1E6FD404002C9B3C /* redis_stream.hpp */,
 				07A4690B1E6FD404002C9B3C /* redis_transaction.hpp */,
 				07A4690C1E6FD404002C9B3C /* redis_zset.hpp */,
 			);
@@ -1615,6 +1620,7 @@
 				07A4D1731E94E4BC00790E12 /* mbox.cpp in Sources */,
 				07A467DA1E6FCCF1002C9B3C /* db_service_mysql.cpp in Sources */,
 				07A4683D1E6FCCF1002C9B3C /* redis_string.cpp in Sources */,
+				07A4683D1E6FCCF1002C9B3C /* redis_stream.cpp in Sources */,
 				07A468051E6FCCF1002C9B3C /* master_conf.cpp in Sources */,
 				0778DAEE1F78D3FC0011B753 /* event_mutex.cpp in Sources */,
 				07A4683E1E6FCCF1002C9B3C /* redis_transaction.cpp in Sources */,

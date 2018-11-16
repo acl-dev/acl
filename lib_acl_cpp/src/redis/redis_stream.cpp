@@ -3,9 +3,8 @@
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
 #include "acl_cpp/redis/redis_result.hpp"
-#endif
-
 #include "acl_cpp/redis/redis_stream.hpp"
+#endif
 
 #define INT_LEN		11
 #define LONG_LEN	21

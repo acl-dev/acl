@@ -466,6 +466,9 @@
     <ClCompile Include="src\redis\redis_string.cpp">
       <Filter>Source Files\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\redis\redis_stream.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
     <ClCompile Include="src\redis\redis_connection.cpp">
       <Filter>Source Files\redis</Filter>
     </ClCompile>
@@ -1096,6 +1099,9 @@
       <Filter>Header Files\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_string.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_stream.hpp">
       <Filter>Header Files\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_connection.hpp">

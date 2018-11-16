@@ -966,6 +966,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_stream.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_transaction.cpp"
 					>
 				</File>
@@ -1793,6 +1797,10 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_string.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_stream.hpp"
 					>
 				</File>
 				<File

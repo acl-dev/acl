@@ -875,6 +875,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\redis\redis_string.cpp">
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_stream.cpp">
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_transaction.cpp">
 				</File>
 				<File
@@ -1532,6 +1535,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_string.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_stream.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_transaction.hpp">
