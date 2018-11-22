@@ -60,7 +60,7 @@ namespace acl
  *  Comments:
  *
  */
-sha1::sha1()
+sha1::sha1(void)
 {
 	reset();
 }
@@ -80,7 +80,7 @@ sha1::sha1()
  *  Comments:
  *
  */
-sha1::~sha1()
+sha1::~sha1(void)
 {
 	// The destructor does nothing
 }
@@ -101,7 +101,7 @@ sha1::~sha1()
  *  Comments:
  *
  */
-void sha1::reset()
+void sha1::reset(void)
 {
 	length_low_          = 0;
 	length_high_         = 0;
@@ -135,21 +135,27 @@ void sha1::reset()
  *  Comments:
  *
  */
-bool sha1::result(unsigned *message_digest_array)
+bool sha1::result(unsigned char *message_digest_array)
 {
 	int i; // Counter
 
-	if (corrupted_)
+	if (corrupted_) {
 		return false;
+	}
 
-	if (!computed_)
-	{
+	if (!computed_) {
 		pad_message();
 		computed_ = true;
 	}
 
-	for(i = 0; i < 5; i++)
-		message_digest_array[i] = h_[i];
+	//for(i = 0; i < 5; i++)
+	//	message_digest_array[i] = h_[i];
+	// 此处应该是将unsigned int数组中的每字节保存到一个 unsigned char 里面
+	// 不能直接将一个int直接赋值给4个char数组
+	// --- dawei.lin@net263.com, 2018.11.22
+	for(i = 0; i < 20; ++i) {
+		message_digest_array[i] = h_[i >> 2] >> 8 * (3 - (i & 0x03));
+	}
 
 	return true;
 }
@@ -174,31 +180,31 @@ bool sha1::result(unsigned *message_digest_array)
  */
 void sha1::input(const unsigned char *message_array, unsigned length)
 {
-	if (!length)
+	if (!length) {
 		return;
+	}
 
-	if (computed_ || corrupted_)
-	{
+	if (computed_ || corrupted_) {
 		corrupted_ = true;
 		return;
 	}
 
-	while (length-- && !corrupted_)
-	{
+	while (length-- && !corrupted_) {
 		message_block_[message_block_index_++] = (*message_array & 0xFF);
 
 		length_low_ += 8;
 		length_low_ &= 0xFFFFFFFF;              // Force it to 32 bits
-		if (length_low_ == 0)
-		{
+		if (length_low_ == 0) {
 			length_high_++;
 			length_high_ &= 0xFFFFFFFF;     // Force it to 32 bits
-			if (length_high_ == 0)
+			if (length_high_ == 0) {
 				corrupted_ = true;      // Message is too long
+			}
 		}
 
-		if (message_block_index_ == 64)
+		if (message_block_index_ == 64) {
 			process_message_block();
+		}
 
 		message_array++;
 	}
@@ -289,12 +295,11 @@ void sha1::input(char message_element)
  *      Each character is assumed to hold 8 bits of information.
  *
  */
-sha1& sha1::operator<<(const char *message_array)
+sha1& sha1::operator << (const char *message_array)
 {
 	const char *p = message_array;
 
-	while(*p)
-	{
+	while (*p) {
 		input(*p);
 		p++;
 	}
@@ -320,12 +325,11 @@ sha1& sha1::operator<<(const char *message_array)
  *      Each character is assumed to hold 8 bits of information.
  *
  */
-sha1& sha1::operator<<(const unsigned char *message_array)
+sha1& sha1::operator << (const unsigned char *message_array)
 {
 	const unsigned char *p = message_array;
 
-	while(*p)
-	{
+	while (*p) {
 		input(*p);
 		p++;
 	}
@@ -350,7 +354,7 @@ sha1& sha1::operator<<(const unsigned char *message_array)
  *      The character is assumed to hold 8 bits of information.
  *
  */
-sha1& sha1::operator<<(const char message_element)
+sha1& sha1::operator << (const char message_element)
 {
 	input((const unsigned char *) &message_element, 1);
 
@@ -374,7 +378,7 @@ sha1& sha1::operator<<(const char message_element)
  *      The character is assumed to hold 8 bits of information.
  *
  */
-sha1& sha1::operator<<(const unsigned char message_element)
+sha1& sha1::operator << (const unsigned char message_element)
 {
 	input(&message_element, 1);
 
@@ -400,7 +404,7 @@ sha1& sha1::operator<<(const unsigned char message_element)
  *      in the publication.
  *
  */
-void sha1::process_message_block()
+void sha1::process_message_block(void)
 {
 	const unsigned K[] =    {               // Constants defined for SHA-1
 		0x5A827999,
@@ -416,16 +420,16 @@ void sha1::process_message_block()
 	/*
 	 *  Initialize the first 16 words in the array W
 	 */
-	for (t = 0; t < 16; t++)
-	{
+	for (t = 0; t < 16; t++) {
 		W[t] = ((unsigned) message_block_[t * 4]) << 24;
 		W[t] |= ((unsigned) message_block_[t * 4 + 1]) << 16;
 		W[t] |= ((unsigned) message_block_[t * 4 + 2]) << 8;
 		W[t] |= ((unsigned) message_block_[t * 4 + 3]);
 	}
 
-	for (t = 16; t < 80; t++)
+	for (t = 16; t < 80; t++) {
 		W[t] = circular_shift(1, W[t-3] ^ W[t-8] ^ W[t-14] ^ W[t-16]);
+	}
 
 	A = h_[0];
 	B = h_[1];
@@ -433,8 +437,7 @@ void sha1::process_message_block()
 	D = h_[3];
 	E = h_[4];
 
-	for (t = 0; t < 20; t++)
-	{
+	for (t = 0; t < 20; t++) {
 		temp = circular_shift(5, A) + ((B & C) | ((~B) & D))
 			+ E + W[t] + K[0];
 		temp &= 0xFFFFFFFF;
@@ -445,8 +448,7 @@ void sha1::process_message_block()
 		A = temp;
 	}
 
-	for (t = 20; t < 40; t++)
-	{
+	for (t = 20; t < 40; t++) {
 		temp = circular_shift(5, A) + (B ^ C ^ D) + E + W[t] + K[1];
 		temp &= 0xFFFFFFFF;
 		E = D;
@@ -456,8 +458,7 @@ void sha1::process_message_block()
 		A = temp;
 	}
 
-	for (t = 40; t < 60; t++)
-	{
+	for (t = 40; t < 60; t++) {
 		temp = circular_shift(5, A) +
 			((B & C) | (B & D) | (C & D)) + E + W[t] + K[2];
 		temp &= 0xFFFFFFFF;
@@ -468,8 +469,7 @@ void sha1::process_message_block()
 		A = temp;
 	}
 
-	for (t = 60; t < 80; t++)
-	{
+	for (t = 60; t < 80; t++) {
 		temp = circular_shift(5, A) + (B ^ C ^ D) + E + W[t] + K[3];
 		temp &= 0xFFFFFFFF;
 		E = D;
@@ -509,29 +509,29 @@ void sha1::process_message_block()
  *  Comments:
  *
  */
-void sha1::pad_message()
+void sha1::pad_message(void)
 {
 	/*
 	 *  Check to see if the current message block is too small to hold
 	 *  the initial padding bits and length.  If so, we will pad the
 	 *  block, process it, and then continue padding into a second block.
 	 */
-	if (message_block_index_ > 55)
-	{
+	if (message_block_index_ > 55) {
 		message_block_[message_block_index_++] = 0x80;
-		while (message_block_index_ < 64)
+		while (message_block_index_ < 64) {
 			message_block_[message_block_index_++] = 0;
+		}
 
 		process_message_block();
 
-		while (message_block_index_ < 56)
+		while (message_block_index_ < 56) {
 			message_block_[message_block_index_++] = 0;
-	}
-	else
-	{
+		}
+	} else {
 		message_block_[message_block_index_++] = 0x80;
-		while (message_block_index_ < 56)
+		while (message_block_index_ < 56) {
 			message_block_[message_block_index_++] = 0;
+		}
 	}
 
 	/*

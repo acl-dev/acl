@@ -32,8 +32,8 @@ static void create_db(void)
 	//mdb = acl_mdb_create(db_name, "hash");
 
 	mdt = acl_mdb_tbl_create(mdb, tab_name,
-			/* ACL_MDT_FLAG_NUL, */
-			ACL_MDT_FLAG_SLICE1,
+			ACL_MDT_FLAG_NUL,
+			/* ACL_MDT_FLAG_SLICE1, */
 			/* ACL_MDT_FLAG_SLICE_RTGC_OFF, */
 			100, key_names, key_flags);
 	acl_assert(mdt);

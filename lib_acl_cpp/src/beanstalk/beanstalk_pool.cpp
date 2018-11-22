@@ -29,9 +29,9 @@ beanstalk* beanstalk_pool::peek(const char* addr, bool clean_watch /* = true */,
 	lock_->lock();
 	pool_range r = pool_.equal_range(key);
 
-    pool_it it = r.first;
-    if (it != r.second)
-    {
+	pool_it it = r.first;
+	if (it != r.second)
+	{
 		beanstalk* client = it->second;
 		pool_.erase(it);
 		lock_->unlock();
