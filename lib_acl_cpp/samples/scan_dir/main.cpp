@@ -102,8 +102,8 @@ static bool compare_files(const char* sfile, const char* dfile)
 	return sbuf == dbuf;
 }
 
-static void diff_path(acl::scan_dir& scan, const char* spath,
-	const char* dpath, bool recursive, const char* file_types)
+static void diff_path(acl::scan_dir& scan, const char* spath, const char* dpath,
+	bool recursive, const char* file_types, bool show_all)
 {
 	if (scan.open(spath, recursive) == false) {
 		logger_error("open path: %s error: %s",
@@ -137,8 +137,11 @@ static void diff_path(acl::scan_dir& scan, const char* spath,
 		dfilepath << dpath << path;
 		n++;
 		bool equal = compare_files(filepath, dfilepath);
-		printf("%s: %s\t%s\r\n", equal ? "same" : "diff",
-			filepath, dfilepath.c_str());
+		if (!equal) {
+			printf("diff %s\t%s\r\n", filepath, dfilepath.c_str());
+		} else if (show_all) {
+			printf("same %s\t%s\r\n", filepath, dfilepath.c_str());
+		}
 	}
 	printf("---scan over %d files---\r\n", n);
 }
@@ -150,6 +153,7 @@ static void usage(const char* procname)
 		" -s source path\r\n"
 		" -d destination path\r\n"
 		" -e file_types\r\n"
+		" -A [show all status including same files]\r\n"
 		" -r [if recursive, default: false]\r\n"
 		" -a [if get fullpath, default: false]\r\n", procname);
 }
@@ -157,11 +161,11 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int   ch;
-	bool  recursive = false, fullpath = false;
+	bool  recursive = false, fullpath = false, show_all = false;
 	acl::string dpath, spath, mode, types("c;cpp;cc;cxx;h;hpp;hxx");
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:d:t:rae:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:d:t:rae:A")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -183,6 +187,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'e':
 			types = optarg;
+			break;
+		case 'A':
+			show_all = true;
 			break;
 		default:
 			break;
@@ -210,7 +217,7 @@ int main(int argc, char* argv[])
 		}
 		if (!dpath.end_with("/"))
 			dpath += "/";
-		diff_path(scan, spath, dpath, recursive, types);
+		diff_path(scan, spath, dpath, recursive, types, show_all);
 	} else
 		ls_all(scan, spath, recursive, fullpath);
 

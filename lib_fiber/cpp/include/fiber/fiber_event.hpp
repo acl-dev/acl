@@ -14,7 +14,16 @@ namespace acl {
 class FIBER_CPP_API fiber_event
 {
 public:
-	fiber_event(void);
+	/**
+	 * 构造方法
+	 * @param use_mutex {bool} 在用在多线程之间进行事件同步时，如果启动的
+	 *  的线程数较多（成百上千个线程），则此标志应设为 true 以便于内部在
+	 *  同步内部对象时使用线程互斥锁进行保护，以避免形成惊群现象，如果启动
+	 *  的线程数较多但该标志为 false，则内部使用原子数进行同步保护，很容易
+	 *  造成惊群问题；当启动的线程数较（几十个左右），则此参数可以设为 false
+	 *  以告之内部使用原子数进行同步保护
+	 */
+	fiber_event(bool use_mutex = false);
 	~fiber_event(void);
 
 	/**

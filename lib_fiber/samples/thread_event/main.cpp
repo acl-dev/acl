@@ -48,7 +48,8 @@ static void usage(const char* procname)
 	printf("usage: %s -h [help]\r\n"
 		" -t nthreads[default: 2]\r\n"
 		" -n nloop[default: 2]\r\n"
-		" -d delay[default: 100 ms]\r\n",
+		" -d delay[default: 0 ms]\r\n"
+		" -m [use thread mutex, default: false]\r\n",
 		procname);
 }
 
@@ -56,10 +57,11 @@ int main(int argc, char *argv[])
 {
 	int  ch;
 
+	bool use_mutex = false;
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "ht:n:d:")) > 0)
+	while ((ch = getopt(argc, argv, "ht:n:d:m")) > 0)
 	{
 		switch (ch)
 		{
@@ -75,12 +77,15 @@ int main(int argc, char *argv[])
 		case 'd':
 			__delay = atoi(optarg);
 			break;
+		case 'm':
+			use_mutex = true;
+			break;
 		default:
 			break;
 		}
 	}
 
-	acl::fiber_event event;
+	acl::fiber_event event(use_mutex);
 
 	std::vector<acl::thread*> threads;
 	for (int i = 0; i < __nthreads; i++)

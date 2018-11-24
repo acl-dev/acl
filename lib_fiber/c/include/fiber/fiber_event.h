@@ -15,10 +15,19 @@ extern "C" {
 typedef struct ACL_FIBER_EVENT ACL_FIBER_EVENT;
 
 /**
+ * when the fiber_event is used in multiple threads for sync, if there're
+ * many threads, the flag FIBER_FLAG_USE_MUTEX should be set to avoid internal
+ * thundering herd which maybe happen by using atomic; if the threads' number
+ * is less than one hundred, the flag FIBER_FLAG_USE_MUTEX needn't be set
+ */
+#define	FIBER_FLAG_USE_MUTEX	(1 << 0)
+
+/**
  * create fiber event mutex which can be used in fibers mode or threads mode
+ * @param flag {unsigned} define as FIBER_FLAG_XXX above
  * @return {ACL_FIBER_EVENT *}
  */
-FIBER_API ACL_FIBER_EVENT *acl_fiber_event_create(void);
+FIBER_API ACL_FIBER_EVENT *acl_fiber_event_create(unsigned flag);
 
 /**
  * free event mutex returned by acl_fiber_event_create

@@ -13,62 +13,62 @@
 #include "fiber/libfiber.h"
 #include "fiber.h"
 
-//#define	USE_THREAD_MUTEX
-
 struct ACL_FIBER_EVENT {
-	RING me;
-	FIBER_BASE *owner;
-	ATOMIC     *atomic;
-	long long   value;
-#ifdef	USE_THREAD_MUTEX
-	pthread_mutex_t lock;
-#else
-	ATOMIC    *lock;
-	long long  lock_value;
-#endif
-	RING waiters;
-	unsigned long tid;
+	RING             me;
+	FIBER_BASE      *owner;
+	ATOMIC          *atomic;
+	long long        value;
+	union {
+		pthread_mutex_t   mutex;
+		struct {
+			ATOMIC   *atomic;
+			long long value;
+		} atomic;
+	} lock;
+	RING             waiters;
+	unsigned long    tid;
+	unsigned int     flag;
 };
 
-ACL_FIBER_EVENT *acl_fiber_event_create(void)
+ACL_FIBER_EVENT *acl_fiber_event_create(unsigned flag)
 {
-#ifdef	USE_THREAD_MUTEX
-	pthread_mutexattr_t attr;
-#endif
 	ACL_FIBER_EVENT *event = (ACL_FIBER_EVENT *)
 		malloc(sizeof(ACL_FIBER_EVENT));
 
 	ring_init(&event->me);
 	event->owner = NULL;
 	event->tid   = 0;
+	event->flag  = flag;
 
 	event->atomic = atomic_new();
 	atomic_set(event->atomic, &event->value);
 	atomic_int64_set(event->atomic, 0);
 
-#ifdef	USE_THREAD_MUTEX
-	pthread_mutexattr_init(&attr);
-	pthread_mutex_init(&event->lock, &attr);
-	pthread_mutexattr_destroy(&attr);
-#else
-	event->lock = atomic_new();
-	atomic_set(event->lock, &event->lock_value);
-	atomic_int64_set(event->lock, 0);
-#endif
+	if ((flag & FIBER_FLAG_USE_MUTEX)) {
+		pthread_mutexattr_t attr;
+
+		pthread_mutexattr_init(&attr);
+		pthread_mutex_init(&event->lock.mutex, &attr);
+		pthread_mutexattr_destroy(&attr);
+	} else {
+		event->lock.atomic.atomic = atomic_new();
+		atomic_set(event->lock.atomic.atomic, &event->lock.atomic.value);
+		atomic_int64_set(event->lock.atomic.atomic, 0);
+	}
 
 	ring_init(&event->waiters);
-
 	return event;
 }
 
 void acl_fiber_event_free(ACL_FIBER_EVENT *event)
 {
 	atomic_free(event->atomic);
-#ifdef	USE_THREAD_MUTEX
-	pthread_mutex_destroy(&event->lock);
-#else
-	atomic_free(event->lock);
-#endif
+	if ((event->flag & FIBER_FLAG_USE_MUTEX)) {
+		pthread_mutex_destroy(&event->lock.mutex);
+	} else {
+		atomic_free(event->lock.atomic.atomic);
+	}
+
 	free(event);
 }
 
@@ -91,9 +91,10 @@ static void channel_open(FIBER_BASE *fbase)
 		return;
 	}
 
-	if (sane_socketpair(AF_UNIX, SOCK_STREAM, 0, fds) < 0)
+	if (sane_socketpair(AF_UNIX, SOCK_STREAM, 0, fds) < 0) {
 		msg_fatal("%s(%d), %s: acl_duplex_pipe error %s",
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
+	}
 	fbase->mutex_in  = fds[0];
 	fbase->mutex_out = fds[1];
 #endif
@@ -101,10 +102,12 @@ static void channel_open(FIBER_BASE *fbase)
 
 void fbase_event_close(FIBER_BASE *fbase)
 {
-	if (fbase->mutex_in >= 0)
+	if (fbase->mutex_in >= 0) {
 		close(fbase->mutex_in);
-	if (fbase->mutex_out != fbase->mutex_in && fbase->mutex_out >= 0)
+	}
+	if (fbase->mutex_out != fbase->mutex_in && fbase->mutex_out >= 0) {
 		close(fbase->mutex_out);
+	}
 	fbase->mutex_in  = -1;
 	fbase->mutex_out = -1;
 	atomic_int64_set(fbase->atomic, 0);
@@ -121,9 +124,10 @@ int fbase_event_wait(FIBER_BASE *fbase)
 			fbase->mutex_in);
 		return -1;
 	}
-	if (atomic_int64_cas(fbase->atomic, 1, 0) != 1)
+	if (atomic_int64_cas(fbase->atomic, 1, 0) != 1) {
 		msg_fatal("%s(%d), %s: atomic corrupt",
 			__FILE__, __LINE__, __FUNCTION__);
+	}
 	return 0;
 }
 
@@ -131,8 +135,9 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 {
 	long long n = 1;
 
-	if (LIKELY(atomic_int64_cas(fbase->atomic, 0, 1) != 0))
+	if (LIKELY(atomic_int64_cas(fbase->atomic, 0, 1) != 0)) {
 		return 0;
+	}
 
 	assert(fbase->mutex_out >= 0);
 	if (write(fbase->mutex_out, &n, sizeof(n)) != sizeof(n)) {
@@ -145,22 +150,21 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 
 static inline void __ll_lock(ACL_FIBER_EVENT *event)
 {
-#ifdef	USE_THREAD_MUTEX
-	pthread_mutex_lock(&event->lock);
-#else
-	while (atomic_int64_cas(event->lock, 0, 1) != 0) {}
-#endif
+	if ((event->flag & FIBER_FLAG_USE_MUTEX)) {
+		pthread_mutex_lock(&event->lock.mutex);
+	} else {
+		while (atomic_int64_cas(event->lock.atomic.atomic, 0, 1)) {}
+	}
 }
 
 static inline void __ll_unlock(ACL_FIBER_EVENT *event)
 {
-#ifdef	USE_THREAD_MUTEX
-	pthread_mutex_unlock(&event->lock);
-#else
-	if (atomic_int64_cas(event->lock, 1, 0) != 1)
+	if ((event->flag & FIBER_FLAG_USE_MUTEX)) {
+		pthread_mutex_unlock(&event->lock.mutex);
+	} else if (atomic_int64_cas(event->lock.atomic.atomic, 1, 0) != 1) {
 		msg_fatal("%s(%d), %s: lock corrupt",
 			__FILE__, __LINE__, __FUNCTION__);
-#endif
+	}
 }
 
 int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
@@ -248,9 +252,10 @@ int acl_fiber_event_notify(ACL_FIBER_EVENT *event)
 		return -1;
 	}
 
-	if (atomic_int64_cas(event->atomic, 1, 0) != 1)
+	if (atomic_int64_cas(event->atomic, 1, 0) != 1) {
 		msg_fatal("%s(%d), %s: atomic corrupt",
 			__FILE__, __LINE__, __FUNCTION__);
+	}
 
 	__ll_lock(event);
 	waiter = FIRST_FIBER(&event->waiters);
