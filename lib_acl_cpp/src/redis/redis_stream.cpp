@@ -202,6 +202,10 @@ void redis_stream::xreadgroup_build(const char* group, const char* consumer,
 	argv_lens_[i] = sizeof("XREADGROUP") - 1;
 	i++;
 
+	argv_[i] = "GROUP";
+	argv_lens_[i] = sizeof("GROUP") - 1;
+	i++;
+
 	argv_[i] = group;
 	argv_lens_[i] = strlen(group);
 	i++;
@@ -302,7 +306,7 @@ bool redis_stream::range(redis_stream_messages& messages, const char* cmd,
 		redis_stream_message message;
 		bool ret = get_one_message(*child, message);
 		if (ret && !message.fields.empty()) {
-			messages.messages[message.id] = message;
+			messages.messages.push_back(message);
 		}
 	}
 	return true;
@@ -318,7 +322,7 @@ bool redis_stream::get_results(redis_stream_messages& messages)
 	size_t size;
 	const redis_result** children = result->get_children(&size);
 	if (size == 0 || children == NULL) {
-		return false;
+		return true;
 	}
 
 	for (size_t i = 0; i < size; i++) {
@@ -366,7 +370,7 @@ bool redis_stream::get_messages(const redis_result& rr,
 		redis_stream_message message;
 		bool ret = get_one_message(*child, message);
 		if (ret && !message.fields.empty()) {
-			messages.messages[message.id] = message;
+			messages.messages.push_back(message);
 		}
 	}
 	return true;
@@ -397,36 +401,28 @@ bool redis_stream::get_one_message(const redis_result& rr,
 		return false;
 	}
 
+	if (size % 2 != 0) {
+		return false;
+	}
+
 	for (size_t i = 0; i < size; i++) {
-		child = children[i];
-		if (child->get_type() != REDIS_RESULT_ARRAY) {
+		const redis_result* name = children[i];
+		if (name->get_type() != REDIS_RESULT_STRING) {
+			continue;
+		}
+
+		const redis_result* value = children[i];
+		if (value->get_type() != REDIS_RESULT_STRING) {
 			continue;
 		}
 
 		redis_stream_field field;
-		if (!get_one_field(*child, field)) {
-			continue;
-		}
+		name->argv_to_string(field.name);
+		value->argv_to_string(field.value);
 
 		message.fields.push_back(field);
 	}
 
-	return true;
-}
-
-bool redis_stream::get_one_field(const redis_result& rr,
-	redis_stream_field& field)
-{
-	size_t size;
-	const redis_result** children = rr.get_children(&size);
-	if (children == NULL || size != 0) {
-		return false;
-	}
-
-	const redis_result* child = children[0];
-	child->argv_to_string(field.name);
-	child = children[1];
-	child->argv_to_string(field.value);
 	return true;
 }
 
@@ -578,10 +574,10 @@ int redis_stream::xack(const char* key, const char* group, const char* id)
 
 	argv[0] = "XACK";
 	lens[0] = sizeof("XACK") - 1;
-	argv[1] = group;
-	lens[1] = strlen(group);
-	argv[2] = key;
-	lens[2] = strlen(key);
+	argv[1] = key;
+	lens[1] = strlen(key);
+	argv[2] = group;
+	lens[2] = strlen(group);
 	argv[3] = id;
 	lens[3] = strlen(id);
 	build_request(4, argv, lens);
@@ -1245,7 +1241,25 @@ bool redis_stream::xinfo_help(std::vector<string>& result)
 	lens[1] = sizeof("HELP") - 1;
 
 	build_request(2, argv, lens);
-	return get_strings(result) >= 0 ? true : false;
+	const redis_result* rr = run();
+	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr->get_children(&size);
+	if (children == NULL || size == 0) {
+		return false;
+	}
+
+	for (size_t i = 0; i < size; i++) {
+		rr = children[i];
+		string buf;
+		rr->argv_to_string(buf);
+		result.push_back(buf);
+	}
+
+	return true;
 }
 
 #define IS_INTEGER(x)	((x) == REDIS_RESULT_INTEGER)
