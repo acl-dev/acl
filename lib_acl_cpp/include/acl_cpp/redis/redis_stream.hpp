@@ -24,7 +24,17 @@ struct redis_stream_message
 struct redis_stream_messages
 {
 	string key;
-	std::map<string, redis_stream_message> messages;
+	std::vector<redis_stream_message> messages;
+
+	bool empty(void) const
+	{
+		return messages.empty();
+	}
+
+	size_t size(void) const
+	{
+		return messages.size();
+	}
 };
 
 struct redis_xinfo_consumer
@@ -229,7 +239,6 @@ private:
 	bool get_results(redis_stream_messages& messages);
 	bool get_messages(const redis_result& rr, redis_stream_messages& messages);
 	bool get_one_message(const redis_result& rr, redis_stream_message& message);
-	bool get_one_field(const redis_result& rr, redis_stream_field& field);
 	bool range(redis_stream_messages& messages, const char* cmd,
 	     	const char* key, const char* start, const char* end, size_t count);
 

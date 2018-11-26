@@ -313,6 +313,11 @@ public:
 	const redis_result* request(const std::vector<string>& args,
 		size_t nchind = 0);
 
+	const string* request_buf(void) const
+	{
+		return request_buf_;
+	}
+
 protected:
 	const redis_result* run(size_t nchild = 0, int* timeout = NULL);
 	const redis_result* run(redis_client_cluster* cluster,
