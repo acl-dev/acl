@@ -298,7 +298,7 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	if (ret == TRUE) {
 		fe->mask |= EVENT_WRITE;
-		return 1;
+		return 0;
 	} else if (acl_fiber_last_error() != ERROR_IO_PENDING) {
 		fe->mask |= EVENT_WRITE;
 		return 0;
