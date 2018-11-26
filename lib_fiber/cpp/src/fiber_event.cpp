@@ -5,7 +5,7 @@
 
 namespace acl {
 
-fiber_event::fiber_event(bool use_mutex /* = false */)
+fiber_event::fiber_event(bool use_mutex /* = true */)
 {
 	unsigned flag = use_mutex ? FIBER_FLAG_USE_MUTEX : 0;
 

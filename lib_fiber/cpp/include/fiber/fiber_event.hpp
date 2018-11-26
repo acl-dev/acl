@@ -23,7 +23,7 @@ public:
 	 *  造成惊群问题；当启动的线程数较（几十个左右），则此参数可以设为 false
 	 *  以告之内部使用原子数进行同步保护
 	 */
-	fiber_event(bool use_mutex = false);
+	fiber_event(bool use_mutex = true);
 	~fiber_event(void);
 
 	/**
