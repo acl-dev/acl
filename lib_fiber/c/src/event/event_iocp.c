@@ -124,7 +124,7 @@ static void iocp_check(EVENT_IOCP *ev, FILE_EVENT *fe)
 		ev->event.fdcount++;
 	} else {
 		assert(fe->id >= 0 && fe->id < ev->count);
-		assert(ev->files[fe->id] = fe);
+		assert(ev->files[fe->id] == fe);
 	}
 
 	if (fe->h_iocp == NULL) {

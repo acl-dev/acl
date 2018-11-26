@@ -1,4 +1,8 @@
 
+93) 2018.11.26
+93.1) bugfix: event_iocp.c 中的 iocp_check 方法中的一处断言有问题
+-- program_code@sohu.com
+
 92) 2018.10.31
 92.1) compile: acl_set_core_limit 仅可用在 UNIX-like 平台
 
