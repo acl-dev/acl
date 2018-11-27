@@ -71,8 +71,6 @@ void fbase_free(FIBER_BASE *fbase);
 void fiber_free(ACL_FIBER *fiber);
 
 /* in fiber_event.c */
-int fbase_event_wait(FIBER_BASE *fbase);
-int fbase_event_wakeup(FIBER_BASE *fbase);
 void fbase_event_close(FIBER_BASE *fbase);
 
 /* in fiber_schedule.c */

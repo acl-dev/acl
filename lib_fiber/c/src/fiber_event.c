@@ -113,7 +113,7 @@ void fbase_event_close(FIBER_BASE *fbase)
 	atomic_int64_set(fbase->atomic, 0);
 }
 
-int fbase_event_wait(FIBER_BASE *fbase)
+static int fbase_event_wait(FIBER_BASE *fbase)
 {
 	long long n;
 
@@ -131,7 +131,7 @@ int fbase_event_wait(FIBER_BASE *fbase)
 	return 0;
 }
 
-int fbase_event_wakeup(FIBER_BASE *fbase)
+static int fbase_event_wakeup(FIBER_BASE *fbase)
 {
 	long long n = 1;
 
@@ -171,6 +171,7 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 {
 	ACL_FIBER  *fiber = acl_fiber_running();
 	FIBER_BASE *fbase;
+	int unlocked;
 
 	if (LIKELY(atomic_int64_cas(event->atomic, 0, 1) == 0)) {
 		event->owner = fiber ? &fiber->base : NULL;
@@ -183,25 +184,32 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 
 	channel_open(fbase);
 
+	unlocked = 0;
 	__ll_lock(event);
+
 	ring_prepend(&event->waiters, &fbase->mutex_waiter);
-	__ll_unlock(event);
 
 	while (1) {
 		if (atomic_int64_cas(event->atomic, 0, 1) == 0) {
-			__ll_lock(event);
+			if (unlocked) {
+				__ll_lock(event);
+			}
 			ring_detach(&fbase->mutex_waiter);
 			__ll_unlock(event);
-
+		
 			event->owner = fbase;
 			event->tid   = __pthread_self();
 			break;
+		} else if (!unlocked) {
+			__ll_unlock(event);
+			unlocked = 1;
 		}
 
 		if (fbase_event_wait(fbase) == -1) {
 			fbase_event_close(fbase);
-			if (fbase->flag & FBASE_F_BASE)
+			if (fbase->flag & FBASE_F_BASE) {
 				fbase_free(fbase);
+			}
 
 			msg_error("%s(%d), %s: event wait error %s", __FILE__,
 				__LINE__, __FUNCTION__, last_serror());
@@ -252,18 +260,20 @@ int acl_fiber_event_notify(ACL_FIBER_EVENT *event)
 		return -1;
 	}
 
+	__ll_lock(event);
+	waiter = FIRST_FIBER(&event->waiters);
+
 	if (atomic_int64_cas(event->atomic, 1, 0) != 1) {
 		msg_fatal("%s(%d), %s: atomic corrupt",
 			__FILE__, __LINE__, __FUNCTION__);
 	}
+	__ll_unlock(event);
 
-	__ll_lock(event);
-	waiter = FIRST_FIBER(&event->waiters);
 	if (waiter && fbase_event_wakeup(waiter) == -1) {
-		__ll_unlock(event);
+		msg_error("%s(%d), %s: wakup waiter error",
+			__FILE__, __LINE__, __FUNCTION__);
 		return -1;
 	}
-	__ll_unlock(event);
 
 	return 0;
 }
