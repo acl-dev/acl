@@ -22,8 +22,10 @@ public:
 	 *  的线程数较多但该标志为 false，则内部使用原子数进行同步保护，很容易
 	 *  造成惊群问题；当启动的线程数较（几十个左右），则此参数可以设为 false
 	 *  以告之内部使用原子数进行同步保护
+	 * @param fatal_on_error {bool} 内部发生错误时是否直接崩溃，以便于开发
+	 *  人员进行错误调试
 	 */
-	fiber_event(bool use_mutex = true);
+	fiber_event(bool use_mutex = true, bool fatal_on_error = false);
 	~fiber_event(void);
 
 	/**
