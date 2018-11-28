@@ -105,6 +105,9 @@
     <ClInclude Include="include\fiber\fiber_define.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\fiber\fiber_cond.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="include\fiber\fiber_event.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -239,7 +242,13 @@
     <ClCompile Include="src\event.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\fbase_event.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="src\fiber.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fiber_cond.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\fiber_event.c">

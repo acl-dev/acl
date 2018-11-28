@@ -155,6 +155,7 @@
     <ClInclude Include="include\fiber\fiber_base.h" />
     <ClInclude Include="include\fiber\fiber_channel.h" />
     <ClInclude Include="include\fiber\fiber_define.h" />
+    <ClInclude Include="include\fiber\fiber_cond.h" />
     <ClInclude Include="include\fiber\fiber_event.h" />
     <ClInclude Include="include\fiber\fiber_hook.h" />
     <ClInclude Include="include\fiber\fiber_lock.h" />
@@ -223,9 +224,11 @@
     <ClCompile Include="src\event\event_poll.c" />
     <ClCompile Include="src\event\event_select.c" />
     <ClCompile Include="src\event\event_wmsg.c" />
+    <ClCompile Include="src\fbase_event.c" />
     <ClCompile Include="src\fiber.c" />
     <ClCompile Include="src\fiber\fiber_unix.c" />
     <ClCompile Include="src\fiber\fiber_win.c" />
+    <ClCompile Include="src\fiber_cond.c" />
     <ClCompile Include="src\fiber_event.c" />
     <ClCompile Include="src\fiber_io.c" />
     <ClCompile Include="src\fiber_lock.c" />
