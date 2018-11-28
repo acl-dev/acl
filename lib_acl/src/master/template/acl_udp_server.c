@@ -713,6 +713,11 @@ static void server_binding(UDP_SERVER *server, ACL_IFCONF *ifconf)
 
 		get_addr(ifaddr->addr, addr, sizeof(addr));
 		stream = server_bind_one(addr);
+		if (stream == NULL) {
+			acl_msg_error("%s(%d): bind %s error %s", __FUNCTION__,
+				__LINE__, addr, acl_last_serror());
+			continue;
+		}
 
 		acl_event_enable_read(server->event, stream,
 			0, udp_server_read, server);
@@ -726,6 +731,8 @@ static void server_binding(UDP_SERVER *server, ACL_IFCONF *ifconf)
 		acl_msg_fatal("%s(%d), %s: binding all addrs failed!",
 			__FILE__, __LINE__, __FUNCTION__);
 	}
+
+	server->count = i;
 }
 
 static UDP_SERVER *servers_binding(const char *service,
