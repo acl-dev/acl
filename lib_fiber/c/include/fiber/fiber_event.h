@@ -3,13 +3,16 @@
 
 #include "fiber_define.h"
 
+#if !defined(_WIN32) && !defined(_WIN64)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* fiber_event.c */
 
-/* fiber event mutex object based on IO event, which is thread safety. That's
+/**
+ * fiber event mutex object based on IO event, which is thread safety. That's
  * to say one event object can used in different threads
  */
 typedef struct ACL_FIBER_EVENT ACL_FIBER_EVENT;
@@ -21,6 +24,12 @@ typedef struct ACL_FIBER_EVENT ACL_FIBER_EVENT;
  * is less than one hundred, the flag FIBER_FLAG_USE_MUTEX needn't be set
  */
 #define	FIBER_FLAG_USE_MUTEX	(1 << 0)
+
+/**
+ * if this flag is set, msg_fatal will be used other msg_error when error
+ * happened, this flag is optional for users
+ */
+#define FIBER_FLAG_USE_FATAL	(1 << 1)
 
 /**
  * create fiber event mutex which can be used in fibers mode or threads mode
@@ -60,5 +69,7 @@ FIBER_API int acl_fiber_event_notify(ACL_FIBER_EVENT *event);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // !defined(_WIN32) && !defined(_WIN64)
 
 #endif

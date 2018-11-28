@@ -7,28 +7,27 @@
 #include "fiber.h"
 
 struct ACL_FIBER_EVENT {
-	RING             me;
-	FIBER_BASE      *owner;
-	ATOMIC          *atomic;
-	long long        value;
+	FIBER_BASE   *owner;
+	ATOMIC       *atomic;
+	long long     value;
+	RING          waiters;
+	unsigned long tid;
+	unsigned int  flag;
+
 	union {
-		pthread_mutex_t   mutex;
+		pthread_mutex_t   tlock;
 		struct {
-			ATOMIC   *atomic;
+			ATOMIC   *alock;
 			long long value;
 		} atomic;
 	} lock;
-	RING             waiters;
-	unsigned long    tid;
-	unsigned int     flag;
 };
 
 ACL_FIBER_EVENT *acl_fiber_event_create(unsigned flag)
 {
 	ACL_FIBER_EVENT *event = (ACL_FIBER_EVENT *)
-		malloc(sizeof(ACL_FIBER_EVENT));
+		calloc(1, sizeof(ACL_FIBER_EVENT));
 
-	ring_init(&event->me);
 	event->owner = NULL;
 	event->tid   = 0;
 	event->flag  = flag;
@@ -41,12 +40,12 @@ ACL_FIBER_EVENT *acl_fiber_event_create(unsigned flag)
 		pthread_mutexattr_t attr;
 
 		pthread_mutexattr_init(&attr);
-		pthread_mutex_init(&event->lock.mutex, &attr);
+		pthread_mutex_init(&event->lock.tlock, &attr);
 		pthread_mutexattr_destroy(&attr);
 	} else {
-		event->lock.atomic.atomic = atomic_new();
-		atomic_set(event->lock.atomic.atomic, &event->lock.atomic.value);
-		atomic_int64_set(event->lock.atomic.atomic, 0);
+		event->lock.atomic.alock = atomic_new();
+		atomic_set(event->lock.atomic.alock, &event->lock.atomic.value);
+		atomic_int64_set(event->lock.atomic.alock, 0);
 	}
 
 	ring_init(&event->waiters);
@@ -57,9 +56,9 @@ void acl_fiber_event_free(ACL_FIBER_EVENT *event)
 {
 	atomic_free(event->atomic);
 	if ((event->flag & FIBER_FLAG_USE_MUTEX)) {
-		pthread_mutex_destroy(&event->lock.mutex);
+		pthread_mutex_destroy(&event->lock.tlock);
 	} else {
-		atomic_free(event->lock.atomic.atomic);
+		atomic_free(event->lock.atomic.alock);
 	}
 
 	free(event);
@@ -68,17 +67,17 @@ void acl_fiber_event_free(ACL_FIBER_EVENT *event)
 static inline void __ll_lock(ACL_FIBER_EVENT *event)
 {
 	if ((event->flag & FIBER_FLAG_USE_MUTEX)) {
-		assert(pthread_mutex_lock(&event->lock.mutex) == 0);
+		assert(pthread_mutex_lock(&event->lock.tlock) == 0);
 	} else {
-		while (atomic_int64_cas(event->lock.atomic.atomic, 0, 1)) {}
+		while (atomic_int64_cas(event->lock.atomic.alock, 0, 1)) {}
 	}
 }
 
 static inline void __ll_unlock(ACL_FIBER_EVENT *event)
 {
 	if ((event->flag & FIBER_FLAG_USE_MUTEX)) {
-		assert(pthread_mutex_unlock(&event->lock.mutex) == 0);
-	} else if (atomic_int64_cas(event->lock.atomic.atomic, 1, 0) != 1) {
+		assert(pthread_mutex_unlock(&event->lock.tlock) == 0);
+	} else if (atomic_int64_cas(event->lock.atomic.alock, 1, 0) != 1) {
 		msg_fatal("%s(%d), %s: lock corrupt",
 			__FILE__, __LINE__, __FUNCTION__);
 	}
@@ -101,6 +100,7 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 	fbase_event_open(fbase);
 
 	wakeup = 0;
+
 	__ll_lock(event);
 
 	ring_prepend(&event->waiters, &fbase->event_waiter);
@@ -112,6 +112,7 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 			}
 
 			__ll_unlock(event);
+
 			event->owner = fbase;
 			event->tid   = __pthread_self();
 			break;
@@ -120,6 +121,7 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 		if (wakeup) {
 			ring_prepend(&event->waiters, &fbase->event_waiter);
 		}
+
 		__ll_unlock(event);
 
 		if (fbase_event_wait(fbase) == -1) {
@@ -128,14 +130,29 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 				fbase_free(fbase);
 			}
 
-			msg_fatal("%s(%d), %s: event wait error %s", __FILE__,
-				__LINE__, __FUNCTION__, last_serror());
+			if ((event->flag & FIBER_FLAG_USE_FATAL)) {
+				msg_fatal("%s(%d), %s: event wait error %s",
+					__FILE__, __LINE__, __FUNCTION__,
+					last_serror());
+			}
+
+			msg_error("%s(%d), %s: event wait error %s",
+				__FILE__, __LINE__, __FUNCTION__,
+				last_serror());
+
+			fbase_event_close(fbase);
+			if (fbase->flag & FBASE_F_BASE) {
+				event->owner = NULL;
+				fbase_free(fbase);
+			}
+			return -1;
 		}
 
 		// overflow ?
 		if (++wakeup == 0) {
 			wakeup = 1;
 		}
+
 		__ll_lock(event);
 	}
 
@@ -194,9 +211,17 @@ int acl_fiber_event_notify(ACL_FIBER_EVENT *event)
 	}
 
 	if (waiter && fbase_event_wakeup(waiter) == -1) {
-		msg_fatal("%s(%d), %s: wakup waiter error=%s",
+		if ((event->flag & FIBER_FLAG_USE_FATAL)) {
+			msg_fatal("%s(%d), %s: wakup waiter error=%s",
+				__FILE__, __LINE__, __FUNCTION__,
+				last_serror());
+		}
+
+		msg_error("%s(%d), %s: wakup waiter error=%s",
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
+		return -1;
 	}
+
 	return 0;
 }
 
