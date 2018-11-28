@@ -26,8 +26,8 @@ typedef struct FIBER_BASE {
 #define FBASE_F_FIBER	(1 << 1)
 	unsigned flag;
 
-	ATOMIC  *atomic;
-	long long atomic_value;
+	//ATOMIC  *atomic;
+	//long long atomic_value;
 	int      event_in;
 	int      event_out;
 	RING     event_waiter;
@@ -70,8 +70,11 @@ FIBER_BASE *fbase_alloc(void);
 void fbase_free(FIBER_BASE *fbase);
 void fiber_free(ACL_FIBER *fiber);
 
-/* in fiber_event.c */
+/* in fbase.c */
+void fbase_event_open(FIBER_BASE *fbase);
 void fbase_event_close(FIBER_BASE *fbase);
+int fbase_event_wait(FIBER_BASE *fbase);
+int fbase_event_wakeup(FIBER_BASE *fbase);
 
 /* in fiber_schedule.c */
 void fiber_save_errno(int errnum);

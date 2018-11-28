@@ -505,14 +505,11 @@ static void fbase_init(FIBER_BASE *fbase, int flag)
 	fbase->flag      = flag;
 	fbase->event_in  = -1;
 	fbase->event_out = -1;
-	fbase->atomic    = NULL;
 	ring_init(&fbase->event_waiter);
 
-	assert(fbase->atomic == NULL);
-
-	fbase->atomic = atomic_new();
-	atomic_set(fbase->atomic, &fbase->atomic_value);
-	atomic_int64_set(fbase->atomic, 0);
+	//fbase->atomic = atomic_new();
+	//atomic_set(fbase->atomic, &fbase->atomic_value);
+	//atomic_int64_set(fbase->atomic, 0);
 }
 
 static void fbase_finish(FIBER_BASE *fbase)
@@ -520,7 +517,7 @@ static void fbase_finish(FIBER_BASE *fbase)
 #ifdef SYS_UNIX
 	fbase_event_close(fbase);
 #endif
-	atomic_free(fbase->atomic);
+	//atomic_free(fbase->atomic);
 }
 
 FIBER_BASE *fbase_alloc(void)
