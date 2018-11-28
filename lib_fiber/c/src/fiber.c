@@ -503,10 +503,10 @@ int acl_fiber_ndead(void)
 static void fbase_init(FIBER_BASE *fbase, int flag)
 {
 	fbase->flag      = flag;
-	fbase->mutex_in  = -1;
-	fbase->mutex_out = -1;
+	fbase->event_in  = -1;
+	fbase->event_out = -1;
 	fbase->atomic    = NULL;
-	ring_init(&fbase->mutex_waiter);
+	ring_init(&fbase->event_waiter);
 
 	assert(fbase->atomic == NULL);
 

@@ -1,4 +1,7 @@
 
+96) 2018.11.28
+96.1) bugfix: acl_fiber_event.c 修复锁竞争问题
+
 95) 2018.11.27
 95.1) bugfix: acl_fiber_event.c 中的锁存在几处锁竞争失效问题
 

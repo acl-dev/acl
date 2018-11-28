@@ -3,12 +3,14 @@
 
 #ifdef SYS_UNIX
 
-#ifdef	LINUX
+#if defined(__linux__)
 # include <linux/version.h>
 # if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
 #  define	HAS_EVENTFD
-# include <sys/eventfd.h>
+#  include <sys/eventfd.h>
+# else
 # endif
+#else
 #endif
 #include "fiber/libfiber.h"
 #include "fiber.h"
@@ -79,15 +81,16 @@ static void channel_open(FIBER_BASE *fbase)
 # if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
 	flags |= FD_CLOEXEC;
 # endif
-	if (fbase->mutex_in == -1) {
-		fbase->mutex_in  = eventfd(0, flags);
-		fbase->mutex_out = fbase->mutex_in;
+	flags = 0;
+	if (fbase->event_in == -1) {
+		fbase->event_in  = eventfd(0, flags);
+		fbase->event_out = fbase->event_in;
 	}
 #else
 	int fds[2];
 
-	if (fbase->mutex_in >= 0) {
-		assert(fbase->mutex_out >= 0);
+	if (fbase->event_in >= 0) {
+		assert(fbase->event_out >= 0);
 		return;
 	}
 
@@ -95,21 +98,21 @@ static void channel_open(FIBER_BASE *fbase)
 		msg_fatal("%s(%d), %s: acl_duplex_pipe error %s",
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
 	}
-	fbase->mutex_in  = fds[0];
-	fbase->mutex_out = fds[1];
+	fbase->event_in  = fds[0];
+	fbase->event_out = fds[1];
 #endif
 }
 
 void fbase_event_close(FIBER_BASE *fbase)
 {
-	if (fbase->mutex_in >= 0) {
-		close(fbase->mutex_in);
+	if (fbase->event_in >= 0) {
+		close(fbase->event_in);
 	}
-	if (fbase->mutex_out != fbase->mutex_in && fbase->mutex_out >= 0) {
-		close(fbase->mutex_out);
+	if (fbase->event_out != fbase->event_in && fbase->event_out >= 0) {
+		close(fbase->event_out);
 	}
-	fbase->mutex_in  = -1;
-	fbase->mutex_out = -1;
+	fbase->event_in  = -1;
+	fbase->event_out = -2;
 	atomic_int64_set(fbase->atomic, 0);
 }
 
@@ -117,17 +120,19 @@ static int fbase_event_wait(FIBER_BASE *fbase)
 {
 	long long n;
 
-	assert(fbase->mutex_in >= 0);
-	if (read(fbase->mutex_in, &n, sizeof(n)) != sizeof(n)) {
+	assert(fbase->event_in >= 0);
+	if (read(fbase->event_in, &n, sizeof(n)) != sizeof(n)) {
 		msg_error("%s(%d), %s: read error %s, in=%d",
-			__FILE__, __LINE__, __FUNCTION__, last_serror(),
-			fbase->mutex_in);
+			__FILE__, __LINE__, __FUNCTION__,
+			last_serror(), fbase->event_in);
 		return -1;
 	}
+	/*
 	if (atomic_int64_cas(fbase->atomic, 1, 0) != 1) {
 		msg_fatal("%s(%d), %s: atomic corrupt",
 			__FILE__, __LINE__, __FUNCTION__);
 	}
+	*/
 	return 0;
 }
 
@@ -135,23 +140,27 @@ static int fbase_event_wakeup(FIBER_BASE *fbase)
 {
 	long long n = 1;
 
+	/*
 	if (LIKELY(atomic_int64_cas(fbase->atomic, 0, 1) != 0)) {
 		return 0;
 	}
+	*/
 
-	assert(fbase->mutex_out >= 0);
-	if (write(fbase->mutex_out, &n, sizeof(n)) != sizeof(n)) {
-		msg_error("%s(%d), %s: write error %s",
-			__FILE__, __LINE__, __FUNCTION__, last_serror());
+	assert(fbase->event_out >= 0);
+	if (write(fbase->event_out, &n, sizeof(n)) != sizeof(n)) {
+		msg_error("%s(%d), %s: write error %s, out=%d",
+			__FILE__, __LINE__, __FUNCTION__,
+			last_serror(), fbase->event_out);
 		return -1;
 	}
+
 	return 0;
 }
 
 static inline void __ll_lock(ACL_FIBER_EVENT *event)
 {
 	if ((event->flag & FIBER_FLAG_USE_MUTEX)) {
-		pthread_mutex_lock(&event->lock.mutex);
+		assert(pthread_mutex_lock(&event->lock.mutex) == 0);
 	} else {
 		while (atomic_int64_cas(event->lock.atomic.atomic, 0, 1)) {}
 	}
@@ -160,7 +169,7 @@ static inline void __ll_lock(ACL_FIBER_EVENT *event)
 static inline void __ll_unlock(ACL_FIBER_EVENT *event)
 {
 	if ((event->flag & FIBER_FLAG_USE_MUTEX)) {
-		pthread_mutex_unlock(&event->lock.mutex);
+		assert(pthread_mutex_unlock(&event->lock.mutex) == 0);
 	} else if (atomic_int64_cas(event->lock.atomic.atomic, 1, 0) != 1) {
 		msg_fatal("%s(%d), %s: lock corrupt",
 			__FILE__, __LINE__, __FUNCTION__);
@@ -171,7 +180,7 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 {
 	ACL_FIBER  *fiber = acl_fiber_running();
 	FIBER_BASE *fbase;
-	int unlocked;
+	unsigned    wakeup;
 
 	if (LIKELY(atomic_int64_cas(event->atomic, 0, 1) == 0)) {
 		event->owner = fiber ? &fiber->base : NULL;
@@ -181,29 +190,29 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 
 	// FIBER_BASE obj will be created if is not in fiber scheduled
 	fbase = fiber ? &fiber->base : fbase_alloc();
-
 	channel_open(fbase);
 
-	unlocked = 0;
+	wakeup = 0;
 	__ll_lock(event);
 
-	ring_prepend(&event->waiters, &fbase->mutex_waiter);
+	ring_prepend(&event->waiters, &fbase->event_waiter);
 
 	while (1) {
 		if (atomic_int64_cas(event->atomic, 0, 1) == 0) {
-			if (unlocked) {
-				__ll_lock(event);
+			if (!wakeup) {
+				ring_detach(&fbase->event_waiter);
 			}
-			ring_detach(&fbase->mutex_waiter);
+
 			__ll_unlock(event);
-		
 			event->owner = fbase;
 			event->tid   = __pthread_self();
 			break;
-		} else if (!unlocked) {
-			__ll_unlock(event);
-			unlocked = 1;
 		}
+
+		if (wakeup) {
+			ring_prepend(&event->waiters, &fbase->event_waiter);
+		}
+		__ll_unlock(event);
 
 		if (fbase_event_wait(fbase) == -1) {
 			fbase_event_close(fbase);
@@ -211,10 +220,16 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 				fbase_free(fbase);
 			}
 
-			msg_error("%s(%d), %s: event wait error %s", __FILE__,
+			msg_fatal("%s(%d), %s: event wait error %s", __FILE__,
 				__LINE__, __FUNCTION__, last_serror());
 			return -1;
 		}
+
+		// overflow ?
+		if (++wakeup == 0) {
+			wakeup = 1;
+		}
+		__ll_lock(event);
 	}
 
 	fbase_event_close(fbase);
@@ -236,45 +251,45 @@ int acl_fiber_event_trywait(ACL_FIBER_EVENT *event)
 	return -1;
 }
 
-#define RING_TO_FIBER(r) \
-    ((FIBER_BASE *) ((char *) (r) - offsetof(FIBER_BASE, mutex_waiter)))
-
-#define FIRST_FIBER(head) \
-    (ring_succ(head) != (head) ? RING_TO_FIBER(ring_succ(head)) : 0)
-
 int acl_fiber_event_notify(ACL_FIBER_EVENT *event)
 {
 	ACL_FIBER  *curr  = acl_fiber_running();
 	FIBER_BASE *owner = curr ? &curr->base : NULL, *waiter;
+	RING       *head;
 
 	if (UNLIKELY(event->owner != owner)) {
-		msg_error("%s(%d), %s: fiber(%p) is not the owner(%p)",
+		msg_fatal("%s(%d), %s: fiber(%p) is not the owner(%p)",
 			__FILE__, __LINE__, __FUNCTION__, owner, event->owner);
 		return -1;
 	} else if (UNLIKELY(event->owner == NULL
 		&& event->tid != __pthread_self())) {
 
-		msg_error("%s(%d), %s: tid(%lu) is not the owner(%lu)",
+		msg_fatal("%s(%d), %s: tid(%lu) is not the owner(%lu)",
 			__FILE__, __LINE__, __FUNCTION__,
 			event->tid, __pthread_self());
 		return -1;
 	}
 
 	__ll_lock(event);
-	waiter = FIRST_FIBER(&event->waiters);
 
+	head = ring_pop_head(&event->waiters);
+	if (head) {
+		waiter = RING_TO_APPL(head, FIBER_BASE, event_waiter);
+	} else {
+		waiter = NULL;
+	}
+
+	__ll_unlock(event);
 	if (atomic_int64_cas(event->atomic, 1, 0) != 1) {
 		msg_fatal("%s(%d), %s: atomic corrupt",
 			__FILE__, __LINE__, __FUNCTION__);
 	}
-	__ll_unlock(event);
 
 	if (waiter && fbase_event_wakeup(waiter) == -1) {
-		msg_error("%s(%d), %s: wakup waiter error",
-			__FILE__, __LINE__, __FUNCTION__);
+		msg_fatal("%s(%d), %s: wakup waiter error=%s",
+			__FILE__, __LINE__, __FUNCTION__, last_serror());
 		return -1;
 	}
-
 	return 0;
 }
 

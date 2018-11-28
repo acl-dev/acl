@@ -17,7 +17,7 @@ struct RING {
 	RING   *pred;           /**< predecessor */
 
 	RING   *parent;         /**< the header of all the rings */
-	int   len;                  /**< the count in the ring */
+	int     len;            /**< the count in the ring */
 };
 
 typedef struct RING_ITER {

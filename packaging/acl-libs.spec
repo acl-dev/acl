@@ -1,4 +1,4 @@
-%define release_id 31
+%define release_id 32
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Wed Nov 28 2018 zhengshuxin@qiyi.com 3.4.1-32-20181128.09
+- lib_fiber/c/src/fiber_event.c: fixed one bug for lock conlision
 
 * Tue Nov 27 2018 zhengshuxin@qiyi.com 3.4.1-31-20181127.14
 - lib_fiber/c/src/fiber_event.c: fixed one bug

@@ -28,9 +28,9 @@ typedef struct FIBER_BASE {
 
 	ATOMIC  *atomic;
 	long long atomic_value;
-	int      mutex_in;
-	int      mutex_out;
-	RING     mutex_waiter;
+	int      event_in;
+	int      event_out;
+	RING     event_waiter;
 } FIBER_BASE;
 
 struct ACL_FIBER {

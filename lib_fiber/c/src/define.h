@@ -2,6 +2,7 @@
 #define	__DEFINE_INCLUDE_H__
 
 #if defined(__linux__)
+# define LINUX
 # define SYS_UNIX
 # define HAS_SELECT
 # define HAS_POLL

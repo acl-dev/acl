@@ -13,7 +13,9 @@ static long long __counter2 = 0;
 class mythread : public acl::thread
 {
 public:
-	mythread(acl::fiber_event& event) : event_(event)
+	mythread(acl::fiber_event& event, std::map<int, int>* table)
+	: event_(event)
+	, table_(table)
 	{
 		this->set_detachable(false);
 	}
@@ -23,6 +25,7 @@ private:
 
 private:
 	acl::fiber_event& event_;
+	std::map<int, int>* table_;
 
 	// @override
 	void* run(void)
@@ -33,7 +36,11 @@ private:
 			if (__delay > 0)
 				acl_doze(__delay);
 			__counter2++;
-			assert(event_.notify());
+			(*table_)[i] = i;
+			if (!event_.notify()) {
+				printf("tid=%ld, notify error\r\n", self());
+				exit (1);
+			}
 			__counter++;
 		}
 
@@ -51,6 +58,17 @@ static void usage(const char* procname)
 		" -d delay[default: 0 ms]\r\n"
 		" -m [use thread mutex, default: false]\r\n",
 		procname);
+}
+
+#include <sys/eventfd.h>
+
+static void test(void)
+{
+	int fd = eventfd(0, 0);
+	long long n = 100;
+	write(fd, &n, sizeof(n));
+	read(fd, &n, sizeof(n));
+	printf("n=%lld\r\n", n);
 }
 
 int main(int argc, char *argv[])
@@ -85,13 +103,17 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	test();
+
+	std::map<int, int>  table;
 	acl::fiber_event event(use_mutex);
 
 	std::vector<acl::thread*> threads;
 	for (int i = 0; i < __nthreads; i++)
 	{
-		acl::thread* thr = new mythread(event);
+		acl::thread* thr = new mythread(event, &table);
 		threads.push_back(thr);
+		thr->set_detachable(false);
 		thr->start();
 	}
 
