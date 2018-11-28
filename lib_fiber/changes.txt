@@ -1,9 +1,10 @@
 
 96) 2018.11.28
-96.1) bugfix: acl_fiber_event.c 修复锁竞争问题
+96.1) bugfix: fiber_event.c 修复锁竞争问题
+96.2) feature: 添加 fiber_cond.c 可用于协程和线程之间的条件变量
 
 95) 2018.11.27
-95.1) bugfix: acl_fiber_event.c 中的锁存在几处锁竞争失效问题
+95.1) bugfix: fiber_event.c 中的锁存在几处锁竞争失效问题
 
 94) 2018.11.26
 94.1) bugfix: event_iocp.c 中的 iocp_check 方法中的一处断言有问题
