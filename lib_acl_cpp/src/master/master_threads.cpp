@@ -133,6 +133,17 @@ void master_threads::push_back(server_socket* ss)
 	servers_.push_back(ss);
 }
 
+acl_pthread_pool_t* master_threads::threads_pool(void) const
+{
+	return acl_threads_server_threads();
+}
+
+size_t master_threads::task_qlen(void) const
+{
+	acl_pthread_pool_t* threads = threads_pool();
+	return threads ? acl_pthread_pool_qlen(threads) : 0;
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 void master_threads::service_pre_jail(void* ctx)

@@ -1,5 +1,9 @@
 修改历史列表：
 
+553) 2018.11.28
+553.1) feature: master_thread.cpp 增加 task_qlen() 方便用户获得当前线程池任务
+队列中积压的任务数; 增 threads_pool() 方法用来获得 lib_acl C 库中的线程池句柄
+
 552) 2018.11.22
 552.1) bugfix: sha1::result 的参数应该为 unsigned char*
 --- by dawei.lin@net263.com

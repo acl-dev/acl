@@ -5,6 +5,7 @@
 struct ACL_VSTREAM;
 struct ACL_EVENT;
 struct ACL_VSTRING;
+struct acl_pthread_pool_t;
 
 namespace acl {
 
@@ -59,6 +60,20 @@ public:
 	 * @return {const char*} 返回值为 NULL 表示没有设配置文件
 	 */
 	const char* get_conf_path(void) const;
+
+	/**
+	 * 获得当前线程池队列中积压的待处理任务数，该 API 可以方便应用决定何时
+	 * 需要进行过载保护，在压力大的时候将后续的任务丢弃
+	 * @return {size_t}
+	 */
+	size_t task_qlen(void) const;
+
+public:
+	/**
+	 * 获得 lib_acl C 库中的线程池句柄
+	 * @return {acl_pthread_pool_t*}
+	 */
+	acl_pthread_pool_t* threads_pool(void) const;
 
 protected:
 	// 该类不能直接被实例化
