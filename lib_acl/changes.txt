@@ -2,6 +2,8 @@
 
 643) 2018.11.28
 643.1) bugfix: acl_udp_server.c 中 server_binding 绑定失败时不应放在事件监控中
+644.2) feature: acl_udp_server.c 增加配置项 udp_fatal_on_bind_err 来决定当无法
+绑定地址时，进程是否需要自动崩溃
 
 642) 2018.11.15
 642.1) bugfix: acl_json_utio.c, acl_json_build() 当数组成员为字符串类型时，应允许空串的存在

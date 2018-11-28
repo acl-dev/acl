@@ -56,6 +56,8 @@ service server
 #	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
 #			sync_action:E_LOG_SEM, sem_name:/tmp/udp_echo.sem
 
+#	在启动时如果绑定某个地址失败，是否让进程崩溃
+#	udp_fatal_on_bind_error = 0
 #	启动时创建的固定线程数
 	udp_threads = 1
 #	创建的线程是否为分离模式

@@ -116,12 +116,15 @@ static ACL_CONFIG_INT64_TABLE __conf_int64_tab[] = {
 
 int   acl_var_udp_threads_detached;
 int   acl_var_udp_non_block;
+int   acl_var_udp_fatal_on_bind_error;
 
 static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
 	{ ACL_VAR_UDP_THREADS_DETACHED, ACL_DEF_UDP_THREADS_DETACHED,
 		&acl_var_udp_threads_detached },
 	{ ACL_VAR_UDP_NON_BLOCK, ACL_DEF_UDP_NON_BLOCK,
 		&acl_var_udp_non_block },
+	{ ACL_VAR_UDP_FATAL_ON_BIND_ERROR, ACL_DEF_UDP_FATAL_ON_BIND_ERROR,
+		&acl_var_udp_fatal_on_bind_error },
 
 	{ 0, 0, 0 },
 };
@@ -714,6 +717,12 @@ static void server_binding(UDP_SERVER *server, ACL_IFCONF *ifconf)
 		get_addr(ifaddr->addr, addr, sizeof(addr));
 		stream = server_bind_one(addr);
 		if (stream == NULL) {
+			if (acl_var_udp_fatal_on_bind_error) {
+				acl_msg_fatal("%s(%d): bind %s error %s",
+					__FUNCTION__, __LINE__, addr,
+					acl_last_serror());
+			}
+
 			acl_msg_error("%s(%d): bind %s error %s", __FUNCTION__,
 				__LINE__, addr, acl_last_serror());
 			continue;
