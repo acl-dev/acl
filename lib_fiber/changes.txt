@@ -2,6 +2,9 @@
 97) 2018.11.29
 97.1) bugfix: fbase_event.c 中 fbase_event_wakeup/fbase_event_wait IO 如果遇到
 中断信号，应该需要重启 IO 过程
+97.2) bugfix: fiber_event.c 的方法 acl_fiber_event_notify 中需要用线程锁对等待
+队列(event->waiters)和原子数(event->atomic)进行保护，否则中间会有时间间隙，导致
+加锁等待者(调用acl_fiber_event_wait)永久等待
 
 96) 2018.11.28
 96.1) bugfix: fiber_event.c 修复锁竞争问题

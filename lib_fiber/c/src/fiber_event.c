@@ -203,12 +203,12 @@ int acl_fiber_event_notify(ACL_FIBER_EVENT *event)
 		waiter = NULL;
 	}
 
-	__ll_unlock(event);
-
 	if (atomic_int64_cas(event->atomic, 1, 0) != 1) {
 		msg_fatal("%s(%d), %s: atomic corrupt",
 			__FILE__, __LINE__, __FUNCTION__);
 	}
+
+	__ll_unlock(event);
 
 	if (waiter && fbase_event_wakeup(waiter) == -1) {
 		if ((event->flag & FIBER_FLAG_USE_FATAL)) {

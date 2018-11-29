@@ -1,4 +1,4 @@
-%define release_id 34
+%define release_id 35
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Nov 29 2018 zhengshuxin@qiyi.com 3.4.1-35-20181129.22
+- fiber_event.c: fixed one bug in acl_fiber_event_notify.
 
 * Thu Nov 29 2018 zhengshuxin@qiyi.com 3.4.1-34-20181129.11
 - fbase_event.c: restart IO when IO process is interrupted by EINTR
