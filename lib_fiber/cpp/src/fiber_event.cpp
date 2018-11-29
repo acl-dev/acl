@@ -6,7 +6,7 @@
 namespace acl {
 
 fiber_event::fiber_event(bool use_mutex /* = true */,
-	bool fatal_on_error /* = false */)
+	bool fatal_on_error /* = true */)
 {
 	unsigned flag = use_mutex ? FIBER_FLAG_USE_MUTEX : 0;
 	if (fatal_on_error) {

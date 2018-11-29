@@ -55,44 +55,94 @@ void fbase_event_close(FIBER_BASE *fbase)
 	}
 	fbase->event_in  = -1;
 	fbase->event_out = -2;
-	//atomic_int64_set(fbase->atomic, 0);
 }
 
 int fbase_event_wait(FIBER_BASE *fbase)
 {
 	long long n;
+	int  ret, interrupt = 0;
 
-	assert(fbase->event_in >= 0);
-	if (read(fbase->event_in, &n, sizeof(n)) != sizeof(n)) {
-		msg_error("%s(%d), %s: read error %s, in=%d",
-			__FILE__, __LINE__, __FUNCTION__,
-			last_serror(), fbase->event_in);
+	if (fbase->event_in < 0) {
+		msg_fatal("%s(%d), %s: invalid event_in=%d",
+			__FILE__, __LINE__, __FUNCTION__, fbase->event_in);
+	}
+
+	while (1) {
+		ret = read(fbase->event_in, &n, sizeof(n));
+		if (ret == sizeof(n)) {
+			break;
+		}
+
+		if (ret >= 0) {
+			msg_fatal("%s(%d), %s: read ret=%d invalid length, "
+				"interrupt=%d", __FILE__, __LINE__,
+				__FUNCTION__, ret, interrupt);
+		}
+
+		if (acl_fiber_last_error() == EINTR) {
+			interrupt++;
+			msg_info("%s(%d), %s: read EINTR=%d, in=%d, ret=%d",
+				__FILE__, __LINE__, __FUNCTION__,
+				interrupt, fbase->event_in, ret);
+			doze(1);
+			continue;
+		}
+
+		msg_error("%s(%d), %s: read error %s, in=%d, ret=%d, "
+			"interrupt=%d", __FILE__, __LINE__, __FUNCTION__,
+			last_serror(), fbase->event_in, ret, interrupt);
 		return -1;
 	}
-	/*
-	if (atomic_int64_cas(fbase->atomic, 1, 0) != 1) {
-		msg_fatal("%s(%d), %s: atomic corrupt",
-			__FILE__, __LINE__, __FUNCTION__);
-	}
-	*/
+
+	/**
+	 * if (atomic_int64_cas(fbase->atomic, 1, 0) != 1) {
+	 *	msg_fatal("%s(%d), %s: atomic corrupt",
+	 *	__FILE__, __LINE__, __FUNCTION__);
+	 * }
+	 */
 	return 0;
 }
 
 int fbase_event_wakeup(FIBER_BASE *fbase)
 {
 	long long n = 1;
+	int  ret, interrupt = 0;
 
-	/*
-	if (LIKELY(atomic_int64_cas(fbase->atomic, 0, 1) != 0)) {
-		return 0;
+	/**
+	 * if (LIKELY(atomic_int64_cas(fbase->atomic, 0, 1) != 0)) {
+	 * 	return 0;
+	 * }
+	 */
+
+	if (fbase->event_out < 0) {
+		msg_fatal("%s(%d), %s: invalid event_out=%d",
+			__FILE__, __LINE__, __FUNCTION__, fbase->event_out);
 	}
-	*/
 
-	assert(fbase->event_out >= 0);
-	if (write(fbase->event_out, &n, sizeof(n)) != sizeof(n)) {
-		msg_error("%s(%d), %s: write error %s, out=%d",
-			__FILE__, __LINE__, __FUNCTION__,
-			last_serror(), fbase->event_out);
+	while (1) {
+		ret = write(fbase->event_out, &n, sizeof(n));
+		if (ret == sizeof(n)) {
+			break;
+		}
+
+		if (ret >= 0) {
+			msg_fatal("%s(%d), %s: write ret=%d invalid length, "
+				"interrupt=%d", __FILE__, __LINE__,
+				__FUNCTION__, ret, interrupt);
+		}
+
+		if (acl_fiber_last_error() == EINTR) {
+			interrupt++;
+			msg_info("%s(%d), %s: write EINTR=%d, out=%d, ret=%d",
+				__FILE__, __LINE__, __FUNCTION__,
+				interrupt, fbase->event_out, ret);
+			doze(1);
+			continue;
+		}
+
+		msg_error("%s(%d), %s: write error %s, out=%d, ret=%d, "
+			"interrupt=%d", __FILE__, __LINE__, __FUNCTION__,
+			last_serror(), fbase->event_out, ret, interrupt);
 		return -1;
 	}
 

@@ -1,4 +1,8 @@
 
+97) 2018.11.29
+97.1) bugfix: fbase_event.c 中 fbase_event_wakeup/fbase_event_wait IO 如果遇到
+中断信号，应该需要重启 IO 过程
+
 96) 2018.11.28
 96.1) bugfix: fiber_event.c 修复锁竞争问题
 96.2) feature: 添加 fiber_cond.c 可用于协程和线程之间的条件变量

@@ -25,7 +25,7 @@ public:
 	 * @param fatal_on_error {bool} 内部发生错误时是否直接崩溃，以便于开发
 	 *  人员进行错误调试
 	 */
-	fiber_event(bool use_mutex = true, bool fatal_on_error = false);
+	fiber_event(bool use_mutex = true, bool fatal_on_error = true);
 	~fiber_event(void);
 
 	/**

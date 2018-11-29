@@ -1,4 +1,4 @@
-%define release_id 33
+%define release_id 34
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Nov 29 2018 zhengshuxin@qiyi.com 3.4.1-34-20181129.11
+- fbase_event.c: restart IO when IO process is interrupted by EINTR
 
 * Wed Nov 28 2018 zhengshuxin@qiyi.com 3.4.1-33-20181128.16
 - acl_udp_server.c: fixed one bug in server_binding() when binding failed

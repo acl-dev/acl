@@ -26,8 +26,6 @@ typedef struct FIBER_BASE {
 #define FBASE_F_FIBER	(1 << 1)
 	unsigned flag;
 
-	//ATOMIC  *atomic;
-	//long long atomic_value;
 	int      event_in;
 	int      event_out;
 	RING     event_waiter;
