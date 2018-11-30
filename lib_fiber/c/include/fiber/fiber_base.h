@@ -294,6 +294,15 @@ FIBER_API int acl_fiber_last_error(void);
 FIBER_API const char *acl_fiber_last_serror(void);
 
 /**
+ * convert errno to string
+ * @param errnum {int}
+ * @param buf {char*} hold the result
+ * @param size {size_t} buf's size
+ * @retur {const char*} the addr of buf
+ */
+FIBER_API const char *acl_fiber_strerror(int errnum, char *buf, size_t size);
+
+/**
  * set the system error number
  * @param errnum {int} the error number
  */

@@ -21,10 +21,10 @@ public:
 	/**
 	 * 等待条件变量事件被触发
 	 * @param event {fiber_event&}
-	 * @param microseconds {long long} 超时等待时间（微秒）
+	 * @param timeout {int} 超时等待时间（毫秒）
 	 * @return {bool} 成功时返回 true，否则返回 false 表示超时
 	 */
-	bool wait(fiber_event& event, long long microseconds = -1);
+	bool wait(fiber_event& event, long long timeout = -1);
 
 	/**
 	 * 唤醒在条件变量上的等待者，如果没有等待者则直接返回，运行行为和

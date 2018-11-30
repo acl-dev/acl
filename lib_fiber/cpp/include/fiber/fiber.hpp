@@ -84,6 +84,33 @@ public:
 	void set_errno(int errnum);
 
 	/**
+	 * 获得本次操作的出错信息
+	 * @return {const char*}
+	 */
+	static const char* last_serror(void);
+
+	/**
+	 * 获得本次操作的出错号
+	 * @return {int}
+	 */
+	static int last_error(void);
+
+	/**
+	 * 将所给错误号转成描述信息
+	 * @param errnum {int} 错误号
+	 * @param buf {char*} 存储结果
+	 * @param size {size_t} buf 空间大小
+	 * @return {const char*} buf 地址
+	 */
+	static const char* strerror(int errnum, char* buf, size_t size);
+
+	/**
+	 * 将错误信息输出至标准输出
+	 * @param on {bool} 为 true 时，内部出错信息将输出至标准输出
+	 */
+	static void stdout_open(bool on);
+
+	/**
 	 * 显式设置协程调度事件引擎类型，同时设置协程调度器为自启动模式，即当创建协程后不必
 	 * 显式调用 schedule 或 schedule_with 来启动协程调度器
 	 * @param type {fiber_event_t} 事件引擎类型，参见：FIBER_EVENT_T_XXX

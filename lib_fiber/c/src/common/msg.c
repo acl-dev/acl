@@ -137,7 +137,7 @@ void msg_fatal(const char *fmt,...)
 
 #endif  /* USE_PRINTF_MACRO */
 
-const char *msg_strerror(int errnum, char *buffer, size_t size)
+const char *acl_fiber_strerror(int errnum, char *buffer, size_t size)
 {
 #ifdef SYS_WIN
 	int   L;
@@ -176,7 +176,7 @@ const char *msg_strerror(int errnum, char *buffer, size_t size)
 
 const char *last_strerror(char *buffer, size_t size)
 {
-	return msg_strerror(acl_fiber_last_error(), buffer, size);
+	return acl_fiber_strerror(acl_fiber_last_error(), buffer, size);
 }
 
 static pthread_key_t __errbuf_key;
@@ -224,7 +224,7 @@ const char *last_serror(void)
 			atexit(main_free_buf);
 		}
 	}
-	return msg_strerror(error, buf, __buf_size);
+	return acl_fiber_strerror(error, buf, __buf_size);
 }
 
 const char *acl_fiber_last_serror(void)

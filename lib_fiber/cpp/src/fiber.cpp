@@ -42,6 +42,21 @@ void fiber::set_errno(int errnum)
 		acl_fiber_set_errno(f_, errnum);
 }
 
+const char* fiber::last_serror(void)
+{
+	return acl_fiber_last_serror();
+}
+
+int fiber::last_error(void)
+{
+	return acl_fiber_last_error();
+}
+
+const char* fiber::strerror(int errnum, char* buf, size_t size)
+{
+	return acl_fiber_strerror(errnum, buf, size);
+}
+
 void fiber::yield(void)
 {
 	(void) acl_fiber_yield();
@@ -227,6 +242,11 @@ int fiber::get_sys_errno(void)
 void fiber::set_sys_errno(int errnum)
 {
 	acl_fiber_set_error(errnum);
+}
+
+void fiber::stdout_open(bool on)
+{
+	acl_fiber_msg_stdout_enable(on ? 1 : 0);
 }
 
 //////////////////////////////////////////////////////////////////////////////

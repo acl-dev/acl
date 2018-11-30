@@ -16,15 +16,15 @@ fiber_cond::~fiber_cond(void)
 	acl_fiber_cond_free(cond_);
 }
 
-bool fiber_cond::wait(fiber_event& event, long long microseconds /* = -1 */)
+bool fiber_cond::wait(fiber_event& event, long long timeout /* = -1 */)
 {
 	ACL_FIBER_EVENT* ev = event.get_event();
 
-	if (microseconds < 0) {
+	if (timeout < 0) {
 		return acl_fiber_cond_wait(cond_, ev) == 0 ? true : false;
 	}
 
-	if (acl_fiber_cond_timedwait(cond_, ev, microseconds) == 0) {
+	if (acl_fiber_cond_timedwait(cond_, ev, timeout) == 0) {
 		return true;
 	} else {
 		return false;

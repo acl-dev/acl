@@ -65,8 +65,6 @@ void PRINTF(1, 2) msg_fatal(const char *fmt,...);
 
 #endif
 
-const char *msg_strerror(int errnum, char *buffer, size_t size);
-
 /**
  * 获得上次系统调用出错时的错误描述信息
  * @param buffer {char*} 存储错误描述信息的内存缓冲区
