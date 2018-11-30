@@ -67,7 +67,14 @@ void acl_fiber_event_free(ACL_FIBER_EVENT *event)
 static inline void __ll_lock(ACL_FIBER_EVENT *event)
 {
 	if ((event->flag & FIBER_FLAG_USE_MUTEX)) {
-		assert(pthread_mutex_lock(&event->lock.tlock) == 0);
+		int n = pthread_mutex_lock(&event->lock.tlock);
+		if (n == 0) {
+			return;
+		}
+
+		acl_fiber_set_error(n);
+		msg_fatal("%s(%d), %s: pthread_mutex_lock error=%s",
+			__FILE__, __LINE__, __FUNCTION__, last_serror());
 	} else {
 		while (atomic_int64_cas(event->lock.atomic.alock, 0, 1)) {}
 	}
@@ -76,7 +83,14 @@ static inline void __ll_lock(ACL_FIBER_EVENT *event)
 static inline void __ll_unlock(ACL_FIBER_EVENT *event)
 {
 	if ((event->flag & FIBER_FLAG_USE_MUTEX)) {
-		assert(pthread_mutex_unlock(&event->lock.tlock) == 0);
+		int n = pthread_mutex_unlock(&event->lock.tlock);
+		if (n == 0) {
+			return;
+		}
+
+		acl_fiber_set_error(n);
+		msg_fatal("%s(%d), %s: pthread_mutex_unlock error=%s",
+			__FILE__, __LINE__, __FUNCTION__, last_serror());
 	} else if (atomic_int64_cas(event->lock.atomic.alock, 1, 0) != 1) {
 		msg_fatal("%s(%d), %s: lock corrupt",
 			__FILE__, __LINE__, __FUNCTION__);

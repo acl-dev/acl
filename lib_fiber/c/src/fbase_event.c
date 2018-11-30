@@ -68,7 +68,7 @@ int fbase_event_wait(FIBER_BASE *fbase)
 	}
 
 	while (1) {
-		ret = read(fbase->event_in, &n, sizeof(n));
+		ret = acl_fiber_read(fbase->event_in, &n, sizeof(n));
 		if (ret == sizeof(n)) {
 			break;
 		}
@@ -120,7 +120,7 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 	}
 
 	while (1) {
-		ret = write(fbase->event_out, &n, sizeof(n));
+		ret = acl_fiber_write(fbase->event_out, &n, sizeof(n));
 		if (ret == sizeof(n)) {
 			break;
 		}

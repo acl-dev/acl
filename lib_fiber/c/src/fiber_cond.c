@@ -8,10 +8,10 @@
 #include "fiber.h"
 
 struct ACL_FIBER_COND {
-	RING      waiters;
-	ATOMIC   *atomic;
-	long long value;
-	pthread_mutex_t  mutex;
+	RING            waiters;
+	ATOMIC         *atomic;
+	long long       value;
+	pthread_mutex_t mutex;
 };
 
 ACL_FIBER_COND *acl_fiber_cond_create(unsigned flag fiber_unused)
@@ -34,6 +34,7 @@ ACL_FIBER_COND *acl_fiber_cond_create(unsigned flag fiber_unused)
 
 void acl_fiber_cond_free(ACL_FIBER_COND *cond)
 {
+	pthread_mutex_destroy(&cond->mutex);
 	atomic_free(cond->atomic);
 	free(cond);
 }
@@ -103,7 +104,7 @@ static int read_wait(int fd, int delay)
 	fds.fd     = fd;
 
 	for (;;) {
-		switch (poll(&fds, 1, delay)) {
+		switch (acl_fiber_poll(&fds, 1, delay)) {
 #ifdef SYS_WIN
 		case SOCKET_ERROR:
 #else
