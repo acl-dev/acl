@@ -41,12 +41,22 @@ void acl_fiber_cond_free(ACL_FIBER_COND *cond)
 
 static void __ll_lock(ACL_FIBER_COND *cond)
 {
-	pthread_mutex_lock(&cond->mutex);
+	int n = pthread_mutex_lock(&cond->mutex);
+	if (n) {
+		acl_fiber_set_error(n);
+		msg_fatal("%s(%d), %s: pthread_mutex_lock error=%s",
+			__FILE__, __LINE__, __FUNCTION__, last_serror());
+	}
 }
 
 static void __ll_unlock(ACL_FIBER_COND *cond)
 {
-	pthread_mutex_unlock(&cond->mutex);
+	int n = pthread_mutex_unlock(&cond->mutex);
+	if (n) {
+		acl_fiber_set_error(n);
+		msg_fatal("%s(%d), %s: pthread_mutex_unlock error=%s",
+			__FILE__, __LINE__, __FUNCTION__, last_serror());
+	}
 }
 
 #define DETACHE do {                       \
@@ -73,19 +83,17 @@ int acl_fiber_cond_wait(ACL_FIBER_COND *cond, ACL_FIBER_EVENT *event)
 
 	if (acl_fiber_event_notify(event) != 0) {
 		DETACHE;
-		msg_error("acl_fiber_event_notify failed");
-		return EINVAL;
+		msg_fatal("acl_fiber_event_notify failed");
 	}
 
 	if (fbase_event_wait(fbase) == -1) {
 		DETACHE;
-		return EINVAL;
+		msg_fatal("fbase_event_wait error");
 	}
 
 	if (acl_fiber_event_wait(event) == -1) {
 		DETACHE;
-		msg_error("acl_fiber_event_wait error");
-		return EINVAL;
+		msg_fatal("acl_fiber_event_wait error");
 	}
 
 	fbase_event_close(fbase);
@@ -190,6 +198,7 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 	__ll_unlock(cond);
 
 	if (waiter && fbase_event_wakeup(waiter) == -1) {
+		msg_error("fbase_event_wakeup error");
 		return EINVAL;
 	}
 

@@ -46,6 +46,16 @@ public:
 	 */
 	bool notify(void);
 
+public:
+	/**
+	 * 返回 C 版本的事件对象
+	 * @return {ACL_FIBER_EVENT*}
+	 */
+	ACL_FIBER_EVENT* get_event(void) const
+	{
+		return event_;
+	}
+
 private:
 	ACL_FIBER_EVENT* event_;
 };
