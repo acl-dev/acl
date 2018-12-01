@@ -3,7 +3,7 @@
 
 #if !defined(_WIN32) && !defined(_WIN64)
 
-struct ACL_FIBER_EVENT;
+struct ACL_FIBER_COND;
 
 namespace acl {
 
