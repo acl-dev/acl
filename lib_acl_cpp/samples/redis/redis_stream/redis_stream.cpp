@@ -135,12 +135,50 @@ static void test_xread(acl::redis_stream& redis, size_t count)
 	}
 }
 
-static void test_xack(acl::redis_stream& redis, const char* group, const char* id)
+static void test_xack(acl::redis_stream& redis, const char* group,
+	const char* id, bool detail = true)
 {
 	int ret = redis.xack(__key, group, id);
-	const acl::string* req = redis.request_buf();
-	printf("xack=%d, key=%s, group=%s, id=%s, req=[%s]\r\n",
-		ret, __key.c_str(), group, id, req ? req->c_str() : "NULL");
+	if (detail) {
+		const acl::string* req = redis.request_buf();
+		printf("xack=%d, key=%s, group=%s, id=%s, req=[%s]\r\n", ret,
+			__key.c_str(), group, id, req ? req->c_str() : "NULL");
+	} else {
+		printf("xack=%d, key=%s, group=%s, id=%s\r\n", ret,
+			__key.c_str(), group, id);
+	}
+}
+
+static void test_xreadgroup_with_xack(acl::redis_stream& redis,
+	const char* group, const char* consumer)
+{
+	acl::redis_stream_messages messages;
+	std::map<acl::string, acl::string> streams;
+	streams[__key] = ">";
+
+	if (redis.xreadgroup(messages, group, consumer, streams) == false) {
+		printf("xreadgroup error=%s, key=%s, group=%s, consumer=%s\r\n",
+			redis.result_error(), __key.c_str(), group, consumer);
+		const acl::string* req = redis.request_buf();
+		printf("request=[%s]\r\n", req ? req->c_str() : "NULL");
+		return;
+	}
+
+	printf("xreadgroup ok, key=%s, group=%s, consumer=%s\r\n",
+		__key.c_str(), group, consumer);
+
+	if (messages.empty()) {
+		printf("no messages\r\n");
+		return;
+	}
+
+	printf("key=%s, begin xack all messages received\r\n", messages.key.c_str());
+	for (std::vector<acl::redis_stream_message>::const_iterator cit =
+		messages.messages.begin(); cit != messages.messages.end();
+		++cit) {
+
+		test_xack(redis, group, (*cit).id, false);
+	}
 }
 
 static void test_xrange(acl::redis_stream& redis, size_t count)
@@ -308,7 +346,10 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		"  -s redis_addr[default: 127.0.0.1:6379]\r\n"
-		"  -a cmd[default: xadd, xadd|xlen|xdel|xgroup_create|xreadgroup|xack]\r\n"
+		"  -a cmd[default: xadd, xadd|xlen|xdel|xgroup_create"
+		"|xreadgroup|xreadgroup_with_xack|xack|xrange|xrevrange"
+		"|xpending_summary|xinfo_help|xinfo_consumers|xinfo_groups"
+		"|xinfo_stream]\r\n"
 		"  -g group[default: mygroup]\r\n"
 		"  -u consumer[default: consumer]\r\n"
 		"  -i message_id\r\n"
@@ -372,6 +413,8 @@ int main(int argc, char* argv[])
 		test_xgroup_create(redis, group);
 	} else if (cmd == "xreadgroup") {
 		test_xreadgroup(redis, group, consumer);
+	} else if (cmd == "xreadgroup_with_xack") {
+		test_xreadgroup_with_xack(redis, group, consumer);
 	} else if (cmd == "xread") {
 		test_xread(redis, n);
 	} else if (cmd == "xack") {
