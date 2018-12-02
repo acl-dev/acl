@@ -135,6 +135,26 @@ void sha1::reset(void)
  *  Comments:
  *
  */
+bool sha1::result2(unsigned int *message_digest_array)
+{
+	int i; // Counter
+
+	if (corrupted_) {
+		return false;
+	}
+
+	if (!computed_) {
+		pad_message();
+		computed_ = true;
+	}
+
+	for(i = 0; i < 5; i++) {
+		message_digest_array[i] = h_[i];
+	}
+
+	return true;
+}
+
 bool sha1::result(unsigned char *message_digest_array)
 {
 	int i; // Counter
@@ -148,8 +168,6 @@ bool sha1::result(unsigned char *message_digest_array)
 		computed_ = true;
 	}
 
-	//for(i = 0; i < 5; i++)
-	//	message_digest_array[i] = h_[i];
 	// 此处应该是将unsigned int数组中的每字节保存到一个 unsigned char 里面
 	// 不能直接将一个int直接赋值给4个char数组
 	// --- dawei.lin@net263.com, 2018.11.22

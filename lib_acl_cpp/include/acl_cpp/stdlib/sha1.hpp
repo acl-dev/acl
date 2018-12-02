@@ -40,7 +40,8 @@ public:
 	/*
 	 *  Returns the message digest, message_digest_array's length must >= 20
 	 */
-	bool result(unsigned char* message_digest_array);
+	bool result(unsigned char *message_digest_array);
+	bool result2(unsigned *message_digest_array);
 
 	/*
 	 *  Provide input to SHA1
