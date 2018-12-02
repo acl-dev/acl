@@ -234,6 +234,15 @@ bool redis_stream::xreadgroup(redis_stream_messages& messages,
 	return get_results(messages);
 }
 
+
+bool redis_stream::xreadgroup_with_noack(redis_stream_messages& messages,
+	const char* group, const char* consumer,
+	const std::map<string, string>& streams, size_t count /* = 0 */,
+	size_t block /* = 0 */)
+{
+	return xreadgroup(messages, group, consumer, streams, count, block, true);
+}
+
 bool redis_stream::xrange(redis_stream_messages& messages, const char* key,
 	const char* start, const char* end, size_t count /* = 0 */)
 {
@@ -951,6 +960,13 @@ bool redis_stream::get_pending_message(const redis_result& rr,
 
 //////////////////////////////////////////////////////////////////////////////
 
+int redis_stream::xdel(const char* key, const char* id)
+{
+	std::vector<const char*> ids;
+	ids.push_back(id);
+	return xdel(key, ids);
+}
+
 int redis_stream::xdel(const char* key, const std::vector<string>& ids)
 {
 	redis_command::build("XDEL", key, ids);
@@ -999,11 +1015,43 @@ int redis_stream::xtrim(const char* key, size_t maxlen, bool tilde)
 
 //////////////////////////////////////////////////////////////////////////////
 
-bool redis_stream::xgroup_create(const char* key, const char* group,
-	const char* id /* = "$" */)
+bool redis_stream::xgroup_help(std::vector<string>& result)
 {
-	const char* argv[5];
-	size_t lens[5];
+	const char* argv[2];
+	size_t lens[2];
+
+	argv[0] = "XGROUP";
+	lens[0] = sizeof("XGROUP") - 1;
+	argv[1] = "HELP";
+	lens[1] = sizeof("HELP") - 1;
+
+	build_request(2, argv, lens);
+	const redis_result* rr = run();
+	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
+		return false;
+	}
+
+	size_t size;
+	const redis_result** children = rr->get_children(&size);
+	if (children == NULL || size == 0) {
+		return false;
+	}
+
+	for (size_t i = 0; i < size; i++) {
+		rr = children[i];
+		string buf;
+		rr->argv_to_string(buf);
+		result.push_back(buf);
+	}
+
+	return true;
+}
+
+bool redis_stream::xgroup_create(const char* key, const char* group,
+	const char* id /* = "$" */, bool mkstream /* = true */)
+{
+	const char* argv[6];
+	size_t lens[6];
 
 	argv[0] = "XGROUP";
 	lens[0] = sizeof("XGROUP") - 1;
@@ -1015,7 +1063,18 @@ bool redis_stream::xgroup_create(const char* key, const char* group,
 	lens[3] = strlen(group);
 	argv[4] = id;
 	lens[4] = strlen(id);
-	build_request(5, argv, lens);
+
+	size_t n;
+
+	if (mkstream) {
+		argv[5] = "MKSTREAM";
+		lens[5] = sizeof("MKSTREAM") - 1;
+		n = 6;
+	} else {
+		n = 5;
+	}
+
+	build_request(n, argv, lens);
 	return check_status();
 }
 

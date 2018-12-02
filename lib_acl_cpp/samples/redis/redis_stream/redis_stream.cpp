@@ -2,7 +2,7 @@
 
 static acl::string __key = "stream_key";
 
-static void test_xadd(acl::redis_stream& redis, int n)
+static void xadd(acl::redis_stream& redis, int n)
 {
 	acl::string name, value, result;
 	std::map<acl::string, acl::string> fields;
@@ -35,27 +35,41 @@ static void test_xadd(acl::redis_stream& redis, int n)
 	printf("xadd ok, key=%s, n=%d\r\n", __key.c_str(), i);
 }
 
-static void test_xdel(acl::redis_stream& redis, const char* id)
+static void xdel(acl::redis_stream& redis,
+	const std::vector<acl::string>& ids)
 {
-	std::vector<acl::string> ids;
-	ids.push_back(id);
 	int ret = redis.xdel(__key, ids);
 	printf("xdel=%d, key=%s\r\n", ret, __key.c_str());
 }
 
-static void test_xtrim(acl::redis_stream& redis, int n)
+static void xtrim(acl::redis_stream& redis, int n)
 {
 	int ret = redis.xtrim(__key, (size_t) n);
 	printf("xtrim=%d, key=%s, n=%d\r\n", ret, __key.c_str(), n);
 }
 
-static void test_xlen(acl::redis_stream& redis)
+static void xlen(acl::redis_stream& redis)
 {
 	int ret = redis.xlen(__key);
 	printf("xlen=%d, key=%s\r\n", ret, __key.c_str());
 }
 
-static void test_xgroup_create(acl::redis_stream& redis, const char* group)
+static void xgroup_help(acl::redis_stream& redis)
+{
+	std::vector<acl::string> infos;
+	if (redis.xgroup_help(infos) == false) {
+		printf("xgroup_help error=%s\r\n", redis.result_error());
+	} else {
+		printf("xgroup_help ok\r\n");
+		for (std::vector<acl::string>::const_iterator cit =
+			infos.begin(); cit != infos.end(); ++cit) {
+
+			printf("%s\r\n", (*cit).c_str());
+		}
+	}
+}
+
+static void xgroup_create(acl::redis_stream& redis, const char* group)
 {
 	if (redis.xgroup_create(__key, group) == false) {
 		printf("xgroup_create error=%s, key=%s, group=%s\r\n",
@@ -63,6 +77,48 @@ static void test_xgroup_create(acl::redis_stream& redis, const char* group)
 	} else {
 		printf("xgroup_create ok, key=%s, group=%s\r\n",
 			__key.c_str(), group);
+	}
+}
+
+static void xgroup_destroy(acl::redis_stream& redis, const char* group)
+{
+	int ret = redis.xgroup_destroy(__key, group);
+	if (ret == -1) {
+		printf("xgroup_destroy error=%s, key=%s, group=%s\r\n",
+			redis.result_error(), __key.c_str(), group);
+	} else if (ret == 1) {
+		printf("xgroup_destroy ok, key=%s, group=%s\r\n",
+			__key.c_str(), group);
+	} else if (ret == 0) {
+		printf("xgroup_destroy, no such group=%s, key=%s\r\n",
+			group, __key.c_str());
+	}
+}
+
+static void xgroup_delconsumer(acl::redis_stream& redis,
+	const char* group, const char* consumer)
+{
+	int ret = redis.xgroup_delconsumer(__key, group, consumer);
+	if (ret < 0) {
+		printf("xgroup_delconsumer error=%s, key=%s, group=%s, consumer=%s\r\n",
+			redis.result_error(), __key.c_str(), group, consumer);
+	} else if (ret == 0) {
+		printf("xgroup_delconsumer, no such consumer=%s, group=%s, key=%s\r\n",
+			consumer, group, __key.c_str());
+	} else {
+		printf("xgroup_delconsumer=%d, key=%s, group=%s, consumer=%s\r\n",
+			ret, __key.c_str(), group, consumer);
+	}
+}
+
+static void xgroup_setid(acl::redis_stream& redis, const char* group)
+{
+	if (redis.xgroup_setid(__key, group)) {
+		printf("%s: ok, key=%s, group=%s\r\n",
+			__FUNCTION__, __key.c_str(), group);
+	} else {
+		printf("%s: error=%s, key=%s, group=%s\r\n",
+			__FUNCTION__, redis.result_error(), __key.c_str(), group);
 	}
 }
 
@@ -88,7 +144,7 @@ static void show_messages(const acl::redis_stream_messages& messages)
 	printf("total messages count=%lu\r\n", (unsigned long) messages.size());
 }
 
-static void test_xreadgroup(acl::redis_stream& redis, const char* group,
+static void xreadgroup(acl::redis_stream& redis, const char* group,
 	const char* consumer)
 {
 	acl::redis_stream_messages messages;
@@ -112,7 +168,7 @@ static void test_xreadgroup(acl::redis_stream& redis, const char* group,
 	}
 }
 
-static void test_xread(acl::redis_stream& redis, size_t count)
+static void xread(acl::redis_stream& redis, size_t count)
 {
 	acl::redis_stream_messages messages;
 	std::map<acl::string, acl::string> streams;
@@ -135,7 +191,7 @@ static void test_xread(acl::redis_stream& redis, size_t count)
 	}
 }
 
-static void test_xack(acl::redis_stream& redis, const char* group,
+static void xack(acl::redis_stream& redis, const char* group,
 	const char* id, bool detail = true)
 {
 	int ret = redis.xack(__key, group, id);
@@ -149,9 +205,57 @@ static void test_xack(acl::redis_stream& redis, const char* group,
 	}
 }
 
-static void test_xreadgroup_with_xack(acl::redis_stream& redis,
+static void xack(acl::redis_stream& redis, const char* group,
+	const std::vector<acl::string>& ids, bool detail = true)
+{
+	int ret = redis.xack(__key, group, ids);
+	if (detail) {
+		const acl::string* req = redis.request_buf();
+		printf("xack=%d, key=%s, group=%s, ids=%ld, req=[%s]\r\n",
+			ret, __key.c_str(), group, ids.size(),
+			req ? req->c_str() : "NULL");
+	} else {
+		printf("xack=%d, key=%s, group=%s, id=%ld\r\n", ret,
+			__key.c_str(), group, ids.size());
+	}
+}
+
+static void xreadgroup_with_noack(acl::redis_stream& redis,
 	const char* group, const char* consumer)
 {
+	printf("\r\n");
+	acl::redis_stream_messages messages;
+	std::map<acl::string, acl::string> streams;
+	streams[__key] = ">";
+
+	if (!redis.xreadgroup_with_noack(messages, group, consumer, streams)) {
+		const acl::string* req = redis.request_buf();
+		printf("xreadgroup_with_noack error=%s, key=%s, group=%s, "
+			"conserumer=%s, req=[%s]\r\n", redis.result_error(),
+			__key.c_str(), group, consumer, req ? req->c_str() : "null");
+	}
+
+	const acl::string* req = redis.request_buf();
+	printf("xreadgroup_with_noack ok, key=%s, group=%s, consumer=%s, req=%s\r\n",
+		__key.c_str(), group, consumer, req ? req->c_str() : "null");
+
+	if (messages.empty()) {
+		printf("no messages\r\n");
+		return;
+	}
+
+	for (std::vector<acl::redis_stream_message>::const_iterator cit =
+		messages.messages.begin(); cit != messages.messages.end();
+		++cit) {
+
+		printf("read one message-id=%s\r\n",  (*cit).id.c_str());
+	}
+}
+
+static void xreadgroup_with_xack(acl::redis_stream& redis,
+	const char* group, const char* consumer)
+{
+	printf("\r\n");
 	acl::redis_stream_messages messages;
 	std::map<acl::string, acl::string> streams;
 	streams[__key] = ">";
@@ -172,16 +276,24 @@ static void test_xreadgroup_with_xack(acl::redis_stream& redis,
 		return;
 	}
 
+	for (std::vector<acl::redis_stream_message>::const_iterator cit =
+		messages.messages.begin(); cit != messages.messages.end();
+		++cit) {
+
+		printf("read one message-id=%s\r\n",  (*cit).id.c_str());
+	}
+
+	printf("\r\n");
 	printf("key=%s, begin xack all messages received\r\n", messages.key.c_str());
 	for (std::vector<acl::redis_stream_message>::const_iterator cit =
 		messages.messages.begin(); cit != messages.messages.end();
 		++cit) {
 
-		test_xack(redis, group, (*cit).id, false);
+		xack(redis, group, (*cit).id, false);
 	}
 }
 
-static void test_xrange(acl::redis_stream& redis, size_t count)
+static void xrange(acl::redis_stream& redis, size_t count)
 {
 	acl::redis_stream_messages messages;
 
@@ -202,7 +314,7 @@ static void test_xrange(acl::redis_stream& redis, size_t count)
 	}
 }
 
-static void test_xrevrange(acl::redis_stream& redis, size_t count)
+static void xrevrange(acl::redis_stream& redis, size_t count)
 {
 	acl::redis_stream_messages messages;
 
@@ -233,7 +345,7 @@ static void show_pending_consumer(const acl::redis_pending_consumer& consumer)
 static void show_xpending_summary(const acl::redis_pending_summary& summary)
 {
 	printf("smallest_id=%s\r\n", summary.smallest_id.c_str());
-	printf("greatest_id=%s\r\n", summary.greatest_id.c_str());
+	printf("greaid=%s\r\n", summary.greatest_id.c_str());
 
 	for (std::vector<acl::redis_pending_consumer>::const_iterator cit =
 		summary.consumers.begin(); cit != summary.consumers.end(); ++cit) {
@@ -241,7 +353,7 @@ static void show_xpending_summary(const acl::redis_pending_summary& summary)
 	}
 }
 
-static void test_xpending_summary(acl::redis_stream& redis, const char* group)
+static void xpending_summary(acl::redis_stream& redis, const char* group)
 {
 	acl::redis_pending_summary summary;
 
@@ -251,10 +363,44 @@ static void test_xpending_summary(acl::redis_stream& redis, const char* group)
 		return;
 	}
 
-	show_xpending_summary(summary);
+	if (summary.empty()) {
+		printf("xpending_summaray, no consumers, key=%s, group=%s\r\n",
+			__key.c_str(), group);
+	} else {
+		show_xpending_summary(summary);
+	}
 }
 
-static void test_xinfo_help(acl::redis_stream& redis)
+static void show_xpending_detail(const acl::redis_pending_detail& detail)
+{
+	for (std::map<acl::string, acl::redis_pending_message>::const_iterator
+		cit = detail.messages.begin(); cit != detail.messages.end();
+		++cit) {
+
+		printf("id=%s, %s, consumer=%s, eplapsed=%llu, delivered=%lu\r\n",
+			cit->first.c_str(), cit->second.id.c_str(),
+			cit->second.consumer.c_str(), cit->second.elapsed,
+			cit->second.delivered);
+	}
+}
+
+static void xpending_detail(acl::redis_stream& redis, const char* group,
+	size_t count)
+{
+	acl::redis_pending_detail detail;
+
+	if (!redis.xpending_detail(detail, __key, group, "-", "+", count)) {
+		printf("xpending_detail error, key=%s, group=%s\r\n",
+			__key.c_str(), group);
+	} else if (detail.empty()) {
+		printf("xpending_detail empty, key=%s, group=%s\r\n",
+			__key.c_str(), group);
+	} else {
+		show_xpending_detail(detail);
+	}
+}
+
+static void xinfo_help(acl::redis_stream& redis)
 {
 	std::vector<acl::string> infos;
 	if (redis.xinfo_help(infos)) {
@@ -275,7 +421,7 @@ static void show_xinfo_consumer(const acl::redis_xinfo_consumer& info)
 	printf("\tidle=%lu\r\n", (unsigned long) info.idle);
 }
 
-static void test_xinfo_consumers(acl::redis_stream& redis, const char* group)
+static void xinfo_consumers(acl::redis_stream& redis, const char* group)
 {
 	std::map<acl::string, acl::redis_xinfo_consumer> result;
 
@@ -302,7 +448,7 @@ static void show_xinfo_group(const acl::redis_xinfo_group& info)
 	printf("\tpending=%lu\r\n", (unsigned long) info.pending);
 }
 
-static void test_xinfo_groups(acl::redis_stream& redis)
+static void xinfo_groups(acl::redis_stream& redis)
 {
 	std::map<acl::string, acl::redis_xinfo_group> result;
 
@@ -320,7 +466,7 @@ static void test_xinfo_groups(acl::redis_stream& redis)
 	}
 }
 
-static void test_xinfo_stream(acl::redis_stream& redis)
+static void xinfo_stream(acl::redis_stream& redis)
 {
 	acl::redis_stream_info info;
 
@@ -346,10 +492,11 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		"  -s redis_addr[default: 127.0.0.1:6379]\r\n"
-		"  -a cmd[default: xadd, xadd|xlen|xdel|xgroup_create"
-		"|xreadgroup|xreadgroup_with_xack|xack|xrange|xrevrange"
-		"|xpending_summary|xinfo_help|xinfo_consumers|xinfo_groups"
-		"|xinfo_stream]\r\n"
+		"  -a cmd[default: xadd, xadd|xlen|xdel|xtrim|xgroup_help"
+		"xgroup_create|xgroup_destroy|xgroup_delconsumer|xgroup_setid"
+		"|xreadgroup|xreadgorup_with_noack|xreadgroup_with_xack|xack"
+		"|xrange|xrevrange|xpending_summary|xinfo_help|xinfo_consumers"
+		"|xinfo_groups|xinfo_stream]\r\n"
 		"  -g group[default: mygroup]\r\n"
 		"  -u consumer[default: consumer]\r\n"
 		"  -i message_id\r\n"
@@ -360,6 +507,7 @@ int main(int argc, char* argv[])
 {
 	acl::string addr("127.0.0.1:16379"), cmd("xadd"), group("mygroup");
 	acl::string consumer("myconsumer"), id;
+	std::vector<acl::string> ids;
 	int ch, n = 10;
 
 	while ((ch = getopt(argc, argv, "hs:a:n:g:u:i:")) > 0) {
@@ -384,6 +532,7 @@ int main(int argc, char* argv[])
 			break;
 		case 'i':
 			id = optarg;
+			ids.push_back(optarg);
 			break;
 		default:
 			break;
@@ -402,41 +551,57 @@ int main(int argc, char* argv[])
 	cmd.lower();
 
 	if (cmd == "xadd") {
-		test_xadd(redis, n);
+		xadd(redis, n);
 	} else if (cmd == "xlen") {
-		test_xlen(redis);
+		xlen(redis);
 	} else if (cmd == "xdel") {
-		test_xdel(redis, id);
+		if (ids.empty()) {
+			printf("ids empty\r\n");
+		} else {
+			xdel(redis, ids);
+		}
 	} else if (cmd == "xtrim") {
-		test_xtrim(redis, n);
+		xtrim(redis, n);
+	} else if (cmd == "xgroup_help") {
+		xgroup_help(redis);
 	} else if (cmd == "xgroup_create") {
-		test_xgroup_create(redis, group);
+		xgroup_create(redis, group);
+	} else if (cmd == "xgroup_destroy") {
+		xgroup_destroy(redis, group);
+	} else if (cmd == "xgroup_delconsumer") {
+		xgroup_delconsumer(redis, group, consumer);
+	} else if (cmd == "xgroup_setid") {
+		xgroup_setid(redis, group);
 	} else if (cmd == "xreadgroup") {
-		test_xreadgroup(redis, group, consumer);
+		xreadgroup(redis, group, consumer);
+	} else if (cmd == "xreadgroup_with_noack") {
+		xreadgroup_with_noack(redis, group, consumer);
 	} else if (cmd == "xreadgroup_with_xack") {
-		test_xreadgroup_with_xack(redis, group, consumer);
+		xreadgroup_with_xack(redis, group, consumer);
 	} else if (cmd == "xread") {
-		test_xread(redis, n);
+		xread(redis, n);
 	} else if (cmd == "xack") {
-		if (id.empty()) {
+		if (ids.empty()) {
 			printf("message id null\r\n");
 		} else {
-			test_xack(redis, group, id);
+			xack(redis, group, ids);
 		}
 	} else if (cmd == "xrange") {
-		test_xrange(redis, n);
+		xrange(redis, n);
 	} else if (cmd == "xrevrange") {
-		test_xrevrange(redis, n);
+		xrevrange(redis, n);
 	} else if (cmd == "xpending_summary") {
-		test_xpending_summary(redis, group);
+		xpending_summary(redis, group);
+	} else if (cmd == "xpending_detail") {
+		xpending_detail(redis, group, (size_t) n);
 	} else if (cmd == "xinfo_help") {
-		test_xinfo_help(redis);
+		xinfo_help(redis);
 	} else if (cmd == "xinfo_consumers") {
-		test_xinfo_consumers(redis, group);
+		xinfo_consumers(redis, group);
 	} else if (cmd == "xinfo_groups") {
-		test_xinfo_groups(redis);
+		xinfo_groups(redis);
 	} else if (cmd == "xinfo_stream") {
-		test_xinfo_stream(redis);
+		xinfo_stream(redis);
 	} else {
 		usage(argv[0]);
 		return 1;

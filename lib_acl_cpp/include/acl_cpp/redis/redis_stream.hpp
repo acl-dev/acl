@@ -99,6 +99,16 @@ struct redis_pending_summary
 	string smallest_id;
 	string greatest_id;
 	std::vector<redis_pending_consumer> consumers;
+
+	bool empty(void) const
+	{
+		return consumers.empty();
+	}
+
+	size_t size(void) const
+	{
+		return consumers.size();
+	}
 };
 
 struct redis_pending_message
@@ -118,6 +128,16 @@ struct redis_pending_message
 struct redis_pending_detail
 {
 	std::map<string, redis_pending_message> messages;
+
+	bool empty(void) const
+	{
+		return messages.empty();
+	}
+
+	size_t size(void) const
+	{
+		return messages.size();
+	}
 };
 
 class ACL_CPP_API redis_stream : virtual public redis_command
@@ -144,6 +164,7 @@ public:
 		string& result, const char* id = "*");
 
 	int  xlen(const char* key);
+	int  xdel(const char* key, const char* id);
 	int  xdel(const char* key, const std::vector<string>& ids);
 	int  xdel(const char* key, const std::vector<const char*>& ids);
 	int  xtrim(const char* key, size_t maxlen, bool tilde = false);
@@ -156,6 +177,10 @@ public:
 	bool xreadgroup(redis_stream_messages& messsages, const char* group,
 		const char* consumer, const std::map<string, string>& streams,
 		size_t count = 0, size_t block = 0, bool noack = false);
+	bool xreadgroup_with_noack(redis_stream_messages& messsages,
+		const char* group, const char* consumer,
+		const std::map<string, string>& streams,
+		size_t count = 0, size_t block = 0);
 	bool xrange(redis_stream_messages& messages, const char* key,
 		const char* start = "-", const char* end = "+", size_t count = 0);
 	bool xrevrange(redis_stream_messages& messages, const char* key,
@@ -198,8 +223,9 @@ public:
 
 	/////////////////////////////////////////////////////////////////////
 
+	bool xgroup_help(std::vector<string>& result);
 	bool xgroup_create(const char* key, const char* group,
-		const char* id = "$");
+		const char* id = "$", bool mkstream = true);
 	int  xgroup_destroy(const char* key, const char* group);
 	bool xgroup_setid(const char* key, const char* group,
 		const char* id = "$");
