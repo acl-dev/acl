@@ -176,11 +176,11 @@ public:
 		size_t count = 0, size_t block = 0);
 	bool xreadgroup(redis_stream_messages& messsages, const char* group,
 		const char* consumer, const std::map<string, string>& streams,
-		size_t count = 0, size_t block = 0, bool noack = false);
+		size_t count = 1000, size_t block = 0, bool noack = false);
 	bool xreadgroup_with_noack(redis_stream_messages& messsages,
 		const char* group, const char* consumer,
 		const std::map<string, string>& streams,
-		size_t count = 0, size_t block = 0);
+		size_t count = 1000, size_t block = 0);
 	bool xrange(redis_stream_messages& messages, const char* key,
 		const char* start = "-", const char* end = "+", size_t count = 0);
 	bool xrevrange(redis_stream_messages& messages, const char* key,

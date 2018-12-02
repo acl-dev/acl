@@ -45,6 +45,7 @@ bool redis_stream::xadd(const char* key, const std::map<string, string>& fields,
 		return false;
 	}
 
+	hash_slot(key);
 	build("XADD", key, id, fields);
 	return get_string(result) >= 0 ? true : false;
 }
@@ -64,6 +65,7 @@ bool redis_stream::xadd(const char* key, const std::vector<string>& names,
 		return false;
 	}
 
+	hash_slot(key);
 	build("XADD", key, id, names, values);
 	return get_string(result) >= 0 ? true : false;
 }
@@ -83,6 +85,7 @@ bool redis_stream::xadd(const char* key, const std::vector<const char*>& names,
 		return false;
 	}
 
+	hash_slot(key);
 	build("XADD", key, id, names, values);
 	return get_string(result) >= 0 ? true : false;
 }
@@ -102,6 +105,7 @@ bool redis_stream::xadd(const char* key, const char* names[],
 		return false;
 	}
 
+	hash_slot(key);
 	build("XADD", key, id, names, names_len, values, values_len, argc);
 	return get_string(result) >= 0 ? true : false;
 }
@@ -116,6 +120,7 @@ int redis_stream::xlen(const char* key)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 	return get_number();
 }
@@ -221,15 +226,23 @@ bool redis_stream::xread(redis_stream_messages& messages,
 	const std::map<string, string>& streams,
 	size_t count /* = 0 */, size_t block /* = 0 */)
 {
+	if (streams.size() == 1) {
+		std::map<string, string>::const_iterator cit = streams.begin();
+		hash_slot(cit->first);
+	}
 	xread_build(streams, count, block);
 	return get_results(messages);
 }
 
 bool redis_stream::xreadgroup(redis_stream_messages& messages,
 	const char* group, const char* consumer,
-	const std::map<string, string>& streams, size_t count /* = 0 */,
+	const std::map<string, string>& streams, size_t count /* = 1000 */,
 	size_t block /* = 0 */, bool noack /* = false */)
 {
+	if (streams.size() == 1) {
+		std::map<string, string>::const_iterator cit = streams.begin();
+		hash_slot(cit->first);
+	}
 	xreadgroup_build(group, consumer, streams, count, block, noack);
 	return get_results(messages);
 }
@@ -246,12 +259,14 @@ bool redis_stream::xreadgroup_with_noack(redis_stream_messages& messages,
 bool redis_stream::xrange(redis_stream_messages& messages, const char* key,
 	const char* start, const char* end, size_t count /* = 0 */)
 {
+	hash_slot(key);
 	return range(messages, "XRANGE", key, start, end, count);
 }
 
 bool redis_stream::xrevrange(redis_stream_messages& messages, const char* key,
 	const char* start, const char* end, size_t count /* = 0 */)
 {
+	hash_slot(key);
 	return range(messages, "XREVRANGE", key, start, end, count);
 }
 
@@ -291,6 +306,7 @@ bool redis_stream::range(redis_stream_messages& messages, const char* cmd,
 		i++;
 	}
 
+	hash_slot(key);
 	build_request(i, argv, lens);
 
 	const redis_result* result = run();
@@ -518,6 +534,7 @@ bool redis_stream::xclaim(std::vector<redis_stream_message>& messages,
 	size_t idle /* = 0 */, long long time_ms /* = -1 */,
 	int retry_count /* = -1 */, bool force /* = false */)
 {
+	hash_slot(key);
 	xclaim_build(key, group, consumer, min_idle_time, ids,
 		idle, time_ms, retry_count, force, false);
 
@@ -548,6 +565,7 @@ bool redis_stream::xclaim_with_justid(std::vector<string>& messages_ids,
 	size_t idle /* = 0 */, long long time_ms /* = -1 */,
 	int retry_count /* = -1 */, bool force /* = false */)
 {
+	hash_slot(key);
 	xclaim_build(key, group, consumer, min_idle_time, ids,
 		idle, time_ms, retry_count, force, false);
 
@@ -589,6 +607,8 @@ int redis_stream::xack(const char* key, const char* group, const char* id)
 	lens[2] = strlen(group);
 	argv[3] = id;
 	lens[3] = strlen(id);
+
+	hash_slot(key);
 	build_request(4, argv, lens);
 	return get_number();
 }
@@ -625,6 +645,7 @@ int redis_stream::xack(const char* key, const char* group,
 		i++;
 	}
 
+	hash_slot(key);
 	build_request(i, argv_, argv_lens_);
 	return get_number();
 }
@@ -661,6 +682,7 @@ int redis_stream::xack(const char* key, const char* group,
 		i++;
 	}
 
+	hash_slot(key);
 	build_request(i, argv_, argv_lens_);
 	return get_number();
 }
@@ -697,6 +719,7 @@ int redis_stream::xack(const char* key, const char* group,
 		i++;
 	}
 
+	hash_slot(key);
 	build_request(i, argv_, argv_lens_);
 	return get_number();
 }
@@ -733,6 +756,7 @@ int redis_stream::xack(const char* key, const char* group,
 		i++;
 	}
 
+	hash_slot(key);
 	build_request(i, argv_, argv_lens_);
 	return get_number();
 }
@@ -752,6 +776,7 @@ bool redis_stream::xpending_summary(const char* key, const char* group,
 	argv[2] = group;
 	lens[2] = strlen(group);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	const redis_result* rr = run();
 	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
@@ -888,6 +913,7 @@ bool redis_stream::xpending_detail(redis_pending_detail& result,
 		i++;
 	}
 
+	hash_slot(key);
 	build_request(i, argv, lens);
 
 	const redis_result* rr = run();
@@ -963,18 +989,27 @@ bool redis_stream::get_pending_message(const redis_result& rr,
 int redis_stream::xdel(const char* key, const char* id)
 {
 	std::vector<const char*> ids;
+	hash_slot(key);
 	ids.push_back(id);
 	return xdel(key, ids);
 }
 
 int redis_stream::xdel(const char* key, const std::vector<string>& ids)
 {
+	if (ids.size() == 1) {
+		hash_slot(ids[0]);
+	}
+
 	redis_command::build("XDEL", key, ids);
 	return get_number();
 }
 
 int redis_stream::xdel(const char* key, const std::vector<const char*>& ids)
 {
+	if (ids.size() == 1) {
+		hash_slot(ids[0]);
+	}
+
 	redis_command::build("XDEL", key, ids);
 	return get_number();
 }
@@ -1009,6 +1044,7 @@ int redis_stream::xtrim(const char* key, size_t maxlen, bool tilde)
 	lens[i] = strlen(buf);
 	i++;
 
+	hash_slot(key);
 	build_request(i, argv, lens);
 	return get_number();
 }
@@ -1074,6 +1110,7 @@ bool redis_stream::xgroup_create(const char* key, const char* group,
 		n = 5;
 	}
 
+	hash_slot(key);
 	build_request(n, argv, lens);
 	return check_status();
 }
@@ -1091,6 +1128,8 @@ int redis_stream::xgroup_destroy(const char* key, const char* group)
 	lens[2] = strlen(key);
 	argv[3] = group;
 	lens[3] = strlen(group);
+
+	hash_slot(key);
 	build_request(4, argv, lens);
 	return get_number();
 }
@@ -1111,6 +1150,8 @@ bool redis_stream::xgroup_setid(const char* key, const char* group,
 	lens[3] = strlen(group);
 	argv[4] = id;
 	lens[4] = strlen(id);
+
+	hash_slot(key);
 	build_request(5, argv, lens);
 	return check_status();
 }
@@ -1131,6 +1172,8 @@ int redis_stream::xgroup_delconsumer(const char* key, const char* group,
 	lens[3] = strlen(group);
 	argv[4] = consumer;
 	lens[4] = strlen(consumer);
+
+	hash_slot(key);
 	build_request(5, argv, lens);
 	return get_number();
 }
@@ -1342,6 +1385,7 @@ bool redis_stream::xinfo_consumers(const char* key, const char* group,
 	argv[3] = group;
 	lens[3] = strlen(group);
 
+	hash_slot(key);
 	build_request(4, argv, lens);
 	const redis_result* rr = run();
 	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
@@ -1434,6 +1478,7 @@ bool redis_stream::xinfo_groups(const char* key,
 	argv[2] = key;
 	lens[2] = strlen(key);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	const redis_result* rr = run();
 	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
@@ -1527,6 +1572,7 @@ bool redis_stream::xinfo_stream(const char* key, redis_stream_info& info)
 	argv[2] = key;
 	lens[2] = strlen(key);
 
+	hash_slot(key);
 	build_request(3, argv, lens);
 	const redis_result* rr = run();
 	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {

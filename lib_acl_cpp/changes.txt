@@ -2,6 +2,7 @@
 
 554) 2018.12.2
 554.1) feature: redis_stream 功能模块单元测试基本 OK :)
+554.2) feature: redis_stream 功能模块压力测试 OK
 
 553) 2018.11.28
 553.1) feature: master_thread.cpp 增加 task_qlen() 方便用户获得当前线程池任务
