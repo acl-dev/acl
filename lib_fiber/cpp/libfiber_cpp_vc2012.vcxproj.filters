@@ -30,10 +30,16 @@
     <ClInclude Include="include\fiber\fiber.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\fiber\fiber_cond.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="include\fiber\fiber_cpp_define.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\fiber\fiber_event.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_tbox.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\fiber\fiber_lock.hpp">
@@ -57,6 +63,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\fiber.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fiber_cond.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\fiber_event.cpp">

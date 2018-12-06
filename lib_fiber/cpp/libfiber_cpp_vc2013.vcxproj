@@ -158,12 +158,23 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\fiber\channel.hpp" />
+    <ClInclude Include="include\fiber\fiber.hpp" />
+    <ClInclude Include="include\fiber\fiber_cond.hpp" />
+    <ClInclude Include="include\fiber\fiber_cpp_define.hpp" />
+    <ClInclude Include="include\fiber\fiber_event.hpp" />
+    <ClInclude Include="include\fiber\fiber_lock.hpp" />
+    <ClInclude Include="include\fiber\fiber_sem.hpp" />
+    <ClInclude Include="include\fiber\fiber_tbox.hpp" />
+    <ClInclude Include="include\fiber\lib_fiber.hpp" />
+    <ClInclude Include="include\fiber\master_fiber.hpp" />
     <ClInclude Include="src\fiber_server.hpp" />
     <ClInclude Include="src\stdafx.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\channel.cpp" />
     <ClCompile Include="src\fiber.cpp" />
+    <ClCompile Include="src\fiber_cond.cpp" />
     <ClCompile Include="src\fiber_event.cpp" />
     <ClCompile Include="src\fiber_lock.cpp" />
     <ClCompile Include="src\fiber_sem.cpp" />
