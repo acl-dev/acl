@@ -369,7 +369,7 @@ bool websocket::read_frame_head(void)
 	return true;
 }
 
-int websocket::read_frame_data(char* buf, size_t size)
+int websocket::read_frame_data(void* buf, size_t size)
 {
 	if (payload_nread_ >= header_.payload_len) {
 		return 0;
@@ -391,7 +391,7 @@ int websocket::read_frame_data(char* buf, size_t size)
 	if (header_.mask) {
 		unsigned char* mask = (unsigned char*) &header_.masking_key;
 		for (int i = 0; i < ret; i++) {
-			buf[i] ^= mask[(payload_nread_ + i) % 4];
+			((char*) buf)[i] ^= mask[(payload_nread_ + i) % 4];
 		}
 	}
 

@@ -188,7 +188,7 @@ bool HttpServlet::start(void)
 				logger_error("sendHeader error!");
 				return false;
 			}
-			ret = doWebsocket(*req_, *res_);
+			ret = doWebSocket(*req_, *res_);
 		} else {
 			ret = doGet(*req_, *res_);
 		}

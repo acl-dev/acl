@@ -1,5 +1,10 @@
 修改历史列表：
 
+644) 2018.12.6
+644.1) bugfix: acl_threads_server.c，在 client_wakeup() 中调用 acl_access_permit()
+时如果该函数返回 0 后再调用 ctx->serv_close() 时会导致服务崩溃，原因是调用
+serv_close 中的参数顺序不对
+
 643) 2018.11.28
 643.1) bugfix: acl_udp_server.c 中 server_binding 绑定失败时不应放在事件监控中
 644.2) feature: acl_udp_server.c 增加配置项 udp_fatal_on_bind_err 来决定当无法

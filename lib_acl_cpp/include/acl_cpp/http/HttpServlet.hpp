@@ -134,9 +134,9 @@ public:
 	/**
 	 * 当 HTTP 请求为 websocket 方式时调用的虚函数
 	 */
-	virtual bool doWebsocket(HttpServletRequest&, HttpServletResponse&)
+	virtual bool doWebSocket(HttpServletRequest&, HttpServletResponse&)
 	{
-		logger_error("child not implement doWebsocket yet!");
+		logger_error("child not implement doWebSocket yet!");
 		return false;
 	}
 

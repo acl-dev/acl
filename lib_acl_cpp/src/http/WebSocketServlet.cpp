@@ -24,10 +24,7 @@ namespace acl
 
 WebSocketServlet::WebSocketServlet(socket_stream* stream, session* session)
 : HttpServlet(stream, session)
-, max_msg_len_(100 * 1024*1024)
 , ws_(NULL)
-, buffer_(NULL)
-, wpos_(0)
 , opcode_(0)
 {
 }
@@ -35,19 +32,13 @@ WebSocketServlet::WebSocketServlet(socket_stream* stream, session* session)
 WebSocketServlet::WebSocketServlet(socket_stream* stream, 
 	const char* memcache_addr)
 : HttpServlet(stream, memcache_addr)
-, max_msg_len_(100 * 1024 * 1024)
 , ws_(NULL)
-, buffer_(NULL)
-, wpos_(0)
 , opcode_(0)
 {
 }
 
 WebSocketServlet::WebSocketServlet(void)
-: max_msg_len_(100 * 1024 * 1024)
-, ws_(NULL)
-, buffer_(NULL)
-, wpos_(0)
+: ws_(NULL)
 , opcode_(0)
 {
 }
@@ -55,9 +46,6 @@ WebSocketServlet::WebSocketServlet(void)
 WebSocketServlet::~WebSocketServlet(void)
 {
 	delete ws_;
-	if (buffer_) {
-		acl_myfree(buffer_);
-	}
 }
 
 bool WebSocketServlet::doRun(session& session, socket_stream* stream /* = NULL */)
@@ -88,74 +76,56 @@ bool WebSocketServlet::doRun(void)
 	}
 
 	unsigned long long len = ws_->get_frame_payload_len();
-	if (len > max_msg_len_) {
-		logger_error("payload too large error: %llu", len);
-		return false;
-	}
-
-	if (len > 0) {
-		if (!buffer_) {
-			buffer_ = (char*) acl_mymalloc((size_t) len + 1);
-		} else {
-			//frame not finish.
-			buffer_ = (char*) acl_myrealloc(buffer_,
-				wpos_ + (size_t) len + 1);
-		}
-
-		if (ws_->read_frame_data(buffer_ + wpos_, (size_t) len) < 0) {
-			acl_myfree(buffer_);
-			buffer_ = NULL;
-			wpos_   = 0;
-			return false;
-		}
-		wpos_ += (int) len;
-		buffer_[wpos_] = '\0';
-	}
-
 	int  opcode = ws_->get_frame_opcode();
 	bool ret    = false;
 
-	if (ws_->get_frame_fin() == false) {
-		//safe opcode.
-		if(opcode != FRAME_CONTINUATION) {
-			opcode_ = opcode;
+	bool finish = ws_->frame_is_fin();
+	if (finish) {
+		if (opcode == FRAME_CONTINUATION) {
+			// restore the saved opcode
+			opcode = opcode_;
 		}
-		return true;
-	}
-
-	//frame is finish callback frame.
-	if (opcode == FRAME_CONTINUATION) {
-		opcode = opcode_;
+	} else if (opcode != FRAME_CONTINUATION) {
+		// save opcode
+		opcode_ = opcode;
 	}
 
 	switch (opcode) {
 	case FRAME_PING:
-		ret = onPing(buffer_, wpos_);
+		ret = onPing(len, finish);
 		break;
 	case FRAME_PONG:
-		ret = onPong(buffer_, wpos_);
+		ret = onPong(len, finish);
 		break;
 	case FRAME_CLOSE:
 		onClose();
 		break;
 	case FRAME_TEXT:
+		ret = onMessage(len, true, finish);
+		break;
 	case FRAME_BINARY:
-		ret = onMessage(buffer_, wpos_,
-			ws_->get_frame_opcode() == FRAME_TEXT);
+		ret = onMessage(len, false, finish);
 		break;
 	default:
-		logger_error("unknown websocket Frame opcode error: %d", 
-			ws_->get_frame_opcode());
+		logger_error("unknown websocket frame opcode: %d", opcode);
+		ret = false;
 		break;
 	}
 
-	if (buffer_) {
-		acl_myfree(buffer_);
-		buffer_ = NULL;
-		wpos_   = 0;
+	if (finish) {
+		opcode_ = 0;
 	}
 
 	return ret;
+}
+
+int WebSocketServlet::readPayload(void* buf, size_t size)
+{
+	if (ws_ == NULL) {
+		logger_error("ws_ NULL");
+		return -1;
+	}
+	return ws_->read_frame_data(buf, size);
 }
 
 bool WebSocketServlet::sendBinary(const char *buffer, int len)
@@ -192,7 +162,7 @@ bool WebSocketServlet::sendPing(const char *text)
 	return ws_->send_frame_data(text, len);
 }
 
-bool WebSocketServlet::doWebsocket(HttpServletRequest&, HttpServletResponse&)
+bool WebSocketServlet::doWebSocket(HttpServletRequest&, HttpServletResponse&)
 {
 	acl_assert(!ws_);
 	ws_ = NEW websocket(*getStream());

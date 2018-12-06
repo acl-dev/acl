@@ -29,37 +29,29 @@ protected:
 
 	/**
 	 * @override
-	 * websocket ping 消息回调.
-	 * @param {const char *} buf 消息数据
-	 * @param {int} len 消息数据长度
-	 * @return {bool} false 断开连接。
 	 */
-	bool onPing(const char *buf, unsigned long long len);
+	bool onPing(unsigned long long len, bool finish);
 
 	/**
 	 * @override
-	 * websocket pong 消息回调.
-	 * @param {const char *} buf 消息数据
-	 * @param {int} len 消息数据长度
-	 * @return {bool} false 断开连接。
 	 */
-	bool onPong(const char *buf, unsigned long long len);
+	bool onPong(unsigned long long len, bool finish);
 
 	/**
 	 * @override
-	 * websocket ping 消息回调.
-	 * @param data{char *} 回调数据缓存区。
-	 * @param len{unsigned long long}回调数据缓存区长度。
-	 * @param text{bool } true 为文本数据。否则是 二进制数据。
-	 * @return {bool} false 断开连接。
 	 */
-	bool onMessage(char *data, unsigned long long len, bool text);
+	bool onMessage(unsigned long long len, bool text, bool finish);
 
 private:
 	acl::session* session_;
 	int step_;
 	acl::string filename_;
-	acl::ofstream *file_;
-	int filesize_;
-	int current_filesize_;
+	long long filesize_;
+	long long nread_;
+	acl::ofstream fp_;
+
+	bool getFilename(unsigned long long payload_len);
+	bool getFilesize(unsigned long long payload_len);
+	bool readData(unsigned long long len, acl::string& path);
+	bool saveFile(unsigned long long len);
 };

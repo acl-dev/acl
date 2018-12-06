@@ -25,7 +25,7 @@ protected:
 	bool doPost(acl::HttpServletRequest&, acl::HttpServletResponse&);
 
 	// @override
-	bool doWebsocket(acl::HttpServletRequest&, acl::HttpServletResponse&);
+	bool doWebSocket(acl::HttpServletRequest&, acl::HttpServletResponse&);
 
 private:
 	acl::session* session_;

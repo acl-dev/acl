@@ -542,7 +542,7 @@ static void client_wakeup(ACL_EVENT *event, ACL_VSTREAM *stream)
 			acl_vstream_fprintf(stream, "%s\r\n", __deny_info);
 		}
 		if (ctx->serv_close != NULL) {
-			ctx->serv_close(stream, ctx->serv_arg);
+			ctx->serv_close(ctx->serv_arg, stream);
 		}
 		acl_vstream_close(stream);
 		return;

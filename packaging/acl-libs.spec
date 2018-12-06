@@ -1,4 +1,4 @@
-%define release_id 35
+%define release_id 36
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,10 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Dec 06 2018 zhengshuxin@qiyi.com 3.4.1-35-20181206.15
+- acl_threads_server.c: fixed one crashed bug in client_wakeup
+- fiber_tbox.hpp: make push more safety
 
 * Thu Nov 29 2018 zhengshuxin@qiyi.com 3.4.1-35-20181129.22
 - fiber_event.c: fixed one bug in acl_fiber_event_notify.

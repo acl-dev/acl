@@ -179,7 +179,7 @@ bool http_servlet::doMsg(acl::websocket& in, acl::websocket& out)
 	return true;
 }
 
-bool http_servlet::doWebsocket(acl::HttpServletRequest& req,
+bool http_servlet::doWebSocket(acl::HttpServletRequest& req,
 	acl::HttpServletResponse&)
 {
 	acl::socket_stream& ss = req.getSocketStream();

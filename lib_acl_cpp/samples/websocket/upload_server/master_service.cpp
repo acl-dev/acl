@@ -99,8 +99,7 @@ void master_service::thread_on_close(acl::socket_stream* conn)
 		conn->sock_handle());
 
 	http_servlet* servlet = (http_servlet*) conn->get_ctx();
-	if (servlet)
-		delete servlet;
+	delete servlet;
 }
 
 void master_service::thread_on_init()

@@ -60,7 +60,6 @@ public:
 	 * @param rw_timeout {const char *} 发送的数据
 	 * @return {bool} 错误 false.否则 true
 	 */
-
 	bool sendBinary(const char *buf, int len);
 
 	/**
@@ -68,7 +67,6 @@ public:
 	 * @param rw_timeout {const char *} 发送的数据
 	 * @return {bool} 错误 false.否则 true
 	 */
-
 	bool sendText(const char *text);
 
 	/**
@@ -85,20 +83,6 @@ public:
 	 */
 	bool sendPing(const char *buffer = NULL);
 
-	unsigned long long getMaxMsgLen(void) const
-	{
-		return max_msg_len_;
-	}
-
-	/**
-	 * 设置最大消息长度，当websocket 消息大于这个值，将断开websocket连接.
-	 * @param unsigned long long{len} 新的长度
-	 */
-	void setMaxMsgLen(unsigned long long len)
-	{
-		max_msg_len_ = len;
-	}
-
 protected:
 	/**
 	 * websocket 关闭消息回调
@@ -108,40 +92,56 @@ protected:
 
 	/**
 	 * websocket ping 消息回调.
-	 * @param {const char *} buf 消息数据
-	 * @param {int} len 消息数据长度
+	 * @param payload_len {unsigned long long} 消息数据总长度
+	 * @param finish {bool} 本数据包是否最后一个
 	 * @return {bool} false 断开连接。
 	 */
-	virtual bool onPing(const char *buf, unsigned long long  len) = 0;
+	virtual bool onPing(unsigned long long payload_len, bool finish) = 0;
 
 	/**
 	 * websocket pong 消息回调.
-	 * @param {const char *} buf 消息数据
-	 * @param {int} len 消息数据长度
+	 * @param payload_len {unsigned long long} 消息数据总长度
+	 * @param finish {bool} 本数据包是否最后一个
 	 * @return {bool} false 断开连接。
 	 */
-	virtual bool onPong(const char *buf, unsigned long long  len) = 0;
+	virtual bool onPong(unsigned long long payload_len, bool finish) = 0;
 
 	/**
 	 * websocket ping 消息回调.
-	 * @param data{char *} 回调数据缓存区。
-	 * @param len{unsigned long long}回调数据缓存区长度。
-	 * @param text{bool } true 为文本数据。否则是 二进制数据。
+	 * @param payload_len {unsigned long long} 消息数据总长度
+	 * @param text {bool } true 表示为文本数据, 否则是 二进制数据。
+	 * @param finish {bool} 本数据包是否最后一个
 	 * @return {bool} false 断开连接。
 	 */
-	virtual bool onMessage(char *data, unsigned long long len, bool text) = 0;
+	virtual bool onMessage(unsigned long long payload_len,
+			bool text, bool finish) = 0;
+
+	/**
+	 * 子类可以循环调用此方法获得数据帧的数据体，直至返回 <= 0 为止
+	 * @param buf {size_t*} 数据缓冲区用来存放结果数据
+	 * @param size {size_t} buf 缓冲区大小
+	 * @return {int} 读到的数据长度，分以下三种情形：
+	 *   0: 表示数据帧正常读完
+	 *  -1: 表示读出错
+	 *  >0: 表示读到的数据，应再次调用本方法以便读余下的数据
+	 */
+	int readPayload(void* buf, size_t size);
+
+	/**
+	 * 返回 websocket 对象，如果返回 NULL 表示还未建立 websocket 连接
+	 * @return {websocket*}
+	 */
+	websocket* get_websocket(void) const
+	{
+		return ws_;
+	}
 
 private:
 	// @override
-	bool doWebsocket(HttpServletRequest&, HttpServletResponse&);
+	bool doWebSocket(HttpServletRequest&, HttpServletResponse&);
 
 private:
-
-	unsigned long long max_msg_len_;
 	websocket *ws_;
-
-	char *buffer_;
-	int   wpos_;
 	int   opcode_;
 };
 

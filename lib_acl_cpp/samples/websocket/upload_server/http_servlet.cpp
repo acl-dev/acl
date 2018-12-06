@@ -335,7 +335,7 @@ int http_servlet::saveFile(acl::websocket& in, acl::ofstream& out)
 	return len;
 }
 
-bool http_servlet::doWebsocket(acl::HttpServletRequest& req,
+bool http_servlet::doWebSocket(acl::HttpServletRequest& req,
 	acl::HttpServletResponse&)
 {
 	acl::socket_stream& ss = req.getSocketStream();

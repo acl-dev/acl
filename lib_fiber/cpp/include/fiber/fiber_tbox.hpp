@@ -74,14 +74,29 @@ public:
 	/**
 	 * 发送消息对象
 	 * @param t {T*} 非空消息对象
+	 * @param notify_first {bool} 如果本参数为 true，则内部添加完消息后
+	 *  采用先通知后解锁方式，否则采用先解锁后通知方式，当 fiber_tbox 对象
+	 *  的生存周期比较长时，该参数设为 false 的效率更高，如果 fiber_tbox
+	 *  对象的生存周期较短(如：等待者调用 pop 后直接销毁 fiber_tbox 对象),
+	 *  则本参数应该设为 true，以避免 push 者还没有完全返回前因 fiber_tbox
+	 *  对象被提前销毁而造成内存非法访问
 	 */
-	void push(T* t)
+	void push(T* t, bool notify_first = true)
 	{
+		// 先加锁
 		event_.wait();
+
+		// 向队列中添加消息对象
 		tbox_.push_back(t);
 		size_++;
-		event_.notify();
-		cond_.notify();
+
+		if (notify_first) {
+			cond_.notify();
+			event_.notify();
+		} else {
+			event_.notify();
+			cond_.notify();
+		}
 	}
 
 	/**

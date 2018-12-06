@@ -77,9 +77,9 @@ service http_server {
 
 #	用 select 进行循环时的时间间隔
 #	单位为秒
-	ioctl_delay_sec = 1
+	ioctl_delay_sec = 0
 #	单位为微秒
-	ioctl_delay_usec = 500
+	ioctl_delay_usec = 100
 
 #       采用事件循环的方式: select(default), poll, kernel(epoll/devpoll/kqueue)
 	ioctl_event_mode = kernel

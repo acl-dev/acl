@@ -58,8 +58,7 @@ bool master_service::thread_on_read(acl::socket_stream* conn)
 
 	acl::session& session = servlet->get_session();
 	conn->set_rw_timeout(60);
-	while (true)
-	{
+	while (true) {
 		bool ret = servlet->doRun(session, conn);
 		if (ret == false)
 			return false;
@@ -78,7 +77,6 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 	WebsocketServlet_impl* servlet = new WebsocketServlet_impl(*session_server,
 			var_cfg_max_threads);
 	conn->set_ctx(servlet);
-
 	return true;
 }
 
@@ -95,8 +93,7 @@ void master_service::thread_on_close(acl::socket_stream* conn)
 		conn->sock_handle());
 
 	WebsocketServlet_impl* servlet = (WebsocketServlet_impl*) conn->get_ctx();
-	if (servlet)
-		delete servlet;
+	delete servlet;
 }
 
 void master_service::thread_on_init()
@@ -116,8 +113,7 @@ void master_service::proc_on_init()
 
 bool master_service::proc_exit_timer(size_t nclients, size_t nthreads)
 {
-	if (nclients == 0 || nthreads == 0)
-	{
+	if (nclients == 0 || nthreads == 0) {
 		logger("clients count: %d, threads count: %d",
 			(int) nclients, (int) nthreads);
 		return true;
