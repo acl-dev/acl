@@ -133,7 +133,7 @@ fi
 
 %changelog
 
-* Thu Dec 06 2018 zhengshuxin@qiyi.com 3.4.1-35-20181206.15
+* Thu Dec 06 2018 zhengshuxin@qiyi.com 3.4.1-36-20181206.15
 - acl_threads_server.c: fixed one crashed bug in client_wakeup
 - fiber_tbox.hpp: make push more safety
 
