@@ -197,6 +197,8 @@ bool WebsocketServlet_impl::saveFile(unsigned long long len)
 		nread_    = 0;
 		filename_.clear();
 		fp_.close();
+		return sendText("+ok");
+	} else {
+		return true;
 	}
-	return true;
 }

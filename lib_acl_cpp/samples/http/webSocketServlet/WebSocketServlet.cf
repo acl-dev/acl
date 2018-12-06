@@ -77,7 +77,7 @@ service http_server {
 
 #	用 select 进行循环时的时间间隔
 #	单位为秒
-	ioctl_delay_sec = 1
+	ioctl_delay_sec = 0
 #	单位为微秒
 	ioctl_delay_usec = 100
 
