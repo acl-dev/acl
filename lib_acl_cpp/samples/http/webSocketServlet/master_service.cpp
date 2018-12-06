@@ -14,7 +14,7 @@ acl::master_str_tbl var_conf_str_tab[] = {
 
 int  var_cfg_keep_loop;
 acl::master_bool_tbl var_conf_bool_tab[] = {
-	{ "keep_loop", false, &var_cfg_keep_loop },
+	{ "keep_loop", 0, &var_cfg_keep_loop },
 
 	{ 0, 0, 0 }
 };
