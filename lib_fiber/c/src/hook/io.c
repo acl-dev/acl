@@ -353,7 +353,7 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 			fiber_wait_read(fe);
 		}
 
-		ret = __sys_recv(sockfd, buf, len, flags);
+		ret = (int) __sys_recv(sockfd, buf, len, flags);
 		if (ret >= 0) {
 			return ret;
 		}
@@ -378,7 +378,7 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 int WINAPI acl_fiber_recvfrom(socket_t sockfd, char *buf, int len,
 	int flags, struct sockaddr *src_addr, socklen_t *addrlen)
 #else
-ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, int len,
+ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 	int flags, struct sockaddr *src_addr, socklen_t *addrlen)
 #endif
 {
@@ -401,11 +401,11 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, int len,
 	fe = fiber_file_open(sockfd);
 
 	if (EVENT_IS_IOCP(fiber_io_event())) {
-		return fiber_iocp_read(fe, buf, len);
+		return fiber_iocp_read(fe, buf, (int) len);
 	}
 
 	while (1) {
-		int ret;
+		ssize_t ret;
 		int err;
 
 		if (IS_READABLE(fe)) {
@@ -536,7 +536,7 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 	}
 
 	while (1) {
-		ssize_t n = __sys_writev(fd, iov, iovcnt);
+		int n = (int) __sys_writev(fd, iov, iovcnt);
 		FILE_EVENT *fe;
 		int err;
 
@@ -581,7 +581,7 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 	}
 
 	while (1) {
-		int n = __sys_send(sockfd, buf, len, flags);
+		int n = (int) __sys_send(sockfd, buf, len, flags);
 		FILE_EVENT *fe;
 		int err;
 
@@ -616,7 +616,7 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 int WINAPI acl_fiber_sendto(socket_t sockfd, const char *buf, int len,
 	int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
 #else
-ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, int len,
+ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 	int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
 #endif
 {
@@ -625,7 +625,7 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, int len,
 	}
 
 	while (1) {
-		int n = __sys_sendto(sockfd, buf, len, flags,
+		int n = (int) __sys_sendto(sockfd, buf, len, flags,
 				dest_addr, addrlen);
 		FILE_EVENT *fe;
 		int err;
