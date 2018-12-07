@@ -291,7 +291,7 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 {
 	fe->buf  = buf;
-	fe->size = (int) len;
+	fe->size = len;
 	fe->len  = 0;
 
 	while (1) {
