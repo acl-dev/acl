@@ -433,7 +433,7 @@ int acl_socket_alive(ACL_SOCKET fd)
 		return 0;
 	if (ret == 0)
 		return 1;
-	ret = __sys_recv(fd, buf, sizeof(buf), MSG_PEEK);
+	ret = (int) __sys_recv(fd, buf, sizeof(buf), MSG_PEEK);
 	if (ret == 0 || (ret < 0 && acl_last_error() != ACL_EWOULDBLOCK))
 		return 0;
 	return 1;

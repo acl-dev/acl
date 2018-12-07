@@ -60,7 +60,8 @@ void fbase_event_close(FIBER_BASE *fbase)
 int fbase_event_wait(FIBER_BASE *fbase)
 {
 	long long n;
-	int  ret, interrupt = 0;
+    ssize_t ret;
+	int     interrupt = 0;
 
 	if (fbase->event_in < 0) {
 		msg_fatal("%s(%d), %s: invalid event_in=%d",
@@ -74,21 +75,21 @@ int fbase_event_wait(FIBER_BASE *fbase)
 		}
 
 		if (ret >= 0) {
-			msg_fatal("%s(%d), %s: read ret=%d invalid length, "
+			msg_fatal("%s(%d), %s: read ret=%ld invalid length, "
 				"interrupt=%d", __FILE__, __LINE__,
 				__FUNCTION__, ret, interrupt);
 		}
 
 		if (acl_fiber_last_error() == EINTR) {
 			interrupt++;
-			msg_info("%s(%d), %s: read EINTR=%d, in=%d, ret=%d",
+			msg_info("%s(%d), %s: read EINTR=%d, in=%d, ret=%ld",
 				__FILE__, __LINE__, __FUNCTION__,
 				interrupt, fbase->event_in, ret);
 			doze(1);
 			continue;
 		}
 
-		msg_error("%s(%d), %s: read error %s, in=%d, ret=%d, "
+		msg_error("%s(%d), %s: read error %s, in=%d, ret=%ld, "
 			"interrupt=%d", __FILE__, __LINE__, __FUNCTION__,
 			last_serror(), fbase->event_in, ret, interrupt);
 		return -1;
@@ -106,7 +107,8 @@ int fbase_event_wait(FIBER_BASE *fbase)
 int fbase_event_wakeup(FIBER_BASE *fbase)
 {
 	long long n = 1;
-	int  ret, interrupt = 0;
+    ssize_t ret;
+	int     interrupt = 0;
 
 	/**
 	 * if (LIKELY(atomic_int64_cas(fbase->atomic, 0, 1) != 0)) {
@@ -126,21 +128,21 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 		}
 
 		if (ret >= 0) {
-			msg_fatal("%s(%d), %s: write ret=%d invalid length, "
+			msg_fatal("%s(%d), %s: write ret=%ld invalid length, "
 				"interrupt=%d", __FILE__, __LINE__,
 				__FUNCTION__, ret, interrupt);
 		}
 
 		if (acl_fiber_last_error() == EINTR) {
 			interrupt++;
-			msg_info("%s(%d), %s: write EINTR=%d, out=%d, ret=%d",
+			msg_info("%s(%d), %s: write EINTR=%d, out=%d, ret=%ld",
 				__FILE__, __LINE__, __FUNCTION__,
 				interrupt, fbase->event_out, ret);
 			doze(1);
 			continue;
 		}
 
-		msg_error("%s(%d), %s: write error %s, out=%d, ret=%d, "
+		msg_error("%s(%d), %s: write error %s, out=%d, ret=%ld, "
 			"interrupt=%d", __FILE__, __LINE__, __FUNCTION__,
 			last_serror(), fbase->event_out, ret, interrupt);
 		return -1;

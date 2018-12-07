@@ -16,7 +16,7 @@ fiber_cond::~fiber_cond(void)
 	acl_fiber_cond_free(cond_);
 }
 
-bool fiber_cond::wait(fiber_event& event, long long timeout /* = -1 */)
+bool fiber_cond::wait(fiber_event& event, int timeout /* = -1 */)
 {
 	ACL_FIBER_EVENT* ev = event.get_event();
 

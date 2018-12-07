@@ -47,11 +47,11 @@ FIBER_API ssize_t acl_fiber_writev(socket_t, const struct iovec* iov, int iovcnt
 FIBER_API ssize_t acl_fiber_sendmsg(socket_t, const struct msghdr* msg, int flags);
 
 FIBER_API ssize_t acl_fiber_recv(socket_t, void* buf, size_t len, int flags);
-FIBER_API ssize_t acl_fiber_recvfrom(socket_t, void* buf, int len, int flags,
+FIBER_API ssize_t acl_fiber_recvfrom(socket_t, void* buf, size_t len, int flags,
 	struct sockaddr* src_addr, socklen_t* addrlen);
 
 FIBER_API ssize_t acl_fiber_send(socket_t, const void* buf, size_t len, int flags);
-FIBER_API ssize_t acl_fiber_sendto(socket_t, const void* buf, int len, int flags,
+FIBER_API ssize_t acl_fiber_sendto(socket_t, const void* buf, size_t len, int flags,
 	const struct sockaddr* dest_addr, socklen_t addrlen);
 
 FIBER_API int acl_fiber_select(int nfds, fd_set *readfds, fd_set *writefds,
