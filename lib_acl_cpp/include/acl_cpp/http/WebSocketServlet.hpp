@@ -10,7 +10,7 @@ class session;
 class HttpServletRequest;
 class HttpServletResponse;
 
-class WebSocketServlet: public HttpServlet
+class ACL_CPP_API WebSocketServlet : public HttpServlet
 {
 public:
 	WebSocketServlet(void);
