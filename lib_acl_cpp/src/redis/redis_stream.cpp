@@ -224,7 +224,7 @@ void redis_stream::xreadgroup_build(const char* group, const char* consumer,
 
 bool redis_stream::xread(redis_stream_messages& messages,
 	const std::map<string, string>& streams,
-	size_t count /* = 0 */, size_t block /* = 0 */)
+	size_t count /* = 1000 */, size_t block /* = 0 */)
 {
 	if (streams.size() == 1) {
 		std::map<string, string>::const_iterator cit = streams.begin();
@@ -257,14 +257,14 @@ bool redis_stream::xreadgroup_with_noack(redis_stream_messages& messages,
 }
 
 bool redis_stream::xrange(redis_stream_messages& messages, const char* key,
-	const char* start, const char* end, size_t count /* = 0 */)
+	const char* start, const char* end, size_t count /* = 1000 */)
 {
 	hash_slot(key);
 	return range(messages, "XRANGE", key, start, end, count);
 }
 
 bool redis_stream::xrevrange(redis_stream_messages& messages, const char* key,
-	const char* start, const char* end, size_t count /* = 0 */)
+	const char* start, const char* end, size_t count /* = 1000 */)
 {
 	hash_slot(key);
 	return range(messages, "XREVRANGE", key, start, end, count);
