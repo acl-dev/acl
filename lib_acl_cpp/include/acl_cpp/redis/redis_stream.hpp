@@ -163,6 +163,7 @@ public:
 	 *  one ID internal. When the user specified and explicit ID, the ID's
 	 *  format is look like 1526919030474-55 that includes two numbers
 	 *  separated by '-', the minimum valid ID is 0-1
+	 * @param maxlen {size_t} if > 0, limit the size of the stream
 	 * @return {bool} return true if entry was added successfully, or some
 	 *  error happened which the error reason can be acquied by calling
 	 *  result_error() of the base class redis_command.
@@ -173,11 +174,14 @@ public:
 		const std::vector<string>& values,
 		string& result, const char* id = "*");
 	bool xadd(const char* key, const std::vector<const char*>& names,
-		const std::vector<const char*>& values,
-		string& result, const char* id = "*");
+		const std::vector<const char*>& values, string& result,
+		const char* id = "*");
 	bool xadd(const char* key, const char* names[], const size_t names_len[],
 		const char* values[], const size_t values_len[], size_t argc,
 		string& result, const char* id = "*");
+	bool xadd_with_maxlen(const char* key, size_t maxlen,
+		const std::map<string, string>& fields, string& result,
+		const char* id = "*");
 
 	/**
 	 * returns the number of entries inside a stream.

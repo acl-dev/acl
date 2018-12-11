@@ -110,6 +110,61 @@ bool redis_stream::xadd(const char* key, const char* names[],
 	return get_string(result) >= 0 ? true : false;
 }
 
+bool redis_stream::xadd_with_maxlen(const char* key, size_t maxlen,
+	const std::map<string, string>& fields, string& result,
+	const char* id /* = "*" */)
+{
+	if (maxlen == 0) {
+		return xadd(key, fields, result, id);
+	}
+
+	argc_ = 6 + fields.size() * 2;
+	argv_space(argc_);
+
+	size_t i = 0;
+	argv_[i] = "XADD";
+	argv_lens_[i] = sizeof("XADD") - 1;
+	i++;
+
+	argv_[i] = key;
+	argv_lens_[i] = strlen(key);
+	i++;
+
+	argv_[i] = "MAXLEN";
+	argv_lens_[i] = sizeof("MAXLEN") - 1;
+	i++;
+
+	argv_[i] = "~";
+	argv_lens_[i] = 1;
+	i++;
+
+	char buf[LONG_LEN];
+	safe_snprintf(buf, sizeof(buf), "%ld", maxlen);
+	argv_[i] = buf;
+	argv_lens_[i] = strlen(buf);
+	i++;
+
+	argv_[i] = id;
+	argv_lens_[i] = strlen(id);
+	i++;
+
+	for (std::map<string, string>::const_iterator cit = fields.begin();
+		cit != fields.end(); ++cit) {
+
+		argv_[i] = cit->first;
+		argv_lens_[i] = cit->first.size();
+		i++;
+
+		argv_[i] = cit->second;
+		argv_lens_[i] = cit->second.size();
+		i++;
+	}
+
+	hash_slot(key);
+	build_request(i, argv_, argv_lens_);
+	return get_string(result) >= 0 ? true : false;
+}
+
 int redis_stream::xlen(const char* key)
 {
 	const char* argv[2];
