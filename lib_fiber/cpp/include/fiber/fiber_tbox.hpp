@@ -4,6 +4,8 @@
 #include "fiber_event.hpp"
 #include "fiber_cond.hpp"
 
+#if !defined(_WIN32) && !defined(_WIN64)
+
 namespace acl
 {
 
@@ -184,3 +186,5 @@ private:
 };
 
 } // namespace acl
+
+#endif
