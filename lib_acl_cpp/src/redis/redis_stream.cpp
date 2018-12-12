@@ -485,13 +485,14 @@ bool redis_stream::get_one_message(const redis_result& rr,
 		return false;
 	}
 
-	for (size_t i = 0; i < size; i++) {
-		const redis_result* name = children[i];
+	for (size_t i = 0; i < size;) {
+		const redis_result* name = children[i++];
 		if (name->get_type() != REDIS_RESULT_STRING) {
+			i++;
 			continue;
 		}
 
-		const redis_result* value = children[i];
+		const redis_result* value = children[i++];
 		if (value->get_type() != REDIS_RESULT_STRING) {
 			continue;
 		}

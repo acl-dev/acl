@@ -1,5 +1,8 @@
 修改历史列表：
 
+555) 2018.12.12
+555.1) bugfix: redis_stream::get_one_message 存在一处数据提取的错误
+
 554) 2018.12.2
 554.1) feature: redis_stream 功能模块单元测试基本 OK :)
 554.2) feature: redis_stream 功能模块压力测试 OK
