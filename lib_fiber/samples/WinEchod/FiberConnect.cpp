@@ -60,7 +60,7 @@ void CFiberConnect::doEcho(socket_t sock)
 
 	for (int i = 0; i < m_count; i++)
 	{
-		if (acl_fiber_send(sock, s, strlen(s), 0) < 0)
+		if (acl_fiber_send(sock, s, (int) strlen(s), 0) < 0)
 		{
 			printf("send error %s\r\n", acl::last_serror());
 			break;

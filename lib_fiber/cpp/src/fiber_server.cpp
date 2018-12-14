@@ -136,7 +136,7 @@ static void fiber_client(ACL_FIBER *fiber acl_unused, void *ctx)
 
 static void thread_fiber_accept(ACL_FIBER *fiber, void *ctx)
 {
-	static int __max_fd = 0, __last_fd = 0;
+	static socket_t __max_fd = 0, __last_fd = 0;
 	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx, *cstream;
 	char  ip[64];
 

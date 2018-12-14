@@ -116,9 +116,9 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">.\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">DebugDll\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">.\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">ReleaseDll\</IntDir>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'" />

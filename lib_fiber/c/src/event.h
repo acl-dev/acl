@@ -150,7 +150,7 @@ struct EVENT {
 	RING events;
 	int  timeout;
 	int  fdcount;
-	socket_t setsize;
+	ssize_t  setsize;
 	socket_t maxfd;
 
 	unsigned flag;
