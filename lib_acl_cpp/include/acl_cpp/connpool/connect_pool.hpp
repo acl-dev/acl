@@ -169,6 +169,13 @@ public:
 		return current_used_;
 	}
 
+public:
+	void set_key(const char* key);
+	const char* get_key(void) const
+	{
+		return key_;
+	}
+
 protected:
 	/**
 	 * 纯虚函数，需要子类实现
@@ -190,6 +197,7 @@ protected:
 	int   retry_inter_;
 	time_t last_dead_;			// 该连接池对象上次不可用时的时间截
 
+	char  key_[256];			// 与该连接池相关的 key
 	char  addr_[256];			// 连接池对应的服务器地址，IP:PORT
 	int   conn_timeout_;			// 网络连接超时时间(秒)
 	int   rw_timeout_;			// 网络 IO 超时时间(秒)

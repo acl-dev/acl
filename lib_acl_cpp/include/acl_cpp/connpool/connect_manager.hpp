@@ -22,6 +22,13 @@ public:
 	virtual ~connect_manager(void);
 
 	/**
+	 * 是否将连接池与线程自动绑定，主要用于协程环境中，内部缺省值为 false，该方法
+	 * 在本对象创建后仅能调用一次
+	 * @param yes {bool}
+	 */
+	void bind_thread(bool yes);
+
+	/**
 	 * 初始化所有服务器的连接池，该函数调用 set 过程添加每个服务的连接池
 	 * @param default_addr {const char*} 缺省的服务器地址，如果非空，
 	 *  则在查询时优先使用此服务器
@@ -97,7 +104,7 @@ public:
 	 * 此外，该函数为虚接口，允许子类实现自己的轮循方式
 	 * @return {connect_pool*} 返回一个连接池，返回指针永远非空
 	 */
-	virtual connect_pool* peek();
+	virtual connect_pool* peek(void);
 
 	/**
 	 * 从连接池集群中获得一个连接池，该函数采用哈希定位方式从集合中获取一个
@@ -114,18 +121,18 @@ public:
 	/**
 	 * 当用户重载了 peek 函数时，可以调用此函数对连接池管理过程加锁
 	 */
-	void lock();
+	void lock(void);
 
 	/**
 	 * 当用户重载了 peek 函数时，可以调用此函数对连接池管理过程加锁
 	 */
-	void unlock();
+	void unlock(void);
 
 	/**
 	 * 获得所有的服务器的连接池，该连接池中包含缺省的服务连接池
 	 * @return {std::vector<connect_pool*>&}
 	 */
-	std::vector<connect_pool*>& get_pools()
+	std::vector<connect_pool*>& get_pools(void)
 	{
 		return pools_;
 	}
@@ -142,7 +149,7 @@ public:
 	 * 获得连接池集合中连接池对象的个数
 	 * @return {size_t}
 	 */
-	size_t size() const
+	size_t size(void) const
 	{
 		return pools_.size();
 	}
@@ -152,7 +159,7 @@ public:
 	 * @return {connect_pool*} 当调用 init 函数的 default_addr 为空时
 	 *  该函数返回 NULL
 	 */
-	connect_pool* get_default_pool()
+	connect_pool* get_default_pool(void)
 	{
 		return default_pool_;
 	}
@@ -160,7 +167,7 @@ public:
 	/**
 	 * 打印当前所有 redis 连接池的访问量
 	 */
-	void statistics();
+	void statistics(void);
 
 	/**
 	 * 启动后台非阻塞检测线程检测所有连接池连接状态
@@ -200,6 +207,7 @@ protected:
 		size_t count, size_t idx) = 0;
 
 protected:
+	bool thread_binding_;			// 用于协程环境中与每个线程绑定
 	string default_addr_;			// 缺省的服务地址
 	connect_pool* default_pool_;		// 缺省的服务连接池
 	std::vector<connect_pool*> pools_;	// 所有的服务连接池
@@ -215,6 +223,8 @@ protected:
 	// 设置除缺省服务之外的服务器集群
 	void set_service_list(const char* addr_list, int count,
 		int conn_timeout, int rw_timeout);
+	void get_key(const char* addr, string& key);
+	void get_addr(const char* key, string& addr);
 };
 
 } // namespace acl

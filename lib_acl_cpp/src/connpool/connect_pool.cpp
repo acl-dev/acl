@@ -27,6 +27,8 @@ connect_pool::connect_pool(const char* addr, size_t max, size_t idx /* = 0 */)
 {
 	retry_inter_ = 1;
 	ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
+	ACL_SAFE_STRNCPY(key_, addr_, sizeof(key_));
+	acl_lowercase(key_);
 }
 
 connect_pool::~connect_pool()
@@ -34,6 +36,12 @@ connect_pool::~connect_pool()
 	std::list<connect_client*>::iterator it = pool_.begin();
 	for (; it != pool_.end(); ++it)
 		delete *it;
+}
+
+void connect_pool::set_key(const char* key)
+{
+	ACL_SAFE_STRNCPY(key_, key, sizeof(key_));
+	acl_lowercase(key_);
 }
 
 connect_pool& connect_pool::set_timeout(int conn_timeout, int rw_timeout)
