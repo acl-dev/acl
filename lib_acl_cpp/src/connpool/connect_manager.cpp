@@ -194,11 +194,12 @@ connect_pool& connect_manager::set(const char* addr, size_t count,
 	return *pool;
 }
 
-void connect_manager::remove(const char* addr)
+void connect_manager::remove(const char* addr, bool all /* = true */)
 {
 	string key;
 	get_key(addr, key);
 
+	size_t n = 0;
 	lock_.lock();
 
 	std::vector<connect_pool*>::iterator it = pools_.begin();
@@ -207,11 +208,14 @@ void connect_manager::remove(const char* addr)
 			(*it)->set_delay_destroy();
 			pools_.erase(it);
 			lock_.unlock();
-			return;
+			n++;
+			if (!all) {
+				return;
+			}
 		}
 	}
 
-	if (it == pools_.end()) {
+	if (n == 0) {
 		logger_warn("addr(%s) not found!", addr);
 	}
 

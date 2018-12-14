@@ -83,7 +83,7 @@ public:
 	 * 被调用，因为内部会自动加锁
 	 * @param addr {const char*} 服务器地址(ip:port)
 	 */
-	void remove(const char* addr);
+	void remove(const char* addr, bool all = true);
 
 	/**
 	 * 根据服务端地址获得该服务器的连接池
