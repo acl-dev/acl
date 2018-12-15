@@ -29,11 +29,14 @@ connect_manager::~connect_manager()
 {
 	lock_.lock();
 
-	std::vector<connect_pool*>::iterator it = pools_.begin();
+	manager_it mit = manager_.begin();
+	for (; mit != manager_.end(); ++mit) {
+		for (pools_t::iterator it = mit->second->begin();
+			it != mit->second->end(); ++it) {
 
-	// default_pool_ 已经包含在 pools_ 里了
-	for (; it != pools_.end(); ++it) {
-		delete *it;
+			delete *it;
+		}
+		delete mit->second;
 	}
 
 	lock_.unlock();
@@ -82,16 +85,18 @@ void connect_manager::set_retry_inter(int n)
 		return;
 	}
 
-	lock_.lock();
+	lock_guard guard(lock_);
 
 	retry_inter_ = n;
 
-	std::vector<connect_pool*>::iterator it = pools_.begin();
-	for (; it != pools_.end(); ++it) {
-		(*it)->set_retry_inter(retry_inter_);
-	}
+	manager_it mit = manager_.begin();
+	for (; mit != manager_.end(); ++mit) {
+		for (pools_t::iterator it = mit->second->begin();
+			it != mit->second->end(); ++it) {
 
-	lock_.unlock();
+			(*it)->set_retry_inter(retry_inter_);
+		}
+	}
 }
 
 void connect_manager::set_check_inter(int n)
@@ -119,16 +124,11 @@ void connect_manager::init(const char* default_addr, const char* addr_list,
 		if (max < 0) {
 			logger("no default connection set");
 		} else {
-			default_pool_ = &set(default_addr_.c_str(), max,
-				conn_timeout, rw_timeout);
+			set(default_addr_.c_str(), max, conn_timeout, rw_timeout);
+			default_pool_ = get(default_addr_);
 		}
 	} else {
 		logger("no default connection set");
-	}
-
-	// 必须保证至少有一个服务可用
-	if (pools_.empty()) {
-		logger_fatal("no connection available!");
 	}
 }
 
@@ -153,7 +153,7 @@ void connect_manager::set_service_list(const char* addr_list, int count,
 			logger_error("invalid server addr: %s", addr.c_str());
 			continue;
 		}
-		(void) set(addr.c_str(), max, conn_timeout, rw_timeout);
+		set(addr.c_str(), max, conn_timeout, rw_timeout);
 		logger("add one service: %s, max connect: %d",
 			addr.c_str(), max);
 	}
@@ -161,79 +161,128 @@ void connect_manager::set_service_list(const char* addr_list, int count,
 	acl_myfree(buf);
 }
 
-connect_pool& connect_manager::set(const char* addr, size_t count,
+std::vector<connect_pool*>& connect_manager::get_pools(void)
+{
+	unsigned long id = get_id();
+	pools_t* pools = get_pools_by_id(id);
+	return *pools;
+}
+
+size_t connect_manager::size(void) const
+{
+	size_t n = 0;
+	for (manager_cit cit = manager_.begin(); cit != manager_.end(); ++cit) {
+		n += cit->second->size();
+	}
+	return n;
+}
+
+void connect_manager::set(const char* addr, size_t count,
 	int conn_timeout /* = 30 */, int rw_timeout /* = 30 */)
 {
-	string key;
-	get_key(addr, key);
+	string buf(addr);
+	buf.lower();
 
-	lock_.lock();
+	lock_guard guard(lock_);
+	std::map<string, connect_config>::const_iterator cit = addrs_.find(buf);
+	if (cit == addrs_.end()) {
+		connect_config config;
+		config.addr         = addr;
+		config.count        = count;
+		config.conn_timeout = conn_timeout;
+		config.rw_timeout   = rw_timeout;
+		addrs_[buf]         = config;
+	}
+}
 
-	std::vector<connect_pool*>::iterator it = pools_.begin();
-	for (; it != pools_.end(); ++it) {
-		if (key == (*it)->get_key()) {
-			lock_.unlock();
-			return **it;
+#define DEFAULT_ID	0
+
+unsigned long connect_manager::get_id(void) const
+{
+	if (thread_binding_) {
+		return thread::self();
+	} else {
+		return DEFAULT_ID;
+	}
+}
+
+std::vector<connect_pool*>* connect_manager::get_pools_by_id(unsigned long id)
+{
+	manager_it mit = manager_.find(id);
+	if (mit == manager_.end()) {
+		pools_t* pools = new pools_t;
+		manager_[id] = pools;
+		return pools;
+	} else {
+		return mit->second;
+	}
+}
+
+void connect_manager::remove(pools_t& pools, const char* addr)
+{
+	string buf;
+	for (pools_t::iterator it = pools.begin(); it != pools.end(); ++it) {
+		get_addr((*it)->get_key(), buf);
+		if (buf == addr) {
+			(*it)->set_delay_destroy();
+			pools.erase(it);
+			break;
 		}
 	}
+}
 
-	connect_pool* pool = create_pool(addr, count, pools_.size() - 1);
+void connect_manager::remove(const char* addr)
+{
+	string buf(addr);
+	buf.lower();
+
+	lock_guard guard(lock_);
+
+	for (manager_it it = manager_.begin(); it != manager_.end(); ++it) {
+		remove(*it->second, buf);
+	}
+}
+
+connect_pool* connect_manager::add_pool(const connect_config& cf)
+{
+	string key;
+	get_key(cf.addr, key);
+
+	unsigned long id = get_id();
+	pools_t* pools = get_pools_by_id(id);
+
+	connect_pool* pool = create_pool(cf.addr, cf.count, pools->size());
 	pool->set_key(key);
 	pool->set_retry_inter(retry_inter_);
-	pool->set_timeout(conn_timeout, rw_timeout);
+	pool->set_timeout(cf.conn_timeout, cf.rw_timeout);
 	if (idle_ttl_ >= 0) {
 		pool->set_idle_ttl(idle_ttl_);
 	}
 	if (check_inter_ > 0) {
 		pool->set_check_inter(check_inter_);
 	}
-	pools_.push_back(pool);
+	pools->push_back(pool);
 
-	lock_.unlock();
-	logger("Add one service, addr: %s, count: %d", addr, (int) count);
-	return *pool;
-}
-
-void connect_manager::remove(const char* addr, bool all /* = true */)
-{
-	string key;
-	get_key(addr, key);
-
-	size_t n = 0;
-	lock_.lock();
-
-	std::vector<connect_pool*>::iterator it = pools_.begin();
-	for (; it != pools_.end(); ++it) {
-		if (key == (*it)->get_key()) {
-			(*it)->set_delay_destroy();
-			pools_.erase(it);
-			lock_.unlock();
-			n++;
-			if (!all) {
-				return;
-			}
-		}
-	}
-
-	if (n == 0) {
-		logger_warn("addr(%s) not found!", addr);
-	}
-
-	lock_.unlock();
+	logger("Add one service, addr: %s, count: %d",
+		cf.addr.c_str(), (int) cf.count);
+	return pool;
 }
 
 connect_pool* connect_manager::get(const char* addr,
 	bool exclusive /* = true */, bool restore /* = false */)
 {
-	string key;
+	string key, buf(addr);
 	get_key(addr, key);
+	buf.lower();
+	unsigned long id = get_id();
 
 	if (exclusive) {
 		lock_.lock();
 	}
 
-	std::vector<connect_pool*>::iterator it = pools_.begin();
-	for (; it != pools_.end(); ++it) {
+	pools_t* pools = get_pools_by_id(id);
+
+	for (pools_t::iterator it = pools->begin(); it != pools->end(); ++it) {
 		if (key == (*it)->get_key()) {
 			if (restore && (*it)->aliving() == false) {
 				(*it)->set_alive(true);
@@ -245,12 +294,22 @@ connect_pool* connect_manager::get(const char* addr,
 		}
 	}
 
+	std::map<string, connect_config>::const_iterator cit = addrs_.find(buf);
+	if (cit == addrs_.end()) {
+		if (exclusive) {
+			lock_.unlock();
+		}
+		logger("no connect pool for addr %s", addr);
+		return NULL;
+	}
+
+	connect_pool* pool = add_pool(cit->second);
+
 	if (exclusive) {
 		lock_.unlock();
 	}
 
-	logger("no connect pool for addr %s", key.c_str());
-	return NULL;
+	return pool;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -262,14 +321,16 @@ size_t connect_manager::check_idle(size_t step, size_t* left /* = NULL */)
 	}
 
 	size_t nleft = 0, nfreed = 0, pools_size, check_max;
+	unsigned long id = get_id();
 
 	lock();
 
-	pools_size = pools_.size();
+	pools_t* pools = get_pools_by_id(id);
+	pools_size = pools->size();
 	check_max = check_pos_ + step;
 
 	while (check_pos_ < pools_size && check_pos_ < check_max) {
-		connect_pool* pool = pools_[check_pos_++];
+		connect_pool* pool = (*pools)[check_pos_++];
 		int ret = pool->check_idle(idle_ttl_);
 		if (ret > 0) {
 			nfreed += ret;
@@ -290,8 +351,11 @@ connect_pool* connect_manager::peek(void)
 	connect_pool* pool;
 	size_t service_size, n;
 
+	unsigned long id = get_id();
 	lock_.lock();
-	service_size = pools_.size();
+
+	pools_t* pools = get_pools_by_id(id);
+	service_size = pools->size();
 	if (service_size == 0) {
 		lock_.unlock();
 		logger_warn("pools's size is 0!");
@@ -302,7 +366,7 @@ connect_pool* connect_manager::peek(void)
 	for(size_t i = 0; i < service_size; i++) {
 		n = service_idx_ % service_size;
 		service_idx_++;
-		pool = pools_[n];
+		pool = (*pools)[n];
 		if (pool->aliving()) {
 			lock_.unlock();
 			return pool;
@@ -322,6 +386,7 @@ connect_pool* connect_manager::peek(const char* addr,
 		return peek();
 	}
 
+	unsigned long id = get_id();
 	connect_pool* pool;
 
 	size_t service_size;
@@ -330,7 +395,10 @@ connect_pool* connect_manager::peek(const char* addr,
 	if (exclusive) {
 		lock_.lock();
 	}
-	service_size = pools_.size();
+
+	pools_t* pools = get_pools_by_id(id);
+
+	service_size = pools->size();
 	if (service_size == 0) {
 		if (exclusive) {
 			lock_.unlock();
@@ -340,7 +408,7 @@ connect_pool* connect_manager::peek(const char* addr,
 	}
 
 	n = n % service_size;
-	pool = pools_[n];
+	pool = (*pools)[n];
 
 	if (exclusive) {
 		lock_.unlock();
@@ -361,8 +429,11 @@ void connect_manager::unlock(void)
 
 void connect_manager::statistics(void)
 {
-	std::vector<connect_pool*>::const_iterator cit = pools_.begin();
-	for (; cit != pools_.end(); ++cit) {
+	unsigned long id = get_id();
+	pools_t* pools = get_pools_by_id(id);
+
+	std::vector<connect_pool*>::const_iterator cit = pools->begin();
+	for (; cit != pools->end(); ++cit) {
 		logger("server: %s, total: %llu, curr: %llu",
 			(*cit)->get_key(), (*cit)->get_total_used(),
 			(*cit)->get_current_used());
@@ -414,37 +485,30 @@ void connect_manager::set_pools_status(const char* addr, bool alive)
 
 	std::vector<connect_pool*>::iterator it;
 
-	lock();
+	lock_guard guard(lock_);
 
-	if (thread_binding_) {
-		string buf1(addr), buf2;
-		buf1.lower();
+	for (manager_it mit = manager_.begin(); mit != manager_.end(); ++mit) {
+		set_status(*mit->second, addr, alive);
+	}
+}
 
-		for (it = pools_.begin(); it != pools_.end(); ++it) {
-			get_addr((*it)->get_key(), buf2);
-			if (buf1 == buf2) {
-				(*it)->set_alive(alive);
-			}
-		}
-	} else {
-		string key(addr);
-		key.lower();
+void connect_manager::set_status(pools_t& pools, const char* addr, bool alive)
+{
+	string buf(addr);
+	buf.lower();
 
-		for (it = pools_.begin(); it != pools_.end(); ++it) {
-			if (key == (*it)->get_key()) {
-				(*it)->set_alive(alive);
-				break;
-			}
+	for (pools_t::iterator it = pools.begin(); it != pools.end(); ++it) {
+		if (buf == (*it)->get_key()) {
+			(*it)->set_alive(alive);
+			break;
 		}
 	}
-
-	unlock();
 }
 
 void connect_manager::get_key(const char* addr, string& key)
 {
 	if (thread_binding_) {
-		key.format("%lu|%s", thread::thread_self());
+		key.format("%lu|%s", thread::self(), addr);
 	} else {
 		key = addr;
 	}

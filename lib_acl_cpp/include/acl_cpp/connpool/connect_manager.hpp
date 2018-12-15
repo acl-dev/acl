@@ -3,6 +3,7 @@
 #include "../stdlib/string.hpp"
 #include "../stdlib/locker.hpp"
 #include <vector>
+#include <map>
 
 struct ACL_EVENT;
 
@@ -53,9 +54,8 @@ public:
 	 *  连接池的连接上限
 	 * @param conn_timeout {int} 网络连接时间(秒)
 	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
-	 * @return {connect_pool&} 返回新添加的连接池对象
 	 */
-	connect_pool& set(const char* addr, size_t count,
+	void set(const char* addr, size_t count,
 		int conn_timeout = 30, int rw_timeout = 30);
 
 	/**
@@ -83,7 +83,7 @@ public:
 	 * 被调用，因为内部会自动加锁
 	 * @param addr {const char*} 服务器地址(ip:port)
 	 */
-	void remove(const char* addr, bool all = true);
+	void remove(const char* addr);
 
 	/**
 	 * 根据服务端地址获得该服务器的连接池
@@ -132,10 +132,7 @@ public:
 	 * 获得所有的服务器的连接池，该连接池中包含缺省的服务连接池
 	 * @return {std::vector<connect_pool*>&}
 	 */
-	std::vector<connect_pool*>& get_pools(void)
-	{
-		return pools_;
-	}
+	std::vector<connect_pool*>& get_pools(void);
 
 	/**
 	 * 检测连接池中的空闲连接，将过期的连接释放掉
@@ -149,10 +146,7 @@ public:
 	 * 获得连接池集合中连接池对象的个数
 	 * @return {size_t}
 	 */
-	size_t size(void) const
-	{
-		return pools_.size();
-	}
+	size_t size(void) const;
 
 	/**
 	 * 获得缺省的服务器连接池
@@ -207,10 +201,26 @@ protected:
 		size_t count, size_t idx) = 0;
 
 protected:
+	typedef std::vector<connect_pool*> pools_t;
+	typedef pools_t::iterator pools_it;
+	typedef pools_t::const_iterator pools_cit;
+
 	bool thread_binding_;			// 用于协程环境中与每个线程绑定
 	string default_addr_;			// 缺省的服务地址
 	connect_pool* default_pool_;		// 缺省的服务连接池
-	std::vector<connect_pool*> pools_;	// 所有的服务连接池
+
+	struct connect_config {
+		string addr;
+		size_t count;
+		int    conn_timeout;
+		int    rw_timeout;
+	};
+	std::map<string, connect_config> addrs_;// 所有的服务端地址
+	//std::vector<connect_pool*> pools_;	// 所有的服务连接池
+	std::map<unsigned long, pools_t*>  manager_;
+	typedef std::map<unsigned long, pools_t*>::iterator manager_it;
+	typedef std::map<unsigned long, pools_t*>::const_iterator manager_cit;
+
 	size_t service_idx_;			// 下一个要访问的的下标值
 	locker lock_;				// 访问 pools_ 时的互斥锁
 	int  stat_inter_;			// 统计访问量的定时器间隔
@@ -223,8 +233,15 @@ protected:
 	// 设置除缺省服务之外的服务器集群
 	void set_service_list(const char* addr_list, int count,
 		int conn_timeout, int rw_timeout);
+	pools_t* get_pools_by_id(unsigned long id);
+	connect_pool* add_pool(const connect_config& cf);
+	void remove(pools_t& pools, const char* addr);
+	void set_status(pools_t& pools, const char* addr, bool alive);
+
+	unsigned long get_id(void) const;
 	void get_key(const char* addr, string& key);
 	void get_addr(const char* key, string& addr);
+	connect_pool* add_pool(const char* addr);
 };
 
 } // namespace acl

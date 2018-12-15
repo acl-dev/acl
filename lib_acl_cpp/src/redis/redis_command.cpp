@@ -324,7 +324,10 @@ redis_client* redis_command::redirect(redis_client_cluster* cluster,
 
 	// 如果服务器地址不存在，则根据服务器地址动态创建连接池对象
 	if ((conns = (redis_client_pool*) cluster->get(addr)) == NULL)
-		conns = (redis_client_pool*) &cluster->set(addr, max_conns_);
+	{
+		cluster->set(addr, max_conns_);
+		conns = (redis_client_pool*) cluster->get(addr);
+	}
 
 	if (conns == NULL)
 		return NULL;

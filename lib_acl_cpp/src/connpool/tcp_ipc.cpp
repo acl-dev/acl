@@ -102,8 +102,10 @@ bool tcp_ipc::send(const char* addr, const void* data, unsigned int len,
 {
 	tcp_pool* pool = (tcp_pool*) manager_->peek(addr);
 	if (pool == NULL)
-		pool = &(tcp_pool&) manager_->set(
-			addr, max_, conn_timeout_, rw_timeout_);
+	{
+		manager_->set(addr, max_, conn_timeout_, rw_timeout_);
+		pool = (tcp_pool*) manager_->peek(addr);
+	}
 	return send(*pool, data, len, out);
 }
 

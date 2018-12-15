@@ -184,8 +184,10 @@ redis_client_cluster& redis_client_cluster::set_password(
 	key.lower();
 	passwds_[key] = pass;
 
-	for (std::vector<connect_pool*>::iterator it = pools_.begin();
-		it != pools_.end(); ++it)
+	unsigned long id = get_id();
+	pools_t* pools = get_pools_by_id(id);
+	for (std::vector<connect_pool*>::iterator it = pools->begin();
+		it != pools->end(); ++it)
 	{
 		redis_client_pool* pool = (redis_client_pool*) (*it);
 		key = pool->get_addr();
