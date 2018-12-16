@@ -215,14 +215,18 @@ void connect_manager::thread_onexit(void* ctx)
 	}
 	delete mit->second;
 	manager->manager_.erase(mit);
+	//printf("thread id=%lu, %lu exit\r\n", id, pthread_self());
 }
 
 static acl_pthread_key_t once_key;
 
 void connect_manager::thread_oninit(void)
 {
-	if (acl_pthread_key_create(&once_key, thread_onexit) != 0) {
-		logger_fatal("pthread_key_create failed");
+	int ret = acl_pthread_key_create(&once_key, thread_onexit);
+	if (ret != 0) {
+		char buf[256];
+		logger_fatal("pthread_key_create error=%s",
+			acl_strerror(ret, buf, sizeof(buf)));
 	}
 }
 
@@ -231,18 +235,26 @@ static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
 conns_pools& connect_manager::get_pools_by_id(unsigned long id)
 {
 	manager_it mit = manager_.find(id);
-	if (mit == manager_.end()) {
-		if (acl_pthread_once(&once_control, thread_oninit) != 0) {
-			logger_fatal("pthread_once failed");
-		}
-		acl_pthread_setspecific(once_key, this);
-
-		conns_pools* pools  = new conns_pools;
-		manager_[id] = pools;
-		return *pools;
-	} else {
+	if (mit != manager_.end()) {
 		return *mit->second;
 	}
+
+	conns_pools* pools  = new conns_pools;
+	manager_[id] = pools;
+	//printf("thread id=%lu create pools, %lu\r\n", id, pthread_self());
+
+	if (id == DEFAULT_ID) {
+		return *pools;
+	}
+
+	int ret = acl_pthread_once(&once_control, thread_oninit);
+	if (ret != 0) {
+		char buf[256];
+		logger_fatal("pthread_once error=%s",
+			acl_strerror(ret, buf, sizeof(buf)));
+	}
+	acl_pthread_setspecific(once_key, this);
+	return *pools;
 }
 
 void connect_manager::remove(pools_t& pools, const char* addr)

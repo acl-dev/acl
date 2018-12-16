@@ -1,5 +1,9 @@
 修改历史列表：
 
+556) 2018.12.16
+556.1) feature: connect_manager 连接池管理器可以更好地支持协程的多线程模式，
+使用者仅需调用 connect_manager::bind_thread(true) 即可
+
 555) 2018.12.12
 555.1) bugfix: redis_stream::get_one_message 存在一处数据提取的错误
 

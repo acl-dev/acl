@@ -7,6 +7,7 @@ static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		" -s redis_addr\r\n"
+		" -g [if use global cluster, default: false]\r\n"
 		" -p passwd\r\n"
 		" -n operation_count\r\n"
 		" -c fibers count\r\n"
@@ -20,8 +21,9 @@ int main(int argc, char *argv[])
 	int   ch, nthreads = 1, fibers_max = 100, oper_count = 100;
 	acl::string addr("127.0.0.1:6379"), passwd;
 	int conn_timeout = 2, rw_timeout = 2;
+	bool use_global_cluster = false;
 
-	while ((ch = getopt(argc, argv, "hs:n:c:r:t:m:p:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:c:r:t:m:p:g")) > 0)
 	{
 		switch (ch) {
 		case 'h':
@@ -48,22 +50,37 @@ int main(int argc, char *argv[])
 		case 'p':
 			passwd = optarg;
 			break;
+		case 'g':
+			use_global_cluster = true;
+			break;
 		default:
 			break;
 		}
 	}
 
 	acl::acl_cpp_init();
+	acl::log::stdout_open(true);
 	acl_fiber_msg_stdout_enable(1);
 
 	std::vector<acl::thread*> threads;
 	int stack_size = STACK_SIZE;
 
+	acl::redis_client_cluster cluster;
+	cluster.bind_thread(true);
+	cluster.set(addr, 0, conn_timeout, rw_timeout);
+	cluster.set_password("default", passwd);
+
 	for (int i = 0; i < nthreads; i++)
 	{
-		redis_thread* thread = new redis_thread(addr, passwd,
-			conn_timeout, rw_timeout, fibers_max,
-			stack_size, oper_count);
+		redis_thread* thread;
+		if (use_global_cluster) {
+			thread = new redis_thread(cluster,
+				fibers_max, stack_size, oper_count);
+		} else {
+			thread = new redis_thread(addr, passwd,
+				conn_timeout, rw_timeout, fibers_max,
+				stack_size, oper_count);
+		}
 		thread->set_detachable(false);
 		thread->set_stacksize(stack_size * (fibers_max + 6400));
 		threads.push_back(thread);

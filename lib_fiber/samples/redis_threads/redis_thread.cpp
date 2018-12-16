@@ -109,23 +109,41 @@ void redis_thread::fiber_redis(ACL_FIBER *fiber, void *ctx)
 redis_thread::redis_thread(const char* addr, const char* passwd,
 	int conn_timeout, int rw_timeout, int fibers_max, int stack_size,
 	int oper_count)
-	: addr_(addr)
-	, passwd_(passwd)
-	, conn_timeout_(conn_timeout)
-	, rw_timeout_(rw_timeout)
-	, fibers_max_(fibers_max)
-	, fibers_cnt_(fibers_max)
-	, stack_size_(stack_size)
-	, oper_count_(oper_count)
+: addr_(addr)
+, passwd_(passwd)
+, conn_timeout_(conn_timeout)
+, rw_timeout_(rw_timeout)
+, fibers_max_(fibers_max)
+, fibers_cnt_(fibers_max)
+, stack_size_(stack_size)
+, oper_count_(oper_count)
 {
+	printf("addr: %s\r\n", addr_.c_str());
+	cluster_internal_ = new acl::redis_client_cluster;
+	cluster_ = cluster_internal_;
+
+	cluster_->set(addr_.c_str(), 0, conn_timeout_, rw_timeout_);
+	cluster_->set_password("default", passwd_);
+}
+
+redis_thread::redis_thread(acl::redis_client_cluster& cluster,
+	int fibers_max, int stack_size, int oper_count)
+: fibers_max_(fibers_max)
+, fibers_cnt_(fibers_max)
+, stack_size_(stack_size)
+, oper_count_(oper_count)
+, cluster_(&cluster)
+, cluster_internal_(NULL)
+{
+}
+
+redis_thread::~redis_thread(void)
+{
+	delete cluster_internal_;
 }
 
 void* redis_thread::run(void)
 {
-	printf("addr: %s\r\n", addr_.c_str());
-	cluster_.set(addr_.c_str(), 0, conn_timeout_, rw_timeout_);
-	cluster_.set_password("default", passwd_);
-
 	gettimeofday(&begin_, NULL);
 
 	for (int i = 0; i < fibers_max_; i++)
