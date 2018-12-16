@@ -15,31 +15,25 @@ namespace acl
 connect_manager::connect_manager()
 : thread_binding_(false)
 , default_pool_(NULL)
-, service_idx_(0)
 , stat_inter_(1)
 , retry_inter_(1)
 , idle_ttl_(-1)
 , check_inter_(-1)
-, check_pos_(0)
 , monitor_(NULL)
 {
 }
 
 connect_manager::~connect_manager()
 {
-	lock_.lock();
-
-	manager_it mit = manager_.begin();
-	for (; mit != manager_.end(); ++mit) {
-		for (pools_t::iterator it = mit->second->begin();
-			it != mit->second->end(); ++it) {
+	lock_guard guard(lock_);
+	for (manager_it mit = manager_.begin(); mit != manager_.end(); ++mit) {
+		for (pools_t::iterator it = mit->second->pools.begin();
+			it != mit->second->pools.end(); ++it) {
 
 			delete *it;
 		}
 		delete mit->second;
 	}
-
-	lock_.unlock();
 }
 
 void connect_manager::bind_thread(bool yes)
@@ -81,18 +75,15 @@ static int check_addr(const char* addr, string& buf, size_t default_count)
 
 void connect_manager::set_retry_inter(int n)
 {
+	lock_guard guard(lock_);
+
 	if (n == retry_inter_) {
 		return;
 	}
-
-	lock_guard guard(lock_);
-
 	retry_inter_ = n;
-
-	manager_it mit = manager_.begin();
-	for (; mit != manager_.end(); ++mit) {
-		for (pools_t::iterator it = mit->second->begin();
-			it != mit->second->end(); ++it) {
+	for (manager_it mit = manager_.begin(); mit != manager_.end(); ++mit) {
+		for (pools_t::iterator it = mit->second->pools.begin();
+			it != mit->second->pools.end(); ++it) {
 
 			(*it)->set_retry_inter(retry_inter_);
 		}
@@ -141,10 +132,10 @@ void connect_manager::set_service_list(const char* addr_list, int count,
 	}
 
 	// 创建连接池服务集群
-	char* buf = acl_mystrdup(addr_list);
+	char* buf   = acl_mystrdup(addr_list);
 	char* addrs = acl_mystr_trim(buf);
 	ACL_ARGV* tokens = acl_argv_split(addrs, ";,");
-	ACL_ITER iter;
+	ACL_ITER  iter;
 	acl::string addr;
 	acl_foreach(iter, tokens) {
 		const char* ptr = (const char*) iter.data;
@@ -164,15 +155,17 @@ void connect_manager::set_service_list(const char* addr_list, int count,
 std::vector<connect_pool*>& connect_manager::get_pools(void)
 {
 	unsigned long id = get_id();
-	pools_t* pools = get_pools_by_id(id);
-	return *pools;
+	lock_guard guard(lock_);
+	conns_pools& pools = get_pools_by_id(id);
+	return pools.pools;
 }
 
 size_t connect_manager::size(void) const
 {
 	size_t n = 0;
+	lock_guard guard(const_cast<connect_manager*>(this)->lock_);
 	for (manager_cit cit = manager_.begin(); cit != manager_.end(); ++cit) {
-		n += cit->second->size();
+		n += cit->second->pools.size();
 	}
 	return n;
 }
@@ -184,9 +177,9 @@ void connect_manager::set(const char* addr, size_t count,
 	buf.lower();
 
 	lock_guard guard(lock_);
-	std::map<string, connect_config>::const_iterator cit = addrs_.find(buf);
+	std::map<string, conn_config>::const_iterator cit = addrs_.find(buf);
 	if (cit == addrs_.end()) {
-		connect_config config;
+		conn_config config;
 		config.addr         = addr;
 		config.count        = count;
 		config.conn_timeout = conn_timeout;
@@ -206,15 +199,49 @@ unsigned long connect_manager::get_id(void) const
 	}
 }
 
-std::vector<connect_pool*>* connect_manager::get_pools_by_id(unsigned long id)
+void connect_manager::thread_onexit(void* ctx)
+{
+	connect_manager* manager = (connect_manager*) ctx;
+	unsigned long id = manager->get_id();
+	lock_guard guard(manager->lock_);
+	manager_it mit = manager->manager_.find(id);
+	if (mit == manager->manager_.end()) {
+		logger_fatal("not id=%lu", id);
+	}
+	for (pools_t::iterator it = mit->second->pools.begin();
+		it != mit->second->pools.end(); ++it) {
+
+		delete *it;
+	}
+	delete mit->second;
+	manager->manager_.erase(mit);
+}
+
+static acl_pthread_key_t once_key;
+
+void connect_manager::thread_oninit(void)
+{
+	if (acl_pthread_key_create(&once_key, thread_onexit) != 0) {
+		logger_fatal("pthread_key_create failed");
+	}
+}
+
+static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
+
+conns_pools& connect_manager::get_pools_by_id(unsigned long id)
 {
 	manager_it mit = manager_.find(id);
 	if (mit == manager_.end()) {
-		pools_t* pools = new pools_t;
+		if (acl_pthread_once(&once_control, thread_oninit) != 0) {
+			logger_fatal("pthread_once failed");
+		}
+		acl_pthread_setspecific(once_key, this);
+
+		conns_pools* pools  = new conns_pools;
 		manager_[id] = pools;
-		return pools;
+		return *pools;
 	} else {
-		return mit->second;
+		return *mit->second;
 	}
 }
 
@@ -239,19 +266,16 @@ void connect_manager::remove(const char* addr)
 	lock_guard guard(lock_);
 
 	for (manager_it it = manager_.begin(); it != manager_.end(); ++it) {
-		remove(*it->second, buf);
+		remove(it->second->pools, buf);
 	}
 }
 
-connect_pool* connect_manager::add_pool(const connect_config& cf)
+connect_pool* connect_manager::create_pool(const conn_config& cf, size_t idx)
 {
 	string key;
 	get_key(cf.addr, key);
 
-	unsigned long id = get_id();
-	pools_t* pools = get_pools_by_id(id);
-
-	connect_pool* pool = create_pool(cf.addr, cf.count, pools->size());
+	connect_pool* pool = create_pool(cf.addr, cf.count, idx);
 	pool->set_key(key);
 	pool->set_retry_inter(retry_inter_);
 	pool->set_timeout(cf.conn_timeout, cf.rw_timeout);
@@ -261,7 +285,6 @@ connect_pool* connect_manager::add_pool(const connect_config& cf)
 	if (check_inter_ > 0) {
 		pool->set_check_inter(check_inter_);
 	}
-	pools->push_back(pool);
 
 	logger("Add one service, addr: %s, count: %d",
 		cf.addr.c_str(), (int) cf.count);
@@ -271,18 +294,18 @@ connect_pool* connect_manager::add_pool(const connect_config& cf)
 connect_pool* connect_manager::get(const char* addr,
 	bool exclusive /* = true */, bool restore /* = false */)
 {
-	string key, buf(addr);
+	string key;
 	get_key(addr, key);
-	buf.lower();
 	unsigned long id = get_id();
 
 	if (exclusive) {
 		lock_.lock();
 	}
 
-	pools_t* pools = get_pools_by_id(id);
+	conns_pools& pools = get_pools_by_id(id);
 
-	for (pools_t::iterator it = pools->begin(); it != pools->end(); ++it) {
+	pools_t::iterator it = pools.pools.begin();
+	for (; it != pools.pools.end(); ++it) {
 		if (key == (*it)->get_key()) {
 			if (restore && (*it)->aliving() == false) {
 				(*it)->set_alive(true);
@@ -294,7 +317,10 @@ connect_pool* connect_manager::get(const char* addr,
 		}
 	}
 
-	std::map<string, connect_config>::const_iterator cit = addrs_.find(buf);
+	string buf(addr);
+	buf.lower();
+
+	std::map<string, conn_config>::const_iterator cit = addrs_.find(buf);
 	if (cit == addrs_.end()) {
 		if (exclusive) {
 			lock_.unlock();
@@ -303,7 +329,8 @@ connect_pool* connect_manager::get(const char* addr,
 		return NULL;
 	}
 
-	connect_pool* pool = add_pool(cit->second);
+	connect_pool* pool = create_pool(cit->second, pools.pools.size());
+	pools.pools.push_back(pool);
 
 	if (exclusive) {
 		lock_.unlock();
@@ -320,17 +347,19 @@ size_t connect_manager::check_idle(size_t step, size_t* left /* = NULL */)
 		step = 1;
 	}
 
-	size_t nleft = 0, nfreed = 0, pools_size, check_max;
+	size_t nleft = 0, nfreed = 0, pools_size, check_max, check_pos;
 	unsigned long id = get_id();
 
-	lock();
+	lock_guard guard(lock_);
 
-	pools_t* pools = get_pools_by_id(id);
-	pools_size = pools->size();
-	check_max = check_pos_ + step;
+	conns_pools& pools = get_pools_by_id(id);
+	pools_size = pools.pools.size();
 
-	while (check_pos_ < pools_size && check_pos_ < check_max) {
-		connect_pool* pool = (*pools)[check_pos_++];
+	check_pos = pools.check_next++ % pools_size;
+	check_max = check_pos + step;
+
+	while (check_pos < pools_size && check_pos < check_max) {
+		connect_pool* pool = pools.pools[check_pos++];
 		int ret = pool->check_idle(idle_ttl_);
 		if (ret > 0) {
 			nfreed += ret;
@@ -338,12 +367,19 @@ size_t connect_manager::check_idle(size_t step, size_t* left /* = NULL */)
 		nleft += pool->get_count();
 	}
 
-	unlock();
-
 	if (left) {
 		*left = nleft;
 	}
 	return nfreed;
+}
+
+void connect_manager::create_pools_for(pools_t& pools)
+{
+	std::map<string, conn_config>::const_iterator cit = addrs_.begin();
+	for (; cit != addrs_.end(); ++cit) {
+		connect_pool* pool = create_pool(cit->second, pools.size());
+		pools.push_back(pool);
+	}
 }
 
 connect_pool* connect_manager::peek(void)
@@ -352,28 +388,30 @@ connect_pool* connect_manager::peek(void)
 	size_t service_size, n;
 
 	unsigned long id = get_id();
-	lock_.lock();
+	lock_guard guard(lock_);
 
-	pools_t* pools = get_pools_by_id(id);
-	service_size = pools->size();
-	if (service_size == 0) {
-		lock_.unlock();
+	if (addrs_.empty()) {
 		logger_warn("pools's size is 0!");
 		return NULL;
 	}
 
+	conns_pools& pools = get_pools_by_id(id);
+	service_size = pools.pools.size();
+	// 如果当前连接池对象还未初始化，则为其创建所有连接池
+	if (service_size == 0) {
+		create_pools_for(pools.pools);
+		service_size = pools.pools.size();
+		assert(service_size > 0);
+	}
+
 	// 遍历所有的连接池，找出一个可用的连接池
 	for(size_t i = 0; i < service_size; i++) {
-		n = service_idx_ % service_size;
-		service_idx_++;
-		pool = (*pools)[n];
+		n = pools.conns_next++ % service_size;
+		pool = pools.pools[n];
 		if (pool->aliving()) {
-			lock_.unlock();
 			return pool;
 		}
 	}
-
-	lock_.unlock();
 
 	logger_error("all pool(size=%d) is dead!", (int) service_size);
 	return NULL;
@@ -382,7 +420,7 @@ connect_pool* connect_manager::peek(void)
 connect_pool* connect_manager::peek(const char* addr,
 	bool exclusive /* = true */)
 {
-	if (addr == NULL || *addr == 0 || thread_binding_) {
+	if (addr == NULL || *addr == 0) {
 		return peek();
 	}
 
@@ -396,10 +434,7 @@ connect_pool* connect_manager::peek(const char* addr,
 		lock_.lock();
 	}
 
-	pools_t* pools = get_pools_by_id(id);
-
-	service_size = pools->size();
-	if (service_size == 0) {
+	if (addrs_.empty()) {
 		if (exclusive) {
 			lock_.unlock();
 		}
@@ -407,8 +442,16 @@ connect_pool* connect_manager::peek(const char* addr,
 		return NULL;
 	}
 
+	conns_pools& pools = get_pools_by_id(id);
+	service_size = pools.pools.size();
+	if (service_size == 0) {
+		create_pools_for(pools.pools);
+		service_size = pools.pools.size();
+		assert(service_size > 0);
+	}
+
 	n = n % service_size;
-	pool = (*pools)[n];
+	pool = pools.pools[n];
 
 	if (exclusive) {
 		lock_.unlock();
@@ -430,10 +473,10 @@ void connect_manager::unlock(void)
 void connect_manager::statistics(void)
 {
 	unsigned long id = get_id();
-	pools_t* pools = get_pools_by_id(id);
+	conns_pools& pools = get_pools_by_id(id);
 
-	std::vector<connect_pool*>::const_iterator cit = pools->begin();
-	for (; cit != pools->end(); ++cit) {
+	pools_cit cit = pools.pools.begin();
+	for (; cit != pools.pools.end(); ++cit) {
 		logger("server: %s, total: %llu, curr: %llu",
 			(*cit)->get_key(), (*cit)->get_total_used(),
 			(*cit)->get_current_used());
@@ -488,17 +531,18 @@ void connect_manager::set_pools_status(const char* addr, bool alive)
 	lock_guard guard(lock_);
 
 	for (manager_it mit = manager_.begin(); mit != manager_.end(); ++mit) {
-		set_status(*mit->second, addr, alive);
+		set_status(mit->second->pools, addr, alive);
 	}
 }
 
 void connect_manager::set_status(pools_t& pools, const char* addr, bool alive)
 {
-	string buf(addr);
-	buf.lower();
+	string buf1(addr), buf2;
+	buf1.lower();
 
 	for (pools_t::iterator it = pools.begin(); it != pools.end(); ++it) {
-		if (buf == (*it)->get_key()) {
+		get_addr((*it)->get_key(), buf2);
+		if (buf1 == buf2) {
 			(*it)->set_alive(alive);
 			break;
 		}
@@ -507,25 +551,14 @@ void connect_manager::set_status(pools_t& pools, const char* addr, bool alive)
 
 void connect_manager::get_key(const char* addr, string& key)
 {
-	if (thread_binding_) {
-		key.format("%lu|%s", thread::self(), addr);
-	} else {
-		key = addr;
-	}
+	key = addr;
 	key.lower();
 }
 
 void connect_manager::get_addr(const char* key, string& addr)
 {
-	if (thread_binding_) {
-		const char* sep = strchr(key, '|');
-		if (sep == NULL || *++sep == 0) {
-			logger_fatal("invalid key=%s", key);
-		}
-		addr = sep;
-	} else {
-		addr = key;
-	}
+	addr = key;
+	addr.lower();
 }
 
 } // namespace acl

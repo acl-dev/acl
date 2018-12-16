@@ -13,6 +13,18 @@ namespace acl
 class connect_pool;
 class connect_monitor;
 
+// 内部使用数据结构
+struct conns_pools {
+	std::vector<connect_pool*> pools;
+	size_t  check_next;			// 连接检测时的检测点下标
+	size_t  conns_next;			// 下一个要访问的的下标值
+	conns_pools(void)
+	{
+		check_next = 0;
+		conns_next = 0;
+	}
+};
+
 /**
  * connect pool 服务管理器，有获取连接池等功能
  */
@@ -202,39 +214,40 @@ protected:
 
 protected:
 	typedef std::vector<connect_pool*> pools_t;
-	typedef pools_t::iterator pools_it;
-	typedef pools_t::const_iterator pools_cit;
+	typedef pools_t::iterator          pools_it;
+	typedef pools_t::const_iterator    pools_cit;
+
+	typedef std::map<unsigned long, conns_pools*> manager_t;
+	typedef manager_t::iterator                   manager_it;
+	typedef manager_t::const_iterator             manager_cit;
 
 	bool thread_binding_;			// 用于协程环境中与每个线程绑定
 	string default_addr_;			// 缺省的服务地址
 	connect_pool* default_pool_;		// 缺省的服务连接池
 
-	struct connect_config {
+	struct conn_config {
 		string addr;
 		size_t count;
 		int    conn_timeout;
 		int    rw_timeout;
 	};
-	std::map<string, connect_config> addrs_;// 所有的服务端地址
-	//std::vector<connect_pool*> pools_;	// 所有的服务连接池
-	std::map<unsigned long, pools_t*>  manager_;
-	typedef std::map<unsigned long, pools_t*>::iterator manager_it;
-	typedef std::map<unsigned long, pools_t*>::const_iterator manager_cit;
+	std::map<string, conn_config> addrs_;// 所有的服务端地址
+	manager_t  manager_;
 
-	size_t service_idx_;			// 下一个要访问的的下标值
 	locker lock_;				// 访问 pools_ 时的互斥锁
 	int  stat_inter_;			// 统计访问量的定时器间隔
 	int  retry_inter_;			// 连接池失败后重试的时间间隔
 	time_t idle_ttl_;			// 空闲连接的生命周期
 	int  check_inter_;			// 检查空闲连接的时间间隔
-	size_t check_pos_;			// 上次检测连接池的下标
 	connect_monitor* monitor_;		// 后台检测线程句柄
 
 	// 设置除缺省服务之外的服务器集群
 	void set_service_list(const char* addr_list, int count,
 		int conn_timeout, int rw_timeout);
-	pools_t* get_pools_by_id(unsigned long id);
-	connect_pool* add_pool(const connect_config& cf);
+	conns_pools& get_pools_by_id(unsigned long id);
+	connect_pool* create_pool(const conn_config& cf, size_t idx);
+	void create_pools_for(pools_t& pools);
+
 	void remove(pools_t& pools, const char* addr);
 	void set_status(pools_t& pools, const char* addr, bool alive);
 
@@ -242,6 +255,11 @@ protected:
 	void get_key(const char* addr, string& key);
 	void get_addr(const char* key, string& addr);
 	connect_pool* add_pool(const char* addr);
+
+	// 线程局部变量初始化时的回调方法
+	static void thread_oninit(void);
+	// 线程退出前需要回调此方法，用来释放内部创建的线程局部变量
+	static void thread_onexit(void* ctx);
 };
 
 } // namespace acl
