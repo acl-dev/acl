@@ -42,15 +42,15 @@ public:
 	/**
 	 * 设置连接池异常的重试时间间隔
 	 * @param retry_inter {int} 当连接断开后，重新再次打开连接的时间间隔(秒)，
-	 *  当该值 <= 0 时表示允许连接断开后可以立即重连，否则必须超过该时间间隔后才
-	 *  允许断开重连；未调用本函数时，内部缺省值为 1 秒
+	 *  当该值 <= 0 时表示允许连接断开后可以立即重连，否则必须超过该时间间隔
+	 *  后才允许断开重连；未调用本函数时，内部缺省值为 1 秒
 	 * @return {connect_pool&}
 	 */
 	connect_pool& set_retry_inter(int retry_inter);
 
 	/**
 	 * 设置连接池中空闲连接的空闲生存周期
-	 * @param ttl {time_t} 空闲连接的生存周期，当该值 < 0 则表示空闲连接不过期，
+	 * @param ttl {time_t} 空闲连接生存周期，当该值 < 0 表示空闲连接不过期，
 	 *  == 0 时表示立刻过期，> 0 表示空闲该时间段后将被释放
 	 * @return {connect_pool&}
 	 */
@@ -64,16 +64,25 @@ public:
 	connect_pool& set_check_inter(int n);
 
 	/**
-	 * 从连接池中尝试性获取一个连接，当服务器不可用、距上次服务端连接异常时间间隔
-	 * 未过期或连接池连接个数达到连接上限则将返回 NULL；当创建一个新的与服务器的
-	 * 连接时失败，则该连接池会被置为不可用状态
+	 * 从连接池中尝试性获取一个连接，当服务器不可用、距上次服务端连接异常
+	 * 时间间隔未过期或连接池连接个数达到连接上限则将返回 NULL；当创建一个
+	 * 新的与服务器的连接时失败，则该连接池会被置为不可用状态
+	 * @param on {bool} 该参数决定当连接池没有可用连接时是否创建新的连接，
+	 *  如果为 false，则不会创建新连接
 	 * @return {connect_client*} 如果为空则表示该服务器连接池对象不可用
 	 */
-	connect_client* peek();
+	connect_client* peek(bool on = true);
 
 	/**
-	 * 释放一个连接至连接池中，当该连接池对应的服务器不可用或调用者希望关闭该连接时，
-	 * 则该连接将会被直接释放
+	 * 将一个不属于当前连接池的连接对象与当前连接池对象绑定，使之从属于当前
+	 * 连接池对象
+	 * @param conn {redis_client*}
+	 */
+	void bind_one(connect_client* conn);
+
+	/**
+	 * 释放一个连接至连接池中，当该连接池对应的服务器不可用或调用者希望关闭
+	 * 该连接时，则该连接将会被直接释放
 	 * @param conn {redis_client*}
 	 * @param keep {bool} 是否针对该连接保持长连接
 	 */
@@ -94,9 +103,10 @@ public:
 	void set_alive(bool ok /* true | false */);
 
 	/**
-	 * 检查连接池是否正常，当连接池有问题时，该函数还会检测该连接池是否应该自动恢复，如果
-	 * 允许恢复，则将该连接池又置为可用状态
-	 * @return {bool} 返回 true 表示当前连接池处于正常状态，否则表示当前连接池不可用
+	 * 检查连接池是否正常，当连接池有问题时，该函数还会检测该连接池是否应该
+	 * 自动恢复，如果允许恢复，则将该连接池又置为可用状态
+	 * @return {bool} 返回 true 表示当前连接池处于正常状态，否则表示当前
+	 *  连接池不可用
 	 */
 	bool aliving();
 
@@ -144,8 +154,7 @@ public:
 	{
 		time_t now = time(NULL);
 		lock_.lock();
-		if (now - last_ >= inter)
-		{
+		if (now - last_ >= inter) {
 			last_ = now;
 			current_used_ = 0;
 		}
@@ -219,7 +228,7 @@ class ACL_CPP_API connect_guard
 {
 public:
 	connect_guard(connect_pool& pool)
-		: keep_(true), pool_(pool), conn_(NULL)
+	: keep_(true), pool_(pool), conn_(NULL)
 	{
 	}
 
