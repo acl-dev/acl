@@ -2903,9 +2903,12 @@ int acl_vstream_close(ACL_VSTREAM *fp)
 		return 0;
 	}
 
-	if (fp->wbuf_dlen > 0)
-		if (acl_vstream_fflush(fp) == ACL_VSTREAM_EOF)
-			acl_msg_error("%s: fflush fp error", myname);
+	if (fp->wbuf_dlen > 0) {
+		if (acl_vstream_fflush(fp) == ACL_VSTREAM_EOF) {
+			acl_msg_error("%s: fflush fp error=%s",
+				myname, acl_last_serror());
+		}
+	}
 
 	/* 须在调用各个关闭回调函数之前将连接关闭，否则会影响 iocp 的事件引擎
 	 * 正常工作。在使用 iocp 事件引擎时，当流关闭时会调用 events_iocp.c 中
