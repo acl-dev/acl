@@ -36,7 +36,7 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ "fiber_disable_core_onexit", 1, &acl_var_fiber_disable_core_onexit, 0, 0 },
 	{ "fiber_use_limit", 0, &acl_var_fiber_use_limit, 0, 0 },
 	{ "fiber_idle_limit", 0, &acl_var_fiber_idle_limit, 0 , 0 },
-	{ "fiber_wait_limit", 0, &acl_var_fiber_wait_limit, 0, 0 },
+	{ "fiber_wait_limit", 10, &acl_var_fiber_wait_limit, 0, 0 },
 	{ "fiber_threads", 1, &acl_var_fiber_threads, 0, 0 },
 
 	{ 0, 0, 0, 0, 0 },
@@ -117,14 +117,17 @@ static void fiber_client(ACL_FIBER *fiber acl_unused, void *ctx)
 		char *ptr;
 		ACL_SAFE_STRNCPY(addr, peer, sizeof(addr));
 		ptr = strchr(addr, ':');
-		if (ptr)
+		if (ptr) {
 			*ptr = 0;
-	} else
+		}
+	} else {
 		addr[0] = 0;
+	}
 
 	if (addr[0] != 0 && !acl_access_permit(addr)) {
-		if (__deny_info && *__deny_info)
+		if (__deny_info && *__deny_info) {
 			acl_vstream_fprintf(cstream, "%s\r\n", __deny_info);
+		}
 		acl_vstream_close(cstream);
 	} else {
 		acl_atomic_clock_users_count_inc(__clock);
@@ -144,24 +147,29 @@ static void thread_fiber_accept(ACL_FIBER *fiber, void *ctx)
 		cstream = acl_vstream_accept(sstream, ip, sizeof(ip));
 		if (cstream != NULL) {
 			__last_fd = ACL_VSTREAM_SOCK(cstream);
-			if (__last_fd > __max_fd)
+			if (__last_fd > __max_fd) {
 				__max_fd = __last_fd;
+			}
 
 			acl_fiber_create(fiber_client, cstream,
 				acl_var_fiber_stack_size);
 			continue;
 		}
 
-		if (acl_fiber_killed(fiber))
+		if (acl_fiber_killed(fiber)) {
+			acl_msg_info("%s(%d), %s: fiber accept was killed",
+				__FILE__, __LINE__, __FUNCTION__);
 			break;
+		}
 
 #if ACL_EAGAIN == ACL_EWOULDBLOCK
-		if (errno == ACL_EAGAIN || errno == ACL_EINTR)
+		if (errno == ACL_EAGAIN || errno == ACL_EINTR) {
 #else
 		if (errno == ACL_EAGAIN || errno == ACL_EWOULDBLOCK
-			|| errno == ACL_EINTR)
+			|| errno == ACL_EINTR) {
 #endif
 			continue;
+		}
 
 		acl_msg_error("%s(%d), %s: accept error: %s(%d, %d), maxfd: %d"
 			", lastfd: %d, listenfd: %d, stoping ...",
@@ -171,20 +179,32 @@ static void thread_fiber_accept(ACL_FIBER *fiber, void *ctx)
 
 		acl_fiber_sleep(1);
 	}
+
+	acl_msg_info("%s(%d), %s: close listenfd=%d", __FILE__, __LINE__,
+		__FUNCTION__, ACL_VSTREAM_SOCK(sstream));
+	acl_vstream_close(sstream);
 }
 
 static void thread_fiber_monitor(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	FIBER_SERVER *server = (FIBER_SERVER *) ctx;
+	static int dummy;
 	int i;
 
 	(void) acl_mbox_read(server->in, -1, NULL);
 
 	// kill all accepting fibers of the current thread
-	for (i = 0; i < server->socket_count; i++)
+	for (i = 0; i < server->socket_count; i++) {
 		acl_fiber_kill(server->accepters[i]);
+	}
 
-	// notify schedule to stop now
+	// response to the main thread
+	(void) acl_mbox_send(server->out, &dummy);
+
+	// waiting for the next command for stop fiber schedule
+	(void) acl_mbox_read(server->in, -1, NULL);
+
+	// notify fiber schedule to stop now
 	acl_fiber_schedule_stop();
 }
 
@@ -194,13 +214,15 @@ static void *thread_main(void *ctx)
 	static int dummy;
 	int i;
 
-	if (__thread_init)
+	if (__thread_init) {
 		__thread_init(__thread_init_ctx);
+	}
 
 	// create accept fibers for each listening socket
-	for (i = 0; i < server->socket_count; i++)
+	for (i = 0; i < server->socket_count; i++) {
 		server->accepters[i] = acl_fiber_create(
 			thread_fiber_accept, server->sstreams[i], STACK_SIZE);
+	}
 
 	// create monitor fiber waiting STOPPING command from main thread
 	acl_fiber_create(thread_fiber_monitor, server, STACK_SIZE);
@@ -222,41 +244,71 @@ static void server_free(FIBER_SERVER *server);
 
 static int __exit_status = 0;
 
+static void main_server_onexit(void)
+{
+	if (__service_onexit) {
+		__service_onexit(__service_ctx);
+		__service_onexit = NULL;
+	}
+}
+
 static void main_server_exit(ACL_FIBER *fiber, int status)
 {
 #if !defined(_WIN32) && !defined(_WIN64)
-	if (acl_var_fiber_disable_core_onexit)
+	if (acl_var_fiber_disable_core_onexit) {
 		acl_set_core_limit(0);
+	}
 #endif
-	if (__service_onexit)
-		__service_onexit(__service_ctx);
 
 	if (__sighup_fiber) {
 		acl_fiber_kill(__sighup_fiber);
 		__sighup_fiber = NULL;
 	}
 
-	acl_msg_info("%s(%d), %s: fiber = %u, service exit now!",
+	acl_msg_info("%s(%d), %s: fiber-%u, service exit now!",
 		__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(fiber));
+
+	/* stop the main thread fiber schedule proccess */
 	acl_fiber_schedule_stop();
 	__exit_status = status;
 }
 
-static void main_server_stop(void)
+static void main_stop_listen(void)
 {
 	static int dummy;
-	void *ptr;
 	int i;
 
-	if (__server_stopping || __servers == NULL)
+	if (__server_stopping || __servers == NULL) {
 		return;
+	}
+
+	for (i = 0; __servers[i] != NULL; i++) {
+		(void) acl_mbox_send(__servers[i]->in, &dummy);
+		(void) acl_mbox_read(__servers[i]->out, -1, NULL);
+	}
+}
+
+static void main_stop_servers(void)
+{
+	static int dummy;
+	int i;
+
+	if (__server_stopping || __servers == NULL) {
+		return;
+	}
 
 	__server_stopping = 1;
 
 	for (i = 0; __servers[i] != NULL; i++) {
 		(void) acl_mbox_send(__servers[i]->in, &dummy);
-		ptr = acl_mbox_read(__servers[i]->out, -1, NULL);
-		acl_assert(ptr);
+		(void) acl_mbox_read(__servers[i]->out, -1, NULL);
+	}
+}
+
+static void main_free_servers(void)
+{
+	int i;
+	for (i = 0; __servers[i] != NULL; i++) {
 		server_free(__servers[i]);
 	}
 
@@ -287,6 +339,14 @@ static void main_fiber_monitor_master(ACL_FIBER *fiber, void *ctx)
 		__FILE__, __LINE__, __FUNCTION__, ret,
 		acl_atomic_clock_users(__clock));
 
+	/* must close listening as quickly as possible, so that acl_master
+	 * can rebind the addr quickly.
+	 */
+	main_stop_listen();
+
+	/* the user's callback will be called here */
+	main_server_onexit();
+
 	while (!acl_var_fiber_quick_abort) {
 		if (acl_atomic_clock_users(__clock) <= 0) {
 			acl_msg_warn("%s(%d), %s: all clients closed!",
@@ -311,6 +371,12 @@ static void main_fiber_monitor_master(ACL_FIBER *fiber, void *ctx)
 			acl_atomic_clock_users(__clock));
 	}
 
+	/* then notify all threads' fiber schedule to stop */
+	main_stop_servers();
+	main_free_servers();
+
+	acl_msg_info("%s(%d), %s: call main_server_exit",
+		__FILE__, __LINE__, __FUNCTION__);
 	main_server_exit(fiber, 0);
 }
 
@@ -333,13 +399,14 @@ static int main_dispatch_receive(int dispatch_fd)
 	cstream = acl_vstream_fdopen(fd, O_RDWR, acl_var_fiber_buf_size,
 		acl_var_fiber_rw_timeout, ACL_VSTREAM_TYPE_SOCK);
 
-	if (acl_getsockname(fd, local, sizeof(local)) == 0)
+	if (acl_getsockname(fd, local, sizeof(local)) == 0) {
 		acl_vstream_set_local(cstream, local);
-	if (acl_getpeername(fd, remote, sizeof(remote)) == 0)
+	}
+	if (acl_getpeername(fd, remote, sizeof(remote)) == 0) {
 		acl_vstream_set_peer(cstream, remote);
+	}
 
 	acl_fiber_create(fiber_client, cstream, acl_var_fiber_stack_size);
-
 	return 0;
 }
 
@@ -381,15 +448,17 @@ static void main_dispatch_poll(ACL_VSTREAM *conn)
 		}
 
 		if (n > 0 && pfd.revents & POLLIN) {
-			if (main_dispatch_receive(ACL_VSTREAM_SOCK(conn)) < 0)
+			if (main_dispatch_receive(ACL_VSTREAM_SOCK(conn)) < 0) {
 				break;
+			}
 
 			pfd.revents = 0;
 		}
 
 		if (time(NULL) - last >= 1) {
-			if (main_dispatch_report(conn) < 0)
+			if (main_dispatch_report(conn) < 0) {
 				break;
+			}
 
 			last = time(NULL);
 		}
@@ -400,8 +469,9 @@ static void main_fiber_dispatch(ACL_FIBER *fiber, void *ctx acl_unused)
 {
 	ACL_VSTREAM *conn;
 
-	if (!acl_var_fiber_dispatch_addr || !*acl_var_fiber_dispatch_addr)
+	if (!acl_var_fiber_dispatch_addr || !*acl_var_fiber_dispatch_addr) {
 		return;
+	}
 
 	while (!__server_stopping) {
 		conn = acl_vstream_connect(acl_var_fiber_dispatch_addr,
@@ -435,25 +505,28 @@ static void main_fiber_sighup(ACL_FIBER *fiber, void *ctx acl_unused)
 	while (1) {
 		acl_fiber_sleep(1);
 
-		if (acl_fiber_killed(fiber))
+		if (acl_fiber_killed(fiber)) {
 			break;
+		}
 
-		if (!__sighup_handler || !acl_var_server_gotsighup)
+		if (!__sighup_handler || !acl_var_server_gotsighup) {
 			continue;
+		}
 
 		acl_var_server_gotsighup = 0;
 
 		buf = acl_vstring_alloc(128);
 
 #if !defined(_WIN32) && !defined(_WIN64)
-		if (__sighup_handler(__service_ctx, buf) < 0)
+		if (__sighup_handler(__service_ctx, buf) < 0) {
 			acl_master_notify(acl_var_fiber_pid,
 				__server_generation,
 				ACL_MASTER_STAT_SIGHUP_ERR);
-		else
+		} else {
 			acl_master_notify(acl_var_fiber_pid,
 				__server_generation,
 				ACL_MASTER_STAT_SIGHUP_OK);
+		}
 #endif
 
 		acl_vstring_free(buf);
@@ -486,8 +559,11 @@ static void main_fiber_monitor_used(ACL_FIBER *fiber, void *ctx acl_unused)
 	acl_msg_info("%s(%d), %s: use_limit reached %d",
 		__FILE__, __LINE__, __FUNCTION__, acl_var_fiber_use_limit);
 
-	main_server_stop();
-	acl_fiber_schedule_stop();
+	main_stop_listen();
+	main_server_onexit();
+	main_stop_servers();
+	main_free_servers();
+
 	main_server_exit(fiber, 0);
 }
 
@@ -502,20 +578,24 @@ static void main_fiber_monitor_idle(ACL_FIBER *fiber, void *ctx acl_unused)
 			continue;
 		}
 
-		if (time(NULL) - last >= acl_var_fiber_idle_limit)
+		if (time(NULL) - last >= acl_var_fiber_idle_limit) {
 			break;
+		}
 
 		acl_fiber_sleep(1);
 	}
 
 	acl_msg_info("%s(%d), %s: idle %ld seconds, limit %d,"
-		"users %lld, used %lld", __FILE__, __LINE__,
-		__FUNCTION__, time(NULL) - last, acl_var_fiber_idle_limit,
+		"users %lld, used %lld", __FILE__, __LINE__, __FUNCTION__,
+		time(NULL) - last, acl_var_fiber_idle_limit,
 		acl_atomic_clock_users(__clock),
 		acl_atomic_clock_count(__clock));
 
-	main_server_stop();
-	acl_fiber_schedule_stop();
+	main_stop_listen();
+	main_server_onexit();
+	main_stop_servers();
+	main_free_servers();
+
 	main_server_exit(fiber, 0);
 }
 
@@ -540,11 +620,13 @@ static void main_thread_loop(void)
 	__sighup_fiber = acl_fiber_create(main_fiber_sighup, NULL,
 		acl_var_fiber_stack_size);
 
-	if (acl_var_fiber_use_limit > 0)
+	if (acl_var_fiber_use_limit > 0) {
 		acl_fiber_create(main_fiber_monitor_used, NULL, STACK_SIZE);
+	}
 
-	if (acl_var_fiber_idle_limit > 0)
+	if (acl_var_fiber_idle_limit > 0) {
 		acl_fiber_create(main_fiber_monitor_idle, NULL, STACK_SIZE);
+	}
 
 	acl_server_sighup_setup();
 	acl_server_sigterm_setup();
@@ -575,11 +657,6 @@ static FIBER_SERVER *server_alloc(int socket_count, int fdtype)
 
 static void server_free(FIBER_SERVER *server)
 {
-	int i;
-
-	for (i = 0; i < server->socket_count; i++)
-		acl_vstream_close(server->sstreams[i]);
-
 	acl_myfree(server->sstreams);
 	acl_myfree(server->accepters);
 	acl_mbox_free(server->in, NULL);
@@ -597,23 +674,31 @@ static FIBER_SERVER **servers_alloc(int nthreads, int socket_count, int fdtype)
 		acl_mycalloc(nthreads + 1, sizeof(FIBER_SERVER*));
 	int i;
 
-	for (i = 0; i < nthreads; i++)
+	for (i = 0; i < nthreads; i++) {
 		servers[i] = server_alloc(socket_count, fdtype);
+	}
 
 	return servers;
 }
 
 #if !defined(_WIN32) && !defined(_WIN64)
-static void server_daemon_open(FIBER_SERVER *server)
+static void server_daemon_open(FIBER_SERVER *server, int n)
 {
-	ACL_SOCKET fd = ACL_MASTER_LISTEN_FD;
-	int i;
+	ACL_SOCKET fd = ACL_MASTER_LISTEN_FD, lfd;
+	int i = 0;
 
-	for (i = 0; fd < ACL_MASTER_LISTEN_FD + server->socket_count; fd++) {
-		server->sstreams[i++] = acl_vstream_fdopen(fd, O_RDWR,
+	if (server->socket_count <= 0) {
+		acl_msg_error("%s(%d), %s: invalid socket_count=%d",
+			__FILE__, __LINE__, __FUNCTION__, server->socket_count);
+		exit(6);
+	}
+
+	for (; fd < ACL_MASTER_LISTEN_FD + server->socket_count; fd++) {
+		lfd = n == 0 ? fd : dup(fd);
+		server->sstreams[i++] = acl_vstream_fdopen(lfd, O_RDWR,
 			acl_var_fiber_buf_size, acl_var_fiber_rw_timeout,
 			server->fdtype);
-		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
+		acl_close_on_exec(lfd, ACL_CLOSE_ON_EXEC);
 	}
 }
 
@@ -623,8 +708,9 @@ static void servers_daemon(int count, int fdtype, int nthreads)
 
 	__servers = servers_alloc(nthreads, count, fdtype);
 
-	for (i = 0; i < nthreads; i++)
-		server_daemon_open(__servers[i]);
+	for (i = 0; i < nthreads; i++) {
+		server_daemon_open(__servers[i], i);
+	}
 }
 #endif
 
@@ -665,8 +751,9 @@ static void servers_alone(const char *addrs, int fdtype, int nthreads)
 
 	__servers = servers_alloc(nthreads, tokens->argc, fdtype);
 
-	for (i = 0; i < nthreads; i++)
+	for (i = 0; i < nthreads; i++) {
 		server_alone_open(__servers[i], tokens);
+	}
 
 	acl_argv_free(tokens);
 }
@@ -676,9 +763,10 @@ static void servers_start(FIBER_SERVER **servers, int nthreads)
 	acl_pthread_attr_t attr;
 	int i;
 
-	if (nthreads <= 0)
+	if (nthreads <= 0) {
 		acl_msg_fatal("%s(%d), %s: invalid nthreads %d",
 			__FILE__, __LINE__, __FUNCTION__, nthreads);
+	}
 
 	/* this can only be called in the main thread */
 	if (__server_on_listen) {
@@ -686,9 +774,10 @@ static void servers_start(FIBER_SERVER **servers, int nthreads)
 			FIBER_SERVER *server = servers[i];
 			int j;
 
-			for (j = 0; j < server->socket_count; j++)
+			for (j = 0; j < server->socket_count; j++) {
 				__server_on_listen(__service_ctx,
 					server->sstreams[j]);
+			}
 		}
 	}
 
@@ -696,9 +785,10 @@ static void servers_start(FIBER_SERVER **servers, int nthreads)
 	acl_pthread_attr_init(&attr);
 	acl_pthread_attr_setdetachstate(&attr, ACL_PTHREAD_CREATE_DETACHED);
 
-	for (i = 0; i < nthreads; i++)
+	for (i = 0; i < nthreads; i++) {
 		acl_pthread_create(&servers[i]->tid, &attr,
 			thread_main, servers[i]);
+	}
 
 	main_thread_loop();
 }
@@ -727,28 +817,23 @@ static void server_init(const char *procname)
 	static int inited = 0;
 	const char* ptr;
 
-	if (inited)
+	if (inited) {
 		return;
+	}
 
 	inited = 1;
 
-	/*
-	 * Don't die when a process goes away unexpectedly.
-	 */
+	/* Don't die when a process goes away unexpectedly. */
 #ifdef SIGPIPE
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	/*
-	 * Don't die for frivolous reasons.
-	 */
+	/* Don't die for frivolous reasons. */
 #ifdef SIGXFSZ
 	signal(SIGXFSZ, SIG_IGN);
 #endif
 
-	/*
-	 * May need this every now and then.
-	 */
+	/* May need this every now and then. */
 #if defined(_WIN32) || defined(_WIN64)
 	acl_var_fiber_pid = _getpid();
 #else
@@ -757,9 +842,9 @@ static void server_init(const char *procname)
 	acl_var_fiber_procname = acl_mystrdup(acl_safe_basename(procname));
 
 	ptr = acl_getenv("SERVICE_LOG");
-	if ((ptr = acl_getenv("SERVICE_LOG")) != NULL && *ptr != 0)
+	if ((ptr = acl_getenv("SERVICE_LOG")) != NULL && *ptr != 0) {
 		acl_var_fiber_log_file = acl_mystrdup(ptr);
-	else {
+	} else {
 		acl_var_fiber_log_file = acl_mystrdup("acl_master.log");
 		acl_msg_info("%s(%d)->%s: can't get SERVICE_LOG's env value,"
 			" use %s log", __FILE__, __LINE__, myname,
@@ -770,10 +855,12 @@ static void server_init(const char *procname)
 	acl_get_app_conf_str_table(__conf_str_tab);
 	acl_get_app_conf_bool_table(__conf_bool_tab);
 
-	if (__deny_info == NULL)
+	if (__deny_info == NULL) {
 		__deny_info = acl_var_fiber_deny_banner;
-	if (acl_var_fiber_access_allow && *acl_var_fiber_access_allow)
+	}
+	if (acl_var_fiber_access_allow && *acl_var_fiber_access_allow) {
 		acl_access_add(acl_var_fiber_access_allow, ", \t", ":");
+	}
 }
 
 static void usage(int argc, char * argv[])
@@ -781,14 +868,16 @@ static void usage(int argc, char * argv[])
 	int   i;
 	const char *service_name;
 
-	if (argc <= 0)
+	if (argc <= 0) {
 		acl_msg_fatal("%s(%d): argc(%d) invalid",
 			__FILE__, __LINE__, argc);
+	}
 
 	service_name = acl_safe_basename(argv[0]);
 
-	for (i = 0; i < argc; i++)
+	for (i = 0; i < argc; i++) {
 		acl_msg_info("argv[%d]: %s", i, argv[i]);
+	}
 
 	acl_msg_info("usage: %s -H[help]"
 		" -c [use chroot]"
@@ -940,21 +1029,23 @@ void acl_fiber_server_main(int argc, char *argv[],
 		}
 	}
 
-	if (__conf_file[0] == 0)
+	if (__conf_file[0] == 0) {
 		acl_msg_info("%s(%d), %s: no configure file",
 			__FILE__, __LINE__, myname);
-	else
+	} else {
 		acl_msg_info("%s(%d), %s: configure file=%s", 
 			__FILE__, __LINE__, myname, __conf_file);
+	}
 
 	ACL_SAFE_STRNCPY(__service_name, service_name, sizeof(__service_name));
 
 #if !defined(_WIN32) && !defined(_WIN64)
-	if (addrs && *addrs)
+	if (addrs && *addrs) {
 		__daemon_mode = 0;
-	else
+	} else {
 #endif
 		__daemon_mode = 1;
+	}
 
 	/*******************************************************************/
 
@@ -967,20 +1058,24 @@ void acl_fiber_server_main(int argc, char *argv[],
 	parse_args();
 
 #if !defined(_WIN32) && !defined(_WIN64)
-	if (root_dir)
+	if (root_dir) {
 		root_dir = acl_var_fiber_queue_dir;
+	}
 
-	if (user)
+	if (user) {
 		user = acl_var_fiber_owner;
+	}
 
 	/* Retrieve process generation from environment. */
 	if ((generation = getenv(ACL_MASTER_GEN_NAME)) != 0) {
-		if (!acl_alldig(generation))
+		if (!acl_alldig(generation)) {
 			acl_msg_fatal("bad generation: %s", generation);
+		}
 		sscanf(generation, "%o", &__server_generation);
-		if (acl_msg_verbose)
+		if (acl_msg_verbose) {
 			acl_msg_info("process generation: %s (%o)",
 				generation, __server_generation);
+		}
 	}
 
 	/*******************************************************************/
@@ -995,20 +1090,24 @@ void acl_fiber_server_main(int argc, char *argv[],
 
 	/* create static servers object */
 
-	if (__daemon_mode)
+	if (__daemon_mode) {
 		servers_daemon(socket_count, fdtype, acl_var_fiber_threads);
-	else
+	} else
 #endif
+	{
 		servers_alone(addrs, fdtype, acl_var_fiber_threads);
+	}
 
 	acl_assert(__servers);
 
-	if (pre_jail)
+	if (pre_jail) {
 		pre_jail(__service_ctx);
+	}
 
 #if !defined(_WIN32) && !defined(_WIN64)
-	if (user && *user)
+	if (user && *user) {
 		acl_chroot_uid(root_dir, user);
+	}
 #endif
 
 	/* open the server's log */
@@ -1016,32 +1115,36 @@ void acl_fiber_server_main(int argc, char *argv[],
 
 #if !defined(_WIN32) && !defined(_WIN64)
 	/* if enable dump core when program crashed ? */
-	if (acl_var_fiber_enable_core && acl_var_fiber_core_limit != 0)
+	if (acl_var_fiber_enable_core && acl_var_fiber_core_limit != 0) {
 		acl_set_core_limit(acl_var_fiber_core_limit);
+	}
 #endif
 
 	/* Run post-jail initialization. */
-	if (post_init)
+	if (post_init) {
 		post_init(__service_ctx);
+	}
 
-	if (strcasecmp(acl_var_fiber_schedule_event, "kernel") == 0)
+	if (strcasecmp(acl_var_fiber_schedule_event, "kernel") == 0) {
 		__fiber_schedule_event = FIBER_EVENT_KERNEL;
-	else if (strcasecmp(acl_var_fiber_schedule_event, "poll") == 0)
+	} else if (strcasecmp(acl_var_fiber_schedule_event, "poll") == 0) {
 		__fiber_schedule_event = FIBER_EVENT_POLL;
-	else if (strcasecmp(acl_var_fiber_schedule_event, "select") == 0)
+	} else if (strcasecmp(acl_var_fiber_schedule_event, "select") == 0) {
 		__fiber_schedule_event = FIBER_EVENT_SELECT;
-	else if (strcasecmp(acl_var_fiber_schedule_event, "wmsg") == 0)
+	} else if (strcasecmp(acl_var_fiber_schedule_event, "wmsg") == 0) {
 		__fiber_schedule_event = FIBER_EVENT_WMSG;
-	else
+	} else {
 		__fiber_schedule_event = FIBER_EVENT_KERNEL;
+	}
 
 	acl_msg_info("schedule event type - %s", acl_var_fiber_schedule_event);
 
 #if !defined(_WIN32) && !defined(_WIN64)
 	/* notify master that child started ok */
-	if (__daemon_mode)
+	if (__daemon_mode) {
 		acl_master_notify(acl_var_fiber_pid, __server_generation,
 			ACL_MASTER_STAT_START_OK);
+	}
 #endif
 	servers_start(__servers, acl_var_fiber_threads);
 }

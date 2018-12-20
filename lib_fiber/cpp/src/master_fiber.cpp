@@ -106,6 +106,7 @@ void master_fiber::service_on_listen(void* ctx, ACL_VSTREAM* sstream)
 	acl_assert(mf != NULL);
 	server_socket* ss = new server_socket(sstream);
 	mf->servers_.push_back(ss);
+	logger("listen %s ok, fd=%d", ss->get_addr(), ss->sock_handle());
 	mf->proc_on_listen(*ss);
 }
 

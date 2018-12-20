@@ -1,4 +1,7 @@
 
+98) 2018.12.20
+98.1) buffix: fiber_server.cpp 当有连接未断开时，进程无法正常退出
+
 97) 2018.11.29
 97.1) bugfix: fbase_event.c 中 fbase_event_wakeup/fbase_event_wait IO 如果遇到
 中断信号，应该需要重启 IO 过程
