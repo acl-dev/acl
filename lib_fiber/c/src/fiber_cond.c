@@ -158,11 +158,19 @@ int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_EVENT *event,
 	}
 
 	if (read_wait(fbase->event_in, delay_ms) == -1) {
+		if (acl_fiber_event_wait(event) == -1) {
+			msg_fatal("%s(%d), %s: wait event error",
+				__FILE__, __LINE__, __FUNCTION__);
+		}
 		DETACHE;
 		return ETIMEDOUT;
 	}
 
 	if (fbase_event_wait(fbase) == -1) {
+		if (acl_fiber_event_wait(event) == -1) {
+			msg_fatal("%s(%d), %s: wait event error",
+				__FILE__, __LINE__, __FUNCTION__);
+		}
 		DETACHE;
 		return EINVAL;
 	}

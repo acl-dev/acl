@@ -71,9 +71,12 @@ private:
 	void* run(void)
 	{
 		for (int i = 0; i < __nloop; i++) {
-			myobj* o = tbox_.pop();
-			if (i <= 10) {
+			myobj* o = tbox_.pop(10);
+			if (o && i <= 10) {
 				o->test();
+			}
+			if (!o) {
+				printf("pop timeout\r\n");
 			}
 			delete o;
 			__consuming++;
@@ -132,6 +135,7 @@ int main(int argc, char *argv[])
 		thr->start();
 	}
 
+	sleep(10);
 	for (int i = 0; i < nthreads; i++) {
 		acl::thread* thr = new producer(tbox);
 		threads.push_back(thr);
