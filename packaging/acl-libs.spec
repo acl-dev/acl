@@ -1,4 +1,4 @@
-%define release_id 37
+%define release_id 38
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,10 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Tue Dec 25 2018 zhengshuxin@qiyi.com 3.4.1-38-20181225.11
+- acl_fiber_cond.c: fixed one bug in acl_fiber_cond_timedwait
+- fiber_tbox: add bool return for push
 
 * Sun Dec 16 2018 zhengshuxin@qiyi.com 3.4.1-37-20181216.16
 - connect_manager: support fiber in thread mode

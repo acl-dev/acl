@@ -24,7 +24,7 @@
 
 #include "init.h"
 
-static char *version = "3.4.1-37 20181216";
+static char *version = "3.4.1-38 20181225";
 
 const char *acl_version(void)
 {
