@@ -1,6 +1,7 @@
 #pragma once
 #include "fiber_cpp_define.hpp"
 #include <list>
+#include <stdlib.h>
 #include "fiber_event.hpp"
 #include "fiber_cond.hpp"
 
@@ -82,22 +83,35 @@ public:
 	 *  对象的生存周期较短(如：等待者调用 pop 后直接销毁 fiber_tbox 对象),
 	 *  则本参数应该设为 true，以避免 push 者还没有完全返回前因 fiber_tbox
 	 *  对象被提前销毁而造成内存非法访问
+	 * @return {bool}
 	 */
-	void push(T* t, bool notify_first = true)
+	bool push(T* t, bool notify_first = true)
 	{
 		// 先加锁
-		event_.wait();
+		if (event_.wait() == false) {
+			abort();
+		}
 
 		// 向队列中添加消息对象
 		tbox_.push_back(t);
 		size_++;
 
 		if (notify_first) {
-			cond_.notify();
-			event_.notify();
+			if (cond_.notify() == false) {
+				abort();
+			}
+			if (event_.notify() == false) {
+				abort();
+			}
+			return true;
 		} else {
-			event_.notify();
-			cond_.notify();
+			if (event_.notify() == false) {
+				abort();
+			}
+			if (cond_.notify() == false) {
+				abort();
+			}
+			return true;
 		}
 	}
 
@@ -117,11 +131,15 @@ public:
 	T* pop(int wait_ms = -1, bool* found = NULL)
 	{
 		bool found_flag;
-		event_.wait();
+		if (event_.wait() == false) {
+			abort();
+		}
 		while (true) {
 			T* t = peek(found_flag);
 			if (found_flag) {
-				event_.notify();
+				if (event_.notify() == false) {
+					abort();
+				}
 				if (found) {
 					*found = found_flag;
 				}
@@ -130,7 +148,9 @@ public:
 
 			// 注意调用顺序，必须先调用 wait 再判断 wait_ms
 			if (!cond_.wait(event_, wait_ms) && wait_ms >= 0) {
-				event_.notify();
+				if (event_.notify() == false) {
+					abort();
+				}
 				if (found) {
 					*found = false;
 				}
@@ -151,12 +171,16 @@ public:
 public:
 	void lock(void)
 	{
-		event_.wait();
+		if (event_.wait() == false) {
+			abort();
+		}
 	}
 
 	void unlock(void)
 	{
-		event_.notify();
+		if (event_.notify() == false) {
+			abort();
+		}
 	}
 
 private:

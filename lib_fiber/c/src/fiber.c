@@ -492,12 +492,20 @@ int acl_fiber_yield(void)
 #endif
 }
 
-int acl_fiber_ndead(void)
+unsigned acl_fiber_ndead(void)
 {
 	if (__thread_fiber == NULL) {
 		return 0;
 	}
-	return ring_size(&__thread_fiber->dead);
+	return (unsigned) ring_size(&__thread_fiber->dead);
+}
+
+unsigned acl_fiber_number(void)
+{
+	if (__thread_fiber == NULL) {
+		return 0;
+	}
+	return __thread_fiber->slot;
 }
 
 static void fbase_init(FIBER_BASE *fbase, int flag)

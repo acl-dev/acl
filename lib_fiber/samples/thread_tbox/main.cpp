@@ -8,6 +8,7 @@ static int __delay    = 0;
 
 static acl::atomic_long __producing = 0;
 static acl::atomic_long __consuming = 0;
+static acl::atomic_long __timedout  = 0;
 
 class myobj
 {
@@ -56,8 +57,9 @@ private:
 class consumer : public acl::thread
 {
 public:
-	consumer(acl::fiber_tbox<myobj>& tbox)
+	consumer(acl::fiber_tbox<myobj>& tbox, int timeout)
 	: tbox_(tbox)
+	, timeout_(timeout)
 	{
 		this->set_detachable(false);
 	}
@@ -67,22 +69,29 @@ private:
 
 private:
 	acl::fiber_tbox<myobj>& tbox_;
+	int timeout_;
 
 	void* run(void)
 	{
+		int n = 0;
 		for (int i = 0; i < __nloop; i++) {
-			myobj* o = tbox_.pop(10);
+			myobj* o = tbox_.pop(timeout_);
 			if (o && i <= 10) {
 				o->test();
 			}
-			if (!o) {
+			if (o) {
+				__consuming++;
+				n++;
+			} else {
+				__timedout++;
 				printf("pop timeout\r\n");
 			}
+
 			delete o;
-			__consuming++;
 		}
 
-		printf("consumer over=%lld\r\n", __consuming.value());
+		printf("consumer-%lu over=%lld, n=%d\r\n",
+			acl::thread::self(), __consuming.value(), n);
 		return NULL;
 	}
 };
@@ -94,18 +103,19 @@ static void usage(const char* procname)
 	printf("usage: %s -h [help]\r\n"
 		" -c threads[default: 1]\r\n"
 		" -n nloop[default: 2]\r\n"
+		" -t timeout[default: -1 ms]\r\n"
 		" -d delay[default: 0 ms]\r\n"
 		, procname);
 }
 
 int main(int argc, char *argv[])
 {
-	int  ch, nthreads = 1;
+	int  ch, nthreads = 1, timeout = -1;
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hc:n:d:")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:n:d:t:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -119,6 +129,9 @@ int main(int argc, char *argv[])
 		case 'd':
 			__delay = atoi(optarg);
 			break;
+		case 't':
+			timeout = atoi(optarg);
+			break;
 		default:
 			break;
 		}
@@ -130,12 +143,12 @@ int main(int argc, char *argv[])
 
 	std::vector<acl::thread*> threads;
 	for (int i = 0; i < nthreads; i++) {
-		acl::thread* thr = new consumer(tbox);
+		acl::thread* thr = new consumer(tbox, timeout);
 		threads.push_back(thr);
 		thr->start();
 	}
 
-	sleep(10);
+	sleep(1);
 	for (int i = 0; i < nthreads; i++) {
 		acl::thread* thr = new producer(tbox);
 		threads.push_back(thr);
@@ -149,8 +162,8 @@ int main(int argc, char *argv[])
 		delete *it;
 	}
 
-	printf("all over, nloop=%d, producing=%lld, consuming=%lld\r\n",
-		__nloop, __producing.value(), __consuming.value());
+	printf("all over, nloop=%d, producing=%lld, consuming=%lld, timedout=%lld\r\n",
+		__nloop, __producing.value(), __consuming.value(), __timedout.value());
 
 	return 0;
 }

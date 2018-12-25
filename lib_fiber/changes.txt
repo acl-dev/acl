@@ -1,4 +1,9 @@
 
+99) 2018.12.25
+99.1) bugfix: acl_fiber_cond.c 中如果多个线程调用同一个条件变量的的
+acl_fiber_cond_timedwait 方法时，可能会存在超时值失效的情况
+99.2) workaround: fiber_tbox::push 增加 bool 返回值
+
 98) 2018.12.20
 98.1) buffix: fiber_server.cpp 当有连接未断开时，进程无法正常退出
 

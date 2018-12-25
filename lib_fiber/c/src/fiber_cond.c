@@ -157,16 +157,30 @@ int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_EVENT *event,
 		return EINVAL;
 	}
 
-	if (read_wait(fbase->event_in, delay_ms) == -1) {
-		if (acl_fiber_event_wait(event) == -1) {
-			msg_fatal("%s(%d), %s: wait event error",
-				__FILE__, __LINE__, __FUNCTION__);
+	while (1) {
+		if (read_wait(fbase->event_in, delay_ms) == -1) {
+			if (acl_fiber_event_wait(event) == -1) {
+				msg_fatal("%s(%d), %s: wait event error",
+					__FILE__, __LINE__, __FUNCTION__);
+			}
+			DETACHE;
+			return ETIMEDOUT;
 		}
-		DETACHE;
-		return ETIMEDOUT;
+
+		__ll_lock(cond);
+		if (atomic_int64_cas(cond->atomic, 0, 1) == 0) {
+			break;
+		}
+		__ll_unlock(cond);
 	}
 
 	if (fbase_event_wait(fbase) == -1) {
+		if (atomic_int64_cas(cond->atomic, 1, 0) != 1) {
+			msg_fatal("%s(%d), %s: cond corrupt",
+				__FILE__, __LINE__, __FUNCTION__);
+		}
+		__ll_unlock(cond);
+
 		if (acl_fiber_event_wait(event) == -1) {
 			msg_fatal("%s(%d), %s: wait event error",
 				__FILE__, __LINE__, __FUNCTION__);
@@ -174,6 +188,12 @@ int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_EVENT *event,
 		DETACHE;
 		return EINVAL;
 	}
+
+	if (atomic_int64_cas(cond->atomic, 1, 0) != 1) {
+		msg_fatal("%s(%d), %s: cond corrupt",
+			__FILE__, __LINE__, __FUNCTION__);
+	}
+	__ll_unlock(cond);
 
 	if (acl_fiber_event_wait(event) == -1) {
 		DETACHE;

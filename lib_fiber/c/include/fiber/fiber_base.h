@@ -25,9 +25,15 @@ FIBER_API ACL_FIBER* acl_fiber_create(void (*fn)(ACL_FIBER*, void*),
 
 /**
  * get the fibers count in deading status
- * @retur {int}
+ * @return {unsigned}
  */
-FIBER_API int acl_fiber_ndead(void);
+FIBER_API unsigned acl_fiber_ndead(void);
+
+/**
+ * get the fibers count in aliving status
+ * @return {unsigned}
+ */
+FIBER_API unsigned acl_fiber_number(void);
 
 /**
  * create one fiber in background for freeing the dead fibers, specify the

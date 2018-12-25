@@ -169,6 +169,18 @@ public:
 	static unsigned int delay(unsigned int milliseconds);
 
 	/**
+	 * 获得处于存活状态的协程数量
+	 * @return {unsigned}
+	 */
+	static unsigned alive_number(void);
+
+	/**
+	 * 获得处于退出状态的协程对象数量
+	 * @return {unsigned}
+	 */
+	static unsigned dead_number(void);
+
+	/**
 	 * 线程启动后调用此函数设置当前线程是否需要 hook 系统 API，内部缺省
 	 * 会 hook 系统 API
 	 * @param on {bool}

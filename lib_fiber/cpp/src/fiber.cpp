@@ -80,6 +80,16 @@ unsigned int fiber::delay(unsigned int milliseconds)
 	return acl_fiber_delay(milliseconds);
 }
 
+unsigned fiber::alive_number(void)
+{
+	return acl_fiber_number();
+}
+
+unsigned fiber::dead_number(void)
+{
+	return acl_fiber_ndead();
+}
+
 void fiber::hook_api(bool on)
 {
 	acl_fiber_hook_api(on ? 1 : 0);

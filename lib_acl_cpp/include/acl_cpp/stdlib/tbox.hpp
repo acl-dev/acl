@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include <list>
+#include <stdlib.h>
 #include "thread_mutex.hpp"
 #include "thread_cond.hpp"
 #include "noncopyable.hpp"
@@ -74,14 +75,22 @@ public:
 	/**
 	 * 发送消息对象
 	 * @param t {T*} 非空消息对象
+	 * @return {bool}
 	 */
-	void push(T* t)
+	bool push(T* t)
 	{
-		lock_.lock();
+		if (lock_.lock() == false) {
+			abort();
+		}
 		tbox_.push_back(t);
 		size_++;
-		lock_.unlock();
-		cond_.notify();
+		if (lock_.unlock() == false) {
+			abort();
+		}
+		if (cond_.notify() == false) {
+			abort();
+		}
+		return true;
 	}
 
 	/**
@@ -101,11 +110,15 @@ public:
 	{
 		long long n = ((long long) wait_ms) * 1000;
 		bool found_flag;
-		lock_.lock();
+		if (lock_.lock() == false) {
+			abort();
+		}
 		while (true) {
 			T* t = peek(found_flag);
 			if (found_flag) {
-				lock_.unlock();
+				if (lock_.unlock() == false) {
+					abort();
+				}
 				if (found) {
 					*found = found_flag;
 				}
@@ -114,7 +127,9 @@ public:
 
 			// 注意调用顺序，必须先调用 wait 再判断 wait_ms
 			if (!cond_.wait(n, true) && wait_ms >= 0) {
-				lock_.unlock();
+				if (lock_.unlock() == false) {
+					abort();
+				}
 				if (found) {
 					*found = false;
 				}
@@ -135,12 +150,16 @@ public:
 public:
 	void lock(void)
 	{
-		lock_.lock();
+		if (lock_.lock() == false) {
+			abort();
+		}
 	}
 
 	void unlock(void)
 	{
-		lock_.unlock();
+		if (lock_.unlock() == false) {
+			abort();
+		}
 	}
 
 private:
