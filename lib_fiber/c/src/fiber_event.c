@@ -35,9 +35,9 @@ static void event_ferror(ACL_FIBER_EVENT* event, const char* fmt, ...)
 	va_end(ap);
 
 	if ((event->flag & FIBER_FLAG_USE_FATAL)) {
-		msg_error("%s", buf);
-	} else {
 		msg_fatal("%s", buf);
+	} else {
+		msg_error("%s", buf);
 	}
 }
 
