@@ -26,6 +26,7 @@ ACL_FIBER_COND *acl_fiber_cond_create(unsigned flag fiber_unused)
 	atomic_int64_set(cond->atomic, 0);
 
 	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
 	pthread_mutex_init(&cond->mutex, &attr);
 	pthread_mutexattr_destroy(&attr);
 
@@ -59,11 +60,18 @@ static void __ll_unlock(ACL_FIBER_COND *cond)
 	}
 }
 
-#define DETACHE do {                       \
+#define FBASE_DETACH_FREE do {             \
 	__ll_lock(cond);                   \
-	fbase_event_close(fbase);          \
 	ring_detach(&fbase->event_waiter); \
 	__ll_unlock(cond);                 \
+	fbase_event_close(fbase);          \
+	if (fbase->flag & FBASE_F_BASE) {  \
+		fbase_free(fbase);         \
+	}                                  \
+} while (0)
+
+#define FBASE_FREE do {                    \
+	fbase_event_close(fbase);          \
 	if (fbase->flag & FBASE_F_BASE) {  \
 		fbase_free(fbase);         \
 	}                                  \
@@ -82,23 +90,23 @@ int acl_fiber_cond_wait(ACL_FIBER_COND *cond, ACL_FIBER_EVENT *event)
 	__ll_unlock(cond);
 
 	if (acl_fiber_event_notify(event) != 0) {
-		DETACHE;
+		FBASE_DETACH_FREE;
 		msg_fatal("acl_fiber_event_notify failed");
 	}
 
 	if (fbase_event_wait(fbase) == -1) {
-		DETACHE;
+		FBASE_DETACH_FREE;
 		msg_fatal("fbase_event_wait error");
-	}
-
-	if (acl_fiber_event_wait(event) == -1) {
-		DETACHE;
-		msg_fatal("acl_fiber_event_wait error");
 	}
 
 	fbase_event_close(fbase);
 	if (fbase->flag & FBASE_F_BASE) {
 		fbase_free(fbase);
+	}
+
+	if (acl_fiber_event_wait(event) == -1) {
+		FBASE_DETACH_FREE;
+		msg_fatal("acl_fiber_event_wait error");
 	}
 
 	return 0;
@@ -152,23 +160,25 @@ int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_EVENT *event,
 	__ll_unlock(cond);
 
 	if (acl_fiber_event_notify(event) != 0) {
-		DETACHE;
+		FBASE_DETACH_FREE;
 		msg_error("acl_fiber_event_notify failed");
 		return EINVAL;
 	}
 
 	while (1) {
 		if (read_wait(fbase->event_in, delay_ms) == -1) {
+			FBASE_DETACH_FREE;
+
 			if (acl_fiber_event_wait(event) == -1) {
 				msg_fatal("%s(%d), %s: wait event error",
 					__FILE__, __LINE__, __FUNCTION__);
 			}
-			DETACHE;
 			return ETIMEDOUT;
 		}
 
 		__ll_lock(cond);
 		if (atomic_int64_cas(cond->atomic, 0, 1) == 0) {
+			ring_detach(&fbase->event_waiter);
 			break;
 		}
 		__ll_unlock(cond);
@@ -179,13 +189,14 @@ int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_EVENT *event,
 			msg_fatal("%s(%d), %s: cond corrupt",
 				__FILE__, __LINE__, __FUNCTION__);
 		}
+
+		FBASE_FREE;
 		__ll_unlock(cond);
 
 		if (acl_fiber_event_wait(event) == -1) {
 			msg_fatal("%s(%d), %s: wait event error",
 				__FILE__, __LINE__, __FUNCTION__);
 		}
-		DETACHE;
 		return EINVAL;
 	}
 
@@ -193,17 +204,13 @@ int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_EVENT *event,
 		msg_fatal("%s(%d), %s: cond corrupt",
 			__FILE__, __LINE__, __FUNCTION__);
 	}
+
+	FBASE_FREE;
 	__ll_unlock(cond);
 
 	if (acl_fiber_event_wait(event) == -1) {
-		DETACHE;
 		msg_error("acl_fiber_event_wait error");
 		return EINVAL;
-	}
-
-	fbase_event_close(fbase);
-	if (fbase->flag & FBASE_F_BASE) {
-		fbase_free(fbase);
 	}
 
 	return 0;
@@ -223,13 +230,13 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 		waiter = NULL;
 	}
 
-	__ll_unlock(cond);
-
 	if (waiter && fbase_event_wakeup(waiter) == -1) {
+		__ll_unlock(cond);
 		msg_error("fbase_event_wakeup error");
 		return EINVAL;
 	}
 
+	__ll_unlock(cond);
 	return 0;
 }
 

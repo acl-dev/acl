@@ -1,4 +1,9 @@
 
+100) 2018.12.27
+100.1) bugfix: acl_fiber_cond.c 中 acl_fiber_cond_timedwait 和 acl_fiber_cond_wait
+在释放 fbase 对象时，必须在调用 acl_fiber_event_wait 之前，否则会引起句柄被
+提前关闭问题
+
 99) 2018.12.25
 99.1) bugfix: acl_fiber_cond.c 中如果多个线程调用同一个条件变量的的
 acl_fiber_cond_timedwait 方法时，可能会存在超时值失效的情况

@@ -1,4 +1,4 @@
-%define release_id 38
+%define release_id 39
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Dec 27 2018 zhengshuxin@qiyi.com 3.4.1-39-20181227.10
+- acl_fiber_cond.c: fixed bugs in acl_fiber_cond_timedwait/acl_fiber_cond_wait
 
 * Tue Dec 25 2018 zhengshuxin@qiyi.com 3.4.1-38-20181225.11
 - acl_fiber_cond.c: fixed one bug in acl_fiber_cond_timedwait

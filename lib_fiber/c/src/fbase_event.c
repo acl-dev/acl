@@ -115,8 +115,9 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 	 */
 
 	if (fbase->event_out < 0) {
-		msg_fatal("%s(%d), %s: invalid event_out=%d",
-			__FILE__, __LINE__, __FUNCTION__, fbase->event_out);
+		msg_fatal("%s(%d), %s: fbase=%p, invalid event_out=%d",
+			__FILE__, __LINE__, __FUNCTION__,
+			fbase, fbase->event_out);
 	}
 
 	while (1) {

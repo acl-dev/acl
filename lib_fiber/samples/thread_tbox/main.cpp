@@ -148,7 +148,6 @@ int main(int argc, char *argv[])
 		thr->start();
 	}
 
-	sleep(1);
 	for (int i = 0; i < nthreads; i++) {
 		acl::thread* thr = new producer(tbox);
 		threads.push_back(thr);

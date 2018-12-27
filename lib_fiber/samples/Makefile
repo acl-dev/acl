@@ -35,6 +35,7 @@ all:
 	@(cd fiber_local; make)
 	@(cd tcp_server; make)
 	@(cd tcp_client; make)
+	@(cd fiber_tbox; make)
 
 cl clean:
 	@(cd dns; make clean)
@@ -72,5 +73,6 @@ cl clean:
 	@(cd fiber_local; make clean)
 	@(cd tcp_server; make clean)
 	@(cd tcp_client; make clean)
+	@(cd fiber_tbox; make clean)
 
 rebuild rb: clean all
