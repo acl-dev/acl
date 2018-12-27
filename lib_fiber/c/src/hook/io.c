@@ -11,7 +11,7 @@ typedef int      (WINAPI *recvfrom_fn)(socket_t, char *, int, int,
 typedef int      (WINAPI *send_fn)(socket_t, const char *, int, int);
 typedef int      (WINAPI *sendto_fn)(socket_t, const char *, int, int,
 	const struct sockaddr *, socklen_t);
-#else
+#elif !defined(USE_SYSCALL)
 typedef unsigned (*sleep_fn)(unsigned int seconds);
 typedef int      (*close_fn)(int);
 typedef ssize_t  (*read_fn)(socket_t, void *, size_t);
@@ -31,6 +31,8 @@ typedef ssize_t  (*sendfile64_fn)(socket_t, int, off64_t*, size_t);
 # endif
 #endif
 
+#if defined(SYS_WIN)
+
 static close_fn    __sys_close    = NULL;
 static recv_fn     __sys_recv     = NULL;
 static recvfrom_fn __sys_recvfrom = NULL;
@@ -38,7 +40,15 @@ static recvfrom_fn __sys_recvfrom = NULL;
 static send_fn     __sys_send     = NULL;
 static sendto_fn   __sys_sendto   = NULL;
 
-#ifdef SYS_UNIX
+#elif defined(SYS_UNIX) && !defined(USE_SYSCALL)
+
+static close_fn    __sys_close    = NULL;
+static recv_fn     __sys_recv     = NULL;
+static recvfrom_fn __sys_recvfrom = NULL;
+
+static send_fn     __sys_send     = NULL;
+static sendto_fn   __sys_sendto   = NULL;
+
 static sleep_fn    __sys_sleep    = NULL;
 static read_fn     __sys_read     = NULL;
 static readv_fn    __sys_readv    = NULL;
@@ -47,10 +57,105 @@ static recvmsg_fn  __sys_recvmsg  = NULL;
 static write_fn    __sys_write    = NULL;
 static writev_fn   __sys_writev   = NULL;
 static sendmsg_fn  __sys_sendmsg  = NULL;
+
+# ifdef __USE_LARGEFILE64
+static sendfile64_fn __sys_sendfile64 = NULL;
+# endif
+
 #endif
 
-#ifdef __USE_LARGEFILE64
-static sendfile64_fn __sys_sendfile64 = NULL;
+#if defined(SYS_UNIX) && defined(USE_SYSCALL)
+#include <sys/syscall.h>
+
+static unsigned __sys_sleep(unsigned int seconds)
+{
+#ifdef SYS_sleep
+	return syscall(SYS_sleep, seconds);
+#else
+	return 0;
+#endif
+}
+
+static int __sys_close(int fd)
+{
+	return syscall(SYS_close, fd);
+}
+
+static ssize_t __sys_read(socket_t fd, void *buf, size_t count)
+{
+	return syscall(SYS_read, fd, buf, count);
+}
+
+static ssize_t __sys_readv(socket_t fd, const struct iovec *iov, int iovcnt)
+{
+	return syscall(SYS_readv, fd, iov, iovcnt);
+}
+
+static ssize_t __sys_recv(socket_t fd, void *buf, size_t len, int flags)
+{
+#ifdef SYS_recv
+	return syscall(SYS_recv, fd, buf, len, flags);
+#else
+	return -1;
+#endif
+}
+
+static ssize_t __sys_recvfrom(int fd, void *buf, size_t len, int flags,
+	struct sockaddr *src_addr, socklen_t *addrlen)
+{
+#ifdef SYS_recvfrom
+	return syscall(SYS_recvfrom, fd, buf, len, flags, src_addr, addrlen);
+#else
+	return -1;
+#endif
+}
+
+static ssize_t __sys_recvmsg(int fd, struct msghdr *msg, int flags)
+{
+	return syscall(SYS_recvmsg, fd, msg, flags);
+}
+
+static ssize_t __sys_write(int fd, const void *buf, size_t count)
+{
+	return syscall(SYS_write, fd, buf, count);
+}
+
+static ssize_t __sys_writev(int fd, const struct iovec *iov, int iovcnt)
+{
+	return syscall(SYS_writev, fd, iov, iovcnt);
+}
+
+static ssize_t __sys_send(int fd, const void *buf, size_t len, int flags)
+{
+#ifdef SYS_send
+	return syscall(SYS_send, fd, buf, len, flags);
+#else
+	return -1;
+#endif
+}
+
+static ssize_t __sys_sendto(int fd, const void *buf, size_t len, int flags,
+	const struct sockaddr *dest_addr, socklen_t addrlen)
+{
+	return syscall(SYS_sendto, fd, buf, len, flags, dest_addr, addrlen);
+}
+
+static ssize_t __sys_sendmsg(int fd, const struct msghdr *msg, int flags)
+{
+	return syscall(SYS_sendmsg, fd, msg, flags);
+}
+
+# ifdef  __USE_LARGEFILE64
+static ssize_t __sys_sendfile64(int ofd, int ifd, off64_t *offset, size_t count)
+{
+#ifdef SYS_sendfile64
+	return syscall(SYS_sendfile64, ofd, ifd, offset, count);
+#else
+	return -1;
+#endif
+}
+# endif
+
 #endif
 
 static void hook_api(void)
@@ -61,7 +166,7 @@ static void hook_api(void)
 	__sys_recvfrom = (recvfrom_fn) recvfrom;
 	__sys_send     = (send_fn) send;
 	__sys_sendto   = (sendto_fn) sendto;
-#else
+#elif !defined(USE_SYSCALL)
 	__sys_sleep      = (sleep_fn) dlsym(RTLD_NEXT, "sleep");
 	assert(__sys_sleep);
 
@@ -118,9 +223,11 @@ static void hook_init(void)
 unsigned int sleep(unsigned int seconds)
 {
 	if (!var_hook_sys_api) {
+#ifndef USE_SYSCALL
 		if (__sys_sleep == NULL) {
 			hook_init();
 		}
+#endif
 
 		return __sys_sleep(seconds);
 	}
@@ -146,9 +253,11 @@ int acl_fiber_close(socket_t fd)
 		return -1;
 	}
 
+#ifndef USE_SYSCALL
 	if (__sys_close == NULL) {
 		hook_init();
 	}
+#endif
 
 	if (!var_hook_sys_api) {
 		return __sys_close(fd);
@@ -197,9 +306,11 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		return -1;
 	}
 
+#ifndef	USE_SYSCALL
 	if (__sys_read == NULL) {
 		hook_init();
 	}
+#endif
 
 	if (!var_hook_sys_api) {
 		return __sys_read(fd, buf, count);
@@ -247,9 +358,11 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 		return -1;
 	}
 
+#ifndef USE_SYSCALL
 	if (__sys_readv == NULL) {
 		hook_init();
 	}
+#endif
 
 	if (!var_hook_sys_api) {
 		return __sys_readv(fd, iov, iovcnt);
@@ -329,9 +442,11 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 		return -1;
 	}
 
+#ifndef USE_SYSCALL
 	if (__sys_recv == NULL) {
 		hook_init();
 	}
+#endif
 
 	if (!var_hook_sys_api) {
 		return __sys_recv(sockfd, buf, len, flags);
@@ -389,9 +504,11 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 		return -1;
 	}
 
+#ifndef USE_SYSCALL
 	if (__sys_recvfrom == NULL) {
 		hook_init();
 	}
+#endif
 
 	if (!var_hook_sys_api) {
 		return __sys_recvfrom(sockfd, buf, len, flags,
@@ -446,9 +563,11 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 		return -1;
 	}
 
+#ifdef USE_SYSCALL
 	if (__sys_recvmsg == NULL) {
 		hook_init();
 	}
+#endif
 
 	if (!var_hook_sys_api) {
 		return __sys_recvmsg(sockfd, msg, flags);
@@ -493,9 +612,11 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 #ifdef SYS_UNIX
 ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 {
+#ifndef USE_SYSCALL
 	if (__sys_write == NULL) {
 		hook_init();
 	}
+#endif
 
 	while (1) {
 		ssize_t n = __sys_write(fd, buf, count);
@@ -531,9 +652,11 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 
 ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 {
+#ifndef USE_SYSCALL
 	if (__sys_writev == NULL) {
 		hook_init();
 	}
+#endif
 
 	while (1) {
 		int n = (int) __sys_writev(fd, iov, iovcnt);
@@ -576,9 +699,11 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 	size_t len, int flags)
 #endif
 {
+#ifndef USE_SYSCALL
 	if (__sys_send == NULL) {
 		hook_init();
 	}
+#endif
 
 	while (1) {
 		int n = (int) __sys_send(sockfd, buf, len, flags);
@@ -620,9 +745,11 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 	int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
 #endif
 {
+#ifndef USE_SYSCALL
 	if (__sys_sendto == NULL) {
 		hook_init();
 	}
+#endif
 
 	while (1) {
 		int n = (int) __sys_sendto(sockfd, buf, len, flags,
@@ -660,9 +787,11 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 #ifdef SYS_UNIX
 ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 {
+#ifndef USE_SYSCALL
 	if (__sys_sendmsg == NULL) {
 		hook_init();
 	}
+#endif
 
 	while (1) {
 		ssize_t n = __sys_sendmsg(sockfd, msg, flags);

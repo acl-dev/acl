@@ -89,4 +89,10 @@ typedef union {
 	struct sockaddr sa;
 } SOCK_ADDR;
 
+/*
+#ifndef USE_SYSCALL
+# define USE_SYSCALL
+#endif
+*/
+
 #endif
