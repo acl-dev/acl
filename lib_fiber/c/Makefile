@@ -21,7 +21,7 @@ CFLAGS = -c -g -W \
 -DUSE_JMP \
 -Wmissing-prototypes \
 -Wcast-qual \
-#-DUSE_VALGRIND \
+-DUSE_VALGRIND \
 #-I/usr/local/include
 #-DUSE_PRINTF_MACRO
 #-Wno-clobbered

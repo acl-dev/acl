@@ -132,7 +132,7 @@ void msg_fatal(const char *fmt,...)
 	}
 
 	va_end (ap);
-	assert(0);
+	abort();
 }
 
 #endif  /* USE_PRINTF_MACRO */

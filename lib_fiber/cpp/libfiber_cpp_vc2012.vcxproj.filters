@@ -54,6 +54,9 @@
     <ClInclude Include="include\fiber\master_fiber.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\fiber\tcp_keeper.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp">
@@ -81,6 +84,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\master_fiber.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tcp_keeper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

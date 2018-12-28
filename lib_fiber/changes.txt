@@ -1,4 +1,7 @@
 
+101) 2018.12.28
+101.1) feature: libfiber_cpp 模块新 tcp_keeper 类
+
 100) 2018.12.27
 100.1) bugfix: acl_fiber_cond.c 中 acl_fiber_cond_timedwait 和 acl_fiber_cond_wait
 在释放 fbase 对象时，必须在调用 acl_fiber_event_wait 之前，否则会引起句柄被
