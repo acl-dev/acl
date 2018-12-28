@@ -150,16 +150,7 @@ public:
 	 * 重置统计计数器
 	 * @param inter {int} 统计的时间间隔
 	 */
-	void reset_statistics(int inter)
-	{
-		time_t now = time(NULL);
-		lock_.lock();
-		if (now - last_ >= inter) {
-			last_ = now;
-			current_used_ = 0;
-		}
-		lock_.unlock();
-	}
+	void reset_statistics(int inter);
 
 	/**
 	 * 获取该连接池总共被使用的次数

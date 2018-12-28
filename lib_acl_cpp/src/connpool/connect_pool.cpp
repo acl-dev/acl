@@ -73,6 +73,17 @@ connect_pool& connect_pool::set_check_inter(int n)
 	return *this;
 }
 
+void connect_pool::reset_statistics(int inter)
+{
+	time_t now = time(NULL);
+	lock_.lock();
+	if (now - last_ >= inter) {
+		last_ = now;
+		current_used_ = 0;
+	}
+	lock_.unlock();
+}
+
 bool connect_pool::aliving()
 {
 	// XXX，虽然此处未加锁，但也应该不会有问题，因为下面的 peek() 过程会再次
