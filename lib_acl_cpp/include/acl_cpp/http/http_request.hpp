@@ -23,17 +23,21 @@ public:
 	/**
 	 * 构造函数：通过该构造函数传入的 socket_stream 流对象并
 	 * 不会被关闭，需要调用者自己关闭
-	 * @param client {socket_stream*} 数据连接流，非空，
-	 *  在本类对象被销毁时该流对象并不会被销毁，所以用户需自行释放
+	 * @param client {socket_stream*} HTTP 连接流对象，可以是请求端的流，
+	 *  也可以是响应端的流；当本对象被销毁时，client 对象是否会被自动销毁，
+	 *  取决于参数 stream_fixed 的值
 	 * @param conn_timeout {int} 如果传入的流关闭，则内部会
 	 *  自动重试，此时需要该值表示连接服务器的超时时间(秒)，
 	 *  至于重连流的 IO 读写超时时间是从 输入的流中继承的
 	 * @param unzip {bool} 是否对服务器响应的数据自动进行解压
 	 * 注：当该类实例被多次使用时，用户应该在每次调用前调用
 	 * request_header::http_header::reset()
+	 * @param stream_fixed {bool} 当该值为 true 时，则当 http_client 对象
+	 *  被销毁时，传入的 client 流对象不会被销毁，需应用自行销毁；如果该
+	 *  值为 false 时，则当本对象销毁时，client 流对象也将被销毁
 	 */
 	http_request(socket_stream* client, int conn_timeout = 60,
-		bool unzip = true);
+		bool unzip = true, bool stream_fixed = true);
 
 	/**
 	 * 构造函数：该构造函数内部创建的 socket_stream 流会自行关闭

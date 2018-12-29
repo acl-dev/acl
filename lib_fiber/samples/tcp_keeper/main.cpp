@@ -9,10 +9,10 @@ static int __loop = 1;
 class fiber_client : public acl::fiber
 {
 public:
-	fiber_client(int& counter, acl::tcp_keeper& producer,
+	fiber_client(int& counter, acl::tcp_keeper& keeper,
 			const char* addr, int max)
 	: counter_(counter)
-	, producer_(producer)
+	, keeper_(keeper)
 	, addr_(addr)
 	, max_(max) {}
 
@@ -25,7 +25,7 @@ private:
 		printf("fiber-%d running\r\n", acl::fiber::self());
 
 		for (int i = 0; i < max_; i++) {
-			acl::socket_stream* conn = producer_.peek(addr_);
+			acl::socket_stream* conn = keeper_.peek(addr_);
 			if (conn == NULL) {
 				printf("peek connection error=%s\r\n",
 					acl::last_serror());
@@ -70,7 +70,7 @@ private:
 
 private:
 	int& counter_;
-	acl::tcp_keeper& producer_;
+	acl::tcp_keeper& keeper_;
 	acl::string addr_;
 	int max_;
 };
@@ -121,6 +121,11 @@ int main(int argc, char *argv[])
 
 	acl::fiber::stdout_open(true);
 	acl::tcp_keeper keeper;
+	keeper.set_conn_timeout(10)
+		.set_rw_timeout(10)
+		.set_conn_max(10)
+		.set_conn_ttl(10)
+		.set_pool_ttl(10);
 	keeper.start();
 
 	int counter = 0;

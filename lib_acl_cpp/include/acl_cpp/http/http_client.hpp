@@ -35,15 +35,18 @@ public:
 	 * 当该 http_client 对象销毁时，传入的 client 流对象并不会被销毁，需
 	 * 要应用自己销毁，否则会造成资源泄露
 	 * @param client {socket_stream*} HTTP 连接流对象，可以是请求端的流，
-	 *  也可以是响应端的流；在本类对象被销毁时该流对象并不会被销毁，所以
-	 *  用户需自行释放之
+	 *  也可以是响应端的流；当本对象被销毁时，client 对象是否会被自动销毁，
+	 *  取决于参数 stream_fixed 的值
 	 * @param is_request {bool} 是请求端还是响应端的客户端流
 	 * @param unzip {bool} 当用来读取服务器的响应数据时，如果服务器返回的
 	 *  数据体为压缩数据时，该参数控制在调用下面的函数时是否自动解压缩:
 	 *  read_body(string&, bool, int*)
+	 * @param stream_fixed {bool} 当该值为 true 时，则当 http_client 对象
+	 *  被销毁时，传入的 client 流对象不会被销毁，需应用自行销毁；如果该
+	 *  值为 false 时，则当本对象销毁时，client 流对象也将被销毁
 	 */
 	http_client(socket_stream* client, bool is_request = false,
-		bool unzip = true);
+		bool unzip = true, bool stream_fixed = true);
 
 	virtual ~http_client(void);
 

@@ -1,5 +1,9 @@
 修改历史列表：
 
+559) 2018.12.29
+559.1) feature: http_request/http_client 类以 socket_stream 为参数的构造方法中，
+增加控制参数 stream_fixed，决定当对象销毁时是否自动将 socket_stream 对象一起销毁
+
 558) 2018.12.25
 558.1) workaround: tbox::push 增加 bool 类型的返回值
 

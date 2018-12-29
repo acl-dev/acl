@@ -13,6 +13,25 @@
 
 namespace acl {
 
+class tcp_keeper_config
+{
+public:
+	tcp_keeper_config(void)
+	: conn_timeo(10)
+	, rw_timeo(10)
+	, conn_max(10)
+	, conn_ttl(10)
+	, pool_ttl(20) {}
+
+	~tcp_keeper_config(void) {}
+
+	int conn_timeo;
+	int rw_timeo;
+	int conn_max;
+	int conn_ttl;
+	int pool_ttl;
+};
+
 class task_req
 {
 public:
@@ -45,23 +64,18 @@ private:
 	fiber_tbox<socket_stream> tbox_;
 };
 
-
 //////////////////////////////////////////////////////////////////////////////
 
 class fiber_conn : public fiber
 {
 public:
-	fiber_conn(void)
+	fiber_conn(const tcp_keeper_config& config, const char* addr)
 	: conn_(NULL)
-	, conn_timeout_(10)
-	, rw_timeout_(10) {}
+	, last_ctime_(0)
+	, config_(config)
+	, addr_(addr) {}
 
 	~fiber_conn(void) { delete conn_; }
-
-	void set_addr(const char* addr)
-	{
-		addr_ = addr;
-	}
 
 	void add_task(task_req* task)
 	{
@@ -79,17 +93,26 @@ public:
 		(void) tbox_ctl_.pop();
 	}
 
+	bool connected(void) const
+	{
+		return conn_ ? true : false;
+	}
+
 private:
 	// @override
 	void run(void)
 	{
+		int timeo = config_.conn_ttl > 0 ? config_.conn_ttl * 1000 : -1;
+
 		while (true) {
 			bool found;
-			task_req* req = tbox_.pop(-1, &found);
+			task_req* req = tbox_.pop(timeo, &found);
 			if (req == NULL) {
 				if (found) {
 					break;
 				}
+
+				check_idle();
 				continue;
 			}
 
@@ -116,7 +139,21 @@ private:
 	void connect_one(void)
 	{
 		conn_ = new socket_stream;
-		if (!conn_->open(addr_, conn_timeout_, rw_timeout_)) {
+		if (conn_->open(addr_, config_.conn_timeo, config_.rw_timeo)) {
+			last_ctime_ = time(NULL);
+		} else {
+			delete conn_;
+			conn_ = NULL;
+		}
+	}
+
+	void check_idle(void)
+	{
+		if (config_.conn_ttl <= 0) {
+			return;
+		}
+		time_t now = time(NULL);
+		if ((now - last_ctime_) >= config_.conn_ttl) {
 			delete conn_;
 			conn_ = NULL;
 		}
@@ -128,12 +165,13 @@ private:
 	}
 
 private:
-	string                 addr_;
-	socket_stream*         conn_;
-	int                    conn_timeout_;
-	int                    rw_timeout_;
 	fiber_tbox<task_req>   tbox_;
 	fiber_tbox<fiber_conn> tbox_ctl_;
+	socket_stream*         conn_;
+	time_t                 last_ctime_;
+
+	const tcp_keeper_config& config_;
+	string addr_;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -141,7 +179,12 @@ private:
 class fiber_pool : public fiber
 {
 public:
-	fiber_pool(const char* addr) : addr_(addr), max_(10) {}
+	fiber_pool(const tcp_keeper_config& config, const char* addr)
+	: last_peek_(0)
+	, config_(config)
+	, addr_(addr)
+	{}
+
 	~fiber_pool(void) {}
 
 	void add_task(task_req* task)
@@ -160,28 +203,49 @@ public:
 		(void) tbox_ctl_.pop();
 	}
 
+	bool empty(void) const
+	{
+		for (std::vector<fiber_conn*>::const_iterator cit =
+			fibers_.begin(); cit != fibers_.end(); ++cit) {
+
+			if ((*cit)->connected()) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	time_t last_peek(void) const
+	{
+		return last_peek_;
+	}
+
 private:
 	// @override
 	void run(void)
 	{
-		for (size_t i = 0; i < max_; i++) {
-			fiber_conn* fb = new fiber_conn;
-			fb->set_addr(addr_);
+		for (int i = 0; i < config_.conn_max; i++) {
+			fiber_conn* fb = new fiber_conn(config_, addr_);
 			fibers_.push_back(fb);
 			fb->start();
 		}
 
 		std::vector<fiber_conn*>::iterator it = fibers_.begin();
 
+		int timeo = config_.conn_ttl > 0 ? config_.conn_ttl * 1000 : -1;
+
 		while (true) {
 			bool found;
-			task_req* task = tbox_.pop(-1, &found);
+			task_req* task = tbox_.pop(timeo, &found);
 			if (task == NULL) {
 				if (found) {
 					break;
 				}
 				continue;
 			}
+
+			last_peek_ = time(NULL);
 
 			(*it)->add_task(task);
 			if (++it == fibers_.end()) {
@@ -207,21 +271,86 @@ private:
 	fiber_tbox<task_req>     tbox_;
 	fiber_tbox<fiber_pool>   tbox_ctl_;
 	std::vector<fiber_conn*> fibers_;
-	string                   addr_;
-	size_t                   max_;
+	time_t last_peek_;
+
+	const tcp_keeper_config& config_;
+	string addr_;
 };
 
 //////////////////////////////////////////////////////////////////////////////
 
+class fiber_pool_killer : public fiber
+{
+public:
+	fiber_pool_killer(fiber_pool* pool)
+	: pool_(pool)
+	{
+	}
+
+private:
+	~fiber_pool_killer(void) {}
+
+	// @override
+	void run(void)
+	{
+		pool_->stop();
+		pool_->join();
+		delete pool_;
+		delete this;
+	}
+
+private:
+	fiber_pool* pool_;
+};
+
 class fiber_waiter : public fiber
 {
 public:
-	fiber_waiter(void) {}
-	~fiber_waiter(void) {}
+	fiber_waiter(void)
+	: last_check_(0)
+	{
+		config_ = new tcp_keeper_config;
+	}
+
+	~fiber_waiter(void)
+	{
+		delete config_;
+	}
 
 	void add_task(task_req* task)
 	{
 		tbox_.push(task);
+	}
+
+public:
+	fiber_waiter& set_conn_timeout(int n)
+	{
+		config_->conn_timeo = n;
+		return *this;
+	}
+
+	fiber_waiter& set_rw_timeout(int n)
+	{
+		config_->rw_timeo = n;
+		return *this;
+	}
+
+	fiber_waiter& set_conn_max(int n)
+	{
+		config_->conn_max = n;
+		return *this;
+	}
+
+	fiber_waiter& set_conn_ttl(int ttl)
+	{
+		config_->conn_ttl = ttl;
+		return *this;
+	}
+
+	fiber_waiter& set_pool_ttl(int ttl)
+	{
+		config_->pool_ttl = ttl;
+		return *this;
 	}
 
 public:
@@ -239,23 +368,30 @@ protected:
 	// @override
 	void run(void)
 	{
+		int timeo = config_->pool_ttl > 0 ? config_->pool_ttl * 1000 : -1;
+
 		while (true) {
 			bool found;
-			task_req* task = tbox_.pop(-1, &found);
+			task_req* task = tbox_.pop(timeo, &found);
+
+			check_idle();
+
 			if (task == NULL) {
 				if (found) {
 					break;
 				}
+
 				continue;
 			}
 
 			fiber_pool* pool;
 
-			std::map<string, fiber_pool*>::iterator it =
-				manager_.find(task->get_addr());
+			const char* addr = task->get_addr();
+			std::map<string, fiber_pool*>::iterator
+				it = manager_.find(addr);
 			if (it == manager_.end()) {
-				pool = new fiber_pool(task->get_addr());
-				manager_[task->get_addr()] = pool;
+				pool = new fiber_pool(*config_, addr);
+				manager_[addr] = pool;
 				pool->start();
 			} else {
 				pool = it->second;
@@ -281,9 +417,39 @@ protected:
 	}
 
 private:
+	void check_idle(void)
+	{
+		if (config_->pool_ttl <= 0) {
+			return;
+		}
+
+		time_t now = time(NULL);
+		if (now - last_check_ <= 10) {
+			return;
+		}
+
+		std::map<string, fiber_pool*>::iterator it, next;
+		it = manager_.begin();
+		for (next = it; it != manager_.end(); it = next) {
+			++next;
+			time_t n = (now - it->second->last_peek());
+			if (n >= config_->pool_ttl && it->second->empty()) {
+				fiber* fb = new fiber_pool_killer(it->second);
+				fb->start();
+
+				manager_.erase(it);
+			}
+		}
+
+		last_check_ = time(NULL);
+	}
+
+private:
 	fiber_tbox<task_req>          tbox_;
 	fiber_tbox<fiber_waiter>      tbox_ctl_;
 	std::map<string, fiber_pool*> manager_;
+	tcp_keeper_config*            config_;
+	time_t last_check_;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -296,6 +462,37 @@ tcp_keeper::tcp_keeper(void)
 tcp_keeper::~tcp_keeper(void)
 {
 	delete waiter_;
+}
+
+tcp_keeper& tcp_keeper::set_conn_timeout(int n)
+{
+	waiter_->set_conn_timeout(n);
+	return *this;
+}
+
+tcp_keeper& tcp_keeper::set_rw_timeout(int n)
+{
+	waiter_->set_rw_timeout(n);
+	return *this;
+}
+
+tcp_keeper& tcp_keeper::set_conn_max(int n)
+{
+	assert (n >= 0);
+	waiter_->set_conn_max(n);
+	return *this;
+}
+
+tcp_keeper& tcp_keeper::set_conn_ttl(int ttl_ms)
+{
+	waiter_->set_conn_ttl(ttl_ms);
+	return *this;
+}
+
+tcp_keeper& tcp_keeper::set_pool_ttl(int ttl_ms)
+{
+	waiter_->set_pool_ttl(ttl_ms);
+	return *this;
 }
 
 void* tcp_keeper::run(void)

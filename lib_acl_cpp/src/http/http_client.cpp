@@ -34,9 +34,9 @@ http_client::http_client(void)
 }
 
 http_client::http_client(socket_stream* client, bool is_request /* = false */,
-	bool unzip /* = true */)
+	bool unzip /* = true */, bool stream_fixed /* = true */)
 : stream_(client)
-, stream_fixed_(true)
+, stream_fixed_(stream_fixed)
 , hdr_res_(NULL)
 , res_(NULL)
 , hdr_req_(NULL)
