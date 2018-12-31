@@ -506,7 +506,7 @@ void tcp_keeper::stop(void)
 {
 	waiter_->stop();
 	waiter_->join();
-	fiber::schedule_stop();
+	//fiber::schedule_stop();
 	this->wait();
 }
 
