@@ -133,7 +133,7 @@ fi
 
 %changelog
 
-* Wed Jan 02 2011 zhengshuxin@qiyi.com 3.4.1-41-20190102.11
+* Wed Jan 02 2019 zhengshuxin@qiyi.com 3.4.1-41-20190102.11
 - fiber_tbox.hpp/tbox.hpp/mbox.hpp: set free_obj's default value to true
 
 * Thu Dec 27 2018 zhengshuxin@qiyi.com 3.4.1-40-20181227.11
