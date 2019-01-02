@@ -45,6 +45,36 @@ static __thread int __scheduled = 0;
 static __thread int __schedule_auto = 0;
 __thread int var_hook_sys_api   = 0;
 
+#ifdef	SYS_UNIX
+static FIBER_ALLOC_FN  __fiber_alloc_fn  = fiber_unix_alloc;
+static FIBER_ORIGIN_FN __fiber_origin_fn = fiber_unix_origin;
+#elif	defined(SYS_WIN)
+static FIBER_ALLOC_FN  __fiber_alloc_fn  = fiber_win_alloc;
+static FIBER_ORIGIN_FN __fiber_origin_fn = fiber_win_ogigin;
+#else
+static ACL_FIBER *fiber_dummy_alloc(void(*start_fn)(ACL_FIBER*) fiber_unused,
+	size_t size fiber_unused)
+{
+	msg_fatal("unknown OS");
+	return NULL;
+}
+
+static ACL_FIBER *fiber_dummy_origin(void)
+{
+	msg_fatal("unknown OS");
+	return NULL;
+}
+
+static FIBER_ALLOC_FN  __fiber_alloc_fn  = fiber_dummy_alloc;
+static FIBER_ORIGIN_FN __fiber_origin_fn = fiber_dummy_origin;
+#endif
+
+void acl_fiber_register(FIBER_ALLOC_FN alloc_fn, FIBER_ORIGIN_FN origin_fn)
+{
+	__fiber_alloc_fn  = alloc_fn;
+	__fiber_origin_fn = origin_fn;
+}
+
 static pthread_key_t __fiber_key;
 
 void acl_fiber_hook_api(int onoff)
@@ -127,11 +157,7 @@ static void fiber_check(void)
 
 	__thread_fiber = (THREAD *) calloc(1, sizeof(THREAD));
 
-#ifdef SYS_UNIX
-	__thread_fiber->original = fiber_unix_origin();
-#elif defined(SYS_WIN)
-	__thread_fiber->original = fiber_win_origin();
-#endif
+	__thread_fiber->original = __fiber_origin_fn();
 	__thread_fiber->fibers   = NULL;
 	__thread_fiber->size     = 0;
 	__thread_fiber->slot     = 0;
@@ -573,6 +599,13 @@ static void fiber_start(ACL_FIBER *fiber)
 	fiber_exit(0);
 }
 
+ACL_FIBER *acl_fiber_alloc(size_t size, void **pptr)
+{
+	ACL_FIBER *fiber = (ACL_FIBER *) calloc(1, sizeof(ACL_FIBER) + size);
+	*pptr = ((char*) fiber) + sizeof(ACL_FIBER);
+	return fiber;
+}
+
 static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	void *arg, size_t size)
 {
@@ -586,13 +619,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	/* try to reuse the fiber memory in dead queue */
 	head = ring_pop_head(&__thread_fiber->dead);
 	if (head == NULL) {
-#ifdef SYS_UNIX
-		fiber = fiber_unix_alloc(fiber_start, size);
-#elif defined(SYS_WIN)
-		fiber = fiber_win_alloc(fiber_start, size);
-#else
-#error "unknown OS"
-#endif
+		fiber = __fiber_alloc_fn(fiber_start, size);
 		fbase_init(&fiber->base, FBASE_F_FIBER);
 	} else {
 		fiber = APPL(head, ACL_FIBER, me);

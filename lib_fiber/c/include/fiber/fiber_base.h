@@ -1,11 +1,20 @@
 #ifndef FIBER_BASE_INCLUDE_H
 #define FIBER_BASE_INCLUDE_H
 
+#include <stdarg.h>
 #include "fiber_define.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef ACL_FIBER *((*FIBER_ALLOC_FN)(void (*)(ACL_FIBER *), size_t));
+typedef ACL_FIBER *((*FIBER_ORIGIN_FN)(void));
+
+FIBER_API void acl_fiber_register(FIBER_ALLOC_FN alloc_fn,
+	FIBER_ORIGIN_FN origin_fn);
+
+FIBER_API ACL_FIBER *acl_fiber_alloc(size_t size, void **pptr);
 
 /**
  * set flag if the system API should be hooked, default value is 1 internal

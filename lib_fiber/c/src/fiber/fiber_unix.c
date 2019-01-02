@@ -234,7 +234,7 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 		2, carg.i[0], carg.i[1]);
 }
 
-ACL_FIBER *fiber_unix_alloc(void(*start_fn)(ACL_FIBER *), size_t size)
+ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *), size_t size)
 {
 	FIBER_UNIX *fb = (FIBER_UNIX *) calloc(1, sizeof(*fb));
 
@@ -263,6 +263,7 @@ ACL_FIBER *fiber_unix_origin(void)
 #endif
 	fb->fiber.free_fn = fiber_unix_free;
 	fb->fiber.swap_fn = (void (*)(ACL_FIBER*, ACL_FIBER*)) fiber_unix_swap;
+
 	return &fb->fiber;
 }
 
