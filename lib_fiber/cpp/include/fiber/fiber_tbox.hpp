@@ -50,7 +50,7 @@ public:
 	 * @param free_obj {bool} 当 fiber_tbox 销毁时，是否自动检查并释放
 	 *  未被消费的动态对象
 	 */
-	fiber_tbox(bool free_obj = false)
+	fiber_tbox(bool free_obj = true)
 	: size_(0), free_obj_(free_obj) {}
 
 	~fiber_tbox(void)

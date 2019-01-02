@@ -52,7 +52,13 @@ template<typename T>
 class mbox : public noncopyable
 {
 public:
-	mbox(void)
+	/**
+	 * 构造方法
+	 * @param free_obj {bool} 当 tbox 销毁时，是否自动检查并释放
+	 *  未被消费的动态对象
+	 */
+	mbox(bool free_obj = true)
+	: free_obj_(free_obj)
 	{
 		mbox_ = mbox_create();
 		assert(mbox_);
@@ -60,7 +66,7 @@ public:
 
 	~mbox(void)
 	{
-		mbox_free(mbox_, mbox_free_fn);
+		mbox_free(mbox_, free_obj_ ? mbox_free_fn : NULL);
 	}
 
 	/**
@@ -106,6 +112,7 @@ public:
 
 private:
 	void* mbox_;
+	bool  free_obj_;
 
 	static void mbox_free_fn(void* o)
 	{

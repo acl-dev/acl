@@ -48,7 +48,7 @@ public:
 	 * @param free_obj {bool} 当 tbox 销毁时，是否自动检查并释放
 	 *  未被消费的动态对象
 	 */
-	tbox(bool free_obj = false)
+	tbox(bool free_obj = true)
 	: size_(0), free_obj_(free_obj), cond_(&lock_) {}
 
 	~tbox(void)

@@ -1,4 +1,8 @@
 
+102) 2019.1.2
+102.1) workaround: fiber_tbox.hpp 将 free_obj 缺省值设为 true，以便与 mbox.hpp
+和 tbox.hpp 中的缺省参数保持一致
+
 101) 2018.12.28
 101.1) feature: libfiber_cpp 模块新 tcp_keeper 类
 
