@@ -50,7 +50,7 @@ static FIBER_ALLOC_FN  __fiber_alloc_fn  = fiber_unix_alloc;
 static FIBER_ORIGIN_FN __fiber_origin_fn = fiber_unix_origin;
 #elif	defined(SYS_WIN)
 static FIBER_ALLOC_FN  __fiber_alloc_fn  = fiber_win_alloc;
-static FIBER_ORIGIN_FN __fiber_origin_fn = fiber_win_ogigin;
+static FIBER_ORIGIN_FN __fiber_origin_fn = fiber_win_origin;
 #else
 static ACL_FIBER *fiber_dummy_alloc(void(*start_fn)(ACL_FIBER*) fiber_unused,
 	size_t size fiber_unused)

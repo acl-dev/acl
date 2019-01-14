@@ -8,4 +8,6 @@
 #include "fiber_tbox.hpp"
 #include "fiber_sem.hpp"
 #include "channel.hpp"
+#if !defined(_WIN32) && !defined(_WIN64)
 #include "tcp_keeper.hpp"
+#endif

@@ -990,7 +990,6 @@ void acl_fiber_server_main(int argc, char *argv[],
 #endif
 	optind = 0;
 	optarg = 0;
-
 #endif
 
 	while ((c = getopt(__argc, __argv, "Hc:n:s:t:uf:L:")) > 0) {
@@ -1042,10 +1041,9 @@ void acl_fiber_server_main(int argc, char *argv[],
 #if !defined(_WIN32) && !defined(_WIN64)
 	if (addrs && *addrs) {
 		__daemon_mode = 0;
-	} else {
+	} else
 #endif
 		__daemon_mode = 1;
-	}
 
 	/*******************************************************************/
 

@@ -317,9 +317,8 @@
     <ClInclude Include="include\fiber\fiber_lock.hpp" />
     <ClInclude Include="include\fiber\fiber_sem.hpp" />
     <ClInclude Include="include\fiber\fiber_tbox.hpp" />
-    <ClInclude Include="include\fiber\lib_fiber.hpp" />
+    <ClInclude Include="include\fiber\libfiber.hpp" />
     <ClInclude Include="include\fiber\master_fiber.hpp" />
-    <ClInclude Include="include\fiber\tcp_keeper.hpp" />
     <ClInclude Include="src\fiber_server.hpp" />
     <ClInclude Include="src\stdafx.hpp" />
   </ItemGroup>
@@ -332,7 +331,6 @@
     <ClCompile Include="src\fiber_sem.cpp" />
     <ClCompile Include="src\fiber_server.cpp" />
     <ClCompile Include="src\master_fiber.cpp" />
-    <ClCompile Include="src\tcp_keeper.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
