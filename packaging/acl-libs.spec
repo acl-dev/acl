@@ -1,4 +1,4 @@
-%define release_id 41
+%define release_id 42
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,10 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Mon Jan 14 2019 zhengshuxin@qiyi.com 3.4.1-42-20190114.14
+- http_request::check_range: compatible some situation for the returned range value
+- fiber/tcp_keeper: more improvement
 
 * Wed Jan 02 2019 zhengshuxin@qiyi.com 3.4.1-41-20190102.11
 - fiber_tbox.hpp/tbox.hpp/mbox.hpp: set free_obj's default value to true
