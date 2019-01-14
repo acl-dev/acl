@@ -1,5 +1,9 @@
 修改历史列表：
 
+561) 2019.1.14
+561.1) compatible: http_request::check_range() 在校验返回 range 数据字段时，
+需要兼容返回值比预值小的情况
+
 560) 2019.1.2
 560.1) workaround: tbox.hpp, mbox.hpp 统一了 free_obj 缺省参数值
 

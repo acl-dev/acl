@@ -446,9 +446,10 @@ void http_request::check_range()
 			range_from_, range_from);
 		RESET_RANGE();
 	}
-	else if (range_to >= range_from && range_to_ != range_to)
+	//else if (range_to >= range_from && range_to_ != range_to)
+	else if (range_to >= range_from && range_to_ > range_to)
 	{
-		logger_error("range_to(%lld) != %lld", range_to_, range_to);
+		logger_error("range_to(%lld) > %lld", range_to_, range_to);
 		RESET_RANGE();
 	}
 
