@@ -193,11 +193,12 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		}
 
 		if (timer == NULL) {
-			if (ev->fdcount > 0) {
+			if (ev->fdcount > 0 || ev->waiter > 0) {
 				continue;
 			}
-			msg_info("%s(%d), tid=%lu: fdcount=0", __FUNCTION__,
-				__LINE__, __pthread_self());
+			msg_info("%s(%d), tid=%lu: fdcount=0, waiter=%u",
+				__FUNCTION__, __LINE__, __pthread_self(),
+				ev->waiter);
 			break;
 		}
 

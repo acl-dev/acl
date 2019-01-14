@@ -21,6 +21,7 @@ CFLAGS = -c -g -W \
 -Wformat \
 -Winvalid-pch \
 -DACL_PREPARE_COMPILE \
+-DUSE_SBOX
 #-DACL_USE_CPP11 -std=c++11
 #-DUSE_DYNAMIC
 # -Wcast-align
@@ -123,7 +124,8 @@ CFLAGS += -I./src -I../c/include  -I./include -I../../lib_acl/include -I../../li
 
 #Project's objs
 
-OBJS_DST = $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/*.cpp)))
+SRC = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
+OBJ = $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC)))
 
 ###########################################################
 .PHONY = static shared clean
@@ -152,34 +154,34 @@ CREATE_DEF = @(echo 'creating $@'; rm -f $@; \
 sample: static
 	@(cd samples; make)
 
-static: $(OBJS_DST)
+static: $(OBJ)
 	@echo 'creating $(LIB_PATH_DST)/$(STATIC_LIBNAME)'
-	@$(AR) $(ARFL) $(LIB_PATH_DST)/$(STATIC_LIBNAME) $(OBJS_DST)
+	@$(AR) $(ARFL) $(LIB_PATH_DST)/$(STATIC_LIBNAME) $(OBJ)
 	@$(RANLIB) $(LIB_PATH_DST)/$(STATIC_LIBNAME)
 	@(cd ${LIB_PATH_DST}; rm -f ${STATIC_OLD_LIBNAME}; \
 		ln -s ${STATIC_LIBNAME} ${STATIC_OLD_LIBNAME})
 	@echo 'create $(LIB_PATH_DST)/$(STATIC_LIBNAME) ok!'
 
-shared: $(OBJS_DST)
+shared: $(OBJ)
 	@echo 'creating $(SHARED_LIBNAME)'
 	@if test -n "$(rpath)" && test "$(UNIXTYPE)" = "LINUX"; then \
 		echo "building for linux"; \
-		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJ) \
 			-L$(rpath) $(shared_ldflags) -Wl,-rpath,$(rpath); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "SUNOS5"; then \
 		echo "building for sunos5"; \
-		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJ) \
 			-R$(rpath) -L$(rpath) $(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "MACOSX"; then \
 		echo "building for Darwin"; \
-		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJ) \
 			-R$(rpath) -L$(rpath) $(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "FREEBSD"; then \
 		echo "building for Darwin"; \
-		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
+		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJ) \
 			-R$(rpath) -L$(rpath) $(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	else \
@@ -189,12 +191,14 @@ shared: $(OBJS_DST)
 # src
 $(OBJ_PATH_DST)/%.o: ./src/%.cpp
 	$(COMPILE_OBJ)
+$(OBJ_PATH_DST)/%.o: ./src/*/%.cpp
+	$(COMPILE_OBJ)
 
 clean cl:
 	rm -f $(LIB_PATH_DST)/${STATIC_LIBNAME}
 	rm -f $(LIB_PATH_DST)/${SHARED_LIBNAME}
 	rm -f $(LIB_PATH_DST)/${STATIC_OLD_LIBNAME}
 	rm -f $(LIB_PATH_DST)/${SHARED_OLD_LIBNAME}
-	rm -f $(OBJS_DST)
+	rm -f $(OBJ)
 
 rebuild rb: clean static

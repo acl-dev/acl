@@ -64,6 +64,7 @@ EVENT *event_create(int size)
 	ev->setsize = size;
 	ev->fdcount = 0;
 	ev->maxfd   = -1;
+	ev->waiter  = 0;
 
 #ifdef HAS_POLL
 	ring_init(&ev->poll_list);

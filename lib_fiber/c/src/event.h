@@ -163,6 +163,7 @@ struct EVENT {
 #ifdef HAS_EPOLL
 	RING   epoll_list;
 #endif
+	unsigned waiter;
 
 	const char *(*name)(void);
 	acl_handle_t (*handle)(EVENT *);

@@ -434,6 +434,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 
 	event_epoll_set(ev, ee, timeout);
 	SET_TIME(begin);
+	ev->waiter++;
 
 	while (1) {
 		ring_prepend(&ev->epoll_list, &ee->me);
@@ -458,6 +459,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 		}
 	}
 
+	ev->waiter--;
 	return ee->nready;
 }
 
