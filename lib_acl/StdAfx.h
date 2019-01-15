@@ -72,5 +72,8 @@ const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
 
 #endif /* ACL_PREPARE_COMPILE */
 
+//#define ACL_DEBUG_MIN 0
+//#define ACL_DEBUG_MAX	30
+
 #endif
 

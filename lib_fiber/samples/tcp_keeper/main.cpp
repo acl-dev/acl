@@ -3,8 +3,10 @@
 #include <stdlib.h>
 
 acl::atomic_long __count;
+acl::atomic_long __hit;
 static int __step = 10000;
 static int __loop = 1;
+static struct timeval __begin;
 
 class fiber_client : public acl::fiber
 {
@@ -19,13 +21,47 @@ public:
 	~fiber_client(void) {}
 
 private:
+	acl::socket_stream* peek(void)
+	{
+#if 1
+		bool reused;
+		//acl_doze(5);
+		acl::socket_stream* conn = keeper_.peek(addr_, &reused);
+		if (reused) {
+			++__hit;
+		}
+		return conn;
+#else
+		acl::socket_stream* conn = new acl::socket_stream;
+		if (conn->open(addr_, 10, 10) == false) {
+			printf("connect %s error %s\r\n",
+				addr_.c_str(), acl::last_serror());
+			delete conn;
+			return NULL;
+		}
+		return conn;
+#endif
+	}
+
 	// @override
 	void run(void)
 	{
 		printf("fiber-%d running\r\n", acl::fiber::self());
 
 		for (int i = 0; i < max_; i++) {
-			acl::socket_stream* conn = keeper_.peek(addr_);
+			struct timeval begin;
+			gettimeofday(&begin, NULL);
+
+			acl::socket_stream* conn = peek();
+
+			struct timeval end;
+			gettimeofday(&end, NULL);
+			double spent = acl::stamp_sub(end, begin);
+			if (spent >= 1000) {
+				printf("%s(%d): spent: %.2f ms\r\n",
+					__FILE__, __LINE__, spent);
+			}
+
 			if (conn == NULL) {
 				printf("peek connection error=%s\r\n",
 					acl::last_serror());
@@ -38,8 +74,24 @@ private:
 		}
 
 		if (--counter_ == 0) {
-			printf("all fiber_client over!\r\n");
+			struct timeval end;
+			gettimeofday(&end, NULL);
+			double spent = acl::stamp_sub(end, __begin);
+			double speed = 1000 * __count / (spent >= 1 ? spent : 1);
+
+			double hit_ratio;
+			if (__count == 0) {
+				hit_ratio = 0.0;
+			} else {
+				hit_ratio = ((double) (__hit.value()) * 100)
+					/ (double) __count.value();
+			}
+			printf("hit=%lld, count=%lld\r\n", __hit.value(), __count.value());
+			printf("all fiber_client over! total count=%lld, "
+				"speed=%.2f, hit=%lld, hit_ratio=%.2f%%\r\n",
+				__count.value(), speed, __hit.value(), hit_ratio);
 		}
+		printf("counter=%d\r\n", counter_);
 	}
 
 	void doit(acl::socket_stream& conn)
@@ -47,6 +99,7 @@ private:
 		const char s[] = "hello world!\r\n";
 		acl::string buf;
 		for (int i = 0; i < __loop; i++) {
+#if 1
 			if (conn.write(s, sizeof(s) - 1) == -1) {
 				printf("write error %s\r\n", acl::last_serror());
 				break;
@@ -56,8 +109,10 @@ private:
 				printf("gets error %s\r\n", acl::last_serror());
 				break;
 			}
+#endif
 
-			if (++__count % __step == 0) {
+			++__count;
+			if (__count % __step == 0) {
 				char tmp[256];
 				snprintf(tmp, sizeof(tmp), "addr=%s, fiber-%d,"
 					" gets line=[%s], n=%lld",
@@ -73,6 +128,22 @@ private:
 	acl::tcp_keeper& keeper_;
 	acl::string addr_;
 	int max_;
+};
+
+class fiber_sleep : public acl::fiber
+{
+public:
+	fiber_sleep(void) {}
+	~fiber_sleep(void) {}
+
+private:
+	// @override
+	void run(void)
+	{
+		while (true) {
+			sleep(1);
+		}
+	}
 };
 
 class thread_client : public acl::thread
@@ -102,6 +173,11 @@ private:
 			fb->start();
 		}
 
+#if 0
+		acl::fiber* fb = new fiber_sleep;
+		fb->start();
+#endif
+
 		acl::fiber::schedule();
 
 		for (std::vector<acl::fiber*>::iterator it = fibers.begin();
@@ -124,8 +200,8 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		" -s server_addrs\r\n"
-		" -n fibers_count[default: 10]\r\n"
-		" -m max_loop[default: 10]\r\n"
+		" -c fibers_count[default: 10]\r\n"
+		" -n max_loop[default: 10]\r\n"
 		" -i step[default: 10000]\r\n"
 		" -l loop for one connection[default: 1]\r\n"
 		, procname);
@@ -149,8 +225,9 @@ int main(int argc, char *argv[])
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
+	acl::fiber::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:n:m:i:l:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:c:n:i:l:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -160,10 +237,10 @@ int main(int argc, char *argv[])
 			append_addrs(addrs_buf, addrs);
 			addrs_buf.clear();
 			break;
-		case 'n':
+		case 'c':
 			n = atoi(optarg);
 			break;
-		case 'm':
+		case 'n':
 			max = atoi(optarg);
 			break;
 		case 'i':
@@ -181,14 +258,19 @@ int main(int argc, char *argv[])
 		append_addrs(addrs_buf, addrs);
 	}
 
-	acl::fiber::stdout_open(true);
+	acl::log::debug_init("all:2");
+
 	acl::tcp_keeper keeper;
+	keeper.set_rtt_min(0);
 	keeper.set_conn_timeout(10)
 		.set_rw_timeout(10)
-		.set_conn_max(10)
-		.set_conn_ttl(10)
+		.set_conn_min(10)
+		.set_conn_max(200)
+		.set_conn_ttl(5)
 		.set_pool_ttl(10);
 	keeper.start();
+
+	gettimeofday(&__begin, NULL);
 
 	std::vector<acl::thread*> threads;
 

@@ -20,9 +20,16 @@ public:
 	socket_stream* peek(double& cost);
 
 public:
+	void ask_open(void);
+	void ask_close(void);
+
 	void stop(void);
-	void ask_connect(void);
 	void join(void);
+
+	time_t get_last_ctime(void) const
+	{
+		return last_ctime_;
+	}
 
 	bool is_ready(void) const
 	{
@@ -46,18 +53,16 @@ private:
 	void run(void);
 	void handle_task(task_req& task);
 	void connect_one(void);
-	void check_idle(void);
 	void done(void);
 
 private:
 #ifdef USE_SBOX
-	fiber_sbox<task_req>    box_;
+	fiber_sbox<ask_req>     box_;
 #else
-	fiber_tbox<task_req>    box_;
+	fiber_tbox<ask_req>     box_;
 #endif
 	fiber_tbox<keeper_conn> tbox_ctl_;
 
-	ask_type_t              ask_;
 	socket_stream*          conn_;
 	keeper_status_t         status_;
 	time_t                  last_ctime_;

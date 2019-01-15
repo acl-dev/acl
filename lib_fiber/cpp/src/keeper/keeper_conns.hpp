@@ -35,12 +35,15 @@ private:
 	keeper_conn* peek_ready(void);
 	void stop_all(void);
 	void done(void);
+	void check_idle(void);
+	void trigger_more(void);
 
 private:
 	fiber_tbox<task_req>     tbox_;
 	fiber_tbox<keeper_conns> tbox_ctl_;
 	ACL_RING                 linker_;
 	time_t                   last_peek_;
+	time_t                   last_trigger_;
 
 	const keeper_config&     config_;
 	string                   addr_;

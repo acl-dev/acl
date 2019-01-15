@@ -7,6 +7,7 @@ namespace acl {
 
 keeper_conns::keeper_conns(const keeper_config& config, const char* addr)
 : last_peek_(0)
+, last_trigger_(0)
 , config_(config)
 , addr_(addr)
 {
@@ -34,6 +35,27 @@ void keeper_conns::on_connect(socket_stream& conn, keeper_link* lk)
 	}
 }
 
+void keeper_conns::trigger_more(void)
+{
+	time(&last_trigger_);
+
+	int n = 0;
+	ACL_RING_ITER iter;
+	acl_ring_foreach_reverse(iter, &linker_) {
+		keeper_link* lk = acl_ring_to_appl(iter.ptr, keeper_link, me);
+		if (!lk->fb->is_idle()) {
+			// lk->fb->print_status();
+			continue;
+		}
+		lk->fb->ask_open();
+		n++;
+		if (config_.conn_min > 0 && n >= config_.conn_min) {
+			break;
+		}
+	}
+	logger_debug(FIBER_DEBUG_KEEPER, 1, "[debug] trigger open count=%d", n);
+}
+
 void keeper_conns::add_task(task_req& task)
 {
 	keeper_conn* fb = peek_ready();
@@ -44,9 +66,9 @@ void keeper_conns::add_task(task_req& task)
 		assert(conn);
 		task.set_conn_cost(cost);
 		task.put(conn);
-		fb->ask_connect();
-		if (0)
-			printf(">>>ready hit\r\n");
+		fb->ask_open();
+		logger_debug(FIBER_DEBUG_KEEPER, 3, "[debug] addr=%s, hit",
+			addr_.c_str());
 	} else {
 		task.set_hit(false);
 		fb = new keeper_conn(config_, addr_, NULL, *this);
@@ -54,9 +76,12 @@ void keeper_conns::add_task(task_req& task)
 		fb->set_task(task);
 		fb->start();
 
-		if (0)
-			printf(">>>>trigger connect one, hit=%d\r\n",
-					this->debug_check());
+		logger_debug(FIBER_DEBUG_KEEPER, 3, "[debug] addr=%s, miss",
+			addr_.c_str());
+
+		if (time(NULL) - last_trigger_ >= 1) {
+			trigger_more();
+		}
 	}
 }
 
@@ -73,9 +98,8 @@ void keeper_conns::join(void)
 bool keeper_conns::empty(void) const
 {
 	ACL_RING_ITER iter;
-	keeper_link* lk;
 	acl_ring_foreach(iter, &linker_) {
-		lk = acl_ring_to_appl(iter.ptr, keeper_link, me);
+		keeper_link* lk = acl_ring_to_appl(iter.ptr, keeper_link, me);
 		if (lk->fb->is_ready()) {
 			return false;
 		}
@@ -86,7 +110,8 @@ bool keeper_conns::empty(void) const
 
 void keeper_conns::run(void)
 {
-	int timeo = config_.conn_ttl > 0 ? config_.conn_ttl * 1000 : -1;
+	//int timeo = config_.conn_ttl > 0 ? config_.conn_ttl * 1000 : -1;
+	int timeo = 1000;
 
 	while (true) {
 		bool found;
@@ -95,12 +120,35 @@ void keeper_conns::run(void)
 			if (found) {
 				break;
 			}
-			continue;
 		}
+
+		check_idle();
 	}
 
 	stop_all();
 	done();
+}
+
+void keeper_conns::check_idle(void)
+{
+	int n = 0;
+	ACL_RING_ITER iter;
+	acl_ring_foreach(iter, &linker_) {
+		keeper_link* lk = acl_ring_to_appl(iter.ptr, keeper_link, me);
+		if (!lk->fb->is_ready()) {
+			break;
+		}
+
+		time_t now = time(NULL);
+		time_t ctime = lk->fb->get_last_ctime();
+		if (ctime > 0 && (now - ctime) >= config_.conn_ttl) {
+			lk->fb->ask_close();
+			n++;
+		}
+	}
+
+	logger_debug(FIBER_DEBUG_KEEPER, 2, "[debug] addr=%s, closed count=%d",
+		addr_.c_str(), n);
 }
 
 int keeper_conns::debug_check(void)

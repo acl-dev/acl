@@ -56,3 +56,5 @@
 //#if defined(_WIN32) || defined(_WIN64)
 #include "acl_cpp/lib_acl.hpp"
 //#endif
+//#define ACL_CPP_DEBUG_MIN 40
+//#define ACL_CPP_DEBUG_MAX 70

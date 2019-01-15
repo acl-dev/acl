@@ -28,6 +28,12 @@ keeper_waiter& keeper_waiter::set_rw_timeout(int n)
 	return *this;
 }
 
+keeper_waiter& keeper_waiter::set_conn_min(int n)
+{
+	config_->conn_min = n;
+	return *this;
+}
+
 keeper_waiter& keeper_waiter::set_conn_max(int n)
 {
 	config_->conn_max = n;

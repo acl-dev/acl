@@ -30,9 +30,16 @@ tcp_keeper& tcp_keeper::set_rw_timeout(int n)
 	return *this;
 }
 
+tcp_keeper& tcp_keeper::set_conn_min(int n)
+{
+	assert(n >= 0);
+	waiter_->set_conn_min(n);
+	return *this;
+}
+
 tcp_keeper& tcp_keeper::set_conn_max(int n)
 {
-	assert (n >= 0);
+	assert(n >= 0);
 	waiter_->set_conn_max(n);
 	return *this;
 }
@@ -128,7 +135,9 @@ socket_stream* tcp_keeper::peek(const char* addr, bool* hit /* = NULL */)
 			if (0)
 			printf("remove %s, cost=%.2f > %.2f\r\n", addr,
 				cost, rtt_min_);
-			remove(addr);
+			if (found) {
+				remove(addr);
+			}
 		}
 		return conn;
 	}

@@ -15,6 +15,7 @@ typedef enum {
 	ASK_T_IDLE,
 	ASK_T_STOP,
 	ASK_T_CONN,
+	ASK_T_CLOSE,
 } ask_type_t;
 
 typedef enum {
@@ -29,6 +30,7 @@ public:
 	keeper_config(void)
 	: conn_timeo(10)
 	, rw_timeo(10)
+	, conn_min(10)
 	, conn_max(10)
 	, conn_ttl(10)
 	, pool_ttl(20) {}
@@ -37,9 +39,26 @@ public:
 
 	int  conn_timeo;
 	int  rw_timeo;
+	int  conn_min;
 	int  conn_max;
 	int  conn_ttl;
 	int  pool_ttl;
+};
+
+class ask_req
+{
+public:
+	ask_req(ask_type_t type) : type_(type) {}
+
+	ask_type_t get_type(void) const
+	{
+		return type_;
+	}
+
+	~ask_req(void) {}
+
+private:
+	ask_type_t type_;
 };
 
 class task_req

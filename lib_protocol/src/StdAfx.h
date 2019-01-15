@@ -19,4 +19,6 @@ int proto_securev_snprintf(char *buf, size_t size, const char *fmt, va_list ap);
 #  endif
 # endif  /* WIN2/WIN64 */
 #include "lib_acl.h"
+//#define PRO_DEBUG_MIN 30
+//#define PRO_DEBUG_MAX 40
 #endif

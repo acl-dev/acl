@@ -22,6 +22,7 @@ public:
 
 	keeper_waiter& set_conn_timeout(int n);
 	keeper_waiter& set_rw_timeout(int n);
+	keeper_waiter& set_conn_min(int n);
 	keeper_waiter& set_conn_max(int n);
 	keeper_waiter& set_conn_ttl(int ttl);
 	keeper_waiter& set_pool_ttl(int ttl);
