@@ -1,4 +1,4 @@
-%define release_id 42
+%define release_id 43
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Jan 17 2019 zhengshuxin@qiyi.com 3.4.1-43-20190117.14
+- tcp_keeper: don't set TCP SO_LINGER; tcp_keeper is ok now.
 
 * Mon Jan 14 2019 zhengshuxin@qiyi.com 3.4.1-42-20190114.14
 - http_request::check_range: compatible some situation for the returned range value
