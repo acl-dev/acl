@@ -123,6 +123,7 @@ void keeper_conn::run(void)
 			}
 		} else if (type == ASK_T_CLOSE) {
 			if (conn_ != NULL) {
+				conn_->set_tcp_solinger(true, 0);
 				delete conn_;
 				conn_ = NULL;
 				status_ = KEEPER_T_IDLE;

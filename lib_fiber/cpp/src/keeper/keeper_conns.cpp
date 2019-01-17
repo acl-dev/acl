@@ -25,13 +25,11 @@ keeper_conns::~keeper_conns(void)
 {
 }
 
-void keeper_conns::on_connect(socket_stream& conn, keeper_link* lk)
+void keeper_conns::on_connect(socket_stream&, keeper_link* lk)
 {
 	if (lk) {
 		ACL_RING_DETACH(&lk->me);
 		ACL_RING_APPEND(&linker_, &lk->me);
-	} else {
-		conn.set_tcp_solinger(true, 0);
 	}
 }
 

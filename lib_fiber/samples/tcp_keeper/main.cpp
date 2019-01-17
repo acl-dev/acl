@@ -202,6 +202,9 @@ static void usage(const char* procname)
 		" -s server_addrs\r\n"
 		" -c fibers_count[default: 10]\r\n"
 		" -n max_loop[default: 10]\r\n"
+		" -r rtt_min[default: 0]\r\n"
+		" -C conn_max[default: 200]\r\n"
+		" -t conn_ttl[default: 10]\r\n"
 		" -i step[default: 10000]\r\n"
 		" -l loop for one connection[default: 1]\r\n"
 		, procname);
@@ -219,7 +222,7 @@ static void append_addrs(acl::string& buf, std::vector<acl::string>& addrs)
 
 int main(int argc, char *argv[])
 {
-	int  ch, n = 10, max = 10;
+	int  ch, n = 10, max = 10, rtt_min = 0, conn_max = 200, conn_ttl = 10;
 	acl::string addrs_buf("127.0.0.1:8001");
 	std::vector<acl::string> addrs;
 
@@ -227,7 +230,7 @@ int main(int argc, char *argv[])
 	acl::log::stdout_open(true);
 	acl::fiber::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:c:n:i:l:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:c:n:i:l:r:C:t:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -242,6 +245,15 @@ int main(int argc, char *argv[])
 			break;
 		case 'n':
 			max = atoi(optarg);
+			break;
+		case 'r':
+			rtt_min = atoi(optarg);
+			break;
+		case 'C':
+			conn_max = atoi(optarg);
+			break;
+		case 't':
+			conn_ttl = atoi(optarg);
 			break;
 		case 'i':
 			__step = atoi(optarg);
@@ -261,12 +273,12 @@ int main(int argc, char *argv[])
 	acl::log::debug_init("all:2");
 
 	acl::tcp_keeper keeper;
-	keeper.set_rtt_min(0);
+	keeper.set_rtt_min(rtt_min);
 	keeper.set_conn_timeout(10)
 		.set_rw_timeout(10)
 		.set_conn_min(10)
-		.set_conn_max(200)
-		.set_conn_ttl(5)
+		.set_conn_max(conn_max)
+		.set_conn_ttl(conn_ttl)
 		.set_pool_ttl(10);
 	keeper.start();
 
