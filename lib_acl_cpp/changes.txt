@@ -1,5 +1,8 @@
 修改历史列表：
 
+562) 2019.1.21
+562.1) bugfix: connect_manager::check_idle() 当 pools_size 为 0 时应该直接返回
+
 561) 2019.1.14
 561.1) compatible: http_request::check_range() 在校验返回 range 数据字段时，
 需要兼容返回值比预值小的情况

@@ -366,6 +366,9 @@ size_t connect_manager::check_idle(size_t step, size_t* left /* = NULL */)
 
 	conns_pools& pools = get_pools_by_id(id);
 	pools_size = pools.pools.size();
+	if (pools_size == 0) {
+		return 0;
+	}
 
 	check_pos = pools.check_next++ % pools_size;
 	check_max = check_pos + step;
