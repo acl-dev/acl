@@ -101,7 +101,7 @@ void keeper_conn::run(void)
 		return;
 	}
 
-	connect_one();
+	// connect_one();
 
 	while (true) {
 		ask_req* ask = box_.pop();
