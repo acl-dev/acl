@@ -42,6 +42,7 @@ static void test_thread(void)
 	printf("%s: thread id is %lu, main thread id: %lu\r\n",
 		myname, thr.thread_id(), acl::thread::thread_self());
 
+	printf("begin wait for thread exit\r\n");
 	if (thr.wait(NULL) == false)
 		printf("wait thread failed\r\n");
 	else
@@ -85,7 +86,7 @@ static void test_thread3(void)
 {
 	acl::thread_cond cond;
 	mythread3 thread(cond);
-	thread.start();
+	thread.start(true);
 	printf("wait %s\r\n", cond.wait() ? "ok" : "error");
 }
 

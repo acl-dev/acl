@@ -3,6 +3,8 @@
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/thread.hpp"
+#include "acl_cpp/stdlib/tbox.hpp"
+#include "acl_cpp/stdlib/atomic.hpp"
 #endif
 
 #ifdef	ACL_FREEBSD
@@ -12,7 +14,7 @@
 namespace acl
 {
 
-thread::thread()
+thread::thread(void)
 : detachable_(false)
 , stack_size_(0)
 , thread_id_(0)
@@ -21,13 +23,17 @@ thread::thread()
 	thread_ = (acl_pthread_t*) acl_mycalloc(1, sizeof(acl_pthread_t));
 #endif
 	return_arg_ = NULL;
+	sync_ = NEW tbox<int>;
+	lock_ = NEW atomic_long;
 }
 
-thread::~thread()
+thread::~thread(void)
 {
 #ifdef ACL_WINDOWS
 	acl_myfree(thread_);
 #endif
+	delete sync_;
+	delete lock_;
 }
 
 thread& thread::set_detachable(bool yes /* = true */)
@@ -40,6 +46,17 @@ thread& thread::set_stacksize(size_t size)
 {
 	stack_size_ = size;
 	return *this;
+}
+
+void thread::wait_for_running(void)
+{
+	if (lock_->cas(0, 1) == 0) {
+		if (thread_id_ == 0) {
+			(void) sync_->pop();
+		}
+	} else if (thread_id_ == 0) {
+		sleep(1);
+	}
 }
 
 void* thread::thread_run(void* arg)
@@ -61,17 +78,20 @@ void* thread::thread_run(void* arg)
 	thr->thread_id_ = (unsigned long) pthread_self();
 #endif
 
+	thr->sync_->push(NULL);
+
 	// 如果线程创建时为分离模式，则当 run 运行时用户有可能
 	// 将线程对象销毁了，所以不能再将 thr->return_arg_ 进行
 	// 赋值，否则就有可能出现内存非法访问
-	if (thr->detachable_)
+	if (thr->detachable_) {
 		return thr->run();
+	}
 
 	thr->return_arg_ = thr->run();
 	return thr->return_arg_;
 }
 
-bool thread::start()
+bool thread::start(bool sync /* = false */)
 {
 	acl_pthread_attr_t attr;
 	acl_pthread_attr_init(&attr);
@@ -81,10 +101,12 @@ bool thread::start()
 	// --- by 562351190@qq.com 
 	thread_id_ = 0;
 
-	if (detachable_)
+	if (detachable_) {
 		acl_pthread_attr_setdetachstate(&attr, 1);
-	if (stack_size_ > 0)
+	}
+	if (stack_size_ > 0) {
 		acl_pthread_attr_setstacksize(&attr, stack_size_);
+	}
 
 #ifdef	ACL_WINDOWS
 	int   ret = acl_pthread_create((acl_pthread_t*) thread_,
@@ -93,11 +115,14 @@ bool thread::start()
 	int   ret = acl_pthread_create((pthread_t*) &thread_, &attr,
 			thread_run, this);
 #endif
-	if (ret != 0)
-	{
+	if (ret != 0) {
 		acl_set_error(ret);
 		logger_error("create thread error %s", last_serror());
 		return false;
+	}
+
+	if (sync) {
+		wait_for_running();
 	}
 
 	// 如果线程创建足够快，在 thread_run 中有可能用户将线程对象释放，
@@ -114,22 +139,14 @@ bool thread::start()
 
 bool thread::wait(void** out /* = NULL */)
 {
-	if (detachable_)
-	{
+	if (detachable_) {
 		logger_error("detachable thread can't be wait!");
 		return false;
 	}
 
-	// 尝试等待线程创建成功
-	for (int i = 0; i < 10; i++)
-	{
-		if (thread_id_ != 0)
-			break;
-		sleep(1);
-	}
+	wait_for_running();
 
-	if (thread_id_ == 0)
-	{
+	if (thread_id_ == 0) {
 		logger_error("thread not running!");
 		return false;
 	}
@@ -142,34 +159,28 @@ bool thread::wait(void** out /* = NULL */)
 	int   ret = acl_pthread_join(thread_, &ptr);
 #endif
 
-	if (ret != 0)
-	{
+	if (ret != 0) {
 		acl_set_error(ret);
 		logger_error("pthread_join error: %s", last_serror());
 		return false;
 	}
 
 	// 比较通过在 thread_run 中截获的参数与 pthread_join 获得的参数是否相同
-	if (ptr != return_arg_)
+	if (ptr != return_arg_) {
 		logger_warn("pthread_josin's arg invalid?");
+	}
 
-	if (out)
+	if (out) {
 		*out = ptr;
+	}
 	return true;
 }
 
-unsigned long thread::thread_id() const
+unsigned long thread::thread_id(void) const
 {
-	// 尝试等待线程创建成功
-	for (int i = 0; i < 10; i++)
-	{
-		if (thread_id_ != 0)
-			break;
-		sleep(1);
-	}
+	const_cast<thread*>(this)->wait_for_running();
 
-	if (thread_id_ == 0)
-	{
+	if (thread_id_ == 0) {
 		logger_error("thread not running!");
 		return 0;
 	}
@@ -177,7 +188,7 @@ unsigned long thread::thread_id() const
 	return thread_id_;
 }
 
-unsigned long thread::thread_self()
+unsigned long thread::thread_self(void)
 {
 #ifdef	ACL_FREEBSD
 #if defined(__FreeBSD__) && (__FreeBSD__ >= 9)
