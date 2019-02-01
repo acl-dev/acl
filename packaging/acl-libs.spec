@@ -1,4 +1,4 @@
-%define release_id 44
+%define release_id 45
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Fri Feb 01 2019 zhengshuxin@qiyi.com 3.4.1-45-20190201.18
+- scan_dir: can remove empty directories automatically.
 
 * Mon Jan 21 2019 zhengshuxin@qiyi.com 3.4.1-44-20190121.13
 - connect_manager::check_idle: fixed one bug when pools_size is 0
