@@ -146,6 +146,11 @@ public:
 	 */
 	static bool get_cwd(string& out);
 
+public:
+	ACL_SCAN_DIR* get_scan_dir(void) const {
+		return scan_;
+	}
+
 private:
 	char* path_;
 	ACL_SCAN_DIR* scan_;

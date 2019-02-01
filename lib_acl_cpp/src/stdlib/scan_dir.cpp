@@ -144,14 +144,17 @@ const char* scan_dir::next(bool full /* = false */, bool* is_file /* = NULL */)
 	if (file_buf_ == NULL)
 		file_buf_ = NEW string(256);
 
+	(*file_buf_) = path;
+	if (!res)
+		return file_buf_->c_str();
 
 #ifdef	ACL_WINDOWS
-	file_buf_->format("%s%c%s", path, PATH_SEP_C, name);
+	file_buf_->format_append("%c%s", PATH_SEP_C, name);
 #else
 	if (*path == '/' && *(path + 1) == 0)
-		file_buf_->format("%s%s", path, name);
+		file_buf_->format_append("%s%s", path, name);
 	else
-		file_buf_->format("%s%c%s", path, PATH_SEP_C, name);
+		file_buf_->format_append("%c%s", PATH_SEP_C, name);
 #endif
 
 	return file_buf_->c_str();

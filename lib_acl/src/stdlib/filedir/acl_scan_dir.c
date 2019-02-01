@@ -86,8 +86,9 @@ ACL_SCAN_DIR *acl_scan_dir_open(const char *path, int recursive)
 	scan->ndirs = 0;
 	scan->nsize = 0;
 
-	if (acl_scan_dir_push(scan, path) < 0)
+	if (acl_scan_dir_push(scan, path) < 0) {
 		return NULL;
+	}
 	return scan;
 }
 
@@ -95,8 +96,9 @@ ACL_SCAN_DIR *acl_scan_dir_open(const char *path, int recursive)
 
 void acl_scan_dir_close(ACL_SCAN_DIR *scan)
 {
-	while (scan->current)
+	while (scan->current) {
 		acl_scan_dir_pop(scan);
+	}
 	acl_myfree(scan);
 }
 
@@ -135,15 +137,17 @@ void acl_scan_dir_ctl(ACL_SCAN_DIR *scan, int name, ...)
 
 const char *acl_scan_dir_path(ACL_SCAN_DIR *scan)
 {
-	if (scan->current == NULL)
+	if (scan->current == NULL) {
 		return NULL;
+	}
 	return ACL_SCAN_DIR_PATH(scan);
 }
 
 const char *acl_scan_dir_file(ACL_SCAN_DIR *scan)
 {
-	if (scan->current == NULL)
+	if (scan->current == NULL) {
 		return NULL;
+	}
 
 	return scan->file_name;
 }
@@ -165,8 +169,9 @@ acl_int64 acl_scan_dir_nsize(ACL_SCAN_DIR *scan)
 
 int acl_scan_stat(ACL_SCAN_DIR *scan, struct acl_stat *sbuf)
 {
-	if (scan->current == NULL || sbuf == NULL)
+	if (scan->current == NULL || sbuf == NULL) {
 		return -1;
+	}
 
 	memcpy(sbuf, &scan->current->sbuf, sizeof(struct acl_stat));
 	return 0;
@@ -174,10 +179,11 @@ int acl_scan_stat(ACL_SCAN_DIR *scan, struct acl_stat *sbuf)
 
 int acl_scan_dir_end(ACL_SCAN_DIR *scan)
 {
-	if (scan->current == NULL)
+	if (scan->current == NULL) {
 		return 1;
-	else
+	} else {
 		return 0;
+	}
 }
 /* acl_scan_dir_push - enter directory */
 
@@ -186,24 +192,31 @@ int acl_scan_dir_push(ACL_SCAN_DIR *scan, const char *path)
 	const char *myname = "acl_scan_dir_push";
 	ACL_SCAN_INFO *info;
 
-	if (path == NULL || *path == 0)
+	if (path == NULL || *path == 0) {
 		acl_msg_fatal("%s(%d), %s: path null",
 			__FILE__, __LINE__, myname);
+	}
 
 	info = (ACL_SCAN_INFO *) acl_mymalloc(sizeof(*info));
-	if (scan->current)
-		info->path = acl_concatenate(ACL_SCAN_DIR_PATH(scan),
-				PATH_SEP_S, path, (char *) 0);
-	else {
+	if (scan->current) {
+		const char *dpath = ACL_SCAN_DIR_PATH(scan);
+
+		if (*dpath == '/' && *(dpath + 1) == 0) {
+			info->path = acl_concatenate(dpath, path, NULL);
+		} else {
+			info->path = acl_concatenate(dpath, PATH_SEP_S, path, NULL);
+		}
+	} else {
 		size_t len = strlen(path);
 		const char *ptr = path + len - 1;
 
 #ifdef	ACL_WINDOWS
-		while (ptr > path && (*ptr == '/' || *ptr == '\\'))
+		while (ptr > path && (*ptr == '/' || *ptr == '\\')) {
 #else
-		while (ptr > path && *ptr == '/')
+		while (ptr > path && *ptr == '/') {
 #endif
 			ptr--;
+		}
 		len = ptr - path + 1;
 		info->path = (char*) acl_mymalloc(len + 1);
 		memcpy(info->path, path, len);
@@ -231,8 +244,9 @@ ACL_SCAN_DIR *acl_scan_dir_pop(ACL_SCAN_DIR *scan)
 	ACL_SCAN_INFO *info = scan->current;
 	ACL_SCAN_INFO *parent;
 
-	if (info == NULL)
+	if (info == NULL) {
 		return NULL;
+	}
 
 	parent = info->parent;
 	if (closedir(info->dir_name)) {
@@ -257,12 +271,14 @@ const char *acl_scan_dir_next(ACL_SCAN_DIR *scan)
 
 #define STREQ(x,y)	(strcmp((x),(y)) == 0)
 
-	if (info == NULL)
+	if (info == NULL) {
 		return NULL;
+	}
 
 	while ((dp = readdir(info->dir_name)) != 0) {
-		if (STREQ(dp->d_name, ".") || STREQ(dp->d_name, ".."))
+		if (STREQ(dp->d_name, ".") || STREQ(dp->d_name, "..")) {
 			continue;
+		}
 
 		return dp->d_name;
 	}
@@ -281,8 +297,9 @@ const char *acl_scan_dir_next_file(ACL_SCAN_DIR *scan)
 
 	for (;;) {
 		if ((name = acl_scan_dir_next(scan)) == NULL) {
-			if (acl_scan_dir_pop(scan) == 0)
+			if (acl_scan_dir_pop(scan) == 0) {
 				return NULL;
+			}
 			continue;
 		}
 
@@ -307,8 +324,9 @@ const char *acl_scan_dir_next_file(ACL_SCAN_DIR *scan)
 
 		scan->ndirs++;
 
-		if (scan->recursive && acl_scan_dir_push(scan, name) < 0)
+		if (scan->recursive && acl_scan_dir_push(scan, name) < 0) {
 			return NULL;
+		}
 	}
 }
 
@@ -323,46 +341,9 @@ const char *acl_scan_dir_next_dir(ACL_SCAN_DIR *scan)
 
 	for (;;) {
 		if ((name = acl_scan_dir_next(scan)) == NULL) {
-			if (acl_scan_dir_pop(scan) == 0)
+			if (acl_scan_dir_pop(scan) == 0) {
 				return NULL;
-			continue;
-		}
-		snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
-			ACL_SCAN_DIR_PATH(scan), PATH_SEP_C, name);
-		if (acl_stat(pathbuf, &sbuf) < 0) {
-			acl_msg_error("%s(%d), %s: stat file(%s) error(%s)",
-				__FILE__, __LINE__, myname, pathbuf,
-				acl_last_serror());
-			return NULL;
-		}
-
-		memcpy(&scan->current->sbuf, &sbuf, sizeof(sbuf));
-
-		scan->nsize += sbuf.st_size;
-
-		if (!S_ISDIR(sbuf.st_mode))
-			continue;
-
-		scan->ndirs++;
-
-		if (scan->recursive && acl_scan_dir_push(scan, name) < 0)
-			return NULL;
-		else
-			return name;
-	}
-}
-
-const char *acl_scan_dir_next_name(ACL_SCAN_DIR *scan, int *is_file)
-{
-	const char *myname = "acl_scan_dir_next_name";
-	const char *name;
-	char  pathbuf[MAX_PATH];
-	struct acl_stat sbuf;
-
-	for (;;) {
-		if ((name = acl_scan_dir_next(scan)) == NULL) {
-			if (acl_scan_dir_pop(scan) == 0)
-				return NULL;
+			}
 			continue;
 		}
 		snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
@@ -379,17 +360,60 @@ const char *acl_scan_dir_next_name(ACL_SCAN_DIR *scan, int *is_file)
 		scan->nsize += sbuf.st_size;
 
 		if (!S_ISDIR(sbuf.st_mode)) {
-			if (is_file)
+			continue;
+		}
+
+		scan->ndirs++;
+
+		if (scan->recursive && acl_scan_dir_push(scan, name) < 0) {
+			return NULL;
+		} else {
+			return name;
+		}
+	}
+}
+
+const char *acl_scan_dir_next_name(ACL_SCAN_DIR *scan, int *is_file)
+{
+	const char *myname = "acl_scan_dir_next_name";
+	const char *name;
+	char  pathbuf[MAX_PATH];
+	struct acl_stat sbuf;
+
+	for (;;) {
+		if ((name = acl_scan_dir_next(scan)) == NULL) {
+			if (acl_scan_dir_pop(scan) == 0) {
+				return NULL;
+			}
+			continue;
+		}
+		snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
+			ACL_SCAN_DIR_PATH(scan), PATH_SEP_C, name);
+		if (acl_stat(pathbuf, &sbuf) < 0) {
+			acl_msg_error("%s(%d), %s: stat file(%s) error(%s)",
+				__FILE__, __LINE__, myname, pathbuf,
+				acl_last_serror());
+			return NULL;
+		}
+
+		memcpy(&scan->current->sbuf, &sbuf, sizeof(sbuf));
+		scan->nsize += sbuf.st_size;
+
+		if (!S_ISDIR(sbuf.st_mode)) {
+			if (is_file) {
 				*is_file = 1;
+			}
 			return name;
 		}
 
 		scan->ndirs++;
 
-		if (scan->recursive && acl_scan_dir_push(scan, name) < 0)
+		if (scan->recursive && acl_scan_dir_push(scan, name) < 0) {
 			return NULL;
-		if (is_file)
+		}
+		if (is_file) {
 			*is_file = 0;
+		}
 		return name;
 	}
 }
@@ -403,8 +427,9 @@ acl_int64 acl_scan_dir_size2(ACL_SCAN_DIR *scan, int *nfile, int *ndir)
 
 	while (1) {
 		if ((name = acl_scan_dir_next(scan)) == NULL) {
-			if (acl_scan_dir_pop(scan) == NULL)
+			if (acl_scan_dir_pop(scan) == NULL) {
 				break;
+			}
 			continue;
 		}
 		snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
@@ -421,8 +446,9 @@ acl_int64 acl_scan_dir_size2(ACL_SCAN_DIR *scan, int *nfile, int *ndir)
 		if (S_ISDIR(sbuf.st_mode)) {
 			scan->ndirs++;
 			scan->file_name[0] = 0;
-			if (scan->recursive && acl_scan_dir_push(scan, name) < 0)
+			if (scan->recursive && acl_scan_dir_push(scan, name) < 0) {
 				break;
+			}
 		} else {
 			ACL_SAFE_STRNCPY(scan->file_name, name,
 				sizeof(scan->file_name));
@@ -430,14 +456,17 @@ acl_int64 acl_scan_dir_size2(ACL_SCAN_DIR *scan, int *nfile, int *ndir)
 			scan->nsize += sbuf.st_size;
 		}
 
-		if (scan->scan_fn && scan->scan_fn(scan, scan->scan_ctx) < 0)
+		if (scan->scan_fn && scan->scan_fn(scan, scan->scan_ctx) < 0) {
 			break;
+		}
 	}
 
-	if (nfile)
+	if (nfile) {
 		*nfile = scan->nfiles;
-	if (ndir)
+	}
+	if (ndir) {
 		*ndir = scan->ndirs;
+	}
 
 	return scan->nsize;
 }
@@ -480,24 +509,27 @@ acl_int64 acl_scan_dir_rm2(ACL_SCAN_DIR *scan, int *ndir, int *nfile)
 
 	for (;;) {
 		if ((name = acl_scan_dir_next(scan)) == NULL) {
-			if (scan->current != NULL)
+			if (scan->current != NULL) {
 				snprintf(path, sizeof(path), "%s",
 					ACL_SCAN_DIR_PATH(scan));
-			else
+			} else {
 				path[0] = 0;
+			}
 
 			/* 必须退出该空目录后才可以删除该目录 */
 
 			if (acl_scan_dir_pop(scan) == 0) {
 				/* 删除最顶层空目录 */
-				if (path[0] != 0 && SANE_RMDIR(path) == 0)
+				if (path[0] != 0 && SANE_RMDIR(path) == 0) {
 					scan->ndirs++;
+				}
 				break;
 			}
 
 			/* 删除空目录 */
-			if (path[0] != 0 && SANE_RMDIR(path) == 0)
+			if (path[0] != 0 && SANE_RMDIR(path) == 0) {
 				scan->ndirs++;
+			}
 			continue;
 		}
 
@@ -512,27 +544,32 @@ acl_int64 acl_scan_dir_rm2(ACL_SCAN_DIR *scan, int *ndir, int *nfile)
 		}
 		if (S_ISDIR(sbuf.st_mode)) {
 			scan->file_name[0] = 0;
-			if (scan->recursive && acl_scan_dir_push(scan, name) < 0)
+			if (scan->recursive && acl_scan_dir_push(scan, name) < 0) {
 				break;
-			if (scan->scan_fn && scan->scan_fn(scan, scan->scan_ctx) < 0)
+			}
+			if (scan->scan_fn && scan->scan_fn(scan, scan->scan_ctx) < 0) {
 				break;
+			}
 			continue;
 		}
 
 		ACL_SAFE_STRNCPY(scan->file_name, name, sizeof(scan->file_name));
 
-		if (scan->scan_fn && scan->scan_fn(scan, scan->scan_ctx) < 0)
+		if (scan->scan_fn && scan->scan_fn(scan, scan->scan_ctx) < 0) {
 			break;
+		}
 		scan->nfiles++;
 		scan->nsize += sbuf.st_size;
 
 		SANE_UNLINK(path);
 	}
 
-	if (ndir)
+	if (ndir) {
 		*ndir = scan->ndirs;
-	if (nfile)
+	}
+	if (nfile) {
 		*nfile = scan->nfiles;
+	}
 
 	return scan->nsize;
 }
@@ -545,10 +582,12 @@ acl_int64 acl_scan_dir_rm(const char *pathname, int recursive,
 	struct acl_stat sbuf;
 	acl_int64 nsize;
 
-	if (ndir)
+	if (ndir) {
 		*ndir = 0;
-	if (nfile)
+	}
+	if (nfile) {
 		*nfile = 0;
+	}
 
 	if (acl_stat(pathname, &sbuf) < 0) {
 		acl_msg_error("%s(%d), %s: stat pathname(%s) error(%s)",
@@ -557,10 +596,10 @@ acl_int64 acl_scan_dir_rm(const char *pathname, int recursive,
 		return -1;
 	}
 	if (S_ISDIR(sbuf.st_mode) == 0) {
-		if (nfile)
+		if (nfile) {
 			*nfile = 1;
+		}
 		SANE_UNLINK(pathname);
-
 		return 1;
 	}
 
@@ -576,6 +615,5 @@ acl_int64 acl_scan_dir_rm(const char *pathname, int recursive,
 
 	nsize = scan->nsize;
 	acl_scan_dir_close(scan);
-
 	return nsize;
 }
