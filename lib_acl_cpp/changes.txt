@@ -2,6 +2,7 @@
 
 564) 2019.2.1
 564.1) bugfix: scan_dir.cpp 当扫描的节点为目录时给的路径有误
+564.2) feature: scan_dir.cpp 增加删除空目录功能
 
 563) 2019.1.30
 563.1) feature: thread::start() 增加同步启动线程的控制参数；在异步创建线程时，

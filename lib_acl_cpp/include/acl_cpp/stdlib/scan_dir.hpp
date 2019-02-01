@@ -10,16 +10,28 @@ class string;
 class ACL_CPP_API scan_dir
 {
 public:
-	scan_dir();
-	~scan_dir();
+	scan_dir(void);
+	virtual ~scan_dir(void);
 
 	/**
 	 * 打开目录
 	 * @param path {const char*} 目录路径，非空指针
 	 * @param recursive {bool} 是否允许递归扫描目录
+	 * @param rmdir_on {bool} 当目录为空时，是否需要删除该空目录
 	 * @return {bool} 打开目录是否成功
 	 */
-	bool open(const char* path, bool recursive = true);
+	bool open(const char* path, bool recursive = true, bool rmdir_on = false);
+
+	/**
+	 * 虚方法，当需要删除空目录时，子类可以实现此虚方法来删除传入的目录
+	 * @param path {const char*} 需要被删除的空目录
+	 * @return {bool} 删除目录是否成功
+	 */
+	virtual bool rmdir_callback(const char* path)
+	{
+		(void) path;
+		return false;
+	}
 
 	/**
 	 * 关闭目录，同时释放内部资源
@@ -147,15 +159,25 @@ public:
 	static bool get_cwd(string& out);
 
 public:
-	ACL_SCAN_DIR* get_scan_dir(void) const {
+	ACL_SCAN_DIR* get_scan_dir(void) const
+	{
 		return scan_;
 	}
+
+	/**
+	 * 设置回调方法，用来删除空目录
+	 * @param fn {int (*)(ACL_SCAN_DIR*, const char*, void*)}
+	 * @param ctx {void*}
+	 */
+	void set_rmdir_callback(int (*fn)(ACL_SCAN_DIR*, const char*, void*), void* ctx);
 
 private:
 	char* path_;
 	ACL_SCAN_DIR* scan_;
 	string* path_buf_;
 	string* file_buf_;
+
+	static int rmdir_def(ACL_SCAN_DIR* scan, const char* path, void* ctx);
 };
 
 }  // namespace acl

@@ -14,11 +14,19 @@ extern "C" {
 typedef struct ACL_SCAN_DIR ACL_SCAN_DIR;
 
 /**
- * 目录描述过程中用户可以设置的回调函数类型定义
+ * 目录扫描过程中用户可以设置的回调函数类型定义
  * @param scan {ACL_SCAN_DIR*} 目录扫描指针
  * @param ctx {void*} 用户参数指针
  */
 typedef int (*ACL_SCAN_DIR_FN)(ACL_SCAN_DIR *scan, void *ctx);
+
+/**
+ * 目录扫描过程中，如果遇到空目录且用户设置了自动删除空目录标记，则回调此方法
+ * 通知用户删除指定的空目录
+ * @param scan {ACL_SCAN_DIR*} 目录扫描指针
+ * @param ctx {void*} 用户参数指针
+ */
+typedef int (*ACL_SCAN_RMDIR_FN)(ACL_SCAN_DIR *scan, const char *path, void *ctx);
 
 /**
  * 打开扫描路径, 为整个 acl_scan_dir 函数库的初始化函数
@@ -27,6 +35,16 @@ typedef int (*ACL_SCAN_DIR_FN)(ACL_SCAN_DIR *scan, void *ctx);
  * @return {ACL_SCAN_DIR*} NULL: Err; != NULL, OK
  */
 ACL_API ACL_SCAN_DIR *acl_scan_dir_open(const char *path, int recursive);
+
+/**
+ * 打开扫描路径, 为整个 acl_scan_dir 函数库的初始化函数
+ * @param path {const char*} 要打开的路径名称
+ * @param flags {unsigned} 标志位, 见 ACL_SCAN_FLAG_XXX
+ * @return {ACL_SCAN_DIR*} NULL: Err; != NULL, OK
+ */
+ACL_API ACL_SCAN_DIR *acl_scan_dir_open2(const char *path, unsigned flags);
+#define ACL_SCAN_FLAG_RECURSIVE	(1 << 0)	/* 是否做递归扫描 */
+#define ACL_SCAN_FLAG_RMDIR	(1 << 1)	/* 是否自动删除空目录 */
 
 /**
  * 关闭扫描句柄
@@ -50,6 +68,7 @@ ACL_API void acl_scan_dir_ctl(ACL_SCAN_DIR *scan, int name, ...);
 #define ACL_SCAN_CTL_END	0  /**< 控制结束标志 */
 #define ACL_SCAN_CTL_FN		1  /**< 设置 ACL_SCAN_DIR_FN 标志 */
 #define ACL_SCAN_CTL_CTX	2  /**< 设置用户参数 */
+#define ACL_SCAN_CTL_RMDIR_FN	3  /**< 设置删除目录回调函数 */
 
 /**
  * 获得当前状态下的相对路径(相对于程序调用 acl_scan_dir_open
@@ -69,16 +88,16 @@ ACL_API const char *acl_scan_dir_file(ACL_SCAN_DIR *scan);
 /**
  * 当前已经扫描的目录总个数
  * @param scan {ACL_SCAN_DIR*}
- * @return {int} 目录总个数, < 0 表示出错
+ * @return {unsigned} 目录总个数
  */
-ACL_API int acl_scan_dir_ndirs(ACL_SCAN_DIR *scan);
+ACL_API unsigned acl_scan_dir_ndirs(ACL_SCAN_DIR *scan);
 
 /**
  * 当前已经扫描的文件总个数
  * @param scan {ACL_SCAN_DIR*}
- * @return {int} 文件总个数, < 0 表示出错
+ * @return {unsigned} 文件总个数
  */
-ACL_API int acl_scan_dir_nfiles(ACL_SCAN_DIR *scan);
+ACL_API unsigned acl_scan_dir_nfiles(ACL_SCAN_DIR *scan);
 
 /**
  * 当前已经扫描的文件大小总和

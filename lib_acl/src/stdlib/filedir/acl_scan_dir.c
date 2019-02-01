@@ -55,36 +55,42 @@ typedef struct ACL_SCAN_INFO ACL_SCAN_INFO;
 struct ACL_SCAN_INFO {
 	char   *path;               /* directory name */
 	DIR    *dir_name;           /* directory structure */
+	unsigned nfiles;
+	unsigned ndirs;
+	acl_int64 nsize;            /* total size of all files of current */
 	struct acl_stat sbuf;       /* the stat of the dir or file */
 	ACL_SCAN_INFO *parent;      /* linkage */
 };
 
 struct ACL_SCAN_DIR {
 	ACL_SCAN_INFO *current;     /* current scan */
-	int   recursive;            /* if scan subtree recursive */
-	int   nfiles;               /* total files' count */
-	int   ndirs;                /* total dirs' count */
+	unsigned flags;             /* define as: ACL_SCAN_FLAGS_XXX */
+	unsigned nfiles;            /* total files' count */
+	unsigned ndirs;             /* total dirs' count */
 	acl_int64 nsize;            /* total size of all files */
-	ACL_SCAN_DIR_FN scan_fn;
+	ACL_SCAN_DIR_FN   scan_fn;
+	ACL_SCAN_RMDIR_FN rmdir_fn;
 	void *scan_ctx;
 	char  file_name[256];       /* if is file set it */
 };
 
-#define ACL_SCAN_DIR_PATH(scan)	(scan->current->path)
+#define SCAN_PATH(scan)		(scan->current->path)
+#define SCAN_RECURSIVE(scan)	(scan->flags & ACL_SCAN_FLAG_RECURSIVE)
+#define SCAN_RMDIR(scan)	(scan->flags & ACL_SCAN_FLAG_RMDIR)
 
 /* acl_scan_dir_open - start directory scan */
 
 ACL_SCAN_DIR *acl_scan_dir_open(const char *path, int recursive)
 {
+	return acl_scan_dir_open2(path, recursive ? ACL_SCAN_FLAG_RECURSIVE : 0);
+}
+
+ACL_SCAN_DIR *acl_scan_dir_open2(const char *path, unsigned flags)
+{
 	ACL_SCAN_DIR *scan;
 
 	scan = (ACL_SCAN_DIR *) acl_mycalloc(1, sizeof(*scan));
-	scan->current = 0;
-	scan->recursive = recursive;
-
-	scan->nfiles = 0;
-	scan->ndirs = 0;
-	scan->nsize = 0;
+	scan->flags   = flags;
 
 	if (acl_scan_dir_push(scan, path) < 0) {
 		return NULL;
@@ -105,8 +111,8 @@ void acl_scan_dir_close(ACL_SCAN_DIR *scan)
 void acl_scan_dir_reset(ACL_SCAN_DIR *scan)
 {
 	scan->nfiles = 0;
-	scan->ndirs = 0;
-	scan->nsize = 0;
+	scan->ndirs  = 0;
+	scan->nsize  = 0;
 }
 
 /* acl_scan_dirctl - ctl interface for set option */
@@ -121,6 +127,9 @@ void acl_scan_dir_ctl(ACL_SCAN_DIR *scan, int name, ...)
 		switch(name) {
 		case ACL_SCAN_CTL_FN:
 			scan->scan_fn = va_arg(ap, ACL_SCAN_DIR_FN);
+			break;
+		case ACL_SCAN_CTL_RMDIR_FN:
+			scan->rmdir_fn = va_arg(ap, ACL_SCAN_RMDIR_FN);
 			break;
 		case ACL_SCAN_CTL_CTX:
 			scan->scan_ctx = va_arg(ap, void*);
@@ -140,7 +149,7 @@ const char *acl_scan_dir_path(ACL_SCAN_DIR *scan)
 	if (scan->current == NULL) {
 		return NULL;
 	}
-	return ACL_SCAN_DIR_PATH(scan);
+	return SCAN_PATH(scan);
 }
 
 const char *acl_scan_dir_file(ACL_SCAN_DIR *scan)
@@ -152,12 +161,12 @@ const char *acl_scan_dir_file(ACL_SCAN_DIR *scan)
 	return scan->file_name;
 }
 
-int acl_scan_dir_ndirs(ACL_SCAN_DIR *scan)
+unsigned acl_scan_dir_ndirs(ACL_SCAN_DIR *scan)
 {
 	return scan->ndirs;
 }
 
-int acl_scan_dir_nfiles(ACL_SCAN_DIR *scan)
+unsigned acl_scan_dir_nfiles(ACL_SCAN_DIR *scan)
 {
 	return scan->nfiles;
 }
@@ -197,9 +206,9 @@ int acl_scan_dir_push(ACL_SCAN_DIR *scan, const char *path)
 			__FILE__, __LINE__, myname);
 	}
 
-	info = (ACL_SCAN_INFO *) acl_mymalloc(sizeof(*info));
+	info = (ACL_SCAN_INFO *) acl_mycalloc(1, sizeof(*info));
 	if (scan->current) {
-		const char *dpath = ACL_SCAN_DIR_PATH(scan);
+		const char *dpath = SCAN_PATH(scan);
 
 		if (*dpath == '/' && *(dpath + 1) == 0) {
 			info->path = acl_concatenate(dpath, path, NULL);
@@ -232,7 +241,6 @@ int acl_scan_dir_push(ACL_SCAN_DIR *scan, const char *path)
 
 	info->parent = scan->current;
 	scan->current = info;
-
 	return 0;
 }
 
@@ -250,9 +258,28 @@ ACL_SCAN_DIR *acl_scan_dir_pop(ACL_SCAN_DIR *scan)
 
 	parent = info->parent;
 	if (closedir(info->dir_name)) {
-		acl_msg_fatal("%s(%d), %s: close directory(%s) error(%s)",
+		acl_msg_error("%s(%d), %s: close directory(%s) error(%s)",
 			__FILE__, __LINE__, myname,
 			info->path, acl_last_serror());
+	}
+
+	if (SCAN_RMDIR(scan) && parent && !info->ndirs && !info->nfiles
+		&& scan->rmdir_fn
+		&& scan->rmdir_fn(scan, info->path, scan->scan_ctx) == 0) {
+
+		if (parent->ndirs > 0) {
+			parent->ndirs--;
+		} else {
+			acl_msg_error("%s(%d), %s: parent=%s ndirs=0",
+				__FILE__, __LINE__, myname, parent->path);
+		}
+
+		if (scan->ndirs > 0) {
+			scan->ndirs--;
+		} else {
+			acl_msg_error("%s(%d), %s: total ndirs=0",
+				__FILE__, __LINE__, myname);
+		}
 	}
 
 	acl_myfree(info->path);
@@ -304,7 +331,7 @@ const char *acl_scan_dir_next_file(ACL_SCAN_DIR *scan)
 		}
 
 		snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
-			ACL_SCAN_DIR_PATH(scan), PATH_SEP_C, name);
+			SCAN_PATH(scan), PATH_SEP_C, name);
 
 		if (acl_stat(pathbuf, &sbuf) < 0) {
 			acl_msg_error("%s(%d), %s: stat file(%s) error(%s)",
@@ -316,15 +343,18 @@ const char *acl_scan_dir_next_file(ACL_SCAN_DIR *scan)
 		memcpy(&scan->current->sbuf, &sbuf, sizeof(sbuf));
 
 		scan->nsize += sbuf.st_size;
+		scan->current->nsize += sbuf.st_size;
 
 		if (!S_ISDIR(sbuf.st_mode)) {
 			scan->nfiles++;
+			scan->current->nfiles++;
 			return name;
 		}
 
 		scan->ndirs++;
+		scan->current->ndirs++;
 
-		if (scan->recursive && acl_scan_dir_push(scan, name) < 0) {
+		if (SCAN_RECURSIVE(scan) && acl_scan_dir_push(scan, name) < 0) {
 			return NULL;
 		}
 	}
@@ -347,7 +377,7 @@ const char *acl_scan_dir_next_dir(ACL_SCAN_DIR *scan)
 			continue;
 		}
 		snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
-			ACL_SCAN_DIR_PATH(scan), PATH_SEP_C, name);
+			SCAN_PATH(scan), PATH_SEP_C, name);
 		if (acl_stat(pathbuf, &sbuf) < 0) {
 			acl_msg_error("%s(%d), %s: stat file(%s) error(%s)",
 				__FILE__, __LINE__, myname, pathbuf,
@@ -358,14 +388,18 @@ const char *acl_scan_dir_next_dir(ACL_SCAN_DIR *scan)
 		memcpy(&scan->current->sbuf, &sbuf, sizeof(sbuf));
 
 		scan->nsize += sbuf.st_size;
+		scan->current->nsize += sbuf.st_size;
 
 		if (!S_ISDIR(sbuf.st_mode)) {
+			scan->nfiles++;
+			scan->current->nfiles++;
 			continue;
 		}
 
 		scan->ndirs++;
+		scan->current->ndirs++;
 
-		if (scan->recursive && acl_scan_dir_push(scan, name) < 0) {
+		if (SCAN_RECURSIVE(scan) && acl_scan_dir_push(scan, name) < 0) {
 			return NULL;
 		} else {
 			return name;
@@ -387,8 +421,10 @@ const char *acl_scan_dir_next_name(ACL_SCAN_DIR *scan, int *is_file)
 			}
 			continue;
 		}
+
 		snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
-			ACL_SCAN_DIR_PATH(scan), PATH_SEP_C, name);
+			SCAN_PATH(scan), PATH_SEP_C, name);
+
 		if (acl_stat(pathbuf, &sbuf) < 0) {
 			acl_msg_error("%s(%d), %s: stat file(%s) error(%s)",
 				__FILE__, __LINE__, myname, pathbuf,
@@ -398,22 +434,28 @@ const char *acl_scan_dir_next_name(ACL_SCAN_DIR *scan, int *is_file)
 
 		memcpy(&scan->current->sbuf, &sbuf, sizeof(sbuf));
 		scan->nsize += sbuf.st_size;
+		scan->current->nsize += sbuf.st_size;
 
 		if (!S_ISDIR(sbuf.st_mode)) {
 			if (is_file) {
 				*is_file = 1;
 			}
+			scan->nfiles++;
+			scan->current->nfiles++;
 			return name;
 		}
 
 		scan->ndirs++;
+		scan->current->ndirs++;
 
-		if (scan->recursive && acl_scan_dir_push(scan, name) < 0) {
+		if (SCAN_RECURSIVE(scan) && acl_scan_dir_push(scan, name) < 0) {
 			return NULL;
 		}
+
 		if (is_file) {
 			*is_file = 0;
 		}
+
 		return name;
 	}
 }
@@ -433,7 +475,7 @@ acl_int64 acl_scan_dir_size2(ACL_SCAN_DIR *scan, int *nfile, int *ndir)
 			continue;
 		}
 		snprintf(pathbuf, sizeof(pathbuf), "%s%c%s",
-			ACL_SCAN_DIR_PATH(scan), PATH_SEP_C, name);
+			SCAN_PATH(scan), PATH_SEP_C, name);
 		if (acl_stat(pathbuf, &sbuf) < 0) {
 			acl_msg_error("%s(%d), %s: stat file(%s) error(%s)",
 				__FILE__, __LINE__, myname, pathbuf,
@@ -446,7 +488,10 @@ acl_int64 acl_scan_dir_size2(ACL_SCAN_DIR *scan, int *nfile, int *ndir)
 		if (S_ISDIR(sbuf.st_mode)) {
 			scan->ndirs++;
 			scan->file_name[0] = 0;
-			if (scan->recursive && acl_scan_dir_push(scan, name) < 0) {
+
+			if (SCAN_RECURSIVE(scan)
+				&& acl_scan_dir_push(scan, name) < 0) {
+
 				break;
 			}
 		} else {
@@ -511,7 +556,7 @@ acl_int64 acl_scan_dir_rm2(ACL_SCAN_DIR *scan, int *ndir, int *nfile)
 		if ((name = acl_scan_dir_next(scan)) == NULL) {
 			if (scan->current != NULL) {
 				snprintf(path, sizeof(path), "%s",
-					ACL_SCAN_DIR_PATH(scan));
+					SCAN_PATH(scan));
 			} else {
 				path[0] = 0;
 			}
@@ -534,7 +579,7 @@ acl_int64 acl_scan_dir_rm2(ACL_SCAN_DIR *scan, int *ndir, int *nfile)
 		}
 
 		snprintf(path, sizeof(path), "%s%c%s",
-			ACL_SCAN_DIR_PATH(scan), PATH_SEP_C, name);
+			SCAN_PATH(scan), PATH_SEP_C, name);
 
 		if (acl_stat(path, &sbuf) < 0) {
 			acl_msg_error("%s(%d), %s: stat file(%s) error(%s)",
@@ -544,9 +589,13 @@ acl_int64 acl_scan_dir_rm2(ACL_SCAN_DIR *scan, int *ndir, int *nfile)
 		}
 		if (S_ISDIR(sbuf.st_mode)) {
 			scan->file_name[0] = 0;
-			if (scan->recursive && acl_scan_dir_push(scan, name) < 0) {
+
+			if (SCAN_RECURSIVE(scan)
+				&& acl_scan_dir_push(scan, name) < 0) {
+
 				break;
 			}
+
 			if (scan->scan_fn && scan->scan_fn(scan, scan->scan_ctx) < 0) {
 				break;
 			}
