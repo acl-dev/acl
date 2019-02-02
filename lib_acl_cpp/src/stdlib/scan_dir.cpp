@@ -92,11 +92,11 @@ bool scan_dir::rmdir_callback(const char* path)
 {
 #ifdef ACL_WINDOWS
 	if (_rmdir(path) == 0) {
-		return true;
 #else
 	if (rmdir(path) == 0) {
-		return true;
 #endif
+		logger("rmdir ok, path=%s", path);
+		return true;
 	} else {
 		logger_error("rmdir error=%s, path=%s", last_serror(), path);
 		return false;
