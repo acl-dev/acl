@@ -23,15 +23,12 @@ public:
 	bool open(const char* path, bool recursive = true, bool rmdir_on = false);
 
 	/**
-	 * 虚方法，当需要删除空目录时，子类可以实现此虚方法来删除传入的目录
+	 * 虚方法，当需要删除空目录时，子类可以实现此虚方法来删除传入的目录，
+	 * 本虚方法内部会自动调用 rmdir 删除空目录
 	 * @param path {const char*} 需要被删除的空目录
 	 * @return {bool} 删除目录是否成功
 	 */
-	virtual bool rmdir_callback(const char* path)
-	{
-		(void) path;
-		return false;
-	}
+	virtual bool rmdir_callback(const char* path);
 
 	/**
 	 * 关闭目录，同时释放内部资源

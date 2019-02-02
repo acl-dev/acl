@@ -88,6 +88,21 @@ int scan_dir::rmdir_def(ACL_SCAN_DIR*, const char* path, void* ctx)
 	return me->rmdir_callback(path) ? 0 : -1;
 }
 
+bool scan_dir::rmdir_callback(const char* path)
+{
+#ifdef ACL_WINDOWS
+	if (_rmdir(path) == 0) {
+		return true;
+#else
+	if (rmdir(path) == 0) {
+		return true;
+#endif
+	} else {
+		logger_error("rmdir error=%s, path=%s", last_serror(), path);
+		return false;
+	}
+}
+
 const char* scan_dir::next_file(bool full /* = false */)
 {
 	if (scan_ == NULL) {
