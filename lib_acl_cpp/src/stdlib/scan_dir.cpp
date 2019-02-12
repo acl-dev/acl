@@ -6,6 +6,17 @@
 #include "acl_cpp/stdlib/scan_dir.hpp"
 #endif
 
+#ifdef ACL_UNIX
+# include <dirent.h>
+# include <unistd.h>
+#elif	defined(ACL_WINDOWS)
+# if	defined(ACL_BCB_COMPILER)
+#  include <dirent.h>
+# else
+#  include <direct.h>
+# endif
+#endif
+
 namespace acl
 {
 
