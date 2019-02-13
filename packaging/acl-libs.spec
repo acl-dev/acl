@@ -1,4 +1,4 @@
-%define release_id 46
+%define release_id 47
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Wed Feb 13 2019 zhengshuxin@qiyi.com 3.4.1-47-20190213.11
+- acl_scan_dir.c: the current dir's attribute can be got in scanning process
 
 * Mon Feb 11 2019 zhengshuxin@qiyi.com 3.4.1-46-20190211.11
 - acl_scan_dir.c: continue to scan the next node when some error happends
