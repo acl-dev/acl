@@ -134,8 +134,9 @@ void acl_log_fp_set(ACL_VSTREAM *fp, const char *logpre)
 
 	acl_assert(fp);
 
-	if (__loggers == NULL)
+	if (__loggers == NULL) {
 		__loggers = private_fifo_new();
+	}
 
 	acl_foreach(iter, __loggers) {
 		log = (ACL_LOG*) iter.data;
@@ -147,8 +148,9 @@ void acl_log_fp_set(ACL_VSTREAM *fp, const char *logpre)
 	}
 
 #ifdef	ACL_UNIX
-	if (__log_close_onexec)
+	if (__log_close_onexec) {
 		acl_close_on_exec(ACL_VSTREAM_SOCK(fp), ACL_CLOSE_ON_EXEC);
+	}
 #endif
 	log = (ACL_LOG*) calloc(1, sizeof(ACL_LOG));
 	log->fp = fp;
@@ -157,15 +159,17 @@ void acl_log_fp_set(ACL_VSTREAM *fp, const char *logpre)
 	log->lock = (acl_pthread_mutex_t*)
 		calloc(1, sizeof(acl_pthread_mutex_t));
 	init_log_mutex(log->lock);
-	if (logpre && *logpre)
+	if (logpre && *logpre) {
 		snprintf(log->logpre, sizeof(log->logpre), "%s", logpre);
-	else
+	} else {
 		log->logpre[0] = 0;
+	}
 	log->flag |= ACL_LOG_F_FIXED;
-	if (fp->type & ACL_VSTREAM_TYPE_FILE)
+	if (fp->type & ACL_VSTREAM_TYPE_FILE) {
 		log->type = ACL_LOG_T_FILE;
-	else if (fp->type & ACL_VSTREAM_TYPE_LISTEN_INET)
+	} else if (fp->type & ACL_VSTREAM_TYPE_LISTEN_INET) {
 		log->type= ACL_LOG_T_UDP;
+	}
 	private_fifo_push(__loggers, log);
 }
 
@@ -212,8 +216,9 @@ static int open_file_log(const char *filename, const char *logpre)
 #endif
 
 #ifdef	ACL_UNIX
-	if (__log_close_onexec)
+	if (__log_close_onexec) {
 		acl_close_on_exec(fh, ACL_CLOSE_ON_EXEC);
+	}
 #endif
 
 	log = (ACL_LOG*) calloc(1, sizeof(ACL_LOG));
@@ -224,10 +229,11 @@ static int open_file_log(const char *filename, const char *logpre)
 	log->lock = (acl_pthread_mutex_t*)
 		calloc(1, sizeof(acl_pthread_mutex_t));
 	init_log_mutex(log->lock);
-	if (logpre && *logpre)
+	if (logpre && *logpre) {
 		snprintf(log->logpre, sizeof(log->logpre), "%s", logpre);
-	else
+	} else {
 		log->logpre[0] = 0;
+	}
 
 	private_fifo_push(__loggers, log);
 	return 0;
@@ -239,28 +245,32 @@ static int reopen_log(ACL_LOG *log)
 
 #undef	RETURN
 #define	RETURN(x) do {  \
-	if (log->lock)  \
+	if (log->lock) {  \
 		thread_mutex_unlock(log->lock);  \
+	} \
 	return (x);  \
 } while (0)
 
-	if (log->lock)
+	if (log->lock) {
 		thread_mutex_lock(log->lock);
+	}
 
 	if (!(log->flag & ACL_LOG_F_DEAD)
 		|| (log->flag & ACL_LOG_F_FIXED)
 		|| !IS_NET_STREAM(log)
 		|| log->fp == NULL
-		|| log->reopen_inter <= 0)
-	{
+		|| log->reopen_inter <= 0) {
+
 		RETURN(-1);
 	}
 
 	if (log->count == 0) {
-		if (now - log->last_open < 5 * log->reopen_inter)
+		if (now - log->last_open < 5 * log->reopen_inter) {
 			RETURN(-1);
-	} else if (now - log->last_open < log->reopen_inter)
+		}
+	} else if (now - log->last_open < log->reopen_inter) {
 		RETURN(-1);
+	}
 
 	if (log->fp->path) {
 		free(log->fp->path);
@@ -281,8 +291,9 @@ static int reopen_log(ACL_LOG *log)
 	acl_assert(log->path);
 	log->fp = private_vstream_connect(log->path, 60, 60);
 	log->last_open = time(NULL);
-	if (log->fp == NULL)
+	if (log->fp == NULL) {
 		RETURN(-1);
+	}
 	log->flag &= ~ACL_LOG_F_DEAD;
 	log->last_open = time(NULL);
 	RETURN(0);
@@ -320,10 +331,11 @@ static int open_stream_log(const char *addr, const char *logpre, int type)
 		calloc(1, sizeof(acl_pthread_mutex_t));
 	thread_mutex_init(log->lock, NULL);
 	log->type = type;
-	if (logpre && *logpre)
+	if (logpre && *logpre) {
 		snprintf(log->logpre, sizeof(log->logpre), "%s", logpre);
-	else
+	} else {
 		log->logpre[0] = 0;
+	}
 
 	private_fifo_push(__loggers, log);
 	return 0;
@@ -437,8 +449,9 @@ static int open_udp_log(const char *addr, const char *logpre)
 	for (res = res0; res != NULL; res = res->ai_next) {
 		fd = socket(res->ai_family, res->ai_socktype,
 				res->ai_protocol);
-		if (fd != ACL_SOCKET_INVALID)
+		if (fd != ACL_SOCKET_INVALID) {
 			break;
+		}
 
 		printf("%s: socket %s", myname, acl_last_serror());
 	}
@@ -470,8 +483,8 @@ static int open_udp_log(const char *addr, const char *logpre)
 	else if (res->ai_family == AF_INET6) {
 		log->dest.sa.in6.sin6_port = htons(port);
 		if (inet_pton(res->ai_family, ip,
-			&log->dest.sa.in6.sin6_addr) != 1)
-		{
+			&log->dest.sa.in6.sin6_addr) != 1) {
+
 			printf("%s(%d), %s: inet_pton error: %s, ip: %s\r\n",
 				__FILE__, __LINE__, myname,
 				acl_last_serror(), ip);
@@ -492,10 +505,11 @@ static int open_udp_log(const char *addr, const char *logpre)
 		calloc(1, sizeof(acl_pthread_mutex_t));
 	thread_mutex_init(log->lock, NULL);
 
-	if (logpre && *logpre)
+	if (logpre && *logpre) {
 		snprintf(log->logpre, sizeof(log->logpre), "%s", logpre);
-	else
+	} else {
 		log->logpre[0] = 0;
+	}
 
 	private_fifo_push(__loggers, log);
 	freeaddrinfo(res0);
@@ -559,8 +573,9 @@ static void fork_prepare(void)
 		ACL_ITER iter;
 		acl_foreach(iter, __loggers) {
 			ACL_LOG *log = (ACL_LOG *) iter.data;
-			if (log->lock)
+			if (log->lock) {
 				thread_mutex_lock(log->lock);
+			}
 		}
 	}
 }
@@ -571,8 +586,9 @@ static void fork_in_parent(void)
 		ACL_ITER iter;
 		acl_foreach(iter, __loggers) {
 			ACL_LOG *log = (ACL_LOG *) iter.data;
-			if (log->lock)
+			if (log->lock) {
 				thread_mutex_unlock(log->lock);
+			}
 		}
 	}
 }
@@ -583,8 +599,9 @@ static void fork_in_child(void)
 		ACL_ITER iter;
 		acl_foreach(iter, __loggers) {
 			ACL_LOG *log = (ACL_LOG *) iter.data;
-			if (log->lock)
+			if (log->lock) {
 				init_log_mutex(log->lock);
+			}
 		}
 	}
 }
@@ -614,8 +631,9 @@ int acl_open_log(const char *recipients, const char *logpre)
 		return -1;
 	}
 
-	if (__loggers == NULL)
+	if (__loggers == NULL) {
 		__loggers = private_fifo_new();
+	}
 
 	argv = acl_argv_split(recipients, "|");
 	acl_foreach(iter, argv) {
@@ -656,81 +674,115 @@ void acl_logtime_fmt(char *buf, size_t size)
 
 #ifdef	ACL_UNIX
 
-static char *get_buf(const char *pre, const char *fmt, va_list ap, size_t *len)
+static char *get_buf(const char *prefix, const char *fmt, va_list ap,
+	const char *suffix, size_t *len)
 {
 	va_list ap_tmp;
-	char *buf, *ptr;
-	size_t n1, n2, n;
-	int   ret;
+	char  *buf, *ptr;
+	size_t prefix_len = strlen(prefix);
+	size_t suffix_len = suffix ? strlen(suffix) : 0;
+	size_t total_len, left_len;
+	int    ret;
 
-	n1 = strlen(pre);
-
-	n = n1 + 1024;
-	buf = (char*) malloc(n);
+	total_len = prefix_len + 1024;
+	buf = (char*) malloc(total_len);
 	acl_assert(buf);
 
-	strcpy(buf, pre);
-	ptr = buf + n1;
-	n2 = n - n1;
+	strcpy(buf, prefix);
+	ptr = buf + prefix_len;
+	left_len = total_len - prefix_len;
 	va_copy(ap_tmp, ap);
-	ret = vsnprintf(ptr, n2, fmt, ap_tmp);
+	ret = vsnprintf(ptr, left_len, fmt, ap_tmp);
 	acl_assert(ret > 0);
 
-	*len = n1 + ret;
+	*len = prefix_len + ret;
 
-	if (ret >= (int) n2) {
-		n = n1 + ret + 1;
-		buf = (char*) realloc(buf, n);
+	if (ret >= (int) left_len) {
+		total_len = prefix_len + ret + 1;
+		buf = (char*) realloc(buf, total_len);
 		acl_assert(buf);
 
-		ptr = buf + n1;
-		n2 = n - n1;
+		ptr = buf + prefix_len;
+		left_len = total_len - prefix_len;
 		va_copy(ap_tmp, ap);
-		ret = vsnprintf(ptr, n2, fmt, ap_tmp);
-		acl_assert(ret > 0 && ret < (int) n2);
+		ret = vsnprintf(ptr, left_len, fmt, ap_tmp);
+		acl_assert(ret > 0 && ret < (int) left_len);
 	}
+
+	if (suffix_len == 0) {
+		return buf;
+	}
+
+	*len = *len + suffix_len;
+	if (*len >= total_len) {
+		total_len = *len + 1;
+		buf = (char*) realloc(buf, total_len);
+		acl_assert(buf);
+	}
+
+	ptr = buf + prefix_len + ret;
+	memcpy(ptr, suffix, suffix_len);
+	ptr[suffix_len] = 0;
 
 	return buf;
 }
 
 #else
 
-static char *get_buf(const char *pre, const char *fmt, va_list ap, size_t *len)
+static char *get_buf(const char *prefix, const char *fmt, va_list ap,
+	const char *suffix, size_t *len)
 {
-	char *buf, *ptr;
-	size_t n1, n2, n;
-	int   ret, i;
+	char  *buf, *ptr;
+	size_t prefix_len = strlen(prefix);
+	size_t suffix_len = suffix ? strlen(suffix) : 0;
+	size_t total_len, left_len;
+	int    ret, i;
 
-	n1 = strlen(pre);
-
-	n = n1 + 1024;
-	buf = (char*) malloc(n);
+	total_len = prefix_len + 1024;
+	buf = (char*) malloc(total_len);
 	acl_assert(buf);
 
-	strcpy(buf, pre);
-	ptr = buf + n1;
-	n2 = n - n1;
-	ret = vsnprintf(ptr, n2, fmt, ap);
-	if (ret > 0 && ret < (int) n2) {
-		*len = n1 + ret;
+	strcpy(buf, prefix);
+	ptr = buf + prefix_len;
+	left_len = total_len - prefix_len;
+	ret = vsnprintf(ptr, left_len, fmt, ap);
+	if (ret > 0 && ret < (int) left_len) {
+		*len = prefix_len + ret;
 		return buf;
 	}
 
 	i = 0;
 	while (1) {
-		n += 1024;
-		buf = (char*) realloc(buf, n);
+		total_len += 1024;
+		buf = (char*) realloc(buf, total_len);
 		acl_assert(buf);
-		ptr = buf + n1;
-		n2 = n - n1;
-		ret = vsnprintf(ptr, n2, fmt, ap);
-		if (ret > 0 && ret < (int) n2) {
-			*len = n1 + ret;
+
+		ptr = buf + prefix_len;
+		left_len = total_len - prefix_len;
+		ret = vsnprintf(ptr, left_len, fmt, ap);
+		if (ret > 0 && ret < (int) left_len) {
+			*len = prefix_len + ret;
 			break;
 		}
-		if (++i >= 10000)
+		if (++i >= 10000) {
 			abort();
+		}
 	}
+
+	if (suffix_len == 0) {
+		return buf;
+	}
+
+	*len = *len + suffix_len;
+	if (*len >= total_len) {
+		total_len = *len + 1;
+		buf = (char*) realloc(buf, total_len);
+		acl_assert(buf);
+	}
+
+	ptr = buf + prefix_len + ret;
+	memcpy(ptr, suffix, suffix_len);
+	ptr[suffix_len] = 0;
 
 	return buf;
 }
@@ -742,9 +794,6 @@ static void file_vsyslog(ACL_LOG *log, const char *info,
 {
 	char   fmtstr[128], tbuf[1024], *buf;
 	size_t len;
-
-	if (log->lock)
-		thread_mutex_lock(log->lock);
 
 	acl_logtime_fmt(fmtstr, sizeof(fmtstr));
 
@@ -782,17 +831,13 @@ static void file_vsyslog(ACL_LOG *log, const char *info,
 #endif
 	}
 
-	buf = get_buf(tbuf, fmt, ap, &len);
+	buf = get_buf(tbuf, fmt, ap, "\r\n", &len);
 
-	if (private_vstream_writen(log->fp, buf, len) == ACL_VSTREAM_EOF
-		|| private_vstream_writen(log->fp, "\r\n", 2) == ACL_VSTREAM_EOF)
-	{
+	if (private_vstream_writen(log->fp, buf, len) == ACL_VSTREAM_EOF) {
 		log->flag |= ACL_LOG_F_DEAD;
-	} else
+	} else {
 		log->count++;
-
-	if (log->lock)
-		thread_mutex_unlock(log->lock);
+	}
 
 	free(buf);
 }
@@ -836,23 +881,25 @@ static void net_vsyslog(ACL_LOG *log, const char *info,
 #endif
 	}
 
-	buf = get_buf(tbuf, fmt, ap, &len);
+	buf = get_buf(tbuf, fmt, ap, log->type == ACL_LOG_T_UDP
+		? NULL : "\r\n", &len);
 
-	if (log->lock)
+	if (log->lock && log->type != ACL_LOG_T_UDP) {
 		thread_mutex_lock(log->lock);
+	}
 
 	if (log->type == ACL_LOG_T_UDP) {
 		(void) private_vstream_write(log->fp, buf, len);
 		log->count++;
-	} else if (private_vstream_buffed_writen(log->fp, buf, len) == ACL_VSTREAM_EOF
-		|| private_vstream_writen(log->fp, "\r\n", 2) == ACL_VSTREAM_EOF)
-	{
+	} else if (private_vstream_writen(log->fp, buf, len) == ACL_VSTREAM_EOF) {
 		log->flag |= ACL_LOG_F_DEAD;
-	} else
+	} else {
 		log->count++;
+	}
 
-	if (log->lock)
+	if (log->lock && log->type != ACL_LOG_T_UDP) {
 		thread_mutex_unlock(log->lock);
+	}
 
 	free(buf);
 }
@@ -865,23 +912,25 @@ int acl_write_to_log2(const char *info, const char *fmt, va_list ap)
 	va_list  tmp;
 #endif
 
-	if (__loggers == NULL)
+	if (__loggers == NULL) {
 		return 0;
+	}
 
 #ifdef ACL_UNIX
 	acl_foreach(iter, __loggers) {
 		log = (ACL_LOG*) iter.data;
 		if ((log->flag & ACL_LOG_F_DEAD)) {
-			if (reopen_log(log) < 0)
+			if (reopen_log(log) < 0) {
 				continue;
+			}
 		}
 		va_copy(tmp, ap);
-		if (log->type == ACL_LOG_T_FILE)
+		if (log->type == ACL_LOG_T_FILE) {
 			file_vsyslog(log, info, fmt, tmp);
-		else if (log->type == ACL_LOG_T_TCP
+		} else if (log->type == ACL_LOG_T_TCP
 			|| log->type == ACL_LOG_T_UDP
-			|| log->type == ACL_LOG_T_UNIX)
-		{
+			|| log->type == ACL_LOG_T_UNIX) {
+
 			net_vsyslog(log, info, fmt, tmp);
 		}
 	}
@@ -889,15 +938,16 @@ int acl_write_to_log2(const char *info, const char *fmt, va_list ap)
 	acl_foreach(iter, __loggers) {
 		log = (ACL_LOG*) iter.data;
 		if ((log->flag & ACL_LOG_F_DEAD)) {
-			if (reopen_log(log) < 0)
+			if (reopen_log(log) < 0) {
 				continue;
+			}
 		}
-		if (log->type == ACL_LOG_T_FILE)
+		if (log->type == ACL_LOG_T_FILE) {
 			file_vsyslog(log, info, fmt, ap);
-		else if (log->type == ACL_LOG_T_TCP
+		} else if (log->type == ACL_LOG_T_TCP
 			|| log->type == ACL_LOG_T_UDP
-			|| log->type == ACL_LOG_T_UNIX)
-		{
+			|| log->type == ACL_LOG_T_UNIX) {
+
 			net_vsyslog(log, info, fmt, ap);
 		}
 	}
@@ -921,16 +971,19 @@ void acl_close_log()
 {
 	ACL_LOG *log;
 
-	if (__loggers == NULL)
+	if (__loggers == NULL) {
 		return;
+	}
 
 	while (1) {
 		log = (ACL_LOG*) private_fifo_pop(__loggers);
-		if (log == NULL)
+		if (log == NULL) {
 			break;
+		}
 
-		if ((log->flag & ACL_LOG_F_FIXED))
+		if ((log->flag & ACL_LOG_F_FIXED)) {
 			continue;
+		}
 
 		if (log->fp) {
 			if (log->fp->path) {
@@ -950,10 +1003,12 @@ void acl_close_log()
 			private_vstream_close(log->fp);
 		}
 
-		if (log->path)
+		if (log->path) {
 			free(log->path);
-		if (log->lock)
+		}
+		if (log->lock) {
 			thread_mutex_destroy(log->lock);
+		}
 		free(log);
 	}
 

@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	char  buf[1024];
 	acl_pthread_pool_t *pool;
 
-	buf[0] = 0;
+	snprintf(buf, sizeof(buf), "test.log");
 	while ((ch = getopt(argc, argv, "ht:n:N:")) > 0) {
 		switch (ch) {
 		case 'h':
@@ -41,11 +41,6 @@ int main(int argc, char *argv[])
 		default:
 			break;
 		}
-	}
-
-	if (buf[0] == 0) {
-		usage(argv[0]);
-		return (0);
 	}
 
 	acl_msg_open(buf, "log_test");

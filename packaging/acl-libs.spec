@@ -1,4 +1,4 @@
-%define release_id 47
+%define release_id 48
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Sun Feb 24 2019 zhengshuxin@qiyi.com 3.4.1-48-20190224.22
+- acl_mylog.c: remove thread mutex when writing log to local file or remote UDP server like syslog-ng
 
 * Wed Feb 13 2019 zhengshuxin@qiyi.com 3.4.1-47-20190213.11
 - acl_scan_dir.c: the current dir's attribute can be got in scanning process
