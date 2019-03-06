@@ -342,10 +342,18 @@ static void main_fiber_monitor_master(ACL_FIBER *fiber, void *ctx)
 	/* must close listening as quickly as possible, so that acl_master
 	 * can rebind the addr quickly.
 	 */
+	acl_msg_info("%s(%d), %s: stopping listen ...",
+		__FILE__, __LINE__, __FUNCTION__);
 	main_stop_listen();
+	acl_msg_info("%s(%d), %s: stop listen ok",
+		__FILE__, __LINE__, __FUNCTION__);
 
 	/* the user's callback will be called here */
+	acl_msg_info("%s(%d), %s: calling server_onexit ...",
+		__FILE__, __LINE__, __FUNCTION__);
 	main_server_onexit();
+	acl_msg_info("%s(%d), %s: call server_onexit ok",
+		__FILE__, __LINE__, __FUNCTION__);
 
 	while (!acl_var_fiber_quick_abort) {
 		if (acl_atomic_clock_users(__clock) <= 0) {
@@ -372,8 +380,17 @@ static void main_fiber_monitor_master(ACL_FIBER *fiber, void *ctx)
 	}
 
 	/* then notify all threads' fiber schedule to stop */
+	acl_msg_info("%s(%d), %s: stopping servers ...",
+		__FILE__, __LINE__, __FUNCTION__);
 	main_stop_servers();
+	acl_msg_info("%s(%d), %s: stop servers ok",
+		__FILE__, __LINE__, __FUNCTION__);
+
+	acl_msg_info("%s(%d), %s: freeing servers ...",
+		__FILE__, __LINE__, __FUNCTION__);
 	main_free_servers();
+	acl_msg_info("%s(%d), %s: free servers ok",
+		__FILE__, __LINE__, __FUNCTION__);
 
 	acl_msg_info("%s(%d), %s: call main_server_exit",
 		__FILE__, __LINE__, __FUNCTION__);
