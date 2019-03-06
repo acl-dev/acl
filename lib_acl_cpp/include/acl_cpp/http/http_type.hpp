@@ -52,10 +52,10 @@ typedef enum
 	// Content-Type: application/octet-stream
 	HTTP_REQUEST_OCTET_STREAM,
 
-	// Content-Type: text/xml
+	// Content-Type: text/xml 或 application/xml
 	HTTP_REQUEST_TEXT_XML,
 
-	// Content-Type: text/json
+	// Content-Type: text/json 或 application/json
 	HTTP_REQUEST_TEXT_JSON,
 
 	// 其它类型
