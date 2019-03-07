@@ -1,32 +1,39 @@
 apply plugin: 'com.android.library'
 buildscript {
     repositories {
+        google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
+        //classpath 'com.android.tools.build:gradle:3.3.2'
+        //classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.android.tools.build:gradle:3.3.1'
     }
+    //implementation {}
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "26.0.0"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
     repositories {
         maven { url 'http://repo1.maven.org/maven2' }
     }
     defaultConfig {
-        minSdkVersion 25
-        targetSdkVersion 25
+        minSdkVersion 15
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_STL=gnustl_shared"
+                //arguments "-DANDROID_STL=gnustl_shared"
+                //arguments "-DANDROID_STL=stl_shared"
                 //cppFlags "-fexceptions"
                 //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86'
-                abiFilters 'armeabi'
+                //abiFilters 'x86', 'arm64-v8a'
+                //abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
+                abiFilters 'arm64-v8a', 'armeabi-v7a'
             }
         }
     }
@@ -48,28 +55,36 @@ android {
         }
     }
     packagingOptions {
-        exclude 'lib/arm64-v8a/libgnustl_shared.so'
-        exclude 'lib/armeabi-v7a/libgnustl_shared.so'
-        exclude 'lib/armeabi/libgnustl_shared.so'
-        exclude 'lib/x86/libgnustl_shared.so'
+        //exclude 'lib/arm64-v8a/libgnustl_shared.so'
+        //exclude 'lib/armeabi-v7a/libgnustl_shared.so'
+        //exclude 'lib/armeabi/libgnustl_shared.so'
+        //exclude 'lib/x86/libgnustl_shared.so'
+        exclude 'lib/arm64-v8a/libc++_shared.so'
+        exclude 'lib/armeabi-v7a/libc++_shared.so'
+        exclude 'lib/armeabi/libc++_shared.so'
+        exclude 'lib/x86/libc++_shared.so'
     }
     productFlavors {
     }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    //compile fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     //compile 'com.android.support:appcompat-v7:25.3.1'
     //compile 'com.android.support.constraint:constraint-layout:1.0.2'
     //testCompile 'junit:junit:4.12'
-    compile files('libs/junit-4.12.jar')
+    //compile files('libs/junit-4.12.jar')
+    //implementation files('libs/junit-4.12.jar')
 }
 
 allprojects {
     repositories {
+        google()
         jcenter()
     }
 }

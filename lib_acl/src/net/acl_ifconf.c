@@ -140,7 +140,7 @@ static ACL_IFCONF *ifconf_create(int max)
 #include <sys/sockio.h>
 #endif
 
-# ifdef ACL_LINUX
+# if defined(ACL_LINUX) && !defined(ACL_ANDROID)
 #include <ifaddrs.h>
 
 ACL_IFCONF *acl_get_ifaddrs(void)

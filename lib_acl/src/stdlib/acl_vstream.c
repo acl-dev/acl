@@ -2760,10 +2760,27 @@ int acl_file_ftruncate(ACL_VSTREAM *fp, acl_off_t length)
 	return ftruncate(hf, length);
 }
 
+# if defined(ACL_ANDROID)
+int acl_file_truncate(const char *path, acl_off_t length)
+{
+	int ret;
+	ACL_VSTREAM *fp = acl_vstream_fopen(path, O_RDWR | O_CREAT, 0600, 0);
+	if (fp == NULL) {
+		acl_msg_error("%s(%d), %s: fopen %s error %s",
+			__FILE__, __LINE__, __FUNCTION__,
+			path, acl_last_serror());
+		return -1;
+	}
+	ret = acl_file_ftruncate(fp, length);
+	acl_vstream_close(fp);
+	return ret;
+}
+# else
 int acl_file_truncate(const char *path, acl_off_t length)
 {
 	return truncate(path, length);
 }
+# endif
 
 #endif /* !ACL_WINDOWS, ACL_UNIX */
 

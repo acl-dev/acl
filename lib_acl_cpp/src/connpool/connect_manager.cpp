@@ -541,7 +541,7 @@ void connect_manager::set_pools_status(const char* addr, bool alive)
 		return;
 	}
 
-	std::vector<connect_pool*>::iterator it;
+	// std::vector<connect_pool*>::iterator it;
 
 	lock_guard guard(lock_);
 
