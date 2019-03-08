@@ -11,10 +11,20 @@
 # include <ctype.h>
 # include <limits.h>			/* CHAR_BIT */
 
-#if defined(_WIN32) || defined(_WIN64)
+# if defined(_WIN32) || defined(_WIN64)
 #  include <process.h>
 #  include <stdio.h>
 #  include <stdarg.h>
+#  if(_MSC_VER >= 1300)
+#   include <winsock2.h>
+#   include <mswsock.h>
+#  else
+#   include <winsock.h>
+#  endif
+
+#  include <ws2tcpip.h> /* for getaddrinfo */
+#  include <netioapi.h>
+
 #  ifdef __STDC_WANT_SECURE_LIB__
 int acl_secure_snprintf(char *buf, size_t size, const char *fmt, ...);
 int acl_secure_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);

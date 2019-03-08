@@ -94,7 +94,7 @@
 # endif
 
 # include <ws2tcpip.h> /* for getaddrinfo */
-# include <netioapi.h>
+//# include <netioapi.h>
 
 # ifdef	ACL_BCB_COMPILER
 #  pragma hdrstop
