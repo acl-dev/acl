@@ -1,8 +1,8 @@
-%define release_id 48
+%define release_id 0
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
-Version:        3.4.1
+Version:        3.4.2
 Release:        %{release_id}
 Group:          System/Libs
 License:        IBM
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Sat Mar 09 2019 zhengshuxin@qiyi.com 3.4.2-0-20190309.13
+- release 3.4.2 version.
 
 * Sun Feb 24 2019 zhengshuxin@qiyi.com 3.4.1-48-20190224.22
 - acl_mylog.c: remove thread mutex when writing log to local file or remote UDP server like syslog-ng
