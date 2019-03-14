@@ -675,14 +675,9 @@ bool HttpServletRequest::readHeader(string* method_s)
 
 		return ret == -1 ? false : true;
 	}
-	if (!EQ(ctype, "text"))
-	{
-		request_type_ = HTTP_REQUEST_OTHER;
-		return true;
-	}
 
-	// 当数据类型为 text/json 格式时：
-	else if (EQ(stype, "json"))
+	// 当数据类型为 application/json 或 text/json 格式时：
+	if (EQ(stype, "json") && (EQ(ctype, "application") || EQ(ctype, "text")))
 	{
 		request_type_ = HTTP_REQUEST_TEXT_JSON;
 		json_ = dbuf_->create<json>();
@@ -704,8 +699,8 @@ bool HttpServletRequest::readHeader(string* method_s)
 		return true;
 	}
 
-	// 当数据类型为 text/xml 格式时：
-	else if (EQ(stype, "xml"))
+	// 当数据类型为 application/xml 或 text/xml 格式时：
+	else if (EQ(stype, "xml") && (EQ(ctype, "application") || EQ(ctype, "text")))
 	{
 		request_type_ = HTTP_REQUEST_TEXT_XML;
 		xml_ = dbuf_->create<xml1>();

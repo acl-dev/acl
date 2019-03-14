@@ -242,7 +242,7 @@ public:
 	http_mime* getHttpMime(void) const;
 
 	/**
-	 * 数据类型为 text/json 格式构造函数中的 body_parse 为 true 时，则内部自动
+	 * 数据类型为 text/json 或 application/json 格式构造函数中的 body_parse 为 true 时，则内部自动
 	 * 解析数据并创建 json 对象
 	 * @return {json*} 返回解析好的 json 对象，若返回 NULL 则有以下几个原因：
 	 *  1、读数据出错
@@ -252,7 +252,7 @@ public:
 	json* getJson(void) const;
 
 	/**
-	 * 数据类型为 text/xml 格式构造函数中的 body_parse 为 true 时，则内部自动
+	 * 数据类型为 text/xml 或 application/xml 格式构造函数中的 body_parse 为 true 时，则内部自动
 	 * 解析数据并创建 xml 对象
 	 * @return {xml*} 返回解析好的 xml 对象，若返回 NULL 则有以下几个原因：
 	 *  1、读数据出错
