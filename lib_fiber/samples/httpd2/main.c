@@ -42,8 +42,6 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	ACL_VSTREAM *cstream = (ACL_VSTREAM *) ctx;
 	const char* res = "HTTP/1.1 200 OK\r\n"
 		"Date: Tue, 31 May 2016 14:20:28 GMT\r\n"
-		"Server: acl\r\n"
-		"Content-Type: text/html\r\n"
 		"Content-Length: 12\r\n"
 		"Connection: Keep-Alive\r\n"
 		"\r\n"
@@ -79,25 +77,37 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 	acl_vstream_close(sstream);
 }
 
-static void usage(const char *procname)
+static void* thread_main(void *ctx)
 {
-	printf("usage: %s -h [help] -s listen_addr -r rw_timeout\r\n", procname);
+	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx;
+
+	printf("%s: call fiber_creater\r\n", __FUNCTION__);
+	acl_fiber_create(fiber_accept, sstream, STACK_SIZE);
+
+	printf("call fiber_schedule\r\n");
+	acl_fiber_schedule();
+	return NULL;
 }
 
-static void fiber_dummy(ACL_FIBER *fiber, void *ctx acl_unused)
+static void usage(const char *procname)
 {
-	printf(">>>curr fiber: %d\r\n", acl_fiber_id(fiber));
+	printf("usage: %s -h [help]\r\n"
+		" -s listen_addr\r\n"
+		" -t max_threads\r\n"
+		" -r rw_timeout\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
 	char addr[64];
 	ACL_VSTREAM *sstream;
-	int  ch;
+	int  ch, nthreads = 1, i;
+	ACL_ARRAY *a = acl_array_create(10);
+	ACL_ITER iter;
 
 	snprintf(addr, sizeof(addr), "%s", "127.0.0.1:9001");
 
-	while ((ch = getopt(argc, argv, "hs:r:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:r:t:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -107,6 +117,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'r':
 			__rw_timeout = atoi(optarg);
+			break;
+		case 't':
+			nthreads = atoi(optarg);
 			break;
 		default:
 			break;
@@ -118,17 +131,27 @@ int main(int argc, char *argv[])
 		printf("acl_vstream_listen error %s\r\n", acl_last_serror());
 		return 1;
 	}
-
-	acl_fiber_create(fiber_dummy, NULL, 1024000);
-	acl_fiber_create(fiber_dummy, NULL, 1024000);
-
 	printf("listen %s ok\r\n", addr);
 
-	printf("%s: call fiber_creater\r\n", __FUNCTION__);
-	acl_fiber_create(fiber_accept, sstream, STACK_SIZE);
+	for (i = 0; i < nthreads; i++) {
+		acl_pthread_t* tid = acl_mymalloc(sizeof(acl_pthread_t));
+		if (acl_pthread_create(tid, NULL, thread_main, sstream) != 0) {
+			printf("create thread failed!\r\n");
+			return 1;
+		}
 
-	printf("call fiber_schedule\r\n");
-	acl_fiber_schedule();
+		acl_array_append(a, tid);
+	}
 
+	acl_foreach(iter, a) {
+		acl_pthread_t *tid = (acl_pthread_t *) iter.data;
+		if (acl_pthread_join(*tid, NULL) != 0) {
+			printf("pthread join failed!\r\n");
+			return 1;
+		}
+		acl_myfree(tid);
+	}
+
+	acl_array_free(a, NULL);
 	return 0;
 }
