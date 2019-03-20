@@ -66,7 +66,7 @@ all:
 	@(cd udp_server; make)
 	@(cd vstream_server; make)
 	@(cd vstream_client; make)
-clean:
+clean cl:
 	@(cd master; make clean)
 	@(cd dlink; make clean)
 	@(cd iplink; make clean)

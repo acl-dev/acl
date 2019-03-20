@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="chunk_chain.cpp"
+	Name="chunk_chain"
 	ProjectGUID="{F81E5153-7C35-46A2-853A-C4B73325E8A3}"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -33,11 +33,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/chunk_chain.cpp.exe"
+				OutputFile="$(OutDir)/chunk_chain.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib_acl"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/chunk_chain.cpp.pdb"
+				ProgramDatabaseFile="$(OutDir)/chunk_chain.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -81,7 +81,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/chunk_chain.cpp.exe"
+				OutputFile="$(OutDir)/chunk_chain.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
@@ -132,11 +132,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/chunk_chain.cpp.exe"
+				OutputFile="$(OutDir)/chunk_chain.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib_acl"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/chunk_chain.cpp.pdb"
+				ProgramDatabaseFile="$(OutDir)/chunk_chain.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -180,7 +180,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/chunk_chain.cpp.exe"
+				OutputFile="$(OutDir)/chunk_chain.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
@@ -217,7 +217,7 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\chunk_chain.cpp.cpp">
+				RelativePath=".\chunk_chain.cpp">
 			</File>
 			<File
 				RelativePath=".\stdafx.cpp">
