@@ -391,8 +391,9 @@ public:
 	 *  effective when not NULL
 	 * @return {int} 下一个游标位置，含义如下：
 	 *  return the next cursor value as follow:
-	 *   0：遍历结束
-	 *      iterating is finished
+	 *   0：遍历结束，当遍历结束时还需要检查 out 中的结果集是否为空，如果
+	 *      不为空，则需要继续进行处理
+	 *      iterating is finished and the out should be checked if emtpy
 	 *  -1: 出错
 	 *      some error happened
 	 *  >0: 游标的下一个位置，即使这样，具体有多少结果还需要检查 out，因为有可能为空
