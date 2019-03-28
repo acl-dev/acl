@@ -593,7 +593,7 @@ int redis_commands::scan(const char* addr, const char* pattern,
 			}
 		}
 
-		if (cursor == 0)
+		if (cursor == 0 && res.empty())
 			break;
 		redis.clear();
 		res.clear();
@@ -946,13 +946,16 @@ void redis_commands::pattern_remove(const std::vector<acl::string>& tokens)
 		return;
 	}
 
+	acl::log::stdout_open(false);
+	acl::log::open("redis-builder.log", "remove");
+
 	const char* pattern = tokens[1].c_str();
 
 	acl::redis redis(conns_);
 	const std::map<acl::string, acl::redis_node*>* masters =
 		redis_util::get_masters(redis);
 
-	int deleted = 0;
+	long long deleted = 0;
 
 	if (masters != NULL)
 	{
@@ -972,73 +975,154 @@ void redis_commands::pattern_remove(const std::vector<acl::string>& tokens)
 	else
 		deleted += pattern_remove(addr_, pattern);
 
-	printf("removed pattern: [%s], total: %d\r\n", pattern, deleted);
+	acl::log::close();
+	acl::log::stdout_open(true);
+
+	printf("removed pattern: [%s], total: %lld\r\n", pattern, deleted);
 }
 
-int redis_commands::pattern_remove(const char* addr, const char* pattern)
+long long redis_commands::pattern_remove(const char* addr, const char* pattern)
 {
 	acl::string buf;
-	std::vector<acl::string> res;
-
-	//acl::redis_client conn(addr, conn_timeout_, rw_timeout_);
-	//if (!passwd_.empty())
-	//	conn.set_password(passwd_);
-
-	acl::redis redis(conns_);
-	redis.keys_pattern(pattern, &res);
-
-	printf("addr: %s, pattern: [%s], total: %d\r\n",
-		addr, pattern, (int) res.size());
-
-	if (res.empty())
-		return 0;
-
 	acl::string prompt;
 	prompt.format("Do you want to delete them all in %s ? [y/n]: ", addr);
-
 	getline(buf, prompt);
-	if (buf.equal("y", false))
+	if (!buf.equal("y", false))
+		return 0;
+
+	size_t count = 10000;
+	std::vector<acl::string> res;
+	res.reserve(count);
+
+	acl::redis_client conn(addr, conn_timeout_, rw_timeout_);
+	if (!passwd_.empty())
+		conn.set_password(passwd_);
+
+	acl::redis redis(&conn);
+
+	acl::atomic_long deleted = 0, error = 0, notfound = 0;
+	int cursor = 0;
+
+	while (true)
 	{
-		int ret = remove(res);
-		if (ret > 0)
-			return ret;
+		cursor = redis.scan(cursor, res, pattern, &count);
+		if (cursor < 0)
+		{
+			printf("%s => scan error: %s\r\n",
+				addr, redis.result_error());
+			break;
+		}
+		else if (cursor == 0 && res.empty())
+		{
+			printf("%s => scan over\r\n", addr);
+			break;
+		}
+
+		// remove(res, deleted, error, notfound);
+		parallel_remove(res, deleted, error, notfound);
+		res.clear();
+
+		printf("%s => deleted: %lld, error: %lld, not found: %lld\r\n",
+			addr, deleted.value(), error.value(), notfound.value());
 	}
 
-	return 0;
+	return deleted;
 }
 
-int redis_commands::remove(const std::vector<acl::string>& keys)
+void redis_commands::remove(const std::vector<acl::string>& keys,
+	acl::atomic_long& deleted, acl::atomic_long& error,
+	acl::atomic_long& notfound)
 {
 	acl::redis cmd(conns_);
 
-	int  deleted = 0, error = 0, notfound = 0;
+	int  display_count = 0;
 
 	for (std::vector<acl::string>::const_iterator cit = keys.begin();
 		cit != keys.end(); ++cit)
 	{
 		cmd.clear(false);
 		int ret = cmd.del_one((*cit).c_str());
+		display_count++;
 		if (ret < 0)
 		{
-			printf("del_one error: %s, key: [%s]\r\n",
-				cmd.result_error(), (*cit).c_str());
-			error++;
+			if (display_count < 10)
+				printf("del_one error: %s, key: [%s]\r\n",
+					cmd.result_error(), (*cit).c_str());
+			++error;
 		}
 		else if (ret == 0)
 		{
-			printf("not exist, key: [%s]\r\n", (*cit).c_str());
-			notfound++;
+			if (display_count < 10)
+				printf("not exist, key: [%s]\r\n", (*cit).c_str());
+			++notfound;
 		}
 		else
 		{
-			printf("Delete ok, key: [%s]\r\n", (*cit).c_str());
-			deleted++;
+			if (display_count < 10)
+				printf("Delete ok, key: [%s]\r\n", (*cit).c_str());
+			++deleted;
 		}
 	}
+}
 
-	printf("Remove over, deleted: %d, error: %d, not found: %d\r\n",
-		deleted, error, notfound);
-	return deleted;
+class remove_job : public acl::thread_job
+{
+public:
+	remove_job(acl::redis_client_cluster& cluster, const char* key,
+		acl::atomic_long& deleted, acl::atomic_long& error,
+		acl::atomic_long& notfound)
+	: cluster_(cluster)
+	, key_(key)
+	, deleted_(deleted)
+	, error_(error)
+	, notfound_(notfound)
+	{
+	}
+
+private:
+	~remove_job(void) {}
+
+	acl::redis_client_cluster& cluster_;
+	acl::string key_;
+	acl::atomic_long& deleted_;
+	acl::atomic_long& error_;
+	acl::atomic_long& notfound_;
+
+private:
+	void* run(void)
+	{
+		acl::redis cmd(&cluster_);
+		int ret = cmd.del_one(key_);
+		if (ret < 0) {
+			++error_;
+		} else if (ret == 0) {
+			++notfound_;
+		} else {
+			++deleted_;
+		}
+
+		delete this;
+		return NULL;
+	}
+};
+
+void redis_commands::parallel_remove(const std::vector<acl::string>& keys,
+	acl::atomic_long& deleted, acl::atomic_long& error,
+	acl::atomic_long& notfound)
+{
+	acl::thread_pool threads;
+	threads.set_limit(100);
+	threads.start();
+
+	for (std::vector<acl::string>::const_iterator cit = keys.begin();
+		cit != keys.end(); ++cit) {
+
+		acl::thread_job* job = new remove_job(*conns_, *cit,
+			deleted, error, notfound);
+		threads.execute(job);
+	}
+
+	threads.stop();
 }
 
 void redis_commands::check_type(const std::vector<acl::string>& tokens)

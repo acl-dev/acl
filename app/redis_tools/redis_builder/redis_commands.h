@@ -62,8 +62,13 @@ private:
 	void zset_get(const char* key, size_t max);
 
 	void pattern_remove(const std::vector<acl::string>& tokens);
-	int pattern_remove(const char* addr, const char* pattern);
-	int remove(const std::vector<acl::string>& keys);
+	long long pattern_remove(const char* addr, const char* pattern);
+	void remove(const std::vector<acl::string>& keys,
+		acl::atomic_long& deleted, acl::atomic_long& error,
+		acl::atomic_long& notfound);
+	void parallel_remove(const std::vector<acl::string>& keys,
+		acl::atomic_long& deleted, acl::atomic_long& error,
+		acl::atomic_long& notfound);
 
 	void check_type(const std::vector<acl::string>& tokens);
 	void check_ttl(const std::vector<acl::string>& tokens);
