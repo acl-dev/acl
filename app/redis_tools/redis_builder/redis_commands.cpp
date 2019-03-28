@@ -235,7 +235,7 @@ void redis_commands::help(void)
 	printf("> \033[1;33;40mgetn\033[0m"
 		" \033[1;36;40mparameter limit\033[0m\r\n");
 	printf("> \033[1;33;40mremove\033[0m"
-		" \033[1;36;40mpattern\033[0m\r\n");
+		" \033[1;36;40mpattern cocurrent\033[0m\r\n");
 	printf("> \033[1;33;40mtype\033[0m"
 		" \033[1;36;40mparameter ...\033[0m\r\n");
 	printf("> \033[1;33;40mttl\033[0m"
@@ -252,7 +252,7 @@ void redis_commands::help(void)
 	printf("> scan pattern display_count ip:port\r\n");
 	printf("> get [:limit] parameter ...\r\n");
 	printf("> getn parameter limit\r\n");
-	printf("> remove pattern\r\n");
+	printf("> remove pattern cocurrent\r\n");
 	printf("> type parameter ...\r\n");
 	printf("> ttl parameter ...\r\n");
 	printf("> server redis_addr\r\n");
@@ -951,6 +951,14 @@ void redis_commands::pattern_remove(const std::vector<acl::string>& tokens)
 
 	const char* pattern = tokens[1].c_str();
 
+	int cocurrent;
+	if (tokens.size() >= 3)
+		cocurrent = atoi(tokens[2]);
+	else
+		cocurrent = 10;
+	if (cocurrent <= 0)
+		cocurrent = 10;
+
 	acl::redis redis(conns_);
 	const std::map<acl::string, acl::redis_node*>* masters =
 		redis_util::get_masters(redis);
@@ -969,11 +977,11 @@ void redis_commands::pattern_remove(const std::vector<acl::string>& tokens)
 				continue;
 			}
 
-			deleted += pattern_remove(addr, pattern);
+			deleted += pattern_remove(addr, pattern, cocurrent);
 		}
 	}
 	else
-		deleted += pattern_remove(addr_, pattern);
+		deleted += pattern_remove(addr_, pattern, cocurrent);
 
 	acl::log::close();
 	acl::log::stdout_open(true);
@@ -981,7 +989,8 @@ void redis_commands::pattern_remove(const std::vector<acl::string>& tokens)
 	printf("removed pattern: [%s], total: %lld\r\n", pattern, deleted);
 }
 
-long long redis_commands::pattern_remove(const char* addr, const char* pattern)
+long long redis_commands::pattern_remove(const char* addr, const char* pattern,
+	int cocurrent)
 {
 	acl::string buf;
 	acl::string prompt;
@@ -1019,7 +1028,7 @@ long long redis_commands::pattern_remove(const char* addr, const char* pattern)
 		}
 
 		// remove(res, deleted, error, notfound);
-		parallel_remove(res, deleted, error, notfound);
+		parallel_remove(cocurrent, res, deleted, error, notfound);
 		res.clear();
 
 		printf("%s => deleted: %lld, error: %lld, not found: %lld\r\n",
@@ -1106,12 +1115,13 @@ private:
 	}
 };
 
-void redis_commands::parallel_remove(const std::vector<acl::string>& keys,
+void redis_commands::parallel_remove(int cocurrent,
+	const std::vector<acl::string>& keys,
 	acl::atomic_long& deleted, acl::atomic_long& error,
 	acl::atomic_long& notfound)
 {
 	acl::thread_pool threads;
-	threads.set_limit(100);
+	threads.set_limit((size_t) cocurrent);
 	threads.start();
 
 	for (std::vector<acl::string>::const_iterator cit = keys.begin();
