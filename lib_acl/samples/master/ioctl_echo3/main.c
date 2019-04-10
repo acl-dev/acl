@@ -25,7 +25,7 @@ static void service_test(void)
 		}
 
 		while (1) {
-			ret = service_main(client, NULL);
+			ret = service_main(NULL, client);
 			if (ret < 0) {
 				acl_vstream_close(client);
 				break;
