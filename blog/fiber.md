@@ -25,6 +25,7 @@ Acl 协程地址：https://github.com/acl-dev/acl/tree/master/lib_fiber
 
 ## 二、简单示例
 下面为一个使用 Acl 库编写的简单线程的例子：
+
 ```c++
 #include <acl-lib/acl_cpp/lib_acl.hpp>
 
@@ -61,7 +62,9 @@ int main(void)
 	return 0;	
 }
 ```
+
 上面线程例子非常简单，接着再给一个简单的协程的例子：
+
 ```c++
 #include <acl-lib/acl_cpp/lib_acl.hpp>
 #include <acl-lib/fiber/libfiber.hpp>
@@ -99,8 +102,10 @@ int main(void)
 	}
 }
 ```
-上面示例演示了协程的创建、启动及运行的过程，与前一个线程的例子非常相似，非常简单（简单实用是 Acl 库的目标之一）。
+
+上面示例演示了协程的创建、启动及运行的过程，与前一个线程的例子非常相似，（简单实用是 Acl 库的目标之一）。
 **协程调度其实是应用层面多个协程之间通过上下文切换形成的协作过程，如果一个协程库仅是实现了上下文切换，其实并不具备太多实用价值，当与网络事件绑定后，其价值才会显现出来**。下面一个简单的使用协程的网络服务程序：
+
 ```c++
 #include <acl-lib/acl_cpp/lib_acl.hpp>
 #include <acl-lib/fiber/libfiber.hpp>
@@ -175,6 +180,7 @@ int main(void)
 	return 0;
 }
 ```
+
 这是一个简单的支持回显功能的网络协程服务器，可以很容易修改成线程模式。使用线程或线程处理网络通信都可以采用**顺序思维**模式，不必象非阻塞网络编程那样复杂，但使用协程的最大好处可以创建大量的协程来处理网络连接，而要创建大量的线程显示是不现实的（线程数非常多时，会导致操作系统的调度能力下降）。**如果你的网络服务应用不需要支持大并发，使用协程的意义就没那么大了**。
 ## 三、编译安装
 在编译前，需要先从 github  https://github.com/acl-dev/acl  下载源码，国内用户可以选择从 gitee  https://gitee.com/acl-dev/acl  下载源码。
@@ -186,15 +192,19 @@ int main(void)
 在 acl 项目根目录下创建 build 目录，然后：**cd build && cmake .. && make**
 - **将 acl 库加入至你的工程**（以 make 方式为例）
 先在代码中加入头文件包含项：
+
 ```c++
 #include <acl-lib/acl_cpp/lib_acl.hpp>
 #include <acl-lib/fiber/libfiber.hpp>
 ```
+
 然后修改你的 Makefile 文件，示例如下：
+
 ```Makefile
 mytest: mytest.cpp
 	g++ -o mytest mytest.cpp -lfiber_cpp -lacl_all -lfiber -ldl -lpthread -lz
 ```
+
 **注意在 Makefile 中各个库的依赖顺序：** libfiber_cpp.a 依赖于 libacl_all.a 和 libfiber.a，其中 libacl_all.a 为 acl 的基础库，libfiber.a 为 C 语言协程库（其不依赖于 libacl_all.a），libfiber_cpp.a 用 C++ 语言封装了 libfiber.a，且使用了 libacl_all.a 中的一些功能。 
 ### 3.2、Windows 平台上编译
 在 Windows 平台的编译也非常简单，可以用 vc2008/2010/2012/2013/2015/2017 打开相应的工程文件进行编译，如：可以用 vc2012 打开 acl_cpp_vc2012.sln 工程进行编译。
@@ -209,6 +219,8 @@ mytest: mytest.cpp
 ## 四、使用多核
 Acl 协程的调度过程是基于单CPU的（虽然也可以修改成多核调度，但考虑到很多原因，最终还是采用了单核调度模式），即创建一个线程，所创建的所有协程都在这个线程空间中运行。为了使用多核，充分使用CPU资源，可以创建多个线程（也可以创建多个进程），每个线程为一个独立的协程运行容器，各个线程之间的协程相互隔离，互不影响。
 下面先修改一下上面的例子，改成多线程的协程方式：
+
+
 ```c++
 #include <acl-lib/acl_cpp/lib_acl.hpp>
 #include <acl-lib/fiber/libfiber.hpp>
@@ -305,10 +317,12 @@ int main(void)
 	return 0;
 }
 ```
+
 经过修改，上面的例子即可以支持大并发，又可以使用多核。
 ## 五、多核同步
 上面的例子中涉及到了通过创建多线程使用多核的过程，但肯定会有人问，在多个线程中的协程之间如果想要共享某个资源怎么办？Acl 协程库提供了可以跨线程使用同步原语：线程协程事件同步及条件变量。
 首先介绍一下事件同步对象类：acl::fiber_event，该类提供了三个方法：
+
 ```C++
 	/**
 	 * 等待事件锁
@@ -328,7 +342,9 @@ int main(void)
 	 */
 	bool notify(void);
 ```
+
 下面给出一个例子，看看在多个线程中的协程之间如何进行互斥的：
+
 ```c++
 #include <acl-lib/acl_cpp/lib_acl.hpp>
 #include <acl-lib/fiber/libfiber.hpp>
@@ -394,9 +410,11 @@ int main(void)
 	return 1;
 }
 ```
+
 acl::fiber_event 常被用在多个线程中的协程之间的同步，当然也可以用在多个线程之间的同步，这在很大程度弥补了 Acl 协程框架在使用多核上的不足。
 ## 六、消息传递
 通过组合 acl::fiber_event（协程事件）和 acl::fiber_cond（协程条件变量），实现了协程间进行消息传递的功能模块：acl::fiber_tbox，fiber_tbox 不仅可以用在同一线程内的协程之间传递消息，而且还可以用在不同线程中的协程之间，不同线程之间，线程与协程之间传递消息。fiber_tbox 为模板类，因而可以传递各种类型对象。以下给出一个示例：
+
 ```c++
 #include <acl-lib/acl_cpp/lib_acl.hpp>
 #include <acl-lib/fiber/libfiber.hpp>
@@ -477,7 +495,9 @@ int main(void)
 	return 0; 
 }
 ```
+
 上面例子展示了同一线程中的两个协程之间的消息传递过程，因为 acl::fiber_tbox 是可以跨线程的，所以它的更大价值是用在多个线程中的不同协程之间进行消息传递。
+
 ```c++
 #include <acl-lib/acl_cpp/lib_acl.hpp>
 #include <acl-lib/fiber/libfiber.hpp>
@@ -558,8 +578,10 @@ int main(void)
 	return 0; 
 }
 ```
+
 在该示例中，生产者为一个独立的线程，消费者为另一个线程中的协程，二者通过 acl::fiber_tbox 进行消息通信。但**有一点需要注意**，fiber_tbox 一般可用在“单生产者-单消费者或多生产者-单消费者”的应用场景中，不应用在多消费者的场景中，虽然用在多个消费者场景时不会造成消费丢失或内存崩溃，但当消费者数量较多时却有可能出现惊群现象，所以应避免将一个 acl::fiber_tbox 用在大量的多消费者场景中。
 下面再给一个应用场景的例子，也是我们平时经常会遇到的。
+
 ```c++
 #include <unistd.h>
 #include <acl-lib/acl_cpp/lib_acl.hpp>
@@ -613,6 +635,7 @@ int main(void)
 	return 0;
 }
 ```
+
 协程一般用在网络高并发环境中，但协程并不是万金油，协程并不适合计算密集型应用，因为线程才是操作系统的最小调度单元，而协程不是，所以当遇到一些比较耗时的运算时，为了不阻塞当前协程所在的协程调度器，应将该耗时运算过程中抛给独立的线程去处理，然后通过 acl::fiber_tbox 等待线程的运算结果。
 ## 七、HOOK API
 为了使现有的很多网络应用和网络库在尽量不修改的情况下协程化，Acl 协程库 Hook 了很多与 IO 和网络通信相关的系统 API，目前已经 Hook 的系统 API 有：
@@ -629,6 +652,7 @@ int main(void)
 ## 九、使第三方网络库协程化
 通常网络通信库都是阻塞式的，因为非阻塞式的通信库的通用性不高（使用各自的事件引擎，很难达到应用层的使用一致性），如果把这些第三方通信库（如：mysql 客户端库，Acl 中的 Redis 库）使用协程所提供的 IO 及网络  API 重写一遍则工作量太大，不太现实，好在 Acl 协程库 Hook 了很多系统 API，从而使阻塞式的网络通信库协程化变得简单。所谓网络库协程化就是使这些网络库可以应用在协程环境中，从而可以很容易编写出支持高并发的网络程序。
 先写一个将 Acl Redis 客户端库协程化的例子：
+
 ```c++
 #include <acl-lib/acl_cpp/lib_acl.hpp>
 #include <acl-lib/fiber/libfiber.hpp>
@@ -672,7 +696,9 @@ int main(void)
 	return 0;
 }
 ```
+
 读者可以尝试将上面的代码拷贝到自己机器上，编译后运行一下。另外，这个例子是只有一个线程，所以会发现 acl::redis_client_cluster 的使用方式和在线程下是一样的。如果将 acl::redis_client_cluster 在多个线程调度器上共享会怎样？还是有一点区别，如下：
+
 ```c++
 #include <acl-lib/acl_cpp/lib_acl.hpp>
 #include <acl-lib/fiber/libfiber.hpp>
@@ -746,6 +772,7 @@ int main(void)
 	return 0;
 }
 ```
+
 在这个多线程多协程环境里使用 acl::redis_client_cluster 对象时与前面的一个例子有所不同，在这里调用了：**cluster.bind_thread(true);** 
 为何要这样做？原因是 Acl Redis 的协程调度器是单线程工作模式，网络套接字句柄在协程环境里不能跨线程使用，当调用 bind_thread(true) 后，Acl 连接池管理对象会自动给每个线程分配一个连接池对象，每个线程内的所有协程共享这个绑定于本线程的连接池对象。
 ## 十、Windows 界面编程协程化
@@ -754,20 +781,25 @@ Acl 协程库的事件引擎支持 win32 消息引擎，所以很容易将界面
 下面以一个简单的对话框为例说明界面网络通信协程化过程：    
 1. 首先使用向导程序生成一个对话框界面程序，需要指定支持 socket 通信；
 2. 然后在 OnInitDialog() 方法尾部添加如下代码：
+
 ```c++
 	// 设置协程调度的事件引擎，同时将协程调度设为自动启动模式
 	acl::fiber::init(acl::FIBER_EVENT_T_WMSG, true);
 	// HOOK ACL 库中的网络 IO 过程
 	acl::fiber::acl_io_hook();
 ```
+
 3. 创建一个按钮，并使其绑定一个事件方法，如：OnBnClickedListen，然后在这个方法里添加一些代码：
+
 ```c++
 	// 创建一个协程用来监听指定地址，接收客户端连接请求
 	m_fiberListen = new CFiberListener("127.0.0.1:8800");
 	// 启动监听协程
 	m_fiberListen->start();
 ```
+
 4. 实现步骤 3 中指定的监听协程类
+
 ```c++
 class CFiberListener : public acl::fiber
 {
@@ -798,7 +830,9 @@ private:
 	}
 };
 ```
+
 5. 实现步骤 4 中指定的客户端响应协程类
+
 ```c++
 class CFiberClient : public acl::fiber
 {
@@ -826,6 +860,7 @@ private:
 	}
 };
 ```
+
 通过以上步骤就可为 win32 界面程序添加基于协程模式的通信模块，上面的两个协程类的处理过程都是“死循环”的，而且又与界面过程同处同一线程运行空间，却为何却不会阻塞界面消息过程呢？其原因就是当通信协程类对象在遇到网络 IO 阻塞时，会自动将自己挂起，将线程的运行权交给其它协程或界面过程。原理就是这么简单，但内部实现还有点复杂度的，感兴趣的可以看看 Acl 协程库的实现源码(https://github.com/acl-dev/acl/tree/master/lib_fiber/ )。
 此外，上面示例的完整代码请参考：https://github.com/acl-dev/acl/tree/master/lib_fiber/samples/WinEchod  。
 
