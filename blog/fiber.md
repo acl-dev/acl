@@ -643,7 +643,8 @@ int main(void)
 
 协程一般用在网络高并发环境中，但协程并不是万金油，协程并不适合计算密集型应用，因为线程才是操作系统的最小调度单元，而协程不是，所以当遇到一些比较耗时的运算时，为了不阻塞当前协程所在的协程调度器，应将该耗时运算过程中抛给独立的线程去处理，然后通过 acl::fiber_tbox 等待线程的运算结果。
 ## 七、HOOK API
-为了使现有的很多网络应用和网络库在尽量不修改的情况下协程化，Acl 协程库 Hook 了很多与 IO 和网络通信相关的系统 API，目前已经 Hook 的系统 API 有：
+为了使现有的很多网络应用和网络库在尽量不修改的情况下协程化，Acl 协程库 Hook 了很多与 IO 和网络通信相关的系统 API，目前已经 Hook 的系统 API 有：    
+
 | 内容项 |API|
 |--|--|
 |网络相关|socket/listen/accept/connect  |
@@ -651,6 +652,7 @@ int main(void)
 |域名相关|gethostbyname(_r)/getaddrinfo/freeaddrinfo|
 |事件相关|select/poll/epoll_create/ epoll_ctl/epoll_wait|
 |其它|close/sleep|
+
 ## 八、域名解析
 使用协程方式编写网络通信程序，域名解析是不能绕过的，记得有一个协程库说为了支持域名解析，甚至看了相关实现代码，然后说通过 Hook _poll API 就可以了，实际上这并不是通用的做法，至少在我的环境里通过 Hook _poll API 是没用的，所以最稳妥的做法还是应该将 DNS 查询协议实现了，在 acl 的协程库中，域名解析模块实际是集成了第三方 DNS 库，参见：https://github.com/wahern/dns  ， 毕竟，实现一个较为完整的 DNS 解析库还是比较麻烦的。 
 
