@@ -67,7 +67,7 @@ CFLAGS += -I. -I../.. -I../../../include -I../../../../lib_acl/include -I../../.
 EXTLIBS =
 CFLAGS += -I/home/zsx/download/db/wiredtiger/github
 #EXTLIBS = -L/home/zsx/download/db/wiredtiger/github/.libs -lwiredtiger -Wl,-rpath=/home/zsx/download/db/wiredtiger/github/.libs
-EXTLIBS = /home/zsx/download/db/wiredtiger/github/.libs/libwiredtiger.a
+EXTLIBS = /usr/local/lib/libwiredtiger.a
 SYSLIB += -ldl
 LDFLAGS = -L../../../lib -l_acl_cpp -L../../../../lib_protocol/lib -l_protocol -L../../../../lib_acl/lib -l_acl \
 	$(EXTLIBS) $(SYSLIB)

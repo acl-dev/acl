@@ -1,6 +1,6 @@
 #include <getopt.h>
 #include "acl_cpp/lib_acl.hpp"
-#include "wiredtiger.h"
+#include <wiredtiger.h>
 
 static acl::atomic_long __count = 0;
 static int __inter = 10000;
