@@ -155,12 +155,16 @@ private:
 		return NULL;
 	}
 
-	void add(wdb_sess& sess, int max) {
+	void add(wdb_sess& sess, long long max) {
 		acl::string key, value;
-		int i;
+		long long i;
+
+		struct timeval begin;
+		gettimeofday(&begin, NULL);
+
 		for (i = 0; i < max; i++) {
-			key.format("key-%d-%d", id_, i);
-			value.format("value-%d", i);
+			key.format("key-%d-%lld", id_, i);
+			value.format("value-%lld", i);
 			bool ret = sess.add(key.c_str(), value.c_str());
 			if (!ret) {
 				printf("add failed, key=%s, value=%s\r\n",
@@ -169,15 +173,24 @@ private:
 			}
 		}
 
-		printf("add over, n=%d\r\n", i);
+		struct timeval end;
+		gettimeofday(&end, NULL);
+		double spent = acl::stamp_sub(end, begin);
+		double speed = (i * 1000) / ( spent > 1 ? spent : 1);
+		printf("add over, n=%lld, spent=%.2f seconds, speed=%.2f\r\n",
+				i, spent / 1000, speed);
 	}
 
-	void get(wdb_sess& sess, int max) {
+	void get(wdb_sess& sess, long long max) {
 		acl::string key, value;
-		int i;
+		long long i;
 		long long n;
+
+		struct timeval begin;
+		gettimeofday(&begin, NULL);
+
 		for (i = 0; i < max; i++) {
-			key.format("key-%d-%d", id_, i);
+			key.format("key-%d-%lld", id_, i);
 			bool ret = sess.get(key.c_str(), value);
 			if (!ret) {
 				printf("Get failed, key=%s\r\n", key.c_str());
@@ -195,14 +208,19 @@ private:
 			}
 		}
 
-		printf("get over, n=%d\r\n", i);
+		struct timeval end;
+		gettimeofday(&end, NULL);
+		double spent = acl::stamp_sub(end, begin);
+		double speed = (i * 1000) / ( spent > 1 ? spent : 1);
+		printf("get over, n=%lld, spend=%.2f seconds, speed=%.2f\r\n",
+				i, spent / 1000, speed);
 	}
 
-	void del(wdb_sess& sess, int max) {
+	void del(wdb_sess& sess, long long max) {
 		acl::string key;
-		int i;
+		long long i;
 		for (i = 0; i < max; i++) {
-			key.format("key-%d-%d", id_, i);
+			key.format("key-%d-%lld", id_, i);
 			bool ret = sess.del(key.c_str());
 			if (!ret) {
 				printf("Del failed, key=%s\r\n", key.c_str());
@@ -210,7 +228,7 @@ private:
 			}
 		}
 
-		printf("del over, n=%d\r\n", i);
+		printf("del over, n=%lld\r\n", i);
 	}
 
 private:
