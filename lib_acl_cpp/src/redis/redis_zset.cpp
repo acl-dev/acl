@@ -48,8 +48,7 @@ int redis_zset::zadd(const char* key, const std::map<string, double>& members)
 	char* buf;
 	size_t i = 2;
 	std::map<string, double>::const_iterator cit = members.begin();
-	for (; cit != members.end(); ++cit)
-	{
+	for (; cit != members.end(); ++cit) {
 		buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 		safe_snprintf(buf, BUFLEN, "%.8f", cit->second);
 
@@ -84,8 +83,7 @@ int redis_zset::zadd(const char* key,
 	char* buf;
 	size_t i = 2;
 	std::vector<std::pair<string, double> >::const_iterator cit;
-	for (cit = members.begin(); cit != members.end(); ++cit)
-	{
+	for (cit = members.begin(); cit != members.end(); ++cit) {
 		buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 		safe_snprintf(buf, BUFLEN, "%.8f", (*cit).second);
 		argv[i] = buf;
@@ -120,8 +118,7 @@ int redis_zset::zadd(const char* key,
 	size_t i = 2;
 	std::vector<std::pair<const char*, double> >::const_iterator cit;
 
-	for (cit = members.begin(); cit != members.end(); ++cit)
-	{
+	for (cit = members.begin(); cit != members.end(); ++cit) {
 		buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 		safe_snprintf(buf, BUFLEN, "%.8f", (*cit).second);
 		argv[i] = buf;
@@ -159,8 +156,7 @@ int redis_zset::zadd(const char* key, const std::vector<string>& members,
 	size_t j = 2;
 	char* buf;
 
-	for (size_t i = 0; i < size; i++)
-	{
+	for (size_t i = 0; i < size; i++) {
 		buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 		safe_snprintf(buf, BUFLEN, "%.8f", scores[i]);
 		argv[j] = buf;
@@ -198,8 +194,7 @@ int redis_zset::zadd(const char* key, const std::vector<const char*>& members,
 	size_t j = 2;
 	char* buf;
 
-	for (size_t i = 0; i < size; i++)
-	{
+	for (size_t i = 0; i < size; i++) {
 		buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 		safe_snprintf(buf, BUFLEN, "%.8f", scores[i]);
 		argv[j] = buf;
@@ -233,8 +228,7 @@ int redis_zset::zadd(const char* key, const char* members[], double scores[],
 	size_t j = 2;
 	char* buf;
 
-	for (size_t i = 0; i < size; i++)
-	{
+	for (size_t i = 0; i < size; i++) {
 		buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 		safe_snprintf(buf, BUFLEN, "%.8f", scores[i]);
 		argv[j] = buf;
@@ -269,8 +263,7 @@ int redis_zset::zadd(const char* key, const char* members[],
 	char* buf;
 	int len;
 
-	for (size_t i = 0; i < size; i++)
-	{
+	for (size_t i = 0; i < size; i++) {
 		buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 		len = safe_snprintf(buf, BUFLEN, "%.8f", scores[i]);
 		argv[j] = buf;
@@ -398,6 +391,47 @@ int redis_zset::zrange(const char* key, int start,
 	return zrange_get("ZRANGE", key, start, stop, result);
 }
 
+int redis_zset::get_with_scores(std::vector<std::pair<string, double> >& out)
+{
+	const redis_result* result = run();
+	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+		return -1;
+
+	size_t size;
+	const redis_result** children = result->get_children(&size);
+	if (children == NULL || size == 0)
+		return 0;
+	if (size % 2 != 0)
+		return -1;
+
+	size /= 2;
+	out.reserve(size);
+	double score;
+	const redis_result* child;
+	string buf(128);
+	out.clear();
+
+	for (size_t i = 0; i < size; i++) {
+		child = children[2 * i + 1];
+		if (child == NULL)
+			continue;
+
+		child->argv_to_string(buf);
+		score = atof(buf.c_str());
+		buf.clear();
+
+		child = children[2 * i];
+		if (child == NULL)
+			continue;
+
+		child->argv_to_string(buf);
+		out.push_back(std::make_pair(buf, score));
+		buf.clear();
+	}
+
+	return (int) size;
+}
+
 int redis_zset::zrange_get_with_scores(const char* cmd, const char* key,
 	int start, int stop, std::vector<std::pair<string, double> >& out)
 {
@@ -427,43 +461,8 @@ int redis_zset::zrange_get_with_scores(const char* cmd, const char* key,
 
 	hash_slot(key);
 	build_request(5, argv, lens);
-	const redis_result* result = run();
-	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
-		return -1;
 
-	size_t size;
-	const redis_result** children = result->get_children(&size);
-	if (children == NULL || size == 0)
-		return 0;
-	if (size % 2 != 0)
-		return -1;
-
-	size /= 2;
-	out.reserve(size);
-	double score;
-	const redis_result* child;
-	string buf(128);
-
-	for (size_t i = 0; i < size; i++)
-	{
-		child = children[2 * i + 1];
-		if (child == NULL)
-			continue;
-
-		child->argv_to_string(buf);
-		score = atof(buf.c_str());
-		buf.clear();
-
-		child = children[2 * i];
-		if (child == NULL)
-			continue;
-
-		child->argv_to_string(buf);
-		out.push_back(std::make_pair(buf, score));
-		buf.clear();
-	}
-
-	return (int) size;
+	return get_with_scores(out);
 }
 
 int redis_zset::zrange_with_scores(const char* key, int start, int stop,
@@ -493,8 +492,7 @@ int redis_zset::zrangebyscore_get(const char* cmd, const char* key,
 	lens[3] = strlen(max);
 
 	char offset_s[INTLEN], count_s[INTLEN];
-	if (offset && count)
-	{
+	if (offset && count) {
 		safe_snprintf(offset_s, sizeof(offset_s), "%d", *offset);
 		safe_snprintf(count_s, sizeof(count_s), "%d", *count);
 
@@ -559,8 +557,7 @@ int redis_zset::zrangebyscore_get_with_scores(const char* cmd,
 	lens[4] = sizeof("WITHSCORES") - 1;
 
 	char offset_s[INTLEN], count_s[INTLEN];
-	if (offset && count)
-	{
+	if (offset && count) {
 		safe_snprintf(offset_s, sizeof(offset_s), "%d", *offset);
 		safe_snprintf(count_s, sizeof(count_s), "%d", *count);
 
@@ -578,44 +575,8 @@ int redis_zset::zrangebyscore_get_with_scores(const char* cmd,
 
 	hash_slot(key);
 	build_request(argc, argv, lens);
-	const redis_result* result = run();
-	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
-		return -1;
 
-	size_t size;
-	const redis_result** children = result->get_children(&size);
-	if (children == NULL || size == 0)
-		return 0;
-	if (size % 2 != 0)
-		return -1;
-
-	size /= 2;
-	out.reserve(size);
-	double score;
-	const redis_result* child;
-	string buf(128);
-	out.clear();
-
-	for (size_t i = 0; i < size; i++)
-	{
-		child = children[2 * i + 1];
-		if (child == NULL)
-			continue;
-
-		child->argv_to_string(buf);
-		score = atof(buf.c_str());
-		buf.clear();
-
-		child = children[2 * i];
-		if (child == NULL)
-			continue;
-		child->argv_to_string(buf);
-
-		out.push_back(std::make_pair(buf, score));
-		buf.clear();
-	}
-
-	return (int) size;
+	return get_with_scores(out);
 }
 
 int redis_zset::zrangebyscore_with_scores(const char* key, const char* min,
@@ -867,8 +828,7 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 
 	size_t i = 3;
 	std::map<string, double>::const_iterator cit = keys.begin();
-	for (; cit != keys.end(); ++cit, i++)
-	{
+	for (; cit != keys.end(); ++cit, i++) {
 		argv[i] = cit->first.c_str();
 		lens[i] = cit->first.length();
 		i++;
@@ -878,8 +838,7 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 	lens[i] = sizeof("WEIGHTS") - 1;
 
 	char* buf;
-	for (cit = keys.begin(); cit != keys.end(); ++cit)
-	{
+	for (cit = keys.begin(); cit != keys.end(); ++cit) {
 		buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
 		safe_snprintf(buf, BUFLEN, "%.8f", cit->second);
 
@@ -922,8 +881,7 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 {
 	size_t argc = 3 + keys.size();
 
-	if (weights != NULL)
-	{
+	if (weights != NULL) {
 		if (weights->size() != keys.size())
 			return -1;
 		argc += weights->size() + 1;
@@ -948,23 +906,20 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 
 	size_t i = 3;
 	std::vector<string>::const_iterator cit = keys.begin();
-	for (; cit != keys.end(); ++cit)
-	{
+	for (; cit != keys.end(); ++cit) {
 		argv[i] = (*cit).c_str();
 		lens[i] = (*cit).length();
 		i++;
 	}
 
-	if (weights != NULL)
-	{
+	if (weights != NULL) {
 		argv[i] = "WEIGHTS";
 		lens[i] = sizeof("WEIGHTS") - 1;
 		i++;
 
 		char* score;
 		std::vector<double>::const_iterator cit2 = weights->begin();
-		for (; cit2 != weights->end(); ++cit2)
-		{
+		for (; cit2 != weights->end(); ++cit2) {
 			score = (char*) dbuf_->dbuf_alloc(BUFLEN);
 			safe_snprintf(score, BUFLEN, "%.8f", *cit2);
 			argv[i] = score;
@@ -973,8 +928,7 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 		}
 	}
 
-	if (aggregate != NULL)
-	{
+	if (aggregate != NULL) {
 		argv[i] = "AGGREGATE";
 		lens[i] = sizeof("AGGREGATE") - 1;
 		i++;
@@ -1024,8 +978,7 @@ int redis_zset::zrangebylex(const char* key, const char* min, const char* max,
 	argv[3] = max;
 	lens[3] = strlen(max);
 
-	if (offset != NULL && count != NULL)
-	{
+	if (offset != NULL && count != NULL) {
 		argv[4] = min;
 		lens[4] = strlen(min);
 		argc++;
@@ -1105,8 +1058,7 @@ int redis_zset::zscan(const char* key, int cursor,
 	const redis_result* rr;
 	string name(128), value(128);
 
-	for (size_t i = 0; i < size;)
-	{
+	for (size_t i = 0; i < size;) {
 		rr = children[i];
 		rr->argv_to_string(name);
 		i++;
@@ -1119,6 +1071,142 @@ int redis_zset::zscan(const char* key, int cursor,
 	}
 
 	return cursor;
+}
+
+int redis_zset::zpopmin(const char* key,
+	std::vector<std::pair<string, double> >& out, size_t count /* = 1 */)
+{
+	return zpop("ZPOPMIN", key, out, count);
+}
+
+int redis_zset::zpopmax(const char* key,
+	std::vector<std::pair<string, double> >& out, size_t count /* = 1 */)
+{
+	return zpop("ZPOPMAX", key, out, count);
+}
+
+int redis_zset::zpop(const char* cmd, const char* key,
+	std::vector<std::pair<string, double> >& out, size_t count)
+{
+	const char* argv[3];
+	size_t lens[3];
+	size_t argc;
+
+	argv[0] = cmd;
+	lens[0] = strlen(cmd);
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	char count_s[BUFLEN];
+	safe_snprintf(count_s, sizeof(count_s), "%lu", (unsigned long) count);
+	argv[2] = count_s;
+	lens[2] = strlen(count_s);
+	argc = 3;
+
+	hash_slot(key);
+	build_request(argc, argv, lens);
+	return get_with_scores(out);
+}
+
+int redis_zset::bzpopmin(const char* key, size_t timeout,
+	string& member, double* score /* = NULL */)
+{
+	hash_slot(key);
+	return bzpop("BZPOPMIN", key, timeout, member, score);
+}
+
+int redis_zset::bzpopmax(const char* key, size_t timeout,
+	string& member, double *score /* = NULL */)
+{
+	hash_slot(key);
+	return bzpop("BZPOPMAX", key, timeout, member, score);
+}
+
+int redis_zset::bzpopmin(const std::vector<string>& keys, size_t timeout,
+	string& member, double* score /* = NULL */)
+{
+	return bzpop("BZPOPMIN", keys, timeout, member, score);
+}
+
+int redis_zset::bzpopmax(const std::vector<string>& keys, size_t timeout,
+	string& member, double* score /* = NULL */)
+{
+	return bzpop("BZPOPMAX", keys, timeout, member, score);
+}
+
+int redis_zset::bzpop(const char* cmd, const char* key, size_t timeout,
+	string& member, double* score)
+{
+	const char* argv[3];
+	size_t lens[3];
+	size_t argc = 3;
+
+	argv[0] = cmd;
+	lens[0] = strlen(cmd);
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	char buf[BUFLEN];
+	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) timeout);
+	argv[2] = buf;
+	lens[2] = strlen(buf);
+
+	hash_slot(key);
+	build_request(argc, argv, lens);
+	return bzpop_result(member, score);
+}
+
+int redis_zset::bzpop(const char* cmd, const std::vector<string>& keys,
+	size_t timeout, string& member, double* score)
+{
+	argc_ = 2 + keys.size();
+	argv_space(argc_);
+	size_t i = 0;
+	argv_[i] = cmd;
+	argv_lens_[i] = strlen(cmd);
+	i++;
+
+	for (std::vector<string>::const_iterator cit = keys.begin();
+		cit != keys.end(); ++cit) {
+		argv_[i] = (*cit).c_str();
+		argv_lens_[i] = (*cit).size();
+		i++;
+	}
+
+	char buf[BUFLEN];
+	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) timeout);
+	argv_[i] = buf;
+	argv_lens_[i] = strlen(buf);
+	build_request(argc_, argv_, argv_lens_);
+	return bzpop_result(member, score);
+}
+
+int redis_zset::bzpop_result(string& member, double* score)
+{
+	const redis_result* result = run();
+	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+		return -1;
+
+	size_t size;
+	const redis_result** children = result->get_children(&size);
+	if (children == NULL || size == 0)
+		return  0;
+	if (size != 3)
+		return -1;
+
+	const redis_result* child;
+	child = children[1];
+	child->argv_to_string(member);
+
+	if (score) {
+		string buf(128);
+		child = children[2];
+		child->argv_to_string(buf);
+		*score = atof(buf.c_str());
+	}
+	return 1;
 }
 
 } // namespace acl

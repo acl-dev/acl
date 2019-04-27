@@ -294,6 +294,7 @@ int redis_list::pop(const char* cmd, const char* key, string& buf)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
+	hash_slot(key);
 	build_request(2, argv, lens);
 	return (int) get_string(buf);
 }
@@ -310,6 +311,8 @@ bool redis_list::blpop(std::pair<string, string>& result, size_t timeout,
 	while ((key = va_arg(ap, const char*)) != NULL)
 		keys.push_back(key);
 	va_end(ap);
+
+	hash_slot(first_key);
 	return blpop(keys, timeout, result);
 }
 
@@ -338,6 +341,8 @@ bool redis_list::brpop(std::pair<string, string>& result, size_t timeout,
 	while ((key = va_arg(ap, const char*)) != NULL)
 		keys.push_back(key);
 	va_end(ap);
+
+	hash_slot(first_key);
 	return brpop(keys, timeout, result);
 }
 
@@ -501,6 +506,7 @@ bool redis_list::lrange(const char* key, int start, int end,
 	argv[3] = end_s;
 	lens[3] = strlen(end_s);
 
+	hash_slot(key);
 	build_request(4, argv, lens);
 	return get_strings(result) < 0 ? false : true;
 }
@@ -528,6 +534,7 @@ int redis_list::lrem(const char* key, int count, const char* value, size_t len)
 	argv[3] = value;
 	lens[3] = len;
 
+	hash_slot(key);
 	build_request(4, argv, lens);
 	return get_number();
 }
@@ -551,6 +558,7 @@ bool redis_list::ltrim(const char* key, int start, int end)
 	argv[3] = end_s;
 	lens[3] = strlen(end_s);
 
+	hash_slot(key);
 	build_request(4, argv, lens);
 	return check_status();
 }

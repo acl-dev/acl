@@ -513,6 +513,19 @@ public:
 	 */
 	int zremrangebylex(const char* key, const char* min, const char* max);
 
+	int zpopmin(const char* key,
+		std::vector<std::pair<string, double> >& out, size_t count = 1);
+	int zpopmax(const char* key,
+		std::vector<std::pair<string, double> >& out, size_t count = 1);
+	int bzpopmin(const char* key, size_t timeout, string& member,
+		double* score = NULL);
+	int bzpopmax(const char* key, size_t timeout, string& member,
+		double* score = NULL);
+	int bzpopmin(const std::vector<string>& keys, size_t timeout,
+		string& member, double* score = NULL);
+	int bzpopmax(const std::vector<string>& keys, size_t timeout,
+		string& member, double* score = NULL);
+
 private:
 	int zrange_get(const char* cmd, const char* key, int start,
 		int stop, std::vector<string>* result);
@@ -529,6 +542,14 @@ private:
 		const std::map<string, double>& keys, const char* aggregate);
 	int zstore(const char* cmd, const char* dst, const std::vector<string>& keys,
 		const std::vector<double>* weights, const char* aggregate);
+	int zpop(const char* cmd, const char* key,
+		std::vector<std::pair<string, double> >& out, size_t count);
+	int get_with_scores(std::vector<std::pair<string, double> >& out);
+	int bzpop(const char* cmd, const char* key, size_t timeout,
+		string& member, double* score);
+	int bzpop(const char* cmd, const std::vector<string>& keys,
+		size_t timeout, string& member, double* score);
+	int bzpop_result(string& member, double* score);
 };
 
 } // namespace acl
