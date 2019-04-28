@@ -1,4 +1,4 @@
-%define release_id 0
+%define release_id 1
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,10 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Sun Apr 28 2019 zhengshuxin@qiyi.com 3.5.0-1-20190428.16
+- tcp_keeper: fixed one bug in keeper_conn.cpp
+- redis_zset: add ZPOPMIN/ZPOPMAX/BZPOPMIN/BZPOPMAX
 
 * Sat Mar 09 2019 zhengshuxin@qiyi.com 3.5.0-0-20190309.20
 - release 3.5.0 version.

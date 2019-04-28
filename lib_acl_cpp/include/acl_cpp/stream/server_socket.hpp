@@ -22,12 +22,14 @@ enum {
 class ACL_CPP_API server_socket
 {
 public:
+#if 0
 	/**
 	 * 构造函数，调用本构造函数后需调用类方法 open 来监听指定服务地址
 	 * @param backlog {int} 监听套接口队列长度
 	 * @param block {bool} 是阻塞模式还是非阻塞模式
 	 */
 	server_socket(int backlog, bool block);
+#endif
 
 	/**
 	 * 构造函数

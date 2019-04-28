@@ -11,6 +11,7 @@
 
 namespace acl {
 
+#if 0
 server_socket::server_socket(int backlog, bool block)
 : backlog_(backlog)
 , unix_sock_(false)
@@ -19,6 +20,7 @@ server_socket::server_socket(int backlog, bool block)
 {
 	open_flag_ = block ? ACL_BLOCKING : ACL_NON_BLOCKING;
 }
+#endif
 
 server_socket::server_socket(unsigned flag, int backlog)
 : backlog_(backlog)

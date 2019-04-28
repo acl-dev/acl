@@ -1,4 +1,11 @@
 
+104) 2019.4.28
+104.1) bugfix: keeper_conn.cpp 中在当 fd dup 后创建 socket_stream 流对象时，
+有可能内部设置的 peer 地址为空，现在通过源 socket_stream 获得 peer 地址再
+给 dup 后的 socket_stream 赋值来解决此类问题
+
+------------------------------------------------------------------------------
+
 103) 2019.1.15
 103.1) feature: tcp_keeper 及相关功能类测试 OK
 

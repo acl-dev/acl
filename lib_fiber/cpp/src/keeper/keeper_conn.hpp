@@ -8,6 +8,7 @@ namespace acl {
 
 class keeper_conns;
 
+// one connection with one fiber
 class keeper_conn : public fiber
 {
 public:
@@ -51,6 +52,8 @@ public:
 private:
 	// @override
 	void run(void);
+
+	socket_stream* dup_stream(socket_stream& from);
 	void handle_task(task_req& task);
 	void connect_one(void);
 	void done(void);

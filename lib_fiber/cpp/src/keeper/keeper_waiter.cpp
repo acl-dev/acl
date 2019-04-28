@@ -93,6 +93,12 @@ void keeper_waiter::run(void)
 		keeper_conns* pool;
 
 		const char* addr = task->get_addr();
+		assert(addr && *addr);
+
+		// lookup the correspond keeper_conns from the manager,
+		// if not exist, then create one,
+		// then put the connection request to the keeper_conns.
+
 		std::map<string, keeper_conns*>::iterator it =
 			manager_.find(addr);
 		if (it == manager_.end()) {
@@ -104,6 +110,9 @@ void keeper_waiter::run(void)
 		}
 
 		task->set_stamp();
+
+		// push the request task to the keeper_conns to get one
+		// connection for the given addr.
 		pool->add_task(*task);
 	}
 
