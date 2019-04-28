@@ -136,6 +136,7 @@ fi
 * Sun Apr 28 2019 zhengshuxin@qiyi.com 3.5.0-1-20190428.16
 - tcp_keeper: fixed one bug in keeper_conn.cpp
 - redis_zset: add ZPOPMIN/ZPOPMAX/BZPOPMIN/BZPOPMAX
+- server_socket: remove one constructur method
 
 * Sat Mar 09 2019 zhengshuxin@qiyi.com 3.5.0-0-20190309.20
 - release 3.5.0 version.
