@@ -107,7 +107,8 @@ void tcp_keeper::update(const char* addr, double cost)
 	addrs_[addr] = cost;
 }
 
-socket_stream* tcp_keeper::peek(const char* addr, bool* hit /* = NULL */)
+socket_stream* tcp_keeper::peek(const char* addr, bool* hit /* = NULL */,
+	bool sync /* = false */)
 {
 	bool found;
 
@@ -119,7 +120,7 @@ socket_stream* tcp_keeper::peek(const char* addr, bool* hit /* = NULL */)
 	// the addr directivly.
 	// in direct-connect mode, using the caller's thread or fiber running
 	// space to connect the server addr.
-	if (direct(addr, found)) {
+	if (sync || direct(addr, found)) {
 		if (hit) {
 			*hit = false;
 		}

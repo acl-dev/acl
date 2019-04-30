@@ -1,4 +1,4 @@
-%define release_id 1
+%define release_id 2
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Apr 30 2019 zhengshuxin@qiyi.com 3.5.0-1-20190430.17
+- tcp_keeper: add sync parameter to control if connect the given addr directly
 
 * Sun Apr 28 2019 zhengshuxin@qiyi.com 3.5.0-1-20190428.16
 - tcp_keeper: fixed one bug in keeper_conn.cpp
