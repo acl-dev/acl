@@ -1322,6 +1322,7 @@ static int write_once(ACL_VSTREAM *fp, const void *vptr, int dlen)
 		if (dlen <= 0)
 			acl_msg_error("%s, %s(%d): dlen(%d) <= 0",
 				myname, __FILE__, __LINE__, dlen);
+		fp->errnum = ACL_EINVAL;
 		return ACL_VSTREAM_EOF;
 	}
 
@@ -2027,6 +2028,12 @@ int acl_vstream_fflush(ACL_VSTREAM *fp)
 		if (fp->wbuf_dlen < 0)
 			acl_msg_fatal("%s(%d): wbuf_dlen(%d) < 0",
 				myname, __LINE__, fp->wbuf_dlen);
+#if ACL_EAGAIN == ACL_EWOULDBLOCK
+	} else if (fp->errnum != ACL_EWOULDBLOCK) {
+#else
+	} else if (fp->errnum != ACL_EAGAIN && fp->errnum != ACL_EWOULDBLOCK) {
+#endif
+		fp->wbuf_dlen = 0;
 	}
 	return n;
 }

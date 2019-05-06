@@ -133,6 +133,9 @@ fi
 
 %changelog
 
+* Mon May 06 2019 zhengshuxin@qiyi.com 3.5.0-2-20190506.09
+- acl_vstream.c: fixed bug in acl_vstream_fflush() where wbuf_dlen should be set 0
+
 * Thu Apr 30 2019 zhengshuxin@qiyi.com 3.5.0-1-20190430.17
 - tcp_keeper: add sync parameter to control if connect the given addr directly
 
