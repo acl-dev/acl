@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <list>
 #include <time.h>
 
@@ -20,7 +21,7 @@ typedef enum
 	tzone_cst
 } tzone_t;
 
-class ACL_CPP_API rfc822
+class ACL_CPP_API rfc822 : public noncopyable
 {
 public:
 	rfc822();

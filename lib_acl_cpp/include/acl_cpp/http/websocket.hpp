@@ -12,6 +12,7 @@
 
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 
 namespace acl
 {
@@ -53,7 +54,7 @@ struct frame_header
 /**
  * websocket »ù´¡Àà
  */
-class ACL_CPP_API websocket
+class ACL_CPP_API websocket : public noncopyable
 {
 public:
 	/**

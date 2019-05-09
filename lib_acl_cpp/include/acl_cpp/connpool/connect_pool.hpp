@@ -2,6 +2,7 @@
 #include "../acl_cpp_define.hpp"
 #include <list>
 #include "../stdlib/locker.hpp"
+#include "../stdlib/noncopyable.hpp"
 
 namespace acl
 {
@@ -15,7 +16,7 @@ class connect_client;
  * 对象允许通过 set_delay_destroy() 设置延迟销毁时，该类的子类实例
  * 必须是动态对象
  */
-class ACL_CPP_API connect_pool
+class ACL_CPP_API connect_pool : public noncopyable
 {
 public:
 	/**
@@ -215,7 +216,7 @@ protected:
 	std::list<connect_client*> pool_;	// 连接池集合
 };
 
-class ACL_CPP_API connect_guard
+class ACL_CPP_API connect_guard : public noncopyable
 {
 public:
 	connect_guard(connect_pool& pool)

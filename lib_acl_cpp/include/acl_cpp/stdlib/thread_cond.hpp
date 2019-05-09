@@ -12,6 +12,8 @@
 
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "noncopyable.hpp"
+
 #if !defined(_WIN32) && !defined(_WIN64)
 # include <pthread.h>
 # ifndef	acl_pthread_cond_t
@@ -28,7 +30,7 @@ class thread_mutex;
 /**
  * 线程条件变量
  */
-class ACL_CPP_API thread_cond
+class ACL_CPP_API thread_cond : public noncopyable
 {
 public:
 	/**

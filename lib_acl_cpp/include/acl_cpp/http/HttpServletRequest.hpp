@@ -2,6 +2,7 @@
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include "../stdlib/string.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include "../http/http_header.hpp"
 #include "http_ctype.hpp"
 #include "http_type.hpp"
@@ -25,7 +26,7 @@ class HttpServletResponse;
  * 与 HTTP 客户端请求相关的类，该类不应被继承，用户也不需要
  * 定义或创建该类对象
  */
-class ACL_CPP_API HttpServletRequest
+class ACL_CPP_API HttpServletRequest : public noncopyable
 {
 public:
 	/**

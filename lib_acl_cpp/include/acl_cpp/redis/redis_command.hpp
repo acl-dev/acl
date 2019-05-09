@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <map>
 #include <list>
 #include <vector>
@@ -17,7 +18,7 @@ class redis_request;
  * the redis command classes's base virtual class, which includes the basic
  * functions for all sub-classes
  */
-class ACL_CPP_API redis_command
+class ACL_CPP_API redis_command : public noncopyable
 {
 public:
 	/**

@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <vector>
 
 namespace acl {
@@ -15,7 +16,7 @@ class ofstream;
  * 邮件数据构造类，此类可以生成一封完整的邮件，同时还用于构建 SMTP 发送过程
  * 的邮件信封信息
  */
-class ACL_CPP_API mail_message
+class ACL_CPP_API mail_message : public noncopyable
 {
 public:
 	/**

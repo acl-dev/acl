@@ -1,4 +1,18 @@
 
+106) 2019.5.9
+106.1) safety & feature: 为防止用错，对于一些类增加了禁止拷贝复制限制
+
+105) 2019.4.30
+105.1) feature: tcp_keeper::peek 增加直连控制参数 sync，当该参数为 true 时，则
+内部不会针对所给地址创建连接池
+
+104) 2019.4.28
+104.1) bugfix: keeper_conn.cpp 中在当 fd dup 后创建 socket_stream 流对象时，
+有可能内部设置的 peer 地址为空，现在通过源 socket_stream 获得 peer 地址再
+给 dup 后的 socket_stream 赋值来解决此类问题
+
+------------------------------------------------------------------------------
+
 103) 2019.1.15
 103.1) feature: tcp_keeper 及相关功能类测试 OK
 

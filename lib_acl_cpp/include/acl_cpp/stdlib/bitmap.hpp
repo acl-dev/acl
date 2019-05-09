@@ -1,8 +1,9 @@
 #pragma once
+#include "noncopyable.hpp"
 
 namespace acl {
 
-class bitmap
+class bitmap : public noncopyable
 {
 public:
 	/**

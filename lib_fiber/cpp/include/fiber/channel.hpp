@@ -12,7 +12,7 @@ int channel_send(ACL_CHANNEL *c, void *v);
 int channel_recv(ACL_CHANNEL *c, void *v);
 
 template <typename T>
-class channel
+class channel : public noncopyable
 {
 public:
 	channel(void)

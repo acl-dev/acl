@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <vector>
 
 namespace acl {
@@ -7,7 +8,7 @@ namespace acl {
 class string;
 class hsrow;
 
-class ACL_CPP_API hsproto
+class ACL_CPP_API hsproto : public noncopyable
 {
 public:
 	hsproto(bool cache_enable);

@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "noncopyable.hpp"
 
 namespace acl
 {
@@ -7,7 +8,7 @@ namespace acl
 /**
  * 纯虚函数：线程任务类，该类实例的 run 方法是在子线程中被执行的
  */
-class ACL_CPP_API thread_job
+class ACL_CPP_API thread_job : public noncopyable
 {
 public:
 	thread_job(void) {}

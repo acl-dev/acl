@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <list>
 
 namespace acl {
@@ -14,7 +15,7 @@ struct rfc2047_entry
 	char  coding;		// 编码格式，B 表示 BASE64, Q 表示 QP
 };
 
-class ACL_CPP_API rfc2047
+class ACL_CPP_API rfc2047 : public noncopyable
 {
 public:
 	/**

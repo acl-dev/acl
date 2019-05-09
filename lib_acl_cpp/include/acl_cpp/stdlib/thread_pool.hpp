@@ -1,4 +1,5 @@
 #pragma once
+#include "noncopyable.hpp"
 
 struct acl_pthread_pool_t;
 struct acl_pthread_pool_attr_t;
@@ -13,28 +14,28 @@ class thread_job;
  * 自动退出)，该类有两个非纯虚函数：thread_on_init(线程池中的某个线程第一次
  * 创建时会首先调用此函数)，thread_on_exit(线程池中的某个线程退出时调用此函数)
  */
-class ACL_CPP_API thread_pool
+class ACL_CPP_API thread_pool : public noncopyable
 {
 public:
-	thread_pool();
-	virtual ~thread_pool();
+	thread_pool(void);
+	virtual ~thread_pool(void);
 
 	/**
 	 * 启动线程池，在创建线程池对象后，必须首先调用此函数以启动线程池
 	 */
-	void start();
+	void start(void);
 
 	/**
 	 * 停止并销毁线程池，并释放线程池资源，调用此函数可以使所有子线程退出，
 	 * 但并不释放本实例，如果该类实例是动态分配的则用户应该自释放类实例，
 	 * 在调用本函数后，如果想重启线程池过程，则必须重新调用 start 过程
 	 */
-	void stop();
+	void stop(void);
 
 	/**
 	 * 等待线程池中的所有线程池执行完所有任务
 	 */
-	void wait();
+	void wait(void);
 
 	/**
 	 * 将一个任务交给线程池中的一个线程去执行，线程池中的
@@ -80,13 +81,13 @@ public:
 	 * @return {int} 返回线程池中子线程的数量，如果未通过调用 start
 	 *  启动线程池过程，则该函数返回 -1
 	 */
-	int threads_count() const;
+	int threads_count(void) const;
 
 	/**
 	 * 获得当前线程池中未被处理的任务数量
 	 * @return {int} 当线程池还未被启动(即未调用 start)或已经销毁则返回 -1
 	 */
-	int task_qlen() const;
+	int task_qlen(void) const;
 
 protected:
 	/**
@@ -94,13 +95,13 @@ protected:
 	 * 用户可以在自己的实现中做一些初始化工作
 	 * @return {bool} 初始化是否成功
 	 */
-	virtual bool thread_on_init() { return true; }
+	virtual bool thread_on_init(void) { return true; }
 
 	/**
 	 * 当线程池中的子线程退出时，该虚函数将被调用，用户可以
 	 * 在自己的实现 中做一些资源释放工作
 	 */
-	virtual void thread_on_exit() {}
+	virtual void thread_on_exit(void) {}
 
 private:
 	size_t stack_size_;

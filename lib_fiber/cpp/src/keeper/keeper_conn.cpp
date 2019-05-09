@@ -28,13 +28,39 @@ void keeper_conn::set_task(task_req& task)
 	task_ = &task;
 }
 
+socket_stream* keeper_conn::dup_stream(socket_stream& from)
+{
+	// move the fd from current fiber to other thread,
+	// we should dup the fd first and delete the origin
+	// fd in the current fiber.
+
+	socket_stream* to = new socket_stream;
+	(void) to->open(dup(from.sock_handle()));
+	const char* local_addr = from.get_local(true);
+	const char* peer_addr  = from.get_peer(true);
+
+	if (local_addr == NULL || *local_addr == 0) {
+		logger_error("local_addr null");
+		delete to;
+		return NULL;
+	}
+	if (peer_addr == NULL || *peer_addr == 0) {
+		logger_error("peer_addr null");
+		delete to;
+		return NULL;
+	}
+
+	to->set_local(local_addr);
+	to->set_peer(peer_addr);
+	return to;
+}
+
 socket_stream* keeper_conn::peek(double& cost)
 {
 	cost = conn_cost_;
 	if (is_ready()) {
 		assert(conn_);
-		socket_stream* conn = new socket_stream;
-		conn->open(dup(conn_->sock_handle()));
+		socket_stream* conn = dup_stream(*conn_);
 		delete conn_;
 		conn_   = NULL;
 		status_ = KEEPER_T_IDLE;
@@ -91,6 +117,8 @@ void keeper_conn::print_status(void) const
 
 void keeper_conn::run(void)
 {
+	// if the task has been set before the fiber started, we should
+	// handle the task directly, without waiting task from box_.
 	if (task_) {
 		double n = task_->get_cost();
 		if (n >= 50) {
@@ -103,6 +131,7 @@ void keeper_conn::run(void)
 
 	// connect_one();
 
+	// loop popping task message for connecting one addr
 	while (true) {
 		ask_req* ask = box_.pop();
 
@@ -144,8 +173,9 @@ void keeper_conn::handle_task(task_req& task)
 
 	socket_stream* conn;
 	if (conn_) {
-		conn = new socket_stream;
-		conn->open(dup(conn_->sock_handle()));
+		// must dup the sock fd for moving the connection from
+		// one thread started in fiber schedule mode to another.
+		conn = dup_stream(*conn_);
 		delete conn_;
 		conn_   = NULL;
 		status_ = KEEPER_T_IDLE;
@@ -154,18 +184,22 @@ void keeper_conn::handle_task(task_req& task)
 		status_ = KEEPER_T_IDLE;
 	}
 
+	// notify the request task with the connection
 	task.set_conn_cost(conn_cost_);
 	task.put(conn);
 }
 
 void keeper_conn::connect_one(void)
 {
+	// this process can be called only when none conn_ was created
 	assert(conn_ == NULL);
 	status_ = KEEPER_T_BUSY;
 
 	conn_ = new socket_stream;
 	struct timeval begin;
 	gettimeofday(&begin, NULL);
+
+	// connecting one server with the given addr
 	bool ret = conn_->open(addr_, config_.conn_timeo, config_.rw_timeo);
 	struct timeval end;
 	gettimeofday(&end, NULL);
@@ -178,6 +212,7 @@ void keeper_conn::connect_one(void)
 	if (ret) {
 		status_     = KEEPER_T_READY;
 		last_ctime_ = time(NULL);
+		// add the connection into the connections pool
 		pool_.on_connect(*conn_, lk_);
 	} else {
 		if (this->killed()) {

@@ -22,8 +22,8 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	while (1) {
 		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
 		if (ret == ACL_VSTREAM_EOF) {
-			printf("gets error: %s, fd: %d, count: %d\r\n",
-				acl_last_serror(), SOCK(cstream), count);
+			//printf("gets error: %s, fd: %d, count: %d\r\n",
+			//	acl_last_serror(), SOCK(cstream), count);
 			break;
 		}
 		buf[ret] = 0;
@@ -57,9 +57,9 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 			break;
 		}
 
-		printf("accept one, fd: %d\r\n", ACL_VSTREAM_SOCK(cstream));
+		//printf("accept one, fd: %d\r\n", ACL_VSTREAM_SOCK(cstream));
 		acl_fiber_create(echo_client, cstream, __stack_size);
-		printf("continue to accept\r\n");
+		//printf("continue to accept\r\n");
 	}
 
 	acl_vstream_close(sstream);

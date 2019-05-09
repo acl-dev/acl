@@ -1,4 +1,4 @@
-%define release_id 0
+%define release_id 3
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,20 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu May 09 2019 zhengshuxin@qiyi.com 3.5.0-3-20190509.13
+- safety & feature: add nocopyable limit for many class to avoid potential problem
+
+* Mon May 06 2019 zhengshuxin@qiyi.com 3.5.0-2-20190506.09
+- acl_vstream.c: fixed bug in acl_vstream_fflush() where wbuf_dlen should be set 0
+
+* Thu Apr 30 2019 zhengshuxin@qiyi.com 3.5.0-1-20190430.17
+- tcp_keeper: add sync parameter to control if connect the given addr directly
+
+* Sun Apr 28 2019 zhengshuxin@qiyi.com 3.5.0-1-20190428.16
+- tcp_keeper: fixed one bug in keeper_conn.cpp
+- redis_zset: add ZPOPMIN/ZPOPMAX/BZPOPMIN/BZPOPMAX
+- server_socket: remove one constructur method
 
 * Sat Mar 09 2019 zhengshuxin@qiyi.com 3.5.0-0-20190309.20
 - release 3.5.0 version.

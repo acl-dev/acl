@@ -107,11 +107,20 @@ void tcp_keeper::update(const char* addr, double cost)
 	addrs_[addr] = cost;
 }
 
-socket_stream* tcp_keeper::peek(const char* addr, bool* hit /* = NULL */)
+socket_stream* tcp_keeper::peek(const char* addr, bool* hit /* = NULL */,
+	bool sync /* = false */)
 {
 	bool found;
 
-	if (direct(addr, found)) {
+	if (addr == NULL || *addr == 0) {
+		logger_fatal("addr null, addr=%s", addr ? addr : "null");
+	}
+
+	// if the rtt from the given addr is short, we should just connect
+	// the addr directivly.
+	// in direct-connect mode, using the caller's thread or fiber running
+	// space to connect the server addr.
+	if (sync || direct(addr, found)) {
 		if (hit) {
 			*hit = false;
 		}
@@ -131,10 +140,13 @@ socket_stream* tcp_keeper::peek(const char* addr, bool* hit /* = NULL */)
 		struct timeval end;
 		gettimeofday(&end, NULL);
 		double cost = stamp_sub(end, begin);
+
+		// if this rtt cost by this connecting process is long, we
+		// should remove the addr from the direct-connect set to
+		// avoid directivly connect in the next connect.
 		if (cost > rtt_min_) {
-			if (0)
-			printf("remove %s, cost=%.2f > %.2f\r\n", addr,
-				cost, rtt_min_);
+			//printf("remove %s, cost=%.2f > %.2f\r\n",
+			//	addr, cost, rtt_min_);
 			if (found) {
 				remove(addr);
 			}
@@ -142,6 +154,9 @@ socket_stream* tcp_keeper::peek(const char* addr, bool* hit /* = NULL */)
 		return conn;
 	}
 
+	// then, we should peek one connection to the given addr from
+	// the keeper connection pool.
+	// we create one connection request and push it to the task handler.
 	task_req task;
 	task.set_addr(addr);
 
@@ -152,12 +167,17 @@ socket_stream* tcp_keeper::peek(const char* addr, bool* hit /* = NULL */)
 		*hit = task.is_hit();
 	}
 
+	// if the connect time cost less the given min rtt, put the addr into
+	// the directivly connect set.
 	double cost = task.get_conn_cost();
 	if (cost < rtt_min_) {
-		if (0)
-		printf("update cost =%.2f < rtt=%.2f, addr=%s\r\n", 
-			cost, rtt_min_, addr);
+		//printf("update cost =%.2f < rtt=%.2f, addr=%s\r\n", 
+		//	cost, rtt_min_, addr);
 		update(addr, cost);
+	}
+
+	if (conn == NULL) {
+		logger_error("connection null for addr=%s", addr);
 	}
 
 	return conn;

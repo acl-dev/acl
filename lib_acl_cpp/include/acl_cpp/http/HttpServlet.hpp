@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/log.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include "http_header.hpp"
 
 namespace acl {
@@ -13,7 +14,7 @@ class HttpServletResponse;
 /**
  * 处理 HTTP 客户端请求的基类，子类需要继承该类
  */
-class ACL_CPP_API HttpServlet
+class ACL_CPP_API HttpServlet : public noncopyable
 {
 public:
 	/**

@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 
 namespace acl {
 
@@ -10,7 +11,7 @@ namespace acl {
  * 类对象的底层 IO 过程为默认过程
  * XXX： 本纯虚类被声明为堆对象类，建议子类也应该声明为堆对象类
  */
-class ACL_CPP_API stream_hook
+class ACL_CPP_API stream_hook : public noncopyable
 {
 public:
 	stream_hook() {}

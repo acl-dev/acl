@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "noncopyable.hpp"
 #include <stdlib.h>
 #if !defined(_WIN32) && !defined(_WIN64)
 #include <pthread.h>
@@ -18,7 +19,7 @@ namespace acl {
 /**
  * 互斥锁，可以同时创建文件锁和线程锁，也可以只创建一种锁
  */
-class ACL_CPP_API locker
+class ACL_CPP_API locker : public noncopyable
 {
 public:
 	/**
@@ -83,7 +84,7 @@ private:
 	void init_mutex(bool use_spinlock);
 };
 
-class ACL_CPP_API lock_guard
+class ACL_CPP_API lock_guard : public noncopyable
 {
 public:
 	lock_guard(locker& lk);

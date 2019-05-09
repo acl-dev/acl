@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <map>
 
 namespace acl {
@@ -12,7 +13,7 @@ class locker;
  * 每个 beanstalkd 有多个连接，内部自动加锁；但不控制连接数限制，
  * 用户应自行控制连接池的最大连接上限
  */
-class ACL_CPP_API beanstalk_pool
+class ACL_CPP_API beanstalk_pool : public noncopyable
 {
 public:
 	beanstalk_pool();

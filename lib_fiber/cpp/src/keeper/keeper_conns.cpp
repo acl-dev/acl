@@ -13,6 +13,7 @@ keeper_conns::keeper_conns(const keeper_config& config, const char* addr)
 {
 	acl_ring_init(&linker_);
 
+	// pre-create fibers to connect server first
 	for (int i = 0; i < config_.conn_max; i++) {
 		keeper_link* lk = new keeper_link;
 		lk->fb = new keeper_conn(config_, addr_, lk, *this);
@@ -54,23 +55,40 @@ void keeper_conns::trigger_more(void)
 	logger_debug(FIBER_DEBUG_KEEPER, 1, "[debug] trigger open count=%d", n);
 }
 
+// this method will be called by keeper_waiter for adding one request task
+// for the keeper_conns with one given addr.
 void keeper_conns::add_task(task_req& task)
 {
+	// try to peek one connection from the connections pool, if found
+	// one, move it the task and set hit flag with true, or create one
+	// fiber to connect the server addr and set hit flag with false.
+
 	keeper_conn* fb = peek_ready();
 	if (fb) {
 		task.set_hit(true);
 		double cost;
+		// peek the real connection from fiber
 		socket_stream* conn = fb->peek(cost);
-		assert(conn);
+		if (conn == NULL) {
+			logger_error("maybe the connection was closed!");
+		}
 		task.set_conn_cost(cost);
+
+		// notify request task the connection got now
 		task.put(conn);
+		// notify keeper fiber re-connect the server
 		fb->ask_open();
 		logger_debug(FIBER_DEBUG_KEEPER, 3, "[debug] addr=%s, hit",
 			addr_.c_str());
 	} else {
+		// if no connection got, create one fiber to real connect
+		// the remote server addr now
 		task.set_hit(false);
 		fb = new keeper_conn(config_, addr_, NULL, *this);
 		task.set_stamp();
+
+		// set the request task, when the fiber started,
+		// the request task will be executed directly.
 		fb->set_task(task);
 		fb->start();
 
@@ -190,6 +208,7 @@ keeper_conn* keeper_conns::peek_ready(void)
 		return NULL;
 	}
 
+	// return the first keeper fiber and re-append it to the tail
 	ACL_RING_DETACH(&lk->me);
 	ACL_RING_PREPEND(&linker_, &lk->me);
 

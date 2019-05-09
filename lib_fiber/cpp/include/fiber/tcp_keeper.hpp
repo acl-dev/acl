@@ -74,9 +74,12 @@ public:
 	 * 从 tcp_keeper 对象中提取对应地址的网络连接对接
 	 * @param addr {const char*} 服务器地址，格式：ip:port
 	 * @param hit {bool*} 非空时，将存放该连接是否在连接池的空闲连接中命中
+	 * @param sync {bool} 是否采用直连模式，如果采用直连模式，则内部不会
+	 *  针对该地址预创连接池
 	 * @return {socket_stream*} 返回 NULL 表示连接失败
 	 */
-	socket_stream* peek(const char* addr, bool* hit = NULL);
+	socket_stream* peek(const char* addr, bool* hit = NULL,
+		bool sync = false);
 
 	/**
 	 * 停止 tcp_keeper 线程运行

@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <list>
 
 namespace acl {
@@ -11,7 +12,7 @@ typedef struct HEADER
 	char *value;
 } HEADER;
 
-class ACL_CPP_API mime_head
+class ACL_CPP_API mime_head : public noncopyable
 {
 public:
 	mime_head();

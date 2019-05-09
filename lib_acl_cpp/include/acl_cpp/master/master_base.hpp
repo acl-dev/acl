@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include "master_conf.hpp"
 #include <vector>
 
@@ -12,7 +13,7 @@ class server_socket;
 class event_timer;
 class string;
 
-class ACL_CPP_API master_base
+class ACL_CPP_API master_base : public noncopyable
 {
 public:
 	/**

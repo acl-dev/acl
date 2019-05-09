@@ -11,8 +11,8 @@ namespace acl {
 class ACL_CPP_API charset_conv : public pipe_stream
 {
 public:
-	charset_conv();
-	~charset_conv();
+	charset_conv(void);
+	~charset_conv(void);
 
 	/**
 	 * 设置是否允许将无效的字符集直接拷贝
@@ -88,7 +88,6 @@ public:
 	virtual int pop_end(string* out, size_t max = 0);
 	virtual void clear();
 
-protected:
 private:
 	bool m_addInvalid;  // 如果遇到无效的字符集，是否直接拷贝
 	string  m_errmsg;

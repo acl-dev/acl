@@ -2,6 +2,7 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 #include "../stdlib/locker.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <vector>
 #include <map>
 
@@ -28,7 +29,7 @@ struct conns_pools {
 /**
  * connect pool 服务管理器，有获取连接池等功能
  */
-class ACL_CPP_API connect_manager
+class ACL_CPP_API connect_manager : public noncopyable
 {
 public:
 	connect_manager(void);

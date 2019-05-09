@@ -14,7 +14,7 @@ namespace acl
  * 该类实际上是封装了 lib_acl 中的 ACL_DBUF_POOL 结构及方法
  */
 
-class ACL_CPP_API dbuf_pool
+class ACL_CPP_API dbuf_pool : public noncopyable
 {
 public:
 	/**
@@ -158,7 +158,7 @@ class dbuf_guard;
 /**
  * 在会话内存池对象上分配的对象基础类
  */
-class ACL_CPP_API dbuf_obj
+class ACL_CPP_API dbuf_obj : public noncopyable
 {
 public:
 	/**

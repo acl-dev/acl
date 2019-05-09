@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
+#include "../stdlib/noncopyable.hpp"
 #if defined(_WIN32) || defined(_WIN64)
 #include <WinSock2.h>
 #endif
@@ -19,15 +20,17 @@ enum {
 /**
  * 服务端监听套接口类，接收客户端连接，并创建客户端流连接对象
  */
-class ACL_CPP_API server_socket
+class ACL_CPP_API server_socket : public noncopyable
 {
 public:
+#if 0
 	/**
 	 * 构造函数，调用本构造函数后需调用类方法 open 来监听指定服务地址
 	 * @param backlog {int} 监听套接口队列长度
 	 * @param block {bool} 是阻塞模式还是非阻塞模式
 	 */
 	server_socket(int backlog, bool block);
+#endif
 
 	/**
 	 * 构造函数

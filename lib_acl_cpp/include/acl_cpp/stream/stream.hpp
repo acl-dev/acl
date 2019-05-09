@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <map>
 
 struct ACL_VSTREAM;
@@ -9,7 +10,7 @@ namespace acl {
 
 class stream_hook;
 
-class ACL_CPP_API stream
+class ACL_CPP_API stream : public noncopyable
 {
 public:
 	stream(void);

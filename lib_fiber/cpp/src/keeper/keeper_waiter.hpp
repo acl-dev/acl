@@ -9,6 +9,8 @@ class keeper_config;
 class task_req;
 class keeper_conns;
 
+// waiting for connection task request and lookup the connection pool
+// for the request's addr, then put the task to the pool.
 class keeper_waiter : public fiber
 {
 public:
@@ -28,12 +30,17 @@ public:
 	keeper_waiter& set_pool_ttl(int ttl);
 
 public:
+	// called by tcp_keeper to stop the waiter fiber
 	void stop(void);
+
+	// called by tcp_keeper to wait the waiter fiber to exit
 	void join(void);
 
 protected:
 	// @override
 	void run(void);
+
+	// notify tcp_keeper the waiter fiber will exit.
 	void done(void);
 
 private:
