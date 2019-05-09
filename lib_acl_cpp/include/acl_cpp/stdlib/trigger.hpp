@@ -238,7 +238,7 @@ private:
  * 定时从触发器中提取到期的任务并触发
  */
 template <typename T>
-class thread_trigger : public thread, public noncopyable
+class thread_trigger : public thread
 {
 public:
 	thread_trigger(void)
