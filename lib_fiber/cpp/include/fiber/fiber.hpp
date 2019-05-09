@@ -17,7 +17,7 @@ typedef enum
 /**
  * 协程类定义，纯虚类，需要子类继承并实现纯虚方法
  */
-class FIBER_CPP_API fiber
+class FIBER_CPP_API fiber : public noncopyable
 {
 public:
 	/**
@@ -234,7 +234,7 @@ private:
 /**
  * 可用作定时器的协程类
  */
-class FIBER_CPP_API fiber_timer
+class FIBER_CPP_API fiber_timer : public noncopyable
 {
 public:
 	fiber_timer(void);

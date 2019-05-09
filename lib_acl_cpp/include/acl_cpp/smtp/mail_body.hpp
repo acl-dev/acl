@@ -2,6 +2,7 @@
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include "../stdlib/string.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include "../http/http_ctype.hpp"
 
 namespace acl {
@@ -12,7 +13,7 @@ class mail_attach;
 /**
  * 邮件正文构建类
  */
-class ACL_CPP_API mail_body
+class ACL_CPP_API mail_body : public noncopyable
 {
 public:
 	/**

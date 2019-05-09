@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
+#include "../stdlib/noncopyable.hpp"
 #if defined(_WIN32) || defined(_WIN64)
 #include <WinSock2.h>
 #endif
@@ -19,7 +20,7 @@ enum {
 /**
  * 服务端监听套接口类，接收客户端连接，并创建客户端流连接对象
  */
-class ACL_CPP_API server_socket
+class ACL_CPP_API server_socket : public noncopyable
 {
 public:
 #if 0

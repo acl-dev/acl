@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 
 namespace acl {
 
@@ -7,7 +8,7 @@ class http_client;
 class http_request;
 class http_header;
 
-class ACL_CPP_API http_download
+class ACL_CPP_API http_download : public noncopyable
 {
 public:
 	/**

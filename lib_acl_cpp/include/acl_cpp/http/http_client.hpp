@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 
 struct HTTP_HDR;
 struct HTTP_HDR_RES;
@@ -21,7 +22,7 @@ class http_header;
  * 到 HTTP 客户端连接时创建一个对应的 HTTP 客户端流对象
  * 该客户端流对象可以支持长连接
  */
-class ACL_CPP_API http_client
+class ACL_CPP_API http_client : public noncopyable
 {
 public:
 	/**

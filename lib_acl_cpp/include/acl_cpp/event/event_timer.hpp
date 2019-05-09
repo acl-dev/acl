@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <list>
 
 namespace acl
@@ -7,7 +8,7 @@ namespace acl
 
 class event_task;
 
-class ACL_CPP_API event_timer
+class ACL_CPP_API event_timer : public noncopyable
 {
 public:
 	/**

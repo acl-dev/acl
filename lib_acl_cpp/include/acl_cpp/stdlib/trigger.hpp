@@ -14,6 +14,7 @@
 #include "../acl_cpp_define.hpp"
 #include <map>
 #include <vector>
+#include "noncopyable.hpp"
 #include "mbox.hpp"
 #include "util.hpp"
 #include "thread.hpp"
@@ -25,7 +26,7 @@ namespace acl {
  * 具有相同时间截的定时任务的集合
  */
 template <typename T>
-class trigger_item
+class trigger_item : public noncopyable
 {
 public:
 	typedef std::map<long long, trigger_item<T>*> trigger_items_t;
@@ -121,7 +122,7 @@ private:
  * };
  */
 template <typename T>
-class timer_trigger
+class timer_trigger : public noncopyable
 {
 public:
 	typedef std::map<long long, trigger_item<T>*> trigger_items_t;
@@ -237,7 +238,7 @@ private:
  * 定时从触发器中提取到期的任务并触发
  */
 template <typename T>
-class thread_trigger : public thread
+class thread_trigger : public thread, public noncopyable
 {
 public:
 	thread_trigger(void)

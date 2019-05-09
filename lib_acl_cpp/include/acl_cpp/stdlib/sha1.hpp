@@ -22,11 +22,12 @@
  */
 
 #pragma once
+#include "noncopyable.hpp"
 
 namespace acl
 {
 
-class sha1
+class sha1 : public noncopyable
 {
 public:
 	sha1();

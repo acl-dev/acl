@@ -1,13 +1,14 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
-#include "../stdlib/pipe_stream.hpp"
+#include "../stdlib/noncopyable.hpp"
 
 namespace acl {
 
 class charset_conv;
 class pipe_stream;
+class pipe_manager;
 
-class ACL_CPP_API http_pipe
+class ACL_CPP_API http_pipe : public noncopyable
 {
 public:
 	http_pipe(void);

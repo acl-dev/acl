@@ -2,6 +2,7 @@
 #include "../acl_cpp_define.hpp"
 #include <stdlib.h>
 #include <map>
+#include "../stdlib/noncopyable.hpp"
 #include "../stdlib/string.hpp"
 
 struct MIME_NODE;
@@ -12,7 +13,7 @@ class pipe_manager;
 class ostream;
 class ifstream;
 
-class ACL_CPP_API mime_node
+class ACL_CPP_API mime_node : public noncopyable
 {
 public:
 	/**

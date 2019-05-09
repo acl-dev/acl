@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 
 namespace acl
 {
@@ -8,7 +9,7 @@ namespace acl
  * 需要被延迟释放的类继承此类后，可以调用 aio_handle:delay_free 来到达
  * 延迟销毁的目的，避免了在递归过程中被立即释放时的对象被提前释放的问题
  */
-class ACL_CPP_API aio_delay_free
+class ACL_CPP_API aio_delay_free : public noncopyable
 {
 public:
 	aio_delay_free(void);

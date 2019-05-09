@@ -1,4 +1,5 @@
 #pragma once
+#include "noncopyable.hpp"
 
 struct ACL_SCAN_DIR;
 
@@ -7,7 +8,7 @@ namespace acl
 
 class string;
 
-class ACL_CPP_API scan_dir
+class ACL_CPP_API scan_dir : public noncopyable
 {
 public:
 	scan_dir(void);
@@ -33,7 +34,7 @@ public:
 	/**
 	 * 关闭目录，同时释放内部资源
 	 */
-	void close();
+	void close(void);
 
 	/**
 	 * 扫描下一个文件(遇到目录会自动跳过)，当在 open 指定了允许递归扫描选项

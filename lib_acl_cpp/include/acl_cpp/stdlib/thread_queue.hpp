@@ -7,14 +7,14 @@ struct ACL_AQUEUE;
 namespace acl
 {
 
-class ACL_CPP_API thread_qitem
+class ACL_CPP_API thread_qitem : public noncopyable
 {
 public:
 	thread_qitem() {}
 	virtual ~thread_qitem() {}
 };
 
-class ACL_CPP_API thread_queue
+class ACL_CPP_API thread_queue : public noncopyable
 {
 public:
 	thread_queue();

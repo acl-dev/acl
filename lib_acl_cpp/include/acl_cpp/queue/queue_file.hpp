@@ -2,6 +2,7 @@
 #include <time.h>
 #include "../stdlib/string.hpp"
 #include "../stdlib/locker.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include "queue_manager.hpp"
 
 #ifndef MAXPATH255
@@ -12,7 +13,7 @@ namespace acl {
 
 class fstream;
 
-class ACL_CPP_API queue_file
+class ACL_CPP_API queue_file : public noncopyable
 {
 public:
 	queue_file();

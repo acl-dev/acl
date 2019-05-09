@@ -1,12 +1,13 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 
 namespace acl
 {
 
 class connect_pool;
 
-class ACL_CPP_API connect_client
+class ACL_CPP_API connect_client : public noncopyable
 {
 public:
 	connect_client() : when_(0), pool_(NULL) {}

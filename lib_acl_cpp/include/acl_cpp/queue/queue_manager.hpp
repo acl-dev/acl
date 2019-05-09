@@ -2,6 +2,7 @@
 #include <map>
 #include "../stdlib/string.hpp"
 #include "../stdlib/locker.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include "queue_file.hpp"
 
 typedef struct ACL_SCAN_DIR ACL_SCAN_DIR;
@@ -10,7 +11,7 @@ namespace acl {
 
 class queue_file;
 
-class ACL_CPP_API queue_manager
+class ACL_CPP_API queue_manager : public noncopyable
 {
 public:
 	/**

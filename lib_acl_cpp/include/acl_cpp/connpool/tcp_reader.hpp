@@ -11,6 +11,7 @@
  */
 
 #pragma once
+#include "../stdlib/noncopyable.hpp"
 
 namespace acl
 {
@@ -21,7 +22,7 @@ class string;
 /**
  * tcp ipc 通信接收类，内部会自动读取完事的数据包
  */
-class ACL_CPP_API tcp_reader
+class ACL_CPP_API tcp_reader : public noncopyable
 {
 public:
 	tcp_reader(socket_stream& conn);

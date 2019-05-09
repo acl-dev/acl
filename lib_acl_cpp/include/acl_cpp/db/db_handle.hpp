@@ -2,6 +2,7 @@
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include "../stdlib/string.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include "../connpool/connect_client.hpp"
 
 namespace acl {
@@ -9,7 +10,7 @@ namespace acl {
 /**
  * 数据库查询结果集的行记录类型定义
  */
-class ACL_CPP_API db_row
+class ACL_CPP_API db_row : public noncopyable
 {
 public:
 	/**
@@ -164,7 +165,7 @@ private:
 /**
  * 数据库查询结果的行记录集合类型定义
  */
-class ACL_CPP_API db_rows
+class ACL_CPP_API db_rows : public noncopyable
 {
 public:
 	db_rows();

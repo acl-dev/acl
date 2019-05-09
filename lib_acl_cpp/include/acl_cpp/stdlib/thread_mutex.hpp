@@ -12,6 +12,7 @@
 
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "noncopyable.hpp"
 
 #if !defined(_WIN32) && !defined(_WIN64)
 # include <pthread.h>
@@ -27,7 +28,7 @@ namespace acl {
 /**
  * Ïß³Ì»¥³âËø
  */
-class ACL_CPP_API thread_mutex
+class ACL_CPP_API thread_mutex : public noncopyable
 {
 public:
 	/**
@@ -68,7 +69,7 @@ private:
 #endif
 };
 
-class ACL_CPP_API thread_mutex_guard
+class ACL_CPP_API thread_mutex_guard : public noncopyable
 {
 public:
 	thread_mutex_guard(thread_mutex& mutex);

@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/locker.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include "ipc_server.hpp"
 
 struct acl_pthread_pool_t;
@@ -9,7 +10,7 @@ namespace acl {
 
 class ipc_client;
 
-class ACL_CPP_API ipc_request
+class ACL_CPP_API ipc_request : public noncopyable
 {
 public:
 	ipc_request();

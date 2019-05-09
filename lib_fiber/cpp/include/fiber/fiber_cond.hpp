@@ -12,7 +12,7 @@ class fiber_event;
 /**
  * 可用在协程之间，线程之间，协程与线程之间的条件变量
  */
-class FIBER_CPP_API fiber_cond
+class FIBER_CPP_API fiber_cond : public noncopyable
 {
 public:
 	fiber_cond(void);

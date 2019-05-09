@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <list>
 #include <string>
 #include "mime_head.hpp"
@@ -16,11 +17,11 @@ class mime_image;
 class ifstream;
 class fstream;
 
-class ACL_CPP_API mime
+class ACL_CPP_API mime : public noncopyable
 {
 public:
-	mime();
-	~mime();
+	mime(void);
+	~mime(void);
 
 	/////////////////////////////////////////////////////////////////////
 	// 与邮件解析相关的函数
@@ -41,7 +42,7 @@ public:
 	 * 调用流式分析时用此函数判断邮件头是否解析完毕
 	 * @return {bool} 是否邮件头解析完毕
 	 */
-	bool primary_head_ok() const;
+	bool primary_head_ok(void) const;
 
 	/**
 	 * 开始进行流式解析过程, 该函数内部会自动调用 reset() 函数以重置解析

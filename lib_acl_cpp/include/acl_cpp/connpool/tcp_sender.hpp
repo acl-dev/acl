@@ -12,6 +12,7 @@
 
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 
 struct iovec;
 
@@ -23,7 +24,7 @@ class socket_stream;
 /**
  * tcp ipc 通信发送类，内部自动组包
  */
-class ACL_CPP_API tcp_sender
+class ACL_CPP_API tcp_sender : public noncopyable
 {
 public:
 	tcp_sender(socket_stream& conn);

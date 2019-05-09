@@ -58,27 +58,27 @@ int main(void)
 	acl::json_node& array = json.create_array();
 	json.get_root().add_child("array", array);
 
-	acl::json_node& node = json.create_node();
-	node.add_number("number11", 100);
-	node.add_number("number12", 200);
-	node.add_number("number13", 300);
-	array.add_child(node);
+	acl::json_node& node1 = json.create_node();
+	node1.add_number("number11", 100);
+	node1.add_number("number12", 200);
+	node1.add_number("number13", 300);
+	array.add_child(node1);
 
-	node = json.create_node();
-	node.add_number("number21", 1000)
+	acl::json_node& node2 = json.create_node();
+	node2.add_number("number21", 1000)
 		.add_number("number22", 2000)
 		.add_number("number23", 3000);
-	array.add_child(node);
+	array.add_child(node2);
 
-	node = json.create_node();
-	node.add_text("number31", "value31")
+	acl::json_node& node3 = json.create_node();
+	node3.add_text("number31", "value31")
 		.add_text("number32", "value32")
 		.add_text("number33", "value33");
-	array.add_child(node);
+	array.add_child(node3);
 
-	node = json.create_node();
-	node.add_bool("number41", true).add_bool("number42", false);
-	array.add_child(node);
+	acl::json_node& node4 = json.create_node();
+	node4.add_bool("number41", true).add_bool("number42", false);
+	array.add_child(node4);
 
 	json.build_json(buf);
 	printf("%s\r\n", buf.c_str());

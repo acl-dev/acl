@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "noncopyable.hpp"
 #include "string.hpp"
 #include <list>
 
@@ -13,7 +14,7 @@ class token_tree;
 /**
  * 256 叉匹配树中的节点对象，为纯私有类
  */
-class ACL_CPP_API token_node
+class ACL_CPP_API token_node : public noncopyable
 {
 public:
 	/**
@@ -65,7 +66,7 @@ private:
  * 256 叉树最大匹配查找算法，该算法具有通用性及非常高的性能(比哈希性能还高)，
  * 通过将字符串映射到 256 叉树上进行匹配查找
  */
-class ACL_CPP_API token_tree
+class ACL_CPP_API token_tree : public noncopyable
 {
 public:
 	token_tree(void);

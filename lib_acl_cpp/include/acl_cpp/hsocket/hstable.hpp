@@ -1,9 +1,10 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 
 namespace acl {
 
-class ACL_CPP_API hstable
+class ACL_CPP_API hstable : public noncopyable
 {
 public:
 	hstable(int id, const char* dbn, const char* tbl,

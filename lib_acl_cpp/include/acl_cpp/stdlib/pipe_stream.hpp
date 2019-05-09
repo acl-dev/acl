@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include <list>
+#include "noncopyable.hpp"
 #include "string.hpp"
 
 namespace acl {
@@ -9,7 +10,7 @@ namespace acl {
  * 双向输入输出缓冲管道流, 该流不仅可接收输入数据，同时还可输出所
  * 输入的数据，纯虚基类，子类需要实现三个接口函数
  */
-class ACL_CPP_API pipe_stream
+class ACL_CPP_API pipe_stream : public noncopyable
 {
 public:
 	pipe_stream() {}
@@ -93,7 +94,7 @@ private:
  * 输入接口，同时从所有管道流的输出接口中获得数据然后再将数据传递给
  * 下一个管道流的输入接口，以此类推，直到最后一个管道流
  */
-class ACL_CPP_API pipe_manager
+class ACL_CPP_API pipe_manager : public noncopyable
 {
 public:
 	pipe_manager();

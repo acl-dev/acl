@@ -1,11 +1,12 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/atomic.hpp"
+#include "../stdlib/noncopyable.hpp"
 
 namespace acl
 {
 
-class ACL_CPP_API event_mutex
+class ACL_CPP_API event_mutex : public noncopyable
 {
 public:
 	event_mutex(bool recursive = true);

@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/thread_mutex.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <vector>
 
 namespace acl
@@ -23,7 +24,7 @@ class polarssl_io;
  * 连接对象进行证书配置；该类加载了全局性的证书、密钥等信息；每一个 SSL 对象
  * (polarssl_io) 调用本对象的setup_certs 方法来初始化自身的证书、密钥等信息
  */
-class ACL_CPP_API polarssl_conf
+class ACL_CPP_API polarssl_conf : public noncopyable
 {
 public:
 	polarssl_conf();

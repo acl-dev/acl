@@ -3,6 +3,7 @@
 #include <map>
 #include <vector>
 #include "../stdlib/string.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include "../stream/socket_stream.hpp"
 #include "../hsocket/hsproto.hpp"
 
@@ -13,7 +14,7 @@ namespace acl {
 class hsrow;
 class hstable;
 
-class ACL_CPP_API hsclient
+class ACL_CPP_API hsclient : public noncopyable
 {
 public:
 	/**

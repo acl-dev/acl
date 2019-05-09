@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <list>
 #if defined(_WIN32) || defined(_WIN64)
 #include <WinSock2.h>
@@ -14,7 +15,7 @@ namespace acl
 /**
  * 异步流回调类
  */
-class ACL_CPP_API aio_callback
+class ACL_CPP_API aio_callback : public noncopyable
 {
 public:
 	aio_callback(void) {}
@@ -86,7 +87,7 @@ class stream_hook;
  * 异步流基类，该类为纯虚类，不能被直接实例化，只能被子类继承使用
  * 该类只能在堆上分配，不能在栈上分配
  */
-class ACL_CPP_API aio_stream
+class ACL_CPP_API aio_stream : public noncopyable
 {
 public:
 	/**

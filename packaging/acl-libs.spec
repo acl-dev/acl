@@ -1,4 +1,4 @@
-%define release_id 2
+%define release_id 3
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu May 09 2019 zhengshuxin@qiyi.com 3.5.0-3-20190509.13
+- safety & feature: add nocopyable limit for many class to avoid potential problem
 
 * Mon May 06 2019 zhengshuxin@qiyi.com 3.5.0-2-20190506.09
 - acl_vstream.c: fixed bug in acl_vstream_fflush() where wbuf_dlen should be set 0

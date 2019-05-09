@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/noncopyable.hpp"
 #include <list>
 
 struct ACL_HTABLE;
@@ -9,7 +10,7 @@ namespace acl {
 class hsclient;
 class locker;
 
-class ACL_CPP_API hspool
+class ACL_CPP_API hspool : public noncopyable
 {
 public:
 	/**
