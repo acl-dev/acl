@@ -199,17 +199,14 @@ void redis_stream::build(const std::map<string, string>& streams, size_t i,
 	}
 
 	char block_s[LONG_LEN];
-	if (block > 0) {
-		argv_[i] = "BLOCK";
-		argv_lens_[i] = sizeof("BLOCK") - 1;
-		i++;
+	argv_[i] = "BLOCK";
+	argv_lens_[i] = sizeof("BLOCK") - 1;
+	i++;
 
-		safe_snprintf(block_s, sizeof(block_s), "%lu",
-			(unsigned long) block);
-		argv_[i] = block_s;
-		argv_lens_[i] = strlen(block_s);
-		i++;
-	}
+	safe_snprintf(block_s, sizeof(block_s), "%lu", (unsigned long) block);
+	argv_[i] = block_s;
+	argv_lens_[i] = strlen(block_s);
+	i++;
 
 	if (noack) {
 		argv_[i] = "NOACK";
