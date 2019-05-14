@@ -183,7 +183,7 @@ int redis_stream::xlen(const char* key)
 //////////////////////////////////////////////////////////////////////////////
 
 void redis_stream::build(const std::map<string, string>& streams, size_t i,
-	size_t count, size_t block, bool noack /* = false */)
+	size_t count, ssize_t block, bool noack /* = false */)
 {
 	char count_s[LONG_LEN];
 	if (count > 0) {
@@ -199,14 +199,16 @@ void redis_stream::build(const std::map<string, string>& streams, size_t i,
 	}
 
 	char block_s[LONG_LEN];
-	argv_[i] = "BLOCK";
-	argv_lens_[i] = sizeof("BLOCK") - 1;
-	i++;
+	if (block >= 0) {
+		argv_[i] = "BLOCK";
+		argv_lens_[i] = sizeof("BLOCK") - 1;
+		i++;
 
-	safe_snprintf(block_s, sizeof(block_s), "%lu", (unsigned long) block);
-	argv_[i] = block_s;
-	argv_lens_[i] = strlen(block_s);
-	i++;
+		safe_snprintf(block_s, sizeof(block_s), "%ld", (long) block);
+		argv_[i] = block_s;
+		argv_lens_[i] = strlen(block_s);
+		i++;
+	}
 
 	if (noack) {
 		argv_[i] = "NOACK";
@@ -234,7 +236,7 @@ void redis_stream::build(const std::map<string, string>& streams, size_t i,
 }
 
 void redis_stream::xread_build(const std::map<string, string>& streams,
-	size_t count, size_t block)
+	size_t count, ssize_t block)
 {
 	argc_ = 6 + streams.size() * 2;
 	argv_space(argc_);
@@ -248,7 +250,7 @@ void redis_stream::xread_build(const std::map<string, string>& streams,
 }
 
 void redis_stream::xreadgroup_build(const char* group, const char* consumer,
-	const std::map<string, string>& streams, size_t count, size_t block,
+	const std::map<string, string>& streams, size_t count, ssize_t block,
 	bool noack)
 {
 	argc_ = 10 + streams.size() * 2;
@@ -276,7 +278,7 @@ void redis_stream::xreadgroup_build(const char* group, const char* consumer,
 
 bool redis_stream::xread(redis_stream_messages& messages,
 	const std::map<string, string>& streams,
-	size_t count /* = 1000 */, size_t block /* = 0 */)
+	size_t count /* = 1000 */, ssize_t block /* = 0 */)
 {
 	if (streams.size() == 1) {
 		std::map<string, string>::const_iterator cit = streams.begin();
@@ -289,7 +291,7 @@ bool redis_stream::xread(redis_stream_messages& messages,
 bool redis_stream::xreadgroup(redis_stream_messages& messages,
 	const char* group, const char* consumer,
 	const std::map<string, string>& streams, size_t count /* = 1000 */,
-	size_t block /* = 0 */, bool noack /* = false */)
+	ssize_t block /* = 0 */, bool noack /* = false */)
 {
 	if (streams.size() == 1) {
 		std::map<string, string>::const_iterator cit = streams.begin();
@@ -303,7 +305,7 @@ bool redis_stream::xreadgroup(redis_stream_messages& messages,
 bool redis_stream::xreadgroup_with_noack(redis_stream_messages& messages,
 	const char* group, const char* consumer,
 	const std::map<string, string>& streams, size_t count /* = 0 */,
-	size_t block /* = 0 */)
+	ssize_t block /* = 0 */)
 {
 	return xreadgroup(messages, group, consumer, streams, count, block, true);
 }

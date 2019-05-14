@@ -236,12 +236,13 @@ public:
 	 *  streams' keys to be read by users
 	 * @param count {size_t} specifies the max count of items to be read,
 	 *  no limit when 0 was set
-	 * @param block {size_t} specifies the read timeout, no block if 0 set
+	 * @param block {ssize_t} specifies the read timeout, block if 0 set,
+	 *  no-block if -1 set
 	 * @return {bool} return the status of executing the xread command
 	 */
 	bool xread(redis_stream_messages& messages,
 		const std::map<string, string>& streams,
-		size_t count = 1000, size_t block = 0);
+		size_t count = 1000, ssize_t block = 0);
 
 	/**
 	 * the XREADGROUP command is a special version of the XREAD command
@@ -263,7 +264,9 @@ public:
 	 *     just let the client access its pending entries: delivered to it,
 	 *     but not yet acknowledged.
 	 * @param count {size_t}
-	 * @param block {size_t}
+	 * @param block {ssize_t} set the blocked timeout waiting for messages,
+	 *  if block is 0, will block until getting one message at least;
+	 *  if block is -1, don't block for messages.
 	 * @param noack {bool} The NOACK subcommand can be used to avoid adding
 	 *  the message to the PEL in cases where reliability is not a
 	 *  requirement and the occasional message loss is acceptable. This is
@@ -272,7 +275,7 @@ public:
 	 */
 	bool xreadgroup(redis_stream_messages& messsages, const char* group,
 		const char* consumer, const std::map<string, string>& streams,
-		size_t count = 1000, size_t block = 0, bool noack = false);
+		size_t count = 1000, ssize_t block = 0, bool noack = false);
 
 	/**
 	 * the XREADGROUP with NOACK subcommand for reading messages.
@@ -281,13 +284,13 @@ public:
 	 * @param consumer {const char*}
 	 * @param streams {const std::map<string, string>&}
 	 * @param count {size_t}
-	 * @param block {size_t}
+	 * @param block {ssize_t}
 	 * @return {bool}
 	 */
 	bool xreadgroup_with_noack(redis_stream_messages& messsages,
 		const char* group, const char* consumer,
 		const std::map<string, string>& streams,
-		size_t count = 1000, size_t block = 0);
+		size_t count = 1000, ssize_t block = 0);
 
 	/**
 	 * The command returns the stream entries matching a given range of IDs.
@@ -513,12 +516,12 @@ private:
 		const char* names[], const size_t names_len[],
 		const char* values[], const size_t values_len[], size_t argc);
 	void build(const std::map<string, string>& streams, size_t i,
-		size_t count, size_t block, bool noack = false);
+		size_t count, ssize_t block, bool noack = false);
 	void xread_build(const std::map<string, string>& streams,
-		size_t count, size_t block);
+		size_t count, ssize_t block);
 	void xreadgroup_build(const char* group, const char* consumer,
 		const std::map<string, string>& streams,
-		size_t count, size_t block, bool noack);
+		size_t count, ssize_t block, bool noack);
 	bool get_results(redis_stream_messages& messages);
 	bool get_messages(const redis_result& rr, redis_stream_messages& messages);
 	bool get_one_message(const redis_result& rr, redis_stream_message& message);
