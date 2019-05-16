@@ -105,6 +105,7 @@ void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *lk)
 	if ((lk->owner = ready) != NULL) {
 		ring_detach(&ready->me);
 		acl_fiber_ready(ready);
+		acl_fiber_yield();
 	}
 }
 
@@ -200,12 +201,14 @@ void acl_fiber_rwlock_runlock(ACL_FIBER_RWLOCK *lk)
 		ring_detach(&lk->wwaiting);
 		lk->writer = fiber;
 		acl_fiber_ready(fiber);
+		acl_fiber_yield();
 	}
 }
 
 void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK *lk)
 {
 	ACL_FIBER *fiber;
+	size_t n = 0;
 	
 	if (lk->writer == NULL)
 		msg_fatal("%s(%d), %s: wunlock: not locked",
@@ -221,11 +224,16 @@ void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK *lk)
 		ring_detach(&lk->rwaiting);
 		lk->readers++;
 		acl_fiber_ready(fiber);
+		n++;
 	}
 
 	if (lk->readers == 0 && (fiber = FIRST_FIBER(&lk->wwaiting)) != NULL) {
 		ring_detach(&lk->wwaiting);
 		lk->writer = fiber;
 		acl_fiber_ready(fiber);
+		n++;
 	}
+
+	if (n > 0)
+		acl_fiber_yield();
 }

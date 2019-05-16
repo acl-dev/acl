@@ -102,11 +102,13 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 
 	if ((ready = FIRST_FIBER(&sem->waiting)) == NULL) {
 		sem->num++;
+		acl_fiber_yield();
 		return sem->num;
 	}
 
 	ring_detach(&ready->me);
 	acl_fiber_ready(ready);
 
+	acl_fiber_yield();
 	return sem->num;
 }
