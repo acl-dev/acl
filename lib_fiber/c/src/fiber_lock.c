@@ -45,8 +45,9 @@ static int __lock(ACL_FIBER_MUTEX *lk, int block)
 	// xxx: no support recursion lock
 	assert(lk->owner != curr);
 
-	if (!block)
+	if (!block) {
 		return -1;
+	}
 
 	ring_prepend(&lk->waiting, &curr->me);
 	curr->waiting = lk;
@@ -59,15 +60,17 @@ static int __lock(ACL_FIBER_MUTEX *lk, int block)
 	 */
 	ring_detach(&curr->me);
 
-	if (lk->owner == curr)
+	if (lk->owner == curr) {
 		return 0;
+	}
 
-	if (acl_fiber_killed(curr))
+	if (acl_fiber_killed(curr)) {
 		msg_info("%s(%d), %s: lock fiber-%u was killed",
 			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(curr));
-	else
+	} else {
 		msg_warn("%s(%d), %s: qlock: owner=%p self=%p oops",
 			__FILE__, __LINE__, __FUNCTION__, lk->owner, curr);
+	}
 
 	return 0;
 }
@@ -92,12 +95,14 @@ void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *lk)
 {
 	ACL_FIBER *ready, *curr = acl_fiber_running();
 	
-	if (lk->owner == NULL)
+	if (lk->owner == NULL) {
 		msg_fatal("%s(%d), %s: qunlock: owner NULL",
 			__FILE__, __LINE__, __FUNCTION__);
-	if (lk->owner != curr)
+	}
+	if (lk->owner != curr) {
 		msg_fatal("%s(%d), %s: invalid owner=%p, %p",
 			__FILE__, __LINE__, __FUNCTION__, lk->owner, curr);
+	}
 
 	ring_detach(&lk->me);
 	ready = FIRST_FIBER(&lk->waiting);
@@ -138,8 +143,9 @@ static int __rlock(ACL_FIBER_RWLOCK *lk, int block)
 		return 1;
 	}
 
-	if (!block)
+	if (!block) {
 		return 0;
+	}
 
 	curr = acl_fiber_running();
 	ring_prepend(&lk->rwaiting, &curr->me);
@@ -170,8 +176,9 @@ static int __wlock(ACL_FIBER_RWLOCK *lk, int block)
 		return 1;
 	}
 
-	if (!block)
+	if (!block) {
 		return 0;
+	}
 
 	curr = acl_fiber_running();
 	ring_prepend(&lk->wwaiting, &curr->me);
@@ -210,15 +217,17 @@ void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK *lk)
 	ACL_FIBER *fiber;
 	size_t n = 0;
 	
-	if (lk->writer == NULL)
+	if (lk->writer == NULL) {
 		msg_fatal("%s(%d), %s: wunlock: not locked",
 			__FILE__, __LINE__, __FUNCTION__);
+	}
 
 	lk->writer = NULL;
 
-	if (lk->readers != 0)
+	if (lk->readers != 0) {
 		msg_fatal("%s(%d), %s: wunlock: readers",
 			__FILE__, __LINE__, __FUNCTION__);
+	}
 
 	while ((fiber = FIRST_FIBER(&lk->rwaiting)) != NULL) {
 		ring_detach(&lk->rwaiting);
@@ -234,6 +243,7 @@ void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK *lk)
 		n++;
 	}
 
-	if (n > 0)
+	if (n > 0) {
 		acl_fiber_yield();
+	}
 }
