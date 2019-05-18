@@ -550,7 +550,8 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 	{
 		dummy = (int*) acl_mymalloc(sizeof(int));
 		*dummy = 1;
-		acl_assert(!acl_pthread_setspecific(__thread_key, dummy));
+		if (acl_pthread_setspecific(__thread_key, dummy) != 0)
+			abort();
 
 		// 调用下面函数可能会造成内存越界
 		//if (__mysql_thread_init != NULL)

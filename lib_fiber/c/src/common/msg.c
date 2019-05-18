@@ -218,7 +218,8 @@ const char *last_serror(void)
 	buf = (char*) pthread_getspecific(__errbuf_key);
 	if (buf == NULL) {
 		buf = (char*) malloc(__buf_size);
-		assert(pthread_setspecific(__errbuf_key, buf) == 0);
+		if (pthread_setspecific(__errbuf_key, buf) != 0)
+			abort();
 		if (__pthread_self() == main_thread_self()) {
 			__main_buf = buf;
 			atexit(main_free_buf);

@@ -145,7 +145,8 @@ static void *poller_thread(void *arg)
 	loop_count = 0;
 	pre_loop_t = time(NULL);
 
-	acl_assert(acl_pthread_mutex_lock(&thr_pool->poller_mutex) == 0);
+	if (acl_pthread_mutex_lock(&thr_pool->poller_mutex) != 0)
+		abort();
 
 	thr_pool->poller_running = 1;
 
@@ -178,10 +179,12 @@ static void *poller_thread(void *arg)
 
 	thr_pool->poller_running = 0;
 		
-	acl_assert(acl_pthread_cond_broadcast(&thr_pool->poller_cond) == 0);
+	if (acl_pthread_cond_broadcast(&thr_pool->poller_cond) != 0)
+		abort();
 
 	acl_debug(ACL_DEBUG_THR_POOL, 3) ("poller broadcast ok");
-	acl_assert(acl_pthread_mutex_unlock(&thr_pool->poller_mutex) == 0);
+	if (acl_pthread_mutex_unlock(&thr_pool->poller_mutex) != 0)
+		abort();
 	acl_debug(ACL_DEBUG_THR_POOL, 3) ("poller unlock ok");
 
 	return NULL;
@@ -192,7 +195,8 @@ static thread_cond *thread_cond_create(void)
 	thread_cond *cond = (thread_cond*)
 		acl_mycalloc(1, sizeof(thread_cond));
 
-	acl_assert(acl_pthread_cond_init(&cond->cond, NULL) == 0);
+	if (acl_pthread_cond_init(&cond->cond, NULL) != 0)
+		abort();
 	return cond;
 }
 

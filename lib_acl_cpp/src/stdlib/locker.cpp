@@ -70,12 +70,15 @@ void locker::init_mutex(bool use_spinlock acl_unused)
 	mutex_ = (acl_pthread_mutex_t*)
 		acl_mycalloc(1, sizeof(acl_pthread_mutex_t));
 #ifdef ACL_WINDOWS
-	acl_assert(acl_pthread_mutex_init(mutex_, NULL) == 0);
+	if (acl_pthread_mutex_init(mutex_, NULL) != 0)
+		abort();
 #else
-	acl_assert(pthread_mutexattr_init(&mutex_attr_) == 0);
-	acl_assert(pthread_mutexattr_settype(&mutex_attr_,
-			PTHREAD_MUTEX_RECURSIVE) == 0);
-	acl_assert(acl_pthread_mutex_init(mutex_, &mutex_attr_) == 0);
+	if (pthread_mutexattr_init(&mutex_attr_) != 0)
+		abort();
+	if (pthread_mutexattr_settype(&mutex_attr_, PTHREAD_MUTEX_RECURSIVE) != 0)
+		abort();
+	if (acl_pthread_mutex_init(mutex_, &mutex_attr_) != 0)
+		abort();
 #endif
 }
 
@@ -123,8 +126,8 @@ bool locker::lock()
 	if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL, operation) == 0)
 		return true;
 
-	if (mutex_)
-		acl_assert(acl_pthread_mutex_unlock(mutex_) == 0);
+	if (mutex_ && acl_pthread_mutex_unlock(mutex_) != 0)
+		abort();
 	return false;
 }
 
@@ -151,8 +154,8 @@ bool locker::try_lock()
 	if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL, operation) == 0)
 		return true;
 
-	if (mutex_)
-		acl_assert(acl_pthread_mutex_unlock(mutex_) == 0);
+	if (mutex_ && acl_pthread_mutex_unlock(mutex_) != 0)
+		abort();
 	return false;
 }
 
@@ -194,12 +197,14 @@ bool locker::unlock()
 lock_guard::lock_guard(locker& lk)
 : lk_(lk)
 {
-	acl_assert(lk_.lock());
+	if (!lk_.lock())
+		abort();
 }
 
 lock_guard::~lock_guard()
 {
-	acl_assert(lk_.unlock());
+	if (!lk_.unlock())
+		abort();
 }
 
 } // namespace acl

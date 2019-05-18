@@ -385,7 +385,8 @@ bool db_pgsql::dbopen(const char* /* charset = NULL */)
 	{
 		dummy = (int*) acl_mymalloc(sizeof(int));
 		*dummy = 1;
-		acl_assert(!acl_pthread_setspecific(__thread_key, dummy));
+		if  (acl_pthread_setspecific(__thread_key, dummy) != 0)
+			abort();
 
 		if ((unsigned long) acl_pthread_self()
 			== acl_main_thread_self())

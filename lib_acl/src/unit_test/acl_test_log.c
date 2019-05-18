@@ -97,7 +97,7 @@ void aut_log_fatal(const char *format, ...)
 	if ((var_aut_log_level & VAR_AUT_LOG_PRINT) != 0) {
 		vprintf(format, ap);
 		printf("\n");
-		acl_assert(0);
+        abort();
 	}
 
 	acl_msg_fatal2(format, ap);
@@ -112,7 +112,7 @@ void aut_log_panic(const char *format, ...)
 	if ((var_aut_log_level & VAR_AUT_LOG_PRINT) != 0) {
 		vprintf(format, ap);
 		printf("\n");
-		acl_assert(0);
+        abort();
 	}
 	acl_msg_panic2(format, ap);
 	va_end(ap);

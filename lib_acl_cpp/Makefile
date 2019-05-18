@@ -24,6 +24,7 @@ CFLAGS = -c -g -W \
 -DHAS_POLARSSL_DLL \
 -Winvalid-pch \
 -DACL_PREPARE_COMPILE \
+#-DACL_CLIENT_ONLY \
 #-DUSE_DYNAMIC
 # -Wcast-align
 #-Wcast-qual

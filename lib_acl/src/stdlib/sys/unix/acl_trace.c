@@ -55,7 +55,8 @@ static void main_buf_free(void)
 
 static void trace_buf_init(void)
 {
-	acl_assert(acl_pthread_key_create(&__trace_key, trace_buf_free) == 0);
+	if (acl_pthread_key_create(&__trace_key, trace_buf_free) != 0)
+        abort();
 }
 
 void acl_trace_info(void)
@@ -72,7 +73,8 @@ void acl_trace_info(void)
 	if (intbuf == NULL) {
 		intbuf = malloc(sizeof(int));
 		*intbuf = 0;
-		acl_assert(acl_pthread_setspecific(__trace_key, intbuf) == 0);
+		if (acl_pthread_setspecific(__trace_key, intbuf) != 0)
+            abort();
 		if ((unsigned long) acl_pthread_self()
 			== acl_main_thread_self())
 		{

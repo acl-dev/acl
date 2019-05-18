@@ -80,7 +80,7 @@ endif
 .PHONY = check help all_lib all samples all clean install uninstall uninstall_all build_one
 VERSION = 3.5.0
 
-default: build_one
+default: build_one acl_master
 help h:
 	@(echo "usage: make help|all|all_lib|all_samples|clean|install|uninstall|uninstall_all|build_one")
 all_lib:
@@ -226,7 +226,7 @@ uninstall_all:
 	rm -f win32_build/vc/lib_protocol/*.ilk
 
 RELEASE_PATH = release
-build_one: all_lib acl_master
+build_one: all_lib
 	@(mkdir -p $(RELEASE_PATH); mkdir -p $(RELEASE_PATH)/acl; \
 		mkdir -p $(RELEASE_PATH)/protocol; \
 		mkdir -p $(RELEASE_PATH)/acl_cpp)

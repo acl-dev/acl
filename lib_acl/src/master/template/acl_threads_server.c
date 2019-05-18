@@ -218,22 +218,26 @@ static void dispatch_open(ACL_EVENT *event, acl_pthread_pool_t *threads);
 
 static void lock_closing_time(void)
 {
-	acl_assert(acl_pthread_mutex_lock(&__closing_time_mutex) == 0);
+	if (acl_pthread_mutex_lock(&__closing_time_mutex) != 0)
+		abort();
 }
 
 static void unlock_closing_time(void)
 {
-	acl_assert(acl_pthread_mutex_unlock(&__closing_time_mutex) == 0);
+	if (acl_pthread_mutex_unlock(&__closing_time_mutex) != 0)
+		abort();
 }
 
 static void lock_counter(void)
 {
-	acl_assert(acl_pthread_mutex_lock(&__counter_mutex) == 0);
+	if (acl_pthread_mutex_lock(&__counter_mutex) != 0)
+		abort();
 }
 
 static void unlock_counter(void)
 {
-	acl_assert(acl_pthread_mutex_unlock(&__counter_mutex) == 0);
+	if (acl_pthread_mutex_unlock(&__counter_mutex) != 0)
+		abort();
 }
 
 static void update_closing_time(void)
