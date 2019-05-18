@@ -10,6 +10,7 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
 #ifdef ACL_UNIX
 
 #include <unistd.h>
@@ -53,3 +54,5 @@ int acl_master_notify(int pid, unsigned generation, int status)
 }
 
 #endif /* ACL_UNIX */
+
+#endif /* ACL_CLIENT_ONLY */

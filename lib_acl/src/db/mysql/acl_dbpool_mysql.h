@@ -2,12 +2,14 @@
 #ifndef	__ACL_DBPOOL_MYSQL_INCLUDE_H__
 #define	__ACL_DBPOOL_MYSQL_INCLUDE_H__
 
+#include "stdlib/acl_define.h"
+#include "db/acl_dbpool.h"
+
+#ifndef ACL_CLIENT_ONLY
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-#include "stdlib/acl_define.h"
-#include "db/acl_dbpool.h"
 
 #ifdef	HAS_MYSQL
 
@@ -34,4 +36,5 @@ int sane_mysql_reopen(ACL_DB_HANDLE *handle);
 }
 #endif
 
+#endif /* ACL_CLIENT_ONLY */
 #endif

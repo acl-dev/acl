@@ -4,6 +4,8 @@
 #include "../session/session.hpp"
 #include <map>
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 class session;
@@ -115,3 +117,5 @@ protected:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

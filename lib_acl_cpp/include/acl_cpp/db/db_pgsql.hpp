@@ -3,6 +3,8 @@
 #include "../stdlib/string.hpp"
 #include "../db/db_handle.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 typedef struct pg_conn PGconn;
 
 namespace acl {
@@ -103,3 +105,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

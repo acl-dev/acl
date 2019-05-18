@@ -16,6 +16,7 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
 #ifdef	HAS_MYSQL
 
 #include "mysql.h"
@@ -491,5 +492,5 @@ void _dosmaperr(unsigned long error)
 #endif /* ACL_WINDOWS */
 #endif
 
-#endif	/* HAS_MYSQL */
-
+#endif /* HAS_MYSQL */
+#endif /* ACL_CLIENT_ONLY */

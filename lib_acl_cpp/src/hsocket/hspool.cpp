@@ -5,6 +5,8 @@
 #include "acl_cpp/hsocket/hspool.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -112,3 +114,5 @@ void hspool::put(hsclient* client)
 }
 
 }  // namespace acl
+
+#endif // ACL_CLIENT_ONLY

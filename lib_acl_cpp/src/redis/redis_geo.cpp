@@ -6,6 +6,8 @@
 #include "acl_cpp/redis/redis_geo.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -614,3 +616,5 @@ const char* redis_geo::get_unit(int unit)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

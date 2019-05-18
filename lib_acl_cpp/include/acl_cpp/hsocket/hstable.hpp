@@ -2,6 +2,8 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 class ACL_CPP_API hstable : public noncopyable
@@ -23,3 +25,5 @@ private:
 };
 
 }  // namespace acl
+
+#endif // ACL_CLIENT_ONLY

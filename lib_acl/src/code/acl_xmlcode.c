@@ -190,6 +190,8 @@ int acl_xml_decode(const char *in, ACL_VSTRING *out)
 
 /*--------------------------------------------------------------------------*/
 
+#ifndef ACL_CLIENT_ONLY
+
 size_t acl_xml_encode2(const char **in, size_t ilen, char *out, size_t olen)
 {
 	size_t olen_saved = olen;
@@ -352,3 +354,5 @@ const char *acl_xml_decode2(const char *in, char **out, size_t *size)
 	*out += 1;
 	return ptr;
 }
+
+#endif /* ACL_CLIENT_ONLY */

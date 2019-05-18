@@ -10,6 +10,7 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
 #ifdef ACL_UNIX
 
 #include <sys/socket.h>
@@ -1596,3 +1597,4 @@ void acl_aio_app2_main(int argc, char *argv[], ACL_AIO_RUN2_FN run2_fn,
 }
 
 #endif /* ACL_UNIX */
+#endif /* ACL_CLIENT_ONLY */

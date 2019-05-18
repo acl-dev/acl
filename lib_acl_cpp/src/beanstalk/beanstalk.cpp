@@ -7,6 +7,8 @@
 #include "acl_cpp/beanstalk/beanstalk.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -857,3 +859,5 @@ void beanstalk::quit()
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

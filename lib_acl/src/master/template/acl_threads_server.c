@@ -10,6 +10,7 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
 #ifdef ACL_UNIX
 
 #include <sys/socket.h>
@@ -1601,3 +1602,5 @@ void acl_threads_server_main(int argc, char * argv[],
 	/* not reached here */
 	/* acl_vstring_free(buf); */
 }
+
+#endif /* ACL_CLIENT_ONLY */

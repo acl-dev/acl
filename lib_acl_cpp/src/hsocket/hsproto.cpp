@@ -11,6 +11,8 @@
 #include "acl_cpp/hsocket/hsproto.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -378,3 +380,5 @@ void hsproto::clear_cache()
 }
 
 }  // namespace acl
+
+#endif // ACL_CLIENT_ONLY

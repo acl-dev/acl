@@ -4,6 +4,8 @@
 #include "acl_cpp/http/HttpSession.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -79,3 +81,5 @@ bool HttpSession::invalidate()
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

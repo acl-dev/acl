@@ -28,6 +28,8 @@
 #endif
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "zdb_private.h"
 
 #define	KEY_LEN	21
@@ -433,3 +435,5 @@ int zdb_read(ZDB_STORE *store, void *buf, size_t size, zdb_off_t off)
 }
 
 /*----------------------------------------------------------------------------*/
+
+#endif /* ACL_CLIENT_ONLY */

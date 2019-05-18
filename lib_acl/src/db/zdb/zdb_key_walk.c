@@ -11,6 +11,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "zdb_private.h"
 
 int zdb_key_walk(ZDB *db, int (*walk_fn)(ZDB_KEY_STORE*))
@@ -60,3 +62,5 @@ int zdb_key_walk(ZDB *db, int (*walk_fn)(ZDB_KEY_STORE*))
 	acl_scan_dir_close(scan);
 	return (ret);
 }
+
+#endif /* ACL_CLIENT_ONLY */

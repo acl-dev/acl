@@ -6,6 +6,8 @@
 #include "acl_cpp/redis/redis_connection.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -102,3 +104,5 @@ bool redis_connection::quit()
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

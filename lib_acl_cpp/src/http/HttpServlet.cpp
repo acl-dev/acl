@@ -11,6 +11,8 @@
 #include "acl_cpp/http/HttpServlet.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -269,3 +271,5 @@ bool HttpServlet::doRun(const char* memcached_addr, socket_stream* stream)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

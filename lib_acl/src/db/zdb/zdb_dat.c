@@ -13,6 +13,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "zdb_private.h"
 
 int dat_store_header_sync(ZDB_DAT_STORE *store)
@@ -1309,3 +1311,5 @@ int zdb_dat_check3(ZDB *db, const char *filepath, ZDB_DAT_HDR *dat_hdr)
 	zdb_dat_store_close(store);
 	return (ret);
 }
+
+#endif /* ACL_CLIENT_ONLY */

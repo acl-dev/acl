@@ -4,6 +4,8 @@
 #include "../stdlib/string.hpp"
 #include "redis_command.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -84,3 +86,5 @@ public:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

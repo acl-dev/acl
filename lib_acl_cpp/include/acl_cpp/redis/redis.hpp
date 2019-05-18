@@ -16,6 +16,8 @@
 #include "redis_geo.hpp"
 #include "redis_stream.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -68,3 +70,5 @@ public:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

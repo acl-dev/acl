@@ -8,6 +8,8 @@
 #include "acl_cpp/redis/redis_role.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -168,3 +170,5 @@ bool redis_role::role_slave(const redis_result** a, size_t n)
 }
 
 }
+
+#endif // ACL_CLIENT_ONLY

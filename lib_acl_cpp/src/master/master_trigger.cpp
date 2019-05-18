@@ -5,6 +5,8 @@
 #include "acl_cpp/master/master_trigger.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -141,3 +143,5 @@ int master_trigger::service_on_sighup(void* ctx, ACL_VSTRING* buf)
 }
 
 }  // namespace acl
+
+#endif // ACL_CLIENT_ONLY

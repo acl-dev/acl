@@ -2,6 +2,8 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -59,3 +61,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

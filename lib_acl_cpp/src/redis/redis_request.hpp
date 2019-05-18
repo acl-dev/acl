@@ -1,6 +1,8 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 struct iovec;
 
 namespace acl
@@ -33,3 +35,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

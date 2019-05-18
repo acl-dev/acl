@@ -7,6 +7,8 @@
 #include "acl_cpp/redis/redis_cluster.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -827,3 +829,5 @@ void redis_cluster::free_masters()
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

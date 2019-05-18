@@ -1,11 +1,13 @@
 #ifndef	ACL_SINGLE_PARAMS_INCLUDE_H
 #define	ACL_SINGLE_PARAMS_INCLUDE_H
 
+#include "../stdlib/acl_define.h"
+
+#ifndef ACL_CLIENT_ONLY
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-#include "../stdlib/acl_define.h"
 
 #ifdef ACL_UNIX
 
@@ -95,5 +97,6 @@ extern int   acl_var_single_max_debug;
 }
 #endif
 
+#endif /* ACL_CLIENT_ONLY */
 #endif
 

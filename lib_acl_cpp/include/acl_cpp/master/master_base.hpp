@@ -4,6 +4,8 @@
 #include "master_conf.hpp"
 #include <vector>
 
+#ifndef ACL_CLIENT_ONLY
+
 struct ACL_EVENT;
 
 namespace acl
@@ -120,3 +122,6 @@ private:
 };
 
 }  // namespace acl
+
+#endif // ACL_CLIENT_ONLY
+

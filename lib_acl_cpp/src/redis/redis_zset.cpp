@@ -7,6 +7,8 @@
 #include "acl_cpp/redis/redis_zset.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -1210,3 +1212,5 @@ int redis_zset::bzpop_result(string& member, double* score)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

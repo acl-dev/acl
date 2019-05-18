@@ -1,12 +1,13 @@
-
 #ifndef	__ACL_UDP_PARAMS_INCLUDE_H_
 #define	__ACL_UDP_PARAMS_INCLUDE_H_
+
+#include "../stdlib/acl_define.h"
+
+#ifndef ACL_CLIENT_ONLY
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-#include "../stdlib/acl_define.h"
 
 extern int   acl_var_udp_pid;
 extern char *acl_var_udp_procname;
@@ -112,4 +113,5 @@ extern char *acl_var_udp_private;
 }
 #endif
 
+#endif /* ACL_CLIENT_ONLY */
 #endif

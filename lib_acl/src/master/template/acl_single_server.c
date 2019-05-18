@@ -10,6 +10,7 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
 #ifdef ACL_UNIX
 
 #include <sys/socket.h>
@@ -750,3 +751,4 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 }
 
 #endif /* ACL_UNIX */
+#endif /* ACL_CLIENT_ONLY */

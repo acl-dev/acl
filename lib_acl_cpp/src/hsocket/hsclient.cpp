@@ -12,6 +12,8 @@
 #include "acl_cpp/hsocket/hsclient.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -509,3 +511,5 @@ void hsclient::debug_enable(bool on)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

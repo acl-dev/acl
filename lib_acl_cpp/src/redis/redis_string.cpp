@@ -8,6 +8,8 @@
 #include "acl_cpp/redis/redis_string.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -795,3 +797,5 @@ bool redis_string::incoper(const char* cmd, const char* key, long long int* n,
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

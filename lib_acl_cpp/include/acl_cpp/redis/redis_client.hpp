@@ -5,6 +5,8 @@
 #include "../stdlib/string.hpp"
 #include "../connpool/connect_client.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -185,3 +187,5 @@ private:
 };
 
 } // end namespace acl
+
+#endif // ACL_CLIENT_ONLY

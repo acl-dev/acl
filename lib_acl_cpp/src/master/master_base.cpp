@@ -6,6 +6,8 @@
 #include "acl_cpp/master/master_base.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -116,3 +118,5 @@ void master_base::proc_del_timer(event_timer* timer)
 }
 
 }  // namespace acl
+
+#endif // ACL_CLIENT_ONLY

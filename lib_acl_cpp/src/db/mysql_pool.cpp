@@ -7,6 +7,8 @@
 #include "acl_cpp/db/mysql_pool.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -52,3 +54,5 @@ connect_client* mysql_pool::create_connect()
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

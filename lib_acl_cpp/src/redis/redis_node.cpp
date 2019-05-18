@@ -4,6 +4,8 @@
 #include "acl_cpp/redis/redis_node.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -150,3 +152,5 @@ const std::vector<std::pair<size_t, size_t> >& redis_node::get_slots() const
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

@@ -2,6 +2,8 @@
 #include "../acl_cpp_define.hpp"
 #include "session.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 class memcache;
@@ -62,3 +64,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

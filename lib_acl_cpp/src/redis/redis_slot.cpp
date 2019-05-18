@@ -3,6 +3,8 @@
 #include "acl_cpp/redis/redis_slot.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -42,3 +44,5 @@ redis_slot& redis_slot::add_slave(redis_slot* node)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

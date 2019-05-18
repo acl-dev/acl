@@ -15,6 +15,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "mysql/acl_dbpool_mysql.h"
 #include "null/acl_dbpool_null.h"
 
@@ -135,4 +137,4 @@ void acl_dbpool_set_ping(ACL_DB_POOL *db_pool, int (*ping_fn)(ACL_DB_HANDLE*))
 	db_pool->dbh_ping = ping_fn;
 }
 /*----------------------------------------------------------------------------*/
-
+#endif /* ACL_CLIENT_ONLY */

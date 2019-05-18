@@ -16,6 +16,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "zdb_private.h"
 
 /*----------------------------------------------------------------------------*/
@@ -394,3 +396,4 @@ int zdb_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off_saved,
 }
 
 /*----------------------------------------------------------------------------*/
+#endif /* ACL_CLIENT_ONLY */

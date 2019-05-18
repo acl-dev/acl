@@ -10,6 +10,8 @@
 #include "acl_cpp/db/db_mysql.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 //////////////////////////////////////////////////////////////////////////
 
 #if defined(HAS_MYSQL) || defined(HAS_MYSQL_DLL)
@@ -940,3 +942,5 @@ const char* db_mysql::get_error(void) const
 } // namespace acl
 
 #endif  // !HAS_MYSQL && !HAS_MYSQL_DLL
+
+#endif // ACL_CLIENT_ONLY

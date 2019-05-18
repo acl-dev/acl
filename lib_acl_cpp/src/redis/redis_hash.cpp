@@ -6,6 +6,8 @@
 #include "acl_cpp/redis/redis_hash.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -441,3 +443,5 @@ int redis_hash::hscan(const char* key, int cursor, std::map<string, string>& out
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

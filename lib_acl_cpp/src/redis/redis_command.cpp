@@ -11,6 +11,8 @@
 #endif
 #include "redis_request.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -1813,3 +1815,5 @@ const redis_result* redis_command::request(const std::vector<string>& args,
 /////////////////////////////////////////////////////////////////////////////
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

@@ -1,6 +1,8 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 #define	HS_ERR_INVALID_REPLY	-7		// 服务器返回数据错误
 #define	HS_ERR_EMPTY		-6		// 服务器返回数据为空
 #define	HS_ERR_PARAMS		-5		// 输入参数错误
@@ -22,3 +24,5 @@ public:
 };
 
 }  // namespace acl
+
+#endif // ACL_CLIENT_ONLY

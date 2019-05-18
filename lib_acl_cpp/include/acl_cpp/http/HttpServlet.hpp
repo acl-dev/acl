@@ -4,6 +4,8 @@
 #include "../stdlib/noncopyable.hpp"
 #include "http_header.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 class session;
@@ -262,3 +264,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

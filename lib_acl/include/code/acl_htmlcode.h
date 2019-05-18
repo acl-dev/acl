@@ -1,6 +1,8 @@
 #ifndef	ACL_HTMLCODE_INCLUDE_H
 #define	ACL_HTMLCODE_INCLUDE_H
 
+#ifndef ACL_CLIENT_ONLY
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
@@ -15,4 +17,5 @@ ACL_API int acl_html_decode(const char *in, ACL_VSTRING *out);
 }
 #endif
 
+#endif /* ACL_CLIENT_ONLY */
 #endif

@@ -9,6 +9,8 @@
 #include "acl_cpp/redis/redis_sentinel.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -452,3 +454,5 @@ bool redis_sentinel::sentinel_set(const char* master_name, const char* name,
 }
 
 }
+
+#endif // ACL_CLIENT_ONLY

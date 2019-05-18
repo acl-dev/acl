@@ -11,6 +11,8 @@
 #include "acl_cpp/http/HttpServletResponse.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -241,3 +243,5 @@ void HttpServletResponse::setHttpServletRequest(HttpServletRequest* request)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

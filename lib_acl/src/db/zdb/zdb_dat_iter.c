@@ -8,6 +8,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "zdb_private.h"
 
 typedef struct {
@@ -382,3 +384,5 @@ void zdb_dat_iter_set(ZDB_DAT_STORE *store, int read_data)
 		((ZDB_STORE*) store)->iter_next = (STORE_ITER) hdr_iter_next;
 	}
 }
+
+#endif /* ACL_CLIENT_ONLY */

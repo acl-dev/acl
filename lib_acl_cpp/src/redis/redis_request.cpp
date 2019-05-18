@@ -1,6 +1,8 @@
 #include "acl_stdafx.hpp"
 #include "redis_request.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -49,3 +51,5 @@ void redis_request::put(const char* data, size_t dlen)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

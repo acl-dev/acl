@@ -1,11 +1,13 @@
 #ifndef	ACL_THREADS_PARAMS_INCLUDE_H
 #define	ACL_THREADS_PARAMS_INCLUDE_H
 
+#include "../stdlib/acl_define.h"
+
+#ifndef ACL_CLIENT_ONLY
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-#include "../stdlib/acl_define.h"
 
 extern char *acl_var_threads_procname;
 extern char *acl_var_threads_log_file;
@@ -150,4 +152,5 @@ extern char *acl_var_threads_dispatch_type;
 }
 #endif
 
+#endif /* ACL_CLIENT_ONLY */
 #endif

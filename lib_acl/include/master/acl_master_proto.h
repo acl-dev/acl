@@ -1,11 +1,13 @@
 #ifndef	__ACL_MASTER_PROTO_INCLUDE_H__
 #define	__ACL_MASTER_PROTO_INCLUDE_H__
 
+#include "../stdlib/acl_define.h"
+
+#ifndef ACL_CLIENT_ONLY
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-#include "../stdlib/acl_define.h"
 
 #ifdef ACL_UNIX
 
@@ -81,4 +83,5 @@ int acl_master_notify(int, unsigned, int);	/* encapsulate status msg */
 }
 #endif
 
+#endif /* ACL_CLIENT_ONLY */
 #endif

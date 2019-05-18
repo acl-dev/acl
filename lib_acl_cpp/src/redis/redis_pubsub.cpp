@@ -7,6 +7,8 @@
 #include "acl_cpp/redis/redis_pubsub.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -497,3 +499,5 @@ int redis_pubsub::pubsub_numpat()
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

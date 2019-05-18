@@ -3,6 +3,8 @@
 #include "master_base.hpp"
 #include "../stdlib/thread_mutex.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 struct ACL_VSTRING;
 
 namespace acl {
@@ -109,3 +111,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

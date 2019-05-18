@@ -1,10 +1,6 @@
 #ifndef	ACL_MASTER_SERVER_API_INCLUDE_H
 #define	ACL_MASTER_SERVER_API_INCLUDE_H
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
 #include "../stdlib/acl_define.h"
 
  /*
@@ -14,6 +10,12 @@ extern "C" {
 #include "../ioctl/acl_ioctl.h"
 #include "../aio/acl_aio.h"
 #include "../event/acl_events.h"
+
+#ifndef ACL_CLIENT_ONLY
+
+#ifdef	__cplusplus
+extern "C" {
+#endif
 
 #define	ACL_MASTER_SERVER_END			0
 #define ACL_MASTER_SERVER_INT_TABLE		1
@@ -189,4 +191,5 @@ ACL_API void acl_server_sigterm_setup(void);
 }
 #endif
 
+#endif /* ACL_CLIENT_ONLY */
 #endif

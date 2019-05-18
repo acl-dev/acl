@@ -1,6 +1,8 @@
 #pragma once
 #include "master_base.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 struct ACL_VSTRING;
 
 namespace acl {
@@ -61,3 +63,5 @@ private:
 };
 
 }  // namespace acl
+
+#endif // ACL_CLIENT_ONLY

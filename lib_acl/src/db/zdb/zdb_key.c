@@ -11,6 +11,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "zdb_private.h"
 
 int key_store_header_sync(ZDB_KEY_STORE *store)
@@ -639,3 +641,5 @@ int zdb_key_init(ZDB *db, zdb_key_t key_begin, zdb_key_t key_end)
 
 	return (0);
 }
+
+#endif /* ACL_CLIENT_ONLY */

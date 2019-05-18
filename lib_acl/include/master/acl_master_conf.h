@@ -1,12 +1,14 @@
 #ifndef	ACL_MASTER_CONF_INCLUDE_H
 #define	ACL_MASTER_CONF_INCLUDE_H
 
+#include "../stdlib/acl_define.h"
+#include "../master/acl_master_type.h"
+
+#ifndef ACL_CLIENT_ONLY
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-#include "../stdlib/acl_define.h"
-#include "../master/acl_master_type.h"
 
 ACL_API void acl_app_conf_load(const char *pathname);
 ACL_API void acl_app_conf_unload(void);
@@ -20,4 +22,5 @@ ACL_API void acl_free_app_conf_str_table(ACL_CONFIG_STR_TABLE *table);
 }
 #endif
 
+#endif /* ACL_CLIENT_ONLY */
 #endif

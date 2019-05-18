@@ -16,6 +16,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 ACL_SQL_RES *acl_dbsql_select(ACL_DB_HANDLE *handle, const char *sql, int *error)
 {
 	const char *myname = "acl_dbsql_select";
@@ -102,3 +104,4 @@ int acl_dbsql_update(ACL_DB_HANDLE *handle, const char *sql, int  *error)
 	return (n);
 }
 
+#endif /* ACL_CLIENT_ONLY */

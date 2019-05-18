@@ -3,6 +3,8 @@
 #include "acl_cpp/master/master_conf.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -235,3 +237,5 @@ ACL_CFG_BOOL_TABLE* master_conf::get_bool_cfg() const
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

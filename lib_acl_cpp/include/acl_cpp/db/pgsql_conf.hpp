@@ -1,6 +1,8 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 class ACL_CPP_API pgsql_conf
@@ -127,3 +129,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

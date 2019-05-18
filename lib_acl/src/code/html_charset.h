@@ -1,6 +1,8 @@
 #ifndef	__HTML_CHARSET_INCLUDE_H__
 #define	__HTML_CHARSET_INCLUDE_H__
 
+#ifndef ACL_CLIENT_ONLY
+
 static const char *html_charmap[] = {
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -8458,4 +8460,5 @@ static const HTML_SPEC html_tab[] = {
 	{ 9830, "&diams;", sizeof("&diams;") - 1 },
 };
 
+#endif /* ACL_CLIENT_ONLY */
 #endif

@@ -3,6 +3,8 @@
 #include "acl_cpp/db/pgsql_conf.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 pgsql_conf::pgsql_conf(const char* dbaddr, const char* dbname)
@@ -123,3 +125,5 @@ pgsql_conf& pgsql_conf::set_rw_timeout(int timeout)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

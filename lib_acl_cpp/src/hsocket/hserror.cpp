@@ -3,6 +3,8 @@
 #include "acl_cpp/hsocket/hserror.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -45,3 +47,5 @@ const char* hserror::get_serror(int errnum)
 }
 
 }
+
+#endif // ACL_CLIENT_ONLY

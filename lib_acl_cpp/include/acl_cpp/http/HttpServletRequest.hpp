@@ -7,6 +7,8 @@
 #include "http_ctype.hpp"
 #include "http_type.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 class dbuf_guard;
@@ -372,3 +374,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

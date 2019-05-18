@@ -4,6 +4,8 @@
 #include "../stdlib/string.hpp"
 #include "../connpool/connect_manager.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 class mysql_conf;
@@ -58,3 +60,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

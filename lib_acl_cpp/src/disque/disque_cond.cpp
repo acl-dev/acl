@@ -3,6 +3,8 @@
 #include "acl_cpp/disque/disque_cond.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -59,3 +61,5 @@ disque_cond& disque_cond::set_async(bool on)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

@@ -6,6 +6,8 @@
 #include "acl_cpp/redis/redis_server.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -436,3 +438,5 @@ bool redis_server::get_time(time_t& stamp, int& escape)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

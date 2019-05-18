@@ -7,6 +7,8 @@
 #include "acl_cpp/redis/redis_script.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -531,3 +533,5 @@ bool redis_script::script_kill()
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

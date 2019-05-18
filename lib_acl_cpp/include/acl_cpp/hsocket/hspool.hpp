@@ -3,6 +3,8 @@
 #include "../stdlib/noncopyable.hpp"
 #include <list>
 
+#ifndef ACL_CLIENT_ONLY
+
 struct ACL_HTABLE;
 
 namespace acl {
@@ -54,3 +56,5 @@ private:
 };
 
 }  // namespace acl
+
+#endif // ACL_CLIENT_ONLY

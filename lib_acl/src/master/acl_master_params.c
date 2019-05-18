@@ -17,6 +17,8 @@
 
 #include "master/acl_master_conf.h"
 
+#ifndef ACL_CLIENT_ONLY
+
 /*-------------- global static inition and update functions ----------------*/
 
 static void init_conf_int_vars(ACL_CONFIG_INT_TABLE cit[])
@@ -246,3 +248,5 @@ void  acl_get_app_conf_bool_table(ACL_CONFIG_BOOL_TABLE *table)
 			update_conf_bool_vars(table, name, value);
 	}
 }
+
+#endif /* ACL_CLIENT_ONLY */

@@ -21,6 +21,8 @@
 #include <fstream>
 #include <string>
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -1702,3 +1704,4 @@ bool gsoner::check_pragma()
 
 } // namespace acl
 
+#endif // ACL_CLIENT_ONLY

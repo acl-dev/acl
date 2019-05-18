@@ -1,11 +1,13 @@
 #ifndef __ACL_MASTER_FLOW_INCLUDED_H__
 #define __ACL_MASTER_FLOW_INCLUDED_H__
 
+#include "../stdlib/acl_define.h"
+
+#ifndef ACL_CLIENT_ONLY
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-#include "../stdlib/acl_define.h"
 
 #ifdef ACL_UNIX
 
@@ -23,6 +25,8 @@ extern int acl_master_flow_count(void);
 
 #ifdef	__cplusplus
 }
+
+#endif /* ACL_CLIENT_ONLY */
 #endif
 
 #endif

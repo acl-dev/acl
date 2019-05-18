@@ -5,6 +5,8 @@
 #include "../stdlib/string.hpp"
 #include "../mime/rfc2047.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 class socket_stream;
@@ -250,3 +252,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

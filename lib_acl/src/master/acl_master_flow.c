@@ -10,6 +10,7 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
 #ifdef ACL_UNIX
 
 #include <sys/stat.h>
@@ -131,3 +132,4 @@ int acl_master_flow_count(void)
 }
 
 #endif /* ACL_UNIX */
+#endif /* ACL_CLIENT_ONLY */

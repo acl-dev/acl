@@ -15,6 +15,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "acl_dbnull.h"
 
 int acl_dbnull_results(ACL_DB_HANDLE *handle acl_unused,
@@ -47,3 +49,5 @@ int acl_dbnull_update(ACL_DB_HANDLE *handle acl_unused,
 	acl_msg_fatal("%s, %s(%d): not supported!", __FILE__, myname, __LINE__);
 	return (-1);
 }
+
+#endif /* ACL_CLIENT_ONLY */

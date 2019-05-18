@@ -9,6 +9,8 @@
 #include "acl_cpp/disque/disque.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -531,3 +533,5 @@ void disque::free_nodes()
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

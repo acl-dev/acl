@@ -2,6 +2,8 @@
 #include "master_base.hpp"
 #include "../stdlib/thread_mutex.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 struct ACL_VSTREAM;
 struct ACL_EVENT;
 struct ACL_VSTRING;
@@ -223,3 +225,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

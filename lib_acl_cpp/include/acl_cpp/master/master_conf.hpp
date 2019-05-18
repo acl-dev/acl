@@ -2,6 +2,8 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 struct ACL_XINETD_CFG_PARSER;
 struct ACL_CFG_INT_TABLE;
 struct ACL_CFG_INT64_TABLE;
@@ -128,3 +130,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

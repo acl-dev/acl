@@ -1,6 +1,8 @@
 #ifndef ACL_DBSQL_INCLUDE_H
 #define ACL_DBSQL_INCLUDE_H
 
+#ifndef ACL_CLIENT_ONLY
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -102,5 +104,6 @@ ACL_API int acl_dbsql_update(ACL_DB_HANDLE *handle, const char *sql, int *error)
 }
 #endif
 
+#endif /* ACL_CLIENT_ONLY */
 #endif
 

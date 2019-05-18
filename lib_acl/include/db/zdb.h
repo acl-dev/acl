@@ -5,6 +5,8 @@
 #include "../stdlib/acl_vstring.h"
 #include "../stdlib/acl_fhandle.h"
 
+#ifndef ACL_CLIENT_ONLY
+
 typedef struct ZDB ZDB;
 typedef struct ZDB_KEY_HDR ZDB_KEY_HDR;
 typedef struct ZDB_BLK ZDB_BLK;
@@ -505,4 +507,5 @@ ACL_API void zdb_dat_iter_set(ZDB_DAT_STORE *store, int read_data);
 }
 #endif
 
+#endif /* ACL_CLIENT_ONLY */
 #endif

@@ -8,6 +8,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "gb_jt2ft.h"
 #include "gb_ft2jt.h"
 
@@ -57,3 +59,5 @@ void acl_gbft2jt(const char *data, size_t dlen, char *buf, size_t size)
 {
 	gbtransfer(__ft2jt_tab, data, dlen, buf, size);
 }
+
+#endif /* ACL_CLIENT_ONLY */

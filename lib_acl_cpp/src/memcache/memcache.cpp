@@ -7,6 +7,8 @@
 #include "acl_cpp/stream/socket_stream.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #define	SPECIAL_CHAR(x)	((x) == ' ' || (x) == '\t' || (x) == '\r' || (x) == '\n')
 
 namespace acl
@@ -605,3 +607,5 @@ void memcache::property_list()
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

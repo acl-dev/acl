@@ -3,6 +3,8 @@
 #include "../stdlib/noncopyable.hpp"
 #include <map>
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 class beanstalk;
@@ -50,3 +52,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

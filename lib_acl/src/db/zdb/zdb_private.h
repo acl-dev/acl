@@ -1,6 +1,8 @@
 #ifndef	__ZDB_PRIVATE_INCLUDE_H__
 #define	__ZDB_PRIVATE_INCLUDE_H__
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "db/zdb.h"
 
 #define	ZDB_DBG_BASE		500
@@ -195,4 +197,5 @@ int zdb_read(ZDB_STORE *store, void *buf, size_t size, zdb_off_t off);
 }
 #endif
 
+#endif /* ACL_CLIENT_ONLY */
 #endif

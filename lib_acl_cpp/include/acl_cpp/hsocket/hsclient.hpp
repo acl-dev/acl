@@ -7,6 +7,8 @@
 #include "../stream/socket_stream.hpp"
 #include "../hsocket/hsproto.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 struct ACL_ARGV;
 
 namespace acl {
@@ -199,3 +201,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

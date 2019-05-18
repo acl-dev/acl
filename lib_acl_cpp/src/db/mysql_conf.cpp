@@ -3,6 +3,8 @@
 #include "acl_cpp/db/mysql_conf.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 mysql_conf::mysql_conf(const char* dbaddr, const char* dbname)
@@ -135,3 +137,5 @@ mysql_conf& mysql_conf::set_rw_timeout(int timeout)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

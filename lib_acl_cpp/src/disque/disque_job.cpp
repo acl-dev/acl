@@ -4,6 +4,8 @@
 #include "acl_cpp/disque/disque_job.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -127,3 +129,5 @@ void disque_job::set_body(const char* job, size_t len)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

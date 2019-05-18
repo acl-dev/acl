@@ -10,6 +10,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "zdb_private.h"
 
 static int zdb_dat_scan_path(ZDB *db, const char *path,
@@ -81,3 +83,5 @@ int zdb_dat_walk(ZDB *db, int (*walk_fn)(ZDB_DAT_STORE *store))
 
 	return (ret);
 }
+
+#endif /* ACL_CLIENT_ONLY */

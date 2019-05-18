@@ -11,6 +11,8 @@
 #endif
 #include "redis_request.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -514,3 +516,5 @@ const redis_result* redis_client::run(dbuf_pool* pool, const redis_request& req,
 }
 
 } // end namespace acl
+
+#endif // ACL_CLIENT_ONLY

@@ -14,6 +14,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "uni2utf8.h"
 #include "html_charset.h"
 
@@ -144,3 +146,5 @@ int acl_html_decode(const char *in, ACL_VSTRING *out)
 	ACL_VSTRING_TERMINATE(out);
 	return (n);
 }
+
+#endif /* ACL_CLIENT_ONLY */

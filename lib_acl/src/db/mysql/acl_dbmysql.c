@@ -12,6 +12,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #ifdef HAS_MYSQL
 
 #include "mysql.h"
@@ -327,4 +329,5 @@ int acl_dbmysql_update(ACL_DB_HANDLE *handle, const char *sql, int  *error)
 }
 
 #endif /* HAS_MYSQL */
+#endif /* ACL_CLIENT_ONLY */
 

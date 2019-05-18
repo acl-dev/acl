@@ -4,6 +4,8 @@
 #include "acl_cpp/memcache/memcache_pool.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -24,3 +26,5 @@ connect_client* memcache_pool::create_connect()
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

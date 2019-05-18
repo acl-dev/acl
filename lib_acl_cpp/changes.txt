@@ -1,5 +1,9 @@
 修改历史列表：
 
+569) 2019.5.18
+569.1) compile: 增加宏编译选项 ACL_CLIENT_ONLY，当将 acl 库用于客户端模式时可以有效地
+减少编译库的大小
+
 568) 2019.5.14
 568.1) bugfix: redis_stream.cpp 中针对 XREADGROUP/XREAD 命令，当 block 为 0 时，
 应该采用阻塞模式等待消息到达

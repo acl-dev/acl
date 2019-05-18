@@ -5,6 +5,8 @@
 #include "acl_cpp/session/redis_session.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -154,3 +156,5 @@ bool redis_session::set_timeout(time_t ttl)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

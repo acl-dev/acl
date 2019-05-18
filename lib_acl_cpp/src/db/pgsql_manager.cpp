@@ -6,6 +6,8 @@
 #include "acl_cpp/db/pgsql_manager.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 pgsql_manager::pgsql_manager(time_t idle_ttl /* = 120 */)
@@ -57,3 +59,5 @@ connect_pool* pgsql_manager::create_pool(const char* key, size_t, size_t)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

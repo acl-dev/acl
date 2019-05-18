@@ -16,6 +16,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #ifdef ACL_WINDOWS
 #include <signal.h>
 #endif
@@ -96,3 +98,5 @@ void acl_server_sigterm_setup(void)
 			__FUNCTION__, SIGTERM, strerror(errno));
 #endif
 }
+
+#endif /* ACL_CLIENT_ONLY */

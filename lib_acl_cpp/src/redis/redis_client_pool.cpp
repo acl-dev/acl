@@ -4,6 +4,8 @@
 #include "acl_cpp/redis/redis_client_pool.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -51,3 +53,5 @@ connect_client* redis_client_pool::create_connect(void)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

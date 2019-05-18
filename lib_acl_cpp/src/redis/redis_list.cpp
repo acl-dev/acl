@@ -8,6 +8,8 @@
 #include "acl_cpp/redis/redis_list.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -564,3 +566,5 @@ bool redis_list::ltrim(const char* key, int start, int end)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

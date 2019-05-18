@@ -7,6 +7,8 @@
 #include "acl_cpp/redis/redis_key.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -604,3 +606,5 @@ int redis_key::scan(int cursor, std::vector<string>& out,
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

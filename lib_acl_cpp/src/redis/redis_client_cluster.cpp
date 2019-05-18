@@ -9,6 +9,8 @@
 #include "acl_cpp/redis/redis_client_cluster.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -220,3 +222,5 @@ const char* redis_client_cluster::get_password(const char* addr) const
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

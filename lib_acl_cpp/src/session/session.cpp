@@ -8,6 +8,8 @@
 #include "acl_cpp/session/session.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -375,3 +377,5 @@ void session::deserialize(string& buf, std::map<string, session_string>& attrs)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

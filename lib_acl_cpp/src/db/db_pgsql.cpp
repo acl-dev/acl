@@ -9,6 +9,8 @@
 #include "acl_cpp/db/db_pgsql.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 //////////////////////////////////////////////////////////////////////////
 
 #if defined(HAS_PGSQL) || defined(HAS_PGSQL_DLL)
@@ -676,3 +678,5 @@ const char* db_pgsql::get_error() const
 } // namespace acl
 
 #endif  // !HAS_MYSQL && !HAS_MYSQL_DLL
+
+#endif // ACL_CLIENT_ONLY

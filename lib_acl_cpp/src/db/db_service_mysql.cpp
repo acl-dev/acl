@@ -4,6 +4,8 @@
 #include "acl_cpp/db/db_service_mysql.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -38,3 +40,5 @@ db_handle* db_service_mysql::db_create(void)
 }
 
 }
+
+#endif // ACL_CLIENT_ONLY

@@ -16,6 +16,8 @@
 #include <vector>
 #include <string>
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -162,3 +164,5 @@ private:
 };
 
 }//end of acl
+
+#endif // ACL_CLIENT_ONLY

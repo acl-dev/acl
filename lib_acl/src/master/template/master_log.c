@@ -8,6 +8,8 @@
 #include "stdlib/acl_env.h"
 #include "master_log.h"
 
+#ifndef ACL_CLIENT_ONLY
+
 static int  var_master_log_opened = 0;
 
 void master_log_open(const char *procname)
@@ -35,3 +37,5 @@ void master_log_close()
 		var_master_log_opened = 0;
 	}
 }
+
+#endif /* ACL_CLIENT_ONLY */

@@ -10,6 +10,7 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
 #ifdef ACL_UNIX
 
 #include <sys/socket.h>
@@ -1246,3 +1247,6 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 
 	servers_start(__servers, acl_var_udp_threads);
 }
+
+#endif /* ACL_CLIENT_ONLY */
+

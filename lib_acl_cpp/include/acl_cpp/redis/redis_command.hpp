@@ -6,6 +6,8 @@
 #include <vector>
 #include "redis_result.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -440,3 +442,5 @@ protected:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

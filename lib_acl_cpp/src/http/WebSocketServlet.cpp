@@ -19,6 +19,8 @@
 #include "acl_cpp/http/WebSocketServlet.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -170,3 +172,5 @@ bool WebSocketServlet::doWebSocket(HttpServletRequest&, HttpServletResponse&)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

@@ -6,6 +6,8 @@
 #include "acl_cpp/redis/redis_stream.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #define INT_LEN		11
 #define LONG_LEN	21
 
@@ -1694,3 +1696,5 @@ bool redis_stream::xinfo_stream(const char* key, redis_stream_info& info)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

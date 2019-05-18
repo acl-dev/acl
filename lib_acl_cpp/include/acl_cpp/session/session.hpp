@@ -4,6 +4,8 @@
 #include "../stdlib/dbuf_pool.hpp"
 #include "../stdlib/string.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 // 用来存储属性值的缓冲区对象定义，这主要是为了兼容属性值
@@ -219,3 +221,5 @@ protected:
 };
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

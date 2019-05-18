@@ -6,6 +6,8 @@
 #include "acl_cpp/redis/redis_result.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -298,3 +300,5 @@ const string& redis_result::to_string(string& out) const
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

@@ -6,6 +6,8 @@
 #include "acl_cpp/redis/redis_transaction.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -126,3 +128,5 @@ const redis_result* redis_transaction::get_child(size_t i, string* cmd) const
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

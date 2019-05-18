@@ -20,6 +20,8 @@
 #include "acl_cpp/http/HttpServletRequest.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #define SKIP_SPACE(x) { while (*x == ' ' || *x == '\t') x++; }
 
 namespace acl
@@ -855,3 +857,5 @@ void HttpServletRequest::sprint_header(string& out, const char* prompt)
 }
 
 } // namespace acl
+
+#endif // ACL_CLIENT_ONLY

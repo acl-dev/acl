@@ -7,6 +7,8 @@
 #include "acl_cpp/hsocket/hsrow.hpp"
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl
 {
 
@@ -63,3 +65,5 @@ const std::vector<const char*>& hsrow::get_row() const
 }
 
 }  // namespace acl
+
+#endif // ACL_CLIENT_ONLY

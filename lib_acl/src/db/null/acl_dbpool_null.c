@@ -17,6 +17,8 @@
 
 #endif
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "acl_dbnull.h"
 #include "acl_dbpool_null.h"
 
@@ -354,3 +356,5 @@ ACL_DB_POOL *acl_dbpool_null_create(const ACL_DB_INFO *db_info)
 	return ((ACL_DB_POOL *) null_pool);
 }
 /*----------------------------------------------------------------------------*/
+
+#endif /* ACL_CLIENT_ONLY */

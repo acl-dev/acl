@@ -2,6 +2,8 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
+#ifndef ACL_CLIENT_ONLY
+
 namespace acl {
 
 class dbuf_guard;
@@ -262,3 +264,5 @@ private:
 };
 
 }  // namespace acl
+
+#endif // ACL_CLIENT_ONLY

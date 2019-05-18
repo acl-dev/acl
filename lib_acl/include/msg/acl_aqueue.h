@@ -1,11 +1,12 @@
 #ifndef ACL_AQUEUE_INCLUDE_H
 #define	ACL_AQUEUE_INCLUDE_H
 
+#include "../stdlib/acl_define.h"
+#include "../thread/acl_thread.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "../stdlib/acl_define.h"
-#include "../thread/acl_thread.h"
 
 #define	ACL_AQUEUE_ERR_UNKNOWN      -1
 #define	ACL_AQUEUE_OK               0
