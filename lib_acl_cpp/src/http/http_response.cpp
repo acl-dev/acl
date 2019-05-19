@@ -87,6 +87,8 @@ http_pipe* http_response::get_pipe(const char* to_charset)
 	if (ptr == NULL || *ptr == 0)
 		return NULL;
 
+#if !defined(ACL_MIME_DISABLE)
+
 	http_ctype ctype;
 	ctype.parse(ptr);
 
@@ -100,6 +102,9 @@ http_pipe* http_response::get_pipe(const char* to_charset)
 	}
 	else
 		return NULL;
+#else
+	return NULL;
+#endif // !defined(ACL_MIME_DISABLE)
 }
 
 bool http_response::get_body(xml& out, const char* to_charset /* = NULL */)

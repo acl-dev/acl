@@ -4,6 +4,8 @@
 #include <list>
 #include <time.h>
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 /**
@@ -100,3 +102,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

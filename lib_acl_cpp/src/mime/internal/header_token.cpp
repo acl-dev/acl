@@ -80,6 +80,9 @@
 /* System library. */
 
 #include "acl_stdafx.hpp"
+
+#if !defined(ACL_MIME_DISABLE)
+
 #include <string.h>
 #include <ctype.h>
 
@@ -267,3 +270,5 @@ ssize_t header_token(HEADER_TOKEN *token, ssize_t token_len,
 
 	return (tok_count);
 }
+
+#endif // !defined(ACL_MIME_DISABLE)

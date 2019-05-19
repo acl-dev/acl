@@ -3,7 +3,7 @@
 #include "acl_cpp/db/pgsql_conf.hpp"
 #endif
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 
 namespace acl {
 
@@ -126,4 +126,4 @@ pgsql_conf& pgsql_conf::set_rw_timeout(int timeout)
 
 } // namespace acl
 
-#endif // ACL_CLIENT_ONLY
+#endif // !deifned(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)

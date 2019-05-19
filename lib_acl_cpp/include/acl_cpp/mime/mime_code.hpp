@@ -2,6 +2,8 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/pipe_stream.hpp"
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 	
 class string;
@@ -157,3 +159,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

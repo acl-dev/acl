@@ -3,6 +3,8 @@
 #include "header_opts.hpp"
 #include "mime_state.hpp"
 
+#if !defined(ACL_MIME_DISABLE)
+
 static MIME_NODE *node_iter_head(ACL_ITER *it, MIME_NODE *node)
 {
 	ACL_RING *ring_ptr;
@@ -509,3 +511,5 @@ const char *mime_head_value(MIME_NODE* node, const char* name)
 
 	return NULL;
 }
+
+#endif // !defined(ACL_MIME_DISABLE)

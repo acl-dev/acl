@@ -2,6 +2,8 @@
 #include "../acl_cpp_define.hpp"
 #include "mime_node.hpp"
 
+#if !defined(ACL_MIME_DISABLE)
+
 struct MIME_NODE;
 
 namespace acl {
@@ -119,3 +121,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

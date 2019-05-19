@@ -2,6 +2,8 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl
 {
 
@@ -13,3 +15,5 @@ public:
 };
 
 }
+
+#endif // !defined(ACL_DB_DISABLE)

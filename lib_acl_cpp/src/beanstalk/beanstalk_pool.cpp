@@ -5,7 +5,7 @@
 #include "acl_cpp/beanstalk/beanstalk_pool.hpp"
 #endif
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_BEANSTALK_DISABLE)
 
 namespace acl {
 
@@ -67,4 +67,4 @@ void beanstalk_pool::put(beanstalk* client, bool clean_watch /* = true */,
 
 } // namespace acl
 
-#endif // ACL_CLIENT_ONLY
+#endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_BEANSTALK_DISABLE)

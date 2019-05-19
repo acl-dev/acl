@@ -9,6 +9,8 @@
 #include "acl_cpp/db/db_service.hpp"
 #endif
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl
 {
 
@@ -323,3 +325,5 @@ void db_service::push_back(db_handle* db)
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_DB_DISABLE)

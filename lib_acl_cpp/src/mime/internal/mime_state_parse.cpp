@@ -7,6 +7,8 @@
 #include "rec_type.hpp"
 #include "mime_state.hpp"
 
+#if !defined(ACL_MIME_DISABLE)
+
 #define SCP(x, s)	acl_vstring_strcpy((x), (s))
 #define SCAT(x, s)	acl_vstring_strcat((x), (s))
 #define STR(x)		acl_vstring_str((x))
@@ -938,3 +940,5 @@ int mime_state_update(MIME_STATE *state, const char *ptr, int n)
 
 	return 0;
 }
+
+#endif // !defined(ACL_MIME_DISABLE)

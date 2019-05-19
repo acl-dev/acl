@@ -2,6 +2,8 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 class mime_code;
@@ -110,3 +112,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

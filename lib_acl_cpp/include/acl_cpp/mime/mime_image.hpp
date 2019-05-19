@@ -2,6 +2,8 @@
 #include "../acl_cpp_define.hpp"
 #include "mime_node.hpp"
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 class ACL_CPP_API mime_image : public mime_node
@@ -20,3 +22,5 @@ public:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

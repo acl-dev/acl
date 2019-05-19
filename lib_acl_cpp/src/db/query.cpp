@@ -6,6 +6,8 @@
 #include "acl_cpp/db/query.hpp"
 #endif
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl
 {
 
@@ -431,3 +433,5 @@ const char* query::to_date(time_t t, string& out,
 }
 
 } // namespace acl
+
+#endif // !defind(ACL_DB_DISABLE)

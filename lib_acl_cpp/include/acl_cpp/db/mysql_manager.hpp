@@ -4,7 +4,7 @@
 #include "../stdlib/string.hpp"
 #include "../connpool/connect_manager.hpp"
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 
 namespace acl {
 
@@ -61,4 +61,4 @@ private:
 
 } // namespace acl
 
-#endif // ACL_CLIENT_ONLY
+#endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)

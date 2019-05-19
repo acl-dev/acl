@@ -4,6 +4,8 @@
 #include "../stdlib/noncopyable.hpp"
 #include <vector>
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 class dbuf_pool;
@@ -297,3 +299,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

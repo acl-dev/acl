@@ -31,6 +31,9 @@
 /* System library. */
 
 #include "acl_stdafx.hpp"
+
+#if !defined(ACL_MIME_DISABLE)
+
 #include <ctype.h>
 
 /* Utility library. */
@@ -223,3 +226,5 @@ void header_nv_free(HEADER_NV *header)
 		acl_myfree(header);
 	}
 }
+
+#endif // !defined(ACL_MIME_DISABLE)

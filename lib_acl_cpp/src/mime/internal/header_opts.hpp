@@ -1,6 +1,8 @@
 #ifndef _HEADER_OPTS_H_INCLUDED_
 #define _HEADER_OPTS_H_INCLUDED_
 
+#if !defined(ACL_MIME_DISABLE)
+
 /*++
  * NAME
  *	header_opts 3h
@@ -93,4 +95,5 @@ extern void header_nv_free(HEADER_NV *header);
  *	Yorktown Heights, NY 10598, USA
  *--*/
 
+#endif // !defined(ACL_MIME_DISABLE)
 #endif

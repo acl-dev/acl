@@ -6,7 +6,7 @@
 #include "acl_cpp/db/mysql_manager.hpp"
 #endif
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 
 namespace acl {
 
@@ -105,4 +105,4 @@ connect_pool* mysql_manager::create_pool(const char* key, size_t, size_t)
 
 } // namespace acl
 
-#endif // ACL_CLIENT_ONLY
+#endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)

@@ -1,6 +1,8 @@
 #ifndef _LEX_822_H_INCLUDED_
 #define _LEX_822_H_INCLUDED_
 
+#if !defined(ACL_MIME_DISABLE)
+
 /*++
  * NAME
  *	lex_822 3h
@@ -34,4 +36,5 @@
  *	Yorktown Heights, NY 10598, USA
  *--*/
 
+#endif // !defined(ACL_MIME_DISABLE)
 #endif

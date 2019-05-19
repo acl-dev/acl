@@ -10,6 +10,8 @@
 #include "acl_cpp/smtp/smtp_client.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 smtp_client::smtp_client(const char* addr, int conn_timeout /* = 60 */,
@@ -267,3 +269,5 @@ bool smtp_client::send_email(const char* filepath)
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

@@ -9,6 +9,8 @@
  * .nf
  */
 
+#if !defined(ACL_MIME_DISABLE)
+
 /*
  * External interface.
  */
@@ -26,3 +28,4 @@
  *	P.O. Box 704
  *	Yorktown Heights, NY 10598, USA
  *--*/
+#endif // !defined(ACL_MIME_DISABLE)

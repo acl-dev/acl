@@ -3,6 +3,8 @@
 #include "../stdlib/noncopyable.hpp"
 #include <list>
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 class string;
@@ -137,3 +139,5 @@ public:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

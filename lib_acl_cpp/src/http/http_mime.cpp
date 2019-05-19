@@ -11,6 +11,8 @@
 #include "acl_cpp/http/http_mime.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl
 {
 
@@ -241,3 +243,5 @@ const http_mime_node* http_mime::get_node(const char* name) const
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

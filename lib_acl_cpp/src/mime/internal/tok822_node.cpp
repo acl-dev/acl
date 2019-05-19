@@ -39,6 +39,9 @@
 /* System library. */
 
 #include "acl_stdafx.hpp"
+
+#if !defined(ACL_MIME_DISABLE)
+
 #include <string.h>
 
 /* Utility library. */
@@ -77,3 +80,5 @@ TOK822 *tok822_free(TOK822 *tp)
 	acl_myfree(tp);
 	return (0);
 }
+
+#endif // !defined(ACL_MIME_DISABLE)

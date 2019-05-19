@@ -119,6 +119,9 @@
 	/* System library. */
 
 #include "acl_stdafx.hpp"
+
+#if !defined(ACL_MIME_DISABLE)
+
 #include <ctype.h>
 #include <string.h>
 
@@ -726,3 +729,4 @@ int     main(int unused_argc, char **unused_argv)
 }
 
 #endif
+#endif // !defined(ACL_MIME_DISABLE)

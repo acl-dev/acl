@@ -502,6 +502,8 @@ void http_request::set_charset_conv()
 	if (ptr == NULL || *ptr == 0)
 		return;
 
+#if !defined(ACL_MIME_DISABLE)
+
 	http_ctype ctype;
 	ctype.parse(ptr);
 
@@ -526,6 +528,8 @@ void http_request::set_charset_conv()
 		delete conv_;
 		conv_ = NULL;
 	}
+
+#endif // !defined(ACL_MIME_DISABLE)
 }
 
 http_pipe* http_request::get_pipe(const char* to_charset)

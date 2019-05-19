@@ -5,6 +5,8 @@
 #include <string>
 #include "mime_head.hpp"
 
+#if !defined(ACL_MIME_DISABLE)
+
 struct MIME_STATE;
 
 namespace acl {
@@ -478,3 +480,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

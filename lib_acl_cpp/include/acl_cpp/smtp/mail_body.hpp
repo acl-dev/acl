@@ -5,6 +5,8 @@
 #include "../stdlib/noncopyable.hpp"
 #include "../http/http_ctype.hpp"
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 class mime_code;
@@ -204,3 +206,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

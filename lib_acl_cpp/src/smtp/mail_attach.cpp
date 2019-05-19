@@ -9,6 +9,8 @@
 #include "acl_cpp/smtp/mail_attach.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 mail_attach::mail_attach(const char* filepath, const char* content_type,
@@ -179,3 +181,5 @@ void mail_attach::build_header(const char* transfer_encoding, string& out)
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

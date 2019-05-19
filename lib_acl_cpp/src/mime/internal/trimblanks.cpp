@@ -28,6 +28,9 @@
 /* System library. */
 
 #include "acl_stdafx.hpp"
+
+#if !defined(ACL_MIME_DISABLE)
+
 #include <ctype.h>
 
 /* Utility library. */
@@ -48,3 +51,5 @@ char   *trimblanks(char *string, int len)
 	curr -= 1;
     return (curr);
 }
+
+#endif // !defined(ACL_MIME_DISABLE)

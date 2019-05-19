@@ -113,6 +113,9 @@
 
 /* Utility library. */
 #include "acl_stdafx.hpp"
+
+#if !defined(ACL_MIME_DISABLE)
+
 #include "stdlib/acl_mymalloc.h"
 
 /* Global library. */
@@ -302,3 +305,5 @@ TOK822 **tok822_grep(TOK822 *tree, int type)
 	list[count] = 0;
 	return (list);
 }
+
+#endif // !defined(ACL_MIME_DISABLE)

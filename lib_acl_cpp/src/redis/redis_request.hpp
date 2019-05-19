@@ -1,7 +1,7 @@
 #pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 struct iovec;
 

@@ -7,6 +7,8 @@
 #include "../mime/mime_attach.hpp"
 #include "http_type.hpp"
 
+#if !defined(ACL_MIME_DISABLE)
+
 struct MIME_STATE;
 struct MIME_NODE;
 
@@ -128,3 +130,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

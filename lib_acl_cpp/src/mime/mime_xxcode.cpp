@@ -3,6 +3,8 @@
 #include "acl_cpp/mime/mime_xxcode.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 static const unsigned char to_xx_tab[] =
@@ -52,3 +54,5 @@ void mime_xxcode::decode(const char* in, int n, acl::string* out)
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

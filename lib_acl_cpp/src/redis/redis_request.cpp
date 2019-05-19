@@ -1,7 +1,7 @@
 #include "acl_stdafx.hpp"
 #include "redis_request.hpp"
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 namespace acl
 {

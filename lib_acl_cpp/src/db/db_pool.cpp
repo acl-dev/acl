@@ -5,6 +5,8 @@
 #include "acl_cpp/db/db_pool.hpp"
 #endif
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl
 {
 
@@ -35,3 +37,5 @@ db_guard::~db_guard(void)
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_DB_DISABLE)

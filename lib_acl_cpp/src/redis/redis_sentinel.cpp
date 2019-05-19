@@ -9,7 +9,7 @@
 #include "acl_cpp/redis/redis_sentinel.hpp"
 #endif
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 namespace acl
 {

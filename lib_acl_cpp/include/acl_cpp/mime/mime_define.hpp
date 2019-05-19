@@ -1,6 +1,8 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 
+#if !defined(ACL_MIME_DISABLE)
+
 /*
  * Content types and subtypes that we care about, either because we have to,
  * or because we want to filter out broken MIME messages.
@@ -45,3 +47,5 @@
 
 #define MIME_MIN                MIME_CTYPE_OTHER
 #define MIME_MAX                MIME_ENC_MAX
+
+#endif // !defined(ACL_MIME_DISABLE)

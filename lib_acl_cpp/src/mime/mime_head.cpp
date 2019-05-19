@@ -6,6 +6,8 @@
 #include "acl_cpp/mime/mime_head.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 const static acl::string  __dummy;
@@ -373,3 +375,5 @@ void mime_head::build_head(string& out, bool clean)
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

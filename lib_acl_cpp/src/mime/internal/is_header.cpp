@@ -35,6 +35,9 @@
 /* System library. */
 
 #include "acl_stdafx.hpp"
+
+#if !defined(ACL_MIME_DISABLE)
+
 #include <ctype.h>
 
 /* Global library. */
@@ -90,3 +93,5 @@ ssize_t is_header_buf(const char *str, ssize_t str_len)
 	/* Redundant return for future proofing. */
 	return (0);
 }
+
+#endif // !defined(ACL_MIME_DISABLE)

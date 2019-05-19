@@ -4,6 +4,8 @@
 #include "../db/db_handle.hpp"
 #include "../connpool/connect_pool.hpp"
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl {
 
 class db_handle;
@@ -66,3 +68,5 @@ public:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_DB_DISABLE)

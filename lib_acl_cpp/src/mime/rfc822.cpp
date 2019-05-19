@@ -9,6 +9,8 @@
 #include "acl_cpp/mime/rfc822.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 #define	STR	acl_vstring_str
@@ -600,3 +602,5 @@ void rfc822::reset()
 }
 
 }  // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

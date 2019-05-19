@@ -5,6 +5,8 @@
 #include "../stdlib/noncopyable.hpp"
 #include "../stdlib/string.hpp"
 
+#if !defined(ACL_MIME_DISABLE)
+
 struct MIME_NODE;
 
 namespace acl {
@@ -269,3 +271,5 @@ protected:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

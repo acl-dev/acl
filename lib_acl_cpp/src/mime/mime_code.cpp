@@ -10,6 +10,8 @@
 #include "acl_cpp/mime/mime_code.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 #define INVALID		0xff
@@ -390,3 +392,5 @@ mime_code* mime_code::create(int encoding, bool warn_unsupport /* = true */)
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

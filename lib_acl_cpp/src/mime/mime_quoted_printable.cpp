@@ -3,6 +3,8 @@
 #include "acl_cpp/mime/mime_quoted_printable.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 #define CU_CHAR_PTR(x)	((const unsigned char *) (x))
@@ -281,3 +283,5 @@ void mime_quoted_printable::decode(acl::string* out)
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

@@ -16,6 +16,8 @@
 #include "acl_cpp/smtp/mail_message.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl
 {
 
@@ -502,3 +504,5 @@ bool mail_message::save_to(const char* filepath)
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

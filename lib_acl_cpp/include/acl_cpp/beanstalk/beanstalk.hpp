@@ -6,7 +6,7 @@
 #include "../stdlib/noncopyable.hpp"
 #include "../stream/socket_stream.hpp"
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_BEANSTALK_DISABLE)
 
 struct ACL_ARGV;
 
@@ -311,4 +311,4 @@ private:
 
 } // namespace acl
 
-#endif // ACL_CLIENT_ONLY
+#endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_BEANSTALK_DISABLE)

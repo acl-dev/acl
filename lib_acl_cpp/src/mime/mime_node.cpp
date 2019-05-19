@@ -12,6 +12,8 @@
 #include "acl_cpp/mime/mime_node.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 #define	SCOPY(x, y)	ACL_SAFE_STRNCPY((x), (y), sizeof((x)))
 
 namespace acl {
@@ -345,3 +347,5 @@ const char* mime_node::parent_header_value(const char* name) const
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

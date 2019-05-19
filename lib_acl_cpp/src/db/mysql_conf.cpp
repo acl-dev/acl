@@ -3,7 +3,7 @@
 #include "acl_cpp/db/mysql_conf.hpp"
 #endif
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 
 namespace acl {
 
@@ -138,4 +138,4 @@ mysql_conf& mysql_conf::set_rw_timeout(int timeout)
 
 } // namespace acl
 
-#endif // ACL_CLIENT_ONLY
+#endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)

@@ -4,6 +4,8 @@
 #include "acl_cpp/db/db_service_sqlite.hpp"
 #endif
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl
 {
 
@@ -30,3 +32,5 @@ db_handle* db_service_sqlite::db_create(void)
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_DB_DISABLE)

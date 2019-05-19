@@ -7,7 +7,7 @@
 #include "acl_cpp/db/pgsql_pool.hpp"
 #endif
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 
 namespace acl
 {
@@ -30,4 +30,4 @@ connect_client* pgsql_pool::create_connect()
 
 } // namespace acl
 
-#endif // ACL_CLIENT_ONLY
+#endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)

@@ -4,6 +4,8 @@
 #include "../ipc/ipc_service.hpp"
 #include "../stdlib/string.hpp"
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl {
 
 typedef enum
@@ -115,3 +117,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_DB_DISABLE)

@@ -3,6 +3,8 @@
 #include "../stdlib/string.hpp"
 #include "../db/db_handle.hpp"
 
+#if !defined(ACL_DB_DISABLE)
+
 typedef struct sqlite3 sqlite3;
 
 namespace acl {
@@ -169,3 +171,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_DB_DISABLE)

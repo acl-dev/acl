@@ -9,6 +9,8 @@
  * .nf
  */
 
+#if !defined(ACL_MIME_DISABLE)
+
 /*
  * Utility library.
  */
@@ -36,3 +38,5 @@ extern ACL_VSTRING *quote_821_local_flags(ACL_VSTRING *, const char *, int);
  *	P.O. Box 704
  *	Yorktown Heights, NY 10598, USA
  *--*/
+
+#endif // !defined(ACL_MIME_DISABLE)

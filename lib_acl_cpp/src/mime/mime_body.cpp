@@ -9,6 +9,8 @@
 #include "acl_cpp/mime/mime_body.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 bool mime_body::save_body(pipe_manager& out, const char* src /* = NULL */,
@@ -106,3 +108,5 @@ bool mime_body::html_stype() const
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

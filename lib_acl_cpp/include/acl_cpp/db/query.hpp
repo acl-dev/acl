@@ -4,6 +4,8 @@
 #include "../stdlib/noncopyable.hpp"
 #include <map>
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl
 {
 
@@ -196,3 +198,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_DB_DISABLE)

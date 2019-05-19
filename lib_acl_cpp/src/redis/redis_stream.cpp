@@ -6,7 +6,7 @@
 #include "acl_cpp/redis/redis_stream.hpp"
 #endif
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 #define INT_LEN		11
 #define LONG_LEN	21

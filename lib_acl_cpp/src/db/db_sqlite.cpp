@@ -9,6 +9,8 @@
 #include "acl_cpp/db/db_sqlite.hpp"
 #endif
 
+#if !defined(ACL_DB_DISABLE)
+
 #if defined(HAS_SQLITE) || defined(HAS_SQLITE_DLL)
 
 # ifdef HAS_SQLITE_DLL
@@ -761,4 +763,5 @@ bool db_sqlite::next(sqlite_cursor&, db_row*) { return false; }
 
 }  // namespace acl
 
-#endif  // !HAS_SQLITE && !HAS_SQLITE_DLL
+#endif // !HAS_SQLITE && !HAS_SQLITE_DLL
+#endif // !defined(ACL_DB_DISABLE)

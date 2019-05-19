@@ -3,7 +3,7 @@
 #include "../stdlib/noncopyable.hpp"
 #include <map>
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_BEANSTALK_DISABLE)
 
 namespace acl {
 
@@ -53,4 +53,4 @@ private:
 
 } // namespace acl
 
-#endif // ACL_CLIENT_ONLY
+#endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_BEANSTALK_DISABLE)

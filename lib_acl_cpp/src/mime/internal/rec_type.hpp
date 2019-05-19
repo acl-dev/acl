@@ -1,6 +1,8 @@
 #ifndef _REC_TYPE_H_INCLUDED_
 #define _REC_TYPE_H_INCLUDED_
 
+#if !defined(ACL_MIME_DISABLE)
+
 /*++
  * NAME
  *	rec_type 3h
@@ -195,4 +197,5 @@ extern const char *rec_type_name(int);
  *	Yorktown Heights, NY 10598, USA
  *--*/
 
+#endif // !defined(ACL_MIME_DISABLE)
 #endif

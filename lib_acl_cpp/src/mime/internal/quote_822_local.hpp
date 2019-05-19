@@ -1,6 +1,8 @@
 #ifndef _QUOTE_822_H_INCLUDED_
 #define _QUOTE_822_H_INCLUDED_
 
+#if !defined(ACL_MIME_DISABLE)
+
 /*++
  * NAME
  *	quote_822_local 3h
@@ -41,4 +43,5 @@ extern ACL_VSTRING *unquote_822_local(ACL_VSTRING *, const char *);
  *	Yorktown Heights, NY 10598, USA
  *--*/
 
+#endif // !defined(ACL_MIME_DISABLE)
 #endif

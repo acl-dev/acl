@@ -1,6 +1,8 @@
 #ifndef __MIME_STATE_INCLUDE__
 #define __MIME_STATE_INCLUDE__
 
+#if !defined(ACL_MIME_DISABLE)
+
 #include "lib_acl.h"
 #include "acl_cpp/mime/mime_define.hpp"
 #include "header_token.hpp"
@@ -132,4 +134,5 @@ const char *mime_ctype_name(size_t ctype);
 const char *mime_stype_name(size_t stype);
 const char *mime_head_value(MIME_NODE *node, const char *name);
 
+#endif // !defined(ACL_MIME_DISABLE)
 #endif

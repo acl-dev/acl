@@ -1,6 +1,8 @@
 #ifndef _IS_HEADER_H_INCLUDED_
 #define _IS_HEADER_H_INCLUDED_
 
+#if !defined(ACL_MIME_DISABLE)
+
 /*++
  * NAME
  *	is_header 3h
@@ -30,4 +32,5 @@ extern ssize_t is_header_buf(const char *, ssize_t);
  *	Yorktown Heights, NY 10598, USA
  *--*/
 
+#endif // !defined(ACL_MIME_DISABLE)
 #endif

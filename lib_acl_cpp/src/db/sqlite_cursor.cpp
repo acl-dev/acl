@@ -6,6 +6,8 @@
 #include "acl_cpp/db/sqlite_cursor.hpp"
 #endif
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl
 {
 
@@ -64,3 +66,5 @@ void sqlite_cursor::add_column_value(const char* s)
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_DB_DISABLE)

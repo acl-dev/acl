@@ -3,6 +3,8 @@
 #include "../stdlib/string.hpp"
 #include "db_cursor.hpp"
 
+#if !defined(ACL_DB_DISABLE)
+
 struct sqlite3_stmt;
 
 namespace acl
@@ -91,3 +93,5 @@ private:
 };
 
 }
+
+#endif // !defined(ACL_DB_DISABLE)

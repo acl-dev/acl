@@ -12,6 +12,8 @@
 #include "acl_cpp/smtp/mail_body.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 mail_body::mail_body(const char* charset /* = "utf-8" */,
@@ -243,3 +245,5 @@ bool mail_body::save_alternative(const char* html, size_t hlen,
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

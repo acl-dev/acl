@@ -6,6 +6,8 @@
 #include "acl_cpp/mime/rfc2047.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 #define SCOPY(x, y) ACL_SAFE_STRNCPY((x), (y), sizeof(x))
 
 namespace acl {
@@ -574,3 +576,5 @@ bool rfc2047::decode(const char* in, int n, acl::string* out,
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

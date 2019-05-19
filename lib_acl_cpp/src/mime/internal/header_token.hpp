@@ -12,10 +12,13 @@
  * .nf
  */
 
+#if !defined(ACL_MIME_DISABLE)
+
  /*
   * Utility library.
   */
 #include <stdlib.h>
+
 #include "stdlib/acl_vstring.h"
 
  /*
@@ -46,4 +49,5 @@ extern ssize_t header_token(HEADER_TOKEN *, ssize_t, ACL_VSTRING *, const char *
  *	Yorktown Heights, NY 10598, USA
  *--*/
 
+#endif // !defined(ACL_MIME_DISABLE)
 #endif

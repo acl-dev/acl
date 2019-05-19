@@ -6,7 +6,7 @@
 #include <vector>
 #include "redis_result.hpp"
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 namespace acl
 {
@@ -443,4 +443,4 @@ protected:
 
 } // namespace acl
 
-#endif // ACL_CLIENT_ONLY
+#endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)

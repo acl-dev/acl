@@ -9,7 +9,7 @@
 #include "acl_cpp/redis/redis_client_cluster.hpp"
 #endif
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 namespace acl
 {

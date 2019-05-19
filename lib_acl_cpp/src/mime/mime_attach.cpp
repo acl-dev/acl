@@ -5,6 +5,8 @@
 #include "acl_cpp/mime/mime_attach.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 mime_attach::mime_attach(const char* emailFile, const MIME_NODE* node,
@@ -40,3 +42,5 @@ const char* mime_attach::get_filename() const
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

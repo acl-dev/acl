@@ -3,7 +3,7 @@
 #include "../stdlib/string.hpp"
 #include "../db/db_handle.hpp"
 
-#ifndef ACL_CLIENT_ONLY
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 
 typedef struct st_mysql MYSQL;
 
@@ -164,4 +164,4 @@ private:
 
 } // namespace acl
 
-#endif // ACL_CLIENT_ONLY
+#endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)

@@ -1,6 +1,8 @@
 #ifndef _TOK822_H_INCLUDED_
 #define _TOK822_H_INCLUDED_
 
+#if !defined(ACL_MIME_DISABLE)
+
 /*++
  * NAME
  *	tok822 3h
@@ -121,4 +123,5 @@ extern TOK822 *tok822_rewrite(TOK822 *, const char *);
  *	Yorktown Heights, NY 10598, USA
  *--*/
 
+#endif // !defined(ACL_MIME_DISABLE)
 #endif

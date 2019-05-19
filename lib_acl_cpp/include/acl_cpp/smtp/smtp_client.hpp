@@ -4,6 +4,8 @@
 #include "../stream/socket_stream.hpp"
 #include <vector>
 
+#if !defined(ACL_MIME_DISABLE)
+
 struct SMTP_CLIENT;
 
 namespace acl {
@@ -218,3 +220,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

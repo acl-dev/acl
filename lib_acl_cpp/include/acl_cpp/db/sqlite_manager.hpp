@@ -2,6 +2,8 @@
 #include "../acl_cpp_define.hpp"
 #include "../connpool/connect_manager.hpp"
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl {
 
 class ACL_CPP_API sqlite_manager : public connect_manager
@@ -39,3 +41,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_DB_DISABLE)

@@ -5,6 +5,8 @@
 #include "acl_cpp/http/http_ctype.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl
 {
 
@@ -193,3 +195,5 @@ const char* http_ctype::get_charset() const
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

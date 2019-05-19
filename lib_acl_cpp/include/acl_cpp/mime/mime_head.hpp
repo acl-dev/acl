@@ -4,6 +4,8 @@
 #include "../stdlib/noncopyable.hpp"
 #include <list>
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 typedef struct HEADER
@@ -70,3 +72,5 @@ private:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

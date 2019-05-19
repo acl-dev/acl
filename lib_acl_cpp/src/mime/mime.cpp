@@ -19,6 +19,8 @@
 #include "acl_cpp/mime/mime.hpp"
 #endif
 
+#if !defined(ACL_MIME_DISABLE)
+
 namespace acl {
 
 mime::mime()
@@ -976,3 +978,5 @@ void mime::mime_debug(const char* save_path, bool decode /* = true */)
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_MIME_DISABLE)

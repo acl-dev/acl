@@ -54,6 +54,9 @@
 /* System library. */
 
 #include "acl_stdafx.hpp"
+
+#if !defined(ACL_MIME_DISABLE)
+
 #include <string.h>
 #include <ctype.h>
 
@@ -181,3 +184,4 @@ int     main(void)
 }
 
 #endif
+#endif // !defined(ACL_MIME_DISABLE)

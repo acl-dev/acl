@@ -6,6 +6,8 @@
 #include "acl_cpp/db/sqlite_pool.hpp"
 #endif
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl
 {
 
@@ -34,3 +36,5 @@ connect_client* sqlite_pool::create_connect()
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_DB_DISABLE)

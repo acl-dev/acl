@@ -7,6 +7,8 @@
 #include "acl_cpp/db/db_handle.hpp"
 #endif
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl
 {
 
@@ -430,3 +432,5 @@ const char* db_handle::get_loadpath()
 }
 
 } // namespace acl
+
+#endif // !defined(ACL_DB_DISABLE)

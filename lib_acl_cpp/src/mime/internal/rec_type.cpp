@@ -26,6 +26,9 @@
  *--*/
 
 #include "acl_stdafx.hpp"
+
+#if !defined(ACL_MIME_DISABLE)
+
 /* Global library. */
 
 #include "rec_type.hpp"
@@ -86,3 +89,5 @@ const char *rec_type_name(int type)
 	    return (p->name);
     return ("unknown_record_type");
 }
+
+#endif // !defined(ACL_MIME_DISABLE)

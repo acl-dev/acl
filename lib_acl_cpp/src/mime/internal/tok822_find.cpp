@@ -38,6 +38,8 @@
 
 #include "acl_stdafx.hpp"
 
+#if !defined(ACL_MIME_DISABLE)
+
 /* Utility library. */
 
 /* Global library. */
@@ -65,3 +67,5 @@ TOK822 *tok822_rfind_type(TOK822 *tail, int op)
 		/* void */ ;
 	return (tp);
 }
+
+#endif // !defined(ACL_MIME_DISABLE)

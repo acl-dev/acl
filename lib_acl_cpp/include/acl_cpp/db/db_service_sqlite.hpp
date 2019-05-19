@@ -3,6 +3,8 @@
 #include "../stdlib/string.hpp"
 #include "../db/db_service.hpp"
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl {
 
 class ACL_CPP_API db_service_sqlite : public db_service
@@ -33,3 +35,5 @@ private:
 };
 
 }
+
+#endif // !defined(ACL_DB_DISABLE)

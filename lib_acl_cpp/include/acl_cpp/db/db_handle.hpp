@@ -5,6 +5,8 @@
 #include "../stdlib/noncopyable.hpp"
 #include "../connpool/connect_client.hpp"
 
+#if !defined(ACL_DB_DISABLE)
+
 namespace acl {
 
 /**
@@ -496,3 +498,5 @@ protected:
 };
 
 } // namespace acl
+
+#endif // !defined(ACL_DB_DISABLE)
