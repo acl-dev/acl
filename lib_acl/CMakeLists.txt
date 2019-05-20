@@ -102,7 +102,6 @@ if (${UNIX_OS})
 		"-Wstrict-prototypes"
 	)
 
-
 	if (CMAKE_COMPILER_IS_GNUCC)
 		execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
 			OUTPUT_VARIABLE GCC_VERSION)
@@ -138,6 +137,7 @@ endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	set(CMAKE_SHARED_LINKER_FLAGS "-shared")
+	add_definitions("-DACL_CLIENT_ONLY")
 	add_definitions("-Wno-invalid-source-encoding")
 else()
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)

@@ -33,7 +33,8 @@ android {
                 //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86'
                 //abiFilters 'x86', 'arm64-v8a'
                 //abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
-                abiFilters 'arm64-v8a', 'armeabi-v7a'
+                //abiFilters 'arm64-v8a', 'armeabi-v7a'
+                abiFilters 'armeabi-v7a'
             }
         }
     }
