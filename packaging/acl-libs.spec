@@ -1,4 +1,4 @@
-%define release_id 3
+%define release_id 4
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -43,7 +43,7 @@ acl tools
 
 %build
 
-make build_one -j 4
+make -j 4
 make -C lib_fiber
 
 %install
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Mon May 20 2019 zhengshuxin@qiyi.com 3.5.0-4-20190520.11
+- optimize package size for Mobile by adding optional compiling
 
 * Thu May 09 2019 zhengshuxin@qiyi.com 3.5.0-3-20190509.13
 - safety & feature: add nocopyable limit for many class to avoid potential problem
