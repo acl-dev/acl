@@ -20,14 +20,17 @@ static ACL_CFG_STR_TABLE __conf_str_tab[] = {
 };
 
 int   var_cfg_hijack_unknown;	// 是否需要对不存在域名进行劫持
-int   var_cfg_dns_neighbor_port;// 上游 DNS 服务器 PORT
 
 static ACL_CFG_BOOL_TABLE __conf_bool_tab[] = {
 	{ "hijack_unknown", 0, &var_cfg_hijack_unknown },
 	{ 0, 0, 0 },
 };
 
+int   var_cfg_server_port;	// 本机绑定的端口号
+int   var_cfg_dns_neighbor_port;// 上游 DNS 服务器 PORT
+
 static ACL_CFG_INT_TABLE __conf_int_tab[] = {
+	{ "server_port", 53, &var_cfg_server_port, 0, 0 },
 	{ "dns_neighbor_port", 53, &var_cfg_dns_neighbor_port, 0, 0 },
 	{ 0, 0, 0, 0, 0 }
 };

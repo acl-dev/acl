@@ -73,8 +73,8 @@ static int udp_res_lookup(ACL_RES *res, const char *data, int dlen, char *buf, i
 		acl_msg_fatal("%s: socket create error", myname);
 
 	memset(&addr, 0, sizeof(addr));
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(res->dns_port);
+	addr.sin_family      = AF_INET;
+	addr.sin_port        = htons(res->dns_port);
 	addr.sin_addr.s_addr = inet_addr(res->dns_ip);
 
 	ret = sendto(fd, data, dlen, 0, (struct sockaddr *) &addr,

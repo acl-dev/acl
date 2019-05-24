@@ -207,6 +207,15 @@ ACL_API ACL_AIO *acl_aio_create2(int event_mode, unsigned int nMsg);
 ACL_API ACL_AIO *acl_aio_create3(ACL_EVENT *event);
 
 /**
+ * 设置 DNS 服务器地址列表，只有设置了 DNS 服务器地址，内部才会支持域名解析并
+ * 异步连接服务器地址
+ * @param aio {ACL_AIO*}
+ * @param dns_list {const char*} DNS 服务器地址列表，格式：ip1:port,ip2:port...
+ * @param timeout {int} 域名解析超时时间（秒）
+ */
+ACL_API void acl_aio_set_dns(ACL_AIO *aio, const char *dns_list, int timeout);
+
+/**
  * 释放一个异步通信异步框架实例句柄，同时会释放掉非空的 aio->event 对象
  * @param aio {ACL_AIO*} 异步框架引擎句柄
  */
@@ -756,11 +765,25 @@ ACL_API void acl_aio_listen(ACL_ASTREAM *astream);
 /**
  * 异步连接一个远程服务器, 当连接流出错、超时或连接成功时将触发事件通知过程.
  * @param aio {ACL_AIO*} 异步框架引擎句柄
- * @param saddr {const char*} 远程服务器地址, 格式: ip:port, 如: 192.168.0.1:80
+ * @param addr {const char*} 远程服务器地址, 格式: ip:port, 如: 192.168.0.1:80
  * @param timeout {int} 连接超时的时间值，单位为秒
  * @return {ACL_ASTREAM*} 创建异步连接过程是否成功
  */
 ACL_API ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout);
+
+/**
+ * 异步连接一个远程服务器，给定的地址可以是域名，以区别于 acl_aio_connect 函数，
+ * 使用本函数的首要条件是必须通过 acl_aio_set_dns 设置的域名服务器的地址
+ * @param aio {ACL_AIO*} 异步框架引擎句柄
+ * @param addr {const char*} 服务器地址，格式：domain:port，如：www.sina.com:80
+ * @param timeout {int} 连接超时的时间值，单位为秒
+ * @param callback {ACL_AIO_CONNECT_FN}
+ * @param context {void*} 传递给 callback 回调函数的参数
+ * @return {int} 返回 0 表示开始异步域名解析及异步连接过程，返回 < 0 表示传入的
+ *  参数有误或在创建 ACL_AIO 句柄后没有通过 acl_aio_set_dns 函数设置域名服务器
+ */
+ACL_API int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
+		ACL_AIO_CONNECT_FN callback, void *context);
 
 /*---------------------------- 其它通用异步操作接口 --------------------------*/
 

@@ -9,6 +9,7 @@ extern "C" {
 #include "stdlib/acl_vstream.h"
 #include "stdlib/acl_vstring.h"
 #include "stdlib/acl_array.h"
+#include "net/acl_dns.h"
 #include "aio/acl_aio.h"
 
 struct ACL_AIO {
@@ -23,6 +24,7 @@ struct ACL_AIO {
 	int   timer_active;
 	unsigned int tid;
 #endif
+	ACL_DNS *dns;
 };
 
 typedef struct AIO_READ_HOOK {

@@ -1,5 +1,6 @@
 
 service server {
+	server_port = 53
 #	本地域名映射关系表，格式：域名1:ip11:ip12..., 域名2:ip21:ip22...
 #	domain_map = mailz.hexun.com:127.0.0.1:211.157.110.179:211.157.110.185, \
 #			www1.sina.com:192.168.0.1:192.168.0.2:192.168.0.3, \
@@ -11,6 +12,7 @@ service server {
 			263es.com:192.168.198.47, \
 			i.163.com:127.0.0.1, \
 			ex.qq.com:127.0.0.1, \
+			test.zsx.com:127.0.0.1, \
 			#all:192.168.198.47
 
 #	未知域名返回的缺省地址列表
@@ -25,7 +27,8 @@ service server {
 
 #	上游 DNS 服务器的 IP
 #	dns_neighbor_ip = 211.157.131.7
-	dns_neighbor_ip = 192.168.198.47
+#	dns_neighbor_ip = 192.168.198.47
+	dns_neighbor_ip = 8.8.8.8
 #	上游 DNS 服务器的 PORT
 	dns_neighbor_port = 53
 }

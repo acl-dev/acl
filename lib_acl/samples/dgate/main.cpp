@@ -7,16 +7,21 @@
 
 static SERVICE *__service;
 
-static char *__conf_file = "dgate.cf";
+static const char *__conf_file = "dgate.cf";
 
 static void init(void)
 {
 	acl_socket_init();
 	conf_load(__conf_file);
+
+	printf("local port: %d\r\n", var_cfg_server_port);
+
 	//acl_msg_open("dgate.log", "dgate");
 	acl_msg_stdout_enable(1);
-	__service = service_create("0.0.0.0", 53, var_cfg_dns_neighbor_ip,
-		var_cfg_dns_neighbor_port);
+
+	__service = service_create("0.0.0.0", (short) var_cfg_server_port,
+		var_cfg_dns_neighbor_ip, var_cfg_dns_neighbor_port);
+
 	printf("neighbor dns_ip: %s, dns_port: %d\r\n",
 		var_cfg_dns_neighbor_ip, var_cfg_dns_neighbor_port);
 }
@@ -39,7 +44,7 @@ int main(int argc, char* argv[])
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
-			exit (0);
+			return 0;
 		case 'f':
 			__conf_file = acl_mystrdup(optarg);
 			break;

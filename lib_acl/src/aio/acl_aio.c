@@ -32,8 +32,15 @@ void acl_aio_free(ACL_AIO *aio)
 
 void acl_aio_free2(ACL_AIO *aio, int keep)
 {
-	if (!keep && aio->event)
+	if (aio->dns) {
+		acl_dns_close(aio->dns);
+		acl_aio_check(aio);
+	}
+
+	if (!keep && aio->event) {
 		acl_event_free(aio->event);
+	}
+
 	acl_array_free(aio->dead_streams, NULL);
 	acl_myfree(aio);
 }
@@ -89,6 +96,44 @@ ACL_AIO *acl_aio_create3(ACL_EVENT *event)
 	return aio;
 }
 
+void acl_aio_set_dns(ACL_AIO *aio, const char *dns_list, int timeout)
+{
+	ACL_ARGV *tokens;
+	ACL_ITER  iter;
+
+	acl_assert(dns_list && *dns_list);
+	tokens = acl_argv_split(dns_list, ",; \t\r\n");
+	if (tokens == NULL) {
+		acl_msg_error("%s(%d), %s: invalid dns_list=%s",
+			__FILE__, __LINE__, __FUNCTION__, dns_list);
+		return;
+	}
+
+	if (aio->dns == NULL) {
+		aio->dns = acl_dns_create(aio, timeout);
+		acl_dns_check_dns_ip(aio->dns);
+	}
+
+	acl_foreach(iter, tokens) {
+		char *ip = (char *) iter.data;
+		char *ptr = strrchr(ip, '|');
+		int   port;
+
+		if (ptr == NULL) {
+			ptr = strrchr(ip, ':');
+		}
+		if (ptr && *(ptr + 1) != 0) {
+			*ptr = 0;
+			port = atoi(++ptr);
+		} else {
+			port = 53;
+		}
+		acl_dns_add_dns(aio->dns, ip, port, 24);
+	}
+
+	acl_argv_free(tokens);
+}
+
 int acl_aio_event_mode(ACL_AIO *aio)
 {
 	return aio->event_mode;
@@ -96,28 +141,32 @@ int acl_aio_event_mode(ACL_AIO *aio)
 
 int acl_aio_get_keep_read(ACL_AIO *aio)
 {
-	if (aio)
+	if (aio) {
 		return aio->keep_read;
+	}
 	return 0;
 }
 
 void acl_aio_set_keep_read(ACL_AIO *aio, int onoff)
 {
-	if (aio)
+	if (aio) {
 		aio->keep_read = onoff;
+	}
 }
 
 int acl_aio_get_delay_sec(ACL_AIO *aio)
 {
-	if (aio)
+	if (aio) {
 		return (aio->delay_sec);
+	}
 	return -1;
 }
 
 int acl_aio_get_delay_usec(ACL_AIO *aio)
 {
-	if (aio)
+	if (aio) {
 		return aio->delay_usec;
+	}
 	return -1;
 }
 
@@ -139,17 +188,17 @@ void acl_aio_set_delay_usec(ACL_AIO *aio, int delay_usec)
 
 void acl_aio_set_check_inter(ACL_AIO *aio, int check_inter)
 {
-	if (aio && check_inter >= 0)
+	if (aio && check_inter >= 0) {
 		acl_event_set_check_inter(aio->event, check_inter);
+	}
 }
 
 void acl_aio_loop(ACL_AIO *aio)
 {	
-	if (aio == NULL || aio->event == NULL)
-		return;
-
-	acl_event_loop(aio->event);
-	aio_delay_check(aio);
+	if (aio && aio->event) {
+		acl_event_loop(aio->event);
+		aio_delay_check(aio);
+	}
 }
 
 int acl_aio_last_nready(ACL_AIO *aio)
@@ -163,8 +212,9 @@ int acl_aio_last_nready(ACL_AIO *aio)
 
 ACL_EVENT *acl_aio_event(ACL_AIO *aio)
 {
-	if (aio)
+	if (aio) {
 		return aio->event;
+	}
 	return NULL;
 }
 
@@ -180,8 +230,9 @@ acl_int64 acl_aio_request_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME timer_fn,
 {
 	const char *myname = "acl_aio_request_timer";
 
-	if (aio == NULL || aio->event == NULL || timer_fn == NULL)
+	if (aio == NULL || aio->event == NULL || timer_fn == NULL) {
 		acl_msg_fatal("%s: input invalid", myname);
+	}
 
 	return acl_event_request_timer(aio->event, timer_fn, context,
 			idle_limit, keep);
@@ -191,8 +242,9 @@ acl_int64 acl_aio_cancel_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME timer_fn, voi
 {
 	const char *myname = "acl_aio_cancel_timer";
 
-	if (aio == NULL || aio->event == NULL || timer_fn == NULL)
+	if (aio == NULL || aio->event == NULL || timer_fn == NULL) {
 		acl_msg_fatal("%s: input invalid", myname);
+	}
 
 	return acl_event_cancel_timer(aio->event, timer_fn, context);
 }
@@ -202,8 +254,9 @@ void acl_aio_keep_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback,
 {
 	const char *myname = "acl_aio_keep_timer";
 
-	if (aio == NULL || aio->event == NULL)
+	if (aio == NULL || aio->event == NULL) {
 		acl_msg_fatal("%s: input invalid", myname);
+	}
 	acl_event_keep_timer(aio->event, callback, context, onoff);
 }
 
@@ -211,7 +264,8 @@ int acl_aio_timer_ifkeep(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback, void *con
 {
 	const char *myname = "acl_aio_timer_ifkeep";
 
-	if (aio == NULL || aio->event == NULL)
+	if (aio == NULL || aio->event == NULL) {
 		acl_msg_fatal("%s: input invalid", myname);
+	}
 	return acl_event_timer_ifkeep(aio->event, callback, context);
 }

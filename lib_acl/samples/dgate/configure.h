@@ -17,6 +17,7 @@ extern char *var_cfg_domain_unknown;
 extern char *var_cfg_dns_name;
 extern char *var_cfg_dns_ip;
 extern char *var_cfg_dns_neighbor_ip;
+extern int   var_cfg_server_port;
 extern int   var_cfg_hijack_unknown;
 extern int   var_cfg_dns_neighbor_port;
 

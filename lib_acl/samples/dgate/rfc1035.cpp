@@ -34,7 +34,7 @@ static int rfc1035HeaderPack(char *buf, size_t sz, rfc1035_message * hdr)
 	unsigned short t;
 
 	if (sz < 12)
-		acl_msg_fatal("%s: sz(%d) < 12", myname, sz);
+		acl_msg_fatal("%s: sz(%d) < 12", myname, (int) sz);
 
 	s = htons(hdr->id);
 	memcpy(buf + off, &s, sizeof(s));
@@ -89,7 +89,7 @@ static int rfc1035LabelPack(char *buf, size_t sz, const char *label)
 	if (len > RFC1035_MAXLABELSZ)
 		len = RFC1035_MAXLABELSZ;
 	if (sz < len + 1)
-		acl_msg_fatal("%s: sz(%d) < len(%d) + 1", myname, sz, len);
+		acl_msg_fatal("%s: sz(%d) < len(%d) + 1", myname, (int) sz, (int) len);
 	*(buf + off) = (char) len;
 	off++;
 	memcpy(buf + off, label, len);
@@ -122,7 +122,7 @@ static int rfc1035NamePack(char *buf, size_t sz, const char *name)
 	acl_myfree(copy);
 	off += rfc1035LabelPack(buf + off, sz - off, NULL);
 	if (off > (int) sz)
-		acl_msg_fatal("%s: off(%d) > sz(%d)", myname, off, sz);
+		acl_msg_fatal("%s: off(%d) > sz(%d)", myname, off, (int) sz);
 	return off;
 }
 
@@ -147,7 +147,7 @@ static int rfc1035QuestionPack(char *buf, size_t sz, const char *name,
 	memcpy(buf + off, &s, sizeof(s));
 	off += sizeof(s);
 	if (off > (int) sz)
-		acl_msg_fatal("%s: off(%d) > sz(%d)", myname, off, sz);
+		acl_msg_fatal("%s: off(%d) > sz(%d)", myname, off, (int) sz);
 
 	return off;
 }
@@ -239,10 +239,10 @@ static int rfc1035NameUnpack(const char *buf, size_t sz, int *off,
 	size_t len;
 
 	if (ns <= 0)
-		acl_msg_fatal("%s: ns(%d) <= 0", myname, ns);
+		acl_msg_fatal("%s: ns(%d) <= 0", myname, (int) ns);
 	do {
 		if (*off >= (int) sz)
-			acl_msg_fatal("%s: *off(%d) >= sz(%d)", myname, *off, sz);
+			acl_msg_fatal("%s: *off(%d) >= sz(%d)", myname, *off, (int) sz);
 		c = *(buf + (*off));
 		if (c > 191) {
 			/* blasted compression */
@@ -290,7 +290,7 @@ static int rfc1035NameUnpack(const char *buf, size_t sz, int *off,
 		*name = '\0';
 	/* make sure we didn't allow someone to overflow the name buffer */
 	if (no > (int) ns)
-		acl_msg_fatal("%s: no(%d) > ns(%d)", myname, no, ns);
+		acl_msg_fatal("%s: no(%d) > ns(%d)", myname, no, (int) ns);
 	return 0;
 }
 
@@ -376,7 +376,7 @@ static int rfc1035RRUnpack(const char *buf, size_t sz, int *off, rfc1035_rr * RR
 	}
 	(*off) += rdlength;
 	if (*off > (int) sz)
-		acl_msg_fatal("%s: *off(%d) > sz(%d)", myname, *off, sz);
+		acl_msg_fatal("%s: *off(%d) > sz(%d)", myname, *off, (int) sz);
 	return 0;
 }
 
@@ -676,7 +676,7 @@ static int rfc1035RRPack(const rfc1035_rr *RR, char *buf, size_t sz)
 	}
 
 	if ((unsigned) off > sz)
-		acl_msg_fatal("%s: off(%d) > sz(%d)", myname, off, sz);
+		acl_msg_fatal("%s: off(%d) > sz(%d)", myname, (int) off, (int) sz);
 
 	return (off);
 }
@@ -781,7 +781,7 @@ ssize_t rfc1035BuildAQuery(const char *hostname, char *buf, size_t sz,
 	}
 
 	if (offset > sz)
-		acl_msg_fatal("%s: offset(%d) > sz(%d)", myname, offset, sz);
+		acl_msg_fatal("%s: offset(%d) > sz(%d)", myname, (int) offset, (int) sz);
 	return (ssize_t) offset;
 }
 
@@ -822,7 +822,7 @@ ssize_t rfc1035BuildPTRQuery(const struct in_addr addr, char *buf,
 		ACL_SAFE_STRNCPY(query->name, rev, sizeof(query->name));
 	}
 	if (offset > sz)
-		acl_msg_fatal("%s: offset(%d) > sz(%d)", myname, offset, sz);
+		acl_msg_fatal("%s: offset(%d) > sz(%d)", myname, (int) offset, (int) sz);
 	return (ssize_t) offset;
 }
 

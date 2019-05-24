@@ -6,7 +6,7 @@
 
 static int __nresult = 0;
 
-static void callback(ACL_DNS_DB *dns_db, void *ctx, int errnum)
+static void dns_lookup_callback(ACL_DNS_DB *dns_db, void *ctx, int errnum)
 {
 	ACL_ITER iter;
 	char *domain = (char*) ctx;
@@ -18,7 +18,7 @@ static void callback(ACL_DNS_DB *dns_db, void *ctx, int errnum)
 		return;
 	}
 
-	printf(">>>lookup result, domain(%s)\n", dns_db->name);
+	printf(">>>%s: lookup result, domain(%s)\n", __FUNCTION__, dns_db->name);
 
 	acl_foreach(iter, dns_db) {
 		const ACL_HOST_INFO *info;
@@ -32,11 +32,12 @@ static void callback(ACL_DNS_DB *dns_db, void *ctx, int errnum)
 
 static void dns_lookup(char *domains, const char *dns_ips, int dns_port)
 {
-	ACL_AIO *aio = acl_aio_create(ACL_EVENT_SELECT);
-	ACL_DNS *dns = acl_dns_create(aio, 5);
-	ACL_ARGV *argv = acl_argv_split(domains, ",:;|");
+	ACL_AIO  *aio     = acl_aio_create(ACL_EVENT_SELECT);
+	int       timeout = 5;
+	ACL_DNS  *dns     = acl_dns_create(aio, timeout);
+	ACL_ARGV *argv    = acl_argv_split(domains, ",:;|");
 	ACL_ARGV *ip_argv = acl_argv_split(dns_ips, ",:;|");
-	ACL_ITER iter;
+	ACL_ITER  iter;
 
 	/* 打开DNS缓存功能 */
 	acl_dns_open_cache(dns, 100);
@@ -44,35 +45,37 @@ static void dns_lookup(char *domains, const char *dns_ips, int dns_port)
 	/* 添加DNS服务器地址 */
 	acl_foreach(iter, ip_argv) {
 		char *ip = (char*) iter.data;
+		printf("add one dns, ip=%s, port=%d\r\n", ip, dns_port);
 		acl_dns_add_dns(dns, ip, dns_port, 24);
 	}
 
 	acl_argv_free(ip_argv);
 
-	/* 校验DNS地址有效性 */
+	/* 设置校验DNS地址有效性标记位 */
 	acl_dns_check_dns_ip(dns);
 
 	/* 查询域名所对应的IP地址 */
 	acl_foreach(iter, argv) {
 		char *domain = (char*) iter.data;
 		printf(">>>call dns lookup for: %s\n", domain);
-		acl_dns_lookup(dns, domain, callback, domain);
+		acl_dns_lookup(dns, domain, dns_lookup_callback, domain);
 	}
 
+	/* 进入事件循环中 */
 	while (__nresult < iter.size) {
 		acl_aio_loop(aio);
 	}
 
 	printf("---------------------------------------------------\n");
-	printf(">>>Dns cache result search\n\n");
+	printf(">>>DNS cache result search\n\n");
 	/* 查询结果清零 */
 	__nresult = 0;
 
 	/* 通过缓存查询域名所对应的IP地址 */
 	acl_foreach(iter, argv) {
 		char *domain = (char*) iter.data;
-		printf(">>>call dns lookup for: %s\n", domain);
-		acl_dns_lookup(dns, domain, callback, domain);
+		printf(">>>call dns lookup from cache for: %s\n", domain);
+		acl_dns_lookup(dns, domain, dns_lookup_callback, domain);
 	}
 
 	while (__nresult < iter.size) {
@@ -124,6 +127,7 @@ int main(int argc, char *argv[])
 		return (0);
 	}
 
+	acl_msg_stdout_enable(1);
 	dns_lookup(domains, dns_ips, dns_port);
 #ifdef ACL_MS_WINDOWS
 	printf("Enter any key to exit\n");

@@ -3,7 +3,7 @@
 #include "configure.h"
 #include "service_main.h"
 
-#define UDP_READ_NONE	1
+#define UDP_READ_NONE	-2
 
 typedef struct UDP_CTX 
 {
@@ -37,7 +37,7 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 		(struct sockaddr*) from_addr, from_addr_len);
 #endif
 
-	return (ret);
+	return ret;
 }
 
 static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
@@ -53,7 +53,7 @@ static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
 		(struct sockaddr*) to_addr, to_addr_len);
 #endif
 
-	return (ret);
+	return ret;
 }
 
 static int request_read_fn(ACL_SOCKET fd, void *buf, size_t size,
@@ -63,15 +63,17 @@ static int request_read_fn(ACL_SOCKET fd, void *buf, size_t size,
 	UDP_CTX *ctx = (UDP_CTX*) arg;
 	int   ret;
 
+	fp->read_ready = 0;
+
 	ctx->client_addr_len = sizeof(ctx->client_addr);
 	ret = udp_read(fd, buf, size, &ctx->client_addr,
 		&ctx->client_addr_len);
 	if (ret < 0) {
-		acl_msg_error("%s(%d): recvfrom error(%s)",
-			myname, __LINE__, acl_last_serror());
-		return (UDP_READ_NONE);
+		acl_msg_error("%s(%d): recvfrom error(%s), ret=%d",
+			myname, __LINE__, acl_last_serror(), ret);
+		return UDP_READ_NONE;
 	}
-	return (ret);
+	return ret;
 }
 
 static int respond_read_fn(ACL_SOCKET fd, void *buf, size_t size,
@@ -81,6 +83,8 @@ static int respond_read_fn(ACL_SOCKET fd, void *buf, size_t size,
 	UDP_CTX *ctx = (UDP_CTX*) arg;
 	struct sockaddr_in server_addr;
 	int   ret, addr_len = sizeof(server_addr);
+
+	fp->read_ready = 0;
 
 	ret = udp_read(fd, buf, size, &server_addr, &addr_len);
 	if (ret < 0) {
@@ -93,9 +97,9 @@ static int respond_read_fn(ACL_SOCKET fd, void *buf, size_t size,
 		acl_inet_ntoa(server_addr.sin_addr, ip, sizeof(ip));
 		acl_msg_warn("%s(%d): invalid addr(%s) from server",
 			myname, __LINE__, ip);
-		return (UDP_READ_NONE);
+		return UDP_READ_NONE;
 	}
-	return (ret);
+	return ret;
 }
 
 static int udp_write_fn(ACL_SOCKET fd acl_unused, const void *buf acl_unused,
@@ -105,7 +109,7 @@ static int udp_write_fn(ACL_SOCKET fd acl_unused, const void *buf acl_unused,
 	const char *myname = "udp_write_fn";
 
 	acl_msg_fatal("%s(%d): not support!", myname, __LINE__);
-	return (-1);
+	return -1;
 }
 
 #if 0
@@ -133,7 +137,7 @@ static ACL_VSTREAM *stream_udp_open(void)
 		acl_msg_fatal("%s(%d): socket create error", myname, __LINE__);
 
 	stream = acl_vstream_fdopen(fd, O_RDWR, 1024, 0, ACL_VSTREAM_TYPE_SOCK);
-	return (stream);
+	return stream;
 }
 
 static ACL_VSTREAM *stream_udp_bind(struct sockaddr_in addr)
@@ -147,7 +151,7 @@ static ACL_VSTREAM *stream_udp_bind(struct sockaddr_in addr)
 	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) != 0)
 		acl_msg_fatal("%s(%d): can't bind", myname, __LINE__);
 
-	return (stream);
+	return stream;
 }
 
 static ACL_ARGV *build_ip_list(DOMAIN_MAP *domain_map)
@@ -168,7 +172,7 @@ static ACL_ARGV *build_ip_list(DOMAIN_MAP *domain_map)
 			i = 0;
 	}
 
-	return (argv);
+	return argv;
 }
 
 static void reply_client_local(ACL_SOCKET fd, DOMAIN_MAP *domain_map,
@@ -272,7 +276,7 @@ static void reply_client(ACL_SOCKET fd, char *buf, int dlen,
 	}
 }
 
-static int read_respond_callback(ACL_ASTREAM *astream, void *context,
+static int read_respond_callback(ACL_ASTREAM *astream acl_unused, void *context,
 	 char *data, int len)
 {
 	const char *myname = "read_respond_callback";
@@ -285,8 +289,7 @@ static int read_respond_callback(ACL_ASTREAM *astream, void *context,
 	char  respond_buf[MAX_BUF];
 
 	if (len == UDP_READ_NONE) {
-		acl_aio_read(astream);
-		return (0);
+		return 0;
 	}
 
 	memcpy(&id, data, 2);
@@ -299,8 +302,7 @@ static int read_respond_callback(ACL_ASTREAM *astream, void *context,
 		create_key(key, sizeof(key), SERVICE_CTX_UDP_REQUEST, id);
 		acl_msg_warn("%s(%d): not found id(%s)",
 			myname, __LINE__, key);
-		acl_aio_read(astream);
-		return (0);
+		return 0;
 	}
 
 	len = len > MAX_BUF ? MAX_BUF : len;
@@ -310,8 +312,7 @@ static int read_respond_callback(ACL_ASTREAM *astream, void *context,
 		len, service_ctx);
 
 	service_ctx_free(service_ctx);
-	acl_aio_read(astream);
-	return (0);
+	return 0;
 }
 
 static const char* get_query_type(int n)
@@ -382,8 +383,7 @@ static int read_request_callback(ACL_ASTREAM *astream, void *context,
 	int  ret;
 
 	if (len == UDP_READ_NONE) {
-		acl_aio_read(astream);
-		return (0);
+		return 0;
 	}
 
 	service_ctx = service_ctx_new(ctx->service, astream,
@@ -422,7 +422,7 @@ static int read_request_callback(ACL_ASTREAM *astream, void *context,
 				ACL_VSTREAM_SOCK(client_stream),
 				domain_map,
 				service_ctx);
-			return (0);
+			return 0;
 		}
 	}
 
@@ -441,8 +441,7 @@ static int read_request_callback(ACL_ASTREAM *astream, void *context,
 		service_ctx->request_buf, service_ctx->request_len,
 		&ctx->remote_addr, sizeof(ctx->remote_addr));
 
-	acl_aio_read(astream);
-	return (0);
+	return 0;
 }
 
 void service_udp_init(SERVICE *service, const char *local_ip,
