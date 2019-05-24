@@ -293,15 +293,14 @@ static int connect_callback(ACL_ASTREAM *astream, void *context)
 	return 0;
 }
 
-static void dns_lookup_callback(ACL_DNS_DB *db, void *context,
-	int errnum acl_unused)
+static void dns_lookup_callback(ACL_DNS_DB *db, void *context, int errnum)
 {
 	RESOLVE_CTX *ctx = (RESOLVE_CTX *) context;
 	ACL_ITER iter;
 	ACL_ASTREAM *astream = NULL;
 
 	if (db == NULL) {
-		acl_set_error(-1);
+		acl_set_error(errnum);
 		ctx->callback(NULL, ctx->context);
 		resolve_ctx_free(ctx);
 		return;
@@ -313,7 +312,7 @@ static void dns_lookup_callback(ACL_DNS_DB *db, void *context,
 	}
 
 	if (acl_argv_size(ctx->ip_list) <= 0) {
-		acl_set_error(-2);
+		acl_set_error(errnum);
 		ctx->callback(NULL, ctx->context);
 		resolve_ctx_free(ctx);
 		return;

@@ -74,8 +74,10 @@ static int on_connect(ACL_ASTREAM *astream, void *ctx)
 	const char data[] = "hello world!\r\n";
 
 	if (astream == NULL) {
+		int err = acl_last_error();
 		printf("connect %s failed, errno=%d, %s\r\n",
-			server_addr, acl_last_error(), acl_last_serror());
+			server_addr, acl_last_error(),
+			err < 0 ? acl_dns_serror(err) : acl_last_serror());
 		__nclosed++;
 		return -1;
 	}
