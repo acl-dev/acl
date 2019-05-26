@@ -302,9 +302,9 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 
 /* 数据流出错时的回调函数 */
 
-static int dns_lookup_error(ACL_ASTREAM *server acl_unused, void *ctx acl_unused)
+static int dns_lookup_close(ACL_ASTREAM *server acl_unused, void *ctx acl_unused)
 {
-	const char *myname = "dns_lookup_error";
+	const char *myname = "dns_lookup_close";
 #if 0
 	ACL_DNS *dns = (ACL_DNS*) ctx;
 
@@ -317,7 +317,7 @@ static int dns_lookup_error(ACL_ASTREAM *server acl_unused, void *ctx acl_unused
 	/* 异步读DNS服务器响应数据 */
 	acl_aio_read(dns->astream);
 #else
-	acl_msg_warn("%s(%d): dns_lookup error %s",
+	acl_msg_info("%s(%d): dns_lookup stream closed(%s)",
 		myname, __LINE__, acl_last_serror());
 #endif
 	return -1;
@@ -340,7 +340,7 @@ static void dns_stream_open(ACL_DNS *dns)
 
 	/* 设置查询套接口可读、关闭时的回调函数 */
 	acl_aio_add_read_hook(dns->astream, dns_lookup_callback, dns);
-	acl_aio_add_close_hook(dns->astream, dns_lookup_error, dns);
+	acl_aio_add_close_hook(dns->astream, dns_lookup_close, dns);
 
 	/* 设置该异步流为持续读状态 */
 	dns->astream->keep_read = 1;
@@ -419,10 +419,10 @@ void acl_dns_init(ACL_DNS *dns, ACL_AIO *aio, int timeout)
 	dns->retry_limit = 0;
 
 	/* 创建DNS服务器地址数组 */
-	dns->dns_list = acl_array_create(10);
+	dns->dns_list       = acl_array_create(10);
 
 	/* 创建查询对象表 */
-	dns->lookup_table = acl_htable_create(1024, 0);
+	dns->lookup_table   = acl_htable_create(1024, 0);
 
 	/* 设置 DNS 查询超时的回调函数*/
 	dns->lookup_timeout = dns_lookup_timeout;
@@ -564,7 +564,7 @@ void acl_dns_add_host(ACL_DNS *dns, const char *domain, const char *ip_list)
 		ACL_HOSTNAME *phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
 
 		SAFE_COPY(phost->ip, ip, sizeof(phost->ip));
-		phost->saddr.sa.sa_family = AF_INET;
+		phost->saddr.sa.sa_family       = AF_INET;
 		phost->saddr.in.sin_addr.s_addr = inet_addr(ip);
 		(void) acl_array_append(dns_db->h_db, phost);
 	}
@@ -630,9 +630,9 @@ ACL_DNS_REQ *acl_dns_lookup(ACL_DNS *dns, const char *domain_in,
 	/* 先检查是否匹配域名组 */
 	if (dns->groups) {
 		ACL_DOMAIN_GROUP *dmgrp = NULL;
-		ACL_ITER  iter;
+		ACL_ITER iter;
 		acl_foreach(iter, dns->groups) {
-			ACL_ITER  iter2;
+			ACL_ITER iter2;
 			ACL_DOMAIN_GROUP *tmp = (ACL_DOMAIN_GROUP*) iter.data;
 
 #define NEQ acl_strrncasecmp

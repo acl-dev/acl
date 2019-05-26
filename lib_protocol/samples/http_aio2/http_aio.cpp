@@ -10,6 +10,7 @@ typedef struct {
 	HTTP_RES     *http_res;
 } CTX;
 
+static char __server_addr[128];
 static bool __stop = false;
 
 static int on_close(ACL_ASTREAM *stream acl_unused, void *context)
@@ -46,12 +47,15 @@ static int read_respond_body_ready(int status, char *data, int dlen,
 static int on_http_hdr(int status, void *arg)
 {
 	CTX *ctx = (CTX*) arg;
-	//ACL_ASTREAM *stream = ctx->stream;
 
 	printf("%s: status=%d\r\n", __FUNCTION__, status);
 
 	http_hdr_print(&ctx->hdr_res->hdr, "---respond---");
+
+	// 构建 HTTP 响应体
 	ctx->http_res = http_res_new(ctx->hdr_res);
+
+	// 异步读取 HTTP 服务端的响应体
 	http_res_body_get_async(ctx->http_res, ctx->stream,
 		read_respond_body_ready, ctx, 0);
 
@@ -72,10 +76,12 @@ static int on_connect(ACL_ASTREAM *stream, void *context)
 
 	printf(">>>> connect %s ok!\r\n", addr);
 
-	const char *request = "GET / HTTP/1.1\r\n"
-		"HOST: www.baidu.com\r\n"
+	char request[1024];
+	snprintf(request, sizeof(request),
+		"GET / HTTP/1.1\r\n"
+		"HOST: %s\r\n"
 		"Connection: close\r\n"
-		"\r\n";
+		"\r\n", __server_addr);
 
 	CTX *ctx = (CTX*) acl_mycalloc(1, sizeof(CTX));
 	ctx->stream = stream;
@@ -89,8 +95,10 @@ static int on_connect(ACL_ASTREAM *stream, void *context)
 	// 发送 HTTP 请求
 	acl_aio_writen(stream, request, (int) strlen(request));
 
-	// 创建 HTTP 响应对象，并异步读取服务端的响应内容
+	// 创建 HTTP 响应对象
 	ctx->hdr_res = http_hdr_res_new();
+
+	// 异步读取服务端响应的 HTTP 头
 	http_hdr_res_get_async(ctx->hdr_res, stream, on_http_hdr, ctx, 0);
 
 	return 0;
@@ -109,12 +117,12 @@ static void usage(const char *procname)
 int main(int argc, char* argv[])
 {
 	ACL_AIO *aio = acl_aio_create(ACL_EVENT_SELECT);
-	char addr[128], name_server[128];
+	char name_server[128];
 	int ch, connect_timeout = 5, dns_timeout = 1;
 
 	acl_aio_set_keep_read(aio, 1);
 
-	snprintf(addr, sizeof(addr), "www.baidu.com:80");
+	snprintf(__server_addr, sizeof(__server_addr), "www.baidu.com:80");
 	snprintf(name_server, sizeof(name_server), "8.8.8.8:53");
 
 	while ((ch = getopt(argc, argv, "hs:N:t:T:")) > 0) {
@@ -123,7 +131,7 @@ int main(int argc, char* argv[])
 			usage(argv[0]);
 			return 0;
 		case 's':
-			snprintf(addr, sizeof(addr), "%s", optarg);
+			snprintf(__server_addr, sizeof(__server_addr), "%s", optarg);
 			break;
 		case 'N':
 			snprintf(name_server, sizeof(name_server), "%s", optarg);
@@ -144,10 +152,10 @@ int main(int argc, char* argv[])
 	acl_aio_set_dns(aio, name_server, dns_timeout);
 
 	// 异步连接指定 WEB 服务器
-	if (acl_aio_connect_addr(aio, addr, connect_timeout,
-		on_connect, addr) == -1) {
+	if (acl_aio_connect_addr(aio, __server_addr, connect_timeout,
+		on_connect, __server_addr) == -1) {
 
-		printf("connect %s error\r\n", addr);
+		printf("connect %s error\r\n", __server_addr);
 		return 1;
 	}
 

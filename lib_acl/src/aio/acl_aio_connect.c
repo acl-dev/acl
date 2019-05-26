@@ -42,11 +42,11 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 static void ConnectTimer(int event_type acl_unused,
 	ACL_EVENT *event acl_unused, void *ctx)
 {
-	ACL_ASTREAM *astream = (ACL_ASTREAM*) ctx;
+	ACL_ASTREAM *conn = (ACL_ASTREAM*) ctx;
 
-	if (astream->aio->event_mode != ACL_EVENT_WMSG) {
+	if (conn->aio->event_mode != ACL_EVENT_WMSG) {
 		acl_msg_fatal("event_mode(%d) != ACL_EVENT_WMSG(%d)",
-			astream->aio->event_mode, ACL_EVENT_WMSG);
+			conn->aio->event_mode, ACL_EVENT_WMSG);
 	}
 	__connect_notify_callback(ACL_EVENT_RW_TIMEOUT, NULL, NULL, ctx);
 }
@@ -56,43 +56,43 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 	ACL_VSTREAM *stream acl_unused, void *context)
 {
 	const char *myname = "__connect_notify_callback";
-	ACL_ASTREAM *astream = (ACL_ASTREAM *) context;
+	ACL_ASTREAM *conn = (ACL_ASTREAM *) context;
 	int   ret, err;
 	socklen_t errlen;
 
-	WRITE_SAFE_DIABLE(astream);
+	WRITE_SAFE_DIABLE(conn);
 
 	/* 先判断是否是超时导致返回 */
 	if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
-		if (aio_timeout_callback(astream) < 0) {
-			acl_aio_iocp_close(astream);
-		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
+		if (aio_timeout_callback(conn) < 0) {
+			acl_aio_iocp_close(conn);
+		} else if (conn->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 			/* 该流正处于IO延迟关闭状态，因为本次写IO已经成功完成，
 			 * 所以需要完成流的IO延迟关闭过程
 			 */
-			acl_aio_iocp_close(astream);
+			acl_aio_iocp_close(conn);
 		} else {
-			acl_event_enable_write(event, astream->stream,
-				astream->timeout, __connect_notify_callback,
-				astream);
+			acl_event_enable_write(event, conn->stream,
+				conn->timeout, __connect_notify_callback,
+				conn);
 		}
 		return;
 	}
 
 #ifdef ACL_WINDOWS
 	/* 如果是基于 win32 窗口消息的事件引擎则需要取消之前设置的超时定时器 */
-	if (astream->aio->event_mode == ACL_EVENT_WMSG) {
-		acl_aio_cancel_timer(astream->aio, ConnectTimer, astream);
+	if (conn->aio->event_mode == ACL_EVENT_WMSG) {
+		acl_aio_cancel_timer(conn->aio, ConnectTimer, conn);
 	}
 #endif
 
 	if ((event_type & ACL_EVENT_XCPT) != 0) {
-		acl_aio_iocp_close(astream);
+		acl_aio_iocp_close(conn);
 		return;
 	}
 
 	errlen = sizeof(err);
-	ret = getsockopt(ACL_VSTREAM_SOCK(acl_aio_vstream(astream)),
+	ret = getsockopt(ACL_VSTREAM_SOCK(acl_aio_vstream(conn)),
 			SOL_SOCKET, SO_ERROR, (char *) &err, &errlen);
 	if (ret >= 0) {
 		acl_set_error(err);
@@ -117,8 +117,8 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 	}
 
 	if ((event_type & ACL_EVENT_XCPT) != 0) {
-		astream->flag |= ACL_AIO_FLAG_DEAD;
-		acl_aio_iocp_close(astream);
+		conn->flag |= ACL_AIO_FLAG_DEAD;
+		acl_aio_iocp_close(conn);
 		return;
 	}
 
@@ -129,9 +129,9 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 	/* 将引用计数加1以防止在 connect_fn 内部调用了关闭过程，connect_fn
 	 * 可通过返回-1，在回调返回后真正关闭
 	 */
-	astream->nrefer++;
+	conn->nrefer++;
 
-	if (astream->connect_handles) {
+	if (conn->connect_handles) {
 		ACL_ITER iter;
 		ACL_FIFO connect_handles;
 
@@ -140,7 +140,7 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 		 */
 
 		acl_fifo_init(&connect_handles);
-		acl_foreach_reverse(iter, astream->connect_handles) {
+		acl_foreach_reverse(iter, conn->connect_handles) {
 			AIO_CONNECT_HOOK *handle = (AIO_CONNECT_HOOK*) iter.data;
 			if (handle->disable) {
 				continue;
@@ -153,35 +153,35 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 			if (handle == NULL) {
 				break;
 			}
-			ret = handle->callback(astream, handle->ctx);
+			ret = handle->callback(conn, handle->ctx);
 			if (ret == 0) {
 				continue;
 			}
 
-			astream->nrefer--;
-			if (ret < 0 || astream->flag  & ACL_AIO_FLAG_IOCP_CLOSE) {
-				acl_aio_iocp_close(astream);
+			conn->nrefer--;
+			if (ret < 0 || conn->flag  & ACL_AIO_FLAG_IOCP_CLOSE) {
+				acl_aio_iocp_close(conn);
 			}
 			return;
 		}
 	}
 
-	astream->nrefer--;
+	conn->nrefer--;
 
 	if (ret < 0) {
-		acl_aio_iocp_close(astream);
-	} else if ((astream->flag  & ACL_AIO_FLAG_IOCP_CLOSE)) {
+		acl_aio_iocp_close(conn);
+	} else if ((conn->flag  & ACL_AIO_FLAG_IOCP_CLOSE)) {
 		/* 之前该流已经被设置了IO完成延迟关闭标志位，
 		 * 则再次启动IO完成延迟关闭过程
 		 */
-		acl_aio_iocp_close(astream);
+		acl_aio_iocp_close(conn);
 	}
 }
 
 ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout)
 {
 	const char *myname = "acl_aio_connect";
-	ACL_ASTREAM *astream;
+	ACL_ASTREAM *conn;
 	ACL_VSTREAM *cstream;
 
 	if (aio == NULL || addr == NULL || *addr == 0) {
@@ -213,33 +213,35 @@ ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout)
 
 	cstream->flag |= ACL_VSTREAM_FLAG_CONNECTING;
 
-	astream = acl_aio_open(aio, cstream);
-	if (astream == NULL) {
-		acl_msg_fatal("%s: open astream error", myname);
+	conn = acl_aio_open(aio, cstream);
+	if (conn == NULL) {
+		acl_msg_fatal("%s: open connection error", myname);
 	}
 
 #ifdef ACL_WINDOWS
 	if (timeout > 0 && aio->event_mode == ACL_EVENT_WMSG) {
-		acl_aio_request_timer(aio, ConnectTimer, astream,
+		acl_aio_request_timer(aio, ConnectTimer, conn,
 			timeout * 1000000, 0);
 	}
 #endif
-	astream->error = acl_last_error();
-	acl_aio_ctl(astream, ACL_AIO_CTL_TIMEOUT, timeout, ACL_AIO_CTL_END);
+	conn->error = acl_last_error();
+	acl_aio_ctl(conn, ACL_AIO_CTL_TIMEOUT, timeout, ACL_AIO_CTL_END);
 
-	WRITE_SAFE_ENABLE(astream, __connect_notify_callback);
-	return astream;
+	WRITE_SAFE_ENABLE(conn, __connect_notify_callback);
+	return conn;
 }
 
 /*--------------------------------------------------------------------------*/
 
 typedef struct {
 	ACL_AIO *aio;
+	ACL_ASTREAM *conn;
 	ACL_AIO_CONNECT_FN callback;
 	void *context;
 	int   port;
 	int   timeout;
 	ACL_ARGV *ip_list;
+	int   ip_next;
 } RESOLVE_CTX;
 
 static void resolve_ctx_free(RESOLVE_CTX *ctx)
@@ -248,16 +250,22 @@ static void resolve_ctx_free(RESOLVE_CTX *ctx)
 	acl_myfree(ctx);
 }
 
-static int connect_callback(ACL_ASTREAM *astream, void *context);
-static int connect_timeout(ACL_ASTREAM *astream acl_unused, void *context);
+static int connect_callback(ACL_ASTREAM *conn, void *context);
+static int connect_timeout(ACL_ASTREAM *conn, void *context);
+static ACL_ASTREAM *try_connect_one(RESOLVE_CTX *ctx);
 
-static int connect_failed(ACL_ASTREAM *astream acl_unused, void *context)
+static int connect_failed(ACL_ASTREAM *conn acl_unused, void *context)
 {
 	RESOLVE_CTX *ctx = (RESOLVE_CTX *) context;
 
-	acl_aio_del_connect_hook(astream, connect_callback, context);
-	acl_aio_del_timeo_hook(astream, connect_timeout, context);
-	acl_aio_del_close_hook(astream, connect_failed, context);
+	/* 因为在 connect_callback 和 connect_timeout 清除了关闭回调，所以当 
+	 * 本函数被调用时，一定是连接失败所导致的，而不是由连接超时所致。
+	 */
+
+	/* 如果 DNS 解析出多个 IP 地址，则尝试连接下一个 IP 地址 */
+	if (try_connect_one(ctx) != NULL) {
+		return -1;
+	}
 
 	acl_set_error(ACL_ECONNREFUSED);
 	ctx->callback(NULL, ctx->context);
@@ -265,13 +273,20 @@ static int connect_failed(ACL_ASTREAM *astream acl_unused, void *context)
 	return -1;
 }
 
-static int connect_timeout(ACL_ASTREAM *astream acl_unused, void *context)
+static int connect_timeout(ACL_ASTREAM *conn, void *context)
 {
 	RESOLVE_CTX *ctx = (RESOLVE_CTX *) context;
 
-	acl_aio_del_connect_hook(astream, connect_callback, context);
-	acl_aio_del_timeo_hook(astream, connect_timeout, context);
-	acl_aio_del_close_hook(astream, connect_failed, context);
+	 /* 按 acl aio 的设计，当超时回调函数被调用且返回 -1 时，则所注册的
+	  * 关闭回调接着会被调用，通过在此处清除域名解析后异步连接所注册的关
+	  * 闭回调，从而禁止 connect_failed 再被调用。
+	 */
+	acl_aio_del_close_hook(conn, connect_failed, context);
+
+	/* 如果 DNS 解析出多个 IP 地址，则尝试连接下一个 IP 地址 */
+	if (try_connect_one(ctx) != NULL) {
+		return -1;
+	}
 
 	acl_set_error(ACL_ETIMEDOUT);
 	ctx->callback(NULL, ctx->context);
@@ -279,25 +294,51 @@ static int connect_timeout(ACL_ASTREAM *astream acl_unused, void *context)
 	return -1;
 }
 
-static int connect_callback(ACL_ASTREAM *astream, void *context)
+static int connect_callback(ACL_ASTREAM *conn, void *context)
 {
 	RESOLVE_CTX *ctx = (RESOLVE_CTX *) context;
 
-	acl_aio_del_connect_hook(astream, connect_callback, context);
-	acl_aio_del_timeo_hook(astream, connect_timeout, context);
-	acl_aio_del_close_hook(astream, connect_failed, context);
+	/* 清除在域名解析后进行连接时注册的回调函数，这样当 IO 超时或关闭时
+	 * 只回调应用注册的回调函数
+	 */
+	acl_aio_del_connect_hook(conn, connect_callback, context);
+	acl_aio_del_timeo_hook(conn, connect_timeout, context);
+	acl_aio_del_close_hook(conn, connect_failed, context);
 
 	acl_set_error(0);
-	ctx->callback(astream, ctx->context);
+	ctx->callback(conn, ctx->context);
 	resolve_ctx_free(ctx);
 	return 0;
 }
 
+static ACL_ASTREAM *try_connect_one(RESOLVE_CTX *ctx)
+{
+	int n = acl_argv_size(ctx->ip_list);
+
+	for (; ctx->ip_next < n; ctx->ip_next++) {
+		char  addr[128];
+		const char *ip = acl_argv_index(ctx->ip_list,  ctx->ip_next);
+		acl_assert(ip && *ip);
+
+		snprintf(addr, sizeof(addr), "%s|%d", ip, ctx->port);
+		ctx->conn = acl_aio_connect(ctx->aio, addr, ctx->timeout);
+		if (ctx->conn == NULL) {
+			continue;
+		}
+
+		acl_aio_add_connect_hook(ctx->conn, connect_callback, ctx);
+		acl_aio_add_timeo_hook(ctx->conn, connect_timeout, ctx);
+		acl_aio_add_close_hook(ctx->conn, connect_failed, ctx);
+		return ctx->conn;
+	}
+
+	return NULL;
+}
+
 static void dns_lookup_callback(ACL_DNS_DB *db, void *context, int errnum)
 {
-	RESOLVE_CTX *ctx = (RESOLVE_CTX *) context;
-	ACL_ITER iter;
-	ACL_ASTREAM *astream = NULL;
+	RESOLVE_CTX *ctx  = (RESOLVE_CTX *) context;
+	ACL_ITER     iter;
 
 	if (db == NULL) {
 		acl_set_error(errnum);
@@ -318,22 +359,7 @@ static void dns_lookup_callback(ACL_DNS_DB *db, void *context, int errnum)
 		return;
 	}
 
-	acl_foreach(iter, ctx->ip_list) {
-		char addr[128];
-		const char *ip = (const char *) iter.data;
-
-		snprintf(addr, sizeof(addr), "%s|%d", ip, ctx->port);
-		astream = acl_aio_connect(ctx->aio, addr, ctx->timeout);
-		if (astream != NULL) {
-			break;
-		}
-	}
-
-	if (astream != NULL) {
-		acl_aio_add_connect_hook(astream, connect_callback, ctx);
-		acl_aio_add_timeo_hook(astream, connect_timeout, ctx);
-		acl_aio_add_close_hook(astream, connect_failed, ctx);
-	} else {
+	if (try_connect_one(ctx) == NULL) {
 		acl_set_error(ACL_ECONNREFUSED);
 		ctx->callback(NULL, ctx->context);
 		resolve_ctx_free(ctx);
@@ -380,16 +406,16 @@ int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
 	ctx->ip_list  = acl_argv_alloc(5);
 
 	if (acl_is_ip(buf) || acl_valid_unix(buf)) {
-		ACL_ASTREAM *astream = acl_aio_connect(aio, addr, timeout);
+		ACL_ASTREAM *conn = acl_aio_connect(aio, addr, timeout);
 
-		if (astream == NULL) {
+		if (conn == NULL) {
 			resolve_ctx_free(ctx);
 			return -1;
 		}
 
-		acl_aio_add_connect_hook(astream, connect_callback, ctx);
-		acl_aio_add_timeo_hook(astream, connect_timeout, ctx);
-		acl_aio_add_close_hook(astream, connect_failed, ctx);
+		acl_aio_add_connect_hook(conn, connect_callback, ctx);
+		acl_aio_add_timeo_hook(conn, connect_timeout, ctx);
+		acl_aio_add_close_hook(conn, connect_failed, ctx);
 	} else {
 		acl_dns_lookup(aio->dns, buf, dns_lookup_callback, ctx);
 	}
