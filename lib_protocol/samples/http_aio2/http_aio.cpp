@@ -6,6 +6,7 @@
 
 typedef struct {
 	ACL_ASTREAM  *stream;
+	HTTP_HDR_REQ *hdr_req;
 	HTTP_HDR_RES *hdr_res;
 	HTTP_RES     *http_res;
 } CTX;
@@ -17,6 +18,7 @@ static int on_close(ACL_ASTREAM *stream acl_unused, void *context)
 {
 	CTX *ctx = (CTX *) context;
 
+	http_hdr_req_free(ctx->hdr_req);
 	http_res_free(ctx->http_res);
 	acl_myfree(ctx);
 
@@ -76,24 +78,32 @@ static int on_connect(ACL_ASTREAM *stream, void *context)
 
 	printf(">>>> connect %s ok!\r\n", addr);
 
-	char request[1024];
-	snprintf(request, sizeof(request),
-		"GET / HTTP/1.1\r\n"
-		"HOST: %s\r\n"
-		"Connection: close\r\n"
-		"\r\n", __server_addr);
-
 	CTX *ctx = (CTX*) acl_mycalloc(1, sizeof(CTX));
 	ctx->stream = stream;
 
-	// 设置读超时、关闭回调函数
+	// 构建 HTTP 请求头
+	ctx->hdr_req = http_hdr_req_create("/", "GET", "HTTP/1.1");
+	// 设置短连接模式
+	http_hdr_entry_replace(&ctx->hdr_req->hdr, "Connection", "Close", 1);
+	// 设置内容类型
+	http_hdr_put_str(&ctx->hdr_req->hdr, "Content-Type", "text/plain");
+	// 设置主机字段
+	http_hdr_put_str(&ctx->hdr_req->hdr, "Host", __server_addr);
+
+	// 设置读超时回调函数
 	acl_aio_add_timeo_hook(stream, on_timeout, ctx);
+	// 设置关闭回调函数
 	acl_aio_add_close_hook(stream, on_close, ctx);
 
-	printf("%s(%d)\n", __FUNCTION__, __LINE__);
+	// 创建动态内存并将 HTTP 请求头拷贝至其中
+	ACL_VSTRING *buf = acl_vstring_alloc(1024);
+	http_hdr_build_request(ctx->hdr_req, buf);
 
 	// 发送 HTTP 请求
-	acl_aio_writen(stream, request, (int) strlen(request));
+	acl_aio_writen(stream, acl_vstring_str(buf), ACL_VSTRING_LEN(buf));
+
+	// 释放动态内存
+	acl_vstring_free(buf);
 
 	// 创建 HTTP 响应对象
 	ctx->hdr_res = http_hdr_res_new();

@@ -315,9 +315,9 @@ static ACL_ASTREAM *try_connect_one(RESOLVE_CTX *ctx)
 {
 	int n = acl_argv_size(ctx->ip_list);
 
-	for (; ctx->ip_next < n; ctx->ip_next++) {
+	while (ctx->ip_next < n) {
 		char  addr[128];
-		const char *ip = acl_argv_index(ctx->ip_list,  ctx->ip_next);
+		const char *ip = acl_argv_index(ctx->ip_list,  ctx->ip_next++);
 		acl_assert(ip && *ip);
 
 		snprintf(addr, sizeof(addr), "%s|%d", ip, ctx->port);

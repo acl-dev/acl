@@ -20,60 +20,60 @@ static double stamp_sub(const struct timeval* from, const struct timeval* sub)
 	return res.tv_sec * 1000.0 + res.tv_usec / 1000.0;
 }
 
-static int  __nconnect = 100;
-static int  __nclosed  = 0;
-static int  __timeout  = 120;
+static int  __nconnect   = 100;
+static int  __nclosed    = 0;
+static int  __timeout    = 120;
 static long long __nloop = 1000;
 static long long __count = 0;
 
 // 当连接句柄关闭时的回调函数
 
-static int on_close(ACL_ASTREAM *astream, void *ctx)
+static int on_close(ACL_ASTREAM *conn, void *ctx)
 {
 	const char *server_addr = (const char*) ctx;
 
 	printf("fd=%d, disconnected from %s\r\n",
-		ACL_VSTREAM_SOCK(astream->stream), server_addr);
+		ACL_VSTREAM_SOCK(conn->stream), server_addr);
 	__nclosed++;
 	return 0;
 }
 
 // 当写成功时的回调函数
 
-static int on_write(ACL_ASTREAM *astream acl_unused, void *ctx acl_unused)
+static int on_write(ACL_ASTREAM *conn acl_unused, void *ctx acl_unused)
 {
 	return 0;
 }
 
 // 当读到服务端的数据时的回调函数
 
-static int on_read(ACL_ASTREAM *astream, void *ctx acl_unused,
+static int on_read(ACL_ASTREAM *conn, void *ctx acl_unused,
 		char *data, int dlen)
 {
 	if (__count % 50000 == 0) {
 		char buf[128];
 		snprintf(buf, sizeof(buf), "fd=%d, count=%lld",
-			ACL_VSTREAM_SOCK(astream->stream), __count);
+			ACL_VSTREAM_SOCK(conn->stream), __count);
 		acl_meter_time(__FUNCTION__, __LINE__, buf);
 	}
 
 	if (++__count < __nloop) {
-		acl_aio_writen(astream, data, dlen);
+		acl_aio_writen(conn, data, dlen);
 		return 0;
 	}
 
-	printf("begin close fd %d\r\n", ACL_VSTREAM_SOCK(astream->stream));
+	printf("begin close fd %d\r\n", ACL_VSTREAM_SOCK(conn->stream));
 	return -1;
 }
 
 // 连接成功或失败时的回调函数
 
-static int on_connect(ACL_ASTREAM *astream, void *ctx)
+static int on_connect(ACL_ASTREAM *conn, void *ctx)
 {
 	const char *server_addr = (const char *) ctx;
 	const char data[] = "hello world!\r\n";
 
-	if (astream == NULL) {
+	if (conn == NULL) {
 		int err = acl_last_error();
 		printf("connect %s failed, errno=%d, %s\r\n",
 			server_addr, acl_last_error(),
@@ -85,19 +85,19 @@ static int on_connect(ACL_ASTREAM *astream, void *ctx)
 	printf("connect %s ok\r\n", server_addr);
 
 	// 添加读成功时的回调函数
-	acl_aio_add_read_hook(astream, on_read, ctx);
+	acl_aio_add_read_hook(conn, on_read, ctx);
 
 	// 添加写成功时的回调函数
-	acl_aio_add_write_hook(astream, on_write, ctx);
+	acl_aio_add_write_hook(conn, on_write, ctx);
 
 	// 添加连接句柄关闭时的回调函数
-	acl_aio_add_close_hook(astream, on_close, ctx);
+	acl_aio_add_close_hook(conn, on_close, ctx);
 
 	// 注册读事件过程
-	acl_aio_read(astream);
+	acl_aio_read(conn);
 
 	// 往服务器写数据，从而开始触发服务器的回显示过程
-	acl_aio_writen(astream, data, sizeof(data) - 1);
+	acl_aio_writen(conn, data, sizeof(data) - 1);
 
 	// 返回 0 表示继续
 	return 0;
@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
 	// 设置域名服务器地址
 	acl_aio_set_dns(aio, dns_addr, 5);
 
-	// 连接回显服务器地址
+	// 连接回显服务器地址，并注册连接回调函数
 	for (i = 0; i < __nconnect; i++) {
 		acl_aio_connect_addr(aio, svr_addr, __timeout, on_connect, svr_addr);
 	}
@@ -185,8 +185,8 @@ int main(int argc, char *argv[])
 	speed = (__count * 1000) / (spent > 0 ? spent : 1);
 
 	printf("\r\n");
-	printf("total=%lld, %lld, spent %.2f ms, speed %.2f\r\n",
-		__nloop, __count, spent, speed);
+	printf("total=%lld, cocurrent=%d, loop=%lld, spent %.2f ms, speed %.2f\r\n",
+		__count, __nconnect, __nloop, spent, speed);
 
 	return 0;
 }
