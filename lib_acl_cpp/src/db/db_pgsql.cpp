@@ -36,6 +36,7 @@ typedef int   (*PQnfields_fn)(const PGresult *res);
 typedef char *(*PQfname_fn)(const PGresult *res, int field_num);
 typedef int   (*PQntuples_fn)(const PGresult *res);
 typedef char *(*PQgetvalue_fn)(const PGresult *res, int tup_num, int field_num);
+typedef int   (*PQgetlength_fn)(const PGresult *res, int tup_num, int field_num);
 typedef char *(*PQcmdTuples_fn)(PGresult *res);
 
 static PQconnectdb_fn __dbconnect = NULL;
@@ -49,6 +50,7 @@ static PQnfields_fn __dbnfields = NULL;
 static PQfname_fn __dbfname = NULL;
 static PQntuples_fn __dbntuples = NULL;
 static PQgetvalue_fn __dbget_value = NULL;
+static PQgetlength_fn __dbget_length = NULL;
 static PQcmdTuples_fn __dbcmd_tuples = NULL;
 
 static acl_pthread_once_t __pgsql_once = ACL_PTHREAD_ONCE_INIT;
@@ -152,6 +154,11 @@ static void __pgsql_dll_load(void)
 		logger_fatal("load PQgetvalue from %s error %s",
 			path, acl_dlerror());
 
+	__dbget_length = (PQgetlength_fn) acl_dlsym(__pgsql_dll, "PQgetlength");
+	if (__dbget_length == NULL)
+		logger_fatal("load PQgetlength from %s error %s",
+			path, acl_dlerror());
+
 	__dbcmd_tuples = (PQcmdTuples_fn) acl_dlsym(__pgsql_dll, "PQcmdTuples");
 	if (__dbcmd_tuples == NULL)
 		logger_fatal("load PQcmdTuples from %s error %s",
@@ -173,6 +180,7 @@ static void __pgsql_dll_load(void)
 #  define __dbfname PQfname
 #  define __dbntuples PQntuples
 #  define __dbget_value PQgetvalue
+#  define __dbget_length PQgetlength
 #  define __dbcmd_tuples PQcmdTuples
 # endif
 
@@ -209,7 +217,11 @@ static void pgsql_rows_save(PGresult* res, db_rows& result)
 	{
 		db_row* row = NEW db_row(result.names_);
 		for (int j = 0; j < ncolumn; j++)
-			row->push_back(__dbget_value(res, i, j));
+		{
+			char* value = __dbget_value(res, i, j);
+			int len = __dbget_length(res, i, j);
+			row->push_back(value, (size_t) len);
+		}
 		result.rows_.push_back(row);
 	}
 

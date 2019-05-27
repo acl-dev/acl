@@ -50,19 +50,19 @@ void sqlite_cursor::add_column_value(long long n)
 {
 	char* buf = (char*) dbuf_->dbuf_alloc(INT4_STR_SIZE + 1);
 	safe_snprintf(buf, INT4_STR_SIZE + 1, "%lld", n);
-	row_->push_back(buf);
+	row_->push_back(buf, strlen(buf));
 }
 
 void sqlite_cursor::add_column_value(double n)
 {
 	char* buf = (char*) dbuf_->dbuf_alloc(INT4_STR_SIZE + 1);
 	safe_snprintf(buf, INT4_STR_SIZE + 1, "%.4f", n);
-	row_->push_back(buf);
+	row_->push_back(buf, strlen(buf));
 }
 
 void sqlite_cursor::add_column_value(const char* s)
 {
-	row_->push_back(s);
+	row_->push_back(s, strlen(s));
 }
 
 } // namespace acl

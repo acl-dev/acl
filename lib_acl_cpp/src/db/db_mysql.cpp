@@ -41,6 +41,7 @@ typedef const char* (STDCALL *mysql_error_fn)(MYSQL*);
 typedef int (STDCALL *mysql_query_fn)(MYSQL*, const char*);
 typedef unsigned int (STDCALL *mysql_num_fields_fn)(MYSQL_RES*);
 typedef MYSQL_FIELD* (STDCALL *mysql_fetch_fields_fn)(MYSQL_RES*);
+typedef unsigned long* (STDCALL *mysql_fetch_lengths_fn)(MYSQL_RES*);
 typedef MYSQL_ROW (STDCALL *mysql_fetch_row_fn)(MYSQL_RES*);
 typedef MYSQL_RES* (STDCALL *mysql_store_result_fn)(MYSQL*);
 typedef my_ulonglong (STDCALL *mysql_num_rows_fn)(MYSQL_RES*);
@@ -65,6 +66,7 @@ static mysql_error_fn __mysql_error = NULL;
 static mysql_query_fn __mysql_query = NULL;
 static mysql_num_fields_fn __mysql_num_fields = NULL;
 static mysql_fetch_fields_fn __mysql_fetch_fields = NULL;
+static mysql_fetch_lengths_fn __mysql_fetch_lengths = NULL;
 static mysql_fetch_row_fn __mysql_fetch_row = NULL;
 static mysql_store_result_fn __mysql_store_result = NULL;
 static mysql_num_rows_fn __mysql_num_rows = NULL;
@@ -207,6 +209,12 @@ static void __mysql_dll_load(void)
 		logger_fatal("load mysql_fetch_fields from %s error: %s",
 			path, acl_dlerror());
 
+	__mysql_fetch_lengths = (mysql_fetch_lengths_fn)
+		acl_dlsym(__mysql_dll, "mysql_fetch_lengths");
+	if (__mysql_fetch_lengths == NULL)
+		logger_fatal("load mysql_fetch_lengths from %s error: %s",
+			path, acl_dlerror());
+
 	__mysql_fetch_row = (mysql_fetch_row_fn)
 		acl_dlsym(__mysql_dll, "mysql_fetch_row");
 	if (__mysql_fetch_row == NULL)
@@ -291,6 +299,7 @@ static void __mysql_dll_load(void)
 #  define  __mysql_query mysql_query
 #  define  __mysql_num_fields mysql_num_fields
 #  define  __mysql_fetch_fields mysql_fetch_fields
+#  define  __mysql_fetch_lengths mysql_fetch_lengths
 #  define  __mysql_fetch_row mysql_fetch_row
 #  define  __mysql_store_result mysql_store_result
 #  define  __mysql_num_rows mysql_num_rows
@@ -339,9 +348,12 @@ static void mysql_rows_save(MYSQL_RES* my_res, db_rows& result)
 		MYSQL_ROW my_row = __mysql_fetch_row(my_res);
 		if (my_row == NULL)
 			break;
+		unsigned long *my_lengths = __mysql_fetch_lengths(my_res);
+		if (my_lengths == NULL)
+			break;
 		db_row* row = NEW db_row(result.names_);
 		for (int j = 0; j < ncolumn; j++)
-			row->push_back(my_row[j]);
+			row->push_back(my_row[j], (size_t) my_lengths[j]);
 		result.rows_.push_back(row);
 	}
 

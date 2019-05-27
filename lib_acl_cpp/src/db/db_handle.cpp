@@ -158,9 +158,46 @@ const char* db_row::field_string(const char* name) const
 		return ptr;
 }
 
-void db_row::push_back(const char* value)
+size_t db_row::field_length(size_t ifield) const
+{
+	if (ifield >= lengths_.size()) {
+		logger_error("ifield(%d) invalid, lengths_.size: %d",
+			(int) ifield, (int) lengths_.size());
+		return NULL;
+	}
+
+	return lengths_[ifield];
+}
+
+size_t db_row::field_length(const char* name) const
+{
+	size_t   i, n = names_.size();
+
+	// 必须保证表中字段名的个数与行记录的值的个数相等
+	if (lengths_.size() != n) {
+		logger_error("invalid result, names=%d, lengths_=%d",
+			(int) n, (int) lengths_.size());
+		return NULL;
+	}
+
+	// 通过扫描字段名找出字段值的下标位置
+	for (i = 0; i < n; i++) {
+		if (strcasecmp(name, names_[i]) == 0)
+			break;
+	}
+	if (i == n) {
+		logger_error("cloumn not exist, name: %s", name);
+		return NULL;
+	}
+
+	// 直接返回相应下标的字段值
+	return lengths_[i];
+}
+
+void db_row::push_back(const char* value, size_t len)
 {
 	values_.push_back(value);
+	lengths_.push_back(len);
 }
 
 size_t db_row::length(void) const

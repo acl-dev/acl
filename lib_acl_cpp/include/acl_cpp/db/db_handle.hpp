@@ -140,10 +140,24 @@ public:
 	const char* field_string(const char* name) const;
 
 	/**
+	 * 从查询结果的记录行中取得对应下标的字符串类型的字段值长度
+	 * @param ifield {size_t} 下标值
+	 * @return {size_t}
+	 */
+	size_t field_length(size_t ifield) const;
+	/**
+	 * 从查询结果的记录行中取得字段名的字符串类型的字段值长度
+	 * @param name {const char*} 下标值
+	 * @return {size_t}
+	 */
+	size_t field_length(const char* name) const;
+
+	/**
 	 * 向记录行添加一个字段值，添加字段值的顺序应该与字段名的顺序一致
 	 * @param value {const char*} 该行记录的某个字段值
+	 * @param len {size_t} value 数据长度
 	 */
-	void push_back(const char* value);
+	void push_back(const char* value, size_t len);
 
 	/**
 	 * 行记录中字段值的个数
@@ -162,6 +176,9 @@ private:
 
 	// 数据结果行的字段集合
 	std::vector<const char*> values_;
+
+	// 数据结果行字段长度集合
+	std::vector<size_t> lengths_;
 };
 
 /**
