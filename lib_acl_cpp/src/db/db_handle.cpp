@@ -163,7 +163,7 @@ size_t db_row::field_length(size_t ifield) const
 	if (ifield >= lengths_.size()) {
 		logger_error("ifield(%d) invalid, lengths_.size: %d",
 			(int) ifield, (int) lengths_.size());
-		return NULL;
+		return 0;
 	}
 
 	return lengths_[ifield];
@@ -177,7 +177,7 @@ size_t db_row::field_length(const char* name) const
 	if (lengths_.size() != n) {
 		logger_error("invalid result, names=%d, lengths_=%d",
 			(int) n, (int) lengths_.size());
-		return NULL;
+		return 0;
 	}
 
 	// 通过扫描字段名找出字段值的下标位置
@@ -187,7 +187,7 @@ size_t db_row::field_length(const char* name) const
 	}
 	if (i == n) {
 		logger_error("cloumn not exist, name: %s", name);
-		return NULL;
+		return 0;
 	}
 
 	// 直接返回相应下标的字段值
