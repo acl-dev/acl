@@ -19,7 +19,16 @@ static int on_close(ACL_ASTREAM *stream acl_unused, void *context)
 	CTX *ctx = (CTX *) context;
 
 	http_hdr_req_free(ctx->hdr_req);
-	http_res_free(ctx->http_res);
+
+	// 当读到完整 HTTP 响应头时，HTTP 响应体对象应该也创建，当释放响应体
+	// 对象时，响应头对象会一起被释放；如果在读响应头时出错，则响应体对象
+	// 并未创建，所以只需释放响应头对象
+	if (ctx->http_res) {
+		http_res_free(ctx->http_res);
+	} else if (ctx->hdr_res) {
+		http_hdr_res_free(ctx->hdr_res);
+	}
+
 	acl_myfree(ctx);
 
 	printf("%s(%d)\n", __FUNCTION__, __LINE__);
