@@ -328,7 +328,7 @@ static int dns_lookup_close(ACL_ASTREAM *server acl_unused, void *ctx acl_unused
 static void dns_stream_open(ACL_DNS *dns)
 {
 	ACL_VSTREAM *stream = acl_vstream_bind("0.0.0.0:0", 0, 0);
-	assert(stream);
+	acl_assert(stream);
 
 	/* 创建异步流 */
 	dns->astream = acl_aio_open(dns->aio, stream);
