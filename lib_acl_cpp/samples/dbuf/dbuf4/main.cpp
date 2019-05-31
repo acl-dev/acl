@@ -6,10 +6,14 @@
 class myobj : public acl::dbuf_obj
 {
 public:
-	myobj(int i) : i_(i) {}
+	myobj(acl::dbuf_guard* dbuf, int i) : dbuf_(dbuf), i_(i) {}
 
 	void run()
 	{
+		for (int i = 0; i < 100; i++) {
+			char* s = dbuf_->dbuf_strdup("hello");
+			bufs_.push_back(s);
+		}
 		printf("hello world\r\n");
 	}
 
@@ -20,6 +24,9 @@ public:
 
 private:
 	~myobj() {}
+
+	acl::dbuf_guard* dbuf_;
+	std::vector<char*> bufs_;
 	int i_;
 };
 
@@ -31,7 +38,7 @@ static void test(int nblock, int capacity, int incr, int max, int pos)
 
 	for (int i = 0; i < max; i++)
 	{
-		o = dbuf.create<myobj>(i);
+		o = dbuf.create<myobj>(&dbuf, i);
 		if (i < 10)
 			o->run();
 	}
@@ -49,7 +56,7 @@ static void test(int nblock, int capacity, int incr, int max, int pos)
 
 	for (int i = 0; i < max; i++)
 	{
-		o = dbuf.create<myobj>(i);
+		o = dbuf.create<myobj>(&dbuf, i);
 		if (i < 10)
 			o->run();
 	}
