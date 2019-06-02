@@ -28,6 +28,7 @@ struct ACL_DBUF_POOL {
         size_t block_size;
 	size_t off;
 	size_t huge;
+	size_t count;
         ACL_DBUF *head;
 	char  buf[1];
 };
@@ -80,6 +81,7 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size)
 	pool->head->used = 0;
 	pool->head->size = size;
 	pool->head->addr = pool->head->buf;
+	pool->count      = 1;
 
 	return pool;
 }
@@ -136,6 +138,15 @@ int acl_dbuf_pool_reset(ACL_DBUF_POOL *pool, size_t off)
 			break;
 		}
 
+		/* 除头部节点外，至少再保留一个空闲的节点，以便重复使用 */
+		if (pool->count == 2) {
+			ACL_DBUF *first = (ACL_DBUF*) pool->buf;
+			pool->head->addr = pool->head->buf;
+			pool->head->used = 0;
+			pool->off        = first->size;
+			break;
+		}
+
 		/* 保留当前内存块指针以便于下面进行释放 */
 		tmp = iter;
 		/* 指向下一个内存块地址 */
@@ -154,6 +165,7 @@ int acl_dbuf_pool_reset(ACL_DBUF_POOL *pool, size_t off)
 #else
 		acl_myfree(tmp);
 #endif
+		pool->count--;
 	}
 
 	return 0;
@@ -225,6 +237,7 @@ static ACL_DBUF *acl_dbuf_alloc(ACL_DBUF_POOL *pool, size_t length)
 	if (length > pool->block_size)
 		pool->huge++;
 
+	pool->count++;
 	return dbuf;
 }
 
