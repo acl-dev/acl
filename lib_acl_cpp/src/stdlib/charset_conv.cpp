@@ -261,20 +261,20 @@ bool charset_conv::update_begin(const char* fromCharset,
 # endif // USE_WIN_ICONV
 #endif
 
-		char *pNil = NULL;
-		size_t zero = 0;
+		char  *pi = NULL, *po = NULL;
+		size_t zi = 0, zo = 0;
 #ifdef	ACL_WINDOWS
 # ifdef USE_WIN_ICONV
-		__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
+		__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 # else
-		__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero, NULL);
+		__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo, NULL);
 # endif // USE_WIN_ICONV
 #elif defined(ACL_SUNOS5)
-		__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
+		__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 #elif defined(ACL_FREEBSD)
-		__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
+		__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 #else
-		__iconv(m_iconv, &pNil, &zero, &pNil, &zero);
+		__iconv(m_iconv, &pi, &zi, &po, &zo);
 #endif
 		return (true);
 	}
@@ -394,25 +394,22 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 		}
 		else if (errno == EILSEQ)
 		{
-			char *pNil = NULL;
-			size_t zero = 0;
+			char  *pi = NULL, *po = NULL;
+			size_t zi = 0, zo = 0;
 
 			// 重置状态, 似乎也没啥用处
 #ifdef	ACL_WINDOWS
 # ifdef USE_WIN_ICONV
-			__iconv(m_iconv, (const char**) &pNil,
-				&zero, &pNil, &zero);
+			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 # else
-			__iconv(m_iconv, (const char**) &pNil,
-				&zero, &pNil, &zero, NULL);
+			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo, NULL);
 # endif
 #elif defined(ACL_SUNOS5)
-			__iconv(m_iconv, (const char**) &pNil,
-				&zero, &pNil, &zero);
+			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 #elif defined(ACL_FREEBSD)
-			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
+			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 #else
-			__iconv(m_iconv, &pNil, &zero, &pNil, &zero);
+			__iconv(m_iconv, &pi, &zi, &po, &zo);
 #endif
 
 			// 遇到无效的多字节序列，pIn 指向第一个无效的位置
@@ -441,24 +438,22 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 		}
 		else if (errno == EINVAL)
 		{
-			char *pNil = NULL;
-			size_t zero = 0;
+			char  *pi = NULL, *po = NULL;
+			size_t zi = 0, zo = 0;
 
 			// 重置状态, 似乎也没啥用处
 #ifdef	ACL_WINDOWS
 # ifdef USE_WIN_ICONV
-			__iconv(m_iconv, (const char**) &pNil,
-				&zero, &pNil, &zero);
+			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 # else
-			__iconv(m_iconv, (const char**) &pNil,
-				&zero, &pNil, &zero, NULL);
+			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo, NULL);
 # endif // USE_WIN_ICONV
 #elif defined(ACL_SUNOS5)
-			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
+			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 #elif defined(ACL_FREEBSD)
-			__iconv(m_iconv, (const char**) &pNil, &zero, &pNil, &zero);
+			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 #else
-			__iconv(m_iconv, &pNil, &zero, &pNil, &zero);
+			__iconv(m_iconv, &pi, &zi, &po, &zo);
 #endif
 
 			// 输入的多字节序列不完整，pIn 指向该不完整的位置
