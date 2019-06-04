@@ -184,6 +184,7 @@ HTTP_HDR_REQ *http_hdr_req_create(const char *url,
 	HTTP_HDR_REQ *hdr_req;
 	ACL_VSTRING *req_line = acl_vstring_alloc(256);
 	HTTP_HDR_ENTRY *entry;
+	char proto[32];
 	const char *ptr;
 	static char *__user_agent = "Mozilla/5.0 (Windows; U; Windows NT 5.0"
 		"; zh-CN; rv:1.9.0.3) Gecko/2008092417 ACL/3.0.6";
@@ -204,10 +205,16 @@ HTTP_HDR_REQ *http_hdr_req_create(const char *url,
 	acl_vstring_strcpy(req_line, method);
 	acl_vstring_strcat(req_line, " ");
 
-	if (strncasecmp(url, "http://", sizeof("http://") - 1) == 0)
+	if (strncasecmp(url, "http://", sizeof("http://") - 1) == 0) {
 		url += sizeof("http://") - 1;
-	else if (strncasecmp(url, "https://", sizeof("https://") - 1) == 0)
+		ACL_SAFE_STRNCPY(proto, "http", sizeof(proto));
+	} else if (strncasecmp(url, "https://", sizeof("https://") - 1) == 0) {
 		url += sizeof("https://") -1;
+		ACL_SAFE_STRNCPY(proto, "https", sizeof(proto));
+	} else {
+		ACL_SAFE_STRNCPY(proto, "http", sizeof(proto));
+	}
+
 	ptr = strchr(url, '/');
 	if (ptr)
 		acl_vstring_strcat(req_line, ptr);
@@ -235,6 +242,8 @@ HTTP_HDR_REQ *http_hdr_req_create(const char *url,
 		http_hdr_req_free(hdr_req);
 		return NULL;
 	}
+
+	ACL_SAFE_STRNCPY(hdr_req->hdr.proto, proto, sizeof(hdr_req->hdr.proto));
 
 	hdr_req->host[0] = 0;
 	__get_host_from_url(hdr_req->host, sizeof(hdr_req->host), url);

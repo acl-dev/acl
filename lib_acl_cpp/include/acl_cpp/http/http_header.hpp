@@ -5,6 +5,7 @@
 #include "../http/http_type.hpp"
 
 struct HTTP_HDR_RES;
+struct HTTP_HDR_REQ;
 struct HTTP_HDR_ENTRY;
 
 namespace acl {
@@ -47,6 +48,20 @@ public:
 	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
 	 */
 	http_header(int status, dbuf_guard* dbuf = NULL);
+
+	/**
+	 * 根据 C语言 的 HTTP 响应头进行构造
+	 * @param hdr_res {const HTTP_HDR_RES&}
+	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
+	 */
+	http_header(const HTTP_HDR_RES& hdr_res, dbuf_guard* dbuf = NULL);
+
+	/**
+	 * 根据 C语言 的 HTTP 请求头进行构造
+	 * @param hdr_req {const HTTP_HDR_REQ&}
+	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
+	 */
+	http_header(const HTTP_HDR_REQ& hdr_req, dbuf_guard* dbuf = NULL);
 
 	virtual ~http_header(void);
 

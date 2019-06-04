@@ -18,13 +18,10 @@ namespace acl
 
 http_header::http_header(dbuf_guard* dbuf /* = NULL */)
 {
-	if (dbuf != NULL)
-	{
+	if (dbuf != NULL) {
 		dbuf_ = dbuf;
 		dbuf_internal_ = NULL;
-	}
-	else
-	{
+	} else {
 		dbuf_internal_ = new dbuf_guard;
 		dbuf_ = dbuf_internal_;
 	}
@@ -33,13 +30,10 @@ http_header::http_header(dbuf_guard* dbuf /* = NULL */)
 
 http_header::http_header(const char* url, dbuf_guard* dbuf /* = NULL */)
 {
-	if (dbuf != NULL)
-	{
+	if (dbuf != NULL) {
 		dbuf_ = dbuf;
 		dbuf_internal_ = NULL;
-	}
-	else
-	{
+	} else {
 		dbuf_internal_ = new dbuf_guard;
 		dbuf_ = dbuf_internal_;
 	}
@@ -50,18 +44,132 @@ http_header::http_header(const char* url, dbuf_guard* dbuf /* = NULL */)
 
 http_header::http_header(int status, dbuf_guard* dbuf /* = NULL */)
 {
-	if (dbuf != NULL)
-	{
+	if (dbuf != NULL) {
 		dbuf_ = dbuf;
 		dbuf_internal_ = NULL;
-	}
-	else
-	{
+	} else {
 		dbuf_internal_ = new dbuf_guard;
 		dbuf_ = dbuf_internal_;
 	}
 	init();
 	set_status(status);
+}
+
+http_header::http_header(const HTTP_HDR_RES& hdr_res, dbuf_guard* dbuf /* = NULL */)
+{
+	if (dbuf != NULL) {
+		dbuf_ = dbuf;
+		dbuf_internal_ = NULL;
+	} else {
+		dbuf_internal_ = new dbuf_guard;
+		dbuf_ = dbuf_internal_;
+	}
+
+	is_request_       = false;
+	url_              = NULL;
+	method_           = HTTP_METHOD_UNKNOWN;
+	CP(method_s_, "UNKNOWN");
+	host_[0]          = 0;
+	keep_alive_       = hdr_res.hdr.keep_alive ? true : false;
+	nredirect_        = 0;
+	accept_compress_  = false;
+	status_           = hdr_res.reply_status;
+	cgi_mode_         = false;
+	range_from_       = -1;
+	range_to_         = -1;
+	content_length_   = hdr_res.hdr.content_length;
+	chunked_transfer_ = hdr_res.hdr.chunked ? true : false;
+	transfer_gzip_    = false;
+
+	upgrade_          = NULL;
+	ws_origin_        = NULL;
+	ws_sec_key_       = NULL;
+	ws_sec_proto_     = NULL;
+	ws_sec_ver_       = -1;
+	ws_sec_accept_    = NULL;
+
+	ACL_ITER iter;
+	acl_foreach(iter, hdr_res.hdr.entry_lnk) {
+		HTTP_HDR_ENTRY* entry = (HTTP_HDR_ENTRY*) iter.data;
+		if (!entry->off) {
+			add_entry(entry->name, entry->value);
+		}
+	}
+}
+
+http_header::http_header(const HTTP_HDR_REQ& hdr_req, dbuf_guard* dbuf /* = NULL */)
+{
+	if (dbuf != NULL) {
+		dbuf_ = dbuf;
+		dbuf_internal_ = NULL;
+	} else {
+		dbuf_internal_ = new dbuf_guard;
+		dbuf_ = dbuf_internal_;
+	}
+
+	is_request_       = true;
+	set_method(hdr_req.method);
+	if (hdr_req.host[0]) {
+		CP(host_, hdr_req.host);
+	} else {
+		host_[0] = 0;
+	}
+	keep_alive_       = hdr_req.hdr.keep_alive ? true : false;
+	nredirect_        = 0;
+	accept_compress_  = false;
+	status_           = 0;
+	cgi_mode_         = false;
+	range_from_       = -1;
+	range_to_         = -1;
+	content_length_   = hdr_req.hdr.content_length;
+	chunked_transfer_ = hdr_req.hdr.chunked ? true : false;
+	transfer_gzip_    = false;
+
+	upgrade_          = NULL;
+	ws_origin_        = NULL;
+	ws_sec_key_       = NULL;
+	ws_sec_proto_     = NULL;
+	ws_sec_ver_       = -1;
+	ws_sec_accept_    = NULL;
+
+	url_              = NULL;
+	string url_buf;
+	url_buf += hdr_req.hdr.proto;
+	url_buf += "://";
+	if (host_[0]) {
+		url_buf += host_;
+	} else {
+		url_buf.clear();
+	}
+	url_buf += acl_vstring_str(hdr_req.url_part);
+	url_ = dbuf_->dbuf_strdup(url_buf.c_str());
+
+	ACL_ITER iter;
+
+	if (hdr_req.hdr.entry_lnk) {
+		acl_foreach(iter, hdr_req.hdr.entry_lnk) {
+			HTTP_HDR_ENTRY* entry = (HTTP_HDR_ENTRY*) iter.data;
+			if (!entry->off) {
+				add_entry(entry->name, entry->value);
+			}
+	}
+	}
+
+	if (hdr_req.params_table) {
+		acl_foreach(iter, hdr_req.params_table) {
+			const char* name = iter.key;
+			const char* value = (const char*) iter.data;
+			add_param(name, value);
+		}
+	}
+
+	if (hdr_req.cookies_table) {
+		acl_foreach(iter, hdr_req.cookies_table) {
+			const char* name = iter.key;
+			const char* value = (const char*) iter.data;
+			add_cookie(name, value);
+		}
+	}
 }
 
 http_header::~http_header(void)
@@ -72,29 +180,29 @@ http_header::~http_header(void)
 
 void http_header::init()
 {
-	is_request_ = true;
-	url_ = NULL;
-	method_ = HTTP_METHOD_GET;
+	is_request_       = true;
+	url_              = NULL;
+	method_           = HTTP_METHOD_GET;
 	CP(method_s_, "GET");
-	host_[0]  = 0;
-	keep_alive_ = false;
-	nredirect_ = 0; // 默认条件下不主动进行重定向
-	accept_compress_ = true;
-	status_ = 200;
-	cgi_mode_ = false;
-	range_from_ = -1;
-	range_to_ = -1;
-	range_total_ = -1;
-	content_length_ = -1;
+	host_[0]          = 0;
+	keep_alive_       = false;
+	nredirect_        = 0; // 默认条件下不主动进行重定向
+	accept_compress_  = true;
+	status_           = 200;
+	cgi_mode_         = false;
+	range_from_       = -1;
+	range_to_         = -1;
+	range_total_      = -1;
+	content_length_   = -1;
 	chunked_transfer_ = false;
-	transfer_gzip_ = false;
+	transfer_gzip_    = false;
 
-	upgrade_ = NULL;
-	ws_origin_ = NULL;
-	ws_sec_key_ = NULL;
-	ws_sec_proto_ = NULL;
-	ws_sec_ver_ = -1;
-	ws_sec_accept_ = NULL;
+	upgrade_          = NULL;
+	ws_origin_        = NULL;
+	ws_sec_key_       = NULL;
+	ws_sec_proto_     = NULL;
+	ws_sec_ver_       = -1;
+	ws_sec_accept_    = NULL;
 }
 
 void http_header::clear()
