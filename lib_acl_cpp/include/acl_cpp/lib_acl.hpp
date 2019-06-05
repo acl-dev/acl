@@ -101,6 +101,7 @@
 #include "http/http_request_manager.hpp"
 #include "http/websocket.hpp"
 #include "http/WebSocketServlet.hpp"
+#include "http/http_aclient.hpp"
 
 #include "db/query.hpp"
 #include "db/mysql_conf.hpp"

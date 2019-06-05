@@ -614,19 +614,21 @@ ACL_API ACL_VSTRING *acl_aio_gets_nonl_peek(ACL_ASTREAM *astream);
 /**
  * 尝试性从异步流中读取数据，如果有数据则返回没有则返回空
  * @param astream {ACL_ASTREM*} 异步流对象
+ * @param count {int*} 函数返回后将存放本次读到的数据长度，返回值永远 >= 0
  * @return {ACL_VSTRING*} 若读到了数据则返回的缓冲区非空(使用者用完此缓冲区后
  *  需要调用 ACL_VSTRING_RESET(s) 清空此缓冲区), 否则返回空
  */
-ACL_API ACL_VSTRING *acl_aio_read_peek(ACL_ASTREAM *astream);
+ACL_API ACL_VSTRING *acl_aio_read_peek(ACL_ASTREAM *astream, int *count);
 
 /**
  * 尝试性从异步流中读给定长度的数据，如果读到的数据满足要求则返回缓冲区
  * @param astream {ACL_ASTREM*} 异步流对象
- * @param count {int} 要求读到的数据长度
+ * @param count {int*} 要求读到的数据长度，函数返回后将存放本次读到的字节数，
+ *  存放的值永远 >= 0
  * @return {ACL_VSTRING*} 若读到规定长度则返回非空缓冲区(使用者用完此缓冲区后
  *  需要调用 ACL_VSTRING_RESET(s) 清空此缓冲区), 否则返回空
  */
-ACL_API ACL_VSTRING *acl_aio_readn_peek(ACL_ASTREAM *astream, int count);
+ACL_API ACL_VSTRING *acl_aio_readn_peek(ACL_ASTREAM *astream, int *count);
 
 /**
  * 设置异步流为读监听状态，当该流可读时则调用用户的回调函数

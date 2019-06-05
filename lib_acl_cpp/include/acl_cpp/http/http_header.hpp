@@ -450,6 +450,7 @@ public:
 private:
 	dbuf_guard* dbuf_internal_;
 	dbuf_guard* dbuf_;
+	bool fixed_;                          // HTTP 是否已经完整了
 	//char* domain_;  // HTTP 服务器域名
 	//unsigned short port_;               // HTTP 服务器端口
 	char* url_;                           // HTTP 请求的 URL

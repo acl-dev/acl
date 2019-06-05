@@ -1189,11 +1189,12 @@ int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
 	const char *myname = "acl_vstream_readn_peek";
 	int   cnt_saved = cnt;
 
-	if (fp == NULL || buf == NULL || cnt <= 0 || ready == NULL)
+	if (fp == NULL || buf == NULL || cnt <= 0 || ready == NULL) {
 		acl_msg_fatal("%s, %s(%d): invalid input, fp: %s, buf: %s, "
 			"cnt: %d, ready: %s", myname, __FILE__, __LINE__, fp ?
 			"not null" : "null", buf ? "not null" : "null", cnt,
 			ready ? "not null" : "null");
+	}
 
 	*ready = 0;
 	if (fp->read_cnt < 0) {
@@ -1204,8 +1205,9 @@ int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
 
 	if (fp->read_cnt > 0) {
 		cnt -= bfread_cnt_peek(fp, buf, cnt, ready);
-		if (*ready)
+		if (*ready) {
 			return cnt_saved - cnt;
+		}
 	}
 
 	/* XXX: 调用者通过检查 *ready 值来判断是否读够数据, 系统IO读操作出错
@@ -1220,8 +1222,9 @@ int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
 		}
 	}
 
-	if (fp->read_cnt > 0)
+	if (fp->read_cnt > 0) {
 		cnt -= bfread_cnt_peek(fp, buf, cnt, ready);
+	}
 	return cnt_saved - cnt;
 }
 
@@ -1294,20 +1297,21 @@ int acl_vstream_can_read(ACL_VSTREAM *fp)
 		return ACL_VSTREAM_EOF;
 	}
 
-	if (fp->flag & (ACL_VSTREAM_FLAG_ERR | ACL_VSTREAM_FLAG_EOF))
+	if (fp->flag & (ACL_VSTREAM_FLAG_ERR | ACL_VSTREAM_FLAG_EOF)) {
 		return ACL_VSTREAM_EOF;
-	else if (fp->read_cnt > 0)
+	} else if (fp->read_cnt > 0) {
 		return 1;
-	else if (fp->read_ready == 0)
+	} else if (fp->read_ready == 0) {
 		return 0;
-	else if ((fp->flag & ACL_VSTREAM_FLAG_PREREAD) != 0) {
-		if (read_buffed(fp) <= 0)
+	} else if ((fp->flag & ACL_VSTREAM_FLAG_PREREAD) != 0) {
+		if (read_buffed(fp) <= 0) {
 			return ACL_VSTREAM_EOF;
-		else
+		} else {
 			return 1;
-	}
-	else
+		}
+	} else {
 		return 1;
+	}
 }
 
 static int write_once(ACL_VSTREAM *fp, const void *vptr, int dlen)

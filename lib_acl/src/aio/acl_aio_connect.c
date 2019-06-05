@@ -373,12 +373,6 @@ int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
 	int  port;
 	RESOLVE_CTX *ctx;
 
-	if (aio->dns == NULL) {
-		acl_msg_error("%s(%d), %s: call acl_aio_set_dns first",
-			__FILE__, __LINE__, __FUNCTION__);
-		return -1;
-	}
-
 	ACL_SAFE_STRNCPY(buf, addr, sizeof(buf));
 	ptr = strrchr(buf, '|');
 	if (ptr == NULL) {
@@ -417,6 +411,12 @@ int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
 		acl_aio_add_timeo_hook(conn, connect_timeout, ctx);
 		acl_aio_add_close_hook(conn, connect_failed, ctx);
 	} else {
+		if (aio->dns == NULL) {
+			acl_msg_error("%s(%d), %s: call acl_aio_set_dns first",
+				__FILE__, __LINE__, __FUNCTION__);
+			return -1;
+		}
+
 		acl_dns_lookup(aio->dns, buf, dns_lookup_callback, ctx);
 	}
 
