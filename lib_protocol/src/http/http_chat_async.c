@@ -33,10 +33,10 @@ typedef struct HTTP_CHAT_CTX {
 } HTTP_CHAT_CTX;
 
 #define	HTTP_LEN_ROUND(_ctx) \
-	(_ctx->chunk_len > 0 ? \
-		(_ctx->chunk_len - _ctx->read_cnt > var_http_buf_size ? \
-			var_http_buf_size : _ctx->chunk_len - _ctx->read_cnt) \
-		: var_http_buf_size)
+    (_ctx->chunk_len > 0 ? \
+        (_ctx->chunk_len > _ctx->read_cnt + var_http_buf_size ? \
+            var_http_buf_size : _ctx->chunk_len - _ctx->read_cnt) \
+        : var_http_buf_size)
 
 #if 1
 #define	DISABLE_READ(x) do {  \
@@ -287,9 +287,10 @@ static int chunked_data(ACL_ASTREAM *astream, HTTP_CHAT_CTX *ctx)
 	int   dlen, ret;
 
 	if (ctx->chunked) {
-		sbuf = acl_aio_read_peek(astream);
+		ret = (int) HTTP_LEN_ROUND(ctx);
+		sbuf = acl_aio_readn_peek(astream, &ret);
 	} else if (ctx->hdr->content_length <= 0) {
-		sbuf = acl_aio_read_peek(astream);
+		sbuf = acl_aio_read_peek(astream, &ret);
 	} else {
 		ret = (int) HTTP_LEN_ROUND(ctx);
 		if (ret <= 0) {
@@ -298,13 +299,16 @@ static int chunked_data(ACL_ASTREAM *astream, HTTP_CHAT_CTX *ctx)
 			 */
 			DISABLE_READ(astream);
 			if (notify(HTTP_CHAT_OK, NULL, 0, arg) < 0) {
-				return (-1);
+				return -1;
 			}
 			return -1;
 		} else {
-			sbuf = acl_aio_read_peek(astream);
+			sbuf = acl_aio_readn_peek(astream, &ret);
 		}
 	}
+
+	ctx->body_len += ret;
+	ctx->read_cnt += ret;
 
 	if (sbuf == NULL) {
 		return 0;
@@ -313,9 +317,6 @@ static int chunked_data(ACL_ASTREAM *astream, HTTP_CHAT_CTX *ctx)
 	data = acl_vstring_str(sbuf);
 	dlen = (int) ACL_VSTRING_LEN(sbuf);
 	ACL_VSTRING_RESET(sbuf);
-
-	ctx->body_len += dlen;
-	ctx->read_cnt += dlen;
 
 	if (ctx->chunk_len > 0 && ctx->read_cnt >= ctx->chunk_len) {
 		if (!ctx->chunked) {
@@ -335,6 +336,10 @@ static int chunked_data(ACL_ASTREAM *astream, HTTP_CHAT_CTX *ctx)
 			return -1;
 		}
 
+		/**
+		 * printf(">>%s: chunk_len=%d, read=%d\r\n", __FUNCTION__,
+		 *	(int) ctx->chunk_len, (int) ctx->read_cnt);
+		 */
 		/* 设置标志位开始读取块数据体的分隔行数据 */
 		ctx->status = CHAT_S_CHUNK_SEP;
 		return 0;
