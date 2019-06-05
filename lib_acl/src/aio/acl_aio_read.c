@@ -664,24 +664,27 @@ ACL_VSTRING *acl_aio_gets_peek(ACL_ASTREAM *astream)
 {
 	int   ready = 0;
 
-	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
+	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE)) {
 		return NULL;
+	}
 	if (acl_vstream_gets_peek(astream->stream,
-			&astream->strbuf, &ready) == ACL_VSTREAM_EOF
+		&astream->strbuf, &ready) == ACL_VSTREAM_EOF
 #if ACL_EWOULDBLOCK == ACL_EAGAIN
 		&& astream->stream->errnum != ACL_EAGAIN
 #endif
 		&& astream->stream->errnum != ACL_EWOULDBLOCK)
 	{
 		astream->flag |= ACL_AIO_FLAG_DEAD;
-		if (ACL_VSTRING_LEN(&astream->strbuf) > 0)
+		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
 			return (&astream->strbuf);
-		else
+		} else {
 			return NULL;
-	} else if (ready)
+		}
+	} else if (ready) {
 		return &astream->strbuf;
-	else
+	} else {
 		return NULL;
+	}
 }
 
 ACL_VSTRING *acl_aio_gets_nonl_peek(ACL_ASTREAM *astream)
@@ -708,52 +711,75 @@ ACL_VSTRING *acl_aio_gets_nonl_peek(ACL_ASTREAM *astream)
 		return NULL;
 }
 
-ACL_VSTRING *acl_aio_read_peek(ACL_ASTREAM *astream)
+ACL_VSTRING *acl_aio_read_peek(ACL_ASTREAM *astream, int *count)
 {
 	int   n;
 
-	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
+	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE)) {
+		*count = 0;
 		return NULL;
-	if ((n = acl_vstream_read_peek(astream->stream,
-		&astream->strbuf)) == ACL_VSTREAM_EOF
+	}
+
+	n = acl_vstream_read_peek(astream->stream, &astream->strbuf);
+
+	if (n == ACL_VSTREAM_EOF
 #if ACL_EWOULDBLOCK == ACL_EAGAIN
 		&& astream->stream->errnum != ACL_EAGAIN
 #endif
-		&& astream->stream->errnum != ACL_EWOULDBLOCK)
-	{
+		&& astream->stream->errnum != ACL_EWOULDBLOCK) {
+
 		astream->flag |= ACL_AIO_FLAG_DEAD;
-		if (ACL_VSTRING_LEN(&astream->strbuf) > 0)
+		*count = 0;
+		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
 			return &astream->strbuf;
-		else
+		} else {
 			return NULL;
-	} else if (n > 0)
+		}
+	}
+
+	*count = n;
+
+	if (n > 0) {
 		return &astream->strbuf;
-	else
+	} else {
 		return NULL;
+	}
 }
 
-ACL_VSTRING *acl_aio_readn_peek(ACL_ASTREAM *astream, int count)
+ACL_VSTRING *acl_aio_readn_peek(ACL_ASTREAM *astream, int *count)
 {
-	int   ready = 0;
+	int   ready = 0, ret;
 
-	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
+	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE)) {
+		*count = 0;
 		return NULL;
-	if (acl_vstream_readn_peek(astream->stream,
-		&astream->strbuf, count, &ready) == ACL_VSTREAM_EOF
+	}
+
+	ret = acl_vstream_readn_peek(astream->stream,
+		&astream->strbuf, *count, &ready);
+
+	if (ret == ACL_VSTREAM_EOF
 #if ACL_EWOULDBLOCK == ACL_EAGAIN
 		&& astream->stream->errnum != ACL_EAGAIN
 #endif
-		&& astream->stream->errnum != ACL_EWOULDBLOCK)
-	{
+		&& astream->stream->errnum != ACL_EWOULDBLOCK) {
+
+		*count = 0;
 		astream->flag |= ACL_AIO_FLAG_DEAD;
-		if (ACL_VSTRING_LEN(&astream->strbuf) > 0)
+		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
 			return &astream->strbuf;
-		else
+		} else {
 			return NULL;
-	} else if (ready)
+		}
+	}
+
+	*count = ret;
+
+	if (ready) {
 		return &astream->strbuf;
-	else
+	} else {
 		return NULL;
+	}
 }
 
 int acl_aio_can_read(ACL_ASTREAM *astream)
@@ -793,8 +819,9 @@ static void can_read_callback(int event_type, ACL_EVENT *event acl_unused,
 	} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 		astream->nrefer--;
 		READ_IOCP_CLOSE(astream);
-	} else
+	} else {
 		astream->nrefer--;
+	}
 }
 
 void acl_aio_enable_read(ACL_ASTREAM *astream,
