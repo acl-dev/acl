@@ -1,5 +1,9 @@
 修改历史列表：
 
+571) 2019.6.5
+571.1) feature: 新增 http_aclient 异步 HTTP 客户端类，支持异步远程解析 WEB 服务
+器地址及异步连接 WEB 服务器获得响应数据，同时支持 SSL 通信方式
+
 570) 2019.5.27
 570.1) feature: db_handle/db_mysql/db_pgsql 支持获取字段值的长度
 -- by 孙良灿(1142263518)

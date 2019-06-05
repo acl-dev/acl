@@ -240,6 +240,11 @@ void aio_handle::reset()
 	stop_ = false;
 }
 
+void aio_handle::set_dns(const char* addrs, int timeout)
+{
+	acl_aio_set_dns(aio_, addrs, timeout);
+}
+
 void aio_handle::increase()
 {
 	nstream_++;

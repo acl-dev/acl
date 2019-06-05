@@ -153,6 +153,13 @@ public:
 	 */
 	void reset();
 
+	/**
+	 * 设置 DNS 服务器地址列表，格式：ip1:port1;ip2:port2...
+	 * @param addrs {const char*} DNS 服务器地址，如：8.8.8.8:53
+	 * @param timeout {int} DNS 查询超时时间（秒）
+	 */
+	void set_dns(const char* addrs, int timeout);
+
 public:
 	/**
 	 * 设置异步引擎循环的等待时间中的秒级部分
