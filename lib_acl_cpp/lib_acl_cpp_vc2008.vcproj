@@ -546,6 +546,10 @@
 				Name="http"
 				>
 				<File
+					RelativePath=".\src\http\http_aclient.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\http\http_client.cpp"
 					>
 				</File>
@@ -1479,6 +1483,10 @@
 			<Filter
 				Name="http"
 				>
+				<File
+					RelativePath=".\include\acl_cpp\http\http_aclient.hpp"
+					>
+				</File>
 				<File
 					RelativePath=".\include\acl_cpp\http\http_client.hpp"
 					>

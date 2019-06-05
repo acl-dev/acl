@@ -79,6 +79,9 @@
     <ClCompile Include="src\http\http_service.cpp">
       <Filter>src\http</Filter>
     </ClCompile>
+    <ClCompile Include="src\http\http_aclient.cpp">
+      <Filter>src\http</Filter>
+    </ClCompile>
     <ClCompile Include="src\http\http_client.cpp">
       <Filter>src\http</Filter>
     </ClCompile>
@@ -682,6 +685,9 @@
       <Filter>include\hsocket</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\http\HttpSession.hpp">
+      <Filter>include\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_aclient.hpp">
       <Filter>include\http</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\http\http_client.hpp">

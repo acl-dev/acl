@@ -445,6 +445,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include="src\http\HttpServletRequest.cpp" />
     <ClCompile Include="src\http\HttpServletResponse.cpp" />
     <ClCompile Include="src\http\HttpSession.cpp" />
+    <ClCompile Include="src\http\http_aclient.cpp" />
     <ClCompile Include="src\http\http_client.cpp" />
     <ClCompile Include="src\http\http_ctype.cpp" />
     <ClCompile Include="src\http\http_download.cpp" />
@@ -646,6 +647,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\http\HttpServletRequest.hpp" />
     <ClInclude Include="include\acl_cpp\http\HttpServletResponse.hpp" />
     <ClInclude Include="include\acl_cpp\http\HttpSession.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_aclient.hpp" />
     <ClInclude Include="include\acl_cpp\http\http_client.hpp" />
     <ClInclude Include="include\acl_cpp\http\http_ctype.hpp" />
     <ClInclude Include="include\acl_cpp\http\http_download.hpp" />

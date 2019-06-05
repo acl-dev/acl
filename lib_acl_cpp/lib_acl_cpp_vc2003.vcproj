@@ -643,6 +643,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Name="http"
 				Filter="">
 				<File
+					RelativePath=".\src\http\http_aclient.cpp">
+				</File>
+				<File
 					RelativePath=".\src\http\http_client.cpp">
 				</File>
 				<File
@@ -1304,6 +1307,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 			<Filter
 				Name="http"
 				Filter="">
+				<File
+					RelativePath=".\include\acl_cpp\http\http_aclient.hpp">
+				</File>
 				<File
 					RelativePath=".\include\acl_cpp\http\http_client.hpp">
 				</File>
