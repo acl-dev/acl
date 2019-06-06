@@ -262,19 +262,19 @@ HTTP_API const char *http_hdr_req_cookie_get(HTTP_HDR_REQ *hh, const char *name)
 
 /**
  * 从HTTP请求头中取得HTTP请求的方法, 如: POST, GET, CONNECT
- * @param hh {HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
+ * @param hh {const HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
  * @return {const char*} 返回请示方法. NULL: error; !NULL: OK.
  */
-HTTP_API const char *http_hdr_req_method(HTTP_HDR_REQ *hh);
+HTTP_API const char *http_hdr_req_method(const HTTP_HDR_REQ *hh);
 
 /**
  * 从HTTP请求头中获取请求URL中某个请求字段的数据, 
  * 如取: /cgi-bin/test.cgi?n1=v1&n2=v2 中的 n2的值v2
- * @param hh {HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
+ * @param hh {const HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
  * @param name {const char*} 请求参数中的变量名
  * @return {const char*} !NULL: ok, 返回变量值的内存指针;  NULL: 出错，或请求的变量名不存在.
  */
-HTTP_API const char *http_hdr_req_param(HTTP_HDR_REQ *hh, const char *name);
+HTTP_API const char *http_hdr_req_param(const HTTP_HDR_REQ *hh, const char *name);
 
 /**
  * 从HTTP请求头中获取请求行中的访问路径部分, 不包含主机名但包含参数.
@@ -284,10 +284,10 @@ HTTP_API const char *http_hdr_req_param(HTTP_HDR_REQ *hh, const char *name);
  *   GET http://www.test.com[:80]/cgi-bin/test.cgi?n1=v1&n2=v2 HTTP/1.1
  * 则分析后的结果数据为:
  *   /cgi-bin/test.cgi?n1=v1&n2=v2
- * @param hh {HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
+ * @param hh {const HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
  * @return {const char*} 请示的URL. !NULL: OK; NULL: error.
  */
-HTTP_API const char *http_hdr_req_url_part(HTTP_HDR_REQ *hh);
+HTTP_API const char *http_hdr_req_url_part(const HTTP_HDR_REQ *hh);
 
 /**
  * 从HTTP请求头中获取请求行中的访问路径部分, 不包含主机名及参数.
@@ -297,18 +297,18 @@ HTTP_API const char *http_hdr_req_url_part(HTTP_HDR_REQ *hh);
  *   GET http://www.test.com[:80]/cgi-bin/test.cgi?n1=v1&n2=v2 HTTP/1.1
  * 则分析后的结果数据为:
  *   /cgi-bin/test.cgi
- * @param hh {HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
+ * @param hh {const HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
  * @return {const char*} 请示的URL. !NULL: OK; NULL: error.
  */
-HTTP_API const char *http_hdr_req_url_path(HTTP_HDR_REQ *hh);
+HTTP_API const char *http_hdr_req_url_path(const HTTP_HDR_REQ *hh);
 
 /**
  * 从HTTP请求协议头中获得服务器的主机IP或域名，格式为：IP|domain[:PORT]
  * 如: 192.168.0.22:80, or www.test.com:8088
- * @param hh {HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
+ * @param hh {const HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
  * @return {const char*} 返回用户请示的主机名. !NULL: ok; NULL: error.
  */
-HTTP_API const char *http_hdr_req_host(HTTP_HDR_REQ *hh);
+HTTP_API const char *http_hdr_req_host(const HTTP_HDR_REQ *hh);
 
 /**
  * 从HTTP请求头协议中获得完整的URL请求字符串
@@ -317,7 +317,7 @@ HTTP_API const char *http_hdr_req_host(HTTP_HDR_REQ *hh);
  * HOST: www.test.com
  * 则经该函数后则返回:
  * http://www.test.com/cgi-bin/test.cgi?n1=v1&n2=v2
- * @param hh {HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
+ * @param hh {const HTTP_HDR_REQ*} HTTP请求头类型的数据指针，不能为空
  * @return {const char*} 请示的URL. !NULL: OK; NULL: error.
  * @example:
  *  void test(HTTP_HDR_REQ *hh)
@@ -353,7 +353,7 @@ HTTP_API const char *http_hdr_req_host(HTTP_HDR_REQ *hh);
  *      acl_myfree(url2);
  *  }
  */
-HTTP_API const char *http_hdr_req_url(HTTP_HDR_REQ *hh);
+HTTP_API const char *http_hdr_req_url(const HTTP_HDR_REQ *hh);
 
 /**
  * 分析HTTP请求头中的 Range 字段
@@ -364,8 +364,8 @@ HTTP_API const char *http_hdr_req_url(HTTP_HDR_REQ *hh);
  * 请求的 Range 格式:
  *   Range: bytes={range_from}-, bytes={range_from}-{range_to}
  */
-HTTP_API int http_hdr_req_range(HTTP_HDR_REQ *hdr_req, http_off_t *range_from,
-		http_off_t *range_to);
+HTTP_API int http_hdr_req_range(const HTTP_HDR_REQ *hdr_req,
+	http_off_t *range_from, http_off_t *range_to);
 
 /*---------------------------- HTTP 响应头操作函数 ---------------------------*/
 /* in http_hdr_res.c */
@@ -415,12 +415,13 @@ HTTP_API int http_hdr_res_parse(HTTP_HDR_RES *hdr_res);
  * @param range_from {http_off_t*} 存储偏移起始位置, 不能为空
  * @param range_to {http_off_t*} 存储偏移结束位置, 不能为空
  * @param total_length {http_off_t*} 整个数据文件的总长度, 可为空
+ * @return {int} 返回 0 表示成功，-1 表示失败
  * 注： * {range_from}, {range_to} 下标从0开始
  * 响应的 Range 格式:
  *   Content-Range: bytes {range_from}-{range_to}/{total_length}
  */
-HTTP_API int http_hdr_res_range(HTTP_HDR_RES *hdr_res, http_off_t *range_from,
-		http_off_t *range_to, http_off_t *total_length);
+HTTP_API int http_hdr_res_range(const HTTP_HDR_RES *hdr_res,
+	http_off_t *range_from, http_off_t *range_to, http_off_t *total_length);
 
 /* in http_rfc1123.c */
 
@@ -742,4 +743,3 @@ HTTP_API http_off_t http_buf_size_get(void);
 #endif
 
 #endif
-

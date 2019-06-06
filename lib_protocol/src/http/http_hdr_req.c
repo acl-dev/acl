@@ -914,14 +914,14 @@ HTTP_HDR_REQ *http_hdr_req_rewrite(const HTTP_HDR_REQ *hh, const char *url)
 
 /* 取得HTTP请求的方法 */
 
-const char *http_hdr_req_method(HTTP_HDR_REQ *hh)
+const char *http_hdr_req_method(const HTTP_HDR_REQ *hh)
 {
 	return hh->method;
 }
 
 /* 获取请求URL中某个请求字段的数据, 如取: /cgi-bin/n1=v1&n2=v2 中的 n2的值v2 */
 
-const char *http_hdr_req_param(HTTP_HDR_REQ *hh, const char *name)
+const char *http_hdr_req_param(const HTTP_HDR_REQ *hh, const char *name)
 {
 	const char *myname = "http_hdr_req_get";
 
@@ -937,7 +937,7 @@ const char *http_hdr_req_param(HTTP_HDR_REQ *hh, const char *name)
 	return acl_htable_find(hh->params_table, name);
 }
 
-const char *http_hdr_req_url_part(HTTP_HDR_REQ *hh)
+const char *http_hdr_req_url_part(const HTTP_HDR_REQ *hh)
 {
 	const char *myname = "http_hdr_req_url_part";
 
@@ -952,7 +952,7 @@ const char *http_hdr_req_url_part(HTTP_HDR_REQ *hh)
 	return acl_vstring_str(hh->url_part);
 }
 
-const char *http_hdr_req_url_path(HTTP_HDR_REQ *hh)
+const char *http_hdr_req_url_path(const HTTP_HDR_REQ *hh)
 {
 	if (ACL_VSTRING_LEN(hh->url_path) == 0)
 		return NULL;
@@ -960,7 +960,7 @@ const char *http_hdr_req_url_path(HTTP_HDR_REQ *hh)
 	return acl_vstring_str(hh->url_path);
 }
 
-const char *http_hdr_req_host(HTTP_HDR_REQ *hh)
+const char *http_hdr_req_host(const HTTP_HDR_REQ *hh)
 {
 	if (hh->host[0] != 0)
 		return hh->host;
@@ -973,7 +973,7 @@ static void free_vstring(ACL_VSTRING *buf)
 	acl_vstring_free(buf);
 }
 
-const char *http_hdr_req_url(HTTP_HDR_REQ *hh)
+const char *http_hdr_req_url(const HTTP_HDR_REQ *hh)
 {
 	static acl_pthread_key_t key = (acl_pthread_key_t) -1;
 	ACL_VSTRING *buf;
@@ -989,7 +989,7 @@ const char *http_hdr_req_url(HTTP_HDR_REQ *hh)
 	return acl_vstring_str(buf);
 }
 
-int http_hdr_req_range(HTTP_HDR_REQ *hdr_req, http_off_t *range_from,
+int http_hdr_req_range(const HTTP_HDR_REQ *hdr_req, http_off_t *range_from,
 	http_off_t *range_to)
 {
 	const char *myname = "http_hdr_req_range";

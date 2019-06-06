@@ -246,7 +246,7 @@ int http_hdr_res_parse(HTTP_HDR_RES *hdr_res)
 	return (http_hdr_parse(hdr));
 }
 
-int http_hdr_res_range(HTTP_HDR_RES *hdr_res, http_off_t *range_from,
+int http_hdr_res_range(const HTTP_HDR_RES *hdr_res, http_off_t *range_from,
 	http_off_t *range_to, http_off_t *total_length)
 {
 	const char* myname = "http_hdr_res_range";

@@ -80,11 +80,17 @@ http_header::http_header(const HTTP_HDR_RES& hdr_res, dbuf_guard* dbuf /* = NULL
 	accept_compress_  = false;
 	status_           = hdr_res.reply_status;
 	cgi_mode_         = false;
-	range_from_       = -1;
-	range_to_         = -1;
 	content_length_   = hdr_res.hdr.content_length;
 	chunked_transfer_ = hdr_res.hdr.chunked ? true : false;
 	transfer_gzip_    = false;
+
+	if (http_hdr_res_range(&hdr_res, &range_from_,
+		&range_to_, &range_total_) == -1) {
+
+		range_from_ = -1;
+		range_to_   = -1;
+		range_total_ = -1;
+	}
 
 	upgrade_          = NULL;
 	ws_origin_        = NULL;
@@ -96,9 +102,16 @@ http_header::http_header(const HTTP_HDR_RES& hdr_res, dbuf_guard* dbuf /* = NULL
 	ACL_ITER iter;
 	acl_foreach(iter, hdr_res.hdr.entry_lnk) {
 		HTTP_HDR_ENTRY* entry = (HTTP_HDR_ENTRY*) iter.data;
-		if (!entry->off) {
-			add_entry(entry->name, entry->value);
+		if (entry->off) {
+			continue;
 		}
+
+		if (!strcasecmp(entry->name, "Content-Encoding")) {
+			if (!strcasecmp(entry->value, "gzip")) {
+				transfer_gzip_ = true;
+			}
+		}
+		add_entry(entry->name, entry->value);
 	}
 }
 
@@ -125,11 +138,14 @@ http_header::http_header(const HTTP_HDR_REQ& hdr_req, dbuf_guard* dbuf /* = NULL
 	accept_compress_  = false;
 	status_           = 0;
 	cgi_mode_         = false;
-	range_from_       = -1;
-	range_to_         = -1;
 	content_length_   = hdr_req.hdr.content_length;
 	chunked_transfer_ = hdr_req.hdr.chunked ? true : false;
 	transfer_gzip_    = false;
+
+	if (http_hdr_req_range(&hdr_req, &range_from_, &range_to_) == -1) {
+		range_from_ = -1;
+		range_to_   = -1;
+	}
 
 	upgrade_          = NULL;
 	ws_origin_        = NULL;

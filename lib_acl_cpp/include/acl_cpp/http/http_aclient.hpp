@@ -18,31 +18,105 @@ class polarssl_conf;
 class polarssl_io;
 class http_header;
 
+/**
+ * HTTP 客户端异步通信类，支持 SSL 加密传输
+ */
 class ACL_CPP_API http_aclient : public aio_open_callback
 {
 public:
+	/**
+	 * 构造函数
+	 * @param handle {aio_handle&} 异步通信事件引擎句柄
+	 * @param ssl_conf {polarssl_conf*} 非 NULL 时自动采用 SSL 通信方式
+	 */
 	http_aclient(aio_handle& handle, polarssl_conf* ssl_conf = NULL);
-	~http_aclient(void);
+	virtual ~http_aclient(void);
 
+	/**
+	 * 当对象销毁时的回调方法，子类必须实现
+	 */
+	virtual void destroy(void) = 0;
+
+	/**
+	 * 获得 HTTP 请求头，以便于应用添加 HTTP 请求头中的字段内容
+	 * @return {http_header&}
+	 */
 	http_header& request_header(void);
 
-	bool open(const char* addr, int conn_timeout);
+	/**
+	 * 开始异步连接远程 WEB 服务器
+	 * @param addr {const char*} 远程 WEB 服务器地址，格式为：
+	 *  domain:port 或 ip:port, 当地址为域名时，内部自动进行异步域名解析
+	 *  过程，但要求在程序开始时必须通过 aio_handle::set_dns() 设置过域名
+	 *  服务器地址，如果地址为 IP 则不需要先设置域名服务器地址
+	 * @param conn_timeout {int} 连接超时时间（秒）
+	 * @param rw_timeout {int} 网络 IO 读写超时时间（秒）
+	 * @return {bool} 返回 false 表示连接失败，返回 true 表示进入异步连接中
+	 */
+	bool open(const char* addr, int conn_timeout, int rw_timeout);
 
+	/**
+	 * 当连接成功后的回调方法，子类必须实现，子类应在该方法里构造 HTTP 请求
+	 * 并调用 send_request 方法向 WEB 服务器发送 HTTP 请求
+	 * @return {bool} 该方法如果返回 false 则内部会自动关闭连接
+	 */
 	virtual bool on_connect(void) = 0;
-	virtual void on_disconnect(void) = 0;
-	virtual void on_connect_timeout(void) = 0;
-	virtual void on_connect_failed(void) = 0;
 
+	/**
+	 * 当连接超时后的回调方法
+	 */
+	virtual void on_connect_timeout(void) {}
+
+	/**
+	 * 当连接失败后的回调方法
+	 */
+	virtual void on_connect_failed(void) {}
+
+	/**
+	 * 当网络读超时时的回调方法
+	 */
+	virtual void on_read_timeout(void) {}
+
+	/**
+	 * 对于连接成功后连接关闭后的回调方法
+	 */
+	virtual void on_disconnect(void) {};
+
+	/**
+	 * 当接收到 WEB 服务端的响应头时的回调方法，子类必须实现
+	 * @param header {const http_header&}
+	 * @return {bool} 返回 false 则将会关闭连接，否则继续读
+	 */
 	virtual bool on_http_res_hdr(const http_header& header) = 0;
+
+	/**
+	 * 当接收到 WEB 服务端的响应体时的回调方法，子类必须实现，该方法可能
+	 * 会被多次回调走到响应数据读完或出错
+	 * @param data {char*} 读到的部分数据体内容
+	 * @param dlen {size_t} 本次读到的 data 数据的长度
+	 * @return {bool} 返回 false 则将会关闭连接，否则继续读
+	 */
 	virtual bool on_http_res_body(char* data, size_t dlen) = 0;
-	virtual bool on_http_res_finish(void) = 0;
+
+	/**
+	 * 当读完 HTTP 响应体或出错后的回调方法，子类必须实现
+	 * @param success {bool} 是否成功读完 HTTP 响应体数据
+	 * @return {bool} 如果成功读完数据体后返回 false 则会关闭连接
+	 */
+	virtual bool on_http_res_finish(bool success) = 0;
 
 protected:
+	/**
+	 * 向 WEB 服务器发送 HTTP 请求，内部在发送后会自动开始读 HTTP 响应过程
+	 * @param body {const void*} HTTP 请求的数据体，当为 NULL 时，内部会自
+	 *  动采用 HTTP GET 方法
+	 * @param len {size_t} body 非 NULL 时表示数据体的长度
+	 */
 	void send_request(const void* body, size_t len);
 
 protected:
-	// @override
-	bool open_callback(void);
+	// @override dummy
+	bool open_callback(void) { return true; }
 
 	// @override
 	bool timeout_callback(void);
@@ -59,10 +133,12 @@ protected:
 protected:
 	aio_handle&        handle_;
 	polarssl_conf*     ssl_conf_;
+	int                rw_timeout_;
 	aio_socket_stream* conn_;
 	http_header*       header_;
 	HTTP_HDR_RES*      hdr_res_;
 	HTTP_RES*          http_res_;
+	bool               keep_alive_;
 
 private:
 	static int connect_callback(ACL_ASTREAM* stream, void* ctx);
