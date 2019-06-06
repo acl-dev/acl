@@ -14,6 +14,8 @@ namespace acl {
 
 class aio_handle;
 class aio_socket_stream;
+class socket_stream;
+class websocket;
 class polarssl_conf;
 class polarssl_io;
 class http_header;
@@ -55,6 +57,7 @@ public:
 	 */
 	bool open(const char* addr, int conn_timeout, int rw_timeout);
 
+protected:
 	/**
 	 * 当连接成功后的回调方法，子类必须实现，子类应在该方法里构造 HTTP 请求
 	 * 并调用 send_request 方法向 WEB 服务器发送 HTTP 请求
@@ -83,27 +86,53 @@ public:
 	virtual void on_disconnect(void) {};
 
 	/**
-	 * 当接收到 WEB 服务端的响应头时的回调方法，子类必须实现
+	 * 当接收到 WEB 服务端的响应头时的回调方法
 	 * @param header {const http_header&}
 	 * @return {bool} 返回 false 则将会关闭连接，否则继续读
 	 */
-	virtual bool on_http_res_hdr(const http_header& header) = 0;
+	virtual bool on_http_res_hdr(const http_header& header)
+	{
+		(void) header;
+		return true;
+	}
 
 	/**
-	 * 当接收到 WEB 服务端的响应体时的回调方法，子类必须实现，该方法可能
-	 * 会被多次回调走到响应数据读完或出错
+	 * 当接收到 WEB 服务端的响应体时的回调方法，该方法可能会被多次回调
+	 * 直到响应数据读完或出错
 	 * @param data {char*} 读到的部分数据体内容
 	 * @param dlen {size_t} 本次读到的 data 数据的长度
 	 * @return {bool} 返回 false 则将会关闭连接，否则继续读
 	 */
-	virtual bool on_http_res_body(char* data, size_t dlen) = 0;
+	virtual bool on_http_res_body(char* data, size_t dlen)
+	{
+		(void) data;
+		(void) dlen;
+		return true;
+	}
 
 	/**
-	 * 当读完 HTTP 响应体或出错后的回调方法，子类必须实现
+	 * 当读完 HTTP 响应体或出错后的回调方法
 	 * @param success {bool} 是否成功读完 HTTP 响应体数据
 	 * @return {bool} 如果成功读完数据体后返回 false 则会关闭连接
 	 */
-	virtual bool on_http_res_finish(bool success) = 0;
+	virtual bool on_http_res_finish(bool success)
+	{
+		(void) success;
+		return true;
+	}
+
+	/**
+	 * 在 websocket 通信方式，当读到数据体时的回调方法
+	 * @param data {char*} 读到的数据地址
+	 * @param dlen {size_t} 读到的数据长度
+	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
+	 */
+	virtual bool on_ws_read_body(char* data, size_t dlen)
+	{
+		(void) data;
+		(void) dlen;
+		return true;
+	}
 
 protected:
 	/**
@@ -113,6 +142,11 @@ protected:
 	 * @param len {size_t} body 非 NULL 时表示数据体的长度
 	 */
 	void send_request(const void* body, size_t len);
+
+	/**
+	 * 与服务器进行 WEBSOCKET 握手
+	 */
+	void ws_handshake(void);
 
 protected:
 	// @override dummy
@@ -135,10 +169,15 @@ protected:
 	polarssl_conf*     ssl_conf_;
 	int                rw_timeout_;
 	aio_socket_stream* conn_;
+	socket_stream*     stream_;
 	http_header*       header_;
 	HTTP_HDR_RES*      hdr_res_;
 	HTTP_RES*          http_res_;
 	bool               keep_alive_;
+	websocket*         ws_in_;
+	websocket*         ws_out_;
+
+	bool handle_websocket(void);
 
 private:
 	static int connect_callback(ACL_ASTREAM* stream, void* ctx);

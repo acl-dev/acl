@@ -51,6 +51,8 @@ struct frame_header
 	unsigned int masking_key;
 };
 
+class string;
+
 /**
  * websocket 基础类
  */
@@ -180,6 +182,39 @@ public:
 	int read_frame_data(void* buf, size_t size);
 
 	/**
+	 * 用在非阻塞网络通信中，尝试读取 websocket 数据头，可以循环调用本方法
+	 * 走到该方法返回 true 表示读到了完整的 websocket 头；如果返回 false，
+	 * 则需通过 eof() 方法来判断网络连接是否已经断开，如 eof() 返回 true，
+	 * 则应释放本对象
+	 * @return {bool} 返回 true 表示读到了完整的 websocket 头，可以通过调用
+	 *  read_frame_data() 来读取数据体
+	 */
+	bool peek_frame_head(void);
+
+	/**
+	 * 用在非阻塞网络通信中，尝试读取 websocket 数据体，可以循环调用本方法
+	 * @param buf {char*} 存放读到的数据
+	 * @param size {size_t} buf 的空间大小
+	 * @return {int} 读到的数据长度，当返回值为：
+	 *   0: 表示本帧的数据体读完毕
+	 *  -1: 表示读出错，需通过调用 eof() 判断连接是否已经关闭
+	 *  >0: 表示本次读到的数据长度
+	 */
+	int peek_frame_data(char* buf, size_t size);
+
+	/**
+	 * 判断当前是否正在读 websocket 帧头数据
+	 * @return {bool}
+	 */
+	bool is_read_head(void) const;
+
+	/**
+	 * 判断当前网络连接是否已经断开
+	 * @return {bool}
+	 */
+	bool eof(void);
+
+	/**
 	 * 获得读到的数据帧的帧头
 	 * @return {const frame_header&}
 	 */
@@ -279,7 +314,17 @@ private:
 	unsigned long long payload_nsent_;
 	bool header_sent_;
 
+	unsigned status_;
+	string*  header_read_;
+
 	void make_frame_header(void);
+
+	void update_head_2bytes(unsigned char ch1, unsigned ch2);
+	bool peek_head_2bytes(void);
+	bool peek_head_len_2bytes(void);
+	bool peek_head_len_8bytes(void);
+	bool peek_head_masking_key(void);
+
 };
 
 } // namespace acl

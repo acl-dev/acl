@@ -2,10 +2,12 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
+#include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 #include "acl_cpp/stream/polarssl_conf.hpp"
 #include "acl_cpp/stream/polarssl_io.hpp"
 #include "acl_cpp/http/http_header.hpp"
+#include "acl_cpp/http/websocket.hpp"
 #include "acl_cpp/http/http_aclient.hpp"
 #endif
 
@@ -17,6 +19,7 @@ http_aclient::http_aclient(aio_handle& handle, polarssl_conf* ssl_conf /* NULL *
 , ssl_conf_(ssl_conf)
 , rw_timeout_(0)
 , conn_(NULL)
+, stream_(NULL)
 , hdr_res_(NULL)
 , http_res_(NULL)
 , keep_alive_(false)
@@ -32,6 +35,11 @@ http_aclient::~http_aclient(void)
 		http_hdr_res_free(hdr_res_);
 	}
 	delete header_;
+
+	if (stream_) {
+		stream_->unbind();
+		delete stream_;
+	}
 }
 
 http_header& http_aclient::request_header(void)
@@ -110,9 +118,66 @@ void http_aclient::close_callback(void)
 	this->destroy();
 }
 
+bool http_aclient::handle_websocket(void)
+{
+	acl_assert(ws_in_);
+
+	if (ws_in_->is_read_head()) {
+		if (!ws_in_->peek_frame_head()) {
+			if (ws_in_->eof()) {
+				return false;
+			}
+			return true;
+		}
+
+		unsigned char opcode = ws_in_->get_frame_opcode();
+		switch (opcode) {
+		case FRAME_TEXT:
+		case FRAME_BINARY:
+			break;
+		case FRAME_CLOSE:
+			return false;
+		case FRAME_PING:
+			return true;
+		case FRAME_PONG:
+			return true;
+		default:
+			return true;
+		}
+	}
+
+	char buf[8192];
+	size_t size = sizeof(buf) - 1;
+
+	while (true) {
+		int ret = ws_in_->peek_frame_data(buf, size);
+		switch (ret) {
+		case -1:
+			if (ws_in_->eof()) {
+				return false;
+			}
+			return true;
+		case 0:
+			return true;
+		default:
+			if (!this->on_ws_read_body(buf, ret)) {
+				return false;
+			}
+			break;
+		}
+	}
+}
+
 // 在 SSL 握手阶段，该方法会多次调用，直至 SSL 握手成功或失败
 bool http_aclient::read_wakeup(void)
 {
+	// 如果 websocket 非 NULL，则说明进入到 websocket 通信方式，
+	// 该触发条件在 http_res_hdr_cllback 中注册
+	if (ws_in_) {
+		return handle_websocket();
+	}
+
+	// 否则，则是第一次进行 SSL 握手阶段的 IO 过程
 	polarssl_io* ssl_io = (polarssl_io*) conn_->get_hook();
 	if (ssl_io == NULL) {
 		logger_error("no ssl_io hooked!");
@@ -156,6 +221,19 @@ int http_aclient::http_res_hdr_cllback(int status, void* ctx)
 
 	me->keep_alive_ = header.get_keep_alive();
 	me->http_res_   = http_res_new(me->hdr_res_);
+
+	if (me->ws_in_) {
+		if (me->hdr_res_->reply_status != 101) {
+			logger_error("invalid status=%d for websocket",
+				me->hdr_res_->reply_status);
+			return -1;
+		}
+
+		// 注册 websocket 读回调过程
+		me->conn_->add_read_callback(me);
+		me->conn_->read_wait(0);
+		return 0;
+	}
 
 	// 如果响应数据体长度为 0，则表示该 HTTP 响应完成
 	if (header.get_content_length() == 0) {
@@ -230,6 +308,25 @@ void http_aclient::send_request(const void* body, size_t len)
 	hdr_res_ = http_hdr_res_new();
 	http_hdr_res_get_async(hdr_res_, conn_->get_astream(),
 		http_res_hdr_cllback, this, rw_timeout_);
+}
+
+void http_aclient::ws_handshake(void)
+{
+	acl_assert(stream_ == NULL);
+	ACL_VSTREAM* vs = conn_->get_vstream();
+	stream_ = new socket_stream;
+	(void) stream_->open(vs);
+
+	http_header& hdr = request_header();
+	hdr.set_ws_key("123456789")
+		.set_ws_version(13)
+		.set_upgrade("websocket")
+		.set_keep_alive(true);
+
+	ws_in_  = NEW websocket(*stream_);
+	ws_out_ = NEW websocket(*stream_);
+
+	send_request(NULL, 0);
 }
 
 } // namespace acl
