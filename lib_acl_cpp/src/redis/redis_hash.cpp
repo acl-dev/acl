@@ -426,8 +426,7 @@ int redis_hash::hscan(const char* key, int cursor, std::map<string, string>& out
 	string name(128), value(128);
 	// out.clear();
 
-	for (size_t i = 0; i < size;)
-	{
+	for (size_t i = 0; i < size;) {
 		rr = children[i];
 		rr->argv_to_string(name);
 		i++;

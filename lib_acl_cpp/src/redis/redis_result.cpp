@@ -48,8 +48,7 @@ void redis_result::clear()
 
 redis_result& redis_result::set_size(size_t size)
 {
-	if (idx_ > 0)
-	{
+	if (idx_ > 0) {
 		logger_error("set size when putting, idx_: %d", (int) idx_);
 		return *this;
 	}
@@ -66,19 +65,16 @@ redis_result& redis_result::set_type(redis_result_t type)
 
 redis_result& redis_result::put(const char* buf, size_t len)
 {
-	if (size_ == 0)
-	{
+	if (size_ == 0) {
 		logger_error("size_ is 0, call set_size first!");
 		return *this;
 	}
-	if (idx_ >= size_)
-	{
+	if (idx_ >= size_) {
 		logger_error("overflow, idx_(%d) >= size_(%d)",
 			(int) idx_, (int) size_);
 		return *this;
 	}
-	if (argv_ == NULL)
-	{
+	if (argv_ == NULL) {
 		argv_ = (const char**) dbuf_->dbuf_alloc(sizeof(char*) * size_);
 		lens_ = (size_t*) dbuf_->dbuf_alloc(sizeof(size_t) * size_);
 	}
@@ -94,8 +90,7 @@ size_t redis_result::get_size() const
 {
 	if (result_type_ == REDIS_RESULT_ARRAY)
 		return children_idx_;
-	else if (result_type_ == REDIS_RESULT_STRING)
-	{
+	else if (result_type_ == REDIS_RESULT_STRING) {
 		if (argv_ == NULL || lens_ == NULL)
 			return 0;
 		return size_;
@@ -164,8 +159,7 @@ const char* redis_result::get_error() const
 
 const char* redis_result::get(size_t i, size_t* len /* = NULL */) const
 {
-	if (i >= idx_)
-	{
+	if (i >= idx_) {
 		if (len)
 			*len = 0;
 		return NULL;
@@ -194,8 +188,7 @@ int redis_result::argv_to_string(string& buf) const
 		return 0;
 
 	int length = 0;
-	for (size_t i = 0; i < idx_; i++)
-	{
+	for (size_t i = 0; i < idx_; i++) {
 		buf.append(argv_[i], lens_[i]);
 		length += (int) lens_[i];
 	}
@@ -215,8 +208,7 @@ int redis_result::argv_to_string(char* buf, size_t size) const
 	char* ptr = buf;
 	int length = 0;
 	size_t n;
-	for (size_t i = 0; i < idx_; i++)
-	{
+	for (size_t i = 0; i < idx_; i++) {
 		n = size > lens_[i] ? lens_[i] : size;
 		memcpy(ptr, argv_[i], n);
 		ptr += n;
@@ -239,8 +231,7 @@ redis_result& redis_result::put(const redis_result* rr, size_t idx)
 		children_idx_ = 0;
 
 	// +1 是为了确保最后一个数组元素可以被设为 NULL
-	if (children_idx_ + 1 < children_size_)
-	{
+	if (children_idx_ + 1 < children_size_) {
 		children_[children_idx_++] = rr;
 		return *this;
 	}
@@ -275,8 +266,7 @@ const redis_result** redis_result::get_children(size_t* size) const
 const string& redis_result::to_string(string& out) const
 {
 	redis_result_t type = get_type();
-	if (type != REDIS_RESULT_ARRAY)
-	{
+	if (type != REDIS_RESULT_ARRAY) {
 		string buf;
 		argv_to_string(buf);
 		out += buf;
@@ -289,8 +279,7 @@ const string& redis_result::to_string(string& out) const
 	if (children == NULL)
 		return out;
 
-	for (size_t i = 0; i < size; i++)
-	{
+	for (size_t i = 0; i < size; i++) {
 		const redis_result* rr = children[i];
 		if (rr != NULL)
 			rr->to_string(out);

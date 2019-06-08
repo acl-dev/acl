@@ -49,8 +49,7 @@ bool redis_role::role(void)
 		return role_master(children, size);
 	else if (role_name_.equal("slave", false))
 		return role_slave(children, size);
-	else
-	{
+	else {
 		logger_error("unknown role name=%s", role_name_.c_str());
 		return false;
 	}
@@ -61,8 +60,7 @@ bool redis_role::role(void)
 bool redis_role::role_sentinel(const redis_result** a, size_t n)
 {
 	string name;
-	for (size_t i = 1; i < n; i++)
-	{
+	for (size_t i = 1; i < n; i++) {
 		name.clear();
 		a[i]->argv_to_string(name);
 		masters_.push_back(name);
@@ -72,8 +70,7 @@ bool redis_role::role_sentinel(const redis_result** a, size_t n)
 
 bool redis_role::role_master(const redis_result** a, size_t n)
 {
-	for (size_t i = 1; i < n; i++)
-	{
+	for (size_t i = 1; i < n; i++) {
 		if (add_one_slave(a[i], role4master_) == false)
 			return false;
 	}
@@ -86,24 +83,21 @@ bool redis_role::add_one_slave(const redis_result* a, redis_role4master& out)
 	string buf;
 	size_t size;
 	const redis_result** children = a->get_children(&size);
-	if (size < 3)
-	{
+	if (size < 3) {
 		logger_error("invalid size=%d", (int) size);
 		return false;
 	}
 
 	redis_role4slave slave;
 
-	if (children[0]->get_type() != REDIS_RESULT_STRING)
-	{
+	if (children[0]->get_type() != REDIS_RESULT_STRING) {
 		logger_error("no ip");
 		return false;
 	}
 	children[0]->argv_to_string(buf);
 	slave.set_ip(buf);
 
-	if (children[1]->get_type() != REDIS_RESULT_STRING)
-	{
+	if (children[1]->get_type() != REDIS_RESULT_STRING) {
 		logger_error("no port");
 		return false;
 	}
@@ -111,8 +105,7 @@ bool redis_role::add_one_slave(const redis_result* a, redis_role4master& out)
 	children[1]->argv_to_string(buf);
 	slave.set_port(atoi(buf.c_str()));
 
-	if (children[2]->get_type() != REDIS_RESULT_STRING)
-	{
+	if (children[2]->get_type() != REDIS_RESULT_STRING) {
 		logger_error("no offset");
 		return false;
 	}
@@ -126,14 +119,12 @@ bool redis_role::add_one_slave(const redis_result* a, redis_role4master& out)
 
 bool redis_role::role_slave(const redis_result** a, size_t n)
 {
-	if (n < 5)
-	{
+	if (n < 5) {
 		logger_error("redis_result's size(%d) too small", (int) n);
 		return false;
 	}
 
-	if (a[1]->get_type() != REDIS_RESULT_STRING)
-	{
+	if (a[1]->get_type() != REDIS_RESULT_STRING) {
 		logger_error("no ip");
 		return false;
 	}
@@ -141,16 +132,14 @@ bool redis_role::role_slave(const redis_result** a, size_t n)
 	a[1]->argv_to_string(buf);
 	role4slave_.set_ip(buf);
 
-	if (a[2]->get_type() != REDIS_RESULT_INTEGER)
-	{
+	if (a[2]->get_type() != REDIS_RESULT_INTEGER) {
 		logger_error("no port");
 		return false;
 	}
 	int port = a[2]->get_integer();
 	role4slave_.set_port(port);
 
-	if (a[3]->get_type() != REDIS_RESULT_STRING)
-	{
+	if (a[3]->get_type() != REDIS_RESULT_STRING) {
 		logger_error("no status");
 		return false;
 	}
@@ -158,8 +147,7 @@ bool redis_role::role_slave(const redis_result** a, size_t n)
 	a[3]->argv_to_string(buf);
 	role4slave_.set_status(buf);
 
-	if (a[4]->get_type() != REDIS_RESULT_INTEGER)
-	{
+	if (a[4]->get_type() != REDIS_RESULT_INTEGER) {
 		logger_error("no offset");
 		return false;
 	}

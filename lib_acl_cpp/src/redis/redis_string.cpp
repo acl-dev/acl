@@ -545,8 +545,7 @@ int redis_string::bitop(const char* op, const char* destkey,
 	lens[2] = strlen(destkey);
 
 	std::vector<string>::const_iterator cit = keys.begin();
-	for (size_t i = 3; cit != keys.end(); ++cit, i++)
-	{
+	for (size_t i = 3; cit != keys.end(); ++cit, i++) {
 		argv[i] = (*cit).c_str();
 		lens[i] = strlen(argv[i]);
 	}
@@ -572,8 +571,7 @@ int redis_string::bitop(const char* op, const char* destkey,
 	lens[2] = strlen(destkey);
 
 	std::vector<const char*>::const_iterator cit = keys.begin();
-	for (size_t i = 3; cit != keys.end(); ++cit, i++)
-	{
+	for (size_t i = 3; cit != keys.end(); ++cit, i++) {
 		argv[i] = *cit;
 		lens[i] = strlen(argv[i]);
 	}
@@ -598,8 +596,7 @@ int redis_string::bitop(const char* op, const char* destkey,
 	argv[2] = destkey;
 	lens[2] = strlen(destkey);
 
-	for (size_t i = 3, j = 0; j < size; i++, j++)
-	{
+	for (size_t i = 3, j = 0; j < size; i++, j++) {
 		argv[i] = keys[j];
 		lens[i] = strlen(argv[i]);
 	}
@@ -777,8 +774,7 @@ bool redis_string::incoper(const char* cmd, const char* key, long long int* n,
 	lens[1] = strlen(key);
 
 	char buf[INT64_LEN];
-	if (n != NULL)
-	{
+	if (n != NULL) {
 		(void) acl_i64toa(*n, buf, sizeof(buf));
 		argv[2] = buf;
 		lens[2] = strlen(buf);

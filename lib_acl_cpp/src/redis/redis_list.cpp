@@ -373,8 +373,7 @@ bool redis_list::bpop(const char* cmd, const std::vector<const char*>& keys,
 
 	size_t i = 1;
 	std::vector<const char*>::const_iterator cit = keys.begin();
-	for (; cit != keys.end(); ++cit)
-	{
+	for (; cit != keys.end(); ++cit) {
 		args[i] = *cit;
 		lens[i] = strlen(args[i]);
 		i++;
@@ -401,8 +400,7 @@ bool redis_list::bpop(const char* cmd, const std::vector<string>& keys,
 
 	size_t i = 1;
 	std::vector<string>::const_iterator cit = keys.begin();
-	for (; cit != keys.end(); ++cit)
-	{
+	for (; cit != keys.end(); ++cit) {
 		args[i] = (*cit).c_str();
 		lens[i] = (*cit).length();
 		i++;
@@ -435,8 +433,8 @@ bool redis_list::bpop(std::pair<string, string>& out)
 	const redis_result* second = result->get_child(1);
 	if (first == NULL || second == NULL
 		|| first->get_type() != REDIS_RESULT_STRING
-		|| second->get_type() != REDIS_RESULT_STRING)
-	{
+		|| second->get_type() != REDIS_RESULT_STRING) {
+
 		return false;
 	}
 

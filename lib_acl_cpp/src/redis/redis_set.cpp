@@ -435,8 +435,7 @@ int redis_set::sscan(const char* key, int cursor, std::vector<string>& out,
 
 	out.reserve(out.size() + size);
 
-	for (size_t i = 0; i < size; i++)
-	{
+	for (size_t i = 0; i < size; i++) {
 		rr = children[i];
 		rr->argv_to_string(key_buf);
 		out.push_back(key_buf);

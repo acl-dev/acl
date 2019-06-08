@@ -249,8 +249,7 @@ int redis_server::info(std::map<string, string>& out)
 		return ret;
 
 	string line;
-	while (!buf.empty())
-	{
+	while (!buf.empty()) {
 		line.clear();
 		buf.scan_line(line);
 		if (line.empty())
@@ -327,13 +326,10 @@ void redis_server::shutdown(bool save_data /* = true */)
 	argv[0] = "SHUTDOWN";
 	lens[0] = sizeof("SHUTDOWN") - 1;
 
-	if (save_data)
-	{
+	if (save_data) {
 		argv[1] = "save";
 		lens[1] = sizeof("save") - 1;
-	}
-	else
-	{
+	} else {
 		argv[1] = "nosave";
 		lens[1] = sizeof("nosave") - 1;
 	}
@@ -376,8 +372,7 @@ const redis_result* redis_server::slowlog_get(int number /* = 0 */)
 	size_t argc = 2;
 
 	char buf[INT_LEN];
-	if (number > 0)
-	{
+	if (number > 0) {
 		safe_snprintf(buf, sizeof(buf), "%d", number);
 		argv[2] = buf;
 		lens[2] = strlen(buf);

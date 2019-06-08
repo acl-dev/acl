@@ -119,8 +119,7 @@ size_t redis_transaction::get_size() const
 
 const redis_result* redis_transaction::get_child(size_t i, string* cmd) const
 {
-	if (cmd != NULL)
-	{
+	if (cmd != NULL) {
 		if (i < cmds_.size())
 			*cmd = cmds_[i];
 	}
