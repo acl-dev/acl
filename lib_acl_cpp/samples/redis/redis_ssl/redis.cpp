@@ -216,13 +216,15 @@ int main(int argc, char* argv[])
 	acl::redis_client_cluster cluster;
 	cluster.set(addr.c_str(), 0, conn_timeout, rw_timeout);
 
+	acl::polarssl_conf* ssl_conf; // the global variable.
+
 	if (!ssl_libpath.empty() && access(ssl_libpath.c_str(), R_OK) == 0) {
 		// set the path of libpolarssl.so
 		acl::polarssl_conf::set_libpath(ssl_libpath);
 		// load libpolarssl.so dynamically
 		acl::polarssl_conf::load();
 
-		acl::polarssl_conf* ssl_conf = new acl::polarssl_conf;
+		ssl_conf = new acl::polarssl_conf;
 
 		// bind libpolarssl
 		client.set_ssl_conf(ssl_conf);
@@ -230,6 +232,7 @@ int main(int argc, char* argv[])
 
 		printf("SSL communication will be used\r\n");
 	} else {
+		ssl_conf = NULL;
 		printf("no SSL\r\n");
 	}
 
@@ -276,5 +279,6 @@ int main(int argc, char* argv[])
 	printf("enter any key to exit\r\n");
 	getchar();
 #endif
+	delete ssl_conf;
 	return 0;
 }
