@@ -14,6 +14,7 @@ redis_client_pool::redis_client_pool(const char* addr, size_t count,
 : connect_pool(addr, count, idx)
 , pass_(NULL)
 , dbnum_(0)
+, ssl_conf_(NULL)
 {
 }
 
@@ -21,6 +22,12 @@ redis_client_pool::~redis_client_pool(void)
 {
 	if (pass_)
 		acl_myfree(pass_);
+}
+
+redis_client_pool& redis_client_pool::set_ssl_conf(polarssl_conf* ssl_conf)
+{
+	ssl_conf_ = ssl_conf;
+	return *this;
 }
 
 redis_client_pool& redis_client_pool::set_password(const char* pass)
@@ -45,6 +52,8 @@ connect_client* redis_client_pool::create_connect(void)
 {
 	redis_client* conn = NEW redis_client(addr_, conn_timeout_,
 		rw_timeout_);
+	if (ssl_conf_)
+		conn->set_ssl_conf(ssl_conf_);
 	if (pass_)
 		conn->set_password(pass_);
 	if (dbnum_ > 0)

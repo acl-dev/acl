@@ -10,6 +10,8 @@
 namespace acl
 {
 
+class polarssl_conf;
+
 class redis_client_pool;
 
 /**
@@ -135,6 +137,15 @@ public:
 	}
 
 	/**
+	 * 设置 SSL 通信方式下的配置句柄，内部缺省值为 NULL，如果设置了 SSL 连
+	 * 接配置对象，则内部切换成 SSL 通信方式
+	 * set SSL communication with Redis-server if ssl_conf not NULL
+	 * @param ssl_conf {polarssl_conf*}
+	 * @return {redis_client_cluster&}
+	 */
+	redis_client_cluster& set_ssl_conf(polarssl_conf* ssl_conf);
+
+	/**
 	 * 设置某个 redis 服务相应的连接密码
 	 * set the password of one redis-server
 	 * @param addr {const char*} 指定的某 redis 服务器地址，当该参数的值为
@@ -189,6 +200,7 @@ private:
 	int redirect_max_;
 	int redirect_sleep_;
 	std::map<string, string> passwds_;
+	polarssl_conf* ssl_conf_;
 };
 
 } // namespace acl

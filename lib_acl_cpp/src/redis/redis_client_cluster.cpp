@@ -18,6 +18,7 @@ redis_client_cluster::redis_client_cluster(int max_slot /* = 16384 */)
 : max_slot_(max_slot)
 , redirect_max_(15)
 , redirect_sleep_(100)
+, ssl_conf_(NULL)
 {
 	slot_addrs_ = (const char**) acl_mycalloc(max_slot_, sizeof(char*));
 }
@@ -47,12 +48,15 @@ connect_pool* redis_client_cluster::create_pool(const char* addr,
 {
 	redis_client_pool* pool = NEW redis_client_pool(addr, count, idx);
 
+	if (ssl_conf_)
+		pool->set_ssl_conf(ssl_conf_);
+
 	string key(addr);
 	key.lower();
 	std::map<string, string>::const_iterator cit;
 	if ((cit = passwds_.find(key)) != passwds_.end()
-		|| (cit = passwds_.find("default")) != passwds_.end())
-	{
+		|| (cit = passwds_.find("default")) != passwds_.end()) {
+
 		pool->set_password(cit->second.c_str());
 	}
 
@@ -67,8 +71,7 @@ redis_client_pool* redis_client_cluster::peek_slot(int slot)
 	// 需要加锁保护
 	lock();
 
-	if (slot_addrs_[slot] == NULL)
-	{
+	if (slot_addrs_[slot] == NULL) {
 		unlock();
 		return NULL;
 	}
@@ -84,8 +87,7 @@ redis_client_pool* redis_client_cluster::peek_slot(int slot)
 
 void redis_client_cluster::clear_slot(int slot)
 {
-	if (slot >= 0 && slot < max_slot_)
-	{
+	if (slot >= 0 && slot < max_slot_) {
 		lock();
 		slot_addrs_[slot] = NULL;
 		unlock();
@@ -103,8 +105,7 @@ void redis_client_cluster::set_slot(int slot, const char* addr)
 	lock();
 
 	std::vector<char*>::const_iterator cit = addrs_.begin();
-	for (; cit != addrs_.end(); ++cit)
-	{
+	for (; cit != addrs_.end(); ++cit) {
 		if (strcmp((*cit), addr) == 0)
 			break;
 	}
@@ -112,8 +113,7 @@ void redis_client_cluster::set_slot(int slot, const char* addr)
 	// 将 slot 与地址进行关联映射
 	if (cit != addrs_.end())
 		slot_addrs_[slot] = *cit;
-	else
-	{
+	else {
 		// 只所以采用动态分配方式，是因为在往数组中添加对象时，无论
 		// 数组如何做动态调整，该添加的动态内存地址都是固定的，所以
 		// slot_addrs_ 的下标地址也是相对不变的
@@ -134,8 +134,8 @@ void redis_client_cluster::set_all_slot(const char* addr, size_t max_conns,
 	key.lower();
 	std::map<string, string>::const_iterator cit0;
 	if ((cit0 = passwds_.find(key)) != passwds_.end()
-		|| (cit0 = passwds_.find("default")) != passwds_.end())
-	{
+		|| (cit0 = passwds_.find("default")) != passwds_.end()) {
+
 		client.set_password(cit0->second.c_str());
 	}
 
@@ -146,8 +146,7 @@ void redis_client_cluster::set_all_slot(const char* addr, size_t max_conns,
 		return;
 
 	std::vector<redis_slot*>::const_iterator cit;
-	for (cit = slots->begin(); cit != slots->end(); ++cit)
-	{
+	for (cit = slots->begin(); cit != slots->end(); ++cit) {
 		const redis_slot* slot = *cit;
 		const char* ip = slot->get_ip();
 		if (*ip == 0)
@@ -172,6 +171,12 @@ void redis_client_cluster::set_all_slot(const char* addr, size_t max_conns,
 	}
 }
 
+redis_client_cluster& redis_client_cluster::set_ssl_conf(polarssl_conf* ssl_conf)
+{
+	ssl_conf_ = ssl_conf;
+	return *this;
+}
+
 redis_client_cluster& redis_client_cluster::set_password(
 	const char* addr, const char* pass)
 {
@@ -189,8 +194,8 @@ redis_client_cluster& redis_client_cluster::set_password(
 	unsigned long id = get_id();
 	conns_pools& pools = get_pools_by_id(id);
 	for (std::vector<connect_pool*>::iterator it = pools.pools.begin();
-		it != pools.pools.end(); ++it)
-	{
+		it != pools.pools.end(); ++it) {
+
 		redis_client_pool* pool = (redis_client_pool*) (*it);
 		key = pool->get_addr();
 		key.lower();

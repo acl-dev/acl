@@ -13,6 +13,7 @@ namespace acl
 class dbuf_pool;
 class redis_result;
 class redis_request;
+class polarssl_conf;
 
 /**
  * redis 客户端对象网络通信类，通过此类将组织好的 redis 请求命令发给 redis
@@ -38,6 +39,14 @@ public:
 	redis_client(const char* addr, int conn_timeout = 60,
 		int rw_timeout = 30, bool retry = true);
 	~redis_client(void);
+
+	/**
+	 * 设置 SSL 通信方式下的配置句柄，内部缺省值为 NULL，如果设置了 SSL 连
+	 * 接配置对象，则内部切换成 SSL 通信方式
+	 * set SSL communication with Redis-server if ssl_conf not NULL
+	 * @param ssl_conf {polarssl_conf*}
+	 */
+	void set_ssl_conf(polarssl_conf* ssl_conf);
 
 	/**
 	 * 调用本函数设置连接 redis 服务的连接密码
@@ -159,7 +168,7 @@ public:
 protected:
 	// 基类虚函数
 	// @override
-	virtual bool open(void);
+	bool open(void);
 
 private:
 	socket_stream conn_;
@@ -172,6 +181,7 @@ private:
 	bool   slice_req_;
 	bool   slice_res_;
 	int    dbnum_;
+	polarssl_conf* ssl_conf_;
 
 	redis_result* get_redis_objects(dbuf_pool* pool, size_t nobjs);
 	redis_result* get_redis_object(dbuf_pool* pool);

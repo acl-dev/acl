@@ -129,21 +129,21 @@ bool http_aclient::handle_websocket(void)
 			}
 			return true;
 		}
+	}
 
-		unsigned char opcode = ws_in_->get_frame_opcode();
-		switch (opcode) {
-		case FRAME_TEXT:
-		case FRAME_BINARY:
-			break;
-		case FRAME_CLOSE:
-			return false;
-		case FRAME_PING:
-			return true;
-		case FRAME_PONG:
-			return true;
-		default:
-			return true;
-		}
+	unsigned char opcode = ws_in_->get_frame_opcode();
+	switch (opcode) {
+	case FRAME_TEXT:
+	case FRAME_BINARY:
+		break;
+	case FRAME_CLOSE:
+		return false;
+	case FRAME_PING:
+		return true;
+	case FRAME_PONG:
+		return true;
+	default:
+		return true;
 	}
 
 	char buf[8192];
