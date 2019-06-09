@@ -122,17 +122,40 @@ protected:
 	}
 
 	/**
+	 * 当读到一个 text 类型的帧时的回调方法
+	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
+	 */
+	virtual bool on_ws_frame_text(void) { return true; }
+
+	/**
+	 * 当读到一个 binary 类型的帧时的回调方法
+	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
+	 */
+	virtual bool on_ws_frame_binary(void) { return true; }
+
+	/**
+	 * 当读到一个关闭帧数据时的回调方法
+	 */
+	virtual void on_ws_frame_closed(void) {}
+
+	/**
 	 * 在 websocket 通信方式，当读到数据体时的回调方法
 	 * @param data {char*} 读到的数据地址
 	 * @param dlen {size_t} 读到的数据长度
 	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
 	 */
-	virtual bool on_ws_read_body(char* data, size_t dlen)
+	virtual bool on_ws_frame_data(char* data, size_t dlen)
 	{
 		(void) data;
 		(void) dlen;
 		return true;
 	}
+
+	/**
+	 * 当读完一帧数据时的回调方法
+	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
+	 */
+	virtual bool on_ws_frame_finish(void) { return true; }
 
 protected:
 	/**
@@ -176,8 +199,13 @@ protected:
 	bool               keep_alive_;
 	websocket*         ws_in_;
 	websocket*         ws_out_;
+	string*            buff_;
 
 	bool handle_websocket(void);
+	bool handle_ws_data(void);
+	bool handle_ws_ping(void);
+	bool handle_ws_pong(void);
+	bool handle_ws_other(void);
 
 private:
 	static int connect_callback(ACL_ASTREAM* stream, void* ctx);

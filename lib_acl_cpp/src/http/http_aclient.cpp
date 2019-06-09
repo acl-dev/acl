@@ -23,6 +23,9 @@ http_aclient::http_aclient(aio_handle& handle, polarssl_conf* ssl_conf /* NULL *
 , hdr_res_(NULL)
 , http_res_(NULL)
 , keep_alive_(false)
+, ws_in_(NULL)
+, ws_out_(NULL)
+, buff_(NULL)
 {
 	header_ = NEW http_header;
 }
@@ -40,6 +43,10 @@ http_aclient::~http_aclient(void)
 		stream_->unbind();
 		delete stream_;
 	}
+
+	delete ws_in_;
+	delete ws_out_;
+	delete buff_;
 }
 
 http_header& http_aclient::request_header(void)
@@ -118,34 +125,83 @@ void http_aclient::close_callback(void)
 	this->destroy();
 }
 
-bool http_aclient::handle_websocket(void)
+bool http_aclient::handle_ws_ping(void)
 {
-	acl_assert(ws_in_);
+	if (buff_ == NULL) {
+		buff_ = NEW string(1024);
+	}
 
-	if (ws_in_->is_read_head()) {
-		if (!ws_in_->peek_frame_head()) {
+	while (true) {
+		int  ret = ws_in_->peek_frame_data(*buff_, 1024);
+		bool res;
+		switch (ret) {
+		case -1:
 			if (ws_in_->eof()) {
+				buff_->clear();
 				return false;
 			}
 			return true;
+		case 0:
+			res = ws_out_->send_frame_pong((void*) buff_->c_str(),
+				buff_->size());
+			buff_->clear();
+			return res;
+		default:
+			break;
 		}
 	}
+}
 
-	unsigned char opcode = ws_in_->get_frame_opcode();
-	switch (opcode) {
-	case FRAME_TEXT:
-	case FRAME_BINARY:
-		break;
-	case FRAME_CLOSE:
-		return false;
-	case FRAME_PING:
-		return true;
-	case FRAME_PONG:
-		return true;
-	default:
-		return true;
+bool http_aclient::handle_ws_pong(void)
+{
+	if (buff_ == NULL) {
+		buff_ = NEW string(1024);
 	}
 
+	while (true) {
+		int ret = ws_in_->peek_frame_data(*buff_, 1024);
+		switch (ret) {
+		case -1:
+			if (ws_in_->eof()) {
+				buff_->clear();
+				return false;
+			}
+			return true;
+		case 0:
+			buff_->clear();
+			return true;
+		default:
+			break;
+		}
+	}
+}
+
+bool http_aclient::handle_ws_other(void)
+{
+	if (buff_ == NULL) {
+		buff_ = NEW string(1024);
+	}
+
+	while (true) {
+		int ret = ws_in_->peek_frame_data(*buff_, 1024);
+		switch (ret) {
+		case -1:
+			if (ws_in_->eof()) {
+				buff_->clear();
+				return false;
+			}
+			return true;
+		case 0:
+			buff_->clear();
+			return true;
+		default:
+			break;
+		}
+	}
+}
+
+bool http_aclient::handle_ws_data(void)
+{
 	char buf[8192];
 	size_t size = sizeof(buf) - 1;
 
@@ -158,13 +214,64 @@ bool http_aclient::handle_websocket(void)
 			}
 			return true;
 		case 0:
-			return true;
+			return this->on_ws_frame_finish();
 		default:
-			if (!this->on_ws_read_body(buf, ret)) {
+			if (!this->on_ws_frame_data(buf, ret)) {
 				return false;
 			}
 			break;
 		}
+	}
+}
+
+bool http_aclient::handle_websocket(void)
+{
+	acl_assert(ws_in_);
+
+	if (!ws_in_->is_head_finish()) {
+		if (!ws_in_->peek_frame_head()) {
+			if (ws_in_->eof()) {
+				return false;
+			}
+			return true;
+		}
+
+		// 当读完数据帧头时，根据不同帧类型回调不同方法
+		unsigned char opcode = ws_in_->get_frame_opcode();
+		switch (opcode) {
+		case FRAME_TEXT:
+			if (!this->on_ws_frame_text()) {
+				return false;
+			}
+			break;
+		case FRAME_BINARY:
+			if (!this->on_ws_frame_binary()) {
+				return false;
+			}
+			break;
+		case FRAME_CLOSE:
+			this->on_ws_frame_closed();
+			return false;
+		case FRAME_PING:
+			return true;
+		case FRAME_PONG:
+			return true;
+		default:
+			return true;
+		}
+	}
+
+	unsigned char opcode = ws_in_->get_frame_opcode();
+	switch (opcode) {
+	case FRAME_TEXT:
+	case FRAME_BINARY:
+		return handle_ws_data();
+	case FRAME_PING:
+		return handle_ws_ping();
+	case FRAME_PONG:
+		return handle_ws_pong();
+	default:
+		return handle_ws_other();
 	}
 }
 

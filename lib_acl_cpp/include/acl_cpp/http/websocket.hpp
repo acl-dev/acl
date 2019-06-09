@@ -201,12 +201,13 @@ public:
 	 *  >0: 表示本次读到的数据长度
 	 */
 	int peek_frame_data(char* buf, size_t size);
+	int peek_frame_data(string& buf, size_t size);
 
 	/**
-	 * 判断当前是否正在读 websocket 帧头数据
+	 * 判断当前是否已读完 websocket 帧头数据
 	 * @return {bool}
 	 */
-	bool is_read_head(void) const;
+	bool is_head_finish(void) const;
 
 	/**
 	 * 判断当前网络连接是否已经断开
@@ -315,7 +316,7 @@ private:
 	bool header_sent_;
 
 	unsigned status_;
-	string*  header_read_;
+	string*  peek_buf_;
 
 	void make_frame_header(void);
 
