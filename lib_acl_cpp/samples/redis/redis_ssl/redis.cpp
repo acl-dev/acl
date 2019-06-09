@@ -33,8 +33,7 @@ static bool test_get(acl::redis& cmd, int n)
 			printf("get key: %s error: %s\r\n", key.c_str(),
 				cmd.result_error());
 			return false;
-		}
-		else if (i < 10)
+		} else if (i < 10)
 			printf("get key: %s ok, val: %s\r\n", key.c_str(),
 				val.c_str());
 	}
@@ -54,8 +53,7 @@ static bool test_del(acl::redis& cmd, int n)
 			printf("del key: %s error: %s\r\n", key.c_str(),
 				cmd.result_error());
 			return false;
-		}
-		else if (i < 10)
+		} else if (i < 10)
 			printf("del ok, key: %s\r\n", key.c_str());
 	}
 
@@ -73,8 +71,7 @@ static bool test_expire(acl::redis& cmd, int n)
 			printf("expire key: %s error: %s\r\n", key.c_str(),
 				cmd.result_error());
 			return false;
-		}
-		else if (i < 10)
+		} else if (i < 10)
 			printf("expire ok, key: %s\r\n", key.c_str());
 	}
 
@@ -93,8 +90,7 @@ static bool test_ttl(acl::redis& cmd, int n)
 			printf("get ttl key: %s error: %s\r\n", key.c_str(),
 				cmd.result_error());
 			return false;
-		}
-		else if (i < 10)
+		} else if (i < 10)
 			printf("ttl ok, key: %s, ttl: %d\r\n",
 				key.c_str(), ttl);
 	}
@@ -112,8 +108,7 @@ static bool test_exists(acl::redis& cmd, int n)
 		if (cmd.exists(key.c_str()) == false) {
 			if (i < 10)
 				printf("no exists key: %s\r\n", key.c_str());
-		}
-		else if (i < 10)
+		} else if (i < 10)
 			printf("exists key: %s\r\n", key.c_str());
 	}
 
@@ -132,8 +127,7 @@ static bool test_type(acl::redis& cmd, int n)
 			printf("unknown type key: %s error: %s\r\n",
 				key.c_str(), cmd.result_error());
 			return false;
-		}
-		else if (i < 10)
+		} else if (i < 10)
 			printf("type ok, key: %s, ret: %d\r\n",
 				key.c_str(), ret);
 	}
