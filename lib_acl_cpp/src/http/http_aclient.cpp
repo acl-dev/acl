@@ -1,6 +1,7 @@
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/stdlib/zlib_stream.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
@@ -34,6 +35,9 @@ http_aclient::http_aclient(aio_handle& handle, polarssl_conf* ssl_conf /* NULL *
 , ws_in_(NULL)
 , ws_out_(NULL)
 , buff_(NULL)
+, unzip_(false)
+, zstream_(NULL)
+, gzip_header_left_(0)
 {
 	header_ = NEW http_header;
 }
@@ -55,11 +59,18 @@ http_aclient::~http_aclient(void)
 	delete ws_in_;
 	delete ws_out_;
 	delete buff_;
+	delete zstream_;
 }
 
 http_header& http_aclient::request_header(void)
 {
 	return *header_;
+}
+
+http_aclient& http_aclient::unzip_body(bool on)
+{
+	unzip_ = on;
+	return *this;
 }
 
 bool http_aclient::open(const char* addr, int conn_timeout, int rw_timeout)
@@ -335,6 +346,110 @@ bool http_aclient::read_callback(char* data, int len)
 	return true;
 }
 
+bool http_aclient::res_plain_finish(char* data, int dlen)
+{
+	if (data == NULL || dlen <= 0) {
+		// 读完 HTTP 响应数据，回调完成方法
+		return this->on_http_res_finish(true) && keep_alive_;
+	}
+
+	// 将读到的 HTTP 响应体数据传递给子类
+	if (!this->on_http_res_body(data, (size_t) dlen)) {
+		return false;
+	}
+
+	// 读完 HTTP 响应数据，回调完成方法
+	return this->on_http_res_finish(true) && keep_alive_;
+}
+
+bool http_aclient::res_unzip_finish(zlib_stream& zstream, char* data, int dlen)
+{
+	if (data == NULL || dlen == 0) {
+		string buf(1024);
+		if (!zstream.unzip_finish(&buf)) {
+			logger_error("unzip_finish error");
+			return false;
+		}
+
+		if (!buf.empty() && !this->on_http_res_body(
+			buf.c_str(), buf.size())) {
+
+			return false;
+		}
+
+		// 读完 HTTP 响应数据，回调完成方法
+		return this->on_http_res_finish(true) && keep_alive_;
+	}
+
+	string buf(4096);
+	if (!zstream.unzip_update(data, dlen, &buf)) {
+		logger_error("unzip_update error");
+		return false;
+	}
+	if (!zstream.unzip_finish(&buf)) {
+		logger_error("unzip_finish error");
+		return false;
+	}
+
+	if (!buf.empty()) {
+		if (!this->on_http_res_body(buf.c_str(), buf.size())) {
+			return false;
+		}
+	}
+
+	// 读完 HTTP 响应数据，回调完成方法
+	return this->on_http_res_finish(true) && keep_alive_;
+}
+
+bool http_aclient::handle_res_body_finish(char* data, int dlen)
+{
+	if (zstream_) {
+		return res_unzip_finish(*zstream_, data, dlen);
+	} else {
+		return res_plain_finish(data, dlen);
+	}
+}
+
+bool http_aclient::res_plain(char* data, int dlen)
+{
+	return this->on_http_res_body(data, (size_t) dlen);
+}
+
+bool http_aclient::res_unzip(zlib_stream& zstream, char* data, int dlen)
+{
+	if (gzip_header_left_ >= dlen) {
+		gzip_header_left_ -= dlen;
+		return true;
+	}
+
+	dlen -= gzip_header_left_;
+	data += gzip_header_left_;
+	gzip_header_left_ = 0;
+
+	string buf(4096);
+	if (!zstream.unzip_update(data, dlen, &buf)) {
+		logger_error("unzip_update error, dlen=%d", dlen);
+		return false;
+	}
+
+	if (!buf.empty()) {
+		if (!this->on_http_res_body(buf.c_str(), buf.size())) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool http_aclient::handle_res_body(char* data, int dlen)
+{
+	if (zstream_) {
+		return res_unzip(*zstream_, data, dlen);
+	} else {
+		return res_plain(data, dlen);
+	}
+}
+
 int http_aclient::http_res_callback(int status, char* data, int dlen, void* ctx)
 {
 	http_aclient* me = (http_aclient*) ctx;
@@ -344,26 +459,14 @@ int http_aclient::http_res_callback(int status, char* data, int dlen, void* ctx)
 	case HTTP_CHAT_CHUNK_TRAILER:
 		return 0;
 	case HTTP_CHAT_OK:
-		if (data && dlen > 0) {
-			// 将读到的 HTTP 响应体数据传递给子类
-			if (!me->on_http_res_body(data, (size_t) dlen)) {
-				return -1;
-			}
-		}
-
-		// 读完 HTTP 响应数据，回调完成方法
-		if (me->on_http_res_finish(true) && me->keep_alive_) {
-			return 0;
-		} else {
-			return -1;
-		}
+		return me->handle_res_body_finish(data, dlen) ? 0 : -1;
 	case HTTP_CHAT_ERR_IO:
 	case HTTP_CHAT_ERR_PROTO:
 		(void) me->on_http_res_finish(false);
 		return -1;
 	case HTTP_CHAT_DATA:
 		// 将读到的 HTTP 响应体数据传递给子类
-		return me->on_http_res_body(data, (size_t) dlen) ? 0 : -1;
+		return me->handle_res_body(data, dlen) ? 0 : -1;
 	default:
 		return 0;
 	}
@@ -405,6 +508,18 @@ int http_aclient::http_res_hdr_cllback(int status, void* ctx)
 	}
 
 	// 否则，走正常的 HTTP 处理过程
+
+	if (me->unzip_ && header.is_transfer_gzip()) {
+		me->zstream_ = NEW zlib_stream();
+		if (!me->zstream_->unzip_begin(false)) {
+			logger_error("unzip_begin error");
+			delete me->zstream_;
+			me->zstream_ = NULL;
+		} else {
+			// gzip 响应数据体前会有 10 字节的头部字段
+			me->gzip_header_left_ = 10;
+		}
+	}
 
 	// 如果响应数据体长度为 0，则表示该 HTTP 响应完成
 	if (header.get_content_length() == 0) {

@@ -15,13 +15,17 @@ namespace acl {
 class aio_handle;
 class aio_socket_stream;
 class socket_stream;
+class zlib_stream;
 class websocket;
 class polarssl_conf;
 class polarssl_io;
 class http_header;
 
 /**
- * HTTP 客户端异步通信类，支持 SSL 加密传输
+ * HTTP 客户端异步通信类，不仅支持标准 HTTP 通信协议，而且支持 Websocket 通信，
+ * 对于 HTTP 协议及 Websocket 通信均支持 SSL 加密传输；
+ * 另外，对于 HTTP 协议，根据用户设置，可以自动解压 GZIP 响应数据，这样在回调
+ * 方法 on_http_res_body() 中收到的便是解压后的明文数据。
  */
 class ACL_CPP_API http_aclient : public aio_open_callback
 {
@@ -44,6 +48,22 @@ public:
 	 * @return {http_header&}
 	 */
 	http_header& request_header(void);
+
+	/**
+	 * 针对 HTTP 协议的响应数据是否自动进行解压
+	 * @param on {bool}
+	 * @return {http_aclient&}
+	 */
+	http_aclient& unzip_body(bool on);
+
+	/**
+	 * 是否针对 GZIP 压缩数据自动进行解压
+	 * @return {bool}
+	 */
+	bool is_unzip_body(void) const
+	{
+		return unzip_;
+	}
 
 	/**
 	 * 开始异步连接远程 WEB 服务器
@@ -256,8 +276,19 @@ protected:
 	websocket*         ws_in_;
 	websocket*         ws_out_;
 	string*            buff_;
+	bool               unzip_;		// 是否自动解压响应体数据
+	zlib_stream*       zstream_;		// 解压对象
+	int                gzip_header_left_;	// gzip 传输时压缩头部长度
 
 	bool handle_ssl_handshake(void);
+
+	bool handle_res_body(char* data, int dlen);
+	bool res_plain(char* data, int dlen);
+	bool res_unzip(zlib_stream& zstream, char* data, int dlen);
+
+	bool handle_res_body_finish(char* data, int dlen);
+	bool res_plain_finish(char* data, int dlen);
+	bool res_unzip_finish(zlib_stream& zstream, char* data, int dlen);
 
 	bool handle_websocket(void);
 	bool handle_ws_data(void);
