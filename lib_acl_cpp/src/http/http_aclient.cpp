@@ -86,50 +86,54 @@ bool http_aclient::open(const char* addr, int conn_timeout, int rw_timeout)
 	return true;
 }
 
-int http_aclient::connect_callback(ACL_ASTREAM *stream, void *ctx)
+bool http_aclient::handle_connect(ACL_ASTREAM *stream)
 {
-	http_aclient* me = (http_aclient*) ctx;
-
 	if (stream == NULL) {
 		if (last_error() == ACL_ETIMEDOUT) {
-			me->on_connect_timeout();
-			me->destroy();
+			this->on_connect_timeout();
+			this->destroy();
 		} else {
-			me->on_connect_failed();
-			me->destroy();
+			this->on_connect_failed();
+			this->destroy();
 		}
-		return -1;
+		return false;
 	}
 
 	// 连接成功，创建 C++ AIO 连接对象
-	me->conn_ = new aio_socket_stream(&me->handle_, stream, true);
+	conn_ = new aio_socket_stream(&handle_, stream, true);
 
 	// 注册连接关闭回调处理对象
-	me->conn_->add_close_callback(me);
+	conn_->add_close_callback(this);
 
 	// 注册 IO 超时回调处理对象
-	me->conn_->add_timeout_callback(me);
+	conn_->add_timeout_callback(this);
 
-	if (!me->ssl_conf_) {
-		return me->on_connect() ? 0 : -1;
+	if (!ssl_conf_) {
+		return this->on_connect();
 	}
 
 	// 因为配置了 SSL 通信方式，所以需要创建 SSL IO 过程，开始 SSL 握手
-	polarssl_io* ssl_io = new polarssl_io(*me->ssl_conf_, false, true);
-	if (me->conn_->setup_hook(ssl_io) == ssl_io || !ssl_io->handshake()) {
+	polarssl_io* ssl_io = new polarssl_io(*ssl_conf_, false, true);
+	if (conn_->setup_hook(ssl_io) == ssl_io || !ssl_io->handshake()) {
 		logger_error("open ssl failed");
-		me->conn_->remove_hook();
+		conn_->remove_hook();
 		ssl_io->destroy();
-		me->on_connect_failed();
-		return -1;
+		this->on_connect_failed();
+		return false;
 	}
 
-	me->status_ = HTTP_ACLIENT_STATUS_SSL_HANDSHAKE;
+	status_ = HTTP_ACLIENT_STATUS_SSL_HANDSHAKE;
 
 	// 开始 SSL 握手过程，read_wait 对应的回调方法为 read_wakeup
-	me->conn_->add_read_callback(me);
-	me->conn_->read_wait(me->rw_timeout_);
-	return 0;
+	conn_->add_read_callback(this);
+	conn_->read_wait(rw_timeout_);
+	return true;
+}
+
+int http_aclient::connect_callback(ACL_ASTREAM *stream, void *ctx)
+{
+	http_aclient* me = (http_aclient*) ctx;
+	return me->handle_connect(stream) ? 0 : -1;
 }
 
 bool http_aclient::timeout_callback(void)
@@ -472,68 +476,78 @@ int http_aclient::http_res_callback(int status, char* data, int dlen, void* ctx)
 	}
 }
 
-int http_aclient::http_res_hdr_cllback(int status, void* ctx)
+bool http_aclient::handle_res_hdr(int status)
 {
-	http_aclient* me = (http_aclient*) ctx;
 	acl_assert(status == HTTP_CHAT_OK);
 
-	http_hdr_res_parse(me->hdr_res_);
+	// 解析 HTTP 响应头
+	http_hdr_res_parse(hdr_res_);
 
 	// 将 C HTTP 响应头转换成 C++ HTTP 响应头，并回调子类方法
-	http_header header(*me->hdr_res_);
-	if (!me->on_http_res_hdr(header)) {
-		return -1;
+	http_header header(*hdr_res_);
+	if (!this->on_http_res_hdr(header)) {
+		return false;
 	}
 
-	me->keep_alive_ = header.get_keep_alive();
-	me->http_res_   = http_res_new(me->hdr_res_);
+	keep_alive_ = header.get_keep_alive();
 
 	// 如果是 websocket 通信方式，则转入 websocket 处理过程
-	if (me->status_ == HTTP_ACLIENT_STATUS_WS_HANDSHAKE) {
-		acl_assert(me->ws_in_ && me->ws_out_);
+	if (status_ == HTTP_ACLIENT_STATUS_WS_HANDSHAKE) {
+		acl_assert(ws_in_ && ws_out_);
 
 		// HTTP 响应状态必须是 101，否则表明 websocket 握手失败
-		if (me->hdr_res_->reply_status != 101) {
+		if (hdr_res_->reply_status != 101) {
 			logger_error("invalid status=%d for websocket",
-				me->hdr_res_->reply_status);
-			me->on_ws_handshake_failed(me->hdr_res_->reply_status);
-			return -1;
+				hdr_res_->reply_status);
+			this->on_ws_handshake_failed(hdr_res_->reply_status);
+			return false;
 		}
 
 		// 回调子类方法，通知 WS 握手完成
-		if (!me->on_ws_handshake()) {
-			return -1;
+		if (!this->on_ws_handshake()) {
+			return false;
 		}
-		return 0;
+		return true;
 	}
 
 	// 否则，走正常的 HTTP 处理过程
 
-	if (me->unzip_ && header.is_transfer_gzip()) {
-		me->zstream_ = NEW zlib_stream();
-		if (!me->zstream_->unzip_begin(false)) {
+	http_res_ = http_res_new(hdr_res_);
+
+	// 如果响应数据为 GZIP 压缩数据，且用户设置了自动解压功能，则需要创建
+	// 解压流对象，针对响应数据进行解压
+	if (unzip_ && header.is_transfer_gzip()) {
+		zstream_ = NEW zlib_stream();
+		if (!zstream_->unzip_begin(false)) {
 			logger_error("unzip_begin error");
-			delete me->zstream_;
-			me->zstream_ = NULL;
+			delete zstream_;
+			zstream_ = NULL;
 		} else {
 			// gzip 响应数据体前会有 10 字节的头部字段
-			me->gzip_header_left_ = 10;
+			gzip_header_left_ = 10;
 		}
 	}
 
 	// 如果响应数据体长度为 0，则表示该 HTTP 响应完成
 	if (header.get_content_length() == 0) {
-		if (me->on_http_res_finish(true) && me->keep_alive_) {
-			return 0;
+		if (this->on_http_res_finish(true) && keep_alive_) {
+			return true;
 		} else {
-			return -1;
+			return false;
 		}
 	}
 
 	// 开始异步读取 HTTP 响应体数据
-	http_res_body_get_async(me->http_res_, me->conn_->get_astream(),
-		http_res_callback, me, me->rw_timeout_);
-	return 0;
+	http_res_body_get_async(http_res_, conn_->get_astream(),
+		http_res_callback, this, rw_timeout_);
+	return true;
+}
+
+int http_aclient::http_res_hdr_cllback(int status, void* ctx)
+{
+	http_aclient* me = (http_aclient*) ctx;
+
+	return me->handle_res_hdr(status) ? 0 : -1;
 }
 
 void http_aclient::send_request(const void* body, size_t len)

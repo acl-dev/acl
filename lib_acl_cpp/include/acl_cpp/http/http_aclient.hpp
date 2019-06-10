@@ -280,7 +280,10 @@ protected:
 	zlib_stream*       zstream_;		// 解压对象
 	int                gzip_header_left_;	// gzip 传输时压缩头部长度
 
+	bool handle_connect(ACL_ASTREAM* stream);
 	bool handle_ssl_handshake(void);
+
+	bool handle_res_hdr(int status);
 
 	bool handle_res_body(char* data, int dlen);
 	bool res_plain(char* data, int dlen);
