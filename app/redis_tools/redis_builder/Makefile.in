@@ -8,7 +8,7 @@ CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
-SYSLIB = -lpthread -lz
+SYSLIB = -lpthread -lz -ldl
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -s)
 OSTYPE = $(shell uname -m)
@@ -33,7 +33,7 @@ EXIST_CURSOR = $(shell if [ -f "/lib64/libncurses.a" \
 ifeq ($(EXIST_READLINE), exist)
 	ifeq ($(EXIST_CURSOR), exist)
 		CFLAGS += -DHAS_READLINE
-		SYSLIB = -lreadline -lcurses -lpthread -lz
+		SYSLIB = -lreadline -lcurses -lpthread -lz -ldl
 	endif
 endif
 
@@ -43,7 +43,7 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 		CFLAGS += -Wstrict-prototypes
 	endif
 	CFLAGS += -DFREEBSD -D_REENTRANT
-	SYSLIB = -lcrypt -lpthread -lz
+	SYSLIB = -lcrypt -lpthread -lz -ldl
 	RPATH = freebsd
 endif
 
