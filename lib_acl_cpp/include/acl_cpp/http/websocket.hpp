@@ -18,6 +18,7 @@ namespace acl
 {
 
 class socket_stream;
+class aio_socket_stream;
 
 enum
 {
@@ -165,6 +166,53 @@ public:
 	bool send_frame_ping(void* data, size_t len);
 	bool send_frame_ping(const char* str);
 	bool send_frame_ping(char* str);
+
+	/**
+	 * 调用非阻塞发送接口异步发送数据，当发送完数据后，应用层应该调用
+	 * reset() 方法重置状态，在发送一个数据包前，应用层需要调用以上的
+	 * set_frame_xxx 方法用来设置每一个数据包的帧头信息
+	 * @param conn {aio_socket_stream&}
+	 * @param data {void*} 要发送的数据，内部会被修改
+	 * @param len {size_t} data 数据长度
+	 * @return {bool} 是否出错
+	 */
+	bool send_frame_data(aio_socket_stream& conn, void* data, size_t len);
+
+	/**
+	 * 异步发送一个 FRAME_TEXT 类型的数据帧
+	 * @param conn {aio_socket_stream&}
+	 * @param data {char*}
+	 * @param len {size_t}
+	 * @return {bool}
+	 */
+	bool send_frame_text(aio_socket_stream& conn, char* data, size_t len);
+
+	/**
+	 * 异步发送一个 FRAME_BINARY 类型的数据帧
+	 * @param conn {aio_socket_stream&}
+	 * @param data {char*}
+	 * @param len {size_t}
+	 * @return {bool}
+	 */
+	bool send_frame_binary(aio_socket_stream& conn, void* data, size_t len);
+
+	/**
+	 * 异步发送一个 FRAME_PING 类型的数据帧
+	 * @param conn {aio_socket_stream&}
+	 * @param data {char*}
+	 * @param len {size_t}
+	 * @return {bool}
+	 */
+	bool send_frame_ping(aio_socket_stream& conn, void* data, size_t len);
+
+	/**
+	 * 异步发送一个 FRAME_PONG 类型的数据帧
+	 * @param conn {aio_socket_stream&}
+	 * @param data {char*}
+	 * @param len {size_t}
+	 * @return {bool}
+	 */
+	bool send_frame_pong(aio_socket_stream& conn, void* data, size_t len);
 
 	/**
 	 * 读取数据帧帧头

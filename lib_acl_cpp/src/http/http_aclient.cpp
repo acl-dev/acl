@@ -14,8 +14,16 @@
 namespace acl
 {
 
+enum {
+	HTTP_ACLIENT_STATUS_NONE,
+	HTTP_ACLIENT_STATUS_SSL_HANDSHAKE,
+	HTTP_ACLIENT_STATUS_WS_HANDSHAKE,
+	HTTP_ACLIENT_STATUS_WS_READING,
+};
+
 http_aclient::http_aclient(aio_handle& handle, polarssl_conf* ssl_conf /* NULL */)
-: handle_(handle)
+: status_(HTTP_ACLIENT_STATUS_NONE)
+, handle_(handle)
 , ssl_conf_(ssl_conf)
 , rw_timeout_(0)
 , conn_(NULL)
@@ -105,6 +113,8 @@ int http_aclient::connect_callback(ACL_ASTREAM *stream, void *ctx)
 		return -1;
 	}
 
+	me->status_ = HTTP_ACLIENT_STATUS_SSL_HANDSHAKE;
+
 	// 开始 SSL 握手过程，read_wait 对应的回调方法为 read_wakeup
 	me->conn_->add_read_callback(me);
 	me->conn_->read_wait(me->rw_timeout_);
@@ -142,8 +152,9 @@ bool http_aclient::handle_ws_ping(void)
 			}
 			return true;
 		case 0:
-			res = ws_out_->send_frame_pong((void*) buff_->c_str(),
-				buff_->size());
+			// 异步发送 pong 数据
+			res = ws_out_->send_frame_pong(*conn_,
+				(void*) buff_->c_str(), buff_->size());
 			buff_->clear();
 			return res;
 		default:
@@ -280,16 +291,27 @@ bool http_aclient::read_wakeup(void)
 {
 	// 如果 websocket 非 NULL，则说明进入到 websocket 通信方式，
 	// 该触发条件在 http_res_hdr_cllback 中注册
-	if (ws_in_) {
+	switch (status_) {
+	case HTTP_ACLIENT_STATUS_WS_READING:
+		acl_assert(ws_in_);
 		return handle_websocket();
+	case HTTP_ACLIENT_STATUS_SSL_HANDSHAKE:
+		return handle_ssl_handshake();
+	default:
+		logger_error("invalid status=%u", status_);
+		return false;
 	}
+}
 
+bool http_aclient::handle_ssl_handshake(void)
+{
 	// 否则，则是第一次进行 SSL 握手阶段的 IO 过程
 	polarssl_io* ssl_io = (polarssl_io*) conn_->get_hook();
 	if (ssl_io == NULL) {
 		logger_error("no ssl_io hooked!");
 		return false;
 	}
+
 	if (!ssl_io->handshake()) {
 		logger_error("ssl handshake error!");
 		return false;
@@ -311,50 +333,6 @@ bool http_aclient::read_callback(char* data, int len)
 	(void) data;
 	(void) len;
 	return true;
-}
-
-int http_aclient::http_res_hdr_cllback(int status, void* ctx)
-{
-	http_aclient* me = (http_aclient*) ctx;
-	acl_assert(status == HTTP_CHAT_OK);
-
-	http_hdr_res_parse(me->hdr_res_);
-
-	// 将 C HTTP 响应头转换成 C++ HTTP 响应头，并回调子类方法
-	http_header header(*me->hdr_res_);
-	if (!me->on_http_res_hdr(header)) {
-		return -1;
-	}
-
-	me->keep_alive_ = header.get_keep_alive();
-	me->http_res_   = http_res_new(me->hdr_res_);
-
-	if (me->ws_in_) {
-		if (me->hdr_res_->reply_status != 101) {
-			logger_error("invalid status=%d for websocket",
-				me->hdr_res_->reply_status);
-			return -1;
-		}
-
-		// 注册 websocket 读回调过程
-		me->conn_->add_read_callback(me);
-		me->conn_->read_wait(0);
-		return 0;
-	}
-
-	// 如果响应数据体长度为 0，则表示该 HTTP 响应完成
-	if (header.get_content_length() == 0) {
-		if (me->on_http_res_finish(true) && me->keep_alive_) {
-			return 0;
-		} else {
-			return -1;
-		}
-	}
-
-	// 开始异步读取 HTTP 响应体数据
-	http_res_body_get_async(me->http_res_, me->conn_->get_astream(),
-		http_res_callback, me, me->rw_timeout_);
-	return 0;
 }
 
 int http_aclient::http_res_callback(int status, char* data, int dlen, void* ctx)
@@ -389,6 +367,58 @@ int http_aclient::http_res_callback(int status, char* data, int dlen, void* ctx)
 	default:
 		return 0;
 	}
+}
+
+int http_aclient::http_res_hdr_cllback(int status, void* ctx)
+{
+	http_aclient* me = (http_aclient*) ctx;
+	acl_assert(status == HTTP_CHAT_OK);
+
+	http_hdr_res_parse(me->hdr_res_);
+
+	// 将 C HTTP 响应头转换成 C++ HTTP 响应头，并回调子类方法
+	http_header header(*me->hdr_res_);
+	if (!me->on_http_res_hdr(header)) {
+		return -1;
+	}
+
+	me->keep_alive_ = header.get_keep_alive();
+	me->http_res_   = http_res_new(me->hdr_res_);
+
+	// 如果是 websocket 通信方式，则转入 websocket 处理过程
+	if (me->status_ == HTTP_ACLIENT_STATUS_WS_HANDSHAKE) {
+		acl_assert(me->ws_in_ && me->ws_out_);
+
+		// HTTP 响应状态必须是 101，否则表明 websocket 握手失败
+		if (me->hdr_res_->reply_status != 101) {
+			logger_error("invalid status=%d for websocket",
+				me->hdr_res_->reply_status);
+			me->on_ws_handshake_failed(me->hdr_res_->reply_status);
+			return -1;
+		}
+
+		// 回调子类方法，通知 WS 握手完成
+		if (!me->on_ws_handshake()) {
+			return -1;
+		}
+		return 0;
+	}
+
+	// 否则，走正常的 HTTP 处理过程
+
+	// 如果响应数据体长度为 0，则表示该 HTTP 响应完成
+	if (header.get_content_length() == 0) {
+		if (me->on_http_res_finish(true) && me->keep_alive_) {
+			return 0;
+		} else {
+			return -1;
+		}
+	}
+
+	// 开始异步读取 HTTP 响应体数据
+	http_res_body_get_async(me->http_res_, me->conn_->get_astream(),
+		http_res_callback, me, me->rw_timeout_);
+	return 0;
 }
 
 void http_aclient::send_request(const void* body, size_t len)
@@ -430,10 +460,48 @@ void http_aclient::ws_handshake(void)
 		.set_upgrade("websocket")
 		.set_keep_alive(true);
 
+	// 创建 websocket 输入输出流对象，并以此做为由 HTTP 协程切换至
+	// websocket 的依据
 	ws_in_  = NEW websocket(*stream_);
 	ws_out_ = NEW websocket(*stream_);
 
+	status_ = HTTP_ACLIENT_STATUS_WS_HANDSHAKE;
 	send_request(NULL, 0);
+}
+
+void http_aclient::ws_read_wait(int timeout /* = 0 */)
+{
+	acl_assert(conn_);
+
+	status_ = HTTP_ACLIENT_STATUS_WS_READING;
+
+	// 注册 websocket 读回调过程
+	conn_->add_read_callback(this);
+	conn_->read_wait(timeout);
+}
+
+bool http_aclient::ws_send_text(char* data, size_t len)
+{
+	acl_assert(ws_out_ && conn_);
+	return ws_out_->send_frame_text(*conn_, data, len);
+}
+
+bool http_aclient::ws_send_binary(void* data, size_t len)
+{
+	acl_assert(ws_out_ && conn_);
+	return ws_out_->send_frame_binary(*conn_, data, len);
+}
+
+bool http_aclient::ws_send_ping(void* data, size_t len)
+{
+	acl_assert(ws_out_ && conn_);
+	return ws_out_->send_frame_ping(*conn_, data, len);
+}
+
+bool http_aclient::ws_send_pong(void* data, size_t len)
+{
+	acl_assert(ws_out_ && conn_);
+	return ws_out_->send_frame_pong(*conn_, data, len);
 }
 
 } // namespace acl

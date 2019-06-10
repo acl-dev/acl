@@ -14,6 +14,7 @@ public:
 	, host_(host)
 	, debug_(false)
 	, compressed_(false)
+	, ws_mode_(false)
 	{
 	}
 
@@ -26,6 +27,12 @@ public:
 	http_aio_client& enable_debug(bool on)
 	{
 		debug_ = on;
+		return *this;
+	}
+
+	http_aio_client& enable_websocket(bool on)
+	{
+		ws_mode_ = on;
 		return *this;
 	}
 
@@ -45,7 +52,11 @@ protected:
 		printf("---------------begin send http request -------\r\n");
 		fflush(stdout);
 
-		this->send_request(NULL, 0);
+		if (ws_mode_) {
+			this->ws_handshake();
+		} else {
+			this->send_request(NULL, 0);
+		}
 		return true;
 	}
 
@@ -108,10 +119,76 @@ protected:
 		return keep_alive_;
 	}
 
+protected:
+	// @override
+	bool on_ws_handshake(void)
+	{
+		printf(">>> websocket handshake ok\r\n");
+		fflush(stdout);
+
+		char buf[128];
+		snprintf(buf, sizeof(buf), "hello, myname is zsx\r\n");
+		size_t len = strlen(buf);
+
+		if (this->ws_send_text(buf, len) == false) {
+			return false;
+		}
+
+		// 开始进入 websocket 异步读过程
+		this->ws_read_wait(0);
+		return true;
+	}
+
+	// @override
+	void on_ws_handshake_failed(int status)
+	{
+		printf(">>> websocket handshake failed, status=%d\r\n", status);
+		fflush(stdout);
+	}
+
+	// @override
+	bool on_ws_frame_text(void)
+	{
+		printf(">>> got frame text type\r\n");
+		fflush(stdout);
+		return true;
+	}
+
+	// @override
+	bool on_ws_frame_binary(void)
+	{
+		printf(">>> got frame binaray type\r\n");
+		fflush(stdout);
+		return true;
+	}
+
+	// @override
+	void on_ws_frame_closed(void)
+	{
+		printf(">>> got frame closed type\r\n");
+		fflush(stdout);
+	}
+
+	// @override
+	bool on_ws_frame_data(char* data, size_t dlen)
+	{
+		(void) write(1, data, dlen);
+		return true;
+	}
+
+	// @override
+	bool on_ws_frame_finish(void)
+	{
+		printf(">>> frame finish\r\n");
+		fflush(stdout);
+		return true;
+	}
+
 private:
 	acl::string host_;
 	bool debug_;
 	bool compressed_;
+	bool ws_mode_;
 };
 
 static void usage(const char* procname)
@@ -126,6 +203,7 @@ static void usage(const char* procname)
 		" -K [keep_alive, default: false]\r\n"
 		" -S polarssl_lib_path[default: none]\n"
 		" -N name_server[default: 8.8.8.8:53]\r\n"
+		" -W [if using websocket, default: no]\r\n"
 		, procname);
 }
 
@@ -136,8 +214,9 @@ int main(int argc, char* argv[])
 	acl::string addr("127.0.0.1:80"), name_server("8.8.8.8:53");
 	acl::string host("www.baidu.com"), ssl_lib_path;
 	bool enable_gzip = false, keep_alive = false, debug = false;
+	bool ws_enable = false;
 
-	while ((ch = getopt(argc, argv, "hs:S:N:H:t:i:ZKD")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:S:N:H:t:i:ZKDW")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -168,6 +247,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'D':
 			debug = true;
+			break;
+		case 'W':
+			ws_enable = true;
 			break;
 		default:
 			break;
@@ -203,7 +285,8 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	conn->enable_debug(debug);
+	(*conn).enable_debug(debug)		// 是否启用调试方式
+		.enable_websocket(ws_enable);	// 是否启用 websocket
 
 	// 设置 HTTP 请求头，也可将此过程放在 conn->on_connect() 里
 	acl::http_header& head = conn->request_header();

@@ -16,20 +16,17 @@ int main(int argc, char* argv[])
 
 	// 开始运行
 
-	if (argc >= 2 && strcasecmp(argv[1], "help") == 0)
-	{
+	if (argc >= 2 && strcasecmp(argv[1], "help") == 0) {
 		printf("usage: %s alone [configure [listen_addr]]\r\n", argv[0]);
 		return 0;
-	}
-	else if (argc >= 2 && strcasecmp(argv[1], "alone") == 0)
-	{
+	} else if (argc >= 2 && strcasecmp(argv[1], "alone") == 0) {
 		acl::log::stdout_open(true);  // 日志输出至标准输出
 
 		const char* conf = NULL;
 		if (argc >= 3)
 			conf = argv[2];
 
-		const char* addr = "0.0.0.0:9001";
+		const char* addr = "0.0.0.0:8885";
 		if (argc >= 4)
 			addr = argv[3];
 
@@ -38,9 +35,9 @@ int main(int argc, char* argv[])
 
 		printf("Enter any key to exit now\r\n");
 		getchar();
-	}
-	else
+	} else {
 		ms.run_daemon(argc, argv);  // acl_master 控制模式运行
+	}
 
 	return 0;
 }

@@ -122,6 +122,23 @@ protected:
 	}
 
 	/**
+	 * 当 websocket 握手成功后的回调方法
+	 * @return {bool} 返回 false 表示需要关闭连接，否则继续
+	 */
+	virtual bool on_ws_handshake(void)
+	{
+		// 开始异步读 websocket 数据
+		this->ws_read_wait(0);
+		return true;
+	}
+
+	/**
+	 * 当 websocket 握手失败后的回调方法
+	 * @param status {int} 服务器返回的 HTTP 响应状态码
+	 */
+	virtual void on_ws_handshake_failed(int status) { (void) status; }
+
+	/**
 	 * 当读到一个 text 类型的帧时的回调方法
 	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
 	 */
@@ -157,7 +174,7 @@ protected:
 	 */
 	virtual bool on_ws_frame_finish(void) { return true; }
 
-protected:
+public:
 	/**
 	 * 向 WEB 服务器发送 HTTP 请求，内部在发送后会自动开始读 HTTP 响应过程
 	 * @param body {const void*} HTTP 请求的数据体，当为 NULL 时，内部会自
@@ -170,6 +187,44 @@ protected:
 	 * 与服务器进行 WEBSOCKET 握手
 	 */
 	void ws_handshake(void);
+
+	/**
+	 * 开始异步读 websocket 数据
+	 * @param timeout {int} 读超时时间
+	 */
+	void ws_read_wait(int timeout = 0);
+
+	/**
+	 * 异步发送一个 FRAME_TEXT 类型的数据帧
+	 * @param data {char*} 内部可能因添加掩码原因被改变内容
+	 * @param len {size_t} data 数据长度
+	 * @return {bool}
+	 */
+	bool ws_send_text(char* data, size_t len);
+
+	/**
+	 * 异步发送一个 FRAME_BINARY 类型的数据帧
+	 * @param data {void*} 内部可能因添加掩码原因被改变内容
+	 * @param len {size_t} data 数据长度
+	 * @return {bool}
+	 */
+	bool ws_send_binary(void* data, size_t len);
+
+	/**
+	 * 异步发送一个 FRAME_PING 类型的数据帧
+	 * @param data {void*} 内部可能因添加掩码原因被改变内容
+	 * @param len {size_t} data 数据长度
+	 * @return {bool}
+	 */
+	bool ws_send_ping(void* data, size_t len);
+
+	/**
+	 * 异步发送一个 FRAME_PONG 类型的数据帧
+	 * @param data {void*} 内部可能因添加掩码原因被改变内容
+	 * @param len {size_t} data 数据长度
+	 * @return {bool}
+	 */
+	bool ws_send_pong(void* data, size_t len);
 
 protected:
 	// @override dummy
@@ -188,6 +243,7 @@ protected:
 	bool read_callback(char* data, int len);
 
 protected:
+	unsigned           status_;
 	aio_handle&        handle_;
 	polarssl_conf*     ssl_conf_;
 	int                rw_timeout_;
@@ -200,6 +256,8 @@ protected:
 	websocket*         ws_in_;
 	websocket*         ws_out_;
 	string*            buff_;
+
+	bool handle_ssl_handshake(void);
 
 	bool handle_websocket(void);
 	bool handle_ws_data(void);

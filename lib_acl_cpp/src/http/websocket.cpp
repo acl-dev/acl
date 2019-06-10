@@ -2,6 +2,7 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
+#include "acl_cpp/stream/aio_socket_stream.hpp"
 #include "acl_cpp/http/websocket.hpp"
 #endif
 
@@ -174,27 +175,7 @@ void websocket::make_frame_header(void)
 	}
 }
 
-bool websocket::send_frame_data(const char* str)
-{
-	return send_frame_data(str, str ? strlen(str) : 0);
-}
-
-bool websocket::send_frame_data(const void* data, size_t len)
-{
-	if (data == NULL || len == 0) {
-		return send_frame_data((void*) data, len);
-	}
-
-	void* buf = acl_mymemdup(data, len);
-	bool  ret = send_frame_data(buf, len);
-	acl_myfree(buf);
-	return ret;
-}
-
-bool websocket::send_frame_data(char* str)
-{
-	return send_frame_data(str, str ? strlen(str) : 0);
-}
+//////////////////////////////////////////////////////////////////////////////
 
 bool websocket::send_frame_data(void* data, size_t len)
 {
@@ -234,6 +215,28 @@ bool websocket::send_frame_data(void* data, size_t len)
 
 	payload_nsent_ += len;
 	return true;
+}
+
+bool websocket::send_frame_data(const char* str)
+{
+	return send_frame_data(str, str ? strlen(str) : 0);
+}
+
+bool websocket::send_frame_data(const void* data, size_t len)
+{
+	if (data == NULL || len == 0) {
+		return send_frame_data((void*) data, len);
+	}
+
+	void* buf = acl_mymemdup(data, len);
+	bool  ret = send_frame_data(buf, len);
+	acl_myfree(buf);
+	return ret;
+}
+
+bool websocket::send_frame_data(char* str)
+{
+	return send_frame_data(str, str ? strlen(str) : 0);
 }
 
 bool websocket::send_frame_pong(const char* str)
@@ -310,6 +313,79 @@ static bool is_big_endian(void)
 		return true;
 	}
 }
+
+//////////////////////////////////////////////////////////////////////////////
+
+bool websocket::send_frame_data(aio_socket_stream& conn, void* data, size_t len)
+{
+	if (!header_sent_) {
+		header_sent_ = true;
+		make_frame_header();
+		conn.write(header_buf_, header_len_);
+	}
+
+	if (data == NULL || len == 0) {
+		return true;
+	}
+
+	// senity check
+	if (payload_nsent_ + len > header_.payload_len) {
+		logger_error("data len overflow=%llu > %llu, %llu, %lu",
+			payload_nsent_ + len, header_.payload_len,
+			payload_nsent_, (unsigned long) len);
+		return false;
+	}
+
+	if (header_.mask) {
+		unsigned char* mask = (unsigned char*) &header_.masking_key;
+		for (size_t i = 0; i < len; i++) {
+			((char*) data)[i] ^= mask[(payload_nsent_ + i) % 4];
+		}
+	}
+
+	conn.write(data, len);
+	payload_nsent_ += len;
+	return true;
+}
+
+bool websocket::send_frame_text(aio_socket_stream& conn, char* data, size_t len)
+{
+	reset();
+	set_frame_fin(true);
+	set_frame_opcode(FRAME_TEXT);
+	set_frame_payload_len(len);
+	//set_frame_masking_key(1);
+	return send_frame_data(conn, data, len);
+}
+
+bool websocket::send_frame_binary(aio_socket_stream& conn, void* data, size_t len)
+{
+	reset();
+	set_frame_fin(true);
+	set_frame_opcode(FRAME_BINARY);
+	set_frame_payload_len(len);
+	return send_frame_data(conn, data, len);
+}
+
+bool websocket::send_frame_ping(aio_socket_stream& conn, void* data, size_t len)
+{
+	reset();
+	set_frame_fin(true);
+	set_frame_opcode(FRAME_PING);
+	set_frame_payload_len(len);
+	return send_frame_data(conn, data, len);
+}
+
+bool websocket::send_frame_pong(aio_socket_stream& conn, void* data, size_t len)
+{
+	reset();
+	set_frame_fin(true);
+	set_frame_opcode(FRAME_PONG);
+	set_frame_payload_len(len);
+	return send_frame_data(conn, data, len);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 #ifndef swap64
 #define swap64(val) (((val) >> 56) | \
