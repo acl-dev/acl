@@ -748,26 +748,26 @@ static char *get_buf(const char *prefix, const char *fmt, va_list ap,
 	ret = vsnprintf(ptr, left_len, fmt, ap);
 	if (ret > 0 && ret < (int) left_len) {
 		*len = prefix_len + ret;
-		return buf;
 	}
+    else {
+        i = 0;
+        for (;;) {
+            total_len += 1024;
+            buf = (char*) realloc(buf, total_len);
+            acl_assert(buf);
 
-	i = 0;
-	while (1) {
-		total_len += 1024;
-		buf = (char*) realloc(buf, total_len);
-		acl_assert(buf);
-
-		ptr = buf + prefix_len;
-		left_len = total_len - prefix_len;
-		ret = vsnprintf(ptr, left_len, fmt, ap);
-		if (ret > 0 && ret < (int) left_len) {
-			*len = prefix_len + ret;
-			break;
-		}
-		if (++i >= 10000) {
-			abort();
-		}
-	}
+            ptr = buf + prefix_len;
+            left_len = total_len - prefix_len;
+            ret = vsnprintf(ptr, left_len, fmt, ap);
+            if (ret > 0 && ret < (int) left_len) {
+                *len = prefix_len + ret;
+                break;
+            }
+            if (++i >= 10000) {
+                abort();
+            }
+        }
+    }
 
 	if (suffix_len == 0) {
 		return buf;
