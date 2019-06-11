@@ -2,8 +2,98 @@
 #include <assert.h>
 #include <getopt.h>
 #include <unistd.h>
-//#include "lib_acl.h"
+#include <sys/types.h>
+#include <sys/socket.h>
+#include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
+
+static acl::atomic_long __refer = 2;
+
+//////////////////////////////////////////////////////////////////////////////
+
+class pipe_reader : public acl::aio_callback
+{
+public:
+	pipe_reader(acl::aio_handle& handle, int fd)
+	: handle_(handle)
+	{
+		in_ = new acl::aio_istream(&handle, fd);
+	}
+
+	void start(void)
+	{
+		in_->add_read_callback(this);
+		in_->add_close_callback(this);
+		in_->read();
+	}
+
+protected:
+	// @override
+	bool read_callback(char* data, int len)
+	{
+		const char* prompt = "reader->";
+		(void) write(1, prompt, strlen(prompt));
+		(void) write(1, data, len);
+		return true;
+	}
+
+	// @override
+	void close_callback(void)
+	{
+		printf("reader->being closed!\r\n");
+		fflush(stdout);
+		delete this;
+	}
+
+private:
+	acl::aio_handle&  handle_;
+	acl::aio_istream* in_;
+
+	~pipe_reader(void)
+	{
+		printf("reader be deleted!\r\n");
+
+		if (--__refer == 0) {
+			printf("%s: stop aio engine now!\r\n", __FUNCTION__);
+			handle_.stop();
+		}
+	}
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
+class pipe_writer : public acl::thread
+{
+public:
+	pipe_writer(int fd)
+	{
+		out_ = new acl::socket_stream;
+		out_->open(fd);
+	}
+
+protected:
+	// @override
+	void* run(void)
+	{
+		for (int i = 0; i < 5; i++) {
+			sleep(1);
+			out_->write("hello world!\r\n");
+		}
+
+		delete this;
+		return NULL;
+	}
+
+private:
+	acl::socket_stream* out_;
+
+	~pipe_writer(void)
+	{
+		delete out_;
+	}
+};
+
+//////////////////////////////////////////////////////////////////////////////
 
 class http_aio_client : public acl::http_aclient
 {
@@ -20,8 +110,11 @@ public:
 
 	~http_aio_client(void)
 	{
-		printf("delete http_aio_client and begin stop aio engine\r\n");
-		handle_.stop();
+		printf("delete http_aio_client!\r\n");
+		if (--__refer == 0) {
+			printf("%s: stop aio engine now!\r\n", __FUNCTION__);
+			handle_.stop();
+		}
 	}
 
 	http_aio_client& enable_debug(bool on)
@@ -282,6 +375,20 @@ int main(int argc, char* argv[])
 
 	// 定义 AIO 事件引擎
 	acl::aio_handle handle(acl::ENGINE_KERNEL);
+
+	int fds[2];
+	int ret = acl_sane_socketpair(AF_UNIX, SOCK_STREAM, 0, fds);
+	if (ret < 0) {
+		printf("acl_sane_socketpair error %s\r\n", acl::last_serror());
+		return 1;
+	}
+
+	pipe_reader*  in = new pipe_reader(handle, fds[0]);
+	pipe_writer* out = new pipe_writer(fds[1]);
+
+	in->start();
+	out->start();
+
 
 	// 设置 DNS 域名服务器地址
 	handle.set_dns(name_server.c_str(), 5);

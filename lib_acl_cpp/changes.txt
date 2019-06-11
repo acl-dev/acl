@@ -3,6 +3,8 @@
 575) 2019.6.11
 575.1) bugfix: websocket::set_frame_pong 中没有设置 payload length
 575.2) bugfix: polarssl_io.cpp 中针对静态编译缺少函数声明，导致编译有错
+575.3) feature: aio_istream/aio_ostream 分别提供输入参数为套接字句柄的构造方法，
+方便将非阻塞管道纳入异步 IO 处理中
 
 574) 2019.6.10
 574.1) feature: http_aclient 类增加自动解压功能

@@ -32,6 +32,7 @@ aio_stream::~aio_stream(void)
 		handle_->decrease();
 		acl_aio_iocp_close(stream_);
 	}
+
 	std::list<AIO_CALLBACK*>::iterator it = close_callbacks_.begin();
 	for (; it != close_callbacks_.end(); ++it) {
 		acl_myfree((*it));

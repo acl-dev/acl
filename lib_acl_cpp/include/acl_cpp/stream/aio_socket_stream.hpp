@@ -54,7 +54,7 @@ public:
 	/**
 	 * 构造函数，创建网络异步客户端流，并 hook 读写过程及关闭/超时过程
 	 * @param handle {aio_handle*} 异步引擎句柄
-	 * @param fd {ACL_SOCKET} 连接套接口句柄
+	 * @param fd {int} 连接套接口句柄
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	aio_socket_stream(aio_handle* handle, SOCKET fd);

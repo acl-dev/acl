@@ -66,6 +66,17 @@ public:
 	aio_ostream(aio_handle* handle);
 
 	/**
+	 * 构造函数，创建异步写流对象，并 hook 写过程及关闭/超时过程
+	 * @param handle {aio_handle*} 异步事件引擎句柄
+	 * @param fd {int} 连接套接口句柄
+	 */
+#if defined(_WIN32) || defined(_WIN64)
+	aio_ostream(aio_handle* handle, SOCKET fd);
+#else
+	aio_ostream(aio_handle* handle, int fd);
+#endif
+
+	/**
 	 * 添加异可写时的回调类对象指针，如果该回调类对象已经存在，则只是
 	 * 使该对象处于打开可用状态
 	 * @param callback {aio_callback*} 继承 aio_callback 的子类回调类对象，

@@ -47,7 +47,7 @@ aio_socket_stream::aio_socket_stream(aio_handle* handle, ACL_SOCKET fd)
 	// 同时 hook 关闭及超时回调过程
 	hook_error();
 
-	// 只有当流连接成功后才可 hook IO 读写状态
+	// 只有当流连接成功后才可 hook IO 读状态
 	// hook 读回调过程
 	hook_read();
 
