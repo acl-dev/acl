@@ -268,6 +268,10 @@ int main(int argc, char* argv[])
 	// 如果设置了 SSL 连接库，则启用 SSL 连接模式
 	if (!ssl_lib_path.empty()) {
 		if (access(ssl_lib_path.c_str(), R_OK) == 0) {
+			// 设置 libpolarssl.so 库全路径
+			acl::polarssl_conf::set_libpath(ssl_lib_path);
+			// 动态加载 libpolarssl.so 库
+			acl::polarssl_conf::load();
 			ssl_conf = new acl::polarssl_conf;
 		} else {
 			printf("disable ssl, %s not found\r\n",
