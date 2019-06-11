@@ -180,8 +180,11 @@ void polarssl_dll_load_io(void)
 
 # ifdef HAS_HAVEGE
 #  define __havege_init			::havege_init
+#  define __havege_random		::havege_random
 # else
 #  define __ctr_drbg_init		::ctr_drbg_init
+#  define __ctr_drbg_random		::ctr_drbg_random
+#  define __entropy_func		::entropy_func
 # endif
 # ifdef DEBUG_SSL
 #  define __ssl_set_dbg			::ssl_set_dbg
