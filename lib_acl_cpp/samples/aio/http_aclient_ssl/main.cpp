@@ -272,6 +272,7 @@ int main(int argc, char* argv[])
 			acl::polarssl_conf::set_libpath(ssl_lib_path);
 			// 动态加载 libpolarssl.so 库
 			acl::polarssl_conf::load();
+			// 创建全局 SSL 配置项
 			ssl_conf = new acl::polarssl_conf;
 		} else {
 			printf("disable ssl, %s not found\r\n",
