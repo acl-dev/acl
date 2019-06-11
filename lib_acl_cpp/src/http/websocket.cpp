@@ -266,7 +266,7 @@ bool websocket::send_frame_pong(void* data, size_t len)
 	reset();
 	set_frame_fin(true);
 	set_frame_opcode(FRAME_PONG);
-	set_frame_payload_len(0);
+	set_frame_payload_len(len);
 
 	return send_frame_data(data, len);
 }
