@@ -32,6 +32,14 @@
 		07BED4D421BA27B70060BBE4 /* fiber_cond.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4D321BA27B70060BBE4 /* fiber_cond.hpp */; };
 		07BED4D621BA27BE0060BBE4 /* fiber_tbox.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4D521BA27BE0060BBE4 /* fiber_tbox.hpp */; };
 		07BED4D821BA27C30060BBE4 /* libfiber.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4D721BA27C30060BBE4 /* libfiber.hpp */; };
+		07BED4DD22AFCAF40060BBE4 /* tcp_keeper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4DC22AFCAF40060BBE4 /* tcp_keeper.hpp */; };
+		07BED4E622AFCB060060BBE4 /* keeper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4DF22AFCB060060BBE4 /* keeper.hpp */; };
+		07BED4E722AFCB060060BBE4 /* keeper_conn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4E022AFCB060060BBE4 /* keeper_conn.cpp */; };
+		07BED4E822AFCB060060BBE4 /* keeper_conn.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4E122AFCB060060BBE4 /* keeper_conn.hpp */; };
+		07BED4E922AFCB060060BBE4 /* keeper_conns.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4E222AFCB060060BBE4 /* keeper_conns.cpp */; };
+		07BED4EA22AFCB060060BBE4 /* keeper_conns.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4E322AFCB060060BBE4 /* keeper_conns.hpp */; };
+		07BED4EB22AFCB060060BBE4 /* keeper_waiter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4E422AFCB060060BBE4 /* keeper_waiter.cpp */; };
+		07BED4EC22AFCB060060BBE4 /* keeper_waiter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4E522AFCB060060BBE4 /* keeper_waiter.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +69,14 @@
 		07BED4D321BA27B70060BBE4 /* fiber_cond.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fiber_cond.hpp; sourceTree = "<group>"; };
 		07BED4D521BA27BE0060BBE4 /* fiber_tbox.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fiber_tbox.hpp; sourceTree = "<group>"; };
 		07BED4D721BA27C30060BBE4 /* libfiber.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = libfiber.hpp; sourceTree = "<group>"; };
+		07BED4DC22AFCAF40060BBE4 /* tcp_keeper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tcp_keeper.hpp; sourceTree = "<group>"; };
+		07BED4DF22AFCB060060BBE4 /* keeper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = keeper.hpp; sourceTree = "<group>"; };
+		07BED4E022AFCB060060BBE4 /* keeper_conn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = keeper_conn.cpp; sourceTree = "<group>"; };
+		07BED4E122AFCB060060BBE4 /* keeper_conn.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = keeper_conn.hpp; sourceTree = "<group>"; };
+		07BED4E222AFCB060060BBE4 /* keeper_conns.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = keeper_conns.cpp; sourceTree = "<group>"; };
+		07BED4E322AFCB060060BBE4 /* keeper_conns.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = keeper_conns.hpp; sourceTree = "<group>"; };
+		07BED4E422AFCB060060BBE4 /* keeper_waiter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = keeper_waiter.cpp; sourceTree = "<group>"; };
+		07BED4E522AFCB060060BBE4 /* keeper_waiter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = keeper_waiter.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +111,7 @@
 		070F35E520902D9800672EDC /* fiber_cpp */ = {
 			isa = PBXGroup;
 			children = (
+				07BED4DE22AFCB060060BBE4 /* keeper */,
 				070F35E620902D9800672EDC /* fiber_cpp.h */,
 				070F35E820902D9800672EDC /* fiber_cppPriv.h */,
 				070F35EA20902D9800672EDC /* fiber_cpp.cp */,
@@ -131,6 +148,7 @@
 		070F35F320902DDC00672EDC /* fiber */ = {
 			isa = PBXGroup;
 			children = (
+				07BED4DC22AFCAF40060BBE4 /* tcp_keeper.hpp */,
 				07BED4D721BA27C30060BBE4 /* libfiber.hpp */,
 				07BED4D521BA27BE0060BBE4 /* fiber_tbox.hpp */,
 				07BED4D321BA27B70060BBE4 /* fiber_cond.hpp */,
@@ -147,6 +165,21 @@
 			path = ../lib_fiber/cpp/include/fiber;
 			sourceTree = "<group>";
 		};
+		07BED4DE22AFCB060060BBE4 /* keeper */ = {
+			isa = PBXGroup;
+			children = (
+				07BED4DF22AFCB060060BBE4 /* keeper.hpp */,
+				07BED4E022AFCB060060BBE4 /* keeper_conn.cpp */,
+				07BED4E122AFCB060060BBE4 /* keeper_conn.hpp */,
+				07BED4E222AFCB060060BBE4 /* keeper_conns.cpp */,
+				07BED4E322AFCB060060BBE4 /* keeper_conns.hpp */,
+				07BED4E422AFCB060060BBE4 /* keeper_waiter.cpp */,
+				07BED4E522AFCB060060BBE4 /* keeper_waiter.hpp */,
+			);
+			name = keeper;
+			path = cpp/src/keeper;
+			sourceTree = SOURCE_ROOT;
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -160,13 +193,18 @@
 				070F35E720902D9800672EDC /* fiber_cpp.h in Headers */,
 				07BED4D621BA27BE0060BBE4 /* fiber_tbox.hpp in Headers */,
 				070F35FD20902DDC00672EDC /* fiber.hpp in Headers */,
+				07BED4DD22AFCAF40060BBE4 /* tcp_keeper.hpp in Headers */,
 				07BED4D421BA27B70060BBE4 /* fiber_cond.hpp in Headers */,
 				070F360220902DDC00672EDC /* lib_fiber.hpp in Headers */,
+				07BED4EA22AFCB060060BBE4 /* keeper_conns.hpp in Headers */,
+				07BED4EC22AFCB060060BBE4 /* keeper_waiter.hpp in Headers */,
 				070F35FE20902DDC00672EDC /* fiber_cpp_define.hpp in Headers */,
+				07BED4E822AFCB060060BBE4 /* keeper_conn.hpp in Headers */,
 				07BED4D821BA27C30060BBE4 /* libfiber.hpp in Headers */,
 				070F360320902DDC00672EDC /* master_fiber.hpp in Headers */,
 				070F360020902DDC00672EDC /* fiber_lock.hpp in Headers */,
 				070F360120902DDC00672EDC /* fiber_sem.hpp in Headers */,
+				07BED4E622AFCB060060BBE4 /* keeper.hpp in Headers */,
 				070F361720902FDA00672EDC /* stdafx.hpp in Headers */,
 				070F361320902FDA00672EDC /* fiber_server.hpp in Headers */,
 			);
@@ -231,11 +269,14 @@
 				070F361620902FDA00672EDC /* stdafx.cpp in Sources */,
 				070F360F20902FDA00672EDC /* fiber_event.cpp in Sources */,
 				070F35EB20902D9800672EDC /* fiber_cpp.cp in Sources */,
+				07BED4E722AFCB060060BBE4 /* keeper_conn.cpp in Sources */,
 				070F361420902FDA00672EDC /* fiber.cpp in Sources */,
 				07BED4D221BA278D0060BBE4 /* fiber_cond.cpp in Sources */,
 				070F360E20902FDA00672EDC /* channel.cpp in Sources */,
 				070F361520902FDA00672EDC /* master_fiber.cpp in Sources */,
 				070F361020902FDA00672EDC /* fiber_lock.cpp in Sources */,
+				07BED4E922AFCB060060BBE4 /* keeper_conns.cpp in Sources */,
+				07BED4EB22AFCB060060BBE4 /* keeper_waiter.cpp in Sources */,
 				070F361120902FDA00672EDC /* fiber_sem.cpp in Sources */,
 				070F361220902FDA00672EDC /* fiber_server.cpp in Sources */,
 			);

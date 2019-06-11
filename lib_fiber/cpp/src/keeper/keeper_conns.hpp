@@ -4,10 +4,10 @@
 
 namespace acl {
 
-class keeper_config;
-class task_req;
-class keeper_conn;
-class keeper_link;
+class  keeper_config;
+class  task_req;
+class  keeper_conn;
+struct keeper_link;
 
 class keeper_conns : public fiber
 {
