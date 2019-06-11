@@ -321,7 +321,7 @@ bool websocket::send_frame_data(aio_socket_stream& conn, void* data, size_t len)
 	if (!header_sent_) {
 		header_sent_ = true;
 		make_frame_header();
-		conn.write(header_buf_, header_len_);
+		conn.write(header_buf_, (int) header_len_);
 	}
 
 	if (data == NULL || len == 0) {
@@ -343,7 +343,7 @@ bool websocket::send_frame_data(aio_socket_stream& conn, void* data, size_t len)
 		}
 	}
 
-	conn.write(data, len);
+	conn.write(data, (int) len);
 	payload_nsent_ += len;
 	return true;
 }
@@ -676,7 +676,7 @@ int websocket::peek_frame_data(char* buf, size_t size)
 	}
 
 	payload_nread_ += len;
-	return len;
+	return (int) len;
 }
 
 int websocket::peek_frame_data(string& buf, size_t size)
@@ -712,7 +712,7 @@ int websocket::peek_frame_data(string& buf, size_t size)
 	}
 
 	payload_nread_ += len;
-	return len;
+	return (int) len;
 }
 
 

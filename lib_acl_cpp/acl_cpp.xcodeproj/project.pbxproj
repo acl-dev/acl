@@ -151,7 +151,6 @@
 		07A4683A1E6FCCF1002C9B3C /* redis_server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677B1E6FCCF1002C9B3C /* redis_server.cpp */; };
 		07A4683B1E6FCCF1002C9B3C /* redis_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677C1E6FCCF1002C9B3C /* redis_set.cpp */; };
 		07A4683C1E6FCCF1002C9B3C /* redis_slot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677D1E6FCCF1002C9B3C /* redis_slot.cpp */; };
-		07A4683D1E6FCCF1002C9B3C /* redis_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677E1E6FCCF1002C9B3C /* redis_string.cpp */; };
 		07A4683D1E6FCCF1002C9B3C /* redis_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677E1E6FCCF1002C9B3C /* redis_stream.cpp */; };
 		07A4683E1E6FCCF1002C9B3C /* redis_transaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677F1E6FCCF1002C9B3C /* redis_transaction.cpp */; };
 		07A4683F1E6FCCF1002C9B3C /* redis_zset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467801E6FCCF1002C9B3C /* redis_zset.cpp */; };
@@ -210,6 +209,7 @@
 		07A468741E6FCCF1002C9B3C /* stdout_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467BE1E6FCCF1002C9B3C /* stdout_stream.cpp */; };
 		07A468751E6FCCF1002C9B3C /* stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467BF1E6FCCF1002C9B3C /* stream.cpp */; };
 		07A4D1731E94E4BC00790E12 /* mbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4D1721E94E4BC00790E12 /* mbox.cpp */; };
+		07BED4DB22AFC5B30060BBE4 /* http_aclient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4DA22AFC5B30060BBE4 /* http_aclient.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -400,7 +400,6 @@
 		07A4677B1E6FCCF1002C9B3C /* redis_server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_server.cpp; sourceTree = "<group>"; };
 		07A4677C1E6FCCF1002C9B3C /* redis_set.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_set.cpp; sourceTree = "<group>"; };
 		07A4677D1E6FCCF1002C9B3C /* redis_slot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_slot.cpp; sourceTree = "<group>"; };
-		07A4677E1E6FCCF1002C9B3C /* redis_string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_string.cpp; sourceTree = "<group>"; };
 		07A4677E1E6FCCF1002C9B3C /* redis_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_stream.cpp; sourceTree = "<group>"; };
 		07A4677F1E6FCCF1002C9B3C /* redis_transaction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_transaction.cpp; sourceTree = "<group>"; };
 		07A467801E6FCCF1002C9B3C /* redis_zset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_zset.cpp; sourceTree = "<group>"; };
@@ -589,7 +588,6 @@
 		07A469071E6FD404002C9B3C /* redis_server.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_server.hpp; sourceTree = "<group>"; };
 		07A469081E6FD404002C9B3C /* redis_set.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_set.hpp; sourceTree = "<group>"; };
 		07A469091E6FD404002C9B3C /* redis_slot.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_slot.hpp; sourceTree = "<group>"; };
-		07A4690A1E6FD404002C9B3C /* redis_string.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_string.hpp; sourceTree = "<group>"; };
 		07A4690A1E6FD404002C9B3C /* redis_stream.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_stream.hpp; sourceTree = "<group>"; };
 		07A4690B1E6FD404002C9B3C /* redis_transaction.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_transaction.hpp; sourceTree = "<group>"; };
 		07A4690C1E6FD404002C9B3C /* redis_zset.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_zset.hpp; sourceTree = "<group>"; };
@@ -662,6 +660,8 @@
 		07BEA6C1214F79BB0060BBE4 /* db_handle.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = db_handle.hpp; sourceTree = "<group>"; };
 		07BEA6C2214F79BB0060BBE4 /* sqlite_cursor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sqlite_cursor.hpp; sourceTree = "<group>"; };
 		07BEA6C3214F79E20060BBE4 /* WebSocketServlet.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = WebSocketServlet.hpp; sourceTree = "<group>"; };
+		07BED4D922AFC5710060BBE4 /* http_aclient.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = http_aclient.hpp; sourceTree = "<group>"; };
+		07BED4DA22AFC5B30060BBE4 /* http_aclient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_aclient.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -869,6 +869,7 @@
 		07A4671A1E6FCCF1002C9B3C /* http */ = {
 			isa = PBXGroup;
 			children = (
+				07BED4DA22AFC5B30060BBE4 /* http_aclient.cpp */,
 				07A4671B1E6FCCF1002C9B3C /* http_client.cpp */,
 				07A4671C1E6FCCF1002C9B3C /* http_ctype.cpp */,
 				07A4671D1E6FCCF1002C9B3C /* http_download.cpp */,
@@ -999,7 +1000,6 @@
 				07A4677B1E6FCCF1002C9B3C /* redis_server.cpp */,
 				07A4677C1E6FCCF1002C9B3C /* redis_set.cpp */,
 				07A4677D1E6FCCF1002C9B3C /* redis_slot.cpp */,
-				07A4677E1E6FCCF1002C9B3C /* redis_string.cpp */,
 				07A4677E1E6FCCF1002C9B3C /* redis_stream.cpp */,
 				07A4677F1E6FCCF1002C9B3C /* redis_transaction.cpp */,
 				07A467801E6FCCF1002C9B3C /* redis_zset.cpp */,
@@ -1291,6 +1291,7 @@
 		07A468BE1E6FD404002C9B3C /* http */ = {
 			isa = PBXGroup;
 			children = (
+				07BED4D922AFC5710060BBE4 /* http_aclient.hpp */,
 				07BEA6C3214F79E20060BBE4 /* WebSocketServlet.hpp */,
 				07A468BF1E6FD404002C9B3C /* http_client.hpp */,
 				07A468C01E6FD404002C9B3C /* http_ctype.hpp */,
@@ -1406,7 +1407,6 @@
 				07A469071E6FD404002C9B3C /* redis_server.hpp */,
 				07A469081E6FD404002C9B3C /* redis_set.hpp */,
 				07A469091E6FD404002C9B3C /* redis_slot.hpp */,
-				07A4690A1E6FD404002C9B3C /* redis_string.hpp */,
 				07A4690A1E6FD404002C9B3C /* redis_stream.hpp */,
 				07A4690B1E6FD404002C9B3C /* redis_transaction.hpp */,
 				07A4690C1E6FD404002C9B3C /* redis_zset.hpp */,
@@ -1582,6 +1582,7 @@
 				07A468291E6FCCF1002C9B3C /* redis.cpp in Sources */,
 				07A467C31E6FCCF1002C9B3C /* CORSOperation.cpp in Sources */,
 				07384F461EB9A57D00084CAD /* db_pgsql.cpp in Sources */,
+				07BED4DB22AFC5B30060BBE4 /* http_aclient.cpp in Sources */,
 				07A467F11E6FCCF1002C9B3C /* http_mime.cpp in Sources */,
 				07A468171E6FCCF1002C9B3C /* tok822_parse.cpp in Sources */,
 				07A468541E6FCCF1002C9B3C /* sha1.cpp in Sources */,
@@ -1619,7 +1620,7 @@
 				07A4685A1E6FCCF1002C9B3C /* url_coder.cpp in Sources */,
 				07A4D1731E94E4BC00790E12 /* mbox.cpp in Sources */,
 				07A467DA1E6FCCF1002C9B3C /* db_service_mysql.cpp in Sources */,
-				07A4683D1E6FCCF1002C9B3C /* redis_string.cpp in Sources */,
+				07A4683D1E6FCCF1002C9B3C /* redis_stream.cpp in Sources */,
 				07A4683D1E6FCCF1002C9B3C /* redis_stream.cpp in Sources */,
 				07A468051E6FCCF1002C9B3C /* master_conf.cpp in Sources */,
 				0778DAEE1F78D3FC0011B753 /* event_mutex.cpp in Sources */,
