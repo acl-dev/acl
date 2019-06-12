@@ -111,6 +111,10 @@ http_header::http_header(const HTTP_HDR_RES& hdr_res, dbuf_guard* dbuf /* = NULL
 				transfer_gzip_ = true;
 			}
 		}
+		if (!strcasecmp(entry->name, "Set-Cookie")) {
+			add_res_cookie(*entry);
+		}
+
 		add_entry(entry->name, entry->value);
 	}
 }
@@ -179,7 +183,7 @@ http_header::http_header(const HTTP_HDR_REQ& hdr_req, dbuf_guard* dbuf /* = NULL
 
 	if (hdr_req.params_table) {
 		acl_foreach(iter, hdr_req.params_table) {
-			const char* name = iter.key;
+			const char* name  = iter.key;
 			const char* value = (const char*) iter.data;
 			add_param(name, value);
 		}
@@ -187,7 +191,7 @@ http_header::http_header(const HTTP_HDR_REQ& hdr_req, dbuf_guard* dbuf /* = NULL
 
 	if (hdr_req.cookies_table) {
 		acl_foreach(iter, hdr_req.cookies_table) {
-			const char* name = iter.key;
+			const char* name  = iter.key;
 			const char* value = (const char*) iter.data;
 			add_cookie(name, value);
 		}
@@ -322,6 +326,7 @@ http_header& http_header::add_cookie(const char* name, const char* value,
 	if (expires > 0) {
 		cookie->setExpires(expires);
 	}
+
 	cookies_.push_back(cookie);
 	return *this;
 }
@@ -336,6 +341,41 @@ http_header& http_header::add_cookie(const HttpCookie* in)
 		dbuf_guard*> (in, dbuf_);
 	cookies_.push_back(cookie);
 	return *this;
+}
+
+const HttpCookie* http_header::get_cookie(const char* name) const
+{
+	if (name == NULL || *name == 0) {
+		return NULL;
+	}
+
+	for (std::list<HttpCookie*>::const_iterator cit = cookies_.begin();
+		cit != cookies_.end(); ++cit) {
+
+		if (!strcasecmp((*cit)->getName(), name)) {
+			return *cit;
+		}
+	}
+
+	return NULL;
+}
+
+void http_header::add_res_cookie(const HTTP_HDR_ENTRY& entry)
+{
+	if (entry.value || !(*entry.value)) {
+		return;
+	}
+
+	HttpCookie* cookie = dbuf_->create
+		<HttpCookie, const char*, const char*, dbuf_guard*>
+		(entry.name, entry.value, dbuf_);
+
+	// 通过 setCookie 方法检查 value 的有效性，如果 value 值无效，则不会
+	// 往 cookies_ 里添加，因为 cookie 是在 dbuf_ 上分配的，所以此内存无
+	// 需手工释放，当 dbuf_ 销毁时其内存自然被释放
+	if (cookie->setCookie(entry.value)) {
+		cookies_.push_back(cookie);
+	}
 }
 
 void http_header::date_format(char* out, size_t size, time_t t)

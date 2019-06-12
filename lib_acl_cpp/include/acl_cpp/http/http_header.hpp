@@ -204,6 +204,13 @@ public:
 	http_header& add_cookie(const HttpCookie* cookie);
 
 	/**
+	 * 从 HTTP 头中获得对应名称的 cookie 对象
+	 * @param name {const char*} cookie 名
+	 * @return {const HttpCookie*}
+	 */
+	const HttpCookie* get_cookie(const char* name) const;
+
+	/**
 	 * 将整型的日期转换为 rfc1123 字符串格式的日期
 	 */
 	static void date_format(char* out, size_t size, time_t t);
@@ -492,6 +499,7 @@ private:
 	void clear(void);
 	void build_common(string& buf) const; // 构建通用头
 
+	void add_res_cookie(const HTTP_HDR_ENTRY& entry);
 	void append_accept_key(const char* sec_key, string& out) const;
 };
 
