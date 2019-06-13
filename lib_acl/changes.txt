@@ -1,5 +1,8 @@
 修改历史列表：
 
+655) 2019.6.13
+655.1) bugfix: acl_mylog.c 中 get_buf() 函数在 WIN 平台下可能会有数据截断的问题
+
 654) 2019.6.5
 654.1) feature: acl_aio_read.c 丰富了 acl_aio_read_peek/acl_aio_readn_peek 的应用场景
 
