@@ -8,7 +8,7 @@ namespace acl
 {
 
 aio_timer_writer::aio_timer_writer()
-	: out_(NULL)
+: out_(NULL)
 {
 
 }

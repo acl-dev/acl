@@ -7,17 +7,106 @@
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 
-static acl::atomic_long __refer = 2;
+static acl::atomic_long __aio_refer = 0;
 
 //////////////////////////////////////////////////////////////////////////////
+
+#ifndef USE_AIO_OSTREAM
+
+class pipe_ostream : public acl::aio_ostream
+{
+public:
+	pipe_ostream(acl::aio_handle& handle, int fd)
+	: aio_stream(&handle), aio_ostream(&handle, fd)
+	, handle_(handle)
+	{
+	}
+
+	~pipe_ostream(void)
+	{
+		if (--__aio_refer == 0) {
+			printf("%s: stop aio engine now!\r\n", __FUNCTION__);
+			handle_.stop();
+		}
+	}
+
+protected:
+	// @override
+	void destroy(void)
+	{
+		printf("pipe_ostream: will be destroied!\r\n");
+		delete this;
+	}
+
+private:
+	acl::aio_handle& handle_;
+};
+
+#endif
+
+class pipe_writer : public acl::aio_callback
+{
+public:
+	pipe_writer(acl::aio_handle& handle, int fd)
+	: handle_(handle)
+	{
+#ifdef USE_AIO_OSTREAM
+		out_ = new acl::aio_ostream(&handle, fd);
+#else
+		out_ = new pipe_ostream(handle, fd);
+#endif
+		++__aio_refer;
+	}
+
+	void start(void)
+	{
+		out_->add_write_callback(this);
+		out_->add_close_callback(this);
+	}
+
+	acl::aio_ostream& get_ostream(void) const
+	{
+		return *out_;
+	}
+
+protected:
+	// @override
+	bool add_write_callback(void)
+	{
+		return true;
+	}
+
+	// @override
+	void close_callback(void)
+	{
+		printf("pipe_writer->being closed!\r\n");
+		fflush(stdout);
+		delete this;
+	}
+
+private:
+	acl::aio_handle&  handle_;
+#ifdef USE_AIO_OSTREAM
+	acl::aio_ostream* out_;
+#else
+	pipe_ostream*     out_;
+#endif
+
+	~pipe_writer(void)
+	{
+		printf("%s: writer pipe will deleted!\r\n", __FUNCTION__);
+	}
+};
 
 class pipe_reader : public acl::aio_callback
 {
 public:
-	pipe_reader(acl::aio_handle& handle, int fd)
+	pipe_reader(acl::aio_handle& handle, int fd, pipe_writer& out)
 	: handle_(handle)
+	, out_(out)
 	{
 		in_ = new acl::aio_istream(&handle, fd);
+		++__aio_refer;
 	}
 
 	void start(void)
@@ -31,29 +120,35 @@ protected:
 	// @override
 	bool read_callback(char* data, int len)
 	{
-		const char* prompt = "reader->";
-		(void) write(1, prompt, strlen(prompt));
-		(void) write(1, data, len);
+		printf("pipe_reader   <- %s", data);
+		fflush(stdout);
+
+		// transfer the data to thread_reader
+		out_.get_ostream().write(data, len);
 		return true;
 	}
 
 	// @override
 	void close_callback(void)
 	{
-		printf("reader->being closed!\r\n");
+		printf("pipe_reader: being closed!\r\n");
 		fflush(stdout);
+
+		printf("pipe_reader: close pipe_out\r\n");
+		out_.get_ostream().close();
+
 		delete this;
 	}
 
 private:
 	acl::aio_handle&  handle_;
 	acl::aio_istream* in_;
+	pipe_writer&      out_;
 
 	~pipe_reader(void)
 	{
-		printf("reader be deleted!\r\n");
-
-		if (--__refer == 0) {
+		printf("%s: reader pipe will be deleted!\r\n", __FUNCTION__);
+		if (--__aio_refer == 0) {
 			printf("%s: stop aio engine now!\r\n", __FUNCTION__);
 			handle_.stop();
 		}
@@ -62,35 +157,72 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////
 
-class pipe_writer : public acl::thread
+class thread_writer : public acl::thread
 {
 public:
-	pipe_writer(int fd)
+	thread_writer(int fd)
 	{
 		out_ = new acl::socket_stream;
 		out_->open(fd);
 	}
+
+	~thread_writer(void) {}
+
+protected:
+	// @override
+	void* run(void)
+	{
+		acl::string buf("hello world!\r\n");
+		for (int i = 0; i < 5; i++) {
+			sleep(1);
+			printf("\r\n");
+			printf("thread_writer -> %s", buf.c_str());
+			fflush(stdout);
+
+			out_->write(buf);
+		}
+
+		printf("thread_writer: close out socket_stream\r\n");
+		delete out_;
+		return NULL;
+	}
+
+private:
+	acl::socket_stream* out_;
+};
+
+class thread_reader : public acl::thread
+{
+public:
+	thread_reader(int fd)
+	{
+		in_ = new acl::socket_stream;
+		in_->open(fd);
+	}
+
+	~thread_reader(void) {}
 
 protected:
 	// @override
 	void* run(void)
 	{
 		for (int i = 0; i < 5; i++) {
-			sleep(1);
-			out_->write("hello world!\r\n");
+			acl::string buf;
+			if (!in_->read(buf, false)) {
+				printf("thread_reader: read over!\r\n");
+				break;
+			}
+			printf("thread_reader <- %s", buf.c_str());
 		}
 
-		delete this;
+		printf("thread_reader: close in socket_stream\r\n");
+		delete in_;
+
 		return NULL;
 	}
 
 private:
-	acl::socket_stream* out_;
-
-	~pipe_writer(void)
-	{
-		delete out_;
-	}
+	acl::socket_stream* in_;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -106,12 +238,13 @@ public:
 	, compressed_(false)
 	, ws_mode_(false)
 	{
+		++__aio_refer;
 	}
 
 	~http_aio_client(void)
 	{
 		printf("delete http_aio_client!\r\n");
-		if (--__refer == 0) {
+		if (--__aio_refer == 0) {
 			printf("%s: stop aio engine now!\r\n", __FUNCTION__);
 			handle_.stop();
 		}
@@ -377,18 +510,34 @@ int main(int argc, char* argv[])
 	acl::aio_handle handle(acl::ENGINE_KERNEL);
 
 	int fds[2];
+
+	//////////////////////////////////////////////////////////////////////
+
 	int ret = acl_sane_socketpair(AF_UNIX, SOCK_STREAM, 0, fds);
 	if (ret < 0) {
 		printf("acl_sane_socketpair error %s\r\n", acl::last_serror());
 		return 1;
 	}
 
-	pipe_reader*  in = new pipe_reader(handle, fds[0]);
-	pipe_writer* out = new pipe_writer(fds[1]);
+	thread_reader* thread_in  = new thread_reader(fds[0]);
+	pipe_writer*   pipe_out   = new pipe_writer(handle, fds[1]);
 
-	in->start();
-	out->start();
+	thread_in->start();
+	pipe_out->start();
 
+	ret = acl_sane_socketpair(AF_UNIX, SOCK_STREAM, 0, fds);
+	if (ret < 0) {
+		printf("acl_sane_socketpair error %s\r\n", acl::last_serror());
+		return 1;
+	}
+
+	pipe_reader*   pipe_in    = new pipe_reader(handle, fds[0], *pipe_out);
+	thread_writer* thread_out = new thread_writer(fds[1]);
+
+	pipe_in->start();
+	thread_out->start();
+
+	//////////////////////////////////////////////////////////////////////
 
 	// 设置 DNS 域名服务器地址
 	handle.set_dns(name_server.c_str(), 5);
@@ -431,5 +580,12 @@ int main(int argc, char* argv[])
 
 	handle.check();
 	delete ssl_conf;
+
+	thread_out->wait(NULL);
+	thread_in->wait(NULL);
+
+	delete thread_out;
+	delete thread_in;
+
 	return 0;
 }
