@@ -1,9 +1,7 @@
 #include <iostream>
 #include <assert.h>
 #include "lib_acl.h"
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/http/http_header.hpp"
-#include "acl_cpp/stream/aio_handle.hpp"
+#include "acl_cpp/lib_acl.hpp"
 #include "ssl_aio_stream.hpp"
 
 #ifdef WIN32
@@ -258,7 +256,7 @@ int main(int argc, char* argv[])
 	}
 
 	ACL_METER_TIME("-----BEGIN-----");
-	acl_init();
+	acl::acl_cpp_init();
 
 	aio_handle handle(use_kernel ? ENGINE_KERNEL : ENGINE_SELECT);
 	ctx.handle = &handle;
