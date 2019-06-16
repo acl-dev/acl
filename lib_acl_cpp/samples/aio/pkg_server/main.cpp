@@ -25,13 +25,13 @@ class io_callback : public acl::aio_callback
 {
 public:
 	io_callback(acl::aio_socket_stream* client)
-		: status_(STATUS_T_HDR)
-		, client_(client)
-		, i_(0)
+	: status_(STATUS_T_HDR)
+	, client_(client)
+	, i_(0)
 	{
 	}
 
-	~io_callback()
+	~io_callback(void)
 	{
 		std::cout << "delete io_callback now ..." << std::endl;
 	}
@@ -45,11 +45,9 @@ public:
 	bool read_callback(char* data, int len)
 	{
 		// 当前状态是处理数据头时
-		if (status_ == STATUS_T_HDR)
-		{
+		if (status_ == STATUS_T_HDR) {
 			// 检验头部长度是否符合要求
-			if (len != sizeof(DAT_HDR))
-			{
+			if (len != sizeof(DAT_HDR)) {
 				printf("invalid len(%d) != DAT_HDR(%d)\r\n",
 					len, (int) sizeof(DAT_HDR));
 				return false;
@@ -61,8 +59,7 @@ public:
 
 			// 将网络字节序转为主机字节序
 			req_hdr->len = ntohl(req_hdr->len);
-			if (req_hdr->len <= 0)
-			{
+			if (req_hdr->len <= 0) {
 				printf("invalid len: %d\r\n", req_hdr->len);
 				return false;
 			}
@@ -75,14 +72,14 @@ public:
 			return true;
 		}
 
-		if (status_ != STATUS_T_DAT)
-		{
+		if (status_ != STATUS_T_DAT) {
 			printf("invalid status: %d\r\n", (int) status_);
 			return false;
 		}
 
-		if (i_++ < 10)
+		if (i_++ < 10) {
 			printf("req len: %d, dat: %s\r\n", len, data);
+		}
 
 		// 向远程客户端回写收到的数据
 
@@ -113,7 +110,7 @@ public:
 	 * 实现父类中的虚函数，客户端流的写成功回调过程
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流
 	 */
-	bool write_callback()
+	bool write_callback(void)
 	{
 		return true;
 	}
@@ -121,7 +118,7 @@ public:
 	/**
 	 * 实现父类中的虚函数，客户端流的超时回调过程
 	 */
-	void close_callback()
+	void close_callback(void)
 	{
 		// 必须在此处删除该动态分配的回调类对象以防止内存泄露
 		delete this;
@@ -131,7 +128,7 @@ public:
 	 * 实现父类中的虚函数，客户端流的超时回调过程
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流
 	 */
-	bool timeout_callback()
+	bool timeout_callback(void)
 	{
 		std::cout << "Timeout, delete it ..." << std::endl;
 		return false;
@@ -140,7 +137,7 @@ public:
 private:
 	status_t status_;
 	acl::aio_socket_stream* client_;
-	int   i_;
+	int      i_;
 };
 
 /**
@@ -149,8 +146,8 @@ private:
 class io_accept_callback : public acl::aio_accept_callback
 {
 public:
-	io_accept_callback() {}
-	~io_accept_callback()
+	io_accept_callback(void) {}
+	~io_accept_callback(void)
 	{
 		printf(">>io_accept_callback over!\n");
 	}
@@ -179,7 +176,7 @@ public:
 
 		// 从异步流读数据包头
 		client->read(sizeof(DAT_HDR), __timeout);
-		return (true);
+		return true;
 	}
 };
 
@@ -198,13 +195,11 @@ int main(int argc, char* argv[])
 	int  ch;
 	acl::string addr(":1900");
 
-	while ((ch = getopt(argc, argv, "l:hkt:")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "l:hkt:")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
-			return (0);
+			return 0;
 		case 'l':
 			addr = optarg;
 			break;
@@ -219,6 +214,9 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	// 初始化ACL库(尤其是在WIN32下一定要调用此函数，在UNIX平台下可不调用)
+	acl::acl_cpp_init();
+
 	acl::log::stdout_open(true);
 
 	// 构建异步引擎类对象
@@ -227,19 +225,15 @@ int main(int argc, char* argv[])
 	// 创建监听异步流
 	acl::aio_listen_stream* sstream = new acl::aio_listen_stream(&handle);
 
-	// 初始化ACL库(尤其是在WIN32下一定要调用此函数，在UNIX平台下可不调用)
-	acl::acl_cpp_init();
-
 	// 监听指定的地址
-	if (sstream->open(addr.c_str()) == false)
-	{
+	if (!sstream->open(addr.c_str())) {
 		std::cout << "open " << addr.c_str() << " error!" << std::endl;
 		sstream->close();
 		// XXX: 为了保证能关闭监听流，应在此处再 check 一下
 		handle.check();
 
 		getchar();
-		return (1);
+		return 1;
 	}
 
 	// 创建回调类对象，当有新连接到达时自动调用此类对象的回调过程
@@ -247,11 +241,9 @@ int main(int argc, char* argv[])
 	sstream->add_accept_callback(&callback);
 	std::cout << "Listen: " << addr.c_str() << " ok!" << std::endl;
 
-	while (true)
-	{
+	while (true) {
 		// 如果返回 false 则表示不再继续，需要退出
-		if (handle.check() == false)
-		{
+		if (!handle.check()) {
 			std::cout << "pkg_server stop now ..." << std::endl;
 			break;
 		}
@@ -263,5 +255,5 @@ int main(int argc, char* argv[])
 	// XXX: 为了保证能关闭监听流，应在此处再 check 一下
 	handle.check();
 
-	return (0);
+	return 0;
 }

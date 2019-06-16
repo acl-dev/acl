@@ -8,26 +8,20 @@
 #include "acl_cpp/ipc/ipc_server.hpp"
 #include "acl_cpp/ipc/ipc_client.hpp"
 
-using namespace acl;
-
 #define MSG_REQ		1
 #define MSG_RES		2
 #define MSG_STOP	3
 
-class test_client1 : public ipc_client
+class test_client1 : public acl::ipc_client
 {
 public:
-	test_client1()
-	{
+	test_client1(void) {}
 
-	}
+protected:
+	~test_client1(void) {}
 
-	~test_client1()
-	{
-
-	}
-
-	virtual void on_open()
+	// @override
+	void on_open(void)
 	{
 		// 添加消息回调对象
 		this->append_message(MSG_RES);
@@ -36,15 +30,17 @@ public:
 		this->send_message(MSG_REQ, NULL, 0);
 
 		// 异步等待消息
-		wait();
+		this->wait();
 	}
 
-	virtual void on_close()
+	// @override
+	void on_close(void)
 	{
 		delete this;
 	}
 
-	virtual void on_message(int nMsg, void* data, int dlen)
+	// @override
+	void on_message(int nMsg, void* data, int dlen)
 	{
 		(void) data;
 		(void) dlen;
@@ -54,104 +50,91 @@ public:
 		this->get_handle().stop();
 		this->close();
 	}
-protected:
-private:
 };
 
 // 子线程处理过程
 
-static bool client_main(aio_handle* handle, const char* addr)
+static bool client_main(acl::aio_handle* handle, const char* addr)
 {
 	// 创建消息连接
-	ipc_client* ipc = new test_client1();
+	acl::ipc_client* ipc = new test_client1();
 	
 	// 连接消息服务器
-	if (ipc->open(handle, addr, 0) == false)
-	{
+	if (!ipc->open(handle, addr, 0)) {
 		std::cout << "open " << addr << " error!" << std::endl;
 		delete ipc;
-		return (false);
+		return false;
 	}
 
-	return (true);
+	return true;
 }
 
 static void* thread_callback(void *ctx)
 {
 	const char* addr = (const char*) ctx;
-	aio_handle handle;
+	acl::aio_handle handle;
 
-	if (client_main(&handle, addr) == false)
-	{
+	if (!client_main(&handle, addr)) {
 		handle.check();
-		return (NULL);
+		return NULL;
 	}
 
 	// 消息循环
-	while (true)
-	{
-		if (handle.check() == false)
+	while (true) {
+		if (!handle.check()) {
 			break;
+		}
 	}
 
 	handle.check();
 
-	return (NULL);
+	return NULL;
 }
 
-class test_client2 : public ipc_client
+class test_client2 : public acl::ipc_client
 {
 public:
-	test_client2()
-	{
+	test_client2(void) {}
 
-	}
+protected:
+	~test_client2(void) {}
 
-	~test_client2()
-	{
-
-	}
-
-	virtual void on_close()
+	// @override
+	void on_close(void)
 	{
 		delete this;
 	}
 
-	virtual void on_message(int nMsg, void* data, int dlen)
+	// @override
+	void on_message(int nMsg, void* data, int dlen)
 	{
 		(void) data;
 		(void) dlen;
 
 		std::cout << "test_client2 on message:" << nMsg << std::endl;
 
-		if (nMsg == MSG_STOP)
-		{
+		if (nMsg == MSG_STOP) {
 			this->close();
 			this->get_handle().stop();
-		}
-		else
+		} else {
 			// 回应客户端消息
 			this->send_message(MSG_RES, NULL, 0);
+		}
 	}
-protected:
-private:
 };
 
-class test_server : public ipc_server
+class test_server : public acl::ipc_server
 {
 public:
-	test_server()
-	{
-	}
+	test_server(void) {}
 
-	~test_server()
-	{
+	~test_server(void) {}
 
-	}
-
-	void on_accept(aio_socket_stream* client)
+protected:
+	// @override
+	void on_accept(acl::aio_socket_stream* client)
 	{
-		ipc_client* ipc = new test_client2();
+		acl::ipc_client* ipc = new test_client2();
 
 		// 打开异步IPC过程
 		ipc->open(client);
@@ -161,8 +144,6 @@ public:
 		ipc->append_message(MSG_STOP);
 		ipc->wait();
 	}
-protected:
-private:
 };
 
 static void usage(const char* procname)
@@ -175,10 +156,8 @@ int main(int argc, char* argv[])
 	int   ch;
 	bool  use_thread = false;
 
-	while ((ch = getopt(argc, argv, "ht")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "ht")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return (0);
@@ -190,19 +169,18 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	acl_cpp_init();
+	acl::acl_cpp_init();
 
-	aio_handle handle;
+	acl::aio_handle handle;
 
-	ipc_server* server = new test_server();
+	acl::ipc_server* server = new test_server();
 
 	// 使消息服务器监听 127.0.0.1 的地址
-	if (server->open(&handle, "127.0.0.1:0") == false)
-	{
+	if (!server->open(&handle, "127.0.0.1:0")) {
 		delete server;
 		std::cout << "open server error!" << std::endl;
 		getchar();
-		return (1);
+		return 1;
 	}
 
 	char  addr[256];
@@ -212,18 +190,15 @@ int main(int argc, char* argv[])
 	snprintf(addr, sizeof(addr), "%s", server->get_addr());
 #endif
 
-	if (use_thread)
-	{
+	if (use_thread) {
 		acl_pthread_t tid;
 		acl_pthread_create(&tid, NULL, thread_callback, addr);
-	}
-	else
+	} else {
 		client_main(&handle, addr);
+	}
 
-	while (true)
-	{
-		if (handle.check() == false)
-		{
+	while (true) {
+		if (!handle.check()) {
 			std::cout << "stop now!" << std::endl;
 			break;
 		}
@@ -232,7 +207,7 @@ int main(int argc, char* argv[])
 	delete server;
 	handle.check();
 
-	std::cout << "server stopped!" << std::endl;
+	std::cout << "server stopped, enter any key to exit ..." << std::endl;
 	getchar();
-	return (0);
+	return 0;
 }

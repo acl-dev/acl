@@ -17,11 +17,13 @@ public:
 	{
 	}
 
-	~io_callback()
+private:
+	~io_callback(void)
 	{
 		std::cout << "delete io_callback now ..." << std::endl;
 	}
 
+public:
 	/**
 	 * 实现父类中的虚函数，客户端流的读成功回调过程
 	 * @param data {char*} 读到的数据地址
@@ -40,7 +42,7 @@ public:
 	 * 实现父类中的虚函数，客户端流的写成功回调过程
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流
 	 */
-	bool write_callback()
+	bool write_callback(void)
 	{
 		return true;
 	}
@@ -48,7 +50,7 @@ public:
 	/**
 	 * 实现父类中的虚函数，客户端流的超时回调过程
 	 */
-	void close_callback()
+	void close_callback(void)
 	{
 		// 必须在此处删除该动态分配的回调类对象以防止内存泄露
 		delete this;
@@ -58,7 +60,7 @@ public:
 	 * 实现父类中的虚函数，客户端流的超时回调过程
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流
 	 */
-	bool timeout_callback()
+	bool timeout_callback(void)
 	{
 		std::cout << "Timeout ..." << std::endl;
 		return true;
@@ -74,8 +76,8 @@ private:
 class io_accept_callback : public acl::aio_accept_callback
 {
 public:
-	io_accept_callback() {}
-	~io_accept_callback()
+	io_accept_callback(void) {}
+	~io_accept_callback(void)
 	{
 		printf(">>io_accept_callback over!\n");
 	}
@@ -113,8 +115,8 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		" -s listen_addr\r\n"
-		" -k[use kernel event: epoll/iocp/kqueue/devpool]\n"
-		, procname);
+		" -k[use kernel event: epoll/iocp/kqueue/devpool]\n",
+		procname);
 }
 
 int main(int argc, char* argv[])
@@ -166,7 +168,7 @@ int main(int argc, char* argv[])
 
 	while (true) {
 		// 如果返回 false 则表示不再继续，需要退出
-		if (handle.check() == false) {
+		if (!handle.check()) {
 			std::cout << "aio_server stop now ..." << std::endl;
 			break;
 		}

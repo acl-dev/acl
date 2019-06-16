@@ -1,6 +1,6 @@
 #include <iostream>
 #include <assert.h>
-#include "lib_acl.h"
+#include "lib_acl.h" // just for getopt on Windows
 #include "acl_cpp/acl_cpp_init.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
@@ -8,15 +8,13 @@
 #include "acl_cpp/stream/aio_listen_stream.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 
-using namespace acl;
-
 static int   __max = 0;
 static int   __timeout = 0;
 
 /**
  * 延迟读回调处理类
  */
-class timer_reader: public aio_timer_reader
+class timer_reader: public acl::aio_timer_reader
 {
 public:
 	timer_reader(int delay)
@@ -25,19 +23,20 @@ public:
 		std::cout << "timer_reader init, delay: " << delay << std::endl;
 	}
 
-	~timer_reader()
-	{
-	}
+protected:
+	~timer_reader(void) {}
 
 	// aio_timer_reader 的子类必须重载 destroy 方法
-	void destroy()
+	// @override
+	void destroy(void)
 	{
 		std::cout << "timer_reader delete, delay: "  << delay_ << std::endl;
 		delete this;
 	}
 
 	// 重载基类回调方法
-	virtual void timer_callback(unsigned int id)
+	// @override
+	void timer_callback(unsigned int id)
 	{
 		std::cout << "timer_reader(" << id
 			<< "): timer_callback, delay: " << delay_ << std::endl;
@@ -53,7 +52,7 @@ private:
 /**
  * 延迟写回调处理类
  */
-class timer_writer: public aio_timer_writer
+class timer_writer: public acl::aio_timer_writer
 {
 public:
 	timer_writer(int delay)
@@ -62,25 +61,26 @@ public:
 		std::cout << "timer_writer init, delay: " << delay << std::endl;
 	}
 
-	~timer_writer()
-	{
-	}
+protected:
+	~timer_writer(void) {}
 
 	// aio_timer_reader 的子类必须重载 destroy 方法
-	void destroy()
+	// @override
+	void destroy(void)
 	{
 		std::cout << "timer_writer delete, delay: " << delay_ << std::endl;
 		delete this;
 	}
 
 	// 重载基类回调方法
-	virtual void timer_callback(unsigned int id)
+	// @override
+	void timer_callback(unsigned int id)
 	{
 		std::cout << "timer_writer(" << id << "): timer_callback, delay: "
 			<< delay_ << std::endl;
 
 		// 调用基类的处理过程
-		aio_timer_writer::timer_callback(id);
+		acl::aio_timer_writer::timer_callback(id);
 	}
 
 private:
@@ -90,16 +90,15 @@ private:
 /**
  * 异步客户端流的回调类的子类
  */
-class io_callback : public aio_callback
+class io_callback : public acl::aio_callback
 {
 public:
-	io_callback(aio_socket_stream* client)
-		: client_(client)
-		, i_(0)
-	{
-	}
+	io_callback(acl::aio_socket_stream* client)
+	: client_(client)
+	, i_(0) {}
 
-	~io_callback()
+protected:
+	~io_callback(void)
 	{
 		std::cout << "delete io_callback now ..." << std::endl;
 	}
@@ -113,20 +112,20 @@ public:
 	bool read_callback(char* data, int len)
 	{
 		i_++;
-		if (i_ < 10)
+		if (i_ < 10) {
 			std::cout << ">>gets(i:" << i_ << "): "
 				<< data << std::endl;
+		}
 
 		// 如果远程客户端希望退出，则关闭之
-		if (strncasecmp(data, "quit", 4) == 0)
-		{
+		if (strncasecmp(data, "quit", 4) == 0) {
 			client_->format("Bye!\r\n");
 			client_->close();
+			return false;
 		}
 
 		// 如果远程客户端希望服务端也关闭，则中止异步事件过程
-		else if (strncasecmp(data, "stop", 4) == 0)
-		{
+		else if (strncasecmp(data, "stop", 4) == 0) {
 			client_->format("Stop now!\r\n");
 			client_->close();  // 关闭远程异步流
 
@@ -138,57 +137,52 @@ public:
 
 		int   delay = 0;
 
-		if (strncasecmp(data, "write_delay", strlen("write_delay")) == 0)
-		{
+		if (!strncasecmp(data, "write_delay", strlen("write_delay"))) {
 			// 延迟写过程
 
 			const char* ptr = data + strlen("write_delay");
 			delay = atoi(ptr);
-			if (delay > 0)
-			{
+			if (delay > 0) {
 				std::cout << ">> write delay " << delay
 					<< " second ..." << std::endl;
 				timer_writer* timer = new timer_writer(delay);
 				client_->write(data, len, delay * 1000000, timer);
 				client_->gets(10, false);
-				return (true);
+				return true;
 			}
-		}
-		else if (strncasecmp(data, "read_delay", strlen("read_delay")) == 0)
-		{
+		} else if (!strncasecmp(data, "read_delay", strlen("read_delay"))) {
 			// 延迟读过程
 
 			const char* ptr = data + strlen("read_delay");
 			delay = atoi(ptr);
-			if (delay > 0)
-			{
+			if (delay > 0) {
 				client_->write(data, len);
 				std::cout << ">> read delay " << delay
 					<< " second ..." << std::endl;
 				timer_reader* timer = new timer_reader(delay);
 				client_->gets(10, false, delay * 1000000, timer);
-				return (true);
+				return true;
 			}
 		}
 
 		client_->write(data, len);
 		//client_->gets(10, false);
-		return (true);
+		return true;
 	}
 
 	/**
 	 * 实现父类中的虚函数，客户端流的写成功回调过程
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流
 	 */
-	bool write_callback()
+	bool write_callback(void)
 	{
-		return (true);
+		return true;
 	}
 
 	/**
 	 * 实现父类中的虚函数，客户端流的超时回调过程
 	 */
-	void close_callback()
+	void close_callback(void)
 	{
 		// 必须在此处删除该动态分配的回调类对象以防止内存泄露
 		delete this;
@@ -198,25 +192,25 @@ public:
 	 * 实现父类中的虚函数，客户端流的超时回调过程
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流
 	 */
-	bool timeout_callback()
+	bool timeout_callback(void)
 	{
 		std::cout << "Timeout, delete it ..." << std::endl;
 		return (false);
 	}
 
 private:
-	aio_socket_stream* client_;
+	acl::aio_socket_stream* client_;
 	int   i_;
 };
 
 /**
  * 异步监听流的回调类的子类
  */
-class io_accept_callback : public aio_accept_callback
+class io_accept_callback : public acl::aio_accept_callback
 {
 public:
-	io_accept_callback() {}
-	~io_accept_callback()
+	io_accept_callback(void) {}
+	~io_accept_callback(void)
 	{
 		printf(">>io_accept_callback over!\n");
 	}
@@ -226,7 +220,7 @@ public:
 	 * @param client {aio_socket_stream*} 异步客户端流
 	 * @return {bool} 返回 true 以通知监听流继续监听
 	 */
-	bool accept_callback(aio_socket_stream* client)
+	bool accept_callback(acl::aio_socket_stream* client)
 	{
 		// 创建异步客户端流的回调对象并与该异步流进行绑定
 		io_callback* callback = new io_callback(client);
@@ -244,12 +238,13 @@ public:
 		client->add_timeout_callback(callback);
 
 		// 当限定了行数据最大长度时
-		if (__max > 0)
+		if (__max > 0) {
 			client->set_buf_max(__max);
+		}
 
 		// 从异步流读一行数据
 		client->gets(__timeout, false);
-		return (true);
+		return true;
 	}
 };
 
@@ -269,13 +264,11 @@ int main(int argc, char* argv[])
 	int  ch;
 	acl::string addr(":9001");
 
-	while ((ch = getopt(argc, argv, "l:hkL:t:")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "l:hkL:t:")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
-			return (0);
+			return 0;
 		case 'l':
 			addr = optarg;
 			break;
@@ -293,27 +286,26 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	acl::log::stdout_open(true);
-
-	// 构建异步引擎类对象
-	aio_handle handle(use_kernel ? ENGINE_KERNEL : ENGINE_SELECT);
-
-	// 创建监听异步流
-	aio_listen_stream* sstream = new aio_listen_stream(&handle);
-
 	// 初始化ACL库(尤其是在WIN32下一定要调用此函数，在UNIX平台下可不调用)
 	acl::acl_cpp_init();
 
+	acl::log::stdout_open(true);
+
+	// 构建异步引擎类对象
+	acl::aio_handle handle(use_kernel ? acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
+
+	// 创建监听异步流
+	acl::aio_listen_stream* sstream = new acl::aio_listen_stream(&handle);
+
 	// 监听指定的地址
-	if (sstream->open(addr.c_str()) == false)
-	{
+	if (!sstream->open(addr.c_str())) {
 		std::cout << "open " << addr.c_str() << " error!" << std::endl;
 		sstream->close();
 		// XXX: 为了保证能关闭监听流，应在此处再 check 一下
 		handle.check();
 
 		getchar();
-		return (1);
+		return 1;
 	}
 
 	// 创建回调类对象，当有新连接到达时自动调用此类对象的回调过程
@@ -321,11 +313,9 @@ int main(int argc, char* argv[])
 	sstream->add_accept_callback(&callback);
 	std::cout << "Listen: " << addr.c_str() << " ok!" << std::endl;
 
-	while (true)
-	{
+	while (true) {
 		// 如果返回 false 则表示不再继续，需要退出
-		if (handle.check() == false)
-		{
+		if (!handle.check()) {
 			std::cout << "aio_server stop now ..." << std::endl;
 			break;
 		}
@@ -337,5 +327,5 @@ int main(int argc, char* argv[])
 	// XXX: 为了保证能关闭监听流，应在此处再 check 一下
 	handle.check();
 
-	return (0);
+	return 0;
 }

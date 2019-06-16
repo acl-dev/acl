@@ -358,7 +358,7 @@ protected:
 		snprintf(buf, sizeof(buf), "hello, myname is zsx\r\n");
 		size_t len = strlen(buf);
 
-		if (this->ws_send_text(buf, len) == false) {
+		if (!this->ws_send_text(buf, len)) {
 			return false;
 		}
 
@@ -496,8 +496,10 @@ int main(int argc, char* argv[])
 		if (access(ssl_lib_path.c_str(), R_OK) == 0) {
 			// 设置 libpolarssl.so 库全路径
 			acl::polarssl_conf::set_libpath(ssl_lib_path);
+
 			// 动态加载 libpolarssl.so 库
 			acl::polarssl_conf::load();
+
 			// 创建全局 SSL 配置项
 			ssl_conf = new acl::polarssl_conf;
 		} else {

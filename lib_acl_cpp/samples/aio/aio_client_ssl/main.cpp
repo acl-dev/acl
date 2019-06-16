@@ -20,8 +20,8 @@ static acl::polarssl_conf* __ssl_conf;
 
 typedef struct
 {
-	char  addr[64];
 	acl::aio_handle* handle;
+	char  addr[64];
 	int   connect_timeout;
 	int   read_timeout;
 	int   nopen_limit;
@@ -48,14 +48,14 @@ public:
 	 * @param id {int} 本流的ID号
 	 */
 	client_io_callback(IO_CTX* ctx, acl::aio_socket_stream* client, int id)
-		: client_(client)
-		, ctx_(ctx)
-		, nwrite_(0)
-		, id_(id)
+	: client_(client)
+	, ctx_(ctx)
+	, nwrite_(0)
+	, id_(id)
 	{
 	}
 
-	~client_io_callback()
+	~client_io_callback(void)
 	{
 		std::cout << ">>>ID: " << id_ << ", io_callback deleted now!" << std::endl;
 	}
@@ -68,44 +68,40 @@ public:
 	 */
 	bool read_callback(char* data, int len)
 	{
-		(void) data;
 		(void) len;
 
 		ctx_->nread_total++;
 
-		if (ctx_->debug)
-		{
-			if (nwrite_ < 10)
+		if (ctx_->debug) {
+			if (nwrite_ < 10) {
 				std::cout << "gets(" << nwrite_ << "): " << data;
-			else if (nwrite_ % 2000 == 0)
+			} else if (nwrite_ % 2000 == 0) {
 				std::cout << ">>ID: " << id_ << ", I: "
 					<< nwrite_ << "; "<<  data;
+			}
 		}
 
 		// 如果收到服务器的退出消息，则也应退出
-		if (acl::strncasecmp_(data, "quit", 4) == 0)
-		{
+		if (acl::strncasecmp_(data, "quit", 4) == 0) {
 			// 向服务器发送数据
 			client_->format("Bye!\r\n");
 			// 关闭异步流连接
 			client_->close();
-			return (true);
+			return true;
 		}
 
-		if (nwrite_ >= ctx_->nwrite_limit)
-		{
-			if (ctx_->debug)
+		if (nwrite_ >= ctx_->nwrite_limit) {
+			if (ctx_->debug) {
 				std::cout << "ID: " << id_
 					<< ", nwrite: " << nwrite_
 					<< ", nwrite_limit: " << ctx_->nwrite_limit
 					<< ", quiting ..." << std::endl;
+			}
 
 			// 向服务器发送退出消息
 			client_->format("quit\r\n");
 			client_->close();
-		}
-		else
-		{
+		} else {
 			char  buf[256];
 			snprintf(buf, sizeof(buf), "hello world: %d\n", nwrite_);
 			client_->write(buf, (int) strlen(buf));
@@ -114,37 +110,35 @@ public:
 			//client_->format("hello world: %d\n", nwrite_);
 		}
 
-		return (true);
+		return true;
 	}
 
 	/**
 	 * 基类虚函数, 当异步流写成功时调用此回调函数
 	 * @return {bool} 返回给调用者 true 表示继续，否则表示需要关闭异步流
 	 */
-	bool write_callback()
+	bool write_callback(void)
 	{
 		ctx_->nwrite_total++;
 		nwrite_++;
 
 		// 从服务器读一行数据
 		client_->gets(ctx_->read_timeout, false);
-		return (true);
+		return true;
 	}
 
 	/**
 	 * 基类虚函数, 当该异步流关闭时调用此回调函数
 	 */
-	void close_callback()
+	void close_callback(void)
 	{
-		if (client_->is_opened() == false)
-		{
+		if (!client_->is_opened()) {
 			std::cout << "Id: " << id_ << " connect "
 				<< ctx_->addr << " error: "
 				<< acl::last_serror();
 
 			// 如果是第一次连接就失败，则退出
-			if (ctx_->nopen_total == 0)
-			{
+			if (ctx_->nopen_total == 0) {
 				std::cout << ", first connect error, quit";
 				/* 获得异步引擎句柄，并设置为退出状态 */
 				client_->get_handle().stop();
@@ -156,8 +150,7 @@ public:
 
 		/* 获得异步引擎中受监控的异步流个数 */
 		int nleft = client_->get_handle().length();
-		if (ctx_->nopen_total == ctx_->nopen_limit && nleft == 1)
-		{
+		if (ctx_->nopen_total == ctx_->nopen_limit && nleft == 1) {
 			std::cout << "Id: " << id_ << " stop now! nstream: "
 				<< nleft << std::endl;
 			/* 获得异步引擎句柄，并设置为退出状态 */
@@ -172,32 +165,29 @@ public:
 	 * 基类虚函数，当异步流超时时调用此函数
 	 * @return {bool} 返回给调用者 true 表示继续，否则表示需要关闭异步流
 	 */
-	bool timeout_callback()
+	bool timeout_callback(void)
 	{
 		std::cout << "Connect " << ctx_->addr << " Timeout ..." << std::endl;
 		client_->close();
-		return (false);
+		return false;
 	}
 
-	bool read_wakeup()
+	bool read_wakeup(void)
 	{
 		acl::polarssl_io* hook = (acl::polarssl_io*) client_->get_hook();
-		if (hook == NULL)
-		{
+		if (hook == NULL) {
 			std::cout << "get hook error"<< std::endl;
 			return false;
 		}
 
 		// 尝试进行 SSL 握手
-		if (hook->handshake() == false)
-		{
+		if (!hook->handshake()) {
 			logger_error("ssl handshake failed");
 			return false;
 		}
 
 		// 如果 SSL 握手已经成功，则开始按行读数据
-		if (hook->handshake_ok())
-		{
+		if (hook->handshake_ok()) {
 			printf("ssl handshake ok\r\n");
 
 			// 由 reactor 模式转为 proactor 模式，从而取消
@@ -221,7 +211,7 @@ public:
 	 * 基类虚函数, 当异步连接成功后调用此函数
 	 * @return {bool} 返回给调用者 true 表示继续，否则表示需要关闭异步流
 	 */
-	bool open_callback()
+	bool open_callback(void)
 	{
 		// 连接成功，设置IO读写回调函数
 		client_->add_read_callback(this);
@@ -229,32 +219,31 @@ public:
 		ctx_->nopen_total++;
 
 		acl::assert_(id_ > 0);
-		if (ctx_->nopen_total < ctx_->nopen_limit)
-		{
+
+		if (ctx_->nopen_total < ctx_->nopen_limit) {
 			// 开始进行下一个连接过程
-			if (connect_server(ctx_, id_ + 1) == false)
+			if (connect_server(ctx_, id_ + 1) == false) {
 				std::cout << "connect error!" << std::endl;
+			}
 		}
 
 		// 设置 SSL 方式
-		if (__ssl_conf)
-		{
+		if (__ssl_conf) {
 			acl::polarssl_io* ssl =
 				new acl::polarssl_io(*__ssl_conf, false, true);
-			if (client_->setup_hook(ssl) == ssl)
-			{
+			if (client_->setup_hook(ssl) == ssl) {
 				std::cout << "open ssl error!" << std::endl;
 				ssl->destroy();
 				return false;
 			}
-			if (ssl->handshake() == false)
-			{
+			if (!ssl->handshake()) {
 				client_->remove_hook();
 				ssl->destroy();
 				return false;
 			}
 
-			client_->read_wait(0);
+			// 进入 SSL 握手阶段
+			client_->read_wait(ctx_->read_timeout);
 			return true;
 		}
 
@@ -268,29 +257,28 @@ public:
 		client_->gets(ctx_->read_timeout, false);
 
 		// 表示继续异步过程
-		return (true);
+		return true;
 	}
 
-protected:
 private:
 	acl::aio_socket_stream* client_;
 	IO_CTX* ctx_;
-	int   nwrite_;
-	int   id_;
+	int     nwrite_;
+	int     id_;
 };
 
 static bool connect_server(IO_CTX* ctx, int id)
 {
 	// 开始异步连接远程服务器
-	acl::aio_socket_stream* stream = acl::aio_socket_stream::open(ctx->handle,
-			ctx->addr, ctx->connect_timeout);
-	if (stream == NULL)
-	{
+	acl::aio_socket_stream* stream = acl::aio_socket_stream::open
+		(ctx->handle, ctx->addr, ctx->connect_timeout);
+	if (stream == NULL) {
 		std::cout << "connect " << ctx->addr << " error!" << std::endl;
 		std::cout << "stoping ..." << std::endl;
-		if (id == 0)
+		if (id == 0) {
 			ctx->handle->stop();
-		return (false);
+		}
+		return false;
 	}
 
 	// 创建连接后的回调函数类
@@ -304,14 +292,20 @@ static bool connect_server(IO_CTX* ctx, int id)
 
 	// 添加连接超时的回调函数类
 	stream->add_timeout_callback(callback);
-	return (true);
+	return true;
 }
 
 static void usage(const char* procname)
 {
-	printf("usage: %s -h[help] -l server_addr -c nconnect"
-		" -n io_max -k[use kernel event: epoll/kqueue/devpoll"
-		" -t connect_timeout -d[debug] -S[use_ssl]\n", procname);
+	printf("usage: %s -h[help]\r\n"
+		" -l server_addr\r\n"
+		" -c nconnect\r\n"
+		" -n io_max\r\n"
+		" -k[use kernel event: epoll/kqueue/devpoll\r\n"
+		" -t connect_timeout\r\n"
+		" -d[debug]\r\n"
+		" -S libpolarssl.so [if set the ssl will be used]\n",
+		procname);
 }
 
 int main(int argc, char* argv[])
@@ -319,19 +313,18 @@ int main(int argc, char* argv[])
 	bool use_kernel = false;
 	int   ch;
 	IO_CTX ctx;
+	acl::string libssl_path;
 
 	memset(&ctx, 0, sizeof(ctx));
 	ctx.connect_timeout = 5;
-	ctx.nopen_limit = 10;
-	ctx.id_begin = 1;
-	ctx.nwrite_limit = 10;
-	ctx.debug = false;
+	ctx.nopen_limit     = 10;
+	ctx.id_begin        = 1;
+	ctx.nwrite_limit    = 10;
+	ctx.debug           = false;
 	snprintf(ctx.addr, sizeof(ctx.addr), "127.0.0.1:9001");
 
-	while ((ch = getopt(argc, argv, "hc:n:kl:dt:S")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "hc:n:kl:dt:S:")) > 0) {
+		switch (ch) {
 		case 'c':
 			ctx.nopen_limit = atoi(optarg);
 			if (ctx.nopen_limit <= 0)
@@ -358,7 +351,8 @@ int main(int argc, char* argv[])
 			ctx.connect_timeout = atoi(optarg);
 			break;
 		case 'S':
-			__ssl_conf = new acl::polarssl_conf();
+			libssl_path = optarg;
+			break;
 		default:
 			break;
 		}
@@ -368,11 +362,23 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
+	if (!libssl_path.empty() && !access(libssl_path.c_str(), R_OK)) {
+		// 设置 libpolarssl.so 库全路径
+		acl::polarssl_conf::set_libpath(libssl_path);
+
+		// 动态加载 libpolarssl.so 库
+		acl::polarssl_conf::load();
+
+		// 创建全局 SSL 配置项
+		__ssl_conf = new acl::polarssl_conf();
+	} else {
+		__ssl_conf = NULL;
+	}
+
 	acl::aio_handle handle(use_kernel ? acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
 	ctx.handle = &handle;
 
-	if (connect_server(&ctx, ctx.id_begin) == false)
-	{
+	if (!connect_server(&ctx, ctx.id_begin)) {
 		std::cout << "enter any key to exit." << std::endl;
 		getchar();
 		return (1);
@@ -380,11 +386,11 @@ int main(int argc, char* argv[])
 
 	std::cout << "Connect " << ctx.addr << " ..." << std::endl;
 
-	while (true)
-	{
+	while (true) {
 		// 如果返回 false 则表示不再继续，需要退出
-		if (handle.check() == false)
+		if (handle.check() == false) {
 			break;
+		}
 	}
 
 	acl::string buf;
