@@ -298,7 +298,8 @@ connect_pool* connect_manager::create_pool(const conn_config& cf, size_t idx)
 		pool->set_check_inter(check_inter_);
 	}
 
-	logger("Add one service, addr: %s, count: %d",
+	logger_debug(ACL_CPP_DEBUG_CONN_MANAGER, 1,
+		"Add one service, addr: %s, count: %d",
 		cf.addr.c_str(), (int) cf.count);
 	return pool;
 }
@@ -337,7 +338,8 @@ connect_pool* connect_manager::get(const char* addr,
 		if (exclusive) {
 			lock_.unlock();
 		}
-		logger("no connect pool for addr %s", addr);
+		logger_debug(ACL_CPP_DEBUG_CONN_MANAGER, 1,
+			"no connect pool for addr %s", addr);
 		return NULL;
 	}
 
