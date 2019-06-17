@@ -1235,7 +1235,7 @@ void redis_commands::get_dbsize(const std::vector<acl::string>&)
 			conn.set_password(passwd_);
 			acl::redis cmd(&conn);
 			int n = cmd.dbsize();
-			printf("----- ADDR: %s, DBSIZE: %d -----\r\n", addr, n);
+			printf("\tADDR: %s, DBSIZE: %d\r\n", addr, n);
 			if (n > 0) {
 				total += n;
 			}
@@ -1245,13 +1245,13 @@ void redis_commands::get_dbsize(const std::vector<acl::string>&)
 		conn.set_password(passwd_);
 		acl::redis cmd(&conn);
 		int n = cmd.dbsize();
-		printf("----- ADDR: %s, DBSIZE: %d -----\r\n", addr_.c_str(), n);
+		printf("\tADDR: %s, DBSIZE: %d\r\n", addr_.c_str(), n);
 		if (n > 0) {
 			total += n;
 		}
 	}
 
-	printf("---- Total DBSIZE: %d -----\r\n", total);
+	printf("\r\n\tTotal DBSIZE: %d\r\n", total);
 }
 
 void redis_commands::request(const std::vector<acl::string>& tokens)
