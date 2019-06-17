@@ -37,6 +37,7 @@ shared_ldflags = -lacl_cpp -lprotocol -lacl -lz -lpthread
 SYSLIB =
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
+OSTYPE   = $(shell uname -m)
 UNIXTYPE = LINUX
 
 ifeq ($(CC),)
@@ -52,68 +53,69 @@ ifeq ($(RANLIB),)
 endif
 
 ifeq ($(findstring clang++, $(CC)), clang++)
-	CFLAGS += -Wno-invalid-source-encoding \
-		  -Wno-invalid-offsetof
+  CFLAGS += -Wno-invalid-source-encoding -Wno-invalid-offsetof
 endif
 
-ifeq ($(findstring g++, $(CC)), g++)
-	GCC_VERSION:=$(shell echo `gcc --version|grep ^gcc|cut -d' ' -f3`)
-	GCC_MAJOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f1)
-	GCC_MINOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f2)
-	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -ge 7 \) ] && echo true)
-	ifeq ($(GCC_VER), true)
-		CFLAGS += -std=c++11 -DACL_USE_CPP11
-	endif
+ifeq ($(findstring x86_64, $(OSTYPE)), x86_64)
+  ifeq ($(findstring g++, $(CC)), g++)
+    GCC_VERSION:=$(shell echo `gcc --version|grep ^gcc|cut -d' ' -f3`)
+    GCC_MAJOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f1)
+    GCC_MINOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f2)
+    GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -ge 7 \) ] && echo true)
+    ifeq ($(GCC_VER), true)
+      CFLAGS += -std=c++11 -DACL_USE_CPP11
+    endif
+  endif
 endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	UNIXTYPE = FREEBSD
-	shared_ldflags = -lacl_cpp -l_protocol -lacl -L/usr/local/lib -liconv -lz -lpthread
+  UNIXTYPE = FREEBSD
+  shared_ldflags = -lacl_cpp -l_protocol -lacl -L/usr/local/lib -liconv -lz -lpthread
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
-	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof \
-		  -Wno-unused-private-field
-	UNIXTYPE = MACOSX
-	shared_ldflags = -lacl_cpp -l_protocol -lacl -L/usr/lib -liconv -lz -lpthread
+  CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
+    -Wno-extended-offsetof \
+    -Wno-unused-private-field
+  UNIXTYPE = MACOSX
+  shared_ldflags = -lacl_cpp -l_protocol -lacl -L/usr/lib -liconv -lz -lpthread
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	UNIXTYPE = LINUX
-	shared_ldflags = -lacl_cpp -l_protocol -lacl -lrt -lpthread -lz -ldl
+  UNIXTYPE = LINUX
+  shared_ldflags = -lacl_cpp -l_protocol -lacl -lrt -lpthread -lz -ldl
 endif
 
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
-	CFLAGS += -DLINUX2 -DMINGW
-	UNIXTYPE = LINUX
+  CFLAGS += -DLINUX2 -DMINGW
+  UNIXTYPE = LINUX
 endif
 
 # For SunOS
 ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
-	ifeq ($(findstring 86, $(UNIXNAME)), 86)
-		SYSLIB = -lsocket -lnsl -lrt
-	endif
-	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
-		SYSLIB = -lsocket -lnsl -lrt
-	endif
-	CFLAGS += -DSUNOS5
-	UNIXTYPE = SUNOS5
+  ifeq ($(findstring 86, $(UNIXNAME)), 86)
+    SYSLIB = -lsocket -lnsl -lrt
+  endif
+  ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
+    SYSLIB = -lsocket -lnsl -lrt
+  endif
+  CFLAGS += -DSUNOS5
+  UNIXTYPE = SUNOS5
 endif
 
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
-	CFLAGS += -DHP_UX -DHPUX11
-	UNIXTYPE = HPUX
+  CFLAGS += -DHP_UX -DHPUX11
+  UNIXTYPE = HPUX
 endif
 
 #Find system type.
 ifneq ($(SYSPATH),)
-	CHECKSYSRES = @echo "System is $(shell uname -sm)"
+  CHECKSYSRES = @echo "System is $(shell uname -sm)"
 endif
 ###########################################################
 
@@ -145,9 +147,9 @@ $(shell mkdir -p $(OBJ_PATH_DST))
 COMPILE = $(CC) $(CFLAGS)
 COMPILE_OBJ = @(echo 'building $<'; $(COMPILE) $< -o $@)
 CREATE_DEF = @(echo 'creating $@'; rm -f $@; \
-	$(COMPILE) -MM $< > $@.$$$$; \
-	sed 's,.*.o\( \)*:,$(patsubst %.inc,%.o,$@) $@ :,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$)
+  $(COMPILE) -MM $< > $@.$$$$; \
+  sed 's,.*.o\( \)*:,$(patsubst %.inc,%.o,$@) $@ :,g' < $@.$$$$ > $@; \
+  rm -f $@.$$$$)
 
 ###########################################################
 
