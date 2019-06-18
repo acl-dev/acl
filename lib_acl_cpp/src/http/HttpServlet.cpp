@@ -195,6 +195,7 @@ bool HttpServlet::start(void)
 			ret = doGet(*req_, *res_);
 		}
 		break;
+	case HTTP_METHOD_PATCH:
 	case HTTP_METHOD_POST:
 		ret = doPost(*req_, *res_);
 		break;
