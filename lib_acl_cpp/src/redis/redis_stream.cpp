@@ -141,7 +141,7 @@ bool redis_stream::xadd_with_maxlen(const char* key, size_t maxlen,
 	i++;
 
 	char buf[LONG_LEN];
-	safe_snprintf(buf, sizeof(buf), "%ld", maxlen);
+	safe_snprintf(buf, sizeof(buf), "%ld", (long) maxlen);
 	argv_[i] = buf;
 	argv_lens_[i] = strlen(buf);
 	i++;
