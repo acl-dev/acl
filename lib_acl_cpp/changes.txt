@@ -1,5 +1,8 @@
 修改历史列表：
 
+577) 2019.6.20
+577.1) feature: string 类支持连加功能
+
 576) 2019.6.12
 576.1) feature: http_header 类丰富了 cookie 的存取方法，可以存取 request 或
 response 的 cookies

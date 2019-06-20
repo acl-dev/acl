@@ -1272,6 +1272,19 @@ public:
 	static string& parse_int64(unsigned long long int n);
 #endif
 
+	/**
+	 * 模板函数，可用在以下场景:
+	 * string s1, s2;
+	 * T v;
+	 * s1 = s2 + v;
+	 */
+	template<typename T>
+	string& operator+(T v)
+	{
+		*this += v;
+		return *this;
+	}
+
 private:
 	bool use_bin_;
 	ACL_VSTRING* vbf_;
@@ -1284,5 +1297,28 @@ private:
 
 	void init(size_t len);
 };
+
+/**
+ * 模板函数，可用在以下场景:
+ * string s1, s2;
+ * T v;
+ * s1 = v + s2;
+ */
+template<typename T>
+string operator+(T v, const string& rhs)
+{
+	string s;
+	s = v;
+	s += rhs;
+	return s;
+}
+
+/**
+ * 示例:
+ * string s, s1 = "hello", s2 = "world";
+ * s = s1 + " " + s2;
+ * s = ">" + s1 + " " + s2;
+ * s = 1000 + s1 + " " + s2 + 1000;
+ */
 
 } // namespce acl
