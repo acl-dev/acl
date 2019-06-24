@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2015-2018
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Wed 14 Jun 2017 03:14:48 PM CST
- */
-
 #pragma once
 #include "struct.h"
 #include "struct.gson.h"

@@ -1,14 +1,3 @@
-/**
- * Copyright (C) 2015-2018 IQIYI
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Mon 29 Jan 2018 02:55:24 PM CST
- */
 #pragma once
 
 extern char *var_cfg_redis_addrs;

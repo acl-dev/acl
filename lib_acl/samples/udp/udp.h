@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2015-2018
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Thu 25 May 2017 05:26:42 PM CST
- */
-
 #pragma once
 #include <sys/socket.h>
 #include <sys/types.h>

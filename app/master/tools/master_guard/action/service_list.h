@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2015-2018 IQIYI
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Wed 03 Jan 2018 05:36:30 PM CST
- */
-
 #pragma once
 
 class service_list
