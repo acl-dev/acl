@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2017-2018 IQIYI
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Tue 22 Aug 2017 11:09:55 AM CST
- */
-
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "noncopyable.hpp"

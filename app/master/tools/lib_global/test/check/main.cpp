@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2015-2018 IQIYI
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Thu 25 Jan 2018 10:21:25 AM CST
- */
-
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 #include <stdio.h>

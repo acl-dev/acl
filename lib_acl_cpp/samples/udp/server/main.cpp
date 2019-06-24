@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2015-2018
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Tue 30 May 2017 10:32:58 PM CST
- */
-
 #include "stdafx.h"
 #include "udp_sock.h"
 #include "udp_pkt.h"

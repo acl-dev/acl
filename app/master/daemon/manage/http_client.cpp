@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2015-2018
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Wed 14 Jun 2017 12:23:36 PM CST
- */
-
 #include "stdafx.h"
 #include "action/service_list.h"
 #include "action/service_stat.h"

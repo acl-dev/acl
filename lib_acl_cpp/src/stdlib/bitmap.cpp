@@ -4,10 +4,6 @@
 #endif
 #include "acl_cpp/stdlib/bitmap.hpp"
 
-/**
- * @author wanghaibin@qiyi.com
- * @date   2017-08-16
- */
 namespace acl {
 
 bitmap::bitmap(const void* buf, size_t len)

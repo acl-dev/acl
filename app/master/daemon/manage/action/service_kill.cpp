@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2015-2018
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Thu 08 Sep 2016 04:24:52 PM CST
- */
-
 #include "stdafx.h"
 #include "master/master_api.h"
 #include "manage/http_client.h"

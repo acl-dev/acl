@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2017-2018
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Tue 08 Aug 2017 02:13:31 PM CST
- */
-
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stream/socket_stream.hpp"
