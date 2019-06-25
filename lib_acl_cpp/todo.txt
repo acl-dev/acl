@@ -31,3 +31,4 @@ http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=270070
 24) http 模块支持 HTTP 认证
 25) redis_pubsub.cpp: 当在同一连接订阅多个频道时可能会收到已订阅频道的消息，目前采取的方式
 是先忽略该消息，将来需要缓冲收到消息
+26) redis: 支持 pipeline 模式，同时支持多 KEY 合并方式
