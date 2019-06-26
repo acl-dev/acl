@@ -597,6 +597,8 @@ bool HttpServletRequest::readHeader(string* method_s)
 		method_ = HTTP_METHOD_OPTION;
 	else if (strcasecmp(method, "PROPFIND") == 0)
 		method_ = HTTP_METHOD_PROPFIND;
+	else if (strcasecmp(method, "PATCH") == 0)
+		method_ = HTTP_METHOD_PATCH;
 	else
 		method_ = HTTP_METHOD_OTHER;
 
