@@ -70,23 +70,23 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-  UNIXTYPE = FREEBSD
-  shared_ldflags = -lacl_cpp -l_protocol -lacl -L/usr/local/lib -liconv -lz -lpthread
+	UNIXTYPE = FREEBSD
+	shared_ldflags = -lacl_cpp -lprotocol -lacl -L/usr/local/lib -liconv -lz -lpthread
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
-  CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
-    -Wno-extended-offsetof \
-    -Wno-unused-private-field
-  UNIXTYPE = MACOSX
-  shared_ldflags = -lacl_cpp -l_protocol -lacl -L/usr/lib -liconv -lz -lpthread
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
+		  -Wno-extended-offsetof \
+		  -Wno-unused-private-field
+	UNIXTYPE = MACOSX
+	shared_ldflags = -lacl_cpp -lprotocol -lacl -L/usr/lib -liconv -lz -lpthread
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-  UNIXTYPE = LINUX
-  shared_ldflags = -lacl_cpp -l_protocol -lacl -lrt -lpthread -lz -ldl
+	UNIXTYPE = LINUX
+	shared_ldflags = -lacl_cpp -lprotocol -lacl -lrt -lpthread -lz -ldl
 endif
 
 # For MINGW

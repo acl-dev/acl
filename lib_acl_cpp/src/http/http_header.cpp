@@ -577,6 +577,9 @@ http_header& http_header::set_method(http_method_t method)
 	case HTTP_METHOD_PROPFIND:
 		CP(method_s_, "PROPFIND");
 		break;
+	case HTTP_METHOD_PATCH:
+		CP(method_s_, "PATCH");
+		break;
 	default:
 		CP(method_s_, "UNKNOWN");
 		break;
@@ -604,6 +607,8 @@ http_header& http_header::set_method(const char* method)
 		method_ = HTTP_METHOD_OPTION;
 	} else if (strcasecmp(method, "PROPFIND") == 0) {
 		method_ = HTTP_METHOD_PROPFIND;
+	} else if (strcasecmp(method, "PATCH") == 0) {
+		method_ = HTTP_METHOD_PATCH;
 	} else if (*method != 0) {
 		method_ = HTTP_METHOD_OTHER;
 	} else {
