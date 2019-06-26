@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2015-2018 IQIYI
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Thu 04 Jan 2018 01:54:01 PM CST
- */
-
 #include "stdafx.h"
 #include "service_app.h"
 

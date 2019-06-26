@@ -655,12 +655,12 @@ bool http_request::get_body(string& out, const char* to_charset /* = NULL */)
 		}
 	}
 
-	delete ps;
-
 	if (hp) {
 		hp->update_end();
 		delete hp;
 	}
+
+	delete ps;
 	return true;
 }
 

@@ -1,13 +1,16 @@
+
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/locker.hpp"
 #endif
 
+/*
 #ifdef ACL_UNIX
 # if !defined(MINGW) && !defined(__APPLE__) && !defined(ANDROID)
 #  define HAS_SPINLOCK
 # endif
 #endif
+*/
 
 namespace acl {
 

@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2015-2018 IQIYI
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Mon 26 Nov 2018 11:25:42 AM CST
- */
-
 #ifndef FIBER_COND_INCLUDE_H
 #define FIBER_COND_INCLUDE_H
 

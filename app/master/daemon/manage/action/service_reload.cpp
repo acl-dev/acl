@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2015-2018
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Tue 27 Jun 2017 10:43:03 AM CST
- */
-
 #include "stdafx.h"
 #include <signal.h>
 #include "master/master_params.h"

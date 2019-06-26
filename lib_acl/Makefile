@@ -110,7 +110,7 @@ endif
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
 	ifeq ($(findstring i686, $(OSTYPE)), i686)
-		CFLAGS += -march=i686
+#		CFLAGS += -march=i686
 		RPATH = linux32
 	endif
 	ifeq ($(findstring x86_64, $(OSTYPE)), x86_64)

@@ -1,5 +1,12 @@
 修改历史列表：
 
+578) 2019.6.23
+578.1) bugfix: http_request::get_body 当 out 类型为 string 时，因为 ps 对象提前
+被释放而引起程序崩溃
+
+577) 2019.6.20
+577.1) feature: string 类支持连加功能
+
 576) 2019.6.12
 576.1) feature: http_header 类丰富了 cookie 的存取方法，可以存取 request 或
 response 的 cookies
