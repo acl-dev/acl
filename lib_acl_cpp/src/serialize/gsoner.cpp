@@ -9,6 +9,8 @@
  *   Sat 08 Oct 2016 09:08:14 PM CST
  */
 
+#ifndef ACL_CLIENT_ONLY
+
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/string.hpp"
@@ -20,8 +22,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-
-#ifndef ACL_CLIENT_ONLY
 
 namespace acl
 {

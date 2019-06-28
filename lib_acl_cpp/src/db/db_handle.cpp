@@ -1,3 +1,5 @@
+#if !defined(ACL_DB_DISABLE)
+
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <assert.h>
@@ -6,8 +8,6 @@
 #include "acl_cpp/db/query.hpp"
 #include "acl_cpp/db/db_handle.hpp"
 #endif
-
-#if !defined(ACL_DB_DISABLE)
 
 namespace acl
 {

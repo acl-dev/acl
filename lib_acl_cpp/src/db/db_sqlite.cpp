@@ -1,3 +1,5 @@
+#if !defined(ACL_DB_DISABLE)
+
 #include "acl_stdafx.hpp"
 #ifdef ACL_WINDOWS
 #include <io.h>
@@ -8,8 +10,6 @@
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/db/db_sqlite.hpp"
 #endif
-
-#if !defined(ACL_DB_DISABLE)
 
 #if defined(HAS_SQLITE) || defined(HAS_SQLITE_DLL)
 
@@ -761,7 +761,7 @@ int db_sqlite::affect_count() const { return 0; }
 int db_sqlite::get_errno() const { return -1; }
 const char* db_sqlite::get_error() const { return "unknown"; }
 bool db_sqlite::prepare(sqlite_cursor&) { return false; }
-bool db_sqlite::next(sqlite_cursor&, db_row*) { return false; }
+bool db_sqlite::next(sqlite_cursor&, bool*) { return false; }
 
 }  // namespace acl
 

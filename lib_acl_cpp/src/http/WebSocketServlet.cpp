@@ -9,6 +9,7 @@
  * VERSION
  *   Wed 31 May 2017 02:37:14 PM CST
  */
+#ifndef ACL_CLIENT_ONLY
 
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
@@ -18,8 +19,6 @@
 #include "acl_cpp/http/websocket.hpp"
 #include "acl_cpp/http/WebSocketServlet.hpp"
 #endif
-
-#ifndef ACL_CLIENT_ONLY
 
 namespace acl
 {

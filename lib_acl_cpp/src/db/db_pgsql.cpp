@@ -1,3 +1,5 @@
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
+
 #include "acl_stdafx.hpp"
 #include "libpq-fe.h"
 #ifndef ACL_PREPARE_COMPILE
@@ -8,8 +10,6 @@
 #include "acl_cpp/db/pgsql_conf.hpp"
 #include "acl_cpp/db/db_pgsql.hpp"
 #endif
-
-#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 
 //////////////////////////////////////////////////////////////////////////
 

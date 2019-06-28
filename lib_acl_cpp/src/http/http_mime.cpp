@@ -1,3 +1,5 @@
+#if !defined(ACL_MIME_DISABLE)
+
 #include "acl_stdafx.hpp"
 #include "../mime/internal/mime_state.hpp"
 #include "../mime/internal/header_opts.hpp"
@@ -10,8 +12,6 @@
 #include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/http/http_mime.hpp"
 #endif
-
-#if !defined(ACL_MIME_DISABLE)
 
 namespace acl
 {

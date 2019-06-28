@@ -1,3 +1,5 @@
+#ifndef ACL_CLIENT_ONLY
+
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <utility>
@@ -7,8 +9,6 @@
 #include "acl_cpp/stdlib/escape.hpp"
 #include "acl_cpp/session/session.hpp"
 #endif
-
-#ifndef ACL_CLIENT_ONLY
 
 namespace acl
 {

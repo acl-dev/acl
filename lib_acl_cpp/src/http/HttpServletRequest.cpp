@@ -1,3 +1,5 @@
+#ifndef ACL_CLIENT_ONLY
+
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
@@ -19,8 +21,6 @@
 #include "acl_cpp/http/HttpServletResponse.hpp"
 #include "acl_cpp/http/HttpServletRequest.hpp"
 #endif
-
-#ifndef ACL_CLIENT_ONLY
 
 #define SKIP_SPACE(x) { while (*x == ' ' || *x == '\t') x++; }
 

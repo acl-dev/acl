@@ -123,7 +123,7 @@ if (${UNIX_OS})
 	endif()
 
 	if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-		add_definitions("-O3")
+		add_definitions("-O2")
 	else()
 		add_definitions("-g")
 	endif()
@@ -133,6 +133,11 @@ elseif (${WIN_OS})
 		"-D_WINSOCK_DEPRECATED_NO_WARNINGS"
 		"-DACL_WRITEABLE_CHECK"
 		"-DACL_PREPARE_COMPILE")
+endif()
+
+if (ACL_CLIENT_ONLY MATCHES "YES")
+	add_definitions("-DACL_CLIENT_ONLY")
+	message(STATUS "acl: ACL_CLIENT_ONLY been set")
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Android")

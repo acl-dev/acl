@@ -54,7 +54,6 @@ include_directories(
 set(src ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(sources
 	${src}
-	${src}/aliyun
 	${src}/beanstalk
 	${src}/connpool
 	${src}/db
@@ -97,10 +96,7 @@ if (${UNIX_OS})
 		"-Wno-long-long"
 		"-Wuninitialized"
 		"-D_POSIX_PTHREAD_SEMANTICS"
-		"-DHAS_MYSQL_DLL"
-		"-DHAS_PGSQL_DLL"
-		"-DHAS_SQLITE_DLL"
-		"-DHAS_POLARSSL_DLL"
+		"-DACL_PREPARE_COMPILE"
 		"-Wno-unused-parameter"
 		"-fexceptions"
 		)
@@ -119,10 +115,57 @@ if (${UNIX_OS})
 	endif()
 
 	if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-		add_definitions("-O3")
+		add_definitions("-O2")
 	else()
 		add_definitions("-g")
 	endif()
+
+	if (DISABLE_DB MATCHES "YES")
+		add_definitions("-DACL_DB_DISABLE")
+		message(STATUS "DB (mysql, pgsql, sqlite) was disabled!")
+	else()
+		if (HAS_MYSQL MATCHES "YES")
+			add_definitions("-DHAS_MYSQL")
+			message(STATUS "HAS_MYSQL been set, mysql enable!")
+		elseif (HAS_MYSQL_DLL MATCHES "YES")
+			add_definitions("-DHAS_MYSQL_DLL")
+			message(STATUS "HAS_MYSQL_DLL been set, mysql enable!")
+		else()
+			message(STATUS "mysql disable!")
+		endif()
+
+		if (HAS_PGSQL MATCHES "YES")
+			add_definitions("-DHAS_PGSQL")
+			message(STATUS "HAS_PGSQL been set, pgsql enable!")
+		elseif (HAS_PGSQL_DLL MATCHES "YES")
+			add_definitions("-DHAS_PGSQL_DLL")
+			message(STATUS "HAS_PGSQL_DLL been set, pgsql enable!")
+		else()
+			message(STATUS "pgsql disable!")
+		endif()
+
+		if (HAS_SQLITE MATCHES "YES")
+			add_definitions("-DHAS_SQLITE")
+			message(STATUS "HAS_SQLITE been set, sqlite enable!")
+		elseif (HAS_SQLITE_DLL MATCHES "YES")
+			add_definitions("-DHAS_SQLITE_DLL")
+			message(STATUS "HAS_SQLITE_DLL been set, sqlite enable!")
+		else()
+			message(STATUS "sqlite disable!")
+		endif()
+	endif()
+
+	if (HAS_POLARSSL MATCHES "YES")
+		add_definitions("-DHAS_POLARSSL")
+		message(STATUS "HAS_POLARSSL been set, polarssl enable!")
+	elseif (HAS_POLARSSL_DLL MATCHES "YES")
+		add_definitions("-DHAS_POLARSSL_DLL")
+		message(STATUS "HAS_POLARSSL_DLL been set, polarssl enable!")
+	else()
+		message(STATUS "polarssl disable!")
+	endif()
+
+
 elseif (${WIN_OS})
 	add_definitions(
 		"-Ycacl_stdafx.hpp"
@@ -135,6 +178,11 @@ elseif (${WIN_OS})
 		"-DHAS_POLARSSL_DLL"
 		"-DUSE_WIN_ICONV")
 	aux_source_directory(${src}/stdlib/internal lib_src)
+endif()
+
+if (ACL_CLIENT_ONLY MATCHES "YES")
+	add_definitions("-DACL_CLIENT_ONLY")
+	message(STATUS "acl_cpp: ACL_CLIENT_ONLY been set")
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Android")

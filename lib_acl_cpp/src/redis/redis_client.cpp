@@ -1,3 +1,5 @@
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
+
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
@@ -12,8 +14,6 @@
 #include "acl_cpp/redis/redis_client.hpp"
 #endif
 #include "redis_request.hpp"
-
-#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 namespace acl
 {

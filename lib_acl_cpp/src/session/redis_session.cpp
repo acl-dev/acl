@@ -1,11 +1,11 @@
+#ifndef ACL_CLIENT_ONLY
+
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/redis/redis_client_cluster.hpp"
 #include "acl_cpp/redis/redis.hpp"
 #include "acl_cpp/session/redis_session.hpp"
 #endif
-
-#ifndef ACL_CLIENT_ONLY
 
 namespace acl
 {

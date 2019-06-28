@@ -1,3 +1,5 @@
+#ifndef ACL_CLIENT_ONLY
+
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <string.h>
@@ -10,8 +12,6 @@
 #include "acl_cpp/hsocket/hserror.hpp"
 #include "acl_cpp/hsocket/hsproto.hpp"
 #endif
-
-#ifndef ACL_CLIENT_ONLY
 
 namespace acl
 {

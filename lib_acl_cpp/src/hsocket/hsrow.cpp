@@ -1,3 +1,5 @@
+#ifndef ACL_CLIENT_ONLY
+
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <vector>
@@ -6,8 +8,6 @@
 #include "acl_cpp/stdlib/escape.hpp"
 #include "acl_cpp/hsocket/hsrow.hpp"
 #endif
-
-#ifndef ACL_CLIENT_ONLY
 
 namespace acl
 {

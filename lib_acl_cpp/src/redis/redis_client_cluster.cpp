@@ -1,3 +1,5 @@
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
+
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <vector>
@@ -8,8 +10,6 @@
 #include "acl_cpp/redis/redis_client_pool.hpp"
 #include "acl_cpp/redis/redis_client_cluster.hpp"
 #endif
-
-#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 namespace acl
 {

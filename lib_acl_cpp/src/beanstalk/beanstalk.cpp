@@ -1,3 +1,5 @@
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_BEANSTALK_DISABLE)
+
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <stdarg.h>
@@ -6,8 +8,6 @@
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/beanstalk/beanstalk.hpp"
 #endif
-
-#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_BEANSTALK_DISABLE)
 
 namespace acl
 {
