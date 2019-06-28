@@ -4,7 +4,7 @@
 #include "acl_cpp/db/db_service_mysql.hpp"
 #endif
 
-#if !defined(ACL_DB_DISABLE)
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 
 namespace acl
 {
