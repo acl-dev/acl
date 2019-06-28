@@ -34,7 +34,7 @@ set(pgsql_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/pgsql)
 set(sqlite_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/sqlite)
 set(polarssl_include ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
-include_directories(
+include_directories(#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 	${zlib_include}
 	${mysql_include}
 	${pgsql_include}
@@ -190,6 +190,10 @@ if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	set(CMAKE_SHARED_LINKER_FLAGS "-lz")
 	add_definitions("-DACL_CLIENT_ONLY")
 	add_definitions("-Wno-invalid-source-encoding")
+
+	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
+	link_directories(${lib_output_path})
 else()
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
 

@@ -95,6 +95,10 @@ endif()
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	# set(CMAKE_SHARED_LINKER_FLAGS "-shared")
 	add_definitions("-Wno-invalid-source-encoding")
+
+	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
+	link_directories(${lib_output_path})
 else()
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
 
