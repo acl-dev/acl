@@ -1,9 +1,9 @@
-#ifndef ACL_CLIENT_ONLY
-
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/master/master_conf.hpp"
 #endif
+
+#ifndef ACL_CLIENT_ONLY
 
 namespace acl
 {

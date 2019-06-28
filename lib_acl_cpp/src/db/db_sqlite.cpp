@@ -1,5 +1,3 @@
-#if !defined(ACL_DB_DISABLE)
-
 #include "acl_stdafx.hpp"
 #ifdef ACL_WINDOWS
 #include <io.h>
@@ -10,6 +8,8 @@
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/db/db_sqlite.hpp"
 #endif
+
+#if !defined(ACL_DB_DISABLE)
 
 #if defined(HAS_SQLITE) || defined(HAS_SQLITE_DLL)
 

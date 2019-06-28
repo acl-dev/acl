@@ -1,5 +1,3 @@
-#ifndef ACL_CLIENT_ONLY
-
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
@@ -10,6 +8,8 @@
 #endif
 
 #define	SPECIAL_CHAR(x)	((x) == ' ' || (x) == '\t' || (x) == '\r' || (x) == '\n')
+
+#ifndef ACL_CLIENT_ONLY
 
 namespace acl
 {

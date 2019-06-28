@@ -1,10 +1,10 @@
-#ifndef ACL_CLIENT_ONLY
-
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/memcache/memcache.hpp"
 #include "acl_cpp/memcache/memcache_pool.hpp"
 #endif
+
+#ifndef ACL_CLIENT_ONLY
 
 namespace acl
 {

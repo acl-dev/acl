@@ -1,5 +1,3 @@
-#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
-
 #include "acl_stdafx.hpp"
 #include "mysql.h"
 #include "errmsg.h"
@@ -11,6 +9,8 @@
 #include "acl_cpp/db/mysql_conf.hpp"
 #include "acl_cpp/db/db_mysql.hpp"
 #endif
+
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 
 //////////////////////////////////////////////////////////////////////////
 

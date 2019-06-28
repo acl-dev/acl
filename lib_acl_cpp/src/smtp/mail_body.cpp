@@ -1,5 +1,3 @@
-#if !defined(ACL_MIME_DISABLE)
-
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
@@ -13,6 +11,8 @@
 #include "acl_cpp/smtp/mail_message.hpp"
 #include "acl_cpp/smtp/mail_body.hpp"
 #endif
+
+#if !defined(ACL_MIME_DISABLE)
 
 namespace acl {
 

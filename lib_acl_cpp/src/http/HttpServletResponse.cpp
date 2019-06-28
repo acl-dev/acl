@@ -1,5 +1,3 @@
-#ifndef ACL_CLIENT_ONLY
-
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
@@ -12,6 +10,8 @@
 #include "acl_cpp/http/HttpServletRequest.hpp"
 #include "acl_cpp/http/HttpServletResponse.hpp"
 #endif
+
+#ifndef ACL_CLIENT_ONLY
 
 namespace acl
 {

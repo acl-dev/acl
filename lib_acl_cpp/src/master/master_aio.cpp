@@ -1,5 +1,3 @@
-#ifndef ACL_CLIENT_ONLY
-
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
@@ -10,6 +8,8 @@
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 #include "acl_cpp/master/master_aio.hpp"
 #endif
+
+#ifndef ACL_CLIENT_ONLY
 
 namespace acl
 {

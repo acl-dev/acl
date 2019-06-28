@@ -1,5 +1,3 @@
-#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
-
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
@@ -7,6 +5,8 @@
 #include "acl_cpp/redis/redis_result.hpp"
 #include "acl_cpp/redis/redis_stream.hpp"
 #endif
+
+#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 #define INT_LEN		11
 #define LONG_LEN	21
