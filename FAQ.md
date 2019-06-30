@@ -99,7 +99,7 @@ main.o: main.cpp
 - Ubuntu：apt-get install zlib1g.dev
 
 ### 6、Linux 平台下 acl 库能打包成一个库吗？
-可以。在 acl 目录下运行：make build_one 则可以将 lib_acl/lib_protocol/lib_acl_cpp 打包成一个完整的库 -- lib_acl.a/lib_acl.so，则应用最终使用时可以仅连接这一个库即可。
+可以。在 acl 目录下运行：make build_one 则可以将 lib_acl/lib_protocol/lib_acl_cpp 打包成一个完整的库：lib_acl.a/lib_acl.so，则应用最终使用时可以仅连接这一个库即可。
 
 ### 7、Linux 平台下如何使用 ssl 功能？
 目前 acl 中的 lib_acl_cpp C++ 库通过集成 polarssl 支持 ssl 功能，所支持的 polarssl 源码的下载位置：https://github.com/acl-dev/third_party, 老版本 acl 通过静态连接 libpolarssl.a 实现对 ssl 的支持，当前版本则是通过动态加载 libpolarssl.so 方式实现了对 ssl 的支持，此动态支持方式更加灵活方便，无须特殊编译条件，也更为通用。
@@ -149,7 +149,9 @@ void get_json(acl::HttpServletRequest& req)
 答案：是，acl redis 客户端库同时支持集群和单机方式的 redis-server。
 
 #### 2. acl redis 库是如何划分的？
-acl redis 客户端库主要分为两类：命令类和连接类，其中的命令类主要有：redis_key, redis_string, redis_hash, redis_list, redis_set, redis_zset, redis_cluster, redis_geo, redis_hyperloglog, redis_pubsub, redis_transaction, redis_server, redis_script, 这些类都继承于基类 redis_command，同时子类 redis 又继承了所有这些命令类，以便于用户可以直接使用 acl::redis 操作所有的 redis 客户端命令；redis_client, redis_client_pool, redis_client_cluster 为通信连接类，命令类对象通过这些连接类对象与 redis-server 进行交互，redis_client 为单连接类，redis_client_pool 为连接池类，这两个类仅能在非集群模式的 redis-server 环境中使用，不支持 redis-server 的集群模式，必须使用 redis_client_cluster 连接集群模式的 redis-server，同时 redis_client_cluster 也兼容非集群模式的连接。
+acl redis 客户端库主要分为两类：命令类和连接类：
+- **命令类主要有**：redis_key, redis_string, redis_hash, redis_list, redis_set, redis_zset, redis_cluster, redis_geo, redis_hyperloglog, redis_pubsub, redis_transaction, redis_server, redis_script, 这些类都继承于基类 redis_command，同时子类 redis 又继承了所有这些命令类，以便于用户可以直接使用 acl::redis 操作所有的 redis 客户端命令；
+- **连接类主要有**：redis_client, redis_client_pool, redis_client_cluster，命令类对象通过这些连接类对象与 redis-server 进行交互，redis_client 为单连接类，redis_client_pool 为连接池类，这两个类仅能在非集群模式的 redis-server 环境中使用，不支持 redis-server 的集群模式，必须使用 redis_client_cluster 连接集群模式的 redis-server，同时 redis_client_cluster 也兼容非集群模式的连接。
 
 #### 3. acl redis 库中的哪些类对象操作是线程安全的？
 acl redis 库中的所有命令类对象及 redis_client 单连接类对象不能同时被多个线程使用（就象 std::string 一样不能跨线程使用）；redis_client_pool，redis_client_cluster 两个连接类对象是线程操作安全的，同一个对象可以被多个线程同时使用。
@@ -172,8 +174,7 @@ acl 协程库支持多线程方式，只是支持的方式与 go 语言有所不
 没有。mysql 客户端库使用的系统 IO API 为 read/write/poll，而 acl 协程库 HOOK 了系统底层的 IO 过程，因此当将用户程序与 mysql 库及 acl 协程库一起编译后，mysql 库的 IO 过程直接被 acl 协程库 HOOK 的 API 接管，从而将 mysql 客户端库协程化而无须修改一行 mysql 库代码。
 
 #### 5. acl 协程库支持域名解析功能吗？
-支持。很多 C/C++ 实现的协程库并未实现 gethostbyname(_r) 函数，导致用户在使用协程编程遇到域名解析时还需要借助单独的线程来完成，acl 库本身从 DNS 协议层次实现了域名解析过程，acl
-协程库基于此功能模块 HOOK 了系统的 gethostbyname(_r) API 而无须借助第三方函数库或起单独的线程完成域名解析。
+支持。很多 C/C++ 实现的协程库并未实现 gethostbyname(_r) 函数，导致用户在使用协程编程遇到域名解析时还需要借助单独的线程来完成，acl 库本身从 DNS 协议层次实现了域名解析过程，acl 协程库基于此功能模块 HOOK 了系统的 gethostbyname(_r) API 而无须借助第三方函数库或起单独的线程完成域名解析。
 
 #### 6. acl 协程库的系统 errno 号如何处理？
 acl 协程库实现了协程安全的 errno 号，正如之前使用多线程编程时 errno 可以与每个线程绑定一样，在 acl 协程库里 errno 也是与每个 acl 协程进行绑定的。因此，当你调用 strerror(errno) 时也是协程安全的。
