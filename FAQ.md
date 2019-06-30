@@ -25,6 +25,7 @@
         * [4. acl HTTP 模块是否支持 websocket 通信协议？](#4-acl-http-模块是否支持-websocket-通信协议)
         * [5. acl HTTP 模块是否支持 session？](#5-acl-http-模块是否支持-session)
         * [6. HttpServletRequest 为何读不到 json 或 xml 数据体？](#6-HttpServletRequest-为何读不到-json-或-xml-数据体)
+        * [7. http_request 因未设 Host 字段而出错的问题](#7-http_request-因未设-Host-字段而出错的问题)
     * [（三）、Redis 模块](#三redis-模块)
         * [1. acl redis 库是否支持集群功能？](#1-acl-redis-库是否支持集群功能)
         * [2. acl redis 库是如何划分的？](#2-acl-redis-库是如何划分的)
@@ -143,6 +144,28 @@ void get_json(acl::HttpServletRequest& req)
 ```
 
 如果应用想自己读取并解析 json 数据，则需要在调用 acl::HttpServlet::setParseBody(false)，禁止 acl::HttpServletRequest 类对象内部自动读取数据。
+
+#### 7. http_request 因未设 Host 字段而出错的问题
+在使用 acl::http_request 类对象访问标准 WEB 服务器（如：nginx）时，如果没有设置 HTTP 请求头中的 Host 字段，nginx 会返回 400 错误，主要是 HTTP/1.1 协议要求 HTTP 客户端必须设置 Host 字段，方法如下：
+
+```c++
+bool http_client(void)
+{
+	acl::http_request req("www.sina.com.cn:80");
+	acl::http_header& hdr = req.request_header();
+	hdr.set_url("/").set_host("www.sina.com.cn");
+	if (!req.request(NULL, 0)) {
+		return false;
+	}
+	acl::string body;
+	if (req.get_body(body)) {
+		printf("%s\r\n", body.c_str());
+	}
+	
+	... 
+}
+
+```
 
 ### （三）、Redis 模块
 #### 1. acl redis 库是否支持集群功能？
