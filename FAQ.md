@@ -24,7 +24,7 @@
         * [3. acl HTTP 模块是否支持服务器/客户端两种模式？](#3-acl-http-模块是否支持服务器客户端两种模式)
         * [4. acl HTTP 模块是否支持 websocket 通信协议？](#4-acl-http-模块是否支持-websocket-通信协议)
         * [5. acl HTTP 模块是否支持 session？](#5-acl-http-模块是否支持-session)
-        * [6. acl::HttpServletRequest 为何读不到 json 或 xml 数据体？](#6-acl::HttpServletRequest-为何读不到-json-或-xml-数据体)
+        * [6. acl::HttpServletRequest 为何读不到 json 或 xml 数据体？](#6-acl::HttpServletRequest为何读不到json或xml数据体)
     * [（三）、Redis 模块](#三redis-模块)
         * [1. acl redis 库是否支持集群功能？](#1-acl-redis-库是否支持集群功能)
         * [2. acl redis 库是如何划分的？](#2-acl-redis-库是如何划分的)
@@ -131,7 +131,7 @@ lib_acl_cpp 库是以动态加载方式加载 mysql 动态库的，所以在编�
 #### 5. acl HTTP 模块是否支持 session？
 支持。acl HTTP 模块当用在服务器编程时支持 session 存储，目前支持使用 memcached 或 redis 存储 session 数据。
  
-#### 6. acl::HttpServletRequest 为何读不到 json 或 xml 数据体？
+#### 6. acl::HttpServletRequest为何读不到json或xml数据体
 当 HTTP 客户端请求的数据体为 json 或 xml 时，默认情况下从 acl::HttpServletRequest 对象中是读不到 json/xml 数据的，主要原因在于 HttpServletRequest 内置了自动读取并解析 json/xml/x-www-form-urlencoded 类型数据的功能，使用者只需直接获取解析后的对象即可，如针对 json 类数据体：
 
 ```c++
