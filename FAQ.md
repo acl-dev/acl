@@ -238,7 +238,7 @@ __触发器模型：__ 将配置项 trigger_use_limit 设为 0。
 需要修改每个服务子进程的配置文件，将配置项：master_maxproc 及 master_prefork 设置成要启动的进程数（设置值需相同），同时需要将 xxx_use_limit 及 xxx_idle_limit 配置项设成 0 以防止子进程空闲退出，xxx_use_limit 及 xxx_idle_limit  的依每种服务器模型而不同，具体可参考上面（4）中的说明。
 
 #### 6. acl_master 控制模式下，如何只监听内网地址？
-在 acl_master 模式下，可以将 master_service 配置项支持模糊匹配方式，即可以将监听地址写成 192.168.*.*:xxx 或 10.0.*.*:xxx 方式，这样 acl_master 会自动扫描服务器所有的网卡地址，但只监听服务匹配条件的内网地址，这样为统一部署提供方便。
+在 acl_master 模式下，可以将 master_service 配置项支持模糊匹配方式，即可以将监听地址写成 `192.168.*.*:xxx` 或 `10.0.*.*:xxx` 方式，这样 acl_master 会自动扫描服务器所有的网卡地址，但只监听服务匹配条件的内网地址，这样为统一部署提供方便。
  
 ### （六）、邮件&mime模块
 。。。
