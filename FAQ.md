@@ -24,7 +24,7 @@
         * [3. acl HTTP 模块是否支持服务器/客户端两种模式？](#3-acl-http-模块是否支持服务器客户端两种模式)
         * [4. acl HTTP 模块是否支持 websocket 通信协议？](#4-acl-http-模块是否支持-websocket-通信协议)
         * [5. acl HTTP 模块是否支持 session？](#5-acl-http-模块是否支持-session)
-        * [6. 从 acl::HttpServletRequest 为何读不到 json 或 xml 数据体？](#6-从-acl::httpservletrequest-为何读不到-json-或-xml-数据体)
+        * [6. 从 acl::HttpServletRequest 为何读不到 json 或 xml 数据体？](#6-从-acl::HttpServletRequest-为何读不到-json-或-xml-数据体)
     * [（三）、Redis 模块](#三redis-模块)
         * [1. acl redis 库是否支持集群功能？](#1-acl-redis-库是否支持集群功能)
         * [2. acl redis 库是如何划分的？](#2-acl-redis-库是如何划分的)
