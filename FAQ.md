@@ -128,7 +128,7 @@ lib_acl_cpp 库是以动态加载方式加载 mysql 动态库的，所以在编�
 #### 4. acl HTTP 模块是否支持 websocket 通信协议？
 支持。可以参考示例：lib_acl_cpp\samples\websocket。
 
-#### 5. acl HTTP 模块是否支持 session?
+#### 5. acl HTTP 模块是否支持 session？
 支持。acl HTTP 模块当用在服务器编程时支持 session 存储，目前支持使用 memcached 或 redis 存储 session 数据。
  
 #### 6. acl::HttpServletRequest 为何读不到 json 或 xml 数据体？
