@@ -26,7 +26,7 @@
         * [1.2.7 MIME protocol library](#127-Mime-protocol-library)
         * [1.2.8 Network coroutine library](#128-Network-coroutine-library)
         * [1.2.9 Database related](#129-Database-related)
-        * [1.2.10 K-V disk storage module (zdb) for numeric keys](#1210-Numeric-key-KV-disk-storage-module-zdb)
+        * [1.2.10 K-V disk storage module (zdb) for numeric keys](#1210-Numeric-key-K-V-disk-storage-module-zdb)
         * [1.2.11 Other function libraries](#1211-Other-function-libraries)
             * [1.2.11.1 Common data structure module](#12111-Common-data-structure-module)
             * [1.2.11.2 Memory operation module](#12112-Memory-operation-module)
