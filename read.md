@@ -1,42 +1,42 @@
 # acl -- One advanced C/C++ library for Unix/Windows.
 
 <!-- vim-markdown-toc GFM -->
-* [I Description](#ID-escription)
-    * [1.1 library composition](#11-library-composition)
-    * [1.2 function module composition](#12-function-module-composition)
-        * [1.2.1 Network Communication Library](#121-Network-Communication-Library)
-            * [1.2.1.1 Stream Processing Module](#1211-Stream-Processing-Module)
-            * [1.2.1.2 Network Operation Module](#1212-Network-Operation-Module)
-            * [1.2.1.3 non-blocking network flow](#1213-non-blocking-network-flow)
-            * [1.2.1.4 Common Network Application Protocol Library](#1214-Common-Network-Application-Protocol-Library)
-            * [1.2.1.5 Common Network Communication Library](#1215-Common-Network-Communication-Library)
-        * [1.2.2 Network IO Event Engine](#122-Network-io-Event-Engine)
-        * [1.2.3 Web Server Framework](#123-Web-Server-Framework)
-            * [1.2.3.1 Process Model](#1231-Process-Model)
-            * [1.2.3.2 Threading Model](#1232-Threading-Model)
-            * [1.2.3.3 non-blocking model](#1233-non-blocking-model)
-            * [1.2.3.4 coroutine model](#1234-coroutine-model)
-            * [1.2.3.5 UDP communication model](#1235-udp-communication-model)
-            * [1.2.3.6 Trigger Model](#1236-Trigger-Model)
-        * [1.2.4 thread and thread pool module](#124-thread-and-thread-pool-module)
-        * [1.2.5 HTTP Protocol Library](#125-http-Protocol-Library)
-            * [1.2.5.1 Client Mode](#1251-Client-Mode)
-            * [1.2.5.2 server mode](#1242-server-mode)
-        * [1.2.6 Redis client library](#126-redis-client-library)
-        * [1.2.7 MIME protocol library](#127-mime-protocol-library)
-        * [1.2.8 Network Coroutine Library](#128-Network-Coroutine-Library)
-        * [1.2.9 database related](#129-database-related)
-        * [1.2.10 K-V disk storage module (zdb) for numeric keys](#1210-numeric-key-kv-disk-storage-module-zdb)
-        * [1.2.11 other function library](#1211-other-function-library)
-            * [1.2.11.1 Common Data Structure Module](#12111-Common-Data-Structure-Module)
-            * [1.2.11.2 Memory Operation Module](#12112-Memory-Operation-Module)
-            * [1.2.11.3 Common String Operation Module](#12113-Common-String-Operation-Module)
-            * [1.2.11.4 File Directory Module](#12114-File-Directory-Module)
-            * [1.2.11.5 read configuration file module](#12115-read-configuration-file-module)
-            * [1.2.11.6 file queue processing library](#12116-file-queue-processing-library)
-            * [1.2.11.7, json parsing library](#12117json-parsing-library)
-            * [1.2.11.8, xml parsing library](#12118xml-parsing-library)
-            * [1.2.11.9, common coding library](#12119-common-coding-library)
+* [I Description](#I-Description)
+    * [1.1 Library composition](#11-Library-composition)
+    * [1.2 Function module composition](#12-Function-module-composition)
+        * [1.2.1 Network communication library](#121-Network-communication-library)
+            * [1.2.1.1 Stream processing module](#1211-Stream-processing-module)
+            * [1.2.1.2 Network operation module](#1212-Network-operation-module)
+            * [1.2.1.3 Non-blocking network flow](#1213-Non-blocking-network-flow)
+            * [1.2.1.4 Common network application protocol Library](#1214-Common-network-application-protocol-library)
+            * [1.2.1.5 Common network communication library](#1215-Common-network-communication-library)
+        * [1.2.2 Network IO event engine](#122-Network-io-event-engine)
+        * [1.2.3 Web server framework](#123-Web-server-framework)
+            * [1.2.3.1 Process model](#1231-Process-model)
+            * [1.2.3.2 Threading model](#1232-Threading-model)
+            * [1.2.3.3 Non-blocking model](#1233-Non-blocking-model)
+            * [1.2.3.4 Coroutine model](#1234-Coroutine-model)
+            * [1.2.3.5 UDP communication model](#1235-UDP-communication-model)
+            * [1.2.3.6 Trigger model](#1236-Trigger-model)
+        * [1.2.4 Thread and thread pool module](#124-Thread-and-thread-pool-module)
+        * [1.2.5 HTTP protocol library](#125-HTTP-protocol-library)
+            * [1.2.5.1 Client mode](#1251-Client-mode)
+            * [1.2.5.2 Server mode](#1242-Server-mode)
+        * [1.2.6 Redis client library](#126-Redis-client-library)
+        * [1.2.7 MIME protocol library](#127-Mime-protocol-library)
+        * [1.2.8 Network coroutine library](#128-Network-coroutine-library)
+        * [1.2.9 Database related](#129-Database-related)
+        * [1.2.10 K-V disk storage module (zdb) for numeric keys](#1210-Numeric-key-kv-disk-storage-module-zdb)
+        * [1.2.11 Other function library](#1211-Other-function-library)
+            * [1.2.11.1 Common data structure module](#12111-Common-data-structure-module)
+            * [1.2.11.2 Memory operation module](#12112-Memory-operation-module)
+            * [1.2.11.3 Common string operation module](#12113-Common-string-operation-module)
+            * [1.2.11.4 File Directory module](#12114-File-Directory-module)
+            * [1.2.11.5 Read configuration file module](#12115-Read-configuration-file-module)
+            * [1.2.11.6 File queue processing library](#12116-File-queue-processing-library)
+            * [1.2.11.7, Json parsing library](#12117Json-parsing-library)
+            * [1.2.11.8, Xml parsing library](#12118Xml-parsing-library)
+            * [1.2.11.9, Common coding library](#12119-Common-coding-library)
 * [II Platform support and compilation](#II-Platform-support-and-compilation)
 * [III Directory structure description](#III-Directory-structure-description)
     * [3.1 lib_acl---Basic C library](#31-lib_acl)
@@ -44,18 +44,18 @@
     * [3.3 lib_acl_cpp---C++ Function Library](#33-lib_acl_cpp)
     * [3.4 lib_fiber---network coroutine library](#34-lib_fiber)
     * [3.5 Legend](#35-Legend)
-    * [3.6 there are a lot of examples in the acl library for reference, please refer to: SAMPLES.md](#36-there-are-a-lot-of-examples-in-the-library-for-reference-please-refer-to-SAMPLES.md)
-    * [3.7 acl use FAQ](#37-acl-Use-FAQ-Reference-FAQ.md)
-* [IV Who is using acl](#IV-Who-are-using-acl)
+    * [3.6 There are a lot of examples in the acl library for reference, please refer to: SAMPLES.md](#36-There-are-a-lot-of-examples-in-the-library-for-reference-please-refer-to-SAMPLES.md)
+    * [3.7 Acl use FAQ](#37-Acl-use-FAQ-reference-FAQ.md)
+* [IV Who are using acl](#IV-Who-are-using-acl)
 * [V License](#V-Licenses)
 * [VI Reference](#IV-Reference)
 
 <!-- vim-markdown-toc -->
 
-## ID escription
+## I Description
 The acl project is a cross-platform (supporting LINUX, WIN32, Solaris, MacOS, FreeBSD) network communication library and server programming framework, while providing more useful functional libraries. Through this library, users can easily write server programs, WEB applications, and database applications that support multiple modes (multi-threaded, multi-process, non-blocking, trigger, UDP, and coroutine). In addition, the library also provides client communication libraries for common applications (such as: HTTP, SMTP, ICMP, redis, memcache, beanstalk, handler socket), common streaming codec library: XML/JSON/MIME/BASE64/UUCODE/ QPCODE/RFC2047 etc.
 
-### 1.1 library composition
+### 1.1 Library composition
 This project consists of 5 libraries and a large number of examples. The description of the five libraries is as follows:
 1. lib_acl: This library is the most basic library, the other four libraries are dependent on the library; the library is implemented in C language.
 2. lib_protocol: This library mainly implements the http protocol and the icmp/ping protocol; the library is implemented in C language.
@@ -67,9 +67,9 @@ This project consists of 5 libraries and a large number of examples. The descrip
 * Overall architecture diagram
     ![Overall architecture diagram] (res/img/architecture.png)
 
-### 1.2 function module composition
-#### 1.2.1 Network Communication Library
-##### 1.2.1.1 stream processing module
+### 1.2 Function module composition
+#### 1.2.1 Network communication library
+##### 1.2.1.1 Stream processing module
 This module is the most basic streaming communication module for the entire acl network communication. It not only supports network streaming, but also supports file streaming. It mainly supports:
 1. Read data by line, compatible with \r\n under win32, and compatible with the end of \n under UNIX
 2. Read data by line but require automatic removal of the trailing \n or \r\n
@@ -87,51 +87,51 @@ This module is the most basic streaming communication module for the entire acl 
 14. Get the file size
 15. Obtain the local address and remote address of the network stream
 
-##### 1.2.1.2 Network Operation Module
+##### 1.2.1.2 Network operation module
 This module mainly supports network server monitoring (supports TCP/UDP/UNIX domain socket), network client connection (supports TCP/UNIX domain socket), DNS domain name query and result cache (supports calling system gethostbyname/getaddrinfo function and direct Send DNS protocol two ways), socket (socket) operation and take the local network card and other functions.
 
-##### 1.2.1.3 non-blocking network flow
+##### 1.2.1.3 Non-blocking network flow
 Support non-blocking mode connection, read (by row read, specified length read), write (write line, write specified length, write a set of data) and other operations.
 
-##### 1.2.1.4 Common Network Application Protocol Library
+##### 1.2.1.4 Common network application protocol library
 It mainly supports common network application protocols, such as: HTTP, SMTP, ICMP, in which HTTP and ICMP modules implement blocking and non-blocking communication methods. In addition, the HTTP protocol supports server and client in C++ version of lib_acl_cpp. Two communication methods, when used as a server, support the interface usage similar to JAVA HttpServlet. When used as a client mode, it supports connection pool and cluster management. The module supports both cookie, session, and HTTP MIME file upload. Rich functions such as block transfer, automatic character set conversion, automatic decompression, and breakpoint resume.
 
-##### 1.2.1.5 Common Network Communication Library
+##### 1.2.1.5 Common network communication library
 Support memcached, beanstalk, handler socket client communication library, the communication library supports connection pool mode.
 
-#### 1.2.2 Network IO Event Engine
+#### 1.2.2 Network IO event engine
 Supports select (UNIX/LINUX/WIN32), poll (UNIX/LINUX), epoll (LINUX), kqueue (BSD), devpoll (solaris), iocp (WIN32), window message (WIN32) and other system event engines, and supports Reactor And Proactor two programming models.
 
-#### 1.2.3 web server framework
+#### 1.2.3 Web server framework
 This module is the most important module in acl, and provides the infrastructure commonly used in server programming. The server framework is derived from the famous Postfix. It has been expanded on the basis of the following. The main service models that have been supported are:
 
-##### 1.2.3.1 process model
+##### 1.2.3.1 Process model
 One connection to a process, the advantage of this model is that the programming is simple, safe and stable, and the disadvantage is that the degree of concurrency is not high;
 
-##### 1.2.3.2 thread model
+##### 1.2.3.2 Thread model
 Each child process handles all client connections by a group of threads in the thread pool. The IO event trigger mode is used. The connection is bound to a thread only when the connection has data readable. The thread is returned immediately after processing. For the thread pool, the biggest advantage of this model is that it can handle a large number of client connections with a small number of threads, and the programming is relatively simple (relative to the non-blocking model);
 
-##### 1.2.3.3 non-blocking model
+##### 1.2.3.3 Non-blocking model
 Each child process consists of a single non-blocking thread that handles a large number of foreign client connections (similar to nginx/squid/ircd) in a completely non-blocking IO manner. The advantage of this model is that it has high processing efficiency and low resource consumption. Can handle a large number of client connections, the disadvantage is that programming is more complicated;
 
-##### 1.2.3.4 coroutine model
+##### 1.2.3.4 Coroutine model
 Although the non-blocking service model can obtain large concurrent processing capability, the programming complexity is high. The coroutine model combines the features of large concurrent processing and low programming complexity, enabling programmers to easily implement sequential IO programming. Business logic;
 
 ##### 1.2.3.5 UDP communication model
 The model is mainly used to support the UDP network process and the service model is added;
 
-##### 1.2.3.6 trigger model
+##### 1.2.3.6 Trigger model
 The model instance is mainly used to process the background service process of some scheduled tasks (similar to the system's crontab).
 
 The sub-process utility in the server framework adopts the semi-resident service model, supports the sub-process pre-boot mechanism, the maximum and minimum process number control, the sub-process abnormal alarm, and the single process to listen to multiple addresses (can simultaneously listen to TCP/UDP sockets and UNIX). Domain sockets), child process security control, log output to syslog-ng, multi-process TCP connection uniformity; configuration file-driven mode, one configuration file per service, convenient process management and online upgrade of service process.
 
-#### 1.2.4 Thread and Thread Pool Module
+#### 1.2.4 Thread and thread pool module
 Provides a cross-platform support for the Posix-compliant thread interface (WIN32 support); the thread pool module minimizes lock conflicts in thread task allocation (used in the multi-process multi-threaded service model in the acl server framework).
 
 #### 1.2.5 HTTP protocol
 Provides a complete HTTP protocol implementation, supports HTTP/1.0, 1.1 version; supports both client mode and server mode:
 
-##### 1.2.5.1 client mode
+##### 1.2.5.1 Client mode
 1. Support connection pool mode;
 2. Support chunked block transfer;
 3. Support compressed transmission;
@@ -140,7 +140,7 @@ Provides a complete HTTP protocol implementation, supports HTTP/1.0, 1.1 version
 6. Support setting/acquisition of cookies;
 7. Support Websocket.
 
-##### 1.2.5.2 server mode
+##### 1.2.5.2 Server mode
 1. Support Java-like HttpServlet usage;
 2. Support chunked block transfer;
 3. Support compressed transmission;
@@ -161,46 +161,46 @@ Specific content reference: [Use the acl library to write efficient C++ redis cl
 1. Support streaming MIME data parsing;
 2. Support MIME RFC2045, RFC2047, RFC822.
 
-#### 1.2.8 Network Coroutine Library
+#### 1.2.8 Network coroutine library
 Direct hook system The underlying IO API, in conjunction with epoll, implements a high-concurrency, high-performance programming framework for network IO. This module enables some native common blocking network libraries (such as client libraries such as mysql/redis/http) to directly support high Concurrent network operation; by using this module, the programmer uses the sequential thinking programming method to change the blocking mode to the non-blocking mode inside the coroutine library, thus greatly improving the network concurrency and processing performance.
 
-#### 1.2.9 database related
+#### 1.2.9 Database related
 Designed a unified database operation interface and connection pool processing, currently supports sqlite/mysql/postgresql.
 
-#### 1.2.10 numeric key K-V disk storage module (zdb)
+#### 1.2.10 Numeric key K-V disk storage module (zdb)
 Take the KEY/VALUE block storage method, because the KEY is limited to the numeric type, you only need the memory calculation to calculate the position of the KEY, and the KEY stores the location of the VALUE, so you only need two disk positioning for any data query. (I used this method to replace K-V storage using B-trees such as BSD and TC when doing traffic statistics storage.)
 
-#### 1.2.11 other function libraries
+#### 1.2.11 Other function libraries
 
-##### 1.2.11.1 Common Data Structure Module
+##### 1.2.11.1 Common data structure module
 The module provides common hash tables (and multiple hash algorithms), dynamic arrays, doubly linked lists, balanced binary trees, queues, binary search trees, 256-fork matching trees, and other array structures; provides a unified data structure traversal method (using acl_foreach).
 
-##### 1.2.11.2 Memory Operation Module
+##### 1.2.11.2 Memory operation module
 
 This module provides three memory pool models:
 1. <b>Basic memory mode:</b> The system's malloc/free API is encapsulated internally to provide security measures such as memory verification. This method also provides an external registration interface that allows users to register their own memory allocation models. ;
 2. <b>memory slice (slab) mode:</b> allocate multiple fixed-length memory chains according to different sizes, which can effectively reduce memory fragmentation and greatly improve memory allocation efficiency;
 3. <b>memory chain mode:</b> Allocate small memory of different lengths on one memory page, which can use memory very effectively and reduce memory waste.
 
-##### 1.2.11.3 commonly used string operation module
+##### 1.2.11.3 Commonly used string operation module
 Supports string matching lookup, pre (post) comparison, string splitting, string case conversion, H2B/B2H conversion, URL encoding/decoding, etc.
 
-##### 1.2.11.4 file directory module
+##### 1.2.11.4 File directory module
 Support multi-level directory creation, multi-level directory scanning, file handle caching, etc., while processing multi-level directories in a round-robin manner, avoiding the potential for stack overflow in recursive mode.
 
-##### 1.2.11.5 read configuration file module
+##### 1.2.11.5 Read configuration file module
 Supports reading the configuration file of the name=value format. When the value is long, you can use the backslash (\) to wrap the line, and use the configuration table to extract the configuration items in the configuration file.
 
-##### 1.2.11.6 file queue processing library
+##### 1.2.11.6 File queue processing library
 Supports the creation, scanning, and deletion of multiple sets of directory queue files; it is commonly used in service programs for temporary file queue scheduling.
 
-##### 1.2.11.7 json parsing library
+##### 1.2.11.7 Json parsing library
 Supports streaming parsing of json data while supporting json packet assembly.
 
-##### 1.2.11.8 xml parsing library
+##### 1.2.11.8 Xml parsing library
 Support streaming methods to parse xml data while supporting xml packet assembly.
 
-##### 1.2.11.9 Common Code Library
+##### 1.2.11.9 Common code library
 It also includes codecs such as rfc2047, url, base64, uucode, qpcode, charset, etc. These decoding libraries are all streamed and are suitable for multiple network IO models (blocking/non-blocking TCP, UDP).
 
 ## II Platform support and compilation
@@ -294,10 +294,10 @@ There are a few things to keep in mind when using dynamic libraries in a WIN32 e
 * Web downloader:
      ![Web downloader](res/img/http_client.jpg)
 
-### 3.6 there are a lot of examples in the acl library for reference, please refer to: [SAMPLES.md](SAMPLES.md)
-### 3.7 acl Use FAQ Reference [FAQ.md](FAQ.md)
+### 3.6 There are a lot of examples in the acl library for reference, please refer to: [SAMPLES.md](SAMPLES.md)
+### 3.7 Acl Use FAQ reference [FAQ.md](FAQ.md)
 
-## IV Who is using acl?
+## IV Who are using acl?
 [![iqiyi](res/logo/logo_iqiyi.png)](http://www.iqiyi.com/)
 [![263](res/logo/logo_263.png)](http://www.263.net/)
 [![hexun](res/logo/logo_hexun.png)](http://www.hexun.com/)
