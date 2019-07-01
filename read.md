@@ -65,7 +65,7 @@ This project consists of 5 libraries and a large number of examples. The descrip
 6. lib_tls: This library encapsulates the openssl library so that the communication mode of lib_acl can support ssl.
 
 * Overall architecture diagram
-    ![Overall architecture diagram](res/img/architecture.png)
+    ![Overall architecture diagram](res/img/architecture_en.png)
 
 ### 1.2 Function module composition
 #### 1.2.1 Network communication library
