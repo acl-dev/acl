@@ -13,32 +13,32 @@
         * [1.2.2 Network IO event engine](#122-Network-io-event-engine)
         * [1.2.3 Web server framework](#123-Web-server-framework)
             * [1.2.3.1 Process model](#1231-Process-model)
-            * [1.2.3.2 Threading model](#1232-Threading-model)
+            * [1.2.3.2 Thread model](#1232-Thread-model)
             * [1.2.3.3 Non-blocking model](#1233-Non-blocking-model)
             * [1.2.3.4 Coroutine model](#1234-Coroutine-model)
             * [1.2.3.5 UDP communication model](#1235-UDP-communication-model)
             * [1.2.3.6 Trigger model](#1236-Trigger-model)
         * [1.2.4 Thread and thread pool module](#124-Thread-and-thread-pool-module)
-        * [1.2.5 HTTP protocol library](#125-HTTP-protocol-library)
+        * [1.2.5 HTTP protocol](#125-HTTP-protocol)
             * [1.2.5.1 Client mode](#1251-Client-mode)
-            * [1.2.5.2 Server mode](#1242-Server-mode)
+            * [1.2.5.2 Server mode](#1252-Server-mode)
         * [1.2.6 Redis client library](#126-Redis-client-library)
         * [1.2.7 MIME protocol library](#127-Mime-protocol-library)
         * [1.2.8 Network coroutine library](#128-Network-coroutine-library)
         * [1.2.9 Database related](#129-Database-related)
         * [1.2.10 K-V disk storage module (zdb) for numeric keys](#1210-Numeric-key-kv-disk-storage-module-zdb)
-        * [1.2.11 Other function library](#1211-Other-function-library)
+        * [1.2.11 Other function libraries](#1211-Other-function-libraries)
             * [1.2.11.1 Common data structure module](#12111-Common-data-structure-module)
             * [1.2.11.2 Memory operation module](#12112-Memory-operation-module)
             * [1.2.11.3 Common string operation module](#12113-Common-string-operation-module)
             * [1.2.11.4 File Directory module](#12114-File-Directory-module)
             * [1.2.11.5 Read configuration file module](#12115-Read-configuration-file-module)
             * [1.2.11.6 File queue processing library](#12116-File-queue-processing-library)
-            * [1.2.11.7, Json parsing library](#12117Json-parsing-library)
-            * [1.2.11.8, Xml parsing library](#12118Xml-parsing-library)
-            * [1.2.11.9, Common coding library](#12119-Common-coding-library)
+            * [1.2.11.7 Json parsing library](#12117-Json-parsing-library)
+            * [1.2.11.8 Xml parsing library](#12118-Xml-parsing-library)
+            * [1.2.11.9 Common coding library](#12119-Common-coding-library)
 * [II Platform support and compilation](#II-Platform-support-and-compilation)
-* [III Directory structure description](#III-Directory-structure-description)
+* [III Description of directory structure](#III-Description-of-directory-structure)
     * [3.1 lib_acl---Basic C library](#31-lib_acl)
     * [3.2 lib_protocol---HTTP/SMTP/ICMP Protocol C Library](#32-lib_protocol)
     * [3.3 lib_acl_cpp---C++ Function Library](#33-lib_acl_cpp)
@@ -47,8 +47,8 @@
     * [3.6 There are a lot of examples in the acl library for reference, please refer to: SAMPLES.md](#36-There-are-a-lot-of-examples-in-the-library-for-reference-please-refer-to-SAMPLES.md)
     * [3.7 Acl use FAQ](#37-Acl-use-FAQ-reference-FAQ.md)
 * [IV Who are using acl](#IV-Who-are-using-acl)
-* [V License](#V-Licenses)
-* [VI Reference](#IV-Reference)
+* [V License](#V-License)
+* [VI Reference](#VI-Reference)
 
 <!-- vim-markdown-toc -->
 
@@ -182,7 +182,7 @@ This module provides three memory pool models:
 2. <b>memory slice (slab) mode:</b> allocate multiple fixed-length memory chains according to different sizes, which can effectively reduce memory fragmentation and greatly improve memory allocation efficiency;
 3. <b>memory chain mode:</b> Allocate small memory of different lengths on one memory page, which can use memory very effectively and reduce memory waste.
 
-##### 1.2.11.3 Commonly used string operation module
+##### 1.2.11.3 Common string operation module
 Supports string matching lookup, pre (post) comparison, string splitting, string case conversion, H2B/B2H conversion, URL encoding/decoding, etc.
 
 ##### 1.2.11.4 File directory module
@@ -200,7 +200,7 @@ Supports streaming parsing of json data while supporting json packet assembly.
 ##### 1.2.11.8 Xml parsing library
 Support streaming methods to parse xml data while supporting xml packet assembly.
 
-##### 1.2.11.9 Common code library
+##### 1.2.11.9 Common coding library
 It also includes codecs such as rfc2047, url, base64, uucode, qpcode, charset, etc. These decoding libraries are all streamed and are suitable for multiple network IO models (blocking/non-blocking TCP, UDP).
 
 ## II Platform support and compilation
