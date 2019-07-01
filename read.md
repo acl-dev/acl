@@ -45,7 +45,7 @@
     * [3.4 lib_fiber---network coroutine library](#34-lib_fiber)
     * [3.5 Legend](#35-Legend)
     * [3.6 There are a lot of examples in the acl library for reference, please refer to: SAMPLES.md](#36-There-are-a-lot-of-examples-in-the-library-for-reference-please-refer-to-SAMPLES.md)
-    * [3.7 Acl use FAQ](#37-Acl-use-FAQ-reference-FAQ.md)
+    * [3.7 Acl using FAQ](#37-Acl-using-faqmd)
 * [IV Who are using acl](#IV-Who-are-using-acl)
 * [V License](#V-License)
 * [VI Reference](#VI-Reference)
@@ -295,7 +295,7 @@ There are a few things to keep in mind when using dynamic libraries in a WIN32 e
      ![Web downloader](res/img/http_client.jpg)
 
 ### 3.6 There are a lot of examples in the acl library for reference, please refer to: [SAMPLES.md](SAMPLES.md)
-### 3.7 Acl Use FAQ reference [FAQ.md](FAQ.md)
+### 3.7 Acl using FAQ: [FAQ.md](FAQ.md)
 
 ## IV Who are using acl?
 [![iqiyi](res/logo/logo_iqiyi.png)](http://www.iqiyi.com/)
