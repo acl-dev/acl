@@ -52,7 +52,7 @@
 
 <!-- vim-markdown-toc -->
 
-## I Description
+## 1 Description
 The acl project is a cross-platform (supporting LINUX, WIN32, Solaris, MacOS, FreeBSD) network communication library and server programming framework, while providing more useful functional libraries. Through this library, users can easily write server programs, WEB applications, and database applications that support multiple modes (multi-threaded, multi-process, non-blocking, trigger, UDP, and coroutine). In addition, the library also provides client communication libraries for common applications (such as: HTTP, SMTP, ICMP, redis, memcache, beanstalk, handler socket), common streaming codec library: XML/JSON/MIME/BASE64/UUCODE/ QPCODE/RFC2047 etc.
 
 ### 1.1 Library composition
@@ -203,7 +203,7 @@ Support streaming methods to parse xml data while supporting xml packet assembly
 ##### 1.2.11.9 Common coding library
 It also includes codecs such as rfc2047, url, base64, uucode, qpcode, charset, etc. These decoding libraries are all streamed and are suitable for multiple network IO models (blocking/non-blocking TCP, UDP).
 
-## II Platform support and compilation
+## 2 Platform support and compilation
 The entire project currently supports Linux (AS4, 5, 6, CS4, 5, 6, ubuntu), Windows, MacOS, FreeBSD, Solaris, Android, IOS.
 * Linux/UNIX: The compiler is gcc, enter the lib_acl/lib_protocol/lib_acl_cpp directory directly in the terminal command line mode, run the make command.
 * Windows: Can be compiled with VC2003/VC2008/VC2010/VC2012/vc2013/vc2015. (If you need to compile with VC6/VC2005, you can refer to the compilation conditions of VC2003).
@@ -218,7 +218,7 @@ There are a few things to keep in mind when using dynamic libraries in a WIN32 e
 * When using a dynamic library of lib_tls, you need to predefine TLS_DLL in your project.
 * Detailed compilation process, see: [compilation and use of acl library] (BUILD.md)
 
-## III Description of directory structure
+## 3 Description of directory structure
 
 ### 3.1 lib_acl
 1. init : mainly used to initialize the acl base library
@@ -297,7 +297,7 @@ There are a few things to keep in mind when using dynamic libraries in a WIN32 e
 ### 3.6 There are a lot of examples in the acl library for reference, please refer to: [SAMPLES.md](SAMPLES.md)
 ### 3.7 Acl using FAQ: [FAQ.md](FAQ.md)
 
-## IV Who are using acl?
+## 4 Who are using acl?
 [![iqiyi](res/logo/logo_iqiyi.png)](http://www.iqiyi.com/)
 [![263](res/logo/logo_263.png)](http://www.263.net/)
 [![hexun](res/logo/logo_hexun.png)](http://www.hexun.com/)
@@ -308,10 +308,10 @@ There are a few things to keep in mind when using dynamic libraries in a WIN32 e
 [![xianyou](res/logo/logo_xianyou.png)](http://www.i3game.com/)
 [![foundao](res/logo/logo_foundao.png)](http://www.foundao.com/)
 
-## V License
+## 5 License
 - LGPL-v3 license (see [LICENSE.txt](LICENSE.txt) in the acl project)
 
-## VI Reference
+## 6 Reference
 - WEB site: http://zsxxsz.iteye.com
 - Github: https://github.com/acl-dev/acl
 - Oschina git: https://git.oschina.net/acl-dev/acl
