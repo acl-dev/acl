@@ -45,7 +45,7 @@
     * [3.4 lib_fiber---network coroutine library](#34-lib_fiber)
     * [3.5 Legend](#35-Legend)
     * [3.6 There are a lot of examples in the acl library for reference, please refer to: SAMPLES.md](#36-There-are-a-lot-of-examples-in-the-library-for-reference-please-refer-to-SAMPLES.md)
-    * [3.7 Acl using FAQ](#37-Acl-using-faqmd)
+    * [3.7 Acl using FAQ](#37-Acl-using-FAQ-faqmd)
 * [IV Who are using acl](#IV-Who-are-using-acl)
 * [V License](#V-License)
 * [VI Reference](#VI-Reference)
@@ -65,7 +65,7 @@ This project consists of 5 libraries and a large number of examples. The descrip
 6. lib_tls: This library encapsulates the openssl library so that the communication mode of lib_acl can support ssl.
 
 * Overall architecture diagram
-    ![Overall architecture diagram] (res/img/architecture.png)
+    ![Overall architecture diagram](res/img/architecture.png)
 
 ### 1.2 Function module composition
 #### 1.2.1 Network communication library
