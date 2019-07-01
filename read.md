@@ -44,7 +44,7 @@
     * [3.3 lib_acl_cpp---C++ Function Library](#33-lib_acl_cpp)
     * [3.4 lib_fiber---network coroutine library](#34-lib_fiber)
     * [3.5 Legend](#35-Legend)
-    * [3.6 There are a lot of examples in the acl library for reference, please refer to: SAMPLES.md](#36-There-are-a-lot-of-examples-in-the-library-for-reference-please-refer-to-samplesmd)
+    * [3.6 There are a lot of examples in the acl library for reference, please refer to: SAMPLES.md](#36-There-are-a-lot-of-examples-in-the-acl-library-for-reference-please-refer-to-samplesmd)
     * [3.7 Acl using FAQ](#37-Acl-using-FAQ-faqmd)
 * [IV Who are using acl](#IV-Who-are-using-acl)
 * [V License](#V-License)
