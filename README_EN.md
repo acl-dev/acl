@@ -312,7 +312,7 @@ There are a few things to keep in mind when using dynamic libraries in a WIN32 e
 - LGPL-v3 license (see [LICENSE.txt](LICENSE.txt) in the acl project)
 
 ## 6 Reference
-- WEB site: http://zsxxsz.iteye.com
+- WEB site: https://blog.csdn.net/zsxxsz
 - Github: https://github.com/acl-dev/acl
 - Oschina git: https://git.oschina.net/acl-dev/acl
 - Download: https://sourceforge.net/projects/acl
