@@ -13,8 +13,9 @@ bool http_utils::get_addr(const char* url, char* addr, size_t size)
 	char  buf[256];
 	unsigned short port;
 
-	if (get_addr(url, buf, sizeof(buf), &port) == false)
+	if (!get_addr(url, buf, sizeof(buf), &port)) {
 		return false;
+	}
 	safe_snprintf(addr, size, "%s:%d", buf, port);
 	return true;
 }
@@ -28,24 +29,18 @@ bool http_utils::get_addr(const char* url, char* domain, size_t size,
 	const char* ptr;
 	unsigned short default_port;
 
-	if (strncasecmp(url, HTTP_PREFIX, sizeof(HTTP_PREFIX) - 1) == 0)
-	{
+	if (!strncasecmp(url, HTTP_PREFIX, sizeof(HTTP_PREFIX) - 1)) {
 		ptr = url + sizeof(HTTP_PREFIX) - 1;
 		default_port = 80;
-	}
-	else if (strncasecmp(url, HTTPS_PREFIX, sizeof(HTTPS_PREFIX) - 1) == 0)
-	{
+	} else if (!strncasecmp(url, HTTPS_PREFIX, sizeof(HTTPS_PREFIX) - 1)) {
 		ptr = url + sizeof(HTTPS_PREFIX) - 1;
 		default_port = 443;
-	}
-	else
-	{
+	} else {
 		logger_error("invalid url: %s", url);
 		return false;
 	}
 
-	if (*ptr == 0)
-	{
+	if (*ptr == 0) {
 		logger_error("invalid url: %s", url);
 		return false;
 	}
@@ -54,24 +49,26 @@ bool http_utils::get_addr(const char* url, char* domain, size_t size,
 	ACL_SAFE_STRNCPY(buf, ptr, sizeof(buf));
 
 	char* slash = strchr(buf, '/');
-	if (slash)
+	if (slash) {
 		*slash = 0;
+	}
 
 	unsigned short port;
 
 	char* col = strchr(buf, ':');
-	if (col == NULL)
+	if (col == NULL) {
 		port = default_port;
-	else
-	{
+	} else {
 		*col++ = 0;
 		port = (unsigned short) atoi(col);
-		if (port == 0 || port == 65535)
+		if (port == 0 || port == 65535) {
 			port = default_port;
+		}
 	}
 
-	if (pport)
+	if (pport) {
 		*pport = port;
+	}
 	ACL_SAFE_STRNCPY(domain, buf, size);
 	return true;
 }

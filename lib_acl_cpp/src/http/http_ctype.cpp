@@ -28,44 +28,44 @@ http_ctype& http_ctype::operator = (const http_ctype& ctype)
 {
 	reset();
 
-	if (ctype.ctype_ && *ctype.ctype_)
+	if (ctype.ctype_ && *ctype.ctype_) {
 		ctype_ = acl_mystrdup(ctype.ctype_);
-	if (ctype.stype_ && *ctype.stype_)
+	}
+	if (ctype.stype_ && *ctype.stype_) {
 		stype_ = acl_mystrdup(ctype.stype_);
-	if (ctype.charset_ && *ctype.charset_)
+	}
+	if (ctype.charset_ && *ctype.charset_) {
 		charset_ = acl_mystrdup(ctype.charset_);
-	if (ctype.name_ && *ctype.name_)
+	}
+	if (ctype.name_ && *ctype.name_) {
 		name_ = acl_mystrdup(ctype.name_);
-	if (ctype.bound_ && !ctype.bound_->empty())
+	}
+	if (ctype.bound_ && !ctype.bound_->empty()) {
 		bound_ = NEW string(*ctype.bound_);
+	}
 
 	return *this;
 }
 
 void http_ctype::reset()
 {
-	if (ctype_)
-	{
+	if (ctype_) {
 		acl_myfree(ctype_);
 		ctype_ = NULL;
 	}
-	if (stype_)
-	{
+	if (stype_) {
 		acl_myfree(stype_);
 		stype_ = NULL;
 	}
-	if (charset_)
-	{
+	if (charset_) {
 		acl_myfree(charset_);
 		charset_ = NULL;
 	}
-	if (name_)
-	{
+	if (name_) {
 		acl_myfree(name_);
 		name_ = NULL;
 	}
-	if (bound_)
-	{
+	if (bound_) {
 		delete bound_;
 		bound_ = NULL;
 	}
@@ -80,7 +80,7 @@ bool http_ctype::parse(const char* cp)
 {
 	reset();
 
-#define PARSE_CONTENT_TYPE_HEADER(t, ptr) \
+#define PARSE_CONTENT_TYPE(t, ptr) \
 	header_token(t, MIME_MAX_TOKEN, \
 		buffer, ptr, RFC2045_TSPECIALS, ';')
 
@@ -88,80 +88,77 @@ bool http_ctype::parse(const char* cp)
 	ssize_t tok_count;
 	ACL_VSTRING* buffer = acl_vstring_alloc(64);
 
-	tok_count = PARSE_CONTENT_TYPE_HEADER(token, &cp);
-	if (tok_count < 0)
-	{
+	tok_count = PARSE_CONTENT_TYPE(token, &cp);
+	if (tok_count < 0) {
 		acl_vstring_free(buffer);
 		return false;
 	}
 
 	ctype_ = acl_mystrdup(token[0].u.value);
 
-	if (TOKEN_MATCH(token[0], "multipart"))
-	{
+	if (TOKEN_MATCH(token[0], "multipart")) {
 		if (tok_count >= 3 && token[1].type == '/')
 			stype_ = acl_mystrdup(token[2].u.value);
-		while ((tok_count = PARSE_CONTENT_TYPE_HEADER(token, &cp)) >= 0)
-		{
-			if (tok_count < 3 || token[1].type != '=')
+		while ((tok_count = PARSE_CONTENT_TYPE(token, &cp)) >= 0) {
+			if (tok_count < 3 || token[1].type != '=') {
 				continue;
-			if (TOKEN_MATCH(token[0], "boundary"))
-			{
-				if (bound_ == NULL)
+			}
+			if (TOKEN_MATCH(token[0], "boundary")) {
+				if (bound_ == NULL) {
 					bound_ = NEW string(64);
+				}
 				/* 需要添加 "--" 做为分隔符的前导符 */
 				*bound_ = "--";
 				*bound_ += token[2].u.value;
 				break;
 			}
 		}
-	}
-	else if (TOKEN_MATCH(token[0], "text"))
-	{
-		if (tok_count >= 3 && token[1].type == '/')
+	} else if (TOKEN_MATCH(token[0], "text")) {
+		if (tok_count >= 3 && token[1].type == '/') {
 			stype_ = acl_mystrdup(token[2].u.value);
-		while ((tok_count = PARSE_CONTENT_TYPE_HEADER(token, &cp)) >= 0)
-		{
-			if (tok_count < 3 || token[1].type != '=')
+		}
+
+		while ((tok_count = PARSE_CONTENT_TYPE(token, &cp)) >= 0) {
+			if (tok_count < 3 || token[1].type != '=') {
 				continue;
-			if (TOKEN_MATCH(token[0], "charset"))
-			{
+			}
+			if (TOKEN_MATCH(token[0], "charset")) {
 				charset_ = acl_mystrdup(token[2].u.value);
 				break;
 			}
 		}
-	}
-	else if (TOKEN_MATCH(token[0], "image"))
-	{
-		if (tok_count >= 3 && token[1].type == '/')
+	} else if (TOKEN_MATCH(token[0], "image")) {
+		if (tok_count >= 3 && token[1].type == '/') {
 			stype_ = acl_mystrdup(token[2].u.value);
-		while ((tok_count = PARSE_CONTENT_TYPE_HEADER(token, &cp)) >= 0)
-		{
-			if (tok_count < 3 || token[1].type != '=')
-				continue;
-			if (TOKEN_MATCH(token[0], "name"))
-			{
-				name_ = acl_mystrdup(token[2].u.value);
-				break;
-			}
 		}
-	}
-	else if (TOKEN_MATCH(token[0], "application"))
-	{
-		if (tok_count >= 3 && token[1].type == '/')
-			stype_ = acl_mystrdup(token[2].u.value);
-		while ((tok_count = PARSE_CONTENT_TYPE_HEADER(token, &cp)) >= 0)
-		{
-			if (tok_count < 3 || token[1].type != '=')
+
+		while ((tok_count = PARSE_CONTENT_TYPE(token, &cp)) >= 0) {
+			if (tok_count < 3 || token[1].type != '=') {
 				continue;
+			}
 			if (TOKEN_MATCH(token[0], "name")) {
 				name_ = acl_mystrdup(token[2].u.value);
 				break;
 			}
 		}
-	}
-	else if (tok_count >= 3 && token[1].type == '/')
+	} else if (TOKEN_MATCH(token[0], "application")) {
+		if (tok_count >= 3 && token[1].type == '/') {
+			stype_ = acl_mystrdup(token[2].u.value);
+		}
+
+		while ((tok_count = PARSE_CONTENT_TYPE(token, &cp)) >= 0) {
+			if (tok_count < 3 || token[1].type != '=') {
+				continue;
+			}
+
+			if (TOKEN_MATCH(token[0], "name")) {
+				name_ = acl_mystrdup(token[2].u.value);
+				break;
+			}
+		}
+	} else if (tok_count >= 3 && token[1].type == '/') {
 		stype_ = acl_mystrdup(token[1].u.value);
+	}
 
 	acl_vstring_free(buffer);
 	return true;
@@ -179,8 +176,9 @@ const char* http_ctype::get_stype() const
 
 const char* http_ctype::get_bound() const
 {
-	if (bound_ == NULL || bound_->empty())
+	if (bound_ == NULL || bound_->empty()) {
 		return NULL;
+	}
 	return bound_->c_str();
 }
 

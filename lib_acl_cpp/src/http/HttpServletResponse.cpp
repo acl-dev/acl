@@ -151,41 +151,41 @@ http_header& HttpServletResponse::getHttpHeader(void) const
 
 bool HttpServletResponse::sendHeader(void)
 {
-	if (head_sent_)
+	if (head_sent_) {
 		return true;
+	}
 	head_sent_ = true;
 
 	acl_assert(header_->is_request() == false);
 
 	char  buf[256];
-	if (charset_[0] != 0)
+	if (charset_[0] != 0) {
 		safe_snprintf(buf, sizeof(buf), "%s; charset=%s",
 			content_type_, charset_);
-	else
+	} else {
 		safe_snprintf(buf, sizeof(buf), "%s", content_type_);
+	}
 
 	header_->set_content_type(buf);
 
 	// 虽然服务端在响应头中设置了 gzip 压缩方式，但如果请求端不接收
 	// gzip 压缩数据，则需要从响应头中禁止
-	if (header_->is_transfer_gzip() && request_)
-	{
+	if (header_->is_transfer_gzip() && request_) {
 		bool accept_gzip = false;
 		std::vector<string> tokens;
 		request_->getAcceptEncoding(tokens);
 		std::vector<string>::const_iterator it;
 
-		for (it = tokens.begin(); it != tokens.end(); ++it)
-		{
-			if ((*it).compare("gzip", false) == 0)
-			{
+		for (it = tokens.begin(); it != tokens.end(); ++it) {
+			if ((*it).compare("gzip", false) == 0) {
 				accept_gzip = true;
 				break;
 			}
 		}
 
-		if (!accept_gzip)
+		if (!accept_gzip) {
 			header_->set_transfer_gzip(false);
+		}
 	}
 
 	return client_->write_head(*header_);
@@ -193,8 +193,9 @@ bool HttpServletResponse::sendHeader(void)
 
 bool HttpServletResponse::write(const void* data, size_t len)
 {
-	if (!head_sent_ && sendHeader() == false)
+	if (!head_sent_ && !sendHeader()) {
 		return false;
+	}
 	return client_->write_body(data, len);
 }
 
@@ -207,8 +208,9 @@ int HttpServletResponse::vformat(const char* fmt, va_list ap)
 {
 	string buf;
 	buf.vformat(fmt, ap);
-	if (write(buf) == false)
+	if (!write(buf)) {
 		return -1;
+	}
 	return (int) buf.length();
 }
 

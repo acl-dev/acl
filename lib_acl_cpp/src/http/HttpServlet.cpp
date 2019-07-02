@@ -40,7 +40,7 @@ HttpServlet::HttpServlet(socket_stream* stream,
 {
 	init();
 
-	session_ = NEW memcache_session(memcache_addr);
+	session_     = NEW memcache_session(memcache_addr);
 	session_ptr_ = session_;
 }
 
@@ -48,20 +48,20 @@ HttpServlet::HttpServlet()
 {
 	init();
 
-	req_ = NULL;
-	res_ = NULL;
-	stream_ = NULL;
-	session_ = NULL;
+	req_         = NULL;
+	res_         = NULL;
+	stream_      = NULL;
+	session_     = NULL;
 	session_ptr_ = NULL;
 }
 
 void HttpServlet::init()
 {
-	first_ = true;
-	local_charset_[0] = 0;
-	rw_timeout_ = 60;
+	first_             = true;
+	local_charset_[0]  = 0;
+	rw_timeout_        = 60;
 	parse_body_enable_ = true;
-	parse_body_limit_ = 0;
+	parse_body_limit_  = 0;
 }
 
 HttpServlet::~HttpServlet(void)

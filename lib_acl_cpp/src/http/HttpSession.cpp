@@ -32,10 +32,12 @@ const void* HttpSession::getAttribute(const char* name, size_t* size) const
 {
 	const session_string* bf = const_cast<HttpSession*>
 		(this)->session_.get_buf(name);
-	if (bf == NULL)
+	if (bf == NULL) {
 		return NULL;
-	if (size)
+	}
+	if (size) {
 		*size = bf->length();
+	}
 	return bf->c_str();
 }
 

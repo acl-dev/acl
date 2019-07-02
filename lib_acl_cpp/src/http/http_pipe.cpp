@@ -8,13 +8,13 @@
 namespace acl
 {
 
-http_pipe::http_pipe()
+http_pipe::http_pipe(void)
 : conv_(NULL)
 {
 
 }
 
-http_pipe::~http_pipe()
+http_pipe::~http_pipe(void)
 {
 	delete conv_;
 }
@@ -26,12 +26,13 @@ void http_pipe::set_charset(charset_conv* conv)
 
 bool http_pipe::set_charset(const char* from, const char* to)
 {
-	if (from == NULL || to == NULL || strcasecmp(from, to) == 0)
+	if (from == NULL || to == NULL || strcasecmp(from, to) == 0) {
 		return false;
-	if (conv_ == NULL)
+	}
+	if (conv_ == NULL) {
 		conv_ = NEW charset_conv();
-	if (conv_->update_begin(from, to) == false)
-	{
+	}
+	if (!conv_->update_begin(from, to)) {
 		delete conv_;
 		conv_ = NULL;
 		return false;
@@ -45,7 +46,7 @@ void http_pipe::append(pipe_stream* ps)
 	manager_.push_back(ps);
 }
 
-void http_pipe::reset()
+void http_pipe::reset(void)
 {
 	manager_.clear();
 }
@@ -55,12 +56,12 @@ bool http_pipe::update(const char* in, size_t len)
 	return manager_.update(in, len);
 }
 
-bool http_pipe::update_end()
+bool http_pipe::update_end(void)
 {
 	return manager_.update_end();
 }
 
-pipe_manager& http_pipe::get_manager()
+pipe_manager& http_pipe::get_manager(void)
 {
 	return manager_;
 }

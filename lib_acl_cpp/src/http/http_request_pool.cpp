@@ -26,22 +26,22 @@ void http_request_pool::set_ssl(polarssl_conf* ssl_conf)
 connect_client* http_request_pool::create_connect()
 {
 	http_request* req = NEW http_request(addr_, conn_timeout_, rw_timeout_);
-	if (ssl_conf_)
+	if (ssl_conf_) {
 		req->set_ssl(ssl_conf_);
+	}
 	return req;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 http_guard::http_guard(http_request_pool& pool)
-	: connect_guard(pool)
+: connect_guard(pool)
 {
 }
 
 http_guard::~http_guard(void)
 {
-	if (conn_)
-	{
+	if (conn_) {
 		http_request* req = (http_request*) conn_;
 		pool_.put(conn_, keep_ & req->keep_alive());
 		conn_ = NULL;

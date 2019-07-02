@@ -19,7 +19,7 @@ http_service_request::http_service_request(const char* domain,
 {
 	acl_assert(domain && *domain);
 	domain_ = acl_mystrdup(domain);
-	port_ = port;
+	port_   = port;
 }
 
 http_service_request::~http_service_request(void)
@@ -29,23 +29,22 @@ http_service_request::~http_service_request(void)
 
 const string* http_service_request::get_body()
 {
-	return (NULL);
+	return NULL;
 }
 
 const char* http_service_request::get_domain(void) const
 {
-	return (domain_);
+	return domain_;
 }
 
 unsigned short http_service_request::get_port(void) const
 {
-	return (port_);
+	return port_;
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-enum
-{
+enum {
 	HTTP_MSG_HDR,
 	HTTP_MSG_DAT,
 	HTTP_MSG_ERR,
@@ -54,13 +53,11 @@ enum
 struct HTTP_IPC_DAT 
 {
 	http_service_request* callback;
-	struct
-	{
+	struct {
 		HTTP_HDR_RES* hdr_res;
 		char addr[64];
 	} http_hdr;
-	struct 
-	{
+	struct {
 		char* ptr;
 		size_t dlen;
 	} http_dat;
@@ -90,34 +87,30 @@ public:
 
 	~http_ipc_request(void)
 	{
-		if (res_)
-		{
+		if (res_) {
 			res_->hdr_res = NULL;
 			http_res_free(res_);
 		}
 	}
 
 	// 基类 ipc_request 会自动调用此回调处理请求过程
-	virtual void run(ipc_client* ipc)
+	// @override
+	void run(ipc_client* ipc)
 	{
 		unsigned int nredirect_limit = data_.callback->get_redirect();
 		unsigned int nredirect = 0;
 		http_status_t ret;
 
-		while (true)
-		{
-			if ((ret = connect_server()) != HTTP_OK)
-			{
+		while (true) {
+			if ((ret = connect_server()) != HTTP_OK) {
 				report_error(ipc, ret);
 				break;
 			}
-			if ((ret = send_request()) != HTTP_OK)
-			{
+			if ((ret = send_request()) != HTTP_OK) {
 				report_error(ipc, ret);
 				break;
 			}
-			if ((ret = read_respond_hdr()) != HTTP_OK)
-			{
+			if ((ret = read_respond_hdr()) != HTTP_OK) {
 				report_error(ipc, ret);
 				break;
 			}
@@ -128,8 +121,8 @@ public:
 
 			if ((hdr_res_->reply_status != 301
 				&& hdr_res_->reply_status != 302)
-				|| nredirect_limit == 0)
-			{
+				|| nredirect_limit == 0) {
+
 				// 发送响应头收到消息给主线程
 				report(ipc, HTTP_MSG_HDR);
 
@@ -142,8 +135,7 @@ public:
 
 			nredirect++;
 			// 防止重定向次数太多而造成了循环
-			if (nredirect > nredirect_limit)
-			{
+			if (nredirect > nredirect_limit) {
 				report_error(ipc, HTTP_ERR_REDIRECT_MAX);
 				break;
 			}
@@ -151,14 +143,12 @@ public:
 			const char* url = http_hdr_entry_value(
 				&hdr_res_->hdr, "Location");
 
-			if (url == NULL)
-			{
+			if (url == NULL) {
 				logger_error("redirect Location null");
 				report_error(ipc, HTTP_ERR_INVALID_HDR);
 				break;
 			}
-			if (data_.callback->redirect(url) == false)
-			{
+			if (!data_.callback->redirect(url)) {
 				http_hdr_res_free(hdr_res_);
 				hdr_res_ = NULL;
 				report_error(ipc, HTTP_ERR_INVALID_HDR);
@@ -175,26 +165,23 @@ public:
 #ifdef ACL_WINDOWS
 	// 基类会自动调用此回调处理请求过程
 	// 基类虚接口，使子线程可以在执行完任务后向主线程发送 ACL_WINDOWS 窗口消息
-	virtual void run(HWND hWnd)
+	// @override
+	void run(HWND hWnd)
 	{
 		unsigned int nredirect_limit = data_.callback->get_redirect();
 		unsigned int nredirect = 0;
 		http_status_t ret;
 
-		while (true)
-		{
-			if ((ret = connect_server()) != HTTP_OK)
-			{
+		while (true) {
+			if ((ret = connect_server()) != HTTP_OK) {
 				report_error(hWnd, ret);
 				break;
 			}
-			if ((ret = send_request()) != HTTP_OK)
-			{
+			if ((ret = send_request()) != HTTP_OK) {
 				report_error(hWnd, ret);
 				break;
 			}
-			if ((ret = read_respond_hdr()) != HTTP_OK)
-			{
+			if ((ret = read_respond_hdr()) != HTTP_OK) {
 				report_error(hWnd, ret);
 				break;
 			}
@@ -205,8 +192,8 @@ public:
 
 			if ((hdr_res_->reply_status != 301
 				&& hdr_res_->reply_status != 302)
-				|| nredirect_limit == 0)
-			{
+				|| nredirect_limit == 0) {
+
 				// 发送响应头收到消息给主线程
 				report(hWnd, HTTP_MSG_HDR);
 
@@ -219,8 +206,7 @@ public:
 
 			nredirect++;
 			// 防止重定向次数太多而造成了循环
-			if (nredirect > nredirect_limit)
-			{
+			if (nredirect > nredirect_limit) {
 				report_error(hWnd, HTTP_ERR_REDIRECT_MAX);
 				break;
 			}
@@ -228,14 +214,12 @@ public:
 			const char* url = http_hdr_entry_value(
 				&hdr_res_->hdr, "Location");
 
-			if (url == NULL)
-			{
+			if (url == NULL) {
 				logger_error("redirect Location null");
 				report_error(hWnd, HTTP_ERR_INVALID_HDR);
 				break;
 			}
-			if (data_.callback->redirect(url) == false)
-			{
+			if (!data_.callback->redirect(url)) {
 				http_hdr_res_free(hdr_res_);
 				hdr_res_ = NULL;
 				report_error(hWnd, HTTP_ERR_INVALID_HDR);
@@ -249,7 +233,6 @@ public:
 		delete this;
 	}
 #endif
-protected:
 private:
 	int  nwait_;
 	HTTP_IPC_DAT data_;
@@ -302,40 +285,43 @@ private:
 		string addr(data_.callback->get_domain());
 		addr << ':' << data_.callback->get_port();
 
-		if (client_.opened())
+		if (client_.opened()) {
 			client_.close();
+		}
 
-		if (client_.open(addr.c_str(), 60, 60) == false)
-		{
+		if (!client_.open(addr.c_str(), 60, 60)) {
 			logger_error("connect %s error(%s)",
 				addr.c_str(), acl_last_serror());
-			return (HTTP_ERR_CONN);
+			return HTTP_ERR_CONN;
 		}
 
 		vstream_ = client_.get_vstream();
-		return (HTTP_OK);
+		return HTTP_OK;
 	}
 
 	http_status_t send_request(void)
 	{
 		string hdr_req;
-		if (data_.callback->build_request(hdr_req) == false)
-			return (HTTP_ERR_REQ);
+		if (!data_.callback->build_request(hdr_req)) {
+			return HTTP_ERR_REQ;
+		}
 
 		// 写 HTTP 请求头
-		if (client_.write(hdr_req.c_str(), hdr_req.length()) == false)
-			return (HTTP_ERR_SEND);
+		if (!client_.write(hdr_req.c_str(), hdr_req.length())) {
+			return HTTP_ERR_SEND;
+		}
 
 		// 循环从请求对象中获得请求体数据，并写 HTTP 请求体数据
-		while (true)
-		{
+		while (true) {
 			const string* data = data_.callback->get_body();
-			if (data == NULL || data->empty())
+			if (data == NULL || data->empty()) {
 				break;
-			if (client_.write(data->c_str(), data->length()) == false)
-				return (HTTP_ERR_SEND);
+			}
+			if (!client_.write(data->c_str(), data->length())) {
+				return HTTP_ERR_SEND;
+			}
 		}
-		return (HTTP_OK);
+		return HTTP_OK;
 	}
 
 	http_status_t read_respond_hdr(void)
@@ -345,26 +331,24 @@ private:
 			"%s", ACL_VSTREAM_PEER(vstream_));
 		hdr_res_ = http_hdr_res_new();
 		int ret = http_hdr_res_get_sync(hdr_res_, vstream_, 60);
-		if (ret < 0)
-		{
+		if (ret < 0) {
 			logger_error("get http respond hdr from %s error %s",
 				data_.i_addr, acl_last_serror());
 			http_hdr_res_free(hdr_res_);
 			hdr_res_ = NULL;
-			return (HTTP_ERR_READ_HDR);
+			return HTTP_ERR_READ_HDR;
 		}
 
-		if (http_hdr_res_parse(hdr_res_) < 0)
-		{
+		if (http_hdr_res_parse(hdr_res_) < 0) {
 			logger_error("parse http respond hdr error from %s",
 				data_.i_addr);
 
 			http_hdr_res_free(hdr_res_);
 			hdr_res_ = NULL;
-			return (HTTP_ERR_INVALID_HDR);
+			return HTTP_ERR_INVALID_HDR;
 		}
 
-		return (HTTP_OK);
+		return HTTP_OK;
 	}
 
 	void read_respond_body(ipc_client* ipc)
@@ -376,9 +360,9 @@ private:
 		if (hdr_res_->hdr.content_length == 0
 			|| (hdr_res_->hdr.content_length == -1
 			&& hdr_res_->reply_status > 300
-			&& hdr_res_->reply_status < 400))
-		{
-			data_.i_ptr = NULL;
+			&& hdr_res_->reply_status < 400)) {
+
+			data_.i_ptr  = NULL;
 			data_.i_dlen = 0;
 			// 如果没有数据体，也发送消息通知调用者数据结束
 			report(ipc, HTTP_MSG_DAT);
@@ -392,28 +376,28 @@ private:
 		char* buf;
 		int   ret;
 
-		while (true)
-		{
+		while (true) {
 			buf = (char*) acl_mymalloc(BUF_LEN);
 			ret = read_respond_body(buf, BUF_LEN - 1);
-			if (ret <= 0)
-			{
+			if (ret <= 0) {
 				acl_myfree(buf);
 				break;
 			}
 			buf[ret] = 0;
 
-			data_.i_ptr = buf;
+			data_.i_ptr  = buf;
 			data_.i_dlen = ret;
 			report(ipc, HTTP_MSG_DAT);
 
-			if (respond_over_)
+			if (respond_over_) {
 				break;
-			if (nwait_ > 0)
+			}
+			if (nwait_ > 0) {
 				acl_doze(nwait_);
+			}
 		}
 
-		data_.i_ptr = NULL;
+		data_.i_ptr  = NULL;
 		data_.i_dlen = 0;
 		report(ipc, HTTP_MSG_DAT);
 	}
@@ -428,8 +412,8 @@ private:
 		if (hdr_res_->hdr.content_length == 0
 			|| (hdr_res_->hdr.content_length == -1
 			&& hdr_res_->reply_status > 300
-			&& hdr_res_->reply_status < 400))
-		{
+			&& hdr_res_->reply_status < 400)) {
+
 			data_.i_ptr = NULL;
 			data_.i_dlen = 0;
 			// 如果没有数据体，也发送消息通知调用者数据结束
@@ -444,28 +428,28 @@ private:
 		char* buf;
 		int   ret;
 
-		while (true)
-		{
+		while (true) {
 			buf = (char*) acl_mymalloc(BUF_LEN);
 			ret = read_respond_body(buf, BUF_LEN - 1);
-			if (ret <= 0)
-			{
+			if (ret <= 0) {
 				acl_myfree(buf);
 				break;
 			}
 			buf[ret] = 0;
 
-			data_.i_ptr = buf;
+			data_.i_ptr  = buf;
 			data_.i_dlen = (size_t) ret;
 			report(hWnd, HTTP_MSG_DAT);
 
-			if (respond_over_)
+			if (respond_over_) {
 				break;
-			if (nwait_ > 0)
+			}
+			if (nwait_ > 0) {
 				acl_doze(nwait_);
+			}
 		}
 
-		data_.i_ptr = NULL;
+		data_.i_ptr  = NULL;
 		data_.i_dlen = 0;
 		report(hWnd, HTTP_MSG_DAT);
 	}
@@ -476,29 +460,28 @@ private:
 		acl_assert(vstream_);
 		acl_assert(res_);
 
-		char* ptr = buf;
+		char* ptr        = buf;
 		int   dlen_saved = dlen;
 		int   ret;
 
 		// 因为 buf 是动态分配的，所以应尽量让 buf 填满，
 		// 这样可以节省内存分配的消耗
 
-		while (true)
-		{
+		while (true) {
 			ret = (int) http_res_body_get_sync(res_, vstream_,
 					ptr, dlen);
-			if (ret <= 0)
-			{
+			if (ret <= 0) {
 				respond_over_ = true;
 				break;
 			}
 			dlen -= ret;
-			if (dlen <= 0)
+			if (dlen <= 0) {
 				break;
+			}
 			ptr += ret;
 		}
 
-		return (dlen_saved - dlen);
+		return dlen_saved - dlen;
 	}
 };
 
@@ -507,37 +490,32 @@ private:
 class http_ipc : public ipc_client
 {
 public:
-	http_ipc(acl_int64 magic) : ipc_client(magic)
+	http_ipc(acl_int64 magic) : ipc_client(magic) {}
+
+	~http_ipc(void) {}
+
+	// @override
+	void on_message(int nMsg, void* data, int dlen)
 	{
-
-	}
-
-	~http_ipc(void)
-	{
-
-	}
-
-	virtual void on_message(int nMsg, void* data, int dlen)
-	{
-		if (dlen != sizeof(HTTP_IPC_DAT))
+		if (dlen != sizeof(HTTP_IPC_DAT)) {
 			abort();
+		}
 		HTTP_IPC_DAT* dat = (HTTP_IPC_DAT*) data;
 
-		switch (nMsg)
-		{
+		switch (nMsg) {
 		case HTTP_MSG_HDR:
 			dat->callback->on_hdr(dat->i_addr, dat->i_hdr_res);
 			break;
 		case HTTP_MSG_DAT:
 			dat->callback->on_body(dat->i_ptr, dat->i_dlen);
-			if (dat->i_ptr && dat->i_dlen > 0)
+			if (dat->i_ptr && dat->i_dlen > 0) {
 				acl_myfree(dat->i_ptr);
-			else
-			{
+			} else {
 				// 调用请求对象的销毁过程
 				dat->callback->destroy();
-				if (dat->i_hdr_res)
+				if (dat->i_hdr_res) {
 					http_hdr_res_free(dat->i_hdr_res);
+				}
 				this->close();  // 自动触发析构过程
 			}
 			break;
@@ -545,8 +523,9 @@ public:
 			dat->callback->on_error(dat->i_error);
 			// 调用请求对象的销毁过程
 			dat->callback->destroy();
-			if (dat->i_hdr_res)
+			if (dat->i_hdr_res) {
 				http_hdr_res_free(dat->i_hdr_res);
+			}
 			this->close();  // 自动触发析构过程
 			break;
 		default:
@@ -555,8 +534,10 @@ public:
 			break;
 		}
 	}
+
 protected:
-	virtual void on_close(void)
+	// @override
+	void on_close(void)
 	{
 		delete this;
 	}
@@ -585,35 +566,36 @@ http_service::http_service(int nthread /* = 1 */, int nwait,
 
 http_service::~http_service()
 {
-	if (addr_)
+	if (addr_) {
 		acl_myfree(addr_);
+	}
 }
 
 #ifdef ACL_WINDOWS
 
 void http_service::win32_proc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (lParam == 0)
+	if (lParam == 0) {
 		return;
+	}
 
 	HTTP_IPC_DAT* dat = (HTTP_IPC_DAT*) lParam;
 
-	switch (nMsg - WM_USER)
-	{
+	switch (nMsg - WM_USER) {
 	case HTTP_MSG_HDR:
 		dat->callback->on_hdr(dat->i_addr, dat->i_hdr_res);
 		acl_myfree(dat);
 		break;
 	case HTTP_MSG_DAT:
 		dat->callback->on_body(dat->i_ptr, dat->i_dlen);
-		if (dat->i_ptr && dat->i_dlen > 0)
+		if (dat->i_ptr && dat->i_dlen > 0) {
 			acl_myfree(dat->i_ptr);
-		else
-		{
+		} else {
 			// 调用请求对象的销毁过程
 			dat->callback->destroy();
-			if (dat->i_hdr_res)
+			if (dat->i_hdr_res) {
 				http_hdr_res_free(dat->i_hdr_res);
+			}
 		}
 		acl_myfree(dat);
 		break;
@@ -621,8 +603,9 @@ void http_service::win32_proc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam
 		dat->callback->on_error(dat->i_error);
 		// 调用请求对象的销毁过程
 		dat->callback->destroy();
-		if (dat->i_hdr_res)
+		if (dat->i_hdr_res) {
 			http_hdr_res_free(dat->i_hdr_res);
+		}
 		acl_myfree(dat);
 		break;
 	default:
@@ -658,7 +641,6 @@ void http_service::on_open(const char*addr)
 
 void http_service::on_close(void)
 {
-
 }
 
 void http_service::do_request(http_service_request* req)
@@ -668,4 +650,4 @@ void http_service::do_request(http_service_request* req)
 	request(ipc_req);
 }
 
-}
+} // namespace acl

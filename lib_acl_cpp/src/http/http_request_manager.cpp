@@ -25,8 +25,9 @@ connect_pool* http_request_manager::create_pool(const char* addr,
 	size_t count, size_t idx)
 {
 	http_request_pool* pool = NEW http_request_pool(addr, count, idx);
-	if (ssl_conf_)
+	if (ssl_conf_) {
 		pool->set_ssl(ssl_conf_);
+	}
 	return pool;
 }
 
