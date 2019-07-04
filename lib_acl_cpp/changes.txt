@@ -5,6 +5,8 @@
 579.2) optimize: HTTP 相关类，针对 HTTP/1.1 传输，默认按长连接对待
 579.3) feature: http_request/http_client 当使用者未设置 Host 字段时，默认按
 HTTP/1.0 协议发送，以免服务端报错
+579.4) feature: http_request::request 内部根据 data, len 参数及请求方法自动
+设置请求头中的 Content-Length 字段
 
 578) 2019.6.23
 578.1) bugfix: http_request::get_body 当 out 类型为 string 时，因为 ps 对象提前

@@ -330,13 +330,15 @@ bool http_request::request(const void* data, size_t len)
 	http_method_t method = header_.get_method();
 
 	// 构建 HTTP 请求头
-	if (data && len > 0 && method != HTTP_METHOD_POST
-		&& method != HTTP_METHOD_PUT) {
-
+	if (data && len > 0) {
 		header_.set_content_length(len);
 
-		// 在有数据体的条件下，重新设置 HTTP 请求方法
-		header_.set_method(HTTP_METHOD_POST);
+		if (method != HTTP_METHOD_POST && method != HTTP_METHOD_PUT) {
+			// 在有数据体的条件下，重新设置 HTTP 请求方法
+			header_.set_method(HTTP_METHOD_POST);
+		}
+	} else if (method == HTTP_METHOD_POST || method == HTTP_METHOD_PUT) {
+		header_.set_content_length(0);
 	}
 
 	while (true) {
