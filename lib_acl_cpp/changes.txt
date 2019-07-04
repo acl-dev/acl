@@ -1,5 +1,11 @@
 修改历史列表：
 
+579) 2019.7.4
+579.1) feature: http_client/HttpServletRequest 支持获得 HTTP 连接的 HTTP 版本
+579.2) optimize: HTTP 相关类，针对 HTTP/1.1 传输，默认按长连接对待
+579.3) feature: http_request/http_client 当使用者未设置 Host 字段时，默认按
+HTTP/1.0 协议发送，以免服务端报错
+
 578) 2019.6.23
 578.1) bugfix: http_request::get_body 当 out 类型为 string 时，因为 ps 对象提前
 被释放而引起程序崩溃

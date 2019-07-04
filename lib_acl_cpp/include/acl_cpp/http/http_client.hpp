@@ -169,10 +169,33 @@ public:
 #endif
 
 	/**
+	 * 获得 HTTP 头中的版本号
+	 * @param major {unsigned&} 将存放主版本号
+	 * @param minor {unsigned&} 将存放次版本号
+	 * @return {bool} 是否成功获得了版本号
+	 */
+	bool get_version(unsigned& major, unsigned& minor) const;
+
+	/**
 	 * HTTP 数据流(请求流或响应流是否允许保持长连接)
 	 * @return {bool}
 	 */
+	bool is_keep_alive(void) const;
 	bool keep_alive(void) const;
+
+	/**
+	 * 当本对象为客户端请求对象时，本方法用来判断服务端返回的 HTTP 头中
+	 * 是否允许保持长连接
+	 * @return {bool}
+	 */
+	bool is_server_keep_alive(void) const;
+
+	/**
+	 * 当本对象为服务端响应对象时，本方法用来判断客户端请求的 HTTP 头中
+	 * 是否允许保持长连接
+	 * @return {bool}
+	 */
+	bool is_client_keep_alive(void) const;
 
 	/**
 	 * 获得 HTTP 请求头或响应头中某个字段名的字段值

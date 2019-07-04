@@ -578,7 +578,7 @@ bool http_client::read_request_head(void)
 	return true;
 }
 
-acl_int64 http_client::body_length() const
+acl_int64 http_client::body_length(void) const
 {
 	if (is_request_) {
 		if (hdr_res_) {
@@ -609,19 +609,96 @@ bool http_client::response_range(acl_int64& range_from,
 			< 0 ? false : true;
 }
 
-bool http_client::keep_alive() const
+bool http_client::keep_alive(void) const
+{
+	return is_keep_alive();
+}
+
+bool http_client::is_keep_alive(void) const
 {
 	if (is_request_) {
-		if (hdr_res_) {
-			return hdr_res_->hdr.keep_alive ? true : false;
-		}
-	} else if (hdr_req_) {
-		return hdr_req_->hdr.keep_alive ? true : false;
+		return is_server_keep_alive();
+	} else {
+		return is_client_keep_alive();
+	}
+}
+
+bool http_client::is_server_keep_alive(void) const
+{
+	// 表示该对象为 HTTP 请求客户端对象，所以需要根据服务端响应
+	// 头中的字段判断是否需要保持长连接
+
+	if (hdr_res_ == NULL) {
+		return false;
+	}
+
+	if (hdr_res_->hdr.keep_alive == 0) {
+		return false;
+	} else if (hdr_res_->hdr.keep_alive > 0) {
+		return true;
+	}
+
+	// 如果未置 Connection: keep-alive 字段，当版本为1.1时
+	// 则按支持长连接对待
+
+	unsigned major, minor;
+	if (!get_version(major, minor)) {
+		return false;
+	}
+
+	if ((major == 1 && minor >= 1) || major > 1) {
+		return true;
 	}
 	return false;
 }
 
-HTTP_HDR* http_client::get_http_hdr() const
+bool http_client::is_client_keep_alive(void) const
+{
+	if (hdr_req_ == NULL) {
+		return false;
+	}
+
+	// 表示该对象为 HTTP 响应客户端对象，即本对象处于服务端位置，
+	// 需要根据 HTTP 请求客户端对象中的字段是否需要保持长连接
+
+	if (hdr_req_->hdr.keep_alive == 0) {
+		return false;
+	} else if (hdr_req_->hdr.keep_alive > 0) {
+		return true;
+	}
+
+	// 如果未置 Connection: keep-alive 字段，当版本为1.1时
+	// 则按支持长连接对待
+
+	unsigned major, minor;
+	if (!get_version(major, minor)) {
+		return false;
+	}
+
+	if ((major == 1 && minor >= 1) || major > 1) {
+		return true;
+	}
+	return false;
+}
+
+bool http_client::get_version(unsigned& major, unsigned& minor) const
+{
+	major = 0;
+	minor = 0;
+
+	if (hdr_req_) {
+		major = hdr_req_->hdr.version.major;
+		minor = hdr_req_->hdr.version.minor;
+	} else if (hdr_res_) {
+		major = hdr_res_->hdr.version.major;
+		minor = hdr_res_->hdr.version.minor;
+	} else {
+		return false;
+	}
+	return true;
+}
+
+HTTP_HDR* http_client::get_http_hdr(void) const
 {
 	if (is_request_) {
 		if (hdr_res_ == NULL) {
@@ -850,7 +927,7 @@ bool http_client::body_finish(void) const
 	return body_finish_;
 }
 
-bool http_client::disconnected() const
+bool http_client::disconnected(void) const
 {
 	return disconnected_;
 }
@@ -976,8 +1053,7 @@ READ_AGAIN:  // 对于有 GZIP 头数据，可能需要重复读
 	return n;
 }
 
-int http_client::read_request_body(string& out, bool clean,
-	int* real_size)
+int http_client::read_request_body(string& out, bool clean, int* real_size)
 {
 	if (real_size) {
 		*real_size = 0;

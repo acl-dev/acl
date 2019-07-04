@@ -245,8 +245,8 @@ public:
 	http_mime* getHttpMime(void) const;
 
 	/**
-	 * 数据类型为 text/json 或 application/json 格式构造函数中的 body_parse 为 true 时，则内部自动
-	 * 解析数据并创建 json 对象
+	 * 数据类型为 text/json 或 application/json 格式构造函数中的 body_parse
+	 * 为 true 时，则内部自动解析数据并创建 json 对象
 	 * @return {json*} 返回解析好的 json 对象，若返回 NULL 则有以下几个原因：
 	 *  1、读数据出错
 	 *  2、非 json 数据格式
@@ -255,8 +255,8 @@ public:
 	json* getJson(void) const;
 
 	/**
-	 * 数据类型为 text/xml 或 application/xml 格式构造函数中的 body_parse 为 true 时，则内部自动
-	 * 解析数据并创建 xml 对象
+	 * 数据类型为 text/xml 或 application/xml 格式构造函数中的 body_parse
+	 * 为 true 时，则内部自动解析数据并创建 xml 对象
 	 * @return {xml*} 返回解析好的 xml 对象，若返回 NULL 则有以下几个原因：
 	 *  1、读数据出错
 	 *  2、非 xml 数据格式
@@ -266,10 +266,9 @@ public:
 
 	/**
 	 * 获得 HTTP 请求数据的类型
-	 * @return {http_request_t}，一般对 POST 方法中的上传
-	 *  文件应用而言，需要调用该函数获得是否是上传数据类型，
-	 *  当该函数返回 HTTP_REQUEST_OTHER 时，用户可以通过调用
-	 *  getContentType 获得具体的类型字符串
+	 * @return {http_request_t}，一般对 POST 方法中的上传文件应用，需要调用
+	 *  该函数获得是否是上传数据类型，当该函数返回 HTTP_REQUEST_OTHER 时，
+	 *  用户可以通过调用 getContentType 获得具体的类型字符串
 	 */
 	http_request_t getRequestType(void) const;
 
@@ -296,6 +295,14 @@ public:
 	 * @return {int} 返回值 < 0 表示不存在 Keep-Alive 字段
 	 */
 	int getKeepAlive(void) const;
+
+	/**
+	 * 获得 HTTP 客户端请求的版本号
+	 * @param major {unsigned&} 将存放主版本号
+	 * @param minor {unsigned&} 将存放次版本号
+	 * @return {bool} 是否成功取得了客户端请求的版本号
+	 */
+	bool getVersion(unsigned& major, unsigned& minor) const;
 
 	/**
 	 * 获得 HTTP 客户端支持的数据压缩算法集合

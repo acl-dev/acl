@@ -122,7 +122,8 @@ struct HTTP_HDR {
 		unsigned int minor; /**< 次版本号 */
 	} version;
 
-	int   keep_alive;       /**< 是否保持长连接 */
+	/**< 是否保持长连接: 0 -> 不保持，> 0 -> 保持，< 0 -> 没有该字段 */
+	int   keep_alive;
 	http_off_t   content_length; /**< HTTP协议体数据长度 */
 	int   chunked;          /**
                                  * 该字段本来对HTTP协议响应有意义,

@@ -849,6 +849,18 @@ http_client* HttpServletRequest::getClient(void) const
 	return client_;
 }
 
+bool HttpServletRequest::getVersion(unsigned& major, unsigned& minor) const
+{
+	major = 0;
+	minor = 0;
+
+	if (client_ == NULL) {
+		return false;
+	}
+
+	return client_->get_version(major, minor);
+}
+
 void HttpServletRequest::fprint_header(ostream& out, const char* prompt)
 {
 	if (client_) {

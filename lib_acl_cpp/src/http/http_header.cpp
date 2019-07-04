@@ -825,7 +825,7 @@ bool http_header::build_request(string& buf) const
 
 	if (url_ == NULL || *url_ == 0) {
 		logger_error("url empty");
-		return (false);
+		return false;
 	}
 
 	buf.format("%s %s", method_s_, url_);
@@ -864,7 +864,12 @@ bool http_header::build_request(string& buf) const
 		}
 	}
 
-	buf += " HTTP/1.1\r\n";
+	// HTTP/1.1 要求必须有 Host 字段，当没有 Host 字段时，则采用 HTTP/1.0
+	if (host_[0] != 0) {
+		buf += " HTTP/1.1\r\n";
+	} else {
+		buf += " HTTP/1.0\r\n";
+	}
 
 	build_common(buf);
 

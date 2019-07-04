@@ -33,10 +33,11 @@ http_request::http_request(socket_stream* client, int conn_timeout /* = 60 */,
 {
 	// 设置解压参数
 	client_ = NEW http_client(client, true, unzip, stream_fixed);
-	unzip_ = unzip;
-	ssl_conf_ = NULL;
+
+	unzip_            = unzip;
+	ssl_conf_         = NULL;
 	local_charset_[0] = 0;
-	conv_ = NULL;
+	conv_             = NULL;
 
 	set_timeout(client->get_vstream()->rw_timeout, conn_timeout);
 
@@ -47,8 +48,8 @@ http_request::http_request(socket_stream* client, int conn_timeout /* = 60 */,
 	header_.set_keep_alive(true);
 	header_.set_host(addr_);
 	cookie_inited_ = false;
-	cookies_ = NULL;
-	need_retry_ = true;
+	cookies_       = NULL;
+	need_retry_    = true;
 	RESET_RANGE();
 }
 
@@ -59,17 +60,17 @@ http_request::http_request(const char* addr, int conn_timeout /* = 60 */,
 	ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
 	set_timeout(conn_timeout, rw_timeout);
 
-	unzip_ = unzip;
-	ssl_conf_ = NULL;
+	unzip_            = unzip;
+	ssl_conf_         = NULL;
 	local_charset_[0] = 0;
-	conv_ = NULL;
+	conv_             = NULL;
 
 	header_.set_url("/");
 	header_.set_keep_alive(true);
 	header_.set_host(addr_);
 	cookie_inited_ = false;
-	cookies_ = NULL;
-	client_ = NULL;
+	cookies_    = NULL;
+	client_     = NULL;
 	need_retry_ = true;
 	RESET_RANGE();
 }
@@ -77,6 +78,7 @@ http_request::http_request(const char* addr, int conn_timeout /* = 60 */,
 http_request::~http_request(void)
 {
 	close();
+
 	if (cookies_) {
 		reset();
 		delete cookies_;
@@ -208,9 +210,8 @@ bool http_request::write_head()
 			&& method != HTTP_METHOD_HEAD
 			&& method != HTTP_METHOD_DELETE
 			&& method != HTTP_METHOD_OPTION
-			&& method != HTTP_METHOD_CONNECT) {
-
-			socket_stream& ss = client_->get_stream();
+			&& method != HTTP_METHOD_CONNECT
+			&& !client_->get_stream().alive()) {
 
 			/* 因为系统 write API 成功并不能保证连接正常，所以只能
 			 * 是调用系统 read API 来探测连接是否正常，该函数内部
@@ -218,17 +219,16 @@ bool http_request::write_head()
 			 * 同时即使有数据读到也会先放到 ACL_VSTREAM 读缓冲中，
 			 * 所以也不会丢失数据
 			 */
-			if (ss.alive() == false) {
-				close();
+			close();
 
-				// 对于新创建的连接，则直接报错
-				if (!reuse_conn) {
-					logger_error("new connection error");
-					return false;
-				}
-				need_retry_ = false;
-				continue;
+			// 对于新创建的连接，则直接报错
+			if (!reuse_conn) {
+				logger_error("new connection error");
+				return false;
 			}
+
+			need_retry_ = false;
+			continue;
 		}
 
 		client_->reset();  // 重置状态
@@ -754,7 +754,6 @@ bool http_request::body_gets(string& out, bool nonl /* = true */,
 	return true;
 }
 
-
 int http_request::read_body(char* buf, size_t size)
 {
 	if (client_ == NULL) {
@@ -784,6 +783,7 @@ const HttpCookie* http_request::get_cookie(const char* name,
 	if (cookies_ == NULL) {
 		return NULL;
 	}
+
 	std::vector<HttpCookie*>::const_iterator cit = cookies_->begin();
 	for (; cit != cookies_->end(); ++cit) {
 		if (case_insensitive) {
@@ -803,6 +803,7 @@ void http_request::create_cookies()
 	if (client_ == NULL) {
 		return;
 	}
+
 	const HTTP_HDR_RES* res = client_->get_respond_head(NULL);
 	if (res == NULL) {
 		return;
@@ -827,6 +828,7 @@ void http_request::create_cookies()
 		}
 		cookies_->push_back(cookie);
 	}
+
 	cookie_inited_ = true;
 }
 

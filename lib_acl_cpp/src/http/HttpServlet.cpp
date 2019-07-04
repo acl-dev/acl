@@ -195,12 +195,14 @@ bool HttpServlet::start(void)
 			ret = doGet(*req_, *res_);
 		}
 		break;
-	case HTTP_METHOD_PATCH:
 	case HTTP_METHOD_POST:
 		ret = doPost(*req_, *res_);
 		break;
 	case HTTP_METHOD_PUT:
 		ret = doPut(*req_, *res_);
+		break;
+	case HTTP_METHOD_PATCH:
+		ret = doPatch(*req_, *res_);
 		break;
 	case HTTP_METHOD_CONNECT:
 		ret = doConnect(*req_, *res_);
@@ -252,15 +254,18 @@ bool HttpServlet::doRun(void)
 	if (req_ == NULL || res_ == NULL) {
 		return ret;
 	}
+	if (!ret) {
+		return false;
+	}
 
 	// 返回给上层调用者：true 表示继续保持长连接，否则表示需断开连接
-	return ret && req_->isKeepAlive()
+	return req_->isKeepAlive()
 		&& res_->getHttpHeader().get_keep_alive();
 }
 
 bool HttpServlet::doRun(session& session, socket_stream* stream /* = NULL */)
 {
-	stream_ = stream;
+	stream_  = stream;
 	session_ = &session;
 	return doRun();
 }
@@ -269,6 +274,92 @@ bool HttpServlet::doRun(const char* memcached_addr, socket_stream* stream)
 {
 	memcache_session session(memcached_addr);
 	return doRun(session, stream);
+}
+
+bool HttpServlet::doGet(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doGet yet!");
+	return false;
+}
+
+bool HttpServlet::doWebSocket(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doWebSocket yet!");
+	return false;
+}
+
+bool HttpServlet::doPost(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doPost yet!");
+	return false;
+}
+
+bool HttpServlet::doPut(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doPut yet!");
+	return false;
+}
+
+bool HttpServlet::doPatch(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doPatch yet!");
+	return false;
+}
+
+bool HttpServlet::doConnect(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doConnect yet!");
+	return false;
+}
+
+bool HttpServlet::doPurge(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doPurge yet!");
+	return false;
+}
+
+bool HttpServlet::doDelete(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doDelete yet!");
+	return false;
+}
+
+bool HttpServlet::doHead(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doHead yet!");
+	return false;
+}
+
+bool HttpServlet::doOptions(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doOptions yet!");
+	return false;
+}
+
+bool HttpServlet::doPropfind(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doPropfind yet!");
+	return false;
+}
+
+bool HttpServlet::doOther(HttpServletRequest&, HttpServletResponse&,
+	const char* method)
+{
+	(void) method;
+	logger_error("child not implement doOther yet!");
+	return false;
+}
+
+bool HttpServlet::doUnknown(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doUnknown yet!");
+	return false;
+}
+
+bool HttpServlet::doError(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doError yet!");
+	return false;
 }
 
 } // namespace acl

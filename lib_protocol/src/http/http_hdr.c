@@ -397,9 +397,9 @@ int http_hdr_parse(HTTP_HDR *hh)
 	/*
 	const char *myname = "http_hdr_parse";
 	*/
-	int   keep_alive = -1;
+	int keep_alive = -1;
 	HTTP_HDR_ENTRY *entry;
-	ACL_ITER  iter;
+	ACL_ITER iter;
 
 	struct HEADER_LIST {
 		char *name;
@@ -528,6 +528,7 @@ int http_hdr_parse(HTTP_HDR *hh)
 	}
 #endif
 
+#if 0
 	if (hh->chunked) {
 		if (keep_alive != 0)
 			hh->keep_alive = 1;
@@ -538,6 +539,13 @@ int http_hdr_parse(HTTP_HDR *hh)
 	} else {
 		hh->keep_alive = 0;
 	}
+#else
+	/* 允许 keep_alive 存在三种可能性：
+	 * 0：不保持长连接；1：保持长连接，-1：没有该字段
+	 * --zsx, 2019.7.4
+	 */
+	hh->keep_alive = keep_alive;
+#endif
 
 	return 0;
 }
