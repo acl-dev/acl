@@ -26,7 +26,7 @@ public:
 	polarssl_io(polarssl_conf& conf, bool server_side,
 		bool non_block = false);
 
-	virtual void destroy();
+	virtual void destroy(void);
 
 	/**
 	 * 调用此方法进行 SSL 握手，在非阻塞 IO 模式下该函数需要与 handshake_ok()
@@ -73,7 +73,7 @@ public:
 	bool check_peer(void);
 
 private:
-	~polarssl_io();
+	~polarssl_io(void);
 
 	virtual bool open(ACL_VSTREAM* s);
 	virtual bool on_close(bool alive);

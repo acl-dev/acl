@@ -13,7 +13,7 @@ class aio_timer_delay_free : public aio_timer_callback
 {
 public:
 	aio_timer_delay_free(aio_handle& handle);
-	~aio_timer_delay_free();
+	~aio_timer_delay_free(void);
 
 	virtual void timer_callback(unsigned int id);
 	bool add(aio_delay_free* callback);

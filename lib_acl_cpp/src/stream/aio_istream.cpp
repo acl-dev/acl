@@ -55,7 +55,7 @@ aio_istream::aio_istream(aio_handle* handle, ACL_SOCKET fd)
 	hook_read();
 }
 
-aio_istream::~aio_istream()
+aio_istream::~aio_istream(void)
 {
 	if (timer_reader_ != NULL) {
 		handle_->del_timer(timer_reader_);
@@ -69,7 +69,7 @@ aio_istream::~aio_istream()
 	read_callbacks_.clear();
 }
 
-void aio_istream::destroy()
+void aio_istream::destroy(void)
 {
 	delete this;
 }
@@ -188,7 +188,7 @@ int aio_istream::enable_read_callback(aio_callback* callback /* = NULL */)
 	return n;
 }
 
-void aio_istream::hook_read()
+void aio_istream::hook_read(void)
 {
 	acl_assert(stream_);
 	if (read_hooked_) {
@@ -199,7 +199,7 @@ void aio_istream::hook_read()
 	acl_aio_add_read_hook(stream_, read_callback, this);
 }
 
-void aio_istream::disable_read()
+void aio_istream::disable_read(void)
 {
 	acl_assert(stream_);
 	acl_aio_disable_read(stream_);
@@ -211,7 +211,7 @@ void aio_istream::keep_read(bool onoff)
 	acl_aio_stream_set_keep_read(stream_, onoff ? 1 : 0);
 }
 
-bool aio_istream::keep_read() const
+bool aio_istream::keep_read(void) const
 {
 	acl_assert(stream_);
 	return acl_aio_stream_get_keep_read(stream_) == 0 ? false : true;

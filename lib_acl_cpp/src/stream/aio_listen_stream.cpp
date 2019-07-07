@@ -17,12 +17,12 @@ aio_listen_stream::aio_listen_stream(aio_handle *handle)
 	addr_[0] = 0;
 }
 
-aio_listen_stream::~aio_listen_stream()
+aio_listen_stream::~aio_listen_stream(void)
 {
 	accept_callbacks_.clear();
 }
 
-void aio_listen_stream::destroy()
+void aio_listen_stream::destroy(void)
 {
 	delete this;
 }
@@ -31,10 +31,10 @@ void aio_listen_stream::add_accept_callback(aio_accept_callback* callback)
 {
 	std::list<aio_accept_callback*>::iterator it =
 		accept_callbacks_.begin();
-	for (; it != accept_callbacks_.end(); ++it)
-	{
-		if (*it == callback)
+	for (; it != accept_callbacks_.end(); ++it) {
+		if (*it == callback) {
 			return;
+		}
 	}
 	accept_callbacks_.push_back(callback);
 }
@@ -42,13 +42,16 @@ void aio_listen_stream::add_accept_callback(aio_accept_callback* callback)
 bool aio_listen_stream::open(const char* addr, unsigned flag /* = 0 */)
 {
 	unsigned oflag = 0;
-	if (flag & OPEN_FLAG_REUSEPORT)
+	if (flag & OPEN_FLAG_REUSEPORT) {
 		oflag |= ACL_INET_FLAG_REUSEPORT;
-	if (flag & OPEN_FLAG_EXCLUSIVE)
+	}
+	if (flag & OPEN_FLAG_EXCLUSIVE) {
 		oflag |= ACL_INET_FLAG_EXCLUSIVE;
+	}
 	ACL_VSTREAM *sstream = acl_vstream_listen_ex(addr, 128, oflag, 0, 0);
-	if (sstream == NULL)
+	if (sstream == NULL) {
 		return false;
+	}
 
 	safe_snprintf(addr_, sizeof(addr_), "%s", ACL_VSTREAM_LOCAL(sstream));
 
@@ -63,16 +66,17 @@ bool aio_listen_stream::open(const char* addr, unsigned flag /* = 0 */)
 	return true;
 }
 
-const char* aio_listen_stream::get_addr() const
+const char* aio_listen_stream::get_addr(void) const
 {
 	return addr_;
 }
 
-void aio_listen_stream::hook_accept()
+void aio_listen_stream::hook_accept(void)
 {
 	acl_assert(stream_);
-	if (accept_hooked_)
+	if (accept_hooked_) {
 		return;
+	}
 	accept_hooked_ = true;
 
 	acl_aio_ctl(stream_,
@@ -90,10 +94,10 @@ int aio_listen_stream::accept_callback(ACL_ASTREAM* stream, void* ctx)
 	aio_socket_stream* ss = NEW aio_socket_stream(as->handle_,
 			stream, true);
 
-	for (; it != as->accept_callbacks_.end(); ++it)
-	{
-		if ((*it)->accept_callback(ss) == false)
+	for (; it != as->accept_callbacks_.end(); ++it) {
+		if ((*it)->accept_callback(ss) == false) {
 			return -1;
+		}
 	}
 	return 0;
 }

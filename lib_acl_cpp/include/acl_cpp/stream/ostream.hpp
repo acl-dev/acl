@@ -19,8 +19,8 @@ class ACL_CPP_API ostream
 	, public pipe_stream
 {
 public:
-	ostream() {}
-	virtual ~ostream() {}
+	ostream(void) {}
+	virtual ~ostream(void) {}
 
 	/**
 	 * 写数据至输出流中

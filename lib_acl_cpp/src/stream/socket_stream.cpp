@@ -7,14 +7,14 @@
 
 namespace acl {
 
-socket_stream::socket_stream()
+socket_stream::socket_stream(void)
 {
 	dummy_[0] = 0;
 	peer_ip_[0] = 0;
 	local_ip_[0] = 0;
 }
 
-socket_stream::~socket_stream()
+socket_stream::~socket_stream(void)
 {
 	close();
 }
@@ -31,8 +31,9 @@ bool socket_stream::open(const char* addr, int conn_timeout, int rw_timeout)
 {
 	ACL_VSTREAM* conn = acl_vstream_connect(addr, ACL_BLOCKING,
 		conn_timeout, rw_timeout, 8192);
-	if (conn == NULL)
+	if (conn == NULL) {
 		return false;
+	}
 
 	return open(conn);
 }
@@ -40,136 +41,142 @@ bool socket_stream::open(const char* addr, int conn_timeout, int rw_timeout)
 bool socket_stream::open(ACL_VSTREAM* vstream, bool udp_mode /* = false */)
 {
 	// 先关闭旧的流对象
-	if (stream_)
+	if (stream_) {
 		acl_vstream_close(stream_);
+	}
 	stream_ = vstream;
-	eof_ = false;
+	eof_    = false;
 	opened_ = true;
 	//acl_tcp_set_nodelay(ACL_VSTREAM_SOCK(vstream));
-	if (udp_mode)
+	if (udp_mode) {
 		acl_vstream_set_udp_io(stream_);
+	}
 	return true;
 }
 
 bool socket_stream::bind_udp(const char* addr, int rw_timeout /* = 0 */,
 	unsigned flag /* = 0 */)
 {
-	if (stream_)
+	if (stream_) {
 		acl_vstream_close(stream_);
+	}
 	stream_ = acl_vstream_bind(addr, rw_timeout, flag);
-	if (stream_ == NULL)
+	if (stream_ == NULL) {
 		return false;
-	eof_ = false;
+	}
+	eof_    = false;
 	opened_ = true;
 	return true;
 }
 
-bool socket_stream::shutdown_read()
+bool socket_stream::shutdown_read(void)
 {
-	if (stream_ == NULL)
-	{
+	if (stream_ == NULL) {
 		logger_error("stream_ null");
 		return false;
 	}
 	return acl_socket_shutdown(ACL_VSTREAM_SOCK(stream_), SHUT_RD) == 0;
 }
 
-bool socket_stream::shutdown_write()
+bool socket_stream::shutdown_write(void)
 {
-	if (stream_ == NULL)
-	{
+	if (stream_ == NULL) {
 		logger_error("stream_ null");
 		return false;
 	}
 	return acl_socket_shutdown(ACL_VSTREAM_SOCK(stream_), SHUT_WR) == 0;
 }
 
-bool socket_stream::shutdown_readwrite()
+bool socket_stream::shutdown_readwrite(void)
 {
-	if (stream_ == NULL)
-	{
+	if (stream_ == NULL) {
 		logger_error("stream_ null");
 		return false;
 	}
 	return acl_socket_shutdown(ACL_VSTREAM_SOCK(stream_), SHUT_RDWR) == 0;
 }
 
-ACL_SOCKET socket_stream::sock_handle() const
+ACL_SOCKET socket_stream::sock_handle(void) const
 {
-	if (stream_ == NULL)
+	if (stream_ == NULL) {
 		return ACL_SOCKET_INVALID;
+	}
 	return ACL_VSTREAM_SOCK(stream_);
 }
 
-ACL_SOCKET socket_stream::unbind_sock()
+ACL_SOCKET socket_stream::unbind_sock(void)
 {
-	if (stream_ == NULL)
+	if (stream_ == NULL) {
 		return ACL_SOCKET_INVALID;
-	ACL_SOCKET sock = ACL_VSTREAM_SOCK(stream_);
+	}
+	ACL_SOCKET sock  = ACL_VSTREAM_SOCK(stream_);
 	stream_->fd.sock = ACL_SOCKET_INVALID;
-	eof_ = true;
+	eof_    = true;
 	opened_ = false;
 	return sock;
 }
 
 int socket_stream::sock_type(void) const
 {
-	if (stream_ == NULL)
+	if (stream_ == NULL) {
 		return -1;
+	}
 
-	if ((stream_->type & ACL_VSTREAM_TYPE_INET4))
+	if ((stream_->type & ACL_VSTREAM_TYPE_INET4)) {
 		return AF_INET;
 #ifdef AF_INET6
-	else if ((stream_->type & ACL_VSTREAM_TYPE_INET6))
+	} else if ((stream_->type & ACL_VSTREAM_TYPE_INET6)) {
 		return AF_INET6;
 #endif
 #ifdef AF_UNIX
-	else if ((stream_->type & ACL_VSTREAM_TYPE_UNIX))
+	} else if ((stream_->type & ACL_VSTREAM_TYPE_UNIX)) {
 		return AF_UNIX;
 #endif
-	else
+	} else {
 		return -1;
+	}
 }
 
 const char* socket_stream::get_peer(bool full /* = false */) const
 {
-	if (stream_ == NULL)
+	if (stream_ == NULL) {
 		return dummy_;
+	}
 
 	// xxx: acl_vstream 中没有对此地址赋值
 	char* ptr = ACL_VSTREAM_PEER(stream_);
-	if (ptr == NULL || *ptr == 0)
-	{
+	if (ptr == NULL || *ptr == 0) {
 		char  buf[256];
 		if (acl_getpeername(ACL_VSTREAM_SOCK(stream_),
-			buf, sizeof(buf)) == -1)
-		{
+			buf, sizeof(buf)) == -1) {
+
 			return dummy_;
 		}
 		acl_vstream_set_peer(stream_, buf);
 	}
 
-	if (full)
+	if (full) {
 		return ACL_VSTREAM_PEER(stream_);
-	else
+	} else {
 		return get_peer_ip();
+	}
 }
 
-const char* socket_stream::get_peer_ip() const
+const char* socket_stream::get_peer_ip(void) const
 {
-	if (stream_ == NULL)
+	if (stream_ == NULL) {
 		return dummy_;
+	}
 
 	//if (peer_ip_[0] != 0)
 	//	return peer_ip_;
 
 	char* ptr = ACL_VSTREAM_PEER(stream_);
-	if (ptr == NULL || *ptr == 0)
-	{
-		char  buf[256];
+	if (ptr == NULL || *ptr == 0) {
+		char buf[256];
 		if (acl_getpeername(ACL_VSTREAM_SOCK(stream_),
-			buf, sizeof(buf)) == -1)
-		{
+			buf, sizeof(buf)) == -1) {
+
 			return dummy_;
 		}
 		acl_vstream_set_peer(stream_, buf);
@@ -183,8 +190,7 @@ const char* socket_stream::get_peer_ip() const
 
 bool socket_stream::set_peer(const char* addr)
 {
-	if (stream_ == NULL)
-	{
+	if (stream_ == NULL) {
 		logger_error("stream not opened yet!");
 		return false;
 	}
@@ -195,44 +201,45 @@ bool socket_stream::set_peer(const char* addr)
 
 const char* socket_stream::get_local(bool full /* = false */) const
 {
-	if (stream_ == NULL)
+	if (stream_ == NULL) {
 		return dummy_;
+	}
 
 	// xxx: acl_vstream 中没有对此地址赋值
 	char* ptr = ACL_VSTREAM_LOCAL(stream_);
-	if (ptr == NULL || *ptr == 0)
-	{
-		char  buf[256];
+	if (ptr == NULL || *ptr == 0) {
+		char buf[256];
 		if (acl_getsockname(ACL_VSTREAM_SOCK(stream_),
-			buf, sizeof(buf)) == -1)
-		{
+			buf, sizeof(buf)) == -1) {
+
 			return dummy_;
 		}
 		acl_vstream_set_local(stream_, buf);
 	}
 
-	if (full)
+	if (full) {
 		return ACL_VSTREAM_LOCAL(stream_);
-	else
+	} else {
 		return get_local_ip();
+	}
 }
 
-const char* socket_stream::get_local_ip() const
+const char* socket_stream::get_local_ip(void) const
 {
-	if (stream_ == NULL)
+	if (stream_ == NULL) {
 		return dummy_;
+	}
 
 	// xxx: acl_vstream 中没有对此地址赋值
 	//if (local_ip_[0] != 0)
 	//	return local_ip_;
 
 	char* ptr = ACL_VSTREAM_LOCAL(stream_);
-	if (ptr == NULL || *ptr == 0)
-	{
-		char  buf[256];
+	if (ptr == NULL || *ptr == 0) {
+		char buf[256];
 		if (acl_getsockname(ACL_VSTREAM_SOCK(stream_),
-			buf, sizeof(buf)) == -1)
-		{
+			buf, sizeof(buf)) == -1) {
+
 			return dummy_;
 		}
 		acl_vstream_set_local(stream_, buf);
@@ -246,8 +253,7 @@ const char* socket_stream::get_local_ip() const
 
 bool socket_stream::set_local(const char* addr)
 {
-	if (stream_ == NULL)
-	{
+	if (stream_ == NULL) {
 		logger_error("stream not opened yet!");
 		return false;
 	}
@@ -260,15 +266,17 @@ const char* socket_stream::get_ip(const char* addr, char* buf, size_t size)
 {
 	safe_snprintf(buf, size, "%s", addr);
 	char* ptr = strchr(buf, ':');
-	if ((ptr = strrchr(buf, ACL_ADDR_SEP)) || (ptr = strrchr(buf, ':')))
+	if ((ptr = strrchr(buf, ACL_ADDR_SEP)) || (ptr = strrchr(buf, ':'))) {
 		*ptr = 0;
+	}
 	return buf;
 }
 
 bool socket_stream::alive(void) const
 {
-	if (stream_ == NULL)
+	if (stream_ == NULL) {
 		return false;
+	}
 #if 0
 	if (acl_vstream_probe_status(stream_) == 0)
 		return true;
@@ -282,8 +290,7 @@ bool socket_stream::alive(void) const
 socket_stream& socket_stream::set_tcp_nodelay(bool on)
 {
 	ACL_SOCKET sock = sock_handle();
-	if (sock == ACL_SOCKET_INVALID)
-	{
+	if (sock == ACL_SOCKET_INVALID) {
 		logger_error("invalid socket handle");
 		return *this;
 	}
@@ -295,8 +302,7 @@ socket_stream& socket_stream::set_tcp_nodelay(bool on)
 socket_stream& socket_stream::set_tcp_solinger(bool on, int linger)
 {
 	ACL_SOCKET sock = sock_handle();
-	if (sock == ACL_SOCKET_INVALID)
-	{
+	if (sock == ACL_SOCKET_INVALID) {
 		logger_error("invalid socket handle");
 		return *this;
 	}
@@ -308,8 +314,7 @@ socket_stream& socket_stream::set_tcp_solinger(bool on, int linger)
 socket_stream& socket_stream::set_tcp_sendbuf(int size)
 {
 	ACL_SOCKET sock = sock_handle();
-	if (sock == ACL_SOCKET_INVALID)
-	{
+	if (sock == ACL_SOCKET_INVALID) {
 		logger_error("invalid socket handle");
 		return *this;
 	}
@@ -321,8 +326,7 @@ socket_stream& socket_stream::set_tcp_sendbuf(int size)
 socket_stream& socket_stream::set_tcp_recvbuf(int size)
 {
 	ACL_SOCKET sock = sock_handle();
-	if (sock == ACL_SOCKET_INVALID)
-	{
+	if (sock == ACL_SOCKET_INVALID) {
 		logger_error("invalid socket handle");
 		return *this;
 	}
@@ -334,8 +338,7 @@ socket_stream& socket_stream::set_tcp_recvbuf(int size)
 socket_stream& socket_stream::set_tcp_non_blocking(bool on)
 {
 	ACL_SOCKET sock = sock_handle();
-	if (sock == ACL_SOCKET_INVALID)
-	{
+	if (sock == ACL_SOCKET_INVALID) {
 		logger_error("invalid socket handle");
 		return *this;
 	}
@@ -344,11 +347,10 @@ socket_stream& socket_stream::set_tcp_non_blocking(bool on)
 	return *this;
 }
 
-bool socket_stream::get_tcp_nodelay()
+bool socket_stream::get_tcp_nodelay(void)
 {
 	ACL_SOCKET sock = sock_handle();
-	if (sock == ACL_SOCKET_INVALID)
-	{
+	if (sock == ACL_SOCKET_INVALID) {
 		logger_error("invalid socket handle");
 		return false;
 	}
@@ -356,11 +358,10 @@ bool socket_stream::get_tcp_nodelay()
 	return acl_get_tcp_nodelay(sock) == 0 ? false : true;
 }
 
-int socket_stream::get_tcp_solinger()
+int socket_stream::get_tcp_solinger(void)
 {
 	ACL_SOCKET sock = sock_handle();
-	if (sock == ACL_SOCKET_INVALID)
-	{
+	if (sock == ACL_SOCKET_INVALID) {
 		logger_error("invalid socket handle");
 		return -1;
 	}
@@ -368,11 +369,10 @@ int socket_stream::get_tcp_solinger()
 	return acl_get_tcp_solinger(sock);
 }
 
-int socket_stream::get_tcp_sendbuf()
+int socket_stream::get_tcp_sendbuf(void)
 {
 	ACL_SOCKET sock = sock_handle();
-	if (sock == ACL_SOCKET_INVALID)
-	{
+	if (sock == ACL_SOCKET_INVALID) {
 		logger_error("invalid socket handle");
 		return -1;
 	}
@@ -380,11 +380,10 @@ int socket_stream::get_tcp_sendbuf()
 	return acl_tcp_get_sndbuf(sock);
 }
 
-int socket_stream::get_tcp_recvbuf()
+int socket_stream::get_tcp_recvbuf(void)
 {
 	ACL_SOCKET sock = sock_handle();
-	if (sock == ACL_SOCKET_INVALID)
-	{
+	if (sock == ACL_SOCKET_INVALID) {
 		logger_error("invalid socket handle");
 		return -1;
 	}
@@ -392,11 +391,10 @@ int socket_stream::get_tcp_recvbuf()
 	return acl_tcp_get_rcvbuf(sock);
 }
 
-bool socket_stream::get_tcp_non_blocking()
+bool socket_stream::get_tcp_non_blocking(void)
 {
 	ACL_SOCKET sock = sock_handle();
-	if (sock == ACL_SOCKET_INVALID)
-	{
+	if (sock == ACL_SOCKET_INVALID) {
 		logger_error("invalid socket handle");
 		return false;
 	}

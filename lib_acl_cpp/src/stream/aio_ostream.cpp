@@ -7,13 +7,13 @@
 namespace acl
 {
 
-aio_timer_writer::aio_timer_writer()
+aio_timer_writer::aio_timer_writer(void)
 : out_(NULL)
 {
 
 }
 
-aio_timer_writer::~aio_timer_writer()
+aio_timer_writer::~aio_timer_writer(void)
 {
 
 }
@@ -69,7 +69,7 @@ aio_ostream::aio_ostream(aio_handle* handle, ACL_SOCKET fd)
 	hook_write();
 }
 
-aio_ostream::~aio_ostream()
+aio_ostream::~aio_ostream(void)
 {
 	std::list<aio_timer_writer*>::iterator it = timer_writers_.begin();
 
@@ -86,7 +86,7 @@ aio_ostream::~aio_ostream()
 	write_callbacks_.clear();
 }
 
-void aio_ostream::destroy()
+void aio_ostream::destroy(void)
 {
 	delete this;
 }
@@ -205,7 +205,7 @@ int aio_ostream::enable_write_callback(aio_callback* callback /* = NULL */)
 	return n;
 }
 
-void aio_ostream::hook_write()
+void aio_ostream::hook_write(void)
 {
 	acl_assert(stream_);
 	if (write_hooked_) {
@@ -216,7 +216,7 @@ void aio_ostream::hook_write()
 	acl_aio_add_write_hook(stream_, write_callback, this);
 }
 
-void aio_ostream::disable_write()
+void aio_ostream::disable_write(void)
 {
 	acl_assert(stream_);
 	acl_aio_disable_write(stream_);

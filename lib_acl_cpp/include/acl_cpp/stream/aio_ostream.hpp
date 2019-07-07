@@ -27,18 +27,18 @@ class aio_ostream;
 class ACL_CPP_API aio_timer_writer : public aio_timer_callback
 {
 public:
-	aio_timer_writer();
+	aio_timer_writer(void);
 
 	/**
 	 * 在 aio_istream 中调用此函数以释放类对象，子类应该实现该函数
 	 */
-	virtual void destroy()
+	virtual void destroy(void)
 	{
 		delete this;
 	}
 
 protected:
-	virtual ~aio_timer_writer();
+	virtual ~aio_timer_writer(void);
 
 	/**
 	 * 延迟读数据时的回调函数，从 aio_timer_callback 类中继承而来
@@ -155,19 +155,19 @@ public:
 	 * 事件中移除，直到用户调用任何一个写操作时会自动打开异
 	 * 步写状态(此时该流会重新被异步引擎监控)
 	 */
-	void disable_write();
+	void disable_write(void);
 protected:
-	virtual ~aio_ostream();
+	virtual ~aio_ostream(void);
 
 	/**
 	 * 释放动态类对象的虚函数
 	 */
-	virtual void destroy();
+	virtual void destroy(void);
 
 	/**
 	 * hook 写过程
 	 */
-	void hook_write();
+	void hook_write(void);
 
 private:
 	friend class aio_timer_writer;

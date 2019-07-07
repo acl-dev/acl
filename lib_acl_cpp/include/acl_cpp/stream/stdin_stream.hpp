@@ -11,8 +11,8 @@ namespace acl {
 class ACL_CPP_API stdin_stream : public istream
 {
 public:
-	stdin_stream();
-	~stdin_stream();
+	stdin_stream(void);
+	~stdin_stream(void);
 };
 
 } // namespace acl

@@ -6,14 +6,14 @@
 namespace acl
 {
 
-stdout_stream::stdout_stream()
+stdout_stream::stdout_stream(void)
 {
 	stream_ = ACL_VSTREAM_OUT;
-	eof_ = false;
+	eof_    = false;
 	opened_ = true;
 }
 
-stdout_stream::~stdout_stream()
+stdout_stream::~stdout_stream(void)
 {
 	stream_ = NULL;
 }

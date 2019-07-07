@@ -12,8 +12,8 @@ namespace acl
 class aio_timer_task
 {
 public:
-	aio_timer_task() {}
-	~aio_timer_task() {}
+	aio_timer_task(void) {}
+	~aio_timer_task(void) {}
 
 private:
 	friend class aio_timer_callback;
@@ -34,8 +34,7 @@ aio_timer_callback::aio_timer_callback(bool keep /* = false */)
 aio_timer_callback::~aio_timer_callback(void)
 {
 	// 如果正在触发定时器的回调过程中析构过程被调用则会发生严重问题
-	if (locked())
-	{
+	if (locked()) {
 		logger_error("In trigger proccess, you delete me now!");
 		acl_assert(0);
 	}
@@ -43,12 +42,11 @@ aio_timer_callback::~aio_timer_callback(void)
 	clear();
 }
 
-int aio_timer_callback::clear()
+int aio_timer_callback::clear(void)
 {
 	int  n = 0;
 	std::list<aio_timer_task*>::iterator it = tasks_.begin();
-	for (; it != tasks_.end(); ++it)
-	{
+	for (; it != tasks_.end(); ++it) {
 		delete (*it);
 		n++;
 	}
@@ -57,12 +55,12 @@ int aio_timer_callback::clear()
 	return n;
 }
 
-bool aio_timer_callback::empty() const
+bool aio_timer_callback::empty(void) const
 {
 	return tasks_.empty();
 }
 
-size_t aio_timer_callback::length() const
+size_t aio_timer_callback::length(void) const
 {
 	return length_;
 }
@@ -91,10 +89,8 @@ acl_int64 aio_timer_callback::del_task(unsigned int id)
 {
 	bool ok = false;
 	std::list<aio_timer_task*>::iterator it = tasks_.begin();
-	for (; it != tasks_.end(); ++it)
-	{
-		if ((*it)->id == id)
-		{
+	for (; it != tasks_.end(); ++it) {
+		if ((*it)->id == id) {
 			delete (*it);
 			tasks_.erase(it);
 			length_--;
@@ -103,11 +99,13 @@ acl_int64 aio_timer_callback::del_task(unsigned int id)
 		}
 	}
 
-	if (!ok)
+	if (!ok) {
 		logger_warn("timer id: %u not found", id);
+	}
 
-	if (tasks_.empty())
+	if (tasks_.empty()) {
 		return TIMER_EMPTY;
+	}
 
 	set_time();
 
@@ -119,10 +117,8 @@ acl_int64 aio_timer_callback::set_task(unsigned int id, acl_int64 delay)
 {
 	aio_timer_task* task = NULL;
 	std::list<aio_timer_task*>::iterator it = tasks_.begin();
-	for (; it != tasks_.end(); ++it)
-	{
-		if ((*it)->id == id)
-		{
+	for (; it != tasks_.end(); ++it) {
+		if ((*it)->id == id) {
 			task = (*it);
 			tasks_.erase(it);
 			length_--;
@@ -130,14 +126,13 @@ acl_int64 aio_timer_callback::set_task(unsigned int id, acl_int64 delay)
 		}
 	}
 
-	if (task == NULL)
-	{
+	if (task == NULL) {
 		task = NEW aio_timer_task();
 		task->delay = delay;
 		task->id = id;
-	}
-	else
+	} else {
 		task->delay = delay;
+	}
 
 	return set_task(task);
 }
@@ -148,17 +143,16 @@ acl_int64 aio_timer_callback::set_task(aio_timer_task* task)
 	task->when = present_ + task->delay;
 
 	std::list<aio_timer_task*>::iterator it = tasks_.begin();
-	for (; it != tasks_.end(); ++it)
-	{
-		if (task->when < (*it)->when)
-		{
+	for (; it != tasks_.end(); ++it) {
+		if (task->when < (*it)->when) {
 			tasks_.insert(it, task);
 			break;
 		}
 	}
 
-	if (it == tasks_.end())
+	if (it == tasks_.end()) {
 		tasks_.push_back(task);
+	}
 
 	length_++;
 
@@ -170,8 +164,9 @@ acl_int64 aio_timer_callback::set_task(aio_timer_task* task)
 acl_int64 aio_timer_callback::trigger(void)
 {
 	// sanity check
-	if (tasks_.empty())
+	if (tasks_.empty()) {
 		return TIMER_EMPTY;
+	}
 
 	acl_assert(length_ > 0);
 
@@ -182,10 +177,10 @@ acl_int64 aio_timer_callback::trigger(void)
 	aio_timer_task* task;
 
 	// 从定时器中取出到达的定时任务
-	for (it = tasks_.begin(); it != tasks_.end();)
-	{
-		if ((*it)->when > present_)
+	for (it = tasks_.begin(); it != tasks_.end();) {
+		if ((*it)->when > present_) {
 			break;
+		}
 		task = *it;
 		it = tasks_.erase(it);
 		length_--;
@@ -193,8 +188,7 @@ acl_int64 aio_timer_callback::trigger(void)
 	}
 
 	// 有可能这些到达的定时任务已经被用户提前删除了
-	if (tasks.empty())
-	{
+	if (tasks.empty()) {
 		acl_assert(!tasks_.empty());
 
 		aio_timer_task* first = tasks_.front();
@@ -215,8 +209,7 @@ acl_int64 aio_timer_callback::trigger(void)
 	// 应该自动销毁
 	destroy_on_unlock_ = false;
 
-	for (it = tasks.begin(); it != tasks.end(); ++it)
-	{
+	for (it = tasks.begin(); it != tasks.end(); ++it) {
 		set_task(*it);
 		timer_callback((*it)->id);
 	}
@@ -227,15 +220,15 @@ acl_int64 aio_timer_callback::trigger(void)
 	unset_locked();
 
 	// 子类有可能会在 timer_callback 中删除了所有的定时任务
-	if (tasks_.empty())
+	if (tasks_.empty()) {
 		return TIMER_EMPTY;
+	}
 
 	aio_timer_task* first = tasks_.front();
 	acl_int64 delay = first->when - present_;
 
 	// 如果在加锁期间外部程序要求释放该对象，则在此处释放
-	if (destroy_on_unlock_)
-	{
+	if (destroy_on_unlock_) {
 		destroy();
 		return TIMER_EMPTY;
 	}

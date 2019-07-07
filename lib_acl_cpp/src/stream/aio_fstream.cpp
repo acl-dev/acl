@@ -35,12 +35,11 @@ aio_fstream::aio_fstream(aio_handle* handle, ACL_FILE_HANDLE fd,
 	hook_write();
 }
 
-aio_fstream::~aio_fstream()
+aio_fstream::~aio_fstream(void)
 {
-
 }
 
-void aio_fstream::destroy()
+void aio_fstream::destroy(void)
 {
 	delete this;
 }
@@ -48,8 +47,9 @@ void aio_fstream::destroy()
 bool aio_fstream::open(const char* path, unsigned int oflags, unsigned int mode)
 {
 	ACL_VSTREAM* fp = acl_vstream_fopen(path, oflags, mode, 8192);
-	if (fp == NULL)
+	if (fp == NULL) {
 		return false;
+	}
 	stream_ = acl_aio_open(handle_->get_handle(), fp);
 
 	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
@@ -58,12 +58,14 @@ bool aio_fstream::open(const char* path, unsigned int oflags, unsigned int mode)
 
 	// 只有当流连接成功后才可 hook IO 读写状态
 	// hook 读回调过程
-	if ((oflags & (O_RDONLY | O_RDWR | O_APPEND | O_CREAT | O_TRUNC)))
+	if ((oflags & (O_RDONLY | O_RDWR | O_APPEND | O_CREAT | O_TRUNC))) {
 		hook_read();
+	}
 
 	// hook 写回调过程
-	if ((oflags & (O_WRONLY | O_RDWR | O_APPEND | O_CREAT | O_TRUNC)))
+	if ((oflags & (O_WRONLY | O_RDWR | O_APPEND | O_CREAT | O_TRUNC))) {
 		hook_write();
+	}
 
 	return true;
 }

@@ -16,10 +16,10 @@ namespace acl
 class ACL_CPP_API aio_open_callback : public aio_callback
 {
 public:
-	aio_open_callback() {}
-	virtual ~aio_open_callback() {}
+	aio_open_callback(void) {}
+	virtual ~aio_open_callback(void) {}
 
-	virtual bool open_callback() = 0;
+	virtual bool open_callback(void) = 0;
 protected:
 private:
 };
@@ -111,20 +111,20 @@ public:
 	 * 针对 open 过程，判断是否已经连接成功
 	 * @return {bool} 返回 true 表示连接成功，否则表示还连接成功
 	 */
-	bool is_opened() const;
+	bool is_opened(void) const;
 
 protected:
-	virtual ~aio_socket_stream();
+	virtual ~aio_socket_stream(void);
 
 	/**
 	 * 通过此函数来动态释放只能在堆上分配的异步流类对象
 	 */
-	virtual void destroy();
+	virtual void destroy(void);
 
 	/**
 	 * 注册流连接成功的回调过程
 	 */
-	void hook_open();
+	void hook_open(void);
 
 private:
 	bool opened_;  // 针对 open 函数而言表示连接是否成功

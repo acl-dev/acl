@@ -80,11 +80,11 @@ public:
 	bool open_append(const char* path);
 
 protected:
-	~aio_fstream();
+	~aio_fstream(void);
 	/**
 	 * 通过此函数来动态释放只能在堆上分配的异步流类对象
 	 */
-	virtual void destroy();
+	virtual void destroy(void);
 
 private:
 };

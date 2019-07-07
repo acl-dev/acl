@@ -14,7 +14,7 @@ namespace acl {
 class ACL_CPP_API stream_hook : public noncopyable
 {
 public:
-	stream_hook() {}
+	stream_hook(void) {}
 
 	/**
 	 * 读数据接口
@@ -51,10 +51,10 @@ public:
 	/**
 	 * 当 stream/aio_stream 对象需要释放 stream_hook 子类对象时调用此方法
 	 */
-	virtual void destroy() {}
+	virtual void destroy(void) {}
 
 protected:
-	virtual ~stream_hook() {}
+	virtual ~stream_hook(void) {}
 };
 
 } // namespace acl

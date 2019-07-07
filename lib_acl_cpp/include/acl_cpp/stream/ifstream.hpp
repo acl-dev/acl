@@ -9,8 +9,8 @@ class string;
 class ACL_CPP_API ifstream: public fstream
 {
 public:
-	ifstream() {}
-	virtual ~ifstream() {}
+	ifstream(void) {}
+	virtual ~ifstream(void) {}
 
 	/**
 	 * 以只读方式打开已经存在的文件

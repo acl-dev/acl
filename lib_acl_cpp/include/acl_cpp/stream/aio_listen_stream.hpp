@@ -14,8 +14,8 @@ class aio_socket_stream;
 class ACL_CPP_API aio_accept_callback : public aio_callback
 {
 public:
-	aio_accept_callback() {}
-	virtual ~aio_accept_callback() {}
+	aio_accept_callback(void) {}
+	virtual ~aio_accept_callback(void) {}
 
 	/**
 	 * 当接收到新的客户端流时的回调函数
@@ -65,17 +65,17 @@ public:
 	 * 获得服务器监听地址
 	 * @return {const char*}
 	 */
-	const char* get_addr() const;
+	const char* get_addr(void) const;
 
-	virtual void destroy();
+	virtual void destroy(void);
 protected:
-	virtual ~aio_listen_stream();
+	virtual ~aio_listen_stream(void);
 private:
 	bool accept_hooked_;
 	char  addr_[256];
 	std::list<aio_accept_callback*> accept_callbacks_;
 
-	void hook_accept();
+	void hook_accept(void);
 	static int accept_callback(ACL_ASTREAM*,  void*);
 };
 

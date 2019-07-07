@@ -27,8 +27,8 @@ class polarssl_io;
 class ACL_CPP_API polarssl_conf : public noncopyable
 {
 public:
-	polarssl_conf();
-	~polarssl_conf();
+	polarssl_conf(void);
+	~polarssl_conf(void);
 
 	/**
 	 * 加载 CA 根证书(每个配置实例只需调用一次本方法)
@@ -71,7 +71,7 @@ public:
 	 * 获得随机数生成器的熵对象
 	 * @return {void*}，返回值为 entropy_context 类型
 	 */
-	void* get_entropy()
+	void* get_entropy(void)
 	{
 		return entropy_;
 	}
@@ -109,7 +109,7 @@ private:
 	polarssl_verify_t verify_mode_;
 
 	void init_once(void);
-	void free_ca();
+	void free_ca(void);
 };
 
 } // namespace acl

@@ -15,8 +15,8 @@ class string;
 class ACL_CPP_API istream : virtual public stream
 {
 public:
-	istream() {}
-	virtual ~istream() {}
+	istream(void) {}
+	virtual ~istream(void) {}
 
 	/**
 	 * 从输入流中读数据

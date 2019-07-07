@@ -83,7 +83,7 @@ public:
 	 * 获得当前系统文件指针在文件中的偏移位置
 	 * @return {acl_off_t} 正常时返回值 >= 0，出错时返回 -1
 	 */
-	__int64 ftell();
+	__int64 ftell(void);
 
 	/**
 	 * 将文件尺寸截断至指定大小
@@ -102,20 +102,20 @@ public:
 	 * 返回系统文件句柄
 	 * @return 系统文件句柄，出错时返回 ACL_FILE_INVALID
 	 */
-	void* file_handle() const;
+	void* file_handle(void) const;
 #else
 	void open(int fh, unsigned int oflags, const char* path = NULL);
 	long long int fseek(long long int offset, int whence);
-	long long int ftell();
+	long long int ftell(void);
 	bool ftruncate(long long int length);
 	long long int fsize(void) const;
-	int file_handle() const;
+	int file_handle(void) const;
 #endif
 	/**
 	 * 获得文件的全路径
 	 * @return {const char*} 若返回空则表示文件还未打开或出错
 	 */
-	const char* file_path() const;
+	const char* file_path(void) const;
 
 	/**
 	 * 当文件打开后，该方法用来对文件加锁
