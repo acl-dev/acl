@@ -7,9 +7,9 @@
 
 namespace acl {
 
-const char* mime_image::get_location() const
+const char* mime_image::get_location(void) const
 {
-	return (header_value("Content-Location"));
+	return header_value("Content-Location");
 }
 
 } // namespace acl

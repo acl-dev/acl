@@ -33,17 +33,17 @@ public:
 	mime_node(const char* emailFile, const MIME_NODE* node,
 		bool enableDecode = true, const char* toCharset = "gb2312",
 		off_t off = 0);
-	virtual ~mime_node();
+	virtual ~mime_node(void);
 
 	/**
 	 * 获得 MIME 结点中 Content-Type 值中的 name 字段值
 	 * @return {const char*} 如果为空则表示没有该字段值
 	 */
-	const char* get_name() const
+	const char* get_name(void) const
 	{
 		if (m_name.empty())
-			return (NULL);
-		return (m_name.c_str());
+			return NULL;
+		return m_name.c_str();
 	}
 
 	/**
@@ -53,7 +53,7 @@ public:
 	 */
 	int get_ctype(void) const
 	{
-		return (m_ctype);
+		return m_ctype;
 	}
 
 	/**
@@ -61,9 +61,9 @@ public:
 	 * 函数返回 MIME_STYPE_JPEG (在 mime_define.hpp 中定义)
 	 * @return {int} 返回 mime_define.hpp 中定义的 MIME_STYPE_XXX
 	 */
-	int get_stype() const
+	int get_stype(void) const
 	{
-		return (m_stype);
+		return m_stype;
 	}
 
 	/**
@@ -82,48 +82,48 @@ public:
 	 * 获得传输编码类型 (对应于 Content-Transfer-Encoding)
 	 * @return {int} 返回 mime_define.hpp 中定义的 MIME_ENC_XXX
 	 */
-	int get_encoding() const
+	int get_encoding(void) const
 	{
-		return (m_encoding);
+		return m_encoding;
 	}
 
 	/**
 	 * 获得结点字符集字符串(对应于 Content-Type 中的 charset 字段)
 	 * @return {const char*} 为空则表示没有该字段
 	 */
-	const char* get_charset() const
+	const char* get_charset(void) const
 	{
-		return (m_charset);
+		return m_charset;
 	}
 
 	/**
 	 * 获得目标字符集, 由用户在构造函数中传入
 	 * @return {const char*} 为空则表示用户未设置
 	 */
-	const char* get_toCharset() const
+	const char* get_toCharset(void) const
 	{
 		if (m_toCharset[0])
-			return (m_toCharset);
+			return m_toCharset;
 		else
-			return (NULL);
+			return NULL;
 	}
 
 	/**
 	 * 获得本结点在邮件中的起始偏移量
 	 * @return {off_t}
 	 */
-	off_t get_bodyBegin() const
+	off_t get_bodyBegin(void) const
 	{
-		return (m_bodyBegin);
+		return m_bodyBegin;
 	}
 
 	/**
 	 * 获得本结点在邮件中的结束偏移量
 	 * @return {off_t}
 	 */
-	off_t get_bodyEnd() const
+	off_t get_bodyEnd(void) const
 	{
-		return (m_bodyEnd);
+		return m_bodyEnd;
 	}
 
 	/**
@@ -137,7 +137,7 @@ public:
 	 * 取得该结点的所有头部字段集合
 	 * @return {const std::map<string, string>&}
 	 */
-	const std::map<string, string>& get_headers() const;
+	const std::map<string, string>& get_headers(void) const;
 
 	/**
 	 * 转储本结点内容于指定的管道流中
@@ -196,13 +196,13 @@ public:
 	 *  本结点为邮件的根结点); 否则则返回的父结点需要在用完后
 	 *  delete 掉以释放相应内存
 	 */
-	mime_node* get_parent() const;
+	mime_node* get_parent(void) const;
 
 	/**
 	 * 判断本结点是否有父结点
 	 * @return {bool} true 则表示有父结点, 否则表示没有
 	 */
-	bool has_parent() const;
+	bool has_parent(void) const;
 
 	/**
 	 * 获得父结点的主类型 (MIME_CTYPE_XXX), 如果为 MIME_CTYPE_OTHER
@@ -225,26 +225,26 @@ public:
 	 * 则说明父结点不存在或父结点的编码类型未知
 	 * @return {int} MIME_ENC_XXX
 	 */
-	int parent_encoding() const;
+	int parent_encoding(void) const;
 
 	/**
 	 * 获得父结点的字符集类型, 如果返回值为空则说明父结点不存在或父结点
 	 * 中没有字符集类型
 	 * @return {const char*}
 	 */
-	char* parent_charset() const;
+	char* parent_charset(void) const;
 
 	/**
 	 * 获得父结点的数据体起始偏移量
 	 * @return {off_t} 返回值为 -1 表示父结点不存在
 	 */
-	off_t parent_bodyBegin() const;
+	off_t parent_bodyBegin(void) const;
 
 	/**
 	 * 获得父结点的数据体结束偏移量
 	 * @return {off_t} 返回值为 -1 表示父结点不存在
 	 */
-	off_t parent_bodyEnd() const;
+	off_t parent_bodyEnd(void) const;
 
 	/**
 	 * 获得父结点头部中某个字段名对应的字段值, 如: Content-Type

@@ -16,9 +16,9 @@ public:
 	{
 	}
 
-	~mime_image() {}
+	~mime_image(void) {}
 
-	const char* get_location() const;
+	const char* get_location(void) const;
 };
 
 } // namespace acl

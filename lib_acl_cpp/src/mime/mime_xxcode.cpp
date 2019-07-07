@@ -30,7 +30,7 @@ static const unsigned char un_xx_tab[] = {
 };
 
 mime_xxcode::mime_xxcode(bool addCrlf /* = false */, bool addInvalid /* = false */)
-	: mime_code(addCrlf, addInvalid, "xxcode")
+: mime_code(addCrlf, addInvalid, "xxcode")
 {
 	init(to_xx_tab, un_xx_tab, '~');
 }
@@ -39,14 +39,14 @@ mime_xxcode::~mime_xxcode()
 {
 }
 
-void mime_xxcode::encode(const char* in, int n, acl::string* out)
+void mime_xxcode::encode(const char* in, int n, string* out)
 {
 	mime_xxcode coder(false, false);
 	coder.encode_update(in, n, out);
 	coder.encode_finish(out);
 }
 
-void mime_xxcode::decode(const char* in, int n, acl::string* out)
+void mime_xxcode::decode(const char* in, int n, string* out)
 {
 	mime_xxcode decoder(false, false);
 	decoder.decode_update(in, n, out);

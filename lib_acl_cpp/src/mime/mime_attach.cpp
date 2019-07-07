@@ -16,29 +16,28 @@ mime_attach::mime_attach(const char* emailFile, const MIME_NODE* node,
 : mime_node(emailFile, node, enableDecode, toCharset, off)
 , m_filename(128)
 {
-	if (node->header_filename)
-	{
-		if (toCharset)
-		{
+	if (node->header_filename) {
+		if (toCharset) {
 			rfc2047 rfc;
 			rfc.decode_update(node->header_filename,
 					(int) strlen(node->header_filename));
 			rfc.decode_finish(toCharset, &m_filename);
-		}
-		else
+		} else {
 			m_filename = node->header_filename;
+		}
 	}
 }
 
-mime_attach::~mime_attach()
+mime_attach::~mime_attach(void)
 {
 }
 
-const char* mime_attach::get_filename() const
+const char* mime_attach::get_filename(void) const
 {
-	if (m_filename.empty())
+	if (m_filename.empty()) {
 		return NULL;
-	return (m_filename.c_str());
+	}
+	return m_filename.c_str();
 }
 
 } // namespace acl

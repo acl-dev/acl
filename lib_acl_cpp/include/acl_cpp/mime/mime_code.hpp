@@ -18,13 +18,13 @@ public:
 	 * @param encoding {const char*} 编码类型标识符
 	 */
 	mime_code(bool addCrlf, bool addInvalid, const char* encoding_type);
-	virtual ~mime_code() = 0;
+	virtual ~mime_code(void) = 0;
 
 	/**
 	 * 获得编码类型标识符
 	 * @return {const char*}
 	 */
-	const char* get_encoding_type() const
+	const char* get_encoding_type(void) const
 	{
 		return encoding_type_;
 	}
@@ -82,7 +82,7 @@ public:
 	/**
 	 * 重置内部缓冲区
 	 */
-	virtual void reset();
+	virtual void reset(void);
 
 	/**
 	 * 在编码过程中设置是否自动在每个编码段添加 "\r\n"
@@ -127,7 +127,7 @@ public:
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max = 0);
 	virtual int pop_end(string* out, size_t max = 0);
-	virtual void clear();
+	virtual void clear(void);
 
 	/**
 	 * 静态函数，根据编码类型 MIME_ENC_XXX (参见：mime_define.hpp) 获得

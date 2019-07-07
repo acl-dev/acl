@@ -84,10 +84,10 @@ public:
 
 	/**
 	 * 将邮件解析结果另存为另一个文件名
-	 * @param out {fstream&} 目标流对象
+	 * @param out {ostream&} 目标流对象
 	 * @return {bool} 是否成功
 	 */
-	bool save_as(fstream& out);
+	bool save_as(ostream& out);
 
 	/**
 	 * 将邮件解析结果另存为另一个文件中
@@ -193,7 +193,7 @@ public:
 	mime& set_sender(const char* addr)
 	{
 		m_primaryHeader.set_returnpath(addr);
-		return (*this);
+		return *this;
 	}
 
 	/**
@@ -204,7 +204,7 @@ public:
 	mime& set_from(const char* addr)
 	{
 		m_primaryHeader.set_from(addr);
-		return (*this);
+		return *this;
 	}
 
 	/**
@@ -215,7 +215,7 @@ public:
 	mime& set_replyto(const char* addr)
 	{
 		m_primaryHeader.set_replyto(addr);
-		return (*this);
+		return *this;
 	}
 
 	/**
@@ -226,7 +226,7 @@ public:
 	mime& set_returnpath(const char* addr)
 	{
 		m_primaryHeader.set_returnpath(addr);
-		return (*this);
+		return *this;
 	}
 
 	/**
@@ -237,7 +237,7 @@ public:
 	mime& set_subject(const char* s)
 	{
 		m_primaryHeader.set_subject(s);
-		return (*this);
+		return *this;
 	}
 
 	/**
@@ -248,7 +248,7 @@ public:
 	mime& add_to(const char* addr)
 	{
 		m_primaryHeader.add_to(addr);
-		return (*this);
+		return *this;
 	}
 
 	/**
@@ -259,7 +259,7 @@ public:
 	mime& add_cc(const char* addr)
 	{
 		m_primaryHeader.add_cc(addr);
-		return (*this);
+		return *this;
 	}
 
 	/**
@@ -270,7 +270,7 @@ public:
 	mime& add_bcc(const char* addr)
 	{
 		m_primaryHeader.add_bcc(addr);
-		return (*this);
+		return *this;
 	}
 
 	/**
@@ -281,7 +281,7 @@ public:
 	mime& add_rcpt(const char* addr)
 	{
 		m_primaryHeader.add_rcpt(addr);
-		return (*this);
+		return *this;
 	}
 
 	/**
@@ -293,7 +293,7 @@ public:
 	mime& add_header(const char* name, const char* value)
 	{
 		m_primaryHeader.add_header(name, value);
-		return (*this);
+		return *this;
 	}
 
 	/**
@@ -305,7 +305,7 @@ public:
 	mime& set_type(const char* ctype, const char* stype)
 	{
 		m_primaryHeader.set_type(ctype, stype);
-		return (*this);
+		return *this;
 	}
 
 	/**
@@ -316,7 +316,7 @@ public:
 	mime& set_boundary(const char* s)
 	{
 		m_primaryHeader.set_boundary(s);
-		return (*this);
+		return *this;
 	}
 
 	/**
@@ -326,7 +326,7 @@ public:
 	 */
 	const string& sender(void) const
 	{
-		return (m_primaryHeader.sender());
+		return m_primaryHeader.sender();
 	}
 
 	/**
@@ -336,7 +336,7 @@ public:
 	 */
 	const string& from(void) const
 	{
-		return (m_primaryHeader.from());
+		return m_primaryHeader.from();
 	}
 
 	/**
@@ -346,7 +346,7 @@ public:
 	 */
 	const string& replyto(void) const
 	{
-		return (m_primaryHeader.replyto());
+		return m_primaryHeader.replyto();
 	}
 
 	/**
@@ -356,7 +356,7 @@ public:
 	 */
 	const string& returnpath(void) const
 	{
-		return (m_primaryHeader.returnpath());
+		return m_primaryHeader.returnpath();
 	}
 
 	/**
@@ -366,7 +366,7 @@ public:
 	 */
 	const string& subject(void) const
 	{
-		return (m_primaryHeader.subject());
+		return m_primaryHeader.subject();
 	}
 
 	/**
@@ -376,7 +376,7 @@ public:
 	 */
 	const std::list<char*>& to_list(void) const
 	{
-		return (m_primaryHeader.to_list());
+		return m_primaryHeader.to_list();
 	}
 
 	/**
@@ -386,7 +386,7 @@ public:
 	 */
 	const std::list<char*>& cc_list(void) const
 	{
-		return (m_primaryHeader.cc_list());
+		return m_primaryHeader.cc_list();
 	}
 
 	/**
@@ -396,7 +396,7 @@ public:
 	 */
 	const std::list<char*>& bcc_list(void) const
 	{
-		return (m_primaryHeader.bcc_list());
+		return m_primaryHeader.bcc_list();
 	}
 
 	/**
@@ -407,7 +407,7 @@ public:
 	 */
 	const std::list<char*>& rcpt_list(void) const
 	{
-		return (m_primaryHeader.rcpt_list());
+		return m_primaryHeader.rcpt_list();
 	}
 
 	/**
@@ -416,7 +416,7 @@ public:
 	 */
 	const std::list<HEADER*>& header_list(void) const
 	{
-		return (m_primaryHeader.header_list());
+		return m_primaryHeader.header_list();
 	}	
 
 	/**
@@ -426,7 +426,7 @@ public:
 	 */
 	const char* header_value(const char* name) const
 	{
-		return (m_primaryHeader.header_value(name));
+		return m_primaryHeader.header_value(name);
 	}
 
 	/**
@@ -437,14 +437,14 @@ public:
 	 */
 	int header_values(const char* name, std::list<const char*>* values) const
 	{
-		return (m_primaryHeader.header_values(name, values));
+		return m_primaryHeader.header_values(name, values);
 	}
 
 	/**
 	 * 获得邮件头中关于 Content-Type: text/html 中的 text 字段
 	 * @return {const char*} 永远返回非空值
 	 */
-	const char* get_ctype() const
+	const char* get_ctype(void) const
 	{
 		return m_primaryHeader.get_ctype();
 	}
@@ -453,7 +453,7 @@ public:
 	 * 获得邮件头中关于 Content-Type: text/html 中的 html 字段
 	 * @return {const char*} 永远返回非空值
 	 */
-	const char* get_stype() const
+	const char* get_stype(void) const
 	{
 		return m_primaryHeader.get_stype();
 	}
@@ -464,7 +464,7 @@ public:
 	 */
 	const mime_head& primary_header(void) const
 	{
-		return (m_primaryHeader);
+		return m_primaryHeader;
 	}
 
 private:

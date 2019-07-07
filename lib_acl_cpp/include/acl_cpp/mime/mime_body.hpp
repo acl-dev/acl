@@ -37,7 +37,7 @@ public:
 	{
 	}
 
-	~mime_body() {}
+	~mime_body(void) {}
 
 	/**
 	 * 设置是否仅提取 HTML 数据, 如果为 true 则优先提取 HTML 数据,
@@ -115,7 +115,8 @@ public:
 	 * 判断结点头部类型中的从类型是否 MIME_STYPE_HTML 类型
 	 * @return {bool}
 	 */
-	bool html_stype() const;
+	bool html_stype(void) const;
+
 private:
 	bool m_htmlFirst;
 };

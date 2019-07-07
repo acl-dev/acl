@@ -1,5 +1,6 @@
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
+#include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/mime/mime_define.hpp"
@@ -28,14 +29,15 @@ mime_code::mime_code(bool addCrlf, bool addInvalid, const char* encoding_type)
 , m_fillChar('=')
 , m_pBuf(NULL)
 {
-	if (encoding_type)
+	if (encoding_type) {
 		encoding_type_ = acl_mystrdup(encoding_type);
-	else
+	} else {
 		encoding_type_ = acl_mystrdup("unknown");
+	}
 	reset();
 }
 
-mime_code::~mime_code()
+mime_code::~mime_code(void)
 {
 	acl_myfree(encoding_type_);
 	delete m_pBuf;
@@ -49,7 +51,7 @@ void mime_code::init(const unsigned char* toTab,
 	m_fillChar = fillChar;
 }
 
-void mime_code::reset()
+void mime_code::reset(void)
 {
 	m_encodeCnt = 0;
 	m_decodeCnt = 0;
@@ -65,7 +67,7 @@ void mime_code::add_invalid(bool on)
 	m_addInvalid = on;
 }
 
-void mime_code::encode_update(const char *src, int n, acl::string* out)
+void mime_code::encode_update(const char *src, int n, string* out)
 {
 	int  i = 0;
 
@@ -75,8 +77,9 @@ void mime_code::encode_update(const char *src, int n, acl::string* out)
 			m_encodeCnt = 0;
 		}
 		i = n;
-		if (i > (int) sizeof(m_encodeBuf) - m_encodeCnt)
+		if (i > (int) sizeof(m_encodeBuf) - m_encodeCnt) {
 			i = (int) sizeof(m_encodeBuf) - m_encodeCnt;
+		}
 		memcpy(m_encodeBuf + m_encodeCnt, src, i);
 		m_encodeCnt += i;
 		src += i;
@@ -84,23 +87,23 @@ void mime_code::encode_update(const char *src, int n, acl::string* out)
 	}
 }
 
-void mime_code::encode_finish(acl::string* out)
+void mime_code::encode_finish(string* out)
 {
 	encode(out);
 	m_encodeCnt = 0;
 }
 
-void mime_code::encode(acl::string *out)
+void mime_code::encode(string *out)
 {
 	const unsigned char *cp;
-	int     count;
+	int count;
 
 	/*
 	* Encode 3 -> 4.
 	*/
 	for (cp = (const unsigned char *) m_encodeBuf, count = m_encodeCnt;
-		count > 0; count -= 3, cp += 3)
-	{
+		count > 0; count -= 3, cp += 3) {
+
 		out->push_back((char) m_toTab[cp[0] >> 2]);
 		if (count > 1) {
 			out->push_back((char) m_toTab[(cp[0] & 0x3) << 4 | cp[1] >> 4]);
@@ -126,7 +129,7 @@ void mime_code::encode(acl::string *out)
 	}
 }
 
-void mime_code::decode_update(const char *src, int n, acl::string* out)
+void mime_code::decode_update(const char *src, int n, string* out)
 {
 	int  i = 0;
 
@@ -144,14 +147,13 @@ void mime_code::decode_update(const char *src, int n, acl::string* out)
 	}
 }
 
-void mime_code::decode_finish(acl::string* out)
+void mime_code::decode_finish(string* out)
 {
 	decode(out);
 
 	/* 如果缓冲区内还有数据, 则因其不够4个字节而照原样拷贝 */
 
-	if (m_addInvalid)
-	{
+	if (m_addInvalid) {
 		if (m_decodeCnt == 1) {
 			out->push_back(m_decodeBuf[0]);
 		} else if (m_decodeCnt == 2) {
@@ -166,18 +168,18 @@ void mime_code::decode_finish(acl::string* out)
 	m_decodeCnt = 0;
 }
 
-void mime_code::decode(acl::string* out)
+void mime_code::decode(string* out)
 {
 	const unsigned char *cp;
-	int     ch0, ch1, ch2, ch3;
+	int ch0, ch1, ch2, ch3;
 
-	if (m_decodeCnt <= 0)
+	if (m_decodeCnt <= 0) {
 		return;
+	}
 
 	/* 必须缓冲到 4 个字节才开始解析 */
 
 	for (cp = (const unsigned char *) m_decodeBuf; m_decodeCnt >= 4;) {
-
 		/* 跳过所有的回车换行符及补齐字节 '=' */
 
 		if (*cp == '\r' || *cp == '\n' || *cp == m_fillChar) {
@@ -190,8 +192,9 @@ void mime_code::decode(acl::string* out)
 
 		if ((ch0 = m_unTab[*cp])== INVALID) {
 			/* 如果非法, 则拷贝原字符 */
-			if(m_addInvalid)
+			if(m_addInvalid) {
 				out->push_back(*cp);
+			}
 			cp++;
 			m_decodeCnt--;
 			continue;
@@ -203,8 +206,9 @@ void mime_code::decode(acl::string* out)
 
 		if ((ch1 = m_unTab[*cp])== INVALID) {
 			/* 如果非法, 则拷贝原字符 */
-			if (m_addInvalid)
+			if (m_addInvalid) {
 				out->push_back((char) (*cp));
+			}
 			cp++;
 			m_decodeCnt--;
 			continue;
@@ -225,8 +229,9 @@ void mime_code::decode(acl::string* out)
 
 		if ((ch2 = m_unTab[ch2]) == INVALID) {
 			/* 如果非法, 则拷贝原字符 */
-			if (m_addInvalid)
+			if (m_addInvalid) {
 				out->push_back((char) (*cp));
+			}
 			cp++;
 			m_decodeCnt--;
 			continue;
@@ -249,8 +254,9 @@ void mime_code::decode(acl::string* out)
 		}
 		if ((ch3 = m_unTab[ch3]) == INVALID) {
 			/* 如果非法, 则拷贝原字符 */
-			if (m_addInvalid)
+			if (m_addInvalid) {
 				out->push_back((char) (*cp));
+			}
 			cp++;
 			m_decodeCnt--;
 			continue;
@@ -273,8 +279,7 @@ void mime_code::decode(acl::string* out)
 	}
 }
 
-void mime_code::create_decode_tab(const unsigned char *toTab,
-	acl::string *out)
+void mime_code::create_decode_tab(const unsigned char *toTab, string *out)
 {
 	unsigned char tab[255];
 	char  buf[32];
@@ -305,89 +310,96 @@ void mime_code::set_status(bool encoding)
 int mime_code::push_pop(const char* in, size_t len,
 	string* out, size_t max /* = 0 */)
 {
-	if (m_pBuf == NULL)
-		m_pBuf = NEW acl::string(1024);
-
-	if (in && len > 0)
-	{
-		if (m_encoding)
-			encode_update(in, (int) len, m_pBuf);
-		else
-			decode_update(in, (int) len, m_pBuf);
+	if (m_pBuf == NULL) {
+		m_pBuf = NEW string(1024);
 	}
 
-	if (out == NULL)
-		return (0);
+	if (in && len > 0) {
+		if (m_encoding) {
+			encode_update(in, (int) len, m_pBuf);
+		} else {
+			decode_update(in, (int) len, m_pBuf);
+		}
+	}
+
+	if (out == NULL) {
+		return 0;
+	}
 
 	len = m_pBuf->length();
-	if (len == 0)
-		return (0);
+	if (len == 0) {
+		return 0;
+	}
 
 	size_t n;
-	if (max > 0)
+	if (max > 0) {
 		n = max > len ? len : max;
-	else
+	} else {
 		n = len;
+	}
 
 	out->append(m_pBuf->c_str(), n);
 
-	if (len > n)
+	if (len > n) {
 		m_pBuf->memmove(m_pBuf->c_str() + n, len - n);
-	else
+	} else {
 		m_pBuf->clear();
+	}
 
 	return (int) (n);
 }
 
-int mime_code::pop_end(acl::string* out, size_t max /* = 0 */)
+int mime_code::pop_end(string* out, size_t max /* = 0 */)
 {
-	if (m_pBuf == NULL)
-	{
+	if (m_pBuf == NULL) {
 		logger_error("call push_pop first");
-		return (-1);
+		return -1;
 	}
-	if (m_encoding)
+	if (m_encoding) {
 		encode_finish(m_pBuf);
-	else
+	} else {
 		decode_finish(m_pBuf);
+	}
 
-	if (out == NULL)
-	{
+	if (out == NULL) {
 		m_pBuf->clear();
-		return (0);
+		return 0;
 	}
 
 	size_t n = m_pBuf->length();
-	if (n == 0)
-		return (0);
-	if (max > 0 && n > max)
+	if (n == 0) {
+		return 0;
+	}
+	if (max > 0 && n > max) {
 		n = max;
+	}
 	out->append(m_pBuf->c_str(), n);
 	m_pBuf->clear();
 	return (int) (n);
 }
 
-void mime_code::clear()
+void mime_code::clear(void)
 {
-	if (m_pBuf)
+	if (m_pBuf) {
 		m_pBuf->clear();
+	}
 }
 
 mime_code* mime_code::create(int encoding, bool warn_unsupport /* = true */)
 {
-	if(encoding == MIME_ENC_BASE64)
-		return (NEW acl::mime_base64());
-	else if (encoding == MIME_ENC_UUCODE)
-		return (NEW acl::mime_uucode());
-	else if (encoding == MIME_ENC_XXCODE)
-		return (NEW acl::mime_xxcode());
-	else if (encoding == MIME_ENC_QP)
-		return (NEW acl::mime_quoted_printable());
-	else
-	{
-		if (warn_unsupport)
+	if(encoding == MIME_ENC_BASE64) {
+		return NEW mime_base64();
+	} else if (encoding == MIME_ENC_UUCODE) {
+		return NEW mime_uucode();
+	} else if (encoding == MIME_ENC_XXCODE) {
+		return NEW mime_xxcode();
+	} else if (encoding == MIME_ENC_QP) {
+		return NEW mime_quoted_printable();
+	} else {
+		if (warn_unsupport) {
 			logger_warn("unknown encoding(%d)", encoding);
-		return (NULL);
+		}
+		return NULL;
 	}
 }
 

@@ -17,12 +17,12 @@ typedef struct HEADER
 class ACL_CPP_API mime_head : public noncopyable
 {
 public:
-	mime_head();
-	~mime_head();
+	mime_head(void);
+	~mime_head(void);
 
 	const string& get_boundary(void) const;
-	const char* get_ctype() const;
-	const char* get_stype() const;
+	const char* get_ctype(void) const;
+	const char* get_stype(void) const;
 	const string& sender(void) const;
 	const string& from(void) const;
 	const string& replyto(void) const;

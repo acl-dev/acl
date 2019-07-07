@@ -30,23 +30,23 @@ static const unsigned char un_b64_tab[] = {
 };
 
 mime_base64::mime_base64(bool addCrlf /* = false */, bool addInvalid /* = false */)
-	: mime_code(addCrlf, addInvalid, "base64")
+: mime_code(addCrlf, addInvalid, "base64")
 {
 	init(to_b64_tab, un_b64_tab, '=');
 }
 
-mime_base64::~mime_base64()
+mime_base64::~mime_base64(void)
 {
 }
 
-void mime_base64::encode(const char* in, int n, acl::string* out)
+void mime_base64::encode(const char* in, int n, string* out)
 {
 	mime_base64 coder(false, false);
 	coder.encode_update(in, n, out);
 	coder.encode_finish(out);
 }
 
-void mime_base64::decode(const char* in, int n, acl::string* out)
+void mime_base64::decode(const char* in, int n, string* out)
 {
 	mime_base64 decoder(false, false);
 	decoder.decode_update(in, n, out);

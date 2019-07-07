@@ -27,7 +27,7 @@ public:
 	 * @param addCrlf {bool} 在编码过程中当数据比较长时是否自动添加 "\r\n"
 	 */
 	rfc2047(bool strip_sp = true, bool addCrlf = true);
-	~rfc2047();
+	~rfc2047(void);
 
 	/**
 	 * 流式解析数据, 可以循环调用此函数, 每次添加部分数据

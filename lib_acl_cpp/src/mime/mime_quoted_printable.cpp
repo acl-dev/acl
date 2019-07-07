@@ -11,19 +11,18 @@ namespace acl {
 
 mime_quoted_printable::mime_quoted_printable(
 	bool addCrlf /* = false */, bool addInvalid /* = false */)
-	: mime_code(addCrlf, addInvalid, "quoted-printable")
+: mime_code(addCrlf, addInvalid, "quoted-printable")
 {
 	m_addCrLf = addCrlf;
 	m_addInvalid = addInvalid;
 	reset();
 }
 
-mime_quoted_printable::~mime_quoted_printable()
+mime_quoted_printable::~mime_quoted_printable(void)
 {
-
 }
 
-void mime_quoted_printable::reset()
+void mime_quoted_printable::reset(void)
 {
 	m_encodeCnt = 0;
 	m_decodeCnt = 0;
@@ -39,16 +38,18 @@ void mime_quoted_printable::add_invalid(bool on)
 	m_addInvalid = on;
 }
 
-void mime_quoted_printable::encode_update(const char *src, int n, acl::string* out)
+void mime_quoted_printable::encode_update(const char *src, int n, string* out)
 {
 	int  i = 0;
 
 	while (n > 0) {
-		if (m_encodeCnt == (int) sizeof(m_encodeBuf))
+		if (m_encodeCnt == (int) sizeof(m_encodeBuf)) {
 			encode(out);
+		}
 		i = n;
-		if (i > (int) sizeof(m_encodeBuf) - m_encodeCnt)
+		if (i > (int) sizeof(m_encodeBuf) - m_encodeCnt) {
 			i = (int) sizeof(m_encodeBuf) - m_encodeCnt;
+		}
 		memcpy(m_encodeBuf + m_encodeCnt, src, i);
 		m_encodeCnt += i;
 		src += i;
@@ -69,29 +70,30 @@ static char hexchars[] = "0123456789ABCDEF";
 	(buffer)->push_back('\n'); \
 }
 
-void mime_quoted_printable::encode_finish(acl::string* out)
+void mime_quoted_printable::encode_finish(string* out)
 {
 	encode(out);
-	if (m_encodeCnt == 1)
+	if (m_encodeCnt == 1) {
 		QP_ENCODE(out, m_encodeBuf[0]);
+	}
 	m_encodeCnt = 0;
 }
 
-void mime_quoted_printable::encode(const char* in, int n, acl::string* out)
+void mime_quoted_printable::encode(const char* in, int n, string* out)
 {
 	mime_quoted_printable coder(false, false);
 	coder.encode_update(in, n, out);
 	coder.encode_finish(out);
 }
 
-void mime_quoted_printable::decode(const char* in, int n, acl::string* out)
+void mime_quoted_printable::decode(const char* in, int n, string* out)
 {
 	mime_quoted_printable decoder(false, false);
 	decoder.decode_update(in, n, out);
 	decoder.decode_finish(out);
 }
 
-void mime_quoted_printable::encode(acl::string* out)
+void mime_quoted_printable::encode(string* out)
 {
 	const unsigned char *cp;
 	const unsigned char *end = CU_CHAR_PTR(m_encodeBuf + m_encodeCnt);
@@ -155,8 +157,7 @@ static int Index_hex[128] = {
 #define INVALID	-1
 #endif
 
-void mime_quoted_printable::decode_update(const char *src,
-	int n, acl::string* out)
+void mime_quoted_printable::decode_update(const char *src, int n, string* out)
 {
 	int  i = 0;
 
@@ -165,8 +166,9 @@ void mime_quoted_printable::decode_update(const char *src,
 			decode(out);
 		}
 		i = n;
-		if (i > (int) sizeof(m_decodeBuf) - m_decodeCnt)
+		if (i > (int) sizeof(m_decodeBuf) - m_decodeCnt) {
 			i = (int) sizeof(m_decodeBuf) - m_decodeCnt;
+		}
 		memcpy(m_decodeBuf + m_decodeCnt, src, i);
 		src += i;
 		n -= i;
@@ -174,14 +176,13 @@ void mime_quoted_printable::decode_update(const char *src,
 	}
 }
 
-void mime_quoted_printable::decode_finish(acl::string* out)
+void mime_quoted_printable::decode_finish(string* out)
 {
 	decode(out);
-	if (m_addInvalid)
-	{
-		if (m_decodeCnt == 1)
+	if (m_addInvalid) {
+		if (m_decodeCnt == 1) {
 			out->push_back(m_decodeBuf[0]);
-		else if (m_decodeCnt == 2) {
+		} else if (m_decodeCnt == 2) {
 			out->push_back(m_decodeBuf[0]);
 			out->push_back(m_decodeBuf[1]);
 		}
@@ -196,28 +197,30 @@ bool mime_quoted_printable::hex_decode(unsigned char first,
 	unsigned int bin;
 
 	hex = first;
-	if (hex >= '0' && hex <= '9')
+	if (hex >= '0' && hex <= '9') {
 		bin = (hex - '0') << 4;
-	else if (hex >= 'A' && hex <= 'F')
+	} else if (hex >= 'A' && hex <= 'F') {
 		bin = (hex - 'A' + 10) << 4;
-	else if (hex >= 'a' && hex <= 'f')
+	} else if (hex >= 'a' && hex <= 'f') {
 		bin = (hex - 'a' + 10) << 4;
-	else
-		return (false);
+	} else {
+		return false;
+	}
 	hex = second;
-	if (hex >= '0' && hex <= '9')
+	if (hex >= '0' && hex <= '9') {
 		bin |= (hex - '0') ;
-	else if (hex >= 'A' && hex <= 'F')
+	} else if (hex >= 'A' && hex <= 'F') {
 		bin |= (hex - 'A' + 10) ;
-	else if (hex >= 'a' && hex <= 'f')
+	} else if (hex >= 'a' && hex <= 'f') {
 		bin |= (hex - 'a' + 10) ;
-	else
-		return (false);
+	} else {
+		return false;
+	}
 	*result = bin;
-	return (true);
+	return true;
 }
 
-void mime_quoted_printable::decode(acl::string* out)
+void mime_quoted_printable::decode(string* out)
 {
 	const unsigned char *cp;
 	const unsigned char *end = CU_CHAR_PTR(m_decodeBuf + m_decodeCnt);

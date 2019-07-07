@@ -54,17 +54,13 @@ bool http_servlet::run(void)
 {
 	if (read_body_ == false)
 		return doRun();
-	else if (req_ == NULL)
-	{
+	else if (req_ == NULL) {
 		logger_error("req_ null");
 		return false;
-	}
-	else if (res_ == NULL)
-	{
+	} else if (res_ == NULL) {
 		logger_error("res_ null");
 		return false;
-	}
-	else
+	} else
 		return doBody(*req_, *res_);
 }
 
@@ -85,8 +81,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	// 获得 HTTP 请求的数据类型，正常的参数类型，即 name&value 方式
 	// 还是 MIME 数据类型，还是数据流类型
 	acl::http_request_t request_type = req.getRequestType();
-	if (request_type != acl::HTTP_REQUEST_MULTIPART_FORM)
-	{
+	if (request_type != acl::HTTP_REQUEST_MULTIPART_FORM) {
 		acl::string buf;
 		buf.format("<root error='should acl::HTTP_REQUEST_MULTIPART_FORM' />\r\n");
 		(void) res.write(buf);
@@ -96,8 +91,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 
 	// 先获得 Content-Type 对应的 http_ctype 对象
 	mime_ = req.getHttpMime();
-	if (mime_ == NULL)
-	{
+	if (mime_ == NULL) {
 		logger_error("http_mime null");
 		(void) doReply(req, res, "http_mime null");
 		return false;
@@ -105,8 +99,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 
 	// 获得数据体的长度
 	content_length_ = req.getContentLength();
-	if (content_length_ <= 0)
-	{
+	if (content_length_ <= 0) {
 		logger_error("body empty");
 		(void) doReply(req, res, "body empty");
 		return false;
@@ -119,8 +112,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	filepath.format("%s/mime_file", var_cfg_var_path);
 #endif
 
-	if (fp_.open_write(filepath) == false)
-	{
+	if (fp_.open_write(filepath) == false) {
 		logger_error("open %s error %s",
 			filepath.c_str(), acl::last_serror());
 		(void) doReply(req, res, "open file error");
@@ -153,8 +145,7 @@ bool http_servlet::doBody(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
 	// 当未读完数据体时，需要异步读 HTTP 请求数据体
-	if (content_length_ > read_length_)
-	{
+	if (content_length_ > read_length_) {
 		if (doUpload(req, res) == false)
 			return false;
 	}
@@ -182,8 +173,7 @@ bool http_servlet::doUpload(acl::HttpServletRequest& req,
 	//	read_length_, content_length_);
 
 	// 读取 HTTP 客户端请求数据
-	while (content_length_ > read_length_)
-	{
+	while (content_length_ > read_length_) {
 		if (in.read_peek(buf, true) == false)
 			break;
 		//if (buf.empty())
@@ -191,8 +181,7 @@ bool http_servlet::doUpload(acl::HttpServletRequest& req,
 //		printf(">>>size: %ld, space: %ld\r\n",
 //			(long) buf.size(), (long) buf.capacity());
 
-		if (fp_.write(buf) == -1)
-		{
+		if (fp_.write(buf) == -1) {
 			logger_error("write error %s", acl::last_serror());
 			(void) doReply(req, res, "write error");
 			return false;
@@ -205,8 +194,7 @@ bool http_servlet::doUpload(acl::HttpServletRequest& req,
 			finish = true;
 	}
 
-	if (in.eof())
-	{
+	if (in.eof()) {
 		logger_error("read error");
 		return false;
 	}
@@ -232,18 +220,15 @@ bool http_servlet::doParse(acl::HttpServletRequest& req,
 	// 遍历所有的 MIME 结点，找出其中为文件结点的部分进行转储
 	const std::list<acl::http_mime_node*>& nodes = mime_->get_nodes();
 	std::list<acl::http_mime_node*>::const_iterator cit = nodes.begin();
-	for (; cit != nodes.end(); ++cit)
-	{
+	for (; cit != nodes.end(); ++cit) {
 		const char* name = (*cit)->get_name();
 		if (name == NULL)
 			continue;
 
 		acl::http_mime_t mime_type = (*cit)->get_mime_type();
-		if (mime_type == acl::HTTP_MIME_FILE)
-		{
+		if (mime_type == acl::HTTP_MIME_FILE) {
 			const char* filename = (*cit)->get_filename();
-			if (filename == NULL)
-			{
+			if (filename == NULL) {
 				logger("filename null");
 				continue;
 			}
@@ -258,18 +243,13 @@ bool http_servlet::doParse(acl::HttpServletRequest& req,
 #endif
 			(void) (*cit)->save(path.c_str());
 
-			if (strcmp(name, "file1") == 0)
-			{
+			if (strcmp(name, "file1") == 0) {
 				file1_ = filename;
 				fsize1_ = get_fsize(var_cfg_var_path, filename);
-			}
-			else if (strcmp(name, "file2") == 0)
-			{
+			} else if (strcmp(name, "file2") == 0) {
 				file2_ = filename;
 				fsize2_ = get_fsize(var_cfg_var_path, filename);
-			}
-			else if (strcmp(name, "file3") == 0)
-			{
+			} else if (strcmp(name, "file3") == 0) {
 				file3_ = filename;
 				fsize3_ = get_fsize(var_cfg_var_path, filename);
 			}
@@ -278,11 +258,9 @@ bool http_servlet::doParse(acl::HttpServletRequest& req,
 
 	// 查找上载的某个文件并转储
 	const acl::http_mime_node* node = mime_->get_node("file1");
-	if (node && node->get_mime_type() == acl::HTTP_MIME_FILE)
-	{
+	if (node && node->get_mime_type() == acl::HTTP_MIME_FILE) {
 		ptr = node->get_filename();
-		if (ptr)
-		{
+		if (ptr) {
 			// 有的浏览器（如IE）上传文件时会带着文件路径，所以
 			// 需要先将路径去掉
 			ptr = acl_safe_basename(ptr);
@@ -349,8 +327,7 @@ long long http_servlet::get_fsize(const char* dir, const char* filename)
 	path.format("%s/%s", dir, filename);
 #endif
 	acl::ifstream in;
-	if (in.open_read(path) == false)
-	{
+	if (in.open_read(path) == false) {
 		logger_error("open %s error %s", path.c_str(), acl::last_serror());
 		return -1;
 	}

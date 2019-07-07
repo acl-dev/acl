@@ -15,7 +15,7 @@ public:
 	 * @param addInvalid {bool} 流式解码时是否遇到非法字符是否原样拷贝
 	 */
 	mime_base64(bool addCrlf = false, bool addInvalid = false);
-	~mime_base64();
+	~mime_base64(void);
 
 	/**
 	 * 静态编码函数，直接将输入数据进行编码同时存入用户缓冲区

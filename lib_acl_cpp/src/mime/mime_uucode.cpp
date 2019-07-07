@@ -30,23 +30,23 @@ static const unsigned char un_uucode_tab[] = {
 };
 
 mime_uucode::mime_uucode(bool addCrlf /* = false */, bool addInvalid /* = false */)
-	: mime_code(addCrlf, addInvalid, "uucode")
+: mime_code(addCrlf, addInvalid, "uucode")
 {
 	init(to_uucode_tab, un_uucode_tab, '~');
 }
 
-mime_uucode::~mime_uucode()
+mime_uucode::~mime_uucode(void)
 {
 }
 
-void mime_uucode::encode(const char* in, int n, acl::string* out)
+void mime_uucode::encode(const char* in, int n, string* out)
 {
 	mime_uucode coder(false, false);
 	coder.encode_update(in, n, out);
 	coder.encode_finish(out);
 }
 
-void mime_uucode::decode(const char* in, int n, acl::string* out)
+void mime_uucode::decode(const char* in, int n, string* out)
 {
 	mime_uucode decoder(false, false);
 	decoder.decode_update(in, n, out);

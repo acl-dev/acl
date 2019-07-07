@@ -26,8 +26,8 @@ typedef enum
 class ACL_CPP_API rfc822 : public noncopyable
 {
 public:
-	rfc822();
-	~rfc822();
+	rfc822(void);
+	~rfc822(void);
 
 	/**
 	 * 解析符合 RFC822 标准的时间格式
@@ -98,7 +98,7 @@ public:
 private:
 	std::list<rfc822_addr*> addrs_;
 
-	void reset();
+	void reset(void);
 };
 
 } // namespace acl
