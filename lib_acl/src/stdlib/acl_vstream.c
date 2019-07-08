@@ -2804,7 +2804,6 @@ acl_off_t acl_vstream_ftell(ACL_VSTREAM *fp)
 #ifdef ACL_WINDOWS
 int acl_file_ftruncate(ACL_VSTREAM *fp, acl_off_t length)
 {
-	const char *__FUNCTION__ = "acl_file_ftruncate";
 	ACL_FILE_HANDLE hf = ACL_VSTREAM_FILE(fp);
 
 	if (fp == NULL) {
