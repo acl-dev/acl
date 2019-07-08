@@ -8,8 +8,9 @@ redis_monitor::redis_monitor(const char* addr, int conn_timeout,
 	addr_ = addr;
 	conn_timeout_ = conn_timeout;
 	rw_timeout_ = rw_timeout;
-	if (passwd && *passwd)
+	if (passwd && *passwd) {
 		passwd_ = passwd;
+	}
 	prefer_master_ = prefer_master;
 }
 
@@ -26,19 +27,17 @@ void redis_monitor::status(void)
 	std::vector<acl::redis_node*> nodes;
 	redis_util::get_nodes(redis, prefer_master_, nodes);
 
-	if (nodes.empty())
-	{
+	if (nodes.empty()) {
 		logger_error("no redis nodes available");
 		return;
 	}
 
 	std::vector<acl::redis_client*> conns;
 	for (std::vector<acl::redis_node*>::const_iterator
-		cit = nodes.begin(); cit != nodes.end(); ++cit)
-	{
+		cit = nodes.begin(); cit != nodes.end(); ++cit) {
+
 		const char* addr = (*cit)->get_addr();
-		if (addr == NULL || *addr == 0)
-		{
+		if (addr == NULL || *addr == 0) {
 			logger_warn("addr NULL, skip it");
 			continue;
 		}
@@ -49,15 +48,14 @@ void redis_monitor::status(void)
 		conns.push_back(conn);
 	}
 
-	while (true)
-	{
+	while (true) {
 		show_status(conns);
 		sleep(1);
 	}
 
 	for (std::vector<acl::redis_client*>::iterator it = conns.begin();
-		it != conns.end(); ++it)
-	{
+		it != conns.end(); ++it) {
+
 		delete *it;
 	}
 }
@@ -67,14 +65,11 @@ int redis_monitor::check(const std::map<acl::string, acl::string>& info,
 {
 	std::map<acl::string, acl::string>::const_iterator cit
 		= info.find(name);
-	if (cit == info.end())
-	{
+	if (cit == info.end()) {
 		logger_error("no %s", name);
 		res.push_back(0);
 		return 0;
-	}
-	else
-	{
+	} else {
 		int n = atoi(cit->second.c_str());
 		res.push_back(n);
 		return n;
@@ -86,14 +81,11 @@ long long redis_monitor::check(const std::map<acl::string, acl::string>& info,
 {
 	std::map<acl::string, acl::string>::const_iterator cit
 		= info.find(name);
-	if (cit == info.end())
-	{
+	if (cit == info.end()) {
 		logger_error("no %s", name);
 		res.push_back(0);
 		return 0;
-	}
-	else
-	{
+	} else {
 		long long n = acl_atoll(cit->second.c_str());
 		res.push_back(n);
 		return n;
@@ -105,14 +97,11 @@ double redis_monitor::check(const std::map<acl::string, acl::string>& info,
 {
 	std::map<acl::string, acl::string>::const_iterator cit
 		= info.find(name);
-	if (cit == info.end())
-	{
+	if (cit == info.end()) {
 		logger_error("no %s", name);
 		res.push_back(0.0);
 		return 0.0;
-	}
-	else
-	{
+	} else {
 		double n = atof(cit->second.c_str());
 		res.push_back(n);
 		return n;
@@ -121,12 +110,14 @@ double redis_monitor::check(const std::map<acl::string, acl::string>& info,
 
 int redis_monitor::check_keys(const char* name, const char* value)
 {
-	if (strncmp(name, "db", 2) != 0 || *value == 0)
+	if (strncmp(name, "db", 2) != 0 || *value == 0) {
 		return 0;
+	}
 
 	name += 2;
-	if (*name == 0 || !acl_alldig(name))
+	if (*name == 0 || !acl_alldig(name)) {
 		return 0;
+	}
 
 	acl::string buf(value);
 	buf.trim_space();
@@ -134,13 +125,15 @@ int redis_monitor::check_keys(const char* name, const char* value)
 	int keys = 0;
 	std::vector<acl::string>& tokens = buf.split2(";,");
 	for (std::vector<acl::string>::iterator it = tokens.begin();
-		it != tokens.end(); ++it)
-	{
+		it != tokens.end(); ++it) {
+
 		std::vector<acl::string>& tokens2 = (*it).split2("=");
-		if (tokens2.size() != 2)
+		if (tokens2.size() != 2) {
 			continue;
-		if (tokens2[0] == "keys" && acl_alldig(tokens2[1]))
+		}
+		if (tokens2[0] == "keys" && acl_alldig(tokens2[1])) {
 			keys = atoi(tokens2[1].c_str());
+		}
 	}
 
 	return keys;
@@ -152,11 +145,12 @@ int redis_monitor::check_keys(const std::map<acl::string, acl::string>& info,
 	int count = 0;
 
 	for (std::map<acl::string, acl::string>::const_iterator cit
-		= info.begin(); cit != info.end(); ++cit)
-	{
+		= info.begin(); cit != info.end(); ++cit) {
+
 		int n = check_keys(cit->first, cit->second);
-		if (n > 0)
+		if (n > 0) {
 			count += n;
+		}
 	}
 
 	keys.push_back(count);
@@ -172,16 +166,15 @@ static double to_human(long long n, acl::string& units)
 #define	GB	(1024 * 1024 * 1024)
 	long long TB = (long long) GB * 1024;
 
-	if ((msize = (double) (n / TB)) >= 1)
+	if ((msize = (double) (n / TB)) >= 1) {
 		units = "T";
-	else if ((msize = ((double) n) / GB) >= 1)
+	} else if ((msize = ((double) n) / GB) >= 1) {
 		units = "G";
-	else if ((msize = ((double) n) / MB) >= 1)
+	} else if ((msize = ((double) n) / MB) >= 1) {
 		units = "M";
-	else if ((msize = ((double) n) / KB) >= 1)
+	} else if ((msize = ((double) n) / KB) >= 1) {
 		units = "K";
-	else
-	{
+	} else {
 		msize = (double) n;
 		units = "B";
 	}
@@ -201,12 +194,11 @@ void redis_monitor::show_status(std::vector<acl::redis_client*>& conns)
 	std::vector<double>    memory_frag;
 
 	for (std::vector<acl::redis_client*>::iterator it = conns.begin();
-		it != conns.end(); ++it)
-	{
+		it != conns.end(); ++it) {
+
 		acl::redis cmd(*it);
 		std::map<acl::string, acl::string> info;
-		if (cmd.info(info) < 0)
-		{
+		if (cmd.info(info) < 0) {
 			logger_error("cmd info error: %s, addr: %s",
 				cmd.result_error(), (*it)->get_addr());
 			continue;
@@ -230,8 +222,7 @@ void redis_monitor::show_status(std::vector<acl::redis_client*>& conns)
 	double msize, mrss, mpeak;
 	long long total_msize = 0, total_rss = 0, total_peak = 0;
 
-	for (size_t i = 0; i < size; i++)
-	{
+	for (size_t i = 0; i < size; i++) {
 		msize = to_human(memory[i], units);
 		mrss  = to_human(memory_rss[i], rss_units);
 		mpeak = to_human(memory_peak[i], peak_units);
@@ -261,18 +252,24 @@ void redis_monitor::show_status(std::vector<acl::redis_client*>& conns)
 			msize, units.c_str(), mrss, rss_units.c_str(),
 			mpeak, peak_units.c_str(), memory_frag[i]);
 
-		if (tpses[i] > 0)
+		if (tpses[i] > 0) {
 			all_tps += tpses[i];
-		if (clients[i] > 0)
+		}
+		if (clients[i] > 0) {
 			all_client += clients[i];
-		if (keys[i] > 0)
+		}
+		if (keys[i] > 0) {
 			all_keys += keys[i];
-		if (memory[i] > 0)
+		}
+		if (memory[i] > 0) {
 			total_msize += memory[i];
-		if (memory_rss[i] > 0)
+		}
+		if (memory_rss[i] > 0) {
 			total_rss += memory_rss[i];
-		if (memory_peak[i] > 0)
+		}
+		if (memory_peak[i] > 0) {
 			total_peak += memory_peak[i];
+		}
 	}
 
 	msize = to_human(total_msize, units);

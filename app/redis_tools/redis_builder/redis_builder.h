@@ -46,7 +46,7 @@ private:
 	acl::redis_node* create_node(acl::xml_node& node);
 
 	// begin build the redis cluster, connect all redis nodes
-	bool build_cluster();
+	bool build_cluster(void);
 
 	// allocate slots for every master, and let its slaves connect
 	// to their master node

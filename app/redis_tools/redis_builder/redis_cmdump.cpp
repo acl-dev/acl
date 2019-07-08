@@ -37,14 +37,15 @@ class dump_thread : public acl::thread
 public:
 	dump_thread(const acl::string& addr, const char* passwd,
 			acl::thread_queue& queue)
-		: stopped_(false)
-		, addr_(addr)
-		, queue_(queue)
-		, conn_timeout_(0)
-		, rw_timeout_(0)
+	: stopped_(false)
+	, addr_(addr)
+	, queue_(queue)
+	, conn_timeout_(0)
+	, rw_timeout_(0)
 	{
-		if (passwd && *passwd)
+		if (passwd && *passwd) {
 			passwd_ = passwd;
+		}
 	}
 
 	~dump_thread(void)
@@ -56,18 +57,15 @@ public:
 		acl::redis_client client(addr_, conn_timeout_, rw_timeout_);
 		client.set_password(passwd_);
 		acl::redis redis(&client);
-		if (redis.monitor() == false)
-		{
+		if (!redis.monitor()) {
 			logger_error("redis monitor error: %s, addr: %s",
 				redis.result_error(), addr_.c_str());
 			return NULL;
 		}
 
 		acl::string buf;
-		while (!stopped_)
-		{
-			if (redis.get_command(buf) == false)
-			{
+		while (!stopped_) {
+			if (!redis.get_command(buf)) {
 				logger_error("redis get_command error: %s",
 					redis.result_error());
 				break;
@@ -101,13 +99,14 @@ private:
 
 redis_cmdump::redis_cmdump(const char* addr, int conn_timeout, int rw_timeout,
 	const char* passwd, bool prefer_master)
-	: addr_(addr)
-	, conn_timeout_(conn_timeout)
-	, rw_timeout_(rw_timeout)
-	, prefer_master_(prefer_master)
+: addr_(addr)
+, conn_timeout_(conn_timeout)
+, rw_timeout_(rw_timeout)
+, prefer_master_(prefer_master)
 {
-	if (passwd && *passwd)
+	if (passwd && *passwd) {
 		passwd_ = passwd;
+	}
 }
 
 redis_cmdump::~redis_cmdump(void)
@@ -123,18 +122,15 @@ void redis_cmdump::get_nodes(std::vector<acl::string>& addrs)
 	std::vector<acl::redis_node*> nodes;
 
 	redis_util::get_nodes(redis, prefer_master_, nodes);
-	if (nodes.empty())
-	{
+	if (nodes.empty()) {
 		logger_error("nodes NULL!");
 		return;
 	}
 
 	for (std::vector<acl::redis_node*>::const_iterator cit
-		= nodes.begin(); cit != nodes.end(); ++cit)
-	{
+		= nodes.begin(); cit != nodes.end(); ++cit) {
 		const char* addr = (*cit)->get_addr();
-		if (addr == NULL || *addr == 0)
-		{
+		if (addr == NULL || *addr == 0) {
 			logger_error("addr null");
 			continue;
 		}
@@ -145,28 +141,24 @@ void redis_cmdump::get_nodes(std::vector<acl::string>& addrs)
 
 void redis_cmdump::saveto(const char* filepath, bool dump_all)
 {
-	if (filepath == NULL || *filepath == 0)
-	{
+	if (filepath == NULL || *filepath == 0) {
 		logger_error("filepath null");
 		return;
 	}
 
 	std::vector<acl::string> addrs;
-	if (dump_all)
-	{
+	if (dump_all) {
 		get_nodes(addrs);
-		if (addrs.empty())
-		{
+		if (addrs.empty()) {
 			logger_error("no master available!");
 			return;
 		}
-	}
-	else
+	} else {
 		addrs.push_back(addr_);
+	}
 
 	acl::ofstream out;
-	if (out.open_append(filepath) == false)
-	{
+	if (!out.open_append(filepath)) {
 		logger_error("open %s error: %s", filepath, acl::last_serror());
 		return;
 	}
@@ -175,32 +167,28 @@ void redis_cmdump::saveto(const char* filepath, bool dump_all)
 
 	std::vector<dump_thread*> threads;
 	for (std::vector<acl::string>::const_iterator cit = addrs.begin();
-		cit != addrs.end(); ++cit)
-	{
+		cit != addrs.end(); ++cit) {
+
 		dump_thread* thread = new dump_thread((*cit), passwd_, queue);
 		threads.push_back(thread);
 		thread->set_detachable(false);
 		thread->start();
 	}
 
-	while (true)
-	{
+	while (true) {
 		qitem* item = (qitem*) queue.pop();
-		if (item == NULL)
-		{
+		if (item == NULL) {
 			logger_error("queue pop error");
 			break;
 		}
 
 		const acl::string& msg = item->get_msg();
-		if (msg.empty())
-		{
+		if (msg.empty()) {
 			delete item;
 			continue;
 		}
 
-		if (out.write(msg) == -1)
-		{
+		if (out.write(msg) == -1) {
 			logger_error("write to %s error %s", filepath,
 				acl::last_serror());
 			delete item;
@@ -211,14 +199,14 @@ void redis_cmdump::saveto(const char* filepath, bool dump_all)
 	}
 
 	for (std::vector<dump_thread*>::iterator it = threads.begin();
-		it != threads.end(); ++it)
-	{
+		it != threads.end(); ++it) {
+
 		(*it)->stop();
 	}
 
 	for (std::vector<dump_thread*>::iterator it = threads.begin();
-		it != threads.end(); ++it)
-	{
+		it != threads.end(); ++it) {
+
 		(*it)->wait();
 		delete *it;
 	}

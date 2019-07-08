@@ -15,13 +15,12 @@
 
 static void test_readline(void)
 {
-	while (true)
-	{
+	while (true) {
 		char* ptr = readline("> ");
-		if (ptr == NULL || *ptr == 0)
+		if (ptr == NULL || *ptr == 0) {
 			break;
-		if (strcasecmp(ptr, "q") == 0)
-		{
+		}
+		if (strcasecmp(ptr, "q") == 0) {
 			printf("Bye!\r\n");
 			break;
 		}
@@ -90,10 +89,8 @@ int main(int argc, char* argv[])
 	bool dump_all = false, prefer_master = false;
 	acl::string filepath("dump.txt"), cmds_file;
 
-	while ((ch = getopt(argc, argv, "hs:a:f:N:SI:r:dk:p:T:AMF:")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "hs:a:f:N:SI:r:dk:p:T:AMF:")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
@@ -146,131 +143,100 @@ int main(int argc, char* argv[])
 
 	int conn_timeout = 10, rw_timeout = 120;
 
-	if (cmd == "hash_slot")
-	{
-		if (key.empty())
+	if (cmd == "hash_slot") {
+		if (key.empty()) {
 			printf("usage: %s -a hash_slot -k key\r\n", argv[0]);
-		else
-		{
+		} else {
 			size_t max_slot = 16384;
 			unsigned short n = acl_hash_crc16(key.c_str(), key.length());
 			unsigned short slot = n %  max_slot;
 			printf("key: %s, slot: %d\r\n", key.c_str(), (int) slot);
 		}
-	}
-	else if (cmd == "nodes")
-	{
-		if (addr.empty())
+	} else if (cmd == "nodes") {
+		if (addr.empty()) {
 			printf("usage: %s -s ip:port -a nodes\r\n", argv[0]);
-		else {
+		} else {
 			acl::redis_client client(addr, conn_timeout, rw_timeout);
 			client.set_password(passwd);
 			acl::redis redis(&client);
 			redis_status status(addr, conn_timeout, rw_timeout, passwd);
 			status.show_nodes(redis);
 		}
-	}
-	else if (cmd == "slots")
-	{
-		if (addr.empty())
+	} else if (cmd == "slots") {
+		if (addr.empty()) {
 			printf("usage: %s -a ip:port -a slots\r\n", argv[0]);
-		else
-		{
+		} else {
 			acl::redis_client client(addr, conn_timeout, rw_timeout);
 			client.set_password(passwd);
 			acl::redis redis(&client);
 			redis_status status(addr, conn_timeout, rw_timeout, passwd);
 			status.show_slots(redis);
 		}
-	}
-	else if (cmd == "create")
-	{
-		if (conf.empty())
+	} else if (cmd == "create") {
+		if (conf.empty()) {
 			printf("usage: %s -a create -f cluster.xml\r\n", argv[0]);
-		else
-		{
+		} else {
 			redis_builder builder(passwd);
 			builder.build(conf.c_str(), replicas, just_display);
 		}
-	}
-	else if (cmd == "add_node")
-	{
-		if (addr.empty() || new_addr.empty())
+	} else if (cmd == "add_node") {
+		if (addr.empty() || new_addr.empty()) {
 			printf("usage: %s -s ip:port -a add_node -N ip:port -S\r\n", argv[0]);
-		else
-		{
+		} else {
 			redis_builder builder(passwd);
 			builder.add_node(addr, new_addr, add_slave);
 		}
-	}
-	else if (cmd == "del_node")
-	{
-		if (addr.empty() || node_id.empty())
+	} else if (cmd == "del_node") {
+		if (addr.empty() || node_id.empty()) {
 			printf("usage: %s -s ip:port -a del_node -I nod_id\r\n", argv[0]);
-		else
-		{
+		} else {
 			redis_builder builder(passwd);
 			builder.del_node(addr, node_id);
 		}
-	}
-	else if (cmd == "node_id")
-	{
-		if (addr.empty())
+	} else if (cmd == "node_id") {
+		if (addr.empty()) {
 			printf("usage: %s -s ip:port -a node_id\r\n", argv[0]);
-		else
-		{
+		} else {
 			node_id.clear();
-			if (redis_util::get_node_id(addr, node_id, passwd) == false)
+			if (!redis_util::get_node_id(addr, node_id, passwd)) {
 				printf("can't get node id, addr: %s\r\n",
 					addr.c_str());
-			else
+			} else {
 				printf("addr: %s, node_id: %s\r\n",
 					addr.c_str(), node_id.c_str());
+			}
 		}
-	}
-	else if (cmd == "reshard")
-	{
-		if (addr.empty())
+	} else if (cmd == "reshard") {
+		if (addr.empty()) {
 			printf("usage: %s -s ip:port -a reshard\r\n", argv[0]);
-		else
-		{
+		} else {
 			redis_reshard reshard(addr, passwd);
 			reshard.run();
 		}
-	}
-	else if (cmd == "status")
-	{
-		if (addr.empty())
+	} else if (cmd == "status") {
+		if (addr.empty()) {
 			printf("usage: %s -s ip:port -a status\r\n", argv[0]);
-		else
-		{
+		} else {
 			redis_monitor monitor(addr, conn_timeout, rw_timeout,
 				passwd, prefer_master);
 			monitor.status();
 		}
-	}
-	else if (cmd == "dump")
-	{
-		if (addr.empty())
+	} else if (cmd == "dump") {
+		if (addr.empty()) {
 			printf("usage: %s -s ip:port -a monitor -f dump.txt\r\n", argv[0]);
-		else
-		{
+		} else {
 			redis_cmdump dump(addr, conn_timeout, rw_timeout,
 				passwd, prefer_master);
 			dump.saveto(filepath, dump_all);
 		}
-	}
-	else if (cmd == "run" || cmd.empty())
-	{
+	} else if (cmd == "run" || cmd.empty()) {
 		acl::string path;
 		const char* ptr = acl_process_path();
-		if (ptr && *ptr)
-		{
+		if (ptr && *ptr) {
 			path.dirname(ptr);
 			filepath.format("%s/redis_commands.txt", path.c_str());
 			acl::ifstream in;
-			if (in.open_read(filepath))
-			{
+			if (in.open_read(filepath)) {
 				in.close();
 				cmds_file = filepath;
 			}
@@ -278,13 +244,13 @@ int main(int argc, char* argv[])
 		redis_commands cmds(addr, passwd, conn_timeout,
 			rw_timeout, prefer_master, cmds_file);
 		cmds.run();
-	}
 #ifdef	HAS_READLINE
-	else if (cmd == "readline")
+	} else if (cmd == "readline") {
 		test_readline();
 #endif
-	else
+	} else {
 		printf("unknown cmd: %s\r\n", cmd.c_str());
+	}
 
 #ifdef WIN32
 	printf("enter any key to exit\r\n");

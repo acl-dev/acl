@@ -21,7 +21,7 @@ public:
 	static void show_master_slots(const acl::redis_node* master);
 	static void show_slave_nodes(const std::vector<acl::redis_node*>& slaves);
 
-	void show_slots();
+	void show_slots(void);
 	static bool show_slots(acl::redis& redis);
 	static void show_slaves_slots(const acl::redis_slot* slot);
 

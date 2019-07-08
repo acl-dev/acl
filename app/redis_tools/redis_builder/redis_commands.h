@@ -36,7 +36,7 @@ private:
 	bool parse(acl::string& line, std::vector<acl::string>& out);
 	void set_addr(const char* in, acl::string& out);
 	void getline(acl::string& buf, const char* prompt = NULL);
-	void create_cluster();
+	void create_cluster(void);
 	void help(void);
 	void set_server(const std::vector<acl::string>& tokens);
 	void show_nodes(void);
