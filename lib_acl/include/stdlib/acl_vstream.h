@@ -522,14 +522,23 @@ ACL_API int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *r
 ACL_API int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int cnt, int *ready);
 
 /**
- * 一次性从 ACL_VSTREAM 流或系统缓存区中读取不固定长度的数据,
- * 只要能读到大于 0 个字节的数据则将 ready 标志位置位
+ * 一次性从 ACL_VSTREAM 流或系统缓存区中读取不固定长度的数据
  * @param fp {ACL_VSTREAM*} 数据流 
  * @param buf {ACL_VSTRING*} 数据缓冲区
  * @return  ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
  *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据.
  */
 ACL_API int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf);
+
+/**
+ * 一次性从 ACL_VSTREAM 流或系统缓存区中读取不固定长度的数据
+ * @param fp {ACL_VSTREAM*} 数据流 
+ * @param buf {void*} 数据缓冲区
+ * @param size {size_t} buf 长度
+ * @return  ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
+ *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据.
+ */
+ACL_API int acl_vstream_read_peek3(ACL_VSTREAM *fp, void *buf, size_t size);
 
 /**
  * 检查 ACL_VSTREAM 流是否可读或出错

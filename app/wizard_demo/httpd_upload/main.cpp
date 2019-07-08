@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 		// 会话总数（一个连接从接收到关闭称之为一个会话），当
 		// 处理的连接会话数超过此值，测试过程结束；如果该值设
 		// 为 0，则测试过程永远不结束
-		unsigned int count = 5;
+		unsigned int count = 0;
 
 		// 测试过程中指定线程池最大线程个数
 		unsigned int max_threads = 100;

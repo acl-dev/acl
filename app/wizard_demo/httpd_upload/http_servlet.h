@@ -4,34 +4,45 @@ class http_servlet : public acl::HttpServlet
 {
 public:
 	http_servlet(acl::socket_stream* stream, acl::session* session);
-	~http_servlet();
+	~http_servlet(void);
 
 	bool run(void);
 
 protected:
-	virtual bool doError(acl::HttpServletRequest&,
-		acl::HttpServletResponse& res);
-	virtual bool doOther(acl::HttpServletRequest&,
-		acl::HttpServletResponse& res, const char* method);
-	virtual bool doGet(acl::HttpServletRequest& req,
-		acl::HttpServletResponse& res);
-	virtual bool doPost(acl::HttpServletRequest& req,
-		acl::HttpServletResponse& res);
+	// @override
+	bool doError(request_t&, response_t&);
+
+	// @override
+	bool doOther(request_t&, response_t&,
+		const char* method);
+
+	// @override
+	bool doGet(request_t&, response_t&);
+
+	// @override
+	bool doPost(request_t&, response_t&);
 
 private:
-	bool doBody(acl::HttpServletRequest&, acl::HttpServletResponse&);
-	bool doUpload(acl::HttpServletRequest&, acl::HttpServletResponse&);
-	bool doParse(acl::HttpServletRequest&, acl::HttpServletResponse&);
-	bool doReply(acl::HttpServletRequest&, acl::HttpServletResponse&,
-		const char* info);
+	typedef bool (http_servlet::*handler_t)(request_t&,response_t&);
+
+	std::map<acl::string, handler_t> handlers_;
+
+	bool doUpload(request_t&, response_t&);
+	bool doReply(request_t&, response_t&, const char* info);
 	void reset(void);
 
+	bool onPage(request_t&, response_t&);
+	bool onUpload(request_t&, response_t&);
+
+private:
+	bool upload(request_t&, response_t&);
+	bool parse(request_t&, response_t&);
 	long long get_fsize(const char* dir, const char* filename);
 
 private:
-	bool read_body_;
-	acl::HttpServletRequest* req_;
-	acl::HttpServletResponse* res_;
+	bool uploading_;
+	request_t*  req_;
+	response_t* res_;
 	acl::ofstream fp_;
 	long long content_length_;
 	long long read_length_;

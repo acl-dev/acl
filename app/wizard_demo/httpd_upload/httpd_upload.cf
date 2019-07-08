@@ -8,7 +8,7 @@ service httpd_upload {
 #	for master_type = unix
 #	master_service = echo.sock
 #	for master_type = sock
-	master_service = 127.0.0.1:5001, 5002, :5003, echo.sock, echo2.sock
+	master_service = 8888
 
 #	服务监听为域套接口
 #	master_service = aio_echo.sock
@@ -133,4 +133,3 @@ service httpd_upload {
 #	是否在一个线程中连接读
 #	loop_read = 1
 }
-

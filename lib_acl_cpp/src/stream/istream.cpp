@@ -314,6 +314,33 @@ bool istream::read_peek(string* buf, bool clear /* = false */)
 	return read_peek(*buf, clear);
 }
 
+int istream::read_peek(void* buf, size_t size)
+{
+	if (buf == NULL || size == 0) {
+		logger_error("invalid params, buf=%p, size=%ld",
+			buf, (long) size);
+		return -1;
+	}
+
+	int n = acl_vstream_read_peek3(stream_, buf, size);
+	if (n == ACL_VSTREAM_EOF) {
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+		if (stream_->errnum != ACL_EWOULDBLOCK) {
+#else
+		if (stream_->errnum != ACL_EWOULDBLOCK
+			&& stream_->errnum != ACL_EAGAIN) {
+#endif
+			eof_ = true;
+			return -1;
+		}
+		return 0;
+	} else if (n == 0) {
+		return 0;
+	} else {
+		return n;
+	}
+}
+
 bool istream::readn_peek(string& buf, size_t cnt, bool clear /* = false */)
 {
 	if (clear) {

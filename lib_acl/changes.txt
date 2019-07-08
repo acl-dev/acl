@@ -1,5 +1,8 @@
 修改历史列表：
 
+656) 2019.7.8
+656.1) feature: acl_vstream.c 新增 acl_vstream_read_peek3 函数
+
 655) 2019.6.13
 655.1) bugfix: acl_mylog.c 中 get_buf() 函数在 WIN 平台下可能会有数据截断的问题
 

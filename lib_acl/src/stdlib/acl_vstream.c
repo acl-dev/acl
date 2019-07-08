@@ -741,8 +741,13 @@ int acl_vstream_bfcp_some(ACL_VSTREAM *fp, void *vptr, size_t maxlen)
 	memcpy(vptr, fp->read_ptr, n);
 
 	fp->read_cnt -= n;
-	fp->read_ptr += n;
-	fp->offset += n;
+	fp->offset   += n;
+
+	if (fp->read_cnt == 0) {
+		fp->read_ptr = fp->read_buf;
+	} else {
+		fp->read_ptr += n;
+	}
 
 	return n;
 }
@@ -938,7 +943,7 @@ int acl_vstream_readn(ACL_VSTREAM *fp, void *buf, size_t size)
 
 	if (fp->read_cnt > 0) {
 		n = acl_vstream_bfcp_some(fp, ptr, size);
-		ptr += n;
+		ptr  += n;
 		size -= n;
 		if (size == 0) {
 			return (int) size_saved;
@@ -953,7 +958,7 @@ int acl_vstream_readn(ACL_VSTREAM *fp, void *buf, size_t size)
 				return ACL_VSTREAM_EOF;
 			}
 			n = acl_vstream_bfcp_some(fp, ptr, size);
-			ptr += n;
+			ptr  += n;
 			size -= n;
 		}
 	}
@@ -966,7 +971,7 @@ int acl_vstream_readn(ACL_VSTREAM *fp, void *buf, size_t size)
 				return ACL_VSTREAM_EOF;
 			}
 			size -= n;
-			ptr += n;
+			ptr  += n;
 		}
 	}
 
@@ -1009,7 +1014,7 @@ int acl_vstream_read(ACL_VSTREAM *fp, void *buf, size_t size)
 	}
 }
 
-static int bfgets_crlf_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
+static int bfgets_crlf(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 {
 	int   ch = 0;
 
@@ -1042,6 +1047,10 @@ static int bfgets_crlf_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 		}
 	}
 
+	if (fp->read_cnt == 0) {
+		fp->read_ptr = fp->read_buf;
+	}
+
 	/* set '\0' teminated */
 	ACL_VSTRING_TERMINATE(buf);
 	return ch;
@@ -1071,7 +1080,7 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	}
 
 	if (fp->read_cnt > 0) {
-		bfgets_crlf_peek(fp, buf, ready);
+		bfgets_crlf(fp, buf, ready);
 		if (*ready) {
 			return (int) LEN(buf) - n;
 		}
@@ -1090,17 +1099,18 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	}
 
 	if (fp->read_cnt > 0) {
-		bfgets_crlf_peek(fp, buf, ready);
+		bfgets_crlf(fp, buf, ready);
 	}
 	return (int) LEN(buf) - n;
 }
 
-static int bfgets_no_crlf_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
+static int bfgets_no_crlf(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 {
-	int   ch = bfgets_crlf_peek(fp, buf, ready);
+	int   ch = bfgets_crlf(fp, buf, ready);
 
-	if (ch == 0)
+	if (ch == 0) {
 		return ch;
+	}
 
 	if (ch == '\n') {
 		int   n = (int) LEN(buf) - 1;
@@ -1147,7 +1157,7 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	}
 
 	if (fp->read_cnt > 0) {
-		bfgets_no_crlf_peek(fp, buf, ready);
+		bfgets_no_crlf(fp, buf, ready);
 		if (*ready) {
 			return (int) LEN(buf) - n;
 		}
@@ -1167,13 +1177,13 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	}
 
 	if (fp->read_cnt > 0) {
-		bfgets_no_crlf_peek(fp, buf, ready);
+		bfgets_no_crlf(fp, buf, ready);
 	}
 
 	return (int) LEN(buf) - n;
 }
 
-static int bfread_cnt_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int cnt, int *ready)
+static int bfread_cnt(ACL_VSTREAM *fp, ACL_VSTRING *buf, int cnt, int *ready)
 {
 	int   n;
 
@@ -1181,11 +1191,17 @@ static int bfread_cnt_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int cnt, int *read
 	if (fp->read_cnt <= 0) {
 		return 0;
 	}
+
 	n = (int) (fp->read_cnt > cnt ? cnt : fp->read_cnt);
 	acl_vstring_memcat(buf, (char*) fp->read_ptr, n);
+	fp->offset   += n;
 	fp->read_cnt -= n;
-	fp->offset += n;
-	fp->read_ptr += n;
+	if (fp->read_cnt == 0) {
+		fp->read_ptr  = NULL;
+	} else {
+		fp->read_ptr += n;
+	}
+
 	cnt -= n;
 	if (cnt == 0) {
 		*ready = 1;
@@ -1215,7 +1231,7 @@ int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
 	}
 
 	if (fp->read_cnt > 0) {
-		cnt -= bfread_cnt_peek(fp, buf, cnt, ready);
+		cnt -= bfread_cnt(fp, buf, cnt, ready);
 		if (*ready) {
 			return cnt_saved - cnt;
 		}
@@ -1234,20 +1250,20 @@ int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
 	}
 
 	if (fp->read_cnt > 0) {
-		cnt -= bfread_cnt_peek(fp, buf, cnt, ready);
+		cnt -= bfread_cnt(fp, buf, cnt, ready);
 	}
 	return cnt_saved - cnt;
 }
 
-static void bfread_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
+static void bfread(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 {
 	/* XXX: sanity check */
 	if (fp->read_cnt <= 0) {
 		return;
 	}
 	acl_vstring_memcat(buf, (char*) fp->read_ptr, (size_t) fp->read_cnt);
-	fp->offset += fp->read_cnt;
-	fp->read_ptr += fp->read_cnt;
+	fp->offset  += fp->read_cnt;
+	fp->read_ptr = fp->read_buf;
 	fp->read_cnt = 0;
 
 	/* set '\0' teminated */
@@ -1261,8 +1277,7 @@ int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 	if (fp == NULL || buf == NULL) {
 		acl_msg_error("%s, %s(%d): fp %s, buf %s",
 			__FUNCTION__, __FILE__, __LINE__,
-			fp ? "not null" : "null",
-			buf ? "not null" : "null");
+			fp ? "not null" : "null", buf ? "not null" : "null");
 		return ACL_VSTREAM_EOF;
 	}
 
@@ -1275,7 +1290,7 @@ int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 	n = (int) LEN(buf);
 
 	if (fp->read_cnt > 0) {
-		bfread_peek(fp, buf);
+		bfread(fp, buf);
 	}
 
 	/* 系统IO读操作出错或关闭时返回结束标记, 如果返回 ACL_VSTRING_EOF
@@ -1290,16 +1305,62 @@ int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 	}
 
 	if (fp->read_cnt > 0) {
-		bfread_peek(fp, buf);
+		bfread(fp, buf);
 	}
 	return (int) LEN(buf) - n;
 }
 
-/*
+static size_t bfread3(ACL_VSTREAM *fp, void *buf, size_t size)
+{
+	size_t n;
+
+	if (fp->read_cnt <= 0) {
+		return 0;
+	}
+
+	n = (size_t) fp->read_cnt > size ? size : (size_t) fp->read_cnt;
+	memcpy(buf, fp->read_ptr, n);
+
+	fp->offset   += n;
+	fp->read_cnt -= n;
+	if (fp->read_cnt == 0) {
+		fp->read_ptr  = fp->read_buf;
+	} else {
+		fp->read_ptr += n;
+	}
+	return n;
+}
+
 int acl_vstream_read_peek3(ACL_VSTREAM *fp, void *buf, size_t size)
 {
+	size_t size_saved = size;
+
+	if (fp->read_cnt < 0) {
+		acl_msg_error("%s, %s(%d): invalid read_cnt=%d",
+			__FUNCTION__, __FILE__, __LINE__, (int) fp->read_cnt);
+		return ACL_VSTREAM_EOF;
+	}
+	if (fp->read_cnt > 0) {
+		size -= bfread3(fp, buf, size);
+		if (size == 0) {
+			return size_saved;
+		}
+	}
+
+	if (fp->read_ready) {
+		if (read_buffed(fp) <= 0) {
+			return size_saved > size ?
+				(int) (size_saved - size) : ACL_VSTREAM_EOF;
+		}
+	}
+
+	if (fp->read_cnt > 0) {
+		size -= bfread3(fp, buf, size);
+	}
+
+	return (int) (size_saved - size);
 }
-*/
+
 int acl_vstream_can_read(ACL_VSTREAM *fp)
 {
 	if (fp == NULL) {
@@ -2635,8 +2696,8 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 		if (fp->offset + fp->read_cnt != fp->sys_offset) {
 			acl_msg_error("%s, %s(%d): offset(" ACL_FMT_I64D
 				") + read_cnt(%d) != sys_offset("
-				ACL_FMT_I64D ")", __FUNCTION__, __FILE__, __LINE__,
-				fp->offset, fp->read_cnt,
+				ACL_FMT_I64D ")", __FUNCTION__, __FILE__,
+				__LINE__, fp->offset, fp->read_cnt,
 				fp->sys_offset);
 			fp->read_cnt = 0;
 			goto SYS_SEEK;
@@ -2664,7 +2725,8 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 			fp->read_cnt = 0;
 		} else { /* fp->read_cnt < 0 ? */
 			acl_msg_error("%s, %s(%d): invalud read_cnt = %d",
-				__FUNCTION__, __FILE__, __LINE__, (int) fp->read_cnt);
+				__FUNCTION__, __FILE__, __LINE__,
+				(int) fp->read_cnt);
 			fp->read_cnt = 0;
 		}
 	} else if (whence == SEEK_SET) {
@@ -2687,8 +2749,8 @@ acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whence)
 		if (fp->offset + fp->read_cnt != fp->sys_offset) {
 			acl_msg_error("%s, %s(%d): offset(" ACL_FMT_I64D
 				") + read_cnt(%d) != sys_offset("
-				ACL_FMT_I64D ")", __FUNCTION__, __FILE__, __LINE__,
-				fp->offset, fp->read_cnt,
+				ACL_FMT_I64D ")", __FUNCTION__, __FILE__,
+				__LINE__, fp->offset, fp->read_cnt,
 				fp->sys_offset);
 			fp->read_cnt = 0;
 			goto SYS_SEEK;

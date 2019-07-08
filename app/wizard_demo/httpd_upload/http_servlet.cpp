@@ -1,32 +1,36 @@
 #include "stdafx.h"
 #include "master_service.h"
 #include "http_servlet.h"
+#if defined(_WIN32) || defined(_WIN64)
+#include <process.h>
+#endif
+
+static acl::atomic_long __counter;
 
 http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session)
-: acl::HttpServlet(stream, session)
-, read_body_(false)
+: HttpServlet(stream, session)
+, uploading_(false)
 , req_(NULL)
 , res_(NULL)
 , content_length_(0)
 , read_length_(0)
 , mime_(NULL)
 {
-
+	handlers_["/upload"] = &http_servlet::onUpload;
 }
 
 http_servlet::~http_servlet(void)
 {
-
 }
 
-bool http_servlet::doError(acl::HttpServletRequest&,
-	acl::HttpServletResponse& res)
+bool http_servlet::doError(request_t&, response_t& res)
 {
 	res.setStatus(400);
-	res.setContentType("text/html; charset=");
+	res.setContentType("text/xml; charset=utf-8");
 	// 发送 http 响应头
-	if (res.sendHeader() == false)
+	if (!res.sendHeader()) {
 		return false;
+	}
 
 	// 发送 http 响应体
 	acl::string buf;
@@ -35,14 +39,14 @@ bool http_servlet::doError(acl::HttpServletRequest&,
 	return false;
 }
 
-bool http_servlet::doOther(acl::HttpServletRequest&,
-	acl::HttpServletResponse& res, const char* method)
+bool http_servlet::doOther(request_t&, response_t& res, const char* method)
 {
 	res.setStatus(400);
-	res.setContentType("text/html; charset=");
+	res.setContentType("text/xml; charset=utf-8");
 	// 发送 http 响应头
-	if (res.sendHeader() == false)
+	if (!res.sendHeader()) {
 		return false;
+	}
 	// 发送 http 响应体
 	acl::string buf;
 	buf.format("<root error='unkown request method %s' />\r\n", method);
@@ -50,30 +54,62 @@ bool http_servlet::doOther(acl::HttpServletRequest&,
 	return false;
 }
 
+// 业务逻辑入口
 bool http_servlet::run(void)
 {
-	if (read_body_ == false)
+	// 如果正在读取客户端上传的数据，则进入上传处理过程
+	if (uploading_) {
+		if (req_ == NULL) {
+			logger_error("req_ null");
+			return false;
+		}
+		if (res_ == NULL) {
+			logger_error("res_ null");
+			return false;
+		}
+
+		return doUpload(*req_, *res_);
+	}
+	// 否则，走正常的HTTP处理流程，doGet/doPost 将会被调用
+	else {
 		return doRun();
-	else if (req_ == NULL) {
-		logger_error("req_ null");
-		return false;
-	} else if (res_ == NULL) {
-		logger_error("res_ null");
-		return false;
-	} else
-		return doBody(*req_, *res_);
+	}
 }
 
-bool http_servlet::doGet(acl::HttpServletRequest& req,
-	acl::HttpServletResponse& res)
+bool http_servlet::doGet(request_t& req, response_t& res)
 {
 	return doPost(req, res);
 }
 
-bool http_servlet::doPost(acl::HttpServletRequest& req,
-	acl::HttpServletResponse& res)
+bool http_servlet::doPost(request_t& req, response_t& res)
 {
-	res.setContentType("text/xml; charset=gbk")	// 设置响应字符集
+	const char* path = req.getPathInfo();
+	handler_t handler = path && *path ? handlers_[path] : NULL;
+	return handler ? (this->*handler)(req, res) : onPage(req, res);
+}
+
+// 缺省 HTTP 请求，将 upload.html 页面返回给 HTTP 客户端
+bool http_servlet::onPage(request_t& req, response_t& res)
+{
+	res.setContentType("text/html; charset=utf-8")	// 设置响应字符集
+		.setKeepAlive(req.isKeepAlive())	// 设置是否保持长连接
+		.setContentEncoding(true)		// 自动支持压缩传输
+		.setChunkedTransferEncoding(true);	// 采用 chunk 传输方式
+
+	const char* page_html = "upload.html";
+	acl::string buf;
+
+	if (!acl::ifstream::load(page_html, &buf)) {
+		buf.format("load %s error %s", page_html, acl::last_serror());
+	}
+
+	res.setContentLength(buf.size());
+	return res.write(buf) && res.write(NULL, 0);
+}
+
+bool http_servlet::onUpload(request_t& req, response_t& res)
+{
+	res.setContentType("text/xml; charset=utf-8")	// 设置响应字符集
 		.setKeepAlive(req.isKeepAlive())	// 设置是否保持长连接
 		.setContentEncoding(true)		// 自动支持压缩传输
 		.setChunkedTransferEncoding(true);	// 采用 chunk 传输方式
@@ -82,104 +118,103 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	// 还是 MIME 数据类型，还是数据流类型
 	acl::http_request_t request_type = req.getRequestType();
 	if (request_type != acl::HTTP_REQUEST_MULTIPART_FORM) {
-		acl::string buf;
-		buf.format("<root error='should acl::HTTP_REQUEST_MULTIPART_FORM' />\r\n");
-		(void) res.write(buf);
-		(void) res.write(NULL, 0);
-		return false;
+		logger_warn("should be acl::HTTP_REQUEST_MULTIPART_FORM");
+		return onPage(req, res);
 	}
 
 	// 先获得 Content-Type 对应的 http_ctype 对象
 	mime_ = req.getHttpMime();
 	if (mime_ == NULL) {
 		logger_error("http_mime null");
-		(void) doReply(req, res, "http_mime null");
-		return false;
+		return onPage(req, res);
 	}
 
 	// 获得数据体的长度
 	content_length_ = req.getContentLength();
 	if (content_length_ <= 0) {
 		logger_error("body empty");
-		(void) doReply(req, res, "body empty");
-		return false;
+		return onPage(req, res);
 	}
 
-	acl::string filepath;
+	acl::string path;
+	long long n = __counter++;
 #if defined(_WIN32) || defined(_WIN64)
-	filepath.format("%s\\mime_file", var_cfg_var_path);
+	path.format("%s\\mime_file.%u.%lld",
+		var_cfg_var_path, (unsigned) _getpid(), n);
 #else
-	filepath.format("%s/mime_file", var_cfg_var_path);
+	path.format("%s/mime_file.%u.%lld",
+		var_cfg_var_path, (unsigned) getpid(), n);
 #endif
 
-	if (fp_.open_write(filepath) == false) {
-		logger_error("open %s error %s",
-			filepath.c_str(), acl::last_serror());
-		(void) doReply(req, res, "open file error");
-		return false;
+	if (fp_.open_write(path)) {
+		// 设置原始文件存入路径
+		mime_->set_saved_path(path);
+
+		req_       = &req;
+		res_       = &res;
+		uploading_ = true;
+
+		// 直接返回，从而触发异步读 HTTP 数据体过程
+		return true;
 	}
 
-	// 设置原始文件存入路径
-	mime_->set_saved_path(filepath);
-
-	req_ = &req;
-	res_ = &res;
-	read_body_ = true;
-
-	// 直接返回，从而触发异步读 HTTP 数据体过程
-	return true;
+	logger_error("open %s error %s", path.c_str(), acl::last_serror());
+	return doReply(req, res, "open file error");
 }
 
 void http_servlet::reset(void)
 {
-	read_body_ = false;
-	req_ = NULL;
-	res_ = NULL;
+	uploading_      = false;
+	req_            = NULL;
+	res_            = NULL;
 	content_length_ = 0;
-	read_length_ = 0;
-	mime_ = NULL;
+	read_length_    = 0;
+	mime_           = NULL;
 	fp_.close();
 }
 
-bool http_servlet::doBody(acl::HttpServletRequest& req,
-	acl::HttpServletResponse& res)
+bool http_servlet::doUpload(request_t& req, response_t& res)
 {
 	// 当未读完数据体时，需要异步读 HTTP 请求数据体
 	if (content_length_ > read_length_) {
-		if (doUpload(req, res) == false)
+		if (!upload(req, res)) {
 			return false;
+		}
 	}
 
-	if (content_length_ > read_length_)
+	// 还没有读完上传的数据，需要返回，异步等待可读
+	if (content_length_ > read_length_) {
 		return true;
+	}
 
 	// 当已经读完 HTTP 请求数据体时，则开始分析上传的数据
-	bool ret = doParse(req, res);
+	bool ret = parse(req, res);
 
 	// 处理完毕，需重置 HTTP 会话状态，以便于处理下一个 HTTP 请求
 	reset();
 	return ret;
 }
 
-bool http_servlet::doUpload(acl::HttpServletRequest& req,
-	acl::HttpServletResponse& res)
+#if 0
+
+bool http_servlet::upload(request_t& req, response_t& res)
 {
 	// 获得输入流
 	acl::istream& in = req.getInputStream();
-	acl::string buf;
-	bool  finish = false;
+	acl::string buf(8193);
+	bool finish = false;
 
 	//logger(">>>>>>>>>>read: %lld, total: %lld<<<<<",
 	//	read_length_, content_length_);
 
 	// 读取 HTTP 客户端请求数据
 	while (content_length_ > read_length_) {
-		if (in.read_peek(buf, true) == false)
+		if (!in.read_peek(buf, true)) {
 			break;
-		//if (buf.empty())
-		//	break;
-//		printf(">>>size: %ld, space: %ld\r\n",
-//			(long) buf.size(), (long) buf.capacity());
+		}
+
+		printf(">>>size: %ld, space: %ld\r\n",
+			(long) buf.size(), (long) buf.capacity());
 
 		if (fp_.write(buf) == -1) {
 			logger_error("write error %s", acl::last_serror());
@@ -190,30 +225,80 @@ bool http_servlet::doUpload(acl::HttpServletRequest& req,
 		read_length_ += buf.size();
 
 		// 将读得到的数据输入至解析器进行解析
-		if (!finish && mime_->update(buf, buf.size()) == true)
+		// 如果再读到多余数据，可以直接丢掉，不必再放入 mime 解析器中
+		if (!finish && mime_->update(buf, buf.size())) {
 			finish = true;
+		}
 	}
 
 	if (in.eof()) {
-		logger_error("read error");
+		logger_error("read error from http client");
 		return false;
 	}
 
 	return true;
 }
 
-bool http_servlet::doParse(acl::HttpServletRequest& req,
-	acl::HttpServletResponse& res)
+#else
+
+bool http_servlet::upload(request_t& req, response_t& res)
+{
+	// 获得输入流
+	acl::istream& in = req.getInputStream();
+	char buf[8192];
+	bool finish = false;
+
+	//logger(">>>>>>>>>>read: %lld, total: %lld<<<<<",
+	//	read_length_, content_length_);
+
+	// 读取 HTTP 客户端请求数据
+	while (content_length_ > read_length_) {
+		int ret = in.read_peek(buf, sizeof(buf));
+		printf(">>>size: %d\r\n", ret);
+
+		if (ret <= 0) {
+			break;
+		}
+
+		if (fp_.write(buf, ret) == -1) {
+			logger_error("write error %s", acl::last_serror());
+			(void) doReply(req, res, "write error");
+			return false;
+		}
+
+		read_length_ += (size_t) ret;
+
+		// 将读得到的数据输入至解析器进行解析
+		// 如果再读到多余数据，可以直接丢掉，不必再放入 mime 解析器中
+		if (!finish && mime_->update(buf, (size_t) ret)) {
+			finish = true;
+		}
+	}
+
+	if (in.eof()) {
+		logger_error("read error from http client");
+		return false;
+	}
+
+	return true;
+}
+
+#endif
+
+bool http_servlet::parse(request_t& req, response_t& res)
 {
 	const char* ptr = req.getParameter("name1");
-	if (ptr)
+	if (ptr) {
 		param1_ = ptr;
+	}
 	ptr = req.getParameter("name2");
-	if (ptr)
+	if (ptr) {
 		param2_ = ptr;
+	}
 	ptr = req.getParameter("name3");
-	if (ptr)
+	if (ptr) {
 		param3_ = ptr;
+	}
 
 	acl::string path;
 
@@ -222,8 +307,9 @@ bool http_servlet::doParse(acl::HttpServletRequest& req,
 	std::list<acl::http_mime_node*>::const_iterator cit = nodes.begin();
 	for (; cit != nodes.end(); ++cit) {
 		const char* name = (*cit)->get_name();
-		if (name == NULL)
+		if (name == NULL) {
 			continue;
+		}
 
 		acl::http_mime_t mime_type = (*cit)->get_mime_type();
 		if (mime_type == acl::HTTP_MIME_FILE) {
@@ -276,8 +362,7 @@ bool http_servlet::doParse(acl::HttpServletRequest& req,
 	return doReply(req, res, "OK");
 }
 
-bool http_servlet::doReply(acl::HttpServletRequest& req,
-	acl::HttpServletResponse& res, const char* info)
+bool http_servlet::doReply(request_t& req, response_t& res, const char* info)
 {
 	// 创建 xml 格式的数据体
 	acl::xml1 body;
