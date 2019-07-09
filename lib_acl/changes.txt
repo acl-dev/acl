@@ -3,6 +3,8 @@
 657) 2019.7.9
 657.1) performance: acl_vstream_read_peek3 支持根据缓冲区空间大小动态决定是否
 将数据直接读到用户缓冲区中以减少数据拷贝次数
+657.2) bugfix: acl_atomic.c 中 acl_atomic_int64_fetch_add 及 acl_atomic_int64_add_fetch
+返回值有误
 
 656) 2019.7.8
 656.1) feature: acl_vstream.c 新增 acl_vstream_read_peek3 函数

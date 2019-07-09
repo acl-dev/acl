@@ -5,7 +5,7 @@
 #include <process.h>
 #endif
 
-static acl::atomic_long __counter;
+static acl::atomic_long __counter = 0;
 
 http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session)
 : HttpServlet(stream, session)
@@ -15,6 +15,9 @@ http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session)
 , content_length_(0)
 , read_length_(0)
 , mime_(NULL)
+, fsize1_(-1)
+, fsize2_(-1)
+, fsize3_(-1)
 {
 	handlers_["/upload"] = &http_servlet::onUpload;
 }
@@ -137,7 +140,9 @@ bool http_servlet::onUpload(request_t& req, response_t& res)
 	}
 
 	acl::string path;
-	long long n = __counter++;
+	long long n = ++__counter;
+	long long i = __counter.value();
+	printf("i=%lld, n=%lld\r\n", i, n);
 #if defined(_WIN32) || defined(_WIN64)
 	path.format("%s\\mime_file.%u.%lld",
 		var_cfg_var_path, (unsigned) _getpid(), n);
@@ -198,7 +203,7 @@ bool http_servlet::doUpload(request_t& req, response_t& res)
 	return ret;
 }
 
-#if 0
+#if 1
 
 bool http_servlet::upload(request_t& req, response_t& res)
 {

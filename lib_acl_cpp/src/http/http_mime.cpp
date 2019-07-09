@@ -57,9 +57,14 @@ void http_mime_node::load_param(const char* path)
 	}
 	off_t begin = get_bodyBegin();
 	off_t end = get_bodyEnd();
-	if (begin < 0 || end < 0 || begin >= end) {
+	if (begin < 0 || end < 0) {
 		logger_error("invalid file offset, begin: %d, end: %d",
 			(int) begin, (int) end);
+		return;
+	}
+
+	// 如果 begin >= end 则说明该节点没有数据 -- zsx, 2019.7.9
+	if (begin >= end) {
 		return;
 	}
 
