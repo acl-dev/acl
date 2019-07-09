@@ -1347,11 +1347,24 @@ int acl_vstream_read_peek3(ACL_VSTREAM *fp, void *buf, size_t size)
 		}
 	}
 
-	if (fp->read_ready) {
-		if (read_buffed(fp) <= 0) {
-			return size_saved > size ?
-				(int) (size_saved - size) : ACL_VSTREAM_EOF;
+	if (!fp->read_ready) {
+		return (int) (size_saved - size);
+	}
+
+	if (size >= (size_t) fp->read_buf_len / 4) {
+		size_t n = size_saved - size;
+		int ret = read_to_buffer(fp, ((unsigned char*) buf) + n, size);
+		if (ret > 0) {
+			return (int) (size_saved - size + ret);
 		}
+
+		return size_saved > size ?
+			(int) (size_saved - size) : ACL_VSTREAM_EOF;
+	}
+
+	if (read_buffed(fp) <= 0) {
+		return size_saved > size ?
+			(int) (size_saved - size) : ACL_VSTREAM_EOF;
 	}
 
 	if (fp->read_cnt > 0) {

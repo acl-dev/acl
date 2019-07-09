@@ -146,6 +146,8 @@ bool http_servlet::onUpload(request_t& req, response_t& res)
 		var_cfg_var_path, (unsigned) getpid(), n);
 #endif
 
+	acl::meter_time(__FUNCTION__, __LINE__, "begin");
+
 	if (fp_.open_write(path)) {
 		// 设置原始文件存入路径
 		mime_->set_saved_path(path);
@@ -192,6 +194,7 @@ bool http_servlet::doUpload(request_t& req, response_t& res)
 
 	// 处理完毕，需重置 HTTP 会话状态，以便于处理下一个 HTTP 请求
 	reset();
+	acl::meter_time(__FUNCTION__, __LINE__, "end");
 	return ret;
 }
 
@@ -213,8 +216,10 @@ bool http_servlet::upload(request_t& req, response_t& res)
 			break;
 		}
 
+#if 0
 		printf(">>>size: %ld, space: %ld\r\n",
 			(long) buf.size(), (long) buf.capacity());
+#endif
 
 		if (fp_.write(buf) == -1) {
 			logger_error("write error %s", acl::last_serror());
@@ -254,12 +259,12 @@ bool http_servlet::upload(request_t& req, response_t& res)
 	// 读取 HTTP 客户端请求数据
 	while (content_length_ > read_length_) {
 		int ret = in.read_peek(buf, sizeof(buf));
-		printf(">>>size: %d\r\n", ret);
 
 		if (ret <= 0) {
 			break;
 		}
 
+		//printf(">>>size: %d\r\n", ret);
 		if (fp_.write(buf, ret) == -1) {
 			logger_error("write error %s", acl::last_serror());
 			(void) doReply(req, res, "write error");
