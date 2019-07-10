@@ -1368,7 +1368,7 @@ int acl_vstream_read_peek3(ACL_VSTREAM *fp, void *buf, size_t size)
 	}
 
 	if (fp->read_cnt > 0) {
-		size -= bfread3(fp, buf, size);
+		size -= bfread3(fp, (char*) buf + size_saved - size, size);
 	}
 
 	return (int) (size_saved - size);

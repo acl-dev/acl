@@ -203,7 +203,7 @@ bool http_servlet::doUpload(request_t& req, response_t& res)
 	return ret;
 }
 
-#if 1
+#if 0
 
 bool http_servlet::upload(request_t& req, response_t& res)
 {
