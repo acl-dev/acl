@@ -77,22 +77,17 @@ void rfc2047::debug_rfc2047(void) const
 	}
 }
 
-#define SKIP(s, n) \
-{ \
-	if (n > 0 && *s == '\r') \
-	{ \
+#define SKIP(s, n) { \
+	if (n > 0 && *s == '\r') { \
 		m_lastCh = *s++; \
 		n--; \
 	} \
-	if (n > 0 && *s == '\n') \
-	{ \
+	if (n > 0 && *s == '\n') { \
 		m_lastCh = *s++; \
 		n--; \
 	} \
-	if (m_lastCh == 0 || m_lastCh == '\n') \
-	{ \
-		while (n > 0 && ((m_lastCh = *s) == ' ' || m_lastCh == '\t')) \
-		{ \
+	if (m_lastCh == 0 || m_lastCh == '\n') { \
+		while (n > 0 && ((m_lastCh = *s) == ' ' || m_lastCh == '\t')) { \
 			s++; \
 			n--; \
 		} \

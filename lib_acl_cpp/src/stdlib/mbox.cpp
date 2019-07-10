@@ -27,8 +27,9 @@ void* mbox_read(void* mbox, int timeout, bool* success)
 {
 	int ok;
 	void* o = (void*) acl_mbox_read((ACL_MBOX*) mbox, timeout, &ok);
-	if (success)
+	if (success) {
 		*success = ok ? true : false;
+	}
 	return o;
 }
 
@@ -42,4 +43,4 @@ size_t mbox_nread(void* mbox)
 	return acl_mbox_nread((ACL_MBOX*) mbox);
 }
 
-}
+} // namespace acl

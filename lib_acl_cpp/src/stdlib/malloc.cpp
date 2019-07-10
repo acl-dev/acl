@@ -57,8 +57,9 @@ void* acl_new(size_t size, const char* filename,
 void  acl_delete(void *ptr, const char* filename,
 	const char* funcname acl_unused, int lineno)
 {
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return;
+	}
 	acl_free_glue(filename, lineno, ptr);
 }
 

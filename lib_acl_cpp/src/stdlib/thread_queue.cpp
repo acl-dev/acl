@@ -6,7 +6,7 @@
 namespace acl
 {
 
-thread_queue::thread_queue()
+thread_queue::thread_queue(void)
 {
 	queue_ = (ACL_AQUEUE*) acl_aqueue_new();
 }
@@ -17,7 +17,7 @@ static void free_qitem(void* item)
 	delete qitem;
 }
 
-thread_queue::~thread_queue()
+thread_queue::~thread_queue(void)
 {
 	acl_aqueue_free(queue_, free_qitem);
 }
@@ -35,7 +35,7 @@ thread_qitem* thread_queue::pop(int wait_ms /* = -1 */)
 				queue_, wait_sec, wait_usec);
 }
 
-int thread_queue::qlen() const
+int thread_queue::qlen(void) const
 {
 	return acl_aqueue_qlen(queue_);
 }

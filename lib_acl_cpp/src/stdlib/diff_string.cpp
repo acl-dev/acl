@@ -39,11 +39,13 @@ bool diff_string::operator== (const diff_object& obj) const
 
 bool diff_string::check_range(long long range_from, long long range_to) const
 {
-	if(range_from == -1 || range_to == -1)
+	if(range_from == -1 || range_to == -1) {
 		return true;
+	}
 
-	if (range_ < 0)
+	if (range_ < 0) {
 		return true;
+	}
 
 	return (range_ >= range_from && range_ <= range_to);
 }

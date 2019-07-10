@@ -11,8 +11,9 @@ namespace acl {
 xml_node::xml_node(xml* xml_ptr)
 	: xml_(xml_ptr)
 {
-	if (xml_ptr == NULL)
+	if (xml_ptr == NULL) {
 		abort();
+	}
 }
 
 xml_node::~xml_node(void)
@@ -23,13 +24,15 @@ xml_node::~xml_node(void)
 void xml_node::clear(void)
 {
 	std::vector<xml_node*>::iterator it = nodes_tmp_.begin();
-	for (; it != nodes_tmp_.end(); ++it)
+	for (; it != nodes_tmp_.end(); ++it) {
 		delete *it;
+	}
 	nodes_tmp_.clear();
 
 	std::vector<xml_attr*>::iterator it2 = attrs_tmp_.begin();
-	for (; it2 != attrs_tmp_.end(); ++it2)
+	for (; it2 != attrs_tmp_.end(); ++it2) {
 		delete *it2;
+	}
 	attrs_tmp_.clear();
 }
 
@@ -83,8 +86,9 @@ xml_node& xml_node::set_text(acl_int64 number)
 {
 	char buf[32];
 
-	if (acl_i64toa(number, buf, sizeof(buf)) == NULL)
+	if (acl_i64toa(number, buf, sizeof(buf)) == NULL) {
 		abort();
+	}
 	return set_text(buf);
 }
 
@@ -120,7 +124,7 @@ xml_node& xml_node::add_child(const char* tag, istream& in, size_t off /* = 0 */
 //////////////////////////////////////////////////////////////////////
 
 xml::xml(size_t dbuf_nblock /* = 2 */, size_t dbuf_capacity /* = 100 */)
-	: dbuf_(dbuf_nblock, dbuf_capacity)
+: dbuf_(dbuf_nblock, dbuf_capacity)
 {
 	//dummyRootAdded_ = false;
 	buf_ = NULL;
@@ -132,14 +136,16 @@ xml::~xml(void)
 	clear();
 
 	delete buf_;
-	if (m_pTokenTree)
+	if (m_pTokenTree) {
 		acl_token_tree_destroy(m_pTokenTree);
+	}
 }
 
 void xml::clear(void)
 {
-	if (buf_)
+	if (buf_) {
 		buf_->clear();
+	}
 
 	//std::vector<acl::xml_node*>::iterator it = elements_.begin();
 	//for (; it != elements_.end(); ++it)
@@ -154,7 +160,7 @@ void xml::clear(void)
 	dbuf_.dbuf_reset();
 }
 
-const acl::string& xml::getText()
+const acl::string& xml::getText(void)
 {
 	if (buf_ == NULL)
 		buf_ = NEW string();
@@ -166,8 +172,9 @@ const acl::string& xml::getText()
 xml_node& xml::create_node(const char* tag, acl_int64 number)
 {
 	char buf[32];
-	if (acl_i64toa(number, buf, sizeof(buf)) == NULL)
+	if (acl_i64toa(number, buf, sizeof(buf)) == NULL) {
 		abort();
+	}
 
 	return create_node(tag, buf);
 }
@@ -180,12 +187,15 @@ int xml::push_pop(const char* in, size_t len acl_unused,
 	//	update("<dummy_root>");
 	//	dummyRootAdded_ = true;
 	//}
-	if (in)
+	if (in) {
 		update(in);
-	if (out == NULL)
-		return (0);
-	if (max > 0 && len > max)
+	}
+	if (out == NULL) {
+		return 0;
+	}
+	if (max > 0 && len > max) {
 		len = max;
+	}
 	out->append(in, len);
 	return (int) len;
 }

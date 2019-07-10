@@ -17,13 +17,11 @@ void escape(const char* in, size_t len, acl::string& out)
 {
 	char  ch;
 
-	while (len > 0)
-	{
+	while (len > 0) {
 		ch = *in;
-		if (ch >= noescape_min)
+		if (ch >= noescape_min) {
 			out << ch;
-		else
-		{
+		} else {
 			out << (char) escape_prefix;
 			out << (char) (ch + escape_shift);
 		}
@@ -36,18 +34,17 @@ bool unescape(const char* in, size_t len, acl::string& out)
 {
 	char  ch;
 
-	while (len > 0)
-	{
+	while (len > 0) {
 		ch = *in;
-		if (ch != escape_prefix)
+		if (ch != escape_prefix) {
 			out << ch;
-		else if (*++in == 0)
-			return (false);
-		else
-		{
+		} else if (*++in == 0) {
+			return false;
+		} else {
 			ch = *in;
-			if (ch < escape_shift)
-				return (false);
+			if (ch < escape_shift) {
+				return false;
+			}
 			ch -= escape_shift;
 			out << ch;
 		}
@@ -55,7 +52,7 @@ bool unescape(const char* in, size_t len, acl::string& out)
 		len--;
 	}
 
-	return (true);
+	return true;
 }
 
 } // namespace acl

@@ -10,13 +10,10 @@ namespace acl {
 
 thread_cond::thread_cond(thread_mutex* mutex)
 {
-	if (mutex)
-	{
+	if (mutex) {
 		mutex_internal_ = NULL;
 		mutex_ = mutex;
-	}
-	else
-	{
+	} else {
 		mutex_internal_ = NEW thread_mutex;
 		mutex_  = mutex_internal_;
 	}
@@ -50,31 +47,29 @@ bool thread_cond::notify_all(void)
 bool thread_cond::wait(long long microseconds /* = -1 */,
 	bool locked /* = false */)
 {
-	if (microseconds >= 0)
+	if (microseconds >= 0) {
 		return timed_wait(microseconds, locked);
-	else
+	} else {
 		return block_wait(locked);
+	}
 }
 
 bool thread_cond::block_wait(bool locked)
 {
 	bool locked_internal;
 
-	if (!locked)
-	{
-		if (!mutex_->lock())
-		{
+	if (!locked) {
+		if (!mutex_->lock()) {
 			logger_error("lock error=%s", last_serror());
 			return false;
 		}
 		locked_internal = true;
-	}
-	else
+	} else {
 		locked_internal = false;
+	}
 
 	int ret = acl_pthread_cond_wait(cond_, mutex_->get_mutex());
-	if (ret)
-	{
+	if (ret) {
 #ifdef ACL_UNIX
 		acl_set_error(ret);
 #endif
@@ -82,8 +77,7 @@ bool thread_cond::block_wait(bool locked)
 	}
 
 	// 如果本方法内部前面加了锁，则此处需要解锁
-	if (locked_internal && !mutex_->unlock())
-	{
+	if (locked_internal && !mutex_->unlock()) {
 		logger_error("mutex unlock error=%s", last_serror());
 		return false;
 	}
@@ -102,31 +96,28 @@ bool thread_cond::timed_wait(long long microseconds, bool locked)
 	ts.tv_sec  += (long) n / SEC_TO_NS;
 
 	bool locked_internal;
-	if (mutex_internal_ || !locked)
-	{
-		if (!mutex_->lock())
-		{
+	if (mutex_internal_ || !locked) {
+		if (!mutex_->lock()) {
 			logger_error("lock error=%s", last_serror());
 			return false;
 		}
 		locked_internal = true;
-	}
-	else
+	} else {
 		locked_internal = false;
+	}
 
 	int ret = acl_pthread_cond_timedwait(cond_, mutex_->get_mutex(), &ts);
-	if (ret)
-	{
+	if (ret) {
 #ifdef ACL_UNIX
 		acl_set_error(ret);
 #endif
-		if (ret != ACL_ETIMEDOUT)
+		if (ret != ACL_ETIMEDOUT) {
 			logger_error("pthread_cond_timedwait error=%s",
 				last_serror());
+		}
 	}
 
-	if (locked_internal && !mutex_->unlock())
-	{
+	if (locked_internal && !mutex_->unlock()) {
 		logger_error("mutex unlock error=%s", last_serror());
 		return false;
 	}

@@ -13,9 +13,7 @@ token_node::token_node(void)
 {
 }
 
-token_node::~token_node(void)
-{
-}
+token_node::~token_node(void) {}
 
 void token_node::set_node(ACL_TOKEN* token, token_tree* tree)
 {

@@ -11,28 +11,31 @@ static bool m_bOpened = false;
 void log::open(const char* recipients, const char* procname /* = unknown */,
 	const char* cfg /* = NULL */)
 {
-	if (m_bOpened)
+	if (m_bOpened) {
 		return;
+	}
 
 	acl_assert(recipients);
 	acl_assert(procname);
 
 	const char* ptr = strrchr(procname, '/');
-	if (ptr)
+	if (ptr) {
 		procname = ptr + 1;
+	}
 #ifdef	ACL_WINDOWS
-	if (ptr == NULL)
-	{
+	if (ptr == NULL) {
 		ptr = strrchr(procname, '\\');
-		if (ptr)
+		if (ptr) {
 			procname = ptr + 1;
+		}
 	}
 #endif
 
 	acl_msg_open(recipients, procname);
 	m_bOpened = true;
-	if (cfg)
+	if (cfg) {
 		acl_debug_init(cfg);
+	}
 }
 
 void log::close(void)
@@ -46,8 +49,9 @@ void log::close(void)
 
 void log::debug_init(const char* cfg)
 {
-	if (cfg && *cfg)
+	if (cfg && *cfg) {
 		acl_debug_init(cfg);
+	}
 }
 
 void log::stdout_open(bool onoff)
@@ -83,14 +87,15 @@ void log::vmsg5(const char* fname, int line, const char* func,
 	const char* fmt, va_list ap)
 {
 	const char* ptr = strrchr(fname, '/');
-	if (ptr)
+	if (ptr) {
 		fname = ptr + 1;
+	}
 #ifdef	ACL_WINDOWS
-	if (ptr == NULL)
-	{
+	if (ptr == NULL) {
 		ptr = strrchr(fname, '\\');
-		if (ptr)
+		if (ptr) {
 			fname = ptr + 1;
+		}
 	}
 #endif
 	acl::string s;
@@ -110,8 +115,9 @@ void log::msg3(size_t section, size_t level, const char* fmt, ...)
 
 void log::vmsg4(size_t section, size_t level, const char* fmt, va_list ap)
 {
-	if (acl_do_debug((int) section, (int) level))
+	if (acl_do_debug((int) section, (int) level)) {
 		vmsg2(fmt, ap);
+	}
 }
 
 void log::msg6(size_t section, size_t level, const char* fname,
@@ -127,18 +133,20 @@ void log::msg6(size_t section, size_t level, const char* fname,
 void log::vmsg7(size_t section, size_t level, const char* fname,
 	int line, const char* func, const char* fmt, va_list ap)
 {
-	if (!acl_do_debug((int) section, (int) level))
+	if (!acl_do_debug((int) section, (int) level)) {
 		return;
+	}
 
 	const char* ptr = strrchr(fname, '/');
-	if (ptr)
+	if (ptr) {
 		fname = ptr + 1;
+	}
 #ifdef	ACL_WINDOWS
-	if (ptr == NULL)
-	{
+	if (ptr == NULL) {
 		ptr = strrchr(fname, '\\');
-		if (ptr)
+		if (ptr) {
 			fname = ptr + 1;
+		}
 	}
 #endif
 
@@ -176,14 +184,15 @@ void log::vwarn5(const char* fname, int line, const char* func,
 	const char* fmt, va_list ap)
 {
 	const char* ptr = strrchr(fname, '/');
-	if (ptr)
+	if (ptr) {
 		fname = ptr + 1;
+	}
 #ifdef	ACL_WINDOWS
-	if (ptr == NULL)
-	{
+	if (ptr == NULL) {
 		ptr = strrchr(fname, '\\');
-		if (ptr)
+		if (ptr) {
 			fname = ptr + 1;
+		}
 	}
 #endif
 
@@ -221,14 +230,15 @@ void log::verror5(const char* fname, int line, const char* func,
 	const char* fmt, va_list ap)
 {
 	const char* ptr = strrchr(fname, '/');
-	if (ptr)
+	if (ptr) {
 		fname = ptr + 1;
+	}
 #ifdef	ACL_WINDOWS
-	if (ptr == NULL)
-	{
+	if (ptr == NULL) {
 		ptr = strrchr(fname, '\\');
-		if (ptr)
+		if (ptr) {
 			fname = ptr + 1;
+		}
 	}
 #endif
 
@@ -266,14 +276,15 @@ void log::vfatal5(const char* fname, int line, const char* func,
 	const char* fmt, va_list ap)
 {
 	const char* ptr = strrchr(fname, '/');
-	if (ptr)
+	if (ptr) {
 		fname = ptr + 1;
+	}
 #ifdef	ACL_WINDOWS
-	if (ptr == NULL)
-	{
+	if (ptr == NULL) {
 		ptr = strrchr(fname, '\\');
-		if (ptr)
+		if (ptr) {
 			fname = ptr + 1;
+		}
 	}
 #endif
 

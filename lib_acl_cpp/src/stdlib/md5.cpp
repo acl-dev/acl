@@ -134,15 +134,12 @@ namespace acl
  * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
  * initialization constants.
  */
-md5::md5()
+md5::md5(void)
 {
 	reset();
 }
 
-md5::~md5()
-{
-
-}
+md5::~md5(void) {}
 
 md5& md5::reset()
 {
@@ -171,12 +168,12 @@ md5& md5::update(const void *in, size_t len)
 	/* Update byte count */
 
 	t = bytes_[0];
-	if ((bytes_[0] = t + (unsigned int) len) < t)
+	if ((bytes_[0] = t + (unsigned int) len) < t) {
 		bytes_[1]++;	/* Carry from low to high */
+	}
 
 	t = 64 - (t & 0x3f);	/* Space available in in_ (at least 1) */
-	if ((size_t) t > len)
-	{
+	if ((size_t) t > len) {
 		memcpy((unsigned char *) in_ + 64 - t, buf, len);
 		return *this;
 	}
@@ -188,8 +185,7 @@ md5& md5::update(const void *in, size_t len)
 	len -= t;
 
 	/* Process data in 64-byte chunks */
-	while (len >= 64)
-	{
+	while (len >= 64) {
 		memcpy(in_, buf, 64);
 		byteSwap(in_, 16);
 		transform(buf_, in_);
@@ -199,7 +195,6 @@ md5& md5::update(const void *in, size_t len)
 
 	/* Handle any remaining bytes of data. */
 	memcpy(in_, buf, len);
-
 	return *this;
 }
 
@@ -218,8 +213,7 @@ md5& md5::finish()
 	/* Bytes of padding needed to make 56 bytes (-8..55) */
 	count = 56 - 1 - count;
 
-	if (count < 0)
-	{
+	if (count < 0) {
 		/* Padding forces an extra block */
 		memset(p, 0, count + 8);
 		byteSwap(in_, 16);
@@ -246,12 +240,12 @@ md5& md5::finish()
 	return *this;
 }
 
-const char* md5::get_digest() const
+const char* md5::get_digest(void) const
 {
 	return (const char*) digest_;
 }
 
-const char* md5::get_string() const
+const char* md5::get_string(void) const
 {
 	const_cast<md5*>(this)->hex_encode(digest_,
 		(char*) digest_s_, sizeof(digest_s_));
@@ -265,12 +259,13 @@ const char* md5::md5_digest(const void *dat, size_t dlen,
 
 	size = size > 16 ? 16 : size;
 
-	if (key != NULL && klen > 0)
+	if (key != NULL && klen > 0) {
 		md5.update(key, klen);
+	}
 	md5.update(dat, dlen);
 	md5.finish();
 	memcpy(out, md5.get_digest(), size);
-	return ((const char*) out);
+	return (const char*) out;
 }
 
 const char* md5::md5_string(const void *dat, size_t dlen,
@@ -278,14 +273,15 @@ const char* md5::md5_string(const void *dat, size_t dlen,
 {
 	md5 md5;
 
-	if (key != NULL && klen > 0)
+	if (key != NULL && klen > 0) {
 		md5.update(key, klen);
+	}
 	md5.update(dat, dlen);
 	md5.finish();
 
 	const unsigned char* d = (const unsigned char*) md5.get_digest();
 	hex_encode(d, out, size);
-	return (out);
+	return out;
 }
 
 acl_int64 md5::md5_file(const char* path, const void *key, size_t klen,
@@ -293,8 +289,7 @@ acl_int64 md5::md5_file(const char* path, const void *key, size_t klen,
 {
 	ifstream in;
 
-	if (in.open_read(path) == false)
-	{
+	if (!in.open_read(path)) {
 		logger_error("open file: %s error: %s", path, last_serror());
 		return -1;
 	}
@@ -309,25 +304,26 @@ acl_int64 md5::md5_file(istream& in, const void *key, size_t klen,
 	int  ret;
 	md5 md5;
 
-	if (size < 33)
-	{
+	if (size < 33) {
 		logger_error("size(%d) < 33", (int) size);
 		return -1;
 	}
 
-	if (key && klen > 0)
+	if (key && klen > 0) {
 		md5.update(key, klen);
-	while (true)
-	{
+	}
+	while (true) {
 		ret = in.read(buf, sizeof(buf), false);
-		if (ret < 0)
+		if (ret < 0) {
 			break;
+		}
 		n += ret;
 		md5.update(buf, ret);
 	}
 	
-	if (n == 0)
+	if (n == 0) {
 		return -1;
+	}
 	md5.finish();
 
 	const char* ptr = md5.get_digest();
@@ -342,13 +338,13 @@ const char* md5::hex_encode(const void *in, char* out, size_t size)
 	char *ptr;
 	unsigned char digest[16];
 
-	if (size < 33)
+	if (size < 33) {
 		abort();
+	}
 
 	memcpy(digest, in, 16);
 
-	for (i = 0; i < 16; i++)
-	{
+	for (i = 0; i < 16; i++) {
 #if _MSC_VER >= 1500
 		sprintf_s(&(buf[2 * i]), 3, "%02x", (unsigned char) digest[i]);
 		sprintf_s(&(buf[2 * i + 1]), 3, "%02x",
@@ -362,10 +358,11 @@ const char* md5::hex_encode(const void *in, char* out, size_t size)
 
 	ptr = out;
 
-	for (i = 0; i < 32; i++)
+	for (i = 0; i < 32; i++) {
 		*ptr++ = buf[i];
-	*ptr = '\0';
+	}
 
+	*ptr = '\0';
 	return (out);
 }
 

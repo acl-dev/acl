@@ -23,17 +23,17 @@ int safe_snprintf(char *buf, size_t size, const char *fmt, ...)
 
 int safe_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 {
-	if (size == 0)
-	{
+	if (size == 0) {
 		buf[0] = 0;
 		return -1;
 	}
 
 	int ret = ::_vsnprintf_s(buf, size, _TRUNCATE, fmt, ap);
-	if (ret < 0)
+	if (ret < 0) {
 		return -1;
-	else
+	} else {
 		return ret;
+	}
 }
 
 # else
@@ -50,20 +50,18 @@ int safe_snprintf(char *buf, size_t size, const char *fmt, ...)
 
 int safe_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 {
-	if (size == 0)
-	{
+	if (size == 0) {
 		buf[0] = 0;
 		return -1;
 	}
 
 	int   ret = ::_vsnprintf(buf, size, fmt, ap);
-	if (ret < 0 || ret >= (int) size)
-	{
+	if (ret < 0 || ret >= (int) size) {
 		buf[size - 1] = 0;
 		return -1;
-	}
-	else
+	} else {
 		return ret;
+	}
 }
 
 # endif // __STDC_WANT_SECURE_LIB__

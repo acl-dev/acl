@@ -7,23 +7,24 @@
 namespace acl
 {
 
-dbuf_pool::dbuf_pool()
+dbuf_pool::dbuf_pool(void)
 {
 }
 
-dbuf_pool::~dbuf_pool()
+dbuf_pool::~dbuf_pool(void)
 {
 }
 
-void dbuf_pool::destroy()
+void dbuf_pool::destroy(void)
 {
 	delete this;
 }
 
 void *dbuf_pool::operator new(size_t size, size_t nblock /* = 2 */)
 {
-	if (nblock == 0)
+	if (nblock == 0) {
 		nblock = 2;
+	}
 	ACL_DBUF_POOL* pool = acl_dbuf_pool_create(4096 * nblock);
 	dbuf_pool* dbuf     = (dbuf_pool*) acl_dbuf_pool_alloc(pool, size);
 	dbuf->pool_         = pool;
@@ -95,18 +96,20 @@ bool dbuf_pool::dbuf_unkeep(const void* addr)
 //////////////////////////////////////////////////////////////////////////////
 
 dbuf_obj::dbuf_obj(dbuf_guard* guard /* = NULL */)
-	: guard_(guard)
-	, nrefer_(0)
-	, pos_(-1)
+: guard_(guard)
+, nrefer_(0)
+, pos_(-1)
 {
-	if (guard)
+	if (guard) {
 		guard->push_back(this);
+	}
 }
 
 void dbuf_guard::init(size_t capacity)
 {
-	if (capacity == 0)
+	if (capacity == 0) {
 		capacity = 500;
+	}
 	head_.capacity = capacity;
 	head_.size = 0;
 	head_.next = NULL;
@@ -117,36 +120,36 @@ void dbuf_guard::init(size_t capacity)
 }
 
 dbuf_guard::dbuf_guard(acl::dbuf_pool* dbuf, size_t capacity /* = 500 */)
-	: nblock_(2)
-	, incr_(500)
-	, size_(0)
+: nblock_(2)
+, incr_(500)
+, size_(0)
 {
-	if (dbuf == NULL)
+	if (dbuf == NULL) {
 		dbuf_ = new (nblock_) acl::dbuf_pool;
-	else
+	} else {
 		dbuf_ = dbuf;
+	}
 
 	init(capacity);
 }
 
 dbuf_guard::dbuf_guard(size_t nblock /* = 2 */, size_t capacity /* = 500 */)
-	: nblock_(nblock == 0 ? 2 : nblock)
-	, incr_(500)
-	, size_(0)
+: nblock_(nblock == 0 ? 2 : nblock)
+, incr_(500)
+, size_(0)
 {
 	dbuf_ = new (nblock_) acl::dbuf_pool;
-
 	init(capacity);
 }
 
-dbuf_guard::~dbuf_guard()
+dbuf_guard::~dbuf_guard(void)
 {
 	dbuf_objs_link* link = &head_;
 
-	while (link != NULL)
-	{
-		for (size_t i = 0; i < link->size; i++)
+	while (link != NULL) {
+		for (size_t i = 0; i < link->size; i++) {
 			link->objs[i]->~dbuf_obj();
+		}
 
 		link = link->next;
 	}
@@ -158,10 +161,10 @@ bool dbuf_guard::dbuf_reset(size_t reserve /* = 0 */)
 {
 	dbuf_objs_link* link = &head_;
 
-	while (link != NULL)
-	{
-		for (size_t i = 0; i < link->size; i++)
+	while (link != NULL) {
+		for (size_t i = 0; i < link->size; i++) {
 			link->objs[i]->~dbuf_obj();
+		}
 		link->size = 0;
 		link = link->next;
 	}
@@ -173,7 +176,7 @@ bool dbuf_guard::dbuf_reset(size_t reserve /* = 0 */)
 	return dbuf_->dbuf_reset(reserve);
 }
 
-void dbuf_guard::extend_objs()
+void dbuf_guard::extend_objs(void)
 {
 	dbuf_objs_link* link = (dbuf_objs_link*)
 		dbuf_->dbuf_alloc(sizeof(dbuf_objs_link));
@@ -188,32 +191,30 @@ void dbuf_guard::extend_objs()
 
 void dbuf_guard::set_increment(size_t incr)
 {
-	if (incr > 0)
+	if (incr > 0) {
 		incr_ = incr;
+	}
 }
 
 int dbuf_guard::push_back(dbuf_obj* obj)
 {
-	if (obj->nrefer_ < 1)
-	{
-		if (obj->guard_ == NULL)
+	if (obj->nrefer_ < 1) {
+		if (obj->guard_ == NULL) {
 			obj->guard_ = this;
-		else if (obj->guard_ != this)
-		{
+		} else if (obj->guard_ != this) {
 			logger_fatal("obj->guard_(%p) != me(%p), nrefer: %d",
 				obj->guard_, this, obj->nrefer_);
 		}
 
-		if (curr_->size >= curr_->capacity)
+		if (curr_->size >= curr_->capacity) {
 			extend_objs();
+		}
 
 		curr_->objs[curr_->size] = obj;
 		obj->nrefer_++;
 		obj->pos_ = (int) size_++;
 		curr_->size++;
-	}
-	else if (obj->guard_ != this)
-	{
+	} else if (obj->guard_ != this) {
 		logger_fatal("obj->guard_(%p) != me(%p), nrefer: %d",
 			obj->guard_, this, obj->nrefer_);
 	}
@@ -228,16 +229,17 @@ dbuf_obj* dbuf_guard::operator[](size_t pos) const
 
 dbuf_obj* dbuf_guard::get(size_t pos) const
 {
-	if (pos >= size_)
+	if (pos >= size_) {
 		return NULL;
+	}
 
 	size_t n = 0;
 	const dbuf_objs_link* link = &head_;
 
-	while (link != NULL)
-	{
-		if (pos >= n && pos < n + link->size)
+	while (link != NULL) {
+		if (pos >= n && pos < n + link->size) {
 			return link->objs[pos - n];
+		}
 
 		n += link->size;
 		link = link->next;

@@ -8,7 +8,7 @@
 namespace acl
 {
 
-thread_pool::thread_pool()
+thread_pool::thread_pool(void)
 : stack_size_(0)
 , threads_limit_(100)
 , thread_idle_(0)
@@ -18,10 +18,11 @@ thread_pool::thread_pool()
 		acl_mycalloc(1, sizeof(acl_pthread_pool_attr_t));
 }
 
-thread_pool::~thread_pool()
+thread_pool::~thread_pool(void)
 {
-	if (thr_pool_ != NULL)
+	if (thr_pool_ != NULL) {
 		stop();
+	}
 
 	acl_myfree(thr_attr_);
 }
@@ -44,10 +45,11 @@ thread_pool& thread_pool::set_idle(int ttl)
 	return *this;
 }
 
-void thread_pool::start()
+void thread_pool::start(void)
 {
-	if (thr_pool_)
+	if (thr_pool_) {
 		return;
+	}
 
 	acl_pthread_pool_attr_set_stacksize(thr_attr_, stack_size_);
 	acl_pthread_pool_attr_set_threads_limit(thr_attr_, (int) threads_limit_);
@@ -58,33 +60,31 @@ void thread_pool::start()
 	acl_pthread_pool_atfree(thr_pool_, thread_exit, this);
 }
 
-void thread_pool::stop()
+void thread_pool::stop(void)
 {
-	if (thr_pool_)
-	{
+	if (thr_pool_) {
 		acl_pthread_pool_destroy(thr_pool_);
 		thr_pool_ = NULL;
 	}
 }
 
-void thread_pool::wait()
+void thread_pool::wait(void)
 {
-	if (thr_pool_)
+	if (thr_pool_) {
 		acl_pthread_pool_stop(thr_pool_);
-	else
+	} else {
 		logger_warn("no thread working, call start first!");
+	}
 }
 
 bool thread_pool::run(thread_job* job)
 {
-	if (job == NULL)
-	{
+	if (job == NULL) {
 		logger_error("thr null!");
 		return false;
 	}
 
-	if (thr_pool_ == NULL)
-	{
+	if (thr_pool_ == NULL) {
 		logger_error("start() not called yet!");
 		return false;
 	}
@@ -98,10 +98,9 @@ bool thread_pool::execute(thread_job* job)
 	return run(job);
 }
 
-int  thread_pool::threads_count() const
+int  thread_pool::threads_count(void) const
 {
-	if (thr_pool_ == NULL)
-	{
+	if (thr_pool_ == NULL) {
 		logger_error("start() not called yet!");
 		return -1;
 	}
@@ -109,10 +108,9 @@ int  thread_pool::threads_count() const
 	return acl_pthread_pool_size(thr_pool_);
 }
 
-int  thread_pool::task_qlen() const
+int  thread_pool::task_qlen(void) const
 {
-	if (thr_pool_ == NULL)
-	{
+	if (thr_pool_ == NULL) {
 		logger_error("start() not called yet!");
 		return -1;
 	}

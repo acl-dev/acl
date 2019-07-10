@@ -13,13 +13,10 @@ diff_manager::diff_manager(long long range_from /* = -1 */,
 {
 	dbuf_.set_increment(10000);
 
-	if (range_from > 0 && range_to >= range_from)
-	{
+	if (range_from > 0 && range_to >= range_from) {
 		range_from_ = range_from;
 		range_to_   = range_to;
-	}
-	else
-	{
+	} else {
 		range_from_ = -1;
 		range_to_   = -1;
 	}
@@ -66,8 +63,8 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 			ACL_HTABLE_FLAG_KEY_REUSE);
 
 	for (std::vector<diff_object*>::const_iterator cit = old_objs.begin();
-		cit != old_objs.end(); ++cit)
-	{
+		cit != old_objs.end(); ++cit) {
+
 		key = (const char* ) (*cit)->get_key();
 		(void) acl_htable_enter(htable, key, (void*) *cit);
 	}
@@ -78,8 +75,8 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 	// 遍历当前集合中的对象，将之与旧对象集合进行比较，找出新增的，旧的
 	// 以及变化的对象集合
 	for (std::vector<diff_object*>::const_iterator cit = curr_objs.begin();
-		cit != curr_objs.end(); ++cit)
-	{
+		cit != curr_objs.end(); ++cit) {
+
 		key = (*cit)->get_key();
 
 		// 在旧集合中查询当前对象是否存在
@@ -88,12 +85,12 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 
 		// 如果不存在，则说明该对象为新对象，则将该对象做为新添加对象
 		// 添加进新对象集合中
-		if (entry == NULL)
-		{
-			if ((*cit)->check_range(range_from_, range_to_))
+		if (entry == NULL) {
+			if ((*cit)->check_range(range_from_, range_to_)) {
 				objs_new_extra_.push_back(*cit);
-			else
+			} else {
 				objs_new_.push_back(*cit);
+			}
 			continue;
 		}
 
@@ -101,8 +98,7 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 
 		// 如果当前对象与旧对象相同，则将该对象放至相同对象集合中，
 		// 同时将之从当前对象集合及旧对象集合（哈希集合）中删除
-		if (*obj == **cit)
-		{
+		if (*obj == **cit) {
 			acl_htable_delete_entry(htable, entry, NULL);
 			objs_equ_.push_back(*cit);
 			continue;
@@ -110,10 +106,11 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 
 		// 说明是 KEY 相等，但对象中的内容并不相等，则需要从当前集合
 		// 及哈希集合中删除，并加入至变化的集合中
-		if ((*cit)->check_range(range_from_, range_to_))
+		if ((*cit)->check_range(range_from_, range_to_)) {
 			objs_upd_extra_.push_back(std::make_pair(*cit, obj));
-		else
+		} else {
 			objs_upd_.push_back(std::make_pair(*cit, obj));
+		}
 		(void) acl_htable_delete(htable, key, NULL);
 	}
 
@@ -121,13 +118,13 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 	// 	(int) objs_new_extra_.size(), (int) objs_new_.size());
 	// 遍历存有旧对象的集合（哈希表对象），其中剩余的元素为已删除的对象
 	ACL_ITER iter;
-	acl_foreach(iter, htable)
-	{
+	acl_foreach(iter, htable) {
 		obj = (diff_object*) iter.data;
-		if (obj->check_range(range_from_, range_to_))
+		if (obj->check_range(range_from_, range_to_)) {
 			objs_del_extra_.push_back(obj);
-		else
+		} else {
 			objs_del_.push_back(obj);
+		}
 	}
 
 	// 销毁临时哈希表对象

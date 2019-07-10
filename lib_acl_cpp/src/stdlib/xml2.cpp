@@ -11,8 +11,8 @@
 namespace acl {
 
 xml2_attr::xml2_attr(xml_node* node, ACL_XML2_ATTR* attr)
-	: xml_attr(node)
-	, attr_(attr)
+: xml_attr(node)
+, attr_(attr)
 {
 	acl_assert(attr_);
 }
@@ -30,12 +30,12 @@ const char* xml2_attr::get_value(void) const
 //////////////////////////////////////////////////////////////////////////
 
 xml2_node::xml2_node(xml* xml_ptr, ACL_XML2_NODE* node)
-	: xml_node(xml_ptr)
-	, node_(node)
-	, child_iter_(NULL)
-	, attr_iter_(NULL)
-	, parent_(NULL)
-	, parent_internal_(NULL)
+: xml_node(xml_ptr)
+, node_(node)
+, child_iter_(NULL)
+, attr_iter_(NULL)
+, parent_(NULL)
+, parent_internal_(NULL)
 {
 	acl_assert(node);
 }
@@ -43,10 +43,12 @@ xml2_node::xml2_node(xml* xml_ptr, ACL_XML2_NODE* node)
 xml2_node::~xml2_node(void)
 {
 	delete parent_internal_;
-	if (child_iter_)
+	if (child_iter_) {
 		acl_myfree(child_iter_);
-	if (attr_iter_)
+	}
+	if (attr_iter_) {
 		acl_myfree(attr_iter_);
+	}
 }
 
 ACL_XML2_NODE* xml2_node::get_xml_node(void) const
@@ -77,16 +79,19 @@ const char* xml2_node::attr_value(const char* name) const
 const xml_attr* xml2_node::first_attr(void) const
 {
 	ACL_ARRAY* a = node_->attr_list;
-	if (a == NULL)
+	if (a == NULL) {
 		return NULL;
+	}
 
-	if (attr_iter_ == NULL)
+	if (attr_iter_ == NULL) {
 		const_cast<xml2_node*>(this)->attr_iter_ =
 			(ACL_ITER*) acl_mymalloc(sizeof(ACL_ITER));
+	}
 
 	ACL_XML2_ATTR* attr = (ACL_XML2_ATTR*) a->iter_head(attr_iter_, a);
-	if (attr == NULL)
+	if (attr == NULL) {
 		return NULL;
+	}
 
 	xml2_attr* xa = NEW xml2_attr(const_cast<xml2_node*>(this), attr);
 	const_cast<xml2_node*>(this)->attrs_tmp_.push_back(xa);
@@ -96,14 +101,16 @@ const xml_attr* xml2_node::first_attr(void) const
 const xml_attr* xml2_node::next_attr(void) const
 {
 	ACL_ARRAY* a = node_->attr_list;
-	if (a == NULL)
+	if (a == NULL) {
 		return NULL;
+	}
 
 	acl_assert(attr_iter_);
 
 	ACL_XML2_ATTR* attr = (ACL_XML2_ATTR*) a->iter_next(attr_iter_, a);
-	if (attr == NULL)
+	if (attr == NULL) {
 		return NULL;
+	}
 
 	xml2_attr* xa = NEW xml2_attr(const_cast<xml2_node*>(this), attr);
 	const_cast<xml2_node*>(this)->attrs_tmp_.push_back(xa);
@@ -119,10 +126,11 @@ xml_node& xml2_node::add_attr(const char* name, const char* value)
 
 xml_node& xml2_node::set_text(const char* str, bool append /* = false */)
 {
-	if (append)
+	if (append) {
 		acl_xml2_node_add_text(node_, str);
-	else
+	} else {
 		acl_xml2_node_set_text(node_, str);
+	}
 	return *this;
 }
 
@@ -139,8 +147,9 @@ xml_node& xml2_node::add_child(xml_node* child, bool return_child /* = false */)
 	acl_xml2_node_add_child(node_, node);
 	child->set_parent(this);
 
-	if (return_child)
+	if (return_child) {
 		return *child;
+	}
 	return *this;
 }
 
@@ -157,12 +166,13 @@ xml_node& xml2_node::set_parent(xml_node* parent)
 
 xml_node& xml2_node::get_parent(void) const
 {
-	if (parent_)
+	if (parent_) {
 		return *parent_;
-	else if (node_->parent == node_->xml->root)
+	} else if (node_->parent == node_->xml->root) {
 		return xml_->get_root();
-	else if (node_->parent == NULL)  // xxx
+	} else if (node_->parent == NULL) { // xxx
 		return xml_->get_root();
+	}
 
 	xml2_node* node = NEW xml2_node(xml_, node_->parent);
 	const_cast<xml2_node*>(this)->parent_internal_ = node;
@@ -173,12 +183,14 @@ xml_node& xml2_node::get_parent(void) const
 
 xml_node* xml2_node::first_child(void)
 {
-	if (child_iter_ == NULL)
+	if (child_iter_ == NULL) {
 		child_iter_ = (ACL_ITER*) acl_mymalloc(sizeof(ACL_ITER));
+	}
 
 	ACL_XML2_NODE* node = node_->iter_head(child_iter_, node_);
-	if (node == NULL)
+	if (node == NULL) {
 		return NULL;
+	}
 
 	xml2_node* n = NEW xml2_node(xml_, node);
 	nodes_tmp_.push_back(n);
@@ -191,8 +203,9 @@ xml_node* xml2_node::next_child(void)
 	acl_assert(child_iter_);
 
 	ACL_XML2_NODE* node = node_->iter_next(child_iter_, node_);
-	if (node == NULL)
+	if (node == NULL) {
 		return NULL;
+	}
 
 	xml2_node* n = NEW xml2_node(xml_, node);
 	nodes_tmp_.push_back(n);
@@ -222,32 +235,34 @@ int xml2_node::children_count(void) const
 xml2::xml2(const char* filepath, size_t max_len, const char* data /* = NULL */,
 	size_t init_len /* = 8192 */, size_t dbuf_nblock /* = 2 */,
 	size_t dbuf_capacity /* = 100 */)
-	: xml(dbuf_nblock, dbuf_capacity)
+: xml(dbuf_nblock, dbuf_capacity)
 {
 	acl_assert(filepath && max_len > 0 && init_len > 0);
 
-	if (max_len < init_len)
+	if (max_len < init_len) {
 		max_len = init_len;
+	}
 
 	iter_ = NULL;
 	root_ = NULL;
 
 	xml_ = acl_xml2_mmap_file(filepath, max_len, init_len, NULL);
 
-	if (data && *data)
+	if (data && *data) {
 		update(data);
-
+	}
 }
 
 xml2::xml2(fstream& fp, size_t max_len, const char* data /* = NULL */,
 	size_t init_len /* = 8192 */, size_t dbuf_nblock /* = 2 */,
 	size_t dbuf_capacity /* = 100 */)
-	: xml(dbuf_nblock, dbuf_capacity)
+: xml(dbuf_nblock, dbuf_capacity)
 {
 	acl_assert(max_len > 0 && init_len > 0);
 
-	if (max_len < init_len)
+	if (max_len < init_len) {
 		max_len = init_len;
+	}
 
 	iter_ = NULL;
 	root_ = NULL;
@@ -255,31 +270,35 @@ xml2::xml2(fstream& fp, size_t max_len, const char* data /* = NULL */,
 	xml_ = acl_xml2_mmap_fd(fp.file_handle(),
 		max_len, init_len, NULL);
 
-	if (data && *data)
+	if (data && *data) {
 		update(data);
+	}
 }
 
 xml2::xml2(ACL_FILE_HANDLE fd, size_t max_len, const char* data /* = NULL */,
 	size_t init_len /* = 8192 */, size_t dbuf_nblock /* = 2 */,
 	size_t dbuf_capacity /* = 100 */)
-	: xml(dbuf_nblock, dbuf_capacity)
+: xml(dbuf_nblock, dbuf_capacity)
 {
 	acl_assert(fd != ACL_FILE_INVALID);
 	acl_assert(max_len > 0);
 
-	if (init_len > max_len)
+	if (init_len > max_len) {
 		max_len = init_len;
+	}
 
 	xml_ = acl_xml2_mmap_fd(fd, max_len, init_len, NULL);
 
-	if (data && *data)
+	if (data && *data) {
 		update(data);
+	}
 }
 
-xml2::~xml2()
+xml2::~xml2(void)
 {
-	if (iter_)
+	if (iter_) {
 		acl_myfree(iter_);
+	}
 	delete root_;
 	acl_xml2_free(xml_);
 }
@@ -323,12 +342,12 @@ const std::vector<xml_node*>& xml2::getElementsByTagName(const char* tag) const
 	const_cast<xml2*>(this)->clear();
 
 	ACL_ARRAY* a = acl_xml2_getElementsByTagName(xml_, tag);
-	if (a == NULL)
+	if (a == NULL) {
 		return elements_;
+	}
 
 	ACL_ITER iter;
-	acl_foreach(iter, a)
-	{
+	acl_foreach(iter, a) {
 		ACL_XML2_NODE *tmp = (ACL_XML2_NODE*) iter.data;
 		xml2_node* node = const_cast<dbuf_guard&>(dbuf_)
 			.create<xml2_node, xml2*, ACL_XML2_NODE*>
@@ -343,8 +362,9 @@ const std::vector<xml_node*>& xml2::getElementsByTagName(const char* tag) const
 xml_node* xml2::getFirstElementByTag(const char* tag) const
 {
 	ACL_XML2_NODE* node = acl_xml2_getFirstElementByTagName(xml_, tag);
-	if (node == NULL)
+	if (node == NULL) {
 		return NULL;
+	}
 
 	xml2_node* n = const_cast<dbuf_guard&>(dbuf_)
 		.create<xml2_node, xml2*, ACL_XML2_NODE*>
@@ -357,12 +377,12 @@ const std::vector<xml_node*>& xml2::getElementsByTags(const char* tags) const
 	const_cast<xml2*>(this)->clear();
 
 	ACL_ARRAY* a = acl_xml2_getElementsByTags(xml_, tags);
-	if (a == NULL)
+	if (a == NULL) {
 		return elements_;
+	}
 
 	ACL_ITER iter;
-	acl_foreach(iter, a)
-	{
+	acl_foreach(iter, a) {
 		ACL_XML2_NODE *tmp = (ACL_XML2_NODE*) iter.data;
 		xml2_node* node = const_cast<dbuf_guard&>(dbuf_)
 			.create<xml2_node, xml2*, ACL_XML2_NODE*>
@@ -377,8 +397,9 @@ const std::vector<xml_node*>& xml2::getElementsByTags(const char* tags) const
 xml_node* xml2::getFirstElementByTags(const char* tags) const
 {
 	ACL_ARRAY* a = acl_xml2_getElementsByTags(xml_, tags);
-	if (a == NULL)
+	if (a == NULL) {
 		return NULL;
+	}
 
 	ACL_XML2_NODE* node = (ACL_XML2_NODE*) acl_array_index(a, 0);
 	acl_assert(node);
@@ -395,12 +416,12 @@ const std::vector<xml_node*>& xml2::getElementsByName(const char* value) const
 {
 	const_cast<xml2*>(this)->clear();
 	ACL_ARRAY* a = acl_xml2_getElementsByName(xml_, value);
-	if (a == NULL)
+	if (a == NULL) {
 		return elements_;
+	}
 
 	ACL_ITER iter;
-	acl_foreach(iter, a)
-	{
+	acl_foreach(iter, a) {
 		ACL_XML2_NODE *tmp = (ACL_XML2_NODE*) iter.data;
 		xml2_node* node = const_cast<dbuf_guard&>(dbuf_)
 			.create<xml2_node, xml2*, ACL_XML2_NODE*>
@@ -417,12 +438,12 @@ const std::vector<xml_node*>& xml2::getElementsByAttr(
 {
 	const_cast<xml2*>(this)->clear();
 	ACL_ARRAY *a = acl_xml2_getElementsByAttr(xml_, name, value);
-	if (a == NULL)
+	if (a == NULL) {
 		return elements_;
+	}
 
 	ACL_ITER iter;
-	acl_foreach(iter, a)
-	{
+	acl_foreach(iter, a) {
 		ACL_XML2_NODE *tmp = (ACL_XML2_NODE*) iter.data;
 		xml2_node* node = const_cast<dbuf_guard&>(dbuf_)
 			.create<xml2_node, xml2*, ACL_XML2_NODE*>
@@ -437,8 +458,9 @@ const std::vector<xml_node*>& xml2::getElementsByAttr(
 xml_node* xml2::getElementById(const char* id) const
 {
 	ACL_XML2_NODE* node = acl_xml2_getElementById(xml_, id);
-	if (node == NULL)
-		return (NULL);
+	if (node == NULL) {
+		return NULL;
+	}
 
 	xml2_node* n = const_cast<dbuf_guard&>(dbuf_)
 		.create<xml2_node, xml2*, ACL_XML2_NODE*>
@@ -446,14 +468,15 @@ xml_node* xml2::getElementById(const char* id) const
 	return n;
 }
 
-const acl::string& xml2::getText()
+const acl::string& xml2::getText(void)
 {
 	logger_error("not supported yet!");
 
-	if (buf_ == NULL)
+	if (buf_ == NULL) {
 		buf_ = NEW string();
-	else
+	} else {
 		buf_->clear();
+	}
 	return *buf_;
 }
 
@@ -477,20 +500,23 @@ xml_node& xml2::create_node(const char* tag, istream& in,
 
 xml_node& xml2::get_root(void)
 {
-	if (root_)
+	if (root_) {
 		return *root_;
+	}
 	root_ = NEW xml2_node(this, xml_->root);
 	return *root_;
 }
 
 xml_node* xml2::first_node(void)
 {
-	if (iter_ == NULL)
+	if (iter_ == NULL) {
 		iter_ = (ACL_ITER*) acl_mymalloc(sizeof(ACL_ITER));
+	}
 
 	ACL_XML2_NODE* node = xml_->iter_head(iter_, xml_);
-	if (node == NULL)
+	if (node == NULL) {
 		return NULL;
+	}
 
 	xml2_node* n = dbuf_.create<xml2_node, xml2*, ACL_XML2_NODE*>
 		(this, node);
@@ -502,8 +528,9 @@ xml_node* xml2::next_node(void)
 	acl_assert(iter_);
 
 	ACL_XML2_NODE* node = xml_->iter_next(iter_, xml_);
-	if (node == NULL)
+	if (node == NULL) {
 		return NULL;
+	}
 
 	xml2_node* n = dbuf_.create<xml2_node, xml2*, ACL_XML2_NODE*>
 		(this, node);
@@ -518,15 +545,16 @@ void xml2::build_xml(string& out) const
 const char* xml2::to_string(size_t* len /* = NULL */) const
 {
 	const char* dat = acl_xml2_build(xml_);
-	if (dat >= acl_vstring_end(xml_->vbuf))
-	{
-		if (len)
+	if (dat >= acl_vstring_end(xml_->vbuf)) {
+		if (len) {
 			*len = 0;
+		}
 		return "";
 	}
 
-	if (len)
+	if (len) {
 		*len = acl_vstring_end(xml_->vbuf) - dat;
+	}
 	return dat;
 }
 

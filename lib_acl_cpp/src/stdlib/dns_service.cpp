@@ -28,27 +28,18 @@ enum
 class dns_request : public ipc_request
 {
 public:
-	dns_request(const char* domain)
-		: domain_(domain)
-	{
+	dns_request(const char* domain) : domain_(domain) {}
 
-	}
-
-	~dns_request()
-	{
-
-	}
+	~dns_request(void) {}
 
 	virtual void run(ipc_client* ipc)
 	{
 		ACL_DNS_DB* db = acl_gethostbyname(domain_.c_str(), NULL);
 		data_.res = NEW dns_res(domain_.c_str());
 
-		if (db != NULL)
-		{
+		if (db != NULL) {
 			ACL_ITER iter;
-			acl_foreach(iter, db)
-			{
+			acl_foreach(iter, db) {
 				ACL_HOSTNAME* hn = (ACL_HOSTNAME*) iter.data;
 				data_.res->ips_.push_back(hn->ip);
 			}
@@ -74,11 +65,9 @@ public:
 			acl_mymalloc(sizeof(DNS_IPC_DATA));
 		data->res = NEW dns_res(domain_.c_str());
 
-		if (db != NULL)
-		{
+		if (db != NULL) {
 			ACL_ITER iter;
-			acl_foreach(iter, db)
-			{
+			acl_foreach(iter, db) {
 				ACL_HOSTNAME* hn = (ACL_HOSTNAME*) iter.data;
 				data->res->ips_.push_back(hn->ip);
 			}
@@ -107,19 +96,14 @@ public:
 	: ipc_client(magic)
 	, server_(server)
 	{
-
 	}
 
-	~dns_ipc()
-	{
-
-	}
+	~dns_ipc(void) {}
 
 	virtual void on_message(int nMsg acl_unused,
 		void* data, int dlen acl_unused)
 	{
-		if (nMsg != IPC_RES)
-		{
+		if (nMsg != IPC_RES) {
 			logger_error("invalid nMsg(%d)", nMsg);
 			this->close();
 			return;
@@ -132,10 +116,11 @@ public:
 		delete res;
 	}
 protected:
-	virtual void on_close()
+	virtual void on_close(void)
 	{
 		delete this;
 	}
+
 private:
 	dns_service* server_;
 };
@@ -155,10 +140,7 @@ dns_service::dns_service(int nthread /* = 1 */, bool win32_gui /* = false */)
 #endif
 }
 
-dns_service::~dns_service()
-{
-
-}
+dns_service::~dns_service(void) {}
 
 void dns_service::on_accept(aio_socket_stream* client)
 {
@@ -174,13 +156,10 @@ void dns_service::on_accept(aio_socket_stream* client)
 
 void dns_service::win32_proc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (nMsg != IPC_RES + WM_USER)
-	{
+	if (nMsg != IPC_RES + WM_USER) {
 		logger_error("invalid nMsg(%d)", nMsg);
 		return;
-	}
-	else if (lParam == 0)
-	{
+	} else if (lParam == 0) {
 		logger_error("lParam invalid");
 		return;
 	}
@@ -202,10 +181,8 @@ void dns_service::lookup(dns_result_callback* callback)
 	std::list<dns_result_callback*>::iterator it;
 	const char* domain = callback->get_domain().c_str();
 
-	for (it= callbacks_.begin(); it != callbacks_.end(); ++it)
-	{
-		if ((*it)->get_domain() == domain)
-		{
+	for (it= callbacks_.begin(); it != callbacks_.end(); ++it) {
+		if ((*it)->get_domain() == domain) {
 			callbacks_.push_back(callback);
 			return;
 		}
@@ -222,17 +199,16 @@ void dns_service::lookup(dns_result_callback* callback)
 void dns_service::on_result(const dns_res& res)
 {
 	for (std::list<dns_result_callback*>::iterator it= callbacks_.begin();
-		it != callbacks_.end();)
-	{
-		if ((*it)->get_domain() == res.domain_.c_str())
-		{
+		it != callbacks_.end();) {
+
+		if ((*it)->get_domain() == res.domain_.c_str()) {
 			// 通知请求对象的解析结果
 			(*it)->on_result((*it)->get_domain(), res);
 			(*it)->destroy(); // 调用请求对象的销毁过程
 			it = callbacks_.erase(it);
-		}
-		else
+		} else {
 			++it;
+		}
 	}
 }
 

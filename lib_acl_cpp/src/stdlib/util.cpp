@@ -40,8 +40,9 @@ int strncasecmp_(const char *s1, const char *s2, size_t n)
 
 void assert_(bool n)
 {
-	if (n == false)
+	if (n == false) {
 		abort();
+	}
 }
 
 void meter_time(const char *filename, int line, const char *info)
@@ -68,8 +69,8 @@ double stamp_sub(const struct timeval& from, const struct timeval& sub)
 		--res.tv_sec;
 		res.tv_usec += 1000000;
 	}
-	res.tv_sec -= sub.tv_sec;
 
+	res.tv_sec -= sub.tv_sec;
 	return res.tv_sec * 1000.0 + res.tv_usec / 1000.0;
 }
 

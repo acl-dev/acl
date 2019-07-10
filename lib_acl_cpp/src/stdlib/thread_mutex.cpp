@@ -23,28 +23,24 @@ thread_mutex::thread_mutex(bool recursive /* = true */)
 
 #ifdef	ACL_UNIX
 	int ret = pthread_mutexattr_init(&mutex_attr_);
-	if (ret)
-	{
+	if (ret) {
 		SET_ERRNO(ret);
 		logger_fatal("pthread_mutexattr_init error=%s", last_serror());
 	}
 	if (recursive && (ret = pthread_mutexattr_settype(&mutex_attr_,
-					PTHREAD_MUTEX_RECURSIVE)))
-	{
+					PTHREAD_MUTEX_RECURSIVE))) {
 		SET_ERRNO(ret);
 		logger_fatal("pthread_mutexattr_settype error=%s", last_serror());
 	}
 	ret = acl_pthread_mutex_init(mutex_, &mutex_attr_);
-	if (ret)
-	{
+	if (ret) {
 		SET_ERRNO(ret);
 		logger_fatal("pthread_mutex_init error=%s", last_serror());
 	}
 #else
 	(void) recursive;
 	int ret = acl_pthread_mutex_init(mutex_, NULL);
-	if (ret)
-	{
+	if (ret) {
 		SET_ERRNO(ret);
 		logger_fatal("pthread_mutex_init error=%s", last_serror());
 	}
@@ -68,8 +64,7 @@ acl_pthread_mutex_t* thread_mutex::get_mutex(void) const
 bool thread_mutex::lock(void)
 {
 	int ret = acl_pthread_mutex_lock(mutex_);
-	if (ret)
-	{
+	if (ret) {
 #ifdef ACL_UNIX
 		acl_set_error(ret);
 		logger_error("pthread_mutex_lock error %s", last_serror());
@@ -87,8 +82,7 @@ bool thread_mutex::try_lock(void)
 bool thread_mutex::unlock(void)
 {
 	int ret = acl_pthread_mutex_unlock(mutex_);
-	if (ret)
-	{
+	if (ret) {
 #ifdef ACL_UNIX
 		acl_set_error(ret);
 		logger_error("pthread_mutex_unlock error %s", last_serror());

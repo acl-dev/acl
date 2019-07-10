@@ -34,10 +34,11 @@ bitmap::~bitmap(void)
 
 bool bitmap::bit_isset(size_t n)
 {
-	if (n < size_)
+	if (n < size_) {
 		return (bmp_[n / 8] >> n % 8) & 1;
-	else
+	} else {
 		return false;
+	}
 }
 
 bool bitmap::bit_set(size_t n)
@@ -47,8 +48,9 @@ bool bitmap::bit_set(size_t n)
 		bmp_[n / 8] |= t;
 		count_++;
 		return true;
-	} else
+	} else {
 		return false;
+	}
 }
 
 bool bitmap::bit_unset(size_t n)
@@ -58,8 +60,9 @@ bool bitmap::bit_unset(size_t n)
 		bmp_[n / 8] &= ~t;
 		count_--;
 		return true;
-	} else
+	} else {
 		return false;
+	}
 }
 
 size_t bitmap::tobuf(void* buf, size_t len)
@@ -106,8 +109,9 @@ void bitmap::recount(void)
 {
 	count_ = 0;
 	for (size_t i = 0; i < size_; ++i) {
-		if ((bmp_[i / 8] >> i % 8) & 1)
+		if ((bmp_[i / 8] >> i % 8) & 1) {
 			count_++;
+		}
 	}
 }
 
