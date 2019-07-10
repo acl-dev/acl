@@ -66,7 +66,7 @@ static void __zlib_dll_load(void)
 		path = ptr;
 	else
 #ifdef ACL_WINDOWS
-		path = "zlib1.dll";
+		path = "zlib.dll";
 #else
 		path = "libz.so";
 #endif
