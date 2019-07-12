@@ -7,6 +7,7 @@ struct ACL_VSTREAM;
 namespace acl {
 
 class polarssl_conf;
+class atomic_long;
 
 /**
  * stream/aio_stream 流对象底层 IO 处理过程的处理类，该类对象中的读写的过程将会替代
@@ -21,11 +22,13 @@ public:
 	 * @param conf {polarssl_conf&} 对每一个 SSL 连接进行配置的类对象
 	 * @param server_side {bool} 是否为服务端模式，因为客户端模式与服务端
 	 *  模式的握手方法不同，所以通过此参数来进行区分
-	 * @param aio_mode {bool} 是否为非阻塞模式
+	 * @param nblock {bool} 是否为非阻塞模式
 	 */
-	polarssl_io(polarssl_conf& conf, bool server_side,
-		bool non_block = false);
+	polarssl_io(polarssl_conf& conf, bool server_side, bool nblock = false);
 
+	/**
+	 * 销毁 SSL IO 对象
+	 */
 	virtual void destroy(void);
 
 	/**
@@ -62,7 +65,7 @@ public:
 	 */
 	bool is_non_blocking(void) const
 	{
-		return non_block_;
+		return nblock_;
 	}
 
 
@@ -82,8 +85,9 @@ private:
 
 private:
 	polarssl_conf& conf_;
+	atomic_long* refers_;
 	bool  server_side_;
-	bool  non_block_;
+	bool  nblock_;
 	bool  handshake_ok_;
 	void* ssl_;
 	void* ssn_;

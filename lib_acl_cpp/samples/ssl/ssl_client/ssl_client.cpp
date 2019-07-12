@@ -19,16 +19,14 @@ static void test0(int i)
 {
 	acl::socket_stream client;
 	acl::string addr("127.0.0.1:441");
-	if (client.open(addr.c_str(), 60, 60) == false)
-	{
+	if (!client.open(addr.c_str(), 60, 60)) {
 		std::cout << "connect " << addr.c_str()
 			<< " error!" << std::endl;
 		return;
 	}
 
 	acl::polarssl_io* ssl = new acl::polarssl_io(*__ssl_conf, false);
-	if (client.setup_hook(ssl) == ssl)
-	{
+	if (client.setup_hook(ssl) == ssl) {
 		std::cout << "open ssl " << addr.c_str()
 			<< " error!" << std::endl;
 		ssl->destroy();
@@ -39,22 +37,21 @@ static void test0(int i)
 	memset(line, 'x', sizeof(line));
 	line[1023] = 0;
 	line[1022] = '\n';
-	if (client.write(line, strlen(line)) == -1)
-	{
+	if (client.write(line, strlen(line)) == -1) {
 		std::cout << "write to " << addr.c_str()
 			<< " error!" << std::endl;
 		return;
 	}
 
 	size_t n = sizeof(line);
-	if (client.gets(line, &n) == false)
-	{
+	if (!client.gets(line, &n)) {
 		std::cout << "gets from " << addr.c_str()
 			<< " error!" << std::endl;
 		return;
 	}
-	if (i < 10)
+	if (i < 10) {
 		std::cout << ">>gets: " << line << std::endl;
+	}
 }
 
 static void test1(const char* domain, int port, bool use_gzip, bool use_ssl)
@@ -65,19 +62,16 @@ static void test1(const char* domain, int port, bool use_gzip, bool use_ssl)
 	addr << domain << ':' << port;
 
 	acl::socket_stream client;
-	if (client.open(addr.c_str(), 60, 60) == false)
-	{
+	if (!client.open(addr.c_str(), 60, 60)) {
 		std::cout << "connect " << addr.c_str()
 			<< " error!" << std::endl;
 		return;
 	}
 
 	// 如果使用 SSL 方式，则进行 SSL 握手过程
-	if (use_ssl)
-	{
+	if (use_ssl) {
 		acl::polarssl_io* ssl = new acl::polarssl_io(*__ssl_conf, false);
-		if (client.setup_hook(ssl) == ssl)
-		{
+		if (client.setup_hook(ssl) == ssl) {
 			std::cout << "open ssl client " << addr.c_str()
 				<< " error!" << std::endl;
 			ssl->destroy();
@@ -93,8 +87,9 @@ static void test1(const char* domain, int port, bool use_gzip, bool use_ssl)
 		.set_keep_alive(false);
 	// mail.126.com 比较土鳖，有时客户端要求非压缩数据其也会返回压缩数据，所以此处
 	// 强制要求非压缩数据
-	if (!use_gzip)
+	if (!use_gzip) {
 		header.add_entry("Accept-Encoding", "text/plain");
+	}
 
 	acl::string request;
 	header.build_request(request);
@@ -105,8 +100,7 @@ static void test1(const char* domain, int port, bool use_gzip, bool use_ssl)
 	std::cout << "----------------------------------------" << std::endl;
 
 	// 发送 HTTP GET 请求头
-	if (client.write(request) == false)
-	{
+	if (!client.write(request)) {
 		std::cout << "write to " << addr.c_str() <<
 			" error!" << std::endl;
 		return;
@@ -118,11 +112,9 @@ static void test1(const char* domain, int port, bool use_gzip, bool use_ssl)
 	size_t size;
 	int   ret;
 
-	while (true)
-	{
+	while (true) {
 		size = sizeof(buf) - 1;
-		if ((ret = client.read(buf, size, false)) == -1)
-		{
+		if ((ret = client.read(buf, size, false)) == -1) {
 			std::cout << "read over!" << std::endl;
 			break;
 		}
@@ -139,20 +131,17 @@ static void test2(const char* domain, int port, bool use_gzip, bool use_ssl)
 	addr << domain << ':' << port;
 
 	acl::http_client client;
-	if (client.open(addr.c_str(), 60, 60, use_gzip) == false)
-	{
+	if (!client.open(addr.c_str(), 60, 60, use_gzip)) {
 		std::cout << "connect " << addr.c_str()
 			<< " error!" << std::endl;
 		return;
 	}
 
-	if (use_ssl)
-	{
+	if (use_ssl) {
 		// 创建 SSL 对象并与网络客户端连接流绑定，当流对象被释放前该 SSL 对象
 		// 将由流对象内部通过调用 stream_hook::destroy() 释放
 		acl::polarssl_io* ssl = new acl::polarssl_io(*__ssl_conf, false);
-		if (client.get_stream().setup_hook(ssl) == ssl)
-		{
+		if (client.get_stream().setup_hook(ssl) == ssl) {
 			std::cout << "open ssl client " << addr.c_str()
 				<< " error!" << std::endl;
 			ssl->destroy();
@@ -182,16 +171,14 @@ static void test2(const char* domain, int port, bool use_gzip, bool use_ssl)
 
 	// 发送 HTTP GET 请求头
 
-	if (client.write_head(header) == false)
-	{
+	if (!client.write_head(header)) {
 		std::cout << "write to " << addr.c_str()
 			<< " error!" << std::endl;
 		return;
 	}
 
 	// 读取 HTTP 响应头
-	if (client.read_head() == false)
-	{
+	if (!client.read_head()) {
 		std::cout << "read http respond header error!" << std::endl;
 		return;
 	}
@@ -206,11 +193,9 @@ static void test2(const char* domain, int port, bool use_gzip, bool use_ssl)
 	size_t size;
 	int   ret;
 
-	while (true)
-	{
+	while (true) {
 		size = sizeof(buf) - 1;
-		if ((ret = client.read_body(buf, size)) <= 0)
-		{
+		if ((ret = client.read_body(buf, size)) <= 0) {
 			std::cout << "read over!" << std::endl;
 			break;
 		}
@@ -234,13 +219,16 @@ int main(int argc, char* argv[])
 	__ssl_conf = new acl::polarssl_conf;
 
 	int   n = 1;
-	if (argc >= 2)
+	if (argc >= 2) {
 		n = atoi(argv[1]);
-	if (n <= 0)
+	}
+	if (n <= 0) {
 		n = 100;
+	}
 	ACL_METER_TIME("---------- begin ----------");
-	for (int i = 0; i < 0; i++)
+	for (int i = 0; i < 0; i++) {
 		test0(i);
+	}
 	ACL_METER_TIME("---------- end ----------");
 
 	// 126 的 SSL 传输时当 HTTP 请求头中的 Host 值为 mail.126.com:443 时其 nginx

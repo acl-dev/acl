@@ -211,22 +211,23 @@ void polarssl_dll_load_io(void)
 namespace acl {
 
 polarssl_io::polarssl_io(polarssl_conf& conf, bool server_side,
-	bool non_block /* = false */)
+	bool nblock /* = false */)
 : conf_(conf)
 , server_side_(server_side)
-, non_block_(non_block)
+, nblock_(nblock)
 , handshake_ok_(false)
 , ssl_(NULL)
 , ssn_(NULL)
 , rnd_(NULL)
 , stream_(NULL)
 {
+	refers_ = NEW atomic_long(0);
 #ifdef HAS_POLARSSL
 	conf.init_once();
 #else
 	(void) conf_;
 	(void) server_side_;
-	(void) non_block_;
+	(void) nblock_;
 	(void) handshake_ok_;
 	(void) ssl_;
 	(void) ssn_;
@@ -235,8 +236,9 @@ polarssl_io::polarssl_io(polarssl_conf& conf, bool server_side,
 #endif
 }
 
-polarssl_io::~polarssl_io()
+polarssl_io::~polarssl_io(void)
 {
+	delete refers_;
 #ifdef HAS_POLARSSL
 	if (ssl_) {
 		__ssl_free((ssl_context*) ssl_);
@@ -270,7 +272,9 @@ polarssl_io::~polarssl_io()
 
 void polarssl_io::destroy(void)
 {
-	delete this;
+	if (--(*refers_) == 0) {
+		delete this;
+	}
 }
 
 #ifdef	DEBUG_SSL
@@ -286,7 +290,7 @@ polarssl_io& polarssl_io::set_non_blocking(bool yes)
 	// 此处仅设置非阻塞 IO 标志位，至于套接字是否被设置了非阻塞模式
 	// 由应用自己来决定
 
-	non_block_ = yes;
+	nblock_ = yes;
 	return *this;
 }
 
@@ -303,6 +307,10 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 		// 如果是同一个流，则返回 true
 		if (stream_ == s) {
 			return true;
+		} else if (ACL_VSTREAM_SOCK(stream_) == ACL_VSTREAM_SOCK(s)) {
+			long long n = ++(*refers_);
+			logger_warn("used by multiple stream, refers=%lld", n);
+			return true;
 		}
 
 		// 否则，禁止同一个 SSL IO 对象被绑在不同的流对象上
@@ -311,6 +319,7 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 	}
 
 	stream_ = s;
+	++(*refers_);
 
 	ssl_ = acl_mycalloc(1, sizeof(ssl_context));
 
@@ -386,8 +395,9 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 	__ssl_set_bio((ssl_context*) ssl_, sock_read, this, sock_send, this);
 
 	// 非阻塞模式下先不启动 SSL 握手过程
-	if (non_block_)
+	if (nblock_) {
 		return true;
+	}
 
 	// 阻塞模式下可以启动 SSL 握手过程
 	return handshake();
@@ -452,7 +462,7 @@ bool polarssl_io::handshake(void)
 			return false;
 		}
 
-		if (non_block_) {
+		if (nblock_) {
 			break;
 		}
 	}
@@ -508,7 +518,7 @@ int polarssl_io::read(void* buf, size_t len)
 
 			return ACL_VSTREAM_EOF;
 		}
-		if (non_block_) {
+		if (nblock_) {
 			return ACL_VSTREAM_EOF;
 		}
 	}
@@ -545,7 +555,7 @@ int polarssl_io::send(const void* buf, size_t len)
 
 			return ACL_VSTREAM_EOF;
 		}
-		if (non_block_) {
+		if (nblock_) {
 			return ACL_VSTREAM_EOF;
 		}
 	}
@@ -567,7 +577,7 @@ int polarssl_io::sock_read(void *ctx, unsigned char *buf, size_t len)
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(vs);
 
 	//logger(">>>non_block: %s, sys_ready: %s",
-	//	io->non_block_ ? "yes" : "no",
+	//	io->nblock_ ? "yes" : "no",
 	//	vs->read_ready ? "yes":"no");
 
 	// 非阻塞模式下，如果 read_ready 标志位为 0，则说明有可能
@@ -575,7 +585,7 @@ int polarssl_io::sock_read(void *ctx, unsigned char *buf, size_t len)
 	// 返回给 polarssl 并告之等待下次读，下次读操作将由事件引擎触发，
 	// 这样做的优点是在非阻塞模式下即使套接字没有设置为非阻塞状态
 	// 也不会阻塞线程，但缺点是增加了事件循环触发的次数
-	if (io->non_block_ && vs->read_ready == 0) {
+	if (io->nblock_ && vs->read_ready == 0) {
 		 int ret = acl_readable(fd);
 		 if (ret == -1) {
 			 return POLARSSL_ERR_NET_RECV_FAILED;
@@ -628,7 +638,7 @@ int polarssl_io::sock_send(void *ctx, const unsigned char *buf, size_t len)
 
 	// 当为非阻塞模式时，超时等待为 0 秒
 	int ret = acl_socket_write(ACL_VSTREAM_SOCK(vs), buf, len,
-			io->non_block_ ? 0 : vs->rw_timeout, vs, NULL);
+			io->nblock_ ? 0 : vs->rw_timeout, vs, NULL);
 	if (ret < 0) {
 		int errnum = acl_last_error();
 
