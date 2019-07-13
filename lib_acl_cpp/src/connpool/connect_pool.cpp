@@ -31,7 +31,7 @@ connect_pool::connect_pool(const char* addr, size_t max, size_t idx /* = 0 */)
 	acl_lowercase(key_);
 }
 
-connect_pool::~connect_pool()
+connect_pool::~connect_pool(void)
 {
 	std::list<connect_client*>::iterator it = pool_.begin();
 	for (; it != pool_.end(); ++it) {
@@ -176,7 +176,6 @@ connect_client* connect_pool::peek(bool on /* = true */)
 	}
 
 	conn->set_pool(this);
-
 	return conn;
 }
 

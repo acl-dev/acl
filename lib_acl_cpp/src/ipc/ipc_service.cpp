@@ -14,14 +14,14 @@ namespace acl
 
 //////////////////////////////////////////////////////////////////////////
 
-ipc_request::ipc_request()
+ipc_request::ipc_request(void)
 {
 #ifdef ACL_WINDOWS
 	hWnd_ = NULL;
 #endif
 }
 
-ipc_request::~ipc_request()
+ipc_request::~ipc_request(void)
 {
 
 }
@@ -52,45 +52,43 @@ static void thread_pool_main(REQ_CTX* ctx)
 
 #ifdef ACL_WINDOWS
 	HWND hWnd = ctx->req->get_hwnd();
-	if (hWnd != NULL)
+	if (hWnd != NULL) {
 		ctx->req->run(hWnd);
-	else
+	} else
 #endif
-	if (ctx->service)
-	{
+	if (ctx->service) {
 		ipc_client* ipc = ctx->service->peek_conn();
-		if (ipc == NULL)
-		{
+		if (ipc == NULL) {
 			logger_error("peek connect to %s error: %s",
 				ctx->addr, last_serror());
-		}
-		else
-		{
+		} else {
 			ctx->req->run(ipc);
 
 			// 如果该连接流依然正常，则放入连接池中
-			if (ipc->active())
+			if (ipc->active()) {
 				ctx->service->push_conn(ipc);
+			}
 
 			// 否则则释放动态对象
-			else
+			else {
 				delete ipc;
+			}
 		}
-	}
-	else
-	{
+	} else {
 		// IO 消息模式
 
 		ipc_client* ipc = NEW ipc_client(ctx->magic);
 
 		// 连接消息服务器, 采用同步IPC通道方式
-		if (ipc->open(ctx->addr, 0) == false)
+		if (!ipc->open(ctx->addr, 0)) {
 			logger_error("open %s error(%s)",
 				ctx->addr, last_serror());
+		}
 
 		// 调用子类的阻塞处理过程
-		else
+		else {
 			ctx->req->run(ipc);
+		}
 
 		// 销毁 IPC 流
 		delete ipc;
@@ -104,52 +102,50 @@ static void* thread_once_main(REQ_CTX* ctx)
 {
 #ifdef ACL_WINDOWS
 	HWND hWnd = ctx->req->get_hwnd();
-	if (hWnd != NULL)
+	if (hWnd != NULL) {
 		ctx->req->run(hWnd);
-	else
+	} else
 #endif
-	if (ctx->service)
-	{
+	if (ctx->service) {
 		ipc_client* ipc = ctx->service->peek_conn();
-		if (ipc == NULL)
-		{
+		if (ipc == NULL) {
 			logger_error("peek connect to %s error: %s",
 				ctx->addr, last_serror());
-		}
-		else
-		{
+		} else {
 			ctx->req->run(ipc);
 
 			// 如果该连接流依然正常，则放入连接池中
-			if (ipc->active())
+			if (ipc->active()) {
 				ctx->service->push_conn(ipc);
+			}
 
 			// 否则则释放动态对象
-			else
+			else {
 				delete ipc;
+			}
 		}
-	}
-	else
-	{
+	} else {
 		// IO 消息模式
 
 		ipc_client* ipc = NEW ipc_client(ctx->magic);
 
 		// 连接消息服务器
-		if (ipc->open(ctx->addr, 0) == false)
+		if (!ipc->open(ctx->addr, 0)) {
 			logger_error("open %s error(%s)",
 				ctx->addr, acl_last_serror());
+		}
 
 		// 调用子类的阻塞处理过程
-		else
+		else {
 			ctx->req->run(ipc);
+		}
 		// 销毁 IPC 流
 		delete ipc;
 	}
 
 	// 释放在主线程中分配的对象
 	acl_myfree(ctx);
-	return (NULL);
+	return NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -161,22 +157,22 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg,
 {
 	ipc_service* service = (ipc_service*)
 		GetWindowLongPtr(hWnd, GWLP_USERDATA);
-	if (service == NULL)
-		return (DefWindowProc(hWnd, msg, wParam, lParam));
+	if (service == NULL) {
+		return DefWindowProc(hWnd, msg, wParam, lParam);
+	}
 
 	// 调用子类的消息处理过程，消息号必须是 >= WM_USER
-	if (msg >= WM_USER)
+	if (msg >= WM_USER) {
 		service->win32_proc(hWnd, msg, wParam, lParam);
-	return (DefWindowProc(hWnd, msg, wParam, lParam));
+	}
+	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 static BOOL InitApplication(const char *class_name, HINSTANCE hInstance)
 {
-	const char *myname = "InitApplication";
 	WNDCLASSEX wcx;
 
-	if (GetClassInfoEx(hInstance, class_name, &wcx))
-	{
+	if (GetClassInfoEx(hInstance, class_name, &wcx)) {
 		// class already registered
 		logger_warn("class(%s) already registered", class_name);
 		return TRUE;
@@ -209,14 +205,14 @@ static BOOL InitApplication(const char *class_name, HINSTANCE hInstance)
 	if (RegisterClassEx(&wcx) == 0) {
 		logger_error("RegisterClassEx error(%d, %s)",
 			acl_last_error(), acl_last_serror());
-		return (FALSE);
-	} else
-		return (TRUE);
+		return FALSE;
+	} else {
+		return TRUE;
+	}
 }
 
 static HWND InitInstance(const char *class_name, HINSTANCE hInstance)
 {
-	const char *myname = "InitInstance";
 	HWND hWnd;
 	CREATESTRUCT cs;
 
@@ -235,9 +231,10 @@ static HWND InitInstance(const char *class_name, HINSTANCE hInstance)
 	hWnd = CreateWindowEx(cs.dwExStyle, cs.lpszClass,
 		cs.lpszName, cs.style, cs.x, cs.y, cs.cx, cs.cy,
 		cs.hwndParent, cs.hMenu, cs.hInstance, cs.lpCreateParams);
-	if (hWnd == NULL)
+	if (hWnd == NULL) {
 		logger_fatal("create window error: %s", acl_last_serror());
-		return (hWnd);
+	}
+	return hWnd;
 }
 
 static const char *__class_name = "__IpcEventsMainWClass";
@@ -245,13 +242,15 @@ static const char *__class_name = "__IpcEventsMainWClass";
 bool ipc_service::create_window(void)
 {
 	hInstance_ = GetModuleHandle(NULL);
-	if (InitApplication(__class_name, hInstance_) == FALSE)
+	if (InitApplication(__class_name, hInstance_) == FALSE) {
 		logger_fatal("InitApplication %s error(%s)",
 			__class_name, acl_last_serror());
+	}
 	hWnd_ = InitInstance(__class_name, hInstance_);
-	if (hWnd_ == NULL)
+	if (hWnd_ == NULL) {
 		logger_fatal("create %s window error(%s)",
 			__class_name, acl_last_serror());
+	}
 
 	// 添加窗口句柄的关联对象
 	SetWindowLongPtr(hWnd_, GWLP_USERDATA, (ULONG_PTR) this);
@@ -263,12 +262,12 @@ bool ipc_service::create_window(void)
 
 void ipc_service::close_window(void)
 {
-	if (hWnd_ == NULL)
+	if (hWnd_ == NULL) {
 		return;
+	}
 	WNDCLASSEX wcx;
 	DestroyWindow(hWnd_);
-	if (__class_name && GetClassInfoEx(hInstance_, __class_name, &wcx))
-	{
+	if (__class_name && GetClassInfoEx(hInstance_, __class_name, &wcx)) {
 		logger("unregister ipc_service class: %s", __class_name);
 		UnregisterClass(__class_name, hInstance_);
 	}
@@ -283,29 +282,32 @@ ipc_service::ipc_service(int nthread, bool ipc_keep /* true */)
 	hWnd_ = NULL;
 #endif
 	ipc_keep_ = ipc_keep;
-	if (nthread > 1)
+	if (nthread > 1) {
 		thread_pool_ = acl_thread_pool_create(nthread, 30);
-	else
+	} else {
 		thread_pool_ = NULL;
+	}
 }
 
-ipc_service::~ipc_service()
+ipc_service::~ipc_service(void)
 {
 #ifdef ACL_WINDOWS
-	if (hWnd_ != NULL)
+	if (hWnd_ != NULL) {
 		close_window();
+	}
 #endif
-	if (thread_pool_)
+	if (thread_pool_) {
 		acl_pthread_pool_destroy(thread_pool_);
+	}
 	std::list<ipc_client*>::iterator it = conn_pool_.begin();
-	for (; it != conn_pool_.end(); ++it)
+	for (; it != conn_pool_.end(); ++it) {
 		delete (*it);
+	}
 	logger("delete service ipc_service");
 }
 
 #ifdef ACL_WINDOWS
-void ipc_service::win32_proc(HWND hWnd, UINT msg,
-	WPARAM wParam, LPARAM lParam)
+void ipc_service::win32_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	// 子类必须实现该接口
 	logger_fatal("ipc_service::win32_proc be called");
@@ -316,26 +318,26 @@ void ipc_service::request(ipc_request* req)
 {
 	REQ_CTX* req_ctx = (REQ_CTX*) acl_mycalloc(1, sizeof(REQ_CTX));
 #ifdef ACL_WINDOWS
-	if (hWnd_ != NULL)
+	if (hWnd_ != NULL) {
 		req->set_hwnd(hWnd_);
-	else
-		ACL_SAFE_STRNCPY(req_ctx->addr,
-			get_addr(), sizeof(req_ctx->addr));
+	} else {
+		ACL_SAFE_STRNCPY(req_ctx->addr, get_addr(), sizeof(req_ctx->addr));
+	}
 #else
 	ACL_SAFE_STRNCPY(req_ctx->addr, get_addr(), sizeof(req_ctx->addr));
 #endif
 	req_ctx->magic = magic_;
 	req_ctx->req = req;
-	if (ipc_keep_)
+	if (ipc_keep_) {
 		req_ctx->service = this;
-	else
+	} else {
 		req_ctx->service = NULL;
+	}
 
-	if (thread_pool_)
+	if (thread_pool_) {
 		acl_pthread_pool_add(thread_pool_, (void (*)(void*))
 			thread_pool_main, req_ctx);
-	else
-	{
+	} else {
 		acl_pthread_t tid;
 		acl_pthread_attr_t attr;
 
@@ -346,7 +348,7 @@ void ipc_service::request(ipc_request* req)
 	}
 }
 
-ipc_client* ipc_service::peek_conn()
+ipc_client* ipc_service::peek_conn(void)
 {
 	ipc_client* ipc;
 
@@ -355,18 +357,18 @@ ipc_client* ipc_service::peek_conn()
 	lock_.lock();
 
 	std::list<ipc_client*>::iterator it = conn_pool_.begin();
-	if (it != conn_pool_.end())
-	{
+	if (it != conn_pool_.end()) {
 		ipc = *it;
 		conn_pool_.pop_front();
-	}
-	else
+	} else {
 		ipc = NULL;
+	}
 
 	lock_.unlock();
 
-	if (ipc)
+	if (ipc) {
 		return ipc;
+	}
 
 	// 创建新的 IO 消息流
 
@@ -374,14 +376,13 @@ ipc_client* ipc_service::peek_conn()
 
 	const char* addr = get_addr();
 	// 连接消息服务器, 采用同步IPC通道方式
-	if (ipc->open(addr, 0) == false)
-	{
+	if (!ipc->open(addr, 0)) {
 		logger_error("open %s error(%s)", addr, acl_last_serror());
 		delete ipc;
 		return NULL;
-	}
-	else
+	} else {
 		return ipc;
+	}
 }
 
 void ipc_service::push_conn(ipc_client* conn)
@@ -391,4 +392,4 @@ void ipc_service::push_conn(ipc_client* conn)
 	lock_.unlock();
 }
 
-}
+} // namespace acl

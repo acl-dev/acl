@@ -16,11 +16,11 @@ check_rpc::check_rpc(connect_monitor& monitor, check_client& checker)
 {
 }
 
-check_rpc::~check_rpc()
+check_rpc::~check_rpc(void)
 {
 }
 
-void check_rpc::rpc_run()
+void check_rpc::rpc_run(void)
 {
 	// 打开阻塞流对象
 	socket_stream stream;
@@ -48,7 +48,7 @@ void check_rpc::rpc_run()
 	stream.unbind();
 }
 
-void check_rpc::rpc_onover()
+void check_rpc::rpc_onover(void)
 {
 	// 取消该检测对象的阻塞状态
 	checker_.set_blocked(false);

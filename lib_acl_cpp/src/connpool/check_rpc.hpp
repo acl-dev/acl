@@ -15,16 +15,16 @@ public:
 
 protected:
 	// 子线程处理函数
-	virtual void rpc_run();
+	virtual void rpc_run(void);
 
 	// 主线程处理过程，收到子线程任务完成的消息
-	virtual void rpc_onover();
+	virtual void rpc_onover(void);
 
 private:
 	connect_monitor& monitor_;
 	check_client& checker_;
 
-	~check_rpc();
+	~check_rpc(void);
 };
 
 } // namespace acl

@@ -20,17 +20,18 @@ ipc_client::ipc_client(acl_int64 magic /* = -1 */)
 , closing_(false)
 , status_(IO_WAIT_HDR)
 {
-
 }
 
-ipc_client::~ipc_client()
+ipc_client::~ipc_client(void)
 {
 	messages_.clear();
 
-	if (addr_)
+	if (addr_) {
 		acl_myfree(addr_);
-	if (async_stream_ && !closing_)
+	}
+	if (async_stream_ && !closing_) {
 		async_stream_->close();
+	}
 	delete sync_stream_inner_;
 }
 
@@ -49,8 +50,9 @@ bool ipc_client::open(aio_handle* handle, const char* addr, int timeout)
 	acl_assert(sync_stream_ == NULL && async_stream_ == NULL);
 
 	async_stream_ = aio_socket_stream::open(handle, addr, timeout);
-	if (async_stream_ == NULL)
-		return (false);
+	if (async_stream_ == NULL) {
+		return false;
+	}
 	addr_ = acl_mystrdup(addr);
 
 	// 添加连接成功的回调函数类
@@ -61,7 +63,7 @@ bool ipc_client::open(aio_handle* handle, const char* addr, int timeout)
 
 	// 添加连接超时的回调函数类
 	async_stream_->add_timeout_callback(this);
-	return (true);
+	return true;
 }
 
 void ipc_client::open(aio_socket_stream* client)
@@ -88,14 +90,13 @@ bool ipc_client::open(const char* addr, int timeout)
 {
 	acl_assert(sync_stream_ == NULL && async_stream_ == NULL);
 	sync_stream_ = NEW socket_stream();
-	if (sync_stream_->open(addr, timeout, 0) == false)
-	{
+	if (!sync_stream_->open(addr, timeout, 0)) {
 		delete sync_stream_;
 		sync_stream_ = NULL;
 		return (false);
 	}
 	sync_stream_inner_ = sync_stream_;
-	return (true);
+	return true;
 }
 
 void ipc_client::open(socket_stream* client)
@@ -105,31 +106,28 @@ void ipc_client::open(socket_stream* client)
 	sync_stream_ = client;
 }
 
-void ipc_client::wait()
+void ipc_client::wait(void)
 {
-	if (closing_)
+	if (closing_) {
 		return;
+	}
 
 	// 同步接收消息
-	if (sync_stream_)
-	{
+	if (sync_stream_) {
 		MSG_HDR hdr;
 		int   n;
 		n = sync_stream_->read(&hdr, sizeof(hdr));
-		if (n < 0)
-		{
+		if (n < 0) {
 			close();
 			return;
 		}
-		if ((n = hdr.dlen) <= 0)
-		{
+		if ((n = hdr.dlen) <= 0) {
 			trigger(hdr.nMsg, NULL, 0);
 			return;
 		}
 		string buf(n);
 
-		if (sync_stream_->read(buf.c_str(), n) < 0)
-		{
+		if (sync_stream_->read(buf.c_str(), n) < 0) {
 			close();
 			return;
 		}
@@ -137,59 +135,60 @@ void ipc_client::wait()
 	}
 
 	// 异步接收消息
-	else if (async_stream_)
-	{
+	else if (async_stream_) {
 		// 进入异步读消息过程
 		status_ = IO_WAIT_HDR;
 		async_stream_->read(sizeof(MSG_HDR));
 	}
 
 	// 未知情况
-	else
+	else {
 		acl_assert(0);
+	}
 }
 
-void ipc_client::close()
+void ipc_client::close(void)
 {
-	if (closing_)
+	if (closing_) {
 		return;
+	}
 
 	closing_ = true;
 
-	if (async_stream_)
+	if (async_stream_) {
 		async_stream_->close();
-	else if (sync_stream_inner_)
-	{
+	} else if (sync_stream_inner_) {
 		delete sync_stream_inner_;
 		sync_stream_inner_ = sync_stream_ = NULL;
 	}
 }
 
-bool ipc_client::active() const
+bool ipc_client::active(void) const
 {
-	if (closing_)
+	if (closing_) {
 		return false;
-	else if (async_stream_ != NULL || sync_stream_ != NULL)
+	} else if (async_stream_ != NULL || sync_stream_ != NULL) {
 		return true;
-	else
+	} else {
 		return false;
+	}
 }
 
-aio_socket_stream* ipc_client::get_async_stream() const
+aio_socket_stream* ipc_client::get_async_stream(void) const
 {
 	acl_assert(async_stream_);
-	return (async_stream_);
+	return async_stream_;
 }
 
-aio_handle& ipc_client::get_handle() const
+aio_handle& ipc_client::get_handle(void) const
 {
-	return (get_async_stream()->get_handle());
+	return get_async_stream()->get_handle();
 }
 
-socket_stream* ipc_client::get_sync_stream() const
+socket_stream* ipc_client::get_sync_stream(void) const
 {
 	acl_assert(sync_stream_);
-	return (sync_stream_);
+	return sync_stream_;
 }
 
 void ipc_client::append_message(int nMsg)
@@ -197,10 +196,10 @@ void ipc_client::append_message(int nMsg)
 	std::list<int>::iterator it = messages_.begin();
 
 	// 该消息是否已经存在于已经注册的消息集合中
-	for (; it != messages_.end(); ++it)
-	{
-		if (*it == nMsg)
+	for (; it != messages_.end(); ++it) {
+		if (*it == nMsg) {
 			return;
+		}
 	}
 
 	messages_.push_back(nMsg);
@@ -211,10 +210,8 @@ void ipc_client::delete_message(int nMsg)
 	std::list<int>::iterator it = messages_.begin();
 
 	// 该消息是否已经存在于已经注册的消息集合中
-	for (; it != messages_.end(); ++it)
-	{
-		if (*it == nMsg)
-		{
+	for (; it != messages_.end(); ++it) {
+		if (*it == nMsg) {
 			messages_.erase(it);
 			break;
 		}
@@ -230,20 +227,21 @@ void ipc_client::send_message(int nMsg, const void* data, int dlen)
 	hdr.magic = magic_;
 
 	// 发送消息头
-	if (sync_stream_ != NULL)
+	if (sync_stream_ != NULL) {
 		sync_stream_->write(&hdr, sizeof(hdr));
-	else if (async_stream_ != NULL)
+	} else if (async_stream_ != NULL) {
 		async_stream_->write(&hdr, sizeof(hdr));
-	else
+	} else {
 		acl_assert(0);
+	}
 
 	// 发关消息体
-	if (data && dlen > 0)
-	{
-		if (sync_stream_ == NULL)
+	if (data && dlen > 0) {
+		if (sync_stream_ == NULL) {
 			async_stream_->write(data, dlen);
-		else if (sync_stream_->write(data, dlen) < 0)
+		} else if (sync_stream_->write(data, dlen) < 0) {
 			close();
+		}
 	}
 }
 
@@ -252,10 +250,8 @@ void ipc_client::trigger(int nMsg, void* data, int dlen)
 	std::list<int>::iterator it = messages_.begin();
 
 	// 该消息是否已经存在于已经注册的消息集合中
-	for (; it != messages_.end(); ++it)
-	{
-		if (*it == nMsg)
-		{
+	for (; it != messages_.end(); ++it) {
+		if (*it == nMsg) {
 			on_message(nMsg, data, dlen);
 			return;
 		}
@@ -266,20 +262,17 @@ void ipc_client::trigger(int nMsg, void* data, int dlen)
 
 bool ipc_client::read_callback(char* data, int len)
 {
-	if (status_ == IO_WAIT_HDR)
-	{
+	if (status_ == IO_WAIT_HDR) {
 		acl_assert(len == sizeof(MSG_HDR));
 		MSG_HDR* hdr = (MSG_HDR*) data;
 
 		// 先检查 IPC 消息数据的有效性
-		if (hdr->magic != magic_)
-		{
+		if (hdr->magic != magic_) {
 			logger_error("unknown ipc magic: %lld", hdr->magic);
 			return false;
 		}
 		//logger(">>>ok, magic: %d", magic_);
-		if (hdr->dlen > 0)
-		{
+		if (hdr->dlen > 0) {
 			hdr_.nMsg = hdr->nMsg;
 			hdr_.dlen = hdr->dlen;
 			// 如果有消息体则继续读消息体
@@ -294,39 +287,37 @@ bool ipc_client::read_callback(char* data, int len)
 		// 异步等待下一条消息
 		wait();
 		return (true);
-	}
-	else if (status_ == IO_WAIT_DAT)
-	{
+	} else if (status_ == IO_WAIT_DAT) {
 		acl_assert(len == hdr_.dlen);
 		trigger(hdr_.nMsg, data, len);
 
 		// 异步等待下一条消息
 		wait();
 		return (true);
-	}
-	else
+	} else {
 		acl_assert(0);
+	}
 
-	return (true);
+	return true;
 }
 
-bool ipc_client::write_callback()
+bool ipc_client::write_callback(void)
 {
-	return (true);
+	return true;
 }
 
-void ipc_client::close_callback()
+void ipc_client::close_callback(void)
 {
 	// 通知子类关闭IPC异步流
 	on_close();
 }
 
-bool ipc_client::timeout_callback()
+bool ipc_client::timeout_callback(void)
 {
-	return (true);
+	return true;
 }
 
-bool ipc_client::open_callback()
+bool ipc_client::open_callback(void)
 {
 	// 连接成功，设置IO读写回调函数
 	async_stream_->add_read_callback(this);
@@ -336,7 +327,7 @@ bool ipc_client::open_callback()
 	on_open();
 
 	// 返回 true 表示继续异步过程
-	return (true);
+	return true;
 }
 
 }  // namespace acl

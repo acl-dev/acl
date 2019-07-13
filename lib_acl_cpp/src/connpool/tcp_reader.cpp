@@ -18,21 +18,18 @@ tcp_reader::tcp_reader(socket_stream& conn)
 bool tcp_reader::read(string& out)
 {
 	int len;
-	if (conn_->read(len) == false)
-	{
+	if (!conn_->read(len)) {
 		//logger_error("read head error!");
 		return false;
 	}
 
 	len = ntohl(len);
-	if (len <= 0)
-	{
+	if (len <= 0) {
 		logger_error("invalid len=%d", len);
 		return false;
 	}
 
-	if (conn_->read(out, (size_t) len) == false)
-	{
+	if (!conn_->read(out, (size_t) len)) {
 		logger_error("read body error %s", last_serror());
 		return false;
 	}

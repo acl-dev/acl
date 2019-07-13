@@ -8,21 +8,18 @@
 namespace acl
 {
 
-disque_cond::disque_cond()
-	: replicate_(0)
-	, delay_(-1)
-	, retry_(0)
-	, ttl_(0)
-	, maxlen_(0)
-	, async_(false)
+disque_cond::disque_cond(void)
+: replicate_(0)
+, delay_(-1)
+, retry_(0)
+, ttl_(0)
+, maxlen_(0)
+, async_(false)
 {
 
 }
 
-disque_cond::~disque_cond()
-{
-
-}
+disque_cond::~disque_cond(void) {}
 
 disque_cond& disque_cond::set_replicate(int n)
 {

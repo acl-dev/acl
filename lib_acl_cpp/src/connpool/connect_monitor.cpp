@@ -25,19 +25,21 @@ connect_monitor::connect_monitor(connect_manager& manager)
 {
 }
 
-connect_monitor::~connect_monitor()
+connect_monitor::~connect_monitor(void)
 {
 }
 
 connect_monitor& connect_monitor::open_rpc_service(int max_threads,
 	const char* addr /* = NULL */)
 {
-	if (rpc_service_ != NULL)
+	if (rpc_service_ != NULL) {
 		return *this;
+	}
 
 	rpc_service_ = NEW rpc_service(max_threads);
-	if (rpc_service_->open(&handle_, addr) == false)
+	if (!rpc_service_->open(&handle_, addr)) {
 		logger_fatal("open rpc_service error: %s", last_serror());
+	}
 
 	return *this;
 }
@@ -60,7 +62,7 @@ void connect_monitor::stop(bool graceful)
 	stop_graceful_ = graceful;
 }
 
-void* connect_monitor::run()
+void* connect_monitor::run(void)
 {
 	// 检查服务端连接状态定时器
 	check_timer timer(*this, handle_, conn_timeout_);
@@ -68,32 +70,30 @@ void* connect_monitor::run()
 	timer.keep_timer(true);  // 保持定时器
 	handle_.set_timer(&timer, check_inter_ * 1000000);
 
-	while (!stop_)
+	while (!stop_) {
 		handle_.check();
+	}
 
 	// 等待定时器结束
-	while (!timer.finish(stop_graceful_))
+	while (!timer.finish(stop_graceful_)) {
 		handle_.check();
+	}
 
 	// 如果 rpc_service_ 对象非空则删除之
 	delete rpc_service_;
 
 	// 最后再检测一次，以尽量释放可能存在的异步对象
 	handle_.check();
-
 	return NULL;
 }
 
 void connect_monitor::on_open(check_client& checker)
 {
 	// 如果未设置 rpc 服务对象，则采用异步 IO 检测过程
-	if (rpc_service_ == NULL)
-	{
+	if (rpc_service_ == NULL) {
 		checker.set_blocked(false);
 		nio_check(checker, checker.get_conn());
-	}
-	else
-	{
+	} else {
 		// 设置检测对象为阻塞模式
 		checker.set_blocked(true);
 

@@ -32,8 +32,7 @@ tcp_client::~tcp_client(void)
 
 bool tcp_client::open(void)
 {
-	if (conn_->open(addr_, conn_timeout_, rw_timeout_) == false)
-	{
+	if (!conn_->open(addr_, conn_timeout_, rw_timeout_)) {
 		logger_error("connnect %s error %s", addr_, last_serror());
 		return false;
 	}
@@ -43,15 +42,13 @@ bool tcp_client::open(void)
 
 bool tcp_client::try_open(bool* reuse_conn)
 {
-	if (conn_->opened())
-	{
+	if (conn_->opened()) {
 		*reuse_conn = true;
 		return true;
 	}
 
 	*reuse_conn = false;
-	if (conn_->open(addr_, conn_timeout_, rw_timeout_) == false)
-	{
+	if (!conn_->open(addr_, conn_timeout_, rw_timeout_)) {
 		logger_error("connect %s error %s", addr_, last_serror());
 		return false;
 	}
@@ -63,18 +60,14 @@ bool tcp_client::send(const void* data, unsigned int len, string* out /* = NULL 
 {
 	bool have_retried = false, reuse_conn;
 
-	while (true)
-	{
-		if (try_open(&reuse_conn) == false)
-		{
+	while (true) {
+		if (!try_open(&reuse_conn)) {
 			logger_error("connect server error");
 			return false;
 		}
 
-		if (sender_->send(data, len) == false)
-		{
-			if (have_retried || !reuse_conn)
-			{
+		if (!sender_->send(data, len)) {
+			if (have_retried || !reuse_conn) {
 				logger_error("send head error");
 				return false;
 			}
@@ -83,15 +76,17 @@ bool tcp_client::send(const void* data, unsigned int len, string* out /* = NULL 
 			continue;
 		}
 
-		if (out == NULL)
+		if (out == NULL) {
 			return true;
+		}
 
-		if (reader_ == NULL)
-			reader_ = new tcp_reader(*conn_);
-		if (reader_->read(*out))
+		if (reader_ == NULL) {
+			reader_ = NEW tcp_reader(*conn_);
+		}
+		if (reader_->read(*out)) {
 			return true;
-		if (have_retried || !reuse_conn)
-		{
+		}
+		if (have_retried || !reuse_conn) {
 			logger_error("read data error");
 			return false;
 		}

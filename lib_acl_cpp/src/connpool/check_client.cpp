@@ -34,12 +34,12 @@ void check_client::set_blocked(bool on)
 	blocked_ = on;
 }
 
-void check_client::close()
+void check_client::close(void)
 {
 	conn_.close();
 }
 
-bool check_client::open_callback()
+bool check_client::open_callback(void)
 {
 	set_alive(true);
 	struct timeval end;
@@ -51,7 +51,7 @@ bool check_client::open_callback()
 	return true;
 }
 
-void check_client::close_callback()
+void check_client::close_callback(void)
 {
 	struct timeval end;
 	gettimeofday(&end, NULL);

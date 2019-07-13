@@ -29,7 +29,7 @@ struct IPC_DAT
 };
 */
 
-rpc_request::rpc_request()
+rpc_request::rpc_request(void)
 : ipc_(NULL)
 , wait_timedout_(false)
 {
@@ -37,16 +37,14 @@ rpc_request::rpc_request()
 	dat_.ctx = NULL;
 
 	cond_count_ = 0;
-	cond_ = (acl_pthread_cond_t*) acl_mycalloc(
-		1, sizeof(acl_pthread_cond_t));
+	cond_ = (acl_pthread_cond_t*) acl_mycalloc(1, sizeof(acl_pthread_cond_t));
 	acl_pthread_cond_init(cond_, NULL);
 
-	lock_ = (acl_pthread_mutex_t*) acl_mycalloc(
-		1, sizeof(acl_pthread_mutex_t));
+	lock_ = (acl_pthread_mutex_t*) acl_mycalloc(1, sizeof(acl_pthread_mutex_t));
 	acl_pthread_mutex_init(lock_, NULL);
 }
 
-rpc_request::~rpc_request()
+rpc_request::~rpc_request(void)
 {
 	acl_pthread_mutex_destroy(lock_);
 	acl_myfree(lock_);
@@ -88,15 +86,15 @@ void rpc_request::rpc_signal(void* ctx)
 {
 #ifdef ACL_WINDOWS
 	HWND hWnd = get_hwnd();
-	if (hWnd != NULL)
-	{
+	if (hWnd != NULL) {
 		// 向窗口句柄发消息，将当前对象的地址发给主线程
 		::PostMessage(hWnd, RPC_WIN32_SIG, (WPARAM) ctx, (LPARAM) this);
 		return;
 	}
 #endif
-	if (ipc_ == NULL)
+	if (ipc_ == NULL) {
 		abort();
+	}
 	/*
 	IPC_DAT data;
 	data.req = this;
@@ -114,37 +112,32 @@ bool rpc_request::cond_wait(int timeout /* = -1 */)
 	int status;
 
 	status = acl_pthread_mutex_lock(lock_);
-	if (status != 0)
-	{
+	if (status != 0) {
 		logger_error("pthread_mutex_lock error: %d", status);
 		return false;
 	}
 
-	if (--cond_count_ >= 0)
-	{
+	if (--cond_count_ >= 0) {
 		status = acl_pthread_mutex_unlock(lock_);
-		if (status != 0)
-		{
+		if (status != 0) {
 			logger_error("pthread_mutex_unlock error: %d", status);
 			return false;
 		}
 		return true;
 	}
 
-	if (timeout < 0)
-	{
+	if (timeout < 0) {
 		status = acl_pthread_cond_wait(cond_, lock_);
-		if (status != 0)
-		{
+		if (status != 0) {
 			logger_error("pthread_cond_wait error: %d", status);
 			status = acl_pthread_mutex_unlock(lock_);
-			if (status != 0)
+			if (status != 0) {
 				logger_error("pthread_mutex_unlock error: %d", status);
+			}
 			return false;
 		}
 		status = acl_pthread_mutex_unlock(lock_);
-		if (status != 0)
-		{
+		if (status != 0) {
 			logger_error("pthread_mutex_unlock error: %d", status);
 			return false;
 		}
@@ -159,22 +152,20 @@ bool rpc_request::cond_wait(int timeout /* = -1 */)
 	wait_timedout_ = false;
 
 	status = acl_pthread_cond_timedwait(cond_, lock_, &when_ttl);
-	if (status != 0)
-	{
-		if (status == ACL_ETIMEDOUT)
+	if (status != 0) {
+		if (status == ACL_ETIMEDOUT) {
 			wait_timedout_ = true;
-		else
+		} else {
 			logger_error("pthread_cond_timedwait error: %d", status);
+		}
 		status = acl_pthread_mutex_unlock(lock_);
-		if (status != 0)
+		if (status != 0) {
 			logger_error("pthread_mutex_unlock error: %d", status);
+		}
 		return false;
-	}
-	else
-	{
+	} else {
 		status = acl_pthread_mutex_unlock(lock_);
-		if (status != 0)
-		{
+		if (status != 0) {
 			logger_error("pthread_mutex_unlock error: %d", status);
 			return false;
 		}
@@ -182,13 +173,12 @@ bool rpc_request::cond_wait(int timeout /* = -1 */)
 	}
 }
 
-bool rpc_request::cond_signal()
+bool rpc_request::cond_signal(void)
 {
 	int status;
 
 	status = acl_pthread_mutex_lock(lock_);
-	if (status != 0)
-	{
+	if (status != 0) {
 		logger_error("pthread_mutex_lock error: %d", status);
 		return false;
 	}
@@ -196,16 +186,14 @@ bool rpc_request::cond_signal()
 	cond_count_++;
 
 	status = acl_pthread_cond_signal(cond_);
-	if (status != 0)
-	{
+	if (status != 0) {
 		(void) acl_pthread_mutex_unlock(lock_);
 		logger_error("pthread_cond_signal error: %d", status);
 		return false;
 	}
 
 	status = acl_pthread_mutex_unlock(lock_);
-	if (status != 0)
-	{
+	if (status != 0) {
 		logger_error("pthread_mutex_unlock error: %d", status);
 		return false;
 	}
@@ -225,27 +213,32 @@ public:
 
 protected:
 	/**
+	 * @override
 	 * 基类虚接口：当收到消息时的回调函数
 	 * @param nMsg {int} 用户添加的自定义消息值
 	 * @param data {void*} 消息数据
 	 * @param dlen {int} 消息数据的长度
 	 */
-	virtual void on_message(int nMsg, void* data, int dlen)
+	void on_message(int nMsg, void* data, int dlen)
 	{
-		if (!(data && dlen == sizeof(RPC_DAT)))
+		if (!(data && dlen == sizeof(RPC_DAT))) {
 			abort();
+		}
 		RPC_DAT* dat = (RPC_DAT*) data;
-		if (dat->req == NULL)
+		if (dat->req == NULL) {
 			abort();
+		}
 
-		if (nMsg == RPC_MSG)
+		if (nMsg == RPC_MSG) {
 			dat->req->rpc_onover();
-		else if (nMsg == RPC_SIG)
+		} else if (nMsg == RPC_SIG) {
 			dat->req->rpc_wakeup(dat->ctx);
+		}
 	}
 
+	// @override
 	// 基类虚接口
-	virtual void on_close(void)
+	void on_close(void)
 	{
 		delete this;
 	}
@@ -281,18 +274,17 @@ void rpc_service::on_accept(aio_socket_stream* client)
 #ifdef ACL_WINDOWS
 void rpc_service::win32_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (msg == RPC_WIN32_MSG)
-	{
+	if (msg == RPC_WIN32_MSG) {
 		rpc_request* req = (rpc_request*) lParam;
-		if (req == NULL)
+		if (req == NULL) {
 			abort();
+		}
 		req->rpc_onover();
-	}
-	else if (msg == RPC_WIN32_SIG)
-	{
+	} else if (msg == RPC_WIN32_SIG) {
 		rpc_request* req = (rpc_request*) lParam;
-		if (req == NULL)
+		if (req == NULL) {
 			abort();
+		}
 		void* ctx = (void*) wParam;
 		req->rpc_wakeup(ctx);
 	}

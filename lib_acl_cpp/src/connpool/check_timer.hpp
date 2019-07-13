@@ -18,9 +18,9 @@ class check_timer : public aio_timer_callback
 public:
 	check_timer(connect_monitor& monitor, aio_handle& handle,
 		int conn_timeout);
-	~check_timer() {}
+	~check_timer(void) {}
 
-	connect_monitor& get_monitor() const
+	connect_monitor& get_monitor(void) const
 	{
 		return monitor_;
 	}

@@ -12,7 +12,7 @@
 namespace acl
 {
 
-connect_manager::connect_manager()
+connect_manager::connect_manager(void)
 : thread_binding_(false)
 , default_pool_(NULL)
 , stat_inter_(1)
@@ -23,7 +23,7 @@ connect_manager::connect_manager()
 {
 }
 
-connect_manager::~connect_manager()
+connect_manager::~connect_manager(void)
 {
 	lock_guard guard(lock_);
 	for (manager_it mit = manager_.begin(); mit != manager_.end(); ++mit) {

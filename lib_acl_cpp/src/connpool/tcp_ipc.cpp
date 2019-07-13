@@ -77,8 +77,8 @@ void tcp_ipc::get_addrs(std::vector<string>& addrs)
 	manager_->lock();
 	std::vector<connect_pool*>& pools = manager_->get_pools();
 	for (std::vector<connect_pool*>::const_iterator cit = pools.begin();
-		cit != pools.end(); ++cit)
-	{
+		cit != pools.end(); ++cit) {
+
 		addrs.push_back((*cit)->get_addr());
 	}
 
@@ -89,8 +89,7 @@ bool tcp_ipc::send(const char* addr, const void* data, unsigned int len,
 	string* out /* = NULL */)
 {
 	tcp_pool* pool = (tcp_pool*) manager_->peek(addr);
-	if (pool == NULL)
-	{
+	if (pool == NULL) {
 		manager_->set(addr, max_, conn_timeout_, rw_timeout_);
 		pool = (tcp_pool*) manager_->peek(addr);
 	}
@@ -101,15 +100,13 @@ bool tcp_ipc::send(tcp_pool& pool, const void* data, unsigned int len,
 	string* out)
 {
 	tcp_client* conn = (tcp_client*) pool.peek();
-	if (conn == NULL)
-	{
+	if (conn == NULL) {
 		logger_error("no connection available, addr=%s",
 			pool.get_addr());
 		return false;
 	}
 
-	if (conn->send(data, len, out) == false)
-	{
+	if (!conn->send(data, len, out)) {
 		pool.put(conn, false);
 		return false;
 	}
@@ -124,24 +121,27 @@ size_t tcp_ipc::broadcast(const void* data, unsigned int len,
 {
 	size_t n = 0;
 
-	if (exclusive)
+	if (exclusive) {
 		manager_->lock();
+	}
 
 	string dummy;
 	std::vector<connect_pool*>& pools = manager_->get_pools();
 	for (std::vector<connect_pool*>::iterator it = pools.begin();
-		it != pools.end(); ++it)
-	{
+		it != pools.end(); ++it) {
+
 		tcp_pool* pool = (tcp_pool*) (*it);
-		if (send(*pool, data, len, check_result ? &dummy : NULL))
+		if (send(*pool, data, len, check_result ? &dummy : NULL)) {
 			n++;
-		else if (nerr)
+		} else if (nerr) {
 			(*nerr)++;
+		}
 		dummy.clear();
 	}
 
-	if (exclusive)
+	if (exclusive) {
 		manager_->unlock();
+	}
 
 	return n;
 }
