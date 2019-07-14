@@ -10,22 +10,20 @@ namespace acl
 
 static const char* dummy_unknown = "uknown error";
 
-hserror::hserror()
+hserror::hserror(void)
 {
 }
 
-hserror::~hserror()
+hserror::~hserror(void)
 {
 }
 
 const char* hserror::get_serror(int errnum)
 {
-	static struct
-	{
+	static struct {
 		int  err;
 		const char* msg;
-	} err_list[] =
-	{
+	} err_list[] = {
 		{ HS_ERR_INVALID_REPLY, "server reply invalid" },
 		{ HS_ERR_EMPTY, "server reply empty" },
 		{ HS_ERR_PARAMS, "params invalid" },
@@ -38,12 +36,12 @@ const char* hserror::get_serror(int errnum)
 		{ -1000, NULL}
 	};
 
-	for (int i = 0; err_list[i].msg != NULL; i++)
-	{
-		if (err_list[i].err == errnum)
-			return (err_list[i].msg);
+	for (int i = 0; err_list[i].msg != NULL; i++) {
+		if (err_list[i].err == errnum) {
+			return err_list[i].msg;
+		}
 	}
-	return (dummy_unknown);
+	return dummy_unknown;
 }
 
 }

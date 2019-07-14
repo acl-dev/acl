@@ -91,146 +91,169 @@
 
 	const char* path;
 	const char* ptr = acl::db_handle::get_loadpath();
-	if (ptr)
+	if (ptr) {
 		path = ptr;
-	else
+	} else {
 #ifdef ACL_WINDOWS
 		path = "sqlite3.dll";
 #else
 		path = "sqlite3.so";
 #endif
+	}
 
 	__sqlite_dll = acl_dlopen(path);
-	if (__sqlite_dll == NULL)
+	if (__sqlite_dll == NULL) {
 		logger_fatal("load %s error: %s", path, acl_last_serror());
+	}
 
 	__sqlite_path = path;
 
 	__sqlite3_libversion = (sqlite3_libversion_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_libversion");
-	if (__sqlite3_libversion == NULL)
+	if (__sqlite3_libversion == NULL) {
 		logger_fatal("load sqlite3_libversion from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_open = (sqlite3_open_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_open");
-	if (__sqlite3_open == NULL)
+	if (__sqlite3_open == NULL) {
 		logger_fatal("load sqlite3_open from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_close = (sqlite3_close_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_close");
-	if (__sqlite3_close == NULL)
+	if (__sqlite3_close == NULL) {
 		logger_fatal("load sqlite3_close from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_get_table = (sqlite3_get_table_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_get_table");
-	if (__sqlite3_get_table == NULL)
+	if (__sqlite3_get_table == NULL) {
 		logger_fatal("load sqlite3_get_table from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_free_table = (sqlite3_free_table_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_free_table");
-	if (__sqlite3_free_table == NULL)
+	if (__sqlite3_free_table == NULL) {
 		logger_fatal("load sqlite3_free_table from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_busy_handler = (sqlite3_busy_handler_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_busy_handler");
-	if (__sqlite3_busy_handler == NULL)
+	if (__sqlite3_busy_handler == NULL) {
 		logger_fatal("load sqlite3_busy_handler from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_errmsg = (sqlite3_errmsg_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_errmsg");
-	if (__sqlite3_errmsg == NULL)
+	if (__sqlite3_errmsg == NULL) {
 		logger_fatal("load sqlite3_errmsg from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_errcode = (sqlite3_errcode_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_errcode");
-	if (__sqlite3_errcode == NULL)
+	if (__sqlite3_errcode == NULL) {
 		logger_fatal("load sqlite3_errcode from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_changes = (sqlite3_changes_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_changes");
-	if (__sqlite3_changes == NULL)
+	if (__sqlite3_changes == NULL) {
 		logger_fatal("load sqlite3_changes from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_total_changes = (sqlite3_total_changes_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_total_changes");
-	if (__sqlite3_total_changes == NULL)
+	if (__sqlite3_total_changes == NULL) {
 		logger_fatal("load sqlite3_total_changes from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_busy_timeout = (sqlite3_busy_timeout_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_busy_timeout");
-	if (__sqlite3_busy_timeout == NULL)
+	if (__sqlite3_busy_timeout == NULL) {
 		logger_fatal("load sqlite3_busy_timeout from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_prepare_v2 = (sqlite3_prepare_v2_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_prepare_v2");
-	if (__sqlite3_prepare_v2 == NULL)
+	if (__sqlite3_prepare_v2 == NULL) {
 		logger_fatal("load sqlite3_prepare_v2 from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_step = (sqlite3_step_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_step");
-	if (__sqlite3_step == NULL)
+	if (__sqlite3_step == NULL) {
 		logger_fatal("load sqlite3_step from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_column_count = (sqlite3_column_count_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_count");
-	if (__sqlite3_column_count == NULL)
+	if (__sqlite3_column_count == NULL) {
 		logger_fatal("load sqlite3_column_count from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_column_type = (sqlite3_column_type_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_type");
-	if (__sqlite3_column_type == NULL)
+	if (__sqlite3_column_type == NULL) {
 		logger_fatal("load sqlite3_column_type from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_column_name = (sqlite3_column_name_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_name");
-	if (__sqlite3_column_name == NULL)
+	if (__sqlite3_column_name == NULL) {
 		logger_fatal("load sqlite3_column_name from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_data_count = (sqlite3_data_count_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_data_count");
-	if (__sqlite3_data_count == NULL)
+	if (__sqlite3_data_count == NULL) {
 		logger_fatal("load sqlite3_data_count from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_column_int64 = (sqlite3_column_int64_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_int64");
-	if (__sqlite3_column_int64 == NULL)
+	if (__sqlite3_column_int64 == NULL) {
 		logger_fatal("load sqlite3_column_int64 from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_column_double = (sqlite3_column_double_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_double");
-	if (__sqlite3_column_double == NULL)
+	if (__sqlite3_column_double == NULL) {
 		logger_fatal("load sqlite3_column_double from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_column_text = (sqlite3_column_text_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_text");
-	if (__sqlite3_column_text == NULL)
+	if (__sqlite3_column_text == NULL) {
 		logger_fatal("load sqlite3_column_text from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	__sqlite3_finalize = (sqlite3_finalize_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_finalize");
-	if (__sqlite3_finalize == NULL)
+	if (__sqlite3_finalize == NULL) {
 		logger_fatal("load sqlite3_finalize from %s error: %s",
 			path, acl_last_serror());
+	}
 
 	logger("%s loaded", path);
 	atexit(__sqlite_dll_unload);
@@ -269,11 +292,12 @@ static void sqlite_rows_free(void* ctx)
 {
 	char** results = (char**) ctx;
 #ifdef HAS_SQLITE_DLL
-	if (__sqlite_dll && results)
+	if (__sqlite_dll && results) {
 #else
-	if (results)
+	if (results) {
 #endif
 		__sqlite3_free_table(results);
+	}
 }
 
 static void sqlite_rows_save(char** results, int nrow,
@@ -309,8 +333,9 @@ db_sqlite::db_sqlite(const char* dbfile, const char* charset /* ="utf-8" */)
 	if (charset && strcasecmp(charset, "utf-8") !=0) {
 		charset_ = charset;
 		conv_ = NEW charset_conv();
-	} else
+	} else {
 		conv_ = NULL;
+	}
 
 	acl_assert(dbfile && *dbfile);
 #ifdef HAS_SQLITE_DLL
@@ -327,7 +352,7 @@ db_sqlite::~db_sqlite(void)
 
 const char* db_sqlite::version(void) const
 {
-	return (__sqlite3_libversion());
+	return __sqlite3_libversion();
 }
 
 static int sqlite_busy_callback(void *ctx acl_unused, int nretry acl_unused)
@@ -344,60 +369,65 @@ const char* db_sqlite::dbtype(void) const
 
 int db_sqlite::get_errno(void) const
 {
-	if (db_)
+	if (db_) {
 		return __sqlite3_errcode(db_);
-	else
+	} else {
 		return -1;
+	}
 }
 
 const char* db_sqlite::get_error(void) const
 {
-	if (db_)
+	if (db_) {
 		return __sqlite3_errmsg(db_);
-	else
+	} else {
 		return "sqlite not opened yet!";
+	}
 }
 
 bool db_sqlite::dbopen(const char* charset /* = NULL */)
 {
 	// 如果数据库已经打开，则直接返回 true
-	if (db_ != NULL)
+	if (db_ != NULL) {
 		return true;
+	}
 
 	string buf;
 
 	const char* ptr;
 
-	if (charset != NULL && *charset != 0)
+	if (charset != NULL && *charset != 0) {
 		charset_ = charset;
+	}
 
 	// 转换成 [utf-8] 编码格式
 
-	if (conv_ == NULL)
+	if (conv_ == NULL) {
 		ptr = dbfile_.c_str();
-	else if (conv_->convert(charset_.c_str(), "utf-8",
+	} else if (conv_->convert(charset_.c_str(), "utf-8",
 		dbfile_.c_str(), dbfile_.length(), &buf) == false) {
 
 		logger_error("charset convert(%s) from %s to utf-8 error",
 			dbfile_.c_str(), charset_.c_str());
 		return false;
-	} else
+	} else {
 		ptr = buf.c_str();
+	}
 
 	string path;
 	string& dir = path.dirname(dbfile_);
 
 #ifdef ACL_WINDOWS
 	if (!dir.empty() && dir != "." &&
-		_access(dir.c_str(), 6) == -1 && errno == ENOENT)
+		_access(dir.c_str(), 6) == -1 && errno == ENOENT) {
 #else
 	if (!dir.empty() && dir != "." &&
-		access(dir.c_str(), R_OK | W_OK | X_OK) == -1 && errno == ENOENT)
+		access(dir.c_str(), R_OK | W_OK | X_OK) == -1 && errno == ENOENT) {
 #endif
-	{
-		if (acl_make_dirs(dir.c_str(), 0755) == -1)
+		if (acl_make_dirs(dir.c_str(), 0755) == -1) {
 			logger_error("make dirs error %s, dir: %s",
 				last_serror(), dir.c_str());
+		}
 	}
 
 	// 打开 sqlite 数据库
@@ -426,8 +456,9 @@ bool db_sqlite::is_opened(void) const
 
 bool db_sqlite::close(void)
 {
-	if (db_ == NULL)
+	if (db_ == NULL) {
 		return false;
+	}
 
 	// 关闭 sqlite 数据库
 	int   ret = __sqlite3_close(db_);
@@ -443,17 +474,17 @@ bool db_sqlite::close(void)
 bool db_sqlite::set_conf(const char* pragma)
 {
 	bool ret = exec_sql(pragma);
-	if (result_)
+	if (result_) {
 		free_result();
+	}
 	return ret;
 }
 
 const char* db_sqlite::get_conf(const char* pragma, string& out)
 {
-	bool ret = exec_sql(pragma);
-	if (ret == false)
+	if (!exec_sql(pragma)) {
 		return NULL;
-	else if (length() == 0) {
+	} else if (length() == 0) {
 		free_result();
 		return NULL;
 	} else {
@@ -505,19 +536,21 @@ void db_sqlite::show_conf(const char* pragma /* = NULL */)
 	string buf;
 
 	if (pragma != NULL) {
-		if (get_conf(pragma, buf) != NULL)
+		if (get_conf(pragma, buf) != NULL) {
 			printf("%s: %s\r\n", pragma, buf.c_str());
-		else
+		} else {
 			printf("%s: UNKNOWN\r\n", pragma);
+		}
 		return;
 	}
 
 	int   i;
 	for (i = 0; __pragmas[i] != NULL; i++) {
-		if (get_conf(__pragmas[i], buf) != NULL)
+		if (get_conf(__pragmas[i], buf) != NULL) {
 			printf("%s: %s\r\n", __pragmas[i], buf.c_str());
-		else
+		} else {
 			printf("%s: UNKNOWN\r\n", __pragmas[i]);
+		}
 	}
 }
 
@@ -532,7 +565,7 @@ bool db_sqlite::tbl_exists(const char* tbl_name)
 	sql.format("select count(*) from sqlite_master"
 		" where type='table' and name='%s'", tbl_name);
 
-	if (exec_sql(sql.c_str()) == false) {
+	if (!exec_sql(sql.c_str())) {
 		free_result();
 		return false;
 	}
@@ -547,8 +580,9 @@ bool db_sqlite::tbl_exists(const char* tbl_name)
 		int  n = row->field_int((size_t) 0, (int) 0);
 		free_result();
 
-		if (n == 0)
-			return (false);
+		if (n == 0) {
+			return false;
+		}
 		return true;
 	}
 }
@@ -580,8 +614,7 @@ bool db_sqlite::exec_sql(const char* sql, db_rows* result /* = NULL */)
 	int    nrow, ncolumn;
 
 	// 执行 sqlite 的查询过程
-	int   ret = __sqlite3_get_table(db_, sql, &results,
-		&nrow, &ncolumn, &err);
+	int   ret = __sqlite3_get_table(db_, sql, &results, &nrow, &ncolumn, &err);
 	if (ret != SQLITE_OK) {
 		logger_error("sqlites_get_table(%s) error(%s)",
 			sql, __sqlite3_errmsg(db_));
@@ -590,9 +623,9 @@ bool db_sqlite::exec_sql(const char* sql, db_rows* result /* = NULL */)
 	}
 
 	if (nrow > 0) {
-		if (result != NULL)
+		if (result != NULL) {
 			sqlite_rows_save(results, nrow, ncolumn, *result);
-		else {
+		} else {
 			result_ = NEW db_rows();
 			sqlite_rows_save(results, nrow, ncolumn, *result_);
 		}
@@ -680,14 +713,16 @@ bool db_sqlite::next(sqlite_cursor& cursor, bool* done)
 {
 	cursor.clear();
 
-	if (done)
+	if (done) {
 		*done = false;
+	}
 
 	int ret = __sqlite3_step(cursor.stmt_);
 	switch (ret) {
 	case SQLITE_DONE:
-		if (done)
+		if (done) {
 			*done = true;
+		}
 		return true;
 	case SQLITE_BUSY:
 		logger_error("SQLITE_BUSY now, error=%s", get_error());

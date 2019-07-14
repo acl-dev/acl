@@ -17,22 +17,25 @@ hspool::hspool(const char* addr_rw, const char* addr_rd,
 {
 	acl_assert(addr_rw);
 	addr_rw_ = acl_mystrdup(addr_rw);
-	if (addr_rd != NULL)
+	if (addr_rd != NULL) {
 		addr_rd_ = acl_mystrdup(addr_rd);
-	else
+	} else {
 		addr_rd_ = addr_rw_;
+	}
 	locker_ = NEW locker(true);
 }
 
-hspool::~hspool()
+hspool::~hspool(void)
 {
-	if (addr_rd_ != addr_rw_)
+	if (addr_rd_ != addr_rw_) {
 		acl_myfree(addr_rd_);
+	}
 	acl_myfree(addr_rw_);
 
 	std::list<hsclient*>::iterator it = pool_.begin();
-	for (; it != pool_.end(); ++it)
-		delete (*it);
+	for (; it != pool_.end(); ++it) {
+		delete *it;
+	}
 	delete locker_;
 }
 
@@ -42,38 +45,36 @@ hsclient* hspool::peek(const char* dbn, const char* tbl,
 	hsclient* client;
 	const char* addr;
 
-	if (readonly)
+	if (readonly) {
 		addr = addr_rd_;
-	else
+	} else {
 		addr = addr_rw_;
+	}
 
 	locker_->lock();
 
 	// 先顺序查询符合表字段条件的连接对象
 	std::list<hsclient*>::iterator it = pool_.begin();
-	for (; it != pool_.end(); ++it)
-	{
+	for (; it != pool_.end(); ++it) {
 		// 如果地址不匹配查跳过，地址必须匹配
-		if (strcmp((*it)->get_addr(), addr) != 0)
+		if (strcmp((*it)->get_addr(), addr) != 0) {
 			continue;
+		}
 
 		// 打开已经打开的表，查询表字段是否符合
-		if ((*it)->open_tbl(dbn, tbl, idx, flds, false))
-		{
+		if ((*it)->open_tbl(dbn, tbl, idx, flds, false)) {
 			client = *it;
 			pool_.erase(it);
 			locker_->unlock();
-			return (client);
+			return client;
 		}
 	}
 
 	// 查询地址匹配的连接对象，如果存在一个匹配的连接对象，则
 	// 打开新的表
-	for (it = pool_.begin(); it != pool_.end();)
-	{
+	for (it = pool_.begin(); it != pool_.end();) {
 		// 如果地址不匹配查跳过，地址必须匹配
-		if (strcmp((*it)->get_addr(), addr) != 0)
-		{
+		if (strcmp((*it)->get_addr(), addr) != 0) {
 			++it;
 			continue;
 		}
@@ -82,10 +83,9 @@ hsclient* hspool::peek(const char* dbn, const char* tbl,
 		it = pool_.erase(it); // 从连接池中删除
 
 		// 打开新的表
-		if (client->open_tbl(dbn, tbl, idx, flds, true))
-		{
+		if (client->open_tbl(dbn, tbl, idx, flds, true)) {
 			locker_->unlock();
-			return (client);
+			return client;
 		}
 
 		// 打开失败，则需要删除该连接对象
@@ -96,13 +96,12 @@ hsclient* hspool::peek(const char* dbn, const char* tbl,
 
 	client = NEW hsclient(addr, cache_enable_, retry_enable_);
 
-	if (client->open_tbl(dbn, tbl, idx, flds) == false)
-	{
+	if (!client->open_tbl(dbn, tbl, idx, flds)) {
 		delete client;
-		return (NULL);
+		return NULL;
 	}
 
-	return (client);
+	return client;
 }
 
 void hspool::put(hsclient* client)

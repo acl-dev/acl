@@ -27,7 +27,7 @@ static unsigned int __counter = 0;
 namespace acl
 {
 
-queue_file::queue_file()
+queue_file::queue_file(void)
 : m_fp(NULL)
 , m_locker(true)
 , m_bLocked(false)
@@ -37,7 +37,7 @@ queue_file::queue_file()
 
 }
 
-queue_file::~queue_file()
+queue_file::~queue_file(void)
 {
 	this->close();
 }
@@ -59,8 +59,7 @@ bool queue_file::create(const char* home, const char* queueName,
 
 	unsigned int n;
 
-	while (1)
-	{
+	while (true) {
 		// 产生部分文件名
 		memset(&tv, 0, sizeof(tv));
 		gettimeofday(&tv, NULL);
@@ -71,8 +70,9 @@ bool queue_file::create(const char* home, const char* queueName,
 			(unsigned int) tv.tv_sec,
 			(unsigned int) tv.tv_usec,
 			(unsigned int) __counter);
-		if (__counter++ >= 1024000)
+		if (__counter++ >= 1024000) {
 			__counter = 0;
+		}
 
 		// 计算队列子目录
 		n = queue_manager::hash_queueSub(m_partName, width);
@@ -86,29 +86,29 @@ bool queue_file::create(const char* home, const char* queueName,
 
 		dir_exist = false;
 
-		while (true)
-		{
+		while (true) {
 			// 排它性创建唯一文件
-			if (fp->open(buf.c_str(), O_RDWR | O_CREAT | O_EXCL, 0600) == true)
+			if (fp->open(buf.c_str(), O_RDWR | O_CREAT | O_EXCL, 0600)) {
 				goto END;
+			}
 
 			logger_warn("open file %s error(%s)", buf.c_str(), acl_last_serror());
 
-			if (acl_last_error() != ENOENT || dir_exist)
+			if (last_error() != ENOENT || dir_exist) {
 				break;
+			}
 
 			// 尝试性创建目录
 			buf.clear();
 			buf << m_home << PATH_SEP << m_queueName << PATH_SEP << m_queueSub;
-			if (acl_make_dirs(buf.c_str(), 0700) == -1)
-			{
+			if (acl_make_dirs(buf.c_str(), 0700) == -1) {
 				logger_error("mkdir: %s error(%s)",
 					buf.c_str(), acl_last_serror());
 				delete fp;
 				return false;
-			}
-			else
+			} else {
 				logger("create path: %s ok", buf.c_str());
+			}
 
 			dir_exist = true;
 			buf.clear();
@@ -130,14 +130,13 @@ END:
 	m_filePath = buf.c_str();
 
 	// 打开队列文件对象锁
-	if (m_locker.open(m_fp->file_handle()) == false)
-	{
+	if (!m_locker.open(m_fp->file_handle())) {
 		logger_error("open lock for %s error(%s)",
-			m_filePath.c_str(), acl_last_serror());
+			m_filePath.c_str(), last_serror());
 		m_bLockerOpened = false;
-	}
-	else
+	} else {
 		m_bLockerOpened = true;
+	}
 
 	return true;
 }
@@ -145,9 +144,9 @@ END:
 bool queue_file::open(const char* filePath)
 {
 	string home, queueName, queueSub, partName, extName;
-	if (queue_manager::parse_filePath(filePath, &home, &queueName, &queueSub,
-		&partName, &extName) == false)
-	{
+	if (!queue_manager::parse_filePath(filePath, &home, &queueName,
+		&queueSub, &partName, &extName)) {
+
 		logger_error("filePath(%s) invalid", filePath);
 		return false;
 	}
@@ -159,8 +158,9 @@ bool queue_file::open(const char* filePath)
 bool queue_file::open(const char* home, const char* queueName,
 	const char* queueSub, const char* partName, const char* extName)
 {
-	if (m_fp)
+	if (m_fp) {
 		logger_fatal("old file(%s) exist", m_filePath.c_str());
+	}
 
 	m_filePath.clear();
 	m_filePath << home << PATH_SEP << queueName << PATH_SEP << queueSub
@@ -168,35 +168,36 @@ bool queue_file::open(const char* home, const char* queueName,
 
 	m_fp = NEW fstream;
 
-	if (m_fp->open(m_filePath.c_str(), O_RDWR, 0600) == false)
-	{
+	if (!m_fp->open(m_filePath.c_str(), O_RDWR, 0600)) {
 		logger_error("open %s error(%s)", m_filePath.c_str(),
-			acl_last_serror());
+			last_serror());
 		delete m_fp;
 		m_fp = NULL;
 		return false;
 	}
 
-	if (m_home != home)
+	if (m_home != home) {
 		ACL_SAFE_STRNCPY(m_home, home, sizeof(m_home));
-	if (m_queueName != queueName)
+	}
+	if (m_queueName != queueName) {
 		ACL_SAFE_STRNCPY(m_queueName, queueName, sizeof(m_queueName));
-	if (m_queueSub != queueSub)
+	}
+	if (m_queueSub != queueSub) {
 		ACL_SAFE_STRNCPY(m_queueSub, queueSub, sizeof(m_queueSub));
-	if (m_partName != partName)
+	}
+	if (m_partName != partName) {
 		ACL_SAFE_STRNCPY(m_partName, partName, sizeof(m_partName));
-	if (m_extName != extName)
+	}
+	if (m_extName != extName) {
 		ACL_SAFE_STRNCPY(m_extName, extName, sizeof(m_extName));
+	}
 
 	// 打开队列文件对象锁
-	if (m_locker.open(m_fp->file_handle()) == false)
-	{
+	if (!m_locker.open(m_fp->file_handle())) {
 		logger_error("open lock for %s error(%s)",
-			m_filePath.c_str(), acl_last_serror());
+			m_filePath.c_str(), last_serror());
 		m_bLockerOpened = false;
-	}
-	else
-	{
+	} else {
 		m_bLockerOpened = true;
 	}
 
@@ -204,39 +205,34 @@ bool queue_file::open(const char* home, const char* queueName,
 	return true;
 }
 
-void queue_file::close()
+void queue_file::close(void)
 {
-	if (m_fp)
-	{
+	if (m_fp) {
 		delete m_fp;
 		m_fp = NULL;
 		nwriten_ = 0;
 	}
 }
 
-acl::fstream* queue_file::get_fstream() const
+acl::fstream* queue_file::get_fstream(void) const
 {
 	return m_fp;
 }
 
-time_t queue_file::get_ctime() const
+time_t queue_file::get_ctime(void) const
 {
-	if (m_fp == NULL)
-	{
+	if (m_fp == NULL) {
 		logger_error("m_fp null");
 		return (time_t) -1;
-	}
-	else if (m_filePath.empty())
-	{
+	} else if (m_filePath.empty()) {
 		logger_error("m_filePath empty");
 		return (time_t) -1;
 	}
 
 	struct acl_stat buf;
-	if (acl_stat(m_filePath.c_str(), &buf) == -1)
-	{
+	if (acl_stat(m_filePath.c_str(), &buf) == -1) {
 		logger_error("stat file(%s) error(%s)",
-			m_filePath.c_str(), acl_last_serror());
+			m_filePath.c_str(), last_serror());
 		return (time_t) -1;
 	}
 	return buf.st_ctime;
@@ -244,18 +240,15 @@ time_t queue_file::get_ctime() const
 
 bool queue_file::write(const void* data, size_t len)
 {
-	if (data == NULL || len == 0 || len >= (unsigned int) -1)
-	{
+	if (data == NULL || len == 0 || len >= (unsigned int) -1) {
 		logger_error("input invalid");
 		return false;
 	}
-	if (m_fp == NULL)
-	{
+	if (m_fp == NULL) {
 		logger_error("m_fp null");
 		return false;
 	}
-	if (m_fp->write(data, len) != (int) len)
-	{
+	if (m_fp->write(data, len) != (int) len) {
 		logger_error("write error");
 		return false;
 	}
@@ -276,8 +269,7 @@ int queue_file::format(const char* fmt, ...)
 int queue_file::vformat(const char* fmt, va_list ap)
 {
 	int ret = m_fp->vformat(fmt, ap);
-	if (ret == -1)
-	{
+	if (ret == -1) {
 		logger_error("write to file error(%s)", last_serror());
 		return -1;
 	}
@@ -287,33 +279,31 @@ int queue_file::vformat(const char* fmt, va_list ap)
 }
 int queue_file::read(void* buf, size_t len)
 {
-	if (buf == NULL || len == 0 || len >= (unsigned int) -1)
-	{
+	if (buf == NULL || len == 0 || len >= (unsigned int) -1) {
 		logger_error("input invalid");
 		return -1;
 	}
-	if (m_fp == NULL)
-	{
+	if (m_fp == NULL) {
 		logger_error("m_fp null");
 		return -1;
 	}
 	int   ret;
-	if ((ret = m_fp->read(buf, len, false)) < 0)
+	if ((ret = m_fp->read(buf, len, false)) < 0) {
 		return -1;
+	}
 	return ret;
 }
 
-bool queue_file::remove()
+bool queue_file::remove(void)
 {
 	this->close();
 #ifdef ACL_WINDOWS
-	if (_unlink(m_filePath.c_str()) != 0)
+	if (_unlink(m_filePath.c_str()) != 0) {
 #else
-	if (unlink(m_filePath.c_str()) != 0)
+	if (unlink(m_filePath.c_str()) != 0) {
 #endif
-	{
 		logger_error("unlink %s error(%s)",
-			m_filePath.c_str(), acl_last_serror());
+			m_filePath.c_str(), last_serror());
 		return false;
 	}
 	return true;
@@ -324,8 +314,7 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 	acl::string buf(256);
 	bool once_again = false;
 
-	while (true)
-	{
+	while (true) {
 		buf.clear();
 		buf << m_home << PATH_SEP << queueName << PATH_SEP << m_queueSub
 			<< PATH_SEP << m_partName << "." << extName;
@@ -335,16 +324,16 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 		this->close();
 #endif
 
-		if (rename(m_filePath.c_str(), buf.c_str()) == 0)
+		if (rename(m_filePath.c_str(), buf.c_str()) == 0) {
 			break;
+		}
 
 		// 如果返回错误原因是目标路径不存在，则尝试创建目录结构
 
-		if (once_again || acl_last_error() != ENOENT)
-		{
+		if (once_again || acl_last_error() != ENOENT) {
 			logger_error("move from %s to %s error(%s), errno: %d, %d",
-				m_filePath.c_str(), buf.c_str(), acl_last_serror(),
-				acl_last_error(), ENOENT);
+				m_filePath.c_str(), buf.c_str(), last_serror(),
+				last_error(), ENOENT);
 			return false;
 		}
 
@@ -356,10 +345,9 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 			<< PATH_SEP << m_queueSub;
 
 		// 创建队列目录
-		if (acl_make_dirs(buf.c_str(), 0700) == -1)
-		{
+		if (acl_make_dirs(buf.c_str(), 0700) == -1) {
 			logger_error("mkdir: %s error(%s)",
-				buf.c_str(), acl_last_serror());
+				buf.c_str(), last_serror());
 			return false;
 		}
 	}
@@ -368,10 +356,12 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 	// win32 下需要重新再打开
 	return open(m_home, queueName, m_queueSub, m_partName, extName);
 #else
-	if (m_queueName != queueName)
+	if (m_queueName != queueName) {
 		ACL_SAFE_STRNCPY(m_queueName, queueName, sizeof(m_queueName));
-	if (m_extName != extName)
+	}
+	if (m_extName != extName) {
 		ACL_SAFE_STRNCPY(m_extName, extName, sizeof(m_extName));
+	}
 	m_filePath.clear();
 	m_filePath << m_home << PATH_SEP << m_queueName << PATH_SEP
 		<< m_queueSub << PATH_SEP << m_partName << "." << m_extName;
@@ -395,21 +385,25 @@ void queue_file::set_extName(const char* extName)
 		<< m_queueSub << PATH_SEP << m_partName << "." << m_extName;
 }
 
-bool queue_file::lock()
+bool queue_file::lock(void)
 {
-	if (m_bLockerOpened == false)
+	if (!m_bLockerOpened) {
 		return false;
-	if (m_locker.try_lock() == false)
+	}
+	if (!m_locker.try_lock()) {
 		return false;
+	}
 	return true;
 }
 
-bool queue_file::unlock()
+bool queue_file::unlock(void)
 {
-	if (m_bLockerOpened == false)
+	if (!m_bLockerOpened) {
 		return false;
-	if (m_locker.unlock() == false)
+	}
+	if (!m_locker.unlock()) {
 		return false;
+	}
 	return true;
 }
 

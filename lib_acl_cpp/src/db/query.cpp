@@ -11,12 +11,12 @@
 namespace acl
 {
 
-query::query()
+query::query(void)
 : sql_buf_(NULL)
 {
 }
 
-query::~query()
+query::~query(void)
 {
 	delete sql_buf_;
 	reset();
@@ -42,8 +42,7 @@ bool query::append_key(string& buf, char* key)
 {
 	acl_lowercase(key);
 	std::map<string, query_param*>::iterator it = params_.find(key);
-	if (it == params_.end())
-	{
+	if (it == params_.end()) {
 		logger_warn("unknown key: %s", key);
 		buf.append(key);
 		return false;
@@ -52,8 +51,7 @@ bool query::append_key(string& buf, char* key)
 	char fmt[256];
 
 	query_param* param = it->second;
-	switch (param->type)
-	{
+	switch (param->type) {
 	case DB_PARAM_CHAR:
 		buf.format_append("'%c'", param->v.c);
 		break;
@@ -88,27 +86,25 @@ bool query::append_key(string& buf, char* key)
 
 const string& query::to_string()
 {
-	if (params_.empty())
+	if (params_.empty()) {
 		return sql_;
-	if (sql_buf_ == NULL)
+	}
+	if (sql_buf_ == NULL) {
 		sql_buf_ = NEW string(sql_.length() + 32);
-	else
+	} else {
 		sql_buf_->clear();
+	}
 
 #define SKIP_WHILE(cond, ptr) { while(*ptr && (cond)) ptr++; }
 
 	char last_ch;
 	char* src = sql_.c_str(), *ptr, *key;
-	while (*src != 0)
-	{
+	while (*src != 0) {
 		ptr = strchr(src, ':');
-		if (ptr == NULL)
-		{
+		if (ptr == NULL) {
 			sql_buf_->append(src);
 			break;
-		}
-		else if (*++ptr == 0)
-		{
+		} else if (*++ptr == 0) {
 			sql_buf_->append(src);
 			logger_warn("the last char is ':'");
 			break;
@@ -122,8 +118,7 @@ const string& query::to_string()
 			&& *ptr != '(' && *ptr != ')'
 			&& *ptr != '\r' && *ptr != '\n'
 			&& *ptr != '\'', ptr);
-		if (ptr - key == 1)
-		{
+		if (ptr - key == 1) {
 			logger_warn("only found: ':%c'", *ptr);
 			sql_buf_->append(key, ptr - key + 1);
 			src = ptr + 2;
@@ -135,8 +130,9 @@ const string& query::to_string()
 		(void) append_key(*sql_buf_, key);
 		*ptr = last_ch;
 
-		if (last_ch == '\0')
+		if (last_ch == '\0') {
 			break;
+		}
 		src = ptr;
 	}
 
@@ -146,8 +142,7 @@ const string& query::to_string()
 void query::del_param(const string& key)
 {
 	std::map<string, query_param*>::iterator it = params_.find(key);
-	if (it != params_.end())
-	{
+	if (it != params_.end()) {
 		acl_myfree(it->second);
 		params_.erase(it);
 	}
@@ -241,10 +236,11 @@ query& query::set_parameter(const char* name, float value, int precision /* = 8 
 	param->type = DB_PARAM_FLOAT;
 	param->v.f = value;
 	param->dlen = sizeof(float);
-	if (precision >= 0)
+	if (precision >= 0) {
 		param->precision = precision;
-	else
+	} else {
 		param->precision = 8;
+	}
 
 	params_[key] = param;
 	return *this;
@@ -260,10 +256,11 @@ query& query::set_parameter(const char* name, double value, int precision /* = 8
 	param->type = DB_PARAM_DOUBLE;
 	param->v.d = value;
 	param->dlen = sizeof(double);
-	if (precision >= 0)
+	if (precision >= 0) {
 		param->precision = precision;
-	else
+	} else {
 		param->precision = 8;
+	}
 
 	params_[key] = param;
 	return *this;
@@ -277,8 +274,7 @@ query& query::set_date(const char* name, time_t value,
 	del_param(key);
 
 	string buf(128);
-	if (to_date(value, buf, fmt) == NULL)
-	{
+	if (to_date(value, buf, fmt) == NULL) {
 		logger_error("to_date_time failed, time: %ld", (long) value);
 		return *this;
 	}
@@ -325,11 +321,12 @@ query& query::set_vformat(const char* name, const char* fmt, va_list ap)
 	return *this;
 }
 
-void query::reset()
+void query::reset(void)
 {
 	std::map<string, query_param*>::iterator it = params_.begin();
-	for (; it != params_.end(); ++it)
+	for (; it != params_.end(); ++it) {
 		acl_myfree(it->second);
+	}
 	params_.clear();
 }
 
@@ -337,8 +334,7 @@ const string& query::escape(const char* in, size_t len, string& out)
 {
 	out.clear();
 
-	for (size_t i = 0; i < len; i++, in++)
-	{
+	for (size_t i = 0; i < len; i++, in++) {
 		switch (*in) {
 		case 0:			/* Must be escaped for 'mysql' */
 			out += '\\';
@@ -386,8 +382,9 @@ const char* query::to_date(time_t t, string& out,
 {
 	char buf[256];
 
-	if (fmt == NULL || *fmt == 0)
+	if (fmt == NULL || *fmt == 0) {
 		fmt = "%Y-%m-%d %H:%M:%S";
+	}
 	
 	
 	struct tm* local_ptr;
@@ -397,16 +394,14 @@ const char* query::to_date(time_t t, string& out,
 
 	struct tm local;
 
-	if (localtime_s(&local, &t) != 0)
-	{
+	if (localtime_s(&local, &t) != 0) {
 		logger_error("localtime_s failed, t: %ld", (long) t);
 		return NULL;
 	}
 	local_ptr = &local;
 # else
 	local_ptr = localtime(&t);
-	if (local_ptr == NULL)
-	{
+	if (local_ptr == NULL) {
 		logger_error("localtime failed, t: %ld", (long) t);
 		return NULL;
 	}
@@ -415,14 +410,12 @@ const char* query::to_date(time_t t, string& out,
 
 	struct tm local;
 
-	if ((local_ptr = localtime_r(&t, &local)) == NULL)
-	{
+	if ((local_ptr = localtime_r(&t, &local)) == NULL) {
 		logger_error("localtime_r failed, t: %ld", (long) t);
 		return NULL;
 	}
 #endif
-	if (strftime(buf, sizeof(buf), fmt, local_ptr) == 0)
-	{
+	if (strftime(buf, sizeof(buf), fmt, local_ptr) == 0) {
 		logger_error("strftime failed, t: %ld, fmt: %s",
 			(long) t, fmt);
 		return NULL;

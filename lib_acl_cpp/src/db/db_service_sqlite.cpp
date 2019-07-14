@@ -21,13 +21,11 @@ db_service_sqlite::db_service_sqlite(const char* dbname, const char* dbfile,
 
 db_service_sqlite::~db_service_sqlite(void)
 {
-
 }
 
 db_handle* db_service_sqlite::db_create(void)
 {
 	db_handle* db = NEW db_sqlite(dbfile_.c_str());
-
 	return db;
 }
 

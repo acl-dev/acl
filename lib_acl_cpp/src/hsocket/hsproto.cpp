@@ -25,38 +25,38 @@ hsproto::hsproto(bool cache_enable)
 {
 }
 
-hsproto::~hsproto()
+hsproto::~hsproto(void)
 {
 	reset();
 	clear_cache();
 }
 
-bool hsproto::build_open(string& out, int id,
-	const char* dbn, const char* tbl,
-	const char* idx, const char* flds)
+bool hsproto::build_open(string& out, int id, const char* dbn,
+	const char* tbl, const char* idx, const char* flds)
 {
 	out.clear();
 	out << "P\t" << id << '\t' << dbn << '\t' << tbl
 		<< '\t' << idx << '\t' << flds << '\n';
-	return (true);
+	return true;
 }
 
 bool hsproto::build_get(string& out, int id, const char* values[], int num,
 	const char* cond /* = "=" */, int nlimit /* = 0 */, int noffset /* = 0 */)
 {
-	if (nlimit <= 0)
+	if (nlimit <= 0) {
 		nlimit = MAX_INT;
-	if (noffset < 0)
+	}
+	if (noffset < 0) {
 		noffset = 0;
+	}
 	char buf[32], *limit_offset = NULL;
-	if (nlimit > 1)
-	{
+	if (nlimit > 1) {
 		safe_snprintf(buf, sizeof(buf), "%d\t%d", nlimit, noffset);
 		limit_offset = buf;
 	}
 
 	build_request(out, id, cond, values, num, limit_offset, 0, 0, 0);
-	return (true);
+	return true;
 }
 
 bool hsproto::build_get(string& out, int id, int nfld,
@@ -71,10 +71,10 @@ bool hsproto::build_get(string& out, int id, int nfld,
 
 	pptr[0] = (char*) first_value;
 	int   i = 1;
-	while ((ptr = va_arg(ap, char*)) != NULL)
-	{
-		if (i >= nfld)
+	while ((ptr = va_arg(ap, char*)) != NULL) {
+		if (i >= nfld) {
 			break;
+		}
 		pptr[i] = ptr;
 		i++;
 	}
@@ -82,42 +82,45 @@ bool hsproto::build_get(string& out, int id, int nfld,
 
 	bool ret = build_get(out, id, (const char**) pptr, i, "=", 0, 0);
 	acl_myfree(pptr);
-	return (ret);
+	return ret;
 }
 
 bool hsproto::build_mod(string& out, int id, const char* values[], int num,
 	const char* to_values[], int to_num, const char* cond /* = "=" */,
 	int nlimit /* = 0 */, int noffset /* = 0 */)
 {
-	if (nlimit <= 0)
+	if (nlimit <= 0) {
 		nlimit = MAX_INT;
-	if (noffset < 0)
+	}
+	if (noffset < 0) {
 		noffset = 0;
+	}
 	char buf[32], *limit_offset = NULL;
 
 	safe_snprintf(buf, sizeof(buf), "%d\t%d", nlimit, noffset);
 	build_request(out, id, cond, values,
 		num, limit_offset, 'U', to_values, to_num);
-	return (true);
+	return true;
 }
 
 bool hsproto::build_del(string& out, int id, const char* values[],
 	int num, const char* cond /* = "=" */,
 	int nlimit /* = 0 */, int noffset /* = 0 */)
 {
-	if (nlimit <= 0)
+	if (nlimit <= 0) {
 		nlimit = 1;
-	if (noffset < 0)
+	}
+	if (noffset < 0) {
 		noffset = 0;
+	}
 	char buf[32], *limit_offset = NULL;
-	if (nlimit > 1)
-	{
+	if (nlimit > 1) {
 		safe_snprintf(buf, sizeof(buf), "%d\t%d", nlimit, noffset);
 		limit_offset = buf;
 	}
 
 	build_request(out, id, cond, values, num, limit_offset, 'D', 0, 0);
-	return (true);
+	return true;
 }
 
 bool hsproto::build_del(string& out, int id, int nfld, const char* first_value, ...)
@@ -131,10 +134,10 @@ bool hsproto::build_del(string& out, int id, int nfld, const char* first_value, 
 
 	pptr[0] = (char*) first_value;
 	int   i = 1;
-	while ((ptr = va_arg(ap, char*)) != NULL)
-	{
-		if (i >= nfld)
+	while ((ptr = va_arg(ap, char*)) != NULL) {
+		if (i >= nfld) {
 			break;
+		}
 		pptr[i] = ptr;
 		i++;
 	}
@@ -142,14 +145,13 @@ bool hsproto::build_del(string& out, int id, int nfld, const char* first_value, 
 
 	bool ret = build_del(out, id, (const char**) pptr, i, "=", 0, 0);
 	acl_myfree(pptr);
-	return (ret);
-
+	return ret;
 }
 
 bool hsproto::build_add(string& out, int id, const char* values[], int num)
 {
 	build_request(out, id, "+", values, num, 0, 0, 0, 0);
-	return (true);
+	return true;
 }
 
 bool hsproto::build_add(string& out, int id, int nfld, const char* first_value, ...)
@@ -163,10 +165,10 @@ bool hsproto::build_add(string& out, int id, int nfld, const char* first_value, 
 
 	pptr[0] = (char*) first_value;
 	int   i = 1;
-	while ((ptr = va_arg(ap, char*)) != NULL)
-	{
-		if (i >= nfld)
+	while ((ptr = va_arg(ap, char*)) != NULL) {
+		if (i >= nfld) {
 			break;
+		}
 		pptr[i] = ptr;
 		i++;
 	}
@@ -174,7 +176,7 @@ bool hsproto::build_add(string& out, int id, int nfld, const char* first_value, 
 
 	bool ret = build_add(out, id, (const char**) pptr, i);
 	acl_myfree(pptr);
-	return (ret);
+	return ret;
 }
 
 void hsproto::build_request(string& buf, int id, const char* oper,
@@ -191,22 +193,21 @@ void hsproto::build_request(string& buf, int id, const char* oper,
 	buf << idbuf << "\t" << oper << "\t" << numbuf;
 
 	int  i;
-	for (i = 0; i < num; i++)
-	{
+	for (i = 0; i < num; i++) {
 		buf << "\t";
 		escape(values[i], strlen(values[i]), buf);
 	}
 
-	if (limit_offset)
+	if (limit_offset) {
 		buf << "\t" << limit_offset;
+	}
 
-	if (mop)
+	if (mop) {
 		buf << "\t" << mop;
+	}
 
-	if (to_values && to_num > 0)
-	{
-		for (i = 0; i < to_num; i++)
-		{
+	if (to_values && to_num > 0) {
+		for (i = 0; i < to_num; i++) {
 			buf << "\t";
 			escape(to_values[i], strlen(to_values[i]), buf);
 		}
@@ -222,19 +223,16 @@ bool hsproto::parse_respond(int nfld, string& buf,
 {
 	serror = dummy_ok;
 
-	if (buf.empty())
-	{
+	if (buf.empty()) {
 		errnum = HS_ERR_EMPTY;
 		logger_error("respond empty");
-		return (false);
+		return false;
 	}
 
 	buf_ptr_ = buf.c_str();
 	char *last = buf_ptr_, *save = NULL;
-	while (*buf_ptr_)
-	{
-		if (*buf_ptr_ == '\t')
-		{
+	while (*buf_ptr_) {
+		if (*buf_ptr_ == '\t') {
 			save = buf_ptr_;
 			*buf_ptr_++ = 0;
 			break;
@@ -242,21 +240,19 @@ bool hsproto::parse_respond(int nfld, string& buf,
 		buf_ptr_++;
 	}
 	errnum = atoi(last);
-	if (*buf_ptr_ == 0)
-	{
-		if (save)
+	if (*buf_ptr_ == 0) {
+		if (save) {
 			*save = '\t';
+		}
 		errnum = HS_ERR_INVALID_REPLY;
 		logger_error("respond(%s) invalid", buf.c_str());
-		return (false);
+		return false;
 	}
 
 	last = buf_ptr_;
 	save = NULL;
-	while (*buf_ptr_)
-	{
-		if (*buf_ptr_ == '\t')
-		{
+	while (*buf_ptr_) {
+		if (*buf_ptr_ == '\t') {
 			save = buf_ptr_;
 			*buf_ptr_++ = 0;
 			break;
@@ -265,56 +261,53 @@ bool hsproto::parse_respond(int nfld, string& buf,
 	}
 
 	ntoken_ = atoi(last);
-	if (ntoken_ <= 0)
-	{
-		if (errnum != 0)
-		{
+	if (ntoken_ <= 0) {
+		if (errnum != 0) {
 			errnum = HS_ERR_INVALID_REPLY;
 			logger_error("ntoken(%d) invalid", ntoken_);
-			return (false);
+			return false;
 		}
-		return (false);
+		return false;
 	}
 
-	if (ntoken_ > nfld)
+	if (ntoken_ > nfld) {
 		ntoken_ = nfld;
+	}
 
-	if (errnum == 0)
-		return (true);
+	if (errnum == 0) {
+		return true;
+	}
 
 	serror = buf_ptr_;
-	return (false);
+	return false;
 }
 
-hsrow* hsproto::get_next_row()
+hsrow* hsproto::get_next_row(void)
 {
 	static const char *dummy_nil = "";
 
-	if (ntoken_ <= 0 || buf_ptr_ == NULL || *buf_ptr_ == 0)
-		return (NULL);
+	if (ntoken_ <= 0 || buf_ptr_ == NULL || *buf_ptr_ == 0) {
+		return NULL;
+	}
 
 	hsrow* row;
 
-	if (!rows_cache_.empty())
-	{
+	if (!rows_cache_.empty()) {
 		row = rows_cache_[rows_cache_.size() - 1];
 		rows_cache_.pop_back();
 		row->reset(ntoken_);
-	}
-	else
+	} else {
 		row = NEW hsrow(ntoken_);
+	}
 
 	char* last;
 	int  i;
-	for (i = 0; i < ntoken_; i++)
-	{
-		if (*buf_ptr_ == '\0')
-		{
+	for (i = 0; i < ntoken_; i++) {
+		if (*buf_ptr_ == '\0') {
 			row->push_back(dummy_nil, 1);
 			break;
 		}
-		if (*buf_ptr_ == '\t')
-		{
+		if (*buf_ptr_ == '\t') {
 			row->push_back(dummy_nil, 1);
 			buf_ptr_++;
 			continue;
@@ -322,8 +315,7 @@ hsrow* hsproto::get_next_row()
 
 		last = buf_ptr_;
 		buf_ptr_ = strchr(buf_ptr_, '\t');
-		if (buf_ptr_ == NULL)
-		{
+		if (buf_ptr_ == NULL) {
 			row->push_back(last, strlen(last));
 			break;
 		}
@@ -333,49 +325,48 @@ hsrow* hsproto::get_next_row()
 		row->push_back(last, strlen(last));
 	}
 
-	if (debugOn_)
-	{
+	if (debugOn_) {
 		std::vector<const char*>::const_iterator cit =
 			row->get_row().begin();
-		for (; cit != row->get_row().end(); ++cit)
-		{
+		for (; cit != row->get_row().end(); ++cit) {
 			printf(">>>%s\n", *cit);
 		}
 	}
 
-	return (row);
+	return row;
 }
 
-const std::vector<hsrow*>& hsproto::get()
+const std::vector<hsrow*>& hsproto::get(void)
 {
-	while (true)
-	{
+	while (true) {
 		hsrow* row = get_next_row();
-		if (row == NULL)
+		if (row == NULL) {
 			break;
+		}
 		rows_.push_back(row);
 	}
-	return (rows_);
+	return rows_;
 }
 
-void hsproto::reset()
+void hsproto::reset(void)
 {
 	std::vector<hsrow*>::iterator it = rows_.begin();
-	for (; it != rows_.end(); ++it)
-	{
-		if (cache_enable_)
+	for (; it != rows_.end(); ++it) {
+		if (cache_enable_) {
 			rows_cache_.push_back(*it);
-		else
-			delete (*it);
+		} else {
+			delete *it;
+		}
 	}
 	rows_.clear();
 }
 
-void hsproto::clear_cache()
+void hsproto::clear_cache(void)
 {
 	std::vector<hsrow*>::iterator it = rows_cache_.begin();
-	for (; it != rows_cache_.end(); ++it)
-		delete (*it);
+	for (; it != rows_cache_.end(); ++it) {
+		delete *it;
+	}
 	rows_cache_.clear();
 }
 

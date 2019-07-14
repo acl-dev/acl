@@ -22,15 +22,17 @@ sqlite_cursor::sqlite_cursor(query& q)
 
 sqlite_cursor::~sqlite_cursor(void)
 {
-	if (stmt_ && free_callback)
+	if (stmt_ && free_callback) {
 		free_callback(stmt_);
+	}
 	delete row_;
 }
 
 void sqlite_cursor::clear(void)
 {
-	if (row_)
+	if (row_) {
 		row_->clear();
+	}
 	dbuf_->dbuf_reset();
 }
 

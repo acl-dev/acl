@@ -61,8 +61,7 @@ static acl::string __pgsql_path;
 // 程序退出释放动态加载的库
 static void __pgsql_dll_unload(void)
 {
-	if (__pgsql_dll != NULL)
-	{
+	if (__pgsql_dll != NULL) {
 		acl_dlclose(__pgsql_dll);
 		__pgsql_dll = NULL;
 		logger("%s unload ok", __pgsql_path.c_str());
@@ -72,97 +71,111 @@ static void __pgsql_dll_unload(void)
 // 动态加载 libpg.dll 库
 static void __pgsql_dll_load(void)
 {
-	if (__pgsql_dll != NULL)
-	{
+	if (__pgsql_dll != NULL) {
 		logger("pgsql(%s) has been loaded!", __pgsql_path.c_str());
 		return;
 	}
 
 	const char* path;
 	const char* ptr = acl::db_handle::get_loadpath();
-	if (ptr)
+	if (ptr) {
 		path = ptr;
-	else
+	} else {
 #ifdef ACL_WINDOWS
 		path = "libpg.dll";
 #else
 		path = "libpg.so";
 #endif
+	}
 
 	__pgsql_dll = acl_dlopen(path);
 
-	if (__pgsql_dll == NULL)
+	if (__pgsql_dll == NULL) {
 		logger_fatal("load %s error: %s", path, acl_dlerror());
+	}
 
 	// 记录动态库路径，以便于在动态库卸载时输出库路径名
 	__pgsql_path = path;
 
 	__dbconnect = (PQconnectdb_fn) acl_dlsym(__pgsql_dll, "PQconnectdb");
-	if (__dbconnect == NULL)
+	if (__dbconnect == NULL) {
 		logger_fatal("load PQconnectdb from %s error %s",
 			path, acl_dlerror());
+	}
 
 	__dbstatus = (PQstatus_fn) acl_dlsym(__pgsql_dll, "PQstatus");
-	if (__dbstatus == NULL)
+	if (__dbstatus == NULL) {
 		logger_fatal("load PQstatus from %s error %s",
 			path, acl_dlerror());
+	}
 
 	__dbexec = (PQexec_fn) acl_dlsym(__pgsql_dll, "PQexec");
-	if (__dbexec == NULL)
+	if (__dbexec == NULL) {
 		logger_fatal("load PQexec from %s error %s",
 			path, acl_dlerror());
+	}
 
 	__dbresult_status = (PQresultStatus_fn)
 		acl_dlsym(__pgsql_dll, "PQresultStatus");
-	if (__dbresult_status == NULL)
+	if (__dbresult_status == NULL) {
 		logger_fatal("load PQresultStatus from %s error %s",
 			path, acl_dlerror());
+	}
 
 	__dberror_message = (PQerrorMessage_fn)
 		acl_dlsym(__pgsql_dll, "PQerrorMessage");
-	if (__dberror_message == NULL)
+	if (__dberror_message == NULL) {
 		logger_fatal("load PQerrorMessage from %s error %s",
 			path, acl_dlerror());
+	}
 
 	__dbfinish = (PQfinish_fn) acl_dlsym(__pgsql_dll, "PQfinish");
-	if (__dbfinish == NULL)
+	if (__dbfinish == NULL) {
 		logger_fatal("load PQfinish_fn from %s error %s",
 			path, acl_dlerror());
+	}
 
 	__dbclear = (PQclear_fn) acl_dlsym(__pgsql_dll, "PQclear");
-	if (__dbclear == NULL)
+	if (__dbclear == NULL) {
 		logger_fatal("load PQclear from %s error %s",
 			path, acl_dlerror());
+	}
 
 	__dbnfields = (PQnfields_fn) acl_dlsym(__pgsql_dll, "PQnfields");
-	if (__dbnfields == NULL)
+	if (__dbnfields == NULL) {
 		logger_fatal("loas PQnfields from %s error %s",
 			path, acl_dlerror());
+	}
 
 	__dbfname = (PQfname_fn) acl_dlsym(__pgsql_dll, "PQfname");
-	if (__dbfname == NULL)
+	if (__dbfname == NULL) {
 		logger_fatal("load PQfname from %s error %s",
 			path, acl_dlerror());
+	}
 
 	__dbntuples = (PQntuples_fn) acl_dlsym(__pgsql_dll, "PQntuples");
-	if (__dbntuples == NULL)
+	if (__dbntuples == NULL) {
 		logger_fatal("load PQntuples from %s error %s",
 			path, acl_dlerror());
+	}
 
 	__dbget_value = (PQgetvalue_fn) acl_dlsym(__pgsql_dll, "PQgetvalue");
-	if (__dbget_value == NULL)
+	if (__dbget_value == NULL) {
 		logger_fatal("load PQgetvalue from %s error %s",
 			path, acl_dlerror());
+	}
 
 	__dbget_length = (PQgetlength_fn) acl_dlsym(__pgsql_dll, "PQgetlength");
-	if (__dbget_length == NULL)
+	if (__dbget_length == NULL) {
 		logger_fatal("load PQgetlength from %s error %s",
 			path, acl_dlerror());
+	}
 
 	__dbcmd_tuples = (PQcmdTuples_fn) acl_dlsym(__pgsql_dll, "PQcmdTuples");
-	if (__dbcmd_tuples == NULL)
+	if (__dbcmd_tuples == NULL) {
 		logger_fatal("load PQcmdTuples from %s error %s",
 			path, acl_dlerror());
+	}
 
 	logger("%s loaded!", path);
 	atexit(__pgsql_dll_unload);
@@ -196,11 +209,12 @@ static void pgsql_rows_free(void* ctx)
 {
 	PGresult* res = (PGresult *) ctx;
 #ifdef HAS_PGSQL_DLL
-	if (res && __pgsql_dll)
+	if (res && __pgsql_dll) {
 #else
-	if (res)
+	if (res) {
 #endif
 		__dbclear(res);
+	}
 }
 
 static void pgsql_rows_save(PGresult* res, db_rows& result)
@@ -208,16 +222,15 @@ static void pgsql_rows_save(PGresult* res, db_rows& result)
 	int   ncolumn = __dbnfields(res);
 
 	// 取出变量名
-	for (int j = 0; j < ncolumn; j++)
+	for (int j = 0; j < ncolumn; j++) {
 		result.names_.push_back(__dbfname(res, j));
+	}
 
 	// 开始取出所有行数据结果，加入动态数组中
 	int nrow = __dbntuples(res);
-	for (int i = 0; i < nrow; i++)
-	{
+	for (int i = 0; i < nrow; i++) {
 		db_row* row = NEW db_row(result.names_);
-		for (int j = 0; j < ncolumn; j++)
-		{
+		for (int j = 0; j < ncolumn; j++) {
 			char* value = __dbget_value(res, i, j);
 			int len = __dbget_length(res, i, j);
 			row->push_back(value, (size_t) len);
@@ -237,33 +250,39 @@ void db_pgsql::sane_pgsql_init(const char* dbaddr, const char* dbname,
 {
 	affect_count_ = 0;
 
-	if (dbaddr == NULL || *dbaddr == 0)
+	if (dbaddr == NULL || *dbaddr == 0) {
 		logger_fatal("dbaddr null");
-	if (dbname == NULL || *dbname == 0)
+	}
+	if (dbname == NULL || *dbname == 0) {
 		logger_fatal("dbname null");
+	}
 
 	// 地址格式：[dbname@]dbaddr
 	const char* ptr = strchr(dbaddr, '@');
-	if (ptr)
+	if (ptr) {
 		ptr++;
-	else
+	} else {
 		ptr = dbaddr;
+	}
 	acl_assert(*ptr);
 	dbaddr_ = acl_mystrdup(ptr);
 	dbname_ = acl_mystrdup(dbname);
 
-	if (dbuser && *dbuser)
+	if (dbuser && *dbuser) {
 		dbuser_ = acl_mystrdup(dbuser);
-	else
+	} else {
 		dbuser_ = NULL;
+	}
 
-	if (dbpass && *dbpass)
+	if (dbpass && *dbpass) {
 		dbpass_ = acl_mystrdup(dbpass);
-	else
+	} else {
 		dbpass_ = NULL;
+	}
 
-	if (charset && *charset)
+	if (charset && *charset) {
 		charset_ = charset;
+	}
 
 	conn_timeout_ = conn_timeout;
 	rw_timeout_   = rw_timeout;
@@ -294,16 +313,19 @@ db_pgsql::~db_pgsql(void)
 {
 	acl_myfree(dbaddr_);
 	acl_myfree(dbname_);
-	if (dbuser_)
+	if (dbuser_) {
 		acl_myfree(dbuser_);
-	if (dbpass_)
+	}
+	if (dbpass_) {
 		acl_myfree(dbpass_);
+	}
 #ifdef HAS_PGSQL_DLL
-	if (conn_ && __pgsql_dll)
+	if (conn_ && __pgsql_dll) {
 #else
-	if (conn_)
+	if (conn_) {
 #endif
 		__dbfinish(conn_);
+	}
 }
 
 const char* db_pgsql::dbtype(void) const
@@ -314,33 +336,35 @@ const char* db_pgsql::dbtype(void) const
 
 int db_pgsql::get_errno(void) const
 {
-	if (conn_)
+	if (conn_) {
 		return __dbstatus(conn_);
-	else
+	} else {
 		return -1;
+	}
 }
 
 const char* db_pgsql::get_error(void) const
 {
-	if (conn_)
+	if (conn_) {
 		return __dberror_message(conn_);
-	else
+	} else {
 		return "pgsql not opened yet!";
+	}
 }
 
 static acl_pthread_key_t __thread_key;
 
 static void thread_free_dummy(void* ctx)
 {
-	if ((unsigned long) acl_pthread_self() != acl_main_thread_self())
+	if ((unsigned long) acl_pthread_self() != acl_main_thread_self()) {
 		acl_myfree(ctx);
+	}
 }
 
 static int* __main_dummy = NULL;
 static void main_free_dummy(void)
 {
-	if (__main_dummy)
-	{
+	if (__main_dummy) {
 		acl_myfree(__main_dummy);
 		__main_dummy = NULL;
 	}
@@ -350,14 +374,16 @@ static acl_pthread_once_t __thread_once_control = ACL_PTHREAD_ONCE_INIT;
 
 static void thread_once(void)
 {
-	if (acl_pthread_key_create(&__thread_key, thread_free_dummy) != 0)
+	if (acl_pthread_key_create(&__thread_key, thread_free_dummy) != 0) {
 		abort();
+	}
 }
 
 bool db_pgsql::dbopen(const char* /* charset = NULL */)
 {
-	if (conn_)
+	if (conn_) {
 		return true;
+	}
 
 	char  tmpbuf[256];
 	char *db_host, *db_unix;
@@ -367,18 +393,16 @@ bool db_pgsql::dbopen(const char* /* charset = NULL */)
 	if (ptr == NULL) {
 		ACL_SAFE_STRNCPY(tmpbuf, dbaddr_, sizeof(tmpbuf));
 		ptr = strchr(tmpbuf, ':');
-		if (ptr == NULL || *(ptr + 1) == 0)
-		{
+		if (ptr == NULL || *(ptr + 1) == 0) {
 			logger_error("invalid db_addr=%s", dbaddr_);
 			return false;
-		}
-		else
+		} else {
 			*ptr++ = 0;
+		}
 		db_host = tmpbuf;
 
 		db_port = atoi(ptr);
-		if (db_port <= 0)
-		{
+		if (db_port <= 0) {
 			logger_error("invalid port=%d", db_port);
 			return false;
 		}
@@ -391,18 +415,18 @@ bool db_pgsql::dbopen(const char* /* charset = NULL */)
 
 	int* dummy;
 
-	if (acl_pthread_once(&__thread_once_control, thread_once) != 0)
+	if (acl_pthread_once(&__thread_once_control, thread_once) != 0) {
 		logger_error("call thread_once error: %s", acl_last_serror());
-	else if (!(dummy = (int*) acl_pthread_getspecific(__thread_key)))
-	{
+	} else if (!(dummy = (int*) acl_pthread_getspecific(__thread_key))) {
 		dummy = (int*) acl_mymalloc(sizeof(int));
 		*dummy = 1;
-		if  (acl_pthread_setspecific(__thread_key, dummy) != 0)
+		if  (acl_pthread_setspecific(__thread_key, dummy) != 0) {
 			abort();
+		}
 
 		if ((unsigned long) acl_pthread_self()
-			== acl_main_thread_self())
-		{
+			== acl_main_thread_self()) {
+
 			__main_dummy = dummy;
 			atexit(main_free_dummy);
 		}
@@ -410,16 +434,18 @@ bool db_pgsql::dbopen(const char* /* charset = NULL */)
 
 	string info;
 	info.format("host=%s dbname=%s", db_host, dbname_);
-	if (db_unix == NULL)
+	if (db_unix == NULL) {
 		info.format_append(" port=%d", db_port);
-	if (dbuser_)
+	}
+	if (dbuser_) {
 		info.format_append(" user=%s", dbuser_);
-	if (dbpass_)
+	}
+	if (dbpass_) {
 		info.format_append(" password=%s", dbpass_);
+	}
 
 	conn_ = __dbconnect(info.c_str());
-	if (conn_ == NULL || __dbstatus(conn_) != CONNECTION_OK)
-	{
+	if (conn_ == NULL || __dbstatus(conn_) != CONNECTION_OK) {
 		logger_error("connect pgsql error(%s), db_host=%s, db_port=%d,"
 			" db_unix=%s, db_name=%s, db_user=%s, db_pass=%s",
 			conn_ ? __dberror_message(conn_) : "connect error",
@@ -429,8 +455,7 @@ bool db_pgsql::dbopen(const char* /* charset = NULL */)
 			dbuser_ ? dbuser_ : "null",
 			dbpass_ ? dbpass_ : "null");
 
-		if (conn_)
-		{
+		if (conn_) {
 			__dbfinish(conn_);
 			conn_ = NULL;
 		}
@@ -446,14 +471,13 @@ bool db_pgsql::is_opened(void) const
 	return conn_ ? true : false;
 }
 
-bool db_pgsql::close()
+bool db_pgsql::close(void)
 {
 #ifdef HAS_PGSQL_DLL
-	if (conn_ && __pgsql_dll)
+	if (conn_ && __pgsql_dll) {
 #else
-	if (conn_)
+	if (conn_) {
 #endif
-	{
 		__dbfinish(conn_);
 		conn_ = NULL;
 	}
@@ -462,26 +486,26 @@ bool db_pgsql::close()
 
 void* db_pgsql::sane_pgsql_query(const char* sql)
 {
-	if (conn_ == NULL)
-	{
+	if (conn_ == NULL) {
 		logger_error("db(%s) not opened yet!", dbname_);
 		return NULL;
 	}
 
 	PGresult* res = __dbexec(conn_, sql);
-	if (res)
+	if (res) {
 		return res;
+	}
 
 	/* 重新打开连接进行重试 */
 	close();
-	if (dbopen() == false)
-	{
+	if (!dbopen()) {
 		logger_error("reopen db(%s) error", dbname_);
 		return NULL;
 	}
 	res = __dbexec(conn_, sql);
-	if (res)
+	if (res) {
 		return res;
+	}
 
 	logger_error("db(%s), sql(%s) error(%s)",
 		dbname_, sql, __dberror_message(conn_));
@@ -497,11 +521,11 @@ bool db_pgsql::tbl_exists(const char* tbl_name)
 	sql.format("select * from %s limit 1", tbl_name);
 
 	PGresult* res = (PGresult *) sane_pgsql_query(sql);
-	if (res == NULL)
+	if (res == NULL) {
 		return false;
+	}
 
-	if (__dbresult_status(res) != PGRES_TUPLES_OK)
-	{
+	if (__dbresult_status(res) != PGRES_TUPLES_OK) {
 		__dbclear(res);
 		return false;
 	}
@@ -516,28 +540,26 @@ bool db_pgsql::sql_select(const char* sql, db_rows* result /* = NULL */)
 	free_result();
 
 	PGresult* res = (PGresult *) sane_pgsql_query(sql);
-	if (res == NULL)
+	if (res == NULL) {
 		return false;
+	}
 
-	if (__dbresult_status(res) != PGRES_TUPLES_OK)
-	{
+	if (__dbresult_status(res) != PGRES_TUPLES_OK) {
 		logger_error("db(%s), sql(%s) error(%s)",
 			dbname_, sql, __dberror_message(conn_));
 		__dbclear(res);
 		return false;
 	}
 
-	if (__dbntuples(res) <= 0)
-	{
+	if (__dbntuples(res) <= 0) {
 		__dbclear(res);
 		result_ = NULL;
 		return true;
 	}
 
-	if (result != NULL)
+	if (result != NULL) {
 		pgsql_rows_save(res, *result);
-	else
-	{
+	} else {
 		result_ = NEW db_rows();
 		pgsql_rows_save(res, *result_);
 	}
@@ -550,11 +572,11 @@ bool db_pgsql::sql_update(const char* sql)
 	free_result();
 
 	PGresult* res = (PGresult *) sane_pgsql_query(sql);
-	if (res == NULL)
+	if (res == NULL) {
 		return false;
+	}
 
-	if (__dbresult_status(res) != PGRES_COMMAND_OK)
-	{
+	if (__dbresult_status(res) != PGRES_COMMAND_OK) {
 		logger_error("db(%s), sql(%s) error(%s)",
 			dbname_, sql, __dberror_message(conn_));
 		__dbclear(res);
@@ -562,8 +584,7 @@ bool db_pgsql::sql_update(const char* sql)
 	}
 
 	const char* ptr = __dbcmd_tuples(res);
-	if (ptr == NULL || *ptr == 0)
-	{
+	if (ptr == NULL || *ptr == 0) {
 		__dbclear(res);
 		return true;
 	}
@@ -581,8 +602,7 @@ int db_pgsql::affect_count(void) const
 bool db_pgsql::begin_transaction(void)
 {
 	const char* sql = "start transaction";
-	if (sql_update(sql) == false)
-	{
+	if (!sql_update(sql)) {
 		logger_error("%s error: %s", sql, get_error());
 		return false;
 	}
@@ -592,8 +612,7 @@ bool db_pgsql::begin_transaction(void)
 bool db_pgsql::commit(void)
 {
 	const char* sql = "commit";
-	if (sql_update(sql) == false)
-	{
+	if (!sql_update(sql)) {
 		logger_error("%s error: %s", sql, get_error());
 		return false;
 	}
@@ -603,8 +622,7 @@ bool db_pgsql::commit(void)
 bool db_pgsql::rollback(void)
 {
 	const char* sql = "rollback";
-	if (sql_update(sql) == false)
-	{
+	if (!sql_update(sql)) {
 		logger_error("%s error: %s", sql, get_error());
 		return false;
 	}

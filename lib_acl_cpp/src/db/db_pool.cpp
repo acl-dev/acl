@@ -11,15 +11,16 @@ namespace acl
 {
 
 db_pool::db_pool(const char* dbaddr, size_t count, size_t idx /* = 0 */)
-	: connect_pool(dbaddr, count, idx)
+: connect_pool(dbaddr, count, idx)
 {
 }
 
 db_handle* db_pool::peek_open(void)
 {
 	db_handle* conn = (db_handle*) peek();
-	if (conn == NULL)
+	if (conn == NULL) {
 		logger_error("peek NULL");
+	}
 	return conn;
 }
 
@@ -27,8 +28,7 @@ db_handle* db_pool::peek_open(void)
 
 db_guard::~db_guard(void)
 {
-	if (conn_)
-	{
+	if (conn_) {
 		db_handle* db = (db_handle*) conn_;
 		db->free_result();
 		pool_.put(conn_, keep_);

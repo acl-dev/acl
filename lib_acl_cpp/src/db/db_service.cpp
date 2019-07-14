@@ -34,12 +34,10 @@ public:
 	, query_(query)
 	, has_res_(has_res)
 	{
-
 	}
 
 	~db_ipc_request(void)
 	{
-
 	}
 
 protected:
@@ -53,22 +51,18 @@ protected:
 		data.rows = NULL;
 		data.affected_rows = 0;
 
-		if (db_->dbopen() == false)
+		if (!db_->dbopen()) {
 			ipc->send_message(DB_ERR_OPEN, &data, sizeof(data));
-		else if (has_res_)
-		{
-			if (db_->sql_select(sql_.c_str()) == false)
+		} else if (has_res_) {
+			if (!db_->sql_select(sql_.c_str())) {
 				ipc->send_message(DB_ERR_EXEC_SQL, &data, sizeof(data));
-			else
-			{
+			} else {
 				data.rows = db_->get_result();
 				ipc->send_message(DB_OK, &data, sizeof(data));
 			}
-		}
-		else if (db_->sql_update(sql_.c_str()) == false)
+		} else if (!db_->sql_update(sql_.c_str())) {
 			ipc->send_message(DB_ERR_EXEC_SQL, &data, sizeof(data));
-		else
-		{
+		} else {
 			data.rows = db_->get_result();
 			// 修改操作，需要取一下 SQL 操作影响的行数
 			data.affected_rows = db_->affect_count();
@@ -91,20 +85,18 @@ protected:
 		data->rows = NULL;
 		data->affected_rows = 0;
 
-		if (db_->dbopen() == false)
+		if (!db_->dbopen()) {
 			::PostMessage(hWnd, DB_ERR_OPEN + WM_USER, 0, (LPARAM) data);
-		else if (has_res_)
-		{
-			if (db_->sql_select(sql_.c_str()) == false)
+		} else if (has_res_) {
+			if (!db_->sql_select(sql_.c_str())) {
 				::PostMessage(hWnd, DB_ERR_EXEC_SQL + WM_USER, 0, (LPARAM) data);
-			{
+			} else {
 				data->rows = db_->get_result();
 				::PostMessage(hWnd, DB_OK + WM_USER, 0, (LPARAM) data);
 			}
-		} else if (db_->sql_update(sql_.c_str()) == false)
+		} else if (!db_->sql_update(sql_.c_str())) {
 			::PostMessage(hWnd, DB_ERR_EXEC_SQL + WM_USER, 0, (LPARAM) data);
-		else
-		{
+		} else {
 			data->rows = db_->get_result();
 			// 修改操作，需要取一下 SQL 操作影响的行数
 			data->affected_rows = db_->affect_count();
@@ -132,12 +124,10 @@ public:
 	: ipc_client(magic)
 	, dbservice_(dbs)
 	{
-
 	}
 
 	~db_ipc(void)
 	{
-
 	}
 
 	virtual void on_message(int nMsg, void* data, int dlen acl_unused)
@@ -145,8 +135,7 @@ public:
 		DB_IPC_DAT* dat = (DB_IPC_DAT*) data;
 		db_query* query = dat->query;
 
-		switch (nMsg)
-		{
+		switch (nMsg) {
 		case DB_OK:
 			query->on_ok(dat->rows, dat->affected_rows);
 			break;
@@ -184,10 +173,11 @@ db_service::db_service(size_t dblimit /* = 100 */, int nthread /* = 2 */,
 , dbsize_(0)
 {
 	// 当采用线程池方式，则数据库连接池的最大值不应超过线程数
-	if (nthread > 1)
+	if (nthread > 1) {
 		dblimit_ = (int) dblimit > nthread ? nthread : dblimit;
-	else
+	} else {
 		dblimit_ = dblimit;
+	}
 #ifdef ACL_WINDOWS
 	magic_ = _getpid() + time(NULL);
 #else
@@ -198,8 +188,9 @@ db_service::db_service(size_t dblimit /* = 100 */, int nthread /* = 2 */,
 db_service::~db_service(void)
 {
 	std::list<db_handle*>::iterator it = dbpool_.begin();
-	for (; it != dbpool_.end(); ++it)
+	for (; it != dbpool_.end(); ++it) {
 		delete (*it);
+	}
 }
 
 void db_service::on_accept(acl::aio_socket_stream* client)
@@ -235,8 +226,7 @@ void db_service::win32_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	DB_IPC_DAT* dat = NULL;
 	db_query* query = NULL;
 
-	switch (msg - WM_USER)
-	{
+	switch (msg - WM_USER) {
 	case DB_OK:
 		dat = (DB_IPC_DAT*) lParam;
 		query = dat->query;
@@ -256,8 +246,7 @@ void db_service::win32_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
-	if (dat)
-	{
+	if (dat) {
 		dat->db->free_result();
 		push_back(dat->db);
 		query->destroy();
@@ -276,10 +265,9 @@ void db_service::sql_select(const char* sql, db_query* query)
 	db_handle* db;
 
 	std::list<db_handle*>::iterator it = dbpool_.begin();
-	if (it == dbpool_.end())
+	if (it == dbpool_.end()) {
 		db = db_create();
-	else
-	{
+	} else {
 		db = *it;
 		dbpool_.erase(it);
 	}
@@ -298,10 +286,9 @@ void db_service::sql_update(const char* sql, db_query* query)
 	db_handle* db;
 
 	std::list<db_handle*>::iterator it = dbpool_.begin();
-	if (it == dbpool_.end())
+	if (it == dbpool_.end()) {
 		db = db_create();
-	else
-	{
+	} else {
 		db = *it;
 		dbpool_.erase(it);
 	}
@@ -315,10 +302,9 @@ void db_service::sql_update(const char* sql, db_query* query)
 
 void db_service::push_back(db_handle* db)
 {
-	if (dbsize_ >= dblimit_)
+	if (dbsize_ >= dblimit_) {
 		delete db;
-	else
-	{
+	} else {
 		dbsize_++;
 		dbpool_.push_back(db);
 	}

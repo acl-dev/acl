@@ -10,17 +10,19 @@ namespace acl {
 
 sqlite_manager::sqlite_manager(const char* charset /* = "utf-8" */)
 {
-	if (charset && *charset)
+	if (charset && *charset) {
 		charset_ = acl_mystrdup(charset);
-	else
+	} else {
 		charset_ = NULL;
+	}
 	dblimit_ = 100;
 }
 
 sqlite_manager::~sqlite_manager()
 {
-	if (charset_)
+	if (charset_) {
 		acl_myfree(charset_);
+	}
 }
 
 sqlite_manager& sqlite_manager::add(const char* dbfile, size_t dblimit)

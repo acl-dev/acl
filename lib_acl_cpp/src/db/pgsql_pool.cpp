@@ -18,12 +18,12 @@ pgsql_pool::pgsql_pool(const pgsql_conf& conf)
 	conf_ = NEW pgsql_conf(conf);
 }
 
-pgsql_pool::~pgsql_pool()
+pgsql_pool::~pgsql_pool(void)
 {
 	delete conf_;
 }
 
-connect_client* pgsql_pool::create_connect()
+connect_client* pgsql_pool::create_connect(void)
 {
 	return NEW db_pgsql(*conf_);
 }

@@ -28,7 +28,7 @@ namespace acl
 
 struct syntax_error : std::exception
 {
-	syntax_error() {}
+	syntax_error(void) {}
 	syntax_error(const char* s) : exception()
 	{
 		std::cout << s << std::endl;
@@ -37,7 +37,7 @@ struct syntax_error : std::exception
 
 struct unsupported_type : std::exception
 {
-	unsupported_type() {}
+	unsupported_type(void) {}
 	unsupported_type(const char* s) : exception()
 	{
 		std::cout << s << std::endl;
@@ -46,7 +46,7 @@ struct unsupported_type : std::exception
 
 struct parent_level_error : std::exception
 {
-	parent_level_error() {}
+	parent_level_error(void) {}
 	parent_level_error(const char* s) : exception()
 	{
 		std::cout << s << std::endl;
@@ -58,29 +58,28 @@ gsoner::field_t::field_t(type_t t, const std::string &name, bool required)
 , name_(name)
 , required_(required)
 {
-
 }
 
-gsoner::field_t::field_t()
+gsoner::field_t::field_t(void)
 {
 }
 
-gsoner::field_t::~field_t()
+gsoner::field_t::~field_t(void)
 {
 }
 
-void gsoner::object_t::reset()
+void gsoner::object_t::reset(void)
 {
 	fields_.clear();
 	name_.clear();
 }
 
-void gsoner::set_default_required()
+void gsoner::set_default_required(void)
 {
 	default_ = true;
 }
 
-void gsoner::set_default_optional()
+void gsoner::set_default_optional(void)
 {
 	default_ = false;
 }
@@ -95,7 +94,7 @@ void gsoner::set_source_filename(const std::string &filename)
 	gen_source_filename_ = filename;
 }
 
-gsoner::gsoner()
+gsoner::gsoner(void)
 {
 	status_ = e_uninit;
 	gen_header_ = NULL;
@@ -112,14 +111,15 @@ gsoner::gsoner()
 
 gsoner::parent_obj_t::level_t gsoner::get_level(std::string str)
 {
-	if(str == "public")
+	if(str == "public") {
 		return parent_obj_t::e_public;
-	else if(str == "protect")
+	} else if(str == "protect") {
 		return parent_obj_t::e_protect;
-	else if(str == "private")
+	} else if(str == "private") {
 		return parent_obj_t::e_private;
-	else
+	} else {
 		throw parent_level_error();
+	}
 
 	// unreached!
 	return parent_obj_t::e_error;
@@ -129,8 +129,7 @@ std::string gsoner::get_node_func(const field_t &field)
 {
 	string code;
 
-	switch(field.type_)
-	{
+	switch(field.type_) {
 	case gsoner::field_t::e_bool:
 	case field_t::e_bool_ptr:
 		return "add_bool";
@@ -159,8 +158,7 @@ std::string gsoner::get_gson_func_laber(const field_t &field)
 {
 	string code;
 
-	switch(field.type_)
-	{
+	switch(field.type_) {
 	case gsoner::field_t::e_list:
 	case gsoner::field_t::e_vector:
 	case gsoner::field_t::e_map:
@@ -214,8 +212,8 @@ gsoner::function_code_t gsoner::gen_pack_code(const object_t &obj)
 		node.add_text("string_ptr", acl::get_value(obj.string_ptr));
 	*/
 	for (object_t::fields_t::const_iterator itr = obj.fields_.begin();
-		itr != obj.fields_.end(); ++itr)
-	{
+		itr != obj.fields_.end(); ++itr) {
+
 		str += tab_;
 		str += "if (check_nullptr($obj."+itr->name_+"))\n";
 		str += tab_;
@@ -238,8 +236,7 @@ gsoner::function_code_t gsoner::gen_pack_code(const object_t &obj)
 
 	str += "\n";
 
-	if (obj.fields_.empty())
-	{
+	if (obj.fields_.empty()) {
 		str += tab_;
 		str += "(void) $obj;\n";
 	}
@@ -260,10 +257,9 @@ std::string gsoner::get_unpack_code(const std::string &obj_name,
 		field.type_ == field_t::e_ccstr ||
 		field.type_ == field_t::e_cstr ||
 		field.type_ == field_t::e_double ||
-		field.type_ == field_t::e_string)
-	{
-		if (field.required_)
-		{
+		field.type_ == field_t::e_string) {
+
+		if (field.required_) {
 			return tab_
 				+ "if(!" + field.name_ + " ||"
 				+ "!($result = gson(*" + field.name_ + ", &$obj."
@@ -271,14 +267,13 @@ std::string gsoner::get_unpack_code(const std::string &obj_name,
 				+ "return std::make_pair(false, \"required ["
 				+ obj_name + "." + field.name_
 				+ "] failed:{\"+$result.second+\"}\");";
-		}
-		else
+		} else {
 			return tab_ +
 				"if(" + field.name_ + ")\n" + tab_ + tab_ +
 				"gson(*" + field.name_ + ", &$obj." + field.name_ + ");";
+		}
 	}
-	if (field.required_)
-	{
+	if (field.required_) {
 		return tab_
 			+ "if(!" + field.name_ + " ||" + "!" + field.name_
 			+ "->get_obj()||" + "!($result = gson(*" + field.name_
@@ -303,8 +298,8 @@ gsoner::function_code_t gsoner::gen_unpack_code(const object_t &obj)
 	std::list<std::string >node_names;
 	std::list<std::string >unpack_codes;
 	for (std::list<field_t>::const_iterator itr = obj.fields_.begin();
-		itr != obj.fields_.end(); ++itr)
-	{
+		itr != obj.fields_.end(); ++itr) {
+
 		node_names.push_back(get_node_name(itr->name_));
 		unpack_codes.push_back(get_unpack_code(obj.name_, *itr));
 	}
@@ -318,20 +313,19 @@ gsoner::function_code_t gsoner::gen_unpack_code(const object_t &obj)
 	code.definition_ += prefix;
 	code.definition_ += obj.name_ + " &$obj)\n{\n";
 	for (std::list<std::string>::iterator itr = node_names.begin();
-		itr != node_names.end(); ++itr)
-	{
+		itr != node_names.end(); ++itr) {
+
 		code.definition_ += *itr;
 		code.definition_ += "\n";
 	}
 	code.definition_ += tab_ + "std::pair<bool, std::string> $result;\n\n";
 	for (std::list<std::string>::iterator itr = unpack_codes.begin();
-			itr != unpack_codes.end(); ++itr)
-	{
+		itr != unpack_codes.end(); ++itr) {
+
 		code.definition_ += *itr;
 		code.definition_ += "\n \n";
 	}
-	if (unpack_codes.empty())
-	{
+	if (unpack_codes.empty()) {
 		code.definition_ += tab_ + "(void) $node;\n";
 		code.definition_ += tab_ + "(void) $obj;\n";
 	}
@@ -356,16 +350,14 @@ gsoner::function_code_t gsoner::gen_unpack_code(const object_t &obj)
 	return code;
 }
 
-bool gsoner::check_use_namespace()
+bool gsoner::check_use_namespace(void)
 {
 	//using namespace xxx;
 	int pos = pos_;
 	std::string token = codes_.substr(pos_, strlen("using"));
-	if (token == "using")
-	{
+	if (token == "using") {
 		pos_ += (int)strlen("using");
-		if(next_token(default_delimiters_) == "namespace")
-		{
+		if(next_token(default_delimiters_) == "namespace") {
 			token = next_token(default_delimiters_ + ";");
 			pos_++;//skip ;
 			std::cout << "find:using namespace " << token << std::endl;;
@@ -376,11 +368,10 @@ bool gsoner::check_use_namespace()
 	return false;
 }
 
-bool gsoner::check_namespace()
+bool gsoner::check_namespace(void)
 {
 	std::string temp = codes_.substr(pos_, strlen("namespace"));
-	if (temp == "namespace")
-	{
+	if (temp == "namespace") {
 		pos_ += (int) strlen("namespace");
 		std::string name = next_token(default_delimiters_+"{");
 		namespaces_.push_back(name);
@@ -391,10 +382,9 @@ bool gsoner::check_namespace()
 	return false;
 }
 
-bool gsoner::check_namespace_end()
+bool gsoner::check_namespace_end(void)
 {
-	if (namespaces_.size())
-	{
+	if (namespaces_.size()) {
 		namespaces_.pop_back();
 		pos_++;
 		return true;
@@ -408,21 +398,20 @@ std::string gsoner::next_token(std::string delimiters)
 	std::string token;
 	skip_space_comment();
 
-	while (delimiters.find(codes_[pos_]) == std::string::npos)
-	{
-		if (codes_[pos_] == '/')
-		{
+	while (delimiters.find(codes_[pos_]) == std::string::npos) {
+		if (codes_[pos_] == '/') {
 check_again:
 			skip_space();
-			if(codes_[pos_] == '/')
-			{
-				if(check_comment() == false)
+			if(codes_[pos_] == '/') {
+				if(!check_comment()) {
 					throw syntax_error();
+				}
 				goto check_again;	
 			}
 
-			if(token.size())
+			if(token.size()) {
 				return token;
+			}
 		}
 
 		token.push_back(codes_[pos_]);
@@ -434,12 +423,12 @@ check_again:
 	return token;
 }
 
-std::string gsoner::get_namespace()
+std::string gsoner::get_namespace(void)
 {
 	std::string result;
 	for (std::list<std::string>::iterator itr = namespaces_.begin();
-		itr != namespaces_.end(); ++itr)
-	{
+		itr != namespaces_.end(); ++itr) {
+
 		result += *itr;
 		result += "::";
 	}
@@ -447,66 +436,64 @@ std::string gsoner::get_namespace()
 	return result;
 }
 
-bool gsoner::check_struct_begin()
+bool gsoner::check_struct_begin(void)
 {
-	if(status_ != e_uninit)
+	if(status_ != e_uninit) {
 		return false;
+	}
 
 	std::string struct_laber = codes_.substr(pos_, strlen("struct"));
 	std::string class_laber = codes_.substr(pos_, strlen("class"));
 
 	//struct user_t
-	if(struct_laber == "struct")
+	if(struct_laber == "struct") {
 		pos_ += (int) strlen("struct");
-	else if(class_laber == "class")
+	} else if(class_laber == "class") {
 		pos_ += (int) strlen("class");
-	else
+	} else {
 		return false;
+	}
 
 	status_ = e_struct_begin;
 	std::string obj_name = next_token(default_delimiters_+ ":;{");
 	current_obj_.name_ = get_namespace()+obj_name;
 
-	if (codes_[pos_] == '{')
-	{
+	if (codes_[pos_] == '{') {
 		pos_++;
 		return true;
 	}
 
-	if (codes_[pos_] == ';')
-	{
+	if (codes_[pos_] == ';') {
 		pos_++;
 		//struct user_t ; end of struct;
 		status_ = e_uninit;
 		return true;
 	}
 
-	if (codes_[pos_] != ':')
+	if (codes_[pos_] != ':') {
 		return true;
+	}
 
 	pos_++;
 	std::string token ;
 	std::string level;
 
-	while ((token = next_token(" \\\r\n\t,")) != "{")
-	{
-		if(codes_[pos_] == ',')
+	while ((token = next_token(" \\\r\n\t,")) != "{") {
+		if(codes_[pos_] == ',') {
 			pos_++;
+		}
 
-		if (token == "public")
-		{
+		if (token == "public") {
 			level = "public";
 			continue;
 		}
 
-		if (token == "protect")
-		{
+		if (token == "protect") {
 			level = "protect";
 			continue;
 		}
 
-		if (token == "private")
-		{
+		if (token == "private") {
 			level = "private";
 			continue;
 		}
@@ -518,23 +505,23 @@ bool gsoner::check_struct_begin()
 		parent.name_ = token;
 
 		if (parent.level_ != parent_obj_t::e_protect &&
-			parent.level_ != parent_obj_t::e_public)
-		{
+			parent.level_ != parent_obj_t::e_public) {
+
 			continue;
 		}
 
 		std::map<std::string, object_t>::const_iterator
 			itr = objs_.find(token);
-		if (itr == objs_.end())
+		if (itr == objs_.end()) {
 			itr = objs_.find(get_namespace()+token);
+		}
 
-		if (itr != objs_.end())
-		{
+		if (itr != objs_.end()) {
 			for (std::list<field_t>::const_iterator 
 				ii = itr->second.fields_.begin();
 				ii != itr->second.fields_.end();
-				++ii)
-			{
+				++ii) {
+
 				current_obj_.fields_.push_back(*ii);
 			}
 
@@ -545,18 +532,17 @@ bool gsoner::check_struct_begin()
 	return true;
 }
 
-bool gsoner::check_struct_end()
+bool gsoner::check_struct_end(void)
 {
-	if (status_ != e_struct_begin)
+	if (status_ != e_struct_begin) {
 		return false;
+	}
 
 	pos_++;
 	skip_space_comment();
-	if (codes_[pos_] == ';')
-	{
+	if (codes_[pos_] == ';') {
 		pos_++;
-		if (current_obj_.name_.size())
-		{
+		if (current_obj_.name_.size()) {
 			objs_.insert(std::make_pair(
 				current_obj_.name_, current_obj_));
 			current_obj_.reset();
@@ -568,41 +554,39 @@ bool gsoner::check_struct_end()
 	return true;
 }
 
-bool gsoner::skip_space_comment()
+bool gsoner::skip_space_comment(void)
 {
 	bool result = false;
 again:
-	if (skip_space ())
+	if (skip_space ()) {
 		result = true;
+	}
 
 	char ch = codes_[pos_];
-	if(ch == '/')
-	{
-		if (check_comment())
-		{
+	if(ch == '/') {
+		if (check_comment()) {
 			result = true;
 			goto again;
-		}
-		else
+		} else {
 			throw syntax_error();
+		}
 	}
 
 	return result;
 }
 
-bool gsoner::check_include()
+bool gsoner::check_include(void)
 {
 	std::string tmp = codes_.substr(pos_, strlen("#include"));
-	if (tmp == "#include")
-	{
+	if (tmp == "#include") {
 		pos_ += (int) strlen("#include");
 		skip_space_comment();
 		char sym = codes_[pos_++];
-		if(sym == '<')
+		if(sym == '<') {
 			sym = '>';
+		}
 		std::string include;
-		while (codes_[pos_] != sym)
-		{
+		while (codes_[pos_] != sym) {
 			include.push_back(codes_[pos_]);
 			pos_++;
 		}
@@ -615,30 +599,25 @@ bool gsoner::check_include()
 	return false;
 }
 
-bool gsoner::check_comment()
+bool gsoner::check_comment(void)
 {
 	std::string commemt;
 	bool result = false;
-	if (codes_[pos_] == '/' && codes_[pos_ + 1] == '/')
-	{
+	if (codes_[pos_] == '/' && codes_[pos_ + 1] == '/') {
 		result = true;
 		pos_++;
 		pos_++;
 		//skip a line
-		while (codes_[pos_] != '\n')
-		{
+		while (codes_[pos_] != '\n') {
 			commemt.push_back(codes_[pos_]);
 			pos_++;
 		}
-	}
-	else if (codes_[pos_] == '/' && codes_[pos_ + 1] == '*')
-	{
+	} else if (codes_[pos_] == '/' && codes_[pos_ + 1] == '*') {
 		result = true;
 		//skip /**/comment
 		pos_++;
 		pos_++;
-		while (codes_[pos_] != '*' || codes_[pos_ + 1] != '/')
-		{
+		while (codes_[pos_] != '*' || codes_[pos_ + 1] != '/') {
 			commemt.push_back(codes_[pos_]);
 			pos_++;
 		}
@@ -646,26 +625,30 @@ bool gsoner::check_comment()
 		pos_++;
 	}
 
-	if (!result)
+	if (!result) {
 		return result;
+	}
 
-	if (commemt.find("Gson@optional") != std::string::npos)
+	if (commemt.find("Gson@optional") != std::string::npos) {
 		required_ = false;
-	if (commemt.find("Gson@required") != std::string::npos)
+	}
+	if (commemt.find("Gson@required") != std::string::npos) {
 		required_ = true;
-	if (commemt.find("Gson@skip") != std::string::npos)
+	}
+	if (commemt.find("Gson@skip") != std::string::npos) {
 		skip_ = true;
-	if (commemt.find("Gson@rename:") != std::string::npos)
-	{
+	}
+	if (commemt.find("Gson@rename:") != std::string::npos) {
 		std::size_t pos = commemt.find("Gson@rename:") + strlen("Gson@rename:");
 		std::size_t n = 0;
-		if (commemt[commemt.size() - 1] == '\n')
+		if (commemt[commemt.size() - 1] == '\n') {
 			n++;
-		if (commemt[commemt.size() - 2] == '\r')
+		}
+		if (commemt[commemt.size() - 2] == '\r') {
 			n++;
+		}
 		newname_ = commemt.substr( pos ,commemt.size() - pos - n);
-		if (newname_.empty())
-		{
+		if (newname_.empty()) {
 			std::cout << "Gson@rename:{} error, new name empty" << std::endl;
 			throw syntax_error();
 		}
@@ -675,41 +658,32 @@ bool gsoner::check_comment()
 
 std::string gsoner::get_static_string(const std::string &str, int &index)
 {
-	if (str[index] != '"')
+	if (str[index] != '"') {
 		return "";
+	}
 
 	index++;
 	//int sym = 1;
 	std::string lines;
 
-	while (true)
-	{
-		if (str[index] == '\\')
-		{
-			if (str[index + 1] == '"')
-			{
+	while (true) {
+		if (str[index] == '\\') {
+			if (str[index + 1] == '"') {
 				lines.push_back('\\');
 				lines.push_back('\"');
 				index += 2;
 				continue;
 			}
-		}
-		else if (str[index] == '\"')
-		{
+		} else if (str[index] == '\"') {
 			index++;
 			skip_space_comment();
-			if (str[index] == ';')
-			{
+			if (str[index] == ';') {
 				index++;
 				break;
-			}
-			else if (str[index] == '\"')
-			{
+			} else if (str[index] == '\"') {
 				index++;
 				continue;
-			}
-			else
-			{
+			} else {
 				break;
 			}
 		}
@@ -721,15 +695,15 @@ std::string gsoner::get_static_string(const std::string &str, int &index)
 	return lines;
 }
 
-bool gsoner::skip_space()
+bool gsoner::skip_space(void)
 {
 	bool result = false;
 	while (codes_[pos_] == ' ' ||
 		codes_[pos_] == '\r' ||
 		codes_[pos_] == '\n' ||
 		codes_[pos_] == '\t' ||
-		codes_[pos_] == '\\')
-	{
+		codes_[pos_] == '\\') {
+
 		pos_++;
 		result = true;
 	}
@@ -737,39 +711,40 @@ bool gsoner::skip_space()
 	return result;
 }
 
-std::pair<bool, std::string> gsoner::get_function_declare()
+std::pair<bool, std::string> gsoner::get_function_declare(void)
 {
-	if (status_ != e_struct_begin)
+	if (status_ != e_struct_begin) {
 		return std::make_pair(false, "");
+	}
 
 	int j = pos_;
 	std::string lines;
 	skip_space();
 
-	while (true)
-	{
-		if (codes_[j] == '/')
-		{
-			if (check_comment() == false)
+	while (true) {
+		if (codes_[j] == '/') {
+			if (!check_comment()) {
 				throw syntax_error();
+			}
 			continue;
 		}
-		if (codes_[j] == '"')
-		{
+		if (codes_[j] == '"') {
 			std::string str = get_static_string(codes_,j);
 		}
-		if (codes_[j] == '=')
+		if (codes_[j] == '=') {
 			break;
-		if (codes_[j] == ';')
+		}
+		if (codes_[j] == ';') {
 			break;
-		if (codes_[j] == '(')
+		}
+		if (codes_[j] == '(') {
 			break;
+		}
 		lines.push_back(codes_[j]);
 		j++;
 	}
 
-	if (codes_[j] != '(')
-	{
+	if (codes_[j] != '(') {
 		//not function, maybe member field
 		return std::make_pair(false, "");
 	}
@@ -778,23 +753,23 @@ std::pair<bool, std::string> gsoner::get_function_declare()
 	j++;
 	int syn = 1;
 
-	while (true)
-	{
-		if (codes_[j] == '/')
-		{
-			if (check_comment() == false)
+	while (true) {
+		if (codes_[j] == '/') {
+			if (!check_comment()) {
 				throw syntax_error();
+			}
 			continue;
 		}
-		if (codes_[j] == ')')
+		if (codes_[j] == ')') {
 			syn--;
-		if (syn == 0)
-		{
+		}
+		if (syn == 0) {
 			lines.push_back(codes_[j]);
 			break;
 		}
-		if (codes_[j] == '(')
+		if (codes_[j] == '(') {
 			syn++;
+		}
 		lines.push_back(codes_[j]);
 		j++;
 	}
@@ -805,75 +780,77 @@ std::pair<bool, std::string> gsoner::get_function_declare()
 	return std::make_pair(true, lines);
 }
 
-std::list<std::string> gsoner::get_initializelist()
+std::list<std::string> gsoner::get_initializelist(void)
 {
 	std::list<std::string> initialize_list;
 	std::list<char> syms;
 	std::string line;
 
-	if (codes_[pos_] != ':')
+	if (codes_[pos_] != ':') {
 		return initialize_list;
+	}
 
 	pos_++;//skip ':'
 
-	while (true)
-	{
+	while (true) {
 		skip_space_comment();
-		if (codes_[pos_] == '(')
+		if (codes_[pos_] == '(') {
 			syms.push_back('(');
-		else if (codes_[pos_] == ')')
-		{
-			if (!syms.size() || syms.back() != '(')
-				throw syntax_error ();
+		} else if (codes_[pos_] == ')') {
+			if (!syms.size() || syms.back() != '(') {
+				throw syntax_error();
+			}
 
 			line.push_back (')');
 			pos_++;
 
 			syms.pop_back ();
-			if (!syms.empty())
+			if (!syms.empty()) {
 				continue;
+			}
 
 			initialize_list.push_back(line);
 			line.clear();
 
-			while (codes_[pos_] != ',' && codes_[pos_] != '{')
-			{
-				if (skip_space_comment () == false)
+			while (codes_[pos_] != ',' && codes_[pos_] != '{') {
+				if (!skip_space_comment ()) {
 					pos_++;
+				}
 			}
 
-			if (codes_[pos_] == ',')
+			if (codes_[pos_] == ',') {
 				pos_++;
+			}
 			continue;
-		}
-		else if (codes_[pos_] == '{')
-		{
-			if (line.empty())
+		} else if (codes_[pos_] == '{') {
+			if (line.empty()) {
 				break;
+			}
 			syms.push_back ('{');
-		}
-		else if (codes_[pos_] == '}')
-		{
-			if (!syms.size() || syms.back() != '{')
+		} else if (codes_[pos_] == '}') {
+			if (!syms.size() || syms.back() != '{') {
 				throw syntax_error();
+			}
 
 			line.push_back('}');
 			pos_++;
 
 			syms.pop_back();
-			if (!syms.empty())
+			if (!syms.empty()) {
 				continue;
+			}
 
 			initialize_list.push_back(line);
 			line.clear();
-			while (codes_[pos_] != ',' && codes_[pos_] != '{')
-			{
-				if (skip_space_comment() == false)
+			while (codes_[pos_] != ',' && codes_[pos_] != '{') {
+				if (!skip_space_comment()) {
 					pos_++;
+				}
 			}
 
-			if (codes_[pos_] == ',')
+			if (codes_[pos_] == ',') {
 				pos_++;
+			}
 
 			continue;
 		}
@@ -885,45 +862,46 @@ std::list<std::string> gsoner::get_initializelist()
 	return initialize_list;
 }
 
-bool gsoner::check_function()
+bool gsoner::check_function(void)
 {
-	if (status_ != e_struct_begin)
+	if (status_ != e_struct_begin) {
 		return false;
+	}
 	
 	int function_begin = pos_;
 	while (function_begin > 1 &&
 		(codes_[function_begin-1] == '\r' ||
 		codes_[function_begin-1] == '\n'||
 		codes_[function_begin-1] == '\t'||
-		codes_[function_begin-1] == ' '))
-	{
+		codes_[function_begin-1] == ' ')) {
+
 		function_begin --;
 	}
 
 	std::pair<bool, std::string> res = get_function_declare();
-	if (res.first == false)
+	if (!res.first) {
 		return false;
+	}
 
 	skip_space_comment();
 	//not find function define.just declare only.
-	if (codes_[pos_] == ';')
-	{
+	if (codes_[pos_] == ';') {
 		pos_++;//skip ';' sym
 		return true;
 	}
-	if (codes_[pos_] == ':')
-	{
+	if (codes_[pos_] == ':') {
 		std::list<std::string> initializelist = get_initializelist();
-		if (initializelist.empty())
+		if (initializelist.empty()) {
 			throw syntax_error();
+		}
 		//what to do with this code.
 	}
 	if (codes_[pos_] == 'c' &&
 		codes_[pos_+1] == 'o'&&
 		codes_[pos_+2] == 'n'&&
 		codes_[pos_+3] == 's'&&
-		codes_[pos_+4] == 't')
-	{
+		codes_[pos_+4] == 't') {
+
 		pos_ += 5;
 		res.second.append(" const");
 		skip_space_comment();
@@ -932,29 +910,25 @@ bool gsoner::check_function()
 	int sym = 1;
 	std::string lines("{");
 
-	while (true)
-	{
-		if (codes_[pos_] == '/')
-		{
-			if (check_comment() == false)
+	while (true) {
+		if (codes_[pos_] == '/') {
+			if (!check_comment()) {
 				throw syntax_error();
+			}
 			continue;
 		}
-		if (codes_[pos_] == '{')
+		if (codes_[pos_] == '{') {
 			sym++;
-		if (codes_[pos_] == '"')
-		{
+		}
+		if (codes_[pos_] == '"') {
 			std::string str = get_static_string(codes_, pos_);
 			lines.push_back('"');
 			lines += str;
 			lines.push_back('"');
 			continue;
-		}
-		else if (codes_[pos_] == '}')
-		{
+		} else if (codes_[pos_] == '}') {
 			sym--;
-			if (sym == 0)
-			{
+			if (sym == 0) {
 				pos_++;
 				lines.push_back('}');
 				break;
@@ -970,35 +944,35 @@ bool gsoner::check_function()
 	return true;
 }
 
-bool gsoner::check_member()
+bool gsoner::check_member(void)
 {
 	//struct user_t{int id;  
 
-	if (status_ != e_struct_begin)
+	if (status_ != e_struct_begin) {
 		return false;
+	}
 
 	std::string lines;
 	skip_space();
 
-	while (true)
-	{
-		if(codes_[pos_] == '/')
-		{
-			if(check_comment() == false)
+	while (true) {
+		if(codes_[pos_] == '/') {
+			if(!check_comment()) {
 				throw syntax_error();
+			}
 			continue;
 		}
 
-		if (codes_[pos_] == '"')
-		{
+		if (codes_[pos_] == '"') {
 			std::string str = get_static_string(codes_, pos_);
 			lines.push_back('"');
 			lines += str;
 			lines.push_back('"');
 		}
 
-		if(codes_[pos_] == ';')
+		if(codes_[pos_] == ';') {
 			break;
+		}
 		lines.push_back(codes_[pos_]);
 		pos_++;
 	}
@@ -1008,23 +982,23 @@ bool gsoner::check_member()
 	pos_++;
 
 	//skip current field;
-	if (skip_)
-	{
+	if (skip_) {
 		skip_ = false;
 		return true;
 	}
 	std::string name;
 	std::string types;
 	// remove assignment =,
-	if (lines.find('=') != std::string::npos)
+	if (lines.find('=') != std::string::npos) {
 		lines = lines.substr(0, lines.find('='));
+	}
 
 	int e = (int) lines.size() - 1;
 	while (lines[e] == ' ' ||
 		lines[e] == '\r' ||
 		lines[e] == '\n' ||
-		lines[e] == '\t')
-	{
+		lines[e] == '\t') {
+
 		e--;
 	}
 
@@ -1034,8 +1008,8 @@ bool gsoner::check_member()
 		lines[e] != '\t' &&
 		lines[e] != '*' &&
 		lines[e] != '&' &&
-		lines[e] != '=')
-	{
+		lines[e] != '=') {
+
 		name.push_back(lines[e]);
 		e--;
 	}
@@ -1047,109 +1021,89 @@ bool gsoner::check_member()
 	std::list<std::string> tokens;
 	std::string token;
 	for (std::string::iterator itr = types.begin();
-		itr != types.end(); ++itr)
-	{
-		if (*itr == ' ' || *itr == '\r' || *itr == '\n' || *itr == '\t')
-		{
-			if (token.size())
-			{
+		itr != types.end(); ++itr) {
+
+		if (*itr == ' ' || *itr == '\r' || *itr == '\n' || *itr == '\t') {
+			if (token.size()) {
 				tokens.push_back(token);
 				token.clear();
 			}
-		}
-		else if (*itr == '*' || *itr == '&')
-		{
-			if (token.size())
-			{
+		} else if (*itr == '*' || *itr == '&') {
+			if (token.size()) {
 				tokens.push_back(token);
 				token.clear();
 			}
-			if (*itr == '*')
+			if (*itr == '*') {
 				tokens.push_back("*");
-			else
+			} else {
 				tokens.push_back("&");
-		}
-		else if (*itr == ':')
-		{
-			if (token.size())
-			{
+			}
+		} else if (*itr == ':') {
+			if (token.size()) {
 				//back
-				if (token[token.size() -1] == ':')
-				{
+				if (token[token.size() -1] == ':') {
 					tokens.push_back("::");
 					token.clear();
 					continue;
-				}
-				else if (token.size())
-				{
+				} else if (token.size()) {
 					tokens.push_back(token);
 					token.clear();
 				}
 			}
 
 			token.push_back(':');
-		}
-		else if (*itr == '<')
-		{
-			if (token.size())
-			{
+		} else if (*itr == '<') {
+			if (token.size()) {
 				tokens.push_back(token);
 				token.clear();
 			}
 			tokens.push_back("<");
-		}
-		else if (*itr == '>')
-		{
-			if (token.size())
-			{
+		} else if (*itr == '>') {
+			if (token.size()) {
 				tokens.push_back(token);
 				token.clear();
 			}
 			tokens.push_back(">");
-		}
-		else if (*itr == ',')
-		{
-			if (token.size())
-			{
+		} else if (*itr == ',') {
+			if (token.size()) {
 				tokens.push_back(token);
 				token.clear();
 			}
 			tokens.push_back(",");
-		}
-		else
+		} else {
 			token.push_back(*itr);
+		}
 	}
 
-	if (token.size())
+	if (token.size()) {
 		tokens.push_back(token);
+	}
 
-	if (tokens.size() == 0)
-	{
+	if (tokens.size() == 0) {
 		printf("\"%s\"[syntax error]", name.c_str());
 		assert(false);
 	}
 
 	//check newname
-	if (newname_.size())
+	if (newname_.size()) {
 		name = newname_;
+	}
 
 	newname_.clear();
 	//std    :: list <int> a;
 	std::string first = tokens.front();
-	if (first == "const")
-	{
+	if (first == "const") {
 		tokens.pop_front();
 		//std::string first = tokens.front();
 		first = tokens.front();
-		if (tokens.empty())
+		if (tokens.empty()) {
 			throw unsupported_type(("unsupported \"" 
 				+ lines + "\"").c_str());
+		}
 	}
 
-	if (first.find("char") != std::string::npos)
-	{
-		if (first == "char*")
-		{
+	if (first.find("char") != std::string::npos) {
+		if (first == "char*") {
 			field_t f;
 			f.name_ = name;
 			f.required_ = required_;
@@ -1160,12 +1114,12 @@ bool gsoner::check_member()
 		}
 
 		tokens.pop_front();
-		if (!tokens.size())
+		if (!tokens.size()) {
 			throw unsupported_type("unsupported 'char' type");
+		}
 
 		first = tokens.front();
-		if (first == "*")
-		{
+		if (first == "*") {
 			field_t f;
 			f.name_ = name;
 			f.required_ = required_;
@@ -1176,13 +1130,11 @@ bool gsoner::check_member()
 		}
 	}
 
-	if (first == "std")
-	{
+	if (first == "std") {
 		for (std::list<std::string>::iterator itr = tokens.begin();
-			itr != tokens.end(); ++itr)
-		{
-			if (itr->find("string") != std::string::npos)
-			{
+			itr != tokens.end(); ++itr) {
+
+			if (itr->find("string") != std::string::npos) {
 				field_t f;
 				f.name_ = name;
 				f.required_ = required_;
@@ -1190,9 +1142,7 @@ bool gsoner::check_member()
 				current_obj_.fields_.push_back(f);
 
 				return true;
-			}
-			else if (itr->find("list") != std::string::npos)
-			{
+			} else if (itr->find("list") != std::string::npos) {
 				field_t f;
 				f.name_ = name;
 				f.required_ = required_;
@@ -1200,9 +1150,7 @@ bool gsoner::check_member()
 				current_obj_.fields_.push_back(f);
 
 				return true;;
-			}
-			else if (itr->find("vector") != std::string::npos)
-			{
+			} else if (itr->find("vector") != std::string::npos) {
 				field_t f;
 				f.name_ = name;
 				f.required_ = required_;
@@ -1210,9 +1158,7 @@ bool gsoner::check_member()
 				current_obj_.fields_.push_back(f);
 
 				return true;;
-			}
-			else if (itr->find("map") != std::string::npos)
-			{
+			} else if (itr->find("map") != std::string::npos) {
 				field_t f;
 				f.name_ = name;
 				f.required_ = required_;
@@ -1220,9 +1166,7 @@ bool gsoner::check_member()
 				current_obj_.fields_.push_back(f);
 
 				return true;;
-			}
-			else if(itr->find("set") != std::string::npos)
-			{
+			} else if(itr->find("set") != std::string::npos) {
 				field_t f;
 				f.name_ = name;
 				f.required_ = required_;
@@ -1232,14 +1176,11 @@ bool gsoner::check_member()
 				return true;;
 			}
 		}
-	}
-	else if (first.find("acl") != std::string::npos)
-	{
+	} else if (first.find("acl") != std::string::npos) {
 		for (std::list<std::string>::iterator itr = tokens.begin();
-			itr != tokens.end(); ++itr)
-		{
-			if (itr->find("string") != std::string::npos)
-			{
+			itr != tokens.end(); ++itr) {
+
+			if (itr->find("string") != std::string::npos) {
 				field_t f;
 				f.name_ = name;
 				f.required_ = required_;
@@ -1251,8 +1192,7 @@ bool gsoner::check_member()
 		}
 
 		throw syntax_error();
-	}
-	else if (first == "unsigned"||
+	} else if (first == "unsigned"||
 		first == "signed" ||
 		first == "int" ||
 		first == "long" ||
@@ -1264,8 +1204,8 @@ bool gsoner::check_member()
 		first == "uint32_t" ||
 		first == "int32_t" ||
 		first == "int64_t" ||
-		first == "uint64_t")
-	{
+		first == "uint64_t") {
+
 		field_t f;
 		f.type_ = field_t::e_number;
 		f.name_ = name;
@@ -1273,9 +1213,7 @@ bool gsoner::check_member()
 		current_obj_.fields_.push_back(f);
 
 		return true;
-	}
-	else if (first == "bool")
-	{
+	} else if (first == "bool") {
 		field_t f;
 		f.type_ = field_t::e_bool;
 		f.name_ = name;
@@ -1284,8 +1222,7 @@ bool gsoner::check_member()
 
 		return true;
 	}
-	else if (first == "float" || first == "double")
-	{
+	else if (first == "float" || first == "double") {
 		field_t f;
 		f.type_ = field_t::e_double;
 		f.name_ = name;
@@ -1293,9 +1230,7 @@ bool gsoner::check_member()
 		current_obj_.fields_.push_back(f);
 
 		return true;
-	}
-	else
-	{
+	} else {
 		// user define class ,struct.
 		field_t f;
 		f.name_ = name;
@@ -1312,8 +1247,9 @@ bool gsoner::check_member()
 bool gsoner::read_file(const char *filepath)
 {
 	std::ifstream is(filepath, std::ifstream::binary);
-	if (!is)
+	if (!is) {
 		return false;
+	}
 
 	std::string str((std::istreambuf_iterator<char>(is)),
 			std::istreambuf_iterator<char>());
@@ -1329,8 +1265,7 @@ std::string gsoner::get_filename(const char *filepath)
 	std::string  filename;
 	int i = (int) strlen(filepath) - 1;
 
-	while (i >= 0 && (filepath[i] != '\\' || filepath[i] != '/'))
-	{
+	while (i >= 0 && (filepath[i] != '\\' || filepath[i] != '/')) {
 		filename.push_back(filepath[i]);
 		i--;
 	}
@@ -1343,10 +1278,9 @@ std::string gsoner::get_filename(const char *filepath)
 bool gsoner::read_multi_file(const std::vector<std::string>& files)
 {
 	for (std::vector<std::string>::const_iterator itr = files.begin();
-		itr != files.end(); itr++)
-	{
-		if (read_file(itr->c_str()) == false)
-		{
+		itr != files.end(); itr++) {
+
+		if (!read_file(itr->c_str())) {
 			std::cout << "read_file:" \
 				<< itr->c_str() << " error" << std::endl;
 			return false;
@@ -1356,7 +1290,7 @@ bool gsoner::read_multi_file(const std::vector<std::string>& files)
 	return true;
 }
 
-void gsoner::parse_code()
+void gsoner::parse_code(void)
 {
 	//char c = '\n';
 	max_pos_ = (int) codes_.size();
@@ -1365,55 +1299,58 @@ void gsoner::parse_code()
 		do
 		{
 			skip_space_comment();
-			if(pos_ == max_pos_)
+			if(pos_ == max_pos_) {
 				break;
+			}
 
 			char ch = codes_[pos_];
-			if (ch == ';')
-			{
+			if (ch == ';') {
 				pos_++;
 				continue;
 			}
-			if (ch == '/')
-			{
-				if (check_comment())
+			if (ch == '/') {
+				if (check_comment()) {
 					continue;
+				}
 			}
-			if (ch == '}')
-			{
-				if(check_struct_end())
+			if (ch == '}') {
+				if(check_struct_end()) {
 					continue;
-				if(check_namespace_end())
+				}
+				if(check_namespace_end()) {
 					continue;
+				}
 			}
-			if (ch == 'n')
-			{
-				if(check_namespace())
+			if (ch == 'n') {
+				if(check_namespace()) {
 					continue;
+				}
 			}
-			if (ch == '#')
-			{
-				if(check_include())
+			if (ch == '#') {
+				if(check_include()) {
 					continue;
-				if(check_define())
+				}
+				if(check_define()) {
 					continue;
-				if(check_pragma())
+				}
+				if(check_pragma()) {
 					continue;
+				}
 			}
-			if (ch == 's')
-			{
-				if(check_struct_begin())
+			if (ch == 's') {
+				if(check_struct_begin()) {
 					continue;
+				}
 			}
-			if (ch == 'u')
-			{
-				if (check_use_namespace())
+			if (ch == 'u') {
+				if (check_use_namespace()) {
 					continue;
+				}
 			}
-			if(check_function())
+			if(check_function()) {
 				continue;
-			if(check_member())
-			{
+			}
+			if(check_member()) {
 				required_ = default_;
 				continue;
 			}
@@ -1422,21 +1359,19 @@ void gsoner::parse_code()
 			pos_++;
 		} while (pos_ < max_pos_);
 	}
-	catch (syntax_error &e)
-	{
+	catch (syntax_error &e) {
 		(void) e;
 
 		int count = 2;
 		std::size_t ii = pos_;
 		int start = 0;
 
-		while (ii > 0)
-		{
-			if (codes_[ii] == '\n')
-			{
+		while (ii > 0) {
+			if (codes_[ii] == '\n') {
 				count--;
-				if (count == 0)
+				if (count == 0) {
 					break;;
+				}
 			}
 			ii--;
 		}
@@ -1444,13 +1379,12 @@ void gsoner::parse_code()
 		start = (int) ii;
 		ii = pos_;
 		count = 2;
-		while (ii < codes_.size())
-		{
-			if (codes_[ii] == '\n')
-			{
+		while (ii < codes_.size()) {
+			if (codes_[ii] == '\n') {
 				count--;
-				if (count == 0)
+				if (count == 0) {
 					break;;
+				}
 			}
 			ii++;
 		}
@@ -1458,29 +1392,27 @@ void gsoner::parse_code()
 		std::cout << codes_.substr(start, ii - start).c_str() << std::endl;
 		ii = 0;
 		count = 0;
-		while (ii < (std::size_t) pos_)
-		{
-			if (codes_[ii] == '\n')
+		while (ii < (std::size_t) pos_) {
+			if (codes_[ii] == '\n') {
 				count++;
+			}
 			ii++;
 		}
 
 		std::cout << "line:" << count << std::endl;
 		return;
-	}
-	catch (std::exception & e)
-	{
+	} catch (std::exception & e) {
 		std::cout << e.what() << std::endl << std::endl;
 		return;
 	}
 }
 
-std::string gsoner::get_include_files()
+std::string gsoner::get_include_files(void)
 {
 	std::string str;
 	for (std::list<std::string>::const_iterator itr = files_.begin();
-		itr != files_.end(); ++itr)
-	{
+		itr != files_.end(); ++itr) {
+
 		str += "#include \"";
 		str += *itr;
 		str += "\"\n";
@@ -1492,32 +1424,34 @@ static std::string get_filename_without_ext(std::string filename)
 {
 	std::string result;
 
-	if (filename.empty())
+	if (filename.empty()) {
 		return std::string(); 
+	}
 	
 	std::size_t pos = filename.find_last_of('.');
-	if (pos != filename.npos)
+	if (pos != filename.npos) {
 		filename = filename.substr(0, pos);
+	}
 	
-	for(int i = (int)filename.size() -1; i >= 0; --i)
-	{
+	for(int i = (int)filename.size() -1; i >= 0; --i) {
 		char ch = filename[i];
-		if (ch == '/' || ch == '\\')
+		if (ch == '/' || ch == '\\') {
 			break;
+		}
 		result += filename[i];
 	}
-	if (result.empty())
+	if (result.empty()) {
 		return std::string();
+	}
 	std::reverse(result.begin(), result.end());
 	return result;
 }
-void gsoner::gen_gson()
+void gsoner::gen_gson(void)
 {
 	const char *namespace_start = "namespace acl\n{";
 	const char *namespace_end = "\n}///end of acl.\n";
 
-	if(files_.size() == 1)
-	{
+	if(files_.size() == 1) {
 		std::string filename = get_filename_without_ext(files_.front());
 		gen_header_filename_ = filename + ".gson.h";
 		gen_source_filename_ = filename + ".gson.cpp";
@@ -1531,8 +1465,8 @@ void gsoner::gen_gson()
 	write_source(namespace_start);
 
 	for (std::map<std::string, object_t>::iterator itr = objs_.begin();
-		itr != objs_.end(); ++itr)
-	{
+		itr != objs_.end(); ++itr) {
+
 		function_code_t pack = gen_pack_code(itr->second);
 		function_code_t unpack = gen_unpack_code(itr->second);
 
@@ -1569,24 +1503,24 @@ std::string gsoner::add_4space(const std::string &code)
 	bool end = false;
 	int syn = 0;
 
-	while (i < len)
-	{
-		if (code[i] == '{')
+	while (i < len) {
+		if (code[i] == '{') {
 			syn++;
+		}
 
-		if (code[i] == '}')
-		{
+		if (code[i] == '}') {
 			syn--;
-			if (syn == 0)
+			if (syn == 0) {
 				end = true;
+			}
 		}
 		result.push_back(code[i]);
 
 		if (end == false &&
 			code[i] == '\n'&&
 			code[i + 1] != '\n'&&
-			code[i + 1] != '\r')
-		{
+			code[i + 1] != '\r') {
+
 			result += tab_;
 		}
 
@@ -1596,7 +1530,7 @@ std::string gsoner::add_4space(const std::string &code)
 	return result;
 }
 
-void gsoner::flush()
+void gsoner::flush(void)
 {
 	gen_header_->flush();
 	gen_source_->flush();
@@ -1606,92 +1540,87 @@ void gsoner::flush()
 
 void gsoner::write_header(const std::string &data)
 {
-	if (gen_header_ == NULL)
+	if (gen_header_ == NULL) {
 		gen_header_ = new std::ofstream(gen_header_filename_.c_str());
+	}
 	gen_header_->write(data.c_str(), data.size());
 }
 
 void gsoner::write_source(const std::string &data)
 {
-	if (gen_source_ == NULL)
+	if (gen_source_ == NULL) {
 		gen_source_ = new std::ofstream(gen_source_filename_.c_str());
+	}
 	gen_source_->write(data.c_str(), data.size());
 }
 
-bool gsoner::check_define()
+bool gsoner::check_define(void)
 {
 	std::string lines;
 	std::string tmp = codes_.substr(pos_, strlen("#define "));
-	if (tmp != "#define ")
+	if (tmp != "#define ") {
 		return false;
+	}
 
 	pos_ += (int) strlen("#define ");
 	bool skip = false;
-	while (true)
-	{
-		if (codes_[pos_] == '\r' && codes_[pos_+1] == '\n')
-		{
+	while (true) {
+		if (codes_[pos_] == '\r' && codes_[pos_+1] == '\n') {
 			pos_++;
 			pos_++;
-			if (skip == true)
+			if (skip == true) {
 				skip = false;
-			else
+			} else {
 				return true;
-		}
-		else if (codes_[pos_] == '\n')
-		{
+			}
+		} else if (codes_[pos_] == '\n') {
 			pos_++;
-			if (skip == true)
+			if (skip == true) {
 				skip = false;
-			else
+			} else {
 				return true;
-		}
-		else if (codes_[pos_] == '\\')
-		{
+			}
+		} else if (codes_[pos_] == '\\') {
 			pos_++;
 			skip = true;
-		}
-		else
-		{
+		} else {
 			lines.push_back(codes_[pos_]);
 			pos_++;
 		}
-
 	}
 
 	return false;
 }
 
-bool gsoner::check_pragma()
+bool gsoner::check_pragma(void)
 {
 	std::string lines;
 	std::string tmp = codes_.substr(pos_, strlen("#pragma "));
-	if (tmp != "#pragma ")
+	if (tmp != "#pragma ") {
 		return false;
+	}
 
 	pos_ += (int) strlen("#pragma ");
 	bool skip = false;
-	while (true)
-	{
-		if (codes_[pos_] == '\r' && codes_[pos_ + 1] == '\n')
-		{
+	while (true) {
+		if (codes_[pos_] == '\r' && codes_[pos_ + 1] == '\n') {
 			pos_++;
 			pos_++;
-			if (skip == true)
+			if (skip == true) {
 				skip = false;
-			else
+			} else {
 				return true;
+			}
 		}
-		if (codes_[pos_] == '\n')
-		{
+		if (codes_[pos_] == '\n') {
 			pos_++;
-			if (skip == true)
+			if (skip == true) {
 				skip = false;
-			else
+			} else {
 				return true;
+			}
 		}
-		if (codes_[pos_] == '\\')
-		{
+		if (codes_[pos_] == '\\') {
 			pos_++;
 			skip = true;
 		}
