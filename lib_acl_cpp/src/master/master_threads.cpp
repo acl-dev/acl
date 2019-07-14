@@ -47,13 +47,12 @@ void master_threads::run(int argc, char** argv)
 
 const char* master_threads::get_conf_path(void) const
 {
-	if (daemon_mode_)
-	{
+	if (daemon_mode_) {
 		const char* ptr = acl_threads_server_conf();
 		return ptr && *ptr ? ptr : NULL;
-	}
-	else
+	} else {
 		return conf_.get_path();
+	}
 }
 
 void master_threads::run_daemon(int argc, char** argv)
@@ -90,8 +89,7 @@ bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 	argv[argc++] = proc ? proc : "demo";
 	argv[argc++] = "-L";
 	argv[argc++] = addrs;
-	if (path && *path)
-	{
+	if (path && *path) {
 		argv[argc++] = "-f";
 		argv[argc++] = path;
 	}
@@ -106,27 +104,28 @@ void master_threads::thread_disable_read(socket_stream* stream)
 {
 	ACL_EVENT* event = get_event();
 
-	if (event == NULL)
+	if (event == NULL) {
 		logger_error("event NULL");
-	else
+	} else {
 		acl_event_disable_readwrite(event, stream->get_vstream());
+	}
 }
 
 void master_threads::thread_enable_read(socket_stream* stream)
 {
 	ACL_EVENT* event = get_event();
-	if (event == NULL)
-	{
+	if (event == NULL) {
 		logger_error("event NULL");
 		return;
 	}
 
 	acl_pthread_pool_t* threads = acl_threads_server_threads();
-	if (threads != NULL)
+	if (threads != NULL) {
 		acl_threads_server_enable_read(event, threads,
 			stream->get_vstream());
-	else
+	} else {
 		logger_error("threads NULL!");
+	}
 }
 
 void master_threads::push_back(server_socket* ss)
@@ -204,8 +203,9 @@ int master_threads::service_on_accept(void* ctx, ACL_VSTREAM* client)
 	acl_assert(mt);
 
 	// client->context 不应被占用
-	if (client->context != NULL)
+	if (client->context != NULL) {
 		logger_fatal("client->context not null!");
+	}
 
 	socket_stream* stream = NEW socket_stream();
 
@@ -213,8 +213,7 @@ int master_threads::service_on_accept(void* ctx, ACL_VSTREAM* client)
 	// service_on_close 中被释放
 	client->context = stream;
 
-	if (stream->open(client) == false)
-	{
+	if (!stream->open(client)) {
 		logger_error("open stream error(%s)", acl_last_serror());
 		// 返回 -1 由上层框架调用 service_on_close 过程，在里面
 		// 释放 stream 对象
@@ -224,8 +223,9 @@ int master_threads::service_on_accept(void* ctx, ACL_VSTREAM* client)
 	// 如果子类的 thread_on_accept 方法返回 false，则直接返回给上层
 	// 框架 -1，由上层框架再调用 service_on_close 过程，从而在该过程
 	// 中将 stream 对象释放
-	if (mt->thread_on_accept(stream) == false)
+	if (!mt->thread_on_accept(stream)) {
 		return -1;
+	}
 
 	// 如果子类的 thread_on_handshake 方法返回 false，则直接返回给上层
 	// 框架 -1，由上层框架再调用 service_on_close 过程，从而在该过程
@@ -245,14 +245,16 @@ int master_threads::service_on_handshake(void* ctx, ACL_VSTREAM *client)
 
 	// client->context 在 service_on_accept 中被设置
 	socket_stream* stream = (socket_stream*) client->context;
-	if (stream == NULL)
+	if (stream == NULL) {
 		logger_fatal("client->context is null!");
+	}
 
 	// 如果子类的 thread_on_handshake 方法返回 false，则直接返回给上层
 	// 框架 -1，由上层框架再调用 service_on_close 过程，从而在该过程
 	// 中将 stream 对象释放
-	if (mt->thread_on_handshake(stream) == true)
+	if (mt->thread_on_handshake(stream)) {
 		return 0;
+	}
 	return -1;
 }
 
@@ -263,8 +265,9 @@ int master_threads::service_main(void* ctx, ACL_VSTREAM *client)
 
 	// client->context 在 service_on_accept 中被设置
 	socket_stream* stream = (socket_stream*) client->context;
-	if (stream == NULL)
+	if (stream == NULL) {
 		logger_fatal("client->context is null!");
+	}
 
 	// 调用子类的虚函数实现，如果返回 true 表示让框架继续监控该连接流，
 	// 否则需要关闭该流
@@ -273,15 +276,14 @@ int master_threads::service_main(void* ctx, ACL_VSTREAM *client)
 	// -1 表示需要关闭该连接
 	// 1 表示不再监控该连接
 
-	if (mt->thread_on_read(stream) == true)
-	{
+	if (mt->thread_on_read(stream)) {
 		// 如果子类在返回 true 后不希望框架继续监控流，则直接返回给框架 1
-		if (!mt->keep_read(stream))
+		if (!mt->keep_read(stream)) {
 			return 1;
+		}
 
 		// 否则，需要检查该流是否已经关闭，如果关闭，则必须返回 -1
-		if (stream->eof())
-		{
+		if (stream->eof()) {
 			logger_error("DISCONNECTED, CLOSING, FD: %d",
 				(int) stream->sock_handle());
 			return -1;
@@ -312,8 +314,9 @@ int master_threads::service_on_timeout(void* ctx, ACL_VSTREAM* client)
 	acl_assert(mt);
 
 	socket_stream* stream = (socket_stream*) client->context;
-	if (stream == NULL)
+	if (stream == NULL) {
 		logger_fatal("client->context is null!");
+	}
 
 	acl_assert(mt != NULL);
 
@@ -326,8 +329,9 @@ void master_threads::service_on_close(void* ctx, ACL_VSTREAM* client)
 	acl_assert(mt != NULL);
 
 	socket_stream* stream = (socket_stream*) client->context;
-	if (stream == NULL)
+	if (stream == NULL) {
 		logger_fatal("client->context is null!");
+	}
 
 	// 调用子类函数对将要关闭的流进行善后处理
 	mt->thread_on_close(stream);
@@ -345,8 +349,9 @@ int master_threads::service_on_sighup(void* ctx, ACL_VSTRING* buf)
 	acl_assert(mt);
 	string s;
 	bool ret = mt->proc_on_sighup(s);
-	if (buf)
+	if (buf) {
 		acl_vstring_strcpy(buf, s.c_str());
+	}
 	return ret ? 0 : -1;
 }
 

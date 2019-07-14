@@ -31,13 +31,13 @@ memcache_session::memcache_session(memcache* cache, bool auto_free /* = false */
 , cache_(cache)
 , auto_free_(auto_free)
 {
-
 }
 
-memcache_session::~memcache_session()
+memcache_session::~memcache_session(void)
 {
-	if (auto_free_)
+	if (auto_free_) {
 		delete cache_;
+	}
 }
 
 bool memcache_session::get_attrs(std::map<string, session_string>& attrs)
@@ -45,12 +45,14 @@ bool memcache_session::get_attrs(std::map<string, session_string>& attrs)
 	// 清空原有数据
 	attrs_clear(attrs);
 	const char* sid = get_sid();
-	if (sid == NULL || *sid == 0)
+	if (sid == NULL || *sid == 0) {
 		return false;
+	}
 
 	string buf;
-	if (cache_->get(sid, buf) == false)
+	if (!cache_->get(sid, buf)) {
 		return false;
+	}
 
 	// 反序列化
 	deserialize(buf, attrs);
@@ -60,8 +62,9 @@ bool memcache_session::get_attrs(std::map<string, session_string>& attrs)
 bool memcache_session::set_attrs(const std::map<string, session_string>& attrs)
 {
 	const char* sid = get_sid();
-	if (sid == NULL || *sid == 0)
+	if (sid == NULL || *sid == 0) {
 		return false;
+	}
 
 	string buf;
 	serialize(attrs, buf);  // 序列化数据
@@ -69,11 +72,12 @@ bool memcache_session::set_attrs(const std::map<string, session_string>& attrs)
 	return cache_->set(sid, buf.c_str(), buf.length(), ttl);
 }
 
-bool memcache_session::remove()
+bool memcache_session::remove(void)
 {
 	const char* sid = get_sid();
-	if (sid == NULL || * sid == 0)
+	if (sid == NULL || * sid == 0) {
 		return false;
+	}
 
 	return cache_->del(sid);
 }
@@ -81,8 +85,9 @@ bool memcache_session::remove()
 bool memcache_session::set_timeout(time_t ttl)
 {
 	const char* sid = get_sid();
-	if (sid == NULL || * sid == 0)
+	if (sid == NULL || * sid == 0) {
 		return false;
+	}
 
 	return cache_->set(sid, ttl);
 }

@@ -14,15 +14,16 @@
 namespace acl
 {
 
-master_aio::master_aio() : handle_(NULL) {}
+master_aio::master_aio(void) : handle_(NULL) {}
 
-master_aio::~master_aio()
+master_aio::~master_aio(void)
 {
-	if (daemon_mode_ == false)
+	if (!daemon_mode_) {
 		delete handle_;
+	}
 }
 
-aio_handle* master_aio::get_handle() const
+aio_handle* master_aio::get_handle(void) const
 {
 	acl_assert(handle_);
 	return handle_;
@@ -59,14 +60,12 @@ void master_aio::run_daemon(int argc, char** argv)
 const char* master_aio::get_conf_path(void) const
 {
 #ifndef ACL_WINDOWS
-	if (daemon_mode_)
-	{
+	if (daemon_mode_) {
 		const char* ptr = acl_aio_server_conf();
 		return ptr && *ptr ? ptr : NULL;
 	}
-	else
 #endif
-		return conf_.get_path();
+	return conf_.get_path();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -74,8 +73,9 @@ const char* master_aio::get_conf_path(void) const
 static void close_all_listener(std::vector<aio_listen_stream*>& sstreams)
 {
 	std::vector<aio_listen_stream*>::iterator it = sstreams.begin();
-	for (; it != sstreams.end(); ++it)
+	for (; it != sstreams.end(); ++it) {
 		(*it)->close();
+	}
 }
 
 bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
@@ -102,13 +102,11 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	ACL_EVENT* eventp = acl_aio_event(aio);
 	set_event(eventp);  // 设置基类的事件句柄
 
-	acl_foreach(iter, tokens)
-	{
+	acl_foreach(iter, tokens) {
 		const char* addr = (const char*) iter.data;
 		aio_listen_stream* sstream = NEW aio_listen_stream(handle_);
 		// 监听指定的地址
-		if (sstream->open(addr) == false)
-		{
+		if (!sstream->open(addr)) {
 			logger_error("listen %s error: %s", addr, last_serror());
 			close_all_listener(sstreams);
 			// XXX: 为了保证能关闭监听流，应在此处再 check 一下
@@ -124,11 +122,9 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 
 	service_pre_jail(this);
 	service_init(this);
-	while (true)
-	{
+	while (true) {
 		// 如果返回 false 则表示不再继续，需要退出
-		if (handle_->check() == false)
-		{
+		if (!handle_->check()) {
 			logger("aio_server stop now ...");
 			break;
 		}
@@ -139,7 +135,7 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	return true;
 }
 
-void master_aio::stop()
+void master_aio::stop(void)
 {
 	acl_assert(handle_);
 	handle_->stop();
@@ -166,10 +162,10 @@ public:
 		stream_ = ss->get_astream();
 	}
 
-	~aio_close_callback() {}
+	~aio_close_callback(void) {}
 
 protected:
-	void close_callback()
+	void close_callback(void)
 	{
 #ifndef ACL_WINDOWS
 		// 通过下面调用通知服务器框架目前已经处理的连接个数，便于
@@ -191,8 +187,7 @@ void master_aio::service_pre_jail(void* ctx)
 	acl_assert(ma != NULL);
 
 #ifndef ACL_WINDOWS
-	if (ma->daemon_mode_)
-	{
+	if (ma->daemon_mode_) {
 		acl_assert(ma->handle_ == NULL);
 
 		ACL_EVENT* eventp = acl_aio_server_event();
@@ -252,8 +247,9 @@ int master_aio::service_on_sighup(void* ctx, ACL_VSTRING* buf)
 	acl_assert(ma);
 	string s;
 	bool ret = ma->proc_on_sighup(s);
-	if (buf)
+	if (buf) {
 		acl_vstring_strcpy(buf, s.c_str());
+	}
 	return ret ? 0 : -1;
 }
 

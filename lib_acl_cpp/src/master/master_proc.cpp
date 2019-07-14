@@ -13,9 +13,9 @@
 namespace acl
 {
 
-master_proc::master_proc() : stop_(false), count_limit_(0), count_(0) {}
+master_proc::master_proc(void) : stop_(false), count_limit_(0), count_(0) {}
 
-master_proc::~master_proc() {}
+master_proc::~master_proc(void) {}
 
 static bool __has_called = false;
 
@@ -47,14 +47,12 @@ void master_proc::run_daemon(int argc, char** argv)
 const char* master_proc::get_conf_path(void) const
 {
 #ifndef ACL_WINDOWS
-	if (daemon_mode_)
-	{
+	if (daemon_mode_) {
 		const char* ptr = acl_single_server_conf();
 		return ptr && *ptr ? ptr : NULL;
 	}
-	else
 #endif
-		return conf_.get_path();
+	return conf_.get_path();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -62,8 +60,9 @@ const char* master_proc::get_conf_path(void) const
 static void close_all_listener(std::vector<ACL_VSTREAM*>& sstreams)
 {
 	std::vector<ACL_VSTREAM*>::iterator it = sstreams.begin();
-	for (; it != sstreams.end(); ++it)
+	for (; it != sstreams.end(); ++it) {
 		acl_vstream_close(*it);
+	}
 }
 
 void master_proc::listen_callback(int, ACL_EVENT*, ACL_VSTREAM *sstream,
@@ -73,19 +72,17 @@ void master_proc::listen_callback(int, ACL_EVENT*, ACL_VSTREAM *sstream,
 	acl_assert(mp);
 
 	ACL_VSTREAM* client = acl_vstream_accept(sstream, NULL, 0);
-	if (client == NULL)
-	{
+	if (client == NULL) {
 		logger_error("accept error %s", last_serror());
 		mp->stop_ = true;
-	}
-	else
-	{
+	} else {
 		service_main(ctx, client);
 		acl_vstream_close(client); // 因为在 service_main 里不会关闭连接
 
 		mp->count_++;
-		if (mp->count_limit_ > 0 && mp->count_ >= mp->count_limit_)
+		if (mp->count_limit_ > 0 && mp->count_ >= mp->count_limit_) {
 			mp->stop_ = true;
+		}
 	}
 }
 
@@ -109,12 +106,10 @@ bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 	ACL_ARGV* tokens = acl_argv_split(addrs, ";,| \t");
 	ACL_ITER iter;
 
-	acl_foreach(iter, tokens)
-	{
+	acl_foreach(iter, tokens) {
 		const char* addr = (const char*) iter.data;
 		ACL_VSTREAM* sstream = acl_vstream_listen(addr, 128);
-		if (sstream == NULL)
-		{
+		if (sstream == NULL) {
 			logger_error("listen %s error %s", addr, last_serror());
 			close_all_listener(sstreams);
 			acl_argv_free(tokens);
@@ -134,8 +129,9 @@ bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 	service_pre_jail(this);
 	service_init(this);
 
-	while (!stop_)
+	while (!stop_) {
 		acl_event_loop(eventp);
+	}
 
 	close_all_listener(sstreams);
 	acl_event_free(eventp);
@@ -152,12 +148,14 @@ void master_proc::service_main(void* ctx, ACL_VSTREAM *stream)
 	acl_assert(mp != NULL);
 
 	socket_stream* client = NEW socket_stream();
-	if (client->open(stream) == false)
+	if (!client->open(stream)) {
 		logger_fatal("open stream error!");
+	}
 
 #ifndef	ACL_WINDOWS
-	if (mp->daemon_mode_)
+	if (mp->daemon_mode_) {
 		acl_watchdog_pat();  // 必须通知 acl_master 框架一下
+	}
 #endif
 	mp->on_accept(client);
 	client->unbind();
@@ -170,8 +168,7 @@ void master_proc::service_pre_jail(void* ctx)
 	acl_assert(mp != NULL);
 
 #ifndef ACL_WINDOWS
-	if (mp->daemon_mode())
-	{
+	if (mp->daemon_mode()) {
 		ACL_EVENT* eventp = acl_single_server_event();
 		mp->set_event(eventp);
 	}
@@ -214,8 +211,9 @@ int master_proc::service_on_sighup(void* ctx, ACL_VSTRING* buf)
 	acl_assert(mp != NULL);
 	string s;
 	bool ret = mp->proc_on_sighup(s);
-	if (buf)
+	if (buf) {
 		acl_vstring_strcpy(buf, s.c_str());
+	}
 	return ret ? 0 : -1;
 }
 

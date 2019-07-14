@@ -17,12 +17,10 @@ namespace acl
 db_row::db_row(const std::vector<const char*>& names)
 : names_(names)
 {
-
 }
 
 db_row::~db_row(void)
 {
-
 }
 
 void db_row::clear(void)
@@ -53,8 +51,9 @@ const char* db_row::field_value(const char* name) const
 
 	// 通过扫描字段名找出字段值的下标位置
 	for (i = 0; i < n; i++) {
-		if (strcasecmp(name, names_[i]) == 0)
+		if (strcasecmp(name, names_[i]) == 0) {
 			break;
+		}
 	}
 	if (i == n) {
 		logger_error("cloumn not exist, name: %s", name);
@@ -89,73 +88,81 @@ const char* db_row::operator [](size_t ifield) const
 int db_row::field_int(size_t ifield, int null_value /* = 0 */) const
 {
 	const char* ptr = field_value(ifield);
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return null_value;
-	else
+	} else {
 		return atoi(ptr);
+	}
 }
 
 int db_row::field_int(const char* name, int null_value /* = 0 */) const
 {
 	const char* ptr = field_value(name);
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return null_value;
-	else
+	} else {
 		return atoi(ptr);
+	}
 }
 
 acl_int64 db_row::field_int64(size_t ifield, acl_int64 null_value /* = 0 */) const
 {
 	const char* ptr = field_value(ifield);
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return null_value;
-	else
+	} else {
 		return acl_atoi64(ptr);
+	}
 }
 
 acl_int64 db_row::field_int64(const char* name, acl_int64 null_value /* = 0 */) const
 {
 	const char* ptr = field_value(name);
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return null_value;
-	else
+	} else {
 		return acl_atoi64(ptr);
+	}
 }
 
 double db_row::field_double(size_t ifield, double null_value /* = 0.0 */) const
 {
 	const char* ptr = field_value(ifield);
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return null_value;
-	else
+	} else {
 		return atof(ptr);
+	}
 }
 
 double db_row::field_double(const char* name, double null_value /* = 0.0 */) const
 {
 	const char* ptr = field_value(name);
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return null_value;
-	else
+	} else {
 		return atof(ptr);
+	}
 }
 
 const char* db_row::field_string(size_t ifield) const
 {
 	const char* ptr = field_value(ifield);
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return NULL;
-	else
+	} else {
 		return ptr;
+	}
 }
 
 const char* db_row::field_string(const char* name) const
 {
 	const char* ptr = field_value(name);
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return NULL;
-	else
+	} else {
 		return ptr;
+	}
 }
 
 size_t db_row::field_length(size_t ifield) const
@@ -182,8 +189,9 @@ size_t db_row::field_length(const char* name) const
 
 	// 通过扫描字段名找出字段值的下标位置
 	for (i = 0; i < n; i++) {
-		if (strcasecmp(name, names_[i]) == 0)
+		if (strcasecmp(name, names_[i]) == 0) {
 			break;
+		}
 	}
 	if (i == n) {
 		logger_error("cloumn not exist, name: %s", name);
@@ -207,22 +215,22 @@ size_t db_row::length(void) const
 
 //////////////////////////////////////////////////////////////////////////
 
-db_rows::db_rows()
+db_rows::db_rows(void)
 : result_tmp_(NULL)
 , result_free(NULL)
 {
-
 }
 
-db_rows::~db_rows()
+db_rows::~db_rows(void)
 {
 	std::vector<db_row*>::iterator it = rows_.begin();
 	for (; it != rows_.end(); ++it) {
 		delete (*it);
 	}
 
-	if (result_free && result_tmp_)
+	if (result_free && result_tmp_) {
 		result_free(result_tmp_);
+	}
 }
 
 const std::vector<const db_row*>& db_rows::get_rows(
@@ -231,15 +239,17 @@ const std::vector<const db_row*>& db_rows::get_rows(
 	// 先清空上一次的临时结果集
 	rows_tmp_.clear();
 
-	if (empty())
+	if (empty()) {
 		return rows_tmp_;
+	}
 
 	size_t icolumn, ncolumn = names_.size();
 
 	// 通过扫描字段名找出字段值的下标位置
 	for (icolumn = 0; icolumn < ncolumn; icolumn++) {
-		if (strcasecmp(name, names_[icolumn]) == 0)
+		if (strcasecmp(name, names_[icolumn]) == 0) {
 			break;
+		}
 	}
 
 	const db_row* row;
@@ -251,14 +261,15 @@ const std::vector<const db_row*>& db_rows::get_rows(
 		row = rows_[irow];
 		acl_assert(row->length() == ncolumn);
 		ptr = (*row)[icolumn];
-		if (ptr && strcmp(ptr, value) == 0)
+		if (ptr && strcmp(ptr, value) == 0) {
 			rows_tmp_.push_back(row);
+		}
 	}
 
 	return rows_tmp_;
 }
 
-const std::vector<db_row*>& db_rows::get_rows() const
+const std::vector<db_row*>& db_rows::get_rows(void) const
 {
 	return rows_;
 }
@@ -275,33 +286,34 @@ const db_row* db_rows::operator [](size_t idx) const
 	return row;
 }
 
-bool db_rows::empty() const
+bool db_rows::empty(void) const
 {
 	return rows_.empty();
 }
 
-size_t db_rows::length() const
+size_t db_rows::length(void) const
 {
 	return rows_.size();
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-db_handle::db_handle()
+db_handle::db_handle(void)
 : result_(NULL)
 , id_(NULL)
 {
 	time(&when_);
 }
 
-db_handle::~db_handle()
+db_handle::~db_handle(void)
 {
-	if (id_)
+	if (id_) {
 		acl_myfree(id_);
+	}
 	free_result();
 }
 
-bool db_handle::open()
+bool db_handle::open(void)
 {
 	// 调用虚方法的子类实现过程
 	return dbopen();
@@ -362,13 +374,15 @@ void db_handle::print_out(size_t max /* = 0 */) const
 {
 	// 列出查询结果方法二
 	for (size_t i = 0; i < length(); i++) {
-		if (max > 0 && i >= max)
+		if (max > 0 && i >= max) {
 			continue;
+		}
 
 		const acl::db_row* row = (*this)[i];
 
-		for (size_t j = 0; j < row->length(); j++)
+		for (size_t j = 0; j < row->length(); j++) {
 			printf("%s, ", (*row)[j]);
+		}
 		printf("\r\n");
 	}
 
@@ -376,7 +390,7 @@ void db_handle::print_out(size_t max /* = 0 */) const
 }
 
 
-const db_rows* db_handle::get_result() const
+const db_rows* db_handle::get_result(void) const
 {
 	return result_;
 }
@@ -384,24 +398,27 @@ const db_rows* db_handle::get_result() const
 const std::vector<const db_row*>* db_handle::get_rows(
 	const char* name, const char* value)
 {
-	if (result_ == NULL)
+	if (result_ == NULL) {
 		return NULL;
+	}
 	const std::vector<const db_row*>& rows = result_->get_rows(name, value);
 	return &rows;
 }
 
-const std::vector<db_row*>* db_handle::get_rows() const
+const std::vector<db_row*>* db_handle::get_rows(void) const
 {
-	if (result_ == NULL)
+	if (result_ == NULL) {
 		return NULL;
+	}
 	const std::vector<db_row*>& rows = result_->get_rows();
 	return &rows;
 }
 
-const db_row* db_handle::get_first_row() const
+const db_row* db_handle::get_first_row(void) const
 {
-	if (result_ == NULL)
+	if (result_ == NULL) {
 		return NULL;
+	}
 
 	const std::vector<db_row*>& rows = result_->get_rows();
 	const acl::db_row* first_row = rows[0];
@@ -409,7 +426,7 @@ const db_row* db_handle::get_first_row() const
 	return first_row;
 }
 
-void db_handle::free_result()
+void db_handle::free_result(void)
 {
 	if (result_) {
 		delete result_;
@@ -419,32 +436,37 @@ void db_handle::free_result()
 
 const db_row* db_handle::operator [](size_t idx) const
 {
-	if (result_ == NULL)
+	if (result_ == NULL) {
 		return NULL;
-	if (idx >= result_->length())
-		return (NULL);
+	}
+	if (idx >= result_->length()) {
+		return NULL;
+	}
 	return (*result_)[idx];
 }
 
-size_t db_handle::length() const
+size_t db_handle::length(void) const
 {
-	if (result_ == NULL)
+	if (result_ == NULL) {
 		return 0;
-	else
+	} else {
 		return result_->length();
+	}
 }
 
-bool db_handle::empty() const
+bool db_handle::empty(void) const
 {
 	return length() == 0 ? true : false;
 }
 
 db_handle& db_handle::set_id(const char* id)
 {
-	if (id == NULL || *id == 0)
+	if (id == NULL || *id == 0) {
 		return *this;
-	if (id_)
+	}
+	if (id_) {
 		acl_myfree(id_);
+	}
 	id_ = acl_mystrdup(id);
 	return *this;
 }
@@ -459,11 +481,12 @@ static string __loadpath;
 
 void db_handle::set_loadpath(const char* path)
 {
-	if (path && *path)
+	if (path && *path) {
 		__loadpath = path;
+	}
 }
 
-const char* db_handle::get_loadpath()
+const char* db_handle::get_loadpath(void)
 {
 	return __loadpath.empty() ? NULL : __loadpath.c_str();
 }

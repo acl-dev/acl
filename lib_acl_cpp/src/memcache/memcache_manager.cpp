@@ -9,11 +9,11 @@
 namespace acl
 {
 
-memcache_manager::memcache_manager()
+memcache_manager::memcache_manager(void)
 {
 }
 
-memcache_manager::~memcache_manager()
+memcache_manager::~memcache_manager(void)
 {
 }
 

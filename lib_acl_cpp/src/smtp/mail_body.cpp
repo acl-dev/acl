@@ -18,29 +18,30 @@ namespace acl {
 
 mail_body::mail_body(const char* charset /* = "utf-8" */,
 	const char* encoding /* = "base64" */)
-	: charset_(charset)
-	, transfer_encoding_(encoding)
+: charset_(charset)
+, transfer_encoding_(encoding)
 {
-	if (transfer_encoding_.compare("base64", false) == 0)
+	if (transfer_encoding_.compare("base64", false) == 0) {
 		coder_ = NEW mime_base64(true, true);
-	else if (transfer_encoding_.compare("qp", false) == 0)
+	} else if (transfer_encoding_.compare("qp", false) == 0) {
 		coder_ = NEW mime_quoted_printable(true, true);
-	else if (transfer_encoding_.compare("uucode", false) == 0)
+	} else if (transfer_encoding_.compare("uucode", false) == 0) {
 		coder_ = NEW mime_uucode(true, true);
-	else if (transfer_encoding_.compare("xxcode", false) == 0)
+	} else if (transfer_encoding_.compare("xxcode", false) == 0) {
 		coder_ = NEW mime_xxcode(true, true);
-	else
+	} else {
 		coder_ = NULL;
+	}
 
-	html_ = NULL;
-	hlen_ = 0;
-	plain_ = NULL;
-	plen_ = 0;
+	html_        = NULL;
+	hlen_        = 0;
+	plain_       = NULL;
+	plen_        = 0;
 	attachments_ = NULL;
-	mime_stype_ = MIME_STYPE_OTHER;
+	mime_stype_  = MIME_STYPE_OTHER;
 }
 
-mail_body::~mail_body()
+mail_body::~mail_body(void)
 {
 	delete coder_;
 }
@@ -49,29 +50,29 @@ mail_body& mail_body::set_html(const char* html, size_t len)
 {
 	html_ = html;
 	hlen_ = len;
-	mime_stype_ = MIME_STYPE_HTML;
 
+	mime_stype_ = MIME_STYPE_HTML;
 	return *this;
 }
 
 mail_body& mail_body::set_plain(const char* plain, size_t len)
 {
 	plain_ = plain;
-	plen_ = len;
-	mime_stype_ = MIME_STYPE_PLAIN;
+	plen_  = len;
 
+	mime_stype_ = MIME_STYPE_PLAIN;
 	return *this;
 }
 
 mail_body& mail_body::set_alternative(const char* html, size_t hlen,
 	const char* plain, size_t plen)
 {
-	html_ = html;
-	hlen_ = hlen;
+	html_  = html;
+	hlen_  = hlen;
 	plain_ = plain;
-	plen_ = plen;
-	mime_stype_ = MIME_STYPE_ALTERNATIVE;
+	plen_  = plen;
 
+	mime_stype_ = MIME_STYPE_ALTERNATIVE;
 	return *this;
 }
 
@@ -79,12 +80,13 @@ mail_body& mail_body::set_relative(const char* html, size_t hlen,
 	const char* plain, size_t plen,
 	const std::vector<mail_attach*>& attachments)
 {
-	html_ = html;
-	hlen_ = hlen;
+	html_  = html;
+	hlen_  = hlen;
 	plain_ = plain;
-	plen_ = plen;
+	plen_  = plen;
+
 	attachments_ = &attachments;
-	mime_stype_ = MIME_STYPE_RELATED;
+	mime_stype_  = MIME_STYPE_RELATED;
 
 	return *this;
 }
@@ -117,8 +119,7 @@ bool mail_body::build_plain(const char* in, size_t len,
 
 bool mail_body::save_to(string& out) const
 {
-	switch (mime_stype_)
-	{
+	switch (mime_stype_) {
 	case MIME_STYPE_HTML:
 		return save_html(html_, hlen_, out);
 	case MIME_STYPE_PLAIN:
@@ -143,8 +144,7 @@ void mail_body::set_content_type(const char* content_type)
 
 bool mail_body::save_html(const char* html, size_t len, string& out) const
 {
-	if (!html || !len)
-	{
+	if (!html || !len) {
 		logger_error("invalid input!");
 		return false;
 	}
@@ -156,8 +156,7 @@ bool mail_body::save_html(const char* html, size_t len, string& out) const
 
 bool mail_body::save_plain(const char* plain, size_t len, string& out) const
 {
-	if (!plain || !len)
-	{
+	if (!plain || !len) {
 		logger_error("invalid input!");
 		return false;
 	}
@@ -172,8 +171,7 @@ bool mail_body::save_relative(const char* html, size_t hlen,
 	const std::vector<mail_attach*>& attachments,
 	string& out) const
 {
-	if (!html || !hlen || !plain || !plen || attachments.empty())
-	{
+	if (!html || !hlen || !plain || !plen || attachments.empty()) {
 		logger_error("invalid input!");
 		return false;
 	}
@@ -193,30 +191,29 @@ bool mail_body::save_relative(const char* html, size_t hlen,
 	// 递归一层，调用生成 alternative 格式数据
 	mail_body body(charset_.c_str(), transfer_encoding_.c_str());
 	bool ret = body.save_alternative(html, hlen, plain, plen, out);
-	if (ret == false)
+	if (ret == false) {
 		return ret;
+	}
 
 	out.append("\r\n");
 
 	std::vector<mail_attach*>::const_iterator cit;
-	for (cit = attachments.begin(); cit != attachments.end(); ++cit)
-	{
+	for (cit = attachments.begin(); cit != attachments.end(); ++cit) {
 		out.format_append("--%s\r\n", boundary_.c_str());
-		if ((*cit)->save_to(coder_, out) == false)
+		if (!(*cit)->save_to(coder_, out)) {
 			return false;
+		}
 		out.append("\r\n");
 	}
 
 	out.format_append("\r\n--%s--\r\n", boundary_.c_str());
-
 	return true;
 }
 
 bool mail_body::save_alternative(const char* html, size_t hlen,
 	const char* plain, size_t plen, string& out) const
 {
-	if (!html || !hlen || !plain || !plen)
-	{
+	if (!html || !hlen || !plain || !plen) {
 		logger_error("invalid input!");
 		return false;
 	}
@@ -230,17 +227,18 @@ bool mail_body::save_alternative(const char* html, size_t hlen,
 
 	out.format_append("Content-Type: %s\r\n\r\n", content_type_.c_str());
 	out.format_append("--%s\r\n", boundary_.c_str());
-	if (build_plain(plain, plen, charset_.c_str(), out) == false)
+	if (!build_plain(plain, plen, charset_.c_str(), out)) {
 		return false;
+	}
 	out.append("\r\n\r\n");
 
 	out.format_append("--%s\r\n", boundary_.c_str());
-	if (build_html(html, hlen, charset_.c_str(), out) == false)
+	if (!build_html(html, hlen, charset_.c_str(), out)) {
 		return false;
+	}
 	out.append("\r\n\r\n");
 
 	out.format_append("--%s--\r\n", boundary_.c_str());
-
 	return true;
 }
 

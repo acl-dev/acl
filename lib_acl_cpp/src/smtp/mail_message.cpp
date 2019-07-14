@@ -24,35 +24,36 @@ namespace acl
 mail_message::mail_message(const char* charset /* = "utf-8"*/)
 {
 	dbuf_ = new dbuf_pool;
-	if (charset == NULL || *charset == 0)
+	if (charset == NULL || *charset == 0) {
 		charset = "utf-8";
+	}
 	charset_ = dbuf_->dbuf_strdup(charset);
 	transfer_encoding_ = dbuf_->dbuf_strdup("base64");
-	auth_user_ = NULL;
-	auth_pass_ = NULL;
-	from_ = NULL;
-	sender_ = NULL;
-	reply_to_ = NULL;
-	return_path_ = NULL;
+	auth_user_    = NULL;
+	auth_pass_    = NULL;
+	from_         = NULL;
+	sender_       = NULL;
+	reply_to_     = NULL;
+	return_path_  = NULL;
 	delivered_to_ = NULL;
-	subject_ = NULL;
-	body_ = NULL;
-	body_len_ = 0;
-	filepath_ = NULL;
+	subject_      = NULL;
+	body_         = NULL;
+	body_len_     = 0;
+	filepath_     = NULL;
 }
 
-mail_message::~mail_message()
+mail_message::~mail_message(void)
 {
 	std::vector<mail_attach*>::iterator it;
-	for (it = attachments_.begin(); it != attachments_.end(); ++it)
+	for (it = attachments_.begin(); it != attachments_.end(); ++it) {
 		(*it)->~mail_attach();
+	}
 	dbuf_->destroy();
 }
 
 mail_message& mail_message::set_auth(const char* user, const char* pass)
 {
-	if (user && *user && pass && *pass)
-	{
+	if (user && *user && pass && *pass) {
 		auth_user_ = dbuf_->dbuf_strdup(user);
 		auth_pass_ = dbuf_->dbuf_strdup(pass);
 	}
@@ -61,47 +62,54 @@ mail_message& mail_message::set_auth(const char* user, const char* pass)
 
 mail_message& mail_message::set_from(const char* from, const char* name)
 {
-	if (from == NULL || *from == 0)
+	if (from == NULL || *from == 0) {
 		return *this;
+	}
 	from_ = (rfc822_addr*) dbuf_->dbuf_alloc(sizeof(rfc822_addr));
 	from_->addr = dbuf_->dbuf_strdup(from);
-	if (name && *name)
+	if (name && *name) {
 		from_->comment = dbuf_->dbuf_strdup(name);
-	else
+	} else {
 		from_->comment = NULL;
+	}
 	return *this;
 }
 
 mail_message& mail_message::set_sender(const char* sender, const char* name)
 {
-	if (sender == NULL || *sender == 0)
+	if (sender == NULL || *sender == 0) {
 		return *this;
+	}
 	sender_ = (rfc822_addr*) dbuf_->dbuf_alloc(sizeof(rfc822_addr));
 	sender_->addr = dbuf_->dbuf_strdup(sender);
-	if (name && *name)
+	if (name && *name) {
 		sender_->comment = dbuf_->dbuf_strdup(name);
-	else
+	} else {
 		sender_->comment = NULL;
+	}
 	return *this;
 }
 
 mail_message& mail_message::set_reply_to(const char* replyto, const char* name)
 {
-	if (replyto == NULL || *replyto == 0)
+	if (replyto == NULL || *replyto == 0) {
 		return *this;
+	}
 	reply_to_ = (rfc822_addr*) dbuf_->dbuf_alloc(sizeof(rfc822_addr));
 	reply_to_->addr = dbuf_->dbuf_strdup(replyto);
-	if (name && *name)
+	if (name && *name) {
 		reply_to_->comment = dbuf_->dbuf_strdup(name);
-	else
+	} else {
 		reply_to_->comment = NULL;
+	}
 	return *this;
 }
 
 mail_message& mail_message::set_return_path(const char* return_path)
 {
-	if (return_path == NULL || *return_path == 0)
+	if (return_path == NULL || *return_path == 0) {
 		return *this;
+	}
 	return_path_ = (rfc822_addr*) dbuf_->dbuf_alloc(sizeof(rfc822_addr));
 	return_path_->addr = dbuf_->dbuf_strdup(return_path);
 	return_path_->comment = NULL;
@@ -110,8 +118,9 @@ mail_message& mail_message::set_return_path(const char* return_path)
 
 mail_message& mail_message::set_delivered_to(const char* delivered_to)
 {
-	if (delivered_to == NULL || *delivered_to == 0)
+	if (delivered_to == NULL || *delivered_to == 0) {
 		return *this;
+	}
 	delivered_to_ = (rfc822_addr*) dbuf_->dbuf_alloc(sizeof(rfc822_addr));
 	delivered_to_->addr = dbuf_->dbuf_strdup(delivered_to);
 	delivered_to_->comment = NULL;
@@ -123,17 +132,18 @@ void mail_message::add_addrs(const char* in, std::vector<rfc822_addr*>& out)
 	rfc822 rfc;
 	const std::list<rfc822_addr*>& addrs = rfc.parse_addrs(in, charset_);
 	std::list<rfc822_addr*>::const_iterator cit = addrs.begin();
-	for (; cit != addrs.end(); ++cit)
-	{
+	for (; cit != addrs.end(); ++cit) {
 		rfc822_addr* addr = (rfc822_addr* )
 			dbuf_->dbuf_alloc(sizeof(rfc822_addr));
-		if ((*cit)->addr == NULL)
+		if ((*cit)->addr == NULL) {
 			continue;
+		}
 		addr->addr = dbuf_->dbuf_strdup((*cit)->addr);
-		if ((*cit)->comment)
+		if ((*cit)->comment) {
 			addr->comment = dbuf_->dbuf_strdup((*cit)->comment);
-		else
+		} else {
 			addr->comment = NULL;
+		}
 		out.push_back(addr);
 	}
 }
@@ -143,15 +153,15 @@ mail_message& mail_message::add_recipients(const char* recipients)
 	string buf(recipients);
 	std::list<string>& tokens = buf.split(" \t;,");
 	std::list<string>::const_iterator cit;
-	for (cit = tokens.begin(); cit != tokens.end(); ++cit)
+	for (cit = tokens.begin(); cit != tokens.end(); ++cit) {
 		(void) add_to((*cit).c_str());
+	}
 	return *this;
 }
 
 mail_message& mail_message::add_to(const char* to)
 {
-	if (to && *to)
-	{
+	if (to && *to) {
 		add_addrs(to, to_list_);
 		add_addrs(to, recipients_);
 	}
@@ -160,8 +170,7 @@ mail_message& mail_message::add_to(const char* to)
 
 mail_message& mail_message::add_cc(const char* cc)
 {
-	if (cc && *cc)
-	{
+	if (cc && *cc) {
 		add_addrs(cc, to_list_);
 		add_addrs(cc, recipients_);
 	}
@@ -170,8 +179,7 @@ mail_message& mail_message::add_cc(const char* cc)
 
 mail_message& mail_message::add_bcc(const char* bcc)
 {
-	if (bcc && *bcc)
-	{
+	if (bcc && *bcc) {
 		add_addrs(bcc, to_list_);
 		add_addrs(bcc, recipients_);
 	}
@@ -180,15 +188,17 @@ mail_message& mail_message::add_bcc(const char* bcc)
 
 mail_message& mail_message::set_subject(const char* subject)
 {
-	if (subject && *subject)
+	if (subject && *subject) {
 		subject_ = dbuf_->dbuf_strdup(subject);
+	}
 	return *this;
 }
 
 mail_message& mail_message::add_header(const char* name, const char* value)
 {
-	if (name == NULL || *name == 0 || value == NULL || *value == 0)
+	if (name == NULL || *name == 0 || value == NULL || *value == 0) {
 		return *this;
+	}
 	char* n = dbuf_->dbuf_strdup(name);
 	char* v = dbuf_->dbuf_strdup(value);
 	headers_.push_back(std::make_pair(n, v));
@@ -198,10 +208,10 @@ mail_message& mail_message::add_header(const char* name, const char* value)
 const char* mail_message::get_header_value(const char* name) const
 {
 	std::vector<std::pair<char*, char*> >::const_iterator cit;
-	for (cit = headers_.begin(); cit != headers_.end(); ++cit)
-	{
-		if (strcasecmp((*cit).first, name) == 0)
+	for (cit = headers_.begin(); cit != headers_.end(); ++cit) {
+		if (strcasecmp((*cit).first, name) == 0) {
 			return (*cit).second;
+		}
 	}
 	return NULL;
 }
@@ -215,8 +225,9 @@ mail_message& mail_message::set_body(const mail_body& body)
 mail_message& mail_message::add_attachment(const char* filepath,
 	const char* content_type)
 {
-	if (filepath == NULL || content_type == NULL)
+	if (filepath == NULL || content_type == NULL) {
 		return *this;
+	}
 
 	char* buf = (char*) dbuf_->dbuf_alloc(sizeof(mail_attach));
 	mail_attach* attach = new(buf) mail_attach(filepath,
@@ -235,12 +246,11 @@ mail_message& mail_message::add_attachment(const char* filepath,
 
 bool mail_message::append_addr(const rfc822_addr& addr, string& out)
 {
-	if (addr.comment)
-	{
+	if (addr.comment) {
 		out.append("\"");
-		if (rfc2047::encode(addr.comment, (int) strlen(addr.comment),
-			&out, charset_, 'B', false) == false)
-		{
+		if (!rfc2047::encode(addr.comment, (int) strlen(addr.comment),
+			&out, charset_, 'B', false)) {
+
 			logger_error("rfc2047::encode(%s) error",
 				addr.comment);
 			return false;
@@ -257,8 +267,9 @@ bool mail_message::append_addr(const char* name, const rfc822_addr& addr,
 {
 	out.format_append("%s: ", name);
 
-	if (append_addr(addr, out) == false)
+	if (!append_addr(addr, out)) {
 		return false;
+	}
 
 	out.append("\r\n");
 	return true;
@@ -268,29 +279,29 @@ bool mail_message::append_addrs(const char* name,
 	const std::vector<rfc822_addr*>& addrs, string& out)
 {
 	std::vector<rfc822_addr*>::const_iterator cit = addrs.begin();
-	if (cit == addrs.end())
+	if (cit == addrs.end()) {
 		return true;
+	}
 
 	out.format_append("%s: ", name);
-	if (append_addr(**cit, out) == false)
+	if (!append_addr(**cit, out)) {
 		return false;
+	}
 
-	if (++cit == addrs.end())
-	{
+	if (++cit == addrs.end()) {
 		out.append("\r\n");
 		return true;
 	}
 
 	out.append(",\r\n");
 
-	while (true)
-	{
+	while (true) {
 		out.append("\t");
-		if (append_addr(**cit, out) == false)
+		if (!append_addr(**cit, out)) {
 			return false;
+		}
 
-		if (++cit == addrs.end())
-		{
+		if (++cit == addrs.end()) {
 			out.append("\r\n");
 			break;
 		}
@@ -303,9 +314,9 @@ bool mail_message::append_addrs(const char* name,
 bool mail_message::append_subject(const char* subject, string& out)
 {
 	out.append("Subject: ");
-	if (rfc2047::encode(subject, (int) strlen(subject), &out,
-		charset_, 'B', false) == false)
-	{
+	if (!rfc2047::encode(subject, (int) strlen(subject), &out,
+		charset_, 'B', false)) {
+
 		logger_error("rfc2047::encode error!");
 		return false;
 	}
@@ -333,37 +344,46 @@ bool mail_message::append_message_id(string& out)
 bool mail_message::build_header(string& out)
 {
 	std::vector<std::pair<char*, char*> >::const_iterator cit;
-	for (cit = headers_.begin(); cit != headers_.end(); ++cit)
+	for (cit = headers_.begin(); cit != headers_.end(); ++cit) {
 		out.format_append("%s: %s\r\n", (*cit).first, (*cit).second);
+	}
 
 	//if (reply_to_ && !append_addr(fp, "ReplyTo", *reply_to_))
 	//	return false;
 
-	if (return_path_ && !append_addr("Return-Path", *return_path_, out))
+	if (return_path_ && !append_addr("Return-Path", *return_path_, out)) {
 		return false;
+	}
 
-	if (delivered_to_ && !append_addr("Delivered-To", *delivered_to_, out))
+	if (delivered_to_ && !append_addr("Delivered-To", *delivered_to_, out)) {
 		return false;
+	}
 
-	if (from_ && !append_addr("From", *from_, out))
+	if (from_ && !append_addr("From", *from_, out)) {
 		return false;
+	}
 
-	if (!append_addrs("To", to_list_, out))
+	if (!append_addrs("To", to_list_, out)) {
 		return false;
+	}
 
-	if (!append_addrs("Cc", cc_list_, out))
+	if (!append_addrs("Cc", cc_list_, out)) {
 		return false;
+	}
 
-	if (subject_ && !append_subject(subject_, out))
+	if (subject_ && !append_subject(subject_, out)) {
 		return false;
+	}
 
-	if (!append_date(out))
+	if (!append_date(out)) {
 		return false;
+	}
 
 	out.append("MIME-Version: 1.0\r\n");
 
-	if (append_message_id(out) == false)
+	if (!append_message_id(out)) {
 		return false;
+	}
 
 	return true;
 }
@@ -372,11 +392,11 @@ bool mail_message::append_header(ofstream& fp)
 {
 	string buf;
 
-	if (build_header(buf) == false)
+	if (!build_header(buf)) {
 		return false;
+	}
 
-	if (fp.write(buf) == -1)
-	{
+	if (fp.write(buf) == -1) {
 		logger_error("write mail header to %s error %s",
 			fp.file_path(), last_serror());
 		return false;
@@ -410,17 +430,16 @@ bool mail_message::append_multipart(ofstream& fp)
 	buf.format_append("%s\r\n\r\n", prompt);
 
 	// 添加数据体
-	if (body_ != NULL)
-	{
+	if (body_ != NULL) {
 		buf.format_append("--%s\r\n", boundary.c_str());
-		if (body_->save_to(buf) == false)
+		if (!body_->save_to(buf)) {
 			return false;
+		}
 
 		buf.append("\r\n");
 	}
 
-	if (fp.write(buf) == -1)
-	{
+	if (fp.write(buf) == -1) {
 		logger_error("write to %s error %s",
 			fp.file_path(), last_serror());
 		return false;
@@ -431,17 +450,14 @@ bool mail_message::append_multipart(ofstream& fp)
 	mime_base64 base64(true, false);
 
 	std::vector<mail_attach*>::const_iterator cit;
-	for (cit = attachments_.begin(); cit != attachments_.end(); ++cit)
-	{
-		if (fp.format("--%s\r\n", boundary.c_str()) == -1)
-		{
+	for (cit = attachments_.begin(); cit != attachments_.end(); ++cit) {
+		if (fp.format("--%s\r\n", boundary.c_str()) == -1) {
 			logger_error("write boundary to %s error %s",
 				fp.file_path(), last_serror());
 			return false;
 		}
 
-		if ((*cit)->save_to(&base64, fp) == false)
-		{
+		if (!(*cit)->save_to(&base64, fp)) {
 			logger_error("write attachment header to %s error %s",
 				fp.file_path(), last_serror());
 			return false;
@@ -450,8 +466,7 @@ bool mail_message::append_multipart(ofstream& fp)
 
 	// 添加最后的分隔符至邮件尾部
 
-	if (fp.format("--%s--\r\n", boundary.c_str()) == -1)
-	{
+	if (fp.format("--%s--\r\n", boundary.c_str()) == -1) {
 		logger_error("write boundary end to %s error %s",
 			fp.file_path(), last_serror());
 		return false;
@@ -463,8 +478,7 @@ bool mail_message::append_multipart(ofstream& fp)
 bool mail_message::save_to(const char* filepath)
 {
 	ofstream fp;
-	if (fp.open_write(filepath) == false)
-	{
+	if (!fp.open_write(filepath)) {
 		logger_error("open %s error: %s", filepath, last_serror());
 		return false;
 	}
@@ -473,16 +487,17 @@ bool mail_message::save_to(const char* filepath)
 
 	// 先添加邮件头部分数据至文件流中
 
-	if (append_header(fp) == false)
+	if (!append_header(fp)) {
 		return false;
+	}
 
 	// 如果是 multipart 格式，则将 multipart 数据输出至文件流中
 
-	if (!attachments_.empty())
+	if (!attachments_.empty()) {
 		return append_multipart(fp);
+	}
 
-	if (body_ == NULL)
-	{
+	if (body_ == NULL) {
 		logger_error("body null!");
 		return false;
 	}
@@ -490,11 +505,11 @@ bool mail_message::save_to(const char* filepath)
 	// 对非 multipart 格式，直接将正文数据输出至文件流中
 
 	string buf(8192);
-	if (body_->save_to(buf) == false)
+	if (!body_->save_to(buf)) {
 		return false;
+	}
 
-	if (fp.write(buf) == -1)
-	{
+	if (fp.write(buf) == -1) {
 		logger_error("write to %s error %s",
 			fp.file_path(), last_serror());
 		return false;

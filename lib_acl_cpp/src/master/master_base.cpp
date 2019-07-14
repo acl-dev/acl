@@ -11,18 +11,18 @@
 namespace acl
 {
 
-master_base::master_base()
+master_base::master_base(void)
 {
 	daemon_mode_ = false;
 	proc_inited_ = false;
 	event_ = NULL;
 }
 
-master_base::~master_base()
+master_base::~master_base(void)
 {
 	for (std::vector<server_socket*>::iterator it = servers_.begin();
-		it != servers_.end(); ++it)
-	{
+		it != servers_.end(); ++it) {
+
 		delete *it;
 	}
 
@@ -35,33 +35,33 @@ master_base::~master_base()
 
 void master_base::set_cfg_bool(master_bool_tbl* table)
 {
-	if (table == NULL)
-		return;
-	conf_.set_cfg_bool(table);
+	if (table) {
+		conf_.set_cfg_bool(table);
+	}
 }
 
 void master_base::set_cfg_int(master_int_tbl* table)
 {
-	if (table == NULL)
-		return;
-	conf_.set_cfg_int(table);
+	if (table) {
+		conf_.set_cfg_int(table);
+	}
 }
 
 void master_base::set_cfg_int64(master_int64_tbl* table)
 {
-	if (table == NULL)
-		return;
-	conf_.set_cfg_int64(table);
+	if (table) {
+		conf_.set_cfg_int64(table);
+	}
 }
 
 void master_base::set_cfg_str(master_str_tbl* table)
 {
-	if (table == NULL)
-		return;
-	conf_.set_cfg_str(table);
+	if (table) {
+		conf_.set_cfg_str(table);
+	}
 }
 
-bool master_base::daemon_mode() const
+bool master_base::daemon_mode(void) const
 {
 	return daemon_mode_;
 }
@@ -74,8 +74,7 @@ static void timer_callback(int, ACL_EVENT* event, void* ctx)
 	acl_int64 next_delay = timer->trigger();
 
 	// 如果定时器中的任务为空或未设置定时器的重复使用，则删除定时器
-	if (timer->empty() || !timer->keep_timer())
-	{
+	if (timer->empty() || !timer->keep_timer()) {
 		// 删除定时器
 		acl_event_cancel_timer(event, timer_callback, timer);
 		timer->destroy();
@@ -96,13 +95,10 @@ void master_base::set_event(ACL_EVENT* event)
 
 bool master_base::proc_set_timer(event_timer* timer)
 {
-	if (event_ == NULL)
-	{
+	if (event_ == NULL) {
 		logger_warn("event NULL!");
 		return false;
-	}
-	else
-	{
+	} else {
 		acl_event_request_timer(event_, timer_callback, timer,
 			timer->min_delay(), timer->keep_timer() ? 1 : 0);
 		return true;
@@ -111,10 +107,11 @@ bool master_base::proc_set_timer(event_timer* timer)
 
 void master_base::proc_del_timer(event_timer* timer)
 {
-	if (event_ == NULL)
+	if (event_ == NULL) {
 		logger_warn("event NULL!");
-	else
+	} else {
 		acl_event_cancel_timer(event_, timer_callback, timer);
+	}
 }
 
 }  // namespace acl

@@ -12,7 +12,7 @@
 namespace acl
 {
 
-redis_pubsub::redis_pubsub()
+redis_pubsub::redis_pubsub(void)
 : redis_command(NULL)
 {
 }
@@ -27,7 +27,7 @@ redis_pubsub::redis_pubsub(redis_client_cluster* cluster, size_t max_conns)
 {
 }
 
-redis_pubsub::~redis_pubsub()
+redis_pubsub::~redis_pubsub(void)
 {
 }
 

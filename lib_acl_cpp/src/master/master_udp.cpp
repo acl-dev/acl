@@ -17,8 +17,8 @@ master_udp::master_udp(void) {}
 master_udp::~master_udp(void)
 {
 	for (std::vector<socket_stream*>::iterator it = sstreams_.begin();
-		it != sstreams_.end(); ++it)
-	{
+		it != sstreams_.end(); ++it) {
+
 		(*it)->unbind();
 		delete *it;
 	}
@@ -63,14 +63,12 @@ void master_udp::run_daemon(int argc, char** argv)
 const char* master_udp::get_conf_path(void) const
 {
 #ifndef ACL_WINDOWS
-	if (daemon_mode_)
-	{
+	if (daemon_mode_) {
 		const char* ptr = acl_udp_server_conf();
 		return ptr && *ptr ? ptr : NULL;
 	}
-	else
 #endif
-		return conf_.get_path();
+	return conf_.get_path();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -95,8 +93,7 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 	argv[argc++] = proc ? proc : "demo";
 	argv[argc++] = "-n";
 	argv[argc++] = addrs;
-	if (path && *path)
-	{
+	if (path && *path) {
 		argv[argc++] = "-f";
 		argv[argc++] = path;
 	}
@@ -118,6 +115,7 @@ void master_udp::remove(socket_stream* ss)
 
 	for (std::vector<socket_stream*>::iterator it = sstreams_.begin();
 		it != sstreams_.end(); ++it) {
+
 		if (*it == ss) {
 			sstreams_.erase(it);
 			return;
@@ -198,8 +196,9 @@ void master_udp::service_on_bind(void* ctx, ACL_VSTREAM* stream)
 	acl_assert(mu);
 
 	socket_stream* ss = NEW socket_stream();
-	if (ss->open(stream) == false)
+	if (!ss->open(stream)) {
 		logger_fatal("open stream error!");
+	}
 	stream->context = ss;
 	mu->push_back(ss);
 
@@ -233,8 +232,9 @@ int master_udp::service_on_sighup(void* ctx, ACL_VSTRING* buf)
 	acl_assert(mu);
 	string s;
 	bool ret = mu->proc_on_sighup(s);
-	if (buf)
+	if (buf) {
 		acl_vstring_strcpy(buf, s.c_str());
+	}
 	return ret ? 0 : -1;
 }
 
