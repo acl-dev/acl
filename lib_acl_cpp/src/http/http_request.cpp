@@ -331,7 +331,7 @@ bool http_request::request(const void* data, size_t len)
 
 	// 构建 HTTP 请求头
 	if (data && len > 0 && method != HTTP_METHOD_POST
-		&& method != HTTP_METHOD_PUT) {
+		&& method != HTTP_METHOD_PUT && method != HTTP_METHOD_PATCH) {
 
 		header_.set_content_length(len);
 
