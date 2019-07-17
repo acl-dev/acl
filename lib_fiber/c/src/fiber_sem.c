@@ -52,11 +52,14 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 
 	if (sem->tid == 0) {
 		sem->tid = __pthread_self();
-	} else if (sem->tid != __pthread_self()) {
+	}
+#if 0
+	else if (sem->tid != __pthread_self()) {
 		msg_error("%s(%d): current tid=%lu, sem tid=%lu",
 			__FUNCTION__, __LINE__, __pthread_self(), sem->tid);
 		return -1;
 	}
+#endif
 
 	if (sem->num > 0) {
 		sem->num--;
@@ -84,11 +87,14 @@ int acl_fiber_sem_trywait(ACL_FIBER_SEM *sem)
 {
 	if (sem->tid == 0) {
 		sem->tid = __pthread_self();
-	} else if (sem->tid != __pthread_self()) {
+	}
+#if 0
+	else if (sem->tid != __pthread_self()) {
 		msg_error("%s(%d): current tid=%lu, sem tid=%lu",
 			__FUNCTION__, __LINE__, __pthread_self(), sem->tid);
 		return -1;
 	}
+#endif
 
 	if (sem->num > 0) {
 		sem->num--;
@@ -110,11 +116,14 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 
 	if (sem->tid == 0) {
 		sem->tid = __pthread_self();
-	} else if (sem->tid != __pthread_self()) {
+	}
+#if 0
+	else if (sem->tid != __pthread_self()) {
 		msg_error("%s(%d): current tid=%lu, sem tid=%lu",
 			__FUNCTION__, __LINE__, __pthread_self(), sem->tid);
 		return -1;
 	}
+#endif
 
 	if ((ready = FIRST_FIBER(&sem->waiting)) == NULL) {
 		sem->num++;
