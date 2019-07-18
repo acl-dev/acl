@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 
 	if (argc >= 2 && strcasecmp(argv[1], "alone") == 0)
 	{
-		const char* addr = ":18080";
+		const char* addr = ":28080";
 
 		acl::log::stdout_open(true);
 

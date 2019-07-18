@@ -38,7 +38,7 @@ service master_dispatch {
 #	最大进程数
 	master_maxproc = 1
 #	预启动进程数，该值不得大于 master_maxproc
-	master_prefork = 0
+	master_prefork = 1
 #	进程程序名
 	master_command = master_dispatch
 #	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]

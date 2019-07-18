@@ -88,10 +88,10 @@ CFLAGS += -I../../../../../lib_acl/include \
 	  -I../../../../../lib_fiber/c/include \
 	  -I../../../../../lib_fiber/cpp/include
 EXTLIBS =
-LDFLAGS = -L../../../../../lib_fiber/lib -lfiber_cpp -lfiber \
+LDFLAGS = -L../../../../../lib_fiber/lib -lfiber_cpp \
 	  -L../../../../../lib_acl_cpp/lib -lacl_cpp \
 	  -L../../../../../lib_protocol/lib -lprotocol \
-	  -L../../../../../lib_acl/lib -lacl \
+	  -L../../../../../lib_acl/lib -lacl -lfiber \
 	  $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
