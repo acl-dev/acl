@@ -1,5 +1,9 @@
 修改历史列表：
 
+581) 2019.7.20
+581.1) feature: HttpServletRequest 不再依赖 body_parse_ 参数，而是根据用户调用
+getJson/getXml/getBody 时才会真正去读请求数据体，免得用户误用
+
 580) 2019.7.12
 580.1) feature: polarssl_io 支持引用计数为 0 时自动销毁
 

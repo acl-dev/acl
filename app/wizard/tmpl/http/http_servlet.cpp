@@ -58,18 +58,23 @@ bool http_servlet::doPost(request_t& req, response_t& res)
 	$<GET_COOKIES>
 	*/
 
-	const char* path = req.getPathInfo();
-	if (path == NULL || *path == 0) {
+	const char* ptr = req.getPathInfo();
+	if (ptr == NULL || *ptr == 0) {
 		logger_error("path null");
-		return false;
+		return doError(req, res);
 	}
+
+	acl::string path(ptr);
+	path.lower();
 
 	// 根据 uri path 查找对应的处理句柄，从而实现 HTTP 路由功能
 
-	std::map<std::string, handler_t>::iterator it = handlers_.find(path);
+	std::map<std::string, handler_t>::iterator it =
+		handlers_.find(path.c_str());
+
 	if (it == handlers_.end()) {
-		logger_warn("not support, path=%s", path);
-		return false;
+		logger_warn("not support, path=%s", path.c_str());
+		return doError(req, res);
 	}
 
 	return (this->*it->second)(req, res);

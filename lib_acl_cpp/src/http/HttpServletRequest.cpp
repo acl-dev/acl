@@ -31,20 +31,20 @@ namespace acl
 
 HttpServletRequest::HttpServletRequest(HttpServletResponse& res,
 	session& store, socket_stream& stream,
-	const char* charset /* = NULL */, bool body_parse /* = true */,
-	int body_limit /* = 102400 */)
+	const char* charset /* = NULL */, int body_limit /* = 102400 */)
 : req_error_(HTTP_REQ_OK)
 , res_(res)
 , store_(store)
 , http_session_(NULL)
 , stream_(stream)
-, body_parse_(body_parse)
 , body_limit_(body_limit)
+, body_parsed_(false)
 , cookies_inited_(false)
 , client_(NULL)
 , method_(HTTP_METHOD_UNKNOWN)
 , request_type_(HTTP_REQUEST_NORMAL)
 , mime_(NULL)
+, body_(NULL)
 , json_(NULL)
 , xml_(NULL)
 , readHeaderCalled_(false)
@@ -72,6 +72,7 @@ HttpServletRequest::~HttpServletRequest(void)
 	if (client_)
 		client_->~http_client();
 	delete dbuf_internal_;
+	delete body_; // 该对象不是在 dbuf 上分配的，所以需要单独释放
 }
 
 http_method_t HttpServletRequest::getMethod(string* method_s /* = NULL */) const
@@ -462,19 +463,170 @@ const char* HttpServletRequest::getParameter(const char* name,
 	return node->get_value();
 }
 
-http_mime* HttpServletRequest::getHttpMime(void) const
+http_mime* HttpServletRequest::getHttpMime(void)
 {
 	return mime_;
 }
 
-json* HttpServletRequest::getJson(void) const
+bool HttpServletRequest::getJson(json& out, size_t body_limit /* 1024000 */)
 {
-	return json_;
+	if (request_type_ != HTTP_REQUEST_TEXT_JSON) {
+		return false;
+	}
+
+	acl_int64 dlen = (acl_int64) getContentLength();
+	if (dlen <= 0 || dlen > (acl_int64) body_limit) {
+		return false;
+	}
+
+	body_parsed_ = true;
+	istream& in  = getInputStream();
+
+	ssize_t n;
+	char buf[8192];
+
+	while (dlen > 0) {
+		n = (ssize_t) sizeof(buf) - 1 > dlen ?
+			dlen : (ssize_t) sizeof(buf) - 1;
+		n = in.read(buf, (size_t) n);
+		if (n == -1) {
+			return false;
+		}
+
+		dlen  -= n;
+		buf[n] = 0;
+		out.update(buf);
+	}
+
+	return true;
 }
 
-xml* HttpServletRequest::getXml(void) const
+json* HttpServletRequest::getJson(size_t body_limit /* 1024000 */)
 {
-	return xml_;
+	if (json_ || body_parsed_) {
+		return json_;
+	} else if (request_type_ != HTTP_REQUEST_TEXT_JSON) {
+		return NULL;
+	}
+
+	acl_int64 dlen = getContentLength();
+	if (dlen <= 0 || dlen > (acl_int64) body_limit) {
+		return NULL;
+	}
+
+	json_ = dbuf_->create<json>();
+	if (getJson(*json_)) {
+		return json_;
+	}  else {
+		json_ = NULL;
+		return NULL;
+	}
+}
+
+bool HttpServletRequest::getXml(xml& out, size_t body_limit /* 1024000 */)
+{
+	if (request_type_ != HTTP_REQUEST_TEXT_XML) {
+		return false;
+	}
+
+	acl_int64 dlen = (acl_int64) getContentLength();
+	if (dlen <= 0 || dlen > (acl_int64) body_limit) {
+		return false;
+	}
+
+	body_parsed_ = true;
+	istream& in  = getInputStream();
+
+	ssize_t n;
+	char buf[8192];
+
+	while (dlen > 0) {
+		n = (ssize_t) sizeof(buf) - 1 > dlen ?
+			dlen : (ssize_t) sizeof(buf) - 1;
+		n = in.read(buf, (size_t) n);
+		if (n == -1) {
+			return false;
+		}
+
+		dlen  -= n;
+		buf[n] = 0;
+		out.update(buf);
+	}
+
+	return true;
+}
+
+xml* HttpServletRequest::getXml(size_t body_limit /* 1024000 */)
+{
+	if (xml_ && body_parsed_) {
+		return xml_;
+	} else if (request_type_ != HTTP_REQUEST_TEXT_XML) {
+		return NULL;
+	}
+
+	acl_int64 dlen = (acl_int64) getContentLength();
+	if (dlen <= 0 || dlen > (acl_int64) body_limit) {
+		return NULL;
+	}
+
+	xml_ = dbuf_->create<xml1>();
+	if (getXml(*xml_)) {
+		return xml_;
+	} else {
+		xml_ = NULL;
+		return NULL;
+	}
+}
+
+bool HttpServletRequest::getBody(string& out, size_t body_limit /* 1024000 */)
+{
+	acl_int64 dlen = (acl_int64) getContentLength();
+	if (dlen <= 0 || dlen > (acl_int64) body_limit) {
+		return false;
+	}
+
+	out.space(dlen + 1);
+	body_parsed_ = true;
+	istream& in  = getInputStream();
+
+	ssize_t n;
+	char buf[8192];
+
+	while (dlen > 0) {
+		n = (ssize_t) sizeof(buf) - 1 > dlen ?
+			dlen : (ssize_t) sizeof(buf) - 1;
+		n = in.read(buf, (size_t) n);
+		if (n == -1) {
+			return false;
+		}
+
+		dlen  -= n;
+		buf[n] = 0;
+		out.append(buf, (size_t) n);
+	}
+
+	return true;
+}
+
+string* HttpServletRequest::getBody(size_t body_limit /* 1024000*/)
+{
+	if (body_ && body_parsed_) {
+		return body_;
+	}
+
+	acl_int64 dlen = (acl_int64) getContentLength();
+	if (dlen <= 0 || dlen > (acl_int64) body_limit) {
+		return NULL;
+	}
+
+	body_ = NEW string(dlen + 1);
+	if (getBody(*body_)) {
+		return body_;
+	} else {
+		delete body_;
+		body_ = NULL;
+		return NULL;
+	}
 }
 
 http_request_t HttpServletRequest::getRequestType(void) const
@@ -652,7 +804,7 @@ bool HttpServletRequest::readHeader(string* method_s)
 		} else {
 			request_type_ = HTTP_REQUEST_MULTIPART_FORM;
 			mime_ = dbuf_->create<http_mime, const char*,
-				const char*>(bound, localCharset_);
+					const char*>(bound, localCharset_);
 		}
 
 		return true;
@@ -664,14 +816,10 @@ bool HttpServletRequest::readHeader(string* method_s)
 		return true;
 	}
 
-	// 数据体为普通的 name=value 类型
-	if (!body_parse_) {
-		request_type_ = HTTP_REQUEST_OTHER;
-		return true;
-	}
-
 	// 如果需要分析数据体的参数时的数据体长度过大，则直接返回错误
 	if (body_limit_ > 0 && len >= body_limit_) {
+		logger_error("request body too large, len=%lld, limit=%d",
+			len, body_limit_);
 		return false;
 	}
 
@@ -685,54 +833,24 @@ bool HttpServletRequest::readHeader(string* method_s)
 			parseParameters(query);
 		}
 
+		body_parsed_ = true;
 		return ret == -1 ? false : true;
 	}
 
 	// 当数据类型为 application/json 或 text/json 格式时：
 	if (EQ(stype, "json") && (EQ(ctype, "application") || EQ(ctype, "text"))) {
 		request_type_ = HTTP_REQUEST_TEXT_JSON;
-		json_ = dbuf_->create<json>();
-		ssize_t dlen = (ssize_t) len, n;
-		char  buf[8192];
-		istream& in = getInputStream();
-		while (dlen > 0) {
-			n = (ssize_t) sizeof(buf) - 1 > dlen
-				? dlen : (ssize_t) sizeof(buf) - 1;
-			n = in.read(buf, (size_t) n);
-			if (n == -1) {
-				return false;
-			}
-
-			buf[n] = 0;
-			json_->update(buf);
-			dlen -= n;
-		}
 		return true;
 	}
 
 	// 当数据类型为 application/xml 或 text/xml 格式时：
-	else if (EQ(stype, "xml") && (EQ(ctype, "application") || EQ(ctype, "text"))) {
+	if (EQ(stype, "xml") && (EQ(ctype, "application") || EQ(ctype, "text"))) {
 		request_type_ = HTTP_REQUEST_TEXT_XML;
-		xml_ = dbuf_->create<xml1>();
-		ssize_t dlen = (ssize_t) len, n;
-		char  buf[8192];
-		istream& in = getInputStream();
-		while (dlen > 0) {
-			n = (ssize_t) sizeof(buf) - 1 > dlen
-				? dlen : (ssize_t) sizeof(buf) - 1;
-			n = in.read(buf, (size_t) n);
-			if (n == -1)
-				return false;
-
-			buf[n] = 0;
-			xml_->update(buf);
-			dlen -= n;
-		}
-		return true;
-	} else {
-		request_type_ = HTTP_REQUEST_OTHER;
 		return true;
 	}
+
+	request_type_ = HTTP_REQUEST_OTHER;
+	return true;
 }
 
 const char* HttpServletRequest::getRequestReferer(void) const

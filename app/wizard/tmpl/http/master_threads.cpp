@@ -38,20 +38,21 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 
 //////////////////////////////////////////////////////////////////////////////
 
-master_service::master_service()
+master_service::master_service(void)
 {
 	redis_ = NULL;
 }
 
-master_service::~master_service()
+master_service::~master_service(void)
 {
 }
 
 bool master_service::thread_on_read(acl::socket_stream* conn)
 {
 	http_servlet* servlet = (http_servlet*) conn->get_ctx();
-	if (servlet == NULL)
+	if (servlet == NULL) {
 		logger_fatal("servlet null!");
+	}
 
 	return servlet->doRun();
 }
@@ -62,14 +63,16 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 		conn->sock_handle());
 
 	conn->set_rw_timeout(var_cfg_rw_timeout);
-	if (var_cfg_rw_timeout > 0)
+	if (var_cfg_rw_timeout > 0) {
 		conn->set_tcp_non_blocking(true);
+	}
 
 	acl::session* session;
-	if (var_cfg_use_redis_session)
+	if (var_cfg_use_redis_session) {
 		session = new acl::redis_session(*redis_, var_cfg_max_threads);
-	else
+	} else {
 		session = new acl::memcache_session("127.0.0.1:11211");
+	}
 
 	http_servlet* servlet = new http_servlet(conn, session);
 	conn->set_ctx(servlet);
@@ -95,11 +98,11 @@ void master_service::thread_on_close(acl::socket_stream* conn)
 	delete servlet;
 }
 
-void master_service::thread_on_init()
+void master_service::thread_on_init(void)
 {
 }
 
-void master_service::thread_on_exit()
+void master_service::thread_on_exit(void)
 {
 }
 
@@ -108,7 +111,7 @@ void master_service::proc_on_listen(acl::server_socket& ss)
 	logger(">>>listen %s ok<<<", ss.get_addr());
 }
 
-void master_service::proc_on_init()
+void master_service::proc_on_init(void)
 {
 	// create redis cluster for session cluster
 	redis_ = new acl::redis_client_cluster;
@@ -116,15 +119,14 @@ void master_service::proc_on_init()
 		var_cfg_conn_timeout, var_cfg_rw_timeout);
 }
 
-void master_service::proc_on_exit()
+void master_service::proc_on_exit(void)
 {
 	delete redis_;
 }
 
 bool master_service::proc_exit_timer(size_t nclients, size_t nthreads)
 {
-	if (nclients == 0)
-	{
+	if (nclients == 0) {
 		logger("clients count: %d, threads count: %d",
 			(int) nclients, (int) nthreads);
 		return true;

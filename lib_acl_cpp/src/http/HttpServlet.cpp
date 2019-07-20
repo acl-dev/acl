@@ -60,7 +60,6 @@ void HttpServlet::init()
 	first_             = true;
 	local_charset_[0]  = 0;
 	rw_timeout_        = 60;
-	parse_body_enable_ = true;
 	parse_body_limit_  = 0;
 }
 
@@ -89,9 +88,8 @@ HttpServlet& HttpServlet::setRwTimeout(int rw_timeout)
 	return *this;
 }
 
-HttpServlet& HttpServlet::setParseBody(bool on)
+HttpServlet& HttpServlet::setParseBody(bool)
 {
-	parse_body_enable_ = on;
 	return *this;
 }
 
@@ -162,7 +160,7 @@ bool HttpServlet::start(void)
 
 	res_ = NEW HttpServletResponse(*out);
 	req_ = NEW HttpServletRequest(*res_, *session_, *in, local_charset_,
-			 parse_body_enable_, parse_body_limit_);
+			parse_body_limit_);
 
 	// ÉèÖÃ HttpServletRequest ¶ÔÏó
 	res_->setHttpServletRequest(req_);

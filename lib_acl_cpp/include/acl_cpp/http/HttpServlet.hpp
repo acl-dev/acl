@@ -74,6 +74,7 @@ public:
 	 * 调用本方法设置了解析数据，也不会对数据体进行解析
 	 * @param on {bool} 是否需要解析
 	 * @return {HttpServlet&}
+	 * xxxx: 该方法已经被废弃！
 	 */
 	HttpServlet& setParseBody(bool on);
 
@@ -209,7 +210,6 @@ private:
 	bool first_;
 	char local_charset_[32];
 	int  rw_timeout_;
-	bool parse_body_enable_;
 	int  parse_body_limit_;
 
 	void init();

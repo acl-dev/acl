@@ -118,8 +118,7 @@ void master_service::proc_on_exit()
 
 bool master_service::proc_exit_timer(size_t nclients, size_t nthreads)
 {
-	if (nclients == 0)
-	{
+	if (nclients == 0) {
 		logger("clients count: %d, threads count: %d",
 			(int) nclients, (int) nthreads);
 		return true;

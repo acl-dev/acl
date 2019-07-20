@@ -35,11 +35,11 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 
 //////////////////////////////////////////////////////////////////////////////
 
-master_service::master_service()
+master_service::master_service(void)
 {
 }
 
-master_service::~master_service()
+master_service::~master_service(void)
 {
 }
 
@@ -49,18 +49,19 @@ void master_service::on_accept(acl::socket_stream* conn)
 		conn->sock_handle());
 
 	conn->set_rw_timeout(var_cfg_rw_timeout);
-	if (var_cfg_rw_timeout > 0)
+	if (var_cfg_rw_timeout > 0) {
 		conn->set_tcp_non_blocking(true);
+	}
 
 	acl::memcache_session session("127.0.0.1:11211");
 	http_servlet servlet(conn, &session);
 
 	// charset: big5, gb2312, gb18030, gbk, utf-8
 	servlet.setLocalCharset("utf-8");
-	while (true)
-	{
-		if (servlet.doRun() == false)
+	while (true) {
+		if (!servlet.doRun()) {
 			break;
+		}
 	}
 
 	logger("disconnect from %s", conn->get_peer());
@@ -71,11 +72,11 @@ void master_service::proc_on_listen(acl::server_socket& ss)
 	logger(">>>listen %s ok<<<", ss.get_addr());
 }
 
-void master_service::proc_on_init()
+void master_service::proc_on_init(void)
 {
 }
 
-void master_service::proc_on_exit()
+void master_service::proc_on_exit(void)
 {
 }
 
@@ -85,7 +86,7 @@ bool master_service::proc_on_sighup(acl::string&)
 	return true;
 }
 
-void master_service::do_cgi()
+void master_service::do_cgi(void)
 {
 	acl::memcache_session session("127.0.0.1:11211");
         http_servlet servlet(NULL, &session);
