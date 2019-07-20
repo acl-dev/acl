@@ -16,8 +16,7 @@ int main(int argc, char* argv[])
 
 	// 开始运行
 
-	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
-	{
+	if (argc >= 2 && strcmp(argv[1], "alone") == 0) {
 		// 日志输出至标准输出
 		acl::log::stdout_open(true);
 
@@ -32,17 +31,16 @@ int main(int argc, char* argv[])
 		unsigned int count = 0;
 
 		// 单独运行方式
-		if (argc >= 3)
+		if (argc >= 3) {
 			ms.run_alone(addrs, argv[2], count);
-		else
+		} else {
 			ms.run_alone(addrs, NULL, count);
+		}
 
 		printf("Enter any key to exit now\r\n");
 		getchar();
-	}
-	else
-	{
-#ifdef	WIN32
+	} else {
+#if defined(_WIN32) || defined(_WIN64)
 		// 日志输出至标准输出
 		acl::log::stdout_open(true);
 

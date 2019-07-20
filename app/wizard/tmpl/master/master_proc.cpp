@@ -34,11 +34,11 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 
 //////////////////////////////////////////////////////////////////////////////
 
-master_service::master_service()
+master_service::master_service(void)
 {
 }
 
-master_service::~master_service()
+master_service::~master_service(void)
 {
 }
 
@@ -52,14 +52,16 @@ void master_service::on_accept(acl::socket_stream* conn)
 		conn->set_tcp_non_blocking(true);
 
 	acl::string buf;
-	while (true)
-	{
-		if (conn->gets(buf, false) == false)
+	while (true) {
+		if (!conn->gets(buf, false)) {
 			break;
-		if (conn->write(buf) == -1)
+		}
+		if (conn->write(buf) == -1) {
 			break;
-		if (buf == "quit")
+		}
+		if (buf == "quit") {
 			break;
+		}
 	}
 
 	logger("disconnect from %s", conn->get_peer());
@@ -70,12 +72,12 @@ void master_service::proc_on_listen(acl::server_socket& ss)
 	logger(">>>listen %s ok<<<", ss.get_addr());
 }
 
-void master_service::proc_on_init()
+void master_service::proc_on_init(void)
 {
 	logger(">>>proc_on_init<<<");
 }
 
-void master_service::proc_on_exit()
+void master_service::proc_on_exit(void)
 {
 	logger(">>>proc_on_exit<<<");
 }

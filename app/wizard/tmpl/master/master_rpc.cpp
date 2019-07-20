@@ -46,13 +46,12 @@ public:
 	{
 	}
 
-	~request_rpc()
-	{
-	}
+	~request_rpc(void) {}
 
 protected:
+	// @override
 	// 基类虚函数，由子线程处理
-	virtual void rpc_run()
+	void rpc_run(void)
 	{
 		// 将非阻塞流转为阻塞流
 
@@ -82,8 +81,9 @@ protected:
 		stream.unbind();
 	}
 
+	// @override
 	// 基类虚函数，由主线程处理，收到子线程任务完成的消息
-	virtual void rpc_onover()
+	void rpc_onover(void)
 	{
 		// 关闭异步流
 		client_->close();
@@ -93,6 +93,7 @@ protected:
 	}
 
 	/**
+	 * @override
 	 * 基类虚接口：当子线程调用本对象的 rpc_signal 时，在主线程中会
 	 * 调用本接口，通知在任务未完成前(即调用 rpc_onover 前)收到
 	 * 子线程运行的中间状态信息；内部自动支持套接口或 WIN32 窗口
@@ -100,7 +101,7 @@ protected:
 	 * 一边下载，一边向主线程发送(调用 rpc_signal 方法)下载进程，
 	 * 则主线程会调用本类实例的此方法来处理此消息
 	 */
-	virtual void rpc_wakeup(void*)
+	void rpc_wakeup(void*)
 	{
 	}
 
@@ -114,13 +115,10 @@ private:
 
 		// 将异步流转为同步流后，以阻塞方式对该连接池进行读写
 
-		if (stream.gets(buf, false) == false)
-		{
+		if (!stream.gets(buf, false)) {
 			logger_warn("gets error!");
 			io_error_ = true;
-		}
-		else if (stream.write(buf) == -1)
-		{
+		} else if (stream.write(buf) == -1) {
 			logger_warn("write error!");
 			io_error_ = true;
 		}
@@ -133,26 +131,21 @@ private:
 class io_callback : public acl::aio_callback
 {
 public:
-	io_callback(acl::aio_socket_stream* client)
-		: client_(client)
-	{
-	}
+	io_callback(acl::aio_socket_stream* client) : client_(client) {}
 
-	~io_callback()
-	{
-	}
+	~io_callback(void) {}
 
 protected:
 	/** 
+	 * @override
 	 * 实现父类中的虚函数，客户端流的读成功回调过程 
 	 * @param data {char*} 读到的数据地址 
 	 * @param len {int} 读到的数据长度 
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流 
 	 */  
-	virtual bool read_callback(char* data, int len)  
+	bool read_callback(char* data, int len)  
 	{
-		if (strncmp(data, "quit", len) == 0)
-		{
+		if (strncmp(data, "quit", len) == 0) {
 			// 可以显式调用异步流的关闭过程，也可以直接返回 false
 			// 通知异步框架自动关闭该异步流
 			// client_->close();
@@ -161,7 +154,8 @@ protected:
 		return true;
 	}
 
-	virtual bool read_wakeup()
+	// @override
+	bool read_wakeup(void)
 	{
 		// 为防止当子线程正处理客户端连接对象过程中连接被关闭，
 		// 所以必须从异步监听集合中去掉对该异步流的监控
@@ -178,28 +172,31 @@ protected:
 	}
 
 	/** 
+	 * @override
 	 * 实现父类中的虚函数，客户端流的写成功回调过程 
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流 
 	 */  
-	virtual bool write_callback()  
+	bool write_callback(void)
 	{
 		return true;  
 	}
 
 	/** 
+	 * @override
 	 * 实现父类中的虚函数，客户端流的关闭回调过程 
 	 */  
-	virtual void close_callback()  
+	void close_callback(void)
 	{
 		// 必须在此处删除该动态分配的回调类对象以防止内存泄露  
 		delete this;  
 	}
 
 	/** 
+	 * @override
 	 * 实现父类中的虚函数，客户端流的超时回调过程 
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流 
 	 */  
-	virtual bool timeout_callback()  
+	bool timeout_callback(void)
 	{
 		// 返回 false 通知异步框架关闭该异步流
 		return false;
@@ -211,11 +208,11 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////
 
-master_service::master_service()
+master_service::master_service(void)
 {
 }
 
-master_service::~master_service()
+master_service::~master_service(void)
 {
 }
 
@@ -245,17 +242,18 @@ bool master_service::on_accept(acl::aio_socket_stream* client)
 	return true;
 }
 
-void master_service::proc_on_init()
+void master_service::proc_on_init(void)
 {
 	// 获得异步框架的事件引擎句柄
-	acl::aio_handle* handle = get_handle();
-	if (handle == NULL)
+	acl::aio_handle* handle = this->get_handle();
+	if (handle == NULL) {
 		logger_fatal("aio handle null!");
+	}
 
 	// 初始化 rpc 服务对象
 	rpc_manager::get_instance().init(*handle, var_cfg_thread_pool_limit);
 }
 
-void master_service::proc_on_exit()
+void master_service::proc_on_exit(void)
 {
 }

@@ -34,11 +34,11 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 
 //////////////////////////////////////////////////////////////////////////////
 
-master_service::master_service()
+master_service::master_service(void)
 {
 }
 
-master_service::~master_service()
+master_service::~master_service(void)
 {
 }
 
@@ -46,18 +46,17 @@ bool master_service::thread_on_read(acl::socket_stream* conn)
 {
 	acl::string buf;
 
-	if (conn->gets(buf) == false)
-	{
+	if (!conn->gets(buf)) {
 		logger_warn("gets error from %s, fd %d",
 			conn->get_peer(), conn->sock_handle());
 		return false;
-	}
-	else if(conn->format("%s\r\n", buf.c_str()) == -1)
+	} else if(conn->format("%s\r\n", buf.c_str()) == -1) {
 		return false;
-	else if (buf == "quit")
+	} else if (buf == "quit") {
 		return false;
-	else
+	} else {
 		return true;
+	}
 }
 
 bool master_service::thread_on_accept(acl::socket_stream* conn)
@@ -65,8 +64,9 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 	logger("connect from %s, fd: %d", conn->get_peer(true),
 		conn->sock_handle());
 	conn->set_rw_timeout(var_cfg_rw_timeout);
-	if (var_cfg_rw_timeout > 0)
+	if (var_cfg_rw_timeout > 0) {
 		conn->set_tcp_non_blocking(true);
+	}
 	return true;
 }
 
@@ -83,11 +83,11 @@ void master_service::thread_on_close(acl::socket_stream* conn)
 		conn->sock_handle());
 }
 
-void master_service::thread_on_init()
+void master_service::thread_on_init(void)
 {
 }
 
-void master_service::thread_on_exit()
+void master_service::thread_on_exit(void)
 {
 }
 
@@ -96,15 +96,14 @@ void master_service::proc_on_listen(acl::server_socket& ss)
 	logger(">>>listen %s ok<<<", ss.get_addr());
 }
 
-void master_service::proc_on_init()
+void master_service::proc_on_init(void)
 {
 	logger(">>>proc_on_init<<<");
 }
 
 bool master_service::proc_exit_timer(size_t nclients, size_t nthreads)
 {
-	if (nclients == 0)
-	{
+	if (nclients == 0) {
 		logger("clients count: %d, threads count: %d",
 			(int) nclients, (int) nthreads);
 		return true;
@@ -113,7 +112,7 @@ bool master_service::proc_exit_timer(size_t nclients, size_t nthreads)
 	return false;
 }
 
-void master_service::proc_on_exit()
+void master_service::proc_on_exit(void)
 {
 	logger(">>>proc_on_exit<<<");
 }

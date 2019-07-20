@@ -47,13 +47,12 @@ void master_service::on_accept(acl::socket_stream& conn)
 
 	acl::string buf;
 
-	while (true)
-	{
-		if (conn.gets(buf, false) == false)
+	while (true) {
+		if (!conn.gets(buf, false)) {
 			break;
+		}
 
-		if (conn.write(buf) == -1)
-		{
+		if (conn.write(buf) == -1) {
 			logger_error("write error!");
 			break;
 		}

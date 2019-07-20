@@ -22,8 +22,8 @@ extern acl::master_int64_tbl var_conf_int64_tab[];
 class master_service : public acl::master_proc
 {
 public:
-	master_service();
-	~master_service();
+	master_service(void);
+	~master_service(void);
 
 protected:
 	/**
@@ -46,13 +46,13 @@ protected:
 	 * 当进程切换用户身份后调用的回调函数，此函数被调用时，进程
 	 * 的权限为普通受限级别
 	 */
-	void proc_on_init();
+	void proc_on_init(void);
 
 	/**
 	 * @override
 	 * 当进程退出前调用的回调函数
 	 */
-	void proc_on_exit();
+	void proc_on_exit(void);
 
 	/**
 	 * @override

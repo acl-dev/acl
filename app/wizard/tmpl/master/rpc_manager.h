@@ -6,8 +6,8 @@
 class rpc_manager : public acl::singleton<rpc_manager>
 {
 public:
-	rpc_manager();
-	~rpc_manager();
+	rpc_manager(void);
+	~rpc_manager(void);
 
 	/**
 	 * 单例初始化函数

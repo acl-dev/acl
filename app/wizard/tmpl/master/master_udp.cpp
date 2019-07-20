@@ -47,8 +47,9 @@ void master_service::on_read(acl::socket_stream* stream)
 	int   n;
 	char  buf[4096];
 
-	if ((n = stream->read(buf, sizeof(buf), false)) == -1)
+	if ((n = stream->read(buf, sizeof(buf), false)) == -1) {
 		return;
+	}
 
 	logger("read from %s, %d bytes", stream->get_peer(), n);
 	stream->write(buf, n);

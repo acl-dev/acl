@@ -38,26 +38,21 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 class io_callback : public acl::aio_callback
 {
 public:
-	io_callback(acl::aio_socket_stream* client)
-		: client_(client)
-	{
-	}
+	io_callback(acl::aio_socket_stream* client) : client_(client) {}
 
-	~io_callback()
-	{
-	}
+	~io_callback(void) {}
 
 protected:
 	/** 
+	 * @override
 	 * 实现父类中的虚函数，客户端流的读成功回调过程 
 	 * @param data {char*} 读到的数据地址 
 	 * @param len {int} 读到的数据长度 
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流 
 	 */  
-	virtual bool read_callback(char* data, int len)  
+	bool read_callback(char* data, int len)  
 	{
-		if (strncmp(data, "quit", 4) == 0)
-		{
+		if (strncmp(data, "quit", 4) == 0) {
 			// 可以显式调用异步流的关闭过程，也可以直接返回 false
 			// 通知异步框架自动关闭该异步流
 			// client_->close();
@@ -68,28 +63,31 @@ protected:
 	}
 
 	/** 
+	 * @override
 	 * 实现父类中的虚函数，客户端流的写成功回调过程 
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流 
 	 */  
-	virtual bool write_callback()  
+	bool write_callback(void)
 	{
 		return true;  
 	}
 
 	/** 
+	 * @override
 	 * 实现父类中的虚函数，客户端流的关闭回调过程 
 	 */  
-	virtual void close_callback()  
+	void close_callback(void)
 	{
 		// 必须在此处删除该动态分配的回调类对象以防止内存泄露  
 		delete this;  
 	}
 
 	/** 
+	 * @override
 	 * 实现父类中的虚函数，客户端流的超时回调过程 
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流 
 	 */  
-	virtual bool timeout_callback()  
+	bool timeout_callback(void)
 	{
 		// 返回 false 通知异步框架关闭该异步流
 		return false;
@@ -101,11 +99,11 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////
 
-master_service::master_service()
+master_service::master_service(void)
 {
 }
 
-master_service::~master_service()
+master_service::~master_service(void)
 {
 }
 
@@ -151,12 +149,12 @@ void master_service::proc_on_listen(acl::server_socket& ss)
 	logger(">>>listen %s ok<<<", ss.get_addr());
 }
 
-void master_service::proc_on_init()
+void master_service::proc_on_init(void)
 {
 	logger(">>>proc_on_init<<<");
 }
 
-void master_service::proc_on_exit()
+void master_service::proc_on_exit(void)
 {
 	logger(">>>proc_on_exit<<<");
 }

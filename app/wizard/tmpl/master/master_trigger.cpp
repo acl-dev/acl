@@ -34,25 +34,25 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 
 //////////////////////////////////////////////////////////////////////////////
 
-master_service::master_service()
+master_service::master_service(void)
 {
 }
 
-master_service::~master_service()
+master_service::~master_service(void)
 {
 }
 
-void master_service::on_trigger()
+void master_service::on_trigger(void)
 {
 	logger("trigger now!");
 }
 
-void master_service::proc_on_init()
+void master_service::proc_on_init(void)
 {
 	logger(">>>proc_on_init<<<");
 }
 
-void master_service::proc_on_exit()
+void master_service::proc_on_exit(void)
 {
 	logger(">>>proc_on_exit<<<");
 }
