@@ -4,7 +4,7 @@
 http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session)
 : acl::HttpServlet(stream, session)
 {
-	handlers_["/hello"] = &http_servlet::on_hello;
+	handlers_["/hello/"] = &http_servlet::on_hello;
 }
 
 http_servlet::~http_servlet(void)
