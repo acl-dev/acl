@@ -37,11 +37,18 @@ static void test_json(void)
 {
 	ACL_JSON *json = acl_json_alloc();
 	const char* ptr = default_data;
+	ACL_VSTRING *buf = acl_vstring_alloc(1024);
 
 	ptr = acl_json_update(json, ptr);
 	printf("finish: %s, left char: %s\r\n",
 		acl_json_finish(json) ? "yes" : "no", ptr);
+
+	acl_json_build(json, buf);
 	acl_json_free(json);
+
+	printf("\r\n%s\r\n", default_data);
+	printf("\r\n%s\r\n", acl_vstring_str(buf));
+	acl_vstring_free(buf);
 }
 
 int main(void)
