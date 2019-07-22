@@ -1,4 +1,4 @@
-%define release_id 4
+%define release_id 5
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -15,7 +15,7 @@ Source:         http://example.com/%{name}-%{version}.tar.gz
 
 %description
 
-One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IOS http://zsxxsz.iteye.com/.
+One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IOS http://blog.csdn.net/zsxxsz/.
 
 %package -n acl-master
 Summary: acl master framework
@@ -132,6 +132,12 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Mon Jul 22 2019 shuxin.zheng@qq.com 3.5.0-5-20190722.15
+- workaroud: format c++ code style
+- compile: compiling with the minimal lib size for mobile client
+- feature: add http_aclient supporting async HTTP+Websocket+SSL
+- http module: more powerful and more feature supporting
 
 * Mon May 20 2019 shuxin.zheng@qq.com 3.5.0-4-20190520.11
 - optimize package size for Mobile by adding optional compiling
