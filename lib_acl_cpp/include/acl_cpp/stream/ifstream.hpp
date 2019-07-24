@@ -25,6 +25,7 @@ public:
 	 * @return {bool} 是否成功
 	 */
 	bool load(string* s);
+	bool load(string& s);
 
 	/**
 	 * 加载文件中的数据至用户指定缓冲区, 该函数是静态成员变量，
@@ -34,6 +35,7 @@ public:
 	 * @return {bool} 是否成功
 	 */
 	static bool load(const char* path, string* s);
+	static bool load(const char* path, string& s);
 };
 
 } // namespace acl

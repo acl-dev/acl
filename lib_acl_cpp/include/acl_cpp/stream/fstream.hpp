@@ -99,6 +99,13 @@ public:
 	__int64 fsize(void) const;
 
 	/**
+	 * 静态方法用于获取指定文件的文件大小
+	 * @param path {const char*} 非空字符串指定文件路径
+	 * @return {__int64} 正常时返回值 >= 0，出错时返回 -1
+	 */
+	static __int64 fsize(const char* path);
+
+	/**
 	 * 返回系统文件句柄
 	 * @return 系统文件句柄，出错时返回 ACL_FILE_INVALID
 	 */
@@ -109,6 +116,7 @@ public:
 	long long int ftell(void);
 	bool ftruncate(long long int length);
 	long long int fsize(void) const;
+	static long long int fsize(const char* path);
 	int file_handle(void) const;
 #endif
 	/**

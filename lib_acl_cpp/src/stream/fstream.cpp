@@ -176,6 +176,11 @@ acl_int64 fstream::fsize(void) const
 	return acl_vstream_fsize(stream_);
 }
 
+acl_int64 fstream::fsize(const char* path)
+{
+	return acl_file_size(path);
+}
+
 ACL_FILE_HANDLE fstream::file_handle(void) const
 {
 	return ACL_VSTREAM_FILE(stream_);

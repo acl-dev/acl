@@ -35,6 +35,11 @@ bool ifstream::load(acl::string* s)
 	return true;
 }
 
+bool ifstream::load(acl::string& s)
+{
+	return load(&s);
+}
+
 bool ifstream::load(const char* path, acl::string* s)
 {
 	acl::ifstream fp;
@@ -42,6 +47,11 @@ bool ifstream::load(const char* path, acl::string* s)
 		return false;
 	}
 	return fp.load(s);
+}
+
+bool ifstream::load(const char* path, acl::string& s)
+{
+	return load(path, &s);
 }
 
 } // namespace acl

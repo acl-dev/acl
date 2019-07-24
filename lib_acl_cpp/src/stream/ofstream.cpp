@@ -13,9 +13,13 @@ ofstream::~ofstream(void)
 {
 }
 
-bool ofstream::open_write(const char* path)
+bool ofstream::open_write(const char* path, bool otrunc /* = true */)
 {
-	return open(path, O_WRONLY | O_TRUNC | O_CREAT, 0600);
+	if (otrunc) {
+		return open(path, O_WRONLY | O_TRUNC | O_CREAT, 0600);
+	} else {
+		return open(path, O_WRONLY | O_CREAT, 0600);
+	}
 }
 
 bool ofstream::open_append(const char* path)
