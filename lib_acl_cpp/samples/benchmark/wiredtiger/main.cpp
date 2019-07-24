@@ -157,7 +157,7 @@ private:
 
 	void add(wdb_sess& sess, long long max) {
 		acl::string key, value;
-		long long i;
+		long long i, n;
 
 		struct timeval begin;
 		gettimeofday(&begin, NULL);
@@ -170,6 +170,13 @@ private:
 				printf("add failed, key=%s, value=%s\r\n",
 					key.c_str(), value.c_str());
 				break;
+			}
+			n = ++__count;
+			if (i % __inter == 0) {
+				char buf[128];
+				snprintf(buf, sizeof(buf), "i=%lld, count=%lld, value=%s",
+					i, n, value.c_str());
+				acl::meter_time(__FILE__, __LINE__, buf);
 			}
 		}
 
