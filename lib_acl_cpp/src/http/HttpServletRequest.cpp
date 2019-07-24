@@ -486,8 +486,8 @@ bool HttpServletRequest::getJson(json& out, size_t body_limit /* 1024000 */)
 	char buf[8192];
 
 	while (dlen > 0) {
-		n = (ssize_t) sizeof(buf) - 1 > dlen ?
-			dlen : (ssize_t) sizeof(buf) - 1;
+		n = (ssize_t) sizeof(buf) - 1 > (ssize_t) dlen ?
+			(ssize_t) dlen : (ssize_t) sizeof(buf) - 1;
 		n = in.read(buf, (size_t) n);
 		if (n == -1) {
 			return false;
@@ -541,8 +541,8 @@ bool HttpServletRequest::getXml(xml& out, size_t body_limit /* 1024000 */)
 	char buf[8192];
 
 	while (dlen > 0) {
-		n = (ssize_t) sizeof(buf) - 1 > dlen ?
-			dlen : (ssize_t) sizeof(buf) - 1;
+		n = (ssize_t) sizeof(buf) - 1 > (ssize_t) dlen ?
+			(ssize_t) dlen : (ssize_t) sizeof(buf) - 1;
 		n = in.read(buf, (size_t) n);
 		if (n == -1) {
 			return false;
@@ -585,7 +585,7 @@ bool HttpServletRequest::getBody(string& out, size_t body_limit /* 1024000 */)
 		return false;
 	}
 
-	out.space(dlen + 1);
+	out.space((size_t) dlen + 1);
 	body_parsed_ = true;
 	istream& in  = getInputStream();
 
@@ -593,8 +593,8 @@ bool HttpServletRequest::getBody(string& out, size_t body_limit /* 1024000 */)
 	char buf[8192];
 
 	while (dlen > 0) {
-		n = (ssize_t) sizeof(buf) - 1 > dlen ?
-			dlen : (ssize_t) sizeof(buf) - 1;
+		n = (ssize_t) sizeof(buf) - 1 > (ssize_t) dlen ?
+			(ssize_t) dlen : (ssize_t) sizeof(buf) - 1;
 		n = in.read(buf, (size_t) n);
 		if (n == -1) {
 			return false;
@@ -619,7 +619,7 @@ string* HttpServletRequest::getBody(size_t body_limit /* 1024000*/)
 		return NULL;
 	}
 
-	body_ = NEW string(dlen + 1);
+	body_ = NEW string((size_t) dlen + 1);
 	if (getBody(*body_)) {
 		return body_;
 	} else {
