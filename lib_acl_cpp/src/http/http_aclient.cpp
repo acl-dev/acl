@@ -554,7 +554,7 @@ void http_aclient::send_request(const void* body, size_t len)
 {
 	http_method_t method = header_->get_method();
 	if (body && len > 0 && method != HTTP_METHOD_POST
-		&& method != HTTP_METHOD_PUT) {
+		&& method != HTTP_METHOD_PUT && method != HTTP_METHOD_PATCH) {
 
 		header_->set_content_length(len);
 		header_->set_method(HTTP_METHOD_POST);
