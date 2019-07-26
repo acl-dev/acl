@@ -362,7 +362,8 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	if (!libssl_path.empty() && !access(libssl_path.c_str(), R_OK)) {
+	if (!libssl_path.empty()
+		&& !access(libssl_path.c_str(), R_OK)) {
 		// ÉèÖÃ libpolarssl.so ¿âÈ«Â·¾¶
 		acl::polarssl_conf::set_libpath(libssl_path);
 

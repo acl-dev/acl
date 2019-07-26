@@ -54,7 +54,9 @@ void CAddBOM::ScanAdd(void)
 	const char* pFile;
 	while ((pFile = scan.next_file(true)) != NULL) {
 		acl::string path(pFile);
-		if (path.end_with(".c") || path.end_with(".h") ||
+		if (path.end_with("resource.h", false)) {
+			logger(">>skip file: %s", pFile);
+		} else if (path.end_with(".c") || path.end_with(".h") ||
 			path.end_with(".cpp") || path.end_with(".cxx") ||
 			path.end_with(".hpp") || path.end_with(".hxx") ||
 			path.end_with(".java") || path.end_with(".txt") ||
