@@ -333,7 +333,7 @@ bool http_request::request(const void* data, size_t len)
 	if (data && len > 0) {
 		header_.set_content_length(len);
 
-		if (method != HTTP_METHOD_POST && method != HTTP_METHOD_PUT) {
+		if (method != HTTP_METHOD_POST && method != HTTP_METHOD_PUT && method != HTTP_METHOD_PATCH) {
 			// 在有数据体的条件下，重新设置 HTTP 请求方法
 			header_.set_method(HTTP_METHOD_POST);
 		}
