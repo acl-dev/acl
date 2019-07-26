@@ -1,5 +1,9 @@
 修改历史列表：
 
+658) 2019.7.26
+658.1) bugfix: acl_vstream.c 中 acl_vstream_clean_close_handle() 函数有存在死
+循环问题 -- by liqiang
+
 657) 2019.7.9
 657.1) performance: acl_vstream_read_peek3 支持根据缓冲区空间大小动态决定是否
 将数据直接读到用户缓冲区中以减少数据拷贝次数

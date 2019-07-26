@@ -3460,7 +3460,7 @@ void acl_vstream_clean_close_handle(ACL_VSTREAM *fp)
 	 * 这样对动态数组的使用的效率才会比较高, 
 	 * 避免了动态数组内部移动的情况
 	 */
-	for (i = n - 1; i >= 0; i++) {
+	for (i = n - 1; i >= 0; i--) {
 		close_handle = (ACL_VSTREAM_CLOSE_HANDLE *)
 			acl_array_index(fp->close_handle_lnk, i);
 		acl_array_delete_idx(fp->close_handle_lnk, i, NULL);
