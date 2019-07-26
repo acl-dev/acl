@@ -329,7 +329,12 @@ const char *acl_scan_dir_next(ACL_SCAN_DIR *scan)
 		acl_set_error(0);
 		dp = readdir(info->dir_name);
 		if (dp == NULL) {
-			if (acl_last_error() != 0) {
+			int err = acl_last_error();
+#ifdef ACL_WINDOWS
+			if (err != 0 && err != ERROR_NO_MORE_FILES) {
+#else
+			if (err != 0) {
+#endif
 				acl_msg_error("%s(%d), %s: readdir error=%s, "
 					"name=%s", __FILE__, __LINE__, myname,
 					acl_last_serror(), info->path);

@@ -8,6 +8,7 @@
 #include "IdxTrans.h"
 #include "JencodeDlg.h"
 #include "DelBOM.h"
+#include "AddBOM.h"
 #include "JencodeDlg.h"
 #include ".\jencodedlg.h"
 
@@ -83,6 +84,7 @@ BEGIN_MESSAGE_MAP(CJencodeDlg, CDialog)
 	ON_BN_CLICKED(IDC_TRANS_IDX, OnBnClickedTransIdx)
 	ON_BN_CLICKED(IDC_DEL_BOM, OnBnClickedDelBom)
 	ON_BN_CLICKED(IDC_BUTTON_GB2UNI, &CJencodeDlg::OnBnClickedButtonGb2uni)
+	ON_BN_CLICKED(IDC_ADD_BOM, &CJencodeDlg::OnBnClickedAddBom)
 END_MESSAGE_MAP()
 
 
@@ -117,7 +119,9 @@ BOOL CJencodeDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 
-	acl_msg_open("jencode.log", "jencode");
+	acl::log::open("jencode.log", "jencode");
+	logger("started!");
+
 	//freopen("CONOUT$","w+t",stdout);
 	// 添加状态栏
 	int aWidths[2] = {50, -1};
@@ -185,6 +189,7 @@ void CJencodeDlg::ButtonsEnable(void)
 	GetDlgItem(IDC_ACL_TRANS)->EnableWindow(TRUE);
 	GetDlgItem(IDC_ACL_RESTORE)->EnableWindow(TRUE);
 	GetDlgItem(IDC_DEL_BOM)->EnableWindow(TRUE);
+	GetDlgItem(IDC_ADD_BOM)->EnableWindow(TRUE);
 }
 
 BOOL CJencodeDlg::CheckPath(void)
@@ -217,6 +222,7 @@ void CJencodeDlg::ButtonsDisable(void)
 	GetDlgItem(IDC_ACL_TRANS)->EnableWindow(FALSE);
 	GetDlgItem(IDC_ACL_RESTORE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_DEL_BOM)->EnableWindow(FALSE);
+	GetDlgItem(IDC_ADD_BOM)->EnableWindow(FALSE);
 }
 
 void CJencodeDlg::OnBnClickedButtonGb2utf()
@@ -398,10 +404,26 @@ void CJencodeDlg::OnBnClickedDelBom()
 		return;
 
 	static CDelBOM delBom;
-
 	delBom.Init(this->GetSafeHwnd(), m_sPath);
 	delBom.OnDeleted(WM_USER_TRANS_OVER);
-	delBom.Run();
+	delBom.start();
+
+	m_wndStatus.SetText("运行", 0, 0);
+	m_nBegin = time(NULL);
+	ButtonsDisable();
+}
+
+void CJencodeDlg::OnBnClickedAddBom()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (!CheckPath())
+		return;
+
+	static CAddBOM addBom;
+	addBom.Init(this->GetSafeHwnd(), m_sPath);
+	addBom.OnAdded(WM_USER_TRANS_OVER);
+	addBom.start();
+
 	m_wndStatus.SetText("运行", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();

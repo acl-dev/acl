@@ -123,6 +123,7 @@ copy ..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir) /Y</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AclTrans.cpp" />
+    <ClCompile Include="AddBOM.cpp" />
     <ClCompile Include="DelBOM.cpp" />
     <ClCompile Include="Gb2Utf8.cpp" />
     <ClCompile Include="IdxTrans.cpp" />
@@ -135,6 +136,7 @@ copy ..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir) /Y</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AclTrans.h" />
+    <ClInclude Include="AddBOM.h" />
     <ClInclude Include="DelBOM.h" />
     <ClInclude Include="Gb2Utf8.h" />
     <ClInclude Include="IdxTrans.h" />

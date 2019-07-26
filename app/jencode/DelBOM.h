@@ -1,15 +1,18 @@
 #pragma once
 
-class CDelBOM
+class CDelBOM : public acl::thread
 {
 public:
 	CDelBOM(void);
 	~CDelBOM(void);
 
 	void Init(HWND hWnd, CString &sPath);
-	void Run(void);
 	void OnDeleting(int nMsg);
 	void OnDeleted(int nMsg);
+
+protected:
+	// @override
+	void *run(void);
 
 private:
 	HWND m_hWnd;
@@ -17,7 +20,7 @@ private:
 	int  m_nMsgDeleting;
 	int  m_nMsgDeleted;
 
-	bool DeleteBOM(CString& filePath);
-	static void *RunThread(void *arg);
+	void ScanDel(void);
+	bool DeleteBOM(const acl::string& filePath);
 };
 
