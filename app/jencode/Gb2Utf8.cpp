@@ -21,7 +21,7 @@ CGb2Utf8::CGb2Utf8(HWND hWnd, CString &sPath, CString &dPath)
 
 void CGb2Utf8::Init(HWND hWnd, CString &sPath, CString &dPath)
 {
-	m_hWnd =hWnd;
+	m_hWnd  = hWnd;
 	m_sPath = sPath;
 	m_dPath = dPath;
 }
@@ -36,106 +36,79 @@ void CGb2Utf8::OnTransEnd(int nMsg)
 	m_nMsgTransEnd = nMsg;
 }
 
-int CGb2Utf8::TransformPath(CString *path_from, CString *path_to)
+bool CGb2Utf8::TransformPath(const char *path_from, const char *path_to)
 {
-	ACL_SCAN_DIR *scan_src; //, *scan_dst;
-	const char *path = path_from->GetString();
-
-	scan_src = acl_scan_dir_open(path, 1);
-	if (scan_src == NULL) {
+	acl::scan_dir scan;
+	if (!scan.open(path_from)) {
 		CString msg;
-
-		msg.Format("Open src path %s error", path_from->GetString());
+		msg.Format("Open src path %s error", path_from);
 		MessageBox(NULL, msg, "Open path", 0);
-		return (-1);
+		return false;
 	}
-	//scan_dst = acl_scan_dir_open(to.GetString(), 1);
-	//if (scan_dst == NULL) {
-	//	MessageBox(NULL, "Open path", "Open dst path error", 0);
-	//	return (-1);
-	//}
 
-	while (1)
-	{
-		const char *fName;
-		CString fPath;
+	const char* pFile;
+	while ((pFile = scan.next_file(true)) != NULL) {
+		acl::string path(pFile);
 
-		fName = acl_scan_dir_next_file(scan_src);
-		if (fName == NULL)
-			break;
-		fPath = acl_scan_dir_path(scan_src);
-		fPath += "\\";
-		fPath += fName;
-		TransformFile(fPath.GetString(), NULL);
+		if (path.end_with(".c") || path.end_with(".h") ||
+			path.end_with(".cpp") || path.end_with(".cxx") ||
+			path.end_with(".hpp") || path.end_with(".hxx") ||
+			path.end_with(".java") || path.end_with(".txt") ||
+			path.end_with(".php") || path.end_with(".html") ||
+			path.end_with(".js") || path.end_with(".css") ||
+			path.end_with(".d") || path.end_with(".py") ||
+			path.end_with(".perl") || path.end_with(".cs") ||
+			path.end_with(".as") || path.end_with(".go") ||
+			path.end_with(".rust") || path.end_with(".erl")) {
+
+			TransformFile(pFile, pFile);
+		} else {
+			logger(">>skip file: %s", pFile);
+		}
 	}
-	acl_scan_dir_close(scan_src);
-	return (0);
+	return true;
 }
 
-int CGb2Utf8::TransformFile(const char *pFrom, const char *pTo)
+bool CGb2Utf8::TransformFile(const char *pFrom, const char *pTo)
 {
-	char *sBuf = NULL;
-	size_t iLen;
-
-#undef RETURN
-#define RETURN(_x_) do \
-{ \
-	if (sBuf) \
-		acl_myfree(sBuf); \
-	return(_x_); \
-} while(0);
-
-	sBuf = acl_vstream_loadfile(pFrom);
-	if (sBuf == NULL)
-		RETURN (-1);
-	if (*sBuf == 0)
-		RETURN (-1);
-
-	iLen = strlen(sBuf);
+	acl::string sBuf;
+	if (!acl::ifstream::load(pFrom, sBuf)) {
+		logger_error("load from %s error %s", pFrom, acl::last_serror());
+		return false;
+	}
 
 	acl::charset_conv conv;
-	acl::string buf;
-	if (conv.convert(m_fromCharset.GetString(), m_toCharset.GetString(),
-		sBuf, iLen, &buf) == false)
-	{
+	acl::string tBuf;
+	if (!conv.convert(m_fromCharset.GetString(), m_toCharset.GetString(),
+		sBuf.c_str(), sBuf.size(), &tBuf)) {
+
 		logger_error("conver from %s to %s error: %s, file: %s",
 			m_fromCharset.GetString(), m_toCharset.GetString(),
 			conv.serror(), pFrom);
-		RETURN (-1);
+		return false;
 	}
 
-	ACL_VSTREAM *fp;
-	fp = acl_vstream_fopen(pFrom, O_RDWR | O_TRUNC | O_BINARY /* | O_APPEND */,
-		0600, 1024);
-	if (fp == NULL)
-	{
-		logger_error("open %s error %s", pFrom, acl::last_serror());
-		RETURN (-1);
+	acl::ofstream fp;
+	if (!fp.open_write(pTo, true)) {
+		logger_error("open %s error %s", pTo, acl::last_serror());
+		return false;
 	}
- 	int ret = acl_vstream_writen(fp, buf.c_str(), buf.length());
-	acl_vstream_close(fp);
-	if (ret == ACL_VSTREAM_EOF)
-		logger_error("write to %s error %s", pFrom, acl::last_serror());
-	else
+	if (fp.write(tBuf) != (int) tBuf.size()) {
+		logger_error("write to %s error %s", pTo, acl::last_serror());
+	} else {
 		logger("transer from %s to %s ok, file: %s",
-			m_fromCharset.GetString(), m_toCharset.GetString(), pFrom);
-	RETURN (ret == ACL_VSTREAM_EOF ? -1 : 0);
+			m_fromCharset.GetString(), m_toCharset.GetString(), pTo);
+	}
+	return true;
 }
 
-void *CGb2Utf8::RunThread(void *arg)
+void *CGb2Utf8::run(void)
 {
-	CGb2Utf8 *pGb2Utf8 = (CGb2Utf8*) arg;
-
-	pGb2Utf8->TransformPath(&pGb2Utf8->m_sPath, &pGb2Utf8->m_dPath);
-	::PostMessage(pGb2Utf8->m_hWnd, pGb2Utf8->m_nMsgTransEnd, 0, 0);
+	if (m_dPath.IsEmpty() || m_sPath.IsEmpty()) {
+		return NULL;
+	}
+	TransformPath(m_sPath, m_dPath);
+	::PostMessage(m_hWnd, m_nMsgTransEnd, 0, 0);
 	return NULL;
 }
 
-void CGb2Utf8::Run(void)
-{
-	acl_pthread_t tid;
-
-	if (m_dPath.GetLength() == 0 || m_sPath.GetLength() == 0)
-		return;
-	acl_pthread_create(&tid, NULL, RunThread, this);
-}

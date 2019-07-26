@@ -2,8 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by lib_acl.rc
 
-// 新对象的下一些默认值
-// 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        101
