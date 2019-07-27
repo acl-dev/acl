@@ -5,11 +5,11 @@ service $<PROGRAM>
 	master_disable = no
 #	服务地址及端口号
 #	for master_type = inet
-#	master_service = 127.0.0.1:5001
+#	master_service = 127.0.0.1|5001
 #	for master_type = unix
 #	master_service = echo.sock
 #	for master_type = sock
-	master_service = 127.0.0.1:5001, 5002, :5003, echo.sock, echo2.sock
+	master_service = 127.0.0.1|5001, 5002, |5003, echo.sock, echo2.sock
 
 #	服务监听为域套接口
 #	master_service = aio_echo.sock
@@ -54,7 +54,7 @@ service $<PROGRAM>
 #	进程程序名
 	master_command = $<PROGRAM>
 #	进程日志记录文件
-	master_log = {install_path}/var/log/$<PROGRAM>
+	master_log = {install_path}/var/log/$<PROGRAM>.log
 #	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2
 #	master_debug =
 #	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
